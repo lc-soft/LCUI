@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Button.h -- LCUI��s Button widget
+ * LCUI_Button.h -- LCUI‘s Button widget
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,59 +21,59 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Button.h -- LCUI �İ�ť����
+ * LCUI_Button.h -- LCUI 的按钮部件
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #ifndef __LCUI_BUTTON_H__
 #define __LCUI_BUTTON_H__
 typedef struct _LCUI_Button LCUI_Button;
 
-/***********************��ť**************************/
+/***********************按钮**************************/
 struct _LCUI_Button
 {
-	LCUI_Graph		image;			/* �ڰ�ť����ʾ��ͼ�� */
+	LCUI_Graph		image;			/* 在按钮上显示的图像 */
 	
-	/* �����ΪCustom_Style(�Զ���)ʱ�������ݰ�ť��״̬ʹ����Щͼ�� */
-	LCUI_Graph		btn_normal;		/* ��ͨ״̬ */
-	LCUI_Graph		btn_over;		/* ����긲�� */
-	LCUI_Graph		btn_down;		/* ����״̬ */
-	LCUI_Graph		btn_focus;		/* ����״̬ */
-	LCUI_Graph		btn_disable;	/* �����õ�״̬ */
+	/* 当风格为Custom_Style(自定义)时，将根据按钮的状态使用这些图形 */
+	LCUI_Graph		btn_normal;		/* 普通状态 */
+	LCUI_Graph		btn_over;		/* 被鼠标覆盖 */
+	LCUI_Graph		btn_down;		/* 按下状态 */
+	LCUI_Graph		btn_focus;		/* 焦点状态 */
+	LCUI_Graph		btn_disable;	/* 不可用的状态 */
 	
-	LCUI_Align		image_align;	/* �ڰ�ť����ʾ��ͼ��Ķ��뷽ʽ */
+	LCUI_Align		image_align;	/* 在按钮上显示的图像的对齐方式 */
 	
-	int				text_image_relation; /* ��ť��ͼ�����ı������λ�� */
+	int				text_image_relation; /* 按钮上图像与文本的相对位置 */
 	
-	LCUI_Widget		*label;	/* Ƕ�׵��ı���ǩ */
+	LCUI_Widget		*label;	/* 嵌套的文本标签 */
 };
 /****************************************************/
 
 LCUI_Widget *Get_Button_Label(LCUI_Widget *widget);
-/* ���ܣ���ȡǶ���ڰ�ť�������label���� */ 
+/* 功能：获取嵌套在按钮部件里的label部件 */ 
 
 void Custom_Button_Style(	LCUI_Widget *widget, LCUI_Graph *normal, 
 							LCUI_Graph *over, LCUI_Graph *down, 
 							LCUI_Graph *focus, LCUI_Graph *disable);
-/* ���ܣ��Զ��尴ť�ڸ���״̬����ʾ��λͼ */ 
+/* 功能：自定义按钮在各种状态下显示的位图 */ 
 
 void Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...);
-/* ���ܣ��趨��ť������ʾ���ı����� */ 
+/* 功能：设定按钮部件显示的文本内容 */ 
 
 LCUI_Widget *Create_Button_With_Text(const char *fmt, ...);
-/* ���ܣ�����һ�����ı����ݵİ�ť */ 
+/* 功能：创建一个带文本内容的按钮 */ 
 #endif

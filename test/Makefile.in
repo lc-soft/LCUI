@@ -34,7 +34,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = helloworld$(EXEEXT) test_progressbar$(EXEEXT) \
+noinst_PROGRAMS = helloworld$(EXEEXT) test_radiobtn$(EXEEXT) \
+	test_checkbox$(EXEEXT) test_progressbar$(EXEEXT) \
 	test_button$(EXEEXT) test_label$(EXEEXT) test_loading$(EXEEXT) \
 	ts_calibrate$(EXEEXT) test_viewimage$(EXEEXT)
 subdir = test
@@ -54,6 +55,9 @@ helloworld_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_button_OBJECTS = test_button.$(OBJEXT)
 test_button_OBJECTS = $(am_test_button_OBJECTS)
 test_button_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_test_checkbox_OBJECTS = test_checkbox.$(OBJEXT)
+test_checkbox_OBJECTS = $(am_test_checkbox_OBJECTS)
+test_checkbox_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_label_OBJECTS = test_label.$(OBJEXT)
 test_label_OBJECTS = $(am_test_label_OBJECTS)
 test_label_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -63,6 +67,9 @@ test_loading_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_progressbar_OBJECTS = test_progressbar.$(OBJEXT)
 test_progressbar_OBJECTS = $(am_test_progressbar_OBJECTS)
 test_progressbar_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_test_radiobtn_OBJECTS = test_radiobtn.$(OBJEXT)
+test_radiobtn_OBJECTS = $(am_test_radiobtn_OBJECTS)
+test_radiobtn_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_viewimage_OBJECTS = test_viewimage.$(OBJEXT)
 test_viewimage_OBJECTS = $(am_test_viewimage_OBJECTS)
 test_viewimage_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -83,12 +90,14 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(helloworld_SOURCES) $(test_button_SOURCES) \
-	$(test_label_SOURCES) $(test_loading_SOURCES) \
-	$(test_progressbar_SOURCES) $(test_viewimage_SOURCES) \
+	$(test_checkbox_SOURCES) $(test_label_SOURCES) \
+	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
+	$(test_radiobtn_SOURCES) $(test_viewimage_SOURCES) \
 	$(ts_calibrate_SOURCES)
 DIST_SOURCES = $(helloworld_SOURCES) $(test_button_SOURCES) \
-	$(test_label_SOURCES) $(test_loading_SOURCES) \
-	$(test_progressbar_SOURCES) $(test_viewimage_SOURCES) \
+	$(test_checkbox_SOURCES) $(test_label_SOURCES) \
+	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
+	$(test_radiobtn_SOURCES) $(test_viewimage_SOURCES) \
 	$(ts_calibrate_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -219,6 +228,10 @@ test_loading_SOURCES = test_loading.c
 test_loading_LDADD = $(top_builddir)/src/libLCUI.la
 test_button_SOURCES = test_button.c
 test_button_LDADD = $(top_builddir)/src/libLCUI.la
+test_radiobtn_SOURCES = test_radiobtn.c
+test_radiobtn_LDADD = $(top_builddir)/src/libLCUI.la
+test_checkbox_SOURCES = test_checkbox.c
+test_checkbox_LDADD = $(top_builddir)/src/libLCUI.la
 ts_calibrate_SOURCES = ts_calibrate.c
 ts_calibrate_LDADD = $(top_builddir)/src/libLCUI.la
 test_viewimage_SOURCES = test_viewimage.c
@@ -272,6 +285,9 @@ helloworld$(EXEEXT): $(helloworld_OBJECTS) $(helloworld_DEPENDENCIES)
 test_button$(EXEEXT): $(test_button_OBJECTS) $(test_button_DEPENDENCIES) 
 	@rm -f test_button$(EXEEXT)
 	$(LINK) $(test_button_OBJECTS) $(test_button_LDADD) $(LIBS)
+test_checkbox$(EXEEXT): $(test_checkbox_OBJECTS) $(test_checkbox_DEPENDENCIES) 
+	@rm -f test_checkbox$(EXEEXT)
+	$(LINK) $(test_checkbox_OBJECTS) $(test_checkbox_LDADD) $(LIBS)
 test_label$(EXEEXT): $(test_label_OBJECTS) $(test_label_DEPENDENCIES) 
 	@rm -f test_label$(EXEEXT)
 	$(LINK) $(test_label_OBJECTS) $(test_label_LDADD) $(LIBS)
@@ -281,6 +297,9 @@ test_loading$(EXEEXT): $(test_loading_OBJECTS) $(test_loading_DEPENDENCIES)
 test_progressbar$(EXEEXT): $(test_progressbar_OBJECTS) $(test_progressbar_DEPENDENCIES) 
 	@rm -f test_progressbar$(EXEEXT)
 	$(LINK) $(test_progressbar_OBJECTS) $(test_progressbar_LDADD) $(LIBS)
+test_radiobtn$(EXEEXT): $(test_radiobtn_OBJECTS) $(test_radiobtn_DEPENDENCIES) 
+	@rm -f test_radiobtn$(EXEEXT)
+	$(LINK) $(test_radiobtn_OBJECTS) $(test_radiobtn_LDADD) $(LIBS)
 test_viewimage$(EXEEXT): $(test_viewimage_OBJECTS) $(test_viewimage_DEPENDENCIES) 
 	@rm -f test_viewimage$(EXEEXT)
 	$(LINK) $(test_viewimage_OBJECTS) $(test_viewimage_LDADD) $(LIBS)
@@ -296,9 +315,11 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helloworld.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_button.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_checkbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_label.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_loading.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_progressbar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_radiobtn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_viewimage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ts_calibrate.Po@am__quote@
 
