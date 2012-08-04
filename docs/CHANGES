@@ -1,0 +1,22 @@
+
+CHANGES BETWEEN 0.12.3 and 0.12.4
+
+    - corrected the graphical display problems of the widget nesting. 
+    - the graphical display method has been changed, in theory,
+      graphics refresh rate will be enhanced.
+	- some functions and data structures has been modified.
+	- add the RadioButton widget and CheckBox widget.
+	- the event mechanism has been modified, add mouse move / click 
+	  event and widget drag event.
+	- add graphics data read-write lock function to protect data, 
+	  prevent multiple threads simultaneously read / write.
+	- the header file has been modified, use LCUI library function, 
+	  you may need to include the appropriate header file.
+	- the graphical output function has been modified, not only 
+	  support 24 and 32-bit color, but also support on other color 
+	  monitor to display graphics.
+	- some source file has been merged.
+	- configure.ac and the README file has been modified.
+	
+======================================================================
+
