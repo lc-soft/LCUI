@@ -340,12 +340,12 @@ static void Print_LCUI_Copyright_Text()
 /* 功能：打印LCUI的信息 */
 {
 	printf(
-	"==========| LCUI v0.12.4 |==========\n"
+	"============| LCUI v0.12.4 |============\n"
 	"Copyright (C) 2012 Liu Chao.\n"
 	"Licensed under GPLv2.\n"
 	"Report bugs to <lc-soft@live.cn>.\n"
 	"Project Homepage: www.lcui.org.\n"
-	"====================================\n"
+	"========================================\n"
 	);
 }
 
@@ -455,11 +455,10 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 			for (x = 0; x < pic->width; ++x, ++n)
 			{
 				count = k + x;//count = 3 * (k + x); 
-				count *= 3;
+				count = (count << 1) + count;
 				dest[count] = pic->rgba[2][n];
 				dest[count + 1] = pic->rgba[1][n];
 				dest[count + 2] = pic->rgba[0][n];
-				++n;
 			}
 		}
 		break;
@@ -469,17 +468,18 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 		 * 低字节的前5位用来表示B(BLUE)
 		 * 低字节的后三位+高字节的前三位用来表示G(Green)
 		 * 高字节的后5位用来表示R(RED)
-		 * */ 
+		 * */  
 		for (n=0, y = 0; y < pic->height; ++y)
 		{
 			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
 			for (x = 0; x < pic->width; ++x, ++n)
 			{
-				count = k + x;//count = 2 * (k + x); 
-				count <<= 1;
-				dest[count] = ((pic->rgba[1][n] & 0x1c)<<3)+((pic->rgba[2][n] & 0xf8)>>3);
-				dest[count+1] = ((pic->rgba[0][n] & 0xf8))+((pic->rgba[1][n] & 0xe0)>>5);
-				++n;
+				count = (k + x) << 1;//count = 2 * (k + x);
+				temp1 = pic->rgba[0][n];
+				temp2 = pic->rgba[2][n];
+				temp3 = pic->rgba[1][n];
+				dest[count] = ((temp3 & 0x1c)<<3)+((temp2 & 0xf8)>>3);
+				dest[count+1] = ((temp1 & 0xf8))+((temp3 & 0xe0)>>5);
 			}
 		}
 		break;
@@ -771,21 +771,67 @@ static void LCUI_IO_Init()
 	
 	LCUI_Sys.ts.status = REMOVE;
 	LCUI_Sys.ts.thread = 0;
-	LCUI_Sys.ts.td = NULL;
-	nobuff_print("checking touchscreen support...");
-	result = Check_TouchScreen_Support();
-	if(result == 0)
-	{
-		printf("yes\n");
-		/* 启用触屏输入处理 */
-		nobuff_print("enable touchscreen input..."); 
-		result = Enable_TouchScreen_Input(); 
-		if(result == 0) printf("success\n");
-		else printf("fail\n");
-	}
-	else printf("no\n");
+	LCUI_Sys.ts.td = NULL; 
+	/* 启用触屏输入处理 */
+	printf("enable touchscreen input processing\n"); 
+	Enable_TouchScreen_Input();  
 	
 	Enable_Key_Input();
+}
+
+static void print_screeninfo(
+			struct fb_var_screeninfo fb_vinfo,
+			struct fb_fix_screeninfo fb_fix
+)
+/* 功能：打印屏幕相关的信息 */
+{
+	char visual[256], type[256];
+	
+	switch(fb_fix.type)
+	{
+		case FB_TYPE_PACKED_PIXELS:	strcpy(type, "packed pixels");break;
+		case FB_TYPE_PLANES:		strcpy(type, "non interleaved planes");break;
+		case FB_TYPE_INTERLEAVED_PLANES:	strcpy(type, "interleaved planes");break;
+		case FB_TYPE_TEXT:					strcpy(type, "text/attributes");break;
+		case FB_TYPE_VGA_PLANES:			strcpy(type, "EGA/VGA planes");break;
+		default: strcpy(type, "unkown");break;
+	}
+	
+	switch(fb_fix.visual)
+	{
+		case FB_VISUAL_MONO01:  strcpy(visual, "Monochr. 1=Black 0=White");break;
+		case FB_VISUAL_MONO10:  strcpy(visual, "Monochr. 1=White 0=Black");break;
+		case FB_VISUAL_TRUECOLOR:  strcpy(visual, "true color");break;
+		case FB_VISUAL_PSEUDOCOLOR:  strcpy(visual, "pseudo color (like atari)");break;
+		case FB_VISUAL_DIRECTCOLOR:  strcpy(visual, "direct color");break;
+		case FB_VISUAL_STATIC_PSEUDOCOLOR:  strcpy(visual, "pseudo color readonly");break;
+		default: strcpy(type, "unkown");break;
+	}
+	printf(
+		"============== screen info =============\n" 
+		"FB mem start  : 0x%08lX\n"
+		"FB mem length : %d\n"
+		"FB type       : %s\n"
+		"FB visual     : %s\n"
+		"accel         : %d\n"
+		"geometry      : %d %d %d %d %d\n"
+		"timings       : %d %d %d %d %d %d\n"
+		"rgba          : %d/%d, %d/%d, %d/%d, %d/%d\n"
+		"========================================\n",
+		fb_fix.smem_start, fb_fix.smem_len,
+		type, visual,
+		fb_fix.accel,
+		fb_vinfo.xres, fb_vinfo.yres, 
+		fb_vinfo.xres_virtual, fb_vinfo.yres_virtual,  
+		fb_vinfo.bits_per_pixel,
+		fb_vinfo.upper_margin, fb_vinfo.lower_margin,
+		fb_vinfo.left_margin, fb_vinfo.right_margin, 
+		fb_vinfo.hsync_len, fb_vinfo.vsync_len,
+		fb_vinfo.red.length, fb_vinfo.red.offset,
+		fb_vinfo.green.length, fb_vinfo.green.offset,
+		fb_vinfo.blue.length, fb_vinfo.blue.offset,
+		fb_vinfo. transp.length, fb_vinfo. transp.offset
+	);
 }
 
 static int Screen_Init()
@@ -811,11 +857,13 @@ static int Screen_Init()
 	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_VSCREENINFO, &fb_vinfo);
 	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_FSCREENINFO, &fb_fix);
 	
+	print_screeninfo(fb_vinfo, fb_fix);
+	
 	LCUI_Sys.screen.bits = fb_vinfo.bits_per_pixel;
 	if (fb_vinfo.bits_per_pixel==8) 
 		ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGETCMAP, &oldcmap); 
 	
-	nobuff_print("mapping video output device...");
+	nobuff_print("mapping framebuffer...");
 	LCUI_Sys.screen.smem_len = fb_fix.smem_len;/* 保存内存空间大小 */
 	/* 映射帧缓存至内存空间 */
 	LCUI_Sys.screen.fb_mem = mmap(NULL,fb_fix.smem_len,
@@ -838,8 +886,6 @@ static int Screen_Init()
 	LCUI_Sys.screen.size.h = fb_vinfo.yres; 
 	LCUI_Sys.screen.buff.width = fb_vinfo.xres; 
 	LCUI_Sys.screen.buff.height = fb_vinfo.yres;
-	/* 保存当前屏幕内容，以便退出LCUI后还原 */
-	Get_Screen_Graph(&LCUI_Sys.screen.buff); 
 	return 0;
 }
 
@@ -903,11 +949,12 @@ int LCUI_Init(int argc, char *argv[])
 		Cursor_Init();	/* 初始化鼠标游标 */
 		LCUI_IO_Init();	/* 初始化输入输出设备 */ 
 		Widget_Event_Init(); /* 初始化部件事件处理 */
+		/* 保存当前屏幕内容，以便退出LCUI后还原 */
+		Get_Screen_Graph(&LCUI_Sys.screen.buff); 
 		//debug_mark = 1;
 		/* 鼠标游标居中 */
 		Set_Cursor_Pos(Get_Screen_Center_Point());  
-		Show_Cursor();	/* 显示鼠标游标 */
-		printf("LCUI init has been completed successfully!\n\n"); 
+		Show_Cursor();	/* 显示鼠标游标 */ 
 	}
 	else
 	{

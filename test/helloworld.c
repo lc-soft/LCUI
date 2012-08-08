@@ -11,7 +11,7 @@
 #include <unistd.h>
 
 int main(int argc, char*argv[]) 
-{ 
+{
 	/* 目前传递给LCUI_Init()函数的参数没用，以后会完善，比如指定字体路径，是否显示鼠标游标等 */
     LCUI_Init(argc, argv);
     LCUI_Widget *window, *label;

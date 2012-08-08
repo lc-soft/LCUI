@@ -559,7 +559,7 @@ static void * Processing_TouchScreen_Input ()
 			LCUI_Sys.ts.td = ts_open (TS_DEV, 0);
 			if (!LCUI_Sys.ts.td)
 			{
-				sprintf (str, "ts_open: %s\n", TS_DEV);
+				sprintf (str, "ts_open: %s", TS_DEV);
 				perror (str);
 				LCUI_Sys.ts.status = REMOVE;
 				break;
@@ -617,24 +617,10 @@ static void * Processing_TouchScreen_Input ()
 		Processing_Mouse_Event(button, &event); 
 		//printf("%ld.%06ld: %6d %6d %6d\n", samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
 	}
-	ts_close(LCUI_Sys.ts.td); 
+	if(LCUI_Sys.ts.status == INSIDE)
+		ts_close(LCUI_Sys.ts.td); 
 	LCUI_Sys.ts.status = REMOVE;
 	pthread_exit (NULL);
-}
-
-int Check_TouchScreen_Support()
-/* 功能：检测是否支持触瓶 */
-{
-	struct tsdev *fd;
-	fd = ts_open (TS_DEV, 0);
-	if (!fd) 
-		return -1; 
-
-	if (ts_config (fd)) 
-		return -1; 
-		
-	ts_close(LCUI_Sys.ts.td);
-	return 0;
 }
 
 int Enable_TouchScreen_Input()

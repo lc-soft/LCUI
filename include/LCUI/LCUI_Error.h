@@ -43,9 +43,9 @@
 #define APP_ERROR_UNRECORDED_APP	"error: app was never recorded\n"
 #define ERROR_MALLOC_ERROR			"error: can not allocate memory space\n"
 
-#define FT_INIT_ERROR                 "初始化库时发生错误!\n"
-#define FT_UNKNOWN_FILE_FORMAT        "不支持该字体库的字体格式!\n"
-#define FT_OPEN_FILE_ERROR            "打开该字体库发生错误!\n"
+#define FT_INIT_ERROR                 "init error!\n"
+#define FT_UNKNOWN_FILE_FORMAT        "unknown file format!\n"
+#define FT_OPEN_FILE_ERROR            "open file error!\n"
 
 #define INIT_ERROR_OPEN_FB_DEV_ERROR  "初始化错误:打开图形输出设备出错"
 #define INIT_ERROR_FONTFILE_ERROR     "初始化错误:默认字体文件打开出错"

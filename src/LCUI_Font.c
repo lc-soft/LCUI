@@ -2708,7 +2708,7 @@ unsigned short Get_Unicode(char *in_gb2312)
 		unicode = (unsigned short) (out[0] & 0x1F) << 6;
 		unicode |= (unsigned short) (out[1] & 0x3F);
 	}
-	return unicode;
+	return unicode; 
 }
 
 /* 默认的字体文件路径 */
@@ -2720,7 +2720,10 @@ void Set_Default_Font(char *fontfile)
  * 说明：需要在LCUI初始化前使用，因为LCUI初始化时会打开默认的字体文件
  *  */
 {
-	strcpy(default_font, fontfile);
+	if(fontfile == NULL)
+		strcpy(default_font, "");
+	else
+		strcpy(default_font, fontfile);
 }
 
 void LCUI_Font_Init(LCUI_Font *font)
@@ -2728,9 +2731,8 @@ void LCUI_Font_Init(LCUI_Font *font)
  * 功能：初始化LCUI的Font结构体数据 
  * 说明：本函数在LCUI初始化时调用，LCUI_Font结构体中记录着字体相关的数据
  * */
-{
-	int temp;
-	nobuff_print("load fontfile...");/* 无缓冲打印内容 */
+{ 
+	printf("loading fontfile...\n");/* 无缓冲打印内容 */
 	font->type = DEFAULT;
 	font->size = 12;
 	font->fore_color.red = 0;
@@ -2747,11 +2749,7 @@ void LCUI_Font_Init(LCUI_Font *font)
 	font->ft_lib = NULL;
 	font->ft_face = NULL;
 	/* 打开默认字体文件 */
-	temp = Open_Fontfile(&LCUI_Sys.default_font, default_font);
-	if(temp) 
-		printf("fail\n");
-	else 
-		printf("success\n"); 
+	Open_Fontfile(&LCUI_Sys.default_font, default_font); 
 }
 
 void Font_Init(LCUI_Font *in)
@@ -3165,7 +3163,7 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 		lib_error = FT_Init_FreeType( & font_data->ft_lib);  /* 初始化FreeType库 */
 		if (lib_error)   /* 当初始化库时发生了一个错误 */
 		{
-			//printf("Open_Fontfile():"FT_INIT_ERROR);
+			printf("open fontfile: "FT_INIT_ERROR);
 			return - 1 ;
 		}
 		
@@ -3177,16 +3175,24 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 		{
 			if ( face_error == FT_Err_Unknown_File_Format ) 
 			{ 
-				//printf("Open_Fontfile():"FT_UNKNOWN_FILE_FORMAT); /* 未知文件格式 */
-				//perror(font_data->font_file.string);
+				printf("open fontfile: "FT_UNKNOWN_FILE_FORMAT); /* 未知文件格式 */
+				perror(font_data->font_file.string);
 			}
 			else
 			{
-				//printf("Open_Fontfile():"FT_OPEN_FILE_ERROR);/* 打开错误 */
-				//perror(font_data->font_file.string);
+				printf("open fontfile: "FT_OPEN_FILE_ERROR);/* 打开错误 */
+				perror(font_data->font_file.string);
 			}
 			return -1;
 		}
+		printf(
+			"=============== font info ==============\n" 
+			"family name: %s\n"
+			"style name : %s\n"
+			"========================================\n" ,
+			font_data->ft_face->family_name,
+			font_data->ft_face->style_name
+		);
 		/* 保存字体信息 */
 		Strcpy(&font_data->family_name, font_data->ft_face->family_name);
 		Strcpy(&font_data->style_name, font_data->ft_face->style_name);

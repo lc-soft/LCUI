@@ -1,9 +1,9 @@
 
 CHANGES BETWEEN 0.12.3 and 0.12.4
 
-    - corrected the graphical display problems of the widget nesting. 
-    - the graphical display method has been changed, in theory,
-      graphics refresh rate will be enhanced.
+	- corrected the graphical display problems of the widget nesting. 
+	- the graphical display method has been changed, in theory,
+	  graphics refresh rate will be enhanced.
 	- some functions and data structures has been modified.
 	- add the RadioButton widget and CheckBox widget.
 	- the event mechanism has been modified, add mouse move / click 

@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS=foreign
 ##设定在编译时头文件的查找位置
 INCLUDES = -I../include
 ##以下是给Libtool的参数
-LDFLAGS=-version-info 1:0:0
+LDFLAGS=-version-info 1:1:0
 ##以下内容摘自相关文章。
 ##Libtool 的版本号分为 3 个部分 :
 ##current: 表示当前库输出的接口的数量。
