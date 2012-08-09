@@ -389,7 +389,7 @@ void Resize_PictureBox_View_Area(LCUI_Widget *widget, int width, int height)
 		return;
 	/* 将中心点位置转换成坐标 */
 	center_pos.x = pic_box->read_box.center_x * pic_box->scale * pic_box->image->width;
-	center_pos.x = pic_box->read_box.center_y * pic_box->scale * pic_box->image->height;
+	center_pos.y = pic_box->read_box.center_y * pic_box->scale * pic_box->image->height;
 	/* 处理区域数据，使之为有效区域 */
 	start.x = center_pos.x - width/2.0;
 	start.y = center_pos.y - height/2.0;
