@@ -2744,7 +2744,7 @@ void LCUI_Font_Init(LCUI_Font *font)
 	font->space = 1;
 	font->linegap = 0;
 	font->status = KILLED;
-	font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT;
+	font->load_flags = FT_LOAD_NO_BITMAP | FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH;;//FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT;
 	font->render_mode = FT_RENDER_MODE_MONO;
 	font->ft_lib = NULL;
 	font->ft_face = NULL;
@@ -3156,48 +3156,56 @@ int String_To_List(char *text , LCUI_WString **out_list)
 int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 /* 功能：打开字体文件，并保存数据至LCUI_Font结构体中 */
 {
-	FT_Error face_error = 0, lib_error = 0;
+	int type;
+	FT_Library    library;
+	FT_Face       face;
+	FT_Error      face_error = 0, lib_error = 0;
 	
-	if(font_data->status != ACTIVE)
+	type = font_data->type;
+	if(font_data->status == ACTIVE)
 	{
-		lib_error = FT_Init_FreeType( & font_data->ft_lib);  /* 初始化FreeType库 */
-		if (lib_error)   /* 当初始化库时发生了一个错误 */
-		{
-			printf("open fontfile: "FT_INIT_ERROR);
-			return - 1 ;
-		}
-		
-		Strcpy(&font_data->font_file, fontfile);/* 记录字体文件路径 */ 
-		face_error = FT_New_Face(	font_data->ft_lib, 
-									font_data->font_file.string , 
-									0 , & font_data->ft_face );
-		if(face_error)
-		{
-			if ( face_error == FT_Err_Unknown_File_Format ) 
-			{ 
-				printf("open fontfile: "FT_UNKNOWN_FILE_FORMAT); /* 未知文件格式 */
-				perror(font_data->font_file.string);
-			}
-			else
-			{
-				printf("open fontfile: "FT_OPEN_FILE_ERROR);/* 打开错误 */
-				perror(font_data->font_file.string);
-			}
-			return -1;
-		}
-		printf(
-			"=============== font info ==============\n" 
-			"family name: %s\n"
-			"style name : %s\n"
-			"========================================\n" ,
-			font_data->ft_face->family_name,
-			font_data->ft_face->style_name
-		);
-		/* 保存字体信息 */
-		Strcpy(&font_data->family_name, font_data->ft_face->family_name);
-		Strcpy(&font_data->style_name, font_data->ft_face->style_name);
-		font_data->status = ACTIVE;
+		if(Strcmp(&font_data->font_file, fontfile) == 0)
+			return 0;
+		else if( Strcmp(&font_data->font_file, 
+				 LCUI_Sys.default_font.font_file.string))
+			type = CUSTOM;
 	}
+	lib_error = FT_Init_FreeType( & library);  /* 初始化FreeType库 */
+	if (lib_error)   /* 当初始化库时发生了一个错误 */
+	{
+		printf("open fontfile: "FT_INIT_ERROR);
+		return - 1 ;
+	}
+	
+	face_error = FT_New_Face( library, fontfile , 0 , & face );
+	if(face_error)
+	{
+		FT_Done_FreeType(library);
+		if ( face_error == FT_Err_Unknown_File_Format )
+			printf("open fontfile: "FT_UNKNOWN_FILE_FORMAT); /* 未知文件格式 */ 
+		else 
+			printf("open fontfile: "FT_OPEN_FILE_ERROR);/* 打开错误 */ 
+			
+		perror(fontfile);
+		return -1;
+	}
+	printf(
+		"=============== font info ==============\n" 
+		"family name: %s\n"
+		"style name : %s\n"
+		"========================================\n" ,
+		face->family_name,
+		face->style_name
+	);
+	Free_Font(font_data);
+	/* 保存字体信息 */
+	Strcpy(&font_data->family_name, face->family_name);
+	Strcpy(&font_data->style_name, face->style_name);
+	Strcpy(&font_data->font_file, fontfile);
+	font_data->type = type;
+	font_data->status = ACTIVE; 
+	font_data->ft_lib = library;
+	font_data->ft_face = face;
 	return 0;
 }
 
