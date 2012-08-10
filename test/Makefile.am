@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS=foreign
 ##设定在编译时头文件的查找位置
 INCLUDES = -I$(top_builddir)/include
 ##需要编译的测试程序, noinst指的是不安装
-noinst_PROGRAMS = helloworld test_radiobtn test_checkbox test_progressbar \
+noinst_PROGRAMS = helloworld test_font test_radiobtn test_checkbox test_progressbar \
 test_button test_label test_loading ts_calibrate test_viewimage
 EXTRA_DIST=README image.jpg logo_128x128.png border.png cross.png ring.png bg.png
 
@@ -36,6 +36,8 @@ test_checkbox_LDADD   = $(top_builddir)/src/libLCUI.la
 ts_calibrate_SOURCES = ts_calibrate.c
 ts_calibrate_LDADD   = $(top_builddir)/src/libLCUI.la
 
+test_font_SOURCES = test_font.c
+test_font_LDADD   = $(top_builddir)/src/libLCUI.la
 
 test_viewimage_SOURCES = test_viewimage.c
 test_viewimage_LDADD   = $(top_builddir)/src/libLCUI.la
