@@ -76,11 +76,34 @@ static void Destroy_Label(LCUI_Widget *widget)
 	Free_String(&label->text);
 }
 
+static void Refresh_Label_FontBitmap(LCUI_Widget *widget)
+/* 功能：刷新label部件内的字体位图 */
+{ 
+	int i, k;
+	
+	LCUI_Label *label = (LCUI_Label*)Get_Widget_Private_Data(widget);  
+	
+	if(label->text.size <= 0)
+		return;
+		
+	for(i = 0; i < label->rows; ++i)
+	{/* 遍历每一行字符串中的每个字符 */ 
+		for(k = 0; k < label->contents[i].size; ++k)
+		{/* 获取字符位图 */ 
+			Get_WChar_Bitmap(&label->font, 
+					label->contents[i].string[k].char_code , 
+					&label->contents[i].string[k].bitmap ); 
+		} 
+		label->contents[i].update = IS_TRUE;
+	}
+	Draw_Widget(widget);
+}
+
 static void Exec_Update_Label(LCUI_Widget *widget)
 /* 功能：执行更新label部件的操作 */
 {
     int len;
-	int i, k, refresh_flag = 0;
+	int i, k;
 	int max_height = 0, max_width = 0;
 	
 	LCUI_Label *label = (LCUI_Label*)Get_Widget_Private_Data(widget); 
@@ -146,8 +169,7 @@ static void Exec_Update_Label(LCUI_Widget *widget)
 						Get_WChar_Bitmap(&label->font, 
 								label->contents[i].string[k].char_code , 
 								&label->contents[i].string[k].bitmap );
-                        label->contents[i].update = IS_TRUE;/* 这一行文本需要刷新 */
-                        ++refresh_flag;/* 用于标识label部件中的文本内容是否改变 */
+                        label->contents[i].update = IS_TRUE;/* 这一行文本需要刷新 */ 
 					}
 				}
 				else
@@ -158,8 +180,7 @@ static void Exec_Update_Label(LCUI_Widget *widget)
 					Get_WChar_Bitmap(&label->font, 
 							label->contents[i].string[k].char_code , 
 							&label->contents[i].string[k].bitmap );
-					label->contents[i].update = IS_TRUE;
-                    ++refresh_flag;/* 用于标识label部件中的文本内容是否改变 */
+					label->contents[i].update = IS_TRUE; 
 				} 
 			}
 			/* 改成新的字符串长度 */
@@ -169,21 +190,18 @@ static void Exec_Update_Label(LCUI_Widget *widget)
 		}
 		/* 释放内存，new_list已经不需要用了 */
 		free(new_list);
-		new_list = NULL;
-		if(refresh_flag > 0)
-		{
+		new_list = NULL; 
 			/* 计算文本内容的尺寸 */
-			label->rows = new_rows;
-			Count_Contents_Size(label->contents, &max_width, &max_height, 
-					label->rows, label->font.space, label->font.linegap);
-			if(label->auto_size == IS_TRUE 
-			&& max_width != widget->size.w 
-			&& max_height != widget->size.h)
-			{/* 如果开启了自动调整大小,并且尺寸有改变 */
-				Resize_Widget(widget, Size(max_width, max_height + 2));
-				Refresh_Widget(widget);
-			}
-		}
+		label->rows = new_rows;
+		Count_Contents_Size(label->contents, &max_width, &max_height, 
+				label->rows, label->font.space, label->font.linegap);
+		if(label->auto_size == IS_TRUE 
+		&& (max_width != widget->size.w 
+		|| max_height != widget->size.h))
+		{/* 如果开启了自动调整大小,并且尺寸有改变 */
+			Resize_Widget(widget, Size(max_width, max_height + 2));
+			Refresh_Widget(widget);
+		} 
 	}
 	
 	int flag;
@@ -283,19 +301,15 @@ int Set_Label_Font(LCUI_Widget *widget, int font_size, char *font_file)
 		label->font.size = font_size;
 		refresh_flag = 1;
 	}
-	if(NULL != font_file)
+	if(Strcmp(&label->font.font_file, font_file) != 0
+	&& 0 == Open_Fontfile(&label->font, font_file) )
 	{
-		if(strcmp(label->font.font_file.string, font_file) != 0)
-		{
-			Open_Fontfile(&label->font, font_file);
-			Strcpy(&label->font.font_file, font_file);
-			refresh_flag = 1;
-		}
-	}
+		Strcpy(&label->font.font_file, font_file);
+		refresh_flag = 1;
+	} 
 	if(refresh_flag == 1)
-    {/* 刷新标签内的字体位图数据 */
-		Set_Label_Text(widget, label->text.string);   
-		Refresh_Widget(widget);
+    {/* 刷新标签内的字体位图数据 */ 
+		Refresh_Label_FontBitmap(widget); 
 	}
 	return 0;
 }
