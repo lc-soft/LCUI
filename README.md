@@ -13,7 +13,7 @@
 
 # Bugs 
 
-  Please report bugs  by e-mail to `lc-soft@live.cn'. Don't forget to 
+  Please report bugs  by e-mail to 'lc-soft@live.cn'. Don't forget to 
   send a  detailed explanation of  the problem --  there is nothing  
   worse than receiving a terse message that only says `it doesn't work'.
 
@@ -47,4 +47,4 @@ TextMate is a trademark of Allan Odgaard.
 Special thanks to Liu Chao for his great work on the LCUI's development.
 
 
---- end of README ---
+--- end of README.md ---
