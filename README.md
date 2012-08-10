@@ -4,18 +4,11 @@
   not very good, so, some files will appear chinese character, 
   please understand. thanks!
 
-  Please read the docs/CHANGES file, it contains IMPORTANT INFORMATION.
+  Please read the file `docs/CHANGES`, it contains IMPORTANT INFORMATION.
 
-  Read the file `INSTALL' for installation instructions.
+  Read the file `INSTALL` for installation instructions.
 
-  See the  file `docs/LICENSE.TXT'  for the available licenses.
-
-
-# Bugs 
-
-  Please report bugs  by e-mail to 'lc-soft@live.cn'. Don't forget to 
-  send a  detailed explanation of  the problem --  there is nothing  
-  worse than receiving a terse message that only says `it doesn't work'.
+  See the  file `docs/LICENSE.TXT`  for the available licenses.
 
 # Documentation 
 
@@ -24,6 +17,22 @@
   At this stage, you can refer to the header files, source code, and 
   sample programs .
 
+# Building
+
+To bootstrap the build you need to run `./configure` (in the root of the source tree). 
+
+In the simplest case you would run:
+
+	git clone https://github.com/lc-soft/LCUI.git
+	cd LCUI
+	git submodule update --init
+	./configure
+
+Please note that if you downloaded the source code (rather than cloned via git) you likely miss the submodules and the build will therefor fail.
+
+# Bugs 
+
+  Please report bugs  by e-mail to 'lc-soft@live.cn'. Don't forget to send a  detailed explanation of  the problem --  there is nothing worse than receiving a terse message that only says `it doesn't work'.
 
 # Contributing
 
