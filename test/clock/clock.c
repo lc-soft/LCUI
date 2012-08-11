@@ -1,4 +1,4 @@
-// Ê±ÖÓµÄÀı×Ó³ÌĞò
+// æ—¶é’Ÿçš„ä¾‹å­ç¨‹åº
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -15,45 +15,45 @@ void *update_clock(void *arg)
     time_t rawtime;
     struct tm * timeinfo;
     LCUI_Graph h_temp, m_temp, clock_bg, hour_pointer, minute_pointer;
-    LCUI_Widget *widget = (LCUI_Widget *)arg; /* ×ª»»ÀàĞÍ */
+    LCUI_Widget *widget = (LCUI_Widget *)arg; /* è½¬æ¢ç±»å‹ */
     LCUI_Widget *bg, *hour, *minute; 
     int h_angle, m_angle;
-    /* ³õÊ¼»¯Í¼ĞÎÊı¾İ½á¹¹ */
+    /* åˆå§‹åŒ–å›¾å½¢æ•°æ®ç»“æ„ */
     Graph_Init(&clock_bg);
     Graph_Init(&minute_pointer);
     Graph_Init(&hour_pointer);
     Graph_Init(&h_temp);
     Graph_Init(&m_temp);
-    /* ´´½¨¼¸¸ö²¿¼ş */
+    /* åˆ›å»ºå‡ ä¸ªéƒ¨ä»¶ */
     bg = Create_Widget("picture_box");
     hour = Create_Widget("picture_box");
     minute = Create_Widget("picture_box");
-    /* PictureBox²¿¼ş¾ÓÖĞÏÔÊ¾Í¼Æ¬ */
+    /* PictureBoxéƒ¨ä»¶å±…ä¸­æ˜¾ç¤ºå›¾ç‰‡ */
     Set_PictureBox_Size_Mode(bg, SIZE_MODE_CENTER);
     Set_PictureBox_Size_Mode(hour, SIZE_MODE_CENTER);
     Set_PictureBox_Size_Mode(minute, SIZE_MODE_CENTER);
-    /* ÔØÈëÍ¼Æ¬£¬±£´æÍ¼ĞÎÊı¾İ */
+    /* è½½å…¥å›¾ç‰‡ï¼Œä¿å­˜å›¾å½¢æ•°æ® */
     Load_Image("new_daytime_background.png", &clock_bg);
     Load_Image("new_daytime_hour.png", &hour_pointer);
     Load_Image("new_daytime_minute.png", &minute_pointer);
-    /* Éè¶¨PictureBox²¿¼şÏÔÊ¾µÄÍ¼ĞÎ */
+    /* è®¾å®šPictureBoxéƒ¨ä»¶æ˜¾ç¤ºçš„å›¾å½¢ */
     Set_PictureBox_Image_From_Graph(bg, &clock_bg);
     Set_PictureBox_Image_From_Graph(hour, &hour_pointer);
     Set_PictureBox_Image_From_Graph(minute, &minute_pointer);
-    /* ½«ÕâĞ©²¿¼şÌí¼ÓÖÁÏàÓ¦ÈİÆ÷ÖĞ */
+    /* å°†è¿™äº›éƒ¨ä»¶æ·»åŠ è‡³ç›¸åº”å®¹å™¨ä¸­ */
     Widget_Container_Add(bg, hour);
     Widget_Container_Add(bg, minute);
-    /* ½«²¿¼şÌí¼ÓÖÁ´°¿Ú¿Í»§ÇøÖĞ */
+    /* å°†éƒ¨ä»¶æ·»åŠ è‡³çª—å£å®¢æˆ·åŒºä¸­ */
     Window_Client_Area_Add(widget, bg);
-    /* ¸Ä±ä²¿¼ş³ß´ç£¬Ê¹ÓÃ¹Ì¶¨µÄ³ß´ç */
+    /* æ”¹å˜éƒ¨ä»¶å°ºå¯¸ï¼Œä½¿ç”¨å›ºå®šçš„å°ºå¯¸ */
     Resize_Widget(bg, Size(280, 280));
     Resize_Widget(hour, Size(120, 120));
     Resize_Widget(minute, Size(120, 120));
-    /* ¸Ä±ä²¿¼şµÄ²¼¾Ö·½Ê½£¬¶¼ÊÇ¾ÓÖĞÏÔÊ¾ */
+    /* æ”¹å˜éƒ¨ä»¶çš„å¸ƒå±€æ–¹å¼ï¼Œéƒ½æ˜¯å±…ä¸­æ˜¾ç¤º */
     Set_Widget_Align(bg, ALIGN_MIDDLE_CENTER, Pos(0, 0));
     Set_Widget_Align(hour, ALIGN_MIDDLE_CENTER, Pos(0, 0));
     Set_Widget_Align(minute, ALIGN_MIDDLE_CENTER, Pos(0, 0));
-    /* ÏÔÊ¾ */
+    /* æ˜¾ç¤º */
     Show_Widget(hour);
     Show_Widget(minute);
     Show_Widget(bg);
@@ -61,40 +61,40 @@ void *update_clock(void *arg)
     while(1)
     {
         time ( &rawtime );
-        timeinfo = localtime ( &rawtime ); /* »ñÈ¡ÏµÍ³µ±Ç°Ê±¼ä */
-        /* ¼ÆËãÊ±Õë·ÖÕëµÄ½Ç¶È */
+        timeinfo = localtime ( &rawtime ); /* è·å–ç³»ç»Ÿå½“å‰æ—¶é—´ */
+        /* è®¡ç®—æ—¶é’ˆåˆ†é’ˆçš„è§’åº¦ */
         h_angle = 360*timeinfo->tm_hour / 12.0;
         m_angle = 360*timeinfo->tm_min / 60.0;
         h_angle += m_angle / 60;
-        /* ¸ù¾İÕâ¸ö½Ç¶ÈÀ´Ğı×ªÍ¼ĞÎ */
+        /* æ ¹æ®è¿™ä¸ªè§’åº¦æ¥æ—‹è½¬å›¾å½¢ */
         Rotate_Graph(&hour_pointer, h_angle, &h_temp);
         Rotate_Graph(&minute_pointer, m_angle, &m_temp);
-        /* ¸ü¸ÄPictureBox²¿¼şÏÔÊ¾µÄÍ¼ĞÎ */
+        /* æ›´æ”¹PictureBoxéƒ¨ä»¶æ˜¾ç¤ºçš„å›¾å½¢ */
         Set_PictureBox_Image_From_Graph(hour, &h_temp);
         Set_PictureBox_Image_From_Graph(minute, &m_temp);
-        sleep(1);/* ÔİÍ£1Ãë */
+        sleep(1);/* æš‚åœ1ç§’ */
     }
     
     LCUI_Thread_Exit(NULL);
 }
 
 int main(int argc, char*argv[])
-/* Ö÷º¯Êı£¬³ÌĞòµÄÈë¿Ú */
+/* ä¸»å‡½æ•°ï¼Œç¨‹åºçš„å…¥å£ */
 {
     LCUI_Widget *window;
     pthread_t t;
 	Set_Default_Font("../../fonts/msyh.ttf");
     LCUI_Init(argc, argv);
-    /* ´´½¨²¿¼ş */
+    /* åˆ›å»ºéƒ¨ä»¶ */
     window  = Create_Widget("window");
-    /* ¸Ä±ä´°¿ÚµÄ³ß´ç */
+    /* æ”¹å˜çª—å£çš„å°ºå¯¸ */
     Resize_Widget(window, Size(320, 320));
-    /* Éè¶¨´°¿Ú±êÌâÄÚÈİ */
-    Set_Window_Title_Text(window, "Ê±ÖÓ");
-    /* ´´½¨Ïß³Ì */
+    /* è®¾å®šçª—å£æ ‡é¢˜å†…å®¹ */
+    Set_Window_Title_Text(window, "æ—¶é’Ÿ");
+    /* åˆ›å»ºçº¿ç¨‹ */
     LCUI_Thread_Create(&t, NULL, update_clock, (void*)window); 
     Show_Widget(window); 
-    return LCUI_Main(); /* ½øÈëÖ÷Ñ­»· */  
+    return LCUI_Main(); /* è¿›å…¥ä¸»å¾ªç¯ */  
 }
 
 

@@ -1,4 +1,4 @@
-#include <LCUI_Build.h> /* °üº¬LCUIµÄÍ·ÎÄ¼ş */
+#include <LCUI_Build.h> /* åŒ…å«LCUIçš„å¤´æ–‡ä»¶ */
 #include LC_LCUI_H
 #include LC_WIDGET_H 
 #include LC_WINDOW_H
@@ -18,45 +18,45 @@
 
 static LCUI_Widget *window, *l_vs, *btn_next, *btn_s, *btn_j, *btn_b; 
 static LCUI_Graph  stone, knife, cloth, think; 
-static LCUI_Graph  left_stone, left_knife, left_cloth; /* ÒÑ±»Ë®Æ½·­×ªµÄÍ¼Æ¬Êı¾İ */
+static LCUI_Graph  left_stone, left_knife, left_cloth; /* å·²è¢«æ°´å¹³ç¿»è½¬çš„å›¾ç‰‡æ•°æ® */
 static LCUI_Widget *label, *me_pic_box, *cpu_pic_box;
-int win = 0, lose = 0, standoff = 0; /* ³É¼¨ */
+int win = 0, lose = 0, standoff = 0; /* æˆç»© */
 
 void update_text()
-/* ¹¦ÄÜ£º¸üĞÂÎÄ±¾ */
+/* åŠŸèƒ½ï¼šæ›´æ–°æ–‡æœ¬ */
 {
-	Set_Label_Text(label, "Íæ¼Ò³É¼¨: Ó®%d´Î, Êä%d´Î, Æ½¾Ö%d´Î", 
-						win, lose, standoff); /* Éè¶¨label²¿¼şÏÔÊ¾µÄÎÄ±¾ */
+	Set_Label_Text(label, "ç©å®¶æˆç»©: èµ¢%dæ¬¡, è¾“%dæ¬¡, å¹³å±€%dæ¬¡", 
+						win, lose, standoff); /* è®¾å®šlabeléƒ¨ä»¶æ˜¾ç¤ºçš„æ–‡æœ¬ */
 }
 
 
 void run_game(int select)
-/* ¹¦ÄÜ£ºÔËĞĞÓÎÏ· */
+/* åŠŸèƒ½ï¼šè¿è¡Œæ¸¸æˆ */
 {
 	int cpu_select;
-	cpu_select = rand() % 3;  /* ²úÉú3ÒÔÄÚµÄËæ»úÊı */ 
-	/* ¸ù¾İËæ»úÊıµÄÈ¡Öµ£¬ÈÃPictureBox²¿¼şÏÔÊ¾²»Í¬µÄÍ¼Ïñ */
-	if(cpu_select == 0) /* Ê¯Í· */
+	cpu_select = rand() % 3;  /* äº§ç”Ÿ3ä»¥å†…çš„éšæœºæ•° */ 
+	/* æ ¹æ®éšæœºæ•°çš„å–å€¼ï¼Œè®©PictureBoxéƒ¨ä»¶æ˜¾ç¤ºä¸åŒçš„å›¾åƒ */
+	if(cpu_select == 0) /* çŸ³å¤´ */
 		Set_PictureBox_Image_From_Graph(cpu_pic_box, &stone); 
-	else if(cpu_select == 1) /* ¼ôµ¶ */
+	else if(cpu_select == 1) /* å‰ªåˆ€ */
 		Set_PictureBox_Image_From_Graph(cpu_pic_box, &knife); 
-	else /* ²¼ */
+	else /* å¸ƒ */
 		Set_PictureBox_Image_From_Graph(cpu_pic_box, &cloth); 
 	
-	if(cpu_select == select) /* Èç¹û³öÒ»ÑùµÄ,Æ½¾Ö´ÎÊı+1 */
+	if(cpu_select == select) /* å¦‚æœå‡ºä¸€æ ·çš„,å¹³å±€æ¬¡æ•°+1 */
 		standoff += 1; 
 	else if((cpu_select == 0 && select == 1) 
 			|| (cpu_select == 1 && select == 2) 
 			|| (cpu_select == 2 && select == 0)
-			)/* Èç¹ûÊÇ³ÌĞòÓ®ÁË, ÊäµÄ´ÎÊı+1 */
+			)/* å¦‚æœæ˜¯ç¨‹åºèµ¢äº†, è¾“çš„æ¬¡æ•°+1 */
 		lose += 1; 
-	else  /* ·ñÔòÖ»ÓĞÍæ¼ÒÓ®ÁË,Ó®µÄ´ÎÊı+1 */
+	else  /* å¦åˆ™åªæœ‰ç©å®¶èµ¢äº†,èµ¢çš„æ¬¡æ•°+1 */
 		win += 1; 
-	update_text();/* ¸üĞÂÎÄ±¾ÄÚÈİ */
+	update_text();/* æ›´æ–°æ–‡æœ¬å†…å®¹ */
 }
 
 void clear_game()
-/* ¹¦ÄÜ£ºÇåÀíÓÎÏ·£¬»Ö¸´PictureBox²¿¼şÏÔÊ¾µÄÍ¼Ïñ */
+/* åŠŸèƒ½ï¼šæ¸…ç†æ¸¸æˆï¼Œæ¢å¤PictureBoxéƒ¨ä»¶æ˜¾ç¤ºçš„å›¾åƒ */
 {
 	Set_PictureBox_Image_From_Graph(me_pic_box, &think); 
 	Set_PictureBox_Image_From_Graph(cpu_pic_box, &think);
@@ -64,21 +64,21 @@ void clear_game()
 }
 
 void select_stone(LCUI_Widget *widget, void *junk)
-/* ¹¦ÄÜ£ºÍæ¼ÒÑ¡ÔñÊ¯Í· */
+/* åŠŸèƒ½ï¼šç©å®¶é€‰æ‹©çŸ³å¤´ */
 {
-	/* Èç¹ûÃ»ÓĞ´æ´¢ÒÑË®Æ½·­×ªµÄÍ¼Ïñ£¬¾Í½øĞĞË®Æ½·­×ª */
+	/* å¦‚æœæ²¡æœ‰å­˜å‚¨å·²æ°´å¹³ç¿»è½¬çš„å›¾åƒï¼Œå°±è¿›è¡Œæ°´å¹³ç¿»è½¬ */
 	if(!Valid_Graph(&left_stone)) 
 		Graph_Flip_Horizontal(&stone, &left_stone);
-	Set_PictureBox_Image_From_Graph(me_pic_box, &left_stone); /* Éè¶¨ÏÔÊ¾µÄÍ¼ÏñÎªÊ¯Í· */
+	Set_PictureBox_Image_From_Graph(me_pic_box, &left_stone); /* è®¾å®šæ˜¾ç¤ºçš„å›¾åƒä¸ºçŸ³å¤´ */
 	Disable_Widget(btn_j);
 	Disable_Widget(btn_s);
 	Disable_Widget(btn_b);
 	Enable_Widget(btn_next);
-	run_game(0);/* ½øÈëÓÎÏ· */
+	run_game(0);/* è¿›å…¥æ¸¸æˆ */
 }
 
 void select_knife(LCUI_Widget *widget, void *junk)
-/* ¹¦ÄÜ£ºÍæ¼ÒÑ¡Ôñ¼ôµ¶ */
+/* åŠŸèƒ½ï¼šç©å®¶é€‰æ‹©å‰ªåˆ€ */
 {
 	if(!Valid_Graph(&left_knife)) 
 		Graph_Flip_Horizontal(&knife, &left_knife);
@@ -91,7 +91,7 @@ void select_knife(LCUI_Widget *widget, void *junk)
 }
 
 void select_cloth(LCUI_Widget *widget, void *junk)
-/* ¹¦ÄÜ£ºÍæ¼ÒÑ¡Ôñ²¼ */
+/* åŠŸèƒ½ï¼šç©å®¶é€‰æ‹©å¸ƒ */
 {
 	if(!Valid_Graph(&left_cloth)) 
 		Graph_Flip_Horizontal(&cloth, &left_cloth);
@@ -105,7 +105,7 @@ void select_cloth(LCUI_Widget *widget, void *junk)
 }
 
 void next()
-/* ¹¦ÄÜ£º½øĞĞÏÂÒ»¾Ö */
+/* åŠŸèƒ½ï¼šè¿›è¡Œä¸‹ä¸€å±€ */
 {
 	Enable_Widget(btn_j);
 	Enable_Widget(btn_s);
@@ -115,7 +115,7 @@ void next()
 }
 
 void Get_Path(char *filepath, char *out_path)
-/* ¹¦ÄÜ£ºÓÃÓÚ»ñÈ¡³ÌĞòËùÔÚµÄÎÄ¼şÄ¿Â¼ */
+/* åŠŸèƒ½ï¼šç”¨äºè·å–ç¨‹åºæ‰€åœ¨çš„æ–‡ä»¶ç›®å½• */
 {
 	int num; 
 	strcpy(out_path, filepath);
@@ -132,16 +132,16 @@ void Get_Path(char *filepath, char *out_path)
 
 
 int main(int argc,char*argv[])
-/* Ö÷º¯Êı£¬³ÌĞòµÄÈë¿Ú */
+/* ä¸»å‡½æ•°ï¼Œç¨‹åºçš„å…¥å£ */
 {
-	LCUI_Graph   icon, btn_normal, btn_focus, btn_down, btn_over;/* ´æ´¢°´Å¥¸÷ÖÖ×´Ì¬ÒªÏÔÊ¾µÄÍ¼ĞÎ */
+	LCUI_Graph   icon, btn_normal, btn_focus, btn_down, btn_over;/* å­˜å‚¨æŒ‰é’®å„ç§çŠ¶æ€è¦æ˜¾ç¤ºçš„å›¾å½¢ */
 	int			 width, height;
-	/* ×Ô¶¨ÒåÄ¬ÈÏ×ÖÌåÎÄ¼şÎ»ÖÃ */
-	//Set_Default_Font("/mnt/Data/LC-SOFT/fonts/Î¢ÈíÑÅºÚ.ttf");
+	/* è‡ªå®šä¹‰é»˜è®¤å­—ä½“æ–‡ä»¶ä½ç½® */
+	//Set_Default_Font("/mnt/Data/LC-SOFT/fonts/å¾®è½¯é›…é»‘.ttf");
 	Set_Default_Font("../../fonts/msyh.ttf");
-	/* ³õÊ¼»¯LCUI */
+	/* åˆå§‹åŒ–LCUI */
 	LCUI_Init(argc, argv); 
-	/* ³õÊ¼»¯Í¼Æ¬Êı¾İ½á¹¹Ìå */
+	/* åˆå§‹åŒ–å›¾ç‰‡æ•°æ®ç»“æ„ä½“ */
 	Graph_Init(&btn_normal);
 	Graph_Init(&btn_focus);
 	Graph_Init(&btn_down);
@@ -155,7 +155,7 @@ int main(int argc,char*argv[])
 	Graph_Init(&think);
 	Graph_Init(&icon);
 	
-	/* »ñÈ¡ÎÄ¼şµÄÂ·¾¶£¬Ö®ºó´ò¿ª²¢ÔØÈëÍ¼Æ¬ */ 
+	/* è·å–æ–‡ä»¶çš„è·¯å¾„ï¼Œä¹‹åæ‰“å¼€å¹¶è½½å…¥å›¾ç‰‡ */ 
 	Load_Image("drawable/jsb_b.png", &cloth); 
 	Load_Image("drawable/jsb_s.png", &stone);  
 	Load_Image("drawable/jsb_j.png", &knife); 
@@ -166,68 +166,68 @@ int main(int argc,char*argv[])
 	Load_Image("drawable/btn_down.png", &btn_down); 
 	Load_Image("drawable/icon.png", &icon);
 	
-	/* ´´½¨Ò»¸öLCUI³ÌĞò´°¿Ú */
-	width  = 320; /* ¼ÇÂ¼´°¿ÚµÄ¿í¶È */
-	height = 240; /* ¼ÇÂ¼´°¿ÚµÄ¸ß¶È */ 
+	/* åˆ›å»ºä¸€ä¸ªLCUIç¨‹åºçª—å£ */
+	width  = 320; /* è®°å½•çª—å£çš„å®½åº¦ */
+	height = 240; /* è®°å½•çª—å£çš„é«˜åº¦ */ 
 	
-	/* ´´½¨Ò»¸ö´°¿Ú */
+	/* åˆ›å»ºä¸€ä¸ªçª—å£ */
 	window = Create_Widget("window"); 
-	/* Éè¶¨±êÌâÀ¸ÏÔÊ¾µÄÎÄ±¾ */
-	Set_Window_Title_Text(window, "²ÂÈ­");
+	/* è®¾å®šæ ‡é¢˜æ æ˜¾ç¤ºçš„æ–‡æœ¬ */
+	Set_Window_Title_Text(window, "çŒœæ‹³");
 	Set_Window_Title_Icon(window, &icon);
 	Resize_Widget(window, Size(width, height));
 	
-	/* ÔÚ´°¿ÚÄÚ´´½¨ÏàÓ¦µÄ²¿¼ş£¬²¢»ñÈ¡²¿¼şÖ¸Õë */ 
-	label		= Create_Widget("label"); /* label²¿¼ş£¬ÓÃÓÚÏÔÊ¾ÎÄ×Ö */
+	/* åœ¨çª—å£å†…åˆ›å»ºç›¸åº”çš„éƒ¨ä»¶ï¼Œå¹¶è·å–éƒ¨ä»¶æŒ‡é’ˆ */ 
+	label		= Create_Widget("label"); /* labeléƒ¨ä»¶ï¼Œç”¨äºæ˜¾ç¤ºæ–‡å­— */
 	l_vs		= Create_Widget("label");
-	/* button²¿¼ş£¬Ìá¹©¿É±»µã»÷µÄ°´Å¥£¬´´½¨ºó£¬Ê¹ÓÃ×Ô¶¨ÒåµÄÎÄ±¾ */
-	btn_b		= Create_Button_With_Text("²¼"); 
-	btn_s		= Create_Button_With_Text("Ê¯Í·");
-	btn_j		= Create_Button_With_Text("¼ôµ¶");
-	btn_next	= Create_Button_With_Text("ÏÂÒ»¾Ö");
-	/* picture_box²¿¼ş£¬ÓÃÓÚÏÔÊ¾Í¼Ïñ */
-	cpu_pic_box = Create_Widget("picture_box"); /* Õâ¸öÊÇÓÃÓÚÏÔÊ¾³ÌĞò³öµÄÈ­ */
-	me_pic_box  = Create_Widget("picture_box"); /* Õâ¸öÊÇÓÃÓÚÏÔÊ¾Íæ¼Ò³öµÄÈ­ */
-	/* Éè¶¨label²¿¼şÏÔÊ¾µÄÎÄ±¾ÄÚÈİ */
-	Set_Label_Text(label, "±¾²ÂÈ­ÓÎÏ·ÓÉliuchao35758600ÖÆ×÷");
+	/* buttonéƒ¨ä»¶ï¼Œæä¾›å¯è¢«ç‚¹å‡»çš„æŒ‰é’®ï¼Œåˆ›å»ºåï¼Œä½¿ç”¨è‡ªå®šä¹‰çš„æ–‡æœ¬ */
+	btn_b		= Create_Button_With_Text("å¸ƒ"); 
+	btn_s		= Create_Button_With_Text("çŸ³å¤´");
+	btn_j		= Create_Button_With_Text("å‰ªåˆ€");
+	btn_next	= Create_Button_With_Text("ä¸‹ä¸€å±€");
+	/* picture_boxéƒ¨ä»¶ï¼Œç”¨äºæ˜¾ç¤ºå›¾åƒ */
+	cpu_pic_box = Create_Widget("picture_box"); /* è¿™ä¸ªæ˜¯ç”¨äºæ˜¾ç¤ºç¨‹åºå‡ºçš„æ‹³ */
+	me_pic_box  = Create_Widget("picture_box"); /* è¿™ä¸ªæ˜¯ç”¨äºæ˜¾ç¤ºç©å®¶å‡ºçš„æ‹³ */
+	/* è®¾å®šlabeléƒ¨ä»¶æ˜¾ç¤ºçš„æ–‡æœ¬å†…å®¹ */
+	Set_Label_Text(label, "æœ¬çŒœæ‹³æ¸¸æˆç”±liuchao35758600åˆ¶ä½œ");
 	
-	/* Éè¶¨label²¿¼şÖĞµÄ×ÖÌå´óĞ¡Îª55ÏñËØ£¬ÑÕÉ«ÎªºìÉ« */
+	/* è®¾å®šlabeléƒ¨ä»¶ä¸­çš„å­—ä½“å¤§å°ä¸º55åƒç´ ï¼Œé¢œè‰²ä¸ºçº¢è‰² */
 	Set_Label_Font(l_vs, 55, NULL); 
 	Set_Label_Text(l_vs, "<color=255,0,0>Vs.</color>");
-	/* ½ûÓÃ°´Å¥µÄ×Ô¶¯³ß´çµ÷Õû */
+	/* ç¦ç”¨æŒ‰é’®çš„è‡ªåŠ¨å°ºå¯¸è°ƒæ•´ */
 	Disable_Widget_Auto_Size(btn_b);
 	Disable_Widget_Auto_Size(btn_s);
 	Disable_Widget_Auto_Size(btn_j);
 	Disable_Widget_Auto_Size(btn_next);
-	/* µ÷ÕûÕâĞ©²¿¼şµÄ´óĞ¡ */
+	/* è°ƒæ•´è¿™äº›éƒ¨ä»¶çš„å¤§å° */
 	Resize_Widget(btn_b, Size(80, 30));
 	Resize_Widget(btn_s, Size(80, 30));
 	Resize_Widget(btn_j, Size(80, 30));
 	Resize_Widget(btn_next, Size(80, 30));
 	Resize_Widget(me_pic_box, Size(110, 140));
 	Resize_Widget(cpu_pic_box, Size(110, 140));
-	/* ×Ô¶¨ÒåÕâËÄ¸ö°´Å¥µÄ·ç¸ñ */
+	/* è‡ªå®šä¹‰è¿™å››ä¸ªæŒ‰é’®çš„é£æ ¼ */
 	Custom_Button_Style(btn_b,    &btn_normal, &btn_over, &btn_down, &btn_focus, NULL); 
 	Custom_Button_Style(btn_s,    &btn_normal, &btn_over, &btn_down, &btn_focus, NULL); 
 	Custom_Button_Style(btn_j,    &btn_normal, &btn_over, &btn_down, &btn_focus, NULL); 
 	Custom_Button_Style(btn_next, &btn_normal, &btn_over, &btn_down, &btn_focus, NULL); 
-	/* Éè¶¨²¿¼ş¶ÔÆë·½Ê½ÒÔ¼°Æ«ÒÆ¾àÀë */
-	Set_Widget_Align(btn_s, ALIGN_BOTTOM_LEFT, Pos(-1, 0));  /* ×óÏÂ */
-	Set_Widget_Align(btn_j, ALIGN_BOTTOM_CENTER, Pos(-40, 0)); /* ÖĞÏÂ */
-	Set_Widget_Align(btn_b, ALIGN_BOTTOM_CENTER, Pos(40, 0));  /* ÖĞÏÂ */
-	Set_Widget_Align(btn_next, ALIGN_BOTTOM_RIGHT, Pos(1, 0)); /* ÓÒÏÂ */
-	Set_Widget_Align(me_pic_box, ALIGN_MIDDLE_LEFT, Pos(5, -5)); /* ÖĞ×ó */
-	Set_Widget_Align(cpu_pic_box, ALIGN_MIDDLE_RIGHT, Pos(-5, -5)); /* ÖĞÓÒ */
-	Set_Widget_Align(label, ALIGN_TOP_CENTER, Pos(0, 3));   /* ÖĞÉÏ */
-	Set_Widget_Align(l_vs, ALIGN_MIDDLE_CENTER, Pos(0, 0)); /* ¾ÓÖĞ */
-	/* Éè¶¨²¿¼şµÄ±ß¿òÒÔ¼°ÑÕÉ« */
+	/* è®¾å®šéƒ¨ä»¶å¯¹é½æ–¹å¼ä»¥åŠåç§»è·ç¦» */
+	Set_Widget_Align(btn_s, ALIGN_BOTTOM_LEFT, Pos(-1, 0));  /* å·¦ä¸‹ */
+	Set_Widget_Align(btn_j, ALIGN_BOTTOM_CENTER, Pos(-40, 0)); /* ä¸­ä¸‹ */
+	Set_Widget_Align(btn_b, ALIGN_BOTTOM_CENTER, Pos(40, 0));  /* ä¸­ä¸‹ */
+	Set_Widget_Align(btn_next, ALIGN_BOTTOM_RIGHT, Pos(1, 0)); /* å³ä¸‹ */
+	Set_Widget_Align(me_pic_box, ALIGN_MIDDLE_LEFT, Pos(5, -5)); /* ä¸­å·¦ */
+	Set_Widget_Align(cpu_pic_box, ALIGN_MIDDLE_RIGHT, Pos(-5, -5)); /* ä¸­å³ */
+	Set_Widget_Align(label, ALIGN_TOP_CENTER, Pos(0, 3));   /* ä¸­ä¸Š */
+	Set_Widget_Align(l_vs, ALIGN_MIDDLE_CENTER, Pos(0, 0)); /* å±…ä¸­ */
+	/* è®¾å®šéƒ¨ä»¶çš„è¾¹æ¡†ä»¥åŠé¢œè‰² */
 	Set_Widget_Border(me_pic_box, RGB(0,0,0), Border(1, 1, 1, 1));
 	Set_Widget_Border(cpu_pic_box, RGB(0,0,0), Border(1, 1, 1, 1));
-	/* ÇåÀíÓÎÏ· */
+	/* æ¸…ç†æ¸¸æˆ */
 	clear_game();
-	/* ½«·µ»Ø¼üÓë Main_Loop_Quitº¯Êı¹ØÁª£¬µ±·µ»Ø¼ü±»°´ÏÂºó£¬³ÌĞòÍË³öÖ÷Ñ­»· */
+	/* å°†è¿”å›é”®ä¸ Main_Loop_Quitå‡½æ•°å…³è”ï¼Œå½“è¿”å›é”®è¢«æŒ‰ä¸‹åï¼Œç¨‹åºé€€å‡ºä¸»å¾ªç¯ */
 	LCUI_Key_Event_Connect(KEY_ESC, Main_Loop_Quit, NULL);
-	/* ¹ØÁªÕâĞ©°´Å¥µÄµ¥»÷ÊÂ¼ş */ 
+	/* å…³è”è¿™äº›æŒ‰é’®çš„å•å‡»äº‹ä»¶ */ 
 	Widget_Clicked_Event_Connect(btn_s, select_stone, NULL); 
 	
 	Widget_Clicked_Event_Connect(btn_j, select_knife, NULL); 
@@ -235,7 +235,7 @@ int main(int argc,char*argv[])
 	Widget_Clicked_Event_Connect(btn_b, select_cloth, NULL); 
 	
 	Widget_Clicked_Event_Connect(btn_next, next, NULL);
-	/* ½«ËüÃÇ¼ÓÈëÖÁ´°¿Ú¿Í»§Çø£¬Ò²¾ÍÊÇÒÔ´°¿Ú¿Í»§ÇøÎªÈİÆ÷ */
+	/* å°†å®ƒä»¬åŠ å…¥è‡³çª—å£å®¢æˆ·åŒºï¼Œä¹Ÿå°±æ˜¯ä»¥çª—å£å®¢æˆ·åŒºä¸ºå®¹å™¨ */
 	Window_Client_Area_Add(window,btn_s);
 	Window_Client_Area_Add(window,btn_j);
 	Window_Client_Area_Add(window,btn_b);
@@ -244,7 +244,7 @@ int main(int argc,char*argv[])
 	Window_Client_Area_Add(window,me_pic_box);
 	Window_Client_Area_Add(window,cpu_pic_box);
 	Window_Client_Area_Add(window,btn_next);
-	/* ÏÔÊ¾²¿¼şÒÔ¼°´°¿Ú */ 
+	/* æ˜¾ç¤ºéƒ¨ä»¶ä»¥åŠçª—å£ */ 
 	Show_Widget(btn_s);
 	Show_Widget(btn_j);
 	Show_Widget(btn_b);
@@ -254,6 +254,6 @@ int main(int argc,char*argv[])
 	Show_Widget(cpu_pic_box);
 	Show_Widget(btn_next);
 	Show_Widget(window);
-	return LCUI_Main(); /* ½øÈëLCUIµÄÖ÷Ñ­»· */
+	return LCUI_Main(); /* è¿›å…¥LCUIçš„ä¸»å¾ªç¯ */
 }
  

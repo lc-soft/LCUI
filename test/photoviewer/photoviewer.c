@@ -1,4 +1,4 @@
-// ÓÃLCUIÊµÏÖµÄ¼òÒ×ÕÕÆ¬²é¿´Æ÷
+// ç”¨LCUIå®ç°çš„ç®€æ˜“ç…§ç‰‡æŸ¥çœ‹å™¨
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -19,54 +19,54 @@
 #include <dirent.h>
 #include <locale.h>
 #include <math.h>
-/* ÓëÕâĞ©º¯Êı¹²ÏíÊı¾İ£¬Ö»ÓĞÊ¹ÓÃÈ«¾Ö±äÁ¿£¬´«²ÎÊıºÜÂé·³ */
+/* ä¸è¿™äº›å‡½æ•°å…±äº«æ•°æ®ï¼Œåªæœ‰ä½¿ç”¨å…¨å±€å˜é‡ï¼Œä¼ å‚æ•°å¾ˆéº»çƒ¦ */
 static LCUI_Widget	*window, *image_box, *tip_text, *tip_box,
 						*image_info_text, *image_info_box,
 						*btn_zoom[2], *btn_switch[2], *container[2];
 						
-static float	mini_scale = 0, scale = 1;   /* ¼ÇÂ¼Ëõ·Å±ÈÂÊ */
+static float	mini_scale = 0, scale = 1;   /* è®°å½•ç¼©æ”¾æ¯”ç‡ */
 static char	name[256], **filename = NULL;
 static int		total_files = 0, current = 0;
 
 static pthread_t thread_hide, thread_loading, thread_viewer;
 
 void image_zoom_in()
-/* ¹¦ÄÜ£º·Å´óÍ¼Ïñ */
+/* åŠŸèƒ½ï¼šæ”¾å¤§å›¾åƒ */
 {
 	LCUI_Size size;
 	LCUI_Graph *image; 
-	scale += 0.25; /* Ëõ·Å±ÈÀı×ÔÔö25% */
+	scale += 0.25; /* ç¼©æ”¾æ¯”ä¾‹è‡ªå¢25% */
 	if(scale >= 2) 
 	{
-		Disable_Widget(btn_zoom[1]);/* ½ûÓÃ¡°·Å´ó¡±°´Å¥ */
-		scale = 2.0; /* ×î´ó²»ÄÜ³¬¹ı200% */
+		Disable_Widget(btn_zoom[1]);/* ç¦ç”¨â€œæ”¾å¤§â€æŒ‰é’® */
+		scale = 2.0; /* æœ€å¤§ä¸èƒ½è¶…è¿‡200% */
 	}
-	/* ÎªÁËÄÜ´ïµ½100%£¬¼ÓÁË¸öÅĞ¶Ï£¬Èç¹ûËõ·Å±ÈÀı½Ó½ü100%£¬ÄÇ¾ÍÖ±½ÓµÈÓÚ100% */
+	/* ä¸ºäº†èƒ½è¾¾åˆ°100%ï¼ŒåŠ äº†ä¸ªåˆ¤æ–­ï¼Œå¦‚æœç¼©æ”¾æ¯”ä¾‹æ¥è¿‘100%ï¼Œé‚£å°±ç›´æ¥ç­‰äº100% */
 	if(scale > 0.85 && scale < 1.10) scale = 1; 
-	/* °´±ÈÀıËõ·Åä¯ÀÀÇøÓò */
+	/* æŒ‰æ¯”ä¾‹ç¼©æ”¾æµè§ˆåŒºåŸŸ */
 	Zoom_PictureBox_View_Area(image_box, scale);
-	scale = Get_PictureBox_Zoom_Scale(image_box);/* »ñÈ¡Ëõ·Å±ÈÀı */
-	image = Get_PictureBox_Graph(image_box); /* »ñÈ¡Í¼ÏñÖ¸Õë */
+	scale = Get_PictureBox_Zoom_Scale(image_box);/* è·å–ç¼©æ”¾æ¯”ä¾‹ */
+	image = Get_PictureBox_Graph(image_box); /* è·å–å›¾åƒæŒ‡é’ˆ */
 	size = Get_Graph_Size(image);
 	Set_Label_Text(
 		image_info_text, 
-		"ÎÄ¼ş£º (%d/%d) %s\n"
-		"³ß´ç£º %d x %d ÏñËØ\n"
-		"Ëõ·Å£º %.2f%%",
+		"æ–‡ä»¶ï¼š (%d/%d) %s\n"
+		"å°ºå¯¸ï¼š %d x %d åƒç´ \n"
+		"ç¼©æ”¾ï¼š %.2f%%",
 		current+1, total_files, name,
 		size.w, size.h, 100*scale);
-	/* ÆôÓÃ¡°ËõĞ¡¡±°´Å¥ */
+	/* å¯ç”¨â€œç¼©å°â€æŒ‰é’® */
 	Enable_Widget(btn_zoom[0]); 
 }
 
 void image_zoom_out()
-/* ¹¦ÄÜ£ºËõĞ¡Í¼Ïñ */
+/* åŠŸèƒ½ï¼šç¼©å°å›¾åƒ */
 {
 	LCUI_Size size;
 	LCUI_Graph *image;
 	
-	scale -= 0.25; /* Ëõ·Å±ÈÀı×Ô¼õ25% */
-	/* ×îĞ¡²»ÄÜµÍÓÚmini_scaleÖĞ±íÊ¾µÄ±ÈÀı */
+	scale -= 0.25; /* ç¼©æ”¾æ¯”ä¾‹è‡ªå‡25% */
+	/* æœ€å°ä¸èƒ½ä½äºmini_scaleä¸­è¡¨ç¤ºçš„æ¯”ä¾‹ */
 	if(scale <= mini_scale) 
 	{
 		scale = mini_scale;
@@ -76,16 +76,16 @@ void image_zoom_out()
 		scale = 1; 
 	if(scale > 0.05 && scale < mini_scale + 0.05) 
 		scale = mini_scale;
-	/* °´±ÈÀıËõ·Åä¯ÀÀÇøÓò */
+	/* æŒ‰æ¯”ä¾‹ç¼©æ”¾æµè§ˆåŒºåŸŸ */
 	Zoom_PictureBox_View_Area(image_box, scale);
 	scale = Get_PictureBox_Zoom_Scale(image_box);
-	image = Get_PictureBox_Graph(image_box); /* »ñÈ¡Í¼ÏñÖ¸Õë */
+	image = Get_PictureBox_Graph(image_box); /* è·å–å›¾åƒæŒ‡é’ˆ */
 	size = Get_Graph_Size(image);
 	Set_Label_Text(
 		image_info_text, 
-		"ÎÄ¼ş£º (%d/%d) %s\n"
-		"³ß´ç£º %d x %d ÏñËØ\n"
-		"Ëõ·Å£º %.2f%%",
+		"æ–‡ä»¶ï¼š (%d/%d) %s\n"
+		"å°ºå¯¸ï¼š %d x %d åƒç´ \n"
+		"ç¼©æ”¾ï¼š %.2f%%",
 		current+1, total_files, name,
 		size.w, size.h, 100*scale);
 		 
@@ -98,31 +98,31 @@ void image_zoom_out()
 
 
 void move_view_area(LCUI_Widget *widget, LCUI_DragEvent *event)
-/* ¹¦ÄÜ£ºÒÆ¶¯ä¯ÀÀÇøÓò */
+/* åŠŸèƒ½ï¼šç§»åŠ¨æµè§ˆåŒºåŸŸ */
 {
 	LCUI_Pos pos; 
 	static LCUI_Pos old_pos, offset_pos;
 	if(event->first_click)
-	{/* Èç¹ûÊÇ¸Õ±»µã»÷ */
-		/* ¼ÇÂ¼±»µã»÷Ê±µÄÎ»ÖÃ£¬ÒÔºóµÄÒÆ¶¯£¬¾ÍÒÔ¸ÃÎ»ÖÃÎª»ù´¡¼ÆËã³öĞÂÎ»ÖÃ */
+	{/* å¦‚æœæ˜¯åˆšè¢«ç‚¹å‡» */
+		/* è®°å½•è¢«ç‚¹å‡»æ—¶çš„ä½ç½®ï¼Œä»¥åçš„ç§»åŠ¨ï¼Œå°±ä»¥è¯¥ä½ç½®ä¸ºåŸºç¡€è®¡ç®—å‡ºæ–°ä½ç½® */
 		old_pos = Get_PictureBox_View_Area_Pos(widget);
-		/* ä¯ÀÀÇøÓòÎ»ÖÃÓëÍ¼Æ¬¿òÎ»ÖÃµÄÆ«ÒÆ¾àÀë */
+		/* æµè§ˆåŒºåŸŸä½ç½®ä¸å›¾ç‰‡æ¡†ä½ç½®çš„åç§»è·ç¦» */
 		offset_pos = Pos_Sub(Get_Widget_Global_Pos(widget), old_pos); 
 	} 
 	else if(event->end_click);
 	else
-	{/* ·ñÔò£¬ÄÇ¾ÍÊÇÕı±»ÍÏ¶¯ */
-		/* »ñÈ¡ä¯ÀÀÇøÓòµÄĞÂÎ»ÖÃ */
+	{/* å¦åˆ™ï¼Œé‚£å°±æ˜¯æ­£è¢«æ‹–åŠ¨ */
+		/* è·å–æµè§ˆåŒºåŸŸçš„æ–°ä½ç½® */
 		pos = Pos_Sub(event->new_pos, offset_pos);
-		/* µÃ³öĞÂÎ»ÖÃÓëÀÏÎ»ÖÃµÄ¡°²î¡± */
+		/* å¾—å‡ºæ–°ä½ç½®ä¸è€ä½ç½®çš„â€œå·®â€ */
 		pos = Pos_Sub(old_pos, pos);
-		/* ÓÉÓÚä¯ÀÀÇøÓòÊÇÏòÊó±êÒÆ¶¯·½ÏòÏà·´µÄ·½ÏòÒÆ¶¯£¬Òò´Ë£¬ĞÂÎ»ÖÃÊµ¼ÊÊÇÀÏÎ»ÖÃÓë¡°²î¡±µÄºÍ */
+		/* ç”±äºæµè§ˆåŒºåŸŸæ˜¯å‘é¼ æ ‡ç§»åŠ¨æ–¹å‘ç›¸åçš„æ–¹å‘ç§»åŠ¨ï¼Œå› æ­¤ï¼Œæ–°ä½ç½®å®é™…æ˜¯è€ä½ç½®ä¸â€œå·®â€çš„å’Œ */
 		pos = Pos_Add(old_pos, pos); 
 		Move_PictureBox_View_Area(widget, pos);
 	}
 }
 
-//Èç¹ûÊÇÓÃ°´Å¥¿ØÖÆä¯ÀÀÇøÓò£¬¾ÍÊ¹ÓÃÏÂÃæµÄËÄ¸öº¯Êı
+//å¦‚æœæ˜¯ç”¨æŒ‰é’®æ§åˆ¶æµè§ˆåŒºåŸŸï¼Œå°±ä½¿ç”¨ä¸‹é¢çš„å››ä¸ªå‡½æ•°
 void left_move_area()
 {
 	LCUI_Rect rect;
@@ -158,7 +158,7 @@ void down_move_area()
 	Move_PictureBox_View_Area(image_box, Pos(rect.x, rect.y));
 }
 
-//´´½¨µÄÏß³ÌÓÃÓÚÒş²Ø°´Å¥ÒÔ¼°Í¼ÏñĞÅÏ¢
+//åˆ›å»ºçš„çº¿ç¨‹ç”¨äºéšè—æŒ‰é’®ä»¥åŠå›¾åƒä¿¡æ¯
 static int wait_hide_btn = 4, wait_hide_info = 4;
 void *hide()
 {
@@ -195,7 +195,7 @@ void show_button()
 }
 
 void get_filename(char *filepath, char *out_name)
-/* ¹¦ÄÜ£ºÓÃÓÚ»ñÈ¡ÎÄ¼şÃû */
+/* åŠŸèƒ½ï¼šç”¨äºè·å–æ–‡ä»¶å */
 {
 	int m,n = 0;
 	char *p;
@@ -211,7 +211,7 @@ void get_filename(char *filepath, char *out_name)
 }
 
 void get_filepath(char *filepath, char *out_path)
-/* ¹¦ÄÜ£ºÓÃÓÚ»ñÈ¡³ÌĞòËùÔÚµÄÎÄ¼şÄ¿Â¼ */
+/* åŠŸèƒ½ï¼šç”¨äºè·å–ç¨‹åºæ‰€åœ¨çš„æ–‡ä»¶ç›®å½• */
 {
 	int num;
 	strcpy(out_path, filepath);
@@ -227,7 +227,7 @@ void get_filepath(char *filepath, char *out_path)
 }
  
 int get_format(char *format, char *filename)
-/* ¹¦ÄÜ£º»ñÈ¡ÎÄ¼ş¸ñÊ½ */
+/* åŠŸèƒ½ï¼šè·å–æ–‡ä»¶æ ¼å¼ */
 {
 	int i, j, len;
 	len = strlen(filename);
@@ -249,7 +249,7 @@ int get_format(char *format, char *filename)
 
  
 char **scan_imgfile(char *dir, int *file_num)
-/* ¹¦ÄÜ£ºÉ¨ÃèÍ¼Æ¬ÎÄ¼ş£¬²¢»ñµÃÎÄ¼şÁĞ±í */
+/* åŠŸèƒ½ï¼šæ‰«æå›¾ç‰‡æ–‡ä»¶ï¼Œå¹¶è·å¾—æ–‡ä»¶åˆ—è¡¨ */
 {
 	int i, len, n; 
 	char **filelist, format[256], path[1024];
@@ -266,7 +266,7 @@ char **scan_imgfile(char *dir, int *file_num)
 		filelist = (char **)malloc(sizeof(char *)*n);
 		for(i=0, *file_num=0; i<n; i++)
 		{
-			if(namelist[i]->d_type==8)/* Èç¹ûÊÇÎÄ¼ş */ 
+			if(namelist[i]->d_type==8)/* å¦‚æœæ˜¯æ–‡ä»¶ */ 
 			{
 				get_format(format, namelist[i]->d_name);
 				if(strlen(format) > 2 && 
@@ -299,7 +299,7 @@ char **scan_imgfile(char *dir, int *file_num)
 }
 
 void *load_imagefile(void *file)
-/* ¹¦ÄÜ£ºÔØÈëÍ¼Æ¬ÎÄ¼ş */
+/* åŠŸèƒ½ï¼šè½½å…¥å›¾ç‰‡æ–‡ä»¶ */
 {
 	LCUI_Size size;
 	LCUI_Graph *image;
@@ -307,12 +307,12 @@ void *load_imagefile(void *file)
 	
 	result = calloc(1, sizeof(int));
 	get_filename(file, name);
-	Set_Label_Text(tip_text, "ÕıÔØÈëÍ¼Æ¬..."); 
+	Set_Label_Text(tip_text, "æ­£è½½å…¥å›¾ç‰‡..."); 
 	tip_box->set_alpha(tip_box, 200);
 	Show_Widget(tip_text); 
     Show_Widget(tip_box);
     
-    /* ²éÕÒ±¾ÎÄ¼şËùÔÚÎ»ÖÃ */ 
+    /* æŸ¥æ‰¾æœ¬æ–‡ä»¶æ‰€åœ¨ä½ç½® */ 
     for(i=0; i<total_files; ++i)
     {
 		if(strcmp(file, filename[i]) == 0)
@@ -329,8 +329,8 @@ void *load_imagefile(void *file)
 	*result = Set_PictureBox_Image_From_File(image_box, file); 
 	
 	if(*result != 0)
-	{/* Èç¹ûÍ¼Æ¬ÎÄ¼ş¶ÁÈ¡Ê§°Ü */
-		Set_Label_Text(tip_text, "Í¼Æ¬ÔØÈëÊ§°Ü!");
+	{/* å¦‚æœå›¾ç‰‡æ–‡ä»¶è¯»å–å¤±è´¥ */
+		Set_Label_Text(tip_text, "å›¾ç‰‡è½½å…¥å¤±è´¥!");
 		size.w = 0;
 		size.h = 0;
 	}
@@ -340,7 +340,7 @@ void *load_imagefile(void *file)
 		size = Get_Graph_Size(image);
 		if( 1 == Size_Cmp(size, Get_Widget_Size(image_box) ))
 		{
-		/* Èç¹ûÍ¼Æ¬³ß´ç´óÓÚPictureBoxµÄ³ß´ç£¬¾Í¸Ä±äPictureBoxµÄÍ¼Ïñ´¦ÀíÄ£Ê½ */
+		/* å¦‚æœå›¾ç‰‡å°ºå¯¸å¤§äºPictureBoxçš„å°ºå¯¸ï¼Œå°±æ”¹å˜PictureBoxçš„å›¾åƒå¤„ç†æ¨¡å¼ */
 			Set_PictureBox_Size_Mode(image_box, SIZE_MODE_ZOOM);
 			mini_scale = Get_PictureBox_Zoom_Scale(image_box);
 		}
@@ -352,63 +352,63 @@ void *load_imagefile(void *file)
 	scale = Get_PictureBox_Zoom_Scale(image_box); 
 	Set_Label_Text(
 		image_info_text, 
-		"ÎÄ¼ş£º (%d/%d) %s\n"
-		"³ß´ç£º %d x %d ÏñËØ\n"
-		"Ëõ·Å£º %.2f%%",
+		"æ–‡ä»¶ï¼š (%d/%d) %s\n"
+		"å°ºå¯¸ï¼š %d x %d åƒç´ \n"
+		"ç¼©æ”¾ï¼š %.2f%%",
 		current+1, total_files, name,
 		size.w, size.h, 100*scale);
-	/* ÉèÖÃÍ¸Ã÷¶È */
+	/* è®¾ç½®é€æ˜åº¦ */
 	image_info_box->set_alpha(image_info_box, 200);
 	Show_Widget(image_info_text);
 	Show_Widget(image_info_box);
-	/* ×ÓÏß³Ì·µ»Ø½á¹û */
+	/* å­çº¿ç¨‹è¿”å›ç»“æœ */
 	LCUI_Thread_Exit(result);
 }
 
 void *viewer(void *file)
-/* ¹¦ÄÜ£º½«ÔØÈëµÄÍ¼Æ¬ÏÔÊ¾³öÀ´ */
+/* åŠŸèƒ½ï¼šå°†è½½å…¥çš„å›¾ç‰‡æ˜¾ç¤ºå‡ºæ¥ */
 {
 	LCUI_Graph *image, bg;
 	int *result = NULL; 
 	Graph_Init(&bg);
-	/* µÈ´ıÍ¼Æ¬ÔØÈë½áÊø£¬²¢»ñÈ¡Ïß³Ì·µ»ØÖµ */
+	/* ç­‰å¾…å›¾ç‰‡è½½å…¥ç»“æŸï¼Œå¹¶è·å–çº¿ç¨‹è¿”å›å€¼ */
 	LCUI_Thread_Join(thread_loading, (void**)&result);
 	if(*result == 0)
-	{/* Èç¹ûÕı³£´ò¿ªÁËÍ¼Æ¬ */
-		scale = Get_PictureBox_Zoom_Scale(image_box); /* »ñÈ¡Ëõ·Å±ÈÀı */
-		image = Get_PictureBox_Graph(image_box); /* »ñÈ¡Í¼ÏñÖ¸Õë */
+	{/* å¦‚æœæ­£å¸¸æ‰“å¼€äº†å›¾ç‰‡ */
+		scale = Get_PictureBox_Zoom_Scale(image_box); /* è·å–ç¼©æ”¾æ¯”ä¾‹ */
+		image = Get_PictureBox_Graph(image_box); /* è·å–å›¾åƒæŒ‡é’ˆ */
 		if(Graph_Is_PNG(image) && Graph_Have_Alpha(image))
 		{
-			Load_Graph_Mosaics(&bg);/* ÔØÈëÂíÈü¿ËÍ¼ĞÎ */
-			Set_Widget_Background_Image(image_box, &bg, LAYOUT_TILE);/* Æ½ÆÌ±³¾°Í¼ */
+			Load_Graph_Mosaics(&bg);/* è½½å…¥é©¬èµ›å…‹å›¾å½¢ */
+			Set_Widget_Background_Image(image_box, &bg, LAYOUT_TILE);/* å¹³é“ºèƒŒæ™¯å›¾ */
 			Free_Graph(&bg);
 		}
 		else Set_Widget_Background_Image(image_box, NULL, LAYOUT_NONE);
 	}
-	/* Èç¹û½Ó½ü×îĞ¡Ëõ·Å±ÈÀı£¬ÄÇ¾Í½ûÓÃ¡°ËõĞ¡¡±°´Å¥£¬·ñÔò£¬ÆôÓÃ */
+	/* å¦‚æœæ¥è¿‘æœ€å°ç¼©æ”¾æ¯”ä¾‹ï¼Œé‚£å°±ç¦ç”¨â€œç¼©å°â€æŒ‰é’®ï¼Œå¦åˆ™ï¼Œå¯ç”¨ */
 	if(fabs(mini_scale - scale) < 0.01)
 		Disable_Widget(btn_zoom[0]); 
 	else
 		Enable_Widget(btn_zoom[0]);
-	/* ÆôÓÃ·Å´ó°´Å¥ */
+	/* å¯ç”¨æ”¾å¤§æŒ‰é’® */
 	Enable_Widget(btn_zoom[1]);
 	free(result);
 	LCUI_Thread_Exit(NULL);
 }
 
 int open_image_file(char *filename)
-/* ¹¦ÄÜ£º´ò¿ªÍ¼Æ¬ÎÄ¼ş */
+/* åŠŸèƒ½ï¼šæ‰“å¼€å›¾ç‰‡æ–‡ä»¶ */
 {
 	show_button();
 	show_image_info();
-	/* ´´½¨Á½¸ö¸öÏß³Ì£¬Ò»¸öÓÃÓÚÔØÈëÍ¼Ïñ£¬Ò»¸öÓÃÓÚä¯ÀÀËùÔØÈëµÄÍ¼Ïñ */
+	/* åˆ›å»ºä¸¤ä¸ªä¸ªçº¿ç¨‹ï¼Œä¸€ä¸ªç”¨äºè½½å…¥å›¾åƒï¼Œä¸€ä¸ªç”¨äºæµè§ˆæ‰€è½½å…¥çš„å›¾åƒ */
 	LCUI_Thread_Create(&thread_loading, NULL, load_imagefile, (void*)filename); 
 	LCUI_Thread_Create(&thread_viewer, NULL, viewer, (void*)filename);
 	return LCUI_Thread_Join(thread_viewer, NULL);
 }
 
 void prev_image(LCUI_Widget *widget, void *arg)
-/* ¹¦ÄÜ£ºÇĞ»»ÖÁÉÏÒ»ÕÅÍ¼ */
+/* åŠŸèƒ½ï¼šåˆ‡æ¢è‡³ä¸Šä¸€å¼ å›¾ */
 { 
 	if(total_files <= 0)
 		return;
@@ -422,7 +422,7 @@ void prev_image(LCUI_Widget *widget, void *arg)
 }
 
 void next_image(LCUI_Widget *widget, void *arg)
-/* ¹¦ÄÜ£ºÇĞ»»ÖÁÏÂÒ»ÕÅÍ¼ */
+/* åŠŸèƒ½ï¼šåˆ‡æ¢è‡³ä¸‹ä¸€å¼ å›¾ */
 {
 	if(total_files <= 0)
 		return;
@@ -439,7 +439,7 @@ int main(int argc, char*argv[])
 { 
 	int i;
     LCUI_Graph app_icon, btn_zoom_pic[6], btn_switch_pic[6];
-	/* Éè¶¨Ä¬ÈÏ×ÖÌåÎÄ¼şÎ»ÖÃ */
+	/* è®¾å®šé»˜è®¤å­—ä½“æ–‡ä»¶ä½ç½® */
 	Set_Default_Font("../../fonts/msyh.ttf");
     LCUI_Init(argc, argv); 
     Graph_Init(&app_icon); 
@@ -449,29 +449,29 @@ int main(int argc, char*argv[])
 		Graph_Init(&btn_zoom_pic[i]); 
 		Graph_Init(&btn_switch_pic[i]); 
 	}
-    /* ´´½¨´°¿Ú²¿¼ş */
+    /* åˆ›å»ºçª—å£éƒ¨ä»¶ */
     window			= Create_Widget("window");
-    /* ´´½¨Á½¸öÈİÆ÷ */
+    /* åˆ›å»ºä¸¤ä¸ªå®¹å™¨ */
     container[0]	= Create_Widget(NULL);
     container[1]	= Create_Widget(NULL);
-    /* ÒÔÏÂÁ½¸ö°´Å¥ÓÃÓÚ·Å´óËõĞ¡ */
-	btn_zoom[0]		= Create_Widget("button"); /* ¡°ËõĞ¡¡±°´Å¥ */
-	btn_zoom[1]		= Create_Widget("button"); /* ¡°·Å´ó¡±°´Å¥ */
-	/* ÒÔÏÂÁ½¸ö°´Å¥ÓÃÓÚÇĞ»»Í¼Æ¬ */
-	btn_switch[0]	= Create_Widget("button"); /* ¡°ÉÏÒ»ÕÅ¡±°´Å¥ */
-	btn_switch[1]	= Create_Widget("button"); /* ¡°ÏÂÒ»ÕÅ¡±°´Å¥ */
+    /* ä»¥ä¸‹ä¸¤ä¸ªæŒ‰é’®ç”¨äºæ”¾å¤§ç¼©å° */
+	btn_zoom[0]		= Create_Widget("button"); /* â€œç¼©å°â€æŒ‰é’® */
+	btn_zoom[1]		= Create_Widget("button"); /* â€œæ”¾å¤§â€æŒ‰é’® */
+	/* ä»¥ä¸‹ä¸¤ä¸ªæŒ‰é’®ç”¨äºåˆ‡æ¢å›¾ç‰‡ */
+	btn_switch[0]	= Create_Widget("button"); /* â€œä¸Šä¸€å¼ â€æŒ‰é’® */
+	btn_switch[1]	= Create_Widget("button"); /* â€œä¸‹ä¸€å¼ â€æŒ‰é’® */
 	
 	image_info_box = Create_Widget(NULL);
 	image_info_text = Create_Widget("label");
     
-    tip_text = Create_Widget("label"); /* ÌáÊ¾ÎÄ±¾ */
-    tip_box  = Create_Widget(NULL); /* ×÷ÎªÌáÊ¾ÎÄ±¾µÄÈİÆ÷ */
+    tip_text = Create_Widget("label"); /* æç¤ºæ–‡æœ¬ */
+    tip_box  = Create_Widget(NULL); /* ä½œä¸ºæç¤ºæ–‡æœ¬çš„å®¹å™¨ */
 	
-	image_box = Create_Widget("picture_box");/* ´´½¨Ò»¸öÍ¼Æ¬ºĞ×Ó£¬ÓÃÓÚÏÔÊ¾Í¼Æ¬ */
+	image_box = Create_Widget("picture_box");/* åˆ›å»ºä¸€ä¸ªå›¾ç‰‡ç›’å­ï¼Œç”¨äºæ˜¾ç¤ºå›¾ç‰‡ */
 	
-	/* ÔØÈë³ÌĞòÍ¼±ê */ 
+	/* è½½å…¥ç¨‹åºå›¾æ ‡ */ 
 	Load_Image("drawable/icon.png", &app_icon);
-	/* ÔØÈëÕâ¼¸¸ö°´Å¥ÔÚ¸÷¸ö×´Ì¬ÏÂÏÔÊ¾µÄÍ¼ĞÎ */ 
+	/* è½½å…¥è¿™å‡ ä¸ªæŒ‰é’®åœ¨å„ä¸ªçŠ¶æ€ä¸‹æ˜¾ç¤ºçš„å›¾å½¢ */ 
 	Load_Image("drawable/btn_zoom_up_normal.png", &btn_zoom_pic[0]); 
 	Load_Image("drawable/btn_zoom_up_pressed.png", &btn_zoom_pic[1]); 
 	Load_Image("drawable/btn_zoom_up_disabled.png", &btn_zoom_pic[2]); 
@@ -485,7 +485,7 @@ int main(int argc, char*argv[])
 	Load_Image("drawable/btn_prev_down_normal.png", &btn_switch_pic[3]); 
 	Load_Image("drawable/btn_prev_down_pressed.png", &btn_switch_pic[4]); 
 	Load_Image("drawable/btn_prev_down_disabled.png", &btn_switch_pic[5]);
-	/* Éè¶¨°´Å¥Í¼ĞÎÑùÊ½ */
+	/* è®¾å®šæŒ‰é’®å›¾å½¢æ ·å¼ */
 	Custom_Button_Style(	btn_zoom[0], &btn_zoom_pic[3], &btn_zoom_pic[3], 
 							&btn_zoom_pic[4], NULL, &btn_zoom_pic[5] );
 	Custom_Button_Style(	btn_zoom[1], &btn_zoom_pic[0], &btn_zoom_pic[0], 
@@ -496,9 +496,9 @@ int main(int argc, char*argv[])
 	Custom_Button_Style(	btn_switch[1], &btn_switch_pic[3], &btn_switch_pic[3], 
 							&btn_switch_pic[4], NULL, &btn_switch_pic[5] );
 							
-	Set_Widget_Border (image_info_box, RGB(50,50,50), Border(1,1,1,1));/* ÉèÖÃ±ß¿ò */
+	Set_Widget_Border (image_info_box, RGB(50,50,50), Border(1,1,1,1));/* è®¾ç½®è¾¹æ¡† */
 	Set_Widget_Border (tip_box, RGB(50,50,50), Border(1,1,1,1));
-	Set_Widget_Backcolor (image_info_box, RGB(180,215,255));/* ±³¾°ÉèÖÃÎªºÚÉ« */ 
+	Set_Widget_Backcolor (image_info_box, RGB(180,215,255));/* èƒŒæ™¯è®¾ç½®ä¸ºé»‘è‰² */ 
 	Set_Widget_Backcolor (tip_box, RGB(180,215,255)); 
 	Set_Widget_BG_Mode (image_info_box, BG_MODE_FILL_BACKCOLOR);
 	Set_Widget_BG_Mode (tip_box, BG_MODE_FILL_BACKCOLOR);
@@ -514,7 +514,7 @@ int main(int argc, char*argv[])
 					btn_zoom_size[0].h + btn_zoom_size[1].h);
 	size[1] = Size( btn_switch_size[0].w+btn_switch_size[1].w,
 					btn_switch_size[0].h);
-	/* ¸ü¸Ä¸÷¸ö²¿¼şµÄ³ß´ç */
+	/* æ›´æ”¹å„ä¸ªéƒ¨ä»¶çš„å°ºå¯¸ */
     Resize_Widget(window, Size(320, 240));
 	Resize_Widget(btn_zoom[0], btn_zoom_size[0]);
 	Resize_Widget(btn_zoom[1], btn_zoom_size[1]);
@@ -525,17 +525,17 @@ int main(int argc, char*argv[])
 	Resize_Widget(image_box, Size(318, 213));
 	Resize_Widget(tip_box, Size(150, 30));
 	
-	/* Éè¶¨±êÌâÀ¸ÖĞÏÔÊ¾µÄ³ÌĞòÍ¼±êÒÔ¼°ÎÄ±¾ */
+	/* è®¾å®šæ ‡é¢˜æ ä¸­æ˜¾ç¤ºçš„ç¨‹åºå›¾æ ‡ä»¥åŠæ–‡æœ¬ */
 	Set_Window_Title_Icon(window, &app_icon); 
 	
 	char version[20];
 	Get_LCUI_Version(version);
 	if(strcmp(version, "0.12.4") == 0)
-		Set_Window_Title_Text(window, "ÕÕÆ¬²é¿´Æ÷ v0.3"); 
+		Set_Window_Title_Text(window, "ç…§ç‰‡æŸ¥çœ‹å™¨ v0.3"); 
 	else
-		Set_Window_Title_Text(window, "ÕÕÆ¬²é¿´Æ÷ v0.3 <color=240,0,0>(´æÔÚ¼æÈİĞÔÎÊÌâ)</color>"); 
+		Set_Window_Title_Text(window, "ç…§ç‰‡æŸ¥çœ‹å™¨ v0.3 <color=240,0,0>(å­˜åœ¨å…¼å®¹æ€§é—®é¢˜)</color>"); 
 	
-    /* Éè¶¨²¿¼şµÄ²¼¾Ö */
+    /* è®¾å®šéƒ¨ä»¶çš„å¸ƒå±€ */
     Set_Widget_Align(btn_zoom[0], ALIGN_BOTTOM_CENTER, Pos(0, 0));
     Set_Widget_Align(btn_zoom[1], ALIGN_TOP_CENTER, Pos(0, 0));
     Set_Widget_Align(btn_switch[0], ALIGN_MIDDLE_RIGHT, Pos(0, 0));
@@ -548,7 +548,7 @@ int main(int argc, char*argv[])
     Set_Widget_Align(image_info_text, ALIGN_MIDDLE_CENTER, Pos(0, 0));
     Set_Widget_Align(image_info_box, ALIGN_TOP_LEFT, Pos(3, 3));
     
-    /* ½«²¿¼ş¼ÓÈëÏàÓ¦µÄÈİÆ÷ÖĞ */
+    /* å°†éƒ¨ä»¶åŠ å…¥ç›¸åº”çš„å®¹å™¨ä¸­ */
     Widget_Container_Add(container[0], btn_zoom[0]);
     Widget_Container_Add(container[0], btn_zoom[1]);
     Widget_Container_Add(container[1], btn_switch[0]);
@@ -560,13 +560,13 @@ int main(int argc, char*argv[])
     Window_Client_Area_Add(window, image_box);
     Window_Client_Area_Add(window, tip_box);
     Window_Client_Area_Add(window, image_info_box);
-    /* ¹ØÁª²¿¼şµÄÊó±êµã»÷ÊÂ¼ş */
+    /* å…³è”éƒ¨ä»¶çš„é¼ æ ‡ç‚¹å‡»äº‹ä»¶ */
     Widget_Clicked_Event_Connect(btn_switch[0], next_image, NULL);
     Widget_Clicked_Event_Connect(btn_switch[1], prev_image, NULL);
     Widget_Clicked_Event_Connect(btn_zoom[0], image_zoom_out, NULL);
     Widget_Clicked_Event_Connect(btn_zoom[1], image_zoom_in, NULL);
     Widget_Drag_Event_Connect(image_box, move_view_area);
-    /* ÏÔÊ¾²¿¼ş */
+    /* æ˜¾ç¤ºéƒ¨ä»¶ */
     Show_Widget(image_box);
     Show_Widget(container[0]);
     Show_Widget(container[1]);
@@ -574,7 +574,7 @@ int main(int argc, char*argv[])
     
 	LCUI_Key_Event_Connect( KEY_ESC,   Main_Loop_Quit,  NULL);
     if(argc == 2)
-	{/* Èç¹û×Ü¹²ÓĞ2¸ö²ÎÊı */ 
+	{/* å¦‚æœæ€»å…±æœ‰2ä¸ªå‚æ•° */ 
 		char path[1024];
 		get_filepath(argv[1], path);
 		filename = scan_imgfile(path, &total_files); 
@@ -583,7 +583,7 @@ int main(int argc, char*argv[])
 		Show_Widget(btn_zoom[1]);
 		Show_Widget(btn_switch[0]);
 		Show_Widget(btn_switch[1]);
-		/* ¹ØÁª°´¼üÊÂ¼ş£¬µ±°´ÏÂÖ¸¶¨¼üÖµµÄ°´¼üºó£¬»áµ÷ÓÃÒÑ¹ØÁªµÄ»Øµ÷º¯Êı */
+		/* å…³è”æŒ‰é”®äº‹ä»¶ï¼Œå½“æŒ‰ä¸‹æŒ‡å®šé”®å€¼çš„æŒ‰é”®åï¼Œä¼šè°ƒç”¨å·²å…³è”çš„å›è°ƒå‡½æ•° */
 		LCUI_Key_Event_Connect( '=',   image_zoom_in,    NULL);
 		LCUI_Key_Event_Connect( '-',   image_zoom_out,   NULL);
 		LCUI_Key_Event_Connect( KEY_AA,   image_zoom_in,    NULL);
@@ -607,16 +607,16 @@ int main(int argc, char*argv[])
 		get_filename(argv[0], myname);
 		help_text = Create_Widget("label");
 		Set_Label_Text(help_text,
-		"<color=30,145,220>ÓÃ·¨£º</color>\n"
-		"<color=30,220,60>%s</color>  ÎÄ¼ş\n\n"
-		"<color=30,145,220>¿ØÖÆ£º</color>\n"
-		"<color=255,0,0>·½Ïò¼ü£º</color> ÒÆ¶¯ä¯ÀÀÇøÓò\n"
-		"<color=255,0,0>·µ»Ø¼ü£º</color> ÍË³ö³ÌĞò\n"
-		"<color=255,0,0>+/-¼ü£º</color>  ·Å´óºÍËõĞ¡Í¼Ïñ\n" 
-		"<color=255,0,0>N/B¼ü£º</color> ÉÏÏÂÇĞ»»Í¼Ïñ\n" 
-		"<color=255,0,0> I ¼ü£º</color>  ÏÔÊ¾Í¼ÏñĞÅÏ¢\n"
-		"ÄãÒ²¿ÉÒÔÊ¹ÓÃÊó±êµã»÷½çÃæÉÏµÄ°´Å¥½øĞĞ¿ØÖÆ¡£\n"
-		"±¾³ÌĞòÄ¿Ç°Ö§³Öä¯ÀÀbmp, png, jpeg¸ñÊ½µÄÍ¼Æ¬¡£\n",
+		"<color=30,145,220>ç”¨æ³•ï¼š</color>\n"
+		"<color=30,220,60>%s</color>  æ–‡ä»¶\n\n"
+		"<color=30,145,220>æ§åˆ¶ï¼š</color>\n"
+		"<color=255,0,0>æ–¹å‘é”®ï¼š</color> ç§»åŠ¨æµè§ˆåŒºåŸŸ\n"
+		"<color=255,0,0>è¿”å›é”®ï¼š</color> é€€å‡ºç¨‹åº\n"
+		"<color=255,0,0>+/-é”®ï¼š</color>  æ”¾å¤§å’Œç¼©å°å›¾åƒ\n" 
+		"<color=255,0,0>N/Bé”®ï¼š</color> ä¸Šä¸‹åˆ‡æ¢å›¾åƒ\n" 
+		"<color=255,0,0> I é”®ï¼š</color>  æ˜¾ç¤ºå›¾åƒä¿¡æ¯\n"
+		"ä½ ä¹Ÿå¯ä»¥ä½¿ç”¨é¼ æ ‡ç‚¹å‡»ç•Œé¢ä¸Šçš„æŒ‰é’®è¿›è¡Œæ§åˆ¶ã€‚\n"
+		"æœ¬ç¨‹åºç›®å‰æ”¯æŒæµè§ˆbmp, png, jpegæ ¼å¼çš„å›¾ç‰‡ã€‚\n",
 		myname
 		);
 		Set_Widget_Align(help_text, ALIGN_TOP_LEFT, Pos(10, 10));
@@ -625,6 +625,6 @@ int main(int argc, char*argv[])
 		Hide_Widget(container[0]);
 		Hide_Widget(container[1]); 
 	}
-    return LCUI_Main(); /* ½øÈëÖ÷Ñ­»· */  
+    return LCUI_Main(); /* è¿›å…¥ä¸»å¾ªç¯ */  
 }
 

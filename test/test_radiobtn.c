@@ -1,5 +1,5 @@
-// ²âÊÔµ¥Ñ¡¿ò²¿¼şµÄÊ¾Àı³ÌĞò
-#include <LCUI_Build.h> /* °üº¬LCUIµÄÍ·ÎÄ¼ş */
+// æµ‹è¯•å•é€‰æ¡†éƒ¨ä»¶çš„ç¤ºä¾‹ç¨‹åº
+#include <LCUI_Build.h> /* åŒ…å«LCUIçš„å¤´æ–‡ä»¶ */
 #include LC_LCUI_H
 #include LC_WIDGET_H 
 #include LC_WINDOW_H
@@ -16,52 +16,52 @@ LCUI_Widget *age_rb[6], *button, *window, *age_label;
 void view_result(LCUI_Widget *widget, void *arg)
 {
 	char str[256]; 
-	strcpy(str, "ÄãµÄÄêÁä¶ÎÊÇ£º ");
+	strcpy(str, "ä½ çš„å¹´é¾„æ®µæ˜¯ï¼š ");
 	if(RadioButton_Is_On(age_rb[0]))
-		strcat(str, "15ËêÒÔÏÂ");
+		strcat(str, "15å²ä»¥ä¸‹");
 	if(RadioButton_Is_On(age_rb[1]))
-		strcat(str, "15-20Ëê");
+		strcat(str, "15-20å²");
 	if(RadioButton_Is_On(age_rb[2]))
-		strcat(str, "21-25Ëê");
+		strcat(str, "21-25å²");
 	if(RadioButton_Is_On(age_rb[3]))
-		strcat(str, "26-30Ëê");
+		strcat(str, "26-30å²");
 	if(RadioButton_Is_On(age_rb[4]))
-		strcat(str, "31-40Ëê");
+		strcat(str, "31-40å²");
 	if(RadioButton_Is_On(age_rb[5]))
-		strcat(str, "40ËêÒÔÉÏ");
+		strcat(str, "40å²ä»¥ä¸Š");
 	
-	strcat(str, "¡£");
+	strcat(str, "ã€‚");
     Set_Label_Text(age_label, str);  
 	Disable_Widget(button);
 }
 
 int main(int argc, char*argv[])
-/* Ö÷º¯Êı£¬³ÌĞòµÄÈë¿Ú */
+/* ä¸»å‡½æ•°ï¼Œç¨‹åºçš„å…¥å£ */
 {
     int i;
     LCUI_Init(argc, argv);
-    /* ´´½¨²¿¼ş */
+    /* åˆ›å»ºéƒ¨ä»¶ */
     window  = Create_Widget("window");
     age_label = Create_Widget("label"); 
-    button	= Create_Button_With_Text("Ìá½»"); 
-    age_rb[0] = Create_RadioButton_With_Text("A. 15ËêÒÔÏÂ");
-    age_rb[1] = Create_RadioButton_With_Text("B. 15-20Ëê");
-    age_rb[2] = Create_RadioButton_With_Text("C. 21-25Ëê");
-    age_rb[3] = Create_RadioButton_With_Text("D. 26-30Ëê");
-    age_rb[4] = Create_RadioButton_With_Text("E. 31-40Ëê");
-    age_rb[5] = Create_RadioButton_With_Text("F. 40ËêÒÔÉÏ");
-    /* Éè¶¨´°¿Ú±êÌâµÄÎÄ±¾ */
-    Set_Window_Title_Text(window, "²âÊÔ¸´Ñ¡¿ò²¿¼ş"); 
-    /* ¸Ä±ä³ß´ç */
+    button	= Create_Button_With_Text("æäº¤"); 
+    age_rb[0] = Create_RadioButton_With_Text("A. 15å²ä»¥ä¸‹");
+    age_rb[1] = Create_RadioButton_With_Text("B. 15-20å²");
+    age_rb[2] = Create_RadioButton_With_Text("C. 21-25å²");
+    age_rb[3] = Create_RadioButton_With_Text("D. 26-30å²");
+    age_rb[4] = Create_RadioButton_With_Text("E. 31-40å²");
+    age_rb[5] = Create_RadioButton_With_Text("F. 40å²ä»¥ä¸Š");
+    /* è®¾å®šçª—å£æ ‡é¢˜çš„æ–‡æœ¬ */
+    Set_Window_Title_Text(window, "æµ‹è¯•å¤é€‰æ¡†éƒ¨ä»¶"); 
+    /* æ”¹å˜å°ºå¯¸ */
     Resize_Widget(window, Size(320, 240));
     Disable_Widget_Auto_Size(button);
     Resize_Widget(button, Size(60, 25));
-    /* ½«´°¿Ú¿Í»§Çø×÷ÎªÕâĞ©²¿¼şµÄÈİÆ÷ */ 
+    /* å°†çª—å£å®¢æˆ·åŒºä½œä¸ºè¿™äº›éƒ¨ä»¶çš„å®¹å™¨ */ 
     Window_Client_Area_Add(window, age_label);
     Window_Client_Area_Add(window, button); 
     for(i=0; i<6; i++) 
 		Window_Client_Area_Add(window, age_rb[i]); 
-    /* µ÷Õû²¿¼şµÄ²¼¾Ö*/
+    /* è°ƒæ•´éƒ¨ä»¶çš„å¸ƒå±€*/
     Set_Widget_Align(age_label, ALIGN_MIDDLE_CENTER, Pos(0,-40));
     Set_Widget_Align(button, ALIGN_MIDDLE_CENTER, Pos(0,60));
 	Set_Widget_Align(age_rb[0], ALIGN_MIDDLE_LEFT, Pos(5,-20));
@@ -70,7 +70,7 @@ int main(int argc, char*argv[])
 	Set_Widget_Align(age_rb[3], ALIGN_MIDDLE_LEFT, Pos(5,0));
 	Set_Widget_Align(age_rb[4], ALIGN_MIDDLE_LEFT, Pos(100,0));
 	Set_Widget_Align(age_rb[5], ALIGN_MIDDLE_LEFT, Pos(200,0)); 
-    Set_Label_Text(age_label, "ÄãµÄÄêÁä¶ÎÊÇ£¿");  
+    Set_Label_Text(age_label, "ä½ çš„å¹´é¾„æ®µæ˜¯ï¼Ÿ");  
     
     RadioButton_Create_Mutex(age_rb[0], age_rb[1]);
     RadioButton_Create_Mutex(age_rb[0], age_rb[2]);
@@ -78,7 +78,7 @@ int main(int argc, char*argv[])
     RadioButton_Create_Mutex(age_rb[0], age_rb[4]);
     RadioButton_Create_Mutex(age_rb[0], age_rb[5]);
     
-    /* ÏÔÊ¾²¿¼ş */
+    /* æ˜¾ç¤ºéƒ¨ä»¶ */
     Show_Widget(age_label);
     Show_Widget(button);
 	Show_Widget(age_rb[0]); 
@@ -87,7 +87,7 @@ int main(int argc, char*argv[])
     Show_Widget(window); 
     
 	Widget_Clicked_Event_Connect(button, view_result, NULL);
-    LCUI_Main(); /* ½øÈëÖ÷Ñ­»· */ 
+    LCUI_Main(); /* è¿›å…¥ä¸»å¾ªç¯ */ 
     return 0;
 }
 

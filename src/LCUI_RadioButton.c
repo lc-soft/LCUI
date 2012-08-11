@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_RadioButton.c -- LCUI¡®s RadioButton widget
+ * LCUI_RadioButton.c -- LCUIâ€˜s RadioButton widget
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_RadioButton.c -- LCUI µÄµ¥Ñ¡¿ò²¿¼ş
+ * LCUI_RadioButton.c -- LCUI çš„å•é€‰æ¡†éƒ¨ä»¶
  *
- * °æÈ¨ËùÓĞ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±äº 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼şÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾İGPLv2Ğí¿ÉĞ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ğí¿ÉÖ¤µÚ¶ş°æ µÄÓ¢ÎÄËõĞ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌĞøÊ¹ÓÃ¡¢ĞŞ¸Ä»ò·¢²¼±¾ÎÄ¼ş£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öĞí¿ÉĞ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜æ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’Œæ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔğÈÎ£¬ÉõÖÁÃ»ÓĞÊÊÏúĞÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒşº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ğí¿ÉĞ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼şµÄGPLv2Ğí¿ÉĞ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼şÖĞ£¬Èç¹û
- * Ã»ÓĞ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -52,10 +52,10 @@
 #include LC_MEM_H 
 
 static LCUI_Queue	mutex_lib;
-static int mutex_lib_init = 0; /* ±êÖ¾£¬ÊÇ·ñ³õÊ¼»¯¹ı */
+static int mutex_lib_init = 0; /* æ ‡å¿—ï¼Œæ˜¯å¦åˆå§‹åŒ–è¿‡ */
 
 void RadioButton_Delete_Mutex(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º½«µ¥Ñ¡¿ò´Ó»¥³â¹ØÏµÁ´ÖĞÒÆ³ı */
+/* åŠŸèƒ½ï¼šå°†å•é€‰æ¡†ä»äº’æ–¥å…³ç³»é“¾ä¸­ç§»é™¤ */
 {
 	int i, total;
 	LCUI_Widget *tmp;
@@ -75,7 +75,7 @@ void RadioButton_Delete_Mutex(LCUI_Widget *widget)
 }
 
 void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
-/* ¹¦ÄÜ£ºÎªÁ½¸öµ¥Ñ¡¿ò½¨Á¢»¥³â¹ØÏµ */
+/* åŠŸèƒ½ï¼šä¸ºä¸¤ä¸ªå•é€‰æ¡†å»ºç«‹äº’æ–¥å…³ç³» */
 {
 	int pos;
 	LCUI_Queue *p, queue;
@@ -94,14 +94,14 @@ void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 		if(rb_b->mutex == NULL)
 		{
 			Queue_Init(&queue, sizeof(LCUI_Widget*), NULL);
-			/* ½«×Ó¶ÓÁĞÌí¼ÓÖÁ¸¸¶ÓÁĞ£¬²¢»ñÈ¡Î»ÖÃ */
+			/* å°†å­é˜Ÿåˆ—æ·»åŠ è‡³çˆ¶é˜Ÿåˆ—ï¼Œå¹¶è·å–ä½ç½® */
 			pos = Queue_Add(&mutex_lib, &queue);
-			/* ´Ó¶ÓÁĞÖĞ»ñÈ¡Ö¸Ïò×Ó¶ÓÁĞµÄÖ¸Õë */
+			/* ä»é˜Ÿåˆ—ä¸­è·å–æŒ‡å‘å­é˜Ÿåˆ—çš„æŒ‡é’ˆ */
 			p = (LCUI_Queue*)Queue_Get(&mutex_lib, pos);
-			/* Ìí¼ÓÖ¸ÕëÖÁ¶ÓÁĞ */
+			/* æ·»åŠ æŒ‡é’ˆè‡³é˜Ÿåˆ— */
 			Queue_Add_Pointer(p, a);
 			Queue_Add_Pointer(p, b);
-			/* ±£´æÖ¸Ïò¹ØÏµ¶ÓÁĞµÄÖ¸Õë */
+			/* ä¿å­˜æŒ‡å‘å…³ç³»é˜Ÿåˆ—çš„æŒ‡é’ˆ */
 			rb_a->mutex = p;
 			rb_b->mutex = p;
 		}
@@ -119,7 +119,7 @@ void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 			rb_b->mutex = rb_a->mutex;
 		}
 		else 
-		{/* ·ñÔò£¬Á½¸ö¶¼ºÍÆäËü²¿¼şÓĞ»¥³â¹ØÏµ£¬ĞèÒª½«ËüÃÇ²ğ¿ª£¬²¢ÖØĞÂ½¨Á¢»¥³â¹ØÏµ */
+		{/* å¦åˆ™ï¼Œä¸¤ä¸ªéƒ½å’Œå…¶å®ƒéƒ¨ä»¶æœ‰äº’æ–¥å…³ç³»ï¼Œéœ€è¦å°†å®ƒä»¬æ‹†å¼€ï¼Œå¹¶é‡æ–°å»ºç«‹äº’æ–¥å…³ç³» */
 			RadioButton_Delete_Mutex(a);
 			RadioButton_Delete_Mutex(b);
 			RadioButton_Create_Mutex(a, b);
@@ -129,7 +129,7 @@ void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 
 
 void Set_RadioButton_On(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÉè¶¨µ¥Ñ¡¿òÎªÑ¡ÖĞ×´Ì¬ */
+/* åŠŸèƒ½ï¼šè®¾å®šå•é€‰æ¡†ä¸ºé€‰ä¸­çŠ¶æ€ */
 {
 	LCUI_RadioButton *radio_button;
 	LCUI_Widget *other;
@@ -137,7 +137,7 @@ void Set_RadioButton_On(LCUI_Widget *widget)
 	radio_button = (LCUI_RadioButton *)
 								Get_Widget_Private_Data(widget); 
 	if(NULL != radio_button->mutex)
-	{/* Èç¹ûÓëÆäËü²¿¼şÓĞ»¥³â¹ØÏµ£¬¾Í½«ÆäËüµ¥Ñ¡¿ò²¿¼şµÄ×´Ì¬¸ÄÎª¡°Î´Ñ¡ÖĞ¡±×´Ì¬ */
+	{/* å¦‚æœä¸å…¶å®ƒéƒ¨ä»¶æœ‰äº’æ–¥å…³ç³»ï¼Œå°±å°†å…¶å®ƒå•é€‰æ¡†éƒ¨ä»¶çš„çŠ¶æ€æ”¹ä¸ºâ€œæœªé€‰ä¸­â€çŠ¶æ€ */
 		total = Queue_Get_Total(radio_button->mutex);
 		for(i=0; i<total; ++i)
 		{
@@ -150,7 +150,7 @@ void Set_RadioButton_On(LCUI_Widget *widget)
 }
 
 void Set_RadioButton_Off(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÉè¶¨µ¥Ñ¡¿òÎªÎ´Ñ¡ÖĞ×´Ì¬ */
+/* åŠŸèƒ½ï¼šè®¾å®šå•é€‰æ¡†ä¸ºæœªé€‰ä¸­çŠ¶æ€ */
 {
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
 								Get_Widget_Private_Data(widget); 
@@ -160,7 +160,7 @@ void Set_RadioButton_Off(LCUI_Widget *widget)
 }
 
 int Get_RadioButton_Status(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡µ¥Ñ¡¿òµÄ×´Ì¬ */
+/* åŠŸèƒ½ï¼šè·å–å•é€‰æ¡†çš„çŠ¶æ€ */
 {
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
 								Get_Widget_Private_Data(widget); 
@@ -169,7 +169,7 @@ int Get_RadioButton_Status(LCUI_Widget *widget)
 }
 
 int RadioButton_Is_On(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º¼ì²âµ¥Ñ¡¿òÊÇ·ñ±»Ñ¡ÖĞ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹å•é€‰æ¡†æ˜¯å¦è¢«é€‰ä¸­ */
 {
 	if(IS_TRUE == Get_RadioButton_Status(widget))
 		return 1;
@@ -178,7 +178,7 @@ int RadioButton_Is_On(LCUI_Widget *widget)
 }
 
 int RadioButton_Is_Off(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º¼ì²âµ¥Ñ¡¿òÊÇ·ñÎ´Ñ¡ÖĞ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹å•é€‰æ¡†æ˜¯å¦æœªé€‰ä¸­ */
 {
 	if(IS_TRUE == Get_RadioButton_Status(widget))
 		return 0;
@@ -188,8 +188,8 @@ int RadioButton_Is_Off(LCUI_Widget *widget)
 
 void Switch_RadioButton_Status(LCUI_Widget *widget, void *arg)
 /* 
- * ¹¦ÄÜ£ºÇĞ»»µ¥Ñ¡¿òµÄ×´Ì¬
- * ËµÃ÷£ºÕâ¸ö×´Ì¬£¬Ö¸µÄÊÇ´ò¹´ÓëÃ»´ò¹´µÄÁ½ÖÖ×´Ì¬
+ * åŠŸèƒ½ï¼šåˆ‡æ¢å•é€‰æ¡†çš„çŠ¶æ€
+ * è¯´æ˜ï¼šè¿™ä¸ªçŠ¶æ€ï¼ŒæŒ‡çš„æ˜¯æ‰“å‹¾ä¸æ²¡æ‰“å‹¾çš„ä¸¤ç§çŠ¶æ€
  *  */
 { 
 	if(RadioButton_Is_Off(widget))
@@ -197,26 +197,26 @@ void Switch_RadioButton_Status(LCUI_Widget *widget, void *arg)
 }
 
 void RadioButton_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
-/* ¹¦ÄÜ£ºÉè¶¨µ¥Ñ¡¿òÖĞµÄÍ¼Ïñ¿òµÄ³ß´ç */
+/* åŠŸèƒ½ï¼šè®¾å®šå•é€‰æ¡†ä¸­çš„å›¾åƒæ¡†çš„å°ºå¯¸ */
 {
 	if(size.w <= 0 && size.h <= 0)
 		return;
 		
 	LCUI_Widget *imgbox = Get_RadioButton_ImgBox(widget);
 	Resize_Widget(imgbox, size);
-	/* ÓÉÓÚÃ»ÓĞ²¼¾ÖºĞ×Ó£¬²»ÄÜ×Ô¶¯µ÷Õû²¿¼ş¼äµÄ¼ä¸ô£¬ÔİÊ±ÓÃÕâ¸ö·½·¨ */
+	/* ç”±äºæ²¡æœ‰å¸ƒå±€ç›’å­ï¼Œä¸èƒ½è‡ªåŠ¨è°ƒæ•´éƒ¨ä»¶é—´çš„é—´éš”ï¼Œæš‚æ—¶ç”¨è¿™ä¸ªæ–¹æ³• */
 	Set_Widget_Align(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
 }
 
 static void RadioButton_Init(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º³õÊ¼»¯µ¥Ñ¡¿ò²¿¼şµÄÊı¾İ */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–å•é€‰æ¡†éƒ¨ä»¶çš„æ•°æ® */
 {
 	LCUI_Widget *container[2];
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton*)
 				Malloc_Widget_Private(widget, sizeof(LCUI_RadioButton));
 	
 	radio_button->on = IS_FALSE;
-	/* ³õÊ¼»¯Í¼Æ¬Êı¾İ */ 
+	/* åˆå§‹åŒ–å›¾ç‰‡æ•°æ® */ 
 	Graph_Init(&radio_button->img_off_disable);
 	Graph_Init(&radio_button->img_off_normal);
 	Graph_Init(&radio_button->img_off_focus);
@@ -230,26 +230,26 @@ static void RadioButton_Init(LCUI_Widget *widget)
 	
 	radio_button->mutex = NULL;
 	
-	radio_button->label = Create_Widget("label");/* ´´½¨label²¿¼ş */
-	radio_button->imgbox = Create_Widget("picture_box"); /* ´´½¨Í¼Ïñ¿ò²¿¼ş */
-	/* ´´½¨Á½¸öÈİÆ÷£¬ÓÃÓÚµ÷ÕûÉÏÃæÁ½¸ö²¿¼şµÄÎ»ÖÃ */
+	radio_button->label = Create_Widget("label");/* åˆ›å»ºlabeléƒ¨ä»¶ */
+	radio_button->imgbox = Create_Widget("picture_box"); /* åˆ›å»ºå›¾åƒæ¡†éƒ¨ä»¶ */
+	/* åˆ›å»ºä¸¤ä¸ªå®¹å™¨ï¼Œç”¨äºè°ƒæ•´ä¸Šé¢ä¸¤ä¸ªéƒ¨ä»¶çš„ä½ç½® */
 	container[0] = Create_Widget(NULL);
 	container[1] = Create_Widget(NULL);
 	
-	/* ÆôÓÃÕâĞ©²¿¼şµÄ×Ô¶¯³ß´çµ÷ÕûµÄ¹¦ÄÜ */
+	/* å¯ç”¨è¿™äº›éƒ¨ä»¶çš„è‡ªåŠ¨å°ºå¯¸è°ƒæ•´çš„åŠŸèƒ½ */
 	Enable_Widget_Auto_Size(widget);
 	Enable_Widget_Auto_Size(container[0]);
 	Enable_Widget_Auto_Size(container[1]);
 	
-	/* ½«°´Å¥²¿¼ş×÷Îªlabel²¿¼şµÄÈİÆ÷ */
+	/* å°†æŒ‰é’®éƒ¨ä»¶ä½œä¸ºlabeléƒ¨ä»¶çš„å®¹å™¨ */
 	Widget_Container_Add(container[0], radio_button->imgbox);
 	Widget_Container_Add(container[1], radio_button->label);
 	Widget_Container_Add(widget, container[0]);
 	Widget_Container_Add(widget, container[1]);
 	
-	/* µ÷Õû³ß´ç */
+	/* è°ƒæ•´å°ºå¯¸ */
 	Resize_Widget(radio_button->imgbox, Size(20, 20));
-	/* µ÷Õû²¼¾Ö */
+	/* è°ƒæ•´å¸ƒå±€ */
 	Set_Widget_Align(container[0], ALIGN_MIDDLE_LEFT, Pos(0,0));
 	Set_Widget_Align(container[1], ALIGN_MIDDLE_LEFT, Pos(22,0));
 	Set_Widget_Align(radio_button->imgbox, ALIGN_MIDDLE_CENTER, Pos(0,0));
@@ -257,7 +257,7 @@ static void RadioButton_Init(LCUI_Widget *widget)
 	
 	Set_PictureBox_Size_Mode(radio_button->imgbox, SIZE_MODE_STRETCH);
 	
-	/* ÏÔÊ¾Ö® */
+	/* æ˜¾ç¤ºä¹‹ */
 	Show_Widget(radio_button->label);
 	Show_Widget(radio_button->imgbox);
 	Show_Widget(container[0]);
@@ -269,20 +269,20 @@ static void RadioButton_Init(LCUI_Widget *widget)
 
 
 static void Exec_Update_RadioButton(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º¸üĞÂµ¥Ñ¡¿òµÄÍ¼ĞÎÊı¾İ */
+/* åŠŸèƒ½ï¼šæ›´æ–°å•é€‰æ¡†çš„å›¾å½¢æ•°æ® */
 {
 	LCUI_Graph *p;
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
 								Get_Widget_Private_Data(widget); 
 								
 	if(Strcmp(&widget->style, "custom") == 0)
-	{/* Èç¹ûÎª×Ô¶¨Òå·ç¸ñ£¬ÄÇ¾ÍÊ¹ÓÃÓÃ»§Ö¸¶¨µÄÍ¼ĞÎ */
+	{/* å¦‚æœä¸ºè‡ªå®šä¹‰é£æ ¼ï¼Œé‚£å°±ä½¿ç”¨ç”¨æˆ·æŒ‡å®šçš„å›¾å½¢ */
 		//printf("custom\n"); 
 		if(widget->enabled == IS_FALSE) 
 			widget->status = WIDGET_STATUS_DISABLE;
 			
 		switch(widget->status)
-		{/* ÅĞ¶Ï°´Å¥µÄ×´Ì¬£¬ÒÔÑ¡ÔñÏàÓ¦µÄ±³¾°É« */
+		{/* åˆ¤æ–­æŒ‰é’®çš„çŠ¶æ€ï¼Œä»¥é€‰æ‹©ç›¸åº”çš„èƒŒæ™¯è‰² */
 		case WIDGET_STATUS_NORMAL:
 			if(radio_button->on == IS_TRUE)
 				p = &radio_button->img_on_normal;
@@ -324,20 +324,20 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 		} 
 	}
 	else
-	{/* Èç¹û°´Å¥µÄ·ç¸ñÎªÈ±Ê¡ */
+	{/* å¦‚æœæŒ‰é’®çš„é£æ ¼ä¸ºç¼ºçœ */
 		Strcpy(&widget->style, "default");
 		if(widget->enabled == IS_FALSE) 
 			widget->status = WIDGET_STATUS_DISABLE;
 		
-		/* ÏÈÊÍ·ÅPictureBox²¿¼şÖĞ±£´æµÄÍ¼ĞÎÊı¾İµÄÖ¸Õë */
+		/* å…ˆé‡Šæ”¾PictureBoxéƒ¨ä»¶ä¸­ä¿å­˜çš„å›¾å½¢æ•°æ®çš„æŒ‡é’ˆ */
 		p = Get_PictureBox_Graph(radio_button->imgbox);
 		Free_Graph(p);
 		
-		/* ÓÉÓÚ±¾º¯ÊıÔÚÍË³öºó£¬Ê¹ÓÃ¾Ö²¿±äÁ¿±£´æµÄÍ¼ĞÎÊı¾İ»áÎŞĞ§£¬Òò´Ë£¬ÉêÇëÄÚ´æ¿Õ¼äÀ´´¢´æ */
+		/* ç”±äºæœ¬å‡½æ•°åœ¨é€€å‡ºåï¼Œä½¿ç”¨å±€éƒ¨å˜é‡ä¿å­˜çš„å›¾å½¢æ•°æ®ä¼šæ— æ•ˆï¼Œå› æ­¤ï¼Œç”³è¯·å†…å­˜ç©ºé—´æ¥å‚¨å­˜ */
 		p = (LCUI_Graph*)calloc(1,sizeof(LCUI_Graph));
 		
 		switch(widget->status)
-		{/* ÅĞ¶Ï°´Å¥µÄ×´Ì¬£¬ÒÔÑ¡ÔñÏàÓ¦µÄ±³¾°É« */
+		{/* åˆ¤æ–­æŒ‰é’®çš„çŠ¶æ€ï¼Œä»¥é€‰æ‹©ç›¸åº”çš„èƒŒæ™¯è‰² */
 		case WIDGET_STATUS_NORMAL:
 			if(radio_button->on == IS_TRUE)
 				Load_Graph_Default_RadioButton_On_Normal(p);
@@ -374,7 +374,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 }
 
 LCUI_Widget *Get_RadioButton_Label(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡µ¥Ñ¡¿ò²¿¼şÖĞµÄlabel²¿¼şµÄÖ¸Õë */
+/* åŠŸèƒ½ï¼šè·å–å•é€‰æ¡†éƒ¨ä»¶ä¸­çš„labeléƒ¨ä»¶çš„æŒ‡é’ˆ */
 {
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
 								Get_Widget_Private_Data(widget); 
@@ -385,7 +385,7 @@ LCUI_Widget *Get_RadioButton_Label(LCUI_Widget *widget)
 }
 
 LCUI_Widget *Get_RadioButton_ImgBox(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡µ¥Ñ¡¿ò²¿¼şÖĞµÄPictureBox²¿¼şµÄÖ¸Õë */
+/* åŠŸèƒ½ï¼šè·å–å•é€‰æ¡†éƒ¨ä»¶ä¸­çš„PictureBoxéƒ¨ä»¶çš„æŒ‡é’ˆ */
 {
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
 								Get_Widget_Private_Data(widget); 
@@ -396,7 +396,7 @@ LCUI_Widget *Get_RadioButton_ImgBox(LCUI_Widget *widget)
 }
 
 void Set_RadioButton_Text(LCUI_Widget *widget, const char *fmt, ...)
-/* ¹¦ÄÜ£ºÉè¶¨Óëµ¥Ñ¡¿ò²¿¼ş¹ØÁªµÄÎÄ±¾ÄÚÈİ */
+/* åŠŸèƒ½ï¼šè®¾å®šä¸å•é€‰æ¡†éƒ¨ä»¶å…³è”çš„æ–‡æœ¬å†…å®¹ */
 {
 	char text[LABEL_TEXT_MAX_SIZE];
 	LCUI_Widget *label = Get_RadioButton_Label(widget); 
@@ -412,7 +412,7 @@ void Set_RadioButton_Text(LCUI_Widget *widget, const char *fmt, ...)
 }
 
 LCUI_Widget *Create_RadioButton_With_Text(const char *fmt, ...)
-/* ¹¦ÄÜ£º´´½¨Ò»¸ö´øÎÄ±¾ÄÚÈİµÄµ¥Ñ¡¿ò */
+/* åŠŸèƒ½ï¼šåˆ›å»ºä¸€ä¸ªå¸¦æ–‡æœ¬å†…å®¹çš„å•é€‰æ¡† */
 {
 	char text[LABEL_TEXT_MAX_SIZE];
 	LCUI_Widget *widget = Create_Widget("radio_button");
@@ -431,13 +431,13 @@ LCUI_Widget *Create_RadioButton_With_Text(const char *fmt, ...)
 
 void Register_RadioButton()
 /*
- * ¹¦ÄÜ£º×¢²á²¿¼şÀàĞÍ-´°¿ÚÖÁ²¿¼ş¿â
+ * åŠŸèƒ½ï¼šæ³¨å†Œéƒ¨ä»¶ç±»å‹-çª—å£è‡³éƒ¨ä»¶åº“
  **/
 {
-	/* Ìí¼Ó¼¸¸ö²¿¼şÀàĞÍ */
+	/* æ·»åŠ å‡ ä¸ªéƒ¨ä»¶ç±»å‹ */
 	WidgetType_Add("radio_button"); 
 	
-	/* Îª²¿¼şÀàĞÍ¹ØÁªÏà¹Øº¯Êı */ 
+	/* ä¸ºéƒ¨ä»¶ç±»å‹å…³è”ç›¸å…³å‡½æ•° */ 
 	WidgetFunc_Add("radio_button",	RadioButton_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("radio_button", Exec_Update_RadioButton, FUNC_TYPE_UPDATE); 
 }

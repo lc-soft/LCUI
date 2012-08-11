@@ -3,7 +3,7 @@
 #include LC_LCUI_H
 #include LC_WIDGET_H
 #include LC_WINDOW_H
-//²âÊÔ½ø¶ÈÌõ²¿¼şµÄÊ¾Àı³ÌĞò
+//æµ‹è¯•è¿›åº¦æ¡éƒ¨ä»¶çš„ç¤ºä¾‹ç¨‹åº
 #include LC_WORK_H
 #include LC_MISC_H
 #include LC_THREAD_H
@@ -12,17 +12,17 @@
 #include <stdlib.h>
 #include <time.h>
 void *change_progress(void *arg)
-/* ¹¦ÄÜ£º¶¯Ì¬¸Ä±älabel²¿¼şµÄÎÄ±¾ÄÚÈİ */
+/* åŠŸèƒ½ï¼šåŠ¨æ€æ”¹å˜labeléƒ¨ä»¶çš„æ–‡æœ¬å†…å®¹ */
 {
     int i, max;
     max = 100;
-    LCUI_Widget *widget = (LCUI_Widget *)arg; /* ×ª»»ÀàĞÍ */
-    Set_ProgressBar_Max_Value(widget, max); /* ×î´óÖµ */
+    LCUI_Widget *widget = (LCUI_Widget *)arg; /* è½¬æ¢ç±»å‹ */
+    Set_ProgressBar_Max_Value(widget, max); /* æœ€å¤§å€¼ */
     srand(time(NULL));
     for(i=0; i<max; i+=rand()%5)
     {
-        Set_ProgressBar_Value(widget, i);/* µ±Ç°Öµ */
-        usleep(100000);/* ÔİÍ£0.1Ãë */
+        Set_ProgressBar_Value(widget, i);/* å½“å‰å€¼ */
+        usleep(100000);/* æš‚åœ0.1ç§’ */
     }
     Set_ProgressBar_Value(widget, max);
     LCUI_Thread_Exit(NULL);
@@ -30,39 +30,39 @@ void *change_progress(void *arg)
 
 
 int main(int argc, char*argv[])
-/* Ö÷º¯Êı£¬³ÌĞòµÄÈë¿Ú */
+/* ä¸»å‡½æ•°ï¼Œç¨‹åºçš„å…¥å£ */
 {
     pthread_t t[2];
     LCUI_Init(argc, argv);
     
     LCUI_Widget *window, *pb_a, *pb_b;
-    /* ´´½¨²¿¼ş */
+    /* åˆ›å»ºéƒ¨ä»¶ */
     window = Create_Widget("window");
     pb_a = Create_Widget("progress_bar");
     pb_b = Create_Widget("progress_bar");
-    /* Éè¶¨´°¿Ú±êÌâµÄÎÄ±¾ */
-    Set_Window_Title_Text(window, "²âÊÔ½ø¶ÈÌõ²¿¼ş"); 
-    /* ¸Ä±ä´°¿ÚµÄ³ß´ç */
+    /* è®¾å®šçª—å£æ ‡é¢˜çš„æ–‡æœ¬ */
+    Set_Window_Title_Text(window, "æµ‹è¯•è¿›åº¦æ¡éƒ¨ä»¶"); 
+    /* æ”¹å˜çª—å£çš„å°ºå¯¸ */
     Resize_Widget(window, Size(320, 240));
-    /* ½«´°¿Ú¿Í»§Çø×÷Îª²¿¼şµÄÈİÆ÷Ìí¼Ó½øÈ¥ */
+    /* å°†çª—å£å®¢æˆ·åŒºä½œä¸ºéƒ¨ä»¶çš„å®¹å™¨æ·»åŠ è¿›å» */
     Window_Client_Area_Add(window, pb_a);
     Window_Client_Area_Add(window, pb_b);
-    /* ¾ÓÖĞÏÔÊ¾ */
+    /* å±…ä¸­æ˜¾ç¤º */
     Set_Widget_Align(pb_a, ALIGN_MIDDLE_CENTER, Pos(0, -25)); 
     Set_Widget_Align(pb_b, ALIGN_MIDDLE_CENTER, Pos(0, 25));
-    /* Éè¶¨²¿¼şµÄ·ç¸ñ */
+    /* è®¾å®šéƒ¨ä»¶çš„é£æ ¼ */
     Set_Widget_Style(pb_a, "dynamic");
     Set_Widget_Style(pb_b, "classic");
-    /* ¸Ä±ä²¿¼ş³ß´ç */
+    /* æ”¹å˜éƒ¨ä»¶å°ºå¯¸ */
     Resize_Widget(pb_a, Size(300, 25));
     Resize_Widget(pb_b, Size(300, 25));
-    /* ´´½¨Ïß³Ì£¬´Ëº¯ÊıºÍpthread_createº¯ÊıÓÃ·¨Ò»Ñù */
+    /* åˆ›å»ºçº¿ç¨‹ï¼Œæ­¤å‡½æ•°å’Œpthread_createå‡½æ•°ç”¨æ³•ä¸€æ · */
     LCUI_Thread_Create(&t[0], NULL, change_progress, (void*)pb_a);
     LCUI_Thread_Create(&t[1], NULL, change_progress, (void*)pb_b); 
-    /* ÏÔÊ¾²¿¼ş */
+    /* æ˜¾ç¤ºéƒ¨ä»¶ */
     Show_Widget(pb_a);
     Show_Widget(pb_b);
     Show_Widget(window); 
-    return LCUI_Main(); /* ½øÈëÖ÷Ñ­»· */  
+    return LCUI_Main(); /* è¿›å…¥ä¸»å¾ªç¯ */  
 }
 

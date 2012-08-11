@@ -10,14 +10,14 @@
 #include LC_RES_H
 #include <unistd.h>
 void *change_graph(void *arg)
-/* ¹¦ÄÜ£º¸Ä±äÏÔÊ¾µÄÍ¼ĞÎ */
+/* åŠŸèƒ½ï¼šæ”¹å˜æ˜¾ç¤ºçš„å›¾å½¢ */
 {
 	LCUI_Widget *widget = (LCUI_Widget *)arg;
 	int i;
 	LCUI_Graph frame, temp;
-	Graph_Init(&frame);/* ³õÊ¼»¯ */
-	Load_Image("ring.png", &frame);/* ÔØÈëÖ® */  
-	/* ¾ÓÖĞÏÔÊ¾Í¼ĞÎ */
+	Graph_Init(&frame);/* åˆå§‹åŒ– */
+	Load_Image("ring.png", &frame);/* è½½å…¥ä¹‹ */  
+	/* å±…ä¸­æ˜¾ç¤ºå›¾å½¢ */
 	Set_Widget_Align(widget, ALIGN_MIDDLE_CENTER, Pos(0, -20));
 	Set_PictureBox_Size_Mode(widget, SIZE_MODE_CENTER);
 	Show_Widget(widget);
@@ -36,22 +36,22 @@ void *change_graph(void *arg)
 
 int main(int argc,char*argv[])
 { 
-	/* ÉùÃ÷¼¸¸ö²¿¼ş */
+	/* å£°æ˜å‡ ä¸ªéƒ¨ä»¶ */
 	LCUI_Widget	*window, 
 					*label,
 					*logo,
 					*img;
 					
 	int			 width, height; 
-	/* ×Ô¶¨ÒåÄ¬ÈÏ×ÖÌåÎÄ¼şÎ»ÖÃ */
+	/* è‡ªå®šä¹‰é»˜è®¤å­—ä½“æ–‡ä»¶ä½ç½® */
 	//Set_Default_Font("msyh.ttf");
-	/* ³õÊ¼»¯LCUI */ 
+	/* åˆå§‹åŒ–LCUI */ 
 	LCUI_Init(argc, argv);
-	/* ´´½¨Ò»¸öLCUI³ÌĞò´°¿Ú */
-	width  = 320;//Get_Screen_Width(); /* ´°¿ÚµÄ¿í¶È */
-	height = 240;//Get_Screen_Height();; /* ´°¿ÚµÄ¸ß¶È */
+	/* åˆ›å»ºä¸€ä¸ªLCUIç¨‹åºçª—å£ */
+	width  = 320;//Get_Screen_Width(); /* çª—å£çš„å®½åº¦ */
+	height = 240;//Get_Screen_Height();; /* çª—å£çš„é«˜åº¦ */
 	
-	/* ´´½¨²¿¼ş */
+	/* åˆ›å»ºéƒ¨ä»¶ */
 	window		= Create_Widget("window");
 	label		= Create_Widget("label");
 	logo		= Create_Widget("picture_box");
@@ -68,22 +68,22 @@ int main(int argc,char*argv[])
 	Set_PictureBox_Size_Mode(logo, SIZE_MODE_CENTER);
 	Set_PictureBox_Image_From_File(logo, "logo_128x128.png"); 
 	
-	Set_Label_Text(label, "LCUI ÕıÔÚÔØÈë...");
+	Set_Label_Text(label, "LCUI æ­£åœ¨è½½å…¥...");
 	Set_Label_Font(label, 15, NULL);
 	Set_Widget_Align(logo, ALIGN_MIDDLE_CENTER, Pos(0, -20));
 	Set_Widget_Align(label, ALIGN_MIDDLE_CENTER, Pos(0, +70));
-    /* ½«ÕâÈı¸ö²¿¼ş·ÅÈë´°¿Ú¿Í»§ÇøÖĞ */
+    /* å°†è¿™ä¸‰ä¸ªéƒ¨ä»¶æ”¾å…¥çª—å£å®¢æˆ·åŒºä¸­ */
 	Window_Client_Area_Add(window, label);
 	Window_Client_Area_Add(window, img); 
 	Window_Client_Area_Add(window, logo);
 	
 	pthread_t t;
     LCUI_Thread_Create(&t, NULL, change_graph, (void*)img); 
-	/* ÏÔÊ¾²¿¼şÒÔ¼°´°¿Ú */
+	/* æ˜¾ç¤ºéƒ¨ä»¶ä»¥åŠçª—å£ */
 	Show_Widget(label);
 	Show_Widget(logo);
 	Show_Widget(window); 
-	LCUI_Main(); /* ½øÈëÖ÷Ñ­»· */
+	LCUI_Main(); /* è¿›å…¥ä¸»å¾ªç¯ */
 	return 0;
 }
 

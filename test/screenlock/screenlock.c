@@ -1,4 +1,4 @@
-// Ò»¸öÆÁÄ»»¬¶¯½âËøµÄ³ÌĞò
+// ä¸€ä¸ªå±å¹•æ»‘åŠ¨è§£é”çš„ç¨‹åº
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H 
@@ -13,7 +13,7 @@
 #include <time.h>
 
 void move_pic_btn(LCUI_Widget *widget, LCUI_DragEvent *event)
-/* ¹¦ÄÜ£ºÒÆ¶¯»¬¿é */
+/* åŠŸèƒ½ï¼šç§»åŠ¨æ»‘å— */
 {
 	LCUI_Pos pos, parent;
 
@@ -21,35 +21,35 @@ void move_pic_btn(LCUI_Widget *widget, LCUI_DragEvent *event)
 	pos = Pos_Sub(event->new_pos, parent);
 	Move_Widget(widget, pos);
 	if(event->end_click)
-	{/* Èç¹ûÍÏ¶¯ÒÑ¾­½áÊø */
+	{/* å¦‚æœæ‹–åŠ¨å·²ç»ç»“æŸ */
 		LCUI_Size size;
 		LCUI_Rect des, rect;
 		usleep(10000);
 		rect = Get_Widget_Rect(widget);
 		size = Get_Widget_Size(widget->parent);
-		des = Rect(size.w-10, 0, 30, 30);/* Ä¿±êÇøÓò */
-		if(Rect_Is_Overlay(rect, des)) /* Èç¹û²¿¼şÇøÓòÓëÄ¿±êÇøÓòÖØµş£¬ÔòÍË³ö³ÌĞò */
+		des = Rect(size.w-10, 0, 30, 30);/* ç›®æ ‡åŒºåŸŸ */
+		if(Rect_Is_Overlay(rect, des)) /* å¦‚æœéƒ¨ä»¶åŒºåŸŸä¸ç›®æ ‡åŒºåŸŸé‡å ï¼Œåˆ™é€€å‡ºç¨‹åº */
 			Main_Loop_Quit(); 
-		else/* ·ñÔò£¬ÈÃ²¿¼ş»Øµ½ÆğÊ¼Î»ÖÃ£¬Õâ¸öÊ¹ÓÃµÄÊÇÔÈËÙÒÆ¶¯ */
+		else/* å¦åˆ™ï¼Œè®©éƒ¨ä»¶å›åˆ°èµ·å§‹ä½ç½®ï¼Œè¿™ä¸ªä½¿ç”¨çš„æ˜¯åŒ€é€Ÿç§»åŠ¨ */
 			Move_Widget_To_Pos(widget, Pos(0,0), 500);
 	}
 }
 
 void *update_time(void *arg)
-/* ¹¦ÄÜ£º¶¯Ì¬¸Ä±älabel²¿¼şµÄÎÄ±¾ÄÚÈİ */
+/* åŠŸèƒ½ï¼šåŠ¨æ€æ”¹å˜labeléƒ¨ä»¶çš„æ–‡æœ¬å†…å®¹ */
 {
     time_t rawtime;
     struct tm * timeinfo;
 	char filename[100];
 	LCUI_Widget *wday_label, *date_label;
 	int l1=0,l2=0,r1=0,r2=0,old_l1=0, old_l2=0, old_r1=0,old_r2=0;
-    char day[][20] = {"ĞÇÆÚÌì","ĞÇÆÚÒ»","ĞÇÆÚ¶ş","ĞÇÆÚÈı","ĞÇÆÚËÄ","ĞÇÆÚÎå","ĞÇÆÚÁù"};
+    char day[][20] = {"æ˜ŸæœŸå¤©","æ˜ŸæœŸä¸€","æ˜ŸæœŸäºŒ","æ˜ŸæœŸä¸‰","æ˜ŸæœŸå››","æ˜ŸæœŸäº”","æ˜ŸæœŸå…­"};
 	LCUI_Widget	*pic_bg, *time_box, *pic_btn_line, *pic_btn,
 					*win, *pic_l1, *pic_l2,
 					 *pic_c, *pic_r1, *pic_r2;
 	
-    win = (LCUI_Widget *)arg; /* ×ª»»ÀàĞÍ */
-    /* ´´½¨²¿¼ş */
+    win = (LCUI_Widget *)arg; /* è½¬æ¢ç±»å‹ */
+    /* åˆ›å»ºéƒ¨ä»¶ */
     time_box		= Create_Widget(NULL);
     pic_bg			= Create_Widget("picture_box");
     pic_l1			= Create_Widget("picture_box");
@@ -63,9 +63,9 @@ void *update_time(void *arg)
     date_label		= Create_Widget("label");
     wday_label		= Create_Widget("label");
     
-    /* Éú³ÉÎÄ¼şÂ·¾¶ */
+    /* ç”Ÿæˆæ–‡ä»¶è·¯å¾„ */
     strcpy(filename, "drawable/time_0.png");
-    /* ÔØÈëÍ¼Æ¬ */
+    /* è½½å…¥å›¾ç‰‡ */
     Set_PictureBox_Image_From_File(pic_bg, "drawable/bg.png"); 
     Set_PictureBox_Image_From_File(pic_btn_line, "drawable/btn_bg.png"); 
     Set_PictureBox_Image_From_File(pic_btn, "drawable/btn.png"); 
@@ -77,7 +77,7 @@ void *update_time(void *arg)
     
     Set_PictureBox_Size_Mode(pic_btn_line, SIZE_MODE_CENTER);
     
-    /* µ÷Õû³ß´ç */
+    /* è°ƒæ•´å°ºå¯¸ */
     Resize_Widget(time_box,		Size(162, 38));
     Resize_Widget(pic_bg,		Size(300, 90));
     Resize_Widget(pic_btn_line,	Size(245, 66));
@@ -87,7 +87,7 @@ void *update_time(void *arg)
     Resize_Widget(pic_c,		Size(30, 38));
     Resize_Widget(pic_r1,		Size(33, 36));
     Resize_Widget(pic_r2,		Size(33, 36));
-    /* µ÷Õû²¼¾Ö */
+    /* è°ƒæ•´å¸ƒå±€ */
     Set_Widget_Align(pic_l1, ALIGN_MIDDLE_CENTER, Pos(-66,0));
     Set_Widget_Align(pic_l2, ALIGN_MIDDLE_CENTER, Pos(-33,0));
     Set_Widget_Align(pic_c, ALIGN_MIDDLE_CENTER, Pos(0,0));
@@ -98,7 +98,7 @@ void *update_time(void *arg)
     Set_Widget_Align(date_label, ALIGN_MIDDLE_CENTER, Pos(0,35-50));
     Set_Widget_Align(wday_label, ALIGN_TOP_CENTER, Pos(0,5));
     Set_Widget_Align(pic_btn_line, ALIGN_BOTTOM_CENTER, Pos(0,-10));
-    /* ·ÅÈëÈİÆ÷ */
+    /* æ”¾å…¥å®¹å™¨ */
     Widget_Container_Add(time_box, pic_l1);
     Widget_Container_Add(time_box, pic_l2);
     Widget_Container_Add(time_box, pic_c);
@@ -111,7 +111,7 @@ void *update_time(void *arg)
     Window_Client_Area_Add(win, date_label);
     Window_Client_Area_Add(win, wday_label);
     Window_Client_Area_Add(win, pic_btn_line);
-    /* ÏŞÖÆÒÆ¶¯·¶Î§ */
+    /* é™åˆ¶ç§»åŠ¨èŒƒå›´ */
     Limit_Widget_Pos(pic_btn, Pos(0,0), Pos(195,0));
     Widget_Drag_Event_Connect(pic_btn, move_pic_btn);
     
@@ -130,10 +130,10 @@ void *update_time(void *arg)
     while(1)
     {
         time ( &rawtime );
-        timeinfo = localtime ( &rawtime ); /* »ñÈ¡ÏµÍ³µ±Ç°Ê±¼ä */ 
-        /* ¸ü¸ÄÎÄ±¾ÄÚÈİ */
+        timeinfo = localtime ( &rawtime ); /* è·å–ç³»ç»Ÿå½“å‰æ—¶é—´ */ 
+        /* æ›´æ”¹æ–‡æœ¬å†…å®¹ */
         Set_Label_Text(
-			date_label, "<color=40,165,45>%4dÄê%02dÔÂ%02dÈÕ</color>",
+			date_label, "<color=40,165,45>%4då¹´%02dæœˆ%02dæ—¥</color>",
             timeinfo->tm_year+1900, timeinfo->tm_mon+1, timeinfo->tm_mday
         );
         Set_Label_Text(
@@ -169,7 +169,7 @@ void *update_time(void *arg)
 			Set_PictureBox_Image_From_File(pic_r2, filename); 
 			old_r2 = r2;
 		}
-        sleep(1);/* ÔİÍ£1Ãë */
+        sleep(1);/* æš‚åœ1ç§’ */
     } 
     LCUI_Thread_Exit(NULL);
 }
@@ -178,13 +178,13 @@ int main(int argc, char*argv[])
 {
     pthread_t t;
     LCUI_Widget *window; 
-    /* ÉèÖÃÄ¬ÈÏ×ÖÌåÎÄ¼şËùÔÚÎ»ÖÃ */
+    /* è®¾ç½®é»˜è®¤å­—ä½“æ–‡ä»¶æ‰€åœ¨ä½ç½® */
     Set_Default_Font("../../fonts/msyh.ttf");
     LCUI_Init(argc, argv);
     
     window = Create_Widget("window"); 
     LCUI_Thread_Create(&t, NULL, update_time, (void*)window);
-    Set_Window_Title_Text(window, "LC ËøÆÁ³ÌĞò");
+    Set_Window_Title_Text(window, "LC é”å±ç¨‹åº");
     Set_Widget_Backcolor(window, RGB(255,255,255));
     Resize_Widget(window, Size(320, 240)); 
     Set_Widget_Border_Style(window, BORDER_STYLE_LINE_BORDER);

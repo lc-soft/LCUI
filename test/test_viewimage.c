@@ -10,22 +10,22 @@
 #include LC_RES_H
 
 int main(int argc,char*argv[])
-/* Ö÷º¯Êı£¬³ÌĞòµÄÈë¿Ú */
+/* ä¸»å‡½æ•°ï¼Œç¨‹åºçš„å…¥å£ */
 { 
 	LCUI_Widget	*window, 
 					*label,
 					*pic_box,
-					*fore_box; /* Ê¹ÓÃÖ¸Ïòwidget²¿¼şµÄÖ¸Õë */
+					*fore_box; /* ä½¿ç”¨æŒ‡å‘widgetéƒ¨ä»¶çš„æŒ‡é’ˆ */
 					
 	int			 width, height; 
-	/* ×Ô¶¨ÒåÄ¬ÈÏ×ÖÌåÎÄ¼şÎ»ÖÃ */
+	/* è‡ªå®šä¹‰é»˜è®¤å­—ä½“æ–‡ä»¶ä½ç½® */
 	//Set_Default_Font("msyh.ttf");
-	/* ³õÊ¼»¯LCUI */ 
+	/* åˆå§‹åŒ–LCUI */ 
 	LCUI_Init(argc, argv);
-	/* ´´½¨Ò»¸öLCUI³ÌĞò´°¿Ú */
-	width  = 320; /* ´°¿ÚµÄ¿í¶È */
-	height = 240; /* ´°¿ÚµÄ¸ß¶È */
-	/* ´´½¨²¿¼ş */
+	/* åˆ›å»ºä¸€ä¸ªLCUIç¨‹åºçª—å£ */
+	width  = 320; /* çª—å£çš„å®½åº¦ */
+	height = 240; /* çª—å£çš„é«˜åº¦ */
+	/* åˆ›å»ºéƒ¨ä»¶ */
 	window		= Create_Widget("window");
 	label		= Create_Widget("label");
 	pic_box		= Create_Widget("picture_box");
@@ -35,7 +35,7 @@ int main(int argc,char*argv[])
 	Resize_Widget(pic_box, Size(135,135));
 	Resize_Widget(window, Size(width, height));
 	 
-	Set_Window_Title_Text(window, "Í·Ïñ");
+	Set_Window_Title_Text(window, "å¤´åƒ");
 	
 	LCUI_Graph pic;
 	Graph_Init(&pic); 
@@ -43,7 +43,7 @@ int main(int argc,char*argv[])
 	Set_PictureBox_Image_From_File(pic_box, "image.jpg");
 	Set_PictureBox_Image_From_File(fore_box, "border.png");
 	 
-	Set_Label_Text(label, "µ°ÌÛµÄÍ·Ïñ");
+	Set_Label_Text(label, "è›‹ç–¼çš„å¤´åƒ");
 	Set_Label_Font(label, 16, NULL);
 	
 	Set_Widget_Align(pic_box, ALIGN_MIDDLE_CENTER, Pos(0, -20));

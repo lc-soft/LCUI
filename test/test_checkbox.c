@@ -1,4 +1,4 @@
-// ²âÊÔ¸´Ñ¡¿ò²¿¼şµÄ³ÌĞòÀı×Ó
+// æµ‹è¯•å¤é€‰æ¡†éƒ¨ä»¶çš„ç¨‹åºä¾‹å­
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -17,23 +17,23 @@ LCUI_Widget *checkbox[5], *button, *window, *label, *result_text;
 void view_result(LCUI_Widget *widget, void *arg)
 {
 	char str[256]; 
-	strcpy(str, "ÄãµÄĞËÈ¤°®ºÃÓĞ£º ");
-	/* ¼ì²â¸÷¸ö¸´Ñ¡¿òÊÇ·ñ±»Ñ¡ÖĞ£¬ÒÔÈ·¶¨ÄÚÈİ */
+	strcpy(str, "ä½ çš„å…´è¶£çˆ±å¥½æœ‰ï¼š ");
+	/* æ£€æµ‹å„ä¸ªå¤é€‰æ¡†æ˜¯å¦è¢«é€‰ä¸­ï¼Œä»¥ç¡®å®šå†…å®¹ */
 	if(CheckBox_Is_On(checkbox[0]))
-		strcat(str, "±à³Ì ");
+		strcat(str, "ç¼–ç¨‹ ");
 	if(CheckBox_Is_On(checkbox[1]))
-		strcat(str, "µçÓ° ");
+		strcat(str, "ç”µå½± ");
 	if(CheckBox_Is_On(checkbox[2]))
-		strcat(str, "¶¯Âş ");
+		strcat(str, "åŠ¨æ¼« ");
 	if(CheckBox_Is_On(checkbox[3]))
-		strcat(str, "ÒôÀÖ ");
+		strcat(str, "éŸ³ä¹ ");
 	if(CheckBox_Is_On(checkbox[4]))
-		strcat(str, "Ë¯¾õ ");
+		strcat(str, "ç¡è§‰ ");
 	
-	strcat(str, "¡£");
-	/* Éè¶¨ÎÄ±¾ÄÚÈİ */
+	strcat(str, "ã€‚");
+	/* è®¾å®šæ–‡æœ¬å†…å®¹ */
 	Set_Label_Text(result_text, str);
-	/* ½ûÓÃ°´Å¥²¿¼ş */
+	/* ç¦ç”¨æŒ‰é’®éƒ¨ä»¶ */
 	Disable_Widget(button);
 }
 
@@ -41,30 +41,30 @@ int main(int argc, char*argv[])
 {
     int i;
     LCUI_Init(argc, argv);
-    /* ´´½¨²¿¼ş */
+    /* åˆ›å»ºéƒ¨ä»¶ */
     window  = Create_Widget("window");
     label   = Create_Widget("label");
-    button	= Create_Button_With_Text("Ìá½»");
+    button	= Create_Button_With_Text("æäº¤");
     result_text = Create_Widget("label");
-    checkbox[0] = Create_CheckBox_With_Text("±à³Ì");
-    checkbox[1] = Create_CheckBox_With_Text("µçÓ°");
-    checkbox[2] = Create_CheckBox_With_Text("¶¯Âş");
-    checkbox[3] = Create_CheckBox_With_Text("ÒôÀÖ");
-    checkbox[4] = Create_CheckBox_With_Text("Ë¯¾õ");
-    /* Éè¶¨´°¿Ú±êÌâµÄÎÄ±¾ */
-    Set_Window_Title_Text(window, "²âÊÔ¸´Ñ¡¿ò²¿¼ş"); 
-    /* ¸Ä±ä´°¿Ú³ß´ç */
+    checkbox[0] = Create_CheckBox_With_Text("ç¼–ç¨‹");
+    checkbox[1] = Create_CheckBox_With_Text("ç”µå½±");
+    checkbox[2] = Create_CheckBox_With_Text("åŠ¨æ¼«");
+    checkbox[3] = Create_CheckBox_With_Text("éŸ³ä¹");
+    checkbox[4] = Create_CheckBox_With_Text("ç¡è§‰");
+    /* è®¾å®šçª—å£æ ‡é¢˜çš„æ–‡æœ¬ */
+    Set_Window_Title_Text(window, "æµ‹è¯•å¤é€‰æ¡†éƒ¨ä»¶"); 
+    /* æ”¹å˜çª—å£å°ºå¯¸ */
     window->resize(window, Size(320, 240));
-    /* ½ûÓÃ°´Å¥²¿¼şµÄ×Ô¶¯³ß´çµ÷Õû£¬ÒòÎªÒª×Ô¶¨Òå³ß´ç */
+    /* ç¦ç”¨æŒ‰é’®éƒ¨ä»¶çš„è‡ªåŠ¨å°ºå¯¸è°ƒæ•´ï¼Œå› ä¸ºè¦è‡ªå®šä¹‰å°ºå¯¸ */
     Disable_Widget_Auto_Size(button);
     Resize_Widget(button, Size(60, 25));
-    /* ½«´°¿Ú¿Í»§Çø×÷ÎªÕâĞ©²¿¼şµÄÈİÆ÷ */
+    /* å°†çª—å£å®¢æˆ·åŒºä½œä¸ºè¿™äº›éƒ¨ä»¶çš„å®¹å™¨ */
     Window_Client_Area_Add(window, label);
     Window_Client_Area_Add(window, button);
     Window_Client_Area_Add(window, result_text);
     for(i=0; i<5; i++) 
 		Window_Client_Area_Add(window, checkbox[i]); 
-    /* µ÷Õû²¿¼şµÄ²¼¾Ö*/
+    /* è°ƒæ•´éƒ¨ä»¶çš„å¸ƒå±€*/
     Set_Widget_Align(label, ALIGN_MIDDLE_CENTER, Pos(0,-20));
     Set_Widget_Align(button, ALIGN_MIDDLE_CENTER, Pos(0,60));
     Set_Widget_Align(result_text, ALIGN_MIDDLE_CENTER, Pos(0, 30));
@@ -73,18 +73,18 @@ int main(int argc, char*argv[])
 	Set_Widget_Align(checkbox[2], ALIGN_MIDDLE_CENTER, Pos(0 ,5));
 	Set_Widget_Align(checkbox[3], ALIGN_MIDDLE_CENTER, Pos(60 ,5));
 	Set_Widget_Align(checkbox[4], ALIGN_MIDDLE_CENTER, Pos(120 ,5));
-	/* Éè¶¨label²¿¼şÏÔÊ¾µÄÎÄ±¾£¬ÒÔ¼°×ÖÌå´óĞ¡ */
-    Set_Label_Text(label, "Äã¶¼ÓĞÄÄĞ©ĞËÈ¤°®ºÃ£¿\n"); 
+	/* è®¾å®šlabeléƒ¨ä»¶æ˜¾ç¤ºçš„æ–‡æœ¬ï¼Œä»¥åŠå­—ä½“å¤§å° */
+    Set_Label_Text(label, "ä½ éƒ½æœ‰å“ªäº›å…´è¶£çˆ±å¥½ï¼Ÿ\n"); 
     Set_Label_Font(label, 14, NULL);
-    /* ÏÔÊ¾²¿¼ş */
+    /* æ˜¾ç¤ºéƒ¨ä»¶ */
     Show_Widget(label);
     Show_Widget(result_text);
     Show_Widget(button);
     for(i=0; i<5; ++i) 
 		Show_Widget(checkbox[i]);  
     Show_Widget(window); 
-    /* Îª°´Å¥²¿¼ş¹ØÁªµã»÷ÊÂ¼ş£¬±»¹ØÁªµÄº¯ÊıÊÇview_result£¬Ëü»áÔÚµã»÷°´Å¥ºó±»µ÷ÓÃ */
+    /* ä¸ºæŒ‰é’®éƒ¨ä»¶å…³è”ç‚¹å‡»äº‹ä»¶ï¼Œè¢«å…³è”çš„å‡½æ•°æ˜¯view_resultï¼Œå®ƒä¼šåœ¨ç‚¹å‡»æŒ‰é’®åè¢«è°ƒç”¨ */
 	Widget_Clicked_Event_Connect(button, view_result, NULL);
-    return LCUI_Main(); /* ½øÈëÖ÷Ñ­»· */
+    return LCUI_Main(); /* è¿›å…¥ä¸»å¾ªç¯ */
 }
 

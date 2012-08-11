@@ -1,7 +1,7 @@
-// ÓÃLCUIÊµÏÖhello,world³ÌĞò
+// ç”¨LCUIå®ç°hello,worldç¨‹åº
 
-#include <LCUI_Build.h> /* °üº¬LCUIµÄÍ·ÎÄ¼ş */
-#include LC_LCUI_H
+#include <LCUI_Build.h> /* åŒ…å«LCUIçš„å¤´æ–‡ä»¶ */
+#include LC_LCUI_H 
 #include LC_WIDGET_H 
 #include LC_WINDOW_H
 #include LC_LABEL_H
@@ -12,50 +12,49 @@
 
 int main(int argc, char*argv[]) 
 {
-	/* Ä¿Ç°´«µİ¸øLCUI_Init()º¯ÊıµÄ²ÎÊıÃ»ÓÃ£¬ÒÔºó»áÍêÉÆ£¬±ÈÈçÖ¸¶¨×ÖÌåÂ·¾¶£¬ÊÇ·ñÏÔÊ¾Êó±êÓÎ±êµÈ */
+	/* ç›®å‰ä¼ é€’ç»™LCUI_Init()å‡½æ•°çš„å‚æ•°æ²¡ç”¨ï¼Œä»¥åä¼šå®Œå–„ï¼Œæ¯”å¦‚æŒ‡å®šå­—ä½“è·¯å¾„ï¼Œæ˜¯å¦æ˜¾ç¤ºé¼ æ ‡æ¸¸æ ‡ç­‰ */
     LCUI_Init(argc, argv);
     LCUI_Widget *window, *label;
     LCUI_Graph pic;
-    /* ³õÊ¼»¯½á¹¹Ìå */
+    /* åˆå§‹åŒ–ç»“æ„ä½“ */
     Graph_Init(&pic);
-    /* ÔØÈë¿âÖĞ×Ô´øµÄÍ¼ĞÎÊı¾İ£¬Õâ¸öÍ¼ĞÎÊÇ18x18³ß´çµÄLCUIµÄÍ¼±ê */
+    /* è½½å…¥åº“ä¸­è‡ªå¸¦çš„å›¾å½¢æ•°æ®ï¼Œè¿™ä¸ªå›¾å½¢æ˜¯18x18å°ºå¯¸çš„LCUIçš„å›¾æ ‡ */
     Load_Graph_Icon_LCUI_18x18(&pic);
-    /* ´´½¨²¿¼ş */
+    /* åˆ›å»ºéƒ¨ä»¶ */
     window  = Create_Widget("window");
     label   = Create_Widget("label");
     
-    /* Éè¶¨´°¿Ú±êÌâµÄÎÄ±¾ */
-    Set_Window_Title_Text(window, "²âÊÔ´°¿Ú");
-    /* Éè¶¨´°¿Ú±êÌâµÄÍ¼±ê */
+    /* è®¾å®šçª—å£æ ‡é¢˜çš„æ–‡æœ¬ */
+    Set_Window_Title_Text(window, "æµ‹è¯•çª—å£ abcde");
+    /* è®¾å®šçª—å£æ ‡é¢˜çš„å›¾æ ‡ */
     Set_Window_Title_Icon(window, &pic);
-    /* ¸Ä±ä´°¿ÚµÄ³ß´ç */
+    /* æ”¹å˜çª—å£çš„å°ºå¯¸ */
     window->resize(window, Size(320, 240));
-    /* ½«´°¿Ú¿Í»§Çø×÷Îªlabel²¿¼şµÄÈİÆ÷Ìí¼Ó½øÈ¥ */
+    /* å°†çª—å£å®¢æˆ·åŒºä½œä¸ºlabeléƒ¨ä»¶çš„å®¹å™¨æ·»åŠ è¿›å» */
     Window_Client_Area_Add(window, label);
-    /* ¾ÓÖĞÏÔÊ¾ */
+    /* å±…ä¸­æ˜¾ç¤º */
     label->set_align(label, ALIGN_MIDDLE_CENTER, Pos(0,0));
     /* 
-     * Éè¶¨label²¿¼şÏÔÊ¾µÄÎÄ±¾
-     * <color=R,G,B>ÎÄ×Ö</color> ±íÊ¾µÄÊÇ£º¡°ÎÄ×Ö¡±½«Ê¹ÓÃ×Ô¶¨ÒåÑÕÉ« 
-     * Set_Label_Textº¯ÊıÊ¹ÓÃ·½·¨ºÍsprintfº¯Êı»ù±¾Ò»Ñù£¬Ö§³Ö¿ØÖÆ·û
+     * è®¾å®šlabeléƒ¨ä»¶æ˜¾ç¤ºçš„æ–‡æœ¬
+     * <color=R,G,B>æ–‡å­—</color> è¡¨ç¤ºçš„æ˜¯ï¼šâ€œæ–‡å­—â€å°†ä½¿ç”¨è‡ªå®šä¹‰é¢œè‰² 
+     * Set_Label_Textå‡½æ•°ä½¿ç”¨æ–¹æ³•å’Œsprintfå‡½æ•°åŸºæœ¬ä¸€æ ·ï¼Œæ”¯æŒæ§åˆ¶ç¬¦
      **/
     Set_Label_Text(label, 
                 "Hello,World!\n"
-                "<color=255,0,0>ÊÀ</color>"
-                "<color=100,155,0>½ç</color>"
+                "<color=255,0,0>ä¸–</color>"
+                "<color=100,155,0>ç•Œ</color>"
                 "<color=0,0,0>,</color>"
-                "<color=0,255,0>Äã</color>"
-                "<color=0,100,155>ºÃ</color>"
-                "<color=0,0,255>£¡</color>\n"); 
-    
+                "<color=0,255,0>ä½ </color>"
+                "<color=0,100,155>å¥½</color>"
+                "<color=0,0,255>ï¼</color>\n");
     /* 
-     * ¸Ä±älabel²¿¼şµÄ×ÖÌå´óĞ¡£¬µ¥Î»Îªpixel(ÏñËØ)£¬²»ÊÇpt£¨µãÊı£©
-     * µÚÈı¸ö²ÎÊıÊÇ×Ô¶¨ÒåÊ¹ÓÃµÄ×ÖÌåÎÄ¼ş£¬ÎÒÉè¶¨ÎªNULL£¬±íÊ¾²»Ê¹ÓÃ¡£
+     * æ”¹å˜labeléƒ¨ä»¶çš„å­—ä½“å¤§å°ï¼Œå•ä½ä¸ºpixel(åƒç´ )ï¼Œä¸æ˜¯ptï¼ˆç‚¹æ•°ï¼‰
+     * ç¬¬ä¸‰ä¸ªå‚æ•°æ˜¯è‡ªå®šä¹‰ä½¿ç”¨çš„å­—ä½“æ–‡ä»¶ï¼Œæˆ‘è®¾å®šä¸ºNULLï¼Œè¡¨ç¤ºä¸ä½¿ç”¨ã€‚
      **/
     Set_Label_Font(label, 24, NULL);
-    /* ÏÔÊ¾²¿¼ş */
+    /* æ˜¾ç¤ºéƒ¨ä»¶ */
     label->show(label);
     window->show(window);
-    return LCUI_Main(); /* ½øÈëÖ÷Ñ­»· */
+    return LCUI_Main(); /* è¿›å…¥ä¸»å¾ªç¯ */
 }
 

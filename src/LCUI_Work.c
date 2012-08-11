@@ -20,22 +20,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Work.c -- LCUI µÄÆäËü¹¤×÷
+ * LCUI_Work.c -- LCUI çš„å…¶å®ƒå·¥ä½œ
  *
- * °æÈ¨ËùÓÐ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±žäºŽ 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼þÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾ÝGPLv2Ðí¿ÉÐ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ðí¿ÉÖ¤µÚ¶þ°æ µÄÓ¢ÎÄËõÐ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌÐøÊ¹ÓÃ¡¢ÐÞ¸Ä»ò·¢²¼±¾ÎÄ¼þ£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öÐí¿ÉÐ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜Žæ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’ŒæŽ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔðÈÎ£¬ÉõÖÁÃ»ÓÐÊÊÏúÐÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒþº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ðí¿ÉÐ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºŽä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼þµÄGPLv2Ðí¿ÉÐ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼þÖÐ£¬Èç¹û
- * Ã»ÓÐ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºŽæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æžœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #include <unistd.h>
@@ -49,13 +49,13 @@
 
 /***************************** Func ***********************************/
 void NULL_Func()
-/* ¹¦ÄÜ£º¿Õº¯Êý£¬²»×öÈÎºÎ²Ù×÷ */
+/* åŠŸèƒ½ï¼šç©ºå‡½æ•°ï¼Œä¸åšä»»ä½•æ“ä½œ */
 {
 	return;
 }
 
 void FuncQueue_Init(LCUI_Queue *queue)
-/* ¹¦ÄÜ£º³õÊ¼»¯º¯ÊýÖ¸Õë¶ÓÁÐ */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–å‡½æ•°æŒ‡é’ˆé˜Ÿåˆ— */
 {
 	Queue_Init(queue, sizeof(LCUI_Func), NULL);
 }
@@ -64,8 +64,8 @@ void FuncQueue_Init(LCUI_Queue *queue)
 
 void Send_Task_To_App(LCUI_Func *func_data)
 /*
- * ¹¦ÄÜ£º·¢ËÍÈÎÎñ¸ø³ÌÐò£¬Ê¹Õâ¸ö³ÌÐò½øÐÐÖ¸¶¨ÈÎÎñ
- * ËµÃ÷£ºLCUI_Func½á¹¹ÌåÖÐµÄ³ÉÔ±±äÁ¿ id£¬±£´æµÄÊÇÄ¿±ê³ÌÐòµÄid
+ * åŠŸèƒ½ï¼šå‘é€ä»»åŠ¡ç»™ç¨‹åºï¼Œä½¿è¿™ä¸ªç¨‹åºè¿›è¡ŒæŒ‡å®šä»»åŠ¡
+ * è¯´æ˜Žï¼šLCUI_Funcç»“æž„ä½“ä¸­çš„æˆå‘˜å˜é‡ idï¼Œä¿å­˜çš„æ˜¯ç›®æ ‡ç¨‹åºçš„id
  */
 { 
 	LCUI_App *app = Find_App(func_data->id);
@@ -77,7 +77,7 @@ void Send_Task_To_App(LCUI_Func *func_data)
 
 
 int Have_Task(LCUI_App *app)
-/* ¹¦ÄÜ£º¼ì²âÊÇ·ñÓÐÈÎÎñ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹æ˜¯å¦æœ‰ä»»åŠ¡ */
 {
 	if(app == NULL) 
 		return 0; 
@@ -88,11 +88,11 @@ int Have_Task(LCUI_App *app)
 }
 
 int Run_Task(LCUI_App *app)
-/* ¹¦ÄÜ£ºÖ´ÐÐÈÎÎñ */
+/* åŠŸèƒ½ï¼šæ‰§è¡Œä»»åŠ¡ */
 { 
 	LCUI_Task *task;
 	task = (LCUI_Task*)Queue_Get(&app->task_queue, 0);
-	/* µ÷ÓÃº¯ÊýÖ¸ÕëÖ¸ÏòµÄº¯Êý£¬²¢´«µÝ²ÎÊý */
+	/* è°ƒç”¨å‡½æ•°æŒ‡é’ˆæŒ‡å‘çš„å‡½æ•°ï¼Œå¹¶ä¼ é€’å‚æ•° */
 	task->func(task->arg[0], task->arg[1]);
 	
 	return Queue_Delete(&app->task_queue, 0);
@@ -101,22 +101,22 @@ int Run_Task(LCUI_App *app)
 
 int AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 /*
- * ¹¦ÄÜ£ºÊ¹ÓÃ×Ô¶¨Òå·½Ê½Ìí¼Ó³ÌÐòÈÎÎñ
- * ÓÃ·¨Ê¾Àý£º
- * ÔÚº¯ÊýµÄ¸÷²ÎÊýÓë¶ÓÁÐÖÐµÄº¯Êý¼°¸÷²ÎÊý²»ÖØ¸´Ê±£¬Ìí¼ÓËü
+ * åŠŸèƒ½ï¼šä½¿ç”¨è‡ªå®šä¹‰æ–¹å¼æ·»åŠ ç¨‹åºä»»åŠ¡
+ * ç”¨æ³•ç¤ºä¾‹ï¼š
+ * åœ¨å‡½æ•°çš„å„å‚æ•°ä¸Žé˜Ÿåˆ—ä¸­çš„å‡½æ•°åŠå„å‚æ•°ä¸é‡å¤æ—¶ï¼Œæ·»åŠ å®ƒ
  * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT | AND_ARG_F | AND_ARG_S, func_data);
- * Ö»Òªº¯ÊýºÍ²ÎÊý1²»ÖØ¸´ÔòÌí¼Ó
+ * åªè¦å‡½æ•°å’Œå‚æ•°1ä¸é‡å¤åˆ™æ·»åŠ 
  * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT | AND_ARG_F, func_data);
- * Òªº¯Êý²»ÖØ¸´ÔòÌí¼Ó
+ * è¦å‡½æ•°ä¸é‡å¤åˆ™æ·»åŠ 
  * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT, func_data);
- * Ìí¼ÓÐÂµÄ£¬²»¹ÜÊÇ·ñÓÐÖØ¸´µÄ
+ * æ·»åŠ æ–°çš„ï¼Œä¸ç®¡æ˜¯å¦æœ‰é‡å¤çš„
  * AppTask_Custom_Add(ADD_MODE_ADD_NEW, func_data);
- * ÓÐÏàÍ¬º¯ÊýÔò¸²¸Ç£¬Ã»ÓÐÔòÐÂÔö
+ * æœ‰ç›¸åŒå‡½æ•°åˆ™è¦†ç›–ï¼Œæ²¡æœ‰åˆ™æ–°å¢ž
  * AppTask_Custom_Add(ADD_MODE_REPLACE, func_data);
  * */
 {
 	int total, i;
-	/* ÏÈ»ñÈ¡³ÌÐòÊý¾Ý½á¹¹ÌåÖ¸Õë */
+	/* å…ˆèŽ·å–ç¨‹åºæ•°æ®ç»“æž„ä½“æŒ‡é’ˆ */
 	LCUI_App *app = Get_Self_AppPointer();
 	LCUI_FuncQueue *queue =& app->task_queue;
 	
@@ -124,57 +124,57 @@ int AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 	
 	total = Queue_Get_Total(queue);
 	if(mode != ADD_MODE_ADD_NEW)
-	{/* Èç¹ûÄ£Ê½²»ÊÇ¡°Ìí¼ÓÐÂµÄ¡±Ä£Ê½ */
+	{/* å¦‚æžœæ¨¡å¼ä¸æ˜¯â€œæ·»åŠ æ–°çš„â€æ¨¡å¼ */
 		//printf("mode: %d\n", mode);
 		for (i = 0; i < total; ++i)
 		{
 			//printf("1\n");
 			temp = Queue_Get(queue, i);
 			if(temp->func == func_data->func)
-			{/* Èç¹ûº¯ÊýÖ¸ÕëÒÑÓÐ¼ÇÂ¼ */
+			{/* å¦‚æžœå‡½æ•°æŒ‡é’ˆå·²æœ‰è®°å½• */
 			//printf("2\n");
 				if(Check_Option(mode, ADD_MODE_NOT_REPEAT))
-				{/* Èç¹ûÒªÇóµÄÊÇ²»ÖØ¸´Ä£Ê½ */ 
+				{/* å¦‚æžœè¦æ±‚çš„æ˜¯ä¸é‡å¤æ¨¡å¼ */ 
 		//	printf("3\n");
 					if(Check_Option(mode, AND_ARG_F))
-					{/* Èç¹ûÒªÇóÊÇµÚ1¸ö²ÎÊý²»ÄÜÖØ¸´ */
+					{/* å¦‚æžœè¦æ±‚æ˜¯ç¬¬1ä¸ªå‚æ•°ä¸èƒ½é‡å¤ */
 						//printf("ADD_MODE_NOT_REPEAT, AND_ARG_F\n");
 						//printf("old:%p, new:%p\n", queue->queue[i].arg_f, arg_f);
 						if(Check_Option(mode, AND_ARG_S))
-						{/* Èç¹ûÒªÇóÊÇµÚ2¸ö²ÎÊýÒ²²»ÄÜÖØ¸´ */
+						{/* å¦‚æžœè¦æ±‚æ˜¯ç¬¬2ä¸ªå‚æ•°ä¹Ÿä¸èƒ½é‡å¤ */
 							if(temp->arg[0] == func_data->arg[0] 
 							&& temp->arg[1] == func_data->arg[1] 
-							)/* Èç¹ûÊµ¼ÊÉÏº¯ÊýÒÔ¼°²ÎÊý1ºÍ2¶¼Ò»Ñù */ 
+							)/* å¦‚æžœå®žé™…ä¸Šå‡½æ•°ä»¥åŠå‚æ•°1å’Œ2éƒ½ä¸€æ · */ 
 								return -1; 
 						}
 						else
-						{/* ·ñÔò£¬Ö»ÊÇÒªÇóº¯ÊýÒÔ¼°µÚ1¸ö²ÎÊý²»ÄÜÈ«²¿ÖØ¸´ */
+						{/* å¦åˆ™ï¼Œåªæ˜¯è¦æ±‚å‡½æ•°ä»¥åŠç¬¬1ä¸ªå‚æ•°ä¸èƒ½å…¨éƒ¨é‡å¤ */
 							if(temp->arg[0] == func_data->arg[0])  
 								return -1; 
 						}
 					}
 					else if(Check_Option(mode, AND_ARG_S))
-					{/* ·ñÔò£¬Èç¹ûÖ»ÊÇÒªÇóÊÇµÚ2¸ö²ÎÊý²»ÄÜÖØ¸´ */
+					{/* å¦åˆ™ï¼Œå¦‚æžœåªæ˜¯è¦æ±‚æ˜¯ç¬¬2ä¸ªå‚æ•°ä¸èƒ½é‡å¤ */
 						if(temp->arg[1] == func_data->arg[1] )  
 							return -1; 
 					}
-					else /* ·ñÔò£¬Ö»ÊÇÒªÇóº¯Êý²»Í¬ */ 
+					else /* å¦åˆ™ï¼Œåªæ˜¯è¦æ±‚å‡½æ•°ä¸åŒ */ 
 						return -1; 
 				}
 				else if(Check_Option(mode, ADD_MODE_REPLACE))
-				{/* Èç¹ûÒªÇóµÄÊÇÌæ»»Ä£Ê½ */
+				{/* å¦‚æžœè¦æ±‚çš„æ˜¯æ›¿æ¢æ¨¡å¼ */
 					//printf("ADD_MODE_REPLACE\n");
 					if(Check_Option(mode, AND_ARG_F))
-					{/* Èç¹ûÒªÇóÊÇµÚ1¸ö²ÎÊýÏàÍ¬ */
+					{/* å¦‚æžœè¦æ±‚æ˜¯ç¬¬1ä¸ªå‚æ•°ç›¸åŒ */
 						if(Check_Option(mode, AND_ARG_S))
-						{/* Èç¹ûÒªÇóÊÇµÚ2¸ö²ÎÊýÒ²ÏàÍ¬ */
+						{/* å¦‚æžœè¦æ±‚æ˜¯ç¬¬2ä¸ªå‚æ•°ä¹Ÿç›¸åŒ */
 							if(temp->arg[0] == func_data->arg[0] 
 							&& temp->arg[1] == func_data->arg[1]
 							)
 								break; 
 						}
 						else
-						{/* ·ñÔò£¬Ö»ÊÇÒªÇóº¯ÊýÒÔ¼°µÚ1¸ö²ÎÊýÈ«²¿ÏàÍ¬ */
+						{/* å¦åˆ™ï¼Œåªæ˜¯è¦æ±‚å‡½æ•°ä»¥åŠç¬¬1ä¸ªå‚æ•°å…¨éƒ¨ç›¸åŒ */
 							if(temp->arg[0] == func_data->arg[0])
 							{
 						//		printf("ARG_F\n");
@@ -183,11 +183,11 @@ int AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 						}
 					}
 					else if(Check_Option(mode, AND_ARG_S))
-					{/* ·ñÔò£¬Èç¹ûÖ»ÊÇÒªÇóµÚ2¸ö²ÎÊý²»ÄÜÏàÍ¬ */
+					{/* å¦åˆ™ï¼Œå¦‚æžœåªæ˜¯è¦æ±‚ç¬¬2ä¸ªå‚æ•°ä¸èƒ½ç›¸åŒ */
 						if(temp->arg[1] == func_data->arg[1]) 
 							break; 
 					}
-					else /* ·ñÔò£¬Ö»ÊÇÒªÇóº¯Êý²»Í¬ */ 
+					else /* å¦åˆ™ï¼Œåªæ˜¯è¦æ±‚å‡½æ•°ä¸åŒ */ 
 						break; 
 				}
 		//	printf("4\n");
@@ -210,7 +210,7 @@ int AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 
 /***************************** Event ***********************************/
 static void Destroy_Event(void *arg)
-/* ¹¦ÄÜ£ºÏú»ÙÊÂ¼þÊý¾Ý */
+/* åŠŸèƒ½ï¼šé”€æ¯äº‹ä»¶æ•°æ® */
 {
 	LCUI_Event *event = (LCUI_Event*)arg;
 	if(event != NULL) 
@@ -218,11 +218,11 @@ static void Destroy_Event(void *arg)
 }
 
 void EventQueue_Init(LCUI_EventQueue * queue)
-/* ¹¦ÄÜ£º³õÊ¼»¯ÊÂ¼þ¶ÓÁÐ */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–äº‹ä»¶é˜Ÿåˆ— */
 {
 	/* 
-	 * ÓÉÓÚLCUI_Event½á¹¹ÌåµÄ³ÉÔ±ÖÐÓÐº¯Êý¶ÓÁÐ£¬Ïú»ÙÊÂ¼þÊ±ÐèÒª°Ñ¸Ã¶ÓÁÐÏú»Ù£¬ËùÒÔÐè
-	 * ÒªDestroy_Event()×÷ÎªÎö¹¹º¯Êý 
+	 * ç”±äºŽLCUI_Eventç»“æž„ä½“çš„æˆå‘˜ä¸­æœ‰å‡½æ•°é˜Ÿåˆ—ï¼Œé”€æ¯äº‹ä»¶æ—¶éœ€è¦æŠŠè¯¥é˜Ÿåˆ—é”€æ¯ï¼Œæ‰€ä»¥éœ€
+	 * è¦Destroy_Event()ä½œä¸ºæžæž„å‡½æ•° 
 	 * */
 	Queue_Init(queue, sizeof(LCUI_Event), Destroy_Event);
 }
@@ -230,8 +230,8 @@ void EventQueue_Init(LCUI_EventQueue * queue)
 
 int Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
 /* 
- * ¹¦ÄÜ£º½«º¯ÊýÖ¸ÕëÒÔ¼°Á½¸ö²ÎÊý£¬×ª»»³ÉLCUI_FuncÀàÐÍµÄÖ¸Õë
- * ËµÃ÷£º´Ëº¯Êý»áÉêÇëÄÚ´æ¿Õ¼ä£¬²¢·µ»ØÖ¸Ïò¸Ã¿Õ¼äµÄÖ¸Õë
+ * åŠŸèƒ½ï¼šå°†å‡½æ•°æŒ‡é’ˆä»¥åŠä¸¤ä¸ªå‚æ•°ï¼Œè½¬æ¢æˆLCUI_Funcç±»åž‹çš„æŒ‡é’ˆ
+ * è¯´æ˜Žï¼šæ­¤å‡½æ•°ä¼šç”³è¯·å†…å­˜ç©ºé—´ï¼Œå¹¶è¿”å›žæŒ‡å‘è¯¥ç©ºé—´çš„æŒ‡é’ˆ
  *  */
 {
 	LCUI_App *app;
@@ -246,8 +246,8 @@ int Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
 	p->id = app->id;
 	p->func = func;
 	/* 
-	 * Ö»ÊÇ±£´æÁËÖ¸Ïò²ÎÊýµÄÖ¸Õë£¬Èç¹û¸Ã²ÎÊýÊÇ¾Ö²¿±äÁ¿£¬ÔÚÉùÃ÷ËüµÄº¯ÊýÍË³öºó£¬¸Ã±äÁ¿
-	 * µÄ¿Õ¼ä¿ÉÄÜ»áÎÞ·¨·ÃÎÊ¡£
+	 * åªæ˜¯ä¿å­˜äº†æŒ‡å‘å‚æ•°çš„æŒ‡é’ˆï¼Œå¦‚æžœè¯¥å‚æ•°æ˜¯å±€éƒ¨å˜é‡ï¼Œåœ¨å£°æ˜Žå®ƒçš„å‡½æ•°é€€å‡ºåŽï¼Œè¯¥å˜é‡
+	 * çš„ç©ºé—´å¯èƒ½ä¼šæ— æ³•è®¿é—®ã€‚
 	 *  */
 	p->arg[0] = arg1;	
 	p->arg[1] = arg2;
@@ -256,7 +256,7 @@ int Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
 }
 
 LCUI_Event *Find_Event(LCUI_EventQueue *queue, int event_id)
-/* ¹¦ÄÜ£º¸ù¾ÝÊÂ¼þµÄID£¬»ñÈ¡Ö¸Ïò¸ÃÊÂ¼þµÄÖ¸Õë */
+/* åŠŸèƒ½ï¼šæ ¹æ®äº‹ä»¶çš„IDï¼ŒèŽ·å–æŒ‡å‘è¯¥äº‹ä»¶çš„æŒ‡é’ˆ */
 {
 	LCUI_Event *event; 
 	int i, total;  
@@ -275,40 +275,40 @@ LCUI_Event *Find_Event(LCUI_EventQueue *queue, int event_id)
 }
 
 int EventQueue_Add(LCUI_EventQueue *queue, int event_id, LCUI_Func *func)
-/* ¹¦ÄÜ£º¼ÇÂ¼ÊÂ¼þ¼°¶ÔÓ¦»Øµ÷º¯ÊýÖÁ¶ÓÁÐ */
+/* åŠŸèƒ½ï¼šè®°å½•äº‹ä»¶åŠå¯¹åº”å›žè°ƒå‡½æ•°è‡³é˜Ÿåˆ— */
 {
 	LCUI_Event *event;
 	
 	event = Find_Event(queue, event_id);
 	if (NULL == event)
-	{/* Èç¹ûÃ»ÓÐ£¬¾ÍÌí¼ÓÒ»¸öÐÂÊÂ¼þÀàÐÍ */ 
+	{/* å¦‚æžœæ²¡æœ‰ï¼Œå°±æ·»åŠ ä¸€ä¸ªæ–°äº‹ä»¶ç±»åž‹ */ 
 		int pos;
 		LCUI_Event new_event;
 		new_event.id = event_id;
 		Queue_Init(&new_event.func_data, sizeof(LCUI_Func), NULL);
-		pos = Queue_Add(queue, &new_event);/* ½«ÐÂÊý¾Ý×·¼ÓÖÁ¶ÓÁÐ */
-		event = Queue_Get(queue, pos);	/* »ñÈ¡Ö¸ÏòÐÂÔö³ÉÔ±µÄÖ¸Õë */
+		pos = Queue_Add(queue, &new_event);/* å°†æ–°æ•°æ®è¿½åŠ è‡³é˜Ÿåˆ— */
+		event = Queue_Get(queue, pos);	/* èŽ·å–æŒ‡å‘æ–°å¢žæˆå‘˜çš„æŒ‡é’ˆ */
 	}
 	
-	event->id = event_id; /* ±£´æÊÂ¼þID */
+	event->id = event_id; /* ä¿å­˜äº‹ä»¶ID */
 	Queue_Add(&event->func_data, func);
 	return 0;
 }
 
 int LCUI_MouseEvent_Connect (void (*func) (), int event_id)
 /* 
- * ¹¦ÄÜ£º½«º¯ÊýÓëÊó±êµÄÏà¹ØÊÂ¼þÏà¹ØÁª
- * ËµÃ÷£ºµ±Êó±êÊÂ¼þ´¥·¢ºó£¬»áÏÈ½«ÒÑ¹ØÁª¸ÃÊÂ¼þµÄº¯ÊýÖ¸Õë¼°Ïà¹ØÊÂ¼þµÄÖ¸Õë
- * Ìí¼ÓÖÁ³ÌÐòµÄÈÎÎñ¶ÓÁÐ£¬µÈ´ý³ÌÐòÔÚÖ÷Ñ­»·ÖÐ´¦Àí
+ * åŠŸèƒ½ï¼šå°†å‡½æ•°ä¸Žé¼ æ ‡çš„ç›¸å…³äº‹ä»¶ç›¸å…³è”
+ * è¯´æ˜Žï¼šå½“é¼ æ ‡äº‹ä»¶è§¦å‘åŽï¼Œä¼šå…ˆå°†å·²å…³è”è¯¥äº‹ä»¶çš„å‡½æ•°æŒ‡é’ˆåŠç›¸å…³äº‹ä»¶çš„æŒ‡é’ˆ
+ * æ·»åŠ è‡³ç¨‹åºçš„ä»»åŠ¡é˜Ÿåˆ—ï¼Œç­‰å¾…ç¨‹åºåœ¨ä¸»å¾ªçŽ¯ä¸­å¤„ç†
  **/
 {
 	LCUI_Func func_data;
 	if(0 != Get_FuncData(&func_data, func, NULL, NULL) ) 
 		return -1;
 	/* 
-	 * ½«º¯ÊýÖ¸Õë¼°µÚÒ»¸ö²ÎÊý¼ÓÈëÖÁÊó±êÊÂ¼þ´¦Àí¶ÓÁÐ
-	 * ÖÐ£¬µÈµ½´¦ÀíÊó±êÊÂ¼þÊ±£¬»á½«°´¼ü×´Ì¬×÷Îª¸Ãº¯
-	 * ÊýµÄµÚ¶þ¸ö²ÎÊý²¢×ªÒÆÖÁ³ÌÐòµÄÈÎÎñ¶ÓÁÐ 
+	 * å°†å‡½æ•°æŒ‡é’ˆåŠç¬¬ä¸€ä¸ªå‚æ•°åŠ å…¥è‡³é¼ æ ‡äº‹ä»¶å¤„ç†é˜Ÿåˆ—
+	 * ä¸­ï¼Œç­‰åˆ°å¤„ç†é¼ æ ‡äº‹ä»¶æ—¶ï¼Œä¼šå°†æŒ‰é”®çŠ¶æ€ä½œä¸ºè¯¥å‡½
+	 * æ•°çš„ç¬¬äºŒä¸ªå‚æ•°å¹¶è½¬ç§»è‡³ç¨‹åºçš„ä»»åŠ¡é˜Ÿåˆ— 
 	 **/ 
 	EventQueue_Add(&LCUI_Sys.mouse.event, event_id, &func_data); 
 	return 0;
@@ -316,7 +316,7 @@ int LCUI_MouseEvent_Connect (void (*func) (), int event_id)
 
 
 int LCUI_Key_Event_Connect (int key_value, void (*func) (), void *arg)
-/* ¹¦ÄÜ£º½«º¯ÊýÓë°´¼üµÄÄ³¸öÊÂ¼þÏàÁ¬½Ó£¬µ±Õâ¸ö°´¼ü°´ÏÂºó£¬¾Í»áµ÷ÓÃÕâ¸öº¯Êý */
+/* åŠŸèƒ½ï¼šå°†å‡½æ•°ä¸ŽæŒ‰é”®çš„æŸä¸ªäº‹ä»¶ç›¸è¿žæŽ¥ï¼Œå½“è¿™ä¸ªæŒ‰é”®æŒ‰ä¸‹åŽï¼Œå°±ä¼šè°ƒç”¨è¿™ä¸ªå‡½æ•° */
 {
 	LCUI_Func func_data;
 	LCUI_App *app = Get_Self_AppPointer();
@@ -333,8 +333,8 @@ int LCUI_Key_Event_Connect (int key_value, void (*func) (), void *arg)
 
 int Processing_Event(LCUI_EventQueue *queue, int event_id)
 /* 
- * ¹¦ÄÜ£º´¦ÀíÖ¸¶¨IDµÄÊÂ¼þ
- * ËµÃ÷£º±¾º¯Êý»á½«ÊÂ¼þ¶ÓÁÐÖÐÓëÖ¸¶¨IDµÄÊÂ¼þ¹ØÁªµÄ»Øµ÷º¯Êý Ìí¼ÓÖÁ³ÌÐòµÄÈÎÎñ¶ÓÁÐ
+ * åŠŸèƒ½ï¼šå¤„ç†æŒ‡å®šIDçš„äº‹ä»¶
+ * è¯´æ˜Žï¼šæœ¬å‡½æ•°ä¼šå°†äº‹ä»¶é˜Ÿåˆ—ä¸­ä¸ŽæŒ‡å®šIDçš„äº‹ä»¶å…³è”çš„å›žè°ƒå‡½æ•° æ·»åŠ è‡³ç¨‹åºçš„ä»»åŠ¡é˜Ÿåˆ—
  * */
 {
 	LCUI_Event *event;
@@ -348,24 +348,24 @@ int Processing_Event(LCUI_EventQueue *queue, int event_id)
 	for (i = 0; i < total; ++i)
 	{
 		func = Queue_Get(&event->func_data, i);
-		/* Ìí¼ÓÖÁ³ÌÐòµÄÈÎÎñ¶ÓÁÐ */ 
+		/* æ·»åŠ è‡³ç¨‹åºçš„ä»»åŠ¡é˜Ÿåˆ— */ 
 		AppTask_Custom_Add(ADD_MODE_ADD_NEW, func);
 	}
 	return 0;
 }
 
 
-/****************** ´¦Àí²¿¼þÍÏ¶¯/µã»÷ÊÂ¼þµÄÏà¹Ø´úÂë ************************/
+/****************** å¤„ç†éƒ¨ä»¶æ‹–åŠ¨/ç‚¹å‡»äº‹ä»¶çš„ç›¸å…³ä»£ç  ************************/
 static LCUI_Widget *click_widget = NULL, *overlay_widget = NULL;
-static LCUI_Pos __offset_pos = {0, 0};  /* µã»÷²¿¼þÊ±±£´æµÄÆ«ÒÆ×ø±ê */ 
+static LCUI_Pos __offset_pos = {0, 0};  /* ç‚¹å‡»éƒ¨ä»¶æ—¶ä¿å­˜çš„åç§»åæ ‡ */ 
 static LCUI_DragEvent drag_event;
 int Widget_Drag_Event_Connect ( 
 				LCUI_Widget *widget, 
 				void (*func)(LCUI_Widget*, LCUI_DragEvent *)
 )
 /* 
- * ¹¦ÄÜ£º½«»Øµ÷º¯ÊýÓë²¿¼þµÄÍÏ¶¯ÊÂ¼þ½øÐÐÁ¬½Ó 
- * ËµÃ÷£º½¨Á¢Á¬½Óºó£¬µ«²¿¼þ±»µã»÷£¬ÍÏ¶¯£¬ÊÍ·Å£¬¶¼»áµ÷ÓÃ»Øµ÷º¯Êý
+ * åŠŸèƒ½ï¼šå°†å›žè°ƒå‡½æ•°ä¸Žéƒ¨ä»¶çš„æ‹–åŠ¨äº‹ä»¶è¿›è¡Œè¿žæŽ¥ 
+ * è¯´æ˜Žï¼šå»ºç«‹è¿žæŽ¥åŽï¼Œä½†éƒ¨ä»¶è¢«ç‚¹å‡»ï¼Œæ‹–åŠ¨ï¼Œé‡Šæ”¾ï¼Œéƒ½ä¼šè°ƒç”¨å›žè°ƒå‡½æ•°
  * */
 {
 	LCUI_DragEvent *p;
@@ -385,8 +385,8 @@ int Widget_Clicked_Event_Connect (
 			void *arg
 )
 /* 
- * ¹¦ÄÜ£º½«»Øµ÷º¯ÊýÓë²¿¼þµÄÍÏ¶¯ÊÂ¼þ½øÐÐÁ¬½Ó 
- * ËµÃ÷£º½¨Á¢Á¬½Óºó£¬²¿¼þ»á½«ÐÂÎ»ÖÃ×÷ÎªµÚ¶þ²ÎÊý£¬´«¸ø»Øµ÷º¯Êý
+ * åŠŸèƒ½ï¼šå°†å›žè°ƒå‡½æ•°ä¸Žéƒ¨ä»¶çš„æ‹–åŠ¨äº‹ä»¶è¿›è¡Œè¿žæŽ¥ 
+ * è¯´æ˜Žï¼šå»ºç«‹è¿žæŽ¥åŽï¼Œéƒ¨ä»¶ä¼šå°†æ–°ä½ç½®ä½œä¸ºç¬¬äºŒå‚æ•°ï¼Œä¼ ç»™å›žè°ƒå‡½æ•°
  * */
 {
 	LCUI_Func func_data;
@@ -400,27 +400,27 @@ int Widget_Clicked_Event_Connect (
 
 static LCUI_Widget *Widget_Find_Response_Status_Change(LCUI_Widget *widget)
 /* 
- * ¹¦ÄÜ£º²éÕÒÄÜÏìÓ¦×´Ì¬¸Ä±äµÄ²¿¼þ 
- * ËµÃ÷£º´Ëº¯ÊýÓÃÓÚ¼ì²é²¿¼þÒÔ¼°ËüµÄÉÏ¼¶ËùÓÐ¸¸²¿¼þ£¬µÚÒ»¸öÓÐÏìÓ¦×´Ì¬¸Ä±äµÄ²¿¼þµÄÖ¸Õë½«»á
- * ×÷Îª±¾º¯ÊýµÄ·µ»ØÖµ¡£
+ * åŠŸèƒ½ï¼šæŸ¥æ‰¾èƒ½å“åº”çŠ¶æ€æ”¹å˜çš„éƒ¨ä»¶ 
+ * è¯´æ˜Žï¼šæ­¤å‡½æ•°ç”¨äºŽæ£€æŸ¥éƒ¨ä»¶ä»¥åŠå®ƒçš„ä¸Šçº§æ‰€æœ‰çˆ¶éƒ¨ä»¶ï¼Œç¬¬ä¸€ä¸ªæœ‰å“åº”çŠ¶æ€æ”¹å˜çš„éƒ¨ä»¶çš„æŒ‡é’ˆå°†ä¼š
+ * ä½œä¸ºæœ¬å‡½æ•°çš„è¿”å›žå€¼ã€‚
  * */
 {
 	if(NULL == widget) 
 		return NULL;
 	if(widget->response_flag == 1)
-		return widget;/* Èç¹û²¿¼þÏìÓ¦×´Ì¬¸Ä±ä£¬ÄÇ¾Í·µ»Ø¸Ã²¿¼þµÄÖ¸Õë */
+		return widget;/* å¦‚æžœéƒ¨ä»¶å“åº”çŠ¶æ€æ”¹å˜ï¼Œé‚£å°±è¿”å›žè¯¥éƒ¨ä»¶çš„æŒ‡é’ˆ */
 		
 	if(widget->parent == NULL)
-		return NULL; /* Èç¹û¸¸²¿¼þÎª¿Õ£¬ÄÇ¾ÍÃ»ÕÒµ½£¬·µ»ØNULL */
-	else /* ·ñÔò£¬ÔÚËüµÄ¸¸¼¶²¿¼þÖÐÕÒ */
+		return NULL; /* å¦‚æžœçˆ¶éƒ¨ä»¶ä¸ºç©ºï¼Œé‚£å°±æ²¡æ‰¾åˆ°ï¼Œè¿”å›žNULL */
+	else /* å¦åˆ™ï¼Œåœ¨å®ƒçš„çˆ¶çº§éƒ¨ä»¶ä¸­æ‰¾ */
 		return Widget_Find_Response_Status_Change(widget->parent); 
 }
 
 static LCUI_Widget *Widget_Find_Response_Event(LCUI_Widget *widget, int event_id)
 /* 
- * ¹¦ÄÜ£º²éÕÒÄÜÏìÓ¦ÊÂ¼þµÄ²¿¼þ 
- * ËµÃ÷£º´Ëº¯ÊýÓÃÓÚ¼ì²é²¿¼þÒÔ¼°ËüµÄÉÏ¼¶ËùÓÐ¸¸²¿¼þ£¬µÚÒ»¸öÓÐÏìÓ¦Ö¸¶¨ÊÂ¼þµÄ²¿¼þ£¬ËüµÄÖ¸Õë
- * ½«»á×÷Îª±¾º¯ÊýµÄ·µ»ØÖµ
+ * åŠŸèƒ½ï¼šæŸ¥æ‰¾èƒ½å“åº”äº‹ä»¶çš„éƒ¨ä»¶ 
+ * è¯´æ˜Žï¼šæ­¤å‡½æ•°ç”¨äºŽæ£€æŸ¥éƒ¨ä»¶ä»¥åŠå®ƒçš„ä¸Šçº§æ‰€æœ‰çˆ¶éƒ¨ä»¶ï¼Œç¬¬ä¸€ä¸ªæœ‰å“åº”æŒ‡å®šäº‹ä»¶çš„éƒ¨ä»¶ï¼Œå®ƒçš„æŒ‡é’ˆ
+ * å°†ä¼šä½œä¸ºæœ¬å‡½æ•°çš„è¿”å›žå€¼
  * */
 { 
 	LCUI_Event *event;
@@ -429,18 +429,18 @@ static LCUI_Widget *Widget_Find_Response_Event(LCUI_Widget *widget, int event_id
 		
 	event = Find_Event(&widget->event, event_id);
 	if(event != NULL)
-		return widget;/* Èç¹û²¿¼þÏìÓ¦×´Ì¬¸Ä±ä£¬ÄÇ¾Í·µ»Ø¸Ã²¿¼þµÄÖ¸Õë */
+		return widget;/* å¦‚æžœéƒ¨ä»¶å“åº”çŠ¶æ€æ”¹å˜ï¼Œé‚£å°±è¿”å›žè¯¥éƒ¨ä»¶çš„æŒ‡é’ˆ */
 	 
 	if(widget->parent == NULL)
-		return NULL; /* Èç¹û¸¸²¿¼þÎª¿Õ£¬ÄÇ¾ÍÃ»ÕÒµ½£¬·µ»ØNULL */
-	else /* ·ñÔò£¬ÔÚËüµÄ¸¸¼¶²¿¼þÖÐÕÒ */
+		return NULL; /* å¦‚æžœçˆ¶éƒ¨ä»¶ä¸ºç©ºï¼Œé‚£å°±æ²¡æ‰¾åˆ°ï¼Œè¿”å›žNULL */
+	else /* å¦åˆ™ï¼Œåœ¨å®ƒçš„çˆ¶çº§éƒ¨ä»¶ä¸­æ‰¾ */
 		return Widget_Find_Response_Event(widget->parent, event_id); 
 }
 
 static void Widget_Clicked(LCUI_MouseEvent *event)
 /*
- * ¹¦ÄÜ£ºÓÃÓÚ´¦ÀíclickÊÂ¼þ£¬²¢±£´æ±»µã»÷ºóµÄ²¿¼þµÄÖ¸Õë
- * ËµÃ÷£ºÔÚÊó±ê×ó¼ü±»°´ÏÂ/ÊÍ·ÅÊ±£¬¶¼»áµ÷ÓÃÕâ¸öº¯Êý
+ * åŠŸèƒ½ï¼šç”¨äºŽå¤„ç†clickäº‹ä»¶ï¼Œå¹¶ä¿å­˜è¢«ç‚¹å‡»åŽçš„éƒ¨ä»¶çš„æŒ‡é’ˆ
+ * è¯´æ˜Žï¼šåœ¨é¼ æ ‡å·¦é”®è¢«æŒ‰ä¸‹/é‡Šæ”¾æ—¶ï¼Œéƒ½ä¼šè°ƒç”¨è¿™ä¸ªå‡½æ•°
  **/
 {
 	LCUI_Widget *widget; 
@@ -457,22 +457,22 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 	//printf("widget :");
 	//print_widget_info(widget);
 	if( Mouse_LeftButton(event) == PRESSED )
-	{/* Èç¹ûÊÇÊó±ê×ó¼ü±»°´ÏÂ */ 
-		/* widget±ØÐëÖ¸ÏòÄÜÏìÓ¦×´Ì¬±ä»¯µÄ²¿¼þ£¬Òò´Ë£¬ÐèÒª²éÕÒ */
+	{/* å¦‚æžœæ˜¯é¼ æ ‡å·¦é”®è¢«æŒ‰ä¸‹ */ 
+		/* widgetå¿…é¡»æŒ‡å‘èƒ½å“åº”çŠ¶æ€å˜åŒ–çš„éƒ¨ä»¶ï¼Œå› æ­¤ï¼Œéœ€è¦æŸ¥æ‰¾ */
 		click_widget = widget; 
 		if(widget != NULL)
 		{
 			//printf("1\n");
-			/* ÓÃÈ«¾Ö×ø±ê¼õÈ¥²¿¼þµÄ×ø±ê£¬µÃµ½Æ«ÒÆÎ»ÖÃ */ 
+			/* ç”¨å…¨å±€åæ ‡å‡åŽ»éƒ¨ä»¶çš„åæ ‡ï¼Œå¾—åˆ°åç§»ä½ç½® */ 
 			__offset_pos = Pos_Sub(
 				event->global_pos, 
 				Get_Widget_Global_Pos( widget )
 			);
-			/* µÃ³ö²¿¼þµÄÐÂÎ»ÖÃ */
+			/* å¾—å‡ºéƒ¨ä»¶çš„æ–°ä½ç½® */
 			drag_event.new_pos = Pos_Sub(event->global_pos, __offset_pos); 
 			drag_event.first_click = 1; 
 			drag_event.end_click = 0;
-			/* ´¦Àí²¿¼þµÄÍÏ¶¯ÊÂ¼þ */
+			/* å¤„ç†éƒ¨ä»¶çš„æ‹–åŠ¨äº‹ä»¶ */
 			Processing_Event(&widget->event, EVENT_DRAG); 
 		}
 			//printf("2\n");
@@ -482,7 +482,7 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 			//printf("3\n");
 			if( event->widget->enabled == IS_TRUE
 			&& widget->enabled == IS_TRUE )
-			/* Èç¹ûµ±Ç°Êó±êÖ¸Õë¸²¸Çµ½µÄ²¿¼þÒÑ±»ÆôÓÃ */  
+			/* å¦‚æžœå½“å‰é¼ æ ‡æŒ‡é’ˆè¦†ç›–åˆ°çš„éƒ¨ä»¶å·²è¢«å¯ç”¨ */  
 				Set_Widget_Status (widget, WIDGET_STATUS_CLICKING); 
 			else 
 				Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
@@ -490,7 +490,7 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 			//printf("4\n");
 	}
 	else if (Mouse_LeftButton (event) == FREE)
-	{/* ·ñÔò£¬Èç¹ûÊó±ê×ó¼üÊÇÊÍ·Å×´Ì¬ */
+	{/* å¦åˆ™ï¼Œå¦‚æžœé¼ æ ‡å·¦é”®æ˜¯é‡Šæ”¾çŠ¶æ€ */
 	//printf("5\n");
 		if(click_widget != NULL)
 		{ 
@@ -504,10 +504,10 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 			Processing_Event(&click_widget->event, EVENT_DRAG);
 			
 			if(click_widget == widget)
-			{/* Èç¹ûµã»÷Ê±ºÍµã»÷ºó¶¼ÔÚÍ¬Ò»¸ö°´Å¥²¿¼þÄÚ½øÐÐµÄ */
+			{/* å¦‚æžœç‚¹å‡»æ—¶å’Œç‚¹å‡»åŽéƒ½åœ¨åŒä¸€ä¸ªæŒ‰é’®éƒ¨ä»¶å†…è¿›è¡Œçš„ */
 				/* 
-				 * ´¥·¢CLICKEDÊÂ¼þ£¬½«²¿¼þÖÐ¹ØÁª¸ÃÊÂ¼þµÄ»Øµ÷º¯Êý·¢ËÍÖÁ
-				 * ÈÎÎñ¶ÓÁÐ£¬Ê¹Ö®ÔÚÖ÷Ñ­»·ÖÐÖ´ÐÐ 
+				 * è§¦å‘CLICKEDäº‹ä»¶ï¼Œå°†éƒ¨ä»¶ä¸­å…³è”è¯¥äº‹ä»¶çš„å›žè°ƒå‡½æ•°å‘é€è‡³
+				 * ä»»åŠ¡é˜Ÿåˆ—ï¼Œä½¿ä¹‹åœ¨ä¸»å¾ªçŽ¯ä¸­æ‰§è¡Œ 
 				 * */  
 				//printf("send clicked event\n"); 
 		//printf("6\n");
@@ -526,7 +526,7 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 		//printf("7\n");
 			}
 			else
-			{/* ·ñÔò£¬½«»Ö¸´Ö®Ç°µã»÷µÄÊó±êµÄ×´Ì¬ */
+			{/* å¦åˆ™ï¼Œå°†æ¢å¤ä¹‹å‰ç‚¹å‡»çš„é¼ æ ‡çš„çŠ¶æ€ */
 		//printf("8\n");
 				widget = Widget_Find_Response_Status_Change(click_widget);
 				if(widget != NULL)
@@ -538,29 +538,29 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 				}
 			} 
 		}
-		click_widget = NULL; /* Ö¸Õë¸³ÖµÎª¿Õ */
+		click_widget = NULL; /* æŒ‡é’ˆèµ‹å€¼ä¸ºç©º */
 	} 
 	//printf("Widget_Clicked() :end!!\n");  
 }
 
 static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 /* 
- * ¹¦ÄÜ£º¸ú×ÙÊó±êÒÆ¶¯£¬´¦Àí´¥·¢µÄ»ù±¾ÊÂ¼þ
- * ËµÃ÷£ºÕâÖ»ÊÇ¸ù¾ÝÊó±êÊÂ¼þÀ´´¦Àí²¿¼þ×´Ì¬µÄÇÐ»»
+ * åŠŸèƒ½ï¼šè·Ÿè¸ªé¼ æ ‡ç§»åŠ¨ï¼Œå¤„ç†è§¦å‘çš„åŸºæœ¬äº‹ä»¶
+ * è¯´æ˜Žï¼šè¿™åªæ˜¯æ ¹æ®é¼ æ ‡äº‹ä»¶æ¥å¤„ç†éƒ¨ä»¶çŠ¶æ€çš„åˆ‡æ¢
  * */
 {
 	//printf("Tracking_Mouse_Move(): start\n");
 	LCUI_Widget *widget;
-	/* »ñÈ¡µ±Ç°Êó±êÓÎ±ê¸²¸Çµ½µÄ²¿¼þµÄÖ¸Õë */
+	/* èŽ·å–å½“å‰é¼ æ ‡æ¸¸æ ‡è¦†ç›–åˆ°çš„éƒ¨ä»¶çš„æŒ‡é’ˆ */
 	widget = Get_Cursor_Overlay_Widget(); 
 	//print_widget_info(widget);
 	//print_widget_info(overlay_widget);
 	if(widget != NULL)
 	{	//printf("6 ");
-		/* »ñÈ¡ÄÜÏìÓ¦×´Ì¬¸Ä±äµÄ²¿¼þµÄÖ¸Õë */
+		/* èŽ·å–èƒ½å“åº”çŠ¶æ€æ”¹å˜çš„éƒ¨ä»¶çš„æŒ‡é’ˆ */
 		widget = Widget_Find_Response_Status_Change(widget); 
 		if(widget != NULL)
-		{/* Èç¹ûÓÐÐ§ */
+		{/* å¦‚æžœæœ‰æ•ˆ */
 		//printf("1\n");
 			if(overlay_widget != widget)
 			{
@@ -580,14 +580,14 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 				
 		//printf("4\n");
 				if (overlay_widget != NULL && click_widget == NULL )
-				{/* Èç¹ûÖ®Ç°ÓÐ¸²¸Çµ½µÄ²¿¼þ */
+				{/* å¦‚æžœä¹‹å‰æœ‰è¦†ç›–åˆ°çš„éƒ¨ä»¶ */
 		//printf("5\n");
-					if (overlay_widget->enabled == IS_TRUE) /* Èç¹û°´Å¥²¿¼þ±»ÆôÓÃ */
+					if (overlay_widget->enabled == IS_TRUE) /* å¦‚æžœæŒ‰é’®éƒ¨ä»¶è¢«å¯ç”¨ */
 						Set_Widget_Status (overlay_widget, WIDGET_STATUS_NORMAL);
 					else
 						Set_Widget_Status (overlay_widget, WIDGET_STATUS_DISABLE);
 				}
-				/* ±£´æµ±Ç°¸²¸Çµ½µÄ°´Å¥²¿¼þÖ¸Õë */
+				/* ä¿å­˜å½“å‰è¦†ç›–åˆ°çš„æŒ‰é’®éƒ¨ä»¶æŒ‡é’ˆ */
 				overlay_widget = widget;
 				return;
 			}
@@ -595,24 +595,24 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 	}
 	//printf("6\n");
 	if(overlay_widget != widget && click_widget == NULL)
-	{/* Èç¹ûÊó±êÖ¸ÕëÔÚÖ®Ç°ÓÐ¸²¸Çµ½µÄ²¿¼þ */
+	{/* å¦‚æžœé¼ æ ‡æŒ‡é’ˆåœ¨ä¹‹å‰æœ‰è¦†ç›–åˆ°çš„éƒ¨ä»¶ */
 	//printf("2\n");
 	//printf("7\n");
-		if (overlay_widget->enabled == IS_TRUE)/* Èç¹û²¿¼þ¿ÉÓÃ£¬¾ÍÈÃËü»Ö¸´µ½ÆÕÍ¨×´Ì¬ */
+		if (overlay_widget->enabled == IS_TRUE)/* å¦‚æžœéƒ¨ä»¶å¯ç”¨ï¼Œå°±è®©å®ƒæ¢å¤åˆ°æ™®é€šçŠ¶æ€ */
 			Set_Widget_Status (overlay_widget, WIDGET_STATUS_NORMAL); 
-		else /* ·ñÔò£¬²¿¼þÎª²»¿ÉÓÃµÄ×´Ì¬ */
+		else /* å¦åˆ™ï¼Œéƒ¨ä»¶ä¸ºä¸å¯ç”¨çš„çŠ¶æ€ */
 			Set_Widget_Status (overlay_widget, WIDGET_STATUS_DISABLE);
 	}
 	//printf("8\n");
 	overlay_widget = widget;
-	/* ´¥·¢²¿¼þÍÏ¶¯ÊÂ¼þ */ 
+	/* è§¦å‘éƒ¨ä»¶æ‹–åŠ¨äº‹ä»¶ */ 
 	if(click_widget != NULL && Mouse_LeftButton (event) == PRESSED)
-	{/* Èç¹ûÖ®Ç°µã»÷¹ý²¿¼þ£¬²¢ÇÒÏÖÔÚÊó±ê×ó¼ü»¹´¦ÓÚ°´ÏÂ×´Ì¬ */ 
+	{/* å¦‚æžœä¹‹å‰ç‚¹å‡»è¿‡éƒ¨ä»¶ï¼Œå¹¶ä¸”çŽ°åœ¨é¼ æ ‡å·¦é”®è¿˜å¤„äºŽæŒ‰ä¸‹çŠ¶æ€ */ 
 		drag_event.new_pos = Pos_Sub(event->global_pos, __offset_pos); 
 		Processing_Event(&click_widget->event, EVENT_DRAG);
 		drag_event.first_click = 0; 
 		drag_event.end_click = 0; 
-		/* ´¦Àí²¿¼þµÄÍÏ¶¯ÊÂ¼þ */
+		/* å¤„ç†éƒ¨ä»¶çš„æ‹–åŠ¨äº‹ä»¶ */
 		Processing_Event(&click_widget->event, EVENT_DRAG);
 	}
 	//printf("Tracking_Mouse_Move(): end\n");
@@ -620,7 +620,7 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 
 
 void Widget_Event_Init()
-/* ¹¦ÄÜ£º³õÊ¼»¯²¿¼þÊÂ¼þ´¦Àí */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–éƒ¨ä»¶äº‹ä»¶å¤„ç† */
 {
 	LCUI_MouseEvent_Connect(Tracking_Mouse_Move, MOUSE_EVENT_MOVE);
 	LCUI_MouseEvent_Connect(Widget_Clicked, MOUSE_EVENT_CLICK);

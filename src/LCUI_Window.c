@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Window.c -- LCUI �Ĵ��ڲ���
+ * LCUI_Window.c -- LCUI 的窗口部件
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #include <LCUI_Build.h> 
@@ -55,21 +55,21 @@
 #include LC_ERROR_H
 
 LCUI_Widget *Get_Window_TitleBar(LCUI_Widget *window)
-/* ���ܣ���ȡ���ڱ�������ָ�� */
+/* 功能：获取窗口标题栏的指针 */
 { 
 	LCUI_Window *win_p = (LCUI_Window *)window->private; 
 	return win_p->titlebar;
 }
 
 LCUI_Widget *Get_Window_Client_Area(LCUI_Widget *window)
-/* ���ܣ���ȡ���ڿͻ�����ָ�� */
+/* 功能：获取窗口客户区的指针 */
 {
 	LCUI_Window *win_p = (LCUI_Window *)window->private;
 	return win_p->client_area;	
 }
 
 static void Move_Window(LCUI_Widget *titlebar, LCUI_DragEvent *event)
-/* ���ܣ���������ƶ��¼� */
+/* 功能：处理鼠标移动事件 */
 {
 	LCUI_Pos pos;
 	LCUI_Widget *window; 
@@ -79,23 +79,23 @@ static void Move_Window(LCUI_Widget *titlebar, LCUI_DragEvent *event)
 		pos = event->new_pos;
 		if(window != NULL)
 		{
-			/* ��ȥ�ڴ����е��������, �ó�����λ�� */
+			/* 减去在窗口中的相对坐标, 得出窗口位置 */
 			pos = Pos_Sub(pos, Get_Widget_Pos(titlebar));
-			/* �ƶ����ڵ�λ�� */
+			/* 移动窗口的位置 */
 			Move_Widget(window, pos);
 		}
 	}
 }
 
 void Set_Window_Title_Icon(LCUI_Widget *window, LCUI_Graph *icon)
-/* ���ܣ��Զ���ָ�����ڵı�����ͼ�� */
+/* 功能：自定义指定窗口的标题栏图标 */
 {
 	LCUI_Graph *image;
 	LCUI_Widget *title_widget = Get_Window_TitleBar(window);
 	LCUI_TitleBar *title_data = (LCUI_TitleBar *)
 							Get_Widget_Private_Data(title_widget);
 	image = Get_PictureBox_Graph(title_data->icon_box);
-	Free_Graph(image);/* �ͷ��ڴ� */
+	Free_Graph(image);/* 释放内存 */
 	if(icon != NULL)
 	{
 		Set_PictureBox_Image_From_Graph(title_data->icon_box, icon);
@@ -105,7 +105,7 @@ void Set_Window_Title_Icon(LCUI_Widget *window, LCUI_Graph *icon)
 }
 
 static void Window_TitleBar_Init(LCUI_Widget *titlebar)
-/* ���ܣ���ʼ�����ڱ����� */
+/* 功能：初始化窗口标题栏 */
 {
 	LCUI_Graph img;
 	LCUI_TitleBar *t;
@@ -126,50 +126,50 @@ static void Window_TitleBar_Init(LCUI_Widget *titlebar)
 }
 
 LCUI_Size Get_Window_Client_Size(LCUI_Widget *win_p)
-/* ���ܣ���ȡ���ڵĿͻ����ĳߴ� */
+/* 功能：获取窗口的客户区的尺寸 */
 {
 	LCUI_Widget *client_area	= Get_Window_Client_Area(win_p);
 	return client_area->size;
 }
 
 void Window_Widget_Auto_Size(LCUI_Widget *win_p)
-/* ���ܣ��ڴ��ڳߴ�ı�ʱ�Զ��ı�������Ϳͻ����ĳߴ� */
+/* 功能：在窗口尺寸改变时自动改变标题栏和客户区的尺寸 */
 {
 	int x, y, width, height;
 	LCUI_Widget *titlebar		= Get_Window_TitleBar(win_p);
 	LCUI_Widget *client_area	= Get_Window_Client_Area(win_p);
-	/* ����ͬ�ķ�������� */
+	/* 按不同的风格来处理 */
 	switch(Get_Widget_Border_Style(win_p))
 	{
-		case BORDER_STYLE_NONE:  /* û�б߿� */
-			/* �ȼ�������ͳߴ� */
+		case BORDER_STYLE_NONE:  /* 没有边框 */
+			/* 先计算坐标和尺寸 */
 			x = win_p->border.left;
 			y = win_p->border.top;
 			width = win_p->size.w - x - win_p->border.right;
 			height = win_p->size.h - y - win_p->border.bottom;
 			
-			Move_Widget( client_area, Pos(x, y) );/* ����λ�� */
-			Resize_Widget( client_area, Size(width, height) );/* ������С */
-			Hide_Widget( titlebar );/* ���ر����� */
-			Show_Widget( client_area );/* �ͻ�����Ҫ��ʾ */
+			Move_Widget( client_area, Pos(x, y) );/* 调整位置 */
+			Resize_Widget( client_area, Size(width, height) );/* 调整大小 */
+			Hide_Widget( titlebar );/* 隐藏标题栏 */
+			Show_Widget( client_area );/* 客户区需要显示 */
 			break;
 			
-		case BORDER_STYLE_LINE_BORDER: /* �����߿� */
+		case BORDER_STYLE_LINE_BORDER: /* 线条边框 */
 			Move_Widget( client_area, Pos(0, 0) );
 			Resize_Widget( client_area, Size(win_p->size.w, win_p->size.h) );
 			Hide_Widget( titlebar);
 			Show_Widget( client_area);
 			break;
 			
-		case BORDER_STYLE_STANDARD: /* ��׼�߿� */
+		case BORDER_STYLE_STANDARD: /* 标准边框 */
 		/* 
-		 * ˵���������û����ĳߴ��λ�õĵ�������Ҫȷ���������ĳߴ磬��ˣ�
-		 * ����Exec_Resize_Widget()�������̵����������ߴ磬����ǵ���
-		 * Resize_Widget()��������ô��ȷ���ĳߴ��������Ϊ�������ĳ�
-		 * �绹����ǰ�ĳߴ硣
+		 * 说明：由于用户区的尺寸和位置的调整，需要确定标题栏的尺寸，因此，
+		 * 调用Exec_Resize_Widget()函数立刻调整标题栏尺寸，如果是调用
+		 * Resize_Widget()函数，那么，确定的尺寸会有误，因为标题栏的尺
+		 * 寸还是以前的尺寸。
 		 * */ 
 			Set_Widget_Border(win_p, RGB(50,50,50), Border(1,1,1,1));
-			/* �ȼ�������ͳߴ� */
+			/* 先计算坐标和尺寸 */
 			x = win_p->border.left;
 			y = win_p->border.top;
 			width = win_p->size.w - x - win_p->border.right;
@@ -180,7 +180,7 @@ void Window_Widget_Auto_Size(LCUI_Widget *win_p)
 			
 			Move_Widget(client_area, Pos(x, y + titlebar->size.h));
 			Resize_Widget(client_area, Size(width, height - titlebar->size.h));
-			/* �������Ϳͻ�������Ҫ��ʾ */
+			/* 标题栏和客户区都需要显示 */
 			Show_Widget(titlebar); 
 			Show_Widget(client_area); 
 			break;
@@ -192,19 +192,19 @@ void Window_Widget_Auto_Size(LCUI_Widget *win_p)
 }
 
 static void Exec_Update_Window(LCUI_Widget *win_p)
-/* ���ܣ����´���ͼ������ */
+/* 功能：更新窗口图形数据 */
 {
 	LCUI_Widget *titlebar = Get_Window_TitleBar(win_p);
 	LCUI_Widget *client_area = Get_Window_Client_Area(win_p);
-	/* ���Ĵ��ڱ߿���ʱ�����������һ�����ã���ΪҪ���ݷ�����������ڵ����� */
+	/* 更改窗口边框风格时，这个函数起到一定作用，因为要根据风格来调整窗口的内容 */
 	Window_Widget_Auto_Size(win_p);
-	/* ��������Ĳ��� */
+	/* 更新下面的部件 */
 	Draw_Widget(titlebar);
 	Draw_Widget(client_area);
 }
 
 LCUI_Widget *Get_Parent_Window(LCUI_Widget *widget)
-/* ���ܣ���ȡָ���������ڵĴ��� */
+/* 功能：获取指定部件所在的窗口 */
 {
 	if(widget == NULL) return NULL;
 	if(widget->parent == NULL) return NULL;
@@ -216,7 +216,7 @@ LCUI_Widget *Get_Parent_Window(LCUI_Widget *widget)
 
 
 static void Quit_Parent_Window(LCUI_Widget *btn, void *arg)
-/* ���ܣ��˳�����btn���ڵĴ��� */
+/* 功能：退出部件btn所在的窗口 */
 {
 	//printf("Quit_Parent_Window start\n");
 	Main_Loop_Quit();
@@ -230,17 +230,17 @@ static void Quit_Parent_Window(LCUI_Widget *btn, void *arg)
 
 static void Destroy_Window(LCUI_Widget *win_p)
 /*
- * ���ܣ��ͷ�window����ռ�õ��ڴ���Դ
- * ˵������������������
+ * 功能：释放window部件占用的内存资源
+ * 说明：类似于析构函数
  **/
 {
-	//����û��ָ�����������ڴ棬��˲���Ҫ�ͷ�ָ�����
+	//由于没有指针变量申请过内存，因此不需要释放指针变量
 }
 
 static void Window_Init(LCUI_Widget *win_p)
 /*
- * ���ܣ���ʼ������
- * ˵���������ڹ��캯��
+ * 功能：初始化窗口
+ * 说明：类似于构造函数
  **/
 {
 	LCUI_Widget *titlebar;
@@ -253,9 +253,9 @@ static void Window_Init(LCUI_Widget *win_p)
 	win->count		 = 0;
 	win->init_align = ALIGN_MIDDLE_CENTER;
 	
-	/* ����һ������������ */
+	/* 创建一个标题栏部件 */
 	titlebar = Create_Widget("titlebar");
-	/* �ٴ���һ���ͻ������� */
+	/* 再创建一个客户区部件 */
 	client_area = Create_Widget(NULL); 
 	btn_close = Create_Widget("button"); 
 
@@ -263,17 +263,17 @@ static void Window_Init(LCUI_Widget *win_p)
 	Graph_Init(&btn_down);
 	Graph_Init(&btn_highlight);
 	Graph_Init(&btn_normal);
-	/* ����Ĭ��ͼ�� */
+	/* 载入默认图形 */
 	Load_Graph_Default_TitleBar_CloseBox_Normal(&btn_normal);
 	Load_Graph_Default_TitleBar_CloseBox_Down(&btn_down);
 	Load_Graph_Default_TitleBar_CloseBox_HighLight(&btn_highlight);
-	/* ��ʾ�����Ͻ� */
+	/* 显示在左上角 */
 	Set_Widget_Align(btn_close, ALIGN_TOP_RIGHT, Pos(0, -2)); 
-	/* ���ߴ�ĳɺ�ͼƬһ�� */
+	/* 将尺寸改成和图片一样 */
 	Resize_Widget(btn_close, Size(btn_normal.width, btn_normal.height));
 	Custom_Button_Style(btn_close, 
 			&btn_normal, &btn_highlight, &btn_down, NULL, NULL);
-	/* ������ť�ĵ���¼�������ť������󣬵���Quit_Window���� */
+	/* 关联按钮的点击事件，当按钮被点击后，调用Quit_Window函数 */
 	Widget_Clicked_Event_Connect(btn_close, Quit_Parent_Window, NULL);
 	Free_Graph(&btn_highlight);
 	Free_Graph(&btn_down);
@@ -282,11 +282,11 @@ static void Window_Init(LCUI_Widget *win_p)
 	win->client_area = client_area;
 	win->titlebar = titlebar;
 	win->btn_close = btn_close;
-	/* û�б���ͼ����䱳��ɫ */
+	/* 没有背景图就填充背景色 */
 	Set_Widget_BG_Mode(win_p, BG_MODE_FILL_BACKCOLOR);
 	Set_Widget_Border_Style(win_p, BORDER_STYLE_STANDARD); 
 	
-	/* ���������� */
+	/* 放入至容器 */
 	Widget_Container_Add(titlebar, btn_close);
 	Widget_Container_Add(win_p, titlebar);
 	Widget_Container_Add(win_p, client_area);
@@ -297,7 +297,7 @@ static void Window_Init(LCUI_Widget *win_p)
 }
 
 static void Show_Window(LCUI_Widget *win_p)
-/* ���ܣ��ڴ�����ʾʱ��������ش��� */
+/* 功能：在窗口显示时，进行相关处理 */
 {
 	int w, h;
 	LCUI_Pos pos;
@@ -306,7 +306,7 @@ static void Show_Window(LCUI_Widget *win_p)
 	pos.y = 0;
 	win->count++;
 	if(win->count == 1)
-	{/* ����ǵ�һ����ʾ */
+	{/* 如果是第一次显示 */
 		if(win_p->parent == NULL && win_p->pos_type == POS_TYPE_IN_SCREEN)
 		{
 			w = Get_Screen_Width();
@@ -319,7 +319,7 @@ static void Show_Window(LCUI_Widget *win_p)
 		}
 		
 		switch(win->init_align)
-		{/* ���ڵ�λ�� */
+		{/* 窗口的位置 */
 		case ALIGN_TOP_LEFT : 
 			break;
 		case ALIGN_TOP_CENTER :
@@ -354,26 +354,26 @@ static void Show_Window(LCUI_Widget *win_p)
 		//printf("window pos: %d,%d\n",x, y);
 		Set_Widget_Pos(win_p, pos);
 	}
-	//�д���չ 
+	//有待扩展 
 }
 
 static void Hide_Window(LCUI_Widget *win_p)
-/* ���ܣ������ش���ʱʹ���Ӿ���Ч */
+/* 功能：在隐藏窗口时使用视觉特效 */
 {
-	//�д���չ
+	//有待扩展
 }
 
 static void Resize_Window(LCUI_Widget *win_p)
-/* ���ܣ��ڸı䴰�ڳߴ�ʱʹ���Ӿ���Ч */
+/* 功能：在改变窗口尺寸时使用视觉特效 */
 {
-	//�д���չ
+	//有待扩展
 	
-	/* Ϊ�����Ͳ���������غ������������������ڴ��ڳߴ�ı�ʱҲ�ı��Լ��ĳߴ� */ 
+	/* 为该类型部件添加相关函数，让这两个部件在窗口尺寸改变时也改变自己的尺寸 */ 
 	Window_Widget_Auto_Size(win_p); 
 }
 
 void Set_Window_Title_Text(LCUI_Widget *win_p, char *text)
-/* ���ܣ�Ϊ�������ñ������� */
+/* 功能：为窗口设置标题文字 */
 {
 	LCUI_Widget *titlebar = Get_Window_TitleBar(win_p);
 	LCUI_TitleBar *title = Get_Widget_Private_Data(titlebar);
@@ -382,27 +382,27 @@ void Set_Window_Title_Text(LCUI_Widget *win_p, char *text)
 
 
 void Window_Client_Area_Add(LCUI_Widget *window, LCUI_Widget *widget)
-/* ���ܣ����������������ڿͻ��� */
+/* 功能：将部件添加至窗口客户区 */
 {
 	LCUI_Widget *w = Get_Window_Client_Area(window);
 	Widget_Container_Add(w, widget);
 }
 
 void Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget)
-/* ���ܣ����������������ڱ����� */
+/* 功能：将部件添加至窗口标题栏 */
 {
 	LCUI_Widget *w = Get_Window_TitleBar(window);
 	Widget_Container_Add(w, widget);
 }
 
 void Register_Window()
-/* ���ܣ�ע�Ჿ������-������������ */
+/* 功能：注册部件类型-窗口至部件库 */
 {
-	/* ���Ӽ����������� */
+	/* 添加几个部件类型 */
 	WidgetType_Add("window");
 	WidgetType_Add("titlebar");
 	
-	/* Ϊ�������͹�����غ��� */ 
+	/* 为部件类型关联相关函数 */ 
 	WidgetFunc_Add("titlebar",	Window_TitleBar_Init,	FUNC_TYPE_INIT);
 	WidgetFunc_Add("window",	Window_Init,			FUNC_TYPE_INIT);
 	WidgetFunc_Add("window",	Exec_Update_Window,		FUNC_TYPE_UPDATE);

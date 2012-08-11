@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_CheckBox.c -- LCUI µÄ¸´Ñ¡¿ò²¿¼ş
+ * LCUI_CheckBox.c -- LCUI çš„å¤é€‰æ¡†éƒ¨ä»¶
  *
- * °æÈ¨ËùÓĞ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±äº 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼şÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾İGPLv2Ğí¿ÉĞ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ğí¿ÉÖ¤µÚ¶ş°æ µÄÓ¢ÎÄËõĞ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌĞøÊ¹ÓÃ¡¢ĞŞ¸Ä»ò·¢²¼±¾ÎÄ¼ş£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öĞí¿ÉĞ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜æ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’Œæ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔğÈÎ£¬ÉõÖÁÃ»ÓĞÊÊÏúĞÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒşº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ğí¿ÉĞ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼şµÄGPLv2Ğí¿ÉĞ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼şÖĞ£¬Èç¹û
- * Ã»ÓĞ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -52,7 +52,7 @@
 #include LC_MEM_H 
 
 void Set_CheckBox_On(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÉè¶¨¸´Ñ¡¿òÎªÑ¡ÖĞ×´Ì¬ */
+/* åŠŸèƒ½ï¼šè®¾å®šå¤é€‰æ¡†ä¸ºé€‰ä¸­çŠ¶æ€ */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
 								Get_Widget_Private_Data(widget); 
@@ -62,7 +62,7 @@ void Set_CheckBox_On(LCUI_Widget *widget)
 }
 
 void Set_CheckBox_Off(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÉè¶¨¸´Ñ¡¿òÎªÎ´Ñ¡ÖĞ×´Ì¬ */
+/* åŠŸèƒ½ï¼šè®¾å®šå¤é€‰æ¡†ä¸ºæœªé€‰ä¸­çŠ¶æ€ */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
 								Get_Widget_Private_Data(widget); 
@@ -72,7 +72,7 @@ void Set_CheckBox_Off(LCUI_Widget *widget)
 }
 
 int Get_CheckBox_Status(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡¸´Ñ¡¿òµÄ×´Ì¬ */
+/* åŠŸèƒ½ï¼šè·å–å¤é€‰æ¡†çš„çŠ¶æ€ */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
 								Get_Widget_Private_Data(widget); 
@@ -81,7 +81,7 @@ int Get_CheckBox_Status(LCUI_Widget *widget)
 }
 
 int CheckBox_Is_On(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º¼ì²â¸´Ñ¡¿òÊÇ·ñ±»Ñ¡ÖĞ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹å¤é€‰æ¡†æ˜¯å¦è¢«é€‰ä¸­ */
 {
 	if(IS_TRUE == Get_CheckBox_Status(widget))
 		return 1;
@@ -90,7 +90,7 @@ int CheckBox_Is_On(LCUI_Widget *widget)
 }
 
 int CheckBox_Is_Off(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º¼ì²â¸´Ñ¡¿òÊÇ·ñÎ´Ñ¡ÖĞ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹å¤é€‰æ¡†æ˜¯å¦æœªé€‰ä¸­ */
 {
 	if(IS_TRUE == Get_CheckBox_Status(widget))
 		return 0;
@@ -100,8 +100,8 @@ int CheckBox_Is_Off(LCUI_Widget *widget)
 
 void Switch_CheckBox_Status(LCUI_Widget *widget, void *arg)
 /* 
- * ¹¦ÄÜ£ºÇĞ»»¸´Ñ¡¿òµÄ×´Ì¬
- * ËµÃ÷£ºÕâ¸ö×´Ì¬£¬Ö¸µÄÊÇ´ò¹´ÓëÃ»´ò¹´µÄÁ½ÖÖ×´Ì¬
+ * åŠŸèƒ½ï¼šåˆ‡æ¢å¤é€‰æ¡†çš„çŠ¶æ€
+ * è¯´æ˜ï¼šè¿™ä¸ªçŠ¶æ€ï¼ŒæŒ‡çš„æ˜¯æ‰“å‹¾ä¸æ²¡æ‰“å‹¾çš„ä¸¤ç§çŠ¶æ€
  *  */
 { 
 	if(CheckBox_Is_On(widget))
@@ -111,26 +111,26 @@ void Switch_CheckBox_Status(LCUI_Widget *widget, void *arg)
 }
 
 void CheckBox_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
-/* ¹¦ÄÜ£ºÉè¶¨¸´Ñ¡¿òÖĞµÄÍ¼Ïñ¿òµÄ³ß´ç */
+/* åŠŸèƒ½ï¼šè®¾å®šå¤é€‰æ¡†ä¸­çš„å›¾åƒæ¡†çš„å°ºå¯¸ */
 {
 	if(size.w <= 0 && size.h <= 0)
 		return;
 		
 	LCUI_Widget *imgbox = Get_CheckBox_ImgBox(widget);
 	Resize_Widget(imgbox, size);
-	/* ÓÉÓÚÃ»ÓĞ²¼¾ÖºĞ×Ó£¬²»ÄÜ×Ô¶¯µ÷Õû²¿¼ş¼äµÄ¼ä¸ô£¬ÔİÊ±ÓÃÕâ¸ö·½·¨ */
+	/* ç”±äºæ²¡æœ‰å¸ƒå±€ç›’å­ï¼Œä¸èƒ½è‡ªåŠ¨è°ƒæ•´éƒ¨ä»¶é—´çš„é—´éš”ï¼Œæš‚æ—¶ç”¨è¿™ä¸ªæ–¹æ³• */
 	Set_Widget_Align(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
 }
 
 static void CheckBox_Init(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º³õÊ¼»¯¸´Ñ¡¿ò²¿¼şµÄÊı¾İ */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–å¤é€‰æ¡†éƒ¨ä»¶çš„æ•°æ® */
 {
 	LCUI_Widget *container[2];
 	LCUI_CheckBox *check_box = (LCUI_CheckBox*)
 				Malloc_Widget_Private(widget, sizeof(LCUI_CheckBox));
 	
 	check_box->on = IS_FALSE;
-	/* ³õÊ¼»¯Í¼ÏñÊı¾İ */ 
+	/* åˆå§‹åŒ–å›¾åƒæ•°æ® */ 
 	Graph_Init(&check_box->img_off_disable);
 	Graph_Init(&check_box->img_off_normal);
 	Graph_Init(&check_box->img_off_focus);
@@ -141,53 +141,53 @@ static void CheckBox_Init(LCUI_Widget *widget)
 	Graph_Init(&check_box->img_on_focus);
 	Graph_Init(&check_box->img_on_down);
 	Graph_Init(&check_box->img_on_over);
-	/* ´´½¨ËùĞèµÄ²¿¼ş */
+	/* åˆ›å»ºæ‰€éœ€çš„éƒ¨ä»¶ */
 	check_box->label = Create_Widget("label");
 	check_box->imgbox = Create_Widget("picture_box");  
-	/* ´´½¨Á½¸öÈİÆ÷£¬ÓÃÓÚµ÷ÕûÉÏÃæÁ½¸ö²¿¼şµÄÎ»ÖÃ */
+	/* åˆ›å»ºä¸¤ä¸ªå®¹å™¨ï¼Œç”¨äºè°ƒæ•´ä¸Šé¢ä¸¤ä¸ªéƒ¨ä»¶çš„ä½ç½® */
 	container[0] = Create_Widget(NULL);
 	container[1] = Create_Widget(NULL);
 	
-	/* ÆôÓÃÕâĞ©²¿¼şµÄ×Ô¶¯³ß´çµ÷ÕûµÄ¹¦ÄÜ */
+	/* å¯ç”¨è¿™äº›éƒ¨ä»¶çš„è‡ªåŠ¨å°ºå¯¸è°ƒæ•´çš„åŠŸèƒ½ */
 	Enable_Widget_Auto_Size(widget);
 	Enable_Widget_Auto_Size(container[0]);
 	Enable_Widget_Auto_Size(container[1]);
 	
-	/* ½«°´Å¥²¿¼ş×÷Îªlabel²¿¼şµÄÈİÆ÷ */
+	/* å°†æŒ‰é’®éƒ¨ä»¶ä½œä¸ºlabeléƒ¨ä»¶çš„å®¹å™¨ */
 	Widget_Container_Add(container[0], check_box->imgbox);
 	Widget_Container_Add(container[1], check_box->label);
 	Widget_Container_Add(widget, container[0]);
 	Widget_Container_Add(widget, container[1]);
 	
-	/* µ÷Õû³ß´ç */
+	/* è°ƒæ•´å°ºå¯¸ */
 	Resize_Widget(check_box->imgbox, Size(20, 20));
 	//Resize_Widget(container[0], Size(18,18));
 	//Resize_Widget(widget, Size(18,18));
-	/* µ÷Õû²¼¾Ö */
+	/* è°ƒæ•´å¸ƒå±€ */
 	Set_Widget_Align(container[0], ALIGN_MIDDLE_LEFT, Pos(0,0));
 	Set_Widget_Align(container[1], ALIGN_MIDDLE_LEFT, Pos(22,0));
 	Set_Widget_Align(check_box->imgbox, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	Set_Widget_Align(check_box->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
-	/* ÉèÖÃÍ¼Ïñ¿òµÄ³ß´çÄ£Ê½ÎªÀ­Éì */
+	/* è®¾ç½®å›¾åƒæ¡†çš„å°ºå¯¸æ¨¡å¼ä¸ºæ‹‰ä¼¸ */
 	Set_PictureBox_Size_Mode(check_box->imgbox, SIZE_MODE_STRETCH);
 	
-	/* ÏÔÊ¾Ö® */
+	/* æ˜¾ç¤ºä¹‹ */
 	Show_Widget(check_box->label);
 	Show_Widget(check_box->imgbox);
 	Show_Widget(container[0]);
 	Show_Widget(container[1]);
-	/* ¹ØÁªÊó±ê×ó¼üµã»÷ÊÂ¼ş */
+	/* å…³è”é¼ æ ‡å·¦é”®ç‚¹å‡»äº‹ä»¶ */
 	Widget_Clicked_Event_Connect(widget, Switch_CheckBox_Status, NULL);
-	/* ÏìÓ¦×´Ì¬¸Ä±ä */
+	/* å“åº”çŠ¶æ€æ”¹å˜ */
 	Response_Status_Change(widget);
 }
 
 static void Destroy_CheckBox(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÊÍ·Å¸´Ñ¡¿ò²¿¼şÕ¼ÓÃµÄ×ÊÔ´ */
+/* åŠŸèƒ½ï¼šé‡Šæ”¾å¤é€‰æ¡†éƒ¨ä»¶å ç”¨çš„èµ„æº */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
 								Get_Widget_Private_Data(widget); 
-	/* ÊÍ·ÅÍ¼ÏñÊı¾İÕ¼ÓÃµÄÄÚ´æ×ÊÔ´ */ 
+	/* é‡Šæ”¾å›¾åƒæ•°æ®å ç”¨çš„å†…å­˜èµ„æº */ 
 	Free_Graph(&check_box->img_off_disable);
 	Free_Graph(&check_box->img_off_normal);
 	Free_Graph(&check_box->img_off_focus);
@@ -201,14 +201,14 @@ static void Destroy_CheckBox(LCUI_Widget *widget)
 }
 
 static void Exec_Update_CheckBox(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º¸üĞÂ¸´Ñ¡¿òµÄÍ¼ĞÎÊı¾İ */
+/* åŠŸèƒ½ï¼šæ›´æ–°å¤é€‰æ¡†çš„å›¾å½¢æ•°æ® */
 {
 	LCUI_Graph *p;
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
 								Get_Widget_Private_Data(widget); 
 								
 	if(Strcmp(&widget->style, "custom") == 0)
-	{/* Èç¹ûÎª×Ô¶¨Òå·ç¸ñ£¬ÄÇ¾ÍÊ¹ÓÃÓÃ»§Ö¸¶¨µÄÍ¼ĞÎ£¬¾ßÌå¿É²Î¿¼°´Å¥²¿¼şµÄ´¦Àí·½·¨ */ 
+	{/* å¦‚æœä¸ºè‡ªå®šä¹‰é£æ ¼ï¼Œé‚£å°±ä½¿ç”¨ç”¨æˆ·æŒ‡å®šçš„å›¾å½¢ï¼Œå…·ä½“å¯å‚è€ƒæŒ‰é’®éƒ¨ä»¶çš„å¤„ç†æ–¹æ³• */ 
 		if(widget->enabled == IS_FALSE) 
 			widget->status = WIDGET_STATUS_DISABLE;
 			
@@ -255,16 +255,16 @@ static void Exec_Update_CheckBox(LCUI_Widget *widget)
 		} 
 	}
 	else
-	{/* Èç¹û°´Å¥µÄ·ç¸ñÎªÈ±Ê¡ */
+	{/* å¦‚æœæŒ‰é’®çš„é£æ ¼ä¸ºç¼ºçœ */
 		Strcpy(&widget->style, "default");
 		if(widget->enabled == IS_FALSE) 
 			widget->status = WIDGET_STATUS_DISABLE;
 		
-		/* ÏÈÊÍ·ÅPictureBox²¿¼şÖĞ±£´æµÄÍ¼ĞÎÊı¾İµÄÖ¸Õë */
+		/* å…ˆé‡Šæ”¾PictureBoxéƒ¨ä»¶ä¸­ä¿å­˜çš„å›¾å½¢æ•°æ®çš„æŒ‡é’ˆ */
 		p = Get_PictureBox_Graph(check_box->imgbox);
 		Free_Graph(p);
 		
-		/* ÓÉÓÚ±¾º¯ÊıÔÚÍË³öºó£¬Ê¹ÓÃ¾Ö²¿±äÁ¿±£´æµÄÍ¼ĞÎÊı¾İ»áÎŞĞ§£¬Òò´Ë£¬ÉêÇëÄÚ´æ¿Õ¼äÀ´´¢´æ */
+		/* ç”±äºæœ¬å‡½æ•°åœ¨é€€å‡ºåï¼Œä½¿ç”¨å±€éƒ¨å˜é‡ä¿å­˜çš„å›¾å½¢æ•°æ®ä¼šæ— æ•ˆï¼Œå› æ­¤ï¼Œç”³è¯·å†…å­˜ç©ºé—´æ¥å‚¨å­˜ */
 		p = (LCUI_Graph*)calloc(1,sizeof(LCUI_Graph));
 		
 		switch(widget->status)
@@ -310,7 +310,7 @@ static void Exec_Update_CheckBox(LCUI_Widget *widget)
 }
 
 LCUI_Widget *Get_CheckBox_Label(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡¸´Ñ¡¿ò²¿¼şÖĞµÄlabel²¿¼şµÄÖ¸Õë */
+/* åŠŸèƒ½ï¼šè·å–å¤é€‰æ¡†éƒ¨ä»¶ä¸­çš„labeléƒ¨ä»¶çš„æŒ‡é’ˆ */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
 								Get_Widget_Private_Data(widget); 
@@ -321,7 +321,7 @@ LCUI_Widget *Get_CheckBox_Label(LCUI_Widget *widget)
 }
 
 LCUI_Widget *Get_CheckBox_ImgBox(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡¸´Ñ¡¿ò²¿¼şÖĞµÄPictureBox²¿¼şµÄÖ¸Õë */
+/* åŠŸèƒ½ï¼šè·å–å¤é€‰æ¡†éƒ¨ä»¶ä¸­çš„PictureBoxéƒ¨ä»¶çš„æŒ‡é’ˆ */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
 								Get_Widget_Private_Data(widget); 
@@ -332,7 +332,7 @@ LCUI_Widget *Get_CheckBox_ImgBox(LCUI_Widget *widget)
 }
 
 void Set_CheckBox_Text(LCUI_Widget *widget, const char *fmt, ...)
-/* ¹¦ÄÜ£ºÉè¶¨Óë¸´Ñ¡¿ò²¿¼ş¹ØÁªµÄÎÄ±¾ÄÚÈİ */
+/* åŠŸèƒ½ï¼šè®¾å®šä¸å¤é€‰æ¡†éƒ¨ä»¶å…³è”çš„æ–‡æœ¬å†…å®¹ */
 {
 	char text[LABEL_TEXT_MAX_SIZE];
 	LCUI_Widget *label = Get_CheckBox_Label(widget); 
@@ -348,7 +348,7 @@ void Set_CheckBox_Text(LCUI_Widget *widget, const char *fmt, ...)
 }
 
 LCUI_Widget *Create_CheckBox_With_Text(const char *fmt, ...)
-/* ¹¦ÄÜ£º´´½¨Ò»¸ö´øÎÄ±¾ÄÚÈİµÄ¸´Ñ¡¿ò */
+/* åŠŸèƒ½ï¼šåˆ›å»ºä¸€ä¸ªå¸¦æ–‡æœ¬å†…å®¹çš„å¤é€‰æ¡† */
 {
 	char text[LABEL_TEXT_MAX_SIZE];
 	LCUI_Widget *widget = Create_Widget("check_box");
@@ -367,13 +367,13 @@ LCUI_Widget *Create_CheckBox_With_Text(const char *fmt, ...)
 
 void Register_CheckBox()
 /*
- * ¹¦ÄÜ£º×¢²á²¿¼şÀàĞÍ-´°¿ÚÖÁ²¿¼ş¿â
+ * åŠŸèƒ½ï¼šæ³¨å†Œéƒ¨ä»¶ç±»å‹-çª—å£è‡³éƒ¨ä»¶åº“
  **/
 {
-	/* Ìí¼Ó¼¸¸ö²¿¼şÀàĞÍ */
+	/* æ·»åŠ å‡ ä¸ªéƒ¨ä»¶ç±»å‹ */
 	WidgetType_Add("check_box"); 
 	
-	/* Îª²¿¼şÀàĞÍ¹ØÁªÏà¹Øº¯Êı */ 
+	/* ä¸ºéƒ¨ä»¶ç±»å‹å…³è”ç›¸å…³å‡½æ•° */ 
 	WidgetFunc_Add("check_box",	CheckBox_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("check_box", Exec_Update_CheckBox, FUNC_TYPE_UPDATE); 
 	WidgetFunc_Add("check_box", Destroy_CheckBox, FUNC_TYPE_DESTROY);

@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Resources.c -- LCUI��s Built-in resources, usually are graphics
+ * LCUI_Resources.c -- LCUI‘s Built-in resources, usually are graphics
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Resources.c -- LCUI ��������Դ��ͨ����һЩͼ��
+ * LCUI_Resources.c -- LCUI 的内置资源，通常是一些图形
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 #include <stdio.h>
 #include <string.h>
@@ -68,7 +68,7 @@ int Load_Graph_ProgressBar_Fore(LCUI_Graph *out)
 	out->type    = TYPE_BMP;
 	out->alpha   = 255;
 	value = Malloc_Graph(out,1,43);
-	/* ���� */
+	/* 拷贝 */
 	if(value == 0)
 	{
 		memcpy(out->rgba[0],red,sizeof(red));
@@ -185,7 +185,7 @@ int Load_Graph_ProgressBar_Img(LCUI_Graph *out)
 	out->type    = TYPE_PNG;
 	out->alpha   = 255;
 	value = Malloc_Graph(out,70,43);
-	/* ���� */
+	/* 拷贝 */
 	if(value == 0)
 	{
 		memset(out->rgba[0],210,	70*43);
@@ -258,7 +258,7 @@ int Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out)
 	out->type    = TYPE_PNG;
 	out->alpha   = 255;
 	value = Malloc_Graph(out,18,18);
-	/* ���� */
+	/* 拷贝 */
 	if(value == 0){
 		memcpy(out->rgba[0],red,sizeof(red));
 		memcpy(out->rgba[1],green,sizeof(green));
@@ -269,7 +269,7 @@ int Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out)
 }
 
 int Load_Graph_Default_Cursor(LCUI_Graph *pic)
-/* ���ܣ�����Ĭ�ϵ����ָ���ͼ�� */
+/* 功能：载入默认的鼠标指针的图形 */
 {
 	unsigned char red[]={
 		3,3,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,3,229,3,3,0,0,0,0,0,
@@ -329,7 +329,7 @@ int Load_Graph_Default_Cursor(LCUI_Graph *pic)
 
 
 int Load_Graph_Mosaics(LCUI_Graph *pic)
-/* ���ܣ�����������ͼ�� */
+/* 功能：载入马赛克图形 */
 {
 	unsigned char color[]={
 		78,78,78,78,78,78,78,78,121,121,121,121,121,121,121,121,
@@ -369,7 +369,7 @@ int Load_Graph_Mosaics(LCUI_Graph *pic)
 
 
 int Load_Graph_Icon_Error(LCUI_Graph *pic)
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ������ͼ�� */
+/* 功能：载入图形，该图形为“错误”图标 */
 {
 	unsigned char red[]={
 		0,
@@ -692,7 +692,7 @@ int Load_Graph_Icon_Error(LCUI_Graph *pic)
 }
 
 int Load_Graph_Icon_Help(LCUI_Graph *pic)
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ��������ͼ�� */
+/* 功能：载入图形，该图形为“帮助”图标 */
 {
 	unsigned char red[]={
 		0,
@@ -1015,7 +1015,7 @@ int Load_Graph_Icon_Help(LCUI_Graph *pic)
 
 
 int Load_Graph_Icon_Info(LCUI_Graph *pic)
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ����Ϣ��ͼ�� */
+/* 功能：载入图形，该图形为“信息”图标 */
 {
 	unsigned char red[]={
 		0,
@@ -1338,7 +1338,7 @@ int Load_Graph_Icon_Info(LCUI_Graph *pic)
 
 
 int Load_Graph_Icon_Warning(LCUI_Graph *pic)
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ�����桱ͼ�� */
+/* 功能：载入图形，该图形为“警告”图标 */
 {
 	unsigned char red[]={
 		0,
@@ -1661,7 +1661,7 @@ int Load_Graph_Icon_Warning(LCUI_Graph *pic)
 
 
 int Load_Graph_Icon_LCUI(LCUI_Graph *pic)
-/* ���ܣ�����ͼ�Σ���ͼ��ΪLCUI��LOGO */
+/* 功能：载入图形，该图形为LCUI的LOGO */
 {
 	unsigned char red[]={
 		239,
@@ -2148,7 +2148,7 @@ int Load_Graph_Icon_LCUI(LCUI_Graph *pic)
 
 
 int Load_Graph_Default_TitleBar_CloseBox_Normal(LCUI_Graph *pic)
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ�������ϵĹرհ�ť����ťΪ����״̬ */
+/* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为正常状态 */
 {
 	unsigned char red[]={
 		255,
@@ -2282,7 +2282,7 @@ int Load_Graph_Default_TitleBar_CloseBox_Normal(LCUI_Graph *pic)
 }
 
 int Load_Graph_Default_TitleBar_CloseBox_HighLight(LCUI_Graph *pic)
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ�������ϵĹرհ�ť����ťΪ����״̬ */
+/* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为高亮状态 */
 {
 	unsigned char red[]={
 		255,
@@ -2417,7 +2417,7 @@ int Load_Graph_Default_TitleBar_CloseBox_HighLight(LCUI_Graph *pic)
 }
 
 int Load_Graph_Default_TitleBar_CloseBox_Down(LCUI_Graph *pic)
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ�������ϵĹرհ�ť����ťΪ����״̬ */
+/* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为按下状态 */
 {
 	unsigned char red[]={
 		255,
@@ -2553,7 +2553,7 @@ int Load_Graph_Default_TitleBar_CloseBox_Down(LCUI_Graph *pic)
 
 int Load_Graph_Default_TitleBar_BG(LCUI_Graph *pic)
 /*
- * ���ܣ�����Ĭ�ϵı���������ͼ
+ * 功能：载入默认的标题栏背景图
  */
 {
 	unsigned char red[]={153,81,77,69,62,56,54,54,54,54,54,54,54,54,53,53,53,53,53,53,52,52,46,148,13};

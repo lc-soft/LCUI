@@ -1,6 +1,6 @@
 /*
- * ÎÄ¼şÃû£ºts_calibrate.c
- * ËµÃ÷£ºÕâÊÇÒ»¸ö¼òµ¥µÄ´¥Æ¿Ğ£×¼³ÌĞò£¬½èÓÃÁËtslib¸øµÄÊ¾ÀıÔ´´úÂë
+ * æ–‡ä»¶åï¼šts_calibrate.c
+ * è¯´æ˜ï¼šè¿™æ˜¯ä¸€ä¸ªç®€å•çš„è§¦ç“¶æ ¡å‡†ç¨‹åºï¼Œå€Ÿç”¨äº†tslibç»™çš„ç¤ºä¾‹æºä»£ç 
  * */
 
 #include <LCUI_Build.h>
@@ -260,7 +260,7 @@ int clearbuf(struct tsdev *ts)
 }
 
 
-/* Ğ£ÕıºóÉú³ÉµÄĞ£ÕıÎÄ¼ş */
+/* æ ¡æ­£åç”Ÿæˆçš„æ ¡æ­£æ–‡ä»¶ */
 #define TS_POINTERCAL "/mnt/Data/LC-SOFT/pointercal"
 
 
@@ -320,7 +320,7 @@ void *calibrate_func(void *widget)
 }
 
 void Get_Path(char *filepath, char *out_path)
-/* ¹¦ÄÜ£ºÓÃÓÚ»ñÈ¡³ÌĞòËùÔÚµÄÎÄ¼şÄ¿Â¼ */
+/* åŠŸèƒ½ï¼šç”¨äºè·å–ç¨‹åºæ‰€åœ¨çš„æ–‡ä»¶ç›®å½• */
 {
 	int num; 
 	strcpy(out_path, filepath);
@@ -337,66 +337,66 @@ void Get_Path(char *filepath, char *out_path)
 
 
 int main(int argc,char*argv[])
-/* Ö÷º¯Êı£¬³ÌĞòµÄÈë¿Ú */
+/* ä¸»å‡½æ•°ï¼Œç¨‹åºçš„å…¥å£ */
 {
 	pthread_t		thread;
-	LCUI_Widget	*window, *label, *click_pic; /* Ê¹ÓÃÖ¸Ïòwidget²¿¼şµÄÖ¸Õë */
-	LCUI_Graph		bg, pic_cross;/* ´æ´¢°´Å¥¸÷ÖÖ×´Ì¬ÒªÏÔÊ¾µÄÍ¼ĞÎ */
+	LCUI_Widget	*window, *label, *click_pic; /* ä½¿ç”¨æŒ‡å‘widgetéƒ¨ä»¶çš„æŒ‡é’ˆ */
+	LCUI_Graph		bg, pic_cross;/* å­˜å‚¨æŒ‰é’®å„ç§çŠ¶æ€è¦æ˜¾ç¤ºçš„å›¾å½¢ */
 	int				width, height;  
-	char			my_path[1024], file_path[1024]; /* ´æ´¢×Ö·û´® */
+	char			my_path[1024], file_path[1024]; /* å­˜å‚¨å­—ç¬¦ä¸² */
 	/**/
-	/* ×Ô¶¨ÒåÄ¬ÈÏ×ÖÌåÎÄ¼şÎ»ÖÃ */
-	//Set_Default_Font("/mnt/Data/LC-SOFT/fonts/Î¢ÈíÑÅºÚ.ttf");
+	/* è‡ªå®šä¹‰é»˜è®¤å­—ä½“æ–‡ä»¶ä½ç½® */
+	//Set_Default_Font("/mnt/Data/LC-SOFT/fonts/å¾®è½¯é›…é»‘.ttf");
 	Set_Default_Font("../fonts/msyh.ttf");
-	/* ³õÊ¼»¯LCUI */
+	/* åˆå§‹åŒ–LCUI */
 	LCUI_Init(argc, argv); 
-	/* ³õÊ¼»¯Í¼Æ¬Êı¾İ½á¹¹Ìå */
+	/* åˆå§‹åŒ–å›¾ç‰‡æ•°æ®ç»“æ„ä½“ */
 	Graph_Init(&pic_cross); 
 	Graph_Init(&bg); 
 	
-	/* »ñÈ¡ÎÄ¼şµÄÂ·¾¶£¬Ö®ºó´ò¿ª²¢ÔØÈëÍ¼Æ¬ */
+	/* è·å–æ–‡ä»¶çš„è·¯å¾„ï¼Œä¹‹åæ‰“å¼€å¹¶è½½å…¥å›¾ç‰‡ */
 	Get_Path(argv[0], my_path);
 	sprintf(file_path, "%scross.png", my_path);
 	Load_Image(file_path, &pic_cross);
 	sprintf(file_path, "%sbg.png", my_path);
 	Load_Image(file_path, &bg);
 	
-	width  = Get_Screen_Width(); /* »ñÈ¡ÆÁÄ»µÄ¿í¶È */
-	height = Get_Screen_Height(); /* »ñÈ¡ÆÁÄ»µÄ¸ß¶È */ 
+	width  = Get_Screen_Width(); /* è·å–å±å¹•çš„å®½åº¦ */
+	height = Get_Screen_Height(); /* è·å–å±å¹•çš„é«˜åº¦ */ 
 	
-	/* ´´½¨Ò»¸ö´°¿Ú²¿¼ş */
+	/* åˆ›å»ºä¸€ä¸ªçª—å£éƒ¨ä»¶ */
 	window = Create_Widget("window"); 
-	/* ´°¿Ú²¿¼ş±ß¿ò·ç¸ñÎªÎŞ(NONE) */
+	/* çª—å£éƒ¨ä»¶è¾¹æ¡†é£æ ¼ä¸ºæ— (NONE) */
 	Set_Widget_Border_Style(window, BORDER_STYLE_NONE);
-	/* ²¿¼ş±³¾°Í¼Îªbg£¬Ìî³äÄ£Ê½ÎªÀ­Éì */
+	/* éƒ¨ä»¶èƒŒæ™¯å›¾ä¸ºbgï¼Œå¡«å……æ¨¡å¼ä¸ºæ‹‰ä¼¸ */
 	Set_Widget_Background_Image(window, &bg, FILL_MODE_STRETCH);
-	/* ¸Ä±ä²¿¼ş³ß´ç */
+	/* æ”¹å˜éƒ¨ä»¶å°ºå¯¸ */
 	Resize_Widget(window, Size(width, height));
 	
-	label       = Create_Widget("label"); /* ¸Ã²¿¼şÓÃÓÚÏÔÊ¾ÎÄ×Ö */ 
-	click_pic   = Create_Widget("picture_box"); /* ¸Ã²¿¼şÓÃÓÚÏÔÊ¾Í¼Ïñ */
+	label       = Create_Widget("label"); /* è¯¥éƒ¨ä»¶ç”¨äºæ˜¾ç¤ºæ–‡å­— */ 
+	click_pic   = Create_Widget("picture_box"); /* è¯¥éƒ¨ä»¶ç”¨äºæ˜¾ç¤ºå›¾åƒ */
 	
-	/* Éè¶¨label²¿¼şÏÔÊ¾µÄÎÄ±¾ÄÚÈİ */
-	Set_Label_Text(label, "µã»÷Ô²È¦ÖĞĞÄ£¬±ÊµãĞ£Õı");
-	/* µ÷Õû²¿¼şµÄ´óĞ¡ */
+	/* è®¾å®šlabeléƒ¨ä»¶æ˜¾ç¤ºçš„æ–‡æœ¬å†…å®¹ */
+	Set_Label_Text(label, "ç‚¹å‡»åœ†åœˆä¸­å¿ƒï¼Œç¬”ç‚¹æ ¡æ­£");
+	/* è°ƒæ•´éƒ¨ä»¶çš„å¤§å° */
 	Resize_Widget(click_pic, Size(pic_cross.width, pic_cross.height));
-	/* Éè¶¨²¿¼şÖĞÏÔÊ¾µÄÍ¼ĞÎ */
+	/* è®¾å®šéƒ¨ä»¶ä¸­æ˜¾ç¤ºçš„å›¾å½¢ */
 	Set_PictureBox_Image_From_Graph(click_pic, &pic_cross);
-	/* Éè¶¨²¿¼ş¶ÔÆë·½Ê½ÒÔ¼°Æ«ÒÆ¾àÀë */
+	/* è®¾å®šéƒ¨ä»¶å¯¹é½æ–¹å¼ä»¥åŠåç§»è·ç¦» */
 	Set_Widget_Align(label, ALIGN_MIDDLE_CENTER, Pos(0, label->size.h + 1)); 
 	
-	/* ½«·µ»Ø¼üÓëMain_Loop_Quitº¯Êı¹ØÁª£¬µ±·µ»Ø¼ü±»°´ÏÂºó£¬³ÌĞòÍË³öÖ÷Ñ­»· */
+	/* å°†è¿”å›é”®ä¸Main_Loop_Quitå‡½æ•°å…³è”ï¼Œå½“è¿”å›é”®è¢«æŒ‰ä¸‹åï¼Œç¨‹åºé€€å‡ºä¸»å¾ªç¯ */
 	LCUI_Key_Event_Connect(KEY_ESC, Main_Loop_Quit, NULL);
 	
-	/* ½«ÕâÁ½¸ö²¿¼ş·ÅÈë´°¿Ú¿Í»§ÇøÄÚ */
+	/* å°†è¿™ä¸¤ä¸ªéƒ¨ä»¶æ”¾å…¥çª—å£å®¢æˆ·åŒºå†… */
 	Window_Client_Area_Add(window, label);
 	Window_Client_Area_Add(window, click_pic);
 	
-	/* ÏÔÊ¾²¿¼şÒÔ¼°´°¿Ú */
+	/* æ˜¾ç¤ºéƒ¨ä»¶ä»¥åŠçª—å£ */
 	Show_Widget(label); 
 	Show_Widget(click_pic);
 	Show_Widget(window);
-	/* ´´½¨Ïß³Ì */
+	/* åˆ›å»ºçº¿ç¨‹ */
 	LCUI_Thread_Create(&thread, NULL, calibrate_func, (void*)click_pic);
-	return LCUI_Main(); /* ½øÈëLCUIµÄÖ÷Ñ­»· */
+	return LCUI_Main(); /* è¿›å…¥LCUIçš„ä¸»å¾ªç¯ */
 }

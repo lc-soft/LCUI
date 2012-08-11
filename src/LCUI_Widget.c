@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Widget.c -- ´¦ÀíGUI²¿¼ş
+ * LCUI_Widget.c -- å¤„ç†GUIéƒ¨ä»¶
  *
- * °æÈ¨ËùÓĞ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±äº 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼şÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾İGPLv2Ğí¿ÉĞ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ğí¿ÉÖ¤µÚ¶ş°æ µÄÓ¢ÎÄËõĞ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌĞøÊ¹ÓÃ¡¢ĞŞ¸Ä»ò·¢²¼±¾ÎÄ¼ş£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öĞí¿ÉĞ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜æ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’Œæ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔğÈÎ£¬ÉõÖÁÃ»ÓĞÊÊÏúĞÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒşº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ğí¿ÉĞ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼şµÄGPLv2Ğí¿ÉĞ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼şÖĞ£¬Èç¹û
- * Ã»ÓĞ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -56,7 +56,7 @@
 /***************************** Widget *********************************/
 
 LCUI_Size Get_Widget_Size(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡²¿¼şµÄ³ß´ç */
+/* åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶çš„å°ºå¯¸ */
 {
 	return widget->size;
 }
@@ -72,21 +72,21 @@ int Get_Widget_Width(LCUI_Widget *widget)
 }
 
 LCUI_Rect Get_Widget_Rect(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡²¿¼şµÄÇøÓò */
+/* åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶çš„åŒºåŸŸ */
 {
 	return Rect(widget->pos.x, widget->pos.y, 
 					widget->size.w, widget->size.h);
 }
 
 LCUI_Pos Get_Widget_Pos(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡²¿¼şµÄÎ»ÖÃ */
+/* åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶çš„ä½ç½® */
 {
 	return widget->pos;
 }
 
 void *Get_Widget_Private_Data(LCUI_Widget *widget)
 /*
- * ¹¦ÄÜ£º»ñÈ¡²¿¼şµÄË½ÓĞÊı¾İ½á¹¹ÌåµÄÖ¸Õë
+ * åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶çš„ç§æœ‰æ•°æ®ç»“æ„ä½“çš„æŒ‡é’ˆ
  **/
 {
 	return widget->private;
@@ -94,7 +94,7 @@ void *Get_Widget_Private_Data(LCUI_Widget *widget)
 
 LCUI_Widget *Get_Widget_Parent(LCUI_Widget *widget)
 /*
- * ¹¦ÄÜ£º»ñÈ¡²¿¼şµÄ¸¸²¿¼ş
+ * åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶çš„çˆ¶éƒ¨ä»¶
  **/
 {
 	return widget->parent;
@@ -102,8 +102,8 @@ LCUI_Widget *Get_Widget_Parent(LCUI_Widget *widget)
 
 void print_widget_info(LCUI_Widget *widget)
 /* 
- * ¹¦ÄÜ£º´òÓ¡widgetµÄĞÅÏ¢
- * ËµÃ÷£ºÔÚµ÷ÊÔÊ±ĞèÒªÓÃµ½Ëü£¬ÓÃÓÚÈ·¶¨widgetÊÇ·ñÓĞÎÊÌâ
+ * åŠŸèƒ½ï¼šæ‰“å°widgetçš„ä¿¡æ¯
+ * è¯´æ˜ï¼šåœ¨è°ƒè¯•æ—¶éœ€è¦ç”¨åˆ°å®ƒï¼Œç”¨äºç¡®å®šwidgetæ˜¯å¦æœ‰é—®é¢˜
  *  */
 {
 	if(widget != NULL)
@@ -119,7 +119,7 @@ void print_widget_info(LCUI_Widget *widget)
 
 int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
 /*
- * ¹¦ÄÜ£ºÔÚÖ¸¶¨²¿¼şµÄÄÚ²¿ÇøÓòÄÚÉè¶¨ĞèÒªË¢ĞÂµÄÇøÓò
+ * åŠŸèƒ½ï¼šåœ¨æŒ‡å®šéƒ¨ä»¶çš„å†…éƒ¨åŒºåŸŸå†…è®¾å®šéœ€è¦åˆ·æ–°çš„åŒºåŸŸ
  * */
 {
 	if(widget == NULL)
@@ -128,10 +128,10 @@ int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
 	if (rect.width <= 0 || rect.height <= 0)
 		return -1;
 	
-	/* µ÷Õû¾ØĞÎÎ»ÖÃ¼°³ß´ç */
+	/* è°ƒæ•´çŸ©å½¢ä½ç½®åŠå°ºå¯¸ */
 	rect = Get_Valid_Area(Get_Widget_Size(widget), rect);
 	
-	/* ±£´æÖÁ¶ÓÁĞÖĞ */
+	/* ä¿å­˜è‡³é˜Ÿåˆ—ä¸­ */
 	if(0 != RectQueue_Add (&widget->update_area, rect))
 		return -1;
 	
@@ -143,7 +143,7 @@ int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
 
 
 void Set_Widget_Border_Style(LCUI_Widget *widget, LCUI_Border_Style style)
-/* ¹¦ÄÜ£ºÉè¶¨²¿¼şµÄ±ß¿ò·ç¸ñ */
+/* åŠŸèƒ½ï¼šè®¾å®šéƒ¨ä»¶çš„è¾¹æ¡†é£æ ¼ */
 {
 	widget->border_style = style;
 	Draw_Widget(widget);
@@ -151,8 +151,8 @@ void Set_Widget_Border_Style(LCUI_Widget *widget, LCUI_Border_Style style)
 
 void Split_Screen_Area_By_Widget(LCUI_Widget *widget)
 /* 
- * ¹¦ÄÜ£º¸ù¾İ²¿¼ş¶ÓÁĞÖĞµÄ²¿¼şÇøÓò£¬À´¶ÔÇøÓò¶ÓÁĞÖĞµÄÇøÓò½øĞĞ·Ö¸î
- * ËµÃ÷£º·Ö¸îºóµÄÇøÓò»áÌí¼ÓÖÁrect_queueÖĞ£¬²¢É¾³ı±»·Ö¸îµÄÇøÓò¡£
+ * åŠŸèƒ½ï¼šæ ¹æ®éƒ¨ä»¶é˜Ÿåˆ—ä¸­çš„éƒ¨ä»¶åŒºåŸŸï¼Œæ¥å¯¹åŒºåŸŸé˜Ÿåˆ—ä¸­çš„åŒºåŸŸè¿›è¡Œåˆ†å‰²
+ * è¯´æ˜ï¼šåˆ†å‰²åçš„åŒºåŸŸä¼šæ·»åŠ è‡³rect_queueä¸­ï¼Œå¹¶åˆ é™¤è¢«åˆ†å‰²çš„åŒºåŸŸã€‚
  *  */
 {
 	//static int count = 0;
@@ -173,16 +173,16 @@ void Split_Screen_Area_By_Widget(LCUI_Widget *widget)
 	total = Queue_Get_Total(widget_list);
 	
 	for(i=total-1; i>=0; --i)
-	{/* ´Óµ×µ½¶¥±éÀú×Ó²¿¼ş */
+	{/* ä»åº•åˆ°é¡¶éå†å­éƒ¨ä»¶ */
 		child = (LCUI_Widget*)Queue_Get(widget_list, i);
 		if(child != NULL && child->visible == IS_TRUE)
-		{/* Èç¹ûÓĞ×Ó²¿¼ş */ 
-			/* µİ¹éµ÷ÓÃ£¬¸ù¾İ×Ó²¿¼şµÄÇøÓò£¬·Ö¸îÒÑ¼ÇÂ¼µÄÇøÓò */
+		{/* å¦‚æœæœ‰å­éƒ¨ä»¶ */ 
+			/* é€’å½’è°ƒç”¨ï¼Œæ ¹æ®å­éƒ¨ä»¶çš„åŒºåŸŸï¼Œåˆ†å‰²å·²è®°å½•çš„åŒºåŸŸ */
 			Split_Screen_Area_By_Widget ( child );
 			
 			for(j=0; RectQueue_Get(&rect, j, &LCUI_Sys.update_area); ++j)
-			{/* »ñÈ¡µ±Ç°¼ÇÂ¼µÄÇøÓò */   
-				/* »ñÈ¡¸Ã²¿¼şµÄÊµ¼ÊÄÜÏÔÊ¾µÄÇøÓò£¬²¢¼ÓÉÏËüµÄÈ«¾Ö×ø±ê */
+			{/* è·å–å½“å‰è®°å½•çš„åŒºåŸŸ */   
+				/* è·å–è¯¥éƒ¨ä»¶çš„å®é™…èƒ½æ˜¾ç¤ºçš„åŒºåŸŸï¼Œå¹¶åŠ ä¸Šå®ƒçš„å…¨å±€åæ ‡ */
 				temp_rect = Get_Widget_Valid_Rect ( child ); 
 				pos = Get_Widget_Global_Pos ( child );
 				temp_rect.x += pos.x;
@@ -193,11 +193,11 @@ void Split_Screen_Area_By_Widget(LCUI_Widget *widget)
 				if( !Rect_Include_Rect(temp_rect, rect) 
 				&& Rect_Is_Overlay(temp_rect, rect) )
 				{ 
-					/* ¼ÈÈ»ÓĞÖØµşÇøÓò£¬ÄÇ¾ÍÉ¾³ıËü£¬½«ĞÂ·Ö¸î³öÀ´µÄ¾ØĞÎÌí¼Ó½øÈ¥ */
+					/* æ—¢ç„¶æœ‰é‡å åŒºåŸŸï¼Œé‚£å°±åˆ é™¤å®ƒï¼Œå°†æ–°åˆ†å‰²å‡ºæ¥çš„çŸ©å½¢æ·»åŠ è¿›å» */
 					Queue_Delete ( &LCUI_Sys.update_area, j );
 					/* 
-					 * ²¿¼şÇøÓò×÷Îª±³¾°ÇøÓò£¬ÒÑ¼ÇÂ¼µÄÇøÓò×÷ÎªÇ°¾°£¬
-					 * ²¢¶ÔÇ°¾°ÇøÓò½øĞĞ·Ö¸î
+					 * éƒ¨ä»¶åŒºåŸŸä½œä¸ºèƒŒæ™¯åŒºåŸŸï¼Œå·²è®°å½•çš„åŒºåŸŸä½œä¸ºå‰æ™¯ï¼Œ
+					 * å¹¶å¯¹å‰æ™¯åŒºåŸŸè¿›è¡Œåˆ†å‰²
 					 *  */
 					Cut_Overlay_Rect(temp_rect, rect, &rq);
 					while( RectQueue_Get(&rect, 0, &rq) )
@@ -217,10 +217,10 @@ void Split_Screen_Area_By_Widget(LCUI_Widget *widget)
 
 void Response_Status_Change(LCUI_Widget *widget)
 /* 
- * ¹¦ÄÜ£ºÈÃÖ¸¶¨²¿¼şÏìÓ¦²¿¼ş×´Ì¬µÄ¸Ä±ä
- * ËµÃ÷£º²¿¼ş´´½¨Ê±£¬Ä¬ÈÏÊÇ²»ÏìÓ¦×´Ì¬¸Ä±äµÄ£¬ÒòÎªÃ¿´Î×´Ì¬¸Ä±äºó£¬¶¼Òªµ÷ÓÃº¯ÊıÖØ»æ²¿¼ş£¬
- * Õâ¶ÔÓÚÒ»Ğ©²¿¼şÊÇ¶àÓàµÄ£¬Ã»±ØÒªÖØ»æ£¬Ó°ÏìĞ§ÂÊ¡£Èç¹ûÏëÈÃ²¿¼şÄÜÏñ°´Å¥ÄÇÑù£¬Êó±êÒÆ¶¯µ½Ëü
- * ÉÏÃæÊ±ÒÔ¼°Êó±êµã»÷ËüÊ±£¬¶¼»á¸Ä±ä°´Å¥µÄÍ¼ĞÎÑùÊ½£¬ÄÇ¾ÍĞèÒªÓÃÕâ¸öº¯ÊıÉèÖÃÒ»ÏÂ¡£
+ * åŠŸèƒ½ï¼šè®©æŒ‡å®šéƒ¨ä»¶å“åº”éƒ¨ä»¶çŠ¶æ€çš„æ”¹å˜
+ * è¯´æ˜ï¼šéƒ¨ä»¶åˆ›å»ºæ—¶ï¼Œé»˜è®¤æ˜¯ä¸å“åº”çŠ¶æ€æ”¹å˜çš„ï¼Œå› ä¸ºæ¯æ¬¡çŠ¶æ€æ”¹å˜åï¼Œéƒ½è¦è°ƒç”¨å‡½æ•°é‡ç»˜éƒ¨ä»¶ï¼Œ
+ * è¿™å¯¹äºä¸€äº›éƒ¨ä»¶æ˜¯å¤šä½™çš„ï¼Œæ²¡å¿…è¦é‡ç»˜ï¼Œå½±å“æ•ˆç‡ã€‚å¦‚æœæƒ³è®©éƒ¨ä»¶èƒ½åƒæŒ‰é’®é‚£æ ·ï¼Œé¼ æ ‡ç§»åŠ¨åˆ°å®ƒ
+ * ä¸Šé¢æ—¶ä»¥åŠé¼ æ ‡ç‚¹å‡»å®ƒæ—¶ï¼Œéƒ½ä¼šæ”¹å˜æŒ‰é’®çš„å›¾å½¢æ ·å¼ï¼Œé‚£å°±éœ€è¦ç”¨è¿™ä¸ªå‡½æ•°è®¾ç½®ä¸€ä¸‹ã€‚
  *  */
 {
 	widget->response_flag = 1;
@@ -228,7 +228,7 @@ void Response_Status_Change(LCUI_Widget *widget)
 
 void Shift_Widget_Refresh_Area(LCUI_Widget *widget)
 /*
- * ¹¦ÄÜ£º×ªÒÆ²¿¼şµÄrect¶ÓÁĞ³ÉÔ±ÖÁ¸¸²¿¼şÖĞ
+ * åŠŸèƒ½ï¼šè½¬ç§»éƒ¨ä»¶çš„recté˜Ÿåˆ—æˆå‘˜è‡³çˆ¶éƒ¨ä»¶ä¸­
  **/
 {
 	//printf("Shift_Widget_Refresh_Area(): enter\n");
@@ -245,22 +245,22 @@ void Shift_Widget_Refresh_Area(LCUI_Widget *widget)
 	total = Queue_Get_Total(widget_list);
 	
 	for(i=total-1; i>=0; --i)
-	{/* ´Óµ×µ½¶¥±éÀú×Ó²¿¼ş */
+	{/* ä»åº•åˆ°é¡¶éå†å­éƒ¨ä»¶ */
 		child = (LCUI_Widget*)Queue_Get(widget_list, i);
 		if(child != NULL && child->visible == IS_TRUE)
-		{/* Èç¹ûÓĞ×Ó²¿¼ş */
-			/* µİ¹éµ÷ÓÃ£¬½«¼ÇÂ¼µÄÇøÓò×ªÒÆÖÁ×Ó²¿¼şÄÚ */
+		{/* å¦‚æœæœ‰å­éƒ¨ä»¶ */
+			/* é€’å½’è°ƒç”¨ï¼Œå°†è®°å½•çš„åŒºåŸŸè½¬ç§»è‡³å­éƒ¨ä»¶å†… */
 			Shift_Widget_Refresh_Area(child);
 			while( RectQueue_Get(&rect, 0, &child->update_area) )
 			{
 				rect.x += child->pos.x;
 				rect.y += child->pos.y;
 				//printf("[%d]\033[1;34mShift_Widget_Refresh_Area(x:%d, y:%d, w:%d, h:%d)\033[0m\n", child->update_area.total_num, rect.x, rect.y, rect.width, rect.height);
-				/* ½«×Ó²¿¼şµÄrect¶ÓÁĞ³ÉÔ±¸´ÖÆµ½×Ô¼ºÕâÀï */
+				/* å°†å­éƒ¨ä»¶çš„recté˜Ÿåˆ—æˆå‘˜å¤åˆ¶åˆ°è‡ªå·±è¿™é‡Œ */
 				
 				Add_Widget_Refresh_Area(widget, rect); 
 					
-				/* É¾³ı×Ó²¿¼şrect¶ÓÁĞ³ÉÔ± */
+				/* åˆ é™¤å­éƒ¨ä»¶recté˜Ÿåˆ—æˆå‘˜ */
 				Queue_Delete(&child->update_area, 0);
 			}
 		}
@@ -272,25 +272,25 @@ void Shift_Widget_Refresh_Area(LCUI_Widget *widget)
 
 void Processing_Refresh_Area()
 /*
- * ¹¦ÄÜ£º´¦ÀíÒÑ¼ÇÂ¼µÄË¢ĞÂÇøÓò
- * ËµÃ÷£º´Ëº¯Êı»á½«¸÷¸ö²¿¼şµÄrect¶ÓÁĞÖĞµÄ´¦Àíµô£¬²¢½«
- * ×îÖÕµÄ¾Ö²¿Ë¢ĞÂÇøÓòÊı¾İÌí¼ÓÖÁÆÁÄ»Ë¢ĞÂÇøÓò¶ÓÁĞÖĞ£¬µÈ
- * ´ıLCUIÀ´´¦Àí¡£
+ * åŠŸèƒ½ï¼šå¤„ç†å·²è®°å½•çš„åˆ·æ–°åŒºåŸŸ
+ * è¯´æ˜ï¼šæ­¤å‡½æ•°ä¼šå°†å„ä¸ªéƒ¨ä»¶çš„recté˜Ÿåˆ—ä¸­çš„å¤„ç†æ‰ï¼Œå¹¶å°†
+ * æœ€ç»ˆçš„å±€éƒ¨åˆ·æ–°åŒºåŸŸæ•°æ®æ·»åŠ è‡³å±å¹•åˆ·æ–°åŒºåŸŸé˜Ÿåˆ—ä¸­ï¼Œç­‰
+ * å¾…LCUIæ¥å¤„ç†ã€‚
  **/
 {
 	//printf("Processing_Refresh_Area: enter\n");
 	if ( LCUI_Sys.shift_flag == IS_TRUE )
-	{	/* Èç¹ûflag±êÖ¾µÄÖµÎªIS_TRUE */ 
-		/* ×ªÒÆ²¿¼şÄÚ¼ÇÂ¼µÄÇøÓòÖÁÖ÷¼ÇÂ¼ÖĞ */ 
+	{	/* å¦‚æœflagæ ‡å¿—çš„å€¼ä¸ºIS_TRUE */ 
+		/* è½¬ç§»éƒ¨ä»¶å†…è®°å½•çš„åŒºåŸŸè‡³ä¸»è®°å½•ä¸­ */ 
 		Shift_Widget_Refresh_Area ( NULL );
 		/* 
-		 * ¸´Î»±êÖ¾£¬ÕâÊÇÎªÁË±ÜÃâÃ¿´Î½øÈë±¾º¯ÊıÊ±¶¼Òª½øÈëµİ¹é£¬²¢¶Ô¸÷
-		 * ¸ö²¿¼şµÄ¾ØĞÎÊı¾İ½øĞĞÒÆ¶¯£¬ÒòÎªÕâÊÇÀË·ÑÊ±¼ä£¬½µµÍÁË³ÌĞòµÄĞ§
-		 * ÂÊ 
+		 * å¤ä½æ ‡å¿—ï¼Œè¿™æ˜¯ä¸ºäº†é¿å…æ¯æ¬¡è¿›å…¥æœ¬å‡½æ•°æ—¶éƒ½è¦è¿›å…¥é€’å½’ï¼Œå¹¶å¯¹å„
+		 * ä¸ªéƒ¨ä»¶çš„çŸ©å½¢æ•°æ®è¿›è¡Œç§»åŠ¨ï¼Œå› ä¸ºè¿™æ˜¯æµªè´¹æ—¶é—´ï¼Œé™ä½äº†ç¨‹åºçš„æ•ˆ
+		 * ç‡ 
 		 * */
 		LCUI_Sys.shift_flag = IS_FALSE; 
 	}
-	/* ·Ö¸îÇøÓò£¬Ê¹Ö®²»ÓëÈÎºÎ²¿¼şµÄÇøÓòÖØµş */
+	/* åˆ†å‰²åŒºåŸŸï¼Œä½¿ä¹‹ä¸ä¸ä»»ä½•éƒ¨ä»¶çš„åŒºåŸŸé‡å  */
 	Split_Screen_Area_By_Widget(NULL);
 	//printf("Processing_Refresh_Area: quit\n"); 
 }
@@ -298,27 +298,27 @@ void Processing_Refresh_Area()
 
 LCUI_Widget *Get_Parent_Widget(LCUI_Widget *widget, char *widget_type)
 /*
- * ¹¦ÄÜ£º»ñÈ¡²¿¼şµÄÖ¸¶¨ÀàĞÍµÄ¸¸²¿¼şµÄÖ¸Õë
- * ËµÃ÷£º±¾º¯Êı»áÔÚ²¿¼ş¹ØÏµÁ´ÖĞÍùÍ·²¿²éÕÒ¸¸²¿¼şÖ¸Õë£¬²¢ÅĞ¶ÏÕâ¸ö¸¸²¿¼şÊÇ·ñÎªÖÆ¶¨ÀàĞÍ
- * ·µ»ØÖµ£ºÃ»ÓĞ·ûºÏÒªÇóµÄ¸¸¼¶²¿¼ş¾Í·µ»ØNULL£¬·ñÔò·µ»Ø²¿¼şÖ¸Õë
+ * åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶çš„æŒ‡å®šç±»å‹çš„çˆ¶éƒ¨ä»¶çš„æŒ‡é’ˆ
+ * è¯´æ˜ï¼šæœ¬å‡½æ•°ä¼šåœ¨éƒ¨ä»¶å…³ç³»é“¾ä¸­å¾€å¤´éƒ¨æŸ¥æ‰¾çˆ¶éƒ¨ä»¶æŒ‡é’ˆï¼Œå¹¶åˆ¤æ–­è¿™ä¸ªçˆ¶éƒ¨ä»¶æ˜¯å¦ä¸ºåˆ¶å®šç±»å‹
+ * è¿”å›å€¼ï¼šæ²¡æœ‰ç¬¦åˆè¦æ±‚çš„çˆ¶çº§éƒ¨ä»¶å°±è¿”å›NULLï¼Œå¦åˆ™è¿”å›éƒ¨ä»¶æŒ‡é’ˆ
  **/
 {
 	LCUI_Widget *temp;
-	if(widget == NULL) return NULL; /* ±¾ÉíÊÇNULL¾ÍÍË³öº¯Êı */
+	if(widget == NULL) return NULL; /* æœ¬èº«æ˜¯NULLå°±é€€å‡ºå‡½æ•° */
 	temp = widget;
 	while(temp->parent != NULL)
 	{
 		if(temp->parent != NULL
 		  && Strcmp(&temp->parent->type, widget_type) == 0
-		)/* Èç¹ûÖ¸ÕëÓĞĞ§£¬²¢ÇÒÀàĞÍ·ûºÏÒªÇó */
-			return temp->parent; /* ·µ»Ø²¿¼şµÄÖ¸Õë */
-		temp = temp->parent;/* »ñÈ¡²¿¼şµÄ¸¸¼¶²¿¼şÖ¸Õë */
+		)/* å¦‚æœæŒ‡é’ˆæœ‰æ•ˆï¼Œå¹¶ä¸”ç±»å‹ç¬¦åˆè¦æ±‚ */
+			return temp->parent; /* è¿”å›éƒ¨ä»¶çš„æŒ‡é’ˆ */
+		temp = temp->parent;/* è·å–éƒ¨ä»¶çš„çˆ¶çº§éƒ¨ä»¶æŒ‡é’ˆ */
 	}
 	return NULL;
 }
 
 int LCUI_Destroy_App_Widgets(LCUI_ID app_id)
-/* ¹¦ÄÜ£ºÏú»ÙÖ¸¶¨IDµÄ³ÌĞòµÄËùÓĞ²¿¼ş */
+/* åŠŸèƒ½ï¼šé”€æ¯æŒ‡å®šIDçš„ç¨‹åºçš„æ‰€æœ‰éƒ¨ä»¶ */
 {
 	int i, total;
 	LCUI_Widget *temp;
@@ -330,13 +330,13 @@ int LCUI_Destroy_App_Widgets(LCUI_ID app_id)
 		if(temp->app_id == app_id)
 		{
 			/* 
-			 * ÔÚQueue_Delete()º¯Êı½«¶ÓÁĞÖĞµÄ²¿¼şÒÆ³ıÊ±£¬»áµ÷ÓÃ³õÊ¼»¯²¿¼ş¶ÓÁĞÊ±Ö¸
-			 * ¶¨µÄDestroy_Widget()º¯Êı½øĞĞ²¿¼şÊı¾İÏà¹ØµÄÇåÀí¡£
+			 * åœ¨Queue_Delete()å‡½æ•°å°†é˜Ÿåˆ—ä¸­çš„éƒ¨ä»¶ç§»é™¤æ—¶ï¼Œä¼šè°ƒç”¨åˆå§‹åŒ–éƒ¨ä»¶é˜Ÿåˆ—æ—¶æŒ‡
+			 * å®šçš„Destroy_Widget()å‡½æ•°è¿›è¡Œéƒ¨ä»¶æ•°æ®ç›¸å…³çš„æ¸…ç†ã€‚
 			 * */
 			Queue_Delete(&LCUI_Sys.widget_list, i);
-			/* ÖØĞÂ»ñÈ¡²¿¼ş×ÜÊı */
+			/* é‡æ–°è·å–éƒ¨ä»¶æ€»æ•° */
 			total = Queue_Get_Total(&LCUI_Sys.widget_list);
-			--i;/* µ±Ç°Î»ÖÃµÄ²¿¼şÒÑ¾­ÒÆ³ı£¬¿ÕÎ»ÒÑÓÉºóÃæ²¿¼şÌî²¹£¬ËùÒÔ£¬--i */
+			--i;/* å½“å‰ä½ç½®çš„éƒ¨ä»¶å·²ç»ç§»é™¤ï¼Œç©ºä½å·²ç”±åé¢éƒ¨ä»¶å¡«è¡¥ï¼Œæ‰€ä»¥ï¼Œ--i */
 		}
 	}
 	return 0;
@@ -344,26 +344,26 @@ int LCUI_Destroy_App_Widgets(LCUI_ID app_id)
 
 
 LCUI_String Get_Widget_Style(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡²¿¼şµÄÀàĞÍ */
+/* åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶çš„ç±»å‹ */
 {
 	return widget->style;
 }
 
 LCUI_Border_Style Get_Widget_Border_Style(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡²¿¼şµÄ±ß¿òÀàĞÍ */
+/* åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶çš„è¾¹æ¡†ç±»å‹ */
 {
 	return widget->border_style;
 }
 
 void Set_Widget_Style(LCUI_Widget *widget, char *style)
-/* ¹¦ÄÜ£ºÉè¶¨²¿¼şµÄ·ç¸ñ */
+/* åŠŸèƒ½ï¼šè®¾å®šéƒ¨ä»¶çš„é£æ ¼ */
 {
 	Strcpy(&widget->style, style); 
 }
 
 LCUI_Widget *Get_Widget_By_Pos(LCUI_Widget *widget, LCUI_Pos pos)
 /*
- * ¹¦ÄÜ£º»ñÈ¡²¿¼şÖĞ°üº¬Ö¸¶¨×ø±êµÄµãµÄ×Ó²¿¼ş
+ * åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶ä¸­åŒ…å«æŒ‡å®šåæ ‡çš„ç‚¹çš„å­éƒ¨ä»¶
  **/
 { 
 	if(widget == NULL) 
@@ -372,7 +372,7 @@ LCUI_Widget *Get_Widget_By_Pos(LCUI_Widget *widget, LCUI_Pos pos)
 	LCUI_Widget *child;
 	LCUI_Widget *w = widget; 
 	for(i=0;;++i)
-	{/* ´Ó¶¥µ½µ×±éÀú×Ó²¿¼ş */
+	{/* ä»é¡¶åˆ°åº•éå†å­éƒ¨ä»¶ */
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
 		if(NULL == child)
 			break;
@@ -380,8 +380,8 @@ LCUI_Widget *Get_Widget_By_Pos(LCUI_Widget *widget, LCUI_Pos pos)
 		{ 
 			temp = Rect_Inside_Point( pos, Get_Widget_Rect(child) );
 			if(temp == 1)
-			{/* Èç¹ûÕâ¸öµã±»°üº¬ÔÚ²¿¼şÇøÓòÄÚ */
-				/* µİ¹éµ÷ÓÃ£¬¸Ä±äÏà¶Ô×ø±ê */
+			{/* å¦‚æœè¿™ä¸ªç‚¹è¢«åŒ…å«åœ¨éƒ¨ä»¶åŒºåŸŸå†… */
+				/* é€’å½’è°ƒç”¨ï¼Œæ”¹å˜ç›¸å¯¹åæ ‡ */
 				w = Get_Widget_By_Pos(child, Pos_Sub(pos, child->pos));
 				if(w == NULL)
 					return widget;
@@ -396,7 +396,7 @@ LCUI_Widget *Get_Widget_By_Pos(LCUI_Widget *widget, LCUI_Pos pos)
 
 LCUI_Widget *Get_Cursor_Overlay_Widget()
 /*
- * ¹¦ÄÜ£º»ñÈ¡Êó±ê¹â±êµ±Ç°¸²¸ÇµÄ²¿¼ş
+ * åŠŸèƒ½ï¼šè·å–é¼ æ ‡å…‰æ ‡å½“å‰è¦†ç›–çš„éƒ¨ä»¶
  **/
 { 
 	int temp;
@@ -405,7 +405,7 @@ LCUI_Widget *Get_Cursor_Overlay_Widget()
 	
 	total = Queue_Get_Total(&LCUI_Sys.widget_list);
 	for (k=0; k<total; ++k)
-	{/* ´Ó×î¶¥µ½µ×£¬±éÀú²¿¼ş */ 
+	{/* ä»æœ€é¡¶åˆ°åº•ï¼Œéå†éƒ¨ä»¶ */ 
 		widget = (LCUI_Widget*)Queue_Get(&LCUI_Sys.widget_list, k);
 		if(widget == NULL) 
 			break;
@@ -414,7 +414,7 @@ LCUI_Widget *Get_Cursor_Overlay_Widget()
 			
 		temp = Rect_Inside_Point(Get_Cursor_Pos(), Get_Widget_Rect(widget) );
 		if(temp == 1)
-		{/* Èç¹ûÕâ¸öµã±»°üº¬ÔÚ²¿¼şÇøÓòÄÚ£¬ÄÇ¾Í»ñÈ¡²¿¼şÖĞ°üº¬Ö¸¶¨×ø±êµÄµãµÄ×Ó²¿¼ş */ 
+		{/* å¦‚æœè¿™ä¸ªç‚¹è¢«åŒ…å«åœ¨éƒ¨ä»¶åŒºåŸŸå†…ï¼Œé‚£å°±è·å–éƒ¨ä»¶ä¸­åŒ…å«æŒ‡å®šåæ ‡çš„ç‚¹çš„å­éƒ¨ä»¶ */ 
 			w = Get_Widget_By_Pos(widget, 
 					Pos_Sub(Get_Cursor_Pos(), Get_Widget_Pos(widget)));
 			if(w == NULL) 
@@ -431,8 +431,8 @@ LCUI_Widget *Get_Cursor_Overlay_Widget()
 
 LCUI_Widget *Get_Focus_Widget()
 /*
- * ¹¦ÄÜ£º»ñÈ¡µ±Ç°½¹µã×´Ì¬ÏÂµÄ²¿¼ş
- * ·µ»ØÖµ£ºÕı³£»ñÈ¡Ôò·µ»Ø²¿¼şµÄÖ¸Õë£¬·ñÔò£¬·µ»ØNULL
+ * åŠŸèƒ½ï¼šè·å–å½“å‰ç„¦ç‚¹çŠ¶æ€ä¸‹çš„éƒ¨ä»¶
+ * è¿”å›å€¼ï¼šæ­£å¸¸è·å–åˆ™è¿”å›éƒ¨ä»¶çš„æŒ‡é’ˆï¼Œå¦åˆ™ï¼Œè¿”å›NULL
  **/
 {
 	#ifdef USE_JUNK___
@@ -455,7 +455,7 @@ LCUI_Widget *Get_Focus_Widget()
 
 int Widget_Is_Active(LCUI_Widget *widget)
 /*
- * ¹¦ÄÜ£ºÅĞ¶Ï²¿¼şÊÇ·ñÎª»î¶¯×´Ì¬
+ * åŠŸèƒ½ï¼šåˆ¤æ–­éƒ¨ä»¶æ˜¯å¦ä¸ºæ´»åŠ¨çŠ¶æ€
  **/
 {
 	if(widget->status != KILLED) return 1;
@@ -466,8 +466,8 @@ int Widget_Is_Active(LCUI_Widget *widget)
 #ifdef _use_old_func_
 LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 /* 
- * ¹¦ÄÜ£º»ñÈ¡ÒÆ¶¯µ½ĞÂÎ»ÖÃµÄ²¿¼şÔÚÆÁÄ»ÉÏµÄÓĞĞ§ÏÔÊ¾ÇøÓò 
- * ËµÃ÷£ºoffsetÊÇÔ­Î»ÖÃÓëĞÂÎ»ÖÃµÄ²î
+ * åŠŸèƒ½ï¼šè·å–ç§»åŠ¨åˆ°æ–°ä½ç½®çš„éƒ¨ä»¶åœ¨å±å¹•ä¸Šçš„æœ‰æ•ˆæ˜¾ç¤ºåŒºåŸŸ 
+ * è¯´æ˜ï¼šoffsetæ˜¯åŸä½ç½®ä¸æ–°ä½ç½®çš„å·®
  * */
 {
 	LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget);
@@ -494,7 +494,7 @@ LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 		h = widget->parent->size.h;
 	}
 	
-	/* »ñÈ¡Ğè²Ã¼ôµÄÇøÓò */
+	/* è·å–éœ€è£å‰ªçš„åŒºåŸŸ */
 	if(pos.x < 0) 
 	{
 		cut_rect.width += pos.x;
@@ -514,18 +514,18 @@ LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 	if(widget->parent != NULL)
 	{
 		LCUI_Rect rect;
-		/* »ñÈ¡¸¸²¿¼şµÄÓĞĞ§ÏÔÊ¾·¶Î§ */
+		/* è·å–çˆ¶éƒ¨ä»¶çš„æœ‰æ•ˆæ˜¾ç¤ºèŒƒå›´ */
 		rect = Get_Widget_Valid_Rect(widget->parent);
-		/* Èç¹û¸¸²¿¼şĞèÒª²Ã¼ô£¬ÄÇÃ´£¬×Ó²¿¼ş¸ù¾İÇé¿ö£¬Ò²ĞèÒª½øĞĞ²Ã¼ô */
+		/* å¦‚æœçˆ¶éƒ¨ä»¶éœ€è¦è£å‰ªï¼Œé‚£ä¹ˆï¼Œå­éƒ¨ä»¶æ ¹æ®æƒ…å†µï¼Œä¹Ÿéœ€è¦è¿›è¡Œè£å‰ª */
 		if(rect.x > 0)
-		{/* Èç¹û²Ã¼ôÇøÓòµÄxÖá×ø±ê´óÓÚ0 */
-			/* ²Ã¼ôÇøÓòºÍ²¿¼şÇøÓòÊÇÔÚÍ¬Ò»ÈİÆ÷ÖĞ£¬Ö»ÒªµÃ³öÁ½¸öÇøÓòµÄÖØµşÇøÓò¼´¿É */
+		{/* å¦‚æœè£å‰ªåŒºåŸŸçš„xè½´åæ ‡å¤§äº0 */
+			/* è£å‰ªåŒºåŸŸå’Œéƒ¨ä»¶åŒºåŸŸæ˜¯åœ¨åŒä¸€å®¹å™¨ä¸­ï¼Œåªè¦å¾—å‡ºä¸¤ä¸ªåŒºåŸŸçš„é‡å åŒºåŸŸå³å¯ */
 			temp = pos.x + cut_rect.x;
 			if(temp < rect.x)
-			{ /* Èç¹û²¿¼şµÄ xÖá×ø±ê+²Ã¼ôÆğµãxÖá×ø±ê Ğ¡ÓÚËü */
-				temp = rect.x - pos.x;		/* ĞÂµÄ²Ã¼ôÇøÓòÆğµãxÖá×ø±ê */
-				cut_rect.width -= (temp - cut_rect.x);/* ¸Ä±ä²Ã¼ôÇøÓòµÄ¿í¶È */
-				cut_rect.x = temp;			/* ¸Ä±ä²¿¼şµÄ²Ã¼ôÇøÓòµÄx×ø±ê */
+			{ /* å¦‚æœéƒ¨ä»¶çš„ xè½´åæ ‡+è£å‰ªèµ·ç‚¹xè½´åæ ‡ å°äºå®ƒ */
+				temp = rect.x - pos.x;		/* æ–°çš„è£å‰ªåŒºåŸŸèµ·ç‚¹xè½´åæ ‡ */
+				cut_rect.width -= (temp - cut_rect.x);/* æ”¹å˜è£å‰ªåŒºåŸŸçš„å®½åº¦ */
+				cut_rect.x = temp;			/* æ”¹å˜éƒ¨ä»¶çš„è£å‰ªåŒºåŸŸçš„xåæ ‡ */
 			}
 		}
 		if(rect.y > 0)
@@ -539,9 +539,9 @@ LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 			}
 		}
 		if(rect.width < w)
-		{/* Èç¹û¸¸²¿¼ş²Ã¼ôÇøÓòµÄ¿í¶ÈĞ¡ÓÚ¸¸²¿¼şµÄ¿í¶È */
+		{/* å¦‚æœçˆ¶éƒ¨ä»¶è£å‰ªåŒºåŸŸçš„å®½åº¦å°äºçˆ¶éƒ¨ä»¶çš„å®½åº¦ */
 			temp = pos.x+cut_rect.x+cut_rect.width;
-			if(temp > rect.x+rect.width) /* Èç¹û²¿¼ş²Ã¼ôÇøÓò×ó±ß²¿·ÖÓë¸¸²¿¼ş²Ã¼ôÇøÓòÖØµş */
+			if(temp > rect.x+rect.width) /* å¦‚æœéƒ¨ä»¶è£å‰ªåŒºåŸŸå·¦è¾¹éƒ¨åˆ†ä¸çˆ¶éƒ¨ä»¶è£å‰ªåŒºåŸŸé‡å  */
 				cut_rect.width -= (temp-(rect.x+rect.width));
 		}
 		if(rect.height < h)
@@ -558,8 +558,8 @@ LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 #else
 LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 /* 
- * ¹¦ÄÜ£º»ñÈ¡ÒÆ¶¯µ½ĞÂÎ»ÖÃµÄ²¿¼şÔÚÆÁÄ»ÉÏµÄÓĞĞ§ÏÔÊ¾ÇøÓò 
- * ËµÃ÷£ºoffsetÊÇÔ­Î»ÖÃÓëĞÂÎ»ÖÃµÄ²î£¬·µ»ØµÄÇøÓòÊÇÏà¶ÔÓÚ×Ô¼ºµÄÇøÓò£¬¶ø²»ÊÇÔÚÈİÆ÷ÖĞµÄÏà¶ÔÇøÓò
+ * åŠŸèƒ½ï¼šè·å–ç§»åŠ¨åˆ°æ–°ä½ç½®çš„éƒ¨ä»¶åœ¨å±å¹•ä¸Šçš„æœ‰æ•ˆæ˜¾ç¤ºåŒºåŸŸ 
+ * è¯´æ˜ï¼šoffsetæ˜¯åŸä½ç½®ä¸æ–°ä½ç½®çš„å·®ï¼Œè¿”å›çš„åŒºåŸŸæ˜¯ç›¸å¯¹äºè‡ªå·±çš„åŒºåŸŸï¼Œè€Œä¸æ˜¯åœ¨å®¹å™¨ä¸­çš„ç›¸å¯¹åŒºåŸŸ
  * 
  * */
 {
@@ -583,24 +583,24 @@ LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 		h = widget->parent->size.h;
 	}
 	
-	/* »ñÈ¡Ğè²Ã¼ôµÄÇøÓò */
+	/* è·å–éœ€è£å‰ªçš„åŒºåŸŸ */
 	Get_Cut_Area(Size(w, h), Get_Widget_Rect(widget), &cut_rect);
 	
 	if(widget->parent != NULL)
 	{
 		LCUI_Rect rect;
-		/* »ñÈ¡¸¸²¿¼şµÄÓĞĞ§ÏÔÊ¾·¶Î§ */
+		/* è·å–çˆ¶éƒ¨ä»¶çš„æœ‰æ•ˆæ˜¾ç¤ºèŒƒå›´ */
 		rect = Get_Widget_Valid_Rect(widget->parent);
-		/* Èç¹û¸¸²¿¼şĞèÒª²Ã¼ô£¬ÄÇÃ´£¬×Ó²¿¼ş¸ù¾İÇé¿ö£¬Ò²ĞèÒª½øĞĞ²Ã¼ô */
+		/* å¦‚æœçˆ¶éƒ¨ä»¶éœ€è¦è£å‰ªï¼Œé‚£ä¹ˆï¼Œå­éƒ¨ä»¶æ ¹æ®æƒ…å†µï¼Œä¹Ÿéœ€è¦è¿›è¡Œè£å‰ª */
 		if(rect.x > 0)
-		{/* Èç¹û²Ã¼ôÇøÓòµÄxÖá×ø±ê´óÓÚ0 */
-			/* ²Ã¼ôÇøÓòºÍ²¿¼şÇøÓòÊÇÔÚÍ¬Ò»ÈİÆ÷ÖĞ£¬Ö»ÒªµÃ³öÁ½¸öÇøÓòµÄÖØµşÇøÓò¼´¿É */
+		{/* å¦‚æœè£å‰ªåŒºåŸŸçš„xè½´åæ ‡å¤§äº0 */
+			/* è£å‰ªåŒºåŸŸå’Œéƒ¨ä»¶åŒºåŸŸæ˜¯åœ¨åŒä¸€å®¹å™¨ä¸­ï¼Œåªè¦å¾—å‡ºä¸¤ä¸ªåŒºåŸŸçš„é‡å åŒºåŸŸå³å¯ */
 			temp = pos.x + cut_rect.x;
 			if(temp < rect.x)
-			{ /* Èç¹û²¿¼şµÄ xÖá×ø±ê+²Ã¼ôÆğµãxÖá×ø±ê Ğ¡ÓÚËü */
-				temp = rect.x - pos.x;		/* ĞÂµÄ²Ã¼ôÇøÓòÆğµãxÖá×ø±ê */
-				cut_rect.width -= (temp - cut_rect.x);/* ¸Ä±ä²Ã¼ôÇøÓòµÄ¿í¶È */
-				cut_rect.x = temp;			/* ¸Ä±ä²¿¼şµÄ²Ã¼ôÇøÓòµÄx×ø±ê */
+			{ /* å¦‚æœéƒ¨ä»¶çš„ xè½´åæ ‡+è£å‰ªèµ·ç‚¹xè½´åæ ‡ å°äºå®ƒ */
+				temp = rect.x - pos.x;		/* æ–°çš„è£å‰ªåŒºåŸŸèµ·ç‚¹xè½´åæ ‡ */
+				cut_rect.width -= (temp - cut_rect.x);/* æ”¹å˜è£å‰ªåŒºåŸŸçš„å®½åº¦ */
+				cut_rect.x = temp;			/* æ”¹å˜éƒ¨ä»¶çš„è£å‰ªåŒºåŸŸçš„xåæ ‡ */
 			}
 		}
 		if(rect.y > 0)
@@ -614,9 +614,9 @@ LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 			}
 		}
 		if(rect.width < w)
-		{/* Èç¹û¸¸²¿¼ş²Ã¼ôÇøÓòµÄ¿í¶ÈĞ¡ÓÚ¸¸²¿¼şµÄ¿í¶È */
+		{/* å¦‚æœçˆ¶éƒ¨ä»¶è£å‰ªåŒºåŸŸçš„å®½åº¦å°äºçˆ¶éƒ¨ä»¶çš„å®½åº¦ */
 			temp = pos.x+cut_rect.x+cut_rect.width;
-			if(temp > rect.x+rect.width) /* Èç¹û²¿¼ş²Ã¼ôÇøÓò×ó±ß²¿·ÖÓë¸¸²¿¼ş²Ã¼ôÇøÓòÖØµş */
+			if(temp > rect.x+rect.width) /* å¦‚æœéƒ¨ä»¶è£å‰ªåŒºåŸŸå·¦è¾¹éƒ¨åˆ†ä¸çˆ¶éƒ¨ä»¶è£å‰ªåŒºåŸŸé‡å  */
 				cut_rect.width -= (temp-(rect.x+rect.width));
 		}
 		if(rect.height < h)
@@ -637,17 +637,17 @@ LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 #endif
 
 LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡²¿¼şÔÚÆÁÄ»ÖĞÊµ¼ÊÏÔÊ¾µÄÇøÓò */
+/* åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶åœ¨å±å¹•ä¸­å®é™…æ˜¾ç¤ºçš„åŒºåŸŸ */
 {
 	return Get_Widget_Valid_Rect_By_New_Pos(widget, Pos(0,0));
 }
 
 int Empty_Widget()
 /* 
- * ¹¦ÄÜ£ºÓÃÓÚ¼ì²â³ÌĞòµÄ²¿¼şÁĞ±íÊÇ·ñÎª¿Õ 
- * ·µ»ØÖµ£º
- *   1  ³ÌĞòµÄ²¿¼şÁĞ±íÎª¿Õ
- *   0  ³ÌĞòµÄ²¿¼şÁĞ±í²»Îª¿Õ
+ * åŠŸèƒ½ï¼šç”¨äºæ£€æµ‹ç¨‹åºçš„éƒ¨ä»¶åˆ—è¡¨æ˜¯å¦ä¸ºç©º 
+ * è¿”å›å€¼ï¼š
+ *   1  ç¨‹åºçš„éƒ¨ä»¶åˆ—è¡¨ä¸ºç©º
+ *   0  ç¨‹åºçš„éƒ¨ä»¶åˆ—è¡¨ä¸ä¸ºç©º
  * */
 {
 	if(Queue_Get_Total(&LCUI_Sys.widget_list) <= 0)
@@ -659,9 +659,9 @@ static void WidgetData_Init(LCUI_Queue *queue);
 
 LCUI_Widget *Create_Widget(char *widget_type)
 /* 
- * ¹¦ÄÜ£º´´½¨Ö¸¶¨ÀàĞÍµÄ´°¿Ú²¿¼ş
- * ËµÃ÷£º´´½¨³öÀ´µÄ²¿¼ş£¬Ä¬ÈÏÊÇÃ»ÓĞ±³¾°Í¼Ê±Í¸Ã÷¡£
- * ·µ»ØÖµ£º³É¹¦Ôò²¿¼şµÄÖ¸Õë£¬Ê§°ÜÔò·µ»ØNULL
+ * åŠŸèƒ½ï¼šåˆ›å»ºæŒ‡å®šç±»å‹çš„çª—å£éƒ¨ä»¶
+ * è¯´æ˜ï¼šåˆ›å»ºå‡ºæ¥çš„éƒ¨ä»¶ï¼Œé»˜è®¤æ˜¯æ²¡æœ‰èƒŒæ™¯å›¾æ—¶é€æ˜ã€‚
+ * è¿”å›å€¼ï¼šæˆåŠŸåˆ™éƒ¨ä»¶çš„æŒ‡é’ˆï¼Œå¤±è´¥åˆ™è¿”å›NULL
  */
 {
 	int pos;
@@ -671,7 +671,7 @@ LCUI_Widget *Create_Widget(char *widget_type)
 
 	app = Get_Self_AppPointer(); 
 	
-	/* ³õÊ¼»¯½á¹¹ÌåÖĞµÄÊı¾İ */
+	/* åˆå§‹åŒ–ç»“æ„ä½“ä¸­çš„æ•°æ® */
 	widget.auto_size		= IS_FALSE;
 	widget.type_id			= 0;
 	widget.status			= WIDGET_STATUS_NORMAL;
@@ -709,38 +709,38 @@ LCUI_Widget *Create_Widget(char *widget_type)
 	widget.disable = Disable_Widget;
 	
 	//widget.matrix		= NULL;
-	/* ³õÊ¼»¯±ß¿òÊı¾İ */
+	/* åˆå§‹åŒ–è¾¹æ¡†æ•°æ® */
 	Border_Init(&widget.border);
-	/* ³õÊ¼»¯´¢´æÍ¼ĞÎÊı¾İµÄ½á¹¹Ìå */
+	/* åˆå§‹åŒ–å‚¨å­˜å›¾å½¢æ•°æ®çš„ç»“æ„ä½“ */
 	Graph_Init(&widget.graph);
 	Graph_Init(&widget.background_image);
 	widget.graph.flag = HAVE_ALPHA;
-	RectQueue_Init(&widget.update_area);/* ³õÊ¼»¯ÇøÓò¸üĞÂ¶ÓÁĞ */
-	EventQueue_Init(&widget.event);/* ³õÊ¼»¯²¿¼şµÄÊÂ¼ş¶ÓÁĞ */
-	WidgetQueue_Init(&widget.child);/* ³õÊ¼»¯×Ó²¿¼ş¶ÓÁĞ */
-	WidgetData_Init(&widget.data);/* ³õÊ¼»¯Êı¾İ¸üĞÂ¶ÓÁĞ */
-	String_Init(&widget.type);/* ³õÊ¼»¯×Ö·û´® */
+	RectQueue_Init(&widget.update_area);/* åˆå§‹åŒ–åŒºåŸŸæ›´æ–°é˜Ÿåˆ— */
+	EventQueue_Init(&widget.event);/* åˆå§‹åŒ–éƒ¨ä»¶çš„äº‹ä»¶é˜Ÿåˆ— */
+	WidgetQueue_Init(&widget.child);/* åˆå§‹åŒ–å­éƒ¨ä»¶é˜Ÿåˆ— */
+	WidgetData_Init(&widget.data);/* åˆå§‹åŒ–æ•°æ®æ›´æ–°é˜Ÿåˆ— */
+	String_Init(&widget.type);/* åˆå§‹åŒ–å­—ç¬¦ä¸² */
 	String_Init(&widget.style);
 	
-	/* ×îºó£¬½«¸Ã²¿¼şÊı¾İÌí¼ÓÖÁ²¿¼ş¶ÓÁĞÖĞ */
+	/* æœ€åï¼Œå°†è¯¥éƒ¨ä»¶æ•°æ®æ·»åŠ è‡³éƒ¨ä»¶é˜Ÿåˆ—ä¸­ */
 	pos = Queue_Add(&LCUI_Sys.widget_list, &widget);
 	p = (LCUI_Widget*)Queue_Get(&LCUI_Sys.widget_list, pos);
 	
 	if(widget_type != NULL)
 	{
-		/* ÑéÖ¤²¿¼şÀàĞÍÊÇ·ñÓĞĞ§ */
+		/* éªŒè¯éƒ¨ä»¶ç±»å‹æ˜¯å¦æœ‰æ•ˆ */
 		if( !Check_WidgetType(widget_type))
 		{
 			puts(WIDGET_ERROR_TYPE_NOT_FOUND);
 			return NULL;
 		}
-		/* ±£´æ²¿¼şÀàĞÍ */
+		/* ä¿å­˜éƒ¨ä»¶ç±»å‹ */
 		Strcpy(&p->type, widget_type);
-		p->type_id = WidgetType_Get_ID(widget_type);	/* »ñÈ¡ÀàĞÍID */
-		/* »ñÈ¡³õÊ¼»¯²¿¼şË½ÓĞ½á¹¹ÌåÊı¾İµÄº¯ÊıÖ¸Õë */ 
+		p->type_id = WidgetType_Get_ID(widget_type);	/* è·å–ç±»å‹ID */
+		/* è·å–åˆå§‹åŒ–éƒ¨ä»¶ç§æœ‰ç»“æ„ä½“æ•°æ®çš„å‡½æ•°æŒ‡é’ˆ */ 
 		func_init = Get_WidgetFunc_By_ID(p->type_id, 
 									FUNC_TYPE_INIT);
-		/* ½øĞĞ³õÊ¼»¯ */
+		/* è¿›è¡Œåˆå§‹åŒ– */
 		func_init( p ); 
 	} 
 	return p;
@@ -748,7 +748,7 @@ LCUI_Widget *Create_Widget(char *widget_type)
 
 
 void Delete_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÉ¾³ıÒ»¸ö²¿¼ş */
+/* åŠŸèƒ½ï¼šåˆ é™¤ä¸€ä¸ªéƒ¨ä»¶ */
 {
 	int i, total;
 	LCUI_Queue *p;
@@ -774,7 +774,7 @@ void Delete_Widget(LCUI_Widget *widget)
 }
 
 LCUI_Pos Count_Widget_Pos(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÀÛ¼Æ²¿¼şµÄÎ»ÖÃ×ø±ê */
+/* åŠŸèƒ½ï¼šç´¯è®¡éƒ¨ä»¶çš„ä½ç½®åæ ‡ */
 {
 	LCUI_Pos pos;
 	if(widget->parent == NULL) 
@@ -785,30 +785,30 @@ LCUI_Pos Count_Widget_Pos(LCUI_Widget *widget)
 }
 
 LCUI_Pos Get_Widget_Global_Pos(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡²¿¼şµÄÈ«¾Ö×ø±ê */
+/* åŠŸèƒ½ï¼šè·å–éƒ¨ä»¶çš„å…¨å±€åæ ‡ */
 {
 	return Count_Widget_Pos(widget);
 }
 
 void Set_Widget_BG_Mode(LCUI_Widget *widget, LCUI_BG_Mode bg_mode)
 /*
- * ¹¦ÄÜ£º¸Ä±ä²¿¼şµÄ±³¾°Ä£Ê½
- * ËµÃ÷£º±³¾°Ä£Ê½¾ö¶¨ÁË²¿¼şÔÚÃ»ÓĞ±³¾°Í¼µÄÊ±ºòÊÇÊ¹ÓÃ±³¾°É«Ìî³ä»¹ÊÇÍêÈ«Í¸Ã÷¡£
+ * åŠŸèƒ½ï¼šæ”¹å˜éƒ¨ä»¶çš„èƒŒæ™¯æ¨¡å¼
+ * è¯´æ˜ï¼šèƒŒæ™¯æ¨¡å¼å†³å®šäº†éƒ¨ä»¶åœ¨æ²¡æœ‰èƒŒæ™¯å›¾çš„æ—¶å€™æ˜¯ä½¿ç”¨èƒŒæ™¯è‰²å¡«å……è¿˜æ˜¯å®Œå…¨é€æ˜ã€‚
  **/
 {
 	widget->bg_mode = bg_mode;
 }
 
 void Set_Widget_Align(LCUI_Widget *widget, LCUI_Align align, LCUI_Pos offset)
-/* ¹¦ÄÜ£ºÉè¶¨²¿¼şµÄ¶ÔÆë·½Ê½ÒÔ¼°Æ«ÒÆ¾àÀë */
+/* åŠŸèƒ½ï¼šè®¾å®šéƒ¨ä»¶çš„å¯¹é½æ–¹å¼ä»¥åŠåç§»è·ç¦» */
 {
 	widget->align = align;
 	widget->offset = offset;
-	Update_Widget_Pos(widget);/* ¸üĞÂÎ»ÖÃ */
+	Update_Widget_Pos(widget);/* æ›´æ–°ä½ç½® */
 }
 
 void Limit_Widget_Size(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_size)
-/* ¹¦ÄÜ£ºÏŞÖÆ²¿¼şµÄ³ß´ç±ä¶¯·¶Î§ */
+/* åŠŸèƒ½ï¼šé™åˆ¶éƒ¨ä»¶çš„å°ºå¯¸å˜åŠ¨èŒƒå›´ */
 {
 	if(min_size.w < 0)
 		min_size.w = 0;
@@ -829,7 +829,7 @@ void Limit_Widget_Size(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_si
 }
 
 void Limit_Widget_Pos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos)
-/* ¹¦ÄÜ£ºÏŞÖÆ²¿¼şµÄÒÆ¶¯·¶Î§ */
+/* åŠŸèƒ½ï¼šé™åˆ¶éƒ¨ä»¶çš„ç§»åŠ¨èŒƒå›´ */
 {
 	if(min_pos.x < 0)
 		min_pos.x = 0;
@@ -850,7 +850,7 @@ void Limit_Widget_Pos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos)
 }
 
 void Set_Widget_Border(LCUI_Widget *widget, LCUI_RGB color, LCUI_Border border)
-/* ¹¦ÄÜ£ºÉè¶¨²¿¼şµÄ±ß¿ò */
+/* åŠŸèƒ½ï¼šè®¾å®šéƒ¨ä»¶çš„è¾¹æ¡† */
 { 
 	widget->border = border;
 	widget->border_color = color;
@@ -865,7 +865,7 @@ void Set_Widget_Border(LCUI_Widget *widget, LCUI_RGB color, LCUI_Border border)
 
 void Set_Widget_Backcolor(LCUI_Widget *widget, LCUI_RGB color)
 /* 
-* ¹¦ÄÜ£ºÉè¶¨²¿¼şµÄ±³¾°É« 
+* åŠŸèƒ½ï¼šè®¾å®šéƒ¨ä»¶çš„èƒŒæ™¯è‰² 
 */
 {
 	widget->back_color = color;
@@ -875,7 +875,7 @@ void Set_Widget_Backcolor(LCUI_Widget *widget, LCUI_RGB color)
 
 int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag)
 /*
- * ¹¦ÄÜ£ºÎª²¿¼şÌî³ä±³¾°Í¼Ïñ
+ * åŠŸèƒ½ï¼šä¸ºéƒ¨ä»¶å¡«å……èƒŒæ™¯å›¾åƒ
  */
 {
 	if(NULL == img)
@@ -883,7 +883,7 @@ int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag)
 	else
 	{
 		widget->background_image_layout = flag;
-		/* Ìî³ä±³¾°Í¼Ïñ */
+		/* å¡«å……èƒŒæ™¯å›¾åƒ */
 		Copy_Graph(&widget->background_image, img);
 	}
 	Draw_Widget(widget); 
@@ -895,12 +895,12 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 							LCUI_WString *contents, 
 							int rows, int space, 
 							int linegap, int flag	)
-/* ¹¦ÄÜ£º»ìºÏ²¿¼şÄÚµÄ×ÖÌåÎ»Í¼£¬Ê¹×ÖÌåÄÜÔÚ²¿¼şÉÏÏÔÊ¾ */
+/* åŠŸèƒ½ï¼šæ··åˆéƒ¨ä»¶å†…çš„å­—ä½“ä½å›¾ï¼Œä½¿å­—ä½“èƒ½åœ¨éƒ¨ä»¶ä¸Šæ˜¾ç¤º */
 {
 	if(!Valid_Graph(&widget->graph)) 
 		return -1; 
 	if(rows > 0)
-	{/* Èç¹ûÎÄ×ÖĞĞÊı´óÓÚ0 */
+	{/* å¦‚æœæ–‡å­—è¡Œæ•°å¤§äº0 */
 		int i, j ,x = start_x, y = start_y, height = 0;
 		for(i = 0; i < rows; ++i)
 		{
@@ -916,21 +916,21 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 		}
 		for(i = 0; i < rows; ++i)
 		{
-			/* Èç¹ûÒÑ¾­³¬³ö²¿¼şµÄ³ß´ç£¬¾Í²»ĞèÒª»æÖÆ×ÖÌåÎ»Í¼ÁË */
+			/* å¦‚æœå·²ç»è¶…å‡ºéƒ¨ä»¶çš„å°ºå¯¸ï¼Œå°±ä¸éœ€è¦ç»˜åˆ¶å­—ä½“ä½å›¾äº† */
 			if(y > widget->size.h) 
 				break; 
 			for(j=0; j < contents[i].size; ++j)
 			{
-				if(x > widget->size.w)  /* Í¬ÉÏ */ 
+				if(x > widget->size.w)  /* åŒä¸Š */ 
 					break; 
-				/* Õ³ÌùÃ¿¸ö×Ö */
+				/* ç²˜è´´æ¯ä¸ªå­— */
 				Mix_Fonts_Bitmap(
 					&widget->graph,  x, y , 
 					&contents[i].string[j].bitmap , 
 					contents[i].string[j].color, flag );
 					
 				if(contents[i].update == IS_TRUE)
-				{/* Èç¹ûÕâÒ»ĞĞÎÄ×ÖĞèÒª¸üĞÂ */
+				{/* å¦‚æœè¿™ä¸€è¡Œæ–‡å­—éœ€è¦æ›´æ–° */
 					contents[i].update = IS_FALSE;
 					Add_Widget_Refresh_Area(
 						widget, 
@@ -938,12 +938,12 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 								widget->size.w, 
 								contents[i].string[0].bitmap.height+2)
 					);
-					/* ÉÔÎ¢Ôö¼ÓµãÇøÓò·¶Î§£¬ËùÒÔy-1£¬height+2 */
+					/* ç¨å¾®å¢åŠ ç‚¹åŒºåŸŸèŒƒå›´ï¼Œæ‰€ä»¥y-1ï¼Œheight+2 */
 				}
 				if( j < contents[i].size - 1) 
-					/* ÀÛ¼ÆÎÄ×Ö¼ä¾à */
+					/* ç´¯è®¡æ–‡å­—é—´è· */
 					x = x + space;  
-				/* ÀÛ¼ÆÎÄ×Ö¿í¶È */
+				/* ç´¯è®¡æ–‡å­—å®½åº¦ */
 				x = x + contents[i].string[j].bitmap.width;
 			}
 			if(contents[i].size == 0)
@@ -951,9 +951,9 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 			else
 				y += contents[i].string[0].bitmap.height; 
 			if(i > 0 && i < rows - 1) 
-				/* ÀÛ¼ÆÎÄ×ÖĞĞ¾à */
+				/* ç´¯è®¡æ–‡å­—è¡Œè· */
 				y += linegap; 
-			x = start_x; /* x¹éÎ» */
+			x = start_x; /* xå½’ä½ */
 			//printf("Mix_Widget_FontBitmap():rows:%d/%d, size:%d\n", i, rows, contents[i].size);
 		}
 	}
@@ -961,21 +961,21 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 }
 
 void Enable_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÆôÓÃ²¿¼ş */
+/* åŠŸèƒ½ï¼šå¯ç”¨éƒ¨ä»¶ */
 {
 	widget->enabled = IS_TRUE; 
 	Set_Widget_Status(widget, WIDGET_STATUS_NORMAL);
 }
 
 void Disable_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º½ûÓÃ²¿¼ş */
+/* åŠŸèƒ½ï¼šç¦ç”¨éƒ¨ä»¶ */
 {
 	widget->enabled = IS_FALSE; 
 	Set_Widget_Status(widget, WIDGET_STATUS_DISABLE);
 }
 
 void Widget_Visible(LCUI_Widget *widget, int flag)
-/* ¹¦ÄÜ£º¶¨Òå²¿¼şÊÇ·ñ¿É¼û */
+/* åŠŸèƒ½ï¼šå®šä¹‰éƒ¨ä»¶æ˜¯å¦å¯è§ */
 {
 	if(flag == IS_TRUE) 
 		widget->visible = IS_TRUE; 
@@ -985,15 +985,15 @@ void Widget_Visible(LCUI_Widget *widget, int flag)
 
 void Set_Widget_Pos(LCUI_Widget *widget, LCUI_Pos pos)
 /* 
- * ¹¦ÄÜ£ºÉè¶¨²¿¼şµÄÎ»ÖÃ 
- * ËµÃ÷£ºÖ»ĞŞ¸Ä×ø±ê£¬²»½øĞĞ¾Ö²¿Ë¢ĞÂ
+ * åŠŸèƒ½ï¼šè®¾å®šéƒ¨ä»¶çš„ä½ç½® 
+ * è¯´æ˜ï¼šåªä¿®æ”¹åæ ‡ï¼Œä¸è¿›è¡Œå±€éƒ¨åˆ·æ–°
  * */
 {
 	widget->pos = pos;
 }
 
 void Set_Widget_Alpha(LCUI_Widget *widget, unsigned char alpha)
-/* ¹¦ÄÜ£ºÉè¶¨²¿¼şµÄÍ¸Ã÷¶È */
+/* åŠŸèƒ½ï¼šè®¾å®šéƒ¨ä»¶çš„é€æ˜åº¦ */
 {
 	if(widget->graph.alpha != alpha)
 	{
@@ -1004,14 +1004,14 @@ void Set_Widget_Alpha(LCUI_Widget *widget, unsigned char alpha)
 
 void Exec_Move_Widget(LCUI_Widget *widget, LCUI_Pos pos)
 /*
- * ¹¦ÄÜ£ºÖ´ĞĞÒÆ¶¯²¿¼şÎ»ÖÃµÄ²Ù×÷
- * ËµÃ÷£º¸ü¸Ä²¿¼şÎ»ÖÃ£¬²¢Ìí¼Ó¾Ö²¿Ë¢ĞÂÇøÓò
+ * åŠŸèƒ½ï¼šæ‰§è¡Œç§»åŠ¨éƒ¨ä»¶ä½ç½®çš„æ“ä½œ
+ * è¯´æ˜ï¼šæ›´æ”¹éƒ¨ä»¶ä½ç½®ï¼Œå¹¶æ·»åŠ å±€éƒ¨åˆ·æ–°åŒºåŸŸ
  **/
 {
 	LCUI_Pos t;
 	LCUI_Rect old_rect;
 	if(IS_TRUE == widget->limit_pos)
-	{/* Èç¹ûÖ¸¶¨ÁËÏŞÖÆ²¿¼şµÄÒÆ¶¯·¶Î§£¬ÄÇÃ´¾Íµ÷ÕûÎ»ÖÃ */
+	{/* å¦‚æœæŒ‡å®šäº†é™åˆ¶éƒ¨ä»¶çš„ç§»åŠ¨èŒƒå›´ï¼Œé‚£ä¹ˆå°±è°ƒæ•´ä½ç½® */
 		if(pos.x > widget->max_pos.x)
 			pos.x = widget->max_pos.x;
 		if(pos.y > widget->max_pos.y)
@@ -1024,8 +1024,8 @@ void Exec_Move_Widget(LCUI_Widget *widget, LCUI_Pos pos)
 	t = widget->pos; 
 	widget->pos = pos;
 	if(widget->visible == IS_TRUE)
-	{/* Èç¹û¸Ã²¿¼ş¿É¼û */
-		/* Éè¶¨ĞèÒªË¢ĞÂµÄÇøÓò */
+	{/* å¦‚æœè¯¥éƒ¨ä»¶å¯è§ */
+		/* è®¾å®šéœ€è¦åˆ·æ–°çš„åŒºåŸŸ */
 		//old_rect = Rect(t.x, t.y, widget->size.w, widget->size.h); 
 		//Add_Widget_Refresh_Area(widget->parent, old_rect);
 		//Refresh_Widget(widget);
@@ -1043,7 +1043,7 @@ void Exec_Move_Widget(LCUI_Widget *widget, LCUI_Pos pos)
 }
 
 void Exec_Hide_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÖ´ĞĞÒş²Ø²¿¼şµÄ²Ù×÷ */
+/* åŠŸèƒ½ï¼šæ‰§è¡Œéšè—éƒ¨ä»¶çš„æ“ä½œ */
 {
 	if(widget == NULL) 
 		return;
@@ -1052,7 +1052,7 @@ void Exec_Hide_Widget(LCUI_Widget *widget)
 	
 	void ( *func_hide ) (LCUI_Widget*);
 	
-	/* »ñÈ¡Òş²Ø²¿¼şĞèÒªµ÷ÓÃµÄº¯ÊıÖ¸Õë£¬²¢µ÷ÓÃÖ® */
+	/* è·å–éšè—éƒ¨ä»¶éœ€è¦è°ƒç”¨çš„å‡½æ•°æŒ‡é’ˆï¼Œå¹¶è°ƒç”¨ä¹‹ */
 	func_hide = Get_WidgetFunc_By_ID( widget->type_id,
 					FUNC_TYPE_HIDE );
 	func_hide(widget);
@@ -1063,7 +1063,7 @@ void Exec_Hide_Widget(LCUI_Widget *widget)
 
 
 void Exec_Show_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÖ´ĞĞÏÔÊ¾²¿¼şµÄÈÎÎñ */
+/* åŠŸèƒ½ï¼šæ‰§è¡Œæ˜¾ç¤ºéƒ¨ä»¶çš„ä»»åŠ¡ */
 { 
 	void ( *func_show ) (LCUI_Widget*); 
 
@@ -1073,18 +1073,18 @@ void Exec_Show_Widget(LCUI_Widget *widget)
 	if(widget->visible == IS_TRUE)
 		return;
 		
-	//Exec_Update_Widget(widget);/* ÏÔÊ¾Ç°£¬ĞèÒª¶Ô²¿¼şÍ¼ĞÎÊı¾İ½øĞĞÒ»´Î¸üĞÂ */
-	Widget_Visible(widget, IS_TRUE); /* ²¿¼ş¿É¼û */
+	//Exec_Update_Widget(widget);/* æ˜¾ç¤ºå‰ï¼Œéœ€è¦å¯¹éƒ¨ä»¶å›¾å½¢æ•°æ®è¿›è¡Œä¸€æ¬¡æ›´æ–° */
+	Widget_Visible(widget, IS_TRUE); /* éƒ¨ä»¶å¯è§ */
 	
-	/* µ÷ÓÃ¸Ã²¿¼şÔÚÏÔÊ¾Ê±ĞèÒªÓÃµ½µÄº¯Êı */
+	/* è°ƒç”¨è¯¥éƒ¨ä»¶åœ¨æ˜¾ç¤ºæ—¶éœ€è¦ç”¨åˆ°çš„å‡½æ•° */
 	func_show = Get_WidgetFunc_By_ID(widget->type_id, FUNC_TYPE_SHOW); 
 	func_show(widget); 
 	
-	Refresh_Widget(widget); /* Ë¢ĞÂ²¿¼şËùÔÚÇøÓòµÄÍ¼ĞÎÏÔÊ¾ */
+	Refresh_Widget(widget); /* åˆ·æ–°éƒ¨ä»¶æ‰€åœ¨åŒºåŸŸçš„å›¾å½¢æ˜¾ç¤º */
 }
 
 void Auto_Resize_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º×Ô¶¯µ÷Õû²¿¼ş´óĞ¡£¬ÒÔÊÊÓ¦ÆäÄÚÈİ´óĞ¡ */
+/* åŠŸèƒ½ï¼šè‡ªåŠ¨è°ƒæ•´éƒ¨ä»¶å¤§å°ï¼Œä»¥é€‚åº”å…¶å†…å®¹å¤§å° */
 {
 	int i, total, temp;
 	LCUI_Widget *child;
@@ -1096,13 +1096,13 @@ void Auto_Resize_Widget(LCUI_Widget *widget)
 	Queue_Init(&point, sizeof (LCUI_Pos), NULL);
 	total = Queue_Get_Total(&widget->child);
 	for(i=0; i<total; ++i)
-	{/* ±éÀúÃ¿¸ö×Ó²¿¼ş */
+	{/* éå†æ¯ä¸ªå­éƒ¨ä»¶ */
 		child = (LCUI_Widget *)Queue_Get(&widget->child, i);
-		/* ±£´æ¸÷¸ö×Ó²¿¼şÇøÓò¾ØĞÎµÄÓÒÉÏ½Ç¶¥µãÖĞ£¬XÖá×ø±ê×î´óµÄ */
+		/* ä¿å­˜å„ä¸ªå­éƒ¨ä»¶åŒºåŸŸçŸ©å½¢çš„å³ä¸Šè§’é¡¶ç‚¹ä¸­ï¼ŒXè½´åæ ‡æœ€å¤§çš„ */
 		temp = child->pos.x + child->size.w;
 		if(temp > size.w)
 			size.w = temp;
-		/* Í¬ÉÏ */
+		/* åŒä¸Š */
 		temp = child->pos.y + child->size.h;
 		if(temp > size.h)
 			size.h = temp;
@@ -1111,12 +1111,12 @@ void Auto_Resize_Widget(LCUI_Widget *widget)
 	size.h += 6;
 	//printf("Auto_Resize_Widget(): new size: %d,%d\n", size.w, size.h);
 	//print_widget_info(widget);
-	/* µÃ³öÊÊºÏµÄ³ß´ç£¬µ÷ÕûÖ® */
+	/* å¾—å‡ºé€‚åˆçš„å°ºå¯¸ï¼Œè°ƒæ•´ä¹‹ */
 	Resize_Widget(widget, size);
 }
 
 void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
-/* ¹¦ÄÜ£ºÖ´ĞĞ¸Ä±ä²¿¼ş³ß´çµÄ²Ù×÷ */
+/* åŠŸèƒ½ï¼šæ‰§è¡Œæ”¹å˜éƒ¨ä»¶å°ºå¯¸çš„æ“ä½œ */
 {
 	if(widget == NULL) 
 		return;
@@ -1126,7 +1126,7 @@ void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
 	if(widget->size.w == size.w && widget->size.h == size.h) 
 		return;
 	if(IS_TRUE == widget->limit_size)
-	{/* Èç¹ûÖ¸¶¨ÁËÏŞÖÆ²¿¼şµÄ³ß´ç£¬ÄÇÃ´¾Íµ÷Õû³ß´ç */
+	{/* å¦‚æœæŒ‡å®šäº†é™åˆ¶éƒ¨ä»¶çš„å°ºå¯¸ï¼Œé‚£ä¹ˆå°±è°ƒæ•´å°ºå¯¸ */
 		if(size.w > widget->max_size.w)
 			size.w = widget->max_size.w;
 		if(size.h > widget->max_size.h)
@@ -1139,39 +1139,39 @@ void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
 	Add_Widget_Refresh_Area(widget->parent, Get_Widget_Rect(widget));
 	widget->size = size;
 	Malloc_Graph(&widget->graph, size.w, size.h);
-	/* »ñÈ¡¸Ä±ä²¿¼ş³ß´çÊ±ĞèÒªµ÷ÓÃµÄº¯Êı */
+	/* è·å–æ”¹å˜éƒ¨ä»¶å°ºå¯¸æ—¶éœ€è¦è°ƒç”¨çš„å‡½æ•° */
 	func_resize = Get_WidgetFunc_By_ID( widget->type_id, 
 						FUNC_TYPE_RESIZE );
 	func_resize(widget); 
 	Refresh_Widget(widget); 
-	Update_Child_Widget_Pos(widget);/* ¸üĞÂ×Ó²¿¼şµÄÎ»ÖÃ */  
+	Update_Child_Widget_Pos(widget);/* æ›´æ–°å­éƒ¨ä»¶çš„ä½ç½® */  
 	
 	if(widget->parent != NULL
 	&& widget->parent->auto_size == IS_TRUE)
-	/* Èç¹ûĞèÒªÈÃËüµÄÈİÆ÷ÄÜ¹»×Ô¶¯µ÷Õû´óĞ¡ */
+	/* å¦‚æœéœ€è¦è®©å®ƒçš„å®¹å™¨èƒ½å¤Ÿè‡ªåŠ¨è°ƒæ•´å¤§å° */
 		Auto_Resize_Widget(widget->parent); 
 }
 
 void Enable_Widget_Auto_Size(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÆôÓÃ²¿¼ş×Ô¶¯³ß´çµ÷Õû¹¦ÄÜ */
+/* åŠŸèƒ½ï¼šå¯ç”¨éƒ¨ä»¶è‡ªåŠ¨å°ºå¯¸è°ƒæ•´åŠŸèƒ½ */
 {
 	widget->auto_size = IS_TRUE;
 }
 
 void Disable_Widget_Auto_Size(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º½ûÓÃ²¿¼ş×Ô¶¯³ß´çµ÷Õû¹¦ÄÜ */
+/* åŠŸèƒ½ï¼šç¦ç”¨éƒ¨ä»¶è‡ªåŠ¨å°ºå¯¸è°ƒæ•´åŠŸèƒ½ */
 {
 	widget->auto_size = IS_FALSE;
 }
 
 void Exec_Refresh_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÖ´ĞĞË¢ĞÂÏÔÊ¾Ö¸¶¨²¿¼şµÄÕû¸öÇøÓòÍ¼ĞÎµÄ²Ù×÷ */
+/* åŠŸèƒ½ï¼šæ‰§è¡Œåˆ·æ–°æ˜¾ç¤ºæŒ‡å®šéƒ¨ä»¶çš„æ•´ä¸ªåŒºåŸŸå›¾å½¢çš„æ“ä½œ */
 { 
 	Add_Widget_Refresh_Area(widget, Rect(0, 0, widget->size.w, widget->size.h));
 }
 
 void Exec_Draw_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÖ´ĞĞ²¿¼şÍ¼ĞÎ¸üĞÂ²Ù×÷ */
+/* åŠŸèƒ½ï¼šæ‰§è¡Œéƒ¨ä»¶å›¾å½¢æ›´æ–°æ“ä½œ */
 { 
 	if(widget == NULL) 
 		return;
@@ -1179,8 +1179,8 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 	void ( *func_update ) (LCUI_Widget*); 
 	
 	if(Valid_Graph(&widget->background_image))
-	{/* Èç¹ûÓĞ±³¾°Í¼ */
-		/* alphaÍ¨µÀÖĞµÄÃ¿¸öÏñËØµÄÍ¸Ã÷ÖµÎª255£¬Õû¸ö²¿¼şµÄÍ¼ĞÎ²»Í¸Ã÷ */
+	{/* å¦‚æœæœ‰èƒŒæ™¯å›¾ */
+		/* alphaé€šé“ä¸­çš„æ¯ä¸ªåƒç´ çš„é€æ˜å€¼ä¸º255ï¼Œæ•´ä¸ªéƒ¨ä»¶çš„å›¾å½¢ä¸é€æ˜ */
 		Fill_Graph_Alpha(&widget->graph, 255);
 		
 		Fill_Background_Image(
@@ -1188,29 +1188,29 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 				&widget->background_image, 
 				widget->background_image_layout,
 				widget->back_color
-		); /* Ìî³ä±³¾°É« */
+		); /* å¡«å……èƒŒæ™¯è‰² */
 	}
 	else 
-	{/* ·ñÔò¸ù¾İ±³¾°Ä£Ê½À´´¦Àí */
+	{/* å¦åˆ™æ ¹æ®èƒŒæ™¯æ¨¡å¼æ¥å¤„ç† */
 		switch(widget->bg_mode)
 		{
-			case BG_MODE_FILL_BACKCOLOR: /* Ìî³ä±³¾°É« */
+			case BG_MODE_FILL_BACKCOLOR: /* å¡«å……èƒŒæ™¯è‰² */
 				Fill_Graph_Alpha(&widget->graph, 255);
 				Fill_Color(&widget->graph, widget->back_color); 
 				break;
 				
-			case BG_MODE_TRANSPARENT: /* ÍêÈ«Í¸Ã÷ */
+			case BG_MODE_TRANSPARENT: /* å®Œå…¨é€æ˜ */
 				Fill_Graph_Alpha(&widget->graph, 0); 
 				break;
 			default:break;
 		}
 	}
 	
-	/* »ñÈ¡º¯Êı */
+	/* è·å–å‡½æ•° */
 	func_update = Get_WidgetFunc_By_ID( widget->type_id, 
 										FUNC_TYPE_UPDATE );
 	func_update(widget);
-	/* »æÖÆ±ß¿òÏß */
+	/* ç»˜åˆ¶è¾¹æ¡†çº¿ */
 	if(widget->border_style != BORDER_STYLE_NONE)
 		Draw_Graph_Border(	&widget->graph, 
 							widget->border_color, 
@@ -1220,12 +1220,12 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 
 
 LCUI_Pos Widget_Align_Get_Pos(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º¸ù¾İ²¿¼şµÄ²¼¾ÖÀ´»ñÈ¡²¿¼şµÄÎ»ÖÃ */
+/* åŠŸèƒ½ï¼šæ ¹æ®éƒ¨ä»¶çš„å¸ƒå±€æ¥è·å–éƒ¨ä»¶çš„ä½ç½® */
 {
 	int width, height;
 	LCUI_Pos pos;
 	pos.x = pos.y = 0;
-	/* ¸ù¾İÎ»ÖÃÀàĞÍ£¬À´»ñÈ¡ÈİÆ÷µÄ³ß´ç */ 
+	/* æ ¹æ®ä½ç½®ç±»å‹ï¼Œæ¥è·å–å®¹å™¨çš„å°ºå¯¸ */ 
 	switch(widget->pos_type)
 	{
 		case POS_TYPE_IN_SCREEN :
@@ -1243,39 +1243,39 @@ LCUI_Pos Widget_Align_Get_Pos(LCUI_Widget *widget)
 	{
 		switch(widget->align)
 		{
-			case ALIGN_TOP_LEFT : /* Ïò×óÉÏ½Ç¶ÔÆë */  
+			case ALIGN_TOP_LEFT : /* å‘å·¦ä¸Šè§’å¯¹é½ */  
 				break;
-			case ALIGN_TOP_CENTER : /* ÏòÉÏÖĞ¼ä¶ÔÆë */ 
+			case ALIGN_TOP_CENTER : /* å‘ä¸Šä¸­é—´å¯¹é½ */ 
 				pos.x = (width - widget->size.w) / 2; 
 				break;
-			case ALIGN_TOP_RIGHT : /* ÏòÓÒÉÏ½Ç¶ÔÆë */ 
+			case ALIGN_TOP_RIGHT : /* å‘å³ä¸Šè§’å¯¹é½ */ 
 				pos.x = width - widget->size.w; 
 				break;
-			case ALIGN_MIDDLE_LEFT : /* ÏòÖĞÑëÆ«×ó¶ÔÆë */  
+			case ALIGN_MIDDLE_LEFT : /* å‘ä¸­å¤®åå·¦å¯¹é½ */  
 				pos.y = (height - widget->size.h) / 2;
 				break;
-			case ALIGN_MIDDLE_CENTER : /* ÏòÕıÖĞÑë¶ÔÆë */ 
+			case ALIGN_MIDDLE_CENTER : /* å‘æ­£ä¸­å¤®å¯¹é½ */ 
 				pos.x = (width - widget->size.w) / 2;
 				pos.y = (height - widget->size.h) / 2;
 				break;
-			case ALIGN_MIDDLE_RIGHT : /* ÏòÖĞÑëÆ«ÓÉ¶ÔÆë */ 
+			case ALIGN_MIDDLE_RIGHT : /* å‘ä¸­å¤®åç”±å¯¹é½ */ 
 				pos.x = width - widget->size.w;
 				pos.y = (height - widget->size.h) / 2;
 				break;
-			case ALIGN_BOTTOM_LEFT : /* Ïòµ×²¿Æ«×ó¶ÔÆë */  
+			case ALIGN_BOTTOM_LEFT : /* å‘åº•éƒ¨åå·¦å¯¹é½ */  
 				pos.y = height - widget->size.h;
 				break;
-			case ALIGN_BOTTOM_CENTER : /* Ïòµ×²¿¾ÓÖĞ¶ÔÆë */ 
+			case ALIGN_BOTTOM_CENTER : /* å‘åº•éƒ¨å±…ä¸­å¯¹é½ */ 
 				pos.x = (width - widget->size.w) / 2;
 				pos.y = height - widget->size.h;
 				break;
-			case ALIGN_BOTTOM_RIGHT : /* Ïòµ×²¿Æ«ÓÒ¶ÔÆë */ 
+			case ALIGN_BOTTOM_RIGHT : /* å‘åº•éƒ¨åå³å¯¹é½ */ 
 				pos.x = width - widget->size.w;
 				pos.y = height - widget->size.h;
 				break; 
 			default :  break; 
 		}
-		/* ¼ÓÉÏÆ«ÒÆ¾àÀë */
+		/* åŠ ä¸Šåç§»è·ç¦» */
 		pos.x = pos.x + widget->offset.x;
 		pos.y = pos.y + widget->offset.y; 
 		return pos;
@@ -1284,32 +1284,32 @@ LCUI_Pos Widget_Align_Get_Pos(LCUI_Widget *widget)
 	return widget->pos;
 }
 
-/* ÉùÃ÷º¯Êı */
+/* å£°æ˜å‡½æ•° */
 static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, int type);
 
 void Move_Widget(LCUI_Widget *widget, LCUI_Pos new_pos)
 /* 
- * ¹¦ÄÜ£ºÒÆ¶¯²¿¼şÎ»ÖÃ
- * ËµÃ÷£ºÈç¹û²¿¼şµÄ²¼¾ÖÎªALIGN_NONE£¬ÄÇÃ´£¬¾Í¿ÉÒÔÒÆ¶¯ËüµÄÎ»ÖÃ£¬·ñÔò£¬ÎŞ·¨ÒÆ¶¯Î»ÖÃ
+ * åŠŸèƒ½ï¼šç§»åŠ¨éƒ¨ä»¶ä½ç½®
+ * è¯´æ˜ï¼šå¦‚æœéƒ¨ä»¶çš„å¸ƒå±€ä¸ºALIGN_NONEï¼Œé‚£ä¹ˆï¼Œå°±å¯ä»¥ç§»åŠ¨å®ƒçš„ä½ç½®ï¼Œå¦åˆ™ï¼Œæ— æ³•ç§»åŠ¨ä½ç½®
  * */
 {
 	if(widget == NULL) 
 		return;
-	/* ¼ÇÂ¼²¿¼şµÄ¸üĞÂÊı¾İ£¬µÈ´ı½øĞĞ¸üĞÂ */
+	/* è®°å½•éƒ¨ä»¶çš„æ›´æ–°æ•°æ®ï¼Œç­‰å¾…è¿›è¡Œæ›´æ–° */
 	Record_WidgetUpdate(widget, &new_pos, DATATYPE_POS);
 }
 
 void Update_Widget_Pos(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º¸üĞÂ²¿¼şµÄÎ»ÖÃ */
+/* åŠŸèƒ½ï¼šæ›´æ–°éƒ¨ä»¶çš„ä½ç½® */
 { 
 	Record_WidgetUpdate(widget, NULL, DATATYPE_POS);
 }
 
 void Update_Child_Widget_Pos(LCUI_Widget *widget)
 /* 
- * ¹¦ÄÜ£º¸üĞÂÖ¸¶¨²¿¼şµÄ×Ó²¿¼şµÄÎ»ÖÃ
- * ËµÃ÷£ºµ±×÷Îª×Ó²¿¼şµÄÈİÆ÷²¿¼şµÄ³ß´ç¸Ä±äºó£¬ÓĞµÄ²¿¼şµÄ²¼¾Ö²»ÎªALIGN_NONE£¬¾ÍĞèÒªÖØĞÂ
- * µ÷ÕûÎ»ÖÃ¡£
+ * åŠŸèƒ½ï¼šæ›´æ–°æŒ‡å®šéƒ¨ä»¶çš„å­éƒ¨ä»¶çš„ä½ç½®
+ * è¯´æ˜ï¼šå½“ä½œä¸ºå­éƒ¨ä»¶çš„å®¹å™¨éƒ¨ä»¶çš„å°ºå¯¸æ”¹å˜åï¼Œæœ‰çš„éƒ¨ä»¶çš„å¸ƒå±€ä¸ä¸ºALIGN_NONEï¼Œå°±éœ€è¦é‡æ–°
+ * è°ƒæ•´ä½ç½®ã€‚
  * */
 {
 	LCUI_Widget *child;
@@ -1323,15 +1323,15 @@ void Update_Child_Widget_Pos(LCUI_Widget *widget)
 }
 
 void Offset_Widget_Pos(LCUI_Widget *widget, LCUI_Pos offset)
-/* ¹¦ÄÜ£ºÒÔ²¿¼şÔ­ÓĞµÄÎ»ÖÃÎª»ù´¡£¬¸ù¾İÖ¸¶¨µÄÆ«ÒÆ×ø±êÆ«ÒÆÎ»ÖÃ */
+/* åŠŸèƒ½ï¼šä»¥éƒ¨ä»¶åŸæœ‰çš„ä½ç½®ä¸ºåŸºç¡€ï¼Œæ ¹æ®æŒ‡å®šçš„åç§»åæ ‡åç§»ä½ç½® */
 {
 	Move_Widget( widget, Pos_Add(widget->pos, offset) ); 
 }
 
 void Move_Widget_To_Pos(LCUI_Widget *widget, LCUI_Pos des_pos, int speed)
 /* 
- * ¹¦ÄÜ£º½«²¿¼şÒÔÖ¸¶¨µÄËÙ¶ÈÏòÖ¸¶¨Î»ÖÃÒÆ¶¯ 
- * ËµÃ÷£ºdes_posÊÇÄ¿±êÎ»ÖÃ£¬speedÊÇ¸Ã²¿¼şµÄÒÆ¶¯ËÙ¶È£¬µ¥Î»Îª£ºÏñËØ/Ãë
+ * åŠŸèƒ½ï¼šå°†éƒ¨ä»¶ä»¥æŒ‡å®šçš„é€Ÿåº¦å‘æŒ‡å®šä½ç½®ç§»åŠ¨ 
+ * è¯´æ˜ï¼šdes_posæ˜¯ç›®æ ‡ä½ç½®ï¼Œspeedæ˜¯è¯¥éƒ¨ä»¶çš„ç§»åŠ¨é€Ÿåº¦ï¼Œå•ä½ä¸ºï¼šåƒç´ /ç§’
  * */
 {
 	if(speed <= 0) return;
@@ -1340,14 +1340,14 @@ void Move_Widget_To_Pos(LCUI_Widget *widget, LCUI_Pos des_pos, int speed)
 	double w, h, l, n, x, y; 
 	x = Get_Widget_Pos(widget).x;
 	y = Get_Widget_Pos(widget).y;
-	/* ÇóÁ½µãÖ®¼äµÄ¾àÀë */
+	/* æ±‚ä¸¤ç‚¹ä¹‹é—´çš„è·ç¦» */
 	w = des_pos.x-x;
 	h = des_pos.y-y;
 	l = sqrt(pow(w, 2) + pow(h, 2));
 	
-	n = l/speed;/* ÇóÒÆ¶¯ËùĞèÊ±¼ä */
-	n = n*100;	/* ÇóÒÆ¶¯´ÎÊı£¬³ËÒÔ100£¬ÊÇÒòÎªÃ¿¸ô0.01ÒÆ¶¯Ò»´ÎÎ»ÖÃ */
-	w = w/n;	/* ¼ÆËãÃ¿´ÎÒÆ¶¯µÄxºÍyÖá×ø±êµÄÒÆ¶¯¾àÀë */
+	n = l/speed;/* æ±‚ç§»åŠ¨æ‰€éœ€æ—¶é—´ */
+	n = n*100;	/* æ±‚ç§»åŠ¨æ¬¡æ•°ï¼Œä¹˜ä»¥100ï¼Œæ˜¯å› ä¸ºæ¯éš”0.01ç§»åŠ¨ä¸€æ¬¡ä½ç½® */
+	w = w/n;	/* è®¡ç®—æ¯æ¬¡ç§»åŠ¨çš„xå’Œyè½´åæ ‡çš„ç§»åŠ¨è·ç¦» */
 	h = h/n;
 	j = (int)(n>(int)n?n+1:n);
 	for(i=0; i<j; i++)
@@ -1355,18 +1355,18 @@ void Move_Widget_To_Pos(LCUI_Widget *widget, LCUI_Pos des_pos, int speed)
 		x += w;
 		y += h;
 		Move_Widget(widget, Pos(x, y));
-		usleep(10000);/* Í£¶Ù0.01Ãë */
+		usleep(10000);/* åœé¡¿0.01ç§’ */
 	}
 }
 
 void Refresh_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºË¢ĞÂÏÔÊ¾Ö¸¶¨²¿¼şµÄÕû¸öÇøÓòÍ¼ĞÎ */
+/* åŠŸèƒ½ï¼šåˆ·æ–°æ˜¾ç¤ºæŒ‡å®šéƒ¨ä»¶çš„æ•´ä¸ªåŒºåŸŸå›¾å½¢ */
 {
 	Record_WidgetUpdate(widget, NULL, DATATYPE_AREA);
 }
 
 void Resize_Widget(LCUI_Widget *widget, LCUI_Size new_size)
-/* ¹¦ÄÜ£º¸Ä±ä²¿¼şµÄ³ß´ç */
+/* åŠŸèƒ½ï¼šæ”¹å˜éƒ¨ä»¶çš„å°ºå¯¸ */
 {
 	if(widget == NULL) 
 		return; 
@@ -1375,7 +1375,7 @@ void Resize_Widget(LCUI_Widget *widget, LCUI_Size new_size)
 }
 
 void Draw_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÖØĞÂ»æÖÆ²¿¼ş */
+/* åŠŸèƒ½ï¼šé‡æ–°ç»˜åˆ¶éƒ¨ä»¶ */
 {
 	if(widget == NULL) 
 		return; 
@@ -1385,31 +1385,31 @@ void Draw_Widget(LCUI_Widget *widget)
 
 
 void Front_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º½«Ö¸¶¨²¿¼şµÄÏÔÊ¾Î»ÖÃÒÆ¶¯µ½×îÇ°¶Ë */
+/* åŠŸèƒ½ï¼šå°†æŒ‡å®šéƒ¨ä»¶çš„æ˜¾ç¤ºä½ç½®ç§»åŠ¨åˆ°æœ€å‰ç«¯ */
 {
 	LCUI_Queue *queue;
-	/* »ñÈ¡Ö¸Ïò¶ÓÁĞµÄÖ¸Õë */
+	/* è·å–æŒ‡å‘é˜Ÿåˆ—çš„æŒ‡é’ˆ */
 	if(widget->parent == NULL)  
 		queue = &LCUI_Sys.widget_list;
 	else 
 		queue = &widget->parent->child;
 	
-	/* ½«¸Ã²¿¼şÒÆ¶¯ÖÁ¶ÓÁĞÇ°¶Ë */
+	/* å°†è¯¥éƒ¨ä»¶ç§»åŠ¨è‡³é˜Ÿåˆ—å‰ç«¯ */
 	WidgetQueue_Move(queue, 0, widget);
 } 
 
 void Show_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÏÔÊ¾²¿¼ş */
+/* åŠŸèƒ½ï¼šæ˜¾ç¤ºéƒ¨ä»¶ */
 {
 	if(widget == NULL) 
 		return;  
 		
-	Front_Widget(widget);/* ¸Ä±ä²¿¼şµÄÅÅÁĞÎ»ÖÃ */
+	Front_Widget(widget);/* æ”¹å˜éƒ¨ä»¶çš„æ’åˆ—ä½ç½® */
 	Record_WidgetUpdate(widget, NULL, DATATYPE_SHOW);
 }
 
 void Hide_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÒş²Ø²¿¼ş */
+/* åŠŸèƒ½ï¼šéšè—éƒ¨ä»¶ */
 {
 	if(widget == NULL) 
 		return; 
@@ -1418,7 +1418,7 @@ void Hide_Widget(LCUI_Widget *widget)
 }
 
 void Set_Widget_Status(LCUI_Widget *widget, int status)
-/* ¹¦ÄÜ£ºÉè¶¨²¿¼şµÄ×´Ì¬ */
+/* åŠŸèƒ½ï¼šè®¾å®šéƒ¨ä»¶çš„çŠ¶æ€ */
 {
 	if(widget == NULL) 
 		return; 
@@ -1431,13 +1431,13 @@ void Set_Widget_Status(LCUI_Widget *widget, int status)
 /**************************** Widget Update ***************************/
 typedef struct _WidgetData
 {
-	void	*data;	/* ĞèÒª¸üĞÂµÄÊı¾İ */
-	int		type;	/* Õâ¸öÊı¾İµÄÀàĞÍ */
+	void	*data;	/* éœ€è¦æ›´æ–°çš„æ•°æ® */
+	int		type;	/* è¿™ä¸ªæ•°æ®çš„ç±»å‹ */
 }
 WidgetData;
 
 static void Destroy_WidgetData(void *arg)
-/* ¹¦ÄÜ£ºÊÍ·ÅWidgetData½á¹¹ÌåÖĞµÄÖ¸Õë */
+/* åŠŸèƒ½ï¼šé‡Šæ”¾WidgetDataç»“æ„ä½“ä¸­çš„æŒ‡é’ˆ */
 {
 	WidgetData *wdata = (WidgetData*)arg;
 	if(NULL == wdata) return;
@@ -1446,17 +1446,17 @@ static void Destroy_WidgetData(void *arg)
 }
 
 static void WidgetData_Init(LCUI_Queue *queue)
-/* ¹¦ÄÜ£º³õÊ¼»¯¼ÇÂ¼²¿¼şÊı¾İ¸üĞÂµÄ¶ÓÁĞ */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–è®°å½•éƒ¨ä»¶æ•°æ®æ›´æ–°çš„é˜Ÿåˆ— */
 {
 	Queue_Init(queue, sizeof(WidgetData), Destroy_WidgetData);
 }
 
 static int Find_WidgetData(LCUI_Widget *widget, const WidgetData *data)
-/* ¹¦ÄÜ£º²éÑ¯Ö¸¶¨Êı¾İÀàĞÍÊÇ·ñÔÚ¶ÓÁĞÖĞ */
+/* åŠŸèƒ½ï¼šæŸ¥è¯¢æŒ‡å®šæ•°æ®ç±»å‹æ˜¯å¦åœ¨é˜Ÿåˆ—ä¸­ */
 {
 	WidgetData *temp;
 	int i, total;
-	total = Queue_Get_Total(&widget->data);	/* »ñÈ¡³ÉÔ±×ÜÊı */
+	total = Queue_Get_Total(&widget->data);	/* è·å–æˆå‘˜æ€»æ•° */
 	for(i=0; i<total; ++i)
 	{
 		temp = (WidgetData*)Queue_Get(&widget->data, i);
@@ -1470,39 +1470,39 @@ static int Find_WidgetData(LCUI_Widget *widget, const WidgetData *data)
 
 static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, int type)
 /* 
- * ¹¦ÄÜ£º¼ÇÂ¼ĞèÒª½øĞĞÊı¾İ¸üĞÂµÄ²¿¼ş
- * ËµÃ÷£º½«²¿¼şÖ¸ÕëÒÔ¼°Ğè¸üĞÂµÄÊı¾İÌí¼ÓÖÁ¶ÓÁĞ£¬¸ù¾İ²¿¼şµÄÏÔÊ¾Ë³ĞòÀ´ÅÅÁĞ¶ÓÁĞ
- * ·µ»ØÖµ£º³öÏÖÎÊÌâÔò·µ»Ø-1£¬Õı³£·µ»Ø²»Ğ¡ÓÚ0µÄÖµ
+ * åŠŸèƒ½ï¼šè®°å½•éœ€è¦è¿›è¡Œæ•°æ®æ›´æ–°çš„éƒ¨ä»¶
+ * è¯´æ˜ï¼šå°†éƒ¨ä»¶æŒ‡é’ˆä»¥åŠéœ€æ›´æ–°çš„æ•°æ®æ·»åŠ è‡³é˜Ÿåˆ—ï¼Œæ ¹æ®éƒ¨ä»¶çš„æ˜¾ç¤ºé¡ºåºæ¥æ’åˆ—é˜Ÿåˆ—
+ * è¿”å›å€¼ï¼šå‡ºç°é—®é¢˜åˆ™è¿”å›-1ï¼Œæ­£å¸¸è¿”å›ä¸å°äº0çš„å€¼
  *  */
 { 
 	int pos, result = 0;
 	size_t size = 0;
 	WidgetData temp;
-	/* ¸ù¾İÀàĞÍ£¬À´µÃÖªÕ¼ÓÃ¿Õ¼ä´óĞ¡ */
+	/* æ ¹æ®ç±»å‹ï¼Œæ¥å¾—çŸ¥å ç”¨ç©ºé—´å¤§å° */
 	switch(type)
 	{
-		case DATATYPE_POS	:	size = sizeof(LCUI_Pos);break;	/* Î»ÖÃ */
-		case DATATYPE_SIZE	:	size = sizeof(LCUI_Size);break;	/* ³ß´ç */
-		case DATATYPE_GRAPH	:	size = sizeof(LCUI_Graph);break;/* Í¼ĞÎ */
-		case DATATYPE_STATUS:	size = sizeof(int);break; /* ×´Ì¬ */
+		case DATATYPE_POS	:	size = sizeof(LCUI_Pos);break;	/* ä½ç½® */
+		case DATATYPE_SIZE	:	size = sizeof(LCUI_Size);break;	/* å°ºå¯¸ */
+		case DATATYPE_GRAPH	:	size = sizeof(LCUI_Graph);break;/* å›¾å½¢ */
+		case DATATYPE_STATUS:	size = sizeof(int);break; /* çŠ¶æ€ */
 		case DATATYPE_AREA:
 		case DATATYPE_HIDE:
 		case DATATYPE_SHOW:		break;
 		default:				return -1;
 	}
 	
-	temp.type = type;			/* ±£´æÀàĞÍ */
+	temp.type = type;			/* ä¿å­˜ç±»å‹ */
 	if(data != NULL)
 	{
-		temp.data = malloc(size);	/* ·ÖÅäÄÚ´æ */
-		memcpy(temp.data, data, size);	/* ¿½±´Êı¾İ */ 
+		temp.data = malloc(size);	/* åˆ†é…å†…å­˜ */
+		memcpy(temp.data, data, size);	/* æ‹·è´æ•°æ® */ 
 	}
 	else temp.data = NULL;
 	  
 	pos = Find_WidgetData(widget, &temp);
-	if(pos >= 0)	/* Èç¹ûÒÑ¾­´æÔÚ£¬¾Í¸²¸Ç */ 
+	if(pos >= 0)	/* å¦‚æœå·²ç»å­˜åœ¨ï¼Œå°±è¦†ç›– */ 
 		result = Queue_Replace(&widget->data, pos, &temp); 
-	else	/* ·ñÔò£¬×·¼ÓÖÁ¶ÓÁĞÄ©Î² */
+	else	/* å¦åˆ™ï¼Œè¿½åŠ è‡³é˜Ÿåˆ—æœ«å°¾ */
 		result = Queue_Add(&widget->data, &temp);
 		
 	return result;
@@ -1510,29 +1510,29 @@ static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, int type)
 
 
 int Processing_WidgetUpdate(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º´¦Àí²¿¼şµÄ¸üĞÂ */
+/* åŠŸèƒ½ï¼šå¤„ç†éƒ¨ä»¶çš„æ›´æ–° */
 {
 	LCUI_Widget *child;
 	WidgetData *temp;
 	LCUI_Pos pos;
 	int i, total;
-	/* ´¦Àí²¿¼şÖĞĞèÒª¸üĞÂµÄÊı¾İ */
+	/* å¤„ç†éƒ¨ä»¶ä¸­éœ€è¦æ›´æ–°çš„æ•°æ® */
 	//printf("Processing_WidgetUpdate(): enter\n");
-	Queue_Lock(&widget->data);/* Ëø¶¨¶ÓÁĞ£¬ÆäËüÏß³ÌÔİÊ±²»ÄÜ·ÃÎÊ */
+	Queue_Lock(&widget->data);/* é”å®šé˜Ÿåˆ—ï¼Œå…¶å®ƒçº¿ç¨‹æš‚æ—¶ä¸èƒ½è®¿é—® */
 	while( ! Queue_Empty(&widget->data) )
 	{
 		temp = (WidgetData *)Queue_Get(&widget->data, 0);
-		/* ¸ù¾İ²»Í¬µÄÀàĞÍÀ´½øĞĞ´¦Àí */
+		/* æ ¹æ®ä¸åŒçš„ç±»å‹æ¥è¿›è¡Œå¤„ç† */
 		switch(temp->type)
 		{
-			case DATATYPE_SIZE	: /* ²¿¼ş³ß´ç¸üĞÂ£¬½«¸üĞÂ²¿¼şµÄÎ»ÖÃ */ 
+			case DATATYPE_SIZE	: /* éƒ¨ä»¶å°ºå¯¸æ›´æ–°ï¼Œå°†æ›´æ–°éƒ¨ä»¶çš„ä½ç½® */ 
 				Exec_Resize_Widget(widget, *((LCUI_Size*)temp->data));
 				Exec_Draw_Widget(widget);
-				/* ĞèÒª¸üĞÂÎ»ÖÃ£¬ËùÒÔ²»ÓÃbreak */ 
+				/* éœ€è¦æ›´æ–°ä½ç½®ï¼Œæ‰€ä»¥ä¸ç”¨break */ 
 			case DATATYPE_POS	:
 				/*
-				 * ÓÉÓÚ¸üĞÂÎ»ÖÃ¿ÉÄÜ»áÊÇ¸üĞÂ²¿¼ş³ß´çµÄ¸½¼Ó²Ù×÷£¬ĞèÒªÅĞ¶ÏÒ»ÏÂ¸üĞÂÀàĞÍ
-				 * ÊÇ·ñÎªDATATYPE_POS 
+				 * ç”±äºæ›´æ–°ä½ç½®å¯èƒ½ä¼šæ˜¯æ›´æ–°éƒ¨ä»¶å°ºå¯¸çš„é™„åŠ æ“ä½œï¼Œéœ€è¦åˆ¤æ–­ä¸€ä¸‹æ›´æ–°ç±»å‹
+				 * æ˜¯å¦ä¸ºDATATYPE_POS 
 				 * */
 				if( temp->type == DATATYPE_POS 
 				 && widget->align == ALIGN_NONE 
@@ -1545,7 +1545,7 @@ int Processing_WidgetUpdate(LCUI_Widget *widget)
 				break;
 			case DATATYPE_STATUS:
 				widget->status = *(int*)temp->data;
-				/* ¸Ä±ä²¿¼ş×´Ì¬ºóĞèÒª½øĞĞÖØ»æ£¬ËùÒÔ²»ÓÃbreak */
+				/* æ”¹å˜éƒ¨ä»¶çŠ¶æ€åéœ€è¦è¿›è¡Œé‡ç»˜ï¼Œæ‰€ä»¥ä¸ç”¨break */
 			case DATATYPE_GRAPH	:
 				Exec_Draw_Widget(widget); 
 				break;
@@ -1560,26 +1560,26 @@ int Processing_WidgetUpdate(LCUI_Widget *widget)
 				break;
 			default: break;
 		} 
-		Queue_Delete(&widget->data, 0);/* ÒÆ³ı¸Ã³ÉÔ± */
+		Queue_Delete(&widget->data, 0);/* ç§»é™¤è¯¥æˆå‘˜ */
 	}
 	Queue_UnLock(&widget->data);
 	total = Queue_Get_Total(&widget->child);  
 	for(i=total-1; i>=0; --i)
 	{
-		/* ´ÓÎ²µ½Ê×»ñÈ¡²¿¼şÖ¸Õë */
+		/* ä»å°¾åˆ°é¦–è·å–éƒ¨ä»¶æŒ‡é’ˆ */
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);  
 		if(child != NULL)
-		{/* µİ¹éµ÷ÓÃ */
+		{/* é€’å½’è°ƒç”¨ */
 			Processing_WidgetUpdate( child );
 		}
 	}
 	//printf("Processing_WidgetUpdate(): quit\n");
-	/* ½âËø */
+	/* è§£é” */
 	return 0;
 }
 
 void Processing_All_WidgetUpdate()
-/* ¹¦ÄÜ£º´¦ÀíËùÓĞ²¿¼şµÄ¸üĞÂ */
+/* åŠŸèƒ½ï¼šå¤„ç†æ‰€æœ‰éƒ¨ä»¶çš„æ›´æ–° */
 {
 	LCUI_Widget *child;
 	int i, total;
@@ -1587,11 +1587,11 @@ void Processing_All_WidgetUpdate()
 	//printf("Processing_All_WidgetUpdate():start\n");
 	for(i=total-1; i>=0; --i)
 	{
-		/* ´ÓÎ²µ½Ê×»ñÈ¡²¿¼şÖ¸Õë */
+		/* ä»å°¾åˆ°é¦–è·å–éƒ¨ä»¶æŒ‡é’ˆ */
 		child = (LCUI_Widget*)Queue_Get(&LCUI_Sys.widget_list, i); 
 		//printf("child: ");print_widget_info(child);
 		if(child != NULL)
-		{/* µİ¹éµ÷ÓÃ */ 
+		{/* é€’å½’è°ƒç”¨ */ 
 			Processing_WidgetUpdate( child );
 		}
 	}
@@ -1606,9 +1606,9 @@ void Processing_All_WidgetUpdate()
 
 typedef struct _WidgetTypeData
 { 
-	LCUI_String		type;		/* ²¿¼şÀàĞÍ£¬ÓÃ×Ö·û´®ÃèÊö */
-	LCUI_ID			type_id;	/* ÀàĞÍID */
-	LCUI_FuncQueue	func;		/* ²¿¼şÏà¹ØµÄº¯Êı */
+	LCUI_String		type;		/* éƒ¨ä»¶ç±»å‹ï¼Œç”¨å­—ç¬¦ä¸²æè¿° */
+	LCUI_ID			type_id;	/* ç±»å‹ID */
+	LCUI_FuncQueue	func;		/* éƒ¨ä»¶ç›¸å…³çš„å‡½æ•° */
 }WidgetTypeData;
 
 int WidgetFunc_Add(
@@ -1617,8 +1617,8 @@ int WidgetFunc_Add(
 			FuncType func_type
 		)
 /*
- * ¹¦ÄÜ£ºÎªÖ¸¶¨ÀàĞÍµÄ²¿¼şÌí¼ÓÏà¹ØÀàĞÍµÄº¯Êı
- * ·µ»ØÖµ£º²¿¼şÀàĞÍ²»´æÔÚ£¬·µ»Ø-1£¬ÆäËü´íÎó·µ»Ø-2
+ * åŠŸèƒ½ï¼šä¸ºæŒ‡å®šç±»å‹çš„éƒ¨ä»¶æ·»åŠ ç›¸å…³ç±»å‹çš„å‡½æ•°
+ * è¿”å›å€¼ï¼šéƒ¨ä»¶ç±»å‹ä¸å­˜åœ¨ï¼Œè¿”å›-1ï¼Œå…¶å®ƒé”™è¯¯è¿”å›-2
  **/
 {
 	WidgetTypeData *temp;
@@ -1635,7 +1635,7 @@ int WidgetFunc_Add(
 	//printf("WidgetFunc_Add(): widget type: %s, func type: %d\n", type, func_type); 
 	
 	total = Queue_Get_Total(&app->widget_lib); 
-		/* ±éÀúÊı¾İ£¬ÕÒµ½¶ÔÓ¦µÄÎ»ÖÃ */
+		/* éå†æ•°æ®ï¼Œæ‰¾åˆ°å¯¹åº”çš„ä½ç½® */
 	for(i = 0; i < total; ++i)
 	{
 		temp = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
@@ -1653,9 +1653,9 @@ int WidgetFunc_Add(
 			}
 			
 			Get_FuncData(&func_data, widget_func, NULL, NULL);
-			func_data.id = func_type; /* ±£´æÀàĞÍID */
+			func_data.id = func_type; /* ä¿å­˜ç±»å‹ID */
 			if(found == 1) 
-			{/* Èç¹ûÒÑ¾­´æÔÚ£¬¾Í¸²¸Ç */
+			{/* å¦‚æœå·²ç»å­˜åœ¨ï¼Œå°±è¦†ç›– */
 				//printf("WidgetFunc_Add(): the function is already registered. repalce\n");
 				Queue_Replace(&temp->func, i, &func_data); 
 			}
@@ -1670,8 +1670,8 @@ int WidgetFunc_Add(
 
 int WidgetType_Add(char *type)
 /*
- * ¹¦ÄÜ£ºÌí¼ÓÒ»¸öĞÂµÄ²¿¼şÀàĞÍÖÁ²¿¼ş¿â
- * ·µ»ØÖµ£ºÈç¹ûÌí¼ÓµÄĞÂ²¿¼şÀàĞÍÒÑ´æÔÚ£¬·µ»Ø-1£¬³É¹¦Ôò·µ»Ø0
+ * åŠŸèƒ½ï¼šæ·»åŠ ä¸€ä¸ªæ–°çš„éƒ¨ä»¶ç±»å‹è‡³éƒ¨ä»¶åº“
+ * è¿”å›å€¼ï¼šå¦‚æœæ·»åŠ çš„æ–°éƒ¨ä»¶ç±»å‹å·²å­˜åœ¨ï¼Œè¿”å›-1ï¼ŒæˆåŠŸåˆ™è¿”å›0
  **/
 {
 	WidgetTypeData *wd, new_wd;
@@ -1689,38 +1689,38 @@ int WidgetType_Add(char *type)
 	{
 		wd = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
 		if(Strcmp(&wd->type, type) == 0)
-		{ /* Èç¹ûÀàĞÍÒ»ÖÂ */
+		{ /* å¦‚æœç±»å‹ä¸€è‡´ */
 			//printf("WidgetType_Add(): the widget type is already registered\n");
 			return -1;
 		}
 	} 
 	
-	/* ÒÔÏÂĞèÒª³õÊ¼»¯ */
+	/* ä»¥ä¸‹éœ€è¦åˆå§‹åŒ– */
 	FuncQueue_Init(&new_wd.func);
-	new_wd.type_id = rand()%100000; /* ÓÃËæ»úÊı×÷ÎªÀàĞÍID */
+	new_wd.type_id = rand()%100000; /* ç”¨éšæœºæ•°ä½œä¸ºç±»å‹ID */
 	//printf("WidgetType_Add(): widget type id: %ld\n", new_wd.type_id); 
 	String_Init(&new_wd.type);
-	Strcpy(&new_wd.type, type);/* ±£´æ²¿¼şÀàĞÍ */
-	Queue_Add(&app->widget_lib, &new_wd);/* Ìí¼ÓÖÁ¶ÓÁĞ */
+	Strcpy(&new_wd.type, type);/* ä¿å­˜éƒ¨ä»¶ç±»å‹ */
+	Queue_Add(&app->widget_lib, &new_wd);/* æ·»åŠ è‡³é˜Ÿåˆ— */
 	return 0;
 }
 
 static void Destroy_WidgetType(void *arg)
-/* ¹¦ÄÜ£ºÒÆ³ı²¿¼şÀàĞÍÊı¾İ */
+/* åŠŸèƒ½ï¼šç§»é™¤éƒ¨ä»¶ç±»å‹æ•°æ® */
 {
 	WidgetTypeData *wd = (WidgetTypeData*)arg;
 	Destroy_Queue(&wd->func);
 }
 
 void WidgetLib_Init(LCUI_Queue *w_lib)
-/* ¹¦ÄÜ£º³õÊ¼»¯²¿¼ş¿â */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–éƒ¨ä»¶åº“ */
 {
 	Queue_Init(w_lib, sizeof(WidgetTypeData), Destroy_WidgetType);
 }
 
 int WidgetType_Delete(char *type)
 /*
- * ¹¦ÄÜ£ºÉ¾³ıÖ¸¶¨²¿¼şÀàĞÍµÄÏà¹ØÊı¾İ
+ * åŠŸèƒ½ï¼šåˆ é™¤æŒ‡å®šéƒ¨ä»¶ç±»å‹çš„ç›¸å…³æ•°æ®
  **/
 {
 	WidgetTypeData *wd;
@@ -1735,7 +1735,7 @@ int WidgetType_Delete(char *type)
 	for(i = 0; i < total; ++i)
 	{
 		wd = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
-		if(Strcmp(&wd->type, type) == 0) /* Èç¹ûÀàĞÍÒ»ÖÂ */
+		if(Strcmp(&wd->type, type) == 0) /* å¦‚æœç±»å‹ä¸€è‡´ */
 			return Queue_Delete(&app->widget_lib, i);
 	} 
 	
@@ -1744,8 +1744,8 @@ int WidgetType_Delete(char *type)
 
 void NULL_Widget_Func(LCUI_Widget *widget)
 /*
- * ¹¦ÄÜ£º¿Õº¯Êı£¬²»×öÈÎºÎ²Ù×÷
- * ËµÃ÷£ºÈç¹û»ñÈ¡Ö¸¶¨²¿¼şÀàĞÍµÄº¯ÊıÖ¸ÕëÊ§°Ü£¬½«·µ»ØÕâ¸öº¯ÊıµÄº¯ÊıÖ¸Õë
+ * åŠŸèƒ½ï¼šç©ºå‡½æ•°ï¼Œä¸åšä»»ä½•æ“ä½œ
+ * è¯´æ˜ï¼šå¦‚æœè·å–æŒ‡å®šéƒ¨ä»¶ç±»å‹çš„å‡½æ•°æŒ‡é’ˆå¤±è´¥ï¼Œå°†è¿”å›è¿™ä¸ªå‡½æ•°çš„å‡½æ•°æŒ‡é’ˆ
  **/
 {
 	
@@ -1753,7 +1753,7 @@ void NULL_Widget_Func(LCUI_Widget *widget)
 
 LCUI_ID WidgetType_Get_ID(char *widget_type)
 /*
- * ¹¦ÄÜ£º»ñÈ¡Ö¸¶¨ÀàĞÍ²¿¼şµÄÀàĞÍID
+ * åŠŸèƒ½ï¼šè·å–æŒ‡å®šç±»å‹éƒ¨ä»¶çš„ç±»å‹ID
  **/
 { 
 	WidgetTypeData *wd;
@@ -1767,7 +1767,7 @@ LCUI_ID WidgetType_Get_ID(char *widget_type)
 	{
 		wd = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
 		if(Strcmp(&wd->type, widget_type) == 0)
-		{ /* Èç¹ûÀàĞÍÒ»ÖÂ */
+		{ /* å¦‚æœç±»å‹ä¸€è‡´ */
 			return wd->type_id;
 		}
 	}
@@ -1779,7 +1779,7 @@ LCUI_ID WidgetType_Get_ID(char *widget_type)
 
 int Get_Widget_Type_By_ID(LCUI_ID id, char *widget_type)
 /*
- * ¹¦ÄÜ£º»ñÈ¡Ö¸¶¨ÀàĞÍIDµÄÀàĞÍÃû³Æ
+ * åŠŸèƒ½ï¼šè·å–æŒ‡å®šç±»å‹IDçš„ç±»å‹åç§°
  **/
 {
 	WidgetTypeData *wd;
@@ -1793,7 +1793,7 @@ int Get_Widget_Type_By_ID(LCUI_ID id, char *widget_type)
 	{
 		wd = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
 		if(wd->type_id == id)
-		{ /* Èç¹ûÀàĞÍÒ»ÖÂ */
+		{ /* å¦‚æœç±»å‹ä¸€è‡´ */
 			strcpy(widget_type, wd->type.string); 
 			return 0;
 		}
@@ -1804,7 +1804,7 @@ int Get_Widget_Type_By_ID(LCUI_ID id, char *widget_type)
 
 void ( *Get_WidgetFunc_By_ID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*)
 /*
- * ¹¦ÄÜ£º»ñÈ¡Ö¸¶¨²¿¼şÀàĞÍIDµÄº¯ÊıµÄº¯ÊıÖ¸Õë
+ * åŠŸèƒ½ï¼šè·å–æŒ‡å®šéƒ¨ä»¶ç±»å‹IDçš„å‡½æ•°çš„å‡½æ•°æŒ‡é’ˆ
  **/
 {
 	LCUI_Func *f = NULL; 
@@ -1820,7 +1820,7 @@ void ( *Get_WidgetFunc_By_ID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*)
 	{
 		wd = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
 		if(wd->type_id == id)
-		{ /* Èç¹ûÀàĞÍÒ»ÖÂ */  
+		{ /* å¦‚æœç±»å‹ä¸€è‡´ */  
 			total = Queue_Get_Total(&wd->func); 
 			for(i=0; i<total; i++)
 			{
@@ -1832,7 +1832,7 @@ void ( *Get_WidgetFunc_By_ID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*)
 				}
 			}
 			
-			if(found == 1) /* Èç¹ûÒÑ¾­´æÔÚ */
+			if(found == 1) /* å¦‚æœå·²ç»å­˜åœ¨ */
 				return f->func; 
 			else 
 			{
@@ -1846,7 +1846,7 @@ void ( *Get_WidgetFunc_By_ID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*)
 }
 
 void ( *Get_WidgetFunc(char *widget_type, FuncType func_type) ) (LCUI_Widget*)
-/* ¹¦ÄÜ£º»ñÈ¡Ö¸¶¨ÀàĞÍ²¿¼şµÄº¯ÊıµÄº¯ÊıÖ¸Õë */
+/* åŠŸèƒ½ï¼šè·å–æŒ‡å®šç±»å‹éƒ¨ä»¶çš„å‡½æ•°çš„å‡½æ•°æŒ‡é’ˆ */
 {
 	LCUI_Func *f = NULL; 
 	WidgetTypeData *wd;
@@ -1862,7 +1862,7 @@ void ( *Get_WidgetFunc(char *widget_type, FuncType func_type) ) (LCUI_Widget*)
 	{
 		wd = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
 		if(Strcmp(&wd->type, widget_type) == 0)
-		{ /* Èç¹ûÀàĞÍÒ»ÖÂ */ 
+		{ /* å¦‚æœç±»å‹ä¸€è‡´ */ 
 			total = Queue_Get_Total(&wd->func);
 			for(i=0; i<total; i++)
 			{
@@ -1874,7 +1874,7 @@ void ( *Get_WidgetFunc(char *widget_type, FuncType func_type) ) (LCUI_Widget*)
 				}
 			}
 			
-			if(found == 1) /* Èç¹ûÒÑ¾­´æÔÚ */
+			if(found == 1) /* å¦‚æœå·²ç»å­˜åœ¨ */
 				return f->func; 
 			else 
 			{
@@ -1889,7 +1889,7 @@ void ( *Get_WidgetFunc(char *widget_type, FuncType func_type) ) (LCUI_Widget*)
 
 int Check_WidgetType(char *widget_type)
 /*
- * ¹¦ÄÜ£º¼ì²âÖ¸¶¨²¿¼şÀàĞÍÊÇ·ñÓĞĞ§
+ * åŠŸèƒ½ï¼šæ£€æµ‹æŒ‡å®šéƒ¨ä»¶ç±»å‹æ˜¯å¦æœ‰æ•ˆ
  **/
 { 
 	WidgetTypeData *wd;
@@ -1904,7 +1904,7 @@ int Check_WidgetType(char *widget_type)
 	for(i = 0; i < total; ++i)
 	{
 		wd = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
-		if(Strcmp(&wd->type, widget_type) == 0)/* Èç¹ûÀàĞÍÒ»ÖÂ */ 
+		if(Strcmp(&wd->type, widget_type) == 0)/* å¦‚æœç±»å‹ä¸€è‡´ */ 
 			return 1; 
 	}
 	
@@ -1922,13 +1922,13 @@ extern void Register_CheckBox();
 extern void Register_RadioButton();
 
 void Register_Default_Widget_Type()
-/* ¹¦ÄÜ£ºÎª³ÌĞòµÄ²¿¼ş¿âÌí¼ÓÄ¬ÈÏµÄ²¿¼şÀàĞÍ */
+/* åŠŸèƒ½ï¼šä¸ºç¨‹åºçš„éƒ¨ä»¶åº“æ·»åŠ é»˜è®¤çš„éƒ¨ä»¶ç±»å‹ */
 {
-	WidgetType_Add(NULL); /* Ìí¼ÓÒ»¸öNULLÀàĞÍµÄ²¿¼ş */
-	Register_Window();/* ×¢²á´°¿Ú²¿¼ş */
-	Register_Label();/* ×¢²áÎÄ±¾±êÇ©²¿¼ş */
-	Register_Button();/* ×¢²á°´Å¥²¿¼ş */
-	Register_PictureBox();/* ×¢²áÍ¼Æ¬ºĞ×Ó²¿¼ş */
+	WidgetType_Add(NULL); /* æ·»åŠ ä¸€ä¸ªNULLç±»å‹çš„éƒ¨ä»¶ */
+	Register_Window();/* æ³¨å†Œçª—å£éƒ¨ä»¶ */
+	Register_Label();/* æ³¨å†Œæ–‡æœ¬æ ‡ç­¾éƒ¨ä»¶ */
+	Register_Button();/* æ³¨å†ŒæŒ‰é’®éƒ¨ä»¶ */
+	Register_PictureBox();/* æ³¨å†Œå›¾ç‰‡ç›’å­éƒ¨ä»¶ */
 	Register_ProgressBar();
 	Register_Menu();
 	Register_CheckBox();
@@ -1939,7 +1939,7 @@ void Register_Default_Widget_Type()
 
 /*************************** Container ********************************/
 void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget)
-/* ¹¦ÄÜ£º½«²¿¼şÌí¼ÓÖÁ×÷ÎªÈİÆ÷µÄ²¿¼şÄÚ */
+/* åŠŸèƒ½ï¼šå°†éƒ¨ä»¶æ·»åŠ è‡³ä½œä¸ºå®¹å™¨çš„éƒ¨ä»¶å†… */
 {
 	int pos;
 	LCUI_Queue *old_queue, *new_queue;
@@ -1948,31 +1948,31 @@ void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget)
 		return;
 		
 	if(container == NULL)
-	{/* Èç¹ûÈİÆ÷ÎªNULL£¬ÄÇ¾Í´ú±íÊÇÒÔÆÁÄ»×÷ÎªÈİÆ÷ */
+	{/* å¦‚æœå®¹å™¨ä¸ºNULLï¼Œé‚£å°±ä»£è¡¨æ˜¯ä»¥å±å¹•ä½œä¸ºå®¹å™¨ */
 		new_queue = &LCUI_Sys.widget_list;
-		/* ¸Ä±ä²¿¼şµÄÎ»ÖÃÀàĞÍ£¬²»¸ÄµÄ»°£¬µÃ³öÀ´µÄ²¿¼şÎ»ÖÃ»áÓĞÎÊÌâ */
+		/* æ”¹å˜éƒ¨ä»¶çš„ä½ç½®ç±»å‹ï¼Œä¸æ”¹çš„è¯ï¼Œå¾—å‡ºæ¥çš„éƒ¨ä»¶ä½ç½®ä¼šæœ‰é—®é¢˜ */
 		widget->pos_type = POS_TYPE_IN_SCREEN;
 	}
 	else
-	{/* ·ñÔò£¬ÒÔÖ¸¶¨²¿¼şÎªÈİÆ÷ */ 
+	{/* å¦åˆ™ï¼Œä»¥æŒ‡å®šéƒ¨ä»¶ä¸ºå®¹å™¨ */ 
 		new_queue = &container->child;
 		widget->pos_type = POS_TYPE_IN_WIDGET; 
 	}
 	
 	if(widget->parent != NULL)
-	/* Èç¹û²¿¼şÓĞ¸¸²¿¼ş£¬ÄÇ¾ÍÔÚ¸¸²¿¼şµÄ×Ó²¿¼ş¶ÓÁĞÖĞ */ 
+	/* å¦‚æœéƒ¨ä»¶æœ‰çˆ¶éƒ¨ä»¶ï¼Œé‚£å°±åœ¨çˆ¶éƒ¨ä»¶çš„å­éƒ¨ä»¶é˜Ÿåˆ—ä¸­ */ 
 		old_queue = &widget->parent->child; 
 	else
-	/* ·ñÔòÃ»ÓĞ²¿¼ş£¬ÄÇÃ´Õâ¸ö²¿¼şÔÚ´´½¨Ê±¾Í´¢´æÖÁÏµÍ³²¿¼ş¶ÓÁĞÖĞ */
+	/* å¦åˆ™æ²¡æœ‰éƒ¨ä»¶ï¼Œé‚£ä¹ˆè¿™ä¸ªéƒ¨ä»¶åœ¨åˆ›å»ºæ—¶å°±å‚¨å­˜è‡³ç³»ç»Ÿéƒ¨ä»¶é˜Ÿåˆ—ä¸­ */
 		old_queue = &LCUI_Sys.widget_list;
 		
-	/* ¸Ä±ä¸Ã²¿¼şµÄÈİÆ÷£¬ĞèÒª½«Ëü´ÓÖ®Ç°µÄÈİÆ÷ÖĞÒÆ³ı */
+	/* æ”¹å˜è¯¥éƒ¨ä»¶çš„å®¹å™¨ï¼Œéœ€è¦å°†å®ƒä»ä¹‹å‰çš„å®¹å™¨ä¸­ç§»é™¤ */
 	pos = WidgetQueue_Get_Pos(old_queue, widget);
 	if(pos >= 0)
 		Queue_Delete_Pointer(old_queue, pos);
 	
-	widget->parent = container; /* ±£´æ¸¸²¿¼şÖ¸Õë */ 
-	Queue_Add_Pointer(new_queue, widget); /* Ìí¼ÓÖÁ²¿¼ş¶ÓÁĞ */
+	widget->parent = container; /* ä¿å­˜çˆ¶éƒ¨ä»¶æŒ‡é’ˆ */ 
+	Queue_Add_Pointer(new_queue, widget); /* æ·»åŠ è‡³éƒ¨ä»¶é˜Ÿåˆ— */
 	Update_Widget_Pos(widget);
 }
 /************************* Container End ******************************/

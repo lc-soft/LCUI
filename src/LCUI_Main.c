@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Main.c -- LCUI µÄºËĞÄ
+ * LCUI_Main.c -- LCUI çš„æ ¸å¿ƒ
  *
- * °æÈ¨ËùÓĞ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±äº 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼şÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾İGPLv2Ğí¿ÉĞ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ğí¿ÉÖ¤µÚ¶ş°æ µÄÓ¢ÎÄËõĞ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌĞøÊ¹ÓÃ¡¢ĞŞ¸Ä»ò·¢²¼±¾ÎÄ¼ş£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öĞí¿ÉĞ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜æ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’Œæ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔğÈÎ£¬ÉõÖÁÃ»ÓĞÊÊÏúĞÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒşº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ğí¿ÉĞ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼şµÄGPLv2Ğí¿ÉĞ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼şÖĞ£¬Èç¹û
- * Ã»ÓĞ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
@@ -67,34 +67,40 @@ LCUI_System LCUI_Sys;
 
 /***************************** Core ***********************************/
 static void Processing_Screen_Update()
-/* ¹¦ÄÜ£º´¦ÀíÆÁÄ»ÄÚÈİ¸üĞÂ */
+/* åŠŸèƒ½ï¼šå¤„ç†å±å¹•å†…å®¹æ›´æ–° */
 {
+	int i;
 	LCUI_Rect rect;
 	LCUI_Graph graph;  
 	Graph_Init(&graph);
-	/* Ëø×¡¶ÓÁĞ£¬ÆäËüÏß³Ì²»ÄÜ·ÃÎÊ */
+	/* é”ä½é˜Ÿåˆ—ï¼Œå…¶å®ƒçº¿ç¨‹ä¸èƒ½è®¿é—® */
 	Queue_Lock(&LCUI_Sys.update_area);
+	i = 0;
 	//printf("Processing_Screen_Update(): start\n"); 
 	while(LCUI_Active())
 	{
 		if ( RectQueue_Get(&rect, 0, &LCUI_Sys.update_area) )
-		{/* Èç¹û´Ó¶ÓÁĞÖĞ»ñÈ¡Êı¾İ³É¹¦ */
+		{/* å¦‚æœä»é˜Ÿåˆ—ä¸­è·å–æ•°æ®æˆåŠŸ */
 			//printf("RectQueue_Get(): %d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
-			/* »ñÈ¡ÄÚ´æÖĞ¶ÔÓ¦ÇøÓòµÄÍ¼ĞÎÊı¾İ */ 
+			/* è·å–å†…å­˜ä¸­å¯¹åº”åŒºåŸŸçš„å›¾å½¢æ•°æ® */ 
 			//printf("Processing_Screen_Update(): get\n"); 
+			//nobuff_print("[%d]Processing_Screen_Update(): ", i);
+			//count_time();
 			Get_Screen_Real_Graph (rect, &graph);
 			//printf("Processing_Screen_Update(): end\n");
-			/* Ğ´ÈëÖÁÖ¡»º³å£¬ÈÃÆÁÄ»ÏÔÊ¾Í¼ĞÎ */ 
+			/* å†™å…¥è‡³å¸§ç¼“å†²ï¼Œè®©å±å¹•æ˜¾ç¤ºå›¾å½¢ */ 
 			Write_Graph_To_FB (&graph, Pos(rect.x, rect.y));
 			Free_Graph(&graph); 
 			//printf("Processing_Screen_Update(): queue delete start\n"); 
 			//printf("queue mode: %d\n", LCUI_Sys.update_area.mode);
-			Queue_Delete (&LCUI_Sys.update_area, 0);/* ÒÆ³ı¶ÓÁĞÖĞµÄ³ÉÔ± */ 
+			Queue_Delete (&LCUI_Sys.update_area, 0);/* ç§»é™¤é˜Ÿåˆ—ä¸­çš„æˆå‘˜ */
+			//end_count_time(); 
 			//printf("Processing_Screen_Update(): queue delete end\n");
+			++i;
 		}
 		else break;
 	}
-	/* ½âËø¶ÓÁĞ */
+	/* è§£é”é˜Ÿåˆ— */
 	Queue_UnLock(&LCUI_Sys.update_area);
 	
 	//printf("Processing_Screen_Update(): end\n"); 
@@ -104,7 +110,7 @@ static void Processing_Screen_Update()
 #ifdef need_test
 static int auto_flag = 0;
 static void *autoquit()
-/* ÔÚ³¬Ê±ºó£¬»á×Ô¶¯ÖÕÖ¹³ÌĞò£¬ÓÃÓÚµ÷ÊÔ */
+/* åœ¨è¶…æ—¶åï¼Œä¼šè‡ªåŠ¨ç»ˆæ­¢ç¨‹åºï¼Œç”¨äºè°ƒè¯• */
 {
 	LCUI_ID time = 0;
 	while(time <5000000)
@@ -124,19 +130,39 @@ static void *autoquit()
 }
 #endif
 
+static clock_t start_time;
+void count_time()
+{
+	start_time = clock();
+}
+
+void end_count_time()
+{
+	printf("%ldms\n", clock()-start_time);
+}
+
 static void *LCUI_Core ()
-/* ¹¦ÄÜ£º½øĞĞLCUIµÄºËĞÄ´¦Àí¹¤×÷ */
+/* åŠŸèƒ½ï¼šè¿›è¡ŒLCUIçš„æ ¸å¿ƒå¤„ç†å·¥ä½œ */
 {
 	//pthread_t t;
 	//LCUI_Thread_Create(&t, NULL, autoquit, NULL);
 	while(LCUI_Active())
 	{
 		//printf("core start\n");
-		Processing_All_WidgetUpdate();/* ´¦ÀíËùÓĞ²¿¼ş¸üĞÂ */ 
-		usleep(5000);/* Í£¶ÙÒ»¶ÎÊ±¼ä£¬ÈÃ³ÌĞò´¦ÀíÈÎÎñ */
-		
-		Processing_Refresh_Area(); /* ´¦ÀíĞèÒªË¢ĞÂµÄÇøÓò */  
-		Processing_Screen_Update();/* ´¦ÀíÆÁÄ»¸üĞÂ */  
+		count_time();
+		//nobuff_print("Processing_All_WidgetUpdate(): ");
+		Processing_All_WidgetUpdate();/* å¤„ç†æ‰€æœ‰éƒ¨ä»¶æ›´æ–° */
+		//end_count_time();
+		usleep(5000);/* åœé¡¿ä¸€æ®µæ—¶é—´ï¼Œè®©ç¨‹åºå¤„ç†ä»»åŠ¡ */
+		 
+		//nobuff_print("Processing_Refresh_Area(): "); 
+		//count_time();
+		Processing_Refresh_Area(); /* å¤„ç†éœ€è¦åˆ·æ–°çš„åŒºåŸŸ */  
+		//end_count_time();
+		//nobuff_print("Processing_Screen_Update(): "); 
+		//count_time(); 
+		Processing_Screen_Update();/* å¤„ç†å±å¹•æ›´æ–° */  
+		//end_count_time();
 		//auto_flag = 1;
 		//printf("core end\n"); 
 	}
@@ -145,29 +171,29 @@ static void *LCUI_Core ()
 }
 
 static int Core_Start()
-/* ¹¦ÄÜ£ºÆôÓÃÄÚºË */
+/* åŠŸèƒ½ï¼šå¯ç”¨å†…æ ¸ */
 {
-	LCUI_Sys.status = ACTIVE;	/* ¸Ä±äLCUIµÄ×´Ì¬ */
+	LCUI_Sys.status = ACTIVE;	/* æ”¹å˜LCUIçš„çŠ¶æ€ */
 	return pthread_create( &LCUI_Sys.core_thread, NULL, LCUI_Core, NULL );
 }
 
 static int Core_End()
-/* ¹¦ÄÜ£º½ûÓÃÄÚºË */
+/* åŠŸèƒ½ï¼šç¦ç”¨å†…æ ¸ */
 {
-	LCUI_Sys.status = KILLED;	/* ¸Ä±äLCUIµÄ×´Ì¬ */
+	LCUI_Sys.status = KILLED;	/* æ”¹å˜LCUIçš„çŠ¶æ€ */
 	return pthread_join( LCUI_Sys.core_thread, NULL );
 }
 /**************************** Core End *********************************/
 
 /************************* App Manage *********************************/
 LCUI_App *Find_App(LCUI_ID id)
-/* ¹¦ÄÜ£º¸ù¾İ³ÌĞòµÄID£¬»ñÈ¡Ö¸Ïò³ÌĞòÊı¾İ½á¹¹µÄÖ¸Õë */
+/* åŠŸèƒ½ï¼šæ ¹æ®ç¨‹åºçš„IDï¼Œè·å–æŒ‡å‘ç¨‹åºæ•°æ®ç»“æ„çš„æŒ‡é’ˆ */
 {
 	LCUI_App *app; 
 	int i, total;  
 	total = Queue_Get_Total(&LCUI_Sys.app_list);
 	if (total > 0)
-	{ /* Èç¹û³ÌĞò×ÜÊı´óÓÚ0 */
+	{ /* å¦‚æœç¨‹åºæ€»æ•°å¤§äº0 */
 		for (i = 0; i < total; ++i)
 		{
 			app = (LCUI_App*)Queue_Get(&LCUI_Sys.app_list, i);
@@ -180,25 +206,25 @@ LCUI_App *Find_App(LCUI_ID id)
 }
 
 LCUI_App* Get_Self_AppPointer()
-/* ¹¦ÄÜ£º»ñÈ¡³ÌĞòµÄÖ¸Õë */
+/* åŠŸèƒ½ï¼šè·å–ç¨‹åºçš„æŒ‡é’ˆ */
 {
 	Thread_TreeNode *ttn;
 	LCUI_ID id;
 	
-	id = pthread_self(); /* »ñÈ¡±¾Ïß³ÌID */  
+	id = pthread_self(); /* è·å–æœ¬çº¿ç¨‹ID */  
 	if(id == LCUI_Sys.core_thread
 	|| id == LCUI_Sys.key_thread
 	|| id == LCUI_Sys.mouse.thread
 	|| id == LCUI_Sys.ts.thread)
-	{/* ÓÉÓÚÄÚºË¼°ÆäËüÏß³ÌIDÃ»ÓĞ±»¼ÇÂ¼£¬Ö»ÓĞÖ±½Ó·µ»ØLCUIÖ÷³ÌĞòµÄÏß³ÌIDÁË */
+	{/* ç”±äºå†…æ ¸åŠå…¶å®ƒçº¿ç¨‹IDæ²¡æœ‰è¢«è®°å½•ï¼Œåªæœ‰ç›´æ¥è¿”å›LCUIä¸»ç¨‹åºçš„çº¿ç¨‹IDäº† */
 		return Find_App(LCUI_Sys.self_id);
 	}
-	/* »ñÈ¡¸¸Ïß³ÌµÄID */
+	/* è·å–çˆ¶çº¿ç¨‹çš„ID */
 	ttn = Search_Thread_Tree(&LCUI_Sys.thread_tree, id);
 	/* 
-	 * Íù¸¸¼¶±éÀú£¬Ö±ÖÁ¸¸¼¶Ö¸ÕëÎªNULL£¬ÒòÎª¸ùÏß³ÌÊÇÃ»
-	 * ÓĞ¸¸Ïß³Ì½áµãÖ¸ÕëµÄ£¬³ÌĞòµÄÏß³ÌID¶¼ÔÚ¸ùÏß³ÌÀïµÄ
-	 * ×ÓÏß³ÌID¶ÓÁĞÖĞ 
+	 * å¾€çˆ¶çº§éå†ï¼Œç›´è‡³çˆ¶çº§æŒ‡é’ˆä¸ºNULLï¼Œå› ä¸ºæ ¹çº¿ç¨‹æ˜¯æ²¡
+	 * æœ‰çˆ¶çº¿ç¨‹ç»“ç‚¹æŒ‡é’ˆçš„ï¼Œç¨‹åºçš„çº¿ç¨‹IDéƒ½åœ¨æ ¹çº¿ç¨‹é‡Œçš„
+	 * å­çº¿ç¨‹IDé˜Ÿåˆ—ä¸­ 
 	 * */
 	while(ttn->parent != NULL)
 	{ 
@@ -212,34 +238,35 @@ LCUI_App* Get_Self_AppPointer()
 
 
 void LCUI_App_Init(LCUI_App *app)
-/* ¹¦ÄÜ£º³õÊ¼»¯³ÌĞòÊı¾İ½á¹¹Ìå */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–ç¨‹åºæ•°æ®ç»“æ„ä½“ */
 {
 	app->stop_loop = IS_FALSE;
 	app->id = 0;
 	FuncQueue_Init(&app->task_queue); 
 	//EventQueue_Init(&app->key_event);
 	WidgetLib_Init(&app->widget_lib);
+	app->encoding_type = ENCODEING_TYPE_UTF8;
 }
 
 
 static void LCUI_Quit ()
 /*
- * ¹¦ÄÜ£ºÍË³öLCUI
- * ËµÃ÷£ºÔÚÃ»ÓĞÈÎºÎLCUI³ÌĞòÊ±£¬LCUI»áµ÷ÓÃ±¾º¯ÊıÀ´»Ö¸´ÔËĞĞLCUIÇ°µÄÏÖ³¡¡£
+ * åŠŸèƒ½ï¼šé€€å‡ºLCUI
+ * è¯´æ˜ï¼šåœ¨æ²¡æœ‰ä»»ä½•LCUIç¨‹åºæ—¶ï¼ŒLCUIä¼šè°ƒç”¨æœ¬å‡½æ•°æ¥æ¢å¤è¿è¡ŒLCUIå‰çš„ç°åœºã€‚
  * */
 {
 	int err = 0; 
 	
-	LCUI_Sys.status = KILLED;	/* ×´Ì¬±êÖ¾ÖÃÎªKILLED */
-	Free_LCUI_Font ();			/* ÊÍ·ÅLCUIµÄÄ¬ÈÏ×ÖÌåÊı¾İÕ¼ÓÃµÄÄÚ´æ×ÊÔ´ */
-	Core_End();/* µÈ´ıCoreÏß³ÌÍË³ö */
-	Destroy_Queue(&LCUI_Sys.key_event);/* ³·Ïú°´¼üÊÂ¼şÊı¾İ¶ÓÁĞ */ 
-	Disable_Mouse_Input();			/* ½ûÓÃÊó±êÊäÈë */
-	Disable_TouchScreen_Input();	/* ½ûÓÃ´¥ÆÁÖ§³Ö */ 
-	Disable_Key_Input();			/* ½ûÓÃ°´¼üÊäÈë */
-	/* »Ö¸´ÆÁÄ»³õÊ¼ÄÚÈİ */ 
+	LCUI_Sys.status = KILLED;	/* çŠ¶æ€æ ‡å¿—ç½®ä¸ºKILLED */
+	Free_LCUI_Font ();			/* é‡Šæ”¾LCUIçš„é»˜è®¤å­—ä½“æ•°æ®å ç”¨çš„å†…å­˜èµ„æº */
+	Core_End();/* ç­‰å¾…Coreçº¿ç¨‹é€€å‡º */
+	Destroy_Queue(&LCUI_Sys.key_event);/* æ’¤é”€æŒ‰é”®äº‹ä»¶æ•°æ®é˜Ÿåˆ— */ 
+	Disable_Mouse_Input();			/* ç¦ç”¨é¼ æ ‡è¾“å…¥ */
+	Disable_TouchScreen_Input();	/* ç¦ç”¨è§¦å±æ”¯æŒ */ 
+	Disable_Key_Input();			/* ç¦ç”¨æŒ‰é”®è¾“å…¥ */
+	/* æ¢å¤å±å¹•åˆå§‹å†…å®¹ */ 
 	Write_Graph_To_FB (&LCUI_Sys.screen.buff, Pos(0, 0));	
-	/* ½â³ıÖ¡»º³åÔÚÄÚ´æÖĞµÄÓ³Éä */
+	/* è§£é™¤å¸§ç¼“å†²åœ¨å†…å­˜ä¸­çš„æ˜ å°„ */
 	err = munmap (LCUI_Sys.screen.fb_mem, LCUI_Sys.screen.smem_len);
 	if (err != 0) perror ("munmap()");
 	close (LCUI_Sys.screen.fb_dev_fd); 
@@ -248,14 +275,14 @@ static void LCUI_Quit ()
 
 
 static int LCUI_AppList_Delete (LCUI_ID app_id)
-/* ¹¦ÄÜ£º¹Ø±ÕÒ»¸öLCUI³ÌĞò */
+/* åŠŸèƒ½ï¼šå…³é—­ä¸€ä¸ªLCUIç¨‹åº */
 {
 	int pos = -1;
 	LCUI_App *app; 
 	int i, total;  
 	total = Queue_Get_Total(&LCUI_Sys.app_list);
 	if (total > 0)
-	{ /* Èç¹û³ÌĞò×ÜÊı´óÓÚ0£¬ ²éÕÒ³ÌĞòĞÅÏ¢ËùÔÚ¶ÓÁĞµÄÎ»ÖÃ */
+	{ /* å¦‚æœç¨‹åºæ€»æ•°å¤§äº0ï¼Œ æŸ¥æ‰¾ç¨‹åºä¿¡æ¯æ‰€åœ¨é˜Ÿåˆ—çš„ä½ç½® */
 		for (i = 0; i < total; ++i)
 		{
 			app = (LCUI_App*)Queue_Get(&LCUI_Sys.app_list, i);
@@ -268,26 +295,26 @@ static int LCUI_AppList_Delete (LCUI_ID app_id)
 		if(pos < 0) return -1;
 	}
 	else return -1;
-	/* ´Ó³ÌĞòÏÔÊ¾Ë³Ğò¶ÓÁĞÖĞÉ¾³ıÕâ¸ö³ÌĞòID */
+	/* ä»ç¨‹åºæ˜¾ç¤ºé¡ºåºé˜Ÿåˆ—ä¸­åˆ é™¤è¿™ä¸ªç¨‹åºID */
 	Queue_Delete (&LCUI_Sys.app_list, pos);
 	
-	if (Queue_Empty(&LCUI_Sys.app_list)) /* Èç¹û³ÌĞòÁĞ±íÎª¿Õ */  
-		LCUI_Quit (); /* ÍË³öLCUI */ 
+	if (Queue_Empty(&LCUI_Sys.app_list)) /* å¦‚æœç¨‹åºåˆ—è¡¨ä¸ºç©º */  
+		LCUI_Quit (); /* é€€å‡ºLCUI */ 
 	return 0;
 }
 
 static void LCUI_Destroy_App(LCUI_App *app)
-/* ¹¦ÄÜ£ºÏú»Ù³ÌĞòÏà¹ØĞÅÏ¢ */
+/* åŠŸèƒ½ï¼šé”€æ¯ç¨‹åºç›¸å…³ä¿¡æ¯ */
 {
 	if(app == NULL) return;
 	
-	LCUI_App_Thread_Cancel(app->id); /* ³·ÏúÕâ¸ö³ÌĞòµÄËùÓĞÏß³Ì */
-	LCUI_Destroy_App_Widgets(app->id); /* Ïú»ÙÕâ¸ö³ÌĞòµÄËùÓĞ²¿¼ş */
+	LCUI_App_Thread_Cancel(app->id); /* æ’¤é”€è¿™ä¸ªç¨‹åºçš„æ‰€æœ‰çº¿ç¨‹ */
+	LCUI_Destroy_App_Widgets(app->id); /* é”€æ¯è¿™ä¸ªç¨‹åºçš„æ‰€æœ‰éƒ¨ä»¶ */
 }
 
 
 static void LCUI_AppList_Init()
-/* ¹¦ÄÜ£º³õÊ¼»¯³ÌĞòÊı¾İ±í */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–ç¨‹åºæ•°æ®è¡¨ */
 {
 	Queue_Init(&LCUI_Sys.app_list, sizeof(LCUI_App), LCUI_Destroy_App);
 }
@@ -295,22 +322,22 @@ static void LCUI_AppList_Init()
 
 static int LCUI_AppList_Add ()
 /* 
- * ¹¦ÄÜ£º´´½¨Ò»¸öLCUI³ÌĞò
- * ËµÃ÷£º´Ëº¯Êı»á½«³ÌĞòĞÅÏ¢Ìí¼ÓÖÁ³ÌĞòÁĞ±í
- * ·µ»ØÖµ£º³É¹¦Ôò·µ»Ø³ÌĞòµÄID£¬Ê§°ÜÔò·µ»Ø-1
+ * åŠŸèƒ½ï¼šåˆ›å»ºä¸€ä¸ªLCUIç¨‹åº
+ * è¯´æ˜ï¼šæ­¤å‡½æ•°ä¼šå°†ç¨‹åºä¿¡æ¯æ·»åŠ è‡³ç¨‹åºåˆ—è¡¨
+ * è¿”å›å€¼ï¼šæˆåŠŸåˆ™è¿”å›ç¨‹åºçš„IDï¼Œå¤±è´¥åˆ™è¿”å›-1
  **/
 {
 	LCUI_App app;
 	LCUI_ID id = pthread_self();
-	/* ³õÊ¼»¯³ÌĞòÊı¾İ½á¹¹Ìå */
+	/* åˆå§‹åŒ–ç¨‹åºæ•°æ®ç»“æ„ä½“ */
 	LCUI_App_Init (&app);
-	app.id	= id;	/* ±£´æID */ 
-	Queue_Add(&LCUI_Sys.app_list, &app);/* Ìí¼ÓÖÁ¶ÓÁĞ */
+	app.id	= id;	/* ä¿å­˜ID */ 
+	Queue_Add(&LCUI_Sys.app_list, &app);/* æ·»åŠ è‡³é˜Ÿåˆ— */
 	return 0;
 }
 
 int App_Quit()
-/* ¹¦ÄÜ£ºÍË³ö³ÌĞò */
+/* åŠŸèƒ½ï¼šé€€å‡ºç¨‹åº */
 {
 	LCUI_App *app;
 	app = Get_Self_AppPointer();
@@ -324,7 +351,7 @@ int App_Quit()
 }
 
 void Main_Loop_Quit()
-/* ¹¦ÄÜ£ºÈÃ³ÌĞòÍË³öÖ÷Ñ­»· */
+/* åŠŸèƒ½ï¼šè®©ç¨‹åºé€€å‡ºä¸»å¾ªç¯ */
 { 
 	LCUI_App *app = Get_Self_AppPointer();
 	if(NULL == app)
@@ -337,7 +364,7 @@ void Main_Loop_Quit()
 /*********************** App Manage End ******************************/
 
 static void Print_LCUI_Copyright_Text()
-/* ¹¦ÄÜ£º´òÓ¡LCUIµÄĞÅÏ¢ */
+/* åŠŸèƒ½ï¼šæ‰“å°LCUIçš„ä¿¡æ¯ */
 {
 	printf(
 	"============| LCUI v0.12.4 |============\n"
@@ -351,8 +378,8 @@ static void Print_LCUI_Copyright_Text()
 
 int Get_Screen_Width ()
 /*
- * ¹¦ÄÜ£º»ñÈ¡ÆÁÄ»¿í¶È
- * ·µ»ØÖµ£ºÆÁÄ»µÄ¿í¶È£¬µ¥Î»ÎªÏñËØ£¬±ØĞëÔÚÊ¹ÓÃLCUI_Init()º¯ÊıºóÊ¹ÓÃ£¬·ñÔòÎŞĞ§
+ * åŠŸèƒ½ï¼šè·å–å±å¹•å®½åº¦
+ * è¿”å›å€¼ï¼šå±å¹•çš„å®½åº¦ï¼Œå•ä½ä¸ºåƒç´ ï¼Œå¿…é¡»åœ¨ä½¿ç”¨LCUI_Init()å‡½æ•°åä½¿ç”¨ï¼Œå¦åˆ™æ— æ•ˆ
  * */
 {
 	if (LCUI_Sys.init == IS_FALSE) 
@@ -363,8 +390,8 @@ int Get_Screen_Width ()
 
 int Get_Screen_Height ()
 /*
- * ¹¦ÄÜ£º»ñÈ¡ÆÁÄ»¸ß¶È
- * ·µ»ØÖµ£ºÆÁÄ»µÄ¸ß¶È£¬µ¥Î»ÎªÏñËØ£¬±ØĞëÔÚÊ¹ÓÃLCUI_Init()º¯ÊıºóÊ¹ÓÃ£¬·ñÔòÎŞĞ§
+ * åŠŸèƒ½ï¼šè·å–å±å¹•é«˜åº¦
+ * è¿”å›å€¼ï¼šå±å¹•çš„é«˜åº¦ï¼Œå•ä½ä¸ºåƒç´ ï¼Œå¿…é¡»åœ¨ä½¿ç”¨LCUI_Init()å‡½æ•°åä½¿ç”¨ï¼Œå¦åˆ™æ— æ•ˆ
  * */
 {
 	if (LCUI_Sys.init == IS_FALSE) 
@@ -374,19 +401,19 @@ int Get_Screen_Height ()
 }
 
 LCUI_Size Get_Screen_Size ()
-/* ¹¦ÄÜ£º»ñÈ¡ÆÁÄ»³ß´ç */
+/* åŠŸèƒ½ï¼šè·å–å±å¹•å°ºå¯¸ */
 {
 	return LCUI_Sys.screen.size; 
 }
 
 void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color)
-/* ¹¦ÄÜ£ºÌî³äÖ¸¶¨Î»ÖÃµÄÏñËØµãµÄÑÕÉ« */
+/* åŠŸèƒ½ï¼šå¡«å……æŒ‡å®šä½ç½®çš„åƒç´ ç‚¹çš„é¢œè‰² */
 {
 	unsigned char *dest;
 	int k;
 	k = (pos.y * LCUI_Sys.screen.size.w + pos.x) << 2; 
 
-	dest = LCUI_Sys.screen.fb_mem;		/* Ö¸ÏòÖ¡»º³å */
+	dest = LCUI_Sys.screen.fb_mem;		/* æŒ‡å‘å¸§ç¼“å†² */
 	dest[k] = color.blue;
 	dest[k + 1] = color.green;
 	dest[k + 2] = color.red; 
@@ -394,9 +421,9 @@ void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color)
 
 void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 /* 
- * ¹¦ÄÜ£ºĞ´ÈëÍ¼ĞÎÊı¾İÖÁÖ¡»º´æ£¬´Ó¶øÔÚÆÁÄ»ÉÏÏÔÊ¾Í¼ĞÎ 
- * ËµÃ÷£º´Ëº¯ÊıµÄÖ÷Òª´úÂë£¬²Î¿¼×Ômgaveiw 0.1.4 µÄmga_vfb.cÎÄ¼şÖĞµÄ
- * write_to_fbº¯ÊıµÄÔ´´úÂë.
+ * åŠŸèƒ½ï¼šå†™å…¥å›¾å½¢æ•°æ®è‡³å¸§ç¼“å­˜ï¼Œä»è€Œåœ¨å±å¹•ä¸Šæ˜¾ç¤ºå›¾å½¢ 
+ * è¯´æ˜ï¼šæ­¤å‡½æ•°çš„ä¸»è¦ä»£ç ï¼Œå‚è€ƒè‡ªmgaveiw 0.1.4 çš„mga_vfb.cæ–‡ä»¶ä¸­çš„
+ * write_to_fbå‡½æ•°çš„æºä»£ç .
  * */
 {
 	int bits;
@@ -409,7 +436,7 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 
 	if (!Valid_Graph (src)) return;
 	
-	dest = LCUI_Sys.screen.fb_mem;		/* Ö¸ÏòÖ¡»º³å */
+	dest = LCUI_Sys.screen.fb_mem;		/* æŒ‡å‘å¸§ç¼“å†² */
 	pic = src; 
 	Graph_Init (&temp);
 	
@@ -418,7 +445,7 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 			Rect ( pos.x, pos.y, src->width, src->height ), 
 			&cut_rect
 		) )
-	{/* Èç¹ûĞèÒª²Ã¼ôÍ¼ĞÎ */
+	{/* å¦‚æœéœ€è¦è£å‰ªå›¾å½¢ */
 		if(!Rect_Valid(cut_rect))
 			return;
 			
@@ -429,26 +456,26 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 	}
 	
 	Using_Graph (pic, 0);
-	/* »ñÈ¡ÏÔÊ¾Æ÷µÄÎ»Êı */
+	/* è·å–æ˜¾ç¤ºå™¨çš„ä½æ•° */
 	bits = Get_Screen_Bits(); 
 	switch(bits)
 	{
-		case 32:/* 32Î»£¬ÆäÖĞRGB¸÷Õ¼8Î»£¬Ê£ÏÂµÄ8Î»ÓÃÓÚalpha£¬¹²4¸ö×Ö½Ú */ 
+		case 32:/* 32ä½ï¼Œå…¶ä¸­RGBå„å 8ä½ï¼Œå‰©ä¸‹çš„8ä½ç”¨äºalphaï¼Œå…±4ä¸ªå­—èŠ‚ */ 
 		for (n=0,y = 0; y < pic->height; ++y)
 		{
 			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
 			for (x = 0; x < pic->width; ++x, ++n)
 			{
-				count = k + x;//count = 4 * (k + x);/* ¼ÆËãĞèÌî³äµÄÏñËØµãµÄ×ø±ê */
+				count = k + x;//count = 4 * (k + x);/* è®¡ç®—éœ€å¡«å……çš„åƒç´ ç‚¹çš„åæ ‡ */
 				count = count << 2; 
-				/* ÓÉÓÚÖ¡»º³å(FrameBuffer)µÄÑÕÉ«ÅÅÁĞÊÇBGR£¬Í¼Æ¬Êı×éÊÇRGB£¬ĞèÒª¸Ä±äÒ»ÏÂĞ´ÈëË³Ğò */
+				/* ç”±äºå¸§ç¼“å†²(FrameBuffer)çš„é¢œè‰²æ’åˆ—æ˜¯BGRï¼Œå›¾ç‰‡æ•°ç»„æ˜¯RGBï¼Œéœ€è¦æ”¹å˜ä¸€ä¸‹å†™å…¥é¡ºåº */
 				dest[count] = pic->rgba[2][n];
 				dest[count + 1] = pic->rgba[1][n];
 				dest[count + 2] = pic->rgba[0][n]; 
 			}
 		}
 		break;
-		case 24:/* 24Î»£¬RGB¸÷Õ¼8Î»£¬Ò²¾ÍÊÇ¹²3¸ö×Ö½Ú */ 
+		case 24:/* 24ä½ï¼ŒRGBå„å 8ä½ï¼Œä¹Ÿå°±æ˜¯å…±3ä¸ªå­—èŠ‚ */ 
 		for (n=0, y = 0; y < pic->height; ++y)
 		{
 			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
@@ -462,12 +489,12 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 			}
 		}
 		break;
-		case 16:/* 16Î»£¬rgb·Ö±ğÕ¼5Î»£¬6Î»£¬5Î»£¬Ò²¾ÍÊÇRGB565 */
+		case 16:/* 16ä½ï¼Œrgbåˆ†åˆ«å 5ä½ï¼Œ6ä½ï¼Œ5ä½ï¼Œä¹Ÿå°±æ˜¯RGB565 */
 		/*
-		 * GB565²ÊÉ«Ä£Ê½, Ò»¸öÏñËØÕ¼Á½¸ö×Ö½Ú, ÆäÖĞ:
-		 * µÍ×Ö½ÚµÄÇ°5Î»ÓÃÀ´±íÊ¾B(BLUE)
-		 * µÍ×Ö½ÚµÄºóÈıÎ»+¸ß×Ö½ÚµÄÇ°ÈıÎ»ÓÃÀ´±íÊ¾G(Green)
-		 * ¸ß×Ö½ÚµÄºó5Î»ÓÃÀ´±íÊ¾R(RED)
+		 * GB565å½©è‰²æ¨¡å¼, ä¸€ä¸ªåƒç´ å ä¸¤ä¸ªå­—èŠ‚, å…¶ä¸­:
+		 * ä½å­—èŠ‚çš„å‰5ä½ç”¨æ¥è¡¨ç¤ºB(BLUE)
+		 * ä½å­—èŠ‚çš„åä¸‰ä½+é«˜å­—èŠ‚çš„å‰ä¸‰ä½ç”¨æ¥è¡¨ç¤ºG(Green)
+		 * é«˜å­—èŠ‚çš„å5ä½ç”¨æ¥è¡¨ç¤ºR(RED)
 		 * */  
 		for (n=0, y = 0; y < pic->height; ++y)
 		{
@@ -483,7 +510,7 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 			}
 		}
 		break;
-		case 8: /* 8Î»£¬Õ¼1¸ö×Ö½Ú */
+		case 8: /* 8ä½ï¼Œå 1ä¸ªå­—èŠ‚ */
 		kolor.start = 0;
 		kolor.len = 255; 
 		kolor.red = calloc(256, sizeof(__u16));
@@ -536,8 +563,8 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 
 static void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Graph *graph)
 /*
- * ¹¦ÄÜ£º»ñÈ¡Ö¸¶¨ÇøÓòÖĞ²¿¼şµÄÊµ¼ÊÍ¼ĞÎ
- * ËµÃ÷£º»ñÈ¡Í¼ĞÎÇ°£¬ĞèÒªÖ¸¶¨±³¾°Í¼£¬Ö®ºó²ÅÄÜÕı³£ºÏ³É£»»ñÈ¡µÄÍ¼ĞÎÊÇÖ¸¶¨ÇøÓòÖĞÏÔÊ¾µÄÊµ¼ÊÍ¼ĞÎ
+ * åŠŸèƒ½ï¼šè·å–æŒ‡å®šåŒºåŸŸä¸­éƒ¨ä»¶çš„å®é™…å›¾å½¢
+ * è¯´æ˜ï¼šè·å–å›¾å½¢å‰ï¼Œéœ€è¦æŒ‡å®šèƒŒæ™¯å›¾ï¼Œä¹‹åæ‰èƒ½æ­£å¸¸åˆæˆï¼›è·å–çš„å›¾å½¢æ˜¯æŒ‡å®šåŒºåŸŸä¸­æ˜¾ç¤ºçš„å®é™…å›¾å½¢
  **/
 {
 	//printf("Get_Widget_Real_Graph(): enter\n");
@@ -547,55 +574,55 @@ static void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Grap
 		
 	int x, y, i;
 	LCUI_Widget *child;
-	/* »ñÈ¡²¿¼şÔÚÆÁÄ»ÄÚµÄ×ø±ê */
+	/* è·å–éƒ¨ä»¶åœ¨å±å¹•å†…çš„åæ ‡ */
 	LCUI_Pos pos = Get_Widget_Global_Pos(widget);
-	/* ¼ÆËã²¿¼şÍ¼ĞÎÕ³ÌùÖÁ±³¾°ÖĞµÄÎ»ÖÃ */
+	/* è®¡ç®—éƒ¨ä»¶å›¾å½¢ç²˜è´´è‡³èƒŒæ™¯ä¸­çš„ä½ç½® */
 	x = pos.x - rect.x;
 	y = pos.y - rect.y;
 	//printf("global pos: %d, %d\n", pos.x, pos.y);
 	//printf("update area: %d, %d, %d, %d\n", rect.x, rect.y, rect.width, rect.height);
 	/*
-	 * ÓÉÓÚ¸¸²¿¼şÊÇ×Ó²¿¼şµÄÈİÆ÷£¬×Ó²¿¼şµÄÏÔÊ¾·¶Î§½öÔÚ¸¸²¿¼şÄÚ£¬Ğè
-	 * Òªµ÷ÕûÕâ¸ö¾ØĞÎµÄÇøÓò£¬Èç¹û×Ó²¿¼şµÄÍ¼ĞÎ³¬³öÈİÆ÷·¶Î§£¬Ôò²Ã¼ô×Ó
-	 * ²¿¼şµÄÍ¼ĞÎ²¢Õ³ÌùÖÁ±³¾°Í¼ÖĞ¡£
+	 * ç”±äºçˆ¶éƒ¨ä»¶æ˜¯å­éƒ¨ä»¶çš„å®¹å™¨ï¼Œå­éƒ¨ä»¶çš„æ˜¾ç¤ºèŒƒå›´ä»…åœ¨çˆ¶éƒ¨ä»¶å†…ï¼Œéœ€
+	 * è¦è°ƒæ•´è¿™ä¸ªçŸ©å½¢çš„åŒºåŸŸï¼Œå¦‚æœå­éƒ¨ä»¶çš„å›¾å½¢è¶…å‡ºå®¹å™¨èŒƒå›´ï¼Œåˆ™è£å‰ªå­
+	 * éƒ¨ä»¶çš„å›¾å½¢å¹¶ç²˜è´´è‡³èƒŒæ™¯å›¾ä¸­ã€‚
 	 **/
 	 if(widget->parent != NULL)
-	 {/* Èç¹ûÓĞ¸¸²¿¼ş */ 
+	 {/* å¦‚æœæœ‰çˆ¶éƒ¨ä»¶ */ 
 		LCUI_Rect cut_rect;
-		/* »ñÈ¡¸Ã²¿¼şµÄÓĞĞ§ÏÔÊ¾ÇøÓò */
+		/* è·å–è¯¥éƒ¨ä»¶çš„æœ‰æ•ˆæ˜¾ç¤ºåŒºåŸŸ */
 		cut_rect = Get_Widget_Valid_Rect(widget);
-		/* ¼ÓÉÏ²Ã¼ôÆğµã×ø±ê */
+		/* åŠ ä¸Šè£å‰ªèµ·ç‚¹åæ ‡ */
 		x += cut_rect.x;
 		y += cut_rect.y;
-		/* ²Ã¼ô³öÀ´²¢ºÏ³ÉÖÁ±³¾°Í¼ */
+		/* è£å‰ªå‡ºæ¥å¹¶åˆæˆè‡³èƒŒæ™¯å›¾ */
 		Cut_And_Overlay_Graph(&widget->graph, cut_rect, Pos(x, y), graph);
 	}
-	else  /* ÏÈ½«¸¸²¿¼şºÏ³ÉÖÁ±³¾°Í¼ÖĞ */
+	else  /* å…ˆå°†çˆ¶éƒ¨ä»¶åˆæˆè‡³èƒŒæ™¯å›¾ä¸­ */
 		Mix_Graph (graph, &widget->graph, Pos(x, y));
 	//printf("widget overlay pos: %d, %d\n", x, y);
 	int total;
 	LCUI_Rect tmp;
 	
 	total = Queue_Get_Total(&widget->child); 
-	/* Ã²ËÆÖ»ĞèÒªxºÍy£¬ÇøÓò³ß´ç¿¿±³¾°Í¼µÄĞÅÏ¢¼´¿ÉµÃµ½ */
+	/* è²Œä¼¼åªéœ€è¦xå’Œyï¼ŒåŒºåŸŸå°ºå¯¸é èƒŒæ™¯å›¾çš„ä¿¡æ¯å³å¯å¾—åˆ° */
 	for(i=total-1; i>=0; --i)
-	{/* ´Óµ×µ½¶¥±éÀú×Ó²¿¼ş */
+	{/* ä»åº•åˆ°é¡¶éå†å­éƒ¨ä»¶ */
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
 		//printf("get child widget: %p, type: %s\n", child, child->type.string);
 		if(child != NULL)
 		{
 			if(child->visible == IS_TRUE)
-			{/* Èç¹ûÓĞ¿É¼ûµÄ×Ó²¿¼ş */
+			{/* å¦‚æœæœ‰å¯è§çš„å­éƒ¨ä»¶ */
 				tmp = Get_Widget_Rect(child);
 				tmp.x += pos.x;
 				tmp.y += pos.y;
 				//printf("tmp: %d, %d, %d, %d\n", tmp.x, tmp.y, tmp.width, tmp.height);
 				//printf("rect: %d, %d, %d, %d\n", rect.x, rect.y, rect.width, rect.height);
-				/* Èç¹ûÓë¸ÃÇøÓòÖØµş£¬½«×Ó²¿¼şºÏ³ÉÖÁ±³¾°Í¼ÖĞ */
+				/* å¦‚æœä¸è¯¥åŒºåŸŸé‡å ï¼Œå°†å­éƒ¨ä»¶åˆæˆè‡³èƒŒæ™¯å›¾ä¸­ */
 				if (Rect_Is_Overlay(tmp, rect)) 
 				{
 					//printf("overlay\n");
-					Get_Widget_Real_Graph(child, rect, graph);  /* µİ¹éµ÷ÓÃ */
+					Get_Widget_Real_Graph(child, rect, graph);  /* é€’å½’è°ƒç”¨ */
 				}
 				//else printf("not bverlay\n");
 			}
@@ -610,15 +637,15 @@ static void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Grap
 
 void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 /* 
- * ¹¦ÄÜ£ºÍ¨¹ıÄÚ´æÖĞµÄÍ¼ÏñÊı¾İ£¬²¶»ñ½«ÔÚÆÁÄ»ÉÏÏÔÊ¾µÄÍ¼Ïñ
- * ËµÃ÷£ºĞ§ÂÊ½ÏµÍ£¬ÒòÎªĞèÒª½øĞĞºÏ³É¡£
+ * åŠŸèƒ½ï¼šé€šè¿‡å†…å­˜ä¸­çš„å›¾åƒæ•°æ®ï¼Œæ•è·å°†åœ¨å±å¹•ä¸Šæ˜¾ç¤ºçš„å›¾åƒ
+ * è¯´æ˜ï¼šæ•ˆç‡è¾ƒä½ï¼Œå› ä¸ºéœ€è¦è¿›è¡Œåˆæˆã€‚
  *  */
 {
 	int k; 
 	LCUI_Widget *widget;
 	LCUI_Rect w_rect;
 	LCUI_Pos pos;
-	/* ¼ì²âÕâ¸öÇøÓòÊÇ·ñÓĞĞ§ */
+	/* æ£€æµ‹è¿™ä¸ªåŒºåŸŸæ˜¯å¦æœ‰æ•ˆ */
 	if (area.x < 0) return; 
 	if (area.y < 0) return; 
 	if (area.x + area.width > Get_Screen_Width ())
@@ -630,28 +657,28 @@ void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 		return;
 		
 	int total; 
-	/* ½ØÈ¡¸ÃÇøÓòµÄ±³¾°Í¼Ïñ */
+	/* æˆªå–è¯¥åŒºåŸŸçš„èƒŒæ™¯å›¾åƒ */
 	out->flag = NO_ALPHA;
 	Cut_Graph (&LCUI_Sys.screen.buff, area, out);
 	total = Queue_Get_Total(&LCUI_Sys.widget_list);
 	
-	/* ÏÈ´Óµ×µ½ÉÏ±éÀú²¿¼ş£¬½«Óë¸ÃÇøÓòÖØµşµÄÍ¼²ãµÄÍ¼ĞÎ½øĞĞ»ìºÏ£¬µÃµ½×îÖÕµÄÍ¼ĞÎ */
+	/* å…ˆä»åº•åˆ°ä¸Šéå†éƒ¨ä»¶ï¼Œå°†ä¸è¯¥åŒºåŸŸé‡å çš„å›¾å±‚çš„å›¾å½¢è¿›è¡Œæ··åˆï¼Œå¾—åˆ°æœ€ç»ˆçš„å›¾å½¢ */
 	for (k = total - 1; k >= 0; --k)
-	{	/* ´Ó×îµ×²ãµÄ²¿¼ş¿ªÊ¼ */ 
+	{	/* ä»æœ€åº•å±‚çš„éƒ¨ä»¶å¼€å§‹ */ 
 		widget = (LCUI_Widget*)Queue_Get(&LCUI_Sys.widget_list, k);
 		w_rect = Get_Widget_Rect(widget);
 		
-		if (Rect_Is_Overlay(w_rect, area))/* Èç¹ûÖØµş */
+		if (Rect_Is_Overlay(w_rect, area))/* å¦‚æœé‡å  */
 			Get_Widget_Real_Graph(widget, area, out);
 	} 
 	
 	if (LCUI_Sys.cursor.visible == IS_TRUE)
-	{						/* Èç¹ûÓÎ±ê¿É¼û */
-		/* ¼ì²é¸ÃÇøÓòÊÇ·ñÓëÓÎ±êµÄÍ¼ĞÎÇøÓòÖØµş */ 
+	{						/* å¦‚æœæ¸¸æ ‡å¯è§ */
+		/* æ£€æŸ¥è¯¥åŒºåŸŸæ˜¯å¦ä¸æ¸¸æ ‡çš„å›¾å½¢åŒºåŸŸé‡å  */ 
 		if (Rect_Is_Overlay( area, Get_Cursor_Rect() ))
-		{					/* Èç¹ûÖØµş */ 
+		{					/* å¦‚æœé‡å  */ 
 			pos = Pos_Sub(Get_Cursor_Pos(), Pos(area.x, area.y));
-			/* ½«Í¼ĞÎºÏ³É */
+			/* å°†å›¾å½¢åˆæˆ */
 			Mix_Graph (out, &LCUI_Sys.cursor.graph, pos);
 		}
 	}
@@ -661,17 +688,17 @@ void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 
 void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 /* 
- * ¹¦ÄÜ£ºÖ±½Ó¶ÁÈ¡Ö¡»º³åÖĞµÄÍ¼ÏñÊı¾İ
- * ËµÃ÷£ºĞ§ÂÊ½Ï¸ß£¬µ«²¶»ñµÄÍ¼ÏñÓĞ¿ÉÄÜ»áÓĞÎÊÌâ¡£
+ * åŠŸèƒ½ï¼šç›´æ¥è¯»å–å¸§ç¼“å†²ä¸­çš„å›¾åƒæ•°æ®
+ * è¯´æ˜ï¼šæ•ˆç‡è¾ƒé«˜ï¼Œä½†æ•è·çš„å›¾åƒæœ‰å¯èƒ½ä¼šæœ‰é—®é¢˜ã€‚
  * */
 {
 	LCUI_Rect cut_rect;
 	unsigned char *dest;
-	dest = LCUI_Sys.screen.fb_mem;		/* Ö¸ÏòÖ¡»º³å */
+	dest = LCUI_Sys.screen.fb_mem;		/* æŒ‡å‘å¸§ç¼“å†² */
 	int x, y, n, k, count;
 	
 	if ( Get_Cut_Area ( Get_Screen_Size(), area,&cut_rect ) )
-	{/* Èç¹ûĞèÒª²Ã¼ôÍ¼ĞÎ */
+	{/* å¦‚æœéœ€è¦è£å‰ªå›¾å½¢ */
 		if(!Rect_Valid(cut_rect))
 			return;
 			
@@ -702,7 +729,7 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 
 
 int Add_Screen_Refresh_Area (LCUI_Rect rect)
-/* ¹¦ÄÜ£ºÔÚÕû¸öÆÁÄ»ÄÚÌí¼ÓĞèÒªË¢ĞÂµÄÇøÓò */
+/* åŠŸèƒ½ï¼šåœ¨æ•´ä¸ªå±å¹•å†…æ·»åŠ éœ€è¦åˆ·æ–°çš„åŒºåŸŸ */
 {
 	if (rect.width <= 0 || rect.height <= 0)
 		return -1; 
@@ -715,7 +742,7 @@ int Add_Screen_Refresh_Area (LCUI_Rect rect)
 
 #define __MAX_TEXT_LEN 1024
 void nobuff_print(const char *fmt, ...)
-/* ¹¦ÄÜ£º´òÓ¡ÕıÖ´ĞĞµÄ²Ù×÷µÄĞÅÏ¢ */
+/* åŠŸèƒ½ï¼šæ‰“å°æ­£æ‰§è¡Œçš„æ“ä½œçš„ä¿¡æ¯ */
 {
 	char text[__MAX_TEXT_LEN];
     memset(text, 0, sizeof(text)); 
@@ -726,42 +753,42 @@ void nobuff_print(const char *fmt, ...)
 	va_end(ap); 
 	
 	printf("%s ", text); 
-	fflush(stdout);	/* Çå¿ÕÊä³ö»º³åÇø */
+	fflush(stdout);	/* æ¸…ç©ºè¾“å‡ºç¼“å†²åŒº */
 }
 
 
 static void Mouse_Init(void)
-/* ¹¦ÄÜ£º³õÊ¼»¯Êó±êÊı¾İ */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–é¼ æ ‡æ•°æ® */
 {
 	LCUI_Sys.mouse.fd = 0;  
-	LCUI_Sys.mouse.status = REMOVE; /* Êó±êÎªÒÆ³ı×´Ì¬ */
-	LCUI_Sys.mouse.move_speed = 1; /* ÒÆ¶¯Êı¶ÈÎª1 */
-	EventQueue_Init(&LCUI_Sys.mouse.event);/* ³õÊ¼»¯Êó±êÊÂ¼şĞÅÏ¢¶ÓÁĞ */
+	LCUI_Sys.mouse.status = REMOVE; /* é¼ æ ‡ä¸ºç§»é™¤çŠ¶æ€ */
+	LCUI_Sys.mouse.move_speed = 1; /* ç§»åŠ¨æ•°åº¦ä¸º1 */
+	EventQueue_Init(&LCUI_Sys.mouse.event);/* åˆå§‹åŒ–é¼ æ ‡äº‹ä»¶ä¿¡æ¯é˜Ÿåˆ— */
 }
 
 
 static void Cursor_Init()
-/* ¹¦ÄÜ£º³õÊ¼»¯ÓÎ±êÊı¾İ */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–æ¸¸æ ‡æ•°æ® */
 {
 	LCUI_Graph pic;
 	Graph_Init(&pic);
-	Load_Graph_Default_Cursor(&pic);/* ÔØÈë×Ô´øµÄÓÎ±êµÄÍ¼ĞÎÊı¾İ */ 
+	Load_Graph_Default_Cursor(&pic);/* è½½å…¥è‡ªå¸¦çš„æ¸¸æ ‡çš„å›¾å½¢æ•°æ® */ 
 	Set_Cursors_Graph(&pic); 
 }
  
 
 static void LCUI_IO_Init()
-/* ¹¦ÄÜ£º³õÊ¼»¯ÊäÈëÊä³ö¹¦ÄÜ */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–è¾“å…¥è¾“å‡ºåŠŸèƒ½ */
 {
 	int result;
 
-	/* ¼ì²âÊÇ·ñÖ§³ÖÊó±ê */
+	/* æ£€æµ‹æ˜¯å¦æ”¯æŒé¼ æ ‡ */
 	nobuff_print("checking mouse support...");
 	result = Check_Mouse_Support();
 	if(result == 0)
 	{
 		printf("yes\n");
-		/* ÆôÓÃÊó±êÊäÈë´¦Àí */
+		/* å¯ç”¨é¼ æ ‡è¾“å…¥å¤„ç† */
 		nobuff_print("enable mouse input..."); 
 		result = Enable_Mouse_Input();
 		if(result == 0) printf("success\n");
@@ -772,7 +799,7 @@ static void LCUI_IO_Init()
 	LCUI_Sys.ts.status = REMOVE;
 	LCUI_Sys.ts.thread = 0;
 	LCUI_Sys.ts.td = NULL; 
-	/* ÆôÓÃ´¥ÆÁÊäÈë´¦Àí */
+	/* å¯ç”¨è§¦å±è¾“å…¥å¤„ç† */
 	printf("enable touchscreen input processing\n"); 
 	Enable_TouchScreen_Input();  
 	
@@ -783,7 +810,7 @@ static void print_screeninfo(
 			struct fb_var_screeninfo fb_vinfo,
 			struct fb_fix_screeninfo fb_fix
 )
-/* ¹¦ÄÜ£º´òÓ¡ÆÁÄ»Ïà¹ØµÄĞÅÏ¢ */
+/* åŠŸèƒ½ï¼šæ‰“å°å±å¹•ç›¸å…³çš„ä¿¡æ¯ */
 {
 	char visual[256], type[256];
 	
@@ -835,7 +862,7 @@ static void print_screeninfo(
 }
 
 static int Screen_Init()
-/* ¹¦ÄÜ£º³õÊ¼»¯ÆÁÄ» */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–å±å¹• */
 {
 
 	__u16 rr[256],gg[256],bb[256];
@@ -847,13 +874,13 @@ static int Screen_Init()
 	LCUI_Sys.screen.fb_dev_name = FB_DEV;
 	if ((LCUI_Sys.screen.fb_dev_fd = 
 		open(LCUI_Sys.screen.fb_dev_name, O_RDWR)) == -1) 
-	{/* Èç¹û´ò¿ªÍ¼ĞÎÊä³öÉè±¸³ö´í */
+	{/* å¦‚æœæ‰“å¼€å›¾å½¢è¾“å‡ºè®¾å¤‡å‡ºé”™ */
 		printf("fail\n");
 		perror("error");
 		exit(-1);
 	}
 	else printf("success\n");
-	/* »ñÈ¡ÆÁÄ»Ïà¹ØĞÅÏ¢ */
+	/* è·å–å±å¹•ç›¸å…³ä¿¡æ¯ */
 	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_VSCREENINFO, &fb_vinfo);
 	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_FSCREENINFO, &fb_fix);
 	
@@ -864,25 +891,25 @@ static int Screen_Init()
 		ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGETCMAP, &oldcmap); 
 	
 	nobuff_print("mapping framebuffer...");
-	LCUI_Sys.screen.smem_len = fb_fix.smem_len;/* ±£´æÄÚ´æ¿Õ¼ä´óĞ¡ */
-	/* Ó³ÉäÖ¡»º´æÖÁÄÚ´æ¿Õ¼ä */
+	LCUI_Sys.screen.smem_len = fb_fix.smem_len;/* ä¿å­˜å†…å­˜ç©ºé—´å¤§å° */
+	/* æ˜ å°„å¸§ç¼“å­˜è‡³å†…å­˜ç©ºé—´ */
 	LCUI_Sys.screen.fb_mem = mmap(NULL,fb_fix.smem_len,
 							PROT_READ|PROT_WRITE,MAP_SHARED,
 							LCUI_Sys.screen.fb_dev_fd,0);
 							
 	if((void *)-1 == LCUI_Sys.screen.fb_mem)
-	{/* Èç¹ûÊ§°Ü */
+	{/* å¦‚æœå¤±è´¥ */
 		printf("fail\n");
 		perror(strerror(errno));
 		exit(-1);
 	}
 	else printf("success\n");
 	
-	Graph_Init(&LCUI_Sys.screen.buff); /* ³õÊ¼»¯Í¼ĞÎÊı¾İ */
+	Graph_Init(&LCUI_Sys.screen.buff); /* åˆå§‹åŒ–å›¾å½¢æ•°æ® */
 	
-	LCUI_Sys.screen.buff.flag = NO_ALPHA;/* ÎŞalphaÍ¨µÀ */
-	LCUI_Sys.screen.buff.type = TYPE_BMP;/* bmpÎ»Í¼ */
-	LCUI_Sys.screen.size.w = fb_vinfo.xres; /* ±£´æÆÁÄ»³ß´ç */
+	LCUI_Sys.screen.buff.flag = NO_ALPHA;/* æ— alphaé€šé“ */
+	LCUI_Sys.screen.buff.type = TYPE_BMP;/* bmpä½å›¾ */
+	LCUI_Sys.screen.size.w = fb_vinfo.xres; /* ä¿å­˜å±å¹•å°ºå¯¸ */
 	LCUI_Sys.screen.size.h = fb_vinfo.yres; 
 	LCUI_Sys.screen.buff.width = fb_vinfo.xres; 
 	LCUI_Sys.screen.buff.height = fb_vinfo.yres;
@@ -890,19 +917,19 @@ static int Screen_Init()
 }
 
 int Get_Screen_Bits()
-/* ¹¦ÄÜ£º»ñÈ¡ÆÁÄ»ÖĞµÄÃ¿¸öÏñËØµÄ±íÊ¾ËùÓÃµÄÎ»Êı */
+/* åŠŸèƒ½ï¼šè·å–å±å¹•ä¸­çš„æ¯ä¸ªåƒç´ çš„è¡¨ç¤ºæ‰€ç”¨çš„ä½æ•° */
 {
 	return LCUI_Sys.screen.bits;
 }
 
 LCUI_Pos Get_Screen_Center_Point()
-/* ¹¦ÄÜ£º»ñÈ¡ÆÁÄ»ÖĞĞÄµãµÄ×ø±ê */
+/* åŠŸèƒ½ï¼šè·å–å±å¹•ä¸­å¿ƒç‚¹çš„åæ ‡ */
 {
 	return Pos(LCUI_Sys.screen.size.w/2.0, LCUI_Sys.screen.size.h/2.0);
 }
 
 int LCUI_Active()
-/* ¹¦ÄÜ£º¼ì²âLCUIÊÇ·ñ»î¶¯ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹LCUIæ˜¯å¦æ´»åŠ¨ */
 {
 	if(LCUI_Sys.status == ACTIVE)
 		return 1;
@@ -912,49 +939,49 @@ int LCUI_Active()
 //extern int debug_mark;
 int LCUI_Init(int argc, char *argv[])
 /* 
- * ¹¦ÄÜ£ºÓÃÓÚ¶ÔLCUI½øĞĞ³õÊ¼»¯²Ù×÷ 
- * ËµÃ÷£ºÃ¿¸öÊ¹ÓÃLCUIÊµÏÖÍ¼ĞÎ½çÃæµÄ³ÌĞò£¬¶¼ĞèÒªÏÈµ÷ÓÃ´Ëº¯Êı½øĞĞLCUIµÄ³õÊ¼»¯
+ * åŠŸèƒ½ï¼šç”¨äºå¯¹LCUIè¿›è¡Œåˆå§‹åŒ–æ“ä½œ 
+ * è¯´æ˜ï¼šæ¯ä¸ªä½¿ç”¨LCUIå®ç°å›¾å½¢ç•Œé¢çš„ç¨‹åºï¼Œéƒ½éœ€è¦å…ˆè°ƒç”¨æ­¤å‡½æ•°è¿›è¡ŒLCUIçš„åˆå§‹åŒ–
  * */
 {
 	int temp;
 	if(LCUI_Sys.init != IS_TRUE)
-	{/* Èç¹ûLCUIÃ»ÓĞ³õÊ¼»¯¹ı */ 
-		srand(time(NULL));/* Éú³ÉËæ»úÊıĞèÒªÓÃµ½£¬Ö»µ÷ÓÃÒ»´Î¼´¿É */
+	{/* å¦‚æœLCUIæ²¡æœ‰åˆå§‹åŒ–è¿‡ */ 
+		srand(time(NULL));/* ç”Ÿæˆéšæœºæ•°éœ€è¦ç”¨åˆ°ï¼Œåªè°ƒç”¨ä¸€æ¬¡å³å¯ */
 		LCUI_Sys.init = IS_TRUE;
 		Print_LCUI_Copyright_Text();
 		
-		Thread_TreeNode_Init (&LCUI_Sys.thread_tree);	/* ³õÊ¼»¯¸ùÏß³Ì½áµã */
-		LCUI_Sys.thread_tree.tid = pthread_self();	/* µ±Ç°Ïß³ÌID×÷Îª¸ù½áµã */
-		LCUI_Sys.self_id = pthread_self();		/* ±£´æÏß³ÌID */
-		/* Éè¶¨×î´ó¿ÕÏĞÊ±¼ä */
+		Thread_TreeNode_Init (&LCUI_Sys.thread_tree);	/* åˆå§‹åŒ–æ ¹çº¿ç¨‹ç»“ç‚¹ */
+		LCUI_Sys.thread_tree.tid = pthread_self();	/* å½“å‰çº¿ç¨‹IDä½œä¸ºæ ¹ç»“ç‚¹ */
+		LCUI_Sys.self_id = pthread_self();		/* ä¿å­˜çº¿ç¨‹ID */
+		/* è®¾å®šæœ€å¤§ç©ºé—²æ—¶é—´ */
 		LCUI_Sys.max_app_idle_time = MAX_APP_IDLE_TIME;
 		LCUI_Sys.max_lcui_idle_time = MAX_LCUI_IDLE_TIME;
 		
-		EventQueue_Init(&LCUI_Sys.key_event);	/* ³õÊ¼»¯°´¼üÊÂ¼ş¶ÓÁĞ */
-		LCUI_Font_Init (&LCUI_Sys.default_font);/* ³õÊ¼»¯Ä¬ÈÏµÄ×ÖÌåÊı¾İ */
-		LCUI_AppList_Init (&LCUI_Sys.app_list); /* ³õÊ¼»¯LCUI³ÌĞòÊı¾İ */
-		RectQueue_Init (&LCUI_Sys.update_area);	/* ³õÊ¼»¯ÆÁÄ»ÇøÓò¸üĞÂ¶ÓÁĞ */ 
-		WidgetQueue_Init (&LCUI_Sys.widget_list); /* ³õÊ¼»¯²¿¼ş¶ÓÁĞ */
-		/* ³õÊ¼»¯ÓÃÓÚ´¢´æÒÑ°´ÏÂµÄ¼üµÄ¼üÖµ¶ÓÁĞ */
+		EventQueue_Init(&LCUI_Sys.key_event);	/* åˆå§‹åŒ–æŒ‰é”®äº‹ä»¶é˜Ÿåˆ— */
+		LCUI_Font_Init (&LCUI_Sys.default_font);/* åˆå§‹åŒ–é»˜è®¤çš„å­—ä½“æ•°æ® */
+		LCUI_AppList_Init (&LCUI_Sys.app_list); /* åˆå§‹åŒ–LCUIç¨‹åºæ•°æ® */
+		RectQueue_Init (&LCUI_Sys.update_area);	/* åˆå§‹åŒ–å±å¹•åŒºåŸŸæ›´æ–°é˜Ÿåˆ— */ 
+		WidgetQueue_Init (&LCUI_Sys.widget_list); /* åˆå§‹åŒ–éƒ¨ä»¶é˜Ÿåˆ— */
+		/* åˆå§‹åŒ–ç”¨äºå‚¨å­˜å·²æŒ‰ä¸‹çš„é”®çš„é”®å€¼é˜Ÿåˆ— */
 		Queue_Init(&LCUI_Sys.press_key, sizeof(int), NULL);
 		
-		/* ¼ÇÂ¼³ÌĞòĞÅÏ¢ */
+		/* è®°å½•ç¨‹åºä¿¡æ¯ */
 		temp = LCUI_AppList_Add();
 		if(temp != 0)  
 			exit(-1);
 		
-		Core_Start();	/* LCUIµÄºËĞÄ¿ªÊ¼¹¤×÷ */ 
-		Screen_Init();	/* ³õÊ¼»¯ÆÁÄ»Í¼ĞÎÊä³ö¹¦ÄÜ */
-		Mouse_Init();	/* ³õÊ¼»¯Êó±ê */
-		Cursor_Init();	/* ³õÊ¼»¯Êó±êÓÎ±ê */
-		LCUI_IO_Init();	/* ³õÊ¼»¯ÊäÈëÊä³öÉè±¸ */ 
-		Widget_Event_Init(); /* ³õÊ¼»¯²¿¼şÊÂ¼ş´¦Àí */
-		/* ±£´æµ±Ç°ÆÁÄ»ÄÚÈİ£¬ÒÔ±ãÍË³öLCUIºó»¹Ô­ */
+		Core_Start();	/* LCUIçš„æ ¸å¿ƒå¼€å§‹å·¥ä½œ */ 
+		Screen_Init();	/* åˆå§‹åŒ–å±å¹•å›¾å½¢è¾“å‡ºåŠŸèƒ½ */
+		Mouse_Init();	/* åˆå§‹åŒ–é¼ æ ‡ */
+		Cursor_Init();	/* åˆå§‹åŒ–é¼ æ ‡æ¸¸æ ‡ */
+		LCUI_IO_Init();	/* åˆå§‹åŒ–è¾“å…¥è¾“å‡ºè®¾å¤‡ */ 
+		Widget_Event_Init(); /* åˆå§‹åŒ–éƒ¨ä»¶äº‹ä»¶å¤„ç† */
+		/* ä¿å­˜å½“å‰å±å¹•å†…å®¹ï¼Œä»¥ä¾¿é€€å‡ºLCUIåè¿˜åŸ */
 		Get_Screen_Graph(&LCUI_Sys.screen.buff); 
 		//debug_mark = 1;
-		/* Êó±êÓÎ±ê¾ÓÖĞ */
+		/* é¼ æ ‡æ¸¸æ ‡å±…ä¸­ */
 		Set_Cursor_Pos(Get_Screen_Center_Point());  
-		Show_Cursor();	/* ÏÔÊ¾Êó±êÓÎ±ê */ 
+		Show_Cursor();	/* æ˜¾ç¤ºé¼ æ ‡æ¸¸æ ‡ */ 
 	}
 	else
 	{
@@ -962,13 +989,13 @@ int LCUI_Init(int argc, char *argv[])
 		if(temp != 0) 
 			exit(-1);
 	}
-	/* ×¢²áÄ¬ÈÏ²¿¼şÀàĞÍ */
+	/* æ³¨å†Œé»˜è®¤éƒ¨ä»¶ç±»å‹ */
 	Register_Default_Widget_Type(); 
 	return 0;
 }
 
 void *catch()
-/* ÔÚ½ØÈ¡¶¯»­Ê±£¬»áÓÃÕâ¸öº¯Êı²¶»ñÆÁÄ»ÄÚÈİ */
+/* åœ¨æˆªå–åŠ¨ç”»æ—¶ï¼Œä¼šç”¨è¿™ä¸ªå‡½æ•°æ•è·å±å¹•å†…å®¹ */
 { 
 	LCUI_Graph graph;
 	int i=0, tsec=0;
@@ -998,7 +1025,7 @@ void *catch()
 }
 
 int Need_Main_Loop(LCUI_App *app)
-/* ¹¦ÄÜ£º¼ì²âÖ÷Ñ­»·ÊÇ·ñĞèÒª¼ÌĞø½øĞĞ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹ä¸»å¾ªç¯æ˜¯å¦éœ€è¦ç»§ç»­è¿›è¡Œ */
 {
 	if(app->stop_loop == IS_TRUE)
 		return 0;
@@ -1007,15 +1034,15 @@ int Need_Main_Loop(LCUI_App *app)
 
 int LCUI_Main ()
 /* 
- * ¹¦ÄÜ£ºLCUI³ÌĞòµÄÖ÷Ñ­»·
- * ËµÃ÷£ºÃ¿¸öLCUI³ÌĞò¶¼ĞèÒªµ÷ÓÃËü£¬´Ëº¯Êı»áÈÃ³ÌĞòÖ´ĞĞLCUI·ÖÅäµÄÈÎÎñ
+ * åŠŸèƒ½ï¼šLCUIç¨‹åºçš„ä¸»å¾ªç¯
+ * è¯´æ˜ï¼šæ¯ä¸ªLCUIç¨‹åºéƒ½éœ€è¦è°ƒç”¨å®ƒï¼Œæ­¤å‡½æ•°ä¼šè®©ç¨‹åºæ‰§è¡ŒLCUIåˆ†é…çš„ä»»åŠ¡
  *  */
 {
 	LCUI_App *app;
 	LCUI_ID idle_time = 1500;
 	LCUI_Graph graph;
 	Graph_Init(&graph);
-	//´´½¨Ïß³Ì£¬ÓÃÓÚ½ØÍ¼¡£
+	//åˆ›å»ºçº¿ç¨‹ï¼Œç”¨äºæˆªå›¾ã€‚
 	//pthread_t t;
 	//LCUI_Thread_Create(&t, NULL, catch, NULL);
 	
@@ -1027,30 +1054,30 @@ int LCUI_Main ()
 	}
 	
 	while (Need_Main_Loop(app))
-	{/* Ñ­»·Ìõ¼şÊÇ³ÌĞò²»ĞèÒª¹Ø±Õ */ 
+	{/* å¾ªç¯æ¡ä»¶æ˜¯ç¨‹åºä¸éœ€è¦å…³é—­ */ 
 	
-		if(Empty_Widget()) /* Ã»ÓĞ²¿¼ş£¬¾Í²»ĞèÒªÑ­»· */
+		if(Empty_Widget()) /* æ²¡æœ‰éƒ¨ä»¶ï¼Œå°±ä¸éœ€è¦å¾ªç¯ */
 			break;
 		
-		if(Have_Task(app)) /* Èç¹ûÓĞĞèÒªÖ´ĞĞµÄÈÎÎñ */
+		if(Have_Task(app)) /* å¦‚æœæœ‰éœ€è¦æ‰§è¡Œçš„ä»»åŠ¡ */
 		{
 			idle_time = 1500;
 			Run_Task(app); 
 		}
 		else
-		{/* ·ñÔòÔİÍ£Ò»¶ÎÊ±¼ä */
+		{/* å¦åˆ™æš‚åœä¸€æ®µæ—¶é—´ */
 			usleep (idle_time);
-			idle_time += 1500;	/* Ã¿´ÎÑ­»·µÄ¿ÕÏĞÊ±¼äÔ½À´Ô½³¤ */
+			idle_time += 1500;	/* æ¯æ¬¡å¾ªç¯çš„ç©ºé—²æ—¶é—´è¶Šæ¥è¶Šé•¿ */
 			if (idle_time >= LCUI_Sys.max_app_idle_time)
 				idle_time = LCUI_Sys.max_app_idle_time;
 		}
 	}
 	
-	return App_Quit ();	/* Ö±½Ó¹Ø±Õ³ÌĞò£¬²¢ÊÍ·Å×ÊÔ´ */ 
+	return App_Quit ();	/* ç›´æ¥å…³é—­ç¨‹åºï¼Œå¹¶é‡Šæ”¾èµ„æº */ 
 }
 
 int Get_LCUI_Version(char *out)
-/* ¹¦ÄÜ£º»ñÈ¡LCUIµÄ°æ±¾ */
+/* åŠŸèƒ½ï¼šè·å–LCUIçš„ç‰ˆæœ¬ */
 {
 	return sprintf(out, "%s", LCUI_VERSION);
 }

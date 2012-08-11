@@ -1,4 +1,4 @@
-// ²âÊÔlabel²¿¼şµÄÊ¾Àı³ÌĞò
+// æµ‹è¯•labeléƒ¨ä»¶çš„ç¤ºä¾‹ç¨‹åº
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -13,67 +13,67 @@
 #include <pthread.h>
 #include <time.h>
 void *change_label_text(void *arg)
-/* ¹¦ÄÜ£º¶¯Ì¬¸Ä±älabel²¿¼şµÄÎÄ±¾ÄÚÈİ */
+/* åŠŸèƒ½ï¼šåŠ¨æ€æ”¹å˜labeléƒ¨ä»¶çš„æ–‡æœ¬å†…å®¹ */
 {
     time_t rawtime;
     struct tm * timeinfo;
-    char day[][20] = {"ĞÇÆÚÌì","ĞÇÆÚÒ»","ĞÇÆÚ¶ş","ĞÇÆÚÈı","ĞÇÆÚËÄ","ĞÇÆÚÎå","ĞÇÆÚÁù"};
-    LCUI_Widget *widget = (LCUI_Widget *)arg; /* ×ª»»ÀàĞÍ */
+    char day[][20] = {"æ˜ŸæœŸå¤©","æ˜ŸæœŸä¸€","æ˜ŸæœŸäºŒ","æ˜ŸæœŸä¸‰","æ˜ŸæœŸå››","æ˜ŸæœŸäº”","æ˜ŸæœŸå…­"};
+    LCUI_Widget *widget = (LCUI_Widget *)arg; /* è½¬æ¢ç±»å‹ */
     while(1)
     {
         time ( &rawtime );
-        timeinfo = localtime ( &rawtime ); /* »ñÈ¡ÏµÍ³µ±Ç°Ê±¼ä */
-        /* ¸ü¸ÄÎÄ±¾ÄÚÈİ */
+        timeinfo = localtime ( &rawtime ); /* è·å–ç³»ç»Ÿå½“å‰æ—¶é—´ */
+        /* æ›´æ”¹æ–‡æœ¬å†…å®¹ */
         Set_Label_Text(widget, 
-            "µ±Ç°Ê±¼ä: %4dÄê%02dÔÂ%02dÈÕ %s %02d:%02d:%02d",
+            "å½“å‰æ—¶é—´: %4då¹´%02dæœˆ%02dæ—¥ %s %02d:%02d:%02d",
             timeinfo->tm_year+1900, timeinfo->tm_mon+1, 
             timeinfo->tm_mday, day[(int) (timeinfo->tm_wday)], 
             timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec
         );
-        sleep(1);/* ÔİÍ£1Ãë */
+        sleep(1);/* æš‚åœ1ç§’ */
     }
     LCUI_Thread_Exit(NULL);
 }
 
 int main(int argc, char*argv[])
-/* Ö÷º¯Êı£¬³ÌĞòµÄÈë¿Ú */
+/* ä¸»å‡½æ•°ï¼Œç¨‹åºçš„å…¥å£ */
 {
     pthread_t t;
     LCUI_Widget *window, *label, *time_text;
     
-    LCUI_Init(argc, argv);/* ³õÊ¼»¯LCUIÍ¼ĞÎ½çÃæ¿â */
-    /* ´´½¨²¿¼ş */
+    LCUI_Init(argc, argv);/* åˆå§‹åŒ–LCUIå›¾å½¢ç•Œé¢åº“ */
+    /* åˆ›å»ºéƒ¨ä»¶ */
     window      = Create_Widget("window");
     label       = Create_Widget("label");
     time_text   = Create_Widget("label");
     
-    /* Éè¶¨´°¿Ú±êÌâµÄÎÄ±¾ */
-    Set_Window_Title_Text(window, "²âÊÔlabel²¿¼şµÄÎÄ±¾ÏÔÊ¾"); 
-    /* ¸Ä±ä´°¿ÚµÄ³ß´ç */
+    /* è®¾å®šçª—å£æ ‡é¢˜çš„æ–‡æœ¬ */
+    Set_Window_Title_Text(window, "æµ‹è¯•labeléƒ¨ä»¶çš„æ–‡æœ¬æ˜¾ç¤º"); 
+    /* æ”¹å˜çª—å£çš„å°ºå¯¸ */
     Resize_Widget(window, Size(320, 240));
-    /* ½«´°¿Ú¿Í»§Çø×÷Îªlael²¿¼şµÄÈİÆ÷Ìí¼Ó½øÈ¥ */
+    /* å°†çª—å£å®¢æˆ·åŒºä½œä¸ºlaeléƒ¨ä»¶çš„å®¹å™¨æ·»åŠ è¿›å» */
     Window_Client_Area_Add(window, label);
     Window_Client_Area_Add(window, time_text);
-    /* ×óÉÏ½ÇÏÔÊ¾£¬ÏòÓÒÆ«ÒÆ4£¬ÏòÏÂÆ«ÒÆ4 */
+    /* å·¦ä¸Šè§’æ˜¾ç¤ºï¼Œå‘å³åç§»4ï¼Œå‘ä¸‹åç§»4 */
     Set_Widget_Align(label, ALIGN_TOP_LEFT, Pos(4, 4));
-    /* ÓÒÏÂ½ÇÏÔÊ¾£¬Ïò×óÆ«ÒÆ10£¬ÏòÉÏÆ«ÒÆ5 */
+    /* å³ä¸‹è§’æ˜¾ç¤ºï¼Œå‘å·¦åç§»10ï¼Œå‘ä¸Šåç§»5 */
     Set_Widget_Align(time_text, ALIGN_BOTTOM_RIGHT, Pos(-10, -5));
     /* 
-     * Éè¶¨label²¿¼şÏÔÊ¾µÄÎÄ±¾
-     * <color=R,G,B>ÎÄ×Ö</color> ±íÊ¾µÄÊÇ£º¡°ÎÄ×Ö¡±½«Ê¹ÓÃ×Ô¶¨ÒåÑÕÉ« 
-     * Set_Label_Textº¯ÊıÊ¹ÓÃ·½·¨ºÍsprintfº¯Êı»ù±¾Ò»Ñù£¬Ö§³Ö¿ØÖÆ·û
+     * è®¾å®šlabeléƒ¨ä»¶æ˜¾ç¤ºçš„æ–‡æœ¬
+     * <color=R,G,B>æ–‡å­—</color> è¡¨ç¤ºçš„æ˜¯ï¼šâ€œæ–‡å­—â€å°†ä½¿ç”¨è‡ªå®šä¹‰é¢œè‰² 
+     * Set_Label_Textå‡½æ•°ä½¿ç”¨æ–¹æ³•å’Œsprintfå‡½æ•°åŸºæœ¬ä¸€æ ·ï¼Œæ”¯æŒæ§åˆ¶ç¬¦
      **/
     Set_Label_Text(label, 
-        "<color=50,200,50>/* ×î¾­µäµÄCÓïÑÔ´úÂë */</color>\n"
+        "<color=50,200,50>/* æœ€ç»å…¸çš„Cè¯­è¨€ä»£ç  */</color>\n"
         "<color=0,155,100>#include</color> <color=255,135,0><stdio.h></color>\n"
         "<color=50,50,200>int</color> main(<color=50,50,200>int</color> argc, <color=50,50,200>char</color> *argv[])\n"
         "{\n"
         "  printf(<color=100,100,100>\"hello world!\\n\"</color>);\n"
         "  <color=0,0,200>return</color> 0;\n"
         "}\n"
-    ); 
-    /* ´´½¨Ïß³Ì£¬´Ëº¯ÊıºÍpthread_createº¯ÊıÓÃ·¨Ò»Ñù */
-    LCUI_Thread_Create(&t, NULL, change_label_text, (void*)time_text); 
+    );
+    /* åˆ›å»ºçº¿ç¨‹ï¼Œæ­¤å‡½æ•°å’Œpthread_createå‡½æ•°ç”¨æ³•ä¸€æ · */
+    LCUI_Thread_Create(&t, NULL, change_label_text, (void*)time_text);
     Show_Widget(label);
     Show_Widget(time_text);
     Show_Widget(window);

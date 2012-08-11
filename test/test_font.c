@@ -1,4 +1,4 @@
-// ²âÊÔ LCUI µÄ×ÖÌå´¦Àí¹¦ÄÜ
+// æµ‹è¯• LCUI çš„å­—ä½“å¤„ç†åŠŸèƒ½
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -24,7 +24,7 @@ static char	**filename = NULL;
 static int		total_files = 0, current = 0;
 
 void get_filepath(char *filepath, char *out_path)
-/* ¹¦ÄÜ£ºÓÃÓÚ»ñÈ¡³ÌĞòËùÔÚµÄÎÄ¼şÄ¿Â¼ */
+/* åŠŸèƒ½ï¼šç”¨äºè·å–ç¨‹åºæ‰€åœ¨çš„æ–‡ä»¶ç›®å½• */
 {
 	int num;
 	strcpy(out_path, filepath);
@@ -40,7 +40,7 @@ void get_filepath(char *filepath, char *out_path)
 }
  
 int get_format(char *format, char *filename)
-/* ¹¦ÄÜ£º»ñÈ¡ÎÄ¼ş¸ñÊ½ */
+/* åŠŸèƒ½ï¼šè·å–æ–‡ä»¶æ ¼å¼ */
 {
 	int i, j, len;
 	len = strlen(filename);
@@ -62,7 +62,7 @@ int get_format(char *format, char *filename)
 
  
 char **scan_imgfile(char *dir, int *file_num)
-/* ¹¦ÄÜ£ºÉ¨ÃèÍ¼Æ¬ÎÄ¼ş£¬²¢»ñµÃÎÄ¼şÁĞ±í */
+/* åŠŸèƒ½ï¼šæ‰«æå›¾ç‰‡æ–‡ä»¶ï¼Œå¹¶è·å¾—æ–‡ä»¶åˆ—è¡¨ */
 {
 	int i, len, n; 
 	char **filelist, format[256], path[1024];
@@ -79,7 +79,7 @@ char **scan_imgfile(char *dir, int *file_num)
 		filelist = (char **)malloc(sizeof(char *)*n);
 		for(i=0, *file_num=0; i<n; i++)
 		{
-			if(namelist[i]->d_type==8)/* Èç¹ûÊÇÎÄ¼ş */ 
+			if(namelist[i]->d_type==8)/* å¦‚æœæ˜¯æ–‡ä»¶ */ 
 			{
 				get_format(format, namelist[i]->d_name);
 				if(strlen(format) > 2 
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 		"<color=30,144,255>ABCDEFGHIJKLMN</color>\n"
 		"<color=0,75,65>OPQRSTUVWXYZ</color>\n"
 		"<color=255,0,0>1234567890.:,;(*!?)</color>\n"
-		"<color=0,215,0>ÖĞ¹ú´´Ôì£¬»Û¼°È«Çò£¡</color>");
+		"<color=0,215,0>ä¸­å›½åˆ›é€ ï¼Œæ…§åŠå…¨çƒï¼</color>");
 	Set_Widget_Align(text, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	Window_Client_Area_Add(window, text);
 	Show_Widget(text);

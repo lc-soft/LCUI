@@ -20,22 +20,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_ProgressBar.c -- LCUI µÄ½ø¶ÈÌõ²¿¼þ
+ * LCUI_ProgressBar.c -- LCUI çš„è¿›åº¦æ¡éƒ¨ä»¶
  *
- * °æÈ¨ËùÓÐ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±žäºŽ 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼þÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾ÝGPLv2Ðí¿ÉÐ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ðí¿ÉÖ¤µÚ¶þ°æ µÄÓ¢ÎÄËõÐ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌÐøÊ¹ÓÃ¡¢ÐÞ¸Ä»ò·¢²¼±¾ÎÄ¼þ£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öÐí¿ÉÐ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜Žæ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’ŒæŽ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔðÈÎ£¬ÉõÖÁÃ»ÓÐÊÊÏúÐÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒþº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ðí¿ÉÐ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºŽä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼þµÄGPLv2Ðí¿ÉÐ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼þÖÐ£¬Èç¹û
- * Ã»ÓÐ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºŽæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æžœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -52,14 +52,14 @@
 #include <pthread.h>
 
 int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
-/* ¹¦ÄÜ£º»æÖÆ½ø¶ÈÌõµÄ¿Õ²Û */
+/* åŠŸèƒ½ï¼šç»˜åˆ¶è¿›åº¦æ¡çš„ç©ºæ§½ */
 {
 	if(width < 4 || height < 4) return -1;
 	graph->flag = HAVE_ALPHA;
-	Malloc_Graph(graph, width, height); /* ÉêÇëÄÚ´æ */
-	Fill_Color(graph, RGB(250,250,250));/* Ìî³ä°×É« */
+	Malloc_Graph(graph, width, height); /* ç”³è¯·å†…å­˜ */
+	Fill_Color(graph, RGB(250,250,250));/* å¡«å……ç™½è‰² */
 	Fill_Graph_Alpha(graph, 255);
-	/* ËÄ¸ö½ÇÉÏµÄÒ»¸öÏñËØµãÍêÈ«Í¸Ã÷ */
+	/* å››ä¸ªè§’ä¸Šçš„ä¸€ä¸ªåƒç´ ç‚¹å®Œå…¨é€æ˜Ž */
 	graph->rgba[3][0] = 0;
 	graph->rgba[3][width-1] = 0;
 	graph->rgba[3][width*(height-1)] = 0;
@@ -67,7 +67,7 @@ int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 	
 	int i, n;
 	unsigned char c;
-	/* »æÖÆ×ó±ßºÍÓÒ±ßµÄÊúÏßÌõ */
+	/* ç»˜åˆ¶å·¦è¾¹å’Œå³è¾¹çš„ç«–çº¿æ¡ */
 	for(i=0; i<height; ++i)
 	{
 		n = i*width; 
@@ -88,7 +88,7 @@ int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 		graph->rgba[2][n-1] = 230;
 	}
 	
-	/* »æÖÆ¶¥¶ËµÄÏßÌõ */
+	/* ç»˜åˆ¶é¡¶ç«¯çš„çº¿æ¡ */
 	memset(graph->rgba[0], 180, width);
 	memset(graph->rgba[1], 180, width);
 	memset(graph->rgba[2], 180, width);
@@ -97,7 +97,7 @@ int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 	memset(graph->rgba[1]+width+1, 240, width-2); 
 	memset(graph->rgba[2]+width+1, 240, width-2); 
 	
-	/* »æÖÆµ×¶ËµÄÏßÌõ */
+	/* ç»˜åˆ¶åº•ç«¯çš„çº¿æ¡ */
 	n = width*(height-1);
 	memset(graph->rgba[0]+n, 140, width);
 	memset(graph->rgba[1]+n, 140, width);
@@ -111,14 +111,14 @@ int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 }
 
 LCUI_Widget *Get_ProgressBar_Flash_Img_Widget(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡½ø¶ÈÌõÉÏÉÁ¹âÍ¼ÐÎËùÔÚµÄPictureBox²¿¼þ */
+/* åŠŸèƒ½ï¼šèŽ·å–è¿›åº¦æ¡ä¸Šé—ªå…‰å›¾å½¢æ‰€åœ¨çš„PictureBoxéƒ¨ä»¶ */
 {
 	LCUI_ProgressBar *pb = (LCUI_ProgressBar*)Get_Widget_Private_Data(widget);
 	return pb->img_pic_box;
 }
 
 static void Destroy_ProgressBar(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÊÍ·Å½ø¶ÈÌõ²¿¼þÕ¼ÓÃµÄÄÚ´æ×ÊÔ´ */
+/* åŠŸèƒ½ï¼šé‡Šæ”¾è¿›åº¦æ¡éƒ¨ä»¶å ç”¨çš„å†…å­˜èµ„æº */
 {
 	LCUI_ProgressBar *pb = (LCUI_ProgressBar*)Get_Widget_Private_Data(widget);
 	Free_Graph(&pb->fore_graph);
@@ -126,7 +126,7 @@ static void Destroy_ProgressBar(LCUI_Widget *widget)
 }
 
 static void ProgressBar_Init(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º³õÊ¼»¯½ø¶ÈÌõµÄÊý¾Ý½á¹¹Ìå */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–è¿›åº¦æ¡çš„æ•°æ®ç»“æž„ä½“ */
 {
 	LCUI_ProgressBar *pb= (LCUI_ProgressBar*)
 									Malloc_Widget_Private
@@ -142,14 +142,14 @@ static void ProgressBar_Init(LCUI_Widget *widget)
 	LCUI_Widget *f_pb, *img_pb;
 	f_pb = Create_Widget("picture_box"); 
 	img_pb = Create_Widget("picture_box");
-	/* ÒÔ×Ô¼ºÎªÈÝÆ÷£¬½«ÕâÐ©²¿¼þ·Å½øÈ¥ */
+	/* ä»¥è‡ªå·±ä¸ºå®¹å™¨ï¼Œå°†è¿™äº›éƒ¨ä»¶æ”¾è¿›åŽ» */
 	Widget_Container_Add(f_pb, img_pb);
 	Widget_Container_Add(widget, f_pb); 
-	/* Ã»ÓÐ±³¾°Í¼Ê±¾ÍÌî³ä±³¾°É« */
+	/* æ²¡æœ‰èƒŒæ™¯å›¾æ—¶å°±å¡«å……èƒŒæ™¯è‰² */
 	Set_Widget_BG_Mode(widget, BG_MODE_FILL_BACKCOLOR);
 	Set_Widget_Border(widget, RGB(50,50,50), Border(1,1,1,1));
 	
-	Set_Widget_Style(widget, "classic"); /* ½ø¶ÈÌõÎª¾­µä·ç¸ñ */
+	Set_Widget_Style(widget, "classic"); /* è¿›åº¦æ¡ä¸ºç»å…¸é£Žæ ¼ */
 	
 	Set_PictureBox_Size_Mode(f_pb, SIZE_MODE_STRETCH); 
 	
@@ -161,15 +161,15 @@ static void ProgressBar_Init(LCUI_Widget *widget)
 }
 
 static void Exec_Update_ProgressBar(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º¸üÐÂ½ø¶ÈÌõµÄÍ¼ÐÎ */
+/* åŠŸèƒ½ï¼šæ›´æ–°è¿›åº¦æ¡çš„å›¾å½¢ */
 { 
 	LCUI_ProgressBar *pb = (LCUI_ProgressBar*)Get_Widget_Private_Data(widget);
 	if(Strcmp(&widget->style, "dynamic") == 0)
 	{
-		/* »æÖÆ¿Õ²Û */
+		/* ç»˜åˆ¶ç©ºæ§½ */
 		Draw_Empty_Slot(&widget->graph, widget->size.w, widget->size.h);
 		Set_Widget_Border_Style(widget, BORDER_STYLE_NONE);
-		/* ÔØÈëÁ½¸öÍ¼ÐÎ */
+		/* è½½å…¥ä¸¤ä¸ªå›¾å½¢ */
 		if(!Valid_Graph(&pb->fore_graph)) 
 			Load_Graph_ProgressBar_Fore(&pb->fore_graph);  
 			
@@ -178,7 +178,7 @@ static void Exec_Update_ProgressBar(LCUI_Widget *widget)
 		
 		Resize_Widget(pb->img_pic_box, 
 				Size(pb->flash_image.width, pb->flash_image.height)); 
-		/* ÈÃÍ¼Æ¬ºÐ×ÓÏÔÊ¾Õâ¸öÍ¼ÐÎ */
+		/* è®©å›¾ç‰‡ç›’å­æ˜¾ç¤ºè¿™ä¸ªå›¾å½¢ */
 		Set_PictureBox_Image_From_Graph(pb->img_pic_box, &pb->flash_image);
 	}
 	else 
@@ -190,24 +190,24 @@ static void Exec_Update_ProgressBar(LCUI_Widget *widget)
 		Fill_Graph_Alpha(&pb->fore_graph, 255);
 	}
 	
-	/* ÈÃÍ¼Æ¬ºÐ×ÓÏÔÊ¾Õâ¸öÍ¼ÐÎ */
+	/* è®©å›¾ç‰‡ç›’å­æ˜¾ç¤ºè¿™ä¸ªå›¾å½¢ */
 	Set_PictureBox_Image_From_Graph(pb->fore_pic_box, &pb->fore_graph); 
 	
 	int width, height;
-	/* ¼ÆËã½ø¶ÈÌõµÄ³¤¶È */ 
+	/* è®¡ç®—è¿›åº¦æ¡çš„é•¿åº¦ */ 
 	width = (widget->size.w - widget->border.left - widget->border.right) 
 			* pb->value / pb->max_value + 0.5;
 	height = widget->size.h - widget->border.top - widget->border.bottom;
 	
 	Move_Widget(pb->fore_pic_box, Pos(widget->border.left, widget->border.top));
-	/* ¸Ä±ä½ø¶ÈÌõµÄ³ß´ç */
+	/* æ”¹å˜è¿›åº¦æ¡çš„å°ºå¯¸ */
 	Resize_Widget(pb->fore_pic_box, 
 		Size(width, height));
 }
 
 
 void Set_ProgressBar_Max_Value(LCUI_Widget *widget, int max_value)
-/* ¹¦ÄÜ£ºÉè¶¨½ø¶ÈÌõ×î´óÖµ */
+/* åŠŸèƒ½ï¼šè®¾å®šè¿›åº¦æ¡æœ€å¤§å€¼ */
 {
 	LCUI_ProgressBar *pb = Get_Widget_Private_Data(widget);
 	pb->max_value = max_value; 
@@ -215,14 +215,14 @@ void Set_ProgressBar_Max_Value(LCUI_Widget *widget, int max_value)
 }
 
 int Get_ProgressBar_Max_Value(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡½ø¶ÈÌõ×î´óÖµ */
+/* åŠŸèƒ½ï¼šèŽ·å–è¿›åº¦æ¡æœ€å¤§å€¼ */
 {
 	LCUI_ProgressBar *pb = Get_Widget_Private_Data(widget);
 	return pb->max_value;
 }
 
 void Set_ProgressBar_Value(LCUI_Widget *widget, int value)
-/* ¹¦ÄÜ£ºÉè¶¨½ø¶ÈÌõµ±Ç°Öµ */
+/* åŠŸèƒ½ï¼šè®¾å®šè¿›åº¦æ¡å½“å‰å€¼ */
 {
 	LCUI_ProgressBar *pb = Get_Widget_Private_Data(widget);
 	pb->value = value; 
@@ -230,14 +230,14 @@ void Set_ProgressBar_Value(LCUI_Widget *widget, int value)
 }
 
 int Get_ProgressBar_Value(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º»ñÈ¡½ø¶ÈÌõµ±Ç°Öµ */
+/* åŠŸèƒ½ï¼šèŽ·å–è¿›åº¦æ¡å½“å‰å€¼ */
 {
 	LCUI_ProgressBar *pb = Get_Widget_Private_Data(widget);
 	return pb->value;
 }
 
 static void *Move_Flash_Img(void *arg)
-/* ¹¦ÄÜ£ºÒÆ¶¯½ø¶ÈÌõÖÐÉÁ¹âµÄÎ»ÖÃ */
+/* åŠŸèƒ½ï¼šç§»åŠ¨è¿›åº¦æ¡ä¸­é—ªå…‰çš„ä½ç½® */
 {
 	int x=0;
 	LCUI_Widget *widget = (LCUI_Widget*)arg;
@@ -258,7 +258,7 @@ static void *Move_Flash_Img(void *arg)
 }
 
 static void Show_ProgressBar(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÔÚÏÔÊ¾½ø¶ÈÌõÊ±£¬´¦ÀíÆäËü²Ù×÷ */
+/* åŠŸèƒ½ï¼šåœ¨æ˜¾ç¤ºè¿›åº¦æ¡æ—¶ï¼Œå¤„ç†å…¶å®ƒæ“ä½œ */
 {
 	LCUI_ProgressBar *pb = (LCUI_ProgressBar*)Get_Widget_Private_Data(widget);
 	if(Strcmp(&widget->style, "dynamic") == 0)
@@ -273,7 +273,7 @@ static void Show_ProgressBar(LCUI_Widget *widget)
 	{
 		Hide_Widget(pb->img_pic_box);
 		if(pb->thread != 0)
-		{/* ·ñÔò£¬Èç¹ûÏß³ÌID²»Îª0£¬¾Í³·ÏúÏß³Ì */
+		{/* å¦åˆ™ï¼Œå¦‚æžœçº¿ç¨‹IDä¸ä¸º0ï¼Œå°±æ’¤é”€çº¿ç¨‹ */
 			LCUI_Thread_Cancel(pb->thread);
 			pb->thread = 0;
 		}
@@ -281,12 +281,12 @@ static void Show_ProgressBar(LCUI_Widget *widget)
 }
 
 void Register_ProgressBar()
-/* ¹¦ÄÜ£º×¢²á²¿¼þÀàÐÍ-½ø¶ÈÌõÖÁ²¿¼þ¿â */
+/* åŠŸèƒ½ï¼šæ³¨å†Œéƒ¨ä»¶ç±»åž‹-è¿›åº¦æ¡è‡³éƒ¨ä»¶åº“ */
 {
-	/* Ìí¼Ó²¿¼þÀàÐÍ */
+	/* æ·»åŠ éƒ¨ä»¶ç±»åž‹ */
 	WidgetType_Add("progress_bar");
 	
-	/* Îª²¿¼þÀàÐÍ¹ØÁªÏà¹Øº¯Êý */
+	/* ä¸ºéƒ¨ä»¶ç±»åž‹å…³è”ç›¸å…³å‡½æ•° */
 	WidgetFunc_Add("progress_bar",	ProgressBar_Init,		FUNC_TYPE_INIT);
 	WidgetFunc_Add("progress_bar",	Exec_Update_ProgressBar,FUNC_TYPE_UPDATE);
 	WidgetFunc_Add("progress_bar",	Show_ProgressBar,		FUNC_TYPE_SHOW); 

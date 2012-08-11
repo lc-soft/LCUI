@@ -20,22 +20,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Misc.c -- Ã»ÓÐ¾ßÌå·ÖÀàµÄÔÓÏî¹¦ÄÜ
+ * LCUI_Misc.c -- æ²¡æœ‰å…·ä½“åˆ†ç±»çš„æ‚é¡¹åŠŸèƒ½
  *
- * °æÈ¨ËùÓÐ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±žäºŽ 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼þÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾ÝGPLv2Ðí¿ÉÐ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ðí¿ÉÖ¤µÚ¶þ°æ µÄÓ¢ÎÄËõÐ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌÐøÊ¹ÓÃ¡¢ÐÞ¸Ä»ò·¢²¼±¾ÎÄ¼þ£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öÐí¿ÉÐ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜Žæ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’ŒæŽ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔðÈÎ£¬ÉõÖÁÃ»ÓÐÊÊÏúÐÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒþº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ðí¿ÉÐ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºŽä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼þµÄGPLv2Ðí¿ÉÐ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼þÖÐ£¬Èç¹û
- * Ã»ÓÐ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºŽæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æžœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
  
 #include <LCUI_Build.h>
@@ -43,7 +43,7 @@
 #include LC_MISC_H
 
 void String_Init(LCUI_String *in)
-/* ¹¦ÄÜ£º³õÊ¼»¯String½á¹¹ÌåÖÐµÄÊý¾Ý */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–Stringç»“æž„ä½“ä¸­çš„æ•°æ® */
 {
 	in->size = 0;
 	in->string = NULL;
@@ -51,7 +51,7 @@ void String_Init(LCUI_String *in)
 
 
 void Rect_Init(LCUI_Rect *rect)
-/* ¹¦ÄÜ£º³õÊ¼»¯¾ØÐÎÇøÓòµÄÊý¾Ý */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–çŸ©å½¢åŒºåŸŸçš„æ•°æ® */
 {
 	rect->x      = 0;
 	rect->y      = 0;
@@ -63,7 +63,7 @@ void Rect_Init(LCUI_Rect *rect)
 
 
 void Border_Init(LCUI_Border *in)
-/* ¹¦ÄÜ£º³õÊ¼»¯±ß¿ò */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–è¾¹æ¡† */
 { 
 	in->left = 0;
 	in->bottom = 0;
@@ -74,7 +74,7 @@ void Border_Init(LCUI_Border *in)
 
 
 void Strcpy (LCUI_String * des, char *src)
-/* ¹¦ÄÜ£º¿½±´×Ö·û´®ÖÁString½á¹¹ÌåÊý¾ÝÖÐ */
+/* åŠŸèƒ½ï¼šæ‹·è´å­—ç¬¦ä¸²è‡³Stringç»“æž„ä½“æ•°æ®ä¸­ */
 {
 	if(des == NULL) 
 		return;
@@ -96,7 +96,7 @@ void Strcpy (LCUI_String * des, char *src)
 }
 
 int Strcmp(LCUI_String *str1, char *str2)
-/* ¹¦ÄÜ£º¶Ô±Èstr1Óëstr2 */
+/* åŠŸèƒ½ï¼šå¯¹æ¯”str1ä¸Žstr2 */
 {
 	if (str1 != NULL && str1->size > 0 && str2 != NULL) 
 		return strcmp(str1->string, str2); 
@@ -105,18 +105,18 @@ int Strcmp(LCUI_String *str1, char *str2)
 
 void Get_Moved_Rect_Refresh_Area (int new_x, int new_y, LCUI_Rect rect,
 							 LCUI_Rect * rect_a, LCUI_Rect * rect_b)
-/* ¹¦ÄÜ£º»ñÈ¡Ò»¸ö¾ØÐÎÒÆ¶¯ºóÐèÒªË¢ÐÂµÄ²ÐÁôÇøÓò£¬Ò²¾ÍÊÇAºÍBÁ½¸öÇøÓò¡£ */
+/* åŠŸèƒ½ï¼šèŽ·å–ä¸€ä¸ªçŸ©å½¢ç§»åŠ¨åŽéœ€è¦åˆ·æ–°çš„æ®‹ç•™åŒºåŸŸï¼Œä¹Ÿå°±æ˜¯Aå’ŒBä¸¤ä¸ªåŒºåŸŸã€‚ */
 {
 	Rect_Init (rect_a);
 	Rect_Init (rect_b);
 	if (rect.x < new_x)
-	{							/* Èç¹ûÊÇÏòÓÒÒÆ */
+	{							/* å¦‚æžœæ˜¯å‘å³ç§» */
 		rect_a->x = rect.x;
 		rect_a->y = rect.y;
 		rect_a->width = new_x - rect.x;
 		rect_a->height = rect.height;
 		if (rect.y > new_y)
-		{						/* Èç¹ûÊÇÏòÉÏÒÆ */
+		{						/* å¦‚æžœæ˜¯å‘ä¸Šç§» */
 			rect_b->x = new_x;
 			rect_b->y = new_y + rect.height;
 			rect_b->width = rect.width - rect_a->width;
@@ -131,14 +131,14 @@ void Get_Moved_Rect_Refresh_Area (int new_x, int new_y, LCUI_Rect rect,
 		}
 	}
 	else if (rect.x > new_x)
-	{							/* Èç¹ûÊÇÏò×óÒÆ */
+	{							/* å¦‚æžœæ˜¯å‘å·¦ç§» */
 		rect_a->x = new_x + rect.width;
 		rect_a->y = rect.y;
 		rect_a->width = rect.x - new_x;
 		rect_a->height = rect.height;
 
 		if (rect.y > new_y)
-		{						/* Èç¹ûÊÇÏòÉÏÒÆ */
+		{						/* å¦‚æžœæ˜¯å‘ä¸Šç§» */
 			rect_b->x = rect.x;
 			rect_b->y = new_y + rect.height;
 			rect_b->width = rect.width - rect_a->width;
@@ -153,13 +153,13 @@ void Get_Moved_Rect_Refresh_Area (int new_x, int new_y, LCUI_Rect rect,
 		}
 	}
 	else
-	{							/* ·ñÔò£¬Ã»ÓÐÏò×óÓÒÒÆ¶¯£¬Ö»ÓÐÏòÉÏºÍÏòÏÂ */
+	{							/* å¦åˆ™ï¼Œæ²¡æœ‰å‘å·¦å³ç§»åŠ¨ï¼Œåªæœ‰å‘ä¸Šå’Œå‘ä¸‹ */
 		rect_a->x = rect.x;
 		rect_a->y = rect.y;
 		rect_a->width = 0;
 		rect_a->height = 0;
 		if (rect.y > new_y)
-		{						/* Èç¹ûÊÇÏòÉÏÒÆ */
+		{						/* å¦‚æžœæ˜¯å‘ä¸Šç§» */
 			rect_b->x = rect.x;
 			rect_b->y = new_y + rect.height;
 			rect_b->width = rect.width;
@@ -178,14 +178,14 @@ void Get_Moved_Rect_Refresh_Area (int new_x, int new_y, LCUI_Rect rect,
 
 int Rect_Cross_Overlay(LCUI_Rect a, LCUI_Rect b)
 /* 
- * ¹¦ÄÜ£º¼ì²âÁ½¸ö¾ØÐÎÊÇ·ñ³ÉÊ®×Ö¼ÜÊ½µþ¼Ó 
- * ·µ»ØÖµ£º
- *  1 aÊú£¬bºá
- * -1 aºâ£¬bÊú
- *  0 ²»µþ¼Ó
+ * åŠŸèƒ½ï¼šæ£€æµ‹ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦æˆåå­—æž¶å¼å åŠ  
+ * è¿”å›žå€¼ï¼š
+ *  1 aç«–ï¼Œbæ¨ª
+ * -1 aè¡¡ï¼Œbç«–
+ *  0 ä¸å åŠ 
  **/
 {
-	/* ¼ì²âÁ½¸ö¾ØÐÎÊÇ·ñ³ÉÊ®×Ö¼ÜÊ½µþ¼Ó */
+	/* æ£€æµ‹ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦æˆåå­—æž¶å¼å åŠ  */
 	if(a.x < b.x && a.y > b.y 
 	&& a.x + a.width  > b.x + b.width 
 	&& a.y + a.height < b.y + b.height) 
@@ -198,7 +198,7 @@ int Rect_Cross_Overlay(LCUI_Rect a, LCUI_Rect b)
 }
 
 int Check_Option(int result, int option)
-/* ¹¦ÄÜ£º¼ì²âresultÊÇ·ñ°üº¬option */
+/* åŠŸèƒ½ï¼šæ£€æµ‹resultæ˜¯å¦åŒ…å«option */
 {
 	if((result & option) == option) return 1; 
 	return 0;
@@ -206,8 +206,8 @@ int Check_Option(int result, int option)
 
 int Get_Cut_Area(LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut)
 /* 
- * ¹¦ÄÜ£º»ñÈ¡Ðè²Ã¼ôµÄÇøÓò
- * ËµÃ÷£ºÖ¸¶¨ÈÝÆ÷³ß´çºÍÈÝÆ÷ÖÐµÄÇøÓòÎ»ÖÃ¼°³ß´ç£¬¼´¿ÉµÃµ½¸ÃÇøÓòÖÐÐèÒª½øÐÐ²Ã¼ôÇøÓò
+ * åŠŸèƒ½ï¼šèŽ·å–éœ€è£å‰ªçš„åŒºåŸŸ
+ * è¯´æ˜Žï¼šæŒ‡å®šå®¹å™¨å°ºå¯¸å’Œå®¹å™¨ä¸­çš„åŒºåŸŸä½ç½®åŠå°ºå¯¸ï¼Œå³å¯å¾—åˆ°è¯¥åŒºåŸŸä¸­éœ€è¦è¿›è¡Œè£å‰ªåŒºåŸŸ
  *  */
 {
 	int result = 0;
@@ -215,7 +215,7 @@ int Get_Cut_Area(LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut)
 	cut->y = 0;
 	cut->width = rect.width;
 	cut->height = rect.height;
-	/* »ñÈ¡Ðè²Ã¼ôµÄÇøÓò */
+	/* èŽ·å–éœ€è£å‰ªçš„åŒºåŸŸ */
 	if(rect.x < 0) 
 	{
 		cut->width += rect.x;
@@ -244,9 +244,9 @@ int Get_Cut_Area(LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut)
 
 LCUI_Rect Get_Valid_Area(LCUI_Size container, LCUI_Rect rect)
 /* 
- * ¹¦ÄÜ£º»ñÈ¡Ö¸¶¨ÇøÓòÔÚÈÝÆ÷ÖÐµÄÓÐÐ§ÏÔÊ¾ÇøÓò 
- * ËµÃ÷£ºÖ¸¶¨ÈÝÆ÷µÄÇøÓò´óÐ¡£¬ÔÙÖ¸¶¨ÈÝÆ÷ÖÐµÄÇøÓòÎ»ÖÃ¼°´óÐ¡£¬¾ÍÄÜµÃµ½¸ÃÈÝÆ÷Êµ¼ÊÄÜÏÔÊ¾
- * ³öµÄ¸ÃÇøÓò·¶Î§¡£
+ * åŠŸèƒ½ï¼šèŽ·å–æŒ‡å®šåŒºåŸŸåœ¨å®¹å™¨ä¸­çš„æœ‰æ•ˆæ˜¾ç¤ºåŒºåŸŸ 
+ * è¯´æ˜Žï¼šæŒ‡å®šå®¹å™¨çš„åŒºåŸŸå¤§å°ï¼Œå†æŒ‡å®šå®¹å™¨ä¸­çš„åŒºåŸŸä½ç½®åŠå¤§å°ï¼Œå°±èƒ½å¾—åˆ°è¯¥å®¹å™¨å®žé™…èƒ½æ˜¾ç¤º
+ * å‡ºçš„è¯¥åŒºåŸŸèŒƒå›´ã€‚
  * */
 {
 	if (rect.x < 0)
@@ -271,14 +271,14 @@ LCUI_Rect Get_Valid_Area(LCUI_Size container, LCUI_Rect rect)
 int
 Rect_Include_Rect (LCUI_Rect a, LCUI_Rect b)
 /*
- * ¹¦ÄÜ£º¼ì²âÁ½¸ö¾ØÐÎÖÐ£¬A¾ØÐÎÊÇ·ñ°üº¬B¾ØÐÎ
- * ·µ»ØÖµ£ºÁ½²»¾ØÐÎÊôÓÚ°üÐÐ¹ØÏµ·µ»Ø1£¬·ñÔò·µ»Ø0¡£
+ * åŠŸèƒ½ï¼šæ£€æµ‹ä¸¤ä¸ªçŸ©å½¢ä¸­ï¼ŒAçŸ©å½¢æ˜¯å¦åŒ…å«BçŸ©å½¢
+ * è¿”å›žå€¼ï¼šä¸¤ä¸çŸ©å½¢å±žäºŽåŒ…è¡Œå…³ç³»è¿”å›ž1ï¼Œå¦åˆ™è¿”å›ž0ã€‚
  * */
 {
 	int count = 0, m, n = 0, x[4], y[4];
 	b.width -= 1;
 	b.height -= 1; 
-	/* µÃ³ö¾ØÐÎbµÄ4¸öµãµÄ×ø±ê */
+	/* å¾—å‡ºçŸ©å½¢bçš„4ä¸ªç‚¹çš„åæ ‡ */
 	x[0] = b.x;
 	y[0] = b.y;
 	x[1] = b.x + b.width;
@@ -295,7 +295,7 @@ Rect_Include_Rect (LCUI_Rect a, LCUI_Rect b)
 		);*/
 		if ((x[m] >= a.x && x[m] < a.x + a.width)
 			&& (y[m] >= a.y && y[m] < a.y + a.height))
-		{						/* Èç¹ûµã(x[m],y[m])ÔÚ¾ØÐÎAÄÚ */
+		{						/* å¦‚æžœç‚¹(x[m],y[m])åœ¨çŸ©å½¢Aå†… */
 			//printf("yes\n");
 			count += 1;
 		}
@@ -309,7 +309,7 @@ Rect_Include_Rect (LCUI_Rect a, LCUI_Rect b)
 }
 
 LCUI_Pos Pos(int x, int y)
-/* ¹¦ÄÜ£º×ª»»³ÉLCUI_PosÀàÐÍ */
+/* åŠŸèƒ½ï¼šè½¬æ¢æˆLCUI_Posç±»åž‹ */
 {
 	LCUI_Pos p;
 	p.x = x;
@@ -318,7 +318,7 @@ LCUI_Pos Pos(int x, int y)
 }
 
 LCUI_Size Size(int w, int h)
-/* ¹¦ÄÜ£º×ª»»³ÉLCUI_SizeÀàÐÍ */
+/* åŠŸèƒ½ï¼šè½¬æ¢æˆLCUI_Sizeç±»åž‹ */
 {
 	LCUI_Size s;
 	s.w = w;
@@ -328,8 +328,8 @@ LCUI_Size Size(int w, int h)
 
 int Size_Cmp(LCUI_Size a, LCUI_Size b)
 /* 
- * ¹¦ÄÜ£º¶Ô±ÈÁ½¸ö³ß´ç
- * ËµÃ÷£ºa´óÓÚb£¬·µ»Ø1£¬ b´óÓÚa£¬·µ»Ø-1£¬ÏàµÈÔò·µ»Ø0
+ * åŠŸèƒ½ï¼šå¯¹æ¯”ä¸¤ä¸ªå°ºå¯¸
+ * è¯´æ˜Žï¼šaå¤§äºŽbï¼Œè¿”å›ž1ï¼Œ bå¤§äºŽaï¼Œè¿”å›ž-1ï¼Œç›¸ç­‰åˆ™è¿”å›ž0
  * */
 {
 	if(a.w > b.w || a.h > b.h)
@@ -343,14 +343,14 @@ int Size_Cmp(LCUI_Size a, LCUI_Size b)
 int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new, 
 						LCUI_Queue *rq	)
 /*
- * ¹¦ÄÜ£º½«ÓÐÖØµþ²¿·ÖµÄÁ½¸ö¾ØÐÎ£¬½øÐÐ·Ö¸î£¬²¢µÃµ½·Ö¸îºóµÄ¾ØÐÎ
- * ËµÃ÷£ºÖ÷ÒªÓÃÓÚ¾Ö²¿ÇøÓòË¢ÐÂÀï£¬Ìí¼ÓµÄÐèË¢ÐÂµÄÇøÓòÓÐ¿ÉÄÜ»áÓëÒÑÌí¼ÓµÄÇøÓòÖØµþ£¬Îª±ÜÃâ
- * ÖØ¸´Ë¢ÐÂÍ¬Ò»¿éÇøÓò£¬ÐèÒªÔÚÌí¼ÓÊ±¶Ô¾ØÐÎ½øÐÐ·Ö¸î£¬µÃµ½ÍêÈ«ÖØµþºÍ²»ÖØµþµÄ¾ØÐÎ¡£
- * ²ÎÊýËµÃ÷£º
- * old £º ÒÑ´æÔÚµÄ¾ØÐÎÇøÓò
- * new £º ½«ÒªÌí¼ÓµÄ¾ØÐÎÇøÓò
- * rq  £º Ö¸Ïò¾ØÐÎµÄ¶ÓÁÐµÄÖ¸Õë
- * ×¢Òâ£¡´«µÝ²ÎÊýÊ±£¬ÇëÎðµßµ¹oldºÍnewÎ»ÖÃ¡£
+ * åŠŸèƒ½ï¼šå°†æœ‰é‡å éƒ¨åˆ†çš„ä¸¤ä¸ªçŸ©å½¢ï¼Œè¿›è¡Œåˆ†å‰²ï¼Œå¹¶å¾—åˆ°åˆ†å‰²åŽçš„çŸ©å½¢
+ * è¯´æ˜Žï¼šä¸»è¦ç”¨äºŽå±€éƒ¨åŒºåŸŸåˆ·æ–°é‡Œï¼Œæ·»åŠ çš„éœ€åˆ·æ–°çš„åŒºåŸŸæœ‰å¯èƒ½ä¼šä¸Žå·²æ·»åŠ çš„åŒºåŸŸé‡å ï¼Œä¸ºé¿å…
+ * é‡å¤åˆ·æ–°åŒä¸€å—åŒºåŸŸï¼Œéœ€è¦åœ¨æ·»åŠ æ—¶å¯¹çŸ©å½¢è¿›è¡Œåˆ†å‰²ï¼Œå¾—åˆ°å®Œå…¨é‡å å’Œä¸é‡å çš„çŸ©å½¢ã€‚
+ * å‚æ•°è¯´æ˜Žï¼š
+ * old ï¼š å·²å­˜åœ¨çš„çŸ©å½¢åŒºåŸŸ
+ * new ï¼š å°†è¦æ·»åŠ çš„çŸ©å½¢åŒºåŸŸ
+ * rq  ï¼š æŒ‡å‘çŸ©å½¢çš„é˜Ÿåˆ—çš„æŒ‡é’ˆ
+ * æ³¨æ„ï¼ä¼ é€’å‚æ•°æ—¶ï¼Œè¯·å‹¿é¢ å€’oldå’Œnewä½ç½®ã€‚
  **/
 {
 	int i; 
@@ -359,29 +359,29 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 	for(i=0; i<5; ++i)
 		Rect_Init(&r[i]); 
 	
-	/* ¼ÆËã¸÷¸ö¾ØÐÎµÄxÖá×ø±êºÍ¿í¶È */
+	/* è®¡ç®—å„ä¸ªçŸ©å½¢çš„xè½´åæ ‡å’Œå®½åº¦ */
 	r[0].x = new.x;
 	r[0].y = new.y; 
 	//printf("old,pos(%d,%d), size(%d,%d)\n", old.x, old.y, old.width, old.height);
 	//printf("new,pos(%d,%d), size(%d,%d)\n", new.x, new.y, new.width, new.height);
 	if(new.x < old.x)
-	{/* Èç¹ûÇ°¾°¾ØÐÎÔÚ±³¾°¾ØÐÎµÄ×ó±ß */  
+	{/* å¦‚æžœå‰æ™¯çŸ©å½¢åœ¨èƒŒæ™¯çŸ©å½¢çš„å·¦è¾¹ */  
 		if(new.x + new.width > old.x)
-		{ /* Èç¹ûXÖáÉÏÓë±³¾°¾ØÐÎÖØµþ */  
+		{ /* å¦‚æžœXè½´ä¸Šä¸ŽèƒŒæ™¯çŸ©å½¢é‡å  */  
 			r[0].width = old.x - new.x;
 			r[1].x = old.x;
 			r[2].x = r[1].x;
 			r[4].x = r[2].x;
 			if(new.x + new.width > old.x + old.width)
-			{/* Èç¹ûÇ°¾°¾ØÐÎÔÚXÖáÉÏ°üº¬±³¾°¾ØÐÎ */  
+			{/* å¦‚æžœå‰æ™¯çŸ©å½¢åœ¨Xè½´ä¸ŠåŒ…å«èƒŒæ™¯çŸ©å½¢ */  
 				r[1].width = old.width;
 				
 				r[3].x = old.x + old.width;
 				r[3].width = new.x + new.width - r[3].x;
 			}
-			else  /* µÃ³ö¾ØÐÎ2µÄ¿í¶È */ 
+			else  /* å¾—å‡ºçŸ©å½¢2çš„å®½åº¦ */ 
 				r[1].width = new.x + new.width - old.x;  
-			/* µÃ³ö¾ØÐÎ3ºÍ5µÄ¿í¶È */ 
+			/* å¾—å‡ºçŸ©å½¢3å’Œ5çš„å®½åº¦ */ 
 			r[2].width = r[1].width;
 			r[4].width = r[2].width;
 		}
@@ -410,7 +410,7 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 		else return -1; 
 	}
 	 
-	/* ¼ÆËã¸÷¸ö¾ØÐÎµÄyÖá×ø±êºÍ¸ß¶È */
+	/* è®¡ç®—å„ä¸ªçŸ©å½¢çš„yè½´åæ ‡å’Œé«˜åº¦ */
 	r[0].height = new.height;
 	r[3].y = new.y;
 	r[3].height = r[0].height;
@@ -424,7 +424,7 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 			r[2].y = old.y; 
 			
 			if(new.y + new.height > old.y + old.height)
-			{ /* Èç¹ûÇ°¾°¾ØÐÎÔÚYÖáÉÏ°üº¬±³¾°¾ØÐÎ */ 
+			{ /* å¦‚æžœå‰æ™¯çŸ©å½¢åœ¨Yè½´ä¸ŠåŒ…å«èƒŒæ™¯çŸ©å½¢ */ 
 				r[2].height = old.height;
 				r[4].height = new.y + new.height - r[4].y; 
 			}
@@ -471,7 +471,7 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 
 
 int Get_Overlay_Rect(LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out)
-/* ¹¦ÄÜ£º»ñÈ¡Á½¾ØÐÎÖØµþ²¿·ÖµÄ¾ØÐÎ */
+/* åŠŸèƒ½ï¼šèŽ·å–ä¸¤çŸ©å½¢é‡å éƒ¨åˆ†çš„çŸ©å½¢ */
 {
 	int x = 0,y = 0,w = 0,h = 0;
 	
@@ -524,7 +524,7 @@ int Get_Overlay_Rect(LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out)
 }
 
 LCUI_Rect Rect (int x, int y, int width, int height)
-/* ¹¦ÄÜ£º½«ÊýÖµ×ª»»³ÉLCUI_RectÐÍ½á¹¹Ìå */
+/* åŠŸèƒ½ï¼šå°†æ•°å€¼è½¬æ¢æˆLCUI_Rectåž‹ç»“æž„ä½“ */
 {
 	LCUI_Rect s;
 
@@ -548,7 +548,7 @@ LCUI_Border Border(int top, int bottom, int left, int right)
 }
 
 LCUI_Pos Pos_Add(LCUI_Pos a, LCUI_Pos b)
-/* ¹¦ÄÜ£ºÇóÁ½¸öLCUI_PosÀàÐÍ±äÁ¿µÄºÍ */
+/* åŠŸèƒ½ï¼šæ±‚ä¸¤ä¸ªLCUI_Posç±»åž‹å˜é‡çš„å’Œ */
 {
 	a.x += b.x;
 	a.y += b.y;
@@ -556,7 +556,7 @@ LCUI_Pos Pos_Add(LCUI_Pos a, LCUI_Pos b)
 }
 
 int Pos_Cmp(LCUI_Pos a, LCUI_Pos b)
-/* ¹¦ÄÜ£º¶Ô±ÈÁ½¸ö×ø±êÊÇ·ñÒ»ÖÂ */
+/* åŠŸèƒ½ï¼šå¯¹æ¯”ä¸¤ä¸ªåæ ‡æ˜¯å¦ä¸€è‡´ */
 {
 	if(a.x != b.x || a.y != b.y)
 		return -1;
@@ -565,7 +565,7 @@ int Pos_Cmp(LCUI_Pos a, LCUI_Pos b)
 }
 
 LCUI_Pos Pos_Sub(LCUI_Pos a, LCUI_Pos b)
-/* ¹¦ÄÜ£ºÇóÁ½¸öLCUI_PosÀàÐÍ±äÁ¿µÄ²î */
+/* åŠŸèƒ½ï¼šæ±‚ä¸¤ä¸ªLCUI_Posç±»åž‹å˜é‡çš„å·® */
 {
 	a.x -= b.x;
 	a.y -= b.y;
@@ -573,7 +573,7 @@ LCUI_Pos Pos_Sub(LCUI_Pos a, LCUI_Pos b)
 }
 
 int Rect_Inside_Point (LCUI_Pos pos, LCUI_Rect rect)
-/* ¹¦ÄÜ£º¼ì²âÒ»¸öµãÊÇ·ñ±»¾ØÐÎ°üº¬ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹ä¸€ä¸ªç‚¹æ˜¯å¦è¢«çŸ©å½¢åŒ…å« */
 {
 	if (pos.x >= rect.x && pos.x < rect.x + rect.width-1 && pos.y >= rect.y
 		&& pos.y < rect.y + rect.height-1)
@@ -586,26 +586,26 @@ int
 Check_Rect_Overlap (int ax, int ay, int aw, int ah, int bx, int by, int bw,
 					int bh)
 /*
-* ¹¦ÄÜ£º¼ì²âÁ½¸ö¾ØÐÎÊÇ·ñÖØµþ
-* ²ÎÊýËµÃ÷£º
-* ax £º¾ØÐÎAµÄ×óÉÏ½ÇÆðµãËùÔÚxÖáµÄ×ø±ê
-* ay £º¾ØÐÎAµÄ×óÉÏ½ÇÆðµãËùÔÚyÖáµÄ×ø±ê
-* aw £º¾ØÐÎAµÄ¿í¶È
-* ah £º¾ØÐÎAµÄ¸ß¶È
-* bx £º¾ØÐÎBµÄ×óÉÏ½ÇÆðµãËùÔÚxÖáµÄ×ø±ê
-* by £º¾ØÐÎBµÄ×óÉÏ½ÇÆðµãËùÔÚyÖáµÄ×ø±ê
-* bw £º¾ØÐÎBµÄ¿í¶È
-* bh £º¾ØÐÎBµÄ¸ß¶È
-* ·µ»ØÖµ£ºÁ½²»ÖØµþ·µ»Ø0£¬ÖØµþÔò·µ»Ø1¡£
+* åŠŸèƒ½ï¼šæ£€æµ‹ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦é‡å 
+* å‚æ•°è¯´æ˜Žï¼š
+* ax ï¼šçŸ©å½¢Açš„å·¦ä¸Šè§’èµ·ç‚¹æ‰€åœ¨xè½´çš„åæ ‡
+* ay ï¼šçŸ©å½¢Açš„å·¦ä¸Šè§’èµ·ç‚¹æ‰€åœ¨yè½´çš„åæ ‡
+* aw ï¼šçŸ©å½¢Açš„å®½åº¦
+* ah ï¼šçŸ©å½¢Açš„é«˜åº¦
+* bx ï¼šçŸ©å½¢Bçš„å·¦ä¸Šè§’èµ·ç‚¹æ‰€åœ¨xè½´çš„åæ ‡
+* by ï¼šçŸ©å½¢Bçš„å·¦ä¸Šè§’èµ·ç‚¹æ‰€åœ¨yè½´çš„åæ ‡
+* bw ï¼šçŸ©å½¢Bçš„å®½åº¦
+* bh ï¼šçŸ©å½¢Bçš„é«˜åº¦
+* è¿”å›žå€¼ï¼šä¸¤ä¸é‡å è¿”å›ž0ï¼Œé‡å åˆ™è¿”å›ž1ã€‚
 */
 {
-	/* ¼ì²âÁ½¸ö¾ØÐÎÊÇ·ñ³ÉÊ®×Ö¼ÜÊ½µþ¼Ó */
+	/* æ£€æµ‹ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦æˆåå­—æž¶å¼å åŠ  */
 	if(ax < bx && ay > by && ax + aw > bx + bw && ay + ah < by + bh) return 1;
 	if(bx < ax && by > ay && bx + bw > ax + aw && by + bh < ay + ah) return 1;
 	/* 
-	 * ÄÄÅÂÊÇÒ»¶¡µãµÄÎó²î£¬¶¼ÓÐ¿ÉÄÜÔì³ÉÍ¼ÐÎÏÔÊ¾ÉÏµÄÎÊÌâ
-	 * ÒòÎª¾Ö²¿ÇøÓòË¢ÐÂ¾ÍÊÇ¿¿Õâ¸öº¯ÊýµÃÖªÇøÓòÊÇ·ñÓë²¿¼þ
-	 * ¾ØÐÎÊÇ·ñÖØµþ¡£ 
+	 * å“ªæ€•æ˜¯ä¸€ä¸ç‚¹çš„è¯¯å·®ï¼Œéƒ½æœ‰å¯èƒ½é€ æˆå›¾å½¢æ˜¾ç¤ºä¸Šçš„é—®é¢˜
+	 * å› ä¸ºå±€éƒ¨åŒºåŸŸåˆ·æ–°å°±æ˜¯é è¿™ä¸ªå‡½æ•°å¾—çŸ¥åŒºåŸŸæ˜¯å¦ä¸Žéƒ¨ä»¶
+	 * çŸ©å½¢æ˜¯å¦é‡å ã€‚ 
 	 * */
 	int m, n = 0, x[4], y[4];
 	x[0] = ax;
@@ -614,9 +614,9 @@ Check_Rect_Overlap (int ax, int ay, int aw, int ah, int bx, int by, int bw,
 	y[1] = ay;
 	x[2] = ax;
 	y[2] = ay + ah - 1;
-	x[3] = ax + aw - 1; /* ÒòÎª³¤ºÍ¿í°üÀ¨ÁË×óÉÏ½ÇµãµÄ³¤¿í£¬Òª-1 */
+	x[3] = ax + aw - 1; /* å› ä¸ºé•¿å’Œå®½åŒ…æ‹¬äº†å·¦ä¸Šè§’ç‚¹çš„é•¿å®½ï¼Œè¦-1 */
 	y[3] = ay + ah - 1;
-	/* ÕâÖ»ÊÇ¼ì²âËÄ¸ö½ÇÊÇ·ñÔÚ¾ØÐÎÄÚ */
+	/* è¿™åªæ˜¯æ£€æµ‹å››ä¸ªè§’æ˜¯å¦åœ¨çŸ©å½¢å†… */
 	for (m = 0; m < 4; ++m)
 	{
 		if ((x[m] >= bx && x[m] < bx + bw)
@@ -656,14 +656,14 @@ Check_Rect_Overlap (int ax, int ay, int aw, int ah, int bx, int by, int bw,
 
 int
 Rect_Is_Overlay (LCUI_Rect a, LCUI_Rect b)
-/* ¹¦ÄÜ£º¼ì²âÁ½¸ö¾ØÐÎÊÇ·ñÖØµþ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦é‡å  */
 {
 	return Check_Rect_Overlap (a.x, a.y, a.width, a.height, b.x, b.y,
 							   b.width, b.height);
 }
 
 int Rect_Equal (LCUI_Rect a, LCUI_Rect b)
-/* ¹¦ÄÜ£ºÅÐ¶ÏÁ½¸ö¾ØÐÎÊÇ·ñÏàµÈ */
+/* åŠŸèƒ½ï¼šåˆ¤æ–­ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦ç›¸ç­‰ */
 {
 	if(a.x == b.x && a.y == b.y && a.width == b.width && a.height == b.height) 
 		return 1;
@@ -671,7 +671,7 @@ int Rect_Equal (LCUI_Rect a, LCUI_Rect b)
 }
 
 int Rect_Valid(LCUI_Rect r)
-/* ¹¦ÄÜ£ºÅÐ¶Ï¾ØÐÎÊÇ·ñÓÐÐ§ */
+/* åŠŸèƒ½ï¼šåˆ¤æ–­çŸ©å½¢æ˜¯å¦æœ‰æ•ˆ */
 {
 	if(r.width <= 0 || r.height <= 0) 
 		return 0;

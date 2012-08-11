@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Cursor.c -- ���������
+ * LCUI_Cursor.c -- 控制鼠标光标
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -48,7 +48,7 @@
 #include LC_MEM_H
 
 void Refresh_Cursor ()
-/* ���ܣ�ˢ������α�����Ļ����ʾ��ͼ�� */
+/* 功能：刷新鼠标游标在屏幕上显示的图形 */
 {
 	Add_Screen_Refresh_Area ( Get_Cursor_Rect() );
 }
@@ -56,16 +56,16 @@ void Refresh_Cursor ()
 
 
 void Show_Cursor ()
-/* ���ܣ���ʾ����α� */
+/* 功能：显示鼠标游标 */
 {
-	LCUI_Sys.cursor.visible = IS_TRUE;	/* ��ʶ�α�Ϊ�ɼ� */
-	Refresh_Cursor ();			/* ˢ���α����ʾ */
+	LCUI_Sys.cursor.visible = IS_TRUE;	/* 标识游标为可见 */
+	Refresh_Cursor ();			/* 刷新游标的显示 */
 }
 
 
 
 void Hide_Cursor ()
-/* ���ܣ���������α� */
+/* 功能：隐藏鼠标游标 */
 {
 	LCUI_Sys.cursor.visible = IS_FALSE;
 	Refresh_Cursor ();
@@ -73,7 +73,7 @@ void Hide_Cursor ()
 
 
 LCUI_Rect Get_Cursor_Rect()
-/* ���ܣ���ȡ����α������Χ */
+/* 功能：获取鼠标游标的区域范围 */
 {
 	LCUI_Rect rect;
 	rect.x = LCUI_Sys.cursor.pos.x;
@@ -84,21 +84,21 @@ LCUI_Rect Get_Cursor_Rect()
 }
 
 void Set_Cursor_Pos (LCUI_Pos pos)
-/* ���ܣ��趨�α��λ�� */
+/* 功能：设定游标的位置 */
 { 
 	LCUI_Queue rt;
 	LCUI_Rect old;
 	RectQueue_Init(&rt);
 	old = Get_Cursor_Rect();
  	LCUI_Sys.cursor.pos = pos; 
-	Add_Screen_Refresh_Area ( old ); /* ˢ���α�ԭ���������е�ͼ�� */
-	Refresh_Cursor ();			/* ˢ���α����ʾ */ 
+	Add_Screen_Refresh_Area ( old ); /* 刷新游标原来的区域中的图形 */
+	Refresh_Cursor ();			/* 刷新游标的显示 */ 
 }
 
 int Set_Cursors_Graph (LCUI_Graph * graph)
 /* 
- * ���ܣ��趨�α��ͼ��
- * ����ֵ���趨�ɹ�����0��ʧ���򷵻�-1
+ * 功能：设定游标的图形
+ * 返回值：设定成功返回0，失败则返回-1
 */
 {
 	if (Valid_Graph (graph))
@@ -111,7 +111,7 @@ int Set_Cursors_Graph (LCUI_Graph * graph)
 }
 
 LCUI_Pos Get_Cursor_Pos ()
-/* ���ܣ���ȡ���ָ���λ�� */
+/* 功能：获取鼠标指针的位置 */
 {
 	return LCUI_Sys.cursor.pos; 
 }

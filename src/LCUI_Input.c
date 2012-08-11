@@ -466,6 +466,7 @@ int Find_Pressed_Key(int key)
 	return 0;
 }
 
+int debug_mark = 0;
 static int disable_key = IS_FALSE;
 extern int LCUI_Active();
 static void * Processing_Key_Input ()
@@ -481,6 +482,10 @@ static void * Processing_Key_Input ()
 		{/* 如果有按键输入 */ 
 			sleep_time = 1500;
 			key = Get_Key ();
+			if(key == 'd')
+				debug_mark = 1;
+			else 
+				debug_mark = 0;
 			//#define __NEED_CATCHSCREEN__
 			#ifdef __NEED_CATCHSCREEN__
 			if(key == 'c')
@@ -553,7 +558,7 @@ static void * Processing_TouchScreen_Input ()
 	
 	char str[100];
 	while (LCUI_Active())
-	{ 
+	{
 		if (LCUI_Sys.ts.status != INSIDE)
 		{
 			LCUI_Sys.ts.td = ts_open (TS_DEV, 0);
@@ -626,21 +631,18 @@ static void * Processing_TouchScreen_Input ()
 int Enable_TouchScreen_Input()
 /* 功能：启用鼠标输入处理 */
 {
+	/* 创建一个线程，用于刷显示鼠标指针 */
 	if(LCUI_Sys.ts.status == REMOVE)
-	{/* 创建一个线程，用于刷显示鼠标指针 */
 		return  pthread_create ( &LCUI_Sys.ts.thread, NULL, 
-							Processing_TouchScreen_Input, NULL );
-	}
+							Processing_TouchScreen_Input, NULL ); 
 	return 0;
 }
 
 int Disable_TouchScreen_Input()
 /* 功能：撤销鼠标输入处理 */
 {
-	if(LCUI_Sys.ts.status == INSIDE)
-	{/* 创建一个线程，用于刷显示鼠标指针 */ 
-		return pthread_cancel ( LCUI_Sys.ts.thread );/* 撤销LCUI子线程 */
-	}
+	if(LCUI_Sys.ts.status == INSIDE) 
+		return pthread_cancel ( LCUI_Sys.ts.thread );/* 撤销LCUI子线程 */ 
 	return 0;
 }
 

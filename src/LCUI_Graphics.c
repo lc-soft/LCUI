@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Graphics.c -- Í¼ĞÎ´¦Àí
+ * LCUI_Graphics.c -- å›¾å½¢å¤„ç†
  *
- * °æÈ¨ËùÓĞ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±äº 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼şÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾İGPLv2Ğí¿ÉĞ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ğí¿ÉÖ¤µÚ¶ş°æ µÄÓ¢ÎÄËõĞ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌĞøÊ¹ÓÃ¡¢ĞŞ¸Ä»ò·¢²¼±¾ÎÄ¼ş£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öĞí¿ÉĞ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜æ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’Œæ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔğÈÎ£¬ÉõÖÁÃ»ÓĞÊÊÏúĞÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒşº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ğí¿ÉĞ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼şµÄGPLv2Ğí¿ÉĞ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼şÖĞ£¬Èç¹û
- * Ã»ÓĞ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 #include <png.h>
 #include <jpeglib.h>
@@ -49,7 +49,7 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
-/* Õâ¸ö½á¹¹ÌåÓÃÓÚ´æ´¢bmpÎÄ¼şµÄÎÄ¼şÍ·µÄĞÅÏ¢ */
+/* è¿™ä¸ªç»“æ„ä½“ç”¨äºå­˜å‚¨bmpæ–‡ä»¶çš„æ–‡ä»¶å¤´çš„ä¿¡æ¯ */
 typedef struct bmp_head {
 	short int BMPsyg;
 	short int nic[8];
@@ -81,7 +81,7 @@ LCUI_RGB
 RGB (unsigned char red, unsigned char green,
 	 unsigned char blue)
 
-/* ¹¦ÄÜ£º½«Èı¸öÑÕÉ«Öµ×ª»»³ÉLCUI_RGBĞÍÊı¾İ */
+/* åŠŸèƒ½ï¼šå°†ä¸‰ä¸ªé¢œè‰²å€¼è½¬æ¢æˆLCUI_RGBå‹æ•°æ® */
 {
 	LCUI_RGB color;
 
@@ -92,13 +92,13 @@ RGB (unsigned char red, unsigned char green,
 }
 
 int Get_Graph_Type(LCUI_Graph *pic)
-/* ·µ»ØÍ¼ĞÎµÄÀàĞÍ */
+/* è¿”å›å›¾å½¢çš„ç±»å‹ */
 {
 	return pic->type;
 }
 
 LCUI_Size Get_Graph_Size(LCUI_Graph *pic)
-/* ¹¦ÄÜ£º»ñÈ¡Í¼ĞÎµÄ³ß´ç */
+/* åŠŸèƒ½ï¼šè·å–å›¾å½¢çš„å°ºå¯¸ */
 {
 	if(NULL == pic)
 		return Size(0,0);
@@ -107,8 +107,8 @@ LCUI_Size Get_Graph_Size(LCUI_Graph *pic)
 
 int Graph_Is_PNG(LCUI_Graph *pic)
 /* 
- * ¹¦ÄÜ£ºÅĞ¶ÏÍ¼ÏñÊÇ·ñÎªpng
- * ·µ»ØÖµ£ºÊÇÔò·µ»Ø1£¬·ñÔò·µ»Ø0
+ * åŠŸèƒ½ï¼šåˆ¤æ–­å›¾åƒæ˜¯å¦ä¸ºpng
+ * è¿”å›å€¼ï¼šæ˜¯åˆ™è¿”å›1ï¼Œå¦åˆ™è¿”å›0
  * */
 {
 	if( Get_Graph_Type(pic) == TYPE_PNG) return 1;
@@ -117,8 +117,8 @@ int Graph_Is_PNG(LCUI_Graph *pic)
 
 int Graph_Is_BMP(LCUI_Graph *pic)
 /* 
- * ¹¦ÄÜ£ºÅĞ¶ÏÍ¼ÏñÊÇ·ñÎªbmp
- * ·µ»ØÖµ£ºÊÇÔò·µ»Ø1£¬·ñÔò·µ»Ø0
+ * åŠŸèƒ½ï¼šåˆ¤æ–­å›¾åƒæ˜¯å¦ä¸ºbmp
+ * è¿”å›å€¼ï¼šæ˜¯åˆ™è¿”å›1ï¼Œå¦åˆ™è¿”å›0
  * */
 {
 	if( Get_Graph_Type(pic) == TYPE_BMP) return 1;
@@ -127,8 +127,8 @@ int Graph_Is_BMP(LCUI_Graph *pic)
 
 int Graph_Is_JPG(LCUI_Graph *pic)
 /* 
- * ¹¦ÄÜ£ºÅĞ¶ÏÍ¼ÏñÊÇ·ñÎªjpg 
- * ·µ»ØÖµ£ºÊÇÔò·µ»Ø1£¬·ñÔò·µ»Ø0
+ * åŠŸèƒ½ï¼šåˆ¤æ–­å›¾åƒæ˜¯å¦ä¸ºjpg 
+ * è¿”å›å€¼ï¼šæ˜¯åˆ™è¿”å›1ï¼Œå¦åˆ™è¿”å›0
  * */
 {
 	if( Get_Graph_Type(pic) == TYPE_JPG) return 1;
@@ -137,8 +137,8 @@ int Graph_Is_JPG(LCUI_Graph *pic)
 
 int Graph_Have_Alpha(LCUI_Graph *pic)
 /* 
- * ¹¦ÄÜ£ºÅĞ¶ÏÍ¼ÏñÊÇ·ñ´øÓĞ´øalphaÍ¨µÀ 
- * ·µ»ØÖµ£ºÊÇÔò·µ»Ø1£¬·ñÔò·µ»Ø0
+ * åŠŸèƒ½ï¼šåˆ¤æ–­å›¾åƒæ˜¯å¦å¸¦æœ‰å¸¦alphaé€šé“ 
+ * è¿”å›å€¼ï¼šæ˜¯åˆ™è¿”å›1ï¼Œå¦åˆ™è¿”å›0
  * */
 {
 	if( pic->flag == HAVE_ALPHA) return 1;
@@ -147,8 +147,8 @@ int Graph_Have_Alpha(LCUI_Graph *pic)
 
 int Valid_Graph(LCUI_Graph *pic)
 /*
- * ¹¦ÄÜ£º¼ì²âÍ¼ĞÎÊı¾İÊÇ·ñÓĞĞ§
- * ·µ»ØÖµ£ºÓĞĞ§·µ»Ø1£¬ÎŞĞ§·µ»Ø0
+ * åŠŸèƒ½ï¼šæ£€æµ‹å›¾å½¢æ•°æ®æ˜¯å¦æœ‰æ•ˆ
+ * è¿”å›å€¼ï¼šæœ‰æ•ˆè¿”å›1ï¼Œæ— æ•ˆè¿”å›0
  */
 {
 	if(NULL != pic && pic->malloc == IS_TRUE 
@@ -159,8 +159,8 @@ int Valid_Graph(LCUI_Graph *pic)
 
 int Valid_Bitmap(LCUI_Bitmap *bitmap)
 /*
- * ¹¦ÄÜ£º¼ì²âÎ»Í¼Êı¾İÊÇ·ñÓĞĞ§
- * ·µ»ØÖµ£ºÓĞĞ§·µ»Ø1£¬ÎŞĞ§·µ»Ø0
+ * åŠŸèƒ½ï¼šæ£€æµ‹ä½å›¾æ•°æ®æ˜¯å¦æœ‰æ•ˆ
+ * è¿”å›å€¼ï¼šæœ‰æ•ˆè¿”å›1ï¼Œæ— æ•ˆè¿”å›0
  */
 {
 	if(NULL != bitmap && bitmap->malloc == IS_TRUE 
@@ -170,7 +170,7 @@ int Valid_Bitmap(LCUI_Bitmap *bitmap)
 }
 
 void Print_Bitmap_Info(LCUI_Bitmap *bitmap)
-/* ¹¦ÄÜ£º´òÓ¡Î»Í¼µÄĞÅÏ¢ */
+/* åŠŸèƒ½ï¼šæ‰“å°ä½å›¾çš„ä¿¡æ¯ */
 {
 	printf("address:%p\n",bitmap);
 	if(bitmap != NULL) 
@@ -180,7 +180,7 @@ void Print_Bitmap_Info(LCUI_Bitmap *bitmap)
 }
 
 void Print_Graph_Info(LCUI_Graph *pic)
-/* ¹¦ÄÜ£º´òÓ¡Í¼ÏñµÄĞÅÏ¢ */
+/* åŠŸèƒ½ï¼šæ‰“å°å›¾åƒçš„ä¿¡æ¯ */
 {
 	printf("address:%p\n",pic);
 	if(pic == NULL) 
@@ -192,7 +192,7 @@ void Print_Graph_Info(LCUI_Graph *pic)
 }
 
 void Bitmap_Init(LCUI_Bitmap *in)
-/* ¹¦ÄÜ£º³õÊ¼»¯LCUI_Bitmap½á¹¹ÌåÊı¾İ */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–LCUI_Bitmapç»“æ„ä½“æ•°æ® */
 {
 	in->data = NULL;
 	in->alpha = 255;
@@ -202,7 +202,7 @@ void Bitmap_Init(LCUI_Bitmap *in)
 }
 
 void Graph_Init(LCUI_Graph *pic)
-/* ³õÊ¼»¯Í¼Æ¬Êı¾İ½á¹¹Ìå */
+/* åˆå§‹åŒ–å›¾ç‰‡æ•°æ®ç»“æ„ä½“ */
 {
 	if(pic == NULL) return;
 	pic->malloc = IS_FALSE;
@@ -212,12 +212,12 @@ void Graph_Init(LCUI_Graph *pic)
 	pic->width  = 0;
 	pic->height = 0;
 	pic->type   = DEFAULT;
-	pic->bit_depth = 8;    /* Î»Éî */
+	pic->bit_depth = 8;    /* ä½æ·± */
 	thread_rwlock_init(&pic->lock);
 }
 
 static int detect_jpg(char *filepath, LCUI_Graph *out)
-/* ¹¦ÄÜ£º½âÂëjpgÍ¼Æ¬ */
+/* åŠŸèƒ½ï¼šè§£ç jpgå›¾ç‰‡ */
 {
 	FILE *fp;
 	fp = fopen(filepath,"r");
@@ -232,7 +232,7 @@ static int detect_jpg(char *filepath, LCUI_Graph *out)
 
 	if(fread(&JPsyg,sizeof (short int),1,fp))
 	{
-		if (JPsyg != -9985)   /* Èç¹û²»ÊÇjpgÍ¼Æ¬ */
+		if (JPsyg != -9985)   /* å¦‚æœä¸æ˜¯jpgå›¾ç‰‡ */
 			return 1;
 	}
 	rewind(fp);
@@ -253,7 +253,7 @@ static int detect_jpg(char *filepath, LCUI_Graph *out)
 	out->flag = NO_ALPHA;
 	Malloc_Graph(out,cinfo.output_width,cinfo.output_height);
 	if(!out->rgba || !out->rgba[0] || !out->rgba[1] || !out->rgba[2]){
-		printf("´íÎó(jpg):ÎŞ·¨·ÖÅä×ã¹»µÄÄÚ´æ¹©´æ´¢Êı¾İ!\n");
+		printf("é”™è¯¯(jpg):æ— æ³•åˆ†é…è¶³å¤Ÿçš„å†…å­˜ä¾›å­˜å‚¨æ•°æ®!\n");
 		return 1;
 	}
 	row_stride = cinfo.output_width * cinfo.output_components;
@@ -279,7 +279,7 @@ static int detect_jpg(char *filepath, LCUI_Graph *out)
 		}
 		y++;
 	}
-	out->type = TYPE_JPG;//Í¼Æ¬ÀàĞÍÎªjpg
+	out->type = TYPE_JPG;//å›¾ç‰‡ç±»å‹ä¸ºjpg
 	(void) jpeg_finish_decompress(&cinfo);
 	jpeg_destroy_decompress(&cinfo);
 	fclose(fp);
@@ -287,7 +287,7 @@ static int detect_jpg(char *filepath, LCUI_Graph *out)
 }
 
 static int detect_bmp(char *filepath, LCUI_Graph *out)
-/* ¹¦ÄÜ£º½âÂëbmpÍ¼Æ¬ */
+/* åŠŸèƒ½ï¼šè§£ç bmpå›¾ç‰‡ */
 {
 	FILE *fp;
 	fp = fopen(filepath,"r");
@@ -295,10 +295,10 @@ static int detect_bmp(char *filepath, LCUI_Graph *out)
 	bmp_head bmp;    
 	int x,y, temp, tempi, rle,pocz, omin;
 	unsigned char rozp;
-	unsigned char **bak_rgba;    /* ±¸·İµÄÍ¼Æ¬Êı¾İ */
+	unsigned char **bak_rgba;    /* å¤‡ä»½çš„å›¾ç‰‡æ•°æ® */
 	
 	temp = fread(&bmp, 1, sizeof(bmp_head),fp);
-	if (temp < sizeof(bmp_head) || bmp.BMPsyg != 19778)/* Èç¹û²»ÊÇbmpÍ¼Æ¬ */ 
+	if (temp < sizeof(bmp_head) || bmp.BMPsyg != 19778)/* å¦‚æœä¸æ˜¯bmpå›¾ç‰‡ */ 
 		return 1; 
 	pocz = bmp.nic[4];
 	out->bit_depth = bmp.depth;
@@ -306,14 +306,14 @@ static int detect_bmp(char *filepath, LCUI_Graph *out)
 	if ((out->bit_depth != 32) && (out->bit_depth != 24) 
 		&& (out->bit_depth != 8) && (out->bit_depth !=4))
 	{ 
-		printf("´íÎó(bmp):Î»Éî %i ²»Ö§³Ö!\n",out->bit_depth);
+		printf("é”™è¯¯(bmp):ä½æ·± %i ä¸æ”¯æŒ!\n",out->bit_depth);
 		return 2;
 	}
-	out->flag = NO_ALPHA;     /* Ã»ÓĞÍ¸Ã÷Ğ§¹û */
+	out->flag = NO_ALPHA;     /* æ²¡æœ‰é€æ˜æ•ˆæœ */
 	temp = Malloc_Graph(out, bmp.ix, bmp.iy);
 	if(temp != 0)
 	{
-		printf("´íÎó(bmp):ÎŞ·¨·ÖÅä×ã¹»µÄÄÚ´æ¹©´æ´¢Êı¾İ!\n");
+		printf("é”™è¯¯(bmp):æ— æ³•åˆ†é…è¶³å¤Ÿçš„å†…å­˜ä¾›å­˜å‚¨æ•°æ®!\n");
 		return 1;
 	}
 	
@@ -325,7 +325,7 @@ static int detect_bmp(char *filepath, LCUI_Graph *out)
 	bak_rgba[2] = (unsigned char*)malloc(size);
 	
 	if(!bak_rgba || !bak_rgba[0] || !bak_rgba[1] || !bak_rgba[2]){
-		printf("´íÎó(bmp):ÎŞ·¨·ÖÅä×ã¹»µÄÄÚ´æ¹©´æ´¢Êı¾İ!\n");
+		printf("é”™è¯¯(bmp):æ— æ³•åˆ†é…è¶³å¤Ÿçš„å†…å­˜ä¾›å­˜å‚¨æ•°æ®!\n");
 		return 1;
 	}
 	rozp = ftell(fp);
@@ -455,7 +455,7 @@ static int detect_bmp(char *filepath, LCUI_Graph *out)
 		} /* end RLE */
 		out->bit_depth=4;
 	}    /* end out->bit_depth=4*/
-	out->type = TYPE_BMP;     /* Í¼Æ¬ÀàĞÍÎªbmp */
+	out->type = TYPE_BMP;     /* å›¾ç‰‡ç±»å‹ä¸ºbmp */
 	free(bak_rgba[0]);
 	free(bak_rgba[1]);
 	free(bak_rgba[2]);
@@ -465,7 +465,7 @@ static int detect_bmp(char *filepath, LCUI_Graph *out)
 }
 
 int write_png_file(char *file_name , LCUI_Graph *graph)
-/* ¹¦ÄÜ£º½«LCUI_Graph½á¹¹ÖĞµÄÊı¾İĞ´ÈëÖÁpngÎÄ¼ş */
+/* åŠŸèƒ½ï¼šå°†LCUI_Graphç»“æ„ä¸­çš„æ•°æ®å†™å…¥è‡³pngæ–‡ä»¶ */
 {
 	int j, i, temp, pos;
 	png_byte color_type; 
@@ -563,14 +563,14 @@ int write_png_file(char *file_name , LCUI_Graph *graph)
 }
 
 int detect_png(char *filepath, LCUI_Graph *out)
-/* ÓÃÓÚ½âÂëpngÍ¼Æ¬ */
+/* ç”¨äºè§£ç pngå›¾ç‰‡ */
 {
 	FILE *pic_fp;
 	pic_fp = fopen(filepath, "rb");
-	if(pic_fp == NULL) /* ÎÄ¼ş´ò¿ªÊ§°Ü */
+	if(pic_fp == NULL) /* æ–‡ä»¶æ‰“å¼€å¤±è´¥ */
 		return -1;
 	
-	/* ³õÊ¼»¯¸÷ÖÖ½á¹¹ */
+	/* åˆå§‹åŒ–å„ç§ç»“æ„ */
 	png_structp png_ptr;
 	png_infop   info_ptr;
 	char        buf[PNG_BYTES_TO_CHECK];
@@ -579,42 +579,42 @@ int detect_png(char *filepath, LCUI_Graph *out)
 	png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 	info_ptr = png_create_info_struct(png_ptr);
 	
-	setjmp(png_jmpbuf(png_ptr)); // Õâ¾äºÜÖØÒª
+	setjmp(png_jmpbuf(png_ptr)); // è¿™å¥å¾ˆé‡è¦
 	
 	temp = fread(buf,1,PNG_BYTES_TO_CHECK,pic_fp);
 	temp = png_sig_cmp((void*)buf,(png_size_t)0,PNG_BYTES_TO_CHECK);
 	
-	/*¼ì²âÊÇ·ñÎªpngÎÄ¼ş*/
+	/*æ£€æµ‹æ˜¯å¦ä¸ºpngæ–‡ä»¶*/
 	if (temp!=0) return 1;
 	
 	rewind(pic_fp);
-	/*¿ªÊ¼¶ÁÎÄ¼ş*/
-	png_init_io(png_ptr, pic_fp);/*pic_fpÊÇÈ«¾Ö±äÁ¿*/
-	// ¶ÁÎÄ¼şÁË
+	/*å¼€å§‹è¯»æ–‡ä»¶*/
+	png_init_io(png_ptr, pic_fp);/*pic_fpæ˜¯å…¨å±€å˜é‡*/
+	// è¯»æ–‡ä»¶äº†
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0);
 
 	int color_type,channels;
 	
-	/*»ñÈ¡¿í¶È£¬¸ß¶È£¬Î»Éî£¬ÑÕÉ«ÀàĞÍ*/
-	channels       = png_get_channels(png_ptr, info_ptr);/*»ñÈ¡Í¨µÀÊı*/
+	/*è·å–å®½åº¦ï¼Œé«˜åº¦ï¼Œä½æ·±ï¼Œé¢œè‰²ç±»å‹*/
+	channels       = png_get_channels(png_ptr, info_ptr);/*è·å–é€šé“æ•°*/
 	out->bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-	color_type     = png_get_color_type(png_ptr, info_ptr);/*ÑÕÉ«ÀàĞÍ*/
+	color_type     = png_get_color_type(png_ptr, info_ptr);/*é¢œè‰²ç±»å‹*/
 	
 	int pos = 0;
-	/* row_pointersÀï±ß¾ÍÊÇrgbaÊı¾İ */
+	/* row_pointersé‡Œè¾¹å°±æ˜¯rgbaæ•°æ® */
 	png_bytep* row_pointers;
 	row_pointers = png_get_rows(png_ptr, info_ptr);
 	int i,j;
 	if(channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-	{/*Èç¹ûÊÇRGB+alphaÍ¨µÀ£¬»òÕßRGB+ÆäËü×Ö½Ú*/
-		//¿ªÊ¼·ÖÅäÄÚ´æ
+	{/*å¦‚æœæ˜¯RGB+alphaé€šé“ï¼Œæˆ–è€…RGB+å…¶å®ƒå­—èŠ‚*/
+		//å¼€å§‹åˆ†é…å†…å­˜
 		out->flag = HAVE_ALPHA;
 		temp = Malloc_Graph(out, png_get_image_width(png_ptr, info_ptr), 
 							png_get_image_height(png_ptr, info_ptr));
 		if(temp != 0)
-		{/* Èç¹û·ÖÅäÄÚ´æÊ§°Ü */
+		{/* å¦‚æœåˆ†é…å†…å­˜å¤±è´¥ */
 			fclose(pic_fp);
-			printf("´íÎó(png):ÎŞ·¨·ÖÅä×ã¹»µÄÄÚ´æ¹©´æ´¢Êı¾İ!\n");
+			printf("é”™è¯¯(png):æ— æ³•åˆ†é…è¶³å¤Ÿçš„å†…å­˜ä¾›å­˜å‚¨æ•°æ®!\n");
 			return 1;
 		}
 		temp = (4 * out->width);
@@ -631,14 +631,14 @@ int detect_png(char *filepath, LCUI_Graph *out)
 		}
 	}
 	else if(channels == 3 || color_type == PNG_COLOR_TYPE_RGB)
-	{/*Èç¹ûÊÇRGBÍ¨µÀ*/
+	{/*å¦‚æœæ˜¯RGBé€šé“*/
 		out->flag = NO_ALPHA;
 		temp = Malloc_Graph(out, png_get_image_width(png_ptr, info_ptr), 
 							png_get_image_height(png_ptr, info_ptr));
 		if(temp != 0)
 		{
 			fclose(pic_fp);
-			printf("´íÎó(png):ÎŞ·¨·ÖÅä×ã¹»µÄÄÚ´æ¹©´æ´¢Êı¾İ!\n");
+			printf("é”™è¯¯(png):æ— æ³•åˆ†é…è¶³å¤Ÿçš„å†…å­˜ä¾›å­˜å‚¨æ•°æ®!\n");
 			return 1;
 		}
 		temp = (3 * out->width);
@@ -654,25 +654,25 @@ int detect_png(char *filepath, LCUI_Graph *out)
 		}
 	}
 	else return 1;
-	out->type = TYPE_PNG;  /* Í¼Æ¬ÀàĞÍÎªpng */
-	/* ³·ÏúÊı¾İÕ¼ÓÃµÄÄÚ´æ */
+	out->type = TYPE_PNG;  /* å›¾ç‰‡ç±»å‹ä¸ºpng */
+	/* æ’¤é”€æ•°æ®å ç”¨çš„å†…å­˜ */
 	png_destroy_read_struct(&png_ptr, &info_ptr, 0); 
 	return 0;
 }
 
 int detect_image(char *filepath, LCUI_Graph *out)
-/*Õâ¸öÊÇÓÃÓÚ¼ì²âÍ¼Æ¬¸ñÊ½£¬²¢½âÂë*/
+/*è¿™ä¸ªæ˜¯ç”¨äºæ£€æµ‹å›¾ç‰‡æ ¼å¼ï¼Œå¹¶è§£ç */
 {
 	int result = 1;
-	if (result == 1) result = detect_png(filepath, out);/*¼ì²âpng*/  
-	if (result == 1) result = detect_jpg(filepath, out);/*¼ì²âjpg*/ 
-	if (result == 1) result = detect_bmp(filepath, out);/*¼ì²âbmp*/ 
+	if (result == 1) result = detect_png(filepath, out);/*æ£€æµ‹png*/  
+	if (result == 1) result = detect_jpg(filepath, out);/*æ£€æµ‹jpg*/ 
+	if (result == 1) result = detect_bmp(filepath, out);/*æ£€æµ‹bmp*/ 
 	return result;
 }
 
 
 void Zoom_Graph(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
-/* ¹¦ÄÜ£º¸ù¾İÖ¸¶¨Ä£Ê½£¬¶ÔÍ¼Ïñ½øĞĞËõ·Å */
+/* åŠŸèƒ½ï¼šæ ¹æ®æŒ‡å®šæ¨¡å¼ï¼Œå¯¹å›¾åƒè¿›è¡Œç¼©æ”¾ */
 {
 	LCUI_Pos pos; 
 	int count, temp, x, y, k, m;
@@ -691,12 +691,12 @@ void Zoom_Graph(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 	scale_y = (double)in->height / size.h;
 	
 	if(flag == DEFAULT)
-	{/* Èç¹ûËõ·Å·½Ê½ÎªÈ±Ê¡£¬Í¼Æ¬µÄ¿íºÍ¸ßµÄËõ·Å±ÈÀı½«»áÒ»Ñù */
+	{/* å¦‚æœç¼©æ”¾æ–¹å¼ä¸ºç¼ºçœï¼Œå›¾ç‰‡çš„å®½å’Œé«˜çš„ç¼©æ”¾æ¯”ä¾‹å°†ä¼šä¸€æ · */
 		if (scale_x<scale_y) scale_y = scale_x; 
 		else scale_x = scale_y;
 	}
 	out->flag = in->flag;
-	Malloc_Graph(out, size.w, size.h);/* ÉêÇëÄÚ´æ */ 
+	Malloc_Graph(out, size.w, size.h);/* ç”³è¯·å†…å­˜ */ 
 	Using_Graph(out, 1);
 	Using_Graph(in, 0);  
 	 
@@ -721,21 +721,21 @@ void Zoom_Graph(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 	End_Use_Graph(in);
 	out->width  = size.w;
 	out->height = size.h;
-	out->malloc = IS_TRUE;  /* ÒÑ¾­·ÖÅäÄÚ´æ */
+	out->malloc = IS_TRUE;  /* å·²ç»åˆ†é…å†…å­˜ */
 }
 
 
 int Load_Image(char *filepath, LCUI_Graph *out)
 /* 
- * ¹¦ÄÜ£ºÔØÈëÖ¸¶¨Í¼Æ¬ÎÄ¼şµÄÍ¼ĞÎÊı¾İ
- * ËµÃ÷£º´ò¿ªÍ¼Æ¬ÎÄ¼ş£¬²¢½âÂëÖÁÄÚ´æ£¬´ò¿ªµÄÍ¼Æ¬ÎÄ¼şÔ½´ó£¬Õ¼ÓÃµÄÄÚ´æÒ²¾ÍÔ½´ó 
+ * åŠŸèƒ½ï¼šè½½å…¥æŒ‡å®šå›¾ç‰‡æ–‡ä»¶çš„å›¾å½¢æ•°æ®
+ * è¯´æ˜ï¼šæ‰“å¼€å›¾ç‰‡æ–‡ä»¶ï¼Œå¹¶è§£ç è‡³å†…å­˜ï¼Œæ‰“å¼€çš„å›¾ç‰‡æ–‡ä»¶è¶Šå¤§ï¼Œå ç”¨çš„å†…å­˜ä¹Ÿå°±è¶Šå¤§ 
  * */
 {
 	FILE *fp;
 	Graph_Init(out); 
-	int result = 0;   /* ´íÎó´úºÅÎª0 */
+	int result = 0;   /* é”™è¯¯ä»£å·ä¸º0 */
 	out->flag = NO_ALPHA;
-	/*fpÊÇÈ«¾Ö±äÁ¿£¬ÆäËüº¯Êı»áÓÃµ½Ëü*/
+	/*fpæ˜¯å…¨å±€å˜é‡ï¼Œå…¶å®ƒå‡½æ•°ä¼šç”¨åˆ°å®ƒ*/
 	if ((fp = fopen(filepath,"r")) == NULL) 
 	{
 		perror(filepath);
@@ -744,27 +744,27 @@ int Load_Image(char *filepath, LCUI_Graph *out)
 	else{
 		fgetc(fp);
 		if (!ferror (fp)) 
-		{/*rÈç¹ûÃ»³ö´í*/
+		{/*rå¦‚æœæ²¡å‡ºé”™*/
 			fseek(fp,0,SEEK_END);
 			if (ftell(fp)>4) 
 			{
 				fclose(fp);
-				result = detect_image(filepath, out);/*¼ì²âÍ¼Æ¬²¢½âÂë*/
+				result = detect_image(filepath, out);/*æ£€æµ‹å›¾ç‰‡å¹¶è§£ç */
 			} 
 			else 
 			{
-				result = SHORT_FILE;//ÎÄ¼ş¹ıĞ¡ 
+				result = SHORT_FILE;//æ–‡ä»¶è¿‡å° 
 				fclose(fp);
 			}
 		}
 	}
-	return result;   /* ·µ»Ø´íÎó´úÂë */
+	return result;   /* è¿”å›é”™è¯¯ä»£ç  */
 }
 
 int Cut_Graph(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 /* 
- * ¹¦ÄÜ£º´ÓÔ´Í¼ĞÎÖĞ½ØÈ¡³öÖ¸¶¨ÇøÓòµÄÍ¼ĞÎ 
- * ËµÃ÷£º²Ã¼ô³öµÄÍ¼ÏñÊı¾İ£¬È«¾ÖÍ¸Ã÷¶ÈºÍÔ´Í¼ÏñÒ»ÖÂ
+ * åŠŸèƒ½ï¼šä»æºå›¾å½¢ä¸­æˆªå–å‡ºæŒ‡å®šåŒºåŸŸçš„å›¾å½¢ 
+ * è¯´æ˜ï¼šè£å‰ªå‡ºçš„å›¾åƒæ•°æ®ï¼Œå…¨å±€é€æ˜åº¦å’Œæºå›¾åƒä¸€è‡´
  * */
 {
 	int x, y;
@@ -798,13 +798,13 @@ int Cut_Graph(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 		if(temp != 0) return -1; 
 		Using_Graph(out, 1);
 		Using_Graph(src, 0);
-		/* ¿ªÊ¼¶ÁÈ¡Í¼Æ¬ÖĞµÄÍ¼ĞÎÊı×é²¢Ğ´Èë´°¿Ú */ 
+		/* å¼€å§‹è¯»å–å›¾ç‰‡ä¸­çš„å›¾å½¢æ•°ç»„å¹¶å†™å…¥çª—å£ */ 
 		for (y=0;y< rect.height; ++y) 
 		{
 			k = (rect.y+y)*src->width + rect.x;
 			for (x=0;x<rect.width; ++x)
 			{
-				temp = k + x; /* ¼ÆËãÍ¼Æ¬ÄÚĞèÒª¶ÁÈ¡µÄÇøÓòµÄ¸÷µã×ø±ê */
+				temp = k + x; /* è®¡ç®—å›¾ç‰‡å†…éœ€è¦è¯»å–çš„åŒºåŸŸçš„å„ç‚¹åæ ‡ */
 				out->rgba[0][count] = src->rgba[0][temp];
 				out->rgba[1][count] = src->rgba[1][temp];
 				out->rgba[2][count] = src->rgba[2][temp];
@@ -821,7 +821,7 @@ int Cut_Graph(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 }
 
 int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)  
-/* ¹¦ÄÜ£º½«Í¼Ïñ½øĞĞË®Æ½·­×ª */  
+/* åŠŸèƒ½ï¼šå°†å›¾åƒè¿›è¡Œæ°´å¹³ç¿»è½¬ */  
 {  
     int value = 0, x, y, pos, left, temp, count;  
     int width = src->width, height = src->height;  
@@ -834,7 +834,7 @@ int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)
 		Malloc_Graph(out, width, height);
         temp = width / 2;
 		for (y = 0; y < height; ++y) 
-		{   /* Ë®Æ½·­×ªÆäÊµÒ²¾ÍÊÇ½»»»Á½±ßµÄÊı¾İ */  
+		{   /* æ°´å¹³ç¿»è½¬å…¶å®ä¹Ÿå°±æ˜¯äº¤æ¢ä¸¤è¾¹çš„æ•°æ® */  
 			pos = y * width;
 			left = pos;
 			for (x = 0; x <= temp; ++x) 
@@ -868,14 +868,14 @@ int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)
 
 int Cut_And_Overlay_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Graph *des)
 /*
- * ¹¦ÄÜ£º´ÓÔ´Í¼ĞÎÖĞ½ØÈ¡³öÒ»¿éÍ¼ĞÎ²¢¸ù¾İalphaÍ¨µÀµş¼ÓÖÁ±³¾°Í¼ÉÏ
- * ËµÃ÷£ºÕâ¸öº¯ÊıÊÇ½ØÈ¡ºÍ¸²¸ÇÒ»Æğ½øĞĞµÄ£¬ÔÚ½ØÈ¡µÄÍ¬Ê±£¬½«Í¼ĞÎ¸²¸ÇÖÁÄ¿±êÍ¼ĞÎÉÏ£¬Ğ§ÂÊ±È·Ö²½µ÷ÓÃº¯Êı¸ßÒ»µã¡£
+ * åŠŸèƒ½ï¼šä»æºå›¾å½¢ä¸­æˆªå–å‡ºä¸€å—å›¾å½¢å¹¶æ ¹æ®alphaé€šé“å åŠ è‡³èƒŒæ™¯å›¾ä¸Š
+ * è¯´æ˜ï¼šè¿™ä¸ªå‡½æ•°æ˜¯æˆªå–å’Œè¦†ç›–ä¸€èµ·è¿›è¡Œçš„ï¼Œåœ¨æˆªå–çš„åŒæ—¶ï¼Œå°†å›¾å½¢è¦†ç›–è‡³ç›®æ ‡å›¾å½¢ä¸Šï¼Œæ•ˆç‡æ¯”åˆ†æ­¥è°ƒç”¨å‡½æ•°é«˜ä¸€ç‚¹ã€‚
  */
 {
 	int x, y;
 	unsigned char alpha;
 	int temp,count, k, n;  
-	/* ´¦Àí²Ã¼ôÇøÓò */
+	/* å¤„ç†è£å‰ªåŒºåŸŸ */
 	cut = Get_Valid_Area(Size(src->width, src->height), cut);
 	/**
 	if(cut.x < 0) 
@@ -893,7 +893,7 @@ int Cut_And_Overlay_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Gra
 	if(cut.height + cut.y > src->height)  
 		cut.height = src->height - cut.y; 
 	**/
-	/* ´¦ÀíÕ³ÌùÇøÓò£¬Õ³ÌùµÄÇøÓò²»ÔÚ±³¾°Í¼µÄÓĞĞ§·¶Î§ÄÚµÄ»°£¬Ò²Òªµ÷Õû²Ã¼ôÇøÓò */
+	/* å¤„ç†ç²˜è´´åŒºåŸŸï¼Œç²˜è´´çš„åŒºåŸŸä¸åœ¨èƒŒæ™¯å›¾çš„æœ‰æ•ˆèŒƒå›´å†…çš„è¯ï¼Œä¹Ÿè¦è°ƒæ•´è£å‰ªåŒºåŸŸ */
 	if(put.x < 0) 
 	{
 		cut.x -= put.x;
@@ -915,14 +915,14 @@ int Cut_And_Overlay_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Gra
 	{
 		Using_Graph(des, 1);
 		Using_Graph(src, 0);
-		/* ¿ªÊ¼¶ÁÈ¡Í¼Æ¬ÖĞµÄÍ¼ĞÎÊı×é²¢Ğ´ÈëÄ¿±êÍ¼ĞÎ */ 
+		/* å¼€å§‹è¯»å–å›¾ç‰‡ä¸­çš„å›¾å½¢æ•°ç»„å¹¶å†™å…¥ç›®æ ‡å›¾å½¢ */ 
 		for (y=0;y<cut.height; ++y) 
 		{
-			k = (cut.y+y)*src->width + cut.x; /* »ñÈ¡½ØÈ¡´¦µÄÆğµãÎ»ÖÃ */
-			n = (y+put.y)*des->width + put.x; /* »ñÈ¡Õ³Ìù´¦µÄÆğµãÎ»ÖÃ */
+			k = (cut.y+y)*src->width + cut.x; /* è·å–æˆªå–å¤„çš„èµ·ç‚¹ä½ç½® */
+			n = (y+put.y)*des->width + put.x; /* è·å–ç²˜è´´å¤„çš„èµ·ç‚¹ä½ç½® */
 			for (x=0;x<cut.width; ++x)
 			{
-				temp  = k + x; /* ¼ÆËãÍ¼Æ¬ÄÚĞèÒª¶ÁÈ¡µÄÇøÓòµÄ¸÷µã×ø±ê */
+				temp  = k + x; /* è®¡ç®—å›¾ç‰‡å†…éœ€è¦è¯»å–çš„åŒºåŸŸçš„å„ç‚¹åæ ‡ */
 				count = n + x; 
 				if(src->flag == HAVE_ALPHA)
 				{
@@ -961,15 +961,15 @@ int Cut_And_Overlay_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Gra
 
 int Cut_And_Replace_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Graph *des)
 /*
- * ¹¦ÄÜ£º´ÓÔ´Í¼ĞÎÖĞ½ØÈ¡³öÒ»¿éÍ¼ĞÎ²¢¸²¸ÇÖÁ±³¾°Í¼ÉÏ
- * ËµÃ÷£ºÓëÆäËüº¯Êı²»Í¬£¬Õâ¸öÊÇ½ØÈ¡ºÍºÏ³ÉÒ»Æğ½øĞĞµÄ£¬ÔÚ½ØÈ¡µÄÍ¬Ê±£¬½«Í¼ĞÎ¸²¸ÇÖÁÄ¿±êÍ¼ĞÎÉÏ£¬Ğ§ÂÊ±È·Ö²½µ÷ÓÃº¯Êı¸ßÒ»µã¡£
+ * åŠŸèƒ½ï¼šä»æºå›¾å½¢ä¸­æˆªå–å‡ºä¸€å—å›¾å½¢å¹¶è¦†ç›–è‡³èƒŒæ™¯å›¾ä¸Š
+ * è¯´æ˜ï¼šä¸å…¶å®ƒå‡½æ•°ä¸åŒï¼Œè¿™ä¸ªæ˜¯æˆªå–å’Œåˆæˆä¸€èµ·è¿›è¡Œçš„ï¼Œåœ¨æˆªå–çš„åŒæ—¶ï¼Œå°†å›¾å½¢è¦†ç›–è‡³ç›®æ ‡å›¾å½¢ä¸Šï¼Œæ•ˆç‡æ¯”åˆ†æ­¥è°ƒç”¨å‡½æ•°é«˜ä¸€ç‚¹ã€‚
  */
 {
 	int x, y; 
 	int temp,count, k, n;  
-	/* ´¦Àí²Ã¼ôÇøÓò */
+	/* å¤„ç†è£å‰ªåŒºåŸŸ */
 	cut = Get_Valid_Area(Size(src->width, src->height), cut);
-	/* ´¦ÀíÕ³ÌùÇøÓò */
+	/* å¤„ç†ç²˜è´´åŒºåŸŸ */
 	if(put.x < 0) 
 	{
 		cut.x -= put.x;
@@ -991,14 +991,14 @@ int Cut_And_Replace_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Gra
 	{
 		Using_Graph(des, 1);
 		Using_Graph(src, 0);
-		/* ¿ªÊ¼¶ÁÈ¡Í¼Æ¬ÖĞµÄÍ¼ĞÎÊı×é²¢Ğ´ÈëÄ¿±êÍ¼ĞÎ */ 
+		/* å¼€å§‹è¯»å–å›¾ç‰‡ä¸­çš„å›¾å½¢æ•°ç»„å¹¶å†™å…¥ç›®æ ‡å›¾å½¢ */ 
 		for (y=0;y<cut.height; ++y) 
 		{
-			k = (cut.y+y)*src->width + cut.x; /* »ñÈ¡½ØÈ¡´¦µÄÆğµãÎ»ÖÃ */
-			n = (y+put.y)*des->width + put.x; /* »ñÈ¡Õ³Ìù´¦µÄÆğµãÎ»ÖÃ */
+			k = (cut.y+y)*src->width + cut.x; /* è·å–æˆªå–å¤„çš„èµ·ç‚¹ä½ç½® */
+			n = (y+put.y)*des->width + put.x; /* è·å–ç²˜è´´å¤„çš„èµ·ç‚¹ä½ç½® */
 			for (x=0;x<cut.width; ++x)
 			{
-				temp  = k + x; /* ¼ÆËãÍ¼Æ¬ÄÚĞèÒª¶ÁÈ¡µÄÇøÓòµÄ¸÷µã×ø±ê */
+				temp  = k + x; /* è®¡ç®—å›¾ç‰‡å†…éœ€è¦è¯»å–çš„åŒºåŸŸçš„å„ç‚¹åæ ‡ */
 				count = n + x;
 				des->rgba[0][count] = src->rgba[0][temp];
 				des->rgba[1][count] = src->rgba[1][temp];
@@ -1022,28 +1022,28 @@ int Cut_And_Replace_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Gra
 
 int Get_Screen_Graph(LCUI_Graph *out)
 /* 
- * ¹¦ÄÜ£º»ñÈ¡ÆÁÄ»ÉÏÏÔÊ¾µÄÍ¼Ïñ
- * ËµÃ÷£º×Ô¶¯·ÖÅäÄÚ´æ¸øÖ¸Õë£¬²¢°ÑÊı¾İ¿½±´ÖÁÖ¸ÕëµÄÄÚ´æ 
+ * åŠŸèƒ½ï¼šè·å–å±å¹•ä¸Šæ˜¾ç¤ºçš„å›¾åƒ
+ * è¯´æ˜ï¼šè‡ªåŠ¨åˆ†é…å†…å­˜ç»™æŒ‡é’ˆï¼Œå¹¶æŠŠæ•°æ®æ‹·è´è‡³æŒ‡é’ˆçš„å†…å­˜ 
  * */
 {
 	unsigned char  *dest;
 	int i, temp, h, w;
-	if(LCUI_Sys.init != IS_TRUE) /* Èç¹ûÃ»ÓĞ³õÊ¼»¯¹ı */
+	if(LCUI_Sys.init != IS_TRUE) /* å¦‚æœæ²¡æœ‰åˆå§‹åŒ–è¿‡ */
 		return -1; 
 	
-	out->flag = NO_ALPHA;/* ÎŞalphaÍ¨µÀ */
+	out->flag = NO_ALPHA;/* æ— alphaé€šé“ */
 	out->type = TYPE_BMP;
 	temp = Malloc_Graph(out, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h);
 	if(temp != 0) 
 		return -2; 
 		
 	i = 0; 
-	dest = LCUI_Sys.screen.fb_mem; /* Ö¸ÕëÖ¸ÏòÖ¡»º³åµÄÄÚ´æ */
+	dest = LCUI_Sys.screen.fb_mem; /* æŒ‡é’ˆæŒ‡å‘å¸§ç¼“å†²çš„å†…å­˜ */
 	for (h = 0; h < LCUI_Sys.screen.size.h; ++h)
 	{
 		for (w = 0; w < LCUI_Sys.screen.size.w; ++w)
 		{
-			/* ¶ÁÈ¡Ö¡»º³åµÄÄÚÈİ */
+			/* è¯»å–å¸§ç¼“å†²çš„å†…å®¹ */
 			out->rgba[2][i] = *(dest++);
 			out->rgba[1][i] = *(dest++);
 			out->rgba[0][i] = *(dest++);
@@ -1055,7 +1055,7 @@ int Get_Screen_Graph(LCUI_Graph *out)
 }
 
 void Fill_Color(LCUI_Graph *pic, LCUI_RGB color)
-/* ¹¦ÄÜ£ºÎª´«ÈëµÄÍ¼ĞÎÌî³äÑÕÉ« */
+/* åŠŸèƒ½ï¼šä¸ºä¼ å…¥çš„å›¾å½¢å¡«å……é¢œè‰² */
 {
 	int size; 
 	if(Valid_Graph(pic))
@@ -1072,12 +1072,12 @@ void Fill_Color(LCUI_Graph *pic, LCUI_RGB color)
 
 void Tile_Graph(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 /* 
- * ¹¦ÄÜ£ºÆ½ÆÌÍ¼ĞÎ
- * ²ÎÊıËµÃ÷£º
- * src Ô­Ê¼Í¼ĞÎ
- * out Ìî³äºóµÄÍ¼ĞÎ
- * width Ìî³äµÄ¿í¶È
- * height Ìî³äµÄ¸ß¶È
+ * åŠŸèƒ½ï¼šå¹³é“ºå›¾å½¢
+ * å‚æ•°è¯´æ˜ï¼š
+ * src åŸå§‹å›¾å½¢
+ * out å¡«å……åçš„å›¾å½¢
+ * width å¡«å……çš„å®½åº¦
+ * height å¡«å……çš„é«˜åº¦
  **/
 {
 	int x,y,w,h,temp,count, m;
@@ -1129,8 +1129,8 @@ void Tile_Graph(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 
 int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 /* 
- * ¹¦ÄÜ£º½«Ç°¾°Í¼Óë±³¾°Í¼»ìºÏµş¼Ó
- * ËµÃ÷£ºback_graphÊÇ±³¾°Í¼Ïñ£¬fore_graphÇ°¾°Í¼Ïñ£¬»ìºÏºóµÄÊı¾İ±£´æÔÚ±³¾°Í¼ÖĞ
+ * åŠŸèƒ½ï¼šå°†å‰æ™¯å›¾ä¸èƒŒæ™¯å›¾æ··åˆå åŠ 
+ * è¯´æ˜ï¼šback_graphæ˜¯èƒŒæ™¯å›¾åƒï¼Œfore_graphå‰æ™¯å›¾åƒï¼Œæ··åˆåçš„æ•°æ®ä¿å­˜åœ¨èƒŒæ™¯å›¾ä¸­
  */
 {
 	unsigned char *r1, *g1, *a1, *b1, *r2, *g2, *b2; 
@@ -1139,7 +1139,7 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 	if(des_pos.y > back_graph->height) return -1;
 
 	if(Valid_Graph(back_graph) && Valid_Graph(fore_graph))
-	{/* Èç¹ûÁ½¸öÍ¼ĞÎÊı¾İ¶¼ÓĞĞ§ */
+	{/* å¦‚æœä¸¤ä¸ªå›¾å½¢æ•°æ®éƒ½æœ‰æ•ˆ */
 		int x = 0, y = 0;
 		int temp,count; 
 		int m, n;
@@ -1147,7 +1147,7 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 		float k;
 		LCUI_Rect cut;
 		
-		/* Èç¹ûÇ°¾°Í¼³ß´ç³¬³ö±³¾°Í¼µÄ·¶Î§£¬ĞèÒª¸ü¸ÄÇ°¾°Í¼µÄÏñËØ¶ÁÈ¡·¶Î§ */ 
+		/* å¦‚æœå‰æ™¯å›¾å°ºå¯¸è¶…å‡ºèƒŒæ™¯å›¾çš„èŒƒå›´ï¼Œéœ€è¦æ›´æ”¹å‰æ™¯å›¾çš„åƒç´ è¯»å–èŒƒå›´ */ 
 		if( Get_Cut_Area(
 			Size( back_graph->width, back_graph->height),
 			Rect( des_pos.x, des_pos.y, 
@@ -1158,11 +1158,11 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 			des_pos.x += cut.x;
 			des_pos.y += cut.y;
 		} 
-		/* ¿ªÊ¼¶ÁÈ¡Í¼Æ¬ÖĞµÄÍ¼ĞÎÊı×é²¢Ğ´Èë´°¿Ú */ 
+		/* å¼€å§‹è¯»å–å›¾ç‰‡ä¸­çš„å›¾å½¢æ•°ç»„å¹¶å†™å…¥çª—å£ */ 
 		Using_Graph(fore_graph, 0);
 		Using_Graph(back_graph, 1);
 		if(fore_graph->flag == HAVE_ALPHA)
-		{ /* Èç¹ûÇ°¾°Í¼ĞÎÓĞÍ¸Ã÷Ğ§¹û */
+		{ /* å¦‚æœå‰æ™¯å›¾å½¢æœ‰é€æ˜æ•ˆæœ */
 			k = fore_graph->alpha / 255.0;
 			for (y = 0; y < cut.height; ++y) 
 			{
@@ -1170,10 +1170,10 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 				n = (des_pos.y + y) * back_graph->width + des_pos.x;
 				for (x = 0; x < cut.width; ++x) 
 				{
-					temp = m + x; /* ¼ÆËãÍ¼Æ¬ÄÚĞèÒª¶ÁÈ¡µÄÇøÓòµÄ¸÷µã×ø±ê */
-					count = n + x;/* ¼ÆËãĞèÌî³äÖÁ´°¿ÚµÄ¸÷µãµÄ×ø±ê */
+					temp = m + x; /* è®¡ç®—å›¾ç‰‡å†…éœ€è¦è¯»å–çš„åŒºåŸŸçš„å„ç‚¹åæ ‡ */
+					count = n + x;/* è®¡ç®—éœ€å¡«å……è‡³çª—å£çš„å„ç‚¹çš„åæ ‡ */
 					j = fore_graph->rgba[3][temp] * k;
-					/* ³Ë³ı·¨ÔËËãÁ¿½Ï¶à£¬²»ÖªÈçºÎÓÅ»¯ */
+					/* ä¹˜é™¤æ³•è¿ç®—é‡è¾ƒå¤šï¼Œä¸çŸ¥å¦‚ä½•ä¼˜åŒ– */
 					back_graph->rgba[0][count] = (fore_graph->rgba[0][temp] * j + back_graph->rgba[0][count] * (255 - j)) /255;
 					back_graph->rgba[1][count] = (fore_graph->rgba[1][temp] * j + back_graph->rgba[1][count] * (255 - j)) /255;
 					back_graph->rgba[2][count] = (fore_graph->rgba[2][temp] * j + back_graph->rgba[2][count] * (255 - j)) /255;
@@ -1181,14 +1181,14 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 			}
 		}
 		else
-		{/* Èç¹ûÇ°¾°Í¼ĞÎÃ»ÓĞÍ¸Ã÷Ğ§¹û */
+		{/* å¦‚æœå‰æ™¯å›¾å½¢æ²¡æœ‰é€æ˜æ•ˆæœ */
 			for (y = 0; y < cut.height; ++y) 
 			{ 
-				/* ¼ÆËãÇ°¾°Í¼ÄÚĞèÒª¶ÁÈ¡µÄÇøÓòµÄ¸÷Æğµã×ø±ê */
+				/* è®¡ç®—å‰æ™¯å›¾å†…éœ€è¦è¯»å–çš„åŒºåŸŸçš„å„èµ·ç‚¹åæ ‡ */
 				m = (cut.y + y) * fore_graph->width + cut.x;
-				/* ¼ÆËã±³¾°Í¼ÄÚĞèÒª¶ÁÈ¡µÄÇøÓòµÄ¸÷Æğµã×ø±ê */
+				/* è®¡ç®—èƒŒæ™¯å›¾å†…éœ€è¦è¯»å–çš„åŒºåŸŸçš„å„èµ·ç‚¹åæ ‡ */
 				n = (des_pos.y + y) * back_graph->width + des_pos.x;
-				/* Ê¹ÓÃÖ¸ÕëÀ´ÒıÓÃ */
+				/* ä½¿ç”¨æŒ‡é’ˆæ¥å¼•ç”¨ */
 				r1 = back_graph->rgba[0] + n;
 				g1 = back_graph->rgba[1] + n;
 				b1 = back_graph->rgba[2] + n;
@@ -1197,12 +1197,12 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 				r2 = fore_graph->rgba[0] + m;
 				g2 = fore_graph->rgba[1] + m;
 				b2 = fore_graph->rgba[2] + m;
-				/* ¿½±´ */
+				/* æ‹·è´ */
 				memcpy(r1, r2, cut.width);
 				memcpy(g1, g2, cut.width);
 				memcpy(b1, b2, cut.width);
 				if(back_graph->flag == HAVE_ALPHA)
-					/* Í¸Ã÷¶ÈÈ¡¾öÓÚÇ°¾°Í¼µÄÍ¸Ã÷¶È */
+					/* é€æ˜åº¦å–å†³äºå‰æ™¯å›¾çš„é€æ˜åº¦ */
 					memset(a1, fore_graph->alpha, sizeof(unsigned char)*cut.width);
 			}
 		} 
@@ -1217,8 +1217,8 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 
 int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 /* 
- * ¹¦ÄÜ£ºÌæ»»Ô­Í¼ÖĞ¶ÔÓ¦Î»ÖÃµÄÇøÓòÖĞµÄÍ¼ĞÎ
- * ËµÃ÷£ºÓëOverlay_Graphº¯Êı²»Í¬£¬back_graphÖĞµÄÍ¼ĞÎÊı¾İ»á±»fore_graphÖĞµÄÍ¼ĞÎÊı¾İ¸²¸Ç
+ * åŠŸèƒ½ï¼šæ›¿æ¢åŸå›¾ä¸­å¯¹åº”ä½ç½®çš„åŒºåŸŸä¸­çš„å›¾å½¢
+ * è¯´æ˜ï¼šä¸Overlay_Graphå‡½æ•°ä¸åŒï¼Œback_graphä¸­çš„å›¾å½¢æ•°æ®ä¼šè¢«fore_graphä¸­çš„å›¾å½¢æ•°æ®è¦†ç›–
  */
 {
 	unsigned char *r1, *g1, *a1, *a2, *b1, *r2, *g2, *b2; 
@@ -1226,7 +1226,7 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 	if(des_pos.y > back_graph->height) return -1;
 
 	if(Valid_Graph(back_graph) && Valid_Graph(fore_graph))
-	{/* Èç¹ûÁ½¸öÍ¼ĞÎÊı¾İ¶¼ÓĞĞ§ */
+	{/* å¦‚æœä¸¤ä¸ªå›¾å½¢æ•°æ®éƒ½æœ‰æ•ˆ */
 		int x = 0, y = 0;
 		int temp,count; 
 		int m, n;
@@ -1234,7 +1234,7 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 		
 		LCUI_Rect cut;
 		
-		/* Èç¹ûÇ°¾°Í¼³ß´ç³¬³ö±³¾°Í¼µÄ·¶Î§£¬ĞèÒª¸ü¸ÄÇ°¾°Í¼µÄÏñËØ¶ÁÈ¡·¶Î§ */ 
+		/* å¦‚æœå‰æ™¯å›¾å°ºå¯¸è¶…å‡ºèƒŒæ™¯å›¾çš„èŒƒå›´ï¼Œéœ€è¦æ›´æ”¹å‰æ™¯å›¾çš„åƒç´ è¯»å–èŒƒå›´ */ 
 		if( Get_Cut_Area(
 			Size( back_graph->width, back_graph->height),
 			Rect( des_pos.x, des_pos.y, 
@@ -1245,20 +1245,20 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 			des_pos.x += cut.x;
 			des_pos.y += cut.y;
 		}
-		/* ¿ªÊ¼¶ÁÈ¡Í¼Æ¬ÖĞµÄÍ¼ĞÎÊı×é²¢Ğ´Èë´°¿Ú */
+		/* å¼€å§‹è¯»å–å›¾ç‰‡ä¸­çš„å›¾å½¢æ•°ç»„å¹¶å†™å…¥çª—å£ */
 		Using_Graph(fore_graph, 0);
 		Using_Graph(back_graph, 1);
 		
 		if(fore_graph->flag == HAVE_ALPHA && back_graph->flag == NO_ALPHA)
-		{ /* Èç¹ûÇ°¾°Í¼ĞÎÓĞÍ¸Ã÷Ğ§¹û£¬±³¾°Í¼ĞÎÃ»ÓĞ */
+		{ /* å¦‚æœå‰æ™¯å›¾å½¢æœ‰é€æ˜æ•ˆæœï¼ŒèƒŒæ™¯å›¾å½¢æ²¡æœ‰ */
 			for (y = 0; y < cut.height; ++y) 
 			{
 				m = (cut.y + y) * fore_graph->width + cut.x;
 				n = (des_pos.y + y) * back_graph->width + des_pos.x;
 				for (x = 0; x < cut.width; ++x) 
 				{
-					temp = m + x; /* ¼ÆËãÍ¼Æ¬ÄÚĞèÒª¶ÁÈ¡µÄÇøÓòµÄ¸÷µã×ø±ê */
-					count = n + x;/* ¼ÆËãĞèÌî³äÖÁ´°¿ÚµÄ¸÷µãµÄ×ø±ê */
+					temp = m + x; /* è®¡ç®—å›¾ç‰‡å†…éœ€è¦è¯»å–çš„åŒºåŸŸçš„å„ç‚¹åæ ‡ */
+					count = n + x;/* è®¡ç®—éœ€å¡«å……è‡³çª—å£çš„å„ç‚¹çš„åæ ‡ */
 					j = fore_graph->rgba[3][temp] * fore_graph->alpha;
 					back_graph->rgba[0][count] = (fore_graph->rgba[0][temp] * j + back_graph->rgba[0][count] * (255 - j)) /255;
 					back_graph->rgba[1][count] = (fore_graph->rgba[1][temp] * j + back_graph->rgba[1][count] * (255 - j)) /255;
@@ -1272,7 +1272,7 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 			{
 				m = (cut.y + y) *fore_graph->width + cut.x;
 				n = (des_pos.y + y) * back_graph->width + des_pos.x;
-				/* Ê¹ÓÃÖ¸ÕëÀ´ÒıÓÃ */
+				/* ä½¿ç”¨æŒ‡é’ˆæ¥å¼•ç”¨ */
 				r1 = back_graph->rgba[0] + n;
 				g1 = back_graph->rgba[1] + n;
 				b1 = back_graph->rgba[2] + n;
@@ -1280,7 +1280,7 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 				r2 = fore_graph->rgba[0] + m;
 				g2 = fore_graph->rgba[1] + m;
 				b2 = fore_graph->rgba[2] + m; 
-				/* ¿½±´ */
+				/* æ‹·è´ */
 				memcpy(r1, r2, cut.width);
 				memcpy(g1, g2, cut.width);
 				memcpy(b1, b2, cut.width);
@@ -1305,55 +1305,55 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 } 
 
 int Align_Image(LCUI_Graph *graph, LCUI_Graph *image, int flag)
-/* ¹¦ÄÜ£º½«Í¼Æ¬ÒÔÖ¸¶¨¶ÔÆë·½Ê½Õ³ÌùÖÁ±³¾°Í¼ÉÏ */
+/* åŠŸèƒ½ï¼šå°†å›¾ç‰‡ä»¥æŒ‡å®šå¯¹é½æ–¹å¼ç²˜è´´è‡³èƒŒæ™¯å›¾ä¸Š */
 {
 	LCUI_Pos pos;
 	pos.x = 0;
 	pos.y = 0;
 	if(!Valid_Graph(graph) || ! Valid_Graph(image))
-	/* Èç¹ûÍ¼Æ¬ÎŞĞ§ */
+	/* å¦‚æœå›¾ç‰‡æ— æ•ˆ */
 		return -1; 
 		
 	if((flag & ALIGN_TOP_LEFT) == ALIGN_TOP_LEFT);
-	/* Ïò×óÉÏ½Ç¶ÔÆë */
+	/* å‘å·¦ä¸Šè§’å¯¹é½ */
 	else if((flag & ALIGN_TOP_CENTER) == ALIGN_TOP_CENTER)
-	/* ÏòÉÏÖĞ¼ä¶ÔÆë */
+	/* å‘ä¸Šä¸­é—´å¯¹é½ */
 		pos.x = (graph->width - image->width) / 2;  
 	else if((flag & ALIGN_TOP_RIGHT) == ALIGN_TOP_RIGHT)
-	/* ÏòÓÒÉÏ½Ç¶ÔÆë */
+	/* å‘å³ä¸Šè§’å¯¹é½ */
 		pos.x = graph->width - image->width; 
 	else if((flag & ALIGN_MIDDLE_LEFT) == ALIGN_MIDDLE_LEFT)
-	/* ÏòÖĞÑëÆ«×ó¶ÔÆë */ 
+	/* å‘ä¸­å¤®åå·¦å¯¹é½ */ 
 		pos.y = (graph->height - image->height) / 2; 
 	else if((flag & ALIGN_MIDDLE_CENTER) == ALIGN_MIDDLE_CENTER)
-	{ /* ÏòÕıÖĞÑë¶ÔÆë */
+	{ /* å‘æ­£ä¸­å¤®å¯¹é½ */
 		pos.x = (graph->width - image->width) / 2;
 		pos.y = (graph->height - image->height) / 2;
 	}
 	else if((flag & ALIGN_MIDDLE_RIGHT) == ALIGN_MIDDLE_RIGHT)
-	{ /* ÏòÖĞÑëÆ«ÓÉ¶ÔÆë */
+	{ /* å‘ä¸­å¤®åç”±å¯¹é½ */
 		pos.x = graph->width - image->width;
 		pos.y = (graph->height - image->height) / 2;
 	}
 	else if((flag & ALIGN_BOTTOM_LEFT) == ALIGN_BOTTOM_LEFT)
-	/* Ïòµ×²¿Æ«×ó¶ÔÆë */ 
+	/* å‘åº•éƒ¨åå·¦å¯¹é½ */ 
 		pos.y = graph->height - image->height; 
 	else if((flag & ALIGN_BOTTOM_CENTER) == ALIGN_BOTTOM_CENTER)
-	{ /* Ïòµ×²¿¾ÓÖĞ¶ÔÆë */
+	{ /* å‘åº•éƒ¨å±…ä¸­å¯¹é½ */
 		pos.x = (graph->width - image->width) / 2;
 		pos.y = graph->height - image->height;
 	}
 	else if((flag & ALIGN_BOTTOM_RIGHT) == ALIGN_BOTTOM_RIGHT)
-	{ /* Ïòµ×²¿Æ«ÓÒ¶ÔÆë */
+	{ /* å‘åº•éƒ¨åå³å¯¹é½ */
 		pos.x = graph->width - image->width;
 		pos.y = graph->height - image->height;
 	}
 	
 	if( Check_Option(flag, GRAPH_MIX_FLAG_OVERLAY) ) 
-	/* Èç¹û°üº¬GRAPH_MIX_FLAG_OVERLAYÑ¡Ïî */
+	/* å¦‚æœåŒ…å«GRAPH_MIX_FLAG_OVERLAYé€‰é¡¹ */
 		Mix_Graph(graph, image, pos); 
 	else if( Check_Option(flag, GRAPH_MIX_FLAG_REPLACE) ) 
-	/* Èç¹û°üº¬GRAPH_MIX_FLAG_REPLACEÑ¡Ïî */
+	/* å¦‚æœåŒ…å«GRAPH_MIX_FLAG_REPLACEé€‰é¡¹ */
 		Replace_Graph(graph, image, pos); 
 	else Mix_Graph(graph, image, pos);
 	
@@ -1362,9 +1362,9 @@ int Align_Image(LCUI_Graph *graph, LCUI_Graph *image, int flag)
 
 
 int Fill_Background_Image(LCUI_Graph *graph, LCUI_Graph *bg, int flag, LCUI_RGB color)
-/* ¹¦ÄÜ£ºÎªÖ¸¶¨Í¼ĞÎÌî³ä±³¾°Í¼Ïñ */
+/* åŠŸèƒ½ï¼šä¸ºæŒ‡å®šå›¾å½¢å¡«å……èƒŒæ™¯å›¾åƒ */
 {
-	Fill_Color(graph, color); /* Ìî³ä±³¾°É« */
+	Fill_Color(graph, color); /* å¡«å……èƒŒæ™¯è‰² */
 	if(Valid_Graph(bg) && graph != NULL)
 	{
 		LCUI_Pos pos;
@@ -1374,32 +1374,32 @@ int Fill_Background_Image(LCUI_Graph *graph, LCUI_Graph *bg, int flag, LCUI_RGB 
 		Graph_Init(&temp_bg);
 		switch(flag)
 		{
-		case LAYOUT_ZOOM:/* Ëõ·Å */
+		case LAYOUT_ZOOM:/* ç¼©æ”¾ */
 			Zoom_Graph(
-			bg,           /* ´«ÈëµÄÍ¼Æ¬Êı¾İ */
-			&temp_bg,      /* Ëõ·ÅºóµÄÍ¼Æ¬Êı¾İ½«±£´æÖÁ´°¿Ú±³¾°Í¼ */
-			DEFAULT,       /* Ëõ·ÅµÄ±êÖ¾(DEFAULT/CUSTOM),±êÖ¾Î»È±Ê¡£¬½«Ê¹ÓÃÄ¬ÈÏµÄ */
+			bg,           /* ä¼ å…¥çš„å›¾ç‰‡æ•°æ® */
+			&temp_bg,      /* ç¼©æ”¾åçš„å›¾ç‰‡æ•°æ®å°†ä¿å­˜è‡³çª—å£èƒŒæ™¯å›¾ */
+			DEFAULT,       /* ç¼©æ”¾çš„æ ‡å¿—(DEFAULT/CUSTOM),æ ‡å¿—ä½ç¼ºçœï¼Œå°†ä½¿ç”¨é»˜è®¤çš„ */
 			Size(graph->width, graph->height)
 			);
 			pos.x = (graph->width - temp_bg.width) / 2.0;
 			pos.y = (graph->height - temp_bg.height) / 2.0;
 			Mix_Graph(graph, &temp_bg, pos);
 			break;
-		case LAYOUT_STRETCH:/* À­Éì */
+		case LAYOUT_STRETCH:/* æ‹‰ä¼¸ */
 			Zoom_Graph(
 			bg, 
 			&temp_bg, 
-			CUSTOM,        /* Ëõ·ÅµÄ±êÖ¾(DEFAULT/CUSTOM),Ê¹ÓÃ×Ô¶¨Òå */
+			CUSTOM,        /* ç¼©æ”¾çš„æ ‡å¿—(DEFAULT/CUSTOM),ä½¿ç”¨è‡ªå®šä¹‰ */
 			Size(graph->width, graph->height) 
 			);
 			Mix_Graph(graph, &temp_bg, pos);
 			break;
-		case LAYOUT_CENTER:/* ¾ÓÖĞ */
+		case LAYOUT_CENTER:/* å±…ä¸­ */
 			pos.x = (graph->width - bg->width) / 2;
 			pos.y = (graph->height - bg->height) / 2;
 			Mix_Graph(graph, bg, pos);
 			break;
-		case LAYOUT_TILE:/* Æ½ÆÌ */
+		case LAYOUT_TILE:/* å¹³é“º */
 			Tile_Graph(bg, graph, graph->width, graph->height);
 			break;
 		default: 
@@ -1412,29 +1412,29 @@ int Fill_Background_Image(LCUI_Graph *graph, LCUI_Graph *bg, int flag, LCUI_RGB 
 	return -1;
 }
 
-/* ÒÔÏÂÊÇÍ¼ÏñÔ²½Ç»¯Ëã·¨£¬ÔİÎ´Íê³É */
+/* ä»¥ä¸‹æ˜¯å›¾åƒåœ†è§’åŒ–ç®—æ³•ï¼Œæš‚æœªå®Œæˆ */
 #ifdef use_round_rect
 int Set_Graph_To_Rounded_Rectangle(LCUI_Graph *graph, int radius, int mode, int line_size, LCUI_RGB *color)
 /* 
- * ¹¦ÄÜ£º½«Í¼ĞÎÔ²½Ç»¯
-* ²ÎÊıËµÃ÷£º
-* graph£ºĞèÒª´¦ÀíµÄÍ¼ĞÎÊı¾İ
-* radius£ºÔ²µÄ°ë¾¶
-* mode£º ´¦ÀíÄ£Ê½(draw_border_line »æÖÆ±ß¿òÏß / none ²»»æÖÆ)
-* line_size£ºÏßµÄÖ±¾¶
-* color£ºÏßµÄÑÕÉ«
+ * åŠŸèƒ½ï¼šå°†å›¾å½¢åœ†è§’åŒ–
+* å‚æ•°è¯´æ˜ï¼š
+* graphï¼šéœ€è¦å¤„ç†çš„å›¾å½¢æ•°æ®
+* radiusï¼šåœ†çš„åŠå¾„
+* modeï¼š å¤„ç†æ¨¡å¼(draw_border_line ç»˜åˆ¶è¾¹æ¡†çº¿ / none ä¸ç»˜åˆ¶)
+* line_sizeï¼šçº¿çš„ç›´å¾„
+* colorï¼šçº¿çš„é¢œè‰²
 */
 {
-	Using_Graph(graph);/* Ê¹ÓÃÊı¾İ */
+	Using_Graph(graph);/* ä½¿ç”¨æ•°æ® */
 	if(Valid_Graph(graph) && graph->flag == HAVE_ALPHA)
-	{/* Èç¹ûÍ¼ĞÎÊı¾İÓĞĞ§,²¢ÇÒÓĞalphaÍ¨µÀ */
+	{/* å¦‚æœå›¾å½¢æ•°æ®æœ‰æ•ˆ,å¹¶ä¸”æœ‰alphaé€šé“ */
 		if(graph->width < radius*2 || graph->height < radius*2)
 		{
 			return 1;
 		}
 		int mini, count, x, y, temp, a, b, start_x, start_y;
-		/* Ô²µÄ·½³Ì£º(x£­a)^2+(y£­b)^2=r^2£¬Ñ§¹ıÊıÑ§µÄÄã¶®µÄ£¡ */
-		/* ×¼±¸½«×óÉÏ½ÇÔ²½Ç»¯ */
+		/* åœ†çš„æ–¹ç¨‹ï¼š(xï¼a)^2+(yï¼b)^2=r^2ï¼Œå­¦è¿‡æ•°å­¦çš„ä½ æ‡‚çš„ï¼ */
+		/* å‡†å¤‡å°†å·¦ä¸Šè§’åœ†è§’åŒ– */
 		start_x = 0;
 		start_y = 0;
 		a = radius;
@@ -1450,7 +1450,7 @@ int Set_Graph_To_Rounded_Rectangle(LCUI_Graph *graph, int radius, int mode, int 
 				{
 					mini = temp;
 					count = y * graph->width + x;
-					graph->rgba[3][count] = 0;/* ·ñÔò¾ÍÈÃÕâ¸öÏñËØµãÍ¸Ã÷ */
+					graph->rgba[3][count] = 0;/* å¦åˆ™å°±è®©è¿™ä¸ªåƒç´ ç‚¹é€æ˜ */
 				}
 				else
 				{
@@ -1458,13 +1458,13 @@ int Set_Graph_To_Rounded_Rectangle(LCUI_Graph *graph, int radius, int mode, int 
 					{
 						mini = temp;
 						count = y * graph->width + x;
-						graph->rgba[3][count] = 0;/* ·ñÔò¾ÍÈÃÕâ¸öÏñËØµãÍ¸Ã÷ */
+						graph->rgba[3][count] = 0;/* å¦åˆ™å°±è®©è¿™ä¸ªåƒç´ ç‚¹é€æ˜ */
 					}
 					else
 					{
 						//printf("draw line : y = %d, x = %d, temp = %d\n", y, x, temp);
 						for(temp = x - 1; temp < x -1 + line_size; ++temp) 
-						{/* »æÖÆ±ß¿òÏß */
+						{/* ç»˜åˆ¶è¾¹æ¡†çº¿ */
 							count = y * graph->width + temp;
 							graph->rgba[0][count] = color->red;
 							graph->rgba[1][count] = color->green;
@@ -1472,7 +1472,7 @@ int Set_Graph_To_Rounded_Rectangle(LCUI_Graph *graph, int radius, int mode, int 
 							graph->rgba[3][count] = 255;
 							//printf("2222\n");
 						}
-						break;/* Èç¹ûÕâ¸öµãÔÚÔ²ÉÏ¾ÍÍË³ö±¾²ãforÑ­»· */
+						break;/* å¦‚æœè¿™ä¸ªç‚¹åœ¨åœ†ä¸Šå°±é€€å‡ºæœ¬å±‚forå¾ªç¯ */
 					}
 				}
 			}
@@ -1485,7 +1485,7 @@ int Set_Graph_To_Rounded_Rectangle(LCUI_Graph *graph, int radius, int mode, int 
 #endif
 
 int Fill_Graph_Alpha(LCUI_Graph *src, unsigned char alpha)
-/* ¹¦ÄÜ£ºÌî³äÍ¼ĞÎµÄalphaÍ¨µÀµÄËùÓĞÖµ */
+/* åŠŸèƒ½ï¼šå¡«å……å›¾å½¢çš„alphaé€šé“çš„æ‰€æœ‰å€¼ */
 {
 	if(Valid_Graph(src) && Graph_Have_Alpha(src))
 	{
@@ -1496,12 +1496,12 @@ int Fill_Graph_Alpha(LCUI_Graph *src, unsigned char alpha)
 }
 
 int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
-/* ¹¦ÄÜ£ºÎªÍ¼ĞÎ±ßÔµ»æÖÆ¾ØĞÎ±ß¿ò */
+/* åŠŸèƒ½ï¼šä¸ºå›¾å½¢è¾¹ç¼˜ç»˜åˆ¶çŸ©å½¢è¾¹æ¡† */
 {
 	int x,y,count, k, start_x,start_y;
 	if(Valid_Graph(src))
 	{
-		/* »æÖÆÉÏ±ßµÄÏß */
+		/* ç»˜åˆ¶ä¸Šè¾¹çš„çº¿ */
 		Using_Graph(src, 1);
 		for(y=0;y<border.top;++y)
 		{
@@ -1516,7 +1516,7 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 			}
 		}
 		start_y = src->height - border.bottom;
-		/* »æÖÆÏÂ±ßµÄÏß */
+		/* ç»˜åˆ¶ä¸‹è¾¹çš„çº¿ */
 		for(y=0;y<border.bottom;++y)
 		{
 			k = (start_y+y) * src->width;
@@ -1530,7 +1530,7 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 					src->rgba[3][count] = 255;
 			}
 		}
-		/* »æÖÆ×ó±ßµÄÏß */
+		/* ç»˜åˆ¶å·¦è¾¹çš„çº¿ */
 		for(y=0;y<src->height;++y)
 		{
 			k = y * src->width;
@@ -1544,7 +1544,7 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 					src->rgba[3][count] = 255;
 			}
 		}
-		/* »æÖÆÓÒ±ßµÄÏß */
+		/* ç»˜åˆ¶å³è¾¹çš„çº¿ */
 		start_x = src->width - border.right;
 		for(y=0;y<src->height;++y)
 		{
@@ -1559,7 +1559,7 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 					src->rgba[3][count] = 255;
 			}
 		}
-		/* ±ß¿òÏß»æÖÆÍê³É */
+		/* è¾¹æ¡†çº¿ç»˜åˆ¶å®Œæˆ */
 		End_Use_Graph(src);
 	}
 	else return -1;
@@ -1568,7 +1568,7 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 
 
 void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
-/* ¹¦ÄÜ£º»ñÈ¡ÓëÖ¸¶¨ÇøÓòÖØµşµÄ²¿¼ş */
+/* åŠŸèƒ½ï¼šè·å–ä¸æŒ‡å®šåŒºåŸŸé‡å çš„éƒ¨ä»¶ */
 {
 	int i, total;
 	LCUI_Pos pos;
@@ -1588,10 +1588,10 @@ void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
 	total = Queue_Get_Total(widget_list); 
 	
 	for(i=total-1; i>=0; --i)
-	{/* ´Óµ×µ½¶¥±éÀú×Ó²¿¼ş */
+	{/* ä»åº•åˆ°é¡¶éå†å­éƒ¨ä»¶ */
 		child = (LCUI_Widget*)Queue_Get(widget_list, i); 
 		if(child != NULL && child->visible == IS_TRUE)
-		{/* Èç¹ûÓĞ¿É¼ûµÄ×Ó²¿¼ş */ 
+		{/* å¦‚æœæœ‰å¯è§çš„å­éƒ¨ä»¶ */ 
 			tmp = Get_Widget_Valid_Rect(child); 
 			pos = Get_Widget_Global_Pos(child);
 			tmp.x += pos.x;
@@ -1599,15 +1599,15 @@ void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
 			if(!Rect_Valid(tmp)) continue;
 			if (Rect_Is_Overlay(tmp, rect)) 
 			{ 
-				Queue_Add_Pointer(queue, child);/* ¼ÇÂ¼Óë¸ÃÇøÓòÖØµşµÄ²¿¼ş */
-				Get_Overlay_Widget(rect, child, queue);  /* µİ¹éµ÷ÓÃ */
+				Queue_Add_Pointer(queue, child);/* è®°å½•ä¸è¯¥åŒºåŸŸé‡å çš„éƒ¨ä»¶ */
+				Get_Overlay_Widget(rect, child, queue);  /* é€’å½’è°ƒç”¨ */
 			} 
 		}
 	} 
 }
 
 LCUI_RGBA Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos)
-/* ¹¦ÄÜ£º»ñÈ¡Í¼ÏñÖĞÖ¸¶¨×ø±êµÄÏñËØµãµÄÑÕÉ« */
+/* åŠŸèƒ½ï¼šè·å–å›¾åƒä¸­æŒ‡å®šåæ ‡çš„åƒç´ ç‚¹çš„é¢œè‰² */
 {
 	int i;
 	LCUI_RGBA rgba;
@@ -1628,8 +1628,8 @@ LCUI_RGBA Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos)
 
 int Graph_Is_Opaque(LCUI_Graph *graph)
 /* 
- * ¹¦ÄÜ£º¼ì²âÍ¼ĞÎÊÇ·ñÎª²»Í¸Ã÷ 
- * ËµÃ÷£ºÍêÈ«Í¸Ã÷Ôò·µ»Ø-1£¬²»Í¸Ã÷Ôò·µ»Ø1£¬ÓĞÍ¸Ã÷Ğ§¹ûÔò·µ»Ø0
+ * åŠŸèƒ½ï¼šæ£€æµ‹å›¾å½¢æ˜¯å¦ä¸ºä¸é€æ˜ 
+ * è¯´æ˜ï¼šå®Œå…¨é€æ˜åˆ™è¿”å›-1ï¼Œä¸é€æ˜åˆ™è¿”å›1ï¼Œæœ‰é€æ˜æ•ˆæœåˆ™è¿”å›0
  * */
 { 
 	if( !Graph_Have_Alpha(graph) )
@@ -1638,12 +1638,12 @@ int Graph_Is_Opaque(LCUI_Graph *graph)
 		return -1;
 	else if(graph->alpha < 255)
 		return 0;
-	//Èç¹ûÓĞĞÂµÄËã·¨£¬¿ÉÒÔ¿ìËÙ¼ì²â³öÒ»¸öÍ¼²ãÊÇ·ñÈ«Í¸Ã÷»ò²»Í¸Ã÷£¬»áÌí¼ÓÔÚÏÂÃæ
+	//å¦‚æœæœ‰æ–°çš„ç®—æ³•ï¼Œå¯ä»¥å¿«é€Ÿæ£€æµ‹å‡ºä¸€ä¸ªå›¾å±‚æ˜¯å¦å…¨é€æ˜æˆ–ä¸é€æ˜ï¼Œä¼šæ·»åŠ åœ¨ä¸‹é¢
 	#ifdef have_new_method
 	LCUI_Pos pos;
 	LCUI_RGBA rgba;
 	int i, total, not_visbale = 0;
-	/* ¸ù¾İ³ß´ç£¬À´»ñÈ¡²ÉÑù´ÎÊı */
+	/* æ ¹æ®å°ºå¯¸ï¼Œæ¥è·å–é‡‡æ ·æ¬¡æ•° */
 	total = (graph->width + graph->height)/4.0;
 	for(i=0; i<total; ++i)
 	{
@@ -1662,13 +1662,13 @@ int Graph_Is_Opaque(LCUI_Graph *graph)
 }
 
 int Widget_Layer_Is_Opaque(LCUI_Widget *widget)
-/* ¹¦ÄÜ£ºÅĞ¶Ï²¿¼şÍ¼ĞÎÊÇ·ñ²»Í¸Ã÷ */
+/* åŠŸèƒ½ï¼šåˆ¤æ–­éƒ¨ä»¶å›¾å½¢æ˜¯å¦ä¸é€æ˜ */
 { 
 	return Graph_Is_Opaque(&widget->graph);
 }
 
 int Widget_Layer_Not_Visible(LCUI_Widget *widget)
-/* ¹¦ÄÜ£º¼ì²â²¿¼şÍ¼ĞÎÊÇ·ñÍêÈ«Í¸Ã÷ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹éƒ¨ä»¶å›¾å½¢æ˜¯å¦å®Œå…¨é€æ˜ */
 {
 	if(Graph_Is_Opaque(&widget->graph) == -1)
 		return 1;
@@ -1677,8 +1677,8 @@ int Widget_Layer_Not_Visible(LCUI_Widget *widget)
 
 int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 /* 
- * ¹¦ÄÜ£º»ñÈ¡ÆÁÄ»ÖĞÖ¸¶¨ÇøÓòÄÚÊµ¼ÊÒªÏÔÊ¾µÄÍ¼ĞÎ 
- * ËµÃ÷£ºÖ¸¶¨µÄÇøÓò±ØĞëÊÇÓë²¿¼şÇøÓò²»²¿·ÖÖØµşµÄ
+ * åŠŸèƒ½ï¼šè·å–å±å¹•ä¸­æŒ‡å®šåŒºåŸŸå†…å®é™…è¦æ˜¾ç¤ºçš„å›¾å½¢ 
+ * è¯´æ˜ï¼šæŒ‡å®šçš„åŒºåŸŸå¿…é¡»æ˜¯ä¸éƒ¨ä»¶åŒºåŸŸä¸éƒ¨åˆ†é‡å çš„
  * */
 { 
 	LCUI_Pos pos;
@@ -1686,8 +1686,8 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 	LCUI_Queue widget_buff;
 	
 	Queue_Init(&widget_buff, sizeof(LCUI_Widget), NULL);
-	Queue_Using_Pointer(&widget_buff); /* Ö»ÓÃÓÚ´æ·ÅÖ¸Õë */
-	/* ¼ì²âÕâ¸öÇøÓòÊÇ·ñÓĞĞ§ */
+	Queue_Using_Pointer(&widget_buff); /* åªç”¨äºå­˜æ”¾æŒ‡é’ˆ */
+	/* æ£€æµ‹è¿™ä¸ªåŒºåŸŸæ˜¯å¦æœ‰æ•ˆ */
 	if (rect.x < 0) return -1; 
 	if (rect.y < 0) return -1; 
 	if (rect.x + rect.width > Get_Screen_Width ())
@@ -1699,9 +1699,9 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 		return -2;
 	
 	int i, total; 
-	/* ¸ù¾İÖ¸¶¨µÄ³ß´ç£¬·ÖÅäÄÚ´æ¿Õ¼ä£¬ÓÃÓÚ´¢´æÍ¼ĞÎÊı¾İ */
+	/* æ ¹æ®æŒ‡å®šçš„å°ºå¯¸ï¼Œåˆ†é…å†…å­˜ç©ºé—´ï¼Œç”¨äºå‚¨å­˜å›¾å½¢æ•°æ® */
 	Malloc_Graph(graph, rect.width, rect.height);
-	/* »ñÈ¡Óë¸ÃÇøÓòÖØµşµÄ²¿¼ş£¬²¢¼ÇÂ¼ÖÁ¶ÓÁĞwidget_buffÖĞ */
+	/* è·å–ä¸è¯¥åŒºåŸŸé‡å çš„éƒ¨ä»¶ï¼Œå¹¶è®°å½•è‡³é˜Ÿåˆ—widget_buffä¸­ */
 	Get_Overlay_Widget(rect, NULL, &widget_buff); 
 	
 	total = Queue_Get_Total(&widget_buff); 
@@ -1712,14 +1712,14 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 		//);
 		//printf("list cover widget:\n"); 
 		for(i=total-1; i>=0; --i)
-		{/* ¶ÓÁĞ×îÄ©¶ËÊÇ×îÇ°¶ËÏÔÊ¾µÄ²¿¼ş£¬ËùÒÔ´ÓÎ²ÖÁÍ·±éÀú */
+		{/* é˜Ÿåˆ—æœ€æœ«ç«¯æ˜¯æœ€å‰ç«¯æ˜¾ç¤ºçš„éƒ¨ä»¶ï¼Œæ‰€ä»¥ä»å°¾è‡³å¤´éå† */
 			widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
 			//print_widget_info(widget); 
-			/* Èç¹ûÍ¼²ãÍêÈ«²»¿É¼û£¬¼´ÍêÈ«Í¸Ã÷ */
+			/* å¦‚æœå›¾å±‚å®Œå…¨ä¸å¯è§ï¼Œå³å®Œå…¨é€æ˜ */
 			if(Widget_Layer_Not_Visible(widget))  
 				Queue_Delete_Pointer(&widget_buff, i); 
 			else if( Widget_Layer_Is_Opaque( widget) )
-			{/* Èç¹û²¿¼şÍ¼²ã²»Í¸Ã÷ */
+			{/* å¦‚æœéƒ¨ä»¶å›¾å±‚ä¸é€æ˜ */
 				//print_widget_info(widget); 
 				//printf("Is_Opaque!\n");
 				break; 
@@ -1727,21 +1727,21 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 		}
 		//printf("list end\n");
 		if(i >= 0)
-		{/* Èç¹ûÕÒµ½×îÇ°¶ËµÄ²»Í¸Ã÷µÄÍ¼²ã */
+		{/* å¦‚æœæ‰¾åˆ°æœ€å‰ç«¯çš„ä¸é€æ˜çš„å›¾å±‚ */
 			total = Queue_Get_Total(&widget_buff);
 			for(; i<total; ++i)
 			{
 				widget = (LCUI_Widget*)Queue_Get(&widget_buff, i); 
 				pos = Get_Widget_Global_Pos(widget);
-				/* »ñÈ¡Ïà¶Ô×ø±ê */
+				/* è·å–ç›¸å¯¹åæ ‡ */
 				pos.x -= rect.x;
 				pos.y -= rect.y;
-				/* µş¼Ó */ 
+				/* å åŠ  */ 
 				Mix_Graph(graph, &widget->graph, pos);
 			}
 		}
 		else
-		{/* ·ñÔò£¬½ØÈ¡±³¾°Í¼£¬È»ºóÔÙ»ìºÏµş¼Ó²¿¼şÍ¼²ã */
+		{/* å¦åˆ™ï¼Œæˆªå–èƒŒæ™¯å›¾ï¼Œç„¶åå†æ··åˆå åŠ éƒ¨ä»¶å›¾å±‚ */
 			graph->flag = NO_ALPHA; 
 			Cut_Graph (&LCUI_Sys.screen.buff, rect, graph);
 			for(i=0; i<total; ++i)
@@ -1755,29 +1755,29 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 		}
 	}
 	else
-	{/* ·ñÔò£¬Ö±½ÓÌù±³¾°Í¼ */
+	{/* å¦åˆ™ï¼Œç›´æ¥è´´èƒŒæ™¯å›¾ */
 		graph->flag = NO_ALPHA; 
 		Cut_Graph (&LCUI_Sys.screen.buff, rect, graph);
 	}
 	
 	if (LCUI_Sys.cursor.visible == IS_TRUE)
-	{ /* Èç¹ûÓÎ±ê¿É¼û */
-		/* ¼ì²é¸ÃÇøÓòÊÇ·ñÓëÓÎ±êµÄÍ¼ĞÎÇøÓòÖØµş */ 
+	{ /* å¦‚æœæ¸¸æ ‡å¯è§ */
+		/* æ£€æŸ¥è¯¥åŒºåŸŸæ˜¯å¦ä¸æ¸¸æ ‡çš„å›¾å½¢åŒºåŸŸé‡å  */ 
 		if (Rect_Is_Overlay( rect, Get_Cursor_Rect()) )
-		{ /* Èç¹ûÖØµş */
+		{ /* å¦‚æœé‡å  */
 			pos.x = LCUI_Sys.cursor.pos.x - rect.x;
 			pos.y = LCUI_Sys.cursor.pos.y - rect.y;
-			/* ½«Í¼ĞÎºÏ³É */ 
+			/* å°†å›¾å½¢åˆæˆ */ 
 			Mix_Graph (graph, &LCUI_Sys.cursor.graph, pos);
 		}
 	} 
-	/* ÊÍ·Å¶ÓÁĞÕ¼ÓÃµÄÄÚ´æ¿Õ¼ä */
+	/* é‡Šæ”¾é˜Ÿåˆ—å ç”¨çš„å†…å­˜ç©ºé—´ */
 	Destroy_Queue(&widget_buff);
 	return 0;
 }
 
 LCUI_RGBA RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore)
-/* ¹¦ÄÜ£º»ìºÏÁ½¸öÏñËØµãµÄÑÕÉ« */
+/* åŠŸèƒ½ï¼šæ··åˆä¸¤ä¸ªåƒç´ ç‚¹çš„é¢œè‰² */
 {
 	if(fore.alpha == 255)
 	{
@@ -1802,57 +1802,57 @@ static long max(long a, long b)
 }
 
 static double radian(int angle)
-/* ¹¦ÄÜ£º¼ÆËã»¡¶È */
+/* åŠŸèƒ½ï¼šè®¡ç®—å¼§åº¦ */
 {
 	return angle*3.1415926/180;
 }
 
 int Rotate_Graph(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 /* 
- * ¹¦ÄÜ£ºĞı×ªÍ¼ĞÎ
- * ËµÃ÷£ºÖ¸¶¨Ğı×ªÖĞĞÄµã×ø±êÒÔ¼°Ğı×ª½Ç¶È£¬¼´¿ÉµÃµ½Ğı×ªºóµÄÍ¼ĞÎ
- * ±¾Ô´´úÂë²Î¿¼×Ô£ºhttp://read.pudn.com/downloads154/sourcecode/graph/684994/%E5%9B%BE%E5%83%8F%E6%97%8B%E8%BD%AC/%E5%9B%BE%E5%83%8F%E6%97%8B%E8%BD%AC/%E6%BA%90%E4%BB%A3%E7%A0%81/MyDIPView.cpp__.htm
- * Ëã·¨ÓĞ´ıÓÅ»¯ÍêÉÆ¡£
+ * åŠŸèƒ½ï¼šæ—‹è½¬å›¾å½¢
+ * è¯´æ˜ï¼šæŒ‡å®šæ—‹è½¬ä¸­å¿ƒç‚¹åæ ‡ä»¥åŠæ—‹è½¬è§’åº¦ï¼Œå³å¯å¾—åˆ°æ—‹è½¬åçš„å›¾å½¢
+ * æœ¬æºä»£ç å‚è€ƒè‡ªï¼šhttp://read.pudn.com/downloads154/sourcecode/graph/684994/%E5%9B%BE%E5%83%8F%E6%97%8B%E8%BD%AC/%E5%9B%BE%E5%83%8F%E6%97%8B%E8%BD%AC/%E6%BA%90%E4%BB%A3%E7%A0%81/MyDIPView.cpp__.htm
+ * ç®—æ³•æœ‰å¾…ä¼˜åŒ–å®Œå–„ã€‚
  */
 {
 	if(!Valid_Graph(src)) return -1;
-    // Ô´Í¼ÏñµÄ¿í¶ÈºÍ¸ß¶È
+    // æºå›¾åƒçš„å®½åº¦å’Œé«˜åº¦
     int    width, height;   
        
-    // Ğı×ªºóÍ¼ÏñµÄ¿í¶ÈºÍ¸ß¶È   
+    // æ—‹è½¬åå›¾åƒçš„å®½åº¦å’Œé«˜åº¦   
     int    new_width,new_height;
 
-    // Ğı×ª½Ç¶È£¨»¡¶È£©   
+    // æ—‹è½¬è§’åº¦ï¼ˆå¼§åº¦ï¼‰   
     float   fRotateAngle;
     
-    // Ğı×ª½Ç¶ÈµÄÕıÏÒºÍÓàÏÒ   
+    // æ—‹è½¬è§’åº¦çš„æ­£å¼¦å’Œä½™å¼¦   
     float   fSina, fCosa;
        
-    // Ô´Í¼ËÄ¸ö½ÇµÄ×ø±ê£¨ÒÔÍ¼ÏñÖĞĞÄÎª×ø±êÏµÔ­µã£©   
+    // æºå›¾å››ä¸ªè§’çš„åæ ‡ï¼ˆä»¥å›¾åƒä¸­å¿ƒä¸ºåæ ‡ç³»åŸç‚¹ï¼‰   
     float   fSrcX1,fSrcY1,fSrcX2,fSrcY2,fSrcX3,fSrcY3,fSrcX4,fSrcY4;   
        
-    // Ğı×ªºóËÄ¸ö½ÇµÄ×ø±ê£¨ÒÔÍ¼ÏñÖĞĞÄÎª×ø±êÏµÔ­µã£©   
+    // æ—‹è½¬åå››ä¸ªè§’çš„åæ ‡ï¼ˆä»¥å›¾åƒä¸­å¿ƒä¸ºåæ ‡ç³»åŸç‚¹ï¼‰   
     float   fDstX1,fDstY1,fDstX2,fDstY2,fDstX3,fDstY3,fDstX4,fDstY4;
     
-    // Á½¸öÖĞ¼ä³£Á¿   
+    // ä¸¤ä¸ªä¸­é—´å¸¸é‡   
     float   f1,f2;
     
-    // »ñÈ¡Í¼ÏñµÄ"¿í¶È"£¨4µÄ±¶Êı£©   
+    // è·å–å›¾åƒçš„"å®½åº¦"ï¼ˆ4çš„å€æ•°ï¼‰   
     width = src->width;
        
-    // »ñÈ¡Í¼ÏñµÄ¸ß¶È   
+    // è·å–å›¾åƒçš„é«˜åº¦   
     height = src->height;   
        
-    // ½«Ğı×ª½Ç¶È´Ó¶È×ª»»µ½»¡¶È   
+    // å°†æ—‹è½¬è§’åº¦ä»åº¦è½¬æ¢åˆ°å¼§åº¦   
     fRotateAngle = (float) radian(rotate_angle);   
        
-    // ¼ÆËãĞı×ª½Ç¶ÈµÄÕıÏÒ   
+    // è®¡ç®—æ—‹è½¬è§’åº¦çš„æ­£å¼¦   
     fSina = (float) sin((double)fRotateAngle);   
        
-    // ¼ÆËãĞı×ª½Ç¶ÈµÄÓàÏÒ   
+    // è®¡ç®—æ—‹è½¬è§’åº¦çš„ä½™å¼¦   
     fCosa = (float) cos((double)fRotateAngle);   
     
-    // ¼ÆËãÔ­Í¼µÄËÄ¸ö½ÇµÄ×ø±ê£¨ÒÔÍ¼ÏñÖĞĞÄÎª×ø±êÏµÔ­µã£©   
+    // è®¡ç®—åŸå›¾çš„å››ä¸ªè§’çš„åæ ‡ï¼ˆä»¥å›¾åƒä¸­å¿ƒä¸ºåæ ‡ç³»åŸç‚¹ï¼‰   
     fSrcX1 = (float) (- (width  - 1) / 2);   
     fSrcY1 = (float) (  (height - 1) / 2);   
     fSrcX2 = (float) (  (width  - 1) / 2);   
@@ -1862,7 +1862,7 @@ int Rotate_Graph(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
     fSrcX4 = (float) (  (width  - 1) / 2);   
     fSrcY4 = (float) (- (height - 1) / 2);   
        
-    // ¼ÆËãĞÂÍ¼ËÄ¸ö½ÇµÄ×ø±ê£¨ÒÔÍ¼ÏñÖĞĞÄÎª×ø±êÏµÔ­µã£©   
+    // è®¡ç®—æ–°å›¾å››ä¸ªè§’çš„åæ ‡ï¼ˆä»¥å›¾åƒä¸­å¿ƒä¸ºåæ ‡ç³»åŸç‚¹ï¼‰   
     fDstX1 =  fCosa * fSrcX1 + fSina * fSrcY1;   
     fDstY1 = -fSina * fSrcX1 + fCosa * fSrcY1;   
     fDstX2 =  fCosa * fSrcX2 + fSina * fSrcY2;   
@@ -1872,45 +1872,45 @@ int Rotate_Graph(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
     fDstX4 =  fCosa * fSrcX4 + fSina * fSrcY4;   
     fDstY4 = -fSina * fSrcX4 + fCosa * fSrcY4;   
        
-    // ¼ÆËãĞı×ªºóµÄÍ¼ÏñÊµ¼Ê¿í¶È   
+    // è®¡ç®—æ—‹è½¬åçš„å›¾åƒå®é™…å®½åº¦   
     new_width  = (long) ( max( fabs(fDstX4 - fDstX1), fabs(fDstX3 - fDstX2) ) + 0.5);   
-    // ¼ÆËãĞı×ªºóµÄÍ¼Ïñ¸ß¶È   
+    // è®¡ç®—æ—‹è½¬åçš„å›¾åƒé«˜åº¦   
     new_height = (long) ( max( fabs(fDstY4 - fDstY1), fabs(fDstY3 - fDstY2) )  + 0.5);   
        
-    // Á½¸ö³£Êı£¬ÕâÑù²»ÓÃÒÔºóÃ¿´Î¶¼¼ÆËãÁË   
+    // ä¸¤ä¸ªå¸¸æ•°ï¼Œè¿™æ ·ä¸ç”¨ä»¥åæ¯æ¬¡éƒ½è®¡ç®—äº†   
     f1 = (float) (-0.5 * (new_width - 1) * fCosa - 0.5 * (new_height - 1) * fSina   
         + 0.5 * (width  - 1));   
     f2 = (float) ( 0.5 * (new_width - 1) * fSina - 0.5 * (new_height - 1) * fCosa   
         + 0.5 * (height - 1));   
        
     if(Valid_Graph(des))
-		Free_Graph(des);/* ÏÈ½«Õâ¸öÄÚ´æÊÍ·Å */
+		Free_Graph(des);/* å…ˆå°†è¿™ä¸ªå†…å­˜é‡Šæ”¾ */
 		
     des->flag = src->flag;
-    // ·ÖÅäÄÚ´æ£¬´¢´æĞÂµÄÍ¼ĞÎ
+    // åˆ†é…å†…å­˜ï¼Œå‚¨å­˜æ–°çš„å›¾å½¢
     if(Malloc_Graph(des, new_width, new_height) != 0)
 		return -1;
 
 	long m, n, z;
 	long src_x, src_y, des_x, des_y;
-    // Õë¶ÔÍ¼ÏñÃ¿ĞĞ½øĞĞ²Ù×÷
+    // é’ˆå¯¹å›¾åƒæ¯è¡Œè¿›è¡Œæ“ä½œ
     Using_Graph(src, 0);
     Using_Graph(des, 1);
     for(des_y = 0; des_y < new_height; ++des_y)   
     {
 		m = new_width * des_y;
-        // Õë¶ÔÍ¼ÏñÃ¿ÁĞ½øĞĞ²Ù×÷   
+        // é’ˆå¯¹å›¾åƒæ¯åˆ—è¿›è¡Œæ“ä½œ   
         for(des_x = 0; des_x < new_width; ++des_x)   
         {
 			n = m + des_x;
-            // ¼ÆËã¸ÃÏóËØÔÚÔ´Í¼ÖĞµÄ×ø±ê   
+            // è®¡ç®—è¯¥è±¡ç´ åœ¨æºå›¾ä¸­çš„åæ ‡   
             src_y = (long) (-((float) des_x) * fSina + ((float) des_y) * fCosa + f2 + 0.5);   
             src_x = (long) ( ((float) des_x) * fCosa + ((float) des_y) * fSina + f1 + 0.5);   
                
-            // ÅĞ¶ÏÊÇ·ñÔÚÔ´Í¼·¶Î§ÄÚ   
+            // åˆ¤æ–­æ˜¯å¦åœ¨æºå›¾èŒƒå›´å†…   
             if( (src_x >= 0) && (src_x < width) && (src_y >= 0) && (src_y < height))   
             {
-                // Ö¸ÏòÔ´DIBµÚi0ĞĞ£¬µÚj0¸öÏóËØµÄÖ¸Õë
+                // æŒ‡å‘æºDIBç¬¬i0è¡Œï¼Œç¬¬j0ä¸ªè±¡ç´ çš„æŒ‡é’ˆ
                 z = width * src_y + src_x;
                 des->rgba[0][n] = src->rgba[0][z];
                 des->rgba[1][n] = src->rgba[1][z];
@@ -1920,7 +1920,7 @@ int Rotate_Graph(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
             }
             else   
             {
-                // ¶ÔÓÚÔ´Í¼ÖĞÃ»ÓĞµÄÏóËØ£¬Ö±½Ó¸³ÖµÎª255   
+                // å¯¹äºæºå›¾ä¸­æ²¡æœ‰çš„è±¡ç´ ï¼Œç›´æ¥èµ‹å€¼ä¸º255   
                 des->rgba[0][n] = 255;
                 des->rgba[1][n] = 255;
                 des->rgba[2][n] = 255;
