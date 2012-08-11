@@ -98,10 +98,8 @@ void Strcpy (LCUI_String * des, char *src)
 int Strcmp(LCUI_String *str1, char *str2)
 /* 功能：对比str1与str2 */
 {
-	if (str1 != NULL && str1->size > 0)
-	{
-		return strcmp(str1->string, str2);
-	}
+	if (str1 != NULL && str1->size > 0 && str2 != NULL) 
+		return strcmp(str1->string, str2); 
 	else return -1;
 }
 
@@ -341,7 +339,7 @@ int Size_Cmp(LCUI_Size a, LCUI_Size b)
 	else 
 		return -1;
 }
-
+extern int debug_mark;
 int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new, 
 						LCUI_Queue *rq	)
 /*
@@ -463,7 +461,8 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 	  
 	for(i=0; i<5; i++) 
 	{ 
-		//printf("slip rect[%d]: %d,%d, %d,%d\n", i, r[i].x, r[i].y, r[i].width, r[i].height);
+		if(debug_mark)
+			printf("slip rect[%d]: %d,%d, %d,%d\n", i, r[i].x, r[i].y, r[i].width, r[i].height);
 		Queue_Add(rq, &r[i]); 
 	}
 	return 0;
