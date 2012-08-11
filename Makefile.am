@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS=foreign
 SUBDIRS=src test test/mora test/photoviewer test/screenlock test/clock \
 include include/LCUI 
-EXTRA_DIST=说明.txt README fonts/README docs/LICENSE.TXT docs/CHANGES \
+EXTRA_DIST=说明.txt README README.md fonts/README docs/LICENSE.TXT docs/CHANGES \
 docs/FAQ  docs/常见问题.txt  docs/更新记录.txt
 #
 #src/freetype/freetype-2.4.9.tar.bz2  \
