@@ -20,29 +20,29 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Work.h -- LCUI µÄÆäËü¹¤×÷
+ * LCUI_Work.h -- LCUI çš„å…¶å®ƒå·¥ä½œ
  *
- * °æÈ¨ËùÓÐ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±žäºŽ 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼þÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾ÝGPLv2Ðí¿ÉÐ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ðí¿ÉÖ¤µÚ¶þ°æ µÄÓ¢ÎÄËõÐ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌÐøÊ¹ÓÃ¡¢ÐÞ¸Ä»ò·¢²¼±¾ÎÄ¼þ£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öÐí¿ÉÐ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜Žæ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’ŒæŽ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔðÈÎ£¬ÉõÖÁÃ»ÓÐÊÊÏúÐÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒþº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ðí¿ÉÐ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºŽä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼þµÄGPLv2Ðí¿ÉÐ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼þÖÐ£¬Èç¹û
- * Ã»ÓÐ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºŽæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æžœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #ifndef __LCUI_WORK_H__
 #define __LCUI_WORK_H__
 
-#define RELATIVE_POS	1 /* Ïà¶Ô×ø±ê */
-#define NORMAL_POS		0 /*ÆÕÍ¨×ø±ê */
+#define RELATIVE_POS	1 /* ç›¸å¯¹åæ ‡ */
+#define NORMAL_POS		0 /*æ™®é€šåæ ‡ */
 
 typedef LCUI_Queue LCUI_EventQueue;
 typedef LCUI_Queue LCUI_FuncQueue;
@@ -53,81 +53,81 @@ typedef struct _LCUI_Func		LCUI_Func;
 typedef struct _LCUI_Func		LCUI_Task;
 typedef struct _LCUI_DragEvent	LCUI_DragEvent;
 
-/************ ²¿¼þÊÂ¼þ ************/
+/************ éƒ¨ä»¶äº‹ä»¶ ************/
 typedef enum _WidgetEvent_ID
 {
-	EVENT_DRAG,		/* ²¿¼þµÄÍÏ¶¯ÊÂ¼þ */
-	EVENT_CLICKED	/* ²¿¼þµÄµã»÷ÊÂ¼þ */
+	EVENT_DRAG,		/* éƒ¨ä»¶çš„æ‹–åŠ¨äº‹ä»¶ */
+	EVENT_CLICKED	/* éƒ¨ä»¶çš„ç‚¹å‡»äº‹ä»¶ */
 }WidgetEvent_ID;
 /*********************************/
 
-/*************** ²¿¼þÍÏ¶¯ÊÂ¼þ ********************/
+/*************** éƒ¨ä»¶æ‹–åŠ¨äº‹ä»¶ ********************/
 struct _LCUI_DragEvent
 {
-	LCUI_Pos new_pos;	/* ÐÂÎ»ÖÃ */
-	int first_click;	/* ±êÖ¾£¬ÊÇ·ñÎªÊ×´Îµã»÷ */ 
-	int end_click;		/* ±êÖ¾£¬ÊÇ·ñÒÑ¾­½áÊøÍÏ¶¯ */
+	LCUI_Pos new_pos;	/* æ–°ä½ç½® */
+	int first_click;	/* æ ‡å¿—ï¼Œæ˜¯å¦ä¸ºé¦–æ¬¡ç‚¹å‡» */ 
+	int end_click;		/* æ ‡å¿—ï¼Œæ˜¯å¦å·²ç»ç»“æŸæ‹–åŠ¨ */
 };
 /**********************************************/
 
-/************************* º¯Êý *****************************/
+/************************* å‡½æ•° *****************************/
 struct _LCUI_Func
 {
 	/* 
-	 * º¯ÊýID£¬²¿¼þ¿âÐèÒªÕâID±êÊ¶º¯ÊýÀàÐÍ£¬Íù³ÌÐòµÄÈÎÎñ¶ÓÁÐÌí¼Ó
-	 * ÈÎÎñÒ²ÐèÒª¸ÃIDÀ´±êÊ¶Ä¿±ê³ÌÐòID 
+	 * å‡½æ•°IDï¼Œéƒ¨ä»¶åº“éœ€è¦è¿™IDæ ‡è¯†å‡½æ•°ç±»åž‹ï¼Œå¾€ç¨‹åºçš„ä»»åŠ¡é˜Ÿåˆ—æ·»åŠ 
+	 * ä»»åŠ¡ä¹Ÿéœ€è¦è¯¥IDæ¥æ ‡è¯†ç›®æ ‡ç¨‹åºID 
 	 * */
 	int id;	
 	
-	void (*func)();  /* º¯ÊýÖ¸Õë */
+	void (*func)();  /* å‡½æ•°æŒ‡é’ˆ */
 	
-	/* ÒÔÏÂ²ÎÊý¸ÃÔõÃ´´«¸ø»Øµ÷º¯Êý£¬¾ßÌåÒª¿´ÊÇÈçºÎ´¦ÀíÊÂ¼þµÄ */  
-	void *arg[2];   /* ´«¸øº¯ÊýµÄÁ½¸ö²ÎÊý */
+	/* ä»¥ä¸‹å‚æ•°è¯¥æ€Žä¹ˆä¼ ç»™å›žè°ƒå‡½æ•°ï¼Œå…·ä½“è¦çœ‹æ˜¯å¦‚ä½•å¤„ç†äº‹ä»¶çš„ */  
+	void *arg[2];   /* ä¼ ç»™å‡½æ•°çš„ä¸¤ä¸ªå‚æ•° */
 };
 /************************************************************/
 
-/*************************** ÊÂ¼þ ******************************/
+/*************************** äº‹ä»¶ ******************************/
 struct _LCUI_Event
 {
-	int			id;			/* ¼ÇÂ¼ÊÂ¼þID */
-	LCUI_Queue	func_data;	/* ¼ÇÂ¼±»¹ØÁªµÄº¯Êý¼°ËüµÄ²ÎÊý */
+	int			id;			/* è®°å½•äº‹ä»¶ID */
+	LCUI_Queue	func_data;	/* è®°å½•è¢«å…³è”çš„å‡½æ•°åŠå®ƒçš„å‚æ•° */
 };
 /**************************************************************/
 
 /***************************** Func ***********************************/
 void NULL_Func();
-/* ¹¦ÄÜ£º¿Õº¯Êý£¬²»×öÈÎºÎ²Ù×÷ */ 
+/* åŠŸèƒ½ï¼šç©ºå‡½æ•°ï¼Œä¸åšä»»ä½•æ“ä½œ */ 
 
 void FuncQueue_Init(LCUI_Queue *queue);
-/* ¹¦ÄÜ£º³õÊ¼»¯º¯ÊýÖ¸Õë¶ÓÁÐ */ 
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–å‡½æ•°æŒ‡é’ˆé˜Ÿåˆ— */ 
 
 /****************************** Task **********************************/
 
 void Send_Task_To_App(LCUI_Func *func_data);
 /*
- * ¹¦ÄÜ£º·¢ËÍÈÎÎñ¸ø³ÌÐò£¬Ê¹Õâ¸ö³ÌÐò½øÐÐÖ¸¶¨ÈÎÎñ
- * ËµÃ÷£ºLCUI_Func½á¹¹ÌåÖÐµÄ³ÉÔ±±äÁ¿ id£¬±£´æµÄÊÇÄ¿±ê³ÌÐòµÄid
+ * åŠŸèƒ½ï¼šå‘é€ä»»åŠ¡ç»™ç¨‹åºï¼Œä½¿è¿™ä¸ªç¨‹åºè¿›è¡ŒæŒ‡å®šä»»åŠ¡
+ * è¯´æ˜Žï¼šLCUI_Funcç»“æž„ä½“ä¸­çš„æˆå‘˜å˜é‡ idï¼Œä¿å­˜çš„æ˜¯ç›®æ ‡ç¨‹åºçš„id
  */ 
 
 int Have_Task(LCUI_App *app);
-/* ¹¦ÄÜ£º¼ì²âÊÇ·ñÓÐÈÎÎñ */ 
+/* åŠŸèƒ½ï¼šæ£€æµ‹æ˜¯å¦æœ‰ä»»åŠ¡ */ 
 
 int Run_Task(LCUI_App *app);
-/* ¹¦ÄÜ£ºÖ´ÐÐÈÎÎñ */ 
+/* åŠŸèƒ½ï¼šæ‰§è¡Œä»»åŠ¡ */ 
 
 int AppTask_Custom_Add(int mode, LCUI_Func *func_data);
 /*
- * ¹¦ÄÜ£ºÊ¹ÓÃ×Ô¶¨Òå·½Ê½Ìí¼Ó³ÌÐòÈÎÎñ
- * ÓÃ·¨Ê¾Àý£º
- * ÔÚº¯ÊýµÄ¸÷²ÎÊýÓë¶ÓÁÐÖÐµÄº¯Êý¼°¸÷²ÎÊý²»ÖØ¸´Ê±£¬Ìí¼ÓËü
+ * åŠŸèƒ½ï¼šä½¿ç”¨è‡ªå®šä¹‰æ–¹å¼æ·»åŠ ç¨‹åºä»»åŠ¡
+ * ç”¨æ³•ç¤ºä¾‹ï¼š
+ * åœ¨å‡½æ•°çš„å„å‚æ•°ä¸Žé˜Ÿåˆ—ä¸­çš„å‡½æ•°åŠå„å‚æ•°ä¸é‡å¤æ—¶ï¼Œæ·»åŠ å®ƒ
  * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT | AND_ARG_F | AND_ARG_S, func_data);
- * Ö»Òªº¯ÊýºÍ²ÎÊý1²»ÖØ¸´ÔòÌí¼Ó
+ * åªè¦å‡½æ•°å’Œå‚æ•°1ä¸é‡å¤åˆ™æ·»åŠ 
  * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT | AND_ARG_F, func_data);
- * Òªº¯Êý²»ÖØ¸´ÔòÌí¼Ó
+ * è¦å‡½æ•°ä¸é‡å¤åˆ™æ·»åŠ 
  * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT, func_data);
- * Ìí¼ÓÐÂµÄ£¬²»¹ÜÊÇ·ñÓÐÖØ¸´µÄ
+ * æ·»åŠ æ–°çš„ï¼Œä¸ç®¡æ˜¯å¦æœ‰é‡å¤çš„
  * AppTask_Custom_Add(ADD_MODE_ADD_NEW, func_data);
- * ÓÐÏàÍ¬º¯ÊýÔò¸²¸Ç£¬Ã»ÓÐÔòÐÂÔö
+ * æœ‰ç›¸åŒå‡½æ•°åˆ™è¦†ç›–ï¼Œæ²¡æœ‰åˆ™æ–°å¢ž
  * AppTask_Custom_Add(ADD_MODE_REPLACE, func_data);
  * */ 
 /**************************** Task End ********************************/
@@ -135,44 +135,44 @@ int AppTask_Custom_Add(int mode, LCUI_Func *func_data);
 
 /***************************** Event ***********************************/ 
 void EventQueue_Init(LCUI_EventQueue * queue);
-/* ¹¦ÄÜ£º³õÊ¼»¯ÊÂ¼þ¶ÓÁÐ */ 
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–äº‹ä»¶é˜Ÿåˆ— */ 
 
 int Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2);
 /* 
- * ¹¦ÄÜ£º½«º¯ÊýÖ¸ÕëÒÔ¼°Á½¸ö²ÎÊý£¬×ª»»³ÉLCUI_FuncÀàÐÍµÄÖ¸Õë
- * ËµÃ÷£º´Ëº¯Êý»áÉêÇëÄÚ´æ¿Õ¼ä£¬²¢·µ»ØÖ¸Ïò¸Ã¿Õ¼äµÄÖ¸Õë
+ * åŠŸèƒ½ï¼šå°†å‡½æ•°æŒ‡é’ˆä»¥åŠä¸¤ä¸ªå‚æ•°ï¼Œè½¬æ¢æˆLCUI_Funcç±»åž‹çš„æŒ‡é’ˆ
+ * è¯´æ˜Žï¼šæ­¤å‡½æ•°ä¼šç”³è¯·å†…å­˜ç©ºé—´ï¼Œå¹¶è¿”å›žæŒ‡å‘è¯¥ç©ºé—´çš„æŒ‡é’ˆ
  * */ 
 
 LCUI_Event *Find_Event(LCUI_EventQueue *queue, int event_id);
-/* ¹¦ÄÜ£º¸ù¾ÝÊÂ¼þµÄID£¬»ñÈ¡Ö¸Ïò¸ÃÊÂ¼þµÄÖ¸Õë */ 
+/* åŠŸèƒ½ï¼šæ ¹æ®äº‹ä»¶çš„IDï¼ŒèŽ·å–æŒ‡å‘è¯¥äº‹ä»¶çš„æŒ‡é’ˆ */ 
 
 int EventQueue_Add(LCUI_EventQueue *queue, int event_id, LCUI_Func *func);
-/* ¹¦ÄÜ£º¼ÇÂ¼ÊÂ¼þ¼°¶ÔÓ¦»Øµ÷º¯ÊýÖÁ¶ÓÁÐ */ 
+/* åŠŸèƒ½ï¼šè®°å½•äº‹ä»¶åŠå¯¹åº”å›žè°ƒå‡½æ•°è‡³é˜Ÿåˆ— */ 
 
 int LCUI_MouseEvent_Connect (void (*func) (), int event_id);
 /* 
- * ¹¦ÄÜ£º½«º¯ÊýÓëÊó±êµÄÏà¹ØÊÂ¼þÏà¹ØÁª
- * ËµÃ÷£ºµ±Êó±êÊÂ¼þ´¥·¢ºó£¬»áÏÈ½«ÒÑ¹ØÁª¸ÃÊÂ¼þµÄº¯ÊýÖ¸Õë¼°Ïà¹ØÊÂ¼þµÄÖ¸Õë
- * Ìí¼ÓÖÁ³ÌÐòµÄÈÎÎñ¶ÓÁÐ£¬µÈ´ý³ÌÐòÔÚÖ÷Ñ­»·ÖÐ´¦Àí
+ * åŠŸèƒ½ï¼šå°†å‡½æ•°ä¸Žé¼ æ ‡çš„ç›¸å…³äº‹ä»¶ç›¸å…³è”
+ * è¯´æ˜Žï¼šå½“é¼ æ ‡äº‹ä»¶è§¦å‘åŽï¼Œä¼šå…ˆå°†å·²å…³è”è¯¥äº‹ä»¶çš„å‡½æ•°æŒ‡é’ˆåŠç›¸å…³äº‹ä»¶çš„æŒ‡é’ˆ
+ * æ·»åŠ è‡³ç¨‹åºçš„ä»»åŠ¡é˜Ÿåˆ—ï¼Œç­‰å¾…ç¨‹åºåœ¨ä¸»å¾ªçŽ¯ä¸­å¤„ç†
  **/ 
 
 int LCUI_Key_Event_Connect (int key_value, void (*func) (), void *arg);
-/* ¹¦ÄÜ£º½«º¯ÊýÓë°´¼üµÄÄ³¸öÊÂ¼þÏàÁ¬½Ó£¬µ±Õâ¸ö°´¼ü°´ÏÂºó£¬¾Í»áµ÷ÓÃÕâ¸öº¯Êý */ 
+/* åŠŸèƒ½ï¼šå°†å‡½æ•°ä¸ŽæŒ‰é”®çš„æŸä¸ªäº‹ä»¶ç›¸è¿žæŽ¥ï¼Œå½“è¿™ä¸ªæŒ‰é”®æŒ‰ä¸‹åŽï¼Œå°±ä¼šè°ƒç”¨è¿™ä¸ªå‡½æ•° */ 
 
 int Processing_Event(LCUI_EventQueue *queue, int event_id);
 /* 
- * ¹¦ÄÜ£º´¦ÀíÖ¸¶¨IDµÄÊÂ¼þ
- * ËµÃ÷£º±¾º¯Êý»á½«ÊÂ¼þ¶ÓÁÐÖÐÓëÖ¸¶¨IDµÄÊÂ¼þ¹ØÁªµÄ»Øµ÷º¯Êý Ìí¼ÓÖÁ³ÌÐòµÄÈÎÎñ¶ÓÁÐ
+ * åŠŸèƒ½ï¼šå¤„ç†æŒ‡å®šIDçš„äº‹ä»¶
+ * è¯´æ˜Žï¼šæœ¬å‡½æ•°ä¼šå°†äº‹ä»¶é˜Ÿåˆ—ä¸­ä¸ŽæŒ‡å®šIDçš„äº‹ä»¶å…³è”çš„å›žè°ƒå‡½æ•° æ·»åŠ è‡³ç¨‹åºçš„ä»»åŠ¡é˜Ÿåˆ—
  * */ 
 
-/********************* ´¦Àí²¿¼þÍÏ¶¯/µã»÷ÊÂ¼þ ******************************/
+/********************* å¤„ç†éƒ¨ä»¶æ‹–åŠ¨/ç‚¹å‡»äº‹ä»¶ ******************************/
 int Widget_Drag_Event_Connect ( 
 				LCUI_Widget *widget, 
 				void (*func)(LCUI_Widget*, LCUI_DragEvent *)
 );
 /* 
- * ¹¦ÄÜ£º½«»Øµ÷º¯ÊýÓë²¿¼þµÄÍÏ¶¯ÊÂ¼þ½øÐÐÁ¬½Ó 
- * ËµÃ÷£º½¨Á¢Á¬½Óºó£¬µ«²¿¼þ±»µã»÷£¬ÍÏ¶¯£¬ÊÍ·Å£¬¶¼»áµ÷ÓÃ»Øµ÷º¯Êý
+ * åŠŸèƒ½ï¼šå°†å›žè°ƒå‡½æ•°ä¸Žéƒ¨ä»¶çš„æ‹–åŠ¨äº‹ä»¶è¿›è¡Œè¿žæŽ¥ 
+ * è¯´æ˜Žï¼šå»ºç«‹è¿žæŽ¥åŽï¼Œä½†éƒ¨ä»¶è¢«ç‚¹å‡»ï¼Œæ‹–åŠ¨ï¼Œé‡Šæ”¾ï¼Œéƒ½ä¼šè°ƒç”¨å›žè°ƒå‡½æ•°
  * */ 
 
 int Widget_Clicked_Event_Connect (
@@ -181,12 +181,12 @@ int Widget_Clicked_Event_Connect (
 			void *arg
 );
 /* 
- * ¹¦ÄÜ£º½«»Øµ÷º¯ÊýÓë²¿¼þµÄÍÏ¶¯ÊÂ¼þ½øÐÐÁ¬½Ó 
- * ËµÃ÷£º½¨Á¢Á¬½Óºó£¬²¿¼þ»á½«ÐÂÎ»ÖÃ×÷ÎªµÚ¶þ²ÎÊý£¬´«¸ø»Øµ÷º¯Êý
+ * åŠŸèƒ½ï¼šå°†å›žè°ƒå‡½æ•°ä¸Žéƒ¨ä»¶çš„æ‹–åŠ¨äº‹ä»¶è¿›è¡Œè¿žæŽ¥ 
+ * è¯´æ˜Žï¼šå»ºç«‹è¿žæŽ¥åŽï¼Œéƒ¨ä»¶ä¼šå°†æ–°ä½ç½®ä½œä¸ºç¬¬äºŒå‚æ•°ï¼Œä¼ ç»™å›žè°ƒå‡½æ•°
  * */ 
 
 void Widget_Event_Init();
-/* ¹¦ÄÜ£º³õÊ¼»¯²¿¼þÊÂ¼þ´¦Àí */ 
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–éƒ¨ä»¶äº‹ä»¶å¤„ç† */ 
 
 /*************************** Event End *********************************/
 

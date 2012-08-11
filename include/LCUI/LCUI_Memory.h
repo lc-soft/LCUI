@@ -21,74 +21,74 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Memory.h -- һЩ�������͵��ڴ����
+ * LCUI_Memory.h -- 一些数据类型的内存管理
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#ifndef __LCUI_MEMORY_H__ /* ���û�ж��� __LCUI_MEMORY_H__ �� */
-#define __LCUI_MEMORY_H__  /* ���� __LCUI_MEMORY_H__ �� */
+#ifndef __LCUI_MEMORY_H__ /* 如果没有定义 __LCUI_MEMORY_H__ 宏 */
+#define __LCUI_MEMORY_H__  /* 定义 __LCUI_MEMORY_H__ 宏 */
 
 void Using_Graph(LCUI_Graph *pic, int mode);
-/* ���ܣ���ָ��ģʽʹ��ͼ������
- * ˵��������mode��ֵΪ0ʱ���ԡ�����ģʽʹ�����ݣ�����ֵʱ���ԡ�д"ģʽʹ������ */ 
+/* 功能：以指定模式使用图像数据
+ * 说明：参数mode的值为0时，以“读”模式使用数据，其它值时，以“写"模式使用数据 */ 
 
 void End_Use_Graph(LCUI_Graph *pic);
-/* ���ܣ�����ͼ�����ݵ�ʹ�� */ 
+/* 功能：结束图像数据的使用 */ 
 
 unsigned char** Get_Malloc(int width,int height,int flag);
-/* ���ܣ�Ϊͼ�����������ڴ�ռ䣬����ʼ�����ڴ�ռ�Ϊ�� */ 
+/* 功能：为图形数据申请内存空间，并初始化该内存空间为零 */ 
  
 void Free_Graph(LCUI_Graph *pic);
-/* ���ܣ��ͷ�LCUI_Graph�ڵ�ͼ������ռ�õ��ڴ���Դ */ 
+/* 功能：释放LCUI_Graph内的图像数据占用的内存资源 */ 
 
 void *Malloc_Widget_Private(LCUI_Widget *widget, size_t size);
-/* ���ܣ�Ϊ����˽�нṹ��ָ������ڴ� */ 
+/* 功能：为部件私有结构体指针分配内存 */ 
 
 int Malloc_Graph(LCUI_Graph *pic, int width, int height);
-/* ���ܣ�Ϊͼ�����ݷ����ڴ���Դ */ 
+/* 功能：为图像数据分配内存资源 */ 
 
 void Copy_Graph(LCUI_Graph *des, LCUI_Graph *src);
 /* 
- * ���ܣ�����ͼ������
- * ˵������src�����ݿ�����des 
+ * 功能：拷贝图像数据
+ * 说明：将src的数据拷贝至des 
  * */ 
 
 void Free_String(LCUI_String *in);
-/* ���ܣ��ͷ�String�ṹ���е�ָ��ռ�õ��ڴ�ռ� */ 
+/* 功能：释放String结构体中的指针占用的内存空间 */ 
 
 void Free_Bitmap(LCUI_Bitmap *bitmap);
-/* ���ܣ��ͷŵ�ɫλͼռ�õ��ڴ���Դ������ʼ�� */ 
+/* 功能：释放单色位图占用的内存资源，并初始化 */ 
 
 void Free_WChar_T(LCUI_WChar_T *ch);
-/* ���ܣ��ͷ�LCUI_Wchar_T�����е�ָ�����ռ�õ��ڴ� */ 
+/* 功能：释放LCUI_Wchar_T型体中的指针变量占用的内存 */ 
 
 void Free_WString(LCUI_WString *str);
-/* ���ܣ��ͷ�LCUI_WString�ͽṹ���е�ָ�����ռ�õ��ڴ� */ 
+/* 功能：释放LCUI_WString型结构体中的指针变量占用的内存 */ 
 
 void Malloc_Bitmap(LCUI_Bitmap *bitmap, int width, int height);
-/* ���ܣ�ΪBitmap�ڵ����ݷ����ڴ���Դ������ʼ�� */ 
+/* 功能：为Bitmap内的数据分配内存资源，并初始化 */ 
 
 void Realloc_Bitmap(LCUI_Bitmap *bitmap, int width, int height);
-/* ���ܣ�����λͼ�ĳߴ� */ 
+/* 功能：更改位图的尺寸 */ 
 
 void Free_Font(LCUI_Font *in);
-/* ���ܣ��ͷ�Font�ṹ������ռ�õ��ڴ���Դ */ 
+/* 功能：释放Font结构体数据占用的内存资源 */ 
 
 void Free_LCUI_Font();
-/* ���ܣ��ͷ�LCUIĬ�ϵ�Font�ṹ������ռ�õ��ڴ���Դ */ 
+/* 功能：释放LCUI默认的Font结构体数据占用的内存资源 */ 
 #endif  /*  __LCUI_MEMORY_H__ */
 

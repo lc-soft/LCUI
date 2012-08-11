@@ -21,79 +21,79 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Window.h -- LCUI �Ĵ��ڲ���
+ * LCUI_Window.h -- LCUI 的窗口部件
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 
 #ifndef __LCUI_WINDOW_H_
 #define __LCUI_WINDOW_H_ 
-/* ��ʹ��typedefΪ�ṹ�崴��ͬ���֣�֮���ٶ���ṹ�� */
+/* 先使用typedef为结构体创建同义字，之后再定义结构体 */
 typedef struct _LCUI_TitleBar		LCUI_TitleBar;
 typedef struct _LCUI_Window			LCUI_Window;
 
-/******************* ���ڱ����� ***********************/
+/******************* 窗口标题栏 ***********************/
 struct _LCUI_TitleBar
 {
-	LCUI_Widget *icon_box;		/* ͼ�� */
-	LCUI_Widget *label;		/* ����������ʾ���ı� */
-}; /* �洢���ڵı��������ݵĽṹ�� */
+	LCUI_Widget *icon_box;		/* 图标 */
+	LCUI_Widget *label;		/* 标题栏中显示的文本 */
+}; /* 存储窗口的标题栏数据的结构体 */
 /****************************************************/
 
 
-/************************ �������� **************************/
+/************************ 窗口数据 **************************/
 struct _LCUI_Window
 {
-	LCUI_Widget *titlebar;		/* ������ */
-	LCUI_Widget *client_area;	/* �ͻ��� */
-	LCUI_Widget *btn_close;	/* �رհ�ť */
-	int hide_style;			/* ��������ʱʹ�õ���Ч */
-	int show_style;			/* ������ʾʱʹ�õ���Ч */
-	int resize_style;		/* ���ڸı�ߴ�ʱʹ�õ���Ч */
-	int count;			/* ��ʾ�������� */
+	LCUI_Widget *titlebar;		/* 标题栏 */
+	LCUI_Widget *client_area;	/* 客户区 */
+	LCUI_Widget *btn_close;	/* 关闭按钮 */
+	int hide_style;			/* 窗口隐藏时使用的特效 */
+	int show_style;			/* 窗口显示时使用的特效 */
+	int resize_style;		/* 窗口改变尺寸时使用的特效 */
+	int count;			/* 显示次数计数 */
 	
-	LCUI_Align	init_align;		/* ���ڳ�ʼ��ʾλ�� */
+	LCUI_Align	init_align;		/* 窗口初始显示位置 */
 };
 /***********************************************************/
 
 LCUI_Widget *Get_Window_TitleBar(LCUI_Widget *window);
-/* ���ܣ���ȡ���ڱ�������ָ�� */ 
+/* 功能：获取窗口标题栏的指针 */ 
 
 LCUI_Widget *Get_Window_Client_Area(LCUI_Widget *window);
-/* ���ܣ���ȡ���ڿͻ�����ָ�� */ 
+/* 功能：获取窗口客户区的指针 */ 
 
 void Set_Window_Title_Icon(LCUI_Widget *window, LCUI_Graph *icon);
-/* ���ܣ��Զ���ָ�����ڵı�����ͼ�� */ 
+/* 功能：自定义指定窗口的标题栏图标 */ 
 
 LCUI_Size Get_Window_Client_Size(LCUI_Widget *win_p);
-/* ���ܣ���ȡ���ڵĿͻ����ĳߴ� */ 
+/* 功能：获取窗口的客户区的尺寸 */ 
 
 void Window_Widget_Auto_Size(LCUI_Widget *win_p);
-/* ���ܣ��ڴ��ڳߴ�ı�ʱ�Զ��ı�������Ϳͻ����ĳߴ� */ 
+/* 功能：在窗口尺寸改变时自动改变标题栏和客户区的尺寸 */ 
 
 LCUI_Widget *Get_Parent_Window(LCUI_Widget *widget);
-/* ���ܣ���ȡָ���������ڵĴ��� */ 
+/* 功能：获取指定部件所在的窗口 */ 
 
 void Set_Window_Title_Text(LCUI_Widget *win_p, char *text);
-/* ���ܣ�Ϊ�������ñ������� */ 
+/* 功能：为窗口设置标题文字 */ 
 
 void Window_Client_Area_Add(LCUI_Widget *window, LCUI_Widget *widget);
-/* ���ܣ����������������ڿͻ��� */ 
+/* 功能：将部件添加至窗口客户区 */ 
 
 void Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget);
-/* ���ܣ����������������ڱ����� */ 
+/* 功能：将部件添加至窗口标题栏 */ 
 #endif /* __LCUI_WINDOW_H__ */

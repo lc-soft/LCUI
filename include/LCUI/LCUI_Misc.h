@@ -20,147 +20,147 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Misc.h -- Ã»ÓÐ¾ßÌå·ÖÀàµÄÔÓÏî¹¦ÄÜ
+ * LCUI_Misc.h -- æ²¡æœ‰å…·ä½“åˆ†ç±»çš„æ‚é¡¹åŠŸèƒ½
  *
- * °æÈ¨ËùÓÐ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±žäºŽ 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼þÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾ÝGPLv2Ðí¿ÉÐ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ðí¿ÉÖ¤µÚ¶þ°æ µÄÓ¢ÎÄËõÐ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌÐøÊ¹ÓÃ¡¢ÐÞ¸Ä»ò·¢²¼±¾ÎÄ¼þ£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öÐí¿ÉÐ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜Žæ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’ŒæŽ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔðÈÎ£¬ÉõÖÁÃ»ÓÐÊÊÏúÐÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒþº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ðí¿ÉÐ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºŽä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼þµÄGPLv2Ðí¿ÉÐ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼þÖÐ£¬Èç¹û
- * Ã»ÓÐ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºŽæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æžœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
  
 
 #ifndef __LCUI_MISC_H__
 #define __LCUI_MISC_H__
 void String_Init(LCUI_String *in);
-/* ¹¦ÄÜ£º³õÊ¼»¯String½á¹¹ÌåÖÐµÄÊý¾Ý */ 
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–Stringç»“æž„ä½“ä¸­çš„æ•°æ® */ 
 
 void Rect_Init(LCUI_Rect *rect);
-/* ¹¦ÄÜ£º³õÊ¼»¯¾ØÐÎÇøÓòµÄÊý¾Ý */ 
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–çŸ©å½¢åŒºåŸŸçš„æ•°æ® */ 
 
 void Border_Init(LCUI_Border *in);
-/* ¹¦ÄÜ£º³õÊ¼»¯±ß¿ò */ 
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–è¾¹æ¡† */ 
 
 void Strcpy (LCUI_String * des, char *src);
-/* ¹¦ÄÜ£º¿½±´×Ö·û´®ÖÁString½á¹¹ÌåÊý¾ÝÖÐ */ 
+/* åŠŸèƒ½ï¼šæ‹·è´å­—ç¬¦ä¸²è‡³Stringç»“æž„ä½“æ•°æ®ä¸­ */ 
 
 int Strcmp(LCUI_String *str1, char *str2);
-/* ¹¦ÄÜ£º¶Ô±Èstr1Óëstr2 */ 
+/* åŠŸèƒ½ï¼šå¯¹æ¯”str1ä¸Žstr2 */ 
 
 void Get_Moved_Rect_Refresh_Area (int new_x, int new_y, LCUI_Rect rect,
 							 LCUI_Rect * rect_a, LCUI_Rect * rect_b);
-/* ¹¦ÄÜ£º»ñÈ¡Ò»¸ö¾ØÐÎÒÆ¶¯ºóÐèÒªË¢ÐÂµÄ²ÐÁôÇøÓò£¬Ò²¾ÍÊÇAºÍBÁ½¸öÇøÓò */ 
+/* åŠŸèƒ½ï¼šèŽ·å–ä¸€ä¸ªçŸ©å½¢ç§»åŠ¨åŽéœ€è¦åˆ·æ–°çš„æ®‹ç•™åŒºåŸŸï¼Œä¹Ÿå°±æ˜¯Aå’ŒBä¸¤ä¸ªåŒºåŸŸ */ 
 
 int Rect_Cross_Overlay(LCUI_Rect a, LCUI_Rect b);
 /* 
- * ¹¦ÄÜ£º¼ì²âÁ½¸ö¾ØÐÎÊÇ·ñ³ÉÊ®×Ö¼ÜÊ½µþ¼Ó 
- * ·µ»ØÖµ£º
- *  1 aÊú£¬bºá
- * -1 aºâ£¬bÊú
- *  0 ²»µþ¼Ó
+ * åŠŸèƒ½ï¼šæ£€æµ‹ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦æˆåå­—æž¶å¼å åŠ  
+ * è¿”å›žå€¼ï¼š
+ *  1 aç«–ï¼Œbæ¨ª
+ * -1 aè¡¡ï¼Œbç«–
+ *  0 ä¸å åŠ 
  **/  
 
 int Check_Option(int result, int option);
-/* ¹¦ÄÜ£º¼ì²âresultÊÇ·ñ°üº¬option */ 
+/* åŠŸèƒ½ï¼šæ£€æµ‹resultæ˜¯å¦åŒ…å«option */ 
 
 int Get_Cut_Area(LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut);
 /* 
- * ¹¦ÄÜ£º»ñÈ¡Ðè²Ã¼ôµÄÇøÓò
- * ËµÃ÷£ºÖ¸¶¨ÈÝÆ÷³ß´çºÍÈÝÆ÷ÖÐµÄÇøÓòÎ»ÖÃ¼°³ß´ç£¬¼´¿ÉµÃµ½¸ÃÇøÓòÖÐÐèÒª½øÐÐ²Ã¼ôÇøÓò
+ * åŠŸèƒ½ï¼šèŽ·å–éœ€è£å‰ªçš„åŒºåŸŸ
+ * è¯´æ˜Žï¼šæŒ‡å®šå®¹å™¨å°ºå¯¸å’Œå®¹å™¨ä¸­çš„åŒºåŸŸä½ç½®åŠå°ºå¯¸ï¼Œå³å¯å¾—åˆ°è¯¥åŒºåŸŸä¸­éœ€è¦è¿›è¡Œè£å‰ªåŒºåŸŸ
  *  */ 
 
 LCUI_Rect Get_Valid_Area(LCUI_Size container, LCUI_Rect rect);
 /* 
- * ¹¦ÄÜ£º»ñÈ¡Ö¸¶¨ÇøÓòÔÚÈÝÆ÷ÖÐµÄÓÐÐ§ÏÔÊ¾ÇøÓò 
- * ËµÃ÷£ºÖ¸¶¨ÈÝÆ÷µÄÇøÓò´óÐ¡£¬ÔÙÖ¸¶¨ÈÝÆ÷ÖÐµÄÇøÓòÎ»ÖÃ¼°´óÐ¡£¬¾ÍÄÜµÃµ½¸ÃÈÝÆ÷Êµ¼ÊÄÜÏÔÊ¾
- * ³öµÄ¸ÃÇøÓò·¶Î§¡£
+ * åŠŸèƒ½ï¼šèŽ·å–æŒ‡å®šåŒºåŸŸåœ¨å®¹å™¨ä¸­çš„æœ‰æ•ˆæ˜¾ç¤ºåŒºåŸŸ 
+ * è¯´æ˜Žï¼šæŒ‡å®šå®¹å™¨çš„åŒºåŸŸå¤§å°ï¼Œå†æŒ‡å®šå®¹å™¨ä¸­çš„åŒºåŸŸä½ç½®åŠå¤§å°ï¼Œå°±èƒ½å¾—åˆ°è¯¥å®¹å™¨å®žé™…èƒ½æ˜¾ç¤º
+ * å‡ºçš„è¯¥åŒºåŸŸèŒƒå›´ã€‚
  * */ 
 
 int
 Rect_Include_Rect (LCUI_Rect a, LCUI_Rect b);
 /*
- * ¹¦ÄÜ£º¼ì²âÁ½¸ö¾ØÐÎÖÐ£¬A¾ØÐÎÊÇ·ñ°üº¬B¾ØÐÎ
- * ·µ»ØÖµ£ºÁ½²»¾ØÐÎÊôÓÚ°üÐÐ¹ØÏµ·µ»Ø1£¬·ñÔò·µ»Ø0¡£
+ * åŠŸèƒ½ï¼šæ£€æµ‹ä¸¤ä¸ªçŸ©å½¢ä¸­ï¼ŒAçŸ©å½¢æ˜¯å¦åŒ…å«BçŸ©å½¢
+ * è¿”å›žå€¼ï¼šä¸¤ä¸çŸ©å½¢å±žäºŽåŒ…è¡Œå…³ç³»è¿”å›ž1ï¼Œå¦åˆ™è¿”å›ž0ã€‚
  * */ 
 
 LCUI_Pos Pos(int x, int y);
-/* ¹¦ÄÜ£º×ª»»³ÉLCUI_PosÀàÐÍ */ 
+/* åŠŸèƒ½ï¼šè½¬æ¢æˆLCUI_Posç±»åž‹ */ 
 
 LCUI_Size Size(int w, int h);
-/* ¹¦ÄÜ£º×ª»»³ÉLCUI_SizeÀàÐÍ */ 
+/* åŠŸèƒ½ï¼šè½¬æ¢æˆLCUI_Sizeç±»åž‹ */ 
 
 int Size_Cmp(LCUI_Size a, LCUI_Size b);
 /* 
- * ¹¦ÄÜ£º¶Ô±ÈÁ½¸ö³ß´ç
- * ËµÃ÷£ºa´óÓÚb£¬·µ»Ø1£¬ b´óÓÚa£¬·µ»Ø-1£¬ÏàµÈÔò·µ»Ø0
+ * åŠŸèƒ½ï¼šå¯¹æ¯”ä¸¤ä¸ªå°ºå¯¸
+ * è¯´æ˜Žï¼šaå¤§äºŽbï¼Œè¿”å›ž1ï¼Œ bå¤§äºŽaï¼Œè¿”å›ž-1ï¼Œç›¸ç­‰åˆ™è¿”å›ž0
  * */ 
 
 int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new, 
 						LCUI_Queue *rq	);
 /*
- * ¹¦ÄÜ£º½«ÓÐÖØµþ²¿·ÖµÄÁ½¸ö¾ØÐÎ£¬½øÐÐ·Ö¸î£¬²¢µÃµ½·Ö¸îºóµÄ¾ØÐÎ
- * ËµÃ÷£ºÖ÷ÒªÓÃÓÚ¾Ö²¿ÇøÓòË¢ÐÂÀï£¬Ìí¼ÓµÄÐèË¢ÐÂµÄÇøÓòÓÐ¿ÉÄÜ»áÓëÒÑÌí¼ÓµÄÇøÓòÖØµþ£¬Îª±ÜÃâ
- * ÖØ¸´Ë¢ÐÂÍ¬Ò»¿éÇøÓò£¬ÐèÒªÔÚÌí¼ÓÊ±¶Ô¾ØÐÎ½øÐÐ·Ö¸î£¬µÃµ½ÍêÈ«ÖØµþºÍ²»ÖØµþµÄ¾ØÐÎ¡£
- * ²ÎÊýËµÃ÷£º
- * old £º ÒÑ´æÔÚµÄ¾ØÐÎÇøÓò
- * new £º ½«ÒªÌí¼ÓµÄ¾ØÐÎÇøÓò
- * rq  £º Ö¸Ïò¾ØÐÎµÄ¶ÓÁÐµÄÖ¸Õë
- * ×¢Òâ£¡´«µÝ²ÎÊýÊ±£¬ÇëÎðµßµ¹oldºÍnewÎ»ÖÃ¡£
+ * åŠŸèƒ½ï¼šå°†æœ‰é‡å éƒ¨åˆ†çš„ä¸¤ä¸ªçŸ©å½¢ï¼Œè¿›è¡Œåˆ†å‰²ï¼Œå¹¶å¾—åˆ°åˆ†å‰²åŽçš„çŸ©å½¢
+ * è¯´æ˜Žï¼šä¸»è¦ç”¨äºŽå±€éƒ¨åŒºåŸŸåˆ·æ–°é‡Œï¼Œæ·»åŠ çš„éœ€åˆ·æ–°çš„åŒºåŸŸæœ‰å¯èƒ½ä¼šä¸Žå·²æ·»åŠ çš„åŒºåŸŸé‡å ï¼Œä¸ºé¿å…
+ * é‡å¤åˆ·æ–°åŒä¸€å—åŒºåŸŸï¼Œéœ€è¦åœ¨æ·»åŠ æ—¶å¯¹çŸ©å½¢è¿›è¡Œåˆ†å‰²ï¼Œå¾—åˆ°å®Œå…¨é‡å å’Œä¸é‡å çš„çŸ©å½¢ã€‚
+ * å‚æ•°è¯´æ˜Žï¼š
+ * old ï¼š å·²å­˜åœ¨çš„çŸ©å½¢åŒºåŸŸ
+ * new ï¼š å°†è¦æ·»åŠ çš„çŸ©å½¢åŒºåŸŸ
+ * rq  ï¼š æŒ‡å‘çŸ©å½¢çš„é˜Ÿåˆ—çš„æŒ‡é’ˆ
+ * æ³¨æ„ï¼ä¼ é€’å‚æ•°æ—¶ï¼Œè¯·å‹¿é¢ å€’oldå’Œnewä½ç½®ã€‚
  **/ 
 
 int Get_Overlay_Rect(LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out);
-/* ¹¦ÄÜ£º»ñÈ¡Á½¾ØÐÎÖØµþ²¿·ÖµÄ¾ØÐÎ */ 
+/* åŠŸèƒ½ï¼šèŽ·å–ä¸¤çŸ©å½¢é‡å éƒ¨åˆ†çš„çŸ©å½¢ */ 
 
 LCUI_Rect Rect (int x, int y, int width, int height);
-/* ¹¦ÄÜ£º½«ÊýÖµ×ª»»³ÉLCUI_RectÐÍ½á¹¹Ìå */ 
+/* åŠŸèƒ½ï¼šå°†æ•°å€¼è½¬æ¢æˆLCUI_Rectåž‹ç»“æž„ä½“ */ 
 
 LCUI_Border Border(int top, int bottom, int left, int right);
 
 LCUI_Pos Pos_Add(LCUI_Pos a, LCUI_Pos b);
-/* ¹¦ÄÜ£ºÇóÁ½¸öLCUI_PosÀàÐÍ±äÁ¿µÄºÍ */ 
+/* åŠŸèƒ½ï¼šæ±‚ä¸¤ä¸ªLCUI_Posç±»åž‹å˜é‡çš„å’Œ */ 
 
 int Pos_Cmp(LCUI_Pos a, LCUI_Pos b);
-/* ¹¦ÄÜ£º¶Ô±ÈÁ½¸ö×ø±êÊÇ·ñÒ»ÖÂ */ 
+/* åŠŸèƒ½ï¼šå¯¹æ¯”ä¸¤ä¸ªåæ ‡æ˜¯å¦ä¸€è‡´ */ 
 
 LCUI_Pos Pos_Sub(LCUI_Pos a, LCUI_Pos b);
-/* ¹¦ÄÜ£ºÇóÁ½¸öLCUI_PosÀàÐÍ±äÁ¿µÄ²î */ 
+/* åŠŸèƒ½ï¼šæ±‚ä¸¤ä¸ªLCUI_Posç±»åž‹å˜é‡çš„å·® */ 
 
 int Rect_Inside_Point (LCUI_Pos pos, LCUI_Rect rect);
-/* ¹¦ÄÜ£º¼ì²âÒ»¸öµãÊÇ·ñ±»¾ØÐÎ°üº¬ */ 
+/* åŠŸèƒ½ï¼šæ£€æµ‹ä¸€ä¸ªç‚¹æ˜¯å¦è¢«çŸ©å½¢åŒ…å« */ 
 
 int
 Check_Rect_Overlap (int ax, int ay, int aw, int ah, int bx, int by, int bw,
 					int bh);
 /*
-* ¹¦ÄÜ£º¼ì²âÁ½¸ö¾ØÐÎÊÇ·ñÖØµþ
-* ²ÎÊýËµÃ÷£º
-* ax £º¾ØÐÎAµÄ×óÉÏ½ÇÆðµãËùÔÚxÖáµÄ×ø±ê
-* ay £º¾ØÐÎAµÄ×óÉÏ½ÇÆðµãËùÔÚyÖáµÄ×ø±ê
-* aw £º¾ØÐÎAµÄ¿í¶È
-* ah £º¾ØÐÎAµÄ¸ß¶È
-* bx £º¾ØÐÎBµÄ×óÉÏ½ÇÆðµãËùÔÚxÖáµÄ×ø±ê
-* by £º¾ØÐÎBµÄ×óÉÏ½ÇÆðµãËùÔÚyÖáµÄ×ø±ê
-* bw £º¾ØÐÎBµÄ¿í¶È
-* bh £º¾ØÐÎBµÄ¸ß¶È
-* ·µ»ØÖµ£ºÁ½²»ÖØµþ·µ»Ø0£¬ÖØµþÔò·µ»Ø1¡£
+* åŠŸèƒ½ï¼šæ£€æµ‹ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦é‡å 
+* å‚æ•°è¯´æ˜Žï¼š
+* ax ï¼šçŸ©å½¢Açš„å·¦ä¸Šè§’èµ·ç‚¹æ‰€åœ¨xè½´çš„åæ ‡
+* ay ï¼šçŸ©å½¢Açš„å·¦ä¸Šè§’èµ·ç‚¹æ‰€åœ¨yè½´çš„åæ ‡
+* aw ï¼šçŸ©å½¢Açš„å®½åº¦
+* ah ï¼šçŸ©å½¢Açš„é«˜åº¦
+* bx ï¼šçŸ©å½¢Bçš„å·¦ä¸Šè§’èµ·ç‚¹æ‰€åœ¨xè½´çš„åæ ‡
+* by ï¼šçŸ©å½¢Bçš„å·¦ä¸Šè§’èµ·ç‚¹æ‰€åœ¨yè½´çš„åæ ‡
+* bw ï¼šçŸ©å½¢Bçš„å®½åº¦
+* bh ï¼šçŸ©å½¢Bçš„é«˜åº¦
+* è¿”å›žå€¼ï¼šä¸¤ä¸é‡å è¿”å›ž0ï¼Œé‡å åˆ™è¿”å›ž1ã€‚
 */ 
 
 int
 Rect_Is_Overlay (LCUI_Rect a, LCUI_Rect b);
-/* ¹¦ÄÜ£º¼ì²âÁ½¸ö¾ØÐÎÊÇ·ñÖØµþ */ 
+/* åŠŸèƒ½ï¼šæ£€æµ‹ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦é‡å  */ 
 
 int Rect_Equal (LCUI_Rect a, LCUI_Rect b);
-/* ¹¦ÄÜ£ºÅÐ¶ÏÁ½¸ö¾ØÐÎÊÇ·ñÏàµÈ */ 
+/* åŠŸèƒ½ï¼šåˆ¤æ–­ä¸¤ä¸ªçŸ©å½¢æ˜¯å¦ç›¸ç­‰ */ 
 
 int Rect_Valid(LCUI_Rect r);
-/* ¹¦ÄÜ£ºÅÐ¶Ï¾ØÐÎÊÇ·ñÓÐÐ§ */ 
+/* åŠŸèƒ½ï¼šåˆ¤æ–­çŸ©å½¢æ˜¯å¦æœ‰æ•ˆ */ 
 #endif

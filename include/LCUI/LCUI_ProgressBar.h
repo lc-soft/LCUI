@@ -20,22 +20,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_ProgressBar.h -- LCUI �Ľ���������
+ * LCUI_ProgressBar.h -- LCUI 的进度条部件
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 
@@ -44,38 +44,38 @@
 
 typedef struct _LCUI_ProgressBar		LCUI_ProgressBar;
 
-/*************** ������ ********************/
+/*************** 进度条 ********************/
 struct _LCUI_ProgressBar
 {
-	pthread_t thread;	/* �߳� */
-	LCUI_Graph fore_graph;		/* ǰ��ͼ�� */ 
-	LCUI_Graph flash_image;	/* ���ӵ�ͼ�Σ�ʵ�ֽ��������ƶ��ĵ����� */
+	pthread_t thread;	/* 线程 */
+	LCUI_Graph fore_graph;		/* 前景图形 */ 
+	LCUI_Graph flash_image;	/* 附加的图形，实现进度条上移动的的闪光 */
 	
-	LCUI_Widget *fore_pic_box;	/* ǰ��ͼƬ��ͼƬ���� */ 
-	LCUI_Widget *img_pic_box;	/* ����ͼƬ��ͼƬ���� */
+	LCUI_Widget *fore_pic_box;	/* 前景图片的图片盒子 */ 
+	LCUI_Widget *img_pic_box;	/* 闪光图片的图片盒子 */
 	
-	int img_move_speed; /* ��ʾ�������ϵ�������ƶ��ٶȣ���λΪ������/�� */
-	int sleep_time;		/* ָ���������ƶ���������β���󣬵ȴ���ý�����һ���ƶ�����λΪ������ */
-	int max_value;		/* �ܽ��ȵ�ֵ */
-	int value;			/* ��ǰ���ȵ�ֵ */
+	int img_move_speed; /* 表示进度条上的闪光的移动速度，单位为：像素/秒 */
+	int sleep_time;		/* 指定在闪光移动至进度条尾部后，等待多久进行下一次移动，单位为：毫秒 */
+	int max_value;		/* 总进度的值 */
+	int value;			/* 当前进度的值 */
 };
 
 int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height);
-/* ���ܣ����ƽ������Ŀղ� */ 
+/* 功能：绘制进度条的空槽 */ 
 
 LCUI_Widget *Get_ProgressBar_Flash_Img_Widget(LCUI_Widget *widget);
-/* ���ܣ���ȡ������������ͼ�����ڵ�PictureBox���� */ 
+/* 功能：获取进度条上闪光图形所在的PictureBox部件 */ 
 
 void Set_ProgressBar_Max_Value(LCUI_Widget *widget, int max_value);
-/* ���ܣ��趨���������ֵ */ 
+/* 功能：设定进度条最大值 */ 
 
 int Get_ProgressBar_Max_Value(LCUI_Widget *widget);
-/* ���ܣ���ȡ���������ֵ */ 
+/* 功能：获取进度条最大值 */ 
 
 void Set_ProgressBar_Value(LCUI_Widget *widget, int value);
-/* ���ܣ��趨��������ǰֵ */ 
+/* 功能：设定进度条当前值 */ 
 
 int Get_ProgressBar_Value(LCUI_Widget *widget);
-/* ���ܣ���ȡ��������ǰֵ */ 
+/* 功能：获取进度条当前值 */ 
 
 #endif

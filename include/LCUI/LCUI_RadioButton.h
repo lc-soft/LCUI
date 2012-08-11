@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_RadioButton.h -- LCUI��s RadioButton widget
+ * LCUI_RadioButton.h -- LCUI‘s RadioButton widget
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,88 +21,88 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_RadioButton.h -- LCUI �ĵ�ѡ�򲿼�
+ * LCUI_RadioButton.h -- LCUI 的单选框部件
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #ifndef __LCUI_RADIOBTN_H__
 #define __LCUI_RADIOBTN_H__
 typedef struct _LCUI_RadioButton LCUI_RadioButton;
 
-/*********************** ��ѡ�� **************************/
+/*********************** 单选框 **************************/
 struct _LCUI_RadioButton
 {
-	int	on; /* һ����־��ָ���Ƿ�ѡ�� */
-	/* �����ΪCustom_Style(�Զ���)ʱ�������ݰ�ť��״̬ʹ����Щͼ�� */
-	/* δ�򹴵�״̬ */
-	LCUI_Graph		img_off_normal;		/* ��ͨ״̬ */
-	LCUI_Graph		img_off_over;		/* ����긲�� */
-	LCUI_Graph		img_off_down;		/* ����״̬ */
-	LCUI_Graph		img_off_focus;		/* ����״̬ */
-	LCUI_Graph		img_off_disable;	/* �����õ�״̬ */
-	/* ���Ϲ���״̬ */
-	LCUI_Graph		img_on_normal;		/* ��ͨ״̬ */
-	LCUI_Graph		img_on_over;		/* ����긲�� */
-	LCUI_Graph		img_on_down;		/* ����״̬ */
-	LCUI_Graph		img_on_focus;		/* ����״̬ */
-	LCUI_Graph		img_on_disable;		/* �����õ�״̬ */
+	int	on; /* 一个标志，指定是否被选中 */
+	/* 当风格为Custom_Style(自定义)时，将根据按钮的状态使用这些图形 */
+	/* 未打勾的状态 */
+	LCUI_Graph		img_off_normal;		/* 普通状态 */
+	LCUI_Graph		img_off_over;		/* 被鼠标覆盖 */
+	LCUI_Graph		img_off_down;		/* 按下状态 */
+	LCUI_Graph		img_off_focus;		/* 焦点状态 */
+	LCUI_Graph		img_off_disable;	/* 不可用的状态 */
+	/* 打上勾的状态 */
+	LCUI_Graph		img_on_normal;		/* 普通状态 */
+	LCUI_Graph		img_on_over;		/* 被鼠标覆盖 */
+	LCUI_Graph		img_on_down;		/* 按下状态 */
+	LCUI_Graph		img_on_focus;		/* 焦点状态 */
+	LCUI_Graph		img_on_disable;		/* 不可用的状态 */
 	
-	LCUI_Widget	*label;	/* Ƕ�׵��ı���ǩ */
-	LCUI_Widget	*imgbox;/* ������ʾͼ�� */
+	LCUI_Widget	*label;	/* 嵌套的文本标签 */
+	LCUI_Widget	*imgbox;/* 用于显示图形 */
 	
-	LCUI_Queue		*mutex;	/* ��¼����ĵ�ѡ�򲿼���ָ�� */
+	LCUI_Queue		*mutex;	/* 记录互斥的单选框部件的指针 */
 };
 /****************************************************/
 void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b);
-/* ���ܣ�Ϊ������ѡ���������ϵ */
+/* 功能：为两个单选框建立互斥关系 */
 
 void RadioButton_Delete_Mutex(LCUI_Widget *widget);
-/* ���ܣ�����ѡ��ӻ����ϵ�����Ƴ� */
+/* 功能：将单选框从互斥关系链中移除 */
 
 void Set_RadioButton_On(LCUI_Widget *widget);
-/* ���ܣ��趨��ѡ��Ϊѡ��״̬ */ 
+/* 功能：设定单选框为选中状态 */ 
 
 void Set_RadioButton_Off(LCUI_Widget *widget);
-/* ���ܣ��趨��ѡ��Ϊδѡ��״̬ */ 
+/* 功能：设定单选框为未选中状态 */ 
 
 int Get_RadioButton_Status(LCUI_Widget *widget);
-/* ���ܣ���ȡ��ѡ���״̬ */ 
+/* 功能：获取单选框的状态 */ 
 
 int RadioButton_Is_On(LCUI_Widget *widget);
-/* ���ܣ���ⵥѡ���Ƿ�ѡ�� */ 
+/* 功能：检测单选框是否被选中 */ 
 
 int RadioButton_Is_Off(LCUI_Widget *widget);
-/* ���ܣ���ⵥѡ���Ƿ�δѡ�� */ 
+/* 功能：检测单选框是否未选中 */ 
 
 void Switch_RadioButton_Status(LCUI_Widget *widget, void *arg);
 /* 
- * ���ܣ��л���ѡ���״̬
- * ˵�������״̬��ָ���Ǵ���û�򹴵�����״̬
+ * 功能：切换单选框的状态
+ * 说明：这个状态，指的是打勾与没打勾的两种状态
  *  */ 
 
 LCUI_Widget *Get_RadioButton_Label(LCUI_Widget *widget);
-/* ���ܣ���ȡ��ѡ�򲿼��е�label������ָ�� */ 
+/* 功能：获取单选框部件中的label部件的指针 */ 
 
 LCUI_Widget *Get_RadioButton_ImgBox(LCUI_Widget *widget);
-/* ���ܣ���ȡ��ѡ�򲿼��е�PictureBox������ָ�� */
+/* 功能：获取单选框部件中的PictureBox部件的指针 */
 
 void Set_RadioButton_Text(LCUI_Widget *widget, const char *fmt, ...);
-/* ���ܣ��趨�뵥ѡ�򲿼��������ı����� */ 
+/* 功能：设定与单选框部件关联的文本内容 */ 
 
 LCUI_Widget *Create_RadioButton_With_Text(const char *fmt, ...);
-/* ���ܣ�����һ�����ı����ݵĵ�ѡ�� */ 
+/* 功能：创建一个带文本内容的单选框 */ 
 #endif

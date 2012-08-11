@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Resources.h -- LCUI��s Built-in resources, usually are graphics
+ * LCUI_Resources.h -- LCUI‘s Built-in resources, usually are graphics
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,62 +21,62 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Resources.h -- LCUI ��������Դ��ͨ����һЩͼ��
+ * LCUI_Resources.h -- LCUI 的内置资源，通常是一些图形
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 int Load_Graph_Default_Cursor(LCUI_Graph *pic);
-/* ���ܣ�����Ĭ�ϵ����ָ���ͼ�� */ 
+/* 功能：载入默认的鼠标指针的图形 */ 
 
 int Load_Graph_Mosaics(LCUI_Graph *pic);
-/* ���ܣ�����������ͼ�� */ 
+/* 功能：载入马赛克图形 */ 
 
 int Load_Graph_ProgressBar_Img(LCUI_Graph *out);
 
 int Load_Graph_ProgressBar_Fore(LCUI_Graph *out);
 
 int Load_Graph_Icon_Error(LCUI_Graph *pic);
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ������ͼ�� */ 
+/* 功能：载入图形，该图形为“错误”图标 */ 
 
 int Load_Graph_Icon_Help(LCUI_Graph *pic);
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ��������ͼ�� */ 
+/* 功能：载入图形，该图形为“帮助”图标 */ 
 
 int Load_Graph_Icon_Info(LCUI_Graph *pic);
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ����Ϣ��ͼ�� */ 
+/* 功能：载入图形，该图形为“信息”图标 */ 
 
 int Load_Graph_Icon_Warning(LCUI_Graph *pic);
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ�����桱ͼ�� */ 
+/* 功能：载入图形，该图形为“警告”图标 */ 
 
 int Load_Graph_Icon_LCUI(LCUI_Graph *pic);
-/* ���ܣ�����ͼ�Σ���ͼ��ΪLCUI��LOGO */
+/* 功能：载入图形，该图形为LCUI的LOGO */
 
 int Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out);
 
 int Load_Graph_Default_TitleBar_CloseBox_Normal(LCUI_Graph *pic);
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ�������ϵĹرհ�ť����ťΪ����״̬ */ 
+/* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为正常状态 */ 
 
 int Load_Graph_Default_TitleBar_CloseBox_HighLight(LCUI_Graph *pic);
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ�������ϵĹرհ�ť����ťΪ����״̬ */ 
+/* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为高亮状态 */ 
 
 int Load_Graph_Default_TitleBar_CloseBox_Down(LCUI_Graph *pic);
-/* ���ܣ�����ͼ�Σ���ͼ��Ϊ�������ϵĹرհ�ť����ťΪ����״̬ */ 
+/* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为按下状态 */ 
 
 int Load_Graph_Default_TitleBar_BG(LCUI_Graph *pic);
 /*
- * ���ܣ�����Ĭ�ϵı���������ͼ
+ * 功能：载入默认的标题栏背景图
  */
 
 int Load_Graph_Default_CheckBox_Off_Normal(LCUI_Graph *pic);

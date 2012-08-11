@@ -21,76 +21,76 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Label.h -- LCUI µÄÎÄ±¾±êÇ©²¿¼þ
+ * LCUI_Label.h -- LCUI çš„æ–‡æœ¬æ ‡ç­¾éƒ¨ä»¶
  *
- * °æÈ¨ËùÓÐ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±žäºŽ 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼þÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾ÝGPLv2Ðí¿ÉÐ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ðí¿ÉÖ¤µÚ¶þ°æ µÄÓ¢ÎÄËõÐ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌÐøÊ¹ÓÃ¡¢ÐÞ¸Ä»ò·¢²¼±¾ÎÄ¼þ£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öÐí¿ÉÐ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜Žæ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’ŒæŽ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔðÈÎ£¬ÉõÖÁÃ»ÓÐÊÊÏúÐÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒþº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ðí¿ÉÐ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºŽä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼þµÄGPLv2Ðí¿ÉÐ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼þÖÐ£¬Èç¹û
- * Ã»ÓÐ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºŽæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æžœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 #ifndef __LCUI_LABEL_H__
 #define __LCUI_LABEL_H__
 typedef struct _LCUI_Label			LCUI_Label;
-/**************************** lable²¿¼þ ********************************/
+/**************************** lableéƒ¨ä»¶ ********************************/
 struct _LCUI_Label
 {
-	int				auto_size;           /* ×Ô¶¯µ÷Õû´óÐ¡(IS_TURE/IS_FALSE) */
+	int				auto_size;           /* è‡ªåŠ¨è°ƒæ•´å¤§å°(IS_TURE/IS_FALSE) */
 
-	LCUI_Graph		*image;              /* ÔÚ²¿¼þÖÐÏÔÊ¾µÄÍ¼Ïñ */
-	LCUI_Align		image_align;         /* ÏÔÊ¾µÄÍ¼ÏñµÄ¶ÔÆë·½Ê½ */ 
-	LCUI_Font		font;                /* ±£´æ×Å×ÖÌåÐÅÏ¢ */
-	LCUI_String		text;                /* Óë¿Ø¼þ¹ØÁªµÄÎÄ±¾£¬Õâ¸öÊÇÔ­Ê¼×Ö·û´® */
-	LCUI_WString	*contents;           /* ÄÚÈÝ£¬¼ÇÂ¼×ÅÃ¿¸ö×ÖµÄÐÅÏ¢ÒÔ¼°Î»Í¼ */
-	int				rows;                /* ÄÚÈÝµÄÐÐÊý */
-	LCUI_Align		text_align;          /* ÎÄ±¾µÄ¶ÔÆë·½Ê½ */
-};/* ¿ÉÓÃÓÚÏÔÊ¾ÔËÐÐÊ±µÄÐÅÏ¢»òÕßËµÃ÷ÐÔÎÄ×Ö */
+	LCUI_Graph		*image;              /* åœ¨éƒ¨ä»¶ä¸­æ˜¾ç¤ºçš„å›¾åƒ */
+	LCUI_Align		image_align;         /* æ˜¾ç¤ºçš„å›¾åƒçš„å¯¹é½æ–¹å¼ */ 
+	LCUI_Font		font;                /* ä¿å­˜ç€å­—ä½“ä¿¡æ¯ */
+	LCUI_String	text;                /* ä¸ŽæŽ§ä»¶å…³è”çš„æ–‡æœ¬ï¼Œè¿™ä¸ªæ˜¯åŽŸå§‹å­—ç¬¦ä¸² */
+	LCUI_WString	*contents;           /* å†…å®¹ï¼Œè®°å½•ç€æ¯ä¸ªå­—çš„ä¿¡æ¯ä»¥åŠä½å›¾ */
+	int				rows;                /* å†…å®¹çš„è¡Œæ•° */
+	LCUI_Align		text_align;          /* æ–‡æœ¬çš„å¯¹é½æ–¹å¼ */
+};/* å¯ç”¨äºŽæ˜¾ç¤ºè¿è¡Œæ—¶çš„ä¿¡æ¯æˆ–è€…è¯´æ˜Žæ€§æ–‡å­— */
 /******************************* END ************************************/
 
 void Set_Label_Image(LCUI_Widget *widget, LCUI_Graph *img, LCUI_Align align);
 /* 
- * ¹¦ÄÜ£ºÉèÖÃlabel²¿¼þµÄ±³¾°Í¼Ïñ
- * ²ÎÊýËµÃ÷£º
- * widget £ºÐèÒª½øÐÐ²Ù×÷µÄ²¿¼þ
- * img    £ºÐèÒªÉèÎª±³¾°Í¼µÄÍ¼ÏñÊý¾Ý
- * align  £º±³¾°Í¼ÏñµÄ²¼¾Ö
+ * åŠŸèƒ½ï¼šè®¾ç½®labeléƒ¨ä»¶çš„èƒŒæ™¯å›¾åƒ
+ * å‚æ•°è¯´æ˜Žï¼š
+ * widget ï¼šéœ€è¦è¿›è¡Œæ“ä½œçš„éƒ¨ä»¶
+ * img    ï¼šéœ€è¦è®¾ä¸ºèƒŒæ™¯å›¾çš„å›¾åƒæ•°æ®
+ * align  ï¼šèƒŒæ™¯å›¾åƒçš„å¸ƒå±€
  * */
 
 int Get_Label_Row_Len(LCUI_Widget *widget, int row);
 /*
- * ¹¦ÄÜ£º»ñÈ¡label²¿¼þÖÐÖ¸¶¨ÐÐµÄ×Ö·û´®³¤¶È
- * ²ÎÊýËµÃ÷£º
- * widget £ºÐèÒª½øÐÐ²Ù×÷µÄ²¿¼þ
- * row   : µÚ¼¸ÐÐ
- * ·µ»ØÖµ£ºÊ§°ÜÔò·µ»Ø-2£¬³É¹¦·µ»Ø³¤¶È£¬ÀàÐÍ²»·û·µ»Ø-1
+ * åŠŸèƒ½ï¼šèŽ·å–labeléƒ¨ä»¶ä¸­æŒ‡å®šè¡Œçš„å­—ç¬¦ä¸²é•¿åº¦
+ * å‚æ•°è¯´æ˜Žï¼š
+ * widget ï¼šéœ€è¦è¿›è¡Œæ“ä½œçš„éƒ¨ä»¶
+ * row   : ç¬¬å‡ è¡Œ
+ * è¿”å›žå€¼ï¼šå¤±è´¥åˆ™è¿”å›ž-2ï¼ŒæˆåŠŸè¿”å›žé•¿åº¦ï¼Œç±»åž‹ä¸ç¬¦è¿”å›ž-1
  * */ 
 
 void Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...);
-/* ¹¦ÄÜ£ºÉè¶¨Óë±êÇ©¹ØÁªµÄÎÄ±¾ÄÚÈÝ */
+/* åŠŸèƒ½ï¼šè®¾å®šä¸Žæ ‡ç­¾å…³è”çš„æ–‡æœ¬å†…å®¹ */
 
 int Set_Label_Font(LCUI_Widget *widget, int font_size, char *font_file);
 /*
- * ¹¦ÄÜ£ºÎª±êÇ©ÎÄ×ÖÉè¶¨×ÖÌå´óÐ¡¡¢×ÖÌåÀàÐÍ¡¢×ÖÌåÑÕÉ«
- * ²ÎÊýËµÃ÷£º
- * widget    £ºÐèÒª½øÐÐ²Ù×÷µÄ²¿¼þ
- * font_file £º×ÖÌåÎÄ¼þµÄÎ»ÖÃ£¬×îºÃÎª¾ø¶ÔÂ·¾¶
- * color     £º×ÖÌåµÄÅäÉ«£¬Ò²¾ÍÊÇ×îÖÕÏÔÊ¾µÄÑÕÉ«
+ * åŠŸèƒ½ï¼šä¸ºæ ‡ç­¾æ–‡å­—è®¾å®šå­—ä½“å¤§å°ã€å­—ä½“ç±»åž‹ã€å­—ä½“é¢œè‰²
+ * å‚æ•°è¯´æ˜Žï¼š
+ * widget    ï¼šéœ€è¦è¿›è¡Œæ“ä½œçš„éƒ¨ä»¶
+ * font_file ï¼šå­—ä½“æ–‡ä»¶çš„ä½ç½®ï¼Œæœ€å¥½ä¸ºç»å¯¹è·¯å¾„
+ * color     ï¼šå­—ä½“çš„é…è‰²ï¼Œä¹Ÿå°±æ˜¯æœ€ç»ˆæ˜¾ç¤ºçš„é¢œè‰²
  * */ 
 
 void Set_Label_Font_Default_Color(LCUI_Widget *widget, LCUI_RGB color);
 /*
- * ¹¦ÄÜ£ºÉèÖÃlabel²¿¼þ¹ØÁªµÄÎÄ±¾µÄ×ÖÌåÑÕÉ«£¬×ÖÌåÑÕÉ«ÎªRGBÈýÉ«µÄ»ìºÏÉ«
- * ²ÎÊýËµÃ÷£º
- * label £ºÐèÒª½øÐÐ²Ù×÷µÄlabel²¿¼þ
- * color : ÅäÉ«
+ * åŠŸèƒ½ï¼šè®¾ç½®labeléƒ¨ä»¶å…³è”çš„æ–‡æœ¬çš„å­—ä½“é¢œè‰²ï¼Œå­—ä½“é¢œè‰²ä¸ºRGBä¸‰è‰²çš„æ··åˆè‰²
+ * å‚æ•°è¯´æ˜Žï¼š
+ * label ï¼šéœ€è¦è¿›è¡Œæ“ä½œçš„labeléƒ¨ä»¶
+ * color : é…è‰²
  * */ 
 #endif
