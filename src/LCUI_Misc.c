@@ -339,7 +339,7 @@ int Size_Cmp(LCUI_Size a, LCUI_Size b)
 	else 
 		return -1;
 }
-extern int debug_mark;
+//extern int debug_mark;
 int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new, 
 						LCUI_Queue *rq	)
 /*
@@ -461,8 +461,8 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 	  
 	for(i=0; i<5; i++) 
 	{ 
-		if(debug_mark)
-			printf("slip rect[%d]: %d,%d, %d,%d\n", i, r[i].x, r[i].y, r[i].width, r[i].height);
+		//if(debug_mark)
+		//	printf("slip rect[%d]: %d,%d, %d,%d\n", i, r[i].x, r[i].y, r[i].width, r[i].height);
 		Queue_Add(rq, &r[i]); 
 	}
 	return 0;
