@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Font.c -- ×ÖÌå´¦Àí
+ * LCUI_Font.c -- å­—ä½“å¤„ç†
  *
- * °æÈ¨ËùÓĞ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±äº 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼şÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾İGPLv2Ğí¿ÉĞ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ğí¿ÉÖ¤µÚ¶ş°æ µÄÓ¢ÎÄËõĞ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌĞøÊ¹ÓÃ¡¢ĞŞ¸Ä»ò·¢²¼±¾ÎÄ¼ş£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öĞí¿ÉĞ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜æ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’Œæ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔğÈÎ£¬ÉõÖÁÃ»ÓĞÊÊÏúĞÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒşº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ğí¿ÉĞ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼şµÄGPLv2Ğí¿ÉĞ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼şÖĞ£¬Èç¹û
- * Ã»ÓĞ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
  
 #include <LCUI_Build.h>
@@ -51,7 +51,7 @@
 #include FT_GLYPH_H
 
 #define FONTDATAMAX 2048
-/* ÒÔÏÂÊÇÈ±Ê¡Ê±Ê¹ÓÃµÄ×ÖÌåÎ»Í¼ */
+/* ä»¥ä¸‹æ˜¯ç¼ºçœæ—¶ä½¿ç”¨çš„å­—ä½“ä½å›¾ */
 static unsigned char fontdata_8x8[FONTDATAMAX] = {
 
 	/* 0 0x00 '^@' */
@@ -2618,15 +2618,15 @@ static unsigned char fontdata_8x8[FONTDATAMAX] = {
 
 
 void Get_Default_Font_Bitmap(unsigned short code, LCUI_Bitmap *out_bitmap)
-/* ¹¦ÄÜ£º¸ù¾İ×Ö·û±àÂë£¬»ñÈ¡ÏµÍ³×Ô´øµÄ×ÖÌåÎ»Í¼ */
+/* åŠŸèƒ½ï¼šæ ¹æ®å­—ç¬¦ç¼–ç ï¼Œè·å–ç³»ç»Ÿè‡ªå¸¦çš„å­—ä½“ä½å›¾ */
 {
 	int i,j, start;
-	Malloc_Bitmap(out_bitmap, 9, 9);/* ÎªÎ»Í¼·ÖÅäÄÚ´æ£¬9x9µÄ³ß´ç */
+	Malloc_Bitmap(out_bitmap, 9, 9);/* ä¸ºä½å›¾åˆ†é…å†…å­˜ï¼Œ9x9çš„å°ºå¯¸ */
 	if(code < 256)
 	{
 		start = code * 8;
 		for (i=start;i<start+8;++i)
-		for (j=0;j<8;++j)/* ½«ÊıÖµ×ª»»³ÉÒ»ĞĞÎ»Í¼ */
+		for (j=0;j<8;++j)/* å°†æ•°å€¼è½¬æ¢æˆä¸€è¡Œä½å›¾ */
 			out_bitmap->data[i-start][7-j] = (fontdata_8x8[i]&(1<<j))?255:0;  
 	}
 	else
@@ -2648,8 +2648,8 @@ void Get_Default_Font_Bitmap(unsigned short code, LCUI_Bitmap *out_bitmap)
 }
 
 
-
-/* ´úÂë×ª»»:´ÓÒ»ÖÖ±àÂë×ªÎªÁíÒ»ÖÖ±àÂë£¬Ö÷ÒªÊÇµ÷ÓÃiconvµÄAPIÊµÏÖ×Ö·û±àÂë×ª»» */
+/************************ char code convert ***************************/
+/* ä»£ç è½¬æ¢:ä»ä¸€ç§ç¼–ç è½¬ä¸ºå¦ä¸€ç§ç¼–ç ï¼Œä¸»è¦æ˜¯è°ƒç”¨iconvçš„APIå®ç°å­—ç¬¦ç¼–ç è½¬æ¢ */
 static int code_convert(
 			char *src_charset,			char *des_charset, 
 			const char *inbuf,			unsigned int inlen,
@@ -2672,52 +2672,157 @@ static int code_convert(
 	return 0;
 }
 
-/* GB2312Âë×ªÎªutf-8Âë */
-int GB2312_To_UTF8(
-		const char *inbuf,
-		unsigned int inlen,
-		unsigned char *outbuf,
-		unsigned int outlen
-	)
+static int Get_EncodingType()
 {
-	return code_convert("gb2312","utf-8",inbuf,inlen,outbuf,outlen);
+	LCUI_App *app;
+	app = Get_Self_AppPointer();
+	if(app == NULL) return -1;
+	return app->encoding_type;
 }
 
-unsigned short Get_Unicode(char *in_gb2312)
+static int Set_EncodingType(int type)
 {
-	unsigned char out[256];
-	unsigned int length_gb2312;
+	LCUI_App *app;
+	app = Get_Self_AppPointer();
+	if(app == NULL) return -1;
+	app->encoding_type = type;
+	return 0;
+}
 
-	/* gb2312Âë×ªÎªutf8Âë */
-	length_gb2312 = strlen(in_gb2312);
-	GB2312_To_UTF8(in_gb2312,length_gb2312,out,256);
+int Using_GB2312()
+/* 
+ * è¯´æ˜ï¼šå¦‚æœä½ çš„ç³»ç»Ÿåªèƒ½ä½¿ç”¨GB2312ç¼–ç ï¼Œä¸èƒ½ä½¿ç”¨UTF-8ç¼–ç ï¼Œå¯ä»¥ä½¿ç”¨è¿™
+ * ä¸ªå‡½æ•°è¿›è¡Œè®¾ç½®ï¼Œè®©ç›¸å…³å‡½æ•°æ­£å¸¸è½¬æ¢å­—ç¬¦ç¼–ç  
+ * */
+{
+	Set_EncodingType(ENCODEING_TYPE_GB2312);
+}
 
-	/* utf8×ªunicodeÂë */
-	unsigned short unicode;
-	unicode = out[0];
+#define MAX_SAVE_NUM   20
+static wchar_t covernt_code(unsigned char in[MAX_SAVE_NUM])
+{
+ 	wchar_t unicode;
+ 	unicode = in[0];
 	if (unicode >= 0xF0) {
-		unicode = (unsigned short) (out[0] & 0x07) << 18;
-		unicode |= (unsigned short) (out[1] & 0x3F) << 12;
-		unicode |= (unsigned short) (out[2] & 0x3F) << 6;
-		unicode |= (unsigned short) (out[3] & 0x3F);
+		unicode = (wchar_t) (in[0] & 0x07) << 18;
+		unicode |= (wchar_t) (in[1] & 0x3F) << 12;
+		unicode |= (wchar_t) (in[2] & 0x3F) << 6;
+		unicode |= (wchar_t) (in[3] & 0x3F);
 	} else if (unicode >= 0xE0) {
-		unicode = (unsigned short) (out[0] & 0x0F) << 12;
-		unicode |= (unsigned short) (out[1] & 0x3F) << 6;
-		unicode |= (unsigned short) (out[2] & 0x3F);
+		unicode = (wchar_t) (in[0] & 0x0F) << 12;
+		unicode |= (wchar_t) (in[1] & 0x3F) << 6;
+		unicode |= (wchar_t) (in[2] & 0x3F);
 	} else if (unicode >= 0xC0) {
-		unicode = (unsigned short) (out[0] & 0x1F) << 6;
-		unicode |= (unsigned short) (out[1] & 0x3F);
+		unicode = (wchar_t) (in[0] & 0x1F) << 6;
+		unicode |= (wchar_t) (in[1] & 0x3F);
 	}
-	return unicode; 
+	return unicode;
 }
 
-/* Ä¬ÈÏµÄ×ÖÌåÎÄ¼şÂ·¾¶ */
+static int utf8_to_unicode(char *in_utf8_str, wchar_t **out_unicode)
+/* åŠŸèƒ½ï¼šå°†GB2312ç¼–ç çš„å­—ç¬¦ä¸²è½¬æ¢æˆUnicodeç¼–ç å­—ç¬¦ä¸² */
+{
+	wchar_t *buff;
+	unsigned char *p, t, save[MAX_SAVE_NUM];
+	unsigned int len, i, j, n, count;
+ 	
+	len = strlen(in_utf8_str)+1;  
+	buff = (wchar_t *)calloc(sizeof(wchar_t), len); 
+	
+	for(count=0,i=0,j=0; i<len; ++i)
+	{
+		t = in_utf8_str[i];
+		/* ç»“æŸç¬¦çš„åˆ¤æ–­ */
+		if(t == 0) break;
+			
+		if((t>>7) == 0)
+		{// 0xxxxxxx
+			buff[j] = t; 
+			++j;
+		}
+		else if((t>>5) == 6) // 110xxxxx 
+			count = 2; 
+		else if((t>>4) == 14) // 1110xxxx 
+			count = 3; 
+		else if((t>>3) == 30) // 11110xxx 
+			count = 4; 
+		else if((t>>2) == 62) // 111110xx 
+			count = 5; 
+		else if((t>>1) == 126) // 1111110x 
+			count = 6; 
+		
+		if(count > 0)
+		{
+			p = (unsigned char*)&in_utf8_str[i];
+			for(n=0; n<count; ++n) 
+				save[n] = *p++;
+				
+			count = 0; 
+			buff[j] = covernt_code(save);
+			memset(save, 0, sizeof(save));
+			++j;
+		}
+	}
+	/****
+	printf("result code:");
+	for(i=0; i<j; ++i)
+		printf("%02x ", buff[i]);
+	printf("\n");
+	* *****/
+	*out_unicode = buff;
+	return j;
+}
+
+static int gb2312_to_unicode(char *in_gb2312_str, wchar_t **out_unicode)
+/* åŠŸèƒ½ï¼šå°†GB2312ç¼–ç çš„å­—ç¬¦ä¸²è½¬æ¢æˆUnicodeç¼–ç å­—ç¬¦ä¸² */
+{
+	char *buff;
+	unsigned char *p;
+	unsigned int len, new_len;
+ 
+	len = strlen(in_gb2312_str);
+	new_len = len*3;
+	buff = (char *)calloc(sizeof(char), new_len);
+	p = (unsigned char*)buff;
+	if(code_convert("gb2312", "utf8", in_gb2312_str, len, p, new_len))
+	{
+		printf("gb2312_to_unicode(): error: "ERROR_CONVERT_ERROR);
+		return -1;
+	}
+	len = utf8_to_unicode(buff, out_unicode);
+	free(buff);
+	return len;
+}
+
+int Char_To_Wchar_T(char *in_text, wchar_t **unicode_text)
+/*
+ * åŠŸèƒ½ï¼šå°†charå‹å­—ç¬¦ä¸²è½¬æ¢æˆwchar_tå­—ç¬¦ä¸²
+ * å‚æ•°è¯´æ˜ï¼š
+ * in_text      ï¼šä¼ å…¥çš„charå‹å­—ç¬¦ä¸²
+ * unicode_text ï¼šè¾“å‡ºçš„wchar_tå‹å­—ç¬¦ä¸²
+ * è¿”å›å€¼ï¼šæ­£å¸¸åˆ™wchar_tå‹å­—ç¬¦ä¸²çš„é•¿åº¦ï¼Œå¦åˆ™è¿”å›-1
+ * */
+{
+	switch(Get_EncodingType())
+	{
+		case ENCODEING_TYPE_GB2312:
+		return gb2312_to_unicode(in_text, unicode_text); 
+		case ENCODEING_TYPE_UTF8:
+		default: 
+		return utf8_to_unicode(in_text, unicode_text); 
+	}
+}
+
+/********************** end char code convert *************************/
+
+
+/* é»˜è®¤çš„å­—ä½“æ–‡ä»¶è·¯å¾„ */
 static char default_font[1024] = LCUI_DEFAULT_FONTFILE;
 
 void Set_Default_Font(char *fontfile)
 /* 
- * ¹¦ÄÜ£ºÉè¶¨Ä¬ÈÏµÄ×ÖÌåÎÄ¼şÂ·¾¶
- * ËµÃ÷£ºĞèÒªÔÚLCUI³õÊ¼»¯Ç°Ê¹ÓÃ£¬ÒòÎªLCUI³õÊ¼»¯Ê±»á´ò¿ªÄ¬ÈÏµÄ×ÖÌåÎÄ¼ş
+ * åŠŸèƒ½ï¼šè®¾å®šé»˜è®¤çš„å­—ä½“æ–‡ä»¶è·¯å¾„
+ * è¯´æ˜ï¼šéœ€è¦åœ¨LCUIåˆå§‹åŒ–å‰ä½¿ç”¨ï¼Œå› ä¸ºLCUIåˆå§‹åŒ–æ—¶ä¼šæ‰“å¼€é»˜è®¤çš„å­—ä½“æ–‡ä»¶
  *  */
 {
 	if(fontfile == NULL)
@@ -2728,11 +2833,11 @@ void Set_Default_Font(char *fontfile)
 
 void LCUI_Font_Init(LCUI_Font *font)
 /* 
- * ¹¦ÄÜ£º³õÊ¼»¯LCUIµÄFont½á¹¹ÌåÊı¾İ 
- * ËµÃ÷£º±¾º¯ÊıÔÚLCUI³õÊ¼»¯Ê±µ÷ÓÃ£¬LCUI_Font½á¹¹ÌåÖĞ¼ÇÂ¼×Å×ÖÌåÏà¹ØµÄÊı¾İ
+ * åŠŸèƒ½ï¼šåˆå§‹åŒ–LCUIçš„Fontç»“æ„ä½“æ•°æ® 
+ * è¯´æ˜ï¼šæœ¬å‡½æ•°åœ¨LCUIåˆå§‹åŒ–æ—¶è°ƒç”¨ï¼ŒLCUI_Fontç»“æ„ä½“ä¸­è®°å½•ç€å­—ä½“ç›¸å…³çš„æ•°æ®
  * */
 { 
-	printf("loading fontfile...\n");/* ÎŞ»º³å´òÓ¡ÄÚÈİ */
+	printf("loading fontfile...\n");/* æ— ç¼“å†²æ‰“å°å†…å®¹ */
 	font->type = DEFAULT;
 	font->size = 12;
 	font->fore_color.red = 0;
@@ -2744,21 +2849,21 @@ void LCUI_Font_Init(LCUI_Font *font)
 	font->space = 1;
 	font->linegap = 0;
 	font->status = KILLED;
-	font->load_flags = FT_LOAD_NO_BITMAP | FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH;;//FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT;
+	font->load_flags = FT_LOAD_NO_BITMAP | FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH;//FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT;
 	font->render_mode = FT_RENDER_MODE_MONO;
 	font->ft_lib = NULL;
 	font->ft_face = NULL;
-	/* ´ò¿ªÄ¬ÈÏ×ÖÌåÎÄ¼ş */
+	/* æ‰“å¼€é»˜è®¤å­—ä½“æ–‡ä»¶ */
 	Open_Fontfile(&LCUI_Sys.default_font, default_font); 
 }
 
 void Font_Init(LCUI_Font *in)
 /* 
- * ¹¦ÄÜ£º³õÊ¼»¯Font½á¹¹ÌåÊı¾İ
- * ËµÃ÷£ºÄ¬ÈÏÊÇ¼Ì³ĞÏµÍ³µÄ×ÖÌåÊı¾İ
+ * åŠŸèƒ½ï¼šåˆå§‹åŒ–Fontç»“æ„ä½“æ•°æ®
+ * è¯´æ˜ï¼šé»˜è®¤æ˜¯ç»§æ‰¿ç³»ç»Ÿçš„å­—ä½“æ•°æ®
  *  */
 {
-	in->type = DEFAULT;   /* ×ÖÌåÀàĞÍÎªLCUIÄ¬ÈÏµÄ */
+	in->type = DEFAULT;   /* å­—ä½“ç±»å‹ä¸ºLCUIé»˜è®¤çš„ */
 	in->size = 12;
 	in->fore_color.red = 0;
 	in->fore_color.green = 0;
@@ -2790,7 +2895,7 @@ void Font_Init(LCUI_Font *in)
 
 
 int Show_Font_Bitmap(LCUI_Bitmap *in_fonts)
-/* ¹¦ÄÜ£ºÔÚÆÁÄ»´òÓ¡ÒÔ0ºÍ1±íÊ¾×ÖÌåÎ»Í¼ */
+/* åŠŸèƒ½ï¼šåœ¨å±å¹•æ‰“å°ä»¥0å’Œ1è¡¨ç¤ºå­—ä½“ä½å›¾ */
 {
 	int x,y;
 	for(y = 0;y < in_fonts->height; ++y){
@@ -2807,49 +2912,49 @@ int Show_Font_Bitmap(LCUI_Bitmap *in_fonts)
 
 
 int Mix_Fonts_Bitmap(
-		LCUI_Graph		*back_graph,  /* ±³¾°Í¼ĞÎ */
+		LCUI_Graph		*back_graph,  /* èƒŒæ™¯å›¾å½¢ */
 		int				start_x,
 		int				start_y,
-		LCUI_Bitmap	*in_fonts,  /* ´«ÈëµÄ×ÖÌåÎ»Í¼Êı¾İ */
-		LCUI_RGB		color,       /* ×ÖÌåµÄÅäÉ« */ 
+		LCUI_Bitmap	*in_fonts,  /* ä¼ å…¥çš„å­—ä½“ä½å›¾æ•°æ® */
+		LCUI_RGB		color,       /* å­—ä½“çš„é…è‰² */ 
 		int				flag
 )
-/* ¹¦ÄÜ£º½«×ÖÌåÎ»Í¼Êı¾İÓë±³¾°Í¼ĞÎ»ìºÏ */
+/* åŠŸèƒ½ï¼šå°†å­—ä½“ä½å›¾æ•°æ®ä¸èƒŒæ™¯å›¾å½¢æ··åˆ */
 {
 	if(!Valid_Graph(back_graph)) return -1;
 	if(!Valid_Bitmap(in_fonts)) return -1;
 	int x = 0;
 	int y = 0;
-	int end_x,end_y;//ÓÒÏÂ½ÇµÄ×ø±ê
+	int end_x,end_y;//å³ä¸‹è§’çš„åæ ‡
 	int count = 0, m;
 	int box_width, box_height, width, height;
 	unsigned char j;
 	float k;
-	LCUI_Rect read, write;/* ÓÃÓÚ¼ÇÂ¼ÇøÓòµÄ·¶Î§µÄÊı¾İ */
+	LCUI_Rect read, write;/* ç”¨äºè®°å½•åŒºåŸŸçš„èŒƒå›´çš„æ•°æ® */
 	Rect_Init(&read);
 	Rect_Init(&write);
 	
-	/* ±£´æÍ¼Æ¬µÄ³ß´ç */
+	/* ä¿å­˜å›¾ç‰‡çš„å°ºå¯¸ */
 	width = in_fonts->width;
 	height = in_fonts->height;
 	read.width = width;
 	read.height = height;
-	/* »ñÈ¡±³¾°µÄÇøÓòµÄ³ß´ç */
+	/* è·å–èƒŒæ™¯çš„åŒºåŸŸçš„å°ºå¯¸ */
 	box_width = back_graph->width;
 	box_height = back_graph->height;
-	/* µÃµ½Í¼ÏñÓÒÏÂ½ÇµãµÄ×ø±ê */
+	/* å¾—åˆ°å›¾åƒå³ä¸‹è§’ç‚¹çš„åæ ‡ */
 	end_x = start_x + width;
 	end_y = start_y + height;
 
-	/* Èç¹ûÍ¼Æ¬³ß´ç³¬³ö´°¿ÚÏŞ¶¨µÄ³ß´ç£¬¸ü¸ÄÍ¼Æ¬ÏÔÊ¾µÄÇøÓò */
+	/* å¦‚æœå›¾ç‰‡å°ºå¯¸è¶…å‡ºçª—å£é™å®šçš„å°ºå¯¸ï¼Œæ›´æ”¹å›¾ç‰‡æ˜¾ç¤ºçš„åŒºåŸŸ */
 	if(start_x < 0)
-	{/* Èç¹ûÆğµãÔÚxÖáµÄ×ø±êĞ¡ÓÚ0 */
-		read.x = 0 - start_x; /* ¸Ä±ä¶ÁÈ¡µÄÇøÓòµÄÆğµãÔÚxÖáµÄ×ø±ê */
+	{/* å¦‚æœèµ·ç‚¹åœ¨xè½´çš„åæ ‡å°äº0 */
+		read.x = 0 - start_x; /* æ”¹å˜è¯»å–çš„åŒºåŸŸçš„èµ·ç‚¹åœ¨xè½´çš„åæ ‡ */
 		read.width = read.width - read.x;
 		start_x = 0;
 	}
 	if(end_x > box_width)
-	{/* Èç¹û³¬¹ı¿ÉÏÔÊ¾ÇøÓò */
+	{/* å¦‚æœè¶…è¿‡å¯æ˜¾ç¤ºåŒºåŸŸ */
 		read.width = read.width - (end_x - box_width);
 		end_x = box_width;
 	}
@@ -2866,10 +2971,10 @@ int Mix_Fonts_Bitmap(
 	}
 	
 	k = in_fonts->alpha / 255.0;
-	/* »ñÈ¡Êı¾İÊä³öµ½±³¾°µÄÇøÓò·¶Î§ */
+	/* è·å–æ•°æ®è¾“å‡ºåˆ°èƒŒæ™¯çš„åŒºåŸŸèŒƒå›´ */
 	write.x = start_x;
 	write.y = start_y;
-	/* ¿ªÊ¼¶ÁÈ¡Í¼Æ¬ÖĞµÄÍ¼ĞÎÊı×é²¢Ğ´Èë´°¿Ú */
+	/* å¼€å§‹è¯»å–å›¾ç‰‡ä¸­çš„å›¾å½¢æ•°ç»„å¹¶å†™å…¥çª—å£ */
 	switch(flag)
 	{
 		case GRAPH_MIX_FLAG_OVERLAY:
@@ -2878,7 +2983,7 @@ int Mix_Fonts_Bitmap(
 				m = (write.y + y) * back_graph->width + write.x; 
 				for (x = 0; x < read.width; ++x) 
 				{
-					count = m + x;/* ¼ÆËãĞèÌî³äÖÁ´°¿ÚµÄ¸÷µãµÄ×ø±ê */
+					count = m + x;/* è®¡ç®—éœ€å¡«å……è‡³çª—å£çš„å„ç‚¹çš„åæ ‡ */
 					j = in_fonts->data[read.y + y][read.x + x] * k;
 					back_graph->rgba[0][count] = (color.red * j + back_graph->rgba[0][count] * (255 - j)) /255;
 					back_graph->rgba[1][count] = (color.green * j + back_graph->rgba[1][count] * (255 - j)) /255;
@@ -2892,7 +2997,7 @@ int Mix_Fonts_Bitmap(
 				m = (write.y + y) * back_graph->width + write.x; 
 				for (x = 0; x < read.width; ++x) 
 				{
-					count = m + x;/* ¼ÆËãĞèÌî³äÖÁ´°¿ÚµÄ¸÷µãµÄ×ø±ê */
+					count = m + x;/* è®¡ç®—éœ€å¡«å……è‡³çª—å£çš„å„ç‚¹çš„åæ ‡ */
 					j = in_fonts->data[read.y + y][read.x + x] * k;
 					if(j != 0)
 					{
@@ -2910,45 +3015,6 @@ int Mix_Fonts_Bitmap(
 }
 
 
-int Char_To_Wchar_T(char *in_text, wchar_t **unicode_text)
-/*
- * ¹¦ÄÜ£º½«charĞÍ×Ö·û´®×ª»»³Éwchar_t×Ö·û´®
- * ²ÎÊıËµÃ÷£º
- * in_text      £º´«ÈëµÄcharĞÍ×Ö·û´®
- * unicode_text £ºÊä³öµÄwchar_tĞÍ×Ö·û´®
- * ·µ»ØÖµ£ºÕı³£Ôòwchar_tĞÍ×Ö·û´®µÄ³¤¶È£¬·ñÔò·µ»Ø-1
- * */
-{
-	int i, j,len;
-	char ch[256];
-	wchar_t  *temp_str = NULL;
-	/* ÉêÇëÄÚ´æ */
-	j = 0;
-	len = strlen(in_text);
-	temp_str = (wchar_t*)calloc(((len+1)*2), sizeof(wchar_t));
-	if(temp_str == NULL) return -1; 
-	
-	for(i = 0; i < len; ++i)
-	{
-		memset(ch, 0, sizeof(ch));  /* ËùÓĞÔªËØÖÃÁã */
-		ch[0] = in_text[i];  /* »ñÈ¡in_textÖĞµÄµÚi¸öÔªËØ */
-		if(ch[0] < 0) 
-		{ 
-			/* GB2312±àÂëµÄºº×Ö£¬Ã¿byteÊÇ¸ºÊı£¬Òò´Ë£¬¿ÉÒÔÓÃÀ´ÅĞ¶ÏÊÇ·ñÓĞºº×Ö */
-			if(i < strlen(in_text) - 1)
-			{/* Èç¹ûÃ»ÓĞµ½×Ö·û´®Ä©Î² */
-				ch[1] = in_text[i + 1];
-				++i;
-			}
-			else break;
-		}
-		temp_str[j] = Get_Unicode(ch);  /* ×ª»»±àÂë */
-		++j;
-	}
-	*unicode_text = temp_str;
-	return j; /* ¼ÇÂ¼×Ö·ûµÄÊıÁ¿ */
-}
-
 typedef struct
 {
 	LCUI_RGB *color;
@@ -2957,14 +3023,14 @@ typedef struct
 LCUI_color_array;
 
 static void color_array_init(LCUI_color_array *in)
-/* ¹¦ÄÜ£º³õÊ¼»¯½á¹¹Ìå */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–ç»“æ„ä½“ */
 {
 	in->color = NULL;
 	in->total_num = 0;
 }
 
 static void add_color(LCUI_color_array *in, LCUI_RGB color)
-/* ¹¦ÄÜ£º½«ÑÕÉ«Êı¾İ×·¼ÓÖÁÑÕÉ«Êı×éÄ©Î² */
+/* åŠŸèƒ½ï¼šå°†é¢œè‰²æ•°æ®è¿½åŠ è‡³é¢œè‰²æ•°ç»„æœ«å°¾ */
 {
 	in->total_num += 1;
 	if(in->total_num > 1) 
@@ -2975,13 +3041,13 @@ static void add_color(LCUI_color_array *in, LCUI_RGB color)
 }
 
 static void delete_color(LCUI_color_array *in)
-/* ¹¦ÄÜ£º´ÓÑÕÉ«Êı×éÖĞÉ¾³ı×îºóÒ»¸öÑÕÉ«Êı¾İ */
+/* åŠŸèƒ½ï¼šä»é¢œè‰²æ•°ç»„ä¸­åˆ é™¤æœ€åä¸€ä¸ªé¢œè‰²æ•°æ® */
 { 
 	if(in->total_num > 1)
 	{
-		/* ¼õÉÙ³ÉÔ±×ÜÊı */
+		/* å‡å°‘æˆå‘˜æ€»æ•° */
 		--in->total_num;
-		/* ËõĞ¡Êı¾İÕ¼ÓÃµÄÄÚ´æ¿Õ¼ä */
+		/* ç¼©å°æ•°æ®å ç”¨çš„å†…å­˜ç©ºé—´ */
 		in->color = (LCUI_RGB *)realloc(in->color, in->total_num * sizeof(LCUI_RGB));
 	}
 	else if(in->total_num == 1)
@@ -2993,7 +3059,7 @@ static void delete_color(LCUI_color_array *in)
 }
 
 static int get_color(LCUI_color_array *in, LCUI_RGB *out)
-/* ¹¦ÄÜ£º»ñÈ¡ÑÕÉ«Êı×éÄ©Î²µÄÑÕÉ«Êı¾İ */
+/* åŠŸèƒ½ï¼šè·å–é¢œè‰²æ•°ç»„æœ«å°¾çš„é¢œè‰²æ•°æ® */
 {
 	if(in->total_num > 0)
 	{
@@ -3004,9 +3070,11 @@ static int get_color(LCUI_color_array *in, LCUI_RGB *out)
 }
 
 static int wstrcmp(wchar_t *str1, int num, char *str2)
-/* ¹¦ÄÜ£º´Óstr1ÖĞÇ°num¸öÔªËØÅĞ¶ÏÊÇ·ñÓëstr2ÖĞµÄÄÚÈİÈ«µÈ */
+/* åŠŸèƒ½ï¼šä»str1ä¸­å‰numä¸ªå…ƒç´ åˆ¤æ–­æ˜¯å¦ä¸str2ä¸­çš„å†…å®¹å…¨ç­‰ */
 {
 	int i;
+	if(str1 == NULL)
+		return -1;
 	for(i=0; i<num; ++i)
 	{
 		if(str1[i] != str2[i]) 
@@ -3016,11 +3084,11 @@ static int wstrcmp(wchar_t *str1, int num, char *str2)
 }
 
 static int cut_wstr_convert_to_color(wchar_t *str1, char mark_char, LCUI_RGB *color)
-/* ËµÃ÷£º´Óstr1ÖĞ¿ªÍ·´¦Æğ£¬µ½µÚÒ»¸öÓëmark_charÏàÍ¬µÄ×Ö·ûÎªÖ¹£¬½ØÈ¡Õâ¶Î×Ö·û´®£¬²¢·µ»Ø½ØÖ¹´¦µÄÎ»ÖÃ */
+/* è¯´æ˜ï¼šä»str1ä¸­å¼€å¤´å¤„èµ·ï¼Œåˆ°ç¬¬ä¸€ä¸ªä¸mark_charç›¸åŒçš„å­—ç¬¦ä¸ºæ­¢ï¼Œæˆªå–è¿™æ®µå­—ç¬¦ä¸²ï¼Œå¹¶è¿”å›æˆªæ­¢å¤„çš„ä½ç½® */
 {
 	char str[105];
 	int r, g, b, i, flag = 0;
-	/* ¼òµ¥µÄ×ª»»³ÉcharĞÍ */
+	/* ç®€å•çš„è½¬æ¢æˆcharå‹ */
 	for(i=0; i<100; ++i)
 	{
 		if(str1[i] == mark_char) 
@@ -3033,7 +3101,7 @@ static int cut_wstr_convert_to_color(wchar_t *str1, char mark_char, LCUI_RGB *co
 	str[i] = 0;
 	if(flag == 1)
 	{ 
-		/* »ñÈ¡RGBÑÕÉ«Öµ */
+		/* è·å–RGBé¢œè‰²å€¼ */
 		sscanf(str, "%d,%d,%d", &r, &g, &b);
 		color->red = r;
 		color->green = g;
@@ -3046,11 +3114,11 @@ static int cut_wstr_convert_to_color(wchar_t *str1, char mark_char, LCUI_RGB *co
 
 int String_To_List(char *text , LCUI_WString **out_list)
 /*
- * ¹¦ÄÜ£º½«Ô­Ê¼µÄ×Ö·û´®·Ö¸î³É¶şÎ¬Êı×é,×Ö·û±àÂëÎªUnicode
- * ²ÎÊıËµÃ÷£º
- * in_text  £º ´«ÈëµÄcharĞÍ×Ö·û´®
- * list     £º Êä³öµÄ¶şÎ¬LCUI_Wchar_TÖ¸Õë
- * ·µ»ØÖµ£º×Ö·û´®µÄĞĞÊı
+ * åŠŸèƒ½ï¼šå°†åŸå§‹çš„å­—ç¬¦ä¸²åˆ†å‰²æˆäºŒç»´æ•°ç»„,å­—ç¬¦ç¼–ç ä¸ºUnicode
+ * å‚æ•°è¯´æ˜ï¼š
+ * in_text  ï¼š ä¼ å…¥çš„charå‹å­—ç¬¦ä¸²
+ * list     ï¼š è¾“å‡ºçš„äºŒç»´LCUI_Wchar_TæŒ‡é’ˆ
+ * è¿”å›å€¼ï¼šå­—ç¬¦ä¸²çš„è¡Œæ•°
  * */
 { 
 	LCUI_color_array colors;
@@ -3066,83 +3134,83 @@ int String_To_List(char *text , LCUI_WString **out_list)
 	color_array_init(&colors);
 	
 	if(text != NULL)
-	{/* Èç¹ûÎÄ±¾²»ÎªNULL */
+	{/* å¦‚æœæ–‡æœ¬ä¸ä¸ºNULL */
 		len = strlen(text);
 		if(len > 0)
 		{
 			list = (LCUI_WString *)calloc(1, sizeof(LCUI_WString));
 			for(i = 0; i <= len; ++i)
-			{/* i<=len,ÒòÎª¿ÉÄÜ»á¶ÁÈ¡×Ö·û´®Ä©Î²µÄ½áÊø·û */
+			{/* i<=len,å› ä¸ºå¯èƒ½ä¼šè¯»å–å­—ç¬¦ä¸²æœ«å°¾çš„ç»“æŸç¬¦ */
 				if(text[i] == '\n' || text[i] == 0)
-				{/* Èç¹ûÓöµ½»»ĞĞ»òÕß×Ö·û´®½áÎ² */
+				{/* å¦‚æœé‡åˆ°æ¢è¡Œæˆ–è€…å­—ç¬¦ä¸²ç»“å°¾ */
 					p		= text + start_x;
 					str		= (char*)calloc(strlen(p)+1,sizeof(char));
-					/* À©ÔöÄÚ´æ */
+					/* æ‰©å¢å†…å­˜ */
 					list	= (LCUI_WString *)realloc(list, (k + 1) * sizeof(LCUI_WString));
 					
 					strcpy(str, p);
-					str[i-start_x] = 0; /* ¼ÓÉÏ½áÊø·û */
-					/* ×ª»»×Ö·û±àÂë£¬¼°×Ö·û´®ÀàĞÍ£¬²¢±£´æ */
+					str[i-start_x] = 0; /* åŠ ä¸Šç»“æŸç¬¦ */
+					/* è½¬æ¢å­—ç¬¦ç¼–ç ï¼ŒåŠå­—ç¬¦ä¸²ç±»å‹ï¼Œå¹¶ä¿å­˜ */
 					w_len = Char_To_Wchar_T(str, &wstr); 
-					/* ÊÍ·Å */
+					/* é‡Šæ”¾ */
 					free(str);
 					str = NULL;
-					/* ·ÖÅäÄÚ´æ */
+					/* åˆ†é…å†…å­˜ */
 					list[k].string = (LCUI_WChar_T*)calloc((w_len+1), sizeof(LCUI_WChar_T)); 
-					/* j¼ÇÂ¼µÄÊÇÊµ¼Ê×Ö·ûÊı£¬z¼ÇÂ¼µÄÊÇ³ıÈ¥<color=R,G,B></color>ºóµÄ×Ö·ûÊı */
+					/* jè®°å½•çš„æ˜¯å®é™…å­—ç¬¦æ•°ï¼Œzè®°å½•çš„æ˜¯é™¤å»<color=R,G,B></color>åçš„å­—ç¬¦æ•° */
 					for(j=0,z=0; j < w_len; ++j,++z)
-					{/* Ñ­»·±éÀúÕâĞĞ×Ö·û´®ÄÚÈİ */
+					{/* å¾ªç¯éå†è¿™è¡Œå­—ç¬¦ä¸²å†…å®¹ */
 						temp_wp = wstr + j; 
 						if(wstrcmp(temp_wp, 7, "<color=") == 0)
 						{
 							temp_wp = temp_wp + 7; 
-							/* ½«¡°<color=¡± ºÍ ¡°>¡± Ö®¼äµÄÄÚÈİ²Ã¼ô³öÀ´£¬²¢×ª»»³ÉRGBÅäÉ«Êı¾İ */
+							/* å°†â€œ<color=â€ å’Œ â€œ>â€ ä¹‹é—´çš„å†…å®¹è£å‰ªå‡ºæ¥ï¼Œå¹¶è½¬æ¢æˆRGBé…è‰²æ•°æ® */
 							tmp = cut_wstr_convert_to_color(temp_wp, '>', &color);
 							if(tmp > 0)
-							{/* Èç¹û³É¹¦ */
+							{/* å¦‚æœæˆåŠŸ */
 								j += (tmp + 7); 
-								add_color(&colors, color);/* Ìí¼ÓÑÕÉ«Êı¾İ */
+								add_color(&colors, color);/* æ·»åŠ é¢œè‰²æ•°æ® */
 							}
 						}
 						else if(get_color(&colors, &color) == 0 
 							&& wstrcmp(temp_wp, 8, "</color>") == 0)
-						{/* Èç¹ûÄÜ»ñÈ¡ÒÑ´¢´æµÄÅäÉ«£¬²¢ÇÒ£¬°üº¬ </color> */
-							j += 8; /* Î»ÖÃÏòÓÒÒÆ¶¯8¸ö×Ö */
-							delete_color(&colors);/* É¾³ıÕâ¸öÅäÉ« */
+						{/* å¦‚æœèƒ½è·å–å·²å‚¨å­˜çš„é…è‰²ï¼Œå¹¶ä¸”ï¼ŒåŒ…å« </color> */
+							j += 8; /* ä½ç½®å‘å³ç§»åŠ¨8ä¸ªå­— */
+							delete_color(&colors);/* åˆ é™¤è¿™ä¸ªé…è‰² */
 							if(j >= w_len) 
-								break; /* Èç¹û³¬¹ıÕâĞĞµÄ×ÖÊı */
+								break; /* å¦‚æœè¶…è¿‡è¿™è¡Œçš„å­—æ•° */
 							/* 
-							 * temp_wpÖ¸ÕëÒÑ¾­Ö¸Ïò</color>ºóÃæµÄµÚÒ»¸ö×Ö·û£¬
-							 * ¼ÌĞøÏÂ´ÎÑ­»·£¬²¢ÅĞ¶ÏÕâ¸ö×Ö·û¼°ºóÃæµÄ×Ö·ûÊÇ·ñ°üº¬
-							 * ÓĞ<color=>»òÕß</color>£¬ÕâÊÇÎªÁËÄÜÕı³£´¦ÀíÒ»
-							 * Á¬´®µÄ<color=>»òÕß</color>¡£
+							 * temp_wpæŒ‡é’ˆå·²ç»æŒ‡å‘</color>åé¢çš„ç¬¬ä¸€ä¸ªå­—ç¬¦ï¼Œ
+							 * ç»§ç»­ä¸‹æ¬¡å¾ªç¯ï¼Œå¹¶åˆ¤æ–­è¿™ä¸ªå­—ç¬¦åŠåé¢çš„å­—ç¬¦æ˜¯å¦åŒ…å«
+							 * æœ‰<color=>æˆ–è€…</color>ï¼Œè¿™æ˜¯ä¸ºäº†èƒ½æ­£å¸¸å¤„ç†ä¸€
+							 * è¿ä¸²çš„<color=>æˆ–è€…</color>ã€‚
 							 **/
 							--z;
 							--j;
 							continue;
 						}
 						if(get_color(&colors, &color) == 0) 
-						/* Èç¹ûÓĞÑÕÉ«Êı¾İ */
+						/* å¦‚æœæœ‰é¢œè‰²æ•°æ® */
 							list[k].string[z].color_type = CUSTOM; 
 						else
-						{/* ·ñÔòÑÕÉ«ÎªÈ±Ê¡ */
+						{/* å¦åˆ™é¢œè‰²ä¸ºç¼ºçœ */
 							color = RGB(0,0,0);
 							list[k].string[z].color_type = DEFAULT;
 						}
-						/* ±£´æ×Ö·ûÂë */
+						/* ä¿å­˜å­—ç¬¦ç  */
 						list[k].string[z].char_code = wstr[j];
-						/* ³õÊ¼»¯×ÖÌåÎ»Í¼Êı¾İ */
+						/* åˆå§‹åŒ–å­—ä½“ä½å›¾æ•°æ® */
 						Bitmap_Init(&list[k].string[z].bitmap);
-						/* ±£´æÅäÉ« */
+						/* ä¿å­˜é…è‰² */
 						list[k].string[z].color = color;
 					}
-					/* ±£´æ×Ö·û´®³¤¶È */
+					/* ä¿å­˜å­—ç¬¦ä¸²é•¿åº¦ */
 					list[k].size = z;
 					++k;
-					start_x = i+1; /* ¼ÇÂ¼ÉÏ¸ö'\n'ËùÔÚµÄÎ»ÖÃ */
-					free(wstr); /* ÊÍ·ÅÄÚ´æ */
+					start_x = i+1; /* è®°å½•ä¸Šä¸ª'\n'æ‰€åœ¨çš„ä½ç½® */
+					free(wstr); /* é‡Šæ”¾å†…å­˜ */
 					wstr = NULL;
-					if(text[i] == 0) break;/* Óöµ½½áÊø·û¹û¶ÏÍË³ö£¡ */
+					if(text[i] == 0) break;/* é‡åˆ°ç»“æŸç¬¦æœæ–­é€€å‡ºï¼ */
 				}
 			}
 			*out_list = list;
@@ -3154,7 +3222,7 @@ int String_To_List(char *text , LCUI_WString **out_list)
 }
 
 int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
-/* ¹¦ÄÜ£º´ò¿ª×ÖÌåÎÄ¼ş£¬²¢±£´æÊı¾İÖÁLCUI_Font½á¹¹ÌåÖĞ */
+/* åŠŸèƒ½ï¼šæ‰“å¼€å­—ä½“æ–‡ä»¶ï¼Œå¹¶ä¿å­˜æ•°æ®è‡³LCUI_Fontç»“æ„ä½“ä¸­ */
 {
 	int type;
 	FT_Library    library;
@@ -3164,14 +3232,15 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 	type = font_data->type;
 	if(font_data->status == ACTIVE)
 	{
-		if(Strcmp(&font_data->font_file, fontfile) == 0)
+		if(fontfile == NULL ||
+			Strcmp(&font_data->font_file, fontfile) == 0)
 			return 0;
 		else if( Strcmp(&font_data->font_file, 
 				 LCUI_Sys.default_font.font_file.string))
 			type = CUSTOM;
 	}
-	lib_error = FT_Init_FreeType( & library);  /* ³õÊ¼»¯FreeType¿â */
-	if (lib_error)   /* µ±³õÊ¼»¯¿âÊ±·¢ÉúÁËÒ»¸ö´íÎó */
+	lib_error = FT_Init_FreeType( & library);  /* åˆå§‹åŒ–FreeTypeåº“ */
+	if (lib_error)   /* å½“åˆå§‹åŒ–åº“æ—¶å‘ç”Ÿäº†ä¸€ä¸ªé”™è¯¯ */
 	{
 		printf("open fontfile: "FT_INIT_ERROR);
 		return - 1 ;
@@ -3182,9 +3251,9 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 	{
 		FT_Done_FreeType(library);
 		if ( face_error == FT_Err_Unknown_File_Format )
-			printf("open fontfile: "FT_UNKNOWN_FILE_FORMAT); /* Î´ÖªÎÄ¼ş¸ñÊ½ */ 
+			printf("open fontfile: "FT_UNKNOWN_FILE_FORMAT); /* æœªçŸ¥æ–‡ä»¶æ ¼å¼ */ 
 		else 
-			printf("open fontfile: "FT_OPEN_FILE_ERROR);/* ´ò¿ª´íÎó */ 
+			printf("open fontfile: "FT_OPEN_FILE_ERROR);/* æ‰“å¼€é”™è¯¯ */ 
 			
 		perror(fontfile);
 		return -1;
@@ -3198,7 +3267,7 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 		face->style_name
 	);
 	Free_Font(font_data);
-	/* ±£´æ×ÖÌåĞÅÏ¢ */
+	/* ä¿å­˜å­—ä½“ä¿¡æ¯ */
 	Strcpy(&font_data->family_name, face->family_name);
 	Strcpy(&font_data->style_name, face->style_name);
 	Strcpy(&font_data->font_file, fontfile);
@@ -3211,27 +3280,27 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 
 int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 /*
- * ¹¦ÄÜ£º»ñÈ¡µ¥¸öwchar_tĞÍ×Ö·ûµÄÎ»Í¼
- * ËµÃ÷£ºLCUI_Font½á¹¹ÌåÖĞ´¢´æ×ÅÒÑ±»´ò¿ªµÄ×ÖÌåÎÄ¼ş¾ä±úºÍface¶ÔÏóµÄ¾ä±ú£¬Èç¹û×ÖÌåÎÄ¼şÒÑ¾­±»
- * ³É¹¦´ò¿ªÒ»´Î£¬´Ëº¯Êı²»»áÔÙ´Î´ò¿ª×ÖÌåÎÄ¼ş¡£
+ * åŠŸèƒ½ï¼šè·å–å•ä¸ªwchar_tå‹å­—ç¬¦çš„ä½å›¾
+ * è¯´æ˜ï¼šLCUI_Fontç»“æ„ä½“ä¸­å‚¨å­˜ç€å·²è¢«æ‰“å¼€çš„å­—ä½“æ–‡ä»¶å¥æŸ„å’Œfaceå¯¹è±¡çš„å¥æŸ„ï¼Œå¦‚æœå­—ä½“æ–‡ä»¶å·²ç»è¢«
+ * æˆåŠŸæ‰“å¼€ä¸€æ¬¡ï¼Œæ­¤å‡½æ•°ä¸ä¼šå†æ¬¡æ‰“å¼€å­—ä½“æ–‡ä»¶ã€‚
  */
 { 
-	FT_Face         p_FT_Face = NULL;   /* face¶ÔÏóµÄ¾ä±ú */
+	FT_Face         p_FT_Face = NULL;   /* faceå¯¹è±¡çš„å¥æŸ„ */
 	FT_Bitmap       bitmap;         
 	FT_BitmapGlyph  bitmap_glyph;    
 	FT_Glyph        glyph;
-	FT_GlyphSlot    slot;               /* ×ÖĞÎ²ÛµÄ¾ä±ú */
+	FT_GlyphSlot    slot;               /* å­—å½¢æ§½çš„å¥æŸ„ */
 	FT_Error        error = 0;
 	int i , j, value = 0;
 	if(font_data != NULL)
-	{/* Èç¹ûLCUI_Font½á¹¹ÌåÖĞµÄ×ÖÌåĞÅÏ¢ÓĞĞ§£¬¾Í´ò¿ª½á¹¹ÌåÖĞµÄÖ¸¶¨µÄ×ÖÌåÎÄ¼ş£¬²¢
-	  * ½«×ÖÌåÎÄ¼şºÍface¶ÔÏóµÄ¾ä±ú±£´æÖÁ½á¹¹ÌåÖĞ¡£
-	  * µ±È»£¬Èç¹ûLCUI_Font½á¹¹ÌåÓĞ×ÖÌåÎÄ¼şºÍface¶ÔÏóµÄ¾ä±ú£¬¾ÍÖ±½Ó·µ»Ø0¡£
+	{/* å¦‚æœLCUI_Fontç»“æ„ä½“ä¸­çš„å­—ä½“ä¿¡æ¯æœ‰æ•ˆï¼Œå°±æ‰“å¼€ç»“æ„ä½“ä¸­çš„æŒ‡å®šçš„å­—ä½“æ–‡ä»¶ï¼Œå¹¶
+	  * å°†å­—ä½“æ–‡ä»¶å’Œfaceå¯¹è±¡çš„å¥æŸ„ä¿å­˜è‡³ç»“æ„ä½“ä¸­ã€‚
+	  * å½“ç„¶ï¼Œå¦‚æœLCUI_Fontç»“æ„ä½“æœ‰å­—ä½“æ–‡ä»¶å’Œfaceå¯¹è±¡çš„å¥æŸ„ï¼Œå°±ç›´æ¥è¿”å›0ã€‚
 	  */
 		error = Open_Fontfile(font_data, font_data->font_file.string);
-		if(error)  /* ×ÖÌå´ò¿ªÊ§°Ü */
+		if(error)  /* å­—ä½“æ‰“å¼€å¤±è´¥ */
 			value = -1; 
-		else /* Ê¹ÓÃÕâ¸ö¾ä±ú */
+		else /* ä½¿ç”¨è¿™ä¸ªå¥æŸ„ */
 			p_FT_Face = font_data->ft_face; 
 	}
 	else return -1;
@@ -3240,12 +3309,12 @@ int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 	int k, start_y = 0, ch_height = 0, ch_width = 0 ;
 		
 	if(value == 0)
-	{/* Èç¹ûÄÜÕı³£´ò¿ª×ÖÌåÎÄ¼ş */
-		FT_Select_Charmap(p_FT_Face, FT_ENCODING_UNICODE);   /* Éè¶¨ÎªUNICODE£¬Ä¬ÈÏµÄÒ²ÊÇ */
-		FT_Set_Pixel_Sizes(p_FT_Face, 0, font_data->size);   /* Éè¶¨×ÖÌå´óĞ¡ */
+	{/* å¦‚æœèƒ½æ­£å¸¸æ‰“å¼€å­—ä½“æ–‡ä»¶ */
+		FT_Select_Charmap(p_FT_Face, FT_ENCODING_UNICODE);   /* è®¾å®šä¸ºUNICODEï¼Œé»˜è®¤çš„ä¹Ÿæ˜¯ */
+		FT_Set_Pixel_Sizes(p_FT_Face, 0, font_data->size);   /* è®¾å®šå­—ä½“å¤§å° */
 		slot = p_FT_Face->glyph;
 		if(ch == ' ') 
-		{ /* Èç¹ûÓĞ¿Õ¸ñ,ËüµÄ¿í¶È¾ÍÒÔ×ÖÄ¸aµÄ¿í¶ÈÎª×¼ */
+		{ /* å¦‚æœæœ‰ç©ºæ ¼,å®ƒçš„å®½åº¦å°±ä»¥å­—æ¯açš„å®½åº¦ä¸ºå‡† */
 			error = FT_Load_Char( p_FT_Face, 'a', font_data->load_flags); 
 			if(!error)
 			{
@@ -3253,15 +3322,15 @@ int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 				if(!error)
 				{
 					Free_Bitmap(out_bitmap);
-					/* ±³¾°Í¼ĞÎµÄ¸ß¶È£¬Õâ¸ö¸ß¶ÈÒª´óÓÚ×ÖÌåµÄ¸ß¶È£¬ËùÒÔÊÇ+3 */
-					/* 256¼¶»Ò¶È×ÖĞÎ×ª»»³ÉÎ»Í¼ */
+					/* èƒŒæ™¯å›¾å½¢çš„é«˜åº¦ï¼Œè¿™ä¸ªé«˜åº¦è¦å¤§äºå­—ä½“çš„é«˜åº¦ï¼Œæ‰€ä»¥æ˜¯+3 */
+					/* 256çº§ç°åº¦å­—å½¢è½¬æ¢æˆä½å›¾ */
 					FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
-					/* FT_RENDER_MODE_NORMAL	   ÕâÊÇÄ¬ÈÏäÖÈ¾Ä£Ê½£¬Ëü¶ÔÓ¦ÓÚ8Î»¿¹¾â³İÎ»Í¼¡£ */
+					/* FT_RENDER_MODE_NORMAL	   è¿™æ˜¯é»˜è®¤æ¸²æŸ“æ¨¡å¼ï¼Œå®ƒå¯¹åº”äº8ä½æŠ—é”¯é½¿ä½å›¾ã€‚ */
 					bitmap_glyph = (FT_BitmapGlyph)glyph;
 					bitmap       = bitmap_glyph -> bitmap;
-					out_bitmap->height = font_data->size + 3; /* ×ÖÌåËùÔÚµÄ±³¾°Í¼µÄ³ß´çĞèÒª´óÒ»µã */
+					out_bitmap->height = font_data->size + 3; /* å­—ä½“æ‰€åœ¨çš„èƒŒæ™¯å›¾çš„å°ºå¯¸éœ€è¦å¤§ä¸€ç‚¹ */
 					Malloc_Bitmap(out_bitmap, bitmap.width, out_bitmap->height);
-					/* ÊÍ·Å×ÖĞÎÕ¼ÓÃµÄÄÚ´æ */
+					/* é‡Šæ”¾å­—å½¢å ç”¨çš„å†…å­˜ */
 					FT_Done_Glyph(glyph);
 					glyph = NULL;
 				}
@@ -3269,29 +3338,29 @@ int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 		}
 		else
 		{
-			/* Õâ¸öº¯ÊıÖ»ÊÇ¼òµ¥µØµ÷ÓÃFT_Get_Char_IndexºÍFT_Load_Glyph */
+			/* è¿™ä¸ªå‡½æ•°åªæ˜¯ç®€å•åœ°è°ƒç”¨FT_Get_Char_Indexå’ŒFT_Load_Glyph */
 			error = FT_Load_Char( p_FT_Face, ch, font_data->load_flags);
 			if(!error)
 			{
-				/* ´Ó²å²ÛÖĞÌáÈ¡Ò»¸ö×ÖĞÎÍ¼Ïñ */
-				/* Çë×¢Òâ£¬´´½¨µÄFT_Glyph¶ÔÏó±ØĞëÓëFT_Done_Glyph³É¶ÔÊ¹ÓÃ */
+				/* ä»æ’æ§½ä¸­æå–ä¸€ä¸ªå­—å½¢å›¾åƒ */
+				/* è¯·æ³¨æ„ï¼Œåˆ›å»ºçš„FT_Glyphå¯¹è±¡å¿…é¡»ä¸FT_Done_Glyphæˆå¯¹ä½¿ç”¨ */
 				error = FT_Get_Glyph(p_FT_Face->glyph, &glyph);
 				if (!error)
 				{
 					int bg_height;
 					Free_Bitmap(out_bitmap);
-					/* ±³¾°Í¼ĞÎµÄ¸ß¶È£¬Õâ¸ö¸ß¶ÈÒª´óÓÚ×ÖÌåµÄ¸ß¶È£¬ËùÒÔÊÇ+4 */
+					/* èƒŒæ™¯å›¾å½¢çš„é«˜åº¦ï¼Œè¿™ä¸ªé«˜åº¦è¦å¤§äºå­—ä½“çš„é«˜åº¦ï¼Œæ‰€ä»¥æ˜¯+4 */
 					bg_height = font_data->size + 4; 
-					/* 256¼¶»Ò¶È×ÖĞÎ×ª»»³ÉÎ»Í¼ */
+					/* 256çº§ç°åº¦å­—å½¢è½¬æ¢æˆä½å›¾ */
 					FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
-					/* FT_RENDER_MODE_NORMAL ÊÇÄ¬ÈÏäÖÈ¾Ä£Ê½£¬Ëü¶ÔÓ¦ÓÚ8Î»¿¹¾â³İÎ»Í¼¡£ */
+					/* FT_RENDER_MODE_NORMAL æ˜¯é»˜è®¤æ¸²æŸ“æ¨¡å¼ï¼Œå®ƒå¯¹åº”äº8ä½æŠ—é”¯é½¿ä½å›¾ã€‚ */
 					bitmap_glyph = (FT_BitmapGlyph)glyph;
 					bitmap       = bitmap_glyph -> bitmap;
 					k = 0;
-					/* »ñÈ¡ÆğµãµÄyÖá×ø±ê */
+					/* è·å–èµ·ç‚¹çš„yè½´åæ ‡ */
 					start_y = font_data->size - slot->bitmap_top; 
 					ch_width = bitmap.width;
-					/* ´¦Àí×ÖÌåÎ»Í¼ÔÚ±³¾°Í¼ÖĞµÄ·¶Î§ */
+					/* å¤„ç†å­—ä½“ä½å›¾åœ¨èƒŒæ™¯å›¾ä¸­çš„èŒƒå›´ */
 					if(start_y < 0)  start_y = 0; 
 					if(bitmap.rows > bg_height) 
 						ch_height = font_data->size; 
@@ -3300,9 +3369,9 @@ int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 						
 					if(ch_height + start_y > bg_height)  
 						ch_height = bg_height - start_y; 
-					/* ¿ª±ÙÄÚ´æ¿Õ¼ä,Èç¹û³öÏÖÎÊÌâ£¬»áµ¼ÖÂFT_Done_Glyphº¯Êı³öÏÖ¶Î´íÎó */
+					/* å¼€è¾Ÿå†…å­˜ç©ºé—´,å¦‚æœå‡ºç°é—®é¢˜ï¼Œä¼šå¯¼è‡´FT_Done_Glyphå‡½æ•°å‡ºç°æ®µé”™è¯¯ */
 					Malloc_Bitmap(out_bitmap, ch_width, bg_height);
-					/* ¿ªÊ¼½«×ÖÌåÎ»Í¼Ìùµ½±³¾°Í¼ĞÎÖĞ */
+					/* å¼€å§‹å°†å­—ä½“ä½å›¾è´´åˆ°èƒŒæ™¯å›¾å½¢ä¸­ */
 					for(i = 0; i < ch_height; ++i)
 					{ 
 						for(j = 0;j < ch_width; ++j)
@@ -3310,18 +3379,18 @@ int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 							switch (bitmap.pixel_mode)
 							{
 							case FT_PIXEL_MODE_GRAY:
-								/* Ò»¸ö8Î»Î»Í¼£¬Ò»°ãÓÃÀ´±íÊ¾·´¾â³İ×ÖĞÎÍ¼Ïñ¡£Ã¿¸öÏñËØÓÃÒ»¸ö×Ö½Ú´æ´¢ */
+								/* ä¸€ä¸ª8ä½ä½å›¾ï¼Œä¸€èˆ¬ç”¨æ¥è¡¨ç¤ºåé”¯é½¿å­—å½¢å›¾åƒã€‚æ¯ä¸ªåƒç´ ç”¨ä¸€ä¸ªå­—èŠ‚å­˜å‚¨ */
 								out_bitmap->data[start_y + i][j] = bitmap.buffer[k];
 								break;
 							case FT_PIXEL_MODE_MONO: 
-								/* Ò»¸öµ¥É«Î»Í¼,Ã¿¸öbit¶ÔÓ¦Ò»¸öµã,·ÇºÚ¼´°× */
+								/* ä¸€ä¸ªå•è‰²ä½å›¾,æ¯ä¸ªbitå¯¹åº”ä¸€ä¸ªç‚¹,éé»‘å³ç™½ */
 								out_bitmap->data[start_y + i][j] = bitmap.buffer[k]?255:0;
 								break;
 							}
 							++k;
 						}
 					}
-					/* ÊÍ·Å×ÖĞÎÕ¼ÓÃµÄÄÚ´æ */
+					/* é‡Šæ”¾å­—å½¢å ç”¨çš„å†…å­˜ */
 					FT_Done_Glyph(glyph);
 					glyph = NULL;
 				}
@@ -3329,10 +3398,10 @@ int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 		}
 	}
 	else
-	{/* ²»ÄÜ»ñÈ¡×ÖÌåÎÄ¼ş£¬¾ÍÊ¹ÓÃÄÚÖÃµÄ8x8µãÕó×ÖÌå */
+	{/* ä¸èƒ½è·å–å­—ä½“æ–‡ä»¶ï¼Œå°±ä½¿ç”¨å†…ç½®çš„8x8ç‚¹é˜µå­—ä½“ */
 		if(ch == ' ')
-		{ /* Èç¹ûÊÇ¿Õ¸ñ */
-			/* ×Ô¶¨ÒåµÄº¯Êı£¬ÓÃÓÚ»ñÈ¡8x8µãÕó×ÖÌåÎ»Í¼ */
+		{ /* å¦‚æœæ˜¯ç©ºæ ¼ */
+			/* è‡ªå®šä¹‰çš„å‡½æ•°ï¼Œç”¨äºè·å–8x8ç‚¹é˜µå­—ä½“ä½å›¾ */
 			Get_Default_Font_Bitmap('a', out_bitmap);
 			for (i=0;i<8;i++)  
 			for (j=0;j<8;j++)  
@@ -3353,14 +3422,14 @@ int Count_Contents_Size(
 	int *out_width, int *out_height, 
 	int rows, int space, int linegap)
 /*
- * ¹¦ÄÜ£º¼ÆËãÎÄ±¾Î»Í¼µÄ³ß´ç
- * ²ÎÊıËµÃ÷£º
- * contents£º ĞèÒª¼ÆËãµÄÄ¿±ê
- * out_width   £º Êä³öµÄ¿í¶È
- * out_height  £º Êä³öµÄ¸ß¶È
- * rows    :  ÎÄ±¾µÄ×ÜĞĞÊı
- * space   :  Ã¿¸ö×ÖÖ®¼äµÄ¼ä¸ô
- * linegap :  ĞĞ¾à
+ * åŠŸèƒ½ï¼šè®¡ç®—æ–‡æœ¬ä½å›¾çš„å°ºå¯¸
+ * å‚æ•°è¯´æ˜ï¼š
+ * contentsï¼š éœ€è¦è®¡ç®—çš„ç›®æ ‡
+ * out_width   ï¼š è¾“å‡ºçš„å®½åº¦
+ * out_height  ï¼š è¾“å‡ºçš„é«˜åº¦
+ * rows    :  æ–‡æœ¬çš„æ€»è¡Œæ•°
+ * space   :  æ¯ä¸ªå­—ä¹‹é—´çš„é—´éš”
+ * linegap :  è¡Œè·
  * */
 {
 	if(rows <= 0) return -1;
@@ -3385,12 +3454,12 @@ int Count_Contents_Size(
 		for(j = 0; j < contents[i].size; ++j)
 			width += contents[i].string[j].bitmap.width; 
 		if(contents[i].size > 0)
-			width += (contents[i].size) * space; /* Ã¿¸ö×ÖÖ®¼äµÄ¼ä¸ô */ 
+			width += (contents[i].size) * space; /* æ¯ä¸ªå­—ä¹‹é—´çš„é—´éš” */ 
 		if(width > max_width) max_width = width;
-		width = 0;/* Ã¿Ò»ĞĞÒª¹éÁã£¬ÖØĞÂ¿ªÊ¼¼ÆËã³¤¶È */
+		width = 0;/* æ¯ä¸€è¡Œè¦å½’é›¶ï¼Œé‡æ–°å¼€å§‹è®¡ç®—é•¿åº¦ */
 	}
 	
-	height += (rows - 1) * linegap; /* Ã¿Á½ĞĞÖ®¼äµÄĞĞ¾à */ 
+	height += (rows - 1) * linegap; /* æ¯ä¸¤è¡Œä¹‹é—´çš„è¡Œè· */ 
 	*out_width = max_width;
 	*out_height = height; 
 	return 0;
