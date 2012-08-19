@@ -352,6 +352,3 @@ void Register_Button()
 	WidgetFunc_Add("button", Destroy_Button,		FUNC_TYPE_DESTROY); 
 }
 
-
-
-

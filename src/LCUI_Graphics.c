@@ -205,25 +205,131 @@ void Graph_Init(LCUI_Graph *pic)
 /* 初始化图片数据结构体 */
 {
 	if(pic == NULL) return;
-	pic->malloc = IS_FALSE;
-	pic->flag   = NO_ALPHA;
-	pic->rgba   = NULL;
-	pic->alpha  = 255;
-	pic->width  = 0;
-	pic->height = 0;
-	pic->type   = DEFAULT;
-	pic->bit_depth = 8;    /* 位深 */
-	thread_rwlock_init(&pic->lock);
+	pic->quote	= IS_FALSE;
+	pic->malloc	= IS_FALSE;
+	pic->flag	= NO_ALPHA;
+	pic->rgba	= NULL;
+	pic->alpha	= 255;
+	pic->pos	= Pos(0, 0);
+	pic->width	= 0;
+	pic->height	= 0;
+	pic->type	= DEFAULT;
+	pic->bit_depth	= 8;    /* 位深 */
+	thread_rwlock_init(&pic->lock);	/* 读/写/互斥锁 */
 }
 
+
+/************************ Graph Quote *********************************/
+int Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area)
+/* 
+ * 功能：引用另一个图层中指定区域里的图形 
+ * 说明：src是被引用的对象，des是引用者，area是引用的src中的图形所在的区域
+ * */
+{
+	if(src == NULL || des == NULL) return -1;
+	area = Get_Valid_Area(Size(src->width, src->height), area); 
+	des->src = src;
+	des->pos.x = area.x;
+	des->pos.y = area.y;
+	des->width = area.width;
+	des->height= area.height;
+	des->quote = IS_TRUE;
+	return 0;
+}
+
+LCUI_Rect Get_Graph_Valid_Rect(LCUI_Graph *graph)
+/* 功能：获取被引用的图形所在的有效区域 */
+{
+	LCUI_Pos pos;
+	int w, h, temp; 
+	LCUI_Rect cut_rect;
+	
+	cut_rect.x = 0;
+	cut_rect.y = 0;
+	cut_rect.width = graph->width;
+	cut_rect.height = graph->height;
+	
+	pos = graph->pos; 
+	
+	if(graph->quote == IS_FALSE) 
+		return cut_rect; 
+	else {
+		w = graph->src->height;
+		h = graph->src->width;
+	}
+	
+	/* 获取需裁剪的区域 */
+	if(pos.x < 0) {
+		cut_rect.width += pos.x;
+		cut_rect.x = 0 - pos.x; 
+	}
+	if(pos.x + graph->width > w)
+		cut_rect.width -= (pos.x +  graph->width - w); 
+	
+	if(pos.y < 0) {
+		cut_rect.height += pos.y;
+		cut_rect.y = 0 - pos.y; 
+	}
+	if(pos.y + graph->height > h)
+		cut_rect.height -= (pos.y +  graph->height - h); 
+	
+	LCUI_Rect rect;
+	/* 获取父部件的有效显示范围 */
+	rect = Get_Graph_Valid_Rect(graph->src);
+	/* 如果父部件需要裁剪，那么，子部件根据情况，也需要进行裁剪 */
+	if(rect.x > 0) { 
+		temp = pos.x + cut_rect.x;
+		if(temp < rect.x) { 
+			temp = rect.x - pos.x; 
+			cut_rect.width -= (temp - cut_rect.x); 
+			cut_rect.x = temp; 
+		}
+	}
+	if(rect.y > 0) {
+		temp = pos.y + cut_rect.y;
+		if(pos.y < rect.y) {
+			temp = rect.y - pos.y;
+			cut_rect.height -= (temp - cut_rect.y);
+			cut_rect.y = temp;
+		}
+	}
+	if(rect.width < w) { 
+		temp = pos.x+cut_rect.x+cut_rect.width;
+		if(temp > rect.x+rect.width)  
+			cut_rect.width -= (temp-(rect.x+rect.width));
+	}
+	if(rect.height < h) {
+		temp = pos.y+cut_rect.y+cut_rect.height;
+		if(temp > rect.y+rect.height)
+			cut_rect.height -= (temp-(rect.y+rect.height));
+	} 
+	
+	return cut_rect;
+}
+
+LCUI_Graph *Get_Quote_Graph(LCUI_Graph *graph)
+/* 
+ * 功能：获取指向被引用的图形的指针 
+ * 说明：如果当前图形引用了另一个图形，并且，该图形处于一条引用链中，那么，本函数会返
+ * 回指向被引用的最终图形的指针。
+ * */
+{
+	if(graph == NULL) return NULL;
+	if(graph->quote == IS_FALSE)
+		return graph; 
+	return Get_Quote_Graph(graph->src);
+}
+
+/************************ End Graph Quote *****************************/
+
 static int detect_jpg(char *filepath, LCUI_Graph *out)
-/* 功能：解码jpg图片 */
+/* 功能：检测并解码jpg图片 */
 {
 	FILE *fp;
 	fp = fopen(filepath,"r");
 	if(fp == NULL) return -1;
 	
-	int x,y;
+	int x,y, m, n, k;
 	short int JPsyg;
 	struct jpeg_decompress_struct cinfo;
 	struct my_error_mgr jerr;
@@ -231,10 +337,9 @@ static int detect_jpg(char *filepath, LCUI_Graph *out)
 	int row_stride,jaka;
 
 	if(fread(&JPsyg,sizeof (short int),1,fp))
-	{
 		if (JPsyg != -9985)   /* 如果不是jpg图片 */
-			return 1;
-	}
+			return 1; 
+			
 	rewind(fp);
 	cinfo.err = jpeg_std_error(&jerr.pub);
 	jerr.pub.error_exit = my_error_exit;
@@ -259,25 +364,23 @@ static int detect_jpg(char *filepath, LCUI_Graph *out)
 	row_stride = cinfo.output_width * cinfo.output_components;
 	buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr) &cinfo,JPOOL_IMAGE,row_stride,1);
 	y=0;
-	while (cinfo.output_scanline <cinfo.output_height) {
+	for(y=0; cinfo.output_scanline <cinfo.output_height; ++y) {
 		(void) jpeg_read_scanlines(&cinfo,buffer,1);
-		if (jaka==3) {
-			for (x=0;x<out->width;x++)
-			{
-				out->rgba[0][x+y*out->width]=buffer[0][x*3];
-				out->rgba[1][x+y*out->width]=buffer[0][x*3+1];
-				out->rgba[2][x+y*out->width]=buffer[0][x*3+2];
-			} 
-		}
-		else {
-			for (x=0;x<out->width;x++)
-			{
-				out->rgba[0][x+y*out->width]=buffer[0][x];
-				out->rgba[1][x+y*out->width]=out->rgba[0][x+y*out->width];
-				out->rgba[2][x+y*out->width]=out->rgba[0][x+y*out->width];
-			} 
-		}
-		y++;
+		m = y*out->width;
+		if (jaka==3) for (x=0;x<out->width;x++) {
+			n = x+m;
+			k=x*3;
+			out->rgba[0][n]=buffer[0][k++];
+			out->rgba[1][n]=buffer[0][k++];
+			out->rgba[2][n]=buffer[0][k++];
+		} 
+		else for (x=0;x<out->width;x++)
+		{
+			n = x+m;
+			out->rgba[0][n]=buffer[0][x];
+			out->rgba[1][n]=buffer[0][x];
+			out->rgba[2][n]=buffer[0][x];
+		} 
 	}
 	out->type = TYPE_JPG;//图片类型为jpg
 	(void) jpeg_finish_decompress(&cinfo);
@@ -287,13 +390,13 @@ static int detect_jpg(char *filepath, LCUI_Graph *out)
 }
 
 static int detect_bmp(char *filepath, LCUI_Graph *out)
-/* 功能：解码bmp图片 */
+/* 功能：检测并解码bmp图片 */
 {
 	FILE *fp;
 	fp = fopen(filepath,"r");
 	if(fp == NULL) return -1;
 	bmp_head bmp;    
-	int x,y, temp, tempi, rle,pocz, omin;
+	int m, n, x, y, temp, tempi, rle,pocz, omin;
 	unsigned char rozp;
 	unsigned char **bak_rgba;    /* 备份的图片数据 */
 	
@@ -335,126 +438,113 @@ static int detect_bmp(char *filepath, LCUI_Graph *out)
 	omin = omin-((out->width*out->height)*(out->bit_depth/8));
 	omin = omin/(out->height);
 	fseek(fp,pocz,SEEK_SET);
-	if (out->bit_depth==32) /* out->bit_depth=32 */
-	{
-		for (y=0;y<out->height;y++)
-		{
-			for (x=0;x<out->width;x++)
-			{
-				out->rgba[2][x+(out->height-y-1)*out->width]=fgetc(fp);
-				out->rgba[1][x+(out->height-y-1)*out->width]=fgetc(fp);
-				out->rgba[0][x+(out->height-y-1)*out->width]=fgetc(fp);
+	switch(out->bit_depth){ 
+	case 32:
+		for (y=0;y<out->height;y++) {
+			m = (out->height-y-1)*out->width;
+			for (x=0;x<out->width;x++) {
+				n = x+m;
+				out->rgba[2][n]=fgetc(fp);
+				out->rgba[1][n]=fgetc(fp);
+				out->rgba[0][n]=fgetc(fp);
 				tempi=fgetc(fp);
 			}
-			if (omin>0) 
-			for (tempi=0;tempi<omin;tempi++) fgetc(fp);
+			if (omin>0) for (tempi=0;tempi<omin;tempi++) fgetc(fp);
 		}
-	}  /* end out->bit_depth=32 */
-
-	if (out->bit_depth==24) /* out->bit_depth=24 */
-	{
-		for (y=0;y<out->height;y++)
-		{
-			for (x=0;x<out->width;x++)
-			{
-				out->rgba[2][x+(out->height-y-1)*out->width]=fgetc(fp);
-				out->rgba[1][x+(out->height-y-1)*out->width]=fgetc(fp);
-				out->rgba[0][x+(out->height-y-1)*out->width]=fgetc(fp);
+	break;
+		 
+	case 24:
+		for (y=0;y<out->height;y++) {
+			m = (out->height-y-1)*out->width;
+			for (x=0;x<out->width;x++) {
+				n = x+m;
+				out->rgba[2][n]=fgetc(fp);
+				out->rgba[1][n]=fgetc(fp);
+				out->rgba[0][n]=fgetc(fp);
 			}
-			if (omin>0) 
-			for (tempi=0;tempi<omin;tempi++) fgetc(fp);
-			
+			if (omin>0) for (tempi=0;tempi<omin;tempi++) fgetc(fp); 
 		}
-	}  /* end out->bit_depth=24 */
-
-	if (out->bit_depth==8) /* out->bit_depth=8 */
-	{
+	break;
+		
+	case 8: 
 		fseek(fp,-256*4,SEEK_CUR);
-		for (tempi=0;tempi<256;tempi++)
-		{
+		for (tempi=0;tempi<256;tempi++) {
 			bak_rgba[2][tempi]=fgetc(fp);	
 			bak_rgba[1][tempi]=fgetc(fp);	
 			bak_rgba[0][tempi]=fgetc(fp);	
 			x=fgetc(fp);
 		}
-		if (rle==0) {   /* nonRLE */	
-			for (y=0;y<out->height;y++)
-			{
-				for (x=0;x<out->width;x++)
-				{
-					if ((tempi=fgetc(fp))==-1) return 0;
-					out->rgba[0][x+(out->height-y-1)*out->width]=bak_rgba[0][tempi];
-					out->rgba[1][x+(out->height-y-1)*out->width]=bak_rgba[1][tempi];
-					out->rgba[2][x+(out->height-y-1)*out->width]=bak_rgba[2][tempi];
-				}
-				if (omin>0)  		 
-				for (tempi=0;tempi<omin;tempi++) fgetc(fp);
+		/* nonRLE */	
+		if (rle==0) for (y=0;y<out->height;y++) {
+			m = (out->height-y-1)*out->width;
+			for (x=0;x<out->width;x++) {
+				n = x+m;
+				if ((tempi=fgetc(fp))==-1) return 0;
+				out->rgba[0][n]=bak_rgba[0][tempi];
+				out->rgba[1][n]=bak_rgba[1][tempi];
+				out->rgba[2][n]=bak_rgba[2][tempi];
 			}
+			if (omin>0) for (tempi=0;tempi<omin;tempi++) 
+				getc(fp); 
 		}   /* end nonRLE */
-		else { /* RLE */
-			for (y=0;y<out->height;y++)
-			{
-				for (x=0;x<out->width;x++)
-				{
-					if ((out->bit_depth=fgetc(fp))==-1) return 0;
-					tempi=fgetc(fp);
-					if (out->bit_depth==0) {
-						for (rle=0;rle<tempi;rle++){
-							out->bit_depth=fgetc(fp);
-							out->rgba[0][(x+rle)+(out->height-y-1)*out->width]=bak_rgba[0][out->bit_depth];
-							out->rgba[1][(x+rle)+(out->height-y-1)*out->width]=bak_rgba[1][out->bit_depth];
-							out->rgba[2][(x+rle)+(out->height-y-1)*out->width]=bak_rgba[2][out->bit_depth];
-						}
-						if (tempi!=((tempi/2)*2)) tempi=fgetc(fp);
-					} else {
-						for (rle=0;rle<out->bit_depth;rle++){
-							out->rgba[0][(x+rle)+(out->height-y-1)*out->width]=bak_rgba[0][tempi];
-							out->rgba[1][(x+rle)+(out->height-y-1)*out->width]=bak_rgba[1][tempi];
-							out->rgba[2][(x+rle)+(out->height-y-1)*out->width]=bak_rgba[2][tempi];
-						}	
+		else for (y=0;y<out->height;y++) {
+			m = (out->height-y-1)*out->width;
+			for (x=0;x<out->width;x++) {
+				if ((out->bit_depth=fgetc(fp))==-1) 
+					return 0;
+				n = m+x+rle;
+				tempi=fgetc(fp);
+				if (out->bit_depth==0) {
+					for (rle=0;rle<tempi;rle++){
+						out->bit_depth=fgetc(fp);
+						out->rgba[0][n]=bak_rgba[0][out->bit_depth];
+						out->rgba[1][n]=bak_rgba[1][out->bit_depth];
+						out->rgba[2][n]=bak_rgba[2][out->bit_depth];
 					}
-					x+=rle-1;
-				}	
-			}
-		} /* end RLE  */
-		out->bit_depth=8;
-	} /* end out->bit_depth=8 */
+					if (tempi!=((tempi/2)*2)) tempi=fgetc(fp);
+				} else for (rle=0;rle<out->bit_depth;rle++){
+					out->rgba[0][n]=bak_rgba[0][tempi];
+					out->rgba[1][n]=bak_rgba[1][tempi];
+					out->rgba[2][n]=bak_rgba[2][tempi];
+				} 
+				x+=rle-1;
+			}	
+		}
+		/* end RLE  */  
+		break;
 
-	if (out->bit_depth==4) /* out->bit_depth=4 */
-	{
+	case 4: 
 		fseek(fp,-16*4,SEEK_CUR);
-		for (tempi=0;tempi<16;tempi++)
-		{
+		for (tempi=0;tempi<16;tempi++) {
 			bak_rgba[2][tempi]=fgetc(fp);	
 			bak_rgba[1][tempi]=fgetc(fp);	
 			bak_rgba[0][tempi]=fgetc(fp);	
 			x=fgetc(fp);
 		}
-		if (rle==0) {  /* nonRLE */	
-			for (y=0;y<out->height;y++)
-			{
-				for (x=0;x<out->width;x++)
-				{
-					tempi=fgetc(fp);
-					rozp=tempi;
-					rozp=(rozp & 0xf0)>>4;
-					out->rgba[0][x+(out->height-y-1)*out->width]=bak_rgba[0][rozp];
-					out->rgba[1][x+(out->height-y-1)*out->width]=bak_rgba[1][rozp];
-					out->rgba[2][x+(out->height-y-1)*out->width]=bak_rgba[2][rozp];
-					x++;
-					rozp=tempi;
-					rozp=(rozp & 0x0f);
-					out->rgba[0][x+(out->height-y-1)*out->width]=bak_rgba[0][rozp];
-					out->rgba[1][x+(out->height-y-1)*out->width]=bak_rgba[1][rozp];
-					out->rgba[2][x+(out->height-y-1)*out->width]=bak_rgba[2][rozp];
-				}
-			}
-		}    /* end nonRLE */
+		/* nonRLE */
+		if (rle==0) for (y=0;y<out->height;y++) {
+			m = (out->height-y-1)*out->width;
+			for (x=0;x<out->width;x++) {
+				n = m+x;
+				tempi=fgetc(fp);
+				rozp=tempi;
+				rozp=(rozp & 0xf0)>>4;
+				out->rgba[0][n]=bak_rgba[0][rozp];
+				out->rgba[1][n]=bak_rgba[1][rozp];
+				out->rgba[2][n]=bak_rgba[2][rozp];
+				x++;
+				rozp=tempi;
+				rozp=(rozp & 0x0f);
+				out->rgba[0][n]=bak_rgba[0][rozp];
+				out->rgba[1][n]=bak_rgba[1][rozp];
+				out->rgba[2][n]=bak_rgba[2][rozp];
+			} 
+		} /* end nonRLE */
 		else { /* RLE */
 			
-		} /* end RLE */
-		out->bit_depth=4;
-	}    /* end out->bit_depth=4*/
+		} /* end RLE */ 
+	break;
+	}
 	out->type = TYPE_BMP;     /* 图片类型为bmp */
 	free(bak_rgba[0]);
 	free(bak_rgba[1]);
@@ -557,13 +647,13 @@ int write_png_file(char *file_name , LCUI_Graph *graph)
 		free(row_pointers[j]);
 	free(row_pointers);
 
-    fclose(fp);
+	fclose(fp);
 	End_Use_Graph(graph);
     return 0;
 }
 
 int detect_png(char *filepath, LCUI_Graph *out)
-/* 用于解码png图片 */
+/* 功能：检测并解码png图片 */
 {
 	FILE *pic_fp;
 	pic_fp = fopen(filepath, "rb");
@@ -610,7 +700,7 @@ int detect_png(char *filepath, LCUI_Graph *out)
 		//开始分配内存
 		out->flag = HAVE_ALPHA;
 		temp = Malloc_Graph(out, png_get_image_width(png_ptr, info_ptr), 
-							png_get_image_height(png_ptr, info_ptr));
+					png_get_image_height(png_ptr, info_ptr));
 		if(temp != 0)
 		{/* 如果分配内存失败 */
 			fclose(pic_fp);
@@ -618,23 +708,21 @@ int detect_png(char *filepath, LCUI_Graph *out)
 			return 1;
 		}
 		temp = (4 * out->width);
-		for(i = 0; i < out->height; i++)
+		for(i = 0; i < out->height; i++) 
+		for(j = 0; j < temp; j += 4)
 		{
-			for(j = 0; j < temp; j += 4)
-			{
-				out->rgba[0][pos] = row_pointers[i][j]; // red
-				out->rgba[1][pos] = row_pointers[i][j+1]; // green
-				out->rgba[2][pos] = row_pointers[i][j+2];   // blue
-				out->rgba[3][pos] = row_pointers[i][j+3]; // alpha
-				++pos;
-			}
-		}
+			out->rgba[0][pos] = row_pointers[i][j]; // red
+			out->rgba[1][pos] = row_pointers[i][j+1]; // green
+			out->rgba[2][pos] = row_pointers[i][j+2];   // blue
+			out->rgba[3][pos] = row_pointers[i][j+3]; // alpha
+			++pos;
+		} 
 	}
 	else if(channels == 3 || color_type == PNG_COLOR_TYPE_RGB)
 	{/*如果是RGB通道*/
 		out->flag = NO_ALPHA;
 		temp = Malloc_Graph(out, png_get_image_width(png_ptr, info_ptr), 
-							png_get_image_height(png_ptr, info_ptr));
+					png_get_image_height(png_ptr, info_ptr));
 		if(temp != 0)
 		{
 			fclose(pic_fp);
@@ -643,15 +731,13 @@ int detect_png(char *filepath, LCUI_Graph *out)
 		}
 		temp = (3 * out->width);
 		for(i = 0; i < out->height; i++)
+		for(j = 0; j < temp; j += 3)
 		{
-			for(j = 0; j < temp; j += 3)
-			{
-				out->rgba[0][pos] = row_pointers[i][j]; // red
-				out->rgba[1][pos] = row_pointers[i][j+1]; // green
-				out->rgba[2][pos] = row_pointers[i][j+2];   // blue
-				++pos;
-			}
-		}
+			out->rgba[0][pos] = row_pointers[i][j]; // red
+			out->rgba[1][pos] = row_pointers[i][j+1]; // green
+			out->rgba[2][pos] = row_pointers[i][j+2];   // blue
+			++pos;
+		} 
 	}
 	else return 1;
 	out->type = TYPE_PNG;  /* 图片类型为png */
@@ -661,7 +747,7 @@ int detect_png(char *filepath, LCUI_Graph *out)
 }
 
 int detect_image(char *filepath, LCUI_Graph *out)
-/*这个是用于检测图片格式，并解码*/
+/* 功能：检测图片格式，并解码图片 */
 {
 	int result = 1;
 	if (result == 1) result = detect_png(filepath, out);/*检测png*/  
@@ -669,61 +755,6 @@ int detect_image(char *filepath, LCUI_Graph *out)
 	if (result == 1) result = detect_bmp(filepath, out);/*检测bmp*/ 
 	return result;
 }
-
-
-void Zoom_Graph(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
-/* 功能：根据指定模式，对图像进行缩放 */
-{
-	LCUI_Pos pos; 
-	int count, temp, x, y, k, m;
-	double scale_x,scale_y;
-	
-	if(!Valid_Graph(in)) 
-		return; 
-	
-	if(size.w <=0 || size.h <= 0)
-	{ 
-		Free_Graph(out);
-		return;
-	}
-	 
-	scale_x = (double)in->width / size.w;
-	scale_y = (double)in->height / size.h;
-	
-	if(flag == DEFAULT)
-	{/* 如果缩放方式为缺省，图片的宽和高的缩放比例将会一样 */
-		if (scale_x<scale_y) scale_y = scale_x; 
-		else scale_x = scale_y;
-	}
-	out->flag = in->flag;
-	Malloc_Graph(out, size.w, size.h);/* 申请内存 */ 
-	Using_Graph(out, 1);
-	Using_Graph(in, 0);  
-	 
-	for (y=0; y < size.h; ++y) 
-	{
-		pos.y = y*scale_y;
-		k = y*size.w;
-		m = pos.y*in->width;
-		for (x = 0; x < size.w; ++x) 
-		{
-			pos.x = x*scale_x; 
-			temp  = k + x;
-			count = m + pos.x;
-			out->rgba[0][temp] = in->rgba[0][count];
-			out->rgba[1][temp] = in->rgba[1][count];
-			out->rgba[2][temp] = in->rgba[2][count];
-			if(in->flag == HAVE_ALPHA)
-				out->rgba[3][temp] = in->rgba[3][count];
-		}
-	} 
-	End_Use_Graph(out);
-	End_Use_Graph(in);
-	out->width  = size.w;
-	out->height = size.h;
-	out->malloc = IS_TRUE;  /* 已经分配内存 */
-}
-
 
 int Load_Image(char *filepath, LCUI_Graph *out)
 /* 
@@ -736,29 +767,82 @@ int Load_Image(char *filepath, LCUI_Graph *out)
 	int result = 0;   /* 错误代号为0 */
 	out->flag = NO_ALPHA;
 	/*fp是全局变量，其它函数会用到它*/
-	if ((fp = fopen(filepath,"r")) == NULL) 
-	{
+	if ((fp = fopen(filepath,"r")) == NULL) {
 		perror(filepath);
 		result = OPEN_ERROR; 
 	}
 	else{
 		fgetc(fp);
-		if (!ferror (fp)) 
-		{/*r如果没出错*/
+		if (!ferror (fp)) {/*r如果没出错*/
 			fseek(fp,0,SEEK_END);
-			if (ftell(fp)>4) 
-			{
+			if (ftell(fp)>4) {
 				fclose(fp);
 				result = detect_image(filepath, out);/*检测图片并解码*/
 			} 
-			else 
-			{
+			else {
 				result = SHORT_FILE;//文件过小 
 				fclose(fp);
 			}
 		}
 	}
 	return result;   /* 返回错误代码 */
+}
+
+
+/************************ Graphics Processing *************************/
+void Zoom_Graph(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
+/* 功能：根据指定模式，对图像进行缩放 */
+{
+	LCUI_Graph *src;
+	LCUI_Rect rect;
+	LCUI_Pos pos; 
+	int count, temp, x, y, k, m;
+	double scale_x,scale_y;
+	
+	if(!Valid_Graph(in)) 
+		return; 
+	
+	if(size.w <=0 || size.h <= 0) { 
+		Free_Graph(out);
+		return;
+	}
+	/* 获取引用的有效区域，以及指向引用的对象的指针 */
+	rect = Get_Graph_Valid_Rect(in);
+	src = Get_Quote_Graph(in);
+	
+	scale_x = (double)rect.width / size.w;
+	scale_y = (double)rect.height / size.h;
+	
+	if(flag == DEFAULT) {/* 如果缩放方式为缺省，图片的宽和高的缩放比例将会一样 */
+		if (scale_x<scale_y) scale_y = scale_x; 
+		else scale_x = scale_y;
+	}
+	out->flag = in->flag;
+	Malloc_Graph(out, size.w, size.h);/* 申请内存 */ 
+	Using_Graph(out, 1);
+	Using_Graph(in, 0); 
+	
+	for (y=0; y < size.h; ++y)  {
+		pos.y = y*scale_y;
+		k = y*size.w;
+		m = (pos.y+rect.y)*src->width+rect.x;
+		for (x = 0; x < size.w; ++x) {
+			pos.x = x*scale_x; 
+			temp  = k + x;
+			count = m + pos.x;
+			out->rgba[0][temp] = in->rgba[0][count];
+			out->rgba[1][temp] = in->rgba[1][count];
+			out->rgba[2][temp] = in->rgba[2][count];
+			if(in->flag == HAVE_ALPHA)
+				out->rgba[3][temp] = in->rgba[3][count];
+		}
+	} 
+	
+	End_Use_Graph(out);
+	End_Use_Graph(in);
+	out->width  = size.w;
+	out->height = size.h;
+	out->malloc = IS_TRUE;  /* 已经分配内存 */
 }
 
 int Cut_Graph(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
@@ -771,39 +855,16 @@ int Cut_Graph(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 	int temp,count = 0, k; 
 	out->flag = src->flag;
 	out->alpha = src->alpha;
-	rect = Get_Valid_Area(Size(src->width, src->height), rect);
-	/***
-	if(rect.x < 0) 
-	{
-		rect.width = rect.width + rect.x;
-		rect.x = 0;
-	}
-	if(rect.y < 0) 
-	{
-		rect.height = rect.height + rect.y;
-		rect.y = 0;
-	}
-	if(rect.width + rect.x > src->width) 
-	{
-		rect.width = src->width - rect.x;
-	}
-	if(rect.height + rect.y > src->height) 
-	{
-		rect.height = src->height - rect.y;
-	}
-	* **/
-	if(Valid_Graph(src) && rect.width * rect.height > 0)
-	{ 
+	rect = Get_Valid_Area(Size(src->width, src->height), rect); 
+	if(Valid_Graph(src) && rect.width * rect.height > 0) { 
 		temp = Malloc_Graph(out, rect.width, rect.height);
 		if(temp != 0) return -1; 
 		Using_Graph(out, 1);
 		Using_Graph(src, 0);
 		/* 开始读取图片中的图形数组并写入窗口 */ 
-		for (y=0;y< rect.height; ++y) 
-		{
+		for (y=0;y< rect.height; ++y) {
 			k = (rect.y+y)*src->width + rect.x;
-			for (x=0;x<rect.width; ++x)
-			{
+			for (x=0;x<rect.width; ++x) {
 				temp = k + x; /* 计算图片内需要读取的区域的各点坐标 */
 				out->rgba[0][count] = src->rgba[0][temp];
 				out->rgba[1][count] = src->rgba[1][temp];
@@ -823,47 +884,44 @@ int Cut_Graph(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)  
 /* 功能：将图像进行水平翻转 */  
 {  
-    int value = 0, x, y, pos, left, temp, count;  
-    int width = src->width, height = src->height;  
-    unsigned char buff;  
+	int value = 0, x, y, pos, left, temp, count;  
+	int width = src->width, height = src->height;  
+	unsigned char buff;  
     
-    if(!Valid_Graph(src)) value = -1;
-    else
-    {
-		if(src->flag == HAVE_ALPHA) out->flag = HAVE_ALPHA; 
+	if(!Valid_Graph(src)) value = -1;
+	else {
+		if(src->flag == HAVE_ALPHA) out->flag = HAVE_ALPHA;
 		Malloc_Graph(out, width, height);
-        temp = width / 2;
-		for (y = 0; y < height; ++y) 
-		{   /* 水平翻转其实也就是交换两边的数据 */  
+		/* 水平翻转其实也就是交换两边的数据 */  
+		temp = width / 2.0;
+		for (y = 0; y < height; ++y) {   
 			pos = y * width;
 			left = pos;
-			for (x = 0; x <= temp; ++x) 
-			{
+			for (x = 0; x <= temp; ++x)  {
 				count = left + width - x - 1;
 				
 				buff = src->rgba[0][pos]; 
-                out->rgba[0][pos] = src->rgba[0][count];  
-                out->rgba[0][count] = buff;
+				out->rgba[0][pos] = src->rgba[0][count];  
+				out->rgba[0][count] = buff;
                  
 				buff = src->rgba[1][pos]; 
-                out->rgba[1][pos] = src->rgba[1][count];  
-                out->rgba[1][count] = buff;
+				out->rgba[1][pos] = src->rgba[1][count];  
+				out->rgba[1][count] = buff;
                 
 				buff = src->rgba[2][pos]; 
-                out->rgba[2][pos] = src->rgba[2][count];  
-                out->rgba[2][count] = buff;
+				out->rgba[2][pos] = src->rgba[2][count];  
+				out->rgba[2][count] = buff;
                 
-                if(src->flag == HAVE_ALPHA)
-                {
+				if(src->flag == HAVE_ALPHA) {
 					buff = src->rgba[3][pos]; 
 					out->rgba[3][pos] = src->rgba[3][count];  
 					out->rgba[3][count] = buff;
 				}
 				++pos;
 			}
-        }
-    }
-    return value;  
+		}
+	}
+	return value;  
 } 
 
 int Cut_And_Overlay_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Graph *des)
@@ -876,32 +934,14 @@ int Cut_And_Overlay_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Gra
 	unsigned char alpha;
 	int temp,count, k, n;  
 	/* 处理裁剪区域 */
-	cut = Get_Valid_Area(Size(src->width, src->height), cut);
-	/**
-	if(cut.x < 0) 
-	{
-		cut.width = cut.width + cut.x;
-		cut.x = 0;
-	}
-	if(cut.y < 0) 
-	{
-		cut.height = cut.height + cut.y;
-		cut.y = 0;
-	}
-	if(cut.width + cut.x > src->width)  
-		cut.width = src->width - cut.x; 
-	if(cut.height + cut.y > src->height)  
-		cut.height = src->height - cut.y; 
-	**/
+	cut = Get_Valid_Area(Size(src->width, src->height), cut); 
 	/* 处理粘贴区域，粘贴的区域不在背景图的有效范围内的话，也要调整裁剪区域 */
-	if(put.x < 0) 
-	{
+	if(put.x < 0) {
 		cut.x -= put.x;
 		cut.width = cut.width + put.x;
 		put.x = 0;
 	}
-	if(put.y < 0) 
-	{
+	if(put.y < 0) {
 		cut.y -= put.y;
 		cut.height = cut.height + put.y;
 		put.y = 0;
@@ -911,52 +951,49 @@ int Cut_And_Overlay_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Gra
 	if(cut.height + put.y > des->height)  
 		cut.height = des->height - put.y;
 		
-	if(Valid_Graph(des) && Valid_Graph(src) && cut.width * cut.height > 0)
+	if(!Valid_Graph(des) || !Valid_Graph(src) 
+	  || cut.width <=0 || cut.height <= 0)
+		return -1;
+		
+	Using_Graph(des, 1);
+	Using_Graph(src, 0);
+	/* 开始读取图片中的图形数组并写入目标图形 */ 
+	for (y=0;y<cut.height; ++y) 
 	{
-		Using_Graph(des, 1);
-		Using_Graph(src, 0);
-		/* 开始读取图片中的图形数组并写入目标图形 */ 
-		for (y=0;y<cut.height; ++y) 
-		{
-			k = (cut.y+y)*src->width + cut.x; /* 获取截取处的起点位置 */
-			n = (y+put.y)*des->width + put.x; /* 获取粘贴处的起点位置 */
-			for (x=0;x<cut.width; ++x)
-			{
-				temp  = k + x; /* 计算图片内需要读取的区域的各点坐标 */
-				count = n + x; 
-				if(src->flag == HAVE_ALPHA)
-				{
-					alpha = src->rgba[3][temp];
-					switch(alpha)
-					{
-						case 255:
-						des->rgba[0][count] = src->rgba[0][temp];
-						des->rgba[1][count] = src->rgba[1][temp];
-						des->rgba[2][count] = src->rgba[2][temp];
-						break;
-						case 0:break;
-						default:
-						des->rgba[0][count] = (src->rgba[0][temp] * alpha + des->rgba[0][count] * (255 - alpha)) /255;
-						des->rgba[1][count] = (src->rgba[1][temp] * alpha + des->rgba[1][count] * (255 - alpha)) /255;
-						des->rgba[2][count] = (src->rgba[2][temp] * alpha + des->rgba[2][count] * (255 - alpha)) /255;
-						break;
-					}
-				}
-				else
-				{
+		k = (cut.y+y)*src->width + cut.x; /* 获取截取处的起点位置 */
+		n = (y+put.y)*des->width + put.x; /* 获取粘贴处的起点位置 */
+		for (x=0;x<cut.width; ++x) {
+			temp  = k + x; /* 计算图片内需要读取的区域的各点坐标 */
+			count = n + x; 
+			if(src->flag == HAVE_ALPHA) {
+				alpha = src->rgba[3][temp];
+				switch(alpha) {
+					case 255:
 					des->rgba[0][count] = src->rgba[0][temp];
 					des->rgba[1][count] = src->rgba[1][temp];
 					des->rgba[2][count] = src->rgba[2][temp];
-					if(des->flag == HAVE_ALPHA)
-						des->rgba[3][count] = 255;
-				}  
+					break;
+					case 0:break;
+					default:
+					des->rgba[0][count] = (src->rgba[0][temp] * alpha + des->rgba[0][count] * (255 - alpha)) /255;
+					des->rgba[1][count] = (src->rgba[1][temp] * alpha + des->rgba[1][count] * (255 - alpha)) /255;
+					des->rgba[2][count] = (src->rgba[2][temp] * alpha + des->rgba[2][count] * (255 - alpha)) /255;
+					break;
+				}
 			}
-		} 
-		End_Use_Graph(des);
-		End_Use_Graph(src);
-		return 0;
-	}
-	return -1;
+			else
+			{
+				des->rgba[0][count] = src->rgba[0][temp];
+				des->rgba[1][count] = src->rgba[1][temp];
+				des->rgba[2][count] = src->rgba[2][temp];
+				if(des->flag == HAVE_ALPHA)
+					des->rgba[3][count] = 255;
+			}  
+		}
+	} 
+	End_Use_Graph(des);
+	End_Use_Graph(src);
+	return 0; 
 }
 
 int Cut_And_Replace_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Graph *des)
@@ -970,14 +1007,12 @@ int Cut_And_Replace_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Gra
 	/* 处理裁剪区域 */
 	cut = Get_Valid_Area(Size(src->width, src->height), cut);
 	/* 处理粘贴区域 */
-	if(put.x < 0) 
-	{
+	if(put.x < 0) {
 		cut.x -= put.x;
 		cut.width = cut.width + put.x;
 		put.x = 0;
 	}
-	if(put.y < 0) 
-	{
+	if(put.y < 0) {
 		cut.y -= put.y;
 		cut.height = cut.height + put.y;
 		put.y = 0;
@@ -987,36 +1022,33 @@ int Cut_And_Replace_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Gra
 	if(cut.height + put.y > des->height)  
 		cut.height = des->height - put.y; 
 		
-	if(Valid_Graph(des) && Valid_Graph(src) && cut.width * cut.height > 0)
-	{
-		Using_Graph(des, 1);
-		Using_Graph(src, 0);
-		/* 开始读取图片中的图形数组并写入目标图形 */ 
-		for (y=0;y<cut.height; ++y) 
-		{
-			k = (cut.y+y)*src->width + cut.x; /* 获取截取处的起点位置 */
-			n = (y+put.y)*des->width + put.x; /* 获取粘贴处的起点位置 */
-			for (x=0;x<cut.width; ++x)
-			{
-				temp  = k + x; /* 计算图片内需要读取的区域的各点坐标 */
-				count = n + x;
-				des->rgba[0][count] = src->rgba[0][temp];
-				des->rgba[1][count] = src->rgba[1][temp];
-				des->rgba[2][count] = src->rgba[2][temp];
-				if(des->flag == HAVE_ALPHA)
-				{
-					if(src->flag == HAVE_ALPHA)
-						des->rgba[3][count] = src->rgba[3][temp]; 
-					else
-						des->rgba[3][count] = 255;
-				}
+	if(!Valid_Graph(des) || !Valid_Graph(src) 
+	  || cut.width <=0 || cut.height <= 0)
+		return -1;
+		
+	Using_Graph(des, 1);
+	Using_Graph(src, 0);
+	/* 开始读取图片中的图形数组并写入目标图形 */ 
+	for (y=0;y<cut.height; ++y) {
+		k = (cut.y+y)*src->width + cut.x; /* 获取截取处的起点位置 */
+		n = (y+put.y)*des->width + put.x; /* 获取粘贴处的起点位置 */
+		for (x=0;x<cut.width; ++x) {
+			temp  = k + x; /* 计算图片内需要读取的区域的各点坐标 */
+			count = n + x;
+			des->rgba[0][count] = src->rgba[0][temp];
+			des->rgba[1][count] = src->rgba[1][temp];
+			des->rgba[2][count] = src->rgba[2][temp];
+			if(des->flag == HAVE_ALPHA) {
+				if(src->flag == HAVE_ALPHA)
+					des->rgba[3][count] = src->rgba[3][temp]; 
+				else
+					des->rgba[3][count] = 255;
 			}
-		} 
-		End_Use_Graph(des);
-		End_Use_Graph(src);
-		return 0;
-	}
-	return -1;
+		}
+	} 
+	End_Use_Graph(des);
+	End_Use_Graph(src);
+	return 0; 
 }
 
 
@@ -1080,51 +1112,40 @@ void Tile_Graph(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
  * height 填充的高度
  **/
 {
+	if(!Valid_Graph(src) || out == NULL || width <=0 || height <= 0)
+		return;
+		
 	int x,y,w,h,temp,count, m;
 	temp = 0;
-	if(Valid_Graph(src) && out != NULL && width * height > 0)
-	{
-		Malloc_Graph(out, width, height);
-		Using_Graph(out, 1);
-		Using_Graph(src, 0);
-		if(src->flag == HAVE_ALPHA)
-		{
-			for(y = 0;y < height;++y)
-			{
-				h = y % src->height;
-				m = h * src->width;
-				for(x = 0;x < width;++x,++temp)
-				{
-					w = x % src->width;
-					count = m + w;
-					out->rgba[0][temp] = (src->rgba[0][count] * src->rgba[3][count] + out->rgba[0][temp] * (255 - src->rgba[3][count])) /255;
-					out->rgba[1][temp] = (src->rgba[1][count] * src->rgba[3][count] + out->rgba[1][temp] * (255 - src->rgba[3][count])) /255;
-					out->rgba[2][temp] = (src->rgba[2][count] * src->rgba[3][count] + out->rgba[2][temp] * (255 - src->rgba[3][count])) /255;
-					
-				}
-			}
+		
+	Malloc_Graph(out, width, height);
+	Using_Graph(out, 1);
+	Using_Graph(src, 0);
+	if(Graph_Have_Alpha(src)) for(y = 0;y < height;++y) {
+		h = y % src->height;
+		m = h * src->width;
+		for(x = 0;x < width;++x,++temp) {
+			w = x % src->width;
+			count = m + w;
+			out->rgba[0][temp] = (src->rgba[0][count] * src->rgba[3][count] + out->rgba[0][temp] * (255 - src->rgba[3][count])) /255;
+			out->rgba[1][temp] = (src->rgba[1][count] * src->rgba[3][count] + out->rgba[1][temp] * (255 - src->rgba[3][count])) /255;
+			out->rgba[2][temp] = (src->rgba[2][count] * src->rgba[3][count] + out->rgba[2][temp] * (255 - src->rgba[3][count])) /255;
+		} 
+	} else for(y = 0;y < height;++y) {
+		h = y%src->height;
+		m = h * src->width;
+		for(x = 0;x < width;++x) {
+			w = x % src->width;
+			count = m + w;
+			out->rgba[0][temp] = src->rgba[0][count];
+			out->rgba[1][temp] = src->rgba[1][count];
+			out->rgba[2][temp] = src->rgba[2][count];
+			out->rgba[3][temp] = 255;
+			++temp;
 		}
-		else 
-		{
-			for(y = 0;y < height;++y)
-			{
-				h = y%src->height;
-				m = h * src->width;
-				for(x = 0;x < width;++x)
-				{
-					w = x % src->width;
-					count = m + w;
-					out->rgba[0][temp] = src->rgba[0][count];
-					out->rgba[1][temp] = src->rgba[1][count];
-					out->rgba[2][temp] = src->rgba[2][count];
-					out->rgba[3][temp] = 255;
-					++temp;
-				}
-			}
-		}
-		End_Use_Graph(out);
-		End_Use_Graph(src);
-	}
+	} 
+	End_Use_Graph(out);
+	End_Use_Graph(src); 
 }
 
 int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
@@ -1133,85 +1154,86 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
  * 说明：back_graph是背景图像，fore_graph前景图像，混合后的数据保存在背景图中
  */
 {
-	unsigned char *r1, *g1, *a1, *b1, *r2, *g2, *b2; 
-	
+	if(!Valid_Graph(back_graph) || !Valid_Graph(fore_graph))
+		return -1;
 	if(des_pos.x > back_graph->width) return -1;
 	if(des_pos.y > back_graph->height) return -1;
+	
+	unsigned char *r1, *g1, *a1, *b1, *r2, *g2, *b2; 
 
-	if(Valid_Graph(back_graph) && Valid_Graph(fore_graph))
-	{/* 如果两个图形数据都有效 */
-		int x = 0, y = 0;
-		int temp,count; 
-		int m, n;
-		unsigned char j;//, alpha; 
-		float k;
-		LCUI_Rect cut;
-		
-		/* 如果前景图尺寸超出背景图的范围，需要更改前景图的像素读取范围 */ 
-		if( Get_Cut_Area(
-			Size( back_graph->width, back_graph->height),
-			Rect( des_pos.x, des_pos.y, 
-				fore_graph->width, fore_graph->height ),
-			&cut
-		))
-		{
-			des_pos.x += cut.x;
-			des_pos.y += cut.y;
-		} 
-		/* 开始读取图片中的图形数组并写入窗口 */ 
-		Using_Graph(fore_graph, 0);
-		Using_Graph(back_graph, 1);
-		if(fore_graph->flag == HAVE_ALPHA)
-		{ /* 如果前景图形有透明效果 */
-			k = fore_graph->alpha / 255.0;
-			for (y = 0; y < cut.height; ++y) 
-			{
-				m = (cut.y + y) * fore_graph->width + cut.x;
-				n = (des_pos.y + y) * back_graph->width + des_pos.x;
-				for (x = 0; x < cut.width; ++x) 
-				{
-					temp = m + x; /* 计算图片内需要读取的区域的各点坐标 */
-					count = n + x;/* 计算需填充至窗口的各点的坐标 */
-					j = fore_graph->rgba[3][temp] * k;
-					/* 乘除法运算量较多，不知如何优化 */
-					back_graph->rgba[0][count] = (fore_graph->rgba[0][temp] * j + back_graph->rgba[0][count] * (255 - j)) /255;
-					back_graph->rgba[1][count] = (fore_graph->rgba[1][temp] * j + back_graph->rgba[1][count] * (255 - j)) /255;
-					back_graph->rgba[2][count] = (fore_graph->rgba[2][temp] * j + back_graph->rgba[2][count] * (255 - j)) /255;
-				}
+	int x = 0, y = 0,temp,count,  m, n;
+	unsigned char j;//, alpha; 
+	float k;
+	LCUI_Graph *src, *des;
+	LCUI_Rect cut, src_rect, des_rect;
+	
+	src_rect = Get_Graph_Valid_Rect(fore_graph);
+	des_rect = Get_Graph_Valid_Rect(back_graph);
+	src = Get_Quote_Graph(fore_graph);
+	des = Get_Quote_Graph(back_graph);
+	/* 如果前景图尺寸超出背景图的范围，需要更改前景图的像素读取范围 */ 
+	if( Get_Cut_Area(
+		Size( des_rect.width, des_rect.height),
+		Rect( des_pos.x, des_pos.y, 
+			src_rect.width, src_rect.height ),
+		&cut
+	)) {
+		des_pos.x += cut.x;
+		des_pos.y += cut.y;
+	} 
+	/* 开始读取图片中的图形数组并写入窗口 */ 
+	Using_Graph(fore_graph, 0);
+	Using_Graph(back_graph, 1);
+	k = fore_graph->alpha / 255.0;
+	/* 如果前景图形有alpha通道 */
+	if(Graph_Have_Alpha(fore_graph)) 
+	for (y = 0; y < cut.height; ++y) {
+		m = (cut.y + y + src_rect.x) * src->width + cut.x + src_rect.x;
+		n = (des_pos.y + y + des_rect.x) * des->width + des_pos.x + des_rect.x;
+		for (x = 0; x < cut.width; ++x) {
+			temp = m + x; /* 计算图片内需要读取的区域的各点坐标 */
+			count = n + x;/* 计算需填充至窗口的各点的坐标 */
+			j = fore_graph->rgba[3][temp] * k;
+			/* 乘除法运算量较多，不知如何优化 */
+			if(j == 255){
+				back_graph->rgba[0][count] = fore_graph->rgba[0][temp] ;
+				back_graph->rgba[1][count] = fore_graph->rgba[1][temp] ;
+				back_graph->rgba[2][count] = fore_graph->rgba[2][temp] ; 
+				continue;
 			}
+			back_graph->rgba[0][count] = (fore_graph->rgba[0][temp] * j + back_graph->rgba[0][count] * (255 - j)) /255;
+			back_graph->rgba[1][count] = (fore_graph->rgba[1][temp] * j + back_graph->rgba[1][count] * (255 - j)) /255;
+			back_graph->rgba[2][count] = (fore_graph->rgba[2][temp] * j + back_graph->rgba[2][count] * (255 - j)) /255;
+		} 
+	} else {/* 如果前景图形没有透明效果 */
+		for (y = 0; y < cut.height; ++y) 
+		{ 
+			/* 计算前景图内需要读取的区域的各起点坐标 */
+			m = (cut.y + y + src_rect.y) * src->width + cut.x + src_rect.x;
+			/* 计算背景图内需要读取的区域的各起点坐标 */
+			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+			/* 使用指针来引用 */
+			r1 = back_graph->rgba[0] + n;
+			g1 = back_graph->rgba[1] + n;
+			b1 = back_graph->rgba[2] + n;
+			a1 = back_graph->rgba[3] + n;
+			
+			r2 = fore_graph->rgba[0] + m;
+			g2 = fore_graph->rgba[1] + m;
+			b2 = fore_graph->rgba[2] + m;
+			/* 拷贝 */
+			memcpy(r1, r2, cut.width);
+			memcpy(g1, g2, cut.width);
+			memcpy(b1, b2, cut.width);
+			/* 透明度取决于前景图的透明度 */
+			if(Graph_Have_Alpha(back_graph))
+				memset(a1, fore_graph->alpha, sizeof(unsigned char)*cut.width);
 		}
-		else
-		{/* 如果前景图形没有透明效果 */
-			for (y = 0; y < cut.height; ++y) 
-			{ 
-				/* 计算前景图内需要读取的区域的各起点坐标 */
-				m = (cut.y + y) * fore_graph->width + cut.x;
-				/* 计算背景图内需要读取的区域的各起点坐标 */
-				n = (des_pos.y + y) * back_graph->width + des_pos.x;
-				/* 使用指针来引用 */
-				r1 = back_graph->rgba[0] + n;
-				g1 = back_graph->rgba[1] + n;
-				b1 = back_graph->rgba[2] + n;
-				a1 = back_graph->rgba[3] + n;
-				
-				r2 = fore_graph->rgba[0] + m;
-				g2 = fore_graph->rgba[1] + m;
-				b2 = fore_graph->rgba[2] + m;
-				/* 拷贝 */
-				memcpy(r1, r2, cut.width);
-				memcpy(g1, g2, cut.width);
-				memcpy(b1, b2, cut.width);
-				if(back_graph->flag == HAVE_ALPHA)
-					/* 透明度取决于前景图的透明度 */
-					memset(a1, fore_graph->alpha, sizeof(unsigned char)*cut.width);
-			}
-		} 
-		
-		End_Use_Graph(back_graph);
-		End_Use_Graph(fore_graph); 
-		return 0;
-	}
-	return -1;
+	} 
+	
+	End_Use_Graph(back_graph);
+	End_Use_Graph(fore_graph); 
+	return 0; 
 }
 
 
@@ -1222,86 +1244,84 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
  */
 {
 	unsigned char *r1, *g1, *a1, *a2, *b1, *r2, *g2, *b2; 
+	
+	if(!Valid_Graph(back_graph) || !Valid_Graph(fore_graph))
+		return -1;
 	if(des_pos.x > back_graph->width) return -1;
 	if(des_pos.y > back_graph->height) return -1;
 
-	if(Valid_Graph(back_graph) && Valid_Graph(fore_graph))
-	{/* 如果两个图形数据都有效 */
-		int x = 0, y = 0;
-		int temp,count; 
-		int m, n;
-		unsigned char j; 
-		
-		LCUI_Rect cut;
-		
-		/* 如果前景图尺寸超出背景图的范围，需要更改前景图的像素读取范围 */ 
-		if( Get_Cut_Area(
-			Size( back_graph->width, back_graph->height),
-			Rect( des_pos.x, des_pos.y, 
-				fore_graph->width, fore_graph->height ),
-			&cut
-		))
-		{
-			des_pos.x += cut.x;
-			des_pos.y += cut.y;
+	int x = 0, y = 0,temp, count, m, n;
+	unsigned char j, k; 
+	
+	LCUI_Graph *src, *des;
+	LCUI_Rect cut, src_rect, des_rect;
+	
+	src_rect = Get_Graph_Valid_Rect(fore_graph);
+	des_rect = Get_Graph_Valid_Rect(back_graph);
+	src = Get_Quote_Graph(fore_graph);
+	des = Get_Quote_Graph(back_graph);
+	 
+	if( Get_Cut_Area(
+		Size( back_graph->width, back_graph->height),
+		Rect( des_pos.x, des_pos.y, 
+			fore_graph->width, fore_graph->height ),
+		&cut
+	)) {
+		des_pos.x += cut.x;
+		des_pos.y += cut.y;
+	} 
+	Using_Graph(fore_graph, 0);
+	Using_Graph(back_graph, 1); 
+	
+	k = fore_graph->alpha / 255.0;
+	if(Graph_Have_Alpha(fore_graph) 
+	&& !Graph_Have_Alpha(back_graph)) 
+	for (y = 0; y < cut.height; ++y) {
+		m = (cut.y + y + src_rect.x) * src->width + cut.x + src_rect.x;
+		n = (des_pos.y + y + des_rect.x) * des->width + des_pos.x + des_rect.x;
+		for (x = 0; x < cut.width; ++x) {
+			temp = m + x; /* 计算图片内需要读取的区域的各点坐标 */
+			count = n + x;/* 计算需填充至窗口的各点的坐标 */
+			j = fore_graph->rgba[3][temp] * k;
+			/* 乘除法运算量较多，不知如何优化 */
+			if(j == 255){
+				back_graph->rgba[0][count] = fore_graph->rgba[0][temp] ;
+				back_graph->rgba[1][count] = fore_graph->rgba[1][temp] ;
+				back_graph->rgba[2][count] = fore_graph->rgba[2][temp] ; 
+				continue;
+			}
+			back_graph->rgba[0][count] = (fore_graph->rgba[0][temp] * j + back_graph->rgba[0][count] * (255 - j)) /255;
+			back_graph->rgba[1][count] = (fore_graph->rgba[1][temp] * j + back_graph->rgba[1][count] * (255 - j)) /255;
+			back_graph->rgba[2][count] = (fore_graph->rgba[2][temp] * j + back_graph->rgba[2][count] * (255 - j)) /255;
 		}
-		/* 开始读取图片中的图形数组并写入窗口 */
-		Using_Graph(fore_graph, 0);
-		Using_Graph(back_graph, 1);
+	} else for (y = 0; y < cut.height; ++y) {
+		m = (cut.y + y + src_rect.y) *src->width + cut.x + src_rect.x;
+		n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+		/* 使用指针来引用 */
+		r1 = back_graph->rgba[0] + n;
+		g1 = back_graph->rgba[1] + n;
+		b1 = back_graph->rgba[2] + n;
 		
-		if(fore_graph->flag == HAVE_ALPHA && back_graph->flag == NO_ALPHA)
-		{ /* 如果前景图形有透明效果，背景图形没有 */
-			for (y = 0; y < cut.height; ++y) 
-			{
-				m = (cut.y + y) * fore_graph->width + cut.x;
-				n = (des_pos.y + y) * back_graph->width + des_pos.x;
-				for (x = 0; x < cut.width; ++x) 
-				{
-					temp = m + x; /* 计算图片内需要读取的区域的各点坐标 */
-					count = n + x;/* 计算需填充至窗口的各点的坐标 */
-					j = fore_graph->rgba[3][temp] * fore_graph->alpha;
-					back_graph->rgba[0][count] = (fore_graph->rgba[0][temp] * j + back_graph->rgba[0][count] * (255 - j)) /255;
-					back_graph->rgba[1][count] = (fore_graph->rgba[1][temp] * j + back_graph->rgba[1][count] * (255 - j)) /255;
-					back_graph->rgba[2][count] = (fore_graph->rgba[2][temp] * j + back_graph->rgba[2][count] * (255 - j)) /255;
-				}
+		r2 = fore_graph->rgba[0] + m;
+		g2 = fore_graph->rgba[1] + m;
+		b2 = fore_graph->rgba[2] + m; 
+		/* 拷贝 */
+		memcpy(r1, r2, cut.width);
+		memcpy(g1, g2, cut.width);
+		memcpy(b1, b2, cut.width);
+		if(Graph_Have_Alpha(back_graph)) {
+			a1 = des->rgba[3] + n;
+			if(!Graph_Have_Alpha(fore_graph))
+				memset(a1, src->alpha, cut.width);
+			else {
+				a2 = src->rgba[3] + m; 
+				memcpy(a1, a2, cut.width);  
 			}
 		}
-		else 
-		{
-			for (y = 0; y < cut.height; ++y) 
-			{
-				m = (cut.y + y) *fore_graph->width + cut.x;
-				n = (des_pos.y + y) * back_graph->width + des_pos.x;
-				/* 使用指针来引用 */
-				r1 = back_graph->rgba[0] + n;
-				g1 = back_graph->rgba[1] + n;
-				b1 = back_graph->rgba[2] + n;
-				
-				r2 = fore_graph->rgba[0] + m;
-				g2 = fore_graph->rgba[1] + m;
-				b2 = fore_graph->rgba[2] + m; 
-				/* 拷贝 */
-				memcpy(r1, r2, cut.width);
-				memcpy(g1, g2, cut.width);
-				memcpy(b1, b2, cut.width);
-				if(back_graph->flag == HAVE_ALPHA)
-				{
-					a1 = back_graph->rgba[3] + n;
-					if(fore_graph->flag == NO_ALPHA)
-						memset(a1, fore_graph->alpha, cut.width);
-					else if(fore_graph->flag == HAVE_ALPHA)
-					{
-						a2 = fore_graph->rgba[3] + m; 
-						memcpy(a1, a2, cut.width);  
-					}
-				}
-			}
-		}
-		End_Use_Graph(back_graph);
-		End_Use_Graph(fore_graph);
-		return 0;
-	}
-	return -1;
+	} 
+	End_Use_Graph(back_graph);
+	End_Use_Graph(fore_graph);
+	return 0; 
 } 
 
 int Align_Image(LCUI_Graph *graph, LCUI_Graph *image, int flag)
@@ -1365,51 +1385,44 @@ int Fill_Background_Image(LCUI_Graph *graph, LCUI_Graph *bg, int flag, LCUI_RGB 
 /* 功能：为指定图形填充背景图像 */
 {
 	Fill_Color(graph, color); /* 填充背景色 */
-	if(Valid_Graph(bg) && graph != NULL)
+	if(!Valid_Graph(bg) || graph == NULL)
+		return -1; 
+		
+	LCUI_Pos pos;
+	LCUI_Graph temp_bg;
+	pos.x = 0;
+	pos.y = 0;
+	Graph_Init(&temp_bg);
+	switch(flag)
 	{
-		LCUI_Pos pos;
-		LCUI_Graph temp_bg;
-		pos.x = 0;
-		pos.y = 0;
-		Graph_Init(&temp_bg);
-		switch(flag)
-		{
-		case LAYOUT_ZOOM:/* 缩放 */
-			Zoom_Graph(
-			bg,           /* 传入的图片数据 */
-			&temp_bg,      /* 缩放后的图片数据将保存至窗口背景图 */
-			DEFAULT,       /* 缩放的标志(DEFAULT/CUSTOM),标志位缺省，将使用默认的 */
-			Size(graph->width, graph->height)
-			);
-			pos.x = (graph->width - temp_bg.width) / 2.0;
-			pos.y = (graph->height - temp_bg.height) / 2.0;
-			Mix_Graph(graph, &temp_bg, pos);
-			break;
-		case LAYOUT_STRETCH:/* 拉伸 */
-			Zoom_Graph(
-			bg, 
-			&temp_bg, 
-			CUSTOM,        /* 缩放的标志(DEFAULT/CUSTOM),使用自定义 */
-			Size(graph->width, graph->height) 
-			);
-			Mix_Graph(graph, &temp_bg, pos);
-			break;
-		case LAYOUT_CENTER:/* 居中 */
-			pos.x = (graph->width - bg->width) / 2;
-			pos.y = (graph->height - bg->height) / 2;
-			Mix_Graph(graph, bg, pos);
-			break;
-		case LAYOUT_TILE:/* 平铺 */
-			Tile_Graph(bg, graph, graph->width, graph->height);
-			break;
-		default: 
-			Mix_Graph(graph, bg, pos);
-			break;
-		}
-		Free_Graph(&temp_bg);
-		return 0;
+	case LAYOUT_ZOOM:/* 缩放 */
+		Zoom_Graph( bg, &temp_bg, DEFAULT,
+		Size(graph->width, graph->height)
+		);
+		pos.x = (graph->width - temp_bg.width) / 2.0;
+		pos.y = (graph->height - temp_bg.height) / 2.0;
+		Mix_Graph(graph, &temp_bg, pos);
+		break;
+	case LAYOUT_STRETCH:/* 拉伸 */
+		Zoom_Graph( bg,  &temp_bg, CUSTOM, 
+		Size(graph->width, graph->height) 
+		);
+		Mix_Graph(graph, &temp_bg, pos);
+		break;
+	case LAYOUT_CENTER:/* 居中 */
+		pos.x = (graph->width - bg->width) / 2;
+		pos.y = (graph->height - bg->height) / 2;
+		Mix_Graph(graph, bg, pos);
+		break;
+	case LAYOUT_TILE:/* 平铺 */
+		Tile_Graph(bg, graph, graph->width, graph->height);
+		break;
+	default: 
+		Mix_Graph(graph, bg, pos);
+		break;
 	}
-	return -1;
+	Free_Graph(&temp_bg);
+	return 0; 
 }
 
 /* 以下是图像圆角化算法，暂未完成 */
@@ -1428,10 +1441,8 @@ int Set_Graph_To_Rounded_Rectangle(LCUI_Graph *graph, int radius, int mode, int 
 	Using_Graph(graph);/* 使用数据 */
 	if(Valid_Graph(graph) && graph->flag == HAVE_ALPHA)
 	{/* 如果图形数据有效,并且有alpha通道 */
-		if(graph->width < radius*2 || graph->height < radius*2)
-		{
-			return 1;
-		}
+		if(graph->width < radius*2 || graph->height < radius*2) 
+			return 1; 
 		int mini, count, x, y, temp, a, b, start_x, start_y;
 		/* 圆的方程：(x－a)^2+(y－b)^2=r^2，学过数学的你懂的！ */
 		/* 准备将左上角圆角化 */
@@ -1487,8 +1498,7 @@ int Set_Graph_To_Rounded_Rectangle(LCUI_Graph *graph, int radius, int mode, int 
 int Fill_Graph_Alpha(LCUI_Graph *src, unsigned char alpha)
 /* 功能：填充图形的alpha通道的所有值 */
 {
-	if(Valid_Graph(src) && Graph_Have_Alpha(src))
-	{
+	if(Valid_Graph(src) && Graph_Have_Alpha(src)) {
 		memset(src->rgba[3], alpha, sizeof(unsigned char) * src->width * src->height);
 		return 0;
 	}
@@ -1499,29 +1509,25 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 /* 功能：为图形边缘绘制矩形边框 */
 {
 	int x,y,count, k, start_x,start_y;
-	if(Valid_Graph(src))
-	{
+	if(Valid_Graph(src)) {
 		/* 绘制上边的线 */
 		Using_Graph(src, 1);
-		for(y=0;y<border.top;++y)
-		{
+		for(y=0;y<border.top;++y) {
 			k = y * src->width;
-			for(x = 0; x < src->width; ++x)
-			{
+			for(x = 0; x < src->width; ++x) {
 				count = k + x;
 				src->rgba[0][count] = color.red;
 				src->rgba[1][count] = color.green;
 				src->rgba[2][count] = color.blue;
-				if(src->flag == HAVE_ALPHA) src->rgba[3][count] = 255;
+				if(src->flag == HAVE_ALPHA) 
+					src->rgba[3][count] = 255;
 			}
 		}
 		start_y = src->height - border.bottom;
 		/* 绘制下边的线 */
-		for(y=0;y<border.bottom;++y)
-		{
+		for(y=0;y<border.bottom;++y) {
 			k = (start_y+y) * src->width;
-			for(x=0;x<src->width;++x)
-			{
+			for(x=0;x<src->width;++x) {
 				count = k + x;
 				src->rgba[0][count] = color.red;
 				src->rgba[1][count] = color.green;
@@ -1531,11 +1537,9 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 			}
 		}
 		/* 绘制左边的线 */
-		for(y=0;y<src->height;++y)
-		{
+		for(y=0;y<src->height;++y) {
 			k = y * src->width;
-			for(x=0;x<border.left;++x)
-			{
+			for(x=0;x<border.left;++x) {
 				count = k + x;
 				src->rgba[0][count] = color.red;
 				src->rgba[1][count] = color.green;
@@ -1546,11 +1550,9 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 		}
 		/* 绘制右边的线 */
 		start_x = src->width - border.right;
-		for(y=0;y<src->height;++y)
-		{
+		for(y=0;y<src->height;++y) {
 			k = y * src->width + start_x;
-			for(x=0;x<border.right;++x) 
-			{
+			for(x=0;x<border.right;++x) {
 				count = k + x;
 				src->rgba[0][count] = color.red;
 				src->rgba[1][count] = color.green;
@@ -1566,228 +1568,16 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 	return 0;
 }
 
-
-void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
-/* 功能：获取与指定区域重叠的部件 */
-{
-	int i, total;
-	LCUI_Pos pos;
-	LCUI_Rect tmp;
-	LCUI_Widget *child; 
-	LCUI_Queue *widget_list;
-	 
-	if(widget == NULL) 
-		widget_list = &LCUI_Sys.widget_list; 
-	else 
-	{
-		if(widget->visible == IS_FALSE) 
-			return;
-		widget_list = &widget->child; 
-	}
-	
-	total = Queue_Get_Total(widget_list); 
-	
-	for(i=total-1; i>=0; --i)
-	{/* 从底到顶遍历子部件 */
-		child = (LCUI_Widget*)Queue_Get(widget_list, i); 
-		if(child != NULL && child->visible == IS_TRUE)
-		{/* 如果有可见的子部件 */ 
-			tmp = Get_Widget_Valid_Rect(child); 
-			pos = Get_Widget_Global_Pos(child);
-			tmp.x += pos.x;
-			tmp.y += pos.y; 
-			if(!Rect_Valid(tmp)) continue;
-			if (Rect_Is_Overlay(tmp, rect)) 
-			{ 
-				Queue_Add_Pointer(queue, child);/* 记录与该区域重叠的部件 */
-				Get_Overlay_Widget(rect, child, queue);  /* 递归调用 */
-			} 
-		}
-	} 
-}
-
-LCUI_RGBA Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos)
-/* 功能：获取图像中指定坐标的像素点的颜色 */
-{
-	int i;
-	LCUI_RGBA rgba;
-	
-	i = graph->width*pos.y + pos.x; 
-	
-	rgba.red = graph->rgba[0][i];
-	rgba.green = graph->rgba[1][i];
-	rgba.blue = graph->rgba[2][i];
-	
-	if(Graph_Have_Alpha(graph))
-		rgba.alpha = graph->rgba[3][i];
-	else 
-		rgba.alpha = 255;
-		
-	return rgba;
-}
-
-int Graph_Is_Opaque(LCUI_Graph *graph)
-/* 
- * 功能：检测图形是否为不透明 
- * 说明：完全透明则返回-1，不透明则返回1，有透明效果则返回0
- * */
-{ 
-	if( !Graph_Have_Alpha(graph) )
-		return 1; 
-	if( graph->alpha == 0 )
-		return -1;
-	else if(graph->alpha < 255)
-		return 0;
-	//如果有新的算法，可以快速检测出一个图层是否全透明或不透明，会添加在下面
-	#ifdef have_new_method
-	LCUI_Pos pos;
-	LCUI_RGBA rgba;
-	int i, total, not_visbale = 0;
-	/* 根据尺寸，来获取采样次数 */
-	total = (graph->width + graph->height)/4.0;
-	for(i=0; i<total; ++i)
-	{
-		pos.x = rand()%graph->width;
-		pos.y = rand()%graph->height;
-		rgba = Get_Graph_Pixel(graph, pos);
-		if( rgba.alpha == 0 && not_visbale == 0)
-			not_visbale = 1;
-		else if(rgba.alpha < 255)
-			return 0;
-	}
-	if(not_visbale == 1)
-		return -1;
-	#endif
-	return 0;
-}
-
-int Widget_Layer_Is_Opaque(LCUI_Widget *widget)
-/* 功能：判断部件图形是否不透明 */
-{ 
-	return Graph_Is_Opaque(&widget->graph);
-}
-
-int Widget_Layer_Not_Visible(LCUI_Widget *widget)
-/* 功能：检测部件图形是否完全透明 */
-{
-	if(Graph_Is_Opaque(&widget->graph) == -1)
-		return 1;
-	return 0;
-}
-
-int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
-/* 
- * 功能：获取屏幕中指定区域内实际要显示的图形 
- * 说明：指定的区域必须是与部件区域不部分重叠的
- * */
-{ 
-	LCUI_Pos pos;
-	LCUI_Widget *widget; 
-	LCUI_Queue widget_buff;
-	
-	Queue_Init(&widget_buff, sizeof(LCUI_Widget), NULL);
-	Queue_Using_Pointer(&widget_buff); /* 只用于存放指针 */
-	/* 检测这个区域是否有效 */
-	if (rect.x < 0) return -1; 
-	if (rect.y < 0) return -1; 
-	if (rect.x + rect.width > Get_Screen_Width ())
-		return -1;
-	if (rect.y + rect.height > Get_Screen_Height ())
-		return -1;
-	
-	if (rect.width <= 0 && rect.height <= 0)
-		return -2;
-	
-	int i, total; 
-	/* 根据指定的尺寸，分配内存空间，用于储存图形数据 */
-	Malloc_Graph(graph, rect.width, rect.height);
-	/* 获取与该区域重叠的部件，并记录至队列widget_buff中 */
-	Get_Overlay_Widget(rect, NULL, &widget_buff); 
-	
-	total = Queue_Get_Total(&widget_buff); 
-	if(total > 0)
-	{
-		//printf("rect(%d,%d,%d,%d), list cover widget:\n",
-		//rect.x, rect.y, rect.width, rect.height
-		//);
-		//printf("list cover widget:\n"); 
-		for(i=total-1; i>=0; --i)
-		{/* 队列最末端是最前端显示的部件，所以从尾至头遍历 */
-			widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
-			//print_widget_info(widget); 
-			/* 如果图层完全不可见，即完全透明 */
-			if(Widget_Layer_Not_Visible(widget))  
-				Queue_Delete_Pointer(&widget_buff, i); 
-			else if( Widget_Layer_Is_Opaque( widget) )
-			{/* 如果部件图层不透明 */
-				//print_widget_info(widget); 
-				//printf("Is_Opaque!\n");
-				break; 
-			}
-		}
-		//printf("list end\n");
-		if(i >= 0)
-		{/* 如果找到最前端的不透明的图层 */
-			total = Queue_Get_Total(&widget_buff);
-			for(; i<total; ++i)
-			{
-				widget = (LCUI_Widget*)Queue_Get(&widget_buff, i); 
-				pos = Get_Widget_Global_Pos(widget);
-				/* 获取相对坐标 */
-				pos.x -= rect.x;
-				pos.y -= rect.y;
-				/* 叠加 */ 
-				Mix_Graph(graph, &widget->graph, pos);
-			}
-		}
-		else
-		{/* 否则，截取背景图，然后再混合叠加部件图层 */
-			graph->flag = NO_ALPHA; 
-			Cut_Graph (&LCUI_Sys.screen.buff, rect, graph);
-			for(i=0; i<total; ++i)
-			{
-				widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
-				pos = Get_Widget_Global_Pos(widget);
-				pos.x -= rect.x;
-				pos.y -= rect.y; 
-				Mix_Graph(graph, &widget->graph, pos);
-			}
-		}
-	}
-	else
-	{/* 否则，直接贴背景图 */
-		graph->flag = NO_ALPHA; 
-		Cut_Graph (&LCUI_Sys.screen.buff, rect, graph);
-	}
-	
-	if (LCUI_Sys.cursor.visible == IS_TRUE)
-	{ /* 如果游标可见 */
-		/* 检查该区域是否与游标的图形区域重叠 */ 
-		if (Rect_Is_Overlay( rect, Get_Cursor_Rect()) )
-		{ /* 如果重叠 */
-			pos.x = LCUI_Sys.cursor.pos.x - rect.x;
-			pos.y = LCUI_Sys.cursor.pos.y - rect.y;
-			/* 将图形合成 */ 
-			Mix_Graph (graph, &LCUI_Sys.cursor.graph, pos);
-		}
-	} 
-	/* 释放队列占用的内存空间 */
-	Destroy_Queue(&widget_buff);
-	return 0;
-}
-
 LCUI_RGBA RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore)
 /* 功能：混合两个像素点的颜色 */
 {
-	if(fore.alpha == 255)
-	{
+	if(fore.alpha == 255) {
 		back.red	= fore.red;
 		back.blue	= fore.blue;
 		back.green	= fore.green;
 	}
 	else if(fore.alpha == 0);
-	else
-	{
+	else {
 		back.red	= (fore.red * fore.alpha + back.red * (255 - back.alpha)) /255;
 		back.green	= (fore.green * fore.alpha + back.green * (255 - back.alpha)) /255;
 		back.blue	= (fore.blue * fore.alpha + back.blue * (255 - back.alpha)) /255;
@@ -1796,12 +1586,12 @@ LCUI_RGBA RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore)
 	return back;
 }
 
-static long max(long a, long b)
+inline long max(long a, long b)
 {
 	return a > b ? a:b;
 }
 
-static double radian(int angle)
+inline double radian(int angle)
 /* 功能：计算弧度 */
 {
 	return angle*3.1415926/180;
@@ -1933,3 +1723,204 @@ int Rotate_Graph(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
     End_Use_Graph(des);
     return 0;
 }
+/********************** Graphics Processing End ***********************/
+
+void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
+/* 功能：获取与指定区域重叠的部件 */
+{
+	int i, total;
+	LCUI_Pos pos;
+	LCUI_Rect tmp;
+	LCUI_Widget *child; 
+	LCUI_Queue *widget_list;
+	 
+	if(widget == NULL) 
+		widget_list = &LCUI_Sys.widget_list; 
+	else {
+		if(widget->visible == IS_FALSE) 
+			return;
+		widget_list = &widget->child; 
+	}
+	
+	total = Queue_Get_Total(widget_list); 
+	
+	for(i=total-1; i>=0; --i) {/* 从底到顶遍历子部件 */
+		child = (LCUI_Widget*)Queue_Get(widget_list, i); 
+		if(child != NULL && child->visible == IS_TRUE)
+		{/* 如果有可见的子部件 */ 
+			tmp = Get_Widget_Valid_Rect(child); 
+			pos = Get_Widget_Global_Pos(child);
+			tmp.x += pos.x;
+			tmp.y += pos.y; 
+			if(!Rect_Valid(tmp)) continue;
+			if (Rect_Is_Overlay(tmp, rect)) 
+			{ 
+				Queue_Add_Pointer(queue, child);/* 记录与该区域重叠的部件 */
+				Get_Overlay_Widget(rect, child, queue);  /* 递归调用 */
+			} 
+		}
+	} 
+}
+
+LCUI_RGBA Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos)
+/* 功能：获取图像中指定坐标的像素点的颜色 */
+{
+	int i;
+	LCUI_RGBA rgba;
+	
+	i = graph->width*pos.y + pos.x; 
+	
+	rgba.red = graph->rgba[0][i];
+	rgba.green = graph->rgba[1][i];
+	rgba.blue = graph->rgba[2][i];
+	
+	if(Graph_Have_Alpha(graph))
+		rgba.alpha = graph->rgba[3][i];
+	else 
+		rgba.alpha = 255;
+		
+	return rgba;
+}
+
+int Graph_Is_Opaque(LCUI_Graph *graph)
+/* 
+ * 功能：检测图形是否为不透明 
+ * 说明：完全透明则返回-1，不透明则返回1，有透明效果则返回0
+ * */
+{ 
+	if( !Graph_Have_Alpha(graph) )
+		return 1; 
+	if( graph->alpha == 0 )
+		return -1;
+	else if(graph->alpha < 255)
+		return 0;
+	//如果有新的算法，可以快速检测出一个图层是否全透明或不透明，会添加在下面
+	#ifdef have_new_method
+	LCUI_Pos pos;
+	LCUI_RGBA rgba;
+	int i, total, not_visbale = 0;
+	/* 根据尺寸，来获取采样次数 */
+	total = (graph->width + graph->height)/4.0;
+	for(i=0; i<total; ++i)
+	{
+		pos.x = rand()%graph->width;
+		pos.y = rand()%graph->height;
+		rgba = Get_Graph_Pixel(graph, pos);
+		if( rgba.alpha == 0 && not_visbale == 0)
+			not_visbale = 1;
+		else if(rgba.alpha < 255)
+			return 0;
+	}
+	if(not_visbale == 1)
+		return -1;
+	#endif
+	return 0;
+}
+
+int Widget_Layer_Is_Opaque(LCUI_Widget *widget)
+/* 功能：判断部件图形是否不透明 */
+{ 
+	return Graph_Is_Opaque(&widget->graph);
+}
+
+int Widget_Layer_Not_Visible(LCUI_Widget *widget)
+/* 功能：检测部件图形是否完全透明 */
+{
+	if(Graph_Is_Opaque(&widget->graph) == -1)
+		return 1;
+	return 0;
+}
+
+int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
+/* 
+ * 功能：获取屏幕中指定区域内实际要显示的图形 
+ * 说明：指定的区域必须是与部件区域不部分重叠的
+ * */
+{ 
+	LCUI_Pos pos;
+	LCUI_Widget *widget; 
+	LCUI_Queue widget_buff;
+	
+	Queue_Init(&widget_buff, sizeof(LCUI_Widget), NULL);
+	Queue_Using_Pointer(&widget_buff); /* 只用于存放指针 */
+	/* 检测这个区域是否有效 */
+	if (rect.x < 0) return -1; 
+	if (rect.y < 0) return -1; 
+	if (rect.x + rect.width > Get_Screen_Width ())
+		return -1;
+	if (rect.y + rect.height > Get_Screen_Height ())
+		return -1;
+	
+	if (rect.width <= 0 && rect.height <= 0)
+		return -2;
+	
+	int i, total; 
+	/* 根据指定的尺寸，分配内存空间，用于储存图形数据 */
+	Malloc_Graph(graph, rect.width, rect.height);
+	/* 获取与该区域重叠的部件，并记录至队列widget_buff中 */
+	Get_Overlay_Widget(rect, NULL, &widget_buff); 
+	
+	total = Queue_Get_Total(&widget_buff); 
+	if(total > 0) {
+		//printf("rect(%d,%d,%d,%d), list cover widget:\n",
+		//rect.x, rect.y, rect.width, rect.height
+		//);
+		//printf("list cover widget:\n"); 
+		for(i=total-1; i>=0; --i) {
+			/* 队列最末端是最前端显示的部件，所以从尾至头遍历 */
+			widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
+			//print_widget_info(widget); 
+			/* 如果图层完全不可见，即完全透明 */
+			if(Widget_Layer_Not_Visible(widget))  
+				Queue_Delete_Pointer(&widget_buff, i); 
+			else if( Widget_Layer_Is_Opaque( widget) ) {
+				/* 如果部件图层不透明 */
+				//print_widget_info(widget); 
+				//printf("Is_Opaque!\n");
+				break; 
+			}
+		}
+		//printf("list end\n");
+		if(i >= 0) {/* 如果找到最前端的不透明的图层 */
+			total = Queue_Get_Total(&widget_buff);
+			for(; i<total; ++i) {
+				widget = (LCUI_Widget*)Queue_Get(&widget_buff, i); 
+				pos = Get_Widget_Global_Pos(widget);
+				/* 获取相对坐标 */
+				pos.x -= rect.x;
+				pos.y -= rect.y;
+				/* 叠加 */ 
+				Mix_Graph(graph, &widget->graph, pos);
+			}
+		} else {/* 否则，截取背景图，然后再混合叠加部件图层 */
+			graph->flag = NO_ALPHA; 
+			Cut_Graph (&LCUI_Sys.screen.buff, rect, graph);
+			for(i=0; i<total; ++i) {
+				widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
+				pos = Get_Widget_Global_Pos(widget);
+				pos.x -= rect.x;
+				pos.y -= rect.y; 
+				Mix_Graph(graph, &widget->graph, pos);
+			}
+		}
+	} else {/* 否则，直接贴背景图 */
+		graph->flag = NO_ALPHA; 
+		Cut_Graph (&LCUI_Sys.screen.buff, rect, graph);
+	}
+	
+	if (LCUI_Sys.cursor.visible == IS_TRUE)
+	{ /* 如果游标可见 */
+		/* 检查该区域是否与游标的图形区域重叠 */ 
+		if (Rect_Is_Overlay( rect, Get_Cursor_Rect()) )
+		{ /* 如果重叠 */
+			pos.x = LCUI_Sys.cursor.pos.x - rect.x;
+			pos.y = LCUI_Sys.cursor.pos.y - rect.y;
+			/* 将图形合成 */ 
+			Mix_Graph (graph, &LCUI_Sys.cursor.graph, pos);
+		}
+	} 
+	/* 释放队列占用的内存空间 */
+	Destroy_Queue(&widget_buff);
+	return 0;
+}
+

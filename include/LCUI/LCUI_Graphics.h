@@ -208,5 +208,22 @@ int Rotate_Graph(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des);
  * 本源代码参考自：http://read.pudn.com/downloads154/sourcecode/graph/684994/%E5%9B%BE%E5%83%8F%E6%97%8B%E8%BD%AC/%E5%9B%BE%E5%83%8F%E6%97%8B%E8%BD%AC/%E6%BA%90%E4%BB%A3%E7%A0%81/MyDIPView.cpp__.htm
  * 算法有待优化完善。
  */ 
+
+/************************ Graph Quote *********************************/
+int Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area);
+/* 
+ * 功能：引用另一个图层中指定区域里的图形 
+ * 说明：src是被引用的对象，des是引用者，area是引用的src中的图形所在的区域
+ * */ 
+
+LCUI_Rect Get_Graph_Valid_Rect(LCUI_Graph *graph);
+/* 功能：获取被引用的图形所在的有效区域 */ 
+
+LCUI_Graph *Get_Quote_Graph(LCUI_Graph *graph);
+/* 
+ * 功能：获取指向被引用的图形的指针 
+ * 说明：如果当前图形引用了另一个图形，并且，该图形处于一条引用链中，那么，本函数会返
+ * 回指向被引用的最终图形的指针。
+ * */
 #endif /* __LCUI_GRAPHICS_H__ */
 

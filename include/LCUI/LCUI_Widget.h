@@ -155,12 +155,6 @@ LCUI_Widget *Get_Focus_Widget();
 int Widget_Is_Active(LCUI_Widget *widget);
 /* 功能：判断部件是否为活动状态 */ 
 
-LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset);
-/* 
- * 功能：获取移动到新位置的部件在屏幕上的有效显示区域 
- * 说明：offset是原位置与新位置的差
- * */ 
-
 LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget);
 /* 功能：获取部件在屏幕中实际显示的区域 */ 
 
@@ -331,7 +325,7 @@ void Processing_All_WidgetUpdate();
 /************************** Widget Library ****************************/
 
 int WidgetFunc_Add(
-			char *type, 
+			const char *type, 
 			void (*widget_func)(LCUI_Widget*), 
 			FuncType func_type
 		);
@@ -349,8 +343,8 @@ int WidgetType_Add(char *type);
 void WidgetLib_Init(LCUI_Queue *w_lib);
 /* 功能：初始化部件库 */ 
 
-int WidgetType_Delete(char *type);
-/* 功能：删除指定部件类型的相关数据 */ 
+int WidgetType_Delete(const char *type);
+/* 功能：删除指定部件类型的相关数据 */
 
 void NULL_Widget_Func(LCUI_Widget *widget);
 /*
@@ -358,19 +352,19 @@ void NULL_Widget_Func(LCUI_Widget *widget);
  * 说明：如果获取指定部件类型的函数指针失败，将返回这个函数的函数指针
  **/ 
 
-LCUI_ID WidgetType_Get_ID(char *widget_type);
-/* 功能：获取指定类型部件的类型ID */ 
+LCUI_ID WidgetType_Get_ID(const char *widget_type);
+/* 功能：获取指定类型部件的类型ID */
 
 int Get_Widget_Type_By_ID(LCUI_ID id, char *widget_type);
-/* 功能：获取指定类型ID的类型名称 */ 
+/* 功能：获取指定类型ID的类型名称 */
 
 void ( *Get_WidgetFunc_By_ID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*);
 /* 功能：获取指定部件类型ID的函数的函数指针 */ 
 
-void ( *Get_WidgetFunc(char *widget_type, FuncType func_type) ) (LCUI_Widget*);
+void ( *Get_WidgetFunc(const char *widget_type, FuncType func_type) ) (LCUI_Widget*);
 /* 功能：获取指定类型部件的函数的函数指针 */ 
 
-int Check_WidgetType(char *widget_type);
+int Check_WidgetType(const char *widget_type);
 /* 功能：检测指定部件类型是否有效 */
 
 void Register_Default_Widget_Type();

@@ -85,17 +85,13 @@ LCUI_Pos Get_Widget_Pos(LCUI_Widget *widget)
 }
 
 void *Get_Widget_Private_Data(LCUI_Widget *widget)
-/*
- * 功能：获取部件的私有数据结构体的指针
- **/
+/* 功能：获取部件的私有数据结构体的指针 */
 {
 	return widget->private;
 }
 
 LCUI_Widget *Get_Widget_Parent(LCUI_Widget *widget)
-/*
- * 功能：获取部件的父部件
- **/
+/* 功能：获取部件的父部件 */
 {
 	return widget->parent;
 }
@@ -462,15 +458,10 @@ int Widget_Is_Active(LCUI_Widget *widget)
 	return 0;
 }
 
-#define  _use_old_func_
-#ifdef _use_old_func_
-LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
-/* 
- * 功能：获取移动到新位置的部件在屏幕上的有效显示区域 
- * 说明：offset是原位置与新位置的差
- * */
+
+LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
+/* 功能：获取部件在屏幕中实际显示的区域 */
 {
-	LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget);
 	LCUI_Pos pos;
 	int w, h, temp; 
 	LCUI_Rect cut_rect;
@@ -479,10 +470,7 @@ LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 	cut_rect.width = widget->size.w;
 	cut_rect.height = widget->size.h;
 	
-	pos = widget->pos;
-	pos.x += offset.x;
-	pos.y += offset.y;
-	
+	pos = widget->pos; 
 	if(widget->parent == NULL)
 	{
 		w = Get_Screen_Width();
@@ -511,135 +499,48 @@ LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 	if(pos.y + widget->size.h > h)
 		cut_rect.height -= (pos.y +  widget->size.h - h); 
 	
-	if(widget->parent != NULL)
+	if(widget->parent == NULL)
+		return cut_rect;
+		
+	LCUI_Rect rect;
+	/* 获取父部件的有效显示范围 */
+	rect = Get_Widget_Valid_Rect(widget->parent);
+	/* 如果父部件需要裁剪，那么，子部件根据情况，也需要进行裁剪 */
+	if(rect.x > 0)
+	{/* 如果裁剪区域的x轴坐标大于0 */
+		/* 裁剪区域和部件区域是在同一容器中，只要得出两个区域的重叠区域即可 */
+		temp = pos.x + cut_rect.x;
+		if(temp < rect.x)
+		{ /* 如果部件的 x轴坐标+裁剪起点x轴坐标 小于它 */
+			temp = rect.x - pos.x;		/* 新的裁剪区域起点x轴坐标 */
+			cut_rect.width -= (temp - cut_rect.x);/* 改变裁剪区域的宽度 */
+			cut_rect.x = temp;			/* 改变部件的裁剪区域的x坐标 */
+		}
+	}
+	if(rect.y > 0)
 	{
-		LCUI_Rect rect;
-		/* 获取父部件的有效显示范围 */
-		rect = Get_Widget_Valid_Rect(widget->parent);
-		/* 如果父部件需要裁剪，那么，子部件根据情况，也需要进行裁剪 */
-		if(rect.x > 0)
-		{/* 如果裁剪区域的x轴坐标大于0 */
-			/* 裁剪区域和部件区域是在同一容器中，只要得出两个区域的重叠区域即可 */
-			temp = pos.x + cut_rect.x;
-			if(temp < rect.x)
-			{ /* 如果部件的 x轴坐标+裁剪起点x轴坐标 小于它 */
-				temp = rect.x - pos.x;		/* 新的裁剪区域起点x轴坐标 */
-				cut_rect.width -= (temp - cut_rect.x);/* 改变裁剪区域的宽度 */
-				cut_rect.x = temp;			/* 改变部件的裁剪区域的x坐标 */
-			}
-		}
-		if(rect.y > 0)
+		temp = pos.y + cut_rect.y;
+		if(pos.y < rect.y)
 		{
-			temp = pos.y + cut_rect.y;
-			if(pos.y < rect.y)
-			{
-				temp = rect.y - pos.y;
-				cut_rect.height -= (temp - cut_rect.y);
-				cut_rect.y = temp;
-			}
+			temp = rect.y - pos.y;
+			cut_rect.height -= (temp - cut_rect.y);
+			cut_rect.y = temp;
 		}
-		if(rect.width < w)
-		{/* 如果父部件裁剪区域的宽度小于父部件的宽度 */
-			temp = pos.x+cut_rect.x+cut_rect.width;
-			if(temp > rect.x+rect.width) /* 如果部件裁剪区域左边部分与父部件裁剪区域重叠 */
-				cut_rect.width -= (temp-(rect.x+rect.width));
-		}
-		if(rect.height < h)
-		{
-			temp = pos.y+cut_rect.y+cut_rect.height;
-			if(temp > rect.y+rect.height)
-				cut_rect.height -= (temp-(rect.y+rect.height));
-		}
+	}
+	if(rect.width < w)
+	{/* 如果父部件裁剪区域的宽度小于父部件的宽度 */
+		temp = pos.x+cut_rect.x+cut_rect.width;
+		if(temp > rect.x+rect.width) /* 如果部件裁剪区域左边部分与父部件裁剪区域重叠 */
+			cut_rect.width -= (temp-(rect.x+rect.width));
+	}
+	if(rect.height < h)
+	{
+		temp = pos.y+cut_rect.y+cut_rect.height;
+		if(temp > rect.y+rect.height)
+			cut_rect.height -= (temp-(rect.y+rect.height));
 	} 
 	
 	return cut_rect;
-}
-
-#else
-LCUI_Rect Get_Widget_Valid_Rect_By_New_Pos(LCUI_Widget *widget, LCUI_Pos offset)
-/* 
- * 功能：获取移动到新位置的部件在屏幕上的有效显示区域 
- * 说明：offset是原位置与新位置的差，返回的区域是相对于自己的区域，而不是在容器中的相对区域
- * 
- * */
-{
-	LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget);
-	LCUI_Pos pos;
-	int w, h, temp; 
-	LCUI_Rect cut_rect; 
-	
-	pos = widget->pos;
-	pos.x += offset.x;
-	pos.y += offset.y;
-	
-	if(widget->parent == NULL)
-	{
-		w = Get_Screen_Width();
-		h = Get_Screen_Height();
-	}
-	else
-	{
-		w = widget->parent->size.w;
-		h = widget->parent->size.h;
-	}
-	
-	/* 获取需裁剪的区域 */
-	Get_Cut_Area(Size(w, h), Get_Widget_Rect(widget), &cut_rect);
-	
-	if(widget->parent != NULL)
-	{
-		LCUI_Rect rect;
-		/* 获取父部件的有效显示范围 */
-		rect = Get_Widget_Valid_Rect(widget->parent);
-		/* 如果父部件需要裁剪，那么，子部件根据情况，也需要进行裁剪 */
-		if(rect.x > 0)
-		{/* 如果裁剪区域的x轴坐标大于0 */
-			/* 裁剪区域和部件区域是在同一容器中，只要得出两个区域的重叠区域即可 */
-			temp = pos.x + cut_rect.x;
-			if(temp < rect.x)
-			{ /* 如果部件的 x轴坐标+裁剪起点x轴坐标 小于它 */
-				temp = rect.x - pos.x;		/* 新的裁剪区域起点x轴坐标 */
-				cut_rect.width -= (temp - cut_rect.x);/* 改变裁剪区域的宽度 */
-				cut_rect.x = temp;			/* 改变部件的裁剪区域的x坐标 */
-			}
-		}
-		if(rect.y > 0)
-		{
-			temp = pos.y + cut_rect.y;
-			if(pos.y < rect.y)
-			{
-				temp = rect.y - pos.y;
-				cut_rect.height -= (temp - cut_rect.y);
-				cut_rect.y = temp;
-			}
-		}
-		if(rect.width < w)
-		{/* 如果父部件裁剪区域的宽度小于父部件的宽度 */
-			temp = pos.x+cut_rect.x+cut_rect.width;
-			if(temp > rect.x+rect.width) /* 如果部件裁剪区域左边部分与父部件裁剪区域重叠 */
-				cut_rect.width -= (temp-(rect.x+rect.width));
-		}
-		if(rect.height < h)
-		{
-			temp = pos.y+cut_rect.y+cut_rect.height;
-			if(temp > rect.y+rect.height)
-				cut_rect.height -= (temp-(rect.y+rect.height));
-		}
-	}
-	else 
-	{
-		cut_rect.x += pos.x;
-		cut_rect.y += pos.y; 
-	}
-	
-	return cut_rect;
-}
-#endif
-
-LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
-/* 功能：获取部件在屏幕中实际显示的区域 */
-{
-	return Get_Widget_Valid_Rect_By_New_Pos(widget, Pos(0,0));
 }
 
 int Empty_Widget()
@@ -1612,7 +1513,7 @@ typedef struct _WidgetTypeData
 }WidgetTypeData;
 
 int WidgetFunc_Add(
-			char *type, 
+			const char *type, 
 			void (*widget_func)(LCUI_Widget*), 
 			FuncType func_type
 		)
@@ -1718,10 +1619,8 @@ void WidgetLib_Init(LCUI_Queue *w_lib)
 	Queue_Init(w_lib, sizeof(WidgetTypeData), Destroy_WidgetType);
 }
 
-int WidgetType_Delete(char *type)
-/*
- * 功能：删除指定部件类型的相关数据
- **/
+int WidgetType_Delete(const char *type)
+/* 功能：删除指定部件类型的相关数据 */
 {
 	WidgetTypeData *wd;
 	LCUI_App *app = Get_Self_AppPointer();
@@ -1751,10 +1650,8 @@ void NULL_Widget_Func(LCUI_Widget *widget)
 	
 }
 
-LCUI_ID WidgetType_Get_ID(char *widget_type)
-/*
- * 功能：获取指定类型部件的类型ID
- **/
+LCUI_ID WidgetType_Get_ID(const char *widget_type)
+/* 功能：获取指定类型部件的类型ID */
 { 
 	WidgetTypeData *wd;
 	LCUI_App *app = Get_Self_AppPointer();
@@ -1778,9 +1675,7 @@ LCUI_ID WidgetType_Get_ID(char *widget_type)
 
 
 int Get_Widget_Type_By_ID(LCUI_ID id, char *widget_type)
-/*
- * 功能：获取指定类型ID的类型名称
- **/
+/* 功能：获取指定类型ID的类型名称 */
 {
 	WidgetTypeData *wd;
 	LCUI_App *app = Get_Self_AppPointer();
@@ -1845,7 +1740,7 @@ void ( *Get_WidgetFunc_By_ID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*)
 	return NULL_Widget_Func;
 }
 
-void ( *Get_WidgetFunc(char *widget_type, FuncType func_type) ) (LCUI_Widget*)
+void ( *Get_WidgetFunc(const char *widget_type, FuncType func_type) ) (LCUI_Widget*)
 /* 功能：获取指定类型部件的函数的函数指针 */
 {
 	LCUI_Func *f = NULL; 
@@ -1887,10 +1782,8 @@ void ( *Get_WidgetFunc(char *widget_type, FuncType func_type) ) (LCUI_Widget*)
 	return NULL_Widget_Func;
 }
 
-int Check_WidgetType(char *widget_type)
-/*
- * 功能：检测指定部件类型是否有效
- **/
+int Check_WidgetType(const char *widget_type)
+/* 功能：检测指定部件类型是否有效 */
 { 
 	WidgetTypeData *wd;
 	LCUI_App *app = Get_Self_AppPointer();

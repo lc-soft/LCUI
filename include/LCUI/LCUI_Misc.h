@@ -53,7 +53,7 @@ void Border_Init(LCUI_Border *in);
 void Strcpy (LCUI_String * des, char *src);
 /* 功能：拷贝字符串至String结构体数据中 */ 
 
-int Strcmp(LCUI_String *str1, char *str2);
+int Strcmp(LCUI_String *str1, const char *str2);
 /* 功能：对比str1与str2 */ 
 
 void Get_Moved_Rect_Refresh_Area (int new_x, int new_y, LCUI_Rect rect,

@@ -320,8 +320,7 @@ int Set_PictureBox_ErrorImage(LCUI_Widget *widget, LCUI_Graph *pic)
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
 								Get_Widget_Private_Data(widget);
 	
-	if(Valid_Graph(pic))
-	{
+	if(Valid_Graph(pic)) {
 		Copy_Graph(&pic_box->error_image, pic);
 		return 0;
 	}

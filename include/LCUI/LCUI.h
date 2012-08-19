@@ -422,9 +422,13 @@ struct _LCUI_Bitmap
 /******************************图片数据*********************************/
 struct _LCUI_Graph
 {
-	int	type;					/* 存储图片类型 */
-	int	width, height;			/* 尺寸 */
+	int	type;					/* 图片类型 */
 	int	bit_depth;				/* 位深 */
+	
+	int quote;					/* 指示是否引用其它图层中的图形 */
+	LCUI_Graph *src;			/* 所引用的对象 */
+	LCUI_Pos pos;				/* 在引用另一个图层中的图形时，会保存区域的起点位置 */
+	int	width, height;			/* 尺寸 */
 	
 	unsigned char	**rgba;		/* 图片数组 */
 	unsigned char	alpha;		/* 全局透明度，表示整张图片的透明度，默认为255 */

@@ -95,7 +95,7 @@ void Strcpy (LCUI_String * des, char *src)
 	}
 }
 
-int Strcmp(LCUI_String *str1, char *str2)
+int Strcmp(LCUI_String *str1, const char *str2)
 /* 功能：对比str1与str2 */
 {
 	if (str1 != NULL && str1->size > 0 && str2 != NULL) 
