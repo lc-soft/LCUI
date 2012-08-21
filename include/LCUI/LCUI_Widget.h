@@ -113,7 +113,7 @@ void Response_Status_Change(LCUI_Widget *widget);
 void Shift_Widget_Refresh_Area(LCUI_Widget *widget);
 /* 功能：转移部件的rect队列成员至父部件中 */ 
 
-void Processing_Refresh_Area();
+void Process_Refresh_Area();
 /*
  * 功能：处理已记录的刷新区域
  * 说明：此函数会将各个部件的rect队列中的处理掉，并将
@@ -313,10 +313,10 @@ void Set_Widget_Status(LCUI_Widget *widget, int status);
 
 
 /**************************** Widget Update ***************************/ 
-int Processing_WidgetUpdate(LCUI_Widget *widget);
+int Process_WidgetUpdate(LCUI_Widget *widget);
 /* 功能：处理部件的更新 */ 
 
-void Processing_All_WidgetUpdate();
+void Process_All_WidgetUpdate();
 /* 功能：处理所有部件的更新 */ 
 /************************ Widget Update End ***************************/
 

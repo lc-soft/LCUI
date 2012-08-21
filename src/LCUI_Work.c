@@ -331,7 +331,7 @@ int LCUI_Key_Event_Connect (int key_value, void (*func) (), void *arg)
 }
 
 
-int Processing_Event(LCUI_EventQueue *queue, int event_id)
+int Process_Event(LCUI_EventQueue *queue, int event_id)
 /* 
  * 功能：处理指定ID的事件
  * 说明：本函数会将事件队列中与指定ID的事件关联的回调函数 添加至程序的任务队列
@@ -473,7 +473,7 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 			drag_event.first_click = 1; 
 			drag_event.end_click = 0;
 			/* 处理部件的拖动事件 */
-			Processing_Event(&widget->event, EVENT_DRAG); 
+			Process_Event(&widget->event, EVENT_DRAG); 
 		}
 			//printf("2\n");
 		widget = Widget_Find_Response_Status_Change(widget); 
@@ -501,7 +501,7 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 			drag_event.new_pos = Pos_Sub(event->global_pos, __offset_pos); 
 			drag_event.first_click = 0; 
 			drag_event.end_click = 1; 
-			Processing_Event(&click_widget->event, EVENT_DRAG);
+			Process_Event(&click_widget->event, EVENT_DRAG);
 			
 			if(click_widget == widget)
 			{/* 如果点击时和点击后都在同一个按钮部件内进行的 */
@@ -512,7 +512,7 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 				//printf("send clicked event\n"); 
 		//printf("6\n");
 				if(widget->enabled == IS_TRUE)
-					Processing_Event(&widget->event, EVENT_CLICKED);
+					Process_Event(&widget->event, EVENT_CLICKED);
 				
 				widget = Widget_Find_Response_Status_Change(event->widget);
 				if(NULL != widget){
@@ -609,11 +609,11 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 	if(click_widget != NULL && Mouse_LeftButton (event) == PRESSED)
 	{/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态 */ 
 		drag_event.new_pos = Pos_Sub(event->global_pos, __offset_pos); 
-		Processing_Event(&click_widget->event, EVENT_DRAG);
+		Process_Event(&click_widget->event, EVENT_DRAG);
 		drag_event.first_click = 0; 
 		drag_event.end_click = 0; 
 		/* 处理部件的拖动事件 */
-		Processing_Event(&click_widget->event, EVENT_DRAG);
+		Process_Event(&click_widget->event, EVENT_DRAG);
 	}
 	//printf("Tracking_Mouse_Move(): end\n");
 }

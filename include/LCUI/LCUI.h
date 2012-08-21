@@ -43,8 +43,9 @@
 /* 为了解决结构体被重复定义，用宏进行头文件保护(其它地方出现类似的内容，将不再注释) */
 #ifndef __LCUI_H__  /* 如果没有定义 __LCUI_H__ 宏 */
 #define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */ 
+
 #define LCUI_VERSION "0.12.4"
-//#define __TSLIB__ /* 是否支持触屏 */ 
+
 #include <pthread.h>
 #include <ft2build.h>
 #include <tslib.h>

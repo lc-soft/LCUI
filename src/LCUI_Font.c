@@ -2695,7 +2695,7 @@ int Using_GB2312()
  * 个函数进行设置，让相关函数正常转换字符编码 
  * */
 {
-	Set_EncodingType(ENCODEING_TYPE_GB2312);
+	return Set_EncodingType(ENCODEING_TYPE_GB2312);
 }
 
 #define MAX_SAVE_NUM   20

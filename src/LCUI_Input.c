@@ -190,7 +190,7 @@ static void Free_MouseKey(LCUI_MouseEvent *event, int key_code)
 	}
 }
 
-void Processing_Mouse_Event(int button_type, LCUI_MouseEvent *event)
+void Process_Mouse_Event(int button_type, LCUI_MouseEvent *event)
 /* 功能：处理鼠标产生的事件 */
 {
 	static LCUI_Pos old_pos;/* 保存鼠标之前的坐标 */
@@ -224,7 +224,7 @@ void Processing_Mouse_Event(int button_type, LCUI_MouseEvent *event)
 
 static int disable_mouse = IS_FALSE;
 
-static void * Mouse_Input ()
+static void * Process_Mouse_Input ()
 /*
  * 功能：处理鼠标的移动，以及按键的点击
  * 说明：本函数会通过读取/dev/input/mice来获得鼠标的相对移动位置，以及按键状态，并
@@ -242,21 +242,16 @@ static void * Mouse_Input ()
 	LCUI_MouseEvent event;
 	LCUI_Pos pos; 
 	disable_mouse = IS_FALSE;
-	while (LCUI_Active())
-	{ 
+	while (LCUI_Active()) { 
 		if(disable_mouse == 1) break;
-		if (LCUI_Sys.mouse.status == REMOVE)
-		{ 
+		if (LCUI_Sys.mouse.status == REMOVE) { 
 			if ((LCUI_Sys.mouse.fd =
-				 open (MS_DEV, O_RDONLY)) < 0)
-			{
+				 open (MS_DEV, O_RDONLY)) < 0) {
 				//printf("Failed to open \"/dev/input/mice\".\n");
 				LCUI_Sys.mouse.status = REMOVE;
 				usleep (100000);
 				//continue;
-			}
-			else
-			{
+			} else {
 				LCUI_Sys.mouse.status = INSIDE;
 				//printf("open \"/dev/input/mice\" successfuly.\n");
 			}
@@ -269,17 +264,15 @@ static void * Mouse_Input ()
 		FD_SET (LCUI_Sys.mouse.fd, &readfds);
 
 		retval = select (LCUI_Sys.mouse.fd + 1, &readfds, NULL, NULL, &tv);
-		if (retval == 0)
-		{
+		if (retval == 0) {
 			//printf("Time out!\n");
 			if(disable_mouse == IS_TRUE) 
 				break;
 		}
-		if (FD_ISSET (LCUI_Sys.mouse.fd, &readfds))
-		{
+		if (FD_ISSET (LCUI_Sys.mouse.fd, &readfds)) {
 			temp = read (LCUI_Sys.mouse.fd, buf, 6);
-			if (temp <= 0)		//终端设备，一次只能读取一行
-			{
+			//终端设备，一次只能读取一行
+			if (temp <= 0){
 				if (temp < 0)
 					LCUI_Sys.mouse.status = REMOVE;
 				continue;
@@ -304,17 +297,15 @@ static void * Mouse_Input ()
 			
 			/* 获取当前鼠标指针覆盖到的部件的指针 */
 			event.widget = Get_Cursor_Overlay_Widget();
-			if(event.widget != NULL)
-			{/* 如果有覆盖到的部件，就需要计算鼠标指针与部件的相对坐标 */
+			/* 如果有覆盖到的部件，就需要计算鼠标指针与部件的相对坐标 */
+			if(event.widget != NULL) {
 				event.pos.x = pos.x - event.widget->pos.x;
 				event.pos.y = pos.y - event.widget->pos.y;
-			}
-			else
-			{/* 否则，和全局坐标一样 */
+			} else {/* 否则，和全局坐标一样 */
 				event.pos = pos;
 			}
 			/* 处理鼠标事件 */
-			Processing_Mouse_Event(button, &event); 
+			Process_Mouse_Event(button, &event); 
 		}
 	}
 	disable_mouse = IS_FALSE;
@@ -340,19 +331,17 @@ int Check_Mouse_Support()
 int Enable_Mouse_Input()
 /* 功能：启用鼠标输入处理 */
 {
-	if(LCUI_Sys.mouse.status == REMOVE)
-	{/* 创建一个线程，用于刷显示鼠标指针 */
+	/* 创建一个线程，用于刷显示鼠标指针 */
+	if(LCUI_Sys.mouse.status == REMOVE) 
 		return pthread_create(&LCUI_Sys.mouse.thread, 
-								NULL, Mouse_Input, NULL);
-	}
+					NULL, Process_Mouse_Input, NULL); 
 	return 0;
 }
 
 int Disable_Mouse_Input()
 /* 功能：禁用鼠标输入处理 */
 { 
-	if(LCUI_Sys.mouse.status == INSIDE)
-	{
+	if(LCUI_Sys.mouse.status == INSIDE) {
 		disable_mouse = IS_TRUE;
 		return pthread_join (LCUI_Sys.mouse.thread, NULL);	/* 等待LCUI子线程结束 */
 	}
@@ -382,8 +371,7 @@ int Set_Raw(int t)
 		if(tcsetattr(fd, TCSANOW, &tm) < 0) 
 			return -1; 
 		printf("\033[?25l");/* 隐藏光标 */
-	}
-	else {
+	} else {
 		/* 以下值是通过获取正常终端属性得到的 */
 		tm.c_iflag = 11522;
 		tm.c_oflag = 5;
@@ -457,8 +445,7 @@ int Find_Pressed_Key(int key)
 	int i, total;
 	
 	total = Queue_Get_Total(&LCUI_Sys.press_key);
-	for(i=0; i<total; ++i)
-	{
+	for(i=0; i<total; ++i) {
 		t = *(int*)Queue_Get(&LCUI_Sys.press_key, i);
 		if(t == key)
 			return 1;
@@ -469,23 +456,19 @@ int Find_Pressed_Key(int key)
 int debug_mark = 0;
 static int disable_key = IS_FALSE;
 extern int LCUI_Active();
-static void * Processing_Key_Input ()
+static void * Process_Key_Input ()
 /* 功能：处理按键输入 */
 {
 	int key; 
 	int sleep_time = 1500;
 	//LCUI_Graph graph;
 	//Graph_Init(&graph);
-	while (LCUI_Active())
-	{
-		if (Check_Key ())
-		{/* 如果有按键输入 */ 
+	while (LCUI_Active()) {
+		if (Check_Key ()) {/* 如果有按键输入 */ 
 			sleep_time = 1500;
 			key = Get_Key ();
-			if(key == 'd')
-				debug_mark = 1;
-			else 
-				debug_mark = 0;
+			if(key == 'd') debug_mark = 1;
+			else  debug_mark = 0;
 			//#define __NEED_CATCHSCREEN__
 			#ifdef __NEED_CATCHSCREEN__
 			if(key == 'c')
@@ -506,11 +489,10 @@ static void * Processing_Key_Input ()
 			}
 			#endif
 			/* 处理程序中关联的按键事件 */
-			Processing_Event(&LCUI_Sys.key_event, key);
+			Process_Event(&LCUI_Sys.key_event, key);
 		}
 		else if(disable_key == IS_TRUE) break;
-		else
-		{/* 停顿一段时间 */
+		else {/* 停顿一段时间 */
 			usleep(sleep_time);
 			sleep_time+=1500;
 			if(sleep_time >= 30000)
@@ -525,11 +507,11 @@ static void * Processing_Key_Input ()
 int Enable_Key_Input()
 /* 功能：启用按键输入处理 */
 {
-	if(disable_key == IS_FALSE)
-	{/* 创建一个线程，用于处理按键输入 */
+	if(disable_key == IS_FALSE) {
 		Set_Raw(1);/* 设置终端属性 */ 
+		/* 创建一个线程，用于处理按键输入 */
 		return pthread_create (&LCUI_Sys.key_thread, 
-							NULL, Processing_Key_Input, NULL);
+				NULL, Process_Key_Input, NULL);
 	}
 	return 0;
 }
@@ -537,8 +519,7 @@ int Enable_Key_Input()
 int Disable_Key_Input()
 /* 功能：撤销按键输入处理 */
 {
-	if(disable_key == IS_FALSE)
-	{
+	if(disable_key == IS_FALSE) {
 		disable_key = IS_TRUE;
 		Set_Raw(0);/* 恢复终端属性 */
 		return pthread_join (LCUI_Sys.key_thread, NULL);/* 等待线程结束 */
@@ -549,22 +530,25 @@ int Disable_Key_Input()
 
 
 /************************* TouchScreen *********************************/ 
-static void * Processing_TouchScreen_Input ()
+static void * Process_TouchScreen_Input ()
 /* 功能：处理触屏输入 */
 {
+	char *tsdevice;
 	struct ts_sample samp;
 	int button, x, y, ret;
 	LCUI_MouseEvent event;
 	
 	char str[100];
-	while (LCUI_Active())
-	{
-		if (LCUI_Sys.ts.status != INSIDE)
-		{
-			LCUI_Sys.ts.td = ts_open (TS_DEV, 0);
-			if (!LCUI_Sys.ts.td)
-			{
-				sprintf (str, "ts_open: %s", TS_DEV);
+	while (LCUI_Active()) {
+		if (LCUI_Sys.ts.status != INSIDE) {
+			tsdevice = getenv("TSLIB_TSDEVICE");
+			if( tsdevice != NULL ) {
+				LCUI_Sys.ts.td = ts_open(tsdevice, 0);
+			}
+			else tsdevice = TS_DEV;
+			LCUI_Sys.ts.td = ts_open (tsdevice, 0);
+			if (!LCUI_Sys.ts.td) { 
+				sprintf (str, "ts_open: %s", tsdevice);
 				perror (str);
 				LCUI_Sys.ts.status = REMOVE;
 				break;
@@ -581,14 +565,12 @@ static void * Processing_TouchScreen_Input ()
 
 		/* 开始获取触屏点击处的坐标 */ 
 		ret = ts_read (LCUI_Sys.ts.td, &samp, 1); 
-		if (ret < 0)
-		{
+		if (ret < 0) {
 			perror ("ts_read");
 			continue;
 		}
 
-		if (ret != 1)
-			continue;
+		if (ret != 1) continue;
 
 		x = samp.x;
 		y = samp.y;
@@ -606,20 +588,18 @@ static void * Processing_TouchScreen_Input ()
 		event.global_pos.y = y;
 		/* 获取当前鼠标指针覆盖到的部件的指针 */
 		event.widget = Get_Cursor_Overlay_Widget();
-		if(event.widget != NULL)
-		{/* 如果有覆盖到的部件，就需要计算鼠标指针与部件的相对坐标 */
+		/* 如果有覆盖到的部件，就需要计算鼠标指针与部件的相对坐标 */
+		if(event.widget != NULL) {
 			event.pos.x = x - Get_Widget_Global_Pos(event.widget).x;
 			event.pos.y = y - Get_Widget_Global_Pos(event.widget).y;
-		}
-		else
-		{/* 否则，和全局坐标一样 */
+		} else {/* 否则，和全局坐标一样 */
 			event.pos.x = x;
 			event.pos.y = y;
 		}
 		if (samp.pressure > 0)  button = 1; 
 		else  button = 0; 
 			/* 处理鼠标事件 */
-		Processing_Mouse_Event(button, &event); 
+		Process_Mouse_Event(button, &event); 
 		//printf("%ld.%06ld: %6d %6d %6d\n", samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
 	}
 	if(LCUI_Sys.ts.status == INSIDE)
@@ -634,7 +614,7 @@ int Enable_TouchScreen_Input()
 	/* 创建一个线程，用于刷显示鼠标指针 */
 	if(LCUI_Sys.ts.status == REMOVE)
 		return  pthread_create ( &LCUI_Sys.ts.thread, NULL, 
-							Processing_TouchScreen_Input, NULL ); 
+					Process_TouchScreen_Input, NULL ); 
 	return 0;
 }
 

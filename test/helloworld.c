@@ -25,7 +25,7 @@ int main(int argc, char*argv[])
     label   = Create_Widget("label");
     
     /* 设定窗口标题的文本 */
-    Set_Window_Title_Text(window, "测试窗口 abcde");
+    Set_Window_Title_Text(window, "测试窗口");
     /* 设定窗口标题的图标 */
     Set_Window_Title_Icon(window, &pic);
     /* 改变窗口的尺寸 */
@@ -54,7 +54,7 @@ int main(int argc, char*argv[])
     Set_Label_Font(label, 24, NULL);
     /* 显示部件 */
     label->show(label);
-    window->show(window);
+    window->show(window); 
     return LCUI_Main(); /* 进入主循环 */
 }
 

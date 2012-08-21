@@ -21,8 +21,8 @@
 #include <math.h>
 /* 与这些函数共享数据，只有使用全局变量，传参数很麻烦 */
 static LCUI_Widget	*window, *image_box, *tip_text, *tip_box,
-						*image_info_text, *image_info_box,
-						*btn_zoom[2], *btn_switch[2], *container[2];
+			*image_info_text, *image_info_box,
+			*btn_zoom[2], *btn_switch[2], *container[2];
 						
 static float	mini_scale = 0, scale = 1;   /* 记录缩放比率 */
 static char	name[256], **filename = NULL;
@@ -36,8 +36,7 @@ void image_zoom_in()
 	LCUI_Size size;
 	LCUI_Graph *image; 
 	scale += 0.25; /* 缩放比例自增25% */
-	if(scale >= 2) 
-	{
+	if(scale >= 2) {
 		Disable_Widget(btn_zoom[1]);/* 禁用“放大”按钮 */
 		scale = 2.0; /* 最大不能超过200% */
 	}
@@ -67,8 +66,7 @@ void image_zoom_out()
 	
 	scale -= 0.25; /* 缩放比例自减25% */
 	/* 最小不能低于mini_scale中表示的比例 */
-	if(scale <= mini_scale) 
-	{
+	if(scale <= mini_scale) {
 		scale = mini_scale;
 		Disable_Widget(btn_zoom[0]);
 	}
@@ -89,29 +87,24 @@ void image_zoom_out()
 		current+1, total_files, name,
 		size.w, size.h, 100*scale);
 		 
-	if(fabs(mini_scale - scale) < 0.01)
-		Disable_Widget(btn_zoom[0]); 
-	else
-		Enable_Widget(btn_zoom[0]);
+	if(fabs(mini_scale - scale) < 0.01) Disable_Widget(btn_zoom[0]); 
+	else Enable_Widget(btn_zoom[0]);
 	Enable_Widget(btn_zoom[1]); 
 }
 
 
 void move_view_area(LCUI_Widget *widget, LCUI_DragEvent *event)
 /* 功能：移动浏览区域 */
-{
+{ 
 	LCUI_Pos pos; 
 	static LCUI_Pos old_pos, offset_pos;
-	if(event->first_click)
-	{/* 如果是刚被点击 */
+	if(event->first_click) {/* 如果是刚被点击 */ 
 		/* 记录被点击时的位置，以后的移动，就以该位置为基础计算出新位置 */
 		old_pos = Get_PictureBox_View_Area_Pos(widget);
 		/* 浏览区域位置与图片框位置的偏移距离 */
 		offset_pos = Pos_Sub(Get_Widget_Global_Pos(widget), old_pos); 
-	} 
-	else if(event->end_click);
-	else
-	{/* 否则，那就是正被拖动 */
+	} else if(event->end_click);
+	else {/* 否则，那就是正被拖动 */ 
 		/* 获取浏览区域的新位置 */
 		pos = Pos_Sub(event->new_pos, offset_pos);
 		/* 得出新位置与老位置的“差” */
@@ -162,10 +155,8 @@ void down_move_area()
 static int wait_hide_btn = 4, wait_hide_info = 4;
 void *hide()
 {
-	while(LCUI_Active())
-	{
-		if(wait_hide_btn == 0)
-		{
+	while(LCUI_Active()) {
+		if(wait_hide_btn == 0) {
 			Hide_Widget ( container[0] );
 			Hide_Widget ( container[1] );
 		}
@@ -199,12 +190,9 @@ void get_filename(char *filepath, char *out_name)
 {
 	int m,n = 0;
 	char *p;
-	for(m=0; m<strlen(filepath); ++m) 
-	{
-		if(filepath[m]=='/') 
-		{
-			n = m+1;
-		}
+	for(m=0; m<strlen(filepath); ++m) {
+		if(filepath[m]=='/')  
+			n = m+1; 
 	}
 	p = filepath + n;
 	strcpy(out_name, p);
@@ -215,10 +203,8 @@ void get_filepath(char *filepath, char *out_path)
 {
 	int num;
 	strcpy(out_path, filepath);
-	for(num = strlen(filepath) - 1; num >= 0; --num) 
-	{
-		if(filepath[num] == '/') 
-		{
+	for(num = strlen(filepath) - 1; num >= 0; --num) {
+		if(filepath[num] == '/')  {
 			out_path[num+1] = 0;
 			return;
 		}
@@ -231,14 +217,10 @@ int get_format(char *format, char *filename)
 {
 	int i, j, len;
 	len = strlen(filename);
-	for(i=len-1; i>=0; --i)
-	{
-		if(filename[i] == '.')
-		{
-			for(j=0, ++i; i<len; ++i, ++j)
-			{
-				format[j] = filename[i];
-			}
+	for(i=len-1; i>=0; --i) {
+		if(filename[i] == '.') {
+			for(j=0, ++i; i<len; ++i, ++j) 
+				format[j] = filename[i]; 
 			format[j] = 0;
 			return 0;
 		}
@@ -254,27 +236,21 @@ char **scan_imgfile(char *dir, int *file_num)
 	int i, len, n; 
 	char **filelist, format[256], path[1024];
 	struct dirent **namelist;
-	if(strlen(dir) == 0)
-		n = scandir(".", &namelist, 0, alphasort);
-	else	
-	n = scandir(dir, &namelist, 0, alphasort);
 	
-	if (n < 0)
-		return 0; 
-	else 
-	{
+	if(strlen(dir) == 0) n = scandir(".", &namelist, 0, alphasort);
+	else n = scandir(dir, &namelist, 0, alphasort);
+	
+	if (n < 0) return 0; 
+	else  {
 		filelist = (char **)malloc(sizeof(char *)*n);
-		for(i=0, *file_num=0; i<n; i++)
-		{
-			if(namelist[i]->d_type==8)/* 如果是文件 */ 
-			{
+		for(i=0, *file_num=0; i<n; i++) {
+			if(namelist[i]->d_type==8) {/* 如果是文件 */ 
 				get_format(format, namelist[i]->d_name);
 				if(strlen(format) > 2 && 
 				(strcasecmp(format, "png") == 0
 				|| strcasecmp(format, "bmp") == 0
 				|| strcasecmp(format, "jpg") == 0
-				|| strcasecmp(format, "jpeg") == 0))
-				{
+				|| strcasecmp(format, "jpeg") == 0)) {
 					sprintf(path, "%s%s", dir, namelist[i]->d_name);
 					len = strlen( path );
 					filelist[*file_num] = (char *)malloc(sizeof(char)*(len+1)); 
@@ -285,8 +261,7 @@ char **scan_imgfile(char *dir, int *file_num)
 		}
 		if(*file_num > 0)
 			filelist = (char**)realloc(filelist, *file_num*sizeof(char*));
-		else
-		{
+		else {
 			free(filelist);
 			filelist = NULL;
 		}
@@ -310,42 +285,34 @@ void *load_imagefile(void *file)
 	Set_Label_Text(tip_text, "正载入图片..."); 
 	tip_box->set_alpha(tip_box, 200);
 	Show_Widget(tip_text); 
-    Show_Widget(tip_box);
-    
-    /* 查找本文件所在位置 */ 
-    for(i=0; i<total_files; ++i)
-    {
-		if(strcmp(file, filename[i]) == 0)
-		{ 
+	Show_Widget(tip_box);
+	
+	/* 查找本文件所在位置 */ 
+	for(i=0; i<total_files; ++i) {
+		if(strcmp(file, filename[i]) == 0) { 
 			current = i;
 			break;
 		}
 	}
 	
-    image = Get_PictureBox_Graph(image_box); 
+	image = Get_PictureBox_Graph(image_box); 
 	Free_Graph(image); 
-    
+	
 	Set_PictureBox_Size_Mode(image_box, SIZE_MODE_CENTER); 
 	*result = Set_PictureBox_Image_From_File(image_box, file); 
 	
-	if(*result != 0)
-	{/* 如果图片文件读取失败 */
+	if(*result != 0) {/* 如果图片文件读取失败 */
 		Set_Label_Text(tip_text, "图片载入失败!");
 		size.w = 0;
 		size.h = 0;
-	}
-	else 
-	{
+	} else {
 		image = Get_PictureBox_Graph(image_box);
 		size = Get_Graph_Size(image);
-		if( 1 == Size_Cmp(size, Get_Widget_Size(image_box) ))
-		{
+		if( 1 == Size_Cmp(size, Get_Widget_Size(image_box) )) {
 		/* 如果图片尺寸大于PictureBox的尺寸，就改变PictureBox的图像处理模式 */
 			Set_PictureBox_Size_Mode(image_box, SIZE_MODE_ZOOM);
 			mini_scale = Get_PictureBox_Zoom_Scale(image_box);
-		}
-		else
-			mini_scale = 0.25;
+		} else mini_scale = 0.25;
 		Hide_Widget(tip_box);
 	}
 		
@@ -373,23 +340,18 @@ void *viewer(void *file)
 	Graph_Init(&bg);
 	/* 等待图片载入结束，并获取线程返回值 */
 	LCUI_Thread_Join(thread_loading, (void**)&result);
-	if(*result == 0)
-	{/* 如果正常打开了图片 */
+	if(*result == 0) {/* 如果正常打开了图片 */
 		scale = Get_PictureBox_Zoom_Scale(image_box); /* 获取缩放比例 */
 		image = Get_PictureBox_Graph(image_box); /* 获取图像指针 */
-		if(Graph_Is_PNG(image) && Graph_Have_Alpha(image))
-		{
+		if(Graph_Is_PNG(image) && Graph_Have_Alpha(image)) {
 			Load_Graph_Mosaics(&bg);/* 载入马赛克图形 */
 			Set_Widget_Background_Image(image_box, &bg, LAYOUT_TILE);/* 平铺背景图 */
 			Free_Graph(&bg);
-		}
-		else Set_Widget_Background_Image(image_box, NULL, LAYOUT_NONE);
+		} else Set_Widget_Background_Image(image_box, NULL, LAYOUT_NONE);
 	}
 	/* 如果接近最小缩放比例，那就禁用“缩小”按钮，否则，启用 */
-	if(fabs(mini_scale - scale) < 0.01)
-		Disable_Widget(btn_zoom[0]); 
-	else
-		Enable_Widget(btn_zoom[0]);
+	if(fabs(mini_scale - scale) < 0.01) Disable_Widget(btn_zoom[0]); 
+	else Enable_Widget(btn_zoom[0]);
 	/* 启用放大按钮 */
 	Enable_Widget(btn_zoom[1]);
 	free(result);
@@ -410,13 +372,10 @@ int open_image_file(char *filename)
 void prev_image(LCUI_Widget *widget, void *arg)
 /* 功能：切换至上一张图 */
 { 
-	if(total_files <= 0)
-		return;
+	if(total_files <= 0) return;
 		
-	if(current <= 0)
-		current = total_files-1;
-	else
-		current--;
+	if(current <= 0) current = total_files-1;
+	else current--;
 		
 	open_image_file(filename[current]);
 }
@@ -424,13 +383,10 @@ void prev_image(LCUI_Widget *widget, void *arg)
 void next_image(LCUI_Widget *widget, void *arg)
 /* 功能：切换至下一张图 */
 {
-	if(total_files <= 0)
-		return;
+	if(total_files <= 0) return;
 		
-	if(current == total_files-1)
-		current = 0;
-	else
-		current++;
+	if(current == total_files-1) current = 0;
+	else current++;
 		
 	open_image_file(filename[current]);
 }
@@ -438,34 +394,33 @@ void next_image(LCUI_Widget *widget, void *arg)
 int main(int argc, char*argv[]) 
 { 
 	int i;
-    LCUI_Graph app_icon, btn_zoom_pic[6], btn_switch_pic[6];
+	LCUI_Graph app_icon, btn_zoom_pic[6], btn_switch_pic[6];
 	/* 设定默认字体文件位置 */
 	Set_Default_Font("../../fonts/msyh.ttf");
-    LCUI_Init(argc, argv); 
-    Graph_Init(&app_icon); 
-    
-    for(i=0; i<6; ++i)
-    {
+	LCUI_Init(argc, argv); 
+	Graph_Init(&app_icon); 
+	
+	for(i=0; i<6; ++i) {
 		Graph_Init(&btn_zoom_pic[i]); 
 		Graph_Init(&btn_switch_pic[i]); 
 	}
-    /* 创建窗口部件 */
-    window			= Create_Widget("window");
-    /* 创建两个容器 */
-    container[0]	= Create_Widget(NULL);
-    container[1]	= Create_Widget(NULL);
-    /* 以下两个按钮用于放大缩小 */
-	btn_zoom[0]		= Create_Widget("button"); /* “缩小”按钮 */
-	btn_zoom[1]		= Create_Widget("button"); /* “放大”按钮 */
+	/* 创建窗口部件 */
+	window		= Create_Widget("window");
+	/* 创建两个容器 */
+	container[0]	= Create_Widget(NULL);
+	container[1]	= Create_Widget(NULL);
+	/* 以下两个按钮用于放大缩小 */
+	btn_zoom[0]	= Create_Widget("button"); /* “缩小”按钮 */
+	btn_zoom[1]	= Create_Widget("button"); /* “放大”按钮 */
 	/* 以下两个按钮用于切换图片 */
 	btn_switch[0]	= Create_Widget("button"); /* “上一张”按钮 */
 	btn_switch[1]	= Create_Widget("button"); /* “下一张”按钮 */
 	
 	image_info_box = Create_Widget(NULL);
 	image_info_text = Create_Widget("label");
-    
-    tip_text = Create_Widget("label"); /* 提示文本 */
-    tip_box  = Create_Widget(NULL); /* 作为提示文本的容器 */
+	
+	tip_text = Create_Widget("label"); /* 提示文本 */
+	tip_box  = Create_Widget(NULL); /* 作为提示文本的容器 */
 	
 	image_box = Create_Widget("picture_box");/* 创建一个图片盒子，用于显示图片 */
 	
@@ -515,7 +470,7 @@ int main(int argc, char*argv[])
 	size[1] = Size( btn_switch_size[0].w+btn_switch_size[1].w,
 					btn_switch_size[0].h);
 	/* 更改各个部件的尺寸 */
-    Resize_Widget(window, Size(320, 240));
+	Resize_Widget(window, Size(320, 240));
 	Resize_Widget(btn_zoom[0], btn_zoom_size[0]);
 	Resize_Widget(btn_zoom[1], btn_zoom_size[1]);
 	Resize_Widget(btn_switch[0], btn_switch_size[0]);
@@ -530,50 +485,48 @@ int main(int argc, char*argv[])
 	
 	char version[20];
 	Get_LCUI_Version(version);
-	if(strcmp(version, "0.12.4") == 0)
-		Set_Window_Title_Text(window, "照片查看器 v0.3"); 
-	else
-		Set_Window_Title_Text(window, "照片查看器 v0.3 <color=240,0,0>(存在兼容性问题)</color>"); 
+	if(strcmp(version, "0.12.4") == 0) Set_Window_Title_Text(window, "照片查看器 v0.3"); 
+	else Set_Window_Title_Text(window, "照片查看器 v0.3 <color=240,0,0>(存在兼容性问题)</color>"); 
 	
-    /* 设定部件的布局 */
-    Set_Widget_Align(btn_zoom[0], ALIGN_BOTTOM_CENTER, Pos(0, 0));
-    Set_Widget_Align(btn_zoom[1], ALIGN_TOP_CENTER, Pos(0, 0));
-    Set_Widget_Align(btn_switch[0], ALIGN_MIDDLE_RIGHT, Pos(0, 0));
-    Set_Widget_Align(btn_switch[1], ALIGN_MIDDLE_LEFT, Pos(0, 0));
-    Set_Widget_Align(container[0], ALIGN_MIDDLE_RIGHT, Pos(-2, 0));
-    Set_Widget_Align(container[1], ALIGN_BOTTOM_LEFT, Pos(2, -2));
-    Set_Widget_Align(image_box, ALIGN_MIDDLE_CENTER, Pos(0, 0));
-    Set_Widget_Align(tip_box, ALIGN_MIDDLE_CENTER, Pos(0, 0));
-    Set_Widget_Align(tip_text, ALIGN_MIDDLE_LEFT, Pos(25, 0));
-    Set_Widget_Align(image_info_text, ALIGN_MIDDLE_CENTER, Pos(0, 0));
-    Set_Widget_Align(image_info_box, ALIGN_TOP_LEFT, Pos(3, 3));
-    
-    /* 将部件加入相应的容器中 */
-    Widget_Container_Add(container[0], btn_zoom[0]);
-    Widget_Container_Add(container[0], btn_zoom[1]);
-    Widget_Container_Add(container[1], btn_switch[0]);
-    Widget_Container_Add(container[1], btn_switch[1]);
-    Widget_Container_Add(tip_box, tip_text);
-    Widget_Container_Add(image_info_box, image_info_text);
-    Window_Client_Area_Add(window, container[0]); 
-    Window_Client_Area_Add(window, container[1]); 
-    Window_Client_Area_Add(window, image_box);
-    Window_Client_Area_Add(window, tip_box);
-    Window_Client_Area_Add(window, image_info_box);
-    /* 关联部件的鼠标点击事件 */
-    Widget_Clicked_Event_Connect(btn_switch[0], next_image, NULL);
-    Widget_Clicked_Event_Connect(btn_switch[1], prev_image, NULL);
-    Widget_Clicked_Event_Connect(btn_zoom[0], image_zoom_out, NULL);
-    Widget_Clicked_Event_Connect(btn_zoom[1], image_zoom_in, NULL);
-    Widget_Drag_Event_Connect(image_box, move_view_area);
-    /* 显示部件 */
-    Show_Widget(image_box);
-    Show_Widget(container[0]);
-    Show_Widget(container[1]);
-    Show_Widget(window); 
-    
+	/* 设定部件的布局 */
+	Set_Widget_Align(btn_zoom[0], ALIGN_BOTTOM_CENTER, Pos(0, 0));
+	Set_Widget_Align(btn_zoom[1], ALIGN_TOP_CENTER, Pos(0, 0));
+	Set_Widget_Align(btn_switch[0], ALIGN_MIDDLE_RIGHT, Pos(0, 0));
+	Set_Widget_Align(btn_switch[1], ALIGN_MIDDLE_LEFT, Pos(0, 0));
+	Set_Widget_Align(container[0], ALIGN_MIDDLE_RIGHT, Pos(-2, 0));
+	Set_Widget_Align(container[1], ALIGN_BOTTOM_LEFT, Pos(2, -2));
+	Set_Widget_Align(image_box, ALIGN_MIDDLE_CENTER, Pos(0, 0));
+	Set_Widget_Align(tip_box, ALIGN_MIDDLE_CENTER, Pos(0, 0));
+	Set_Widget_Align(tip_text, ALIGN_MIDDLE_LEFT, Pos(25, 0));
+	Set_Widget_Align(image_info_text, ALIGN_MIDDLE_CENTER, Pos(0, 0));
+	Set_Widget_Align(image_info_box, ALIGN_TOP_LEFT, Pos(3, 3));
+	
+	/* 将部件加入相应的容器中 */
+	Widget_Container_Add(container[0], btn_zoom[0]);
+	Widget_Container_Add(container[0], btn_zoom[1]);
+	Widget_Container_Add(container[1], btn_switch[0]);
+	Widget_Container_Add(container[1], btn_switch[1]);
+	Widget_Container_Add(tip_box, tip_text);
+	Widget_Container_Add(image_info_box, image_info_text);
+	Window_Client_Area_Add(window, container[0]); 
+	Window_Client_Area_Add(window, container[1]); 
+	Window_Client_Area_Add(window, image_box);
+	Window_Client_Area_Add(window, tip_box);
+	Window_Client_Area_Add(window, image_info_box);
+	/* 关联部件的鼠标点击事件 */
+	Widget_Clicked_Event_Connect(btn_switch[0], next_image, NULL);
+	Widget_Clicked_Event_Connect(btn_switch[1], prev_image, NULL);
+	Widget_Clicked_Event_Connect(btn_zoom[0], image_zoom_out, NULL);
+	Widget_Clicked_Event_Connect(btn_zoom[1], image_zoom_in, NULL);
+	Widget_Drag_Event_Connect(image_box, move_view_area);
+	/* 显示部件 */
+	Show_Widget(image_box);
+	Show_Widget(container[0]);
+	Show_Widget(container[1]);
+	Show_Widget(window); 
+	
 	LCUI_Key_Event_Connect( KEY_ESC,   Main_Loop_Quit,  NULL);
-    if(argc == 2)
+	if(argc == 2)
 	{/* 如果总共有2个参数 */ 
 		char path[1024];
 		get_filepath(argv[1], path);
@@ -584,13 +537,13 @@ int main(int argc, char*argv[])
 		Show_Widget(btn_switch[0]);
 		Show_Widget(btn_switch[1]);
 		/* 关联按键事件，当按下指定键值的按键后，会调用已关联的回调函数 */
-		LCUI_Key_Event_Connect( '=',   image_zoom_in,    NULL);
+		LCUI_Key_Event_Connect( '=',   image_zoom_in,	NULL);
 		LCUI_Key_Event_Connect( '-',   image_zoom_out,   NULL);
-		LCUI_Key_Event_Connect( KEY_AA,   image_zoom_in,    NULL);
+		LCUI_Key_Event_Connect( KEY_AA,   image_zoom_in,	NULL);
 		LCUI_Key_Event_Connect( KEY_BB,   image_zoom_out,   NULL);
 		LCUI_Key_Event_Connect( KEY_LEFT,   left_move_area,  NULL);
 		LCUI_Key_Event_Connect( KEY_RIGHT,  right_move_area, NULL);
-		LCUI_Key_Event_Connect( KEY_UP,     up_move_area,    NULL);
+		LCUI_Key_Event_Connect( KEY_UP,	 up_move_area,	NULL);
 		LCUI_Key_Event_Connect( KEY_DOWN,   down_move_area,  NULL);
 		LCUI_Key_Event_Connect( 'n',   next_image,  NULL);
 		LCUI_Key_Event_Connect( 'N',   next_image,  NULL);
@@ -625,6 +578,6 @@ int main(int argc, char*argv[])
 		Hide_Widget(container[0]);
 		Hide_Widget(container[1]); 
 	}
-    return LCUI_Main(); /* 进入主循环 */  
+	return LCUI_Main(); /* 进入主循环 */  
 }
 

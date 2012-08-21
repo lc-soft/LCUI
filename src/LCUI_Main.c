@@ -66,7 +66,7 @@
 LCUI_System LCUI_Sys; 
 
 /***************************** Core ***********************************/
-static void Processing_Screen_Update()
+static void Process_Screen_Update()
 /* 功能：处理屏幕内容更新 */
 {
 	int i;
@@ -76,25 +76,25 @@ static void Processing_Screen_Update()
 	/* 锁住队列，其它线程不能访问 */
 	Queue_Lock(&LCUI_Sys.update_area);
 	i = 0;
-	//printf("Processing_Screen_Update(): start\n"); 
+	//printf("Process_Screen_Update(): start\n"); 
 	while(LCUI_Active())
 	{
 		if ( RectQueue_Get(&rect, 0, &LCUI_Sys.update_area) )
 		{/* 如果从队列中获取数据成功 */
 			//printf("RectQueue_Get(): %d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
 			/* 获取内存中对应区域的图形数据 */ 
-			//printf("Processing_Screen_Update(): get\n"); 
-			//nobuff_print("[%d]Processing_Screen_Update(): ", i);
+			//printf("Process_Screen_Update(): get\n"); 
+			//nobuff_print("[%d]Process_Screen_Update(): ", i);
 			//count_time();
 			Get_Screen_Real_Graph (rect, &graph);
-			//printf("Processing_Screen_Update(): end\n");
+			//printf("Process_Screen_Update(): end\n");
 			/* 写入至帧缓冲，让屏幕显示图形 */ 
 			Write_Graph_To_FB (&graph, Pos(rect.x, rect.y)); 
-			//printf("Processing_Screen_Update(): queue delete start\n"); 
+			//printf("Process_Screen_Update(): queue delete start\n"); 
 			//printf("queue mode: %d\n", LCUI_Sys.update_area.mode);
 			Queue_Delete (&LCUI_Sys.update_area, 0);/* 移除队列中的成员 */
 			//end_count_time(); 
-			//printf("Processing_Screen_Update(): queue delete end\n");
+			//printf("Process_Screen_Update(): queue delete end\n");
 			++i;
 		}
 		else break;
@@ -102,7 +102,7 @@ static void Processing_Screen_Update()
 	/* 解锁队列 */
 	Queue_UnLock(&LCUI_Sys.update_area);
 	
-	//printf("Processing_Screen_Update(): end\n"); 
+	//printf("Process_Screen_Update(): end\n"); 
 	Free_Graph(&graph);
 }
 
@@ -149,18 +149,18 @@ static void *LCUI_Core ()
 	{
 		//printf("core start\n");
 		count_time();
-		//nobuff_print("Processing_All_WidgetUpdate(): ");
-		Processing_All_WidgetUpdate();/* 处理所有部件更新 */
+		//nobuff_print("Process_All_WidgetUpdate(): ");
+		Process_All_WidgetUpdate();/* 处理所有部件更新 */
 		//end_count_time();
 		usleep(5000);/* 停顿一段时间，让程序处理任务 */
 		 
-		//nobuff_print("Processing_Refresh_Area(): "); 
+		//nobuff_print("Process_Refresh_Area(): "); 
 		//count_time();
-		Processing_Refresh_Area(); /* 处理需要刷新的区域 */  
+		Process_Refresh_Area(); /* 处理需要刷新的区域 */  
 		//end_count_time();
-		//nobuff_print("Processing_Screen_Update(): "); 
+		//nobuff_print("Process_Screen_Update(): "); 
 		//count_time(); 
-		Processing_Screen_Update();/* 处理屏幕更新 */  
+		Process_Screen_Update();/* 处理屏幕更新 */  
 		//end_count_time();
 		//auto_flag = 1;
 		//printf("core end\n"); 
@@ -443,8 +443,7 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 			Get_Screen_Size(), 
 			Rect ( pos.x, pos.y, src->width, src->height ), 
 			&cut_rect
-		) )
-	{/* 如果需要裁剪图形 */
+		) ) {/* 如果需要裁剪图形 */
 		if(!Rect_Valid(cut_rect))
 			return;
 			
@@ -457,14 +456,11 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 	Using_Graph (pic, 0);
 	/* 获取显示器的位数 */
 	bits = Get_Screen_Bits(); 
-	switch(bits)
-	{
+	switch(bits) {
 		case 32:/* 32位，其中RGB各占8位，剩下的8位用于alpha，共4个字节 */ 
-		for (n=0,y = 0; y < pic->height; ++y)
-		{
+		for (n=0,y = 0; y < pic->height; ++y) {
 			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
-			for (x = 0; x < pic->width; ++x, ++n)
-			{
+			for (x = 0; x < pic->width; ++x, ++n) {
 				count = k + x;//count = 4 * (k + x);/* 计算需填充的像素点的坐标 */
 				count = count << 2; 
 				/* 由于帧缓冲(FrameBuffer)的颜色排列是BGR，图片数组是RGB，需要改变一下写入顺序 */
@@ -475,11 +471,9 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 		}
 		break;
 		case 24:/* 24位，RGB各占8位，也就是共3个字节 */ 
-		for (n=0, y = 0; y < pic->height; ++y)
-		{
+		for (n=0, y = 0; y < pic->height; ++y) {
 			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
-			for (x = 0; x < pic->width; ++x, ++n)
-			{
+			for (x = 0; x < pic->width; ++x, ++n) {
 				count = k + x;//count = 3 * (k + x); 
 				count = (count << 1) + count;
 				dest[count] = pic->rgba[2][n];
@@ -495,11 +489,9 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 		 * 低字节的后三位+高字节的前三位用来表示G(Green)
 		 * 高字节的后5位用来表示R(RED)
 		 * */  
-		for (n=0, y = 0; y < pic->height; ++y)
-		{
+		for (n=0, y = 0; y < pic->height; ++y) {
 			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
-			for (x = 0; x < pic->width; ++x, ++n)
-			{
+			for (x = 0; x < pic->width; ++x, ++n) {
 				count = (k + x) << 1;//count = 2 * (k + x);
 				temp1 = pic->rgba[0][n];
 				temp2 = pic->rgba[2][n];
@@ -517,18 +509,15 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 		kolor.blue = calloc(256, sizeof(__u16));
 		kolor.transp = 0; 
 		
-		for (i=0;i<256;i++) 
-		{
+		for (i=0;i<256;i++) {
 			kolor.red[i]=0;
 			kolor.green[i]=0;
 			kolor.blue[i]=0;
 		}
 		
-		for (n=0, y = 0; y < pic->height; ++y)
-		{
+		for (n=0, y = 0; y < pic->height; ++y) {
 			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
-			for (x = 0; x < pic->width; ++x, ++n)
-			{
+			for (x = 0; x < pic->width; ++x, ++n) {
 				count = k + x;
 				
 				temp1 = pic->rgba[0][n]*0.92;
@@ -586,8 +575,7 @@ static void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Grap
 	 * 要调整这个矩形的区域，如果子部件的图形超出容器范围，则裁剪子
 	 * 部件的图形并粘贴至背景图中。
 	 **/
-	 if(widget->parent != NULL)
-	 {/* 如果有父部件 */ 
+	 if(widget->parent != NULL) {/* 如果有父部件 */ 
 		LCUI_Rect cut_rect;
 		/* 获取该部件的有效显示区域 */
 		cut_rect = Get_Widget_Valid_Rect(widget);
@@ -598,8 +586,7 @@ static void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Grap
 		Quote_Graph(&temp, &widget->graph, cut_rect);
 		/* 合成之 */
 		Mix_Graph(&widget->graph, &temp, Pos(x, y));
-	}
-	else  /* 先将父部件合成至背景图中 */
+	} else  /* 先将父部件合成至背景图中 */
 		Mix_Graph (graph, &widget->graph, Pos(x, y));
 	//printf("widget overlay pos: %d, %d\n", x, y);
 	int total;
@@ -607,29 +594,24 @@ static void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Grap
 	
 	total = Queue_Get_Total(&widget->child); 
 	/* 貌似只需要x和y，区域尺寸靠背景图的信息即可得到 */
-	for(i=total-1; i>=0; --i)
-	{/* 从底到顶遍历子部件 */
+	for(i=total-1; i>=0; --i) {/* 从底到顶遍历子部件 */
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
 		//printf("get child widget: %p, type: %s\n", child, child->type.string);
-		if(child != NULL)
-		{
-			if(child->visible == IS_TRUE)
-			{/* 如果有可见的子部件 */
+		if(child != NULL) {
+			if(child->visible == IS_TRUE) {/* 如果有可见的子部件 */
 				tmp = Get_Widget_Rect(child);
 				tmp.x += pos.x;
 				tmp.y += pos.y;
 				//printf("tmp: %d, %d, %d, %d\n", tmp.x, tmp.y, tmp.width, tmp.height);
 				//printf("rect: %d, %d, %d, %d\n", rect.x, rect.y, rect.width, rect.height);
 				/* 如果与该区域重叠，将子部件合成至背景图中 */
-				if (Rect_Is_Overlay(tmp, rect)) 
-				{
+				if (Rect_Is_Overlay(tmp, rect)) {
 					//printf("overlay\n");
 					Get_Widget_Real_Graph(child, rect, graph);  /* 递归调用 */
 				}
 				//else printf("not bverlay\n");
 			}
-		}
-		else {
+		} else {
 			//printf("break\n");
 			continue;
 		}
@@ -969,8 +951,7 @@ int LCUI_Init(int argc, char *argv[])
 		
 		/* 记录程序信息 */
 		temp = LCUI_AppList_Add();
-		if(temp != 0)  
-			exit(-1);
+		if(temp != 0) exit(-1);
 		
 		Core_Start();	/* LCUI的核心开始工作 */ 
 		Screen_Init();	/* 初始化屏幕图形输出功能 */
@@ -988,8 +969,7 @@ int LCUI_Init(int argc, char *argv[])
 	else
 	{
 		temp = LCUI_AppList_Add();
-		if(temp != 0) 
-			exit(-1);
+		if(temp != 0)  exit(-1);
 	}
 	/* 注册默认部件类型 */
 	Register_Default_Widget_Type(); 

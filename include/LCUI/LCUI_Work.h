@@ -159,7 +159,7 @@ int LCUI_MouseEvent_Connect (void (*func) (), int event_id);
 int LCUI_Key_Event_Connect (int key_value, void (*func) (), void *arg);
 /* 功能：将函数与按键的某个事件相连接，当这个按键按下后，就会调用这个函数 */ 
 
-int Processing_Event(LCUI_EventQueue *queue, int event_id);
+int Process_Event(LCUI_EventQueue *queue, int event_id);
 /* 
  * 功能：处理指定ID的事件
  * 说明：本函数会将事件队列中与指定ID的事件关联的回调函数 添加至程序的任务队列

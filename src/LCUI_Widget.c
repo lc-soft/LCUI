@@ -264,7 +264,7 @@ void Shift_Widget_Refresh_Area(LCUI_Widget *widget)
 
 
 
-void Processing_Refresh_Area()
+void Process_Refresh_Area()
 /*
  * 功能：处理已记录的刷新区域
  * 说明：此函数会将各个部件的rect队列中的处理掉，并将
@@ -272,7 +272,7 @@ void Processing_Refresh_Area()
  * 待LCUI来处理。
  **/
 {
-	//printf("Processing_Refresh_Area: enter\n");
+	//printf("Process_Refresh_Area: enter\n");
 	if ( LCUI_Sys.shift_flag == IS_TRUE )
 	{	/* 如果flag标志的值为IS_TRUE */ 
 		/* 转移部件内记录的区域至主记录中 */ 
@@ -286,7 +286,7 @@ void Processing_Refresh_Area()
 	}
 	/* 分割区域，使之不与任何部件的区域重叠 */
 	Split_Screen_Area_By_Widget(NULL);
-	//printf("Processing_Refresh_Area: quit\n"); 
+	//printf("Process_Refresh_Area: quit\n"); 
 }
 
 
@@ -1408,7 +1408,7 @@ static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, int type)
 }
 
 
-int Processing_WidgetUpdate(LCUI_Widget *widget)
+int Process_WidgetUpdate(LCUI_Widget *widget)
 /* 功能：处理部件的更新 */
 {
 	LCUI_Widget *child;
@@ -1416,7 +1416,7 @@ int Processing_WidgetUpdate(LCUI_Widget *widget)
 	LCUI_Pos pos;
 	int i, total;
 	/* 处理部件中需要更新的数据 */
-	//printf("Processing_WidgetUpdate(): enter\n");
+	//printf("Process_WidgetUpdate(): enter\n");
 	Queue_Lock(&widget->data);/* 锁定队列，其它线程暂时不能访问 */
 	while( ! Queue_Empty(&widget->data) )
 	{
@@ -1469,21 +1469,21 @@ int Processing_WidgetUpdate(LCUI_Widget *widget)
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);  
 		if(child != NULL)
 		{/* 递归调用 */
-			Processing_WidgetUpdate( child );
+			Process_WidgetUpdate( child );
 		}
 	}
-	//printf("Processing_WidgetUpdate(): quit\n");
+	//printf("Process_WidgetUpdate(): quit\n");
 	/* 解锁 */
 	return 0;
 }
 
-void Processing_All_WidgetUpdate()
+void Process_All_WidgetUpdate()
 /* 功能：处理所有部件的更新 */
 {
 	LCUI_Widget *child;
 	int i, total;
 	total = Queue_Get_Total(&LCUI_Sys.widget_list); 
-	//printf("Processing_All_WidgetUpdate():start\n");
+	//printf("Process_All_WidgetUpdate():start\n");
 	for(i=total-1; i>=0; --i)
 	{
 		/* 从尾到首获取部件指针 */
@@ -1491,10 +1491,10 @@ void Processing_All_WidgetUpdate()
 		//printf("child: ");print_widget_info(child);
 		if(child != NULL)
 		{/* 递归调用 */ 
-			Processing_WidgetUpdate( child );
+			Process_WidgetUpdate( child );
 		}
 	}
-	//printf("Processing_All_WidgetUpdate():end\n");
+	//printf("Process_All_WidgetUpdate():end\n");
 }
 
 /************************ Widget Update End ***************************/

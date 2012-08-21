@@ -117,7 +117,7 @@ void Send_Mouse_Event(int event_id, LCUI_MouseEvent *event);
 int KeyQueue_Find(LCUI_Queue *queue, int key_code);
 /* 功能:在按键键值队列里查找指定键值的位置 */ 
 
-void Processing_Mouse_Event(int button_type, LCUI_MouseEvent *event);
+void Process_Mouse_Event(int button_type, LCUI_MouseEvent *event);
 /* 功能：处理鼠标产生的事件 */ 
 
 int Check_Mouse_Support();
