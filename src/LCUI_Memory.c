@@ -90,21 +90,29 @@ unsigned char** Get_Malloc(int width,int height,int flag)
  
 void Free_Graph(LCUI_Graph *pic)
 /* 功能：释放LCUI_Graph内的图像数据占用的内存资源 */
-{ 
-	if(Valid_Graph(pic))
+{
+	LCUI_Graph *p;
+	p = Get_Quote_Graph(pic);
+	if(Valid_Graph(p))
 	{
-		Using_Graph(pic, 1);
-		free(pic->rgba[0]);
-		free(pic->rgba[1]);
-		free(pic->rgba[2]);
-		if(pic->flag == HAVE_ALPHA) 
-			free(pic->rgba[3]);
-		free(pic->rgba);
-		pic->rgba = NULL;
-		pic->malloc = IS_FALSE;
-		pic->width = 0;
-		pic->height = 0;
-		End_Use_Graph(pic); 
+		Using_Graph(p, 1);
+		if(pic->quote == IS_TRUE)
+		{
+			pic->src = NULL; 
+			pic->quote = IS_FALSE;
+		} else {
+			free(pic->rgba[0]);
+			free(pic->rgba[1]);
+			free(pic->rgba[2]);
+			if(pic->flag == HAVE_ALPHA) 
+				free(pic->rgba[3]);
+			free(pic->rgba);
+			pic->rgba = NULL;
+			pic->malloc = IS_FALSE;
+			pic->width = 0;
+			pic->height = 0;
+		}
+		End_Use_Graph(p); 
 	}
 }
 
@@ -119,21 +127,28 @@ void *Malloc_Widget_Private(LCUI_Widget *widget, size_t size)
 int Malloc_Graph(LCUI_Graph *pic, int width, int height)
 /* 功能：为图像数据分配内存资源 */
 {
-	if(Valid_Graph(pic)) 
-		Free_Graph(pic); 
-	
 	if(width > 10000 || height > 10000)
 	{
 		printf("error: can not allocate too much memory!\n");
 		exit(-1);
 	}
-	
 	if(height < 0 || width < 0) 
 	{
 		Free_Graph(pic);
 		return -1; 
 	}
-	 
+	
+	if(Valid_Graph(pic)) 
+	{
+		if(pic->width*pic->height > width*height)
+		{
+			pic->width  = width;
+			pic->height = height;
+			return 1;
+		}
+		Free_Graph(pic); 
+	}
+	
 	Using_Graph(pic, 1);
 	pic->rgba  = Get_Malloc(width, height, pic->flag); 
 	if(NULL == pic->rgba)

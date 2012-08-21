@@ -117,18 +117,6 @@ int Cut_Graph(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out);
 int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out);
 /* 功能：将图像进行水平翻转 */ 
 
-int Cut_And_Overlay_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Graph *des);
-/*
- * 功能：从源图形中截取出一块图形并根据alpha通道叠加至背景图上
- * 说明：这个函数是截取和覆盖一起进行的，在截取的同时，将图形覆盖至目标图形上，效率比分步调用函数高一点。
- */ 
-
-int Cut_And_Replace_Graph(LCUI_Graph *src, LCUI_Rect cut, LCUI_Pos put, LCUI_Graph *des);
-/*
- * 功能：从源图形中截取出一块图形并覆盖至背景图上
- * 说明：与其它函数不同，这个是截取和合成一起进行的，在截取的同时，将图形覆盖至目标图形上，效率比分步调用函数高一点。
- */ 
-
 int Get_Screen_Graph(LCUI_Graph *out);
 /* 
  * 功能：获取屏幕上显示的图像
@@ -186,10 +174,10 @@ int Graph_Is_Opaque(LCUI_Graph *graph);
 int write_png_file(char *file_name , LCUI_Graph *graph);
 /* 功能：将LCUI_Graph结构中的数据写入至png文件 */
 
-int Widget_Layer_Is_Opaque(LCUI_Widget *widget);
+inline int Widget_Layer_Is_Opaque(LCUI_Widget *widget);
 /* 功能：判断部件图形是否不透明 */ 
 
-int Widget_Layer_Not_Visible(LCUI_Widget *widget);
+inline int Widget_Layer_Not_Visible(LCUI_Widget *widget);
 /* 功能：检测部件图形是否完全透明 */ 
 
 int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph);
