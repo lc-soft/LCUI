@@ -114,9 +114,7 @@ void print_widget_info(LCUI_Widget *widget)
 
 
 int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
-/*
- * 功能：在指定部件的内部区域内设定需要刷新的区域
- * */
+/* 功能：在指定部件的内部区域内设定需要刷新的区域 */
 {
 	if(widget == NULL)
 		return Add_Screen_Refresh_Area(rect);
