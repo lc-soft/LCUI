@@ -89,8 +89,7 @@ static void Processing_Screen_Update()
 			Get_Screen_Real_Graph (rect, &graph);
 			//printf("Processing_Screen_Update(): end\n");
 			/* 写入至帧缓冲，让屏幕显示图形 */ 
-			Write_Graph_To_FB (&graph, Pos(rect.x, rect.y));
-			Free_Graph(&graph); 
+			Write_Graph_To_FB (&graph, Pos(rect.x, rect.y)); 
 			//printf("Processing_Screen_Update(): queue delete start\n"); 
 			//printf("queue mode: %d\n", LCUI_Sys.update_area.mode);
 			Queue_Delete (&LCUI_Sys.update_area, 0);/* 移除队列中的成员 */
@@ -573,6 +572,7 @@ static void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Grap
 		return;
 		
 	int x, y, i;
+	LCUI_Graph temp;
 	LCUI_Widget *child;
 	/* 获取部件在屏幕内的坐标 */
 	LCUI_Pos pos = Get_Widget_Global_Pos(widget);
@@ -594,8 +594,10 @@ static void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Grap
 		/* 加上裁剪起点坐标 */
 		x += cut_rect.x;
 		y += cut_rect.y;
-		/* 裁剪出来并合成至背景图 */
-		Cut_And_Overlay_Graph(&widget->graph, cut_rect, Pos(x, y), graph);
+		/* 引用图层中指定区域的图形 */
+		Quote_Graph(&temp, &widget->graph, cut_rect);
+		/* 合成之 */
+		Mix_Graph(&widget->graph, &temp, Pos(x, y));
 	}
 	else  /* 先将父部件合成至背景图中 */
 		Mix_Graph (graph, &widget->graph, Pos(x, y));

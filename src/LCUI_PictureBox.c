@@ -89,11 +89,10 @@ static void Exec_Update_PictureBox(LCUI_Widget *widget)
 /* 功能：更新PictureBox部件 */
 {
 	LCUI_PictureBox *pic_box;
-	LCUI_Graph graph, *p;
+	LCUI_Graph graph, *p; 
 	int width, height; 
 	LCUI_Pos pos;
-	pos.x = 0;
-	pos.y = 0; 
+	pos = Pos(0,0);
 	Graph_Init(&graph); 
 	pic_box  = (LCUI_PictureBox*)Get_Widget_Private_Data(widget);
 	/************************
@@ -109,63 +108,29 @@ static void Exec_Update_PictureBox(LCUI_Widget *widget)
 		{
 		case SIZE_MODE_ZOOM:
 		/* 裁剪图像 */ 
-			if(pic_box->scale == 1.00) 
-				p = pic_box->image; 
-			else
-				p = &pic_box->buff_graph;
+			if(pic_box->scale == 1.00) p = pic_box->image; 
+			else p = &pic_box->buff_graph;
 				
 			width = pic_box->read_box.width;
 			height = pic_box->read_box.height;
 			pos.x = (widget->size.w - width)/2.0;
-			pos.y = (widget->size.h - height)/2.0;
-			if(!Valid_Graph(&widget->background_image)) 
-			/* 如果没有背景图像 */ 
-				/* 截取并直接覆盖图形 */
-				Cut_And_Replace_Graph(p, 
-					Rect(pic_box->read_box.x, pic_box->read_box.y, width, height), 
-					pos, &widget->graph); 
-			else  
-				/* 截取并按alpha通道叠加图形 */
-				Cut_And_Overlay_Graph(p, 
-					Rect(pic_box->read_box.x, pic_box->read_box.y, width, height), 
-					pos, &widget->graph);  
+			pos.y = (widget->size.h - height)/2.0; 
+			/* 引用图像中指定区域的图形 */
+			Quote_Graph(&graph, p, pic_box->read_box);   
 			break;
 			 
-		case SIZE_MODE_NORMAL:/* 正常模式 */
-			width = pic_box->read_box.width; 
-			height = pic_box->read_box.height;  
-			if(!Valid_Graph(&widget->background_image)) 
-			/* 如果没有背景图像 */ 
-				/* 截取并直接覆盖图形 */
-				Cut_And_Replace_Graph(pic_box->image, 
-					Rect(pic_box->read_box.x, pic_box->read_box.y, width, height), 
-					pos, &widget->graph); 
-			else 
-				/* 截取并按alpha通道叠加图形 */
-				Cut_And_Overlay_Graph(pic_box->image, 
-					Rect(pic_box->read_box.x, pic_box->read_box.y, width, height), 
-					pos, &widget->graph);
+		case SIZE_MODE_NORMAL:/* 正常模式 */ 
+			/* 引用图像中指定区域的图形 */
+			Quote_Graph(&graph, pic_box->image, pic_box->read_box); 
 			break;
 			
 		case SIZE_MODE_STRETCH:/* 拉伸模式 */ 
 			/* 开始缩放图片 */
 			Zoom_Graph( pic_box->image, &graph, CUSTOM, widget->size ); 
-			if(!Valid_Graph(&widget->background_image)) 
-			/* 如果没有背景图像 */ 
-				Replace_Graph(&widget->graph, &graph, pos);
-			else
-				Mix_Graph(&widget->graph, &graph, pos);
-			Free_Graph(&graph);
 			break;
 			
 		case SIZE_MODE_TILE:/* 平铺模式 */ 
 			Tile_Graph( pic_box->image, &graph, widget->size.w, widget->size.h); 
-			if(!Valid_Graph(&widget->background_image)) 
-			/* 如果没有背景图像 */ 
-				Replace_Graph(&widget->graph, &graph, pos); 
-			else  
-				Mix_Graph(&widget->graph, &graph, pos); 
-			Free_Graph(&graph);
 			break;
 			
 		case SIZE_MODE_CENTER:
@@ -188,22 +153,15 @@ static void Exec_Update_PictureBox(LCUI_Widget *widget)
 			if(pic_box->read_box.x + pic_box->read_box.width >= pic_box->image->width) 
 				pic_box->read_box.x = pic_box->image->width - pic_box->read_box.width;
 				
-			if(!Valid_Graph(&widget->background_image)) 
-			/* 如果没有背景图像 */ 
-				/* 截取并直接覆盖图形 */
-				Cut_And_Replace_Graph(pic_box->image, 
-					Rect(pic_box->read_box.x, pic_box->read_box.y, 
-					pic_box->read_box.width, pic_box->read_box.height),
-					pos, &widget->graph);
-			else 
-				/* 截取并按alpha通道叠加图形 */
-				Cut_And_Overlay_Graph(pic_box->image, 
-					Rect(pic_box->read_box.x, pic_box->read_box.y, 
-					pic_box->read_box.width, pic_box->read_box.height),
-					pos, &widget->graph); 
+			Quote_Graph(&graph, pic_box->image, pic_box->read_box); 
 			break;
 			default : break;
-		} 
+		}
+		if(!Valid_Graph(&widget->background_image)) 
+			Replace_Graph(&widget->graph, &graph, pos); 
+		else
+			Mix_Graph(&widget->graph, &graph, pos);  
+		Free_Graph(&graph);
 	}
 	//printf("Exec_Update_PictureBox end\n");
 	Refresh_Widget(widget); 
