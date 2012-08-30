@@ -2837,6 +2837,7 @@ void LCUI_Font_Init(LCUI_Font *font)
  * 说明：本函数在LCUI初始化时调用，LCUI_Font结构体中记录着字体相关的数据
  * */
 { 
+	char *p;
 	printf("loading fontfile...\n");/* 无缓冲打印内容 */
 	font->type = DEFAULT;
 	font->size = 12;
@@ -2853,6 +2854,9 @@ void LCUI_Font_Init(LCUI_Font *font)
 	font->render_mode = FT_RENDER_MODE_MONO;
 	font->ft_lib = NULL;
 	font->ft_face = NULL;
+	/* 如果在环境变量中定义了字体文件路径，那就使用它 */
+	p = getenv("LCUI_FONTFILE");
+	if(p != NULL) strcpy(default_font, p); 
 	/* 打开默认字体文件 */
 	Open_Fontfile(&LCUI_Sys.default_font, default_font); 
 }
@@ -3239,6 +3243,7 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 				 LCUI_Sys.default_font.font_file.string))
 			type = CUSTOM;
 	}
+	else if(fontfile == NULL) return -1;
 	lib_error = FT_Init_FreeType( & library);  /* 初始化FreeType库 */
 	if (lib_error)   /* 当初始化库时发生了一个错误 */
 	{
@@ -3253,8 +3258,7 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 		if ( face_error == FT_Err_Unknown_File_Format )
 			printf("open fontfile: "FT_UNKNOWN_FILE_FORMAT); /* 未知文件格式 */ 
 		else 
-			printf("open fontfile: "FT_OPEN_FILE_ERROR);/* 打开错误 */ 
-			
+			printf("open fontfile: "FT_OPEN_FILE_ERROR);/* 打开错误 */
 		perror(fontfile);
 		return -1;
 	}

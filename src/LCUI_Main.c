@@ -65,6 +65,17 @@
 
 LCUI_System LCUI_Sys; 
 
+static clock_t start_time;
+void count_time()
+{
+	start_time = clock();
+}
+
+void end_count_time()
+{
+	printf("%ldms\n",clock()-start_time);
+}
+
 /***************************** Core ***********************************/
 static void Process_Screen_Update()
 /* 功能：处理屏幕内容更新 */
@@ -128,17 +139,6 @@ static void *autoquit()
 	exit(0);
 }
 #endif
-
-static clock_t start_time;
-void count_time()
-{
-	start_time = clock();
-}
-
-void end_count_time()
-{
-	printf("%ldms\n", clock()-start_time);
-}
 
 static void *LCUI_Core ()
 /* 功能：进行LCUI的核心处理工作 */
@@ -366,7 +366,7 @@ static void Print_LCUI_Copyright_Text()
 /* 功能：打印LCUI的信息 */
 {
 	printf(
-	"============| LCUI v0.12.4 |============\n"
+	"============| LCUI v0.12.5 |============\n"
 	"Copyright (C) 2012 Liu Chao.\n"
 	"Licensed under GPLv2.\n"
 	"Report bugs to <lc-soft@live.cn>.\n"
@@ -853,21 +853,25 @@ static int Screen_Init()
 	struct fb_var_screeninfo fb_vinfo;
 	struct fb_fix_screeninfo fb_fix;
 	struct fb_cmap oldcmap = {0,256,rr,gg,bb} ;
-
-	nobuff_print("open video output device...");
-	LCUI_Sys.screen.fb_dev_name = FB_DEV;
-	if ((LCUI_Sys.screen.fb_dev_fd = 
-		open(LCUI_Sys.screen.fb_dev_name, O_RDWR)) == -1) 
-	{/* 如果打开图形输出设备出错 */
+	
+	char *fb_dev;
+	/* 获取环境变量中指定的帧缓冲设备的位置 */
+	fb_dev = getenv("LCUI_FB_DEVICE");
+	if(fb_dev == NULL) fb_dev = FB_DEV;
+		
+	nobuff_print("open video output device..."); 
+	LCUI_Sys.screen.fb_dev_fd = open(fb_dev, O_RDWR);
+	if (LCUI_Sys.screen.fb_dev_fd== -1) {
 		printf("fail\n");
 		perror("error");
 		exit(-1);
 	}
 	else printf("success\n");
+	LCUI_Sys.screen.fb_dev_name = fb_dev;
 	/* 获取屏幕相关信息 */
 	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_VSCREENINFO, &fb_vinfo);
 	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_FSCREENINFO, &fb_fix);
-	
+	/* 打印屏幕信息 */
 	print_screeninfo(fb_vinfo, fb_fix);
 	
 	LCUI_Sys.screen.bits = fb_vinfo.bits_per_pixel;
@@ -879,15 +883,13 @@ static int Screen_Init()
 	/* 映射帧缓存至内存空间 */
 	LCUI_Sys.screen.fb_mem = mmap(NULL,fb_fix.smem_len,
 							PROT_READ|PROT_WRITE,MAP_SHARED,
-							LCUI_Sys.screen.fb_dev_fd,0);
+							LCUI_Sys.screen.fb_dev_fd, 0);
 							
-	if((void *)-1 == LCUI_Sys.screen.fb_mem)
-	{/* 如果失败 */
+	if((void *)-1 == LCUI_Sys.screen.fb_mem) { 
 		printf("fail\n");
 		perror(strerror(errno));
 		exit(-1);
-	}
-	else printf("success\n");
+	} else printf("success\n");
 	
 	Graph_Init(&LCUI_Sys.screen.buff); /* 初始化图形数据 */
 	
@@ -965,9 +967,7 @@ int LCUI_Init(int argc, char *argv[])
 		/* 鼠标游标居中 */
 		Set_Cursor_Pos(Get_Screen_Center_Point());  
 		Show_Cursor();	/* 显示鼠标游标 */ 
-	}
-	else
-	{
+	} else {
 		temp = LCUI_AppList_Add();
 		if(temp != 0)  exit(-1);
 	}
@@ -985,8 +985,7 @@ void *catch()
 	struct tm * timeinfo;
 	char filename[100];
 	Graph_Init(&graph);
-	while(1)
-	{
+	while(1) {
 		time ( &rawtime );
 		timeinfo = localtime ( &rawtime );
 		if(tsec != timeinfo->tm_sec)
@@ -999,7 +998,7 @@ void *catch()
 		);
 		tsec = timeinfo->tm_sec;
 		
-		Catch_Screen_Graph_By_Cache(Rect((Get_Screen_Width()-320)/2.0, 
+		Catch_Screen_Graph_By_FB(Rect((Get_Screen_Width()-320)/2.0, 
 				(Get_Screen_Height()-240)/2.0, 320, 240), &graph);
 		write_png_file(filename, &graph);
 		usleep(35000);
@@ -1029,25 +1028,20 @@ int LCUI_Main ()
 	//LCUI_Thread_Create(&t, NULL, catch, NULL);
 	
 	app = Get_Self_AppPointer();
-	if(app == NULL)
-	{
+	if(app == NULL) {
 		printf("LCUI_Main(): "APP_ERROR_UNRECORDED_APP);
 		return -1;
 	}
 	
-	while (Need_Main_Loop(app))
-	{/* 循环条件是程序不需要关闭 */ 
+	while (Need_Main_Loop(app)) {/* 循环条件是程序不需要关闭 */ 
 	
 		if(Empty_Widget()) /* 没有部件，就不需要循环 */
 			break;
-		
-		if(Have_Task(app)) /* 如果有需要执行的任务 */
-		{
+		/* 如果有需要执行的任务 */
+		if(Have_Task(app)) {
 			idle_time = 1500;
 			Run_Task(app); 
-		}
-		else
-		{/* 否则暂停一段时间 */
+		} else {/* 否则暂停一段时间 */
 			usleep (idle_time);
 			idle_time += 1500;	/* 每次循环的空闲时间越来越长 */
 			if (idle_time >= LCUI_Sys.max_app_idle_time)

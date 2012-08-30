@@ -233,7 +233,7 @@ static void * Process_Mouse_Input ()
 { 
 	int  temp, button, retval;
 
-	char buf[6];
+	char *msdev, buf[6];
 
 	fd_set readfds;
 
@@ -245,6 +245,10 @@ static void * Process_Mouse_Input ()
 	while (LCUI_Active()) { 
 		if(disable_mouse == 1) break;
 		if (LCUI_Sys.mouse.status == REMOVE) { 
+			
+			msdev = getenv("LCUI_MOUSE_DEVICE");
+			if( msdev == NULL ) msdev = MS_DEV;
+			
 			if ((LCUI_Sys.mouse.fd =
 				 open (MS_DEV, O_RDONLY)) < 0) {
 				//printf("Failed to open \"/dev/input/mice\".\n");
