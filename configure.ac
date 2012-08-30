@@ -7,7 +7,7 @@
 # http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/html_node/index.html
 
 AC_PREREQ([2.68])
-AC_INIT(LCUI, 0.12.4, lc-soft@live.cn)
+AC_INIT(LCUI, 0.12.5, lc-soft@live.cn)
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([include/LCUI_Build.h])
 AC_CONFIG_HEADERS([config.h])
