@@ -21,7 +21,8 @@ LCUI_Window.h \
 LCUI_Memory.h \
 LCUI_Menu.h \
 LCUI_CheckBox.h \
-LCUI_RadioButton.h
+LCUI_RadioButton.h \
+LCUI_ActiveBox.h
 
 # Headers to install
 pkginclude_HEADERS = $(INSTINCLUDES)

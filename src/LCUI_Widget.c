@@ -1117,69 +1117,30 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 }
 
 
-
 LCUI_Pos Widget_Align_Get_Pos(LCUI_Widget *widget)
 /* 功能：根据部件的布局来获取部件的位置 */
-{
-	int width, height;
+{ 
 	LCUI_Pos pos;
+	LCUI_Size size;
 	pos.x = pos.y = 0;
 	/* 根据位置类型，来获取容器的尺寸 */ 
 	switch(widget->pos_type)
 	{
 		case POS_TYPE_IN_SCREEN :
-			width	= Get_Screen_Width();
-			height	= Get_Screen_Height();
-			break;
-		case POS_TYPE_IN_WIDGET :
-			width	= Get_Widget_Width(widget->parent);
-			height	= Get_Widget_Height(widget->parent);
-			break;
+		size = Get_Screen_Size(); 
+		break;
+		case POS_TYPE_IN_WIDGET : 
+		size = Get_Widget_Size(widget->parent); 
+		break;
 		default: return pos; 
 	} 
-	
-	if(widget->align != ALIGN_NONE)
-	{
-		switch(widget->align)
-		{
-			case ALIGN_TOP_LEFT : /* 向左上角对齐 */  
-				break;
-			case ALIGN_TOP_CENTER : /* 向上中间对齐 */ 
-				pos.x = (width - widget->size.w) / 2; 
-				break;
-			case ALIGN_TOP_RIGHT : /* 向右上角对齐 */ 
-				pos.x = width - widget->size.w; 
-				break;
-			case ALIGN_MIDDLE_LEFT : /* 向中央偏左对齐 */  
-				pos.y = (height - widget->size.h) / 2;
-				break;
-			case ALIGN_MIDDLE_CENTER : /* 向正中央对齐 */ 
-				pos.x = (width - widget->size.w) / 2;
-				pos.y = (height - widget->size.h) / 2;
-				break;
-			case ALIGN_MIDDLE_RIGHT : /* 向中央偏由对齐 */ 
-				pos.x = width - widget->size.w;
-				pos.y = (height - widget->size.h) / 2;
-				break;
-			case ALIGN_BOTTOM_LEFT : /* 向底部偏左对齐 */  
-				pos.y = height - widget->size.h;
-				break;
-			case ALIGN_BOTTOM_CENTER : /* 向底部居中对齐 */ 
-				pos.x = (width - widget->size.w) / 2;
-				pos.y = height - widget->size.h;
-				break;
-			case ALIGN_BOTTOM_RIGHT : /* 向底部偏右对齐 */ 
-				pos.x = width - widget->size.w;
-				pos.y = height - widget->size.h;
-				break; 
-			default :  break; 
-		}
+	if(widget->align != ALIGN_NONE){
+		pos = Align_Get_Pos(size, Get_Widget_Size(widget), widget->align);
 		/* 加上偏移距离 */
 		pos.x = pos.x + widget->offset.x;
 		pos.y = pos.y + widget->offset.y; 
-		return pos;
+		return pos; 
 	}
-	
 	return widget->pos;
 }
 
@@ -1811,6 +1772,7 @@ extern void Register_ProgressBar();
 extern void Register_Menu();
 extern void Register_CheckBox();
 extern void Register_RadioButton();
+extern void Register_ActiveBox();
 
 void Register_Default_Widget_Type()
 /* 功能：为程序的部件库添加默认的部件类型 */
@@ -1824,6 +1786,7 @@ void Register_Default_Widget_Type()
 	Register_Menu();
 	Register_CheckBox();
 	Register_RadioButton();
+	Register_ActiveBox();
 }
 /************************ Widget Library End **************************/
 

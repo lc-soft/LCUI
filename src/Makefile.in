@@ -73,7 +73,8 @@ am_libLCUI_la_OBJECTS = LCUI_Main.lo LCUI_Queue.lo LCUI_Font.lo \
 	LCUI_Work.lo LCUI_Cursor.lo LCUI_Widget.lo LCUI_Misc.lo \
 	LCUI_Button.lo LCUI_Error.lo LCUI_Label.lo LCUI_PictureBox.lo \
 	LCUI_ProgressBar.lo LCUI_Resources.lo LCUI_Window.lo \
-	LCUI_Menu.lo LCUI_CheckBox.lo LCUI_RadioButton.lo
+	LCUI_Menu.lo LCUI_CheckBox.lo LCUI_RadioButton.lo \
+	LCUI_ActiveBox.lo
 libLCUI_la_OBJECTS = $(am_libLCUI_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -230,7 +231,8 @@ LCUI_Resources.c \
 LCUI_Window.c \
 LCUI_Menu.c \
 LCUI_CheckBox.c \
-LCUI_RadioButton.c
+LCUI_RadioButton.c \
+LCUI_ActiveBox.c
 
 all: all-am
 
@@ -306,6 +308,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_ActiveBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Button.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_CheckBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Cursor.Plo@am__quote@

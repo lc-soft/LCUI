@@ -41,6 +41,7 @@ LCUI_Resources.c \
 LCUI_Window.c \
 LCUI_Menu.c \
 LCUI_CheckBox.c \
-LCUI_RadioButton.c
+LCUI_RadioButton.c \
+LCUI_ActiveBox.c
 
 

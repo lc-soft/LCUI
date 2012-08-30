@@ -40,29 +40,29 @@
  * ****************************************************************************/
  
 #ifndef __LCUI_H__
-#define LC_LCUI_H			<LCUI/LCUI.h>
-#define LC_MISC_H			<LCUI/LCUI_Misc.h>
-#define LC_FONT_H			<LCUI/LCUI_Font.h>
-#define LC_GRAPHICS_H		<LCUI/LCUI_Graphics.h>
-#define LC_WIDGET_H			<LCUI/LCUI_Widget.h>
-#define LC_QUEUE_H			<LCUI/LCUI_Queue.h> 
-#define LC_CURSOR_H			<LCUI/LCUI_Cursor.h> 
-#define LC_WORK_H			<LCUI/LCUI_Work.h> 
-#define LC_INPUT_H			<LCUI/LCUI_Input.h>
-#define LC_MEM_H			<LCUI/LCUI_Memory.h>
-#define LC_ERROR_H			<LCUI/LCUI_Error.h>
-#define LC_THREAD_H			<LCUI/LCUI_Thread.h>
-#define LC_INIT_H			<LCUI/LCUI_Init.h>
-#define LC_RES_H			<LCUI/LCUI_Resources.h> 
+#define LC_LCUI_H	<LCUI/LCUI.h>
+#define LC_MISC_H	<LCUI/LCUI_Misc.h>
+#define LC_FONT_H	<LCUI/LCUI_Font.h>
+#define LC_GRAPHICS_H	<LCUI/LCUI_Graphics.h>
+#define LC_WIDGET_H	<LCUI/LCUI_Widget.h>
+#define LC_QUEUE_H	<LCUI/LCUI_Queue.h> 
+#define LC_CURSOR_H	<LCUI/LCUI_Cursor.h> 
+#define LC_WORK_H	<LCUI/LCUI_Work.h> 
+#define LC_INPUT_H	<LCUI/LCUI_Input.h>
+#define LC_MEM_H	<LCUI/LCUI_Memory.h>
+#define LC_ERROR_H	<LCUI/LCUI_Error.h>
+#define LC_THREAD_H	<LCUI/LCUI_Thread.h>
+#define LC_INIT_H	<LCUI/LCUI_Init.h>
+#define LC_RES_H	<LCUI/LCUI_Resources.h> 
 
 /* 一些部件的头文件路径 */
-#define LC_WINDOW_H			<LCUI/LCUI_Window.h>
-#define LC_LABEL_H			<LCUI/LCUI_Label.h>
-#define LC_BUTTON_H			<LCUI/LCUI_Button.h>
-#define LC_PICBOX_H			<LCUI/LCUI_PictureBox.h>
-#define LC_PROGBAR_H		<LCUI/LCUI_ProgressBar.h>
-#define LC_MENU_H			<LCUI/LCUI_Menu.h>
-#define LC_CHECKBOX_H		<LCUI/LCUI_CheckBox.h>
-#define LC_RADIOBTN_H		<LCUI/LCUI_RadioButton.h>
-#define LC_TAB_H			<LCUI/LCUI_Tab.h>
+#define LC_WINDOW_H	<LCUI/LCUI_Window.h>
+#define LC_LABEL_H	<LCUI/LCUI_Label.h>
+#define LC_BUTTON_H	<LCUI/LCUI_Button.h>
+#define LC_PICBOX_H	<LCUI/LCUI_PictureBox.h>
+#define LC_PROGBAR_H	<LCUI/LCUI_ProgressBar.h>
+#define LC_MENU_H	<LCUI/LCUI_Menu.h>
+#define LC_CHECKBOX_H	<LCUI/LCUI_CheckBox.h>
+#define LC_RADIOBTN_H	<LCUI/LCUI_RadioButton.h>
+#define LC_ACTIVEBOX_H	<LCUI/LCUI_ActiveBox.h> 
 #endif
