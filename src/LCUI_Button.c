@@ -245,17 +245,14 @@ static void Button_Init(LCUI_Widget *widget)
 	LCUI_Button *button = (LCUI_Button*)
 				Malloc_Widget_Private(widget, sizeof(LCUI_Button));
 	 
-	/* 初始化图像数据 */
-	Graph_Init(&button->image); 
+	/* 初始化图像数据 */ 
 	Graph_Init(&button->btn_disable);
 	Graph_Init(&button->btn_normal);
 	Graph_Init(&button->btn_focus);
 	Graph_Init(&button->btn_down);
 	Graph_Init(&button->btn_over);
-	
-	button->image_align			= ALIGN_MIDDLE_CENTER;	/* 图像向正中央对齐 */
-	button->text_image_relation	= Overlay;				/* 文字覆盖在图片上 */ 
-	button->label				= Create_Widget("label");/* 创建label部件 */ 
+	 
+	button->label = Create_Widget("label");/* 创建label部件 */ 
 	
 	Response_Status_Change(widget); /* 响应状态改变 */ 
 	/* 将按钮部件作为label部件的容器 */
@@ -270,8 +267,7 @@ static void Button_Init(LCUI_Widget *widget)
 static void Destroy_Button(LCUI_Widget *widget)
 {
 	LCUI_Button *button = (LCUI_Button*)Get_Widget_Private_Data(widget);
-	/* 释放图像数据占用的内存 */
-	Free_Graph(&button->image); 
+	/* 释放图像数据占用的内存 */ 
 	Free_Graph(&button->btn_disable);
 	Free_Graph(&button->btn_normal);
 	Free_Graph(&button->btn_focus);
@@ -343,7 +339,7 @@ LCUI_Widget *Create_Button_With_Text(const char *fmt, ...)
 void Register_Button()
 /*功能：将按钮部件类型注册至部件库 */
 {
-	/* 添加几个部件类型 */
+	/* 添加部件类型 */
 	WidgetType_Add("button");
 	
 	/* 为部件类型关联相关函数 */

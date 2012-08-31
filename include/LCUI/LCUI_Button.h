@@ -46,8 +46,6 @@ typedef struct _LCUI_Button LCUI_Button;
 /***********************按钮**************************/
 struct _LCUI_Button
 {
-	LCUI_Graph		image;			/* 在按钮上显示的图像 */
-	
 	/* 当风格为Custom_Style(自定义)时，将根据按钮的状态使用这些图形 */
 	LCUI_Graph		btn_normal;		/* 普通状态 */
 	LCUI_Graph		btn_over;		/* 被鼠标覆盖 */
@@ -55,11 +53,7 @@ struct _LCUI_Button
 	LCUI_Graph		btn_focus;		/* 焦点状态 */
 	LCUI_Graph		btn_disable;	/* 不可用的状态 */
 	
-	LCUI_Align		image_align;	/* 在按钮上显示的图像的对齐方式 */
-	
-	int				text_image_relation; /* 按钮上图像与文本的相对位置 */
-	
-	LCUI_Widget		*label;	/* 嵌套的文本标签 */
+	LCUI_Widget	*label;	/* 嵌套的文本标签 */
 };
 /****************************************************/
 

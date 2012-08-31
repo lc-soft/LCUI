@@ -46,8 +46,6 @@ struct _LCUI_Label
 {
 	int				auto_size;           /* 自动调整大小(IS_TURE/IS_FALSE) */
 
-	LCUI_Graph		*image;              /* 在部件中显示的图像 */
-	LCUI_Align		image_align;         /* 显示的图像的对齐方式 */ 
 	LCUI_Font		font;                /* 保存着字体信息 */
 	LCUI_String	text;                /* 与控件关联的文本，这个是原始字符串 */
 	LCUI_WString	*contents;           /* 内容，记录着每个字的信息以及位图 */

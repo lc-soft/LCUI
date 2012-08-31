@@ -56,8 +56,6 @@ static void Label_Init(LCUI_Widget *widget)
 	label = (LCUI_Label*)Malloc_Widget_Private(widget, sizeof(LCUI_Label));
 
 	label->auto_size	= IS_TRUE; 				/* 开启自动调整尺寸 */
-	label->image		= NULL;
-	label->image_align	= ALIGN_MIDDLE_CENTER;	/* 对齐方式为居中 */
 	label->contents		= NULL; 
 	label->rows			= 0;					/* 行数归0 */
 	label->text_align	= ALIGN_TOP_LEFT;		/* 文本对齐方式为左上角对齐 */  
@@ -204,50 +202,16 @@ static void Exec_Update_Label(LCUI_Widget *widget)
 		} 
 	}
 	
-	int flag;
-    if(Valid_Graph(label->image))
-	{ /* 如果有标签图像需要显示 */
-        if(Valid_Graph(&widget->background_image))
-            flag = label->image_align | GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */ 
-        else 
-			flag = label->image_align | GRAPH_MIX_FLAG_REPLACE; /* 替换模式 */
-        /* 根据对齐方式以及处理模式来处理图形 */
-		Align_Image(&widget->graph, label->image, flag); 
-	}
-    else
-    {
-        if(!Valid_Graph(&widget->background_image)) 
-			flag = GRAPH_MIX_FLAG_REPLACE; /* 替换模式 */
-        else 
-			flag = GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */
-    }
+	int flag; 
+	if(!Valid_Graph(&widget->background_image)) 
+		flag = GRAPH_MIX_FLAG_REPLACE; /* 替换模式 */
+	else 
+		flag = GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */ 
 	/* 合成字体位图 */
 	Mix_Widget_FontBitmap(widget, 1, 1, label->contents, label->rows, 
 							label->font.space, label->font.linegap, flag);
 }
 
-void Set_Label_Image(LCUI_Widget *widget, LCUI_Graph *img, LCUI_Align align)
-/* 
- * 功能：设置label部件的背景图像
- * 参数说明：
- * widget ：需要进行操作的部件
- * img    ：需要设为背景图的图像数据
- * align  ：背景图像的布局
- * */
-{
-	LCUI_Label *label = (LCUI_Label*)Get_Widget_Private_Data(widget);
-    
-	if(img != NULL)
-	{
-		if(Valid_Graph(img))
-		{
-			label->image = img;
-			label->image_align = align;
-			Draw_Widget(widget);
-		}
-		else label->image = NULL;
-	}
-}
 
 int Get_Label_Row_Len(LCUI_Widget *widget, int row)
 /*
