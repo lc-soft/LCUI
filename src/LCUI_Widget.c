@@ -920,24 +920,17 @@ void Exec_Move_Widget(LCUI_Widget *widget, LCUI_Pos pos)
 		if(pos.y < widget->min_pos.y)
 			pos.y = widget->min_pos.y;
 	}
-	t = widget->pos; 
-	widget->pos = pos;
+	t = widget->pos; /* 记录老位置 */
+	widget->pos = pos;/* 记录新位置 */
 	if(widget->visible == IS_TRUE)
 	{/* 如果该部件可见 */
-		/* 设定需要刷新的区域 */
-		//old_rect = Rect(t.x, t.y, widget->size.w, widget->size.h); 
-		//Add_Widget_Refresh_Area(widget->parent, old_rect);
-		//Refresh_Widget(widget);
-					
-		LCUI_Rect a, b;
 		old_rect = Rect(t.x, t.y, widget->size.w, widget->size.h);
-		Refresh_Widget(widget);
-		if(Rect_Is_Overlay(Get_Widget_Rect(widget), old_rect))
-		{
-			Get_Moved_Rect_Refresh_Area( pos.x, pos.y, old_rect, &a, &b );
-			Add_Widget_Refresh_Area(widget->parent, a); 
-			Add_Widget_Refresh_Area(widget->parent, b); 
-		}
+		Add_Widget_Refresh_Area(widget->parent, old_rect); /* 刷新老区域 */
+		Refresh_Widget(widget); /* 刷新现在的区域 */
+		/* 
+		 * 不用担心老区域和新区域存在重叠区域而导致屏幕刷新效率下降的问题，因为LCUI会
+		 * 在处理这些区域时，会将这些区域进行分割和删减，确保区域独立且不重叠。
+		 *  */
 	}
 }
 
@@ -1066,7 +1059,7 @@ void Disable_Widget_Auto_Size(LCUI_Widget *widget)
 void Exec_Refresh_Widget(LCUI_Widget *widget)
 /* 功能：执行刷新显示指定部件的整个区域图形的操作 */
 { 
-	Add_Widget_Refresh_Area(widget, Rect(0, 0, widget->size.w, widget->size.h));
+	Add_Widget_Refresh_Area(widget->parent, Get_Widget_Rect(widget));
 }
 
 void Exec_Draw_Widget(LCUI_Widget *widget)
