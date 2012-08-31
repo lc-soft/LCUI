@@ -54,15 +54,6 @@ struct _LCUI_Label
 };/* 可用于显示运行时的信息或者说明性文字 */
 /******************************* END ************************************/
 
-void Set_Label_Image(LCUI_Widget *widget, LCUI_Graph *img, LCUI_Align align);
-/* 
- * 功能：设置label部件的背景图像
- * 参数说明：
- * widget ：需要进行操作的部件
- * img    ：需要设为背景图的图像数据
- * align  ：背景图像的布局
- * */
-
 int Get_Label_Row_Len(LCUI_Widget *widget, int row);
 /*
  * 功能：获取label部件中指定行的字符串长度
