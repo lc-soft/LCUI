@@ -276,7 +276,7 @@ int Set_PictureBox_ErrorImage(LCUI_Widget *widget, LCUI_Graph *pic)
 /* 功能：设定当加载图像失败时显示的图像 */
 {
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-								Get_Widget_Private_Data(widget);
+				Get_Widget_Private_Data(widget);
 	
 	if(Valid_Graph(pic)) {
 		Copy_Graph(&pic_box->error_image, pic);
@@ -290,8 +290,7 @@ int Set_PictureBox_InitImage(LCUI_Widget *widget, LCUI_Graph *pic)
 {
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)Get_Widget_Private_Data(widget);
 	
-	if(Valid_Graph(pic))
-	{
+	if(Valid_Graph(pic)) {
 		Copy_Graph(&pic_box->initial_image, pic);
 		return 0;
 	}
@@ -303,12 +302,11 @@ void Set_PictureBox_Size_Mode(LCUI_Widget *widget, int mode)
 {
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)Get_Widget_Private_Data(widget);
 	
-	if(pic_box->size_mode != mode)
-	{
+	if(pic_box->size_mode != mode) {
 		float scale_x,scale_y;
 		pic_box->size_mode = mode;
-		switch(mode)
-		{
+		if(pic_box->image == NULL) return;
+		switch(mode) {
 		case SIZE_MODE_ZOOM:
 			scale_x = (float)widget->size.w / pic_box->image->width;
 			scale_y = (float)widget->size.h / pic_box->image->height;
