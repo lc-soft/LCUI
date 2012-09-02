@@ -306,11 +306,11 @@ void *load_imagefile(void *file)
 		size.w = 0;
 		size.h = 0;
 	} else {
-		image = Get_PictureBox_Graph(image_box);
+		image = Get_PictureBox_Graph(image_box); 
 		size = Get_Graph_Size(image);
 		if( 1 == Size_Cmp(size, Get_Widget_Size(image_box) )) {
 		/* 如果图片尺寸大于PictureBox的尺寸，就改变PictureBox的图像处理模式 */
-			Set_PictureBox_Size_Mode(image_box, SIZE_MODE_ZOOM);
+			Set_PictureBox_Size_Mode(image_box, SIZE_MODE_BLOCK_ZOOM);
 			mini_scale = Get_PictureBox_Zoom_Scale(image_box);
 		} else mini_scale = 0.25;
 		Hide_Widget(tip_box);
@@ -442,14 +442,14 @@ int main(int argc, char*argv[])
 	Load_Image("drawable/btn_prev_down_disabled.png", &btn_switch_pic[5]);
 	/* 设定按钮图形样式 */
 	Custom_Button_Style(	btn_zoom[0], &btn_zoom_pic[3], &btn_zoom_pic[3], 
-							&btn_zoom_pic[4], NULL, &btn_zoom_pic[5] );
+				&btn_zoom_pic[4], NULL, &btn_zoom_pic[5] );
 	Custom_Button_Style(	btn_zoom[1], &btn_zoom_pic[0], &btn_zoom_pic[0], 
-							&btn_zoom_pic[1], NULL, &btn_zoom_pic[2] );
+				&btn_zoom_pic[1], NULL, &btn_zoom_pic[2] );
 							
 	Custom_Button_Style(	btn_switch[0], &btn_switch_pic[0], &btn_switch_pic[0], 
-							&btn_switch_pic[1], NULL, &btn_switch_pic[2] );
+				&btn_switch_pic[1], NULL, &btn_switch_pic[2] );
 	Custom_Button_Style(	btn_switch[1], &btn_switch_pic[3], &btn_switch_pic[3], 
-							&btn_switch_pic[4], NULL, &btn_switch_pic[5] );
+				&btn_switch_pic[4], NULL, &btn_switch_pic[5] );
 							
 	Set_Widget_Border (image_info_box, RGB(50,50,50), Border(1,1,1,1));/* 设置边框 */
 	Set_Widget_Border (tip_box, RGB(50,50,50), Border(1,1,1,1));
@@ -466,9 +466,9 @@ int main(int argc, char*argv[])
 	btn_switch_size[0] = Get_Graph_Size(&btn_switch_pic[0]);
 	btn_switch_size[1] = Get_Graph_Size(&btn_switch_pic[1]);
 	size[0] = Size(	btn_zoom_size[0].w, 
-					btn_zoom_size[0].h + btn_zoom_size[1].h);
+			btn_zoom_size[0].h + btn_zoom_size[1].h);
 	size[1] = Size( btn_switch_size[0].w+btn_switch_size[1].w,
-					btn_switch_size[0].h);
+			btn_switch_size[0].h);
 	/* 更改各个部件的尺寸 */
 	Resize_Widget(window, Size(320, 240));
 	Resize_Widget(btn_zoom[0], btn_zoom_size[0]);
@@ -485,8 +485,11 @@ int main(int argc, char*argv[])
 	
 	char version[20];
 	Get_LCUI_Version(version);
-	if(strcmp(version, "0.12.4") == 0) Set_Window_Title_Text(window, "照片查看器 v0.3"); 
-	else Set_Window_Title_Text(window, "照片查看器 v0.3 <color=240,0,0>(存在兼容性问题)</color>"); 
+	if(strcmp(version, "0.12.5") == 0) 
+		Set_Window_Title_Text(window, "照片查看器 v0.4"); 
+	else 
+		Set_Window_Title_Text(window, 
+		 "照片查看器 v0.3 <color=240,0,0>(存在兼容性问题)</color>"); 
 	
 	/* 设定部件的布局 */
 	Set_Widget_Align(btn_zoom[0], ALIGN_BOTTOM_CENTER, Pos(0, 0));
@@ -526,8 +529,7 @@ int main(int argc, char*argv[])
 	Show_Widget(window); 
 	
 	LCUI_Key_Event_Connect( KEY_ESC,   Main_Loop_Quit,  NULL);
-	if(argc == 2)
-	{/* 如果总共有2个参数 */ 
+	if(argc == 2) {/* 如果总共有2个参数 */ 
 		char path[1024];
 		get_filepath(argv[1], path);
 		filename = scan_imgfile(path, &total_files); 
@@ -552,9 +554,7 @@ int main(int argc, char*argv[])
 		LCUI_Key_Event_Connect( 'i',   show_image_info,  NULL);
 		Widget_Clicked_Event_Connect( image_box, show_button, NULL);
 		LCUI_Thread_Create(&thread_hide, NULL, hide, NULL);
-	}
-	else
-	{
+	} else {
 		char myname[256];
 		LCUI_Widget *help_text;
 		get_filename(argv[0], myname);
