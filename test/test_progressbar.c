@@ -1,13 +1,16 @@
 
+//测试进度条部件的示例程序
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
 #include LC_WINDOW_H
-//测试进度条部件的示例程序
+#include LC_GRAPHICS_H
+#include LC_RES_H
 #include LC_WORK_H
 #include LC_MISC_H
 #include LC_THREAD_H
 #include LC_PROGBAR_H
+#include LC_PICBOX_H
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
@@ -28,8 +31,29 @@ void *change_progress(void *arg)
     LCUI_Thread_Exit(NULL);
 }
 
-
 int main(int argc, char*argv[])
+{
+    LCUI_Graph graph;
+    LCUI_Widget *window, *pb;
+    
+    Graph_Init(&graph);
+    LCUI_Init(argc, argv); 
+    window = Create_Widget("window");
+    pb = Create_Widget("picture_box");  
+    Set_Window_Title_Text(window, "测试进度条部件");  
+    Resize_Widget(window, Size(320, 240));
+    Resize_Widget(pb, Size(318, 215));
+    Load_Graph_ProgressBar_Img(&graph);
+    Set_PictureBox_Size_Mode(pb, SIZE_MODE_ZOOM);
+    Set_PictureBox_Image_From_Graph(pb, &graph); 
+    Window_Client_Area_Add(window, pb);
+    Set_Widget_Align(pb, ALIGN_MIDDLE_CENTER, Pos(0, 0)); 
+    Show_Widget(pb);
+    Show_Widget(window); 
+    return LCUI_Main(); /* 进入主循环 */  
+}
+
+int tttmain(int argc, char*argv[])
 /* 主函数，程序的入口 */
 {
     pthread_t t[2];
