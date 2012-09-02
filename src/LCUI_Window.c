@@ -73,12 +73,10 @@ static void Move_Window(LCUI_Widget *titlebar, LCUI_DragEvent *event)
 {
 	LCUI_Pos pos;
 	LCUI_Widget *window; 
-	if(event->first_click == 0 )
-	{
+	if(event->first_click == 0 ) {
 		window = titlebar->parent;
 		pos = event->new_pos;
-		if(window != NULL)
-		{
+		if(window != NULL) {
 			/* 减去在窗口中的相对坐标, 得出窗口位置 */
 			pos = Pos_Sub(pos, Get_Widget_Pos(titlebar));
 			/* 移动窗口的位置 */
@@ -93,15 +91,15 @@ void Set_Window_Title_Icon(LCUI_Widget *window, LCUI_Graph *icon)
 	LCUI_Graph *image;
 	LCUI_Widget *title_widget = Get_Window_TitleBar(window);
 	LCUI_TitleBar *title_data = (LCUI_TitleBar *)
-							Get_Widget_Private_Data(title_widget);
+			Get_Widget_Private_Data(title_widget);
 	image = Get_PictureBox_Graph(title_data->icon_box);
 	Free_Graph(image);/* 释放内存 */
-	if(icon != NULL)
-	{
-		Set_PictureBox_Image_From_Graph(title_data->icon_box, icon);
-		Set_Widget_Align(title_data->icon_box, ALIGN_MIDDLE_LEFT, Pos(3,0));
-		Set_Widget_Align(title_data->label, ALIGN_MIDDLE_LEFT, Pos(23,0));
-	}
+	if(icon == NULL) return;
+
+	Set_PictureBox_Image_From_Graph(title_data->icon_box, icon);
+	Set_Widget_Align(title_data->icon_box, ALIGN_MIDDLE_LEFT, Pos(3,0));
+	Set_Widget_Align(title_data->label, ALIGN_MIDDLE_LEFT, Pos(23,0));
+ 
 }
 
 static void Window_TitleBar_Init(LCUI_Widget *titlebar)
@@ -128,7 +126,7 @@ static void Window_TitleBar_Init(LCUI_Widget *titlebar)
 LCUI_Size Get_Window_Client_Size(LCUI_Widget *win_p)
 /* 功能：获取窗口的客户区的尺寸 */
 {
-	LCUI_Widget *client_area	= Get_Window_Client_Area(win_p);
+	LCUI_Widget *client_area = Get_Window_Client_Area(win_p);
 	return client_area->size;
 }
 
@@ -139,8 +137,7 @@ void Window_Widget_Auto_Size(LCUI_Widget *win_p)
 	LCUI_Widget *titlebar		= Get_Window_TitleBar(win_p);
 	LCUI_Widget *client_area	= Get_Window_Client_Area(win_p);
 	/* 按不同的风格来处理 */
-	switch(Get_Widget_Border_Style(win_p))
-	{
+	switch(Get_Widget_Border_Style(win_p)) {
 		case BORDER_STYLE_NONE:  /* 没有边框 */
 			/* 先计算坐标和尺寸 */
 			x = win_p->border.left;
@@ -156,7 +153,8 @@ void Window_Widget_Auto_Size(LCUI_Widget *win_p)
 			
 		case BORDER_STYLE_LINE_BORDER: /* 线条边框 */
 			Move_Widget( client_area, Pos(0, 0) );
-			Resize_Widget( client_area, Size(win_p->size.w, win_p->size.h) );
+			Resize_Widget( client_area, 
+				Size(win_p->size.w, win_p->size.h) );
 			Hide_Widget( titlebar);
 			Show_Widget( client_area);
 			break;
@@ -178,8 +176,10 @@ void Window_Widget_Auto_Size(LCUI_Widget *win_p)
 			Move_Widget(titlebar, Pos(x, y) );
 			Exec_Resize_Widget(titlebar, Size(width, 25));
 			
-			Move_Widget(client_area, Pos(x, y + titlebar->size.h));
-			Resize_Widget(client_area, Size(width, height - titlebar->size.h));
+			Move_Widget(client_area, 
+				Pos(x, y + titlebar->size.h));
+			Resize_Widget(client_area, 
+				Size(width, height - titlebar->size.h));
 			/* 标题栏和客户区都需要显示 */
 			Show_Widget(titlebar); 
 			Show_Widget(client_area); 
@@ -305,21 +305,17 @@ static void Show_Window(LCUI_Widget *win_p)
 	pos.x = 0;
 	pos.y = 0;
 	win->count++;
-	if(win->count == 1)
-	{/* 如果是第一次显示 */
-		if(win_p->parent == NULL && win_p->pos_type == POS_TYPE_IN_SCREEN)
-		{
+	if(win->count == 1) {/* 如果是第一次显示 */
+		if(win_p->parent == NULL 
+		&& win_p->pos_type == POS_TYPE_IN_SCREEN) {
 			w = Get_Screen_Width();
 			h = Get_Screen_Height();
-		}
-		else 
-		{
+		} else {
 			w = Get_Widget_Width(win_p->parent);
 			h = Get_Widget_Height(win_p->parent);
 		}
 		
-		switch(win->init_align)
-		{/* 窗口的位置 */
+		switch(win->init_align) {/* 窗口的位置 */
 		case ALIGN_TOP_LEFT : 
 			break;
 		case ALIGN_TOP_CENTER :
@@ -404,11 +400,11 @@ void Register_Window()
 	
 	/* 为部件类型关联相关函数 */ 
 	WidgetFunc_Add("titlebar",	Window_TitleBar_Init,	FUNC_TYPE_INIT);
-	WidgetFunc_Add("window",	Window_Init,			FUNC_TYPE_INIT);
-	WidgetFunc_Add("window",	Exec_Update_Window,		FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("window",	Resize_Window,			FUNC_TYPE_RESIZE);
-	WidgetFunc_Add("window",	Show_Window,			FUNC_TYPE_SHOW);
-	WidgetFunc_Add("window",	Hide_Window,			FUNC_TYPE_HIDE);
-	WidgetFunc_Add("window",	Destroy_Window,			FUNC_TYPE_DESTROY);
+	WidgetFunc_Add("window",	Window_Init,		FUNC_TYPE_INIT);
+	WidgetFunc_Add("window",	Exec_Update_Window,	FUNC_TYPE_UPDATE);
+	WidgetFunc_Add("window",	Resize_Window,		FUNC_TYPE_RESIZE);
+	WidgetFunc_Add("window",	Show_Window,		FUNC_TYPE_SHOW);
+	WidgetFunc_Add("window",	Hide_Window,		FUNC_TYPE_HIDE);
+	WidgetFunc_Add("window",	Destroy_Window,		FUNC_TYPE_DESTROY);
 }
 

@@ -360,8 +360,8 @@ static LCUI_Widget *click_widget = NULL, *overlay_widget = NULL;
 static LCUI_Pos __offset_pos = {0, 0};  /* 点击部件时保存的偏移坐标 */ 
 static LCUI_DragEvent drag_event;
 int Widget_Drag_Event_Connect ( 
-				LCUI_Widget *widget, 
-				void (*func)(LCUI_Widget*, LCUI_DragEvent *)
+		LCUI_Widget *widget, 
+		void (*func)(LCUI_Widget*, LCUI_DragEvent *)
 )
 /* 
  * 功能：将回调函数与部件的拖动事件进行连接 
@@ -456,12 +456,10 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 		widget = Widget_Find_Response_Event(event->widget, EVENT_DRAG);  
 	//printf("widget :");
 	//print_widget_info(widget);
-	if( Mouse_LeftButton(event) == PRESSED )
-	{/* 如果是鼠标左键被按下 */ 
+	if( Mouse_LeftButton(event) == PRESSED ) {/* 如果是鼠标左键被按下 */ 
 		/* widget必须指向能响应状态变化的部件，因此，需要查找 */
 		click_widget = widget; 
-		if(widget != NULL)
-		{
+		if(widget != NULL) {
 			//printf("1\n");
 			/* 用全局坐标减去部件的坐标，得到偏移位置 */ 
 			__offset_pos = Pos_Sub(
@@ -477,8 +475,7 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 		}
 			//printf("2\n");
 		widget = Widget_Find_Response_Status_Change(widget); 
-		if(widget != NULL)
-		{
+		if(widget != NULL) {
 			//printf("3\n");
 			if( event->widget->enabled == IS_TRUE
 			&& widget->enabled == IS_TRUE )
@@ -489,11 +486,10 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 		}
 			//printf("4\n");
 	}
-	else if (Mouse_LeftButton (event) == FREE)
-	{/* 否则，如果鼠标左键是释放状态 */
+	else if (Mouse_LeftButton (event) == FREE) {
+		/* 否则，如果鼠标左键是释放状态 */
 	//printf("5\n");
-		if(click_widget != NULL)
-		{ 
+		if(click_widget != NULL) { 
 			__offset_pos = Pos_Sub(
 				event->global_pos, 
 				Get_Widget_Global_Pos( click_widget )
@@ -502,9 +498,8 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 			drag_event.first_click = 0; 
 			drag_event.end_click = 1; 
 			Process_Event(&click_widget->event, EVENT_DRAG);
-			
-			if(click_widget == widget)
-			{/* 如果点击时和点击后都在同一个按钮部件内进行的 */
+			/* 如果点击时和点击后都在同一个按钮部件内进行的 */
+			if(click_widget == widget) {
 				/* 
 				 * 触发CLICKED事件，将部件中关联该事件的回调函数发送至
 				 * 任务队列，使之在主循环中执行 
@@ -516,21 +511,17 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 				
 				widget = Widget_Find_Response_Status_Change(event->widget);
 				if(NULL != widget){
-				if(widget->enabled == IS_TRUE)
-				{ 
+				if(widget->enabled == IS_TRUE) { 
 					Set_Widget_Status (widget, WIDGET_STATUS_CLICKED);
 					Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
 				} else 
 					Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
 				}
 		//printf("7\n");
-			}
-			else
-			{/* 否则，将恢复之前点击的鼠标的状态 */
+			} else {/* 否则，将恢复之前点击的鼠标的状态 */
 		//printf("8\n");
 				widget = Widget_Find_Response_Status_Change(click_widget);
-				if(widget != NULL)
-				{
+				if(widget != NULL) {
 					if(widget->enabled == IS_TRUE)
 						Set_Widget_Status (widget, WIDGET_STATUS_NORMAL);
 					else
@@ -555,32 +546,25 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 	widget = Get_Cursor_Overlay_Widget(); 
 	//print_widget_info(widget);
 	//print_widget_info(overlay_widget);
-	if(widget != NULL)
-	{	//printf("6 ");
+	if(widget != NULL) {	//printf("6 ");
 		/* 获取能响应状态改变的部件的指针 */
 		widget = Widget_Find_Response_Status_Change(widget); 
-		if(widget != NULL)
-		{/* 如果有效 */
+		if(widget != NULL) {/* 如果有效 */
 		//printf("1\n");
-			if(overlay_widget != widget)
-			{
+			if(overlay_widget != widget) {
 		//printf("2\n");
-				if (widget->enabled == IS_TRUE)
-				{
+				if (widget->enabled == IS_TRUE) {
 		//printf("3\n");
 		//printf("leftbutton status: %d\n", Mouse_LeftButton (event));
-					if( click_widget == NULL )
-					{
+					if( click_widget == NULL ) {
 		//printf("leftbutton is free\n\n");
 						Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
 					} 
-				}
-				else
-					Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
+				} else Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
 				
 		//printf("4\n");
-				if (overlay_widget != NULL && click_widget == NULL )
-				{/* 如果之前有覆盖到的部件 */
+				if (overlay_widget != NULL && click_widget == NULL ) {
+					/* 如果之前有覆盖到的部件 */
 		//printf("5\n");
 					if (overlay_widget->enabled == IS_TRUE) /* 如果按钮部件被启用 */
 						Set_Widget_Status (overlay_widget, WIDGET_STATUS_NORMAL);
@@ -594,8 +578,8 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 		}
 	}
 	//printf("6\n");
-	if(overlay_widget != widget && click_widget == NULL)
-	{/* 如果鼠标指针在之前有覆盖到的部件 */
+	if(overlay_widget != widget && click_widget == NULL) {
+		/* 如果鼠标指针在之前有覆盖到的部件 */
 	//printf("2\n");
 	//printf("7\n");
 		if (overlay_widget->enabled == IS_TRUE)/* 如果部件可用，就让它恢复到普通状态 */
@@ -606,8 +590,8 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 	//printf("8\n");
 	overlay_widget = widget;
 	/* 触发部件拖动事件 */ 
-	if(click_widget != NULL && Mouse_LeftButton (event) == PRESSED)
-	{/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态 */ 
+	if(click_widget != NULL && Mouse_LeftButton (event) == PRESSED) {
+		/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态 */ 
 		drag_event.new_pos = Pos_Sub(event->global_pos, __offset_pos); 
 		Process_Event(&click_widget->event, EVENT_DRAG);
 		drag_event.first_click = 0; 

@@ -55,7 +55,7 @@ void Set_CheckBox_On(LCUI_Widget *widget)
 /* 功能：设定复选框为选中状态 */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-								Get_Widget_Private_Data(widget); 
+			Get_Widget_Private_Data(widget); 
 	
 	check_box->on = IS_TRUE;
 	Draw_Widget(widget);
@@ -65,7 +65,7 @@ void Set_CheckBox_Off(LCUI_Widget *widget)
 /* 功能：设定复选框为未选中状态 */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-								Get_Widget_Private_Data(widget); 
+			Get_Widget_Private_Data(widget); 
 	
 	check_box->on = IS_FALSE;
 	Draw_Widget(widget);
@@ -75,7 +75,7 @@ int Get_CheckBox_Status(LCUI_Widget *widget)
 /* 功能：获取复选框的状态 */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-								Get_Widget_Private_Data(widget); 
+			Get_Widget_Private_Data(widget); 
 	
 	return check_box->on;
 }
@@ -92,9 +92,7 @@ int CheckBox_Is_On(LCUI_Widget *widget)
 int CheckBox_Is_Off(LCUI_Widget *widget)
 /* 功能：检测复选框是否未选中 */
 {
-	if(IS_TRUE == Get_CheckBox_Status(widget))
-		return 0;
-	
+	if(IS_TRUE == Get_CheckBox_Status(widget)) return 0;
 	return 1;
 }
 
@@ -104,17 +102,14 @@ void Switch_CheckBox_Status(LCUI_Widget *widget, void *arg)
  * 说明：这个状态，指的是打勾与没打勾的两种状态
  *  */
 { 
-	if(CheckBox_Is_On(widget))
-		Set_CheckBox_Off(widget);
-	else
-		Set_CheckBox_On(widget); 
+	if(CheckBox_Is_On(widget)) Set_CheckBox_Off(widget);
+	else Set_CheckBox_On(widget); 
 }
 
 void CheckBox_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
 /* 功能：设定复选框中的图像框的尺寸 */
 {
-	if(size.w <= 0 && size.h <= 0)
-		return;
+	if(size.w <= 0 && size.h <= 0) return;
 		
 	LCUI_Widget *imgbox = Get_CheckBox_ImgBox(widget);
 	Resize_Widget(imgbox, size);
@@ -127,7 +122,7 @@ static void CheckBox_Init(LCUI_Widget *widget)
 {
 	LCUI_Widget *container[2];
 	LCUI_CheckBox *check_box = (LCUI_CheckBox*)
-				Malloc_Widget_Private(widget, sizeof(LCUI_CheckBox));
+		Malloc_Widget_Private(widget, sizeof(LCUI_CheckBox));
 	
 	check_box->on = IS_FALSE;
 	/* 初始化图像数据 */ 
@@ -186,7 +181,7 @@ static void Destroy_CheckBox(LCUI_Widget *widget)
 /* 功能：释放复选框部件占用的资源 */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-								Get_Widget_Private_Data(widget); 
+			Get_Widget_Private_Data(widget); 
 	/* 释放图像数据占用的内存资源 */ 
 	Free_Graph(&check_box->img_off_disable);
 	Free_Graph(&check_box->img_off_normal);
@@ -205,15 +200,14 @@ static void Exec_Update_CheckBox(LCUI_Widget *widget)
 {
 	LCUI_Graph *p;
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-								Get_Widget_Private_Data(widget); 
+			Get_Widget_Private_Data(widget); 
 								
-	if(Strcmp(&widget->style, "custom") == 0)
-	{/* 如果为自定义风格，那就使用用户指定的图形，具体可参考按钮部件的处理方法 */ 
+	if(Strcmp(&widget->style, "custom") == 0){
+		/* 如果为自定义风格，那就使用用户指定的图形，具体可参考按钮部件的处理方法 */ 
 		if(widget->enabled == IS_FALSE) 
 			widget->status = WIDGET_STATUS_DISABLE;
 			
-		switch(widget->status)
-		{
+		switch(widget->status){
 		case WIDGET_STATUS_NORMAL:
 			if(check_box->on == IS_TRUE)
 				p = &check_box->img_on_normal;
@@ -253,9 +247,7 @@ static void Exec_Update_CheckBox(LCUI_Widget *widget)
 			default :
 			break;
 		} 
-	}
-	else
-	{/* 如果按钮的风格为缺省 */
+	} else {/* 如果按钮的风格为缺省 */
 		Strcpy(&widget->style, "default");
 		if(widget->enabled == IS_FALSE) 
 			widget->status = WIDGET_STATUS_DISABLE;
@@ -267,8 +259,7 @@ static void Exec_Update_CheckBox(LCUI_Widget *widget)
 		/* 由于本函数在退出后，使用局部变量保存的图形数据会无效，因此，申请内存空间来储存 */
 		p = (LCUI_Graph*)calloc(1,sizeof(LCUI_Graph));
 		
-		switch(widget->status)
-		{ 
+		switch(widget->status) { 
 		case WIDGET_STATUS_NORMAL:
 			if(check_box->on == IS_TRUE)
 				Load_Graph_Default_CheckBox_On_Normal(p);
@@ -313,7 +304,7 @@ LCUI_Widget *Get_CheckBox_Label(LCUI_Widget *widget)
 /* 功能：获取复选框部件中的label部件的指针 */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-								Get_Widget_Private_Data(widget); 
+			Get_Widget_Private_Data(widget); 
 	if(NULL == check_box)
 		return NULL;
 		
@@ -324,9 +315,8 @@ LCUI_Widget *Get_CheckBox_ImgBox(LCUI_Widget *widget)
 /* 功能：获取复选框部件中的PictureBox部件的指针 */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-								Get_Widget_Private_Data(widget); 
-	if(NULL == check_box)
-		return NULL;
+			Get_Widget_Private_Data(widget); 
+	if(NULL == check_box) return NULL;
 		
 	return check_box->imgbox;
 }
@@ -337,9 +327,9 @@ void Set_CheckBox_Text(LCUI_Widget *widget, const char *fmt, ...)
 	char text[LABEL_TEXT_MAX_SIZE];
 	LCUI_Widget *label = Get_CheckBox_Label(widget); 
 	
-    memset(text, 0, sizeof(text)); 
+	memset(text, 0, sizeof(text)); 
     
-    va_list ap; 
+	va_list ap; 
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
 	va_end(ap);
@@ -353,9 +343,9 @@ LCUI_Widget *Create_CheckBox_With_Text(const char *fmt, ...)
 	char text[LABEL_TEXT_MAX_SIZE];
 	LCUI_Widget *widget = Create_Widget("check_box");
 	
-    memset(text, 0, sizeof(text)); 
+	memset(text, 0, sizeof(text)); 
     
-    va_list ap; 
+	va_list ap; 
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
 	va_end(ap); 
@@ -366,15 +356,13 @@ LCUI_Widget *Create_CheckBox_With_Text(const char *fmt, ...)
 
 
 void Register_CheckBox()
-/*
- * 功能：注册部件类型-窗口至部件库
- **/
+/* 功能：注册部件类型-窗口至部件库 */
 {
 	/* 添加几个部件类型 */
 	WidgetType_Add("check_box"); 
 	
 	/* 为部件类型关联相关函数 */ 
-	WidgetFunc_Add("check_box",	CheckBox_Init, FUNC_TYPE_INIT);
+	WidgetFunc_Add("check_box", CheckBox_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("check_box", Exec_Update_CheckBox, FUNC_TYPE_UPDATE); 
 	WidgetFunc_Add("check_box", Destroy_CheckBox, FUNC_TYPE_DESTROY);
 }

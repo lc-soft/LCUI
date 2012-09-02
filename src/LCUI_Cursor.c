@@ -101,8 +101,7 @@ int Set_Cursors_Graph (LCUI_Graph * graph)
  * 返回值：设定成功返回0，失败则返回-1
 */
 {
-	if (Valid_Graph (graph))
-	{
+	if (Valid_Graph (graph)) {
 		Copy_Graph (&LCUI_Sys.cursor.graph, graph);
 		Refresh_Cursor();
 		return 0;

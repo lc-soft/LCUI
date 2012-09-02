@@ -138,10 +138,8 @@ int Malloc_Graph(LCUI_Graph *pic, int width, int height)
 		return -1; 
 	}
 	
-	if(Valid_Graph(pic)) 
-	{
-		if(pic->width*pic->height > width*height)
-		{
+	if(Valid_Graph(pic)) {
+		if(pic->width*pic->height > width*height) {
 			pic->width  = width;
 			pic->height = height;
 			return 1;
@@ -151,8 +149,7 @@ int Malloc_Graph(LCUI_Graph *pic, int width, int height)
 	
 	Using_Graph(pic, 1);
 	pic->rgba  = Get_Malloc(width, height, pic->flag); 
-	if(NULL == pic->rgba)
-	{
+	if(NULL == pic->rgba) {
 		pic->width  = 0;
 		pic->height = 0;
 		End_Use_Graph(pic);
@@ -175,8 +172,7 @@ void Copy_Graph(LCUI_Graph *des, LCUI_Graph *src)
 {
 	int size;
 	des->flag = src->flag;       /* 是否需要透明度 */
-	if(Valid_Graph(src))
-	{
+	if(Valid_Graph(src)) {
 		if(Valid_Graph(des)) Free_Graph(des);
 		if(src->flag == HAVE_ALPHA) des->flag = HAVE_ALPHA;
 		else des->flag = NO_ALPHA;
@@ -210,8 +206,7 @@ void Free_Bitmap(LCUI_Bitmap *bitmap)
 /* 功能：释放单色位图占用的内存资源，并初始化 */
 {
 	int y;
-	if(Valid_Bitmap(bitmap)) 
-	{
+	if(Valid_Bitmap(bitmap)) {
 		for(y = 0; y < bitmap->height; ++y) 
 			free(bitmap->data[y]); 
 		free(bitmap->data);
@@ -233,10 +228,8 @@ void Free_WString(LCUI_WString *str)
 /* 功能：释放LCUI_WString型结构体中的指针变量占用的内存 */
 {
 	int i;
-	if(str != NULL)
-	{
-		if(str->size > 0 && str->string != NULL)
-		{
+	if(str != NULL) {
+		if(str->size > 0 && str->string != NULL) {
 			for(i = 0; i < str->size; ++i) 
 				Free_WChar_T(&str->string[i]); 
 			free(str->string);
@@ -258,10 +251,10 @@ void Malloc_Bitmap(LCUI_Bitmap *bitmap, int width, int height)
 		bitmap->height = height;
 		bitmap->data = (unsigned char**)malloc(
 				bitmap->height*sizeof(unsigned char*));
-		for(i = 0; i < bitmap->height; ++i)
-		{   /* 为背景图的每一行分配内存 */
+		for(i = 0; i < bitmap->height; ++i) { 
+			/* 为背景图的每一行分配内存 */
 			bitmap->data[i] = (unsigned char*)calloc(1,
-							sizeof(unsigned char) * bitmap->width); 
+				sizeof(unsigned char) * bitmap->width); 
 		}
 		bitmap->alpha    = 255; /* 字体默认不透明 */
 		bitmap->malloc = IS_TRUE;
@@ -275,17 +268,15 @@ void Realloc_Bitmap(LCUI_Bitmap *bitmap, int width, int height)
 	if(width >= bitmap->width && height >= bitmap->height)
 	{/* 如果新尺寸大于原来的尺寸 */
 		bitmap->data = (unsigned char**)realloc(
-						bitmap->data, height*sizeof(unsigned char*));
-		for(i = 0; i < height; ++i)
-		{   /* 为背景图的每一行扩增内存 */
+			bitmap->data, height*sizeof(unsigned char*));
+		for(i = 0; i < height; ++i) {   /* 为背景图的每一行扩增内存 */
 			bitmap->data[i] = (unsigned char*)realloc(
-					bitmap->data[i], sizeof(unsigned char) * width); 
+				bitmap->data[i], sizeof(unsigned char) * width); 
 			/* 把扩增的部分置零 */
 			if(i < bitmap->height)  
 				for(j = bitmap->width; j < width; ++j)
 					bitmap->data[i][j] = 0; 
-			else  
-				memset(bitmap->data[i], 0 , bitmap->width); 
+			else memset(bitmap->data[i], 0 , bitmap->width); 
 		}
 	}
 }
@@ -296,11 +287,9 @@ void Free_Font(LCUI_Font *in)
 	Free_String(&in->font_file);
 	Free_String(&in->family_name);
 	Free_String(&in->style_name);
-	if(in->status == ACTIVE)
-	{ 
+	if(in->status == ACTIVE) { 
 		in->status = KILLED;
-		if(in->type == CUSTOM)
-		{ 
+		if(in->type == CUSTOM) { 
 			FT_Done_Face(in->ft_face);
 			FT_Done_FreeType(in->ft_lib);
 		} 
@@ -315,8 +304,7 @@ void Free_LCUI_Font()
 	Free_String(&LCUI_Sys.default_font.font_file);
 	Free_String(&LCUI_Sys.default_font.family_name);
 	Free_String(&LCUI_Sys.default_font.style_name);
-	if(LCUI_Sys.default_font.status == ACTIVE)
-	{
+	if(LCUI_Sys.default_font.status == ACTIVE) {
 		LCUI_Sys.default_font.status = KILLED;
 		FT_Done_Face(LCUI_Sys.default_font.ft_face);
 		FT_Done_FreeType(LCUI_Sys.default_font.ft_lib); 

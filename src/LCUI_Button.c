@@ -55,116 +55,95 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 	LCUI_RGB color;
 	LCUI_Button *button = (LCUI_Button *)Get_Widget_Private_Data(widget);
 	/* 根据按钮的不同风格来处理 */
-	if(Strcmp(&widget->style, "custom") == 0)
-	{
+	if(Strcmp(&widget->style, "custom") == 0) {
 		int no_bitmap = 0;
 		if(widget->enabled == IS_FALSE) 
 			widget->status = WIDGET_STATUS_DISABLE;
 		/* 判断按钮的状态，以选择相应的背景色 */
-		switch(widget->status)
-		{
+		switch(widget->status) {
 		case WIDGET_STATUS_NORMAL:
-			if(Valid_Graph(&button->btn_normal))
-			{/* 如果已为按钮的normal状态设定有效的自定义图形 */
+			/* 如果已为按钮的normal状态设定有效的自定义图形 */
+			if(Valid_Graph(&button->btn_normal)) {
 				/* 缩放图像 */ 
 				Zoom_Graph(&button->btn_normal, &widget->graph, 
 						CUSTOM, widget->size);
 				no_bitmap = 0;/* 标记有位图 */
-			}
-			else
-			{
+			} else {
 				no_bitmap = 1;/* 标记无位图 */
 				/* 需填充的颜色，具体可用颜色选择器查看其它颜色的RGB值 */
 				color = RGB(100, 150, 255); 
 			}
 			break;
 		case WIDGET_STATUS_OVERLAY :
-			if(Valid_Graph(&button->btn_over))
-			{ 
+			if(Valid_Graph(&button->btn_over)) { 
 				Zoom_Graph(&button->btn_over, &widget->graph, 
 					CUSTOM, widget->size);
 				no_bitmap = 0;
-			}
-			else
-			{
+			} else {
 				no_bitmap = 1;
 				color = RGB(50, 180, 240); /* 浅蓝色 */
 			}
 			break;
 		case WIDGET_STATUS_CLICKING :
-			if(Valid_Graph(&button->btn_down))
-			{
+			if(Valid_Graph(&button->btn_down)) {
 				/* 缩放图像 */
 				Zoom_Graph(&button->btn_down, &widget->graph, 
 					CUSTOM, widget->size);
 				no_bitmap = 0;
-			}
-			else
-			{
+			} else {
 				no_bitmap = 1;
 				color = RGB(255, 50, 50); /* 红色 */
 			}
 			break;
 		case WIDGET_STATUS_CLICKED :
-			if(Valid_Graph(&button->btn_down))
-			{
+			if(Valid_Graph(&button->btn_down)) {
 				/* 缩放图像 */
 				Zoom_Graph(&button->btn_down, &widget->graph, 
 					CUSTOM, widget->size);
 				no_bitmap = 0;
-			}
-			else
-			{
+			} else {
 				no_bitmap = 1;
 				color = RGB(220, 220, 220); /* 灰色 */
 			} 
 			break;
 		case WIDGET_STATUS_FOCUS :
-			if(Valid_Graph(&button->btn_focus))
-			{
+			if(Valid_Graph(&button->btn_focus)) {
 				/* 缩放图像 */
 				Zoom_Graph(&button->btn_focus, &widget->graph, 
 					CUSTOM, widget->size );
 				no_bitmap = 0;
-			}
-			else
-			{
+			} else {
 				no_bitmap = 1;
 				color = RGB(50, 50, 255); /* 蓝色 */
 			} 
 			break;
 		case WIDGET_STATUS_DISABLE :
-			if(Valid_Graph(&button->btn_disable))
-			{
+			if(Valid_Graph(&button->btn_disable)) {
 				/* 缩放图像 */
 				Zoom_Graph(&button->btn_disable, &widget->graph, 
 					CUSTOM, widget->size );
 				no_bitmap = 0;
-			}
-			else
-			{
+			} else {
 				no_bitmap = 1;
 				color = RGB(190, 190, 190); /* 灰色 */
 			} 
 			break;
 			default : break;
 		}
-		if(no_bitmap == 1)
-		{/* 如果没有位图 */
+		if(no_bitmap == 1) {/* 如果没有位图 */
 			/* alpha通道的值改为255，不透明 */
 			Fill_Graph_Alpha(&widget->graph, 255);
 			/* 为部件填充背景图 */
 			Fill_Background_Image( &widget->graph, 
-					&widget->background_image, 0, color);
+				&widget->background_image, 0, color);
 			/* 然后绘制按钮边框，黑色的 */
 			Draw_Graph_Border(&widget->graph, RGB(0,0,0), 
-									Border(1, 1, 1, 1));
+						Border(1, 1, 1, 1));
 		}
 	}
-	else if(Strcmp(&widget->style, "menu_style") == 0)
-	{/* 菜单默认使用的按钮风格 */ 
-		switch(widget->status)
-		{
+	else if(Strcmp(&widget->style, "menu_style") == 0){
+		/* 菜单默认使用的按钮风格 */ 
+		switch(widget->status) {
 		case WIDGET_STATUS_NORMAL :
 			Free_Graph(&widget->background_image);
 			Fill_Graph_Alpha(&widget->graph, 0);  
@@ -173,21 +152,21 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 			color = RGB(80, 180, 240);
 			Fill_Color(&widget->graph, color);
 			Draw_Graph_Border(&widget->graph, RGB(50,50,255), 
-									Border(1, 1, 1, 1));
+						Border(1, 1, 1, 1));
 			Fill_Graph_Alpha(&widget->graph, 255);
 			break;
 		case WIDGET_STATUS_CLICKING :
 			color = RGB(80, 170, 255);
 			Fill_Color(&widget->graph, color);
 			Draw_Graph_Border(&widget->graph, RGB(50,50,255), 
-									Border(1, 1, 1, 1));
+						Border(1, 1, 1, 1));
 			Fill_Graph_Alpha(&widget->graph, 255);
 			break;
 		case WIDGET_STATUS_CLICKED :
 			color = RGB(80, 170, 255);
 			Fill_Color(&widget->graph, color);
 			Draw_Graph_Border(&widget->graph, RGB(50,50,255), 
-									Border(1, 1, 1, 1));
+						Border(1, 1, 1, 1));
 			Fill_Graph_Alpha(&widget->graph, 255);
 			break;
 		case WIDGET_STATUS_FOCUS :
@@ -201,12 +180,9 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 			default :
 			break;
 		}
-	}
-	else
-	{/* 如果按钮的风格为缺省 */ 
+	} else {/* 如果按钮的风格为缺省 */ 
 		Strcpy(&widget->style, "default");
-		switch(widget->status)
-		{ 
+		switch(widget->status) { 
 		case WIDGET_STATUS_NORMAL :
 			color = RGB(30, 145, 255); 
 			break;
@@ -225,14 +201,13 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 		case WIDGET_STATUS_DISABLE :
 			color = RGB(190, 190, 190); 
 			break;
-			default :
-			break;
+			default : break;
 		} 
 		Fill_Graph_Alpha(&widget->graph, 255);
 		Fill_Background_Image(&widget->graph, 
-					&widget->background_image, 0, color); 
+			&widget->background_image, 0, color); 
 		Draw_Graph_Border(&widget->graph, RGB(0,0,0), 
-							Border(1, 1, 1, 1));
+			Border(1, 1, 1, 1));
 	}
 	/* 按钮每次更新都需要更新整个按钮区域内的图形 */ 
 	Refresh_Widget(widget); 
@@ -243,7 +218,7 @@ static void Button_Init(LCUI_Widget *widget)
 /* 功能：初始化按钮部件的数据 */
 {
 	LCUI_Button *button = (LCUI_Button*)
-				Malloc_Widget_Private(widget, sizeof(LCUI_Button));
+		Malloc_Widget_Private(widget, sizeof(LCUI_Button));
 	 
 	/* 初始化图像数据 */ 
 	Graph_Init(&button->btn_disable);
@@ -284,8 +259,8 @@ LCUI_Widget *Get_Button_Label(LCUI_Widget *widget)
 }
 
 void Custom_Button_Style(	LCUI_Widget *widget, LCUI_Graph *normal, 
-							LCUI_Graph *over, LCUI_Graph *down, 
-							LCUI_Graph *focus, LCUI_Graph *disable)
+				LCUI_Graph *over, LCUI_Graph *down, 
+				LCUI_Graph *focus, LCUI_Graph *disable)
 /* 功能：自定义按钮在各种状态下显示的位图 */
 {
 	LCUI_Button *button = (LCUI_Button*)Get_Widget_Private_Data(widget);
@@ -307,9 +282,9 @@ void Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...)
 	LCUI_Button *button = (LCUI_Button*)Get_Widget_Private_Data(widget);
 	LCUI_Widget *label = button->label;  
 	
-    memset(text, 0, sizeof(text));
-    /* 由于是可变参数，让vsnprintf函数根据参数将字符串保存至text中 */
-    va_list ap; 
+	memset(text, 0, sizeof(text));
+	/* 由于是可变参数，让vsnprintf函数根据参数将字符串保存至text中 */
+	va_list ap; 
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
 	va_end(ap);
@@ -324,9 +299,9 @@ LCUI_Widget *Create_Button_With_Text(const char *fmt, ...)
 	char text[LABEL_TEXT_MAX_SIZE];
 	LCUI_Widget *widget = Create_Widget("button");
 	
-    memset(text, 0, sizeof(text)); 
+	memset(text, 0, sizeof(text)); 
     
-    va_list ap; 
+	va_list ap; 
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
 	va_end(ap); 
@@ -343,8 +318,8 @@ void Register_Button()
 	WidgetType_Add("button");
 	
 	/* 为部件类型关联相关函数 */
-	WidgetFunc_Add("button", Button_Init,			FUNC_TYPE_INIT);
+	WidgetFunc_Add("button", Button_Init,		FUNC_TYPE_INIT);
 	WidgetFunc_Add("button", Exec_Update_Button,	FUNC_TYPE_UPDATE); 
-	WidgetFunc_Add("button", Destroy_Button,		FUNC_TYPE_DESTROY); 
+	WidgetFunc_Add("button", Destroy_Button,	FUNC_TYPE_DESTROY); 
 }
 

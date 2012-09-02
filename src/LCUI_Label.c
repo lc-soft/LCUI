@@ -114,10 +114,8 @@ static void Exec_Update_Label(LCUI_Widget *widget)
 			/*如果开启了自动调整大小*/
 			Resize_Widget(widget, Size(0, 0)); 
 			
-		widget->graph.flag = HAVE_ALPHA; 
-	}
-	else
-	{
+		widget->graph.flag = HAVE_ALPHA;
+	} else {
 		/* 声明一个用于保存分割后的wchar_t型字符串的LCUI_Wchar_T型指针 */
 		LCUI_WString *new_list; 
 		/* 声明两个用于保存字符串行数的整型变量 */
@@ -128,50 +126,45 @@ static void Exec_Update_Label(LCUI_Widget *widget)
 		old_rows = label->rows;
 		
 		if(old_rows > 0) /* 改变内存空间大小 */
-            label->contents = (LCUI_WString *)realloc(label->contents, 
-										sizeof(LCUI_WString) * new_rows); 
-		else 
-			label->contents = (LCUI_WString *)calloc(new_rows, 
-												sizeof(LCUI_WString));
+			label->contents = (LCUI_WString *)
+					realloc(label->contents, 
+					sizeof(LCUI_WString) * new_rows); 
+		else label->contents = (LCUI_WString *)calloc(new_rows, 
+					sizeof(LCUI_WString));
 		
-		for(i = 0; i < new_rows; ++i)
-		{/* 遍历每一行 */
+		for(i = 0; i < new_rows; ++i) {/* 遍历每一行 */
 			/* 改变这一行内容占的内存空间大小 */
 			if(old_rows > i)
 				label->contents[i].string = (LCUI_WChar_T*)realloc(
 								label->contents[i].string, 
 								sizeof(LCUI_WChar_T) * 
 								(new_list[i].size + 1));
-			else
-			{
+			else {
 				label->contents[i].string = (LCUI_WChar_T*)malloc(
 							sizeof(LCUI_WChar_T) * 
 							(new_list[i].size + 1));
 				label->contents[i].size = 0;
 			}
-			
-			for(k = 0; k < new_list[i].size; ++k)
-			{/* 遍历这行的字符串的每个元素 */
+			/* 遍历这行的字符串的每个元素 */
+			for(k = 0; k < new_list[i].size; ++k) {
 				if(new_list[i].string[k].color_type == DEFAULT)
 				/* 使用默认的颜色 */
 					label->contents[i].string[k].color = label->font.fore_color;
 				else  /* 否则使用自定义颜色 */
 					label->contents[i].string[k].color = new_list[i].string[k].color; 
-				
-				if(k < label->contents[i].size)
-				{/* 如果字符的位置还在label->contents[i]的范围内 */
-					if(label->contents[i].string[k].char_code != new_list[i].string[k].char_code)
-					{/* 如果文字不一样，就需要刷新该字 */
+				/* 如果字符的位置还在label->contents[i]的范围内 */
+				if(k < label->contents[i].size) {
+					/* 如果文字不一样，就需要刷新该字 */
+					if(label->contents[i].string[k].char_code != new_list[i].string[k].char_code) {
 						label->contents[i].string[k].char_code = new_list[i].string[k].char_code; 
 						/* 获取字符位图 */ 
 						Get_WChar_Bitmap(&label->font, 
 								label->contents[i].string[k].char_code , 
 								&label->contents[i].string[k].bitmap );
-                        label->contents[i].update = IS_TRUE;/* 这一行文本需要刷新 */ 
+								label->contents[i].update = IS_TRUE;/* 这一行文本需要刷新 */ 
 					}
-				}
-				else
-				{/* 否则，说明new_list[i]的元素个数比label->contents[i]的多 */
+				} else {
+					/* 否则，说明new_list[i]的元素个数比label->contents[i]的多 */
 					label->contents[i].string[k].char_code = new_list[i].string[k].char_code; 
 					/* 先初始化数据结构，然后获取字符位图 */
 					Bitmap_Init(&label->contents[i].string[k].bitmap);
@@ -192,11 +185,11 @@ static void Exec_Update_Label(LCUI_Widget *widget)
 			/* 计算文本内容的尺寸 */
 		label->rows = new_rows;
 		Count_Contents_Size(label->contents, &max_width, &max_height, 
-				label->rows, label->font.space, label->font.linegap);
+			label->rows, label->font.space, label->font.linegap);
 		if(label->auto_size == IS_TRUE 
 		&& (max_width != widget->size.w 
-		|| max_height != widget->size.h))
-		{/* 如果开启了自动调整大小,并且尺寸有改变 */
+		|| max_height != widget->size.h)) {
+			/* 如果开启了自动调整大小,并且尺寸有改变 */
 			Resize_Widget(widget, Size(max_width, max_height + 2));
 			Refresh_Widget(widget);
 		} 
@@ -209,7 +202,7 @@ static void Exec_Update_Label(LCUI_Widget *widget)
 		flag = GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */ 
 	/* 合成字体位图 */
 	Mix_Widget_FontBitmap(widget, 1, 1, label->contents, label->rows, 
-							label->font.space, label->font.linegap, flag);
+			label->font.space, label->font.linegap, flag);
 }
 
 
@@ -233,13 +226,13 @@ void Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 /* 功能：设定与标签关联的文本内容 */
 {
 	char text[LABEL_TEXT_MAX_SIZE];
-    memset(text, 0, sizeof(text)); 
+	memset(text, 0, sizeof(text)); 
     
 	LCUI_Label *label;
 	
 	label = (LCUI_Label*)Get_Widget_Private_Data(widget);
 	
-    va_list ap;
+	va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
 	va_end(ap); 
@@ -260,19 +253,16 @@ int Set_Label_Font(LCUI_Widget *widget, int font_size, char *font_file)
 	LCUI_Label *label = (LCUI_Label*)Get_Widget_Private_Data(widget);
     
 	int refresh_flag = 0;
-	if(label->font.size != font_size)
-	{
+	if(label->font.size != font_size) {
 		label->font.size = font_size;
 		refresh_flag = 1;
 	}
 	if(Strcmp(&label->font.font_file, font_file) != 0
-	&& 0 == Open_Fontfile(&label->font, font_file) )
-	{
+	&& 0 == Open_Fontfile(&label->font, font_file) ) {
 		Strcpy(&label->font.font_file, font_file);
 		refresh_flag = 1;
 	} 
-	if(refresh_flag == 1)
-    {/* 刷新标签内的字体位图数据 */ 
+	if(refresh_flag == 1) {/* 刷新标签内的字体位图数据 */ 
 		Refresh_Label_FontBitmap(widget); 
 	}
 	return 0;
@@ -290,23 +280,19 @@ void Set_Label_Font_Default_Color(LCUI_Widget *widget, LCUI_RGB color)
     
 	LCUI_Label *label = (LCUI_Label*)Get_Widget_Private_Data(widget);
     
-    label->font.fore_color = color;
+	label->font.fore_color = color;
 
-	if(label->contents != NULL && label->rows > 0)
-	{
-		for(i = 0; i < label->rows; ++i)
-		{/* 遍历每一行 */
-			for(k = 0; k < label->contents[i].size; ++k)
-			{/* 遍历这行的字符串的每个元素 */
-                if(label->contents[i].string[k].color_type == DEFAULT)
-                {/* 如果改变了label部件的默认的字体颜色，那么这些使用缺省颜色的文字将刷新 */
-                    label->contents[i].string[k].color = label->font.fore_color; 
-                }
-			}
-            label->contents[i].update = IS_TRUE;
+	if(label->contents == NULL || label->rows <= 0) return;
+	
+	for(i = 0; i < label->rows; ++i) {/* 遍历每一行 */
+		for(k = 0; k < label->contents[i].size; ++k) {/* 遍历这行的字符串的每个元素 */
+			/* 如果改变了label部件的默认的字体颜色，那么这些使用缺省颜色的文字将刷新 */
+			if(label->contents[i].string[k].color_type == DEFAULT) 
+				label->contents[i].string[k].color = label->font.fore_color;  
 		}
-		Draw_Widget(widget);/* 更新部件 */
-	} 
+		label->contents[i].update = IS_TRUE;
+	}
+	Draw_Widget(widget);/* 更新部件 */ 
 }
 
 void Register_Label()

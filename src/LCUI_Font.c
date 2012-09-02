@@ -2628,9 +2628,7 @@ void Get_Default_Font_Bitmap(unsigned short code, LCUI_Bitmap *out_bitmap)
 		for (i=start;i<start+8;++i)
 		for (j=0;j<8;++j)/* 将数值转换成一行位图 */
 			out_bitmap->data[i-start][7-j] = (fontdata_8x8[i]&(1<<j))?255:0;  
-	}
-	else
-	{
+	} else {
 		unsigned char error_bitmap[] = {
 			1,1,1,1,1,1,1,1,
 			1,0,0,0,0,0,0,1,
@@ -2651,9 +2649,9 @@ void Get_Default_Font_Bitmap(unsigned short code, LCUI_Bitmap *out_bitmap)
 /************************ char code convert ***************************/
 /* 代码转换:从一种编码转为另一种编码，主要是调用iconv的API实现字符编码转换 */
 static int code_convert(
-			char *src_charset,			char *des_charset, 
-			const char *inbuf,			unsigned int inlen,
-			unsigned char *outbuf,		unsigned int outlen
+			char *src_charset,	char *des_charset, 
+			const char *inbuf,	unsigned int inlen,
+			unsigned char *outbuf,	unsigned int outlen
 	)
 {
 	iconv_t cd;
@@ -2729,14 +2727,12 @@ static int utf8_to_unicode(char *in_utf8_str, wchar_t **out_unicode)
 	len = strlen(in_utf8_str)+1;  
 	buff = (wchar_t *)calloc(sizeof(wchar_t), len); 
 	
-	for(count=0,i=0,j=0; i<len; ++i)
-	{
+	for(count=0,i=0,j=0; i<len; ++i) {
 		t = in_utf8_str[i];
 		/* 结束符的判断 */
 		if(t == 0) break;
 			
-		if((t>>7) == 0)
-		{// 0xxxxxxx
+		if((t>>7) == 0) {// 0xxxxxxx
 			buff[j] = t; 
 			++j;
 		}
@@ -2751,8 +2747,7 @@ static int utf8_to_unicode(char *in_utf8_str, wchar_t **out_unicode)
 		else if((t>>1) == 126) // 1111110x 
 			count = 6; 
 		
-		if(count > 0)
-		{
+		if(count > 0) {
 			p = (unsigned char*)&in_utf8_str[i];
 			for(n=0; n<count; ++n) 
 				save[n] = *p++;
@@ -2784,8 +2779,7 @@ static int gb2312_to_unicode(char *in_gb2312_str, wchar_t **out_unicode)
 	new_len = len*3;
 	buff = (char *)calloc(sizeof(char), new_len);
 	p = (unsigned char*)buff;
-	if(code_convert("gb2312", "utf8", in_gb2312_str, len, p, new_len))
-	{
+	if(code_convert("gb2312", "utf8", in_gb2312_str, len, p, new_len)) {
 		printf("gb2312_to_unicode(): error: "ERROR_CONVERT_ERROR);
 		return -1;
 	}
@@ -2803,8 +2797,7 @@ int Char_To_Wchar_T(char *in_text, wchar_t **unicode_text)
  * 返回值：正常则wchar_t型字符串的长度，否则返回-1
  * */
 {
-	switch(Get_EncodingType())
-	{
+	switch(Get_EncodingType()) {
 		case ENCODEING_TYPE_GB2312:
 		return gb2312_to_unicode(in_text, unicode_text); 
 		case ENCODEING_TYPE_UTF8:
@@ -2875,17 +2868,14 @@ void Font_Init(LCUI_Font *in)
 	String_Init(&in->font_file);
 	String_Init(&in->family_name);
 	String_Init(&in->style_name);
-	if(LCUI_Sys.default_font.status == ACTIVE)
-	{
+	if(LCUI_Sys.default_font.status == ACTIVE) {
 		in->status = ACTIVE;
 		Strcpy(&in->family_name, LCUI_Sys.default_font.family_name.string);
 		Strcpy(&in->style_name, LCUI_Sys.default_font.style_name.string);
 		Strcpy(&in->font_file, LCUI_Sys.default_font.font_file.string);
 		in->ft_lib = LCUI_Sys.default_font.ft_lib;
 		in->ft_face = LCUI_Sys.default_font.ft_face;
-	}
-	else 
-	{
+	} else {
 		in->status = KILLED;
 		in->ft_lib = NULL;
 		in->ft_face = NULL;
@@ -2916,12 +2906,12 @@ int Show_Font_Bitmap(LCUI_Bitmap *in_fonts)
 
 
 int Mix_Fonts_Bitmap(
-		LCUI_Graph		*back_graph,  /* 背景图形 */
-		int				start_x,
-		int				start_y,
+		LCUI_Graph	*back_graph,  /* 背景图形 */
+		int		start_x,
+		int		start_y,
 		LCUI_Bitmap	*in_fonts,  /* 传入的字体位图数据 */
-		LCUI_RGB		color,       /* 字体的配色 */ 
-		int				flag
+		LCUI_RGB	color,       /* 字体的配色 */ 
+		int		flag
 )
 /* 功能：将字体位图数据与背景图形混合 */
 {
@@ -2951,25 +2941,21 @@ int Mix_Fonts_Bitmap(
 	end_y = start_y + height;
 
 	/* 如果图片尺寸超出窗口限定的尺寸，更改图片显示的区域 */
-	if(start_x < 0)
-	{/* 如果起点在x轴的坐标小于0 */
+	if(start_x < 0) {/* 如果起点在x轴的坐标小于0 */
 		read.x = 0 - start_x; /* 改变读取的区域的起点在x轴的坐标 */
 		read.width = read.width - read.x;
 		start_x = 0;
 	}
-	if(end_x > box_width)
-	{/* 如果超过可显示区域 */
+	if(end_x > box_width) {/* 如果超过可显示区域 */
 		read.width = read.width - (end_x - box_width);
 		end_x = box_width;
 	}
-	if(start_y < 0)
-	{
+	if(start_y < 0) {
 		read.y = 0 - start_y;
 		read.height = read.height - read.y;
 		start_y = 0;
 	}
-	if(end_y > box_height)
-	{
+	if(end_y > box_height) {
 		read.height = read.height - (end_y - box_height);
 		end_y = box_height;
 	}
@@ -2979,14 +2965,11 @@ int Mix_Fonts_Bitmap(
 	write.x = start_x;
 	write.y = start_y;
 	/* 开始读取图片中的图形数组并写入窗口 */
-	switch(flag)
-	{
+	switch(flag) {
 		case GRAPH_MIX_FLAG_OVERLAY:
-			for (y = 0; y < read.height; ++y) 
-			{
+			for (y = 0; y < read.height; ++y) {
 				m = (write.y + y) * back_graph->width + write.x; 
-				for (x = 0; x < read.width; ++x) 
-				{
+				for (x = 0; x < read.width; ++x) {
 					count = m + x;/* 计算需填充至窗口的各点的坐标 */
 					j = in_fonts->data[read.y + y][read.x + x] * k;
 					back_graph->rgba[0][count] = (color.red * j + back_graph->rgba[0][count] * (255 - j)) /255;
@@ -2996,15 +2979,12 @@ int Mix_Fonts_Bitmap(
 			}
 			break;
 		case GRAPH_MIX_FLAG_REPLACE:
-			for (y = 0; y < read.height; ++y) 
-			{
+			for (y = 0; y < read.height; ++y) {
 				m = (write.y + y) * back_graph->width + write.x; 
-				for (x = 0; x < read.width; ++x) 
-				{
+				for (x = 0; x < read.width; ++x) {
 					count = m + x;/* 计算需填充至窗口的各点的坐标 */
 					j = in_fonts->data[read.y + y][read.x + x] * k;
-					if(j != 0)
-					{
+					if(j != 0) {
 						back_graph->rgba[0][count] = color.red;
 						back_graph->rgba[1][count] = color.green;
 						back_graph->rgba[2][count] = color.blue;
@@ -3038,7 +3018,8 @@ static void add_color(LCUI_color_array *in, LCUI_RGB color)
 {
 	in->total_num += 1;
 	if(in->total_num > 1) 
-		in->color = (LCUI_RGB*)realloc(in->color, sizeof(LCUI_RGB) * in->total_num); 
+		in->color = (LCUI_RGB*)realloc(in->color, 
+			sizeof(LCUI_RGB) * in->total_num); 
 	else 
 		in->color = (LCUI_RGB*)malloc(sizeof(LCUI_RGB)); 
 	in->color[in->total_num - 1] = color;
@@ -3047,15 +3028,13 @@ static void add_color(LCUI_color_array *in, LCUI_RGB color)
 static void delete_color(LCUI_color_array *in)
 /* 功能：从颜色数组中删除最后一个颜色数据 */
 { 
-	if(in->total_num > 1)
-	{
+	if(in->total_num > 1) {
 		/* 减少成员总数 */
 		--in->total_num;
 		/* 缩小数据占用的内存空间 */
-		in->color = (LCUI_RGB *)realloc(in->color, in->total_num * sizeof(LCUI_RGB));
-	}
-	else if(in->total_num == 1)
-	{
+		in->color = (LCUI_RGB *)realloc(in->color, 
+				in->total_num * sizeof(LCUI_RGB));
+	} else if(in->total_num == 1) {
 		free(in->color);
 		in->color = NULL;
 		in->total_num = 0;
@@ -3065,8 +3044,7 @@ static void delete_color(LCUI_color_array *in)
 static int get_color(LCUI_color_array *in, LCUI_RGB *out)
 /* 功能：获取颜色数组末尾的颜色数据 */
 {
-	if(in->total_num > 0)
-	{
+	if(in->total_num > 0) {
 		*out = in->color[in->total_num-1];
 		return 0;
 	}
@@ -3077,13 +3055,10 @@ static int wstrcmp(wchar_t *str1, int num, char *str2)
 /* 功能：从str1中前num个元素判断是否与str2中的内容全等 */
 {
 	int i;
-	if(str1 == NULL)
-		return -1;
+	if(str1 == NULL) return -1;
 	for(i=0; i<num; ++i)
-	{
 		if(str1[i] != str2[i]) 
 			return -1; 
-	}
 	return 0;
 }
 
@@ -3093,18 +3068,15 @@ static int cut_wstr_convert_to_color(wchar_t *str1, char mark_char, LCUI_RGB *co
 	char str[105];
 	int r, g, b, i, flag = 0;
 	/* 简单的转换成char型 */
-	for(i=0; i<100; ++i)
-	{
-		if(str1[i] == mark_char) 
-		{
+	for(i=0; i<100; ++i) {
+		if(str1[i] == mark_char) {
 			flag = 1;
 			break;
 		}
 		str[i] = str1[i];
 	} 
 	str[i] = 0;
-	if(flag == 1)
-	{ 
+	if(flag == 1) { 
 		/* 获取RGB颜色值 */
 		sscanf(str, "%d,%d,%d", &r, &g, &b);
 		color->red = r;
@@ -3137,92 +3109,85 @@ int String_To_List(char *text , LCUI_WString **out_list)
 	
 	color_array_init(&colors);
 	
-	if(text != NULL)
-	{/* 如果文本不为NULL */
-		len = strlen(text);
-		if(len > 0)
-		{
-			list = (LCUI_WString *)calloc(1, sizeof(LCUI_WString));
-			for(i = 0; i <= len; ++i)
-			{/* i<=len,因为可能会读取字符串末尾的结束符 */
-				if(text[i] == '\n' || text[i] == 0)
-				{/* 如果遇到换行或者字符串结尾 */
-					p		= text + start_x;
-					str		= (char*)calloc(strlen(p)+1,sizeof(char));
-					/* 扩增内存 */
-					list	= (LCUI_WString *)realloc(list, (k + 1) * sizeof(LCUI_WString));
-					
-					strcpy(str, p);
-					str[i-start_x] = 0; /* 加上结束符 */
-					/* 转换字符编码，及字符串类型，并保存 */
-					w_len = Char_To_Wchar_T(str, &wstr); 
-					/* 释放 */
-					free(str);
-					str = NULL;
-					/* 分配内存 */
-					list[k].string = (LCUI_WChar_T*)calloc((w_len+1), sizeof(LCUI_WChar_T)); 
-					/* j记录的是实际字符数，z记录的是除去<color=R,G,B></color>后的字符数 */
-					for(j=0,z=0; j < w_len; ++j,++z)
-					{/* 循环遍历这行字符串内容 */
-						temp_wp = wstr + j; 
-						if(wstrcmp(temp_wp, 7, "<color=") == 0)
-						{
-							temp_wp = temp_wp + 7; 
-							/* 将“<color=” 和 “>” 之间的内容裁剪出来，并转换成RGB配色数据 */
-							tmp = cut_wstr_convert_to_color(temp_wp, '>', &color);
-							if(tmp > 0)
-							{/* 如果成功 */
-								j += (tmp + 7); 
-								add_color(&colors, color);/* 添加颜色数据 */
-							}
-						}
-						else if(get_color(&colors, &color) == 0 
-							&& wstrcmp(temp_wp, 8, "</color>") == 0)
-						{/* 如果能获取已储存的配色，并且，包含 </color> */
-							j += 8; /* 位置向右移动8个字 */
-							delete_color(&colors);/* 删除这个配色 */
-							if(j >= w_len) 
-								break; /* 如果超过这行的字数 */
-							/* 
-							 * temp_wp指针已经指向</color>后面的第一个字符，
-							 * 继续下次循环，并判断这个字符及后面的字符是否包含
-							 * 有<color=>或者</color>，这是为了能正常处理一
-							 * 连串的<color=>或者</color>。
-							 **/
-							--z;
-							--j;
-							continue;
-						}
-						if(get_color(&colors, &color) == 0) 
-						/* 如果有颜色数据 */
-							list[k].string[z].color_type = CUSTOM; 
-						else
-						{/* 否则颜色为缺省 */
-							color = RGB(0,0,0);
-							list[k].string[z].color_type = DEFAULT;
-						}
-						/* 保存字符码 */
-						list[k].string[z].char_code = wstr[j];
-						/* 初始化字体位图数据 */
-						Bitmap_Init(&list[k].string[z].bitmap);
-						/* 保存配色 */
-						list[k].string[z].color = color;
-					}
-					/* 保存字符串长度 */
-					list[k].size = z;
-					++k;
-					start_x = i+1; /* 记录上个'\n'所在的位置 */
-					free(wstr); /* 释放内存 */
-					wstr = NULL;
-					if(text[i] == 0) break;/* 遇到结束符果断退出！ */
+	/* 如果文本为NULL */
+	if(text == NULL) return 0;
+	len = strlen(text);
+	if(len <= 0) return 0;
+	
+	list = (LCUI_WString *)calloc(1, sizeof(LCUI_WString));
+	/* i<=len,因为可能会读取字符串末尾的结束符 */
+	for(i = 0; i <= len; ++i) {
+		/* 如果遇到换行或者字符串结尾 */
+		if(text[i] != '\n' && text[i] != 0)
+			continue;
+		p = text + start_x;
+		str = (char*)calloc(strlen(p)+1,sizeof(char));
+		/* 扩增内存 */
+		list = (LCUI_WString *)realloc(list, 
+				(k + 1) * sizeof(LCUI_WString));
+		
+		strcpy(str, p);
+		str[i-start_x] = 0; /* 加上结束符 */
+		/* 转换字符编码，及字符串类型，并保存 */
+		w_len = Char_To_Wchar_T(str, &wstr); 
+		/* 释放 */
+		free(str);
+		str = NULL;
+		/* 分配内存 */
+		list[k].string = (LCUI_WChar_T*)calloc((w_len+1), 
+					sizeof(LCUI_WChar_T)); 
+		/* j记录的是实际字符数，z记录的是除去<color=R,G,B></color>后的字符数 */
+		for(j=0,z=0; j < w_len; ++j,++z) { 
+			temp_wp = wstr + j; 
+			if(wstrcmp(temp_wp, 7, "<color=") == 0) {
+				temp_wp = temp_wp + 7; 
+				/* 将“<color=” 和 “>” 之间的内容裁剪出来，并转换成RGB配色数据 */
+				tmp = cut_wstr_convert_to_color(temp_wp, '>', &color);
+				if(tmp > 0) {/* 如果成功 */
+					j += (tmp + 7); 
+					add_color(&colors, color);/* 添加颜色数据 */
 				}
+			} else if(get_color(&colors, &color) == 0 
+			 && wstrcmp(temp_wp, 8, "</color>") == 0) {
+				/* 如果能获取已储存的配色，并且，包含 </color> */
+				j += 8; /* 位置向右移动8个字 */
+				delete_color(&colors);/* 删除这个配色 */
+				/* 如果超过这行的字数 */
+				if(j >= w_len) break; 
+				/* 
+				 * temp_wp指针已经指向</color>后面的第一个字符，
+				 * 继续下次循环，并判断这个字符及后面的字符是否包含
+				 * 有<color=>或者</color>，这是为了能正常处理一
+				 * 连串的<color=>或者</color>。
+				 **/
+				--z; --j;
+				continue;
 			}
-			*out_list = list;
+			if(get_color(&colors, &color) == 0) 
+			/* 如果有颜色数据 */
+				list[k].string[z].color_type = CUSTOM; 
+			else {/* 否则颜色为缺省 */
+				color = RGB(0,0,0);
+				list[k].string[z].color_type = DEFAULT;
+			}
+			/* 保存字符码 */
+			list[k].string[z].char_code = wstr[j];
+			/* 初始化字体位图数据 */
+			Bitmap_Init(&list[k].string[z].bitmap);
+			/* 保存配色 */
+			list[k].string[z].color = color;
 		}
-		free(colors.color);
-		return k;
+		/* 保存字符串长度 */
+		list[k].size = z;
+		++k;
+		start_x = i+1; /* 记录上个'\n'所在的位置 */
+		free(wstr); /* 释放内存 */
+		wstr = NULL;
+		if(text[i] == 0) break;/* 遇到结束符果断退出！ */ 
 	}
-	else return 0;
+	*out_list = list; 
+	free(colors.color);
+	return k; 
 }
 
 int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
@@ -3234,26 +3199,23 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 	FT_Error      face_error = 0, lib_error = 0;
 	
 	type = font_data->type;
-	if(font_data->status == ACTIVE)
-	{
-		if(fontfile == NULL ||
-			Strcmp(&font_data->font_file, fontfile) == 0)
+	if(font_data->status == ACTIVE) {
+		if(fontfile == NULL 
+		|| Strcmp(&font_data->font_file, fontfile) == 0)
 			return 0;
 		else if( Strcmp(&font_data->font_file, 
-				 LCUI_Sys.default_font.font_file.string))
+				LCUI_Sys.default_font.font_file.string))
 			type = CUSTOM;
 	}
 	else if(fontfile == NULL) return -1;
 	lib_error = FT_Init_FreeType( & library);  /* 初始化FreeType库 */
-	if (lib_error)   /* 当初始化库时发生了一个错误 */
-	{
+	if (lib_error) { /* 当初始化库时发生了一个错误 */
 		printf("open fontfile: "FT_INIT_ERROR);
 		return - 1 ;
 	}
 	
 	face_error = FT_New_Face( library, fontfile , 0 , & face );
-	if(face_error)
-	{
+	if(face_error) {
 		FT_Done_FreeType(library);
 		if ( face_error == FT_Err_Unknown_File_Format )
 			printf("open fontfile: "FT_UNKNOWN_FILE_FORMAT); /* 未知文件格式 */ 
@@ -3296,127 +3258,110 @@ int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 	FT_GlyphSlot    slot;               /* 字形槽的句柄 */
 	FT_Error        error = 0;
 	int i , j, value = 0;
-	if(font_data != NULL)
-	{/* 如果LCUI_Font结构体中的字体信息有效，就打开结构体中的指定的字体文件，并
+	if(font_data != NULL){
+	 /* 如果LCUI_Font结构体中的字体信息有效，就打开结构体中的指定的字体文件，并
 	  * 将字体文件和face对象的句柄保存至结构体中。
 	  * 当然，如果LCUI_Font结构体有字体文件和face对象的句柄，就直接返回0。
 	  */
 		error = Open_Fontfile(font_data, font_data->font_file.string);
-		if(error)  /* 字体打开失败 */
-			value = -1; 
-		else /* 使用这个句柄 */
-			p_FT_Face = font_data->ft_face; 
+		if(error) value = -1; 
+		else p_FT_Face = font_data->ft_face; 
 	}
 	else return -1;
 	
 	j = 0;
 	int k, start_y = 0, ch_height = 0, ch_width = 0 ;
-		
-	if(value == 0)
-	{/* 如果能正常打开字体文件 */
-		FT_Select_Charmap(p_FT_Face, FT_ENCODING_UNICODE);   /* 设定为UNICODE，默认的也是 */
-		FT_Set_Pixel_Sizes(p_FT_Face, 0, font_data->size);   /* 设定字体大小 */
-		slot = p_FT_Face->glyph;
-		if(ch == ' ') 
-		{ /* 如果有空格,它的宽度就以字母a的宽度为准 */
-			error = FT_Load_Char( p_FT_Face, 'a', font_data->load_flags); 
-			if(!error)
-			{
-				error = FT_Get_Glyph(p_FT_Face -> glyph, &glyph);
-				if(!error)
-				{
-					Free_Bitmap(out_bitmap);
-					/* 背景图形的高度，这个高度要大于字体的高度，所以是+3 */
-					/* 256级灰度字形转换成位图 */
-					FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
-					/* FT_RENDER_MODE_NORMAL	   这是默认渲染模式，它对应于8位抗锯齿位图。 */
-					bitmap_glyph = (FT_BitmapGlyph)glyph;
-					bitmap       = bitmap_glyph -> bitmap;
-					out_bitmap->height = font_data->size + 3; /* 字体所在的背景图的尺寸需要大一点 */
-					Malloc_Bitmap(out_bitmap, bitmap.width, out_bitmap->height);
-					/* 释放字形占用的内存 */
-					FT_Done_Glyph(glyph);
-					glyph = NULL;
-				}
-			}
-		}
-		else
-		{
-			/* 这个函数只是简单地调用FT_Get_Char_Index和FT_Load_Glyph */
-			error = FT_Load_Char( p_FT_Face, ch, font_data->load_flags);
-			if(!error)
-			{
-				/* 从插槽中提取一个字形图像 */
-				/* 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
-				error = FT_Get_Glyph(p_FT_Face->glyph, &glyph);
-				if (!error)
-				{
-					int bg_height;
-					Free_Bitmap(out_bitmap);
-					/* 背景图形的高度，这个高度要大于字体的高度，所以是+4 */
-					bg_height = font_data->size + 4; 
-					/* 256级灰度字形转换成位图 */
-					FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
-					/* FT_RENDER_MODE_NORMAL 是默认渲染模式，它对应于8位抗锯齿位图。 */
-					bitmap_glyph = (FT_BitmapGlyph)glyph;
-					bitmap       = bitmap_glyph -> bitmap;
-					k = 0;
-					/* 获取起点的y轴坐标 */
-					start_y = font_data->size - slot->bitmap_top; 
-					ch_width = bitmap.width;
-					/* 处理字体位图在背景图中的范围 */
-					if(start_y < 0)  start_y = 0; 
-					if(bitmap.rows > bg_height) 
-						ch_height = font_data->size; 
-					else  
-						ch_height = bitmap.rows; 
-						
-					if(ch_height + start_y > bg_height)  
-						ch_height = bg_height - start_y; 
-					/* 开辟内存空间,如果出现问题，会导致FT_Done_Glyph函数出现段错误 */
-					Malloc_Bitmap(out_bitmap, ch_width, bg_height);
-					/* 开始将字体位图贴到背景图形中 */
-					for(i = 0; i < ch_height; ++i)
-					{ 
-						for(j = 0;j < ch_width; ++j)
-						{
-							switch (bitmap.pixel_mode)
-							{
-							case FT_PIXEL_MODE_GRAY:
-								/* 一个8位位图，一般用来表示反锯齿字形图像。每个像素用一个字节存储 */
-								out_bitmap->data[start_y + i][j] = bitmap.buffer[k];
-								break;
-							case FT_PIXEL_MODE_MONO: 
-								/* 一个单色位图,每个bit对应一个点,非黑即白 */
-								out_bitmap->data[start_y + i][j] = bitmap.buffer[k]?255:0;
-								break;
-							}
-							++k;
-						}
-					}
-					/* 释放字形占用的内存 */
-					FT_Done_Glyph(glyph);
-					glyph = NULL;
-				}
-			}
-		}
-	}
-	else
-	{/* 不能获取字体文件，就使用内置的8x8点阵字体 */
-		if(ch == ' ')
-		{ /* 如果是空格 */
+	/* 不能获取字体文件，就使用内置的8x8点阵字体 */
+	if(value != 0) {
+		if(ch == ' ') { /* 如果是空格 */
 			/* 自定义的函数，用于获取8x8点阵字体位图 */
 			Get_Default_Font_Bitmap('a', out_bitmap);
 			for (i=0;i<8;i++)  
 			for (j=0;j<8;j++)  
 				out_bitmap->data[i][j]= 0; 
-		}
-		else 
-		{ 
+		} else { 
 			Malloc_Bitmap(out_bitmap, 8, 8);
 			Get_Default_Font_Bitmap(ch, out_bitmap);
 		}
+		return 0;
 	}
+	/* 如果能正常打开字体文件 */
+	FT_Select_Charmap(p_FT_Face, FT_ENCODING_UNICODE);   /* 设定为UNICODE，默认的也是 */
+	FT_Set_Pixel_Sizes(p_FT_Face, 0, font_data->size);   /* 设定字体大小 */
+	slot = p_FT_Face->glyph;
+	if(ch == ' ') { /* 如果有空格,它的宽度就以字母a的宽度为准 */
+		error = FT_Load_Char( p_FT_Face, 'a', font_data->load_flags); 
+		if(error) return error; 
+		
+		error = FT_Get_Glyph(p_FT_Face -> glyph, &glyph);
+		if(error) return error; 
+		
+		Free_Bitmap(out_bitmap);
+		/* 背景图形的高度，这个高度要大于字体的高度，所以是+3 */
+		/* 256级灰度字形转换成位图 */
+		FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
+		/* FT_RENDER_MODE_NORMAL 这是默认渲染模式，它对应于8位抗锯齿位图 */
+		bitmap_glyph = (FT_BitmapGlyph)glyph;
+		bitmap       = bitmap_glyph -> bitmap;
+		/* 字体所在的背景图的尺寸需要大一点 */
+		out_bitmap->height = font_data->size + 3;
+		Malloc_Bitmap(out_bitmap, bitmap.width, out_bitmap->height);
+		/* 释放字形占用的内存 */
+		FT_Done_Glyph(glyph);
+		glyph = NULL; 
+		return 0;
+	}
+	/* 这个函数只是简单地调用FT_Get_Char_Index和FT_Load_Glyph */
+	error = FT_Load_Char( p_FT_Face, ch, font_data->load_flags);
+	if(error) return error; 
+	
+	/* 从插槽中提取一个字形图像 
+	 * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
+	error = FT_Get_Glyph(p_FT_Face->glyph, &glyph);
+	if(error) return error; 
+	
+	int bg_height;
+	Free_Bitmap(out_bitmap);
+	/* 背景图形的高度，这个高度要大于字体的高度，所以是+4 */
+	bg_height = font_data->size + 4; 
+	/* 256级灰度字形转换成位图 */
+	FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
+	/* FT_RENDER_MODE_NORMAL 是默认渲染模式，它对应于8位抗锯齿位图。 */
+	bitmap_glyph = (FT_BitmapGlyph)glyph;
+	bitmap       = bitmap_glyph -> bitmap;
+	k = 0;
+	/* 获取起点的y轴坐标 */
+	start_y = font_data->size - slot->bitmap_top; 
+	ch_width = bitmap.width;
+	/* 处理字体位图在背景图中的范围 */
+	if(start_y < 0)  start_y = 0; 
+	if(bitmap.rows > bg_height) 
+		ch_height = font_data->size; 
+	else  
+		ch_height = bitmap.rows; 
+		
+	if(ch_height + start_y > bg_height)  
+		ch_height = bg_height - start_y; 
+	/* 开辟内存空间,如果出现问题，会导致FT_Done_Glyph函数出现段错误 */
+	Malloc_Bitmap(out_bitmap, ch_width, bg_height);
+	/* 开始将字体位图贴到背景图形中 */
+	for(i = 0; i < ch_height; ++i) 
+	for(j = 0;j < ch_width; ++j) {
+		switch (bitmap.pixel_mode) {
+		case FT_PIXEL_MODE_GRAY:
+			/* 一个8位位图，一般用来表示反锯齿字形图像。每个像素用一个字节存储 */
+			out_bitmap->data[start_y + i][j] = bitmap.buffer[k];
+			break;
+		case FT_PIXEL_MODE_MONO: 
+			/* 一个单色位图,每个bit对应一个点,非黑即白 */
+			out_bitmap->data[start_y + i][j] = bitmap.buffer[k]?255:0;
+			break;
+		}
+		++k;
+	} 
+	/* 释放字形占用的内存 */
+	FT_Done_Glyph(glyph);
+	glyph = NULL; 
 	return 0;
 }
 
@@ -3438,20 +3383,16 @@ int Count_Contents_Size(
 {
 	if(rows <= 0) return -1;
 	int i, j, default_height = 0, max_width = 0, width = 0, height = 0;
-	for(i = 0; i < rows; ++i)
-	{
-		for(j=0; j < contents[i].size; ++j)
-		{
-			if(contents[i].string[j].bitmap.height > 0)
-			{
+	for(i = 0; i < rows; ++i) {
+		for(j=0; j < contents[i].size; ++j) {
+			if(contents[i].string[j].bitmap.height > 0) {
 				default_height = contents[i].string[j].bitmap.height;
 				break;
 			}
 		}
 		if(default_height > 0) break;
 	}
-	for(i = 0; i < rows; ++i)
-	{ 
+	for(i = 0; i < rows; ++i) { 
 		if(contents[i].size > 0) 
 			height += contents[i].string[0].bitmap.height;
 		else height += default_height;

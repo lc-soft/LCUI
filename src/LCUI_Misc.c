@@ -216,26 +216,22 @@ int Get_Cut_Area(LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut)
 	cut->width = rect.width;
 	cut->height = rect.height;
 	/* 获取需裁剪的区域 */
-	if(rect.x < 0) 
-	{
+	if(rect.x < 0) {
 		cut->width += rect.x;
 		cut->x = 0 - rect.x;
 		result = 1;
 	}
-	if(rect.x + rect.width > container.w)
-	{
+	if(rect.x + rect.width > container.w) {
 		cut->width -= (rect.x + rect.width - container.w); 
 		result = 1;
 	}
 	
-	if(rect.y < 0)  
-	{
+	if(rect.y < 0) {
 		cut->height += rect.y;
 		cut->y = 0 - rect.y; 
 		result = 1;
 	}
-	if(rect.y + rect.height > container.h)
-	{
+	if(rect.y + rect.height > container.h) {
 		cut->height -= (rect.y + rect.height - container.h); 
 		result = 1;
 	}
@@ -249,13 +245,11 @@ LCUI_Rect Get_Valid_Area(LCUI_Size container, LCUI_Rect rect)
  * 出的该区域范围。
  * */
 {
-	if (rect.x < 0)
-	{
+	if (rect.x < 0) {
 		rect.width += rect.x;
 		rect.x = 0;
 	}
-	if (rect.y < 0)
-	{
+	if (rect.y < 0) {
 		rect.height += rect.y;
 		rect.y = 0;
 	}
@@ -469,6 +463,49 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 }
 
 
+LCUI_Pos Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align)
+/* 功能：根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */
+{
+	LCUI_Pos pos;
+	pos.x = pos.y = 0; 
+	 
+	switch(align)
+	{
+		case ALIGN_NONE :
+		case ALIGN_TOP_LEFT : /* 向左上角对齐 */  
+			break;
+		case ALIGN_TOP_CENTER : /* 向上中间对齐 */ 
+			pos.x = (container.w - child.w) / 2; 
+			break;
+		case ALIGN_TOP_RIGHT : /* 向右上角对齐 */ 
+			pos.x = container.w - child.w; 
+			break;
+		case ALIGN_MIDDLE_LEFT : /* 向中央偏左对齐 */  
+			pos.y = (container.h - child.h) / 2;
+			break;
+		case ALIGN_MIDDLE_CENTER : /* 向正中央对齐 */ 
+			pos.x = (container.w - child.w) / 2;
+			pos.y = (container.h - child.h) / 2;
+			break;
+		case ALIGN_MIDDLE_RIGHT : /* 向中央偏由对齐 */ 
+			pos.x = container.w - child.w;
+			pos.y = (container.h - child.h) / 2;
+			break;
+		case ALIGN_BOTTOM_LEFT : /* 向底部偏左对齐 */  
+			pos.y = container.h - child.h;
+			break;
+		case ALIGN_BOTTOM_CENTER : /* 向底部居中对齐 */ 
+			pos.x = (container.w - child.w) / 2;
+			pos.y = container.h - child.h;
+			break;
+		case ALIGN_BOTTOM_RIGHT : /* 向底部偏右对齐 */ 
+			pos.x = container.w - child.w;
+			pos.y = container.h - child.h;
+			break; 
+		default :  break; 
+	}
+	return pos;
+}
 
 int Get_Overlay_Rect(LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out)
 /* 功能：获取两矩形重叠部分的矩形 */
