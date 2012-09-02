@@ -123,8 +123,6 @@ enum _BOOL
 #define LAYOUT_NORMAL	0 
 /**********************************************/
 
-
-
 /************ 任务的添加模式 ***************/
 
 #define ADD_MODE_ADD_NEW	0 /* 新增 */
@@ -222,7 +220,12 @@ enum _LCUI_Widget_Status
 /*******************************************/
 
 /****************** 图像的处理方式 *****************/
-#define SIZE_MODE_ZOOM		LAYOUT_ZOOM	/* 缩放 */
+/* 缩放，缩放比例随着PictureBox部件的尺寸的改变而改变 */
+#define SIZE_MODE_ZOOM		LAYOUT_ZOOM	
+
+/* 固定缩放，用于照片查看器，PictureBox部件的尺寸的改变不影响缩放比列 */
+#define SIZE_MODE_BLOCK_ZOOM	5
+
 #define SIZE_MODE_STRETCH	LAYOUT_STRETCH	/* 拉伸 */
 #define SIZE_MODE_CENTER	LAYOUT_CENTER	/* 居中 */
 #define SIZE_MODE_TILE		LAYOUT_TILE	/* 平铺 */
@@ -326,10 +329,10 @@ struct _LCUI_Size
 /********************** 鼠标相关信息 ***************************/
 struct _LCUI_Mouse
 {
-	int fd, status;			/* 句柄，状态 */
-	float move_speed;		/* 鼠标移动速度，1.0为正常速度 */
-	pthread_t thread;		/* 处理鼠标输入的线程的ID */
-	LCUI_EventQueue event;	/* 记录鼠标事件相关的信息 */
+	int fd, status;		 /* 句柄，状态 */
+	float move_speed;	 /* 鼠标移动速度，1.0为正常速度 */
+	pthread_t thread;	 /* 处理鼠标输入的线程的ID */
+	LCUI_EventQueue event; /* 记录鼠标事件相关的信息 */
 };
 /*************************************************************/
 
@@ -401,8 +404,8 @@ struct _LCUI_ImageInfo
 /*******************保存字体位图数据***************************/
 struct _LCUI_Bitmap
 {
-	unsigned char  **data;		/* 字体位图数据 */
-	unsigned char  alpha;		/* 全局透明度 */
+	unsigned char  **data;	/* 字体位图数据 */
+	unsigned char  alpha;	/* 全局透明度 */
 	
 	int	width;	   /* 位图的宽度 */
 	int	height;	  /* 位图的高度 */
@@ -421,11 +424,11 @@ struct _LCUI_Graph
 	LCUI_Pos pos;		/* 在引用另一个图层中的图形时，会保存区域的起点位置 */
 	int	width, height;	/* 尺寸 */
 	
-	unsigned char	**rgba;		/* 图片数组 */
-	unsigned char	alpha;		/* 全局透明度，表示整张图片的透明度，默认为255 */
-	int		flag;		/* 是否需要透明度，分配内存时会根据它分配 */
-	int		malloc;		/* 是否分配了内存 */
-	thread_rwlock	lock;		/* 锁，用于数据保护 */
+	unsigned char	**rgba;	/* 图片数组 */
+	unsigned char	alpha;	/* 全局透明度，表示整张图片的透明度，默认为255 */
+	int		flag;	/* 是否需要透明度，分配内存时会根据它分配 */
+	int		malloc;	/* 是否分配了内存 */
+	thread_rwlock	lock;	/* 锁，用于数据保护 */
 };/*  存储图片数据 */
 /**********************************************************************/
 
@@ -611,10 +614,10 @@ struct _LCUI_Screen
 	LCUI_Size	size;		/* 屏幕尺寸 */
 	LCUI_Graph	buff;		/* 保存启动LCUI前的屏幕内容 */
 	char		*fb_dev_name;	/* 图形输出设备的名称 */
-	unsigned char	*fb_mem;		/* 指向图像输出设备映射到的内存的指针 */
-	int		fb_dev_fd;		/* 图形显示设备的句柄 */
-	size_t		smem_len;		/* 内存空间的大小 */
-	int		bits;			/* 每个像素的用多少位表示 */
+	unsigned char	*fb_mem;	/* 指向图像输出设备映射到的内存的指针 */
+	int		fb_dev_fd;	/* 图形显示设备的句柄 */
+	size_t		smem_len;	/* 内存空间的大小 */
+	int		bits;		/* 每个像素的用多少位表示 */
 	//Matrix		*matrix;		/* 屏幕脏矩形矩阵 */
 };
 /***********************************************************************/
