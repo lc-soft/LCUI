@@ -19,7 +19,8 @@
 
 ## Building
 
-To bootstrap the build you need to run `./configure` (in the root of the source tree). 
+To bootstrap the build you need to run `./configure` (in the root of the
+ source tree). 
 
 In the simplest case you would run:
 
@@ -28,11 +29,14 @@ In the simplest case you would run:
 	git submodule update --init
 	./configure
 
-Please note that if you downloaded the source code (rather than cloned via git) you likely miss the submodules and the build will therefor fail.
+Please note that if you downloaded the source code (rather than cloned 
+via git) you likely miss the submodules and the build will therefor fail.
 
 ## Bugs 
 
-  Please report bugs  by e-mail to 'lc-soft@live.cn'. Don't forget to send a  detailed explanation of  the problem --  there is nothing worse than receiving a terse message that only says `it doesn't work'.
+  Please report bugs  by e-mail to `lc-soft@live.cn`. Don't forget to 
+  send a  detailed explanation of  the problem --  there is nothing 
+  worse than receiving a terse message that only says `it doesn't work`.
 
 ## Contributing
 
@@ -40,14 +44,29 @@ You can send pull requests via GitHub. Patches should:
 
 1. Follow the style of the existing code.
 2. One commit should do exactly one thing.
-3. Commit messages should start with a summary line below 80 characters followed by a blank line, and then the reasoning/analysis for why the change was made (if appropriate).
-4. Commits that fix a bug in a previous commit (which has already been merged) should start with `fixup!` and then the summary line of the commit it fixes. If you are writing your commit message in TextMate then type `fix⇥` to get the prefix and a menu allowing you to pick the summary line from one of the last 15 commits.
-5. Rebase your branch against the upstream’s master. We don’t want to pull redundant merge commits.
-6. **Be clear about what license applies to your patch:** The files within this repository are under the [GPL 2][] (or later) but (as the original creator) we are still allowed to create non-free derivatives. However, if patches are given to us under GPL then those cannot make it into any non-free derivatives we may later wish to create. So to make it easier for us (and avoid any legal issues) we prefer if patches are released as public domain.
+3. Commit messages should start with a summary line below 80 characters 
+   followed by a blank line, and then the reasoning/analysis for why the
+    change was made (if appropriate).
+4. Commits that fix a bug in a previous commit (which has already been 
+   merged) should start with `fixup!` and then the summary line of the 
+   commit it fixes. If you are writing your commit message in TextMate 
+   then type `fix⇥` to get the prefix and a menu allowing you to pick 
+   the summary line from one of the last 15 commits.
+5. Rebase your branch against the upstream’s master. We don’t want to 
+   pull redundant merge commits.
+6. **Be clear about what license applies to your patch:** The files with
+   in this repository are under the [GPL 2][] (or later) but (as the 
+   original creator) we are still allowed to create non-free derivatives.
+   However, if patches are given to us under GPL then those cannot make 
+   it into any non-free derivatives we may later wish to create. So to 
+   make it easier for us (and avoid any legal issues) we prefer if 
+   patches are released as public domain.
 
 ## Legal
 
-The LCUI Project is released under the GNU General Public License as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.
+The LCUI Project is released under the GNU General Public License as 
+published by the Free Software Foundation, either version 2 of the 
+License, or (at your option) any later version.
 TextMate is a trademark of Allan Odgaard.
 
 ## Thanks to 
