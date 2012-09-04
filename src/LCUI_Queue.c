@@ -43,8 +43,7 @@
 #include LC_LCUI_H
 #include LC_MISC_H
 #include LC_MEM_H
-#include LC_WIDGET_H
-#include LC_THREAD_H
+#include LC_WIDGET_H 
 #include LC_ERROR_H
 
 /************************ LCUI_Queue **********************************/
@@ -133,26 +132,17 @@ int Queue_Delete_By_Flag (LCUI_Queue * queue, int pos, int flag)
  * */
 {
 	int i, value = 0;
-	void *bak;
+	void *save = NULL;
 	Queue_Using (queue, QUEUE_MODE_WRITE);
-	if (pos >=0 && pos < queue->total_num && queue->total_num > 0)
-	{
-		if(flag == 1)
-		{/* 如果要删除的是队列成员的话 */
-			/* 释放该位置的成员占用的内存空间 */
-			if(NULL != queue->destroy_func)  /* 如果有析构函数，就调用它进行销毁 */
-				queue->destroy_func(queue->queue[pos]); 
-			/* 不需要释放内存，只有在调用Destroy_Queue函数时才全部释放 */
-			//free(queue->queue[pos]); 
-		}
-		bak = queue->queue[pos];/* 备份地址 */
+	if (pos >=0 && pos < queue->total_num 
+		&& queue->total_num > 0) {
+		save = queue->queue[pos];/* 备份地址 */
 		for (i = pos; i < queue->total_num - 1; ++i)
 		/* 移动排列各个成员位置，这只是交换指针的值，把需要删除的成员移至队列末尾 */
 			queue->queue[i] = queue->queue[i + 1]; 
 			
-		if(flag == 1) 
-		{/* 被删除的队列成员的内存地址移动到队列末尾 */
-			queue->queue[i] = bak;
+		if(flag == 1) {/* 被删除的队列成员的内存地址移动到队列末尾 */
+			queue->queue[i] = save;
 			memset(queue->queue[i], 0, queue->element_size);
 		}
 		else queue->queue[i] = NULL;
@@ -167,6 +157,13 @@ int Queue_Delete_By_Flag (LCUI_Queue * queue, int pos, int flag)
 		value = 1;
 	} 
 	Queue_End_Use (queue);
+	if(flag == 1) { 
+		/* 对该位置的成员进行析构处理 */
+		if(NULL != queue->destroy_func) 
+			queue->destroy_func(save); 
+		/* 不需要释放内存，只有在调用Destroy_Queue函数时才全部释放 */
+		//free(save); 
+	}
 	return value;
 }
 
