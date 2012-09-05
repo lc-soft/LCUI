@@ -55,17 +55,15 @@
 #ifndef __LCUI_THREAD_H__
 #define __LCUI_THREAD_H__ 
 
-#define RWLOCK_READ		1
+#define RWLOCK_READ	1
 #define RWLOCK_WRITE	2
 
-typedef struct _thread_rwlock
-{
+typedef struct _thread_rwlock{
 	pthread_t host;
 	pthread_rwlock_t lock;
 	//pthread_cond_t cond;
-	pthread_mutex_t mutex;
-}
-thread_rwlock;
+	pthread_mutex_t mutex; 
+}thread_rwlock;
 
 /************************ thread R/W lock *****************************/ 
 

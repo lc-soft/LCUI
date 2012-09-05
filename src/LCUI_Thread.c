@@ -54,9 +54,9 @@
  * */
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_THREAD_H 
+#include LC_LCUI_H 
 #include <unistd.h>
+
 /************************ thread R/W lock *****************************/ 
 
 void thread_perror(char *msg, int err)
@@ -74,7 +74,7 @@ void thread_rwlock_init(thread_rwlock *rwlock)
 	//error = pthread_cond_init(&rwlock->cond, NULL);
 	//if(error) thread_perror("cond init", error);
 	
-    error = pthread_mutex_init(&rwlock->mutex, NULL);
+	error = pthread_mutex_init(&rwlock->mutex, NULL);
 	if(error) thread_perror("mutex init", error); 
 	
 	error = pthread_rwlock_init(&rwlock->lock, NULL);

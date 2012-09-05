@@ -41,9 +41,9 @@
 
 
 #define APP_ERROR_UNRECORDED_APP	"error: app was never recorded\n"
-#define ERROR_MALLOC_ERROR			"error: can not allocate memory space\n"
+#define ERROR_MALLOC_ERROR		"error: can not allocate memory space\n"
 
-#define ERROR_CONVERT_ERROR			"error: convert error\n"
+#define ERROR_CONVERT_ERROR		"error: convert error\n"
 
 #define FT_INIT_ERROR                 "init error!\n"
 #define FT_UNKNOWN_FILE_FORMAT        "unknown file format!\n"
@@ -53,10 +53,10 @@
 #define INIT_ERROR_FONTFILE_ERROR     "初始化错误:默认字体文件打开出错"
 #define INIT_ERROR_MALLOC_GRAPH_ERROR "初始化错误:无法分配足够的内存空间"
 
-#define WIDGET_ERROR_GRAPH_ERROR		"部件错误:未为部件开辟内存空间!\n"
-#define WIDGET_ERROR_TYPE_NOT_FOUND		"部件错误:未找到该类型的部件!\n"
+#define WIDGET_ERROR_GRAPH_ERROR	"部件错误:未为部件开辟内存空间!\n"
+#define WIDGET_ERROR_TYPE_NOT_FOUND	"部件错误:未找到该类型的部件!\n"
 
-#define QUIT_PARENT_WINDOW_ERROR		"Quit_Parent_Window()错误:部件没有父窗口"
+#define QUIT_PARENT_WINDOW_ERROR	"Quit_Parent_Window()错误:部件没有父窗口"
 
 
 #define LABLE_MALLOC_ERROR            "Lable_Text():无法分配足够的内存!\n"
@@ -69,6 +69,6 @@
 #define WIDGET_REALLOC_ERROR          "无法分配足够的内存用于存储窗口部件的数据！\n"
 #define WIDGET_MALLOC_ERROR           "无法为该部件分配足够的内存空间！\n"
 
-#define ADD_NEW_WIDGET_TYPE_ERROR		"添加新的部件类型出错！\n"
+#define ADD_NEW_WIDGET_TYPE_ERROR	"添加新的部件类型出错！\n"
 
 #define ERROR_WINDOW_CLOSED            -10

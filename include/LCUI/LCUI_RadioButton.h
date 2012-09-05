@@ -49,17 +49,17 @@ struct _LCUI_RadioButton
 	int	on; /* 一个标志，指定是否被选中 */
 	/* 当风格为Custom_Style(自定义)时，将根据按钮的状态使用这些图形 */
 	/* 未打勾的状态 */
-	LCUI_Graph		img_off_normal;		/* 普通状态 */
-	LCUI_Graph		img_off_over;		/* 被鼠标覆盖 */
-	LCUI_Graph		img_off_down;		/* 按下状态 */
-	LCUI_Graph		img_off_focus;		/* 焦点状态 */
-	LCUI_Graph		img_off_disable;	/* 不可用的状态 */
+	LCUI_Graph	img_off_normal;	/* 普通状态 */
+	LCUI_Graph	img_off_over;	/* 被鼠标覆盖 */
+	LCUI_Graph	img_off_down;	/* 按下状态 */
+	LCUI_Graph	img_off_focus;	/* 焦点状态 */
+	LCUI_Graph	img_off_disable;/* 不可用的状态 */
 	/* 打上勾的状态 */
-	LCUI_Graph		img_on_normal;		/* 普通状态 */
-	LCUI_Graph		img_on_over;		/* 被鼠标覆盖 */
-	LCUI_Graph		img_on_down;		/* 按下状态 */
-	LCUI_Graph		img_on_focus;		/* 焦点状态 */
-	LCUI_Graph		img_on_disable;		/* 不可用的状态 */
+	LCUI_Graph	img_on_normal;	/* 普通状态 */
+	LCUI_Graph	img_on_over;	/* 被鼠标覆盖 */
+	LCUI_Graph	img_on_down;	/* 按下状态 */
+	LCUI_Graph	img_on_focus;	/* 焦点状态 */
+	LCUI_Graph	img_on_disable;	/* 不可用的状态 */
 	
 	LCUI_Widget	*label;	/* 嵌套的文本标签 */
 	LCUI_Widget	*imgbox;/* 用于显示图形 */

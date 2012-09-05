@@ -39,8 +39,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 #include <LCUI_Build.h>
-#include LC_LCUI_H 
-#include LC_QUEUE_H
+#include LC_LCUI_H
 #include LC_GRAPHICS_H
 #include LC_RES_H
 #include LC_CURSOR_H 
@@ -48,8 +47,7 @@
 #include LC_MISC_H 
 #include LC_MEM_H
 #include LC_ERROR_H
-#include LC_FONT_H
-#include LC_THREAD_H 
+#include LC_FONT_H 
 #include LC_WIDGET_H
 
 #include <linux/fb.h>
@@ -82,26 +80,36 @@ static void Process_Screen_Update()
 {
 	int i;
 	LCUI_Rect rect;
-	LCUI_Graph graph;  
+	LCUI_Graph fill_area, graph;  
 	Graph_Init(&graph);
+	Graph_Init(&fill_area);
 	/* 锁住队列，其它线程不能访问 */
 	Queue_Lock(&LCUI_Sys.update_area);
 	i = 0;
 	//printf("Process_Screen_Update(): start\n"); 
-	while(LCUI_Active())
-	{
-		if ( RectQueue_Get(&rect, 0, &LCUI_Sys.update_area) )
-		{/* 如果从队列中获取数据成功 */
+	while(LCUI_Active()) {
+		/* 如果从队列中获取数据成功 */
+		if ( RectQueue_Get(&rect, 0, &LCUI_Sys.update_area) ) {
 			//printf("RectQueue_Get(): %d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
 			/* 获取内存中对应区域的图形数据 */ 
 			//printf("Process_Screen_Update(): get\n"); 
 			//nobuff_print("[%d]Process_Screen_Update(): ", i);
 			//count_time();
+			//printf("Get_Screen_Real_Graph(): start\n");
+			//Malloc_Graph(&fill_area, rect.width, rect.height);
+			//Fill_Color(&fill_area, RGB(255,0,0));
+			//Write_Graph_To_FB (&fill_area, Pos(rect.x, rect.y)); 
 			Get_Screen_Real_Graph (rect, &graph);
+			//printf("Get_Screen_Real_Graph(): end\n");
 			//printf("Process_Screen_Update(): end\n");
+			//nobuff_print("Write_Graph_To_FB(): ");
+			//count_time();
 			/* 写入至帧缓冲，让屏幕显示图形 */ 
+			//usleep(100000);
 			Write_Graph_To_FB (&graph, Pos(rect.x, rect.y)); 
+			//end_count_time(); 
 			//printf("Process_Screen_Update(): queue delete start\n"); 
+			//count_time();
 			//printf("queue mode: %d\n", LCUI_Sys.update_area.mode);
 			Queue_Delete (&LCUI_Sys.update_area, 0);/* 移除队列中的成员 */
 			//end_count_time(); 
@@ -123,15 +131,11 @@ static void *autoquit()
 /* 在超时后，会自动终止程序，用于调试 */
 {
 	LCUI_ID time = 0;
-	while(time <5000000)
-	{
-		if(auto_flag == 0)
-		{
+	while(time <5000000) {
+		if(auto_flag == 0) {
 			usleep(10000);
 			time += 10000;
-		}
-		else 
-		{
+		} else {
 			auto_flag = 0;
 			time = 0;
 		}
@@ -145,10 +149,9 @@ static void *LCUI_Core ()
 {
 	//pthread_t t;
 	//LCUI_Thread_Create(&t, NULL, autoquit, NULL);
-	while(LCUI_Active())
-	{
+	while(LCUI_Active()) {
 		//printf("core start\n");
-		count_time();
+		//count_time();
 		//nobuff_print("Process_All_WidgetUpdate(): ");
 		Process_All_WidgetUpdate();/* 处理所有部件更新 */
 		//end_count_time();
@@ -191,10 +194,8 @@ LCUI_App *Find_App(LCUI_ID id)
 	LCUI_App *app; 
 	int i, total;  
 	total = Queue_Get_Total(&LCUI_Sys.app_list);
-	if (total > 0)
-	{ /* 如果程序总数大于0 */
-		for (i = 0; i < total; ++i)
-		{
+	if (total > 0) { /* 如果程序总数大于0 */
+		for (i = 0; i < total; ++i) {
 			app = (LCUI_App*)Queue_Get(&LCUI_Sys.app_list, i);
 			if(app->id == id)
 				return app;
@@ -225,8 +226,7 @@ LCUI_App* Get_Self_AppPointer()
 	 * 有父线程结点指针的，程序的线程ID都在根线程里的
 	 * 子线程ID队列中 
 	 * */
-	while(ttn->parent != NULL)
-	{ 
+	while(ttn->parent != NULL) { 
 		ttn = ttn->parent; 
 		if(ttn != NULL && ttn->parent == NULL) 
 			break;
@@ -254,21 +254,21 @@ static void LCUI_Quit ()
  * 说明：在没有任何LCUI程序时，LCUI会调用本函数来恢复运行LCUI前的现场。
  * */
 {
-	int err = 0; 
-	
+	int err = 0;
 	LCUI_Sys.status = KILLED;	/* 状态标志置为KILLED */
-	Free_LCUI_Font ();			/* 释放LCUI的默认字体数据占用的内存资源 */
-	Core_End();/* 等待Core线程退出 */
-	Destroy_Queue(&LCUI_Sys.key_event);/* 撤销按键事件数据队列 */ 
-	Disable_Mouse_Input();			/* 禁用鼠标输入 */
+	Free_LCUI_Font ();		/* 释放LCUI的默认字体数据占用的内存资源 */
+	 
+	Core_End();/* 等待Core线程退出 */ 
+	Destroy_Queue(&LCUI_Sys.key_event);/* 撤销按键事件数据队列 */
+	Disable_Mouse_Input();		/* 禁用鼠标输入 */ 
 	Disable_TouchScreen_Input();	/* 禁用触屏支持 */ 
-	Disable_Key_Input();			/* 禁用按键输入 */
+	Disable_Key_Input();		/* 禁用按键输入 */ 
 	/* 恢复屏幕初始内容 */ 
 	Write_Graph_To_FB (&LCUI_Sys.screen.buff, Pos(0, 0));	
 	/* 解除帧缓冲在内存中的映射 */
 	err = munmap (LCUI_Sys.screen.fb_mem, LCUI_Sys.screen.smem_len);
 	if (err != 0) perror ("munmap()");
-	close (LCUI_Sys.screen.fb_dev_fd); 
+	close (LCUI_Sys.screen.fb_dev_fd);  
 	exit (err);
 }
 
@@ -280,13 +280,10 @@ static int LCUI_AppList_Delete (LCUI_ID app_id)
 	LCUI_App *app; 
 	int i, total;  
 	total = Queue_Get_Total(&LCUI_Sys.app_list);
-	if (total > 0)
-	{ /* 如果程序总数大于0， 查找程序信息所在队列的位置 */
-		for (i = 0; i < total; ++i)
-		{
+	if (total > 0) { /* 如果程序总数大于0， 查找程序信息所在队列的位置 */
+		for (i = 0; i < total; ++i) {
 			app = (LCUI_App*)Queue_Get(&LCUI_Sys.app_list, i);
-			if(app->id == app_id)
-			{
+			if(app->id == app_id) {
 				pos = i;
 				break;
 			}
@@ -294,8 +291,8 @@ static int LCUI_AppList_Delete (LCUI_ID app_id)
 		if(pos < 0) return -1;
 	}
 	else return -1;
-	/* 从程序显示顺序队列中删除这个程序ID */
-	Queue_Delete (&LCUI_Sys.app_list, pos);
+	/* 从程序显示顺序队列中删除这个程序ID */ 
+	Queue_Delete (&LCUI_Sys.app_list, pos); 
 	
 	if (Queue_Empty(&LCUI_Sys.app_list)) /* 如果程序列表为空 */  
 		LCUI_Quit (); /* 退出LCUI */ 
@@ -340,8 +337,7 @@ int App_Quit()
 {
 	LCUI_App *app;
 	app = Get_Self_AppPointer();
-	if(NULL == app)
-	{
+	if(NULL == app) {
 		printf("App_Quit(): "APP_ERROR_UNRECORDED_APP);
 		return -1;
 	} 
@@ -353,8 +349,7 @@ void Main_Loop_Quit()
 /* 功能：让程序退出主循环 */
 { 
 	LCUI_App *app = Get_Self_AppPointer();
-	if(NULL == app)
-	{
+	if(NULL == app) {
 		printf("Main_Loop_Quit(): "APP_ERROR_UNRECORDED_APP);
 		return;
 	}
@@ -381,10 +376,8 @@ int Get_Screen_Width ()
  * 返回值：屏幕的宽度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
  * */
 {
-	if (LCUI_Sys.init == IS_FALSE) 
-		return 0; 
-	else 
-		return LCUI_Sys.screen.size.w; 
+	if (LCUI_Sys.init == IS_FALSE) return 0; 
+	else return LCUI_Sys.screen.size.w; 
 }
 
 int Get_Screen_Height ()
@@ -393,10 +386,8 @@ int Get_Screen_Height ()
  * 返回值：屏幕的高度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
  * */
 {
-	if (LCUI_Sys.init == IS_FALSE) 
-		return 0; 
-	else 
-		return LCUI_Sys.screen.size.h; 
+	if (LCUI_Sys.init == IS_FALSE) return 0; 
+	else return LCUI_Sys.screen.size.h; 
 }
 
 LCUI_Size Get_Screen_Size ()
@@ -427,7 +418,7 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 {
 	int bits;
 	unsigned char *dest;
-    struct fb_cmap kolor; 
+	struct fb_cmap kolor; 
 	unsigned int x, y, n, k, count;
 	unsigned int temp1, temp2, temp3, i; 
 	LCUI_Rect cut_rect;
@@ -525,15 +516,15 @@ void Write_Graph_To_FB (LCUI_Graph * src, LCUI_Pos pos)
 				temp3 = pic->rgba[2][n]*0.92; 
 				
 				i = ((temp1 & 0xc0))
-						+((temp2 & 0xf0)>>2)
-						+((temp3 & 0xc0)>>6);
+					+((temp2 & 0xf0)>>2)
+					+((temp3 & 0xc0)>>6);
 						
 				kolor.red[i] = temp1*256;
 				kolor.green[i] = temp2*256;
 				kolor.blue[i] = temp3*256;
 				dest[count] = (((temp1 & 0xc0))
-								+((temp2 & 0xf0)>>2)
-								+((temp3 & 0xc0)>>6)); 
+						+((temp2 & 0xf0)>>2)
+						+((temp3 & 0xc0)>>6)); 
 			}
 		}
 		
@@ -647,20 +638,17 @@ void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 	total = Queue_Get_Total(&LCUI_Sys.widget_list);
 	
 	/* 先从底到上遍历部件，将与该区域重叠的图层的图形进行混合，得到最终的图形 */
-	for (k = total - 1; k >= 0; --k)
-	{	/* 从最底层的部件开始 */ 
+	for (k = total - 1; k >= 0; --k){
 		widget = (LCUI_Widget*)Queue_Get(&LCUI_Sys.widget_list, k);
 		w_rect = Get_Widget_Rect(widget);
 		
 		if (Rect_Is_Overlay(w_rect, area))/* 如果重叠 */
 			Get_Widget_Real_Graph(widget, area, out);
 	} 
-	
-	if (LCUI_Sys.cursor.visible == IS_TRUE)
-	{						/* 如果游标可见 */
-		/* 检查该区域是否与游标的图形区域重叠 */ 
-		if (Rect_Is_Overlay( area, Get_Cursor_Rect() ))
-		{					/* 如果重叠 */ 
+	/* 如果游标可见 */
+	if (LCUI_Sys.cursor.visible == IS_TRUE){						
+		/* 检查该区域与游标的图形区域重叠 */ 
+		if (Rect_Is_Overlay( area, Get_Cursor_Rect() )) { 
 			pos = Pos_Sub(Get_Cursor_Pos(), Pos(area.x, area.y));
 			/* 将图形合成 */
 			Mix_Graph (out, &LCUI_Sys.cursor.graph, pos);
@@ -681,8 +669,8 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 	dest = LCUI_Sys.screen.fb_mem;		/* 指向帧缓冲 */
 	int x, y, n, k, count;
 	
-	if ( Get_Cut_Area ( Get_Screen_Size(), area,&cut_rect ) )
-	{/* 如果需要裁剪图形 */
+	/* 如果需要裁剪图形 */
+	if ( Get_Cut_Area ( Get_Screen_Size(), area,&cut_rect ) ){
 		if(!Rect_Valid(cut_rect))
 			return;
 			
@@ -769,8 +757,7 @@ static void LCUI_IO_Init()
 	/* 检测是否支持鼠标 */
 	nobuff_print("checking mouse support...");
 	result = Check_Mouse_Support();
-	if(result == 0)
-	{
+	if(result == 0) {
 		printf("yes\n");
 		/* 启用鼠标输入处理 */
 		nobuff_print("enable mouse input..."); 
@@ -791,25 +778,23 @@ static void LCUI_IO_Init()
 }
 
 static void print_screeninfo(
-			struct fb_var_screeninfo fb_vinfo,
-			struct fb_fix_screeninfo fb_fix
+		struct fb_var_screeninfo fb_vinfo,
+		struct fb_fix_screeninfo fb_fix
 )
 /* 功能：打印屏幕相关的信息 */
 {
 	char visual[256], type[256];
 	
-	switch(fb_fix.type)
-	{
+	switch(fb_fix.type) {
 		case FB_TYPE_PACKED_PIXELS:	strcpy(type, "packed pixels");break;
 		case FB_TYPE_PLANES:		strcpy(type, "non interleaved planes");break;
-		case FB_TYPE_INTERLEAVED_PLANES:	strcpy(type, "interleaved planes");break;
-		case FB_TYPE_TEXT:					strcpy(type, "text/attributes");break;
-		case FB_TYPE_VGA_PLANES:			strcpy(type, "EGA/VGA planes");break;
+		case FB_TYPE_INTERLEAVED_PLANES:strcpy(type, "interleaved planes");break;
+		case FB_TYPE_TEXT:		strcpy(type, "text/attributes");break;
+		case FB_TYPE_VGA_PLANES:	strcpy(type, "EGA/VGA planes");break;
 		default: strcpy(type, "unkown");break;
 	}
 	
-	switch(fb_fix.visual)
-	{
+	switch(fb_fix.visual) {
 		case FB_VISUAL_MONO01:  strcpy(visual, "Monochr. 1=Black 0=White");break;
 		case FB_VISUAL_MONO10:  strcpy(visual, "Monochr. 1=White 0=Black");break;
 		case FB_VISUAL_TRUECOLOR:  strcpy(visual, "true color");break;
@@ -882,8 +867,8 @@ static int Screen_Init()
 	LCUI_Sys.screen.smem_len = fb_fix.smem_len;/* 保存内存空间大小 */
 	/* 映射帧缓存至内存空间 */
 	LCUI_Sys.screen.fb_mem = mmap(NULL,fb_fix.smem_len,
-							PROT_READ|PROT_WRITE,MAP_SHARED,
-							LCUI_Sys.screen.fb_dev_fd, 0);
+					PROT_READ|PROT_WRITE,MAP_SHARED,
+					LCUI_Sys.screen.fb_dev_fd, 0);
 							
 	if((void *)-1 == LCUI_Sys.screen.fb_mem) { 
 		printf("fail\n");
@@ -930,8 +915,7 @@ int LCUI_Init(int argc, char *argv[])
  * */
 {
 	int temp;
-	if(LCUI_Sys.init != IS_TRUE)
-	{/* 如果LCUI没有初始化过 */ 
+	if(LCUI_Sys.init != IS_TRUE) {/* 如果LCUI没有初始化过 */ 
 		srand(time(NULL));/* 生成随机数需要用到，只调用一次即可 */
 		LCUI_Sys.init = IS_TRUE;
 		Print_LCUI_Copyright_Text();
@@ -1047,8 +1031,7 @@ int LCUI_Main ()
 			if (idle_time >= LCUI_Sys.max_app_idle_time)
 				idle_time = LCUI_Sys.max_app_idle_time;
 		}
-	}
-	
+	} 
 	return App_Quit ();	/* 直接关闭程序，并释放资源 */ 
 }
 

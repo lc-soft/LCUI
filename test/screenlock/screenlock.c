@@ -6,8 +6,7 @@
 #include LC_LABEL_H
 #include LC_MISC_H
 #include LC_GRAPHICS_H
-#include LC_PICBOX_H
-#include LC_THREAD_H
+#include LC_PICBOX_H 
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>

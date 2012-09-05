@@ -37,11 +37,12 @@
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
- * ****************************************************************************/
+ * ****************************************************************************/ 
 #include <png.h>
 #include <jpeglib.h>
-#include <math.h>
-#include <LCUI_Build.h> 
+#include <math.h> 
+
+#include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPHICS_H
 #include LC_MEM_H
@@ -1030,6 +1031,72 @@ void Tile_Graph(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 	End_Use_Graph(src); 
 }
 
+static inline void rgba_mix(
+		LCUI_Graph *des, unsigned int m, 
+		LCUI_Graph *src, unsigned int n, 
+		unsigned char alpha )
+/* 功能：于进行像素点的alpha混合
+ * 说明：这是个内联函数，取代了表达式形式的宏定义，没有它的缺点，同时又很好地继承了它
+ * 的优点。
+ * */
+{ 
+	#ifdef use_slow_method
+	float z;
+	#endif
+	/* 乘除法运算量较多，不知如何优化 */ 
+	switch(alpha) {
+	/* 某些alpha值可以用位移，避免了乘除法运算，提升效率 */
+	    case 255:
+		des->rgba[0][m] = src->rgba[0][n];
+		des->rgba[1][m] = src->rgba[1][n];
+		des->rgba[2][m] = src->rgba[2][n]; 
+		break;
+	    case 128:
+	    case 127: 
+		des->rgba[0][m] += ((src->rgba[0][n] - des->rgba[0][m])>>1);
+		des->rgba[1][m] += ((src->rgba[1][n] - des->rgba[1][m])>>1);
+		des->rgba[2][m] += ((src->rgba[2][n] - des->rgba[2][m])>>1); 
+		break;
+	    case 63:
+	    case 64:
+		des->rgba[0][m] += ((src->rgba[0][n] - des->rgba[0][m])>>2);
+		des->rgba[1][m] += ((src->rgba[1][n] - des->rgba[1][m])>>2);
+		des->rgba[2][m] += ((src->rgba[2][n] - des->rgba[2][m])>>2); 
+		break;
+	    case 31:
+	    case 32:
+		des->rgba[0][m] += ((src->rgba[0][n] - des->rgba[0][m])>>3);
+		des->rgba[1][m] += ((src->rgba[1][n] - des->rgba[1][m])>>3);
+		des->rgba[2][m] += ((src->rgba[2][n] - des->rgba[2][m])>>3); 
+		break;
+	    case 15:
+	    case 16:
+		des->rgba[0][m] += ((src->rgba[0][n] - des->rgba[0][m])>>4);
+		des->rgba[1][m] += ((src->rgba[1][n] - des->rgba[1][m])>>4);
+		des->rgba[2][m] += ((src->rgba[2][n] - des->rgba[2][m])>>4); 
+	    case 0: break;
+	    default:
+		#ifdef use_slow_method
+		//以下代码运算速度慢，可能是由于使用了浮点数的原因
+		/* alpha混合公式简化
+		 * a = (b*j + a*(255-j))/255;
+		 * a = b*j/255 + a*(255-j)/255;
+		 * a = b*j/255 + a - a*j/255;
+		 * a = (b - a)*j/255 + a;
+		 * */
+		z = alpha/255.0;
+		des->rgba[0][m] += (src->rgba[0][n] - des->rgba[0][m])*z;
+		des->rgba[1][m] += (src->rgba[1][n] - des->rgba[1][m])*z;
+		des->rgba[2][m] += (src->rgba[2][n] - des->rgba[2][m])*z;
+		#else
+		des->rgba[0][m] = (src->rgba[0][n]*alpha + des->rgba[0][m]*(255-alpha))/255;
+		des->rgba[1][m] = (src->rgba[1][n]*alpha + des->rgba[1][m]*(255-alpha))/255;
+		des->rgba[2][m] = (src->rgba[2][n]*alpha + des->rgba[2][m]*(255-alpha))/255;
+		#endif
+		break;
+	}
+}
+
 int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 /* 
  * 功能：将前景图与背景图混合叠加
@@ -1043,7 +1110,7 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 	
 	unsigned char *r1, *g1, *a1, *b1, *r2, *g2, *b2; 
 
-	int x = 0, y = 0,temp,count,  m, n;
+	unsigned int x = 0, y = 0,temp,count, m, n;
 	unsigned char j;//, alpha; 
 	float k;
 	LCUI_Graph *src, *des;
@@ -1077,27 +1144,9 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 			temp = m + x; /* 得出图片内需要读取的区域的各点坐标 */
 			count = n + x;/* 得出需填充至窗口的各点的坐标 */
 			j = src->rgba[3][temp] * k;
-			/* 乘除法运算量较多，不知如何优化 */
-			switch(j)
-			{
-				case 255:
-				des->rgba[0][count] = src->rgba[0][temp] ;
-				des->rgba[1][count] = src->rgba[1][temp] ;
-				des->rgba[2][count] = src->rgba[2][temp] ; 
-				case 0: break;
-				default:
-				/* alpha混合公式简化
-				 * a = (b*j + a*(255-j))/255;
-				 * a = b*j/255 + a*(255-j)/255;
-				 * a = b*j/255 + a - a*j/255;
-				 * a = (b - a)*j/255 + a;
-				 * */ 
-				des->rgba[0][count] = (src->rgba[0][temp] - des->rgba[0][count])*j/255 + des->rgba[0][count];
-				des->rgba[1][count] = (src->rgba[1][temp] - des->rgba[1][count])*j/255 + des->rgba[1][count];
-				des->rgba[2][count] = (src->rgba[2][temp] - des->rgba[2][count])*j/255 + des->rgba[2][count];
-				break;
-			}
-		} 
+			/* 根据alpha通道来混合像素点 */
+			rgba_mix(des, count, src, temp, j);
+		}
 	} else {/* 如果前景图形没有透明效果 */
 		for (y = 0; y < cut.height; ++y) { 
 			/* 计算前景图内需要读取的区域的各起点坐标 */
@@ -1171,22 +1220,10 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 		m = (cut.y + y + src_rect.y) * src->width + cut.x + src_rect.x;
 		n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
 		for (x = 0; x < cut.width; ++x) {
-			temp = m + x; /* 计算图片内需要读取的区域的各点坐标 */
-			count = n + x;/* 计算需填充至窗口的各点的坐标 */
+			temp = m + x; 
+			count = n + x; 
 			j = src->rgba[3][temp] * k;
-			/* 乘除法运算量较多，不知如何优化 */
-			switch(j) {
-				case 255:
-				des->rgba[0][count] = src->rgba[0][temp] ;
-				des->rgba[1][count] = src->rgba[1][temp] ;
-				des->rgba[2][count] = src->rgba[2][temp] ;
-				case 0:break;
-				default: 
-				des->rgba[0][count] = (src->rgba[0][temp] - des->rgba[0][count])*j/255 + des->rgba[0][count];
-				des->rgba[1][count] = (src->rgba[1][temp] - des->rgba[1][count])*j/255 + des->rgba[1][count];
-				des->rgba[2][count] = (src->rgba[2][temp] - des->rgba[2][count])*j/255 + des->rgba[2][count];
-				break;
-			}
+			rgba_mix(des, count, src, temp, j);
 		}
 	} else for (y = 0; y < cut.height; ++y) { 
 		m = (cut.y + y + src_rect.y) *src->width + cut.x + src_rect.x;
@@ -1287,8 +1324,7 @@ int Fill_Background_Image(LCUI_Graph *graph, LCUI_Graph *bg, int flag, LCUI_RGB 
 	pos.x = 0;
 	pos.y = 0;
 	Graph_Init(&temp_bg);
-	switch(flag)
-	{
+	switch(flag) {
 	case LAYOUT_ZOOM:/* 缩放 */
 		Zoom_Graph( bg, &temp_bg, DEFAULT,
 		Size(graph->width, graph->height)
@@ -1631,20 +1667,21 @@ void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
 	
 	for(i=total-1; i>=0; --i) {/* 从底到顶遍历子部件 */
 		child = (LCUI_Widget*)Queue_Get(widget_list, i); 
-		if(child != NULL && child->visible == IS_TRUE)
-		{/* 如果有可见的子部件 */ 
+		if(child != NULL && child->visible == IS_TRUE) {
+		/* 如果有可见的子部件 */ 
 			tmp = Get_Widget_Valid_Rect(child); 
 			pos = Get_Widget_Global_Pos(child);
 			tmp.x += pos.x;
-			tmp.y += pos.y; 
+			tmp.y += pos.y;
 			if(!Rect_Valid(tmp)) continue;
-			if (Rect_Is_Overlay(tmp, rect)) 
-			{ 
-				Queue_Add_Pointer(queue, child);/* 记录与该区域重叠的部件 */
-				Get_Overlay_Widget(rect, child, queue);  /* 递归调用 */
+			if (Rect_Is_Overlay(tmp, rect)) { 
+				/* 记录与该区域重叠的部件 */
+				Queue_Add_Pointer(queue, child);
+				/* 递归调用 */
+				Get_Overlay_Widget(rect, child, queue);  
 			} 
 		}
-	} 
+	}
 }
 
 LCUI_RGBA Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos)
@@ -1705,6 +1742,9 @@ int Widget_Layer_Not_Visible(LCUI_Widget *widget)
 	return 0;
 }
 
+extern void count_time();
+extern void end_count_time();
+
 int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 /* 
  * 功能：获取屏幕中指定区域内实际要显示的图形 
@@ -1720,17 +1760,15 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 	/* 检测这个区域是否有效 */
 	if (rect.x < 0) return -1; 
 	if (rect.y < 0) return -1; 
-	if (rect.x + rect.width > Get_Screen_Width ())
-		return -1;
-	if (rect.y + rect.height > Get_Screen_Height ())
-		return -1;
+	if (rect.x + rect.width > Get_Screen_Width ()) return -1;
+	if (rect.y + rect.height > Get_Screen_Height ()) return -1;
 	
-	if (rect.width <= 0 && rect.height <= 0)
-		return -2;
+	if (rect.width <= 0 && rect.height <= 0) return -2;
 	
 	int i, total; 
 	/* 根据指定的尺寸，分配内存空间，用于储存图形数据 */
 	Malloc_Graph(graph, rect.width, rect.height);
+	graph->flag = NO_ALPHA; 
 	/* 获取与该区域重叠的部件，并记录至队列widget_buff中 */
 	Get_Overlay_Widget(rect, NULL, &widget_buff); 
 	
@@ -1739,21 +1777,24 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 		//printf("rect(%d,%d,%d,%d), list cover widget:\n",
 		//rect.x, rect.y, rect.width, rect.height
 		//);
-		//printf("list cover widget:\n"); 
-		for(i=total-1; i>=0; --i) {
-			/* 队列最末端是最前端显示的部件，所以从尾至头遍历 */
-			widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
+		//printf("list cover widget:\n");
+		//for(i=total-1; i>=0; --i) {
+			///* 队列最末端是最前端显示的部件，所以从尾至头遍历 */
+			//widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
 			//print_widget_info(widget); 
-			/* 如果图层完全不可见，即完全透明 */
-			switch(Graph_Is_Opaque(&widget->graph)) {
-				case -1:
-				Queue_Delete_Pointer(&widget_buff, i);
-				case 0: break;
-				case 1: goto skip_loop;
-			} 
-		}
-skip_loop:
+			///* 如果图层完全不可见，即完全透明 */
+			//switch(Graph_Is_Opaque(&widget->graph)) {
+				//case -1:
+				//Queue_Delete_Pointer(&widget_buff, i);
+				//case 0: break;
+				//case 1: goto skip_loop;
+			//} 
+		//} 
+		i = -1;
+//skip_loop:
 		//printf("list end\n");
+		//nobuff_print("mix graph layer, use time:");
+		//count_time();
 		if(i >= 0) {/* 如果找到最前端的不透明的图层 */
 			total = Queue_Get_Total(&widget_buff);
 			for(; i<total; ++i) {
@@ -1766,23 +1807,21 @@ skip_loop:
 				Mix_Graph(graph, &widget->graph, pos);
 			}
 		} else {/* 否则，截取背景图，然后再混合叠加部件图层 */
-			graph->flag = NO_ALPHA; 
 			Cut_Graph (&LCUI_Sys.screen.buff, rect, graph);
 			for(i=0; i<total; ++i) {
 				widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
 				pos = Get_Widget_Global_Pos(widget);
 				pos.x -= rect.x;
-				pos.y -= rect.y; 
+				pos.y -= rect.y;
 				Mix_Graph(graph, &widget->graph, pos);
 			}
 		}
-	} else {/* 否则，直接贴背景图 */
-		graph->flag = NO_ALPHA; 
+		//end_count_time();
+	} else {/* 否则，直接贴背景图 */ 
 		Cut_Graph (&LCUI_Sys.screen.buff, rect, graph);
 	}
 	
-	if (LCUI_Sys.cursor.visible == IS_TRUE)
-	{ /* 如果游标可见 */
+	if (LCUI_Sys.cursor.visible == IS_TRUE) { /* 如果游标可见 */
 		/* 如果该区域与游标的图形区域重叠 */ 
 		if (Rect_Is_Overlay( rect, Get_Cursor_Rect()) ) {
 			pos.x = LCUI_Sys.cursor.pos.x - rect.x;

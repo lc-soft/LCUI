@@ -39,7 +39,13 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
  
-#ifndef __LCUI_H__
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
+#ifndef __LCUI_BUILD_UNIX_H__
+#define __LCUI_BUILD_UNIX_H__
+
 #define LC_LCUI_H	<LCUI/LCUI.h>
 #define LC_MISC_H	<LCUI/LCUI_Misc.h>
 #define LC_FONT_H	<LCUI/LCUI_Font.h>
@@ -51,8 +57,7 @@
 #define LC_INPUT_H	<LCUI/LCUI_Input.h>
 #define LC_MEM_H	<LCUI/LCUI_Memory.h>
 #define LC_ERROR_H	<LCUI/LCUI_Error.h>
-#define LC_THREAD_H	<LCUI/LCUI_Thread.h>
-#define LC_INIT_H	<LCUI/LCUI_Init.h>
+#define LC_THREAD_H	<LCUI/LCUI_Thread.h> 
 #define LC_RES_H	<LCUI/LCUI_Resources.h> 
 
 /* 一些部件的头文件路径 */

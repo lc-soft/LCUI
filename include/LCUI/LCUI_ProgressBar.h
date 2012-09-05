@@ -55,9 +55,9 @@ struct _LCUI_ProgressBar
 	LCUI_Widget *img_pic_box;	/* 闪光图片的图片盒子 */
 	
 	int img_move_speed; /* 表示进度条上的闪光的移动速度，单位为：像素/秒 */
-	int sleep_time;		/* 指定在闪光移动至进度条尾部后，等待多久进行下一次移动，单位为：毫秒 */
-	int max_value;		/* 总进度的值 */
-	int value;			/* 当前进度的值 */
+	int sleep_time;	/* 指定在闪光移动至进度条尾部后，等待多久进行下一次移动，单位为：毫秒 */
+	int max_value;	/* 总进度的值 */
+	int value;	/* 当前进度的值 */
 };
 
 int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height);

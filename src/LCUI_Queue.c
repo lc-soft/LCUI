@@ -39,12 +39,12 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 #include <LCUI_Build.h>
-#include <unistd.h>
 #include LC_LCUI_H
 #include LC_MISC_H
 #include LC_MEM_H
 #include LC_WIDGET_H 
 #include LC_ERROR_H
+#include <unistd.h>
 
 /************************ LCUI_Queue **********************************/
 int Queue_Lock (LCUI_Queue *queue)
@@ -114,8 +114,7 @@ int Queue_Swap(LCUI_Queue * queue, int pos_a, int pos_b)
 	void *temp;
 	if (pos_a < queue->total_num 
 		&& pos_b < queue->total_num 
-		&& queue->total_num > 0)
-	{
+		&& queue->total_num > 0) {
 		temp = queue->queue[pos_a];
 		queue->queue[pos_a] = queue->queue[pos_b];
 		queue->queue[pos_b] = temp;
@@ -186,8 +185,8 @@ void Destroy_Queue(LCUI_Queue * queue)
  */
 { 
 	int i;
-	if(queue->member_type == 0)
-	{/* 如果成员是普通类型，释放队列成员占用的内存空间 */
+	if(queue->member_type == 0) {
+	/* 如果成员是普通类型，释放队列成员占用的内存空间 */
 		while(Queue_Delete(queue, 0));/* 清空队列成员 */ 
 		for(i=0; i<queue->max_num; i++)
 			free(queue->queue[i]); 
@@ -228,12 +227,12 @@ int Queue_Insert(const void *data, int pos, LCUI_Queue * queue)
 	Queue_Using(queue, QUEUE_MODE_WRITE);
 	/* 没有的话，就需要添加至队列 */
 	++queue->total_num;
-	if(queue->total_num > queue->max_num)
-	{/* 如果如果当前数量大于当前容量，就扩增用于储存数据的内存空间 */
+	if(queue->total_num > queue->max_num) {
+	/* 如果如果当前数量大于当前容量，就扩增用于储存数据的内存空间 */
 		size =  sizeof(void*) * queue->total_num;
 		queue->queue = (void**)realloc( queue->queue, size );
-		if(queue->queue == NULL)
-		{/* 如果重新分配内存失败了 */
+		if(queue->queue == NULL) {
+		/* 如果重新分配内存失败了 */
 			Queue_End_Use(queue);
 			printf("Queue_Insert(): "ERROR_MALLOC_ERROR);
 			exit(-1);
@@ -265,13 +264,12 @@ int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos)
 	
 	Queue_Using(queue, QUEUE_MODE_WRITE);
 	temp = queue->queue[src_pos];
-	if (src_pos > des_pos)
-	{	/* 如果新位置在原位置的前面，把两位置之间的成员向右移动 */
+	if (src_pos > des_pos) {
+	/* 如果新位置在原位置的前面，把两位置之间的成员向右移动 */
 		for (i = src_pos; i > des_pos; --i) 
 			queue->queue[i] = queue->queue[i - 1];  
-	}
-	else if (src_pos < des_pos)
-	{	/* 如果新位置在原位置的后面，把两位置之间的成员向左移动 */
+	} else if (src_pos < des_pos) {
+	/* 如果新位置在原位置的后面，把两位置之间的成员向左移动 */
 		for (i = src_pos; i < des_pos; ++i) 
 			queue->queue[i] = queue->queue[i + 1];  
 	} 
@@ -318,20 +316,16 @@ int Queue_Add_By_Flag(LCUI_Queue * queue, void *data, int flag)
 	
 	pos = queue->total_num;
 	queue->total_num += 1;					/* 总数+1 */
-	if(queue->total_num > queue->max_num)
-	{/* 如果当前总数大于之前最大的总数 */
+	if(queue->total_num > queue->max_num) {
+	/* 如果当前总数大于之前最大的总数 */
 		queue->max_num = queue->total_num;
 		/* 如果总数大于1，说明之前已经malloc过，直接realloc扩增内存 */
 		if (queue->total_num > 1 && queue->queue != NULL) 
-			queue->queue =	(void **)
-								realloc(
-									queue->queue, sizeof(void*) * 
-									queue->total_num ); 
-		else /* 否则，需要先malloc */
-			queue->queue = (void **) malloc (sizeof(void*)); 
+			queue->queue =	(void **) realloc( queue->queue, 
+					sizeof(void*) * queue->total_num ); 
+		else queue->queue = (void **) malloc (sizeof(void*)); 
 		
-		if(NULL == queue->queue)
-		{
+		if(NULL == queue->queue) {
 			printf("Queue_Add_By_Flag(): "ERROR_MALLOC_ERROR);
 			Queue_End_Use(queue);
 			exit(-1);
@@ -339,9 +333,7 @@ int Queue_Add_By_Flag(LCUI_Queue * queue, void *data, int flag)
 		/* 为该位置的成员分配内存空间 */
 		if (flag == 1)
 			queue->queue[pos] = malloc(queue->element_size);
-	}
-	else if(flag == 1)
-	{
+	} else if(flag == 1) {
 		/* 
 		 * 转移队列成员的地址至另一个队列后，源队列中的多余指针会赋为NULL，所以需要
 		 * 重新分配内存。
@@ -417,16 +409,12 @@ int main()
 	Queue_Init(&q1, sizeof(char), NULL);
 	Queue_Init(&q2, sizeof(char), NULL);
 	/* 添加0至9的字符至队列 */
-	for(i=0; i<10; i++)
-	{
+	for(i=0; i<10; i++) {
 		ch = '0' + i;
 		Queue_Add(&q1, &ch);
 	}
 	/* 获取每个成员，并保存至队列 */
-	for(i=0; i<10; i++) 
-	{	/* 先将void型指针转换成char型指针，之后取该指针指向的变量的至 */
-		str[i] = *( (char*)Queue_Get(&q1, i) );  
-	}
+	for(i=0; i<10; i++) str[i] = *( (char*)Queue_Get(&q1, i) );  
 	str[i] = 0;
 	
 	printf("q1, string:%s\n", str);
@@ -466,10 +454,8 @@ int main()
 		Queue_Add(&bq, &ch);
 	}
 	/* 获取每个成员，并保存至队列 */
-	for(i=0; i<10; i++) 
-	{	/* 先将void型指针转换成char型指针，之后取该指针指向的变量的至 */
-		str[i] = *( (char*)Queue_Get(&bq, i) );  
-	}
+	for(i=0; i<10; i++) str[i] = *( (char*)Queue_Get(&bq, i) );  
+		
 	str[i] = 0;
 	
 	printf("string:%s\n", str);
@@ -513,7 +499,7 @@ static void Destroy_Widget(LCUI_Widget *widget)
 	
 	void (*func)(LCUI_Widget*);
 	func = Get_WidgetFunc_By_ID(widget->type_id, 
-						FUNC_TYPE_DESTROY);
+				FUNC_TYPE_DESTROY);
 	func(widget); /* 调用之，释放private指针指向的内存空间 */
 	free(widget->private);/* 释放这个指向部件私有数据结构体的指针 */
 }
@@ -531,11 +517,9 @@ int WidgetQueue_Get_Pos(LCUI_Queue *queue, LCUI_Widget *widget)
 	int i, result = -1, total; 
 	
 	total = Queue_Get_Total(queue); 
-	for(i = 0; i < total; ++i)
-	{
+	for(i = 0; i < total; ++i) {
 		temp = Queue_Get(queue, i);
-		if(temp == widget)
-		{ 
+		if(temp == widget) { 
 			result = i; 
 			break;
 		}
@@ -553,20 +537,17 @@ int WidgetQueue_Move(LCUI_Queue *queue, int pos, LCUI_Widget *widget)
 	LCUI_Widget *temp;
 	int total, i, j, des_pos;
 	total = Queue_Get_Total(queue);
-	for(i=0; i<total; ++i)
-	{
+	for(i=0; i<total; ++i) {
 		temp = (LCUI_Widget*)Queue_Get(queue, i);
-		if(temp == widget)
-		{/* 如果找到部件 */
+		if(temp == widget) {/* 如果找到部件 */
 			j = i;
-			for(i=0; i<j; ++i)
-			{/* 从头到当前位置遍历队列 */
+			for(i=0; i<j; ++i) {/* 从头到当前位置遍历队列 */
 				temp = (LCUI_Widget*)Queue_Get(queue, i);
 				
-				if( temp->lock_display == IS_TRUE )
-				{/* 如果该位置的部件锁定了位置 */
-					if(widget->lock_display == IS_TRUE)
-					{/* 如果目标部件锁定了位置，那就可以移动至最前端 */
+				if( temp->lock_display == IS_TRUE ) {
+				/* 如果该位置的部件锁定了位置 */
+					if(widget->lock_display == IS_TRUE) {
+					/* 如果目标部件锁定了位置，那就可以移动至最前端 */
 						des_pos = 0; 
 						Queue_Using(queue, QUEUE_MODE_WRITE);
 						for (i=j; i > des_pos; --i) 
@@ -576,9 +557,7 @@ int WidgetQueue_Move(LCUI_Queue *queue, int pos, LCUI_Widget *widget)
 						Queue_End_Use(queue);
 						break;
 					}
-				}
-				else
-				{/* 否则，该位置的部件没锁定位置 */
+				} else {/* 否则，该位置的部件没锁定位置 */
 					des_pos = i;
 					Queue_Using(queue, QUEUE_MODE_WRITE);
 					for (i=j; i > des_pos; --i) 
@@ -622,11 +601,10 @@ void Queue_Copy(LCUI_Queue *des, LCUI_Queue *src)
 	LCUI_Rect *rect;
 	int i, total;
 	total = Queue_Get_Total(src);
-	for(i=0; i<total; ++i)
-	{
+	for(i=0; i<total; ++i) {
 		rect = (LCUI_Rect *)Queue_Get(src, i);/* 获取源队列里的成员 */
 		//printf("[%d] rect: %d,%d, %d,%d\n", i, rect->x, rect->y, rect->width, rect->height);
-		Queue_Add(des, rect); /* 添加至目标队列里 */
+		RectQueue_Add(des, *rect); /* 添加至目标队列里 */
 	}
 }
  
@@ -640,45 +618,40 @@ int RectQueue_Add (LCUI_Queue * queue, LCUI_Rect rect)
 	//if(debug_mark)
 	//	printf("New : [%d,%d] %d,%d\n", rect.x, rect.y, rect.width, rect.height);
 	
-	if(!Rect_Valid(rect))
-	{
+	if(!Rect_Valid(rect)) {
 		//printf("not valid\n");
 		return -1;
 	}
 	
 	RectQueue_Init(&rect_buff);
 	
-	for (i = 0; i < queue->total_num; ++i)
-	{
-		if(RectQueue_Get(&t_rect, i, queue))
-		{
+	for (i = 0; i < queue->total_num; ++i) {
+		if(RectQueue_Get(&t_rect, i, queue)) {
 			//if(debug_mark)
 			//  printf("temp : [%d,%d] %d,%d\n", t_rect.x, t_rect.y, t_rect.width, t_rect.height);
 			
 			if (!Rect_Valid(t_rect)) 
-				/* 删除这个矩形数据，因为它是无效的 */
+			/* 删除这个矩形数据，因为它是无效的 */
 				Queue_Delete (queue, i); 
 			else if (Rect_Include_Rect (rect, t_rect)) 
-				/* 删除这个矩形数据，因为它已经被新增的矩形区域包含 */
+			/* 删除这个矩形数据，因为它已经被新增的矩形区域包含 */
 				Queue_Delete (queue, i); 
-			else if (Rect_Include_Rect (t_rect, rect))
-			{/* 如果新增的矩形数据与已存在的矩形数据属于包含关系 */
+			else if (Rect_Include_Rect (t_rect, rect)) {
+			/* 如果新增的矩形数据与已存在的矩形数据属于包含关系 */
 				//if(debug_mark) 
 				//  printf("Include 2\n");
 				  
 				flag = 1;
 				break;
-			}
-			else if(Rect_Equal(rect, t_rect))
-			{/* 相等的就不需要了 */
+			} else if(Rect_Equal(rect, t_rect)) {
+			/* 相等的就不需要了 */
 				//if(debug_mark)
 				//  printf("Equal || not valid\n");
 				
 				flag = 1;
 				break;
-			}
-			else if(Rect_Is_Overlay(rect, t_rect))
-			{/* 如果新增的矩形与队列中的矩形重叠 */ 
+			} else if(Rect_Is_Overlay(rect, t_rect)) {
+				/* 如果新增的矩形与队列中的矩形重叠 */ 
 				/* 将矩形分离成若干个不重叠的矩形，之后将它们添加进去 */
 				//printf("Rect_Is_Overlay(rect, t_rect)\n");
 				Cut_Overlay_Rect(t_rect, rect, &rect_buff);

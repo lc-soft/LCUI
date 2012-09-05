@@ -117,6 +117,9 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
  * 注意！传递参数时，请勿颠倒old和new位置。
  **/ 
 
+LCUI_Pos Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align);
+/* 功能：根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */
+
 int Get_Overlay_Rect(LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out);
 /* 功能：获取两矩形重叠部分的矩形 */ 
 

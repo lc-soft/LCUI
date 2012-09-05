@@ -52,15 +52,15 @@
 #include FT_FREETYPE_H 
 
 /* 打开文件时的错误 */
-#define SHORT_FILE		1
-#define BIG_FILE		2
-#define UNKNOWN_FORMAT  3
-#define OPEN_ERROR		4
+#define SHORT_FILE	1
+#define BIG_FILE	2
+#define UNKNOWN_FORMAT	3
+#define OPEN_ERROR	4
 
 /* 图像类型 */
-#define TYPE_PNG		1
-#define TYPE_JPG		2
-#define TYPE_BMP		3
+#define TYPE_PNG	1
+#define TYPE_JPG	2
+#define TYPE_BMP	3
 
 #define PNG_BYTES_TO_CHECK 4
 
@@ -89,6 +89,14 @@
 #define TS_DEV	"/dev/jz_ts"		/* 触屏输入设备 */
 #define MS_DEV	"/dev/input/mice"	/* 鼠标设备 */
 /*****************************************************/
+
+#ifndef false
+#define false 0
+#endif
+
+#ifndef ture
+#define ture 1
+#endif
 
 enum _BOOL
 {
@@ -323,40 +331,6 @@ struct _LCUI_Size
 };
 /*******************************/
 
-#include LC_QUEUE_H
-#include LC_WORK_H
-
-/********************** 鼠标相关信息 ***************************/
-struct _LCUI_Mouse
-{
-	int fd, status;		 /* 句柄，状态 */
-	float move_speed;	 /* 鼠标移动速度，1.0为正常速度 */
-	pthread_t thread;	 /* 处理鼠标输入的线程的ID */
-	LCUI_EventQueue event; /* 记录鼠标事件相关的信息 */
-};
-/*************************************************************/
-
-
-/************************ 鼠标事件 **************************/
-struct _LCUI_MouseEvent
-{
-	LCUI_Widget	*widget;	/* 当前鼠标指针覆盖到的部件 */
-	LCUI_Key	key;		/* 按键键值以及状态 */
-	LCUI_Pos	global_pos;	/* 鼠标指针的全局坐标 */
-	LCUI_Pos	pos;		/* 与当前覆盖到的部件的相对坐标 */
-};
-/***********************************************************/
-
-
-/*********** 触屏相关 **************/
-struct _LCUI_TS
-{
-	struct tsdev *td;
-	int status;  /* 状态 */ 
-	pthread_t thread;
-};
-/**********************************/
- 
 /*************** 记录像素点信息 *******************/
 struct _Pixel
 {
@@ -364,6 +338,24 @@ struct _Pixel
 	LCUI_RGB	rgb;	/* RGBA值 */
 };
 /***********************************************/
+
+/*********** 字符串 ***********/
+struct _LCUI_String
+{
+	char   *string; /* 字符串内容 */
+	size_t size;	/* 占用的空间大小 */
+};
+/*****************************/
+
+
+/****************** 区域数据1 **********************/
+struct _LCUI_Rect /* 可记录需刷新的区域 */
+{
+	int x,y;
+	int width,height;
+	double center_x,center_y; /* 中心点的坐标 */
+};
+/**************************************************/
 
 /***************************** 脏矩形 *********************************/
 struct _Dirty_Rect
@@ -413,6 +405,30 @@ struct _LCUI_Bitmap
 };/* 字体位图数据 */
 /**************************************************************/
 
+/************************wchar_t型字符***************************/
+struct _LCUI_WChar_T
+{
+	wchar_t		char_code;	/* 字符码 */
+	LCUI_Bitmap	bitmap;		/* 字符的位图数据 */
+	LCUI_RGB	color;		/* 该文字的配色 */
+	int		update;		/* 标明这个字符是否需要刷新 */ 
+	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */		   
+};
+/****************************************************************/
+
+/************** wchar_t型字符串 ***********/
+struct _LCUI_WString
+{
+	LCUI_WChar_T *string;
+	int	update;
+	size_t size;
+};
+/*****************************************/
+
+#include LC_QUEUE_H
+#include LC_WORK_H
+#include LC_THREAD_H
+
 /***************************** 图片数据 ********************************/
 struct _LCUI_Graph
 {
@@ -431,34 +447,6 @@ struct _LCUI_Graph
 	thread_rwlock	lock;	/* 锁，用于数据保护 */
 };/*  存储图片数据 */
 /**********************************************************************/
-
-/*********** 字符串 ***********/
-struct _LCUI_String
-{
-	char   *string; /* 字符串内容 */
-	size_t size;	/* 占用的空间大小 */
-};
-/*****************************/
-
-
-/****************** 区域数据1 **********************/
-struct _LCUI_Rect /* 可记录需刷新的区域 */
-{
-	int x,y;
-	int width,height;
-	double center_x,center_y; /* 中心点的坐标 */
-};
-/**************************************************/
-
-/************** wchar_t型字符串 ***********/
-struct _LCUI_WString
-{
-	LCUI_WChar_T *string;
-	int	update;
-	size_t size;
-};
-/*****************************************/
-
 
 /******************************保存字体信息********************************/
 struct _LCUI_Font/* 字体信息数据 */
@@ -480,6 +468,37 @@ struct _LCUI_Font/* 字体信息数据 */
 /************************************************************************/
 
 
+/********************** 鼠标相关信息 ***************************/
+struct _LCUI_Mouse
+{
+	int fd, status;		 /* 句柄，状态 */
+	float move_speed;	 /* 鼠标移动速度，1.0为正常速度 */
+	pthread_t thread;	 /* 处理鼠标输入的线程的ID */
+	LCUI_EventQueue event; /* 记录鼠标事件相关的信息 */
+};
+/*************************************************************/
+
+
+/************************ 鼠标事件 **************************/
+struct _LCUI_MouseEvent
+{
+	LCUI_Widget	*widget;	/* 当前鼠标指针覆盖到的部件 */
+	LCUI_Key	key;		/* 按键键值以及状态 */
+	LCUI_Pos	global_pos;	/* 鼠标指针的全局坐标 */
+	LCUI_Pos	pos;		/* 与当前覆盖到的部件的相对坐标 */
+};
+/***********************************************************/
+
+
+/*********** 触屏相关 **************/
+struct _LCUI_TS
+{
+	struct tsdev *td;
+	int status;  /* 状态 */ 
+	pthread_t thread;
+};
+/**********************************/
+ 
 
 /*************** 边框 ******************/
 struct _LCUI_Border
@@ -487,17 +506,6 @@ struct _LCUI_Border
 	int left,top,right,bottom;
 };
 /*************************************/
-
-/************************wchar_t型字符***************************/
-struct _LCUI_WChar_T
-{
-	wchar_t		char_code;	/* 字符码 */
-	LCUI_Bitmap	bitmap;		/* 字符的位图数据 */
-	LCUI_RGB	color;		/* 该文字的配色 */
-	int		update;		/* 标明这个字符是否需要刷新 */ 
-	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */		   
-};
-/****************************************************************/
 
 /******************************* 部件 **********************************/
 struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */

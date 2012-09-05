@@ -171,14 +171,15 @@ int Graph_Is_Opaque(LCUI_Graph *graph);
  * 功能：检测图形是否为不透明 
  * 说明：完全透明则返回-1，不透明则返回1，有透明效果则返回0
  * */ 
-int write_png_file(char *file_name , LCUI_Graph *graph);
-/* 功能：将LCUI_Graph结构中的数据写入至png文件 */
 
-inline int Widget_Layer_Is_Opaque(LCUI_Widget *widget);
+int Widget_Layer_Is_Opaque(LCUI_Widget *widget);
 /* 功能：判断部件图形是否不透明 */ 
 
-inline int Widget_Layer_Not_Visible(LCUI_Widget *widget);
-/* 功能：检测部件图形是否完全透明 */ 
+int Widget_Layer_Not_Visible(LCUI_Widget *widget);
+/* 功能：检测部件图形是否完全透明 */
+
+int write_png_file(char *file_name , LCUI_Graph *graph);
+/* 功能：将LCUI_Graph结构中的数据写入至png文件 */
 
 int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph);
 /* 

@@ -254,8 +254,8 @@ static LCUI_Frames *Frames_Stream_Update()
 /* 功能：更新流中的动画至下一帧 */
 { 
 	int i, total;
-	LCUI_Frame *frame;
-	LCUI_Frames *frames,*temp;
+	LCUI_Frame *frame = NULL;
+	LCUI_Frames *frames = NULL,*temp = NULL;
 	clock_t used_time; 
 	//printf("Frames_Stream_Update(): start\n");
 	total = Queue_Get_Total(&frames_stream); 
@@ -263,7 +263,7 @@ static LCUI_Frames *Frames_Stream_Update()
 		frames = Queue_Get(&frames_stream, i);
 		if(frames->status == 1) break;
 	}
-	if(i >= total) return NULL; 
+	if(i >= total || frames == NULL) return NULL; 
 	/* 
 	 * 由于有些动画还未更新第一帧图像，动画槽里的图像也未载入第一帧的图像，因此，
 	 * 需要优先处理帧序号为0的动画。
@@ -275,7 +275,7 @@ static LCUI_Frames *Frames_Stream_Update()
 			break;
 		}
 	}
-	if(frames->current > 0){ 
+	if(frames != NULL && frames->current > 0){ 
 		frame = Queue_Get(&frames->pic, frames->current-1);
 		if(frame == NULL) return NULL;
 		//printf("current time: %ld\n", frame->current_time);

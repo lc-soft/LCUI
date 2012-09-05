@@ -93,11 +93,9 @@ void Free_Graph(LCUI_Graph *pic)
 {
 	LCUI_Graph *p;
 	p = Get_Quote_Graph(pic);
-	if(Valid_Graph(p))
-	{
+	if(Valid_Graph(p)) {
 		Using_Graph(p, 1);
-		if(pic->quote == IS_TRUE)
-		{
+		if(pic->quote == IS_TRUE) {
 			pic->src = NULL; 
 			pic->quote = IS_FALSE;
 		} else {
@@ -127,13 +125,11 @@ void *Malloc_Widget_Private(LCUI_Widget *widget, size_t size)
 int Malloc_Graph(LCUI_Graph *pic, int width, int height)
 /* 功能：为图像数据分配内存资源 */
 {
-	if(width > 10000 || height > 10000)
-	{
+	if(width > 10000 || height > 10000) {
 		printf("error: can not allocate too much memory!\n");
 		exit(-1);
 	}
-	if(height < 0 || width < 0) 
-	{
+	if(height < 0 || width < 0) {
 		Free_Graph(pic);
 		return -1; 
 	}

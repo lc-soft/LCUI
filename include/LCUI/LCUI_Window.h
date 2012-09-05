@@ -66,7 +66,7 @@ struct _LCUI_Window
 	int resize_style;		/* 窗口改变尺寸时使用的特效 */
 	int count;			/* 显示次数计数 */
 	
-	LCUI_Align	init_align;		/* 窗口初始显示位置 */
+	LCUI_Align init_align;		/* 窗口初始显示位置 */
 };
 /***********************************************************/
 

@@ -47,11 +47,11 @@ typedef struct _LCUI_Button LCUI_Button;
 struct _LCUI_Button
 {
 	/* 当风格为Custom_Style(自定义)时，将根据按钮的状态使用这些图形 */
-	LCUI_Graph		btn_normal;		/* 普通状态 */
-	LCUI_Graph		btn_over;		/* 被鼠标覆盖 */
-	LCUI_Graph		btn_down;		/* 按下状态 */
-	LCUI_Graph		btn_focus;		/* 焦点状态 */
-	LCUI_Graph		btn_disable;	/* 不可用的状态 */
+	LCUI_Graph	btn_normal;	/* 普通状态 */
+	LCUI_Graph	btn_over;	/* 被鼠标覆盖 */
+	LCUI_Graph	btn_down;	/* 按下状态 */
+	LCUI_Graph	btn_focus;	/* 焦点状态 */
+	LCUI_Graph	btn_disable;	/* 不可用的状态 */
 	
 	LCUI_Widget	*label;	/* 嵌套的文本标签 */
 };
@@ -61,8 +61,8 @@ LCUI_Widget *Get_Button_Label(LCUI_Widget *widget);
 /* 功能：获取嵌套在按钮部件里的label部件 */ 
 
 void Custom_Button_Style(	LCUI_Widget *widget, LCUI_Graph *normal, 
-							LCUI_Graph *over, LCUI_Graph *down, 
-							LCUI_Graph *focus, LCUI_Graph *disable);
+				LCUI_Graph *over, LCUI_Graph *down, 
+				LCUI_Graph *focus, LCUI_Graph *disable);
 /* 功能：自定义按钮在各种状态下显示的位图 */ 
 
 void Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...);

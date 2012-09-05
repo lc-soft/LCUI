@@ -40,13 +40,14 @@
  * ****************************************************************************/
  
 #include <LCUI_Build.h>
-#include <iconv.h>
 #include LC_LCUI_H
 #include LC_MISC_H
 #include LC_FONT_H
 #include LC_MEM_H
 #include LC_ERROR_H
 #include LC_GRAPHICS_H
+
+#include <iconv.h>
 
 #include FT_GLYPH_H
 

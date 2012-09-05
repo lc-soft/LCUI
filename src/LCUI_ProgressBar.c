@@ -44,8 +44,7 @@
 #include LC_GRAPHICS_H
 #include LC_WIDGET_H
 #include LC_PROGBAR_H
-#include LC_PICBOX_H
-#include LC_THREAD_H
+#include LC_PICBOX_H 
 #include LC_RES_H
 #include LC_MEM_H
 #include <unistd.h>
@@ -128,9 +127,9 @@ static void Destroy_ProgressBar(LCUI_Widget *widget)
 static void ProgressBar_Init(LCUI_Widget *widget)
 /* 功能：初始化进度条的数据结构体 */
 {
-	LCUI_ProgressBar *pb= (LCUI_ProgressBar*)
-									Malloc_Widget_Private
-									(widget, sizeof(LCUI_ProgressBar));
+	LCUI_ProgressBar *pb = (LCUI_ProgressBar*)
+				Malloc_Widget_Private
+				(widget, sizeof(LCUI_ProgressBar));
 	pb->thread = 0;
 	Graph_Init(&pb->fore_graph); 
 	Graph_Init(&pb->flash_image);
@@ -164,8 +163,7 @@ static void Exec_Update_ProgressBar(LCUI_Widget *widget)
 /* 功能：更新进度条的图形 */
 { 
 	LCUI_ProgressBar *pb = (LCUI_ProgressBar*)Get_Widget_Private_Data(widget);
-	if(Strcmp(&widget->style, "dynamic") == 0)
-	{
+	if(Strcmp(&widget->style, "dynamic") == 0) {
 		/* 绘制空槽 */
 		Draw_Empty_Slot(&widget->graph, widget->size.w, widget->size.h);
 		Set_Widget_Border_Style(widget, BORDER_STYLE_NONE);
@@ -180,9 +178,7 @@ static void Exec_Update_ProgressBar(LCUI_Widget *widget)
 				Size(pb->flash_image.width, pb->flash_image.height)); 
 		/* 让图片盒子显示这个图形 */
 		Set_PictureBox_Image_From_Graph(pb->img_pic_box, &pb->flash_image);
-	}
-	else 
-	{
+	} else {
 		Strcpy(&widget->style, "classic");
 		if(!Valid_Graph(&pb->fore_graph)) 
 			Malloc_Graph(&pb->fore_graph, 10, widget->size.h); 
@@ -201,8 +197,7 @@ static void Exec_Update_ProgressBar(LCUI_Widget *widget)
 	
 	Move_Widget(pb->fore_pic_box, Pos(widget->border.left, widget->border.top));
 	/* 改变进度条的尺寸 */
-	Resize_Widget(pb->fore_pic_box, 
-		Size(width, height));
+	Resize_Widget(pb->fore_pic_box, Size(width, height));
 }
 
 
@@ -243,12 +238,10 @@ static void *Move_Flash_Img(void *arg)
 	LCUI_Widget *widget = (LCUI_Widget*)arg;
 	LCUI_Widget *flash = Get_ProgressBar_Flash_Img_Widget(widget);
 	LCUI_ProgressBar *pb = Get_Widget_Private_Data(widget);
-	while(1)
-	{
+	while(1) {
 		for(x=(0-flash->size.w); 
 			x<=flash->parent->size.w; 
-			x+=(pb->img_move_speed/20.0+0.5))
-		{
+			x+=(pb->img_move_speed/20.0+0.5)) {
 			Move_Widget(flash, Pos(x , flash->pos.y));
 			usleep(50000);
 		}
@@ -261,19 +254,14 @@ static void Show_ProgressBar(LCUI_Widget *widget)
 /* 功能：在显示进度条时，处理其它操作 */
 {
 	LCUI_ProgressBar *pb = (LCUI_ProgressBar*)Get_Widget_Private_Data(widget);
-	if(Strcmp(&widget->style, "dynamic") == 0)
-	{
-		if(pb->thread == 0)
-		{
+	if(Strcmp(&widget->style, "dynamic") == 0) {
+		if(pb->thread == 0) {
 			Show_Widget(pb->img_pic_box);
 			LCUI_Thread_Create(&pb->thread, NULL, Move_Flash_Img, (void*)widget);
 		}
-	}
-	else 
-	{
+	} else {
 		Hide_Widget(pb->img_pic_box);
-		if(pb->thread != 0)
-		{/* 否则，如果线程ID不为0，就撤销线程 */
+		if(pb->thread != 0) {/* 否则，如果线程ID不为0，就撤销线程 */
 			LCUI_Thread_Cancel(pb->thread);
 			pb->thread = 0;
 		}
@@ -287,9 +275,9 @@ void Register_ProgressBar()
 	WidgetType_Add("progress_bar");
 	
 	/* 为部件类型关联相关函数 */
-	WidgetFunc_Add("progress_bar",	ProgressBar_Init,		FUNC_TYPE_INIT);
+	WidgetFunc_Add("progress_bar",	ProgressBar_Init,	FUNC_TYPE_INIT);
 	WidgetFunc_Add("progress_bar",	Exec_Update_ProgressBar,FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("progress_bar",	Show_ProgressBar,		FUNC_TYPE_SHOW); 
+	WidgetFunc_Add("progress_bar",	Show_ProgressBar,	FUNC_TYPE_SHOW); 
 	WidgetFunc_Add("progress_bar",	Destroy_ProgressBar,	FUNC_TYPE_DESTROY); 
 }
 

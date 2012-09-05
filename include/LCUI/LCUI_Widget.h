@@ -207,10 +207,10 @@ int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag);
 /* 功能：为部件填充背景图像 */ 
 
 int Mix_Widget_FontBitmap(	LCUI_Widget *widget, 
-							int start_x, int start_y, 
-							LCUI_WString *contents, 
-							int rows, int space, 
-							int linegap, int flag	);
+				int start_x, int start_y, 
+				LCUI_WString *contents, 
+				int rows, int space, 
+				int linegap, int flag	);
 /* 功能：混合部件内的字体位图，使字体能在部件上显示 */ 
 
 void Enable_Widget(LCUI_Widget *widget);

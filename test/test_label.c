@@ -3,8 +3,7 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H 
-#include LC_WINDOW_H
-#include LC_THREAD_H
+#include LC_WINDOW_H 
 #include LC_LABEL_H
 #include LC_MISC_H
 #include LC_GRAPHICS_H

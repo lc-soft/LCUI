@@ -335,7 +335,7 @@ int Size_Cmp(LCUI_Size a, LCUI_Size b)
 }
 //extern int debug_mark;
 int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new, 
-						LCUI_Queue *rq	)
+					LCUI_Queue *rq	)
 /*
  * 功能：将有重叠部分的两个矩形，进行分割，并得到分割后的矩形
  * 说明：主要用于局部区域刷新里，添加的需刷新的区域有可能会与已添加的区域重叠，为避免
@@ -358,45 +358,35 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 	r[0].y = new.y; 
 	//printf("old,pos(%d,%d), size(%d,%d)\n", old.x, old.y, old.width, old.height);
 	//printf("new,pos(%d,%d), size(%d,%d)\n", new.x, new.y, new.width, new.height);
-	if(new.x < old.x)
-	{/* 如果前景矩形在背景矩形的左边 */  
-		if(new.x + new.width > old.x)
-		{ /* 如果X轴上与背景矩形重叠 */  
+	if(new.x < old.x) {/* 如果前景矩形在背景矩形的左边 */  
+		if(new.x + new.width > old.x) { /* 如果X轴上与背景矩形重叠 */  
 			r[0].width = old.x - new.x;
 			r[1].x = old.x;
 			r[2].x = r[1].x;
 			r[4].x = r[2].x;
-			if(new.x + new.width > old.x + old.width)
-			{/* 如果前景矩形在X轴上包含背景矩形 */  
+			/* 如果前景矩形在X轴上包含背景矩形 */  
+			if(new.x + new.width > old.x + old.width) {
 				r[1].width = old.width;
 				
 				r[3].x = old.x + old.width;
 				r[3].width = new.x + new.width - r[3].x;
-			}
-			else  /* 得出矩形2的宽度 */ 
+			} else  /* 得出矩形2的宽度 */ 
 				r[1].width = new.x + new.width - old.x;  
 			/* 得出矩形3和5的宽度 */ 
 			r[2].width = r[1].width;
 			r[4].width = r[2].width;
-		}
-		else return -1; 
-	}
-	else
-	{  
-		if(old.x + old.width > new.x)
-		{ 
+		} else return -1; 
+	} else {  
+		if(old.x + old.width > new.x) { 
 			r[1].x = new.x;
 			r[2].x = r[1].x; 
 			r[4].x = r[2].x;
 			
-			if(new.x + new.width > old.x + old.width)
-			{  
+			if(new.x + new.width > old.x + old.width) {  
 				r[1].width = old.x + old.width - r[1].x;
 				r[3].x = old.x + old.width;
 				r[3].width = new.x + new.width - r[3].x;
-			} 
-			else 
-				r[1].width = new.width; 
+			} else r[1].width = new.width; 
 				
 			r[2].width = r[1].width;
 			r[4].width = r[2].width; 
@@ -409,39 +399,28 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 	r[3].y = new.y;
 	r[3].height = r[0].height;
 	r[4].y = old.y + old.height; 
-	if(new.y < old.y)
-	{  
-		if(new.y + new.height > old.y)
-		{  
+	if(new.y < old.y) {  
+		if(new.y + new.height > old.y) {  
 			r[1].y = new.y; 
 			r[1].height = old.y - new.y;
 			r[2].y = old.y; 
-			
-			if(new.y + new.height > old.y + old.height)
-			{ /* 如果前景矩形在Y轴上包含背景矩形 */ 
+			/* 如果前景矩形在Y轴上包含背景矩形 */ 
+			if(new.y + new.height > old.y + old.height) { 
 				r[2].height = old.height;
 				r[4].height = new.y + new.height - r[4].y; 
-			}
-			else 
-			{ 
+			} else { 
 				r[2].height = new.y + new.height - old.y;  
 			}
 		}
 		else return -1; 
-	}
-	else
-	{  
-		if(new.y < old.y + old.height)
-		{ 
+	} else {  
+		if(new.y < old.y + old.height) { 
 			r[2].y = new.y; 
 			
-			if(new.y + new.height > old.y + old.height)
-			{  
+			if(new.y + new.height > old.y + old.height) {  
 				r[2].height = old.y + old.height - r[2].y;
 				r[4].height = new.y + new.height - r[4].y;
-			}
-			else 
-				r[2].height = new.y + new.height - r[2].y;  
+			} else r[2].height = new.y + new.height - r[2].y;  
 		}
 		else return -1; 
 	}
@@ -453,8 +432,7 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 	//r[4].y += 1;
 	//r[4].height -= 1;
 	  
-	for(i=0; i<5; i++) 
-	{ 
+	for(i=0; i<5; i++) { 
 		//if(debug_mark)
 		//	printf("slip rect[%d]: %d,%d, %d,%d\n", i, r[i].x, r[i].y, r[i].width, r[i].height);
 		Queue_Add(rq, &r[i]); 

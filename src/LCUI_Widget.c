@@ -143,72 +143,6 @@ void Set_Widget_Border_Style(LCUI_Widget *widget, LCUI_Border_Style style)
 	Draw_Widget(widget);
 }
 
-void Split_Screen_Area_By_Widget(LCUI_Widget *widget)
-/* 
- * 功能：根据部件队列中的部件区域，来对区域队列中的区域进行分割
- * 说明：分割后的区域会添加至rect_queue中，并删除被分割的区域。
- *  */
-{
-	//static int count = 0;
-	//int bak_count = count++;
-	//printf("Split_Screen_Area_By_Widget(): enter, count = %d\n", bak_count); 
-	int i,j, total; 
-	LCUI_Pos pos;
-	LCUI_Widget *child;
-	LCUI_Rect rect, temp_rect;
-	LCUI_Queue rq, *widget_list;
-	
-	RectQueue_Init(&rq);
-	if(NULL == widget) 
-		widget_list = &LCUI_Sys.widget_list; 
-	else  
-		widget_list = &widget->child;  
-	
-	total = Queue_Get_Total(widget_list);
-	
-	for(i=total-1; i>=0; --i)
-	{/* 从底到顶遍历子部件 */
-		child = (LCUI_Widget*)Queue_Get(widget_list, i);
-		if(child != NULL && child->visible == IS_TRUE)
-		{/* 如果有子部件 */ 
-			/* 递归调用，根据子部件的区域，分割已记录的区域 */
-			Split_Screen_Area_By_Widget ( child );
-			
-			for(j=0; RectQueue_Get(&rect, j, &LCUI_Sys.update_area); ++j)
-			{/* 获取当前记录的区域 */   
-				/* 获取该部件的实际能显示的区域，并加上它的全局坐标 */
-				temp_rect = Get_Widget_Valid_Rect ( child ); 
-				pos = Get_Widget_Global_Pos ( child );
-				temp_rect.x += pos.x;
-				temp_rect.y += pos.y; 
-				if(!Rect_Valid(temp_rect)) 
-					continue; 
-					
-				if( !Rect_Include_Rect(temp_rect, rect) 
-				&& Rect_Is_Overlay(temp_rect, rect) )
-				{ 
-					/* 既然有重叠区域，那就删除它，将新分割出来的矩形添加进去 */
-					Queue_Delete ( &LCUI_Sys.update_area, j );
-					/* 
-					 * 部件区域作为背景区域，已记录的区域作为前景，
-					 * 并对前景区域进行分割
-					 *  */
-					Cut_Overlay_Rect(temp_rect, rect, &rq);
-					while( RectQueue_Get(&rect, 0, &rq) )
-					{
-						Add_Screen_Refresh_Area(rect);			
-						Queue_Delete(&rq, 0);
-					}
-					--j; 
-				} 
-			}
-		}
-	}
-	//printf("Split_Screen_Area_By_Widget(): quit, count = %d\n", bak_count);
-	Destroy_Queue(&rq);
-	//count--;
-}
-
 void Response_Status_Change(LCUI_Widget *widget)
 /* 
  * 功能：让指定部件响应部件状态的改变
@@ -273,8 +207,8 @@ void Process_Refresh_Area()
  **/
 {
 	//printf("Process_Refresh_Area: enter\n");
-	if ( LCUI_Sys.shift_flag == IS_TRUE )
-	{	/* 如果flag标志的值为IS_TRUE */ 
+	/* 如果flag标志的值为IS_TRUE */ 
+	if ( LCUI_Sys.shift_flag == IS_TRUE ) {	
 		/* 转移部件内记录的区域至主记录中 */ 
 		Shift_Widget_Refresh_Area ( NULL );
 		/* 
@@ -284,8 +218,7 @@ void Process_Refresh_Area()
 		 * */
 		LCUI_Sys.shift_flag = IS_FALSE; 
 	}
-	/* 分割区域，使之不与任何部件的区域重叠 */
-	Split_Screen_Area_By_Widget(NULL);
+	/* 分割区域，使之不与任何部件的区域重叠 */ 
 	//printf("Process_Refresh_Area: quit\n"); 
 }
 
@@ -318,11 +251,9 @@ int LCUI_Destroy_App_Widgets(LCUI_ID app_id)
 	LCUI_Widget *temp;
 	
 	total = Queue_Get_Total(&LCUI_Sys.widget_list);
-	for(i=0; i<total; i++)
-	{
+	for(i=0; i<total; i++) {
 		temp = (LCUI_Widget*)Queue_Get(&LCUI_Sys.widget_list,i);
-		if(temp->app_id == app_id)
-		{
+		if(temp->app_id == app_id) {
 			/* 
 			 * 在Queue_Delete()函数将队列中的部件移除时，会调用初始化部件队列时指
 			 * 定的Destroy_Widget()函数进行部件数据相关的清理。

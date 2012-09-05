@@ -44,13 +44,13 @@ typedef struct _LCUI_Label			LCUI_Label;
 /**************************** lable部件 ********************************/
 struct _LCUI_Label
 {
-	int				auto_size;           /* 自动调整大小(IS_TURE/IS_FALSE) */
+	int auto_size;           /* 自动调整大小(IS_TURE/IS_FALSE) */
 
-	LCUI_Font		font;                /* 保存着字体信息 */
-	LCUI_String	text;                /* 与控件关联的文本，这个是原始字符串 */
-	LCUI_WString	*contents;           /* 内容，记录着每个字的信息以及位图 */
-	int				rows;                /* 内容的行数 */
-	LCUI_Align		text_align;          /* 文本的对齐方式 */
+	LCUI_Font	font;		/* 保存着字体信息 */
+	LCUI_String	text;		/* 与控件关联的文本，这个是原始字符串 */
+	LCUI_WString	*contents;	/* 内容，记录着每个字的信息以及位图 */
+	int		rows;		/* 内容的行数 */
+	LCUI_Align	text_align;	/* 文本的对齐方式 */
 };/* 可用于显示运行时的信息或者说明性文字 */
 /******************************* END ************************************/
 

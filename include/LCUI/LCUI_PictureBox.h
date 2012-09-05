@@ -53,16 +53,16 @@ typedef struct _LCUI_PictureBox	LCUI_PictureBox;
 /**************************** 图片盒子 *********************************/
 struct _LCUI_PictureBox
 {
-	LCUI_Graph		*image;			/* 在PictureBox中显示的图像 */
-	LCUI_Rect		read_box;		/* 显示图像的区域范围 */ 
-	LCUI_Graph		buff_graph;		/* 用于储存缩放后的图形 */
-	float			scale;			/* 缩放比例 */
-	int				size_mode;		/* 控制PictureBox该如何处理图像位置和部件大小 */
+	LCUI_Graph	*image;		/* 在PictureBox中显示的图像 */
+	LCUI_Rect	read_box;	/* 显示图像的区域范围 */ 
+	LCUI_Graph	buff_graph;	/* 用于储存缩放后的图形 */
+	float		scale;		/* 缩放比例 */
+	int		size_mode;	/* 控制PictureBox该如何处理图像位置和部件大小 */
 	
-	LCUI_Graph		error_image;	/* 当加载图像失败时显示的图像 */
-	LCUI_Graph		initial_image;	/* 正在加载另一图像时显示的图像 */ 
+	LCUI_Graph	error_image;	/* 当加载图像失败时显示的图像 */
+	LCUI_Graph	initial_image;	/* 正在加载另一图像时显示的图像 */ 
 	
-	int		image_status;			/* 图片状态(LOADING / FAIL / SUCCESS) */
+	int		image_status;	/* 图片状态(LOADING / FAIL / SUCCESS) */
 };
 /****************************** END ***********************************/
 
