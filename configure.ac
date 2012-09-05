@@ -8,13 +8,28 @@
 
 AC_PREREQ([2.68])
 AC_INIT(LCUI, 0.12.5, lc-soft@live.cn)
+
+# Check system type
+AC_CANONICAL_TARGET
+
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([include/LCUI_Build.h])
 AC_CONFIG_HEADERS([config.h])
 
+# Make --enable-silent-rules the default.
+# To get verbose build output you may configure
+# with --disable-silent-rules or use "make V=1".
+# 默认情况下，是 Make --enable-silent-rules， 也就是启用无声规则，make时输出的是精简的信息。
+# 要获得详细的编译输出，你可以在运行configurue时加上--disable-silent-rules参数或使用"make V=1".
+AM_SILENT_RULES([yes])
+
 # Checks for programs.
 AC_PROG_CC
-AC_PROG_LIBTOOL
+AC_PROG_LIBTOOL 
+AC_PROG_CC_STDC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_PROG_LN_S
 
 # Checks for libraries.
 # 检测LCUI所依赖的库是否存在并且能正常使用
