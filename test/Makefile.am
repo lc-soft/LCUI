@@ -3,7 +3,8 @@ AUTOMAKE_OPTIONS=foreign
 INCLUDES = -I$(top_builddir)/include
 ##需要编译的测试程序, noinst指的是不安装
 noinst_PROGRAMS = helloworld test_font test_radiobtn test_checkbox test_progressbar \
-test_button test_label test_loading ts_calibrate test_viewimage
+test_button test_label test_loading ts_calibrate test_viewimage test_lcui_graph_mix
+
 EXTRA_DIST=README image.jpg logo_128x128.png border.png cross.png ring.png bg.png
 
 ##指定测试程序的源码文件
@@ -42,3 +43,5 @@ test_font_LDADD   = $(top_builddir)/src/libLCUI.la
 test_viewimage_SOURCES = test_viewimage.c
 test_viewimage_LDADD   = $(top_builddir)/src/libLCUI.la
 
+test_lcui_graph_mix_SOURCES = test_lcui_graph_mix.c
+test_lcui_graph_mix_LDADD   = $(top_builddir)/src/libLCUI.la

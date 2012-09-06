@@ -39,7 +39,8 @@ noinst_PROGRAMS = helloworld$(EXEEXT) test_font$(EXEEXT) \
 	test_radiobtn$(EXEEXT) test_checkbox$(EXEEXT) \
 	test_progressbar$(EXEEXT) test_button$(EXEEXT) \
 	test_label$(EXEEXT) test_loading$(EXEEXT) \
-	ts_calibrate$(EXEEXT) test_viewimage$(EXEEXT)
+	ts_calibrate$(EXEEXT) test_viewimage$(EXEEXT) \
+	test_lcui_graph_mix$(EXEEXT)
 subdir = test
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -69,6 +70,9 @@ test_font_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_label_OBJECTS = test_label.$(OBJEXT)
 test_label_OBJECTS = $(am_test_label_OBJECTS)
 test_label_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_test_lcui_graph_mix_OBJECTS = test_lcui_graph_mix.$(OBJEXT)
+test_lcui_graph_mix_OBJECTS = $(am_test_lcui_graph_mix_OBJECTS)
+test_lcui_graph_mix_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_loading_OBJECTS = test_loading.$(OBJEXT)
 test_loading_OBJECTS = $(am_test_loading_OBJECTS)
 test_loading_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -112,14 +116,16 @@ am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(helloworld_SOURCES) $(test_button_SOURCES) \
 	$(test_checkbox_SOURCES) $(test_font_SOURCES) \
-	$(test_label_SOURCES) $(test_loading_SOURCES) \
-	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
-	$(test_viewimage_SOURCES) $(ts_calibrate_SOURCES)
+	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
+	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
+	$(test_radiobtn_SOURCES) $(test_viewimage_SOURCES) \
+	$(ts_calibrate_SOURCES)
 DIST_SOURCES = $(helloworld_SOURCES) $(test_button_SOURCES) \
 	$(test_checkbox_SOURCES) $(test_font_SOURCES) \
-	$(test_label_SOURCES) $(test_loading_SOURCES) \
-	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
-	$(test_viewimage_SOURCES) $(ts_calibrate_SOURCES)
+	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
+	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
+	$(test_radiobtn_SOURCES) $(test_viewimage_SOURCES) \
+	$(ts_calibrate_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -264,6 +270,8 @@ test_font_SOURCES = test_font.c
 test_font_LDADD = $(top_builddir)/src/libLCUI.la
 test_viewimage_SOURCES = test_viewimage.c
 test_viewimage_LDADD = $(top_builddir)/src/libLCUI.la
+test_lcui_graph_mix_SOURCES = test_lcui_graph_mix.c
+test_lcui_graph_mix_LDADD = $(top_builddir)/src/libLCUI.la
 all: all-am
 
 .SUFFIXES:
@@ -322,6 +330,9 @@ test_font$(EXEEXT): $(test_font_OBJECTS) $(test_font_DEPENDENCIES)
 test_label$(EXEEXT): $(test_label_OBJECTS) $(test_label_DEPENDENCIES) 
 	@rm -f test_label$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_label_OBJECTS) $(test_label_LDADD) $(LIBS)
+test_lcui_graph_mix$(EXEEXT): $(test_lcui_graph_mix_OBJECTS) $(test_lcui_graph_mix_DEPENDENCIES) 
+	@rm -f test_lcui_graph_mix$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_lcui_graph_mix_OBJECTS) $(test_lcui_graph_mix_LDADD) $(LIBS)
 test_loading$(EXEEXT): $(test_loading_OBJECTS) $(test_loading_DEPENDENCIES) 
 	@rm -f test_loading$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_loading_OBJECTS) $(test_loading_LDADD) $(LIBS)
@@ -349,6 +360,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_checkbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_label.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_lcui_graph_mix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_loading.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_progressbar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_radiobtn.Po@am__quote@
