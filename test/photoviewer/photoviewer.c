@@ -18,12 +18,17 @@
 #include <dirent.h>
 #include <locale.h>
 #include <math.h>
+
+//定义图片盒子和窗口的尺寸
+#define IMAGE_BOX_SIZE	Size(318, 215)
+#define WINDOW_SIZE	Size(320, 240)
+
 /* 与这些函数共享数据，只有使用全局变量，传参数很麻烦 */
 static LCUI_Widget	*window, *image_box, *tip_text, *tip_box,
 			*image_info_text, *image_info_box,
 			*btn_zoom[2], *btn_switch[2], *container[2];
 						
-static float	mini_scale = 0, scale = 1;   /* 记录缩放比率 */
+static float	mini_scale = 1.0, scale = 1.0;   /* 记录缩放比率 */
 static char	name[256], **filename = NULL;
 static int		total_files = 0, current = 0;
 
@@ -293,28 +298,30 @@ void *load_imagefile(void *file)
 			break;
 		}
 	}
-	
+	 
 	image = Get_PictureBox_Graph(image_box); 
-	Free_Graph(image); 
-	
-	Set_PictureBox_Size_Mode(image_box, SIZE_MODE_CENTER); 
+	Free_Graph(image);  
+	Set_PictureBox_Size_Mode(image_box, SIZE_MODE_CENTER);
 	*result = Set_PictureBox_Image_From_File(image_box, file); 
-	
 	if(*result != 0) {/* 如果图片文件读取失败 */
 		Set_Label_Text(tip_text, "图片载入失败!");
 		size.w = 0;
 		size.h = 0;
 	} else {
 		image = Get_PictureBox_Graph(image_box); 
-		size = Get_Graph_Size(image);
-		if( 1 == Size_Cmp(size, Get_Widget_Size(image_box) )) {
-		/* 如果图片尺寸大于PictureBox的尺寸，就改变PictureBox的图像处理模式 */
+		size = Get_Graph_Size(image); 
+		/* 
+		 * 不能使用Get_Widget_Size()函数获取image_box，因为
+		 * 该函数获取的尺寸可能不准确 
+		 * */ 
+		if( 1 == Size_Cmp(size, IMAGE_BOX_SIZE)) {
+		/* 如果图片尺寸大于image_box的尺寸，就改变image_box的图像处理模式 */ 
 			Set_PictureBox_Size_Mode(image_box, SIZE_MODE_BLOCK_ZOOM);
 			mini_scale = Get_PictureBox_Zoom_Scale(image_box);
-		} else mini_scale = 0.25;
+		} else mini_scale = 0.25; 
 		Hide_Widget(tip_box);
-	}
-		
+	} 
+	
 	scale = Get_PictureBox_Zoom_Scale(image_box); 
 	Set_Label_Text(
 		image_info_text, 
@@ -322,8 +329,8 @@ void *load_imagefile(void *file)
 		"尺寸： %d x %d 像素\n"
 		"缩放： %.2f%%",
 		current+1, total_files, name,
-		size.w, size.h, 100*scale);
-	/* 设置透明度 */
+		size.w, size.h, 100*scale); 
+	/* 设置透明度 */ 
 	image_info_box->set_alpha(image_info_box, 200);
 	Show_Widget(image_info_text);
 	Show_Widget(image_info_box);
@@ -343,8 +350,10 @@ void *viewer(void *file)
 		scale = Get_PictureBox_Zoom_Scale(image_box); /* 获取缩放比例 */
 		image = Get_PictureBox_Graph(image_box); /* 获取图像指针 */
 		if(Graph_Is_PNG(image) && Graph_Have_Alpha(image)) {
-			Load_Graph_Mosaics(&bg);/* 载入马赛克图形 */
-			Set_Widget_Background_Image(image_box, &bg, LAYOUT_TILE);/* 平铺背景图 */
+			/* 载入马赛克图形 */
+			Load_Graph_Mosaics(&bg);
+			/* 平铺背景图 */
+			Set_Widget_Background_Image(image_box, &bg, LAYOUT_TILE);
 			Free_Graph(&bg);
 		} else Set_Widget_Background_Image(image_box, NULL, LAYOUT_NONE);
 	}
@@ -469,14 +478,14 @@ int main(int argc, char*argv[])
 	size[1] = Size( btn_switch_size[0].w+btn_switch_size[1].w,
 			btn_switch_size[0].h);
 	/* 更改各个部件的尺寸 */
-	Resize_Widget(window, Size(320, 240));
+	Resize_Widget(window, WINDOW_SIZE);
 	Resize_Widget(btn_zoom[0], btn_zoom_size[0]);
 	Resize_Widget(btn_zoom[1], btn_zoom_size[1]);
 	Resize_Widget(btn_switch[0], btn_switch_size[0]);
 	Resize_Widget(btn_switch[1], btn_switch_size[1]);
 	Resize_Widget(container[0], size[0]);
 	Resize_Widget(container[1], size[1]);
-	Resize_Widget(image_box, Size(318, 213));
+	Resize_Widget(image_box, IMAGE_BOX_SIZE);
 	Resize_Widget(tip_box, Size(150, 30));
 	
 	/* 设定标题栏中显示的程序图标以及文本 */
