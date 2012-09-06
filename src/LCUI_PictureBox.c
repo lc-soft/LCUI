@@ -123,6 +123,18 @@ static int Update_ReadBox(LCUI_Widget *widget)
 	
 	if(pic_box->scale == 1.00) p = pic_box->image;
 	else p = &pic_box->buff_graph;  
+	
+	/* 如果部件的宽或者高不大于0 */
+	if( widget->size.w <= 0 || widget->size.h <= 0 ) { 
+		pic_box->read_box.x = 0;
+		pic_box->read_box.y = 0;
+		pic_box->read_box.width = p->width;
+		pic_box->read_box.height = p->height;
+		pic_box->read_box.center_x = 0.5;
+		pic_box->read_box.center_y = 0.5;
+		return 0;
+	}
+	
 	/* 如果缩放后的图像的宽度还是不大于部件的宽度 */
 	if(width <= widget->size.w) {
 		pic_box->read_box.width = width;
@@ -404,13 +416,14 @@ void Set_PictureBox_Size_Mode(LCUI_Widget *widget, int mode)
 	switch(mode) {
 	case SIZE_MODE_BLOCK_ZOOM:
 	case SIZE_MODE_ZOOM:
-		scale_x = (float)widget->size.w / pic_box->image->width;
-		scale_y = (float)widget->size.h / pic_box->image->height;
-		if(scale_x < scale_y) pic_box->scale = scale_x;
-		else pic_box->scale = scale_y;
-		
-		pic_box->read_box.center_x = 0.5;
-		pic_box->read_box.center_y = 0.5;
+		if( widget->size.w <= 0 || widget->size.h <= 0) {
+			pic_box->scale = 1.0; 
+		} else {
+			scale_x = (float)widget->size.w / pic_box->image->width;
+			scale_y = (float)widget->size.h / pic_box->image->height;
+			if(scale_x < scale_y) pic_box->scale = scale_x;
+			else pic_box->scale = scale_y; 	
+		}
 		Zoom_PictureBox_View_Area(widget, pic_box->scale); 
 		break;
 	default: break;
@@ -526,11 +539,12 @@ int Zoom_PictureBox_View_Area(LCUI_Widget *widget, float scale)
 	/* 有效范围为2%~2000% */
 	if(scale < 0.02) scale = 0.02;
 	if(scale > 20) scale = 20;
-	pic_box->size_mode = SIZE_MODE_ZOOM; /* 改为缩放模式 */
-	pic_box->scale = scale;
-	
-	Update_BuffGraph(widget);
-	Update_ReadBox(widget); 
+	if(pic_box->size_mode != SIZE_MODE_ZOOM
+	 && pic_box->size_mode != SIZE_MODE_BLOCK_ZOOM) 
+		pic_box->size_mode = SIZE_MODE_ZOOM; /* 改为缩放模式 */
+	pic_box->scale = scale; 
+	Update_BuffGraph(widget); 
+	Update_ReadBox(widget);
 	Draw_Widget(widget);
 	Refresh_Widget(widget);
 	return 0;
