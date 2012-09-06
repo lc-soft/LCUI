@@ -1033,72 +1033,6 @@ void Tile_Graph(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 	End_Use_Graph(src); 
 }
 
-static inline void rgba_mix(
-		LCUI_Graph *des, unsigned int m, 
-		LCUI_Graph *src, unsigned int n, 
-		unsigned char alpha )
-/* 功能：于进行像素点的alpha混合
- * 说明：这是个内联函数，取代了表达式形式的宏定义，没有它的缺点，同时又很好地继承了它
- * 的优点。
- * */
-{ 
-	#ifdef use_slow_method
-	float z;
-	#endif
-	/* 乘除法运算量较多，不知如何优化 */ 
-	switch(alpha) {
-	/* 某些alpha值可以用位移，避免了乘除法运算，提升效率 */
-	    case 255:
-		des->rgba[0][m] = src->rgba[0][n];
-		des->rgba[1][m] = src->rgba[1][n];
-		des->rgba[2][m] = src->rgba[2][n]; 
-		break;
-	    case 128:
-	    case 127: 
-		des->rgba[0][m] += ((src->rgba[0][n] - des->rgba[0][m])>>1);
-		des->rgba[1][m] += ((src->rgba[1][n] - des->rgba[1][m])>>1);
-		des->rgba[2][m] += ((src->rgba[2][n] - des->rgba[2][m])>>1); 
-		break;
-	    case 63:
-	    case 64:
-		des->rgba[0][m] += ((src->rgba[0][n] - des->rgba[0][m])>>2);
-		des->rgba[1][m] += ((src->rgba[1][n] - des->rgba[1][m])>>2);
-		des->rgba[2][m] += ((src->rgba[2][n] - des->rgba[2][m])>>2); 
-		break;
-	    case 31:
-	    case 32:
-		des->rgba[0][m] += ((src->rgba[0][n] - des->rgba[0][m])>>3);
-		des->rgba[1][m] += ((src->rgba[1][n] - des->rgba[1][m])>>3);
-		des->rgba[2][m] += ((src->rgba[2][n] - des->rgba[2][m])>>3); 
-		break;
-	    case 15:
-	    case 16:
-		des->rgba[0][m] += ((src->rgba[0][n] - des->rgba[0][m])>>4);
-		des->rgba[1][m] += ((src->rgba[1][n] - des->rgba[1][m])>>4);
-		des->rgba[2][m] += ((src->rgba[2][n] - des->rgba[2][m])>>4); 
-	    case 0: break;
-	    default:
-		#ifdef use_slow_method
-		//以下代码运算速度慢，可能是由于使用了浮点数的原因
-		/* alpha混合公式简化
-		 * a = (b*j + a*(255-j))/255;
-		 * a = b*j/255 + a*(255-j)/255;
-		 * a = b*j/255 + a - a*j/255;
-		 * a = (b - a)*j/255 + a;
-		 * */
-		z = alpha/255.0;
-		des->rgba[0][m] += (src->rgba[0][n] - des->rgba[0][m])*z;
-		des->rgba[1][m] += (src->rgba[1][n] - des->rgba[1][m])*z;
-		des->rgba[2][m] += (src->rgba[2][n] - des->rgba[2][m])*z;
-		#else
-		des->rgba[0][m] = (src->rgba[0][n]*alpha + des->rgba[0][m]*(255-alpha))/255;
-		des->rgba[1][m] = (src->rgba[1][n]*alpha + des->rgba[1][m]*(255-alpha))/255;
-		des->rgba[2][m] = (src->rgba[2][n]*alpha + des->rgba[2][m]*(255-alpha))/255;
-		#endif
-		break;
-	}
-}
-
 int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 /* 
  * 功能：将前景图与背景图混合叠加
@@ -1107,7 +1041,7 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 {
 	unsigned char *r1, *g1, *a1, *b1, *r2, *g2, *b2; 
 
-	unsigned int total, x = 0, y = 0,temp, count, m, n;
+	unsigned int total, y = 0, m, n;
 	unsigned char j;//, alpha; 
 	float k;
 	LCUI_Graph *src, *des;
@@ -1148,7 +1082,7 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 				 * for (x = 0; x < cut.width; ++x) {
 				 *   temp = m + x; //得出图片内需要读取的区域的各点坐标
 				 *   count = n + x; //得出需填充至窗口的各点的坐标 
-				 *   rgba_mix(des, count, src, temp, src->rgba[3][temp]);
+				 *   ......
 				 * }
 				 * 为了尽可能的提高效率，使用了以下简化的代码：
 				 * */
@@ -1156,7 +1090,9 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 				total = n + cut.width;
 				/* 根据alpha通道来混合像素点 */
 				for (; n < total; ++n,++m) { 
-					rgba_mix(des, n, src, m, src->rgba[3][m]);
+					des->rgba[0][n] = (src->rgba[0][m]*src->rgba[3][m] + des->rgba[0][n]*(255-src->rgba[3][m]))/255;
+					des->rgba[1][n] = (src->rgba[1][m]*src->rgba[3][m] + des->rgba[1][n]*(255-src->rgba[3][m]))/255;
+					des->rgba[2][n] = (src->rgba[2][m]*src->rgba[3][m] + des->rgba[2][n]*(255-src->rgba[3][m]))/255; 
 				}
 				//
 			}
@@ -1167,7 +1103,9 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 				total = n + cut.width; 
 				for (; n < total; ++n,++m) { 
 					j = src->rgba[3][m] * k;
-					rgba_mix(des, n, src, m, j);
+					des->rgba[0][n] = (src->rgba[0][m]*j + des->rgba[0][n]*(255-j))/255;
+					des->rgba[1][n] = (src->rgba[1][m]*j + des->rgba[1][n]*(255-j))/255;
+					des->rgba[2][n] = (src->rgba[2][m]*j + des->rgba[2][n]*(255-j))/255;
 				}
 			} 
 		} 
@@ -1175,11 +1113,12 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 		for (y = 0; y < cut.height; ++y) {
 			m = (cut.y + y + src_rect.y) * src->width + cut.x + src_rect.x;
 			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
-			for (x = 0; x < cut.width; ++x) {
-				temp = m + x;
-				count = n + x;
-				rgba_mix(des, count, src, temp, fore_graph->alpha);
-			}
+			total = n + cut.width; 
+			for (; n < total; ++n,++m) {
+				des->rgba[0][n] = (src->rgba[0][m]*fore_graph->alpha + des->rgba[0][n]*(255-fore_graph->alpha))/255;
+				des->rgba[1][n] = (src->rgba[1][m]*fore_graph->alpha + des->rgba[1][n]*(255-fore_graph->alpha))/255;
+				des->rgba[2][n] = (src->rgba[2][m]*fore_graph->alpha + des->rgba[2][n]*(255-fore_graph->alpha))/255;
+			} 
 		}
 	} else {/* 如果前景图形没有透明效果 */
 		for (y = 0; y < cut.height; ++y) { 
@@ -1221,7 +1160,7 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 {
 	unsigned char *r1, *g1, *a1, *a2, *b1, *r2, *g2, *b2;
 
-	int x = 0, y = 0,temp, count, m, n;
+	int y = 0,total, m, n;
 	unsigned char j, k; 
 	
 	LCUI_Graph *src, *des;
@@ -1253,11 +1192,12 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 		for (y = 0; y < cut.height; ++y) {
 			m = (cut.y + y + src_rect.y) * src->width + cut.x + src_rect.x;
 			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
-			for (x = 0; x < cut.width; ++x) {
-				temp = m + x; 
-				count = n + x; 
-				j = src->rgba[3][temp] * k;
-				rgba_mix(des, count, src, temp, j);
+			total = n + cut.width; 
+			for (; n < total; ++n,++m) {
+				j = src->rgba[3][m] * k; 
+				des->rgba[0][n] = (src->rgba[0][m]*j + 255*(255-j))/255;
+				des->rgba[1][n] = (src->rgba[1][m]*j + 255*(255-j))/255;
+				des->rgba[2][n] = (src->rgba[2][m]*j + 255*(255-j))/255; 
 			}
 		}
 	} else {
