@@ -156,7 +156,10 @@ int Widget_Is_Active(LCUI_Widget *widget);
 /* 功能：判断部件是否为活动状态 */ 
 
 LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget);
-/* 功能：获取部件在屏幕中实际显示的区域 */ 
+/* 
+ * 功能：获取部件在屏幕中实际显示的区域 
+ * 说明：返回的是部件需要裁剪的区域
+ * */
 
 int Empty_Widget();
 /* 
