@@ -30,7 +30,7 @@ static LCUI_Widget	*window, *image_box, *tip_text, *tip_box,
 						
 static float	mini_scale = 1.0, scale = 1.0;   /* 记录缩放比率 */
 static char	name[256], **filename = NULL;
-static int		total_files = 0, current = 0;
+static int	total_files = 0, current = 0;
 
 static pthread_t thread_hide, thread_loading, thread_viewer;
 
@@ -241,37 +241,43 @@ char **scan_imgfile(char *dir, int *file_num)
 	char **filelist, format[256], path[1024];
 	struct dirent **namelist;
 	
-	if(strlen(dir) == 0) n = scandir(".", &namelist, 0, alphasort);
-	else n = scandir(dir, &namelist, 0, alphasort);
+	if(dir[strlen(dir)-2] != '/') {
+		strcat(dir, "/");
+	}
+	if(strlen(dir) == 0) {
+		n = scandir(".", &namelist, 0, alphasort);
+	} else {
+		n = scandir(dir, &namelist, 0, alphasort);
+	}
 	
 	if (n < 0) return 0; 
-	else  {
-		filelist = (char **)malloc(sizeof(char *)*n);
-		for(i=0, *file_num=0; i<n; i++) {
-			if(namelist[i]->d_type==8) {/* 如果是文件 */ 
-				get_format(format, namelist[i]->d_name);
-				if(strlen(format) > 2 && 
-				(strcasecmp(format, "png") == 0
-				|| strcasecmp(format, "bmp") == 0
-				|| strcasecmp(format, "jpg") == 0
-				|| strcasecmp(format, "jpeg") == 0)) {
-					sprintf(path, "%s%s", dir, namelist[i]->d_name);
-					len = strlen( path );
-					filelist[*file_num] = (char *)malloc(sizeof(char)*(len+1)); 
-					strcpy(filelist[*file_num], path);  
-					++*file_num;
-				}
+	
+	filelist = (char **)malloc(sizeof(char *)*n);
+	for(i=0, *file_num=0; i<n; i++) {
+		if(namelist[i]->d_type==8) {/* 如果是文件 */ 
+			get_format(format, namelist[i]->d_name);
+			if(strlen(format) > 2 && 
+			(strcasecmp(format, "png") == 0
+			|| strcasecmp(format, "bmp") == 0
+			|| strcasecmp(format, "jpg") == 0
+			|| strcasecmp(format, "jpeg") == 0)) {
+				sprintf(path, "%s%s", dir, namelist[i]->d_name);
+				len = strlen( path );
+				filelist[*file_num] = (char *)malloc(sizeof(char)*(len+1)); 
+				strcpy(filelist[*file_num], path);  
+				++*file_num;
 			}
 		}
-		if(*file_num > 0)
-			filelist = (char**)realloc(filelist, *file_num*sizeof(char*));
-		else {
-			free(filelist);
-			filelist = NULL;
-		}
 	}
-	for(i=0;i<n;++i)
+	if(*file_num > 0) {
+		filelist = (char**)realloc(filelist, *file_num*sizeof(char*));
+	} else {
+		free(filelist);
+		filelist = NULL;
+	} 
+	for(i=0;i<n;++i) {
 		free(namelist[i]); 
+	}
 	free(namelist); 
 	
 	return filelist;
@@ -279,7 +285,7 @@ char **scan_imgfile(char *dir, int *file_num)
 
 void *load_imagefile(void *file)
 /* 功能：载入图片文件 */
-{
+{ 
 	LCUI_Size size;
 	LCUI_Graph *image;
 	int *result, i;
@@ -493,11 +499,12 @@ int main(int argc, char*argv[])
 	
 	char version[20];
 	Get_LCUI_Version(version);
-	if(strcmp(version, "0.12.5") == 0) 
+	if(strcmp(version, "0.12.5") == 0) {
 		Set_Window_Title_Text(window, "照片查看器 v0.4"); 
-	else 
+	} else {
 		Set_Window_Title_Text(window, 
 		 "照片查看器 v0.3 <color=240,0,0>(存在兼容性问题)</color>"); 
+	 }
 	
 	/* 设定部件的布局 */
 	Set_Widget_Align(btn_zoom[0], ALIGN_BOTTOM_CENTER, Pos(0, 0));
@@ -539,9 +546,24 @@ int main(int argc, char*argv[])
 	LCUI_Key_Event_Connect( KEY_ESC,   Main_Loop_Quit,  NULL);
 	if(argc == 2) {/* 如果总共有2个参数 */ 
 		char path[1024];
-		get_filepath(argv[1], path);
-		filename = scan_imgfile(path, &total_files); 
-		open_image_file (argv[1]);
+		DIR *dirptr = NULL; 
+		
+		/* 判断这个文件路径是文件还是目录 */ 
+		if((dirptr = opendir(argv[1])) == NULL) {
+			get_filepath(argv[1], path);
+			filename = scan_imgfile(path, &total_files);
+			open_image_file (argv[1]);
+		} else {
+			closedir(dirptr);
+			filename = scan_imgfile(argv[1], &total_files);
+			/* 判断文件数是否有效 */
+			if( total_files > 0 ) {
+				open_image_file (filename[0]);
+			} else {
+				goto skip_openfile;
+			}
+		} 
+		
 		Show_Widget(btn_zoom[0]);
 		Show_Widget(btn_zoom[1]);
 		Show_Widget(btn_switch[0]);
@@ -563,6 +585,7 @@ int main(int argc, char*argv[])
 		Widget_Clicked_Event_Connect( image_box, show_button, NULL);
 		LCUI_Thread_Create(&thread_hide, NULL, hide, NULL);
 	} else {
+skip_openfile:;
 		char myname[256];
 		LCUI_Widget *help_text;
 		get_filename(argv[0], myname);
