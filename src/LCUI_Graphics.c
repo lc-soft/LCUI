@@ -1072,8 +1072,8 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 	Using_Graph(des, 1);
 	/* 如果前景图形有alpha通道 */
 	if(Graph_Have_Alpha(src)) {
-		k = fore_graph->alpha / 255.0;
-		if(fore_graph->alpha == 255){
+		k = src->alpha / 255.0;
+		if(src->alpha == 255){
 			for (y = 0; y < cut.height; ++y) {
 				m = (cut.y + y + src_rect.y) * src->width + cut.x + src_rect.x;
 				n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
