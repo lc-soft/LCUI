@@ -84,6 +84,8 @@ static void Move_Window(LCUI_Widget *titlebar, LCUI_DragEvent *event)
 		if(window != NULL) {
 			/* 减去在窗口中的相对坐标, 得出窗口位置 */
 			pos = Pos_Sub(pos, Get_Widget_Pos(titlebar));
+			if(window->parent != NULL)
+				pos = Pos_Sub(pos, Get_Widget_Global_Pos(window->parent));
 			/* 移动窗口的位置 */
 			Move_Widget(window, pos);
 		}
