@@ -117,8 +117,8 @@ void Free_Graph(LCUI_Graph *pic)
 void *Malloc_Widget_Private(LCUI_Widget *widget, size_t size)
 /* 功能：为部件私有结构体指针分配内存 */
 {
-	widget->private = malloc(size);
-	return widget->private;
+	widget->private_data = malloc(size);
+	return widget->private_data;
 }
 
 

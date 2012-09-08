@@ -509,7 +509,7 @@ struct _LCUI_Border
 
 /******************************* 部件 **********************************/
 struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
-{ 
+{
 	int		lock_display;	/* 指示是否锁定部件的显示顺序 */
 	
 	LCUI_String	type;		/* 部件的类型 */
@@ -527,7 +527,7 @@ struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
 	int visible;		/* 确定该部件是可见的还是隐藏的 */
 	int status;		/* 部件的状态 */
 	
-	void *private;   /* 该部件私有的数据的指针，其它的是各个部件公用的数据 */
+	void *private_data;   /* 该部件私有的数据的指针，其它的是各个部件公用的数据 */
 	
 	LCUI_Pos	pos;		/* 位置 */
 	/* max_pos和min_pos限制了widget的移动范围 */
@@ -673,6 +673,9 @@ struct _LCUI_System
 /***********************************************************************/
 
 extern LCUI_System  LCUI_Sys;
+
+LCUI_BEGIN_HEADER
+
 void Set_Default_Font(char *fontfile);
 /* 
  * 功能：设定默认的字体文件路径
@@ -685,9 +688,6 @@ LCUI_App *Find_App(LCUI_ID id);
 
 LCUI_App* Get_Self_AppPointer();
 /* 功能：获取程序的指针 */ 
-
-int App_Quit();
-/* 功能：退出程序 */ 
 
 void Main_Loop_Quit();
 /* 功能：让程序退出主循环 */ 
@@ -767,9 +767,17 @@ int Using_GB2312();
 /* 
  * 说明：如果你的系统只能使用GB2312编码，不能使用UTF-8编码，可以使用这
  * 个函数进行设置，让相关函数正常转换字符编码 
- * */
- 
-#endif /* __LCUI_H__ */
+ * */ 
 
+LCUI_END_HEADER
+
+#include LC_MISC_H
+
+/* 如果是使用C++语言，那么就包含LCUI的C++版头文件 */
+#ifdef __cplusplus
+#include LC_LCUI_HPP
+#endif
+
+#endif /* __LCUI_H__ */
 
 

@@ -43,14 +43,25 @@
 #define _GNU_SOURCE
 #endif
 
+#ifdef __cplusplus
+#define LCUI_BEGIN_HEADER  extern "C"{
+#define LCUI_END_HEADER  }
+#else
+#define LCUI_BEGIN_HEADER  /* nothing */
+#define LCUI_END_HEADER
+#endif
+
 #ifndef __LCUI_BUILD_UNIX_H__
 #define __LCUI_BUILD_UNIX_H__
 
 #define LC_LCUI_H	<LCUI/LCUI.h>
+#define LC_LCUI_HPP	<LCUI/LCUI.hpp>
 #define LC_MISC_H	<LCUI/LCUI_Misc.h>
 #define LC_FONT_H	<LCUI/LCUI_Font.h>
 #define LC_GRAPHICS_H	<LCUI/LCUI_Graphics.h>
+#define LC_GRAPHICS_HPP	<LCUI/LCUI_Graphics.hpp>
 #define LC_WIDGET_H	<LCUI/LCUI_Widget.h>
+#define LC_WIDGET_HPP	<LCUI/LCUI_Widget.hpp>
 #define LC_QUEUE_H	<LCUI/LCUI_Queue.h> 
 #define LC_CURSOR_H	<LCUI/LCUI_Cursor.h> 
 #define LC_WORK_H	<LCUI/LCUI_Work.h> 

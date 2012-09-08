@@ -73,7 +73,7 @@ void Border_Init(LCUI_Border *in)
 
 
 
-void Strcpy (LCUI_String * des, char *src)
+void Strcpy (LCUI_String * des, const char *src)
 /* 功能：拷贝字符串至String结构体数据中 */
 {
 	if(des == NULL) 
@@ -334,7 +334,7 @@ int Size_Cmp(LCUI_Size a, LCUI_Size b)
 		return -1;
 }
 //extern int debug_mark;
-int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new, 
+int Cut_Overlay_Rect (	LCUI_Rect old_rect, LCUI_Rect new_rect, 
 					LCUI_Queue *rq	)
 /*
  * 功能：将有重叠部分的两个矩形，进行分割，并得到分割后的矩形
@@ -354,39 +354,39 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 		Rect_Init(&r[i]); 
 	
 	/* 计算各个矩形的x轴坐标和宽度 */
-	r[0].x = new.x;
-	r[0].y = new.y; 
-	//printf("old,pos(%d,%d), size(%d,%d)\n", old.x, old.y, old.width, old.height);
-	//printf("new,pos(%d,%d), size(%d,%d)\n", new.x, new.y, new.width, new.height);
-	if(new.x < old.x) {/* 如果前景矩形在背景矩形的左边 */  
-		if(new.x + new.width > old.x) { /* 如果X轴上与背景矩形重叠 */  
-			r[0].width = old.x - new.x;
-			r[1].x = old.x;
+	r[0].x = new_rect.x;
+	r[0].y = new_rect.y; 
+	//printf("old,pos(%d,%d), size(%d,%d)\n", old_rect.x, old_rect.y, old_rect.width, old_rect.height);
+	//printf("new,pos(%d,%d), size(%d,%d)\n", new_rect.x, new_rect.y, new_rect.width, new_rect.height);
+	if(new_rect.x < old_rect.x) {/* 如果前景矩形在背景矩形的左边 */  
+		if(new_rect.x + new_rect.width > old_rect.x) { /* 如果X轴上与背景矩形重叠 */  
+			r[0].width = old_rect.x - new_rect.x;
+			r[1].x = old_rect.x;
 			r[2].x = r[1].x;
 			r[4].x = r[2].x;
 			/* 如果前景矩形在X轴上包含背景矩形 */  
-			if(new.x + new.width > old.x + old.width) {
-				r[1].width = old.width;
+			if(new_rect.x + new_rect.width > old_rect.x + old_rect.width) {
+				r[1].width = old_rect.width;
 				
-				r[3].x = old.x + old.width;
-				r[3].width = new.x + new.width - r[3].x;
+				r[3].x = old_rect.x + old_rect.width;
+				r[3].width = new_rect.x + new_rect.width - r[3].x;
 			} else  /* 得出矩形2的宽度 */ 
-				r[1].width = new.x + new.width - old.x;  
+				r[1].width = new_rect.x + new_rect.width - old_rect.x;  
 			/* 得出矩形3和5的宽度 */ 
 			r[2].width = r[1].width;
 			r[4].width = r[2].width;
 		} else return -1; 
 	} else {  
-		if(old.x + old.width > new.x) { 
-			r[1].x = new.x;
+		if(old_rect.x + old_rect.width > new_rect.x) { 
+			r[1].x = new_rect.x;
 			r[2].x = r[1].x; 
 			r[4].x = r[2].x;
 			
-			if(new.x + new.width > old.x + old.width) {  
-				r[1].width = old.x + old.width - r[1].x;
-				r[3].x = old.x + old.width;
-				r[3].width = new.x + new.width - r[3].x;
-			} else r[1].width = new.width; 
+			if(new_rect.x + new_rect.width > old_rect.x + old_rect.width) {  
+				r[1].width = old_rect.x + old_rect.width - r[1].x;
+				r[3].x = old_rect.x + old_rect.width;
+				r[3].width = new_rect.x + new_rect.width - r[3].x;
+			} else r[1].width = new_rect.width; 
 				
 			r[2].width = r[1].width;
 			r[4].width = r[2].width; 
@@ -395,32 +395,32 @@ int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new,
 	}
 	 
 	/* 计算各个矩形的y轴坐标和高度 */
-	r[0].height = new.height;
-	r[3].y = new.y;
+	r[0].height = new_rect.height;
+	r[3].y = new_rect.y;
 	r[3].height = r[0].height;
-	r[4].y = old.y + old.height; 
-	if(new.y < old.y) {  
-		if(new.y + new.height > old.y) {  
-			r[1].y = new.y; 
-			r[1].height = old.y - new.y;
-			r[2].y = old.y; 
+	r[4].y = old_rect.y + old_rect.height; 
+	if(new_rect.y < old_rect.y) {  
+		if(new_rect.y + new_rect.height > old_rect.y) {  
+			r[1].y = new_rect.y; 
+			r[1].height = old_rect.y - new_rect.y;
+			r[2].y = old_rect.y; 
 			/* 如果前景矩形在Y轴上包含背景矩形 */ 
-			if(new.y + new.height > old.y + old.height) { 
-				r[2].height = old.height;
-				r[4].height = new.y + new.height - r[4].y; 
+			if(new_rect.y + new_rect.height > old_rect.y + old_rect.height) { 
+				r[2].height = old_rect.height;
+				r[4].height = new_rect.y + new_rect.height - r[4].y; 
 			} else { 
-				r[2].height = new.y + new.height - old.y;  
+				r[2].height = new_rect.y + new_rect.height - old_rect.y;  
 			}
 		}
 		else return -1; 
 	} else {  
-		if(new.y < old.y + old.height) { 
-			r[2].y = new.y; 
+		if(new_rect.y < old_rect.y + old_rect.height) { 
+			r[2].y = new_rect.y; 
 			
-			if(new.y + new.height > old.y + old.height) {  
-				r[2].height = old.y + old.height - r[2].y;
-				r[4].height = new.y + new.height - r[4].y;
-			} else r[2].height = new.y + new.height - r[2].y;  
+			if(new_rect.y + new_rect.height > old_rect.y + old_rect.height) {  
+				r[2].height = old_rect.y + old_rect.height - r[2].y;
+				r[4].height = new_rect.y + new_rect.height - r[4].y;
+			} else r[2].height = new_rect.y + new_rect.height - r[2].y;  
 		}
 		else return -1; 
 	}

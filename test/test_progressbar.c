@@ -66,10 +66,13 @@ int main(int argc, char*argv[])
 	
 	LCUI_Widget *window, *pb_a, *pb_b;
 	/* 创建部件 */
+	printf("main(): create widget\n");
 	window = Create_Widget("window");
 	pb_a = Create_Widget("progress_bar");
 	pb_b = Create_Widget("progress_bar");
+	printf("main(): create widget done\n");
 	/* 设定窗口标题的文本 */
+	printf("main(): setting widget\n");
 	Set_Window_Title_Text(window, "测试进度条部件"); 
 	/* 改变窗口的尺寸 */
 	Resize_Widget(window, Size(320, 240));
@@ -85,13 +88,17 @@ int main(int argc, char*argv[])
 	/* 改变部件尺寸 */
 	Resize_Widget(pb_a, Size(300, 25));
 	Resize_Widget(pb_b, Size(300, 25));
+	printf("main(): create thread 1\n");
 	/* 创建线程，此函数和pthread_create函数用法一样 */
 	LCUI_Thread_Create(&t[0], NULL, change_progress_1, (void*)pb_a);
+	printf("main(): create thread 2\n");
 	LCUI_Thread_Create(&t[1], NULL, change_progress_2, (void*)pb_b); 
+	printf("main(): create thread done\n");
 	/* 显示部件 */
 	Show_Widget(pb_a);
 	Show_Widget(pb_b);
 	Show_Widget(window); 
+	printf("main(): enter LCUI_Main()\n");
 	return LCUI_Main(); /* 进入主循环 */  
 }
 

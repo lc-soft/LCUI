@@ -1,11 +1,10 @@
-
+// 一个演示程序，主要用了LCUI的图形旋转功能
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H 
 #include LC_WINDOW_H
 #include LC_LABEL_H
-#include LC_PICBOX_H
-#include LC_MISC_H
+#include LC_PICBOX_H 
 #include LC_GRAPHICS_H
 #include LC_RES_H
 #include <unistd.h>
@@ -21,11 +20,9 @@ void *change_graph(void *arg)
 	Set_Widget_Align(widget, ALIGN_MIDDLE_CENTER, Pos(0, -20));
 	Set_PictureBox_Size_Mode(widget, SIZE_MODE_CENTER);
 	Show_Widget(widget);
-	while(1)
-	{
+	while(1) {
 		Set_PictureBox_Image_From_Graph(widget, &frame);
-		for(i=10; i<=360; i+=10)
-		{
+		for(i=10; i<=360; i+=10) {
 			Rotate_Graph(&frame, i, &temp);
 			Set_PictureBox_Image_From_Graph(widget, &temp);
 			usleep(20000);
@@ -37,12 +34,9 @@ void *change_graph(void *arg)
 int main(int argc,char*argv[])
 { 
 	/* 声明几个部件 */
-	LCUI_Widget	*window, 
-					*label,
-					*logo,
-					*img;
+	LCUI_Widget	*window, *label, *logo, *img;
 					
-	int			 width, height; 
+	int width, height; 
 	/* 自定义默认字体文件位置 */
 	//Set_Default_Font("msyh.ttf");
 	/* 初始化LCUI */ 
@@ -52,10 +46,10 @@ int main(int argc,char*argv[])
 	height = 240;//Get_Screen_Height();; /* 窗口的高度 */
 	
 	/* 创建部件 */
-	window		= Create_Widget("window");
-	label		= Create_Widget("label");
-	logo		= Create_Widget("picture_box");
-	img			= Create_Widget("picture_box");
+	window	= Create_Widget("window");
+	label	= Create_Widget("label");
+	logo	= Create_Widget("picture_box");
+	img	= Create_Widget("picture_box");
 	
 	//Set_Widget_Border_Style(window, BORDER_STYLE_NONE);
 	Resize_Widget(img, Size(180, 180));
@@ -78,7 +72,7 @@ int main(int argc,char*argv[])
 	Window_Client_Area_Add(window, logo);
 	
 	pthread_t t;
-    LCUI_Thread_Create(&t, NULL, change_graph, (void*)img); 
+	LCUI_Thread_Create(&t, NULL, change_graph, (void*)img); 
 	/* 显示部件以及窗口 */
 	Show_Widget(label);
 	Show_Widget(logo);

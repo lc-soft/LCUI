@@ -501,7 +501,7 @@ static void Destroy_Widget(LCUI_Widget *widget)
 	func = Get_WidgetFunc_By_ID(widget->type_id, 
 				FUNC_TYPE_DESTROY);
 	func(widget); /* 调用之，释放private指针指向的内存空间 */
-	free(widget->private);/* 释放这个指向部件私有数据结构体的指针 */
+	free(widget->private_data);/* 释放这个指向部件私有数据结构体的指针 */
 }
 
 void WidgetQueue_Init(LCUI_Queue *queue)

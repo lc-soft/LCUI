@@ -1,0 +1,223 @@
+LCUI_Work.lo: LCUI_Work.c ../include/LCUI_Build.h ../include/LCUI/LCUI.h \
+ /usr/include/pthread.h /usr/include/features.h \
+ /usr/include/i386-linux-gnu/bits/predefs.h \
+ /usr/include/i386-linux-gnu/sys/cdefs.h \
+ /usr/include/i386-linux-gnu/bits/wordsize.h \
+ /usr/include/i386-linux-gnu/gnu/stubs.h \
+ /usr/include/i386-linux-gnu/gnu/stubs-32.h /usr/include/endian.h \
+ /usr/include/i386-linux-gnu/bits/endian.h \
+ /usr/include/i386-linux-gnu/bits/byteswap.h /usr/include/sched.h \
+ /usr/include/i386-linux-gnu/bits/types.h \
+ /usr/include/i386-linux-gnu/bits/typesizes.h \
+ /usr/lib/gcc/i686-linux-gnu/4.6.1/include/stddef.h /usr/include/time.h \
+ /usr/include/i386-linux-gnu/bits/sched.h \
+ /usr/include/i386-linux-gnu/bits/time.h /usr/include/xlocale.h \
+ /usr/include/i386-linux-gnu/bits/pthreadtypes.h \
+ /usr/include/i386-linux-gnu/bits/setjmp.h /usr/local/include/ft2build.h \
+ /usr/local/include/freetype/config/ftheader.h /usr/local/include/tslib.h \
+ /usr/lib/gcc/i686-linux-gnu/4.6.1/include/stdarg.h \
+ /usr/include/i386-linux-gnu/sys/time.h \
+ /usr/include/i386-linux-gnu/sys/select.h \
+ /usr/include/i386-linux-gnu/bits/select.h \
+ /usr/include/i386-linux-gnu/bits/sigset.h \
+ /usr/local/include/freetype/freetype.h \
+ /usr/local/include/freetype/config/ftconfig.h \
+ /usr/local/include/freetype/config/ftoption.h \
+ /usr/local/include/freetype/config/ftstdlib.h \
+ /usr/lib/gcc/i686-linux-gnu/4.6.1/include-fixed/limits.h \
+ /usr/lib/gcc/i686-linux-gnu/4.6.1/include-fixed/syslimits.h \
+ /usr/include/limits.h /usr/include/i386-linux-gnu/bits/posix1_lim.h \
+ /usr/include/i386-linux-gnu/bits/local_lim.h /usr/include/linux/limits.h \
+ /usr/include/i386-linux-gnu/bits/posix2_lim.h \
+ /usr/include/i386-linux-gnu/bits/xopen_lim.h \
+ /usr/include/i386-linux-gnu/bits/stdio_lim.h /usr/include/string.h \
+ /usr/include/i386-linux-gnu/bits/string.h \
+ /usr/include/i386-linux-gnu/bits/string2.h /usr/include/stdlib.h \
+ /usr/include/i386-linux-gnu/bits/string3.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+ /usr/include/i386-linux-gnu/bits/sys_errlist.h \
+ /usr/include/i386-linux-gnu/bits/stdio.h \
+ /usr/include/i386-linux-gnu/bits/stdio2.h \
+ /usr/include/i386-linux-gnu/bits/waitflags.h \
+ /usr/include/i386-linux-gnu/bits/waitstatus.h \
+ /usr/include/i386-linux-gnu/sys/types.h \
+ /usr/include/i386-linux-gnu/sys/sysmacros.h /usr/include/alloca.h \
+ /usr/include/i386-linux-gnu/bits/stdlib.h /usr/include/setjmp.h \
+ /usr/include/i386-linux-gnu/bits/setjmp2.h \
+ /usr/local/include/freetype/fterrors.h \
+ /usr/local/include/freetype/ftmoderr.h \
+ /usr/local/include/freetype/fterrdef.h \
+ /usr/local/include/freetype/fttypes.h \
+ /usr/local/include/freetype/ftsystem.h \
+ /usr/local/include/freetype/ftimage.h ../include/LCUI/LCUI_Queue.h \
+ ../include/LCUI/LCUI_Thread.h ../include/LCUI/LCUI_Work.h \
+ ../include/LCUI/LCUI_Misc.h ../include/LCUI/LCUI_Error.h \
+ ../include/LCUI/LCUI_Input.h ../include/LCUI/LCUI_Widget.h \
+ /usr/include/unistd.h /usr/include/i386-linux-gnu/bits/posix_opt.h \
+ /usr/include/i386-linux-gnu/bits/environments.h \
+ /usr/include/i386-linux-gnu/bits/confname.h /usr/include/getopt.h \
+ /usr/include/i386-linux-gnu/bits/unistd.h
+
+../include/LCUI_Build.h:
+
+../include/LCUI/LCUI.h:
+
+/usr/include/pthread.h:
+
+/usr/include/features.h:
+
+/usr/include/i386-linux-gnu/bits/predefs.h:
+
+/usr/include/i386-linux-gnu/sys/cdefs.h:
+
+/usr/include/i386-linux-gnu/bits/wordsize.h:
+
+/usr/include/i386-linux-gnu/gnu/stubs.h:
+
+/usr/include/i386-linux-gnu/gnu/stubs-32.h:
+
+/usr/include/endian.h:
+
+/usr/include/i386-linux-gnu/bits/endian.h:
+
+/usr/include/i386-linux-gnu/bits/byteswap.h:
+
+/usr/include/sched.h:
+
+/usr/include/i386-linux-gnu/bits/types.h:
+
+/usr/include/i386-linux-gnu/bits/typesizes.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.6.1/include/stddef.h:
+
+/usr/include/time.h:
+
+/usr/include/i386-linux-gnu/bits/sched.h:
+
+/usr/include/i386-linux-gnu/bits/time.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/i386-linux-gnu/bits/pthreadtypes.h:
+
+/usr/include/i386-linux-gnu/bits/setjmp.h:
+
+/usr/local/include/ft2build.h:
+
+/usr/local/include/freetype/config/ftheader.h:
+
+/usr/local/include/tslib.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.6.1/include/stdarg.h:
+
+/usr/include/i386-linux-gnu/sys/time.h:
+
+/usr/include/i386-linux-gnu/sys/select.h:
+
+/usr/include/i386-linux-gnu/bits/select.h:
+
+/usr/include/i386-linux-gnu/bits/sigset.h:
+
+/usr/local/include/freetype/freetype.h:
+
+/usr/local/include/freetype/config/ftconfig.h:
+
+/usr/local/include/freetype/config/ftoption.h:
+
+/usr/local/include/freetype/config/ftstdlib.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.6.1/include-fixed/limits.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.6.1/include-fixed/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/i386-linux-gnu/bits/posix1_lim.h:
+
+/usr/include/i386-linux-gnu/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/i386-linux-gnu/bits/posix2_lim.h:
+
+/usr/include/i386-linux-gnu/bits/xopen_lim.h:
+
+/usr/include/i386-linux-gnu/bits/stdio_lim.h:
+
+/usr/include/string.h:
+
+/usr/include/i386-linux-gnu/bits/string.h:
+
+/usr/include/i386-linux-gnu/bits/string2.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/i386-linux-gnu/bits/string3.h:
+
+/usr/include/stdio.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/include/i386-linux-gnu/bits/sys_errlist.h:
+
+/usr/include/i386-linux-gnu/bits/stdio.h:
+
+/usr/include/i386-linux-gnu/bits/stdio2.h:
+
+/usr/include/i386-linux-gnu/bits/waitflags.h:
+
+/usr/include/i386-linux-gnu/bits/waitstatus.h:
+
+/usr/include/i386-linux-gnu/sys/types.h:
+
+/usr/include/i386-linux-gnu/sys/sysmacros.h:
+
+/usr/include/alloca.h:
+
+/usr/include/i386-linux-gnu/bits/stdlib.h:
+
+/usr/include/setjmp.h:
+
+/usr/include/i386-linux-gnu/bits/setjmp2.h:
+
+/usr/local/include/freetype/fterrors.h:
+
+/usr/local/include/freetype/ftmoderr.h:
+
+/usr/local/include/freetype/fterrdef.h:
+
+/usr/local/include/freetype/fttypes.h:
+
+/usr/local/include/freetype/ftsystem.h:
+
+/usr/local/include/freetype/ftimage.h:
+
+../include/LCUI/LCUI_Queue.h:
+
+../include/LCUI/LCUI_Thread.h:
+
+../include/LCUI/LCUI_Work.h:
+
+../include/LCUI/LCUI_Misc.h:
+
+../include/LCUI/LCUI_Error.h:
+
+../include/LCUI/LCUI_Input.h:
+
+../include/LCUI/LCUI_Widget.h:
+
+/usr/include/unistd.h:
+
+/usr/include/i386-linux-gnu/bits/posix_opt.h:
+
+/usr/include/i386-linux-gnu/bits/environments.h:
+
+/usr/include/i386-linux-gnu/bits/confname.h:
+
+/usr/include/getopt.h:
+
+/usr/include/i386-linux-gnu/bits/unistd.h:

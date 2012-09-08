@@ -42,6 +42,8 @@
 #ifndef __LCUI_MEMORY_H__ /* 如果没有定义 __LCUI_MEMORY_H__ 宏 */
 #define __LCUI_MEMORY_H__  /* 定义 __LCUI_MEMORY_H__ 宏 */
 
+LCUI_BEGIN_HEADER
+
 void Using_Graph(LCUI_Graph *pic, int mode);
 /* 功能：以指定模式使用图像数据
  * 说明：参数mode的值为0时，以“读”模式使用数据，其它值时，以“写"模式使用数据 */ 
@@ -90,5 +92,8 @@ void Free_Font(LCUI_Font *in);
 
 void Free_LCUI_Font();
 /* 功能：释放LCUI默认的Font结构体数据占用的内存资源 */ 
+
+LCUI_END_HEADER
+
 #endif  /*  __LCUI_MEMORY_H__ */
 

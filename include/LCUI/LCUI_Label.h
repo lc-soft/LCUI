@@ -54,6 +54,8 @@ struct _LCUI_Label
 };/* 可用于显示运行时的信息或者说明性文字 */
 /******************************* END ************************************/
 
+LCUI_BEGIN_HEADER
+
 int Get_Label_Row_Len(LCUI_Widget *widget, int row);
 /*
  * 功能：获取label部件中指定行的字符串长度
@@ -82,4 +84,7 @@ void Set_Label_Font_Default_Color(LCUI_Widget *widget, LCUI_RGB color);
  * label ：需要进行操作的label部件
  * color : 配色
  * */ 
+ 
+LCUI_END_HEADER
+
 #endif

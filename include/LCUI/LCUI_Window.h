@@ -70,6 +70,8 @@ struct _LCUI_Window
 };
 /***********************************************************/
 
+LCUI_BEGIN_HEADER
+
 LCUI_Widget *Get_Window_TitleBar(LCUI_Widget *window);
 /* 功能：获取窗口标题栏的指针 */ 
 
@@ -88,7 +90,7 @@ void Window_Widget_Auto_Size(LCUI_Widget *win_p);
 LCUI_Widget *Get_Parent_Window(LCUI_Widget *widget);
 /* 功能：获取指定部件所在的窗口 */ 
 
-void Set_Window_Title_Text(LCUI_Widget *win_p, char *text);
+void Set_Window_Title_Text(LCUI_Widget *win_p, const char *text);
 /* 功能：为窗口设置标题文字 */ 
 
 void Window_Client_Area_Add(LCUI_Widget *window, LCUI_Widget *widget);
@@ -96,4 +98,7 @@ void Window_Client_Area_Add(LCUI_Widget *window, LCUI_Widget *widget);
 
 void Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget);
 /* 功能：将部件添加至窗口标题栏 */ 
+
+LCUI_END_HEADER
+
 #endif /* __LCUI_WINDOW_H__ */

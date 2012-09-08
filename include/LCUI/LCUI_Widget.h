@@ -42,6 +42,8 @@
 #ifndef __LCUI_WIDGET_H__
 #define __LCUI_WIDGET_H__
 
+LCUI_BEGIN_HEADER
+
 /* 定义数据类型标识 */
 #define DATATYPE_POS	1
 #define DATATYPE_SIZE	2
@@ -169,7 +171,7 @@ int Empty_Widget();
  *   0  程序的部件列表不为空
  * */ 
 
-LCUI_Widget *Create_Widget(char *widget_type);
+LCUI_Widget *Create_Widget(const char *widget_type);
 /* 
  * 功能：创建指定类型的窗口部件
  * 说明：创建出来的部件，默认是没有背景图时透明。
@@ -380,4 +382,9 @@ void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget);
 /* 功能：将部件添加至作为容器的部件内 */ 
 /************************* Container End ******************************/
 
+LCUI_END_HEADER
+
+#ifdef __cplusplus
+#include LC_WIDGET_HPP
+#endif
 #endif

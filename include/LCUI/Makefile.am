@@ -1,16 +1,16 @@
 AUTOMAKE_OPTIONS=foreign
 ##一些需要安装的头文件
 # Headers which are installed to support the library
-INSTINCLUDES=LCUI.h \
+INSTINCLUDES=LCUI.h LCUI.hpp\
 LCUI_Font.h \
 LCUI_Misc.h \
 LCUI_Work.h \
 LCUI_Button.h \
-LCUI_Graphics.h \
+LCUI_Graphics.h LCUI_Graphics.hpp \
 LCUI_Input.h \
 LCUI_Queue.h \
 LCUI_Thread.h \
-LCUI_Widget.h \
+LCUI_Widget.h LCUI_Widget.hpp\
 LCUI_Resources.h \
 LCUI_PictureBox.h \
 LCUI_ProgressBar.h \

@@ -24,12 +24,15 @@ AC_CONFIG_HEADERS([config.h])
 AM_SILENT_RULES([yes])
 
 # Checks for programs.
-AC_PROG_CC
-AC_PROG_LIBTOOL 
 AC_PROG_CC_STDC
-AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
+AC_PROG_RANLIB
+AC_PROG_INSTALL
+AC_PROG_CXX
+AC_PROG_CPP
+AC_PROG_AWK 
 
 # Checks for libraries.
 # 检测LCUI所依赖的库是否存在并且能正常使用
@@ -50,14 +53,16 @@ AC_ARG_ENABLE(debug, [  --enable-debug=[no/yes] turn on debugging
 # 看到CFLAGS，你应该懂的！是给gcc编译器的参数。
 if test "x$enable_debug" = "xyes"; then
 CFLAGS="-O2 -g -Wall -D _GNU_SOURCE"
+CXXFLAG="-O2 -g -Wall -D _GNU_SOURCE"
 AC_MSG_RESULT(yes)
 else
 CFLAGS="-O2 -Wall -D _GNU_SOURCE"
+CXXFLAGS="-O2 -Wall -D _GNU_SOURCE"
 AC_MSG_RESULT(no)
 fi
 
 # Checks for header files.
-AC_CHECK_HEADERS([fcntl.h limits.h stddef.h stdlib.h string.h strings.h sys/ioctl.h sys/time.h termio.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h limits.h malloc.h memory.h stddef.h stdlib.h string.h strings.h sys/ioctl.h termio.h unistd.h wchar.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
@@ -68,12 +73,12 @@ AC_FUNC_MMAP
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset munmap select strcasecmp sysinfo])
 ##输出文件
-AC_OUTPUT([Makefile 
-                 test/Makefile	
-                 test/mora/Makefile
-                 test/photoviewer/Makefile
-                 test/screenlock/Makefile
-                 test/clock/Makefile
+AC_OUTPUT([Makefile
                  include/Makefile
                  include/LCUI/Makefile
-                 src/Makefile])
+                 src/Makefile
+                 test/Makefile
+                 test/mora/Makefile
+                 test/photoviewer/Makefile
+                 test/clock/Makefile
+                 test/screenlock/Makefile])

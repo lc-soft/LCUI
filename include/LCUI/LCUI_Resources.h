@@ -38,6 +38,12 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
+
+#ifndef __LCUI_RES_H__
+#define __LCUI_RES_H__
+
+LCUI_BEGIN_HEADER
+
 int Load_Graph_Default_Cursor(LCUI_Graph *pic);
 /* 功能：载入默认的鼠标指针的图形 */ 
 
@@ -104,3 +110,6 @@ int Load_Graph_Default_RadioButton_On_Selected(LCUI_Graph *pic);
 
 int Load_Graph_Default_RadioButton_On_Pressed(LCUI_Graph *pic);
 
+LCUI_END_HEADER
+
+#endif

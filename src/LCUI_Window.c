@@ -57,14 +57,19 @@
 LCUI_Widget *Get_Window_TitleBar(LCUI_Widget *window)
 /* 功能：获取窗口标题栏的指针 */
 { 
-	LCUI_Window *win_p = (LCUI_Window *)window->private; 
+	LCUI_Window *win_p; 
+	win_p = (LCUI_Window *)Get_Widget_Private_Data(window); 
+	if(win_p == NULL) {
+		return NULL;
+	} 
 	return win_p->titlebar;
 }
 
 LCUI_Widget *Get_Window_Client_Area(LCUI_Widget *window)
 /* 功能：获取窗口客户区的指针 */
 {
-	LCUI_Window *win_p = (LCUI_Window *)window->private;
+	LCUI_Window *win_p;
+	win_p = (LCUI_Window *)Get_Widget_Private_Data(window); 
 	return win_p->client_area;	
 }
 
@@ -368,11 +373,11 @@ static void Resize_Window(LCUI_Widget *win_p)
 	Window_Widget_Auto_Size(win_p); 
 }
 
-void Set_Window_Title_Text(LCUI_Widget *win_p, char *text)
+void Set_Window_Title_Text(LCUI_Widget *win_p, const char *text)
 /* 功能：为窗口设置标题文字 */
-{
-	LCUI_Widget *titlebar = Get_Window_TitleBar(win_p);
-	LCUI_TitleBar *title = Get_Widget_Private_Data(titlebar);
+{ 
+	LCUI_Widget *titlebar = Get_Window_TitleBar(win_p); 
+	LCUI_TitleBar *title = Get_Widget_Private_Data(titlebar); 
 	Set_Label_Text(title->label, text);
 }
 

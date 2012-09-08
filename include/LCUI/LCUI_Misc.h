@@ -41,6 +41,9 @@
 
 #ifndef __LCUI_MISC_H__
 #define __LCUI_MISC_H__
+
+LCUI_BEGIN_HEADER
+
 void String_Init(LCUI_String *in);
 /* 功能：初始化String结构体中的数据 */ 
 
@@ -50,7 +53,7 @@ void Rect_Init(LCUI_Rect *rect);
 void Border_Init(LCUI_Border *in);
 /* 功能：初始化边框 */ 
 
-void Strcpy (LCUI_String * des, char *src);
+void Strcpy (LCUI_String * des, const char *src);
 /* 功能：拷贝字符串至String结构体数据中 */ 
 
 int Strcmp(LCUI_String *str1, const char *str2);
@@ -104,7 +107,7 @@ int Size_Cmp(LCUI_Size a, LCUI_Size b);
  * 说明：a大于b，返回1， b大于a，返回-1，相等则返回0
  * */ 
 
-int Cut_Overlay_Rect (	LCUI_Rect old, LCUI_Rect new, 
+int Cut_Overlay_Rect (	LCUI_Rect old_rect, LCUI_Rect new_rect, 
 						LCUI_Queue *rq	);
 /*
  * 功能：将有重叠部分的两个矩形，进行分割，并得到分割后的矩形
@@ -166,4 +169,7 @@ int Rect_Equal (LCUI_Rect a, LCUI_Rect b);
 
 int Rect_Valid(LCUI_Rect r);
 /* 功能：判断矩形是否有效 */ 
+
+LCUI_END_HEADER
+
 #endif

@@ -87,7 +87,10 @@ LCUI_Pos Get_Widget_Pos(LCUI_Widget *widget)
 void *Get_Widget_Private_Data(LCUI_Widget *widget)
 /* 功能：获取部件的私有数据结构体的指针 */
 {
-	return widget->private;
+	if(widget == NULL) {
+		return NULL;
+	}
+	return widget->private_data;
 }
 
 LCUI_Widget *Get_Widget_Parent(LCUI_Widget *widget)
@@ -479,7 +482,7 @@ int Empty_Widget()
 
 static void WidgetData_Init(LCUI_Queue *queue);
 
-LCUI_Widget *Create_Widget(char *widget_type)
+LCUI_Widget *Create_Widget(const char *widget_type)
 /* 
  * 功能：创建指定类型的窗口部件
  * 说明：创建出来的部件，默认是没有背景图时透明。
@@ -516,7 +519,7 @@ LCUI_Widget *Create_Widget(char *widget_type)
 	widget.fore_color	= RGB(0,0,0);
 	widget.border_color	= RGB(0,0,0);
 	widget.border_style	= NONE;
-	widget.private		= NULL;
+	widget.private_data	= NULL;
 	widget.bg_mode		= BG_MODE_TRANSPARENT;
 	widget.response_flag	= 0;
 	

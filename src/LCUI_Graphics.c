@@ -332,7 +332,7 @@ LCUI_Graph *Get_Quote_Graph(LCUI_Graph *graph)
 
 
 /********************* Image File Processing **************************/
-static int detect_jpg(char *filepath, LCUI_Graph *out)
+static int detect_jpg(const char *filepath, LCUI_Graph *out)
 /* 功能：检测并解码jpg图片 */
 {
 	FILE *fp;
@@ -399,7 +399,7 @@ static int detect_jpg(char *filepath, LCUI_Graph *out)
 	return 0;	
 }
 
-static int detect_bmp(char *filepath, LCUI_Graph *out)
+static int detect_bmp(const char *filepath, LCUI_Graph *out)
 /* 功能：检测并解码bmp图片 */
 {
 	FILE *fp;
@@ -564,7 +564,7 @@ static int detect_bmp(char *filepath, LCUI_Graph *out)
 	return 0;	
 }
 
-int write_png_file(char *file_name , LCUI_Graph *graph)
+int write_png_file(const char *file_name , LCUI_Graph *graph)
 /* 功能：将LCUI_Graph结构中的数据写入至png文件 */
 {
 	int j, i, temp, pos;
@@ -662,7 +662,7 @@ int write_png_file(char *file_name , LCUI_Graph *graph)
     return 0;
 }
 
-int detect_png(char *filepath, LCUI_Graph *out)
+int detect_png(const char *filepath, LCUI_Graph *out)
 /* 功能：检测并解码png图片 */
 {
 	FILE *pic_fp;
@@ -756,7 +756,7 @@ int detect_png(char *filepath, LCUI_Graph *out)
 	return 0;
 }
 
-int detect_image(char *filepath, LCUI_Graph *out)
+int detect_image(const char *filepath, LCUI_Graph *out)
 /* 功能：检测图片格式，并解码图片 */
 {
 	int result = 1;
@@ -766,7 +766,7 @@ int detect_image(char *filepath, LCUI_Graph *out)
 	return result;
 }
 
-int Load_Image(char *filepath, LCUI_Graph *out)
+int Load_Image(const char *filepath, LCUI_Graph *out)
 /* 
  * 功能：载入指定图片文件的图形数据
  * 说明：打开图片文件，并解码至内存，打开的图片文件越大，占用的内存也就越大 
@@ -851,9 +851,6 @@ void Zoom_Graph(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 	
 	End_Use_Graph(out);
 	End_Use_Graph(in);
-	out->width  = size.w;
-	out->height = size.h;
-	out->malloc = IS_TRUE;  /* 已经分配内存 */
 }
 
 int Cut_Graph(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)

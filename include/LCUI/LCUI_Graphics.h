@@ -40,6 +40,9 @@
  * ****************************************************************************/
 #ifndef __LCUI_GRAPHICS_H__
 #define __LCUI_GRAPHICS_H__
+
+LCUI_BEGIN_HEADER
+
 LCUI_RGB
 RGB (unsigned char red, unsigned char green,
 	 unsigned char blue);
@@ -102,7 +105,7 @@ void Graph_Init(LCUI_Graph *pic);
 void Zoom_Graph(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size);
 /* 功能：根据指定模式，对图像进行缩放 */ 
 
-int Load_Image(char *filepath, LCUI_Graph *out);
+int Load_Image(const char *filepath, LCUI_Graph *out);
 /* 
  * 功能：载入指定图片文件的图形数据
  * 说明：打开图片文件，并解码至内存，打开的图片文件越大，占用的内存也就越大 
@@ -178,7 +181,7 @@ int Widget_Layer_Is_Opaque(LCUI_Widget *widget);
 int Widget_Layer_Not_Visible(LCUI_Widget *widget);
 /* 功能：检测部件图形是否完全透明 */
 
-int write_png_file(char *file_name , LCUI_Graph *graph);
+int write_png_file(const char *file_name , LCUI_Graph *graph);
 /* 功能：将LCUI_Graph结构中的数据写入至png文件 */
 
 int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph);
@@ -214,5 +217,12 @@ LCUI_Graph *Get_Quote_Graph(LCUI_Graph *graph);
  * 说明：如果当前图形引用了另一个图形，并且，该图形处于一条引用链中，那么，本函数会返
  * 回指向被引用的最终图形的指针。
  * */
+ 
+LCUI_END_HEADER
+
+#ifdef __cplusplus
+#include LC_GRAPHICS_HPP
+#endif
+
 #endif /* __LCUI_GRAPHICS_H__ */
 

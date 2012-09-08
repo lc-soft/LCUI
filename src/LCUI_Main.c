@@ -332,7 +332,7 @@ static int LCUI_AppList_Add ()
 	return 0;
 }
 
-int App_Quit()
+static int App_Quit()
 /* 功能：退出程序 */
 {
 	LCUI_App *app;
@@ -956,7 +956,7 @@ int LCUI_Init(int argc, char *argv[])
 		if(temp != 0)  exit(-1);
 	}
 	/* 注册默认部件类型 */
-	Register_Default_Widget_Type(); 
+	Register_Default_Widget_Type();
 	return 0;
 }
 
