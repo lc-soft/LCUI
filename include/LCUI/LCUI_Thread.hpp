@@ -1,5 +1,5 @@
-/* ****************************************************************************
- * LCUI_Build.h -- macro definition defines the location of some header files
+/* ***************************************************************************
+ * LCUI_Thread.hpp -- C++ class of basic thread management
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Build.h -- 定义了一些头文件的位置的宏定义
+ * LCUI_Thread.hpp -- 基本的线程管理的C++类
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -38,48 +38,67 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
- 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
+
+
+#ifndef __LCUI_THREAD_HPP__
+#define __LCUI_THREAD_HPP__ 
 
 #ifdef __cplusplus
-#define LCUI_BEGIN_HEADER  extern "C"{
-#define LCUI_END_HEADER  }
-#else
-#define LCUI_BEGIN_HEADER  /* nothing */
-#define LCUI_END_HEADER
+
+class LCUIThread
+{
+	public:
+	LCUIThread()
+	{
+		tid = 0;
+		thread_rwlock_init(&lock);
+	}
+	int create( const pthread_attr_t *restrict_attr,
+			void *(*start_rtn)(void*),
+			void * arg )
+	{
+		return LCUI_Thread_Create(&tid, restrict_attr, start_rtn, arg);
+	}
+	int rdlock()
+	{
+		return thread_rwlock_rdlock(&lock);
+	}
+	int wrlock()
+	{
+		return thread_rwlock_wrlock(&lock);
+	}
+	int unlock()
+	{
+		return thread_rwlock_unlock(&lock);
+	}
+	int mutex_lock()
+	{
+		return thread_mutex_lock(&lock);
+	}
+	int mutex_unlock()
+	{
+		return thread_mutex_unlock(&lock);
+	}
+	int cancel()
+	{
+		return LCUI_Thread_Cancel(tid);
+	}
+	int join(void **retval)
+	{
+		return LCUI_Thread_Join(tid, retval);
+	}
+	void exit(void* retval) __attribute__ ((__noreturn__))
+	{
+		LCUI_Thread_Exit(retval);
+	}
+	pthread_t getid()
+	{
+		return tid;
+	}
+	private:
+	pthread_t tid;
+	thread_rwlock lock;
+};
 #endif
 
-#ifndef __LCUI_BUILD_UNIX_H__
-#define __LCUI_BUILD_UNIX_H__
-
-#define LC_LCUI_H	<LCUI/LCUI.h>
-#define LC_LCUI_HPP	<LCUI/LCUI.hpp>
-#define LC_MISC_H	<LCUI/LCUI_Misc.h>
-#define LC_FONT_H	<LCUI/LCUI_Font.h>
-#define LC_GRAPHICS_H	<LCUI/LCUI_Graphics.h>
-#define LC_GRAPHICS_HPP	<LCUI/LCUI_Graphics.hpp>
-#define LC_WIDGET_H	<LCUI/LCUI_Widget.h>
-#define LC_WIDGET_HPP	<LCUI/LCUI_Widget.hpp>
-#define LC_QUEUE_H	<LCUI/LCUI_Queue.h> 
-#define LC_CURSOR_H	<LCUI/LCUI_Cursor.h> 
-#define LC_WORK_H	<LCUI/LCUI_Work.h> 
-#define LC_INPUT_H	<LCUI/LCUI_Input.h>
-#define LC_MEM_H	<LCUI/LCUI_Memory.h>
-#define LC_ERROR_H	<LCUI/LCUI_Error.h>
-#define LC_THREAD_H	<LCUI/LCUI_Thread.h> 
-#define LC_THREAD_HPP	<LCUI/LCUI_Thread.hpp> 
-#define LC_RES_H	<LCUI/LCUI_Resources.h> 
-
-/* 一些部件的头文件路径 */
-#define LC_WINDOW_H	<LCUI/LCUI_Window.h>
-#define LC_LABEL_H	<LCUI/LCUI_Label.h>
-#define LC_BUTTON_H	<LCUI/LCUI_Button.h>
-#define LC_PICBOX_H	<LCUI/LCUI_PictureBox.h>
-#define LC_PROGBAR_H	<LCUI/LCUI_ProgressBar.h>
-#define LC_MENU_H	<LCUI/LCUI_Menu.h>
-#define LC_CHECKBOX_H	<LCUI/LCUI_CheckBox.h>
-#define LC_RADIOBTN_H	<LCUI/LCUI_RadioButton.h>
-#define LC_ACTIVEBOX_H	<LCUI/LCUI_ActiveBox.h> 
 #endif

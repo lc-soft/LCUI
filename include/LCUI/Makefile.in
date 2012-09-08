@@ -213,7 +213,7 @@ LCUI_Button.h \
 LCUI_Graphics.h LCUI_Graphics.hpp \
 LCUI_Input.h \
 LCUI_Queue.h \
-LCUI_Thread.h \
+LCUI_Thread.h LCUI_Thread.hpp \
 LCUI_Widget.h LCUI_Widget.hpp\
 LCUI_Resources.h \
 LCUI_PictureBox.h \

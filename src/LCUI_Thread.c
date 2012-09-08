@@ -309,9 +309,9 @@ int Thread_TreeNode_Delete(Thread_TreeNode *ttn, pthread_t tid)
 }
 
 int LCUI_Thread_Create( pthread_t *tidp,
-						const pthread_attr_t *restrict_attr,
-						void *(*start_rtn)(void*),
-						void * arg)
+			const pthread_attr_t *restrict_attr,
+			void *(*start_rtn)(void*),
+			void * arg )
 /*
  * 功能：创建一个线程
  * 说明：主要是调用pthread_create函数来创建线程，并进行附加处理

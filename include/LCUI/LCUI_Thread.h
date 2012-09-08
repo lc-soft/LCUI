@@ -65,6 +65,8 @@ typedef struct _thread_rwlock{
 	pthread_mutex_t mutex; 
 }thread_rwlock;
 
+LCUI_BEGIN_HEADER
+
 /************************ thread R/W lock *****************************/ 
 
 void thread_perror(char *msg, int err);
@@ -139,5 +141,13 @@ int LCUI_Thread_Tree_Cancel(Thread_TreeNode *ttn);
 
 int LCUI_App_Thread_Cancel(LCUI_ID app_id);
 /* 功能：撤销指定ID的程序的全部线程 */ 
+
+LCUI_END_HEADER
+
+
+#ifdef __cplusplus
+#include LC_THREAD_HPP
+#endif
+
 #endif
 
