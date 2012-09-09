@@ -69,6 +69,7 @@ static void PictureBox_Init(LCUI_Widget *widget)
 	Graph_Init(&pic_box->buff_graph); 
 	Graph_Init(&pic_box->error_image);
 	Graph_Init(&pic_box->initial_image); 
+	//Set_Widget_BG_Mode(widget, BG_MODE_FILL_BACKCOLOR);
 }
 
 LCUI_Rect Get_PictureBox_View_Area(LCUI_Widget *widget)
@@ -193,6 +194,10 @@ static void Exec_Update_PictureBox(LCUI_Widget *widget)
 	Graph_Init(&graph); 
 	pic_box  = (LCUI_PictureBox*)Get_Widget_Private_Data(widget);
 	
+	//print_widget_info(widget);
+	//Print_Graph_Info(&widget->graph);
+	//Print_Graph_Info(pic_box->image);
+	//printf("Exec_Update_PictureBox(): 1\n");
 	if(! Valid_Graph(pic_box->image)) return;
 	
 	//printf("Exec_Update_PictureBox(): widget size: w: %d, h: %d\n", widget->size.w, widget->size.h);
@@ -261,6 +266,7 @@ static void Exec_Update_PictureBox(LCUI_Widget *widget)
 		Replace_Graph(&widget->graph, &graph, pos); 
 	else Mix_Graph(&widget->graph, &graph, pos);
 	Free_Graph(&graph);
+	//printf("scale: %.4f\n", pic_box->scale);
 	//printf("Exec_Update_PictureBox(): end\n");
 	Refresh_Widget(widget); 
 }
@@ -273,6 +279,40 @@ float Get_PictureBox_Zoom_Scale(LCUI_Widget *widget)
 	return pic_box->scale;
 }
 
+
+static int init = IS_FALSE;
+static LCUI_Queue picbox_graph_mem;
+
+typedef struct _graph_data
+{
+	LCUI_Widget *widget;
+	LCUI_Graph *image;
+}
+graph_data;
+
+static void destroy_graph_data(void *data)
+{
+	graph_data *p = (graph_data *)data;
+	Free_Graph(p->image);
+	free(p->image);
+}
+
+static int find_widget_data(LCUI_Widget *widget)
+{
+	graph_data *temp;
+	int total, i;
+	/* 检查该部件是否用过本函数分配的内存，用过的话，清理它 */
+	total = Queue_Get_Total(&picbox_graph_mem); 
+	for(i=0; i<total; ++i) {
+		temp = (graph_data *)Queue_Get(&picbox_graph_mem, i);
+		if(temp->widget == widget) {
+			return i;
+		}
+	} 
+	return -1;
+}
+
+
 void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 /* 功能：添加一个图片数据至图片盒子 */
 { 
@@ -280,14 +320,12 @@ void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 	float scale_x,scale_y;
 	LCUI_Graph *graph = image; 
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_Private_Data(widget);
-	
-	/* 图片更换了，就释放缓存图形 */
-	Free_Graph(&pic_box->buff_graph);
-	//Print_Graph_Info(image);
+				Get_Widget_Private_Data(widget); 
 	for(i = 0;i < 2; ++i) {
-		if(Valid_Graph(graph)) {/* 如果image有效 */
-			/* 保存图像数据指针 */ 
+		/* 如果image有效 */ 
+		if(Valid_Graph(graph)) {
+			/* 图片更换了，就释放缓存图形 */
+			Free_Graph(&pic_box->buff_graph);
 			pic_box->image = graph;
 			/* 读取的范区域为整个图片区域 */
 			pic_box->read_box.x = 0;
@@ -297,12 +335,13 @@ void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 			pic_box->read_box.center_x = 0.5;
 			pic_box->read_box.center_y = 0.5;
 			pic_box->scale = 1.0; 
+			
 			//printf("Set_PictureBox_Image_From_Graph(): img, w: %d, h: %d\n", graph->width, graph->height);
 			//printf("Set_PictureBox_Image_From_Graph(): pb: w: %d, h: %d\n", widget->size.w, widget->size.h);
 			//printf("Set_PictureBox_Image_From_Graph(): size mode: %d\n", pic_box->size_mode);
 			switch(pic_box->size_mode) {
-			case SIZE_MODE_BLOCK_ZOOM:
-			case SIZE_MODE_ZOOM:
+			    case SIZE_MODE_BLOCK_ZOOM:
+			    case SIZE_MODE_ZOOM: 
 			//printf("Set_PictureBox_Image_From_Graph(): widget: w: %d, h: %d\n", widget->size.w, widget->size.h);
 				if(widget->size.w <= 0 || widget->size.h <= 0) {
 					//printf("Set_PictureBox_Image_From_Graph(): break\n");
@@ -320,12 +359,12 @@ void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 				//pic_box->read_box.width, pic_box->read_box.height);
 				break;
 			/* 正常模式 */
-			case SIZE_MODE_NORMAL: break;
+			    case SIZE_MODE_NORMAL: break;
 			/* 拉伸模式 */
-			case SIZE_MODE_STRETCH: break;
+			    case SIZE_MODE_STRETCH: break;
 			/* 平铺模式 */
-			case SIZE_MODE_TILE: break;
-			case SIZE_MODE_CENTER:
+			    case SIZE_MODE_TILE: break;
+			    case SIZE_MODE_CENTER: 
 				/* 判断图像的尺寸是否超出图片盒子的尺寸 */
 				if(pic_box->image->width >= widget->size.w) {
 					pic_box->read_box.x = (pic_box->image->width - widget->size.w)/2.0;
@@ -339,40 +378,74 @@ void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 				default : break;
 			}
 			break;
+		} else if(pic_box->image_status == IMAGE_STATUS_LOADING) {
+			/* 使用对应的图片 */ 
+			if(Valid_Graph(&pic_box->initial_image)) { 
+				graph = &pic_box->initial_image; 
+			} else {
+				return;
+			}
 		}
-		else if(pic_box->image_status == IMAGE_STATUS_LOADING) 
-			/* 使用对应的图片 */
-			graph = &pic_box->initial_image; 
-		else { /* 使用对应的图片 */
-			graph = &pic_box->error_image;
-			pic_box->image_status = IMAGE_STATUS_FAIL;
+		else { /* 使用对应的图片 */ 
+			if(Valid_Graph(&pic_box->error_image)) {
+				graph = &pic_box->error_image; 
+				pic_box->image_status = IMAGE_STATUS_FAIL;
+			} else {
+				return;
+			} 
 		}
-	}
+	} 
+	/* 如果记录中有该部件，那判断该部件使用的图像是否为同一个，不一样就释放之前的 */
+	graph_data *data;
+	i = find_widget_data(widget);
+	if(i >= 0) {
+		data = (graph_data*)Queue_Get(&picbox_graph_mem, i); 
+		if(data->image != image) {
+			Queue_Delete(&picbox_graph_mem, i);
+		}
+	} 
 	Draw_Widget(widget);
-	Refresh_Widget(widget);
 }
+
 
 int Set_PictureBox_Image_From_File(LCUI_Widget *widget, char *image_file)
 /* 功能：添加一个图片文件，并载入至图片盒子 */
 {
 	int value;
+	graph_data data;
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
 			Get_Widget_Private_Data(widget);
-	LCUI_Graph *graph = (LCUI_Graph*)
-			calloc(1, sizeof(LCUI_Graph));
-			
+	LCUI_Graph *graph, *image;
+	
+	if(init == IS_FALSE) {
+		Queue_Init( &picbox_graph_mem, 
+			sizeof(graph_data), destroy_graph_data);
+		init = IS_TRUE;
+	}
+	/* 如果在记录中没找到该部件，那么就分配内存，否则，直接使用那块内存 */
+	value = find_widget_data(widget);
+	if(value == -1) {
+		data.image = (LCUI_Graph*) calloc(1, sizeof(LCUI_Graph));
+		data.widget = widget;
+		Queue_Add(&picbox_graph_mem, &data); 
+	} else {
+		data = *(graph_data*)Queue_Get(&picbox_graph_mem, value); 
+	}
+	graph = data.image;
+	
 	pic_box->image_status = IMAGE_STATUS_LOADING; /* 图片状态为正在载入 */
 	Set_PictureBox_Image_From_Graph(widget, NULL);
-	value = Load_Image(image_file, graph);/* 载入图片文件 */
+	value = Load_Image(image_file, graph);/* 载入图片文件 */ 
 	if(value != 0) {
 		/* 载入失败 */
 		pic_box->image_status = IMAGE_STATUS_FAIL;
 		Set_PictureBox_Image_From_Graph(widget, NULL);
 	} else {
 		/* 载入成功 */
-		pic_box->image_status = IMAGE_STATUS_SUCCESS;
+		pic_box->image_status = IMAGE_STATUS_SUCCESS; 
 		Set_PictureBox_Image_From_Graph(widget, graph);
 	}
+	 
 	return value;
 }
 
@@ -426,10 +499,9 @@ void Set_PictureBox_Size_Mode(LCUI_Widget *widget, int mode)
 		}
 		Zoom_PictureBox_View_Area(widget, pic_box->scale); 
 		break;
-	default: break;
+	default: pic_box->scale = 1.0; break;
 	}
 	Draw_Widget(widget);
-	Refresh_Widget(widget);
 }
 
 

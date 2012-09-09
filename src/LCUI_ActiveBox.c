@@ -75,6 +75,7 @@ LCUI_Frames* Create_Frames(LCUI_Size size)
 	Queue_Init(&frames.pic, sizeof(LCUI_Frame), NULL);
 	Queue_Init(&frames.func_data, sizeof(LCUI_Func), NULL);
 	Graph_Init(&frames.slot);
+	frames.slot.have_alpha = IS_TRUE;
 	frames.current = 0;
 	frames.status = 0;
 	frames.size = size; 
@@ -101,8 +102,12 @@ LCUI_Pos Frame_Get_Pos(LCUI_Frames *stream, LCUI_Frame *frame)
 int Resize_Frames(LCUI_Frames *p, LCUI_Size new_size)
 /* 功能：调整动画的容器尺寸 */
 {
-	if(new_size.w <= 0 || new_size.h <= 0)	return -1;
-	if(p == NULL) return -2;
+	if(new_size.w <= 0 || new_size.h <= 0)	{
+		return -1;
+	}
+	if(p == NULL) {
+		return -2;
+	}
 	
 	int i, total;
 	LCUI_Pos pos;
@@ -148,7 +153,7 @@ int Add_Frame(	LCUI_Frames *des, LCUI_Graph *pic,
 	frame.offset = offset;
 	frame.sleep_time = sleep_time*10000;
 	frame.pic = pic;
-	frame.current_time = frame.sleep_time;
+	frame.current_time = frame.sleep_time; 
 	Queue_Add(&des->pic, &frame); 
 	return 0;
 }
@@ -161,9 +166,13 @@ int Frames_Add_Func(	LCUI_Frames *des,
  * 说明：关联回调函数后，动画每更新一帧都会调用这个函数
  * */
 {
-	if(des == NULL) return -1;
+	if(des == NULL) {
+		return -1;
+	}
 	LCUI_App *app = Get_Self_AppPointer();
-	if(app == NULL) return -2;
+	if(app == NULL) {
+		return -2;
+	}
 	
 	LCUI_Func func_data;
 	func_data.func = func;
@@ -186,24 +195,39 @@ static void Frames_Stream_Sort()
 	/* 使用的是选择排序 */
 	for(i=0; i<total; ++i) {
 		temp = Queue_Get(&frames_stream, i);
-		if(temp == NULL) continue;
-		if(temp->current > 0) pos = temp->current-1;
-		else pos = 0;
+		if(temp == NULL) {
+			continue;
+		}
+		if(temp->current > 0) {
+			pos = temp->current-1;
+		} else {
+			pos = 0;
+		}
 		
 		p = Queue_Get(&temp->pic, pos);
-		if(p == NULL) continue; 
+		if(p == NULL) {
+			continue; 
+		}
 		
 		for(j=i+1; j<total; ++j) {
 			temp = Queue_Get(&frames_stream, j);
-			if(temp == NULL) continue; 
-			if(temp->current > 0) pos = temp->current-1;
-			else pos = 0;
+			if(temp == NULL) {
+				continue; 
+			}
+			if(temp->current > 0) {
+				pos = temp->current-1;
+			} else {
+				pos = 0;
+			}
 			
 			q = Queue_Get(&temp->pic, pos);
-			if(q == NULL) continue; 
+			if(q == NULL) {
+				continue; 
+			}
 			
-			if( q->current_time < p->current_time ) 
+			if( q->current_time < p->current_time ) {
 				Queue_Swap(&frames_stream, j, i);
+			}
 		}
 	}
 	Queue_UnLock(&frames_stream);
@@ -215,17 +239,24 @@ static void Frames_Stream_Time_Sub(int time)
 	LCUI_Frame *frame;
 	LCUI_Frames *frames;
 	int i, total, pos;
+	
 	Queue_Lock(&frames_stream);
 	total = Queue_Get_Total(&frames_stream);
 	//printf("Frames_Stream_Time_Sub(): start\n");
 	for(i=0; i<total; ++i){
-		frames = Queue_Get(&frames_stream, i); 
-		if(frames == NULL) continue;
-		if(frames->status == 0) continue;
-		if(frames->current > 0) pos = frames->current-1;
-		else pos = 0;
+		frames = Queue_Get(&frames_stream, i);  
+		if(frames == NULL || frames->status == 0) {
+			continue;
+		}
+		if(frames->current > 0) {
+			pos = frames->current-1;
+		} else {
+			pos = 0;
+		}
 		frame = Queue_Get(&frames->pic, pos);
-		if(frame == NULL) continue; 
+		if(frame == NULL) {
+			continue; 
+		}
 		frame->current_time -= time; 
 		//printf("fames: %p, current: %d, time:%ld, sub:%d\n", frames, pos, frame->current_time, time);
 	}
@@ -245,7 +276,9 @@ LCUI_Graph *Frames_Get_Slot(LCUI_Frames *src)
 /* 功能：获取当前帧的图像 */
 {
 	LCUI_Graph *p;
-	if(src == NULL) return NULL;
+	if(src == NULL) {
+		return NULL;
+	}
 	p = &src->slot;
 	return p;
 }
@@ -261,7 +294,9 @@ static LCUI_Frames *Frames_Stream_Update()
 	total = Queue_Get_Total(&frames_stream); 
 	for(i=0; i<total; ++i){
 		frames = Queue_Get(&frames_stream, i);
-		if(frames->status == 1) break;
+		if(frames->status == 1) {
+			break;
+		}
 	}
 	if(i >= total || frames == NULL) return NULL; 
 	/* 
@@ -277,17 +312,25 @@ static LCUI_Frames *Frames_Stream_Update()
 	}
 	if(frames != NULL && frames->current > 0){ 
 		frame = Queue_Get(&frames->pic, frames->current-1);
-		if(frame == NULL) return NULL;
+		if(frame == NULL) {
+			return NULL;
+		}
 		//printf("current time: %ld\n", frame->current_time);
-		if(frame->current_time > 0) usleep(frame->current_time); 
+		if(frame->current_time > 0) {
+			usleep(frame->current_time); 
+		}
 		
 		Frames_Stream_Time_Sub(frame->current_time); 
 		frame->current_time = frame->sleep_time; 
 		++frames->current;
 		total = Queue_Get_Total(&frames->pic);
-		if(frames->current > total) frames->current = 1;
+		if(frames->current > total) {
+			frames->current = 1;
+		}
 		frame = Queue_Get(&frames->pic, frames->current-1);
-		if(frame == NULL) return NULL;
+		if(frame == NULL) {
+			return NULL;
+		}
 	} else {
 		frames->current = 1; 
 		frame = Queue_Get(&frames->pic, 0);
@@ -298,8 +341,10 @@ static LCUI_Frames *Frames_Stream_Update()
 	if(Valid_Graph(&frames->slot)){
 		LCUI_Pos pos;
 		Fill_Graph_Alpha(&frames->slot, 0);
-		pos = Frame_Get_Pos(frames, frame); 
-		Replace_Graph(&frames->slot, frame->pic, pos);
+		if(0 < Queue_Get_Total(&frames->pic)) {
+			pos = Frame_Get_Pos(frames, frame);
+			Replace_Graph(&frames->slot, frame->pic, pos); 
+		}
 	}
 	used_time = clock()-used_time;
 	if(used_time > 0) Frames_Stream_Time_Sub(used_time);
@@ -412,7 +457,7 @@ static void ActiveBox_Init(LCUI_Widget *widget)
 	LCUI_ActiveBox *actbox;
 	actbox = (LCUI_ActiveBox *)Malloc_Widget_Private(widget, 
 					sizeof(LCUI_ActiveBox)); 
-	actbox->frames = Create_Frames(Size(50,50)); 
+	actbox->frames = Create_Frames(Size(50,50));
 	Frames_Add_Func(actbox->frames, ActiveBox_Refresh_Frame, widget);
 }
 
@@ -424,8 +469,9 @@ static void Exec_Update_ActiveBox(LCUI_Widget *widget)
 	LCUI_Graph *graph = Frames_Get_Slot(frames);
 	LCUI_Pos pos = Align_Get_Pos(Get_Widget_Size(widget), 
 				frames->size, ALIGN_MIDDLE_CENTER);
-				
-	Replace_Graph(&widget->graph, graph, pos);
+
+	Fill_Graph_Alpha(&widget->graph, 0);
+	Replace_Graph(&widget->graph, graph, pos);  
 	rect = Rect(pos.x, pos.y, graph->width, graph->height);
 	Add_Widget_Refresh_Area(widget, rect);
 }

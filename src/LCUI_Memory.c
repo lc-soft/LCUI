@@ -117,6 +117,9 @@ void End_Use_Graph(LCUI_Graph *pic)
 			} else {
 				pic->is_opaque = IS_TRUE;
 			}
+		} else {
+			pic->not_visible = IS_TRUE;
+			pic->is_opaque = IS_FALSE;
 		}
 	}
 	thread_rwlock_unlock(&src->lock);

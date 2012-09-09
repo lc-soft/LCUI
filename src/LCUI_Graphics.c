@@ -726,6 +726,7 @@ int detect_png(const char *filepath, LCUI_Graph *out)
 			printf("错误(png):无法分配足够的内存供存储数据!\n");
 			return 1;
 		}
+		Using_Graph(out, 1);
 		temp = (4 * out->width);
 		for(i = 0; i < out->height; i++) 
 		for(j = 0; j < temp; j += 4) {
@@ -735,6 +736,7 @@ int detect_png(const char *filepath, LCUI_Graph *out)
 			out->rgba[3][pos] = row_pointers[i][j+3]; // alpha
 			++pos;
 		} 
+		End_Use_Graph(out);
 	}
 	else if(channels == 3 || color_type == PNG_COLOR_TYPE_RGB) {
 	/*如果是RGB通道*/
@@ -746,6 +748,7 @@ int detect_png(const char *filepath, LCUI_Graph *out)
 			printf("错误(png):无法分配足够的内存供存储数据!\n");
 			return 1;
 		}
+		Using_Graph(out, 1);
 		temp = (3 * out->width);
 		for(i = 0; i < out->height; i++)
 		for(j = 0; j < temp; j += 3) {
@@ -754,6 +757,7 @@ int detect_png(const char *filepath, LCUI_Graph *out)
 			out->rgba[2][pos] = row_pointers[i][j+2];   // blue
 			++pos;
 		} 
+		End_Use_Graph(out);
 	} else {
 		return 1;
 	}
