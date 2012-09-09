@@ -143,8 +143,11 @@ int Graph_Have_Alpha(LCUI_Graph *pic)
  * */
 {
 	pic = Get_Quote_Graph(pic);
-	if( pic->flag == HAVE_ALPHA) return 1;
-	else return 0;
+	if( pic->have_alpha == IS_TRUE/* && pic->rgba[3] != NULL */) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 int Valid_Graph(LCUI_Graph *pic)
@@ -155,9 +158,10 @@ int Valid_Graph(LCUI_Graph *pic)
 {
 	LCUI_Graph *p;
 	p = Get_Quote_Graph(pic);
-	if(NULL != p && p->malloc == IS_TRUE 
-	&& p->width > 0 && p->height > 0)
+	if(NULL != p && p->width > 0 
+	&& p->height > 0 && p->rgba != NULL) {
 		return 1; 
+	}
 	return 0;
 }
 
@@ -188,11 +192,11 @@ void Print_Graph_Info(LCUI_Graph *pic)
 {
 	printf("address:%p\n",pic);
 	if(pic == NULL) return;
-	printf("width:%d, height:%d, alpha:%u,flag = %d(%s),malloc = %d(%s)\n", 
-	pic->width, pic->height, pic->alpha, pic->flag, 
-	pic->flag == HAVE_ALPHA ? "have alpha":"no alpha",
-	pic->malloc, pic->malloc == IS_TRUE?"is true":"is false");
-	
+	printf("width:%d, height:%d, alpha:%u, %s, %s, %s\n", 
+	pic->width, pic->height, pic->alpha, 
+	pic->have_alpha == IS_TRUE ? "have alpha channel":"no alpha channel",
+	pic->not_visible == IS_TRUE ? "not visible":"visible",
+	pic->is_opaque == IS_TRUE ? "is opaque":"not opaque");
 	if(pic->quote == IS_TRUE) {
 		printf("graph src:");
 		Print_Graph_Info(Get_Quote_Graph(pic));
@@ -213,9 +217,10 @@ void Graph_Init(LCUI_Graph *pic)
 /* 初始化图片数据结构体 */
 {
 	if(pic == NULL) return;
-	pic->quote	= IS_FALSE;
-	pic->malloc	= IS_FALSE;
-	pic->flag	= NO_ALPHA;
+	pic->quote	= IS_FALSE; 
+	pic->have_alpha	= IS_FALSE;
+	pic->is_opaque	= IS_FALSE;
+	pic->not_visible = IS_FALSE;
 	pic->rgba	= NULL;
 	pic->alpha	= 255;
 	pic->pos	= Pos(0, 0);
@@ -365,7 +370,7 @@ static int detect_jpg(const char *filepath, LCUI_Graph *out)
 	jaka = cinfo.num_components;
 	
 	//if (jaka==3) printf("color\n"); else printf("grayscale\n");
-	out->flag = NO_ALPHA;
+	out->have_alpha = IS_FALSE;
 	Malloc_Graph(out,cinfo.output_width,cinfo.output_height);
 	if(!out->rgba || !out->rgba[0] || !out->rgba[1] || !out->rgba[2]){
 		printf("错误(jpg):无法分配足够的内存供存储数据!\n");
@@ -422,7 +427,7 @@ static int detect_bmp(const char *filepath, LCUI_Graph *out)
 		printf("错误(bmp):位深 %i 不支持!\n",out->bit_depth);
 		return 2;
 	}
-	out->flag = NO_ALPHA;     /* 没有透明效果 */
+	out->have_alpha = IS_FALSE;     /* 没有透明效果 */
 	temp = Malloc_Graph(out, bmp.ix, bmp.iy);
 	if(temp != 0)
 	{
@@ -603,14 +608,16 @@ int write_png_file(const char *file_name , LCUI_Graph *graph)
 
 
 	/* write header */
-	if (setjmp(png_jmpbuf(png_ptr)))
-	{
+	if (setjmp(png_jmpbuf(png_ptr))) {
 		printf("[write_png_file] Error during writing header");
 		return -1;
 	}
 	Using_Graph(graph, 0);
-	if(graph->flag == HAVE_ALPHA) color_type = PNG_COLOR_TYPE_RGB_ALPHA;
-	else color_type = PNG_COLOR_TYPE_RGB;
+	if(Graph_Have_Alpha(graph)) {
+		color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+	} else {
+		color_type = PNG_COLOR_TYPE_RGB;
+	}
 	
 	png_set_IHDR(png_ptr, info_ptr, graph->width, graph->height,
 		graph->bit_depth, color_type, PNG_INTERLACE_NONE,
@@ -625,27 +632,29 @@ int write_png_file(const char *file_name , LCUI_Graph *graph)
 		End_Use_Graph(graph);
 		return -1;
 	}
-	if(graph->flag == HAVE_ALPHA) temp = (4 * graph->width);
-	else temp = (3 * graph->width);
+	if(Graph_Have_Alpha(graph)) {
+		temp = (4 * graph->width);
+	} else {
+		temp = (3 * graph->width);
+	}
 	
 	row_pointers = (png_bytep*)malloc(graph->height*sizeof(png_bytep));
 	for(i=0,pos=0; i < graph->height; i++)
 	{
 		row_pointers[i] = (png_bytep)malloc(sizeof(unsigned char)*temp);
-		for(j=0; j < temp; ++pos)
-		{
+		for(j=0; j < temp; ++pos) {
 			row_pointers[i][j++] = graph->rgba[0][pos]; // red
 			row_pointers[i][j++] = graph->rgba[1][pos]; // green
 			row_pointers[i][j++] = graph->rgba[2][pos];   // blue
-			if(graph->flag == HAVE_ALPHA) 
+			if(Graph_Have_Alpha(graph)) {
 				row_pointers[i][j++] = graph->rgba[3][pos]; // alpha 
+			}
 		}
 	}
 	png_write_image(png_ptr, row_pointers);
 
 	/* end write */
-	if (setjmp(png_jmpbuf(png_ptr)))
-	{
+	if (setjmp(png_jmpbuf(png_ptr))) {
 		printf("[write_png_file] Error during end of write");
 		End_Use_Graph(graph);
 		return -1;
@@ -704,23 +713,22 @@ int detect_png(const char *filepath, LCUI_Graph *out)
 	/* row_pointers里边就是rgba数据 */
 	png_bytep* row_pointers;
 	row_pointers = png_get_rows(png_ptr, info_ptr);
+	
 	int i,j;
-	if(channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-	{/*如果是RGB+alpha通道，或者RGB+其它字节*/
+	/*如果是RGB+alpha通道，或者RGB+其它字节*/
+	if(channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
 		//开始分配内存
-		out->flag = HAVE_ALPHA;
+		out->have_alpha = IS_TRUE;
 		temp = Malloc_Graph(out, png_get_image_width(png_ptr, info_ptr), 
 					png_get_image_height(png_ptr, info_ptr));
-		if(temp != 0)
-		{/* 如果分配内存失败 */
+		if(temp != 0) {/* 如果分配内存失败 */
 			fclose(pic_fp);
 			printf("错误(png):无法分配足够的内存供存储数据!\n");
 			return 1;
 		}
 		temp = (4 * out->width);
 		for(i = 0; i < out->height; i++) 
-		for(j = 0; j < temp; j += 4)
-		{
+		for(j = 0; j < temp; j += 4) {
 			out->rgba[0][pos] = row_pointers[i][j]; // red
 			out->rgba[1][pos] = row_pointers[i][j+1]; // green
 			out->rgba[2][pos] = row_pointers[i][j+2];   // blue
@@ -728,28 +736,27 @@ int detect_png(const char *filepath, LCUI_Graph *out)
 			++pos;
 		} 
 	}
-	else if(channels == 3 || color_type == PNG_COLOR_TYPE_RGB)
-	{/*如果是RGB通道*/
-		out->flag = NO_ALPHA;
+	else if(channels == 3 || color_type == PNG_COLOR_TYPE_RGB) {
+	/*如果是RGB通道*/
+		out->have_alpha = IS_FALSE;
 		temp = Malloc_Graph(out, png_get_image_width(png_ptr, info_ptr), 
 					png_get_image_height(png_ptr, info_ptr));
-		if(temp != 0)
-		{
+		if(temp != 0) {
 			fclose(pic_fp);
 			printf("错误(png):无法分配足够的内存供存储数据!\n");
 			return 1;
 		}
 		temp = (3 * out->width);
 		for(i = 0; i < out->height; i++)
-		for(j = 0; j < temp; j += 3)
-		{
+		for(j = 0; j < temp; j += 3) {
 			out->rgba[0][pos] = row_pointers[i][j]; // red
 			out->rgba[1][pos] = row_pointers[i][j+1]; // green
 			out->rgba[2][pos] = row_pointers[i][j+2];   // blue
 			++pos;
 		} 
+	} else {
+		return 1;
 	}
-	else return 1;
 	out->type = TYPE_PNG;  /* 图片类型为png */
 	/* 撤销数据占用的内存 */
 	png_destroy_read_struct(&png_ptr, &info_ptr, 0); 
@@ -773,23 +780,22 @@ int Load_Image(const char *filepath, LCUI_Graph *out)
  * */
 {
 	FILE *fp;
-	Graph_Init(out); 
 	int result = 0;   /* 错误代号为0 */
-	out->flag = NO_ALPHA;
+	
+	Graph_Init(out); 
+	out->have_alpha = IS_FALSE;
 	/*fp是全局变量，其它函数会用到它*/
 	if ((fp = fopen(filepath,"r")) == NULL) {
 		perror(filepath);
 		result = OPEN_ERROR; 
-	}
-	else{
+	} else{
 		fgetc(fp);
 		if (!ferror (fp)) {/*r如果没出错*/
 			fseek(fp,0,SEEK_END);
 			if (ftell(fp)>4) {
 				fclose(fp);
 				result = detect_image(filepath, out);/*检测图片并解码*/
-			} 
-			else {
+			} else {
 				result = SHORT_FILE;//文件过小 
 				fclose(fp);
 			}
@@ -828,7 +834,7 @@ void Zoom_Graph(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 		if (scale_x<scale_y) scale_y = scale_x; 
 		else scale_x = scale_y;
 	}
-	out->flag = in->flag;
+	out->have_alpha = in->have_alpha;
 	Malloc_Graph(out, size.w, size.h);/* 申请内存 */ 
 	Using_Graph(out, 1);
 	Using_Graph(in, 0); 
@@ -844,8 +850,9 @@ void Zoom_Graph(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 			out->rgba[0][temp] = in->rgba[0][count];
 			out->rgba[1][temp] = in->rgba[1][count];
 			out->rgba[2][temp] = in->rgba[2][count];
-			if(in->flag == HAVE_ALPHA)
+			if(Graph_Have_Alpha(in)) {
 				out->rgba[3][temp] = in->rgba[3][count];
+			}
 		}
 	} 
 	
@@ -861,7 +868,7 @@ int Cut_Graph(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 {
 	int x, y;
 	int temp,count = 0, k; 
-	out->flag = src->flag;
+	out->have_alpha = src->have_alpha;
 	out->alpha = src->alpha;
 	rect = Get_Valid_Area(Size(src->width, src->height), rect); 
 	if(Valid_Graph(src) && rect.width * rect.height > 0) { 
@@ -877,7 +884,7 @@ int Cut_Graph(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 				out->rgba[0][count] = src->rgba[0][temp];
 				out->rgba[1][count] = src->rgba[1][temp];
 				out->rgba[2][count] = src->rgba[2][temp];
-				if(src->flag == HAVE_ALPHA)
+				if(Graph_Have_Alpha(src))
 					out->rgba[3][count] = src->rgba[3][temp];
 				++count;
 			}
@@ -898,7 +905,9 @@ int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)
     
 	if(!Valid_Graph(src)) value = -1;
 	else {
-		if(src->flag == HAVE_ALPHA) out->flag = HAVE_ALPHA;
+		if(Graph_Have_Alpha(src)) {
+			out->have_alpha = IS_TRUE;
+		}
 		Malloc_Graph(out, width, height);
 		/* 水平翻转其实也就是交换两边的数据 */  
 		temp = width / 2.0;
@@ -920,7 +929,7 @@ int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)
 				out->rgba[2][pos] = src->rgba[2][count];  
 				out->rgba[2][count] = buff;
                 
-				if(src->flag == HAVE_ALPHA) {
+				if(Graph_Have_Alpha(src)) {
 					buff = src->rgba[3][pos]; 
 					out->rgba[3][pos] = src->rgba[3][count];  
 					out->rgba[3][count] = buff;
@@ -943,7 +952,7 @@ int Get_Screen_Graph(LCUI_Graph *out)
 	if(LCUI_Sys.init != IS_TRUE) /* 如果没有初始化过 */
 		return -1; 
 	
-	out->flag = NO_ALPHA;/* 无alpha通道 */
+	out->have_alpha = IS_FALSE;/* 无alpha通道 */
 	out->type = TYPE_BMP;
 	temp = Malloc_Graph(out, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h);
 	if(temp != 0) 
@@ -1343,7 +1352,7 @@ int Set_Graph_To_Rounded_Rectangle(LCUI_Graph *graph, int radius, int mode, int 
 */
 {
 	Using_Graph(graph);/* 使用数据 */
-	if(Valid_Graph(graph) && graph->flag == HAVE_ALPHA)
+	if(Valid_Graph(graph) && Graph_Have_Alpha(graph) == IS_TURE)
 	{/* 如果图形数据有效,并且有alpha通道 */
 		if(graph->width < radius*2 || graph->height < radius*2) 
 			return 1; 
@@ -1415,7 +1424,7 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 				src->rgba[0][count] = color.red;
 				src->rgba[1][count] = color.green;
 				src->rgba[2][count] = color.blue;
-				if(src->flag == HAVE_ALPHA) 
+				if(Graph_Have_Alpha(src)) 
 					src->rgba[3][count] = 255;
 			}
 		}
@@ -1428,7 +1437,7 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 				src->rgba[0][count] = color.red;
 				src->rgba[1][count] = color.green;
 				src->rgba[2][count] = color.blue;
-				if(src->flag == HAVE_ALPHA) 
+				if(Graph_Have_Alpha(src)) 
 					src->rgba[3][count] = 255;
 			}
 		}
@@ -1440,7 +1449,7 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 				src->rgba[0][count] = color.red;
 				src->rgba[1][count] = color.green;
 				src->rgba[2][count] = color.blue;
-				if(src->flag == HAVE_ALPHA) 
+				if(Graph_Have_Alpha(src)) 
 					src->rgba[3][count] = 255;
 			}
 		}
@@ -1453,7 +1462,7 @@ int Draw_Graph_Border(LCUI_Graph *src,LCUI_RGB color, LCUI_Border border)
 				src->rgba[0][count] = color.red;
 				src->rgba[1][count] = color.green;
 				src->rgba[2][count] = color.blue;
-				if(src->flag == HAVE_ALPHA) 
+				if(Graph_Have_Alpha(src)) 
 					src->rgba[3][count] = 255;
 			}
 		}
@@ -1571,7 +1580,7 @@ int Rotate_Graph(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
     if(Valid_Graph(des))
 		Free_Graph(des);/* 先将这个内存释放 */
 		
-    des->flag = src->flag;
+    des->have_alpha = src->have_alpha;
     // 分配内存，储存新的图形
     if(Malloc_Graph(des, new_width, new_height) != 0)
 		return -1;
@@ -1593,24 +1602,24 @@ int Rotate_Graph(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
             src_x = (long) ( ((float) des_x) * fCosa + ((float) des_y) * fSina + f1 + 0.5);   
                
             // 判断是否在源图范围内   
-            if( (src_x >= 0) && (src_x < width) && (src_y >= 0) && (src_y < height))   
-            {
+            if( (src_x >= 0) && (src_x < width) 
+            && (src_y >= 0) && (src_y < height)) {
                 // 指向源DIB第i0行，第j0个象素的指针
                 z = width * src_y + src_x;
                 des->rgba[0][n] = src->rgba[0][z];
                 des->rgba[1][n] = src->rgba[1][z];
                 des->rgba[2][n] = src->rgba[2][z];
-                if(des->flag == HAVE_ALPHA)
-					des->rgba[3][n] = src->rgba[3][z];
-            }
-            else   
-            {
+                if(Graph_Have_Alpha(des)) {
+			des->rgba[3][n] = src->rgba[3][z];
+		}
+            } else {
                 // 对于源图中没有的象素，直接赋值为255   
                 des->rgba[0][n] = 255;
                 des->rgba[1][n] = 255;
                 des->rgba[2][n] = 255;
-                if(des->flag == HAVE_ALPHA)
-					des->rgba[3][n] = 0;
+                if(Graph_Have_Alpha(des)) {
+			des->rgba[3][n] = 0;
+		}
             }
         }
     }
@@ -1621,7 +1630,10 @@ int Rotate_Graph(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 /********************** Graphics Processing End ***********************/
 
 void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
-/* 功能：获取与指定区域重叠的部件 */
+/* 
+ * 功能：获取与指定区域重叠的部件 
+ * 说明：得到的队列，队列中的部件排列顺序为：底-》上 == 左-》右
+ * */
 {
 	int i, total;
 	LCUI_Pos pos;
@@ -1632,8 +1644,9 @@ void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
 	if(widget == NULL) 
 		widget_list = &LCUI_Sys.widget_list; 
 	else {
-		if(widget->visible == IS_FALSE) 
+		if(widget->visible == IS_FALSE) {
 			return;
+		}
 		widget_list = &widget->child; 
 	}
 	
@@ -1647,7 +1660,9 @@ void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
 			pos = Get_Widget_Global_Pos(child);
 			tmp.x += pos.x;
 			tmp.y += pos.y;
-			if(!Rect_Valid(tmp)) continue;
+			if(!Rect_Valid(tmp)){
+				continue;
+			}
 			if (Rect_Is_Overlay(tmp, rect)) { 
 				/* 记录与该区域重叠的部件 */
 				Queue_Add_Pointer(queue, child);
@@ -1683,22 +1698,23 @@ int Graph_Is_Opaque(LCUI_Graph *graph)
  * 功能：检测图形是否为不透明 
  * 说明：完全透明则返回-1，不透明则返回1，有透明效果则返回0
  * */
-{ 
-	if( !Graph_Have_Alpha(graph) )
+{
+	if( !Graph_Have_Alpha(graph) ) {
 		return 1; 
-	if( graph->alpha == 0 )
+	}
+	if( graph->alpha == 0 ) {
 		return -1;
-	else if(graph->alpha < 255)
+	} else if(graph->alpha < 255) {
 		return 0;
+	}
 		
-	unsigned char *p;
-	unsigned int size;
-	
-	size = graph->width * graph->height;
-	
-	for(p=graph->rgba[3]; *p==255 && p<graph->rgba[3]+size; ++p);
-	if(p == graph->rgba[3]+size) return 1; 
-	else return 0; 
+	if( graph->is_opaque ) {
+		return 1;
+	}
+	if( graph->not_visible ) {
+		return -1;
+	}
+	return 0;
 }
 
 
@@ -1725,7 +1741,7 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
  * 说明：指定的区域必须是与部件区域不部分重叠的
  * */
 { 
-	LCUI_Pos pos;
+	LCUI_Pos pos, widget_pos;
 	LCUI_Widget *widget; 
 	LCUI_Queue widget_buff;
 	LCUI_Rect valid_area;
@@ -1743,36 +1759,50 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 	if (rect.width <= 0 && rect.height <= 0) return -2;
 	
 	int i, total; 
+	graph->have_alpha = IS_FALSE; 
+	buff.have_alpha = IS_TRUE;
 	/* 根据指定的尺寸，分配内存空间，用于储存图形数据 */
 	Malloc_Graph(graph, rect.width, rect.height);
-	graph->flag = NO_ALPHA; 
 	/* 获取与该区域重叠的部件，并记录至队列widget_buff中 */
 	Get_Overlay_Widget(rect, NULL, &widget_buff); 
-	buff.flag = HAVE_ALPHA;
 	total = Queue_Get_Total(&widget_buff); 
 	if(total > 0) {
 		//printf("rect(%d,%d,%d,%d), list cover widget:\n",
 		//rect.x, rect.y, rect.width, rect.height
 		//);
 		//printf("list cover widget:\n");
-		//for(i=total-1; i>=0; --i) {
-			///* 队列最末端是最前端显示的部件，所以从尾至头遍历 */
-			//widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
-			//print_widget_info(widget); 
-			///* 如果图层完全不可见，即完全透明 */
-			//switch(Graph_Is_Opaque(&widget->graph)) {
-				//case -1:
-				//Queue_Delete_Pointer(&widget_buff, i);
-				//case 0: break;
-				//case 1: goto skip_loop;
-			//} 
-		//} 
-		i = -1;
-//skip_loop:
-		//printf("list end\n");
+		for(i=total-1; i>=0; --i) {
+			widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
+			valid_area = Get_Widget_Valid_Rect(widget);
+			widget_pos = Get_Widget_Global_Pos(widget);
+			valid_area.x += widget_pos.x;
+			valid_area.y += widget_pos.y;
+			//Print_Graph_Info(&widget->graph);
+			//print_widget_info(widget);
+			/* 检测图层属性 */
+			switch(Graph_Is_Opaque(&widget->graph)) {
+			    case -1:
+				//printf("delete\n");
+				/* 如果完全不可见，直接从队列中移除 */
+				Queue_Delete_Pointer(&widget_buff, i);
+				break;
+			    case 0: break;
+			    case 1:
+				if(Rect_Include_Rect(valid_area, rect)) { 
+					/* 如果不透明，并且图层区域包含需刷新的区域 */
+					//printf("goto\n");
+					goto skip_loop;
+				}
+				break;
+			    default:break;
+			} 
+		}
+skip_loop:
 		//nobuff_print("mix graph layer, use time:");
 		//count_time();
 		total = Queue_Get_Total(&widget_buff);
+		//printf("list end, total: %d\n", i);
+		//i = -1;
 		if(i <= 0){
 			i=0;
 			Cut_Graph (&LCUI_Sys.screen.buff, rect, graph);

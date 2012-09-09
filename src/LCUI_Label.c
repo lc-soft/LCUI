@@ -108,98 +108,104 @@ static void Exec_Update_Label(LCUI_Widget *widget)
 	
 	len = label->text.size; 
 	
-	if(len <= 0)
-	{/* 如果内容为空 */
-		if(label->auto_size == IS_TRUE) 
-			/*如果开启了自动调整大小*/
+	if(len <= 0) {/* 如果内容为空 */
+		/*如果开启了自动调整大小*/
+		if(label->auto_size == IS_TRUE) {
 			Resize_Widget(widget, Size(0, 0)); 
-			
-		widget->graph.flag = HAVE_ALPHA;
-	} else {
-		/* 声明一个用于保存分割后的wchar_t型字符串的LCUI_Wchar_T型指针 */
-		LCUI_WString *new_list; 
-		/* 声明两个用于保存字符串行数的整型变量 */
-		int old_rows, new_rows; 
-		/* 分割成wchar_t型数据 */ 
-		new_rows = String_To_List(label->text.string , &new_list); 
-		/* 获取之前文本的行数 */
-		old_rows = label->rows;
-		
-		if(old_rows > 0) /* 改变内存空间大小 */
-			label->contents = (LCUI_WString *)
-					realloc(label->contents, 
-					sizeof(LCUI_WString) * new_rows); 
-		else label->contents = (LCUI_WString *)calloc(new_rows, 
-					sizeof(LCUI_WString));
-		
-		for(i = 0; i < new_rows; ++i) {/* 遍历每一行 */
-			/* 改变这一行内容占的内存空间大小 */
-			if(old_rows > i)
-				label->contents[i].string = (LCUI_WChar_T*)realloc(
-								label->contents[i].string, 
-								sizeof(LCUI_WChar_T) * 
-								(new_list[i].size + 1));
-			else {
-				label->contents[i].string = (LCUI_WChar_T*)malloc(
-							sizeof(LCUI_WChar_T) * 
-							(new_list[i].size + 1));
-				label->contents[i].size = 0;
-			}
-			/* 遍历这行的字符串的每个元素 */
-			for(k = 0; k < new_list[i].size; ++k) {
-				if(new_list[i].string[k].color_type == DEFAULT)
-				/* 使用默认的颜色 */
-					label->contents[i].string[k].color = label->font.fore_color;
-				else  /* 否则使用自定义颜色 */
-					label->contents[i].string[k].color = new_list[i].string[k].color; 
-				/* 如果字符的位置还在label->contents[i]的范围内 */
-				if(k < label->contents[i].size) {
-					/* 如果文字不一样，就需要刷新该字 */
-					if(label->contents[i].string[k].char_code != new_list[i].string[k].char_code) {
-						label->contents[i].string[k].char_code = new_list[i].string[k].char_code; 
-						/* 获取字符位图 */ 
-						Get_WChar_Bitmap(&label->font, 
-								label->contents[i].string[k].char_code , 
-								&label->contents[i].string[k].bitmap );
-								label->contents[i].update = IS_TRUE;/* 这一行文本需要刷新 */ 
-					}
-				} else {
-					/* 否则，说明new_list[i]的元素个数比label->contents[i]的多 */
-					label->contents[i].string[k].char_code = new_list[i].string[k].char_code; 
-					/* 先初始化数据结构，然后获取字符位图 */
-					Bitmap_Init(&label->contents[i].string[k].bitmap);
-					Get_WChar_Bitmap(&label->font, 
-							label->contents[i].string[k].char_code , 
-							&label->contents[i].string[k].bitmap );
-					label->contents[i].update = IS_TRUE; 
-				} 
-			}
-			/* 改成新的字符串长度 */
-			label->contents[i].size = new_list[i].size;
-			/* 释放内存，这行的数据没用了 */
-			free(new_list[i].string);
 		}
-		/* 释放内存，new_list已经不需要用了 */
-		free(new_list);
-		new_list = NULL; 
-			/* 计算文本内容的尺寸 */
-		label->rows = new_rows;
-		Count_Contents_Size(label->contents, &max_width, &max_height, 
-			label->rows, label->font.space, label->font.linegap);
-		if(label->auto_size == IS_TRUE 
-		&& (max_width != widget->size.w 
-		|| max_height != widget->size.h)) {
-			/* 如果开启了自动调整大小,并且尺寸有改变 */
-			Resize_Widget(widget, Size(max_width, max_height + 2));
-			Refresh_Widget(widget);
-		} 
+		widget->graph.have_alpha = IS_TRUE;
+		goto skip_fontbitmap_mix;
+	} 
+	
+	LCUI_WString *new_list;
+	int old_rows, new_rows; 
+	wchar_t *new_code, *old_code;
+	/* 分割成wchar_t型数据 */ 
+	new_rows = String_To_List(label->text.string , &new_list); 
+	/* 获取之前文本的行数 */
+	old_rows = label->rows;
+	
+	if(old_rows > 0) {/* 改变内存空间大小 */
+		label->contents = (LCUI_WString *)
+				realloc(label->contents, 
+				sizeof(LCUI_WString) * new_rows); 
+	} else {
+		label->contents = (LCUI_WString *)calloc(new_rows, 
+				sizeof(LCUI_WString));
 	}
+	for(i = 0; i < new_rows; ++i) {/* 遍历每一行 */
+		/* 改变这一行内容占的内存空间大小 */
+		if(old_rows > i)
+			label->contents[i].string = 
+				(LCUI_WChar_T*)realloc(
+				label->contents[i].string, 
+				sizeof(LCUI_WChar_T) * 
+				(new_list[i].size + 1));
+		else {
+			label->contents[i].string = 
+				(LCUI_WChar_T*)malloc(
+				sizeof(LCUI_WChar_T) * 
+				(new_list[i].size + 1));
+			label->contents[i].size = 0;
+		}
+		/* 遍历这行的字符串的每个元素 */
+		for(k = 0; k < new_list[i].size; ++k) {
+			if(new_list[i].string[k].color_type == DEFAULT) {
+			/* 使用默认的颜色 */
+				label->contents[i].string[k].color = label->font.fore_color;
+			} else {  /* 否则使用自定义颜色 */
+				label->contents[i].string[k].color = new_list[i].string[k].color; 
+			}
+			
+			new_code = &new_list[i].string[k].char_code;
+			old_code = &label->contents[i].string[k].char_code;
+			/* 如果字符的位置还在label->contents[i]的范围内 */
+			if(k < label->contents[i].size) {
+				/* 如果文字不一样，就需要刷新该字 */
+				if( old_code != new_code) {
+					*old_code = *new_code; 
+					/* 获取字符位图 */ 
+					Get_WChar_Bitmap(&label->font, *old_code , 
+						&label->contents[i].string[k].bitmap );
+					label->contents[i].update = IS_TRUE;/* 这一行文本需要刷新 */ 
+				}
+			} else { 
+				*old_code = *new_code; 
+				/* 先初始化数据结构，然后获取字符位图 */
+				Bitmap_Init(&label->contents[i].string[k].bitmap);
+				Get_WChar_Bitmap(&label->font, *old_code , 
+					&label->contents[i].string[k].bitmap );
+				label->contents[i].update = IS_TRUE; 
+			}
+		}
+		/* 改成新的字符串长度 */
+		label->contents[i].size = new_list[i].size;
+		/* 释放内存，这行的数据没用了 */
+		free(new_list[i].string);
+	}
+	/* 释放内存，new_list已经不需要用了 */
+	free(new_list);
+	new_list = NULL; 
+	/* 计算文本内容的尺寸 */
+	label->rows = new_rows;
+	Count_Contents_Size(label->contents, &max_width, &max_height, 
+		label->rows, label->font.space, label->font.linegap);
+	if(label->auto_size == IS_TRUE 
+	&& (max_width != widget->size.w 
+	|| max_height != widget->size.h)) {
+		/* 如果开启了自动调整大小,并且尺寸有改变 */
+		Resize_Widget(widget, Size(max_width, max_height + 2));
+		Refresh_Widget(widget);
+	}
+		
+skip_fontbitmap_mix:;
 	
 	int flag; 
-	if(!Valid_Graph(&widget->background_image)) 
+	if(!Valid_Graph(&widget->background_image)) {
 		flag = GRAPH_MIX_FLAG_REPLACE; /* 替换模式 */
-	else 
+	} else {
 		flag = GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */ 
+	}
 	/* 合成字体位图 */
 	Mix_Widget_FontBitmap(widget, 1, 1, label->contents, label->rows, 
 			label->font.space, label->font.linegap, flag);

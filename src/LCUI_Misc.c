@@ -266,7 +266,7 @@ int
 Rect_Include_Rect (LCUI_Rect a, LCUI_Rect b)
 /*
  * 功能：检测两个矩形中，A矩形是否包含B矩形
- * 返回值：两不矩形属于包行关系返回1，否则返回0。
+ * 返回值：两不矩形属于包含关系返回1，否则返回0。
  * */
 {
 	int count = 0, m, n = 0, x[4], y[4];
@@ -281,24 +281,24 @@ Rect_Include_Rect (LCUI_Rect a, LCUI_Rect b)
 	y[2] = b.y + b.height;
 	x[3] = b.x + b.width;
 	y[3] = b.y + b.height; 
-	for (m = 0; m < 4; ++m)
-	{
+	for (m = 0; m < 4; ++m) {
 		/*printf("[%d](%d>=%d && %d<%d+%d) && (%d>=%d && %d<%d+%d)\n", 
 			m, x[m], a.x, x[m], a.x, a.width, 
 			y[m], a.y, y[m], a.y, a.height
 		);*/
 		if ((x[m] >= a.x && x[m] < a.x + a.width)
-			&& (y[m] >= a.y && y[m] < a.y + a.height))
-		{						/* 如果点(x[m],y[m])在矩形A内 */
+		 && (y[m] >= a.y && y[m] < a.y + a.height)) {
+		/* 如果点(x[m],y[m])在矩形A内 */
 			//printf("yes\n");
 			count += 1;
 		}
 	}
 
-	if (count == 4)
+	if (count == 4) {
 		n = 1;
-	else
+	} else {
 		n = 0;
+	}
 	return n;
 }
 
@@ -350,8 +350,9 @@ int Cut_Overlay_Rect (	LCUI_Rect old_rect, LCUI_Rect new_rect,
 	int i; 
 	LCUI_Rect r[5];
 	
-	for(i=0; i<5; ++i)
+	for(i=0; i<5; ++i) {
 		Rect_Init(&r[i]); 
+	}
 	
 	/* 计算各个矩形的x轴坐标和宽度 */
 	r[0].x = new_rect.x;
@@ -370,12 +371,15 @@ int Cut_Overlay_Rect (	LCUI_Rect old_rect, LCUI_Rect new_rect,
 				
 				r[3].x = old_rect.x + old_rect.width;
 				r[3].width = new_rect.x + new_rect.width - r[3].x;
-			} else  /* 得出矩形2的宽度 */ 
+			} else { /* 得出矩形2的宽度 */ 
 				r[1].width = new_rect.x + new_rect.width - old_rect.x;  
+			}
 			/* 得出矩形3和5的宽度 */ 
 			r[2].width = r[1].width;
 			r[4].width = r[2].width;
-		} else return -1; 
+		} else {
+			return -1; 
+		}
 	} else {  
 		if(old_rect.x + old_rect.width > new_rect.x) { 
 			r[1].x = new_rect.x;
@@ -386,12 +390,15 @@ int Cut_Overlay_Rect (	LCUI_Rect old_rect, LCUI_Rect new_rect,
 				r[1].width = old_rect.x + old_rect.width - r[1].x;
 				r[3].x = old_rect.x + old_rect.width;
 				r[3].width = new_rect.x + new_rect.width - r[3].x;
-			} else r[1].width = new_rect.width; 
+			} else {
+				r[1].width = new_rect.width; 
+			}
 				
 			r[2].width = r[1].width;
 			r[4].width = r[2].width; 
+		} else {
+			return -1; 
 		}
-		else return -1; 
 	}
 	 
 	/* 计算各个矩形的y轴坐标和高度 */
@@ -411,8 +418,9 @@ int Cut_Overlay_Rect (	LCUI_Rect old_rect, LCUI_Rect new_rect,
 			} else { 
 				r[2].height = new_rect.y + new_rect.height - old_rect.y;  
 			}
+		} else {
+			return -1; 
 		}
-		else return -1; 
 	} else {  
 		if(new_rect.y < old_rect.y + old_rect.height) { 
 			r[2].y = new_rect.y; 
@@ -421,8 +429,9 @@ int Cut_Overlay_Rect (	LCUI_Rect old_rect, LCUI_Rect new_rect,
 				r[2].height = old_rect.y + old_rect.height - r[2].y;
 				r[4].height = new_rect.y + new_rect.height - r[4].y;
 			} else r[2].height = new_rect.y + new_rect.height - r[2].y;  
+		} else {
+			return -1; 
 		}
-		else return -1; 
 	}
 	
 	//r[0].width -= 1;
@@ -490,51 +499,38 @@ int Get_Overlay_Rect(LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out)
 {
 	int x = 0,y = 0,w = 0,h = 0;
 	
-	if(b.x > a.x && b.x+b.width < a.x+a.width)
-	{
+	if(b.x > a.x && b.x+b.width < a.x+a.width) {
 		x = a.x;
 		w = b.width;
-	}
-	else if(b.x <= a.x && b.x+b.width >= a.x+a.width)
-	{
+	} else if(b.x <= a.x && b.x+b.width >= a.x+a.width) {
 		x = a.x;
 		w = a.width;
-	}
-	else if(b.x+b.width > a.x && b.x+b.width <= a.x+a.width)
-	{
+	} else if(b.x+b.width > a.x && b.x+b.width <= a.x+a.width) {
 		x = a.x;
 		w = b.x+b.width - a.x;
-	}
-	else if(b.x >= a.x && b.x < a.x+a.width)
-	{
+	} else if(b.x >= a.x && b.x < a.x+a.width) {
 	   x = b.x;
 	   w = a.x+a.width - b.x;
 	}
 	
-	if(b.y > a.y && b.y+b.height < a.y+a.height)
-	{
+	if(b.y > a.y && b.y+b.height < a.y+a.height) {
 		y = b.y;
 		h = b.height;
-	}
-	else if(b.y <= a.y && b.y+b.height >= a.y+a.height)
-	{
+	} else if(b.y <= a.y && b.y+b.height >= a.y+a.height) {
 	   y = a.y;
 	   h = a.height;
-	}
-	else if(b.y+b.height > a.y && b.y+b.height <= a.y+a.height)
-	{
+	} else if(b.y+b.height > a.y && b.y+b.height <= a.y+a.height) {
 		y = a.y;
 		h = b.y+b.height - a.y;
-	}
-	else if(b.y >= a.y && b.y < a.y+a.height)
-	{
+	} else if(b.y >= a.y && b.y < a.y+a.height) {
 		y = b.y;
 		h = a.y+a.height - b.y;
 	}
 	
 	*out = Rect(x, y, w, h);
-	if (x + w == 0 || y + h == 0) 
+	if (x + w == 0 || y + h == 0) {
 		return 0;
+	}
 	return 1;
 }
 

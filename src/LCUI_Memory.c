@@ -54,37 +54,96 @@ void Using_Graph(LCUI_Graph *pic, int mode)
 {
 	LCUI_Graph *src;
 	src = Get_Quote_Graph(pic);
-	if(mode == 0) thread_rwlock_rdlock(&src->lock);
-	else thread_rwlock_wrlock(&src->lock);
+	if(mode == 0) {
+		thread_rwlock_rdlock(&src->lock);
+	} else {
+		thread_rwlock_wrlock(&src->lock);
+	}
 }
 
 void End_Use_Graph(LCUI_Graph *pic)
 /* 功能：结束图像数据的使用 */
 {
+	rwlock_status status;
 	LCUI_Graph *src;
 	src = Get_Quote_Graph(pic);
+	status = thread_rwlock_get_status(&src->lock);
+	/* 如果当前为写锁，那就说明这个图形数据被修改了 */
+	if(status == RWLOCK_WRITE){
+		/* 根据图形数据内容来设定各个标志 */
+		if(Valid_Graph(pic)){ 
+			if( Graph_Have_Alpha(pic) ) {
+				int flag;
+				unsigned int i, total;
+				total = pic->width*pic->height;
+				/* 遍历alpha通道中的每个元素的值 */
+				for(flag=0,i=0; i<total; ++i) { 
+					if(src->rgba[3][i] == 0) {
+						if(i>0 && flag != -1) {
+							break;
+						}
+						flag = -1;
+					} else if(src->rgba[3][i] == 255) {
+						if(i>0 && flag != 0) {
+							break;
+						}
+						flag = 0;
+					} else {
+						if(i>0 && flag != 1) {
+							break;
+						}
+						flag = 1;
+					}
+				}
+				if(i == total) {
+					switch(flag) {
+					    case -1:
+						pic->not_visible = IS_TRUE;
+						pic->is_opaque = IS_FALSE;
+						break;
+					    case 1:
+						pic->not_visible = IS_FALSE;
+						pic->is_opaque = IS_FALSE;
+						break;
+					    default:
+						pic->not_visible = IS_FALSE;
+						pic->is_opaque = IS_TRUE;
+						break;
+					}
+				} else {
+					pic->not_visible = IS_FALSE;
+					pic->is_opaque = IS_FALSE;
+				}
+			} else {
+				pic->is_opaque = IS_TRUE;
+			}
+		}
+	}
 	thread_rwlock_unlock(&src->lock);
 }
 
-unsigned char** Get_Malloc(int width,int height,int flag)
+unsigned char** Get_Malloc(int width,int height,int have_alpha)
 /* 功能：为图形数据申请内存空间，并初始化该内存空间为零 */
 {
 	unsigned int size;
 	unsigned char** out_buff;
 	size = sizeof(unsigned char)*width*height;
-	if(flag == HAVE_ALPHA)
+	if(have_alpha == IS_TRUE) { 
 		out_buff = (unsigned char**)malloc(sizeof(unsigned char*)*4);
-	else
+	} else {
 		out_buff = (unsigned char**)malloc(sizeof(unsigned char*)*3);
-		out_buff[0] = (unsigned char*)malloc(size);
-		out_buff[1] = (unsigned char*)malloc(size);
-		out_buff[2] = (unsigned char*)malloc(size);
-		if(flag == HAVE_ALPHA)
-			out_buff[3] = (unsigned char*)calloc(1, size);
-			
-		if(!out_buff || !out_buff[0] || !out_buff[1] 
-		|| !out_buff[2] || (flag == HAVE_ALPHA && !out_buff[3]))
-			return NULL; 
+	}
+	out_buff[0] = (unsigned char*)malloc(size);
+	out_buff[1] = (unsigned char*)malloc(size);
+	out_buff[2] = (unsigned char*)malloc(size);
+	if(have_alpha == IS_TRUE) {
+		out_buff[3] = (unsigned char*)calloc(1, size);
+	}
+	
+	if(!out_buff || !out_buff[0] || !out_buff[1] || !out_buff[2] 
+	|| (have_alpha == IS_TRUE && !out_buff[3])) {
+		return NULL; 
+	} 
 	return out_buff;
 }
  
@@ -102,11 +161,11 @@ void Free_Graph(LCUI_Graph *pic)
 			free(pic->rgba[0]);
 			free(pic->rgba[1]);
 			free(pic->rgba[2]);
-			if(pic->flag == HAVE_ALPHA) 
+			if(Graph_Have_Alpha(pic)) {
 				free(pic->rgba[3]);
+			}
 			free(pic->rgba);
 			pic->rgba = NULL;
-			pic->malloc = IS_FALSE;
 			pic->width = 0;
 			pic->height = 0;
 		}
@@ -143,19 +202,17 @@ int Malloc_Graph(LCUI_Graph *pic, int width, int height)
 		Free_Graph(pic); 
 	}
 	
-	Using_Graph(pic, 1);
-	pic->rgba  = Get_Malloc(width, height, pic->flag); 
+	Using_Graph(pic, 1); 
+	pic->rgba = Get_Malloc(width, height, pic->have_alpha); 
 	if(NULL == pic->rgba) {
 		pic->width  = 0;
 		pic->height = 0;
-		End_Use_Graph(pic);
-		pic->malloc = IS_FALSE;
+		End_Use_Graph(pic); 
 		return -1;
 	}
 	
 	pic->width  = width;
-	pic->height = height;
-	pic->malloc = IS_TRUE;
+	pic->height = height; 
 	End_Use_Graph(pic); 
 	return 0;
 }
@@ -167,11 +224,16 @@ void Copy_Graph(LCUI_Graph *des, LCUI_Graph *src)
  * */
 {
 	int size;
-	des->flag = src->flag;       /* 是否需要透明度 */
+	des->have_alpha = src->have_alpha; /* 是否需要透明度 */
 	if(Valid_Graph(src)) {
-		if(Valid_Graph(des)) Free_Graph(des);
-		if(src->flag == HAVE_ALPHA) des->flag = HAVE_ALPHA;
-		else des->flag = NO_ALPHA;
+		if(Valid_Graph(des)) {
+			Free_Graph(des);
+		}
+		if(Graph_Have_Alpha(src)) {
+			des->have_alpha = IS_TRUE;
+		} else {
+			des->have_alpha = IS_FALSE;
+		}
 		Malloc_Graph(des, src->width, src->height);/* 重新分配 */
 		/* 拷贝图像数组 */
 		Using_Graph(des, 1);
@@ -180,8 +242,9 @@ void Copy_Graph(LCUI_Graph *des, LCUI_Graph *src)
 		memcpy(des->rgba[0], src->rgba[0], size);
 		memcpy(des->rgba[1], src->rgba[1], size);
 		memcpy(des->rgba[2], src->rgba[2], size);
-		if(src->flag == HAVE_ALPHA)
-		memcpy(des->rgba[3], src->rgba[3], size);
+		if(Graph_Have_Alpha(src)) {
+			memcpy(des->rgba[3], src->rgba[3], size);
+		}
 		des->type = src->type;       /* 存储图片类型 */
 		des->bit_depth = src->bit_depth;  /* 位深 */
 		des->alpha = src->alpha;      /* 透明度 */
@@ -193,8 +256,9 @@ void Copy_Graph(LCUI_Graph *des, LCUI_Graph *src)
 void Free_String(LCUI_String *in)
 /* 功能：释放String结构体中的指针占用的内存空间 */
 {
-	if(in->size > 0) 
+	if(in->size > 0) {
 		free(in->string); 
+	}
 	in->string = NULL;
 }
 
@@ -203,8 +267,9 @@ void Free_Bitmap(LCUI_Bitmap *bitmap)
 {
 	int y;
 	if(Valid_Bitmap(bitmap)) {
-		for(y = 0; y < bitmap->height; ++y) 
+		for(y = 0; y < bitmap->height; ++y) {
 			free(bitmap->data[y]); 
+		}
 		free(bitmap->data);
 		bitmap->alpha    = 255;/* 字体位图默认不透明 */
 		bitmap->width    = 0;
@@ -226,8 +291,9 @@ void Free_WString(LCUI_WString *str)
 	int i;
 	if(str != NULL) {
 		if(str->size > 0 && str->string != NULL) {
-			for(i = 0; i < str->size; ++i) 
+			for(i = 0; i < str->size; ++i) {
 				Free_WChar_T(&str->string[i]); 
+			}
 			free(str->string);
 			str->string = NULL;
 		}
@@ -240,8 +306,7 @@ void Malloc_Bitmap(LCUI_Bitmap *bitmap, int width, int height)
 /* 功能：为Bitmap内的数据分配内存资源，并初始化 */
 {
 	int i;
-	if(width * height > 0)
-	{
+	if(width * height > 0) {
 		if(Valid_Bitmap(bitmap)) Free_Bitmap(bitmap);
 		bitmap->width = width;
 		bitmap->height = height;
@@ -261,18 +326,21 @@ void Realloc_Bitmap(LCUI_Bitmap *bitmap, int width, int height)
 /* 功能：更改位图的尺寸 */
 {
 	int i, j;
-	if(width >= bitmap->width && height >= bitmap->height)
-	{/* 如果新尺寸大于原来的尺寸 */
+	if(width >= bitmap->width && height >= bitmap->height) {
+	/* 如果新尺寸大于原来的尺寸 */
 		bitmap->data = (unsigned char**)realloc(
 			bitmap->data, height*sizeof(unsigned char*));
 		for(i = 0; i < height; ++i) {   /* 为背景图的每一行扩增内存 */
 			bitmap->data[i] = (unsigned char*)realloc(
 				bitmap->data[i], sizeof(unsigned char) * width); 
 			/* 把扩增的部分置零 */
-			if(i < bitmap->height)  
-				for(j = bitmap->width; j < width; ++j)
+			if(i < bitmap->height) {
+				for(j = bitmap->width; j < width; ++j) {
 					bitmap->data[i][j] = 0; 
-			else memset(bitmap->data[i], 0 , bitmap->width); 
+				}
+			} else {
+				memset(bitmap->data[i], 0 , bitmap->width); 
+			}
 		}
 	}
 }
@@ -288,10 +356,10 @@ void Free_Font(LCUI_Font *in)
 		if(in->type == CUSTOM) { 
 			FT_Done_Face(in->ft_face);
 			FT_Done_FreeType(in->ft_lib);
-		} 
+		}
 		in->ft_lib = NULL;
 		in->ft_face = NULL;
-	} 
+	}
 }
 
 void Free_LCUI_Font()
@@ -308,7 +376,3 @@ void Free_LCUI_Font()
 		LCUI_Sys.default_font.ft_face = NULL;
 	}
 }
-
-
-
-

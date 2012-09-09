@@ -539,7 +539,7 @@ LCUI_Widget *Create_Widget(const char *widget_type)
 	/* 初始化储存图形数据的结构体 */
 	Graph_Init(&widget.graph);
 	Graph_Init(&widget.background_image);
-	widget.graph.flag = HAVE_ALPHA;
+	widget.graph.have_alpha = IS_TRUE;
 	RectQueue_Init(&widget.update_area);/* 初始化区域更新队列 */
 	EventQueue_Init(&widget.event);/* 初始化部件的事件队列 */
 	WidgetQueue_Init(&widget.child);/* 初始化子部件队列 */
@@ -712,9 +712,13 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 				int linegap, int flag	)
 /* 功能：混合部件内的字体位图，使字体能在部件上显示 */
 {
-	if(!Valid_Graph(&widget->graph)) return -1; 
+	if(!Valid_Graph(&widget->graph)) {
+		return -1; 
+	}
 	/* 如果文字行数不大于0 */ 
-	if(rows <= 0) return -2;
+	if(rows <= 0) {
+		return -2;
+	}
 	
 	int i, j ,x = start_x, y = start_y, height = 0;
 	for(i = 0; i < rows; ++i) {
@@ -724,13 +728,21 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 				break;
 			}
 		}
-		if(height > 0) break;
+		if(height > 0) {
+			break;
+		}
 	}
+	
+	Using_Graph(&widget->graph, 1);
 	for(i = 0; i < rows; ++i) {
 		/* 如果已经超出部件的尺寸，就不需要绘制字体位图了 */
-		if(y > widget->size.h) break; 
+		if(y > widget->size.h) {
+			break; 
+		}
 		for(j=0; j < contents[i].size; ++j) {
-			if(x > widget->size.w) break; 
+			if(x > widget->size.w) {
+				break; 
+			}
 			/* 粘贴每个字 */
 			Mix_Fonts_Bitmap(
 				&widget->graph,  x, y , 
@@ -747,18 +759,26 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 				/* 稍微增加点区域范围，所以y-1，height+2 */
 			}
 			/* 累计文字间距 */
-			if( j < contents[i].size - 1) x = x + space;  
+			if( j < contents[i].size - 1) {
+				x = x + space;  
+			}
 			/* 累计文字宽度 */
 			x = x + contents[i].string[j].bitmap.width;
 		}
-		if(contents[i].size == 0) y += height;
-		else y += contents[i].string[0].bitmap.height; 
+		if(contents[i].size == 0) {
+			y += height;
+		} else {
+			y += contents[i].string[0].bitmap.height; 
+		}
 		/* 累计文字行距 */
-		if(i > 0 && i < rows - 1) y += linegap; 
+		if(i > 0 && i < rows - 1) {
+			y += linegap; 
+		}
 		/* x归位 */
 		x = start_x;
 		//printf("Mix_Widget_FontBitmap():rows:%d/%d, size:%d\n", i, rows, contents[i].size);
 	} 
+	End_Use_Graph(&widget->graph);
 	return 0;
 }
 

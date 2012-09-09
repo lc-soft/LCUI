@@ -91,8 +91,8 @@ void Set_Cursor_Pos (LCUI_Pos pos)
 	RectQueue_Init(&rt);
 	old = Get_Cursor_Rect();
  	LCUI_Sys.cursor.pos = pos; 
+	Refresh_Cursor ();		/* 刷新游标的显示 */ 
 	Add_Screen_Refresh_Area ( old ); /* 刷新游标原来的区域中的图形 */
-	Refresh_Cursor ();			/* 刷新游标的显示 */ 
 }
 
 int Set_Cursors_Graph (LCUI_Graph * graph)
