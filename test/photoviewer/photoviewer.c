@@ -6,9 +6,9 @@
 #include LC_WINDOW_H
 #include LC_PICBOX_H
 #include LC_BUTTON_H
+#include LC_ACTIVEBOX_H
 #include LC_MEM_H
-#include LC_LABEL_H
-#include LC_MISC_H
+#include LC_LABEL_H 
 #include LC_GRAPHICS_H
 #include LC_RES_H
 #include LC_INPUT_H 
@@ -25,7 +25,7 @@
 
 /* 与这些函数共享数据，只有使用全局变量，传参数很麻烦 */
 static LCUI_Widget	*window, *image_box, *tip_text, *tip_box,
-			*image_info_text, *image_info_box,
+			*tip_icon, *tip_pic, *image_info_text, *image_info_box,
 			*btn_zoom[2], *btn_switch[2], *container[2];
 						
 static float	mini_scale = 1.0, scale = 1.0;   /* 记录缩放比率 */
@@ -45,7 +45,9 @@ void image_zoom_in()
 		scale = 2.0; /* 最大不能超过200% */
 	}
 	/* 为了能达到100%，加了个判断，如果缩放比例接近100%，那就直接等于100% */
-	if(scale > 0.85 && scale < 1.10) scale = 1; 
+	if(fabs(scale - 1.0) < 0.2 && scale != mini_scale) {
+		scale = 1; 
+	}
 	/* 按比例缩放浏览区域 */
 	Zoom_PictureBox_View_Area(image_box, scale);
 	scale = Get_PictureBox_Zoom_Scale(image_box);/* 获取缩放比例 */
@@ -74,10 +76,12 @@ void image_zoom_out()
 		scale = mini_scale;
 		Disable_Widget(btn_zoom[0]);
 	}
-	if(scale > 0.85 && scale < 1.10 && scale != mini_scale)  
+	if(fabs(scale - 1.0) < 0.2 && scale != mini_scale) {
 		scale = 1; 
-	if(scale > 0.05 && scale < mini_scale + 0.05) 
+	}
+	if(scale > 0.05 && scale < mini_scale + 0.05) {
 		scale = mini_scale;
+	}
 	/* 按比例缩放浏览区域 */
 	Zoom_PictureBox_View_Area(image_box, scale);
 	scale = Get_PictureBox_Zoom_Scale(image_box);
@@ -241,7 +245,7 @@ char **scan_imgfile(char *dir, int *file_num)
 	char **filelist, format[256], path[1024];
 	struct dirent **namelist;
 	
-	if(dir[strlen(dir)-2] != '/') {
+	if(strlen(dir)>0 && dir[strlen(dir)-2] != '/') {
 		strcat(dir, "/");
 	}
 	if(strlen(dir) == 0) {
@@ -249,7 +253,6 @@ char **scan_imgfile(char *dir, int *file_num)
 	} else {
 		n = scandir(dir, &namelist, 0, alphasort);
 	}
-	
 	if (n < 0) return 0; 
 	
 	filelist = (char **)malloc(sizeof(char *)*n);
@@ -292,11 +295,14 @@ void *load_imagefile(void *file)
 	
 	result = calloc(1, sizeof(int));
 	get_filename(file, name);
-	Set_Label_Text(tip_text, "正载入图片..."); 
+	Set_Label_Text(tip_text, "正载入图片...");  
 	tip_box->set_alpha(tip_box, 200);
+	Hide_Widget(tip_icon);
+	Show_Widget(tip_pic);
 	Show_Widget(tip_text); 
 	Show_Widget(tip_box);
-	
+	/* 播放动画 */
+	ActiveBox_Play(tip_pic); 
 	/* 查找本文件所在位置 */ 
 	for(i=0; i<total_files; ++i) {
 		if(strcmp(file, filename[i]) == 0) { 
@@ -306,11 +312,14 @@ void *load_imagefile(void *file)
 	}
 	 
 	image = Get_PictureBox_Graph(image_box); 
-	Free_Graph(image);  
-	Set_PictureBox_Size_Mode(image_box, SIZE_MODE_CENTER);
 	*result = Set_PictureBox_Image_From_File(image_box, file); 
 	if(*result != 0) {/* 如果图片文件读取失败 */
 		Set_Label_Text(tip_text, "图片载入失败!");
+		Set_PictureBox_Image_From_File(tip_icon, "drawable/pic_fail.png");
+		Show_Widget(tip_icon);
+		Hide_Widget(tip_pic);
+		/* 暂停动画播放 */
+		ActiveBox_Pause(tip_pic);
 		size.w = 0;
 		size.h = 0;
 	} else {
@@ -324,7 +333,10 @@ void *load_imagefile(void *file)
 		/* 如果图片尺寸大于image_box的尺寸，就改变image_box的图像处理模式 */ 
 			Set_PictureBox_Size_Mode(image_box, SIZE_MODE_BLOCK_ZOOM);
 			mini_scale = Get_PictureBox_Zoom_Scale(image_box);
-		} else mini_scale = 0.25; 
+		} else {
+			Set_PictureBox_Size_Mode(image_box, SIZE_MODE_CENTER);
+			mini_scale = 0.25; 
+		}
 		Hide_Widget(tip_box);
 	} 
 	
@@ -372,15 +384,14 @@ void *viewer(void *file)
 	LCUI_Thread_Exit(NULL);
 }
 
-int open_image_file(char *filename)
+void open_image_file(char *filename)
 /* 功能：打开图片文件 */
 {
 	show_button();
 	show_image_info();
 	/* 创建两个个线程，一个用于载入图像，一个用于浏览所载入的图像 */
 	LCUI_Thread_Create(&thread_loading, NULL, load_imagefile, (void*)filename); 
-	LCUI_Thread_Create(&thread_viewer, NULL, viewer, (void*)filename);
-	return LCUI_Thread_Join(thread_viewer, NULL);
+	LCUI_Thread_Create(&thread_viewer, NULL, viewer, (void*)filename); 
 }
 
 void prev_image(LCUI_Widget *widget, void *arg)
@@ -408,7 +419,8 @@ void next_image(LCUI_Widget *widget, void *arg)
 int main(int argc, char*argv[]) 
 { 
 	int i;
-	LCUI_Graph app_icon, btn_zoom_pic[6], btn_switch_pic[6];
+	char path[1024];
+	LCUI_Graph pic_loading[8], app_icon, btn_zoom_pic[6], btn_switch_pic[6];
 	/* 设定默认字体文件位置 */
 	Set_Default_Font("../../fonts/msyh.ttf");
 	LCUI_Init(argc, argv); 
@@ -435,7 +447,8 @@ int main(int argc, char*argv[])
 	
 	tip_text = Create_Widget("label"); /* 提示文本 */
 	tip_box  = Create_Widget(NULL); /* 作为提示文本的容器 */
-	
+	tip_pic = Create_Widget("active_box"); /* ActiveBox部件用于显示载入动画 */
+	tip_icon = Create_Widget("picture_box"); 
 	image_box = Create_Widget("picture_box");/* 创建一个图片盒子，用于显示图片 */
 	
 	/* 载入程序图标 */ 
@@ -466,11 +479,13 @@ int main(int argc, char*argv[])
 				&btn_switch_pic[4], NULL, &btn_switch_pic[5] );
 							
 	Set_Widget_Border (image_info_box, RGB(50,50,50), Border(1,1,1,1));/* 设置边框 */
-	Set_Widget_Border (tip_box, RGB(50,50,50), Border(1,1,1,1));
-	Set_Widget_Backcolor (image_info_box, RGB(180,215,255));/* 背景设置为黑色 */ 
-	Set_Widget_Backcolor (tip_box, RGB(180,215,255)); 
+	Set_Widget_Border (tip_box, RGB(200,200,200), Border(1,1,1,1));
+	Set_Widget_Backcolor (image_info_box, RGB(180,215,255));
+	Set_Widget_Backcolor (tip_box, RGB(20,20,20)); 
 	Set_Widget_BG_Mode (image_info_box, BG_MODE_FILL_BACKCOLOR);
 	Set_Widget_BG_Mode (tip_box, BG_MODE_FILL_BACKCOLOR);
+	
+	Set_Label_Font_Default_Color(tip_text, RGB(230, 230, 230));
 	
 	Enable_Widget_Auto_Size(image_info_box);
 	
@@ -492,8 +507,10 @@ int main(int argc, char*argv[])
 	Resize_Widget(container[0], size[0]);
 	Resize_Widget(container[1], size[1]);
 	Resize_Widget(image_box, IMAGE_BOX_SIZE);
-	Resize_Widget(tip_box, Size(150, 30));
-	
+	Resize_Widget(tip_box, Size(150, 34));
+	Resize_Widget(tip_pic, Size(32, 24));
+	Resize_Widget(tip_icon, Size(32, 24));
+	ActiveBox_Set_Frames_Size(tip_pic, Size(26, 26));
 	/* 设定标题栏中显示的程序图标以及文本 */
 	Set_Window_Title_Icon(window, &app_icon); 
 	
@@ -515,7 +532,9 @@ int main(int argc, char*argv[])
 	Set_Widget_Align(container[1], ALIGN_BOTTOM_LEFT, Pos(2, -2));
 	Set_Widget_Align(image_box, ALIGN_MIDDLE_CENTER, Pos(0, 0));
 	Set_Widget_Align(tip_box, ALIGN_MIDDLE_CENTER, Pos(0, 0));
-	Set_Widget_Align(tip_text, ALIGN_MIDDLE_LEFT, Pos(25, 0));
+	Set_Widget_Align(tip_text, ALIGN_MIDDLE_LEFT, Pos(35, 0));
+	Set_Widget_Align(tip_icon, ALIGN_MIDDLE_LEFT, Pos(2, 0));
+	Set_Widget_Align(tip_pic, ALIGN_MIDDLE_LEFT, Pos(2, 0));
 	Set_Widget_Align(image_info_text, ALIGN_MIDDLE_CENTER, Pos(0, 0));
 	Set_Widget_Align(image_info_box, ALIGN_TOP_LEFT, Pos(3, 3));
 	
@@ -525,6 +544,8 @@ int main(int argc, char*argv[])
 	Widget_Container_Add(container[1], btn_switch[0]);
 	Widget_Container_Add(container[1], btn_switch[1]);
 	Widget_Container_Add(tip_box, tip_text);
+	Widget_Container_Add(tip_box, tip_icon);
+	Widget_Container_Add(tip_box, tip_pic);
 	Widget_Container_Add(image_info_box, image_info_text);
 	Window_Client_Area_Add(window, container[0]); 
 	Window_Client_Area_Add(window, container[1]); 
@@ -542,10 +563,15 @@ int main(int argc, char*argv[])
 	Show_Widget(container[0]);
 	Show_Widget(container[1]);
 	Show_Widget(window); 
+	/* 为动画添加8帧图像，供ActiveBox部件播放 */
+	for(i=0; i<8; ++i) {
+		sprintf(path, "drawable/publish_loading_%02d.png", i+1);
+		Load_Image(path, &pic_loading[i]); 
+		ActiveBox_Add_Frame(tip_pic, &pic_loading[i], Pos(0,0), 10);
+	}
 	
 	LCUI_Key_Event_Connect( KEY_ESC,   Main_Loop_Quit,  NULL);
 	if(argc == 2) {/* 如果总共有2个参数 */ 
-		char path[1024];
 		DIR *dirptr = NULL; 
 		
 		/* 判断这个文件路径是文件还是目录 */ 
