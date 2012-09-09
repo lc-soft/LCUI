@@ -80,6 +80,7 @@ void thread_rwlock_init(thread_rwlock *rwlock)
 	error = pthread_rwlock_init(&rwlock->lock, NULL);
 	if(error) thread_perror("rwlock init", error); 
 	rwlock->host = 0;
+	rwlock->status = RWLOCK_FREE;
 }
 
 void thread_rwlock_destroy(thread_rwlock *rwlock)
@@ -89,13 +90,14 @@ void thread_rwlock_destroy(thread_rwlock *rwlock)
 	//error = pthread_cond_destroy(&rwlock->cond);
 	//if(error) thread_perror("cond destroy", error);
 	
-    error = pthread_mutex_destroy(&rwlock->mutex);
+	error = pthread_mutex_destroy(&rwlock->mutex);
 	if(error) thread_perror("mutex destroy", error);
 	
 	error = pthread_rwlock_destroy(&rwlock->lock);
 	if(error) thread_perror("rwlock destroy", error);
 	 
 	rwlock->host = 0; 
+	rwlock->status = RWLOCK_FREE;
 }
 	
 int thread_wait_mutex(thread_rwlock *rwlock)
@@ -104,19 +106,16 @@ int thread_wait_mutex(thread_rwlock *rwlock)
 	pthread_t tid;  
 	tid = pthread_self();
 	/* 检测队列互斥锁是否被锁住 */
-	while(1)
-	{
+	while(1) {
 		//printf("thread %lu: mutex try lock\n", tid);
-		if(pthread_mutex_trylock(&rwlock->mutex))
-		{/* 如果锁住失败 */
+		/* 如果锁住失败 */
+		if(pthread_mutex_trylock(&rwlock->mutex)) {
 			/* 如果锁住互斥锁的是自己，那就中断循环 */
-			if(rwlock->host == tid) 
-			{
+			if(rwlock->host == tid) {
 				//printf("thread %lu: is self, finish\n", tid);
 				return 0;
-			}
-			else 
-			{/* 否则，暂时移除自己的记录，之后阻塞等待互斥锁被解锁，并恢复记录 */
+			} else {
+			/* 否则，暂时移除自己的记录，之后阻塞等待互斥锁被解锁，并恢复记录 */
 				//printf("thread %lu: wrlock lock\n", tid);
 				//pthread_rwlock_wrlock(&rwlock->lock);
 				//printf("thread %lu: wrlock lock end\n", tid);
@@ -127,8 +126,9 @@ int thread_wait_mutex(thread_rwlock *rwlock)
 				//printf("thread %lu: wrlock unlock\n", tid);
 				break;
 			}
-		}/* 能够锁住互斥锁，说明可用 */  
-		else break;
+		} else {
+			break;
+		}
 	}
 	//printf("thread %lu: mutex unlock\n", tid);
 	return pthread_mutex_unlock(&rwlock->mutex);/* 解开互斥锁 */
@@ -138,6 +138,7 @@ int thread_rwlock_rdlock(thread_rwlock *rwlock)
 /* 功能：设定“读”锁 */
 { 
 	thread_wait_mutex(rwlock);/* 等待互斥锁可用 */ 
+	rwlock->status = RWLOCK_READ;
 	return pthread_rwlock_rdlock(&rwlock->lock); 
 }
 
@@ -145,13 +146,21 @@ int thread_rwlock_wrlock(thread_rwlock *rwlock)
 /* 功能：设定“写”锁 */
 {
 	thread_wait_mutex(rwlock);
+	rwlock->status = RWLOCK_WRITE;
 	return pthread_rwlock_wrlock(&rwlock->lock);
 }
 
 int thread_rwlock_unlock(thread_rwlock *rwlock)
 /* 功能：解开读写锁 */
 {
+	rwlock->status = RWLOCK_FREE;
 	return pthread_rwlock_unlock(&rwlock->lock);
+}
+
+rwlock_status thread_rwlock_get_status(thread_rwlock *rwlock)
+/* 功能：获取读写锁的状态 */
+{
+	return rwlock->status;
 }
 
 int thread_mutex_lock(thread_rwlock *rwlock)

@@ -53,8 +53,10 @@
 int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 /* 功能：绘制进度条的空槽 */
 {
-	if(width < 4 || height < 4) return -1;
-	graph->flag = HAVE_ALPHA;
+	if(width < 4 || height < 4) {
+		return -1;
+	}
+	graph->have_alpha = IS_TRUE;
 	Malloc_Graph(graph, width, height); /* 申请内存 */
 	Fill_Color(graph, RGB(250,250,250));/* 填充白色 */
 	Fill_Graph_Alpha(graph, 255);

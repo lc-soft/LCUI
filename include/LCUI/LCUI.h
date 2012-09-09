@@ -435,16 +435,19 @@ struct _LCUI_Graph
 	int	type;		/* 图片类型 */
 	int	bit_depth;	/* 位深 */
 	
+	thread_rwlock	lock;	/* 锁，用于数据保护 */
+	
 	int quote;		/* 指示是否引用其它图层中的图形 */
 	LCUI_Graph *src;	/* 所引用的对象 */
 	LCUI_Pos pos;		/* 在引用另一个图层中的图形时，会保存区域的起点位置 */
-	int	width, height;	/* 尺寸 */
+	int width, height;	/* 尺寸 */
 	
 	unsigned char	**rgba;	/* 图片数组 */
 	unsigned char	alpha;	/* 全局透明度，表示整张图片的透明度，默认为255 */
-	int		flag;	/* 是否需要透明度，分配内存时会根据它分配 */
-	int		malloc;	/* 是否分配了内存 */
-	thread_rwlock	lock;	/* 锁，用于数据保护 */
+	
+	int have_alpha;	/* 标志，指定是否需要透明度，分配内存时会根据它分配 */
+	int is_opaque;	/* 标志，指定该图形是否为不透明 */
+	int not_visible; /* 标志，指定该图形是否不可见，也就是全透明 */
 };/*  存储图片数据 */
 /**********************************************************************/
 
@@ -603,7 +606,7 @@ struct _LCUI_Cursor
 /****************************************/
 
 #define MAX_APP_IDLE_TIME	50000
-#define MAX_LCUI_IDLE_TIME  50000
+#define MAX_LCUI_IDLE_TIME	50000
 
 
 

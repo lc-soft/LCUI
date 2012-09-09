@@ -14,8 +14,8 @@ int main()
 	
 	Graph_Init(&bg);
 	Graph_Init(&fg);
-	bg.flag = NO_ALPHA;
-	fg.flag = HAVE_ALPHA; 
+	bg.have_alpha = IS_FALSE;
+	fg.have_alpha = IS_TRUE; 
 	w = 1640;
 	h = 1480;
 	//为前景图和背景图分配内存

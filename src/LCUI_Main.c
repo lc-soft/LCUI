@@ -633,7 +633,7 @@ void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 		
 	int total; 
 	/* 截取该区域的背景图像 */
-	out->flag = NO_ALPHA;
+	out->have_alpha = NO_ALPHA;
 	Cut_Graph (&LCUI_Sys.screen.buff, area, out);
 	total = Queue_Get_Total(&LCUI_Sys.widget_list);
 	
@@ -716,15 +716,11 @@ int Add_Screen_Refresh_Area (LCUI_Rect rect)
 void nobuff_print(const char *fmt, ...)
 /* 功能：打印正执行的操作的信息 */
 {
-	char text[__MAX_TEXT_LEN];
-    memset(text, 0, sizeof(text)); 
-    
-    va_list ap;
+	va_list ap;
 	va_start(ap, fmt);
-	vsprintf(text, fmt, ap);
+	vprintf(fmt, ap);
 	va_end(ap); 
-	
-	printf("%s ", text); 
+	printf(" ");
 	fflush(stdout);	/* 清空输出缓冲区 */
 }
 
@@ -878,7 +874,7 @@ static int Screen_Init()
 	
 	Graph_Init(&LCUI_Sys.screen.buff); /* 初始化图形数据 */
 	
-	LCUI_Sys.screen.buff.flag = NO_ALPHA;/* 无alpha通道 */
+	LCUI_Sys.screen.buff.have_alpha = NO_ALPHA;/* 无alpha通道 */
 	LCUI_Sys.screen.buff.type = TYPE_BMP;/* bmp位图 */
 	LCUI_Sys.screen.size.w = fb_vinfo.xres; /* 保存屏幕尺寸 */
 	LCUI_Sys.screen.size.h = fb_vinfo.yres; 

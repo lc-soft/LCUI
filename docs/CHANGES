@@ -1,3 +1,24 @@
+CHANGES BETWEEN 0.12.3 and 0.12.4
+
+	- Add C + + class to some function modules, please see the 
+	  helloworld2.cpp file for more details.
+	- Add ActiveBox Widget, it can achieve the continuity of a simple
+	  multi-frame image switching display.
+	- Improved screen graphics refresh method.
+	- Solve the problem of disappear  after dragging the child window,  
+	  the reason is that the sub window position calculation is error.
+	- Optimized Alpha blending processing, efficiency has improved.
+	- Solve some of the problems of graphics processing.
+	- LCUI_Graph support the "quote" function, you can quote graph 
+	  of a specified area in an graph.
+	- Solve some of the problems of the PictureBox Widget.
+	- Improved the nested multi Widget graphic display processing.
+	- Improved the area refresh processing of widget moving.
+	- Some settings support environment variable setting.
+	- Solve the thread is blocked waiting for unlock the rwlock 
+	  problem, the problem is in the LCUI exit.
+
+======================================================================
 
 CHANGES BETWEEN 0.12.3 and 0.12.4
 

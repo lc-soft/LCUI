@@ -38,6 +38,14 @@ test/mora/drawable/jsb_b.png \
 test/mora/drawable/jsb_s.png \
 test/mora/Makefile.am \
 test/mora/Makefile.in \
+test/photoviewer/drawable/publish_loading_01.png \
+test/photoviewer/drawable/publish_loading_02.png \
+test/photoviewer/drawable/publish_loading_03.png \
+test/photoviewer/drawable/publish_loading_04.png \
+test/photoviewer/drawable/publish_loading_05.png \
+test/photoviewer/drawable/publish_loading_06.png \
+test/photoviewer/drawable/publish_loading_07.png \
+test/photoviewer/drawable/publish_loading_08.png \
 test/photoviewer/drawable/btn_prev_down_pressed.png  \
 test/photoviewer/drawable/btn_zoom_up_pressed.png \
 test/photoviewer/drawable/btn_next_up_disabled.png \

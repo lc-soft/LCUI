@@ -55,15 +55,23 @@
 #ifndef __LCUI_THREAD_H__
 #define __LCUI_THREAD_H__ 
 
-#define RWLOCK_READ	1
-#define RWLOCK_WRITE	2
+typedef enum _rwlock_status
+{
+	RWLOCK_FREE,
+	RWLOCK_READ,
+	RWLOCK_WRITE
+}
+rwlock_status;
 
-typedef struct _thread_rwlock{
+typedef struct _thread_rwlock
+{
 	pthread_t host;
 	pthread_rwlock_t lock;
 	//pthread_cond_t cond;
 	pthread_mutex_t mutex; 
-}thread_rwlock;
+	rwlock_status status;
+}
+thread_rwlock;
 
 LCUI_BEGIN_HEADER
 
@@ -88,6 +96,9 @@ int thread_rwlock_wrlock(thread_rwlock *rwlock);
 
 int thread_rwlock_unlock(thread_rwlock *rwlock);
 /* 功能：解开读写锁 */ 
+
+rwlock_status thread_rwlock_get_status(thread_rwlock *rwlock);
+/* 功能：获取读写锁的状态 */
 
 int thread_mutex_lock(thread_rwlock *rwlock);
 /* 功能：设定互斥锁 */ 

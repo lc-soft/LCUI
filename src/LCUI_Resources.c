@@ -64,7 +64,7 @@ int Load_Graph_ProgressBar_Fore(LCUI_Graph *out)
 	int value;
 	Free_Graph(out);
 	Graph_Init(out);
-	out->flag    = NO_ALPHA;
+	out->have_alpha = IS_FALSE;
 	out->type    = TYPE_BMP;
 	out->alpha   = 255;
 	value = Malloc_Graph(out,1,43);
@@ -181,9 +181,9 @@ int Load_Graph_ProgressBar_Img(LCUI_Graph *out)
 	int value;
 	Free_Graph(out);
 	Graph_Init(out);
-	out->flag    = HAVE_ALPHA;
-	out->type    = TYPE_PNG;
-	out->alpha   = 255;
+	out->have_alpha	= IS_TRUE;
+	out->type	= TYPE_PNG;
+	out->alpha	= 255;
 	value = Malloc_Graph(out,70,43);
 	/* 拷贝 */
 	if(value == 0) {
@@ -253,9 +253,9 @@ int Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out)
 	int value;
 	Free_Graph(out);
 	Graph_Init(out);
-	out->flag    = HAVE_ALPHA;
-	out->type    = TYPE_PNG;
-	out->alpha   = 255;
+	out->have_alpha	= IS_TRUE;
+	out->type	= TYPE_PNG;
+	out->alpha	= 255;
 	value = Malloc_Graph(out,18,18);
 	/* 拷贝 */
 	if(value == 0){
@@ -307,17 +307,15 @@ int Load_Graph_Default_Cursor(LCUI_Graph *pic)
 		244,55,0,0,55,215,255,255,209,0,0,0,0,0,0,0,0,180,255,255,204,0,0,0,0,0,0,0,0,26,215,158,
 		49,0,0};
 	int value;
-	if(Valid_Graph(pic))
-	{
+	if(Valid_Graph(pic)) {
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->type = TYPE_PNG;
 	pic->alpha = 255;
 	value = Malloc_Graph(pic,12,19);
-	if(value == 0)
-	{
+	if(value == 0) {
 		memcpy(pic->rgba[0], red, sizeof(red));
 		memcpy(pic->rgba[1], green, sizeof(green));
 		memcpy(pic->rgba[2], blue, sizeof(blue));
@@ -354,7 +352,7 @@ int Load_Graph_Mosaics(LCUI_Graph *pic)
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = NO_ALPHA;
+	pic->have_alpha = IS_FALSE;
 	pic->type = TYPE_PNG;
 	pic->alpha = 255;
 	value = Malloc_Graph(pic,16,16);
@@ -676,7 +674,7 @@ int Load_Graph_Icon_Error(LCUI_Graph *pic)
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic,48,48);
@@ -999,7 +997,7 @@ int Load_Graph_Icon_Help(LCUI_Graph *pic)
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	value = Malloc_Graph(pic,48,48);
 	if(value == 0)
@@ -1322,7 +1320,7 @@ int Load_Graph_Icon_Info(LCUI_Graph *pic)
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	value = Malloc_Graph(pic,48,48);
 	if(value == 0)
@@ -1645,7 +1643,7 @@ int Load_Graph_Icon_Warning(LCUI_Graph *pic)
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	value = Malloc_Graph(pic,48,48);
 	if(value == 0)
@@ -2132,7 +2130,7 @@ int Load_Graph_Icon_LCUI(LCUI_Graph *pic)
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	value = Malloc_Graph(pic,60,60);
 	if(value == 0)
@@ -2267,7 +2265,7 @@ int Load_Graph_Default_TitleBar_CloseBox_Normal(LCUI_Graph *pic)
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255; 
 	value = Malloc_Graph(pic, 39, 20); 
 	if(value == 0)
@@ -2401,7 +2399,7 @@ int Load_Graph_Default_TitleBar_CloseBox_HighLight(LCUI_Graph *pic)
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->type = TYPE_PNG;
 	pic->alpha = 255;
 	value = Malloc_Graph(pic, 39, 20); 
@@ -2536,7 +2534,7 @@ int Load_Graph_Default_TitleBar_CloseBox_Down(LCUI_Graph *pic)
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 39, 20); 
@@ -2564,7 +2562,7 @@ int Load_Graph_Default_TitleBar_BG(LCUI_Graph *pic)
 		Free_Graph(pic);
 	}
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 1, 25); 
@@ -2708,7 +2706,7 @@ int Load_Graph_Default_CheckBox_Off_Normal(LCUI_Graph *pic)
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 30, 30); 
@@ -2858,7 +2856,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 30, 30); 
@@ -3007,7 +3005,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 30, 30); 
@@ -3157,7 +3155,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 30, 30); 
@@ -3307,7 +3305,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 30, 30); 
@@ -3456,7 +3454,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 30, 30); 
@@ -3662,7 +3660,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 37, 37); 
@@ -3867,7 +3865,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 37, 37); 
@@ -4072,7 +4070,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 37, 37); 
@@ -4278,7 +4276,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 37, 37); 
@@ -4483,7 +4481,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 37, 37); 
@@ -4688,7 +4686,7 @@ unsigned char alpha[]={
 		Free_Graph(pic); 
 		
 	Graph_Init(pic);
-	pic->flag = HAVE_ALPHA;
+	pic->have_alpha = IS_TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Malloc_Graph(pic, 37, 37); 
