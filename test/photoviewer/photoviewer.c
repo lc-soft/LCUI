@@ -15,8 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <dirent.h>
-#include <locale.h>
+#include <dirent.h> 
 #include <math.h>
 
 //定义图片盒子和窗口的尺寸
