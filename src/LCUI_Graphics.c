@@ -1067,6 +1067,10 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 	if(des_pos.x > des->width) return -1;
 	if(des_pos.y > des->height) return -1;
 	
+	if(fore_graph->width < 0 || fore_graph->height < 0 
+	|| back_graph->width < 0 || back_graph->height < 0 ) {
+		return -1;
+	}
 	/* 如果前景图尺寸超出背景图的范围，需要更改前景图的像素读取范围 */ 
 	if( Get_Cut_Area(
 		Size( des_rect.width, des_rect.height),
@@ -1181,11 +1185,16 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 	src = Get_Quote_Graph(fore_graph);
 	des = Get_Quote_Graph(back_graph);
 	
-	if(!Valid_Graph(des) || !Valid_Graph(src))
+	if(!Valid_Graph(des) || !Valid_Graph(src)) {
 		return -1;
+	}
 	if(des_pos.x > des->width) return -1;
 	if(des_pos.y > des->height) return -1;
 	 
+	if(fore_graph->width < 0 || fore_graph->height < 0 
+	|| back_graph->width < 0 || back_graph->height < 0 ) {
+		return -1;
+	}
 	if( Get_Cut_Area(
 		Size( back_graph->width, back_graph->height),
 		Rect( des_pos.x, des_pos.y, 
@@ -1194,7 +1203,7 @@ int Replace_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 	)) {
 		des_pos.x += cut.x;
 		des_pos.y += cut.y;
-	} 
+	}
 	Using_Graph(src, 0);
 	Using_Graph(des, 1);
 	k = src->alpha / 255.0;
