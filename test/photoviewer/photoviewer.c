@@ -605,8 +605,9 @@ int main(int argc, char*argv[])
 		LCUI_Key_Event_Connect( 'n',   next_image,  NULL);
 		LCUI_Key_Event_Connect( 'N',   next_image,  NULL);
 		LCUI_Key_Event_Connect( 'b',   prev_image,  NULL);
-		LCUI_Key_Event_Connect( 'b',   prev_image,  NULL);
+		LCUI_Key_Event_Connect( 'B',   prev_image,  NULL);
 		LCUI_Key_Event_Connect( 'i',   show_image_info,  NULL);
+		LCUI_Key_Event_Connect( 'I',   show_image_info,  NULL);
 		Widget_Clicked_Event_Connect( image_box, show_button, NULL);
 		LCUI_Thread_Create(&thread_hide, NULL, hide, NULL);
 	} else {
