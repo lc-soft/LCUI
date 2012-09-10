@@ -415,7 +415,7 @@ int Set_PictureBox_Image_From_File(LCUI_Widget *widget, char *image_file)
 	graph_data data;
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
 			Get_Widget_Private_Data(widget);
-	LCUI_Graph *graph, *image;
+	LCUI_Graph *graph;
 	
 	if(init == IS_FALSE) {
 		Queue_Init( &picbox_graph_mem, 
