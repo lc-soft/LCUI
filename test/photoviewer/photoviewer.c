@@ -18,15 +18,6 @@
 #include <dirent.h> 
 #include <math.h>
 
-//定义图片盒子和窗口的尺寸, 屏幕较大的话，可以使用宏定义：USE_MAX_SIZE
-#define USE_MAX_SIZE
-#ifdef USE_MAX_SIZE
-#define IMAGE_BOX_SIZE	Size(638, 455) 
-#define WINDOW_SIZE	Size(640, 480) 
-#else
-#define IMAGE_BOX_SIZE	Size(318, 215)
-#define WINDOW_SIZE	Size(320, 240)
-#endif
 /* 与这些函数共享数据，只有使用全局变量，传参数很麻烦 */
 static LCUI_Widget	*window, *image_box, *tip_text, *tip_box,
 			*tip_icon, *tip_pic, *image_info_text, *image_info_box,
