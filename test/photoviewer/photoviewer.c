@@ -18,10 +18,15 @@
 #include <dirent.h> 
 #include <math.h>
 
-//定义图片盒子和窗口的尺寸
+//定义图片盒子和窗口的尺寸, 屏幕较大的话，可以使用宏定义：USE_MAX_SIZE
+#define USE_MAX_SIZE
+#ifdef USE_MAX_SIZE
+#define IMAGE_BOX_SIZE	Size(638, 455) 
+#define WINDOW_SIZE	Size(640, 480) 
+#else
 #define IMAGE_BOX_SIZE	Size(318, 215)
 #define WINDOW_SIZE	Size(320, 240)
-
+#endif
 /* 与这些函数共享数据，只有使用全局变量，传参数很麻烦 */
 static LCUI_Widget	*window, *image_box, *tip_text, *tip_box,
 			*tip_icon, *tip_pic, *image_info_text, *image_info_box,
@@ -29,9 +34,9 @@ static LCUI_Widget	*window, *image_box, *tip_text, *tip_box,
 						
 static float	mini_scale = 1.0, scale = 1.0;   /* 记录缩放比率 */
 static char	name[256], **filename = NULL;
-static int	total_files = 0, current = 0;
-
-static pthread_t thread_hide, thread_loading, thread_viewer;
+static int	total_files = 0, current = 0, need_refresh = IS_FALSE;
+static LCUI_Size image_box_size, window_size;
+static pthread_t thread_hide, thread_viewer;
 
 void image_zoom_in()
 /* 功能：放大图像 */
@@ -285,15 +290,14 @@ char **scan_imgfile(char *dir, int *file_num)
 	return filelist;
 }
 
-void *load_imagefile(void *file)
+int load_imagefile()
 /* 功能：载入图片文件 */
 { 
+	int i; 
 	LCUI_Size size;
 	LCUI_Graph *image;
-	int *result, i;
+	char file[1024];
 	
-	result = calloc(1, sizeof(int));
-	get_filename(file, name);
 	Set_Label_Text(tip_text, "正载入图片...");  
 	tip_box->set_alpha(tip_box, 200);
 	Hide_Widget(tip_icon);
@@ -301,18 +305,18 @@ void *load_imagefile(void *file)
 	Show_Widget(tip_text); 
 	Show_Widget(tip_box);
 	/* 播放动画 */
-	ActiveBox_Play(tip_pic); 
-	/* 查找本文件所在位置 */ 
-	for(i=0; i<total_files; ++i) {
-		if(strcmp(file, filename[i]) == 0) { 
-			current = i;
-			break;
-		}
+	ActiveBox_Play(tip_pic);  
+	if(current < total_files) {
+		strcpy(file, filename[current]);
+	} else {
+		return -1;
 	}
-	 
+	get_filename(file, name);
+	
 	image = Get_PictureBox_Graph(image_box); 
-	*result = Set_PictureBox_Image_From_File(image_box, file); 
-	if(*result != 0) {/* 如果图片文件读取失败 */
+	i = Set_PictureBox_Image_From_File(image_box, file); 
+	if(i != 0) {/* 如果图片文件读取失败 */
+	printf("3\n");
 		Set_Label_Text(tip_text, "图片载入失败!");
 		Set_PictureBox_Image_From_File(tip_icon, "drawable/pic_fail.png");
 		Show_Widget(tip_icon);
@@ -321,7 +325,7 @@ void *load_imagefile(void *file)
 		ActiveBox_Pause(tip_pic);
 		size.w = 0;
 		size.h = 0;
-	} else {
+	} else { 
 		image = Get_PictureBox_Graph(image_box); 
 		size = Get_Graph_Size(image); 
 		/* 
@@ -336,8 +340,7 @@ void *load_imagefile(void *file)
 			Set_PictureBox_Size_Mode(image_box, SIZE_MODE_CENTER);
 			mini_scale = 0.25; 
 		}
-		Hide_Widget(tip_box);
-	} 
+	}
 	
 	scale = Get_PictureBox_Zoom_Scale(image_box); 
 	Set_Label_Text(
@@ -350,58 +353,82 @@ void *load_imagefile(void *file)
 	/* 设置透明度 */ 
 	image_info_box->set_alpha(image_info_box, 200);
 	Show_Widget(image_info_text);
-	Show_Widget(image_info_box);
-	/* 子线程返回结果 */
-	LCUI_Thread_Exit(result);
+	Show_Widget(image_info_box); 
+	return i;
 }
 
-void *viewer(void *file)
+static void *viewer()
 /* 功能：将载入的图片显示出来 */
 {
 	LCUI_Graph *image, bg;
-	int *result = NULL; 
+	int result; 
+	
 	Graph_Init(&bg);
-	/* 等待图片载入结束，并获取线程返回值 */
-	LCUI_Thread_Join(thread_loading, (void**)&result);
-	if(*result == 0) {/* 如果正常打开了图片 */
-		scale = Get_PictureBox_Zoom_Scale(image_box); /* 获取缩放比例 */
-		image = Get_PictureBox_Graph(image_box); /* 获取图像指针 */
-		if(Graph_Is_PNG(image) && Graph_Have_Alpha(image)) {
-			/* 载入马赛克图形 */
-			Load_Graph_Mosaics(&bg);
-			/* 平铺背景图 */
-			Set_Widget_Background_Image(image_box, &bg, LAYOUT_TILE);
-			Free_Graph(&bg);
-		} else Set_Widget_Background_Image(image_box, NULL, LAYOUT_NONE);
+	while(1) {
+		/* 等待需要刷新 */ 
+		while( !need_refresh ) {
+			usleep(10000);
+		}
+		need_refresh = IS_FALSE; 
+		show_button();
+		show_image_info();
+		/* 载入图片 */
+		result = load_imagefile();
+		if(result == 0) {/* 如果正常打开了图片 */ 
+			scale = Get_PictureBox_Zoom_Scale(image_box); /* 获取缩放比例 */
+			image = Get_PictureBox_Graph(image_box); /* 获取图像指针 */
+			if(Graph_Is_PNG(image) && Graph_Have_Alpha(image)) {
+				/* 载入马赛克图形 */
+				Load_Graph_Mosaics(&bg);
+				/* 平铺背景图 */
+				Set_Widget_Background_Image(image_box, &bg, LAYOUT_TILE);
+				Free_Graph(&bg);
+			} else {
+				Set_Widget_Background_Image(image_box, NULL, LAYOUT_NONE);
+			}
+		} 
+		/* 如果接近最小缩放比例，那就禁用“缩小”按钮，否则，启用 */
+		if(fabs(mini_scale - scale) < 0.01) {
+			Disable_Widget(btn_zoom[0]); 
+		} else {
+			Enable_Widget(btn_zoom[0]);
+		}
+		/* 启用放大按钮 */
+		Enable_Widget(btn_zoom[1]);
+		Hide_Widget(tip_box); 
 	}
-	/* 如果接近最小缩放比例，那就禁用“缩小”按钮，否则，启用 */
-	if(fabs(mini_scale - scale) < 0.01) Disable_Widget(btn_zoom[0]); 
-	else Enable_Widget(btn_zoom[0]);
-	/* 启用放大按钮 */
-	Enable_Widget(btn_zoom[1]);
-	free(result);
 	LCUI_Thread_Exit(NULL);
 }
 
-void open_image_file(char *filename)
+static void open_image_file(char *file)
 /* 功能：打开图片文件 */
 {
-	show_button();
-	show_image_info();
-	/* 创建两个个线程，一个用于载入图像，一个用于浏览所载入的图像 */
-	LCUI_Thread_Create(&thread_loading, NULL, load_imagefile, (void*)filename); 
-	LCUI_Thread_Create(&thread_viewer, NULL, viewer, (void*)filename); 
+	int i;
+	need_refresh = IS_TRUE;
+	
+	for(i=0; i<total_files; ++i) {
+		if(strcmp(file, filename[i]) == 0) { 
+			current = i;
+			break;
+		}
+	}
+	
+	LCUI_Thread_Create(&thread_viewer, NULL, viewer, NULL); 
 }
 
 void prev_image(LCUI_Widget *widget, void *arg)
 /* 功能：切换至上一张图 */
 { 
-	if(total_files <= 0) return;
+	if(total_files <= 0) {
+		return;
+	}
 		
-	if(current <= 0) current = total_files-1;
-	else current--;
-		
-	open_image_file(filename[current]);
+	if(current <= 0) {
+		current = total_files-1;
+	} else {
+		--current;
+	}
+	need_refresh = IS_TRUE; 
 }
 
 void next_image(LCUI_Widget *widget, void *arg)
@@ -409,21 +436,34 @@ void next_image(LCUI_Widget *widget, void *arg)
 {
 	if(total_files <= 0) return;
 		
-	if(current == total_files-1) current = 0;
-	else current++;
+	if(current == total_files-1) {
+		current = 0;
+	} else {
+		++current;
+	}
 		
-	open_image_file(filename[current]);
+	need_refresh = IS_TRUE; 
 }
 
 int main(int argc, char*argv[]) 
 { 
 	int i;
+	LCUI_Size screen_size;
 	char path[1024];
 	LCUI_Graph pic_loading[8], app_icon, btn_zoom_pic[6], btn_switch_pic[6];
 	/* 设定默认字体文件位置 */
 	Set_Default_Font("../../fonts/msyh.ttf");
 	LCUI_Init(argc, argv); 
 	Graph_Init(&app_icon); 
+	/* 如果屏幕分辨率小于640x480，那就使用320x240分辨率 */
+	screen_size = Get_Screen_Size();
+	if(screen_size.w < 640 && screen_size.h <480){
+		image_box_size = Size(318, 215);
+		window_size = Size(320, 240);
+	} else {
+		image_box_size = Size(638, 455);
+		window_size = Size(640, 480);
+	}
 	
 	for(i=0; i<6; ++i) {
 		Graph_Init(&btn_zoom_pic[i]); 
