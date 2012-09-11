@@ -1,20 +1,7 @@
-// C++°æµÄhello,world³ÌĞò
+// C++ç‰ˆçš„hello,worldç¨‹åº
 #include <LCUI_Build.h> 
-#include LC_LCUI_H	/* °üº¬LCUIµÄÏà¹ØÍ·ÎÄ¼ş */
-#include LC_WIDGET_H
-#include <unistd.h>
-#include <iostream>
-
-using namespace std;
-/* ²âÊÔÏß³Ì */
-void *test_thread(void *object)
-{
-	LCUIThread *t = (LCUIThread *)object;
-	/* ´òÓ¡Ïß³ÌID */
-	cout<<"thread id: "<<t->getid()<<endl;
-	/* Ïß³ÌÍË³ö */
-	t->exit( NULL );
-}
+#include LC_LCUI_H	/* åŒ…å«LCUIçš„ç›¸å…³å¤´æ–‡ä»¶ */
+#include LC_WIDGET_H 
 
 int main(int argc, char*argv[]) 
 {
@@ -23,36 +10,31 @@ int main(int argc, char*argv[])
 	LCUIGraph	icon;
 	LCUIThread	t;
 	
-	Using_GB2312();
-	/* ´´½¨Ïß³Ì */
-	t.create( NULL, test_thread, &t );
-	/* µÈ´ıÏß³ÌÍË³ö */
-	t.join( NULL );
-	/* ÔØÈëLCUIµÄ18x18³ß´çµÄÍ¼±ê */
+	/* è½½å…¥LCUIçš„18x18å°ºå¯¸çš„å›¾æ ‡ */
 	icon.load.icon.LCUI_18x18();
-	/* Îª´°¿ÚÉè¶¨Í¼±ê */
+	/* ä¸ºçª—å£è®¾å®šå›¾æ ‡ */
 	window.Window.setIcon( icon );
-	/* ¸Ä±ä´°¿ÚµÄ³ß´ç */
+	/* æ”¹å˜çª—å£çš„å°ºå¯¸ */
 	window.resize( Size(320, 240) ); 
-	/* Éè¶¨´°¿ÚµÄ±êÌâÎÄ±¾ */
-	window.Window.setTitle( "²âÊÔ´°¿Ú" ); 
-	/* ½«label²¿¼şÌí¼ÓÖÁ´°¿Ú¿Í»§Çø */
+	/* è®¾å®šçª—å£çš„æ ‡é¢˜æ–‡æœ¬ */
+	window.Window.setTitle( "æµ‹è¯•çª—å£" ); 
+	/* å°†labeléƒ¨ä»¶æ·»åŠ è‡³çª—å£å®¢æˆ·åŒº */
 	window.Window.addToClientArea( label ); 
-	/* Éè¶¨label²¿¼şµÄ¶ÔÆë·½Ê½ */
+	/* è®¾å®šlabeléƒ¨ä»¶çš„å¯¹é½æ–¹å¼ */
 	label.setAlign( ALIGN_MIDDLE_CENTER, Pos(0,0) ); 
-	/* Éè¶¨label²¿¼şÏÔÊ¾µÄÎÄ±¾ */
+	/* è®¾å®šlabeléƒ¨ä»¶æ˜¾ç¤ºçš„æ–‡æœ¬ */
 	label.Label.setText(
 		"Hello,World!\n"
-		"<color=255,0,0>ÊÀ</color><color=100,155,0>½ç</color>"
-		"<color=0,0,0>,</color><color=0,255,0>Äã</color>"
-		"<color=0,100,155>ºÃ</color><color=0,0,255>£¡</color>\n" 
+		"<color=255,0,0>ä¸–</color><color=100,155,0>ç•Œ</color>"
+		"<color=0,0,0>,</color><color=0,255,0>ä½ </color>"
+		"<color=0,100,155>å¥½</color><color=0,0,255>ï¼</color>\n" 
 	); 
-	/* Éè¶¨×ÖÌå´óĞ¡ */
+	/* è®¾å®šå­—ä½“å¤§å° */
 	label.Label.setFont( 24, NULL );
-	/* ÏÔÊ¾ÕâÁ½¸ö²¿¼ş */
+	/* æ˜¾ç¤ºè¿™ä¸¤ä¸ªéƒ¨ä»¶ */
 	label.show();
 	window.show();
-	/* ½øÈëÖ÷Ñ­»· */
+	/* è¿›å…¥ä¸»å¾ªç¯ */
 	return app.main(); 
 }
 
