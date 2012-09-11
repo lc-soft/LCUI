@@ -485,8 +485,8 @@ static void * Process_Key_Input ()
 					timeinfo->tm_mday, timeinfo->tm_hour, 
 					timeinfo->tm_min, timeinfo->tm_sec
 				);
-				Catch_Screen_Graph_By_FB(Rect((Get_Screen_Width()-320)/2, 
-						(Get_Screen_Height()-240)/2, 320, 240), &graph);
+				Catch_Screen_Graph_By_FB(Rect((Get_Screen_Width()-640)/2, 
+						(Get_Screen_Height()-480)/2, 640, 480), &graph);
 				write_png_file(filename, &graph);
 			}
 			#endif

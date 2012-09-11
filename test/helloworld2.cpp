@@ -1,18 +1,18 @@
-// C++ç‰ˆçš„hello,worldç¨‹åº
+// C++°æµÄhello,world³ÌĞò
 #include <LCUI_Build.h> 
-#include LC_LCUI_H	/* åŒ…å«LCUIçš„ç›¸å…³å¤´æ–‡ä»¶ */
+#include LC_LCUI_H	/* °üº¬LCUIµÄÏà¹ØÍ·ÎÄ¼ş */
 #include LC_WIDGET_H
 #include <unistd.h>
 #include <iostream>
 
 using namespace std;
-/* æµ‹è¯•çº¿ç¨‹ */
+/* ²âÊÔÏß³Ì */
 void *test_thread(void *object)
 {
 	LCUIThread *t = (LCUIThread *)object;
-	/* æ‰“å°çº¿ç¨‹ID */
+	/* ´òÓ¡Ïß³ÌID */
 	cout<<"thread id: "<<t->getid()<<endl;
-	/* çº¿ç¨‹é€€å‡º */
+	/* Ïß³ÌÍË³ö */
 	t->exit( NULL );
 }
 
@@ -22,35 +22,37 @@ int main(int argc, char*argv[])
 	LCUIWidget	window( "window" ), label( "label" );
 	LCUIGraph	icon;
 	LCUIThread	t;
-	/* åˆ›å»ºçº¿ç¨‹ */
+	
+	Using_GB2312();
+	/* ´´½¨Ïß³Ì */
 	t.create( NULL, test_thread, &t );
-	/* ç­‰å¾…çº¿ç¨‹é€€å‡º */
+	/* µÈ´ıÏß³ÌÍË³ö */
 	t.join( NULL );
-	/* è½½å…¥LCUIçš„18x18å°ºå¯¸çš„å›¾æ ‡ */
+	/* ÔØÈëLCUIµÄ18x18³ß´çµÄÍ¼±ê */
 	icon.load.icon.LCUI_18x18();
-	/* ä¸ºçª—å£è®¾å®šå›¾æ ‡ */
+	/* Îª´°¿ÚÉè¶¨Í¼±ê */
 	window.Window.setIcon( icon );
-	/* æ”¹å˜çª—å£çš„å°ºå¯¸ */
+	/* ¸Ä±ä´°¿ÚµÄ³ß´ç */
 	window.resize( Size(320, 240) ); 
-	/* è®¾å®šçª—å£çš„æ ‡é¢˜æ–‡æœ¬ */
-	window.Window.setTitle( "æµ‹è¯•çª—å£" ); 
-	/* å°†labeléƒ¨ä»¶æ·»åŠ è‡³çª—å£å®¢æˆ·åŒº */
+	/* Éè¶¨´°¿ÚµÄ±êÌâÎÄ±¾ */
+	window.Window.setTitle( "²âÊÔ´°¿Ú" ); 
+	/* ½«label²¿¼şÌí¼ÓÖÁ´°¿Ú¿Í»§Çø */
 	window.Window.addToClientArea( label ); 
-	/* è®¾å®šlabeléƒ¨ä»¶çš„å¯¹é½æ–¹å¼ */
+	/* Éè¶¨label²¿¼şµÄ¶ÔÆë·½Ê½ */
 	label.setAlign( ALIGN_MIDDLE_CENTER, Pos(0,0) ); 
-	/* è®¾å®šlabeléƒ¨ä»¶æ˜¾ç¤ºçš„æ–‡æœ¬ */
+	/* Éè¶¨label²¿¼şÏÔÊ¾µÄÎÄ±¾ */
 	label.Label.setText(
 		"Hello,World!\n"
-		"<color=255,0,0>ä¸–</color><color=100,155,0>ç•Œ</color>"
-		"<color=0,0,0>,</color><color=0,255,0>ä½ </color>"
-		"<color=0,100,155>å¥½</color><color=0,0,255>ï¼</color>\n" 
+		"<color=255,0,0>ÊÀ</color><color=100,155,0>½ç</color>"
+		"<color=0,0,0>,</color><color=0,255,0>Äã</color>"
+		"<color=0,100,155>ºÃ</color><color=0,0,255>£¡</color>\n" 
 	); 
-	/* è®¾å®šå­—ä½“å¤§å° */
+	/* Éè¶¨×ÖÌå´óĞ¡ */
 	label.Label.setFont( 24, NULL );
-	/* æ˜¾ç¤ºè¿™ä¸¤ä¸ªéƒ¨ä»¶ */
+	/* ÏÔÊ¾ÕâÁ½¸ö²¿¼ş */
 	label.show();
 	window.show();
-	/* è¿›å…¥ä¸»å¾ªç¯ */
+	/* ½øÈëÖ÷Ñ­»· */
 	return app.main(); 
 }
 

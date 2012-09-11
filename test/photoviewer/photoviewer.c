@@ -323,7 +323,7 @@ int load_imagefile()
 		 * 不能使用Get_Widget_Size()函数获取image_box，因为
 		 * 该函数获取的尺寸可能不准确 
 		 * */ 
-		if( 1 == Size_Cmp(size, IMAGE_BOX_SIZE)) {
+		if( 1 == Size_Cmp(size, image_box_size)) {
 		/* 如果图片尺寸大于image_box的尺寸，就改变image_box的图像处理模式 */ 
 			Set_PictureBox_Size_Mode(image_box, SIZE_MODE_BLOCK_ZOOM);
 			mini_scale = Get_PictureBox_Zoom_Scale(image_box);
@@ -439,13 +439,14 @@ void next_image(LCUI_Widget *widget, void *arg)
 int main(int argc, char*argv[]) 
 { 
 	int i;
-	LCUI_Size screen_size;
 	char path[1024];
+	LCUI_Size screen_size;
 	LCUI_Graph pic_loading[8], app_icon, btn_zoom_pic[6], btn_switch_pic[6];
 	/* 设定默认字体文件位置 */
 	Set_Default_Font("../../fonts/msyh.ttf");
-	LCUI_Init(argc, argv); 
 	Graph_Init(&app_icon); 
+	
+	LCUI_Init(argc, argv); 
 	/* 如果屏幕分辨率小于640x480，那就使用320x240分辨率 */
 	screen_size = Get_Screen_Size();
 	if(screen_size.w < 640 && screen_size.h <480){
@@ -529,14 +530,14 @@ int main(int argc, char*argv[])
 	size[1] = Size( btn_switch_size[0].w+btn_switch_size[1].w,
 			btn_switch_size[0].h);
 	/* 更改各个部件的尺寸 */
-	Resize_Widget(window, WINDOW_SIZE);
+	Resize_Widget(window, window_size);
 	Resize_Widget(btn_zoom[0], btn_zoom_size[0]);
 	Resize_Widget(btn_zoom[1], btn_zoom_size[1]);
 	Resize_Widget(btn_switch[0], btn_switch_size[0]);
 	Resize_Widget(btn_switch[1], btn_switch_size[1]);
 	Resize_Widget(container[0], size[0]);
 	Resize_Widget(container[1], size[1]);
-	Resize_Widget(image_box, IMAGE_BOX_SIZE);
+	Resize_Widget(image_box, image_box_size);
 	Resize_Widget(tip_box, Size(150, 34));
 	Resize_Widget(tip_pic, Size(32, 24));
 	Resize_Widget(tip_icon, Size(32, 24));

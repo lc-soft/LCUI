@@ -262,9 +262,11 @@ static void Exec_Update_PictureBox(LCUI_Widget *widget)
 	//pic_box->read_box.width, pic_box->read_box.height, 
 	//pic_box->read_box.x + pic_box->read_box.width, pic_box->buff_graph.width, 
 	//pic_box->read_box.y + pic_box->read_box.height, pic_box->buff_graph.height);
-	if(!Valid_Graph(&widget->background_image)) 
+	if(!Valid_Graph(&widget->background_image)) { 
 		Replace_Graph(&widget->graph, &graph, pos); 
-	else Mix_Graph(&widget->graph, &graph, pos);
+	} else {
+		Mix_Graph(&widget->graph, &graph, pos);
+	}
 	Free_Graph(&graph);
 	//printf("scale: %.4f\n", pic_box->scale);
 	//printf("Exec_Update_PictureBox(): end\n");
