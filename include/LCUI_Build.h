@@ -74,7 +74,9 @@
 
 /* 一些部件的头文件路径 */
 #define LC_WINDOW_H	<LCUI/LCUI_Window.h>
+#define LC_WINDOW_HPP	<LCUI/LCUI_Window.hpp>
 #define LC_LABEL_H	<LCUI/LCUI_Label.h>
+#define LC_LABEL_HPP	<LCUI/LCUI_Label.hpp>
 #define LC_BUTTON_H	<LCUI/LCUI_Button.h>
 #define LC_PICBOX_H	<LCUI/LCUI_PictureBox.h>
 #define LC_PROGBAR_H	<LCUI/LCUI_ProgressBar.h>

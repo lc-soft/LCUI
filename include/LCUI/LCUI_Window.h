@@ -101,4 +101,8 @@ void Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget);
 
 LCUI_END_HEADER
 
+#ifdef __cplusplus
+#include LC_WINDOW_HPP
+#endif
+
 #endif /* __LCUI_WINDOW_H__ */

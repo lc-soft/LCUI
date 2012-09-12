@@ -46,199 +46,172 @@
 
 #define WIDGET_IS_NULL -5
 
-#include LC_WINDOW_H
-#include LC_LABEL_H
 #include LC_GRAPHICS_H
 
 class LCUIWidget
 {
-	private:
-	int error;
-	LCUI_Widget **widget;
-	
 	public: 
-	LCUIWidget(const char* widget_type):Label(this),Window(this)
-	{
-		error = 0;
-		widget = new (LCUI_Widget *);
-		*widget = Create_Widget(widget_type);
-		if(*widget == NULL){
-			error = 1;
-		}
-	}
-	~LCUIWidget()
-	{
-		delete widget;
-	}
-	int isError()
-	{
-		return error;
-	}
-	LCUI_Widget *getWidget()
-	{
-		return *widget;
-	}
-	int resize(LCUI_Size new_size)
-	{
-		if( error ) return WIDGET_IS_NULL;
-		Resize_Widget( getWidget() , new_size);
-		return 0;
-	}
-	int move(LCUI_Pos new_pos)
-	{
-		if(error) return WIDGET_IS_NULL;
-		Move_Widget( getWidget() , new_pos);
-		return 0;
-	}
-	int show()
-	{
-		if(error) return WIDGET_IS_NULL;
-		Show_Widget( getWidget() );
-		return 0;
-	}
-	int hide()
-	{
-		if(error) return WIDGET_IS_NULL;
-		Hide_Widget( getWidget() );
-		return 0;
-	}
-	int refresh()
-	{
-		if(error) return WIDGET_IS_NULL;
-		Refresh_Widget( getWidget() );
-		return 0;
-	}
-	int draw()
-	{
-		if(error) return WIDGET_IS_NULL;
-		Draw_Widget( getWidget() );
-		return 0;
-	}
-	int enable()
-	{
-		if(error) return WIDGET_IS_NULL;
-		Enable_Widget( getWidget() );
-		return 0;
-	}
-	int disable()
-	{
-		if(error) return WIDGET_IS_NULL;
-		Disable_Widget( getWidget() );
-		return 0;
-	}
-	int setAlpha(unsigned char alpha)
-	{
-		if(error) return WIDGET_IS_NULL;
-		Set_Widget_Alpha( getWidget() , alpha);
-		return 0;
-	}
-	int setAlign(LCUI_Align align, LCUI_Pos offset_pos)
-	{
-		if(error) return WIDGET_IS_NULL; 
-		Set_Widget_Align( getWidget() , align, offset_pos);
-		return 0;
-	}
-	int setBorder(LCUI_RGB color, LCUI_Border border)
-	{
-		if(error) return WIDGET_IS_NULL;
-		Set_Widget_Border( getWidget() , color, border);
-		return 0;
-	}
-	int setBackgroundImage(LCUI_Graph *img, int flag)
-	{
-		if(error) return WIDGET_IS_NULL;
-		return Set_Widget_Background_Image( getWidget() , img, flag); 
-	}
-	
-	/* label widget */
-	class _Label
-	{
-		public: 
-		_Label(LCUIWidget *object)
-		{
-			parent = object; 
-		}
-		int setText(const char *fmt, ...)
-		{
-			if( parent->isError() ) {
-				return WIDGET_IS_NULL;
-			}
-			
-			char text[LABEL_TEXT_MAX_SIZE];
-			memset(text, 0, sizeof(text)); 
-			
-			LCUI_Label *p_label;
-			p_label = (LCUI_Label*)Get_Widget_Private_Data(parent->getWidget());
-			
-			va_list ap;
-			va_start(ap, fmt);
-			vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
-			va_end(ap); 
-			 
-			Strcpy( &p_label->text, text );/* 拷贝字符串 */ 
-			Draw_Widget( parent->getWidget() );/* 更新部件 */ 
-			return 0;
-		}
-		int setFont(int font_pixel_size, char *fontfile)
-		{
-			if( parent->isError() ) {
-				return WIDGET_IS_NULL;
-			}
-			return Set_Label_Font(parent->getWidget(), font_pixel_size, fontfile);
-		}
-		private:
-		LCUIWidget *parent; 
-	};
-	_Label Label;
-	/* label widget end */ 
-	
-	/* window widget */
+	LCUIWidget(const char* widget_type);
+	~LCUIWidget();
+	int isError();
+	LCUI_Widget *getWidget();
+	int resize(LCUI_Size new_size);
+	int move(LCUI_Pos new_pos);
+	int show();
+	int hide();
+	int refresh();
+	int draw();
+	int enable();
+	int disable();
+	int setAlpha(unsigned char alpha);
+	int setAlign(LCUI_Align align, LCUI_Pos offset_pos);
+	int setBorder(LCUI_RGB color, LCUI_Border border);
+	int setBackgroundImage(LCUI_Graph *img, int flag);
+	/* window widget class */
 	class _Window
-	{ 
+	{
 		public: 
-		_Window( LCUIWidget *object )
-		{
-			parent = object;
-		}
-		int setTitle( const char *text )
-		{
-			if( parent->isError() ) {
-				return WIDGET_IS_NULL;
-			} 
-			Set_Window_Title_Text(parent->getWidget(), text);
-			return 0;
-		}
-		int setIcon( LCUIGraph &icon )
-		{
-			if( parent->isError() ) {
-				return WIDGET_IS_NULL;
-			} 
-			Set_Window_Title_Icon(parent->getWidget(), &icon.graph);
-			return 0;
-		}
-		int setIcon( LCUI_Graph *icon )
-		{
-			if( parent->isError() ) {
-				return WIDGET_IS_NULL;
-			} 
-			Set_Window_Title_Icon(parent->getWidget(), icon);
-			return 0;
-		}
-		int addToClientArea(LCUIWidget &object)
-		{
-			if( parent->isError() ) {
-				return WIDGET_IS_NULL;
-			}
-			Window_Client_Area_Add(parent->getWidget(), object.getWidget());
-			return 0;
-		}
+		_Window( LCUIWidget *object );
+		int setTitle( const char *text );
+		int setIcon( LCUIGraph &icon );
+		int setIcon( LCUI_Graph *icon );
+		int addToClientArea( LCUIWidget &object );
 		
 		private:
 		LCUIWidget *parent; 
 	}; 
-	_Window Window;
-	/* window widget end */
+	/* window widget class --end-- */
+	
+	/* label widget class */
+	class _Label
+	{
+		public: 
+		_Label(LCUIWidget *object);
+		int setText(const char *fmt, ...);
+		int setFont(int font_pixel_size, char *fontfile);
+		
+		private:
+		LCUIWidget *parent; 
+	};
+	/* label widget class --end-- */
+	_Label Label;
+	_Window Window; 
+	
+	private:
+	int error;
+	LCUI_Widget **widget;
+	
 };
+
+
+#include LC_WINDOW_H
+#include LC_LABEL_H
+
+
+LCUIWidget::LCUIWidget(const char* widget_type):Label(this),Window(this)
+{
+	error = 0;
+	widget = new (LCUI_Widget *);
+	*widget = Create_Widget(widget_type);
+	if(*widget == NULL){
+		error = 1;
+	}
+}
+
+LCUIWidget::~LCUIWidget()
+{
+	delete this->widget;
+}
+
+int LCUIWidget::isError()
+{
+	return error;
+}
+
+LCUI_Widget *LCUIWidget::getWidget()
+{
+	return *widget;
+}
+
+int LCUIWidget::resize(LCUI_Size new_size)
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	Resize_Widget( getWidget() , new_size );
+	return 0;
+}
+
+int LCUIWidget::move(LCUI_Pos new_pos)
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	Move_Widget( getWidget() , new_pos );
+	return 0;
+}
+
+int LCUIWidget::show()
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	Show_Widget( getWidget() );
+	return 0;
+}
+
+int LCUIWidget::hide()
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	Hide_Widget( getWidget() );
+	return 0;
+}
+
+int LCUIWidget::refresh()
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	Refresh_Widget( getWidget() );
+	return 0;
+}
+
+int LCUIWidget::draw()
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	Draw_Widget( getWidget() );
+	return 0;
+}
+
+int LCUIWidget::enable()
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	Enable_Widget( getWidget() );
+	return 0;
+}
+
+int LCUIWidget::disable()
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	Disable_Widget( getWidget() );
+	return 0;
+}
+
+int LCUIWidget::setAlpha(unsigned char alpha)
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	Set_Widget_Alpha( getWidget() , alpha);
+	return 0;
+}
+int LCUIWidget::setAlign(LCUI_Align align, LCUI_Pos offset_pos)
+{
+	if( isError() ) return WIDGET_IS_NULL; 
+	Set_Widget_Align( getWidget() , align, offset_pos);
+	return 0;
+}
+int LCUIWidget::setBorder(LCUI_RGB color, LCUI_Border border)
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	Set_Widget_Border( getWidget() , color, border);
+	return 0;
+}
+int LCUIWidget::setBackgroundImage(LCUI_Graph *img, int flag)
+{
+	if( isError() ) return WIDGET_IS_NULL;
+	return Set_Widget_Background_Image( getWidget() , img, flag); 
+}
 
 #endif
 

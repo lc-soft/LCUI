@@ -69,12 +69,12 @@ int Show_Font_Bitmap(LCUI_Bitmap *in_fonts);
 /* 功能：在屏幕打印以0和1表示字体位图 */ 
 
 int Mix_Fonts_Bitmap(
-		LCUI_Graph		*back_graph,  /* 背景图形 */
-		int				start_x,
-		int				start_y,
+		LCUI_Graph	*back_graph,  /* 背景图形 */
+		int		start_x,
+		int		start_y,
 		LCUI_Bitmap	*in_fonts,  /* 传入的字体位图数据 */
-		LCUI_RGB		color,       /* 字体的配色 */ 
-		int				flag
+		LCUI_RGB	color,       /* 字体的配色 */ 
+		int		flag
 );
 /* 功能：将字体位图数据与背景图形混合 */ 
 

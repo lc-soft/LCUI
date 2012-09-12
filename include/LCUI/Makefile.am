@@ -16,8 +16,8 @@ LCUI_PictureBox.h \
 LCUI_ProgressBar.h \
 LCUI_Cursor.h \
 LCUI_Error.h \
-LCUI_Label.h \
-LCUI_Window.h \
+LCUI_Label.h LCUI_Label.hpp\
+LCUI_Window.h LCUI_Window.hpp\
 LCUI_Memory.h \
 LCUI_Menu.h \
 LCUI_CheckBox.h \

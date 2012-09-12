@@ -40,7 +40,7 @@
  * ****************************************************************************/
 #ifndef __LCUI_LABEL_H__
 #define __LCUI_LABEL_H__
-typedef struct _LCUI_Label			LCUI_Label;
+typedef struct _LCUI_Label LCUI_Label;
 /**************************** lable部件 ********************************/
 struct _LCUI_Label
 {
@@ -86,5 +86,10 @@ void Set_Label_Font_Default_Color(LCUI_Widget *widget, LCUI_RGB color);
  * */ 
  
 LCUI_END_HEADER
+
+
+#ifdef __cplusplus
+#include LC_LABEL_HPP
+#endif
 
 #endif
