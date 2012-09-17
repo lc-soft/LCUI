@@ -75,7 +75,7 @@ am_libLCUI_la_OBJECTS = LCUI_Main.lo LCUI_Queue.lo LCUI_Font.lo \
 	LCUI_Button.lo LCUI_Error.lo LCUI_Label.lo LCUI_PictureBox.lo \
 	LCUI_ProgressBar.lo LCUI_Resources.lo LCUI_Window.lo \
 	LCUI_Menu.lo LCUI_CheckBox.lo LCUI_RadioButton.lo \
-	LCUI_ActiveBox.lo
+	LCUI_ActiveBox.lo LCUI_TextBox.lo
 libLCUI_la_OBJECTS = $(am_libLCUI_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -259,7 +259,8 @@ LCUI_Window.c \
 LCUI_Menu.c \
 LCUI_CheckBox.c \
 LCUI_RadioButton.c \
-LCUI_ActiveBox.c
+LCUI_ActiveBox.c \
+LCUI_TextBox.c 
 
 all: all-am
 
@@ -353,6 +354,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Queue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_RadioButton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Resources.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_TextBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Thread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Widget.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Window.Plo@am__quote@

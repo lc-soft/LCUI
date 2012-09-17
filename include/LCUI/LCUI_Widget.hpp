@@ -67,6 +67,8 @@ class LCUIWidget
 	int setAlign(LCUI_Align align, LCUI_Pos offset_pos);
 	int setBorder(LCUI_RGB color, LCUI_Border border);
 	int setBackgroundImage(LCUI_Graph *img, int flag);
+	//int connectDragEvent(void (*func)(LCUIWidget &obj, LCUI_DragEvent *event));
+	//int connectClickedEvent(void (*func)(LCUIWidget &obj, LCUI_DragEvent *event));
 	/* window widget class */
 	class _Window
 	{

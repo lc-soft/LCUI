@@ -56,7 +56,7 @@ typedef struct _LCUI_DragEvent	LCUI_DragEvent;
 /************ 部件事件 ************/
 typedef enum _WidgetEvent_ID
 {
-	EVENT_DRAG,		/* 部件的拖动事件 */
+	EVENT_DRAG,	/* 部件的拖动事件 */
 	EVENT_CLICKED	/* 部件的点击事件 */
 }WidgetEvent_ID;
 /*********************************/

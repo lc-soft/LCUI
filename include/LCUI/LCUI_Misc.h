@@ -59,6 +59,12 @@ void Strcpy (LCUI_String * des, const char *src);
 int Strcmp(LCUI_String *str1, const char *str2);
 /* 功能：对比str1与str2 */ 
 
+int LCUI_Strcmp(LCUI_String *str1, LCUI_String *str2);
+/* LCUI_String 字符串对比 */ 
+
+int LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2);
+/* LCUI_String 字符串拷贝 */
+
 void Get_Moved_Rect_Refresh_Area (int new_x, int new_y, LCUI_Rect rect,
 							 LCUI_Rect * rect_a, LCUI_Rect * rect_b);
 /* 功能：获取一个矩形移动后需要刷新的残留区域，也就是A和B两个区域 */ 

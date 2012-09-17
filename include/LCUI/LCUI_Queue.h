@@ -121,7 +121,7 @@ void * Queue_Get (LCUI_Queue * queue, int pos);
  * 注意：请勿对返回的指针进行free操作
  * */ 
 
-int Queue_Insert(const void *data, int pos, LCUI_Queue * queue);
+int Queue_Insert(LCUI_Queue * queue, int pos, const void *data);
 /* 功能：向队列中指定位置插入成员 */ 
 
 int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos);

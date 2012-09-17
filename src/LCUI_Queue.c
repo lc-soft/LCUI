@@ -84,7 +84,7 @@ void Queue_Init (LCUI_Queue * queue, size_t element_size, void (*func) ())
 /* 功能：初始化队列 */
 {
 	thread_rwlock_init(&queue->lock);
-	queue->member_type  = 0;   
+	queue->member_type	= 0;   
 	queue->queue		= NULL;
 	queue->total_num	= 0;
 	queue->max_num		= 0;
@@ -215,7 +215,7 @@ void * Queue_Get (LCUI_Queue * queue, int pos)
 	return data;
 }
 
-int Queue_Insert(const void *data, int pos, LCUI_Queue * queue)
+int Queue_Insert( LCUI_Queue * queue, int pos, const void *data)
 /* 功能：向队列中指定位置插入成员 */
 {
 	int i, total;

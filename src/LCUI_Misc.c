@@ -103,6 +103,32 @@ int Strcmp(LCUI_String *str1, const char *str2)
 	else return -1;
 }
 
+int LCUI_Strcmp(LCUI_String *str1, LCUI_String *str2)
+/* LCUI_String 字符串对比 */
+{
+	if( str1->size > 0 && str2->size > 0 ) {
+		return strcmp(str1->string, str2->string);
+	}
+	return 0;
+}
+
+int LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2)
+/* LCUI_String 字符串拷贝 */
+{
+	if( str2->size <= 0 ) {
+		return -1;
+	}
+	if(str1->size > 0) {
+		if( str2->size > str1->size ) { 
+			free( str1->string );
+			str1->string = (char*)calloc(str2->size+1, sizeof(char));
+		}
+	}
+	strcpy( str1->string, str2->string );
+	str1->size = str2->size;
+	return 0;
+}
+
 void Get_Moved_Rect_Refresh_Area (int new_x, int new_y, LCUI_Rect rect,
 							 LCUI_Rect * rect_a, LCUI_Rect * rect_b)
 /* 功能：获取一个矩形移动后需要刷新的残留区域，也就是A和B两个区域。 */

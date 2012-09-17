@@ -1257,9 +1257,10 @@ int Align_Image(LCUI_Graph *graph, LCUI_Graph *image, int flag)
 	LCUI_Pos pos;
 	pos.x = 0;
 	pos.y = 0;
-	if(!Valid_Graph(graph) || ! Valid_Graph(image))
 	/* 如果图片无效 */
+	if(!Valid_Graph(graph) || ! Valid_Graph(image)) {
 		return -1; 
+	}
 		
 	if((flag & ALIGN_TOP_LEFT) == ALIGN_TOP_LEFT);
 	/* 向左上角对齐 */
@@ -1321,7 +1322,7 @@ int Fill_Background_Image(LCUI_Graph *graph, LCUI_Graph *bg, int flag, LCUI_RGB 
 	pos.y = 0;
 	Graph_Init(&temp_bg);
 	switch(flag) {
-	case LAYOUT_ZOOM:/* 缩放 */
+	    case LAYOUT_ZOOM:/* 缩放 */
 		Zoom_Graph( bg, &temp_bg, DEFAULT,
 		Size(graph->width, graph->height)
 		);
@@ -1329,21 +1330,21 @@ int Fill_Background_Image(LCUI_Graph *graph, LCUI_Graph *bg, int flag, LCUI_RGB 
 		pos.y = (graph->height - temp_bg.height) / 2.0;
 		Mix_Graph(graph, &temp_bg, pos);
 		break;
-	case LAYOUT_STRETCH:/* 拉伸 */
+	    case LAYOUT_STRETCH:/* 拉伸 */
 		Zoom_Graph( bg,  &temp_bg, CUSTOM, 
 		Size(graph->width, graph->height) 
 		);
 		Mix_Graph(graph, &temp_bg, pos);
 		break;
-	case LAYOUT_CENTER:/* 居中 */
+	    case LAYOUT_CENTER:/* 居中 */
 		pos.x = (graph->width - bg->width) / 2;
 		pos.y = (graph->height - bg->height) / 2;
 		Mix_Graph(graph, bg, pos);
 		break;
-	case LAYOUT_TILE:/* 平铺 */
+	    case LAYOUT_TILE:/* 平铺 */
 		Tile_Graph(bg, graph, graph->width, graph->height);
 		break;
-	default: 
+	    default: 
 		Mix_Graph(graph, bg, pos);
 		break;
 	}

@@ -365,7 +365,7 @@ int Widget_Drag_Event_Connect (
 )
 /* 
  * 功能：将回调函数与部件的拖动事件进行连接 
- * 说明：建立连接后，但部件被点击，拖动，释放，都会调用回调函数
+ * 说明：建立连接后，当部件被点击，拖动，释放，都会调用回调函数
  * */
 {
 	LCUI_DragEvent *p;
@@ -477,12 +477,13 @@ static void Widget_Clicked(LCUI_MouseEvent *event)
 		widget = Widget_Find_Response_Status_Change(widget); 
 		if(widget != NULL) {
 			//printf("3\n");
-			if( event->widget->enabled == IS_TRUE
-			&& widget->enabled == IS_TRUE )
 			/* 如果当前鼠标指针覆盖到的部件已被启用 */  
+			if( event->widget->enabled == IS_TRUE
+			 && widget->enabled == IS_TRUE ) {
 				Set_Widget_Status (widget, WIDGET_STATUS_CLICKING); 
-			else 
+			} else {
 				Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
+			}
 		}
 			//printf("4\n");
 	}

@@ -375,10 +375,8 @@ int Set_Raw(int t)
 		printf("\033[?25l");/* 隐藏光标 */
 	} else {
 		/* 以下值是通过获取正常终端属性得到的 */
-		tm.c_iflag = 11522;
-		tm.c_oflag = 5;
-		tm.c_cflag = 1215;
-		tm.c_lflag = 35387;
+		tm.c_lflag |= ICANON;
+		tm.c_lflag |= ECHO;
 		tm.c_cc[VMIN] = 1;
 		tm.c_cc[VTIME] = 0;
 		if(tcsetattr(fd,TCSANOW,&tm)<0) 
@@ -396,13 +394,13 @@ int Check_Key(void)
  *   2   无按键输入
  * */
 {
-	struct termios oldt, newt;  
+	struct termios oldt;//, newt;  
 	int ch;  
 	int oldf;  
 	tcgetattr(STDIN_FILENO, &oldt);  
-	newt = oldt;  
-	newt.c_lflag &= ~(ICANON | ECHO);  
-	tcsetattr(STDIN_FILENO, TCSANOW, &newt);  
+	//newt = oldt;  
+	//newt.c_lflag &= ~(ICANON | ECHO);  
+	//tcsetattr(STDIN_FILENO, TCSANOW, &newt);  
 	oldf = fcntl(STDIN_FILENO, F_GETFL, 0);  
 	fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);  
 	ch = getchar();  /* 获取一个字符 */

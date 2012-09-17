@@ -98,12 +98,12 @@
 #define ture 1
 #endif
 
-enum _BOOL
+typedef enum _BOOL
 {
 	IS_FALSE = 0,
 	IS_TRUE = 1,
 	IS_ERROR = -1
-};
+}BOOL;
 
 #define FORCE	2
 

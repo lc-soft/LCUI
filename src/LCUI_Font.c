@@ -3292,10 +3292,14 @@ int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 	slot = p_FT_Face->glyph;
 	if(ch == ' ') { /* 如果有空格,它的宽度就以字母a的宽度为准 */
 		error = FT_Load_Char( p_FT_Face, 'a', font_data->load_flags); 
-		if(error) return error; 
+		if(error) {
+			return error; 
+		}
 		
 		error = FT_Get_Glyph(p_FT_Face -> glyph, &glyph);
-		if(error) return error; 
+		if(error) {
+			return error; 
+		}
 		
 		Free_Bitmap(out_bitmap);
 		/* 背景图形的高度，这个高度要大于字体的高度，所以是+3 */
@@ -3314,12 +3318,16 @@ int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 	}
 	/* 这个函数只是简单地调用FT_Get_Char_Index和FT_Load_Glyph */
 	error = FT_Load_Char( p_FT_Face, ch, font_data->load_flags);
-	if(error) return error; 
+	if(error) {
+		return error; 
+	}
 	
 	/* 从插槽中提取一个字形图像 
 	 * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
 	error = FT_Get_Glyph(p_FT_Face->glyph, &glyph);
-	if(error) return error; 
+	if(error) {
+		return error; 
+	}
 	
 	int bg_height;
 	Free_Bitmap(out_bitmap);
@@ -3336,10 +3344,11 @@ int Get_WChar_Bitmap(LCUI_Font *font_data, wchar_t ch, LCUI_Bitmap *out_bitmap)
 	ch_width = bitmap.width;
 	/* 处理字体位图在背景图中的范围 */
 	if(start_y < 0)  start_y = 0; 
-	if(bitmap.rows > bg_height) 
+	if(bitmap.rows > bg_height) {
 		ch_height = font_data->size; 
-	else  
+	} else {
 		ch_height = bitmap.rows; 
+	}
 		
 	if(ch_height + start_y > bg_height)  
 		ch_height = bg_height - start_y; 
