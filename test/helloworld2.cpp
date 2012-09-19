@@ -8,7 +8,6 @@ int main(int argc, char*argv[])
 	LCUI		app(argc, argv); 
 	LCUIWidget	window( "window" ), label( "label" );
 	LCUIGraph	icon;
-	LCUIThread	t;
 	
 	/* 载入LCUI的18x18尺寸的图标 */
 	icon.load.icon.LCUI_18x18();

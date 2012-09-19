@@ -50,19 +50,42 @@
 
 #define MAX_TID		50
 
-typedef struct _LCUI_Queue LCUI_Queue;
+typedef struct _LCUI_Queue	LCUI_Queue;
+typedef struct _LCUI_Node	LCUI_Node;
 
+typedef enum _Queue_DataMode Queue_DataMode;
+
+enum _Queue_DataMode
+{
+	QUEUE_DATA_MODE_ARRAY = 0,
+	QUEUE_DATA_MODE_LINKED_LIST = 1
+};
+
+/*************** 链表的结点 ******************/
+struct _LCUI_Node
+{
+	void *data;
+	LCUI_Node *next;
+	LCUI_Node *prev;
+};
+/*******************************************/
+
+/****************************** 队列 ***********************************/
 struct _LCUI_Queue
 { 
-	thread_rwlock lock;/* 读写锁 */
-	int member_type;	/* 成员类型 */ 
+	thread_rwlock lock;	/* 读写锁 */
+	int member_type:2;	/* 成员类型 */ 
+	int data_mode:2;	/* 数据储存方式（数组/链表） */
 	
-	void **queue;		/* 记录队列成员 */
+	void **data_array;		/* 记录队列成员(数组模式) */
+	LCUI_Node *data_head_node;	/* 记录队列成员(链表模式) */
+	
 	size_t element_size;	/* 成员的占用的内存空间大小，单位为字节 */
 	int total_num;		/* 记录队列成员数量 */
 	int max_num;		/* 最大的数量 */
 	void (*destroy_func) (void*); /* 析构函数，当销毁队列成员时，会调用它进行销毁 */
 };
+/**********************************************************************/
  
 /************************ LCUI_Queue **********************************/
 int Queue_Lock (LCUI_Queue *queue);
@@ -130,20 +153,20 @@ int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos);
 int Queue_Replace(LCUI_Queue * queue, int pos, const void *data);
 /* 功能：覆盖队列中指定位置的成员 */ 
 
-int Queue_Add_By_Flag(LCUI_Queue * queue, void *data, int flag);
+int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag);
 /* 
  * 功能：将新的成员添加至队列 
  * 说明：是否为新成员重新分配内存空间，由参数flag的值决定
  * 返回值：正常则返回在队列中的位置，错误则返回非0值
  * */ 
 
-int Queue_Add(LCUI_Queue * queue, void *data) ;
+int Queue_Add(LCUI_Queue * queue, const void *data) ;
 /* 
  * 功能：将新的成员添加至队列 
  * 说明：这个函数只是单纯的添加成员，如果想有更多的功能，需要自己实现
  * */ 
 
-int Queue_Add_Pointer(LCUI_Queue * queue, void *data);
+int Queue_Add_Pointer(LCUI_Queue * queue, const void *data);
 /* 
  * 功能：将新的成员添加至队列 
  * 说明：与Queue_Add函数不同，该函数只是修改指定位置的成员指针指向的地址，主要用

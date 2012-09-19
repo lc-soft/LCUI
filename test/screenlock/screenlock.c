@@ -26,10 +26,12 @@ void move_pic_btn(LCUI_Widget *widget, LCUI_DragEvent *event)
 		rect = Get_Widget_Rect(widget);
 		size = Get_Widget_Size(widget->parent);
 		des = Rect(size.w-10, 0, 30, 30);/* 目标区域 */
-		if(Rect_Is_Overlay(rect, des)) /* 如果部件区域与目标区域重叠，则退出程序 */
+		 /* 如果部件区域与目标区域重叠，则退出程序 */
+		if(Rect_Is_Overlay(rect, des)) {
 			Main_Loop_Quit(); 
-		else/* 否则，让部件回到起始位置，这个使用的是匀速移动 */
+		} else {/* 否则，让部件回到起始位置，这个使用的是匀速移动 */
 			Move_Widget_To_Pos(widget, Pos(0,0), 500);
+		}
 	}
 }
 
