@@ -2844,13 +2844,17 @@ void LCUI_Font_Init(LCUI_Font *font)
 	font->space = 1;
 	font->linegap = 0;
 	font->status = KILLED;
-	font->load_flags = FT_LOAD_NO_BITMAP | FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH;//FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT;
+	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT;
+	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_MONOCHROME;
+	font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT; 
 	font->render_mode = FT_RENDER_MODE_MONO;
 	font->ft_lib = NULL;
 	font->ft_face = NULL;
 	/* 如果在环境变量中定义了字体文件路径，那就使用它 */
 	p = getenv("LCUI_FONTFILE");
-	if(p != NULL) strcpy(default_font, p); 
+	if(p != NULL) {
+		strcpy(default_font, p); 
+	}
 	/* 打开默认字体文件 */
 	Open_Fontfile(&LCUI_Sys.default_font, default_font); 
 }
@@ -2871,9 +2875,9 @@ void Font_Init(LCUI_Font *in)
 	String_Init(&in->style_name);
 	if(LCUI_Sys.default_font.status == ACTIVE) {
 		in->status = ACTIVE;
-		Strcpy(&in->family_name, LCUI_Sys.default_font.family_name.string);
-		Strcpy(&in->style_name, LCUI_Sys.default_font.style_name.string);
-		Strcpy(&in->font_file, LCUI_Sys.default_font.font_file.string);
+		LCUI_Strcpy(&in->family_name, &LCUI_Sys.default_font.family_name);
+		LCUI_Strcpy(&in->style_name, &LCUI_Sys.default_font.style_name);
+		LCUI_Strcpy(&in->font_file, &LCUI_Sys.default_font.font_file);
 		in->ft_lib = LCUI_Sys.default_font.ft_lib;
 		in->ft_face = LCUI_Sys.default_font.ft_face;
 	} else {
@@ -2883,8 +2887,8 @@ void Font_Init(LCUI_Font *in)
 	}
 	in->space = 1;
 	in->linegap = 0;
-	in->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT;
-	in->render_mode = FT_RENDER_MODE_MONO;
+	in->load_flags = LCUI_Sys.default_font.load_flags;
+	in->render_mode = LCUI_Sys.default_font.render_mode;
 }
 
 
@@ -2916,16 +2920,17 @@ int Mix_Fonts_Bitmap(
 )
 /* 功能：将字体位图数据与背景图形混合 */
 {
-	if(!Valid_Graph(back_graph)) return -1;
-	if(!Valid_Bitmap(in_fonts)) return -1;
-	int x = 0;
-	int y = 0;
-	int end_x,end_y;//右下角的坐标
-	int count = 0, m;
-	int box_width, box_height, width, height;
-	unsigned char j;
+	if(!Valid_Bitmap(in_fonts) || !Valid_Graph(back_graph)) {
+		return -1;
+	}
+	
 	float k;
+	int count = 0, m;
+	unsigned char j;
 	LCUI_Rect read, write;/* 用于记录区域的范围的数据 */
+	int x = 0, y = 0, end_x, end_y;//右下角的坐标
+	int box_width, box_height, width, height;
+	
 	Rect_Init(&read);
 	Rect_Init(&write);
 	
