@@ -40,7 +40,11 @@
  * ****************************************************************************/
 #ifndef __LCUI_QUEUE_H__
 #define __LCUI_QUEUE_H__
+
 #include LC_THREAD_H
+
+LCUI_BEGIN_HEADER
+
 /********* 队列的使用模式 *******/
 #define QUEUE_MODE_FREE		0
 #define QUEUE_MODE_READ		1
@@ -53,13 +57,12 @@
 typedef struct _LCUI_Queue	LCUI_Queue;
 typedef struct _LCUI_Node	LCUI_Node;
 
-typedef enum _Queue_DataMode Queue_DataMode;
-
-enum _Queue_DataMode
+typedef enum _Queue_DataMode
 {
 	QUEUE_DATA_MODE_ARRAY = 0,
 	QUEUE_DATA_MODE_LINKED_LIST = 1
-};
+}
+Queue_DataMode;
 
 /*************** 链表的结点 ******************/
 struct _LCUI_Node
@@ -78,7 +81,7 @@ struct _LCUI_Queue
 	int data_mode:2;	/* 数据储存方式（数组/链表） */
 	
 	void **data_array;		/* 记录队列成员(数组模式) */
-	LCUI_Node *data_head_node;	/* 记录队列成员(链表模式) */
+	LCUI_Node data_head_node;	/* 记录队列成员(链表模式) */
 	
 	size_t element_size;	/* 成员的占用的内存空间大小，单位为字节 */
 	int total_num;		/* 记录队列成员数量 */
@@ -153,6 +156,9 @@ int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos);
 int Queue_Replace(LCUI_Queue * queue, int pos, const void *data);
 /* 功能：覆盖队列中指定位置的成员 */ 
 
+int Queue_Replace_Pointer(LCUI_Queue * queue, int pos, const void *data);
+/* 功能：覆盖队列中指定位置的成员指针 */
+
 int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag);
 /* 
  * 功能：将新的成员添加至队列 
@@ -208,6 +214,9 @@ void Queue_Copy(LCUI_Queue *des, LCUI_Queue *src);
 int RectQueue_Add (LCUI_Queue * queue, LCUI_Rect rect) ;
 /* 功能：将矩形数据追加至队列 */ 
 /************************* RectQueue end *******************************/
+
+
+LCUI_END_HEADER
 
 #endif
 
