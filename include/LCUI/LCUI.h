@@ -44,7 +44,7 @@
 #ifndef __LCUI_H__  /* 如果没有定义 __LCUI_H__ 宏 */
 #define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */ 
 
-#define LCUI_VERSION "0.12.5"
+#define LCUI_VERSION "0.12.6"
 
 #include <pthread.h>
 #include <ft2build.h>

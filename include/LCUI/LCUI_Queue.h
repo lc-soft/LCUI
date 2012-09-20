@@ -121,15 +121,14 @@ void Queue_Using_Pointer(LCUI_Queue * queue);
 int Queue_Get_Total(LCUI_Queue * queue);
 /* 说明：获取队列当前总成员数量 */ 
 
+int Queue_Set_DataMode(LCUI_Queue * queue, Queue_DataMode mode);
+/* 
+ * 功能：设定队列使用的数据储存模式
+ * 说明：只能在初始化后且未加入成员时使用该函数
+ * */
+
 int Queue_Swap(LCUI_Queue * queue, int pos_a, int pos_b);
 /* 功能：交换队列中指定位置两个成员的值 */ 
-
-int Queue_Delete_By_Flag (LCUI_Queue * queue, int pos, int flag) ;
-/* 
- * 功能：从队列中删除一个成员，并重新排列队列
- * 说明：处理方式因flag的值而不同 
- * 返回值：正常返回真（1），出错返回假（0）
- * */ 
 
 int Queue_Delete (LCUI_Queue * queue, int pos);
 /* 功能：从队列中删除一个成员，并释放该成员占用的内存资源 */ 
@@ -158,13 +157,6 @@ int Queue_Replace(LCUI_Queue * queue, int pos, const void *data);
 
 int Queue_Replace_Pointer(LCUI_Queue * queue, int pos, const void *data);
 /* 功能：覆盖队列中指定位置的成员指针 */
-
-int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag);
-/* 
- * 功能：将新的成员添加至队列 
- * 说明：是否为新成员重新分配内存空间，由参数flag的值决定
- * 返回值：正常则返回在队列中的位置，错误则返回非0值
- * */ 
 
 int Queue_Add(LCUI_Queue * queue, const void *data) ;
 /* 

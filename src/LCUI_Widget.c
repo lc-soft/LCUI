@@ -1244,18 +1244,19 @@ static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, int type)
 	}
 	
 	temp.type = type;			/* 保存类型 */
-	if(data != NULL) {
+	if(data != NULL) { 
 		temp.data = malloc(size);	/* 分配内存 */
 		memcpy(temp.data, data, size);	/* 拷贝数据 */ 
+	} else {
+		temp.data = NULL;
 	}
-	else temp.data = NULL;
 	  
 	pos = Find_WidgetData(widget, &temp);
-	if(pos >= 0)	/* 如果已经存在，就覆盖 */ 
+	if(pos >= 0) {	/* 如果已经存在，就覆盖 */ 
 		result = Queue_Replace(&widget->data, pos, &temp); 
-	else	/* 否则，追加至队列末尾 */
+	} else {	/* 否则，追加至队列末尾 */
 		result = Queue_Add(&widget->data, &temp);
-		
+	}
 	return result;
 }
 
