@@ -115,7 +115,7 @@ int LCUI_Strcmp(LCUI_String *str1, LCUI_String *str2)
 int LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2)
 /* LCUI_String 字符串拷贝 */
 {
-	if( str2->size <= 0 ) {
+	if( str1->size <=0 || str2->size <= 0 ) {
 		return -1;
 	}
 	if(str1->size > 0) {
@@ -129,79 +129,6 @@ int LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2)
 	return 0;
 }
 
-void Get_Moved_Rect_Refresh_Area (int new_x, int new_y, LCUI_Rect rect,
-							 LCUI_Rect * rect_a, LCUI_Rect * rect_b)
-/* 功能：获取一个矩形移动后需要刷新的残留区域，也就是A和B两个区域。 */
-{
-	Rect_Init (rect_a);
-	Rect_Init (rect_b);
-	if (rect.x < new_x)
-	{							/* 如果是向右移 */
-		rect_a->x = rect.x;
-		rect_a->y = rect.y;
-		rect_a->width = new_x - rect.x;
-		rect_a->height = rect.height;
-		if (rect.y > new_y)
-		{						/* 如果是向上移 */
-			rect_b->x = new_x;
-			rect_b->y = new_y + rect.height;
-			rect_b->width = rect.width - rect_a->width;
-			rect_b->height = rect.y - new_y;
-		}
-		else
-		{
-			rect_b->x = new_x;
-			rect_b->y = rect.y;
-			rect_b->width = rect.width - rect_a->width;
-			rect_b->height = new_y - rect.y;
-		}
-	}
-	else if (rect.x > new_x)
-	{							/* 如果是向左移 */
-		rect_a->x = new_x + rect.width;
-		rect_a->y = rect.y;
-		rect_a->width = rect.x - new_x;
-		rect_a->height = rect.height;
-
-		if (rect.y > new_y)
-		{						/* 如果是向上移 */
-			rect_b->x = rect.x;
-			rect_b->y = new_y + rect.height;
-			rect_b->width = rect.width - rect_a->width;
-			rect_b->height = rect.y - new_y;
-		}
-		else
-		{
-			rect_b->x = rect.x;
-			rect_b->y = rect.y;
-			rect_b->width = rect.width - rect_a->width;
-			rect_b->height = new_y - rect.y;
-		}
-	}
-	else
-	{							/* 否则，没有向左右移动，只有向上和向下 */
-		rect_a->x = rect.x;
-		rect_a->y = rect.y;
-		rect_a->width = 0;
-		rect_a->height = 0;
-		if (rect.y > new_y)
-		{						/* 如果是向上移 */
-			rect_b->x = rect.x;
-			rect_b->y = new_y + rect.height;
-			rect_b->width = rect.width;
-			rect_b->height = rect.y - new_y;
-		}
-		else
-		{
-			rect_b->x = rect.x;
-			rect_b->y = rect.y;
-			rect_b->width = rect.width;
-			rect_b->height = new_y - rect.y;
-		}
-	}
-}
-
-
 int Rect_Cross_Overlay(LCUI_Rect a, LCUI_Rect b)
 /* 
  * 功能：检测两个矩形是否成十字架式叠加 
@@ -214,12 +141,14 @@ int Rect_Cross_Overlay(LCUI_Rect a, LCUI_Rect b)
 	/* 检测两个矩形是否成十字架式叠加 */
 	if(a.x < b.x && a.y > b.y 
 	&& a.x + a.width  > b.x + b.width 
-	&& a.y + a.height < b.y + b.height) 
+	&& a.y + a.height < b.y + b.height) {
 		return 1;
+	}
 	if(b.x < a.x && b.y > a.y 
 	&& b.x + b.width  > a.x + a.width  
-	&& b.y + b.height < a.y + a.height) 
+	&& b.y + b.height < a.y + a.height) {
 		return -1;
+	}
 	return 0;
 }
 
