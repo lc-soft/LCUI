@@ -46,8 +46,7 @@
 #include LC_MEM_H
 #include LC_LABEL_H
 #include LC_PICBOX_H
-#include LC_WINDOW_H
-#include LC_MISC_H 
+#include LC_WINDOW_H 
 #include LC_GRAPHICS_H
 #include LC_RES_H
 #include LC_INPUT_H
@@ -84,8 +83,9 @@ static void Move_Window(LCUI_Widget *titlebar, LCUI_DragEvent *event)
 		if(window != NULL) {
 			/* 减去在窗口中的相对坐标, 得出窗口位置 */
 			pos = Pos_Sub(pos, Get_Widget_Pos(titlebar));
-			if(window->parent != NULL)
+			if(window->parent != NULL) {
 				pos = Pos_Sub(pos, Get_Widget_Global_Pos(window->parent));
+			}
 			/* 移动窗口的位置 */
 			Move_Widget(window, pos);
 		}
@@ -96,13 +96,18 @@ void Set_Window_Title_Icon(LCUI_Widget *window, LCUI_Graph *icon)
 /* 功能：自定义指定窗口的标题栏图标 */
 {
 	LCUI_Graph *image;
-	LCUI_Widget *title_widget = Get_Window_TitleBar(window);
-	LCUI_TitleBar *title_data = (LCUI_TitleBar *)
-			Get_Widget_Private_Data(title_widget);
+	LCUI_Widget *title_widget;
+	LCUI_TitleBar *title_data;
+	
+	title_widget = Get_Window_TitleBar(window);
+	title_data = (LCUI_TitleBar *)Get_Widget_Private_Data(title_widget);
+	
 	image = Get_PictureBox_Graph(title_data->icon_box);
-	Free_Graph(image);/* 释放内存 */
-	if(icon == NULL) return;
-
+	Free_Graph(image);/* 释放PictureBox部件内的图像占用的资源 */
+	if(icon == NULL) {
+		return;
+	}
+	/* 设置新图标 */
 	Set_PictureBox_Image_From_Graph(title_data->icon_box, icon);
 	Set_Widget_Align(title_data->icon_box, ALIGN_MIDDLE_LEFT, Pos(3,0));
 	Set_Widget_Align(title_data->label, ALIGN_MIDDLE_LEFT, Pos(23,0));
@@ -114,16 +119,21 @@ static void Window_TitleBar_Init(LCUI_Widget *titlebar)
 {
 	LCUI_Graph img;
 	LCUI_TitleBar *t;
+	
 	Graph_Init(&img);
 	t = Malloc_Widget_Private(titlebar, sizeof(LCUI_TitleBar));
 	t->icon_box = Create_Widget("picture_box");
 	t->label = Create_Widget("label");
+	
 	Widget_Container_Add(titlebar, t->icon_box);
 	Widget_Container_Add(titlebar, t->label);
+	
 	Resize_Widget(t->icon_box, Size(18,18));
 	Set_PictureBox_Size_Mode(t->icon_box, SIZE_MODE_CENTER);
+	
 	Show_Widget(t->icon_box);
 	Show_Widget(t->label);
+	
 	Set_Widget_Align(t->icon_box, ALIGN_MIDDLE_LEFT, Pos(0,0));
 	Set_Widget_Align(t->label, ALIGN_MIDDLE_LEFT, Pos(0,0));
 	Load_Graph_Default_TitleBar_BG(&img);
@@ -141,8 +151,12 @@ void Window_Widget_Auto_Size(LCUI_Widget *win_p)
 /* 功能：在窗口尺寸改变时自动改变标题栏和客户区的尺寸 */
 {
 	int x, y, width, height;
-	LCUI_Widget *titlebar		= Get_Window_TitleBar(win_p);
-	LCUI_Widget *client_area	= Get_Window_Client_Area(win_p);
+	LCUI_Widget *titlebar;
+	LCUI_Widget *client_area;
+	
+	titlebar = Get_Window_TitleBar(win_p);
+	client_area = Get_Window_Client_Area(win_p);
+	
 	/* 按不同的风格来处理 */
 	switch(Get_Widget_Border_Style(win_p)) {
 		case BORDER_STYLE_NONE:  /* 没有边框 */
@@ -213,10 +227,12 @@ static void Exec_Update_Window(LCUI_Widget *win_p)
 LCUI_Widget *Get_Parent_Window(LCUI_Widget *widget)
 /* 功能：获取指定部件所在的窗口 */
 {
-	if(widget == NULL) return NULL;
-	if(widget->parent == NULL) return NULL;
-	if(strcmp(widget->parent->type.string, "window") == 0)
+	if(widget == NULL || widget->parent == NULL) {
+		return NULL;
+	}
+	if(strcmp(widget->parent->type.string, "window") == 0) {
 		return widget->parent;
+	}
 	
 	return Get_Parent_Window(widget->parent);
 }
@@ -254,11 +270,13 @@ static void Window_Init(LCUI_Widget *win_p)
 	LCUI_Widget *client_area;
 	LCUI_Widget *btn_close;
 	LCUI_Window *win;
+	
 	win = (LCUI_Window*)Malloc_Widget_Private(win_p, sizeof(LCUI_Window));
-	win->hide_style	 = NONE;
-	win->show_style	 = NONE;
-	win->count		 = 0;
-	win->init_align = ALIGN_MIDDLE_CENTER;
+	
+	win->hide_style	= NONE;
+	win->show_style	= NONE;
+	win->count	= 0;
+	win->init_align	= ALIGN_MIDDLE_CENTER;
 	
 	/* 创建一个标题栏部件 */
 	titlebar = Create_Widget("titlebar");
@@ -278,8 +296,8 @@ static void Window_Init(LCUI_Widget *win_p)
 	Set_Widget_Align(btn_close, ALIGN_TOP_RIGHT, Pos(0, -2)); 
 	/* 将尺寸改成和图片一样 */
 	Resize_Widget(btn_close, Size(btn_normal.width, btn_normal.height));
-	Custom_Button_Style(btn_close, 
-			&btn_normal, &btn_highlight, &btn_down, NULL, NULL);
+	Custom_Button_Style(btn_close, &btn_normal, &btn_highlight, 
+				&btn_down, NULL, NULL);
 	/* 关联按钮的点击事件，当按钮被点击后，调用Quit_Window函数 */
 	Widget_Clicked_Event_Connect(btn_close, Quit_Parent_Window, NULL);
 	Free_Graph(&btn_highlight);
@@ -308,9 +326,10 @@ static void Show_Window(LCUI_Widget *win_p)
 {
 	int w, h;
 	LCUI_Pos pos;
-	LCUI_Window *win = (LCUI_Window*)Get_Widget_Private_Data(win_p);
-	pos.x = 0;
-	pos.y = 0;
+	LCUI_Window *win;
+	
+	win = (LCUI_Window*)Get_Widget_Private_Data(win_p);
+	pos.x = pos.y = 0;
 	win->count++;
 	if(win->count == 1) {/* 如果是第一次显示 */
 		if(win_p->parent == NULL 
