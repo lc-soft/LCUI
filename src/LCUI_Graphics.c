@@ -50,6 +50,10 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
+
+#define ALPHA_BLENDING(__fore__ , __back__, __alpha__) \
+	((__fore__*__alpha__+__back__*(255-__alpha__))/255)
+	
 /* 这个结构体用于存储bmp文件的文件头的信息 */
 typedef struct bmp_head {
 	short int BMPsyg;
@@ -1104,9 +1108,9 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 				total = n + cut.width;
 				/* 根据alpha通道来混合像素点 */
 				for (; n < total; ++n,++m) { 
-					des->rgba[0][n] = (src->rgba[0][m]*src->rgba[3][m] + des->rgba[0][n]*(255-src->rgba[3][m]))/255;
-					des->rgba[1][n] = (src->rgba[1][m]*src->rgba[3][m] + des->rgba[1][n]*(255-src->rgba[3][m]))/255;
-					des->rgba[2][n] = (src->rgba[2][m]*src->rgba[3][m] + des->rgba[2][n]*(255-src->rgba[3][m]))/255; 
+					des->rgba[0][n] = ALPHA_BLENDING(src->rgba[0][m], des->rgba[0][n], src->rgba[3][m]); 
+					des->rgba[1][n] = ALPHA_BLENDING(src->rgba[1][m], des->rgba[1][n], src->rgba[3][m]);
+					des->rgba[2][n] = ALPHA_BLENDING(src->rgba[2][m], des->rgba[2][n], src->rgba[3][m]); 
 				}
 				//
 			}
@@ -1117,9 +1121,9 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 				total = n + cut.width; 
 				for (; n < total; ++n,++m) { 
 					j = src->rgba[3][m] * k;
-					des->rgba[0][n] = (src->rgba[0][m]*j + des->rgba[0][n]*(255-j))/255;
-					des->rgba[1][n] = (src->rgba[1][m]*j + des->rgba[1][n]*(255-j))/255;
-					des->rgba[2][n] = (src->rgba[2][m]*j + des->rgba[2][n]*(255-j))/255;
+					des->rgba[0][n] = ALPHA_BLENDING(src->rgba[0][m], des->rgba[0][n], j); 
+					des->rgba[1][n] = ALPHA_BLENDING(src->rgba[1][m], des->rgba[1][n], j);
+					des->rgba[2][n] = ALPHA_BLENDING(src->rgba[2][m], des->rgba[2][n], j); 
 				}
 			} 
 		} 
@@ -1129,9 +1133,9 @@ int Mix_Graph(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
 			total = n + cut.width; 
 			for (; n < total; ++n,++m) {
-				des->rgba[0][n] = (src->rgba[0][m]*fore_graph->alpha + des->rgba[0][n]*(255-fore_graph->alpha))/255;
-				des->rgba[1][n] = (src->rgba[1][m]*fore_graph->alpha + des->rgba[1][n]*(255-fore_graph->alpha))/255;
-				des->rgba[2][n] = (src->rgba[2][m]*fore_graph->alpha + des->rgba[2][n]*(255-fore_graph->alpha))/255;
+				des->rgba[0][n] = ALPHA_BLENDING(src->rgba[0][m], des->rgba[0][n], fore_graph->alpha); 
+				des->rgba[1][n] = ALPHA_BLENDING(src->rgba[1][m], des->rgba[1][n], fore_graph->alpha);
+				des->rgba[2][n] = ALPHA_BLENDING(src->rgba[2][m], des->rgba[2][n], fore_graph->alpha); 
 			} 
 		}
 	} else {/* 如果前景图形没有透明效果 */
