@@ -2,9 +2,9 @@ The LCUI Project
 ===================
 此项目是 GNU/Linux 平台上的一款开源GUI函数库，遵循GPLv2许可协议开放源代码。
 
-请阅读 docs/更新记录.txt 文件了解新版本的更新内容。
-阅读 docs/常见问题.txt 文件可以找到常见问题的解决方法。
-阅读 docs/LICENSE.TXT  文件了解 GPLv2 许可协议的具体内容。
+请阅读 `docs/CHANGES.zh-cn` 文件了解新版本的更新内容。
+阅读 `docs/FAQ.zh-cn` 文件可以找到常见问题的解决方法。
+阅读 `docs/LICENSE.TXT`  文件了解 GPLv2 许可协议的具体内容。
 
 项目主页：www.lcui.org
 支持论坛：bbs.lcui.org

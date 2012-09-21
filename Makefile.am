@@ -1,8 +1,8 @@
 AUTOMAKE_OPTIONS=foreign
 SUBDIRS=src include
-EXTRA_DIST=说明.txt README README.md fonts/README docs/LICENSE.TXT docs/CHANGES \
-docs/FAQ  docs/常见问题.txt  docs/更新记录.txt\
-test/README \
+EXTRA_DIST=README README.zh-cn README.md fonts/README.zh-cn \
+docs/LICENSE.TXT docs/CHANGES docs/CHANGES.zh-cn docs/FAQ docs/FAQ.zh-cn\
+test/README.zh-cn \
 test/Makefile.in \
 test/Makefile.am \
 test/image.jpg \
@@ -26,7 +26,7 @@ test/test_rect_cut.c \
 test/test_viewimage.c \
 test/test_window.c \
 test/mora/mora.c \
-test/mora/README \
+test/mora/README.zh-cn \
 test/mora/drawable/btn_down.png \
 test/mora/drawable/btn_normal.png \
 test/mora/drawable/icon.png \
@@ -64,8 +64,8 @@ test/photoviewer/drawable/btn_zoom_up_normal.png \
 test/photoviewer/photoviewer.c \
 test/photoviewer/Makefile.am \
 test/photoviewer/Makefile.in \
-test/photoviewer/README \
-test/screenlock/README \
+test/photoviewer/README.zh-cn \
+test/screenlock/README.zh-cn \
 test/screenlock/drawable/icon.png \
 test/screenlock/drawable/time_0.png \
 test/screenlock/drawable/time_5.png \
@@ -93,7 +93,7 @@ test/screenlock/drawable/time_pm.png \
 test/screenlock/screenlock.c \
 test/screenlock/Makefile.am \
 test/screenlock/Makefile.in \
-test/clock/README \
+test/clock/README.zh-cn \
 test/clock/new_daytime_hour.png \
 test/clock/new_night_cup.png \
 test/clock/new_daytime_background.png \
