@@ -18,7 +18,7 @@ typedef struct _LCUI_FontData	LCUI_FontData;
 typedef struct _Special_KeyWord	Special_KeyWord;
 typedef struct _LCUI_TextBox 	LCUI_TextBox;
 typedef struct _LCUI_CharData	LCUI_CharData;
-typedef struct _Text_Row_Data	Text_Row_Data;
+typedef struct _Text_Row_Data	Text_Row_Data; 
 typedef struct _tag_style_data	tag_style_data;
 
 typedef enum _font_style		enum_font_style;
@@ -83,7 +83,7 @@ struct _LCUI_CharData
 	LCUI_Bitmap bitmap;	/* 字体位图 */
 	BOOL display:2;		/* 标志，是否需要显示该字 */
 	BOOL need_update:2;	/* 标志，表示是否需要刷新该字的字体位图数据 */
-	BOOL using_quote:2;	/* 标志，表示字体数据是否引用了另一处的数据 */
+	//BOOL using_quote:2;	/* 标志，表示字体数据是否引用了另一处的数据 */
 	LCUI_FontData *data;	/* 字体相关数据 */
 };
 /***************************************/
@@ -92,7 +92,7 @@ struct _LCUI_CharData
 struct _Text_Row_Data
 {
 	LCUI_Size max_size;	/* 记录最大尺寸 */
-	LCUI_Queue bitmaps;	/* 这个队列中的成员用于引用源文本的字体位图 */
+	LCUI_Queue string;	/* 这个队列中的成员用于引用源文本的字体数据 */
 };
 /***************************************/
 
@@ -127,8 +127,8 @@ struct _LCUI_TextBox
 	LCUI_Queue rows_data;		/* 储存每一行文本的数据 */
 	LCUI_Queue style_data;		/* 用于保存控制符中表达的字体属性 */
 	
-	uint32_t current_text_mark;	/* 当前处理的文字数 */
-	uint32_t current_cursor_pos;	/* 当前光标位置 */
+	uint32_t current_src_pos;	/* 当前光标在源文本中位置 */
+	LCUI_Pos current_des_pos;	/* 当前光标在分段后的文本中的位置 */
 	uint32_t max_text_len;		/* 最大文本长度 */ 
 	
 	LCUI_FontData default_data;
@@ -161,14 +161,15 @@ static void Destroy_Special_KeyWord(Special_KeyWord *key)
 static void Destroy_CharData(LCUI_CharData *data)
 { 
 	Free_Bitmap( &data->bitmap );
-	if( data->using_quote == IS_FALSE ) {
-		free( data->data );
-	}
+	free( data->data );
+	//if( data->using_quote == IS_FALSE ) {
+		//free( data->data );
+	//}
 }
 
 static void Destroy_Text_Row_Data(Text_Row_Data *data)
 {
-	Destroy_Queue ( &data->bitmaps );
+	Destroy_Queue ( &data->string );
 }
 
 
@@ -394,6 +395,26 @@ static void TextBox_Get_Char_Bitmap ( LCUI_CharData *data )
 {
 	
 }
+
+static int TextBox_Text_Add_NewRow ( LCUI_Queue *rows_data )
+/* 添加新行 */
+{
+	Text_Row_Data data;
+	
+	Queue_Init( &data.string, sizeof(LCUI_CharData), NULL );
+	/* 使用链表模式，方便数据的插入 */
+	Queue_Set_DataMode( &data.string, QUEUE_DATA_MODE_LINKED_LIST );
+	/* 队列成员使用指针，主要是引用text_source_data里面的数据 */
+	Queue_Using_Pointer( &data.string );
+	return Queue_Add( rows_data, &data );
+}
+
+static LCUI_Queue *TextBox_Get_Current_RowData ( LCUI_TextBox *textbox )
+/* 获取指向当前行的指针 */
+{
+	return Queue_Get( &textbox->rows_data, textbox->current_des_pos.y );
+}
+
 /**********************************************************************/
 
 
@@ -402,7 +423,7 @@ static void TextBox_Init(LCUI_Widget *widget)
 /* 初始化文本框相关数据 */
 {
 	LCUI_TextBox *textbox;
-	textbox = (LCUI_TextBox *)Malloc_Widget_Private(widget, sizeof(LCUI_TextBox));
+	textbox = Malloc_Widget_Private(widget, sizeof(LCUI_TextBox));
 	textbox->using_code_mode = IS_FALSE; 
 	textbox->using_style_tags = IS_FALSE; 
 	textbox->enable_word_wrap = IS_FALSE; 
@@ -413,17 +434,24 @@ static void TextBox_Init(LCUI_Widget *widget)
 	textbox->end = 0;
 	
 	Queue_Init( &textbox->color_keyword, sizeof(Special_KeyWord), 
-			Destroy_Special_KeyWord );
+					Destroy_Special_KeyWord );
+	/* 队列中使用链表储存这些数据 */
 	Queue_Init( &textbox->text_source_data, sizeof(LCUI_CharData),
-			Destroy_CharData );
+					Destroy_CharData );
+	Queue_Set_DataMode( &textbox->text_source_data, 
+					QUEUE_DATA_MODE_LINKED_LIST );
+			
 	Queue_Init( &textbox->rows_data, sizeof(Text_Row_Data), 
-			Destroy_Text_Row_Data );
+					Destroy_Text_Row_Data );
+	/* 添加新行 */
+	TextBox_Text_Add_NewRow ( &textbox->rows_data );
 	Queue_Init( &textbox->style_data, sizeof(tag_style_data), 
 			destroy_tag_style_data );
 	FontData_Init ( &textbox->default_data );
+	
 	textbox->default_data.pixel_size = 12;
-	textbox->current_text_mark = 0;
-	textbox->current_cursor_pos = 0;
+	textbox->current_src_pos = 0;
+	textbox->current_des_pos = Pos(0,0);
 	textbox->max_text_len = 5000;
 }
 
@@ -470,43 +498,77 @@ int TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 /* 在光标处添加自定义样式的文本 */
 {
 	int i, total; 
+	uint32_t rows, n_ignore = 0;
 	wchar_t *buff, *p, *q;
 	LCUI_TextBox *textbox;
-	LCUI_CharData char_data;
+	LCUI_CharData char_data; 
+	LCUI_Queue *current_row_data;
 	
 	/* 如果有选中的文本，那就删除 */
-	//......
+	//...... 
 	
 	total = Char_To_Wchar_T( new_text, &buff );
 	textbox = Get_Widget_Private_Data( widget );
 	
-	for(p=buff, i=0; i<total; ++i, ++p, ++textbox->current_text_mark) {
-		/* 根据样式标签生成对应的样式数据 */
+	current_row_data = TextBox_Get_Current_RowData ( textbox );
+	/* 根据样式标签生成对应的样式数据 */
+	for(p=buff, i=0; i<total; ++i, ++p) { 
 		if( textbox->using_style_tags ) {
 			/* 处理样式的结束标签 */
 			q = handle_style_endtag ( widget, p );
 			if(q != NULL) { 
-				p = q;
+				/* 计算需忽略的字符数 */
+				n_ignore = (q-p)/sizeof(wchar_t); 
 			} else {
 				/* 处理样式标签 */
 				q = handle_style_tag ( widget, p ); 
-				if( q != NULL ) { 
-					p = q; /* 指针移向标签末尾 */
+				if( q != NULL ) {
+					n_ignore = (q-p)/sizeof(wchar_t);
 				}
 			}
 		}
+		if(*p == '\n') { 
+			/* 计算需要忽略的换行符的数量 */
+			for( n_ignore=0,q=p; *q == '\n'; ++q,++n_ignore);
+		}
+		if(n_ignore > 0) {
+			/* 被忽略的字符的属性都一样，所以只需赋一次值 */
+			char_data.data = NULL;
+			char_data.display = IS_FALSE; 
+			char_data.need_update = IS_FALSE; 
+			Bitmap_Init( &char_data.bitmap ); 
+			while(n_ignore--) { 
+				char_data.char_code = *p++;
+				++textbox->current_src_pos;
+				Queue_Insert( &textbox->text_source_data, 
+					textbox->current_src_pos, &char_data );
+				/* 遇到换行符，那就增加新行 */
+				if(char_data.char_code == '\n') {
+					rows = TextBox_Text_Add_NewRow( &textbox->rows_data );
+					current_row_data = Queue_Get( &textbox->rows_data, rows );
+					textbox->current_des_pos.x = 0;
+					textbox->current_des_pos.y = rows;
+				}
+			}
+			n_ignore = 0;
+		}
+		
+		char_data.char_code = *p;
+		char_data.display = IS_TRUE; 
+		char_data.need_update = IS_TRUE;
 		/* 获取当前字体样式属性 */
 		char_data.data = TextBox_Get_Current_FontData( widget );
-		/* 保存相关数据 */
-		char_data.char_code = *p;
-		char_data.need_update = IS_TRUE;
-		char_data.using_quote = IS_FALSE;
 		/* 获取字体位图 */
 		TextBox_Get_Char_Bitmap ( &char_data );
 		/* 插入队列 */
 		Queue_Insert( &textbox->text_source_data, 
-			textbox->current_text_mark, &char_data );
-		/* 字体位图添加至队列 */
+				textbox->current_src_pos, &char_data );
+		/* 添加该字的数据的引用指针至队列 */
+		Queue_Insert( current_row_data, 
+				textbox->current_des_pos.x, &char_data );
+		//......
+		++textbox->current_src_pos;
+		++textbox->current_des_pos.x;
 	}
 	return 0;
 }
