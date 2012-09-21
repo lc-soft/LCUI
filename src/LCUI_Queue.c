@@ -252,6 +252,9 @@ int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos)
 	|| src_pos < 0 || src_pos > total ) {
 		return -1;
 	}
+	if(des_pos == src_pos ) {
+		return 0;
+	}
 	
 	Queue_Using(queue, QUEUE_MODE_WRITE);
 	if(queue->data_mode == 0) {
@@ -279,7 +282,7 @@ int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos)
 		/* 解除该位置的结点与前后结点的链接 */
 		temp = p_src->prev;
 		temp->next = p_src->next;
-		p_src->next->prev = temp; 
+		p_src->next->prev = temp;
 		/* 得到目标位置的结点的指针 */
 		p_des = queue->data_head_node.next;
 		if(des_pos < src_pos) {
