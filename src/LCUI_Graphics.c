@@ -1421,8 +1421,15 @@ int Set_Graph_To_Rounded_Rectangle(LCUI_Graph *graph, int radius, int mode, int 
 int Fill_Graph_Alpha(LCUI_Graph *src, unsigned char alpha)
 /* 功能：填充图形的alpha通道的所有值 */
 {
-	if(Valid_Graph(src) && Graph_Have_Alpha(src)) {
-		memset(src->rgba[3], alpha, sizeof(unsigned char) * src->width * src->height);
+	if(! Valid_Graph(src) ) {
+		return -1;
+	}
+	if( Graph_Have_Alpha(src) ) {
+		size_t size;
+		size = sizeof(unsigned char) * src->width * src->height;
+		Using_Graph( src, 1);
+		memset(src->rgba[3], alpha, size);
+		End_Use_Graph( src );
 		return 0;
 	}
 	return -1;
