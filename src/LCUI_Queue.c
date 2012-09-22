@@ -428,13 +428,12 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 		} else {
 			memcpy(&queue->data_array[pos], &data, sizeof(void*));
 		}
-	} else {/* 否则，数据是以链表形式储存 */ 
+	} else {/* 否则，数据是以链表形式储存 */  
 		if(queue->total_num > queue->max_num) {
 			p = &queue->data_head_node;
 			while ( p->next ) {
 				p = p->next;
-			}
-			
+			} 
 			q = (LCUI_Node*) malloc (sizeof(LCUI_Node)); 
 			q->prev = p;
 			q->next = NULL; 
@@ -445,12 +444,12 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 		for(i=0; p->next && i<pos; ++i ) {
 			p = p->next;
 		} 
-		if(flag == 1) {
+		if(flag == 1) { 
 			p->data = malloc ( queue->element_size );
-			memcpy( p->data, data, sizeof(queue->element_size) );
+			memcpy( p->data, data, queue->element_size );
 		} else {
 			memcpy( &p->data, &data, sizeof(void*) );
-		}
+		} 
 	}
 	/* 
 	 * total_num自增1，但不大于max_num，那么，就有现成的内存空间可用，直接
