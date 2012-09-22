@@ -10,6 +10,7 @@
 #include LC_LCUI_H
 #include LC_MEM_H
 #include LC_WIDGET_H
+#include LC_GRAPHICS_H
 #include LC_FONT_H
 #include <stdint.h>
 #include <wchar.h>
@@ -216,6 +217,7 @@ static LCUI_FontData *TextBox_Get_Current_FontData ( LCUI_Widget *widget )
 		}
 	}
 	if( equal != MAX_TAG_NUM ) {
+		free( data );
 		return NULL;
 	}
 	return data;
@@ -239,7 +241,7 @@ static void TextBox_TagStyle_Delete( LCUI_Widget *widget, enum_tag_id tag)
 	}
 }
 
-static void clear_space(char *in, char *out)
+void clear_space(char *in, char *out)
 /* 清除字符串中的空格 */
 {
 	int j, i, len = strlen(in);
@@ -393,7 +395,14 @@ static wchar_t *handle_style_endtag(LCUI_Widget *widget, wchar_t *str)
 static void TextBox_Get_Char_Bitmap ( LCUI_CharData *data )
 /* 获取字体位图，字体的样式由文本框中记录的字体样式决定 */
 {
-	
+	LCUI_Font font;
+	font = LCUI_Sys.default_font;
+	if(data->data != NULL) {
+		if(data->data->pixel_size != -1) {
+			font.size = data->data->pixel_size;
+		}
+	}
+	Get_WChar_Bitmap( &font, data->char_code, &data->bitmap );
 }
 
 static int TextBox_Text_Add_NewRow ( LCUI_Queue *rows_data )
@@ -409,7 +418,7 @@ static int TextBox_Text_Add_NewRow ( LCUI_Queue *rows_data )
 	return Queue_Add( rows_data, &data );
 }
 
-static LCUI_Queue *TextBox_Get_Current_RowData ( LCUI_TextBox *textbox )
+static Text_Row_Data *TextBox_Get_Current_RowData ( LCUI_TextBox *textbox )
 /* 获取指向当前行的指针 */
 {
 	return Queue_Get( &textbox->rows_data, textbox->current_des_pos.y );
@@ -452,7 +461,7 @@ static void TextBox_Init(LCUI_Widget *widget)
 	textbox->default_data.pixel_size = 12;
 	textbox->current_src_pos = 0;
 	textbox->current_des_pos = Pos(0,0);
-	textbox->max_text_len = 5000;
+	textbox->max_text_len = 5000; 
 }
 
 static void Destroy_TextBox(LCUI_Widget *widget)
@@ -461,19 +470,65 @@ static void Destroy_TextBox(LCUI_Widget *widget)
 	
 }
 
-static void TextBox_Update(LCUI_Widget *widget)
+extern int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height);
+static void TextBox_Draw(LCUI_Widget *widget)
 /* 处理文本框的图形渲染 */
 {
+	LCUI_Pos pos;
+	int i, j, n, rows;
+	LCUI_RGB color;
+	LCUI_Size size;
+	LCUI_TextBox *textbox;
+	LCUI_CharData *p_data;
+	Text_Row_Data *p_row;
 	
+	textbox = Get_Widget_Private_Data( widget );
+	if( widget->auto_size ) {
+		
+		/* 如果设置了自动调整尺寸，那就计算适应文本位图的最佳尺寸 */
+		size.w = size.h = 0;
+		rows = Queue_Get_Total( &textbox->rows_data );
+		for(i=0; i<rows; ++i) {
+			p_row = Queue_Get( &textbox->rows_data, i ); 
+			size.w = size.w < p_row->max_size.w ? p_row->max_size.w: size.w;
+			size.h += p_row->max_size.h;
+		}
+	} else {
+		size = widget->size;
+	}
+	/* 绘制文本框背景图 */
+	Draw_Empty_Slot( &widget->graph, size.w, size.h );
+	printf("size: %d, %d\n", size.w, size.h); 
+	/* 开始粘贴文本位图 */
+	rows = Queue_Get_Total( &textbox->rows_data );
+	for(pos.y=2,i=0; i<rows; ++i) {
+		p_row = Queue_Get( &textbox->rows_data, i );
+		n = Queue_Get_Total( &p_row->string );
+		printf("char num: %d\n", n);
+		for(pos.x=3,j=0; j<n; ++j) {
+			p_data = Queue_Get( &p_row->string, j );
+			printf("j:%d, p:%p, data: %p\n", j, p_data, p_data->data);
+			if( p_data->data != NULL 
+			 && p_data->data->need_fore_color ) {
+				color = p_data->data->fore_color;
+			} else {
+				color = widget->fore_color;
+			}
+			Mix_Fonts_Bitmap( &widget->graph, pos.x, pos.y,
+					&p_data->bitmap, color, 
+					GRAPH_MIX_FLAG_OVERLAY );
+			pos.x = pos.x + p_data->bitmap.width + 1;
+		}
+	}
 }
 
-static void Process_TextBox_Drag(LCUI_Widget *widget, LCUI_DragEvent *event)
+void Process_TextBox_Drag(LCUI_Widget *widget, LCUI_DragEvent *event)
 /* 处理鼠标对文本框的拖动事件 */
 {
 	
 }
 
-static void Process_TextBox_Clicked(LCUI_Widget *widget, LCUI_Event *event)
+void Process_TextBox_Clicked(LCUI_Widget *widget, LCUI_Event *event)
 /* 处理鼠标对文本框的点击事件 */
 {
 	
@@ -484,7 +539,7 @@ void Register_TextBox()
 {
 	WidgetType_Add ( "text_box" );
 	WidgetFunc_Add ( "text_box", TextBox_Init, FUNC_TYPE_INIT );
-	WidgetFunc_Add ( "text_box", TextBox_Update, FUNC_TYPE_UPDATE );
+	WidgetFunc_Add ( "text_box", TextBox_Draw, FUNC_TYPE_UPDATE );
 	WidgetFunc_Add ( "text_box", Destroy_TextBox, FUNC_TYPE_DESTROY );
 }
 
@@ -492,7 +547,7 @@ void Register_TextBox()
 
 /************************ 文本框部件的扩展功能 ****************************/
 /* 剪切板 */
-static LCUI_String clip_board;
+//static LCUI_String clip_board;
 
 int TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 /* 在光标处添加自定义样式的文本 */
@@ -502,7 +557,7 @@ int TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 	wchar_t *buff, *p, *q;
 	LCUI_TextBox *textbox;
 	LCUI_CharData char_data; 
-	LCUI_Queue *current_row_data;
+	Text_Row_Data *current_row_data;
 	
 	/* 如果有选中的文本，那就删除 */
 	//...... 
@@ -536,7 +591,7 @@ int TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 			char_data.data = NULL;
 			char_data.display = IS_FALSE; 
 			char_data.need_update = IS_FALSE; 
-			Bitmap_Init( &char_data.bitmap ); 
+			Bitmap_Init( &char_data.bitmap );
 			while(n_ignore--) { 
 				char_data.char_code = *p++;
 				++textbox->current_src_pos;
@@ -553,20 +608,36 @@ int TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 			n_ignore = 0;
 		}
 		
+		LCUI_CharData *pp;
 		char_data.char_code = *p;
 		char_data.display = IS_TRUE; 
 		char_data.need_update = IS_TRUE;
 		/* 获取当前字体样式属性 */
 		char_data.data = TextBox_Get_Current_FontData( widget );
+		printf("char: %c, style data:%p\n", *p, char_data.data);
 		/* 获取字体位图 */
+		Bitmap_Init( &char_data.bitmap );
 		TextBox_Get_Char_Bitmap ( &char_data );
 		/* 插入队列 */
 		Queue_Insert( &textbox->text_source_data, 
 				textbox->current_src_pos, &char_data );
+		pp = Queue_Get( &textbox->text_source_data, textbox->current_src_pos );
+		printf("1, at queue, pos: %d, char: %c, data: %p\n", 
+		textbox->current_src_pos, pp->char_code, pp->data);
+		
 		/* 添加该字的数据的引用指针至队列 */
-		Queue_Insert( current_row_data, 
+		Queue_Insert( &current_row_data->string, 
 				textbox->current_des_pos.x, &char_data );
-		//......
+		
+		pp = Queue_Get( &current_row_data->string, textbox->current_des_pos.x );
+		printf("2, at queue, pos: %d, char: %c, data: %p\n", 
+		textbox->current_des_pos.x, pp->char_code, pp->data);
+		
+		/* 记录这一行文本的宽度和高度 */
+		current_row_data->max_size.w += char_data.bitmap.width;
+		if(current_row_data->max_size.h < char_data.bitmap.height) {
+			current_row_data->max_size.h = char_data.bitmap.height;
+		}
 		++textbox->current_src_pos;
 		++textbox->current_des_pos.x;
 	}
