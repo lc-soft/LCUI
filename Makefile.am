@@ -1,5 +1,10 @@
 AUTOMAKE_OPTIONS=foreign
 SUBDIRS=src include
+
+
+pkgconfigdir = $(prefix)/lib/pkgconfig
+pkgconfig_DATA = $(PACKAGE).pc
+
 EXTRA_DIST=README README.zh-cn README.md fonts/README.zh-cn \
 docs/LICENSE.TXT docs/CHANGES docs/CHANGES.zh-cn docs/FAQ docs/FAQ.zh-cn\
 test/README.zh-cn \

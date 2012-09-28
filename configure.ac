@@ -74,9 +74,20 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset munmap select strcasecmp sysinfo])
 ##输出文件
 AC_OUTPUT([Makefile
+                 lcui.pc
                  include/Makefile
                  include/LCUI/Makefile
                  src/Makefile
+                 src/font/Makefile
+                 src/font/in-core/Makefile
+                 src/draw/Makefile
+                 src/draw/in-core/Makefile
+                 src/thread/Makefile
+                 src/bmp/Makefile
+                 src/misc/Makefile
+                 src/input/Makefile
+                 src/output/Makefile
+                 src/widget/Makefile
                  test/Makefile
                  test/mora/Makefile
                  test/photoviewer/Makefile
