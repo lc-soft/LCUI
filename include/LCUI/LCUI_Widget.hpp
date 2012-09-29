@@ -109,7 +109,6 @@ class LCUIWidget
 #include LC_WINDOW_H
 #include LC_LABEL_H
 
-
 LCUIWidget::LCUIWidget(const char* widget_type):Label(this),Window(this)
 {
 	error = 0;

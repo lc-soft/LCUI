@@ -1,5 +1,6 @@
 /* ***************************************************************************
  * LCUI_Misc.h -- no specific categories of miscellaneous function
+ * 
  * Copyright (C) 2012 by
  * Liu Chao
  * 
@@ -180,6 +181,18 @@ void WChar_T_Free(LCUI_WChar_T *ch);
 
 void WString_Free(LCUI_WString *str);
 /************************** End String ********************************/
+
+void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out);
+/* 
+ * 功能：通过内存中的图像数据，捕获将在屏幕上显示的图像
+ * 说明：效率较低，因为需要进行合成。
+ *  */ 
+
+void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out);
+/* 
+ * 功能：直接读取帧缓冲中的图像数据
+ * 说明：效率较高，但捕获的图像有可能会有问题。
+ * */
 
 LCUI_END_HEADER
 

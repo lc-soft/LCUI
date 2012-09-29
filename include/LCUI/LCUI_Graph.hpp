@@ -38,9 +38,9 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-#ifndef __LCUI_GRAPHICS_HPP__
-#define __LCUI_GRAPHICS_HPP__
-#include LC_MEM_H
+#ifndef __LCUI_GRAPH_HPP__
+#define __LCUI_GRAPH_HPP__
+#include LC_DRAW_H
 #include LC_RES_H
 
 #ifdef __cplusplus
@@ -72,7 +72,7 @@ class LCUIGraph
 	}
 	int writeToFile(const char *out_imgfile)
 	{
-		return write_png_file(out_imgfile, &graph);
+		return write_png(out_imgfile, &graph);
 	} 
 	
 	class _loadGraph

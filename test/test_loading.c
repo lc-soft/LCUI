@@ -6,8 +6,11 @@
 #include LC_LABEL_H
 #include LC_PICBOX_H 
 #include LC_GRAPH_H
+#include LC_DRAW_H
 #include LC_RES_H
+
 #include <unistd.h>
+
 void *change_graph(void *arg)
 /* 功能：改变显示的图形 */
 {
@@ -23,7 +26,7 @@ void *change_graph(void *arg)
 	while(1) {
 		Set_PictureBox_Image_From_Graph(widget, &frame);
 		for(i=10; i<=360; i+=10) {
-			Rotate_Graph(&frame, i, &temp);
+			Graph_Rotate(&frame, i, &temp);
 			Set_PictureBox_Image_From_Graph(widget, &temp);
 			usleep(20000);
 		}

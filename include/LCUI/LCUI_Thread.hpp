@@ -53,11 +53,11 @@ class LCUIThread
 		tid = 0;
 		thread_rwlock_init(&lock);
 	}
-	int create( const pthread_attr_t *restrict_attr,
+	int create( const thread_attr_t *attr,
 			void *(*start_rtn)(void*),
 			void * arg )
 	{
-		return LCUI_Thread_Create(&tid, restrict_attr, start_rtn, arg);
+		return LCUI_Thread_Create(&tid, attr, start_rtn, arg);
 	}
 	int rdlock()
 	{
@@ -91,12 +91,12 @@ class LCUIThread
 	{
 		LCUI_Thread_Exit(retval);
 	}
-	pthread_t getid()
+	thread_t getid()
 	{
 		return tid;
 	}
 	private:
-	pthread_t tid;
+	thread_t tid;
 	thread_rwlock lock;
 };
 #endif

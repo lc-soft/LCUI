@@ -34,6 +34,5 @@ int main(int argc, char*argv[])
 	label.show();
 	window.show();
 	/* 进入主循环 */
-	return app.main(); 
+	return app.main();
 }
-

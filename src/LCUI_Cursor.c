@@ -38,7 +38,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-
+#define DEBUG
 #include <LCUI_Build.h>
 
 #include LC_LCUI_H
@@ -84,12 +84,11 @@ LCUI_Rect Get_Cursor_Rect()
 
 void Set_Cursor_Pos (LCUI_Pos pos)
 /* 功能：设定游标的位置 */
-{ 
-	LCUI_Queue rt;
+{
 	LCUI_Rect old;
-	RectQueue_Init(&rt);
 	old = Get_Cursor_Rect();
  	LCUI_Sys.cursor.pos = pos; 
+ 	DEBUG_MSG("cursor new pos: %d, %d\n", pos.x, pos.y);
 	Refresh_Cursor ();		/* 刷新游标的显示 */ 
 	Add_Screen_Refresh_Area ( old ); /* 刷新游标原来的区域中的图形 */
 }

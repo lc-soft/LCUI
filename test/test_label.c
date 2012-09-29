@@ -4,13 +4,12 @@
 #include LC_LCUI_H
 #include LC_WIDGET_H 
 #include LC_WINDOW_H 
-#include LC_LABEL_H
-#include LC_MISC_H
+#include LC_LABEL_H 
 #include LC_GRAPH_H
 #include LC_RES_H
-#include <unistd.h>
-#include <pthread.h>
+#include <unistd.h> 
 #include <time.h>
+
 void *change_label_text(void *arg)
 /* 功能：动态改变label部件的文本内容 */
 {

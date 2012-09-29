@@ -38,7 +38,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-#define DEBUG
+//#define DEBUG
 #include <LCUI_Build.h>
 #include <unistd.h>
 #include <math.h>
@@ -401,7 +401,7 @@ LCUI_Widget *Get_Cursor_Overlay_Widget()
 		if(widget == NULL) {
 			break;
 		}
-		if( widget->visible ) {
+		if( !widget->visible ) {
 			continue;
 		}
 			

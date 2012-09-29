@@ -1,5 +1,6 @@
 /* ***************************************************************************
  * LCUI_ProgressBar.h -- LCUI's ProgressBar widget
+ * 
  * Copyright (C) 2012 by
  * Liu Chao
  * 

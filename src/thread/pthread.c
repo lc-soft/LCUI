@@ -49,10 +49,10 @@ thread_t thread_self()
 	return pthread_self();
 }
 
-int thread_create(	thread_t *restrict __newthread,
-			const thread_attr_t *restrict __attr,
+int thread_create(	thread_t *__newthread,
+			const thread_attr_t *__attr,
 			void *(*__start_routine) (void *),
-			void *restrict __arg )
+			void *__arg )
 {
 	return pthread_create ( __newthread, __attr, __start_routine, __arg);
 }

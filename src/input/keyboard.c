@@ -1,5 +1,48 @@
+/* ***************************************************************************
+ * keyboard.c -- keyboard support
+ * 
+ * Copyright (C) 2012 by
+ * Liu Chao
+ * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ * 
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
+ 
+/* ****************************************************************************
+ * keyboard.c -- 键盘支持
+ *
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ****************************************************************************/
+
 #include <LCUI_Build.h>
 #include LC_LCUI_H
+#include LC_GRAPH_H
+#include LC_DRAW_H
 
 #include <termios.h>
 #include <unistd.h>
@@ -117,20 +160,21 @@ int Find_Pressed_Key(int key)
 int debug_mark = 0;
 static int disable_key = IS_FALSE;
 extern int LCUI_Active();
+
 static void * Handle_Key_Input ()
 /* 功能：处理按键输入 */
 {
 	int key; 
 	int sleep_time = 1500;
-	//LCUI_Graph graph;
-	//Graph_Init(&graph);
+	LCUI_Graph graph;
+	Graph_Init(&graph);
 	while (LCUI_Active()) {
 		if (Check_Key ()) {/* 如果有按键输入 */ 
 			sleep_time = 1500;
 			key = Get_Key ();
 			if(key == 'd') debug_mark = 1;
 			else  debug_mark = 0;
-			//#define __NEED_CATCHSCREEN__
+			#define __NEED_CATCHSCREEN__
 			#ifdef __NEED_CATCHSCREEN__
 			if(key == 'c')
 			{//当按下c键后，可以进行截图，只截取指定区域的图形
@@ -144,9 +188,8 @@ static void * Handle_Key_Input ()
 					timeinfo->tm_mday, timeinfo->tm_hour, 
 					timeinfo->tm_min, timeinfo->tm_sec
 				);
-				Catch_Screen_Graph_By_FB(Rect((Get_Screen_Width()-320)/2, 
-						(Get_Screen_Height()-240)/2, 320, 240), &graph);
-				write_png_file(filename, &graph);
+				Catch_Screen_Graph_By_FB(Rect(0, 0, 1280, 800), &graph);
+				write_png(filename, &graph);
 			}
 			#endif
 			/* 处理程序中关联的按键事件 */

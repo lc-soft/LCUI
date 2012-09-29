@@ -68,7 +68,7 @@ int Get_Screen_Graph(LCUI_Graph *out)
 {
 	uchar_t  *dest;
 	int i, temp, h, w;
-	if(LCUI_Sys.init != IS_TRUE) {/* 如果没有初始化过 */
+	if( !LCUI_Sys.init ) {/* 如果没有初始化过 */
 		return -1; 
 	}
 	
@@ -223,12 +223,12 @@ static int Screen_Init()
 	
 	Graph_Init(&LCUI_Sys.screen.buff); /* 初始化图形数据 */
 	
-	LCUI_Sys.screen.buff.have_alpha = NO_ALPHA;/* 无alpha通道 */
 	LCUI_Sys.screen.buff.type = TYPE_BMP;/* bmp位图 */
 	LCUI_Sys.screen.size.w = fb_vinfo.xres; /* 保存屏幕尺寸 */
 	LCUI_Sys.screen.size.h = fb_vinfo.yres; 
-	LCUI_Sys.screen.buff.width = fb_vinfo.xres; 
-	LCUI_Sys.screen.buff.height = fb_vinfo.yres;
+	
+	/* 保存当前屏幕内容，以便退出LCUI后还原 */
+	Get_Screen_Graph(&LCUI_Sys.screen.buff); 
 	return 0;
 }
 
@@ -421,16 +421,14 @@ skip_loop:
 
 static void Handle_Screen_Update()
 /* 功能：进行屏幕内容更新 */
-{
-	int i;
+{ 
 	LCUI_Rect rect;
 	LCUI_Graph fill_area, graph;
 	
 	Graph_Init(&graph);
 	Graph_Init(&fill_area);
 	/* 锁住队列，其它线程不能访问 */
-	Queue_Lock(&LCUI_Sys.update_area);
-	i = 0;  
+	Queue_Lock(&LCUI_Sys.update_area); 
 	while(LCUI_Active()) {
 		/* 如果从队列中获取数据成功 */
 		if ( RectQueue_Get(&rect, 0, &LCUI_Sys.update_area) ) { 
@@ -439,8 +437,7 @@ static void Handle_Screen_Update()
 			/* 写入至帧缓冲，让屏幕显示图形 */  
 			Graph_Display (&graph, Pos(rect.x, rect.y)); 
 			/* 移除队列中的成员 */ 
-			Queue_Delete (&LCUI_Sys.update_area, 0);
-			++i;
+			Queue_Delete (&LCUI_Sys.update_area, 0); 
 		} else {
 			break;
 		}
@@ -470,33 +467,34 @@ static void *autoquit()
 }
 #endif
 
-static void *LCUI_Core ()
+static void *Handle_Area_Update ()
 /* 功能：进行屏幕内容更新 */
 {
 #ifdef need_autoquit
 	pthread_t t;
 	LCUI_Thread_Create(&t, NULL, autoquit, NULL);
 #endif
-	Screen_Init();
 	while(LCUI_Active()) { 
 		Handle_All_WidgetUpdate();/* 处理所有部件更新 */ 
 		usleep(5000);/* 停顿一段时间，让程序主循环处理任务 */ 
 		Handle_Refresh_Area(); /* 处理需要刷新的区域 */ 
 		Handle_Screen_Update();/* 处理屏幕更新 */
 	}
-	pthread_exit(NULL);
+	thread_exit(NULL);
 }
 
 int Enable_Graph_Display()
 /* 功能：启用图形输出 */
 {
+	Screen_Init();
 	LCUI_Sys.status = ACTIVE;
-	return pthread_create( &LCUI_Sys.core_thread, NULL, LCUI_Core, NULL );
+	return thread_create( &LCUI_Sys.core_thread, 
+			NULL, Handle_Area_Update, NULL );
 }
 
 int Disable_Graph_Display()
 /* 功能：禁用图形输出 */
 {
 	LCUI_Sys.status = KILLED;
-	return pthread_join( LCUI_Sys.core_thread, NULL );
+	return thread_join( LCUI_Sys.core_thread, NULL );
 }

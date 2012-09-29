@@ -25,14 +25,14 @@ AM_SILENT_RULES([yes])
 
 # Checks for programs.
 AC_PROG_CC_STDC
-AC_PROG_LIBTOOL
-AC_PROG_MAKE_SET
-AC_PROG_LN_S
-AC_PROG_RANLIB
-AC_PROG_INSTALL
 AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_AWK 
+AC_PROG_INSTALL
+AC_PROG_LIBTOOL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 
 # Checks for libraries.
 # 检测LCUI所依赖的库是否存在并且能正常使用
@@ -66,6 +66,9 @@ AC_CHECK_HEADERS([fcntl.h limits.h malloc.h memory.h stddef.h stdlib.h string.h 
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
+AC_HEADER_STDBOOL
+AC_C_RESTRICT
+AC_TYPE_UINT32_T
 
 # Checks for library functions.
 AC_FUNC_MALLOC

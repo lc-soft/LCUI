@@ -7,11 +7,14 @@
 #include LC_PICBOX_H
 #include LC_BUTTON_H
 #include LC_ACTIVEBOX_H
-#include LC_MEM_H
+#include LC_DISPLAY_H
 #include LC_LABEL_H 
 #include LC_GRAPH_H
+#include LC_DRAW_H
 #include LC_RES_H
 #include LC_INPUT_H 
+#include LC_FONT_H
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>

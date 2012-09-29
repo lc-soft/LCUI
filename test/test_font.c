@@ -18,9 +18,10 @@
 #include <dirent.h>
 #include <locale.h>
 #include <math.h>
-static LCUI_Widget	*window, *text; 
-static char	**filename = NULL;
-static int		total_files = 0, current = 0;
+
+static LCUI_Widget *window, *text; 
+static char **filename = NULL;
+static int total_files = 0, current = 0;
 
 void get_filepath(char *filepath, char *out_path)
 /* 功能：用于获取程序所在的文件目录 */

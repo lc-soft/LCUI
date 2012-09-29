@@ -88,10 +88,10 @@ LCUI_BEGIN_HEADER
 /************************ thread management ***************************/ 
 thread_t thread_self();
 
-int thread_create(	thread_t *restrict __newthread,
-			const thread_attr_t *restrict __attr,
+int thread_create(	thread_t *__newthread,
+			const thread_attr_t *__attr,
 			void *(*__start_routine) (void *),
-			void *restrict __arg );
+			void *__arg );
 
 int thread_cancel(thread_t __th);
 
@@ -152,7 +152,7 @@ int Thread_TreeNode_Delete(Thread_TreeNode *ttn, thread_t tid);
 /* 功能：在线程树中删除一个结点 */ 
 
 int LCUI_Thread_Create( thread_t *tidp,
-			const thread_attr_t *restrict attr,
+			const thread_attr_t *attr,
 			void *(*start_rtn)(void*),
 			void * arg );
 /*

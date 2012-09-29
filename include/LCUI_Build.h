@@ -91,7 +91,7 @@
 
 
 #ifdef DEBUG
-#define DEBUG_MSG(format, ...) printf(__FILE__"%d:"format, __LINE__,##__VA_ARGS__)
+#define DEBUG_MSG(format, ...) printf(__FILE__" %d:"format, __LINE__,##__VA_ARGS__)
 #else
 #define DEBUG_MSG(format, ...) 
 #endif

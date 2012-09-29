@@ -362,11 +362,9 @@ int LCUI_Init(int argc, char *argv[])
 		Cursor_Init();	/* 初始化鼠标游标 */
 		LCUI_IO_Init();	/* 初始化输入输出设备 */ 
 		Widget_Event_Init(); /* 初始化部件事件处理 */
-		/* 保存当前屏幕内容，以便退出LCUI后还原 */
-		Get_Screen_Graph(&LCUI_Sys.screen.buff); 
 		//debug_mark = 1;
 		/* 鼠标游标居中 */
-		Set_Cursor_Pos(Get_Screen_Center_Point());  
+		Set_Cursor_Pos( Get_Screen_Center_Point() );  
 		Show_Cursor();	/* 显示鼠标游标 */ 
 	} else {
 		temp = LCUI_AppList_Add();

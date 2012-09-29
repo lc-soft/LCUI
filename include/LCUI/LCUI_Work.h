@@ -1,5 +1,6 @@
 /* ***************************************************************************
  * LCUI_Work.h -- LCUI's other work
+ * 
  * Copyright (C) 2012 by
  * Liu Chao
  * 
@@ -191,6 +192,7 @@ void Widget_Event_Init();
 
 /*************************** Event End *********************************/
 
+LCUI_END_HEADER
 
 #endif
 

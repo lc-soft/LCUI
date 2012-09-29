@@ -55,7 +55,6 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des);
  * 算法有待优化完善。
  */
 
-
 int load_bmp(const char *filepath, LCUI_Graph *out);
 /* 打开并载入BMP图片文件内的图形数据 */
 

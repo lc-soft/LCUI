@@ -5,6 +5,8 @@
 #include LC_WIDGET_H
 #include LC_WINDOW_H
 #include LC_GRAPH_H 
+#include LC_DRAW_H
+#include LC_FONT_H
 #include LC_MISC_H
 #include LC_PICBOX_H
 #include <unistd.h>
@@ -66,8 +68,8 @@ void *update_clock(void *arg)
         m_angle = 360*timeinfo->tm_min / 60.0;
         h_angle += m_angle / 60;
         /* 根据这个角度来旋转图形 */
-        Rotate_Graph(&hour_pointer, h_angle, &h_temp);
-        Rotate_Graph(&minute_pointer, m_angle, &m_temp);
+        Graph_Rotate(&hour_pointer, h_angle, &h_temp);
+        Graph_Rotate(&minute_pointer, m_angle, &m_temp);
         /* 更改PictureBox部件显示的图形 */
         Set_PictureBox_Image_From_Graph(hour, &h_temp);
         Set_PictureBox_Image_From_Graph(minute, &m_temp);

@@ -4,7 +4,6 @@
 #include LC_LCUI_H
 #include LC_MISC_H
 #include LC_GRAPH_H
-#include LC_MEM_H
 
 int main()
 {
@@ -25,7 +24,7 @@ int main()
 	time = clock(); //开始计时
 	for(i=0; i<=255; ++i){
 		t = clock(); 
-		nobuff_print("[%2d] mix graph, alpha = %3d, use time: ", i, i);
+		nobuff_printf("[%2d] mix graph, alpha = %3d, use time: ", i, i);
 		Graph_Fill_Alpha(&fg, i);
 		Graph_Mix(&bg, &fg, Pos(0,0));
 		printf("%ldms\n", clock()-t);//结束计时，输出结果

@@ -1,3 +1,44 @@
+/* ***************************************************************************
+ * touchscreen.c -- touchscreen support
+ * 
+ * Copyright (C) 2012 by
+ * Liu Chao
+ * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ * 
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
+ 
+/* ****************************************************************************
+ * touchscreen.c -- 触屏支持
+ *
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ****************************************************************************/
+
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_CURSOR_H
@@ -19,8 +60,9 @@ static void * Handle_TouchScreen_Input ()
 			tsdevice = getenv("TSLIB_TSDEVICE");
 			if( tsdevice != NULL ) {
 				LCUI_Sys.ts.td = ts_open(tsdevice, 0);
+			} else {
+				tsdevice = TS_DEV;
 			}
-			else tsdevice = TS_DEV;
 			LCUI_Sys.ts.td = ts_open (tsdevice, 0);
 			if (!LCUI_Sys.ts.td) { 
 				sprintf (str, "ts_open: %s", tsdevice);
@@ -29,8 +71,7 @@ static void * Handle_TouchScreen_Input ()
 				break;
 			}
 
-			if (ts_config (LCUI_Sys.ts.td))
-			{
+			if (ts_config (LCUI_Sys.ts.td)) {
 				perror ("ts_config");
 				LCUI_Sys.ts.status = REMOVE;
 				break;
@@ -45,17 +86,24 @@ static void * Handle_TouchScreen_Input ()
 			continue;
 		}
 
-		if (ret != 1) continue;
-
+		if (ret != 1) {
+			continue;
+		}
 		x = samp.x;
 		y = samp.y;
 		
-		if (x > Get_Screen_Width ())
+		if (x > Get_Screen_Width ()) {
 			x = Get_Screen_Width ();
-		if (y > Get_Screen_Height ())
+		}
+		if (y > Get_Screen_Height ()) {
 			y = Get_Screen_Height ();
-		if (x < 0) x = 0;
-		if (y < 0) y = 0;
+		}
+		if (x < 0) {
+			x = 0;
+		}
+		if (y < 0) {
+			y = 0;
+		}
 		/* 设定游标位置 */ 
 		Set_Cursor_Pos (Pos(x, y));
 		
@@ -71,8 +119,11 @@ static void * Handle_TouchScreen_Input ()
 			event.pos.x = x;
 			event.pos.y = y;
 		}
-		if (samp.pressure > 0)  button = 1; 
-		else  button = 0; 
+		if (samp.pressure > 0) {
+			button = 1; 
+		} else {
+			button = 0; 
+		}
 			/* 处理鼠标事件 */
 		Handle_Mouse_Event(button, &event); 
 		//printf("%ld.%06ld: %6d %6d %6d\n", samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
@@ -81,25 +132,24 @@ static void * Handle_TouchScreen_Input ()
 		ts_close(LCUI_Sys.ts.td); 
 	}
 	LCUI_Sys.ts.status = REMOVE;
-	pthread_exit (NULL);
+	thread_exit (NULL);
 }
 
 int Enable_TouchScreen_Input()
-/* 功能：启用鼠标输入处理 */
-{
-	/* 创建一个线程，用于刷显示鼠标指针 */
+/* 功能：启用触屏输入处理 */
+{ 
 	if(LCUI_Sys.ts.status == REMOVE) {
-		return  pthread_create ( &LCUI_Sys.ts.thread, NULL, 
+		return  thread_create ( &LCUI_Sys.ts.thread, NULL, 
 					Handle_TouchScreen_Input, NULL ); 
 	}
 	return 0;
 }
 
 int Disable_TouchScreen_Input()
-/* 功能：撤销鼠标输入处理 */
+/* 功能：撤销触屏输入处理 */
 {
 	if(LCUI_Sys.ts.status == INSIDE) {
-		return pthread_cancel ( LCUI_Sys.ts.thread );/* 撤销LCUI子线程 */ 
+		return thread_cancel ( LCUI_Sys.ts.thread ); 
 	}
 	return 0;
 }

@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Input.c -- Processing  input device's data
+ * mouse.c -- mouse support
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Input.c -- 处理输入设备的数据
+ * mouse.c -- 鼠标支持
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -46,16 +46,10 @@
 #include LC_CURSOR_H
 #include LC_DISPLAY_H
 #include LC_INPUT_H 
-
-#include <linux/unistd.h>
+ 
 #include <errno.h>
-#include <unistd.h>  
-#include <stdio.h>
-#include <stdlib.h>
-#include <termio.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <string.h>
+#include <unistd.h> 
+#include <fcntl.h> 
 
 /****************************** Mouse *********************************/
 int Mouse_LeftButton(LCUI_MouseEvent *event)
@@ -190,19 +184,19 @@ void Handle_Mouse_Event(int button_type, LCUI_MouseEvent *event)
 {
 	static LCUI_Pos old_pos;/* 保存鼠标之前的坐标 */
 	switch (button_type) {
-	    case 1:			/* 鼠标左键被按下 */
+	    case 1:		/* 鼠标左键被按下 */
 		Press_MouseKey(event, MOUSE_LEFT_KEY); 
 		Free_MouseKey(event, MOUSE_RIGHT_KEY);
 		break;
-	    case 2:			/* 鼠标右键被按下 */
+	    case 2:		/* 鼠标右键被按下 */
 		Press_MouseKey(event, MOUSE_RIGHT_KEY); 
 		Free_MouseKey(event, MOUSE_LEFT_KEY); 
 		break;
-	    case 3:			/* 鼠标左右键被按下 */
+	    case 3:		/* 鼠标左右键被按下 */
 		Press_MouseKey(event, MOUSE_RIGHT_KEY); 
 		Press_MouseKey(event, MOUSE_LEFT_KEY); 
 		break;
-	    default:			/* 默认是释放的 */
+	    default:		/* 默认是释放的 */
 		Free_MouseKey(event, MOUSE_RIGHT_KEY); 
 		Free_MouseKey(event, MOUSE_LEFT_KEY); 
 		break;
@@ -224,24 +218,24 @@ static void * Handle_Mouse_Input ()
  * 处理相应的鼠标事件。
  */
 { 
-	int  temp, button, retval;
-
-	char *msdev, buf[6];
-
-	fd_set readfds;
-
-	struct timeval tv;
-	
+	int  temp, button, retval; 
+	char *msdev, buf[6]; 
+	fd_set readfds; 
+	struct timeval tv; 
 	LCUI_MouseEvent event;
 	LCUI_Pos pos; 
+	
 	disable_mouse = IS_FALSE;
 	while (LCUI_Active()) { 
-		if(disable_mouse == 1) break;
+		if(disable_mouse == 1) {
+			break;
+		}
 		if (LCUI_Sys.mouse.status == REMOVE) { 
 			
 			msdev = getenv("LCUI_MOUSE_DEVICE");
-			if( msdev == NULL ) msdev = MS_DEV;
-			
+			if( msdev == NULL ) {
+				msdev = MS_DEV;
+			}
 			if ((LCUI_Sys.mouse.fd =
 				 open (MS_DEV, O_RDONLY)) < 0) {
 				//printf("Failed to open \"/dev/input/mice\".\n");
@@ -263,15 +257,17 @@ static void * Handle_Mouse_Input ()
 		retval = select (LCUI_Sys.mouse.fd + 1, &readfds, NULL, NULL, &tv);
 		if (retval == 0) {
 			//printf("Time out!\n");
-			if(disable_mouse == IS_TRUE) 
+			if(disable_mouse == IS_TRUE) {
 				break;
+			}
 		}
 		if (FD_ISSET (LCUI_Sys.mouse.fd, &readfds)) {
 			temp = read (LCUI_Sys.mouse.fd, buf, 6);
 			//终端设备，一次只能读取一行
 			if (temp <= 0){
-				if (temp < 0)
+				if (temp < 0) {
 					LCUI_Sys.mouse.status = REMOVE;
+				}
 				continue;
 			}
   
@@ -279,12 +275,18 @@ static void * Handle_Mouse_Input ()
 			pos.x += (buf[1] * LCUI_Sys.mouse.move_speed); 
 			pos.y -= (buf[2] * LCUI_Sys.mouse.move_speed);
 
-			if (pos.x > Get_Screen_Width ())
+			if (pos.x > Get_Screen_Width ()) {
 				pos.x = Get_Screen_Width ();
-			if (pos.y > Get_Screen_Height ())
+			}
+			if (pos.y > Get_Screen_Height ()) {
 				pos.y = Get_Screen_Height ();
-			if (pos.x < 0) pos.x = 0;
-			if (pos.y < 0) pos.y = 0;
+			}
+			if (pos.x < 0) {
+				pos.x = 0;
+			}
+			if (pos.y < 0) {
+				pos.y = 0;
+			}
 			/* 设定游标位置 */ 
 			Set_Cursor_Pos (pos);
 			
@@ -307,11 +309,11 @@ static void * Handle_Mouse_Input ()
 	}
 	disable_mouse = IS_FALSE;
 	Hide_Cursor();
-	if (LCUI_Sys.mouse.status == INSIDE)
+	if (LCUI_Sys.mouse.status == INSIDE) {
 		close (LCUI_Sys.mouse.fd);
-		
+	}
 	LCUI_Sys.mouse.status = REMOVE; 
-	pthread_exit (NULL);
+	thread_exit (NULL);
 }
 
 int Check_Mouse_Support()
@@ -319,9 +321,9 @@ int Check_Mouse_Support()
 {
 	/* 只是测试是否能打开这个设备 */
 	int fd;
-	if ((fd = open (MS_DEV, O_RDONLY)) < 0)
+	if ((fd = open (MS_DEV, O_RDONLY)) < 0) {
 		 return -1;
-		 
+	}
 	return 0;
 }
 
@@ -330,7 +332,7 @@ int Enable_Mouse_Input()
 {
 	/* 创建一个线程，用于刷显示鼠标指针 */
 	if(LCUI_Sys.mouse.status == REMOVE) {
-		return pthread_create(&LCUI_Sys.mouse.thread, 
+		return thread_create(&LCUI_Sys.mouse.thread, 
 					NULL, Handle_Mouse_Input, NULL); 
 	}
 	return 0;
@@ -338,11 +340,11 @@ int Enable_Mouse_Input()
 
 int Disable_Mouse_Input()
 /* 功能：禁用鼠标输入处理 */
-{ 
+{
 	if(LCUI_Sys.mouse.status == INSIDE) {
 		disable_mouse = IS_TRUE;
 		/* 等待LCUI子线程结束 */
-		return pthread_join (LCUI_Sys.mouse.thread, NULL);	
+		return thread_join (LCUI_Sys.mouse.thread, NULL);	
 	}
 	return 0;
 }

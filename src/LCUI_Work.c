@@ -551,8 +551,8 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 	LCUI_Widget *widget;
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
 	widget = Get_Cursor_Overlay_Widget(); 
-	print_widget_info(widget);
-	print_widget_info(overlay_widget);
+	//print_widget_info(widget);
+	//print_widget_info(overlay_widget);
 	if(widget == NULL) {
 		goto skip_widget_check;
 	}
@@ -587,16 +587,15 @@ skip_widget_check:;
 
 	//printf("6\n");
 	if(overlay_widget != widget && click_widget == NULL) {
-		/* 如果鼠标指针在之前有覆盖到的部件 */
-	//printf("2\n");
-	//printf("7\n");
+		/* 如果鼠标指针在之前有覆盖到的部件 */ 
+		DEBUG_MSG("7\n");
 		if (overlay_widget->enabled == IS_TRUE) {/* 如果部件可用，就让它恢复到普通状态 */
 			Set_Widget_Status (overlay_widget, WIDGET_STATUS_NORMAL); 
 		} else {/* 否则，部件为不可用的状态 */
 			Set_Widget_Status (overlay_widget, WIDGET_STATUS_DISABLE);
 		}
 	}
-	//printf("8\n");
+	DEBUG_MSG("8\n");
 	overlay_widget = widget;
 	/* 触发部件拖动事件 */ 
 	if(click_widget != NULL && Mouse_LeftButton (event) == PRESSED) {
@@ -608,7 +607,7 @@ skip_widget_check:;
 		/* 处理部件的拖动事件 */
 		Handle_Event(&click_widget->event, EVENT_DRAG);
 	}
-	//printf("Tracking_Mouse_Move(): end\n");
+	DEBUG_MSG("Tracking_Mouse_Move(): end\n");
 }
 
 void Widget_Event_Init()
