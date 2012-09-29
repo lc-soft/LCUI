@@ -478,7 +478,7 @@ static void *Handle_Area_Update ()
 		Handle_All_WidgetUpdate();/* 处理所有部件更新 */ 
 		usleep(5000);/* 停顿一段时间，让程序主循环处理任务 */ 
 		Handle_Refresh_Area(); /* 处理需要刷新的区域 */ 
-		Handle_Screen_Update();/* 处理屏幕更新 */
+		Handle_Screen_Update();/* 处理屏幕更新 */ 
 	}
 	thread_exit(NULL);
 }

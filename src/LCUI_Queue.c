@@ -895,9 +895,9 @@ int RectQueue_Add (LCUI_Queue * queue, LCUI_Rect rect)
 	}
 	
 	Destroy_Queue(&rect_buff);
-	if (flag == 0)
-	/* 没有的话，就需要添加至队列 */ 
+	if (flag == 0) { /* 没有的话，就需要添加至队列 */ 
 		return Queue_Add(queue, &rect);
+	}
 	/* 销毁队列 */
 	//if(debug_mark) 
 	//	printf("done\n");

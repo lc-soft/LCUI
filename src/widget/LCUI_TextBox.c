@@ -5,7 +5,8 @@
  * 
  * 
  * */
- 
+//#define DEBUG
+
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_MEM_H
@@ -269,7 +270,7 @@ static wchar_t *get_style_endtag ( wchar_t *str, char *out_tag_name )
 	int i, j, len, tag_found = 0;
 	
 	len = wcslen ( str );
-	printf("string: %S\n", str);
+	//printf("string: %S\n", str);
 	if(str[0] != '<' || str[1] != '/') {
 		return NULL;
 	} 
@@ -358,7 +359,7 @@ static wchar_t *covernt_tag_to_style_data (wchar_t *str, tag_style_data *out_dat
 	char tag_data[256];
 	
 	p = str; 
-	printf("covernt_tag_to_style_data(): enter\n");
+	DEBUG_MSG("covernt_tag_to_style_data(): enter\n");
 	if( (q = get_style_tag ( p, "color", tag_data)) ) {
 		int r,g,b;
 		LCUI_RGB rgb;
@@ -374,7 +375,7 @@ static wchar_t *covernt_tag_to_style_data (wchar_t *str, tag_style_data *out_dat
 	} else {
 		p = NULL;
 	}
-	printf("covernt_tag_to_style_data(): quit\n");
+	DEBUG_MSG("covernt_tag_to_style_data(): quit\n");
 	return p;
 }
 
@@ -386,9 +387,9 @@ static wchar_t *handle_style_tag(LCUI_Widget *widget, wchar_t *str)
 	
 	/* 开始处理样式标签 */
 	q = covernt_tag_to_style_data ( str, &data );
-	printf("handle_style_tag():%p\n", q);
+	DEBUG_MSG("handle_style_tag():%p\n", q);
 	if( q != NULL ) {
-		printf("add style data\n");
+		DEBUG_MSG("add style data\n");
 		/* 将标签样式数据加入队列 */
 		TextBox_TagStyle_Add( widget, &data ); 
 	}
@@ -409,7 +410,7 @@ static wchar_t *handle_style_endtag(LCUI_Widget *widget, wchar_t *str)
 	return p;
 }
 
-static void TextBox_Get_Char_Bitmap ( LCUI_CharData *data )
+static void TextBox_Get_Char_BMP ( LCUI_CharData *data )
 /* 获取字体位图，字体的样式由文本框中记录的字体样式决定 */
 {
 	LCUI_Font font;
@@ -642,7 +643,7 @@ int TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 		DEBUG_MSG("char: %c, style data:%p\n", *p, char_data.data);
 		/* 获取字体位图 */
 		FontBMP_Init( &char_data.bitmap );
-		TextBox_Get_Char_Bitmap ( &char_data );
+		TextBox_Get_Char_BMP ( &char_data );
 		/* 插入队列 */
 		Queue_Insert( &textbox->text_source_data, 
 				textbox->current_src_pos, &char_data );

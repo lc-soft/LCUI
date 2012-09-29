@@ -190,25 +190,25 @@ void print_widget_info(LCUI_Widget *widget)
 int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
 /* 功能：在指定部件的内部区域内设定需要刷新的区域 */
 {
-	if(widget == NULL) {
+	DEBUG_MSG("Add_Widget_Refresh_Area():enter\n");
+	if(widget == NULL) { 
 		return Add_Screen_Refresh_Area(rect);
 	}
-	if (rect.width <= 0 || rect.height <= 0) {
+	if (rect.width <= 0 || rect.height <= 0) { 
 		return -1;
 	}
 	
 	/* 调整矩形位置及尺寸 */
 	rect = Get_Valid_Area(Get_Widget_Size(widget), rect);
-	
+	if( widget->visible ) { 
+		LCUI_Sys.need_shift_area = IS_TRUE; 
+	}
 	/* 保存至队列中 */
-	if(0 != RectQueue_Add (&widget->update_area, rect)) {
+	if(0 != RectQueue_Add (&widget->update_area, rect)) { 
 		return -1;
 	}
 	
-	if( widget->visible ) {
-		LCUI_Sys.shift_flag = IS_TRUE; 
-	}
-		
+	DEBUG_MSG("Add_Widget_Refresh_Area():quit\n");
 	return 0;
 }
 
@@ -233,7 +233,7 @@ void Response_Status_Change(LCUI_Widget *widget)
 void Shift_Widget_Refresh_Area(LCUI_Widget *widget)
 /* 功能：转移部件的rect队列成员至父部件中 */
 {
-	//printf("Shift_Widget_Refresh_Area(): enter\n");
+	DEBUG_MSG("Shift_Widget_Refresh_Area(): enter\n");
 	int i, total;
 	LCUI_Widget *child;
 	LCUI_Rect rect;
@@ -245,7 +245,6 @@ void Shift_Widget_Refresh_Area(LCUI_Widget *widget)
 		widget_list = &widget->child; 
 	}
 	total = Queue_Get_Total(widget_list);
-	
 	for(i=total-1; i>=0; --i) {/* 从底到顶遍历子部件 */
 		child = (LCUI_Widget*)Queue_Get(widget_list, i);
 		if(child != NULL && child->visible ) {/* 如果有子部件 */
@@ -257,12 +256,15 @@ void Shift_Widget_Refresh_Area(LCUI_Widget *widget)
 				//printf("[%d]\033[1;34mShift_Widget_Refresh_Area(x:%d, y:%d, w:%d, h:%d)\033[0m\n", child->update_area.total_num, rect.x, rect.y, rect.width, rect.height);
 				/* 将子部件的rect队列成员复制到自己这里 */ 
 				Add_Widget_Refresh_Area(widget, rect); 
+				if(Strcmp(&child->type, "button") == 0) {
+					DEBUG_MSG("shift area:%d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
+				}
 				/* 删除子部件rect队列成员 */
 				Queue_Delete(&child->update_area, 0);
 			}
 		}
 	} 
-	//printf("Shift_Widget_Refresh_Area(): quit\n");
+	DEBUG_MSG("Shift_Widget_Refresh_Area(): quit\n");
 }
 
 void Handle_Refresh_Area()
@@ -272,10 +274,9 @@ void Handle_Refresh_Area()
  * 最终的局部刷新区域数据添加至屏幕刷新区域队列中，等
  * 待LCUI来处理。
  **/
-{
-	//printf("Handle_Refresh_Area: enter\n");
+{ 
 	/* 如果flag标志的值为IS_TRUE */ 
-	if ( LCUI_Sys.shift_flag == IS_TRUE ) {	
+	if ( LCUI_Sys.need_shift_area ) {	
 		/* 转移部件内记录的区域至主记录中 */ 
 		Shift_Widget_Refresh_Area ( NULL );
 		/* 
@@ -283,10 +284,8 @@ void Handle_Refresh_Area()
 		 * 个部件的矩形数据进行移动，因为这是浪费时间，降低了程序的效
 		 * 率 
 		 * */
-		LCUI_Sys.shift_flag = IS_FALSE; 
-	}
-	/* 分割区域，使之不与任何部件的区域重叠 */ 
-	//printf("Handle_Refresh_Area: quit\n"); 
+		LCUI_Sys.need_shift_area = IS_FALSE; 
+	} 
 }
 
 
@@ -1055,7 +1054,7 @@ void Disable_Widget_Auto_Size(LCUI_Widget *widget)
 void Exec_Refresh_Widget(LCUI_Widget *widget)
 /* 功能：执行刷新显示指定部件的整个区域图形的操作 */
 { 
-	DEBUG_MSG("%d,%d,%d,%d\n", 
+	DEBUG_MSG("refresh widget: %d,%d,%d,%d\n", 
 		Get_Widget_Rect(widget).x, Get_Widget_Rect(widget).y, 
 		Get_Widget_Rect(widget).width, Get_Widget_Rect(widget).height
 	);
@@ -1306,11 +1305,15 @@ static int Find_WidgetData(LCUI_Widget *widget, const WidgetData *data)
 {
 	WidgetData *temp;
 	int i, total;
-	total = Queue_Get_Total(&widget->data);	/* 获取成员总数 */
+	total = Queue_Get_Total(&widget->data);	/* 获取成员总数 */ 
 	for(i=0; i<total; ++i) {
 		temp = (WidgetData*)Queue_Get(&widget->data, i);
-		if(NULL == temp) break;
-		if(temp->type == data->type) return i; 
+		if(NULL == temp) { 
+			break;
+		} 
+		if(temp->type == data->type) {
+			return i; 
+		}
 	}
 	return -1;
 }
@@ -1346,10 +1349,16 @@ static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, int type)
 	}
 	  
 	pos = Find_WidgetData(widget, &temp);
+	if( type == DATATYPE_AREA ) {
+		DEBUG_MSG("search result: the recod at %d\n", pos);
+	}
 	if(pos >= 0) {	/* 如果已经存在，就覆盖 */ 
 		result = Queue_Replace(&widget->data, pos, &temp); 
 	} else {	/* 否则，追加至队列末尾 */
 		result = Queue_Add(&widget->data, &temp);
+		if( type == DATATYPE_AREA ) {
+			DEBUG_MSG("queue add, the widget data at: %d\n", result);
+		}
 	}
 	return result;
 }

@@ -37,7 +37,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-
+//#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WORK_H 
@@ -561,9 +561,11 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 	if( widget == NULL || overlay_widget == widget ) {
 		goto skip_widget_check;
 	} 
+	DEBUG_MSG("check widget whether enabled\n");
 	if (widget->enabled == IS_TRUE) { 
+		DEBUG_MSG("widget not enabled");
 		if( click_widget == NULL ) {
-			DEBUG_MSG("leftbutton is free\n\n");
+			DEBUG_MSG("leftbutton is free, widget overlay\n\n");
 			Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
 		} 
 	} else {

@@ -604,13 +604,13 @@ struct _LCUI_System
 {
 	Thread_TreeNode thread_tree; /* 线程关系树 */
 	
-	thread_t	self_id;	/* 保存LCUI主程序的线程ID */
-	thread_t	core_thread;	/* 保存核心处理的线程ID */
-	thread_t	key_thread;	/* 保存按键处理的线程ID */
+	thread_t self_id;	/* 保存LCUI主程序的线程ID */
+	thread_t core_thread;	/* 保存核心处理的线程ID */
+	thread_t key_thread;	/* 保存按键处理的线程ID */
 	
-	int		status;		/* 状态 */
-	int		init;		/* 一个标志，表示LCUI是否初始化过 */
-	int		shift_flag;	/* 一个标志，表示是否需要转移部件中记录的区域数据 */
+	int status;		/* 状态 */
+	BOOL init;		/* 指示LCUI是否初始化过 */
+	BOOL need_shift_area;	/* 指示是否需要转移部件中记录的区域数据 */ 
 	
 	LCUI_ID max_app_idle_time;	/* 程序最大的空闲时间 */
 	LCUI_ID max_lcui_idle_time;	/* LCUI最大的空闲时间 */
@@ -633,7 +633,7 @@ struct _LCUI_System
 
 #define nobuff_printf(format, ...) \
 	{ \
-		printf(__FILE__"%d:"format, __LINE__,##__VA_ARGS__); \
+		printf(format, ##__VA_ARGS__); \
 		fflush(stdout); \
 	}
 
