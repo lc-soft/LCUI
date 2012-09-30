@@ -5,7 +5,7 @@
  * 
  * 
  * */
-//#define DEBUG
+#define DEBUG
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H

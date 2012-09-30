@@ -60,7 +60,7 @@ int FontBMP_Valid(LCUI_FontBMP *bitmap)
  * 返回值：有效返回1，无效返回0
  */
 {
-	if(NULL != bitmap && bitmap->width * bitmap->height > 0) {
+	if(NULL != bitmap && bitmap->width > 0 && bitmap->height > 0) {
 		return 1; 
 	}
 	return 0;
@@ -522,8 +522,6 @@ int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap)
 			return error; 
 		}
 		
-		FontBMP_Free(out_bitmap);
-		/* 背景图形的高度，这个高度要大于字体的高度，所以是+3 */
 		/* 256级灰度字形转换成位图 */
 		FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
 		/* FT_RENDER_MODE_NORMAL 这是默认渲染模式，它对应于8位抗锯齿位图 */
@@ -551,7 +549,6 @@ int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap)
 	}
 	
 	int bg_height;
-	FontBMP_Free(out_bitmap);
 	/* 背景图形的高度，这个高度要大于字体的高度，所以是+4 */
 	bg_height = font_data->size + 4; 
 	/* 256级灰度字形转换成位图 */
