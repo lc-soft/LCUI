@@ -353,16 +353,20 @@ struct _LCUI_Rect /* 可记录需刷新的区域 */
 };
 /**************************************************/
 
-/*******************保存字体位图数据***************************/
+/********** 保存字体位图数据 ***************/
 struct _LCUI_FontBMP
 {
-	unsigned char  **data;	/* 字体位图数据 */
-	unsigned char  alpha;	/* 全局透明度 */
-	
-	int	width;	   /* 位图的宽度 */
-	int	height;	  /* 位图的高度 */ 
-};/* 字体位图数据 */
-/**************************************************************/
+	int top;
+	int left;
+	int width;
+	int rows;
+	int pitch;
+	uchar_t *buffer;
+	short num_grays;
+	char pixel_mode;
+	LCUI_Pos advance;
+};
+/*****************************************/
 
 /************************wchar_t型字符***************************/
 struct _LCUI_WChar_T

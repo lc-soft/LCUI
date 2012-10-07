@@ -43,8 +43,7 @@
 #include LC_LCUI_H 
 #include LC_DISPLAY_H
 #include LC_WIDGET_H
-#include LC_BUTTON_H
-#include LC_MEM_H
+#include LC_BUTTON_H 
 #include LC_LABEL_H
 #include LC_PICBOX_H
 #include LC_WINDOW_H 
@@ -136,7 +135,7 @@ static void Window_TitleBar_Init(LCUI_Widget *titlebar)
 	Show_Widget(t->label);
 	
 	Set_Widget_Align(t->icon_box, ALIGN_MIDDLE_LEFT, Pos(0,0));
-	Set_Widget_Align(t->label, ALIGN_MIDDLE_LEFT, Pos(0,0));
+	Set_Widget_Align(t->label, ALIGN_MIDDLE_LEFT, Pos(2,-2));
 	Load_Graph_Default_TitleBar_BG(&img);
 	Set_Widget_Background_Image(titlebar, &img, LAYOUT_STRETCH);
 }

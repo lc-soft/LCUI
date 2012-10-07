@@ -39,12 +39,9 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#define DEBUG
-
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_MISC_H
-#include LC_MEM_H
 #include LC_GRAPH_H
 #include LC_WIDGET_H 
 #include LC_ERROR_H

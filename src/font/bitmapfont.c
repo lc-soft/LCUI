@@ -51,6 +51,7 @@
 #include <iconv.h>
 
 #include FT_GLYPH_H
+#include FT_OUTLINE_H
 
 extern uchar_t const *in_core_font_8x8();
 
@@ -60,7 +61,7 @@ int FontBMP_Valid(LCUI_FontBMP *bitmap)
  * 返回值：有效返回1，无效返回0
  */
 {
-	if(NULL != bitmap && bitmap->width > 0 && bitmap->height > 0) {
+	if(NULL != bitmap && bitmap->width > 0 && bitmap->rows > 0) {
 		return 1; 
 	}
 	return 0;
@@ -73,91 +74,75 @@ void Print_FontBMP_Info(LCUI_FontBMP *bitmap)
 	if(bitmap == NULL) {
 		return;
 	}
-	printf("width:%d,height:%d,alpha:%u\n", 
-	bitmap->width, bitmap->height, bitmap->alpha);
+	printf("width:%d, rows:%d\n", bitmap->width, bitmap->rows);
 }
 
 void FontBMP_Init(LCUI_FontBMP *bitmap)
 /* 初始化字体位图 */
 {
+	bitmap->rows = 0;
 	bitmap->width = 0;
-	bitmap->height = 0;
-	bitmap->data = NULL;
-	bitmap->alpha = 255;
+	bitmap->top = 0;
+	bitmap->left = 0; 
+	bitmap->num_grays = 0;
+	bitmap->pixel_mode = 0;
+	bitmap->buffer = NULL; 
 }
 
 void FontBMP_Free(LCUI_FontBMP *bitmap)
 /* 释放字体位图占用的资源 */
 {
 	if(FontBMP_Valid(bitmap)) {
-		free(bitmap->data);
+		free(bitmap->buffer);
 		FontBMP_Init(bitmap);
 	}
 }
 
-void FontBMP_Create(LCUI_FontBMP *bitmap, int width, int height)
-/* 功能：为Bitmap内的数据分配内存资源，并初始化 */
-{
-	int i;
-	if(width < 0 || height < 0) {
-		return;
+int FontBMP_Create(LCUI_FontBMP *bitmap, int width, int rows)
+/* 功能：创建字体位图 */
+{ 
+	size_t size;
+	if(width < 0 || rows < 0) {
+		FontBMP_Free(bitmap);
+		return -1;
 	}
 	if(FontBMP_Valid(bitmap)) {
 		FontBMP_Free(bitmap);
 	}
 	bitmap->width = width;
-	bitmap->height = height;
-	bitmap->data = (uchar_t**)malloc(bitmap->height*sizeof(uchar_t*));
-	/* 为背景图的每一行分配内存 */
-	for(i = 0; i < bitmap->height; ++i) { 
-		bitmap->data[i] = (uchar_t*)calloc(1, 
-				sizeof(uchar_t) * bitmap->width); 
+	bitmap->rows = rows;
+	size = width*rows*sizeof(uchar_t);
+	bitmap->buffer = (uchar_t*)malloc( size );
+	if( bitmap->buffer == NULL ) {
+		return -2;
 	}
-	bitmap->alpha  = 255; /* 字体位图默认不透明 */
-}
-
-void FontBMP_Resize(LCUI_FontBMP *bitmap, int width, int height)
-/* 功能：更改位图的尺寸 */
-{
-	int i, j;
-	/* 如果新尺寸不大于原来的尺寸 */
-	if(width < bitmap->width || height < bitmap->height) {
-		return;
-	} 
-	bitmap->data = (uchar_t**)realloc( bitmap->data, 
-				height*sizeof(uchar_t*) );
-	for(i = 0; i < height; ++i) {   /* 为背景图的每一行扩增内存 */
-		bitmap->data[i] = (uchar_t*)realloc( bitmap->data[i], 
-					sizeof(uchar_t) * width); 
-		/* 把扩增的部分置零 */
-		if(i < bitmap->height) {
-			for(j = bitmap->width; j < width; ++j) {
-				bitmap->data[i][j] = 0; 
-			}
-		} else {
-			memset(bitmap->data[i], 0 , bitmap->width); 
-		}
-	} 
+	return 0;
 }
 
 void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 /* 功能：根据字符编码，获取系统自带的字体位图 */
 {
-	int i,j, start;
+	int i,j, start, m;
 	uchar_t const *p;
 	
 	p = in_core_font_8x8();
-	FontBMP_Create(out_bitmap, 9, 9);/* 为位图分配内存，9x9的尺寸 */
+	FontBMP_Create(out_bitmap, 8, 8);/* 为位图分配内存，8x8的尺寸 */
 	if(code < 256) {
-		start = code * 8;
-		for (i=start;i<start+8;++i) {
-			for (j=0;j<8;++j) {/* 将数值转换成一行位图 */
-				out_bitmap->data[i-start][7-j] = 
-						(p[i]&(1<<j))?255:0;  
+		if(code == ' ') {
+			memset(out_bitmap->buffer, 0, sizeof(uchar_t)*64); 
+		} else {
+			start = code * 8;
+			for (i=start;i<start+8;++i) {
+				m = (i-start) * 8 + 7;
+				/* 将数值转换成一行位图 */
+				for (j=0;j<8;++j,--m) {
+					out_bitmap->buffer[m] 
+					 = (p[i]&(1<<j))?255:0;  
+				}
 			}
 		}
 	} else {
-		uchar_t error_bitmap[] = {
+		uchar_t null_bmp[] = {
 			1,1,1,1,1,1,1,1,
 			1,0,0,0,0,0,0,1,
 			1,0,0,0,0,0,0,1,
@@ -168,9 +153,9 @@ void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 			1,1,1,1,1,1,1,1 
 		};
 		for (i=0;i<8;i++) {
-			for (j=0;j<8;j++) {
-				out_bitmap->data[i][j]= 
-					(error_bitmap[i*8+j] > 0) ?255:0; 
+			m = i*8;
+			for (j=0;j<8;j++,++m) {
+				out_bitmap->buffer[m] = (null_bmp[m]>0)?255:0; 
 			}
 		}
 	}
@@ -291,15 +276,18 @@ void LCUI_Font_Free()
 }
 
 
-int Show_FontBMP(LCUI_FontBMP *in_fonts)
+int Show_FontBMP(LCUI_FontBMP *fontbmp)
 /* 功能：在屏幕打印以0和1表示字体位图 */
 {
-	int x,y;
-	for(y = 0;y < in_fonts->height; ++y){
-		for(x = 0; x < in_fonts->width; ++x){
-			if(in_fonts->data[y*in_fonts->width + x] > 0)
+	int x,y,m;
+	for(y = 0;y < fontbmp->rows; ++y){
+		m = y*fontbmp->width;
+		for(x = 0; x < fontbmp->width; ++x,++m){
+			if(fontbmp->buffer[m] > 0) {
 				printf("1");
-			else printf("0");
+			} else {
+				printf("0");
+			}
 		}
 		printf("\n");
 	}
@@ -307,97 +295,62 @@ int Show_FontBMP(LCUI_FontBMP *in_fonts)
 	return 0;
 }
 
-int FontBMP_Mix(
-		LCUI_Graph	*back_graph,  /* 背景图形 */
-		int		start_x,
-		int		start_y,
-		LCUI_FontBMP	*in_fonts,  /* 传入的字体位图数据 */
-		LCUI_RGB	color,       /* 字体的配色 */ 
-		int		flag
-)
+int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
+		LCUI_FontBMP	*bitmap, LCUI_RGB	color,
+		int flag )
 /* 功能：将字体位图数据与背景图形混合 */
 {
-	if(!FontBMP_Valid(in_fonts) || !Graph_Valid(back_graph)) {
+	LCUI_Graph *des;
+	LCUI_Rect des_rect, cut;
+	uint_t total, m, n, y;
+	
+	des_rect = Get_Graph_Valid_Rect( graph );
+	des = Get_Quote_Graph( graph ); 
+	
+	if( !FontBMP_Valid( bitmap ) || !Graph_Valid( graph ) ) {
 		return -1;
 	}
-	
-	float k;
-	int count = 0, m;
-	uchar_t j;
-	LCUI_Rect read, write;/* 用于记录区域的范围的数据 */
-	int x = 0, y = 0, end_x, end_y;//右下角的坐标
-	int box_width, box_height, width, height;
-	
-	Rect_Init(&read);
-	Rect_Init(&write);
-	
-	/* 保存图片的尺寸 */
-	width = in_fonts->width;
-	height = in_fonts->height;
-	read.width = width;
-	read.height = height;
-	/* 获取背景的区域的尺寸 */
-	box_width = back_graph->width;
-	box_height = back_graph->height;
-	/* 得到图像右下角点的坐标 */
-	end_x = start_x + width;
-	end_y = start_y + height;
-
-	/* 如果图片尺寸超出窗口限定的尺寸，更改图片显示的区域 */
-	if(start_x < 0) {/* 如果起点在x轴的坐标小于0 */
-		read.x = 0 - start_x; /* 改变读取的区域的起点在x轴的坐标 */
-		read.width = read.width - read.x;
-		start_x = 0;
-	}
-	if(end_x > box_width) {/* 如果超过可显示区域 */
-		read.width = read.width - (end_x - box_width);
-		end_x = box_width;
-	}
-	if(start_y < 0) {
-		read.y = 0 - start_y;
-		read.height = read.height - read.y;
-		start_y = 0;
-	}
-	if(end_y > box_height) {
-		read.height = read.height - (end_y - box_height);
-		end_y = box_height;
+	if(des_pos.x > des->width || des_pos.y > des->height) {
+		return -2;
 	}
 	
-	k = in_fonts->alpha / 255.0;
-	/* 获取数据输出到背景的区域范围 */
-	write.x = start_x;
-	write.y = start_y;
+	if( Get_Cut_Area( Size( des_rect.width, des_rect.height ),
+		Rect( des_pos.x, des_pos.y, bitmap->width, bitmap->rows ),
+		&cut
+	)) {
+		des_pos.x += cut.x;
+		des_pos.y += cut.y;
+	}
+	
+	Graph_Lock( des, 1 );
 	/* 开始读取图片中的图形数组并写入窗口 */
-	switch(flag) {
-		case GRAPH_MIX_FLAG_OVERLAY:
-			for (y = 0; y < read.height; ++y) {
-				m = (write.y + y) * back_graph->width + write.x; 
-				for (x = 0; x < read.width; ++x) {
-					count = m + x;/* 计算需填充至窗口的各点的坐标 */
-					j = in_fonts->data[read.y + y][read.x + x] * k;
-					back_graph->rgba[0][count] = (color.red * j + back_graph->rgba[0][count] * (255 - j)) /255;
-					back_graph->rgba[1][count] = (color.green * j + back_graph->rgba[1][count] * (255 - j)) /255;
-					back_graph->rgba[2][count] = (color.blue * j + back_graph->rgba[2][count] * (255 - j)) /255;
+	if( flag == GRAPH_MIX_FLAG_OVERLAY ) {
+		for (y = 0; y < cut.height; ++y) {
+			m = (cut.y + y) * bitmap->width + cut.x;
+			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+			total = n + cut.width;
+			for (; n < total; ++n,++m) { 
+				des->rgba[0][n] = ALPHA_BLENDING(color.red, des->rgba[0][n], bitmap->buffer[m]);
+				des->rgba[1][n] = ALPHA_BLENDING(color.green, des->rgba[1][n], bitmap->buffer[m]);
+				des->rgba[2][n] = ALPHA_BLENDING(color.blue, des->rgba[2][n], bitmap->buffer[m]);
+			}
+		}
+	} else {
+		for (y = 0; y < cut.height; ++y) {
+			m = (cut.y + y) * bitmap->width + cut.x;
+			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+			total = n + cut.width;
+			for (; n < total; ++n,++m) { 
+				if(bitmap->buffer[m] != 0) {
+					des->rgba[0][n] = color.red;
+					des->rgba[1][n] = color.green;
+					des->rgba[2][n] = color.blue;
+					des->rgba[3][n] = bitmap->buffer[m];
 				}
 			}
-			break;
-		case GRAPH_MIX_FLAG_REPLACE:
-			for (y = 0; y < read.height; ++y) {
-				m = (write.y + y) * back_graph->width + write.x; 
-				for (x = 0; x < read.width; ++x) {
-					count = m + x;/* 计算需填充至窗口的各点的坐标 */
-					j = in_fonts->data[read.y + y][read.x + x] * k;
-					if(j != 0) {
-						back_graph->rgba[0][count] = color.red;
-						back_graph->rgba[1][count] = color.green;
-						back_graph->rgba[2][count] = color.blue;
-						back_graph->rgba[3][count] = j;
-					}
-				}
-			}
-			break;
-		default : flag = GRAPH_MIX_FLAG_REPLACE;
+		} 
 	}
+	Graph_Unlock( des );
 	return 0;
 }
 
@@ -414,7 +367,8 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 		if(fontfile == NULL 
 		|| Strcmp(&font_data->font_file, fontfile) == 0) {
 			return 0;
-		} else if( Strcmp(&font_data->font_file, 
+		}
+		else if( Strcmp(&font_data->font_file, 
 				LCUI_Sys.default_font.font_file.string)) {
 			type = CUSTOM;
 		}
@@ -458,82 +412,69 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 	return 0;
 }
 
+static int Convert_FT_BitmapGlyph(LCUI_FontBMP *des, const FT_BitmapGlyph src)
+{
+	static size_t size;
+	
+	des->top = src->top;
+	des->left = src->left;
+	des->rows = src->bitmap.rows;
+	des->width = src->bitmap.width;
+	des->pixel_mode = src->bitmap.pixel_mode;
+	des->num_grays = src->bitmap.num_grays;
+	
+	size = des->rows * des->width * sizeof(uchar_t);
+	des->buffer = malloc( size );
+	if( des->buffer == NULL ) {
+		return -1;
+	}
+	memcpy( des->buffer, src->bitmap.buffer, size );
+	
+	DEBUG_MSG("des->top: %d, des->left: %d, des->rows: %d\n", des->top, des->left, des->rows);
+	return size;
+}
+
 int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap)
 /*
- * 功能：获取单个wchar_t型字符的位图
+ * 功能：获取单个wchar_t型字符的字体位图数据
  * 说明：LCUI_Font结构体中储存着已被打开的字体文件句柄和face对象的句柄，如果字体文件已经被
  * 成功打开一次，此函数不会再次打开字体文件。
  */
-{ 
-	FT_Face         p_FT_Face = NULL;   /* face对象的句柄 */
-	FT_Bitmap       bitmap;         
-	FT_BitmapGlyph  bitmap_glyph;    
-	FT_Glyph        glyph;
-	FT_GlyphSlot    slot;               /* 字形槽的句柄 */
-	FT_Error        error = 0;
-	int i , j = 0, value = 0;
-	int k, start_y = 0, ch_height = 0, ch_width = 0;
+{
+	size_t size;
+	BOOL have_space = IS_FALSE;
 	
-	DEBUG_MSG("Get_FontBMP():char: %d\n", ch);
+	FT_Face         p_FT_Face = NULL;   /* face对象的句柄 */ 
+	FT_BitmapGlyph  bitmap_glyph;
+	FT_Glyph        glyph; 
+	FT_Error        error;
+	
 	if(font_data != NULL) {
 	 /* 如果LCUI_Font结构体中的字体信息有效，就打开结构体中的指定的字体文件，并
 	  * 将字体文件和face对象的句柄保存至结构体中。
-	  * 当然，如果LCUI_Font结构体有字体文件和face对象的句柄，就直接返回0。
+	  * 当然，如果LCUI_Font结构体有有效的字体文件和face对象的句柄，就直接返回0。
 	  */
 		if(font_data->ft_face == NULL 
-		|| font_data->ft_lib == NULL ) { 
-			error = Open_Fontfile(font_data, 
+		 || font_data->ft_lib == NULL ) { 
+			error = Open_Fontfile( font_data, 
 					font_data->font_file.string);
 			if(error) {
-				value = -1; 
+				Get_Default_FontBMP( ch, out_bitmap );
+				return 1;
 			}
 		}
 		p_FT_Face = font_data->ft_face; 
 	} else {
+		Get_Default_FontBMP( ch, out_bitmap );
 		return -1;
 	}
 	
-	/* 不能获取字体文件，就使用内置的8x8点阵字体 */
-	if(value != 0) {
-		if(ch == ' ') { /* 如果是空格 */
-			/* 自定义的函数，用于获取8x8点阵字体位图 */
-			Get_Default_FontBMP('a', out_bitmap);
-			for (i=0;i<8;i++)  
-			for (j=0;j<8;j++)  
-				out_bitmap->data[i][j]= 0; 
-		} else { 
-			FontBMP_Create(out_bitmap, 8, 8);
-			Get_Default_FontBMP(ch, out_bitmap);
-		}
-		return 0;
-	}
-	/* 如果能正常打开字体文件 */
-	FT_Select_Charmap(p_FT_Face, FT_ENCODING_UNICODE);   /* 设定为UNICODE，默认的也是 */
-	FT_Set_Pixel_Sizes(p_FT_Face, 0, font_data->size);   /* 设定字体大小 */
-	slot = p_FT_Face->glyph;
-	if(ch == ' ') { /* 如果有空格,它的宽度就以字母a的宽度为准 */
-		error = FT_Load_Char( p_FT_Face, 'a', font_data->load_flags); 
-		if(error) {
-			return error; 
-		}
-		
-		error = FT_Get_Glyph(p_FT_Face -> glyph, &glyph);
-		if(error) {
-			return error; 
-		}
-		
-		/* 256级灰度字形转换成位图 */
-		FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
-		/* FT_RENDER_MODE_NORMAL 这是默认渲染模式，它对应于8位抗锯齿位图 */
-		bitmap_glyph = (FT_BitmapGlyph)glyph;
-		bitmap       = bitmap_glyph -> bitmap;
-		/* 字体所在的背景图的尺寸需要大一点 */
-		out_bitmap->height = font_data->size + 3;
-		FontBMP_Create(out_bitmap, bitmap.width, out_bitmap->height);
-		/* 释放字形占用的内存 */
-		FT_Done_Glyph(glyph);
-		glyph = NULL; 
-		return 0;
+	FT_Select_Charmap( p_FT_Face, FT_ENCODING_UNICODE ); /* 设定为UNICODE，默认的也是 */
+	FT_Set_Pixel_Sizes( p_FT_Face, 0, font_data->size ); /* 设定字体尺寸 */ 
+	
+	if( ch == ' ' ) {
+		ch = 'a';
+		have_space = IS_TRUE;
 	}
 	/* 这个函数只是简单地调用FT_Get_Char_Index和FT_Load_Glyph */
 	error = FT_Load_Char( p_FT_Face, ch, font_data->load_flags);
@@ -543,58 +484,22 @@ int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap)
 	
 	/* 从插槽中提取一个字形图像 
 	 * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
-	error = FT_Get_Glyph(p_FT_Face->glyph, &glyph);
+	error = FT_Get_Glyph( p_FT_Face->glyph, &glyph );
 	if(error) {
 		return error; 
 	}
-	
-	int bg_height;
-	/* 背景图形的高度，这个高度要大于字体的高度，所以是+4 */
-	bg_height = font_data->size + 4; 
-	/* 256级灰度字形转换成位图 */
-	FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
-	/* FT_RENDER_MODE_NORMAL 是默认渲染模式，它对应于8位抗锯齿位图。 */
-	bitmap_glyph = (FT_BitmapGlyph)glyph;
-	bitmap       = bitmap_glyph -> bitmap;
-	k = 0;
-	/* 获取起点的y轴坐标 */
-	start_y = font_data->size - slot->bitmap_top; 
-	ch_width = bitmap.width;
-	/* 处理字体位图在背景图中的范围 */
-	if(start_y < 0) {
-		start_y = 0; 
-	}
-	if(bitmap.rows > bg_height) {
-		ch_height = font_data->size; 
-	} else {
-		ch_height = bitmap.rows; 
-	}
-		
-	if(ch_height + start_y > bg_height) {
-		ch_height = bg_height - start_y; 
-	}
-	/* 开辟内存空间,如果出现问题，会导致FT_Done_Glyph函数出现段错误 */
-	FontBMP_Create(out_bitmap, ch_width, bg_height);
-	/* 开始将字体位图贴到背景图形中 */
-	for(i = 0; i < ch_height; ++i) 
-	for(j = 0;j < ch_width; ++j) {
-		switch (bitmap.pixel_mode) {
-		    case FT_PIXEL_MODE_GRAY:
-			/* 一个8位位图，一般用来表示反锯齿字形图像。每个像素用一个字节存储 */
-			out_bitmap->data[start_y + i][j] = bitmap.buffer[k];
-			break;
-		    case FT_PIXEL_MODE_MONO: 
-			/* 一个单色位图,每个bit对应一个点,非黑即白 */
-			out_bitmap->data[start_y + i][j] = bitmap.buffer[k]?255:0;
-			break;
+	if ( glyph->format != FT_GLYPH_FORMAT_BITMAP ) {
+		error = FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
+		if(error) {
+			return error;
 		}
-		++k;
-	} 
-	/* 释放字形占用的内存 */
+	}
+	bitmap_glyph = (FT_BitmapGlyph)glyph;
+	size = Convert_FT_BitmapGlyph (out_bitmap, bitmap_glyph);
+	if( have_space ) {
+		memset( out_bitmap->buffer, 0, size );
+	}
 	FT_Done_Glyph(glyph);
-	glyph = NULL; 
-	
-	//Print_FontBMP_Info(out_bitmap);
 	return 0;
 }
 

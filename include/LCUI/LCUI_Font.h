@@ -41,6 +41,7 @@
 #ifndef __LCUI_FONT_H__
 #define __LCUI_FONT_H__
 
+#include <stdint.h>
 
 #define ENCODEING_TYPE_UTF8	0
 #define ENCODEING_TYPE_GB2312	1
@@ -77,11 +78,8 @@ void FontBMP_Init(LCUI_FontBMP *bitmap);
 void FontBMP_Free(LCUI_FontBMP *bitmap);
 /* 释放字体位图占用的资源 */ 
 
-void FontBMP_Create(LCUI_FontBMP *bitmap, int width, int height);
+int FontBMP_Create(LCUI_FontBMP *bitmap, int width, int height);
 /* 功能：为Bitmap内的数据分配内存资源，并初始化 */ 
-
-void FontBMP_Resize(LCUI_FontBMP *bitmap, int width, int height);
-/* 功能：更改位图的尺寸 */ 
 
 void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap);
 /* 功能：根据字符编码，获取系统自带的字体位图 */ 
@@ -113,15 +111,10 @@ void LCUI_Font_Free();
 int Show_FontBMP(LCUI_FontBMP *in_fonts);
 /* 功能：在屏幕打印以0和1表示字体位图 */ 
 
-int FontBMP_Mix(
-		LCUI_Graph	*back_graph,  /* 背景图形 */
-		int		start_x,
-		int		start_y,
-		LCUI_FontBMP	*in_fonts,  /* 传入的字体位图数据 */
-		LCUI_RGB	color,       /* 字体的配色 */ 
-		int		flag
-);
-/* 功能：将字体位图数据与背景图形混合 */ 
+int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
+		LCUI_FontBMP	*bitmap, LCUI_RGB	color,
+		int flag );
+/* 功能：将字体位图数据与背景图形混合 */
 
 int Open_Fontfile(LCUI_Font *font_data, char *fontfile);
 /* 功能：打开字体文件，并保存数据至LCUI_Font结构体中 */ 
@@ -132,7 +125,160 @@ int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap);
  * 说明：LCUI_Font结构体中储存着已被打开的字体文件句柄和face对象的句柄，如果字体文件已经被
  * 成功打开一次，此函数不会再次打开字体文件。
  */
- 
+
+
+/*************************** LCUI_TextLayer ****************************/
+typedef struct _LCUI_TextStyle	LCUI_TextStyle; 
+typedef struct _LCUI_TextLayer 	LCUI_TextLayer; 
+
+typedef enum _font_style		enum_font_style;
+typedef enum _font_weight		enum_font_weight;
+typedef enum _font_decoration	enum_font_decoration; 
+
+enum _font_style
+{ 
+	FONT_STYLE_NORMAL = 0, 
+	FONT_STYLE_ITALIC = 1, 
+	FONT_STYLE_OBIQUE = 2 
+};
+
+enum _font_weight
+{
+	FONT_WEIGHT_NORMAL	= 0,
+	FONT_WEIGHT_BOLD	= 1 
+}; 
+
+enum _font_decoration
+{
+	FONT_DECORATION_NONE		= 0,	/* 无装饰 */
+	FONT_DECORATION_BLINK		= 1,	/* 闪烁 */
+	FONT_DECORATION_UNDERLINE	= 2,	/* 下划线 */
+	FONT_DECORATION_LINE_THROUGH	= 3,	/* 贯穿线 */
+	FONT_DECORATION_OVERLINE	= 4	/* 上划线 */
+};
+
+/******************* 字体相关数据 **********************/
+struct _LCUI_TextStyle
+{
+	char family[256];
+	
+	enum_font_style	style		:3;
+	enum_font_weight	weight		:3;
+	enum_font_decoration	decoration	:4;
+	
+	int need_back_color:1;
+	int need_fore_color:1;
+	LCUI_RGB fore_color;
+	LCUI_RGB back_color;
+	
+	int pixel_size;		/* 当它等于-1时，将使用全局尺寸 */
+};
+/******************************************************/
+
+struct _LCUI_TextLayer
+{
+	BOOL using_code_mode	:2;	/* 指示是否开启代码模式 */
+	BOOL using_style_tags	:2;	/* 指示是否处理样式标签 */
+	BOOL enable_word_wrap	:2;	/* 指示是否自动换行 */
+	BOOL enable_multiline	:2;	/* 指示是否为多行文本图层部件 */ 
+	
+	BOOL have_select : 2;	/* 标记，指示是否在文本图层中选择了文本 */
+	uint32_t start, end;	/* 被选中的文本的范围 */ 
+	
+	LCUI_Queue color_keyword;	/* 记录需要使用指定风格的关键字 */
+	LCUI_Queue text_source_data;	/* 储存文本相关数据 */
+	LCUI_Queue rows_data;		/* 储存每一行文本的数据 */
+	LCUI_Queue tag_buff;		/* 保存样式标签中表达的属性数据 */
+	LCUI_Queue style_data;		/* 保存样式数据 */
+	
+	uint32_t current_src_pos;	/* 当前光标在源文本中位置 */
+	LCUI_Pos current_des_pos;	/* 当前光标在分段后的文本中的位置 */
+	uint32_t max_text_len;		/* 最大文本长度 */ 
+	
+	LCUI_TextStyle default_data;	/* 缺省状态下使用的字体样式数据 */
+};
+
+/**********************************************************************/
+
+
+/*************************** 基本的处理 *********************************/
+void 
+TextLayer_Init( LCUI_TextLayer *layer );
+/* 初始化文本图层相关数据 */ 
+
+void 
+Destroy_TextLayer( LCUI_TextLayer *layer );
+/* 销毁文本图层占用的资源 */ 
+
+void 
+TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode );
+/* 绘制文本图层 */
+
+void
+TextLayer_Refresh( LCUI_TextLayer *layer );
+/* 标记文本图层中每个字的位图，等待绘制文本图层时进行更新 */
+/**********************************************************************/
+
+/************************ 文本图层的扩展功能 *****************************/ 
+LCUI_Size 
+TextLayer_Get_Size ( LCUI_TextLayer *layer );
+/* 获取文本图层的实际尺寸 */
+
+void
+TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style );
+/* 设定默认的文本样式 */
+
+int
+TextLayer_Text( LCUI_TextLayer *layer, char *new_text );
+/* 设定整个文本图层中需显示的文本，光标复位，原有选中文本被删除 */ 
+
+int 
+TextLayer_Append( LCUI_TextLayer *layer, char *new_text );
+/* 在文本末尾追加文本，不移动光标，不删除原有选中文本 */ 
+
+int 
+TextLayer_Text_Add( LCUI_TextLayer *layer, char *new_text );
+/* 在光标处添加文本，如有选中文本，将被删除 */
+
+int 
+TextLayer_Text_Paste( LCUI_TextLayer *layer );
+/* 将剪切板的内容粘贴至文本图层 */ 
+
+int 
+TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n );
+/* 删除光标左边处n个字符 */ 
+
+int 
+TextLayer_Text_Delete( LCUI_TextLayer *layer, int n );
+/* 删除光标右边处n个字符 */ 
+
+LCUI_Pos 
+TextLayer_Get_Pixel_Pos( LCUI_TextLayer *layer, uint32_t char_pos );
+/* 根据源文本中的位置，获取该位置的字符相对于文本图层的坐标 */ 
+
+uint32_t 
+TextLayer_Get_Char_Pos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos );
+/* 根据文本图层的相对坐标，获取该坐标对应于源文本中的字符 */ 
+
+int 
+TextLayer_Get_Select_Text( LCUI_TextLayer *layer, char *out_text );
+/* 获取文本图层内被选中的文本 */ 
+
+int 
+TextLayer_Copy_Select_Text( LCUI_TextLayer *layer );
+/* 复制文本图层内被选中的文本 */ 
+
+int 
+TextLayer_Cut_Select_Text( LCUI_TextLayer *layer );
+/* 剪切文本图层内被选中的文本 */ 
+
+void 
+TextLayer_Using_StyleTags( LCUI_TextLayer *layer, BOOL flag );
+/* 指定文本图层是否处理样式标签 */ 
+
+/************************* End LCUI_TextLayer *************************/
+
+
 LCUI_END_HEADER
 
 

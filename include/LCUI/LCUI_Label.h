@@ -40,51 +40,25 @@
  * ****************************************************************************/
 #ifndef __LCUI_LABEL_H__
 #define __LCUI_LABEL_H__
-typedef struct _LCUI_Label LCUI_Label;
-/**************************** lable部件 ********************************/
-struct _LCUI_Label
-{
-	int auto_size;           /* 自动调整大小(IS_TURE/IS_FALSE) */
 
-	LCUI_Font	font;		/* 保存着字体信息 */
-	LCUI_String	text;		/* 与控件关联的文本，这个是原始字符串 */
-	LCUI_WString	*contents;	/* 内容，记录着每个字的信息以及位图 */
-	int		rows;		/* 内容的行数 */
-	LCUI_Align	text_align;	/* 文本的对齐方式 */
-};/* 可用于显示运行时的信息或者说明性文字 */
-/******************************* END ************************************/
+#include LC_FONT_H
+
+typedef struct _LCUI_TextLayer LCUI_Label;
 
 LCUI_BEGIN_HEADER
 
-int Get_Label_Row_Len(LCUI_Widget *widget, int row);
-/*
- * 功能：获取label部件中指定行的字符串长度
- * 参数说明：
- * widget ：需要进行操作的部件
- * row   : 第几行
- * 返回值：失败则返回-2，成功返回长度，类型不符返回-1
- * */ 
+/************************* Label部件操作 *******************************/
+void Refresh_Label_FontBitmap(LCUI_Widget *widget);
+/* 功能：刷新label部件内的字体位图 */ 
 
 void Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...);
-/* 功能：设定与标签关联的文本内容 */
+/* 功能：设定与标签关联的文本内容 */ 
 
-int Set_Label_Font(LCUI_Widget *widget, int font_size, char *font_file);
-/*
- * 功能：为标签文字设定字体大小、字体类型、字体颜色
- * 参数说明：
- * widget    ：需要进行操作的部件
- * font_file ：字体文件的位置，最好为绝对路径
- * color     ：字体的配色，也就是最终显示的颜色
- * */ 
+int Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
+/* 为Label部件内显示的文本设定文本样式 */ 
+/***************************** END ************************************/
 
-void Set_Label_Font_Default_Color(LCUI_Widget *widget, LCUI_RGB color);
-/*
- * 功能：设置label部件关联的文本的字体颜色，字体颜色为RGB三色的混合色
- * 参数说明：
- * label ：需要进行操作的label部件
- * color : 配色
- * */ 
- 
+
 LCUI_END_HEADER
 
 

@@ -64,9 +64,6 @@ struct _LCUI_ProgressBar
 
 LCUI_BEGIN_HEADER
 
-int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height);
-/* 功能：绘制进度条的空槽 */ 
-
 LCUI_Widget *Get_ProgressBar_Flash_Img_Widget(LCUI_Widget *widget);
 /* 功能：获取进度条上闪光图形所在的PictureBox部件 */ 
 

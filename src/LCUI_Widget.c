@@ -793,18 +793,18 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 		return -2;
 	}
 	
-	int i, j ,x = start_x, y = start_y, height = 0;
-	for(i = 0; i < rows; ++i) {
-		for(j=0; j < contents[i].size; ++j) {
-			if(contents[i].string[j].bitmap.height > 0) {
-				height = contents[i].string[j].bitmap.height;
-				break;
-			}
-		}
-		if(height > 0) {
-			break;
-		}
-	}
+	int i, j ,x = start_x, y = start_y, height = 13;
+	//for(i = 0; i < rows; ++i) {
+		//for(j=0; j < contents[i].size; ++j) {
+			//if(contents[i].string[j].bitmap.height > 0) {
+				//height = contents[i].string[j].bitmap.height;
+				//break;
+			//}
+		//}
+		//if(height > 0) {
+			//break;
+		//}
+	//}
 	
 	Graph_Lock(&widget->graph, 1);
 	for(i = 0; i < rows; ++i) {
@@ -818,7 +818,7 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 			}
 			/* 粘贴每个字 */
 			FontBMP_Mix(
-				&widget->graph,  x, y , 
+				&widget->graph,  Pos(x, y) , 
 				&contents[i].string[j].bitmap , 
 				contents[i].string[j].color, flag );
 			
@@ -827,7 +827,7 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 				contents[i].update = IS_FALSE;
 				Add_Widget_Refresh_Area( widget, 
 					Rect(	start_x, y-1, widget->size.w, 
-					contents[i].string[0].bitmap.height+2 )
+					contents[i].string[0].bitmap.rows+2 )
 				);
 				/* 稍微增加点区域范围，所以y-1，height+2 */
 			}
@@ -841,7 +841,7 @@ int Mix_Widget_FontBitmap(	LCUI_Widget *widget,
 		if(contents[i].size == 0) {
 			y += height;
 		} else {
-			y += contents[i].string[0].bitmap.height; 
+			y += 13;//contents[i].string[0].bitmap.height; 
 		}
 		/* 累计文字行距 */
 		if(i > 0 && i < rows - 1) {

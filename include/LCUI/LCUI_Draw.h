@@ -73,6 +73,10 @@ int Load_Image(const char *filepath, LCUI_Graph *out);
  * 说明：打开图片文件，并解码至内存，打开的图片文件越大，占用的内存也就越大 
  * */
 
+
+int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height);
+/* 功能：绘制进度条的空槽 */ 
+
 LCUI_END_HEADER
 
 #endif

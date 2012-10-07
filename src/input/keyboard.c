@@ -161,13 +161,18 @@ int debug_mark = 0;
 static int disable_key = IS_FALSE;
 extern int LCUI_Active();
 
+#include LC_DISPLAY_H
+
 static void * Handle_Key_Input ()
 /* 功能：处理按键输入 */
 {
 	int key; 
 	int sleep_time = 1500;
+	
+	LCUI_Rect area;
 	LCUI_Graph graph;
 	Graph_Init(&graph);
+	area = Rect((Get_Screen_Width()-320)/2, (Get_Screen_Height()-240)/2, 320, 240);
 	while (LCUI_Active()) {
 		if (Check_Key ()) {/* 如果有按键输入 */ 
 			sleep_time = 1500;
@@ -188,7 +193,7 @@ static void * Handle_Key_Input ()
 					timeinfo->tm_mday, timeinfo->tm_hour, 
 					timeinfo->tm_min, timeinfo->tm_sec
 				);
-				Catch_Screen_Graph_By_FB(Rect(0, 0, 1280, 800), &graph);
+				Catch_Screen_Graph_By_FB( area, &graph );
 				write_png(filename, &graph);
 			}
 			#endif
