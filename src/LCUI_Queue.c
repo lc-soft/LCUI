@@ -38,6 +38,9 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
+
+#define DEBUG
+
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_MISC_H
@@ -197,6 +200,7 @@ void Destroy_Queue(LCUI_Queue * queue)
 				p = p->next;
 				free( obj );
 			}
+			queue->data_head_node.next = NULL;
 		}
 	}
 	free (queue->data_array);/* 释放二维指针占用的的内存空间 */ 
@@ -433,8 +437,10 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 			memcpy(&queue->data_array[pos], &data, sizeof(void*));
 		}
 	} else {/* 否则，数据是以链表形式储存 */  
+		DEBUG_MSG("new total_num: %d\n", queue->total_num);
 		if(queue->total_num > queue->max_num) {
 			p = &queue->data_head_node;
+			DEBUG_MSG("head_node: %p, next: %p\n", p, p->next);
 			while ( p->next ) {
 				p = p->next;
 			} 
