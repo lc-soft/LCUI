@@ -808,7 +808,7 @@ int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 	uchar_t *r1, *g1, *a1, *b1, *r2, *g2, *b2; 
 
 	float k;
-	uint_t total, y = 0, m, n;
+	uint_t total, y = 0, m, n, tmp_m, tmp_n;
 	LCUI_Graph *src, *des;
 	LCUI_Rect cut, src_rect, des_rect;
 	
@@ -845,58 +845,57 @@ int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 	if(Graph_Have_Alpha(src)) {
 		k = src->alpha / 255.0;
 		if(src->alpha == 255){
-			for (y = 0; y < cut.height; ++y) {
-				m = (cut.y + y + src_rect.y) * src->width + cut.x + src_rect.x;
-				n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
-				/*
-				 * 原来的代码是这样的：
-				 * for (x = 0; x < cut.width; ++x) {
-				 *   temp = m + x; //得出图片内需要读取的区域的各点坐标
-				 *   count = n + x; //得出需填充至窗口的各点的坐标 
-				 *   ......
-				 * }
-				 * 为了尽可能的提高效率，使用了以下简化的代码：
-				 * */
-				//
-				total = n + cut.width;
+			/* 根据左上角点的二维坐标，计算出一维坐标 */
+			m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
+			n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+			for (y = 0; y < cut.height; ++y) { 
+				/* 保存这一行开头的像素点的位置 */
+				tmp_n = n; tmp_m = m;
+				total = tmp_n + cut.width;
 				/* 根据alpha通道来混合像素点 */
-				for (; n < total; ++n,++m) { 
-					des->rgba[0][n] = ALPHA_BLENDING(src->rgba[0][m], des->rgba[0][n], src->rgba[3][m]); 
-					des->rgba[1][n] = ALPHA_BLENDING(src->rgba[1][m], des->rgba[1][n], src->rgba[3][m]);
-					des->rgba[2][n] = ALPHA_BLENDING(src->rgba[2][m], des->rgba[2][n], src->rgba[3][m]); 
+				for (; tmp_n < total; ++tmp_n,++tmp_m) { 
+					des->rgba[0][tmp_n] = ALPHA_BLENDING(src->rgba[0][tmp_m], des->rgba[0][tmp_n], src->rgba[3][tmp_m]); 
+					des->rgba[1][tmp_n] = ALPHA_BLENDING(src->rgba[1][tmp_m], des->rgba[1][tmp_n], src->rgba[3][tmp_m]);
+					des->rgba[2][tmp_n] = ALPHA_BLENDING(src->rgba[2][tmp_m], des->rgba[2][tmp_n], src->rgba[3][tmp_m]); 
 				}
-				//
+				/* 切换到下一行像素点 */
+				m += src->width;
+				n += des->width; 
 			}
 		} else {
+			m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
+			n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
 			for (y = 0; y < cut.height; ++y) {
-				m = (cut.y + y + src_rect.y) * src->width + cut.x + src_rect.x;
-				n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
-				total = n + cut.width; 
-				for (; n < total; ++n,++m) { 
+				tmp_n = n; tmp_m = m;
+				total = tmp_n + cut.width; 
+				for (; tmp_n < total; ++tmp_n,++tmp_m) { 
 					j = src->rgba[3][m] * k;
-					des->rgba[0][n] = ALPHA_BLENDING(src->rgba[0][m], des->rgba[0][n], j); 
-					des->rgba[1][n] = ALPHA_BLENDING(src->rgba[1][m], des->rgba[1][n], j);
-					des->rgba[2][n] = ALPHA_BLENDING(src->rgba[2][m], des->rgba[2][n], j); 
-				}
-			} 
+					des->rgba[0][tmp_n] = ALPHA_BLENDING(src->rgba[0][tmp_m], des->rgba[0][tmp_n], j); 
+					des->rgba[1][tmp_n] = ALPHA_BLENDING(src->rgba[1][tmp_m], des->rgba[1][tmp_n], j);
+					des->rgba[2][tmp_n] = ALPHA_BLENDING(src->rgba[2][tmp_m], des->rgba[2][tmp_n], j);  
+				} 
+				m += src->width;
+				n += des->width; 
+			}
 		} 
-	} else if(fore_graph->alpha < 255) {
+	} else if(fore_graph->alpha < 255) { 
+		m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
+		n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
 		for (y = 0; y < cut.height; ++y) {
-			m = (cut.y + y + src_rect.y) * src->width + cut.x + src_rect.x;
-			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
-			total = n + cut.width; 
-			for (; n < total; ++n,++m) {
-				des->rgba[0][n] = ALPHA_BLENDING(src->rgba[0][m], des->rgba[0][n], fore_graph->alpha); 
-				des->rgba[1][n] = ALPHA_BLENDING(src->rgba[1][m], des->rgba[1][n], fore_graph->alpha);
-				des->rgba[2][n] = ALPHA_BLENDING(src->rgba[2][m], des->rgba[2][n], fore_graph->alpha); 
-			} 
+			tmp_n = n; tmp_m = m;
+			total = tmp_n + cut.width; 
+			for (; tmp_n < total; ++tmp_n,++tmp_m) { 
+				des->rgba[0][tmp_n] = ALPHA_BLENDING(src->rgba[0][tmp_m], des->rgba[0][tmp_n], fore_graph->alpha); 
+				des->rgba[1][tmp_n] = ALPHA_BLENDING(src->rgba[1][tmp_m], des->rgba[1][tmp_n], fore_graph->alpha);
+				des->rgba[2][tmp_n] = ALPHA_BLENDING(src->rgba[2][tmp_m], des->rgba[2][tmp_n], fore_graph->alpha); 
+			}
+			m += src->width;
+			n += des->width; 
 		}
 	} else {/* 如果前景图形没有透明效果 */
-		for (y = 0; y < cut.height; ++y) { 
-			/* 计算前景图内需要读取的区域的各起点坐标 */
-			m = (cut.y + y + src_rect.y) * src->width + cut.x + src_rect.x;
-			/* 计算背景图内需要读取的区域的各起点坐标 */
-			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+		m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
+		n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+		for (y = 0; y < cut.height; ++y) {
 			/* 使用指针来引用 */
 			r1 = des->rgba[0] + n;
 			g1 = des->rgba[1] + n;
@@ -914,6 +913,8 @@ int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 			if(Graph_Have_Alpha(des)) {
 				memset(a1, src->alpha, sizeof(uchar_t)*cut.width);
 			}
+			m += src->width;
+			n += des->width; 
 		}
 	} 
 	
@@ -931,7 +932,7 @@ int Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 {
 	uchar_t *r1, *g1, *a1, *a2, *b1, *r2, *g2, *b2;
 
-	int y = 0,total, m, n;
+	uint_t y,total, m, n, tmp_m, tmp_n;
 	uchar_t j, k; 
 	
 	LCUI_Graph *src, *des;
@@ -965,18 +966,20 @@ int Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 	Graph_Lock(src, 0);
 	Graph_Lock(des, 1);
 	k = src->alpha / 255.0;
-	if(Graph_Have_Alpha(src) && !Graph_Have_Alpha(des)) {
+	if(Graph_Have_Alpha(src) && !Graph_Have_Alpha(des)) { 
+		m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
+		n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
 		for (y = 0; y < cut.height; ++y) {
-			m = (cut.y + y + src_rect.y) * src->width + cut.x + src_rect.x;
-			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
-			total = n + cut.width; 
-			for (; n < total; ++n,++m) {
-				j = src->rgba[3][m] * k; 
-				/* 去掉alpha通道后，默认使用白色背景 */
-				des->rgba[0][n] = (src->rgba[0][m]*j + 255*(255-j))/255;
-				des->rgba[1][n] = (src->rgba[1][m]*j + 255*(255-j))/255;
-				des->rgba[2][n] = (src->rgba[2][m]*j + 255*(255-j))/255; 
-			}
+			tmp_n = n; tmp_m = m;
+			total = tmp_n + cut.width; 
+			for (; tmp_n < total; ++tmp_n,++tmp_m) { 
+				j = src->rgba[3][m] * k;
+				des->rgba[0][tmp_n] = ALPHA_BLENDING(src->rgba[0][tmp_m], 255, j); 
+				des->rgba[1][tmp_n] = ALPHA_BLENDING(src->rgba[1][tmp_m], 255, j);
+				des->rgba[2][tmp_n] = ALPHA_BLENDING(src->rgba[2][tmp_m], 255, j);  
+			} 
+			m += src->width;
+			n += des->width; 
 		}
 	} else {
 		for (y = 0; y < cut.height; ++y) { 
