@@ -42,6 +42,8 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
 #include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 
 /************************ thread management ***************************/ 
 thread_t thread_self()

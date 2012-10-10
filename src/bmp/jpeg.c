@@ -1,11 +1,13 @@
+#include "config.h"
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
 #include LC_ERROR_H 
 
-#include <stdio.h> 
+#ifdef USE_LIBJPEG
 #include <jpeglib.h>
 #include <jerror.h>
+#include <setjmp.h>
 
 struct my_error_mgr {
 	struct jpeg_error_mgr pub;
@@ -20,10 +22,12 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 	(*cinfo->err->output_message)(cinfo);
 	longjmp(myerr->setjmp_buffer,1);
 }
+#endif
 
 int load_jpeg(const char *filepath, LCUI_Graph *out)
 /* 功能：载入并解码jpg图片 */
 {
+#ifdef USE_LIBJPEG
 	FILE *fp;
 	fp = fopen(filepath,"r");
 	if(fp == NULL) {
@@ -97,5 +101,8 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 	(void) jpeg_finish_decompress(&cinfo);
 	jpeg_destroy_decompress(&cinfo);
 	fclose(fp);
+#else
+	printf("warning: not JPEG support!"); 
+#endif
 	return 0;
 }

@@ -5,9 +5,11 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <linux/fb.h>
 #include <sys/mman.h>
-#include <stdio.h>
 #include <sys/ioctl.h> 
 #include <fcntl.h>
 #include <errno.h>

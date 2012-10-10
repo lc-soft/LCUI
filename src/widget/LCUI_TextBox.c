@@ -14,9 +14,8 @@
 #include LC_GRAPH_H
 #include LC_FONT_H
 #include LC_ERROR_H 
-#include <wchar.h>
 
-typedef struct _LCUI_TextBox		LCUI_TextBox;
+typedef struct _LCUI_TextBox	 LCUI_TextBox;
 
 struct _LCUI_TextBox
 {

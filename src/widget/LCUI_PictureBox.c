@@ -46,7 +46,6 @@
 #include LC_DRAW_H
 #include LC_WIDGET_H
 #include LC_PICBOX_H
-#include LC_MEM_H
 
 static void Destroy_PictureBox(LCUI_Widget* widget)
 /* 功能：释放图片盒子占用的内存资源 */

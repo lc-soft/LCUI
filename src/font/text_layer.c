@@ -7,7 +7,11 @@
 #include LC_GRAPH_H
 #include LC_WIDGET_H
 #include LC_FONT_H
+
 #include <wchar.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct _Special_KeyWord	Special_KeyWord;
 typedef struct _LCUI_CharData	LCUI_CharData;
@@ -118,6 +122,13 @@ TextStyle_FontDecoration( LCUI_TextStyle *style, enum_font_decoration decoration
 {
 	style->decoration = decoration;
 }
+
+int 
+TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b )
+{
+	return 0;
+}
+
 /************************** End TextStyle *****************************/
 
 
@@ -629,16 +640,22 @@ TextLayer_Clear( LCUI_TextLayer *layer )
 	layer->current_des_pos = Pos(0,0);
 }
 
+int TextLayer_Text_Length( LCUI_TextLayer *layer )
+/* 获取文本位图中的文本长度 */
+{
+	return Queue_Get_Total( &layer->text_source_data );
+}
+
 int
 TextLayer_Text( LCUI_TextLayer *layer, char *new_text )
-/* 设定整个文本图层中需显示的文本，光标复位，原有选中文本被删除 */
+/* 设定整个文本图层中需显示的文本，原有选中文本被删除 */
 {
 	TextLayer_Clear( layer );
 	return TextLayer_Text_Add( layer, new_text );
 }
 
 int 
-TextLayer_Append( LCUI_TextLayer *layer, char *new_text )
+TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text )
 /* 在文本末尾追加文本，不移动光标，不删除原有选中文本 */
 {
 	return 0;

@@ -48,8 +48,7 @@
 #include LC_GRAPH_H
 #include LC_RES_H 
 #include LC_MISC_H 
-#include LC_INPUT_H 
-#include LC_MEM_H 
+#include LC_INPUT_H
 
 void Set_CheckBox_On(LCUI_Widget *widget)
 /* 功能：设定复选框为选中状态 */

@@ -4,6 +4,8 @@
 #include LC_FONT_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <iconv.h>
 
 /* 代码转换:从一种编码转为另一种编码，主要是调用iconv的API实现字符编码转换 */

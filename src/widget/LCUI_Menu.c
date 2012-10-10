@@ -55,7 +55,7 @@
 #include LC_DISPLAY_H
 #include LC_MENU_H
 #include LC_RES_H
-#include LC_MEM_H
+
 
 static void Menu_Init(LCUI_Widget *widget)
 /* 功能：初始化菜单的数据结构体 */

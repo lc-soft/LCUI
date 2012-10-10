@@ -38,8 +38,9 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
- 
+
 //#define DEBUG
+#include "config.h"
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_MISC_H
@@ -48,10 +49,17 @@
 #include LC_ERROR_H
 #include LC_GRAPH_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <iconv.h>
 
+#ifdef USE_FREETYPE
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include FT_OUTLINE_H
+#endif
 
 extern uchar_t const *in_core_font_8x8();
 
@@ -198,8 +206,13 @@ void LCUI_Font_Init(LCUI_Font *font)
 	font->status = KILLED;
 	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT;
 	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_MONOCHROME;
+#ifdef USE_FREETYPE
 	font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT; 
 	font->render_mode = FT_RENDER_MODE_MONO;
+#else
+	font->load_flags = 0;
+	font->render_mode = 0;
+#endif
 	font->ft_lib = NULL;
 	font->ft_face = NULL;
 	/* 如果在环境变量中定义了字体文件路径，那就使用它 */
@@ -252,8 +265,10 @@ void Font_Free(LCUI_Font *in)
 	if(in->status == ACTIVE) { 
 		in->status = KILLED;
 		if(in->type == CUSTOM) { 
+#ifdef USE_FREETYPE
 			FT_Done_Face(in->ft_face);
 			FT_Done_FreeType(in->ft_lib);
+#endif
 		}
 		in->ft_lib = NULL;
 		in->ft_face = NULL;
@@ -268,8 +283,10 @@ void LCUI_Font_Free()
 	String_Free(&LCUI_Sys.default_font.style_name);
 	if(LCUI_Sys.default_font.status == ACTIVE) {
 		LCUI_Sys.default_font.status = KILLED;
+#ifdef USE_FREETYPE
 		FT_Done_Face(LCUI_Sys.default_font.ft_face);
 		FT_Done_FreeType(LCUI_Sys.default_font.ft_lib); 
+#endif
 		LCUI_Sys.default_font.ft_lib = NULL;
 		LCUI_Sys.default_font.ft_face = NULL;
 	}
@@ -357,6 +374,7 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 /* 功能：打开字体文件，并保存数据至LCUI_Font结构体中 */
 {
+#ifdef USE_FREETYPE
 	int type;
 	FT_Library    library;
 	FT_Face       face;
@@ -410,8 +428,13 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 	font_data->ft_lib = library;
 	font_data->ft_face = face;
 	return 0;
+#else
+	printf("warning: not font engine support!\n");
+	return -1;
+#endif
 }
 
+#ifdef USE_FREETYPE
 static int Convert_FT_BitmapGlyph(LCUI_FontBMP *des, const FT_BitmapGlyph src)
 {
 	static size_t size;
@@ -433,6 +456,7 @@ static int Convert_FT_BitmapGlyph(LCUI_FontBMP *des, const FT_BitmapGlyph src)
 	DEBUG_MSG("des->top: %d, des->left: %d, des->rows: %d\n", des->top, des->left, des->rows);
 	return size;
 }
+#endif
 
 int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap)
 /*
@@ -441,6 +465,7 @@ int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap)
  * 成功打开一次，此函数不会再次打开字体文件。
  */
 {
+#ifdef USE_FREETYPE
 	size_t size;
 	BOOL have_space = IS_FALSE;
 	
@@ -501,6 +526,10 @@ int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap)
 	}
 	FT_Done_Glyph(glyph);
 	return 0;
+#else
+	Get_Default_FontBMP( ch, out_bitmap );
+	return -1;
+#endif
 }
 
 

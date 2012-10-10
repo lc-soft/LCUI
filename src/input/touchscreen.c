@@ -39,12 +39,17 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
+//#include "config.h"
+
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_CURSOR_H
 #include LC_WIDGET_H
 #include LC_DISPLAY_H
 #include LC_INPUT_H
+
+#ifdef USE_TSLIB
+#include <tslib.h> 
 
 static void * Handle_TouchScreen_Input ()
 /* 功能：处理触屏输入 */
@@ -134,23 +139,33 @@ static void * Handle_TouchScreen_Input ()
 	LCUI_Sys.ts.status = REMOVE;
 	thread_exit (NULL);
 }
+#endif
 
 int Enable_TouchScreen_Input()
 /* 功能：启用触屏输入处理 */
 { 
+#ifdef USE_TSLIB
 	if(LCUI_Sys.ts.status == REMOVE) {
+		printf("enable touchscreen input processing\n");
 		return  thread_create ( &LCUI_Sys.ts.thread, NULL, 
 					Handle_TouchScreen_Input, NULL ); 
 	}
 	return 0;
+#else
+	return -1;
+#endif
 }
 
 int Disable_TouchScreen_Input()
 /* 功能：撤销触屏输入处理 */
 {
+#ifdef USE_TSLIB
 	if(LCUI_Sys.ts.status == INSIDE) {
 		return thread_cancel ( LCUI_Sys.ts.thread ); 
 	}
 	return 0;
+#else
+	return -1;
+#endif
 }
 

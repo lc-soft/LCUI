@@ -47,8 +47,7 @@
 #include LC_GRAPH_H
 #include LC_DRAW_H
 #include LC_MISC_H
-#include LC_INPUT_H 
-#include LC_MEM_H 
+#include LC_INPUT_H
 
 static void Exec_Update_Button(LCUI_Widget *widget)
 /* 功能：更新按钮的图形数据 */

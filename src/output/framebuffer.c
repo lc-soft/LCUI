@@ -3,6 +3,8 @@
 #include LC_GRAPH_H
 #include LC_DISPLAY_H 
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <linux/fb.h> 
 #include <sys/ioctl.h> 
 

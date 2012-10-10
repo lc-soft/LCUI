@@ -1,12 +1,20 @@
+#include "config.h"
 #include <LCUI_Build.h>
+
+#ifdef USE_LIBPNG
 #include <png.h>
+#endif
+
 #include LC_LCUI_H
 #include LC_ERROR_H
 #include LC_GRAPH_H
 
+#include <stdlib.h>
+
 int load_png(const char *filepath, LCUI_Graph *out)
 /* 载入PNG图片中的图形数据 */
 {
+#ifdef USE_LIBPNG
 	FILE *pic_fp;
 	pic_fp = fopen(filepath, "rb");
 	if(pic_fp == NULL) {/* 文件打开失败 */
@@ -103,39 +111,49 @@ int load_png(const char *filepath, LCUI_Graph *out)
 		return 1;
 	}
 	/* 撤销数据占用的内存 */
-	png_destroy_read_struct(&png_ptr, &info_ptr, 0); 
+	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+#else
+	printf("warning: not PNG support!"); 
+#endif
 	return 0;
 }
 
 int write_png(const char *file_name, LCUI_Graph *graph)
 /* 将图像数据写入至png文件 */
 {
+#ifdef USE_LIBPNG
 	int j, i, temp, pos;
 	png_byte color_type; 
 
 	png_structp png_ptr;
 	png_infop info_ptr; 
 	png_bytep * row_pointers;
+	
+	if(!Graph_Valid(graph)) {
+		printf("write_png(): graph is not valid\n");
+		return -1;
+	}
+	
 	/* create file */
 	FILE *fp = fopen(file_name, "wb");
 	if (!fp) {
-		printf("write_png(): File %s could not be opened for writing", file_name);
+		printf("write_png(): File %s could not be opened for writing\n", file_name);
 		return -1;
 	}
 	/* initialize stuff */
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
 	if (!png_ptr) {
-		printf("write_png(): png_create_write_struct failed");
+		printf("write_png(): png_create_write_struct failed\n");
 		return -1;
 	}
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr) {
-		printf("write_png(): png_create_info_struct failed");
+		printf("write_png(): png_create_info_struct failed\n");
 		return -1;
 	}
 	if (setjmp(png_jmpbuf(png_ptr))) {
-		printf("write_png(): Error during init_io");
+		printf("write_png(): Error during init_io\n");
 		return -1;
 	}
 	png_init_io(png_ptr, fp);
@@ -143,7 +161,7 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 
 	/* write header */
 	if (setjmp(png_jmpbuf(png_ptr))) {
-		printf("write_png(): Error during writing header");
+		printf("write_png(): Error during writing header\n");
 		return -1;
 	}
 	Graph_Lock(graph, 0);
@@ -162,7 +180,7 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 	/* write bytes */
 	if (setjmp(png_jmpbuf(png_ptr)))
 	{
-		printf("write_png(): Error during writing bytes");
+		printf("write_png(): Error during writing bytes\n");
 		Graph_Unlock(graph);
 		return -1;
 	}
@@ -188,7 +206,7 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 
 	/* end write */
 	if (setjmp(png_jmpbuf(png_ptr))) {
-		printf("write_png(): Error during end of write");
+		printf("write_png(): Error during end of write\n");
 		Graph_Unlock(graph);
 		return -1;
 	}
@@ -202,6 +220,9 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 
 	fclose(fp);
 	Graph_Unlock(graph);
+#else
+	printf("warning: not PNG support!"); 
+#endif
 	return 0;
 }
 

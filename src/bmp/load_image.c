@@ -5,6 +5,9 @@
 #include LC_GRAPH_H 
 #include LC_DRAW_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
 static int detect_image(const char *filepath, LCUI_Graph *out)
 /* 功能：检测图片格式，并解码图片 */
 {

@@ -47,7 +47,6 @@
 #include LC_GRAPH_H
 #include LC_LABEL_H
 
-#include <stdarg.h>
 /**************************** 私有函数 **********************************/
 static void Label_Init(LCUI_Widget *widget)
 /* 功能：初始化label部件数据 */

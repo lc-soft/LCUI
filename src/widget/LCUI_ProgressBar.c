@@ -46,8 +46,8 @@
 #include LC_PROGBAR_H
 #include LC_PICBOX_H 
 #include LC_RES_H 
+
 #include <unistd.h>
-#include <pthread.h>
 
 LCUI_Widget *Get_ProgressBar_Flash_Img_Widget(LCUI_Widget *widget)
 /* 功能：获取进度条上闪光图形所在的PictureBox部件 */
@@ -114,8 +114,7 @@ static void Exec_Update_ProgressBar(LCUI_Widget *widget)
 		if(!Graph_Valid(&pb->flash_image)) 
 			Load_Graph_ProgressBar_Img(&pb->flash_image);
 		
-		Resize_Widget(pb->img_pic_box, 
-				Size(pb->flash_image.width, pb->flash_image.height)); 
+		Resize_Widget(pb->img_pic_box, Get_Graph_Size(&pb->flash_image)); 
 		/* 让图片盒子显示这个图形 */
 		Set_PictureBox_Image_From_Graph(pb->img_pic_box, &pb->flash_image);
 	} else {

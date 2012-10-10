@@ -48,8 +48,7 @@
 #include LC_GRAPH_H
 #include LC_RES_H 
 #include LC_MISC_H 
-#include LC_INPUT_H 
-#include LC_MEM_H 
+#include LC_INPUT_H
 
 static LCUI_Queue	mutex_lib;
 static int mutex_lib_init = 0; /* 标志，是否初始化过 */
@@ -63,11 +62,9 @@ void RadioButton_Delete_Mutex(LCUI_Widget *widget)
 	
 	rb = (LCUI_RadioButton *)Get_Widget_PrivData(widget);
 	total = Queue_Get_Total(rb->mutex);
-	for(i=0; i<total; ++i)
-	{
+	for(i=0; i<total; ++i) {
 		tmp = (LCUI_Widget*)Queue_Get(rb->mutex, i);
-		if(tmp == widget)
-		{
+		if(tmp == widget) {
 			Queue_Delete_Pointer(rb->mutex, i);
 			break;
 		}
@@ -80,8 +77,7 @@ void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 	int pos;
 	LCUI_Queue *p, queue;
 	LCUI_RadioButton *rb_a, *rb_b;
-	if(mutex_lib_init == 0)
-	{
+	if(mutex_lib_init == 0) {
 		Queue_Init(&mutex_lib, sizeof(LCUI_Queue), Destroy_Queue);
 		mutex_lib_init = 1;
 	}
@@ -89,10 +85,8 @@ void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 	rb_a = (LCUI_RadioButton *)Get_Widget_PrivData(a);
 	rb_b = (LCUI_RadioButton *)Get_Widget_PrivData(b);
 	
-	if(rb_a->mutex == NULL)
-	{
-		if(rb_b->mutex == NULL)
-		{
+	if(rb_a->mutex == NULL) {
+		if(rb_b->mutex == NULL) {
 			Queue_Init(&queue, sizeof(LCUI_Widget*), NULL);
 			/* 将子队列添加至父队列，并获取位置 */
 			pos = Queue_Add(&mutex_lib, &queue);
@@ -104,22 +98,15 @@ void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 			/* 保存指向关系队列的指针 */
 			rb_a->mutex = p;
 			rb_b->mutex = p;
-		}
-		else
-		{
+		} else {
 			Queue_Add_Pointer(rb_b->mutex, a);
 			rb_a->mutex = rb_b->mutex;
 		}
-	}
-	else
-	{
-		if(rb_b->mutex == NULL) 
-		{
+	} else {
+		if(rb_b->mutex == NULL) {
 			Queue_Add_Pointer(rb_a->mutex, b);
 			rb_b->mutex = rb_a->mutex;
-		}
-		else 
-		{/* 否则，两个都和其它部件有互斥关系，需要将它们拆开，并重新建立互斥关系 */
+		} else {/* 否则，两个都和其它部件有互斥关系，需要将它们拆开，并重新建立互斥关系 */
 			RadioButton_Delete_Mutex(a);
 			RadioButton_Delete_Mutex(b);
 			RadioButton_Create_Mutex(a, b);
@@ -134,8 +121,8 @@ void Set_RadioButton_On(LCUI_Widget *widget)
 	LCUI_RadioButton *radio_button;
 	LCUI_Widget *other;
 	int i, total;
-	radio_button = (LCUI_RadioButton *)
-								Get_Widget_PrivData(widget); 
+	
+	radio_button = (LCUI_RadioButton *)Get_Widget_PrivData(widget); 
 	if(NULL != radio_button->mutex)
 	{/* 如果与其它部件有互斥关系，就将其它单选框部件的状态改为“未选中”状态 */
 		total = Queue_Get_Total(radio_button->mutex);
@@ -153,7 +140,7 @@ void Set_RadioButton_Off(LCUI_Widget *widget)
 /* 功能：设定单选框为未选中状态 */
 {
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
-								Get_Widget_PrivData(widget); 
+					Get_Widget_PrivData(widget); 
 	
 	radio_button->on = IS_FALSE;
 	Draw_Widget(widget);
@@ -163,7 +150,7 @@ int Get_RadioButton_Status(LCUI_Widget *widget)
 /* 功能：获取单选框的状态 */
 {
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
-								Get_Widget_PrivData(widget); 
+					Get_Widget_PrivData(widget); 
 	
 	return radio_button->on;
 }
@@ -212,9 +199,9 @@ static void RadioButton_Init(LCUI_Widget *widget)
 /* 功能：初始化单选框部件的数据 */
 {
 	LCUI_Widget *container[2];
-	LCUI_RadioButton *radio_button = (LCUI_RadioButton*)
-				Widget_Create_PrivData(widget, sizeof(LCUI_RadioButton));
+	LCUI_RadioButton *radio_button;
 	
+	radio_button = Widget_Create_PrivData(widget, sizeof(LCUI_RadioButton));
 	radio_button->on = IS_FALSE;
 	/* 初始化图片数据 */ 
 	Graph_Init(&radio_button->img_off_disable);
@@ -273,7 +260,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 {
 	LCUI_Graph *p;
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
-								Get_Widget_PrivData(widget); 
+					Get_Widget_PrivData(widget); 
 								
 	if(Strcmp(&widget->style, "custom") == 0)
 	{/* 如果为自定义风格，那就使用用户指定的图形 */
@@ -377,7 +364,7 @@ LCUI_Widget *Get_RadioButton_Label(LCUI_Widget *widget)
 /* 功能：获取单选框部件中的label部件的指针 */
 {
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
-								Get_Widget_PrivData(widget); 
+					Get_Widget_PrivData(widget); 
 	if(NULL == radio_button)
 		return NULL;
 		
@@ -388,7 +375,7 @@ LCUI_Widget *Get_RadioButton_ImgBox(LCUI_Widget *widget)
 /* 功能：获取单选框部件中的PictureBox部件的指针 */
 {
 	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
-								Get_Widget_PrivData(widget); 
+					Get_Widget_PrivData(widget); 
 	if(NULL == radio_button)
 		return NULL;
 		
