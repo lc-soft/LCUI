@@ -68,7 +68,15 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libLCUI_la_DEPENDENCIES = $(LCUI_LIBADD)
+am__DEPENDENCIES_1 =
+am__DEPENDENCIES_2 = bmp/libbmp.la draw/libdraw.la \
+	draw/in-core/libdraw_incore.la misc/libmisc.la font/libfont.la \
+	font/in-core/libfont_incore.la input/libinput.la \
+	output/liboutput.la thread/libthread.la widget/libwidget.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+libLCUI_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__objects_1 = LCUI_Main.lo LCUI_Queue.lo LCUI_Graph.lo LCUI_Work.lo \
 	LCUI_Cursor.lo LCUI_Widget.lo LCUI_Error.lo LCUI_Thread.lo
 am_libLCUI_la_OBJECTS = $(am__objects_1)
@@ -177,12 +185,15 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+FREETYPE_LIBS = @FREETYPE_LIBS@
 GREP = @GREP@
+ICONV_LIBS = @ICONV_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+JPEG_LIBS = @JPEG_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
@@ -208,11 +219,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PNG_LIBS = @PNG_LIBS@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+THREAD_LIBS = @THREAD_LIBS@
+TS_LIBS = @TS_LIBS@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -294,7 +308,13 @@ LCUI_LIBADD = \
 	input/libinput.la \
 	output/liboutput.la \
 	thread/libthread.la \
-	widget/libwidget.la
+	widget/libwidget.la \
+	$(JPEG_LIBS) \
+	$(PNG_LIBS) \
+	$(THREAD_LIBS) \
+	$(FREETYPE_LIBS) \
+	$(ICONV_LIBS) \
+	$(TS_LIBS)
 
 SUBDIRS = bmp misc draw font input output thread widget
 lib_LTLIBRARIES = libLCUI.la

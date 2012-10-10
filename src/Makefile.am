@@ -36,7 +36,13 @@ LCUI_LIBADD = \
 	input/libinput.la \
 	output/liboutput.la \
 	thread/libthread.la \
-	widget/libwidget.la
+	widget/libwidget.la \
+	$(JPEG_LIBS) \
+	$(PNG_LIBS) \
+	$(THREAD_LIBS) \
+	$(FREETYPE_LIBS) \
+	$(ICONV_LIBS) \
+	$(TS_LIBS)
 
 SUBDIRS = bmp misc draw font input output thread widget
 
