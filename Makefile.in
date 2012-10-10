@@ -161,12 +161,15 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+FREETYPE_LIBS = @FREETYPE_LIBS@
 GREP = @GREP@
+ICONV_LIBS = @ICONV_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+JPEG_LIBS = @JPEG_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
@@ -192,11 +195,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PNG_LIBS = @PNG_LIBS@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+THREAD_LIBS = @THREAD_LIBS@
+TS_LIBS = @TS_LIBS@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -284,6 +290,7 @@ test/test_radiobtn.c \
 test/test_rect_cut.c \
 test/test_viewimage.c \
 test/test_window.c \
+test/test_gaussian_blur.c \
 test/mora/mora.c \
 test/mora/README.zh-cn \
 test/mora/drawable/btn_down.png \

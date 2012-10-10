@@ -6,29 +6,17 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
+/* Define to 1 if you have the <ft2build.h> header file. */
+#undef HAVE_FT2BUILD_H
+
 /* Define to 1 if you have the `getpagesize' function. */
 #undef HAVE_GETPAGESIZE
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `freetype' library (-lfreetype). */
-#undef HAVE_LIBFREETYPE
-
-/* Define to 1 if you have the `iconv' library (-liconv). */
-#undef HAVE_LIBICONV
-
-/* Define to 1 if you have the `jpeg' library (-ljpeg). */
-#undef HAVE_LIBJPEG
-
-/* Define to 1 if you have the `png' library (-lpng). */
-#undef HAVE_LIBPNG
-
-/* Define to 1 if you have the `pthread' library (-lpthread). */
-#undef HAVE_LIBPTHREAD
-
-/* Define to 1 if you have the `ts' library (-lts). */
-#undef HAVE_LIBTS
+/* Define to 1 if you have the <jpeglib.h> header file. */
+#undef HAVE_JPEGLIB_H
 
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
@@ -52,12 +40,21 @@
 /* Define to 1 if you have the `munmap' function. */
 #undef HAVE_MUNMAP
 
+/* Define to 1 if you have the <png.h> header file. */
+#undef HAVE_PNG_H
+
+/* Define to 1 if you have the <pthread.h> header file. */
+#undef HAVE_PTHREAD_H
+
 /* Define to 1 if your system has a GNU libc compatible `realloc' function,
    and to 0 otherwise. */
 #undef HAVE_REALLOC
 
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
+
+/* Define to 1 if you have the <setjmp.h> header file. */
+#undef HAVE_SETJMP_H
 
 /* Define to 1 if stdbool.h conforms to C99. */
 #undef HAVE_STDBOOL_H
@@ -134,6 +131,24 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* Define to 1 if you have the FreeType font engine */
+#undef USE_FREETYPE
+
+/* Define to 1 if you have the libiconv */
+#undef USE_LIBICONV
+
+/* Define to 1 if you have the libjpeg */
+#undef USE_LIBJPEG
+
+/* Define to 1 if you have the libpng */
+#undef USE_LIBPNG
+
+/* Define to 1 if you select pthread for thread support */
+#undef USE_PTHREAD
+
+/* Define to 1 if you have the tslib */
+#undef USE_TSLIB
 
 /* Version number of package */
 #undef VERSION

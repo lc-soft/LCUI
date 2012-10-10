@@ -24,10 +24,9 @@ AC_CONFIG_HEADERS([config.h])
 AM_SILENT_RULES([yes])
 
 # Checks for programs.
-AC_PROG_CC_STDC
+AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
-AC_PROG_AWK 
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
@@ -36,13 +35,71 @@ AC_PROG_RANLIB
 
 # Checks for libraries.
 # 检测LCUI所依赖的库是否存在并且能正常使用
-# 在检测不到可用的依赖库时，会调用AC_MSG_ERROR宏来打印错误信息
-AC_CHECK_LIB(iconv, iconv_open)
-AC_CHECK_LIB(pthread, pthread_create,,AC_MSG_ERROR(pthread is not found!) )
-AC_CHECK_LIB(png, png_create_read_struct,,AC_MSG_ERROR(libpng is not found!))
-AC_CHECK_LIB(freetype, FT_Init_FreeType,,AC_MSG_ERROR(freetype is not found!))
-AC_CHECK_LIB(jpeg, jpeg_read_header,,AC_MSG_ERROR(libjpeg is not found!))
-AC_CHECK_LIB(ts, ts_open,,AC_MSG_ERROR(tslib is not found!))
+want_iconv=no
+AC_ARG_WITH(iconv, [  --with-iconv             use libiconv		(default)])
+if test "x$with_iconv" != "xno"; then
+    AC_CHECK_LIB([iconv], [iconv_open], want_iconv=yes, want_iconv=no)
+    if test "x$want_iconv" != "xno"; then
+	ICONV_LIBS=-liconv
+	AC_SUBST(ICONV_LIBS)
+    fi
+fi
+
+want_thread=no
+thread_name=pthread
+AC_ARG_WITH(pthread, [  --with-pthread             use pthread		(default)])
+if test "x$with_pthread" != "xno"; then
+    AC_CHECK_LIB([pthread], [pthread_create], want_thread=yes, want_thread=no)
+    if test "x$want_thread" != "xno"; then
+	THREAD_LIBS=-lpthread
+	AC_CHECK_HEADERS([pthread.h],want_thread=yes,want_thread=no)
+	AC_SUBST(THREAD_LIBS)
+    fi
+fi
+
+want_freetype=no
+AC_ARG_WITH(freetype, [  --with-freetype             use freetype		(default)])
+if test "x$with_freetype" != "xno"; then
+    AC_CHECK_LIB([freetype], [FT_Init_FreeType], want_freetype=yes, want_freetype=no)
+    if test "x$want_freetype" != "xno"; then
+	FREETYPE_LIBS=-lfreetype
+	AC_CHECK_HEADERS([ft2build.h],want_freetype=yes,want_freetype=no)
+	AC_SUBST(FREETYPE_LIBS)
+    fi
+fi
+
+want_ts=no
+AC_ARG_WITH(ts, [  --with-ts             use tslib		(default)])
+if test "x$with_ts" != "xno"; then
+    AC_CHECK_LIB([ts], [ts_open], want_ts=yes, want_ts=no)
+    if test "x$want_ts" != "xno"; then
+	TS_LIBS=-lts
+	AC_SUBST(TS_LIBS)
+    fi
+fi
+
+want_png=no
+AC_ARG_WITH(png, [  --with-png              use libpng		(default)])
+if test "x$with_png" != "xno"; then
+    AC_CHECK_LIB([png], [png_sig_cmp],want_png=yes,want_png=no)
+    if test "x$want_png" != "xno"; then
+	PNG_LIBS=-lpng
+	AC_CHECK_HEADERS([png.h],want_png=yes,want_png=no)
+	AC_SUBST(PNG_LIBS)
+    fi
+fi
+
+want_jpeg=no
+AC_ARG_WITH(jpeg, [  --with-jpeg             use libjpeg		(default)])
+if test "x$with_jpeg" != "xno"; then
+    AC_CHECK_LIB([jpeg], [jpeg_start_decompress],want_jpeg=yes,want_jpeg=no)
+    if test "x$want_jpeg" != "xno"; then
+	JPEG_LIBS=-ljpeg
+	AC_CHECK_HEADERS([jpeglib.h setjmp.h],want_jpeg=yes,want_jpeg=no)
+	AC_SUBST(JPEG_LIBS)
+    fi
+fi
+
 
 # DEBUG option 
 # 调试选项，如果需要对项目进行调试，可启用调试选项
@@ -75,6 +132,37 @@ AC_FUNC_MALLOC
 AC_FUNC_MMAP
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset munmap select strcasecmp sysinfo])
+
+#根据之前的检测结果，定义相应宏
+if test "$want_png" = "yes"; then
+    AC_DEFINE_UNQUOTED(USE_LIBPNG, 1, Define to 1 if you have the libpng)
+fi
+
+if test "$want_jpeg" = "yes"; then
+    AC_DEFINE_UNQUOTED(USE_LIBJPEG, 1, Define to 1 if you have the libjpeg)
+fi
+
+if test "$want_ts" = "yes"; then
+    AC_DEFINE_UNQUOTED(USE_TSLIB, 1, Define to 1 if you have the tslib)
+fi
+
+if test "$want_freetype" = "yes"; then
+    AC_DEFINE_UNQUOTED(USE_FREETYPE, 1,  Define to 1 if you have the FreeType font engine)
+fi
+
+if test "$want_iconv" = "yes"; then
+    AC_DEFINE_UNQUOTED(USE_LIBICONV, 1, Define to 1 if you have the libiconv)
+fi
+
+if test "$want_thread" = "yes"; then
+    if test "$thread_name" = "pthread"; then
+        AC_DEFINE_UNQUOTED(USE_PTHREAD, 1, Define to 1 if you select pthread for thread support)
+    else 
+        thread_name=none
+    fi
+else 
+    thread_name=none
+fi
 ##输出文件
 AC_OUTPUT([Makefile
                  lcui.pc
@@ -96,3 +184,13 @@ AC_OUTPUT([Makefile
                  test/photoviewer/Makefile
                  test/clock/Makefile
                  test/screenlock/Makefile])
+echo
+echo
+echo -e "Build with tslib support ........ : $want_ts"
+echo -e "Build with libpng support ....... : $want_png"
+echo -e "Build with libjpeg support ...... : $want_jpeg"
+echo -e "Build with libiconv support ..... : $want_iconv"
+echo -e "Build with freetype support ..... : $want_freetype"
+echo -e "Build with thread support ....... : $thread_name"
+echo 
+

@@ -30,6 +30,7 @@ test/test_radiobtn.c \
 test/test_rect_cut.c \
 test/test_viewimage.c \
 test/test_window.c \
+test/test_gaussian_blur.c \
 test/mora/mora.c \
 test/mora/README.zh-cn \
 test/mora/drawable/btn_down.png \
