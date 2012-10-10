@@ -46,9 +46,11 @@
 
 #define LCUI_VERSION "0.12.6"
 
-#include <ft2build.h>
-#include <tslib.h>
-#include FT_FREETYPE_H 
+#include <wchar.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
 
 /* 打开文件时的错误 */
 #define SHORT_FILE	1
@@ -139,8 +141,6 @@ typedef enum _BOOL
 #define AND_ARG_F	1<<3	/* 第一个参数 */
 #define AND_ARG_S 	1<<4	/* 第二个参数 */ 
 /*****************************************/
-
-
 
 #define LCUI_Menu_Style_Default	20
 #define LCUI_Style_Default	1
@@ -282,7 +282,10 @@ typedef enum	_LCUI_Border_Style	LCUI_Border_Style;
 typedef enum	_LCUI_BG_Mode		LCUI_BG_Mode;
 typedef enum	_LCUI_Widget_Status	LCUI_Widget_Status; 
 typedef enum	_LCUI_Align		LCUI_Align;
+typedef enum	_LCUI_PosType		LCUI_PosType;
 
+typedef LCUI_Border LCUI_Margin;
+typedef LCUI_Border LCUI_Padding;
 
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
@@ -425,8 +428,8 @@ struct _LCUI_Font/* 字体信息数据 */
 	LCUI_String	style_name;	/* 字体风格名称 */
 	int		space;		/* 字体的左右间距（单位为像素） */
 	int		linegap;	/* 字体的行距（单位为像素） */
-	FT_Library	ft_lib;		/* FreeType2库的句柄  */
-	FT_Face		ft_face;	/* FreeType2的face对象的句柄 */
+	void*		ft_lib;		/* FreeType2库的句柄  */
+	void*		ft_face;	/* FreeType2的face对象的句柄 */
 	int		load_flags;	/* 字形载入标志 */
 	int		render_mode;	/* 字形转换模式标志 */
 	int		status;		/* 状态，是否打开了字体库 */
@@ -459,7 +462,7 @@ struct _LCUI_MouseEvent
 /*********** 触屏相关 **************/
 struct _LCUI_TS
 {
-	struct tsdev *td;
+	void *td;
 	int status;  /* 状态 */ 
 	thread_t thread;
 };
@@ -472,6 +475,32 @@ struct _LCUI_Border
 	int left,top,right,bottom;
 };
 /*************************************/
+
+/***************************** 定位类型 ********************************/
+enum _LCUI_PosType
+{
+	POS_TYPE_STATIC,
+	POS_TYPE_ABSOLUTE,
+	POS_TYPE_FIXED,
+	POS_TYPE_RELATIVE,
+	POS_TYPE_INHERIT
+};
+/*
+ * absolute:
+ * 	绝对定位，相对于 static 定位以外的第一个父元素进行定位。
+ * 	元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
+ * fixed：
+ * 	绝对定位，相对于屏幕进行定位。
+ * 	元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
+ * relative：
+ * 	相对定位，相对于其正常位置进行定位。
+ * 	因此，"left:20" 会向元素的 LEFT 位置添加 20 像素。
+ * static：
+ * 	默认值。没有定位，元素出现在正常的流中（忽略 top, bottom, left, right 或者 z-index 声明）。
+ * inherit：
+ * 	规定应该从父元素继承 position 属性的值。
+ */
+/**********************************************************************/
 
 /******************************* 部件 **********************************/
 struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
@@ -500,10 +529,13 @@ struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
 	int		limit_pos;	/* 指定是否限制部件的位置 */
 	LCUI_Pos	max_pos;	/* 最大位置 */
 	LCUI_Pos	min_pos;	/* 最小位置 */
-	int		pos_type;	/* 位置类型 */
+	LCUI_PosType	pos_type;	/* 位置类型 */
 	int		align;		/* 部件的布局 */
 	LCUI_Pos	offset;		/* xy轴的偏移量 */
 	
+	LCUI_Margin	margin;		/* 外边距 */
+	LCUI_Padding	padding;	/* 内边距 */
+	int		z_index;
 	int		auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */ 
 	int		limit_size;	/* 指定是否限制尺寸大小 */
 	LCUI_Size	size;		/* 部件的尺寸，单位为像素 */
@@ -518,17 +550,16 @@ struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
 	LCUI_RGB	border_color;	/* 边框颜色 */
 	int		border_style;	/* 边框类型(NONE:没有) */
 	
-	LCUI_Queue	event;		/* 保存部件的事件关联的数据 */
-	LCUI_Queue	update_area;	/* 部件内需要刷新的区域 */ 
-	
-	LCUI_Queue	data;		/* 记录需要进行更新的数据 */
-	
 	int		bg_mode;	/* 背景模式，指定没有背景时是使用透明背景还是使用背景色填充 */
 	LCUI_Graph	background_image;	 /* 背景图 */
 	int		background_image_layout; /* 背景图的布局 */
 	
 	LCUI_Widget	*focus; /* 获得焦点的部件 */
+	LCUI_Queue	event;		/* 保存部件的事件关联的数据 */
+	LCUI_Queue	update_area;	/* 部件内需要刷新的区域 */
+	LCUI_Queue	data;		/* 记录需要进行更新的数据 */ 
 	LCUI_Graph	graph; /* 部件的图形数据 */ 
+	
 	/* 以下是函数指针，闲函数名太长的话，可以直接用下面的 */
 	void (*resize)(LCUI_Widget*, LCUI_Size);
 	void (*move)(LCUI_Widget*, LCUI_Pos); 
