@@ -779,6 +779,9 @@ int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 			} 
 		}
 	} else {
+		if(Graph_Have_Alpha(out)) {
+			Graph_Fill_Alpha(out, 255);
+		}
 		for(y = 0;y < height;++y) {
 			h = y%src->height;
 			m = h * src->width;
@@ -788,7 +791,6 @@ int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 				out->rgba[0][temp] = src->rgba[0][count];
 				out->rgba[1][temp] = src->rgba[1][count];
 				out->rgba[2][temp] = src->rgba[2][count];
-				out->rgba[3][temp] = 255;
 				++temp;
 			}
 		}
@@ -869,7 +871,7 @@ int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 				tmp_n = n; tmp_m = m;
 				total = tmp_n + cut.width; 
 				for (; tmp_n < total; ++tmp_n,++tmp_m) { 
-					j = src->rgba[3][m] * k;
+					j = src->rgba[3][tmp_m] * k;
 					des->rgba[0][tmp_n] = ALPHA_BLENDING(src->rgba[0][tmp_m], des->rgba[0][tmp_n], j); 
 					des->rgba[1][tmp_n] = ALPHA_BLENDING(src->rgba[1][tmp_m], des->rgba[1][tmp_n], j);
 					des->rgba[2][tmp_n] = ALPHA_BLENDING(src->rgba[2][tmp_m], des->rgba[2][tmp_n], j);  
@@ -973,7 +975,7 @@ int Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 			tmp_n = n; tmp_m = m;
 			total = tmp_n + cut.width; 
 			for (; tmp_n < total; ++tmp_n,++tmp_m) { 
-				j = src->rgba[3][m] * k;
+				j = src->rgba[3][tmp_m] * k;
 				des->rgba[0][tmp_n] = ALPHA_BLENDING(src->rgba[0][tmp_m], 255, j); 
 				des->rgba[1][tmp_n] = ALPHA_BLENDING(src->rgba[1][tmp_m], 255, j);
 				des->rgba[2][tmp_n] = ALPHA_BLENDING(src->rgba[2][tmp_m], 255, j);  
@@ -982,9 +984,9 @@ int Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 			n += des->width; 
 		}
 	} else {
-		for (y = 0; y < cut.height; ++y) { 
-			m = (cut.y + y + src_rect.y) *src->width + cut.x + src_rect.x;
-			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+		m = (cut.y + src_rect.y) *src->width + cut.x + src_rect.x;
+		n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+		for (y = 0; y < cut.height; ++y) {
 			/* 使用指针来引用 */
 			r1 = des->rgba[0] + n;
 			g1 = des->rgba[1] + n;
@@ -1006,6 +1008,8 @@ int Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 					memcpy(a1, a2, cut.width);  
 				}
 			}
+			m += src->width;
+			n += des->width; 
 		}
 	} 
 	Graph_Unlock(des);
