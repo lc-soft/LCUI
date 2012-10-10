@@ -306,9 +306,8 @@ static void LCUI_IO_Init()
 	
 	LCUI_Sys.ts.status = REMOVE;
 	LCUI_Sys.ts.thread = 0;
-	LCUI_Sys.ts.td = NULL; 
-	/* 启用触屏输入处理 */
-	printf("enable touchscreen input processing\n"); 
+	LCUI_Sys.ts.td = NULL;
+	/* 启用触屏输入处理 */ 
 	Enable_TouchScreen_Input();  
 	
 	Enable_Key_Input();

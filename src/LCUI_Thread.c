@@ -180,7 +180,7 @@ int Thread_TreeNode_Delete(Thread_TreeNode *ttn, thread_t tid)
 }
 
 int LCUI_Thread_Create( thread_t *tidp,
-			const thread_attr_t *restrict attr,
+			const thread_attr_t *attr,
 			void *(*start_rtn)(void*),
 			void * arg )
 /*
