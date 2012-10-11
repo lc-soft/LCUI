@@ -73,7 +73,11 @@ int Load_Image(const char *filepath, LCUI_Graph *out);
  * 说明：打开图片文件，并解码至内存，打开的图片文件越大，占用的内存也就越大 
  * */
 
+int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
+/* 对图像进行高斯模糊处理 */ 
 
+int Graph_Smooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
+/* 对图像进行模糊处理 */
 int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height);
 /* 功能：绘制进度条的空槽 */ 
 

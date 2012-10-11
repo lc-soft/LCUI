@@ -2,6 +2,8 @@
 #include LC_LCUI_H
 #include LC_GRAPH_H
 
+#include <memory.h>
+
 int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 /* 功能：绘制进度条的空槽 */
 {
