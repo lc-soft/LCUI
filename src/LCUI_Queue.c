@@ -38,7 +38,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-
+//#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_MISC_H
@@ -182,12 +182,13 @@ void Destroy_Queue(LCUI_Queue * queue)
 { 
 	int i;
 	if(queue->member_type == 0) {
-	/* 如果成员是普通类型，释放队列成员占用的内存空间 */
-		while( Queue_Delete(queue, 0) );/* 清空队列成员 */ 
+	/* 如果成员是普通类型，释放队列成员占用的内存空间 */ 
+		while( Queue_Delete(queue, 0) );/* 清空队列成员 */
 		if(queue->data_mode == 0) {
 			for(i=0; i<queue->max_num; ++i) {
 				free( queue->data_array[i] ); 
 			}
+			free (queue->data_array);/* 释放二维指针占用的的内存空间 */ 
 		} else {
 			LCUI_Node *p, *obj;
 			p = queue->data_head_node.next;
@@ -200,7 +201,6 @@ void Destroy_Queue(LCUI_Queue * queue)
 			queue->data_head_node.next = NULL;
 		}
 	}
-	free (queue->data_array);/* 释放二维指针占用的的内存空间 */ 
 	
 	queue->data_array	= NULL;
 	queue->total_num	= 0;
@@ -499,24 +499,23 @@ int Queue_Empty(LCUI_Queue *queue)
 	return 1;
 }
 
-static int Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag) 
+static BOOL Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag) 
 /* 
  * 功能：从队列中删除一个成员，并重新排列队列
  * 说明：处理方式因flag的值而不同 
  * 返回值：正常返回真（1），出错返回假（0）
  * */
 {
-	int i, value = 0;
+	int i;
 	void *save = NULL;
 	
-	Queue_Using (queue, QUEUE_MODE_WRITE);
+	Queue_Using (queue, QUEUE_MODE_WRITE); 
 	/* 有效性检测 */
 	if (pos >=0 && pos < queue->total_num && queue->total_num > 0);
 	else {
 		Queue_End_Use (queue);
-		return 0;
-	}
-	
+		return FALSE;
+	} 
 	if(queue->data_mode == QUEUE_DATA_MODE_ARRAY) {
 		save = queue->data_array[pos];/* 备份地址 */
 		/* 移动排列各个成员位置，这只是交换指针的值，把需要删除的成员移至队列末尾 */
@@ -534,6 +533,9 @@ static int Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 		LCUI_Node *temp, *p_src, *p_des;
 		/* 得到源位置的结点的指针 */
 		p_src = queue->data_head_node.next;
+		if(p_src == NULL) {
+			return FALSE;
+		}
 		for(i=0; p_src->next && i<pos; ++i ) {
 			p_src = p_src->next;
 		} 
@@ -542,13 +544,14 @@ static int Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 		/* 解除该位置的结点与前后结点的链接 */
 		temp = p_src->prev;
 		temp->next = p_src->next;
-		p_src->next->prev = temp; 
-		
+		if(p_src->next != NULL)  {
+			p_src->next->prev = temp; 
+		}
 		p_des = queue->data_head_node.next;
 		/* 找到链表中最后一个结点 */
 		for(i=0; p_des->next; ++i ) {
 			p_des = p_des->next;
-		} 
+		}
 		/* 把需删除的结点链接到链表尾部 */
 		p_des->next = p_src;
 		p_src->prev = p_des;
@@ -566,8 +569,7 @@ static int Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 	 * 该成员的地址，因为源队列可能会被销毁，销毁时也会free掉队列中每个成员，而
 	 * 目标队列未被销毁，且正在使用之前转移过来的成员，这会产生错误。
 	 *  */ 
-	--queue->total_num;
-	value = 1; 
+	--queue->total_num; 
 	
 	Queue_End_Use (queue);
 	if(flag == 1) { 
@@ -578,7 +580,7 @@ static int Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 		/* 不需要释放内存，只有在调用Destroy_Queue函数时才全部释放 */
 		//free(save); 
 	}
-	return value;
+	return TRUE;
 }
 
 int Queue_Delete (LCUI_Queue * queue, int pos)
@@ -820,10 +822,10 @@ int RectQueue_Get( LCUI_Rect * rect, int pos, LCUI_Queue * queue)
 {
 	void *temp;
 	temp = Queue_Get(queue, pos);
-	if(NULL == temp)
+	if(NULL == temp) {
 		return 0;
-	
-	memcpy(rect, temp, sizeof(LCUI_Rect));
+	}
+	*rect = *((LCUI_Rect*)temp);
 	return 1;
 }
 
