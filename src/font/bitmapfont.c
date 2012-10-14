@@ -135,6 +135,8 @@ void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 	
 	p = in_core_font_8x8();
 	FontBMP_Create(out_bitmap, 8, 8);/* 为位图分配内存，8x8的尺寸 */
+	out_bitmap->left = 0;
+	out_bitmap->top = 0;
 	if(code < 256) {
 		if(code == ' ') {
 			memset(out_bitmap->buffer, 0, sizeof(uchar_t)*64); 
@@ -358,12 +360,12 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 			n = (des_pos.y + y + des_rect.y) * des->width + des_pos.x + des_rect.x;
 			total = n + cut.width;
 			for (; n < total; ++n,++m) { 
-				if(bitmap->buffer[m] != 0) {
+				//if(bitmap->buffer[m] != 0) {
 					des->rgba[0][n] = color.red;
 					des->rgba[1][n] = color.green;
 					des->rgba[2][n] = color.blue;
 					des->rgba[3][n] = bitmap->buffer[m];
-				}
+				//}
 			}
 		} 
 	}
