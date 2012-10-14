@@ -57,14 +57,8 @@ int Set_Raw(int t)
 	if (t > 0) {
 		if(tcgetattr(fd, &tm) < 0) {
 			return -1; 
-		}
-		//tm_old = tm; 
-		//27906, 5, 1215, 35387
-		/**
-		 * printf("c_iflag: %d, c_oflag: %d, c_cflag: %d, c_lflag: %d\n"
-		 * "c_cc[VMIN]: %d, c_cc[VTIME]: %d\n",
-		 * tm.c_iflag, tm.c_oflag, tm.c_cflag, tm.c_lflag, tm.c_cc[VMIN], tm.c_cc[VTIME]);
-		 * */
+		} 
+		/* 设置终端为无回显无缓冲模式 */
 		tm.c_lflag &= ~(ICANON|ECHO);
 		tm.c_cc[VMIN] = 1;
 		tm.c_cc[VTIME] = 0;
@@ -73,13 +67,13 @@ int Set_Raw(int t)
 		}
 		printf("\033[?25l");/* 隐藏光标 */
 	} else {
-		/* 以下值是通过获取正常终端属性得到的 */
 		tm.c_lflag |= ICANON;
 		tm.c_lflag |= ECHO;
 		tm.c_cc[VMIN] = 1;
 		tm.c_cc[VTIME] = 0;
-		if(tcsetattr(fd,TCSANOW,&tm)<0) 
+		if(tcsetattr(fd,TCSANOW,&tm)<0) {
 			return -1;
+		}
 		printf("\033[?25h"); /* 显示光标 */ 
 	}
 	return 0;
