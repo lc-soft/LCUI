@@ -549,9 +549,11 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	LCUI_Pos pos;
 	int i, j, n, rows, size;
 	LCUI_RGB color;
+	LCUI_Graph slot;
 	LCUI_CharData *p_data;
 	Text_RowData *p_row;
 	
+	Graph_Init( &slot );
 	/* 开始粘贴文本位图 */
 	rows = Queue_Get_Total( &layer->rows_data ); 
 	for(pos.y=0,i=0; i<rows; ++i) {
@@ -585,7 +587,12 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 			} 
 			if( p_data->need_update ) { 
 				p_data->need_update = FALSE;
-				RectQueue_Add( &layer->refresh_area, Rect(pos.x, pos.y, size, size) );
+				/* 引用区域 */
+				area = Rect(pos.x, pos.y, size, size);
+				RectQueue_Add( &layer->refresh_area, area );
+				Quote_Graph( &slot, &widget->graph, area );
+				/* 将该区域的alpha通道填充为0 */
+				Graph_Fill_Alpha( &slot, 0 );
 				FontBMP_Mix( &widget->graph, Pos( pos.x, 
 					pos.y + size - p_data->bitmap.top),
 					&p_data->bitmap, color, mode );
