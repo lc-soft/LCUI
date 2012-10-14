@@ -68,30 +68,27 @@ static void Destroy_Label(LCUI_Widget *widget)
 	Destroy_TextLayer( layer );
 }
 
-static void Exec_Update_Label(LCUI_Widget *widget)
+static void Exec_Label_Update(LCUI_Widget *widget)
 /* 功能：执行更新label部件的操作 */
 {
+	int mode; 
 	LCUI_Size max;
 	LCUI_TextLayer *layer;
 	
 	layer = Get_Widget_PrivData( widget );
-	max = TextLayer_Get_Size( layer );
-	DEBUG_MSG("%d\n", widget->auto_size);
-	DEBUG_MSG("size: %d,%d\n", max.w, max.h);
+	max = TextLayer_Get_Size( layer );  
 	if( widget->auto_size && Size_Cmp( max, widget->size ) != 0 ) {
-		/* 如果开启了自动调整大小,并且尺寸有改变 */
-		DEBUG_MSG("resize\n");
+		/* 如果开启了自动调整大小,并且尺寸有改变 */ 
 		Resize_Widget(widget, max );
 		Refresh_Widget(widget);
 		return;
 	}
-	
-	int mode; 
 	if(!Graph_Valid(&widget->background_image)) {
 		mode = GRAPH_MIX_FLAG_REPLACE; /* 替换模式 */
 	} else {
 		mode = GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */ 
 	}
+	layer = Get_Widget_PrivData( widget );
 	TextLayer_Draw( widget, layer, mode );
 }
 /****************************** END ***********************************/
@@ -104,7 +101,7 @@ void Refresh_Label_FontBitmap(LCUI_Widget *widget)
 	
 	layer = Get_Widget_PrivData( widget );
 	TextLayer_Refresh( layer );
-	Draw_Widget(widget);
+	Draw_Widget( widget ); 
 }
 
 void Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...)
@@ -122,7 +119,7 @@ void Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 	va_end( ap ); 
 	 
 	TextLayer_Text( layer, text );
-	Draw_Widget( widget ); 
+	Exec_Label_Update( widget ); 
 }
 
 int Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
@@ -131,7 +128,7 @@ int Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 	LCUI_TextLayer *layer;
 	layer = Get_Widget_PrivData( widget );
 	TextLayer_Text_Set_Default_Style( layer, style );
-	Draw_Widget( widget );
+	Exec_Label_Update( widget );
 	return 0;
 }
 /***************************** END ************************************/
@@ -145,6 +142,6 @@ void Register_Label()
 	
 	/* 为部件类型关联相关函数 */
 	WidgetFunc_Add("label",	Label_Init,		FUNC_TYPE_INIT);
-	WidgetFunc_Add("label",	Exec_Update_Label,	FUNC_TYPE_UPDATE); 
+	WidgetFunc_Add("label",	Exec_Label_Update,	FUNC_TYPE_UPDATE); 
 	WidgetFunc_Add("label", Destroy_Label,		FUNC_TYPE_DESTROY);
 }
