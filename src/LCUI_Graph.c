@@ -724,20 +724,38 @@ int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)
 	return 0;  
 }
 
-int Graph_Fill_Color(LCUI_Graph *pic, LCUI_RGB color)
+int Graph_Fill_Color(LCUI_Graph *graph, LCUI_RGB color)
 /* 功能：为传入的图形填充颜色 */
 {
-	int size; 
-	if(!Graph_Valid(pic)) {
+	uchar_t *r_ptr, *g_ptr, *b_ptr;
+	LCUI_Rect src_rect;
+	
+	src_rect = Get_Graph_Valid_Rect( graph ); 
+	graph = Get_Quote_Graph( graph );
+	
+	if(! Graph_Valid(graph) ) {
 		return -1;
+	} 
+	
+	int i, pos;
+	size_t size;
+	
+	Graph_Lock( graph, 1);
+	size = sizeof(uchar_t) * src_rect.width;
+	pos = src_rect.x + src_rect.y * graph->width;
+	r_ptr = graph->rgba[0] + pos;
+	g_ptr = graph->rgba[1] + pos;
+	b_ptr = graph->rgba[2] + pos;
+	for(i=0; i<src_rect.height; ++i){ 
+		memset(r_ptr, color.red, size);
+		memset(g_ptr, color.green, size);
+		memset(b_ptr, color.blue, size);
+		r_ptr += graph->width;
+		g_ptr += graph->width;
+		b_ptr += graph->width;
 	}
-	Graph_Lock(pic, 1); 
-	size = sizeof(uchar_t) * pic->height * pic->width;
-	memset(pic->rgba[0], color.red,		size);
-	memset(pic->rgba[1], color.green,	size);
-	memset(pic->rgba[2], color.blue,	size);
-	Graph_Unlock(pic); 
-	return 0;
+	Graph_Unlock( graph );
+	return 0; 
 }
 
 int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
@@ -1118,16 +1136,30 @@ int Graph_Fill_Image(LCUI_Graph *graph, LCUI_Graph *bg, int flag, LCUI_RGB color
 int Graph_Fill_Alpha(LCUI_Graph *src, uchar_t alpha)
 /* 功能：填充图形的alpha通道的所有值 */
 {
+	uchar_t *ptr;
+	LCUI_Rect src_rect;
+	/* 获取引用的区域在源图形中的有效区域 */
+	src_rect = Get_Graph_Valid_Rect( src );
+	/* 获取引用的源图指针 */
+	src = Get_Quote_Graph( src );
+	
 	if(! Graph_Valid(src) ) {
 		return -1;
 	}
-	if( Graph_Have_Alpha(src) ) {
-		size_t size;
-		size = sizeof(uchar_t) * src->width * src->height;
-		Graph_Lock( src, 1);
-		memset(src->rgba[3], alpha, size);
-		Graph_Unlock( src );
-		return 0;
+	if( !Graph_Have_Alpha(src) ) {
+		return -1;
 	}
-	return -1;
+	
+	int i;
+	size_t size;
+	
+	Graph_Lock( src, 1);
+	size = sizeof(uchar_t) * src_rect.width;
+	ptr = src->rgba[3] + src_rect.x + src_rect.y * src->width;
+	for(i=0; i<src_rect.height; ++i){ 
+		memset(ptr, alpha, size);
+		ptr += src->width;
+	}
+	Graph_Unlock( src );
+	return 0; 
 }
