@@ -190,7 +190,7 @@ struct _LCUI_TextLayer
 	LCUI_Queue rows_data;		/* 储存每一行文本的数据 */
 	LCUI_Queue tag_buff;		/* 保存样式标签中表达的属性数据 */
 	LCUI_Queue style_data;		/* 保存样式数据 */
-	
+	LCUI_Queue clear_area;		/* 记录需刷新的区域 */
 	uint32_t current_src_pos;	/* 当前光标在源文本中位置 */
 	LCUI_Pos current_des_pos;	/* 当前光标在分段后的文本中的位置 */
 	uint32_t max_text_len;		/* 最大文本长度 */ 

@@ -48,9 +48,6 @@ typedef struct _LCUI_TextLayer LCUI_Label;
 LCUI_BEGIN_HEADER
 
 /************************* Label部件操作 *******************************/
-void Refresh_Label_FontBitmap(LCUI_Widget *widget);
-/* 功能：刷新label部件内的字体位图 */ 
-
 void Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...);
 /* 功能：设定与标签关联的文本内容 */ 
 

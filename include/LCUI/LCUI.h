@@ -91,19 +91,18 @@
 #define MS_DEV	"/dev/input/mice"	/* 鼠标设备 */
 /*****************************************************/
 
-#ifndef false
-#define false 0
+#ifndef FALSE
+#define FALSE 0
 #endif
 
-#ifndef ture
-#define ture 1
+#ifndef TRUE
+#define TRUE 1
 #endif
 
 typedef enum _BOOL
 {
 	IS_FALSE = 0,
-	IS_TRUE = 1,
-	IS_ERROR = -1
+	IS_TRUE = 1
 }BOOL;
 
 #define FORCE	2
@@ -535,7 +534,8 @@ struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
 	
 	LCUI_Margin	margin;		/* 外边距 */
 	LCUI_Padding	padding;	/* 内边距 */
-	int		z_index;
+	int		z_index;	/* 堆叠顺序 */
+	
 	int		auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */ 
 	int		limit_size;	/* 指定是否限制尺寸大小 */
 	LCUI_Size	size;		/* 部件的尺寸，单位为像素 */
