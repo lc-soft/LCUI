@@ -11,4 +11,5 @@ libwidget_la_SOURCES = \
 	LCUI_ProgressBar.c	\
 	LCUI_RadioButton.c	\
 	LCUI_TextBox.c		\
-	LCUI_Window.c
+	LCUI_Window.c		\
+	LCUI_ScrollBar.c

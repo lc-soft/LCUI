@@ -50,7 +50,7 @@ libwidget_la_LIBADD =
 am_libwidget_la_OBJECTS = LCUI_ActiveBox.lo LCUI_Button.lo \
 	LCUI_CheckBox.lo LCUI_Label.lo LCUI_Menu.lo LCUI_PictureBox.lo \
 	LCUI_ProgressBar.lo LCUI_RadioButton.lo LCUI_TextBox.lo \
-	LCUI_Window.lo
+	LCUI_Window.lo LCUI_ScrollBar.lo
 libwidget_la_OBJECTS = $(am_libwidget_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -228,7 +228,8 @@ libwidget_la_SOURCES = \
 	LCUI_ProgressBar.c	\
 	LCUI_RadioButton.c	\
 	LCUI_TextBox.c		\
-	LCUI_Window.c
+	LCUI_Window.c		\
+	LCUI_ScrollBar.c
 
 all: all-am
 
@@ -290,6 +291,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_PictureBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_ProgressBar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_RadioButton.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_ScrollBar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_TextBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Window.Plo@am__quote@
 
