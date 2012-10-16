@@ -179,13 +179,11 @@ TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
 {
 	int i, total, equal = 0,flags[MAX_TAG_NUM];
 	LCUI_TextStyle *data;
-	tag_style_data *p; 
+	tag_style_data *p;
 	
 	data = (LCUI_TextStyle*) malloc (sizeof(LCUI_TextStyle));
 	TextStyle_Init( data );
-	
 	total = Queue_Get_Total( &layer->tag_buff );
-	//DEBUG_MSG("total tag: %d\n", total);
 	if(total <= 0) {
 		free( data );
 		return NULL;
@@ -462,9 +460,9 @@ static int
 TextLayer_Text_Add_NewRow ( LCUI_TextLayer *layer )
 /* 添加新行 */
 {
-	Text_RowData data;
-	
-	data.pos = Pos(0,0);
+	Text_RowData data; 
+	/* 单整行最大尺寸改变时，需要移动整行，目前还未支持此功能 */
+	data.pos = Pos(0,0); 
 	data.max_size = Size(0,0);
 	Queue_Init( &data.string, sizeof(LCUI_CharData), NULL );
 	/* 使用链表模式，方便数据的插入 */
@@ -489,10 +487,27 @@ TextLayer_Update_RowSize (LCUI_TextLayer *layer, int row )
 	LCUI_Size size;
 	LCUI_CharData *char_data;
 	Text_RowData *row_data;
+	LCUI_TextStyle *style;
 	
 	row_data = Queue_Get( &layer->rows_data, row );
-	total = Queue_Get_Total( &row_data->string );
-	for( size.w=0,size.h=0,i=0; i<total; ++i ) {
+	total = Queue_Get_Total( &row_data->string ); 
+	style = TextLayer_Get_Current_TextStyle( layer ); 
+	if(style == NULL) {
+		if(layer->default_data.pixel_size > 0) {
+			size = Size(0, layer->default_data.pixel_size+2);
+		} else {
+			size = Size(0, 14);
+		} 
+	} else {
+		if(style->pixel_size > 0) {
+			size = Size(0,style->pixel_size+2);
+		} else {
+			size = Size(0,14);
+		}
+	}
+	free( style );
+	
+	for( i=0; i<total; ++i ) {
 		char_data = Queue_Get( &row_data->string, i );
 		size.w += char_data->bitmap.width;
 		size.w += char_data->bitmap.left;
@@ -537,7 +552,6 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	Queue_Init( &layer->text_source_data, sizeof(LCUI_CharData), Destroy_CharData );
 	Queue_Set_DataMode( &layer->text_source_data, QUEUE_DATA_MODE_LINKED_LIST ); 
 	Queue_Init( &layer->rows_data, sizeof(Text_RowData), Destroy_Text_RowData ); 
-	TextLayer_Text_Add_NewRow ( layer );/* 添加新行 */
 	Queue_Init( &layer->tag_buff, sizeof(tag_style_data), destroy_tag_style_data );
 	Queue_Init( &layer->style_data, sizeof(LCUI_TextStyle), NULL );
 	RectQueue_Init( &layer->clear_area );
@@ -546,6 +560,7 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	layer->current_des_pos = Pos(0,0);
 	layer->max_text_len = 5000; 
 	TextStyle_Init ( &layer->default_data );
+	//TextLayer_Text_Add_NewRow ( layer );/* 添加新行 */
 }
 
 void 
@@ -767,7 +782,7 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 				layer->current_src_pos, &char_data );
 			/* 遇到换行符，那就增加新行 */
 			if(char_data.char_code == '\n') {
-				rows = TextLayer_Text_Add_NewRow( layer );
+				rows = TextLayer_Text_Add_NewRow( layer ); 
 				current_row_data = Queue_Get( &layer->rows_data, rows );
 				layer->current_des_pos.x = 0;
 				layer->current_des_pos.y = rows;
@@ -788,12 +803,12 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 		char_data.char_code = *p;
 		char_data.display = IS_TRUE; 
 		char_data.need_update = IS_TRUE; 
-		char_data.data = TextLayer_Get_Current_TextStyle( layer );
+		char_data.data = TextLayer_Get_Current_TextStyle( layer ); 
 		Queue_Insert( &layer->text_source_data, layer->current_src_pos, &char_data ); 
 		Queue_Insert( &current_row_data->string, layer->current_des_pos.x, &char_data ); 
 		
 		++layer->current_src_pos;
-		++layer->current_des_pos.x;
+		++layer->current_des_pos.x; 
 	}
 }
 
