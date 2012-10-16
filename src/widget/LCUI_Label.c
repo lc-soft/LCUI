@@ -57,7 +57,7 @@ static void Label_Init(LCUI_Widget *widget)
 	TextLayer_Init( layer );
 	widget->private_data = layer;
 	Enable_Widget_Auto_Size( widget );
-	TextLayer_Using_StyleTags( layer, IS_TRUE );
+	TextLayer_Using_StyleTags( layer, TRUE );
 }
 
 static void Destroy_Label(LCUI_Widget *widget)
@@ -68,8 +68,17 @@ static void Destroy_Label(LCUI_Widget *widget)
 	Destroy_TextLayer( layer );
 }
 
-static void Exec_Label_Update(LCUI_Widget *widget)
-/* 功能：执行更新label部件的操作 */
+static void Refresh_Label_FontBitmap(LCUI_Widget *widget)
+/* 功能：刷新label部件内的字体位图 */
+{
+	LCUI_TextLayer *layer;
+	
+	layer = Get_Widget_PrivData( widget );
+	TextLayer_Refresh( layer ); 
+}
+
+static void Update_Label(LCUI_Widget *widget)
+/* 功能：更新label部件 */
 {
 	int mode; 
 	LCUI_Size max;
@@ -91,19 +100,17 @@ static void Exec_Label_Update(LCUI_Widget *widget)
 	layer = Get_Widget_PrivData( widget );
 	TextLayer_Draw( widget, layer, mode );
 }
+
+static void Redraw_Label(LCUI_Widget *widget)
+/* 重绘Label部件 */
+{
+	Refresh_Label_FontBitmap(widget);
+	Update_Label(widget);
+}
+
 /****************************** END ***********************************/
 
 /************************* Label部件操作 *******************************/
-void Refresh_Label_FontBitmap(LCUI_Widget *widget)
-/* 功能：刷新label部件内的字体位图 */
-{
-	LCUI_TextLayer *layer;
-	
-	layer = Get_Widget_PrivData( widget );
-	TextLayer_Refresh( layer );
-	Draw_Widget( widget ); 
-}
-
 void Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 /* 功能：设定与标签关联的文本内容 */
 {
@@ -119,7 +126,7 @@ void Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 	va_end( ap ); 
 	 
 	TextLayer_Text( layer, text );
-	Exec_Label_Update( widget ); 
+	Update_Label( widget ); 
 }
 
 int Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
@@ -128,7 +135,7 @@ int Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 	LCUI_TextLayer *layer;
 	layer = Get_Widget_PrivData( widget );
 	TextLayer_Text_Set_Default_Style( layer, style );
-	Exec_Label_Update( widget );
+	Update_Label( widget );
 	return 0;
 }
 /***************************** END ************************************/
@@ -141,7 +148,7 @@ void Register_Label()
 	WidgetType_Add("label");
 	
 	/* 为部件类型关联相关函数 */
-	WidgetFunc_Add("label",	Label_Init,		FUNC_TYPE_INIT);
-	WidgetFunc_Add("label",	Exec_Label_Update,	FUNC_TYPE_UPDATE); 
-	WidgetFunc_Add("label", Destroy_Label,		FUNC_TYPE_DESTROY);
+	WidgetFunc_Add("label",	Label_Init,	FUNC_TYPE_INIT);
+	WidgetFunc_Add("label",	Redraw_Label,	FUNC_TYPE_UPDATE); 
+	WidgetFunc_Add("label", Destroy_Label,	FUNC_TYPE_DESTROY);
 }
