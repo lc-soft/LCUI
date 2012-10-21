@@ -415,14 +415,10 @@ struct _LCUI_Graph
 /******************************保存字体信息********************************/
 struct _LCUI_Font/* 字体信息数据 */
 {
-	int		type;		/* 类型(DEFAULT / CUSTOM) */
-	unsigned int	size;		/* 字体大小 */
-	LCUI_RGB	fore_color;	/* 前景色 */
+	int		type;		/* 类型(DEFAULT / CUSTOM) */ 
 	LCUI_String	font_file;	/* 字体文件的路径 */
 	LCUI_String	family_name;	/* 字体名称 */
-	LCUI_String	style_name;	/* 字体风格名称 */
-	int		space;		/* 字体的左右间距（单位为像素） */
-	int		linegap;	/* 字体的行距（单位为像素） */
+	LCUI_String	style_name;	/* 字体风格名称 */ 
 	void*		ft_lib;		/* FreeType2库的句柄  */
 	void*		ft_face;	/* FreeType2的face对象的句柄 */
 	int		load_flags;	/* 字形载入标志 */
