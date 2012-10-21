@@ -102,7 +102,7 @@ int _Get_Widget_Container_Width(LCUI_Widget *widget)
 		return Get_Screen_Width();
 	}
 	if( widget->parent->w.which_one == 0 ) {
-		return widget->parent->w.integer;
+		return widget->parent->w.px;
 	}
 	/* 既然容器的宽度也使用百分比，那么就递归调用计算父容器的宽度，直至为整数为止 */
 	return widget->parent->w.scale * _Get_Widget_Container_Width( widget->parent );
@@ -115,7 +115,7 @@ int _Get_Widget_Container_Height(LCUI_Widget *widget)
 		return Get_Screen_Height();
 	}
 	if( widget->parent->h.which_one == 0 ) {
-		return widget->parent->h.integer;
+		return widget->parent->h.px;
 	} 
 	return widget->parent->h.scale * _Get_Widget_Container_Height( widget->parent );
 }
@@ -137,7 +137,7 @@ int _Get_Widget_X( LCUI_Widget *widget )
 /* 通过计算得出部件的x轴坐标 */
 {
 	if(widget->x.which_one == 0) {
-		return widget->x.integer;
+		return widget->x.px;
 	}
 	return widget->x.scale * _Get_Widget_Container_Width( widget );
 }
@@ -145,7 +145,7 @@ int _Get_Widget_Y( LCUI_Widget *widget )
 /* 通过计算得出部件的y轴坐标 */
 {
 	if(widget->x.which_one == 0) {
-		return widget->y.integer;
+		return widget->y.px;
 	}
 	return widget->y.scale * _Get_Widget_Container_Height( widget );
 }
@@ -187,7 +187,7 @@ LCUI_Pos Get_Widget_Pos(LCUI_Widget *widget)
 int _Get_Widget_MaxX( LCUI_Widget *widget ) 
 {
 	if(widget->max_x.which_one == 0) {
-		return widget->max_x.integer;
+		return widget->max_x.px;
 	}
 	return widget->max_x.scale * _Get_Widget_Container_Width( widget );
 }
@@ -195,7 +195,7 @@ int _Get_Widget_MaxX( LCUI_Widget *widget )
 int _Get_Widget_MaxY( LCUI_Widget *widget ) 
 {
 	if(widget->max_y.which_one == 0) {
-		return widget->max_y.integer;
+		return widget->max_y.px;
 	}
 	return widget->max_y.scale * _Get_Widget_Container_Height( widget );
 }
@@ -216,7 +216,7 @@ LCUI_Pos Get_Widget_MaxPos(LCUI_Widget *widget)
 int _Get_Widget_MinX( LCUI_Widget *widget ) 
 {
 	if(widget->min_x.which_one == 0) {
-		return widget->min_x.integer;
+		return widget->min_x.px;
 	}
 	return widget->min_x.scale * _Get_Widget_Container_Width( widget );
 }
@@ -224,7 +224,7 @@ int _Get_Widget_MinX( LCUI_Widget *widget )
 int _Get_Widget_MinY( LCUI_Widget *widget ) 
 {
 	if(widget->min_y.which_one == 0) {
-		return widget->min_y.integer;
+		return widget->min_y.px;
 	}
 	return widget->min_y.scale * _Get_Widget_Container_Height( widget );
 }
@@ -247,7 +247,7 @@ LCUI_Pos Get_Widget_MinPos(LCUI_Widget *widget)
 int _Get_Widget_MaxWidth( LCUI_Widget *widget ) 
 {
 	if(widget->max_w.which_one == 0) {
-		return widget->max_w.integer;
+		return widget->max_w.px;
 	}
 	return widget->max_w.scale * _Get_Widget_Container_Width( widget );
 }
@@ -255,7 +255,7 @@ int _Get_Widget_MaxWidth( LCUI_Widget *widget )
 int _Get_Widget_MaxHeight( LCUI_Widget *widget ) 
 {
 	if(widget->max_h.which_one == 0) {
-		return widget->max_h.integer;
+		return widget->max_h.px;
 	}
 	return widget->max_h.scale * _Get_Widget_Container_Height( widget );
 }
@@ -276,7 +276,7 @@ LCUI_Size Get_Widget_MaxSize( LCUI_Widget *widget )
 int _Get_Widget_MinWidth( LCUI_Widget *widget ) 
 {
 	if(widget->min_w.which_one == 0) {
-		return widget->min_w.integer;
+		return widget->min_w.px;
 	}
 	return widget->min_w.scale * _Get_Widget_Container_Width( widget );
 }
@@ -284,7 +284,7 @@ int _Get_Widget_MinWidth( LCUI_Widget *widget )
 int _Get_Widget_MinHeight( LCUI_Widget *widget ) 
 {
 	if(widget->min_h.which_one == 0) {
-		return widget->min_h.integer;
+		return widget->min_h.px;
 	}
 	return widget->min_h.scale * _Get_Widget_Container_Height( widget );
 }
@@ -292,7 +292,7 @@ int _Get_Widget_MinHeight( LCUI_Widget *widget )
 int _Get_Widget_Height(LCUI_Widget *widget)
 {
 	if(widget->h.which_one == 0) {
-		return widget->min_h.integer;
+		return widget->min_h.px;
 	}
 	return widget->h.scale * _Get_Widget_Container_Height( widget );
 }
@@ -300,7 +300,7 @@ int _Get_Widget_Height(LCUI_Widget *widget)
 int _Get_Widget_Width(LCUI_Widget *widget)
 {
 	if(widget->w.which_one == 0) {
-		return widget->min_h.integer;
+		return widget->min_h.px;
 	}
 	return widget->w.scale * _Get_Widget_Container_Height( widget );
 }
@@ -857,22 +857,22 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	/*------------------------- END --------------------------*/
 	
 	/*--------------- 初始化部件的附加属性 ------------------*/
-	combo_t_init( &widget.x );
-	combo_t_init( &widget.y );
-	combo_t_init( &widget.max_x );
-	combo_t_init( &widget.max_y );
-	combo_t_init( &widget.min_x );
-	combo_t_init( &widget.min_y );
-	widget.max_x.integer = INT_MAX;
-	widget.max_y.integer = INT_MAX;
-	widget.min_x.integer = INT_MIN;
-	widget.min_y.integer = INT_MIN;
-	combo_t_init( &widget.w );
-	combo_t_init( &widget.h );
-	combo_t_init( &widget.max_w );
-	combo_t_init( &widget.max_h );
-	combo_t_init( &widget.min_w );
-	combo_t_init( &widget.min_h );
+	PX_P_t_init( &widget.x );
+	PX_P_t_init( &widget.y );
+	PX_P_t_init( &widget.max_x );
+	PX_P_t_init( &widget.max_y );
+	PX_P_t_init( &widget.min_x );
+	PX_P_t_init( &widget.min_y );
+	widget.max_x.px = INT_MAX;
+	widget.max_y.px = INT_MAX;
+	widget.min_x.px = INT_MIN;
+	widget.min_y.px = INT_MIN;
+	PX_P_t_init( &widget.w );
+	PX_P_t_init( &widget.h );
+	PX_P_t_init( &widget.max_w );
+	PX_P_t_init( &widget.max_h );
+	PX_P_t_init( &widget.min_w );
+	PX_P_t_init( &widget.min_h );
 	/*---------------------- END -----------------------*/
 	
 	/*------------- 函数指针初始化 ------------------*/
@@ -996,8 +996,8 @@ int Widget_MaxSize( LCUI_Widget *widget, char *width, char *height )
  * */
 {
 	int n;
-	n = get_combo_t( width, &widget->max_w );
-	n += get_combo_t( width, &widget->max_h );
+	n = get_PX_P_t( width, &widget->max_w );
+	n += get_PX_P_t( width, &widget->max_h );
 	return n;
 }
 
@@ -1008,8 +1008,8 @@ int Widget_MinSize( LCUI_Widget *widget, char *width, char *height )
  * */
 {
 	int n;
-	n = get_combo_t( width, &widget->min_w );
-	n += get_combo_t( width, &widget->min_h );
+	n = get_PX_P_t( width, &widget->min_w );
+	n += get_PX_P_t( width, &widget->min_h );
 	return n;
 }
 
@@ -1035,12 +1035,12 @@ void Limit_Widget_Size(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_si
 		max_size.h = min_size.h;
 	}
 		
-	widget->min_w.integer = min_size.w;
-	widget->min_h.integer = min_size.h;
+	widget->min_w.px = min_size.w;
+	widget->min_h.px = min_size.h;
 	widget->min_w.which_one = 0;
 	widget->min_h.which_one = 0;
-	widget->max_w.integer = max_size.w;
-	widget->max_h.integer = max_size.h;
+	widget->max_w.px = max_size.w;
+	widget->max_h.px = max_size.h;
 	widget->max_w.which_one = 0;
 	widget->max_h.which_one = 0;
 }
@@ -1067,12 +1067,12 @@ void Limit_Widget_Pos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos)
 		max_pos.y = min_pos.y;
 	}
 		
-	widget->min_x.integer = min_pos.x;
-	widget->min_y.integer = min_pos.y;
+	widget->min_x.px = min_pos.x;
+	widget->min_y.px = min_pos.y;
 	widget->min_x.which_one = 0;
 	widget->min_x.which_one = 0;
-	widget->max_x.integer = max_pos.x;
-	widget->max_y.integer = max_pos.y;
+	widget->max_x.px = max_pos.x;
+	widget->max_y.px = max_pos.y;
 	widget->max_x.which_one = 0;
 	widget->max_y.which_one = 0;
 }
@@ -1475,8 +1475,8 @@ void Move_Widget(LCUI_Widget *widget, LCUI_Pos new_pos)
 	if(widget == NULL) {
 		return; 
 	}
-	widget->x.integer = new_pos.x;
-	widget->y.integer = new_pos.y;
+	widget->x.px = new_pos.x;
+	widget->y.px = new_pos.y;
 	widget->x.which_one = 0;
 	widget->y.which_one = 0;
 	/* 记录部件的更新数据，等待进行更新 */
