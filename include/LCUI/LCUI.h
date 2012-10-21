@@ -493,27 +493,38 @@ enum _LCUI_PosType
  */
 /**********************************************************************/
 
-/*----------- int和double组成的复合类型 -----------------*/
-typedef struct _combo_t combo_t;
-struct _combo_t
+/*---------------- 用于表示像素或百分比 -----------------*/
+typedef struct _PX_P_t PX_P_t;
+struct _PX_P_t
 {
 	BOOL which_one;		/* 指定用哪个类型的变量 */
-	int integer;		/* 数值 */
+	int px;			/* 数值，单位为像素 */
 	double scale;		/* 比例 */
 };
 /*---------------------- END -------------------------*/
 
-/*------------------ 四个复合类型 ----------------------*/
-typedef struct _combo_t_4 combo_t_4;
-struct _combo_t_4
+/*----------------- 用于表示字体大小 --------------------*/
+typedef struct _PX_PT_t PX_PT_t;
+struct _PX_PT_t
 {
-	combo_t left, top, right, bottom;
+	BOOL which_one;		/* 指定用哪个类型的变量 */
+	int px;			/* pixel, 字体大小（像素） */
+	int pt;			/* point，字体大小（点数） */
+};
+/*---------------------- END -------------------------*/
+
+
+/*------------------ 四个复合类型 ----------------------*/
+typedef struct _PX_P_t_4 PX_P_t_4;
+struct _PX_P_t_4
+{
+	PX_P_t left, top, right, bottom;
 };
 /*---------------------- END -------------------------*/
 
 /*------------------- 内边距和外边距 --------------------*/
-typedef struct _combo_t_4 LCUI_Margin;
-typedef struct _combo_t_4 LCUI_Padding;
+typedef struct _PX_P_t_4 LCUI_Margin;
+typedef struct _PX_P_t_4 LCUI_Padding;
 /*---------------------- END -------------------------*/
 
 /*----------------- 自动尺寸调整模式 --------------------*/
@@ -534,9 +545,9 @@ struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
 	LCUI_Pos max_pos;
 	LCUI_Pos min_pos;
 	/*------------ 位置限制（描述） ---------------*/ 
-	combo_t x, y;
-	combo_t max_x, min_x;
-	combo_t max_y, min_y;
+	PX_P_t x, y;
+	PX_P_t max_x, min_x;
+	PX_P_t max_y, min_y;
 	/*------------------ END -------------------*/
 	
 	LCUI_Size size; /* 已计算出的实际尺寸，单位为像素 */
@@ -544,9 +555,9 @@ struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
 	LCUI_Size min_size;
 	
 	/*------------ 尺寸限制（描述） ---------------*/ 
-	combo_t w, h;
-	combo_t max_w, min_w;
-	combo_t max_h, min_h;
+	PX_P_t w, h;
+	PX_P_t max_w, min_w;
+	PX_P_t max_h, min_h;
 	/*------------------ END -------------------*/
 	
 	int status;		/* 部件的状态 */
