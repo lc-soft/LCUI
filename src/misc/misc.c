@@ -105,28 +105,28 @@ LCUI_Pos Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align)
 	    case ALIGN_TOP_LEFT : /* 向左上角对齐 */  
 		break;
 	    case ALIGN_TOP_CENTER : /* 向上中间对齐 */ 
-		pos.x = (container.w - child.w) / 2; 
+		pos.x = (container.w - child.w) / 2.0; 
 		break;
 	    case ALIGN_TOP_RIGHT : /* 向右上角对齐 */ 
 		pos.x = container.w - child.w; 
 		break;
 	    case ALIGN_MIDDLE_LEFT : /* 向中央偏左对齐 */  
-		pos.y = (container.h - child.h) / 2;
+		pos.y = (container.h - child.h) / 2.0;
 		break;
 	    case ALIGN_MIDDLE_CENTER : /* 向正中央对齐 */ 
-		pos.x = (container.w - child.w) / 2;
-		pos.y = (container.h - child.h) / 2;
+		pos.x = (container.w - child.w) / 2.0;
+		pos.y = (container.h - child.h) / 2.0;
 		break;
 	    case ALIGN_MIDDLE_RIGHT : /* 向中央偏由对齐 */ 
 		pos.x = container.w - child.w;
-		pos.y = (container.h - child.h) / 2;
+		pos.y = (container.h - child.h) / 2.0;
 		break;
 	    case ALIGN_BOTTOM_LEFT : /* 向底部偏左对齐 */  
 		pos.y = container.h - child.h;
 		break;
 	    case ALIGN_BOTTOM_CENTER : /* 向底部居中对齐 */ 
-		pos.x = (container.w - child.w) / 2;
-		pos.y = container.h - child.h;
+		pos.x = (container.w - child.w) / 2.0;
+		pos.y = container.h - child.h; 
 		break;
 	    case ALIGN_BOTTOM_RIGHT : /* 向底部偏右对齐 */ 
 		pos.x = container.w - child.w;
@@ -172,3 +172,64 @@ LCUI_Pos Pos_Sub(LCUI_Pos a, LCUI_Pos b)
 	a.y -= b.y;
 	return a;
 }
+
+void combo_t_init( combo_t *combo_num )
+/* 初始化复合数 */
+{
+	combo_num->which_one = 0;
+	combo_num->integer = 0;
+	combo_num->scale = 0.0;
+}
+
+void combo_t_4_init( combo_t_4 *data )
+/* 初始化4组复合数 */
+{
+	combo_t_init( &data->top );
+	combo_t_init( &data->bottom );
+	combo_t_init( &data->left );
+	combo_t_init( &data->right );
+}
+
+int get_combo_t( char *str, combo_t *combo_num )
+/* 根据传入的字符串，获取字符串实际表达的值 */
+{
+	char buff[256];
+	int j, i, len; 
+	
+	len = strlen(str);
+	for(j=0,i=0; i<len; ++i, ++j) {
+		if(str[i] == ' ') {
+			--j;
+			continue;
+		}
+		if(str[i] >= '0' && str[i] <= '9' ) {
+			buff[j] = str[i];
+			continue;
+		}
+		else if(str[i] == '%') {/* 如果有%，取浮点数 */ 
+			buff[j+1] = 0; 
+			sscanf( buff, "%lf", &combo_num->scale );
+			combo_num->scale/=100.0; 
+			combo_num->which_one = 1;
+			return 0;
+		}
+		else if (str[i] == 'p' || str[i] == 'P') { 
+			if(i<len-1) { 
+				if (str[i+1] == 'x' || str[i+1] == 'X') {
+					buff[j+1] = 0;
+					sscanf( str, "%d", &combo_num->integer ); 
+					combo_num->which_one = 0;
+					return 0;
+				}
+			}
+			return -1;
+		} else {
+			break;
+		}
+	}
+	/* 不包含px和%，那单位就默认为px，取整数 */
+	sscanf( buff, "%d", &combo_num->integer ); 
+	combo_num->which_one = 0;
+	return 0;
+}
+
