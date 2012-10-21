@@ -407,7 +407,7 @@ static LCUI_Widget *Widget_Find_Response_Status_Change(LCUI_Widget *widget)
 	if(NULL == widget) {
 		return NULL;
 	}
-	if(widget->response_flag == 1) {
+	if( widget->status_response ) {
 		return widget;/* 如果部件响应状态改变，那就返回该部件的指针 */
 	}
 	if(widget->parent == NULL) {
