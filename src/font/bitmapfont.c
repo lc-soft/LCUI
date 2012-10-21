@@ -193,15 +193,15 @@ void LCUI_Font_Init(LCUI_Font *font)
 	char *p;
 	printf("loading fontfile...\n");/* 无缓冲打印内容 */
 	font->type = DEFAULT;
-	font->size = 12;
-	font->fore_color.red = 0;
-	font->fore_color.green = 0;
-	font->fore_color.blue = 0;
+	//font->size = 12;
+	//font->fore_color.red = 0;
+	//font->fore_color.green = 0;
+	//font->fore_color.blue = 0;
 	String_Init(&font->font_file);
 	String_Init(&font->family_name);
 	String_Init(&font->style_name);
-	font->space = 1;
-	font->linegap = 0;
+	//font->space = 1;
+	//font->linegap = 0;
 	font->status = KILLED;
 	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT;
 	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_MONOCHROME;
@@ -230,10 +230,10 @@ void Font_Init(LCUI_Font *in)
  * */
 {
 	in->type = DEFAULT;   /* 字体类型为LCUI默认的 */
-	in->size = 12;
-	in->fore_color.red = 0;
-	in->fore_color.green = 0;
-	in->fore_color.blue = 0;
+	//in->size = 12;
+	//in->fore_color.red = 0;
+	//in->fore_color.green = 0;
+	//in->fore_color.blue = 0;
 	String_Init(&in->font_file);
 	String_Init(&in->family_name);
 	String_Init(&in->style_name);
@@ -249,8 +249,8 @@ void Font_Init(LCUI_Font *in)
 		in->ft_lib = NULL;
 		in->ft_face = NULL;
 	}
-	in->space = 1;
-	in->linegap = 0;
+	//in->space = 1;
+	//in->linegap = 0;
 	in->load_flags = LCUI_Sys.default_font.load_flags;
 	in->render_mode = LCUI_Sys.default_font.render_mode;
 }
@@ -465,7 +465,8 @@ static int Convert_FT_BitmapGlyph(LCUI_FontBMP *des, const FT_BitmapGlyph src)
 }
 #endif
 
-int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap)
+int 
+Get_FontBMP(LCUI_Font *font_data, wchar_t ch, int pixel_size, LCUI_FontBMP *out_bitmap)
 /*
  * 功能：获取单个wchar_t型字符的字体位图数据
  * 说明：LCUI_Font结构体中储存着已被打开的字体文件句柄和face对象的句柄，如果字体文件已经被
@@ -502,7 +503,7 @@ int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap)
 	}
 	
 	FT_Select_Charmap( p_FT_Face, FT_ENCODING_UNICODE ); /* 设定为UNICODE，默认的也是 */
-	FT_Set_Pixel_Sizes( p_FT_Face, 0, font_data->size ); /* 设定字体尺寸 */ 
+	FT_Set_Pixel_Sizes( p_FT_Face, 0, pixel_size ); /* 设定字体尺寸 */ 
 	
 	if( ch == ' ' ) {
 		ch = 'a';
