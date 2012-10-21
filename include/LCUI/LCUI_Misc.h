@@ -182,6 +182,16 @@ void WChar_T_Free(LCUI_WChar_T *ch);
 void WString_Free(LCUI_WString *str);
 /************************** End String ********************************/
 
+
+void combo_t_init( combo_t *combo_num );
+/* 初始化复合数 */
+
+int get_combo_t( char *str, combo_t *combo_num );
+/* 根据传入的字符串，获取字符串实际表达的值 */
+
+void combo_t_4_init( combo_t_4 *data );
+/* 初始化4组复合数 */
+
 void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out);
 /* 
  * 功能：通过内存中的图像数据，捕获将在屏幕上显示的图像
