@@ -268,9 +268,6 @@ void Exec_Refresh_Widget(LCUI_Widget *widget);
 void Exec_Draw_Widget(LCUI_Widget *widget);
 /* 功能：执行部件图形更新操作 */ 
 
-LCUI_Pos Widget_Align_Get_Pos(LCUI_Widget *widget);
-/* 功能：根据部件的布局来获取部件的位置 */ 
-
 void Move_Widget(LCUI_Widget *widget, LCUI_Pos new_pos);
 /* 
  * 功能：移动部件位置
