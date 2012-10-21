@@ -71,55 +71,66 @@ void
 TextStyle_Init ( LCUI_TextStyle *data )
 /* 初始化字体样式数据 */
 {
+	data->_style = FALSE;
+	data->_weight = FALSE;
+	data->_decoration = FALSE;
+	data->_family = FALSE;
+	data->_back_color = FALSE;
+	data->_fore_color = FALSE;
+	
 	memset( data->family, 0, sizeof(data->family) );
 	data->style = FONT_STYLE_NORMAL;
 	data->weight = FONT_WEIGHT_NORMAL;
 	data->decoration = FONT_DECORATION_NONE;
-	data->need_back_color = IS_FALSE;
-	data->need_fore_color = IS_FALSE;
 	data->fore_color = RGB(0,0,0);
-	data->back_color = RGB(0,0,0);
+	data->back_color = RGB(255,255,255);
 	data->pixel_size = 12;
 }
 
 void
 TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily )
+/* 设置字体族 */
 {
 	strncpy( style->family, fontfamily, sizeof(style->family) );
 }
 
 void
 TextStyle_FontSize( LCUI_TextStyle *style, int fontsize )
+/* 设置字体大小 */
 {
 	style->pixel_size = fontsize;
 }
 
 void
 TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color )
+/* 设置字体颜色 */
 {
 	style->fore_color = color;
 }
 
 void
 TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color )
+/* 设置字体背景颜色 */
 {
 	style->back_color = color;
 }
 
 void
 TextStyle_FontStyle( LCUI_TextStyle *style, enum_font_style fontstyle )
+/* 设置字体样式 */
 {
 	style->style = fontstyle;
 }
 
 void
-TextStyle_FontWeight( LCUI_TextStyle *style, enum_font_weight fontweight )
+TextStyle_FontWeight( LCUI_TextStyle *style, enum_font_weight fontweight ) 
 {
 	style->weight = fontweight;
 }
 
 void
 TextStyle_FontDecoration( LCUI_TextStyle *style, enum_font_decoration decoration )
+/* 设置字体下划线 */
 {
 	style->decoration = decoration;
 }
@@ -183,6 +194,7 @@ TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
 	
 	data = (LCUI_TextStyle*) malloc (sizeof(LCUI_TextStyle));
 	TextStyle_Init( data );
+	*data = layer->default_data;
 	total = Queue_Get_Total( &layer->tag_buff );
 	if(total <= 0) {
 		free( data );
@@ -195,7 +207,7 @@ TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
 		switch( p->tag ) {
 		    case TAG_ID_COLOR: 
 			if( flags[0] == 0 ) {
-				data->need_fore_color = IS_TRUE;
+				data->_fore_color = TRUE;
 				data->fore_color = *((LCUI_RGB*)p->style);
 				++equal;
 			}
@@ -205,7 +217,7 @@ TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
 		if(equal == MAX_TAG_NUM) {
 			break;
 		}
-	} 
+	}
 	if( equal != MAX_TAG_NUM ) {
 		free( data );
 		return NULL;
@@ -423,37 +435,25 @@ handle_style_endtag( LCUI_TextLayer *layer, wchar_t *str )
 	if( strcasecmp(tag_name, "color") == 0 ) {
 		/* 消除该标签添加的字体样式 */
 		TextLayer_TagStyle_Delete ( layer, TAG_ID_COLOR );
+	} else {
+		return NULL;
 	}
 	return p;
 }
 
 static void 
-TextLayer_Get_Char_BMP ( LCUI_CharData *data )
+TextLayer_Get_Char_BMP ( LCUI_TextStyle *default_style, LCUI_CharData *data )
 /* 获取字体位图，字体的样式由文本图层中记录的字体样式决定 */
 {
 	LCUI_Font font;
-	
+	int pixel_size;
 	Font_Init( &font );
-	if(data->data != NULL) {
-		if(data->data->pixel_size != -1) {
-			font.size = data->data->pixel_size;
-		}
+	if(data->data == NULL) {
+		pixel_size = default_style->pixel_size;	
+	} else {
+		pixel_size = data->data->pixel_size; 
 	}
-	Get_FontBMP( &font, data->char_code, &data->bitmap ); 
-#ifdef abcddd
-	switch( data->char_code ) {
-	    case L'最':
-	    case L'经':
-	    case L'典':
-	    case L'的':
-	    case L'代':
-	    case L'码':
-	    case L'部':
-		printf("char code: %d, size: %d, height:%d\n", data->char_code, font.size, data->bitmap.rows);
-		Show_FontBMP(&data->bitmap);
-		break;
-	}
-#endif
+	Get_FontBMP( &font, data->char_code, pixel_size, &data->bitmap );  
 }
 
 static int 
@@ -609,22 +609,22 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 		for(j=0; j<n; ++j) {
 			p_data = Queue_Get( &p_row->string, j ); 
 			if( p_data->data != NULL ) {
-				if( p_data->data->pixel_size > 0 ) {
+				//if( p_data->data->pixel_size > 0 ) {
 					size = p_data->data->pixel_size;
-				} else { 
-					size = layer->default_data.pixel_size;
-				}
+				//} else { 
+				//	size = layer->default_data.pixel_size;
+				//}
 				size += 2;
 				
-				if( p_data->data->need_fore_color ) {
+				//if( p_data->data->_fore_color ) {
 					color = p_data->data->fore_color;
-				} else {
-					color = layer->default_data.fore_color;
-				}
+				//} else {
+				//	color = layer->default_data.fore_color;
+				//}
 			} else {
 				size = layer->default_data.pixel_size + 2; 
 				color = layer->default_data.fore_color;
-			} 
+			}
 			pos.x += p_data->bitmap.left;
 			if( p_data->need_update ) { 
 				p_data->need_update = FALSE; 
@@ -688,9 +688,81 @@ TextLayer_Get_Size ( LCUI_TextLayer *layer )
 
 void
 TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style )
-/* 设定默认的文本样式 */
+/* 设定默认的文本样式，需要调用TextLayer_Draw函数进行文本位图更新 */
 {
-	memcpy( &layer->default_data, &style, sizeof(LCUI_TextStyle) );
+	LCUI_Rect area, tmp_area;
+	uint_t i, j;
+	LCUI_CharData *char_ptr;
+	LCUI_TextStyle *old_style;
+	Text_RowData *row_ptr;
+	int32_t rows, len, old_size;
+	
+	layer->default_data = style; 
+	rows = Queue_Get_Total( &layer->rows_data );
+	for(area.y=0,i=0; i<rows; ++i) {
+		area.x = 0;
+		row_ptr = Queue_Get( &layer->rows_data, i ); 
+		len = Queue_Get_Total( &row_ptr->string );
+		for(j=0; j<len; ++j) {
+			char_ptr = Queue_Get( &row_ptr->string, j ); 
+			area.x += char_ptr->bitmap.left; 
+			old_style = char_ptr->data;
+			if(old_style == NULL) {
+				old_size = 12;
+				char_ptr->need_update = TRUE; 
+			} else {
+				if(old_style->pixel_size > 0) {
+					old_size = old_style->pixel_size;
+				} else {
+					old_size = 12;
+				}
+			}
+			/* 若有属性是缺省的 */
+			if(!old_style->_pixel_size) {
+				old_style->pixel_size = style.pixel_size;
+				char_ptr->need_update = TRUE; 
+			}
+			if(!old_style->_style) {
+				old_style->style = style.style;
+				char_ptr->need_update = TRUE; 
+			}
+			if(!old_style->_family) {
+				strcpy(old_style->family, style.family);
+				char_ptr->need_update = TRUE; 
+			}
+			if(!old_style->_weight) {
+				old_style->weight = style.weight;
+				char_ptr->need_update = TRUE; 
+			}
+			if(!old_style->_back_color) {
+				old_style->back_color = style.back_color;
+				char_ptr->need_update = TRUE; 
+			}
+			if(!old_style->_fore_color) {
+				old_style->fore_color = style.fore_color;
+				char_ptr->need_update = TRUE; 
+			}
+			if(!old_style->_decoration) {
+				old_style->decoration = style.decoration;
+				char_ptr->need_update = TRUE; 
+			} 
+			if(char_ptr->need_update) {
+				tmp_area.x = area.x;
+				tmp_area.y = area.y + old_size+2 - char_ptr->bitmap.top;
+				tmp_area.width = char_ptr->bitmap.width;
+				tmp_area.height = char_ptr->bitmap.rows; 
+				/* 记录之前字体位图所在区域，等待刷新 */
+				RectQueue_Add( &layer->clear_area, tmp_area ); 
+				area.x += char_ptr->bitmap.width;
+				/* 重新获取字体位图 */
+				FontBMP_Free(&char_ptr->bitmap); 
+				TextLayer_Get_Char_BMP ( &layer->default_data, char_ptr );
+			} else {
+				area.x += char_ptr->bitmap.width;
+			}
+		}
+		area.y += row_ptr->max_size.h; 
+	} 
 }
 
 void
@@ -801,9 +873,9 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 		}
 		
 		char_data.char_code = *p;
-		char_data.display = IS_TRUE; 
-		char_data.need_update = IS_TRUE; 
-		char_data.data = TextLayer_Get_Current_TextStyle( layer ); 
+		char_data.display = TRUE; 
+		char_data.need_update = TRUE; 
+		char_data.data = TextLayer_Get_Current_TextStyle( layer );  
 		Queue_Insert( &layer->text_source_data, layer->current_src_pos, &char_data ); 
 		Queue_Insert( &current_row_data->string, layer->current_des_pos.x, &char_data ); 
 		
@@ -831,7 +903,7 @@ TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
 				continue;
 			}
 			DEBUG_MSG( "generate FontBMP, char code: %d\n", char_ptr->char_code );
-			TextLayer_Get_Char_BMP ( char_ptr );
+			TextLayer_Get_Char_BMP ( &layer->default_data, char_ptr );
 		}
 	}
 }
