@@ -372,7 +372,7 @@ int Graph_Create(LCUI_Graph *graph, int width, int height)
 {
 	if(width > 10000 || height > 10000) {
 		printf("error: can not allocate too much memory!\n");
-		exit(-1);
+		abort();
 	}
 	if(height < 0 || width < 0) {
 		Graph_Free( graph );
