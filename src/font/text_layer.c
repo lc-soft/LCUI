@@ -621,7 +621,7 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	rows = Queue_Get_Total( &layer->rows_data ); 
 	for(pos.y=0,i=0; i<rows; ++i) {
 		p_row = Queue_Get( &layer->rows_data, i );
-		n = Queue_Get_Total( &p_row->string );
+		n = Queue_Get_Total( &p_row->string ); 
 		pos.x = 0;
 		//
 		//if( p_row->pos.y != pos.y ) { 
@@ -654,7 +654,7 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 				area = Rect(pos.x, pos.y, size, size);
 				/* 贴上字体位图 */
 				FontBMP_Mix( &widget->graph, Pos( pos.x, 
-					pos.y + size - p_data->bitmap.top),
+					pos.y + p_row->max_size.h - p_data->bitmap.top),
 					&p_data->bitmap, color, mode );
 				Add_Widget_Refresh_Area( widget, area );  
 			}
