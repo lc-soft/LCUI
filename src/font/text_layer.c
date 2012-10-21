@@ -182,7 +182,7 @@ TextLayer_TagStyle_Add( LCUI_TextLayer *layer, tag_style_data *data )
 	Queue_Add( &layer->tag_buff, data );
 }
 
-#define MAX_TAG_NUM 1
+#define MAX_TAG_NUM 2
 
 static LCUI_TextStyle *
 TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
@@ -212,13 +212,22 @@ TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
 				++equal;
 			}
 			break;
+		    case TAG_ID_SIZE:
+			if( flags[1] == 0 ) {
+				PX_PT_t pxpt;
+				pxpt = *((PX_PT_t*)p->style);
+				data->_pixel_size = TRUE;
+				data->pixel_size = pxpt.px;
+				++equal;
+			}
+			break;
 		    default: break;
 		}
 		if(equal == MAX_TAG_NUM) {
 			break;
 		}
 	}
-	if( equal != MAX_TAG_NUM ) {
+	if( equal == 0 ) {
 		free( data );
 		return NULL;
 	}
@@ -397,6 +406,16 @@ covernt_tag_to_style_data (wchar_t *str, tag_style_data *out_data)
 		out_data->tag = TAG_ID_COLOR;
 		out_data->style = malloc( sizeof(LCUI_RGB) );
 		memcpy( out_data->style, &rgb, sizeof(LCUI_RGB) );
+	}
+	else if( (q = get_style_tag ( p, "size", tag_data)) ) {
+		PX_PT_t pxpt;
+		p = q;
+		if( get_PX_PT_t( tag_data, &pxpt ) != 0) {
+			return NULL;
+		}
+		out_data->tag = TAG_ID_SIZE;
+		out_data->style = malloc( sizeof(PX_PT_t) );
+		memcpy( out_data->style, &pxpt, sizeof(PX_PT_t) );
 	} else {
 		p = NULL;
 	}
@@ -435,6 +454,10 @@ handle_style_endtag( LCUI_TextLayer *layer, wchar_t *str )
 	if( strcasecmp(tag_name, "color") == 0 ) {
 		/* 消除该标签添加的字体样式 */
 		TextLayer_TagStyle_Delete ( layer, TAG_ID_COLOR );
+	} 
+	else if( strcasecmp(tag_name, "size") == 0 ) {
+		/* 消除该标签添加的字体样式 */
+		TextLayer_TagStyle_Delete ( layer, TAG_ID_SIZE );
 	} else {
 		return NULL;
 	}
