@@ -183,14 +183,20 @@ void WString_Free(LCUI_WString *str);
 /************************** End String ********************************/
 
 
-void combo_t_init( combo_t *combo_num );
-/* 初始化复合数 */
+void PX_P_t_init( PX_P_t *combo_num );
+/* 初始化PX_P_t */ 
 
-int get_combo_t( char *str, combo_t *combo_num );
-/* 根据传入的字符串，获取字符串实际表达的值 */
+void PX_P_t_4_init( PX_P_t_4 *data );
+/* 初始化4组PX_P_t */ 
 
-void combo_t_4_init( combo_t_4 *data );
-/* 初始化4组复合数 */
+void PX_PT_t_init( PX_PT_t *combo_num );
+/* 初始化PX_PT_t */ 
+
+int get_PX_P_t( char *str, PX_P_t *combo_num );
+/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是百分比 */ 
+
+int get_PX_PT_t( char *str, PX_PT_t *combo_num );
+/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是PT */ 
 
 void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out);
 /* 

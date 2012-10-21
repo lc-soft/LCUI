@@ -173,25 +173,33 @@ LCUI_Pos Pos_Sub(LCUI_Pos a, LCUI_Pos b)
 	return a;
 }
 
-void combo_t_init( combo_t *combo_num )
-/* 初始化复合数 */
+void PX_P_t_init( PX_P_t *combo_num )
+/* 初始化PX_P_t */
 {
 	combo_num->which_one = 0;
-	combo_num->integer = 0;
+	combo_num->px = 0;
 	combo_num->scale = 0.0;
 }
 
-void combo_t_4_init( combo_t_4 *data )
-/* 初始化4组复合数 */
+void PX_P_t_4_init( PX_P_t_4 *data )
+/* 初始化4组PX_P_t */
 {
-	combo_t_init( &data->top );
-	combo_t_init( &data->bottom );
-	combo_t_init( &data->left );
-	combo_t_init( &data->right );
+	PX_P_t_init( &data->top );
+	PX_P_t_init( &data->bottom );
+	PX_P_t_init( &data->left );
+	PX_P_t_init( &data->right );
 }
 
-int get_combo_t( char *str, combo_t *combo_num )
-/* 根据传入的字符串，获取字符串实际表达的值 */
+void PX_PT_t_init( PX_PT_t *combo_num )
+/* 初始化PX_PT_t */
+{
+	combo_num->which_one = 0;
+	combo_num->px = 0;
+	combo_num->pt = 0;
+}
+
+int get_PX_P_t( char *str, PX_P_t *combo_num )
+/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是百分比 */
 {
 	char buff[256];
 	int j, i, len; 
@@ -217,7 +225,7 @@ int get_combo_t( char *str, combo_t *combo_num )
 			if(i<len-1) { 
 				if (str[i+1] == 'x' || str[i+1] == 'X') {
 					buff[j+1] = 0;
-					sscanf( str, "%d", &combo_num->integer ); 
+					sscanf( str, "%d", &combo_num->px ); 
 					combo_num->which_one = 0;
 					return 0;
 				}
@@ -228,7 +236,50 @@ int get_combo_t( char *str, combo_t *combo_num )
 		}
 	}
 	/* 不包含px和%，那单位就默认为px，取整数 */
-	sscanf( buff, "%d", &combo_num->integer ); 
+	sscanf( buff, "%d", &combo_num->px ); 
+	combo_num->which_one = 0;
+	return 0;
+}
+
+
+int get_PX_PT_t( char *str, PX_PT_t *combo_num )
+/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是PT */
+{
+	char buff[256];
+	int j, i, len; 
+	
+	len = strlen(str);
+	for(j=0,i=0; i<len; ++i, ++j) {
+		if(str[i] == ' ') {
+			--j;
+			continue;
+		}
+		if(str[i] >= '0' && str[i] <= '9' ) {
+			buff[j] = str[i];
+			continue;
+		}
+		else if (str[i] == 'p' || str[i] == 'P') { 
+			if(i<len-1) { 
+				if (str[i+1] == 'x' || str[i+1] == 'X') {
+					buff[j+1] = 0;
+					sscanf( str, "%d", &combo_num->px ); 
+					combo_num->which_one = 0;
+					return 0;
+				} 
+				else if(str[i+1] == 't' || str[i+1] == 'T') {
+					buff[j+1] = 0;
+					sscanf( str, "%d", &combo_num->pt ); 
+					combo_num->which_one = 1;
+					return 0;
+				}
+			}
+			return -1;
+		} else {
+			break;
+		}
+	}
+	/* 不包含px和pt，那单位就默认为px，取整数 */
+	sscanf( buff, "%d", &combo_num->px ); 
 	combo_num->which_one = 0;
 	return 0;
 }
