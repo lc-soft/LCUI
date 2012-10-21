@@ -119,7 +119,7 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 int Open_Fontfile(LCUI_Font *font_data, char *fontfile);
 /* 功能：打开字体文件，并保存数据至LCUI_Font结构体中 */ 
 
-int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, LCUI_FontBMP *out_bitmap);
+int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, int pixel_size, LCUI_FontBMP *out_bitmap);
 /*
  * 功能：获取单个wchar_t型字符的位图
  * 说明：LCUI_Font结构体中储存着已被打开的字体文件句柄和face对象的句柄，如果字体文件已经被
@@ -160,18 +160,23 @@ enum _font_decoration
 /******************* 字体相关数据 **********************/
 struct _LCUI_TextStyle
 {
-	char family[256];
+	BOOL _family:1;
+	BOOL _style:1;
+	BOOL _weight:1;
+	BOOL _decoration:1;
+	BOOL _back_color:1;
+	BOOL _fore_color:1;
+	BOOL _pixel_size:1;
 	
+	char family[256];
 	enum_font_style	style		:3;
 	enum_font_weight	weight		:3;
 	enum_font_decoration	decoration	:4;
 	
-	int need_back_color:1;
-	int need_fore_color:1;
 	LCUI_RGB fore_color;
 	LCUI_RGB back_color;
 	
-	int pixel_size;		/* 当它等于-1时，将使用全局尺寸 */
+	int pixel_size;	
 };
 /******************************************************/
 
@@ -200,6 +205,43 @@ struct _LCUI_TextLayer
 
 /**********************************************************************/
 
+/**************************** TextStyle *******************************/
+void 
+TextStyle_Init ( LCUI_TextStyle *data );
+/* 初始化字体样式数据 */ 
+
+void
+TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily );
+/* 设置字体族 */ 
+
+void
+TextStyle_FontSize( LCUI_TextStyle *style, int fontsize );
+/* 设置字体大小 */ 
+
+void
+TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color );
+/* 设置字体颜色 */ 
+
+void
+TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color );
+/* 设置字体背景颜色 */ 
+
+void
+TextStyle_FontStyle( LCUI_TextStyle *style, enum_font_style fontstyle );
+/* 设置字体样式 */ 
+
+void
+TextStyle_FontWeight( LCUI_TextStyle *style, enum_font_weight fontweight );
+
+void
+TextStyle_FontDecoration( LCUI_TextStyle *style, enum_font_decoration decoration );
+/* 设置字体下划线 */ 
+
+int 
+TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b );
+
+/************************** End TextStyle *****************************/
+
 
 /*************************** 基本的处理 *********************************/
 void 
@@ -226,7 +268,7 @@ TextLayer_Get_Size ( LCUI_TextLayer *layer );
 
 void
 TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style );
-/* 设定默认的文本样式 */
+/* 设定默认的文本样式，需要调用TextLayer_Draw函数进行文本位图更新 */
 
 int
 TextLayer_Text( LCUI_TextLayer *layer, char *new_text );
