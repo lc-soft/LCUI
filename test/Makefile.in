@@ -41,7 +41,8 @@ noinst_PROGRAMS = helloworld2$(EXEEXT) helloworld$(EXEEXT) \
 	test_button$(EXEEXT) test_label$(EXEEXT) test_loading$(EXEEXT) \
 	ts_calibrate$(EXEEXT) test_viewimage$(EXEEXT) \
 	test_lcui_graph_mix$(EXEEXT) test_window$(EXEEXT) \
-	test_rect_cut$(EXEEXT)
+	test_rect_cut$(EXEEXT) test_gaussian_blur$(EXEEXT) \
+	test_widget_1$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -71,6 +72,9 @@ test_checkbox_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_font_OBJECTS = test_font.$(OBJEXT)
 test_font_OBJECTS = $(am_test_font_OBJECTS)
 test_font_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_test_gaussian_blur_OBJECTS = test_gaussian_blur.$(OBJEXT)
+test_gaussian_blur_OBJECTS = $(am_test_gaussian_blur_OBJECTS)
+test_gaussian_blur_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_label_OBJECTS = test_label.$(OBJEXT)
 test_label_OBJECTS = $(am_test_label_OBJECTS)
 test_label_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -92,6 +96,9 @@ test_rect_cut_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_viewimage_OBJECTS = test_viewimage.$(OBJEXT)
 test_viewimage_OBJECTS = $(am_test_viewimage_OBJECTS)
 test_viewimage_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_test_widget_1_OBJECTS = test_widget_1.$(OBJEXT)
+test_widget_1_OBJECTS = $(am_test_widget_1_OBJECTS)
+test_widget_1_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_window_OBJECTS = test_window.$(OBJEXT)
 test_window_OBJECTS = $(am_test_window_OBJECTS)
 test_window_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -142,17 +149,19 @@ am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(helloworld_SOURCES) $(helloworld2_SOURCES) \
 	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
-	$(test_font_SOURCES) $(test_label_SOURCES) \
-	$(test_lcui_graph_mix_SOURCES) $(test_loading_SOURCES) \
-	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
-	$(test_rect_cut_SOURCES) $(test_viewimage_SOURCES) \
+	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
+	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
+	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
+	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
+	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
 	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 DIST_SOURCES = $(helloworld_SOURCES) $(helloworld2_SOURCES) \
 	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
-	$(test_font_SOURCES) $(test_label_SOURCES) \
-	$(test_lcui_graph_mix_SOURCES) $(test_loading_SOURCES) \
-	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
-	$(test_rect_cut_SOURCES) $(test_viewimage_SOURCES) \
+	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
+	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
+	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
+	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
+	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
 	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -224,12 +233,15 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+FREETYPE_LIBS = @FREETYPE_LIBS@
 GREP = @GREP@
+ICONV_LIBS = @ICONV_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+JPEG_LIBS = @JPEG_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
@@ -255,11 +267,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PNG_LIBS = @PNG_LIBS@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+THREAD_LIBS = @THREAD_LIBS@
+TS_LIBS = @TS_LIBS@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -349,6 +364,10 @@ test_window_SOURCES = test_window.c
 test_window_LDADD = $(top_builddir)/src/libLCUI.la
 test_rect_cut_SOURCES = test_rect_cut.c
 test_rect_cut_LDADD = $(top_builddir)/src/libLCUI.la
+test_gaussian_blur_SOURCES = test_gaussian_blur.c
+test_gaussian_blur_LDADD = $(top_builddir)/src/libLCUI.la
+test_widget_1_SOURCES = test_widget_1.c
+test_widget_1_LDADD = $(top_builddir)/src/libLCUI.la
 all: all-recursive
 
 .SUFFIXES:
@@ -407,6 +426,9 @@ test_checkbox$(EXEEXT): $(test_checkbox_OBJECTS) $(test_checkbox_DEPENDENCIES)
 test_font$(EXEEXT): $(test_font_OBJECTS) $(test_font_DEPENDENCIES) 
 	@rm -f test_font$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_font_OBJECTS) $(test_font_LDADD) $(LIBS)
+test_gaussian_blur$(EXEEXT): $(test_gaussian_blur_OBJECTS) $(test_gaussian_blur_DEPENDENCIES) 
+	@rm -f test_gaussian_blur$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_gaussian_blur_OBJECTS) $(test_gaussian_blur_LDADD) $(LIBS)
 test_label$(EXEEXT): $(test_label_OBJECTS) $(test_label_DEPENDENCIES) 
 	@rm -f test_label$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_label_OBJECTS) $(test_label_LDADD) $(LIBS)
@@ -428,6 +450,9 @@ test_rect_cut$(EXEEXT): $(test_rect_cut_OBJECTS) $(test_rect_cut_DEPENDENCIES)
 test_viewimage$(EXEEXT): $(test_viewimage_OBJECTS) $(test_viewimage_DEPENDENCIES) 
 	@rm -f test_viewimage$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_viewimage_OBJECTS) $(test_viewimage_LDADD) $(LIBS)
+test_widget_1$(EXEEXT): $(test_widget_1_OBJECTS) $(test_widget_1_DEPENDENCIES) 
+	@rm -f test_widget_1$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_widget_1_OBJECTS) $(test_widget_1_LDADD) $(LIBS)
 test_window$(EXEEXT): $(test_window_OBJECTS) $(test_window_DEPENDENCIES) 
 	@rm -f test_window$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_window_OBJECTS) $(test_window_LDADD) $(LIBS)
@@ -446,6 +471,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_button.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_checkbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_font.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_gaussian_blur.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_label.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_lcui_graph_mix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_loading.Po@am__quote@
@@ -453,6 +479,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_radiobtn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_rect_cut.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_viewimage.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_widget_1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_window.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ts_calibrate.Po@am__quote@
 
