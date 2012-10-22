@@ -127,11 +127,20 @@ LCUI_Rect Get_Valid_Area(LCUI_Size container, LCUI_Rect rect)
 		rect.y = 0;
 	}
 	
-	if (rect.x + rect.width > container.w) 
-		rect.width = container.w - rect.x; 
-	if (rect.y + rect.height > container.h) 
-		rect.height = container.h - rect.y; 
-	
+	if (rect.x + rect.width > container.w) {
+		if(rect.x < container.w) {
+			rect.width = container.w - rect.x; 
+		} else {
+			rect.width = 0;
+		}
+	}
+	if (rect.y + rect.height > container.h) {
+		if(rect.y < container.h) {
+			rect.height = container.h - rect.y; 
+		} else {
+			rect.height = 0;
+		}
+	}
 	return rect;
 }
 
