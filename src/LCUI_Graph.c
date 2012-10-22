@@ -478,14 +478,21 @@ int Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area)
 	if(src == NULL || des == NULL) {
 		return -1;
 	}
-	
-	area = Get_Valid_Area(Size(src->width, src->height), area); 
+	area = Get_Valid_Area(Size(src->width, src->height), area);
+	if(!Rect_Valid( area )) {
+		des->src = NULL;
+		des->pos.x = 0;
+		des->pos.y = 0;
+		des->width = 0;
+		des->height= 0;
+		des->quote = FALSE;
+	}
 	des->src = src;
 	des->pos.x = area.x;
 	des->pos.y = area.y;
 	des->width = area.width;
 	des->height= area.height;
-	des->quote = IS_TRUE;
+	des->quote = TRUE;
 	return 0;
 }
 
@@ -508,7 +515,11 @@ LCUI_Rect Get_Graph_Valid_Rect(LCUI_Graph *graph)
 		w = graph->src->width;
 		h = graph->src->height;
 	}
-	
+	if(pos.x > graph->width || pos.y > graph->height) {
+		cut_rect.width = 0;
+		cut_rect.height = 0;
+		return cut_rect;
+	}
 	/* 获取需裁剪的区域 */
 	if(pos.x < 0) {
 		cut_rect.width += pos.x;
@@ -1156,7 +1167,7 @@ int Graph_Fill_Alpha(LCUI_Graph *src, uchar_t alpha)
 	Graph_Lock( src, 1);
 	size = sizeof(uchar_t) * src_rect.width;
 	ptr = src->rgba[3] + src_rect.x + src_rect.y * src->width;
-	for(i=0; i<src_rect.height; ++i){ 
+	for(i=0; i<src_rect.height; ++i) {
 		memset(ptr, alpha, size);
 		ptr += src->width;
 	}
