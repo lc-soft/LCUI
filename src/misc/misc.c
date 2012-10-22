@@ -204,7 +204,14 @@ int get_PX_P_t( char *str, PX_P_t *combo_num )
 	char buff[256];
 	int j, i, len; 
 	
+	if(str == NULL) {
+		return -1;
+	}
+	
 	len = strlen(str);
+	if(len == 0) {
+		return -1;
+	}
 	for(j=0,i=0; i<len; ++i, ++j) {
 		if(str[i] == ' ') {
 			--j;
@@ -248,7 +255,14 @@ int get_PX_PT_t( char *str, PX_PT_t *combo_num )
 	char buff[256];
 	int j, i, len; 
 	
+	if(str == NULL) {
+		return -1;
+	}
+	
 	len = strlen(str);
+	if(len == 0) {
+		return -1;
+	}
 	for(j=0,i=0; i<len; ++i, ++j) {
 		if(str[i] == ' ') {
 			--j;
