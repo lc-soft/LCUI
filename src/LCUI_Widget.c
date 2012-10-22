@@ -101,7 +101,7 @@ int _Get_Widget_Container_Width(LCUI_Widget *widget)
 	if( widget->parent == NULL ) {
 		return Get_Screen_Width();
 	}
-	if( widget->parent->w.which_one == 0 ) {
+	if( widget->parent->w.which_one == 0 ) { 
 		return widget->parent->w.px;
 	}
 	/* 既然容器的宽度也使用百分比，那么就递归调用计算父容器的宽度，直至为整数为止 */
@@ -292,7 +292,7 @@ int _Get_Widget_MinHeight( LCUI_Widget *widget )
 int _Get_Widget_Height(LCUI_Widget *widget)
 {
 	if(widget->h.which_one == 0) {
-		return widget->min_h.px;
+		return widget->h.px;
 	}
 	return widget->h.scale * _Get_Widget_Container_Height( widget );
 }
@@ -300,9 +300,9 @@ int _Get_Widget_Height(LCUI_Widget *widget)
 int _Get_Widget_Width(LCUI_Widget *widget)
 {
 	if(widget->w.which_one == 0) {
-		return widget->min_h.px;
+		return widget->w.px;
 	}
-	return widget->w.scale * _Get_Widget_Container_Height( widget );
+	return widget->w.scale * _Get_Widget_Container_Width( widget );
 }
 
 int Get_Widget_Height(LCUI_Widget *widget)
@@ -845,6 +845,7 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	widget.min_size		= Size(0, 0); 
 	widget.max_size		= Size(INT_MAX, INT_MAX); 
 	widget.align		= ALIGN_NONE; 
+	widget.dock		= DOCK_TYPE_NONE;
 	widget.offset		= Pos(0, 0); 
 	widget.pos_type		= POS_TYPE_IN_SCREEN;
 	widget.back_color	= RGB(238,243,250);
@@ -984,15 +985,10 @@ void Set_Widget_Align(LCUI_Widget *widget, ALIGN_TYPE align, LCUI_Pos offset)
 	Update_Widget_Pos(widget);/* 更新位置 */
 }
 
-int Widget_MaxSize( LCUI_Widget *widget, char *width, char *height )
+int Set_Widget_MaxSize( LCUI_Widget *widget, char *width, char *height )
 /* 
  * 功能：设定部件的最大尺寸 
- * 说明：当值为0时，部件的尺寸不受限制
- * 用法示例：
- * Widget_MaxSize( widget, "100px", "50px" ); 部件尺寸最大为100x50像素
- * Widget_MaxSize( widget, "100%", "50px" ); 部件宽度等于容器宽度，高度为50像素
- * Widget_MaxSize( widget, "50", "50" ); 部件尺寸最大为50x50像素，px可以省略
- * Widget_MaxSize( widget, "0", "50%" ); 部件宽度不受限制，高度为容器高度的一半
+ * 说明：当值为0时，部件的尺寸不受限制，用法示例可参考Set_Widget_Size()函数 
  * */
 {
 	int n;
@@ -1001,10 +997,10 @@ int Widget_MaxSize( LCUI_Widget *widget, char *width, char *height )
 	return n;
 }
 
-int Widget_MinSize( LCUI_Widget *widget, char *width, char *height )
+int Set_Widget_MinSize( LCUI_Widget *widget, char *width, char *height )
 /* 
  * 功能：设定部件的最小尺寸 
- * 说明：用法示例可参考Widget_MaxSize()函数的注释
+ * 说明：用法示例可参考Set_Widget_Size()函数 
  * */
 {
 	int n;
@@ -1077,12 +1073,12 @@ void Limit_Widget_Pos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos)
 	widget->max_y.which_one = 0;
 }
 
-void Widget_LimitPos( LCUI_Widget *widget, char *x_str, char*y_str )
+void _Limit_Widget_Pos( LCUI_Widget *widget, char *x_str, char*y_str )
 {
 	
 }
 
-void Widget_LimitSize( LCUI_Widget *widget, char *w_str, char*h_str )
+void _Limit_Widget_Size( LCUI_Widget *widget, char *w_str, char*h_str )
 {
 	
 }
@@ -1361,8 +1357,7 @@ void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
 	}
 	void ( *func_resize ) (LCUI_Widget*);
 	
-	if(widget->size.w == size.w 
-	 && widget->size.h == size.h) {
+	if(widget->size.w == size.w && widget->size.h == size.h) {
 		return;
 	}
 	LCUI_Size max_size, min_size;
@@ -1381,18 +1376,20 @@ void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
 	if(size.h < min_size.h) {
 		size.h = min_size.h;
 	}
-			
+	
 	Add_Widget_Refresh_Area(widget->parent, Get_Widget_Rect(widget));
+	
 	widget->size = size;
+	
 	Graph_Create(&widget->graph, size.w, size.h);
 	/* 获取改变部件尺寸时需要调用的函数 */
 	func_resize = Get_WidgetFunc_By_ID( widget->type_id, FUNC_TYPE_RESIZE );
 	func_resize(widget); 
 	Refresh_Widget(widget); 
-	Update_Child_Widget_Pos(widget);/* 更新子部件的位置 */  
-	
+	/* 更新子部件的位置及尺寸 */  
+	Update_Child_Widget_Size( widget );
 	if(widget->parent != NULL
-	&& widget->parent->auto_size == IS_TRUE) {
+	&& widget->parent->auto_size) {
 	/* 如果需要让它的容器能够自动调整大小 */
 		Auto_Resize_Widget(widget->parent); 
 	}
@@ -1499,10 +1496,10 @@ void Exec_Update_Widget_Pos( LCUI_Widget *widget )
 	Exec_Move_Widget(widget, pos);
 }
 
-void Widget_Size_Update( LCUI_Widget *widget )
+void Update_Widget_Size( LCUI_Widget *widget )
 /* 部件尺寸更新 */
 {
-	Record_WidgetUpdate(widget, NULL, DATATYPE_SIZE);
+	Resize_Widget( widget, _Get_Widget_Size(widget) ); 
 }
 
 void Update_Child_Widget_Size(LCUI_Widget *widget)
@@ -1511,20 +1508,28 @@ void Update_Child_Widget_Size(LCUI_Widget *widget)
  * 说明：当部件尺寸改变后，有的部件的尺寸以及位置是按百分比算的，需要重新计算。
  * */
 {
+	if(widget == NULL) {
+		return;
+	}
+	
 	LCUI_Widget *child;
 	int i, total;
-	total = Queue_Get_Total(&widget->child);
+	total = Queue_Get_Total(&widget->child); 
 	for(i=0; i<total; ++i) {
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
-		Widget_Size_Update( child ); 
+		if( !child ) {
+			continue;
+		}
+		Update_Widget_Size( child ); 
 		Update_Widget_Pos( child );
 	}
 }
 
-void Exec_Widget_Size_Update( LCUI_Widget *widget )
-{
+void Exec_Update_Widget_Size( LCUI_Widget *widget )
+{ 
 	widget->size = _Get_Widget_Size( widget ); 
-	Update_Child_Widget_Size( widget ); 
+	widget->w.px = widget->size.w;
+	widget->h.px = widget->size.h;
 }
 
 void Update_Child_Widget_Pos(LCUI_Widget *widget)
@@ -1542,6 +1547,68 @@ void Update_Child_Widget_Pos(LCUI_Widget *widget)
 		Update_Widget_Pos( child ); 
 	}
 }
+
+
+void Set_Widget_Size( LCUI_Widget *widget, char *width, char *height )
+/* 
+ * 功能：设定部件的尺寸大小
+ * 说明：如果设定了部件的停靠位置，并且该停靠类型默认限制了宽/高，那么部件的宽/高就不能被改变。
+ * 用法示例：
+ * Set_Widget_Size( widget, "100px", "50px" ); 部件尺寸最大为100x50像素
+ * Set_Widget_Size( widget, "100%", "50px" ); 部件宽度等于容器宽度，高度为50像素
+ * Set_Widget_Size( widget, "50", "50" ); 部件尺寸最大为50x50像素，px可以省略 
+ * Set_Widget_Size( widget, NULL, "50%" ); 部件宽度保持原样，高度为容器高度的一半
+ * */
+{ 
+	switch( widget->dock ) {
+	    case DOCK_TYPE_TOP:
+	    case DOCK_TYPE_BOTTOM: /* 只能改变高 */
+		get_PX_P_t( height, &widget->h );
+		break;
+	    case DOCK_TYPE_LEFT:
+	    case DOCK_TYPE_RIGHT:/* 只能改变宽 */
+		get_PX_P_t( width, &widget->w );
+		break;
+	    case DOCK_TYPE_FILL:break;
+	    case DOCK_TYPE_NONE: /* 可改变宽和高 */
+		get_PX_P_t( width, &widget->w );
+		get_PX_P_t( height, &widget->h );
+		break;
+	} 
+	Update_Widget_Size( widget );
+}
+
+void Set_Widget_Dock( LCUI_Widget *widget, DOCK_TYPE dock )
+/* 设定部件的停靠类型 */
+{
+	switch( dock ) {
+	    case DOCK_TYPE_TOP:
+		Set_Widget_Align( widget, ALIGN_TOP_CENTER, Pos(0,0) );
+		Set_Widget_Size( widget, "100%", NULL );
+		break;
+	    case DOCK_TYPE_BOTTOM:
+		Set_Widget_Align( widget, ALIGN_BOTTOM_CENTER, Pos(0,0) );
+		Set_Widget_Size( widget, "100%", NULL );
+		break;
+	    case DOCK_TYPE_LEFT:
+		Set_Widget_Align( widget, ALIGN_MIDDLE_LEFT, Pos(0,0) );
+		Set_Widget_Size( widget, NULL, "100%" );
+		break;
+	    case DOCK_TYPE_RIGHT:
+		Set_Widget_Align( widget, ALIGN_MIDDLE_RIGHT, Pos(0,0) );
+		Set_Widget_Size( widget, NULL, "100%" );
+		break;
+	    case DOCK_TYPE_FILL:
+		Set_Widget_Align( widget, ALIGN_MIDDLE_CENTER, Pos(0,0) );
+		Set_Widget_Size( widget, "100%", "100%" );
+		break;
+	    case DOCK_TYPE_NONE:
+		Set_Widget_Align( widget, ALIGN_NONE, Pos(0,0) );
+		break;
+	}
+	widget->dock = dock; 
+}
+
 
 void Offset_Widget_Pos(LCUI_Widget *widget, LCUI_Pos offset)
 /* 功能：以部件原有的位置为基础，根据指定的偏移坐标偏移位置 */
@@ -1594,7 +1661,9 @@ void Resize_Widget(LCUI_Widget *widget, LCUI_Size new_size)
 {
 	if(widget == NULL) {
 		return; 
-	}	
+	}
+	widget->w.px = new_size.w;
+	widget->h.px = new_size.h;
 	Record_WidgetUpdate(widget, &new_size, DATATYPE_SIZE);
 }
 
@@ -1756,7 +1825,7 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 		    case DATATYPE_SIZE	: 
 			/* 部件尺寸更新，将更新部件的位置 */ 
 			if( temp->data == NULL ) {
-				Widget_Size_Update( widget );
+				Exec_Update_Widget_Size( widget );
 			} else {
 				Exec_Resize_Widget(widget, *((LCUI_Size*)temp->data));
 			}
