@@ -399,7 +399,7 @@ struct _LCUI_Graph
 	
 	thread_rwlock	lock;	/* 锁，用于数据保护 */
 	
-	int quote;		/* 指示是否引用其它图层中的图形 */
+	BOOL quote;		/* 指示是否引用其它图层中的图形 */
 	LCUI_Graph *src;	/* 所引用的对象 */
 	LCUI_Pos pos;		/* 在引用另一个图层中的图形时，会保存区域的起点位置 */
 	int width, height;	/* 尺寸 */

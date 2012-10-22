@@ -173,7 +173,7 @@ int Empty_Widget();
 void *Widget_Create_PrivData(LCUI_Widget *widget, size_t size);
 /* 功能：为部件私有结构体指针分配内存 */ 
 
-LCUI_Widget *Create_Widget(const char *widget_type);
+LCUI_Widget *Create_Widget( const char *widget_type );
 /* 
  * 功能：创建指定类型的窗口部件
  * 说明：创建出来的部件，默认是没有背景图时透明。
@@ -198,6 +198,31 @@ void Set_Widget_BG_Mode(LCUI_Widget *widget, BG_MODE bg_mode);
 void Set_Widget_Align(LCUI_Widget *widget, ALIGN_TYPE align, LCUI_Pos offset);
 /* 功能：设定部件的对齐方式以及偏移距离 */ 
 
+void Set_Widget_Size( LCUI_Widget *widget, char *width, char *height );
+/* 
+ * 功能：设定部件的尺寸大小
+ * 说明：如果设定了部件的停靠位置，并且该停靠类型默认限制了宽/高，那么部件的宽/高就不能被改变。
+ * 用法示例：
+ * Set_Widget_Size( widget, "100px", "50px" ); 部件尺寸最大为100x50像素
+ * Set_Widget_Size( widget, "100%", "50px" ); 部件宽度等于容器宽度，高度为50像素
+ * Set_Widget_Size( widget, "50", "50" ); 部件尺寸最大为50x50像素，px可以省略 
+ * Set_Widget_Size( widget, NULL, "50%" ); 部件宽度保持原样，高度为容器高度的一半
+ * */ 
+
+void Set_Widget_Dock( LCUI_Widget *widget, DOCK_TYPE dock );
+/* 设定部件的停靠类型 */ 
+
+int Set_Widget_MaxSize( LCUI_Widget *widget, char *width, char *height );
+/* 
+ * 功能：设定部件的最大尺寸 
+ * 说明：当值为0时，部件的尺寸不受限制，用法示例可参考Set_Widget_Size()函数 
+ * */ 
+
+int Set_Widget_MinSize( LCUI_Widget *widget, char *width, char *height );
+/* 
+ * 功能：设定部件的最小尺寸 
+ * 说明：用法示例可参考Set_Widget_Size()函数 
+ * */
 void Limit_Widget_Size(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_size);
 /* 功能：限制部件的尺寸变动范围 */ 
 
@@ -284,6 +309,15 @@ void Update_Child_Widget_Pos(LCUI_Widget *widget);
  * 调整位置。
  * */ 
 
+void Update_Widget_Size( LCUI_Widget *widget );
+/* 部件尺寸更新 */ 
+
+void Update_Child_Widget_Size(LCUI_Widget *widget);
+/* 
+ * 功能：更新指定部件的子部件的尺寸
+ * 说明：当部件尺寸改变后，有的部件的尺寸以及位置是按百分比算的，需要重新计算。
+ * */
+ 
 void Offset_Widget_Pos(LCUI_Widget *widget, LCUI_Pos offset);
 /* 功能：以部件原有的位置为基础，根据指定的偏移坐标偏移位置 */ 
 
