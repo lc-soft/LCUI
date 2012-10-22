@@ -480,7 +480,7 @@ int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
 	return 0;
 }
 
-void Set_Widget_Border_Style(LCUI_Widget *widget, LCUI_Border_Style style)
+void Set_Widget_Border_Style(LCUI_Widget *widget, BORDER_STYLE style)
 /* 功能：设定部件的边框风格 */
 {
 	widget->border_style = style;
@@ -610,7 +610,7 @@ LCUI_String Get_Widget_Style(LCUI_Widget *widget)
 	return widget->style;
 }
 
-LCUI_Border_Style Get_Widget_Border_Style(LCUI_Widget *widget)
+BORDER_STYLE Get_Widget_Border_Style(LCUI_Widget *widget)
 /* 功能：获取部件的边框类型 */
 {
 	return widget->border_style;
@@ -964,7 +964,7 @@ LCUI_Pos Get_Widget_Global_Pos(LCUI_Widget *widget)
 	return Count_Widget_Pos(widget);
 }
 
-void Set_Widget_BG_Mode(LCUI_Widget *widget, LCUI_BG_Mode bg_mode)
+void Set_Widget_BG_Mode(LCUI_Widget *widget, BG_MODE bg_mode)
 /*
  * 功能：改变部件的背景模式
  * 说明：背景模式决定了部件在没有背景图的时候是使用背景色填充还是完全透明。
@@ -973,7 +973,7 @@ void Set_Widget_BG_Mode(LCUI_Widget *widget, LCUI_BG_Mode bg_mode)
 	widget->bg_mode = bg_mode;
 }
 
-void Set_Widget_Align(LCUI_Widget *widget, LCUI_Align align, LCUI_Pos offset)
+void Set_Widget_Align(LCUI_Widget *widget, ALIGN_TYPE align, LCUI_Pos offset)
 /* 功能：设定部件的对齐方式以及偏移距离 */
 {
 	if(widget == NULL) {

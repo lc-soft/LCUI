@@ -64,7 +64,7 @@ class LCUIWidget
 	int enable();
 	int disable();
 	int setAlpha(unsigned char alpha);
-	int setAlign(LCUI_Align align, LCUI_Pos offset_pos);
+	int setAlign(ALIGN_TYPE align, LCUI_Pos offset_pos);
 	int setBorder(LCUI_RGB color, LCUI_Border border);
 	int setBackgroundImage(LCUI_Graph *img, int flag);
 	//int connectDragEvent(void (*func)(LCUIWidget &obj, LCUI_DragEvent *event));
@@ -196,7 +196,7 @@ int LCUIWidget::setAlpha(unsigned char alpha)
 	Set_Widget_Alpha( getWidget() , alpha);
 	return 0;
 }
-int LCUIWidget::setAlign(LCUI_Align align, LCUI_Pos offset_pos)
+int LCUIWidget::setAlign(ALIGN_TYPE align, LCUI_Pos offset_pos)
 {
 	if( isError() ) return WIDGET_IS_NULL; 
 	Set_Widget_Align( getWidget() , align, offset_pos);
