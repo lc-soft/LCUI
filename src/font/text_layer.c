@@ -610,7 +610,7 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	n = Queue_Get_Total( &layer->clear_area ); 
 	for(i=0; i<n; ++i) { 
 		RectQueue_Get( &area, 0 , &layer->clear_area ); 
-		Queue_Delete( &layer->clear_area, 0 );
+		Queue_Delete( &layer->clear_area, 0 ); 
 		Quote_Graph( &slot, &widget->graph, area );
 		/* 将该区域的alpha通道填充为0 */
 		Graph_Fill_Alpha( &slot, 0 ); 
@@ -649,12 +649,12 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 				color = layer->default_data.fore_color;
 			}
 			pos.x += p_data->bitmap.left;
-			if( p_data->need_update ) { 
+			if( p_data->need_update ) {
 				p_data->need_update = FALSE; 
 				area = Rect(pos.x, pos.y, size, size);
 				/* 贴上字体位图 */
 				FontBMP_Mix( &widget->graph, Pos( pos.x, 
-					pos.y + p_row->max_size.h - p_data->bitmap.top),
+					pos.y + p_row->max_size.h-1 - p_data->bitmap.top),
 					&p_data->bitmap, color, mode );
 				Add_Widget_Refresh_Area( widget, area );  
 			}
