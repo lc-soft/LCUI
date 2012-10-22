@@ -103,7 +103,8 @@ typedef enum _BOOL
 {
 	IS_FALSE = 0,
 	IS_TRUE = 1
-}BOOL;
+}
+BOOL;
 
 #define FORCE	2
 
@@ -123,16 +124,18 @@ typedef enum _BOOL
 #define LABEL_TEXT_MAX_SIZE	2048
 
 /****************** 图像的布局 *****************/
-#define LAYOUT_ZOOM	1	  /* 缩放 */
-#define LAYOUT_STRETCH	2	  /* 拉伸 */
-#define LAYOUT_CENTER	3	  /* 居中 */
-#define LAYOUT_TILE	4	  /* 平铺 */
-#define LAYOUT_NONE	0	  /* 无 */
-#define LAYOUT_NORMAL	0 
+typedef enum _LAYOUT_TYPE
+{
+	LAYOUT_ZOOM	= 1,	  /* 缩放 */
+	LAYOUT_STRETCH	= 2,	  /* 拉伸 */
+	LAYOUT_CENTER	= 3,	  /* 居中 */
+	LAYOUT_TILE	= 4,	  /* 平铺 */
+	LAYOUT_NONE	= 0,	  /* 无 */
+	LAYOUT_NORMAL	= 0 
+}LAYOUT_TYPE;
 /**********************************************/
 
 /************ 任务的添加模式 ***************/
-
 #define ADD_MODE_ADD_NEW	0 /* 新增 */
 #define ADD_MODE_NOT_REPEAT	1 /* 不能重复 */
 #define ADD_MODE_REPLACE	2 /* 覆盖 */
@@ -180,25 +183,27 @@ typedef enum _BOOL
 #define MB_Yes_No_Cancel	6
 
 /*************** 边框风格 *****************/
-enum _LCUI_Border_Style
+typedef enum _BORDER_STYLE
 {
 	BORDER_STYLE_NONE,
 	BORDER_STYLE_STANDARD,
 	BORDER_STYLE_LINE_BORDER,
 	BORDER_STYLE_ROUND_BORDER
-};
+}
+BORDER_STYLE;
 /*****************************************/
 
 /************ 部件的背景模式 ***************/
-enum _LCUI_BG_Mode
+typedef enum _BG_MODE
 {
 	BG_MODE_TRANSPARENT,
 	BG_MODE_FILL_BACKCOLOR
-};
+}
+BG_MODE;
 /*****************************************/
 
 /*********************** 定义了一些对齐方式 *********************/
-enum _LCUI_Align
+typedef enum _ALIGN_TYPE
 {
 	ALIGN_NONE,		/* 无 */
 	ALIGN_TOP_LEFT,	  	/* 向左上角对齐 */
@@ -210,11 +215,12 @@ enum _LCUI_Align
 	ALIGN_BOTTOM_LEFT,	/* 向底部偏左对齐 */
 	ALIGN_BOTTOM_CENTER,	/* 向底部居中对齐 */
 	ALIGN_BOTTOM_RIGHT	/* 向底部偏右对齐 */
-};
+}
+ALIGN_TYPE;
 /*****************************************************************/
 
 /*************** 部件的几种状态 ***************/
-enum _LCUI_Widget_Status
+typedef enum _WIDGET_STATUS
 {
 	WIDGET_STATUS_NORMAL,	/* 普通状态 */
 	WIDGET_STATUS_CLICKED,	/* 被鼠标点击，已松开 */
@@ -222,7 +228,8 @@ enum _LCUI_Widget_Status
 	WIDGET_STATUS_CLICKING,	/* 被鼠标点击，未松开 */
 	WIDGET_STATUS_FOCUS,	/* 焦点 */
 	WIDGET_STATUS_DISABLE	/* 不可用 */
-};
+}
+WIDGET_STATUS;
 /*******************************************/
 
 /****************** 图像的处理方式 *****************/
@@ -275,12 +282,6 @@ typedef struct	_Thread_TreeNode	Thread_TreeNode;
 typedef struct	_LCUI_Screen		LCUI_Screen;
 typedef struct	_Pixel			Pixel;
 typedef struct	_LCUI_Queue 		LCUI_AppList;
-
-typedef enum	_LCUI_Border_Style	LCUI_Border_Style;
-typedef enum	_LCUI_BG_Mode		LCUI_BG_Mode;
-typedef enum	_LCUI_Widget_Status	LCUI_Widget_Status; 
-typedef enum	_LCUI_Align		LCUI_Align;
-typedef enum	_LCUI_PosType		LCUI_PosType;
 
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
@@ -468,14 +469,15 @@ struct _LCUI_Border
 /*************************************/
 
 /***************************** 定位类型 ********************************/
-enum _LCUI_PosType
+typedef enum _POS_TYPE
 {
 	POS_TYPE_STATIC,
 	POS_TYPE_ABSOLUTE,
 	POS_TYPE_FIXED,
 	POS_TYPE_RELATIVE,
 	POS_TYPE_INHERIT
-};
+}
+POS_TYPE;
 /*
  * absolute:
  * 	绝对定位，相对于 static 定位以外的第一个父元素进行定位。
@@ -493,33 +495,46 @@ enum _LCUI_PosType
  */
 /**********************************************************************/
 
+/*------------ 部件停靠类型 --------------*/
+typedef enum _DOCK_TYPE
+{
+	DOCK_TYPE_NONE,
+	DOCK_TYPE_TOP,
+	DOCK_TYPE_LEFT,
+	DOCK_TYPE_RIGHT,
+	DOCK_TYPE_FILL,
+	DOCK_TYPE_BOTTOM
+}
+DOCK_TYPE;
+/*---------------- END -----------------*/
+
 /*---------------- 用于表示像素或百分比 -----------------*/
-typedef struct _PX_P_t PX_P_t;
-struct _PX_P_t
+typedef struct _PX_P_t
 {
 	BOOL which_one;		/* 指定用哪个类型的变量 */
 	int px;			/* 数值，单位为像素 */
 	double scale;		/* 比例 */
-};
+}
+PX_P_t;
 /*---------------------- END -------------------------*/
 
 /*----------------- 用于表示字体大小 --------------------*/
-typedef struct _PX_PT_t PX_PT_t;
-struct _PX_PT_t
+typedef struct _PX_PT_t
 {
 	BOOL which_one;		/* 指定用哪个类型的变量 */
 	int px;			/* pixel, 字体大小（像素） */
 	int pt;			/* point，字体大小（点数） */
-};
+}
+PX_PT_t;
 /*---------------------- END -------------------------*/
 
 
 /*------------------ 四个复合类型 ----------------------*/
-typedef struct _PX_P_t_4 PX_P_t_4;
-struct _PX_P_t_4
+typedef struct _PX_P_t_4
 {
 	PX_P_t left, top, right, bottom;
-};
+}
+PX_P_t_4;;
 /*---------------------- END -------------------------*/
 
 /*------------------- 内边距和外边距 --------------------*/
@@ -528,18 +543,18 @@ typedef struct _PX_P_t_4 LCUI_Padding;
 /*---------------------- END -------------------------*/
 
 /*----------------- 自动尺寸调整模式 --------------------*/
-typedef enum _AUTOSIZE_MODE AUTOSIZE_MODE;
-enum _AUTOSIZE_MODE
+typedef enum _AUTOSIZE_MODE
 {
 	AUTOSIZE_MODE_GROW_ONLY,	/* 只增大 */
 	AUTOSIZE_MODE_GROW_AND_SHRINK 	/* 增大和缩小 */
-};
+}
+AUTOSIZE_MODE;
 /*----------------------------------------------------*/
 
 /******************************* 部件 **********************************/
-struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
+struct _LCUI_Widget 
 {
-	LCUI_ID app_id;
+	LCUI_ID app_id; /* 所属程序的ID */
 	
 	LCUI_Pos pos;	/* 已计算出的实际位置 */
 	LCUI_Pos max_pos;
@@ -560,15 +575,15 @@ struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
 	PX_P_t max_h, min_h;
 	/*------------------ END -------------------*/
 	
-	int status;		/* 部件的状态 */
+	WIDGET_STATUS status;	/* 部件的状态 */
 	BOOL status_response:1;	/* 是否响应部件的状态改变 */
 	BOOL enabled:1;		/* 是否启用 */
 	BOOL visible:1; 	/* 是否可见 */
 	BOOL lock_display:1;	/* 指示是否锁定部件的显示顺序 */
 	int z_index;		/* 堆叠顺序 */
 	
-	BOOL auto_size:1;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
-	int auto_size_mode;	/* 自动尺寸调整模式 */ 
+	BOOL		auto_size:1;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
+	AUTOSIZE_MODE	auto_size_mode;	/* 自动尺寸调整模式 */  
 	
 	LCUI_RGB  back_color;  /* 背景色 */
 	LCUI_RGB  fore_color;  /* 前景色 */
@@ -581,10 +596,10 @@ struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
 	LCUI_Queue	child;		/* 子部件集 */
 	
 	/*----------------- 部件布局相关 ----------------*/
-	LCUI_PosType	pos_type;	/* 位置类型 */
-	int		align;		/* 部件的布局 */
+	POS_TYPE	pos_type;	/* 位置类型 */
+	ALIGN_TYPE	align;		/* 布局 */
 	LCUI_Pos	offset;		/* x，y轴的偏移量 */
-	int		dock;		/* 停靠位置 */
+	DOCK_TYPE	dock;		/* 停靠位置 */
 	/*------------------ END ----------------------*/
 	
 	/*---------- 外边距和内边距（描述） ---------------*/ 
@@ -594,7 +609,7 @@ struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
 	
 	LCUI_Border	border;		/* 边框 */
 	LCUI_RGB	border_color;	/* 边框颜色 */
-	int		border_style;	/* 边框类型(NONE:没有) */
+	BORDER_STYLE	border_style;	/* 边框类型(NONE:没有) */
 	
 	int		bg_mode;  /* 背景模式，指定在无背景时是使用透明背景还是使用背景色填充 */
 	int		background_image_layout; /* 背景图的布局 */
@@ -615,7 +630,7 @@ struct _LCUI_Widget /* 存储窗口内所有控件的图形数据 */
 	void (*hide)(LCUI_Widget*);
 	void (*disable)(LCUI_Widget*);
 	void (*enable)(LCUI_Widget*);
-	void (*set_align)(LCUI_Widget*, LCUI_Align, LCUI_Pos); 
+	void (*set_align)(LCUI_Widget*, ALIGN_TYPE, LCUI_Pos); 
 	void (*set_alpha)(LCUI_Widget*, unsigned char); 
 	void (*set_border)(LCUI_Widget*, LCUI_RGB, LCUI_Border);
 };
