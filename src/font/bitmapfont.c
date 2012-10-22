@@ -79,7 +79,8 @@ void Print_FontBMP_Info(LCUI_FontBMP *bitmap)
 	if(bitmap == NULL) {
 		return;
 	}
-	printf("width:%d, rows:%d\n", bitmap->width, bitmap->rows);
+	printf("top: %d, left: %d, width:%d, rows:%d\n", 
+	bitmap->top, bitmap->left, bitmap->width, bitmap->rows);
 }
 
 void FontBMP_Init(LCUI_FontBMP *bitmap)
