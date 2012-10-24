@@ -534,9 +534,9 @@ LCUI_Rect Get_Graph_Valid_Rect(LCUI_Graph *graph)
 	}
 	
 	LCUI_Rect rect;
-	/* 获取父部件的有效显示范围 */
+	/* 获取引用的图像的有效显示范围 */
 	rect = Get_Graph_Valid_Rect(graph->src);
-	/* 如果父部件需要裁剪，那么，子部件根据情况，也需要进行裁剪 */
+	/* 如果引用的图像需要裁剪，那么，该图像根据情况，也需要进行裁剪 */
 	if(rect.x > 0) { 
 		temp = pos.x + cut_rect.x;
 		if(temp < rect.x) { 
