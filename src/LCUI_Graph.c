@@ -234,7 +234,7 @@ BOOL Graph_Have_Alpha(LCUI_Graph *pic)
  * */
 {
 	pic = Get_Quote_Graph(pic);
-	if( pic->have_alpha == IS_TRUE) {
+	if( pic->have_alpha ) {
 		return 1;
 	}
 	return 0; 
@@ -479,14 +479,15 @@ int Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area)
 		return -1;
 	}
 	area = Get_Valid_Area(Size(src->width, src->height), area);
-	if(!Rect_Valid( area )) {
+	if(!Rect_Valid( area )) { 
 		des->src = NULL;
 		des->pos.x = 0;
 		des->pos.y = 0;
 		des->width = 0;
 		des->height= 0;
 		des->quote = FALSE;
-	}
+		return -1;
+	} 
 	des->src = src;
 	des->pos.x = area.x;
 	des->pos.y = area.y;
@@ -509,17 +510,12 @@ LCUI_Rect Get_Graph_Valid_Rect(LCUI_Graph *graph)
 	cut_rect.width = graph->width;
 	cut_rect.height = graph->height; 
 	
-	if(graph->quote == IS_FALSE) {
+	if( !graph->quote ) {
 		return cut_rect; 
 	} else {
 		w = graph->src->width;
 		h = graph->src->height;
-	}
-	if(pos.x > graph->width || pos.y > graph->height) {
-		cut_rect.width = 0;
-		cut_rect.height = 0;
-		return cut_rect;
-	}
+	} 
 	/* 获取需裁剪的区域 */
 	if(pos.x < 0) {
 		cut_rect.width += pos.x;
@@ -583,7 +579,7 @@ LCUI_Graph *Get_Quote_Graph(LCUI_Graph *graph)
 	if(graph == NULL) {
 		return NULL;
 	}
-	if(graph->quote == IS_FALSE) {
+	if( !graph->quote ) {
 		return graph; 
 	}
 	return Get_Quote_Graph(graph->src);
@@ -1149,6 +1145,7 @@ int Graph_Fill_Alpha(LCUI_Graph *src, uchar_t alpha)
 {
 	uchar_t *ptr;
 	LCUI_Rect src_rect;
+	
 	/* 获取引用的区域在源图形中的有效区域 */
 	src_rect = Get_Graph_Valid_Rect( src );
 	/* 获取引用的源图指针 */
