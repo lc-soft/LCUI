@@ -57,6 +57,10 @@
 #include <limits.h>
 
 
+/* 声明函数 */
+static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type);
+
+
 /*************************** Container ********************************/
 void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget)
 /* 功能：将部件添加至作为容器的部件内 */
@@ -68,12 +72,9 @@ void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget)
 	}
 		
 	if(container == NULL) {/* 如果容器为NULL，那就代表是以屏幕作为容器 */
-		new_queue = &LCUI_Sys.widget_list;
-		/* 改变部件的位置类型，不改的话，得出来的部件位置会有问题 */
-		widget->pos_type = POS_TYPE_IN_SCREEN;
+		new_queue = &LCUI_Sys.widget_list; 
 	} else {/* 否则，以指定部件为容器 */ 
-		new_queue = &container->child;
-		widget->pos_type = POS_TYPE_IN_WIDGET; 
+		new_queue = &container->child; 
 	}
 	
 	if(widget->parent != NULL){
@@ -150,22 +151,174 @@ int _Get_Widget_Y( LCUI_Widget *widget )
 	return widget->y.scale * _Get_Widget_Container_Height( widget );
 }
 
-LCUI_Pos _Get_Widget_Pos(LCUI_Widget *widget)
+static int
+_get_x_overlay_widget( LCUI_Queue *list, LCUI_Rect area, LCUI_Queue *out_data )
+/* 获取在x轴上指定该区域重叠的部件 */
+{
+	int i, n, len;
+	LCUI_Widget *wptr;
+	
+	if( Queue_Get_Total( out_data ) > 0 ) {
+		Destroy_Queue( out_data );
+	}
+	len = Queue_Get_Total( list );
+	for(i=0,n=0; i<len; ++i) {
+		wptr = Queue_Get( list, i );
+		/* 如果当前部件区域与area 在x轴上重叠，就添加至队列 */
+		if( wptr->pos.x < area.x+area.width
+		 && wptr->pos.x >= area.x ) {
+			Queue_Add_Pointer( out_data, wptr );
+			++n;
+		}
+	} 
+	return n;
+}
+
+LCUI_Widget *
+_get_max_y_widget( LCUI_Queue *widget_list )
+/* 获取底边y轴坐标最大的部件 */
+{
+	int total, i, y, max_y;
+	LCUI_Widget *widget, *tmp;
+	
+	total = Queue_Get_Total( widget_list );
+	widget = Queue_Get( widget_list, 0 );
+	
+	for(max_y=0,i=0; i<total; ++i) {
+		tmp = Queue_Get( widget_list, i );
+		y = tmp->y.px + tmp->size.h;
+		if(y > max_y) {
+			max_y = y;
+			widget = tmp;
+		}
+	}
+	return widget;
+}
+
+static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
+/* 更新使用static定位类型的子部件 */
+{
+	printf("Update_StaticPosType_ChildWidget(): enter\n");
+	print_widget_info( widget );
+	int i, x, y, total, j, n;
+	LCUI_Queue *queue;
+	LCUI_Size container_size;
+	LCUI_Pos new_pos;
+	LCUI_Widget *wptr, *tmp, *tmp2;
+	LCUI_Queue *old_row, *cur_row, *tmp_row, q1, q2, widget_list;
+	LCUI_Rect area;
+	
+	new_pos = Pos(0,0);
+	old_row = &q1;
+	cur_row = &q2;
+	Queue_Init( old_row, sizeof(LCUI_Widget*), NULL );
+	Queue_Init( cur_row, sizeof(LCUI_Widget*), NULL );
+	Queue_Init( &widget_list, sizeof(LCUI_Widget*), NULL );
+	Queue_Using_Pointer( &widget_list );
+	Queue_Using_Pointer( old_row );
+	Queue_Using_Pointer( cur_row );
+	
+	if(widget == NULL) { 
+		queue = &LCUI_Sys.widget_list;
+	} else { 
+		queue = &widget->child;
+	}
+	container_size = _Get_Widget_Size( widget );
+	total = Queue_Get_Total( queue );
+	printf("queue total: %d\n", total);
+	for(i=total-1,y=0,x=0; i>=0; --i) {
+		wptr = Queue_Get( queue, i );
+		/* 过滤掉定位类型不是static和relative的部件 */
+		if(wptr->pos_type != POS_TYPE_STATIC
+		&& wptr->pos_type != POS_TYPE_RELATIVE ) {
+			continue;
+		}
+		
+		printf("0, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+		if( y == 0 ) {/* 如果还在第一行，就直接记录部件 */
+			/* 记录部件指针 */
+			Queue_Add_Pointer( cur_row, wptr );
+			/* 更新部件位置 */
+			Move_Widget( wptr, new_pos );
+			print_widget_info( wptr );
+			printf("1, %d + %d > %d\n", new_pos.x, wptr->size.w, container_size.w);
+			if(new_pos.x + wptr->size.w > container_size.w) {
+				new_pos.x = x = 0; 
+				Destroy_Queue( old_row );
+				tmp_row = old_row;
+				old_row = cur_row;
+				cur_row = tmp_row;
+				tmp = Queue_Get( old_row, x ); 
+				if(tmp != NULL) {
+					new_pos.y = tmp->pos.y + tmp->size.h;
+				}
+				++y;
+			} else { 
+				/* 更新x轴坐标 */
+				new_pos.x += wptr->size.w;
+			}
+			printf("y == 0\n");
+			printf("1, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+			
+			continue;
+		}
+		printf("2,%d + %d > %d\n", new_pos.x, wptr->size.w, container_size.w);
+		/* 如果当前部件区块超出容器范围，y++，开始在下一行记录部件指针。*/
+		if(new_pos.x + wptr->size.w > container_size.w) {
+			new_pos.x = x = 0; 
+			Destroy_Queue( old_row );
+			tmp_row = old_row;
+			old_row = cur_row;
+			cur_row = tmp_row;
+			tmp = Queue_Get( old_row, x );
+			if(tmp != NULL) {
+				new_pos.y = tmp->pos.y + tmp->size.h;
+			}
+			++y;
+		}
+		printf("2, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+		/* 保存在新位置的部件的区域 */
+		area = Rect( new_pos.x, new_pos.y, wptr->size.w, wptr->size.h );
+		/* 如果有上一行记录,获取上面几行与当前部件在x轴上重叠的部件列表 */ 
+		n = _get_x_overlay_widget( cur_row, area, &widget_list );
+		printf("n: %d\n", n); 
+		if( n <= 0 ) { /* 如果上一行没有与之重叠的部件 */
+			Queue_Add_Pointer( cur_row, wptr ); 
+			printf("3,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+			Move_Widget( wptr, new_pos );
+			new_pos.x = wptr->x.px + wptr->size.w;
+			continue;
+		}
+		/* 获取底边y轴坐标最大的部件 */
+		tmp = _get_max_y_widget( &widget_list );
+		/* 如果上一行中的部件区块的底边超过当前区块的一半 */
+		if( tmp->y.px+tmp->size.h > (wptr->y.px+wptr->size.h)/2.0 ) { 
+			/* 将该部件左边的部件也一同记录到当前行 */
+			for(j=0; j<n; ++j) {
+				tmp2 = Queue_Get( &widget_list, j );
+				Queue_Add_Pointer( cur_row, tmp2 );
+				if(tmp2 == tmp) {
+					break;
+				}
+			}
+			new_pos.x = tmp->x.px + tmp->size.w; 
+			continue;
+		}
+		new_pos.y = tmp->y.px+tmp->size.h;
+		Queue_Add_Pointer( cur_row, wptr ); 
+		printf("4,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+		Move_Widget( wptr, new_pos ); 
+		new_pos.x = tmp->x.px + wptr->size.w;
+	}
+	printf("Update_StaticPosType_ChildWidget(): quit\n");
+}
+
+LCUI_Pos __Get_Widget_Pos(LCUI_Widget *widget)
 /* 功能：通过计算得出部件的位置，单位为像素 */
 {
 	LCUI_Pos pos;
 	LCUI_Size size;
-	pos.x = pos.y = 0;
-	/* 根据位置类型，来获取容器的尺寸 */ 
-	switch(widget->pos_type) {
-	    case POS_TYPE_IN_SCREEN :
-		size = Get_Screen_Size(); 
-		break;
-	    case POS_TYPE_IN_WIDGET : 
-		size = Get_Widget_Size( widget->parent ); 
-		break;
-		default: return pos; 
-	} 
+	pos.x = pos.y = 0; 
 	if(widget->align != ALIGN_NONE) { 
 		size = _Get_Widget_Container_Size( widget ); 
 		pos = Align_Get_Pos(size, Get_Widget_Size(widget), widget->align);
@@ -175,6 +328,33 @@ LCUI_Pos _Get_Widget_Pos(LCUI_Widget *widget)
 		pos.x = _Get_Widget_X( widget );
 		pos.y = _Get_Widget_Y( widget );
 	} 
+	return pos;
+}
+
+LCUI_Pos _Get_Widget_Pos(LCUI_Widget *widget)
+/* 功能：通过计算得出部件的位置，单位为像素 */
+{
+	LCUI_Pos pos;
+	LCUI_Size size;
+	pos.x = pos.y = 0;
+	
+	switch(widget->pos_type) {
+	    case POS_TYPE_STATIC:
+	    case POS_TYPE_RELATIVE: 
+		return widget->pos; 
+		
+	    default: 
+		if(widget->align == ALIGN_NONE) { 
+			pos.x = _Get_Widget_X( widget );
+			pos.y = _Get_Widget_Y( widget );
+			break;
+		}
+		size = _Get_Widget_Container_Size( widget ); 
+		pos = Align_Get_Pos(size, Get_Widget_Size(widget), widget->align);
+		/* 加上偏移距离 */
+		pos = Pos_Add(pos, widget->offset);  
+		break;
+	}
 	return pos;
 }
 
@@ -746,18 +926,19 @@ LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
 		cut_rect.width += pos.x;
 		cut_rect.x = 0 - pos.x; 
 	}
-	if(pos.x + widget->size.w > w)
+	if(pos.x + widget->size.w > w) {
 		cut_rect.width -= (pos.x +  widget->size.w - w); 
-	
+	}
 	if(pos.y < 0) {
 		cut_rect.height += pos.y;
 		cut_rect.y = 0 - pos.y; 
 	}
-	if(pos.y + widget->size.h > h)
+	if(pos.y + widget->size.h > h) {
 		cut_rect.height -= (pos.y +  widget->size.h - h); 
-	
-	if(widget->parent == NULL)
+	}
+	if(widget->parent == NULL) {
 		return cut_rect;
+	}
 		
 	LCUI_Rect rect;
 	/* 获取父部件的有效显示范围 */
@@ -847,7 +1028,7 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	widget.align		= ALIGN_NONE; 
 	widget.dock		= DOCK_TYPE_NONE;
 	widget.offset		= Pos(0, 0); 
-	widget.pos_type		= POS_TYPE_IN_SCREEN;
+	widget.pos_type		= POS_TYPE_ABSOLUTE;
 	widget.back_color	= RGB(238,243,250);
 	widget.fore_color	= RGB(0,0,0);
 	widget.border_color	= RGB(0,0,0);
@@ -1231,6 +1412,13 @@ void Set_Widget_Pos(LCUI_Widget *widget, LCUI_Pos pos)
 	widget->pos = pos;
 }
 
+void Set_Widget_PosType( LCUI_Widget *widget, POS_TYPE pos_type )
+/* 设定部件的定位类型 */
+{
+	widget->pos_type = pos_type;
+	Record_WidgetUpdate( widget, NULL, DATATYPE_POS_TYPE );
+}
+
 void Set_Widget_Alpha(LCUI_Widget *widget, unsigned char alpha)
 /* 功能：设定部件的透明度 */
 {
@@ -1459,10 +1647,6 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 	}
 }
 
-
-/* 声明函数 */
-static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, int type);
-
 void Move_Widget(LCUI_Widget *widget, LCUI_Pos new_pos)
 /* 
  * 功能：移动部件位置
@@ -1546,6 +1730,8 @@ void Update_Child_Widget_Pos(LCUI_Widget *widget)
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
 		Update_Widget_Pos( child ); 
 	}
+	/* 更新该部件内定位类型为static的子部件的位置 */
+	Update_StaticPosType_ChildWidget( widget );
 }
 
 
@@ -1665,6 +1851,10 @@ void Resize_Widget(LCUI_Widget *widget, LCUI_Size new_size)
 	widget->w.px = new_size.w;
 	widget->h.px = new_size.h;
 	Record_WidgetUpdate(widget, &new_size, DATATYPE_SIZE);
+	if( widget->pos_type == POS_TYPE_STATIC
+	 || widget->pos_type == POS_TYPE_RELATIVE ) {
+		Record_WidgetUpdate(widget, NULL, DATATYPE_POS_TYPE);
+	}
 }
 
 void Draw_Widget(LCUI_Widget *widget)
@@ -1762,7 +1952,7 @@ static int Find_WidgetData(LCUI_Widget *widget, const WidgetData *data)
 	return -1;
 }
 
-static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, int type)
+static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type)
 /* 
  * 功能：记录需要进行数据更新的部件
  * 说明：将部件指针以及需更新的数据添加至队列，根据部件的显示顺序来排列队列
@@ -1780,6 +1970,7 @@ static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, int type)
 	    case DATATYPE_STATUS: size = sizeof(int);break; /* 状态 */
 	    case DATATYPE_AREA:
 	    case DATATYPE_HIDE:
+	    case DATATYPE_POS_TYPE:
 	    case DATATYPE_SHOW:	 break;
 	    default: return -1;
 	}
@@ -1791,7 +1982,7 @@ static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, int type)
 	} else {
 		temp.data = NULL;
 	}
-	  
+	
 	pos = Find_WidgetData(widget, &temp);
 	if( type == DATATYPE_AREA ) {
 		DEBUG_MSG("search result: the recod at %d\n", pos);
@@ -1844,6 +2035,9 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 			} else {
 				Exec_Update_Widget_Pos( widget );
 			}
+			break;
+		    case DATATYPE_POS_TYPE:
+			Update_StaticPosType_ChildWidget( widget->parent );
 			break;
 		    case DATATYPE_STATUS:
 			widget->status = *(int*)temp->data;

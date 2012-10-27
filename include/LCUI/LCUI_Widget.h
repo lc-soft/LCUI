@@ -43,13 +43,18 @@
 #define __LCUI_WIDGET_H__
 
 /* 定义数据类型标识 */
-#define DATATYPE_POS	1
-#define DATATYPE_SIZE	2
-#define DATATYPE_GRAPH	3
-#define DATATYPE_STATUS	4    
-#define DATATYPE_SHOW	5
-#define DATATYPE_HIDE	6
-#define DATATYPE_AREA	7
+typedef enum DATATYPE
+{
+	DATATYPE_POS,
+	DATATYPE_POS_TYPE,
+	DATATYPE_SIZE,
+	DATATYPE_GRAPH,
+	DATATYPE_STATUS,   
+	DATATYPE_SHOW,
+	DATATYPE_HIDE,
+	DATATYPE_AREA
+}
+DATATYPE;
 
 /***************** 部件相关函数的类型 *******************/
 typedef enum _FuncType
@@ -68,6 +73,9 @@ LCUI_BEGIN_HEADER
 /***************************** Widget *********************************/
 LCUI_Size Get_Widget_Size(LCUI_Widget *widget);
 /* 功能：获取部件的尺寸 */ 
+
+LCUI_Size _Get_Widget_Size(LCUI_Widget *widget);
+/* 功能：通过计算获取部件的尺寸 */
 
 int Get_Widget_Height(LCUI_Widget *widget);
 
@@ -260,6 +268,9 @@ void Set_Widget_Pos(LCUI_Widget *widget, LCUI_Pos pos);
  * 说明：只修改坐标，不进行局部刷新
  * */ 
 
+void Set_Widget_PosType( LCUI_Widget *widget, POS_TYPE pos_type );
+/* 设定部件的定位类型 */
+
 void Set_Widget_Alpha(LCUI_Widget *widget, unsigned char alpha);
 /* 功能：设定部件的透明度 */ 
 
@@ -412,6 +423,16 @@ void Register_Default_Widget_Type();
 /*************************** Container ********************************/
 void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget);
 /* 功能：将部件添加至作为容器的部件内 */ 
+
+
+int _Get_Widget_Container_Width(LCUI_Widget *widget);
+/* 通过计算得出指定部件的容器的宽度，单位为像素 */ 
+
+int _Get_Widget_Container_Height(LCUI_Widget *widget);
+/* 通过计算得出指定部件的容器的高度，单位为像素 */ 
+
+LCUI_Size _Get_Widget_Container_Size( LCUI_Widget *widget );
+/* 获取部件容器的尺寸 */
 /************************* Container End ******************************/
 
 
