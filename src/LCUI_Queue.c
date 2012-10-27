@@ -767,44 +767,48 @@ int WidgetQueue_Move(LCUI_Queue *queue, int pos, LCUI_Widget *widget)
  * */
 {
 	LCUI_Widget *temp;
-	int total, i, j, des_pos;
+	int total, i;//, j, des_pos;
 	total = Queue_Get_Total(queue);
 	for(i=0; i<total; ++i) {
 		temp = (LCUI_Widget*)Queue_Get(queue, i);
-		if(temp != widget) {/* 如果未找到部件 */
-			continue;
+		if(temp == widget) {/* 如果找到了部件 */
+			break;
 		}
+	}
+	return Queue_Move( queue, pos, i );
+	
+/* 现在暂时不需要“总是保持在前端显示” 这个功能 */
+#ifdef use_this_old_code
+	j = i;
+	for(i=0; i<j; ++i) {/* 从头到当前位置遍历队列 */
+		temp = (LCUI_Widget*)Queue_Get(queue, i);
 		
-		j = i;
-		for(i=0; i<j; ++i) {/* 从头到当前位置遍历队列 */
-			temp = (LCUI_Widget*)Queue_Get(queue, i);
-			
-			if( temp->lock_display == IS_TRUE ) {
-			/* 如果该位置的部件锁定了位置 */
-				if(widget->lock_display == IS_TRUE) {
-				/* 如果目标部件锁定了位置，那就可以移动至最前端 */
-					des_pos = 0; 
-					Queue_Using(queue, QUEUE_MODE_WRITE);
-					for (i=j; i > des_pos; --i) {
-						queue->data_array[i] = queue->data_array[i - 1]; 
-					}
-					queue->data_array[des_pos] = widget; 
-					Queue_End_Use(queue);
-					break;
-				}
-			} else {/* 否则，该位置的部件没锁定位置 */
-				des_pos = i;
+		if( temp->lock_display ) {
+		/* 如果该位置的部件锁定了位置 */
+			if( widget->lock_display ) {
+			/* 如果目标部件锁定了位置，那就可以移动至最前端 */
+				des_pos = 0; 
 				Queue_Using(queue, QUEUE_MODE_WRITE);
 				for (i=j; i > des_pos; --i) {
-					queue->data_array[i] = queue->data_array[i - 1];  
+					queue->data_array[i] = queue->data_array[i - 1]; 
 				}
 				queue->data_array[des_pos] = widget; 
 				Queue_End_Use(queue);
 				break;
 			}
+		} else {/* 否则，该位置的部件没锁定位置 */
+			des_pos = i;
+			Queue_Using(queue, QUEUE_MODE_WRITE);
+			for (i=j; i > des_pos; --i) {
+				queue->data_array[i] = queue->data_array[i - 1];  
+			}
+			queue->data_array[des_pos] = widget; 
+			Queue_End_Use(queue); 
+			break;
 		}
-	} 
+	}
 	return -1;
+#endif
 }
 /************************ WidgetQueue End ******************************/
 
