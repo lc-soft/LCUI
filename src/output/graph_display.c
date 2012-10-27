@@ -1,3 +1,4 @@
+#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
@@ -5,9 +6,6 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h> 
@@ -267,26 +265,53 @@ void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
  * 说明：得到的队列，队列中的部件排列顺序为：底-》上 == 左-》右
  * */
 {
-	int i, total;
+	int i, flag, total;
 	LCUI_Pos pos;
 	LCUI_Rect tmp;
 	LCUI_Widget *child; 
 	LCUI_Queue *widget_list;
 
-	if(widget == NULL) 
+	if(widget == NULL) {
 		widget_list = &LCUI_Sys.widget_list; 
-	else {
-		if(widget->visible == IS_FALSE) {
+	} else {
+		if( !widget->visible ) {
 			return;
 		}
 		widget_list = &widget->child; 
 	}
+	flag = 0;
+	
+filter_widget:;
 
 	total = Queue_Get_Total(widget_list); 
-
+	/* 先处理static定位类型的部件 */
 	for(i=total-1; i>=0; --i) {/* 从底到顶遍历子部件 */
-		child = (LCUI_Widget*)Queue_Get(widget_list, i); 
-		if(child != NULL && child->visible == IS_TRUE) {
+		child = (LCUI_Widget*)Queue_Get(widget_list, i);
+		if( child == NULL ) {
+			continue;
+		}
+		
+		if( flag==0 ) {
+			/* 过滤定位类型不为static的部件 */
+			if( child->pos_type != POS_TYPE_STATIC ) {
+				continue;
+			}
+		}
+		else if( flag==1 ) {
+			/* 过滤定位类型不为relative的部件 */
+			if( child->pos_type != POS_TYPE_RELATIVE ) {
+				continue;
+			}
+		}
+		else if( flag==2 ) {
+			/* 过滤定位类型为relative和static的部件 */
+			if( child->pos_type == POS_TYPE_RELATIVE
+			 && child->pos_type == POS_TYPE_STATIC ) {
+				continue;
+			}
+		}
+		
+		if( child->visible ) {
 		/* 如果有可见的子部件 */ 
 			tmp = Get_Widget_Valid_Rect(child); 
 			pos = Get_Widget_Global_Pos(child);
@@ -303,6 +328,11 @@ void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
 			} 
 		}
 	}
+	++flag;
+	if(flag < 3) {
+		goto filter_widget;
+	}
+	
 }
 
 int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
@@ -335,8 +365,8 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 	Queue_Init(&widget_buff, sizeof(LCUI_Widget), NULL);
 	Queue_Using_Pointer(&widget_buff); /* 只用于存放指针 */
 	
-	graph->have_alpha = IS_FALSE; 
-	buff.have_alpha = IS_TRUE;
+	graph->have_alpha = FALSE; 
+	buff.have_alpha = TRUE;
 	/* 根据指定的尺寸，分配内存空间，用于储存图形数据 */
 	Graph_Create(graph, rect.width, rect.height);
 	/* 获取与该区域重叠的部件，并记录至队列widget_buff中 */
@@ -344,8 +374,7 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 	total = Queue_Get_Total(&widget_buff); 
 	if(total > 0) {
 		//printf("rect(%d,%d,%d,%d), list cover widget:\n",
-		//rect.x, rect.y, rect.width, rect.height
-		//);
+		//rect.x, rect.y, rect.width, rect.height );
 		//printf("list cover widget:\n");
 		for(i=total-1; i>=0; --i) {
 			widget = (LCUI_Widget*)Queue_Get(&widget_buff, i);
@@ -353,11 +382,19 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 			widget_pos = Get_Widget_Global_Pos(widget);
 			valid_area.x += widget_pos.x;
 			valid_area.y += widget_pos.y;
+			pos = Get_Widget_Global_Pos(widget);
+			//printf("widget global pos: %d,%d\n", pos.x, pos.y);
+			//printf("widget parent: ");
+			//print_widget_info(widget->parent);
+			if(widget->parent != NULL) {
+				//printf("widget parent parent: ");
+				//print_widget_info(widget->parent->parent); 
+			}
 			//Print_Graph_Info(&widget->graph);
 			//print_widget_info(widget);
 			/* 检测图层属性 */
 			switch(Graph_Is_Opaque(&widget->graph)) {
-			    case -1:
+			    case -1: 
 				//printf("delete\n");
 				/* 如果完全不可见，直接从队列中移除 */
 				Queue_Delete_Pointer(&widget_buff, i);
@@ -365,7 +402,7 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 			    case 0: break;
 			    case 1:
 				if(Rect_Include_Rect(valid_area, rect)) { 
-					/* 如果不透明，并且图层区域包含需刷新的区域 */
+					/* 如果不透明，并且图层区域包含需刷新的区域 */ 
 					//printf("goto\n");
 					goto skip_loop;
 				}
@@ -407,7 +444,7 @@ skip_loop:
 		Graph_Cut (&LCUI_Sys.screen.buff, rect, graph);
 	}
 
-	if (LCUI_Sys.cursor.visible == IS_TRUE) { /* 如果游标可见 */
+	if ( LCUI_Sys.cursor.visible ) { /* 如果游标可见 */
 		/* 如果该区域与游标的图形区域重叠 */ 
 		if (Rect_Is_Overlay( rect, Get_Cursor_Rect()) ) {
 			pos.x = LCUI_Sys.cursor.pos.x - rect.x;
@@ -449,7 +486,7 @@ static void Handle_Screen_Update()
 	Graph_Free(&graph);
 }
 
-
+//#define need_autoquit
 #ifdef need_autoquit
 static int auto_flag = 0;
 static void *autoquit()
@@ -476,11 +513,14 @@ static void *Handle_Area_Update ()
 	pthread_t t;
 	LCUI_Thread_Create(&t, NULL, autoquit, NULL);
 #endif
-	while(LCUI_Active()) { 
+	while(LCUI_Active()) {
 		Handle_All_WidgetUpdate();/* 处理所有部件更新 */ 
 		usleep(5000);/* 停顿一段时间，让程序主循环处理任务 */ 
 		Handle_Refresh_Area(); /* 处理需要刷新的区域 */ 
 		Handle_Screen_Update();/* 处理屏幕更新 */ 
+#ifdef need_autoquit
+		auto_flag = 1;
+#endif
 	}
 	thread_exit(NULL);
 }
