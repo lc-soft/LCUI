@@ -195,12 +195,10 @@ void Window_Widget_Auto_Size(LCUI_Widget *win_p)
 			height = win_p->size.h - y - win_p->border.bottom;
 			
 			Move_Widget(titlebar, Pos(x, y) );
-			Exec_Resize_Widget(titlebar, Size(width, 25));
+			Resize_Widget(titlebar, Size(width, 25));
 			
-			Move_Widget(client_area, 
-				Pos(x, y + titlebar->size.h));
-			Resize_Widget(client_area, 
-				Size(width, height - titlebar->size.h));
+			Set_Widget_Align(client_area, ALIGN_BOTTOM_CENTER, Pos(0, y));
+			Resize_Widget(client_area, Size(width, height - 23));
 			/* 标题栏和客户区都需要显示 */
 			Show_Widget(titlebar); 
 			Show_Widget(client_area); 
@@ -309,8 +307,7 @@ static void Window_Init(LCUI_Widget *win_p)
 	win->btn_close = btn_close;
 	/* 没有背景图就填充背景色 */
 	Set_Widget_BG_Mode(win_p, BG_MODE_FILL_BACKCOLOR);
-	Set_Widget_Border_Style(win_p, BORDER_STYLE_STANDARD); 
-	
+	Set_Widget_Border_Style(win_p, BORDER_STYLE_STANDARD);
 	/* 放入至容器 */
 	Widget_Container_Add(titlebar, btn_close);
 	Widget_Container_Add(win_p, titlebar);
@@ -324,57 +321,16 @@ static void Window_Init(LCUI_Widget *win_p)
 static void Show_Window(LCUI_Widget *win_p)
 /* 功能：在窗口显示时，进行相关处理 */
 {
-	int w, h;
+	LCUI_Size size;
 	LCUI_Pos pos;
 	LCUI_Window *win;
 	
-	win = (LCUI_Window*)Get_Widget_PrivData(win_p);
-	pos.x = pos.y = 0;
+	win = (LCUI_Window*)Get_Widget_PrivData(win_p); 
 	win->count++;
-	if(win->count == 1) {/* 如果是第一次显示 */
-		if(win_p->parent == NULL 
-		&& win_p->pos_type == POS_TYPE_IN_SCREEN) {
-			w = Get_Screen_Width();
-			h = Get_Screen_Height();
-		} else {
-			w = Get_Widget_Width(win_p->parent);
-			h = Get_Widget_Height(win_p->parent);
-		}
-		
-		switch(win->init_align) {/* 窗口的位置 */
-		case ALIGN_TOP_LEFT : 
-			break;
-		case ALIGN_TOP_CENTER :
-			pos.x = (w - Get_Widget_Width(win_p))/2;
-			break;
-		case ALIGN_TOP_RIGHT :
-			pos.x = w - Get_Widget_Width(win_p);
-			break;
-		case ALIGN_MIDDLE_LEFT :
-			pos.y = (h - Get_Widget_Height(win_p))/2;
-			break;
-		case ALIGN_MIDDLE_CENTER :
-			pos.y = (h - Get_Widget_Height(win_p))/2;
-			pos.x = (w - Get_Widget_Width(win_p))/2; 
-			break;
-		case ALIGN_MIDDLE_RIGHT :
-			pos.x = w - Get_Widget_Width(win_p);
-			pos.y = (h - Get_Widget_Height(win_p))/2;
-			break;
-		case ALIGN_BOTTOM_LEFT :
-			pos.y = h - Get_Widget_Height(win_p);
-			pos.x = 0;
-		case ALIGN_BOTTOM_CENTER :
-			pos.y = h - Get_Widget_Height(win_p);
-			pos.x = (w - Get_Widget_Width(win_p))/2;
-		case ALIGN_BOTTOM_RIGHT :
-			pos.y = h - Get_Widget_Height(win_p);
-			pos.x = w - Get_Widget_Width(win_p);
-		default : 
-			break;
-		}
-		//printf("window pos: %d,%d\n",x, y);
-		Set_Widget_Pos(win_p, pos);
+	if(win->count == 1) {/* 如果是第一次显示 */ 
+		size = _Get_Widget_Container_Size( win_p ); 
+		pos = Align_Get_Pos( size, _Get_Widget_Size(win_p), win->init_align ); 
+		Move_Widget( win_p, pos );
 	}
 	//有待扩展 
 }
