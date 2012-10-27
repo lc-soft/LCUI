@@ -32,8 +32,8 @@ int main(int argc, char *argv[])
 		Set_Widget_Backcolor( widget[i], color[i] );
 		Show_Widget( label[i] );
 		Show_Widget( widget[i] );
-		printf("widget[%d]: %p\n", i, widget[i]);
 	}
+	
 	Set_Window_Title_Text( window, "测试部件布局-2" ); 
 	Resize_Widget( window, Size(320, 240) );
 	
