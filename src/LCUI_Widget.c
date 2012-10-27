@@ -198,12 +198,12 @@ _get_max_y_widget( LCUI_Queue *widget_list )
 static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 /* 更新使用static定位类型的子部件 */
 {
-	printf("Update_StaticPosType_ChildWidget(): enter\n");
-	print_widget_info( widget );
+	//printf("Update_StaticPosType_ChildWidget(): enter\n");
+	//print_widget_info( widget );
 	int i, x, y, total, j, n;
 	LCUI_Queue *queue;
 	LCUI_Size container_size;
-	LCUI_Pos new_pos;
+	LCUI_Pos tmp_pos, new_pos;
 	LCUI_Widget *wptr, *tmp, *tmp2;
 	LCUI_Queue *old_row, *cur_row, *tmp_row, q1, q2, widget_list;
 	LCUI_Rect area;
@@ -225,7 +225,7 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 	}
 	container_size = _Get_Widget_Size( widget );
 	total = Queue_Get_Total( queue );
-	printf("queue total: %d\n", total);
+	//printf("queue total: %d\n", total);
 	for(i=total-1,y=0,x=0; i>=0; --i) {
 		wptr = Queue_Get( queue, i );
 		/* 过滤掉定位类型不是static和relative的部件 */
@@ -234,14 +234,20 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 			continue;
 		}
 		
-		printf("0, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+		//printf("0, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
 		if( y == 0 ) {/* 如果还在第一行，就直接记录部件 */
 			/* 记录部件指针 */
 			Queue_Add_Pointer( cur_row, wptr );
 			/* 更新部件位置 */
-			Move_Widget( wptr, new_pos );
-			print_widget_info( wptr );
-			printf("1, %d + %d > %d\n", new_pos.x, wptr->size.w, container_size.w);
+			if( wptr->pos_type == POS_TYPE_RELATIVE ) {
+				/* 如果是RELATIVE定位类型，需要加上偏移坐标 */
+				tmp_pos = Pos_Add(new_pos, wptr->offset);
+				Move_Widget( wptr, tmp_pos );
+			} else {
+				Move_Widget( wptr, new_pos );
+			}
+			//print_widget_info( wptr );
+			//printf("1, %d + %d > %d\n", new_pos.x, wptr->size.w, container_size.w);
 			if(new_pos.x + wptr->size.w > container_size.w) {
 				new_pos.x = x = 0; 
 				Destroy_Queue( old_row );
@@ -253,16 +259,16 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 					new_pos.y = tmp->pos.y + tmp->size.h;
 				}
 				++y;
-			} else { 
+			} else {
 				/* 更新x轴坐标 */
 				new_pos.x += wptr->size.w;
 			}
-			printf("y == 0\n");
-			printf("1, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+			//printf("y == 0\n");
+			//printf("1, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
 			
 			continue;
 		}
-		printf("2,%d + %d > %d\n", new_pos.x, wptr->size.w, container_size.w);
+		//printf("2,%d + %d > %d\n", new_pos.x, wptr->size.w, container_size.w);
 		/* 如果当前部件区块超出容器范围，y++，开始在下一行记录部件指针。*/
 		if(new_pos.x + wptr->size.w > container_size.w) {
 			new_pos.x = x = 0; 
@@ -276,15 +282,15 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 			}
 			++y;
 		}
-		printf("2, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+		//printf("2, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
 		/* 保存在新位置的部件的区域 */
 		area = Rect( new_pos.x, new_pos.y, wptr->size.w, wptr->size.h );
 		/* 如果有上一行记录,获取上面几行与当前部件在x轴上重叠的部件列表 */ 
 		n = _get_x_overlay_widget( cur_row, area, &widget_list );
-		printf("n: %d\n", n); 
+		//printf("n: %d\n", n); 
 		if( n <= 0 ) { /* 如果上一行没有与之重叠的部件 */
 			Queue_Add_Pointer( cur_row, wptr ); 
-			printf("3,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+			//printf("3,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
 			Move_Widget( wptr, new_pos );
 			new_pos.x = wptr->x.px + wptr->size.w;
 			continue;
@@ -306,29 +312,17 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 		}
 		new_pos.y = tmp->y.px+tmp->size.h;
 		Queue_Add_Pointer( cur_row, wptr ); 
-		printf("4,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
-		Move_Widget( wptr, new_pos ); 
+		//printf("4,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y); 
+		if( wptr->pos_type == POS_TYPE_RELATIVE ) {
+			/* 如果是RELATIVE定位类型，需要加上偏移坐标 */
+			tmp_pos = Pos_Add(new_pos, wptr->offset);
+			Move_Widget( wptr, tmp_pos );
+		} else {
+			Move_Widget( wptr, new_pos );
+		}
 		new_pos.x = tmp->x.px + wptr->size.w;
 	}
-	printf("Update_StaticPosType_ChildWidget(): quit\n");
-}
-
-LCUI_Pos __Get_Widget_Pos(LCUI_Widget *widget)
-/* 功能：通过计算得出部件的位置，单位为像素 */
-{
-	LCUI_Pos pos;
-	LCUI_Size size;
-	pos.x = pos.y = 0; 
-	if(widget->align != ALIGN_NONE) { 
-		size = _Get_Widget_Container_Size( widget ); 
-		pos = Align_Get_Pos(size, Get_Widget_Size(widget), widget->align);
-		/* 加上偏移距离 */
-		pos = Pos_Add(pos, widget->offset);
-	} else {
-		pos.x = _Get_Widget_X( widget );
-		pos.y = _Get_Widget_Y( widget );
-	} 
-	return pos;
+	//printf("Update_StaticPosType_ChildWidget(): quit\n");
 }
 
 LCUI_Pos _Get_Widget_Pos(LCUI_Widget *widget)
@@ -1396,10 +1390,10 @@ void Disable_Widget(LCUI_Widget *widget)
 void Widget_Visible(LCUI_Widget *widget, int flag)
 /* 功能：定义部件是否可见 */
 {
-	if(flag == IS_TRUE) {
-		widget->visible = IS_TRUE; 
+	if( flag == TRUE ) {
+		widget->visible = TRUE; 
 	} else {
-		widget->visible = IS_FALSE; 
+		widget->visible = FALSE; 
 	}
 }
 
@@ -1495,7 +1489,7 @@ void Exec_Show_Widget(LCUI_Widget *widget)
 	
 	void ( *func_show ) (LCUI_Widget*);
 	//Exec_Update_Widget(widget);/* 显示前，需要对部件图形数据进行一次更新 */
-	Widget_Visible(widget, IS_TRUE); /* 部件可见 */
+	Widget_Visible(widget, TRUE); /* 部件可见 */
 	
 	/* 调用该部件在显示时需要用到的函数 */
 	func_show = Get_WidgetFunc_By_ID(widget->type_id, FUNC_TYPE_SHOW); 
