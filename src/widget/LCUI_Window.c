@@ -188,17 +188,19 @@ void Window_Widget_Auto_Size(LCUI_Widget *win_p)
 		 * 寸还是以前的尺寸。
 		 * */ 
 			Set_Widget_Border(win_p, RGB(50,50,50), Border(1,1,1,1));
+			Set_Widget_Padding(win_p, Padding(1,1,1,1));
 			/* 先计算坐标和尺寸 */
 			x = win_p->border.left;
 			y = win_p->border.top;
 			width = win_p->size.w - x - win_p->border.right;
 			height = win_p->size.h - y - win_p->border.bottom;
 			
-			Move_Widget(titlebar, Pos(x, y) );
 			Resize_Widget(titlebar, Size(width, 25));
-			
-			Set_Widget_Align(client_area, ALIGN_BOTTOM_CENTER, Pos(0, y));
 			Resize_Widget(client_area, Size(width, height - 23));
+			/* 标题栏向顶部停靠 */
+			Set_Widget_Dock( titlebar, DOCK_TYPE_TOP );
+			/* 客户区向底部停靠 */
+			Set_Widget_Dock( client_area, DOCK_TYPE_BOTTOM );
 			/* 标题栏和客户区都需要显示 */
 			Show_Widget(titlebar); 
 			Show_Widget(client_area); 
