@@ -60,6 +60,16 @@ void Border_Init(LCUI_Border *in)
 	in->top = 0; 
 }
 
+void Padding_Init( LCUI_Padding *padding )
+{
+	Border_Init( padding );
+}
+
+void Margin_Init( LCUI_Margin *margin )
+{
+	Border_Init( margin );
+}
+
 LCUI_Pos Pos(int x, int y)
 /* 功能：转换成LCUI_Pos类型 */
 {
@@ -144,8 +154,12 @@ LCUI_Border Border(int top, int bottom, int left, int right)
 	border.left = left;
 	border.right = right;
 	border.bottom = bottom;
-	return border;
-	
+	return border; 
+}
+
+LCUI_Padding Padding(int top, int bottom, int left, int right)
+{
+	return Border( top, bottom, left, right );
 }
 
 LCUI_Pos Pos_Add(LCUI_Pos a, LCUI_Pos b)
@@ -179,15 +193,6 @@ void PX_P_t_init( PX_P_t *combo_num )
 	combo_num->which_one = 0;
 	combo_num->px = 0;
 	combo_num->scale = 0.0;
-}
-
-void PX_P_t_4_init( PX_P_t_4 *data )
-/* 初始化4组PX_P_t */
-{
-	PX_P_t_init( &data->top );
-	PX_P_t_init( &data->bottom );
-	PX_P_t_init( &data->left );
-	PX_P_t_init( &data->right );
 }
 
 void PX_PT_t_init( PX_PT_t *combo_num )
