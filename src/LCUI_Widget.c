@@ -99,35 +99,55 @@ void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget)
 int _Get_Widget_Container_Width(LCUI_Widget *widget)
 /* 通过计算得出指定部件的容器的宽度，单位为像素 */
 {
-	if( widget->parent == NULL ) {
+	widget = widget->parent;
+	if( widget == NULL ) {
 		return Get_Screen_Width();
 	}
-	if( widget->parent->w.which_one == 0 ) { 
-		return widget->parent->w.px;
-	}
-	/* 既然容器的宽度也使用百分比，那么就递归调用计算父容器的宽度，直至为整数为止 */
-	return widget->parent->w.scale * _Get_Widget_Container_Width( widget->parent );
+	if( widget->w.which_one == 0 ) {
+		return widget->w.px - widget->padding.left - widget->padding.right;
+	} 
+	return widget->w.scale * _Get_Widget_Container_Width( widget );
 }
 
 int _Get_Widget_Container_Height(LCUI_Widget *widget)
 /* 通过计算得出指定部件的容器的高度，单位为像素 */
 {
-	if( widget->parent == NULL ) {
+	widget = widget->parent;
+	if( widget == NULL ) {
 		return Get_Screen_Height();
 	}
-	if( widget->parent->h.which_one == 0 ) {
-		return widget->parent->h.px;
+	if( widget->h.which_one == 0 ) {
+		return widget->h.px - widget->padding.top - widget->padding.bottom;
 	} 
-	return widget->parent->h.scale * _Get_Widget_Container_Height( widget->parent );
+	return widget->h.scale * _Get_Widget_Container_Height( widget );
 }
 
 LCUI_Size _Get_Widget_Container_Size( LCUI_Widget *widget )
-/* 获取部件容器的尺寸 */
+/* 获取部件所在容器的尺寸 */
 {
 	if(widget->parent == NULL) {
 		return Get_Screen_Size();
 	}
-	return widget->parent->size;
+	LCUI_Size size;
+	widget = widget->parent;
+	/* padding属性影响容器尺寸 */
+	size = widget->size;
+	size.w -= (widget->padding.left + widget->padding.right);
+	size.h -= (widget->padding.top + widget->padding.bottom);
+	return size;
+}
+
+LCUI_Size _Get_Container_Size( LCUI_Widget *widget )
+/* 获取容器的尺寸 */
+{
+	if(widget == NULL) {
+		return Get_Screen_Size();
+	}
+	LCUI_Size size; 
+	size = widget->size;
+	size.w -= (widget->padding.left + widget->padding.right);
+	size.h -= (widget->padding.top + widget->padding.bottom);
+	return size;
 }
 /************************* Container End ******************************/
 
@@ -195,6 +215,18 @@ _get_max_y_widget( LCUI_Queue *widget_list )
 	return widget;
 }
 
+static void _move_widget( LCUI_Widget *widget, LCUI_Pos new_pos )
+{
+	static LCUI_Pos tmp_pos;
+	if( widget->pos_type == POS_TYPE_RELATIVE ) {
+		/* 如果是RELATIVE定位类型，需要加上偏移坐标 */
+		tmp_pos = Pos_Add(new_pos, widget->offset);
+		Move_Widget( widget, tmp_pos );
+	} else {
+		Move_Widget( widget, new_pos );
+	}
+}
+
 static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 /* 更新使用static定位类型的子部件 */
 {
@@ -203,7 +235,7 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 	int i, x, y, total, j, n;
 	LCUI_Queue *queue;
 	LCUI_Size container_size;
-	LCUI_Pos tmp_pos, new_pos;
+	LCUI_Pos new_pos;
 	LCUI_Widget *wptr, *tmp, *tmp2;
 	LCUI_Queue *old_row, *cur_row, *tmp_row, q1, q2, widget_list;
 	LCUI_Rect area;
@@ -223,7 +255,8 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 	} else { 
 		queue = &widget->child;
 	}
-	container_size = _Get_Widget_Size( widget );
+	container_size = _Get_Container_Size( widget );
+	//printf("container size: %d,%d\n", container_size.w, container_size.h);
 	total = Queue_Get_Total( queue );
 	//printf("queue total: %d\n", total);
 	for(i=total-1,y=0,x=0; i>=0; --i) {
@@ -233,22 +266,20 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 		&& wptr->pos_type != POS_TYPE_RELATIVE ) {
 			continue;
 		}
-		
+		if( new_pos.x == 0 && wptr->size.w > container_size.w ) {
+			new_pos.x = x = 0; 
+			Queue_Add_Pointer( cur_row, wptr ); 
+			//printf("width > container width, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+			_move_widget( wptr, new_pos );
+			/* 更新y轴坐标 */
+			new_pos.y += wptr->size.h; 
+		}
 		//printf("0, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
-		if( y == 0 ) {/* 如果还在第一行，就直接记录部件 */
-			/* 记录部件指针 */
-			Queue_Add_Pointer( cur_row, wptr );
-			/* 更新部件位置 */
-			if( wptr->pos_type == POS_TYPE_RELATIVE ) {
-				/* 如果是RELATIVE定位类型，需要加上偏移坐标 */
-				tmp_pos = Pos_Add(new_pos, wptr->offset);
-				Move_Widget( wptr, tmp_pos );
-			} else {
-				Move_Widget( wptr, new_pos );
-			}
+		if( y == 0 ) {/* 如果还在第一行，就直接记录部件 */ 
 			//print_widget_info( wptr );
 			//printf("1, %d + %d > %d\n", new_pos.x, wptr->size.w, container_size.w);
 			if(new_pos.x + wptr->size.w > container_size.w) {
+				/* 如果超出容器范围，就开始下一行记录 */
 				new_pos.x = x = 0; 
 				Destroy_Queue( old_row );
 				tmp_row = old_row;
@@ -256,16 +287,19 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 				cur_row = tmp_row;
 				tmp = Queue_Get( old_row, x ); 
 				if(tmp != NULL) {
-					new_pos.y = tmp->pos.y + tmp->size.h;
+					new_pos.y = tmp->y.px + tmp->size.h;
 				}
-				++y;
-			} else {
-				/* 更新x轴坐标 */
-				new_pos.x += wptr->size.w;
+				++y; ++i;
+				/* 在下次循环里再次处理该部件 */
+				//printf("1.1, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y); 
+				continue;
 			}
-			//printf("y == 0\n");
-			//printf("1, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
-			
+
+			Queue_Add_Pointer( cur_row, wptr ); 
+			//printf("1.2, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+			_move_widget( wptr, new_pos );
+			/* 更新x轴坐标 */
+			new_pos.x += wptr->size.w; 
 			continue;
 		}
 		//printf("2,%d + %d > %d\n", new_pos.x, wptr->size.w, container_size.w);
@@ -291,7 +325,7 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 		if( n <= 0 ) { /* 如果上一行没有与之重叠的部件 */
 			Queue_Add_Pointer( cur_row, wptr ); 
 			//printf("3,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
-			Move_Widget( wptr, new_pos );
+			_move_widget( wptr, new_pos );
 			new_pos.x = wptr->x.px + wptr->size.w;
 			continue;
 		}
@@ -312,14 +346,8 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 		}
 		new_pos.y = tmp->y.px+tmp->size.h;
 		Queue_Add_Pointer( cur_row, wptr ); 
-		//printf("4,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y); 
-		if( wptr->pos_type == POS_TYPE_RELATIVE ) {
-			/* 如果是RELATIVE定位类型，需要加上偏移坐标 */
-			tmp_pos = Pos_Add(new_pos, wptr->offset);
-			Move_Widget( wptr, tmp_pos );
-		} else {
-			Move_Widget( wptr, new_pos );
-		}
+		//printf("4,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
+		_move_widget( wptr, new_pos );
 		new_pos.x = tmp->x.px + wptr->size.w;
 	}
 	//printf("Update_StaticPosType_ChildWidget(): quit\n");
@@ -1065,6 +1093,8 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	
 	/* 初始化边框数据 */
 	Border_Init(&widget.border);
+	Padding_Init( &widget.padding );
+	Margin_Init( &widget.margin );
 	
 	Graph_Init(&widget.graph);		/* 初始化部件图形数据 */
 	Graph_Init(&widget.background_image);	/* 初始化背景图数据 */
@@ -1406,6 +1436,22 @@ void Set_Widget_Pos(LCUI_Widget *widget, LCUI_Pos pos)
 	widget->pos = pos;
 }
 
+void Set_Widget_Padding( LCUI_Widget *widget, LCUI_Padding padding )
+/* 设置部件的内边距 */
+{
+	widget->padding = padding;
+	/* 更新子部件的位置 */
+	Update_Child_Widget_Pos( widget );
+}
+
+void Set_Widget_Margin( LCUI_Widget *widget, LCUI_Margin margin )
+/* 设置部件的外边距 */
+{
+	widget->margin = margin;
+	Update_Child_Widget_Pos( widget->parent );
+}
+
+
 void Set_Widget_PosType( LCUI_Widget *widget, POS_TYPE pos_type )
 /* 设定部件的定位类型 */
 {
@@ -1447,6 +1493,11 @@ void Exec_Move_Widget(LCUI_Widget *widget, LCUI_Pos pos)
 	if(pos.y < min_pos.y) {
 		pos.y = min_pos.y;
 	} 
+	if( widget->parent != NULL ) {
+		/* 加上容器的内边距 */
+		pos.x += widget->parent->padding.left;
+		pos.y += widget->parent->padding.top;
+	}
 	t = widget->pos; /* 记录老位置 */
 	widget->pos = pos;/* 记录新位置 */
 	if( widget->visible ) {/* 如果该部件可见 */
