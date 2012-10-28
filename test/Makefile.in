@@ -42,7 +42,8 @@ noinst_PROGRAMS = helloworld2$(EXEEXT) helloworld$(EXEEXT) \
 	ts_calibrate$(EXEEXT) test_viewimage$(EXEEXT) \
 	test_lcui_graph_mix$(EXEEXT) test_window$(EXEEXT) \
 	test_rect_cut$(EXEEXT) test_gaussian_blur$(EXEEXT) \
-	test_widget_1$(EXEEXT) test_widget_2$(EXEEXT)
+	test_widget_1$(EXEEXT) test_widget_2$(EXEEXT) \
+	test_widget_3$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -102,6 +103,9 @@ test_widget_1_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_widget_2_OBJECTS = test_widget_2.$(OBJEXT)
 test_widget_2_OBJECTS = $(am_test_widget_2_OBJECTS)
 test_widget_2_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_test_widget_3_OBJECTS = test_widget_3.$(OBJEXT)
+test_widget_3_OBJECTS = $(am_test_widget_3_OBJECTS)
+test_widget_3_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_window_OBJECTS = test_window.$(OBJEXT)
 test_window_OBJECTS = $(am_test_window_OBJECTS)
 test_window_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -157,8 +161,8 @@ SOURCES = $(helloworld_SOURCES) $(helloworld2_SOURCES) \
 	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
 	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
 	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
-	$(test_widget_2_SOURCES) $(test_window_SOURCES) \
-	$(ts_calibrate_SOURCES)
+	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
+	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 DIST_SOURCES = $(helloworld_SOURCES) $(helloworld2_SOURCES) \
 	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
 	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
@@ -166,8 +170,8 @@ DIST_SOURCES = $(helloworld_SOURCES) $(helloworld2_SOURCES) \
 	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
 	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
 	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
-	$(test_widget_2_SOURCES) $(test_window_SOURCES) \
-	$(ts_calibrate_SOURCES)
+	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
+	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -375,6 +379,8 @@ test_widget_1_SOURCES = test_widget_1.c
 test_widget_1_LDADD = $(top_builddir)/src/libLCUI.la
 test_widget_2_SOURCES = test_widget_2.c
 test_widget_2_LDADD = $(top_builddir)/src/libLCUI.la
+test_widget_3_SOURCES = test_widget_3.c
+test_widget_3_LDADD = $(top_builddir)/src/libLCUI.la
 all: all-recursive
 
 .SUFFIXES:
@@ -463,6 +469,9 @@ test_widget_1$(EXEEXT): $(test_widget_1_OBJECTS) $(test_widget_1_DEPENDENCIES)
 test_widget_2$(EXEEXT): $(test_widget_2_OBJECTS) $(test_widget_2_DEPENDENCIES) 
 	@rm -f test_widget_2$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_widget_2_OBJECTS) $(test_widget_2_LDADD) $(LIBS)
+test_widget_3$(EXEEXT): $(test_widget_3_OBJECTS) $(test_widget_3_DEPENDENCIES) 
+	@rm -f test_widget_3$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_widget_3_OBJECTS) $(test_widget_3_LDADD) $(LIBS)
 test_window$(EXEEXT): $(test_window_OBJECTS) $(test_window_DEPENDENCIES) 
 	@rm -f test_window$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_window_OBJECTS) $(test_window_LDADD) $(LIBS)
@@ -491,6 +500,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_viewimage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_widget_1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_widget_2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_widget_3.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_window.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ts_calibrate.Po@am__quote@
 

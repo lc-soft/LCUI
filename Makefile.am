@@ -33,6 +33,7 @@ test/test_window.c \
 test/test_gaussian_blur.c \
 test/test_widget_1.c \
 test/test_widget_2.c \
+test/test_widget_3.c \
 test/mora/mora.c \
 test/mora/README.zh-cn \
 test/mora/drawable/btn_down.png \
