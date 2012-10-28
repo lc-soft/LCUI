@@ -51,6 +51,10 @@ int Check_Option(int result, int option);
 void Border_Init(LCUI_Border *in);
 /* 功能：初始化边框 */ 
 
+void Padding_Init( LCUI_Padding *padding );
+
+void Margin_Init( LCUI_Margin *margin );
+
 LCUI_Pos Pos(int x, int y);
 /* 功能：转换成LCUI_Pos类型 */ 
 
@@ -67,6 +71,8 @@ LCUI_Pos Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align);
 /* 功能：根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */ 
 
 LCUI_Border Border(int top, int bottom, int left, int right);
+
+LCUI_Padding Padding(int top, int bottom, int left, int right);
 
 LCUI_Pos Pos_Add(LCUI_Pos a, LCUI_Pos b);
 /* 功能：求两个LCUI_Pos类型变量的和 */ 
@@ -185,9 +191,6 @@ void WString_Free(LCUI_WString *str);
 
 void PX_P_t_init( PX_P_t *combo_num );
 /* 初始化PX_P_t */ 
-
-void PX_P_t_4_init( PX_P_t_4 *data );
-/* 初始化4组PX_P_t */ 
 
 void PX_PT_t_init( PX_PT_t *combo_num );
 /* 初始化PX_PT_t */ 

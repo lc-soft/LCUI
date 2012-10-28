@@ -472,10 +472,9 @@ struct _LCUI_Border
 typedef enum _POS_TYPE
 {
 	POS_TYPE_STATIC,
+	POS_TYPE_RELATIVE,
 	POS_TYPE_ABSOLUTE,
 	POS_TYPE_FIXED,
-	POS_TYPE_RELATIVE,
-	POS_TYPE_INHERIT
 }
 POS_TYPE;
 /*
@@ -484,14 +483,9 @@ POS_TYPE;
  * 	元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
  * fixed：
  * 	绝对定位，相对于屏幕进行定位。
- * 	元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
- * relative：
- * 	相对定位，相对于其正常位置进行定位。
- * 	因此，"left:20" 会向元素的 LEFT 位置添加 20 像素。
+ * 	元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。 
  * static：
- * 	默认值。没有定位，元素出现在正常的流中（忽略 top, bottom, left, right 或者 z-index 声明）。
- * inherit：
- * 	规定应该从父元素继承 position 属性的值。
+ * 	默认值。没有定位，忽略 top, bottom, left, right 或者 z-index。 
  */
 /**********************************************************************/
 
@@ -528,18 +522,9 @@ typedef struct _PX_PT_t
 PX_PT_t;
 /*---------------------- END -------------------------*/
 
-
-/*------------------ 四个复合类型 ----------------------*/
-typedef struct _PX_P_t_4
-{
-	PX_P_t left, top, right, bottom;
-}
-PX_P_t_4;;
-/*---------------------- END -------------------------*/
-
 /*------------------- 内边距和外边距 --------------------*/
-typedef struct _PX_P_t_4 LCUI_Margin;
-typedef struct _PX_P_t_4 LCUI_Padding;
+typedef struct _LCUI_Border LCUI_Margin;
+typedef struct _LCUI_Border LCUI_Padding;
 /*---------------------- END -------------------------*/
 
 /*----------------- 自动尺寸调整模式 --------------------*/
@@ -602,10 +587,10 @@ struct _LCUI_Widget
 	DOCK_TYPE	dock;		/* 停靠位置 */
 	/*------------------ END ----------------------*/
 	
-	/*---------- 外边距和内边距（描述） ---------------*/ 
+	/*------------ 外边距和内边距 ---------------*/ 
 	LCUI_Margin	margin;
 	LCUI_Padding	padding;
-	/*------------------ END ----------------------*/
+	/*---------------- END -------------------*/
 	
 	LCUI_Border	border;		/* 边框 */
 	LCUI_RGB	border_color;	/* 边框颜色 */

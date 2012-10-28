@@ -246,13 +246,6 @@ void Set_Widget_Backcolor(LCUI_Widget *widget, LCUI_RGB color);
 int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag);
 /* 功能：为部件填充背景图像 */ 
 
-int Mix_Widget_FontBitmap(	LCUI_Widget *widget, 
-				int start_x, int start_y, 
-				LCUI_WString *contents, 
-				int rows, int space, 
-				int linegap, int flag	);
-/* 功能：混合部件内的字体位图，使字体能在部件上显示 */ 
-
 void Enable_Widget(LCUI_Widget *widget);
 /* 功能：启用部件 */ 
 
@@ -267,6 +260,9 @@ void Set_Widget_Pos(LCUI_Widget *widget, LCUI_Pos pos);
  * 功能：设定部件的位置 
  * 说明：只修改坐标，不进行局部刷新
  * */ 
+
+void Set_Widget_Padding( LCUI_Widget *widget, LCUI_Padding padding );
+/* 设置部件的内边距 */
 
 void Set_Widget_PosType( LCUI_Widget *widget, POS_TYPE pos_type );
 /* 设定部件的定位类型 */
@@ -432,7 +428,10 @@ int _Get_Widget_Container_Height(LCUI_Widget *widget);
 /* 通过计算得出指定部件的容器的高度，单位为像素 */ 
 
 LCUI_Size _Get_Widget_Container_Size( LCUI_Widget *widget );
-/* 获取部件容器的尺寸 */
+/* 获取部件所在容器的尺寸 */
+
+LCUI_Size _Get_Container_Size( LCUI_Widget *widget );
+/* 获取容器的尺寸 */
 /************************* Container End ******************************/
 
 
