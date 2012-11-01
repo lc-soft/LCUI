@@ -151,9 +151,7 @@ int Find_Pressed_Key(int key)
 	return 0;
 }
 
-int debug_mark = 0;
-static int disable_key = IS_FALSE;
-extern int LCUI_Active();
+static int disable_key = FALSE; 
 
 #include LC_DISPLAY_H
 
@@ -161,18 +159,16 @@ static void * Handle_Key_Input ()
 /* 功能：处理按键输入 */
 {
 	int key; 
-	int sleep_time = 1500;
-	
+	int sleep_time = 1500; 
 	LCUI_Rect area;
 	LCUI_Graph graph;
+	
 	Graph_Init(&graph);
 	area = Rect((Get_Screen_Width()-320)/2, (Get_Screen_Height()-240)/2, 320, 240);
 	while (LCUI_Active()) {
 		if (Check_Key ()) {/* 如果有按键输入 */ 
 			sleep_time = 1500;
-			key = Get_Key ();
-			if(key == 'd') debug_mark = 1;
-			else  debug_mark = 0;
+			key = Get_Key (); 
 			#define __NEED_CATCHSCREEN__
 			#ifdef __NEED_CATCHSCREEN__
 			if(key == 'c')
@@ -189,13 +185,18 @@ static void * Handle_Key_Input ()
 				);
 				Catch_Screen_Graph_By_FB( area, &graph );
 				write_png(filename, &graph);
+			} 
+			else if(key == 'r') {
+				/* 如果按下r键，就录制指定区域的图像 */
+				start_record_screen( area );
 			}
 			#endif
 			/* 处理程序中关联的按键事件 */
 			Handle_Event(&LCUI_Sys.key_event, key);
 		}
-		else if(disable_key == IS_TRUE) break;
-		else {/* 停顿一段时间 */
+		else if( disable_key ) {
+			break;
+		} else {/* 停顿一段时间 */
 			usleep(sleep_time);
 			sleep_time+=1500;
 			if(sleep_time >= 30000) {
@@ -203,7 +204,7 @@ static void * Handle_Key_Input ()
 			}
 		}
 	}
-	//Graph_Free(&graph);
+	Graph_Free(&graph);
 	disable_key = IS_FALSE; 
 	pthread_exit (NULL);
 }
@@ -211,10 +212,10 @@ static void * Handle_Key_Input ()
 int Enable_Key_Input()
 /* 功能：启用按键输入处理 */
 {
-	if(disable_key == IS_FALSE) {
+	if( !disable_key ) {
 		Set_Raw(1);/* 设置终端属性 */ 
 		/* 创建一个线程，用于处理按键输入 */
-		return pthread_create (&LCUI_Sys.key_thread, 
+		return thread_create (&LCUI_Sys.key_thread, 
 				NULL, Handle_Key_Input, NULL);
 	}
 	return 0;
@@ -223,10 +224,10 @@ int Enable_Key_Input()
 int Disable_Key_Input()
 /* 功能：撤销按键输入处理 */
 {
-	if(disable_key == IS_FALSE) {
-		disable_key = IS_TRUE;
+	if( !disable_key ) {
+		disable_key = TRUE;
 		Set_Raw(0);/* 恢复终端属性 */
-		return pthread_join (LCUI_Sys.key_thread, NULL);/* 等待线程结束 */
+		return thread_join (LCUI_Sys.key_thread, NULL);/* 等待线程结束 */
 	}
 	return 0;
 }
