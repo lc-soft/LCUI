@@ -478,7 +478,11 @@ int Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area)
 	if(src == NULL || des == NULL) {
 		return -1;
 	}
+	//printf("Quote_Graph(), before, area: %d,%d,%d,%d\n",
+	//	area.x, area.y, area.width, area.height);
 	area = Get_Valid_Area(Size(src->width, src->height), area);
+	//printf("Quote_Graph(), after, area: %d,%d,%d,%d\n",
+	//	area.x, area.y, area.width, area.height);
 	if(!Rect_Valid( area )) { 
 		des->src = NULL;
 		des->pos.x = 0;
