@@ -1,3 +1,43 @@
+/* ***************************************************************************
+ * text_layer.c -- text bitmap layer processing module.
+ * 
+ * Copyright (C) 2012 by
+ * Liu Chao
+ * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ * 
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
+ 
+/* ****************************************************************************
+ * text_layer.c -- 文本图层处理模块
+ *
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ****************************************************************************/
 
 //#define DEBUG
 
@@ -195,6 +235,7 @@ TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
 	data = (LCUI_TextStyle*) malloc (sizeof(LCUI_TextStyle));
 	TextStyle_Init( data );
 	*data = layer->default_data;
+	memset( flags, 0, sizeof(flags) );
 	total = Queue_Get_Total( &layer->tag_buff );
 	if(total <= 0) {
 		free( data );
@@ -209,6 +250,9 @@ TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
 			if( flags[0] == 0 ) {
 				data->_fore_color = TRUE;
 				data->fore_color = *((LCUI_RGB*)p->style);
+				DEBUG_MSG("color: %d,%d,%d\n", data->fore_color.red,
+				 data->fore_color.green, data->fore_color.blue);
+				flags[0] = 1;
 				++equal;
 			}
 			break;
@@ -218,6 +262,7 @@ TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
 				pxpt = *((PX_PT_t*)p->style);
 				data->_pixel_size = TRUE;
 				data->pixel_size = pxpt.px;
+				flags[1] = 1;
 				++equal;
 			}
 			break;
@@ -369,13 +414,13 @@ covernt_tag_to_style_data (wchar_t *str, tag_style_data *out_data)
 	char tag_data[256];
 	
 	p = str; 
-	//DEBUG_MSG("covernt_tag_to_style_data(): enter\n");
+	DEBUG_MSG("covernt_tag_to_style_data(): enter\n");
 	if( (q = get_style_tag ( p, "color", tag_data)) ) {
 		int r,g,b, len, i, j;
 		LCUI_RGB rgb;
 		
 		p = q;
-		//DEBUG_MSG("is color style tag, data: %s\n", tag_data);
+		DEBUG_MSG("is color style tag, data: %s\n", tag_data);
 		len = strlen(tag_data); 
 		for(j=0,i=0; i<len; ++i) {
 			if(tag_data[i] == ',') {
@@ -419,7 +464,7 @@ covernt_tag_to_style_data (wchar_t *str, tag_style_data *out_data)
 	} else {
 		p = NULL;
 	}
-	//DEBUG_MSG("covernt_tag_to_style_data(): quit\n");
+	DEBUG_MSG("covernt_tag_to_style_data(): quit\n");
 	return p;
 }
 
@@ -561,12 +606,12 @@ void
 TextLayer_Init( LCUI_TextLayer *layer )
 /* 初始化文本图层相关数据 */
 {
-	layer->using_code_mode = IS_FALSE; 
-	layer->using_style_tags = IS_FALSE; 
-	layer->enable_word_wrap = IS_FALSE; 
-	layer->enable_multiline = IS_FALSE; 
+	layer->using_code_mode = FALSE; 
+	layer->using_style_tags = FALSE; 
+	layer->enable_word_wrap = FALSE; 
+	layer->enable_multiline = FALSE; 
 	
-	layer->have_select = IS_FALSE;
+	layer->have_select = FALSE;
 	layer->start = 0;
 	layer->end = 0;
 	
@@ -733,6 +778,7 @@ TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style )
 			if(old_style == NULL) {
 				old_size = 12;
 				char_ptr->need_update = TRUE; 
+				goto skip_style_cmp;
 			} else {
 				if(old_style->pixel_size > 0) {
 					old_size = old_style->pixel_size;
@@ -769,6 +815,7 @@ TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style )
 				old_style->decoration = style.decoration;
 				char_ptr->need_update = TRUE; 
 			} 
+skip_style_cmp:;
 			if(char_ptr->need_update) {
 				tmp_area.x = area.x;
 				tmp_area.y = area.y + old_size+2 - char_ptr->bitmap.top;
@@ -785,7 +832,8 @@ TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style )
 			}
 		}
 		area.y += row_ptr->max_size.h; 
-	} 
+		TextLayer_Update_RowSize( layer, i );
+	}
 }
 
 void
@@ -844,7 +892,6 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 	}
 	
 	FontBMP_Init( &char_data.bitmap );
-	/* 根据样式标签生成对应的样式数据 */
 	for(p=buff, finish=buff+total; p<finish; ++p) { 
 		if( layer->using_style_tags ) {
 			/* 处理样式的结束标签 */ 
@@ -867,8 +914,8 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 		if(n_ignore > 0) {
 			/* 被忽略的字符的属性都一样，所以只需赋一次值 */
 			char_data.data = NULL;
-			char_data.display = IS_FALSE; 
-			char_data.need_update = IS_FALSE; 
+			char_data.display = FALSE; 
+			char_data.need_update = FALSE; 
 			FontBMP_Init( &char_data.bitmap ); 
 		}
 		while(n_ignore > 0) { 
@@ -1058,6 +1105,10 @@ int
 TextLayer_Text( LCUI_TextLayer *layer, char *new_text )
 /* 设定整个文本图层中需显示的文本，原有选中文本被删除 */
 {
+	if(layer == NULL) {
+		return -1;
+	}
+	
 	DEBUG_MSG("enter\n"); 
 	uint_t i, rows;
 	LCUI_TextLayer new_layer;
