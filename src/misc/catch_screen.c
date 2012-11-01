@@ -97,20 +97,21 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 	Graph_Unlock (out);
 }
 
-static int need_break = IS_FALSE;
+static int need_break = FALSE;
 static pthread_t t;
-static void *catch(void *arg)
+static LCUI_Rect target_area;
+static void *catch()
 /* 在截取动画时，会用这个函数捕获屏幕内容 */
 {
 	LCUI_Graph graph;
-	LCUI_Rect *area;
+	LCUI_Rect area;
 	int i=0, tsec=0;
 	time_t rawtime;
 	struct tm * timeinfo;
 	char filename[100];
 	
 	Graph_Init(&graph);
-	area = (LCUI_Rect*)arg;
+	area = target_area;
 	
 	while(!need_break) {
 		time ( &rawtime );
@@ -125,21 +126,24 @@ static void *catch(void *arg)
 		);
 		tsec = timeinfo->tm_sec;
 		
-		Catch_Screen_Graph_By_FB( *area, &graph );
+		Catch_Screen_Graph_By_FB( area, &graph );
 		write_png( filename, &graph );
 		usleep(35000);
 	}
 	LCUI_Thread_Exit(NULL);
 }
 
-int start_catch_screen()
+int start_record_screen( LCUI_Rect area )
+/* 录制屏幕指定区域的内容 */
 {
-	need_break = IS_FALSE;
-	return LCUI_Thread_Create(&t, NULL, catch, NULL);
+	need_break = FALSE;
+	target_area = area;
+	return LCUI_Thread_Create(&t, NULL, catch, NULL );
 }
 
 int end_catch_screen()
+/* 结束录制 */
 {
-	need_break = IS_TRUE;
+	need_break = TRUE;
 	return LCUI_Thread_Join(t, NULL);
 }
