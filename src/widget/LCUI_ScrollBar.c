@@ -41,9 +41,10 @@
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
+#include LC_WIDGET_H
+#include LC_GRAPH_H
 
-typedef struct _LCUI_ScrollBar LCUI_ScrollBar;
-struct _LCUI_ScrollBar
+typedef struct _LCUI_ScrollBar
 {
 	/* 这两个控制滑块的位置 */
 	int max_num;
@@ -51,57 +52,128 @@ struct _LCUI_ScrollBar
 	/* 这两个控制滑块的宽度 */
 	int max_size;
 	int current_size;
+	int direction;
 	LCUI_Widget *widget;	/* 滑块 */
-};
+}
+LCUI_ScrollBar;
 
 
 /**************************** 私有函数 **********************************/
-void ScrollBar_Init( LCUI_Widget *widget )
+static void 
+ScrollBar_Drag( LCUI_Widget *widget, LCUI_DragEvent *event )
 {
+	LCUI_Pos pos, offset;
 	
+	pos = Get_Widget_Global_Pos( widget );
+	offset = Pos_Sub( event->new_pos, pos ); 
+	pos = Pos_Add( pos, offset ); 
+	pos = GlobalPos_ConvTo_RelativePos( widget, pos ); 
+	Move_Widget(widget, pos);
 }
 
-void ScrollBar_Drag(  )
+/*
+ * 创建一个部件，作为滚动条的容器
+ * 再创建一个部件，作为滚动条
+ * 限制滚动条的移动范围
+ * */
+static void 
+ScrollBar_Init( LCUI_Widget *widget )
 {
+	LCUI_ScrollBar *scrollbar;
+	scrollbar = Widget_Create_PrivData(widget, sizeof(LCUI_ScrollBar));
+	scrollbar->max_num = 100;
+	scrollbar->current_num = 100;
+	scrollbar->max_size = 100;
+	scrollbar->current_size = 100;
+	scrollbar->direction = 0;
 	
+	scrollbar->widget = Create_Widget("button");
+	Widget_Container_Add( widget, scrollbar->widget );
+	Set_Widget_Size( scrollbar->widget, "100%", "100%" );
+	Limit_Widget_Pos( scrollbar->widget, Pos(0,0), Pos(0,0) ); 
+	Set_Widget_Border( widget, RGB(100,100,100), Border(1,1,1,1) );
+	Set_Widget_Padding( widget, Padding(1,1,1,1) );
+	Show_Widget( scrollbar->widget );
+	Widget_Drag_Event_Connect( scrollbar->widget, ScrollBar_Drag );
 }
 
-/* 滑块的图形更新 */
-void ScrollBar_Update(  )
+void 
+ScrollBar_Update( LCUI_Widget *widget )
 {
+	static int pos;
+	static double scale;
+	static char scale_str[256];
+	LCUI_ScrollBar *scrollbar;
 	
+	scrollbar = Get_Widget_PrivData( widget );
+	/* 计算比例，之后转换成字符串 */
+	scale = scrollbar->current_size*1.0 / scrollbar->max_size; 
+	sprintf( scale_str, "%.2lf%%", scale*100 );
+	//printf( "scale: %s\n", scale_str );
+	/* 判断滚动条的方向 */
+	if( scrollbar->direction == 1 ) { /* 横向 */
+		Set_Widget_Size( scrollbar->widget, NULL, scale_str );
+	} else { /* 纵向 */
+		Set_Widget_Size( scrollbar->widget, NULL, scale_str );
+		pos = Get_Container_Height( widget ) - _Get_Widget_Height( scrollbar->widget ); 
+		Limit_Widget_Pos( scrollbar->widget, Pos(0,0), Pos( 0, pos ) );
+	}
 }
-/* 更新容纳滑块的容器的图形 */
-void ScrollBar_Container_Update(  )
+
+void 
+Register_ScrollBar()
 {
-	
+	WidgetType_Add( "scrollbar" );
+	WidgetFunc_Add( "scrollbar", ScrollBar_Init, FUNC_TYPE_INIT );
+	WidgetFunc_Add( "scrollbar", ScrollBar_Update, FUNC_TYPE_UPDATE );
 }
 /**********************************************************************/
 
 
 /**************************** 公共函数 **********************************/
-void ScrollBar_Set_MaxNum( LCUI_Widget *widget, int max_num )
+LCUI_Widget *
+Get_ScrollBar( LCUI_Widget *widget )
+{
+	LCUI_ScrollBar *scrollbar;
+	
+	scrollbar = Get_Widget_PrivData( widget );
+	return scrollbar->widget;
+}
+
+void 
+ScrollBar_Set_MaxNum( LCUI_Widget *widget, int max_num )
 {
 	
 }
 
-void ScrollBar_Set_MaxSize( LCUI_Widget *widget, int max_size )
+void 
+ScrollBar_Set_MaxSize( LCUI_Widget *widget, int max_size )
+{
+	LCUI_ScrollBar *scrollbar;
+	
+	scrollbar = Get_Widget_PrivData( widget );
+	scrollbar->max_size = max_size;
+	Update_Widget( widget );
+}
+
+void 
+ScrollBar_Set_CurrentNum( LCUI_Widget *widget, int current_num )
 {
 	
 }
 
-void ScrollBar_Set_CurrentNum( LCUI_Widget *widget, int current_num )
+void 
+ScrollBar_Set_CurrentSize( LCUI_Widget *widget, int current_size )
 {
 	
 }
 
-void ScrollBar_Set_CurrentSize( LCUI_Widget *widget, int current_size )
+/* 设置滚动条是横向移动还是纵向移动 */
+void 
+ScrollBar_Set_Direction( LCUI_Widget *widget, int direction )
 {
-	
-}
-/*  */
-void ScrollBar_Set_Direction( LCUI_Widget *widget, int direction )
-{
-	
+	if(direction) {
+		
+	}
 }
 /**********************************************************************/
