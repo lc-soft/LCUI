@@ -49,6 +49,7 @@ typedef enum DATATYPE
 	DATATYPE_POS_TYPE,
 	DATATYPE_SIZE,
 	DATATYPE_GRAPH,
+	DATATYPE_UPDATE,
 	DATATYPE_STATUS,   
 	DATATYPE_SHOW,
 	DATATYPE_HIDE,
@@ -62,6 +63,7 @@ typedef enum _FuncType
 	FUNC_TYPE_SHOW,
 	FUNC_TYPE_HIDE,
 	FUNC_TYPE_INIT,
+	FUNC_TYPE_DRAW,
 	FUNC_TYPE_RESIZE,
 	FUNC_TYPE_UPDATE,
 	FUNC_TYPE_DESTROY
@@ -85,8 +87,24 @@ LCUI_Rect Get_Widget_Rect(LCUI_Widget *widget);
 /* 功能：获取部件的区域 */ 
 
 LCUI_Pos Get_Widget_Pos(LCUI_Widget *widget);
-/* 功能：获取部件的位置 */ 
+/* 
+ * 功能：获取部件相对于容器部件的位置
+ * 说明：该位置相对于容器部件的左上角点，忽略容器部件的内边距。
+ *  */
 
+LCUI_Pos Get_Widget_RelativePos(LCUI_Widget *widget);
+/* 
+ * 功能：获取部件的相对于所在容器区域的位置
+ * 说明：部件所在容器区域并不一定等于容器部件的区域，因为容器区域大小受到
+ * 容器部件的内边距的影响。
+ *  */
+
+LCUI_Pos GlobalPos_ConvTo_RelativePos(LCUI_Widget *widget, LCUI_Pos global_pos);
+/* 
+ * 功能：全局坐标转换成相对坐标
+ * 说明：传入的全局坐标，将根据传入的部件指针，转换成相对于该部件所在容器区域的坐标
+ *  */
+ 
 void *Get_Widget_PrivData(LCUI_Widget *widget);
 /* 功能：获取部件的私有数据结构体的指针 */ 
 
@@ -148,6 +166,9 @@ BORDER_STYLE Get_Widget_Border_Style(LCUI_Widget *widget);
 
 void Set_Widget_Style(LCUI_Widget *widget, char *style);
 /* 功能：设定部件的风格 */ 
+
+void Set_Widget_StyleID(LCUI_Widget *widget, int style_id);
+/* 设定部件的风格ID */
 
 LCUI_Widget *Get_Widget_By_Pos(LCUI_Widget *widget, LCUI_Pos pos);
 /* 功能：获取部件中包含指定坐标的点的子部件 */ 
@@ -343,6 +364,9 @@ void Resize_Widget(LCUI_Widget *widget, LCUI_Size new_size);
 void Draw_Widget(LCUI_Widget *widget);
 /* 功能：重新绘制部件 */ 
 
+void Update_Widget(LCUI_Widget *widget);
+/* 让部件根据已设定的属性，进行相应数据的更新 */
+
 void Front_Widget(LCUI_Widget *widget);
 /* 功能：将指定部件的显示位置移动到最前端 */ 
 
@@ -420,7 +444,6 @@ void Register_Default_Widget_Type();
 void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget);
 /* 功能：将部件添加至作为容器的部件内 */ 
 
-
 int _Get_Widget_Container_Width(LCUI_Widget *widget);
 /* 通过计算得出指定部件的容器的宽度，单位为像素 */ 
 
@@ -430,7 +453,13 @@ int _Get_Widget_Container_Height(LCUI_Widget *widget);
 LCUI_Size _Get_Widget_Container_Size( LCUI_Widget *widget );
 /* 获取部件所在容器的尺寸 */
 
-LCUI_Size _Get_Container_Size( LCUI_Widget *widget );
+int Get_Container_Width( LCUI_Widget *widget );
+/* 获取容器的宽度 */ 
+
+int Get_Container_Height( LCUI_Widget *widget );
+/* 获取容器的高度 */
+
+LCUI_Size Get_Container_Size( LCUI_Widget *widget );
 /* 获取容器的尺寸 */
 /************************* Container End ******************************/
 

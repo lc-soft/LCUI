@@ -187,8 +187,8 @@ typedef enum _BORDER_STYLE
 {
 	BORDER_STYLE_NONE,
 	BORDER_STYLE_STANDARD,
-	BORDER_STYLE_LINE_BORDER,
-	BORDER_STYLE_ROUND_BORDER
+	BORDER_STYLE_LINE,
+	BORDER_STYLE_ROUND
 }
 BORDER_STYLE;
 /*****************************************/
@@ -576,7 +576,7 @@ struct _LCUI_Widget
 	LCUI_String	type;		/* 部件的类型 */
 	LCUI_ID	type_id;	/* 部件的类型ID */
 	LCUI_String	style;		/* 部件的风格，对某些部件有效 */
-	
+	LCUI_ID	style_id;	/* 部件的风格的ID */
 	LCUI_Widget	*parent;	/* 父部件 */
 	LCUI_Queue	child;		/* 子部件集 */
 	
@@ -594,7 +594,7 @@ struct _LCUI_Widget
 	
 	LCUI_Border	border;		/* 边框 */
 	LCUI_RGB	border_color;	/* 边框颜色 */
-	BORDER_STYLE	border_style;	/* 边框类型(NONE:没有) */
+	BORDER_STYLE	border_style;	/* 边框类型 */
 	
 	int		bg_mode;  /* 背景模式，指定在无背景时是使用透明背景还是使用背景色填充 */
 	int		background_image_layout; /* 背景图的布局 */

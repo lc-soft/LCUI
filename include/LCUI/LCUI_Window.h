@@ -43,20 +43,32 @@
 #ifndef __LCUI_WINDOW_H_
 #define __LCUI_WINDOW_H_ 
 
-/* 先使用typedef为结构体创建同义字，之后再定义结构体 */
-typedef struct _LCUI_TitleBar		LCUI_TitleBar;
-typedef struct _LCUI_Window			LCUI_Window;
+/*-------------- 窗口风格 ----------------*/
+typedef enum WINDOW_STYLE
+{
+	WINDOW_STYLE_NONE,
+	WINDOW_STYLE_STANDARD,
+	WINDOW_STYLE_LINE,
+	WINDOW_STYLE_PURE_BLUE,
+	WINDOW_STYLE_PURE_GREEN,
+	WINDOW_STYLE_PURE_RED,
+	WINDOW_STYLE_PURE_ORANGE,
+	WINDOW_STYLE_PURE_PURPLE 
+}
+WINDOW_STYLE;
+/*--------------- END --------------------*/
 
 /******************* 窗口标题栏 ***********************/
-struct _LCUI_TitleBar
+typedef struct _LCUI_TitleBar
 {
 	LCUI_Widget *icon_box;		/* 图标 */
 	LCUI_Widget *label;		/* 标题栏中显示的文本 */
-}; /* 存储窗口的标题栏数据的结构体 */
+}
+LCUI_TitleBar;
 /****************************************************/
 
 /************************ 窗口数据 **************************/
-struct _LCUI_Window
+typedef struct _LCUI_Window
 {
 	LCUI_Widget *titlebar;		/* 标题栏 */
 	LCUI_Widget *client_area;	/* 客户区 */
@@ -67,36 +79,43 @@ struct _LCUI_Window
 	int count;			/* 显示次数计数 */
 	
 	ALIGN_TYPE init_align;		/* 窗口初始显示位置 */
-};
+}
+LCUI_Window;
 /***********************************************************/
 
 LCUI_BEGIN_HEADER
 
-LCUI_Widget *Get_Window_TitleBar(LCUI_Widget *window);
+
+LCUI_Widget *
+Get_Window_TitleBar(LCUI_Widget *window);
 /* 功能：获取窗口标题栏的指针 */ 
 
-LCUI_Widget *Get_Window_Client_Area(LCUI_Widget *window);
-/* 功能：获取窗口客户区的指针 */ 
+LCUI_Widget *
+Get_Window_Client_Area(LCUI_Widget *window);
+/* 功能：获取窗口客户区的指针 */
 
-void Set_Window_Title_Icon(LCUI_Widget *window, LCUI_Graph *icon);
+void 
+Set_Window_Title_Icon(LCUI_Widget *window, LCUI_Graph *icon);
 /* 功能：自定义指定窗口的标题栏图标 */ 
 
-LCUI_Size Get_Window_Client_Size(LCUI_Widget *win_p);
+LCUI_Size 
+Get_Window_Client_Size(LCUI_Widget *win_p);
 /* 功能：获取窗口的客户区的尺寸 */ 
 
-void Window_Widget_Auto_Size(LCUI_Widget *win_p);
-/* 功能：在窗口尺寸改变时自动改变标题栏和客户区的尺寸 */ 
-
-LCUI_Widget *Get_Parent_Window(LCUI_Widget *widget);
+LCUI_Widget *
+Get_Parent_Window(LCUI_Widget *widget);
 /* 功能：获取指定部件所在的窗口 */ 
 
-void Set_Window_Title_Text(LCUI_Widget *win_p, const char *text);
+void 
+Set_Window_Title_Text(LCUI_Widget *win_p, const char *text);
 /* 功能：为窗口设置标题文字 */ 
 
-void Window_Client_Area_Add(LCUI_Widget *window, LCUI_Widget *widget);
+void 
+Window_Client_Area_Add(LCUI_Widget *window, LCUI_Widget *widget);
 /* 功能：将部件添加至窗口客户区 */ 
 
-void Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget);
+void 
+Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget);
 /* 功能：将部件添加至窗口标题栏 */ 
 
 LCUI_END_HEADER

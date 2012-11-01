@@ -65,7 +65,7 @@ typedef enum _WidgetEvent_ID
 /*************** 部件拖动事件 ********************/
 struct _LCUI_DragEvent
 {
-	LCUI_Pos new_pos;	/* 新位置 */
+	LCUI_Pos new_pos;	/* 部件的新全局坐标 */
 	int first_click;	/* 标志，是否为首次点击 */ 
 	int end_click;		/* 标志，是否已经结束拖动 */
 };

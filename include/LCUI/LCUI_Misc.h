@@ -213,6 +213,12 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out);
  * 说明：效率较高，但捕获的图像有可能会有问题。
  * */
 
+int start_record_screen( LCUI_Rect area );
+/* 录制屏幕指定区域的内容 */
+
+int end_catch_screen();
+/* 结束录制 */
+
 LCUI_END_HEADER
 
 #endif
