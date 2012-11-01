@@ -137,16 +137,38 @@ LCUI_Size _Get_Widget_Container_Size( LCUI_Widget *widget )
 	return size;
 }
 
-LCUI_Size _Get_Container_Size( LCUI_Widget *widget )
+int Get_Container_Width( LCUI_Widget *widget )
+/* 获取容器的宽度 */
+{
+	int width;
+	if(widget == NULL) {
+		width = Get_Screen_Size().w;
+	} else {
+		width = widget->size.w;
+	}
+	width -= (widget->padding.left + widget->padding.right);
+	return width;
+}
+
+int Get_Container_Height( LCUI_Widget *widget )
+/* 获取容器的高度 */
+{
+	int height;
+	if(widget == NULL) {
+		height = Get_Screen_Size().h;
+	} else {
+		height = widget->size.h;
+	}
+	height -= (widget->padding.top + widget->padding.bottom);
+	return height;
+}
+
+LCUI_Size Get_Container_Size( LCUI_Widget *widget )
 /* 获取容器的尺寸 */
 {
-	if(widget == NULL) {
-		return Get_Screen_Size();
-	}
 	LCUI_Size size; 
-	size = widget->size;
-	size.w -= (widget->padding.left + widget->padding.right);
-	size.h -= (widget->padding.top + widget->padding.bottom);
+	size.w = Get_Container_Width( widget ); 
+	size.h = Get_Container_Height( widget ); 
 	return size;
 }
 /************************* Container End ******************************/
@@ -255,7 +277,7 @@ static void Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 	} else { 
 		queue = &widget->child;
 	}
-	container_size = _Get_Container_Size( widget );
+	container_size = Get_Container_Size( widget );
 	//printf("container size: %d,%d\n", container_size.w, container_size.h);
 	total = Queue_Get_Total( queue );
 	//printf("queue total: %d\n", total);
@@ -381,9 +403,42 @@ LCUI_Pos _Get_Widget_Pos(LCUI_Widget *widget)
 }
 
 LCUI_Pos Get_Widget_Pos(LCUI_Widget *widget)
-/* 功能：获取部件的位置，单位为像素 */
+/* 
+ * 功能：获取部件相对于容器部件的位置
+ * 说明：该位置相对于容器部件的左上角点，忽略容器部件的内边距。
+ *  */
 {
 	return widget->pos;
+}
+
+LCUI_Pos Get_Widget_RelativePos(LCUI_Widget *widget)
+/* 
+ * 功能：获取部件的相对于所在容器区域的位置
+ * 说明：部件所在容器区域并不一定等于容器部件的区域，因为容器区域大小受到
+ * 容器部件的内边距的影响。
+ *  */
+{
+	return Pos(widget->x.px, widget->x.px);
+}
+
+LCUI_Pos GlobalPos_ConvTo_RelativePos(LCUI_Widget *widget, LCUI_Pos global_pos)
+/* 
+ * 功能：全局坐标转换成相对坐标
+ * 说明：传入的全局坐标，将根据传入的部件指针，转换成相对于该部件所在容器区域的坐标
+ *  */
+{
+	if( widget == NULL || widget->parent == NULL) {
+		return global_pos;
+	}
+	widget = widget->parent; 
+	global_pos.x -= widget->padding.left;
+	global_pos.y -= widget->padding.top; 
+	while( widget ) {
+		global_pos.x -= widget->pos.x;
+		global_pos.y -= widget->pos.y; 
+		widget = widget->parent;
+	} 
+	return global_pos;
 }
 
 int _Get_Widget_MaxX( LCUI_Widget *widget ) 
@@ -509,12 +564,12 @@ int _Get_Widget_Width(LCUI_Widget *widget)
 
 int Get_Widget_Height(LCUI_Widget *widget)
 {
-	return Get_Widget_Size(widget).h;
+	return widget->size.h;
 }
 
 int Get_Widget_Width(LCUI_Widget *widget)
 {
-	return Get_Widget_Size(widget).w;
+	return widget->size.w;
 }
 
 LCUI_Size _Get_Widget_MinSize( LCUI_Widget *widget )
@@ -576,8 +631,6 @@ void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Graph *grap
  * 说明：获取图形前，需要指定背景图，之后才能正常合成；获取的图形是指定区域中显示的实际图形
  **/
 {
-	//printf("Get_Widget_Real_Graph(): enter\n");
-	//print_widget_info(widget);
 	if( !widget->visible ) {
 		return;
 	}
@@ -590,8 +643,6 @@ void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Graph *grap
 	/* 计算部件图形粘贴至背景中的位置 */
 	x = pos.x - rect.x;
 	y = pos.y - rect.y;
-	//printf("global pos: %d, %d\n", pos.x, pos.y);
-	//printf("update area: %d, %d, %d, %d\n", rect.x, rect.y, rect.width, rect.height);
 	/*
 	 * 由于父部件是子部件的容器，子部件的显示范围仅在父部件内，需
 	 * 要调整这个矩形的区域，如果子部件的图形超出容器范围，则裁剪子
@@ -600,19 +651,17 @@ void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Graph *grap
 	 if(widget->parent != NULL) {/* 如果有父部件 */ 
 		LCUI_Rect cut_rect;
 		/* 获取该部件的有效显示区域 */
-		cut_rect = Get_Widget_Valid_Rect(widget);
+		cut_rect = Get_Widget_Valid_Rect( widget );
 		/* 加上裁剪区域的起点坐标 */
 		x += cut_rect.x;
 		y += cut_rect.y;
-		/* 引用图层中指定区域的图形 */
-		Quote_Graph(&temp, &widget->graph, cut_rect);
-		/* 合成之 */
-		Graph_Mix(&widget->graph, &temp, Pos(x, y));
+		/* 引用图层中指定区域的图形,并将之合成至 */
+		Quote_Graph( &temp, &widget->graph, cut_rect );
+		Graph_Mix( graph, &temp, Pos(x, y) );
 	} else { /* 先将父部件合成至背景图中 */
-		Graph_Mix (graph, &widget->graph, Pos(x, y));
+		Graph_Mix ( graph, &widget->graph, Pos(x, y) );
 	}
 	
-	//printf("widget overlay pos: %d, %d\n", x, y);
 	int total;
 	LCUI_Rect tmp;
 	
@@ -620,25 +669,19 @@ void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Graph *grap
 	/* 貌似只需要x和y，区域尺寸靠背景图的信息即可得到 */
 	for(i=total-1; i>=0; --i) {/* 从底到顶遍历子部件 */
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
-		//printf("get child widget: %p, type: %s\n", child, child->type.string);
 		if(child == NULL) {
 			continue;
 		}
 		if( child->visible ) {/* 如果有可见的子部件 */
 			tmp = Get_Widget_Rect(child);
 			tmp.x += pos.x;
-			tmp.y += pos.y;
-			//printf("tmp: %d, %d, %d, %d\n", tmp.x, tmp.y, tmp.width, tmp.height);
-			//printf("rect: %d, %d, %d, %d\n", rect.x, rect.y, rect.width, rect.height);
+			tmp.y += pos.y; 
 			/* 如果与该区域重叠，将子部件合成至背景图中 */
 			if (Rect_Is_Overlay(tmp, rect)) {
-				//printf("overlay\n");
 				Get_Widget_Real_Graph(child, rect, graph);  /* 递归调用 */
 			}
-			//else printf("not bverlay\n");
 		} 
 	}
-	//printf("Get_Widget_Real_Graph(): quit\n");
 }
 
 void print_widget_info(LCUI_Widget *widget)
@@ -649,11 +692,12 @@ void print_widget_info(LCUI_Widget *widget)
 {
 	if(widget != NULL) {
 		printf("widget: %p, type: %s, visible: %d, pos: (%d,%d), size: (%d, %d)\n",
-				widget, widget->type.string, widget->visible,
-				widget->pos.x, widget->pos.y,
-				widget->size.w, widget->size.h);  
+			widget, widget->type.string, widget->visible,
+			widget->pos.x, widget->pos.y,
+			widget->size.w, widget->size.h);  
+	} else {
+		printf("NULL widget\n");
 	}
-	else printf("NULL widget\n");
 }
 
 
@@ -671,7 +715,7 @@ int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
 	/* 调整矩形位置及尺寸 */
 	rect = Get_Valid_Area(Get_Widget_Size(widget), rect);
 	if( widget->visible ) { 
-		LCUI_Sys.need_shift_area = IS_TRUE; 
+		LCUI_Sys.need_shift_area = TRUE; 
 	}
 	/* 保存至队列中 */
 	if(0 != RectQueue_Add (&widget->update_area, rect)) { 
@@ -824,6 +868,13 @@ void Set_Widget_Style(LCUI_Widget *widget, char *style)
 	Strcpy(&widget->style, style); 
 }
 
+void Set_Widget_StyleID(LCUI_Widget *widget, int style_id)
+/* 设定部件的风格ID */
+{
+	widget->style_id = style_id;
+	Draw_Widget( widget );
+}
+
 LCUI_Widget *Get_Widget_By_Pos(LCUI_Widget *widget, LCUI_Pos pos)
 /* 功能：获取部件中包含指定坐标的点的子部件 */
 { 
@@ -927,36 +978,41 @@ LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
  * */
 {
 	LCUI_Pos pos;
-	int w, h, temp; 
+	LCUI_Rect area;
+	int temp; 
 	LCUI_Rect cut_rect;
 	cut_rect.x = 0;
 	cut_rect.y = 0;
 	cut_rect.width = widget->size.w;
 	cut_rect.height = widget->size.h;
 	
-	pos = widget->pos; 
+	pos = widget->pos;
 	if(widget->parent == NULL) {
-		w = Get_Screen_Width();
-		h = Get_Screen_Height();
+		area.x = area.y = 0;
+		area.width = Get_Screen_Width();
+		area.height = Get_Screen_Height(); 
 	} else {
-		w = widget->parent->size.w;
-		h = widget->parent->size.h;
+		area.x = widget->parent->padding.left;
+		area.y = widget->parent->padding.top;
+		area.width = _Get_Widget_Container_Width( widget );
+		area.height = _Get_Widget_Container_Height( widget );
 	}
-	
 	/* 获取需裁剪的区域 */
-	if(pos.x < 0) {
-		cut_rect.width += pos.x;
-		cut_rect.x = 0 - pos.x; 
+	if(pos.x < area.x) {
+		cut_rect.x = area.x - pos.x; 
+		cut_rect.width -= cut_rect.x;
 	}
-	if(pos.x + widget->size.w > w) {
-		cut_rect.width -= (pos.x +  widget->size.w - w); 
+	if(pos.x + widget->size.w > area.width) {
+		cut_rect.width -= (pos.x + widget->size.w - area.width);
+		cut_rect.width += area.x;
 	}
-	if(pos.y < 0) {
-		cut_rect.height += pos.y;
-		cut_rect.y = 0 - pos.y; 
+	if(pos.y < area.y) {
+		cut_rect.y = area.y - pos.y; 
+		cut_rect.height -= cut_rect.y;
 	}
-	if(pos.y + widget->size.h > h) {
-		cut_rect.height -= (pos.y +  widget->size.h - h); 
+	if(pos.y + widget->size.h > area.height) {
+		cut_rect.height -= (pos.y + widget->size.h - area.height);
+		cut_rect.height += area.y;
 	}
 	if(widget->parent == NULL) {
 		return cut_rect;
@@ -964,7 +1020,7 @@ LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
 		
 	LCUI_Rect rect;
 	/* 获取父部件的有效显示范围 */
-	rect = Get_Widget_Valid_Rect(widget->parent);
+	rect = Get_Widget_Valid_Rect( widget->parent );
 	/* 如果父部件需要裁剪，那么，子部件根据情况，也需要进行裁剪 */
 	if(rect.x > 0) {/* 如果裁剪区域的x轴坐标大于0 */
 		/* 裁剪区域和部件区域是在同一容器中，只要得出两个区域的重叠区域即可 */
@@ -983,17 +1039,18 @@ LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
 			cut_rect.y = temp;
 		}
 	}
-	if(rect.width < w) {/* 如果父部件裁剪区域的宽度小于父部件的宽度 */
+	if(rect.width < area.width) {/* 如果父部件裁剪区域的宽度小于父部件的宽度 */
 		temp = pos.x+cut_rect.x+cut_rect.width;
-		if(temp > rect.x+rect.width) /* 如果部件裁剪区域左边部分与父部件裁剪区域重叠 */
+		if(temp > rect.x+rect.width) {/* 如果部件裁剪区域左边部分与父部件裁剪区域重叠 */
 			cut_rect.width -= (temp-(rect.x+rect.width));
+		}
 	}
-	if(rect.height < h) {
+	if(rect.height < area.height) {
 		temp = pos.y+cut_rect.y+cut_rect.height;
-		if(temp > rect.y+rect.height)
+		if(temp > rect.y+rect.height) {
 			cut_rect.height -= (temp-(rect.y+rect.height));
-	} 
-	
+		}
+	}
 	return cut_rect;
 }
 
@@ -1276,6 +1333,7 @@ void Limit_Widget_Pos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos)
 	widget->max_y.px = max_pos.y;
 	widget->max_x.which_one = 0;
 	widget->max_y.which_one = 0;
+	Update_Widget_Pos( widget );
 }
 
 void _Limit_Widget_Pos( LCUI_Widget *widget, char *x_str, char*y_str )
@@ -1295,7 +1353,7 @@ void Set_Widget_Border(LCUI_Widget *widget, LCUI_RGB color, LCUI_Border border)
 	widget->border_color = color;
 	
 	if(widget->border_style == BORDER_STYLE_NONE) {
-		Set_Widget_Border_Style(widget, BORDER_STYLE_LINE_BORDER);
+		Set_Widget_Border_Style(widget, BORDER_STYLE_LINE );
 	}
 	Draw_Widget(widget); 
 	Add_Widget_Refresh_Area(widget, Get_Widget_Rect(widget));
@@ -1323,83 +1381,6 @@ int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag)
 		Graph_Copy(&widget->background_image, img);
 	}
 	Draw_Widget(widget); 
-	return 0;
-}
-
-int Mix_Widget_FontBitmap(	LCUI_Widget *widget, 
-				int start_x, int start_y, 
-				LCUI_WString *contents, 
-				int rows, int space, 
-				int linegap, int flag	)
-/* 功能：混合部件内的字体位图，使字体能在部件上显示 */
-{
-	if(!Graph_Valid(&widget->graph)) {
-		return -1; 
-	}
-	/* 如果文字行数不大于0 */ 
-	if(rows <= 0) {
-		return -2;
-	}
-	
-	int i, j ,x = start_x, y = start_y, height = 13;
-	//for(i = 0; i < rows; ++i) {
-		//for(j=0; j < contents[i].size; ++j) {
-			//if(contents[i].string[j].bitmap.height > 0) {
-				//height = contents[i].string[j].bitmap.height;
-				//break;
-			//}
-		//}
-		//if(height > 0) {
-			//break;
-		//}
-	//}
-	
-	Graph_Lock(&widget->graph, 1);
-	for(i = 0; i < rows; ++i) {
-		/* 如果已经超出部件的尺寸，就不需要绘制字体位图了 */
-		if(y > widget->size.h) {
-			break; 
-		}
-		for(j=0; j < contents[i].size; ++j) {
-			if(x > widget->size.w) {
-				break; 
-			}
-			/* 粘贴每个字 */
-			FontBMP_Mix(
-				&widget->graph,  Pos(x, y) , 
-				&contents[i].string[j].bitmap , 
-				contents[i].string[j].color, flag );
-			
-			/* 如果这一行文字需要更新 */
-			if(contents[i].update == IS_TRUE) {
-				contents[i].update = IS_FALSE;
-				Add_Widget_Refresh_Area( widget, 
-					Rect(	start_x, y-1, widget->size.w, 
-					contents[i].string[0].bitmap.rows+2 )
-				);
-				/* 稍微增加点区域范围，所以y-1，height+2 */
-			}
-			/* 累计文字间距 */
-			if( j < contents[i].size - 1) {
-				x = x + space;  
-			}
-			/* 累计文字宽度 */
-			x = x + contents[i].string[j].bitmap.width;
-		}
-		if(contents[i].size == 0) {
-			y += height;
-		} else {
-			y += 13;//contents[i].string[0].bitmap.height; 
-		}
-		/* 累计文字行距 */
-		if(i > 0 && i < rows - 1) {
-			y += linegap; 
-		}
-		/* x归位 */
-		x = start_x;
-		//printf("Mix_Widget_FontBitmap():rows:%d/%d, size:%d\n", i, rows, contents[i].size);
-	} 
-	Graph_Unlock(&widget->graph);
 	return 0;
 }
 
@@ -1500,6 +1481,7 @@ void Exec_Move_Widget(LCUI_Widget *widget, LCUI_Pos pos)
 	}
 	t = widget->pos; /* 记录老位置 */
 	widget->pos = pos;/* 记录新位置 */
+	//printf("exec_move_widget, new:%d,%d, old: %d, %d\n", pos.x, pos.y, t.x, t.y);
 	if( widget->visible ) {/* 如果该部件可见 */
 		old_rect = Rect(t.x, t.y, widget->size.w, widget->size.h);
 		Add_Widget_Refresh_Area(widget->parent, old_rect); /* 刷新老区域 */
@@ -1631,13 +1613,13 @@ void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
 void Enable_Widget_Auto_Size(LCUI_Widget *widget)
 /* 功能：启用部件自动尺寸调整功能 */
 {
-	widget->auto_size = IS_TRUE;
+	widget->auto_size = TRUE;
 }
 
 void Disable_Widget_Auto_Size(LCUI_Widget *widget)
 /* 功能：禁用部件自动尺寸调整功能 */
 {
-	widget->auto_size = IS_FALSE;
+	widget->auto_size = FALSE;
 }
 
 void Exec_Refresh_Widget(LCUI_Widget *widget)
@@ -1648,6 +1630,14 @@ void Exec_Refresh_Widget(LCUI_Widget *widget)
 		Get_Widget_Rect(widget).width, Get_Widget_Rect(widget).height
 	);
 	Add_Widget_Refresh_Area(widget->parent, Get_Widget_Rect(widget));
+}
+
+void Exec_Update_Widget(LCUI_Widget *widget)
+{
+	void ( *func_update ) (LCUI_Widget*); 
+	/* 获取函数 */
+	func_update = Get_WidgetFunc_By_ID( widget->type_id, FUNC_TYPE_UPDATE );
+	func_update(widget);
 }
 
 void Exec_Draw_Widget(LCUI_Widget *widget)
@@ -1668,7 +1658,7 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 				widget->background_image_layout,
 				widget->back_color
 		); /* 填充背景色 */
-	} else {/* 否则根据背景模式来处理 */
+	} else {/* 否则根据背景模式来处理 */ 
 		switch(widget->bg_mode) {
 		    case BG_MODE_FILL_BACKCOLOR: /* 填充背景色 */
 			Graph_Fill_Alpha(&widget->graph, 255);
@@ -1682,8 +1672,7 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 		}
 	}
 	
-	/* 获取函数 */
-	func_update = Get_WidgetFunc_By_ID( widget->type_id, FUNC_TYPE_UPDATE );
+	func_update = Get_WidgetFunc_By_ID( widget->type_id, FUNC_TYPE_DRAW );
 	func_update(widget);
 	/* 绘制边框线 */
 	if(widget->border_style != BORDER_STYLE_NONE) {
@@ -1700,11 +1689,21 @@ void Move_Widget(LCUI_Widget *widget, LCUI_Pos new_pos)
 {
 	if(widget == NULL) {
 		return; 
+	} 
+	if( new_pos.x > widget->max_x.px ) {
+		new_pos.x = widget->max_x.px;
+	}
+	if( new_pos.x < widget->min_x.px ) {
+		new_pos.x = widget->min_x.px;
+	}
+	if( new_pos.y > widget->max_y.px ) {
+		new_pos.y = widget->max_y.px;
+	}
+	if( new_pos.y < widget->min_y.px ) {
+		new_pos.y = widget->min_y.px;
 	}
 	widget->x.px = new_pos.x;
 	widget->y.px = new_pos.y;
-	widget->x.which_one = 0;
-	widget->y.which_one = 0;
 	/* 记录部件的更新数据，等待进行更新 */
 	Record_WidgetUpdate(widget, &new_pos, DATATYPE_POS);
 }
@@ -1727,7 +1726,7 @@ void Exec_Update_Widget_Pos( LCUI_Widget *widget )
 
 void Update_Widget_Size( LCUI_Widget *widget )
 /* 部件尺寸更新 */
-{
+{ 
 	Resize_Widget( widget, _Get_Widget_Size(widget) ); 
 }
 
@@ -1911,6 +1910,15 @@ void Draw_Widget(LCUI_Widget *widget)
 	Record_WidgetUpdate(widget, NULL, DATATYPE_GRAPH);
 }
 
+void Update_Widget(LCUI_Widget *widget)
+/* 让部件根据已设定的属性，进行相应数据的更新 */
+{
+	if(widget == NULL) {
+		return; 
+	}
+	Record_WidgetUpdate(widget, NULL, DATATYPE_UPDATE);
+}
+
 
 void Front_Widget(LCUI_Widget *widget)
 /* 功能：将指定部件的显示位置移动到最前端 */
@@ -2016,6 +2024,7 @@ static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type)
 	    case DATATYPE_AREA:
 	    case DATATYPE_HIDE:
 	    case DATATYPE_POS_TYPE:
+	    case DATATYPE_UPDATE:
 	    case DATATYPE_SHOW:	 break;
 	    default: return -1;
 	}
@@ -2084,9 +2093,12 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 		    case DATATYPE_POS_TYPE:
 			Update_StaticPosType_ChildWidget( widget->parent );
 			break;
+		    case DATATYPE_UPDATE:
+			Exec_Update_Widget( widget );
+			break;
 		    case DATATYPE_STATUS:
 			widget->status = *(int*)temp->data;
-				/* 改变部件状态后需要进行重绘，所以不用break */
+			/* 改变部件状态后需要进行重绘，所以不用break */
 		    case DATATYPE_GRAPH	:
 			Exec_Draw_Widget(widget); 
 			break;
@@ -2424,21 +2436,23 @@ extern void Register_CheckBox();
 extern void Register_RadioButton();
 extern void Register_ActiveBox();
 extern void Register_TextBox();
+extern void Register_ScrollBar();
 
 void Register_Default_Widget_Type()
 /* 功能：为程序的部件库添加默认的部件类型 */
 {
-	WidgetType_Add(NULL); /* 添加一个NULL类型的部件 */
-	Register_Window();/* 注册窗口部件 */
-	Register_Label();/* 注册文本标签部件 */
-	Register_Button();/* 注册按钮部件 */
-	Register_PictureBox();/* 注册图片盒子部件 */
+	WidgetType_Add(NULL);	/* 添加一个NULL类型的部件 */
+	Register_Window();	/* 注册窗口部件 */
+	Register_Label();	/* 注册文本标签部件 */
+	Register_Button();	/* 注册按钮部件 */
+	Register_PictureBox();	/* 注册图片盒子部件 */
 	Register_ProgressBar();
 	Register_Menu();
 	Register_CheckBox();
 	Register_RadioButton();
 	Register_ActiveBox();
 	Register_TextBox();
+	Register_ScrollBar();
 }
 /************************ Widget Library End **************************/
 
