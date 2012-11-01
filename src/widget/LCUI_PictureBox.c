@@ -680,6 +680,7 @@ void Register_PictureBox()
 	/* 为部件类型关联相关函数 */
 	WidgetFunc_Add("picture_box",	PictureBox_Init,	FUNC_TYPE_INIT);
 	WidgetFunc_Add("picture_box",	Exec_Update_PictureBox,	FUNC_TYPE_UPDATE); 
+	WidgetFunc_Add("picture_box",	Exec_Update_PictureBox,	FUNC_TYPE_DRAW); 
 	WidgetFunc_Add("picture_box",	Exec_Resize_PictureBox,	FUNC_TYPE_RESIZE); 
 	WidgetFunc_Add("picture_box",	Destroy_PictureBox,	FUNC_TYPE_DESTROY); 
 }

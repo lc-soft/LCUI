@@ -58,8 +58,9 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 	/* 根据按钮的不同风格来处理 */
 	if(Strcmp(&widget->style, "custom") == 0) {
 		int no_bitmap = 0;
-		if(widget->enabled == IS_FALSE) 
+		if( !widget->enabled ) {
 			widget->status = WIDGET_STATUS_DISABLE;
+		}
 		/* 判断按钮的状态，以选择相应的背景色 */
 		switch(widget->status) {
 		case WIDGET_STATUS_NORMAL:
@@ -322,6 +323,7 @@ void Register_Button()
 	/* 为部件类型关联相关函数 */
 	WidgetFunc_Add("button", Button_Init,		FUNC_TYPE_INIT);
 	WidgetFunc_Add("button", Exec_Update_Button,	FUNC_TYPE_UPDATE); 
+	WidgetFunc_Add("button", Exec_Update_Button,	FUNC_TYPE_DRAW); 
 	WidgetFunc_Add("button", Destroy_Button,	FUNC_TYPE_DESTROY); 
 }
 

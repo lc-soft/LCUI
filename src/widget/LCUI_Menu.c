@@ -69,7 +69,7 @@ static void Menu_Init(LCUI_Widget *widget)
 	WidgetQueue_Init(&menu->child_menu);
 	Queue_Using_Pointer(&menu->child_menu);
 	/* 设置边框风格类型为线条边框 */
-	Set_Widget_Border_Style(widget, BORDER_STYLE_LINE_BORDER);
+	Set_Widget_Border_Style(widget, BORDER_STYLE_LINE);
 	Set_Widget_Border(widget, RGB(50,50,50), Border(1,1,1,1));
 	Set_Widget_BG_Mode(widget, BG_MODE_FILL_BACKCOLOR);
 	LCUI_MouseEvent_Connect(Auto_Hide_Menu, MOUSE_EVENT_MOVE);

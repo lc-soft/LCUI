@@ -85,7 +85,7 @@ static void Update_Label(LCUI_Widget *widget)
 	LCUI_TextLayer *layer;
 	
 	layer = Get_Widget_PrivData( widget );
-	max = TextLayer_Get_Size( layer );  
+	max = TextLayer_Get_Size( layer );
 	if( widget->auto_size && Size_Cmp( max, widget->size ) != 0 ) {
 		/* 如果开启了自动调整大小,并且尺寸有改变 */ 
 		Resize_Widget(widget, max );
@@ -101,11 +101,11 @@ static void Update_Label(LCUI_Widget *widget)
 	TextLayer_Draw( widget, layer, mode );
 }
 
-static void Redraw_Label(LCUI_Widget *widget)
+static void Draw_Label(LCUI_Widget *widget)
 /* 重绘Label部件 */
 {
-	Refresh_Label_FontBitmap(widget);
-	Update_Label(widget);
+	Refresh_Label_FontBitmap( widget );
+	Update_Label( widget );
 }
 
 /****************************** END ***********************************/
@@ -126,7 +126,7 @@ void Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 	va_end( ap ); 
 	 
 	TextLayer_Text( layer, text );
-	Update_Label( widget ); 
+	Update_Widget( widget ); 
 }
 
 int Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
@@ -135,7 +135,7 @@ int Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 	LCUI_TextLayer *layer;
 	layer = Get_Widget_PrivData( widget );
 	TextLayer_Text_Set_Default_Style( layer, style );
-	Update_Label( widget );
+	Draw_Widget( widget ); 
 	return 0;
 }
 /***************************** END ************************************/
@@ -149,6 +149,7 @@ void Register_Label()
 	
 	/* 为部件类型关联相关函数 */
 	WidgetFunc_Add("label",	Label_Init,	FUNC_TYPE_INIT);
-	WidgetFunc_Add("label",	Redraw_Label,	FUNC_TYPE_UPDATE); 
+	WidgetFunc_Add("label",	Draw_Label,	FUNC_TYPE_DRAW); 
+	WidgetFunc_Add("label",	Update_Label,	FUNC_TYPE_UPDATE); 
 	WidgetFunc_Add("label", Destroy_Label,	FUNC_TYPE_DESTROY);
 }
