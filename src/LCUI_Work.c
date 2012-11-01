@@ -48,13 +48,15 @@
 #include <unistd.h>
 
 /***************************** Func ***********************************/
-void NULL_Func()
+void 
+NULL_Func()
 /* 功能：空函数，不做任何操作 */
 {
 	return;
 }
 
-void FuncQueue_Init(LCUI_Queue *queue)
+void 
+FuncQueue_Init(LCUI_Queue *queue)
 /* 功能：初始化函数指针队列 */
 {
 	Queue_Init(queue, sizeof(LCUI_Func), NULL);
@@ -62,7 +64,8 @@ void FuncQueue_Init(LCUI_Queue *queue)
 
 /****************************** Task **********************************/
 
-void Send_Task_To_App(LCUI_Func *func_data)
+void 
+Send_Task_To_App(LCUI_Func *func_data)
 /*
  * 功能：发送任务给程序，使这个程序进行指定任务
  * 说明：LCUI_Func结构体中的成员变量 id，保存的是目标程序的id
@@ -77,7 +80,8 @@ void Send_Task_To_App(LCUI_Func *func_data)
 }
 
 
-int Have_Task(LCUI_App *app)
+int 
+Have_Task(LCUI_App *app)
 /* 功能：检测是否有任务 */
 {
 	if(app == NULL) {
@@ -89,7 +93,8 @@ int Have_Task(LCUI_App *app)
 	return 0;
 }
 
-int Run_Task(LCUI_App *app)
+int 
+Run_Task(LCUI_App *app)
 /* 功能：执行任务 */
 { 
 	LCUI_Task *task;
@@ -101,7 +106,8 @@ int Run_Task(LCUI_App *app)
 }
 
 
-int AppTask_Custom_Add(int mode, LCUI_Func *func_data)
+int 
+AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 /*
  * 功能：使用自定义方式添加程序任务
  * 用法示例：
@@ -208,7 +214,8 @@ int AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 
 
 /***************************** Event ***********************************/
-static void Destroy_Event(void *arg)
+static void 
+Destroy_Event(void *arg)
 /* 功能：销毁事件数据 */
 {
 	LCUI_Event *event = (LCUI_Event*)arg;
@@ -217,7 +224,8 @@ static void Destroy_Event(void *arg)
 	}
 }
 
-void EventQueue_Init(LCUI_EventQueue * queue)
+void 
+EventQueue_Init(LCUI_EventQueue * queue)
 /* 功能：初始化事件队列 */
 {
 	/* 
@@ -228,7 +236,8 @@ void EventQueue_Init(LCUI_EventQueue * queue)
 }
 
 
-int Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
+int 
+Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
 /* 
  * 功能：将函数指针以及两个参数，转换成LCUI_Func类型的指针
  * 说明：此函数会申请内存空间，并返回指向该空间的指针
@@ -254,7 +263,8 @@ int Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
 	return 0;
 }
 
-LCUI_Event *Find_Event(LCUI_EventQueue *queue, int event_id)
+LCUI_Event *
+Find_Event(LCUI_EventQueue *queue, int event_id)
 /* 功能：根据事件的ID，获取指向该事件的指针 */
 {
 	LCUI_Event *event; 
@@ -271,7 +281,8 @@ LCUI_Event *Find_Event(LCUI_EventQueue *queue, int event_id)
 	return NULL;
 }
 
-int EventQueue_Add(LCUI_EventQueue *queue, int event_id, LCUI_Func *func)
+int 
+EventQueue_Add(LCUI_EventQueue *queue, int event_id, LCUI_Func *func)
 /* 功能：记录事件及对应回调函数至队列 */
 {
 	LCUI_Event *event;
@@ -291,7 +302,8 @@ int EventQueue_Add(LCUI_EventQueue *queue, int event_id, LCUI_Func *func)
 	return 0;
 }
 
-int LCUI_MouseEvent_Connect (void (*func) (), int event_id)
+int 
+LCUI_MouseEvent_Connect (void (*func) (), int event_id)
 /* 
  * 功能：将函数与鼠标的相关事件相关联
  * 说明：当鼠标事件触发后，会先将已关联该事件的函数指针及相关事件的指针
@@ -312,7 +324,8 @@ int LCUI_MouseEvent_Connect (void (*func) (), int event_id)
 }
 
 
-int LCUI_Key_Event_Connect (int key_value, void (*func) (), void *arg)
+int 
+LCUI_Key_Event_Connect (int key_value, void (*func) (), void *arg)
 /* 功能：将函数与按键的某个事件相连接，当这个按键按下后，就会调用这个函数 */
 {
 	LCUI_Func func_data;
@@ -327,7 +340,8 @@ int LCUI_Key_Event_Connect (int key_value, void (*func) (), void *arg)
 }
 
 
-int Handle_Event(LCUI_EventQueue *queue, int event_id)
+int 
+Handle_Event(LCUI_EventQueue *queue, int event_id)
 /* 
  * 功能：处理指定ID的事件
  * 说明：本函数会将事件队列中与指定ID的事件关联的回调函数 添加至程序的任务队列
@@ -355,8 +369,8 @@ static LCUI_Widget *click_widget = NULL, *overlay_widget = NULL;
 static LCUI_Pos __offset_pos = {0, 0};  /* 点击部件时保存的偏移坐标 */ 
 static LCUI_DragEvent drag_event;
 
-int Widget_Drag_Event_Connect ( 
-		LCUI_Widget *widget, 
+int 
+Widget_Drag_Event_Connect ( LCUI_Widget *widget, 
 		void (*func)(LCUI_Widget*, LCUI_DragEvent *)
 )
 /* 
@@ -378,7 +392,8 @@ int Widget_Drag_Event_Connect (
 	return 0;
 }
 
-int Widget_Clicked_Event_Connect (
+int 
+Widget_Clicked_Event_Connect (
 			LCUI_Widget *widget,
 			void (*func)(LCUI_Widget*, void *), 
 			void *arg
@@ -397,7 +412,8 @@ int Widget_Clicked_Event_Connect (
 	return 0;
 }
 
-static LCUI_Widget *Widget_Find_Response_Status_Change(LCUI_Widget *widget)
+static LCUI_Widget *
+Get_ResponseStatusChange_Widget(LCUI_Widget *widget)
 /* 
  * 功能：查找能响应状态改变的部件 
  * 说明：此函数用于检查部件以及它的上级所有父部件，第一个有响应状态改变的部件的指针将会
@@ -413,156 +429,177 @@ static LCUI_Widget *Widget_Find_Response_Status_Change(LCUI_Widget *widget)
 	if(widget->parent == NULL) {
 		return NULL; /* 如果父部件为空，那就没找到，返回NULL */
 	} else {/* 否则，在它的父级部件中找 */
-		return Widget_Find_Response_Status_Change(widget->parent); 
+		return Get_ResponseStatusChange_Widget(widget->parent); 
 	}
 }
 
-static LCUI_Widget *Widget_Find_Response_Event(LCUI_Widget *widget, int event_id)
+static BOOL
+Widget_Have_Event(LCUI_Widget *widget, int event_id)
+/* 检测部件是否关联了指定事件 */
+{ 
+	LCUI_Event *event;
+	
+	if( NULL == widget ) {
+		return FALSE;
+	}
+	event = Find_Event( &widget->event, event_id );
+	if( event == NULL ) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
+static LCUI_Widget *
+Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
 /* 
  * 功能：查找能响应事件的部件 
  * 说明：此函数用于检查部件以及它的上级所有父部件，第一个有响应指定事件的部件，它的指针
  * 将会作为本函数的返回值
  * */
-{ 
-	LCUI_Event *event;
+{
 	if(NULL == widget) {
 		return NULL;
 	}
-	event = Find_Event(&widget->event, event_id);
-	if(event != NULL) {
-		return widget;/* 如果部件响应状态改变，则返回该部件的指针 */
+	if( Widget_Have_Event(widget, event_id) ) { 
+		return widget; 
 	}
-	if(widget->parent == NULL) {/* 如果父部件为空，说明没找到，返回NULL */
-		return NULL; 
-	} else {/* 否则，在它的父级部件中找 */
-		return Widget_Find_Response_Event(widget->parent, event_id); 
+	if(widget->parent == NULL) { 
+		return NULL;
+	} else {
+		return Get_ResponseEvent_Widget(widget->parent, event_id); 
 	}
 }
 
-static void Widget_Clicked(LCUI_MouseEvent *event)
+static void 
+_Start_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
+{
+	/* 用全局坐标减去部件的全局坐标，得到偏移坐标 */ 
+	__offset_pos = Pos_Sub( event->global_pos, Get_Widget_Global_Pos( widget ) );
+	/* 得出部件的新全局坐标 */
+	drag_event.new_pos = Pos_Sub( event->global_pos, __offset_pos );
+	drag_event.first_click = 1;
+	drag_event.end_click = 0;
+	/* 处理部件的拖动事件 */
+	Handle_Event( &widget->event, EVENT_DRAG );
+}
+
+static void 
+_Doing_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
+{
+	drag_event.new_pos = Pos_Sub( event->global_pos, __offset_pos );
+	drag_event.first_click = 0;
+	drag_event.end_click = 0;
+	Handle_Event( &widget->event, EVENT_DRAG );
+}
+
+static void 
+_End_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
+{
+	drag_event.new_pos = Pos_Sub( event->global_pos, __offset_pos );
+	drag_event.first_click = 0;
+	drag_event.end_click = 1;
+	Handle_Event( &widget->event, EVENT_DRAG );
+}
+
+static void 
+Widget_Clicked(LCUI_MouseEvent *event)
 /*
  * 功能：用于处理click事件，并保存被点击后的部件的指针
  * 说明：在鼠标左键被按下/释放时，都会调用这个函数
  **/
 {
-	LCUI_Widget *widget; 
-	//printf("Widget_Clicked() :start!!\n"); 
+	LCUI_Widget *widget;
 	if(event == NULL) {
 		return;
 	}
 	
-	widget = event->widget;  
-	//printf("event widget: ");
-	//print_widget_info(widget);
-
-	widget = Widget_Find_Response_Event(widget, EVENT_CLICKED);
-	if(NULL == widget) {
-		widget = Widget_Find_Response_Event(event->widget, EVENT_DRAG);  
-	}
-	//printf("widget :");
-	//print_widget_info(widget);
-	if( Mouse_LeftButton(event) == PRESSED ) {/* 如果是鼠标左键被按下 */ 
-		/* widget必须指向能响应状态变化的部件，因此，需要查找 */
-		click_widget = widget; 
-		if(widget != NULL) {
-			//printf("1\n");
-			/* 用全局坐标减去部件的坐标，得到偏移位置 */ 
-			__offset_pos = Pos_Sub(
-				event->global_pos, 
-				Get_Widget_Global_Pos( widget )
-			);
-			/* 得出部件的新位置 */
-			drag_event.new_pos = Pos_Sub(event->global_pos, __offset_pos); 
-			drag_event.first_click = 1; 
-			drag_event.end_click = 0;
-			/* 处理部件的拖动事件 */
-			Handle_Event(&widget->event, EVENT_DRAG); 
+	widget = event->widget;
+	
+	switch( Mouse_LeftButton(event) ) {
+	    case PRESSED:
+		click_widget = widget;
+		if( Widget_Have_Event( widget, EVENT_DRAG ) ) {
+			/* 处理部件的拖动 */
+			_Start_DragEvent( widget, event );
 		}
-			//printf("2\n");
-		widget = Widget_Find_Response_Status_Change(widget); 
-		if(widget != NULL) {
-			//printf("3\n");
-			/* 如果当前鼠标指针覆盖到的部件已被启用 */  
-			if( event->widget->enabled == IS_TRUE
-			 && widget->enabled == IS_TRUE ) {
-				Set_Widget_Status (widget, WIDGET_STATUS_CLICKING); 
-			} else {
-				Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
+		widget = Get_ResponseStatusChange_Widget( widget ); 
+		if( widget == NULL) {
+			break;
+		}
+		/* 如果当前鼠标指针覆盖到的部件已被启用 */  
+		if( event->widget->enabled && widget->enabled ) {
+			Set_Widget_Status (widget, WIDGET_STATUS_CLICKING); 
+		} else {
+			Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
+		}
+		break;
+		
+	    case FREE:
+		if(click_widget == NULL) {
+			break;
+		}
+		if( Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
+			_End_DragEvent( click_widget, event );
+		}
+		if(click_widget == widget) {
+			click_widget = NULL;
+			/* 如果点击时和点击后都在同一个按钮部件内进行的,
+			 * 触发CLICKED事件，将部件中关联该事件的回调函数发送至
+			 * 任务队列，使之在主循环中执行 
+			 * */
+			widget = Get_ResponseEvent_Widget( event->widget, EVENT_CLICKED );
+			if( !widget ) {
+				break;
 			}
+			if( widget->enabled ) {
+				Handle_Event(&widget->event, EVENT_CLICKED);
+			}
+			widget = Get_ResponseStatusChange_Widget(event->widget);
+			if( !widget ) {
+				break;
+			}
+			if(widget->enabled) { 
+				Set_Widget_Status (widget, WIDGET_STATUS_CLICKED);
+				Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
+				break;
+			}
+			Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
+			break;
 		}
-			//printf("4\n");
+		/* 否则，将恢复之前点击的鼠标的状态 */ 
+		widget = Get_ResponseStatusChange_Widget(click_widget);
+		click_widget = NULL;
+		if( !widget ) {
+			break;
+		}
+		if(widget->enabled) {
+			Set_Widget_Status (widget, WIDGET_STATUS_NORMAL);
+		} else {
+			Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
+		}
 	}
-	else if (Mouse_LeftButton (event) == FREE) {
-		/* 否则，如果鼠标左键是释放状态 */
-	//printf("5\n");
-		if(click_widget != NULL) {
-			__offset_pos = Pos_Sub(
-				event->global_pos, 
-				Get_Widget_Global_Pos( click_widget )
-			); 
-			drag_event.new_pos = Pos_Sub(event->global_pos, __offset_pos); 
-			drag_event.first_click = 0; 
-			drag_event.end_click = 1; 
-			Handle_Event(&click_widget->event, EVENT_DRAG);
-			/* 如果点击时和点击后都在同一个按钮部件内进行的 */
-			if(click_widget == widget) {
-				/* 
-				 * 触发CLICKED事件，将部件中关联该事件的回调函数发送至
-				 * 任务队列，使之在主循环中执行 
-				 * */  
-				//printf("send clicked event\n"); 
-		//printf("6\n");
-				if(widget->enabled == IS_TRUE)
-					Handle_Event(&widget->event, EVENT_CLICKED);
-				
-				widget = Widget_Find_Response_Status_Change(event->widget);
-				if(NULL != widget){
-					if(widget->enabled == IS_TRUE) { 
-						Set_Widget_Status (widget, WIDGET_STATUS_CLICKED);
-						Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
-					} else {
-						Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
-					}
-				}
-		//printf("7\n");
-			} else {/* 否则，将恢复之前点击的鼠标的状态 */
-		//printf("8\n");
-				widget = Widget_Find_Response_Status_Change(click_widget);
-				if(widget != NULL) {
-					if(widget->enabled == IS_TRUE)
-						Set_Widget_Status (widget, WIDGET_STATUS_NORMAL);
-					else
-						Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
-				}
-			} 
-		}
-		click_widget = NULL; /* 指针赋值为空 */
-	} 
-	//printf("Widget_Clicked() :end!!\n");  
 }
 
-static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
+static void 
+Tracking_Mouse_Move (LCUI_MouseEvent *event)
 /* 
  * 功能：跟踪鼠标移动，处理触发的基本事件
  * 说明：这只是根据鼠标事件来处理部件状态的切换
  * */
 {
-	DEBUG_MSG("Tracking_Mouse_Move(): start\n");
 	LCUI_Widget *widget;
+	
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
-	widget = Get_Cursor_Overlay_Widget(); 
-	//print_widget_info(widget);
-	//print_widget_info(overlay_widget);
+	widget = Get_Cursor_Overlay_Widget();
 	if(widget == NULL) {
 		goto skip_widget_check;
 	}
 	/* 获取能响应状态改变的部件的指针 */
-	widget = Widget_Find_Response_Status_Change(widget); 
+	widget = Get_ResponseStatusChange_Widget(widget); 
 	if( widget == NULL || overlay_widget == widget ) {
 		goto skip_widget_check;
-	} 
-	DEBUG_MSG("check widget whether enabled\n");
-	if (widget->enabled == IS_TRUE) { 
+	}
+	if ( widget->enabled ) {
 		DEBUG_MSG("widget not enabled");
 		if( click_widget == NULL ) {
 			DEBUG_MSG("leftbutton is free, widget overlay\n\n");
@@ -573,9 +610,8 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 	}
 	
 	/* 如果之前有覆盖到的部件 */
-	if (overlay_widget != NULL && click_widget == NULL ) { 
-		/* 如果按钮部件被启用 */
-		if (overlay_widget->enabled == IS_TRUE) {
+	if (overlay_widget && !click_widget ) {
+		if ( overlay_widget->enabled ) {
 			Set_Widget_Status (overlay_widget, WIDGET_STATUS_NORMAL);
 		} else {
 			Set_Widget_Status (overlay_widget, WIDGET_STATUS_DISABLE);
@@ -587,27 +623,19 @@ static void Tracking_Mouse_Move (LCUI_MouseEvent *event)
 
 skip_widget_check:;
 
-	//printf("6\n");
-	if(overlay_widget != widget && click_widget == NULL) {
-		/* 如果鼠标指针在之前有覆盖到的部件 */ 
-		DEBUG_MSG("7\n");
-		if (overlay_widget->enabled == IS_TRUE) {/* 如果部件可用，就让它恢复到普通状态 */
+	/* 如果鼠标指针在之前有覆盖到的部件 */
+	if( overlay_widget != widget && !click_widget ) {
+		if ( overlay_widget->enabled ) {
 			Set_Widget_Status (overlay_widget, WIDGET_STATUS_NORMAL); 
-		} else {/* 否则，部件为不可用的状态 */
+		} else {
 			Set_Widget_Status (overlay_widget, WIDGET_STATUS_DISABLE);
 		}
-	}
-	DEBUG_MSG("8\n");
+	} 
 	overlay_widget = widget;
-	/* 触发部件拖动事件 */ 
-	if(click_widget != NULL && Mouse_LeftButton (event) == PRESSED) {
-		/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态 */ 
-		drag_event.new_pos = Pos_Sub(event->global_pos, __offset_pos); 
-		Handle_Event(&click_widget->event, EVENT_DRAG);
-		drag_event.first_click = 0; 
-		drag_event.end_click = 0; 
-		/* 处理部件的拖动事件 */
-		Handle_Event(&click_widget->event, EVENT_DRAG);
+	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */ 
+	if( click_widget && Mouse_LeftButton (event) == PRESSED 
+	 && Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
+		_Doing_DragEvent( click_widget, event );
 	}
 	DEBUG_MSG("Tracking_Mouse_Move(): end\n");
 }
