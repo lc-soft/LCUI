@@ -11,11 +11,15 @@
 
 int main(int argc, char*argv[]) 
 {
-        LCUI_Init(argc, argv);
         LCUI_Widget *window, *label;
+        LCUI_TextStyle style;
         LCUI_Graph pic;
+        
+        LCUI_Init(argc, argv);
+        
         /* 初始化结构体 */
-        Graph_Init(&pic);
+        Graph_Init( &pic );
+        TextStyle_Init( &style );
         /* 载入库中自带的图形数据，这个图形是18x18尺寸的LCUI的图标 */
         Load_Graph_Icon_LCUI_18x18(&pic);
         /* 创建部件 */
@@ -49,7 +53,8 @@ int main(int argc, char*argv[])
          * 改变label部件的字体大小，单位为pixel(像素)，不是pt（点数）
          * 第三个参数是自定义使用的字体文件，我设定为NULL，表示不使用。
          **/
-        Set_Label_Font(label, 24, NULL);
+        TextStyle_FontSize( &style, 24 );
+        Set_Label_TextStyle( label, style );
         /* 显示部件 */
         label->show(label);
         window->show(window); 
