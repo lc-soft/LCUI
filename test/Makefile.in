@@ -43,7 +43,7 @@ noinst_PROGRAMS = helloworld2$(EXEEXT) helloworld$(EXEEXT) \
 	test_lcui_graph_mix$(EXEEXT) test_window$(EXEEXT) \
 	test_rect_cut$(EXEEXT) test_gaussian_blur$(EXEEXT) \
 	test_widget_1$(EXEEXT) test_widget_2$(EXEEXT) \
-	test_widget_3$(EXEEXT)
+	test_widget_3$(EXEEXT) test_timer$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -94,6 +94,9 @@ test_radiobtn_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_rect_cut_OBJECTS = test_rect_cut.$(OBJEXT)
 test_rect_cut_OBJECTS = $(am_test_rect_cut_OBJECTS)
 test_rect_cut_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_test_timer_OBJECTS = test_timer.$(OBJEXT)
+test_timer_OBJECTS = $(am_test_timer_OBJECTS)
+test_timer_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_viewimage_OBJECTS = test_viewimage.$(OBJEXT)
 test_viewimage_OBJECTS = $(am_test_viewimage_OBJECTS)
 test_viewimage_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -160,18 +163,20 @@ SOURCES = $(helloworld_SOURCES) $(helloworld2_SOURCES) \
 	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
 	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
 	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
-	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
-	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
-	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
+	$(test_timer_SOURCES) $(test_viewimage_SOURCES) \
+	$(test_widget_1_SOURCES) $(test_widget_2_SOURCES) \
+	$(test_widget_3_SOURCES) $(test_window_SOURCES) \
+	$(ts_calibrate_SOURCES)
 DIST_SOURCES = $(helloworld_SOURCES) $(helloworld2_SOURCES) \
 	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
 	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
 	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
 	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
 	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
-	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
-	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
-	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
+	$(test_timer_SOURCES) $(test_viewimage_SOURCES) \
+	$(test_widget_1_SOURCES) $(test_widget_2_SOURCES) \
+	$(test_widget_3_SOURCES) $(test_window_SOURCES) \
+	$(ts_calibrate_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -381,6 +386,8 @@ test_widget_2_SOURCES = test_widget_2.c
 test_widget_2_LDADD = $(top_builddir)/src/libLCUI.la
 test_widget_3_SOURCES = test_widget_3.c
 test_widget_3_LDADD = $(top_builddir)/src/libLCUI.la
+test_timer_SOURCES = test_timer.c
+test_timer_LDADD = $(top_builddir)/src/libLCUI.la
 all: all-recursive
 
 .SUFFIXES:
@@ -460,6 +467,9 @@ test_radiobtn$(EXEEXT): $(test_radiobtn_OBJECTS) $(test_radiobtn_DEPENDENCIES)
 test_rect_cut$(EXEEXT): $(test_rect_cut_OBJECTS) $(test_rect_cut_DEPENDENCIES) 
 	@rm -f test_rect_cut$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_rect_cut_OBJECTS) $(test_rect_cut_LDADD) $(LIBS)
+test_timer$(EXEEXT): $(test_timer_OBJECTS) $(test_timer_DEPENDENCIES) 
+	@rm -f test_timer$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_timer_OBJECTS) $(test_timer_LDADD) $(LIBS)
 test_viewimage$(EXEEXT): $(test_viewimage_OBJECTS) $(test_viewimage_DEPENDENCIES) 
 	@rm -f test_viewimage$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_viewimage_OBJECTS) $(test_viewimage_LDADD) $(LIBS)
@@ -497,6 +507,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_progressbar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_radiobtn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_rect_cut.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_viewimage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_widget_1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_widget_2.Po@am__quote@
