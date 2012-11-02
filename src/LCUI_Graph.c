@@ -418,9 +418,9 @@ void Graph_Copy(LCUI_Graph *des, LCUI_Graph *src)
 	
 	if( Graph_Valid(src) ) { 
 		if( Graph_Have_Alpha(src) ) {
-			des->have_alpha = IS_TRUE;
+			des->have_alpha = TRUE;
 		} else {
-			des->have_alpha = IS_FALSE;
+			des->have_alpha = FALSE;
 		}
 		/* 创建合适尺寸的Graph */
 		Graph_Create(des, src->width, src->height);
@@ -449,9 +449,9 @@ void Graph_Free(LCUI_Graph *pic)
 	p = Get_Quote_Graph(pic);
 	if(Graph_Valid(p)) {
 		Graph_Lock(p, 1);
-		if(pic->quote == IS_TRUE) {
+		if( pic->quote ) {
 			pic->src = NULL; 
-			pic->quote = IS_FALSE;
+			pic->quote = FALSE;
 		} else {
 			free(pic->rgba[0]);
 			free(pic->rgba[1]);
