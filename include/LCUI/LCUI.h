@@ -690,6 +690,7 @@ struct _LCUI_System
 	thread_t self_id;	/* 保存LCUI主程序的线程ID */
 	thread_t core_thread;	/* 保存核心处理的线程ID */
 	thread_t key_thread;	/* 保存按键处理的线程ID */
+	thread_t timer_thread;	/* 定时器列表处理线程ID */
 	
 	int status;		/* 状态 */
 	BOOL init;		/* 指示LCUI是否初始化过 */
@@ -710,7 +711,8 @@ struct _LCUI_System
 	LCUI_Queue	widget_list;	/* 部件队列，对应它的显示顺序 */
 	LCUI_AppList	app_list;	/* LCUI程序列表 */ 
 	LCUI_Font	default_font;	/* 默认的字体数据 */ 
-	LCUI_Queue	update_area;	/* 窗口外需要刷新的区域 */
+	LCUI_Queue	update_area;	/* 需要刷新的区域 */
+	LCUI_Queue	timer_list;	/* 定时器列表 */
 };
 /***********************************************************************/
 
@@ -723,6 +725,22 @@ struct _LCUI_System
 extern LCUI_System  LCUI_Sys;
 
 LCUI_BEGIN_HEADER
+
+/*----------------------------- Public --------------------------------*/
+/* 
+ * 功能：设置定时器，在指定的时间后调用指定回调函数 
+ * 说明：时间单位为毫秒，调用后会返回该定时器的标识符; 
+ * 如果要用于循环定时处理某些任务，可将 reuse 置为 1，否则置于 0。
+ * */
+int set_timer( long int n_ms, void (*callback_func)(void), BOOL reuse );
+
+/*
+ * 功能：释放定时器
+ * 说明：当不需要定时器时，可以使用该函数释放定时器占用的资源
+ * 返回值：正常返回0，指定ID的定时器不存在则返回-1.
+ * */
+int free_timer( int timer_id );
+/*---------------------------- End Timer -----------------------------*/
 
 /************************* App Management *****************************/
 LCUI_App *Find_App(LCUI_ID id);

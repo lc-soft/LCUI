@@ -41,6 +41,7 @@
 
 
 #define APP_ERROR_UNRECORDED_APP	"error: app was never recorded\n"
+#define APP_ERROR_REGISTER_ERROR	"error: app register error\n"
 #define ERROR_MALLOC_ERROR		"error: can not allocate memory space\n"
 
 #define ERROR_CONVERT_ERROR		"error: convert error\n"
