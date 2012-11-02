@@ -2235,7 +2235,7 @@ int WidgetType_Add(char *type)
 	
 	/* 以下需要初始化 */
 	FuncQueue_Init(&new_wd.func);
-	new_wd.type_id = total; /* 保存类型ID */
+	new_wd.type_id = rand(); /* 用随机数作为类型ID */
 	//printf("WidgetType_Add(): widget type id: %ld\n", new_wd.type_id); 
 	String_Init(&new_wd.type);
 	Strcpy(&new_wd.type, type);/* 保存部件类型 */
