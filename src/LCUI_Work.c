@@ -125,11 +125,19 @@ AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 {
 	int total, i;
 	/* 先获取程序数据结构体指针 */
-	LCUI_App *app = Get_Self_AppPointer();
-	LCUI_FuncQueue *queue =& app->task_queue;
-	
+	LCUI_App *app;
+	LCUI_FuncQueue *queue;
 	LCUI_Func *temp = NULL;
 	
+	if( func_data->id == (LCUI_ID)0 ) {
+		app = Get_Self_AppPointer();
+	} else {
+		app = Find_App( func_data->id );
+	}
+	if( !app ) {
+		return -1;
+	}
+	queue =& app->task_queue;
 	total = Queue_Get_Total(queue);
 	if(mode != ADD_MODE_ADD_NEW) {/* 如果模式不是“添加新的”模式 */
 		//printf("mode: %d\n", mode);
@@ -209,9 +217,6 @@ AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 	return 0;
 }
 /**************************** Task End ********************************/
-
-
-
 
 /***************************** Event ***********************************/
 static void 
