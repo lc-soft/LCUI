@@ -234,7 +234,6 @@ TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
 	
 	data = (LCUI_TextStyle*) malloc (sizeof(LCUI_TextStyle));
 	TextStyle_Init( data );
-	*data = layer->default_data;
 	memset( flags, 0, sizeof(flags) );
 	total = Queue_Get_Total( &layer->tag_buff );
 	if(total <= 0) {
@@ -516,10 +515,16 @@ TextLayer_Get_Char_BMP ( LCUI_TextStyle *default_style, LCUI_CharData *data )
 	LCUI_Font font;
 	int pixel_size;
 	Font_Init( &font );
-	if(data->data == NULL) {
-		pixel_size = default_style->pixel_size;	
+	/* 获取字体尺寸 */
+	if( !data->data ) {
+		pixel_size = default_style->pixel_size;
 	} else {
-		pixel_size = data->data->pixel_size; 
+		/* 如果已经自定义字体尺寸 */
+		if( data->data->_pixel_size ) {
+			pixel_size = data->data->pixel_size; 
+		} else {
+			pixel_size = default_style->pixel_size;
+		}
 	}
 	Get_FontBMP( &font, data->char_code, pixel_size, &data->bitmap );  
 }
