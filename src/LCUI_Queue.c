@@ -548,6 +548,9 @@ static BOOL Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 			p_src->next->prev = temp; 
 		}
 		p_des = queue->data_head_node.next;
+		if(p_des == NULL) {
+			return FALSE;
+		}
 		/* 找到链表中最后一个结点 */
 		for(i=0; p_des->next; ++i ) {
 			p_des = p_des->next;
