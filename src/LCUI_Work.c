@@ -324,7 +324,7 @@ LCUI_MouseEvent_Connect (void (*func) (), int event_id)
 	 * 中，等到处理鼠标事件时，会将按键状态作为该函
 	 * 数的第二个参数并转移至程序的任务队列 
 	 **/ 
-	EventQueue_Add(&LCUI_Sys.mouse.event, event_id, &func_data); 
+	EventQueue_Add(&LCUI_Sys.mouse_event, event_id, &func_data); 
 	return 0;
 }
 
@@ -648,8 +648,8 @@ skip_widget_check:;
 void Widget_Event_Init()
 /* 功能：初始化部件事件处理 */
 {
-	LCUI_MouseEvent_Connect(Tracking_Mouse_Move, MOUSE_EVENT_MOVE);
-	LCUI_MouseEvent_Connect(Widget_Clicked, MOUSE_EVENT_CLICK);
+	LCUI_MouseEvent_Connect( Tracking_Mouse_Move, MOUSE_EVENT_MOVE );
+	LCUI_MouseEvent_Connect( Widget_Clicked, MOUSE_EVENT_CLICK );
 }
 
 /*************************** Event End *********************************/
