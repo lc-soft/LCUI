@@ -72,8 +72,97 @@ void end_count_time()
 	printf("%ldms\n",clock()-start_time);
 }
 
+/*----------------------------- Device -------------------------------*/
+typedef struct _dev_func_data
+{
+	BOOL (*init_func)();
+	BOOL (*proc_func)();
+	BOOL (*destroy_func)();
+}
+dev_func_data;
 
-/*----------------------------- Timer ---------------------------------*/
+static void dev_list_init( LCUI_Queue *dev_list )
+{
+	Queue_Init( dev_list, sizeof(dev_func_data), NULL );
+}
+
+/* 
+ * 功能：注册设备
+ * 说明：为指定设备添加处理函数
+ * */
+int LCUI_Dev_Add(	BOOL (*init_func)(), 
+			BOOL (*proc_func)(), 
+			BOOL (*destroy_func)() )
+{
+	dev_func_data data;
+	
+	if( init_func ) {
+		init_func();
+	}
+	data.init_func = init_func;
+	data.proc_func = proc_func;
+	data.destroy_func = destroy_func;
+	if( 0<= Queue_Add( &LCUI_Sys.dev_list, &data ) ) {
+		return 0;
+	}
+	return -1;
+}
+
+static void *proc_dev_list ( void *arg )
+{
+	dev_func_data *data_ptr;
+	int total, i, result, sleep_time = 1000;
+	LCUI_Queue *dev_list;
+	dev_list = (LCUI_Queue *)arg;
+	while( LCUI_Active() ) {
+		result = 0;
+		total = Queue_Get_Total( dev_list );
+		for(i=0; i<total; ++i) {
+			data_ptr = Queue_Get( dev_list, i );
+			if( !data_ptr || !data_ptr->proc_func ) {
+				continue;
+			}
+			result += data_ptr->proc_func();
+		}
+		if( result > 0 ) {
+			sleep_time = 1000;
+		} else {
+			usleep( sleep_time );
+			if( sleep_time < 100000 ) {
+				sleep_time += 1000;
+			}
+		}
+	}
+	thread_exit(NULL);
+}
+
+/* 初始化设备 */
+int LCUI_Dev_Init()
+{
+	dev_list_init( &LCUI_Sys.dev_list );
+	return thread_create( &LCUI_Sys.dev_thread, NULL, 
+			proc_dev_list, &LCUI_Sys.dev_list );
+}
+
+void LCUI_Dev_Destroy()
+{
+	int total, i;
+	dev_func_data *data_ptr;
+	LCUI_Queue *dev_list;
+	
+	dev_list = &LCUI_Sys.dev_list; 
+	total = Queue_Get_Total( dev_list );
+	for(i=0; i<total; ++i) {
+		data_ptr = Queue_Get( dev_list, i );
+		if( !data_ptr || !data_ptr->destroy_func ) {
+			continue;
+		}
+		data_ptr->destroy_func();
+	}
+}
+/*--------------------------- End Device -----------------------------*/
+
+/*----------------------------- Timer --------------------------------*/
 typedef struct _timer_data
 {
 	int status;		/* 状态 */
@@ -86,7 +175,7 @@ typedef struct _timer_data
 }
 timer_data;
 
-/*----------------------------- Private -------------------------------*/
+/*----------------------------- Private ------------------------------*/
 /* 功能：初始化定时器列表 */
 static void timer_list_init( LCUI_Queue *timer_list )
 {
@@ -206,9 +295,9 @@ static void *timer_list_process( void *arg )
 	}
 	LCUI_Thread_Exit(NULL);
 }
-/*--------------------------- End Private -----------------------------*/
+/*--------------------------- End Private ----------------------------*/
 
-/*----------------------------- Public --------------------------------*/
+/*----------------------------- Public -------------------------------*/
 /* 
  * 功能：设置定时器，在指定的时间后调用指定回调函数 
  * 说明：时间单位为毫秒，调用后会返回该定时器的标识符; 
@@ -287,10 +376,10 @@ LCUI_App* Get_Self_AppPointer()
 	Thread_TreeNode *ttn;
 	
 	id = pthread_self(); /* 获取本线程ID */  
-	if(id == LCUI_Sys.core_thread
-	|| id == LCUI_Sys.key_thread
-	|| id == LCUI_Sys.mouse.thread
-	|| id == LCUI_Sys.ts.thread )
+	if(id == LCUI_Sys.display_thread 
+	|| id == LCUI_Sys.dev_thread
+	|| id == LCUI_Sys.self_id
+	|| id == LCUI_Sys.timer_thread )
 	{/* 由于内核及其它线程ID没有被记录，只有直接返回LCUI主程序的线程ID了 */
 		return Find_App(LCUI_Sys.self_id);
 	}
@@ -454,15 +543,6 @@ static void Print_LCUI_Copyright_Text()
 	"========================================\n" );
 }
 
-static void Mouse_Init(void)
-/* 功能：初始化鼠标数据 */
-{
-	LCUI_Sys.mouse.fd = 0;  
-	LCUI_Sys.mouse.status = REMOVE; /* 鼠标为移除状态 */
-	LCUI_Sys.mouse.move_speed = 1; /* 移动数度为1 */
-	EventQueue_Init(&LCUI_Sys.mouse.event);/* 初始化鼠标事件信息队列 */
-}
-
 static void Cursor_Init()
 /* 功能：初始化游标数据 */
 {
@@ -475,32 +555,10 @@ static void Cursor_Init()
 static void LCUI_IO_Init()
 /* 功能：初始化输入输出功能 */
 {
-	int result;
-
-	/* 检测是否支持鼠标 */
-	nobuff_printf("checking mouse support...");
-	result = Check_Mouse_Support();
-	if(result == 0) {
-		printf("yes\n");
-		/* 启用鼠标输入处理 */
-		nobuff_printf("enable mouse input..."); 
-		result = Enable_Mouse_Input();
-		if(result == 0) {
-			printf("success\n");
-		} else {
-			printf("fail\n");
-		}
-	} else {
-		printf("no\n");
-	}
-	
-	LCUI_Sys.ts.status = REMOVE;
-	LCUI_Sys.ts.thread = 0;
-	LCUI_Sys.ts.td = NULL;
-	/* 启用触屏输入处理 */ 
-	Enable_TouchScreen_Input();  
-	
-	Enable_Key_Input();
+	Mouse_Init();
+	Cursor_Init();
+	Keyboard_Init();
+	TouchScreen_Init();
 }
 
 int LCUI_Active()
@@ -550,8 +608,7 @@ int LCUI_Init(int argc, char *argv[])
 		}
 		
 		Enable_Graph_Display();	/* LCUI的核心开始工作 */
-		Mouse_Init();	/* 初始化鼠标 */
-		Cursor_Init();	/* 初始化鼠标游标 */
+		LCUI_Dev_Init();
 		LCUI_IO_Init();	/* 初始化输入输出设备 */ 
 		Widget_Event_Init(); /* 初始化部件事件处理 */ 
 		/* 鼠标游标居中 */
