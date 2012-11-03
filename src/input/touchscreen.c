@@ -39,8 +39,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-//#include "config.h"
-
+#include "config.h"
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_CURSOR_H
@@ -50,122 +49,126 @@
 
 #ifdef USE_TSLIB
 #include <tslib.h> 
-
-static void * Handle_TouchScreen_Input ()
-/* 功能：处理触屏输入 */
-{
-	char *tsdevice;
-	struct ts_sample samp;
-	int button, x, y, ret;
-	LCUI_MouseEvent event;
-	
-	char str[100];
-	while (LCUI_Active()) {
-		if (LCUI_Sys.ts.status != INSIDE) {
-			tsdevice = getenv("TSLIB_TSDEVICE");
-			if( tsdevice != NULL ) {
-				LCUI_Sys.ts.td = ts_open(tsdevice, 0);
-			} else {
-				tsdevice = TS_DEV;
-			}
-			LCUI_Sys.ts.td = ts_open (tsdevice, 0);
-			if (!LCUI_Sys.ts.td) { 
-				sprintf (str, "ts_open: %s", tsdevice);
-				perror (str);
-				LCUI_Sys.ts.status = REMOVE;
-				break;
-			}
-
-			if (ts_config (LCUI_Sys.ts.td)) {
-				perror ("ts_config");
-				LCUI_Sys.ts.status = REMOVE;
-				break;
-			}
-			LCUI_Sys.ts.status = INSIDE;
-		}
-
-		/* 开始获取触屏点击处的坐标 */ 
-		ret = ts_read (LCUI_Sys.ts.td, &samp, 1); 
-		if (ret < 0) {
-			perror ("ts_read");
-			continue;
-		}
-
-		if (ret != 1) {
-			continue;
-		}
-		x = samp.x;
-		y = samp.y;
-		
-		if (x > Get_Screen_Width ()) {
-			x = Get_Screen_Width ();
-		}
-		if (y > Get_Screen_Height ()) {
-			y = Get_Screen_Height ();
-		}
-		if (x < 0) {
-			x = 0;
-		}
-		if (y < 0) {
-			y = 0;
-		}
-		/* 设定游标位置 */ 
-		Set_Cursor_Pos (Pos(x, y));
-		
-		event.global_pos.x = x;
-		event.global_pos.y = y;
-		/* 获取当前鼠标指针覆盖到的部件的指针 */
-		event.widget = Get_Cursor_Overlay_Widget();
-		/* 如果有覆盖到的部件，就需要计算鼠标指针与部件的相对坐标 */
-		if(event.widget != NULL) {
-			event.pos.x = x - Get_Widget_Global_Pos(event.widget).x;
-			event.pos.y = y - Get_Widget_Global_Pos(event.widget).y;
-		} else {/* 否则，和全局坐标一样 */
-			event.pos.x = x;
-			event.pos.y = y;
-		}
-		if (samp.pressure > 0) {
-			button = 1; 
-		} else {
-			button = 0; 
-		}
-			/* 处理鼠标事件 */
-		Handle_Mouse_Event(button, &event); 
-		//printf("%ld.%06ld: %6d %6d %6d\n", samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure);
-	}
-	if(LCUI_Sys.ts.status == INSIDE) {
-		ts_close(LCUI_Sys.ts.td); 
-	}
-	LCUI_Sys.ts.status = REMOVE;
-	thread_exit (NULL);
-}
 #endif
 
-int Enable_TouchScreen_Input()
+/*********** 触屏相关 **************/
+typedef struct _LCUI_TS
+{
+	void *td;
+	int status;
+}
+LCUI_TS;
+/**********************************/
+
+static LCUI_TS ts_data;
+#ifdef USE_TSLIB
+static LCUI_MouseEvent mouse_event;
+#endif
+
+static BOOL proc_touchscreen()
+{
+#ifdef USE_TSLIB
+	struct ts_sample samp;
+	int button, ret;
+	static LCUI_Pos pos;
+	
+	if (ts_data.status != INSIDE) {
+		return FALSE;
+	}
+
+	/* 开始获取触屏点击处的坐标 */ 
+	ret = ts_read (ts_data.td, &samp, 1); 
+	if (ret < 0) {
+		perror ("ts_read");
+		return FALSE;
+	}
+
+	if (ret != 1) {
+		return FALSE;
+	}
+	pos.x = samp.x;
+	pos.y = samp.y;
+	
+	if (pos.x > Get_Screen_Width ()) {
+		pos.x = Get_Screen_Width ();
+	}
+	if (pos.y > Get_Screen_Height ()) {
+		pos.y = Get_Screen_Height ();
+	}
+	pos.x = pos.x<0 ? 0:pos.x; 
+	pos.y = pos.y<0 ? 0:pos.y; 
+	/* 设定游标位置 */ 
+	Set_Cursor_Pos ( pos );
+	
+	mouse_event.global_pos = pos;
+	mouse_event.widget = Get_Cursor_Overlay_Widget(); 
+	if( mouse_event.widget ) {
+		mouse_event.pos = GlobalPos_ConvTo_RelativePos( mouse_event.widget, pos );
+	} else { 
+		mouse_event.pos = pos;
+	}
+	button = samp.pressure > 0 ? 1:0;
+	Handle_Mouse_Event(button, &mouse_event); 
+	//printf("%ld.%06ld: %6d %6d %6d\n", samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure); 
+	return TRUE;
+#else
+	return FALSE;
+#endif
+}
+
+BOOL Enable_TouchScreen_Input()
 /* 功能：启用触屏输入处理 */
 { 
 #ifdef USE_TSLIB
-	if(LCUI_Sys.ts.status == REMOVE) {
-		printf("enable touchscreen input processing\n");
-		return  thread_create ( &LCUI_Sys.ts.thread, NULL, 
-					Handle_TouchScreen_Input, NULL ); 
+	char *tsdevice;
+	char str[256];
+	if (ts_data.status != INSIDE) {
+		tsdevice = getenv("TSLIB_TSDEVICE");
+		if( tsdevice != NULL ) {
+			ts_data.td = ts_open(tsdevice, 0);
+		} else {
+			tsdevice = TS_DEV;
+		}
+		ts_data.td = ts_open (tsdevice, 0);
+		if (!ts_data.td) {
+			sprintf (str, "ts_open: %s", tsdevice);
+			perror (str);
+			ts_data.status = REMOVE;
+			return FALSE;
+		}
+
+		if (ts_config (ts_data.td)) {
+			perror ("ts_config");
+			ts_data.status = REMOVE;
+			return FALSE;
+		}
+		ts_data.status = INSIDE;
 	}
-	return 0;
+	return TRUE;
 #else
-	return -1;
+	return FALSE;
 #endif
 }
 
-int Disable_TouchScreen_Input()
+BOOL Disable_TouchScreen_Input()
 /* 功能：撤销触屏输入处理 */
 {
 #ifdef USE_TSLIB
-	if(LCUI_Sys.ts.status == INSIDE) {
-		return thread_cancel ( LCUI_Sys.ts.thread ); 
+	if(ts_data.status == INSIDE) {
+		ts_close(ts_data.td);
+		ts_data.status = REMOVE;
+		return TRUE;
 	}
-	return 0;
+	return FALSE;
 #else
-	return -1;
+	return FALSE;
 #endif
 }
 
+void TouchScreen_Init()
+{
+	ts_data.td = NULL;
+	ts_data.status = REMOVE;
+	LCUI_Dev_Add( Enable_TouchScreen_Input, proc_touchscreen,
+			Disable_TouchScreen_Input );
+}
