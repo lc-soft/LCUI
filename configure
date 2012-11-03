@@ -1417,12 +1417,12 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
-  --with-iconv             use libiconv		(default)
-  --with-pthread             use pthread		(default)
-  --with-freetype             use freetype		(default)
-  --with-ts             use tslib		(default)
-  --with-png              use libpng		(default)
-  --with-jpeg             use libjpeg		(default)
+  --with-iconv            use libiconv	(default)
+  --with-pthread          use pthread	(default)
+  --with-freetype         use freetype	(default)
+  --with-ts               use tslib	(default)
+  --with-png              use libpng	(default)
+  --with-jpeg             use libjpeg	(default)
 
 Some influential environment variables:
   CC          C compiler command

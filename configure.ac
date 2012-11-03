@@ -36,7 +36,7 @@ AC_PROG_RANLIB
 # Checks for libraries.
 # 检测LCUI所依赖的库是否存在并且能正常使用
 want_iconv=no
-AC_ARG_WITH(iconv, [  --with-iconv             use libiconv		(default)])
+AC_ARG_WITH(iconv, [  --with-iconv            use libiconv	(default)])
 if test "x$with_iconv" != "xno"; then
     AC_CHECK_LIB([iconv], [iconv_open], want_iconv=yes, want_iconv=no)
     if test "x$want_iconv" != "xno"; then
@@ -47,7 +47,7 @@ fi
 
 want_thread=no
 thread_name=pthread
-AC_ARG_WITH(pthread, [  --with-pthread             use pthread		(default)])
+AC_ARG_WITH(pthread, [  --with-pthread          use pthread	(default)])
 if test "x$with_pthread" != "xno"; then
     AC_CHECK_LIB([pthread], [pthread_create], want_thread=yes, want_thread=no)
     if test "x$want_thread" != "xno"; then
@@ -58,7 +58,7 @@ if test "x$with_pthread" != "xno"; then
 fi
 
 want_freetype=no
-AC_ARG_WITH(freetype, [  --with-freetype             use freetype		(default)])
+AC_ARG_WITH(freetype, [  --with-freetype         use freetype	(default)])
 if test "x$with_freetype" != "xno"; then
     AC_CHECK_LIB([freetype], [FT_Init_FreeType], want_freetype=yes, want_freetype=no)
     if test "x$want_freetype" != "xno"; then
@@ -69,7 +69,7 @@ if test "x$with_freetype" != "xno"; then
 fi
 
 want_ts=no
-AC_ARG_WITH(ts, [  --with-ts             use tslib		(default)])
+AC_ARG_WITH(ts, [  --with-ts               use tslib	(default)])
 if test "x$with_ts" != "xno"; then
     AC_CHECK_LIB([ts], [ts_open], want_ts=yes, want_ts=no)
     if test "x$want_ts" != "xno"; then
@@ -79,7 +79,7 @@ if test "x$with_ts" != "xno"; then
 fi
 
 want_png=no
-AC_ARG_WITH(png, [  --with-png              use libpng		(default)])
+AC_ARG_WITH(png, [  --with-png              use libpng	(default)])
 if test "x$with_png" != "xno"; then
     AC_CHECK_LIB([png], [png_sig_cmp],want_png=yes,want_png=no)
     if test "x$want_png" != "xno"; then
@@ -90,7 +90,7 @@ if test "x$with_png" != "xno"; then
 fi
 
 want_jpeg=no
-AC_ARG_WITH(jpeg, [  --with-jpeg             use libjpeg		(default)])
+AC_ARG_WITH(jpeg, [  --with-jpeg             use libjpeg	(default)])
 if test "x$with_jpeg" != "xno"; then
     AC_CHECK_LIB([jpeg], [jpeg_start_decompress],want_jpeg=yes,want_jpeg=no)
     if test "x$want_jpeg" != "xno"; then
