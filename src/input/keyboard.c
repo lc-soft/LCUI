@@ -151,84 +151,67 @@ int Find_Pressed_Key(int key)
 	return 0;
 }
 
-static int disable_key = FALSE; 
-
 #include LC_DISPLAY_H
 
-static void * Handle_Key_Input ()
-/* 功能：处理按键输入 */
+static BOOL proc_keyboard()
 {
-	int key; 
-	int sleep_time = 1500; 
+	int key;
 	LCUI_Rect area;
 	LCUI_Graph graph;
 	
 	Graph_Init(&graph);
-	area = Rect((Get_Screen_Width()-320)/2, (Get_Screen_Height()-240)/2, 320, 240);
-	while (LCUI_Active()) {
-		if (Check_Key ()) {/* 如果有按键输入 */ 
-			sleep_time = 1500;
-			key = Get_Key (); 
-			#define __NEED_CATCHSCREEN__
-			#ifdef __NEED_CATCHSCREEN__
-			if(key == 'c')
-			{//当按下c键后，可以进行截图，只截取指定区域的图形
-				time_t rawtime;
-				struct tm * timeinfo;
-				char filename[100];
-				time ( &rawtime );
-				timeinfo = localtime ( &rawtime ); /* 获取系统当前时间 */ 
-				sprintf(filename, "%4d-%02d-%02d-%02d-%02d-%02d.png",
-					timeinfo->tm_year+1900, timeinfo->tm_mon+1, 
-					timeinfo->tm_mday, timeinfo->tm_hour, 
-					timeinfo->tm_min, timeinfo->tm_sec
-				);
-				Catch_Screen_Graph_By_FB( area, &graph );
-				write_png(filename, &graph);
-			} 
-			else if(key == 'r') {
-				/* 如果按下r键，就录制指定区域的图像 */
-				start_record_screen( area );
-			}
-			#endif
-			/* 处理程序中关联的按键事件 */
-			Handle_Event(&LCUI_Sys.key_event, key);
-		}
-		else if( disable_key ) {
-			break;
-		} else {/* 停顿一段时间 */
-			usleep(sleep_time);
-			sleep_time+=1500;
-			if(sleep_time >= 30000) {
-				sleep_time = 30000;
-			}
-		}
+	area.x = (Get_Screen_Width()-320)/2;
+	area.y = (Get_Screen_Height()-240)/2;
+	area.width = 320;
+	area.height = 240;
+	if ( !Check_Key ()) { /* 如果没有按键输入 */ 
+		return FALSE;
 	}
+	key = Get_Key (); 
+	#define __NEED_CATCHSCREEN__
+	#ifdef __NEED_CATCHSCREEN__
+	if(key == 'c')
+	{//当按下c键后，可以进行截图，只截取指定区域的图形
+		time_t rawtime;
+		struct tm * timeinfo;
+		char filename[100];
+		time ( &rawtime );
+		timeinfo = localtime ( &rawtime ); /* 获取系统当前时间 */ 
+		sprintf(filename, "%4d-%02d-%02d-%02d-%02d-%02d.png",
+			timeinfo->tm_year+1900, timeinfo->tm_mon+1, 
+			timeinfo->tm_mday, timeinfo->tm_hour, 
+			timeinfo->tm_min, timeinfo->tm_sec
+		);
+		Catch_Screen_Graph_By_FB( area, &graph );
+		write_png(filename, &graph);
+	}
+	else if(key == 'r') {
+		/* 如果按下r键，就录制指定区域的图像 */
+		start_record_screen( area );
+	}
+	#endif
+	/* 处理程序中关联的按键事件 */
+	Handle_Event(&LCUI_Sys.key_event, key);
 	Graph_Free(&graph);
-	disable_key = IS_FALSE; 
-	pthread_exit (NULL);
+	return TRUE;
 }
 
-int Enable_Key_Input()
+BOOL Enable_Key_Input()
 /* 功能：启用按键输入处理 */
 {
-	if( !disable_key ) {
-		Set_Raw(1);/* 设置终端属性 */ 
-		/* 创建一个线程，用于处理按键输入 */
-		return thread_create (&LCUI_Sys.key_thread, 
-				NULL, Handle_Key_Input, NULL);
-	}
-	return 0;
+	Set_Raw(1);/* 设置终端属性 */
+	return TRUE;
 }
 
-int Disable_Key_Input()
+BOOL Disable_Key_Input()
 /* 功能：撤销按键输入处理 */
 {
-	if( !disable_key ) {
-		disable_key = TRUE;
-		Set_Raw(0);/* 恢复终端属性 */
-		return thread_join (LCUI_Sys.key_thread, NULL);/* 等待线程结束 */
-	}
-	return 0;
+	Set_Raw(0);/* 恢复终端属性 */
+	return TRUE;
+}
+
+void Keyboard_Init()
+{
+	LCUI_Dev_Add( Enable_Key_Input, proc_keyboard, Disable_Key_Input);
 }
 /*************************** Key End **********************************/
