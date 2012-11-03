@@ -121,14 +121,18 @@ int KeyQueue_Find(LCUI_Queue *queue, int key_code);
 void Handle_Mouse_Event(int button_type, LCUI_MouseEvent *event);
 /* 功能：处理鼠标产生的事件 */ 
 
+
 int Check_Mouse_Support();
 /* 功能：检测鼠标的支持 */ 
 
-int Enable_Mouse_Input();
+BOOL Enable_Mouse_Input();
 /* 功能：启用鼠标输入处理 */ 
 
-int Disable_Mouse_Input();
+BOOL Disable_Mouse_Input();
 /* 功能：禁用鼠标输入处理 */ 
+
+int Mouse_Init();
+/* 初始化鼠标 */
 /**************************** Mouse End *******************************/
 
 
@@ -154,12 +158,14 @@ int Find_Pressed_Key(int key);
  *   1 存在
  *   0 不存在
  **/ 
- 
-int Enable_Key_Input();
-/* 功能：启用按键输入处理 */ 
 
-int Disable_Key_Input();
-/* 功能：撤销按键输入处理 */ 
+BOOL Enable_Key_Input();
+/* 功能：启用按键输入处理 */
+
+BOOL Disable_Key_Input();
+/* 功能：撤销按键输入处理 */
+
+void Keyboard_Init();
 /*************************** Key End **********************************/
 
 
@@ -167,12 +173,13 @@ int Disable_Key_Input();
 int Check_TouchScreen_Support();
 /* 功能：检测是否支持触瓶 */ 
 
-int Enable_TouchScreen_Input();
+BOOL Enable_TouchScreen_Input();
 /* 功能：启用鼠标输入处理 */ 
 
-int Disable_TouchScreen_Input();
+BOOL Disable_TouchScreen_Input();
 /* 功能：撤销鼠标输入处理 */ 
 
+void TouchScreen_Init();
 /*********************** TouchScreen End *******************************/
 
 LCUI_END_HEADER

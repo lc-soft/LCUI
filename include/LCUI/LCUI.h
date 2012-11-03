@@ -272,7 +272,6 @@ typedef struct	_LCUI_FontBMP		LCUI_FontBMP;
 typedef struct	_LCUI_Graph		LCUI_Graph;
 typedef struct	_LCUI_Font		LCUI_Font;
 typedef struct	_LCUI_TS		LCUI_TS;
-typedef struct	_LCUI_Mouse		LCUI_Mouse;
 typedef struct	_LCUI_MouseEvent	LCUI_MouseEvent;
 typedef struct	_LCUI_Key		LCUI_Key;
 typedef struct	_LCUI_Pos		LCUI_Pos;
@@ -281,7 +280,6 @@ typedef struct	_Thread_Queue		Thread_Queue;
 typedef struct	_Thread_TreeNode	Thread_TreeNode;
 typedef struct	_LCUI_Screen		LCUI_Screen;
 typedef struct	_Pixel			Pixel;
-typedef struct	_LCUI_Queue 		LCUI_AppList;
 
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
@@ -429,17 +427,6 @@ struct _LCUI_Font/* 字体信息数据 */
 /************************************************************************/
 
 
-/********************** 鼠标相关信息 ***************************/
-struct _LCUI_Mouse
-{
-	int fd, status;		 /* 句柄，状态 */
-	float move_speed;	 /* 鼠标移动速度，1.0为正常速度 */
-	thread_t thread;	 /* 处理鼠标输入的线程的ID */
-	LCUI_EventQueue event; /* 记录鼠标事件相关的信息 */
-};
-/*************************************************************/
-
-
 /************************ 鼠标事件 **************************/
 struct _LCUI_MouseEvent
 {
@@ -450,16 +437,6 @@ struct _LCUI_MouseEvent
 };
 /***********************************************************/
 
-
-/*********** 触屏相关 **************/
-struct _LCUI_TS
-{
-	void *td;
-	int status;  /* 状态 */ 
-	thread_t thread;
-};
-/**********************************/
- 
 
 /*************** 边框 ******************/
 struct _LCUI_Border
@@ -669,7 +646,6 @@ struct _LCUI_Screen
 	int		fb_dev_fd;	/* 图形显示设备的句柄 */
 	size_t		smem_len;	/* 内存空间的大小 */
 	int		bits;		/* 每个像素的用多少位表示 */
-	//Matrix		*matrix;		/* 屏幕脏矩形矩阵 */
 };
 /***********************************************************************/
 
@@ -684,35 +660,32 @@ struct _Thread_TreeNode
 
 /***************************整个LCUI的数据 *****************************/
 struct _LCUI_System
-{
-	Thread_TreeNode thread_tree; /* 线程关系树 */
-	
-	thread_t self_id;	/* 保存LCUI主程序的线程ID */
-	thread_t core_thread;	/* 保存核心处理的线程ID */
-	thread_t key_thread;	/* 保存按键处理的线程ID */
-	thread_t timer_thread;	/* 定时器列表处理线程ID */
-	
+{	
 	int status;		/* 状态 */
 	BOOL init;		/* 指示LCUI是否初始化过 */
 	BOOL need_shift_area;	/* 指示是否需要转移部件中记录的区域数据 */ 
+	
+	thread_t self_id;		/* 保存LCUI主程序的线程的ID */
+	thread_t display_thread;	/* 保存核心处理的线程的ID */
+	thread_t timer_thread;		/* 定时器列表处理线程的ID */
+	thread_t dev_thread;		/* 设备输入数据处理线程的ID */
+	Thread_TreeNode thread_tree; /* 线程关系树 */
 	
 	LCUI_ID max_app_idle_time;	/* 程序最大的空闲时间 */
 	LCUI_ID max_lcui_idle_time;	/* LCUI最大的空闲时间 */
 	
 	LCUI_Cursor	cursor;		/* 游标 */
-	LCUI_Mouse	mouse;		/* 鼠标 */
-	LCUI_TS	ts;	 	/* 触屏 */
 	
 	LCUI_Screen	screen;		/* 屏幕信息 */
-	
+	LCUI_Queue	mouse_event;	/* 鼠标事件 */
 	LCUI_Queue	press_key;	/* 保存已被按下的按键的键值 */
 	LCUI_Queue	key_event;	/* 保存与按键事件关联的数据 */
-	
+	LCUI_Queue	dev_list;	/* 设备列表 */
 	LCUI_Queue	widget_list;	/* 部件队列，对应它的显示顺序 */
-	LCUI_AppList	app_list;	/* LCUI程序列表 */ 
-	LCUI_Font	default_font;	/* 默认的字体数据 */ 
 	LCUI_Queue	update_area;	/* 需要刷新的区域 */
 	LCUI_Queue	timer_list;	/* 定时器列表 */
+	LCUI_Queue	app_list;	/* LCUI程序列表 */ 
+	LCUI_Font	default_font;	/* 默认的字体数据 */ 
 };
 /***********************************************************************/
 
@@ -726,7 +699,15 @@ extern LCUI_System  LCUI_Sys;
 
 LCUI_BEGIN_HEADER
 
-/*----------------------------- Public --------------------------------*/
+/* 
+ * 功能：注册设备
+ * 说明：为指定设备添加处理函数
+ * */
+int LCUI_Dev_Add(	BOOL (*init_func)(), 
+			BOOL (*proc_func)(), 
+			BOOL (*destroy_func)() );
+
+/*----------------------------- Timer --------------------------------*/
 /* 
  * 功能：设置定时器，在指定的时间后调用指定回调函数 
  * 说明：时间单位为毫秒，调用后会返回该定时器的标识符; 
