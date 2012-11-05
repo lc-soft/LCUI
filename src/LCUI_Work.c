@@ -524,7 +524,7 @@ Widget_Clicked(LCUI_MouseEvent *event)
 	    case PRESSED:
 		click_widget = widget;
 		if( Widget_Have_Event( widget, EVENT_DRAG ) ) {
-			/* 处理部件的拖动 */
+			/* 开始处理部件的拖动 */
 			_Start_DragEvent( widget, event );
 		}
 		widget = Get_ResponseStatusChange_Widget( widget ); 
@@ -553,10 +553,7 @@ Widget_Clicked(LCUI_MouseEvent *event)
 			 * 任务队列，使之在主循环中执行 
 			 * */
 			widget = Get_ResponseEvent_Widget( event->widget, EVENT_CLICKED );
-			if( !widget ) {
-				break;
-			}
-			if( widget->enabled ) {
+			if( widget && widget->enabled ) {
 				Handle_Event(&widget->event, EVENT_CLICKED);
 			}
 			widget = Get_ResponseStatusChange_Widget(event->widget);
