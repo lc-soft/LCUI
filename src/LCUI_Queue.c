@@ -217,6 +217,10 @@ void * Queue_Get (LCUI_Queue * queue, int pos)
  * */
 {
 	void  *data = NULL;
+	
+	if( pos < 0) {
+		return NULL;
+	} 
 	Queue_Using (queue, QUEUE_MODE_READ);
 	if (queue->total_num > 0 && pos < queue->total_num) {
 		if(queue->data_mode == 0) {
@@ -712,7 +716,6 @@ static void Destroy_Widget(LCUI_Widget *widget)
  * */
 {
 	widget->parent = NULL;
-	widget->focus = NULL;
 	
 	/* 释放字符串 */
 	String_Free(&widget->type);
@@ -728,9 +731,8 @@ static void Destroy_Widget(LCUI_Widget *widget)
 	Destroy_Queue(&widget->data);
 	Destroy_Queue(&widget->update_area);
 	
-	widget->focus = NULL;
-	widget->visible = IS_FALSE;
-	widget->enabled = IS_TRUE;
+	widget->visible = FALSE;
+	widget->enabled = TRUE;
 	
 	void (*func)(LCUI_Widget*);
 	func = Get_WidgetFunc_By_ID(widget->type_id, 
@@ -902,8 +904,9 @@ int RectQueue_Add (LCUI_Queue * queue, LCUI_Rect rect)
 				flag = 1;
 				break;
 			}
+		} else {
+			break;
 		}
-		else break;
 	}
 	
 	Destroy_Queue(&rect_buff);
