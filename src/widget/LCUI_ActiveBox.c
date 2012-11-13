@@ -59,7 +59,7 @@
 /* 动画库，用于记录所有动画的信息 */
 static LCUI_Queue frames_database;
 static pthread_t thread_id = 0;
-static int database_init = IS_FALSE;
+static int database_init = FALSE;
 /* 动画流，以流水线的形式处理每个动画的每帧图像的更新 */
 static LCUI_Queue frames_stream;
 
@@ -75,11 +75,11 @@ LCUI_Frames* Create_Frames(LCUI_Size size)
 	Queue_Init(&frames.pic, sizeof(LCUI_Frame), NULL);
 	Queue_Init(&frames.func_data, sizeof(LCUI_Func), NULL);
 	Graph_Init(&frames.slot);
-	frames.slot.have_alpha = IS_TRUE;
+	frames.slot.have_alpha = TRUE;
 	frames.current = 0;
 	frames.status = 0;
 	frames.size = size; 
-	if(database_init == IS_FALSE) {
+	if( !database_init ) {
 		Queue_Init(&frames_database, sizeof(LCUI_Frames), NULL); 
 		database_init = IS_TRUE;
 	}
@@ -298,7 +298,9 @@ static LCUI_Frames *Frames_Stream_Update()
 			break;
 		}
 	}
-	if(i >= total || frames == NULL) return NULL; 
+	if(i >= total || frames == NULL) {
+		return NULL; 
+	}
 	/* 
 	 * 由于有些动画还未更新第一帧图像，动画槽里的图像也未载入第一帧的图像，因此，
 	 * 需要优先处理帧序号为0的动画。
@@ -362,22 +364,26 @@ static void *Process_Frames()
 	LCUI_Graph *slot;
 	LCUI_Frames *frames; 
 	
-	while(!LCUI_Active()) usleep(10000);
+	while(!LCUI_Active()) {
+		usleep(10000);
+	}
 	while(LCUI_Active()) { 
 		frames = Frames_Stream_Update(); 
 		//printf("frames: %p\n", frames);
-		if(frames !=NULL){
+		if( frames ){
 			sleep_time = 1000;
-			total = Queue_Get_Total(&frames->func_data);
-			slot = Frames_Get_Slot(frames); 
+			total = Queue_Get_Total( &frames->func_data );
+			slot = Frames_Get_Slot( frames ); 
 			for(i=0; i<total; ++i){
-				func = Queue_Get(&frames->func_data, i);
+				func = Queue_Get( &frames->func_data, i );
 				func->arg[0] = slot;
-				Send_Task_To_App(func);
+				Send_Task_To_App( func );
 			} 
-		}else{
+		} else {
 			usleep(sleep_time);
-			if(sleep_time < 500000) sleep_time += 1000;
+			if(sleep_time < 500000) {
+				sleep_time += 1000;
+			}
 		} 
 	} 
 	LCUI_Thread_Exit(NULL);
@@ -386,7 +392,9 @@ static void *Process_Frames()
 int Frames_Play(LCUI_Frames *frames)
 /* 功能：播放动画 */
 {
-	if(frames == NULL) return -1; 
+	if(frames == NULL) {
+		return -1; 
+	}
 	frames->status = 1;
 	if(thread_id == 0){
 		Queue_Init(&frames_stream, sizeof(LCUI_Frames), NULL);
@@ -400,7 +408,9 @@ int Frames_Play(LCUI_Frames *frames)
 int Frames_Pause(LCUI_Frames *frames)
 /* 功能：暂停动画 */
 { 
-	if(frames == NULL) return -1;
+	if(frames == NULL) {
+		return -1;
+	}
 	frames->status = 0;
 	return 0;
 }
@@ -485,7 +495,7 @@ void Register_ActiveBox()
 {
 	WidgetType_Add("active_box"); 
 	WidgetFunc_Add("active_box", ActiveBox_Init, FUNC_TYPE_INIT);
-	WidgetFunc_Add("active_box", Exec_Update_ActiveBox, FUNC_TYPE_UPDATE); 
+	WidgetFunc_Add("active_box", Exec_Update_ActiveBox, FUNC_TYPE_UPDATE);
 	WidgetFunc_Add("active_box", Destroy_ActiveBox,	 FUNC_TYPE_DESTROY); 
 }
 

@@ -123,7 +123,7 @@ static void CheckBox_Init(LCUI_Widget *widget)
 	LCUI_CheckBox *check_box = (LCUI_CheckBox*)
 		Widget_Create_PrivData(widget, sizeof(LCUI_CheckBox));
 	
-	check_box->on = IS_FALSE;
+	check_box->on = FALSE;
 	/* 初始化图像数据 */ 
 	Graph_Init(&check_box->img_off_disable);
 	Graph_Init(&check_box->img_off_normal);
@@ -143,9 +143,9 @@ static void CheckBox_Init(LCUI_Widget *widget)
 	container[1] = Create_Widget(NULL);
 	
 	/* 启用这些部件的自动尺寸调整的功能 */
-	Enable_Widget_Auto_Size(widget);
-	Enable_Widget_Auto_Size(container[0]);
-	Enable_Widget_Auto_Size(container[1]);
+	Widget_AutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
+	Widget_AutoSize( container[0], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
+	Widget_AutoSize( container[1], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
 	
 	/* 将按钮部件作为label部件的容器 */
 	Widget_Container_Add(container[0], check_box->imgbox);

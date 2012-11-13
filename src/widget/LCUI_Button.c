@@ -238,7 +238,8 @@ static void Button_Init(LCUI_Widget *widget)
 	/* label部件居中显示 */
 	Set_Widget_Align(button->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	Show_Widget(button->label); /* 显示label部件 */
-	Enable_Widget_Auto_Size(widget);/* 启用自动尺寸调整，以适应内容 */
+	/* 启用自动尺寸调整，以适应内容 */
+	Widget_AutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK);
 }
 
 
