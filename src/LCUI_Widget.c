@@ -875,69 +875,59 @@ void Set_Widget_StyleID(LCUI_Widget *widget, int style_id)
 	Draw_Widget( widget );
 }
 
-LCUI_Widget *Get_Widget_By_Pos(LCUI_Widget *widget, LCUI_Pos pos)
+LCUI_Widget *Get_Widget_By_Pos( LCUI_Widget *widget, LCUI_Pos pos )
 /* 功能：获取部件中包含指定坐标的点的子部件 */
-{ 
-	if(widget == NULL) {
-		return NULL;
+{
+	LCUI_Pos tmp_pos;
+	int i, total, temp;
+	static LCUI_Widget *child, *w;
+	static LCUI_Queue *widget_list;
+	static LCUI_RGBA pixel;
+	
+	if( widget ) {
+		widget_list = &widget->child;
+		/* 判断 鼠标坐标对应部件图层中的像素点的透明度 是否符合要求，
+		 * 如果透明度不大于clickable_area_alpha的值，那么，无视
+		 * 该部件。
+		 *  */ 
+		tmp_pos = Pos_Sub( pos, widget->pos ); 
+		pixel = Get_Graph_Pixel( &widget->graph, tmp_pos ); 
+		if( (widget->clickable_mode == 0 
+		 && pixel.alpha < widget->clickable_area_alpha )
+		 || (widget->clickable_mode == 1 
+		 && pixel.alpha > widget->clickable_area_alpha ) ) { 
+			return NULL;
+		}
+	} else {
+		widget_list = &LCUI_Sys.widget_list;
 	}
 	
-	int i, temp;
-	LCUI_Widget *child;
-	LCUI_Widget *w = widget; 
-	
-	for(i=0;;++i) {/* 从顶到底遍历子部件 */
-		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
-		if(NULL == child) {
-			break;
+	w = widget; 
+	total = Queue_Get_Total( widget_list );
+	for(i=0; i<total; ++i) {/* 从顶到底遍历子部件 */
+		child = Queue_Get( widget_list, i ); 
+		if( !child || !child->visible ) { 
+			continue;
 		}
-		if( child->visible ) { 
-			temp = Rect_Inside_Point( pos, Get_Widget_Rect(child) );
-			if(temp == 1) {/* 如果这个点被包含在部件区域内 */
-				/* 递归调用，改变相对坐标 */
-				w = Get_Widget_By_Pos(child, Pos_Sub(pos, child->pos));
-				if(w == NULL) {
-					return widget;
-				}
-				break;
-			} else {
-				continue;
-			}
+		
+		temp = Rect_Inside_Point( pos, Get_Widget_Rect(child) );
+		/* 如果这个点被包含在部件区域内 */
+		if(temp != 1) {
+			continue;
 		}
+		/* 递归调用，改变相对坐标 */
+		w = Get_Widget_By_Pos( child, Pos_Sub( pos, child->pos) );
+		if( !w ) {
+			w = widget;
+		}
+		break;
 	}
 	return w; 
 }
-
 LCUI_Widget *Get_Cursor_Overlay_Widget()
 /* 功能：获取鼠标光标当前覆盖的部件 */
 { 
-	int temp;
-	int total,k; 
-	LCUI_Widget *widget, *w = NULL;
-	
-	total = Queue_Get_Total(&LCUI_Sys.widget_list);
-	for (k=0; k<total; ++k) {/* 从最顶到底，遍历部件 */ 
-		widget = (LCUI_Widget*)Queue_Get(&LCUI_Sys.widget_list, k);
-		if(widget == NULL) {
-			break;
-		}
-		if( !widget->visible ) {
-			continue;
-		}
-			
-		temp = Rect_Inside_Point(Get_Cursor_Pos(), Get_Widget_Rect(widget) );
-		if(temp != 1) {
-			continue; 
-		}
-		/* 如果这个点被包含在部件区域内，那就获取部件中包含指定坐标的点的子部件 */  
-		w = Get_Widget_By_Pos(widget, Pos_Sub(Get_Cursor_Pos(), 
-					Get_Widget_Pos(widget)));
-		if(w == NULL) {
-			w = widget; 
-		}
-		break;
-	} 
-	return w;  
+	return Get_Widget_By_Pos( NULL, Get_Cursor_Pos() );
 }
 
 LCUI_Widget *Get_Focus_Widget()
@@ -1092,29 +1082,31 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	app = Get_Self_AppPointer(); 
 	
 	/*--------------- 初始化部件基本属性及数据 ------------------*/
-	widget.auto_size	= IS_FALSE;
-	widget.auto_size_mode	= AUTOSIZE_MODE_GROW_AND_SHRINK;
-	widget.type_id		= 0;
-	widget.status		= WIDGET_STATUS_NORMAL;
-	widget.app_id		= app->id; 
-	widget.parent		= NULL;
-	widget.enabled		= TRUE;
-	widget.visible		= FALSE;
-	widget.pos		= Pos(0, 0);
-	widget.size		= Size(0, 0); 
-	widget.min_size		= Size(0, 0); 
-	widget.max_size		= Size(INT_MAX, INT_MAX); 
-	widget.align		= ALIGN_NONE; 
-	widget.dock		= DOCK_TYPE_NONE;
-	widget.offset		= Pos(0, 0); 
-	widget.pos_type		= POS_TYPE_ABSOLUTE;
-	widget.back_color	= RGB(238,243,250);
-	widget.fore_color	= RGB(0,0,0);
-	widget.border_color	= RGB(0,0,0);
-	widget.border_style	= BORDER_STYLE_NONE;
-	widget.private_data	= NULL;
-	widget.bg_mode		= BG_MODE_TRANSPARENT;
-	widget.status_response	= 0;
+	widget.auto_size		= FALSE;
+	widget.auto_size_mode		= AUTOSIZE_MODE_GROW_AND_SHRINK;
+	widget.type_id			= 0;
+	widget.status			= WIDGET_STATUS_NORMAL;
+	widget.app_id			= app->id; 
+	widget.parent			= NULL;
+	widget.enabled			= TRUE;
+	widget.visible			= FALSE;
+	widget.pos			= Pos(0, 0);
+	widget.size			= Size(0, 0); 
+	widget.min_size			= Size(0, 0); 
+	widget.max_size			= Size(INT_MAX, INT_MAX); 
+	widget.align			= ALIGN_NONE; 
+	widget.dock			= DOCK_TYPE_NONE;
+	widget.offset			= Pos(0, 0); 
+	widget.pos_type			= POS_TYPE_ABSOLUTE;
+	widget.back_color		= RGB(238,243,250);
+	widget.fore_color		= RGB(0,0,0);
+	widget.border_color		= RGB(0,0,0);
+	widget.border_style		= BORDER_STYLE_NONE;
+	widget.private_data		= NULL;
+	widget.bg_mode			= BG_MODE_TRANSPARENT;
+	widget.status_response		= 0;
+	widget.clickable_mode		= 0;
+	widget.clickable_area_alpha	= 0;
 	/*------------------------- END --------------------------*/
 	
 	/*--------------- 初始化部件的附加属性 ------------------*/
@@ -1167,20 +1159,21 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	pos = Queue_Add(&LCUI_Sys.widget_list, &widget);
 	p = (LCUI_Widget*)Queue_Get(&LCUI_Sys.widget_list, pos);
 	
-	if(widget_type != NULL) {
-		/* 验证部件类型是否有效 */
-		if( !WidgetType_Valid(widget_type) ) {
-			puts(WIDGET_ERROR_TYPE_NOT_FOUND);
-			return NULL;
-		}
-		/* 保存部件类型 */
-		Strcpy(&p->type, widget_type);
-		p->type_id = WidgetType_Get_ID(widget_type);	/* 获取类型ID */
-		/* 获取初始化部件私有结构体数据的函数指针 */ 
-		func_init = Get_WidgetFunc_By_ID(p->type_id, FUNC_TYPE_INIT);
-		/* 进行初始化 */
-		func_init( p ); 
-	} 
+	if( !widget_type ) {
+		return p;
+	}
+	/* 验证部件类型是否有效 */
+	if( !WidgetType_Valid(widget_type) ) {
+		puts(WIDGET_ERROR_TYPE_NOT_FOUND);
+		return NULL;
+	}
+	/* 保存部件类型 */
+	Strcpy(&p->type, widget_type);
+	p->type_id = WidgetType_Get_ID(widget_type);	/* 获取类型ID */
+	/* 获取初始化部件私有结构体数据的函数指针 */ 
+	func_init = Get_WidgetFunc_By_ID(p->type_id, FUNC_TYPE_INIT);
+	/* 进行初始化 */
+	func_init( p ); 
 	return p;
 }
 
@@ -1234,6 +1227,17 @@ void Set_Widget_BG_Mode(LCUI_Widget *widget, BG_MODE bg_mode)
  **/
 {
 	widget->bg_mode = bg_mode;
+}
+
+void Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode )
+/* 设定部件可被点击的区域的透明度 */
+{
+	if( mode == 0 ) {
+		widget->clickable_mode = 0;
+	} else {
+		widget->clickable_mode = 1;
+	}
+	widget->clickable_area_alpha = alpha;
 }
 
 void Set_Widget_Align(LCUI_Widget *widget, ALIGN_TYPE align, LCUI_Pos offset)
@@ -1369,9 +1373,7 @@ void Set_Widget_Backcolor(LCUI_Widget *widget, LCUI_RGB color)
 }
 
 int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag)
-/*
- * 功能：为部件填充背景图像
- */
+/* 功能：为部件填充背景图像 */
 {
 	if(NULL == img) {
 		Graph_Free(&widget->background_image);
@@ -2120,7 +2122,7 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 	for(i=total-1; i>=0; --i) {
 		/* 从尾到首获取部件指针 */
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);  
-		if(child != NULL) {/* 递归调用 */
+		if( child ) {/* 递归调用 */
 			Handle_WidgetUpdate( child );
 		}
 	}
@@ -2140,7 +2142,7 @@ void Handle_All_WidgetUpdate()
 		/* 从尾到首获取部件指针 */
 		child = (LCUI_Widget*)Queue_Get(&LCUI_Sys.widget_list, i); 
 		//printf("child: ");print_widget_info(child);
-		if(child != NULL) {/* 递归调用 */ 
+		if( child ) { 
 			Handle_WidgetUpdate( child );
 		}
 	}
@@ -2177,7 +2179,7 @@ int WidgetFunc_Add(
 	LCUI_App *app = Get_Self_AppPointer();
 	if(app == NULL) {
 		printf("WidgetFunc_Add():"APP_ERROR_UNRECORDED_APP);
-		exit(-1);
+		abort();
 	}
 	
 	//printf("WidgetFunc_Add(): widget type: %s, func type: %d\n", type, func_type); 
@@ -2186,24 +2188,27 @@ int WidgetFunc_Add(
 		/* 遍历数据，找到对应的位置 */
 	for(i = 0; i < total; ++i) {
 		temp = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
-		if(strcmp(temp->type.string, type) == 0) { 
-			total = Queue_Get_Total(&temp->func); 
-			for(i=0; i<total; i++) {
-				temp_func = Queue_Get(&temp->func, i);
-				if(temp_func->id == func_type) {
-					found = 1;
-					break;
-				}
-			}
-			
-			Get_FuncData(&func_data, widget_func, NULL, NULL);
-			func_data.id = func_type; /* 保存类型ID */
-			if(found == 1) {/* 如果已经存在，就覆盖 */
-				//printf("WidgetFunc_Add(): the function is already registered. repalce\n");
-				Queue_Replace(&temp->func, i, &func_data); 
-			} else Queue_Add(&temp->func, &func_data); 
-			return 0;
+		if(strcmp( temp->type.string, type) != 0) { 
+			continue;
 		}
+		total = Queue_Get_Total(&temp->func); 
+		for(i=0; i<total; i++) {
+			temp_func = Queue_Get(&temp->func, i);
+			if(temp_func->id == func_type) {
+				found = 1;
+				break;
+			}
+		}
+		
+		Get_FuncData(&func_data, widget_func, NULL, NULL);
+		func_data.id = func_type; /* 保存类型ID */
+		if(found == 1) {/* 如果已经存在，就覆盖 */
+			//printf("WidgetFunc_Add(): the function is already registered. repalce\n");
+			Queue_Replace(&temp->func, i, &func_data); 
+		} else {
+			Queue_Add(&temp->func, &func_data); 
+		}
+		return 0;
 	}
 	//printf("WidgetFunc_Add(): warning: the widget type was never recorded\n");
 	return -1;
