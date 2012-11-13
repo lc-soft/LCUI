@@ -43,18 +43,33 @@
 
 #include LC_FONT_H
 
-typedef struct _LCUI_TextLayer LCUI_Label;
+typedef struct _LCUI_Label 
+{
+	BOOL auto_size;		/* 指定是否根据文本图层的尺寸来调整部件尺寸 */
+	AUTOSIZE_MODE mode;	/* 自动尺寸调整的模式 */
+	LCUI_TextLayer layer;	/* 文本图层 */
+}
+LCUI_Label;
 
 LCUI_BEGIN_HEADER
 
-/************************* Label部件操作 *******************************/
-void Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...);
+/*---------------------------- Public --------------------------------*/
+void 
+Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...);
 /* 功能：设定与标签关联的文本内容 */ 
 
-int Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
+int 
+Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
 /* 为Label部件内显示的文本设定文本样式 */ 
-/***************************** END ************************************/
 
+LCUI_TextLayer *
+Label_Get_TextLayer( LCUI_Widget *widget );
+/* 获取label部件内的文本图层的指针 */ 
+
+void
+Label_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode );
+/* 启用或禁用Label部件的自动尺寸调整功能 */ 
+/*-------------------------- End Public ------------------------------*/
 
 LCUI_END_HEADER
 

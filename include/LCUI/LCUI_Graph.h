@@ -59,8 +59,8 @@ void Graph_Unlock(LCUI_Graph *pic);
 LCUI_RGBA RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore);
 /* 功能：混合两个像素点的颜色 */ 
 
-LCUI_RGBA Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos);
-/* 功能：获取图像中指定坐标的像素点的颜色 */ 
+BOOL Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel);
+/* 功能：获取图像中指定坐标的像素点的颜色 */
 
 int Get_Graph_Type(LCUI_Graph *pic);
 /* 返回图形的类型 */ 

@@ -49,30 +49,26 @@ typedef LCUI_Queue LCUI_EventQueue;
 typedef LCUI_Queue LCUI_FuncQueue;
 typedef LCUI_Queue LCUI_TaskQueue;
 
-typedef struct _LCUI_Event		LCUI_Event;
-typedef struct _LCUI_Func		LCUI_Func;
-typedef struct _LCUI_Func		LCUI_Task;
-typedef struct _LCUI_DragEvent	LCUI_DragEvent;
-
-/************ 部件事件 ************/
 typedef enum _WidgetEvent_ID
 {
 	EVENT_DRAG,	/* 部件的拖动事件 */
-	EVENT_CLICKED	/* 部件的点击事件 */
-}WidgetEvent_ID;
-/*********************************/
+	EVENT_CLICKED,	/* 部件的点击事件 */
+	EVENT_KEYBOARD,	/* 按键事件 */
+	EVENT_FOCUS_IN,	/* 得到焦点 */
+	EVENT_FOCUS_OUT	/* 失去焦点 */
+}
+WidgetEvent_ID; 
 
-/*************** 部件拖动事件 ********************/
-struct _LCUI_DragEvent
+typedef struct _LCUI_DragEvent
 {
 	LCUI_Pos new_pos;	/* 部件的新全局坐标 */
+	LCUI_Pos cursor_pos;	/* 鼠标游标的坐标 */
 	int first_click;	/* 标志，是否为首次点击 */ 
 	int end_click;		/* 标志，是否已经结束拖动 */
-};
-/**********************************************/
+}
+LCUI_DragEvent; 
 
-/************************* 函数 *****************************/
-struct _LCUI_Func
+typedef struct _LCUI_Func
 {
 	/* 
 	 * 函数ID，部件库需要这ID标识函数类型，往程序的任务队列添加
@@ -82,17 +78,19 @@ struct _LCUI_Func
 	void (*func)();  /* 函数指针 */
 	
 	/* 以下参数该怎么传给回调函数，具体要看是如何处理事件的 */  
-	void *arg[2];   /* 传给函数的两个参数 */
-};
-/************************************************************/
+	void *arg[2];		/* 传给函数的两个参数 */
+	BOOL destroy_arg[2];	/* 指定是否在调用完回调函数后，销毁参数 */
+}
+LCUI_Func, LCUI_Task;
 
-/*************************** 事件 ******************************/
-struct _LCUI_Event
+
+typedef struct _LCUI_Event
 {
 	int id;			/* 记录事件ID */
-	LCUI_Queue func_data;	/* 记录被关联的函数及它的参数 */
-};
-/**************************************************************/
+	LCUI_Queue func_data;	/* 记录被关联的回调函数数据 */
+}
+LCUI_Event;
+
 
 LCUI_BEGIN_HEADER
 
@@ -111,7 +109,8 @@ void Send_Task_To_App(LCUI_Func *func_data);
  * 说明：LCUI_Func结构体中的成员变量 id，保存的是目标程序的id
  */ 
 
-int Have_Task(LCUI_App *app);
+BOOL
+Have_Task( LCUI_App *app );
 /* 功能：检测是否有任务 */ 
 
 int Run_Task(LCUI_App *app);
@@ -139,7 +138,7 @@ int AppTask_Custom_Add(int mode, LCUI_Func *func_data);
 void EventQueue_Init(LCUI_EventQueue * queue);
 /* 功能：初始化事件队列 */ 
 
-int Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2);
+BOOL Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2);
 /* 
  * 功能：将函数指针以及两个参数，转换成LCUI_Func类型的指针
  * 说明：此函数会申请内存空间，并返回指向该空间的指针
@@ -189,6 +188,40 @@ int Widget_Clicked_Event_Connect (
 
 void Widget_Event_Init();
 /* 功能：初始化部件事件处理 */ 
+
+
+/*--------------------------- Focus Proc ------------------------------*/
+BOOL 
+Set_Focus( LCUI_Widget *widget );
+/* 
+ * 功能：为部件设置焦点
+ * 说明：上个获得焦点的部件会得到EVENT_FOCUS_OUT事件，而当前获得焦点的部件会得到
+ * EVENT_FOCUS_IN事件。
+ * */ 
+
+BOOL 
+Cancel_Focus( LCUI_Widget *widget );
+/* 
+ * 功能：取消指定部件的焦点
+ * 说明：该部件会得到EVENT_FOCUS_OUT事件，并且，会将焦点转移至其它部件
+ * */ 
+
+BOOL
+Reset_Focus( LCUI_Widget* widget );
+/* 复位指定部件内的子部件的焦点 */ 
+
+BOOL 
+Widget_FocusIn_Event_Connect(	LCUI_Widget *widget, 
+				void (*func)(LCUI_Widget*, void*), 
+				void *arg );
+/* 将回调函数与FOCUS_IN事件连接，当部件得到焦点时，会调用该回调函数 */ 
+
+BOOL 
+Widget_FocusOut_Event_Connect(	LCUI_Widget *widget, 
+				void (*func)(LCUI_Widget*, void*), 
+				void *arg );
+/* 将回调函数与FOCUS_OUT事件连接，当部件失去焦点时，会调用该回调函数 */ 
+/*------------------------- End Focus Proc ----------------------------*/
 
 /*************************** Event End *********************************/
 

@@ -130,10 +130,34 @@ int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, int pixel_size, LCUI_FontBMP *
 /*************************** LCUI_TextLayer ****************************/
 typedef struct _LCUI_TextStyle	LCUI_TextStyle; 
 typedef struct _LCUI_TextLayer 	LCUI_TextLayer; 
+typedef struct _LCUI_CharData	LCUI_CharData;
+typedef struct _Text_RowData		Text_RowData; 
 
 typedef enum _font_style		enum_font_style;
 typedef enum _font_weight		enum_font_weight;
 typedef enum _font_decoration	enum_font_decoration; 
+
+/********* 保存字体相关数据以及位图 ********/
+struct _LCUI_CharData
+{
+	uint32_t pos;		/* 对应字符串中的位置 */
+	wchar_t char_code;	/* 字符码 */
+	LCUI_FontBMP bitmap;	/* 字体位图 */
+	BOOL display:1;		/* 标志，是否需要显示该字 */
+	BOOL need_update:1;	/* 标志，表示是否需要刷新该字的字体位图数据 */
+	//BOOL using_quote:2;	/* 标志，表示是否引用了现成的文本样式 */
+	LCUI_TextStyle *data;	/* 文本样式数据 */
+};
+/***************************************/
+
+/********* 保存一行的文本数据 *************/
+struct _Text_RowData
+{
+	LCUI_Size max_size;	/* 记录最大尺寸 */
+	LCUI_Pos pos;		/* 当前行所在的位置 */
+	LCUI_Queue string;	/* 这个队列中的成员用于引用源文本的字体数据 */
+};
+/***************************************/
 
 enum _font_style
 { 
@@ -182,12 +206,12 @@ struct _LCUI_TextStyle
 
 struct _LCUI_TextLayer
 {
-	BOOL using_code_mode	:2;	/* 指示是否开启代码模式 */
-	BOOL using_style_tags	:2;	/* 指示是否处理样式标签 */
-	BOOL enable_word_wrap	:2;	/* 指示是否自动换行 */
-	BOOL enable_multiline	:2;	/* 指示是否为多行文本图层部件 */ 
+	BOOL using_code_mode	:1;	/* 指示是否开启代码模式 */
+	BOOL using_style_tags	:1;	/* 指示是否处理样式标签 */
+	BOOL enable_word_wrap	:1;	/* 指示是否自动换行 */
+	BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */ 
 	
-	BOOL have_select : 2;	/* 标记，指示是否在文本图层中选择了文本 */
+	BOOL have_select : 1;	/* 标记，指示是否在文本图层中选择了文本 */
 	uint32_t start, end;	/* 被选中的文本的范围 */ 
 	
 	LCUI_Queue color_keyword;	/* 记录需要使用指定风格的关键字 */
@@ -196,11 +220,15 @@ struct _LCUI_TextLayer
 	LCUI_Queue tag_buff;		/* 保存样式标签中表达的属性数据 */
 	LCUI_Queue style_data;		/* 保存样式数据 */
 	LCUI_Queue clear_area;		/* 记录需刷新的区域 */
+	
 	uint32_t current_src_pos;	/* 当前光标在源文本中位置 */
 	LCUI_Pos current_des_pos;	/* 当前光标在分段后的文本中的位置 */
-	uint32_t max_text_len;		/* 最大文本长度 */ 
+	uint32_t max_text_len;		/* 最大文本长度 */
 	
-	LCUI_TextStyle default_data;	/* 缺省状态下使用的字体样式数据 */
+	BOOL show_cursor;	/* 指定是否需要显示文本光标 */
+	int timer_id;		/* 定时器的ID */
+	
+	LCUI_TextStyle default_data;	/* 缺省状态下使用的文本样式数据 */
 };
 
 /**********************************************************************/
@@ -298,6 +326,16 @@ LCUI_Pos
 TextLayer_Get_Pixel_Pos( LCUI_TextLayer *layer, uint32_t char_pos );
 /* 根据源文本中的位置，获取该位置的字符相对于文本图层的坐标 */ 
 
+LCUI_Pos 
+TextLayer_Set_Pixel_Pos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos );
+/* 
+ * 功能：根据传入的二维坐标，设定光标在的文本图层中的位置
+ * 说明：该位置会根据当前位置中的字体位图来调整，确保光标显示在字体位图边上，而不
+ * 会遮挡字体位图；光标在文本图层中的位置改变后，在字符串中的位置也要做相应改变，
+ * 因为文本的添加，删减，都需要以光标当前所在位置对应的字符为基础。
+ * 返回值：文本图层中对应字体位图的坐标
+ *  */
+ 
 uint32_t 
 TextLayer_Get_Char_Pos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos );
 /* 根据文本图层的相对坐标，获取该坐标对应于源文本中的字符 */ 

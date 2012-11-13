@@ -202,7 +202,7 @@ typedef enum _BG_MODE
 BG_MODE;
 /*****************************************/
 
-/*********************** 定义了一些对齐方式 *********************/
+/*----------------- 部件对齐方式 -------------------*/
 typedef enum _ALIGN_TYPE
 {
 	ALIGN_NONE,		/* 无 */
@@ -217,9 +217,9 @@ typedef enum _ALIGN_TYPE
 	ALIGN_BOTTOM_RIGHT	/* 向底部偏右对齐 */
 }
 ALIGN_TYPE;
-/*****************************************************************/
+/*-------------------------------------------------*/
 
-/*************** 部件的几种状态 ***************/
+/*----------------- 部件的几种状态 ------------------*/
 typedef enum _WIDGET_STATUS
 {
 	WIDGET_STATUS_NORMAL,	/* 普通状态 */
@@ -230,7 +230,7 @@ typedef enum _WIDGET_STATUS
 	WIDGET_STATUS_DISABLE	/* 不可用 */
 }
 WIDGET_STATUS;
-/*******************************************/
+/*-------------------------------------------------*/
 
 /****************** 图像的处理方式 *****************/
 /* 缩放，缩放比例随着PictureBox部件的尺寸的改变而改变 */
@@ -507,8 +507,8 @@ typedef struct _LCUI_Border LCUI_Padding;
 /*----------------- 自动尺寸调整模式 --------------------*/
 typedef enum _AUTOSIZE_MODE
 {
-	AUTOSIZE_MODE_GROW_ONLY,	/* 只增大 */
-	AUTOSIZE_MODE_GROW_AND_SHRINK 	/* 增大和缩小 */
+	AUTOSIZE_MODE_GROW_AND_SHRINK,	/* 增大和缩小 */
+	AUTOSIZE_MODE_GROW_ONLY		/* 只增大 */
 }
 AUTOSIZE_MODE;
 /*----------------------------------------------------*/
@@ -538,17 +538,21 @@ struct _LCUI_Widget
 	/*------------------ END -------------------*/
 	
 	WIDGET_STATUS status;	/* 部件的状态 */
-	BOOL status_response:1;	/* 是否响应部件的状态改变 */
-	BOOL enabled:1;		/* 是否启用 */
-	BOOL visible:1; 	/* 是否可见 */
-	BOOL auto_size:1;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
-	int z_index;			/* 堆叠顺序 */
-	int clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“大于”才使条件成立 */
-	uchar_t clickable_area_alpha;	/* 指定部件图层中的区域的alpha值大于/小于多少时可被鼠标点击，默认为0，最大为255 */
+	BOOL status_response;	/* 是否响应部件的状态改变 */
+	
+	BOOL enabled;	/* 是否启用 */
+	BOOL visible;	/* 是否可见 */
+	
+	BOOL		auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
 	AUTOSIZE_MODE	auto_size_mode;	/* 自动尺寸调整模式 */
 	
-	LCUI_RGB  back_color;  /* 背景色 */
-	LCUI_RGB  fore_color;  /* 前景色 */
+	BOOL		focus;		/* 指定该部件是否需要焦点 */
+	LCUI_Widget*	focus_widget;	/* 获得焦点的子部件 */
+	
+	int z_index;	/* 堆叠顺序 */
+	
+	int		clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“不小于”才使条件成立 */
+	uchar_t	clickable_area_alpha;	/* 指定部件图层中的区域的alpha值小于/不小于多少时可被鼠标点击，默认为0，最大为255 */
 	
 	LCUI_String	type;		/* 部件的类型 */
 	LCUI_ID	type_id;	/* 部件的类型ID */
@@ -573,17 +577,19 @@ struct _LCUI_Widget
 	LCUI_RGB	border_color;	/* 边框颜色 */
 	BORDER_STYLE	border_style;	/* 边框类型 */
 	
+	LCUI_RGB  back_color;  /* 背景色 */
+	LCUI_RGB  fore_color;  /* 前景色 */
+	
 	int		bg_mode;  /* 背景模式，指定在无背景时是使用透明背景还是使用背景色填充 */
 	int		background_image_layout; /* 背景图的布局 */
 	LCUI_Graph	background_image;	 /* 背景图 */
 	
-	void *private_data;   /* 该部件私有的数据的指针，其它的是各个部件公用的数据 */ 
+	void *private_data;   /* 该部件私有数据的指针，其它的是各个部件公用的数据 */ 
 	
-	LCUI_Widget	*focus;		/* 获得焦点的部件 */
 	LCUI_Queue	event;		/* 保存部件的事件关联的数据 */
 	LCUI_Queue	update_area;	/* 部件内需要刷新的区域 */
 	LCUI_Queue	data;		/* 记录需要进行更新的数据 */ 
-	LCUI_Graph	graph;		/* 部件的图形数据 */ 
+	LCUI_Graph	graph;		/* 部件的图层 */ 
 	
 	/* 以下是函数指针，闲函数名太长的话，可以直接用下面的 */
 	void (*resize)(LCUI_Widget*, LCUI_Size);
@@ -661,7 +667,7 @@ struct _Thread_TreeNode
 /***************************整个LCUI的数据 *****************************/
 struct _LCUI_System
 {	
-	int status;		/* 状态 */
+	int status;		/* 状态 */ 
 	BOOL init;		/* 指示LCUI是否初始化过 */
 	BOOL need_shift_area;	/* 指示是否需要转移部件中记录的区域数据 */ 
 	
@@ -682,6 +688,7 @@ struct _LCUI_System
 	LCUI_Queue	key_event;	/* 保存与按键事件关联的数据 */
 	LCUI_Queue	dev_list;	/* 设备列表 */
 	LCUI_Queue	widget_list;	/* 部件队列，对应它的显示顺序 */
+	LCUI_Widget	*focus_widget;	/* 获得焦点的部件 */
 	LCUI_Queue	update_area;	/* 需要刷新的区域 */
 	LCUI_Queue	timer_list;	/* 定时器列表 */
 	LCUI_Queue	app_list;	/* LCUI程序列表 */ 

@@ -158,6 +158,14 @@ LCUI_Widget *Get_Parent_Widget(LCUI_Widget *widget, char *widget_type);
 int LCUI_Destroy_App_Widgets(LCUI_ID app_id);
 /* 功能：销毁指定ID的程序的所有部件 */ 
 
+LCUI_Widget *
+Get_FocusWidget( LCUI_Widget *widget );
+/* 获取指定部件内的已获得焦点的子部件 */ 
+
+BOOL 
+Focus_Widget( LCUI_Widget *widget );
+/* 检测指定部件是否处于焦点状态 */
+
 LCUI_String Get_Widget_Style(LCUI_Widget *widget);
 /* 功能：获取部件的类型 */ 
 
@@ -175,12 +183,6 @@ LCUI_Widget *Get_Widget_By_Pos(LCUI_Widget *widget, LCUI_Pos pos);
 
 LCUI_Widget *Get_Cursor_Overlay_Widget();
 /* 功能：获取鼠标光标当前覆盖的部件 */ 
-
-LCUI_Widget *Get_Focus_Widget();
-/*
- * 功能：获取当前焦点状态下的部件
- * 返回值：正常获取则返回部件的指针，否则，返回NULL
- **/ 
 
 int Widget_Is_Active(LCUI_Widget *widget);
 /* 功能：判断部件是否为活动状态 */ 
@@ -223,6 +225,9 @@ void Set_Widget_BG_Mode(LCUI_Widget *widget, BG_MODE bg_mode);
  * 功能：改变部件的背景模式
  * 说明：背景模式决定了部件在没有背景图的时候是使用背景色填充还是完全透明。
  **/ 
+
+void Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode );
+/* 设定部件可被点击的区域的透明度 */
 
 void Set_Widget_Align(LCUI_Widget *widget, ALIGN_TYPE align, LCUI_Pos offset);
 /* 功能：设定部件的对齐方式以及偏移距离 */ 
@@ -309,11 +314,8 @@ void Auto_Resize_Widget(LCUI_Widget *widget);
 void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size);
 /* 功能：执行改变部件尺寸的操作 */ 
 
-void Enable_Widget_Auto_Size(LCUI_Widget *widget);
-/* 功能：启用部件自动尺寸调整功能 */ 
-
-void Disable_Widget_Auto_Size(LCUI_Widget *widget);
-/* 功能：禁用部件自动尺寸调整功能 */ 
+void Widget_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode );
+/* 启用或禁用部件的自动尺寸调整功能 */
 
 void Exec_Refresh_Widget(LCUI_Widget *widget);
 /* 功能：执行刷新显示指定部件的整个区域图形的操作 */ 
