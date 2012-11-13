@@ -259,7 +259,7 @@ int Widget_Layer_Not_Visible(LCUI_Widget *widget)
 	return 0;
 }
 
-void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
+void __Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
 /* 
  * 功能：获取与指定区域重叠的部件 
  * 说明：得到的队列，队列中的部件排列顺序为：底-》上 == 左-》右
@@ -268,7 +268,7 @@ void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
 	int i, total;
 	LCUI_Pos pos;
 	LCUI_Rect tmp;
-	LCUI_Widget *child; 
+	LCUI_Widget *child;
 	LCUI_Queue *widget_list;
 
 	if(widget == NULL) {
@@ -281,31 +281,28 @@ void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
 	}
 
 	total = Queue_Get_Total(widget_list); 
-
-	for(i=total-1; i>=0; --i) {/* 从底到顶遍历子部件 */
+	/* 从底到顶遍历子部件 */
+	for(i=total-1; i>=0; --i) {
 		child = Queue_Get( widget_list, i ); 
-		if( child == NULL ) {
+		if( child == NULL || !child->visible ) {
 			continue;
 		}
-		if( child->visible ) {
-		/* 如果有可见的子部件 */ 
-			tmp = Get_Widget_Valid_Rect( child ); 
-			pos = Get_Widget_Global_Pos( child );
-			tmp.x += pos.x;
-			tmp.y += pos.y;
-			if( !Rect_Valid(tmp) ){
-				continue;
-			}
-			if (Rect_Is_Overlay(tmp, rect)) { 
-				/* 记录与该区域重叠的部件 */
-				Queue_Add_Pointer( queue, child ); 
-				Get_Overlay_Widget( rect, child, queue );  
-			}
+		tmp = Get_Widget_Valid_Rect( child ); 
+		pos = Get_Widget_Global_Pos( child );
+		tmp.x += pos.x;
+		tmp.y += pos.y;
+		if( !Rect_Valid(tmp) ){
+			continue;
 		}
+		if (Rect_Is_Overlay(tmp, rect)) { 
+			/* 记录与该区域重叠的部件 */
+			Queue_Add_Pointer( queue, child ); 
+			Get_Overlay_Widget( rect, child, queue );  
+		} 
 	}
 }
 
-void __Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
+void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
 /* 
  * 功能：获取与指定区域重叠的部件 
  * 说明：得到的队列，队列中的部件排列顺序为：底-》上 == 左-》右
@@ -328,9 +325,9 @@ void __Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue
 	flag = 0;
 	
 filter_widget:;
-
+	/* 从底到顶遍历子部件 */
 	total = Queue_Get_Total(widget_list);
-	for(i=total-1; i>=0; --i) {/* 从底到顶遍历子部件 */
+	for(i=total-1; i>=0; --i) {
 		child = (LCUI_Widget*)Queue_Get(widget_list, i);
 		if( child == NULL ) {
 			continue;
@@ -354,23 +351,24 @@ filter_widget:;
 			 && child->pos_type == POS_TYPE_STATIC ) {
 				continue;
 			}
+		} 
+		/* 过滤掉不可见的子部件 */ 
+		if( !child->visible ) {
+			continue;
 		}
 		
-		if( child->visible ) {
-		/* 如果有可见的子部件 */ 
-			tmp = Get_Widget_Valid_Rect(child); 
-			pos = Get_Widget_Global_Pos(child);
-			tmp.x += pos.x;
-			tmp.y += pos.y;
-			if(!Rect_Valid(tmp)){
-				continue;
-			}
-			if (Rect_Is_Overlay(tmp, rect)) { 
-				/* 记录与该区域重叠的部件 */
-				Queue_Add_Pointer(queue, child);
-				/* 递归调用 */
-				Get_Overlay_Widget(rect, child, queue);  
-			} 
+		tmp = Get_Widget_Valid_Rect(child); 
+		pos = Get_Widget_Global_Pos(child);
+		tmp.x += pos.x;
+		tmp.y += pos.y;
+		if(!Rect_Valid(tmp)){
+			continue;
+		}
+		if (Rect_Is_Overlay(tmp, rect)) { 
+			/* 记录与该区域重叠的部件 */
+			Queue_Add_Pointer(queue, child);
+			/* 递归调用 */
+			Get_Overlay_Widget(rect, child, queue);  
 		}
 	}
 	++flag;
@@ -551,7 +549,7 @@ int Enable_Graph_Display()
 {
 	Screen_Init();
 	LCUI_Sys.status = ACTIVE;
-	return thread_create( &LCUI_Sys.core_thread, 
+	return thread_create( &LCUI_Sys.display_thread, 
 			NULL, Handle_Area_Update, NULL );
 }
 
@@ -559,5 +557,5 @@ int Disable_Graph_Display()
 /* 功能：禁用图形输出 */
 {
 	LCUI_Sys.status = KILLED;
-	return thread_join( LCUI_Sys.core_thread, NULL );
+	return thread_join( LCUI_Sys.display_thread, NULL );
 }
