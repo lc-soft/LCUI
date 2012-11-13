@@ -194,7 +194,7 @@ static void Destroy_CheckBox(LCUI_Widget *widget)
 	Graph_Free(&check_box->img_on_over);
 }
 
-static void Exec_Update_CheckBox(LCUI_Widget *widget)
+static void Exec_Draw_CheckBox(LCUI_Widget *widget)
 /* 功能：更新复选框的图形数据 */
 {
 	LCUI_Graph *p;
@@ -362,6 +362,6 @@ void Register_CheckBox()
 	
 	/* 为部件类型关联相关函数 */ 
 	WidgetFunc_Add("check_box", CheckBox_Init, FUNC_TYPE_INIT);
-	WidgetFunc_Add("check_box", Exec_Update_CheckBox, FUNC_TYPE_UPDATE); 
+	WidgetFunc_Add("check_box", Exec_Draw_CheckBox, FUNC_TYPE_DRAW); 
 	WidgetFunc_Add("check_box", Destroy_CheckBox, FUNC_TYPE_DESTROY);
 }
