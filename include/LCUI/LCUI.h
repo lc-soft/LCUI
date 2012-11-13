@@ -541,11 +541,11 @@ struct _LCUI_Widget
 	BOOL status_response:1;	/* 是否响应部件的状态改变 */
 	BOOL enabled:1;		/* 是否启用 */
 	BOOL visible:1; 	/* 是否可见 */
-	BOOL lock_display:1;	/* 指示是否锁定部件的显示顺序 */
-	int z_index;		/* 堆叠顺序 */
-	
-	BOOL		auto_size:1;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
-	AUTOSIZE_MODE	auto_size_mode;	/* 自动尺寸调整模式 */  
+	BOOL auto_size:1;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
+	int z_index;			/* 堆叠顺序 */
+	int clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“大于”才使条件成立 */
+	uchar_t clickable_area_alpha;	/* 指定部件图层中的区域的alpha值大于/小于多少时可被鼠标点击，默认为0，最大为255 */
+	AUTOSIZE_MODE	auto_size_mode;	/* 自动尺寸调整模式 */
 	
 	LCUI_RGB  back_color;  /* 背景色 */
 	LCUI_RGB  fore_color;  /* 前景色 */

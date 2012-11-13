@@ -539,7 +539,7 @@ Widget_Clicked(LCUI_MouseEvent *event)
 		}
 		break;
 		
-	    case FREE:
+	    case FREE: 
 		if(click_widget == NULL) {
 			break;
 		}
@@ -606,7 +606,7 @@ Tracking_Mouse_Move (LCUI_MouseEvent *event)
 		if( click_widget == NULL ) {
 			DEBUG_MSG("leftbutton is free, widget overlay\n\n");
 			Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
-		} 
+		}
 	} else {
 		Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
 	}
