@@ -131,6 +131,11 @@ Window_TitleBar_Init(LCUI_Widget *titlebar)
 	t = Widget_Create_PrivData(titlebar, sizeof(LCUI_TitleBar));
 	t->icon_box = Create_Widget("picture_box");
 	t->label = Create_Widget("label");
+	/* 窗口图标和标题文字不可获得焦点，并忽略鼠标点击 */
+	t->label->focus = FALSE;
+	t->icon_box->focus = FALSE;
+	Set_Widget_ClickableAlpha( t->label, 0, 1 );
+	Set_Widget_ClickableAlpha( t->icon_box, 0, 1 );
 	
 	Widget_Container_Add(titlebar, t->icon_box);
 	Widget_Container_Add(titlebar, t->label);
@@ -155,9 +160,8 @@ Get_Window_Client_Size(LCUI_Widget *win_p)
 	return client_area->size;
 }
 
-void 
-Window_Widget_Auto_Size(LCUI_Widget *win_p)
-/* 功能：在窗口尺寸改变时自动改变标题栏和客户区的尺寸 */
+static void
+Exec_Update_Window( LCUI_Widget *win_p )
 {
 	LCUI_Size size;
 	LCUI_Widget *titlebar;
@@ -221,7 +225,13 @@ Window_Widget_Auto_Size(LCUI_Widget *win_p)
 		back_color = RGB(110,20,95);
 		border_color = RGB(80,0,65); 
 union_draw_method:;
-		Set_Widget_Border( win_p, RGB(50,50,50), Border(1,1,1,1) );
+		/* 若窗口未获得焦点 */
+		if( !Focus_Widget( win_p ) ) {
+			back_color = RGB(255,255,255);
+			border_color = RGB(50,50,50); 
+		}
+		
+		Set_Widget_Border( win_p, border_color, Border(1,1,1,1) );
 		Set_Widget_Border( client_area, border_color, Border(1,1,1,1) );
 		Set_Widget_Backcolor( win_p, back_color );
 		Graph_Fill_Color( &win_p->graph, back_color );
@@ -245,24 +255,11 @@ union_draw_method:;
 	} 
 }
 
-static void 
-Exec_Update_Window(LCUI_Widget *win_p)
-/* 功能：更新窗口图形数据 */
-{
-	LCUI_Widget *titlebar = Get_Window_TitleBar(win_p);
-	LCUI_Widget *client_area = Get_Window_Client_Area(win_p);
-	/* 更改窗口边框风格时，这个函数起到一定作用，因为要根据风格来调整窗口的内容 */
-	Window_Widget_Auto_Size(win_p);
-	/* 更新下面的部件 */
-	Draw_Widget(titlebar);
-	Draw_Widget(client_area);
-}
-
 LCUI_Widget *
 Get_Parent_Window(LCUI_Widget *widget)
 /* 功能：获取指定部件所在的窗口 */
 {
-	if(widget == NULL || widget->parent == NULL) {
+	if( !widget || !widget->parent ) {
 		return NULL;
 	}
 	if(strcmp(widget->parent->type.string, "window") == 0) {
@@ -297,31 +294,47 @@ Destroy_Window(LCUI_Widget *win_p)
 	//由于没有指针变量申请过内存，因此不需要释放指针变量
 }
 
+static void
+Window_FocusOut( LCUI_Widget *window, void *arg )
+/* 在窗口失去焦点时会调用此函数 */
+{
+	//printf( "Window_FocusOut!\n" );
+	Update_Widget( window );
+}
+
+static void
+Window_FocusIn( LCUI_Widget *window, void *arg )
+/* 在窗口获得焦点时会调用此函数 */
+{
+	//printf( "Window_FocusIn!\n" );
+	Front_Widget( window ); /* 前置窗口 */
+	Update_Widget( window ); /* 更新窗口 */
+}
+
 static void 
 Window_Init(LCUI_Widget *win_p)
-/*
- * 功能：初始化窗口
- * 说明：类似于构造函数
- **/
+/* 初始化window部件相关数据 */
 {
 	LCUI_Widget *titlebar;
 	LCUI_Widget *client_area;
 	LCUI_Widget *btn_close;
 	LCUI_Window *win;
 	
-	win = (LCUI_Window*)Widget_Create_PrivData(win_p, sizeof(LCUI_Window));
+	win = Widget_Create_PrivData(win_p, sizeof(LCUI_Window));
 	
 	win->hide_style	= NONE;
 	win->show_style	= NONE;
 	win->count	= 0;
 	win->init_align	= ALIGN_MIDDLE_CENTER;
 	
-	/* 创建一个标题栏部件 */
-	titlebar = Create_Widget("titlebar");
-	/* 再创建一个客户区部件 */
+	titlebar = Create_Widget("titlebar"); 
 	client_area = Create_Widget(NULL); 
 	btn_close = Create_Widget("button"); 
-
+	
+	titlebar->focus = FALSE;
+	
+	Set_Focus( client_area );
+	
 	static LCUI_Graph btn_highlight, btn_normal, btn_down; 
 	
 	Graph_Init(&btn_down);
@@ -360,6 +373,12 @@ Window_Init(LCUI_Widget *win_p)
 	Show_Widget(btn_close);
 	/* 关联拖动事件，让鼠标能够拖动标题栏并使窗口移动 */
 	Widget_Drag_Event_Connect(titlebar, Move_Window); 
+	/* 
+	 * 由于需要在窗口获得/失去焦点时进行相关处理，因此需要将回调函数 与部件
+	 * 的FOCUS_IN和FOCUS_OUT事件 进行关联
+	 * */
+	Widget_FocusOut_Event_Connect( win_p, Window_FocusOut, NULL );
+	Widget_FocusIn_Event_Connect( win_p, Window_FocusIn, NULL );
 }
 
 static void 
@@ -385,16 +404,6 @@ Hide_Window(LCUI_Widget *win_p)
 /* 功能：在隐藏窗口时使用视觉特效 */
 {
 	//有待扩展
-}
-
-static void 
-Resize_Window(LCUI_Widget *win_p)
-/* 功能：在改变窗口尺寸时使用视觉特效 */
-{
-	//有待扩展
-	
-	/* 为该类型部件添加相关函数，让这两个部件在窗口尺寸改变时也改变自己的尺寸 */ 
-	Window_Widget_Auto_Size( win_p ); 
 }
 
 void 
@@ -435,7 +444,6 @@ Register_Window()
 	WidgetFunc_Add("window", Window_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("window", Exec_Update_Window, FUNC_TYPE_UPDATE);
 	WidgetFunc_Add("window", Exec_Update_Window, FUNC_TYPE_DRAW);
-	WidgetFunc_Add("window", Resize_Window, FUNC_TYPE_RESIZE);
 	WidgetFunc_Add("window", Show_Window, FUNC_TYPE_SHOW);
 	WidgetFunc_Add("window", Hide_Window, FUNC_TYPE_HIDE);
 	WidgetFunc_Add("window", Destroy_Window, FUNC_TYPE_DESTROY);
