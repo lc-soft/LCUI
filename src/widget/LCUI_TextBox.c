@@ -13,36 +13,131 @@
 #include LC_WIDGET_H
 #include LC_GRAPH_H
 #include LC_FONT_H
+#include LC_LABEL_H
 #include LC_ERROR_H 
 
-typedef struct _LCUI_TextBox	 LCUI_TextBox;
-
-struct _LCUI_TextBox
+typedef struct _LCUI_TextBox
 {
 	LCUI_Widget *text;
-};
+	LCUI_Widget *cursor;
+}
+LCUI_TextBox;
 
+static LCUI_Widget *active_textbox = NULL; 
 /************************* 基本的部件处理 ********************************/
+
+static void
+set_textbox_cursor_despos( LCUI_Pos pos )
+{
+	LCUI_Pos pixel_pos;
+	LCUI_TextBox *tb;
+	LCUI_TextLayer *layer;
+	Text_RowData *row_ptr;
+	
+	tb = Get_Widget_PrivData( active_textbox ); 
+	layer = Label_Get_TextLayer( tb->text );
+	pixel_pos = TextLayer_Set_Pixel_Pos( layer, pos );
+	pixel_pos.y += 2;
+	pos = layer->current_des_pos;
+	row_ptr = Queue_Get( &layer->rows_data, pos.y );
+	Move_Widget( tb->cursor, pixel_pos );
+	Resize_Widget( tb->cursor, Size(1, row_ptr->max_size.h) );
+}
+
+static void 
+hide_textbox_cursor( )
+{
+	if( !active_textbox ) {
+		return;
+	}
+	
+	LCUI_TextBox *tb;
+	tb = Get_Widget_PrivData( active_textbox );
+	Hide_Widget( tb->cursor );
+}
+
+static void 
+show_textbox_cursor( )
+{
+	if( !active_textbox ) {
+		return;
+	}
+	
+	LCUI_TextBox *tb;
+	tb = Get_Widget_PrivData( active_textbox );
+	Show_Widget( tb->cursor );
+}
+
+static void 
+blink_cursor()
+/* 闪烁文本框中的光标 */
+{
+	static int status = 0;
+	if(status == 0) {
+		show_textbox_cursor();
+		status = 1;
+	} else {
+		hide_textbox_cursor();
+		status = 0;
+	}
+}
+
+static void 
+TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_DragEvent *event )
+{
+	LCUI_Pos pos;
+	LCUI_TextBox *tb;
+	active_textbox = widget;
+	tb = Get_Widget_PrivData( active_textbox );
+	pos = GlobalPos_ConvTo_RelativePos( tb->text, event->cursor_pos );
+	//printf("pos: %d,%d\n", pos.x, pos.y);
+	set_textbox_cursor_despos( pos );
+}
+
 static void 
 TextBox_Init( LCUI_Widget *widget )
 /* 初始化文本框相关数据 */
 {
 	LCUI_TextBox *textbox;
 	
+	Set_Widget_Padding( widget, Padding(2,2,2,2) );
 	textbox = Widget_Create_PrivData(widget, sizeof(LCUI_TextBox));
 	textbox->text = Create_Widget( "label" );
+	textbox->cursor = Create_Widget( NULL );
+	textbox->text->focus = FALSE;
+	textbox->cursor->focus = FALSE;
+	TextLayer_Using_StyleTags( Label_Get_TextLayer(textbox->text), FALSE );
+	Widget_Container_Add( textbox->text, textbox->cursor ); 
 	Widget_Container_Add( widget, textbox->text ); 
+	Show_Widget( textbox->text );
+	Set_Widget_BG_Mode( textbox->cursor, BG_MODE_FILL_BACKCOLOR );
+	Set_Widget_Backcolor( textbox->cursor, RGB(0,0,0) );
+	Resize_Widget( textbox->cursor, Size(1, 14) );
+	Set_Widget_ClickableAlpha( textbox->cursor, 0, 1 );
+	Set_Widget_ClickableAlpha( textbox->text, 0, 1 );
+	/* 设定定时器，每1秒闪烁一次 */
+	set_timer( 500, blink_cursor, TRUE );
+	Widget_Drag_Event_Connect( widget, TextBox_TextLayer_Click );
+}
+
+static LCUI_Widget*
+TextBox_Get_Label( LCUI_Widget *widget )
+/* 获取文本框部件内的label部件指针 */
+{
+	LCUI_TextBox *textbox;
+	textbox = Get_Widget_PrivData( widget );
+	return textbox->text;
 }
 
 static void 
-Destroy_TextBox(LCUI_Widget *widget)
+Destroy_TextBox( LCUI_Widget *widget )
 /* 销毁文本框占用的资源 */
 {
 	
 }
 
 static void 
-Exec_TextBox_Update( LCUI_Widget *widget )
+Exec_TextBox_Draw( LCUI_Widget *widget )
 /* 处理文本框的图形渲染 */
 {
 	Draw_Empty_Slot( &widget->graph, widget->size.w, widget->size.h );
@@ -51,9 +146,9 @@ Exec_TextBox_Update( LCUI_Widget *widget )
 static LCUI_TextLayer *
 TextBox_Get_TextLayer( LCUI_Widget *widget )
 {
-	LCUI_TextBox *textbox;
-	textbox = Get_Widget_PrivData( widget );
-	return Get_Widget_PrivData( textbox->text );
+	LCUI_Widget *label;
+	label = TextBox_Get_Label( widget );
+	return Label_Get_TextLayer( label );
 }
 
 void 
@@ -75,7 +170,7 @@ void Register_TextBox()
 {
 	WidgetType_Add ( "text_box" );
 	WidgetFunc_Add ( "text_box", TextBox_Init, FUNC_TYPE_INIT );
-	WidgetFunc_Add ( "text_box", Exec_TextBox_Update, FUNC_TYPE_UPDATE );
+	WidgetFunc_Add ( "text_box", Exec_TextBox_Draw, FUNC_TYPE_DRAW );
 	WidgetFunc_Add ( "text_box", Destroy_TextBox, FUNC_TYPE_DESTROY );
 }
 
@@ -85,12 +180,12 @@ void Register_TextBox()
 /* 剪切板 */
 //static LCUI_String clip_board;
 
-int TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
+void TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 /* 在光标处添加文本 */
 {
-	LCUI_TextLayer *layer;
-	layer = TextBox_Get_TextLayer( widget );
-	return TextLayer_Text_Add( layer, new_text );
+	LCUI_Widget *label;
+	label = TextBox_Get_Label( widget );
+	Set_Label_Text( label, new_text );
 }
 
 int TextBox_Text_Paste(LCUI_Widget *widget)
