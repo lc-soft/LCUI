@@ -130,11 +130,6 @@ void Send_Mouse_Event(int event_id, LCUI_MouseEvent *event)
 		total[1] = Queue_Get_Total(&temp->func_data);
 		for(i[1]=0; i[1]<total[1]; ++i[1]) {
 			func = Queue_Get(&temp->func_data, i[1]);
-			/* 
-			 * 由于Mouse_Input函数只会在LCUI退出时才退出，因此，储存事件的
-			 * 变量的生存周期很长，直接用指向它的指针event即可，无需申请内存
-			 * 空间，保存副本。
-			 * */
 			func->arg[0] = event;
 			func->arg[1] = NULL;
 			Send_Task_To_App( func );
@@ -218,7 +213,7 @@ void Handle_Mouse_Event(int button_type, LCUI_MouseEvent *event)
 	
 	/* 如果鼠标位置有改变 */
 	if(Pos_Cmp(event->global_pos, old_pos) != 0) {
-		Send_Mouse_Event(MOUSE_EVENT_MOVE, event);/*  触发事件 */ 
+		Send_Mouse_Event(MOUSE_EVENT_MOVE, event);/* 触发事件 */ 
 		old_pos = event->global_pos;
 	}
 }

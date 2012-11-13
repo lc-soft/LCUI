@@ -8,7 +8,7 @@
 #include LC_LABEL_H
 #include <unistd.h>
 
-#define TEST_THIS
+//#define TEST_THIS
 #ifdef TEST_THIS
 /* 声明一些部件 */
 static LCUI_Widget *main_window, *label, *btn_ok, *rdbtn[5];
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 	RadioButton_Create_Mutex(rdbtn[0], rdbtn[4]);
 	Set_RadioButton_On( rdbtn[0] );
 	/* 禁用按钮部件的自动尺寸调整 */
-	Disable_Widget_Auto_Size( btn_ok );
+	Widget_AutoSize( btn_ok, FALSE, 0 );
 	Resize_Widget( btn_ok, Size(100, 30) );
 	/* 将部件加入窗口客户区 */
 	Window_Client_Area_Add( main_window, btn_ok );
@@ -91,23 +91,28 @@ int main(int argc, char*argv[])
 /* 主函数，程序的入口 */
 {
 	LCUI_Init(argc, argv);
-	LCUI_Widget *w1, *w2, *w3;
-	/* 创建部件 */
-	w1  = Create_Widget("window");
-	w2  = Create_Widget("window");
-	w3  = Create_Widget("window");
+	LCUI_Widget *windows[3];
+	/* 创建窗口部件 */
+	windows[0] = Create_Widget("window");
+	windows[1] = Create_Widget("window");
+	windows[2] = Create_Widget("window");
 	/* 改变窗口的尺寸 */
-	Resize_Widget(w1, Size(320, 240));
-	Resize_Widget(w2, Size(200, 140));
-	Resize_Widget(w3, Size(120, 100));
-	Set_Window_Title_Text(w1, "窗口1");
-	Set_Window_Title_Text(w2, "窗口2");
-	Set_Window_Title_Text(w3, "窗口3");
-	Window_Client_Area_Add(w2, w3);
-	Window_Client_Area_Add(w1, w2);
-	Show_Widget(w1); 
-	Show_Widget(w2); 
-	Show_Widget(w3); 
+	Resize_Widget(windows[0], Size(320, 240));
+	Resize_Widget(windows[1], Size(200, 140));
+	Resize_Widget(windows[2], Size(120, 100));
+	Set_Window_Title_Text(windows[0], "主窗口"); 
+	Set_Window_Title_Text(windows[1], "子窗口 A"); 
+	Set_Window_Title_Text(windows[2], "子窗口 C");
+	/* 改变风格 */
+	Set_Widget_StyleID( windows[1], WINDOW_STYLE_PURE_ORANGE );
+	Set_Widget_StyleID( windows[2], WINDOW_STYLE_PURE_GREEN );
+	/* 将子窗口放入主窗口的客户区中 */
+	Window_Client_Area_Add( windows[0], windows[1] );
+	Window_Client_Area_Add( windows[0], windows[2] );
+	/* 显示它们 */
+	Show_Widget(windows[0]); 
+	Show_Widget(windows[1]); 
+	Show_Widget(windows[2]);
 	LCUI_Main(); /* 进入主循环 */ 
 	return 0;
 }
