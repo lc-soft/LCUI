@@ -295,6 +295,25 @@ static void *timer_list_process( void *arg )
 	}
 	LCUI_Thread_Exit(NULL);
 }
+
+timer_data *find_timer( int timer_id )
+{
+	int i, total;
+	timer_data *timer = NULL;
+	Queue_Lock( &LCUI_Sys.timer_list );
+	total = Queue_Get_Total( &LCUI_Sys.timer_list );
+	for(i=0; i<total; ++i) {
+		timer = Queue_Get( &LCUI_Sys.timer_list, i );
+		if( !timer ) {
+			continue;
+		}
+		if( timer->id == timer_id ) { 
+			break;
+		}
+	}
+	Queue_UnLock( &LCUI_Sys.timer_list ); 
+	return timer;
+}
 /*--------------------------- End Private ----------------------------*/
 
 /*----------------------------- Public -------------------------------*/
@@ -339,12 +358,38 @@ int free_timer( int timer_id )
 			break;
 		}
 	}
+	Queue_UnLock( &LCUI_Sys.timer_list );
 	if( i < total ) {
 		return 0;
 	}
 	return -1;
 }
 
+/*
+ * 功能：暂停定时器的使用 
+ * 说明：一般用于往复定时的定时器
+ * */
+int pause_timer( int timer_id )
+{
+	timer_data *timer;
+	timer = find_timer( timer_id );
+	if( timer ) {
+		timer->status = 0;
+		return 0;
+	}
+	return -1;
+}
+
+int continue_timer( int timer_id )
+{
+	timer_data *timer;
+	timer = find_timer( timer_id );
+	if( timer ) {
+		timer->status = 1;
+		return 0;
+	}
+	return -1;
+}
 /*---------------------------- End Public -----------------------------*/
 
 /*---------------------------- End Timer ------------------------------*/
@@ -586,10 +631,12 @@ int LCUI_Init(int argc, char *argv[])
 		Thread_TreeNode_Init (&LCUI_Sys.thread_tree);	/* 初始化根线程结点 */
 		LCUI_Sys.thread_tree.tid = thread_self();	/* 当前线程ID作为根结点 */
 		LCUI_Sys.self_id = thread_self();		/* 保存线程ID */
+		
+		LCUI_Sys.focus_widget = NULL; 
+		
 		/* 设定最大空闲时间 */
 		LCUI_Sys.max_app_idle_time = MAX_APP_IDLE_TIME;
 		LCUI_Sys.max_lcui_idle_time = MAX_LCUI_IDLE_TIME;
-		
 		EventQueue_Init(&LCUI_Sys.key_event);	/* 初始化按键事件队列 */
 		LCUI_Font_Init (&LCUI_Sys.default_font);/* 初始化默认的字体数据 */
 		LCUI_AppList_Init (&LCUI_Sys.app_list); /* 初始化LCUI程序数据 */
@@ -607,10 +654,10 @@ int LCUI_Init(int argc, char *argv[])
 			abort();
 		}
 		
-		Enable_Graph_Display();	/* LCUI的核心开始工作 */
+		Enable_Graph_Display();	/* 启用图形输出 */
 		LCUI_Dev_Init();
-		LCUI_IO_Init();	/* 初始化输入输出设备 */ 
-		Widget_Event_Init(); /* 初始化部件事件处理 */ 
+		LCUI_IO_Init();		/* 初始化输入输出设备 */ 
+		Widget_Event_Init();	/* 初始化部件事件处理 */ 
 		/* 鼠标游标居中 */
 		Set_Cursor_Pos( Get_Screen_Center_Point() );  
 		Show_Cursor();	/* 显示鼠标游标 */ 
@@ -663,9 +710,9 @@ int LCUI_Main ()
 			break;
 		}
 		/* 如果有需要执行的任务 */
-		if(Have_Task(app)) {
+		if( Have_Task(app) ) {
 			idle_time = 1500;
-			Run_Task(app); 
+			Run_Task( app ); 
 		} else {/* 否则暂停一段时间 */
 			usleep (idle_time);
 			idle_time += 1500;	/* 每次循环的空闲时间越来越长 */
