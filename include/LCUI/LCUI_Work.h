@@ -157,9 +157,6 @@ int LCUI_MouseEvent_Connect (void (*func) (), int event_id);
  * 添加至程序的任务队列，等待程序在主循环中处理
  **/ 
 
-int LCUI_Key_Event_Connect (int key_value, void (*func) (), void *arg);
-/* 功能：将函数与按键的某个事件相连接，当这个按键按下后，就会调用这个函数 */ 
-
 int Handle_Event(LCUI_EventQueue *queue, int event_id);
 /* 
  * 功能：处理指定ID的事件
