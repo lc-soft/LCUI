@@ -110,28 +110,28 @@ void Graph_Unlock(LCUI_Graph *pic)
 			if(i == total) {
 				switch(flag) {
 				    case -1:
-					pic->not_visible = IS_TRUE;
-					pic->is_opaque = IS_FALSE;
+					pic->not_visible = TRUE;
+					pic->is_opaque = FALSE;
 					break;
 				    case 1:
-					pic->not_visible = IS_FALSE;
-					pic->is_opaque = IS_FALSE;
+					pic->not_visible = FALSE;
+					pic->is_opaque = FALSE;
 					break;
 				    default:
-					pic->not_visible = IS_FALSE;
-					pic->is_opaque = IS_TRUE;
+					pic->not_visible = FALSE;
+					pic->is_opaque = TRUE;
 					break;
 				}
 			} else {
-				pic->not_visible = IS_FALSE;
-				pic->is_opaque = IS_FALSE;
+				pic->not_visible = FALSE;
+				pic->is_opaque = FALSE;
 			}
 		} else {
-			pic->is_opaque = IS_TRUE;
+			pic->is_opaque = TRUE;
 		}
 	} else {
-		pic->not_visible = IS_TRUE;
-		pic->is_opaque = IS_FALSE;
+		pic->not_visible = TRUE;
+		pic->is_opaque = FALSE;
 	} 
 skip_graph_data_update:;
 	thread_rwlock_unlock(&src->lock);
@@ -156,24 +156,31 @@ LCUI_RGBA RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore)
 	return back;
 }
 
-LCUI_RGBA Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos)
+BOOL Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel)
 /* 功能：获取图像中指定坐标的像素点的颜色 */
 {
 	int i;
-	LCUI_RGBA rgba;
+	LCUI_Rect rect;
 	
-	i = graph->width*pos.y + pos.x; 
-	
-	rgba.red = graph->rgba[0][i];
-	rgba.green = graph->rgba[1][i];
-	rgba.blue = graph->rgba[2][i];
+	if( pos.x < 0 || pos.y < 0 ) {
+		return FALSE;
+	}
+	rect = Get_Graph_Valid_Rect( graph );
+	graph = Get_Quote_Graph( graph );
+	if( !Graph_Valid(graph) ) {
+		return FALSE;
+	}
+	i = graph->width*(pos.y+rect.y) + pos.x + rect.x;
+	pixel->red = graph->rgba[0][i];
+	pixel->green = graph->rgba[1][i];
+	pixel->blue = graph->rgba[2][i];
 	
 	if(Graph_Have_Alpha(graph)) {
-		rgba.alpha = graph->rgba[3][i];
+		pixel->alpha = graph->rgba[3][i];
 	} else {
-		rgba.alpha = 255;
+		pixel->alpha = 255;
 	}
-	return rgba;
+	return TRUE;
 }
 
 int Get_Graph_Type(LCUI_Graph *pic)
@@ -198,9 +205,9 @@ BOOL Graph_Is_PNG(LCUI_Graph *pic)
  * */
 {
 	if( Get_Graph_Type(pic) == TYPE_PNG) {
-		return IS_TRUE;
+		return TRUE;
 	}
-	return IS_FALSE;
+	return FALSE;
 }
 
 BOOL Graph_Is_BMP(LCUI_Graph *pic)
@@ -210,9 +217,9 @@ BOOL Graph_Is_BMP(LCUI_Graph *pic)
  * */
 {
 	if( Get_Graph_Type(pic) == TYPE_BMP) {
-		return IS_TRUE;
+		return TRUE;
 	}
-	return IS_FALSE;
+	return FALSE;
 }
 
 BOOL Graph_Is_JPG(LCUI_Graph *pic)
@@ -222,9 +229,9 @@ BOOL Graph_Is_JPG(LCUI_Graph *pic)
  * */
 {
 	if( Get_Graph_Type(pic) == TYPE_JPG) {
-		return IS_TRUE;
+		return TRUE;
 	}
-	return IS_FALSE;
+	return FALSE;
 }
 
 BOOL Graph_Have_Alpha(LCUI_Graph *pic)
@@ -289,10 +296,10 @@ void Print_Graph_Info(LCUI_Graph *pic)
 	
 	printf("width:%d, height:%d, alpha:%u, %s, %s, %s\n", 
 	pic->width, pic->height, pic->alpha, 
-	pic->have_alpha == IS_TRUE ? "have alpha channel":"no alpha channel",
-	pic->not_visible == IS_TRUE ? "not visible":"visible",
-	pic->is_opaque == IS_TRUE ? "is opaque":"not opaque");
-	if(pic->quote == IS_TRUE) {
+	pic->have_alpha == TRUE ? "have alpha channel":"no alpha channel",
+	pic->not_visible == TRUE ? "not visible":"visible",
+	pic->is_opaque == TRUE ? "is opaque":"not opaque");
+	if(pic->quote == TRUE) {
 		printf("graph src:");
 		Print_Graph_Info(Get_Quote_Graph(pic));
 	}
@@ -304,10 +311,10 @@ void Graph_Init(LCUI_Graph *pic)
 	if(pic == NULL) {
 		return;
 	}
-	pic->quote	= IS_FALSE; 
-	pic->have_alpha	= IS_FALSE;
-	pic->is_opaque	= IS_FALSE;
-	pic->not_visible = IS_FALSE;
+	pic->quote	= FALSE; 
+	pic->have_alpha	= FALSE;
+	pic->is_opaque	= FALSE;
+	pic->not_visible = FALSE;
 	pic->rgba	= NULL;
 	pic->alpha	= 255;
 	pic->pos	= Pos(0, 0);
@@ -325,7 +332,7 @@ static uchar_t** New_Graph(int width, int height, int have_alpha)
 	uchar_t** out_buff;
 	
 	size = sizeof(uchar_t)*width*height;
-	if(have_alpha == IS_TRUE) { 
+	if(have_alpha == TRUE) { 
 		out_buff = (uchar_t**)malloc(sizeof(uchar_t*)*4);
 	} else {
 		out_buff = (uchar_t**)malloc(sizeof(uchar_t*)*3);
@@ -353,7 +360,7 @@ static uchar_t** New_Graph(int width, int height, int have_alpha)
 		return NULL;
 	}
 	 
-	if(have_alpha == IS_TRUE) {
+	if(have_alpha == TRUE) {
 		out_buff[3] = (uchar_t*)calloc(1, size);
 		if(!out_buff[3]) {
 			free(out_buff);
@@ -701,7 +708,7 @@ int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)
 	}
 	
 	if(Graph_Have_Alpha(src)) {
-		out->have_alpha = IS_TRUE;
+		out->have_alpha = TRUE;
 	}
 	Graph_Create(out, width, height);
 	/* 水平翻转其实也就是交换两边的数据 */  

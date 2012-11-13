@@ -85,12 +85,13 @@ Search_Thread_Tree(Thread_TreeNode *ttn, thread_t tid)
 	int i;
 	Thread_TreeNode *new_ttn;
 	for(i=0; i<ttn->child.max_num; ++i) {
+		if( !ttn->child.queue[i] ) {
+			continue;
+		}
 		/* 如果该线程树结点指针有效，就继续递归查找 */
-		if(ttn->child.queue[i] != NULL) {
-			new_ttn = Search_Thread_Tree(ttn->child.queue[i], tid);
-			if(new_ttn != NULL) {
-				return new_ttn;
-			}
+		new_ttn = Search_Thread_Tree(ttn->child.queue[i], tid);
+		if( new_ttn ) {
+			return new_ttn;
 		}
 	}
 	return NULL;/* 没有在for循环里返回正常的指针，那么就在这里返回NULL */
