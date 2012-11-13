@@ -72,36 +72,42 @@ Send_Task_To_App(LCUI_Func *func_data)
  */
 { 
 	LCUI_App *app;
-	app = Find_App(func_data->id);
-	if(app == NULL) {
+	app = Find_App( func_data->id );
+	if( !app ) {
 		return;
 	}
-	Queue_Add(&app->task_queue, func_data);
+	Queue_Add( &app->task_queue, func_data );
 }
 
 
-int 
-Have_Task(LCUI_App *app)
+BOOL
+Have_Task( LCUI_App *app )
 /* 功能：检测是否有任务 */
 {
-	if(app == NULL) {
-		return 0; 
+	if( !app ) {
+		return FALSE; 
 	}
 	if(Queue_Get_Total(&app->task_queue) > 0) {
-		return 1; 
+		return TRUE; 
 	}
-	return 0;
+	return FALSE;
 }
 
 int 
-Run_Task(LCUI_App *app)
+Run_Task( LCUI_App *app )
 /* 功能：执行任务 */
 { 
 	LCUI_Task *task;
-	task = (LCUI_Task*)Queue_Get(&app->task_queue, 0);
+	task = (LCUI_Task*)Queue_Get( &app->task_queue, 0 );
 	/* 调用函数指针指向的函数，并传递参数 */
-	task->func(task->arg[0], task->arg[1]);
-	
+	task->func( task->arg[0], task->arg[1] );
+	/* 若需要在调用回调函数后销毁参数 */
+	if( task->destroy_arg[0] ) {
+		free( task->arg[0] );
+	}
+	if( task->destroy_arg[1] ) {
+		free( task->arg[1] );
+	}
 	return Queue_Delete(&app->task_queue, 0);
 }
 
@@ -137,83 +143,84 @@ AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 	if( !app ) {
 		return -1;
 	}
-	queue =& app->task_queue;
+	queue = &app->task_queue;
 	total = Queue_Get_Total(queue);
-	if(mode != ADD_MODE_ADD_NEW) {/* 如果模式不是“添加新的”模式 */
-		//printf("mode: %d\n", mode);
-		for (i = 0; i < total; ++i) {
-			//printf("1\n");
-			temp = Queue_Get(queue, i);
-			/* 如果函数指针已有记录 */
-			if(temp->func != func_data->func) {
-				continue;
-			}
-			//printf("2\n");/* 如果要求的是不重复模式 */ 
-			if(Check_Option(mode, ADD_MODE_NOT_REPEAT)) {
-	//	printf("3\n");/* 如果要求是第1个参数不能重复 */
-				if(Check_Option(mode, AND_ARG_F)) {
-					//printf("ADD_MODE_NOT_REPEAT, AND_ARG_F\n");
-					//printf("old:%p, new:%p\n", queue->queue[i].arg_f, arg_f);
-					/* 如果要求是第2个参数也不能重复 */
-					if(Check_Option(mode, AND_ARG_S)) {
-						if(temp->arg[0] == func_data->arg[0] 
-						&& temp->arg[1] == func_data->arg[1] 
-						) {/* 如果实际上函数以及参数1和2都一样 */ 
-							return -1; 
-						}
-					} else {/* 否则，只是要求函数以及第1个参数不能全部重复 */
-						if(temp->arg[0] == func_data->arg[0])  
-							return -1; 
+	/* 如果模式是“添加新的”模式 */
+	if( mode == ADD_MODE_ADD_NEW ) {
+		Queue_Add(queue, func_data); 
+		return 0;
+	}
+	
+	//printf("mode: %d\n", mode);
+	for (i = 0; i < total; ++i) {
+		//printf("1\n");
+		temp = Queue_Get(queue, i);
+		/* 如果函数指针已有记录 */
+		if(temp->func != func_data->func) {
+			continue;
+		}
+		//printf("2\n");/* 如果要求的是不重复模式 */ 
+		if(Check_Option(mode, ADD_MODE_NOT_REPEAT)) {
+//	printf("3\n");/* 如果要求是第1个参数不能重复 */
+			if(Check_Option(mode, AND_ARG_F)) {
+				//printf("ADD_MODE_NOT_REPEAT, AND_ARG_F\n");
+				//printf("old:%p, new:%p\n", queue->queue[i].arg_f, arg_f);
+				/* 如果要求是第2个参数也不能重复 */
+				if(Check_Option(mode, AND_ARG_S)) {
+					/* 如果函数以及参数1和2都一样 */ 
+					if(temp->arg[0] == func_data->arg[0] 
+					&& temp->arg[1] == func_data->arg[1]) {
+						return -1; 
 					}
-				}/* 否则，如果只是要求是第2个参数不能重复 */
-				else if(Check_Option(mode, AND_ARG_S)) {
-					if(temp->arg[1] == func_data->arg[1] ) {
+				} else {/* 否则，只是要求函数以及第1个参数不能全部重复 */
+					if(temp->arg[0] == func_data->arg[0]) { 
 						return -1; 
 					}
 				}
-				else {/* 否则，只是要求函数不同 */ 
+			}/* 否则，如果只是要求是第2个参数不能重复 */
+			else if(Check_Option(mode, AND_ARG_S)) {
+				if(temp->arg[1] == func_data->arg[1] ) {
 					return -1; 
 				}
-			}/* 如果要求的是替换模式 */
-			else if(Check_Option(mode, ADD_MODE_REPLACE)) {
-				//printf("ADD_MODE_REPLACE\n");
-				/* 如果要求是第1个参数相同 */
-				if( Check_Option(mode, AND_ARG_F) ) {
-					/* 如果要求是第2个参数也相同 */
-					if( Check_Option(mode, AND_ARG_S) ) {
-						if(temp->arg[0] == func_data->arg[0] 
-						&& temp->arg[1] == func_data->arg[1]
-						) {
-							break; 
-						}
-					} else {/* 否则，只是要求函数以及第1个参数全部相同 */
-						if(temp->arg[0] == func_data->arg[0]) {
-					//		printf("ARG_F\n");
-							break; 
-						}
+			}
+			else {/* 否则，只是要求函数不同 */ 
+				return -1; 
+			}
+		}/* 如果要求的是替换模式 */
+		else if(Check_Option(mode, ADD_MODE_REPLACE)) {
+			//printf("ADD_MODE_REPLACE\n");
+			/* 如果要求是第1个参数相同 */
+			if( Check_Option(mode, AND_ARG_F) ) {
+				/* 如果要求是第2个参数也相同 */
+				if( Check_Option(mode, AND_ARG_S) ) {
+					if(temp->arg[0] == func_data->arg[0] 
+					&& temp->arg[1] == func_data->arg[1]
+					) {
+						break; 
 					}
-				}/* 否则，如果只是要求第2个参数不能相同 */
-				else if(Check_Option(mode, AND_ARG_S)) {
-					if(temp->arg[1] == func_data->arg[1]) {
+				} else {/* 否则，只是要求函数以及第1个参数全部相同 */
+					if(temp->arg[0] == func_data->arg[0]) {
+				//		printf("ARG_F\n");
 						break; 
 					}
 				}
-				else {/* 否则，只是要求函数不同 */ 
+			}/* 否则，如果只是要求第2个参数不能相同 */
+			else if(Check_Option(mode, AND_ARG_S)) {
+				if(temp->arg[1] == func_data->arg[1]) {
 					break; 
 				}
 			}
-		//	printf("4\n"); 
+			else { 
+				break; 
+			}
 		}
-		//printf("5\n");
-		if(i == total) {
-			Queue_Add(queue, func_data); 
-		} else {
-			Queue_Replace( queue, i, func_data ); 
-		}
-	} else {
-		Queue_Add(queue, func_data); 
 	}
-	//		printf("6\n");
+	
+	if(i == total) {
+		Queue_Add(queue, func_data); 
+	} else {
+		Queue_Replace( queue, i, func_data ); 
+	}
 	return 0;
 }
 /**************************** Task End ********************************/
@@ -241,7 +248,7 @@ EventQueue_Init(LCUI_EventQueue * queue)
 }
 
 
-int 
+BOOL
 Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
 /* 
  * 功能：将函数指针以及两个参数，转换成LCUI_Func类型的指针
@@ -251,9 +258,9 @@ Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
 	LCUI_App *app;
 	app = Get_Self_AppPointer();
 	
-	if(NULL == app) {
+	if( !app ) {
 		printf("Get_FuncData(): "APP_ERROR_UNRECORDED_APP);
-		return -1;
+		return FALSE;
 	}
 	
 	p->id = app->id;
@@ -264,8 +271,9 @@ Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
 	 *  */
 	p->arg[0] = arg1;	
 	p->arg[1] = arg2;
-	
-	return 0;
+	p->destroy_arg[0] = FALSE;
+	p->destroy_arg[1] = FALSE;
+	return TRUE;
 }
 
 LCUI_Event *
@@ -278,8 +286,9 @@ Find_Event(LCUI_EventQueue *queue, int event_id)
 	if (total > 0) {
 		for (i = 0; i < total; ++i) {
 			event = (LCUI_Event*)Queue_Get(queue, i);
-			if(event->id == event_id)
+			if(event->id == event_id) {
 				return event;
+			}
 		}
 	}
 	
@@ -293,7 +302,7 @@ EventQueue_Add(LCUI_EventQueue *queue, int event_id, LCUI_Func *func)
 	LCUI_Event *event;
 	
 	event = Find_Event(queue, event_id);
-	if (NULL == event) {/* 如果没有，就添加一个新事件类型 */ 
+	if ( !event ) {/* 如果没有，就添加一个新事件类型 */ 
 		int pos;
 		LCUI_Event new_event;
 		new_event.id = event_id;
@@ -316,7 +325,7 @@ LCUI_MouseEvent_Connect (void (*func) (), int event_id)
  **/
 {
 	LCUI_Func func_data;
-	if(0 != Get_FuncData(&func_data, func, NULL, NULL) ) {
+	if( !Get_FuncData(&func_data, func, NULL, NULL) ) {
 		return -1;
 	}
 	/* 
@@ -328,22 +337,50 @@ LCUI_MouseEvent_Connect (void (*func) (), int event_id)
 	return 0;
 }
 
-
 int 
-LCUI_Key_Event_Connect (int key_value, void (*func) (), void *arg)
-/* 功能：将函数与按键的某个事件相连接，当这个按键按下后，就会调用这个函数 */
+LCUI_KeyboardEvent_Connect ( void (*func) (LCUI_Key*, void*), void *arg )
+/* 与键盘建立连接，当键盘中某个按键被按下/释放后，就会调用这个函数 */
 {
 	LCUI_Func func_data;
-	LCUI_App *app = Get_Self_AppPointer();
-	if(NULL == app) {
-		printf("LCUI_Key_Event_Connect(): "APP_ERROR_UNRECORDED_APP);
+	if( !Get_FuncData(&func_data, func, NULL, arg) ) {
+		return -2;
+	}
+	return Queue_Add( &LCUI_Sys.key_event, &func_data );
+}
+
+int 
+Handle_Widget_KeyboardEvent( LCUI_Widget *widget, LCUI_Key key ) 
+{
+	if( !widget ) {
 		return -1;
 	}
 	
-	Get_FuncData(&func_data, func, arg, NULL);
-	return EventQueue_Add(&LCUI_Sys.key_event, key_value, &func_data);
+	LCUI_Key *key_data;
+	LCUI_Event *event;
+	LCUI_Func *func;
+	int total, i;
+	
+	event = Find_Event( &widget->event, EVENT_KEYBOARD );
+	if( !event ) {
+		return -2;
+	}
+	
+	total = Queue_Get_Total( &event->func_data );
+	if( total <= 0 ) {
+		return 1;
+	}
+	key_data = (LCUI_Key*)malloc( sizeof(LCUI_Key) );
+	memcpy( key_data, &key, sizeof(LCUI_Key) );
+	for (i = 0; i < total; ++i) {
+		func = Queue_Get( &event->func_data, i );
+		/* 为第二个参数分配了内存，需要在调用完回调函数后销毁它 */
+		func->arg[1] = key_data;
+		func->destroy_arg[1] = TRUE;
+		/* 添加至程序的任务队列 */ 
+		AppTask_Custom_Add( ADD_MODE_ADD_NEW, func );
+	}
+	return 0;
 }
-
 
 int 
 Handle_Event(LCUI_EventQueue *queue, int event_id)
@@ -356,7 +393,7 @@ Handle_Event(LCUI_EventQueue *queue, int event_id)
 	LCUI_Func *func;
 	int total, i;
 	event = Find_Event(queue, event_id);
-	if(NULL == event) {
+	if( !event ) {
 		return -1;
 	}
 	total = Queue_Get_Total(&event->func_data);
@@ -390,7 +427,7 @@ Widget_Drag_Event_Connect ( LCUI_Widget *widget,
 		return -1;
 	}
 	p = &drag_event;
-	if(0 != Get_FuncData(&func_data, func, (void*)widget, p)) {
+	if( !Get_FuncData(&func_data, func, (void*)widget, p) ) {
 		return -1;
 	}
 	EventQueue_Add(&widget->event, EVENT_DRAG, &func_data);
@@ -409,9 +446,11 @@ Widget_Clicked_Event_Connect (
  * */
 {
 	LCUI_Func func_data;
-	if(widget == NULL) return -1;
-	if(0 != Get_FuncData(&func_data, func, (void*)widget, arg)) {
+	if( !widget ) {
 		return -1;
+	}
+	if( !Get_FuncData(&func_data, func, (void*)widget, arg) ) {
+		return FALSE;
 	}
 	EventQueue_Add(&widget->event, EVENT_CLICKED, &func_data);
 	return 0;
@@ -425,13 +464,13 @@ Get_ResponseStatusChange_Widget(LCUI_Widget *widget)
  * 作为本函数的返回值。
  * */
 {
-	if(NULL == widget) {
+	if( !widget ) {
 		return NULL;
 	}
 	if( widget->status_response ) {
 		return widget;/* 如果部件响应状态改变，那就返回该部件的指针 */
 	}
-	if(widget->parent == NULL) {
+	if( !widget->parent ) {
 		return NULL; /* 如果父部件为空，那就没找到，返回NULL */
 	} else {/* 否则，在它的父级部件中找 */
 		return Get_ResponseStatusChange_Widget(widget->parent); 
@@ -444,11 +483,11 @@ Widget_Have_Event(LCUI_Widget *widget, int event_id)
 { 
 	LCUI_Event *event;
 	
-	if( NULL == widget ) {
+	if( !widget ) {
 		return FALSE;
 	}
 	event = Find_Event( &widget->event, event_id );
-	if( event == NULL ) {
+	if( !event ) {
 		return FALSE;
 	}
 	return TRUE;
@@ -462,13 +501,13 @@ Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
  * 将会作为本函数的返回值
  * */
 {
-	if(NULL == widget) {
+	if( !widget ) {
 		return NULL;
 	}
 	if( Widget_Have_Event(widget, event_id) ) { 
 		return widget; 
 	}
-	if(widget->parent == NULL) { 
+	if( !widget->parent ) { 
 		return NULL;
 	} else {
 		return Get_ResponseEvent_Widget(widget->parent, event_id); 
@@ -478,6 +517,7 @@ Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
 static void 
 _Start_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
 {
+	drag_event.cursor_pos = event->global_pos;
 	/* 用全局坐标减去部件的全局坐标，得到偏移坐标 */ 
 	__offset_pos = Pos_Sub( event->global_pos, Get_Widget_Global_Pos( widget ) );
 	/* 得出部件的新全局坐标 */
@@ -491,6 +531,7 @@ _Start_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
 static void 
 _Doing_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
 {
+	drag_event.cursor_pos = event->global_pos;
 	drag_event.new_pos = Pos_Sub( event->global_pos, __offset_pos );
 	drag_event.first_click = 0;
 	drag_event.end_click = 0;
@@ -500,6 +541,7 @@ _Doing_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
 static void 
 _End_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
 {
+	drag_event.cursor_pos = event->global_pos;
 	drag_event.new_pos = Pos_Sub( event->global_pos, __offset_pos );
 	drag_event.first_click = 0;
 	drag_event.end_click = 1;
@@ -514,21 +556,25 @@ Widget_Clicked(LCUI_MouseEvent *event)
  **/
 {
 	LCUI_Widget *widget;
-	if(event == NULL) {
+	if( !event ) {
 		return;
 	}
 	
 	widget = event->widget;
-	
 	switch( Mouse_LeftButton(event) ) {
 	    case PRESSED:
+		DEBUG_MSG("mouse left button pressed\n");
 		click_widget = widget;
+		/* 焦点转移给该部件 */
+		Set_Focus( widget );
 		if( Widget_Have_Event( widget, EVENT_DRAG ) ) {
 			/* 开始处理部件的拖动 */
+			DEBUG_MSG("widget have EVENT_DRAG\n");
 			_Start_DragEvent( widget, event );
 		}
 		widget = Get_ResponseStatusChange_Widget( widget ); 
-		if( widget == NULL) {
+		if( !widget ) {
+			DEBUG_MSG("widget not response status change\n");
 			break;
 		}
 		/* 如果当前鼠标指针覆盖到的部件已被启用 */  
@@ -540,10 +586,14 @@ Widget_Clicked(LCUI_MouseEvent *event)
 		break;
 		
 	    case FREE: 
-		if(click_widget == NULL) {
+		DEBUG_MSG("mouse left button free\n");
+		if( !click_widget ) {
+			/* 如果是点击屏幕空白处，则复位焦点 */
+			Reset_Focus( NULL );
 			break;
 		}
 		if( Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
+			DEBUG_MSG("end drag\n");
 			_End_DragEvent( click_widget, event );
 		}
 		if(click_widget == widget) {
@@ -552,6 +602,7 @@ Widget_Clicked(LCUI_MouseEvent *event)
 			 * 触发CLICKED事件，将部件中关联该事件的回调函数发送至
 			 * 任务队列，使之在主循环中执行 
 			 * */
+			
 			widget = Get_ResponseEvent_Widget( event->widget, EVENT_CLICKED );
 			if( widget && widget->enabled ) {
 				Handle_Event(&widget->event, EVENT_CLICKED);
@@ -560,7 +611,7 @@ Widget_Clicked(LCUI_MouseEvent *event)
 			if( !widget ) {
 				break;
 			}
-			if(widget->enabled) { 
+			if(widget->enabled) {
 				Set_Widget_Status (widget, WIDGET_STATUS_CLICKED);
 				Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
 				break;
@@ -593,17 +644,17 @@ Tracking_Mouse_Move (LCUI_MouseEvent *event)
 	
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
 	widget = Get_Cursor_Overlay_Widget();
-	if(widget == NULL) {
+	if( !widget ) {
 		goto skip_widget_check;
 	}
 	/* 获取能响应状态改变的部件的指针 */
 	widget = Get_ResponseStatusChange_Widget(widget); 
-	if( widget == NULL || overlay_widget == widget ) {
+	if( !widget || overlay_widget == widget ) {
 		goto skip_widget_check;
 	}
 	if ( widget->enabled ) {
 		DEBUG_MSG("widget not enabled");
-		if( click_widget == NULL ) {
+		if( !click_widget  ) {
 			DEBUG_MSG("leftbutton is free, widget overlay\n\n");
 			Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
 		}
@@ -639,14 +690,210 @@ skip_widget_check:;
 	 && Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
 		_Doing_DragEvent( click_widget, event );
 	}
-	DEBUG_MSG("Tracking_Mouse_Move(): end\n");
 }
 
-void Widget_Event_Init()
+static void 
+WidgetFocusProc( LCUI_Key *key_data, void *arg );
+
+void 
+Widget_Event_Init()
 /* 功能：初始化部件事件处理 */
 {
 	LCUI_MouseEvent_Connect( Tracking_Mouse_Move, MOUSE_EVENT_MOVE );
 	LCUI_MouseEvent_Connect( Widget_Clicked, MOUSE_EVENT_CLICK );
+	LCUI_KeyboardEvent_Connect( WidgetFocusProc, NULL );
 }
 
 /*************************** Event End *********************************/
+
+
+/*--------------------------- Focus Proc ------------------------------*/
+
+BOOL 
+Set_Focus( LCUI_Widget *widget )
+/* 
+ * 功能：为部件设置焦点
+ * 说明：上个获得焦点的部件会得到EVENT_FOCUS_OUT事件，而当前获得焦点的部件会得到
+ * EVENT_FOCUS_IN事件。
+ * */
+{
+	if( widget ) {
+		/* 先处理上级部件的焦点 */
+		if( widget->parent ) {
+			Set_Focus( widget->parent );
+		}
+		if( !widget->focus ) {
+			return FALSE;
+		}
+	} else {
+		return FALSE;
+	}
+	
+	LCUI_Widget **focus_widget;
+	
+	if( widget->parent ) {
+		focus_widget = &widget->parent->focus_widget;
+	} else {
+		focus_widget = &LCUI_Sys.focus_widget; 
+	}
+	if( *focus_widget ) {
+		/* 如果上次和这次的部件不一样 */
+		if( *focus_widget != widget ) {
+			Handle_Event( &(*focus_widget)->event, EVENT_FOCUS_OUT );
+		}
+	}
+	Handle_Event( &widget->event, EVENT_FOCUS_IN );
+	/* 保存新焦点位置 */
+	*focus_widget = widget;
+	return TRUE;
+}
+
+BOOL 
+Cancel_Focus( LCUI_Widget *widget )
+/* 
+ * 功能：取消指定部件的焦点
+ * 说明：该部件会得到EVENT_FOCUS_OUT事件，并且，会将焦点转移至其它部件
+ * */
+{
+	if( !widget || !widget->focus ) {
+		return FALSE;
+	}
+	
+	int i, total, focus_pos;
+	LCUI_Widget *other_widget, **focus_widget;
+	LCUI_Queue *queue_ptr;
+	
+	if( widget->parent ) {
+		focus_widget = &widget->parent->focus_widget;
+		queue_ptr = &widget->parent->child;
+	} else {
+		focus_widget = &LCUI_Sys.focus_widget;
+		queue_ptr = &LCUI_Sys.widget_list;
+	}
+	/* 寻找可获得焦点的其它部件 */
+	total = Queue_Get_Total( queue_ptr );
+	focus_pos = WidgetQueue_Get_Pos( queue_ptr, *focus_widget );
+	for( i=0; i<focus_pos; ++i ) {
+		other_widget = Queue_Get( queue_ptr, i);
+		if( other_widget && other_widget->visible
+		 && other_widget->focus ) {
+			Handle_Event( &widget->event, EVENT_FOCUS_IN );
+			*focus_widget = other_widget;
+			break;
+		}
+	}
+	if( i < focus_pos ) {
+		return TRUE;
+	}
+	/* 排在该部件前面的符合条件的部件没找到，就找排在该部件后面的 */
+	for( i=focus_pos+1; i<total; ++i ) {
+		other_widget = Queue_Get( queue_ptr, i);
+		if( other_widget && other_widget->visible
+		 && other_widget->focus ) {
+			Handle_Event( &widget->event, EVENT_FOCUS_IN );
+			*focus_widget = other_widget;
+			break;
+		}
+	}
+	/* 没找到就复位焦点 */
+	if( i >= total ) {
+		*focus_widget = NULL;
+	}
+	return TRUE;
+}
+
+BOOL
+Reset_Focus( LCUI_Widget* widget )
+/* 复位指定部件内的子部件的焦点 */
+{	
+	LCUI_Widget** focus_widget;
+	
+	if( widget ) {
+		focus_widget = &widget->focus_widget; 
+	} else {
+		focus_widget = &LCUI_Sys.focus_widget; 
+	}
+	if( *focus_widget ) {
+		Handle_Event( &(*focus_widget)->event, EVENT_FOCUS_OUT );
+	}
+	
+	*focus_widget = NULL;
+	return TRUE;
+}
+
+int Next_FocusWidget()
+{
+	return 0;
+}
+
+int Prev_FocusWidget()
+{
+	return 0;
+}
+
+int Return_FocusToParent()
+{
+	return 0;
+}
+
+BOOL 
+Widget_FocusIn_Event_Connect(	LCUI_Widget *widget, 
+				void (*func)(LCUI_Widget*, void*), 
+				void *arg )
+/* 将回调函数与FOCUS_IN事件连接，当部件得到焦点时，会调用该回调函数 */
+{
+	if( !widget ) {
+		return FALSE;
+	}
+	
+	LCUI_Func func_data;
+	
+	if( !Get_FuncData(&func_data, func, (void*)widget, arg) ) {
+		return FALSE;
+	}
+	EventQueue_Add(&widget->event, EVENT_FOCUS_IN, &func_data);
+	return TRUE;
+}
+
+BOOL 
+Widget_FocusOut_Event_Connect(	LCUI_Widget *widget, 
+				void (*func)(LCUI_Widget*, void*), 
+				void *arg )
+/* 将回调函数与FOCUS_OUT事件连接，当部件失去焦点时，会调用该回调函数 */
+{
+	if( !widget ) {
+		return FALSE;
+	}
+	
+	LCUI_Func func_data;
+	
+	if( !Get_FuncData(&func_data, func, (void*)widget, arg) ) {
+		return FALSE;
+	}
+	EventQueue_Add(&widget->event, EVENT_FOCUS_OUT, &func_data);
+	return TRUE;
+}
+
+static void 
+WidgetFocusProc( LCUI_Key *key_data, void *arg )
+{
+	LCUI_Widget *widget, *focus_widget;
+	
+	widget = NULL;
+	printf("key, code: %d, status:%d\n", 
+		key_data->code, key_data->status);
+	while( 1 ) {
+		printf("1\n");
+		focus_widget = Get_FocusWidget( widget );
+		printf("2\n");
+		if( !focus_widget ) { 
+			printf("focus widget:\n");
+			print_widget_info( widget );
+			Handle_Widget_KeyboardEvent( widget, *key_data );
+			break;
+		}
+		printf("3\n");
+		widget = focus_widget;
+	}
+}
+/*------------------------- End Focus Proc ----------------------------*/

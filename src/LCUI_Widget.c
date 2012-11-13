@@ -56,7 +56,6 @@
 #include <math.h>
 #include <limits.h>
 
-
 /* 声明函数 */
 static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type);
 
@@ -66,25 +65,33 @@ void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget)
 /* 功能：将部件添加至作为容器的部件内 */
 {
 	int pos;
+	LCUI_Widget **focus_widget;
 	LCUI_Queue *old_queue, *new_queue;
-	if(widget == NULL || container == widget->parent) {
+	if( !widget || container == widget->parent ) {
 		return;
 	}
 		
-	if(container == NULL) {/* 如果容器为NULL，那就代表是以屏幕作为容器 */
+	if( !container ) {/* 如果容器为NULL，那就代表是以屏幕作为容器 */
 		new_queue = &LCUI_Sys.widget_list; 
 	} else {/* 否则，以指定部件为容器 */ 
 		new_queue = &container->child; 
 	}
 	
-	if(widget->parent != NULL){
+	if( widget->parent ){
 	/* 如果部件有父部件，那就在父部件的子部件队列中 */ 
 		old_queue = &widget->parent->child; 
+		focus_widget = &widget->focus_widget;
 	} else {
 	/* 否则没有部件，那么这个部件在创建时就储存至系统部件队列中 */
 		old_queue = &LCUI_Sys.widget_list;
+		focus_widget = &LCUI_Sys.focus_widget;
 	}
-		
+	
+	/* 若部件已获得过焦点，则复位之前容器中的焦点 */
+	if( Focus_Widget( widget ) ) {
+		*focus_widget = NULL;
+	}
+	
 	/* 改变该部件的容器，需要将它从之前的容器中移除 */
 	pos = WidgetQueue_Get_Pos(old_queue, widget);
 	if(pos >= 0) {
@@ -850,6 +857,72 @@ int LCUI_Destroy_App_Widgets(LCUI_ID app_id)
 }
 
 
+LCUI_Widget *
+Get_FocusWidget( LCUI_Widget *widget )
+/* 获取指定部件内的已获得焦点的子部件 */
+{
+	int i, focus_pos, total;
+	LCUI_Widget **focus_widget;
+	LCUI_Queue *queue_ptr;
+	
+	//printf( "Get_FocusWidget(）： widget: %p\n", widget );
+	//print_widget_info( widget );
+	if( !widget ) {
+		queue_ptr = &LCUI_Sys.widget_list;
+		focus_widget = &LCUI_Sys.focus_widget;
+	} else {
+		/* 如果部件不需要焦点，则返回NULL */
+		if( !widget->focus ) {
+			return NULL;
+		}
+		queue_ptr = &widget->child;
+		focus_widget = &widget->focus_widget;
+	}
+	
+	if( !focus_widget ) { 
+		return NULL;
+	}
+	
+	total = Queue_Get_Total( queue_ptr );
+	if( total <= 0 ) {
+		return NULL;
+	}
+	focus_pos = WidgetQueue_Get_Pos( queue_ptr, *focus_widget );
+	if( focus_pos < 0 ) {
+		*focus_widget = NULL; 
+		return NULL;
+	}
+	/* 查找可获取焦点的有效部件 */
+	for( i=focus_pos; i<total; ++i ) {
+		widget = Queue_Get( queue_ptr, i ); 
+		if( widget && widget->focus ) {
+			break;
+		}
+	}
+	if( i>=total ) {
+		*focus_widget = NULL; 
+		widget = NULL;
+	}
+	
+	return widget;
+}
+
+BOOL 
+Focus_Widget( LCUI_Widget *widget )
+/* 检测指定部件是否处于焦点状态 */
+{
+	LCUI_Widget *tmp;
+	
+	if( !widget ) {
+		return FALSE;
+	}
+	tmp = Get_FocusWidget( widget->parent );
+	if( tmp == widget ) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
 LCUI_String Get_Widget_Style(LCUI_Widget *widget)
 /* 功能：获取部件的类型 */
 {
@@ -880,24 +953,30 @@ LCUI_Widget *Get_Widget_By_Pos( LCUI_Widget *widget, LCUI_Pos pos )
 {
 	LCUI_Pos tmp_pos;
 	int i, total, temp;
-	static LCUI_Widget *child, *w;
-	static LCUI_Queue *widget_list;
-	static LCUI_RGBA pixel;
+	LCUI_Widget *child, *w;
+	LCUI_Queue *widget_list;
+	LCUI_RGBA pixel;
 	
 	if( widget ) {
 		widget_list = &widget->child;
 		/* 判断 鼠标坐标对应部件图层中的像素点的透明度 是否符合要求，
-		 * 如果透明度不大于clickable_area_alpha的值，那么，无视
+		 * 如果透明度小于/不小于clickable_area_alpha的值，那么，无视
 		 * 该部件。
 		 *  */ 
 		tmp_pos = Pos_Sub( pos, widget->pos ); 
-		pixel = Get_Graph_Pixel( &widget->graph, tmp_pos ); 
-		if( (widget->clickable_mode == 0 
-		 && pixel.alpha < widget->clickable_area_alpha )
-		 || (widget->clickable_mode == 1 
-		 && pixel.alpha > widget->clickable_area_alpha ) ) { 
-			return NULL;
-		}
+		if( Get_Graph_Pixel( &widget->graph, tmp_pos, &pixel )) {
+			//printf("mode: %d, pixel alpha: %d, alpha: %d\n",
+			//widget->clickable_mode, pixel.alpha, widget->clickable_area_alpha );
+			if( (widget->clickable_mode == 0 
+			 && pixel.alpha < widget->clickable_area_alpha )
+			 || (widget->clickable_mode == 1 
+			 && pixel.alpha >= widget->clickable_area_alpha ) ) { 
+				//printf("Ignore widget\n");
+				return NULL;
+			}
+		}/* else {
+			printf("get graph pixel error\n");
+		} */
 	} else {
 		widget_list = &LCUI_Sys.widget_list;
 	}
@@ -928,28 +1007,6 @@ LCUI_Widget *Get_Cursor_Overlay_Widget()
 /* 功能：获取鼠标光标当前覆盖的部件 */
 { 
 	return Get_Widget_By_Pos( NULL, Get_Cursor_Pos() );
-}
-
-LCUI_Widget *Get_Focus_Widget()
-/*
- * 功能：获取当前焦点状态下的部件
- * 返回值：正常获取则返回部件的指针，否则，返回NULL
- **/
-{
-	#ifdef USE_JUNK___
-	LCUI_App *app = Get_Self_AppPointer();
-	LCUI_Widget *widget;
-	widget = (LCUI_Widget*)Queue_Get(&app->widget_display, 0);
-	if(widget != NULL) {
-		while(widget->focus != NULL) {
-			widget = widget->focus;
-		}
-	}
-	else return NULL;
-	return widget;
-	#else 
-	return NULL;
-	#endif
 }
 
 int Widget_Is_Active(LCUI_Widget *widget)
@@ -1090,9 +1147,11 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	widget.parent			= NULL;
 	widget.enabled			= TRUE;
 	widget.visible			= FALSE;
+	widget.focus			= TRUE; 
+	widget.focus_widget		= NULL; 
 	widget.pos			= Pos(0, 0);
-	widget.size			= Size(0, 0); 
-	widget.min_size			= Size(0, 0); 
+	widget.size			= Size(0, 0);
+	widget.min_size			= Size(0, 0);
 	widget.max_size			= Size(INT_MAX, INT_MAX); 
 	widget.align			= ALIGN_NONE; 
 	widget.dock			= DOCK_TYPE_NONE;
@@ -1151,7 +1210,7 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	RectQueue_Init(&widget.update_area);	/* 初始化区域更新队列 */
 	EventQueue_Init(&widget.event);		/* 初始化部件的事件数据队列 */
 	WidgetQueue_Init(&widget.child);	/* 初始化子部件集 */
-	WidgetData_Init(&widget.data);		/* 初始化数据更新队列 */
+	WidgetData_Init(&widget.data);		/* 初始化数据更新队列 */ 
 	String_Init(&widget.type);
 	String_Init(&widget.style);
 	
@@ -1389,14 +1448,14 @@ int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag)
 void Enable_Widget(LCUI_Widget *widget)
 /* 功能：启用部件 */
 {
-	widget->enabled = IS_TRUE; 
+	widget->enabled = TRUE; 
 	Set_Widget_Status(widget, WIDGET_STATUS_NORMAL);
 }
 
 void Disable_Widget(LCUI_Widget *widget)
 /* 功能：禁用部件 */
 {
-	widget->enabled = IS_FALSE; 
+	widget->enabled = FALSE; 
 	Set_Widget_Status(widget, WIDGET_STATUS_DISABLE);
 }
 
@@ -1509,7 +1568,7 @@ void Exec_Hide_Widget(LCUI_Widget *widget)
 					FUNC_TYPE_HIDE );
 	func_hide(widget);
 	
-	Widget_Visible(widget, IS_FALSE); 
+	Widget_Visible(widget, FALSE); 
 	Add_Widget_Refresh_Area(widget->parent, Get_Widget_Rect(widget)); 
 }
 
@@ -1517,14 +1576,14 @@ void Exec_Hide_Widget(LCUI_Widget *widget)
 void Exec_Show_Widget(LCUI_Widget *widget)
 /* 功能：执行显示部件的任务 */
 { 
+	void ( *func_show ) (LCUI_Widget*);
 
-	if(widget == NULL || widget->visible ) {
+	if( !widget || widget->visible ) {
 		return; 
 	}
 	
-	void ( *func_show ) (LCUI_Widget*);
-	//Exec_Update_Widget(widget);/* 显示前，需要对部件图形数据进行一次更新 */
 	Widget_Visible(widget, TRUE); /* 部件可见 */
+	Set_Focus( widget );	/* 将焦点给该部件 */
 	
 	/* 调用该部件在显示时需要用到的函数 */
 	func_show = Get_WidgetFunc_By_ID(widget->type_id, FUNC_TYPE_SHOW); 
@@ -1546,7 +1605,7 @@ void Auto_Resize_Widget(LCUI_Widget *widget)
 	Queue_Init(&point, sizeof (LCUI_Pos), NULL);
 	total = Queue_Get_Total(&widget->child);
 	for(i=0; i<total; ++i) {/* 遍历每个子部件 */
-		child = (LCUI_Widget *)Queue_Get(&widget->child, i);
+		child = Queue_Get(&widget->child, i);
 		/* 保存各个子部件区域矩形的右上角顶点中，X轴坐标最大的 */
 		temp = child->pos.x + child->size.w;
 		if(temp > size.w) {
@@ -1572,6 +1631,7 @@ void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
 	if(widget == NULL) {
 		return;
 	}
+	
 	void ( *func_resize ) (LCUI_Widget*);
 	
 	if(widget->size.w == size.w && widget->size.h == size.h) {
@@ -1605,23 +1665,17 @@ void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
 	Refresh_Widget(widget); 
 	/* 更新子部件的位置及尺寸 */  
 	Update_Child_Widget_Size( widget );
-	if(widget->parent != NULL
-	&& widget->parent->auto_size) {
+	if(widget->parent && widget->parent->auto_size) {
 	/* 如果需要让它的容器能够自动调整大小 */
 		Auto_Resize_Widget(widget->parent); 
 	}
 }
 
-void Enable_Widget_Auto_Size(LCUI_Widget *widget)
-/* 功能：启用部件自动尺寸调整功能 */
+void Widget_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode )
+/* 启用或禁用部件的自动尺寸调整功能 */
 {
-	widget->auto_size = TRUE;
-}
-
-void Disable_Widget_Auto_Size(LCUI_Widget *widget)
-/* 功能：禁用部件自动尺寸调整功能 */
-{
-	widget->auto_size = FALSE;
+	widget->auto_size = flag;
+	widget->auto_size_mode = mode;
 }
 
 void Exec_Refresh_Widget(LCUI_Widget *widget)
@@ -1648,7 +1702,6 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 	if(widget == NULL) {
 		return;
 	}
-	
 	void ( *func_update ) (LCUI_Widget*); 
 	
 	if(Graph_Valid(&widget->background_image)) {/* 如果有背景图 */
@@ -1942,7 +1995,7 @@ void Show_Widget(LCUI_Widget *widget)
 	if(widget == NULL) {
 		return; 
 	}
-	Front_Widget(widget);/* 改变部件的排列位置 */
+	Front_Widget(widget); /* 改变部件的排列位置 */
 	Record_WidgetUpdate(widget, NULL, DATATYPE_SHOW);
 }
 
