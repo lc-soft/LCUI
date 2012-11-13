@@ -57,7 +57,7 @@ int main(int argc, char*argv[])
 	/* 改变窗口尺寸 */
 	window->resize(window, Size(320, 240));
 	/* 禁用按钮部件的自动尺寸调整，因为要自定义尺寸 */
-	Disable_Widget_Auto_Size(button);
+	Widget_AutoSize( button, FALSE, 0 );
 	Resize_Widget(button, Size(60, 25));
 	/* 将窗口客户区作为这些部件的容器 */
 	Window_Client_Area_Add(window, label);
@@ -75,18 +75,17 @@ int main(int argc, char*argv[])
 	Set_Widget_Align(checkbox[3], ALIGN_MIDDLE_CENTER, Pos(60 ,5));
 	Set_Widget_Align(checkbox[4], ALIGN_MIDDLE_CENTER, Pos(120 ,5));
 	/* 设定label部件显示的文本，以及字体大小 */
-	Set_Label_Text(label, "你都有哪些兴趣爱好？\n"); 
-	Set_Label_Font(label, 14, NULL);
+	Set_Label_Text(label, "你都有哪些兴趣爱好？\n");
 	/* 显示部件 */
 	Show_Widget(label);
 	Show_Widget(result_text);
 	Show_Widget(button);
-	for(i=0; i<5; ++i) 
+	for(i=0; i<5; ++i) {
 		Show_Widget(checkbox[i]);  
+	}
 	Show_Widget(window); 
 	/* 为按钮部件关联点击事件，被关联的函数是view_result，它会在点击按钮后被调用 */
-	Widget_Clicked_Event_Connect(button, view_result, NULL);
-	LCUI_Key_Event_Connect(KEY_ESC, Main_Loop_Quit, NULL);
+	Widget_Clicked_Event_Connect(button, view_result, NULL); 
 	return LCUI_Main(); /* 进入主循环 */
 }
 
