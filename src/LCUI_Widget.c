@@ -106,27 +106,39 @@ void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget)
 int _Get_Widget_Container_Width(LCUI_Widget *widget)
 /* 通过计算得出指定部件的容器的宽度，单位为像素 */
 {
+	int width;
 	widget = widget->parent;
-	if( widget == NULL ) {
+	if( !widget ) {
 		return Get_Screen_Width();
 	}
 	if( widget->w.which_one == 0 ) {
-		return widget->w.px - widget->padding.left - widget->padding.right;
-	} 
-	return widget->w.scale * _Get_Widget_Container_Width( widget );
+		width = widget->w.px;
+	} else {
+		width = _Get_Widget_Container_Width( widget );
+		width *= widget->w.scale;
+	}
+	width -= widget->padding.left;
+	width -= widget->padding.right; 
+	return width;
 }
 
 int _Get_Widget_Container_Height(LCUI_Widget *widget)
 /* 通过计算得出指定部件的容器的高度，单位为像素 */
 {
+	int height;
 	widget = widget->parent;
-	if( widget == NULL ) {
+	if( !widget ) {
 		return Get_Screen_Height();
 	}
 	if( widget->h.which_one == 0 ) {
-		return widget->h.px - widget->padding.top - widget->padding.bottom;
-	} 
-	return widget->h.scale * _Get_Widget_Container_Height( widget );
+		height = widget->h.px;
+	} else {
+		height = _Get_Widget_Container_Height( widget );
+		height *= widget->h.scale;
+	}
+	height -= widget->padding.top;
+	height -= widget->padding.bottom; 
+	return height;
 }
 
 LCUI_Size _Get_Widget_Container_Size( LCUI_Widget *widget )
@@ -1024,17 +1036,18 @@ LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
  * 说明：返回的是部件需要裁剪的区域
  * */
 {
+	int temp; 
 	LCUI_Pos pos;
 	LCUI_Rect area;
-	int temp; 
 	LCUI_Rect cut_rect;
+	
 	cut_rect.x = 0;
 	cut_rect.y = 0;
 	cut_rect.width = widget->size.w;
 	cut_rect.height = widget->size.h;
-	
 	pos = widget->pos;
-	if(widget->parent == NULL) {
+	
+	if( !widget->parent ) {
 		area.x = area.y = 0;
 		area.width = Get_Screen_Width();
 		area.height = Get_Screen_Height(); 
@@ -1049,19 +1062,23 @@ LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
 		cut_rect.x = area.x - pos.x; 
 		cut_rect.width -= cut_rect.x;
 	}
-	if(pos.x + widget->size.w > area.width) {
-		cut_rect.width -= (pos.x + widget->size.w - area.width);
+	if(pos.x + widget->size.w - area.x > area.width) {
+		cut_rect.width -= pos.x;
 		cut_rect.width += area.x;
+		cut_rect.width -= widget->size.w;
+		cut_rect.width += area.width;
 	}
 	if(pos.y < area.y) {
 		cut_rect.y = area.y - pos.y; 
 		cut_rect.height -= cut_rect.y;
 	}
-	if(pos.y + widget->size.h > area.height) {
-		cut_rect.height -= (pos.y + widget->size.h - area.height);
+	if(pos.y + widget->size.h - area.y > area.height) {
+		cut_rect.height -= pos.y;
 		cut_rect.height += area.y;
+		cut_rect.height -= widget->size.h;
+		cut_rect.height += area.height;
 	}
-	if(widget->parent == NULL) {
+	if( !widget->parent ) {
 		return cut_rect;
 	}
 		
@@ -1069,16 +1086,16 @@ LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
 	/* 获取父部件的有效显示范围 */
 	rect = Get_Widget_Valid_Rect( widget->parent );
 	/* 如果父部件需要裁剪，那么，子部件根据情况，也需要进行裁剪 */
-	if(rect.x > 0) {/* 如果裁剪区域的x轴坐标大于0 */
+	if(rect.x > area.x) {/* 如果裁剪区域的x轴坐标大于容器区域的x轴起点坐标 */
 		/* 裁剪区域和部件区域是在同一容器中，只要得出两个区域的重叠区域即可 */
 		temp = pos.x + cut_rect.x;
 		if(temp < rect.x) { /* 如果部件的 x轴坐标+裁剪起点x轴坐标 小于它 */
-			temp = rect.x - pos.x;		/* 新的裁剪区域起点x轴坐标 */
+			temp = rect.x - pos.x;		/* 得出新的裁剪区域起点x轴坐标 */
 			cut_rect.width -= (temp - cut_rect.x);/* 改变裁剪区域的宽度 */
 			cut_rect.x = temp;			/* 改变部件的裁剪区域的x坐标 */
 		}
 	}
-	if(rect.y > 0) {
+	if(rect.y > area.y) {
 		temp = pos.y + cut_rect.y;
 		if(pos.y < rect.y) {
 			temp = rect.y - pos.y;
@@ -1086,13 +1103,13 @@ LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
 			cut_rect.y = temp;
 		}
 	}
-	if(rect.width < area.width) {/* 如果父部件裁剪区域的宽度小于父部件的宽度 */
+	if(rect.x+rect.width < area.x+area.width) {/* 如果父部件裁剪区域的宽度小于容器区域的宽度 */
 		temp = pos.x+cut_rect.x+cut_rect.width;
 		if(temp > rect.x+rect.width) {/* 如果部件裁剪区域左边部分与父部件裁剪区域重叠 */
 			cut_rect.width -= (temp-(rect.x+rect.width));
 		}
 	}
-	if(rect.height < area.height) {
+	if(rect.y+rect.height < area.y+area.height) {
 		temp = pos.y+cut_rect.y+cut_rect.height;
 		if(temp > rect.y+rect.height) {
 			cut_rect.height -= (temp-(rect.y+rect.height));
