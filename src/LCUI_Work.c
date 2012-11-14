@@ -435,14 +435,35 @@ Widget_Drag_Event_Connect ( LCUI_Widget *widget,
 }
 
 int 
+Widget_Keyboard_Event_Connect (
+			LCUI_Widget *widget,
+			void (*func)(LCUI_Widget*, LCUI_Key *)
+)
+/* 
+ * 功能：将回调函数与部件的按键输入事件进行连接 
+ * 说明：建立连接后，当部件处于焦点状态，并使用键盘进行输入时，会调用该回调函数
+ * */
+{
+	LCUI_Func func_data;
+	if( !widget ) {
+		return -1;
+	}
+	if( !Get_FuncData(&func_data, func, (void*)widget, NULL) ) {
+		return FALSE;
+	}
+	EventQueue_Add(&widget->event, EVENT_KEYBOARD, &func_data);
+	return 0;
+}
+
+int 
 Widget_Clicked_Event_Connect (
 			LCUI_Widget *widget,
 			void (*func)(LCUI_Widget*, void *), 
 			void *arg
 )
 /* 
- * 功能：将回调函数与部件的拖动事件进行连接 
- * 说明：建立连接后，部件会将新位置作为第二参数，传给回调函数
+ * 功能：将回调函数与部件的点击事件进行连接 
+ * 说明：建立连接后，当部件被鼠标点击，会调用回调函数
  * */
 {
 	LCUI_Func func_data;
@@ -880,19 +901,14 @@ WidgetFocusProc( LCUI_Key *key_data, void *arg )
 	LCUI_Widget *widget, *focus_widget;
 	
 	widget = NULL;
-	printf("key, code: %d, status:%d\n", 
-		key_data->code, key_data->status);
+	//printf("key, code: %d, status:%d\n", 
+	//	key_data->code, key_data->status);
 	while( 1 ) {
-		printf("1\n");
 		focus_widget = Get_FocusWidget( widget );
-		printf("2\n");
-		if( !focus_widget ) { 
-			printf("focus widget:\n");
-			print_widget_info( widget );
+		if( !focus_widget ) {
 			Handle_Widget_KeyboardEvent( widget, *key_data );
 			break;
 		}
-		printf("3\n");
 		widget = focus_widget;
 	}
 }

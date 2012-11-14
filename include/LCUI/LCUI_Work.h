@@ -173,15 +173,25 @@ int Widget_Drag_Event_Connect (
  * 说明：建立连接后，但部件被点击，拖动，释放，都会调用回调函数
  * */ 
 
+int 
+Widget_Keyboard_Event_Connect (
+			LCUI_Widget *widget,
+			void (*func)(LCUI_Widget*, LCUI_Key *)
+);
+/* 
+ * 功能：将回调函数与部件的按键输入事件进行连接 
+ * 说明：建立连接后，当部件处于焦点状态，并使用键盘进行输入时，会调用该回调函数
+ * */
+
 int Widget_Clicked_Event_Connect (
 			LCUI_Widget *widget,
 			void (*func)(LCUI_Widget*, void *), 
 			void *arg
 );
 /* 
- * 功能：将回调函数与部件的拖动事件进行连接 
- * 说明：建立连接后，部件会将新位置作为第二参数，传给回调函数
- * */ 
+ * 功能：将回调函数与部件的点击事件进行连接 
+ * 说明：建立连接后，当部件被鼠标点击，会调用回调函数
+ * */
 
 void Widget_Event_Init();
 /* 功能：初始化部件事件处理 */ 
