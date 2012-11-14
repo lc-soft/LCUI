@@ -1600,7 +1600,9 @@ void Exec_Show_Widget(LCUI_Widget *widget)
 	}
 	
 	Widget_Visible(widget, TRUE); /* 部件可见 */
-	Set_Focus( widget );	/* 将焦点给该部件 */
+	if( widget->focus ) {
+		Set_Focus( widget );	/* 将焦点给该部件 */
+	}
 	
 	/* 调用该部件在显示时需要用到的函数 */
 	func_show = Get_WidgetFunc_By_ID(widget->type_id, FUNC_TYPE_SHOW); 
