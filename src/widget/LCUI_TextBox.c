@@ -14,6 +14,7 @@
 #include LC_GRAPH_H
 #include LC_FONT_H
 #include LC_LABEL_H
+#include LC_INPUT_H
 #include LC_ERROR_H 
 
 typedef struct _LCUI_TextBox
@@ -25,6 +26,11 @@ LCUI_TextBox;
 
 static LCUI_Widget *active_textbox = NULL; 
 /************************* 基本的部件处理 ********************************/
+static void
+_put_textbox_cursor( LCUI_Widget *widget, void *arg )
+{
+	active_textbox = widget;
+}
 
 static void
 set_textbox_cursor_despos( LCUI_Pos pos )
@@ -94,6 +100,23 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_DragEvent *event )
 	set_textbox_cursor_despos( pos );
 }
 
+static void
+TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
+{
+	printf("you input %d\n", key->code);
+	switch( key->code ) {
+	    case KEY_LEFT:
+		break;
+	    case KEY_RIGHT:
+		break;
+	    case KEY_UP:
+		break;
+	    case KEY_DOWN:
+		break;
+	    default:break;
+	}
+}
+
 static void 
 TextBox_Init( LCUI_Widget *widget )
 /* 初始化文本框相关数据 */
@@ -118,6 +141,8 @@ TextBox_Init( LCUI_Widget *widget )
 	/* 设定定时器，每1秒闪烁一次 */
 	set_timer( 500, blink_cursor, TRUE );
 	Widget_Drag_Event_Connect( widget, TextBox_TextLayer_Click );
+	Widget_FocusIn_Event_Connect( widget, _put_textbox_cursor, NULL );
+	Widget_Keyboard_Event_Connect( widget, TextBox_Input );
 }
 
 static LCUI_Widget*
