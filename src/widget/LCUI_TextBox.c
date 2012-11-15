@@ -26,29 +26,29 @@ LCUI_TextBox;
 
 static LCUI_Widget *active_textbox = NULL; 
 /************************* 基本的部件处理 ********************************/
+static LCUI_Widget*
+TextBox_Get_Label( LCUI_Widget *widget )
+/* 获取文本框部件内的label部件指针 */
+{
+	LCUI_TextBox *textbox;
+	textbox = Get_Widget_PrivData( widget );
+	return textbox->text;
+}
+
+static LCUI_TextLayer *
+TextBox_Get_TextLayer( LCUI_Widget *widget )
+{
+	LCUI_Widget *label;
+	label = TextBox_Get_Label( widget );
+	return Label_Get_TextLayer( label );
+}
+
 static void
 _put_textbox_cursor( LCUI_Widget *widget, void *arg )
 {
 	active_textbox = widget;
 }
 
-static void
-set_textbox_cursor_despos( LCUI_Pos pos )
-{
-	LCUI_Pos pixel_pos;
-	LCUI_TextBox *tb;
-	LCUI_TextLayer *layer;
-	Text_RowData *row_ptr;
-	
-	tb = Get_Widget_PrivData( active_textbox ); 
-	layer = Label_Get_TextLayer( tb->text );
-	pixel_pos = TextLayer_Set_Pixel_Pos( layer, pos );
-	pixel_pos.y += 2;
-	pos = layer->current_des_pos;
-	row_ptr = Queue_Get( &layer->rows_data, pos.y );
-	Move_Widget( tb->cursor, pixel_pos );
-	Resize_Widget( tb->cursor, Size(1, row_ptr->max_size.h) );
-}
 
 static void 
 hide_textbox_cursor( )
@@ -74,17 +74,36 @@ show_textbox_cursor( )
 	Show_Widget( tb->cursor );
 }
 
+static void
+set_textbox_cursor_despos( LCUI_Pos pos )
+{
+	LCUI_Pos pixel_pos;
+	LCUI_TextBox *tb;
+	LCUI_TextLayer *layer;
+	Text_RowData *row_ptr;
+	
+	tb = Get_Widget_PrivData( active_textbox ); 
+	layer = Label_Get_TextLayer( tb->text );
+	pixel_pos = TextLayer_Set_Cursor_PixelPos( layer, pos );
+	pixel_pos.y += 2;
+	pos = TextLayer_Get_Cursor_Pos( layer );
+	row_ptr = Queue_Get( &layer->rows_data, pos.y );
+	Move_Widget( tb->cursor, pixel_pos );
+	Resize_Widget( tb->cursor, Size(1, row_ptr->max_size.h) );
+	show_textbox_cursor(); /* 让光标在移动时显示 */
+	//printf( "set_textbox_cursor_despos(): cursor pos: %d,%d\n", pos.x, pos.y );
+}
 static void 
 blink_cursor()
 /* 闪烁文本框中的光标 */
 {
-	static int status = 0;
-	if(status == 0) {
+	static int cur_status = 0;
+	if(cur_status == 0) {
 		show_textbox_cursor();
-		status = 1;
+		cur_status = 1;
 	} else {
 		hide_textbox_cursor();
-		status = 0;
+		cur_status = 0;
 	}
 }
 
@@ -103,17 +122,54 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_DragEvent *event )
 static void
 TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 {
+	int cols, rows;
+	LCUI_Pos cur_pos, pixel_pos;
+	LCUI_TextLayer *layer;
+	
 	printf("you input %d\n", key->code);
+	layer = TextBox_Get_TextLayer( widget );
+	cur_pos = TextLayer_Get_Cursor_Pos( layer );
+	cols = TextLayer_Get_RowLen( layer, cur_pos.y );
+	rows = TextLayer_Get_Rows( layer );
 	switch( key->code ) {
 	    case KEY_LEFT:
-		break;
+		if( cur_pos.x > 0 ) {
+			cur_pos.x--;
+		} else if( cur_pos.y > 0 ) {
+			cur_pos.y--;
+			cur_pos.x = TextLayer_Get_RowLen( layer, cur_pos.y );
+		}
+		goto mv_cur_pos;
 	    case KEY_RIGHT:
-		break;
+		if( cur_pos.x < cols ) {
+			cur_pos.x++;
+		} else if( cur_pos.y < rows ) {
+			cur_pos.y++;
+			cur_pos.x = 0;
+		}
+		goto mv_cur_pos;
 	    case KEY_UP:
-		break;
+		if( cur_pos.y > 0 ) {
+			cur_pos.y--;
+		}
+		goto mv_cur_pos;
 	    case KEY_DOWN:
+		if( cur_pos.y < rows ) {
+			cur_pos.y++;
+		}
+mv_cur_pos:;/* 移动光标位置 */
+		pixel_pos = TextLayer_Set_Cursor_Pos( layer, cur_pos );
+		set_textbox_cursor_despos( pixel_pos ); 
 		break;
-	    default:break;
+	    case KEY_BACKSPACE:
+		//删除光标左边的字符
+		break;
+	    case KEY_DELETE:
+		//删除光标右边的字符
+		break;
+	    default:
+	    //向文本框中添加字符
+		break;
 	}
 }
 
@@ -145,15 +201,6 @@ TextBox_Init( LCUI_Widget *widget )
 	Widget_Keyboard_Event_Connect( widget, TextBox_Input );
 }
 
-static LCUI_Widget*
-TextBox_Get_Label( LCUI_Widget *widget )
-/* 获取文本框部件内的label部件指针 */
-{
-	LCUI_TextBox *textbox;
-	textbox = Get_Widget_PrivData( widget );
-	return textbox->text;
-}
-
 static void 
 Destroy_TextBox( LCUI_Widget *widget )
 /* 销毁文本框占用的资源 */
@@ -166,14 +213,6 @@ Exec_TextBox_Draw( LCUI_Widget *widget )
 /* 处理文本框的图形渲染 */
 {
 	Draw_Empty_Slot( &widget->graph, widget->size.w, widget->size.h );
-}
-
-static LCUI_TextLayer *
-TextBox_Get_TextLayer( LCUI_Widget *widget )
-{
-	LCUI_Widget *label;
-	label = TextBox_Get_Label( widget );
-	return Label_Get_TextLayer( label );
 }
 
 void 
