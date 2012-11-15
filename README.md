@@ -4,7 +4,7 @@
 
   The LCUI project is create by a China developer, and his English is 
   not very good, so, some files will appear chinese character, 
-  please understand. thanks!
+  please understand. thanks.
 
   Please read the file `docs/CHANGES`, it contains IMPORTANT INFORMATION.
 
@@ -69,7 +69,6 @@ You can send pull requests via GitHub. Patches should:
 The LCUI Project is released under the GNU General Public License as 
 published by the Free Software Foundation, either version 2 of the 
 License, or (at your option) any later version.
-TextMate is a trademark of Allan Odgaard.
 
 ## Thanks to 
   Liu Chao <lc-soft@live.cn>
