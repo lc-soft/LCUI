@@ -14,11 +14,11 @@ LCUI 是 GNU/Linux 平台上的一款自由软件，主要面向嵌入式，注�
 
 阅读 `docs/LICENSE.TXT`  文件了解 GPLv2 许可协议的具体内容。
 
-项目主页：[www.lcui.org][http://www.lcui.org]
+项目主页：http://www.lcui.org
 
 联系邮箱：lc-soft@live.cn
 
-项目托管: [github.com/lc-soft/LCUI][https://github.com/lc-soft/LCUI]
+项目托管: https://github.com/lc-soft/LCUI
 
 LCUI 的相关信息与资料可以在项目主页中找到。
 
