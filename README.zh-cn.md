@@ -14,15 +14,15 @@ LCUI 是 GNU/Linux 平台上的一款自由软件，主要面向嵌入式，注�
 
 阅读 `docs/LICENSE.TXT`  文件了解 GPLv2 许可协议的具体内容。
 
-项目主页：www.lcui.org
+项目主页：[www.lcui.org][http://www.lcui.org]
 
 联系邮箱：lc-soft@live.cn
 
-项目托管: github.com/lc-soft/LCUI
+项目托管: [github.com/lc-soft/LCUI][https://github.com/lc-soft/LCUI]
 
 LCUI 的相关信息与资料可以在项目主页中找到。
 
-如果遇到问题、发现BUG或者有好的建议、想法，可以在项目主页上留言或发送邮件告诉我们。
+如果遇到问题、发现BUG或者有好的建议和想法，可以在项目主页上留言或发送邮件告诉我们。
 
 我们已经使用 GitHub 托管 LCUI 项目，网址在上面，欢迎您参与 LCUI 项目的优化和改进。
 
@@ -45,12 +45,12 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 
 在 LCUI 的项目主页上发布的源码包，一般是比较稳定的版本，你只需要这样做：
 
-1.	解压LCUI的源码包。
-2.	进入解压后得到的新文件夹。
-3.	运行源码根目录中的configure脚本，以对系统环境进行检测。
-4.	使用make命令编译 LCUI 的源代码。
-5.	等待编译成功完成，如果在编译过程中遇到错误，请检查您的系统中是否有完整的编译环境。
-6.	使用make install命令安装 LCUI 的函数库和头文件。
+1. 解压LCUI的源码包。
+2. 进入解压后得到的新文件夹。
+3. 运行源码根目录中的configure脚本，以对系统环境进行检测。
+4. 使用make命令编译 LCUI 的源代码。
+5. 等待编译成功完成，如果在编译过程中遇到错误，请检查您的系统中是否有完整的编译环境。
+6. 使用make install命令安装 LCUI 的函数库和头文件。
 
 ### 系统需求
 
@@ -86,23 +86,23 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 
 #### 初始设置
 
-1.	在GitHub上进行Fork (点击 Fork 按钮)
-2.	Clone到计算机: `git clone git@github.com:«github account»/LCUI.git`
-3.	cd 到你的库里面: `cd LCUI`
-4.	设置upstream至remote: `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
+1. 在GitHub上进行Fork (点击 Fork 按钮)
+2. Clone到计算机: `git clone git@github.com:«github account»/LCUI.git`
+3. cd 到你的库里面: `cd LCUI`
+4. 设置upstream至remote: `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
 
 #### 添加Feature
 
-1.	为新的feature创建一个branch: `git checkout -b my_new_feature`
-2.	在你的feature上工作, 像往常一样添加和提交
+1. 为新的feature创建一个branch: `git checkout -b my_new_feature`
+2. 在你的feature上工作, 像往常一样添加和提交
 
 创建一个分支并非必须的，但是，当已经合并至源项目时可以方便删除你的分支，比较你的分支和源
 项目的最终版本，然后提交拉取请求。
 
 #### 推送到GitHub
 
-1.	推送分支至GitHub: `git push origin my_new_feature`
-2.	Issue拉取请求: 在Github上点击 Pull Request 按钮
+1. 推送分支至GitHub: `git push origin my_new_feature`
+2. Issue拉取请求: 在Github上点击 Pull Request 按钮
 
 #### 有用的命令
 
