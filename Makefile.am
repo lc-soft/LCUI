@@ -5,7 +5,7 @@ SUBDIRS=src include
 pkgconfigdir = $(prefix)/lib/pkgconfig
 pkgconfig_DATA = $(PACKAGE).pc
 
-EXTRA_DIST=README README.zh-cn README.md fonts/README.zh-cn \
+EXTRA_DIST=README README.zh-cn.md README.md fonts/README.zh-cn \
 docs/LICENSE.TXT docs/CHANGES docs/CHANGES.zh-cn docs/FAQ docs/FAQ.zh-cn\
 test/README.zh-cn \
 test/Makefile.in \
