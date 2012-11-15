@@ -18,7 +18,7 @@ LCUI 是 GNU/Linux 平台上的一款自由软件，主要面向嵌入式，注�
 
 联系邮箱：lc-soft@live.cn
 
-项目托管: https://github.com/lc-soft/LCUI
+项目托管：https://github.com/lc-soft/LCUI
 
 LCUI 的相关信息与资料可以在项目主页中找到。
 
@@ -64,7 +64,7 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 
 ## 贡献
 
-你可以通过GitHub发送pull请求，patch应符合以下要求:
+你可以通过GitHub发送pull请求，patch应符合以下要求：
 
 1. 遵循现有代码风格。
 2. 一个commit应该做完整的一件事。
@@ -87,13 +87,13 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 #### 初始设置
 
 1. 在GitHub上进行Fork (点击 Fork 按钮)
-2. Clone到计算机: `git clone git@github.com:«github account»/LCUI.git`
-3. cd 到你的库里面: `cd LCUI`
-4. 设置upstream至remote: `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
+2. Clone到计算机： `git clone git@github.com:«github account»/LCUI.git`
+3. cd 到你的库里面： `cd LCUI`
+4. 设置upstream至remote： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
 
 #### 添加Feature
 
-1. 为新的feature创建一个branch: `git checkout -b my_new_feature`
+1. 为新的feature创建一个分支(branch)： `git checkout -b my_new_feature`
 2. 在你的feature上工作, 像往常一样添加和提交
 
 创建一个分支并非必须的，但是，当已经合并至源项目时可以方便删除你的分支，比较你的分支和源
@@ -101,8 +101,8 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 
 #### 推送到GitHub
 
-1. 推送分支至GitHub: `git push origin my_new_feature`
-2. Issue拉取请求: 在Github上点击 Pull Request 按钮
+1. 推送分支至GitHub： `git push origin my_new_feature`
+2. Issue拉取请求： 在Github上点击 Pull Request 按钮
 
 #### 有用的命令
 
