@@ -132,6 +132,20 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 	cols = TextLayer_Get_RowLen( layer, cur_pos.y );
 	rows = TextLayer_Get_Rows( layer );
 	switch( key->code ) {
+	    case KEY_HOMEPAGE: //home键移动光标至行首
+		cur_pos.x = 0;
+		goto mv_cur_pos;
+		
+	    case KEY_END: //end键移动光标至行尾
+		cur_pos.x = cols;
+		goto mv_cur_pos;
+		
+	    case KEY_BACKSPACE: //删除光标左边的字符
+		TextLayer_Text_Backspace( layer, 1 );
+		Update_Widget( widget );
+		cur_pos = TextLayer_Get_Cursor_Pos( layer );
+		goto mv_cur_pos;
+		
 	    case KEY_LEFT:
 		if( cur_pos.x > 0 ) {
 			cur_pos.x--;
@@ -140,6 +154,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 			cur_pos.x = TextLayer_Get_RowLen( layer, cur_pos.y );
 		}
 		goto mv_cur_pos;
+		
 	    case KEY_RIGHT:
 		if( cur_pos.x < cols ) {
 			cur_pos.x++;
@@ -148,25 +163,28 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 			cur_pos.x = 0;
 		}
 		goto mv_cur_pos;
+		
 	    case KEY_UP:
 		if( cur_pos.y > 0 ) {
 			cur_pos.y--;
 		}
 		goto mv_cur_pos;
+		
 	    case KEY_DOWN:
 		if( cur_pos.y < rows ) {
 			cur_pos.y++;
 		}
-mv_cur_pos:;/* 移动光标位置 */
+		/* 移动光标位置 */
+mv_cur_pos:;
 		pixel_pos = TextLayer_Set_Cursor_Pos( layer, cur_pos );
 		set_textbox_cursor_despos( pixel_pos ); 
 		break;
-	    case KEY_BACKSPACE:
-		//删除光标左边的字符
-		break;
+		
 	    case KEY_DELETE:
 		//删除光标右边的字符
+		
 		break;
+		
 	    default:
 	    //向文本框中添加字符
 		break;
@@ -215,6 +233,13 @@ Exec_TextBox_Draw( LCUI_Widget *widget )
 	Draw_Empty_Slot( &widget->graph, widget->size.w, widget->size.h );
 }
 
+static void
+Exec_TextBox_Update( LCUI_Widget *widget )
+/* 更新文本框的文本图层 */
+{
+	Update_Widget( TextBox_Get_Label( widget ) );
+}
+
 void 
 Process_TextBox_Drag(LCUI_Widget *widget, LCUI_DragEvent *event)
 /* 处理鼠标对文本框的拖动事件 */
@@ -235,6 +260,7 @@ void Register_TextBox()
 	WidgetType_Add ( "text_box" );
 	WidgetFunc_Add ( "text_box", TextBox_Init, FUNC_TYPE_INIT );
 	WidgetFunc_Add ( "text_box", Exec_TextBox_Draw, FUNC_TYPE_DRAW );
+	WidgetFunc_Add ( "text_box", Exec_TextBox_Update, FUNC_TYPE_UPDATE );
 	WidgetFunc_Add ( "text_box", Destroy_TextBox, FUNC_TYPE_DESTROY );
 }
 
