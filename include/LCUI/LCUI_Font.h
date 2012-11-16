@@ -352,10 +352,6 @@ int
 TextLayer_Get_Rows( LCUI_TextLayer *layer );
 /* 获取文本行数 */
 
-uint32_t 
-TextLayer_Get_Char_Pos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos );
-/* 根据文本图层的相对坐标，获取该坐标对应于源文本中的字符 */ 
-
 int 
 TextLayer_Get_Select_Text( LCUI_TextLayer *layer, char *out_text );
 /* 获取文本图层内被选中的文本 */ 
