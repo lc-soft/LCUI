@@ -46,6 +46,10 @@
 
 #define KEY_ENTER	10
 #define KEY_BACKSPACE	127
+#define KEY_DELETE	295
+#define KEY_HOMEPAGE	293
+#define KEY_END		296
+
 #define _PC_
 
 /* 这个是诺亚舟NP1500学习机的游戏键A和B键的键值 */
@@ -54,10 +58,10 @@
 
 #ifndef _PC_
 
-#define KEY_DOWN    172
-#define KEY_UP      171
-#define KEY_LEFT    174
-#define KEY_RIGHT   173
+#define KEY_DOWN	172
+#define KEY_UP		171
+#define KEY_LEFT	174
+#define KEY_RIGHT	173
 
 #else
 
@@ -68,7 +72,6 @@
 
 #endif
 
-#define KEY_DELETE  295
 /*
 #define KEY_DOWN    264
 #define KEY_UP      260
