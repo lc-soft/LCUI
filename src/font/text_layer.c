@@ -678,7 +678,10 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 		//} 
 		for(j=0; j<n; ++j) {
 			p_data = Queue_Get( &p_row->string, j ); 
-			if( p_data->data != NULL ) {
+			if( !p_data ) {
+				continue;
+			}
+			if( p_data->data ) {
 				//if( p_data->data->pixel_size > 0 ) {
 					size = p_data->data->pixel_size;
 				//} else { 
@@ -698,10 +701,12 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 			pos.x += p_data->bitmap.left;
 			if( p_data->need_update ) {
 				p_data->need_update = FALSE; 
-				area = Rect(pos.x, pos.y, size, size);
+				area.x = pos.x;
+				area.y = pos.y + p_row->max_size.h-1 - p_data->bitmap.top;
+				area.height = p_data->bitmap.rows;
+				area.width = p_data->bitmap.width;
 				/* 贴上字体位图 */
-				FontBMP_Mix( &widget->graph, Pos( pos.x, 
-					pos.y + p_row->max_size.h-1 - p_data->bitmap.top),
+				FontBMP_Mix( &widget->graph, Pos(area.x, area.y),
 					&p_data->bitmap, color, mode );
 				Add_Widget_Refresh_Area( widget, area );  
 			}
@@ -1228,6 +1233,7 @@ int
 TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 /* 删除光标左边处n个字符 */
 {
+	int i;
 	LCUI_Pos char_pos;
 	Text_RowData *row_ptr;
 	LCUI_CharData *char_ptr;
@@ -1242,16 +1248,22 @@ TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 	if( !char_ptr ) {
 		return -1;
 	}
-	/* 记录该字及后面的区域，以便刷新 */
-	TextLayer_CharLater_Refresh( layer, char_pos );
-	//printf( "char pos: %d\n", char_ptr->pos );
-	/* 将该字前面的一个字从源字符串中删除 */
-	Queue_Delete( &layer->text_source_data, char_ptr->pos-1 );
-	/* 该字前面的那个字在这行的字体位图也需要删除 */
-	char_pos.x -= 1;
-	Queue_Delete( &row_ptr->string, char_pos.x );
-	/* 删除完后，需要将光标向左移动一个位置 */
-	TextLayer_Set_Cursor_Pos( layer, char_pos );
+	/* 判断需删除的字符个数是否有效 */
+	if( char_pos.x < n ) {
+		n = char_pos.x;
+	}
+	/* 记录被删除的字及后面的区域，以便刷新 */
+	TextLayer_CharLater_Refresh( layer, Pos(char_pos.x-n, char_pos.y) );
+	for( i=0; i<n; ++i ) {
+		char_pos.x -= 1;
+		//printf( "char pos: %d\n", char_ptr->pos );
+		/* 将该字从源字符串中删除 */
+		Queue_Delete( &layer->text_source_data, char_ptr->pos-1 );
+		/* 该字在这行的字体位图也需要删除 */
+		Queue_Delete( &row_ptr->string, char_pos.x );
+		/* 删除完后，需要将光标向左移动一个位置 */
+		TextLayer_Set_Cursor_Pos( layer, char_pos );
+	}
 	//printf( "TextLayer_Text_Backspace(): quit\n" );
 	return 0;
 }
