@@ -130,7 +130,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 	layer = TextBox_Get_TextLayer( widget );
 	cur_pos = TextLayer_Get_Cursor_Pos( layer );
 	cols = TextLayer_Get_RowLen( layer, cur_pos.y );
-	rows = TextLayer_Get_Rows( layer );
+	rows = TextLayer_Get_Rows( layer ); 
 	switch( key->code ) {
 	    case KEY_HOMEPAGE: //home键移动光标至行首
 		cur_pos.x = 0;
@@ -158,7 +158,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 	    case KEY_RIGHT:
 		if( cur_pos.x < cols ) {
 			cur_pos.x++;
-		} else if( cur_pos.y < rows ) {
+		} else if( cur_pos.y < rows-1 ) {
 			cur_pos.y++;
 			cur_pos.x = 0;
 		}
@@ -178,6 +178,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 mv_cur_pos:;
 		pixel_pos = TextLayer_Set_Cursor_Pos( layer, cur_pos );
 		set_textbox_cursor_despos( pixel_pos ); 
+		cur_pos = TextLayer_Get_Cursor_Pos( layer );
 		break;
 		
 	    case KEY_DELETE:
