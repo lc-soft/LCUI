@@ -1217,7 +1217,7 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 		area.x += char_ptr->bitmap.left;
 		area.x += char_ptr->bitmap.width;
 	}
-	//printf("char_pos.x: %d, len: %d\n", char_pos.x, len);
+	printf("char_pos.x: %d, len: %d\n", char_pos.x, len);
 	for( i=char_pos.x; i<len; ++i ) {
 		char_ptr = Queue_Get( &row_ptr->string, i );
 		if( !char_ptr ) {
@@ -1238,9 +1238,10 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 /* 以start_pos为起点，删除n个文字 */
 {
 	LCUI_Rect area;
+	LCUI_Pos tmp_pos;
 	int start_n, y, n, i, rows, cols;
-	BOOL multiline = TRUE;
-	Text_RowData *row_ptr;
+	BOOL multiline = TRUE, refresh = TRUE;
+	Text_RowData *row_ptr, *tmp_row;
 	LCUI_CharData *char_ptr;
 	
 	if( len <= 0 || start_pos.y < 0 || start_pos.x < 0 ) {
@@ -1277,9 +1278,35 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 			TextLayer_CharLater_Refresh( layer, start_pos );
 			multiline = FALSE;
 		}
+		printf("1, start_n: %d, cols: %d, len: %d\n", start_n, cols, len);
+		/* 如果起点位置是行尾，且len大于0，那么，拼接两行文本 */
+		if( start_n == cols && len > 0 ) {
+			if( refresh ) {
+				tmp_pos.x = 0;
+				tmp_pos.y=start_pos.y+1;
+				/* 刷新该行后面所有行的字符 */
+				for( ; tmp_pos.y<rows; ++tmp_pos.y ) {
+					TextLayer_CharLater_Refresh( layer, tmp_pos );
+				}
+				refresh = FALSE;
+			}
+			/* 获取指向下一行文本的指针 */
+			tmp_row = Queue_Get( &layer->rows_data, n+1 );
+			/* 拼接至当前行行尾 */
+			Queue_Cat( &row_ptr->string, &tmp_row->string ); 
+			/* 销毁下一行的文本 */
+			Destroy_Queue( &tmp_row->string ); 
+			Queue_Delete( &layer->rows_data, n+1 );
+			/* 更新当前行的总字符数 */
+			cols = Queue_Get_Total( &row_ptr->string );
+			TextLayer_Update_RowSize( layer, n );
+			--len;
+		}
+		printf("2, start_n: %d, cols: %d, len: %d\n", start_n, cols, len);
 		for( i=start_n; i<cols && len>0; ++i ) {
 			char_ptr = Queue_Get( &row_ptr->string, i );
 			if( !char_ptr ) {
+				printf("null\n");
 				continue;
 			}
 			/* 计算区域范围 */
@@ -1292,7 +1319,7 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 			RectQueue_Add( &layer->clear_area, area );
 			area.x += char_ptr->bitmap.width;
 			/* 将该字从源字符串中删除 */
-			Queue_Delete( &layer->text_source_data, char_ptr->pos );
+			//Queue_Delete( &layer->text_source_data, char_ptr->pos );
 			/* 该字在这行的字体位图也需要删除 */
 			Queue_Delete( &row_ptr->string, start_n );
 			--len;
@@ -1305,8 +1332,10 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 	if( !multiline ) {
 		return 0;
 	}
+	printf("multiline\n");
 	/* 更新该行及后面的所有字符 */
 	//......
+	
 	return 0;
 }
 
@@ -1326,21 +1355,20 @@ TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 	for( i=n; char_pos.y>=0; --char_pos.y ) {
 		row_ptr = Queue_Get( &layer->rows_data, char_pos.y );
 		row_len = Queue_Get_Total( &row_ptr->string );
-		for( ; row_len>0; --row_len ) {
-			if( i>0 ) {
-				--i; --char_pos.x;
-			} else {
-				break;
-			}
+		
+		if( char_pos.x == -1 ) {
+			char_pos.x = row_len;
 		}
-		if( i<=0 ) {
+		for( ; char_pos.x>=0 && i>0; --char_pos.x,--i );
+		
+		if( i<=0 && char_pos.x >= 0 ) {
 			break;
 		}
 	}
 	if( i>0 ) {
 		n -= i;
 	}
-	//printf("start_pos: %d,%d, len: %d\n", char_pos.x, char_pos.y, n);
+	printf("start_pos: %d,%d, len: %d\n", char_pos.x, char_pos.y, n);
 	/* 开始删除文字 */
 	_TextLayer_Text_Delete( layer, char_pos, n );
 	/* 删除完后，需要将光标向左移动一个位置 */
