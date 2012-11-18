@@ -229,7 +229,7 @@ void * Queue_Get (LCUI_Queue * queue, int pos)
 			int i;
 			LCUI_Node *p;
 			p = queue->data_head_node.next;
-			for(i=0; i<= pos && p!=NULL; ++i) {
+			for(i=0; i<= pos && p; ++i) {
 				data = p->data;
 				p = p->next;
 			}
@@ -289,7 +289,7 @@ int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos)
 		/* 解除该位置的结点与前后结点的链接 */
 		temp = p_src->prev;
 		temp->next = p_src->next;
-		if(p_src->next != NULL) {
+		if( p_src->next ) {
 			p_src->next->prev = temp;
 		}
 		/* 得到目标位置的结点的指针 */
@@ -344,7 +344,7 @@ int Queue_Replace_By_Flag(LCUI_Queue * queue, int pos, const void *data, int fla
 		 * 对指针进行释放而导致的内存溢出，需要先调用析构函数对该成员进行销毁，因为析构函数
 		 * 一般会对结构体中的指针进行释放，之后，再复制新成员的数据至该成员的内存空间。
 		 *  */
-		if(NULL != queue->destroy_func) {
+		if( queue->destroy_func ) {
 			queue->destroy_func(queue->data_array[pos]); 
 		}
 		Queue_Using(queue, QUEUE_MODE_WRITE);
@@ -410,14 +410,14 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 			queue->max_num = queue->total_num;
 			size = sizeof(void*) * queue->total_num;
 			/* 如果总数大于1，说明之前已经malloc过，直接realloc扩增内存 */
-			if (queue->total_num > 1 && queue->data_array != NULL) { 
+			if (queue->total_num > 1 && queue->data_array ) { 
 				queue->data_array = (void **) 
 					realloc( queue->data_array, size ); 
 			} else {
 				queue->data_array = (void **) malloc (sizeof(void*)); 
 			}
 			
-			if(NULL == queue->data_array) {
+			if( !queue->data_array ) {
 				printf("Queue_Add_By_Flag(): "ERROR_MALLOC_ERROR);
 				Queue_End_Use(queue);
 				exit(-1);
@@ -426,7 +426,7 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 				queue->data_array[pos] = malloc(queue->element_size);
 			}
 		}
-		else if (flag == 1 && queue->data_array[pos] == NULL) { 
+		else if ( flag == 1 && !queue->data_array[pos] ) { 
 			queue->data_array[pos] = 
 					malloc(queue->element_size);
 		}
@@ -491,6 +491,44 @@ int Queue_Add_Pointer(LCUI_Queue * queue, const void *data)
  * */
 {
 	return Queue_Add_By_Flag(queue, data, 0); 
+}
+
+int Queue_Cat( LCUI_Queue *des, LCUI_Queue *src )
+/*
+ * 功能：将一个队列拼接至另一个队列的末尾
+ * 说明：如果两个队列的数据存储方式选择的是链表，那么，直接将src队列的首结点与des队列的
+ * 尾结点相链接，然后修改des队列的总成员数即可；
+ * 注意，拼接后，des队列中的新增成员指针和src中的成员指针都是指向同一地址，若其中一个队
+ * 列进行销毁操作，另一个队列的成员就会无效化。
+ * */
+{
+	LCUI_Node *p;
+	int i,total;
+	
+	if( !des || !src ) {
+		return -1;
+	}
+	
+	if(src->data_mode == des->data_mode
+	 && des->data_mode == QUEUE_DATA_MODE_LINKED_LIST) {
+		des->total_num += src->total_num;
+		if(des->total_num > des->max_num) {
+			des->max_num = des->total_num;
+		} 
+		/* 获取尾结点指针 */
+		p = des->data_head_node.next; 
+		while( p->next ) {
+			p = p->next;
+		}
+		/* 连接首尾结点 */
+		p->next = src->data_head_node.next;
+	} else {
+		total = Queue_Get_Total( src );
+		for( i=0; i<total; ++i ) {
+			Queue_Add_Pointer( des, Queue_Get( src, i ) );
+		}
+	}
+	return 0;
 }
 
 int Queue_Empty(LCUI_Queue *queue)
@@ -610,6 +648,44 @@ int Queue_Delete_Pointer (LCUI_Queue * queue, int pos)
  * */
 #define test_1
 #ifdef test_1
+/* 测试Queue_Cat函数 */
+int main()
+{
+	int i, total;
+	char ch, str[20];
+	LCUI_Queue q1, q2;
+	/* 初始化 */
+	Queue_Init(&q1, sizeof(char), NULL);
+	Queue_Init(&q2, sizeof(char), NULL);
+	Queue_Set_DataMode(&q1, QUEUE_DATA_MODE_LINKED_LIST);
+	Queue_Set_DataMode(&q2, QUEUE_DATA_MODE_LINKED_LIST);
+	/* 添加0至9的字符至队列 */
+	for(i=0; i<10; i++) {
+		ch = '0' + i; 
+		Queue_Add(&q1, &ch);
+		Queue_Add(&q2, &ch);
+	}
+	total = Queue_Get_Total( &q1 );
+	for(i=0; i<total; i++) {
+		str[i] = *( (char*)Queue_Get(&q1, i) );  
+	}
+	str[i] = 0;
+	
+	printf("before, string:%s\n", str);
+	Queue_Cat( &q1, &q2 ); /* 拼接队列 */
+	total = Queue_Get_Total( &q1 );
+	for(i=0; i<total; i++) {
+		str[i] = *( (char*)Queue_Get(&q1, i) );  
+	}
+	str[i] = 0;
+	printf("after, string:%s\n\n", str);
+	
+	Destroy_Queue(&q1);
+	Destroy_Queue(&q2);
+	return 0;
+}
+#endif
+#ifdef test_2
 /* 
  * 功能：测试通用队列的成员指针增删功能
  * 说明：先从队列1中获取指定位置的成员指针，之后删除该位置的成员指针，把成员指针添加至
@@ -629,7 +705,7 @@ int main()
 		ch = '0' + i; 
 		Queue_Add(&q1, &ch);
 	}
-	/* 获取每个成员，并保存至队列 */
+	/* 获取每个成员，并保存至字符串 */
 	for(i=0; i<10; i++) {
 		str[i] = *( (char*)Queue_Get(&q1, i) );  
 	}
