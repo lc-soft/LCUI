@@ -44,7 +44,7 @@ if test "x$with_iconv" != "xno"; then
 	AC_SUBST(ICONV_LIBS)
     fi
 fi
-
+##检测是否启用线程支持
 want_thread=no
 thread_name=pthread
 AC_ARG_WITH(pthread, [  --with-pthread          use pthread	(default)])
@@ -56,7 +56,7 @@ if test "x$with_pthread" != "xno"; then
 	AC_SUBST(THREAD_LIBS)
     fi
 fi
-
+##检测是否有freetype库
 want_freetype=no
 AC_ARG_WITH(freetype, [  --with-freetype         use freetype	(default)])
 if test "x$with_freetype" != "xno"; then
@@ -66,6 +66,19 @@ if test "x$with_freetype" != "xno"; then
 	AC_CHECK_HEADERS([ft2build.h],want_freetype=yes,want_freetype=no)
 	AC_SUBST(FREETYPE_LIBS)
     fi
+fi
+
+## 检测图形输出设备
+want_graph_display=yes
+graph_output_dev="framebuffer" 
+AC_ARG_ENABLE(graph-display, AC_HELP_STRING([--enable-graph-display], 
+[turn on graph display [[default=yes]]]), want_graph_display=$enableval)
+if test $want_graph_display = "yes"; then
+	AC_CHECK_HEADERS([linux/fb.h],
+	[graph_output_dev="framebuffer"], [graph_output_dev="none"])
+else 
+	want_graph_display=no
+	graph_output_dev=none
 fi
 
 want_ts=no
@@ -103,19 +116,18 @@ fi
 
 # DEBUG option 
 # 调试选项，如果需要对项目进行调试，可启用调试选项
+want_debug=no
 AC_MSG_CHECKING(whether to enable debugging)
-debug_default="no"
-AC_ARG_ENABLE(debug, [  --enable-debug=[no/yes] turn on debugging
-[default=$debug_default]],, enable_debug=$debug_default)
-# 看到CFLAGS，你应该懂的！是给gcc编译器的参数。
-if test "x$enable_debug" = "xyes"; then
-CFLAGS="-O2 -g -Wall -D _GNU_SOURCE"
-CXXFLAG="-O2 -g -Wall -D _GNU_SOURCE"
-AC_MSG_RESULT(yes)
+AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug], 
+[turn on debugging [[default=no]]]), want_debug=$enableval)
+if test "$want_debug" = "yes"; then
+	CFLAGS="-O2 -g -Wall -D _GNU_SOURCE"
+	CXXFLAG="-O2 -g -Wall -D _GNU_SOURCE"
+	AC_MSG_RESULT(yes)
 else
-CFLAGS="-O2 -Wall -D _GNU_SOURCE"
-CXXFLAGS="-O2 -Wall -D _GNU_SOURCE"
-AC_MSG_RESULT(no)
+	CFLAGS="-O2 -Wall -D _GNU_SOURCE"
+	CXXFLAGS="-O2 -Wall -D _GNU_SOURCE"
+	AC_MSG_RESULT(no)
 fi
 
 # Checks for header files.
@@ -163,6 +175,19 @@ if test "$want_thread" = "yes"; then
 else 
     thread_name=none
 fi
+
+if test "$want_graph_display" = "yes"; then
+    if test "$graph_output_dev" = "framebuffer"; then
+        AC_DEFINE_UNQUOTED(GRAPH_OUTPUT_USE_FRAMEBUFFER, 1, Define to 1 if you select FrameBuffer for graph display support) 
+    else 
+        AC_DEFINE_UNQUOTED(GRAPH_OUTPUT_USE_DUMMY, 1, Define to 1 if you disable graph display support) 
+        graph_output_dev=none
+    fi
+else 
+    AC_DEFINE_UNQUOTED(GRAPH_OUTPUT_USE_DUMMY, 1, Define to 1 if you disable graph display support) 
+    graph_output_dev=none 
+fi
+
 ##输出文件
 AC_OUTPUT([Makefile
                  lcui.pc
@@ -186,11 +211,12 @@ AC_OUTPUT([Makefile
                  test/screenlock/Makefile])
 echo
 echo
-echo -e "Build with tslib support ........ : $want_ts"
-echo -e "Build with libpng support ....... : $want_png"
-echo -e "Build with libjpeg support ...... : $want_jpeg"
-echo -e "Build with libiconv support ..... : $want_iconv"
-echo -e "Build with freetype support ..... : $want_freetype"
-echo -e "Build with thread support ....... : $thread_name"
+echo -e "Build with tslib support ............. : $want_ts"
+echo -e "Build with libpng support ............ : $want_png"
+echo -e "Build with libjpeg support ........... : $want_jpeg"
+echo -e "Build with libiconv support .......... : $want_iconv"
+echo -e "Build with freetype support .......... : $want_freetype"
+echo -e "Build with thread support ............ : $thread_name"
+echo -e "Build with graph display support ..... : $graph_output_dev"
 echo 
 
