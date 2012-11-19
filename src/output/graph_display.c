@@ -1,4 +1,4 @@
-#define DEBUG
+//#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
@@ -6,15 +6,7 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
-#include <linux/fb.h>
-#include <sys/mman.h>
-#include <sys/ioctl.h> 
-#include <fcntl.h>
-#include <errno.h>
 #include <unistd.h>
-
-extern void count_time();
-extern void end_count_time();
 
 int Get_Screen_Width ()
 /*
@@ -46,54 +38,6 @@ LCUI_Size Get_Screen_Size ()
 	return LCUI_Sys.screen.size; 
 }
 
-void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color)
-/* 功能：填充指定位置的像素点的颜色 */
-{
-	int k;
-	uchar_t *dest;
-	
-	k = (pos.y * LCUI_Sys.screen.size.w + pos.x) << 2; 
-	//这里需要根据不同位的显示器来进行相应处理
-	dest = LCUI_Sys.screen.fb_mem;	/* 指向帧缓冲 */
-	dest[k] = color.blue;
-	dest[k + 1] = color.green;
-	dest[k + 2] = color.red; 
-}
-
-int Get_Screen_Graph(LCUI_Graph *out)
-/* 
- * 功能：获取屏幕上显示的图像
- * 说明：自动分配内存给指针，并把数据拷贝至指针的内存 
- * */
-{
-	uchar_t  *dest;
-	int i, temp, h, w;
-	if( !LCUI_Sys.init ) {/* 如果没有初始化过 */
-		return -1; 
-	}
-	
-	out->have_alpha = IS_FALSE;/* 无alpha通道 */
-	out->type = TYPE_BMP;
-	temp = Graph_Create(out, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h);
-	if(temp != 0) {
-		return -2; 
-	}
-	
-	dest = LCUI_Sys.screen.fb_mem; /* 指针指向帧缓冲的内存 */
-	for (i=0,h=0; h < LCUI_Sys.screen.size.h; ++h) {
-		for (w = 0; w < LCUI_Sys.screen.size.w; ++w) {
-			/* 读取帧缓冲的内容 */
-			out->rgba[2][i] = *(dest++);
-			out->rgba[1][i] = *(dest++);
-			out->rgba[0][i] = *(dest++);
-			dest++;
-			++i; 
-		}
-	}
-	return 0;
-}
-
-
 int Add_Screen_Refresh_Area (LCUI_Rect rect)
 /* 功能：在整个屏幕内添加需要刷新的区域 */
 {
@@ -102,134 +46,6 @@ int Add_Screen_Refresh_Area (LCUI_Rect rect)
 	} 
 	rect = Get_Valid_Area(Get_Screen_Size(), rect); 
 	return RectQueue_Add (&LCUI_Sys.update_area, rect);
-}
-
-
-static void print_screeninfo(
-		struct fb_var_screeninfo fb_vinfo,
-		struct fb_fix_screeninfo fb_fix
-	)
-/* 功能：打印屏幕相关的信息 */
-{
-	char visual[256], type[256];
-	
-	switch(fb_fix.type) {
-	    case FB_TYPE_PACKED_PIXELS:
-		strcpy(type, "packed pixels");break;
-	    case FB_TYPE_PLANES:
-		strcpy(type, "non interleaved planes");break;
-	    case FB_TYPE_INTERLEAVED_PLANES:
-		strcpy(type, "interleaved planes");break;
-	    case FB_TYPE_TEXT:
-		strcpy(type, "text/attributes");break;
-	    case FB_TYPE_VGA_PLANES:
-		strcpy(type, "EGA/VGA planes");break;
-	    default: 
-		strcpy(type, "unkown");break;
-	}
-	
-	switch(fb_fix.visual) {
-	    case FB_VISUAL_MONO01:  
-		strcpy(visual, "Monochr. 1=Black 0=White");break;
-	    case FB_VISUAL_MONO10:
-		strcpy(visual, "Monochr. 1=White 0=Black");break;
-	    case FB_VISUAL_TRUECOLOR: 
-		strcpy(visual, "true color");break;
-	    case FB_VISUAL_PSEUDOCOLOR: 
-		strcpy(visual, "pseudo color (like atari)");break;
-	    case FB_VISUAL_DIRECTCOLOR:  
-		strcpy(visual, "direct color");break;
-	    case FB_VISUAL_STATIC_PSEUDOCOLOR:
-		strcpy(visual, "pseudo color readonly");break;
-	    default: 
-		strcpy(type, "unkown");break;
-	}
-	printf(
-		"============== screen info =============\n" 
-		"FB mem start  : 0x%08lX\n"
-		"FB mem length : %d\n"
-		"FB type       : %s\n"
-		"FB visual     : %s\n"
-		"accel         : %d\n"
-		"geometry      : %d %d %d %d %d\n"
-		"timings       : %d %d %d %d %d %d\n"
-		"rgba          : %d/%d, %d/%d, %d/%d, %d/%d\n"
-		"========================================\n",
-		fb_fix.smem_start, fb_fix.smem_len,
-		type, visual,
-		fb_fix.accel,
-		fb_vinfo.xres, fb_vinfo.yres, 
-		fb_vinfo.xres_virtual, fb_vinfo.yres_virtual,  
-		fb_vinfo.bits_per_pixel,
-		fb_vinfo.upper_margin, fb_vinfo.lower_margin,
-		fb_vinfo.left_margin, fb_vinfo.right_margin, 
-		fb_vinfo.hsync_len, fb_vinfo.vsync_len,
-		fb_vinfo.red.length, fb_vinfo.red.offset,
-		fb_vinfo.green.length, fb_vinfo.green.offset,
-		fb_vinfo.blue.length, fb_vinfo.blue.offset,
-		fb_vinfo. transp.length, fb_vinfo. transp.offset
-	);
-}
-
-static int Screen_Init()
-/* 功能：初始化屏幕 */
-{
-	__u16 rr[256],gg[256],bb[256];
-	struct fb_var_screeninfo fb_vinfo;
-	struct fb_fix_screeninfo fb_fix;
-	struct fb_cmap oldcmap = {0,256,rr,gg,bb} ;
-	
-	char *fb_dev;
-	/* 获取环境变量中指定的帧缓冲设备的位置 */
-	fb_dev = getenv("LCUI_FB_DEVICE");
-	if(fb_dev == NULL) {
-		fb_dev = FB_DEV;
-	}
-	
-	nobuff_printf("open video output device..."); 
-	LCUI_Sys.screen.fb_dev_fd = open(fb_dev, O_RDWR);
-	if (LCUI_Sys.screen.fb_dev_fd== -1) {
-		printf("fail\n");
-		perror("error");
-		exit(-1);
-	} else {
-		printf("success\n");
-	}
-	LCUI_Sys.screen.fb_dev_name = fb_dev;
-	/* 获取屏幕相关信息 */
-	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_VSCREENINFO, &fb_vinfo);
-	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_FSCREENINFO, &fb_fix);
-	/* 打印屏幕信息 */
-	print_screeninfo(fb_vinfo, fb_fix);
-	
-	LCUI_Sys.screen.bits = fb_vinfo.bits_per_pixel;
-	if (fb_vinfo.bits_per_pixel==8) {
-		ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGETCMAP, &oldcmap); 
-	}
-	nobuff_printf("mapping framebuffer...");
-	LCUI_Sys.screen.smem_len = fb_fix.smem_len;/* 保存内存空间大小 */
-	/* 映射帧缓存至内存空间 */
-	LCUI_Sys.screen.fb_mem = mmap(NULL,fb_fix.smem_len,
-					PROT_READ|PROT_WRITE,MAP_SHARED,
-					LCUI_Sys.screen.fb_dev_fd, 0);
-							
-	if((void *)-1 == LCUI_Sys.screen.fb_mem) { 
-		printf("fail\n");
-		perror(strerror(errno));
-		exit(-1);
-	} else {
-		printf("success\n");
-	}
-	
-	Graph_Init(&LCUI_Sys.screen.buff); /* 初始化图形数据 */
-	
-	LCUI_Sys.screen.buff.type = TYPE_BMP;/* bmp位图 */
-	LCUI_Sys.screen.size.w = fb_vinfo.xres; /* 保存屏幕尺寸 */
-	LCUI_Sys.screen.size.h = fb_vinfo.yres; 
-	
-	/* 保存当前屏幕内容，以便退出LCUI后还原 */
-	Get_Screen_Graph(&LCUI_Sys.screen.buff); 
-	return 0;
 }
 
 int Get_Screen_Bits()
@@ -543,6 +359,10 @@ static void *Handle_Area_Update ()
 	}
 	thread_exit(NULL);
 }
+
+
+
+extern void Screen_Init();
 
 int Enable_Graph_Display()
 /* 功能：启用图形输出 */

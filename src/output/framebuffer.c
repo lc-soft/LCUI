@@ -1,22 +1,202 @@
+#include "config.h"
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
 #include LC_DISPLAY_H 
 
+#ifdef GRAPH_OUTPUT_USE_FRAMEBUFFER
 #include <stdio.h>
 #include <stdlib.h>
 #include <linux/fb.h> 
 #include <sys/ioctl.h> 
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <errno.h>
+
+
+void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color)
+/* åŠŸèƒ½ï¼šå¡«å……æŒ‡å®šä½ç½®çš„åƒç´ ç‚¹çš„é¢œè‰² */
+{
+	int k;
+	uchar_t *dest;
+	
+	k = (pos.y * LCUI_Sys.screen.size.w + pos.x) << 2; 
+	//è¿™é‡Œéœ€è¦æ ¹æ®ä¸åŒä½çš„æ˜¾ç¤ºå™¨æ¥è¿›è¡Œç›¸åº”å¤„ç†
+	dest = LCUI_Sys.screen.fb_mem;	/* æŒ‡å‘å¸§ç¼“å†² */
+	dest[k] = color.blue;
+	dest[k + 1] = color.green;
+	dest[k + 2] = color.red; 
+}
+
+int Get_Screen_Graph(LCUI_Graph *out)
+/* 
+ * åŠŸèƒ½ï¼šè·å–å±å¹•ä¸Šæ˜¾ç¤ºçš„å›¾åƒ
+ * è¯´æ˜ï¼šè‡ªåŠ¨åˆ†é…å†…å­˜ç»™æŒ‡é’ˆï¼Œå¹¶æŠŠæ•°æ®æ‹·è´è‡³æŒ‡é’ˆçš„å†…å­˜ 
+ * */
+{
+	uchar_t  *dest;
+	int i, temp, h, w;
+	if( !LCUI_Sys.init ) {/* å¦‚æœæ²¡æœ‰åˆå§‹åŒ–è¿‡ */
+		return -1; 
+	}
+	
+	out->have_alpha = IS_FALSE;/* æ— alphaé€šé“ */
+	out->type = TYPE_BMP;
+	temp = Graph_Create(out, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h);
+	if(temp != 0) {
+		return -2; 
+	}
+	
+	dest = LCUI_Sys.screen.fb_mem; /* æŒ‡é’ˆæŒ‡å‘å¸§ç¼“å†²çš„å†…å­˜ */
+	for (i=0,h=0; h < LCUI_Sys.screen.size.h; ++h) {
+		for (w = 0; w < LCUI_Sys.screen.size.w; ++w) {
+			/* è¯»å–å¸§ç¼“å†²çš„å†…å®¹ */
+			out->rgba[2][i] = *(dest++);
+			out->rgba[1][i] = *(dest++);
+			out->rgba[0][i] = *(dest++);
+			dest++;
+			++i; 
+		}
+	}
+	return 0;
+}
+
+static void print_screeninfo(
+		struct fb_var_screeninfo fb_vinfo,
+		struct fb_fix_screeninfo fb_fix
+	)
+/* åŠŸèƒ½ï¼šæ‰“å°å±å¹•ç›¸å…³çš„ä¿¡æ¯ */
+{
+	char visual[256], type[256];
+	
+	switch(fb_fix.type) {
+	    case FB_TYPE_PACKED_PIXELS:
+		strcpy(type, "packed pixels");break;
+	    case FB_TYPE_PLANES:
+		strcpy(type, "non interleaved planes");break;
+	    case FB_TYPE_INTERLEAVED_PLANES:
+		strcpy(type, "interleaved planes");break;
+	    case FB_TYPE_TEXT:
+		strcpy(type, "text/attributes");break;
+	    case FB_TYPE_VGA_PLANES:
+		strcpy(type, "EGA/VGA planes");break;
+	    default: 
+		strcpy(type, "unkown");break;
+	}
+	
+	switch(fb_fix.visual) {
+	    case FB_VISUAL_MONO01:  
+		strcpy(visual, "Monochr. 1=Black 0=White");break;
+	    case FB_VISUAL_MONO10:
+		strcpy(visual, "Monochr. 1=White 0=Black");break;
+	    case FB_VISUAL_TRUECOLOR: 
+		strcpy(visual, "true color");break;
+	    case FB_VISUAL_PSEUDOCOLOR: 
+		strcpy(visual, "pseudo color (like atari)");break;
+	    case FB_VISUAL_DIRECTCOLOR:  
+		strcpy(visual, "direct color");break;
+	    case FB_VISUAL_STATIC_PSEUDOCOLOR:
+		strcpy(visual, "pseudo color readonly");break;
+	    default: 
+		strcpy(type, "unkown");break;
+	}
+	printf(
+		"============== screen info =============\n" 
+		"FB mem start  : 0x%08lX\n"
+		"FB mem length : %d\n"
+		"FB type       : %s\n"
+		"FB visual     : %s\n"
+		"accel         : %d\n"
+		"geometry      : %d %d %d %d %d\n"
+		"timings       : %d %d %d %d %d %d\n"
+		"rgba          : %d/%d, %d/%d, %d/%d, %d/%d\n"
+		"========================================\n",
+		fb_fix.smem_start, fb_fix.smem_len,
+		type, visual,
+		fb_fix.accel,
+		fb_vinfo.xres, fb_vinfo.yres, 
+		fb_vinfo.xres_virtual, fb_vinfo.yres_virtual,  
+		fb_vinfo.bits_per_pixel,
+		fb_vinfo.upper_margin, fb_vinfo.lower_margin,
+		fb_vinfo.left_margin, fb_vinfo.right_margin, 
+		fb_vinfo.hsync_len, fb_vinfo.vsync_len,
+		fb_vinfo.red.length, fb_vinfo.red.offset,
+		fb_vinfo.green.length, fb_vinfo.green.offset,
+		fb_vinfo.blue.length, fb_vinfo.blue.offset,
+		fb_vinfo. transp.length, fb_vinfo. transp.offset
+	);
+}
+
+int Screen_Init()
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–å±å¹• */
+{
+	__u16 rr[256],gg[256],bb[256];
+	struct fb_var_screeninfo fb_vinfo;
+	struct fb_fix_screeninfo fb_fix;
+	struct fb_cmap oldcmap = {0,256,rr,gg,bb} ;
+	
+	char *fb_dev;
+	/* è·å–ç¯å¢ƒå˜é‡ä¸­æŒ‡å®šçš„å¸§ç¼“å†²è®¾å¤‡çš„ä½ç½® */
+	fb_dev = getenv("LCUI_FB_DEVICE");
+	if(fb_dev == NULL) {
+		fb_dev = FB_DEV;
+	}
+	
+	nobuff_printf("open video output device..."); 
+	LCUI_Sys.screen.fb_dev_fd = open(fb_dev, O_RDWR);
+	if (LCUI_Sys.screen.fb_dev_fd== -1) {
+		printf("fail\n");
+		perror("error");
+		exit(-1);
+	} else {
+		printf("success\n");
+	}
+	LCUI_Sys.screen.fb_dev_name = fb_dev;
+	/* è·å–å±å¹•ç›¸å…³ä¿¡æ¯ */
+	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_VSCREENINFO, &fb_vinfo);
+	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_FSCREENINFO, &fb_fix);
+	/* æ‰“å°å±å¹•ä¿¡æ¯ */
+	print_screeninfo(fb_vinfo, fb_fix);
+	
+	LCUI_Sys.screen.bits = fb_vinfo.bits_per_pixel;
+	if (fb_vinfo.bits_per_pixel==8) {
+		ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGETCMAP, &oldcmap); 
+	}
+	nobuff_printf("mapping framebuffer...");
+	LCUI_Sys.screen.smem_len = fb_fix.smem_len;/* ä¿å­˜å†…å­˜ç©ºé—´å¤§å° */
+	/* æ˜ å°„å¸§ç¼“å­˜è‡³å†…å­˜ç©ºé—´ */
+	LCUI_Sys.screen.fb_mem = mmap(NULL,fb_fix.smem_len,
+					PROT_READ|PROT_WRITE,MAP_SHARED,
+					LCUI_Sys.screen.fb_dev_fd, 0);
+							
+	if((void *)-1 == LCUI_Sys.screen.fb_mem) { 
+		printf("fail\n");
+		perror(strerror(errno));
+		exit(-1);
+	} else {
+		printf("success\n");
+	}
+	
+	Graph_Init(&LCUI_Sys.screen.buff); /* åˆå§‹åŒ–å›¾å½¢æ•°æ® */
+	
+	LCUI_Sys.screen.buff.type = TYPE_BMP;/* bmpä½å›¾ */
+	LCUI_Sys.screen.size.w = fb_vinfo.xres; /* ä¿å­˜å±å¹•å°ºå¯¸ */
+	LCUI_Sys.screen.size.h = fb_vinfo.yres; 
+	
+	/* ä¿å­˜å½“å‰å±å¹•å†…å®¹ï¼Œä»¥ä¾¿é€€å‡ºLCUIåè¿˜åŸ */
+	Get_Screen_Graph(&LCUI_Sys.screen.buff); 
+	return 0;
+}
 
 int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 /* 
- * ¹¦ÄÜ£ºÏÔÊ¾Í¼ĞÎ 
- * ËµÃ÷£º´Ëº¯ÊıÊ¹ÓÃÖ¡»º³å£¨FrameBuffer£©½øĞĞÍ¼ĞÎÊä³ö
- * *×¢£ºÖ÷Òª´úÂë²Î¿¼×ÔmgaveiwµÄmga_vfb.cÎÄ¼şÖĞµÄwrite_to_fbº¯Êı.
+ * åŠŸèƒ½ï¼šæ˜¾ç¤ºå›¾å½¢ 
+ * è¯´æ˜ï¼šæ­¤å‡½æ•°ä½¿ç”¨å¸§ç¼“å†²ï¼ˆFrameBufferï¼‰è¿›è¡Œå›¾å½¢è¾“å‡º
+ * *æ³¨ï¼šä¸»è¦ä»£ç å‚è€ƒè‡ªmgaveiwçš„mga_vfb.cæ–‡ä»¶ä¸­çš„write_to_fbå‡½æ•°.
  * */
 {
 	int bits;
-	unsigned char *dest;
+	uchar_t *dest;
 	struct fb_cmap kolor; 
 	unsigned int x, y, n, k, count;
 	unsigned int temp1, temp2, temp3, i; 
@@ -26,7 +206,7 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 	if (!Graph_Valid (src)) {
 		return -1;
 	}
-	/* Ö¸ÏòÖ¡»º³å */
+	/* æŒ‡å‘å¸§ç¼“å†² */
 	dest = LCUI_Sys.screen.fb_mem;		
 	pic = src; 
 	Graph_Init (&temp);
@@ -34,7 +214,7 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 	if ( Get_Cut_Area ( Get_Screen_Size(), 
 			Rect ( pos.x, pos.y, src->width, src->height ), 
 			&cut_rect
-		) ) {/* Èç¹ûĞèÒª²Ã¼ôÍ¼ĞÎ */
+		) ) {/* å¦‚æœéœ€è¦è£å‰ªå›¾å½¢ */
 		if(!Rect_Valid(cut_rect)) {
 			return -2;
 		}
@@ -45,25 +225,26 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 	}
 	
 	Graph_Lock (pic, 0);
-	/* »ñÈ¡ÏÔÊ¾Æ÷µÄÎ»Êı */
+	/* è·å–æ˜¾ç¤ºå™¨çš„ä½æ•° */
 	bits = Get_Screen_Bits(); 
 	switch(bits) {
-	    case 32:/* 32Î»£¬ÆäÖĞRGB¸÷Õ¼8Î»£¬Ê£ÏÂµÄ8Î»ÓÃÓÚalpha£¬¹²4¸ö×Ö½Ú */ 
+	    case 32:/* 32ä½ï¼Œå…¶ä¸­RGBå„å 8ä½ï¼Œå‰©ä¸‹çš„8ä½ç”¨äºalphaï¼Œå…±4ä¸ªå­—èŠ‚ */ 
+		k = pos.y * LCUI_Sys.screen.size.w + pos.x;
 		for (n=0,y = 0; y < pic->height; ++y) {
-			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
 			for (x = 0; x < pic->width; ++x, ++n) {
-				count = k + x;//count = 4 * (k + x);/* ¼ÆËãĞèÌî³äµÄÏñËØµãµÄ×ø±ê */
+				count = k + x;//count = 4 * (k + x);/* è®¡ç®—éœ€å¡«å……çš„åƒç´ ç‚¹çš„åæ ‡ */
 				count = count << 2; 
-				/* ÓÉÓÚÖ¡»º³å(FrameBuffer)µÄÑÕÉ«ÅÅÁĞÊÇBGR£¬Í¼Æ¬Êı×éÊÇRGB£¬ĞèÒª¸Ä±äÒ»ÏÂĞ´ÈëË³Ğò */
+				/* ç”±äºå¸§ç¼“å†²(FrameBuffer)çš„é¢œè‰²æ’åˆ—æ˜¯BGRï¼Œå›¾ç‰‡æ•°ç»„æ˜¯RGBï¼Œéœ€è¦æ”¹å˜ä¸€ä¸‹å†™å…¥é¡ºåº */
 				dest[count] = pic->rgba[2][n];
 				dest[count + 1] = pic->rgba[1][n];
 				dest[count + 2] = pic->rgba[0][n]; 
 			}
+			k += LCUI_Sys.screen.size.w;
 		}
 		break;
-	    case 24:/* 24Î»£¬RGB¸÷Õ¼8Î»£¬Ò²¾ÍÊÇ¹²3¸ö×Ö½Ú */ 
+	    case 24:/* 24ä½ï¼ŒRGBå„å 8ä½ï¼Œä¹Ÿå°±æ˜¯å…±3ä¸ªå­—èŠ‚ */ 
+		k = pos.y * LCUI_Sys.screen.size.w + pos.x;
 		for (n=0, y = 0; y < pic->height; ++y) {
-			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
 			for (x = 0; x < pic->width; ++x, ++n) {
 				count = k + x;//count = 3 * (k + x); 
 				count = (count << 1) + count;
@@ -71,17 +252,18 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 				dest[count + 1] = pic->rgba[1][n];
 				dest[count + 2] = pic->rgba[0][n];
 			}
+			k += LCUI_Sys.screen.size.w;
 		}
 		break;
-	    case 16:/* 16Î»£¬rgb·Ö±ğÕ¼5Î»£¬6Î»£¬5Î»£¬Ò²¾ÍÊÇRGB565 */
+	    case 16:/* 16ä½ï¼Œrgbåˆ†åˆ«å 5ä½ï¼Œ6ä½ï¼Œ5ä½ï¼Œä¹Ÿå°±æ˜¯RGB565 */
 		/*
-		 * GB565²ÊÉ«Ä£Ê½, Ò»¸öÏñËØÕ¼Á½¸ö×Ö½Ú, ÆäÖĞ:
-		 * µÍ×Ö½ÚµÄÇ°5Î»ÓÃÀ´±íÊ¾B(BLUE)
-		 * µÍ×Ö½ÚµÄºóÈıÎ»+¸ß×Ö½ÚµÄÇ°ÈıÎ»ÓÃÀ´±íÊ¾G(Green)
-		 * ¸ß×Ö½ÚµÄºó5Î»ÓÃÀ´±íÊ¾R(RED)
+		 * GB565å½©è‰²æ¨¡å¼, ä¸€ä¸ªåƒç´ å ä¸¤ä¸ªå­—èŠ‚, å…¶ä¸­:
+		 * ä½å­—èŠ‚çš„å‰5ä½ç”¨æ¥è¡¨ç¤ºB(BLUE)
+		 * ä½å­—èŠ‚çš„åä¸‰ä½+é«˜å­—èŠ‚çš„å‰ä¸‰ä½ç”¨æ¥è¡¨ç¤ºG(Green)
+		 * é«˜å­—èŠ‚çš„å5ä½ç”¨æ¥è¡¨ç¤ºR(RED)
 		 * */  
+		k = pos.y * LCUI_Sys.screen.size.w + pos.x;
 		for (n=0, y = 0; y < pic->height; ++y) {
-			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
 			for (x = 0; x < pic->width; ++x, ++n) {
 				count = (k + x) << 1;//count = 2 * (k + x);
 				temp1 = pic->rgba[0][n];
@@ -90,9 +272,10 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 				dest[count] = ((temp3 & 0x1c)<<3)+((temp2 & 0xf8)>>3);
 				dest[count+1] = ((temp1 & 0xf8))+((temp3 & 0xe0)>>5);
 			}
+			k += LCUI_Sys.screen.size.w;
 		}
 		break;
-	    case 8: /* 8Î»£¬Õ¼1¸ö×Ö½Ú */
+	    case 8: /* 8ä½ï¼Œå 1ä¸ªå­—èŠ‚ */
 		kolor.start = 0;
 		kolor.len = 255; 
 		kolor.red = calloc(256, sizeof(__u16));
@@ -106,8 +289,8 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 			kolor.blue[i]=0;
 		}
 		
+		k = pos.y * LCUI_Sys.screen.size.w + pos.x;
 		for (n=0, y = 0; y < pic->height; ++y) {
-			k = (pos.y + y) * LCUI_Sys.screen.size.w + pos.x;
 			for (x = 0; x < pic->width; ++x, ++n) {
 				count = k + x;
 				
@@ -126,6 +309,7 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 						+((temp2 & 0xf0)>>2)
 						+((temp3 & 0xc0)>>6)); 
 			}
+			k += LCUI_Sys.screen.size.w;
 		}
 		
 		ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOPUTCMAP, &kolor); 
@@ -137,5 +321,7 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 	}
 	Graph_Unlock (pic);
 	Graph_Free (&temp);
-	return -1;
+	return 0;
 }
+
+#endif
