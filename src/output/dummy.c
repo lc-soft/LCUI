@@ -18,6 +18,11 @@ int Screen_Init()
 	return -1;
 }
 
+int Screen_Destroy()
+{
+	return -1;
+}
+
 int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 {
 	return -1;

@@ -362,13 +362,13 @@ static void *Handle_Area_Update ()
 
 
 
-extern void Screen_Init();
+extern int Screen_Init();
+extern int Screen_Destroy();
 
 int Enable_Graph_Display()
 /* 功能：启用图形输出 */
 {
 	Screen_Init();
-	LCUI_Sys.status = ACTIVE;
 	return thread_create( &LCUI_Sys.display_thread, 
 			NULL, Handle_Area_Update, NULL );
 }
@@ -376,6 +376,6 @@ int Enable_Graph_Display()
 int Disable_Graph_Display()
 /* 功能：禁用图形输出 */
 {
-	LCUI_Sys.status = KILLED;
+	Screen_Destroy();
 	return thread_join( LCUI_Sys.display_thread, NULL );
 }
