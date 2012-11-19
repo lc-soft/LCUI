@@ -47,7 +47,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 liboutput_la_LIBADD =
-am_liboutput_la_OBJECTS = framebuffer.lo graph_display.lo
+am_liboutput_la_OBJECTS = dummy.lo framebuffer.lo graph_display.lo
 liboutput_la_OBJECTS = $(am_liboutput_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -214,8 +214,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign 
 INCLUDES = -I$(abs_top_srcdir)/include 
-noinst_LTLIBRARIES = liboutput.la
-liboutput_la_SOURCES = framebuffer.c graph_display.c
+noinst_LTLIBRARIES = liboutput.la 
+liboutput_la_SOURCES = dummy.c framebuffer.c graph_display.c
 all: all-am
 
 .SUFFIXES:
@@ -268,6 +268,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dummy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/framebuffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/graph_display.Plo@am__quote@
 
