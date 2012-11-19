@@ -758,6 +758,7 @@ enable_libtool_lock
 with_iconv
 with_pthread
 with_freetype
+enable_graph_display
 with_ts
 with_png
 with_jpeg
@@ -1406,8 +1407,8 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --enable-debug=no/yes turn on debugging
-default=$debug_default
+  --enable-graph-display  turn on graph display [[default=yes]]
+  --enable-debug          turn on debugging [[default=no]]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -15337,7 +15338,7 @@ fi
 
     fi
 fi
-
+##检测是否启用线程支持
 want_thread=no
 thread_name=pthread
 
@@ -15408,7 +15409,7 @@ done
 
     fi
 fi
-
+##检测是否有freetype库
 want_freetype=no
 
 # Check whether --with-freetype was given.
@@ -15477,6 +15478,34 @@ done
 
 
     fi
+fi
+
+## 检测图形输出设备
+want_graph_display=yes
+graph_output_dev="framebuffer"
+# Check whether --enable-graph-display was given.
+if test "${enable_graph_display+set}" = set; then :
+  enableval=$enable_graph_display; want_graph_display=$enableval
+fi
+
+if test $want_graph_display = "yes"; then
+	for ac_header in linux/fb.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "linux/fb.h" "ac_cv_header_linux_fb_h" "$ac_includes_default"
+if test "x$ac_cv_header_linux_fb_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LINUX_FB_H 1
+_ACEOF
+ graph_output_dev="framebuffer"
+else
+  graph_output_dev="none"
+fi
+
+done
+
+else
+	want_graph_display=no
+	graph_output_dev=none
 fi
 
 want_ts=no
@@ -15679,26 +15708,23 @@ fi
 
 # DEBUG option
 # 调试选项，如果需要对项目进行调试，可启用调试选项
+want_debug=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable debugging" >&5
 $as_echo_n "checking whether to enable debugging... " >&6; }
-debug_default="no"
 # Check whether --enable-debug was given.
 if test "${enable_debug+set}" = set; then :
-  enableval=$enable_debug;
-else
-  enable_debug=$debug_default
+  enableval=$enable_debug; want_debug=$enableval
 fi
 
-# 看到CFLAGS，你应该懂的！是给gcc编译器的参数。
-if test "x$enable_debug" = "xyes"; then
-CFLAGS="-O2 -g -Wall -D _GNU_SOURCE"
-CXXFLAG="-O2 -g -Wall -D _GNU_SOURCE"
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+if test "$want_debug" = "yes"; then
+	CFLAGS="-O2 -g -Wall -D _GNU_SOURCE"
+	CXXFLAG="-O2 -g -Wall -D _GNU_SOURCE"
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
-CFLAGS="-O2 -Wall -D _GNU_SOURCE"
-CXXFLAGS="-O2 -Wall -D _GNU_SOURCE"
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	CFLAGS="-O2 -Wall -D _GNU_SOURCE"
+	CXXFLAGS="-O2 -Wall -D _GNU_SOURCE"
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
@@ -16285,6 +16311,31 @@ _ACEOF
 else
     thread_name=none
 fi
+
+if test "$want_graph_display" = "yes"; then
+    if test "$graph_output_dev" = "framebuffer"; then
+
+cat >>confdefs.h <<_ACEOF
+#define GRAPH_OUTPUT_USE_FRAMEBUFFER 1
+_ACEOF
+
+    else
+
+cat >>confdefs.h <<_ACEOF
+#define GRAPH_OUTPUT_USE_DUMMY 1
+_ACEOF
+
+        graph_output_dev=none
+    fi
+else
+
+cat >>confdefs.h <<_ACEOF
+#define GRAPH_OUTPUT_USE_DUMMY 1
+_ACEOF
+
+    graph_output_dev=none
+fi
+
 ##输出文件
 ac_config_files="$ac_config_files Makefile lcui.pc include/Makefile include/LCUI/Makefile src/Makefile src/font/Makefile src/font/in-core/Makefile src/draw/Makefile src/draw/in-core/Makefile src/thread/Makefile src/bmp/Makefile src/misc/Makefile src/input/Makefile src/output/Makefile src/widget/Makefile test/Makefile test/mora/Makefile test/photoviewer/Makefile test/clock/Makefile test/screenlock/Makefile"
 
@@ -18953,11 +19004,12 @@ fi
 
 echo
 echo
-echo -e "Build with tslib support ........ : $want_ts"
-echo -e "Build with libpng support ....... : $want_png"
-echo -e "Build with libjpeg support ...... : $want_jpeg"
-echo -e "Build with libiconv support ..... : $want_iconv"
-echo -e "Build with freetype support ..... : $want_freetype"
-echo -e "Build with thread support ....... : $thread_name"
+echo -e "Build with tslib support ............. : $want_ts"
+echo -e "Build with libpng support ............ : $want_png"
+echo -e "Build with libjpeg support ........... : $want_jpeg"
+echo -e "Build with libiconv support .......... : $want_iconv"
+echo -e "Build with freetype support .......... : $want_freetype"
+echo -e "Build with thread support ............ : $thread_name"
+echo -e "Build with graph display support ..... : $graph_output_dev"
 echo
 
