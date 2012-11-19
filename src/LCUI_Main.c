@@ -50,13 +50,6 @@
 #include LC_FONT_H 
 #include LC_WIDGET_H
 
-#include <linux/fb.h>
-#include <sys/mman.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <errno.h>
 #include <unistd.h>
 
 LCUI_System LCUI_Sys; 
@@ -417,10 +410,10 @@ LCUI_App *Find_App(LCUI_ID id)
 LCUI_App* Get_Self_AppPointer()
 /* 功能：获取程序的指针 */
 {
-	LCUI_ID id;
+	thread_t id;
 	Thread_TreeNode *ttn;
 	
-	id = pthread_self(); /* 获取本线程ID */  
+	id = thread_self(); /* 获取本线程ID */  
 	if(id == LCUI_Sys.display_thread 
 	|| id == LCUI_Sys.dev_thread
 	|| id == LCUI_Sys.self_id
@@ -435,10 +428,11 @@ LCUI_App* Get_Self_AppPointer()
 	 * 有父线程结点指针的，程序的线程ID都在根线程里的
 	 * 子线程ID队列中 
 	 * */
-	while(ttn->parent != NULL) { 
+	while( ttn->parent ) { 
 		ttn = ttn->parent; 
-		if(ttn != NULL && ttn->parent == NULL) 
+		if( ttn && !ttn->parent ) { 
 			break;
+		}
 	}
 	
 	return Find_App(ttn->tid);
@@ -462,27 +456,15 @@ static void LCUI_Quit ()
  * 说明：在没有任何LCUI程序时，LCUI会调用本函数来恢复运行LCUI前的现场。
  * */
 {
-	int err = 0;
-	
 	LCUI_Sys.status = KILLED;	/* 状态标志置为KILLED */
 	LCUI_Font_Free ();		/* 释放LCUI的默认字体数据占用的内存资源 */
-	
-	Disable_Graph_Display();	/* 等待Core线程退出 */ 
+	Disable_Graph_Display();	/* 禁用图形显示 */ 
 	Destroy_Queue(&LCUI_Sys.key_event);/* 销毁按键事件数据队列 */
 	Disable_Mouse_Input();		/* 禁用鼠标输入 */ 
 	Disable_TouchScreen_Input();	/* 禁用触屏支持 */ 
 	Disable_Key_Input();		/* 禁用按键输入 */ 
 	thread_join( LCUI_Sys.timer_thread, NULL ); /* 等待定时器处理线程的退出 */
 	timer_list_destroy( &LCUI_Sys.timer_list ); /* 销毁定时器列表 */
-	/* 恢复屏幕初始内容 */ 
-	Graph_Display (&LCUI_Sys.screen.buff, Pos(0, 0));	
-	/* 解除帧缓冲在内存中的映射 */
-	err = munmap (LCUI_Sys.screen.fb_mem, LCUI_Sys.screen.smem_len);
-	if (err != 0) {
-		perror ("munmap()");
-	}
-	close (LCUI_Sys.screen.fb_dev_fd);  
-	exit (err);
 }
 
 
@@ -520,7 +502,7 @@ static int LCUI_AppList_Delete (LCUI_ID app_id)
 static void LCUI_Destroy_App(LCUI_App *app)
 /* 功能：销毁程序相关信息 */
 {
-	if(app == NULL) {
+	if( !app ) {
 		return;
 	}
 	
@@ -542,10 +524,10 @@ static int LCUI_AppList_Add ()
  **/
 {
 	LCUI_App app;
-	LCUI_ID id = pthread_self();
+	
 	/* 初始化程序数据结构体 */
 	LCUI_App_Init (&app);
-	app.id	= id;	/* 保存ID */ 
+	app.id	= thread_self(); /* 保存ID */ 
 	Queue_Add(&LCUI_Sys.app_list, &app);/* 添加至队列 */
 	return 0;
 }
@@ -555,7 +537,7 @@ static int App_Quit()
 {
 	LCUI_App *app;
 	app = Get_Self_AppPointer();
-	if(NULL == app) {
+	if( !app ) {
 		printf("App_Quit(): "APP_ERROR_UNRECORDED_APP);
 		return -1;
 	} 
@@ -567,7 +549,7 @@ void Main_Loop_Quit()
 /* 功能：让程序退出主循环 */
 { 
 	LCUI_App *app = Get_Self_AppPointer();
-	if(NULL == app) {
+	if( !app ) {
 		printf("Main_Loop_Quit(): "APP_ERROR_UNRECORDED_APP);
 		return;
 	}
@@ -625,6 +607,7 @@ int LCUI_Init(int argc, char *argv[])
 	int temp;
 	if( !LCUI_Sys.init ) {/* 如果LCUI没有初始化过 */
 		LCUI_Sys.init = TRUE;
+		LCUI_Sys.status = ACTIVE;
 		srand(time(NULL));
 		Print_LCUI_Copyright_Text();
 		timer_list_init( &LCUI_Sys.timer_list );	/* 初始化定时器列表 */
@@ -654,10 +637,10 @@ int LCUI_Init(int argc, char *argv[])
 			abort();
 		}
 		
-		Enable_Graph_Display();	/* 启用图形输出 */
 		LCUI_Dev_Init();
 		LCUI_IO_Init();		/* 初始化输入输出设备 */ 
-		Widget_Event_Init();	/* 初始化部件事件处理 */ 
+		Widget_Event_Init();	/* 初始化部件事件处理 */
+		Enable_Graph_Display();	/* 启用图形输出 */ 
 		/* 鼠标游标居中 */
 		Set_Cursor_Pos( Get_Screen_Center_Point() );  
 		Show_Cursor();	/* 显示鼠标游标 */ 
@@ -700,7 +683,7 @@ int LCUI_Main ()
 	//LCUI_Thread_Create(&t, NULL, catch, NULL);
 #endif
 	app = Get_Self_AppPointer();
-	if(app == NULL) {
+	if( !app ) {
 		printf("LCUI_Main(): "APP_ERROR_UNRECORDED_APP);
 		return -1;
 	}
