@@ -580,8 +580,7 @@ TextLayer_Update_RowSize (LCUI_TextLayer *layer, int row )
 	
 	for( i=0; i<total; ++i ) {
 		char_data = Queue_Get( &row_data->string, i );
-		size.w += char_data->bitmap.width;
-		size.w += char_data->bitmap.left;
+		size.w += char_data->bitmap.advance.x;
 		if( char_data->data ) {
 			if( char_data->data->_pixel_size ) {
 				if( size.h < char_data->data->pixel_size + 2) {
@@ -608,6 +607,7 @@ void
 TextLayer_Init( LCUI_TextLayer *layer )
 /* 初始化文本图层相关数据 */
 {
+	layer->read_only = FALSE;
 	layer->using_code_mode = FALSE; 
 	layer->using_style_tags = FALSE; 
 	layer->enable_word_wrap = FALSE; 
@@ -697,20 +697,20 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 			} else {
 				size = layer->default_data.pixel_size + 2; 
 				color = layer->default_data.fore_color;
-			}
-			pos.x += p_data->bitmap.left;
+			}\
 			if( p_data->need_update ) {
-				p_data->need_update = FALSE; 
-				area.x = pos.x;
-				area.y = pos.y + p_row->max_size.h-1 - p_data->bitmap.top;
+				p_data->need_update = FALSE;
+				area.x = pos.x + p_data->bitmap.left;
+				area.y = pos.y + p_row->max_size.h-1;
+				area.y -= p_data->bitmap.top;
 				area.height = p_data->bitmap.rows;
 				area.width = p_data->bitmap.width;
 				/* 贴上字体位图 */
 				FontBMP_Mix( &widget->graph, Pos(area.x, area.y),
 					&p_data->bitmap, color, mode );
-				Add_Widget_Refresh_Area( widget, area );  
+				Add_Widget_Refresh_Area( widget, area );
 			}
-			pos.x += p_data->bitmap.width;
+			pos.x += p_data->bitmap.advance.x;
 		}
 		pos.y += p_row->max_size.h;
 	}
@@ -761,6 +761,29 @@ TextLayer_Get_Size ( LCUI_TextLayer *layer )
 	size.w += 2;
 	size.h += 2;
 	return size;
+}
+
+wchar_t *
+TextLayer_Get_Text( LCUI_TextLayer *layer )
+/* 获取文本图层中的文本内容 */
+{
+	int i, buff_size;
+	wchar_t *text_buff;
+	LCUI_CharData *char_p;
+	buff_size = Queue_Get_Total( &layer->text_source_data );
+	if( buff_size <= 0 ) {
+		return NULL;
+	}
+	text_buff = (wchar_t*) malloc( sizeof(wchar_t)*(buff_size+1) );
+	printf("print text:\n");
+	for( i=0; i<buff_size; ++i ) {
+		char_p = Queue_Get( &layer->text_source_data, i );
+		printf("%c", char_p->char_code);
+		text_buff[i] = char_p->char_code;
+	}
+	printf("end\n");
+	text_buff[i] = 0;
+	return text_buff;
 }
 
 void
@@ -843,6 +866,13 @@ skip_style_cmp:;
 		area.y += row_ptr->max_size.h; 
 		TextLayer_Update_RowSize( layer, i );
 	}
+}
+
+void 
+TextLayer_ReadOnly( LCUI_TextLayer *layer, BOOL flag )
+/* 指定文本图层中的文本是否为只读 */
+{
+	layer->read_only = flag;
 }
 
 void
@@ -928,7 +958,9 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 			FontBMP_Init( &char_data.bitmap ); 
 		}
 		while(n_ignore > 0) { 
+			char_data.pos = p-buff;
 			char_data.char_code = *p++;
+			printf("char: %c, pos; %d\n", char_data.char_code, char_data.pos);
 			Queue_Insert( &layer->text_source_data, 
 				layer->current_src_pos, &char_data );
 			/* 遇到换行符，那就增加新行 */
@@ -952,6 +984,7 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 		}
 		char_data.pos = p-buff;
 		char_data.char_code = *p;
+		printf("char: %c, pos; %d\n", *p, p-buff);
 		char_data.display = TRUE; 
 		char_data.need_update = TRUE; 
 		char_data.data = TextLayer_Get_Current_TextStyle( layer );  
@@ -1196,7 +1229,7 @@ void
 TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 /* 刷新指定行中指定字以及后面的字的区域 */
 {
-	int y, i, len;
+	int x, y, i, len;
 	LCUI_Rect area;
 	Text_RowData *row_ptr;
 	LCUI_CharData *char_ptr;
@@ -1212,10 +1245,9 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 	row_ptr = Queue_Get( &layer->rows_data, char_pos.y );
 	len = Queue_Get_Total( &row_ptr->string );
 	/* 获取该字的起点X轴坐标 */
-	for( area.x=0,i=0; i<char_pos.x; ++i ) {
-		char_ptr = Queue_Get( &row_ptr->string, i );
-		area.x += char_ptr->bitmap.left;
-		area.x += char_ptr->bitmap.width;
+	for( x=0,i=0; i<char_pos.x; ++i ) {
+		char_ptr = Queue_Get( &row_ptr->string, i ); 
+		x += char_ptr->bitmap.advance.x;
 	}
 	printf("char_pos.x: %d, len: %d\n", char_pos.x, len);
 	for( i=char_pos.x; i<len; ++i ) {
@@ -1223,13 +1255,13 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 		if( !char_ptr ) {
 			continue;
 		}
-		area.x += char_ptr->bitmap.left;
-		area.y = y + row_ptr->max_size.h-1 - char_ptr->bitmap.top;
+		area.x = x + char_ptr->bitmap.left;
+		area.y = y + row_ptr->max_size.h-1-char_ptr->bitmap.top;
 		area.width = char_ptr->bitmap.width;
 		area.height = char_ptr->bitmap.rows;
 		char_ptr->need_update = TRUE; /* 标记该字的位图需要重绘 */
-		RectQueue_Add( &layer->clear_area, area );
-		area.x += char_ptr->bitmap.width;
+		RectQueue_Add( &layer->clear_area, area ); 
+		x += char_ptr->bitmap.advance.x;
 	}
 }
 
@@ -1278,7 +1310,7 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 			TextLayer_CharLater_Refresh( layer, start_pos );
 			multiline = FALSE;
 		}
-		printf("1, start_n: %d, cols: %d, len: %d\n", start_n, cols, len);
+		//printf("1, start_n: %d, cols: %d, len: %d\n", start_n, cols, len);
 		/* 如果起点位置是行尾，且len大于0，那么，拼接两行文本 */
 		if( start_n == cols && len > 0 ) {
 			if( refresh ) {
@@ -1302,11 +1334,10 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 			TextLayer_Update_RowSize( layer, n );
 			--len;
 		}
-		printf("2, start_n: %d, cols: %d, len: %d\n", start_n, cols, len);
+		//printf("2, start_n: %d, cols: %d, len: %d\n", start_n, cols, len);
 		for( i=start_n; i<cols && len>0; ++i ) {
 			char_ptr = Queue_Get( &row_ptr->string, i );
 			if( !char_ptr ) {
-				printf("null\n");
 				continue;
 			}
 			/* 计算区域范围 */
@@ -1319,7 +1350,8 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 			RectQueue_Add( &layer->clear_area, area );
 			area.x += char_ptr->bitmap.width;
 			/* 将该字从源字符串中删除 */
-			//Queue_Delete( &layer->text_source_data, char_ptr->pos );
+			printf("delete: %c, pos: %d\n",char_ptr->char_code, char_ptr->pos);
+			Queue_Delete( &layer->text_source_data, char_ptr->pos );
 			/* 该字在这行的字体位图也需要删除 */
 			Queue_Delete( &row_ptr->string, start_n );
 			--len;
@@ -1347,8 +1379,12 @@ TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 	LCUI_Pos char_pos;
 	Text_RowData *row_ptr;
 	
-	if( n <= 0 ) {
+	if( layer->read_only ) {
 		return -1;
+	}
+	
+	if( n <= 0 ) {
+		return -2;
 	}
 	/* 计算当前光标所在字的位置 */
 	char_pos = TextLayer_Get_Cursor_Pos( layer );
@@ -1368,7 +1404,7 @@ TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 	if( i>0 ) {
 		n -= i;
 	}
-	printf("start_pos: %d,%d, len: %d\n", char_pos.x, char_pos.y, n);
+	//printf("start_pos: %d,%d, len: %d\n", char_pos.x, char_pos.y, n);
 	/* 开始删除文字 */
 	_TextLayer_Text_Delete( layer, char_pos, n );
 	/* 删除完后，需要将光标向左移动一个位置 */
@@ -1428,7 +1464,7 @@ TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 		if( !char_ptr ) {
 			continue;
 		}
-		tmp = char_ptr->bitmap.left + char_ptr->bitmap.width;
+		tmp = char_ptr->bitmap.advance.x;
 		if( pixel_pos.x >= tmp/2 ) {
 			pixel_pos.x -= tmp;
 			new_pos.x += tmp;
@@ -1488,8 +1524,7 @@ TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos )
 		if( !char_ptr ) {
 			continue;
 		}
-		pixel_pos.x += char_ptr->bitmap.left;
-		pixel_pos.x += char_ptr->bitmap.width;
+		pixel_pos.x += char_ptr->bitmap.advance.x;
 		//printf("TextLayer_Set_Cursor_Pos(): pixel pos x: %d, total: %d, cols: %d, pos.x: %d\n", 
 		//pixel_pos.x, total, cols, pos.x);
 	}
