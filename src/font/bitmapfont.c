@@ -443,27 +443,56 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 }
 
 #ifdef USE_FREETYPE
-static int Convert_FT_BitmapGlyph(LCUI_FontBMP *des, const FT_BitmapGlyph src)
+
+static int Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 {
-	static size_t size;
+	static FT_Error	error;
+	static size_t		size;
+	static FT_BitmapGlyph  bitmap_glyph;
+	static FT_Glyph        glyph;
 	
-	des->top = src->top;
-	des->left = src->left;
-	des->rows = src->bitmap.rows;
-	des->width = src->bitmap.width;
-	des->pixel_mode = src->bitmap.pixel_mode;
-	des->num_grays = src->bitmap.num_grays;
+	/* 从插槽中提取一个字形图像 
+	 * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
+	error = FT_Get_Glyph( slot, &glyph );
+	if(error) {
+		return -1; 
+	}
+	/**************
+	printf(" width= %ld,  met->height= %ld\n"
+	"horiBearingX = %ld, horiBearingY = %ld, horiAdvance = %ld\n"
+	"vertBearingX = %ld, vertBearingY = %ld,  vertAdvance = %ld\n", 
+	slot->metrics.width>>6, slot->metrics.height>>6,
+	slot->metrics.horiBearingX>>6, slot->metrics.horiBearingY>>6, 
+	slot->metrics.horiAdvance>>6, slot->metrics.vertBearingX>>6, 
+	slot->metrics.vertBearingY>>6, slot->metrics.vertAdvance>>6 ); 
+	****************/
+	if ( glyph->format != FT_GLYPH_FORMAT_BITMAP ) {
+		error = FT_Glyph_To_Bitmap(&glyph, render_mode, 0 ,1);
+		if(error) {
+			return -1;
+		}
+	}
+	bitmap_glyph = (FT_BitmapGlyph)glyph;
 	
+	des->top = bitmap_glyph->top;
+	des->left = slot->metrics.horiBearingX>>6;
+	des->rows = bitmap_glyph->bitmap.rows;
+	des->width = bitmap_glyph->bitmap.width;
+	des->pixel_mode = bitmap_glyph->bitmap.pixel_mode;
+	des->num_grays = bitmap_glyph->bitmap.num_grays;
+	des->advance.x = slot->metrics.horiAdvance>>6;	/* 水平跨距 */
+	des->advance.y = slot->metrics.vertAdvance>>6;	/* 垂直跨距 */
 	size = des->rows * des->width * sizeof(uchar_t);
 	des->buffer = malloc( size );
-	if( des->buffer == NULL ) {
+	if( !des->buffer ) {
+		FT_Done_Glyph(glyph);
 		return -1;
 	}
-	memcpy( des->buffer, src->bitmap.buffer, size );
-	
-	DEBUG_MSG("des->top: %d, des->left: %d, des->rows: %d\n", des->top, des->left, des->rows);
+	memcpy( des->buffer, bitmap_glyph->bitmap.buffer, size ); 
+	FT_Done_Glyph(glyph);
 	return size;
 }
+
 #endif
 
 int 
@@ -476,20 +505,17 @@ Get_FontBMP(LCUI_Font *font_data, wchar_t ch, int pixel_size, LCUI_FontBMP *out_
 {
 #ifdef USE_FREETYPE
 	size_t size;
-	BOOL have_space = IS_FALSE;
+	BOOL have_space = FALSE;
 	
 	FT_Face         p_FT_Face = NULL;   /* face对象的句柄 */ 
-	FT_BitmapGlyph  bitmap_glyph;
-	FT_Glyph        glyph; 
 	FT_Error        error;
 	
-	if(font_data != NULL) {
+	if( font_data ) {
 	 /* 如果LCUI_Font结构体中的字体信息有效，就打开结构体中的指定的字体文件，并
 	  * 将字体文件和face对象的句柄保存至结构体中。
 	  * 当然，如果LCUI_Font结构体有有效的字体文件和face对象的句柄，就直接返回0。
 	  */
-		if(font_data->ft_face == NULL 
-		 || font_data->ft_lib == NULL ) { 
+		if( !font_data->ft_face || !font_data->ft_lib ) { 
 			error = Open_Fontfile( font_data, 
 					font_data->font_file.string);
 			if(error) {
@@ -504,36 +530,20 @@ Get_FontBMP(LCUI_Font *font_data, wchar_t ch, int pixel_size, LCUI_FontBMP *out_
 	}
 	
 	FT_Select_Charmap( p_FT_Face, FT_ENCODING_UNICODE ); /* 设定为UNICODE，默认的也是 */
-	FT_Set_Pixel_Sizes( p_FT_Face, 0, pixel_size ); /* 设定字体尺寸 */ 
-	
+	FT_Set_Pixel_Sizes( p_FT_Face, 0, pixel_size ); /* 设定字体尺寸 */
 	if( ch == ' ' ) {
 		ch = 'a';
-		have_space = IS_TRUE;
+		have_space = TRUE;
 	}
 	/* 这个函数只是简单地调用FT_Get_Char_Index和FT_Load_Glyph */
 	error = FT_Load_Char( p_FT_Face, ch, font_data->load_flags);
 	if(error) {
 		return error; 
 	}
-	
-	/* 从插槽中提取一个字形图像 
-	 * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
-	error = FT_Get_Glyph( p_FT_Face->glyph, &glyph );
-	if(error) {
-		return error; 
-	}
-	if ( glyph->format != FT_GLYPH_FORMAT_BITMAP ) {
-		error = FT_Glyph_To_Bitmap(&glyph, font_data->render_mode, 0 ,1);
-		if(error) {
-			return error;
-		}
-	}
-	bitmap_glyph = (FT_BitmapGlyph)glyph;
-	size = Convert_FT_BitmapGlyph (out_bitmap, bitmap_glyph);
+	size = Convert_FTGlyph( out_bitmap, p_FT_Face->glyph, font_data->render_mode );
 	if( have_space ) {
 		memset( out_bitmap->buffer, 0, size );
 	}
-	FT_Done_Glyph(glyph);
 	return 0;
 #else
 	Get_Default_FontBMP( ch, out_bitmap );

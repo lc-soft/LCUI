@@ -271,7 +271,6 @@ typedef struct	_LCUI_RGBA		LCUI_RGBA;
 typedef struct	_LCUI_FontBMP		LCUI_FontBMP;
 typedef struct	_LCUI_Graph		LCUI_Graph;
 typedef struct	_LCUI_Font		LCUI_Font;
-typedef struct	_LCUI_TS		LCUI_TS;
 typedef struct	_LCUI_MouseEvent	LCUI_MouseEvent;
 typedef struct	_LCUI_Key		LCUI_Key;
 typedef struct	_LCUI_Pos		LCUI_Pos;
@@ -353,15 +352,15 @@ struct _LCUI_Rect /* 可记录需刷新的区域 */
 /********** 保存字体位图数据 ***************/
 struct _LCUI_FontBMP
 {
-	int top;
-	int left;
-	int width;
-	int rows;
+	int top;		/* 与顶边框的距离 */
+	int left;		/* 与左边框的距离 */
+	int width;		/* 位图宽度 */
+	int rows;		/* 位图行数 */
 	int pitch;
-	uchar_t *buffer;
+	uchar_t *buffer;	/* 字体位图数据 */
 	short num_grays;
 	char pixel_mode;
-	LCUI_Pos advance;
+	LCUI_Pos advance;	/* XY轴的跨距 */
 };
 /*****************************************/
 
