@@ -74,23 +74,35 @@ show_textbox_cursor( )
 	Show_Widget( tb->cursor );
 }
 
+static void 
+update_textbox_cursor( LCUI_Pos pixel_pos )
+{
+	LCUI_Pos pos;
+	LCUI_TextBox *tb;
+	LCUI_TextLayer *layer; 
+	Text_RowData *row_ptr;
+	
+	tb = Get_Widget_PrivData( active_textbox );
+	layer = Label_Get_TextLayer( tb->text );
+	pos = TextLayer_Get_Cursor_Pos( layer );
+	row_ptr = Queue_Get( &layer->rows_data, pos.y );
+	pixel_pos.y += 2;
+	Move_Widget( tb->cursor, pixel_pos );
+	Resize_Widget( tb->cursor, Size(1, row_ptr->max_size.h) );
+	show_textbox_cursor(); /* 让光标在移动时显示 */
+}
+
 static void
 set_textbox_cursor_despos( LCUI_Pos pos )
 {
 	LCUI_Pos pixel_pos;
 	LCUI_TextBox *tb;
 	LCUI_TextLayer *layer;
-	Text_RowData *row_ptr;
 	
 	tb = Get_Widget_PrivData( active_textbox ); 
 	layer = Label_Get_TextLayer( tb->text );
 	pixel_pos = TextLayer_Set_Cursor_PixelPos( layer, pos );
-	pixel_pos.y += 2;
-	pos = TextLayer_Get_Cursor_Pos( layer );
-	row_ptr = Queue_Get( &layer->rows_data, pos.y );
-	Move_Widget( tb->cursor, pixel_pos );
-	Resize_Widget( tb->cursor, Size(1, row_ptr->max_size.h) );
-	show_textbox_cursor(); /* 让光标在移动时显示 */
+	update_textbox_cursor( pixel_pos );
 	//printf( "set_textbox_cursor_despos(): cursor pos: %d,%d\n", pos.x, pos.y );
 }
 static void 
@@ -122,11 +134,12 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_DragEvent *event )
 static void
 TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 {
+	wchar_t *text_ptr;
 	int cols, rows;
 	LCUI_Pos cur_pos, pixel_pos;
 	LCUI_TextLayer *layer;
 	
-	printf("you input %d\n", key->code);
+	//printf("you input %d\n", key->code);
 	layer = TextBox_Get_TextLayer( widget );
 	cur_pos = TextLayer_Get_Cursor_Pos( layer );
 	cols = TextLayer_Get_RowLen( layer, cur_pos.y );
@@ -144,6 +157,8 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 		TextLayer_Text_Backspace( layer, 1 );
 		Update_Widget( widget );
 		cur_pos = TextLayer_Get_Cursor_Pos( layer );
+		text_ptr = TextLayer_Get_Text( layer ); 
+		free( text_ptr );
 		goto mv_cur_pos;
 		
 	    case KEY_LEFT:
@@ -177,7 +192,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 		/* 移动光标位置 */
 mv_cur_pos:;
 		pixel_pos = TextLayer_Set_Cursor_Pos( layer, cur_pos );
-		set_textbox_cursor_despos( pixel_pos ); 
+		update_textbox_cursor( pixel_pos );
 		cur_pos = TextLayer_Get_Cursor_Pos( layer );
 		break;
 		
