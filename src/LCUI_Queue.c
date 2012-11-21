@@ -247,6 +247,14 @@ int Queue_Insert( LCUI_Queue * queue, int pos, const void *data)
 	return Queue_Move(queue, pos, src_pos); 
 }
 
+int Queue_Insert_Pointer( LCUI_Queue * queue, int pos, const void *data)
+/* 功能：向队列中指定位置插入成员的指针 */
+{
+	int src_pos;
+	src_pos = Queue_Add_Pointer(queue, data);
+	return Queue_Move(queue, pos, src_pos); 
+}
+
 int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos)
 /* 功能：将队列中指定位置的成员移动至目的位置 */
 {
@@ -646,7 +654,7 @@ int Queue_Delete_Pointer (LCUI_Queue * queue, int pos)
  * 下面有两个main函数，用于对本文件内的函数进行测试，你可以选择其中一个main函数，编译
  * 并运行，看看结果
  * */
-#define test_1
+#define test_2
 #ifdef test_1
 /* 测试Queue_Cat函数 */
 int main()
@@ -749,7 +757,7 @@ int main()
 	return 0;
 }
 #endif
-#ifdef test_2
+#ifdef test_3
 /* 
  * 功能：测试通用队列的基本功能
  * 说明：此函数是将‘0’-’9‘的字符存入通用队列中，之后再取出保存至字符串中，最后打印字符串
