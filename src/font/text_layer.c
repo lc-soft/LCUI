@@ -529,26 +529,6 @@ TextLayer_Get_Current_RowData ( LCUI_TextLayer *layer )
 	return Queue_Get( &layer->rows_data, layer->current_des_pos.y );
 }
 
-int
-TextLayer_Text_Get_CurCharPos ( LCUI_TextLayer *layer )
-/* 获取当前光标所在的字符的位置 */
-{
-	LCUI_Pos pos;
-	LCUI_CharData *char_ptr;
-	Text_RowData *row_ptr;
-	
-	pos = TextLayer_Get_Cursor_Pos( layer );
-	row_ptr = Queue_Get( &layer->rows_data, pos.y );
-	if( !row_ptr ) {
-		return -1;
-	}
-	char_ptr = Queue_Get( &row_ptr->string, pos.x );
-	if( !char_ptr ) {
-		return -1;
-	}
-	
-	return char_ptr->pos;
-}
 
 static void
 TextLayer_Update_RowSize (LCUI_TextLayer *layer, int row )
@@ -918,7 +898,7 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 	
 	DEBUG_MSG("%s\n", new_text);
 	
-	LCUI_CharData char_data; 
+	LCUI_CharData *char_ptr, char_data; 
 	Text_RowData *current_row_data;
 	
 	/* 如果有选中的文本，那就删除 */
@@ -957,10 +937,8 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 			char_data.need_update = FALSE; 
 			FontBMP_Init( &char_data.bitmap ); 
 		}
-		while(n_ignore > 0) { 
-			char_data.pos = p-buff;
+		while(n_ignore > 0) {
 			char_data.char_code = *p++;
-			printf("char: %c, pos; %d\n", char_data.char_code, char_data.pos);
 			Queue_Insert( &layer->text_source_data, 
 				layer->current_src_pos, &char_data );
 			/* 遇到换行符，那就增加新行 */
@@ -969,9 +947,8 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 				current_row_data = Queue_Get( &layer->rows_data, rows );
 				layer->current_des_pos.x = 0;
 				layer->current_des_pos.y = rows;
-			} else {
-				++layer->current_src_pos; 
 			}
+			++layer->current_src_pos; 
 			--n_ignore;
 			if(n_ignore == 0) {
 				n_ignore = -1;
@@ -982,14 +959,16 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 			--p; n_ignore = 0;
 			continue;
 		}
-		char_data.pos = p-buff;
 		char_data.char_code = *p;
-		printf("char: %c, pos; %d\n", *p, p-buff);
 		char_data.display = TRUE; 
 		char_data.need_update = TRUE; 
-		char_data.data = TextLayer_Get_Current_TextStyle( layer );  
+		char_data.data = TextLayer_Get_Current_TextStyle( layer );
+		/* 插入至源文本中 */
 		Queue_Insert( &layer->text_source_data, layer->current_src_pos, &char_data ); 
-		Queue_Insert( &current_row_data->string, layer->current_des_pos.x, &char_data ); 
+		/* 获取源文本中的字符数据的指针 */
+		char_ptr = Queue_Get( &layer->text_source_data, layer->current_src_pos ); 
+		/* 将该指针添加至行数据队列中 */
+		Queue_Insert_Pointer( &current_row_data->string, layer->current_des_pos.x, char_ptr ); 
 		
 		++layer->current_src_pos;
 		++layer->current_des_pos.x; 
@@ -1249,7 +1228,6 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 		char_ptr = Queue_Get( &row_ptr->string, i ); 
 		x += char_ptr->bitmap.advance.x;
 	}
-	printf("char_pos.x: %d, len: %d\n", char_pos.x, len);
 	for( i=char_pos.x; i<len; ++i ) {
 		char_ptr = Queue_Get( &row_ptr->string, i );
 		if( !char_ptr ) {
@@ -1350,8 +1328,8 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 			RectQueue_Add( &layer->clear_area, area );
 			area.x += char_ptr->bitmap.width;
 			/* 将该字从源字符串中删除 */
-			printf("delete: %c, pos: %d\n",char_ptr->char_code, char_ptr->pos);
-			Queue_Delete( &layer->text_source_data, char_ptr->pos );
+			//ppp = Queue_Get(&layer->text_source_data, char_ptr->pos);  
+			//Queue_Delete( &layer->text_source_data, char_ptr->pos );
 			/* 该字在这行的字体位图也需要删除 */
 			Queue_Delete( &row_ptr->string, start_n );
 			--len;
@@ -1419,6 +1397,81 @@ TextLayer_Text_Delete( LCUI_TextLayer *layer, int n )
 	return 0;
 }
 
+static uint32_t 
+TextLayer_Update_CurSrcPos( LCUI_TextLayer *layer, int left_or_right )
+/* 更新当前光标所在的字符 对应于源文本中的位置 */
+{
+	int n, total;
+	LCUI_Pos pos;
+	LCUI_CharData *tmp_ptr, *char_ptr;
+	Text_RowData *row_ptr;
+	
+	pos = TextLayer_Get_Cursor_Pos( layer );
+	row_ptr = Queue_Get( &layer->rows_data, pos.y );
+	if( !row_ptr ) {
+		return -1;
+	}
+	char_ptr = Queue_Get( &row_ptr->string, pos.x );
+	if( !char_ptr ) {
+		return -1;
+	}
+	total = Queue_Get_Total( &layer->text_source_data );
+	if( left_or_right == 0 ) {
+		printf( "left, char_ptr: %p, char_code: %c\n", char_ptr, char_ptr->char_code );
+		/* 先向左遍历源文本，匹配地址 */
+		for( n=layer->current_src_pos; n>=0; --n ) {
+			tmp_ptr = Queue_Get( &layer->text_source_data, n );
+			printf( "get, char_ptr: %p, char_code: %c\n", 
+			tmp_ptr, tmp_ptr->char_code );
+			if( tmp_ptr == char_ptr ) {
+				break;
+			}
+		}
+		/* 若没有匹配到，再向右遍历 */
+		if( n < 0 ) {
+			printf(" not found, again\n ");
+			for( n=layer->current_src_pos; n<total; ++n ) {
+				tmp_ptr = Queue_Get( &layer->text_source_data, n );
+				if( tmp_ptr == char_ptr ) {
+					break;
+				}
+			}
+		}
+		/* 若没有匹配到 */
+		if( n >= total ) {
+			n = 0;
+		}
+	} else {
+		printf( "right, char_ptr: %p, char_code: %c\n", char_ptr, char_ptr->char_code );
+		/* 先向右遍历源文本，匹配地址 */
+		for( n=layer->current_src_pos; n<total; ++n ) {
+			tmp_ptr = Queue_Get( &layer->text_source_data, n );
+			printf( "get, char_ptr: %p, char_code: %c\n", 
+			tmp_ptr, tmp_ptr->char_code );
+			if( tmp_ptr == char_ptr ) {
+				break;
+			}
+		}
+		/* 若没有匹配到，再向左遍历 */
+		if( n >= total ) {
+			printf(" not found, again\n ");
+			for( n=layer->current_src_pos; n>=0; --n ) {
+				tmp_ptr = Queue_Get( &layer->text_source_data, n );
+				if( tmp_ptr == char_ptr ) {
+					break;
+				}
+			}
+		} 
+		/* 若没有匹配到 */
+		if( n < 0 ) {
+			n = 0;
+		}
+	}
+	layer->current_src_pos = n;
+	printf( "layer->current_src_pos: %d\n", n );
+	return layer->current_src_pos;
+}
+
 LCUI_Pos 
 TextLayer_Get_Char_PixelPos( LCUI_TextLayer *layer, uint32_t char_pos )
 /* 根据源文本中的位置，获取该位置的字符相对于文本图层的坐标 */
@@ -1475,6 +1528,17 @@ TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 		break;
 	}
 	pos.x = n;
+	/* 判断光标位置变化，以快速确定当前字符在源文本中的位置并更新 */
+	if( layer->current_des_pos.y > pos.y 
+	 || (layer->current_des_pos.y == pos.y 
+	 && layer->current_des_pos.x > pos.x)) {
+		 /* 优先向左边遍历 */
+		TextLayer_Update_CurSrcPos( layer, 0 );
+	} 
+	else if( layer->current_des_pos.y == pos.y && layer->current_des_pos.x == pos.x );
+	else { /* 优先向右边遍历 */
+		TextLayer_Update_CurSrcPos( layer, 1 );
+	}
 	layer->current_des_pos = pos;
 	return new_pos;
 }
@@ -1527,6 +1591,18 @@ TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos )
 		pixel_pos.x += char_ptr->bitmap.advance.x;
 		//printf("TextLayer_Set_Cursor_Pos(): pixel pos x: %d, total: %d, cols: %d, pos.x: %d\n", 
 		//pixel_pos.x, total, cols, pos.x);
+	}
+	printf("layer->current_des_pos: %d,%d,  pos: %d,%d\n",
+	layer->current_des_pos.x, layer->current_des_pos.y, pos.x, pos.y );
+	if( layer->current_des_pos.y > pos.y 
+	 || (layer->current_des_pos.y == pos.y 
+	 && layer->current_des_pos.x > pos.x)) {
+		 /* 优先向左边遍历 */
+		TextLayer_Update_CurSrcPos( layer, 0 );
+	} 
+	else if( layer->current_des_pos.y == pos.y && layer->current_des_pos.x == pos.x );
+	else { /* 优先向右边遍历 */
+		TextLayer_Update_CurSrcPos( layer, 1 );
 	}
 	layer->current_des_pos = pos;
 	return pixel_pos;

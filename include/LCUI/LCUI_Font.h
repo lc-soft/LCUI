@@ -140,12 +140,12 @@ typedef enum _font_decoration	enum_font_decoration;
 /********* 保存字体相关数据以及位图 ********/
 struct _LCUI_CharData
 {
-	uint32_t pos;		/* 对应字符串中的位置 */
-	wchar_t char_code;	/* 字符码 */
-	LCUI_FontBMP bitmap;	/* 字体位图 */
 	BOOL display:1;		/* 标志，是否需要显示该字 */
 	BOOL need_update:1;	/* 标志，表示是否需要刷新该字的字体位图数据 */
 	//BOOL using_quote:2;	/* 标志，表示是否引用了现成的文本样式 */
+	
+	wchar_t char_code;	/* 字符码 */
+	LCUI_FontBMP bitmap;	/* 字体位图 */
 	LCUI_TextStyle *data;	/* 文本样式数据 */
 };
 /***************************************/
@@ -206,6 +206,7 @@ struct _LCUI_TextStyle
 
 struct _LCUI_TextLayer
 {
+	BOOL read_only		:1;	/* 指示文本内容是否为只读 */
 	BOOL using_code_mode	:1;	/* 指示是否开启代码模式 */
 	BOOL using_style_tags	:1;	/* 指示是否处理样式标签 */
 	BOOL enable_word_wrap	:1;	/* 指示是否自动换行 */
@@ -294,9 +295,16 @@ LCUI_Size
 TextLayer_Get_Size ( LCUI_TextLayer *layer );
 /* 获取文本图层的实际尺寸 */
 
+wchar_t *
+TextLayer_Get_Text( LCUI_TextLayer *layer );
+
 void
 TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style );
 /* 设定默认的文本样式，需要调用TextLayer_Draw函数进行文本位图更新 */
+
+void 
+TextLayer_ReadOnly( LCUI_TextLayer *layer, BOOL flag );
+/* 指定文本图层中的文本是否为只读 */
 
 int
 TextLayer_Text( LCUI_TextLayer *layer, char *new_text );
