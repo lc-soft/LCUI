@@ -86,12 +86,13 @@
 #define LC_CHECKBOX_H	<LCUI/LCUI_CheckBox.h>
 #define LC_RADIOBTN_H	<LCUI/LCUI_RadioButton.h>
 #define LC_ACTIVEBOX_H	<LCUI/LCUI_ActiveBox.h> 
+#define LC_TEXTBOX_H	<LCUI/LCUI_TextBox.h>
 #endif
 
 
 
 #ifdef DEBUG
-#define DEBUG_MSG(format, ...) printf(__FILE__" %d:"format, __LINE__,##__VA_ARGS__)
+#define DEBUG_MSG(format, ...) printf(__FILE__" %s(): %d:"format, __FUNCTION__, __LINE__,##__VA_ARGS__)
 #else
 #define DEBUG_MSG(format, ...) 
 #endif
