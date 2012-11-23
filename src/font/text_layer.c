@@ -514,6 +514,7 @@ TextLayer_Text_Add_NewRow ( LCUI_TextLayer *layer )
 	/* 单整行最大尺寸改变时，需要移动整行，目前还未支持此功能 */
 	data.pos = Pos(0,0); 
 	data.max_size = Size(0,0);
+	data.last_char = NULL;
 	Queue_Init( &data.string, sizeof(LCUI_CharData), NULL );
 	/* 使用链表模式，方便数据的插入 */
 	Queue_Set_DataMode( &data.string, QUEUE_DATA_MODE_LINKED_LIST );
@@ -915,13 +916,13 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 		if( layer->using_style_tags ) {
 			/* 处理样式的结束标签 */ 
 			q = handle_style_endtag ( layer, p );
-			if(q != NULL) {
+			if( q ) {
 				/* 计算需忽略的字符数 */
 				n_ignore = q-p+1;
 			} else {
 				/* 处理样式标签 */
 				q = handle_style_tag ( layer, p ); 
-				if( q != NULL ) {
+				if( q ) {
 					n_ignore = q-p+1;
 				}
 			}
@@ -939,10 +940,12 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 		}
 		while(n_ignore > 0) {
 			char_data.char_code = *p++;
-			Queue_Insert( &layer->text_source_data, 
-				layer->current_src_pos, &char_data );
+			Queue_Insert( &layer->text_source_data, layer->current_src_pos, &char_data ); 
+			char_ptr = Queue_Get( &layer->text_source_data, layer->current_src_pos );
 			/* 遇到换行符，那就增加新行 */
 			if(char_data.char_code == '\n') {
+				/* 换行符的数据单独保存 */
+				current_row_data->last_char = char_ptr;
 				rows = TextLayer_Text_Add_NewRow( layer ); 
 				current_row_data = Queue_Get( &layer->rows_data, rows );
 				layer->current_des_pos.x = 0;
@@ -1063,7 +1066,7 @@ TextLayer_Merge( LCUI_TextLayer *des, LCUI_TextLayer *src )
 			des_ptr = Queue_Get( &des_row_ptr->string, j );
 			area.x += des_ptr->bitmap.left;
 			/* 获取字体大小 */
-			if(src_ptr->data == NULL) {
+			if( !src_ptr->data ) {
 				new_size = 12;
 			} else {
 				if(src_ptr->data->pixel_size > 0) {
@@ -1072,7 +1075,7 @@ TextLayer_Merge( LCUI_TextLayer *des, LCUI_TextLayer *src )
 					new_size = 12;
 				}
 			}
-			if(des_ptr->data == NULL) {
+			if( !des_ptr->data ) {
 				old_size = 12;
 			} else {
 				if(des_ptr->data->pixel_size > 0) {
@@ -1101,7 +1104,7 @@ TextLayer_Merge( LCUI_TextLayer *des, LCUI_TextLayer *src )
 				tmp_area.x = area.x;
 				tmp_area.y = area.y + old_size+2 - des_ptr->bitmap.top;
 				tmp_area.width = des_ptr->bitmap.width;
-				tmp_area.height = des_ptr->bitmap.rows; 
+				tmp_area.height = des_ptr->bitmap.rows;
 				RectQueue_Add( &des->clear_area, tmp_area ); 
 				area.x += des_ptr->bitmap.width;
 				FontBMP_Free(&des_ptr->bitmap); 
@@ -1109,24 +1112,26 @@ TextLayer_Merge( LCUI_TextLayer *des, LCUI_TextLayer *src )
 				area.x += des_ptr->bitmap.width;
 			}
 		}
-		if( src_len < max_len ) {
-			/* 如果这一行删减了几个字，则记录区域 */
-			for(j=min_len; j<max_len; ++j) {
-				des_ptr = Queue_Get( &des_row_ptr->string, j );
-				if(des_ptr->data == NULL) {
-					old_size = 12;
+		if( src_len >= max_len ) {
+			area.y += des_row_ptr->max_size.h; 
+			continue;
+		}
+		/* 如果这一行删减了几个字，则记录区域 */
+		for(j=min_len; j<max_len; ++j) {
+			des_ptr = Queue_Get( &des_row_ptr->string, j );
+			if( !des_ptr->data ) {
+				old_size = 12;
+			} else {
+				if(des_ptr->data->pixel_size > 0) {
+					old_size = des_ptr->data->pixel_size;
 				} else {
-					if(des_ptr->data->pixel_size > 0) {
-						old_size = des_ptr->data->pixel_size;
-					} else {
-						old_size = 12;
-					}
+					old_size = 12;
 				}
-				area.x += des_ptr->bitmap.left;
-				area.width = area.height = old_size+2;
-				RectQueue_Add( &des->clear_area, area );
-				area.x += des_ptr->bitmap.width;
 			}
+			area.x += des_ptr->bitmap.left;
+			area.width = area.height = old_size+2;
+			RectQueue_Add( &des->clear_area, area );
+			area.x += des_ptr->bitmap.width;
 		} 
 		area.y += des_row_ptr->max_size.h; 
 	}
@@ -1141,7 +1146,7 @@ TextLayer_Merge( LCUI_TextLayer *des, LCUI_TextLayer *src )
 	} 
 	/* 转移数据 */
 	Destroy_Queue( &des->text_source_data );
-	des->text_source_data = src->text_source_data; 
+	des->text_source_data = src->text_source_data;
 	Destroy_Queue( &des->rows_data );
 	des->rows_data = src->rows_data;
 }
@@ -1243,243 +1248,136 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 	}
 }
 
-static int 
-_TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
-/* 以start_pos为起点，删除n个文字 */
-{
-	LCUI_Rect area;
-	LCUI_Pos tmp_pos;
-	int start_n, y, n, i, rows, cols;
-	BOOL multiline = TRUE, refresh = TRUE;
-	Text_RowData *row_ptr, *tmp_row;
-	LCUI_CharData *char_ptr;
-	
-	if( len <= 0 || start_pos.y < 0 || start_pos.x < 0 ) {
-		return -1;
-	}
-	/* 先确定起点位置的XY轴坐标 */
-	rows = Queue_Get_Total( &layer->rows_data );
-	for( y=0,n=0; n<start_pos.y; ++n ) {
-		row_ptr = Queue_Get( &layer->rows_data, n );
-		y += row_ptr->max_size.h;
-	}
-	row_ptr = Queue_Get( &layer->rows_data, start_pos.y );
-	if( !row_ptr ) {
-		return -1;
-	}
-	cols = Queue_Get_Total( &row_ptr->string );
-	for( i=0; i<cols; ++i ) {
-		char_ptr = Queue_Get( &row_ptr->string, i );
-		area.x += char_ptr->bitmap.left;
-		area.x += char_ptr->bitmap.width;
-	}
-	/* 然后开始删除字符，并记录这些字符的区域 */
-	for( n=start_pos.y; n<rows; ++n ) {
-		row_ptr = Queue_Get( &layer->rows_data, n );
-		cols = Queue_Get_Total( &row_ptr->string );
-		if( n == start_pos.y ) {
-			start_n = start_pos.x;
-		} else {
-			start_n = 0;
-		}
-		/* 如果只在一行内就把所需删除的字符删除完了 */
-		if( n == start_pos.y && start_pos.x + len <= cols ) { 
-			/* 标记后面的文字位图需要刷新 */
-			TextLayer_CharLater_Refresh( layer, start_pos );
-			multiline = FALSE;
-		}
-		//printf("1, start_n: %d, cols: %d, len: %d\n", start_n, cols, len);
-		/* 如果起点位置是行尾，且len大于0，那么，拼接两行文本 */
-		if( start_n == cols && len > 0 ) {
-			if( refresh ) {
-				tmp_pos.x = 0;
-				tmp_pos.y=start_pos.y+1;
-				/* 刷新该行后面所有行的字符 */
-				for( ; tmp_pos.y<rows; ++tmp_pos.y ) {
-					TextLayer_CharLater_Refresh( layer, tmp_pos );
-				}
-				refresh = FALSE;
-			}
-			/* 获取指向下一行文本的指针 */
-			tmp_row = Queue_Get( &layer->rows_data, n+1 );
-			/* 拼接至当前行行尾 */
-			Queue_Cat( &row_ptr->string, &tmp_row->string ); 
-			/* 销毁下一行的文本 */
-			Destroy_Queue( &tmp_row->string ); 
-			Queue_Delete( &layer->rows_data, n+1 );
-			/* 更新当前行的总字符数 */
-			cols = Queue_Get_Total( &row_ptr->string );
-			TextLayer_Update_RowSize( layer, n );
-			--len;
-		}
-		//printf("2, start_n: %d, cols: %d, len: %d\n", start_n, cols, len);
-		for( i=start_n; i<cols && len>0; ++i ) {
-			char_ptr = Queue_Get( &row_ptr->string, i );
-			if( !char_ptr ) {
-				continue;
-			}
-			/* 计算区域范围 */
-			area.x += char_ptr->bitmap.left;
-			area.y = y + row_ptr->max_size.h-1;
-			area.y -= char_ptr->bitmap.top;
-			area.width = char_ptr->bitmap.width;
-			area.height = char_ptr->bitmap.rows;
-			/* 记录需刷新的区域 */
-			RectQueue_Add( &layer->clear_area, area );
-			area.x += char_ptr->bitmap.width;
-			/* 将该字从源字符串中删除 */
-			//ppp = Queue_Get(&layer->text_source_data, char_ptr->pos);  
-			//Queue_Delete( &layer->text_source_data, char_ptr->pos );
-			/* 该字在这行的字体位图也需要删除 */
-			Queue_Delete( &row_ptr->string, start_n );
-			--len;
-		}
-		if( len <= 0 ) {
-			break;
-		}
-		y += row_ptr->max_size.h;
-	}
-	if( !multiline ) {
-		return 0;
-	}
-	printf("multiline\n");
-	/* 更新该行及后面的所有字符 */
-	//......
-	
-	return 0;
-}
 
-int 
-TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
-/* 删除光标左边处n个字符 */
+static int
+TextLayer_Get_CharPos( 
+	LCUI_TextLayer *layer, 
+	LCUI_CharData *char_ptr, 
+	int left_or_right )
+/* 获取指定字符数据在源文本中的位置 */
 {
-	int i, row_len;
-	LCUI_Pos char_pos;
-	Text_RowData *row_ptr;
+	int n, src_pos, total;
+	LCUI_CharData *tmp_ptr;
 	
-	if( layer->read_only ) {
+	if( !char_ptr ) {
 		return -1;
 	}
-	
-	if( n <= 0 ) {
-		return -2;
+	src_pos = layer->current_src_pos;
+	total = Queue_Get_Total( &layer->text_source_data );
+	//printf( "source text len: %d\n", total );
+	/* 确保起点位置有效 */
+	if( src_pos >= total ) {
+		src_pos = total-1;
 	}
-	/* 计算当前光标所在字的位置 */
-	char_pos = TextLayer_Get_Cursor_Pos( layer );
-	for( i=n; char_pos.y>=0; --char_pos.y ) {
-		row_ptr = Queue_Get( &layer->rows_data, char_pos.y );
-		row_len = Queue_Get_Total( &row_ptr->string );
-		
-		if( char_pos.x == -1 ) {
-			char_pos.x = row_len;
-		}
-		for( ; char_pos.x>=0 && i>0; --char_pos.x,--i );
-		
-		if( i<=0 && char_pos.x >= 0 ) {
+	if( src_pos < 0 ) {
+		src_pos = 0;
+	}
+	/* 判断遍历方向 */
+	if( left_or_right == 0 ) {
+		goto left_search;
+	} else {
+		goto right_search;
+	}
+	/* 确定该字在源文本中的位置 */
+left_search:
+	//printf( "left, char_ptr: %p, char_code: %c\n", 
+	//	char_ptr, char_ptr?char_ptr->char_code:'?' );
+	for( n=src_pos; n>=0 ;--n ) {
+		tmp_ptr = Queue_Get( &layer->text_source_data, n );
+		//printf( "get, char_ptr: %p, char_code: %c\n", 
+		//	tmp_ptr, tmp_ptr?tmp_ptr->char_code:'?' );
+		if( tmp_ptr == char_ptr ) {
 			break;
 		}
 	}
-	if( i>0 ) {
-		n -= i;
+	goto end_search;
+	
+right_search:
+	//printf( "right, char_ptr: %p, char_code: %c\n", 
+	//	char_ptr, char_ptr?char_ptr->char_code:'?' );
+	for( n=src_pos; n<total; ++n ) {
+		tmp_ptr = Queue_Get( &layer->text_source_data, n );
+		//printf( "get, char_ptr: %p, char_code: %c\n", 
+		//	tmp_ptr, tmp_ptr?tmp_ptr->char_code:'?' );
+		if( tmp_ptr == char_ptr ) {
+			break;
+		}
 	}
-	//printf("start_pos: %d,%d, len: %d\n", char_pos.x, char_pos.y, n);
-	/* 开始删除文字 */
-	_TextLayer_Text_Delete( layer, char_pos, n );
-	/* 删除完后，需要将光标向左移动一个位置 */
-	TextLayer_Set_Cursor_Pos( layer, char_pos );
-	return 0;
+	goto end_search;
+	
+end_search:
+	/* 检测遍历结果 */
+	if( left_or_right == 0 ) {
+		if( n < 0 ) {
+			goto right_search;
+		}
+		/* 未找到则返回-1 */
+		if( n >= total ) {
+			return -1;
+		}
+	} else {
+		if( n < 0 ) {
+			return -1;
+		}
+		if( n >= total ) {
+			goto left_search;
+		}
+	}
+	return n;
 }
 
-int 
-TextLayer_Text_Delete( LCUI_TextLayer *layer, int n )
-/* 删除光标右边处n个字符 */
-{
-	return 0;
-}
 
-static uint32_t 
-TextLayer_Update_CurSrcPos( LCUI_TextLayer *layer, int left_or_right )
-/* 更新当前光标所在的字符 对应于源文本中的位置 */
+static LCUI_CharData *
+TextLayer_Get_CurChar( LCUI_TextLayer *layer )
+/* 获取光标附近的字符数据的指针 */
 {
-	int n, total;
+	int total;
 	LCUI_Pos pos;
-	LCUI_CharData *tmp_ptr, *char_ptr;
+	LCUI_CharData *char_ptr;
 	Text_RowData *row_ptr;
 	
 	pos = TextLayer_Get_Cursor_Pos( layer );
 	row_ptr = Queue_Get( &layer->rows_data, pos.y );
 	if( !row_ptr ) {
-		return -1;
+		return NULL;
 	}
 	char_ptr = Queue_Get( &row_ptr->string, pos.x );
+	total = Queue_Get_Total( &row_ptr->string );
 	if( !char_ptr ) {
-		return -1;
-	}
-	total = Queue_Get_Total( &layer->text_source_data );
-	if( left_or_right == 0 ) {
-		printf( "left, char_ptr: %p, char_code: %c\n", char_ptr, char_ptr->char_code );
-		/* 先向左遍历源文本，匹配地址 */
-		for( n=layer->current_src_pos; n>=0; --n ) {
-			tmp_ptr = Queue_Get( &layer->text_source_data, n );
-			printf( "get, char_ptr: %p, char_code: %c\n", 
-			tmp_ptr, tmp_ptr->char_code );
-			if( tmp_ptr == char_ptr ) {
-				break;
-			}
-		}
-		/* 若没有匹配到，再向右遍历 */
-		if( n < 0 ) {
-			printf(" not found, again\n ");
-			for( n=layer->current_src_pos; n<total; ++n ) {
-				tmp_ptr = Queue_Get( &layer->text_source_data, n );
-				if( tmp_ptr == char_ptr ) {
-					break;
-				}
-			}
-		}
-		/* 若没有匹配到 */
-		if( n >= total ) {
-			n = 0;
-		}
-	} else {
-		printf( "right, char_ptr: %p, char_code: %c\n", char_ptr, char_ptr->char_code );
-		/* 先向右遍历源文本，匹配地址 */
-		for( n=layer->current_src_pos; n<total; ++n ) {
-			tmp_ptr = Queue_Get( &layer->text_source_data, n );
-			printf( "get, char_ptr: %p, char_code: %c\n", 
-			tmp_ptr, tmp_ptr->char_code );
-			if( tmp_ptr == char_ptr ) {
-				break;
-			}
-		}
-		/* 若没有匹配到，再向左遍历 */
-		if( n >= total ) {
-			printf(" not found, again\n ");
-			for( n=layer->current_src_pos; n>=0; --n ) {
-				tmp_ptr = Queue_Get( &layer->text_source_data, n );
-				if( tmp_ptr == char_ptr ) {
-					break;
-				}
-			}
-		} 
-		/* 若没有匹配到 */
-		if( n < 0 ) {
-			n = 0;
+		/* 如果当前光标在这行行尾 */
+		if( pos.x == total ) {
+			char_ptr = row_ptr->last_char;
+		} else {
+			return NULL;
 		}
 	}
-	layer->current_src_pos = n;
-	printf( "layer->current_src_pos: %d\n", n );
+	return char_ptr;
+}
+
+
+static int
+TextLayer_Get_Cursor_CharPos( LCUI_TextLayer *layer, int left_or_right )
+/* 根据光标当前所在位置，获取对于源字符串中的位置 */
+{
+	LCUI_CharData *char_ptr;
+	
+	char_ptr = TextLayer_Get_CurChar( layer );
+	return TextLayer_Get_CharPos( layer, char_ptr, left_or_right );
+}
+
+static int32_t 
+TextLayer_Update_CurSrcPos( LCUI_TextLayer *layer, int left_or_right )
+/* 更新当前光标所在的字符 对应于源文本中的位置 */
+{
+	int32_t pos;
+	pos = TextLayer_Get_Cursor_CharPos( layer, left_or_right );
+	if( pos >= 0 ) {
+		layer->current_src_pos = pos;
+	}
+	//printf( "layer->current_src_pos: %d\n", layer->current_src_pos );
 	return layer->current_src_pos;
 }
 
-LCUI_Pos 
-TextLayer_Get_Char_PixelPos( LCUI_TextLayer *layer, uint32_t char_pos )
-/* 根据源文本中的位置，获取该位置的字符相对于文本图层的坐标 */
-{
-	LCUI_Pos pos;
-	pos.x = pos.y = 0;
-	return pos;
-}
 
 LCUI_Pos 
 TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
@@ -1532,22 +1430,18 @@ TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 	if( layer->current_des_pos.y > pos.y 
 	 || (layer->current_des_pos.y == pos.y 
 	 && layer->current_des_pos.x > pos.x)) {
+		layer->current_des_pos = pos;
 		 /* 优先向左边遍历 */
 		TextLayer_Update_CurSrcPos( layer, 0 );
 	} 
-	else if( layer->current_des_pos.y == pos.y && layer->current_des_pos.x == pos.x );
-	else { /* 优先向右边遍历 */
+	else if( layer->current_des_pos.y == pos.y 
+		&& layer->current_des_pos.x == pos.x );
+	else { 
+		layer->current_des_pos = pos;
+		/* 优先向右边遍历 */
 		TextLayer_Update_CurSrcPos( layer, 1 );
 	}
-	layer->current_des_pos = pos;
 	return new_pos;
-}
-
-LCUI_Pos
-TextLayer_Get_Cursor_Pos( LCUI_TextLayer *layer )
-/* 获取光标在文本框中的位置，也就是光标在哪一行的哪个字后面 */
-{
-	return layer->current_des_pos;
 }
 
 LCUI_Pos
@@ -1561,8 +1455,11 @@ TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos )
 	
 	pixel_pos.x = pixel_pos.y = 0;
 	total = Queue_Get_Total( &layer->rows_data );
-	if( pos.y > total ) {
-		pos.y = total;
+	if( pos.y >= total ) {
+		pos.y = total-1;
+	}
+	if( pos.y < 0 ) {
+		pos.y = 0;
 	}
 	/* 累加pos.y行之前几行的高度 */
 	for( pixel_pos.y=0,rows=0; rows<pos.y; ++rows ) {
@@ -1582,6 +1479,9 @@ TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos )
 	if( pos.x > total ) {
 		pos.x = total;
 	}
+	if( pos.x < 0 ) {
+		pos.x = 0;
+	}
 	/* 累计宽度 */
 	for( pixel_pos.x=0,cols=0; cols<pos.x; ++cols ) {
 		char_ptr = Queue_Get( &row_ptr->string, cols );
@@ -1592,20 +1492,225 @@ TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos )
 		//printf("TextLayer_Set_Cursor_Pos(): pixel pos x: %d, total: %d, cols: %d, pos.x: %d\n", 
 		//pixel_pos.x, total, cols, pos.x);
 	}
-	printf("layer->current_des_pos: %d,%d,  pos: %d,%d\n",
-	layer->current_des_pos.x, layer->current_des_pos.y, pos.x, pos.y );
+	//printf("layer->current_des_pos: %d,%d,  pos: %d,%d\n",
+	//layer->current_des_pos.x, layer->current_des_pos.y, pos.x, pos.y );
 	if( layer->current_des_pos.y > pos.y 
 	 || (layer->current_des_pos.y == pos.y 
 	 && layer->current_des_pos.x > pos.x)) {
-		 /* 优先向左边遍历 */
+		layer->current_des_pos = pos;
 		TextLayer_Update_CurSrcPos( layer, 0 );
 	} 
-	else if( layer->current_des_pos.y == pos.y && layer->current_des_pos.x == pos.x );
-	else { /* 优先向右边遍历 */
+	else if( layer->current_des_pos.y == pos.y 
+		&& layer->current_des_pos.x == pos.x );
+	else {
+		layer->current_des_pos = pos;
 		TextLayer_Update_CurSrcPos( layer, 1 );
 	}
 	layer->current_des_pos = pos;
 	return pixel_pos;
+}
+
+
+int 
+TextLayer_Text_Delete( LCUI_TextLayer *layer, int n )
+/* 删除光标右边处n个字符 */
+{
+	return 0;
+}
+
+static int
+TextLayer_Text_DeleteChar( 
+		LCUI_TextLayer *layer, 
+		LCUI_CharData *char_ptr, 
+		int left_or_right )
+/* 
+ * 功能：将字符数据从源文本中移除
+ * 参数：
+ * layer         操作对象
+ * char_ptr      指向所要删除的字符数据的指针
+ * left_or_right 指定在源文本中遍历的方向，值为0时是向左遍历，其它值则像右遍历
+ *  */
+{
+	int n;
+	n = TextLayer_Get_CharPos( layer, char_ptr, left_or_right );
+	/* 将该字从源文本中移除 */
+	Queue_Delete( &layer->text_source_data, n );
+	return 0;
+}
+
+
+static int 
+_TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
+/* 以start_pos为起点，删除n个文字 */
+{
+	LCUI_Rect area;
+	LCUI_Pos tmp_pos;
+	BOOL refresh = TRUE;
+	LCUI_CharData *char_ptr;
+	Text_RowData *row_ptr, *tmp_row;
+	int left_or_right, x, y, i, rows, cols;
+	
+	if( start_pos.x < 0 ) {
+		len += start_pos.x;
+		start_pos.x = 0;
+	}
+	if( start_pos.y < 0 ) {
+		start_pos.y = 0;
+	}
+	if( len <= 0 ) {
+		return -1;
+	}
+	/* 先确定起点位置的XY轴坐标 */
+	rows = Queue_Get_Total( &layer->rows_data );
+	for( y=0,i=0; i<start_pos.y; ++i ) {
+		row_ptr = Queue_Get( &layer->rows_data, i );
+		y += row_ptr->max_size.h;
+	}
+	row_ptr = Queue_Get( &layer->rows_data, start_pos.y );
+	if( !row_ptr ) {
+		return -1;
+	}
+	cols = Queue_Get_Total( &row_ptr->string );
+	for( x=0,i=0; i<start_pos.x; ++i ) {
+		char_ptr = Queue_Get( &row_ptr->string, i );
+		if( !char_ptr ) {
+			continue;
+		}
+		x += char_ptr->bitmap.advance.x;
+	}
+	/* 根据光标所在位置，确定遍历方向 */
+	if( layer->current_des_pos.y > start_pos.y 
+	 || (layer->current_des_pos.y == start_pos.y 
+	 && layer->current_des_pos.x > start_pos.x)) {
+		left_or_right = 0;
+	}
+	else {
+		left_or_right = 1;
+	}
+	
+	/* 如果需删除的字符只在当前行 */
+	if( start_pos.x + len <= cols ) {
+		/* 标记后面的文字位图需要刷新 */
+		TextLayer_CharLater_Refresh( layer, start_pos );
+	}
+	for( ; start_pos.x<=cols && len>0; --len ) {
+		/* 如果到了行尾 */
+		if( start_pos.x == cols ) {
+			/* 如果当前行是最后一行 */
+			if( start_pos.y >= rows-1 ) {
+				break;
+			}
+			if( refresh ) {
+				tmp_pos.x = 0;
+				tmp_pos.y=start_pos.y+1;
+				/* 刷新该行后面所有行的字符 */
+				for( ; tmp_pos.y<rows; ++tmp_pos.y ) {
+					TextLayer_CharLater_Refresh( layer, tmp_pos );
+				}
+				refresh = FALSE;
+			}
+			
+			/* 将当前行行尾的换行符'\n'从源文本中移除 */
+			TextLayer_Text_DeleteChar( layer, row_ptr->last_char, left_or_right );
+			/* 获取指向下一行文本的指针 */
+			tmp_row = Queue_Get( &layer->rows_data, start_pos.y+1 );
+			/* 将下一行的文本拼接至当前行行尾 */
+			Queue_Cat( &row_ptr->string, &tmp_row->string );
+			/* 将下一行的行尾字符数据转移至当前行 */
+			row_ptr->last_char = tmp_row->last_char;
+			/* 销毁下一行的文本 */
+			Destroy_Queue( &tmp_row->string ); 
+			Queue_Delete( &layer->rows_data, start_pos.y+1 );
+			/* 更新当前行的总字符数 */
+			cols = Queue_Get_Total( &row_ptr->string );
+			/* 更新总行数 */
+			rows = Queue_Get_Total( &layer->rows_data );
+			/* 更新当前行的尺寸 */
+			TextLayer_Update_RowSize( layer, start_pos.y );
+			continue;
+		}
+		char_ptr = Queue_Get( &row_ptr->string, start_pos.x );
+		if( !char_ptr ) {
+			continue;
+		}
+		/* 计算区域范围 */
+		area.x = x + char_ptr->bitmap.left;
+		area.y = y + row_ptr->max_size.h-1;
+		area.y -= char_ptr->bitmap.top;
+		area.width = char_ptr->bitmap.width;
+		area.height = char_ptr->bitmap.rows;
+		/* 记录需刷新的区域 */
+		RectQueue_Add( &layer->clear_area, area );
+		
+		x += char_ptr->bitmap.advance.x;
+		/* 将该字从源文本中移除 */
+		TextLayer_Text_DeleteChar( layer, char_ptr, left_or_right );
+		/* 该字在这行的字体位图也需要删除 */
+		Queue_Delete( &row_ptr->string, start_pos.x );
+		char_ptr = Queue_Get( &row_ptr->string, start_pos.x );
+		cols = Queue_Get_Total( &row_ptr->string );
+	}
+	return 0;
+}
+
+int 
+TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
+/* 删除光标左边处n个字符 */
+{
+	int i, row_len;
+	LCUI_Pos char_pos;
+	Text_RowData *row_ptr;
+	
+	if( layer->read_only ) {
+		return -1;
+	}
+	
+	if( n <= 0 ) {
+		return -2;
+	}
+	/* 计算当前光标所在字的位置 */
+	char_pos = TextLayer_Get_Cursor_Pos( layer );
+	//printf( "before: %d,%d\n", char_pos.x, char_pos.y );
+	for( i=n; char_pos.y>=0; --char_pos.y ) {
+		row_ptr = Queue_Get( &layer->rows_data, char_pos.y );
+		row_len = Queue_Get_Total( &row_ptr->string );
+		
+		if( char_pos.x == -1 ) {
+			char_pos.x = row_len;
+		}
+		for( ; char_pos.x>=0 && i>0; --char_pos.x,--i );
+		
+		if( i<=0 && char_pos.x >= 0 ) {
+			break;
+		}
+	}
+	//printf( "after: %d,%d\n", char_pos.x, char_pos.y );
+	if( i>0 ) {
+		n -= i;
+	}
+	//printf("start_pos: %d,%d, len: %d\n", char_pos.x, char_pos.y, n);
+	/* 开始删除文字 */
+	_TextLayer_Text_Delete( layer, char_pos, n );
+	/* 删除完后，需要将光标向左移动一个位置 */
+	TextLayer_Set_Cursor_Pos( layer, char_pos );
+	return 0;
+}
+
+
+LCUI_Pos 
+TextLayer_Get_Char_PixelPos( LCUI_TextLayer *layer, uint32_t char_pos )
+/* 根据源文本中的位置，获取该位置的字符相对于文本图层的坐标 */
+{
+	LCUI_Pos pos;
+	pos.x = pos.y = 0;
+	return pos;
+}
+
+LCUI_Pos
+TextLayer_Get_Cursor_Pos( LCUI_TextLayer *layer )
+/* 获取光标在文本框中的位置，也就是光标在哪一行的哪个字后面 */
+{
+	return layer->current_des_pos;
 }
 
 int
@@ -1634,12 +1739,6 @@ TextLayer_Get_Rows( LCUI_TextLayer *layer )
 	return Queue_Get_Total( &layer->rows_data );
 }
 
-int
-TextLayer_Get_Cursor_CharPos( LCUI_TextLayer *layer )
-/* 根据光标当前所在位置，获取对于源字符串中的位置 */
-{
-	return 0;
-}
 
 int 
 TextLayer_Get_Select_Text( LCUI_TextLayer *layer, char *out_text )

@@ -156,6 +156,7 @@ struct _Text_RowData
 	LCUI_Size max_size;	/* 记录最大尺寸 */
 	LCUI_Pos pos;		/* 当前行所在的位置 */
 	LCUI_Queue string;	/* 这个队列中的成员用于引用源文本的字体数据 */
+	LCUI_CharData *last_char;	/* 保存最后一个字符数据的地址，通常是换行符 */
 };
 /***************************************/
 
