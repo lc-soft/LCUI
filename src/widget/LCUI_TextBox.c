@@ -13,6 +13,7 @@
 #include LC_WIDGET_H
 #include LC_GRAPH_H
 #include LC_FONT_H
+#include LC_TEXTBOX_H
 #include LC_LABEL_H
 #include LC_INPUT_H
 #include LC_ERROR_H 
@@ -134,7 +135,6 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_DragEvent *event )
 static void
 TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 {
-	wchar_t *text_ptr;
 	int cols, rows;
 	LCUI_Pos cur_pos, pixel_pos;
 	LCUI_TextLayer *layer;
@@ -151,14 +151,6 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 		
 	    case KEY_END: //end键移动光标至行尾
 		cur_pos.x = cols;
-		goto mv_cur_pos;
-		
-	    case KEY_BACKSPACE: //删除光标左边的字符
-		TextLayer_Text_Backspace( layer, 1 );
-		Update_Widget( widget );
-		cur_pos = TextLayer_Get_Cursor_Pos( layer );
-		text_ptr = TextLayer_Get_Text( layer ); 
-		free( text_ptr );
 		goto mv_cur_pos;
 		
 	    case KEY_LEFT:
@@ -186,7 +178,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 		goto mv_cur_pos;
 		
 	    case KEY_DOWN:
-		if( cur_pos.y < rows ) {
+		if( cur_pos.y < rows-1 ) {
 			cur_pos.y++;
 		}
 		/* 移动光标位置 */
@@ -196,12 +188,17 @@ mv_cur_pos:;
 		cur_pos = TextLayer_Get_Cursor_Pos( layer );
 		break;
 		
+	    case KEY_BACKSPACE: //删除光标左边的字符
+		TextBox_Text_Backspace( widget, 1 );
+		break;
+		
 	    case KEY_DELETE:
 		//删除光标右边的字符
 		
 		break;
 		
 	    default:
+		TextBox_Text_Add( widget, "-new-");
 	    //向文本框中添加字符
 		break;
 	}
@@ -286,12 +283,20 @@ void Register_TextBox()
 /* 剪切板 */
 //static LCUI_String clip_board;
 
-void TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
-/* 在光标处添加文本 */
+void TextBox_Text(LCUI_Widget *widget, char *new_text)
+/* 设定文本框显示的文本 */
 {
 	LCUI_Widget *label;
 	label = TextBox_Get_Label( widget );
 	Set_Label_Text( label, new_text );
+}
+
+void TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
+/* 在光标处添加文本 */
+{
+	LCUI_TextLayer *layer;
+	layer = TextBox_Get_TextLayer( widget );
+	TextLayer_Text_Add( layer, new_text );
 }
 
 int TextBox_Text_Paste(LCUI_Widget *widget)
@@ -304,6 +309,15 @@ int TextBox_Text_Paste(LCUI_Widget *widget)
 int TextBox_Text_Backspace(LCUI_Widget *widget, int n)
 /* 删除光标左边处n个字符 */
 {
+	LCUI_Pos cur_pos, pixel_pos;
+	LCUI_TextLayer *layer;
+	
+	layer = TextBox_Get_TextLayer( widget );
+	TextLayer_Text_Backspace( layer, n );
+	cur_pos = TextLayer_Get_Cursor_Pos( layer );
+	pixel_pos = TextLayer_Set_Cursor_Pos( layer, cur_pos );
+	update_textbox_cursor( pixel_pos );
+	Update_Widget( widget );
 	return 0;
 }
 
