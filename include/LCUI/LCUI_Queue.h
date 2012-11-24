@@ -155,6 +155,9 @@ int Queue_Insert_Pointer( LCUI_Queue * queue, int pos, const void *data);
 int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos);
 /* 功能：将队列中指定位置的成员移动至目的位置 */ 
 
+int Queue_Quote( LCUI_Queue *des, LCUI_Queue *src );
+/* 引用队列 */
+
 int Queue_Replace(LCUI_Queue * queue, int pos, const void *data);
 /* 功能：覆盖队列中指定位置的成员 */ 
 
@@ -176,13 +179,7 @@ int Queue_Add_Pointer(LCUI_Queue * queue, const void *data);
  * */ 
 
 int Queue_Cat( LCUI_Queue *des, LCUI_Queue *src );
-/*
- * 功能：将一个队列拼接至另一个队列的末尾
- * 说明：如果两个队列的数据存储方式选择的是链表，那么，直接将src队列的首结点与des队列的
- * 尾结点相链接，然后修改des队列的总成员数即可；
- * 注意，拼接后，des队列中的新增成员指针和src中的成员指针都是指向同一地址，若其中一个队
- * 列进行销毁操作，另一个队列的成员就会无效化。
- * */
+/* 功能：将一个队列拼接至另一个队列的末尾 */
  
 int Queue_Empty(LCUI_Queue *queue);
 /* 功能：检测队列是否为空 */ 
