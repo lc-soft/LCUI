@@ -332,8 +332,8 @@ TextLayer_Text_Delete( LCUI_TextLayer *layer, int n );
 /* 删除光标右边处n个字符 */ 
 
 LCUI_Pos 
-TextLayer_Get_Char_PixelPos( LCUI_TextLayer *layer, uint32_t char_pos );
-/* 根据源文本中的位置，获取该位置的字符相对于文本图层的坐标 */ 
+TextLayer_Get_Char_PixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos );
+/* 获取显示出来的文字相对于文本图层的坐标，单位为像素 */
 
 LCUI_Pos 
 TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos );
@@ -350,12 +350,20 @@ TextLayer_Get_Cursor_Pos( LCUI_TextLayer *layer );
 /* 获取光标在文本框中的位置，也就是光标在哪一行的哪个字后面 */ 
 
 LCUI_Pos
+TextLayer_Get_Cursor_PixelPos( LCUI_TextLayer *layer );
+/* 获取光标在文本框中的位置，单位为像素 */
+
+LCUI_Pos
 TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos );
 /* 设定光标在文本框中的位置，并返回该光标的坐标，单位为像素 */
 
 int
 TextLayer_Get_RowLen( LCUI_TextLayer *layer, int row );
 /* 获取指定行显式文字数 */
+
+int 
+TextLayer_CurRow_Get_MaxHeight( LCUI_TextLayer *layer );
+/* 获取当前行的最大高度 */
 
 int 
 TextLayer_Get_Rows( LCUI_TextLayer *layer );

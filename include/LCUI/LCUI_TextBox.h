@@ -39,6 +39,18 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
+LCUI_Widget*
+TextBox_Get_Label( LCUI_Widget *widget );
+/* 获取文本框部件内的label部件指针 */
+
+LCUI_TextLayer *
+TextBox_Get_TextLayer( LCUI_Widget *widget );
+/* 获取文本框部件内的文本图层指针 */
+
+LCUI_Widget *
+TextBox_Get_Cursor( LCUI_Widget *widget );
+/* 获取文本框部件内的光标 */
+
 void TextBox_Text(LCUI_Widget *widget, char *new_text);
 /* 设定文本框显示的文本 */
 
@@ -50,6 +62,10 @@ int TextBox_Text_Backspace(LCUI_Widget *widget, int n);
 
 int TextBox_Text_Delete(LCUI_Widget *widget, int n);
 /* 删除光标右边处n个字符 */
+
+void
+TextBox_Cursor_Update( LCUI_Widget *widget );
+/* 更新文本框的光标 */
 
 int TextBox_Get_Select_Text( LCUI_Widget *widget, char *out_text );
 /* 获取文本框内被选中的文本 */
