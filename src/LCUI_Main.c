@@ -678,9 +678,12 @@ int LCUI_Main ()
 	Graph_Init(&graph);
 	
 #ifdef NEED_CATCH_SCREEN
-	//创建线程，用于截图。
-	//pthread_t t;
-	//LCUI_Thread_Create(&t, NULL, catch, NULL);
+	LCUI_Rect area;
+	area.x = (Get_Screen_Width()-320)/2;
+	area.y = (Get_Screen_Height()-240)/2;
+	area.width = 320;
+	area.height = 240;
+	start_record_screen( area );
 #endif
 	app = Get_Self_AppPointer();
 	if( !app ) {
