@@ -25,24 +25,8 @@ typedef struct _LCUI_TextBox
 }
 LCUI_TextBox;
 
+/*----------------------------- Private ------------------------------*/
 static LCUI_Widget *active_textbox = NULL; 
-/************************* 基本的部件处理 ********************************/
-static LCUI_Widget*
-TextBox_Get_Label( LCUI_Widget *widget )
-/* 获取文本框部件内的label部件指针 */
-{
-	LCUI_TextBox *textbox;
-	textbox = Get_Widget_PrivData( widget );
-	return textbox->text;
-}
-
-static LCUI_TextLayer *
-TextBox_Get_TextLayer( LCUI_Widget *widget )
-{
-	LCUI_Widget *label;
-	label = TextBox_Get_Label( widget );
-	return Label_Get_TextLayer( label );
-}
 
 static void
 _put_textbox_cursor( LCUI_Widget *widget, void *arg )
@@ -75,37 +59,16 @@ show_textbox_cursor( )
 	Show_Widget( tb->cursor );
 }
 
-static void 
-update_textbox_cursor( LCUI_Pos pixel_pos )
-{
-	LCUI_Pos pos;
-	LCUI_TextBox *tb;
-	LCUI_TextLayer *layer; 
-	Text_RowData *row_ptr;
-	
-	tb = Get_Widget_PrivData( active_textbox );
-	layer = Label_Get_TextLayer( tb->text );
-	pos = TextLayer_Get_Cursor_Pos( layer );
-	row_ptr = Queue_Get( &layer->rows_data, pos.y );
-	pixel_pos.y += 2;
-	Move_Widget( tb->cursor, pixel_pos );
-	Resize_Widget( tb->cursor, Size(1, row_ptr->max_size.h) );
-	show_textbox_cursor(); /* 让光标在移动时显示 */
-}
-
 static void
 set_textbox_cursor_despos( LCUI_Pos pos )
 {
-	LCUI_Pos pixel_pos;
-	LCUI_TextBox *tb;
 	LCUI_TextLayer *layer;
 	
-	tb = Get_Widget_PrivData( active_textbox ); 
-	layer = Label_Get_TextLayer( tb->text );
-	pixel_pos = TextLayer_Set_Cursor_PixelPos( layer, pos );
-	update_textbox_cursor( pixel_pos );
-	//printf( "set_textbox_cursor_despos(): cursor pos: %d,%d\n", pos.x, pos.y );
+	layer = TextBox_Get_TextLayer( active_textbox );
+	TextLayer_Set_Cursor_PixelPos( layer, pos );
+	TextBox_Cursor_Update( active_textbox );
 }
+
 static void 
 blink_cursor()
 /* 闪烁文本框中的光标 */
@@ -136,7 +99,7 @@ static void
 TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 {
 	int cols, rows;
-	LCUI_Pos cur_pos, pixel_pos;
+	LCUI_Pos cur_pos;
 	LCUI_TextLayer *layer;
 	
 	//printf("you input %d\n", key->code);
@@ -183,8 +146,8 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 		}
 		/* 移动光标位置 */
 mv_cur_pos:;
-		pixel_pos = TextLayer_Set_Cursor_Pos( layer, cur_pos );
-		update_textbox_cursor( pixel_pos );
+		TextLayer_Set_Cursor_Pos( layer, cur_pos );
+		TextBox_Cursor_Update( widget );
 		cur_pos = TextLayer_Get_Cursor_Pos( layer );
 		break;
 		
@@ -197,8 +160,12 @@ mv_cur_pos:;
 		
 		break;
 		
-	    default:
+	    default:;
+		wchar_t *text;
 		TextBox_Text_Add( widget, "-new-");
+		text = TextLayer_Get_Text( layer );
+		free( text );
+		
 	    //向文本框中添加字符
 		break;
 	}
@@ -266,7 +233,12 @@ Process_TextBox_Clicked(LCUI_Widget *widget, LCUI_Event *event)
 {
 	
 }
+/*--------------------------- End Private ----------------------------*/
 
+
+/*----------------------------- Public -------------------------------*/
+/* 剪切板 */
+//static LCUI_String clip_board;
 void Register_TextBox()
 /* 注册文本框部件 */
 {
@@ -277,11 +249,32 @@ void Register_TextBox()
 	WidgetFunc_Add ( "text_box", Destroy_TextBox, FUNC_TYPE_DESTROY );
 }
 
-/**********************************************************************/
+LCUI_Widget*
+TextBox_Get_Label( LCUI_Widget *widget )
+/* 获取文本框部件内的label部件指针 */
+{
+	LCUI_TextBox *textbox;
+	textbox = Get_Widget_PrivData( widget );
+	return textbox->text;
+}
 
-/************************ 文本框部件的扩展功能 ****************************/
-/* 剪切板 */
-//static LCUI_String clip_board;
+LCUI_TextLayer *
+TextBox_Get_TextLayer( LCUI_Widget *widget )
+/* 获取文本框部件内的文本图层指针 */
+{
+	LCUI_Widget *label;
+	label = TextBox_Get_Label( widget );
+	return Label_Get_TextLayer( label );
+}
+
+LCUI_Widget *
+TextBox_Get_Cursor( LCUI_Widget *widget )
+/* 获取文本框部件内的光标 */
+{
+	LCUI_TextBox *tb;
+	tb = Get_Widget_PrivData( widget );
+	return tb->cursor;
+}
 
 void TextBox_Text(LCUI_Widget *widget, char *new_text)
 /* 设定文本框显示的文本 */
@@ -297,6 +290,8 @@ void TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 	LCUI_TextLayer *layer;
 	layer = TextBox_Get_TextLayer( widget );
 	TextLayer_Text_Add( layer, new_text );
+	TextBox_Cursor_Update( widget );
+	Update_Widget( widget );
 }
 
 int TextBox_Text_Paste(LCUI_Widget *widget)
@@ -309,14 +304,14 @@ int TextBox_Text_Paste(LCUI_Widget *widget)
 int TextBox_Text_Backspace(LCUI_Widget *widget, int n)
 /* 删除光标左边处n个字符 */
 {
-	LCUI_Pos cur_pos, pixel_pos;
+	LCUI_Pos cur_pos;
 	LCUI_TextLayer *layer;
 	
 	layer = TextBox_Get_TextLayer( widget );
 	TextLayer_Text_Backspace( layer, n );
 	cur_pos = TextLayer_Get_Cursor_Pos( layer );
-	pixel_pos = TextLayer_Set_Cursor_Pos( layer, cur_pos );
-	update_textbox_cursor( pixel_pos );
+	TextLayer_Set_Cursor_Pos( layer, cur_pos );
+	TextBox_Cursor_Update( widget );
 	Update_Widget( widget );
 	return 0;
 }
@@ -327,6 +322,26 @@ int TextBox_Text_Delete(LCUI_Widget *widget, int n)
 	return 0;
 }
 
+
+void
+TextBox_Cursor_Update( LCUI_Widget *widget )
+/* 更新文本框的光标 */
+{
+	LCUI_Size size;
+	LCUI_Pos pixel_pos;
+	LCUI_TextLayer *layer;
+	LCUI_Widget *cursor;
+	
+	layer = TextBox_Get_TextLayer( widget );
+	cursor = TextBox_Get_Cursor( widget );
+	size.w = 1;
+	size.h = TextLayer_CurRow_Get_MaxHeight( layer );
+	pixel_pos = TextLayer_Get_Cursor_PixelPos( layer ); 
+	pixel_pos.y += 2;
+	Move_Widget( cursor, pixel_pos );
+	Resize_Widget( cursor, size );
+	Show_Widget( cursor ); /* 让光标在更新时显示 */
+}
 
 LCUI_Pos TextBox_Get_Pixel_Pos(LCUI_Widget *widget, uint32_t char_pos)
 /* 根据源文本中的位置，获取该位置的字符相对于文本框的坐标 */
@@ -374,4 +389,4 @@ void TextBox_Using_StyleTags(LCUI_Widget *widget, BOOL flag)
 	TextLayer_Using_StyleTags( layer, flag );
 }
 
-/**********************************************************************/
+/*--------------------------- End Public -----------------------------*/
