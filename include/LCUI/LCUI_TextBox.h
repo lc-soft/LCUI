@@ -43,10 +43,6 @@ LCUI_Widget*
 TextBox_Get_Label( LCUI_Widget *widget );
 /* 获取文本框部件内的label部件指针 */
 
-LCUI_TextLayer *
-TextBox_Get_TextLayer( LCUI_Widget *widget );
-/* 获取文本框部件内的文本图层指针 */
-
 LCUI_Widget *
 TextBox_Get_Cursor( LCUI_Widget *widget );
 /* 获取文本框部件内的光标 */
