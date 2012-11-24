@@ -59,6 +59,15 @@ show_textbox_cursor( )
 	Show_Widget( tb->cursor );
 }
 
+static LCUI_TextLayer *
+TextBox_Get_TextLayer( LCUI_Widget *widget )
+/* 获取文本框部件内的文本图层指针 */
+{
+	LCUI_Widget *label;
+	label = TextBox_Get_Label( widget );
+	return Label_Get_TextLayer( label );
+}
+
 static void
 set_textbox_cursor_despos( LCUI_Pos pos )
 {
@@ -98,9 +107,10 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_DragEvent *event )
 static void
 TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 {
-	int cols, rows;
-	LCUI_Pos cur_pos;
-	LCUI_TextLayer *layer;
+	static char buff[5];
+	static int cols, rows;
+	static LCUI_Pos cur_pos;
+	static LCUI_TextLayer *layer;
 	
 	//printf("you input %d\n", key->code);
 	layer = TextBox_Get_TextLayer( widget );
@@ -161,10 +171,15 @@ mv_cur_pos:;
 		break;
 		
 	    default:;
-		wchar_t *text;
-		TextBox_Text_Add( widget, "-new-");
-		text = TextLayer_Get_Text( layer );
-		free( text );
+		/* 如果该ASCII码代表的字符是可见的 */
+		if( key->code == 10 || (key->code > 31 && key->code < 126) ) {
+			//wchar_t *text;
+			buff[0] = key->code;
+			buff[1] = 0;
+			TextBox_Text_Add( widget, buff);
+			//text = TextLayer_Get_Text( layer );
+			//free( text );
+		}
 		
 	    //向文本框中添加字符
 		break;
@@ -258,14 +273,6 @@ TextBox_Get_Label( LCUI_Widget *widget )
 	return textbox->text;
 }
 
-LCUI_TextLayer *
-TextBox_Get_TextLayer( LCUI_Widget *widget )
-/* 获取文本框部件内的文本图层指针 */
-{
-	LCUI_Widget *label;
-	label = TextBox_Get_Label( widget );
-	return Label_Get_TextLayer( label );
-}
 
 LCUI_Widget *
 TextBox_Get_Cursor( LCUI_Widget *widget )
