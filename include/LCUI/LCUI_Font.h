@@ -223,6 +223,7 @@ struct _LCUI_TextLayer
 	LCUI_Queue style_data;		/* 保存样式数据 */
 	LCUI_Queue clear_area;		/* 记录需刷新的区域 */
 	
+	LCUI_Pos offset_pos;		/* 偏移位置 */
 	uint32_t current_src_pos;	/* 当前光标在源文本中位置 */
 	LCUI_Pos current_des_pos;	/* 当前光标在分段后的文本中的位置 */
 	uint32_t max_text_len;		/* 最大文本长度 */
@@ -273,7 +274,7 @@ TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b );
 /************************** End TextStyle *****************************/
 
 
-/*************************** 基本的处理 *********************************/
+/*************************** TextLayer *********************************/
 void 
 TextLayer_Init( LCUI_TextLayer *layer );
 /* 初始化文本图层相关数据 */ 
@@ -289,9 +290,11 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode );
 void
 TextLayer_Refresh( LCUI_TextLayer *layer );
 /* 标记文本图层中每个字的位图，等待绘制文本图层时进行更新 */
-/**********************************************************************/
 
-/************************ 文本图层的扩展功能 *****************************/ 
+void
+TextLayer_Set_Offset( LCUI_TextLayer *layer, LCUI_Pos offset_pos );
+/* 设定文本图层的偏移位置 */
+
 LCUI_Size 
 TextLayer_Get_Size ( LCUI_TextLayer *layer );
 /* 获取文本图层的实际尺寸 */
@@ -385,7 +388,7 @@ void
 TextLayer_Using_StyleTags( LCUI_TextLayer *layer, BOOL flag );
 /* 指定文本图层是否处理样式标签 */ 
 
-/************************* End LCUI_TextLayer *************************/
+/*************************** End TextLayer ****************************/
 
 
 LCUI_END_HEADER
