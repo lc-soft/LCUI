@@ -87,6 +87,7 @@
 #define LC_RADIOBTN_H	<LCUI/LCUI_RadioButton.h>
 #define LC_ACTIVEBOX_H	<LCUI/LCUI_ActiveBox.h> 
 #define LC_TEXTBOX_H	<LCUI/LCUI_TextBox.h>
+#define LC_SCROLLBAR_H	<LCUI/LCUI_ScrollBar.h>
 #endif
 
 
