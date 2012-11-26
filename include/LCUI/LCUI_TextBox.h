@@ -39,6 +39,11 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
+#ifndef __LCUI_TEXTBOX_H__
+#define __LCUI_TEXTBOX_H__
+
+LCUI_BEGIN_HEADER
+
 LCUI_Widget*
 TextBox_Get_Label( LCUI_Widget *widget );
 /* 获取文本框部件内的label部件指针 */
@@ -74,3 +79,7 @@ int TextBox_Cut_Select_Text(LCUI_Widget *widget);
 
 void TextBox_Using_StyleTags(LCUI_Widget *widget, BOOL flag);
 /* 指定文本框是否处理控制符 */
+
+LCUI_END_HEADER
+
+#endif
