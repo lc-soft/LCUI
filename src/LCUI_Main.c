@@ -103,9 +103,10 @@ int LCUI_Dev_Add(	BOOL (*init_func)(),
 
 static void *proc_dev_list ( void *arg )
 {
+	LCUI_Queue *dev_list;
 	dev_func_data *data_ptr;
 	int total, i, result, sleep_time = 1000;
-	LCUI_Queue *dev_list;
+	
 	dev_list = (LCUI_Queue *)arg;
 	while( LCUI_Active() ) {
 		result = 0;
@@ -339,6 +340,7 @@ int free_timer( int timer_id )
 {
 	int i, total;
 	timer_data *timer;
+	
 	Queue_Lock( &LCUI_Sys.timer_list );
 	total = Queue_Get_Total( &LCUI_Sys.timer_list );
 	for(i=0; i<total; ++i) {
@@ -393,11 +395,12 @@ LCUI_App *Find_App(LCUI_ID id)
 /* 功能：根据程序的ID，获取指向程序数据结构的指针 */
 {
 	LCUI_App *app; 
-	int i, total;  
+	int i, total;
+	
 	total = Queue_Get_Total(&LCUI_Sys.app_list);
 	if (total > 0) { /* 如果程序总数大于0 */
 		for (i = 0; i < total; ++i) {
-			app = (LCUI_App*)Queue_Get(&LCUI_Sys.app_list, i);
+			app = Queue_Get(&LCUI_Sys.app_list, i);
 			if(app->id == id) {
 				return app;
 			}
@@ -478,7 +481,7 @@ static int LCUI_AppList_Delete (LCUI_ID app_id)
 	total = Queue_Get_Total(&LCUI_Sys.app_list);
 	if (total > 0) { /* 如果程序总数大于0， 查找程序信息所在队列的位置 */
 		for (i = 0; i < total; ++i) {
-			app = (LCUI_App*)Queue_Get(&LCUI_Sys.app_list, i);
+			app = Queue_Get(&LCUI_Sys.app_list, i);
 			if(app->id == app_id) {
 				pos = i;
 				break;
@@ -588,13 +591,13 @@ static void LCUI_IO_Init()
 	TouchScreen_Init();
 }
 
-int LCUI_Active()
+BOOL LCUI_Active()
 /* 功能：检测LCUI是否活动 */
 {
 	if(LCUI_Sys.status == ACTIVE) {
-		return 1;
+		return TRUE;
 	}
-	return 0;
+	return FALSE;
 }
 
 //extern int debug_mark;
@@ -605,7 +608,8 @@ int LCUI_Init(int argc, char *argv[])
  * */
 {
 	int temp;
-	if( !LCUI_Sys.init ) {/* 如果LCUI没有初始化过 */
+	/* 如果LCUI没有初始化过 */
+	if( !LCUI_Sys.init ) {
 		LCUI_Sys.init = TRUE;
 		LCUI_Sys.status = ACTIVE;
 		srand(time(NULL));
