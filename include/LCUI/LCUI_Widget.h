@@ -81,6 +81,8 @@ LCUI_Size _Get_Widget_Size(LCUI_Widget *widget);
 
 int Get_Widget_Height(LCUI_Widget *widget);
 
+int _Get_Widget_Height(LCUI_Widget *widget);
+
 int Get_Widget_Width(LCUI_Widget *widget);
 
 LCUI_Rect Get_Widget_Rect(LCUI_Widget *widget);
