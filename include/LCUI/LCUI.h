@@ -740,7 +740,7 @@ void Main_Loop_Quit();
 /* 功能：让程序退出主循环 */
 /*********************** App Management End ***************************/
 
-int LCUI_Active();
+BOOL LCUI_Active();
 /* 功能：检测LCUI是否活动 */ 
 
 //extern int debug_mark;
