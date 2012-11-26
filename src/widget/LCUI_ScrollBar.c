@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Window.c -- LCUI 的滚动条部件
+ * LCUI_ScrollBar.c -- LCUI 的滚动条部件
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -115,7 +115,8 @@ ScrollBar_Update( LCUI_Widget *widget )
 		Set_Widget_Size( scrollbar->widget, NULL, scale_str );
 	} else { /* 纵向 */
 		Set_Widget_Size( scrollbar->widget, NULL, scale_str );
-		pos = Get_Container_Height( widget ) - _Get_Widget_Height( scrollbar->widget ); 
+		pos = Get_Container_Height( widget );
+		pos -= _Get_Widget_Height( scrollbar->widget );
 		Limit_Widget_Pos( scrollbar->widget, Pos(0,0), Pos( 0, pos ) );
 	}
 }
