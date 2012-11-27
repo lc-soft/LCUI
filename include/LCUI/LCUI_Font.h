@@ -212,7 +212,7 @@ struct _LCUI_TextLayer
 	BOOL using_style_tags	:1;	/* 指示是否处理样式标签 */
 	BOOL enable_word_wrap	:1;	/* 指示是否自动换行 */
 	BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */ 
-	
+	BOOL need_proc_buff	:1;
 	BOOL have_select : 1;	/* 标记，指示是否在文本图层中选择了文本 */
 	uint32_t start, end;	/* 被选中的文本的范围 */ 
 	
@@ -231,6 +231,7 @@ struct _LCUI_TextLayer
 	BOOL show_cursor;	/* 指定是否需要显示文本光标 */
 	int timer_id;		/* 定时器的ID */
 	
+	LCUI_String text_buff;
 	LCUI_TextStyle default_data;	/* 缺省状态下使用的文本样式数据 */
 };
 
@@ -310,7 +311,11 @@ void
 TextLayer_ReadOnly( LCUI_TextLayer *layer, BOOL flag );
 /* 指定文本图层中的文本是否为只读 */
 
-int
+void
+TextLayer_Text_Clear( LCUI_TextLayer *layer );
+/* 清空文本内容 */
+
+void
 TextLayer_Text( LCUI_TextLayer *layer, char *new_text );
 /* 设定整个文本图层中需显示的文本，光标复位，原有选中文本被删除 */ 
 
