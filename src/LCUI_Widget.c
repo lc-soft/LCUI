@@ -1755,27 +1755,33 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 	}
 }
 
+LCUI_Pos Get_Widget_Valid_Pos( LCUI_Widget *widget, LCUI_Pos pos )
+/* 获取有效化后的坐标数据，其实就是将在限制范围外的坐标处理成在限制范围内的 */
+{
+	if( pos.x > widget->max_x.px ) {
+		pos.x = widget->max_x.px;
+	}
+	if( pos.x < widget->min_x.px ) {
+		pos.x = widget->min_x.px;
+	}
+	if( pos.y > widget->max_y.px ) {
+		pos.y = widget->max_y.px;
+	}
+	if( pos.y < widget->min_y.px ) {
+		pos.y = widget->min_y.px;
+	}
+	return pos;
+}
+
 void Move_Widget(LCUI_Widget *widget, LCUI_Pos new_pos)
 /* 
  * 功能：移动部件位置
  * 说明：如果部件的布局为ALIGN_NONE，那么，就可以移动它的位置，否则，无法移动位置
  * */
 {
-	if(widget == NULL) {
+	if( !widget ) {
 		return; 
 	} 
-	if( new_pos.x > widget->max_x.px ) {
-		new_pos.x = widget->max_x.px;
-	}
-	if( new_pos.x < widget->min_x.px ) {
-		new_pos.x = widget->min_x.px;
-	}
-	if( new_pos.y > widget->max_y.px ) {
-		new_pos.y = widget->max_y.px;
-	}
-	if( new_pos.y < widget->min_y.px ) {
-		new_pos.y = widget->min_y.px;
-	}
 	widget->x.px = new_pos.x;
 	widget->y.px = new_pos.y;
 	/* 记录部件的更新数据，等待进行更新 */
