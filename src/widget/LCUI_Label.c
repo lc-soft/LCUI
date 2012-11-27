@@ -90,19 +90,21 @@ Update_Label(LCUI_Widget *widget)
 	LCUI_Label *label;
 	
 	label = Get_Widget_PrivData( widget );
-	max = TextLayer_Get_Size( &label->layer );
-	if( label->auto_size && Size_Cmp( max, widget->size ) != 0 ) {
-		/* 如果开启了自动调整大小,并且尺寸有改变 */ 
-		Resize_Widget(widget, max );
-		Refresh_Widget(widget);
-		return;
-	}
 	if(!Graph_Valid(&widget->background_image)) {
 		mode = GRAPH_MIX_FLAG_REPLACE; /* 替换模式 */
 	} else {
 		mode = GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */ 
 	}
+	/* 先绘制文本位图，在绘制前它会更新位图尺寸 */
 	TextLayer_Draw( widget, &label->layer, mode );
+	/* 获取尺寸 */
+	max = TextLayer_Get_Size( &label->layer );
+	if( widget->dock == DOCK_TYPE_NONE && label->auto_size
+	 && Size_Cmp( max, widget->size ) != 0 ) {
+		/* 如果开启了自动调整大小,并且尺寸有改变 */ 
+		Resize_Widget(widget, max );
+		Refresh_Widget(widget);
+	}
 }
 
 static void 
@@ -130,8 +132,8 @@ Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 	va_list ap;
 	va_start( ap, fmt );
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
-	va_end( ap ); 
-	 
+	va_end( ap );
+	
 	TextLayer_Text( &label->layer, text );
 	Update_Widget( widget ); 
 }
