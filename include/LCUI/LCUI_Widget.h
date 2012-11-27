@@ -85,6 +85,8 @@ int _Get_Widget_Height(LCUI_Widget *widget);
 
 int Get_Widget_Width(LCUI_Widget *widget);
 
+int _Get_Widget_Width(LCUI_Widget *widget);
+
 LCUI_Rect Get_Widget_Rect(LCUI_Widget *widget);
 /* 功能：获取部件的区域 */ 
 
@@ -324,6 +326,9 @@ void Exec_Refresh_Widget(LCUI_Widget *widget);
 
 void Exec_Draw_Widget(LCUI_Widget *widget);
 /* 功能：执行部件图形更新操作 */ 
+
+LCUI_Pos Get_Widget_Valid_Pos( LCUI_Widget *widget, LCUI_Pos pos );
+/* 获取有效化后的坐标数据，其实就是将在限制范围外的坐标处理成在限制范围内的 */
 
 void Move_Widget(LCUI_Widget *widget, LCUI_Pos new_pos);
 /* 
