@@ -412,6 +412,19 @@ static LCUI_Pos __offset_pos = {0, 0};  /* 点击部件时保存的偏移坐标 
 static LCUI_DragEvent drag_event;
 
 int 
+Widget_Event_Connect (	LCUI_Widget *widget, 
+			WidgetEvent_ID event_id, 
+			LCUI_Func *func_data )
+/* 将回调函数与部件的指定事件进行关联 */
+{
+	if( !widget ) {
+		return -1;
+	}
+	EventQueue_Add( &widget->event, event_id, func_data );
+	return 0;
+}
+
+int 
 Widget_Drag_Event_Connect ( LCUI_Widget *widget, 
 		void (*func)(LCUI_Widget*, LCUI_DragEvent *)
 )
@@ -423,15 +436,11 @@ Widget_Drag_Event_Connect ( LCUI_Widget *widget,
 	LCUI_DragEvent *p;
 	LCUI_Func func_data;
 	
-	if(widget == NULL) {
-		return -1;
-	}
 	p = &drag_event;
-	if( !Get_FuncData(&func_data, func, (void*)widget, p) ) {
-		return -1;
+	if( !Get_FuncData(&func_data, func, widget, p) ) {
+		return -2;
 	}
-	EventQueue_Add(&widget->event, EVENT_DRAG, &func_data);
-	return 0;
+	return Widget_Event_Connect( widget, EVENT_DRAG, &func_data );
 }
 
 int 
@@ -445,14 +454,11 @@ Widget_Keyboard_Event_Connect (
  * */
 {
 	LCUI_Func func_data;
-	if( !widget ) {
-		return -1;
-	}
+	
 	if( !Get_FuncData(&func_data, func, (void*)widget, NULL) ) {
-		return FALSE;
+		return -2;
 	}
-	EventQueue_Add(&widget->event, EVENT_KEYBOARD, &func_data);
-	return 0;
+	return Widget_Event_Connect( widget, EVENT_KEYBOARD, &func_data );
 }
 
 int 
@@ -467,14 +473,11 @@ Widget_Clicked_Event_Connect (
  * */
 {
 	LCUI_Func func_data;
-	if( !widget ) {
-		return -1;
-	}
+	
 	if( !Get_FuncData(&func_data, func, (void*)widget, arg) ) {
-		return FALSE;
+		return -2;
 	}
-	EventQueue_Add(&widget->event, EVENT_CLICKED, &func_data);
-	return 0;
+	return Widget_Event_Connect( widget, EVENT_CLICKED, &func_data );
 }
 
 static LCUI_Widget *
