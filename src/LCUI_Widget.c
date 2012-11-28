@@ -709,7 +709,7 @@ void print_widget_info(LCUI_Widget *widget)
  * 说明：在调试时需要用到它，用于确定widget是否有问题
  *  */
 {
-	if(widget != NULL) {
+	if( widget ) {
 		printf("widget: %p, type: %s, visible: %d, pos: (%d,%d), size: (%d, %d)\n",
 			widget, widget->type.string, widget->visible,
 			widget->pos.x, widget->pos.y,
@@ -1638,7 +1638,8 @@ void Auto_Resize_Widget(LCUI_Widget *widget)
 	}
 	size.w += 6;
 	size.h += 6;
-	//printf("Auto_Resize_Widget(): new size: %d,%d\n", size.w, size.h);
+	//printf("Auto_Resize_Widget(): %p, autosize: %d, new size: %d,%d\n", 
+	//widget, widget->auto_size, size.w, size.h);
 	//print_widget_info(widget);
 	/* 得出适合的尺寸，调整之 */
 	Resize_Widget(widget, size);
@@ -1647,16 +1648,18 @@ void Auto_Resize_Widget(LCUI_Widget *widget)
 void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
 /* 功能：执行改变部件尺寸的操作 */
 {
-	if(widget == NULL) {
+	if( !widget ) {
 		return;
 	}
 	
+	if(widget->w.which_one == 0 && widget->size.w == size.w 
+	 && widget->h.which_one == 0 && widget->size.h == size.h) {
+		return;
+	}
+	
+	LCUI_Size max_size, min_size;
 	void ( *func_resize ) (LCUI_Widget*);
 	
-	if(widget->size.w == size.w && widget->size.h == size.h) {
-		return;
-	}
-	LCUI_Size max_size, min_size;
 	max_size = Get_Widget_MaxSize( widget );
 	min_size = Get_Widget_MinSize( widget );
 	/* 根据指定的部件的尺寸范围，调整尺寸 */
@@ -1684,7 +1687,7 @@ void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
 	Refresh_Widget(widget); 
 	/* 更新子部件的位置及尺寸 */  
 	Update_Child_Widget_Size( widget );
-	if(widget->parent && widget->parent->auto_size) {
+	if( widget->parent && widget->parent->auto_size ) {
 	/* 如果需要让它的容器能够自动调整大小 */
 		Auto_Resize_Widget(widget->parent); 
 	}
@@ -1708,6 +1711,7 @@ void Exec_Refresh_Widget(LCUI_Widget *widget)
 }
 
 void Exec_Update_Widget(LCUI_Widget *widget)
+/* 功能：执行部件的更新操作 */
 {
 	void ( *func_update ) (LCUI_Widget*); 
 	/* 获取函数 */
@@ -1806,7 +1810,7 @@ void Exec_Update_Widget_Pos( LCUI_Widget *widget )
 
 void Update_Widget_Size( LCUI_Widget *widget )
 /* 部件尺寸更新 */
-{ 
+{
 	Resize_Widget( widget, _Get_Widget_Size(widget) ); 
 }
 
@@ -1834,7 +1838,7 @@ void Update_Child_Widget_Size(LCUI_Widget *widget)
 }
 
 void Exec_Update_Widget_Size( LCUI_Widget *widget )
-{ 
+{
 	widget->size = _Get_Widget_Size( widget ); 
 	widget->w.px = widget->size.w;
 	widget->h.px = widget->size.h;
@@ -1969,11 +1973,12 @@ void Refresh_Widget(LCUI_Widget *widget)
 void Resize_Widget(LCUI_Widget *widget, LCUI_Size new_size)
 /* 功能：改变部件的尺寸 */
 {
-	if(widget == NULL) {
+	if( !widget ) {
 		return; 
 	}
 	widget->w.px = new_size.w;
 	widget->h.px = new_size.h;
+	
 	Record_WidgetUpdate(widget, &new_size, DATATYPE_SIZE);
 	if( widget->pos_type == POS_TYPE_STATIC
 	 || widget->pos_type == POS_TYPE_RELATIVE ) {
@@ -2147,9 +2152,9 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 		temp = (WidgetData *)Queue_Get(&widget->data, 0);
 		/* 根据不同的类型来进行处理 */
 		switch(temp->type) {
-		    case DATATYPE_SIZE	: 
+		    case DATATYPE_SIZE	:
 			/* 部件尺寸更新，将更新部件的位置 */ 
-			if( temp->data == NULL ) {
+			if( !temp->data ) {
 				Exec_Update_Widget_Size( widget );
 			} else {
 				Exec_Resize_Widget(widget, *((LCUI_Size*)temp->data));
@@ -2255,7 +2260,7 @@ int WidgetFunc_Add(
 	int total, i, found = 0;
 	
 	LCUI_App *app = Get_Self_AppPointer();
-	if(app == NULL) {
+	if( !app ) {
 		printf("WidgetFunc_Add():"APP_ERROR_UNRECORDED_APP);
 		abort();
 	}
@@ -2300,7 +2305,7 @@ int WidgetType_Add(char *type)
 {
 	WidgetTypeData *wd, new_wd;
 	LCUI_App *app = Get_Self_AppPointer();
-	if(app == NULL) {
+	if( !app ) {
 		printf("WidgetType_Add():"APP_ERROR_UNRECORDED_APP);
 		exit(-1);
 	}
@@ -2345,7 +2350,7 @@ int WidgetType_Delete(const char *type)
 	WidgetTypeData *wd;
 	LCUI_App *app = Get_Self_AppPointer();
 	
-	if(app == NULL) {
+	if( !app ) {
 		return -2;
 	}
 	
@@ -2376,7 +2381,7 @@ LCUI_ID WidgetType_Get_ID(const char *widget_type)
 { 
 	WidgetTypeData *wd;
 	LCUI_App *app = Get_Self_AppPointer();
-	if(app == NULL) return -2;
+	if( !app ) return -2;
 	
 	int total, i; 
 	
@@ -2396,7 +2401,7 @@ int Get_Widget_Type_By_ID(LCUI_ID id, char *widget_type)
 {
 	WidgetTypeData *wd;
 	LCUI_App *app = Get_Self_AppPointer();
-	if(app == NULL) return -2;
+	if( !app ) return -2;
 	
 	int total, i; 
 	
@@ -2420,7 +2425,7 @@ void ( *Get_WidgetFunc_By_ID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*)
 	LCUI_Func *f = NULL; 
 	WidgetTypeData *wd;
 	LCUI_App *app = Get_Self_AppPointer();
-	if(app == NULL) 
+	if( !app ) 
 		return NULL_Widget_Func;
 	
 	int total, i, found = 0; 
@@ -2456,7 +2461,7 @@ void ( *Get_WidgetFunc(const char *widget_type, FuncType func_type) ) (LCUI_Widg
 	LCUI_Func *f = NULL; 
 	WidgetTypeData *wd;
 	LCUI_App *app = Get_Self_AppPointer();
-	if(app == NULL) {
+	if( !app ) {
 		return NULL_Widget_Func;
 	}
 	
@@ -2494,7 +2499,7 @@ int WidgetType_Valid(const char *widget_type)
 	WidgetTypeData *wd;
 	LCUI_App *app = Get_Self_AppPointer();
 	
-	if(app == NULL) return 0;
+	if( !app ) return 0;
 	
 	int total, i; 
 	
