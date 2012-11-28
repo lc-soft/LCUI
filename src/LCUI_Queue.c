@@ -159,43 +159,34 @@ int Queue_Swap(LCUI_Queue * queue, int pos_a, int pos_b)
 /* 功能：交换队列中指定位置两个成员的位置 */
 {
 	void *temp;
-	if (pos_a < queue->total_num && pos_b < queue->total_num 
-	 && pos_a != pos_b && queue->total_num > 0) {
-		if(queue->data_mode == QUEUE_DATA_MODE_ARRAY) {
-			temp = queue->data_array[pos_a];
-			queue->data_array[pos_a] = queue->data_array[pos_b];
-			queue->data_array[pos_b] = temp;
-		} else {
-			int i, pos;
-			LCUI_Node *a, *b, *temp;
-			if(pos_a < pos_b) {
-				pos = pos_a;
-			} else {
-				pos = pos_b;
-			}
-			a = &queue->data_head_node;
-			for(i=0; i<=pos; ++i) {
-				a = a->next;
-			}
-			if(pos_a < pos_b) {
-				pos = pos_b;
-			}
-			b = &queue->data_head_node;
-			for(i=0; i<=pos; ++i) {
-				b = b->next;
-			}
-			/* 交换两个结点的指向上结点的指针 */
-			temp = a->prev;
-			a->prev = b->prev;
-			b->prev = temp; 
-			/* 交换两个结点的指向下结点的指针 */
-			temp = a->next;
-			a->next = b->next;
-			b->next = temp;
-		}
-		return 0;
+	
+	if (pos_a >= queue->total_num || pos_b >= queue->total_num 
+	 || pos_a == pos_b || queue->total_num <= 0) {
+		return -1;
 	}
-	return -1;
+	
+	if(queue->data_mode == QUEUE_DATA_MODE_ARRAY) {
+		temp = queue->data_array[pos_a];
+		queue->data_array[pos_a] = queue->data_array[pos_b];
+		queue->data_array[pos_b] = temp;
+	} else {
+		int i;
+		LCUI_Node *a, *b;
+		/* 找到两个位置的结点 */
+		a = &queue->data_head_node;
+		for(i=0; i<=pos_a; ++i) {
+			a = a->next;
+		}
+		b = &queue->data_head_node;
+		for(i=0; i<=pos_b; ++i) {
+			b = b->next;
+		}
+		/* 交换指针 */
+		temp = a->data;
+		a->data = b->data;
+		b->data = temp;
+	}
+	return 0;
 }
 
 void Destroy_Queue(LCUI_Queue * queue) 
