@@ -38,7 +38,8 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
- 
+
+//#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
 
@@ -209,12 +210,15 @@ int get_PX_P_t( char *str, PX_P_t *combo_num )
 	char buff[256];
 	int j, i, len; 
 	
-	if(str == NULL) {
+	DEBUG_MSG( "enter\n" );
+	if( !str ) {
+		DEBUG_MSG( "!str, quit\n" );
 		return -1;
 	}
-	
+	DEBUG_MSG( "string: %s\n", str );
 	len = strlen(str);
 	if(len == 0) {
+		DEBUG_MSG( "len == 0, quit\n" );
 		return -1;
 	}
 	for(j=0,i=0; i<len; ++i, ++j) {
@@ -222,7 +226,7 @@ int get_PX_P_t( char *str, PX_P_t *combo_num )
 			--j;
 			continue;
 		}
-		if(str[i] >= '0' && str[i] <= '9' ) {
+		if(str[i] >= '0' && str[i] <= '9' || str[i] == '.' ) {
 			buff[j] = str[i];
 			continue;
 		}
@@ -231,6 +235,7 @@ int get_PX_P_t( char *str, PX_P_t *combo_num )
 			sscanf( buff, "%lf", &combo_num->scale );
 			combo_num->scale/=100.0; 
 			combo_num->which_one = 1;
+			DEBUG_MSG( "scale: %.2f, quit\n", combo_num->scale );
 			return 0;
 		}
 		else if (str[i] == 'p' || str[i] == 'P') { 
@@ -239,17 +244,21 @@ int get_PX_P_t( char *str, PX_P_t *combo_num )
 					buff[j+1] = 0;
 					sscanf( str, "%d", &combo_num->px ); 
 					combo_num->which_one = 0;
+					DEBUG_MSG( "px: %d, quit\n", combo_num->px );
 					return 0;
 				}
 			}
+			DEBUG_MSG( "1, quit\n" );
 			return -1;
 		} else {
+			DEBUG_MSG( "2, quit\n" );
 			break;
 		}
 	}
 	/* 不包含px和%，那单位就默认为px，取整数 */
 	sscanf( buff, "%d", &combo_num->px ); 
 	combo_num->which_one = 0;
+	DEBUG_MSG( "quit\n" );
 	return 0;
 }
 
