@@ -664,6 +664,7 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	layer->enable_word_wrap = FALSE; 
 	layer->enable_multiline = FALSE; 
 	layer->need_proc_buff = FALSE;
+	layer->need_scroll_layer = FALSE;
 	layer->have_select = FALSE;
 	layer->start = 0;
 	layer->end = 0;
@@ -718,16 +719,25 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 {
 	LCUI_Rect area;
 	LCUI_Pos pos;
+	BOOL draw_all = FALSE;
 	int i, j, n, rows, size;
 	LCUI_RGB color;
 	LCUI_Graph slot;
 	LCUI_CharData *p_data;
 	Text_RowData *p_row;
 	
+	//printf("TextLayer_Draw(): enter\n");
 	/* 如果文本缓存区内有数据 */
 	if( layer->need_proc_buff ) {
 		__TextLayer_Text( layer );
 		layer->need_proc_buff = FALSE;
+	}
+	/* 如果需要滚动图层 */
+	if( layer->need_scroll_layer ) {
+		Graph_Fill_Alpha( &widget->graph, 0 );
+		draw_all = TRUE;
+		layer->need_scroll_layer = FALSE;
+		Refresh_Widget( widget );
 	}
 	
 	Graph_Init( &slot );
@@ -774,10 +784,10 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 				size = layer->default_data.pixel_size + 2; 
 				color = layer->default_data.fore_color;
 			}
-			//nobuff_printf("get, pos: %d, char_ptr: %p, char: %c ", 
-			//	i, p_data, p_data->char_code );
 			/* 如果字体位图已标记更新，则绘制它 */
-			if( p_data->need_update ) {
+			if( p_data->need_update || draw_all ) { 
+			//nobuff_printf("get, pos: %d, char_ptr: %p, char: %c, draw\n", 
+			//	i, p_data, p_data->char_code ); 
 				p_data->need_update = FALSE;
 				/* 计算区域范围 */
 				area.x = pos.x + p_data->bitmap.left;
@@ -790,13 +800,12 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 					&p_data->bitmap, color, mode );
 				/* 记录该区域，以刷新显示到屏幕上 */
 				Add_Widget_Refresh_Area( widget, area );
-			//	printf("Draw");
-			}
-			//printf("\n");
+			} 
 			pos.x += p_data->bitmap.advance.x;
 		}
 		pos.y += p_row->max_size.h;
 	}
+	//printf("TextLayer_Draw(): quit\n");
 }
 
 void
@@ -832,8 +841,7 @@ TextLayer_Set_Offset( LCUI_TextLayer *layer, LCUI_Pos offset_pos )
 /* 设定文本图层的偏移位置 */
 {
 	layer->offset_pos = offset_pos;
-	/* 刷新图层 */
-	TextLayer_Refresh( layer );
+	layer->need_scroll_layer = TRUE;
 }
 
 /* 剪切板 */
@@ -858,6 +866,7 @@ TextLayer_Get_Size ( LCUI_TextLayer *layer )
 		}
 		size.h += p_row->max_size.h;
 	}
+	/* 尺寸稍微搞大一点，因为显示文本光标需要一定空间 */
 	size.w += 2;
 	size.h += 2;
 	return size;
@@ -910,6 +919,7 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 		char_ptr = Queue_Get( &row_ptr->string, i ); 
 		pos.x += char_ptr->bitmap.advance.x;
 	}
+	
 	for( i=char_pos.x; i<len; ++i ) {
 		char_ptr = Queue_Get( &row_ptr->string, i );
 		if( !char_ptr ) {
@@ -1035,8 +1045,8 @@ void
 TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 /* 对文本进行预处理，处理后的数据保存至layer里 */ 
 {
-	BOOL refresh;
-	int total, rows, n_ignore = 0;
+	BOOL refresh = TRUE;
+	int total, row, total_row, n_ignore = 0;
 	wchar_t *finish, *buff, *p, *q;
 	
 	LCUI_Pos tmp_pos;
@@ -1053,8 +1063,8 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 		TextLayer_Text_Add_NewRow( layer );
 		cur_row_ptr = Queue_Get( &layer->rows_data, layer->current_des_pos.y );
 	}
-	rows = layer->current_des_pos.y;
-	
+	row = layer->current_des_pos.y;
+	total_row = TextLayer_Get_Rows( layer );
 	FontBMP_Init( &char_data.bitmap );
 	/* 先记录这一行需要刷新的区域，起点为光标所在位置 */
 	TextLayer_CharLater_Refresh( layer, layer->current_des_pos );
@@ -1092,27 +1102,32 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, char *new_text )
 				layer->current_src_pos );
 			/* 遇到换行符，那就增加新行 */
 			if(char_data.char_code == '\n') {
+				++row;
 				if( refresh ) {
 					tmp_pos.x = 0;
-					tmp_pos.y = layer->current_des_pos.y+1;
+					tmp_pos.y = row;
 					/* 刷新该行后面所有行的字符 */
-					for( ; tmp_pos.y<rows; ++tmp_pos.y ) {
+					for( ; tmp_pos.y<total_row; ++tmp_pos.y ) {
 						TextLayer_CharLater_Refresh( layer, tmp_pos );
 					}
 					refresh = FALSE;
 				}
-				++rows;
 				/* 换行符的数据单独保存 */
 				cur_row_ptr->last_char = char_ptr;
-				TextLayer_Text_Insert_NewRow( layer, rows );
-				tmp_row_ptr = Queue_Get( &layer->rows_data, rows );
+				/* 在该行插入新行 */
+				TextLayer_Text_Insert_NewRow( layer, row );
+				/* 获取新行的行指针 */
+				tmp_row_ptr = Queue_Get( &layer->rows_data, row );
 				/* 当前位置后面的字符转移到新行里 */
 				TextLayer_Text_RowBreak( layer, cur_row_ptr, 
 				 layer->current_des_pos.x, tmp_row_ptr );
 				/* 行指针切换到下一行 */
 				cur_row_ptr = tmp_row_ptr;
+				/* 更新当前字符坐标 */
 				layer->current_des_pos.x = 0;
-				layer->current_des_pos.y = rows;
+				layer->current_des_pos.y = row;
+				/* 更新总行数 */
+				total_row = TextLayer_Get_Rows( layer );
 			}
 			++layer->current_src_pos; 
 			--n_ignore;
@@ -1780,6 +1795,9 @@ TextLayer_CurRow_Get_MaxHeight( LCUI_TextLayer *layer )
 {
 	Text_RowData *row_ptr;
 	row_ptr = TextLayer_Get_Current_RowData( layer );
+	if( !row_ptr ) {
+		return layer->default_data.pixel_size;
+	}
 	return row_ptr->max_size.h;
 }
 
