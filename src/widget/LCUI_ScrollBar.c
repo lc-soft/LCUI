@@ -51,7 +51,8 @@ typedef struct _LCUI_ScrollBar
 	ScrollBar_Data data;
 	
 	/* 与滚动条部件连接的回调函数，当滚动条移动时，会调用它 */
-	void (*callback_func)( LCUI_Widget*, ScrollBar_Data );
+	void (*callback_func)( ScrollBar_Data, void * );
+	void *arg;
 	
 	LCUI_Widget *widget;	/* 滑块 */
 }
@@ -104,7 +105,7 @@ ScrollBar_Drag( LCUI_Widget *widget, LCUI_DragEvent *event )
 	Move_ScrollBar( widget, pos );
 	/* 若函数指针有效，则调用回调函数 */
 	if( scrollbar->callback_func ) {
-		scrollbar->callback_func( widget, scrollbar->data );
+		scrollbar->callback_func( scrollbar->data, scrollbar->arg );
 	}
 }
 
@@ -127,6 +128,9 @@ ScrollBar_Init( LCUI_Widget *widget )
 	scrollbar->callback_func = NULL;
 	
 	scrollbar->widget = Create_Widget("button");
+	/* 禁用部件的自动尺寸调整 */
+	Widget_AutoSize( scrollbar->widget, FALSE, 0 );
+	
 	Widget_Container_Add( widget, scrollbar->widget );
 	Set_Widget_Size( scrollbar->widget, "100%", "100%" );
 	Limit_Widget_Pos( scrollbar->widget, Pos(0,0), Pos(0,0) ); 
@@ -139,7 +143,7 @@ ScrollBar_Init( LCUI_Widget *widget )
 void 
 ScrollBar_Update( LCUI_Widget *widget )
 {
-	static int pos;
+	static int pos, max_len;
 	static double scale;
 	static char scale_str[256];
 	LCUI_ScrollBar *scrollbar;
@@ -148,15 +152,24 @@ ScrollBar_Update( LCUI_Widget *widget )
 	/* 计算比例，之后转换成字符串 */
 	scale = scrollbar->data.current_size*1.0 / scrollbar->data.max_size; 
 	sprintf( scale_str, "%.2lf%%", scale*100 );
-	//printf( "scale: %s\n", scale_str );
+	//printf( "ScrollBar_Update(): scale: %s\n", scale_str );
 	/* 判断滚动条的方向 */
 	if( scrollbar->direction == 1 ) { /* 横向 */
 		Set_Widget_Size( scrollbar->widget, NULL, scale_str );
 	} else { /* 纵向 */
 		Set_Widget_Size( scrollbar->widget, NULL, scale_str );
-		pos = Get_Container_Height( widget );
-		pos -= _Get_Widget_Height( scrollbar->widget );
-		Limit_Widget_Pos( scrollbar->widget, Pos(0,0), Pos( 0, pos ) );
+		max_len = Get_Container_Height( widget );
+		max_len -= _Get_Widget_Height( scrollbar->widget );
+		Limit_Widget_Pos( scrollbar->widget, Pos(0,0), Pos( 0, max_len ) );
+		
+		scale = scrollbar->data.current_num*1.0 / scrollbar->data.max_num;
+		pos = scale * max_len;
+		//printf("ScrollBar_Update(), num: %d / %d\n", 
+		//scrollbar->data.current_num, scrollbar->data.max_num);
+		//printf("ScrollBar_Update(), scale: %.2f\n", scale);
+		//printf("ScrollBar_Update(), y: %d\n", pos);
+		/* 移动滚动条 */
+		Move_Widget( scrollbar->widget, Pos(0,pos) );
 	}
 }
 
@@ -183,7 +196,11 @@ Get_ScrollBar( LCUI_Widget *widget )
 void 
 ScrollBar_Set_MaxNum( LCUI_Widget *widget, int max_num )
 {
+	LCUI_ScrollBar *scrollbar;
 	
+	scrollbar = Get_Widget_PrivData( widget );
+	scrollbar->data.max_num = max_num;
+	Update_Widget( widget );
 }
 
 void 
@@ -199,19 +216,28 @@ ScrollBar_Set_MaxSize( LCUI_Widget *widget, int max_size )
 void 
 ScrollBar_Set_CurrentNum( LCUI_Widget *widget, int current_num )
 {
+	LCUI_ScrollBar *scrollbar;
 	
+	scrollbar = Get_Widget_PrivData( widget );
+	scrollbar->data.current_num = current_num;
+	Update_Widget( widget );
 }
 
 void 
 ScrollBar_Set_CurrentSize( LCUI_Widget *widget, int current_size )
 {
+	LCUI_ScrollBar *scrollbar;
 	
+	scrollbar = Get_Widget_PrivData( widget );
+	scrollbar->data.current_size = current_size;
+	Update_Widget( widget );
 }
 
 void
 ScrollBar_Connect( 
 		LCUI_Widget *widget,
-		void (*callback_func)( LCUI_Widget*, ScrollBar_Data )
+		void (*callback_func)( ScrollBar_Data, void* ),
+		void *arg
 		)
 /* 将回调函数与滚动条部件连接 */
 {
@@ -219,6 +245,7 @@ ScrollBar_Connect(
 	
 	scrollbar = Get_Widget_PrivData( widget );
 	scrollbar->callback_func = callback_func;
+	scrollbar->arg = arg;
 }
 
 /* 设置滚动条是横向移动还是纵向移动 */
