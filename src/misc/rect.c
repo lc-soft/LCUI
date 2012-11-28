@@ -108,6 +108,13 @@ int Get_Cut_Area(LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut)
 		cut->height -= (rect.y + rect.height - container.h); 
 		result = 1;
 	}
+	/* 有效化处理 */
+	if( cut->width < 0 ) {
+		cut->width = 0;
+	}
+	if( cut->height < 0 ) {
+		cut->height = 0;
+	}
 	return result;
 }
 
