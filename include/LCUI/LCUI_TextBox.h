@@ -55,6 +55,9 @@ TextBox_Get_Cursor( LCUI_Widget *widget );
 void TextBox_Text(LCUI_Widget *widget, char *new_text);
 /* 设定文本框显示的文本 */
 
+void TextBox_TextLayer_Set_Offset( LCUI_Widget *widget, LCUI_Pos offset_pos );
+/* 为文本框内的文本图层设置偏移 */
+
 void TextBox_Text_Add(LCUI_Widget *widget, char *new_text);
 /* 在光标处添加文本 */
 
@@ -64,9 +67,13 @@ int TextBox_Text_Backspace(LCUI_Widget *widget, int n);
 int TextBox_Text_Delete(LCUI_Widget *widget, int n);
 /* 删除光标右边处n个字符 */
 
-void
+LCUI_Pos 
 TextBox_Cursor_Update( LCUI_Widget *widget );
-/* 更新文本框的光标 */
+/* 更新文本框的光标，返回该光标的像素坐标 */
+
+void 
+TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos );
+/* 移动文本框内的光标 */
 
 int TextBox_Get_Select_Text( LCUI_Widget *widget, char *out_text );
 /* 获取文本框内被选中的文本 */

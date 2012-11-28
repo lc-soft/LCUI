@@ -44,6 +44,17 @@
 
 LCUI_BEGIN_HEADER
 
+typedef struct _ScrollBar_Data
+{
+	/* 这两个控制滑块的位置 */
+	int max_num;
+	int current_num;
+	/* 这两个控制滑块的宽度 */
+	int max_size;
+	int current_size;
+}
+ScrollBar_Data;
+
 LCUI_Widget *
 Get_ScrollBar( LCUI_Widget *widget );
 
@@ -61,6 +72,14 @@ ScrollBar_Set_CurrentSize( LCUI_Widget *widget, int current_size );
 
 void 
 ScrollBar_Set_Direction( LCUI_Widget *widget, int direction );
+
+void
+ScrollBar_Connect( 
+		LCUI_Widget *widget,
+		void (*callback_func)( ScrollBar_Data, void* ),
+		void *arg
+		);
+/* 将回调函数与滚动条部件连接 */
 
 LCUI_END_HEADER
 

@@ -212,7 +212,8 @@ struct _LCUI_TextLayer
 	BOOL using_style_tags	:1;	/* 指示是否处理样式标签 */
 	BOOL enable_word_wrap	:1;	/* 指示是否自动换行 */
 	BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */ 
-	BOOL need_proc_buff	:1;
+	BOOL need_proc_buff	:1;	/* 指示是否处理缓冲区内的文本 */
+	BOOL need_scroll_layer	:1;	/* 指示是否需要滚动图层 */
 	BOOL have_select : 1;	/* 标记，指示是否在文本图层中选择了文本 */
 	uint32_t start, end;	/* 被选中的文本的范围 */ 
 	

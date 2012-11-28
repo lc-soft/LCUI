@@ -324,6 +324,9 @@ void Widget_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode );
 void Exec_Refresh_Widget(LCUI_Widget *widget);
 /* 功能：执行刷新显示指定部件的整个区域图形的操作 */ 
 
+void Exec_Update_Widget(LCUI_Widget *widget);
+/* 功能：执行部件的更新操作 */
+
 void Exec_Draw_Widget(LCUI_Widget *widget);
 /* 功能：执行部件图形更新操作 */ 
 
