@@ -197,7 +197,6 @@ static void timer_list_sort( LCUI_Queue *timer_list )
 		if( !a_timer ) {
 			continue;
 		}
-		
 		for(j=i+1; j<total; ++j) {
 			b_timer = Queue_Get( timer_list, j );
 			if( !b_timer ) {
