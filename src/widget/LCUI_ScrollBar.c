@@ -186,11 +186,22 @@ Register_ScrollBar()
 /**************************** 公共函数 **********************************/
 LCUI_Widget *
 Get_ScrollBar( LCUI_Widget *widget )
+/* 获取滚动条部件 */
 {
 	LCUI_ScrollBar *scrollbar;
 	
 	scrollbar = Get_Widget_PrivData( widget );
 	return scrollbar->widget;
+}
+
+ScrollBar_Data 
+ScrollBar_Get_Data ( LCUI_Widget *widget )
+/* 获取滚动条的数据 */
+{
+	LCUI_ScrollBar *scrollbar;
+	
+	scrollbar = Get_Widget_PrivData( widget );
+	return scrollbar->data;
 }
 
 void 
