@@ -48,6 +48,10 @@ LCUI_Widget*
 TextBox_Get_Label( LCUI_Widget *widget );
 /* 获取文本框部件内的label部件指针 */
 
+int 
+TextBox_ViewArea_Update( LCUI_Widget *widget );
+/* 更新文本框的文本显示区域 */
+
 LCUI_Widget *
 TextBox_Get_Cursor( LCUI_Widget *widget );
 /* 获取文本框部件内的光标 */
@@ -71,9 +75,9 @@ LCUI_Pos
 TextBox_Cursor_Update( LCUI_Widget *widget );
 /* 更新文本框的光标，返回该光标的像素坐标 */
 
-void 
+LCUI_Pos
 TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos );
-/* 移动文本框内的光标 */
+/* 移动文本框内的光标,返回该光标的像素坐标 */
 
 int TextBox_Get_Select_Text( LCUI_Widget *widget, char *out_text );
 /* 获取文本框内被选中的文本 */

@@ -358,9 +358,14 @@ LCUI_Pos
 TextLayer_Get_Cursor_Pos( LCUI_TextLayer *layer );
 /* 获取光标在文本框中的位置，也就是光标在哪一行的哪个字后面 */ 
 
+
+LCUI_Pos
+TextLayer_Get_Cursor_FixedPixelPos( LCUI_TextLayer *layer );
+/* 获取文本图层的光标位置，单位为像素 */
+
 LCUI_Pos
 TextLayer_Get_Cursor_PixelPos( LCUI_TextLayer *layer );
-/* 获取光标在文本框中的位置，单位为像素 */
+/* 获取文本图层的光标相对于容器位置，单位为像素 */
 
 LCUI_Pos
 TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos );
