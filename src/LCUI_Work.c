@@ -111,6 +111,19 @@ Run_Task( LCUI_App *app )
 	return Queue_Delete(&app->task_queue, 0);
 }
 
+static void
+__destroy_apptask( LCUI_Func *func_data )
+/* 销毁程序任务 */
+{
+	if( func_data->destroy_arg[0] && func_data->arg[0] ) {
+		free( func_data->arg[0] );
+		func_data->arg[0] = NULL;
+	}
+	if( func_data->destroy_arg[1] && func_data->arg[1] ) {
+		free( func_data->arg[1] );
+		func_data->arg[1] = NULL;
+	}
+}
 
 int 
 AppTask_Custom_Add(int mode, LCUI_Func *func_data)
@@ -155,8 +168,8 @@ AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 	for (i = 0; i < total; ++i) {
 		//printf("1\n");
 		temp = Queue_Get(queue, i);
-		/* 如果函数指针已有记录 */
-		if(temp->func != func_data->func) {
+		/* 如果指针无效，或者函数指针已有记录 */
+		if( !temp || temp->func != func_data->func ) {
 			continue;
 		}
 		//printf("2\n");/* 如果要求的是不重复模式 */ 
@@ -170,20 +183,24 @@ AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 					/* 如果函数以及参数1和2都一样 */ 
 					if(temp->arg[0] == func_data->arg[0] 
 					&& temp->arg[1] == func_data->arg[1]) {
+						__destroy_apptask( func_data );
 						return -1; 
 					}
 				} else {/* 否则，只是要求函数以及第1个参数不能全部重复 */
 					if(temp->arg[0] == func_data->arg[0]) { 
+						__destroy_apptask( func_data );
 						return -1; 
 					}
 				}
 			}/* 否则，如果只是要求是第2个参数不能重复 */
 			else if(Check_Option(mode, AND_ARG_S)) {
 				if(temp->arg[1] == func_data->arg[1] ) {
+					__destroy_apptask( func_data );
 					return -1; 
 				}
 			}
 			else {/* 否则，只是要求函数不同 */ 
+				__destroy_apptask( func_data );
 				return -1; 
 			}
 		}/* 如果要求的是替换模式 */
@@ -400,7 +417,7 @@ Handle_Event(LCUI_EventQueue *queue, int event_id)
 	for (i = 0; i < total; ++i) {
 		func = Queue_Get(&event->func_data, i);
 		/* 添加至程序的任务队列 */ 
-		AppTask_Custom_Add(ADD_MODE_ADD_NEW, func);
+		AppTask_Custom_Add(ADD_MODE_REPLACE | AND_ARG_F, func);
 	}
 	return 0;
 }
