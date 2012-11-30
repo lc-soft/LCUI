@@ -856,7 +856,7 @@ TextLayer_Get_Size ( LCUI_TextLayer *layer )
 	Text_RowData *p_row; 
 	
 	rows = Queue_Get_Total( &layer->rows_data );
-	for(size.w=0,size.h=0,i=0; i<rows; ++i,++size.h) {
+	for(size.w=0,size.h=0,i=0; i<rows; ++i) {
 		p_row = Queue_Get( &layer->rows_data, i );
 		if( !p_row ) {
 			continue;
@@ -1527,6 +1527,8 @@ TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos )
 	layer->current_des_pos = pos;
 	/* 加上偏移坐标 */
 	pixel_pos = Pos_Add( pixel_pos, layer->offset_pos );
+	/* 微调位置 */
+	pixel_pos.y += 2;
 	return pixel_pos;
 }
 
@@ -1747,6 +1749,8 @@ TextLayer_Get_Char_PixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 		}
 		pixel_pos.x += char_ptr->bitmap.advance.x;
 	}
+	/* 微调位置 */
+	pixel_pos.y += 2;
 	return pixel_pos;
 }
 
@@ -1758,13 +1762,21 @@ TextLayer_Get_Cursor_Pos( LCUI_TextLayer *layer )
 }
 
 LCUI_Pos
-TextLayer_Get_Cursor_PixelPos( LCUI_TextLayer *layer )
-/* 获取光标在文本框中的位置，单位为像素 */
+TextLayer_Get_Cursor_FixedPixelPos( LCUI_TextLayer *layer )
+/* 获取文本图层的光标位置，单位为像素 */
 {
-	
 	LCUI_Pos pos;
 	pos = TextLayer_Get_Cursor_Pos( layer );
 	pos = TextLayer_Get_Char_PixelPos( layer, pos );
+	return pos;
+}
+
+LCUI_Pos
+TextLayer_Get_Cursor_PixelPos( LCUI_TextLayer *layer )
+/* 获取文本图层的光标相对于容器位置，单位为像素 */
+{
+	LCUI_Pos pos;
+	pos = TextLayer_Get_Cursor_FixedPixelPos( layer );
 	/* 加上偏移坐标 */
 	pos = Pos_Add( pos, layer->offset_pos );
 	return pos;
