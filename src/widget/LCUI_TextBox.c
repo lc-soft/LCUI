@@ -198,10 +198,9 @@ TextBox_Scroll_TextLayer( ScrollBar_Data data, void *arg )
 	LCUI_Pos pos;
 	
 	pos.x = 0;
-	pos.y = data.max_size - data.current_size;
-	pos.y = pos.y * data.current_num * 1.0 / data.max_num;
+	pos.y = data.current_num;
 	pos.y = 0 - pos.y;
-	printf("%d\n", pos.y);
+	printf("offset.y: %d\n", pos.y);
 	TextBox_TextLayer_Set_Offset( widget, pos );
 	Update_Widget( widget );
 }
@@ -315,9 +314,11 @@ static void
 Exec_TextBox_Update( LCUI_Widget *widget )
 /* 更新文本框的文本图层 */
 {
+	printf("Exec_TextBox_Update(): enter\n");
 	Exec_Update_Widget( TextBox_Get_Label( widget ) );
 	TextBox_ScrollBar_Update( widget );
 	TextBox_Cursor_Update( widget );
+	printf("Exec_TextBox_Update(): quit\n");
 }
 
 static void
@@ -419,7 +420,9 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 		area_pos.y = cursor_pos.y;
 	}
 	if(cursor_pos.y + cursor_h > area_pos.y + area_size.h ) {
+		printf("outrange\n");
 		area_pos.y = cursor_pos.y + cursor_h - area_size.h;
+		printf("area_pos.y: %d\n", area_pos.y);
 	}
 	/* 如果显示区域在Y轴上超过文本图层的范围 */
 	if( area_pos.y + area_size.h > layer_size.h ) {
@@ -432,9 +435,12 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	ScrollBar_Set_CurrentNum( scrollbar, area_pos.y );
 	/* 获取滚动条的数据，供滚动文本层利用 */
 	scrollbar_data = ScrollBar_Get_Data( scrollbar );
+	
+	printf("scrollbar_data: size: %d / %d, num: %d / %d\n", 
+	scrollbar_data.current_size, scrollbar_data.max_size, 
+	scrollbar_data.current_num, scrollbar_data.max_num);
 	/* 根据数据，滚动文本图层至响应的位置，也就是移动文本显示区域 */
 	TextBox_Scroll_TextLayer( scrollbar_data, widget );
-	Update_Widget( widget );
 	printf("TextBox_ViewArea_Update(): quit\n");
 	return 0;
 }
@@ -484,6 +490,7 @@ void TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 	
 	layer = TextBox_Get_TextLayer( widget );
 	TextLayer_Text_Add( layer, new_text );
+	Update_Widget( widget );
 	TextBox_ViewArea_Update( widget );
 }
 
