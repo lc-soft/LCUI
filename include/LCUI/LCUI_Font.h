@@ -214,7 +214,7 @@ struct _LCUI_TextLayer
 	BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */ 
 	BOOL need_proc_buff	:1;	/* 指示是否处理缓冲区内的文本 */
 	BOOL need_scroll_layer	:1;	/* 指示是否需要滚动图层 */
-	BOOL have_select : 1;	/* 标记，指示是否在文本图层中选择了文本 */
+	BOOL have_select	:1;	/* 标记，指示是否在文本图层中选择了文本 */
 	uint32_t start, end;	/* 被选中的文本的范围 */ 
 	
 	LCUI_Queue color_keyword;	/* 记录需要使用指定风格的关键字 */
@@ -225,6 +225,7 @@ struct _LCUI_TextLayer
 	LCUI_Queue clear_area;		/* 记录需刷新的区域 */
 	
 	LCUI_Pos offset_pos;		/* 偏移位置 */
+	LCUI_Pos old_offset_pos;	/* 未滚动前的偏移位置 */
 	uint32_t current_src_pos;	/* 当前光标在源文本中位置 */
 	LCUI_Pos current_des_pos;	/* 当前光标在分段后的文本中的位置 */
 	uint32_t max_text_len;		/* 最大文本长度 */

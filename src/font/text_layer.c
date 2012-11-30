@@ -669,6 +669,7 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	layer->start = 0;
 	layer->end = 0;
 	layer->offset_pos = Pos(0,0);
+	layer->old_offset_pos = Pos(0,0);
 	
 	Queue_Init( &layer->color_keyword, sizeof(Special_KeyWord), Destroy_Special_KeyWord );
 	/* 队列中使用链表储存这些数据 */
@@ -713,6 +714,80 @@ __TextLayer_Text( LCUI_TextLayer *layer )
 	return 0;
 }
 
+static void
+__TextLayer_OldArea_Erase( LCUI_Widget *widget, LCUI_TextLayer *layer )
+/* 
+ * 功能：擦除文本图层的老区域
+ * 说明：根据记录的旧偏移坐标，刷新部件区域内的文字所在区域。
+ *  */
+{
+	static int i, j, x, y, rows, len;
+	static LCUI_Graph slot;
+	static Text_RowData *row_ptr;
+	static LCUI_CharData *char_ptr;
+	static LCUI_Rect area;
+	
+	Graph_Init( &slot );
+	rows = Queue_Get_Total( &layer->rows_data );
+	for(y=layer->old_offset_pos.y,i=0; y<0 && i<rows; ++i) {
+		row_ptr = Queue_Get( &layer->rows_data, i );
+		if( !row_ptr ) {
+			continue;
+		}
+		if( y + row_ptr->max_size.h > 0 ) {
+			break;
+		}
+		y += row_ptr->max_size.h;
+	}
+	for(; i<rows; ++i) {
+		row_ptr = Queue_Get( &layer->rows_data, i );
+		if( !row_ptr ) {
+			continue;
+		}
+		len = Queue_Get_Total( &row_ptr->string );
+		for(x=layer->old_offset_pos.x,j=0; x<0 && j<len; ++j) {
+			char_ptr = Queue_Get( &row_ptr->string, j );
+			if( !char_ptr ) {
+				continue;
+			}
+			if( x+char_ptr->bitmap.advance.x > 0 ) {
+				break;
+			}
+			x += char_ptr->bitmap.advance.x;
+		}
+		
+		area.height = layer->default_data.pixel_size+2;
+		for( ; j<len; ++j ) {
+			char_ptr = Queue_Get( &row_ptr->string, j );
+			if( !char_ptr ) {
+				continue;
+			}
+			area.y = y + row_ptr->max_size.h-1;
+			area.y -= char_ptr->bitmap.top;
+			if( area.y + char_ptr->bitmap.rows > area.height ) {
+				area.height = area.y + char_ptr->bitmap.rows;
+			}
+			x += char_ptr->bitmap.advance.x;
+			if( x > widget->size.w ) {
+				break;
+			}
+		}
+		area.x = 0;
+		area.y = y;
+		area.width = x;
+		/* 引用部件图层中的区域 */
+		Quote_Graph( &slot, &widget->graph, area );
+		/* 将该区域的alpha通道填充为0 */
+		Graph_Fill_Alpha( &slot, 0 );
+		/* 添加刷新区域 */
+		Add_Widget_Refresh_Area( widget, area );
+		y += row_ptr->max_size.h;
+		if( y > widget->size.h ) {
+			break;
+		}
+	}
+}
+
 void 
 TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 /* 将文本图层绘制到目标部件的图层上 */
@@ -734,10 +809,10 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	}
 	/* 如果需要滚动图层 */
 	if( layer->need_scroll_layer ) {
-		Graph_Fill_Alpha( &widget->graph, 0 );
+		/* 根据之前记录的偏移坐标，刷新文本图层 */
+		__TextLayer_OldArea_Erase( widget, layer );
 		draw_all = TRUE;
 		layer->need_scroll_layer = FALSE;
-		Refresh_Widget( widget );
 	}
 	
 	Graph_Init( &slot );
@@ -747,7 +822,7 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 		RectQueue_Get( &area, 0 , &layer->clear_area ); 
 		area.x += layer->offset_pos.x;
 		area.y += layer->offset_pos.y;
-		Queue_Delete( &layer->clear_area, 0 ); 
+		Queue_Delete( &layer->clear_area, 0 );
 		Quote_Graph( &slot, &widget->graph, area );
 		/* 将该区域的alpha通道填充为0 */
 		Graph_Fill_Alpha( &slot, 0 );
@@ -840,6 +915,10 @@ void
 TextLayer_Set_Offset( LCUI_TextLayer *layer, LCUI_Pos offset_pos )
 /* 设定文本图层的偏移位置 */
 {
+	/* 如果之前已经标记不需要滚动，那么就记录当前的偏移位置 */
+	if( !layer->need_scroll_layer ) {
+		layer->old_offset_pos = layer->offset_pos;
+	}
 	layer->offset_pos = offset_pos;
 	layer->need_scroll_layer = TRUE;
 }
