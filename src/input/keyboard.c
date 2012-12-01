@@ -183,10 +183,10 @@ static BOOL proc_keyboard()
 	LCUI_Graph graph;
 	
 	Graph_Init(&graph);
-	area.x = (Get_Screen_Width()-320)/2;
-	area.y = (Get_Screen_Height()-240)/2;
 	area.width = 320;
 	area.height = 240;
+	area.x = (Get_Screen_Width()-area.width)/2;
+	area.y = (Get_Screen_Height()-area.height)/2;
 	if ( !Check_Key ()) { /* 如果没有按键输入 */ 
 		return FALSE;
 	}
