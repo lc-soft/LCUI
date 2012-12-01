@@ -24,11 +24,14 @@ typedef struct _LCUI_TextBox
 	LCUI_Widget *text;
 	LCUI_Widget *cursor;
 	LCUI_Widget *scrollbar[2];
+	int block_size;			/* 块大小 */
+	LCUI_Queue text_block_buff;	/* 文本块缓冲区 */
 }
 LCUI_TextBox;
 
 /*----------------------------- Private ------------------------------*/
 static LCUI_Widget *active_textbox = NULL; 
+static int __timer_id = -1;
 
 static void
 _put_textbox_cursor( LCUI_Widget *widget, void *arg )
@@ -223,6 +226,8 @@ TextBox_Init( LCUI_Widget *widget )
 	textbox->scrollbar[0]->focus = FALSE;
 	textbox->scrollbar[1]->focus = FALSE;
 	
+	textbox->block_size = 256;
+	
 	Label_AutoSize( textbox->text, FALSE, 0 );
 	Set_Widget_Dock( textbox->text, DOCK_TYPE_FILL );
 	
@@ -239,6 +244,8 @@ TextBox_Init( LCUI_Widget *widget )
 	
 	Show_Widget( textbox->text );
 	
+	Queue_Init( &textbox->text_block_buff, sizeof(char*), NULL );
+	
 	TextLayer_Using_StyleTags( Label_Get_TextLayer(textbox->text), FALSE );
 	Set_Widget_Padding( widget, Padding(2,2,2,2) );
 	Set_Widget_Backcolor( textbox->cursor, RGB(0,0,0) );
@@ -249,7 +256,9 @@ TextBox_Init( LCUI_Widget *widget )
 	Set_Widget_ClickableAlpha( textbox->cursor, 0, 1 );
 	Set_Widget_ClickableAlpha( textbox->text, 0, 1 );
 	/* 设定定时器，每1秒闪烁一次 */
-	set_timer( 500, blink_cursor, TRUE );
+	if( __timer_id == -1 ) {
+		__timer_id = set_timer( 500, blink_cursor, TRUE );
+	}
 	Widget_Drag_Event_Connect( widget, TextBox_TextLayer_Click );
 	/* 关联FOCUS_IN 事件 */
 	Widget_FocusIn_Event_Connect( widget, _put_textbox_cursor, NULL );
@@ -310,15 +319,37 @@ TextBox_ScrollBar_Update( LCUI_Widget *widget )
 	}
 }
 
+static void 
+__TextBox_Text_Append(LCUI_Widget *widget, char *new_text)
+/* 在文本末尾追加文本 */
+{
+	LCUI_TextLayer *layer;
+	layer = TextBox_Get_TextLayer( widget );
+	TextLayer_Text_Append( layer, new_text );
+}
+
 static void
 Exec_TextBox_Update( LCUI_Widget *widget )
 /* 更新文本框的文本图层 */
 {
-	printf("Exec_TextBox_Update(): enter\n");
+	char *text_ptr;
+	LCUI_TextBox *textbox;
+	
+	textbox = Get_Widget_PrivData( widget );
+	//printf("Exec_TextBox_Update(): enter\n");
+	/* 如果缓冲区内有文本块 */
+	if( Queue_Get_Total( &textbox->text_block_buff ) > 0 ) {
+		text_ptr = Queue_Get( &textbox->text_block_buff, 0 );
+		//printf("Exec_TextBox_Update(): buff: %s\n", text_ptr);
+		__TextBox_Text_Append( widget, text_ptr );
+		Queue_Delete( &textbox->text_block_buff, 0 );
+		TextBox_ViewArea_Update( widget );
+		Update_Widget( widget );
+	}
 	Exec_Update_Widget( TextBox_Get_Label( widget ) );
 	TextBox_ScrollBar_Update( widget );
 	TextBox_Cursor_Update( widget );
-	printf("Exec_TextBox_Update(): quit\n");
+	//printf("Exec_TextBox_Update(): quit\n");
 }
 
 static void
@@ -387,7 +418,7 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	static LCUI_Size layer_size, area_size;
 	static LCUI_Widget *scrollbar;
 	static LCUI_TextLayer *layer;
-	printf("TextBox_ViewArea_Update(): enter\n");
+	//printf("TextBox_ViewArea_Update(): enter\n");
 	/* 获取显示区域的尺寸 */
 	area_size = Get_Container_Size( widget );
 	if( area_size.h <= 0 || area_size.w <= 0 ) {
@@ -411,18 +442,18 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	/* 设定滚动条的数据中的最大值 */
 	ScrollBar_Set_MaxNum( scrollbar, layer_size.h - area_size.h );
 	
-	printf("cursor_pos: %d,%d\n", cursor_pos.x, cursor_pos.y);
-	printf("area_rect: %d,%d,%d,%d\n", area_pos.x, area_pos.y,
-	area_size.w, area_size.h );
-	printf("layer_size: %d,%d\n", layer_size.w, layer_size.h);
+	//printf("cursor_pos: %d,%d\n", cursor_pos.x, cursor_pos.y);
+	//printf("area_rect: %d,%d,%d,%d\n", area_pos.x, area_pos.y,
+	//area_size.w, area_size.h );
+	//printf("layer_size: %d,%d\n", layer_size.w, layer_size.h);
 	/* 检测光标Y轴坐标是否超出显示区域的范围 */
 	if( cursor_pos.y < area_pos.y ) {
 		area_pos.y = cursor_pos.y;
 	}
 	if(cursor_pos.y + cursor_h > area_pos.y + area_size.h ) {
-		printf("outrange\n");
+	//	printf("outrange\n");
 		area_pos.y = cursor_pos.y + cursor_h - area_size.h;
-		printf("area_pos.y: %d\n", area_pos.y);
+	//	printf("area_pos.y: %d\n", area_pos.y);
 	}
 	/* 如果显示区域在Y轴上超过文本图层的范围 */
 	if( area_pos.y + area_size.h > layer_size.h ) {
@@ -436,12 +467,12 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	/* 获取滚动条的数据，供滚动文本层利用 */
 	scrollbar_data = ScrollBar_Get_Data( scrollbar );
 	
-	printf("scrollbar_data: size: %d / %d, num: %d / %d\n", 
-	scrollbar_data.current_size, scrollbar_data.max_size, 
-	scrollbar_data.current_num, scrollbar_data.max_num);
+	//printf("scrollbar_data: size: %d / %d, num: %d / %d\n", 
+	//scrollbar_data.current_size, scrollbar_data.max_size, 
+	//scrollbar_data.current_num, scrollbar_data.max_num);
 	/* 根据数据，滚动文本图层至响应的位置，也就是移动文本显示区域 */
 	TextBox_Scroll_TextLayer( scrollbar_data, widget );
-	printf("TextBox_ViewArea_Update(): quit\n");
+	//printf("TextBox_ViewArea_Update(): quit\n");
 	return 0;
 }
 
@@ -463,20 +494,94 @@ TextBox_Get_Cursor( LCUI_Widget *widget )
 	return tb->cursor;
 }
 
+
+static void
+TextBox_Split_Text( LCUI_Widget *widget, char *new_text )
+{
+	int i, j, count,len;
+	LCUI_TextBox *textbox;
+	char *text_block;
+	unsigned char t;
+	
+	len = strlen( new_text );
+	textbox = Get_Widget_PrivData( widget );
+	/* 判断当前使用的文本编码方式 */
+	switch(Get_EncodingType()) {
+	    case ENCODEING_TYPE_UTF8 :
+		//printf("len: %d\n", len);
+		for(i=0; i<len; ++i) {
+			text_block = malloc( sizeof(char) * textbox->block_size );
+			for( count=0,j=0; i<len; ++i, ++j ) {
+				/* 如果大于当前块大小 */
+				if( j >= textbox->block_size ) {
+					if( count == 0 ) {
+						break;
+					} else {
+						text_block = realloc( text_block, sizeof(char) * (j+count) );
+					}
+				}
+				if(count > 0) {
+					/* 保存一个字节 */
+					text_block[j] = new_text[i];
+					--count;
+					continue;
+				}
+				/* 需要转存为unsigned char类型，否则位移的结果会有问题 */
+				t = new_text[i];
+				/* 根据编码信息，判断该UTF-8字符还剩多少个字节 */
+				if((t>>7) == 0); // 0xxxxxxx
+				else if((t>>5) == 6) {// 110xxxxx 
+					count = 1; 
+				}
+				else if((t>>4) == 14) {// 1110xxxx 
+					count = 2; 
+				}
+				else if((t>>3) == 30) {// 11110xxx 
+					count = 3; 
+				}
+				else if((t>>2) == 62) {// 111110xx 
+					count = 4; 
+				}
+				else if((t>>1) == 126) {// 1111110x 
+					count = 5; 
+				}
+				/* 保存一个字节 */
+				text_block[j] = new_text[i];
+				//printf("char: %d, count: %d\n", new_text[i], count);
+			}
+			--i;
+			text_block[j] = 0;
+			//printf("text block: %s\n", text_block);
+			/* 添加文本块至缓冲区 */
+			Queue_Add_Pointer( &textbox->text_block_buff, text_block );
+		}
+		break;
+	    case ENCODEING_TYPE_GB2312 :
+		break;
+	    default: break;
+	}
+}
+
+static void
+TextBox_Text_Clear( LCUI_Widget *widget )
+{
+	
+}
+
 void TextBox_Text(LCUI_Widget *widget, char *new_text)
 /* 设定文本框显示的文本 */
 {
-	LCUI_Widget *label;
-	label = TextBox_Get_Label( widget );
-	Set_Label_Text( label, new_text );
-	TextBox_ViewArea_Update( widget );
+	/* 清空显示的文本 */
+	TextBox_Text_Clear( widget );
+	/* 把文本分割成块，加入至缓冲队列，让文本框分段显示 */
+	TextBox_Split_Text( widget, new_text );
+	Update_Widget( widget );
 }
 
 void TextBox_TextLayer_Set_Offset( LCUI_Widget *widget, LCUI_Pos offset_pos )
 /* 为文本框内的文本图层设置偏移 */
 {
 	LCUI_TextLayer *layer;
-	
 	layer = TextBox_Get_TextLayer( widget );
 	TextLayer_Set_Offset( layer, offset_pos );
 	/* 需要更新光标的显示位置 */
@@ -486,12 +591,18 @@ void TextBox_TextLayer_Set_Offset( LCUI_Widget *widget, LCUI_Pos offset_pos )
 void TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 /* 在光标处添加文本 */
 {
-	static LCUI_TextLayer *layer;
-	
+	LCUI_TextLayer *layer;
 	layer = TextBox_Get_TextLayer( widget );
 	TextLayer_Text_Add( layer, new_text );
 	Update_Widget( widget );
-	TextBox_ViewArea_Update( widget );
+}
+
+void TextBox_Text_Append(LCUI_Widget *widget, char *new_text)
+/* 在文本末尾追加文本 */
+{
+	/* 把文本分割成块，加入至缓冲队列，让文本框分段显示 */
+	TextBox_Split_Text( widget, new_text );
+	Update_Widget( widget );
 }
 
 int TextBox_Text_Paste(LCUI_Widget *widget)
