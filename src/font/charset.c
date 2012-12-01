@@ -34,11 +34,12 @@ static int code_convert(
 	return 0;
 }
 
-static int Get_EncodingType()
+int Get_EncodingType()
+/* 获取字符编码类型 */
 {
 	LCUI_App *app;
 	app = Get_Self_AppPointer();
-	if(app == NULL) {
+	if( !app ) {
 		return -1;
 	}
 	return app->encoding_type;
