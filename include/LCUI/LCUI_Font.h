@@ -231,7 +231,6 @@ struct _LCUI_TextLayer
 	uint32_t max_text_len;		/* 最大文本长度 */
 	
 	BOOL show_cursor;	/* 指定是否需要显示文本光标 */
-	int timer_id;		/* 定时器的ID */
 	
 	LCUI_String text_buff;
 	LCUI_TextStyle default_data;	/* 缺省状态下使用的文本样式数据 */
@@ -320,6 +319,10 @@ TextLayer_Text_Clear( LCUI_TextLayer *layer );
 void
 TextLayer_Text( LCUI_TextLayer *layer, char *new_text );
 /* 设定整个文本图层中需显示的文本，光标复位，原有选中文本被删除 */ 
+
+int 
+TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text );
+/* 在文本末尾追加文本，不移动光标，不删除原有选中文本 */
 
 int 
 TextLayer_Append( LCUI_TextLayer *layer, char *new_text );

@@ -762,6 +762,9 @@ int LCUI_Main ();
 int Get_LCUI_Version(char *out);
 /* 功能：获取LCUI的版本 */ 
 
+int Get_EncodingType();
+/* 获取字符编码类型 */
+
 int Using_GB2312();
 /* 
  * 说明：如果你的系统只能使用GB2312编码，不能使用UTF-8编码，可以使用这

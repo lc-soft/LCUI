@@ -48,7 +48,11 @@ LCUI_Widget*
 TextBox_Get_Label( LCUI_Widget *widget );
 /* 获取文本框部件内的label部件指针 */
 
-int 
+LCUI_Pos
+TextBox_ViewArea_Get_Pos( LCUI_Widget *widget );
+/* 获取文本显示区域的位置 */
+
+int
 TextBox_ViewArea_Update( LCUI_Widget *widget );
 /* 更新文本框的文本显示区域 */
 
@@ -64,6 +68,9 @@ void TextBox_TextLayer_Set_Offset( LCUI_Widget *widget, LCUI_Pos offset_pos );
 
 void TextBox_Text_Add(LCUI_Widget *widget, char *new_text);
 /* 在光标处添加文本 */
+
+void TextBox_Text_Append(LCUI_Widget *widget, char *new_text);
+/* 在文本末尾追加文本 */
 
 int TextBox_Text_Backspace(LCUI_Widget *widget, int n);
 /* 删除光标左边处n个字符 */
