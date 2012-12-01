@@ -252,7 +252,7 @@ union_draw_method:;
 	    default:
 			//
 		break;
-	} 
+	}
 }
 
 LCUI_Widget *
@@ -347,6 +347,7 @@ Window_Init(LCUI_Widget *win_p)
 	/* 显示在左上角 */
 	Set_Widget_Align(btn_close, ALIGN_TOP_RIGHT, Pos(0, -2)); 
 	/* 将尺寸改成和图片一样 */
+	Widget_AutoSize( btn_close, FALSE, 0 );
 	Resize_Widget(btn_close, Size(btn_normal.width, btn_normal.height));
 	Custom_Button_Style(btn_close, &btn_normal, &btn_highlight, &btn_down, NULL, NULL);
 	/* 关联按钮的点击事件，当按钮被点击后，调用Quit_Window函数 */
@@ -369,7 +370,8 @@ Window_Init(LCUI_Widget *win_p)
 	Widget_Container_Add(titlebar, btn_close);
 	Widget_Container_Add(win_p, titlebar);
 	Widget_Container_Add(win_p, client_area);
-	Resize_Widget(win_p, Size(50, 50));
+	/* 窗口初始尺寸 */
+	Resize_Widget(win_p, Size(100, 50));
 	Show_Widget(btn_close);
 	/* 关联拖动事件，让鼠标能够拖动标题栏并使窗口移动 */
 	Widget_Drag_Event_Connect(titlebar, Move_Window); 
@@ -393,8 +395,8 @@ Show_Window(LCUI_Widget *win_p)
 	win->count++;
 	if(win->count == 1) {/* 如果是第一次显示 */ 
 		size = _Get_Widget_Container_Size( win_p ); 
-		pos = Align_Get_Pos( size, _Get_Widget_Size(win_p), win->init_align ); 
-		Move_Widget( win_p, pos );
+		pos = Align_Get_Pos( size, _Get_Widget_Size(win_p), win->init_align );
+		Exec_Move_Widget( win_p, pos );
 	}
 	//有待扩展 
 }
