@@ -226,12 +226,13 @@ int get_PX_P_t( char *str, PX_P_t *combo_num )
 			--j;
 			continue;
 		}
-		if(str[i] >= '0' && str[i] <= '9' || str[i] == '.' ) {
+		if((str[i] >= '0' && str[i] <= '9') || str[i] == '.' ) {
 			buff[j] = str[i];
 			continue;
 		}
 		else if(str[i] == '%') {/* 如果有%，取浮点数 */ 
-			buff[j+1] = 0; 
+			buff[j] = 0; 
+			DEBUG_MSG( "buff: %s\n", buff );
 			sscanf( buff, "%lf", &combo_num->scale );
 			combo_num->scale/=100.0; 
 			combo_num->which_one = 1;
