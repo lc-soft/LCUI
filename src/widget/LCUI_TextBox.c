@@ -1,11 +1,45 @@
-/*
- * 文本框部件，正在实现中，只添加了数据结构以及部分函数接口
+/* ***************************************************************************
+ * LCUI_TextBox.c -- LCUI's TextBox widget
  * 
+ * Copyright (C) 2012 by
+ * Liu Chao
  * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
  * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
  * 
- * */
-#define DEBUG
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
+ 
+/* ****************************************************************************
+ * LCUI_TextBox.c -- LCUI 的文本框部件
+ *
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ****************************************************************************/
+
+//#define DEBUG
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -190,20 +224,39 @@ mv_cur_pos:;
 }
 
 static void 
-TextBox_Scroll_TextLayer( ScrollBar_Data data, void *arg )
-/* 滚动文本框内的文本图层 */
+TextBox_HoriScroll_TextLayer( ScrollBar_Data data, void *arg )
+/* 水平滚动文本框内的文本图层 */
 {
 	LCUI_Widget *widget;
 	
 	widget = (LCUI_Widget *)arg;
-	printf("data: size: %d / %d, num: %d / %d\n", 
-	data.current_size, data.max_size, data.current_num, data.max_num);
+	//printf("1, data: size: %d / %d, num: %d / %d\n", 
+	//data.current_size, data.max_size, data.current_num, data.max_num);
 	LCUI_Pos pos;
 	
-	pos.x = 0;
-	pos.y = data.current_num;
+	pos = TextBox_ViewArea_Get_Pos( arg );
+	pos.x = 0 - data.current_num;
 	pos.y = 0 - pos.y;
-	printf("offset.y: %d\n", pos.y);
+	//printf("1, offset.x: %d\n", pos.x);
+	TextBox_TextLayer_Set_Offset( widget, pos );
+	Update_Widget( widget );
+}
+
+static void 
+TextBox_VertScroll_TextLayer( ScrollBar_Data data, void *arg )
+/* 垂直滚动文本框内的文本图层 */
+{
+	LCUI_Widget *widget;
+	
+	widget = (LCUI_Widget *)arg;
+	//printf("2, data: size: %d / %d, num: %d / %d\n", 
+	//data.current_size, data.max_size, data.current_num, data.max_num);
+	LCUI_Pos pos;
+	
+	pos = TextBox_ViewArea_Get_Pos( arg );
+	pos.y = 0 - data.current_num;
+	pos.x = 0 - pos.x;
+	//printf("2, offset.y: %d\n", pos.y);
 	TextBox_TextLayer_Set_Offset( widget, pos );
 	Update_Widget( widget );
 }
@@ -229,19 +282,24 @@ TextBox_Init( LCUI_Widget *widget )
 	textbox->block_size = 256;
 	
 	Label_AutoSize( textbox->text, FALSE, 0 );
-	Set_Widget_Dock( textbox->text, DOCK_TYPE_FILL );
+	Set_Widget_Size( textbox->text, "100%", "100%" );
 	
 	/* 添加至相应的容器 */
 	Widget_Container_Add( textbox->text, textbox->cursor ); 
 	Widget_Container_Add( widget, textbox->text ); 
-	Widget_Container_Add( widget, textbox->scrollbar[0] ); 
-	Widget_Container_Add( widget, textbox->scrollbar[1] ); 
+	Widget_Container_Add( widget, textbox->scrollbar[0] );
+	Widget_Container_Add( widget, textbox->scrollbar[1] );
 	/* 设置滚动条的尺寸 */
 	Set_Widget_Size( textbox->scrollbar[0], "10px", NULL );
-	Set_Widget_Dock( textbox->scrollbar[0], DOCK_TYPE_RIGHT );
-	/* 将回调函数与滚动条连接 */
-	ScrollBar_Connect( textbox->scrollbar[0], TextBox_Scroll_TextLayer, widget );
+	Set_Widget_Size( textbox->scrollbar[1], NULL, "10px" );
+	Set_Widget_Align( textbox->scrollbar[0], ALIGN_TOP_RIGHT, Pos(0,0) );
+	Set_Widget_Align( textbox->scrollbar[1], ALIGN_BOTTOM_LEFT, Pos(0,0) );
+	/* 滚动条设为横向 */
+	ScrollBar_Set_Direction( textbox->scrollbar[1], 1 );
 	
+	/* 将回调函数与滚动条连接 */
+	ScrollBar_Connect( textbox->scrollbar[0], TextBox_VertScroll_TextLayer, widget );
+	ScrollBar_Connect( textbox->scrollbar[1], TextBox_HoriScroll_TextLayer, widget );
 	Show_Widget( textbox->text );
 	
 	Queue_Init( &textbox->text_block_buff, sizeof(char*), NULL );
@@ -291,32 +349,124 @@ TextBox_Get_Scrollbar( LCUI_Widget *widget, int which )
 }
 
 static void 
-TextBox_ScrollBar_Update( LCUI_Widget *widget )
-/* 更新文本框的滚动条 */
+TextBox_ScrollBar_Update_Size( LCUI_Widget *widget )
+/* 更新滚动条的长度 */
 {
+	int tmp;
+	char size_str[15];
 	LCUI_Size area_size, layer_size;
-	LCUI_Widget *scrollbar;
+	LCUI_Widget *scrollbar[2], *label;
 	LCUI_TextLayer *layer;
 	
+	label = TextBox_Get_Label( widget );
 	/* 获取文本图层 */
 	layer = TextBox_Get_TextLayer( widget );
 	/* 获取文本图层和文本框区域的尺寸 */
 	layer_size = TextLayer_Get_Size( layer );
 	area_size = Get_Container_Size( widget );
-	/* 获取纵向滚动条 */
-	scrollbar = TextBox_Get_Scrollbar( widget, 0 );
-	//printf("area: %d,%d, layer: %d,%d\n", 
-	//area_size.w, area_size.h, layer_size.w, layer_size.h);
+	/* 获取纵向和横向滚动条 */
+	scrollbar[0] = TextBox_Get_Scrollbar( widget, 0 );
+	scrollbar[1] = TextBox_Get_Scrollbar( widget, 1 );
+	
 	/* 如果文本图层高度超过显示区域 */
 	if( area_size.h > 0 && layer_size.h > area_size.h ) {
+		tmp = area_size.w - Get_Widget_Width( scrollbar[0] );
+		snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
+		Set_Widget_Size( label, size_str, NULL );
+		
 		/* 修改滚动条中记录的最大值和当前值，让滚动条在更新后有相应的长度 */
-		ScrollBar_Set_MaxSize( scrollbar, layer_size.h );
-		ScrollBar_Set_CurrentSize( scrollbar, area_size.h );
-		Show_Widget( scrollbar );
+		ScrollBar_Set_MaxSize( scrollbar[0], layer_size.h );
+		ScrollBar_Set_CurrentSize( scrollbar[0], area_size.h );
+		Show_Widget( scrollbar[0] );
+		/* 如果横向滚动条可见 */
+		if( scrollbar[1]->visible ) {
+			tmp = area_size.h - Get_Widget_Height( scrollbar[1] );
+			snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
+			Set_Widget_Size( scrollbar[0], NULL, size_str );
+		} else {
+			Set_Widget_Size( scrollbar[0], NULL, "100%" );
+		}
 	} else {
 		/* 不需要显示滚动条 */
-		Hide_Widget( scrollbar );
+		Hide_Widget( scrollbar[0] );
+		Set_Widget_Size( label, "100%", NULL );
 	}
+	/* 和上面的处理基本一样，这个是处理横向滚动条 */
+	if( area_size.w > 0 && layer_size.w > area_size.w ) {
+		tmp = area_size.h - Get_Widget_Height( scrollbar[1] );
+		snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
+		Set_Widget_Size( label, NULL, size_str );
+		
+		ScrollBar_Set_MaxSize( scrollbar[1], layer_size.w );
+		ScrollBar_Set_CurrentSize( scrollbar[1], area_size.w );
+		Show_Widget( scrollbar[1] );
+		
+		if( scrollbar[0]->visible ) {
+			tmp = area_size.w - Get_Widget_Width( scrollbar[0] );
+			snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
+			Set_Widget_Size( scrollbar[1], size_str, NULL );
+		} else {
+			Set_Widget_Size( scrollbar[1], "100%", NULL );
+		}
+	} else {
+		Set_Widget_Size( label, NULL, "100%" );
+		Hide_Widget( scrollbar[1] );
+	}
+}
+
+static int
+TextBox_ScrollBar_Update_Pos( LCUI_Widget *widget )
+/* 更新滚动条的位置 */
+{
+	static ScrollBar_Data scrollbar_data;
+	static LCUI_Pos area_pos;
+	static LCUI_Size layer_size, area_size;
+	static LCUI_Widget *scrollbar[2];
+	static LCUI_TextLayer *layer;
+	
+	area_size = Get_Container_Size( widget ); 
+	scrollbar[0] = TextBox_Get_Scrollbar( widget, 0 );
+	scrollbar[1] = TextBox_Get_Scrollbar( widget, 1 ); 
+	if( scrollbar[0]->visible ) {
+		area_size.w -= Get_Widget_Width( scrollbar[0] );
+	}
+	if( scrollbar[1]->visible ) {
+		area_size.h -= Get_Widget_Height( scrollbar[1] );
+	}
+	
+	if( area_size.h <= 0 || area_size.w <= 0 ) {
+		return -1;
+	}
+	
+	layer = TextBox_Get_TextLayer( widget );
+	layer_size = TextLayer_Get_Size( layer );
+	if( layer_size.h <= 0 || layer_size.w <= 0 ) {
+		return -2;
+	}
+	area_pos = TextBox_ViewArea_Get_Pos( widget );
+	ScrollBar_Set_MaxNum( scrollbar[0], layer_size.h - area_size.h );
+	
+	if( area_pos.y + area_size.h > layer_size.h ) {
+		area_pos.y = layer_size.h - area_size.h;
+	}
+	if( area_pos.x + area_size.w > layer_size.w ) {
+		area_pos.x = layer_size.w - area_size.w;
+	}
+	if( area_pos.y < 0 ) {
+		area_pos.y = 0;
+	}
+	if( area_pos.x < 0 ) {
+		area_pos.x = 0;
+	}
+	ScrollBar_Set_CurrentNum( scrollbar[0], area_pos.y ); 
+	scrollbar_data = ScrollBar_Get_Data( scrollbar[0] );
+	TextBox_VertScroll_TextLayer( scrollbar_data, widget );
+	
+	ScrollBar_Set_MaxNum( scrollbar[1], layer_size.w - area_size.w );
+	ScrollBar_Set_CurrentNum( scrollbar[1], area_pos.x );
+	scrollbar_data = ScrollBar_Get_Data( scrollbar[1] );
+	TextBox_HoriScroll_TextLayer( scrollbar_data, widget );
+	return 0;
 }
 
 static void 
@@ -336,32 +486,32 @@ Exec_TextBox_Update( LCUI_Widget *widget )
 	LCUI_TextBox *textbox;
 	
 	textbox = Get_Widget_PrivData( widget );
-	//printf("Exec_TextBox_Update(): enter\n");
 	/* 如果缓冲区内有文本块 */
 	if( Queue_Get_Total( &textbox->text_block_buff ) > 0 ) {
+		/* 获取文本块 */
 		text_ptr = Queue_Get( &textbox->text_block_buff, 0 );
-		//printf("Exec_TextBox_Update(): buff: %s\n", text_ptr);
+		/* 追加至文本框内的文本 */
 		__TextBox_Text_Append( widget, text_ptr );
+		/* 删除该文本块 */
 		Queue_Delete( &textbox->text_block_buff, 0 );
-		TextBox_ViewArea_Update( widget );
-		Update_Widget( widget );
+		/* 更新滚动条的位置 */
+		TextBox_ScrollBar_Update_Pos( widget );
+		/* 标记下次继续更新 */
+		__Update_Widget( widget );
 	}
+	/* 更新文本图层的内容 */
 	Exec_Update_Widget( TextBox_Get_Label( widget ) );
-	TextBox_ScrollBar_Update( widget );
+	/* 更新滚动条的长度 */
+	TextBox_ScrollBar_Update_Size( widget );
+	/* 更新文本框内的光标 */
 	TextBox_Cursor_Update( widget );
-	//printf("Exec_TextBox_Update(): quit\n");
 }
 
 static void
 Exec_TextBox_Resize( LCUI_Widget *widget )
 /* 在文本框改变尺寸后，进行附加处理 */
 {
-	/* 更新文本框内的文本图层 */
-	Exec_Update_Widget( TextBox_Get_Label( widget ) );
-	/* 更新文本框的滚动条 */
-	TextBox_ScrollBar_Update( widget );
-	/* 更新文本框的显示区域 */
-	TextBox_ViewArea_Update( widget );
+	Exec_TextBox_Update( widget );
 }
 
 void 
@@ -416,11 +566,22 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	static ScrollBar_Data scrollbar_data;
 	static LCUI_Pos cursor_pos, area_pos;
 	static LCUI_Size layer_size, area_size;
-	static LCUI_Widget *scrollbar;
+	static LCUI_Widget *scrollbar[2];
 	static LCUI_TextLayer *layer;
 	//printf("TextBox_ViewArea_Update(): enter\n");
 	/* 获取显示区域的尺寸 */
 	area_size = Get_Container_Size( widget );
+	/* 获取滚动条 */
+	scrollbar[0] = TextBox_Get_Scrollbar( widget, 0 );
+	scrollbar[1] = TextBox_Get_Scrollbar( widget, 1 );
+	/* 如果滚动条可见，那么区域尺寸就需要减去滚动条占用的尺寸 */
+	if( scrollbar[0]->visible ) {
+		area_size.w -= Get_Widget_Width( scrollbar[0] );
+	}
+	if( scrollbar[1]->visible ) {
+		area_size.h -= Get_Widget_Height( scrollbar[1] );
+	}
+	
 	if( area_size.h <= 0 || area_size.w <= 0 ) {
 		return -1;
 	}
@@ -437,23 +598,20 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	/* 获取当前行的最大高度作为光标的高度 */
 	cursor_h = TextLayer_CurRow_Get_MaxHeight( layer );
 	
-	/* 准备调整纵向滚动条的位置，先获取文本框的纵向滚动条 */
-	scrollbar = TextBox_Get_Scrollbar( widget, 0 );
 	/* 设定滚动条的数据中的最大值 */
-	ScrollBar_Set_MaxNum( scrollbar, layer_size.h - area_size.h );
+	ScrollBar_Set_MaxNum( scrollbar[0], layer_size.h - area_size.h );
 	
-	//printf("cursor_pos: %d,%d\n", cursor_pos.x, cursor_pos.y);
-	//printf("area_rect: %d,%d,%d,%d\n", area_pos.x, area_pos.y,
-	//area_size.w, area_size.h );
-	//printf("layer_size: %d,%d\n", layer_size.w, layer_size.h);
+	DEBUG_MSG("cursor_pos: %d,%d\n", cursor_pos.x, cursor_pos.y);
+	DEBUG_MSG("area_rect: %d,%d,%d,%d\n", 
+		area_pos.x, area_pos.y,area_size.w, area_size.h );
+	DEBUG_MSG("layer_size: %d,%d\n", layer_size.w, layer_size.h);
+	
 	/* 检测光标Y轴坐标是否超出显示区域的范围 */
 	if( cursor_pos.y < area_pos.y ) {
 		area_pos.y = cursor_pos.y;
 	}
 	if(cursor_pos.y + cursor_h > area_pos.y + area_size.h ) {
-	//	printf("outrange\n");
 		area_pos.y = cursor_pos.y + cursor_h - area_size.h;
-	//	printf("area_pos.y: %d\n", area_pos.y);
 	}
 	/* 如果显示区域在Y轴上超过文本图层的范围 */
 	if( area_pos.y + area_size.h > layer_size.h ) {
@@ -463,15 +621,40 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 		area_pos.y = 0;
 	}
 	/* 设定滚动条的数据中的当前值 */
-	ScrollBar_Set_CurrentNum( scrollbar, area_pos.y );
+	ScrollBar_Set_CurrentNum( scrollbar[0], area_pos.y );
 	/* 获取滚动条的数据，供滚动文本层利用 */
-	scrollbar_data = ScrollBar_Get_Data( scrollbar );
+	scrollbar_data = ScrollBar_Get_Data( scrollbar[0] );
 	
 	//printf("scrollbar_data: size: %d / %d, num: %d / %d\n", 
 	//scrollbar_data.current_size, scrollbar_data.max_size, 
 	//scrollbar_data.current_num, scrollbar_data.max_num);
 	/* 根据数据，滚动文本图层至响应的位置，也就是移动文本显示区域 */
-	TextBox_Scroll_TextLayer( scrollbar_data, widget );
+	TextBox_VertScroll_TextLayer( scrollbar_data, widget );
+	
+	/* 设定滚动条的数据中的最大值 */
+	ScrollBar_Set_MaxNum( scrollbar[1], layer_size.w - area_size.w );
+	
+	if( cursor_pos.x < area_pos.x ) {
+		area_pos.x = cursor_pos.x;
+	}
+	if(cursor_pos.x +5 > area_pos.x + area_size.w ) {
+		area_pos.x = cursor_pos.x+5 - area_size.w;
+	}
+	if( area_pos.x + area_size.w > layer_size.w ) {
+		area_pos.x = layer_size.w - area_size.w;
+	}
+	if( area_pos.x < 0 ) {
+		area_pos.x = 0;
+	}
+	/* 设定滚动条的数据中的当前值 */
+	ScrollBar_Set_CurrentNum( scrollbar[1], area_pos.x );
+	/* 获取滚动条的数据，供滚动文本层利用 */
+	scrollbar_data = ScrollBar_Get_Data( scrollbar[1] );
+	
+	//printf("scrollbar_data: size: %d / %d, num: %d / %d\n", 
+	//scrollbar_data.current_size, scrollbar_data.max_size, 
+	//scrollbar_data.current_num, scrollbar_data.max_num);
+	TextBox_HoriScroll_TextLayer( scrollbar_data, widget );
 	//printf("TextBox_ViewArea_Update(): quit\n");
 	return 0;
 }
@@ -591,9 +774,13 @@ void TextBox_TextLayer_Set_Offset( LCUI_Widget *widget, LCUI_Pos offset_pos )
 void TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 /* 在光标处添加文本 */
 {
+	LCUI_Pos cur_pos;
 	LCUI_TextLayer *layer;
+	
 	layer = TextBox_Get_TextLayer( widget );
 	TextLayer_Text_Add( layer, new_text );
+	cur_pos = TextLayer_Get_Cursor_Pos( layer );
+	TextBox_Cursor_Move( widget, cur_pos );
 	Update_Widget( widget );
 }
 
