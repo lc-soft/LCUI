@@ -71,9 +71,7 @@ Move_ScrollBar( LCUI_Widget *widget, LCUI_Pos new_pos )
 	/* 使该坐标在限制范围内 */
 	new_pos = Get_Widget_Valid_Pos( widget, new_pos );
 	/* 判断滚动条的方向 */
-	if( scrollbar->direction == 1 ) { /* 横向 */
-	
-	} else { /* 纵向 */
+	if( scrollbar->direction == 0 ) { /* 纵向 */
 		/* 先得到容器高度 */
 		size = _Get_Widget_Container_Height( widget );
 		/* 减去自身高度 */
@@ -81,6 +79,11 @@ Move_ScrollBar( LCUI_Widget *widget, LCUI_Pos new_pos )
 		/* 再用当前坐标除以size，得到比例 */
 		scale = new_pos.y * 1.0 / size;
 		/* 将max_num乘以比例，得出current_num的值 */
+		scrollbar->data.current_num = scale * scrollbar->data.max_num;
+	} else { /* 横向 */
+		size = _Get_Widget_Container_Width( widget );
+		size -= _Get_Widget_Width( widget );
+		scale = new_pos.x * 1.0 / size;
 		scrollbar->data.current_num = scale * scrollbar->data.max_num;
 	}
 	Move_Widget( widget, new_pos );
@@ -136,11 +139,13 @@ ScrollBar_Init( LCUI_Widget *widget )
 	Limit_Widget_Pos( scrollbar->widget, Pos(0,0), Pos(0,0) ); 
 	Set_Widget_Border( widget, RGB(100,100,100), Border(1,1,1,1) );
 	Set_Widget_Padding( widget, Padding(1,1,1,1) );
+	Set_Widget_Backcolor( widget, RGB(200,200,200) );
+	Set_Widget_BG_Mode( widget, BG_MODE_FILL_BACKCOLOR );
 	Show_Widget( scrollbar->widget );
 	Widget_Drag_Event_Connect( scrollbar->widget, ScrollBar_Drag );
 }
 
-void 
+static void 
 ScrollBar_Update( LCUI_Widget *widget )
 {
 	static int pos, max_len;
@@ -154,9 +159,7 @@ ScrollBar_Update( LCUI_Widget *widget )
 	sprintf( scale_str, "%.2lf%%", scale*100 );
 	//printf( "ScrollBar_Update(): scale: %s\n", scale_str );
 	/* 判断滚动条的方向 */
-	if( scrollbar->direction == 1 ) { /* 横向 */
-		Set_Widget_Size( scrollbar->widget, NULL, scale_str );
-	} else { /* 纵向 */
+	if( scrollbar->direction == 0 ) { /* 纵向 */
 		Set_Widget_Size( scrollbar->widget, NULL, scale_str );
 		max_len = Get_Container_Height( widget );
 		max_len -= _Get_Widget_Height( scrollbar->widget );
@@ -170,6 +173,18 @@ ScrollBar_Update( LCUI_Widget *widget )
 		//printf("ScrollBar_Update(), y: %d\n", pos);
 		/* 移动滚动条 */
 		Move_Widget( scrollbar->widget, Pos(0,pos) );
+	} else { /* 横向 */ 
+		Set_Widget_Size( scrollbar->widget, scale_str, NULL );
+		max_len = Get_Container_Width( widget );
+		max_len -= _Get_Widget_Width( scrollbar->widget );
+		Limit_Widget_Pos( scrollbar->widget, Pos(0,0), Pos(max_len,0) );
+		scale = scrollbar->data.current_num*1.0 / scrollbar->data.max_num;
+		pos = scale * max_len;
+		//printf("ScrollBar_Update(), num: %d / %d\n", 
+		//scrollbar->data.current_num, scrollbar->data.max_num);
+		//printf("ScrollBar_Update(), scale: %.2f\n", scale);
+		//printf("ScrollBar_Update(), x: %d\n", pos);
+		Move_Widget( scrollbar->widget, Pos(pos, 0) );
 	}
 }
 
@@ -263,8 +278,14 @@ ScrollBar_Connect(
 void 
 ScrollBar_Set_Direction( LCUI_Widget *widget, int direction )
 {
-	if(direction) {
-		
+	LCUI_ScrollBar *scrollbar;
+	
+	scrollbar = Get_Widget_PrivData( widget );
+	if(direction == 0) { /* 纵向 */
+		scrollbar->direction = 0;
+	} else { /* 横向 */
+		scrollbar->direction = 1;
 	}
+	Update_Widget( widget );
 }
 /**********************************************************************/
