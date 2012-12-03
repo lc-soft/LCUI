@@ -55,7 +55,7 @@ struct _LCUI_Frame
 {
 	LCUI_Pos offset;	/* 该帧的偏移位置 */
 	LCUI_Graph *pic;	/* 当前帧的图形 */
-	long int sleep_time;	/* 该帧显示的时长，为10毫秒 */
+	long int sleep_time;	/* 该帧显示的时长（单位：毫秒） */
 	long int current_time;	/* 当前剩下的等待时间 */
 };
 /******************************************************************/

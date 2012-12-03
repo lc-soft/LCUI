@@ -38,7 +38,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-
+//#define DEBUG
 #include <LCUI_Build.h>
 #include <unistd.h>
 #include LC_LCUI_H
@@ -58,12 +58,14 @@
 /*********************** Frames Process *******************************/
 /* 动画库，用于记录所有动画的信息 */
 static LCUI_Queue frames_database;
-static pthread_t thread_id = 0;
-static int database_init = FALSE;
 /* 动画流，以流水线的形式处理每个动画的每帧图像的更新 */
 static LCUI_Queue frames_stream;
 
-LCUI_Frames* Create_Frames(LCUI_Size size)
+static int database_init = FALSE;
+static int __timer_id = -1;
+
+LCUI_Frames* 
+Create_Frames(LCUI_Size size)
 /* 
  * 功能：创建一个能存放动画数据的容器
  * 说明：该容器用于记录动画的每一帧的信息，需要指定该容器的尺寸。
@@ -105,7 +107,7 @@ int Resize_Frames(LCUI_Frames *p, LCUI_Size new_size)
 	if(new_size.w <= 0 || new_size.h <= 0)	{
 		return -1;
 	}
-	if(p == NULL) {
+	if( !p ) {
 		return -2;
 	}
 	
@@ -143,17 +145,21 @@ int Add_Frame(	LCUI_Frames *des, LCUI_Graph *pic,
  * 说明：
  * pic指的是该帧的图像；
  * pos代表该帧图像在整个动画画面中的位置；
- * sleep_time表示该帧的显示时长，单位为：10毫秒
+ * sleep_time表示该帧的显示时长（单位：毫秒）
  * */
 {
-	if(des == NULL) return -1;
-	if(!Graph_Valid(pic)) return -2;
+	if( !des ) {
+		return -1;
+	}
+	if(!Graph_Valid(pic)) {
+		return -2;
+	}
 	
 	LCUI_Frame frame;
 	frame.offset = offset;
-	frame.sleep_time = sleep_time*10000;
+	frame.sleep_time = sleep_time;
 	frame.pic = pic;
-	frame.current_time = frame.sleep_time; 
+	frame.current_time = frame.sleep_time;
 	Queue_Add(&des->pic, &frame); 
 	return 0;
 }
@@ -166,11 +172,12 @@ int Frames_Add_Func(	LCUI_Frames *des,
  * 说明：关联回调函数后，动画每更新一帧都会调用这个函数
  * */
 {
-	if(des == NULL) {
+	if( !des ) {
 		return -1;
 	}
-	LCUI_App *app = Get_Self_AppPointer();
-	if(app == NULL) {
+	LCUI_App *app;
+	app = Get_Self_AppPointer();
+	if( !app ) {
 		return -2;
 	}
 	
@@ -179,11 +186,15 @@ int Frames_Add_Func(	LCUI_Frames *des,
 	func_data.id = app->id;
 	func_data.arg[0] = NULL;
 	func_data.arg[1] = arg;
+	/* 如果不将该标志置为FALSE，会是确定的值，导致在执行任务后的销毁参数时出现段错误 */
+	func_data.destroy_arg[0] = FALSE;
+	func_data.destroy_arg[1] = FALSE;
 	Queue_Add(&des->func_data, &func_data);
 	return 0;
 } 
 
-static void Frames_Stream_Sort()
+static void 
+Frames_Stream_Sort()
 /* 功能：对动画流进行排序 */
 {
 	int i, j, pos, total;
@@ -195,7 +206,7 @@ static void Frames_Stream_Sort()
 	/* 使用的是选择排序 */
 	for(i=0; i<total; ++i) {
 		temp = Queue_Get(&frames_stream, i);
-		if(temp == NULL) {
+		if( !temp ) {
 			continue;
 		}
 		if(temp->current > 0) {
@@ -205,13 +216,13 @@ static void Frames_Stream_Sort()
 		}
 		
 		p = Queue_Get(&temp->pic, pos);
-		if(p == NULL) {
+		if( !p ) {
 			continue; 
 		}
 		
 		for(j=i+1; j<total; ++j) {
 			temp = Queue_Get(&frames_stream, j);
-			if(temp == NULL) {
+			if( !temp ) {
 				continue; 
 			}
 			if(temp->current > 0) {
@@ -221,7 +232,7 @@ static void Frames_Stream_Sort()
 			}
 			
 			q = Queue_Get(&temp->pic, pos);
-			if(q == NULL) {
+			if( !q ) {
 				continue; 
 			}
 			
@@ -233,7 +244,8 @@ static void Frames_Stream_Sort()
 	Queue_UnLock(&frames_stream);
 }
 
-static void Frames_Stream_Time_Sub(int time)
+static void 
+Frames_Stream_Time_Sub(int time)
 /* 功能：将各个动画的当前帧的等待时间与指定时间相减 */
 {
 	LCUI_Frame *frame;
@@ -242,10 +254,10 @@ static void Frames_Stream_Time_Sub(int time)
 	
 	Queue_Lock(&frames_stream);
 	total = Queue_Get_Total(&frames_stream);
-	//printf("Frames_Stream_Time_Sub(): start\n");
-	for(i=0; i<total; ++i){
+	DEBUG_MSG("start\n");
+	for(i=0; i<total; ++i) {
 		frames = Queue_Get(&frames_stream, i);  
-		if(frames == NULL || frames->status == 0) {
+		if( !frames || frames->status == 0 ) {
 			continue;
 		}
 		if(frames->current > 0) {
@@ -254,17 +266,19 @@ static void Frames_Stream_Time_Sub(int time)
 			pos = 0;
 		}
 		frame = Queue_Get(&frames->pic, pos);
-		if(frame == NULL) {
+		if( !frame ) {
 			continue; 
 		}
 		frame->current_time -= time; 
-		//printf("fames: %p, current: %d, time:%ld, sub:%d\n", frames, pos, frame->current_time, time);
+		DEBUG_MSG("fames: %p, current: %d, time:%ld, sub:%d\n", 
+			frames, pos, frame->current_time, time);
 	}
-	//printf("Frames_Stream_Time_Sub(): end\n");
+	DEBUG_MSG("end\n");
 	Queue_UnLock(&frames_stream);
 }
 
-LCUI_Frame *Frames_Get_Frame(LCUI_Frames *src)
+LCUI_Frame *
+Frames_Get_Frame(LCUI_Frames *src)
 /* 功能：获取当前帧 */
 {
 	LCUI_Frame *p;
@@ -272,25 +286,28 @@ LCUI_Frame *Frames_Get_Frame(LCUI_Frames *src)
 	return p;
 }
 
-LCUI_Graph *Frames_Get_Slot(LCUI_Frames *src)
+LCUI_Graph *
+Frames_Get_Slot(LCUI_Frames *src)
 /* 功能：获取当前帧的图像 */
 {
 	LCUI_Graph *p;
-	if(src == NULL) {
+	if( !src ) {
 		return NULL;
 	}
 	p = &src->slot;
 	return p;
 }
 
-static LCUI_Frames *Frames_Stream_Update()
+static LCUI_Frames *
+Frames_Stream_Update( int *sleep_time )
 /* 功能：更新流中的动画至下一帧 */
 { 
 	int i, total;
 	LCUI_Frame *frame = NULL;
-	LCUI_Frames *frames = NULL,*temp = NULL;
+	LCUI_Frames *frames = NULL, *temp = NULL;
 	clock_t used_time; 
-	//printf("Frames_Stream_Update(): start\n");
+	
+	DEBUG_MSG("start\n");
 	total = Queue_Get_Total(&frames_stream); 
 	for(i=0; i<total; ++i){
 		frames = Queue_Get(&frames_stream, i);
@@ -298,7 +315,7 @@ static LCUI_Frames *Frames_Stream_Update()
 			break;
 		}
 	}
-	if(i >= total || frames == NULL) {
+	if(i >= total || !frames ) {
 		return NULL; 
 	}
 	/* 
@@ -306,23 +323,23 @@ static LCUI_Frames *Frames_Stream_Update()
 	 * 需要优先处理帧序号为0的动画。
 	 * */
 	for(i=0; i<total; ++i){
-		temp = Queue_Get(&frames_stream, i);
-		if(frames->status == 1 && temp->current==0) {
+		temp = Queue_Get( &frames_stream, i );
+		if( frames->status == 1 && temp->current == 0 ) {
 			frames = temp;
 			break;
 		}
 	}
-	if(frames != NULL && frames->current > 0){ 
-		frame = Queue_Get(&frames->pic, frames->current-1);
-		if(frame == NULL) {
+	if( frames && frames->current > 0 ) { 
+		frame = Queue_Get( &frames->pic, frames->current-1 );
+		if( !frame ) {
 			return NULL;
 		}
-		//printf("current time: %ld\n", frame->current_time);
+		DEBUG_MSG("current time: %ld\n", frame->current_time);
 		if(frame->current_time > 0) {
-			usleep(frame->current_time); 
+			*sleep_time = frame->current_time;
+			Frames_Stream_Time_Sub( frame->current_time ); 
 		}
 		
-		Frames_Stream_Time_Sub(frame->current_time); 
 		frame->current_time = frame->sleep_time; 
 		++frames->current;
 		total = Queue_Get_Total(&frames->pic);
@@ -330,7 +347,7 @@ static LCUI_Frames *Frames_Stream_Update()
 			frames->current = 1;
 		}
 		frame = Queue_Get(&frames->pic, frames->current-1);
-		if(frame == NULL) {
+		if( !frame ) {
 			return NULL;
 		}
 	} else {
@@ -349,66 +366,76 @@ static LCUI_Frames *Frames_Stream_Update()
 		}
 	}
 	used_time = clock()-used_time;
-	if(used_time > 0) Frames_Stream_Time_Sub(used_time);
+	if(used_time > 0) {
+		Frames_Stream_Time_Sub(used_time);
+	}
 	Frames_Stream_Sort(); /* 重新排序 */
-	//printf("current frame: %d\n", frames->current);
-	//printf("Frames_Stream_Update(): end\n");
+	DEBUG_MSG("current frame: %d\n", frames->current);
+	DEBUG_MSG("end\n");
 	return frames;
 }
 
-static void *Process_Frames()
+static void 
+Process_Frames()
 /* 功能：处理动画的每一帧的更新 */
 {
-	int i, total, sleep_time = 1000;
+	int i, total, sleep_time = 10;
 	LCUI_Func *func;
 	LCUI_Graph *slot;
-	LCUI_Frames *frames; 
+	LCUI_Frames *frames;
 	
 	while(!LCUI_Active()) {
 		usleep(10000);
 	}
-	while(LCUI_Active()) { 
-		frames = Frames_Stream_Update(); 
-		//printf("frames: %p\n", frames);
-		if( frames ){
-			sleep_time = 1000;
-			total = Queue_Get_Total( &frames->func_data );
-			slot = Frames_Get_Slot( frames ); 
-			for(i=0; i<total; ++i){
-				func = Queue_Get( &frames->func_data, i );
-				func->arg[0] = slot;
-				Send_Task_To_App( func );
-			} 
-		} else {
-			usleep(sleep_time);
-			if(sleep_time < 500000) {
-				sleep_time += 1000;
-			}
+	frames = Frames_Stream_Update( &sleep_time ); 
+	reset_timer( __timer_id, sleep_time );
+	DEBUG_MSG("frames: %p\n", frames);
+	if( frames ){
+		total = Queue_Get_Total( &frames->func_data );
+		slot = Frames_Get_Slot( frames ); 
+		for(i=0; i<total; ++i){
+			func = Queue_Get( &frames->func_data, i );
+			func->arg[0] = slot;
+			AppTask_Custom_Add( ADD_MODE_REPLACE | AND_ARG_S, func );
 		} 
-	} 
-	LCUI_Thread_Exit(NULL);
+	}
 }
 
 int Frames_Play(LCUI_Frames *frames)
 /* 功能：播放动画 */
 {
-	if(frames == NULL) {
+	int i, total;
+	LCUI_Frames *tmp_ptr;
+	if( !frames ) {
 		return -1; 
 	}
 	frames->status = 1;
-	if(thread_id == 0){
-		Queue_Init(&frames_stream, sizeof(LCUI_Frames), NULL);
-		Queue_Using_Pointer(&frames_stream);
-		LCUI_Thread_Create(&thread_id, NULL, Process_Frames, NULL);
+	if(__timer_id == -1){
+		Queue_Init( &frames_stream, sizeof(LCUI_Frames), NULL );
+		Queue_Using_Pointer( &frames_stream );
+		__timer_id = set_timer( 50, Process_Frames, TRUE );
 	}
+	/* 检查该动画是否已存在 */
+	Queue_Lock( &frames_stream );
+	total = Queue_Get_Total( &frames_stream );
+	for( i=0; i<total; ++i ) {
+		tmp_ptr = Queue_Get( &frames_stream, i );
+		if( tmp_ptr == frames ) {
+			break;
+		}
+	}
+	Queue_UnLock( &frames_stream );
 	/* 添加至动画更新队列中 */ 
-	return Queue_Add_Pointer(&frames_stream, frames); 
+	if( i>=total ) {
+		return Queue_Add_Pointer(&frames_stream, frames); 
+	}
+	return 1;
 }
 
 int Frames_Pause(LCUI_Frames *frames)
 /* 功能：暂停动画 */
 { 
-	if(frames == NULL) {
+	if( !frames ) {
 		return -1;
 	}
 	frames->status = 0;
@@ -417,14 +444,16 @@ int Frames_Pause(LCUI_Frames *frames)
 /*********************** End Frames Process ***************************/
 
 /************************** ActiveBox *********************************/
-LCUI_Frames *ActiveBox_Get_Frames(LCUI_Widget *widget)
+LCUI_Frames *
+ActiveBox_Get_Frames(LCUI_Widget *widget)
 {
 	LCUI_ActiveBox *actbox;
 	actbox = (LCUI_ActiveBox *)Get_Widget_PrivData(widget);
 	return actbox->frames;
 }
 
-static void ActiveBox_Refresh_Frame(LCUI_Graph *frame, void *arg)
+static void 
+ActiveBox_Refresh_Frame(LCUI_Graph *frame, void *arg)
 /* 功能：刷新动画当前帧的显示 */
 {
 	LCUI_Widget *widget = (LCUI_Widget*)arg;
@@ -461,17 +490,19 @@ int ActiveBox_Add_Frame(	LCUI_Widget *widget, LCUI_Graph *pic,
 }
 
 
-static void ActiveBox_Init(LCUI_Widget *widget)
+static void 
+ActiveBox_Init(LCUI_Widget *widget)
 /* 功能：初始化ActiveBox部件 */
 {
 	LCUI_ActiveBox *actbox;
 	actbox = (LCUI_ActiveBox *)Widget_Create_PrivData(widget, 
 					sizeof(LCUI_ActiveBox)); 
 	actbox->frames = Create_Frames(Size(50,50));
-	Frames_Add_Func(actbox->frames, ActiveBox_Refresh_Frame, widget);
+	Frames_Add_Func( actbox->frames, ActiveBox_Refresh_Frame, widget );
 }
 
-static void Exec_Update_ActiveBox(LCUI_Widget *widget)
+static void 
+Exec_Update_ActiveBox(LCUI_Widget *widget)
 /* 功能：更新ActiveBox部件内显示的图像 */
 {
 	LCUI_Rect rect;
@@ -486,7 +517,8 @@ static void Exec_Update_ActiveBox(LCUI_Widget *widget)
 	Add_Widget_Refresh_Area(widget, rect);
 }
 
-static void Destroy_ActiveBox(LCUI_Widget *widget)
+static void 
+Destroy_ActiveBox(LCUI_Widget *widget)
 {
 	
 }
@@ -496,6 +528,7 @@ void Register_ActiveBox()
 	WidgetType_Add("active_box"); 
 	WidgetFunc_Add("active_box", ActiveBox_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("active_box", Exec_Update_ActiveBox, FUNC_TYPE_UPDATE);
+	WidgetFunc_Add("active_box", Exec_Update_ActiveBox, FUNC_TYPE_DRAW);
 	WidgetFunc_Add("active_box", Destroy_ActiveBox,	 FUNC_TYPE_DESTROY); 
 }
 
