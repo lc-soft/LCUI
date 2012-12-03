@@ -167,6 +167,14 @@ void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 			}
 		}
 	}
+	out_bitmap->top = 8;
+	out_bitmap->left = 0;
+	out_bitmap->rows = 8;
+	out_bitmap->width = 8;
+	out_bitmap->pixel_mode = 0;
+	out_bitmap->num_grays = 1;
+	out_bitmap->advance.x = 8;
+	out_bitmap->advance.y = 8;
 }
 
 /* 默认的字体文件路径 */
@@ -341,6 +349,7 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 		des_pos.x += cut.x;
 		des_pos.y += cut.y;
 	}
+	
 	Graph_Lock( des, 1 );
 	/* 开始读取图片中的图形数组并写入窗口 */
 	if( flag == GRAPH_MIX_FLAG_OVERLAY ) {
