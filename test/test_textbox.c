@@ -11,9 +11,11 @@
 
 int main(int argc, char*argv[]) 
 {
-	LCUI_Init(argc, argv);
-	
+	FILE *fp;
+	char buff[256];
 	LCUI_Widget *window, *textbox;
+	
+	LCUI_Init(argc, argv);
 	
 	window  = Create_Widget("window");
 	textbox = Create_Widget("text_box");
@@ -21,9 +23,17 @@ int main(int argc, char*argv[])
 	Set_Window_Title_Text(window, "测试文本框部件"); 
 	window->resize(window, Size(320, 240)); 
 	Window_Client_Area_Add(window, textbox);
+	TextBox_Using_StyleTags( textbox, TRUE );
 	textbox->set_align( textbox, ALIGN_MIDDLE_CENTER, Pos(0,0) );
-	TextBox_Text( textbox, "在此输入文本，仅支持英文字母+符号。"); 
-	Resize_Widget(textbox, Size(300, 200));
+	/* 打开README.md文件，并将内容读取至文本框上显示 */
+	fp = fopen("../README.md", "r");
+	if( fp ) {
+		while(fgets( buff, sizeof(buff), fp )) {
+			TextBox_Text_Append( textbox, buff );
+		}
+		fclose( fp );
+	}
+	Set_Widget_Dock( textbox, DOCK_TYPE_FILL );
 	textbox->show(textbox);
 	window->show(window); 
 	return LCUI_Main(); 
