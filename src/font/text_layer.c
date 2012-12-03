@@ -696,7 +696,6 @@ __TextLayer_Text( LCUI_TextLayer *layer )
 		return -1;
 	}
 	TextLayer_Text_Clear( layer );
-	printf("__TextLayer_Text(): len = %d\n", strlen(layer->text_buff.string));
 	TextLayer_Text_Add( layer, layer->text_buff.string );
 	return 0;
 }
@@ -766,7 +765,7 @@ __TextLayer_OldArea_Erase( LCUI_Widget *widget, LCUI_TextLayer *layer )
 		Quote_Graph( &slot, &widget->graph, area );
 		/* 将该区域的alpha通道填充为0 */
 		Graph_Fill_Alpha( &slot, 0 );
-		printf("area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
+		//printf("area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
 		/* 添加刷新区域 */
 		Add_Widget_Refresh_Area( widget, area );
 		y += row_ptr->max_size.h;
@@ -789,6 +788,8 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	LCUI_CharData *p_data;
 	Text_RowData *p_row;
 	
+	//clock_t start;
+	//start = clock();
 	//printf("TextLayer_Draw(): enter\n");
 	/* 如果文本缓存区内有数据 */
 	if( layer->need_proc_buff ) {
@@ -802,6 +803,9 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 		draw_all = TRUE;
 		layer->need_scroll_layer = FALSE;
 	}
+	
+	//nobuff_printf("1, use time: %ld\n", clock() - start );
+	//start = clock();
 	
 	Graph_Init( &slot );
 	/* 先处理需要清空的区域 */
@@ -818,6 +822,8 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 		//printf("refresh area: %d,%d,%d,%d\n",
 		//area.x, area.y, area.width, area.height);
 	}
+	//nobuff_printf("2, use time: %ld\n", clock() - start );
+	//start = clock();
 	/* 开始绘制文本位图至目标图层上 */
 	rows = Queue_Get_Total( &layer->rows_data ); 
 	for(pos.y=layer->offset_pos.y,i=0; i<rows; ++i) {
@@ -877,6 +883,7 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 			break;
 		}
 	}
+	//nobuff_printf("3, use time: %ld\n", clock() - start );
 	//printf("TextLayer_Draw(): quit\n");
 }
 
@@ -1545,8 +1552,12 @@ TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 		break;
 	}
 	pos.y = i;
-	row_ptr = Queue_Get( &layer->rows_data, i ); 
-	cols = Queue_Get_Total( &row_ptr->string );
+	row_ptr = Queue_Get( &layer->rows_data, i );
+	if( !row_ptr ) {
+		cols = 0;
+	} else {
+		cols = Queue_Get_Total( &row_ptr->string );
+	}
 	for( new_pos.x=0,n=0; n<cols; ++n ) {
 		char_ptr = Queue_Get( &row_ptr->string, n );
 		if( !char_ptr ) {
