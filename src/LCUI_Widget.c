@@ -57,7 +57,8 @@
 #include <limits.h>
 
 /* 声明函数 */
-static int Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type);
+static int 
+Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type, int flag);
 
 
 /*************************** Container ********************************/
@@ -711,7 +712,6 @@ void print_widget_info(LCUI_Widget *widget)
 	}
 }
 
-
 int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
 /* 功能：在指定部件的内部区域内设定需要刷新的区域 */
 {
@@ -732,7 +732,7 @@ int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
 	if(0 != RectQueue_Add (&widget->update_area, rect)) { 
 		return -1;
 	}
-	
+	rect = Get_Valid_Area(Get_Screen_Size(), rect);
 	DEBUG_MSG("Add_Widget_Refresh_Area():quit\n");
 	return 0;
 }
@@ -943,6 +943,7 @@ void Set_Widget_Style(LCUI_Widget *widget, char *style)
 /* 功能：设定部件的风格 */
 {
 	Strcpy(&widget->style, style); 
+	Draw_Widget( widget );
 }
 
 void Set_Widget_StyleID(LCUI_Widget *widget, int style_id)
@@ -1507,7 +1508,7 @@ void Set_Widget_PosType( LCUI_Widget *widget, POS_TYPE pos_type )
 /* 设定部件的定位类型 */
 {
 	widget->pos_type = pos_type;
-	Record_WidgetUpdate( widget, NULL, DATATYPE_POS_TYPE );
+	Record_WidgetUpdate( widget, NULL, DATATYPE_POS_TYPE, 0 );
 }
 
 void Set_Widget_Alpha(LCUI_Widget *widget, unsigned char alpha)
@@ -1780,13 +1781,13 @@ void Move_Widget(LCUI_Widget *widget, LCUI_Pos new_pos)
 	widget->x.px = new_pos.x;
 	widget->y.px = new_pos.y;
 	/* 记录部件的更新数据，等待进行更新 */
-	Record_WidgetUpdate(widget, &new_pos, DATATYPE_POS);
+	Record_WidgetUpdate( widget, &new_pos, DATATYPE_POS, 0 );
 }
 
 void Update_Widget_Pos(LCUI_Widget *widget)
 /* 功能：更新部件的位置 */
 { 
-	Record_WidgetUpdate(widget, NULL, DATATYPE_POS);
+	Record_WidgetUpdate( widget, NULL, DATATYPE_POS, 0 );
 }
 
 void Exec_Update_Widget_Pos( LCUI_Widget *widget )
@@ -1879,7 +1880,7 @@ void Set_Widget_Size( LCUI_Widget *widget, char *width, char *height )
 		get_PX_P_t( width, &widget->w );
 		get_PX_P_t( height, &widget->h );
 		break;
-	} 
+	}
 	Update_Widget_Size( widget );
 }
 
@@ -1958,7 +1959,7 @@ void Refresh_Widget(LCUI_Widget *widget)
 	if( !widget ) {
 		return; 
 	}
-	Record_WidgetUpdate(widget, NULL, DATATYPE_AREA);
+	Record_WidgetUpdate( widget, NULL, DATATYPE_AREA, 0 );
 }
 
 void Resize_Widget(LCUI_Widget *widget, LCUI_Size new_size)
@@ -1969,10 +1970,10 @@ void Resize_Widget(LCUI_Widget *widget, LCUI_Size new_size)
 	}
 	widget->w.px = new_size.w;
 	widget->h.px = new_size.h;
-	Record_WidgetUpdate(widget, &new_size, DATATYPE_SIZE);
+	Record_WidgetUpdate( widget, &new_size, DATATYPE_SIZE, 0 );
 	if( widget->pos_type == POS_TYPE_STATIC
 	 || widget->pos_type == POS_TYPE_RELATIVE ) {
-		Record_WidgetUpdate(widget, NULL, DATATYPE_POS_TYPE);
+		Record_WidgetUpdate( widget, NULL, DATATYPE_POS_TYPE, 0 );
 	}
 }
 
@@ -1982,18 +1983,32 @@ void Draw_Widget(LCUI_Widget *widget)
 	if( !widget ) {
 		return; 
 	}
-	Record_WidgetUpdate(widget, NULL, DATATYPE_GRAPH);
+	Record_WidgetUpdate( widget, NULL, DATATYPE_GRAPH, 0 );
 }
 
 void Update_Widget(LCUI_Widget *widget)
-/* 让部件根据已设定的属性，进行相应数据的更新 */
+/* 
+ * 功能：让部件根据已设定的属性，进行相应数据的更新
+ * 说明：此记录会添加至队列，如果队列中有一条相同记录，则覆盖上条记录。
+ * */
 {
 	if( !widget ) {
 		return; 
 	}
-	Record_WidgetUpdate(widget, NULL, DATATYPE_UPDATE);
+	Record_WidgetUpdate( widget, NULL, DATATYPE_UPDATE, 0 );
 }
 
+void __Update_Widget(LCUI_Widget *widget)
+/* 
+ * 功能：让部件根据已设定的属性，进行相应数据的更新
+ * 说明：与上个函数功能一样，但是，可以允许队列中有两条相同记录。
+ * */
+{
+	if( !widget ) {
+		return; 
+	}
+	Record_WidgetUpdate( widget, NULL, DATATYPE_UPDATE, 1 );
+}
 
 void Front_Widget(LCUI_Widget *widget)
 /* 功能：将指定部件的显示位置移动到最前端 */
@@ -2016,7 +2031,7 @@ void Show_Widget(LCUI_Widget *widget)
 		return; 
 	}
 	Front_Widget(widget); /* 改变部件的排列位置 */
-	Record_WidgetUpdate(widget, NULL, DATATYPE_SHOW);
+	Record_WidgetUpdate( widget, NULL, DATATYPE_SHOW, 0 );
 }
 
 void Hide_Widget(LCUI_Widget *widget)
@@ -2025,7 +2040,7 @@ void Hide_Widget(LCUI_Widget *widget)
 	if( !widget ) {
 		return; 
 	}
-	Record_WidgetUpdate(widget, NULL, DATATYPE_HIDE); 
+	Record_WidgetUpdate( widget, NULL, DATATYPE_HIDE, 0 ); 
 }
 
 void Set_Widget_Status(LCUI_Widget *widget, int status)
@@ -2034,74 +2049,82 @@ void Set_Widget_Status(LCUI_Widget *widget, int status)
 	if( !widget ) {
 		return; 
 	}
-	Record_WidgetUpdate(widget, &status, DATATYPE_STATUS); 
+	Record_WidgetUpdate( widget, &status, DATATYPE_STATUS, 0 ); 
 }
 /************************* Widget End *********************************/
 
 
 
 /**************************** Widget Update ***************************/
+typedef union union_widget_data
+{
+	LCUI_Pos pos;
+	LCUI_Size size;
+	int status;
+}
+u_wdata;
+
 typedef struct _WidgetData
 {
-	void	*data;	/* 需要更新的数据 */
-	int	type;	/* 这个数据的类型 */
+	int type;	/* 数据的类型 */
+	int valid;	/* 数据是否有效 */
+	u_wdata data;	/* 需要更新的数据 */
 }
 WidgetData;
 
-static void Destroy_WidgetData(void *arg)
-/* 功能：释放WidgetData结构体中的指针 */
-{
-	WidgetData *wdata = (WidgetData*)arg;
-	if( !wdata ) {
-		return;
-	}
-	if( wdata->data ) {
-		free(wdata->data);
-	}
-}
-
-static void WidgetData_Init(LCUI_Queue *queue)
+static void 
+WidgetData_Init(LCUI_Queue *queue)
 /* 功能：初始化记录部件数据更新的队列 */
 {
-	Queue_Init(queue, sizeof(WidgetData), Destroy_WidgetData);
+	Queue_Init( queue, sizeof(WidgetData), NULL );
 }
 
 static int 
-Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type)
+Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type, int flag)
 /* 
  * 功能：记录需要进行数据更新的部件
  * 说明：将部件指针以及需更新的数据添加至队列，根据部件的显示顺序来排列队列
  * 返回值：出现问题则返回-1，正常返回不小于0的值
  *  */
 { 
-	int i, total, result = 0;
-	size_t size = 0;
+	int i, total, n_found, result = 0;
 	WidgetData temp, *tmp_ptr;
-	/* 根据类型，来得知占用空间大小 */
+	
+	/* 保存类型 */
+	temp.type = type;
+	if( data ) {
+		temp.valid = TRUE;
+	} else {
+		temp.valid = FALSE;
+	}
 	switch(type) {
-	    case DATATYPE_POS	: size = sizeof(LCUI_Pos);break; /* 位置 */
-	    case DATATYPE_SIZE	: size = sizeof(LCUI_Size);break; /* 尺寸 */
-	    case DATATYPE_GRAPH	: size = sizeof(LCUI_Graph);break;/* 图形 */
-	    case DATATYPE_STATUS: size = sizeof(int);break; /* 状态 */
+	    case DATATYPE_POS :
+		if(temp.valid) {
+			temp.data.pos = *((LCUI_Pos*)data);
+		}
+		break;
+	    case DATATYPE_SIZE :
+		if(temp.valid) {
+			temp.data.size = *((LCUI_Size*)data);
+		}
+		break;
+	    case DATATYPE_STATUS :
+		if(temp.valid) {
+			temp.data.status = *((int*)data);
+		}
+		break;
+	    case DATATYPE_GRAPH	: 
 	    case DATATYPE_AREA:
 	    case DATATYPE_HIDE:
 	    case DATATYPE_POS_TYPE:
 	    case DATATYPE_UPDATE:
-	    case DATATYPE_SHOW:	 break;
+	    case DATATYPE_SHOW:
+		temp.valid = FALSE;
+		break;
 	    default: return -1;
 	}
-	/* 保存类型 */
-	temp.type = type;
-	if( data ) { 
-		temp.data = malloc(size);	/* 分配内存 */
-		memcpy(temp.data, data, size);	/* 拷贝数据 */ 
-	} else {
-		temp.data = NULL;
-	}
-	
-	int n_found = 0;
 	total = Queue_Get_Total( &widget->data );
-	for(i=0; i<total; ++i) {
+	for(n_found=0,i=0; i<total; ++i) {
 		tmp_ptr = Queue_Get(&widget->data, i);
 		if( !tmp_ptr ) { 
 			continue;
@@ -2110,17 +2133,39 @@ Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type)
 		if(tmp_ptr->type == temp.type) {
 			++n_found;
 			/* 如果已存在的数量少于2 */
-			if( n_found < 2 ) {
+			if( flag == 1 && n_found < 2 ) {
 				continue;
 			}
 			/* 否则，需要进行替换 */
 			if( type == DATATYPE_AREA ) {
 				DEBUG_MSG("search result: the recod at %d\n", i);
 			}
-			if( tmp_ptr->data ) {
-				free( tmp_ptr->data );
+			switch(type) {
+			    case DATATYPE_POS :
+				if(temp.valid) {
+					tmp_ptr->data.pos = temp.data.pos;
+				}
+				break;
+			    case DATATYPE_SIZE :
+				if(temp.valid) {
+					tmp_ptr->data.size = temp.data.size;
+				}
+				break;
+			    case DATATYPE_STATUS :
+				if(temp.valid) {
+					tmp_ptr->data.status = temp.data.status;
+				}
+				break;
+			    case DATATYPE_GRAPH	: 
+			    case DATATYPE_AREA:
+			    case DATATYPE_HIDE:
+			    case DATATYPE_POS_TYPE:
+			    case DATATYPE_UPDATE:
+			    case DATATYPE_SHOW:
+				temp.valid = FALSE;
+				break;
+			    default: return -1;
 			}
-			tmp_ptr->data = temp.data;
 			break;
 		}
 	}
@@ -2134,7 +2179,6 @@ Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type)
 	return result;
 }
 
-
 int Handle_WidgetUpdate(LCUI_Widget *widget)
 /* 功能：处理部件的更新 */
 {
@@ -2146,6 +2190,7 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 	//printf("Handle_WidgetUpdate(): enter\n");
 	Queue_Lock( &widget->data );/* 锁定队列，其它线程暂时不能访问 */
 	total = Queue_Get_Total( &widget->data );
+	//printf("Handle_WidgetUpdate(): 1, total: %d\n", total);
 	for(i=0; i<total; ++i) {
 		temp = Queue_Get(&widget->data, 0);
 		if( !temp ) {
@@ -2155,10 +2200,10 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 		switch(temp->type) {
 		    case DATATYPE_SIZE	:
 			/* 部件尺寸更新，将更新部件的位置 */ 
-			if( !temp->data ) {
+			if( !temp->valid ) {
 				Exec_Update_Widget_Size( widget );
 			} else {
-				Exec_Resize_Widget(widget, *((LCUI_Size*)temp->data));
+				Exec_Resize_Widget(widget, temp->data.size);
 			}
 			Exec_Draw_Widget(widget);
 			/* 需要更新位置，所以不用break */ 
@@ -2169,8 +2214,8 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 			 * */
 			if( temp->type == DATATYPE_POS 
 			 && widget->align == ALIGN_NONE 
-			 && temp->data ) {
-				pos = *((LCUI_Pos*)temp->data);
+			 && temp->valid ) {
+				pos = temp->data.pos;
 				Exec_Move_Widget(widget, pos);
 			} else {
 				Exec_Update_Widget_Pos( widget );
@@ -2183,7 +2228,7 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 			Exec_Update_Widget( widget );
 			break;
 		    case DATATYPE_STATUS:
-			widget->status = *(int*)temp->data;
+			widget->status = temp->data.status;
 			/* 改变部件状态后需要进行重绘，所以不用break */
 		    case DATATYPE_GRAPH	:
 			Exec_Draw_Widget(widget); 
@@ -2201,6 +2246,8 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 		} 
 		Queue_Delete(&widget->data, 0);/* 移除该成员 */
 	}
+	total = Queue_Get_Total( &widget->data );
+	//printf("Handle_WidgetUpdate(): 2, total: %d\n", total);
 	Queue_UnLock(&widget->data);
 	/* 处理子部件更新 */
 	total = Queue_Get_Total(&widget->child);  
