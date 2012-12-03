@@ -249,6 +249,29 @@ void * Queue_Get (LCUI_Queue * queue, int pos)
 	return data;
 }
 
+void * __Queue_Get (LCUI_Queue * queue, int pos)
+{
+	void  *data = NULL;
+	
+	if( pos < 0) {
+		return NULL;
+	}
+	if (queue->total_num > 0 && pos < queue->total_num) {
+		if(queue->data_mode == QUEUE_DATA_MODE_ARRAY) {
+			data = queue->data_array[pos]; 
+		} else {
+			int i;
+			LCUI_Node *p;
+			p = queue->data_head_node.next;
+			for(i=0; i< pos && p->next; ++i) {
+				p = p->next;
+			}
+			data = p->data;
+		}
+	}
+	return data;
+}
+
 int Queue_Insert( LCUI_Queue * queue, int pos, const void *data)
 /* 功能：向队列中指定位置插入成员 */
 {
@@ -658,7 +681,7 @@ int Queue_Delete_Pointer (LCUI_Queue * queue, int pos)
  * 下面有几个main函数，用于对本文件内的函数进行测试，你可以选择其中一个main函数，编译
  * 并运行，看看结果
  * */
-#define test_2
+#define test_4
 #ifdef test_1
 /* 测试Queue_Cat函数 */
 int main()
@@ -788,6 +811,33 @@ int main()
 	printf("string:%s\n", str);
 	
 	Destroy_Queue(&bq);
+	return 0;
+}
+#endif
+#ifdef test_4
+int main()
+{
+	clock_t start;
+	int i, total;
+	LCUI_Queue q1;
+	/* 初始化 */
+	Queue_Init(&q1, sizeof(int), NULL);
+	//Queue_Set_DataMode(&q1, QUEUE_DATA_MODE_LINKED_LIST);
+	nobuff_printf( "queue add......" );
+	start = clock();
+	/* 添加0至9的字符至队列 */
+	for(i=0; i<20000; i++) {
+		Queue_Add(&q1, &i);
+	}
+	nobuff_printf( "%ld us\n", clock()-start );
+	total = Queue_Get_Total( &q1 );
+	nobuff_printf( "queue get......" );
+	start = clock();
+	for(i=0; i<total; i++) {
+		Queue_Get(&q1, i);  
+	}
+	nobuff_printf( "%ld us\n", clock()-start );
+	Destroy_Queue(&q1);
 	return 0;
 }
 #endif
