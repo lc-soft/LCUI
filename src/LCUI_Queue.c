@@ -618,25 +618,24 @@ static BOOL Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 		} 
 		/* 备份指针 */
 		save = p_src->data;
-		/* 解除该位置的结点与前后结点的链接 */
-		temp = p_src->prev;
-		temp->next = p_src->next;
+		/* 如果后面还有结点 */
 		if( p_src->next ) {
+			/* 解除该位置的结点与前后结点的链接 */
+			temp = p_src->prev;
+			temp->next = p_src->next;
 			p_src->next->prev = temp; 
+			p_des = queue->data_head_node.next;
+			if( p_des ) {
+				/* 找到链表中最后一个结点 */
+				while( p_des->next ) {
+					p_des = p_des->next;
+				}
+				/* 把需删除的结点链接到链表尾部 */
+				p_des->next = p_src;
+				p_src->prev = p_des;
+				p_src->next = NULL;
+			}
 		}
-		p_des = queue->data_head_node.next;
-		if( !p_des ) {
-			return FALSE;
-		}
-		/* 找到链表中最后一个结点 */
-		while( p_des->next ) {
-			p_des = p_des->next;
-		}
-		/* 把需删除的结点链接到链表尾部 */
-		p_des->next = p_src;
-		p_src->prev = p_des;
-		p_src->next = NULL;
-
 		if(flag == 1) { 
 			memset(p_src->data, 0, queue->element_size);
 		} else {
@@ -648,8 +647,8 @@ static BOOL Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 	 * 只不过，记录该成员的内存地址的队列不同。这种操作，本函数不会在源队列中保留
 	 * 该成员的地址，因为源队列可能会被销毁，销毁时也会free掉队列中每个成员，而
 	 * 目标队列未被销毁，且正在使用之前转移过来的成员，这会产生错误。
-	 *  */ 
-	--queue->total_num; 
+	 *  */
+	--queue->total_num;
 	
 	Queue_End_Use (queue);
 	if(flag == 1) { 
