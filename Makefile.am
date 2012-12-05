@@ -36,6 +36,7 @@ test/test_widget_2.c \
 test/test_widget_3.c \
 test/test_timer.c \
 test/test_textbox.c \
+test/faceback.png \
 test/test_scrollbar.c \
 test/mora/mora.c \
 test/mora/README.zh-cn \
