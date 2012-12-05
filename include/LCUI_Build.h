@@ -90,10 +90,28 @@
 #define LC_SCROLLBAR_H	<LCUI/LCUI_ScrollBar.h>
 #endif
 
-
+#define _DEBUG_MSG(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
 
 #ifdef DEBUG
-#define DEBUG_MSG(format, ...) printf(__FILE__" %s(): %d:"format, __FUNCTION__, __LINE__,##__VA_ARGS__)
+#define DEBUG_MSG(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
 #else
 #define DEBUG_MSG(format, ...) 
+#endif
+
+#ifdef DEBUG1
+#define DEBUG_MSG1(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
+#else
+#define DEBUG_MSG1(format, ...) 
+#endif
+
+#ifdef DEBUG2
+#define DEBUG_MSG2(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
+#else
+#define DEBUG_MSG2(format, ...) 
+#endif
+
+#ifdef DEBUG3
+#define DEBUG_MSG3(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
+#else
+#define DEBUG_MSG3(format, ...) 
 #endif
