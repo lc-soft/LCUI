@@ -377,7 +377,16 @@ void Draw_Widget(LCUI_Widget *widget);
 /* 功能：重新绘制部件 */ 
 
 void Update_Widget(LCUI_Widget *widget);
-/* 让部件根据已设定的属性，进行相应数据的更新 */
+/* 
+ * 功能：让部件根据已设定的属性，进行相应数据的更新
+ * 说明：此记录会添加至队列，如果队列中有一条相同记录，则覆盖上条记录。
+ * */
+
+void __Update_Widget(LCUI_Widget *widget);
+/* 
+ * 功能：让部件根据已设定的属性，进行相应数据的更新
+ * 说明：与上个函数功能一样，但是，可以允许队列中有两条相同记录。
+ * */
 
 void Front_Widget(LCUI_Widget *widget);
 /* 功能：将指定部件的显示位置移动到最前端 */ 

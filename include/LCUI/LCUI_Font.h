@@ -137,6 +137,9 @@ typedef enum _font_style		enum_font_style;
 typedef enum _font_weight		enum_font_weight;
 typedef enum _font_decoration	enum_font_decoration; 
 
+#define	AT_TEXT_LAST	0
+#define	AT_CURSOR_POS	1
+
 /********* 保存字体相关数据以及位图 ********/
 struct _LCUI_CharData
 {
@@ -229,6 +232,7 @@ struct _LCUI_TextLayer
 	uint32_t current_src_pos;	/* 当前光标在源文本中位置 */
 	LCUI_Pos current_des_pos;	/* 当前光标在分段后的文本中的位置 */
 	uint32_t max_text_len;		/* 最大文本长度 */
+	LCUI_CharData password_char;	/* 该字符用于屏蔽单行，为0时则不屏蔽 */
 	
 	BOOL show_cursor;	/* 指定是否需要显示文本光标 */
 	
@@ -316,6 +320,21 @@ void
 TextLayer_Text_Clear( LCUI_TextLayer *layer );
 /* 清空文本内容 */
 
+int
+TextLayer_Text_Get_Length( LCUI_TextLayer *layer );
+/* 获取文本位图中的文本长度 */
+
+void
+TextLayer_Text_Set_MaxLength( LCUI_TextLayer *layer, int max );
+/* 设定文本位图中的文本长度 */
+
+void 
+TextLayer_Text_Set_PasswordChar( LCUI_TextLayer *layer, wchar_t ch );
+/* 
+ * 设置屏蔽字符，设置后，文本框内的文本都会显示成该字符
+ * 如果ch的值为0，则不对文本框里的文本进行屏蔽 
+ * */
+ 
 void
 TextLayer_Text( LCUI_TextLayer *layer, char *new_text );
 /* 设定整个文本图层中需显示的文本，光标复位，原有选中文本被删除 */ 
@@ -403,6 +422,9 @@ void
 TextLayer_Using_StyleTags( LCUI_TextLayer *layer, BOOL flag );
 /* 指定文本图层是否处理样式标签 */ 
 
+void 
+TextLayer_Multiline( LCUI_TextLayer *layer, BOOL flag );
+/* 指定文本图层是否启用多行文本显示 */
 /*************************** End TextLayer ****************************/
 
 

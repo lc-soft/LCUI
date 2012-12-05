@@ -42,6 +42,11 @@
 #ifndef __LCUI_TEXTBOX_H__
 #define __LCUI_TEXTBOX_H__
 
+#define ONLY_0_TO_9	1
+#define ONLY_a_TO_z	1<<1
+#define ONLY_A_TO_Z	1<<2
+#define ONLY_UNDERLINE	1<<3
+
 LCUI_BEGIN_HEADER
 
 LCUI_Widget*
@@ -97,6 +102,32 @@ int TextBox_Cut_Select_Text(LCUI_Widget *widget);
 
 void TextBox_Using_StyleTags(LCUI_Widget *widget, BOOL flag);
 /* 指定文本框是否处理控制符 */
+
+void 
+TextBox_Multiline( LCUI_Widget *widget, BOOL flag );
+/* 指定文本框是否启用多行文本显示 */
+
+void
+TextBox_Text_Set_MaxLength( LCUI_Widget *widget, int max );
+/* 设置文本框中能够输入的最大字符数 */
+
+void
+TextBox_Text_Set_PasswordChar( LCUI_Widget *widget, wchar_t ch );
+/* 为文本框设置屏蔽字符 */
+
+void
+TextBox_Text_Limit( LCUI_Widget *widget, int mode );
+/* 
+ * 功能：限制能对文本框输入的字符 
+ * 说明：参数mode的取值可为：
+ *      ONLY_0_9       //只能输入0至9范围内的字符
+ *      ONLY_a_z       //只能输入a至z范围内的字符
+ *      ONLY_A_Z       //只能输入A至Z范围内的字符
+ *      ONLY_UNDERLINE //只能输入下划线
+ * 上述值可同时使用，可以这样：
+ * ONLY_0_TO_9 | ONLY_a_TO_z | ONLY_A_TO_Z
+ * 设置文本框，只能输入数字和字母
+ * */
 
 LCUI_END_HEADER
 

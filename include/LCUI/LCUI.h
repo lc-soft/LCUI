@@ -727,6 +727,10 @@ int set_timer( long int n_ms, void (*callback_func)(void), BOOL reuse );
  * 返回值：正常返回0，指定ID的定时器不存在则返回-1.
  * */
 int free_timer( int timer_id );
+
+
+/* 重设定时器的时间 */
+int reset_timer( int timer_id, long int n_ms );
 /*---------------------------- End Timer -----------------------------*/
 
 /************************* App Management *****************************/
