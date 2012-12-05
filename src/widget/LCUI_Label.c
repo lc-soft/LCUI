@@ -53,7 +53,8 @@ Label_Init(LCUI_Widget *widget)
 /* 功能：初始化label部件数据 */
 {
 	LCUI_Label *label;
-	
+	/* label部件不需要焦点 */
+	widget->focus = FALSE;
 	label = Widget_Create_PrivData( widget, sizeof(LCUI_Label) );
 	label->auto_size = TRUE;
 	TextLayer_Init( &label->layer ); 
@@ -133,7 +134,6 @@ Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 	va_start( ap, fmt );
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
 	va_end( ap );
-	
 	TextLayer_Text( &label->layer, text );
 	Update_Widget( widget ); 
 }
