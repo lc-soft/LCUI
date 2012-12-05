@@ -38,13 +38,22 @@ LCUI_Size Get_Screen_Size ()
 	return LCUI_Sys.screen.size; 
 }
 
+//static int debug_count = 0;
 int Add_Screen_Refresh_Area (LCUI_Rect rect)
 /* 功能：在整个屏幕内添加需要刷新的区域 */
 {
 	if (rect.width <= 0 || rect.height <= 0) {
 		return -1; 
 	} 
+	DEBUG_MSG("add screen area: %d,%d,%d,%d\n", 
+	rect.x, rect.y, rect.width, rect.height);
 	rect = Get_Valid_Area(Get_Screen_Size(), rect); 
+	//if( rect.width == 320 && rect.height == 240 ) {
+		//++debug_count;
+	//}
+	//if( debug_count >= 20 ) {
+	//	abort();
+	//}
 	return RectQueue_Add (&LCUI_Sys.update_area, rect);
 }
 
@@ -73,49 +82,6 @@ int Widget_Layer_Not_Visible(LCUI_Widget *widget)
 		return 1;
 	}
 	return 0;
-}
-
-void __Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
-/* 
- * 功能：获取与指定区域重叠的部件 
- * 说明：得到的队列，队列中的部件排列顺序为：底-》上 == 左-》右
- * */
-{
-	int i, total;
-	LCUI_Pos pos;
-	LCUI_Rect tmp;
-	LCUI_Widget *child;
-	LCUI_Queue *widget_list;
-
-	if(widget == NULL) {
-		widget_list = &LCUI_Sys.widget_list; 
-	} else {
-		if( !widget->visible ) {
-			return;
-		}
-		widget_list = &widget->child; 
-	}
-
-	total = Queue_Get_Total(widget_list); 
-	/* 从底到顶遍历子部件 */
-	for(i=total-1; i>=0; --i) {
-		child = Queue_Get( widget_list, i ); 
-		if( child == NULL || !child->visible ) {
-			continue;
-		}
-		tmp = Get_Widget_Valid_Rect( child ); 
-		pos = Get_Widget_Global_Pos( child );
-		tmp.x += pos.x;
-		tmp.y += pos.y;
-		if( !Rect_Valid(tmp) ){
-			continue;
-		}
-		if (Rect_Is_Overlay(tmp, rect)) { 
-			/* 记录与该区域重叠的部件 */
-			Queue_Add_Pointer( queue, child ); 
-			Get_Overlay_Widget( rect, child, queue );  
-		} 
-	}
 }
 
 void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
@@ -197,6 +163,13 @@ filter_widget:;
 int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 /* 获取屏幕中指定区域内实际要显示的图形 */
 {
+	static int i, total; 
+	static LCUI_Pos pos, widget_pos;
+	static LCUI_Widget *widget; 
+	static LCUI_Queue widget_buff;
+	static LCUI_Rect valid_area;
+	static LCUI_Graph buff;
+	
 	/* 检测这个区域是否有效 */
 	if (rect.x < 0 || rect.y < 0) {
 		return -1; 
@@ -209,14 +182,6 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 		return -2;
 	}
 	
-	int i, total; 
-	
-	LCUI_Pos pos, widget_pos;
-	LCUI_Widget *widget; 
-	LCUI_Queue widget_buff;
-	LCUI_Rect valid_area;
-	LCUI_Graph buff;
-
 	Graph_Init(&buff);
 	Queue_Init(&widget_buff, sizeof(LCUI_Widget), NULL);
 	Queue_Using_Pointer(&widget_buff); /* 只用于存放指针 */
@@ -304,11 +269,14 @@ static void Handle_Screen_Update()
 	/* 锁住队列，其它线程不能访问 */
 	Queue_Lock(&LCUI_Sys.update_area); 
 	while(LCUI_Active()) {
+		DEBUG_MSG("total area: %d\n", Queue_Get_Total( &LCUI_Sys.update_area ));
 		/* 如果从队列中获取数据成功 */
 		if ( RectQueue_Get(&rect, 0, &LCUI_Sys.update_area) ) { 
 			/* 获取内存中对应区域的图形数据 */  
 			Get_Screen_Real_Graph (rect, &graph); 
-			/* 写入至帧缓冲，让屏幕显示图形 */  
+			DEBUG_MSG("get screen area: %d,%d,%d,%d\n", 
+			rect.x, rect.y, rect.width, rect.height);
+			/* 写入至帧缓冲，让屏幕显示图形 */
 			Graph_Display (&graph, Pos(rect.x, rect.y)); 
 			/* 移除队列中的成员 */ 
 			Queue_Delete (&LCUI_Sys.update_area, 0); 
@@ -350,7 +318,7 @@ static void *Handle_Area_Update ()
 #endif
 	while(LCUI_Active()) {
 		Handle_All_WidgetUpdate();/* 处理所有部件更新 */ 
-		usleep(5000);/* 停顿一段时间，让程序主循环处理任务 */ 
+		usleep(1000);/* 停顿一段时间，让程序主循环处理任务 */ 
 		Handle_Refresh_Area(); /* 处理需要刷新的区域 */ 
 		Handle_Screen_Update();/* 处理屏幕更新 */ 
 #ifdef need_autoquit
