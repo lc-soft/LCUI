@@ -384,6 +384,18 @@ int continue_timer( int timer_id )
 	}
 	return -1;
 }
+
+/* 重设定时器的时间 */
+int reset_timer( int timer_id, long int n_ms ) 
+{
+	timer_data *timer;
+	timer = find_timer( timer_id );
+	if( timer ) {
+		timer->total_ms = timer->cur_ms = n_ms;
+		return 0;
+	}
+	return -1;
+}
 /*---------------------------- End Public -----------------------------*/
 
 /*---------------------------- End Timer ------------------------------*/
@@ -679,7 +691,7 @@ int LCUI_Main ()
 	LCUI_Graph graph;
 	
 	Graph_Init(&graph);
-	
+//#define NEED_CATCH_SCREEN
 #ifdef NEED_CATCH_SCREEN
 	LCUI_Rect area;
 	area.x = (Get_Screen_Width()-320)/2;
