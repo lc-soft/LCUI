@@ -55,13 +55,21 @@
 
 typedef struct _LCUI_TextBox
 {
-	LCUI_Widget *text;
-	LCUI_Widget *cursor;
-	LCUI_Widget *scrollbar[2];
+	LCUI_Widget *text;		/* 文本显示层 */
+	LCUI_Widget *cursor;		/* 光标 */
+	LCUI_Widget *scrollbar[2];	/* 两个滚动条 */
+	int limit_mode;			/* 限制模式 */
 	int block_size;			/* 块大小 */
 	LCUI_Queue text_block_buff;	/* 文本块缓冲区 */
 }
 LCUI_TextBox;
+
+typedef struct _LCUI_TextBlock
+{
+	int pos_type;	/* 指定该文本块要添加至哪个位置 */
+	char *text;	/* 指向文本所在内存空间的指针 */
+}
+LCUI_TextBlock;
 
 /*----------------------------- Private ------------------------------*/
 static LCUI_Widget *active_textbox = NULL; 
@@ -147,12 +155,14 @@ static void
 TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 {
 	static char buff[5];
-	static int cols, rows;
+	static int cols, flag, rows;
 	static LCUI_Pos cur_pos;
 	static LCUI_TextLayer *layer;
+	static LCUI_TextBox *textbox;
 	
 	//printf("you input %d\n", key->code);
 	layer = TextBox_Get_TextLayer( widget );
+	textbox = Get_Widget_PrivData( widget );
 	cur_pos = TextLayer_Get_Cursor_Pos( layer );
 	cols = TextLayer_Get_RowLen( layer, cur_pos.y );
 	rows = TextLayer_Get_Rows( layer ); 
@@ -208,8 +218,36 @@ mv_cur_pos:;
 		break;
 		
 	    default:;
+		if( textbox->limit_mode == 0 ) {
+			flag = 1;
+		} else {
+			flag = 0;
+		}
+		/* 处理文本框的字符输入限制 */
+		if( Check_Option( textbox->limit_mode, ONLY_0_TO_9 ) ) {
+			if( key->code >= '0' && key->code <= '9' ) {
+				++flag;
+			}
+		}
+		if( Check_Option( textbox->limit_mode, ONLY_a_TO_z ) ) {
+			if( key->code >= 'a' && key->code <= 'z' ) {
+				++flag;
+			}
+		}
+		if( Check_Option( textbox->limit_mode, ONLY_A_TO_Z ) ) {
+			if( key->code >= 'A' && key->code <= 'Z' ) {
+				++flag;
+			}
+		}
+		if( Check_Option( textbox->limit_mode, ONLY_UNDERLINE ) ) {
+			if( key->code == '_' ) {
+				++flag;
+			}
+		}
+		//_DEBUG_MSG("input char: %c, %d\n", key->code, flag);
 		/* 如果该ASCII码代表的字符是可见的 */
-		if( key->code == 10 || (key->code > 31 && key->code < 126) ) {
+		if( flag == 1 && (key->code == 10 || 
+			(key->code > 31 && key->code < 126)) ) {
 			//wchar_t *text;
 			buff[0] = key->code;
 			buff[1] = 0;
@@ -261,6 +299,12 @@ TextBox_VertScroll_TextLayer( ScrollBar_Data data, void *arg )
 	Update_Widget( widget );
 }
 
+static void
+destroy_textblock( LCUI_TextBlock *ptr )
+{
+	free( ptr->text );
+}
+
 static void 
 TextBox_Init( LCUI_Widget *widget )
 /* 初始化文本框相关数据 */
@@ -278,7 +322,7 @@ TextBox_Init( LCUI_Widget *widget )
 	textbox->cursor->focus = FALSE;
 	textbox->scrollbar[0]->focus = FALSE;
 	textbox->scrollbar[1]->focus = FALSE;
-	
+	textbox->limit_mode = 0;
 	textbox->block_size = 256;
 	
 	Label_AutoSize( textbox->text, FALSE, 0 );
@@ -302,7 +346,7 @@ TextBox_Init( LCUI_Widget *widget )
 	ScrollBar_Connect( textbox->scrollbar[1], TextBox_HoriScroll_TextLayer, widget );
 	Show_Widget( textbox->text );
 	
-	Queue_Init( &textbox->text_block_buff, sizeof(char*), NULL );
+	Queue_Init( &textbox->text_block_buff, sizeof(LCUI_TextBlock), destroy_textblock );
 	
 	TextLayer_Using_StyleTags( Label_Get_TextLayer(textbox->text), FALSE );
 	Set_Widget_Padding( widget, Padding(2,2,2,2) );
@@ -318,8 +362,10 @@ TextBox_Init( LCUI_Widget *widget )
 		__timer_id = set_timer( 500, blink_cursor, TRUE );
 	}
 	Widget_Drag_Event_Connect( widget, TextBox_TextLayer_Click );
-	/* 关联FOCUS_IN 事件 */
+	/* 关联 FOCUS_OUT 和 FOCUS_IN 事件 */
+	Widget_FocusOut_Event_Connect( widget, hide_textbox_cursor, NULL );
 	Widget_FocusIn_Event_Connect( widget, _put_textbox_cursor, NULL );
+	/* 关联按键输入事件 */
 	Widget_Keyboard_Event_Connect( widget, TextBox_Input );
 }
 
@@ -361,6 +407,7 @@ TextBox_ScrollBar_Update_Size( LCUI_Widget *widget )
 	label = TextBox_Get_Label( widget );
 	/* 获取文本图层 */
 	layer = TextBox_Get_TextLayer( widget );
+	
 	/* 获取文本图层和文本框区域的尺寸 */
 	layer_size = TextLayer_Get_Size( layer );
 	area_size = Get_Container_Size( widget );
@@ -369,7 +416,8 @@ TextBox_ScrollBar_Update_Size( LCUI_Widget *widget )
 	scrollbar[1] = TextBox_Get_Scrollbar( widget, 1 );
 	
 	/* 如果文本图层高度超过显示区域 */
-	if( area_size.h > 0 && layer_size.h > area_size.h ) {
+	if( layer->enable_multiline && area_size.h > 0 
+	  && layer_size.h > area_size.h ) {
 		tmp = area_size.w - Get_Widget_Width( scrollbar[0] );
 		snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
 		Set_Widget_Size( label, size_str, NULL );
@@ -392,7 +440,8 @@ TextBox_ScrollBar_Update_Size( LCUI_Widget *widget )
 		Set_Widget_Size( label, "100%", NULL );
 	}
 	/* 和上面的处理基本一样，这个是处理横向滚动条 */
-	if( area_size.w > 0 && layer_size.w > area_size.w ) {
+	if( layer->enable_multiline &&
+	 area_size.w > 0 && layer_size.w > area_size.w ) {
 		tmp = area_size.h - Get_Widget_Height( scrollbar[1] );
 		snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
 		Set_Widget_Size( label, NULL, size_str );
@@ -439,6 +488,9 @@ TextBox_ScrollBar_Update_Pos( LCUI_Widget *widget )
 	}
 	
 	layer = TextBox_Get_TextLayer( widget );
+	if( !layer->enable_multiline ) {
+		return 1;
+	}
 	layer_size = TextLayer_Get_Size( layer );
 	if( layer_size.h <= 0 || layer_size.w <= 0 ) {
 		return -2;
@@ -478,11 +530,24 @@ __TextBox_Text_Append(LCUI_Widget *widget, char *new_text)
 	TextLayer_Text_Append( layer, new_text );
 }
 
+static void 
+__TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
+/* 在光标处添加文本 */
+{
+	LCUI_Pos cur_pos;
+	LCUI_TextLayer *layer;
+	
+	layer = TextBox_Get_TextLayer( widget );
+	TextLayer_Text_Add( layer, new_text );
+	cur_pos = TextLayer_Get_Cursor_Pos( layer );
+	TextBox_Cursor_Move( widget, cur_pos );
+}
+
 static void
 Exec_TextBox_Update( LCUI_Widget *widget )
 /* 更新文本框的文本图层 */
 {
-	char *text_ptr;
+	LCUI_TextBlock *text_ptr;
 	LCUI_TextBox *textbox;
 	
 	textbox = Get_Widget_PrivData( widget );
@@ -490,8 +555,21 @@ Exec_TextBox_Update( LCUI_Widget *widget )
 	if( Queue_Get_Total( &textbox->text_block_buff ) > 0 ) {
 		/* 获取文本块 */
 		text_ptr = Queue_Get( &textbox->text_block_buff, 0 );
-		/* 追加至文本框内的文本 */
-		__TextBox_Text_Append( widget, text_ptr );
+		if( text_ptr ) {
+			//_DEBUG_MSG("text block: %p, text: %p\n", 
+			//	text_ptr, text_ptr->text);
+			switch( text_ptr->pos_type ) {
+			    case AT_TEXT_LAST:
+				/* 将此文本块追加至文本末尾 */
+				__TextBox_Text_Append( widget, text_ptr->text );
+				break;
+			    case AT_CURSOR_POS:
+				/* 将此文本块插入至光标当前处 */
+				__TextBox_Text_Add( widget, text_ptr->text );
+				break;
+			    default: break;
+			}
+		}
 		/* 删除该文本块 */
 		Queue_Delete( &textbox->text_block_buff, 0 );
 		/* 更新滚动条的位置 */
@@ -677,67 +755,95 @@ TextBox_Get_Cursor( LCUI_Widget *widget )
 	return tb->cursor;
 }
 
-
-static void
-TextBox_Split_Text( LCUI_Widget *widget, char *new_text )
+static int
+textbuff_add_utf8_text( LCUI_TextBox* textbox, char *new_text, int pos_type )
+/* 将UTF-8编码文本添加至缓冲区内 */
 {
-	int i, j, count,len;
-	LCUI_TextBox *textbox;
-	char *text_block;
 	unsigned char t;
+	int i, j, count, len, size;
+	char *text_buff;
+	LCUI_TextBlock text_block;
 	
 	len = strlen( new_text );
+	//_DEBUG_MSG("len = %d\n", len);
+	switch( pos_type ) {
+		case AT_TEXT_LAST: 
+		case AT_CURSOR_POS:
+		text_block.pos_type = pos_type;
+		break;
+		default: return -1;
+	}
+	for(i=0; i<len; ++i) {
+		if( len-i > textbox->block_size ) {
+			size = textbox->block_size;
+		} else {
+			size = len-i +1;
+		}
+		text_buff = malloc( sizeof(char) * size );
+		if( !text_buff ) {
+			return -2;
+		}
+		for( count=0,j=0; i<len; ++i, ++j ) {
+			/* 如果大于当前块大小 */
+			if( j >= textbox->block_size ) {
+				if( count == 0 ) {
+					break;
+				} 
+				text_buff = realloc( text_buff, 
+						sizeof(char) * (j+count) );
+				if( !text_buff ) {
+					return -2;
+				}
+			}
+			if(count > 0) {
+				/* 保存一个字节 */
+				text_buff[j] = new_text[i];
+				--count;
+				continue;
+			}
+			/* 需要转存为unsigned char类型，否则位移的结果会有问题 */
+			t = new_text[i];
+			/* 根据编码信息，判断该UTF-8字符还剩多少个字节 */
+			if((t>>7) == 0); // 0xxxxxxx
+			else if((t>>5) == 6) {// 110xxxxx 
+				count = 1; 
+			}
+			else if((t>>4) == 14) {// 1110xxxx 
+				count = 2; 
+			}
+			else if((t>>3) == 30) {// 11110xxx 
+				count = 3; 
+			}
+			else if((t>>2) == 62) {// 111110xx 
+				count = 4; 
+			}
+			else if((t>>1) == 126) {// 1111110x 
+				count = 5; 
+			}
+			/* 保存一个字节 */
+			text_buff[j] = new_text[i];
+			//_DEBUG_MSG("char: %d, count: %d\n", new_text[i], count);
+		}
+		--i;
+		text_buff[j] = 0;
+		text_block.text = text_buff;
+		/* 添加文本块至缓冲区 */
+		Queue_Add( &textbox->text_block_buff, &text_block );
+	}
+	return 0;
+}
+
+static void
+TextBox_TextBuff_Add( LCUI_Widget *widget, char *new_text, int pos_type )
+/* 将文本添加至缓冲区内 */
+{
+	LCUI_TextBox *textbox;
+	
 	textbox = Get_Widget_PrivData( widget );
 	/* 判断当前使用的文本编码方式 */
 	switch(Get_EncodingType()) {
 	    case ENCODEING_TYPE_UTF8 :
-		//printf("len: %d\n", len);
-		for(i=0; i<len; ++i) {
-			text_block = malloc( sizeof(char) * textbox->block_size );
-			for( count=0,j=0; i<len; ++i, ++j ) {
-				/* 如果大于当前块大小 */
-				if( j >= textbox->block_size ) {
-					if( count == 0 ) {
-						break;
-					} else {
-						text_block = realloc( text_block, sizeof(char) * (j+count) );
-					}
-				}
-				if(count > 0) {
-					/* 保存一个字节 */
-					text_block[j] = new_text[i];
-					--count;
-					continue;
-				}
-				/* 需要转存为unsigned char类型，否则位移的结果会有问题 */
-				t = new_text[i];
-				/* 根据编码信息，判断该UTF-8字符还剩多少个字节 */
-				if((t>>7) == 0); // 0xxxxxxx
-				else if((t>>5) == 6) {// 110xxxxx 
-					count = 1; 
-				}
-				else if((t>>4) == 14) {// 1110xxxx 
-					count = 2; 
-				}
-				else if((t>>3) == 30) {// 11110xxx 
-					count = 3; 
-				}
-				else if((t>>2) == 62) {// 111110xx 
-					count = 4; 
-				}
-				else if((t>>1) == 126) {// 1111110x 
-					count = 5; 
-				}
-				/* 保存一个字节 */
-				text_block[j] = new_text[i];
-				//printf("char: %d, count: %d\n", new_text[i], count);
-			}
-			--i;
-			text_block[j] = 0;
-			//printf("text block: %s\n", text_block);
-			/* 添加文本块至缓冲区 */
-			Queue_Add_Pointer( &textbox->text_block_buff, text_block );
-		}
+		textbuff_add_utf8_text( textbox, new_text, pos_type );
 		break;
 	    case ENCODEING_TYPE_GB2312 :
 		break;
@@ -748,7 +854,10 @@ TextBox_Split_Text( LCUI_Widget *widget, char *new_text )
 static void
 TextBox_Text_Clear( LCUI_Widget *widget )
 {
+	LCUI_TextLayer *layer;
 	
+	layer = TextBox_Get_TextLayer( widget );
+	TextLayer_Text_Clear( layer );
 }
 
 void TextBox_Text(LCUI_Widget *widget, char *new_text)
@@ -757,7 +866,7 @@ void TextBox_Text(LCUI_Widget *widget, char *new_text)
 	/* 清空显示的文本 */
 	TextBox_Text_Clear( widget );
 	/* 把文本分割成块，加入至缓冲队列，让文本框分段显示 */
-	TextBox_Split_Text( widget, new_text );
+	TextBox_TextBuff_Add( widget, new_text, AT_TEXT_LAST );
 	Update_Widget( widget );
 }
 
@@ -774,21 +883,15 @@ void TextBox_TextLayer_Set_Offset( LCUI_Widget *widget, LCUI_Pos offset_pos )
 void TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 /* 在光标处添加文本 */
 {
-	LCUI_Pos cur_pos;
-	LCUI_TextLayer *layer;
-	
-	layer = TextBox_Get_TextLayer( widget );
-	TextLayer_Text_Add( layer, new_text );
-	cur_pos = TextLayer_Get_Cursor_Pos( layer );
-	TextBox_Cursor_Move( widget, cur_pos );
+	/* 把文本分割成若干块，加入至缓冲队列，让文本框分段处理显示 */ 
+	TextBox_TextBuff_Add( widget, new_text, AT_CURSOR_POS );
 	Update_Widget( widget );
 }
 
 void TextBox_Text_Append(LCUI_Widget *widget, char *new_text)
 /* 在文本末尾追加文本 */
 {
-	/* 把文本分割成块，加入至缓冲队列，让文本框分段显示 */
-	TextBox_Split_Text( widget, new_text );
+	TextBox_TextBuff_Add( widget, new_text, AT_TEXT_LAST );
 	Update_Widget( widget );
 }
 
@@ -909,4 +1012,52 @@ void TextBox_Using_StyleTags(LCUI_Widget *widget, BOOL flag)
 	TextLayer_Using_StyleTags( layer, flag );
 }
 
+void 
+TextBox_Multiline( LCUI_Widget *widget, BOOL flag )
+/* 指定文本框是否启用多行文本显示 */
+{
+	LCUI_TextLayer *layer;
+	layer = TextBox_Get_TextLayer( widget );
+	TextLayer_Multiline( layer, flag );
+}
+
+void
+TextBox_Text_Set_MaxLength( LCUI_Widget *widget, int max )
+/* 设置文本框中能够输入的最大字符数 */
+{
+	LCUI_TextLayer *layer;
+	layer = TextBox_Get_TextLayer( widget );
+	TextLayer_Text_Set_MaxLength( layer, max );
+}
+
+void
+TextBox_Text_Set_PasswordChar( LCUI_Widget *widget, wchar_t ch )
+/* 为文本框设置屏蔽字符 */
+{
+	LCUI_TextLayer *layer;
+	layer = TextBox_Get_TextLayer( widget );
+	TextLayer_Text_Set_PasswordChar( layer, ch );
+	TextLayer_Refresh( layer );
+	Update_Widget( widget );
+}
+
+void
+TextBox_Text_Limit( LCUI_Widget *widget, int mode )
+/* 
+ * 功能：限制能对文本框输入的字符 
+ * 说明：参数mode的取值可为：
+ *      ONLY_0_9       //只能输入0至9范围内的字符
+ *      ONLY_a_z       //只能输入a至z范围内的字符
+ *      ONLY_A_Z       //只能输入A至Z范围内的字符
+ *      ONLY_UNDERLINE //只能输入下划线
+ * 上述值可同时使用，可以这样：
+ * ONLY_0_TO_9 | ONLY_a_TO_z | ONLY_A_TO_Z
+ * 设置文本框，只能输入数字和字母
+ * */
+{
+	LCUI_TextBox *textbox;
+	
+	textbox = Get_Widget_PrivData( widget );
+	textbox->limit_mode = mode;
+}
 /*--------------------------- End Public -----------------------------*/
