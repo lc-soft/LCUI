@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <errno.h>
+#include <unistd.h>
 
 
 void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color)
@@ -185,6 +186,22 @@ int Screen_Init()
 	
 	/* 保存当前屏幕内容，以便退出LCUI后还原 */
 	Get_Screen_Graph(&LCUI_Sys.screen.buff); 
+	return 0;
+}
+
+int Screen_Destroy()
+{
+	int err;
+	LCUI_Sys.status = KILLED;
+	/* 恢复屏幕初始内容 */ 
+	Graph_Display (&LCUI_Sys.screen.buff, Pos(0, 0));	
+	/* 解除帧缓冲在内存中的映射 */
+	err = munmap (LCUI_Sys.screen.fb_mem, LCUI_Sys.screen.smem_len);
+	if (err != 0) {
+		perror ("munmap()");
+		return err;
+	}
+	close (LCUI_Sys.screen.fb_dev_fd);  
 	return 0;
 }
 
