@@ -1803,7 +1803,10 @@ void Exec_Update_Widget_Pos( LCUI_Widget *widget )
 void Update_Widget_Size( LCUI_Widget *widget )
 /* 部件尺寸更新 */
 {
-	Resize_Widget( widget, _Get_Widget_Size(widget) ); 
+	LCUI_Size size;
+	
+	size = _Get_Widget_Size(widget);
+	Resize_Widget( widget, size ); 
 }
 
 void Update_Child_Widget_Size(LCUI_Widget *widget)
@@ -1965,8 +1968,8 @@ void Refresh_Widget(LCUI_Widget *widget)
 void Resize_Widget(LCUI_Widget *widget, LCUI_Size new_size)
 /* 功能：改变部件的尺寸 */
 {
-	if( !widget ) {
-		return; 
+	if( !widget || new_size.w < 0 || new_size.h < 0) {
+		return;
 	}
 	widget->w.px = new_size.w;
 	widget->h.px = new_size.h;
