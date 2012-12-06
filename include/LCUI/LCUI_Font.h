@@ -63,11 +63,11 @@ int Char_To_Wchar_T(char *in_text, wchar_t **unicode_text);
  * 返回值：正常则wchar_t型字符串的长度，否则返回-1
  * */
 
-int FontBMP_Valid(LCUI_FontBMP *bitmap);
+BOOL FontBMP_Valid(LCUI_FontBMP *bitmap);
 /*
  * 功能：检测位图数据是否有效
- * 返回值：有效返回1，无效返回0
- */ 
+ * 返回值：有效返回帧，无效返回假
+ */
 
 void Print_FontBMP_Info(LCUI_FontBMP *bitmap);
 /* 功能：打印位图的信息 */ 
@@ -82,7 +82,7 @@ int FontBMP_Create(LCUI_FontBMP *bitmap, int width, int height);
 /* 功能：为Bitmap内的数据分配内存资源，并初始化 */ 
 
 void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap);
-/* 功能：根据字符编码，获取系统自带的字体位图 */ 
+/* 功能：根据字符编码，获取已内置的字体位图 */
 
 void Set_Default_Font(char *fontfile);
 /* 
@@ -119,13 +119,14 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 int Open_Fontfile(LCUI_Font *font_data, char *fontfile);
 /* 功能：打开字体文件，并保存数据至LCUI_Font结构体中 */ 
 
-int Get_FontBMP(LCUI_Font *font_data, wchar_t ch, int pixel_size, LCUI_FontBMP *out_bitmap);
+int 
+Get_FontBMP(	LCUI_Font *font_data, wchar_t ch, 
+		int pixel_size, LCUI_FontBMP *out_bitmap);
 /*
- * 功能：获取单个wchar_t型字符的位图
- * 说明：LCUI_Font结构体中储存着已被打开的字体文件句柄和face对象的句柄，如果字体文件已经被
- * 成功打开一次，此函数不会再次打开字体文件。
+ * 功能：获取单个wchar_t型字符的字体位图数据
+ * 说明：LCUI_Font结构体中储存着已被打开的字体文件句柄和face对象的句柄，如果字体文件
+ * 已经被成功打开一次，此函数不会再次打开字体文件。
  */
-
 
 /*************************** LCUI_TextLayer ****************************/
 typedef struct _LCUI_TextStyle	LCUI_TextStyle; 

@@ -60,23 +60,23 @@
 
 extern uchar_t const *in_core_font_8x8();
 
-int FontBMP_Valid(LCUI_FontBMP *bitmap)
+BOOL FontBMP_Valid(LCUI_FontBMP *bitmap)
 /*
  * 功能：检测位图数据是否有效
- * 返回值：有效返回1，无效返回0
+ * 返回值：有效返回帧，无效返回假
  */
 {
-	if(NULL != bitmap && bitmap->width > 0 && bitmap->rows > 0) {
-		return 1; 
+	if( bitmap && bitmap->width > 0 && bitmap->rows > 0) {
+		return TRUE; 
 	}
-	return 0;
+	return FALSE;
 }
 
 void Print_FontBMP_Info(LCUI_FontBMP *bitmap)
 /* 功能：打印位图的信息 */
 {
 	printf("address:%p\n",bitmap);
-	if(bitmap == NULL) {
+	if( !bitmap ) {
 		return;
 	}
 	printf("top: %d, left: %d, width:%d, rows:%d\n", 
@@ -126,17 +126,17 @@ int FontBMP_Create(LCUI_FontBMP *bitmap, int width, int rows)
 }
 
 void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
-/* 功能：根据字符编码，获取系统自带的字体位图 */
+/* 功能：根据字符编码，获取已内置的字体位图 */
 {
 	int i,j, start, m;
 	uchar_t const *p;
 	
-	p = in_core_font_8x8();
-	FontBMP_Create(out_bitmap, 8, 8);/* 为位图分配内存，8x8的尺寸 */
+	p = in_core_font_8x8(); /* 获取指向内置字体位图数组的指针 */
+	FontBMP_Create(out_bitmap, 8, 8); /* 为位图分配内存，8x8的尺寸 */
 	out_bitmap->left = 0;
 	out_bitmap->top = 0;
-	if(code < 256) {
-		if(code == ' ') {
+	if(code < 256) { /* 如果在ASCII编码范围内 */
+		if(code == ' ') { /* 空格就直接置0 */
 			memset(out_bitmap->buffer, 0, sizeof(uchar_t)*64); 
 		} else {
 			start = code * 8;
@@ -149,8 +149,8 @@ void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 				}
 			}
 		}
-	} else {
-		uchar_t null_bmp[] = {
+	} else { /* 否则用“口”表示未知编码字符 */
+		static uchar_t null_bmp[] = {
 			1,1,1,1,1,1,1,1,
 			1,0,0,0,0,0,0,1,
 			1,0,0,0,0,0,0,1,
@@ -158,8 +158,7 @@ void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 			1,0,0,0,0,0,0,1,
 			1,0,0,0,0,0,0,1,
 			1,0,0,0,0,0,0,1,
-			1,1,1,1,1,1,1,1 
-		};
+			1,1,1,1,1,1,1,1 };
 		for (i=0;i<8;i++) {
 			m = i*8;
 			for (j=0;j<8;j++,++m) {
@@ -167,6 +166,7 @@ void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 			}
 		}
 	}
+	/* 修改相关属性 */
 	out_bitmap->top = 8;
 	out_bitmap->left = 0;
 	out_bitmap->rows = 8;
@@ -186,7 +186,7 @@ void Set_Default_Font(char *fontfile)
  * 说明：需要在LCUI初始化前使用，因为LCUI初始化时会打开默认的字体文件
  *  */
 {
-	if(fontfile == NULL) {
+	if( !fontfile ) {
 		strcpy(default_font, "");
 	} else {
 		strcpy(default_font, fontfile);
@@ -225,7 +225,7 @@ void LCUI_Font_Init(LCUI_Font *font)
 	font->ft_face = NULL;
 	/* 如果在环境变量中定义了字体文件路径，那就使用它 */
 	p = getenv("LCUI_FONTFILE");
-	if(p != NULL) {
+	if( p ) {
 		strcpy(default_font, p); 
 	}
 	/* 打开默认字体文件 */
@@ -238,14 +238,13 @@ void Font_Init(LCUI_Font *in)
  * 说明：默认是继承系统的字体数据
  * */
 {
-	in->type = DEFAULT;   /* 字体类型为LCUI默认的 */
-	//in->size = 12;
-	//in->fore_color.red = 0;
-	//in->fore_color.green = 0;
-	//in->fore_color.blue = 0;
+	/* 字体类型为LCUI默认的 */
+	in->type = DEFAULT;
+	/* 初始化字符串 */
 	String_Init(&in->font_file);
 	String_Init(&in->family_name);
 	String_Init(&in->style_name);
+	/* 如果缺省字体的状态是活动的，那就拷贝 */
 	if(LCUI_Sys.default_font.status == ACTIVE) {
 		in->status = ACTIVE;
 		LCUI_Strcpy(&in->family_name, &LCUI_Sys.default_font.family_name);
@@ -258,8 +257,6 @@ void Font_Init(LCUI_Font *in)
 		in->ft_lib = NULL;
 		in->ft_face = NULL;
 	}
-	//in->space = 1;
-	//in->linegap = 0;
 	in->load_flags = LCUI_Sys.default_font.load_flags;
 	in->render_mode = LCUI_Sys.default_font.render_mode;
 }
@@ -286,9 +283,11 @@ void Font_Free(LCUI_Font *in)
 void LCUI_Font_Free()
 /* 功能：释放LCUI默认的Font结构体数据占用的内存资源 */
 { 
+	/* 释放字符串 */
 	String_Free(&LCUI_Sys.default_font.font_file);
 	String_Free(&LCUI_Sys.default_font.family_name);
 	String_Free(&LCUI_Sys.default_font.style_name);
+	/* 如果缺省字体的状态是活动的，那就拷贝 */
 	if(LCUI_Sys.default_font.status == ACTIVE) {
 		LCUI_Sys.default_font.status = KILLED;
 #ifdef USE_FREETYPE
@@ -325,23 +324,25 @@ int Show_FontBMP(LCUI_FontBMP *fontbmp)
 int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 		LCUI_FontBMP	*bitmap, LCUI_RGB	color,
 		int flag )
-/* 功能：将字体位图数据与背景图形混合 */
+/* 功能：将字体位图绘制到背景图形上 */
 {
 	LCUI_Graph *des;
 	LCUI_Rect des_rect, cut;
 	uint_t total, m, n, y;
 	uint_t src_start_pos, des_start_pos;
-	
+	/* 获取背景图形的有效区域 */
 	des_rect = Get_Graph_Valid_Rect( graph );
+	/* 获取背景图引用的源图形 */
 	des = Get_Quote_Graph( graph ); 
-	
+	/* 数据有效性检测 */
 	if( !FontBMP_Valid( bitmap ) || !Graph_Valid( graph ) ) {
 		return -1;
 	}
+	/* 起点位置的有效性检测 */
 	if(des_pos.x > des->width || des_pos.y > des->height) {
 		return -2;
 	}
-	
+	/* 获取需要裁剪的区域 */
 	if( Get_Cut_Area( Size( des_rect.width, des_rect.height ),
 		Rect( des_pos.x, des_pos.y, bitmap->width, bitmap->rows ),
 		&cut
@@ -349,10 +350,11 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 		des_pos.x += cut.x;
 		des_pos.y += cut.y;
 	}
-	
+	/* 锁定图形 */
 	Graph_Lock( des, 1 );
-	/* 开始读取图片中的图形数组并写入窗口 */
+	/* 如果是以叠加模式绘制字体位图 */
 	if( flag == GRAPH_MIX_FLAG_OVERLAY ) {
+		/* 预先计算起点位置 */
 		src_start_pos = cut.y * bitmap->width + cut.x;
 		des_start_pos = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
 		for (y = 0; y < cut.height; ++y) {
@@ -360,14 +362,16 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 			n = des_start_pos;
 			total = n + cut.width;
 			for (; n < total; ++n,++m) { 
+				/* 获取通过ALPHA混合后的像素点的数据 */
 				des->rgba[0][n] = ALPHA_BLENDING(color.red, des->rgba[0][n], bitmap->buffer[m]);
 				des->rgba[1][n] = ALPHA_BLENDING(color.green, des->rgba[1][n], bitmap->buffer[m]);
 				des->rgba[2][n] = ALPHA_BLENDING(color.blue, des->rgba[2][n], bitmap->buffer[m]);
 			}
+			/* 切换至下一行像素点 */
 			des_start_pos += des->width;
 			src_start_pos += bitmap->width;
 		}
-	} else {
+	} else { /* 否则是以覆盖模式 */
 		src_start_pos = cut.y * bitmap->width + cut.x;
 		des_start_pos = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
 		for (y = 0; y < cut.height; ++y) {
@@ -389,59 +393,66 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 }
 
 int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
-/* 功能：打开字体文件，并保存数据至LCUI_Font结构体中 */
+/* 打开指定路径中的字体文件，并保存数据至LCUI_Font结构体中 */
 {
 #ifdef USE_FREETYPE
-	int type;
-	FT_Library    library;
-	FT_Face       face;
-	FT_Error      face_error = 0, lib_error = 0;
+	int		type;
+	FT_Library	library;
+	FT_Face		face;
+	FT_Error	face_error = 0, lib_error = 0;
 	
 	type = font_data->type;
 	if(font_data->status == ACTIVE) {
-		if(fontfile == NULL 
-		|| Strcmp(&font_data->font_file, fontfile) == 0) {
+		/* 如果字体文件路径无效，或该路径和默认的字体文件路径一样，则退出函数 */
+		if( !fontfile || !Strcmp(&font_data->font_file, fontfile) ) {
 			return 0;
 		}
 		else if( Strcmp(&font_data->font_file, 
 				LCUI_Sys.default_font.font_file.string)) {
+			/* 否则，如果不一样，就将type赋值为CUSTOM，表示自定义 */
 			type = CUSTOM;
 		}
 	}
-	else if(fontfile == NULL) {
+	else if( !fontfile ) {
 		return -1;
 	}
-	lib_error = FT_Init_FreeType( & library);  /* 初始化FreeType库 */
-	if (lib_error) { /* 当初始化库时发生了一个错误 */
+	/* 初始化FreeType库 */
+	lib_error = FT_Init_FreeType( & library);
+	/* 当初始化库时发生了一个错误 */
+	if (lib_error) {
 		printf("open fontfile: "FT_INIT_ERROR);
 		return - 1 ;
 	}
 	
-	face_error = FT_New_Face( library, fontfile , 0 , & face );
+	face_error = FT_New_Face( library, fontfile , 0 , &face );
 	if(face_error) {
 		FT_Done_FreeType(library);
-		if ( face_error == FT_Err_Unknown_File_Format )
-			printf("open fontfile: "FT_UNKNOWN_FILE_FORMAT); /* 未知文件格式 */ 
-		else 
-			printf("open fontfile: "FT_OPEN_FILE_ERROR);/* 打开错误 */
+		if ( face_error == FT_Err_Unknown_File_Format ) {
+			/* 未知文件格式 */ 
+			printf("open fontfile: "FT_UNKNOWN_FILE_FORMAT);
+		} else  {
+			/* 打开错误 */
+			printf("open fontfile: "FT_OPEN_FILE_ERROR);
+		}
+		/* 打印错误信息 */
 		perror(fontfile);
 		return -1;
 	}
-	printf(
-		"=============== font info ==============\n" 
+	/* 打印字体信息 */
+	printf(	"=============== font info ==============\n" 
 		"family name: %s\n"
 		"style name : %s\n"
 		"========================================\n" ,
 		face->family_name,
-		face->style_name
-	);
-	Font_Free(font_data);
-	/* 保存字体信息 */
+		face->style_name );
+	/* 先处理掉之前保存的字体信息 */
+	Font_Free( font_data );
+	/* 保存新的字体信息 */
 	Strcpy(&font_data->family_name, face->family_name);
 	Strcpy(&font_data->style_name, face->style_name);
 	Strcpy(&font_data->font_file, fontfile);
 	font_data->type = type;
-	font_data->status = ACTIVE; 
+	font_data->status = ACTIVE;
 	font_data->ft_lib = library;
 	font_data->ft_face = face;
 	return 0;
@@ -451,22 +462,25 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 #endif
 }
 
+/* 如果定义了USE_FREETYPE宏定义，则使用FreeType字体引擎处理字体数据 */
 #ifdef USE_FREETYPE
 
-static int Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
+static int 
+Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
+/* 转换FT_GlyphSlot类型数据为LCUI_FontBMP */
 {
 	static FT_Error	error;
 	static size_t		size;
 	static FT_BitmapGlyph  bitmap_glyph;
 	static FT_Glyph        glyph;
 	
-	/* 从插槽中提取一个字形图像 
+	/* 从字形槽中提取一个字形图像 
 	 * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
 	error = FT_Get_Glyph( slot, &glyph );
 	if(error) {
 		return -1; 
 	}
-	/**************
+	/*---------------------- 打印字体信息 --------------------------
 	printf(" width= %ld,  met->height= %ld\n"
 	"horiBearingX = %ld, horiBearingY = %ld, horiAdvance = %ld\n"
 	"vertBearingX = %ld, vertBearingY = %ld,  vertAdvance = %ld\n", 
@@ -474,7 +488,7 @@ static int Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mod
 	slot->metrics.horiBearingX>>6, slot->metrics.horiBearingY>>6, 
 	slot->metrics.horiAdvance>>6, slot->metrics.vertBearingX>>6, 
 	slot->metrics.vertBearingY>>6, slot->metrics.vertAdvance>>6 ); 
-	****************/
+	------------------------------------------------------------*/
 	if ( glyph->format != FT_GLYPH_FORMAT_BITMAP ) {
 		error = FT_Glyph_To_Bitmap(&glyph, render_mode, 0 ,1);
 		if(error) {
@@ -482,7 +496,13 @@ static int Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mod
 		}
 	}
 	bitmap_glyph = (FT_BitmapGlyph)glyph;
-	
+	/*
+	 * FT_Glyph_Metrics结构体中保存字形度量，通过face->glyph->metrics结
+	 * 构访问，可得到字形的宽、高、左边界距、上边界距、水平跨距等等。
+	 * 注意：因为不是所有的字体都包含垂直度量，当FT_HAS_VERTICAL为假时，
+	 * vertBearingX，vertBearingY和vertAdvance的值是不可靠的，目前暂不考虑
+	 * 此情况的处理。
+	 * */
 	des->top = bitmap_glyph->top;
 	des->left = slot->metrics.horiBearingX>>6;
 	des->rows = bitmap_glyph->bitmap.rows;
@@ -491,12 +511,14 @@ static int Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mod
 	des->num_grays = bitmap_glyph->bitmap.num_grays;
 	des->advance.x = slot->metrics.horiAdvance>>6;	/* 水平跨距 */
 	des->advance.y = slot->metrics.vertAdvance>>6;	/* 垂直跨距 */
+	/* 分配内存，用于保存字体位图 */
 	size = des->rows * des->width * sizeof(uchar_t);
 	des->buffer = malloc( size );
 	if( !des->buffer ) {
 		FT_Done_Glyph(glyph);
 		return -1;
 	}
+	/* 拷贝至该内存空间内 */
 	memcpy( des->buffer, bitmap_glyph->bitmap.buffer, size ); 
 	FT_Done_Glyph(glyph);
 	return size;
@@ -505,41 +527,47 @@ static int Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mod
 #endif
 
 int 
-Get_FontBMP(LCUI_Font *font_data, wchar_t ch, int pixel_size, LCUI_FontBMP *out_bitmap)
+Get_FontBMP(	LCUI_Font *font_data, wchar_t ch, 
+		int pixel_size, LCUI_FontBMP *out_bitmap)
 /*
  * 功能：获取单个wchar_t型字符的字体位图数据
- * 说明：LCUI_Font结构体中储存着已被打开的字体文件句柄和face对象的句柄，如果字体文件已经被
- * 成功打开一次，此函数不会再次打开字体文件。
+ * 说明：LCUI_Font结构体中储存着已被打开的字体文件句柄和face对象的句柄，如果字体文件
+ * 已经被成功打开一次，此函数不会再次打开字体文件。
  */
 {
 #ifdef USE_FREETYPE
 	size_t size;
 	BOOL have_space = FALSE;
 	
-	FT_Face         p_FT_Face = NULL;   /* face对象的句柄 */ 
-	FT_Error        error;
+	FT_Face		p_FT_Face = NULL;   /* face对象的句柄 */ 
+	FT_Error	error;
 	
 	if( font_data ) {
-	 /* 如果LCUI_Font结构体中的字体信息有效，就打开结构体中的指定的字体文件，并
-	  * 将字体文件和face对象的句柄保存至结构体中。
-	  * 当然，如果LCUI_Font结构体有有效的字体文件和face对象的句柄，就直接返回0。
+	 /* 如果font_data有效，则打开font_data中的指定的字体文件，并将字体文件
+	  * 和face对象的句柄保存至结构体中。
+	  * 当然，如果LCUI_Font结构体有有效的字体文件和face对象的句柄，就不会再重新
+	  * 打开字体文件。
 	  */
 		if( !font_data->ft_face || !font_data->ft_lib ) { 
 			error = Open_Fontfile( font_data, 
 					font_data->font_file.string);
-			if(error) {
+			if( error ) {
 				Get_Default_FontBMP( ch, out_bitmap );
 				return 1;
 			}
 		}
+		/* 引用face对象句柄 */
 		p_FT_Face = font_data->ft_face; 
 	} else {
+		/* 使用内置的字体位图 */
 		Get_Default_FontBMP( ch, out_bitmap );
 		return -1;
 	}
-	
-	FT_Select_Charmap( p_FT_Face, FT_ENCODING_UNICODE ); /* 设定为UNICODE，默认的也是 */
-	FT_Set_Pixel_Sizes( p_FT_Face, 0, pixel_size ); /* 设定字体尺寸 */
+	/* 设定为UNICODE，默认的也是 */
+	FT_Select_Charmap( p_FT_Face, FT_ENCODING_UNICODE ); 
+	/* 设定字体尺寸 */
+	FT_Set_Pixel_Sizes( p_FT_Face, 0, pixel_size );
+	/* 如果是空格 */
 	if( ch == ' ' ) {
 		ch = 'a';
 		have_space = TRUE;
@@ -550,6 +578,7 @@ Get_FontBMP(LCUI_Font *font_data, wchar_t ch, int pixel_size, LCUI_FontBMP *out_
 		return error; 
 	}
 	size = Convert_FTGlyph( out_bitmap, p_FT_Face->glyph, font_data->render_mode );
+	/* 如果是空格则将位图内容清空 */
 	if( have_space ) {
 		memset( out_bitmap->buffer, 0, size );
 	}
