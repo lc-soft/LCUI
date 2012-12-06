@@ -57,8 +57,12 @@ Label_Init(LCUI_Widget *widget)
 	widget->focus = FALSE;
 	label = Widget_Create_PrivData( widget, sizeof(LCUI_Label) );
 	label->auto_size = TRUE;
+	/* 初始化文本图层 */
 	TextLayer_Init( &label->layer ); 
+	/* 启用多行文本显示 */
+	TextLayer_Multiline( &label->layer, TRUE );
 	Widget_AutoSize( widget, FALSE, 0 );
+	/* 启用样式标签的支持 */
 	TextLayer_Using_StyleTags( &label->layer, TRUE );
 }
 
