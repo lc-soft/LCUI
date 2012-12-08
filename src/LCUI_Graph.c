@@ -57,13 +57,13 @@ LCUI_RGB RGB ( uchar_t red, uchar_t green, uchar_t blue )
 	return color;
 }
 
-
 void Graph_Lock(LCUI_Graph *pic, int mode)
 /* 功能：以指定模式使用图像数据
  * 说明：参数mode的值为0时，以“读”模式使用数据，其它值时，以“写模式使用数据” */
 {
 	LCUI_Graph *src;
 	src = Get_Quote_Graph(pic);
+	
 	if(mode == 0) {
 		thread_rwlock_rdlock(&src->lock);
 	} else {
@@ -290,16 +290,16 @@ void Print_Graph_Info(LCUI_Graph *pic)
 /* 功能：打印图像的信息 */
 {
 	printf("address:%p\n",pic);
-	if(pic == NULL) {
+	if( pic ) {
 		return;
 	}
 	
 	printf("width:%d, height:%d, alpha:%u, %s, %s, %s\n", 
 	pic->width, pic->height, pic->alpha, 
-	pic->have_alpha == TRUE ? "have alpha channel":"no alpha channel",
-	pic->not_visible == TRUE ? "not visible":"visible",
-	pic->is_opaque == TRUE ? "is opaque":"not opaque");
-	if(pic->quote == TRUE) {
+	pic->have_alpha ? "have alpha channel":"no alpha channel",
+	pic->not_visible ? "not visible":"visible",
+	pic->is_opaque ? "is opaque":"not opaque");
+	if( pic->quote ) {
 		printf("graph src:");
 		Print_Graph_Info(Get_Quote_Graph(pic));
 	}
@@ -308,9 +308,10 @@ void Print_Graph_Info(LCUI_Graph *pic)
 void Graph_Init(LCUI_Graph *pic)
 /* 初始化图片数据结构体 */
 {
-	if(pic == NULL) {
+	if( !pic ) {
 		return;
 	}
+	pic->r_count = pic->w_count = 0;
 	pic->quote	= FALSE; 
 	pic->have_alpha	= FALSE;
 	pic->is_opaque	= FALSE;
@@ -325,14 +326,15 @@ void Graph_Init(LCUI_Graph *pic)
 	thread_rwlock_init(&pic->lock);	/* 读/写/互斥锁 */
 }
 
-static uchar_t** New_Graph(int width, int height, int have_alpha)
+static uchar_t** 
+New_Graph(int width, int height, int have_alpha)
 /* 功能：为图形数据申请内存空间，并初始化该内存空间为零 */
 {
 	uint_t size;
 	uchar_t** out_buff;
 	
 	size = sizeof(uchar_t)*width*height;
-	if(have_alpha == TRUE) { 
+	if( have_alpha ) { 
 		out_buff = (uchar_t**)malloc(sizeof(uchar_t*)*4);
 	} else {
 		out_buff = (uchar_t**)malloc(sizeof(uchar_t*)*3);
@@ -360,7 +362,7 @@ static uchar_t** New_Graph(int width, int height, int have_alpha)
 		return NULL;
 	}
 	 
-	if(have_alpha == TRUE) {
+	if( have_alpha ) {
 		out_buff[3] = (uchar_t*)calloc(1, size);
 		if(!out_buff[3]) {
 			free(out_buff);
@@ -482,7 +484,7 @@ int Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area)
  * 说明：src是被引用的对象，des是引用者，area是引用的src中的图形所在的区域
  * */
 {
-	if(src == NULL || des == NULL) {
+	if( !src || !des ) {
 		return -1;
 	}
 	//printf("Quote_Graph(), before, area: %d,%d,%d,%d\n",
@@ -587,7 +589,7 @@ LCUI_Graph *Get_Quote_Graph(LCUI_Graph *graph)
  * 回指向被引用的最终图形的指针。
  * */
 {
-	if(graph == NULL) {
+	if( !graph ) {
 		return NULL;
 	}
 	if( !graph->quote ) {
@@ -797,9 +799,9 @@ int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 		return -2;
 	}
 	
-	Graph_Lock(out, 1);
-	Graph_Lock(src, 0);
 	if(Graph_Have_Alpha(src)) {
+		Graph_Lock(out, 1);
+		Graph_Lock(src, 0);
 		for(y = 0;y < height;++y) {
 			h = y % src->height;
 			m = h * src->width;
@@ -814,10 +816,14 @@ int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 				//out->rgba[2][temp] = (src->rgba[2][count] * src->rgba[3][count] + out->rgba[2][temp] * (255 - src->rgba[3][count])) /255;
 			} 
 		}
+		Graph_Unlock(out);
+		Graph_Unlock(src); 
 	} else {
 		if(Graph_Have_Alpha(out)) {
 			Graph_Fill_Alpha(out, 255);
 		}
+		Graph_Lock(out, 1);
+		Graph_Lock(src, 0);
 		for(y = 0;y < height;++y) {
 			h = y%src->height;
 			m = h * src->width;
@@ -830,9 +836,9 @@ int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 				++temp;
 			}
 		}
+		Graph_Unlock(out);
+		Graph_Unlock(src); 
 	} 
-	Graph_Unlock(out);
-	Graph_Unlock(src); 
 	return 0;
 }
 
