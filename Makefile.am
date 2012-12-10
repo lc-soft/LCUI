@@ -67,6 +67,7 @@ test/photoviewer/drawable/icon.png \
 test/photoviewer/drawable/btn_next_up_normal.png  \
 test/photoviewer/drawable/btn_zoom_down_normal.png \
 test/photoviewer/drawable/pic_fail.png \
+test/photoviewer/drawable/pic_ok.png \
 test/photoviewer/drawable/btn_next_up_pressed.png \
 test/photoviewer/drawable/btn_zoom_down_pressed.png \
 test/photoviewer/drawable/pic_loading.png \
