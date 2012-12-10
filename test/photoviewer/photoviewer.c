@@ -6,6 +6,7 @@
 #include LC_DRAW_H
 #include LC_FONT_H
 #include LC_RES_H
+#include LC_INPUT_H
 #include LC_WIDGET_H
 #include LC_WINDOW_H
 #include LC_BUTTON_H
@@ -21,28 +22,28 @@
 
 #define IMG_PATH_WND_ICON	"drawable/icon.png"
 #define IMG_PATH_LOADING	"drawable/publish_loading_%02d.png"
-#define FONTFILE_PATH_MSYH	"../../fonts/msyh.ttf"
-#define WND_TITLE_TEXT		"照片查看器 v0.5"
 #define IMG_PATH_FAILD_LOAD	"drawable/pic_fail.png"
+#define IMG_PATH_DONE_LOAD	"drawable/pic_ok.png"
+#define IMG_PATH_BTN_ZOOM_PIC0 "drawable/btn_zoom_up_normal.png"
+#define IMG_PATH_BTN_ZOOM_PIC1 "drawable/btn_zoom_up_pressed.png"
+#define IMG_PATH_BTN_ZOOM_PIC2 "drawable/btn_zoom_up_disabled.png"
+#define IMG_PATH_BTN_ZOOM_PIC3 "drawable/btn_zoom_down_normal.png"
+#define IMG_PATH_BTN_ZOOM_PIC4 "drawable/btn_zoom_down_pressed.png"
+#define IMG_PATH_BTN_ZOOM_PIC5 "drawable/btn_zoom_down_disabled.png"
+#define IMG_PATH_BTN_SWITCH_PIC0 "drawable/btn_next_up_normal.png"
+#define IMG_PATH_BTN_SWITCH_PIC1 "drawable/btn_next_up_pressed.png"
+#define IMG_PATH_BTN_SWITCH_PIC2 "drawable/btn_next_up_disabled.png"
+#define IMG_PATH_BTN_SWITCH_PIC3 "drawable/btn_prev_down_normal.png"
+#define IMG_PATH_BTN_SWITCH_PIC4 "drawable/btn_prev_down_pressed.png"
+#define IMG_PATH_BTN_SWITCH_PIC5 "drawable/btn_prev_down_disabled.png"
+
+#define PATH_FONTFILE_MSYH	"../../fonts/msyh.ttf"
+#define TEXT_WND_TITLE		"照片查看器 v0.5"
 #define TEXT_FAID_LOAD		"图片载入失败!"
 #define TEXT_LOADING		"正在载入..."
+#define TEXT_DONE_LOAD		"图片载入成功!"
 
-static LCUI_Widget
-*window, *help_text, *tip_pic, *tip_box, *tip_text, *tip_icon,
-*btn_zoom[2], *btn_switch[2], *container[2], *image_box, 
-*image_info_box, *image_info_text;
-
-static LCUI_Graph
-wnd_icon, pic_loading[8], btn_zoom_pic[6], btn_switch_pic[6];
-
-static int
-total_imgfile_num = 0, current_file_num = 0, need_refresh = FALSE;
-
-static thread_t 
-thread_viewer;
-
-static float 
-mini_scale = 1.0, scale = 1.0;
+#define TOTAL_SLEEP_TIME	2000
 
 static char 
 name[256], **filename = NULL;
@@ -61,7 +62,136 @@ usage_text[] = {
 	"本程序目前支持浏览bmp, png, jpeg格式的图片。\n"	
 };
 
+static LCUI_Widget
+*window, *help_text, *tip_pic, *tip_box, *tip_text, *tip_icon,
+*btn_zoom[2], *btn_switch[2], *container[2], *image_box, 
+*image_info_box, *image_info_text;
 
+static LCUI_Graph
+wnd_icon, pic_loading[8], btn_zoom_pic[6], btn_switch_pic[6];
+
+static int
+total_imgfile_num = 0, current_file_num = 0, need_refresh = FALSE;
+
+static thread_t 
+thread_viewer;
+
+static float 
+mini_scale = 1.0, scale = 1.0;
+
+static int 
+sleep_time[2] = {TOTAL_SLEEP_TIME,TOTAL_SLEEP_TIME}, timer_id[3] = {-1,-1,-1};
+
+static uchar_t 
+tipbox_alpha = 200, infobox_alpha = 200, btn_alpha = 255;
+
+/*------------------------ 部件的隐藏处理 -------------------------------*/
+static void 
+hide_tip_box()
+/* 隐藏提示框，但不是瞬间隐藏，带 淡出 效果 */
+{
+	if( timer_id[0] == -1 ) {
+		/* 创建定时器，每隔50毫秒调用一次此函数 */
+		timer_id[0] = set_timer( 50, hide_tip_box, TRUE );
+	} else {
+		/* 已经创建过定时器，如果alpha为200，说明之前已经暂停了定时器 */
+		if( tipbox_alpha == 200 ) {
+			/* 让定时器继续 */
+			usleep(500000);
+			continue_timer( timer_id[0] );
+		}
+		/* 当alpha接近0时，直接隐藏提示框，并暂停定时器 */
+		if( tipbox_alpha <= 15 ) {
+			Hide_Widget( tip_box );
+			tipbox_alpha = 200;
+			pause_timer( timer_id[0] );
+		} else {
+			/* 设置透明度 */
+			Set_Widget_Alpha( tip_box, tipbox_alpha );
+			tipbox_alpha -= 15;
+		}
+	}
+}
+
+static void 
+show_tip_box()
+/* 显示提示框 */
+{
+	tipbox_alpha = 200;
+	Set_Widget_Alpha( tip_box, tipbox_alpha );
+	Show_Widget( tip_box );
+	if( timer_id[0] != -1 ) {
+		pause_timer( timer_id[0] );
+	}
+}
+
+
+static void 
+hide_image_info_box()
+{
+	if( sleep_time[0] >= 50 ) {
+		sleep_time[0] -= 50;
+		return;
+	}
+	if( infobox_alpha == 0 );
+	else if( infobox_alpha <= 15 ) {
+		Hide_Widget( image_info_box );
+		infobox_alpha = 0;
+	} else {
+		Set_Widget_Alpha( image_info_box, infobox_alpha );
+		infobox_alpha -= 15;
+	}
+}
+
+static void 
+show_image_info_box()
+{
+	sleep_time[0] = TOTAL_SLEEP_TIME;
+	infobox_alpha = 200;
+	Set_Widget_Alpha( image_info_box, infobox_alpha );
+	Show_Widget( image_info_box );
+	/* 如果没有设置定时器，那么就设置定时器 */
+	if( timer_id[1] == -1 ) {
+		timer_id[1] = set_timer( 50, hide_image_info_box, TRUE );
+	} 
+}
+
+static void 
+hide_btn_area()
+{
+	if( sleep_time[1] >= 50 ) {
+		sleep_time[1] -= 50;
+		return;
+	}
+	if( btn_alpha == 0 );
+	else if( btn_alpha <= 20 ) {
+		Hide_Widget( container[0] );
+		Hide_Widget( container[1] );
+		btn_alpha = 0;
+	} else {
+		Set_Widget_Alpha( container[0], btn_alpha );
+		Set_Widget_Alpha( container[1], btn_alpha );
+		btn_alpha -= 20;
+	}
+}
+
+static void 
+show_btn_area()
+{
+	sleep_time[1] = TOTAL_SLEEP_TIME;
+	btn_alpha = 255;
+	Set_Widget_Alpha( container[0], btn_alpha );
+	Set_Widget_Alpha( container[1], btn_alpha );
+	Show_Widget( container[0] );
+	Show_Widget( container[1] );
+	if( timer_id[2] == -1 ) {
+		timer_id[2] = set_timer( 50, hide_btn_area, TRUE );
+	} 
+}
+/*--------------------------------------------------------------------*/
+
+
+/*---------------------------- 文件路径处理 ----------------------------*/
 static void 
 get_filename(char *filepath, char *out_name)
 /* 根据文件路径，获取文件名 */
@@ -83,15 +213,16 @@ int get_format(char *format, char *filename)
 	len = strlen(filename);
 	for(i=len-1; i>=0; --i) {
 		if(filename[i] == '.') {
-			for(j=0, ++i; i<len; ++i, ++j) 
-				format[j] = filename[i]; 
+			for(j=0, ++i; i<len; ++i, ++j) {
+				format[j] = filename[i];
+			} 
 			format[j] = 0;
 			return 0;
 		}
 	}
 	strcpy(format, "");
 	return -1;
-} 
+}
 
 static char **
 scan_imgfile( char *dir, int *file_num )
@@ -109,13 +240,17 @@ scan_imgfile( char *dir, int *file_num )
 	} else {
 		n = scandir(dir, &namelist, 0, alphasort);
 	}
-	if (n < 0) return 0; 
+	if (n < 0) {
+		return 0; 
+	}
 	
 	filelist = (char **)malloc(sizeof(char *)*n);
 	for(i=0, *file_num=0; i<n; i++) {
-		if( namelist[i]->d_type !=8 ) {/* 如果不是文件 */ 
+		/* 如果不是文件 */ 
+		if( namelist[i]->d_type !=8 ) {
 			continue;
 		}
+		/* 获取文件格式 */
 		get_format(format, namelist[i]->d_name);
 		if(strlen(format) > 2 && 
 		(strcasecmp(format, "png") == 0
@@ -185,6 +320,7 @@ generate_imgfilelist( char *filepath, char *imgfile )
 	}
 	return 0;
 }
+/*--------------------------------------------------------------------*/
 
 int load_imagefile()
 /* 功能：载入图片文件 */
@@ -194,8 +330,11 @@ int load_imagefile()
 	LCUI_Graph *image;
 	char file[1024];
 	
-	Set_Label_Text( tip_text, TEXT_LOADING );
-	Show_Widget( tip_box );
+	Label_Text( tip_text, TEXT_LOADING );
+	Hide_Widget( tip_icon );
+	Show_Widget( tip_pic );
+	show_tip_box();
+	
 	/* 播放动画 */
 	ActiveBox_Play( tip_pic );
 	
@@ -205,17 +344,23 @@ int load_imagefile()
 		return -1;
 	}
 	get_filename(file, name);
-	
 	image = Get_PictureBox_Graph( image_box ); 
 	i = Set_PictureBox_Image_From_File( image_box, file ); 
 	if(i != 0) {/* 如果图片文件读取失败 */
-		Set_Label_Text( tip_text, TEXT_FAID_LOAD );
+		Label_Text( tip_text, TEXT_FAID_LOAD );
 		Set_PictureBox_Image_From_File( tip_icon, IMG_PATH_FAILD_LOAD );
+		Show_Widget( tip_icon );
 		Hide_Widget( tip_pic );
 		/* 暂停动画播放 */
 		ActiveBox_Pause( tip_pic );
 		size.w = size.h = 0;
 	} else {
+		Label_Text( tip_text, TEXT_DONE_LOAD );
+		Set_PictureBox_Image_From_File( tip_icon, IMG_PATH_DONE_LOAD );
+		Show_Widget( tip_icon );
+		Hide_Widget( tip_pic );
+		ActiveBox_Pause( tip_pic );
+		
 		image = Get_PictureBox_Graph(image_box); 
 		size = Get_Graph_Size(image); 
 		/* 
@@ -223,7 +368,7 @@ int load_imagefile()
 		 * 该函数获取的尺寸可能不准确 
 		 * */ 
 		if( 1 == Size_Cmp(size, _Get_Widget_Size(image_box) )) {
-		/* 如果图片尺寸大于image_box的尺寸，就改变image_box的图像处理模式 */ 
+		/* 如果图片尺寸大于image_box的尺寸，就改变image_box的图像处理模式 */
 			Set_PictureBox_Size_Mode(image_box, SIZE_MODE_BLOCK_ZOOM);
 			mini_scale = Get_PictureBox_Zoom_Scale(image_box);
 		} else {
@@ -233,17 +378,15 @@ int load_imagefile()
 	}
 	
 	scale = Get_PictureBox_Zoom_Scale( image_box ); 
-	Set_Label_Text(
+	Label_Text(
 		image_info_text, 
 		"文件： (%d/%d) %s\n"
 		"尺寸： %d x %d 像素\n"
 		"缩放： %.2f%%",
 		current_file_num+1, total_imgfile_num, name,
-		size.w, size.h, 100*scale); 
-	/* 设置透明度 */ 
-	Set_Widget_Alpha( image_info_box, 200 );
-	Show_Widget( image_info_text );
-	Show_Widget( image_info_box );
+		size.w, size.h, 100*scale);
+		
+	show_image_info_box();
 	return i;
 }
 
@@ -269,11 +412,14 @@ viewer()
 				/* 载入马赛克图形 */
 				Load_Graph_Mosaics( &bg );
 				/* 平铺背景图 */
-				Set_Widget_Background_Image( image_box, &bg, LAYOUT_TILE );
+				Set_Widget_Background_Image( 
+					image_box, &bg, LAYOUT_TILE );
 				Graph_Free( &bg );
 			} else {
-				Set_Widget_Background_Image( image_box, NULL, LAYOUT_NONE );
+				Set_Widget_Background_Image( 
+					image_box, NULL, LAYOUT_NONE );
 			}
+			hide_tip_box();
 		}
 		/* 如果接近最小缩放比例，那就禁用“缩小”按钮，否则，启用 */
 		if(fabs(mini_scale - scale) < 0.01) {
@@ -283,7 +429,6 @@ viewer()
 		}
 		/* 启用放大按钮 */
 		Enable_Widget( btn_zoom[1] );
-		Hide_Widget( tip_box );
 	}
 	LCUI_Thread_Exit(NULL);
 }
@@ -303,17 +448,20 @@ open_imgfile(char *file)
 	}
 }
 
-void move_view_area(LCUI_Widget *widget, LCUI_DragEvent *event)
+static void 
+move_view_area(LCUI_Widget *widget, LCUI_DragEvent *event)
 /* 移动图像浏览区域 */
 { 
 	LCUI_Pos pos; 
 	static LCUI_Pos old_pos, offset_pos;
-	if(event->first_click) {/* 如果是刚被点击 */ 
+	/* 如果是刚被点击 */ 
+	if(event->first_click) {
 		/* 记录被点击时的位置，以后的移动，就以该位置为基础计算出新位置 */
 		old_pos = Get_PictureBox_View_Area_Pos(widget);
 		/* 浏览区域位置与图片框位置的偏移距离 */
 		offset_pos = Pos_Sub(Get_Widget_Global_Pos(widget), old_pos); 
-	} else if(event->end_click);
+	}
+	else if(event->end_click);
 	else {/* 否则，那就是正被拖动 */ 
 		/* 获取浏览区域的新位置 */
 		pos = Pos_Sub(event->new_pos, offset_pos);
@@ -325,14 +473,14 @@ void move_view_area(LCUI_Widget *widget, LCUI_DragEvent *event)
 	}
 }
 
-void image_zoom_in()
+void image_zoom_in( LCUI_Widget *widget, void *arg )
 /* 放大图像 */
 {
 	LCUI_Size size;
 	LCUI_Graph *image; 
 	scale += 0.25; /* 缩放比例自增25% */
 	if(scale >= 2) {
-		Disable_Widget(btn_zoom[1]);/* 禁用“放大”按钮 */
+		Disable_Widget(btn_zoom[1]); /* 禁用“放大”按钮 */
 		scale = 2.0; /* 最大不能超过200% */
 	}
 	/* 为了能达到100%，加了个判断，如果缩放比例接近100%，那就直接等于100% */
@@ -340,23 +488,28 @@ void image_zoom_in()
 		scale = 1; 
 	}
 	/* 按比例缩放浏览区域 */
-	Zoom_PictureBox_View_Area(image_box, scale);
-	scale = Get_PictureBox_Zoom_Scale(image_box);/* 获取缩放比例 */
-	image = Get_PictureBox_Graph(image_box); /* 获取图像指针 */
-	size = Get_Graph_Size(image);
-	Set_Label_Text(
+	Zoom_PictureBox_View_Area( image_box, scale );
+	scale = Get_PictureBox_Zoom_Scale( image_box );/* 获取缩放比例 */
+	image = Get_PictureBox_Graph( image_box ); /* 获取图像指针 */
+	size = Get_Graph_Size( image );
+	Label_Text(
 		image_info_text, 
 		"文件： (%d/%d) %s\n"
 		"尺寸： %d x %d 像素\n"
 		"缩放： %.2f%%",
 		current_file_num+1, total_imgfile_num, name,
-		size.w, size.h, 100*scale);
+		size.w, size.h, 100*scale );
 	/* 启用“缩小”按钮 */
-	Enable_Widget(btn_zoom[0]); 
+	Enable_Widget( btn_zoom[0] );
+	/* 显示图片信息框 */
+	show_image_info_box();
+	if( widget ) {
+		show_btn_area();
+	}
 }
 
 static void 
-image_zoom_out()
+image_zoom_out( LCUI_Widget *widget, void *arg )
 /* 缩小图像 */
 {
 	LCUI_Size size;
@@ -379,26 +532,33 @@ image_zoom_out()
 	scale = Get_PictureBox_Zoom_Scale(image_box);
 	image = Get_PictureBox_Graph(image_box); /* 获取图像指针 */
 	size = Get_Graph_Size(image);
-	Set_Label_Text(
+	Label_Text(
 		image_info_text, 
 		"文件： (%d/%d) %s\n"
 		"尺寸： %d x %d 像素\n"
 		"缩放： %.2f%%",
 		current_file_num+1, total_imgfile_num, name,
-		size.w, size.h, 100*scale);
+		size.w, size.h, 100*scale );
 		 
 	if(fabs(mini_scale - scale) < 0.01) {
-		Disable_Widget(btn_zoom[0]); 
+		Disable_Widget( btn_zoom[0] ); 
 	} else {
-		Enable_Widget(btn_zoom[0]);
+		Enable_Widget( btn_zoom[0] );
 	}
-	Enable_Widget(btn_zoom[1]); 
+	Enable_Widget( btn_zoom[1] ); 
+	show_image_info_box();
+	if( widget ) {
+		show_btn_area();
+	}
 }
 
 static void
 prev_image( LCUI_Widget *widget, void *arg )
 /* 切换至上一张图 */
 { 
+	if( widget ) {
+		show_btn_area();
+	}
 	if(total_imgfile_num <= 0) {
 		return;
 	}
@@ -415,7 +575,13 @@ static void
 next_image( LCUI_Widget *widget, void *arg )
 /* 切换至下一张图 */
 {
-	if(total_imgfile_num <= 0) return;
+	/* 如果部件指针有效，说明是点击按钮部件后调用此函数，那么需要延长等待时间 */
+	if( widget ) {
+		show_btn_area();
+	}
+	if(total_imgfile_num <= 0) {
+		return;
+	}
 		
 	if(current_file_num == total_imgfile_num-1) {
 		current_file_num = 0;
@@ -426,6 +592,75 @@ next_image( LCUI_Widget *widget, void *arg )
 	need_refresh = TRUE; 
 }
 
+
+//如果是用按钮控制浏览区域，就使用下面的四个函数
+void left_move_area()
+{
+	LCUI_Rect rect;
+	rect = Get_PictureBox_View_Area(image_box);
+	rect.x -= rect.width/2.0;
+	if(rect.x < 0) rect.x = 0;
+	Move_PictureBox_View_Area(image_box, Pos(rect.x, rect.y));
+}
+
+void right_move_area()
+{ 
+	LCUI_Rect rect;
+	rect = Get_PictureBox_View_Area(image_box);
+	rect.x += rect.width/2.0; 
+	Move_PictureBox_View_Area(image_box, Pos(rect.x, rect.y));
+}
+
+void up_move_area()
+{
+
+	LCUI_Rect rect;
+	rect = Get_PictureBox_View_Area(image_box);
+	rect.y -= rect.height/2.0;
+	if(rect.y < 0) rect.y = 0;
+	Move_PictureBox_View_Area(image_box, Pos(rect.x, rect.y));
+}
+
+void down_move_area()
+{ 
+	LCUI_Rect rect;
+	rect = Get_PictureBox_View_Area(image_box);
+	rect.y += rect.height/2.0; 
+	Move_PictureBox_View_Area(image_box, Pos(rect.x, rect.y));
+}
+
+static void 
+key_proc( LCUI_Widget *widget, LCUI_Key *key )
+{
+	switch( key->code ) {
+	    case '+':
+	    case '=':
+	    case KEY_AA:
+		image_zoom_in( NULL, NULL );
+		break;
+	    case '-':
+	    case '_':
+	    case KEY_BB:
+		image_zoom_out( NULL, NULL );
+		break;
+	    case 'n':
+	    case 'N':
+		next_image( NULL, NULL );
+		break;
+	    case 'b':
+	    case 'B':
+		prev_image( NULL, NULL );
+		break;
+	    case 'i':
+	    case 'I':
+		show_image_info_box();
+		break;
+	    case KEY_LEFT: left_move_area();break;
+	    case KEY_RIGHT: right_move_area(); break;
+	    case KEY_UP: up_move_area(); break;
+	    case KEY_DOWN: down_move_area(); break;   
+	}
+}
 static void
 enter_viewer_mode( void )
 {
@@ -434,6 +669,8 @@ enter_viewer_mode( void )
 	Show_Widget( container[1] );
 	Show_Widget(tip_pic);
 	Show_Widget(tip_text); 
+	Show_Widget( image_info_text );
+	show_btn_area();
 	/* 关联部件的拖动事件 */
 	Widget_Drag_Event_Connect( image_box, move_view_area );
 	/* 关联按钮的点击事件 */
@@ -441,6 +678,8 @@ enter_viewer_mode( void )
 	Widget_Clicked_Event_Connect( btn_switch[1], prev_image, NULL );
 	Widget_Clicked_Event_Connect( btn_zoom[0], image_zoom_out, NULL );
 	Widget_Clicked_Event_Connect( btn_zoom[1], image_zoom_in, NULL );
+	Widget_Clicked_Event_Connect( image_box, show_btn_area, NULL );
+	Widget_Keyboard_Event_Connect( window, key_proc );
 	
 	LCUI_Thread_Create( &thread_viewer, NULL, viewer, NULL );
 }
@@ -485,6 +724,7 @@ widgets_configure( void )
 	Widget_Container_Add( container[1], btn_switch[0] );
 	Widget_Container_Add( container[1], btn_switch[1] );
 	Widget_Container_Add( tip_box, tip_text );
+	Widget_Container_Add( tip_box, tip_icon );
 	Widget_Container_Add( tip_box, tip_pic );
 	Widget_Container_Add( image_info_box, image_info_text );
 	Window_Client_Area_Add( window, container[0] ); 
@@ -501,7 +741,7 @@ widgets_configure( void )
 		wnd_size = Size(640, 480);
 	}
 	Resize_Widget( window, wnd_size );
-	Set_Window_Title_Text( window, WND_TITLE_TEXT );
+	Set_Window_Title_Text( window, TEXT_WND_TITLE );
 	Set_Window_Title_Icon( window, &wnd_icon );
 	
 	for(i=0; i<8; ++i) {
@@ -548,7 +788,7 @@ widgets_configure( void )
 	
 	TextStyle_Init( &tip_style );
 	TextStyle_FontColor( &tip_style, RGB(230, 230, 230) );
-	Set_Label_TextStyle( tip_text, tip_style );
+	Label_TextStyle( tip_text, tip_style );
 	
 	Set_Widget_Alpha( tip_box, 200 );
 	/* 设定部件的布局 */
@@ -561,12 +801,12 @@ widgets_configure( void )
 	Set_Widget_Align( container[0], ALIGN_MIDDLE_RIGHT, Pos(-2, 0) );
 	Set_Widget_Align( container[1], ALIGN_BOTTOM_LEFT, Pos(2, -2) );
 	
-	Set_Widget_Align( tip_box, ALIGN_MIDDLE_CENTER, Pos(0, 0) );
+	Set_Widget_Align( tip_box, ALIGN_BOTTOM_RIGHT, Pos(-1, -1) );
 	Set_Widget_Align( tip_text, ALIGN_MIDDLE_LEFT, Pos(35, 0) );
 	Set_Widget_Align( tip_pic, ALIGN_MIDDLE_LEFT, Pos(2, 0) );
 	Set_Widget_Align( tip_icon, ALIGN_MIDDLE_LEFT, Pos(2, 0) );
 	
-	Set_Widget_Align(image_info_text, ALIGN_MIDDLE_CENTER, Pos(0, 0));
+	Set_Widget_Align(image_info_text, ALIGN_MIDDLE_LEFT, Pos(5, 0));
 	Set_Widget_Align(image_info_box, ALIGN_TOP_LEFT, Pos(3, 3));
 	
 	Set_Widget_Dock( image_box, DOCK_TYPE_FILL );
@@ -589,19 +829,20 @@ load_graphic_resource( void )
 		snprintf( path, sizeof(path), IMG_PATH_LOADING, i+1 );
 		Load_Image( path, &pic_loading[i] );
 	}
+	
 	/* 载入按钮在各个状态下显示的图形 */ 
-	Load_Image("drawable/btn_zoom_up_normal.png", &btn_zoom_pic[0]); 
-	Load_Image("drawable/btn_zoom_up_pressed.png", &btn_zoom_pic[1]); 
-	Load_Image("drawable/btn_zoom_up_disabled.png", &btn_zoom_pic[2]); 
-	Load_Image("drawable/btn_zoom_down_normal.png", &btn_zoom_pic[3]); 
-	Load_Image("drawable/btn_zoom_down_pressed.png", &btn_zoom_pic[4]); 
-	Load_Image("drawable/btn_zoom_down_disabled.png", &btn_zoom_pic[5]);
-	Load_Image("drawable/btn_next_up_normal.png", &btn_switch_pic[0]); 
-	Load_Image("drawable/btn_next_up_pressed.png", &btn_switch_pic[1]); 
-	Load_Image("drawable/btn_next_up_disabled.png", &btn_switch_pic[2]);  
-	Load_Image("drawable/btn_prev_down_normal.png", &btn_switch_pic[3]); 
-	Load_Image("drawable/btn_prev_down_pressed.png", &btn_switch_pic[4]); 
-	Load_Image("drawable/btn_prev_down_disabled.png", &btn_switch_pic[5]);
+	Load_Image( IMG_PATH_BTN_ZOOM_PIC0, &btn_zoom_pic[0] );
+	Load_Image( IMG_PATH_BTN_ZOOM_PIC1, &btn_zoom_pic[1] );
+	Load_Image( IMG_PATH_BTN_ZOOM_PIC2, &btn_zoom_pic[2] );
+	Load_Image( IMG_PATH_BTN_ZOOM_PIC3, &btn_zoom_pic[3] );
+	Load_Image( IMG_PATH_BTN_ZOOM_PIC4, &btn_zoom_pic[4] );
+	Load_Image( IMG_PATH_BTN_ZOOM_PIC5, &btn_zoom_pic[5] );
+	Load_Image( IMG_PATH_BTN_SWITCH_PIC0, &btn_switch_pic[0] );
+	Load_Image( IMG_PATH_BTN_SWITCH_PIC1, &btn_switch_pic[1] );
+	Load_Image( IMG_PATH_BTN_SWITCH_PIC2, &btn_switch_pic[2] );
+	Load_Image( IMG_PATH_BTN_SWITCH_PIC3, &btn_switch_pic[3] );
+	Load_Image( IMG_PATH_BTN_SWITCH_PIC4, &btn_switch_pic[4] );
+	Load_Image( IMG_PATH_BTN_SWITCH_PIC5, &btn_switch_pic[5] );
 }
 
 static void
@@ -632,7 +873,7 @@ show_usage( char *app_path )
 	
 	get_filename( app_path, myname );
 	help_text = Create_Widget( "label" );
-	Set_Label_Text(help_text, usage_text, myname );
+	Label_Text(help_text, usage_text, myname );
 	Set_Widget_Align( help_text, ALIGN_MIDDLE_CENTER, Pos(10, 10) );
 	Window_Client_Area_Add( window, help_text );
 	Show_Widget( help_text );
@@ -643,7 +884,7 @@ int main( int argc, char *argv[] )
 	int ret;
 	char imgfilepath[1024];
 	/* 添加环境变量，设置字体文件位置 */
-	setenv( "LCUI_FONTFILE", FONTFILE_PATH_MSYH, FALSE );
+	setenv( "LCUI_FONTFILE", PATH_FONTFILE_MSYH, FALSE );
 	/* 初始化LCUI */
 	LCUI_Init( argc, argv );
 	/* 创建GUI */
