@@ -11,6 +11,8 @@
 #include <pthread.h>
 #include <time.h>
 
+#define PATH_FONTFILE "../../fonts/msyh.ttf"
+
 void move_pic_btn(LCUI_Widget *widget, LCUI_DragEvent *event)
 /* 功能：移动滑块 */
 {
@@ -131,11 +133,11 @@ void *update_time(void *arg)
 		time ( &rawtime );
 		timeinfo = localtime ( &rawtime ); /* 获取系统当前时间 */ 
 		/* 更改文本内容 */
-		Set_Label_Text(
+		Label_Text(
 			date_label, "<color=40,165,45>%4d年%02d月%02d日</color>",
 			timeinfo->tm_year+1900, timeinfo->tm_mon+1, timeinfo->tm_mday
 		);
-		Set_Label_Text(
+		Label_Text(
 			wday_label, 
 			"<color=40,165,45>%s</color>", 
 			day[(int) (timeinfo->tm_wday)]
@@ -171,17 +173,23 @@ void *update_time(void *arg)
 
 int main(int argc, char*argv[]) 
 {
-	pthread_t t;
+	thread_t t;
 	LCUI_Widget *window;
-	LCUI_Init(argc, argv);
 	
-	window = Create_Widget("window"); 
+	setenv( "LCUI_FONTFILE", PATH_FONTFILE, FALSE );
+	
+	LCUI_Init(argc, argv);
+	/* 创建窗口 */
+	window = Create_Widget("window");
+	/* 创建线程，用于更新时间显示 */
 	LCUI_Thread_Create(&t, NULL, update_time, (void*)window);
-	Set_Window_Title_Text(window, "LC 锁屏程序");
+	/* 设置窗口背景色为白色 */
 	Set_Widget_Backcolor(window, RGB(255,255,255));
+	/* 调整窗口尺寸 */
 	Resize_Widget(window, Size(320, 240)); 
-	Set_Widget_Border_Style(window, BORDER_STYLE_LINE_BORDER);
-	Show_Widget(window); 
-	return LCUI_Main(); 
+	/* 设置窗口为线条边框风格 */
+	Set_Widget_StyleID( window, WINDOW_STYLE_LINE );
+	Show_Widget( window );
+	return LCUI_Main();
 }
 
