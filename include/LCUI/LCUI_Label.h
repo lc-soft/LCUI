@@ -55,16 +55,20 @@ LCUI_BEGIN_HEADER
 
 /*---------------------------- Public --------------------------------*/
 void 
-Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...);
+Label_Text(LCUI_Widget *widget, const char *fmt, ...);
 /* 功能：设定与标签关联的文本内容 */ 
 
 int 
-Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
+Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
 /* 为Label部件内显示的文本设定文本样式 */ 
 
 LCUI_TextLayer *
 Label_Get_TextLayer( LCUI_Widget *widget );
 /* 获取label部件内的文本图层的指针 */ 
+
+void
+Label_Refresh( LCUI_Widget *widget );
+/* 刷新label部件显示的文本 */
 
 void
 Label_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode );

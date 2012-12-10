@@ -124,7 +124,7 @@ Draw_Label(LCUI_Widget *widget)
 
 /*---------------------------- Public --------------------------------*/
 void 
-Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...)
+Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 /* 功能：设定与标签关联的文本内容 */
 {
 	char text[LABEL_TEXT_MAX_SIZE];
@@ -143,7 +143,7 @@ Set_Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 }
 
 int 
-Set_Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
+Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 /* 为Label部件内显示的文本设定文本样式 */
 {
 	LCUI_Label *label;
@@ -162,6 +162,15 @@ Label_Get_TextLayer( LCUI_Widget *widget )
 	
 	label = Get_Widget_PrivData( widget );
 	return &label->layer;
+}
+
+void
+Label_Refresh( LCUI_Widget *widget )
+/* 刷新label部件显示的文本 */
+{
+	LCUI_TextLayer *layer;
+	layer = Label_Get_TextLayer( widget );
+	TextLayer_Refresh( layer );
 }
 
 void
