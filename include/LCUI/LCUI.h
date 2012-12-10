@@ -393,7 +393,7 @@ struct _LCUI_Graph
 {
 	int	type;		/* 图片类型 */
 	int	bit_depth;	/* 位深 */
-	
+	int r_count, w_count;	
 	thread_rwlock	lock;	/* 锁，用于数据保护 */
 	
 	BOOL quote;		/* 指示是否引用其它图层中的图形 */
@@ -541,6 +541,7 @@ struct _LCUI_Widget
 	
 	BOOL enabled;	/* 是否启用 */
 	BOOL visible;	/* 是否可见 */
+	BOOL inherit_alpha; /* 是否继承父部件的透明度 */
 	
 	BOOL		auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
 	AUTOSIZE_MODE	auto_size_mode;	/* 自动尺寸调整模式 */
@@ -728,6 +729,14 @@ int set_timer( long int n_ms, void (*callback_func)(void), BOOL reuse );
  * */
 int free_timer( int timer_id );
 
+/*
+ * 功能：暂停定时器的使用 
+ * 说明：一般用于往复定时的定时器
+ * */
+int pause_timer( int timer_id );
+
+int continue_timer( int timer_id );
+/* 继续使用定时器 */
 
 /* 重设定时器的时间 */
 int reset_timer( int timer_id, long int n_ms );

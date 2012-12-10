@@ -164,6 +164,7 @@ int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 /* 获取屏幕中指定区域内实际要显示的图形 */
 {
 	static int i, total; 
+	static uchar_t tmp_alpha, alpha;
 	static LCUI_Pos pos, widget_pos;
 	static LCUI_Widget *widget; 
 	static LCUI_Queue widget_buff;
@@ -237,8 +238,19 @@ skip_loop:
 			Quote_Graph( &buff, &widget->graph, valid_area ); 
 			/* 获取相对坐标 */
 			pos.x = pos.x - rect.x + valid_area.x;
-			pos.y = pos.y - rect.y + valid_area.y; 
-			Graph_Mix( graph, &buff, pos );
+			pos.y = pos.y - rect.y + valid_area.y;
+			/* 如果该部件没有继承父部件的透明度 */
+			if( !widget->inherit_alpha ) {
+				Graph_Mix( graph, &buff, pos );
+			} else {
+				/* 否则，计算该部件应有的透明度 */
+				alpha = _Get_Widget_RealAlpha( widget );
+				tmp_alpha = widget->graph.alpha;
+				widget->graph.alpha = alpha;
+				Graph_Mix( graph, &buff, pos );
+				widget->graph.alpha = tmp_alpha;
+				
+			}
 		}
 	} else {/* 否则，直接贴背景图 */ 
 		Graph_Cut ( &LCUI_Sys.screen.buff, rect, graph );
@@ -267,15 +279,17 @@ static void Handle_Screen_Update()
 	Graph_Init(&graph);
 	Graph_Init(&fill_area);
 	/* 锁住队列，其它线程不能访问 */
+	//_DEBUG_MSG("enter\n");
 	Queue_Lock(&LCUI_Sys.update_area); 
 	while(LCUI_Active()) {
-		DEBUG_MSG("total area: %d\n", Queue_Get_Total( &LCUI_Sys.update_area ));
+		//_DEBUG_MSG("total area: %d\n", 
+		//Queue_Get_Total( &LCUI_Sys.update_area ));
 		/* 如果从队列中获取数据成功 */
 		if ( RectQueue_Get(&rect, 0, &LCUI_Sys.update_area) ) { 
 			/* 获取内存中对应区域的图形数据 */  
 			Get_Screen_Real_Graph (rect, &graph); 
-			DEBUG_MSG("get screen area: %d,%d,%d,%d\n", 
-			rect.x, rect.y, rect.width, rect.height);
+			//_DEBUG_MSG("get screen area: %d,%d,%d,%d\n", 
+			//rect.x, rect.y, rect.width, rect.height);
 			/* 写入至帧缓冲，让屏幕显示图形 */
 			Graph_Display (&graph, Pos(rect.x, rect.y)); 
 			/* 移除队列中的成员 */ 
@@ -286,6 +300,7 @@ static void Handle_Screen_Update()
 	}
 	/* 解锁队列 */
 	Queue_UnLock(&LCUI_Sys.update_area); 
+	//_DEBUG_MSG("quit\n");
 	Graph_Free(&graph);
 }
 
@@ -316,15 +331,17 @@ static void *Handle_Area_Update ()
 	pthread_t t;
 	LCUI_Thread_Create(&t, NULL, autoquit, NULL);
 #endif
+	//_DEBUG_MSG("enter\n");
 	while(LCUI_Active()) {
 		Handle_All_WidgetUpdate();/* 处理所有部件更新 */ 
-		usleep(1000);/* 停顿一段时间，让程序主循环处理任务 */ 
-		Handle_Refresh_Area(); /* 处理需要刷新的区域 */ 
+		usleep(5000);/* 停顿一段时间，让程序主循环处理任务 */
+		Handle_Refresh_Area(); /* 处理需要刷新的区域 */
 		Handle_Screen_Update();/* 处理屏幕更新 */ 
 #ifdef need_autoquit
 		auto_flag = 1;
 #endif
 	}
+	//_DEBUG_MSG("exit\n");
 	thread_exit(NULL);
 }
 

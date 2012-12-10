@@ -76,6 +76,9 @@ LCUI_BEGIN_HEADER
 LCUI_Size Get_Widget_Size(LCUI_Widget *widget);
 /* 功能：获取部件的尺寸 */ 
 
+uchar_t _Get_Widget_RealAlpha( LCUI_Widget *widget );
+/* 获取部件实际的全局透明度 */
+
 LCUI_Size _Get_Widget_Size(LCUI_Widget *widget);
 /* 功能：通过计算获取部件的尺寸 */
 
@@ -114,12 +117,6 @@ void *Get_Widget_PrivData(LCUI_Widget *widget);
 
 LCUI_Widget *Get_Widget_Parent(LCUI_Widget *widget);
 /* 功能：获取部件的父部件 */ 
-
-void Get_Widget_Real_Graph(LCUI_Widget *widget, LCUI_Rect rect, LCUI_Graph *graph);
-/*
- * 功能：获取指定区域中部件的实际图形
- * 说明：获取图形前，需要指定背景图，之后才能正常合成；获取的图形是指定区域中显示的实际图形
- **/ 
 
 void print_widget_info(LCUI_Widget *widget);
 /* 
