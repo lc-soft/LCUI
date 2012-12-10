@@ -311,7 +311,7 @@ void Graph_Init(LCUI_Graph *pic)
 	if( !pic ) {
 		return;
 	}
-	pic->r_count = pic->w_count = 0;
+	
 	pic->quote	= FALSE; 
 	pic->have_alpha	= FALSE;
 	pic->is_opaque	= FALSE;
