@@ -258,6 +258,8 @@ _move_widget( LCUI_Widget *widget, LCUI_Pos new_pos )
 		tmp_pos = Pos_Add(new_pos, widget->offset);
 		Move_Widget( widget, tmp_pos );
 	} else {
+		_DEBUG_MSG( "widget %p, pos: %d,%d\n", 
+		widget, new_pos.x, new_pos.y );
 		Move_Widget( widget, new_pos );
 	}
 }
@@ -266,8 +268,7 @@ static void
 Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 /* 更新使用static定位类型的子部件 */
 {
-	//DEBUG_MSG("enter\n");
-	//print_widget_info( widget );
+	//_DEBUG_MSG("enter\n");
 	int i, x, y, total, j, n;
 	LCUI_Queue *queue;
 	LCUI_Size container_size;
@@ -399,7 +400,9 @@ LCUI_Pos _Get_Widget_Pos(LCUI_Widget *widget)
 	switch(widget->pos_type) {
 	    case POS_TYPE_STATIC:
 	    case POS_TYPE_RELATIVE: 
-		return widget->pos; 
+		pos.x = _Get_Widget_X( widget );
+		pos.y = _Get_Widget_Y( widget );
+		break;
 		
 	    default: 
 		if(widget->align == ALIGN_NONE) { 
@@ -410,7 +413,7 @@ LCUI_Pos _Get_Widget_Pos(LCUI_Widget *widget)
 		size = _Get_Widget_Container_Size( widget ); 
 		pos = Align_Get_Pos(size, Get_Widget_Size(widget), widget->align);
 		/* 加上偏移距离 */
-		pos = Pos_Add(pos, widget->offset);  
+		pos = Pos_Add(pos, widget->offset);
 		break;
 	}
 	return pos;
@@ -1488,9 +1491,10 @@ void Exec_Move_Widget(LCUI_Widget *widget, LCUI_Pos pos)
 	LCUI_Pos t;
 	LCUI_Rect old_rect;
 	LCUI_Pos max_pos, min_pos;
-	
+	//_DEBUG_MSG("pos: %d,%d\n", pos.x, pos.y);
 	max_pos = Get_Widget_MaxPos( widget );
 	min_pos = Get_Widget_MinPos( widget );
+	
 	/* 根据限制的移动范围，调整位置 */
 	if(pos.x > max_pos.x) {
 		pos.x = max_pos.x;
@@ -1512,6 +1516,7 @@ void Exec_Move_Widget(LCUI_Widget *widget, LCUI_Pos pos)
 	t = widget->pos; /* 记录老位置 */
 	widget->pos = pos;/* 记录新位置 */
 	//printf("exec_move_widget, new:%d,%d, old: %d, %d\n", pos.x, pos.y, t.x, t.y);
+	//printf("px pos: %d,%d\n", widget->x.px, widget->y.px);
 	if( widget->visible ) {/* 如果该部件可见 */
 		old_rect = Rect(t.x, t.y, widget->size.w, widget->size.h);
 		Add_Widget_Refresh_Area(widget->parent, old_rect); /* 刷新老区域 */
