@@ -616,11 +616,15 @@ TextLayer_Update_RowSize (LCUI_TextLayer *layer, int row )
 		} 
 	}
 	free( style );
-	
 	for( i=0; i<total; ++i ) {
-		char_data = Queue_Get( &row_data->string, i );
-		if( !char_data ) {
-			continue;
+		/* 如果屏蔽字符有效，则使用该字符的数据 */
+		if( layer->password_char.char_code > 0 ) {
+			char_data = &layer->password_char;
+		} else {
+			char_data = Queue_Get( &row_data->string, i );
+			if( !char_data ) {
+				continue;
+			}
 		}
 		size.w += char_data->bitmap.advance.x;
 		if( char_data->data ) {
