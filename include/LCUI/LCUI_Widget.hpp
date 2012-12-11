@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Widget.hpp -- C++ class of GUI widget 
+ * LCUI_Widget.hpp -- C++ class for GUI widget 
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -46,172 +46,231 @@
 
 #define WIDGET_IS_NULL -5
 
-#include LC_GRAPH_H
-
 class LCUIWidget
 {
-	public: 
-	LCUIWidget(const char* widget_type);
+public: 
+	LCUIWidget( const char* widget_type );
 	~LCUIWidget();
-	int isError();
-	LCUI_Widget *getWidget();
-	int resize(LCUI_Size new_size);
-	int move(LCUI_Pos new_pos);
-	int show();
-	int hide();
-	int refresh();
-	int draw();
-	int enable();
-	int disable();
-	int setAlpha(unsigned char alpha);
-	int setAlign(ALIGN_TYPE align, LCUI_Pos offset_pos);
-	int setBorder(LCUI_RGB color, LCUI_Border border);
-	int setBackgroundImage(LCUI_Graph *img, int flag);
-	//int connectDragEvent(void (*func)(LCUIWidget &obj, LCUI_DragEvent *event));
-	//int connectClickedEvent(void (*func)(LCUIWidget &obj, LCUI_DragEvent *event));
-	/* window widget class */
-	class _Window
-	{
-		public: 
-		_Window( LCUIWidget *object );
-		int setTitle( const char *text );
-		int setIcon( LCUIGraph &icon );
-		int setIcon( LCUI_Graph *icon );
-		int addToClientArea( LCUIWidget &object );
-		
-		private:
-		LCUIWidget *parent; 
-	}; 
-	/* window widget class --end-- */
 	
-	/* label widget class */
-	class _Label
-	{
-		public: 
-		_Label(LCUIWidget *object);
-		int setText(const char *fmt, ...);
-		int setFont(int font_pixel_size, char *fontfile);
-		
-		private:
-		LCUIWidget *parent; 
-	};
-	/* label widget class --end-- */
-	_Label Label;
-	_Window Window; 
+	LCUI_Widget *getWidget( void );
 	
-	private:
-	int error;
-	LCUI_Widget **widget;
+	int resize( LCUI_Size new_size );
+	int move( LCUI_Pos new_pos );
+	int show( void );
+	int hide( void );
+	int refresh( void );
+	int draw( void );
+	int enable( void );
+	int disable( void );
 	
+	int cancelFocus( void );
+	int resetFocus( void );
+
+	int setFocus( void );
+	int setAlpha( unsigned char alpha );
+	int setAlign( ALIGN_TYPE align, LCUI_Pos offset_pos );
+	int setDock( DOCK_TYPE dock );
+	int setBorder( LCUI_RGB color, LCUI_Border border );
+	int setBackgroundImage( LCUI_Graph *img, int flag );
+	int setStyle( char *style );
+	int setStyleID( int style_id );
+
+	int connectDragEvent( void (*func)(LCUI_Widget*, LCUI_DragEvent *) );
+	int connectClickedEvent( void (*func)(LCUI_Widget*, void *), void *arg );
+	int connectKeyboardEvent( void (*func)(LCUI_Widget*, LCUI_Key *) );
+	int connectFocusInEvent( void (*func)(LCUI_Widget*, void*), void *arg );
+	int connectFocusOutEvent( void (*func)(LCUI_Widget*, void*), void *arg );
+
+	int addChildWidget( LCUIWidget &child_widget );
+
+private:
+	LCUI_Widget *widget;
 };
 
-
-#include LC_WINDOW_H
-#include LC_LABEL_H
-
-LCUIWidget::LCUIWidget(const char* widget_type):Label(this),Window(this)
+LCUIWidget::LCUIWidget( const char* widget_type )
 {
-	error = 0;
-	widget = new (LCUI_Widget *);
-	*widget = Create_Widget(widget_type);
-	if(*widget == NULL){
-		error = 1;
+	widget = Create_Widget( widget_type );
+}
+
+LCUIWidget::~LCUIWidget( void )
+{
+	//
+}
+
+
+LCUI_Widget* LCUIWidget::getWidget( void )
+{
+	return widget;
+}
+
+int LCUIWidget::resize( LCUI_Size new_size )
+{
+	if( !widget ) {
+		return WIDGET_IS_NULL;
 	}
-}
-
-LCUIWidget::~LCUIWidget()
-{
-	delete this->widget;
-}
-
-int LCUIWidget::isError()
-{
-	return error;
-}
-
-LCUI_Widget *LCUIWidget::getWidget()
-{
-	return *widget;
-}
-
-int LCUIWidget::resize(LCUI_Size new_size)
-{
-	if( isError() ) return WIDGET_IS_NULL;
-	Resize_Widget( getWidget() , new_size );
+	Resize_Widget( widget , new_size );
 	return 0;
 }
 
-int LCUIWidget::move(LCUI_Pos new_pos)
+int LCUIWidget::move( LCUI_Pos new_pos )
 {
-	if( isError() ) return WIDGET_IS_NULL;
-	Move_Widget( getWidget() , new_pos );
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Move_Widget( widget , new_pos );
 	return 0;
 }
 
-int LCUIWidget::show()
+int LCUIWidget::show( void )
 {
-	if( isError() ) return WIDGET_IS_NULL;
-	Show_Widget( getWidget() );
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Show_Widget( widget );
 	return 0;
 }
 
-int LCUIWidget::hide()
+int LCUIWidget::hide( void )
 {
-	if( isError() ) return WIDGET_IS_NULL;
-	Hide_Widget( getWidget() );
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Hide_Widget( widget );
 	return 0;
 }
 
-int LCUIWidget::refresh()
+int LCUIWidget::refresh( void )
 {
-	if( isError() ) return WIDGET_IS_NULL;
-	Refresh_Widget( getWidget() );
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Refresh_Widget( widget );
 	return 0;
 }
 
-int LCUIWidget::draw()
+int LCUIWidget::draw( void )
 {
-	if( isError() ) return WIDGET_IS_NULL;
-	Draw_Widget( getWidget() );
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Draw_Widget( widget );
 	return 0;
 }
 
-int LCUIWidget::enable()
+int LCUIWidget::enable( void )
 {
-	if( isError() ) return WIDGET_IS_NULL;
-	Enable_Widget( getWidget() );
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Enable_Widget( widget );
 	return 0;
 }
 
-int LCUIWidget::disable()
+int LCUIWidget::disable( void )
 {
-	if( isError() ) return WIDGET_IS_NULL;
-	Disable_Widget( getWidget() );
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Disable_Widget( widget );
 	return 0;
 }
 
-int LCUIWidget::setAlpha(unsigned char alpha)
+int LCUIWidget::setAlpha( unsigned char alpha )
 {
-	if( isError() ) return WIDGET_IS_NULL;
-	Set_Widget_Alpha( getWidget() , alpha);
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Set_Widget_Alpha( widget , alpha );
 	return 0;
 }
-int LCUIWidget::setAlign(ALIGN_TYPE align, LCUI_Pos offset_pos)
+int LCUIWidget::setAlign( ALIGN_TYPE align, LCUI_Pos offset_pos )
 {
-	if( isError() ) return WIDGET_IS_NULL; 
-	Set_Widget_Align( getWidget() , align, offset_pos);
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Set_Widget_Align( widget , align, offset_pos );
 	return 0;
 }
-int LCUIWidget::setBorder(LCUI_RGB color, LCUI_Border border)
+int LCUIWidget::setBorder( LCUI_RGB color, LCUI_Border border )
 {
-	if( isError() ) return WIDGET_IS_NULL;
-	Set_Widget_Border( getWidget() , color, border);
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Set_Widget_Border( widget , color, border );
 	return 0;
 }
-int LCUIWidget::setBackgroundImage(LCUI_Graph *img, int flag)
+int LCUIWidget::setBackgroundImage( LCUI_Graph *img, int flag )
 {
-	if( isError() ) return WIDGET_IS_NULL;
-	return Set_Widget_Background_Image( getWidget() , img, flag); 
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	return Set_Widget_Background_Image( widget , img, flag ); 
+}
+
+int LCUIWidget::setFocus( void ) 
+{
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	return Set_Focus( widget );
+}
+
+int LCUIWidget::setDock( DOCK_TYPE dock )
+{
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Set_Widget_Dock( widget, dock );
+	return 0;
+}
+
+int LCUIWidget::connectDragEvent( void (*func)(LCUI_Widget*, LCUI_DragEvent *) )
+{
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	return Widget_Drag_Event_Connect( widget, func );
+}
+
+int LCUIWidget::connectClickedEvent( void (*func)(LCUI_Widget*, void *), void *arg )
+{
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	return Widget_Clicked_Event_Connect( widget, func, arg );
+}
+
+int LCUIWidget::connectKeyboardEvent( void (*func)(LCUI_Widget*, LCUI_Key *) )
+{
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	return Widget_Keyboard_Event_Connect( widget, func );
+}
+
+int LCUIWidget::connectFocusInEvent( void (*func)(LCUI_Widget*, void*), void *arg )
+{
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	return Widget_FocusIn_Event_Connect( widget, func, arg );
+}
+
+int LCUIWidget::connectFocusOutEvent( void (*func)(LCUI_Widget*, void*), void *arg )
+{
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	return Widget_FocusOut_Event_Connect( widget, func, arg );
+}
+
+int LCUIWidget::addChildWidget( LCUIWidget &child_widget )
+{
+	if( !widget ) {
+		return WIDGET_IS_NULL;
+	}
+	Widget_Container_Add( widget, child_widget.getWidget() );
+	return 0;
 }
 
 #endif
