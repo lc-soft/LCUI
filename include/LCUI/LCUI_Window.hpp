@@ -41,45 +41,41 @@
 #ifndef __LCUI_WINDOW_HPP_
 #define __LCUI_WINDOW_HPP_ 
 
-LCUIWidget::_Window::_Window( LCUIWidget *object )
+/* LCUIWindowÀà¼Ì³Ð×ÔLCUIWidgetÀà */
+class LCUIWindow:public LCUIWidget
 {
-	parent = object;
+public:
+	LCUIWindow():LCUIWidget("window"){};
+	void setTitleIcon( LCUI_Graph* );
+	void setTitleIcon( LCUIGraph & );
+	void setTitleText( const char* );
+	void addToTitleBar( LCUIWidget& );
+	void addToClientArea( LCUIWidget& );
+};
+
+void LCUIWindow::setTitleIcon( LCUI_Graph *icon )
+{
+	Set_Window_Title_Icon( getWidget(), icon );
 }
 
-int LCUIWidget::_Window::setTitle( const char *text )
+void LCUIWindow::setTitleIcon( LCUIGraph &icon )
 {
-	if( parent->isError() ) {
-		return WIDGET_IS_NULL;
-	} 
-	Set_Window_Title_Text(parent->getWidget(), text);
-	return 0;
+	Set_Window_Title_Icon( getWidget(), icon.getGraph() );
 }
 
-int LCUIWidget::_Window::setIcon( LCUIGraph &icon )
+void LCUIWindow::setTitleText( const char *text )
 {
-	if( parent->isError() ) {
-		return WIDGET_IS_NULL;
-	} 
-	Set_Window_Title_Icon(parent->getWidget(), &icon.graph);
-	return 0;
+	Set_Window_Title_Text( getWidget(), text );
 }
 
-int LCUIWidget::_Window::setIcon( LCUI_Graph *icon )
+void LCUIWindow::addToTitleBar( LCUIWidget &obj )
 {
-	if( parent->isError() ) {
-		return WIDGET_IS_NULL;
-	} 
-	Set_Window_Title_Icon(parent->getWidget(), icon);
-	return 0;
+	Window_TitleBar_Add( getWidget(), obj.getWidget() );
 }
 
-int LCUIWidget::_Window::addToClientArea( LCUIWidget &object )
+void LCUIWindow::addToClientArea( LCUIWidget &obj )
 {
-	if( parent->isError() ) {
-		return WIDGET_IS_NULL;
-	}
-	Window_Client_Area_Add(parent->getWidget(), object.getWidget());
-	return 0;
+	Window_Client_Area_Add( getWidget(), obj.getWidget() );
 }
 #endif
 
