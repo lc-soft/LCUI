@@ -340,7 +340,6 @@ TextBox_Init( LCUI_Widget *widget )
 	Set_Widget_Align( textbox->scrollbar[1], ALIGN_BOTTOM_LEFT, Pos(0,0) );
 	/* 滚动条设为横向 */
 	ScrollBar_Set_Direction( textbox->scrollbar[1], 1 );
-	
 	/* 将回调函数与滚动条连接 */
 	ScrollBar_Connect( textbox->scrollbar[0], TextBox_VertScroll_TextLayer, widget );
 	ScrollBar_Connect( textbox->scrollbar[1], TextBox_HoriScroll_TextLayer, widget );
@@ -367,6 +366,8 @@ TextBox_Init( LCUI_Widget *widget )
 	Widget_FocusIn_Event_Connect( widget, _put_textbox_cursor, NULL );
 	/* 关联按键输入事件 */
 	Widget_Keyboard_Event_Connect( widget, TextBox_Input );
+	/* 默认不启用多行文本模式 */
+	TextBox_Multiline( widget, FALSE );
 }
 
 static void 
