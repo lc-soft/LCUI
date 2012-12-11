@@ -42,38 +42,22 @@
 #ifndef __LCUI_LABEL_HPP__
 #define __LCUI_LABEL_HPP__
 
-LCUIWidget::_Label::_Label(LCUIWidget *object)
+class LCUILabel:public LCUIWidget
 {
-	parent = object; 
+public:
+	LCUILabel():LCUIWidget( "label" ){};
+	void setText( const char* );
+	void setTextStyle( LCUI_TextStyle );
+};
+
+void LCUILabel::setText( const char *text )
+{
+	Label_Text( getWidget(), text );
 }
 
-int LCUIWidget::_Label::setText(const char *fmt, ...)
+void LCUILabel::setTextStyle( LCUI_TextStyle style )
 {
-	if( parent->isError() ) {
-		return WIDGET_IS_NULL;
-	}
-	
-	char text[LABEL_TEXT_MAX_SIZE];
-	memset(text, 0, sizeof(text)); 
-	
-	LCUI_Label *p_label;
-	p_label = (LCUI_Label*)Get_Widget_PrivData(parent->getWidget());
-	
-	va_list ap;
-	va_start(ap, fmt);
-	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
-	va_end(ap); 
-	 
-	Strcpy( &p_label->text, text );/* 拷贝字符串 */ 
-	Draw_Widget( parent->getWidget() );/* 更新部件 */ 
-	return 0;
+	Label_TextStyle( getWidget(), style );
 }
 
-int LCUIWidget::_Label::setFont(int font_pixel_size, char *fontfile)
-{
-	if( parent->isError() ) {
-		return WIDGET_IS_NULL;
-	}
-	return Set_Label_Font(parent->getWidget(), font_pixel_size, fontfile);
-}
 #endif
