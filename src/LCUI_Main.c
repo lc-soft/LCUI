@@ -375,6 +375,7 @@ int pause_timer( int timer_id )
 }
 
 int continue_timer( int timer_id )
+/* 继续使用定时器 */
 {
 	timer_data *timer;
 	timer = find_timer( timer_id );

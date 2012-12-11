@@ -414,7 +414,7 @@ Set_Window_Title_Text(LCUI_Widget *win_p, const char *text)
 { 
 	LCUI_Widget *titlebar = Get_Window_TitleBar(win_p); 
 	LCUI_TitleBar *title = Get_Widget_PrivData(titlebar); 
-	Set_Label_Text(title->label, text);
+	Label_Text(title->label, text);
 }
 
 void 
@@ -435,7 +435,7 @@ Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget)
 
 void 
 Register_Window()
-/* 功能：注册窗口部件 */
+/* 注册窗口部件类型 */
 {
 	/* 添加几个部件类型 */
 	WidgetType_Add("window");

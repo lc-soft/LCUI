@@ -17,7 +17,6 @@ test/cross.png \
 test/ring.png \
 test/bg.png \
 test/helloworld.c \
-test/helloworld2.cpp \
 test/test_label.c \
 test/test_loading.c \
 test/test_progressbar.c \

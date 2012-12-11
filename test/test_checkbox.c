@@ -33,7 +33,7 @@ void view_result(LCUI_Widget *widget, void *arg)
 	
 	strcat(str, "。");
 	/* 设定文本内容 */
-	Set_Label_Text(result_text, str);
+	Label_Text(result_text, str);
 	/* 禁用按钮部件 */
 	Disable_Widget(button);
 }
@@ -75,7 +75,7 @@ int main(int argc, char*argv[])
 	Set_Widget_Align(checkbox[3], ALIGN_MIDDLE_CENTER, Pos(60 ,5));
 	Set_Widget_Align(checkbox[4], ALIGN_MIDDLE_CENTER, Pos(120 ,5));
 	/* 设定label部件显示的文本，以及字体大小 */
-	Set_Label_Text(label, "你都有哪些兴趣爱好？\n");
+	Label_Text(label, "你都有哪些兴趣爱好？\n");
 	/* 显示部件 */
 	Show_Widget(label);
 	Show_Widget(result_text);

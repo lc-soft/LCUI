@@ -10,9 +10,9 @@
 
 LCUI_Widget *label, *window, *scrollbar; 
 
-void callback_func( LCUI_Widget *widget, ScrollBar_Data data )
+void callback_func( ScrollBar_Data data, void *arg )
 {
-	Set_Label_Text( label, "%d", data.current_num );
+	Label_Text( label, "%d", data.current_num );
 }
 
 int main(int argc, char*argv[]) 
@@ -32,13 +32,13 @@ int main(int argc, char*argv[])
 	Set_Widget_Align( label, ALIGN_MIDDLE_CENTER, Pos(-20,0) );
 	Set_Widget_Align( scrollbar, ALIGN_MIDDLE_CENTER, Pos(0,0) );
 	
-	Set_Label_Text( label, "0" );
+	Label_Text( label, "0" );
 	
 	/* 将窗口客户区作为部件的容器添加进去 */
 	Window_Client_Area_Add(window, label);
 	Window_Client_Area_Add(window, scrollbar); 
 	/* 将回调函数与滚动条部件连接 */
-	ScrollBar_Connect( scrollbar, callback_func );
+	ScrollBar_Connect( scrollbar, callback_func, NULL );
 	/* 显示部件 */
 	scrollbar->show(scrollbar);
 	window->show(window); 

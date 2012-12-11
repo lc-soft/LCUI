@@ -34,8 +34,8 @@ int main(int argc, char*argv[])
 	login_btn = Create_Widget("button");
 	/* 设置界面上显示的文本 */
 	Set_Window_Title_Text(window, "用户登录"); 
-	Set_Label_Text( text[0], "帐号：" );
-	Set_Label_Text( text[1], "密码：" );
+	Label_Text( text[0], "帐号：" );
+	Label_Text( text[1], "密码：" );
 	Set_Button_Text( login_btn, "登录" );
 	/* 调整部件的尺寸 */
 	Resize_Widget( login_btn, Size(50, 50) ); 

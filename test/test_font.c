@@ -1,16 +1,14 @@
 // 测试 LCUI 的字体处理功能
-
+// 由于LCUI的版本变更，该程序的功能暂时无法完全实现
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H 
 #include LC_WINDOW_H
 #include LC_PICBOX_H
 #include LC_BUTTON_H
-#include LC_MEM_H
 #include LC_LABEL_H
 #include LC_MISC_H
 #include LC_GRAPH_H
-#include LC_RES_H
 #include LC_INPUT_H 
 #include <stdio.h>
 #include <string.h>
@@ -61,8 +59,8 @@ int get_format(char *format, char *filename)
 } 
 
  
-char **scan_imgfile(char *dir, int *file_num)
-/* 功能：扫描图片文件，并获得文件列表 */
+char **scan_fontfile(char *dir, int *file_num)
+/* 功能：扫描字体文件，并获得文件列表 */
 {
 	int i, len, n; 
 	char **filelist, format[256], path[1024];
@@ -72,10 +70,9 @@ char **scan_imgfile(char *dir, int *file_num)
 	else	
 	n = scandir(dir, &namelist, 0, alphasort);
 	
-	if (n < 0)
+	if (n < 0) {
 		return 0; 
-	else 
-	{
+	} else {
 		filelist = (char **)malloc(sizeof(char *)*n);
 		for(i=0, *file_num=0; i<n; i++)
 		{
@@ -112,34 +109,34 @@ char **scan_imgfile(char *dir, int *file_num)
 void *change_fonttype()
 { 
 	char info[256];
-	for(;;)
-	{
+	for(;;) {
 		sprintf(info, "(%d/%d) %s", current+1, total_files, filename[current]);
-		Set_Window_Title_Text(window, info); 
-		Set_Label_Font(text, 25, filename[current]);
+		Set_Window_Title_Text(window, info);
+		Label_Refresh(text);
 		sleep(1);
 		++current;
-		if(current >= total_files)
+		if(current >= total_files) {
 			current = 0;
+		}
 	}
 	LCUI_Thread_Exit(NULL);
 }
 
 int main(int argc, char *argv[])
 {
-	pthread_t t; 
+	thread_t t; 
 	LCUI_Init(argc, argv);
 	window = Create_Widget("window");
 	text = Create_Widget("label"); 
-	filename = scan_imgfile("../fonts/", &total_files); 
+	filename = scan_fontfile("../fonts/", &total_files); 
 	Resize_Widget(window, Size(320, 240));
-	Set_Label_Text(text, 
-		"<color=0,0,0>abcdefghijklmn</color>\n"
+	Label_Text( text, 
+		"<size=25px><color=0,0,0>abcdefghijklmn</color>\n"
 		"<color=165,42,42>opqrstuvwxyz</color>\n" 
 		"<color=30,144,255>ABCDEFGHIJKLMN</color>\n"
 		"<color=0,75,65>OPQRSTUVWXYZ</color>\n"
 		"<color=255,0,0>1234567890.:,;(*!?)</color>\n"
-		"<color=0,215,0>中国创造，慧及全球！</color>");
+		"<color=0,215,0>中国创造，慧及全球！</color></size>");
 	Set_Widget_Align(text, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	Window_Client_Area_Add(window, text);
 	Show_Widget(text);

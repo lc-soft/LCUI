@@ -124,7 +124,7 @@ BOOL Enable_TouchScreen_Input()
 	char str[256];
 	if (ts_data.status != INSIDE) {
 		tsdevice = getenv("TSLIB_TSDEVICE");
-		if( tsdevice != NULL ) {
+		if( tsdevice ) {
 			ts_data.td = ts_open(tsdevice, 0);
 		} else {
 			tsdevice = TS_DEV;
@@ -165,7 +165,14 @@ BOOL Disable_TouchScreen_Input()
 #endif
 }
 
+void *Get_TouchScreen()
+/* 获取触屏设备文件句柄 */
+{
+	return ts_data.td;
+}
+
 void TouchScreen_Init()
+/* 初始化触屏设备 */
 {
 	ts_data.td = NULL;
 	ts_data.status = REMOVE;

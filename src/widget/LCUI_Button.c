@@ -293,7 +293,7 @@ void Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...)
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
 	va_end(ap);
 	/* 设定部件显示的文本 */
-	Set_Label_Text(label, text);
+	Label_Text(label, text);
 }
 
 

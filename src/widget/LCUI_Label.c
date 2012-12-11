@@ -189,7 +189,7 @@ Label_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode )
 
 void 
 Register_Label()
-/* 功能：注册label部件类型 */
+/* 注册label部件类型 */
 {
 	/* 添加几个部件类型 */
 	WidgetType_Add("label");

@@ -57,8 +57,8 @@ void Refresh_Cursor ()
 void Show_Cursor ()
 /* 功能：显示鼠标游标 */
 {
-	LCUI_Sys.cursor.visible = IS_TRUE;	/* 标识游标为可见 */
-	Refresh_Cursor ();			/* 刷新游标的显示 */
+	LCUI_Sys.cursor.visible = TRUE;	/* 标识游标为可见 */
+	Refresh_Cursor ();		/* 刷新游标的显示 */
 }
 
 
@@ -66,7 +66,7 @@ void Show_Cursor ()
 void Hide_Cursor ()
 /* 功能：隐藏鼠标游标 */
 {
-	LCUI_Sys.cursor.visible = IS_FALSE;
+	LCUI_Sys.cursor.visible = FALSE;
 	Refresh_Cursor ();
 }
 
@@ -89,8 +89,10 @@ void Set_Cursor_Pos (LCUI_Pos pos)
 	old = Get_Cursor_Rect();
  	LCUI_Sys.cursor.pos = pos; 
  	DEBUG_MSG("cursor new pos: %d, %d\n", pos.x, pos.y);
-	Refresh_Cursor ();		/* 刷新游标的显示 */ 
-	Add_Screen_Refresh_Area ( old ); /* 刷新游标原来的区域中的图形 */
+ 	/* 刷新游标的显示 */ 
+	Refresh_Cursor ();
+	/* 刷新游标原来的区域中的图形 */		
+	Add_Screen_Refresh_Area ( old );
 }
 
 int Set_Cursors_Graph (LCUI_Graph * graph)

@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_ActiveBox.h -- ActiveBox widget, play simple dynamic picture
+ * LCUI_ActiveBox.c -- ActiveBox widget, play simple dynamic picture
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_ActiveBox.h -- ActiveBox部件, 播放简单的动态图像
+ * LCUI_ActiveBox.c -- ActiveBox部件, 播放简单的动态图像
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -389,8 +389,7 @@ Process_Frames()
 	}
 	frames = Frames_Stream_Update( &sleep_time ); 
 	reset_timer( __timer_id, sleep_time );
-	DEBUG_MSG("frames: %p\n", frames);
-	if( frames ){
+	if( frames ) {
 		total = Queue_Get_Total( &frames->func_data );
 		slot = Frames_Get_Slot( frames ); 
 		for(i=0; i<total; ++i){

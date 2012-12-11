@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Graph.h -- The base graphics handling module of LCUI
+ * LCUI_Graph.h -- The base graphics handling module for LCUI
  * 
  * Copyright (C) 2012 by
  * Liu Chao

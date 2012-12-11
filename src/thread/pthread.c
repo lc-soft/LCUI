@@ -88,7 +88,6 @@ void thread_rwlock_init(thread_rwlock *rwlock)
 /* 功能：初始化读写锁 */
 {
 	int error;
-
 	//error = pthread_cond_init(&rwlock->cond, NULL);
 	//if(error) thread_perror("cond init", error);
 	

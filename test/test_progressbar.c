@@ -28,11 +28,11 @@ void *change_progress_1(void *arg)
 	srand(time(NULL));
 	for(i=0; i<max; i+=rand()%5) {
 		Set_ProgressBar_Value(widget, i);/* 当前值 */
-		Set_Label_Text(label, "%d%%", (int)(i*100.0/max));
+		Label_Text(label, "%d%%", (int)(i*100.0/max));
 		usleep(100000);/* 暂停0.1秒 */
 	}
 	Set_ProgressBar_Value(widget, max);
-		Set_Label_Text(label, "100%%");
+	Label_Text(label, "100%%");
 	LCUI_Thread_Exit(NULL);
 }
 
@@ -50,11 +50,11 @@ void *change_progress_2(void *arg)
 	srand(time(NULL));
 	for(i=0; i<max; i+=rand()%5) {
 		Set_ProgressBar_Value(widget, i); 
-		Set_Label_Text(label, "%d/%d", i, max);
+		Label_Text(label, "%d/%d", i, max);
 		usleep(100000); 
 	}
 	Set_ProgressBar_Value(widget, max);
-	Set_Label_Text(label, "%d/%d", max, max);
+	Label_Text(label, "%d/%d", max, max);
 	LCUI_Thread_Exit(NULL);
 }
 

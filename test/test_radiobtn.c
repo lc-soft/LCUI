@@ -31,7 +31,7 @@ void view_result(LCUI_Widget *widget, void *arg)
 		strcat(str, "40岁以上");
 	
 	strcat(str, "。");
-	Set_Label_Text(age_label, str);  
+	Label_Text(age_label, str);  
 	Disable_Widget(button);
 }
 
@@ -53,8 +53,8 @@ int main(int argc, char*argv[])
 	/* 设定窗口标题的文本 */
 	Set_Window_Title_Text(window, "测试复选框部件"); 
 	/* 改变尺寸 */
-	Resize_Widget(window, Size(320, 240));
-	Disable_Widget_Auto_Size(button);
+	Resize_Widget(window, Size(320, 240)); 
+	Widget_AutoSize( button, FALSE, 0 );
 	Resize_Widget(button, Size(60, 25));
 	/* 将窗口客户区作为这些部件的容器 */ 
 	Window_Client_Area_Add(window, age_label);
@@ -70,7 +70,7 @@ int main(int argc, char*argv[])
 	Set_Widget_Align(age_rb[3], ALIGN_MIDDLE_LEFT, Pos(5,0));
 	Set_Widget_Align(age_rb[4], ALIGN_MIDDLE_LEFT, Pos(100,0));
 	Set_Widget_Align(age_rb[5], ALIGN_MIDDLE_LEFT, Pos(200,0)); 
-	Set_Label_Text(age_label, "你的年龄段是？");  
+	Label_Text(age_label, "你的年龄段是？");  
 	
 	RadioButton_Create_Mutex(age_rb[0], age_rb[1]);
 	RadioButton_Create_Mutex(age_rb[0], age_rb[2]);

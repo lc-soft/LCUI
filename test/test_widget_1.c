@@ -17,28 +17,28 @@ static void *thread(void *arg)
 	Set_Widget_Align( label, ALIGN_MIDDLE_CENTER, Pos(0,0) );
 	Show_Widget( label );
 	while(LCUI_Active()) {
-		Set_Label_Text( label, "DOCK_TYPE_TOP" );
+		Label_Text( label, "DOCK_TYPE_TOP" );
 		Set_Widget_Dock( widget, DOCK_TYPE_TOP ); 
 		Set_Widget_Size( widget, "120px", "120px" ); 
 		/* 还原尺寸 */
 		sleep(1);
-		Set_Label_Text( label, "DOCK_TYPE_LEFT" );
+		Label_Text( label, "DOCK_TYPE_LEFT" );
 		Set_Widget_Dock( widget, DOCK_TYPE_LEFT ); 
 		Set_Widget_Size( widget, "120px", "120px" ); 
 		sleep(1);
-		Set_Label_Text( label, "DOCK_TYPE_RIGHT" );
+		Label_Text( label, "DOCK_TYPE_RIGHT" );
 		Set_Widget_Dock( widget, DOCK_TYPE_RIGHT ); 
 		Set_Widget_Size( widget, "120px", "120px" ); 
 		sleep(1);
-		Set_Label_Text( label, "DOCK_TYPE_BOTTOM" );
+		Label_Text( label, "DOCK_TYPE_BOTTOM" );
 		Set_Widget_Dock( widget, DOCK_TYPE_BOTTOM ); 
 		Set_Widget_Size( widget, "120px", "120px" ); 
 		sleep(1);
-		Set_Label_Text( label, "DOCK_TYPE_FILL" );
+		Label_Text( label, "DOCK_TYPE_FILL" );
 		Set_Widget_Dock( widget, DOCK_TYPE_FILL ); 
 		Set_Widget_Size( widget, "120px", "120px" ); 
 		sleep(1);
-		Set_Label_Text( label, "DOCK_TYPE_NONE" );
+		Label_Text( label, "DOCK_TYPE_NONE" );
 		Set_Widget_Dock( widget, DOCK_TYPE_NONE ); 
 		Set_Widget_Size( widget, "120px", "120px" );  
 		sleep(1);

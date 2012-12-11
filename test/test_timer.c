@@ -36,9 +36,9 @@ int main(int argc, char*argv[])
         window->resize(window, Size(320, 240));
         Window_Client_Area_Add(window, label);
         label->set_align(label, ALIGN_MIDDLE_CENTER, Pos(0,0));
-        Set_Label_Text(label, "利用定时器实现的文本闪烁");
+        Label_Text(label, "利用定时器实现的文本闪烁");
         TextStyle_FontSize( &style, 20 );
-        Set_Label_TextStyle( label, style );
+        Label_TextStyle( label, style );
         window->show( window ); 
         /* 设置定时器，每隔500毫秒调用display_text函数，重复调用 */
         set_timer( 500, display_text, TRUE );

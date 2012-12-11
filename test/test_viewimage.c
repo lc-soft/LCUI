@@ -12,12 +12,8 @@
 int main(int argc,char*argv[])
 /* 主函数，程序的入口 */
 { 
-	LCUI_Widget	*window, 
-					*label,
-					*pic_box,
-					*fore_box; /* 使用指向widget部件的指针 */
-					
-	int			 width, height; 
+	LCUI_Widget	*window, *label, *pic_box, *fore_box;
+	int width, height; 
 	/* 自定义默认字体文件位置 */
 	//Set_Default_Font("msyh.ttf");
 	/* 初始化LCUI */ 
@@ -43,8 +39,7 @@ int main(int argc,char*argv[])
 	Set_PictureBox_Image_From_File(pic_box, "image.jpg");
 	Set_PictureBox_Image_From_File(fore_box, "border.png");
 	 
-	Set_Label_Text(label, "蛋疼的头像");
-	Set_Label_Font(label, 16, NULL);
+	Label_Text(label, "蛋疼的头像");
 	
 	Set_Widget_Align(pic_box, ALIGN_MIDDLE_CENTER, Pos(0, -20));
 	Set_Widget_Align(fore_box, ALIGN_MIDDLE_CENTER, Pos(0, -20));

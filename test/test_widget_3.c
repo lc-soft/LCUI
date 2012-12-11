@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	for(i=0; i<6; ++i) {
 		widget[i] = Create_Widget( NULL );
 		label[i] = Create_Widget( "label" );
-		Set_Label_Text( label[i], "%c" , 'A'+i);
+		Label_Text( label[i], "%c" , 'A'+i);
 		Widget_Container_Add( widget[i], label[i] );
 		Window_Client_Area_Add( window, widget[i] );
 		Resize_Widget( widget[i], Size(80,80) );

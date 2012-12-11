@@ -7,42 +7,40 @@
 #include <math.h>
 
 int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
+/* 对图像进行高斯模糊处理 */
 {
 	LCUI_Graph temp;
 	
-	uint_t x, y, i;
-	uint_t ksize, kcenter;
+	int32_t kcenter, i;
+	uint_t x, y, ksize;
 	uint_t temp_pos, temp_start_pos;
 	uint_t a_src_pos, b_src_pos, src_start_pos;
-	double bmul, gmul, rmul, sum = 0;
-	double *kernel, *kvalue_ptr, scale, cons;
+	double amul, bmul, gmul, rmul, *kvalue_ptr;
+	double *kernel, scale, cons, sum = 0;
 	const double PI = 3.141592653;
 	
 	sigma = sigma > 0 ? sigma : -sigma;
-	//高斯核矩阵的大小为(6*sigma+1)*(6*sigma+1)
-	//ksize为奇数
-	ksize = ceil(sigma * 3) * 2 + 1;
-	kcenter = ksize/2;
-
+	//ksize为奇数 
+	ksize = ceil(sigma * 3) * 2 + 1; 
 	if(ksize == 1) {
-		Graph_Copy( des, src ); 
+		Graph_Copy( des, src );
 		return 0;
 	}
 
-	//计算一维高斯核
-	
+	//计算一维高斯核 
 	scale = -0.5/(sigma*sigma);
-	cons = 1/sqrt(-scale / PI);
+	cons = 1/sqrt(-scale / PI); 
+	kcenter = ksize/2; 
 	kernel = (double*) malloc( ksize*sizeof(double) );
-	for(i = 0; i < ksize; i++) {
-		x = i - kcenter;
+	for(i = 0; i < ksize; ++i) {
+		int x = i - kcenter;
 		*(kernel+i) = cons * exp(x * x * scale);//一维高斯函数
-		sum += *(kernel+i); 
+		sum += *(kernel+i);
 	} 
 	//归一化,确保高斯权值在[0,1]之间
 	for(i = 0; i < ksize; i++) {
-		*(kernel+i) /= sum; 
-	} 
+		*(kernel+i) /= sum;
+	}
 	
 	des->have_alpha = src->have_alpha;
 	if( Graph_Create( des, src->width, src->height ) != 0 ) {
@@ -54,7 +52,10 @@ int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 	if( Graph_Create( &temp, src->width, src->height ) != 0 ) {
 		return -2;
 	}
-
+	
+	Graph_Lock( src, RWLOCK_READ );
+	Graph_Lock( &temp, RWLOCK_WRITE );
+	
 	//x方向一维高斯模糊
 	temp_start_pos = 0;
 	src_start_pos = 0 - kcenter;
@@ -62,7 +63,7 @@ int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 		temp_pos = temp_start_pos;
 		b_src_pos = src_start_pos;
 		for(x = 0; x < src->width; x++) { 
-			sum = bmul = gmul = rmul = 0;
+			sum = amul = bmul = gmul = rmul = 0;
 			a_src_pos = b_src_pos;
 			kvalue_ptr = kernel;
 			for(i = -kcenter; i <= kcenter; i++) {
@@ -70,6 +71,9 @@ int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 					rmul += src->rgba[0][a_src_pos]*(*kvalue_ptr);
 					gmul += src->rgba[1][a_src_pos]*(*kvalue_ptr);
 					bmul += src->rgba[2][a_src_pos]*(*kvalue_ptr);
+					if(src->have_alpha) {
+						amul += src->rgba[3][a_src_pos]*(*kvalue_ptr);
+					}
 					sum += (*kvalue_ptr);
 				}
 				++a_src_pos;
@@ -78,39 +82,65 @@ int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 			temp.rgba[0][temp_pos] = rmul/sum;
 			temp.rgba[1][temp_pos] = gmul/sum;
 			temp.rgba[2][temp_pos] = bmul/sum;
+			if(temp.have_alpha) {
+				temp.rgba[3][temp_pos] = amul/sum;
+			}
 			++temp_pos;
 			++b_src_pos;
 		}
 		temp_start_pos += temp.width;
 		src_start_pos += src->width;
 	}
+	Graph_Unlock( &temp );
 	
+	Graph_Lock( des, RWLOCK_WRITE );
+	Graph_Lock( &temp, RWLOCK_READ );
 	//y方向一维高斯模糊
+	src_start_pos = 0 - kcenter*temp.width;
 	src_start_pos = 0 - kcenter*temp.width;
 	for(x = 0; x < temp.width; x++) {
 		temp_start_pos = x;
 		b_src_pos = src_start_pos;
 		for(y = 0; y < temp.height; y++) { 
-			sum = bmul = gmul = rmul = 0;
+			sum = amul = bmul = gmul = rmul = 0;
 			a_src_pos = b_src_pos;
+			kvalue_ptr = kernel;
 			for(i = -kcenter; i <= kcenter; i++) {
 				if((y+i) >= 0 && (y+i) < temp.height) { 
-					rmul += temp.rgba[0][a_src_pos]*(*(kernel+kcenter+i));
-					gmul += temp.rgba[1][a_src_pos]*(*(kernel+kcenter+i));
-					bmul += temp.rgba[2][a_src_pos]*(*(kernel+kcenter+i));
-					sum += (*(kernel+kcenter+i));
+					rmul += temp.rgba[0][a_src_pos]*(*kvalue_ptr);
+					gmul += temp.rgba[1][a_src_pos]*(*kvalue_ptr);
+					bmul += temp.rgba[2][a_src_pos]*(*kvalue_ptr);
+					if(temp.have_alpha) {
+						amul += temp.rgba[3][a_src_pos]*(*kvalue_ptr);
+					}
+					sum += (*kvalue_ptr);
 				}
 				a_src_pos += temp.width;
+				++kvalue_ptr;
 			}
 			des->rgba[0][temp_start_pos] = rmul/sum;
 			des->rgba[1][temp_start_pos] = gmul/sum;
 			des->rgba[2][temp_start_pos] = bmul/sum;
+			if(des->have_alpha) {
+				des->rgba[3][temp_start_pos] = amul/sum; 
+			}
 			temp_start_pos += des->width;
 			b_src_pos += temp.width;
 		}
 		++src_start_pos;
 	}
 	
+	Graph_Unlock( &temp );
+	Graph_Unlock( des );
+	Graph_Unlock( src );
+	
+	Graph_Free( &temp );
 	free(kernel);
 	return 0;
+}
+
+int Graph_Smooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
+/* 对图像进行模糊处理 */
+{
+	return GaussianSmooth( src, des, sigma );
 }

@@ -97,8 +97,10 @@ int
 Run_Task( LCUI_App *app )
 /* 功能：执行任务 */
 { 
-	LCUI_Task *task;
+	static LCUI_Task *task;
 	task = (LCUI_Task*)Queue_Get( &app->task_queue, 0 );
+	//clock_t start = clock();
+	//printf("run task %p\n", task->func);
 	/* 调用函数指针指向的函数，并传递参数 */
 	task->func( task->arg[0], task->arg[1] );
 	/* 若需要在调用回调函数后销毁参数 */
@@ -108,6 +110,7 @@ Run_Task( LCUI_App *app )
 	if( task->destroy_arg[1] ) {
 		free( task->arg[1] );
 	}
+	//printf("task %p use time: %ldus\n", task->func, clock()-start);
 	return Queue_Delete(&app->task_queue, 0);
 }
 
@@ -172,9 +175,9 @@ AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 		if( !temp || temp->func != func_data->func ) {
 			continue;
 		}
-		//printf("2\n");/* 如果要求的是不重复模式 */ 
+		/* 如果要求的是不重复模式 */ 
 		if(Check_Option(mode, ADD_MODE_NOT_REPEAT)) {
-//	printf("3\n");/* 如果要求是第1个参数不能重复 */
+			/* 如果要求是第1个参数不能重复 */
 			if(Check_Option(mode, AND_ARG_F)) {
 				//printf("ADD_MODE_NOT_REPEAT, AND_ARG_F\n");
 				//printf("old:%p, new:%p\n", queue->queue[i].arg_f, arg_f);
@@ -198,8 +201,7 @@ AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 					__destroy_apptask( func_data );
 					return -1; 
 				}
-			}
-			else {/* 否则，只是要求函数不同 */ 
+			} else {/* 否则，只是要求函数不同 */ 
 				__destroy_apptask( func_data );
 				return -1; 
 			}
@@ -226,8 +228,7 @@ AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 				if(temp->arg[1] == func_data->arg[1]) {
 					break; 
 				}
-			}
-			else { 
+			} else { 
 				break; 
 			}
 		}
@@ -918,7 +919,7 @@ Widget_FocusOut_Event_Connect(	LCUI_Widget *widget,
 static void 
 WidgetFocusProc( LCUI_Key *key_data, void *arg )
 {
-	LCUI_Widget *widget, *focus_widget;
+	LCUI_Widget *widget, *tmp = NULL, *focus_widget;
 	
 	widget = NULL;
 	//printf("key, code: %d, status:%d\n", 
@@ -926,10 +927,16 @@ WidgetFocusProc( LCUI_Key *key_data, void *arg )
 	while( 1 ) {
 		focus_widget = Get_FocusWidget( widget );
 		if( !focus_widget ) {
-			Handle_Widget_KeyboardEvent( widget, *key_data );
+			if( tmp ) {
+				Handle_Widget_KeyboardEvent( tmp, *key_data );
+			}
 			break;
 		}
 		widget = focus_widget;
+		/* 保存已关联按键事件的部件指针 */
+		if( Find_Event( &widget->event, EVENT_KEYBOARD ) ) {
+			tmp = widget;
+		}
 	}
 }
 /*------------------------- End Focus Proc ----------------------------*/

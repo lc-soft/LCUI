@@ -46,11 +46,10 @@
 #include LC_PICBOX_H
 #include LC_RADIOBTN_H
 #include LC_GRAPH_H
-#include LC_RES_H 
-#include LC_MISC_H 
+#include LC_RES_H
 #include LC_INPUT_H
 
-static LCUI_Queue	mutex_lib;
+static LCUI_Queue mutex_lib;
 static int mutex_lib_init = 0; /* 标志，是否初始化过 */
 
 void RadioButton_Delete_Mutex(LCUI_Widget *widget)
@@ -85,8 +84,8 @@ void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 	rb_a = (LCUI_RadioButton *)Get_Widget_PrivData(a);
 	rb_b = (LCUI_RadioButton *)Get_Widget_PrivData(b);
 	
-	if(rb_a->mutex == NULL) {
-		if(rb_b->mutex == NULL) {
+	if( !rb_a->mutex ) {
+		if( !rb_b->mutex ) {
 			Queue_Init(&queue, sizeof(LCUI_Widget*), NULL);
 			/* 将子队列添加至父队列，并获取位置 */
 			pos = Queue_Add(&mutex_lib, &queue);
@@ -103,7 +102,7 @@ void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 			rb_a->mutex = rb_b->mutex;
 		}
 	} else {
-		if(rb_b->mutex == NULL) {
+		if( !rb_b->mutex ) {
 			Queue_Add_Pointer(rb_a->mutex, b);
 			rb_b->mutex = rb_a->mutex;
 		} else {/* 否则，两个都和其它部件有互斥关系，需要将它们拆开，并重新建立互斥关系 */
@@ -122,36 +121,33 @@ void Set_RadioButton_On(LCUI_Widget *widget)
 	LCUI_Widget *other;
 	int i, total;
 	
-	radio_button = (LCUI_RadioButton *)Get_Widget_PrivData(widget); 
-	if(NULL != radio_button->mutex)
-	{/* 如果与其它部件有互斥关系，就将其它单选框部件的状态改为“未选中”状态 */
+	radio_button = Get_Widget_PrivData(widget); 
+	/* 如果与其它部件有互斥关系，就将其它单选框部件的状态改为“未选中”状态 */
+	if( radio_button->mutex ) {
 		total = Queue_Get_Total(radio_button->mutex);
-		for(i=0; i<total; ++i)
-		{
+		for(i=0; i<total; ++i) {
 			other = (LCUI_Widget*)Queue_Get(radio_button->mutex, i);
 			Set_RadioButton_Off(other);
 		}
 	}
-	radio_button->on = IS_TRUE;
+	radio_button->on = TRUE;
 	Draw_Widget(widget);
 }
 
 void Set_RadioButton_Off(LCUI_Widget *widget)
 /* 功能：设定单选框为未选中状态 */
 {
-	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
-					Get_Widget_PrivData(widget); 
-	
-	radio_button->on = IS_FALSE;
+	LCUI_RadioButton *radio_button;
+	radio_button = Get_Widget_PrivData(widget); 
+	radio_button->on = FALSE;
 	Draw_Widget(widget);
 }
 
 int Get_RadioButton_Status(LCUI_Widget *widget)
 /* 功能：获取单选框的状态 */
 {
-	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
-					Get_Widget_PrivData(widget); 
-	
+	LCUI_RadioButton *radio_button;
+	radio_button = Get_Widget_PrivData(widget); 
 	return radio_button->on;
 }
 
@@ -195,7 +191,8 @@ void RadioButton_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
 	Set_Widget_Align(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
 }
 
-static void RadioButton_Init(LCUI_Widget *widget)
+static void 
+RadioButton_Init(LCUI_Widget *widget)
 /* 功能：初始化单选框部件的数据 */
 {
 	LCUI_Widget *container[2];
@@ -261,9 +258,9 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 	LCUI_Graph *p;
 	LCUI_RadioButton *radio_button;
 	
-	radio_button = Get_Widget_PrivData(widget); 	
-	if(Strcmp(&widget->style, "custom") == 0)
-	{/* 如果为自定义风格，那就使用用户指定的图形 */
+	radio_button = Get_Widget_PrivData(widget);
+	/* 如果为自定义风格，那就使用用户指定的图形 */ 	
+	if(Strcmp(&widget->style, "custom") == 0) {
 		//printf("custom\n"); 
 		if(widget->enabled == IS_FALSE) 
 			widget->status = WIDGET_STATUS_DISABLE;
@@ -323,7 +320,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 		
 		switch(widget->status)
 		{/* 判断按钮的状态，以选择相应的背景色 */
-		case WIDGET_STATUS_NORMAL:
+		    case WIDGET_STATUS_NORMAL:
 			if(radio_button->on) {
 				Load_Graph_Default_RadioButton_On_Normal(p);
 			} else {
@@ -331,7 +328,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		case WIDGET_STATUS_OVERLAY :
+		    case WIDGET_STATUS_OVERLAY :
 			if(radio_button->on) {
 				Load_Graph_Default_RadioButton_On_Selected(p);
 			} else {
@@ -339,7 +336,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		case WIDGET_STATUS_CLICKING : 
+		    case WIDGET_STATUS_CLICKING : 
 			if(radio_button->on) {
 				Load_Graph_Default_RadioButton_On_Pressed(p);
 			} else {
@@ -347,11 +344,11 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		case WIDGET_STATUS_CLICKED : 
+		    case WIDGET_STATUS_CLICKED : 
 			break;
-		case WIDGET_STATUS_FOCUS : 
+		    case WIDGET_STATUS_FOCUS : 
 			break;
-		case WIDGET_STATUS_DISABLE :
+		    case WIDGET_STATUS_DISABLE :
 			break;
 			default :
 			break;
@@ -362,9 +359,10 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 LCUI_Widget *Get_RadioButton_Label(LCUI_Widget *widget)
 /* 功能：获取单选框部件中的label部件的指针 */
 {
-	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
-					Get_Widget_PrivData(widget); 
-	if(NULL == radio_button) {
+	LCUI_RadioButton *radio_button;
+	
+	radio_button = Get_Widget_PrivData(widget); 
+	if( !radio_button ) {
 		return NULL;
 	}
 	return radio_button->label;
@@ -373,11 +371,12 @@ LCUI_Widget *Get_RadioButton_Label(LCUI_Widget *widget)
 LCUI_Widget *Get_RadioButton_ImgBox(LCUI_Widget *widget)
 /* 功能：获取单选框部件中的PictureBox部件的指针 */
 {
-	LCUI_RadioButton *radio_button = (LCUI_RadioButton *)
-					Get_Widget_PrivData(widget); 
-	if(NULL == radio_button)
+	LCUI_RadioButton *radio_button;
+	
+	radio_button = Get_Widget_PrivData(widget); 
+	if( !radio_button ) {
 		return NULL;
-		
+	}
 	return radio_button->imgbox;
 }
 
@@ -394,7 +393,7 @@ void Set_RadioButton_Text(LCUI_Widget *widget, const char *fmt, ...)
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
 	va_end(ap);
 
-	Set_Label_Text(label, text); 
+	Label_Text(label, text); 
 }
 
 LCUI_Widget *Create_RadioButton_With_Text(const char *fmt, ...)
@@ -416,9 +415,7 @@ LCUI_Widget *Create_RadioButton_With_Text(const char *fmt, ...)
 
 
 void Register_RadioButton()
-/*
- * 功能：注册部件类型-窗口至部件库
- **/
+/* 注册单选框部件类型 */
 {
 	/* 添加几个部件类型 */
 	WidgetType_Add("radio_button"); 

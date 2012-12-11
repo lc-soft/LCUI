@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 	Set_Widget_Align( label, ALIGN_MIDDLE_CENTER, Pos(0,-50) ); 
 	/* 设置部件的文本 */
 	Set_Button_Text( btn_ok, "应用" ); 
-	Set_Label_Text( label, "选择窗口配色：" );
+	Label_Text( label, "选择窗口配色：" );
 	/* 为按钮的点击事件关联回调函数 */
 	Widget_Clicked_Event_Connect( btn_ok, switch_style, NULL );
 	/* 显示部件 */
@@ -102,7 +102,7 @@ int main(int argc, char*argv[])
 	Resize_Widget(windows[2], Size(120, 100));
 	Set_Window_Title_Text(windows[0], "主窗口"); 
 	Set_Window_Title_Text(windows[1], "子窗口 A"); 
-	Set_Window_Title_Text(windows[2], "子窗口 C");
+	Set_Window_Title_Text(windows[2], "子窗口 B");
 	/* 改变风格 */
 	Set_Widget_StyleID( windows[1], WINDOW_STYLE_PURE_ORANGE );
 	Set_Widget_StyleID( windows[2], WINDOW_STYLE_PURE_GREEN );

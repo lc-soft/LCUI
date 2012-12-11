@@ -231,7 +231,7 @@ Show_ProgressBar(LCUI_Widget *widget)
 }
 
 void Register_ProgressBar()
-/* 功能：注册部件类型-进度条至部件库 */
+/* 注册进度条部件类型 */
 {
 	/* 添加部件类型 */
 	WidgetType_Add("progress_bar");

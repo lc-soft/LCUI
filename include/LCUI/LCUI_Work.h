@@ -53,6 +53,7 @@ typedef enum _WidgetEvent_ID
 {
 	EVENT_DRAG,	/* 部件的拖动事件 */
 	EVENT_CLICKED,	/* 部件的点击事件 */
+	EVENT_MOVE,	/* 部件的移动事件 */
 	EVENT_KEYBOARD,	/* 按键事件 */
 	EVENT_FOCUS_IN,	/* 得到焦点 */
 	EVENT_FOCUS_OUT	/* 失去焦点 */

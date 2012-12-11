@@ -46,52 +46,50 @@
 #include LC_PICBOX_H
 #include LC_CHECKBOX_H
 #include LC_GRAPH_H
-#include LC_RES_H 
-#include LC_MISC_H 
+#include LC_RES_H
 #include LC_INPUT_H
 
 void Set_CheckBox_On(LCUI_Widget *widget)
 /* 功能：设定复选框为选中状态 */
 {
-	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-			Get_Widget_PrivData(widget); 
-	
-	check_box->on = IS_TRUE;
+	LCUI_CheckBox *check_box;
+	check_box = Get_Widget_PrivData(widget); 
+	check_box->on = TRUE;
 	Draw_Widget(widget);
 }
 
 void Set_CheckBox_Off(LCUI_Widget *widget)
 /* 功能：设定复选框为未选中状态 */
 {
-	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-			Get_Widget_PrivData(widget); 
-	
-	check_box->on = IS_FALSE;
+	LCUI_CheckBox *check_box;
+	check_box = Get_Widget_PrivData(widget); 
+	check_box->on = FALSE;
 	Draw_Widget(widget);
 }
 
 int Get_CheckBox_Status(LCUI_Widget *widget)
 /* 功能：获取复选框的状态 */
 {
-	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-			Get_Widget_PrivData(widget); 
-	
+	LCUI_CheckBox *check_box;
+	check_box = Get_Widget_PrivData(widget); 
 	return check_box->on;
 }
 
 int CheckBox_Is_On(LCUI_Widget *widget)
 /* 功能：检测复选框是否被选中 */
 {
-	if(IS_TRUE == Get_CheckBox_Status(widget))
+	if( Get_CheckBox_Status(widget)) {
 		return 1;
-	
+	}
 	return 0;
 }
 
 int CheckBox_Is_Off(LCUI_Widget *widget)
 /* 功能：检测复选框是否未选中 */
 {
-	if(IS_TRUE == Get_CheckBox_Status(widget)) return 0;
+	if( Get_CheckBox_Status(widget) ) {
+		return 0;
+	}
 	return 1;
 }
 
@@ -101,14 +99,19 @@ void Switch_CheckBox_Status(LCUI_Widget *widget, void *arg)
  * 说明：这个状态，指的是打勾与没打勾的两种状态
  *  */
 { 
-	if(CheckBox_Is_On(widget)) Set_CheckBox_Off(widget);
-	else Set_CheckBox_On(widget); 
+	if(CheckBox_Is_On(widget)) {
+		Set_CheckBox_Off(widget);
+	} else {
+		Set_CheckBox_On(widget); 
+	}
 }
 
 void CheckBox_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
 /* 功能：设定复选框中的图像框的尺寸 */
 {
-	if(size.w <= 0 && size.h <= 0) return;
+	if(size.w <= 0 && size.h <= 0) {
+		return;
+	}
 		
 	LCUI_Widget *imgbox = Get_CheckBox_ImgBox(widget);
 	Resize_Widget(imgbox, size);
@@ -120,8 +123,9 @@ static void CheckBox_Init(LCUI_Widget *widget)
 /* 功能：初始化复选框部件的数据 */
 {
 	LCUI_Widget *container[2];
-	LCUI_CheckBox *check_box = (LCUI_CheckBox*)
-		Widget_Create_PrivData(widget, sizeof(LCUI_CheckBox));
+	LCUI_CheckBox *check_box;
+	
+	check_box = Widget_Create_PrivData(widget, sizeof(LCUI_CheckBox));
 	
 	check_box->on = FALSE;
 	/* 初始化图像数据 */ 
@@ -198,37 +202,38 @@ static void Exec_Draw_CheckBox(LCUI_Widget *widget)
 /* 功能：更新复选框的图形数据 */
 {
 	LCUI_Graph *p;
-	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-			Get_Widget_PrivData(widget); 
+	LCUI_CheckBox *check_box;
+	
+	check_box = Get_Widget_PrivData(widget); 
 								
-	if(Strcmp(&widget->style, "custom") == 0){
+	if(Strcmp(&widget->style, "custom") == 0) {
 		/* 如果为自定义风格，那就使用用户指定的图形，具体可参考按钮部件的处理方法 */ 
-		if(widget->enabled == IS_FALSE) 
+		if( !widget->enabled ) {
 			widget->status = WIDGET_STATUS_DISABLE;
-			
+		}
 		switch(widget->status){
 		case WIDGET_STATUS_NORMAL:
-			if(check_box->on == IS_TRUE)
+			if( check_box->on ) {
 				p = &check_box->img_on_normal;
-			else
+			} else {
 				p = &check_box->img_off_normal;
-			
+			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
 		case WIDGET_STATUS_OVERLAY :
-			if(check_box->on == IS_TRUE)
+			if( check_box->on ) {
 				p = &check_box->img_on_over;
-			else
+			} else {
 				p = &check_box->img_off_over;
-			
+			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
 		case WIDGET_STATUS_CLICKING : 
-			if(check_box->on == IS_TRUE)
+			if( check_box->on ) {
 				p = &check_box->img_on_down;
-			else
+			} else {
 				p = &check_box->img_off_down;
-			
+			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
 		case WIDGET_STATUS_CLICKED : 
@@ -236,11 +241,11 @@ static void Exec_Draw_CheckBox(LCUI_Widget *widget)
 		case WIDGET_STATUS_FOCUS : 
 			break;
 		case WIDGET_STATUS_DISABLE :
-			if(check_box->on == IS_TRUE)
+			if( check_box->on ) {
 				p = &check_box->img_on_disable;
-			else
+			} else {
 				p = &check_box->img_off_disable;
-			
+			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p); 
 			break;
 			default :
@@ -260,26 +265,27 @@ static void Exec_Draw_CheckBox(LCUI_Widget *widget)
 		
 		switch(widget->status) { 
 		case WIDGET_STATUS_NORMAL:
-			if(check_box->on == IS_TRUE)
+			if( check_box->on ) {
 				Load_Graph_Default_CheckBox_On_Normal(p);
-			else
+			} else {
 				Load_Graph_Default_CheckBox_Off_Normal(p);
+			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
 		case WIDGET_STATUS_OVERLAY :
-			if(check_box->on == IS_TRUE)
+			if( check_box->on ) {
 				Load_Graph_Default_CheckBox_On_Selected(p);
-			else
+			} else {
 				Load_Graph_Default_CheckBox_Off_Selected(p);
-			
+			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
 		case WIDGET_STATUS_CLICKING : 
-			if(check_box->on == IS_TRUE)
+			if( check_box->on ) {
 				Load_Graph_Default_CheckBox_On_Selected(p);
-			else
+			} else {
 				Load_Graph_Default_CheckBox_Off_Selected(p);
-			
+			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
 		case WIDGET_STATUS_CLICKED : 
@@ -287,11 +293,11 @@ static void Exec_Draw_CheckBox(LCUI_Widget *widget)
 		case WIDGET_STATUS_FOCUS : 
 			break;
 		case WIDGET_STATUS_DISABLE :
-			if(check_box->on == IS_TRUE)
+			if( check_box->on ) {
 				Load_Graph_Default_CheckBox_On_Disabled(p);
-			else
+			} else {
 				Load_Graph_Default_CheckBox_Off_Disabled(p);
-			
+			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
 			default : break;
@@ -302,20 +308,24 @@ static void Exec_Draw_CheckBox(LCUI_Widget *widget)
 LCUI_Widget *Get_CheckBox_Label(LCUI_Widget *widget)
 /* 功能：获取复选框部件中的label部件的指针 */
 {
-	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-			Get_Widget_PrivData(widget); 
-	if(NULL == check_box)
+	LCUI_CheckBox *check_box;
+	
+	check_box = Get_Widget_PrivData(widget); 
+	if( !check_box ) {
 		return NULL;
-		
+	}
 	return check_box->label;
 }
 
 LCUI_Widget *Get_CheckBox_ImgBox(LCUI_Widget *widget)
 /* 功能：获取复选框部件中的PictureBox部件的指针 */
 {
-	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-			Get_Widget_PrivData(widget); 
-	if(NULL == check_box) return NULL;
+	LCUI_CheckBox *check_box;
+	
+	check_box = Get_Widget_PrivData(widget);
+	if( !check_box ) {
+		return NULL;
+	}
 		
 	return check_box->imgbox;
 }
@@ -333,14 +343,16 @@ void Set_CheckBox_Text(LCUI_Widget *widget, const char *fmt, ...)
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
 	va_end(ap);
 
-	Set_Label_Text(label, text); 
+	Label_Text(label, text); 
 }
 
 LCUI_Widget *Create_CheckBox_With_Text(const char *fmt, ...)
 /* 功能：创建一个带文本内容的复选框 */
 {
 	char text[LABEL_TEXT_MAX_SIZE];
-	LCUI_Widget *widget = Create_Widget("check_box");
+	LCUI_Widget *widget;
+	
+	widget = Create_Widget("check_box");
 	
 	memset(text, 0, sizeof(text)); 
     
@@ -355,7 +367,7 @@ LCUI_Widget *Create_CheckBox_With_Text(const char *fmt, ...)
 
 
 void Register_CheckBox()
-/* 功能：注册部件类型-窗口至部件库 */
+/* 功能：注册多选框部件类型 */
 {
 	/* 添加几个部件类型 */
 	WidgetType_Add("check_box"); 

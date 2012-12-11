@@ -22,7 +22,7 @@ int main()
 	Graph_Create(&fg, w, h);
 	printf("graph size: %dx%d\n", w, h);
 	time = clock(); //开始计时
-	for(i=0; i<=255; ++i){
+	for(i=0; i<=255; i+=5){
 		t = clock(); 
 		nobuff_printf("[%2d] mix graph, alpha = %3d, use time: ", i, i);
 		Graph_Fill_Alpha(&fg, i);

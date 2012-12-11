@@ -65,8 +65,7 @@ int main(int argc,char*argv[])
 	Set_PictureBox_Size_Mode(logo, SIZE_MODE_CENTER);
 	Set_PictureBox_Image_From_File(logo, "logo_128x128.png"); 
 	
-	Set_Label_Text(label, "LCUI 正在载入...");
-	Set_Label_Font(label, 15, NULL);
+	Label_Text(label, "LCUI 正在载入..."); 
 	Set_Widget_Align(logo, ALIGN_MIDDLE_CENTER, Pos(0, -20));
 	Set_Widget_Align(label, ALIGN_MIDDLE_CENTER, Pos(0, +70));
     /* 将这三个部件放入窗口客户区中 */

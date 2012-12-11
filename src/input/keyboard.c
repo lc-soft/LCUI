@@ -187,11 +187,12 @@ static BOOL proc_keyboard()
 	area.height = 240;
 	area.x = (Get_Screen_Width()-area.width)/2;
 	area.y = (Get_Screen_Height()-area.height)/2;
-	if ( !Check_Key ()) { /* 如果没有按键输入 */ 
+	 /* 如果没有按键输入 */ 
+	if ( !Check_Key ()) {
 		return FALSE;
 	}
 	key.code = Get_Key (); 
-	#define __NEED_CATCHSCREEN__
+	//#define __NEED_CATCHSCREEN__
 	#ifdef __NEED_CATCHSCREEN__
 	if(key.code == 'c')
 	{//当按下c键后，可以进行截图，只截取指定区域的图形
@@ -237,4 +238,3 @@ void Keyboard_Init()
 {
 	LCUI_Dev_Add( Enable_Key_Input, proc_keyboard, Disable_Key_Input);
 }
-/*************************** Key End **********************************/

@@ -47,7 +47,8 @@
 #include LC_WIDGET_H
 #include LC_PICBOX_H
 
-static void Destroy_PictureBox(LCUI_Widget* widget)
+static void 
+Destroy_PictureBox(LCUI_Widget* widget)
 /* 功能：释放图片盒子占用的内存资源 */
 {
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
@@ -57,11 +58,13 @@ static void Destroy_PictureBox(LCUI_Widget* widget)
 	Graph_Free(&pic_box->initial_image); 
 }
 
-static void PictureBox_Init(LCUI_Widget *widget)
+static void 
+PictureBox_Init(LCUI_Widget *widget)
 /* 功能：初始化图片盒子 */
 {
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-	Widget_Create_PrivData(widget, sizeof(LCUI_PictureBox));;
+	LCUI_PictureBox *pic_box;
+	
+	pic_box = Widget_Create_PrivData(widget, sizeof(LCUI_PictureBox));;
 	
 	Rect_Init(&pic_box->read_box);
 	pic_box->image		= NULL; 
@@ -76,8 +79,9 @@ static void PictureBox_Init(LCUI_Widget *widget)
 LCUI_Rect Get_PictureBox_View_Area(LCUI_Widget *widget)
 /* 功能：获取图片盒子的图片显示的区域 */
 {
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget);
+	LCUI_PictureBox *pic_box;
+	
+	pic_box = Get_Widget_PrivData(widget);
 	return pic_box->read_box;
 }
 
@@ -94,17 +98,21 @@ static int Update_BuffGraph(LCUI_Widget *widget)
 /* 功能：更新缩放后的图像的缓存 */
 {
 	float width = 0,height = 0;
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget);
-	if(!Graph_Valid(pic_box->image)) return -1;
+	LCUI_PictureBox *pic_box;
 	
+	pic_box = Get_Widget_PrivData(widget);
+	if(!Graph_Valid(pic_box->image)) {
+		return -1;
+	}
 	width = pic_box->scale * pic_box->image->width;
 	height = pic_box->scale * pic_box->image->height;
 	
-	if(pic_box->scale == 1.00) Graph_Free(&pic_box->buff_graph); 
-	else Graph_Zoom(pic_box->image, &pic_box->buff_graph,
+	if(pic_box->scale == 1.00) {
+		Graph_Free(&pic_box->buff_graph); 
+	} else {
+		Graph_Zoom(pic_box->image, &pic_box->buff_graph,
 				DEFAULT, Size(width, height)); 
-	
+	}
 	return 0;
 }
 
@@ -114,17 +122,22 @@ static int Update_ReadBox(LCUI_Widget *widget)
 	LCUI_Graph *p;
 	LCUI_Pos center_pos;
 	float width = 0,height = 0;
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget);
-	if(!Graph_Valid(pic_box->image)) return -1;
+	LCUI_PictureBox *pic_box;
 	
+	pic_box = Get_Widget_PrivData(widget);
+	if(!Graph_Valid(pic_box->image)) {
+		return -1;
+	}
 	/* 缩放后的图像尺寸 */
 	width = pic_box->scale * pic_box->image->width;
 	height = pic_box->scale * pic_box->image->height;
 	//printf("Update_ReadBox(): scale: %.4f, size: %.2f, %.2f\n", pic_box->scale, width, height);
 	
-	if(pic_box->scale == 1.00) p = pic_box->image;
-	else p = &pic_box->buff_graph;  
+	if(pic_box->scale == 1.00) {
+		p = pic_box->image;
+	} else {
+		p = &pic_box->buff_graph;  
+	}
 	
 	/* 如果部件的宽或者高不大于0 */
 	if( widget->size.w <= 0 || widget->size.h <= 0 ) { 
@@ -184,13 +197,14 @@ static int Update_ReadBox(LCUI_Widget *widget)
 	return 0;
 }
 
-static void Exec_Update_PictureBox(LCUI_Widget *widget)
+static void 
+Exec_Update_PictureBox(LCUI_Widget *widget)
 /* 功能：更新PictureBox部件 */
 {
 	LCUI_Pos pos;
 	LCUI_PictureBox *pic_box;
-	LCUI_Graph graph, *p; 
-	//printf("Exec_Update_PictureBox(): start\n");
+	LCUI_Graph graph, *p;
+	
 	pos = Pos(0,0);
 	Graph_Init(&graph); 
 	pic_box  = (LCUI_PictureBox*)Get_Widget_PrivData(widget);
@@ -199,7 +213,9 @@ static void Exec_Update_PictureBox(LCUI_Widget *widget)
 	//Print_Graph_Info(&widget->graph);
 	//Print_Graph_Info(pic_box->image);
 	//printf("Exec_Update_PictureBox(): 1\n");
-	if(! Graph_Valid(pic_box->image)) return;
+	if(! Graph_Valid(pic_box->image)) {
+		return;
+	}
 	
 	//printf("Exec_Update_PictureBox(): widget size: w: %d, h: %d\n", widget->size.w, widget->size.h);
 	//printf("Exec_Update_PictureBox(): read box: %d,%d,%d,%d\n",
@@ -263,8 +279,8 @@ static void Exec_Update_PictureBox(LCUI_Widget *widget)
 	//pic_box->read_box.width, pic_box->read_box.height, 
 	//pic_box->read_box.x + pic_box->read_box.width, pic_box->buff_graph.width, 
 	//pic_box->read_box.y + pic_box->read_box.height, pic_box->buff_graph.height);
-	if(!Graph_Valid(&widget->background_image)) { 
-		Graph_Replace(&widget->graph, &graph, pos); 
+	if(!Graph_Valid(&widget->background_image)) {
+		Graph_Replace(&widget->graph, &graph, pos);
 	} else {
 		Graph_Mix(&widget->graph, &graph, pos);
 	}
@@ -283,7 +299,7 @@ float Get_PictureBox_Zoom_Scale(LCUI_Widget *widget)
 }
 
 
-static int init = IS_FALSE;
+static int graph_mem_init = FALSE;
 static LCUI_Queue picbox_graph_mem;
 
 typedef struct _graph_data
@@ -293,14 +309,16 @@ typedef struct _graph_data
 }
 graph_data;
 
-static void destroy_graph_data(void *data)
+static void 
+destroy_graph_data(void *data)
 {
 	graph_data *p = (graph_data *)data;
 	Graph_Free(p->image);
 	free(p->image);
 }
 
-static int find_widget_data(LCUI_Widget *widget)
+static int 
+find_widget_data(LCUI_Widget *widget)
 {
 	graph_data *temp;
 	int total, i;
@@ -315,15 +333,15 @@ static int find_widget_data(LCUI_Widget *widget)
 	return -1;
 }
 
-
 void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 /* 功能：添加一个图片数据至图片盒子 */
 { 
 	int i;
 	float scale_x,scale_y;
 	LCUI_Graph *graph = image; 
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget); 
+	LCUI_PictureBox *pic_box;
+	
+	pic_box = Get_Widget_PrivData(widget);
 	for(i = 0;i < 2; ++i) {
 		/* 如果image有效 */ 
 		if(Graph_Valid(graph)) {
@@ -406,7 +424,7 @@ void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 		if(data->image != image) {
 			Queue_Delete(&picbox_graph_mem, i);
 		}
-	} 
+	}
 	Draw_Widget(widget);
 }
 
@@ -414,49 +432,49 @@ void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 int Set_PictureBox_Image_From_File(LCUI_Widget *widget, char *image_file)
 /* 功能：添加一个图片文件，并载入至图片盒子 */
 {
-	int value;
+	int ret;
 	graph_data data;
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-			Get_Widget_PrivData(widget);
+	LCUI_PictureBox *pic_box;
 	LCUI_Graph *graph;
 	
-	if(init == IS_FALSE) {
+	pic_box = Get_Widget_PrivData(widget);
+	if( !graph_mem_init ) {
 		Queue_Init( &picbox_graph_mem, 
 			sizeof(graph_data), destroy_graph_data);
-		init = IS_TRUE;
+		graph_mem_init = TRUE;
 	}
 	/* 如果在记录中没找到该部件，那么就分配内存，否则，直接使用那块内存 */
-	value = find_widget_data(widget);
-	if(value == -1) {
+	ret = find_widget_data(widget);
+	if(ret == -1) {
 		data.image = (LCUI_Graph*) calloc(1, sizeof(LCUI_Graph));
 		data.widget = widget;
 		Queue_Add(&picbox_graph_mem, &data); 
 	} else {
-		data = *(graph_data*)Queue_Get(&picbox_graph_mem, value); 
+		data = *(graph_data*)Queue_Get(&picbox_graph_mem, ret); 
 	}
 	graph = data.image;
 	
 	pic_box->image_status = IMAGE_STATUS_LOADING; /* 图片状态为正在载入 */
 	Set_PictureBox_Image_From_Graph(widget, NULL);
-	value = Load_Image(image_file, graph);/* 载入图片文件 */ 
-	if(value != 0) {
-		/* 载入失败 */
-		pic_box->image_status = IMAGE_STATUS_FAIL;
-		Set_PictureBox_Image_From_Graph(widget, NULL);
-	} else {
+	ret = Load_Image( image_file, graph );/* 载入图片文件 */
+	if( ret == 0 ) {
 		/* 载入成功 */
 		pic_box->image_status = IMAGE_STATUS_SUCCESS; 
 		Set_PictureBox_Image_From_Graph(widget, graph);
+	} else {
+		/* 载入失败 */
+		pic_box->image_status = IMAGE_STATUS_FAIL;
+		Set_PictureBox_Image_From_Graph(widget, NULL);
 	}
-	 
-	return value;
+	return ret;
 }
 
 int Set_PictureBox_ErrorImage(LCUI_Widget *widget, LCUI_Graph *pic)
 /* 功能：设定当加载图像失败时显示的图像 */
 {
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget);
+	LCUI_PictureBox *pic_box;
+	
+	pic_box = Get_Widget_PrivData(widget);
 	
 	if(Graph_Valid(pic)) {
 		Graph_Copy(&pic_box->error_image, pic);
@@ -468,7 +486,9 @@ int Set_PictureBox_ErrorImage(LCUI_Widget *widget, LCUI_Graph *pic)
 int Set_PictureBox_InitImage(LCUI_Widget *widget, LCUI_Graph *pic)
 /* 功能：设定正在加载另一图像时显示的图像 */
 {
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)Get_Widget_PrivData(widget);
+	LCUI_PictureBox *pic_box;
+	
+	pic_box = Get_Widget_PrivData(widget);
 	
 	if(Graph_Valid(pic)) {
 		Graph_Copy(&pic_box->initial_image, pic);
@@ -480,25 +500,34 @@ int Set_PictureBox_InitImage(LCUI_Widget *widget, LCUI_Graph *pic)
 void Set_PictureBox_Size_Mode(LCUI_Widget *widget, int mode)
 /* 功能：设定图片盒子的图像显示模式 */
 {
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget);
+	LCUI_PictureBox *pic_box;
+	LCUI_Size my_size;
 	
-	if(pic_box->size_mode == mode) return;
+	pic_box = Get_Widget_PrivData(widget);
+	
+	if(pic_box->size_mode == mode) {
+		return;
+	}
 	
 	float scale_x,scale_y;
 	pic_box->size_mode = mode;
-	if(pic_box->image == NULL) return; 
-	
+	if( !pic_box->image ) {
+		return; 
+	}
+	my_size = _Get_Widget_Size( widget );
 	switch(mode) {
 	case SIZE_MODE_BLOCK_ZOOM:
 	case SIZE_MODE_ZOOM:
-		if( widget->size.w <= 0 || widget->size.h <= 0) {
+		if( my_size.w <= 0 || my_size.h <= 0) {
 			pic_box->scale = 1.0; 
 		} else {
-			scale_x = (float)widget->size.w / pic_box->image->width;
-			scale_y = (float)widget->size.h / pic_box->image->height;
-			if(scale_x < scale_y) pic_box->scale = scale_x;
-			else pic_box->scale = scale_y; 	
+			scale_x = (float)my_size.w / pic_box->image->width;
+			scale_y = (float)my_size.h / pic_box->image->height;
+			if(scale_x < scale_y) {
+				pic_box->scale = scale_x;
+			} else {
+				pic_box->scale = scale_y;
+			}
 		}
 		Zoom_PictureBox_View_Area(widget, pic_box->scale); 
 		break;
@@ -512,12 +541,16 @@ void Resize_PictureBox_View_Area(LCUI_Widget *widget, int width, int height)
 /* 功能：设定PictureBox部件的图片显示区域的大小 */
 {
 	LCUI_Pos start, center_pos;
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget);
+	LCUI_PictureBox *pic_box;
 	
-	if(width <= 0 || height <= 0) return;
+	pic_box = Get_Widget_PrivData(widget);
 	
-	if(!Graph_Valid(pic_box->image)) return;
+	if(width <= 0 || height <= 0) {
+		return;
+	}
+	if(!Graph_Valid(pic_box->image)) {
+		return;
+	}
 	/* 将中心点位置转换成坐标 */
 	center_pos.x = pic_box->read_box.center_x * pic_box->scale * pic_box->image->width;
 	center_pos.y = pic_box->read_box.center_y * pic_box->scale * pic_box->image->height;
@@ -550,8 +583,9 @@ void Resize_PictureBox_View_Area(LCUI_Widget *widget, int width, int height)
 LCUI_Graph *Get_PictureBox_Graph(LCUI_Widget *widget)
 /* 功能：获取PictureBox部件内的图像指针 */
 {
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-			Get_Widget_PrivData(widget);
+	LCUI_PictureBox *pic_box;
+	
+	pic_box = Get_Widget_PrivData(widget);
 	return pic_box->image;
 }
 
@@ -560,29 +594,37 @@ int Move_PictureBox_View_Area(LCUI_Widget *widget, LCUI_Pos des_pos)
 {
 	LCUI_Size size;
 	LCUI_Graph *p;
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget);
+	LCUI_PictureBox *pic_box;
 	
-	if(!Graph_Valid(pic_box->image)) return -1;
-		
-	if(pic_box->scale == 1.00 || !Graph_Valid(&pic_box->buff_graph))
+	pic_box = Get_Widget_PrivData(widget);
+	
+	if(!Graph_Valid(pic_box->image)) {
+		return -1;
+	}
+	if(pic_box->scale == 1.00 || !Graph_Valid(&pic_box->buff_graph)) {
 		p = pic_box->image;
-	else p = &pic_box->buff_graph;
-		
+	} else {
+		p = &pic_box->buff_graph;
+	}
 	size.w = pic_box->read_box.width;
 	size.h = pic_box->read_box.height;
 	/* 处理区域数据，使之为有效区域 */
-	if(des_pos.x < 0) des_pos.x = 0;
-	if(des_pos.y < 0) des_pos.y = 0;
-	if(des_pos.x + size.w > p->width)
-	des_pos.x = p->width - size.w;
-	if(des_pos.y + size.h > p->height)
-	des_pos.y = p->height - size.h;
-	
+	if(des_pos.x < 0) {
+		des_pos.x = 0;
+	}
+	if(des_pos.y < 0) {
+		des_pos.y = 0;
+	}
+	if(des_pos.x + size.w > p->width) {
+		des_pos.x = p->width - size.w;
+	}
+	if(des_pos.y + size.h > p->height) {
+		des_pos.y = p->height - size.h;
+	}
 	if(des_pos.x == pic_box->read_box.x 
-	&& des_pos.y == pic_box->read_box.y)
+	&& des_pos.y == pic_box->read_box.y) {
 		return 0; 
-		
+	}
 	/* 更新图片盒子内的图像 */
 	pic_box->read_box.x = des_pos.x;
 	pic_box->read_box.y = des_pos.y;
@@ -605,18 +647,25 @@ int Zoom_PictureBox_View_Area(LCUI_Widget *widget, float scale)
 /* 功能：缩放PictureBox部件的图片浏览区域 */
 {
 	LCUI_Graph buff, temp;
-	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget);
-	if(!Graph_Valid(pic_box->image)) return -1;
+	LCUI_PictureBox *pic_box;
 	
+	pic_box = Get_Widget_PrivData(widget);
+	if(!Graph_Valid(pic_box->image)) {
+		return -1;
+	}
 	Graph_Init(&buff);
 	Graph_Init(&temp);
 	/* 有效范围为2%~2000% */
-	if(scale < 0.02) scale = 0.02;
-	if(scale > 20) scale = 20;
+	if(scale < 0.02) {
+		scale = 0.02;
+	}
+	if(scale > 20) {
+		scale = 20;
+	}
 	if(pic_box->size_mode != SIZE_MODE_ZOOM
-	 && pic_box->size_mode != SIZE_MODE_BLOCK_ZOOM) 
+	 && pic_box->size_mode != SIZE_MODE_BLOCK_ZOOM) {
 		pic_box->size_mode = SIZE_MODE_ZOOM; /* 改为缩放模式 */
+	}
 	pic_box->scale = scale; 
 	Update_BuffGraph(widget); 
 	Update_ReadBox(widget);
@@ -631,48 +680,50 @@ static void Exec_Resize_PictureBox(LCUI_Widget *widget)
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
 				Get_Widget_PrivData(widget);
 	float scale_x, scale_y;
-	
-	if(widget->size.w * widget->size.h > 0) {
-		switch(pic_box->size_mode) {
-		case SIZE_MODE_BLOCK_ZOOM:
-			/* 重新改变图像浏览区域的尺寸，这个尺寸指的是从源图像中截取出的图像的尺寸 */
-			Resize_PictureBox_View_Area(
-				widget, 
-				widget->size.w / pic_box->scale, 
-				widget->size.h / pic_box->scale );
-			/* 以现在的缩放比例重新生成缩放后的图像 */
-			Zoom_PictureBox_View_Area(widget, pic_box->scale);
-			break;
-		case SIZE_MODE_ZOOM:
-			if(widget->size.w <= 0 || widget->size.h <= 0) 
-				break; 
-			scale_x = (float)widget->size.w / pic_box->image->width;
-			scale_y = (float)widget->size.h / pic_box->image->height;
-			if(scale_x < scale_y) pic_box->scale = scale_x;
-			else pic_box->scale = scale_y; 
-			//printf("Exec_Resize_PictureBox(): scale: %.4f, x: %.4f, y: %.4f\n", pic_box->scale, scale_x, scale_y);
-			Zoom_PictureBox_View_Area(widget, pic_box->scale); 
-			//printf("Exec_Resize_PictureBox(): read box: %d,%d,%d,%d\n",
-			//pic_box->read_box.x, pic_box->read_box.y, 
-			//pic_box->read_box.width, pic_box->read_box.height);
-			break;
-		case SIZE_MODE_NORMAL:/* 正常模式 */
-			break;
-		case SIZE_MODE_STRETCH:/* 拉伸模式 */
-			break;
-		case SIZE_MODE_TILE:/* 平铺模式 */
-			break;
-		case SIZE_MODE_CENTER: /* 居中模式 */ 
-			Resize_PictureBox_View_Area(widget, widget->size.w, widget->size.h);
-			break;
-			default : break;
-		}
+	if( widget->size.w <= 0 || widget->size.h <= 0 ) {
+		Refresh_Widget(widget); 
+		return;
 	}
+	
+	switch(pic_box->size_mode) {
+	case SIZE_MODE_BLOCK_ZOOM:
+		/* 重新改变图像浏览区域的尺寸，这个尺寸指的是从源图像中截取出的图像的尺寸 */
+		Resize_PictureBox_View_Area(
+			widget, 
+			widget->size.w / pic_box->scale, 
+			widget->size.h / pic_box->scale );
+		/* 以现在的缩放比例重新生成缩放后的图像 */
+		Zoom_PictureBox_View_Area(widget, pic_box->scale);
+		break;
+	case SIZE_MODE_ZOOM:
+		if(widget->size.w <= 0 || widget->size.h <= 0) {
+			break; 
+		}
+		scale_x = (float)widget->size.w / pic_box->image->width;
+		scale_y = (float)widget->size.h / pic_box->image->height;
+		if(scale_x < scale_y) pic_box->scale = scale_x;
+		else pic_box->scale = scale_y; 
+		//printf("Exec_Resize_PictureBox(): scale: %.4f, x: %.4f, y: %.4f\n", pic_box->scale, scale_x, scale_y);
+		Zoom_PictureBox_View_Area(widget, pic_box->scale); 
+		//printf("Exec_Resize_PictureBox(): read box: %d,%d,%d,%d\n",
+		//pic_box->read_box.x, pic_box->read_box.y, 
+		//pic_box->read_box.width, pic_box->read_box.height);
+		break;
+	case SIZE_MODE_NORMAL:/* 正常模式 */
+	case SIZE_MODE_STRETCH:/* 拉伸模式 */
+	case SIZE_MODE_TILE:/* 平铺模式 */
+		break;
+	case SIZE_MODE_CENTER: /* 居中模式 */ 
+		Resize_PictureBox_View_Area(widget, widget->size.w, widget->size.h);
+		break;
+		default : break;
+	}
+	
 	Refresh_Widget(widget); 
 }
 
 void Register_PictureBox()
-/* 功能：注册部件类型-按钮至部件库 */
+/* 注册图片部件类型 */
 {
 	/* 添加部件类型 */
 	WidgetType_Add("picture_box");

@@ -35,10 +35,10 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-noinst_PROGRAMS = helloworld2$(EXEEXT) helloworld$(EXEEXT) \
-	test_font$(EXEEXT) test_radiobtn$(EXEEXT) \
-	test_checkbox$(EXEEXT) test_progressbar$(EXEEXT) \
-	test_button$(EXEEXT) test_label$(EXEEXT) test_loading$(EXEEXT) \
+noinst_PROGRAMS = helloworld$(EXEEXT) test_font$(EXEEXT) \
+	test_radiobtn$(EXEEXT) test_checkbox$(EXEEXT) \
+	test_progressbar$(EXEEXT) test_button$(EXEEXT) \
+	test_label$(EXEEXT) test_loading$(EXEEXT) \
 	ts_calibrate$(EXEEXT) test_viewimage$(EXEEXT) \
 	test_lcui_graph_mix$(EXEEXT) test_window$(EXEEXT) \
 	test_rect_cut$(EXEEXT) test_gaussian_blur$(EXEEXT) \
@@ -62,9 +62,6 @@ helloworld_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-am_helloworld2_OBJECTS = helloworld2.$(OBJEXT)
-helloworld2_OBJECTS = $(am_helloworld2_OBJECTS)
-helloworld2_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_button_OBJECTS = test_button.$(OBJEXT)
 test_button_OBJECTS = $(am_test_button_OBJECTS)
 test_button_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -145,47 +142,29 @@ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CCLD = $(am__v_CCLD_$(V))
 am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
 am__v_CCLD_0 = @echo "  CCLD  " $@;
-CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CXXFLAGS) $(CXXFLAGS)
-AM_V_CXX = $(am__v_CXX_$(V))
-am__v_CXX_ = $(am__v_CXX_$(AM_DEFAULT_VERBOSITY))
-am__v_CXX_0 = @echo "  CXX   " $@;
-CXXLD = $(CXX)
-CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CXXLD = $(am__v_CXXLD_$(V))
-am__v_CXXLD_ = $(am__v_CXXLD_$(AM_DEFAULT_VERBOSITY))
-am__v_CXXLD_0 = @echo "  CXXLD " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(helloworld_SOURCES) $(helloworld2_SOURCES) \
-	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
-	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
-	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
-	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
-	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
-	$(test_scrollbar_SOURCES) $(test_textbox_SOURCES) \
-	$(test_timer_SOURCES) $(test_viewimage_SOURCES) \
-	$(test_widget_1_SOURCES) $(test_widget_2_SOURCES) \
-	$(test_widget_3_SOURCES) $(test_window_SOURCES) \
-	$(ts_calibrate_SOURCES)
-DIST_SOURCES = $(helloworld_SOURCES) $(helloworld2_SOURCES) \
-	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
-	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
-	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
-	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
-	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
-	$(test_scrollbar_SOURCES) $(test_textbox_SOURCES) \
-	$(test_timer_SOURCES) $(test_viewimage_SOURCES) \
-	$(test_widget_1_SOURCES) $(test_widget_2_SOURCES) \
-	$(test_widget_3_SOURCES) $(test_window_SOURCES) \
-	$(ts_calibrate_SOURCES)
+SOURCES = $(helloworld_SOURCES) $(test_button_SOURCES) \
+	$(test_checkbox_SOURCES) $(test_font_SOURCES) \
+	$(test_gaussian_blur_SOURCES) $(test_label_SOURCES) \
+	$(test_lcui_graph_mix_SOURCES) $(test_loading_SOURCES) \
+	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
+	$(test_rect_cut_SOURCES) $(test_scrollbar_SOURCES) \
+	$(test_textbox_SOURCES) $(test_timer_SOURCES) \
+	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
+	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
+	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
+DIST_SOURCES = $(helloworld_SOURCES) $(test_button_SOURCES) \
+	$(test_checkbox_SOURCES) $(test_font_SOURCES) \
+	$(test_gaussian_blur_SOURCES) $(test_label_SOURCES) \
+	$(test_lcui_graph_mix_SOURCES) $(test_loading_SOURCES) \
+	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
+	$(test_rect_cut_SOURCES) $(test_scrollbar_SOURCES) \
+	$(test_textbox_SOURCES) $(test_timer_SOURCES) \
+	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
+	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
+	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -240,10 +219,6 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
-CXX = @CXX@
-CXXCPP = @CXXCPP@
-CXXDEPMODE = @CXXDEPMODE@
-CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
@@ -305,7 +280,6 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
-ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
@@ -361,8 +335,6 @@ SUBDIRS = mora photoviewer screenlock clock
 INCLUDES = -I$(top_builddir)/include
 helloworld_SOURCES = helloworld.c
 helloworld_LDADD = $(top_builddir)/src/libLCUI.la
-helloworld2_SOURCES = helloworld2.cpp
-helloworld2_LDADD = $(top_builddir)/src/libLCUI.la
 test_progressbar_SOURCES = test_progressbar.c
 test_progressbar_LDADD = $(top_builddir)/src/libLCUI.la
 test_label_SOURCES = test_label.c
@@ -404,7 +376,7 @@ test_scrollbar_LDADD = $(top_builddir)/src/libLCUI.la
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .cpp .lo .o .obj
+.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -447,9 +419,6 @@ clean-noinstPROGRAMS:
 helloworld$(EXEEXT): $(helloworld_OBJECTS) $(helloworld_DEPENDENCIES) 
 	@rm -f helloworld$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(helloworld_OBJECTS) $(helloworld_LDADD) $(LIBS)
-helloworld2$(EXEEXT): $(helloworld2_OBJECTS) $(helloworld2_DEPENDENCIES) 
-	@rm -f helloworld2$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(helloworld2_OBJECTS) $(helloworld2_LDADD) $(LIBS)
 test_button$(EXEEXT): $(test_button_OBJECTS) $(test_button_DEPENDENCIES) 
 	@rm -f test_button$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_button_OBJECTS) $(test_button_LDADD) $(LIBS)
@@ -515,7 +484,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helloworld.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helloworld2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_button.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_checkbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_font.Po@am__quote@
@@ -559,30 +527,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-.cpp.o:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
-
-.cpp.obj:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.cpp.lo:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo

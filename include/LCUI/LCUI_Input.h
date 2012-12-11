@@ -182,7 +182,11 @@ BOOL Enable_TouchScreen_Input();
 BOOL Disable_TouchScreen_Input();
 /* 功能：撤销鼠标输入处理 */ 
 
+void *Get_TouchScreen();
+/* 获取触屏设备文件句柄 */
+
 void TouchScreen_Init();
+/* 初始化触屏设备 */
 /*********************** TouchScreen End *******************************/
 
 LCUI_END_HEADER

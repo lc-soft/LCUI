@@ -267,37 +267,42 @@ int clearbuf(struct tsdev *ts)
 
 void *calibrate_func(void *widget)
 {
-	struct tsdev *ts = LCUI_Sys.ts.td;
-	if(ts != NULL)
-	{
+	struct tsdev *ts;
+	
+	ts = Get_TouchScreen();
+	if( ts ) {
 		calibration cal;
 		int cal_fd;
 		int width, height;
 		char cal_buffer[256];
 		char *calfile = NULL;
 		unsigned int i, len;
-		LCUI_Widget *cross = (LCUI_Widget *)widget;
+		LCUI_Widget *cross;
+		
+		cross = (LCUI_Widget*)widget;
+		
 		width = Get_Screen_Width();
 		height = Get_Screen_Height();
 		// Clear the buffer
 		clearbuf(ts);
 
-		get_sample (ts, &cal, 0, 50,        50,        cross);
+		get_sample (ts, &cal, 0, 50, 50, cross);
 		clearbuf(ts);
-		get_sample (ts, &cal, 1, width - 50, 50,        cross);
+		get_sample (ts, &cal, 1, width - 50, 50, cross);
 		clearbuf(ts);
 		get_sample (ts, &cal, 2, width - 50, height - 50, cross);
 		clearbuf(ts);
-		get_sample (ts, &cal, 3, 50,        height - 50, cross);
+		get_sample (ts, &cal, 3, 50, height - 50, cross);
 		clearbuf(ts);
-		get_sample (ts, &cal, 4, width / 2,   height / 2,  cross);
+		get_sample (ts, &cal, 4, width / 2, height / 2, cross);
 
-		if (perform_calibration (&cal)) 
-		{
+		if (perform_calibration (&cal)) {
 			printf ("Calibration constants: ");
-			for (i = 0; i < 7; i++) printf("%d ", cal.a [i]);
+			for (i = 0; i < 7; i++) {
+				printf("%d ", cal.a [i]);
+			}
 			printf("\n");
-			if ((calfile = getenv("TSLIB_CALIBFILE")) != NULL) {
+			if( (calfile = getenv("TSLIB_CALIBFILE")) ) {
 				cal_fd = open (calfile, O_CREAT | O_RDWR,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 			} else {
@@ -313,9 +318,10 @@ void *calibrate_func(void *widget)
 		} else {
 			printf("Calibration failed.\n"); 
 		}
-	}
-	else
+	} else {
 		printf("error: your device can not support touch screen!\n");
+	}
+	/* 退出主循环 */
 	Main_Loop_Quit();
 	LCUI_Thread_Exit(NULL);
 }
@@ -325,10 +331,8 @@ void Get_Path(char *filepath, char *out_path)
 {
 	int num; 
 	strcpy(out_path, filepath);
-	for(num = strlen(filepath) - 1; num >= 0; --num) 
-	{
-		if(filepath[num] == '/') 
-		{
+	for(num = strlen(filepath) - 1; num >= 0; --num) {
+		if(filepath[num] == '/') {
 			out_path[num+1] = 0;
 			return;
 		}
@@ -336,22 +340,27 @@ void Get_Path(char *filepath, char *out_path)
 	out_path[0] = 0;
 }
 
+void quit_window( LCUI_Widget *widget, LCUI_Key *key )
+{
+	if( key->code == KEY_ESC ) {
+		Main_Loop_Quit();
+	}
+}
 
 int main(int argc,char*argv[])
 /* 主函数，程序的入口 */
 {
-	pthread_t		thread;
-	LCUI_Widget	*window, *label, *click_pic; /* 使用指向widget部件的指针 */
-	LCUI_Graph		bg, pic_cross;/* 存储按钮各种状态要显示的图形 */
-	int				width, height;  
-	char			my_path[1024], file_path[1024]; /* 存储字符串 */
-	/**/
+	thread_t thread;
+	LCUI_Graph bg, pic_cross;
+	LCUI_Size wnd_size;
+	LCUI_Widget *window, *label, *click_pic;
+	char my_path[1024], file_path[1024];
+	
 	/* 自定义默认字体文件位置 */
-	//Set_Default_Font("/mnt/Data/LC-SOFT/fonts/微软雅黑.ttf");
 	Set_Default_Font("../fonts/msyh.ttf");
 	/* 初始化LCUI */
-	LCUI_Init(argc, argv); 
-	/* 初始化图片数据结构体 */
+	LCUI_Init(argc, argv);
+	
 	Graph_Init(&pic_cross); 
 	Graph_Init(&bg); 
 	
@@ -362,9 +371,7 @@ int main(int argc,char*argv[])
 	sprintf(file_path, "%sbg.png", my_path);
 	Load_Image(file_path, &bg);
 	
-	width  = Get_Screen_Width(); /* 获取屏幕的宽度 */
-	height = Get_Screen_Height(); /* 获取屏幕的高度 */ 
-	
+	wnd_size = Get_Screen_Size();
 	/* 创建一个窗口部件 */
 	window = Create_Widget("window"); 
 	/* 窗口部件边框风格为无(NONE) */
@@ -372,13 +379,13 @@ int main(int argc,char*argv[])
 	/* 部件背景图为bg，填充模式为拉伸 */
 	Set_Widget_Background_Image(window, &bg, FILL_MODE_STRETCH);
 	/* 改变部件尺寸 */
-	Resize_Widget(window, Size(width, height));
-	
+	Resize_Widget( window, wnd_size );
+	Set_Widget_StyleID( window, WINDOW_STYLE_LINE );
 	label       = Create_Widget("label"); /* 该部件用于显示文字 */ 
 	click_pic   = Create_Widget("picture_box"); /* 该部件用于显示图像 */
 	
 	/* 设定label部件显示的文本内容 */
-	Set_Label_Text(label, "点击圆圈中心，笔点校正");
+	Label_Text(label, "点击圆圈中心，笔点校正");
 	/* 调整部件的大小 */
 	Resize_Widget(click_pic, Size(pic_cross.width, pic_cross.height));
 	/* 设定部件中显示的图形 */
@@ -387,8 +394,7 @@ int main(int argc,char*argv[])
 	Set_Widget_Align(label, ALIGN_MIDDLE_CENTER, Pos(0, label->size.h + 1)); 
 	
 	/* 将返回键与Main_Loop_Quit函数关联，当返回键被按下后，程序退出主循环 */
-	LCUI_Key_Event_Connect(KEY_ESC, Main_Loop_Quit, NULL);
-	
+	Widget_Keyboard_Event_Connect( window, quit_window );
 	/* 将这两个部件放入窗口客户区内 */
 	Window_Client_Area_Add(window, label);
 	Window_Client_Area_Add(window, click_pic);
