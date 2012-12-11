@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Graphics.hpp -- C++ class of graphics processing
+ * LCUI_Graph.hpp -- C++ class for base graphics handling module
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Graphics.hpp -- 图形处理的C++类
+ * LCUI_Graph.hpp -- 基本图形处理模块的C++类
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -47,61 +47,107 @@
 
 class LCUIGraph
 {
-	public:
+public:
+	LCUIGraph();
+	~LCUIGraph();
+	BOOL isValid( void );
+	int isOpaque( void );
+	BOOL haveAlpha( void );
+	int create( int, int );
+	void copyTo( LCUIGraph & );
+	int quote( LCUIGraph &, LCUI_Rect );
+	int mix( LCUIGraph &, LCUI_Pos );
+	int tile( LCUIGraph & );
+	int fillImage( LCUI_Graph *, int, LCUI_RGB );
+	int fillAlpha( LCUI_Graph *, uchar_t );
+	int fillColor( LCUI_RGB );
+
+	int loadFromFile( const char * );
+	int writeToFile( const char * );
+	
+	LCUI_Graph *getGraph( void );
+	LCUI_Graph *getQuoteGraph( void );
+	LCUI_Rect getGraphValidRect( void );
+private:
 	LCUI_Graph graph;
-	
-	LCUIGraph():load(this)
-	{
-		Graph_Init(&graph); 
-	}
-	~LCUIGraph()
-	{
-		Graph_Free(&graph);
-	}
-	int isValid()
-	{
-		return Graph_Valid(&graph);
-	}
-	int haveAlpha()
-	{
-		return Graph_Have_Alpha(&graph);
-	}
-	int loadFromFile(const char *in_imgfile)
-	{
-		return Load_Image(in_imgfile, &graph);
-	}
-	int writeToFile(const char *out_imgfile)
-	{
-		return write_png(out_imgfile, &graph);
-	} 
-	
-	class _loadGraph
-	{
-		public:
-		LCUI_Graph *graph;
-		_loadGraph(LCUIGraph *object):icon(this)
-		{
-			graph = &object->graph; 
-		}
-		class _icon
-		{
-			public:
-			_icon(_loadGraph *object)
-			{
-				graph = &object->graph; 
-			}
-			void LCUI_18x18()
-			{
-				Load_Graph_Icon_LCUI_18x18(*graph);
-			}
-			private:
-			LCUI_Graph **graph; 
-		};
-		
-		_icon icon; 
-	};
-	_loadGraph load;
 };
+
+LCUIGraph::LCUIGraph()
+{
+	Graph_Init( &graph );
+}
+LCUIGraph::~LCUIGraph()
+{
+	Graph_Free( &graph );
+}
+BOOL LCUIGraph::isValid( void )
+{
+	return Graph_Valid( &graph );
+}
+int LCUIGraph::isOpaque( void )
+{
+	return Graph_Is_Opaque( &graph );
+}
+BOOL LCUIGraph::haveAlpha( void )
+{
+	return Graph_Have_Alpha( &graph );
+}
+int LCUIGraph::create( int w, int h )
+{
+	return Graph_Create( &graph, w, h );
+}
+void LCUIGraph::copyTo( LCUIGraph &des_graph )
+{
+	Graph_Copy( des_graph.getGraph(), &graph );
+}
+int LCUIGraph::quote( LCUIGraph &src_graph, LCUI_Rect area )
+{
+	Quote_Graph( &graph, src_graph.getGraph(), area );
+}
+
+int LCUIGraph::mix( LCUIGraph &fore_graph, LCUI_Pos pos )
+{
+	Graph_Mix( &graph, fore_graph.getGraph(), pos );
+}
+int LCUIGraph::tile( LCUIGraph &chunk )
+{
+	return Graph_Tile( chunk.getGraph(), &graph, graph.width, graph.height );
+}
+int LCUIGraph::fillImage( LCUI_Graph *bg, int flag, LCUI_RGB color )
+{
+	return Graph_Fill_Image( &graph, bg, flag, color );
+}
+int LCUIGraph::fillAlpha( LCUI_Graph *src, uchar_t alpha )
+{
+	return Graph_Fill_Alpha( &graph, alpha );
+}
+int LCUIGraph::fillColor( LCUI_RGB color )
+{
+	return Graph_Fill_Color( &graph, color );
+}
+
+int LCUIGraph::loadFromFile( const char *in_imgfile )
+{
+	return Load_Image( in_imgfile, &graph );
+}
+int LCUIGraph::writeToFile( const char *out_imgfile )
+{
+	/* 暂时只能创建png文件 */
+	return write_png( out_imgfile, &graph );
+}
+
+LCUI_Graph *LCUIGraph::getGraph( void )
+{
+	return &graph;
+}
+LCUI_Graph *LCUIGraph::getQuoteGraph( void )
+{
+	return Get_Quote_Graph( &graph );
+}
+LCUI_Rect LCUIGraph::getGraphValidRect( void )
+{
+	return Get_Graph_Valid_Rect( &graph );
+}
 #endif
 
 #endif
