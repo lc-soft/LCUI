@@ -1,4 +1,32 @@
-CHANGES BETWEEN 0.12.3 and 0.12.4
+CHANGES BETWEEN 0.12.5 and 0.12.6
+
+	- LCUI class renamed to LCUIApp, some widget C++ class changed to 
+	  inherited from the LCUIWidget class, cancel previous nested class.
+	- Re-planning project source code, and prepare for the future of 
+	  cross-platform.
+	- Add new widget: TextBox and ScrollBar, the TextBox also only have 
+	  the basic functions, pending to continue to improve.
+	- Add TextLayer module for handling text-bitmap drawing.
+	- The default style of window has been modified.
+	- Add timer function, ActvieBox widget animation each frame update 
+	  has been changed to use the timer.
+	- widget can get focus, you can connect FocusIn and FocusOut event 
+	  for response to widget get/lose focus.
+	- Keyboard input event mechanism has been modified, when keyboard 
+	  input, keyboard event default sent to the Focus Widget.
+	- Re-planning widget attributes, the widget update processing function 
+	  has been modified.
+	- Add new widget attributes: padding, you can adjust the padding 
+	  of the widget.
+	- Add new widget attributes: dock, you can set Widget's dock type.
+	- Add STATIC positioning type for widget, this positioning type of 
+	  widget will according to display order Auto-Arrange.
+	- Widget size support expressed as percentage, When the container 
+	  size has been changed, the widget's size will also change.
+	  
+======================================================================
+
+CHANGES BETWEEN 0.12.4 and 0.12.5
 
 	- Add C + + class to some function modules, please see the 
 	  helloworld2.cpp file for more details.
