@@ -2,6 +2,14 @@
 
 ![LCUI Logo](https://raw.github.com/lc-soft/LCUI/gh-pages/files/images/lc-soft-logo.png)
 
+## Screenshort
+![screenshort 1](http://lcui.org/files/images/helloworld-01.png)
+![screenshort 2](http://lcui.org/files/images/label-01.png)
+![screenshort 3](http://lcui.org/files/images/devlog/test_textbox-05.gif)
+![screenshort 4](http://lcui.org/files/images/devlog/2012-12-03-17-24-03.png)
+![screenshort 5](http://lcui.org/files/images/mora-01.gif)
+![screenshort 6](http://lcui.org/files/images/test_LCPV-3.gif)
+
 ## 说明
 
 LCUI 是 GNU/Linux 平台上的一款自由软件，主要面向嵌入式，注重易用性和性能。
