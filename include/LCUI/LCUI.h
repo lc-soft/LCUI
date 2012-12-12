@@ -294,19 +294,19 @@ struct _LCUI_Key
 /************ 保存RGB配色数据 *************/
 struct _LCUI_RGB
 {
-	unsigned char red;
-	unsigned char green;
-	unsigned char blue;
+	uchar_t red;
+	uchar_t green;
+	uchar_t blue;
 }; 
 /****************************************/
 
 /************ 保存RGBA配色数据 *************/
 struct _LCUI_RGBA
 {
-	unsigned char red;
-	unsigned char green;
-	unsigned char blue;
-	unsigned char alpha;
+	uchar_t red;
+	uchar_t green;
+	uchar_t blue;
+	uchar_t alpha;
 }; 
 /****************************************/
 
@@ -327,8 +327,8 @@ struct _LCUI_Size
 /*************** 记录像素点信息 *******************/
 struct _Pixel
 {
-	LCUI_Pos	pos;	/* 位置 */ 
-	LCUI_RGB	rgb;	/* RGBA值 */
+	LCUI_Pos pos;	/* 位置 */ 
+	LCUI_RGB rgb;	/* RGBA值 */
 };
 /***********************************************/
 
@@ -370,7 +370,7 @@ struct _LCUI_WChar_T
 	wchar_t		char_code;	/* 字符码 */
 	LCUI_FontBMP	bitmap;		/* 字符的位图数据 */
 	LCUI_RGB	color;		/* 该文字的配色 */
-	int		update;		/* 标明这个字符是否需要刷新 */ 
+	BOOL		update;		/* 标明这个字符是否需要刷新 */ 
 	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */		   
 };
 /****************************************************************/
@@ -401,12 +401,12 @@ struct _LCUI_Graph
 	LCUI_Pos pos;		/* 在引用另一个图层中的图形时，会保存区域的起点位置 */
 	int width, height;	/* 尺寸 */
 	
-	unsigned char	**rgba;	/* 图片数组 */
-	unsigned char	alpha;	/* 全局透明度，表示整张图片的透明度，默认为255 */
+	uchar_t**	rgba;	/* 图片数组 */
+	uchar_t	alpha;	/* 全局透明度，表示整张图片的透明度，默认为255 */
 	
-	int have_alpha;	/* 标志，指定是否需要透明度，分配内存时会根据它分配 */
-	int is_opaque;	/* 标志，指定该图形是否为不透明 */
-	int not_visible; /* 标志，指定该图形是否不可见，也就是全透明 */
+	BOOL have_alpha;	/* 标志，指定是否需要透明度，分配内存时会根据它分配 */
+	BOOL is_opaque;		/* 标志，指定该图形是否为不透明 */
+	BOOL not_visible;	/* 标志，指定该图形是否不可见，也就是全透明 */
 };
 /**********************************************************************/
 
@@ -609,9 +609,8 @@ struct _LCUI_Widget
 /************************ LCUI程序的数据 *******************************/
 struct _LCUI_App 
 {
-	int		stop_loop;	/* 一个标志，用于指示是否停止主循环 */
-	int		flag;		/* 一个标志，目前是将它作为是否处理部件局部刷新区域数据的标志 */ 
-	LCUI_ID	id;		/* LCUI程序的ID,果是以线程方式运行的话，这个就是线程ID */ 
+	BOOL		stop_loop;	/* 一个标志，用于指示是否停止主循环 */
+	LCUI_ID	id;		/* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
 	
 	LCUI_Queue	task_queue;	/* 程序的任务队列 */
 	LCUI_Queue	widget_lib;	/* 部件类型库 */
@@ -756,7 +755,6 @@ void Main_Loop_Quit();
 BOOL LCUI_Active();
 /* 功能：检测LCUI是否活动 */ 
 
-//extern int debug_mark;
 int LCUI_Init(int argc, char *argv[]);
 /* 
  * 功能：用于对LCUI进行初始化操作 
