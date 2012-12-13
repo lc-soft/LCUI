@@ -2,7 +2,7 @@
 
 ![LCUI Logo](https://raw.github.com/lc-soft/LCUI/gh-pages/files/images/lc-soft-logo.png)
 
-## Screenshort
+## 效果图
 ![screenshort 1](http://lcui.org/files/images/helloworld-01.png)
 ![screenshort 2](http://lcui.org/files/images/label-01.png)
 ![screenshort 3](http://lcui.org/files/images/devlog/test_textbox-05.gif)
