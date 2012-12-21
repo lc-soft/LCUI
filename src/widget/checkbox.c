@@ -119,8 +119,9 @@ void CheckBox_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
 	Set_Widget_Align(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
 }
 
-static void CheckBox_Init(LCUI_Widget *widget)
-/* 功能：初始化复选框部件的数据 */
+static void 
+CheckBox_Init(LCUI_Widget *widget)
+/* 初始化复选框部件的数据 */
 {
 	LCUI_Widget *container[2];
 	LCUI_CheckBox *check_box;
@@ -180,8 +181,9 @@ static void CheckBox_Init(LCUI_Widget *widget)
 	Response_Status_Change(widget);
 }
 
-static void Destroy_CheckBox(LCUI_Widget *widget)
-/* 功能：释放复选框部件占用的资源 */
+static void 
+Destroy_CheckBox(LCUI_Widget *widget)
+/* 释放复选框部件占用的资源 */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
 			Get_Widget_PrivData(widget); 
@@ -253,9 +255,9 @@ static void Exec_Draw_CheckBox(LCUI_Widget *widget)
 		} 
 	} else {/* 如果按钮的风格为缺省 */
 		Strcpy(&widget->style, "default");
-		if(widget->enabled == IS_FALSE) 
+		if( !widget->enabled ) {
 			widget->status = WIDGET_STATUS_DISABLE;
-		
+		}
 		/* 先释放PictureBox部件中保存的图形数据的指针 */
 		p = Get_PictureBox_Graph(check_box->imgbox);
 		Graph_Free(p);
@@ -303,6 +305,7 @@ static void Exec_Draw_CheckBox(LCUI_Widget *widget)
 			default : break;
 		}
 	} 
+	print_widget_info( widget );
 }
 
 LCUI_Widget *Get_CheckBox_Label(LCUI_Widget *widget)

@@ -47,10 +47,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libwidget_la_LIBADD =
-am_libwidget_la_OBJECTS = LCUI_ActiveBox.lo LCUI_Button.lo \
-	LCUI_CheckBox.lo LCUI_Label.lo LCUI_Menu.lo LCUI_PictureBox.lo \
-	LCUI_ProgressBar.lo LCUI_RadioButton.lo LCUI_TextBox.lo \
-	LCUI_Window.lo LCUI_ScrollBar.lo
+am_libwidget_la_OBJECTS = activebox.lo button.lo checkbox.lo label.lo \
+	menu.lo picturebox.lo progressbar.lo radiobutton.lo textbox.lo \
+	window.lo scrollbar.lo
 libwidget_la_OBJECTS = $(am_libwidget_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -214,17 +213,17 @@ AUTOMAKE_OPTIONS = foreign
 INCLUDES = -I$(abs_top_srcdir)/include 
 noinst_LTLIBRARIES = libwidget.la
 libwidget_la_SOURCES = \
-	LCUI_ActiveBox.c	\
-	LCUI_Button.c		\
-	LCUI_CheckBox.c		\
-	LCUI_Label.c		\
-	LCUI_Menu.c		\
-	LCUI_PictureBox.c	\
-	LCUI_ProgressBar.c	\
-	LCUI_RadioButton.c	\
-	LCUI_TextBox.c		\
-	LCUI_Window.c		\
-	LCUI_ScrollBar.c
+	activebox.c	\
+	button.c	\
+	checkbox.c	\
+	label.c		\
+	menu.c		\
+	picturebox.c	\
+	progressbar.c	\
+	radiobutton.c	\
+	textbox.c	\
+	window.c	\
+	scrollbar.c
 
 all: all-am
 
@@ -278,17 +277,17 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_ActiveBox.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Button.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_CheckBox.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Label.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Menu.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_PictureBox.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_ProgressBar.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_RadioButton.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_ScrollBar.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_TextBox.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Window.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/activebox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/button.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/checkbox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/label.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/menu.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/picturebox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/progressbar.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radiobutton.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scrollbar.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/textbox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/window.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

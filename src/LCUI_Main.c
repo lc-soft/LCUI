@@ -51,6 +51,7 @@
 #include LC_WIDGET_H
 
 #include <unistd.h>
+#include <signal.h>
 
 LCUI_System LCUI_Sys; 
 
@@ -625,6 +626,7 @@ int LCUI_Init(int argc, char *argv[])
 		LCUI_Sys.init = TRUE;
 		LCUI_Sys.status = ACTIVE;
 		srand(time(NULL));
+		signal(SIGTTOU, SIG_IGN);	/* 忽略SIGTTOU信号 */
 		Print_LCUI_Copyright_Text();
 		timer_list_init( &LCUI_Sys.timer_list );	/* 初始化定时器列表 */
 		Thread_TreeNode_Init (&LCUI_Sys.thread_tree);	/* 初始化根线程结点 */

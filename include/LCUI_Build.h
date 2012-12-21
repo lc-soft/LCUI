@@ -74,20 +74,25 @@
 #define LC_THREAD_HPP	<LCUI/LCUI_Thread.hpp> 
 #define LC_RES_H	<LCUI/LCUI_Resources.h> 
 
+#define LC_CHARSET_H	<LCUI/font/charset.h>
+#define LC_FONTBMP_H	<LCUI/font/bitmapfont.h>
+#define LC_TEXTSTYLE_H	<LCUI/font/textstyle.h>
+#define LC_TEXTLAYER_H	<LCUI/font/textlayer.h>
+
 /* 一些部件的头文件路径 */
-#define LC_WINDOW_H	<LCUI/LCUI_Window.h>
-#define LC_WINDOW_HPP	<LCUI/LCUI_Window.hpp>
-#define LC_LABEL_H	<LCUI/LCUI_Label.h>
-#define LC_LABEL_HPP	<LCUI/LCUI_Label.hpp>
-#define LC_BUTTON_H	<LCUI/LCUI_Button.h>
-#define LC_PICBOX_H	<LCUI/LCUI_PictureBox.h>
-#define LC_PROGBAR_H	<LCUI/LCUI_ProgressBar.h>
-#define LC_MENU_H	<LCUI/LCUI_Menu.h>
-#define LC_CHECKBOX_H	<LCUI/LCUI_CheckBox.h>
-#define LC_RADIOBTN_H	<LCUI/LCUI_RadioButton.h>
-#define LC_ACTIVEBOX_H	<LCUI/LCUI_ActiveBox.h> 
-#define LC_TEXTBOX_H	<LCUI/LCUI_TextBox.h>
-#define LC_SCROLLBAR_H	<LCUI/LCUI_ScrollBar.h>
+#define LC_WINDOW_H	<LCUI/widget/window.h>
+#define LC_WINDOW_HPP	<LCUI/widget/window.hpp>
+#define LC_LABEL_H	<LCUI/widget/label.h>
+#define LC_LABEL_HPP	<LCUI/widget/label.hpp>
+#define LC_BUTTON_H	<LCUI/widget/button.h>
+#define LC_PICBOX_H	<LCUI/widget/picturebox.h>
+#define LC_PROGBAR_H	<LCUI/widget/progressbar.h>
+#define LC_MENU_H	<LCUI/widget/menu.h>
+#define LC_CHECKBOX_H	<LCUI/widget/checkbox.h>
+#define LC_RADIOBTN_H	<LCUI/widget/radiobutton.h>
+#define LC_ACTIVEBOX_H	<LCUI/widget/activebox.h> 
+#define LC_TEXTBOX_H	<LCUI/widget/textbox.h>
+#define LC_SCROLLBAR_H	<LCUI/widget/scrollbar.h>
 #endif
 
 #define _DEBUG_MSG(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)

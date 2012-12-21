@@ -58,8 +58,6 @@
 #include FT_OUTLINE_H
 #endif
 
-extern uchar_t const *in_core_font_8x8();
-
 BOOL FontBMP_Valid(LCUI_FontBMP *bitmap)
 /*
  * 功能：检测位图数据是否有效

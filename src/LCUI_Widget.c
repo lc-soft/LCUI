@@ -1582,6 +1582,9 @@ void Auto_Resize_Widget(LCUI_Widget *widget)
 	total = Queue_Get_Total(&widget->child);
 	for(i=0; i<total; ++i) {/* 遍历每个子部件 */
 		child = Queue_Get(&widget->child, i);
+		if( !child ) {
+			continue;
+		}
 		/* 保存各个子部件区域矩形的右上角顶点中，X轴坐标最大的 */
 		temp = child->pos.x + child->size.w;
 		if(temp > size.w) {
@@ -1593,8 +1596,8 @@ void Auto_Resize_Widget(LCUI_Widget *widget)
 			size.h = temp;
 		}
 	}
-	size.w += 6;
-	size.h += 6;
+	//size.w += 6;
+	//size.h += 6;
 	//printf("Auto_Resize_Widget(): %p, autosize: %d, new size: %d,%d\n", 
 	//widget, widget->auto_size, size.w, size.h);
 	//print_widget_info(widget);

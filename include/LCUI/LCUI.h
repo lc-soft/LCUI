@@ -44,7 +44,7 @@
 #ifndef __LCUI_H__  /* 如果没有定义 __LCUI_H__ 宏 */
 #define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */ 
 
-#define LCUI_VERSION "0.12.6"
+#define LCUI_VERSION "0.13.0"
 
 #include <wchar.h>
 #include <stdio.h>

@@ -42,6 +42,7 @@
 //#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
+#include LC_GRAPH_H
 
 int Check_Option(int result, int option)
 /* 功能：检测result是否包含option */
@@ -59,6 +60,23 @@ void Border_Init(LCUI_Border *in)
 	in->bottom = 0;
 	in->right = 0;
 	in->top = 0; 
+}
+
+void BorderData_Init( LCUI_BorderData *border )
+/* 初始化边框数据 */
+{
+	border->top_width = 0;
+	border->bottom_width = 0;
+	border->left_width = 0;
+	border->right_width = 0;
+	border->top_style = BORDER_STYLE_NONE;
+	border->bottom_style = BORDER_STYLE_NONE;
+	border->left_style = BORDER_STYLE_NONE;
+	border->right_style = BORDER_STYLE_NONE;
+	border->top_color = RGB(0,0,0);
+	border->bottom_color = RGB(0,0,0);
+	border->left_color = RGB(0,0,0);
+	border->right_color = RGB(0,0,0);
 }
 
 void Padding_Init( LCUI_Padding *padding )

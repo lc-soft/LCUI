@@ -194,8 +194,8 @@ static BOOL proc_keyboard()
 	key.code = Get_Key (); 
 	//#define __NEED_CATCHSCREEN__
 	#ifdef __NEED_CATCHSCREEN__
-	if(key.code == 'c')
-	{//当按下c键后，可以进行截图，只截取指定区域的图形
+	//当按下c键后，可以进行截图，只截取指定区域的图形
+	if(key.code == 'c') {
 		time_t rawtime;
 		struct tm * timeinfo;
 		char filename[100];

@@ -114,6 +114,14 @@ int Get_Screen_Graph(LCUI_Graph *out)
 		}
 		break;
 	    case 16: 
+		for (i=0,h=0; h < LCUI_Sys.screen.size.h; ++h) {
+			for (w = 0; w < LCUI_Sys.screen.size.w; ++w) {
+				out->rgba[0][i] = *(dest+1) & 0xf8;
+				out->rgba[1][i] = (*(dest+1) << 5) | ((*dest & 0xe0) >> 3);
+				out->rgba[2][i] = *dest << 3;
+				dest += 2; ++i;
+			}
+		}
 		break;
 	    case 8: 
 		break;
