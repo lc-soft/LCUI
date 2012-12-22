@@ -451,6 +451,10 @@ typedef struct _LCUI_Border
 	LCUI_RGB bottom_color;
 	LCUI_RGB left_color;
 	LCUI_RGB right_color;
+	int top_left_radius;
+	int top_right_radius;
+	int bottom_left_radius;
+	int bottom_right_radius;
 }
 LCUI_Border;
 

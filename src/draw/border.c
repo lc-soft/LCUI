@@ -2,6 +2,23 @@
 #include LC_LCUI_H
 #include LC_GRAPH_H
 
+void Border_Init( LCUI_Border *border )
+/* 初始化边框数据 */
+{
+	border->top_width = 0;
+	border->bottom_width = 0;
+	border->left_width = 0;
+	border->right_width = 0;
+	border->top_style = BORDER_STYLE_NONE;
+	border->bottom_style = BORDER_STYLE_NONE;
+	border->left_style = BORDER_STYLE_NONE;
+	border->right_style = BORDER_STYLE_NONE;
+	border->top_color = RGB(0,0,0);
+	border->bottom_color = RGB(0,0,0);
+	border->left_color = RGB(0,0,0);
+	border->right_color = RGB(0,0,0);
+}
+
 LCUI_Border Border( int width_px, BORDER_STYLE style, LCUI_RGB color )
 /* 简单的设置边框样式，并获取该样式数据 */
 {
@@ -18,24 +35,20 @@ LCUI_Border Border( int width_px, BORDER_STYLE style, LCUI_RGB color )
 	border.bottom_color = color;
 	border.left_color = color;
 	border.right_color = color;
+	border.top_left_radius = 0;
+	border.top_right_radius = 0;
+	border.bottom_left_radius = 0;
+	border.bottom_right_radius = 0;
 	return border; 
 }
 
-void Border_Init( LCUI_Border *border )
-/* 初始化边框数据 */
+void Border_Radius( LCUI_Border *border, int radius )
+/* 设置边框的圆角半径 */
 {
-	border->top_width = 0;
-	border->bottom_width = 0;
-	border->left_width = 0;
-	border->right_width = 0;
-	border->top_style = BORDER_STYLE_NONE;
-	border->bottom_style = BORDER_STYLE_NONE;
-	border->left_style = BORDER_STYLE_NONE;
-	border->right_style = BORDER_STYLE_NONE;
-	border->top_color = RGB(0,0,0);
-	border->bottom_color = RGB(0,0,0);
-	border->left_color = RGB(0,0,0);
-	border->right_color = RGB(0,0,0);
+	border->top_left_radius = radius;
+	border->top_right_radius = radius;
+	border->bottom_left_radius = radius;
+	border->bottom_right_radius = radius;
 }
 
 int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
