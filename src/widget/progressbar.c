@@ -150,7 +150,8 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 		Graph_Fill_Alpha(&pb->fore_graph, 255);
 		Set_Widget_Backcolor( widget, RGB(255,255,255) );
 		Set_Widget_BG_Mode( widget, BG_MODE_FILL_BACKCOLOR );
-		Set_Widget_Border( widget, RGB(50,50,50), Border(1,1,1,1) );
+		Set_Widget_Border( widget,
+		 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)) );
 		Set_Widget_Padding( widget, Padding(1,1,1,1) );
 	}
 	

@@ -44,40 +44,9 @@
 
 LCUI_BEGIN_HEADER
 
-/* 边框样式 */
-#define BORDER_STYLE_NONE	0	/* 无边框 */
-#define BORDER_STYLE_SOLID	1	/* 实线 */
-#define BORDER_STYLE_DOTTED	2	/* 点状 */
-#define BORDER_STYLE_DOUBLE	3	/* 双线 */
-#define BORDER_STYLE_DASHED	4	/* 虚线 */
-
-/* 完整的边框信息 */
-typedef struct _LCUI_BorderData 
-{
-	int top_width;
-	int bottom_width;
-	int left_width;
-	int right_width;
-	int top_style;
-	int bottom_style;
-	int left_style;
-	int right_style;
-	LCUI_RGB top_color;
-	LCUI_RGB bottom_color;
-	LCUI_RGB left_color;
-	LCUI_RGB right_color;
-}
-LCUI_BorderData;
-
 /******************************** Misc *********************************/
 int Check_Option(int result, int option);
 /* 功能：检测result是否包含option */
-
-void Border_Init(LCUI_Border *in);
-/* 功能：初始化边框 */ 
-
-void BorderData_Init( LCUI_BorderData *border );
-/* 初始化边框数据 */
 
 void Padding_Init( LCUI_Padding *padding );
 
@@ -97,8 +66,6 @@ int Size_Cmp(LCUI_Size a, LCUI_Size b);
 
 LCUI_Pos Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align);
 /* 功能：根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */ 
-
-LCUI_Border Border(int top, int bottom, int left, int right);
 
 LCUI_Padding Padding(int top, int bottom, int left, int right);
 

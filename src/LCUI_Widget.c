@@ -1381,15 +1381,10 @@ void _Limit_Widget_Size( LCUI_Widget *widget, char *w_str, char*h_str )
 	
 }
 
-void Set_Widget_Border(LCUI_Widget *widget, LCUI_RGB color, LCUI_Border border)
+void Set_Widget_Border(LCUI_Widget *widget, LCUI_Border border)
 /* 功能：设定部件的边框 */
 { 
 	widget->border = border;
-	widget->border_color = color;
-	
-	if(widget->border_style == BORDER_STYLE_NONE) {
-		Set_Widget_Border_Style(widget, BORDER_STYLE_LINE );
-	}
 	Draw_Widget(widget); 
 	Add_Widget_Refresh_Area(widget, Get_Widget_Rect(widget));
 }
@@ -1711,8 +1706,7 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 	func_update(widget);
 	/* 绘制边框线 */
 	if(widget->border_style != BORDER_STYLE_NONE) {
-		Graph_Draw_Border( &widget->graph, 
-			widget->border_color, widget->border); 
+		Graph_Draw_Border( &widget->graph, widget->border); 
 	}
 }
 

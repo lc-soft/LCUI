@@ -138,9 +138,9 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 			/* 为部件填充背景图 */
 			Graph_Fill_Image( &widget->graph, 
 				&widget->background_image, 0, color);
-			/* 然后绘制按钮边框，黑色的 */
-			Graph_Draw_Border(&widget->graph, RGB(0,0,0), 
-						Border(1, 1, 1, 1));
+			/* 然后绘制按钮边框，实线，黑色的 */
+			Graph_Draw_Border(&widget->graph, 
+			 Border(1, BORDER_STYLE_SOLID, RGB(0,0,0)) );
 		}
 	}
 	else if(Strcmp(&widget->style, "menu_style") == 0){
@@ -153,22 +153,22 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 		case WIDGET_STATUS_OVERLAY :
 			color = RGB(80, 180, 240);
 			Graph_Fill_Color(&widget->graph, color);
-			Graph_Draw_Border(&widget->graph, RGB(50,50,255), 
-						Border(1, 1, 1, 1));
+			Graph_Draw_Border(&widget->graph, 
+			 Border(1, BORDER_STYLE_SOLID, RGB(50,50,255)) );
 			Graph_Fill_Alpha(&widget->graph, 255);
 			break;
 		case WIDGET_STATUS_CLICKING :
 			color = RGB(80, 170, 255);
 			Graph_Fill_Color(&widget->graph, color);
-			Graph_Draw_Border(&widget->graph, RGB(50,50,255), 
-						Border(1, 1, 1, 1));
+			Graph_Draw_Border(&widget->graph, 
+			 Border(1, BORDER_STYLE_SOLID, RGB(50,50,255)) );
 			Graph_Fill_Alpha(&widget->graph, 255);
 			break;
 		case WIDGET_STATUS_CLICKED :
 			color = RGB(80, 170, 255);
 			Graph_Fill_Color(&widget->graph, color);
-			Graph_Draw_Border(&widget->graph, RGB(50,50,255), 
-						Border(1, 1, 1, 1));
+			Graph_Draw_Border(&widget->graph, 
+			 Border(1, BORDER_STYLE_SOLID, RGB(50,50,255)) );
 			Graph_Fill_Alpha(&widget->graph, 255);
 			break;
 		case WIDGET_STATUS_FOCUS :
@@ -208,8 +208,8 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 		Graph_Fill_Alpha(&widget->graph, 255);
 		Graph_Fill_Image(&widget->graph, 
 			&widget->background_image, 0, color); 
-		Graph_Draw_Border(&widget->graph, RGB(0,0,0), 
-			Border(1, 1, 1, 1));
+		Graph_Draw_Border(&widget->graph, 
+		 Border(1, BORDER_STYLE_SOLID, RGB(0,0,0)) );
 	}
 	/* 按钮每次更新都需要更新整个按钮区域内的图形 */ 
 	Refresh_Widget(widget); 

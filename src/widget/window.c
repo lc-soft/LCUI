@@ -48,6 +48,7 @@
 #include LC_PICBOX_H
 #include LC_WINDOW_H 
 #include LC_GRAPH_H
+#include LC_DRAW_H
 #include LC_RES_H
 #include LC_INPUT_H
 #include LC_FONT_H
@@ -181,7 +182,8 @@ Exec_Update_Window( LCUI_Widget *win_p )
 		break;
 			
 	    case WINDOW_STYLE_LINE: /* 线条边框 */
-		Set_Widget_Border(win_p, RGB(50,50,50), Border(1,1,1,1));
+		Set_Widget_Border(win_p,
+		 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)));
 		Set_Widget_Padding( win_p, Padding(1,1,1,1) );
 		Set_Widget_Dock( client_area, DOCK_TYPE_FILL );
 		Hide_Widget( titlebar );
@@ -189,7 +191,8 @@ Exec_Update_Window( LCUI_Widget *win_p )
 		break;
 		
 	    case WINDOW_STYLE_STANDARD: /* 标准边框 */ 
-		Set_Widget_Border(win_p, RGB(50,50,50), Border(1,1,1,1));
+		Set_Widget_Border(win_p,
+		 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)));
 		Set_Widget_Padding(win_p, Padding(1,1,1,1)); 
 		
 		size = Get_Container_Size( win_p );
@@ -231,8 +234,10 @@ union_draw_method:;
 			border_color = RGB(50,50,50); 
 		}
 		
-		Set_Widget_Border( win_p, border_color, Border(1,1,1,1) );
-		Set_Widget_Border( client_area, border_color, Border(1,1,1,1) );
+		Set_Widget_Border( win_p,
+		 Border(1, BORDER_STYLE_SOLID, border_color));
+		Set_Widget_Border( client_area,
+		 Border(1, BORDER_STYLE_SOLID, border_color));
 		Set_Widget_Backcolor( win_p, back_color );
 		Graph_Fill_Color( &win_p->graph, back_color );
 		Set_Widget_Backcolor( client_area, RGB(255,255,255) );
@@ -362,7 +367,7 @@ Window_Init(LCUI_Widget *win_p)
 	win->btn_close = btn_close;
 	/* 没有背景图就填充背景色 */
 	Set_Widget_BG_Mode(win_p, BG_MODE_FILL_BACKCOLOR);
-	Set_Widget_Border_Style(win_p, BORDER_STYLE_STANDARD);
+	Set_Widget_Border_Style(win_p, BORDER_STYLE_SOLID);
 	/* 部件的风格ID */
 	win_p->style_id = WINDOW_STYLE_PURE_BLUE;
 	

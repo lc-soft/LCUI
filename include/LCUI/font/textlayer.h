@@ -199,6 +199,18 @@ int
 TextLayer_Get_Rows( LCUI_TextLayer *layer );
 /* 获取文本行数 */
 
+int 
+TextLayer_Get_Select_Text( LCUI_TextLayer *layer, char *out_text );
+/* 获取文本图层内被选中的文本 */ 
+
+int 
+TextLayer_Copy_Select_Text( LCUI_TextLayer *layer );
+/* 复制文本图层内被选中的文本 */
+
+int 
+TextLayer_Cut_Select_Text( LCUI_TextLayer *layer );
+/* 剪切文本图层内被选中的文本 */
+
 void 
 TextLayer_Using_StyleTags( LCUI_TextLayer *layer, BOOL flag );
 /* 指定文本图层是否处理样式标签 */

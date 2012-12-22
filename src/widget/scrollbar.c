@@ -43,6 +43,7 @@
 #include LC_LCUI_H
 #include LC_WIDGET_H
 #include LC_GRAPH_H
+#include LC_DRAW_H
 #include LC_SCROLLBAR_H
 
 typedef struct _LCUI_ScrollBar
@@ -136,8 +137,9 @@ ScrollBar_Init( LCUI_Widget *widget )
 	
 	Widget_Container_Add( widget, scrollbar->widget );
 	Set_Widget_Size( scrollbar->widget, "100%", "100%" );
-	Limit_Widget_Pos( scrollbar->widget, Pos(0,0), Pos(0,0) ); 
-	Set_Widget_Border( widget, RGB(100,100,100), Border(1,1,1,1) );
+	Limit_Widget_Pos( scrollbar->widget, Pos(0,0), Pos(0,0) );
+	Set_Widget_Border( widget,
+	 Border(1, BORDER_STYLE_SOLID, RGB(100,100,100)) );
 	Set_Widget_Padding( widget, Padding(1,1,1,1) );
 	Set_Widget_Backcolor( widget, RGB(200,200,200) );
 	Set_Widget_BG_Mode( widget, BG_MODE_FILL_BACKCOLOR );

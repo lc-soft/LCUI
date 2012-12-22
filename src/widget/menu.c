@@ -41,7 +41,7 @@
 
 /* 
  * 说明：
- * 此部件可能与本版本的LCUI兼容，请等待后续版本更新中对该部件进行修改。
+ * 此部件可能与本版本的LCUI不兼容，请等待后续版本更新中对该部件进行修改。
  * 需要改进的地方很多，如果鼠标指针离开菜单，菜单中的选项光标也会消失。等到让部件支持焦
  * 点状态的时候，菜单中处于焦点状态的部件会高亮显示，即使鼠标指针移开菜单，菜单中的焦点
  * 部件是不会变的，高亮状态还是保存着的。
@@ -55,6 +55,7 @@
 #include LC_WIDGET_H
 #include LC_BUTTON_H 
 #include LC_DISPLAY_H
+#include LC_DRAW_H
 #include LC_MENU_H
 #include LC_RES_H
 
@@ -70,53 +71,19 @@ static void Menu_Init(LCUI_Widget *widget)
 	menu->mini_width  = 50;
 	WidgetQueue_Init(&menu->child_menu);
 	Queue_Using_Pointer(&menu->child_menu);
-	/* 设置边框风格类型为线条边框 */
-	Set_Widget_Border_Style(widget, BORDER_STYLE_LINE);
-	Set_Widget_Border(widget, RGB(50,50,50), Border(1,1,1,1));
+	
+	Graph_Draw_Border(&widget->graph, 
+	 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)) );
+	
 	Set_Widget_BG_Mode(widget, BG_MODE_FILL_BACKCOLOR);
 	LCUI_MouseEvent_Connect(Auto_Hide_Menu, MOUSE_EVENT_MOVE);
 }
 
-static void Exec_Update_Menu(LCUI_Widget *widget)
-/* 功能：更新菜单的图形数据 */
+static void 
+Exec_Update_Menu(LCUI_Widget *widget)
+/* 更新菜单的图形数据 */
 {
-	LCUI_Widget *item;
-	LCUI_Menu *menu;
-	int i, max_width = 0, total, max_height = 0;
 	
-	total = Queue_Get_Total(&widget->child);
-	for(i=total-1; i>=0; --i)
-	{   /* 按照顺序排列部件 */
-		item = (LCUI_Widget*)Queue_Get(&widget->child, i);
-		if(item->visible == IS_TRUE)
-		{/* 如果该部件可见 */
-			/* 设定部件的位置 */ 
-			Move_Widget(item, Pos(0+widget->border.left, max_height+widget->border.top)); 
-			/* 得出最大宽度 */
-			max_width = (max_width < item->size.w ? item->size.w : max_width);
-			/* 累加总高度 */
-			max_height += item->size.h;
-		}
-	}
-	menu = Get_Widget_PrivData(widget);
-	/* 如果当前最大宽度低于设定的最低宽度 */
-	if(max_width < menu->mini_width) 
-		max_width = menu->mini_width;
-	/* 得出最大宽度后，改变所有作为选项的部件的尺寸 */
-	for(i=total-1; i>=0; --i)
-	{   /* 按照顺序排列部件 */
-		item = (LCUI_Widget*)Queue_Get(&widget->child, i);
-		if(item == NULL) return;
-		/* 改变尺寸 */
-		Resize_Widget(item, Size(max_width, item->size.h));
-	}
-	
-	int w, h;
-	w = widget->border.left + widget->border.right;
-	h = widget->border.top + widget->border.bottom;
-	/* 更改窗口的尺寸，以适应部件的尺寸 */ 
-	Resize_Widget(widget, Size(max_width+w, max_height+h));
-	Refresh_Widget(widget); /* 每次更新，都需要刷新整个部件的图形显示 */
 }
 
 void Show_Menu(LCUI_Widget *src, LCUI_Widget *des_menu)

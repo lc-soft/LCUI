@@ -264,7 +264,7 @@ void Limit_Widget_Size(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_si
 void Limit_Widget_Pos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos);
 /* 功能：限制部件的移动范围 */ 
 
-void Set_Widget_Border(LCUI_Widget *widget, LCUI_RGB color, LCUI_Border border);
+void Set_Widget_Border(LCUI_Widget *widget, LCUI_Border border);
 /* 功能：设定部件的边框 */ 
 
 void Set_Widget_Backcolor(LCUI_Widget *widget, LCUI_RGB color);

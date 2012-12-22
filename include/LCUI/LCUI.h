@@ -185,10 +185,11 @@ typedef enum _LAYOUT_TYPE
 /*************** 边框风格 *****************/
 typedef enum _BORDER_STYLE
 {
-	BORDER_STYLE_NONE,
-	BORDER_STYLE_STANDARD,
-	BORDER_STYLE_LINE,
-	BORDER_STYLE_ROUND
+	BORDER_STYLE_NONE,	/* 无边框 */
+	BORDER_STYLE_SOLID,	/* 实线 */
+	BORDER_STYLE_DOTTED,	/* 点状 */
+	BORDER_STYLE_DOUBLE,	/* 双线 */
+	BORDER_STYLE_DASHED,	/* 虚线 */
 }
 BORDER_STYLE;
 /*****************************************/
@@ -261,7 +262,6 @@ typedef struct	_LCUI_System		LCUI_System;
 typedef struct	_LCUI_Cursor		LCUI_Cursor;
 typedef struct	_LCUI_App		LCUI_App;
 typedef struct	_LCUI_WString		LCUI_WString;
-typedef struct	_LCUI_Border		LCUI_Border;
 typedef struct	_LCUI_WChar_T		LCUI_WChar_T;
 typedef struct	_LCUI_Rect		LCUI_Rect; 
 typedef struct	_LCUI_String		LCUI_String;
@@ -436,13 +436,23 @@ struct _LCUI_MouseEvent
 };
 /***********************************************************/
 
-
-/*************** 边框 ******************/
-struct _LCUI_Border
+/* 完整的边框信息 */
+typedef struct _LCUI_Border
 {
-	int left,top,right,bottom;
-};
-/*************************************/
+	int top_width;
+	int bottom_width;
+	int left_width;
+	int right_width;
+	BORDER_STYLE top_style;
+	BORDER_STYLE bottom_style;
+	BORDER_STYLE left_style;
+	BORDER_STYLE right_style;
+	LCUI_RGB top_color;
+	LCUI_RGB bottom_color;
+	LCUI_RGB left_color;
+	LCUI_RGB right_color;
+}
+LCUI_Border;
 
 /***************************** 定位类型 ********************************/
 typedef enum _POS_TYPE
@@ -499,8 +509,11 @@ PX_PT_t;
 /*---------------------- END -------------------------*/
 
 /*------------------- 内边距和外边距 --------------------*/
-typedef struct _LCUI_Border LCUI_Margin;
-typedef struct _LCUI_Border LCUI_Padding;
+typedef struct _LCUI_Margin
+{
+	int top, bottom, left, right;
+}
+LCUI_Margin, LCUI_Padding;
 /*---------------------- END -------------------------*/
 
 /*----------------- 自动尺寸调整模式 --------------------*/
@@ -600,7 +613,7 @@ struct _LCUI_Widget
 	void (*enable)(LCUI_Widget*);
 	void (*set_align)(LCUI_Widget*, ALIGN_TYPE, LCUI_Pos); 
 	void (*set_alpha)(LCUI_Widget*, unsigned char); 
-	void (*set_border)(LCUI_Widget*, LCUI_RGB, LCUI_Border);
+	void (*set_border)(LCUI_Widget*, LCUI_Border);
 };
 /**********************************************************************/
 

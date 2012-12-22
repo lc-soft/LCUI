@@ -44,11 +44,7 @@
 
 LCUI_BEGIN_HEADER
 
-int Graph_Draw_HLBorder( LCUI_Graph *des, LCUI_BorderData border );
-/* 为图形绘制圆角边框，其中的HL是高级（Hight Level）的英文缩写 */
-
-int Graph_Draw_Border( LCUI_Graph *des, LCUI_RGB color, LCUI_Border border );
-/* 简单的为图形边缘绘制矩形边框 */
+#include LC_DRAW_BORDER_H
 
 int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des);
 /* 

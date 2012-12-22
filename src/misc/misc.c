@@ -53,40 +53,20 @@ int Check_Option(int result, int option)
 	return 0;
 }
 
-void Border_Init(LCUI_Border *in)
-/* 功能：初始化边框 */
-{ 
-	in->left = 0;
-	in->bottom = 0;
-	in->right = 0;
-	in->top = 0; 
-}
-
-void BorderData_Init( LCUI_BorderData *border )
-/* 初始化边框数据 */
-{
-	border->top_width = 0;
-	border->bottom_width = 0;
-	border->left_width = 0;
-	border->right_width = 0;
-	border->top_style = BORDER_STYLE_NONE;
-	border->bottom_style = BORDER_STYLE_NONE;
-	border->left_style = BORDER_STYLE_NONE;
-	border->right_style = BORDER_STYLE_NONE;
-	border->top_color = RGB(0,0,0);
-	border->bottom_color = RGB(0,0,0);
-	border->left_color = RGB(0,0,0);
-	border->right_color = RGB(0,0,0);
-}
-
 void Padding_Init( LCUI_Padding *padding )
 {
-	Border_Init( padding );
+	padding->left = 0;
+	padding->bottom = 0;
+	padding->right = 0;
+	padding->top = 0; 
 }
 
 void Margin_Init( LCUI_Margin *margin )
 {
-	Border_Init( margin );
+	margin->left = 0;
+	margin->bottom = 0;
+	margin->right = 0;
+	margin->top = 0; 
 }
 
 LCUI_Pos Pos(int x, int y)
@@ -166,19 +146,16 @@ LCUI_Pos Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align)
 	return pos;
 }
 
-LCUI_Border Border(int top, int bottom, int left, int right)
-{
-	LCUI_Border border;
-	border.top = top;
-	border.left = left;
-	border.right = right;
-	border.bottom = bottom;
-	return border; 
-}
-
 LCUI_Padding Padding(int top, int bottom, int left, int right)
 {
-	return Border( top, bottom, left, right );
+	LCUI_Padding padding;
+	
+	padding.top = top;
+	padding.bottom = bottom;
+	padding.left = left;
+	padding.right = right;
+	
+	return padding;
 }
 
 LCUI_Pos Pos_Add(LCUI_Pos a, LCUI_Pos b)
