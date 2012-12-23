@@ -2,6 +2,8 @@
 #include LC_LCUI_H
 #include LC_GRAPH_H
 
+#include <math.h>
+
 void Border_Init( LCUI_Border *border )
 /* 初始化边框数据 */
 {
@@ -17,6 +19,10 @@ void Border_Init( LCUI_Border *border )
 	border->bottom_color = RGB(0,0,0);
 	border->left_color = RGB(0,0,0);
 	border->right_color = RGB(0,0,0);
+	border->top_left_radius = 0;
+	border->top_right_radius = 0;
+	border->bottom_left_radius = 0;
+	border->bottom_right_radius = 0;
 }
 
 LCUI_Border Border( int width_px, BORDER_STYLE style, LCUI_RGB color )
@@ -58,13 +64,40 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 		return -1;
 	}
 	
-	int x,y,count, k, start_x,start_y;
+	int x,y,count, k, w[2], h[2], start_x,start_y;
+	
+	w[0] = des->width - border.top_right_radius;
+	h[0] = des->height - border.bottom_left_radius;
+	w[1] = des->width - border.bottom_right_radius;
+	h[1] = des->height - border.bottom_right_radius;
 	
 	Graph_Lock(des, 1);
-	/* 绘制上边的线 */
+	/* 绘制左上角的圆角 */
+	for(y=0; y<border.top_left_radius; ++y) {
+		k = y * des->width;
+		for(x=0; x<border.top_left_radius; ++x) {
+			if( fabs( pow(x-border.top_left_radius, 2)
+				+pow(y-border.top_left_radius, 2) )
+			    -pow(border.top_left_radius, 2) > 1 ) {
+				printf("(%d,%d), skip\n", y, x);
+				continue;
+			}
+			printf("(%d,%d)\n", y, x);
+			count = k + x;
+			des->rgba[0][count] = border.top_color.red;
+			des->rgba[1][count] = border.top_color.green;
+			des->rgba[2][count] = border.top_color.blue;
+			if(Graph_Have_Alpha(des)) {
+				des->rgba[3][count] = 255;
+			}
+			break;
+		}
+	}
+	
+	/* 绘制上边框 */
 	for(y=0;y<border.top_width;++y) {
 		k = y * des->width;
-		for(x = 0; x < des->width; ++x) {
+		for(x = border.top_left_radius; x < w[0]; ++x) {
 			count = k + x;
 			des->rgba[0][count] = border.top_color.red;
 			des->rgba[1][count] = border.top_color.green;
@@ -78,7 +111,7 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	/* 绘制下边的线 */
 	for(y=0;y<border.bottom_width;++y) {
 		k = (start_y+y) * des->width;
-		for(x=0;x<des->width;++x) {
+		for(x = border.bottom_left_radius; x < w[1]; ++x) {
 			count = k + x;
 			des->rgba[0][count] = border.bottom_color.red;
 			des->rgba[1][count] = border.bottom_color.green;
@@ -89,7 +122,7 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 		}
 	}
 	/* 绘制左边的线 */
-	for(y=0;y<des->height;++y) {
+	for(y=border.top_left_radius; y<h[0]; ++y) {
 		k = y * des->width;
 		for(x=0;x<border.left_width;++x) {
 			count = k + x;
@@ -102,7 +135,7 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	}
 	/* 绘制右边的线 */
 	start_x = des->width - border.right_width;
-	for(y=0;y<des->height;++y) {
+	for(y=border.top_right_radius; y<h[1]; ++y) {
 		k = y * des->width + start_x;
 		for(x=0;x<border.right_width;++x) {
 			count = k + x;

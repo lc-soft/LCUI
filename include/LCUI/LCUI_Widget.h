@@ -127,9 +127,6 @@ void print_widget_info(LCUI_Widget *widget);
 int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect);
 /* 功能：在指定部件的内部区域内设定需要刷新的区域 */ 
 
-void Set_Widget_Border_Style(LCUI_Widget *widget, BORDER_STYLE style);
-/* 功能：设定部件的边框风格 */ 
-
 void Response_Status_Change(LCUI_Widget *widget);
 /* 
  * 功能：让指定部件响应部件状态的改变
@@ -169,9 +166,6 @@ Focus_Widget( LCUI_Widget *widget );
 
 LCUI_String Get_Widget_Style(LCUI_Widget *widget);
 /* 功能：获取部件的类型 */ 
-
-BORDER_STYLE Get_Widget_Border_Style(LCUI_Widget *widget);
-/* 功能：获取部件的边框类型 */ 
 
 void Set_Widget_Style(LCUI_Widget *widget, char *style);
 /* 功能：设定部件的风格 */ 

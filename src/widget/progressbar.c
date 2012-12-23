@@ -128,7 +128,6 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 	if(Strcmp(&widget->style, "dynamic") == 0) {
 		/* 绘制空槽 */
 		Draw_Empty_Slot(&widget->graph, widget->size.w, widget->size.h);
-		Set_Widget_Border_Style(widget, BORDER_STYLE_NONE);
 		/* 载入两个图形 */
 		if(!Graph_Valid(&pb->fore_graph)) {
 			Load_Graph_ProgressBar_Fore(&pb->fore_graph);  

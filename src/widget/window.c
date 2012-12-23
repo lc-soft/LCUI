@@ -367,7 +367,6 @@ Window_Init(LCUI_Widget *win_p)
 	win->btn_close = btn_close;
 	/* 没有背景图就填充背景色 */
 	Set_Widget_BG_Mode(win_p, BG_MODE_FILL_BACKCOLOR);
-	Set_Widget_Border_Style(win_p, BORDER_STYLE_SOLID);
 	/* 部件的风格ID */
 	win_p->style_id = WINDOW_STYLE_PURE_BLUE;
 	

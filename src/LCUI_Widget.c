@@ -696,13 +696,6 @@ int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
 	return 0;
 }
 
-void Set_Widget_Border_Style(LCUI_Widget *widget, BORDER_STYLE style)
-/* 功能：设定部件的边框风格 */
-{
-	widget->border_style = style;
-	Draw_Widget(widget);
-}
-
 void Response_Status_Change(LCUI_Widget *widget)
 /* 
  * 功能：让指定部件响应部件状态的改变
@@ -890,12 +883,6 @@ LCUI_String Get_Widget_Style(LCUI_Widget *widget)
 /* 功能：获取部件的类型 */
 {
 	return widget->style;
-}
-
-BORDER_STYLE Get_Widget_Border_Style(LCUI_Widget *widget)
-/* 功能：获取部件的边框类型 */
-{
-	return widget->border_style;
 }
 
 void Set_Widget_Style(LCUI_Widget *widget, char *style)
@@ -1129,8 +1116,6 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	widget.pos_type			= POS_TYPE_ABSOLUTE;
 	widget.back_color		= RGB(238,243,250);
 	widget.fore_color		= RGB(0,0,0);
-	widget.border_color		= RGB(0,0,0);
-	widget.border_style		= BORDER_STYLE_NONE;
 	widget.private_data		= NULL;
 	widget.bg_mode			= BG_MODE_TRANSPARENT;
 	widget.status_response		= 0;
@@ -1705,9 +1690,7 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 	func_update = Get_WidgetFunc_By_ID( widget->type_id, FUNC_TYPE_DRAW );
 	func_update(widget);
 	/* 绘制边框线 */
-	if(widget->border_style != BORDER_STYLE_NONE) {
-		Graph_Draw_Border( &widget->graph, widget->border); 
-	}
+	Graph_Draw_Border( &widget->graph, widget->border);
 }
 
 LCUI_Pos Get_Widget_Valid_Pos( LCUI_Widget *widget, LCUI_Pos pos )

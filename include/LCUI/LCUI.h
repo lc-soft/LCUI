@@ -591,8 +591,6 @@ struct _LCUI_Widget
 	/*---------------- END -------------------*/
 	
 	LCUI_Border	border;		/* 边框 */
-	LCUI_RGB	border_color;	/* 边框颜色 */
-	BORDER_STYLE	border_style;	/* 边框类型 */
 	
 	LCUI_RGB  back_color;  /* 背景色 */
 	LCUI_RGB  fore_color;  /* 前景色 */

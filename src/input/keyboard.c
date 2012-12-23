@@ -192,7 +192,7 @@ static BOOL proc_keyboard()
 		return FALSE;
 	}
 	key.code = Get_Key (); 
-	//#define __NEED_CATCHSCREEN__
+	#define __NEED_CATCHSCREEN__
 	#ifdef __NEED_CATCHSCREEN__
 	//当按下c键后，可以进行截图，只截取指定区域的图形
 	if(key.code == 'c') {
