@@ -57,39 +57,62 @@ void Border_Radius( LCUI_Border *border, int radius )
 	border->bottom_right_radius = radius;
 }
 
-static void 
+static int 
 Graph_Draw_RoundBorder( 
 		LCUI_Graph *des, LCUI_Pos center, int radius,
 		int line_size, LCUI_RGB line_color )
 {
 	int pos, k, j, y, x;
+	LCUI_Rect real_rect;
+	
+	real_rect = Get_Graph_Valid_Rect( des );
+	des = Get_Quote_Graph( des );
+	if( !Graph_Valid( des ) ) {
+		return -1;
+	}
+	
 	/* 先记录起点的线性坐标 */
-	k = j = center.y * des->width + center.x;
+	k = (real_rect.y + center.y) * des->width;
+	k = j = k + center.x + real_rect.x;
 	/* 根据y轴计算各点的x轴坐标并填充点 */
 	for(y=0; y<radius; ++y) {
 		/* 四舍五入，计算出x轴整数坐标 */
 		x = sqrt( pow(radius, 2) - y*y )+0.5;
-		/* 左上半圆 */
-		pos = j - x;
-		des->rgba[0][pos] = line_color.red;
-		des->rgba[1][pos] = line_color.green;
-		des->rgba[2][pos] = line_color.blue;
-		/* 左下半圆 */
-		pos = k - x;
-		des->rgba[0][pos] = line_color.red;
-		des->rgba[1][pos] = line_color.green;
-		des->rgba[2][pos] = line_color.blue;
-		
-		/* 右上半圆 */
-		pos = j + x;
-		des->rgba[0][pos] = line_color.red;
-		des->rgba[1][pos] = line_color.green;
-		des->rgba[2][pos] = line_color.blue;
-		/* 右下半圆 */
-		pos = k + x;
-		des->rgba[0][pos] = line_color.red;
-		des->rgba[1][pos] = line_color.green;
-		des->rgba[2][pos] = line_color.blue;
+		if( center.x-x >= 0 
+		 && center.x-x < real_rect.x+real_rect.width) {
+			if( center.y-y >= 0
+			 && center.y-y < real_rect.y+real_rect.height ) {
+				/* 左上半圆 */
+				pos = j - x;
+				des->rgba[0][pos] = line_color.red;
+				des->rgba[1][pos] = line_color.green;
+				des->rgba[2][pos] = line_color.blue;
+			}
+			if( center.y+y < real_rect.y+real_rect.height ) {
+				/* 左下半圆 */
+				pos = k - x;
+				des->rgba[0][pos] = line_color.red;
+				des->rgba[1][pos] = line_color.green;
+				des->rgba[2][pos] = line_color.blue;
+			}
+		}
+		if( center.x+x < real_rect.x+real_rect.width ) {
+			/* 右上半圆 */
+			if( center.y-y >= 0
+			 && center.y-y < real_rect.y+real_rect.height ) {
+				pos = j + x;
+				des->rgba[0][pos] = line_color.red;
+				des->rgba[1][pos] = line_color.green;
+				des->rgba[2][pos] = line_color.blue;
+			}
+			if( center.y+y < real_rect.y+real_rect.height ) {
+				/* 右下半圆 */
+				pos = k + x;
+				des->rgba[0][pos] = line_color.red;
+				des->rgba[1][pos] = line_color.green;
+				des->rgba[2][pos] = line_color.blue;
+			}
+		}
 		/* 
 		 * 由于圆是y轴上下对称，可以用变量k记录下半圆的下一行点的y轴坐标，
 		 * 而变量j则相反
@@ -97,38 +120,54 @@ Graph_Draw_RoundBorder(
 		k += des->width;
 		j -= des->width;
 	}
+	/* 
+	 * 那个 pos = k - y * des->width - x; 之前是这样的：
+	 * pos = (center.y-y)*des->width+center.x-x;
+	 * 式子可以转换成这样：
+	 * pos = (center.y*des->width+center.x)-y*des->width-x;
+	 * 鉴于center.y*des->width+center.x的运算结果是不变的，所以，
+	 * 每次就不必重复将它们代入进去进行运算，在运算前，一次性计算出它的
+	 * 值即可。
+	 * */
 	/* 先计算固定的二维坐标对应的线性坐标 */
-	k = center.y * des->width + center.x;
+	k = (real_rect.y+center.y) * des->width;
+	k = k + center.x + real_rect.x;
 	/* 根据x轴计算各点的y轴坐标并填充点 */
 	for(x=0; x<radius; ++x) {
 		y = sqrt( pow(radius, 2) - x*x )+0.5;
-		/* 
-		 * 之前是这样的：
-		 * pos = (center.y-y)*des->width+center.x-x;
-		 * 式子可以转换成这样：
-		 * pos = (center.y*des->width+center.x)-y*des->width-x;
-		 * 鉴于center.y*des->width+center.x的运算结果是不变的，所以，
-		 * 每次就不必重复将它们代入进去进行运算，在运算前，一次性计算出它的
-		 * 值即可。
-		 * */
-		pos = k - y * des->width - x;
-		des->rgba[0][pos] = line_color.red;
-		des->rgba[1][pos] = line_color.green;
-		des->rgba[2][pos] = line_color.blue;
-		pos = k + y * des->width - x;
-		des->rgba[0][pos] = line_color.red;
-		des->rgba[1][pos] = line_color.green;
-		des->rgba[2][pos] = line_color.blue;
-		
-		pos = k - y * des->width + x;
-		des->rgba[0][pos] = line_color.red;
-		des->rgba[1][pos] = line_color.green;
-		des->rgba[2][pos] = line_color.blue;
-		pos = k + y * des->width + x;
-		des->rgba[0][pos] = line_color.red;
-		des->rgba[1][pos] = line_color.green;
-		des->rgba[2][pos] = line_color.blue;
+		if( center.y-y >= 0
+		 && center.y-y < real_rect.y+real_rect.height ) {
+			if( center.x-x >= 0 
+			 && center.x-x < real_rect.x+real_rect.width) {
+				pos = k - y * des->width - x;
+				des->rgba[0][pos] = line_color.red;
+				des->rgba[1][pos] = line_color.green;
+				des->rgba[2][pos] = line_color.blue;
+			}
+			if( center.x+x < real_rect.x+real_rect.width ) {
+				pos = k - y * des->width + x;
+				des->rgba[0][pos] = line_color.red;
+				des->rgba[1][pos] = line_color.green;
+				des->rgba[2][pos] = line_color.blue;
+			}
+		}
+		if( center.y+y < real_rect.y+real_rect.height ) {
+			if( center.x-x >= 0 
+			 && center.x-x < real_rect.x+real_rect.width) {
+				pos = k + y * des->width - x;
+				des->rgba[0][pos] = line_color.red;
+				des->rgba[1][pos] = line_color.green;
+				des->rgba[2][pos] = line_color.blue;
+			}
+			if( center.x+x < real_rect.x+real_rect.width ) {
+				pos = k + y * des->width + x;
+				des->rgba[0][pos] = line_color.red;
+				des->rgba[1][pos] = line_color.green;
+				des->rgba[2][pos] = line_color.blue;
+			}
+		}
 	}
+	return 0;
 }
 
 int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
@@ -138,6 +177,8 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 		return -1;
 	}
 	
+	LCUI_Graph des_area;
+	LCUI_Rect rect;
 	int  x,y,count, k, w[2], h[2], start_x,start_y;
 	
 	w[0] = des->width - border.top_right_radius;
@@ -150,8 +191,27 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	k = des->width;
 	
 	radius = border.top_left_radius;
-	/* 绘制左上角的圆角 */
-	Graph_Draw_RoundBorder( des, Pos(radius+10,radius+10), radius, 1, RGB(0,0,0));
+	/* 绘制左上角的圆角，先引用左上角区域，再将圆绘制到这个区域里 */
+	rect = Rect(0,0,radius,radius);
+	Quote_Graph( &des_area, des, rect );
+	Graph_Draw_RoundBorder( &des_area, 
+		Pos(radius,radius), radius, 1, RGB(0,0,0) );
+	/* 绘制右上角的圆角 */
+	rect = Rect( des->width-radius-1, 0, radius, radius );
+	Quote_Graph( &des_area, des, rect );
+	Graph_Draw_RoundBorder( &des_area, 
+		Pos(0,radius), radius, 1, RGB(0,0,0) );
+	/* 绘制左下角的圆角 */
+	rect = Rect( 0, des->height-radius-1, radius, radius );
+	Quote_Graph( &des_area, des, rect );
+	Graph_Draw_RoundBorder( &des_area, 
+		Pos(radius,0), radius, 1, RGB(0,0,0) );
+	/* 绘制右下角的圆角 */
+	rect = Rect( des->width-radius-1, 
+		des->height-radius-1, radius, radius );
+	Quote_Graph( &des_area, des, rect );
+	Graph_Draw_RoundBorder( &des_area, 
+		Pos(0,0), radius, 1, RGB(0,0,0) );
 	
 	/* 绘制上边框 */
 	for(y=0;y<border.top_width;++y) {
