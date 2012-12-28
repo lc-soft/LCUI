@@ -60,11 +60,29 @@ void Border_Radius( LCUI_Border *border, int radius )
 static int 
 Graph_Draw_RoundBorder( 
 	LCUI_Graph *des, LCUI_Pos center, 
-	int radius, LCUI_RGB line_color )
+	int radius, int line_width, 
+	LCUI_RGB line_color, BOOL hide_outarea )
+/* 
+ * 功能：为图层绘制圆角边框 
+ * 参数说明：
+ * 	des		目标图层
+ * 	center		圆心在目标图层中的坐标
+ * 	radius		圆的半径
+ * 	line_width	线条宽度
+ * 	line_color	线条颜色
+ * 	hide_outarea	指示是否需要隐藏圆外的区域
+ * */
 {
 	int pos, k, j, y, x;
 	LCUI_Rect real_rect;
 	
+	if( line_width <= 0 && !hide_outarea ) {
+		return 1;
+	}
+	/* 递归调用，先绘制最里面的同心圆，并且，对圆的外部区域进行隐藏处理 */
+	Graph_Draw_RoundBorder( des, center, radius-1, 
+		line_width-1, line_color, FALSE );
+	/* 里面一层圆绘制完了后，再绘制这一层圆 */
 	real_rect = Get_Graph_Valid_Rect( des );
 	des = Get_Quote_Graph( des );
 	if( !Graph_Valid( des ) ) {
@@ -199,40 +217,33 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	count = max( border.left_width, border.top_width );
 	Quote_Graph( &des_area, des, rect );
 	/* 根据边框粗细程度，绘制相应数量的同心圆 */
-	for(k=0; k<count; ++k) {
-		Graph_Draw_RoundBorder( &des_area, 
-			Pos(radius,radius), radius-k, RGB(0,0,0) );
-	}
+	Graph_Draw_RoundBorder( &des_area, Pos(radius,radius), 
+		radius, count, RGB(0,0,0), FALSE );
 	
 	/* 绘制右上角的圆角 */
 	radius = border.top_right_radius;
 	rect = Rect( des->width-radius-1, 0, radius, radius );
 	count = max( border.right_width, border.top_width );
 	Quote_Graph( &des_area, des, rect );
-	for(k=0; k<count; ++k) {
-		Graph_Draw_RoundBorder( &des_area, 
-			Pos(0,radius), radius-k, RGB(0,0,0) );
-	}
+	Graph_Draw_RoundBorder( &des_area, 
+		Pos(0,radius), radius, count, RGB(0,0,0), FALSE );
 	
 	/* 绘制左下角的圆角 */
 	radius = border.bottom_left_radius;
 	rect = Rect( 0, des->height-radius-1, radius, radius );
 	count = max( border.left_width, border.bottom_width );
 	Quote_Graph( &des_area, des, rect );
-	for(k=0; k<count; ++k) {
-		Graph_Draw_RoundBorder( &des_area, 
-			Pos(radius,0), radius-k, RGB(0,0,0) );
-	}
+	Graph_Draw_RoundBorder( &des_area, 
+		Pos(radius,0), radius, count, RGB(0,0,0), FALSE );
+	
 	/* 绘制右下角的圆角 */
 	radius = border.bottom_right_radius;
 	rect = Rect( des->width-radius-1, 
 		des->height-radius-1, radius, radius );
 	count = max( border.right_width, border.bottom_width );
 	Quote_Graph( &des_area, des, rect );
-	for(k=0; k<count; ++k) {
-		Graph_Draw_RoundBorder( &des_area, 
-			Pos(0,0), radius-k, RGB(0,0,0) );
-	}
+	Graph_Draw_RoundBorder( &des_area, 
+		Pos(0,0), radius, count, RGB(0,0,0), FALSE );
 	
 	/* 绘制上边框 */
 	k = des->width;
