@@ -74,7 +74,7 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 
 ## 贡献
 
-你可以通过GitHub发送pull请求，patch应符合以下要求：
+你可以通过GitHub向本项目提交合并请求，patch应符合以下要求：
 
 1. 遵循现有代码风格。
 2. 一个commit应该做完整的一件事。
@@ -83,7 +83,7 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 4. 修复之前的commit（已经合并）中存在的bug，commit信息的摘要行应该以`fixup!`开头，
    表示修复了它。如果你修复的是issues列表中未解决的bug，commit信息的摘要行应该以
    `fix->`开头，并加上issues列表中对应bug信息的标题。
-5. 衍合你的分支至源项目的master分支。我们不希望拉取到多余的合并提交。
+5. 衍合你的分支至源项目的master分支。我们不希望抓取到冗余的合并请求。
 6. **要清楚什么许可证适用于你的patch：** 该库中的文件基于GPLv2（或更高版本），但（原
    作者）我们仍然可以创建非自由的衍生工具。然而，如果给我们的补丁是基于GPL的，我们希望它
    以后不会进入任何非自由的衍生工具，因此，如果补丁发布于公共领域，会为我们带来方便（以及
@@ -99,20 +99,21 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 1. 在GitHub上进行Fork (点击 Fork 按钮)
 2. Clone到计算机： `git clone git@github.com:«github account»/LCUI.git`
 3. cd 到你的库里面： `cd LCUI`
-4. 设置upstream至remote： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
+4. 设置remote记录，假设该记录名为upstream，那么命令为： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
 
 #### 添加Feature
 
-1. 为新的feature创建一个分支(branch)： `git checkout -b my_new_feature`
+1. 为新的feature创建一个分支(branch)，假设分支名为my_new_feature，那么命令为：
+ `git checkout -b my_new_feature`
 2. 在你的feature上工作, 像往常一样添加和提交
 
-创建一个分支并非必须的，但是，当已经合并至源项目时可以方便删除你的分支，比较你的分支和源
-项目的最终版本，然后提交拉取请求。
+创建一个分支并非必须的，但是，当已经合并至源项目时 可以方便删除你的分支，也可以在提交合并
+请求前 比较你的分支和源项目的最终版本，然后提交合并请求。
 
 #### 推送到GitHub
 
 1. 推送分支至GitHub： `git push origin my_new_feature`
-2. Issue拉取请求： 在Github上点击 Pull Request 按钮
+2. 发出合并请求： 在Github上点击 Pull Request 按钮
 
 #### 有用的命令
 
