@@ -73,8 +73,9 @@ Graph_Draw_RoundBorder(
  * 	hide_outarea	指示是否需要隐藏圆外的区域
  * */
 {
-	int pos, k, j, y, x;
 	LCUI_Rect real_rect;
+	int pos, k, j, y, x;
+	int max_x, max_y, min_x, min_y;
 	
 	if( line_width <= 0 && !hide_outarea ) {
 		return 1;
@@ -88,7 +89,11 @@ Graph_Draw_RoundBorder(
 	if( !Graph_Valid( des ) ) {
 		return -1;
 	}
-	
+	/* 预先计算xy轴坐标的有效范围 */
+	max_x = real_rect.x + real_rect.width - center.x;
+	min_x = center.x - real_rect.x - real_rect.width;
+	max_y = real_rect.y + real_rect.height - center.y;
+	min_y = center.y - real_rect.y - real_rect.height;
 	/* 先记录起点的线性坐标 */
 	k = (real_rect.y + center.y) * des->width;
 	k = j = k + center.x + real_rect.x;
@@ -96,34 +101,31 @@ Graph_Draw_RoundBorder(
 	for(y=0; y<radius; ++y) {
 		/* 四舍五入，计算出x轴整数坐标 */
 		x = sqrt( pow(radius, 2) - y*y )+0.5;
-		if( center.x-x >= 0 
-		 && center.x-x < real_rect.x+real_rect.width) {
-			if( center.y-y >= 0
-			 && center.y-y < real_rect.y+real_rect.height ) {
+		if( y <= center.y && y > min_y ) {
+			if( x <= center.x && x > min_x ) {
 				/* 左上半圆 */
 				pos = j - x;
 				des->rgba[0][pos] = line_color.red;
 				des->rgba[1][pos] = line_color.green;
 				des->rgba[2][pos] = line_color.blue;
 			}
-			if( center.y+y < real_rect.y+real_rect.height ) {
+			if( x < max_x ) {
+				/* 右上半圆 */
+				pos = j + x;
+				des->rgba[0][pos] = line_color.red;
+				des->rgba[1][pos] = line_color.green;
+				des->rgba[2][pos] = line_color.blue;
+			}
+		}
+		if( y < max_y ) {
+			if( x <= center.x && x > min_x ) {
 				/* 左下半圆 */
 				pos = k - x;
 				des->rgba[0][pos] = line_color.red;
 				des->rgba[1][pos] = line_color.green;
 				des->rgba[2][pos] = line_color.blue;
 			}
-		}
-		if( center.x+x < real_rect.x+real_rect.width ) {
-			/* 右上半圆 */
-			if( center.y-y >= 0
-			 && center.y-y < real_rect.y+real_rect.height ) {
-				pos = j + x;
-				des->rgba[0][pos] = line_color.red;
-				des->rgba[1][pos] = line_color.green;
-				des->rgba[2][pos] = line_color.blue;
-			}
-			if( center.y+y < real_rect.y+real_rect.height ) {
+			if( x < max_x ) {
 				/* 右下半圆 */
 				pos = k + x;
 				des->rgba[0][pos] = line_color.red;
@@ -153,31 +155,28 @@ Graph_Draw_RoundBorder(
 	/* 根据x轴计算各点的y轴坐标并填充点 */
 	for(x=0; x<radius; ++x) {
 		y = sqrt( pow(radius, 2) - x*x )+0.5;
-		if( center.y-y >= 0
-		 && center.y-y < real_rect.y+real_rect.height ) {
-			if( center.x-x >= 0 
-			 && center.x-x < real_rect.x+real_rect.width) {
+		if( center.x >= x && x > min_x ) {
+			if( y <= center.y && y > min_y) {
 				pos = k - y * des->width - x;
 				des->rgba[0][pos] = line_color.red;
 				des->rgba[1][pos] = line_color.green;
 				des->rgba[2][pos] = line_color.blue;
 			}
-			if( center.x+x < real_rect.x+real_rect.width ) {
-				pos = k - y * des->width + x;
-				des->rgba[0][pos] = line_color.red;
-				des->rgba[1][pos] = line_color.green;
-				des->rgba[2][pos] = line_color.blue;
-			}
-		}
-		if( center.y+y < real_rect.y+real_rect.height ) {
-			if( center.x-x >= 0 
-			 && center.x-x < real_rect.x+real_rect.width) {
+			if( y < max_y ) {
 				pos = k + y * des->width - x;
 				des->rgba[0][pos] = line_color.red;
 				des->rgba[1][pos] = line_color.green;
 				des->rgba[2][pos] = line_color.blue;
 			}
-			if( center.x+x < real_rect.x+real_rect.width ) {
+		}
+		if( x < max_x ) {
+			if( y <= center.y && y > min_y ) {
+				pos = k - y * des->width + x;
+				des->rgba[0][pos] = line_color.red;
+				des->rgba[1][pos] = line_color.green;
+				des->rgba[2][pos] = line_color.blue;
+			}
+			if( y < max_y ) {
 				pos = k + y * des->width + x;
 				des->rgba[0][pos] = line_color.red;
 				des->rgba[1][pos] = line_color.green;
