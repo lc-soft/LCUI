@@ -42,10 +42,26 @@
 #define __LCUI_GRAPH_H__
 
 LCUI_BEGIN_HEADER
+/* 如果需要宏定义版的ALPHA_BLENDING */
+#ifdef NEED_MACRO_ALPHA_BLENDING
 
 #define ALPHA_BLENDING(__fore__ , __back__, __alpha__) \
 	((__fore__*__alpha__+__back__*(255-__alpha__))/255)
-	
+
+#else /* 否则，用内联函数版的ALPHA_BLENDING */
+
+extern inline uchar_t 
+ALPHA_BLENDING( uchar_t fore, uchar_t back, uchar_t alpha )
+__attribute__((always_inline));
+
+extern inline uchar_t 
+ALPHA_BLENDING( uchar_t fore, uchar_t back, uchar_t alpha )
+{
+	return (fore * alpha + back*(255-alpha))/255;
+}
+
+#endif
+
 LCUI_RGB RGB ( uchar_t red, uchar_t green, uchar_t blue ) ;
 /* 将三个颜色值转换成LCUI_RGB型数据 */
 
