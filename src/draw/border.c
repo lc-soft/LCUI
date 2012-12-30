@@ -57,6 +57,19 @@ void Border_Radius( LCUI_Border *border, int radius )
 	border->bottom_right_radius = radius;
 }
 
+
+extern inline void 
+fill_pixel( uchar_t **buff, int pos, LCUI_RGB color ) 
+__attribute__((always_inline));
+
+extern inline void 
+fill_pixel( uchar_t **buff, int pos, LCUI_RGB color ) 
+{
+	buff[0][pos] = color.red;
+	buff[1][pos] = color.green;
+	buff[2][pos] = color.blue;
+}
+
 static int 
 Graph_Draw_RoundBorder( 
 	LCUI_Graph *des, LCUI_Pos center, 
@@ -105,32 +118,24 @@ Graph_Draw_RoundBorder(
 			if( x <= center.x && x > min_x ) {
 				/* 左上半圆 */
 				pos = j - x;
-				des->rgba[0][pos] = line_color.red;
-				des->rgba[1][pos] = line_color.green;
-				des->rgba[2][pos] = line_color.blue;
+				fill_pixel( des->rgba, pos, line_color );
 			}
 			if( x < max_x ) {
 				/* 右上半圆 */
 				pos = j + x;
-				des->rgba[0][pos] = line_color.red;
-				des->rgba[1][pos] = line_color.green;
-				des->rgba[2][pos] = line_color.blue;
+				fill_pixel( des->rgba, pos, line_color );
 			}
 		}
 		if( y < max_y ) {
 			if( x <= center.x && x > min_x ) {
 				/* 左下半圆 */
 				pos = k - x;
-				des->rgba[0][pos] = line_color.red;
-				des->rgba[1][pos] = line_color.green;
-				des->rgba[2][pos] = line_color.blue;
+				fill_pixel( des->rgba, pos, line_color );
 			}
 			if( x < max_x ) {
 				/* 右下半圆 */
 				pos = k + x;
-				des->rgba[0][pos] = line_color.red;
-				des->rgba[1][pos] = line_color.green;
-				des->rgba[2][pos] = line_color.blue;
+				fill_pixel( des->rgba, pos, line_color );
 			}
 		}
 		/* 
@@ -158,29 +163,21 @@ Graph_Draw_RoundBorder(
 		if( center.x >= x && x > min_x ) {
 			if( y <= center.y && y > min_y) {
 				pos = k - y * des->width - x;
-				des->rgba[0][pos] = line_color.red;
-				des->rgba[1][pos] = line_color.green;
-				des->rgba[2][pos] = line_color.blue;
+				fill_pixel( des->rgba, pos, line_color );
 			}
 			if( y < max_y ) {
 				pos = k + y * des->width - x;
-				des->rgba[0][pos] = line_color.red;
-				des->rgba[1][pos] = line_color.green;
-				des->rgba[2][pos] = line_color.blue;
+				fill_pixel( des->rgba, pos, line_color );
 			}
 		}
 		if( x < max_x ) {
 			if( y <= center.y && y > min_y ) {
 				pos = k - y * des->width + x;
-				des->rgba[0][pos] = line_color.red;
-				des->rgba[1][pos] = line_color.green;
-				des->rgba[2][pos] = line_color.blue;
+				fill_pixel( des->rgba, pos, line_color );
 			}
 			if( y < max_y ) {
 				pos = k + y * des->width + x;
-				des->rgba[0][pos] = line_color.red;
-				des->rgba[1][pos] = line_color.green;
-				des->rgba[2][pos] = line_color.blue;
+				fill_pixel( des->rgba, pos, line_color );
 			}
 		}
 	}
@@ -253,7 +250,7 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 			des->rgba[0][count] = border.top_color.red;
 			des->rgba[1][count] = border.top_color.green;
 			des->rgba[2][count] = border.top_color.blue;
-			if(Graph_Have_Alpha(des)) {
+			if( des->have_alpha ) {
 				des->rgba[3][count] = 255;
 			}
 		}
@@ -267,7 +264,7 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 			des->rgba[0][count] = border.bottom_color.red;
 			des->rgba[1][count] = border.bottom_color.green;
 			des->rgba[2][count] = border.bottom_color.blue;
-			if(Graph_Have_Alpha(des)) {
+			if( des->have_alpha ) {
 				des->rgba[3][count] = 255;
 			}
 		}
@@ -280,8 +277,9 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 			des->rgba[0][count] = border.left_color.red;
 			des->rgba[1][count] = border.left_color.green;
 			des->rgba[2][count] = border.left_color.blue;
-			if(Graph_Have_Alpha(des)) 
+			if( des->have_alpha ) {
 				des->rgba[3][count] = 255;
+			}
 		}
 	}
 	/* 绘制右边的线 */
@@ -293,7 +291,7 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 			des->rgba[0][count] = border.right_color.red;
 			des->rgba[1][count] = border.right_color.green;
 			des->rgba[2][count] = border.right_color.blue;
-			if(Graph_Have_Alpha(des)) {
+			if( des->have_alpha ) {
 				des->rgba[3][count] = 255;
 			}
 		}
