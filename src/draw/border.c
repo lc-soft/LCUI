@@ -87,15 +87,13 @@ Graph_Draw_RoundBorder(
  * */
 {
 	LCUI_Rect real_rect;
-	int pos, k, j, y, x;
+	int pos, k, j, y, x, i, n;
 	int max_x, max_y, min_x, min_y;
 	
 	if( line_width <= 0 && !hide_outarea ) {
 		return 1;
 	}
-	/* 递归调用，先绘制最里面的同心圆，并且，对圆的外部区域进行隐藏处理 */
-	Graph_Draw_RoundBorder( des, center, radius-1, 
-		line_width-1, line_color, FALSE );
+	
 	/* 里面一层圆绘制完了后，再绘制这一层圆 */
 	real_rect = Get_Graph_Valid_Rect( des );
 	des = Get_Quote_Graph( des );
@@ -119,11 +117,25 @@ Graph_Draw_RoundBorder(
 				/* 左上半圆 */
 				pos = j - x;
 				fill_pixel( des->rgba, pos, line_color );
+				/* 根据线条宽度，继续向右填充n个像素点 */
+				n = center.x-x+line_width;
+				n = n>center.x ? center.x-x:line_width;
+				for(i=0; i<n; ++i) {
+					++pos;
+					fill_pixel( des->rgba, pos, line_color );
+				}
 			}
 			if( x < max_x ) {
 				/* 右上半圆 */
 				pos = j + x;
 				fill_pixel( des->rgba, pos, line_color );
+				/* 根据线条宽度，继续向左填充n个像素点 */
+				n = x-line_width;
+				n = n<min_x ? x-min_x:line_width;
+				for(i=0; i<n; ++i) {
+					--pos;
+					fill_pixel( des->rgba, pos, line_color );
+				}
 			}
 		}
 		if( y < max_y ) {
@@ -131,11 +143,23 @@ Graph_Draw_RoundBorder(
 				/* 左下半圆 */
 				pos = k - x;
 				fill_pixel( des->rgba, pos, line_color );
+				n = center.x-x+line_width;
+				n = n>center.x ? center.x-x:line_width;
+				for(i=0; i<n; ++i) {
+					++pos;
+					fill_pixel( des->rgba, pos, line_color );
+				}
 			}
 			if( x < max_x ) {
 				/* 右下半圆 */
 				pos = k + x;
 				fill_pixel( des->rgba, pos, line_color );
+				n = x-line_width;
+				n = n<min_x ? x-min_x:line_width;
+				for(i=0; i<n; ++i) {
+					--pos;
+					fill_pixel( des->rgba, pos, line_color );
+				}
 			}
 		}
 		/* 
@@ -164,20 +188,46 @@ Graph_Draw_RoundBorder(
 			if( y <= center.y && y > min_y) {
 				pos = k - y * des->width - x;
 				fill_pixel( des->rgba, pos, line_color );
+				/* 根据线条宽度，继续向下填充n个像素点 */
+				n = center.y-y+line_width;
+				n = n>center.y ? center.y-y:line_width;
+				for(i=0; i<n; ++i) {
+					pos+=des->width;
+					fill_pixel( des->rgba, pos, line_color );
+				}
 			}
 			if( y < max_y ) {
 				pos = k + y * des->width - x;
 				fill_pixel( des->rgba, pos, line_color );
+				/* 根据线条宽度，继续向上填充n个像素点 */
+				n = y-line_width;
+				n = n<min_y ? y-min_y:line_width;
+				for(i=0; i<n; ++i) {
+					pos-=des->width;
+					fill_pixel( des->rgba, pos, line_color );
+				}
 			}
 		}
 		if( x < max_x ) {
 			if( y <= center.y && y > min_y ) {
 				pos = k - y * des->width + x;
 				fill_pixel( des->rgba, pos, line_color );
+				n = center.y-y+line_width;
+				n = n>center.y ? center.y-y:line_width;
+				for(i=0; i<n; ++i) {
+					pos+=des->width;
+					fill_pixel( des->rgba, pos, line_color );
+				}
 			}
 			if( y < max_y ) {
 				pos = k + y * des->width + x;
 				fill_pixel( des->rgba, pos, line_color );
+				n = y-line_width;
+				n = n<min_y ? y-min_y:line_width;
+				for(i=0; i<n; ++i) {
+					pos-=des->width;
+					fill_pixel( des->rgba, pos, line_color );
+				}
 			}
 		}
 	}
