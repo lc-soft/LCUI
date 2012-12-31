@@ -102,9 +102,9 @@ Graph_Draw_RoundBorder(
 	}
 	/* 预先计算xy轴坐标的有效范围 */
 	max_x = real_rect.x + real_rect.width - center.x;
-	min_x = center.x - real_rect.x - real_rect.width;
+	min_x = center.x>0? 0:-center.x;
 	max_y = real_rect.y + real_rect.height - center.y;
-	min_y = center.y - real_rect.y - real_rect.height;
+	min_y = center.y>0? 0:-center.y;
 	/* 先记录起点的线性坐标 */
 	k = (real_rect.y + center.y) * des->width;
 	k = j = k + center.x + real_rect.x;
@@ -119,7 +119,7 @@ Graph_Draw_RoundBorder(
 				fill_pixel( des->rgba, pos, line_color );
 				/* 根据线条宽度，继续向右填充n个像素点 */
 				n = center.x-x+line_width;
-				n = n>center.x ? center.x-x:line_width;
+				n = n>center.x ? x:line_width;
 				for(i=0; i<n; ++i) {
 					++pos;
 					fill_pixel( des->rgba, pos, line_color );
@@ -144,7 +144,7 @@ Graph_Draw_RoundBorder(
 				pos = k - x;
 				fill_pixel( des->rgba, pos, line_color );
 				n = center.x-x+line_width;
-				n = n>center.x ? center.x-x:line_width;
+				n = n>center.x ? x:line_width;
 				for(i=0; i<n; ++i) {
 					++pos;
 					fill_pixel( des->rgba, pos, line_color );
@@ -190,7 +190,7 @@ Graph_Draw_RoundBorder(
 				fill_pixel( des->rgba, pos, line_color );
 				/* 根据线条宽度，继续向下填充n个像素点 */
 				n = center.y-y+line_width;
-				n = n>center.y ? center.y-y:line_width;
+				n = n>center.y ? y:line_width;
 				for(i=0; i<n; ++i) {
 					pos+=des->width;
 					fill_pixel( des->rgba, pos, line_color );
@@ -213,7 +213,7 @@ Graph_Draw_RoundBorder(
 				pos = k - y * des->width + x;
 				fill_pixel( des->rgba, pos, line_color );
 				n = center.y-y+line_width;
-				n = n>center.y ? center.y-y:line_width;
+				n = n>center.y ? y:line_width;
 				for(i=0; i<n; ++i) {
 					pos+=des->width;
 					fill_pixel( des->rgba, pos, line_color );
