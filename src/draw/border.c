@@ -70,173 +70,110 @@ fill_pixel( uchar_t **buff, int pos, LCUI_RGB color )
 	buff[2][pos] = color.blue;
 }
 
-static int 
-Graph_Draw_RoundBorder( 
-	LCUI_Graph *des, LCUI_Pos center, 
-	int radius, int line_width, 
-	LCUI_RGB line_color, BOOL hide_outarea )
-/* 
- * 功能：为图层绘制圆角边框 
- * 参数说明：
- * 	des		目标图层
- * 	center		圆心在目标图层中的坐标
- * 	radius		圆的半径
- * 	line_width	线条宽度
- * 	line_color	线条颜色
- * 	hide_outarea	指示是否需要隐藏圆外的区域
- * */
+static int
+Graph_Draw_RoundBorder_LeftTop( 
+	LCUI_Graph *des,	LCUI_Pos center,
+	int radius,		int line_width,
+	LCUI_RGB line_color,	BOOL hide_outarea )
+/* 绘制左上角的圆角，从左至上 */
 {
 	LCUI_Rect real_rect;
-	int pos, k, j, y, x, i, n;
+	int pos, center_pos, y, x, i, n;
 	int max_x, max_y, min_x, min_y;
 	
 	if( line_width <= 0 && !hide_outarea ) {
 		return 1;
 	}
 	
-	/* 里面一层圆绘制完了后，再绘制这一层圆 */
 	real_rect = Get_Graph_Valid_Rect( des );
 	des = Get_Quote_Graph( des );
 	if( !Graph_Valid( des ) ) {
 		return -1;
 	}
 	/* 预先计算xy轴坐标的有效范围 */
-	max_x = real_rect.x + real_rect.width - center.x;
-	min_x = center.x>0? 0:-center.x;
-	max_y = real_rect.y + real_rect.height - center.y;
-	min_y = center.y>0? 0:-center.y;
-	/* 先记录起点的线性坐标 */
-	k = (real_rect.y + center.y) * des->width;
-	k = j = k + center.x + real_rect.x;
+	max_x = radius*2;
+	if( center.x+radius > real_rect.x + real_rect.width ) {
+		max_x -= (center.x+radius-real_rect.x-real_rect.width);
+	}
+	if( max_x < 0 ) {
+		max_x = 0;
+	}
+	min_x = center.x>radius? 0:radius-center.x;
+	if( min_x < 0 ) {
+		min_x = 0;
+	}
+	max_y = radius*2;
+	if( center.y+radius > real_rect.y + real_rect.height ) {
+		max_y -= (center.y+radius-real_rect.y-real_rect.height);
+	}
+	min_y = center.y>radius? 0:radius-center.y;
+	if( min_y < 0 ) {
+		min_y = 0;
+	}
+	
+	/* 预先计算圆心的线性坐标 */
+	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = center_pos + center.x + real_rect.x;
+
+	/* 若需要隐藏圆外的区域 */
+	if( hide_outarea && des->have_alpha ) {
+		for( y=0; y<center.y-radius; ++y ) {
+			pos = (real_rect.y+y)*des->width+real_rect.x;
+			n = max_x-min_x;
+			n += center.x - radius;
+			memset( &des->rgba[3][pos], 0, n );
+		}
+	}
 	/* 根据y轴计算各点的x轴坐标并填充点 */
-	for(y=0; y<radius; ++y) {
+	for( y=0; y<=radius; ++y, center_pos -= des->width ) {
+		if( radius-y >= max_y || radius-y < min_y ) {
+			continue;
+		}
 		/* 四舍五入，计算出x轴整数坐标 */
 		x = sqrt( pow(radius, 2) - y*y )+0.5;
-		if( y <= center.y && y > min_y ) {
-			if( x <= center.x && x > min_x ) {
-				/* 左上半圆 */
-				pos = j - x;
-				fill_pixel( des->rgba, pos, line_color );
-				/* 根据线条宽度，继续向右填充n个像素点 */
-				n = center.x-x+line_width;
-				n = n>center.x ? x:line_width;
-				for(i=0; i<n; ++i) {
-					++pos;
-					fill_pixel( des->rgba, pos, line_color );
-				}
+		if( radius-x >= min_x && radius-x < max_x ) {
+			pos = center_pos - x;
+			fill_pixel( des->rgba, pos, line_color );
+		}
+		
+		if( hide_outarea && des->have_alpha ) {
+			/* 计算起点坐标 */
+			pos = center_pos - center.x;
+			if( radius-x > max_x ) {
+				n = max_x - min_x;
+			} else {
+				n = radius-x-min_x;
 			}
-			if( x < max_x ) {
-				/* 右上半圆 */
-				pos = j + x;
-				fill_pixel( des->rgba, pos, line_color );
-				/* 根据线条宽度，继续向左填充n个像素点 */
-				n = x-line_width;
-				n = n<min_x ? x-min_x:line_width;
-				for(i=0; i<n; ++i) {
-					--pos;
-					fill_pixel( des->rgba, pos, line_color );
-				}
+			/* 加上圆与背景图的左边距 */
+			n += (center.x-radius);
+			for(i=0; i<n; ++i) {
+				des->rgba[3][pos++]=0;
 			}
 		}
-		if( y < max_y ) {
-			if( x <= center.x && x > min_x ) {
-				/* 左下半圆 */
-				pos = k - x;
-				fill_pixel( des->rgba, pos, line_color );
-				n = center.x-x+line_width;
-				n = n>center.x ? x:line_width;
-				for(i=0; i<n; ++i) {
-					++pos;
-					fill_pixel( des->rgba, pos, line_color );
-				}
-			}
-			if( x < max_x ) {
-				/* 右下半圆 */
-				pos = k + x;
-				fill_pixel( des->rgba, pos, line_color );
-				n = x-line_width;
-				n = n<min_x ? x-min_x:line_width;
-				for(i=0; i<n; ++i) {
-					--pos;
-					fill_pixel( des->rgba, pos, line_color );
-				}
-			}
+		/* 计算需要向右填充的像素点的个数n */
+		n = radius-x+line_width;
+		n = n>radius ? x:line_width;
+		/* 如果该点x轴坐标小于最小x轴坐标 */
+		if( radius-x < min_x ) {
+			/* 重新确定起点坐标pos和填充的像素点的个数n */
+			pos = center_pos - radius+min_x-1;
+			n -= (min_x-radius+x);
+		} else {
+			pos = center_pos - x;
 		}
-		/* 
-		 * 由于圆是y轴上下对称，可以用变量k记录下半圆的下一行点的y轴坐标，
-		 * 而变量j则相反
-		 * */
-		k += des->width;
-		j -= des->width;
-	}
-	/* 
-	 * 那个 pos = k - y * des->width - x; 之前是这样的：
-	 * pos = (center.y-y)*des->width+center.x-x;
-	 * 式子可以转换成这样：
-	 * pos = (center.y*des->width+center.x)-y*des->width-x;
-	 * 鉴于center.y*des->width+center.x的运算结果是不变的，所以，
-	 * 每次就不必重复将它们代入进去进行运算，在运算前，一次性计算出它的
-	 * 值即可。
-	 * */
-	/* 先计算固定的二维坐标对应的线性坐标 */
-	k = (real_rect.y+center.y) * des->width;
-	k = k + center.x + real_rect.x;
-	/* 根据x轴计算各点的y轴坐标并填充点 */
-	for(x=0; x<radius; ++x) {
-		y = sqrt( pow(radius, 2) - x*x )+0.5;
-		if( center.x >= x && x > min_x ) {
-			if( y <= center.y && y > min_y) {
-				pos = k - y * des->width - x;
-				fill_pixel( des->rgba, pos, line_color );
-				/* 根据线条宽度，继续向下填充n个像素点 */
-				n = center.y-y+line_width;
-				n = n>center.y ? y:line_width;
-				for(i=0; i<n; ++i) {
-					pos+=des->width;
-					fill_pixel( des->rgba, pos, line_color );
-				}
-			}
-			if( y < max_y ) {
-				pos = k + y * des->width - x;
-				fill_pixel( des->rgba, pos, line_color );
-				/* 根据线条宽度，继续向上填充n个像素点 */
-				n = y-line_width;
-				n = n<min_y ? y-min_y:line_width;
-				for(i=0; i<n; ++i) {
-					pos-=des->width;
-					fill_pixel( des->rgba, pos, line_color );
-				}
-			}
+		/* 从下一个像素点开始 */
+		++pos;
+		/* 如果填充的像素点超出了最大x轴范围 */
+		if( radius-x + n > max_x ) {
+			/* 重新确定需要填充的像素点的个数n */
+			n = max_x - radius + x;
 		}
-		if( x < max_x ) {
-			if( y <= center.y && y > min_y ) {
-				pos = k - y * des->width + x;
-				fill_pixel( des->rgba, pos, line_color );
-				n = center.y-y+line_width;
-				n = n>center.y ? y:line_width;
-				for(i=0; i<n; ++i) {
-					pos+=des->width;
-					fill_pixel( des->rgba, pos, line_color );
-				}
-			}
-			if( y < max_y ) {
-				pos = k + y * des->width + x;
-				fill_pixel( des->rgba, pos, line_color );
-				n = y-line_width;
-				n = n<min_y ? y-min_y:line_width;
-				for(i=0; i<n; ++i) {
-					pos-=des->width;
-					fill_pixel( des->rgba, pos, line_color );
-				}
-			}
+		/* 开始填充当前点右边的n-1个像素点 */
+		for(i=0; i<n-1; ++i,++pos) {
+			fill_pixel( des->rgba, pos, line_color );
 		}
 	}
 	return 0;
-}
-
-static int max( int a, int b )
-{
-	return a>b?a:b;
 }
 
 int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
@@ -260,36 +197,13 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	radius = border.top_left_radius;
 	/* 绘制左上角的圆角，先引用左上角区域，再将圆绘制到这个区域里 */
 	rect = Rect( 0, 0, radius, radius );
-	count = max( border.left_width, border.top_width );
 	Quote_Graph( &des_area, des, rect );
-	/* 根据边框粗细程度，绘制相应数量的同心圆 */
-	Graph_Draw_RoundBorder( &des_area, Pos(radius,radius), 
-		radius, count, RGB(0,0,0), FALSE );
+	Graph_Draw_RoundBorder_LeftTop( 
+		&des_area,		Pos( radius, radius ), 
+		radius,			border.left_width, 
+		border.left_color,	TRUE 
+	);
 	
-	/* 绘制右上角的圆角 */
-	radius = border.top_right_radius;
-	rect = Rect( des->width-radius-1, 0, radius, radius );
-	count = max( border.right_width, border.top_width );
-	Quote_Graph( &des_area, des, rect );
-	Graph_Draw_RoundBorder( &des_area, 
-		Pos(0,radius), radius, count, RGB(0,0,0), FALSE );
-	
-	/* 绘制左下角的圆角 */
-	radius = border.bottom_left_radius;
-	rect = Rect( 0, des->height-radius-1, radius, radius );
-	count = max( border.left_width, border.bottom_width );
-	Quote_Graph( &des_area, des, rect );
-	Graph_Draw_RoundBorder( &des_area, 
-		Pos(radius,0), radius, count, RGB(0,0,0), FALSE );
-	
-	/* 绘制右下角的圆角 */
-	radius = border.bottom_right_radius;
-	rect = Rect( des->width-radius-1, 
-		des->height-radius-1, radius, radius );
-	count = max( border.right_width, border.bottom_width );
-	Quote_Graph( &des_area, des, rect );
-	Graph_Draw_RoundBorder( &des_area, 
-		Pos(0,0), radius, count, RGB(0,0,0), FALSE );
 	
 	/* 绘制上边框 */
 	k = des->width;
