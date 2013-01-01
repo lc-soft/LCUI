@@ -75,7 +75,7 @@ Graph_Draw_RoundBorder_LeftTop(
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
 	LCUI_RGB line_color,	BOOL hide_outarea )
-/* 绘制左上角的圆角，从左至上 */
+/* 绘制左上角的圆角，从左边框的上端到上边框的左端绘制一条圆角线 */
 {
 	LCUI_Rect real_rect;
 	int pos, center_pos, y, x, i, n;
@@ -131,7 +131,9 @@ Graph_Draw_RoundBorder_LeftTop(
 		}
 		/* 四舍五入，计算出x轴整数坐标 */
 		x = sqrt( pow(radius, 2) - y*y )+0.5;
-		if( radius-x >= min_x && radius-x < max_x ) {
+		
+		if( line_width > 0 && radius-x >= min_x 
+		 && radius-x <= max_x ) {
 			pos = center_pos - x;
 			fill_pixel( des->rgba, pos, line_color );
 		}
@@ -176,6 +178,91 @@ Graph_Draw_RoundBorder_LeftTop(
 	return 0;
 }
 
+static int
+Graph_Draw_RoundBorder_RightTop( 
+	LCUI_Graph *des,	LCUI_Pos center,
+	int radius,		int line_width,
+	LCUI_RGB line_color,	BOOL hide_outarea )
+/* 绘制右上角的圆角，从右边框的上端到上边框的右端绘制一条圆角线 */
+{
+	LCUI_Rect real_rect;
+	int pos, center_pos, y, x, i, n;
+	int max_x, max_y, min_x, min_y;
+	
+	if( line_width <= 0 && !hide_outarea ) {
+		return 1;
+	}
+	
+	real_rect = Get_Graph_Valid_Rect( des );
+	des = Get_Quote_Graph( des );
+	if( !Graph_Valid( des ) ) {
+		return -1;
+	}
+	
+	max_x = radius*2;
+	if( center.x+radius > real_rect.x + real_rect.width ) {
+		max_x -= (center.x+radius-real_rect.x-real_rect.width);
+	}
+	if( max_x < 0 ) {
+		max_x = 0;
+	}
+	min_x = center.x>radius? 0:radius-center.x;
+	if( min_x < 0 ) {
+		min_x = 0;
+	}
+	max_y = radius*2;
+	if( center.y+radius > real_rect.y + real_rect.height ) {
+		max_y -= (center.y+radius-real_rect.y-real_rect.height);
+	}
+	min_y = center.y>radius? 0:radius-center.y;
+	if( min_y < 0 ) {
+		min_y = 0;
+	}
+	
+	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = center_pos + center.x + real_rect.x;
+	
+	for( y=0; y<=radius; ++y, center_pos -= des->width ) {
+		if( radius-y >= max_y || radius-y < min_y ) {
+			continue;
+		}
+		x = sqrt( pow(radius, 2) - y*y )+0.5;
+		
+		if( line_width > 0 && radius+x >= min_x 
+		 && radius+x <= max_x ) {
+			pos = center_pos + x;
+			fill_pixel( des->rgba, pos, line_color );
+		}
+		
+		if( hide_outarea && des->have_alpha ) {
+			n = center_pos + max_x - radius;
+			if( radius+x < min_x ) {
+				pos = center_pos + min_x - radius;
+			} else {
+				pos = center_pos + x;
+			}
+			for( ++pos; pos<=n; ++pos ) {
+				des->rgba[3][pos] = 0;
+			}
+		}
+		
+		/* 计算需要向左填充的像素点的个数n */
+		n = radius+x-line_width;
+		n = n<min_x ? x+radius-min_x:line_width;
+		
+		if( radius+x > max_x ) {
+			pos = center_pos - radius+max_x-1;
+			n -= (radius+x-max_x);
+		} else {
+			pos = center_pos + x;
+		}
+		for(i=0; i<n; ++i,--pos) {
+			fill_pixel( des->rgba, pos, line_color );
+		}
+	}
+	return 0;
+}
+
 int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 /* 简单的为图形边缘绘制边框 */
 {
@@ -194,16 +281,24 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	
 	Graph_Lock(des, 1);
 	
-	radius = border.top_left_radius;
 	/* 绘制左上角的圆角，先引用左上角区域，再将圆绘制到这个区域里 */
+	radius = border.top_left_radius;
 	rect = Rect( 0, 0, radius, radius );
 	Quote_Graph( &des_area, des, rect );
 	Graph_Draw_RoundBorder_LeftTop( 
-		&des_area,		Pos( radius, radius ), 
-		radius,			border.left_width, 
-		border.left_color,	TRUE 
+		&des_area		, Pos( radius, radius ), 
+		radius			, border.left_width, 
+		border.left_color	, TRUE 
 	);
 	
+	radius = border.top_right_radius;
+	rect = Rect( des->width-radius-1, 0, radius, radius );
+	Quote_Graph( &des_area, des, rect );
+	Graph_Draw_RoundBorder_RightTop( 
+		&des_area		, Pos( 0, radius ), 
+		radius			, border.right_width, 
+		border.right_color	, TRUE 
+	);
 	
 	/* 绘制上边框 */
 	k = des->width;
