@@ -263,6 +263,180 @@ Graph_Draw_RoundBorder_RightTop(
 	return 0;
 }
 
+static int
+Graph_Draw_RoundBorder_LeftBottom(
+	LCUI_Graph *des,	LCUI_Pos center,
+	int radius,		int line_width,
+	LCUI_RGB line_color,	BOOL hide_outarea )
+/* 绘制左下角的圆角，从左边框的下端到下边框的左端绘制一条圆角线 */
+{
+	LCUI_Rect real_rect;
+	int pos, center_pos, y, x, i, n;
+	int max_x, max_y, min_x, min_y;
+	
+	if( line_width <= 0 && !hide_outarea ) {
+		return 1;
+	}
+	
+	real_rect = Get_Graph_Valid_Rect( des );
+	des = Get_Quote_Graph( des );
+	if( !Graph_Valid( des ) ) {
+		return -1;
+	}
+	
+	max_x = radius*2;
+	if( center.x+radius > real_rect.x + real_rect.width ) {
+		max_x -= (center.x+radius-real_rect.x-real_rect.width);
+	}
+	if( max_x < 0 ) {
+		max_x = 0;
+	}
+	min_x = center.x>radius? 0:radius-center.x;
+	if( min_x < 0 ) {
+		min_x = 0;
+	}
+	max_y = radius*2;
+	if( center.y+radius > real_rect.y + real_rect.height ) {
+		max_y -= (center.y+radius-real_rect.y-real_rect.height);
+	}
+	min_y = center.y>radius? 0:radius-center.y;
+	if( min_y < 0 ) {
+		min_y = 0;
+	}
+	
+	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = center_pos + center.x + real_rect.x;
+
+	if( hide_outarea && des->have_alpha ) {
+		
+	}
+	for( y=0; y<=radius; ++y, center_pos += des->width ) {
+		if( radius+y >= max_y || radius+y < min_y ) {
+			continue;
+		}
+		x = sqrt( pow(radius, 2) - y*y )+0.5;
+		
+		if( line_width > 0 && radius-x >= min_x 
+		 && radius-x <= max_x ) {
+			pos = center_pos - x;
+			fill_pixel( des->rgba, pos, line_color );
+		}
+		if( hide_outarea && des->have_alpha ) {
+			pos = center_pos - center.x;
+			if( radius-x > max_x ) {
+				n = max_x - min_x;
+			} else {
+				n = radius-x-min_x;
+			}
+			n += (center.x-radius);
+			for(i=0; i<n; ++i) {
+				des->rgba[3][pos++]=0;
+			}
+		}
+		n = radius-x+line_width;
+		n = n>radius ? x:line_width;
+		if( radius-x < min_x ) {
+			pos = center_pos - radius+min_x-1;
+			n -= (min_x-radius+x);
+		} else {
+			pos = center_pos - x;
+		}
+		++pos;
+		if( radius-x + n > max_x ) {
+			n = max_x - radius + x;
+		}
+		for(i=0; i<n-1; ++i,++pos) {
+			fill_pixel( des->rgba, pos, line_color );
+		}
+	}
+	return 0;
+}
+
+static int
+Graph_Draw_RoundBorder_RightBottom( 
+	LCUI_Graph *des,	LCUI_Pos center,
+	int radius,		int line_width,
+	LCUI_RGB line_color,	BOOL hide_outarea )
+/* 绘制右下角的圆角，从右边框的下端到下边框的右端绘制一条圆角线 */
+{
+	LCUI_Rect real_rect;
+	int pos, center_pos, y, x, i, n;
+	int max_x, max_y, min_x, min_y;
+	
+	if( line_width <= 0 && !hide_outarea ) {
+		return 1;
+	}
+	
+	real_rect = Get_Graph_Valid_Rect( des );
+	des = Get_Quote_Graph( des );
+	if( !Graph_Valid( des ) ) {
+		return -1;
+	}
+	
+	max_x = radius*2;
+	if( center.x+radius > real_rect.x + real_rect.width ) {
+		max_x -= (center.x+radius-real_rect.x-real_rect.width);
+	}
+	if( max_x < 0 ) {
+		max_x = 0;
+	}
+	min_x = center.x>radius? 0:radius-center.x;
+	if( min_x < 0 ) {
+		min_x = 0;
+	}
+	max_y = radius*2;
+	if( center.y+radius > real_rect.y + real_rect.height ) {
+		max_y -= (center.y+radius-real_rect.y-real_rect.height);
+	}
+	min_y = center.y>radius? 0:radius-center.y;
+	if( min_y < 0 ) {
+		min_y = 0;
+	}
+	
+	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = center_pos + center.x + real_rect.x;
+	
+	for( y=0; y<=radius; ++y, center_pos += des->width ) {
+		if( radius+y >= max_y || radius+y < min_y ) {
+			continue;
+		}
+		x = sqrt( pow(radius, 2) - y*y )+0.5;
+		
+		if( line_width > 0 && radius+x >= min_x 
+		 && radius+x <= max_x ) {
+			pos = center_pos + x;
+			fill_pixel( des->rgba, pos, line_color );
+		}
+		
+		if( hide_outarea && des->have_alpha ) {
+			n = center_pos + max_x - radius;
+			if( radius+x < min_x ) {
+				pos = center_pos + min_x - radius;
+			} else {
+				pos = center_pos + x;
+			}
+			for( ++pos; pos<=n; ++pos ) {
+				des->rgba[3][pos] = 0;
+			}
+		}
+		
+		n = radius+x-line_width;
+		n = n<min_x ? x+radius-min_x:line_width;
+		
+		if( radius+x > max_x ) {
+			pos = center_pos - radius+max_x-1;
+			n -= (radius+x-max_x);
+		} else {
+			pos = center_pos + x;
+		}
+		for(i=0; i<n; ++i,--pos) {
+			fill_pixel( des->rgba, pos, line_color );
+		}
+	}
+	return 0;
+}
+
+
 int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 /* 简单的为图形边缘绘制边框 */
 {
@@ -291,11 +465,33 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 		border.left_color	, TRUE 
 	);
 	
+	/* 右上角 */
 	radius = border.top_right_radius;
 	rect = Rect( des->width-radius-1, 0, radius, radius );
 	Quote_Graph( &des_area, des, rect );
 	Graph_Draw_RoundBorder_RightTop( 
 		&des_area		, Pos( 0, radius ), 
+		radius			, border.right_width, 
+		border.right_color	, TRUE 
+	);
+	
+	/* 左下角 */
+	radius = border.bottom_left_radius;
+	rect = Rect( 0, des->height-radius, radius, radius );
+	Quote_Graph( &des_area, des, rect );
+	Graph_Draw_RoundBorder_LeftBottom( 
+		&des_area		, Pos( radius, 0 ), 
+		radius			, border.left_width, 
+		border.left_color	, TRUE 
+	);
+	
+	/* 右下角 */
+	radius = border.bottom_left_radius;
+	rect = Rect(	des->width-radius-1, 
+			des->height-radius, radius, radius );
+	Quote_Graph( &des_area, des, rect );
+	Graph_Draw_RoundBorder_RightBottom( 
+		&des_area		, Pos( 0, 0 ), 
 		radius			, border.right_width, 
 		border.right_color	, TRUE 
 	);
