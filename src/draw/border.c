@@ -615,7 +615,7 @@ Graph_Draw_RoundBorder_BottomLeft(
 			/* 加上圆与背景图的下边距 */
 			n += (real_rect.height-center.y-radius);
 			pos+=des->width;
-			for(i=0; i<n-1; ++i,pos+=des->width) {
+			for(i=0; i<n; ++i,pos+=des->width) {
 				des->rgba[3][pos]=0;
 			}
 		}
@@ -855,7 +855,7 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	
 	/* 右上角 */
 	radius = border.top_right_radius;
-	rect = Rect( des->width-radius, 0, radius, radius );
+	rect = Rect( des->width-radius-1, 0, radius, radius );
 	Quote_Graph( &des_area, des, rect );
 	Graph_Draw_RoundBorder_RightTop( 
 		&des_area		, Pos( 0, radius ), 
@@ -870,7 +870,7 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	
 	/* 左下角 */
 	radius = border.bottom_left_radius;
-	rect = Rect( 0, des->height-radius, radius, radius );
+	rect = Rect( 0, des->height-radius-1, radius, radius );
 	Quote_Graph( &des_area, des, rect );
 	Graph_Draw_RoundBorder_LeftBottom( 
 		&des_area		, Pos( radius, 0 ), 
@@ -885,8 +885,8 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	
 	/* 右下角 */
 	radius = border.bottom_left_radius;
-	rect = Rect(	des->width-radius, 
-			des->height-radius, radius, radius );
+	rect = Rect(	des->width-radius-1, 
+			des->height-radius-1, radius, radius );
 	Quote_Graph( &des_area, des, rect );
 	Graph_Draw_RoundBorder_RightBottom( 
 		&des_area		, Pos( 0, 0 ), 
