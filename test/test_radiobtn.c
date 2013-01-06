@@ -17,18 +17,24 @@ void view_result(LCUI_Widget *widget, void *arg)
 {
 	char str[256]; 
 	strcpy(str, "你的年龄段是： ");
-	if(RadioButton_Is_On(age_rb[0]))
+	if(RadioButton_Is_On(age_rb[0])) {
 		strcat(str, "15岁以下");
-	if(RadioButton_Is_On(age_rb[1]))
+	}
+	if(RadioButton_Is_On(age_rb[1])) {
 		strcat(str, "15-20岁");
-	if(RadioButton_Is_On(age_rb[2]))
+	}
+	if(RadioButton_Is_On(age_rb[2])) {
 		strcat(str, "21-25岁");
-	if(RadioButton_Is_On(age_rb[3]))
+	}
+	if(RadioButton_Is_On(age_rb[3])) {
 		strcat(str, "26-30岁");
-	if(RadioButton_Is_On(age_rb[4]))
+	}
+	if(RadioButton_Is_On(age_rb[4])) {
 		strcat(str, "31-40岁");
-	if(RadioButton_Is_On(age_rb[5]))
+	}
+	if(RadioButton_Is_On(age_rb[5])) {
 		strcat(str, "40岁以上");
+	}
 	
 	strcat(str, "。");
 	Label_Text(age_label, str);  
@@ -59,8 +65,9 @@ int main(int argc, char*argv[])
 	/* 将窗口客户区作为这些部件的容器 */ 
 	Window_Client_Area_Add(window, age_label);
 	Window_Client_Area_Add(window, button); 
-	for(i=0; i<6; i++) 
+	for(i=0; i<6; i++) {
 		Window_Client_Area_Add(window, age_rb[i]); 
+	}
 	/* 调整部件的布局*/
 	Set_Widget_Align(age_label, ALIGN_MIDDLE_CENTER, Pos(0,-40));
 	Set_Widget_Align(button, ALIGN_MIDDLE_CENTER, Pos(0,60));
@@ -82,8 +89,9 @@ int main(int argc, char*argv[])
 	Show_Widget(age_label);
 	Show_Widget(button);
 	Show_Widget(age_rb[0]); 
-	for(i=0; i<6; ++i) 
-		Show_Widget(age_rb[i]);  
+	for(i=0; i<6; ++i) {
+		Show_Widget(age_rb[i]); 
+	}
 	Show_Widget(window); 
 	Widget_Clicked_Event_Connect(button, view_result, NULL);
 	LCUI_Main(); /* 进入主循环 */ 
