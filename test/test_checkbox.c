@@ -20,16 +20,21 @@ void view_result(LCUI_Widget *widget, void *arg)
 	char str[256]; 
 	strcpy(str, "你的兴趣爱好有： ");
 	/* 检测各个复选框是否被选中，以确定内容 */
-	if(CheckBox_Is_On(checkbox[0]))
+	if(CheckBox_Is_On(checkbox[0])) {
 		strcat(str, "编程 ");
-	if(CheckBox_Is_On(checkbox[1]))
+	}
+	if(CheckBox_Is_On(checkbox[1])){
 		strcat(str, "电影 ");
-	if(CheckBox_Is_On(checkbox[2]))
+	}
+	if(CheckBox_Is_On(checkbox[2])){
 		strcat(str, "动漫 ");
-	if(CheckBox_Is_On(checkbox[3]))
+	}
+	if(CheckBox_Is_On(checkbox[3])){
 		strcat(str, "音乐 ");
-	if(CheckBox_Is_On(checkbox[4]))
+	}
+	if(CheckBox_Is_On(checkbox[4])){
 		strcat(str, "睡觉 ");
+	}
 	
 	strcat(str, "。");
 	/* 设定文本内容 */
@@ -63,8 +68,9 @@ int main(int argc, char*argv[])
 	Window_Client_Area_Add(window, label);
 	Window_Client_Area_Add(window, button);
 	Window_Client_Area_Add(window, result_text);
-	for(i=0; i<5; i++) 
+	for(i=0; i<5; i++) {
 		Window_Client_Area_Add(window, checkbox[i]); 
+	}
 	/* 调整部件的布局*/
 	Set_Widget_Align(label, ALIGN_MIDDLE_CENTER, Pos(0,-20));
 	Set_Widget_Align(button, ALIGN_MIDDLE_CENTER, Pos(0,60));
