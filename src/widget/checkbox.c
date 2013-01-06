@@ -152,19 +152,18 @@ CheckBox_Init(LCUI_Widget *widget)
 	Widget_AutoSize( container[0], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
 	Widget_AutoSize( container[1], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
 	
-	/* 将按钮部件作为label部件的容器 */
 	Widget_Container_Add(container[0], check_box->imgbox);
 	Widget_Container_Add(container[1], check_box->label);
 	Widget_Container_Add(widget, container[0]);
 	Widget_Container_Add(widget, container[1]);
 	
 	/* 调整尺寸 */
-	Resize_Widget(check_box->imgbox, Size(20, 20));
+	Resize_Widget(check_box->imgbox, Size(15, 15));
 	//Resize_Widget(container[0], Size(18,18));
 	//Resize_Widget(widget, Size(18,18));
 	/* 调整布局 */
 	Set_Widget_Align(container[0], ALIGN_MIDDLE_LEFT, Pos(0,0));
-	Set_Widget_Align(container[1], ALIGN_MIDDLE_LEFT, Pos(22,0));
+	Set_Widget_Align(container[1], ALIGN_MIDDLE_LEFT, Pos(17,0));
 	Set_Widget_Align(check_box->imgbox, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	Set_Widget_Align(check_box->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	/* 设置图像框的尺寸模式为拉伸 */
@@ -200,7 +199,8 @@ Destroy_CheckBox(LCUI_Widget *widget)
 	Graph_Free(&check_box->img_on_over);
 }
 
-static void Exec_Draw_CheckBox(LCUI_Widget *widget)
+static void 
+Exec_Draw_CheckBox(LCUI_Widget *widget)
 /* 功能：更新复选框的图形数据 */
 {
 	LCUI_Graph *p;
