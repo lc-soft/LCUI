@@ -225,17 +225,16 @@ RadioButton_Init(LCUI_Widget *widget)
 	Widget_AutoSize( container[0], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
 	Widget_AutoSize( container[1], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
 	
-	/* 将按钮部件作为label部件的容器 */
 	Widget_Container_Add(container[0], radio_button->imgbox);
 	Widget_Container_Add(container[1], radio_button->label);
 	Widget_Container_Add(widget, container[0]);
 	Widget_Container_Add(widget, container[1]);
 	
 	/* 调整尺寸 */
-	Resize_Widget(radio_button->imgbox, Size(20, 20));
+	Resize_Widget(radio_button->imgbox, Size(15, 15));
 	/* 调整布局 */
 	Set_Widget_Align(container[0], ALIGN_MIDDLE_LEFT, Pos(0,0));
-	Set_Widget_Align(container[1], ALIGN_MIDDLE_LEFT, Pos(22,0));
+	Set_Widget_Align(container[1], ALIGN_MIDDLE_LEFT, Pos(17,0));
 	Set_Widget_Align(radio_button->imgbox, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	Set_Widget_Align(radio_button->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	
