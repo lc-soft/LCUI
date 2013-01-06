@@ -44,7 +44,8 @@ noinst_PROGRAMS = helloworld$(EXEEXT) test_font$(EXEEXT) \
 	test_rect_cut$(EXEEXT) test_gaussian_blur$(EXEEXT) \
 	test_widget_1$(EXEEXT) test_widget_2$(EXEEXT) \
 	test_widget_3$(EXEEXT) test_timer$(EXEEXT) \
-	test_textbox$(EXEEXT) test_scrollbar$(EXEEXT)
+	test_textbox$(EXEEXT) test_scrollbar$(EXEEXT) \
+	graph2array$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -56,12 +57,15 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_helloworld_OBJECTS = helloworld.$(OBJEXT)
-helloworld_OBJECTS = $(am_helloworld_OBJECTS)
-helloworld_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_graph2array_OBJECTS = graph2array.$(OBJEXT)
+graph2array_OBJECTS = $(am_graph2array_OBJECTS)
+graph2array_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
+am_helloworld_OBJECTS = helloworld.$(OBJEXT)
+helloworld_OBJECTS = $(am_helloworld_OBJECTS)
+helloworld_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_button_OBJECTS = test_button.$(OBJEXT)
 test_button_OBJECTS = $(am_test_button_OBJECTS)
 test_button_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -145,26 +149,28 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(helloworld_SOURCES) $(test_button_SOURCES) \
-	$(test_checkbox_SOURCES) $(test_font_SOURCES) \
-	$(test_gaussian_blur_SOURCES) $(test_label_SOURCES) \
-	$(test_lcui_graph_mix_SOURCES) $(test_loading_SOURCES) \
-	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
-	$(test_rect_cut_SOURCES) $(test_scrollbar_SOURCES) \
-	$(test_textbox_SOURCES) $(test_timer_SOURCES) \
-	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
-	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
-	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
-DIST_SOURCES = $(helloworld_SOURCES) $(test_button_SOURCES) \
-	$(test_checkbox_SOURCES) $(test_font_SOURCES) \
-	$(test_gaussian_blur_SOURCES) $(test_label_SOURCES) \
-	$(test_lcui_graph_mix_SOURCES) $(test_loading_SOURCES) \
-	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
-	$(test_rect_cut_SOURCES) $(test_scrollbar_SOURCES) \
-	$(test_textbox_SOURCES) $(test_timer_SOURCES) \
-	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
-	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
-	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
+SOURCES = $(graph2array_SOURCES) $(helloworld_SOURCES) \
+	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
+	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
+	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
+	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
+	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
+	$(test_scrollbar_SOURCES) $(test_textbox_SOURCES) \
+	$(test_timer_SOURCES) $(test_viewimage_SOURCES) \
+	$(test_widget_1_SOURCES) $(test_widget_2_SOURCES) \
+	$(test_widget_3_SOURCES) $(test_window_SOURCES) \
+	$(ts_calibrate_SOURCES)
+DIST_SOURCES = $(graph2array_SOURCES) $(helloworld_SOURCES) \
+	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
+	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
+	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
+	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
+	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
+	$(test_scrollbar_SOURCES) $(test_textbox_SOURCES) \
+	$(test_timer_SOURCES) $(test_viewimage_SOURCES) \
+	$(test_widget_1_SOURCES) $(test_widget_2_SOURCES) \
+	$(test_widget_3_SOURCES) $(test_window_SOURCES) \
+	$(ts_calibrate_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -373,6 +379,8 @@ test_textbox_SOURCES = test_textbox.c
 test_textbox_LDADD = $(top_builddir)/src/libLCUI.la
 test_scrollbar_SOURCES = test_scrollbar.c
 test_scrollbar_LDADD = $(top_builddir)/src/libLCUI.la
+graph2array_SOURCES = graph2array.c
+graph2array_LDADD = $(top_builddir)/src/libLCUI.la
 all: all-recursive
 
 .SUFFIXES:
@@ -416,6 +424,9 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+graph2array$(EXEEXT): $(graph2array_OBJECTS) $(graph2array_DEPENDENCIES) 
+	@rm -f graph2array$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(graph2array_OBJECTS) $(graph2array_LDADD) $(LIBS)
 helloworld$(EXEEXT): $(helloworld_OBJECTS) $(helloworld_DEPENDENCIES) 
 	@rm -f helloworld$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(helloworld_OBJECTS) $(helloworld_LDADD) $(LIBS)
@@ -483,6 +494,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/graph2array.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helloworld.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_button.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_checkbox.Po@am__quote@

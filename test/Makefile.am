@@ -6,7 +6,7 @@ INCLUDES = -I$(top_builddir)/include
 noinst_PROGRAMS = helloworld test_font test_radiobtn test_checkbox test_progressbar \
 test_button test_label test_loading ts_calibrate test_viewimage test_lcui_graph_mix \
 test_window test_rect_cut test_gaussian_blur test_widget_1 test_widget_2 test_widget_3 \
-test_timer test_textbox test_scrollbar
+test_timer test_textbox test_scrollbar graph2array 
 
 ##指定测试程序的源码文件
 helloworld_SOURCES = helloworld.c
@@ -70,3 +70,6 @@ test_textbox_LDADD	= $(top_builddir)/src/libLCUI.la
 
 test_scrollbar_SOURCES	= test_scrollbar.c
 test_scrollbar_LDADD	= $(top_builddir)/src/libLCUI.la
+
+graph2array_SOURCES	= graph2array.c
+graph2array_LDADD	= $(top_builddir)/src/libLCUI.la
