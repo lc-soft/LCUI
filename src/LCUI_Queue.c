@@ -230,31 +230,6 @@ void * Queue_Get (LCUI_Queue * queue, int pos)
 	
 	if( pos < 0) {
 		return NULL;
-	} 
-	Queue_Using (queue, QUEUE_MODE_READ);
-	if (queue->total_num > 0 && pos < queue->total_num) {
-		if(queue->data_mode == QUEUE_DATA_MODE_ARRAY) {
-			data = queue->data_array[pos]; 
-		} else {
-			int i;
-			LCUI_Node *p;
-			p = queue->data_head_node.next;
-			for(i=0; i< pos && p->next; ++i) {
-				p = p->next;
-			}
-			data = p->data;
-		}
-	}
-	Queue_End_Use (queue);
-	return data;
-}
-
-void * __Queue_Get (LCUI_Queue * queue, int pos)
-{
-	void  *data = NULL;
-	
-	if( pos < 0) {
-		return NULL;
 	}
 	if (queue->total_num > 0 && pos < queue->total_num) {
 		if(queue->data_mode == QUEUE_DATA_MODE_ARRAY) {
@@ -305,7 +280,6 @@ int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos)
 		return 0;
 	}
 	
-	Queue_Using(queue, QUEUE_MODE_WRITE);
 	if(queue->data_mode == QUEUE_DATA_MODE_ARRAY) {
 		temp = queue->data_array[src_pos];
 		if (src_pos > des_pos) {
@@ -361,7 +335,6 @@ int Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos)
 			p_src->prev = p_des;
 		}
 	}
-	Queue_End_Use(queue);
 	return 0;
 }
 
@@ -402,14 +375,12 @@ int Queue_Replace_By_Flag(LCUI_Queue * queue, int pos, const void *data, int fla
 		if( queue->destroy_func ) {
 			queue->destroy_func(queue->data_array[pos]); 
 		}
-		Queue_Using(queue, QUEUE_MODE_WRITE);
 		if(flag == 1) {
 			memcpy(queue->data_array[pos], data, queue->element_size);
 		} else {
 			/* 拷贝指针 */
 			memcpy(&queue->data_array[pos], &data, sizeof(void*));
 		}
-		Queue_End_Use(queue);
 	} else {
 		LCUI_Node *p;
 		
@@ -420,13 +391,11 @@ int Queue_Replace_By_Flag(LCUI_Queue * queue, int pos, const void *data, int fla
 		if(NULL != queue->destroy_func) {
 			queue->destroy_func( p->data ); 
 		}
-		Queue_Using(queue, QUEUE_MODE_WRITE);
 		if(flag == 1) {
 			memcpy(p->data, data, queue->element_size); 
 		} else { 
 			memcpy(&p->data, &data, sizeof(void*));
 		}
-		Queue_End_Use(queue);
 	}
 	return 0;
 }
@@ -454,8 +423,6 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 	size_t size; 
 	LCUI_Node *p, *q;
 	
-	Queue_Using(queue, QUEUE_MODE_WRITE);
-	
 	pos = queue->total_num;
 	++queue->total_num;
 	/* 如果数据是以数组形式储存 */
@@ -474,7 +441,6 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 			
 			if( !queue->data_array ) {
 				printf("Queue_Add_By_Flag(): "ERROR_MALLOC_ERROR);
-				Queue_End_Use(queue);
 				exit(-1);
 			}
 			if (flag == 1) {
@@ -519,12 +485,6 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 			memcpy( &p->data, &data, sizeof(void*) );
 		}
 	}
-	/* 
-	 * total_num自增1，但不大于max_num，那么，就有现成的内存空间可用，直接
-	 * 调用memcpy函数拷贝数据进去即可。因为Queue_Delete函数并不会释放成员
-	 * 占用的内存空间，最多也只是将成员里的指针指向的内存空间释放。
-	 *  */ 
-	Queue_End_Use(queue);
 	return pos;
 }
 
@@ -576,7 +536,8 @@ int Queue_Empty(LCUI_Queue *queue)
 	return 1;
 }
 
-static BOOL Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag) 
+static BOOL 
+Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag) 
 /* 
  * 功能：从队列中删除一个成员，并重新排列队列
  * 说明：处理方式因flag的值而不同 
@@ -586,11 +547,9 @@ static BOOL Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 	int i;
 	void *save = NULL;
 	
-	Queue_Using (queue, QUEUE_MODE_WRITE); 
 	/* 有效性检测 */
 	if (pos >=0 && pos < queue->total_num && queue->total_num > 0);
 	else {
-		Queue_End_Use (queue);
 		return FALSE;
 	} 
 	if(queue->data_mode == QUEUE_DATA_MODE_ARRAY) {
@@ -650,7 +609,6 @@ static BOOL Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 	 *  */
 	--queue->total_num;
 	
-	Queue_End_Use (queue);
 	if(flag == 1) { 
 		/* 对该位置的成员进行析构处理 */
 		if( queue->destroy_func ) {
@@ -847,7 +805,8 @@ int main()
 
 /************************** WidgetQueue ********************************/
 
-static void Destroy_Widget(LCUI_Widget *widget)
+static void 
+Destroy_Widget(LCUI_Widget *widget)
 /*
  * 功能：销毁一个部件
  * 说明：如果这个部件有子部件，将对它进行销毁
