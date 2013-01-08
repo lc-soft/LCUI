@@ -84,11 +84,13 @@ LCUI_Size Get_Screen_Size ()
 int Add_Screen_Refresh_Area (LCUI_Rect rect)
 /* 功能：在整个屏幕内添加需要刷新的区域 */
 {
+	int ret;
 	if (rect.width <= 0 || rect.height <= 0) {
 		return -1; 
 	} 
 	DEBUG_MSG("add screen area: %d,%d,%d,%d\n", 
 	rect.x, rect.y, rect.width, rect.height);
+	
 	rect = Get_Valid_Area(Get_Screen_Size(), rect); 
 	//if( rect.width == 320 && rect.height == 240 ) {
 		//++debug_count;
@@ -96,7 +98,12 @@ int Add_Screen_Refresh_Area (LCUI_Rect rect)
 	//if( debug_count >= 20 ) {
 	//	abort();
 	//}
-	return RectQueue_Add (&LCUI_Sys.update_area, rect);
+	/* 为队列加上“写”锁，以确保正常操作队列 */
+	Queue_Using( &LCUI_Sys.update_area, RWLOCK_WRITE );
+	ret = RectQueue_Add ( &LCUI_Sys.update_area, rect );
+	/* 队列使用结束，解开锁 */
+	Queue_End_Use( &LCUI_Sys.update_area );
+	return ret;
 }
 
 int Get_Screen_Bits()

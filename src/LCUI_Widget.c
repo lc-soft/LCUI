@@ -687,10 +687,16 @@ int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect)
 	if( widget->visible ) { 
 		LCUI_Sys.need_shift_area = TRUE; 
 	}
+	/* 以“写”模式使用该队列 */
+	Queue_Using( &widget->update_area, RWLOCK_WRITE );
 	/* 保存至队列中 */
-	if(0 != RectQueue_Add (&widget->update_area, rect)) { 
+	if(0 != RectQueue_Add (&widget->update_area, rect)) {
+		Queue_End_Use( &widget->update_area );
 		return -1;
 	}
+	/* 使用结束 */
+	Queue_End_Use( &widget->update_area );
+	
 	rect = Get_Valid_Area(Get_Screen_Size(), rect);
 	DEBUG_MSG("Add_Widget_Refresh_Area():quit\n");
 	return 0;
@@ -1370,7 +1376,7 @@ void Set_Widget_Border(LCUI_Widget *widget, LCUI_Border border)
 /* 功能：设定部件的边框 */
 { 
 	widget->border = border;
-	Draw_Widget(widget); 
+	Draw_Widget( widget );
 	Add_Widget_Refresh_Area(widget, Get_Widget_Rect(widget));
 }
 
