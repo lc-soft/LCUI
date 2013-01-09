@@ -71,69 +71,85 @@ void Graph_Lock(LCUI_Graph *pic, int mode)
 	}
 }
 
-void Graph_Unlock(LCUI_Graph *pic)
-/* 功能：结束图像数据的使用 */
+void Graph_Update_Attr( LCUI_Graph *buff )
+/* 更新图层的属性 */
 {
-	rwlock_status status;
 	LCUI_Graph *src;
-	src = Get_Quote_Graph(pic);
-	status = thread_rwlock_get_status(&src->lock);
-	/* 如果当前为写锁，那就说明这个图形数据被修改了 */
-	if(status == RWLOCK_READ) {
-		goto skip_graph_data_update;
-	}
+	LCUI_Rect src_rect;
+	int flag;
+	unsigned int x=0, y=0, pos, start_pos;
+	
+	src = Get_Quote_Graph( buff );
+	src_rect = Get_Graph_Valid_Rect( buff );
 	/* 根据图形数据内容来设定各个标志 */
-	if(Graph_Valid(pic)){ 
-		if( Graph_Have_Alpha(pic) ) {
-			int flag;
-			unsigned int i, total;
-			total = pic->width*pic->height;
-			/* 遍历alpha通道中的每个元素的值 */
-			for(flag=0,i=0; i<total; ++i) { 
-				if(src->rgba[3][i] == 0) {
-					if(i>0 && flag != -1) {
-						break;
-					}
-					flag = -1;
-				} else if(src->rgba[3][i] == 255) {
-					if(i>0 && flag != 0) {
-						break;
-					}
-					flag = 0;
-				} else {
-					if(i>0 && flag != 1) {
+	if( !Graph_Valid(src) ){ 
+		buff->not_visible = TRUE;
+		buff->is_opaque = FALSE;
+		return;
+	}
+	/* 如果该图层引用的源图层有alpha通道 */
+	if( src->have_alpha ) {
+		start_pos = src_rect.y * src->width + src_rect.x;
+		/* 遍历alpha通道中的每个元素的值 */
+		for(flag=0,y=0; y<src_rect.height; ++y) { 
+			pos = start_pos;
+			for(x=0; x<src_rect.width; ++x,++pos) {
+				if(src->rgba[3][pos] == 0) {
+					/* 全透明 */
+					if(flag>0 && flag != 1) {
 						break;
 					}
 					flag = 1;
+				} else if(src->rgba[3][pos] == 255) {
+					/* 不透明 */
+					if(flag>0 && flag != 2) {
+						break;
+					}
+					flag = 2;
+				} else {
+					/* 有透明效果 */
+					if(flag>0 && flag != 3) {
+						break;
+					}
+					flag = 3;
 				}
 			}
-			if(i == total) {
-				switch(flag) {
-				    case -1:
-					pic->not_visible = TRUE;
-					pic->is_opaque = FALSE;
-					break;
-				    case 1:
-					pic->not_visible = FALSE;
-					pic->is_opaque = FALSE;
-					break;
-				    default:
-					pic->not_visible = FALSE;
-					pic->is_opaque = TRUE;
-					break;
-				}
-			} else {
-				pic->not_visible = FALSE;
-				pic->is_opaque = FALSE;
+			if( x < src_rect.width ) {
+				break;
 			}
-		} else {
-			pic->is_opaque = TRUE;
+			start_pos += src->width;
+		}
+		/* 如果全部遍历完了 */
+		if( x >= src_rect.width && y >= src_rect.height ) {
+			switch(flag) {
+			    case 1:
+				buff->not_visible = TRUE;
+				buff->is_opaque = FALSE;
+				break;
+			    case 2:
+				buff->not_visible = FALSE;
+				buff->is_opaque = TRUE;
+				break;
+			    default:
+				buff->not_visible = FALSE;
+				buff->is_opaque = FALSE;
+				break;
+			}
+		} else { /* 否则，中途结束，说明像素点的透明度不全一致 */
+			buff->not_visible = FALSE;
+			buff->is_opaque = FALSE;
 		}
 	} else {
-		pic->not_visible = TRUE;
-		pic->is_opaque = FALSE;
-	} 
-skip_graph_data_update:;
+		/* 否则，不透明 */
+		buff->is_opaque = TRUE;
+	}
+}
+
+void Graph_Unlock(LCUI_Graph *pic)
+/* 解除锁，以结束图像数据的使用 */
+{
+	LCUI_Graph *src;
+	src = Get_Quote_Graph(pic);
 	thread_rwlock_unlock(&src->lock);
 }
 
@@ -398,7 +414,6 @@ int Graph_Create(LCUI_Graph *graph, int width, int height)
 		Graph_Free( graph ); 
 	}
 	
-	Graph_Lock(graph, 1); 
 	graph->rgba = New_Graph( width, height, graph->have_alpha ); 
 	if(NULL == graph->rgba) {
 		graph->width  = 0;
@@ -408,8 +423,7 @@ int Graph_Create(LCUI_Graph *graph, int width, int height)
 	}
 	
 	graph->width  = width;
-	graph->height = height; 
-	Graph_Unlock( graph ); 
+	graph->height = height;
 	return 0;
 }
 
@@ -434,8 +448,6 @@ void Graph_Copy(LCUI_Graph *des, LCUI_Graph *src)
 		/* 创建合适尺寸的Graph */
 		Graph_Create(des, src->width, src->height);
 		/* 开始拷贝图像数组 */
-		Graph_Lock(des, 1);
-		Graph_Lock(src, 0);
 		size = sizeof(uchar_t)*src->width*src->height;
 		memcpy(des->rgba[0], src->rgba[0], size);
 		memcpy(des->rgba[1], src->rgba[1], size);
@@ -446,8 +458,6 @@ void Graph_Copy(LCUI_Graph *des, LCUI_Graph *src)
 		des->type = src->type;       /* 存储图片类型 */
 		des->bit_depth = src->bit_depth;  /* 位深 */
 		des->alpha = src->alpha;      /* 全局透明度 */
-		Graph_Unlock(des);
-		Graph_Unlock(src);
 	}
 }
 
@@ -457,7 +467,6 @@ void Graph_Free(LCUI_Graph *pic)
 	LCUI_Graph *p;
 	p = Get_Quote_Graph(pic);
 	if(Graph_Valid(p)) {
-		Graph_Lock(p, 1);
 		if( pic->quote ) {
 			pic->src = NULL; 
 			pic->quote = FALSE;
@@ -473,7 +482,6 @@ void Graph_Free(LCUI_Graph *pic)
 			pic->width = 0;
 			pic->height = 0;
 		}
-		Graph_Unlock(p); 
 	}
 }
 
@@ -630,9 +638,7 @@ void Graph_Zoom(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 		else scale_x = scale_y;
 	}
 	out->have_alpha = in->have_alpha;
-	Graph_Create(out, size.w, size.h);/* 申请内存 */ 
-	Graph_Lock(out, 1);
-	Graph_Lock(in, 0); 
+	Graph_Create(out, size.w, size.h);/* 申请内存 */
 	
 	for (y=0; y < size.h; ++y)  {
 		pos.y = y*scale_y;
@@ -650,9 +656,6 @@ void Graph_Zoom(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 			}
 		}
 	} 
-	
-	Graph_Unlock(out);
-	Graph_Unlock(in);
 }
 
 int Graph_Cut(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
@@ -678,8 +681,6 @@ int Graph_Cut(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 		return -1; 
 	}
 	
-	Graph_Lock(out, 1);
-	Graph_Lock(src, 0);
 	/* 开始读取图片中的图形数组并写入窗口 */ 
 	for (y=0;y< rect.height; ++y) {
 		k = (rect.y+y)*src->width + rect.x;
@@ -692,9 +693,7 @@ int Graph_Cut(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 				out->rgba[3][count] = src->rgba[3][temp];
 			++count;
 		}
-	} 
-	Graph_Unlock(out);
-	Graph_Unlock(src);
+	}
 	return 0; 
 }
 
@@ -760,7 +759,6 @@ int Graph_Fill_Color(LCUI_Graph *graph, LCUI_RGB color)
 	int i, pos;
 	size_t size;
 	
-	Graph_Lock( graph, 1);
 	size = sizeof(uchar_t) * src_rect.width;
 	pos = src_rect.x + src_rect.y * graph->width;
 	r_ptr = graph->rgba[0] + pos;
@@ -774,7 +772,6 @@ int Graph_Fill_Color(LCUI_Graph *graph, LCUI_RGB color)
 		g_ptr += graph->width;
 		b_ptr += graph->width;
 	}
-	Graph_Unlock( graph );
 	return 0; 
 }
 
@@ -800,8 +797,6 @@ int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 	}
 	
 	if(Graph_Have_Alpha(src)) {
-		Graph_Lock(out, 1);
-		Graph_Lock(src, 0);
 		for(y = 0;y < height;++y) {
 			h = y % src->height;
 			m = h * src->width;
@@ -816,14 +811,10 @@ int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 				//out->rgba[2][temp] = (src->rgba[2][count] * src->rgba[3][count] + out->rgba[2][temp] * (255 - src->rgba[3][count])) /255;
 			} 
 		}
-		Graph_Unlock(out);
-		Graph_Unlock(src); 
 	} else {
 		if(Graph_Have_Alpha(out)) {
 			Graph_Fill_Alpha(out, 255);
 		}
-		Graph_Lock(out, 1);
-		Graph_Lock(src, 0);
 		for(y = 0;y < height;++y) {
 			h = y%src->height;
 			m = h * src->width;
@@ -836,8 +827,6 @@ int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
 				++temp;
 			}
 		}
-		Graph_Unlock(out);
-		Graph_Unlock(src); 
 	} 
 	return 0;
 }
@@ -883,8 +872,6 @@ int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 		des_pos.y += cut.y;
 	}
 	
-	Graph_Lock(src, 0);
-	Graph_Lock(des, 1);
 	/* 如果前景图形有alpha通道 */
 	if(Graph_Have_Alpha(src)) {
 		k = src->alpha / 255.0;
@@ -961,9 +948,6 @@ int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 			n += des->width; 
 		}
 	} 
-	
-	Graph_Unlock(des);
-	Graph_Unlock(src); 
 	return 0; 
 }
 
@@ -1007,8 +991,7 @@ int Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 		des_pos.x += cut.x;
 		des_pos.y += cut.y;
 	}
-	Graph_Lock(src, 0);
-	Graph_Lock(des, 1);
+	
 	k = src->alpha / 255.0;
 	if(Graph_Have_Alpha(src) && !Graph_Have_Alpha(des)) { 
 		m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
@@ -1053,9 +1036,8 @@ int Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 			m += src->width;
 			n += des->width; 
 		}
-	} 
-	Graph_Unlock(des);
-	Graph_Unlock(src);
+	}
+	
 	return 0; 
 } 
 
@@ -1178,13 +1160,11 @@ int Graph_Fill_Alpha(LCUI_Graph *src, uchar_t alpha)
 	int i;
 	size_t size;
 	
-	Graph_Lock( src, 1);
 	size = sizeof(uchar_t) * src_rect.width;
 	ptr = src->rgba[3] + src_rect.x + src_rect.y * src->width;
 	for(i=0; i<src_rect.height; ++i) {
 		memset(ptr, alpha, size);
 		ptr += src->width;
 	}
-	Graph_Unlock( src );
 	return 0; 
 }
