@@ -9,10 +9,11 @@
 #include LC_LABEL_H
 #include LC_PICBOX_H
 #include LC_GRAPH_H
+#include LC_DRAW_H
 #include LC_RES_H
 #include <unistd.h>
 
-#define TEST_1
+//#define TEST_1
 #ifdef TEST_1
 int main(int argc, char*argv[]) 
 {
@@ -77,7 +78,7 @@ int main(int argc, char*argv[])
 	tb_username->set_align( tb_username, ALIGN_MIDDLE_LEFT, Pos(35,-12) );
 	tb_password->set_align( tb_password, ALIGN_MIDDLE_LEFT, Pos(35,12) );
 	/* 设置边框 */
-	Set_Widget_Border( fore_pb, RGB(120,120,120), Border(1,1,1,1) );
+	Set_Widget_Border( fore_pb, Border(1, BORDER_STYLE_SOLID, RGB(120,120,120)) );
 	/* 显示这些部件 */
 	Show_Widget( back_pb );
 	Show_Widget( fore_pb );
