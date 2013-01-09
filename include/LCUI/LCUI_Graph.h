@@ -69,6 +69,9 @@ void Graph_Lock(LCUI_Graph *pic, int mode);
 /* 功能：以指定模式使用图像数据
  * 说明：参数mode的值为0时，以“读”模式使用数据，其它值时，以“写模式使用数据” */ 
 
+void Graph_Update_Attr( LCUI_Graph *buff );
+/* 更新图层的属性 */
+
 void Graph_Unlock(LCUI_Graph *pic);
 /* 功能：结束图像数据的使用 */
 
