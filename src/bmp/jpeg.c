@@ -63,7 +63,7 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 	jaka = cinfo.num_components;
 	
 	//if (jaka==3) printf("color\n"); else printf("grayscale\n");
-	out->have_alpha = IS_FALSE; /* 设置为无透明度 */
+	out->have_alpha = FALSE; /* 设置为无透明度 */
 	n = Graph_Create(out, cinfo.output_width, cinfo.output_height);
 	if( n != 0 ){
 		printf("load_jpeg(): error: "MALLOC_ERROR);
@@ -74,7 +74,6 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 	buffer = (*cinfo.mem->alloc_sarray)(
 			(j_common_ptr) &cinfo,JPOOL_IMAGE,row_stride,1);
 	
-	Graph_Lock( out, 1 );
 	for(y=0; cinfo.output_scanline <cinfo.output_height; ++y) {
 		(void) jpeg_read_scanlines(&cinfo, buffer, 1);
 		m = y*out->width;
@@ -96,8 +95,6 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 		} 
 	}
 	out->type = TYPE_JPG;//图片类型为jpg
-	Graph_Unlock( out );
-	
 	(void) jpeg_finish_decompress(&cinfo);
 	jpeg_destroy_decompress(&cinfo);
 	fclose(fp);

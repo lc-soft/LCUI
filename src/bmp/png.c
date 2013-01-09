@@ -68,8 +68,6 @@ int load_png(const char *filepath, LCUI_Graph *out)
 			return 1;
 		}
 		
-		Graph_Lock(out, 1);
-		
 		temp = (4 * out->width);
 		for(pos=0,i=0; i < out->height; i++) 
 		for(j=0; j < temp; j += 4) {
@@ -79,8 +77,6 @@ int load_png(const char *filepath, LCUI_Graph *out)
 			out->rgba[3][pos] = row_pointers[i][j+3];// alpha
 			++pos;
 		} 
-		
-		Graph_Unlock(out);
 	}
 	else if(channels == 3 || color_type == PNG_COLOR_TYPE_RGB) {
 	/*如果是RGB通道*/
@@ -95,8 +91,6 @@ int load_png(const char *filepath, LCUI_Graph *out)
 			return 1;
 		}
 		
-		Graph_Lock(out, 1);
-		
 		temp = (3 * out->width);
 		for(pos=0,i=0; i < out->height; i++)
 		for(j=0; j < temp; j += 3) {
@@ -105,8 +99,6 @@ int load_png(const char *filepath, LCUI_Graph *out)
 			out->rgba[2][pos] = row_pointers[i][j+2];// blue
 			++pos;
 		} 
-		
-		Graph_Unlock(out);
 	} else {
 		return 1;
 	}
