@@ -348,8 +348,7 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 		des_pos.x += cut.x;
 		des_pos.y += cut.y;
 	}
-	/* 锁定图形 */
-	Graph_Lock( des, 1 );
+	
 	/* 如果是以叠加模式绘制字体位图 */
 	if( flag == GRAPH_MIX_FLAG_OVERLAY ) {
 		/* 预先计算起点位置 */
@@ -386,7 +385,6 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 			src_start_pos += bitmap->width;
 		}
 	}
-	Graph_Unlock( des );
 	return 0;
 }
 
