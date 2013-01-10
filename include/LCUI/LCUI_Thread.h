@@ -83,6 +83,24 @@ thread_rwlock;
 
 #endif
 
+/************ 线程队列 **************/
+struct _Thread_Queue
+{
+	Thread_TreeNode **queue;	/* 储存队列成员 */
+	int max_num;			/* 最大成员数量 */
+	int total_num;			/* 当前成员总数 */
+};
+/***********************************/
+
+/************ 线程树的结点 ***************/
+struct _Thread_TreeNode
+{
+	Thread_TreeNode *parent;	/* 父线程结点指针 */
+	thread_t tid;			/* 父线程ID */
+	Thread_Queue child;		/* 子线程队列 */
+};
+/***************************************/
+
 LCUI_BEGIN_HEADER
 
 /************************ thread management ***************************/ 

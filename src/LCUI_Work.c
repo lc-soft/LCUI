@@ -79,41 +79,6 @@ Send_Task_To_App(LCUI_Func *func_data)
 	Queue_Add( &app->task_queue, func_data );
 }
 
-
-BOOL
-Have_Task( LCUI_App *app )
-/* 功能：检测是否有任务 */
-{
-	if( !app ) {
-		return FALSE; 
-	}
-	if(Queue_Get_Total(&app->task_queue) > 0) {
-		return TRUE; 
-	}
-	return FALSE;
-}
-
-int 
-Run_Task( LCUI_App *app )
-/* 功能：执行任务 */
-{ 
-	static LCUI_Task *task;
-	task = (LCUI_Task*)Queue_Get( &app->task_queue, 0 );
-	//clock_t start = clock();
-	//printf("run task %p\n", task->func);
-	/* 调用函数指针指向的函数，并传递参数 */
-	task->func( task->arg[0], task->arg[1] );
-	/* 若需要在调用回调函数后销毁参数 */
-	if( task->destroy_arg[0] ) {
-		free( task->arg[0] );
-	}
-	if( task->destroy_arg[1] ) {
-		free( task->arg[1] );
-	}
-	//printf("task %p use time: %ldus\n", task->func, clock()-start);
-	return Queue_Delete(&app->task_queue, 0);
-}
-
 static void
 __destroy_apptask( LCUI_Func *func_data )
 /* 销毁程序任务 */

@@ -258,9 +258,7 @@ WIDGET_STATUS;
 
 typedef unsigned long int LCUI_ID; 
 /* 先使用typedef为结构体创建同义字，之后再定义结构体 */
-typedef struct	_LCUI_System		LCUI_System;
 typedef struct	_LCUI_Cursor		LCUI_Cursor;
-typedef struct	_LCUI_App		LCUI_App;
 typedef struct	_LCUI_WString		LCUI_WString;
 typedef struct	_LCUI_WChar_T		LCUI_WChar_T;
 typedef struct	_LCUI_Rect		LCUI_Rect; 
@@ -619,22 +617,6 @@ struct _LCUI_Widget
 };
 /**********************************************************************/
 
-
-
-/************************ LCUI程序的数据 *******************************/
-struct _LCUI_App 
-{
-	BOOL		stop_loop;	/* 一个标志，用于指示是否停止主循环 */
-	LCUI_ID	id;		/* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
-	
-	LCUI_Queue	task_queue;	/* 程序的任务队列 */
-	LCUI_Queue	widget_lib;	/* 部件类型库 */
-	
-	int encoding_type;	/* 字符编码类型，默认为UTF-8 */
-};
-/**********************************************************************/
-
-
 /***********  储存游标的位置 **************/
 struct _LCUI_Cursor
 {
@@ -647,158 +629,15 @@ struct _LCUI_Cursor
 #define MAX_APP_IDLE_TIME	50000
 #define MAX_LCUI_IDLE_TIME	50000
 
-/************ 线程队列 **************/
-struct _Thread_Queue
-{
-	Thread_TreeNode **queue;	/* 储存队列成员 */
-	int max_num;			/* 最大成员数量 */
-	int total_num;			/* 当前成员总数 */
-};
-/***********************************/
-
-/****************************** 屏幕信息 ********************************/
-struct _LCUI_Screen
-{
-	LCUI_Size	size;		/* 屏幕尺寸 */
-	LCUI_Graph	buff;		/* 保存启动LCUI前的屏幕内容 */
-	char		*fb_dev_name;	/* 图形输出设备的名称 */
-	uchar_t	*fb_mem;	/* 指向图像输出设备映射到的内存的指针 */
-	int		fb_dev_fd;	/* 图形显示设备的句柄 */
-	size_t		smem_len;	/* 内存空间的大小 */
-	int		bits;		/* 每个像素的用多少位表示 */
-};
-/***********************************************************************/
-
-/************ 线程树的结点 ***************/
-struct _Thread_TreeNode
-{
-	Thread_TreeNode *parent;	/* 父线程结点指针 */
-	thread_t tid;			/* 父线程ID */
-	Thread_Queue child;		/* 子线程队列 */
-};
-/***************************************/
-
-/***************************整个LCUI的数据 *****************************/
-struct _LCUI_System
-{	
-	int status;		/* 状态 */ 
-	BOOL init;		/* 指示LCUI是否初始化过 */
-	BOOL need_shift_area;	/* 指示是否需要转移部件中记录的区域数据 */ 
-	
-	thread_t self_id;		/* 保存LCUI主程序的线程的ID */
-	thread_t display_thread;	/* 保存核心处理的线程的ID */
-	thread_t timer_thread;		/* 定时器列表处理线程的ID */
-	thread_t dev_thread;		/* 设备输入数据处理线程的ID */
-	Thread_TreeNode thread_tree; /* 线程关系树 */
-	
-	LCUI_ID max_app_idle_time;	/* 程序最大的空闲时间 */
-	LCUI_ID max_lcui_idle_time;	/* LCUI最大的空闲时间 */
-	
-	LCUI_Cursor	cursor;		/* 游标 */
-	
-	LCUI_Screen	screen;		/* 屏幕信息 */
-	LCUI_Queue	mouse_event;	/* 鼠标事件 */
-	LCUI_Queue	press_key;	/* 保存已被按下的按键的键值 */
-	LCUI_Queue	key_event;	/* 保存与按键事件关联的数据 */
-	LCUI_Queue	dev_list;	/* 设备列表 */
-	LCUI_Queue	widget_list;	/* 部件队列，对应它的显示顺序 */
-	LCUI_Widget	*focus_widget;	/* 获得焦点的部件 */
-	LCUI_Queue	update_area;	/* 需要刷新的区域 */
-	LCUI_Queue	timer_list;	/* 定时器列表 */
-	LCUI_Queue	app_list;	/* LCUI程序列表 */ 
-	LCUI_Font	default_font;	/* 默认的字体数据 */ 
-};
-/***********************************************************************/
-
 #define nobuff_printf(format, ...) \
 	{ \
 		printf(format, ##__VA_ARGS__); \
 		fflush(stdout); \
 	}
 
-extern LCUI_System  LCUI_Sys;
-
-LCUI_BEGIN_HEADER
-
-/* 
- * 功能：注册设备
- * 说明：为指定设备添加处理函数
- * */
-int LCUI_Dev_Add(	BOOL (*init_func)(), 
-			BOOL (*proc_func)(), 
-			BOOL (*destroy_func)() );
-
-/*----------------------------- Timer --------------------------------*/
-/* 
- * 功能：设置定时器，在指定的时间后调用指定回调函数 
- * 说明：时间单位为毫秒，调用后会返回该定时器的标识符; 
- * 如果要用于循环定时处理某些任务，可将 reuse 置为 1，否则置于 0。
- * */
-int set_timer( long int n_ms, void (*callback_func)(void), BOOL reuse );
-
-/*
- * 功能：释放定时器
- * 说明：当不需要定时器时，可以使用该函数释放定时器占用的资源
- * 返回值：正常返回0，指定ID的定时器不存在则返回-1.
- * */
-int free_timer( int timer_id );
-
-/*
- * 功能：暂停定时器的使用 
- * 说明：一般用于往复定时的定时器
- * */
-int pause_timer( int timer_id );
-
-int continue_timer( int timer_id );
-/* 继续使用定时器 */
-
-/* 重设定时器的时间 */
-int reset_timer( int timer_id, long int n_ms );
-/*---------------------------- End Timer -----------------------------*/
-
-/************************* App Management *****************************/
-LCUI_App *Find_App(LCUI_ID id);
-/* 功能：根据程序的ID，获取指向程序数据结构的指针 */ 
-
-LCUI_App* Get_Self_AppPointer();
-/* 功能：获取程序的指针 */ 
-
-void Main_Loop_Quit();
-/* 功能：让程序退出主循环 */
-/*********************** App Management End ***************************/
-
-BOOL LCUI_Active();
-/* 功能：检测LCUI是否活动 */ 
-
-int LCUI_Init(int argc, char *argv[]);
-/* 
- * 功能：用于对LCUI进行初始化操作 
- * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
- * */ 
-
-int Need_Main_Loop(LCUI_App *app);
-/* 功能：检测主循环是否需要继续进行 */ 
-
-int LCUI_Main ();
-/* 
- * 功能：LCUI程序的主循环
- * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
- *  */ 
-
-int Get_LCUI_Version(char *out);
-/* 功能：获取LCUI的版本 */ 
-
-int Get_EncodingType();
-/* 获取字符编码类型 */
-
-int Using_GB2312();
-/* 
- * 说明：如果你的系统只能使用GB2312编码，不能使用UTF-8编码，可以使用这
- * 个函数进行设置，让相关函数正常转换字符编码 
- * */ 
-
-LCUI_END_HEADER
-
+#include LC_KERNEL_MAIN_H
+#include LC_KERNEL_DEV_H
+#include LC_KERNEL_TIMER_H
 #include LC_MISC_H
 
 /* 如果是使用C++语言，那么就包含LCUI的C++版头文件 */

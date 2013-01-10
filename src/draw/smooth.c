@@ -53,7 +53,6 @@ int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 		return -2;
 	}
 	
-	Graph_Lock( src, RWLOCK_READ );
 	Graph_Lock( &temp, RWLOCK_WRITE );
 	
 	//x方向一维高斯模糊
@@ -93,7 +92,6 @@ int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 	}
 	Graph_Unlock( &temp );
 	
-	Graph_Lock( des, RWLOCK_WRITE );
 	Graph_Lock( &temp, RWLOCK_READ );
 	//y方向一维高斯模糊
 	src_start_pos = 0 - kcenter*temp.width;
@@ -131,9 +129,6 @@ int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 	}
 	
 	Graph_Unlock( &temp );
-	Graph_Unlock( des );
-	Graph_Unlock( src );
-	
 	Graph_Free( &temp );
 	free(kernel);
 	return 0;

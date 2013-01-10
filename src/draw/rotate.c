@@ -93,8 +93,6 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 	long m, n, z;
 	long src_x, src_y, des_x, des_y;
 	// 针对图像每行进行操作
-	Graph_Lock(src, 0);
-	Graph_Lock(des, 1);
 	for(des_y = 0; des_y < new_height; ++des_y) {
 		m = new_width * des_y;
 		// 针对图像每列进行操作   
@@ -126,7 +124,5 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 			}
 		}
 	}
-	Graph_Unlock(src);
-	Graph_Unlock(des);
 	return 0;
 }

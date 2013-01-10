@@ -304,8 +304,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			break;
 			default : break;
 		}
-	} 
-	print_widget_info( widget );
+	}
 }
 
 LCUI_Widget *Get_CheckBox_Label(LCUI_Widget *widget)

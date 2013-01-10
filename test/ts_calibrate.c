@@ -375,7 +375,7 @@ int main(int argc,char*argv[])
 	/* 创建一个窗口部件 */
 	window = Create_Widget("window"); 
 	/* 窗口部件边框风格为无(NONE) */
-	Set_Widget_Border_Style(window, BORDER_STYLE_NONE);
+	Set_Widget_StyleID( window, WINDOW_STYLE_NONE );
 	/* 部件背景图为bg，填充模式为拉伸 */
 	Set_Widget_Background_Image(window, &bg, FILL_MODE_STRETCH);
 	/* 改变部件尺寸 */

@@ -17,7 +17,6 @@ LCUI_LDFLAGS=-version-info 2:0:0
 ##如果新接口删除了前面接口的元素，那么应该将 age重置为 0。这是一个新的，但是不向后兼容的版本。
 
 LCUI_SOURCES = \
-	LCUI_Main.c	\
 	LCUI_Queue.c	\
 	LCUI_Graph.c	\
 	LCUI_Work.c	\
@@ -31,6 +30,7 @@ LCUI_LIBADD = \
 	draw/libdraw.la \
 	draw/in-core/libdraw_incore.la \
 	misc/libmisc.la \
+	kernel/libkernel.la \
 	font/libfont.la \
 	font/in-core/libfont_incore.la \
 	input/libinput.la \
@@ -44,7 +44,7 @@ LCUI_LIBADD = \
 	$(ICONV_LIBS) \
 	$(TS_LIBS)
 
-SUBDIRS = bmp misc draw font input output thread widget
+SUBDIRS = bmp misc draw kernel font input output thread widget
 
 ##库的编译需要这样
 lib_LTLIBRARIES = libLCUI.la

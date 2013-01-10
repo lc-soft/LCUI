@@ -45,7 +45,6 @@
 #include LC_DISPLAY_H
 #include LC_CURSOR_H 
 #include LC_INPUT_H
-#include LC_MISC_H
 #include LC_ERROR_H
 #include LC_FONT_H 
 #include LC_WIDGET_H
@@ -65,343 +64,6 @@ void end_count_time()
 {
 	printf("%ldms\n",clock()-start_time);
 }
-
-/*----------------------------- Device -------------------------------*/
-typedef struct _dev_func_data
-{
-	BOOL (*init_func)();
-	BOOL (*proc_func)();
-	BOOL (*destroy_func)();
-}
-dev_func_data;
-
-static void dev_list_init( LCUI_Queue *dev_list )
-{
-	Queue_Init( dev_list, sizeof(dev_func_data), NULL );
-}
-
-/* 
- * 功能：注册设备
- * 说明：为指定设备添加处理函数
- * */
-int LCUI_Dev_Add(	BOOL (*init_func)(), 
-			BOOL (*proc_func)(), 
-			BOOL (*destroy_func)() )
-{
-	dev_func_data data;
-	
-	if( init_func ) {
-		init_func();
-	}
-	data.init_func = init_func;
-	data.proc_func = proc_func;
-	data.destroy_func = destroy_func;
-	if( 0<= Queue_Add( &LCUI_Sys.dev_list, &data ) ) {
-		return 0;
-	}
-	return -1;
-}
-
-static void *proc_dev_list ( void *arg )
-{
-	LCUI_Queue *dev_list;
-	dev_func_data *data_ptr;
-	int total, i, result, sleep_time = 1000;
-	
-	dev_list = (LCUI_Queue *)arg;
-	while( LCUI_Active() ) {
-		result = 0;
-		total = Queue_Get_Total( dev_list );
-		for(i=0; i<total; ++i) {
-			data_ptr = Queue_Get( dev_list, i );
-			if( !data_ptr || !data_ptr->proc_func ) {
-				continue;
-			}
-			result += data_ptr->proc_func();
-		}
-		if( result > 0 ) {
-			sleep_time = 1000;
-		} else {
-			usleep( sleep_time );
-			if( sleep_time < 100000 ) {
-				sleep_time += 1000;
-			}
-		}
-	}
-	thread_exit(NULL);
-}
-
-/* 初始化设备 */
-int LCUI_Dev_Init()
-{
-	dev_list_init( &LCUI_Sys.dev_list );
-	return thread_create( &LCUI_Sys.dev_thread, NULL, 
-			proc_dev_list, &LCUI_Sys.dev_list );
-}
-
-void LCUI_Dev_Destroy()
-{
-	int total, i;
-	dev_func_data *data_ptr;
-	LCUI_Queue *dev_list;
-	
-	dev_list = &LCUI_Sys.dev_list; 
-	total = Queue_Get_Total( dev_list );
-	for(i=0; i<total; ++i) {
-		data_ptr = Queue_Get( dev_list, i );
-		if( !data_ptr || !data_ptr->destroy_func ) {
-			continue;
-		}
-		data_ptr->destroy_func();
-	}
-}
-/*--------------------------- End Device -----------------------------*/
-
-/*----------------------------- Timer --------------------------------*/
-typedef struct _timer_data
-{
-	int status;		/* 状态 */
-	BOOL reuse;		/* 是否重复使用该定时器 */
-	LCUI_ID app_id;	/* 所属程序ID */
-	long int id;		/* 定时器ID */
-	long int total_ms;	/* 定时总时间（单位：毫秒） */
-	long int cur_ms;	/* 当前剩下的等待时间 */
-	void (*callback_func)(); /* 回调函数 */ 
-}
-timer_data;
-
-/*----------------------------- Private ------------------------------*/
-/* 功能：初始化定时器列表 */
-static void timer_list_init( LCUI_Queue *timer_list )
-{
-	Queue_Init( timer_list, sizeof(timer_data), NULL );
-	/* 使用链表 */
-	Queue_Set_DataMode( timer_list, QUEUE_DATA_MODE_LINKED_LIST );
-}
-/* 功能：销毁定时器列表 */
-static void timer_list_destroy( LCUI_Queue *timer_list )
-{
-	Destroy_Queue( timer_list );
-}
-
-/* 功能：对定时器列表进行排序 */
-static void timer_list_sort( LCUI_Queue *timer_list )
-{
-	int i, j, total;
-	timer_data *a_timer, *b_timer;
-	
-	Queue_Lock( timer_list );
-	total = Queue_Get_Total( timer_list );
-	/* 使用的是选择排序,按剩余等待时间从少到多排序 */
-	for(i=0; i<total; ++i) {
-		a_timer = Queue_Get( timer_list, i );
-		if( !a_timer ) {
-			continue;
-		}
-		for(j=i+1; j<total; ++j) {
-			b_timer = Queue_Get( timer_list, j );
-			if( !b_timer ) {
-				continue; 
-			}
-			if( b_timer->cur_ms < a_timer->cur_ms ) {
-				Queue_Swap( timer_list , j, i);
-			}
-		}
-	}
-	Queue_UnLock( timer_list );
-}
-
-/* 功能：将各个定时器的等待时间与指定时间相减 */
-static void timer_list_sub( LCUI_Queue *timer_list, int time )
-{
-	timer_data *timer;
-	int i, total;
-	
-	Queue_Lock( timer_list );
-	total = Queue_Get_Total( timer_list );
-	
-	for(i=0; i<total; ++i) {
-		timer = Queue_Get( timer_list , i);
-		/* 忽略无效的定时器，或者状态为暂停的定时器 */
-		if( !timer || timer->status == 0) {
-			continue;
-		}
-		timer->cur_ms -= time;
-	}
-	Queue_UnLock( timer_list );
-}
-
-static timer_data *timer_list_update( LCUI_Queue *timer_list )
-/* 功能：更新定时器列表中的定时器 */
-{
-	int i, total;
-	timer_data *timer = NULL;
-	
-	total = Queue_Get_Total( timer_list ); 
-	for(i=0; i<total; ++i){
-		timer = Queue_Get( timer_list , i);
-		if(timer->status == 1) {
-			break;
-		}
-	}
-	if(i >= total || !timer ) {
-		return NULL; 
-	}
-	if(timer->cur_ms > 0) {
-		usleep( timer->cur_ms*1000 ); 
-	}
-	/* 减少列表中所有定时器的剩余等待时间 */
-	timer_list_sub( timer_list, timer->cur_ms );
-	timer->cur_ms = timer->total_ms;
-	timer_list_sort( timer_list ); /* 重新排序 */
-	return timer;
-}
-
-/* 一个线程，用于处理定时器 */
-static void *timer_list_process( void *arg )
-{
-	int sleep_time = 1000;
-	LCUI_Func func_data;
-	LCUI_Queue *timer_list;
-	timer_data *timer;
-	
-	timer_list = (LCUI_Queue*)arg;
-	func_data.arg[0] = NULL;
-	func_data.arg[1] = NULL;
-	
-	while( !LCUI_Active() ) {
-		usleep(10000);
-	}
-	while( LCUI_Active() ) { 
-		timer = timer_list_update( timer_list );
-		if( !timer ) {
-			usleep( sleep_time );
-			if(sleep_time < 500000) {
-				sleep_time += 1000;
-			}
-			continue;
-		}
-		sleep_time = 1000;
-		func_data.id = timer->app_id;
-		func_data.func = timer->callback_func;
-		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */
-		AppTask_Custom_Add( ADD_MODE_REPLACE, &func_data );
-	}
-	LCUI_Thread_Exit(NULL);
-}
-
-timer_data *find_timer( int timer_id )
-{
-	int i, total;
-	timer_data *timer = NULL;
-	Queue_Lock( &LCUI_Sys.timer_list );
-	total = Queue_Get_Total( &LCUI_Sys.timer_list );
-	for(i=0; i<total; ++i) {
-		timer = Queue_Get( &LCUI_Sys.timer_list, i );
-		if( !timer ) {
-			continue;
-		}
-		if( timer->id == timer_id ) { 
-			break;
-		}
-	}
-	Queue_UnLock( &LCUI_Sys.timer_list ); 
-	return timer;
-}
-/*--------------------------- End Private ----------------------------*/
-
-/*----------------------------- Public -------------------------------*/
-/* 
- * 功能：设置定时器，在指定的时间后调用指定回调函数 
- * 说明：时间单位为毫秒，调用后会返回该定时器的标识符; 
- * 如果要用于循环定时处理某些任务，可将 reuse 置为 1，否则置于 0。
- * */
-int set_timer( long int n_ms, void (*callback_func)(void), BOOL reuse )
-{
-	timer_data timer;
-	timer.status = 1;
-	timer.total_ms = timer.cur_ms = n_ms;
-	timer.callback_func = callback_func;
-	timer.reuse = reuse;
-	timer.id = rand();
-	timer.app_id = Get_Self_AppPointer()->id;
-	if( 0 > Queue_Add( &LCUI_Sys.timer_list, &timer ) ) {
-		return -1;
-	}
-	return timer.id;
-}
-
-/*
- * 功能：释放定时器
- * 说明：当不需要定时器时，可以使用该函数释放定时器占用的资源
- * 返回值：正常返回0，指定ID的定时器不存在则返回-1.
- * */
-int free_timer( int timer_id )
-{
-	int i, total;
-	timer_data *timer;
-	
-	Queue_Lock( &LCUI_Sys.timer_list );
-	total = Queue_Get_Total( &LCUI_Sys.timer_list );
-	for(i=0; i<total; ++i) {
-		timer = Queue_Get( &LCUI_Sys.timer_list, i );
-		if( !timer ) {
-			continue;
-		}
-		if( timer->id == timer_id ) {
-			Queue_Delete( &LCUI_Sys.timer_list, i );
-			break;
-		}
-	}
-	Queue_UnLock( &LCUI_Sys.timer_list );
-	if( i < total ) {
-		return 0;
-	}
-	return -1;
-}
-
-/*
- * 功能：暂停定时器的使用 
- * 说明：一般用于往复定时的定时器
- * */
-int pause_timer( int timer_id )
-{
-	timer_data *timer;
-	timer = find_timer( timer_id );
-	if( timer ) {
-		timer->status = 0;
-		return 0;
-	}
-	return -1;
-}
-
-int continue_timer( int timer_id )
-/* 继续使用定时器 */
-{
-	timer_data *timer;
-	timer = find_timer( timer_id );
-	if( timer ) {
-		timer->status = 1;
-		return 0;
-	}
-	return -1;
-}
-
-/* 重设定时器的时间 */
-int reset_timer( int timer_id, long int n_ms ) 
-{
-	timer_data *timer;
-	timer = find_timer( timer_id );
-	if( timer ) {
-		timer->total_ms = timer->cur_ms = n_ms;
-		return 0;
-	}
-	return -1;
-}
-/*---------------------------- End Public -----------------------------*/
-
-/*---------------------------- End Timer ------------------------------*/
-
 
 /************************* App Management *****************************/
 LCUI_App *Find_App(LCUI_ID id)
@@ -479,8 +141,7 @@ static void LCUI_Quit ()
 	Disable_Mouse_Input();		/* 禁用鼠标输入 */ 
 	Disable_TouchScreen_Input();	/* 禁用触屏支持 */ 
 	Disable_Key_Input();		/* 禁用按键输入 */ 
-	thread_join( LCUI_Sys.timer_thread, NULL ); /* 等待定时器处理线程的退出 */
-	timer_list_destroy( &LCUI_Sys.timer_list ); /* 销毁定时器列表 */
+	timer_thread_destroy( LCUI_Sys.timer_thread, &LCUI_Sys.timer_list );
 }
 
 
@@ -578,7 +239,7 @@ static void Print_LCUI_Copyright_Text()
 /* 功能：打印LCUI的信息 */
 {
 	printf(
-	"============| LCUI v0.12.6 |============\n"
+	"============| LCUI v0.13.0 |============\n"
 	"Copyright (C) 2012 Liu Chao.\n"
 	"Licensed under GPLv2.\n"
 	"Report bugs to <lc-soft@live.cn>.\n"
@@ -623,31 +284,40 @@ int LCUI_Init(int argc, char *argv[])
 	int temp;
 	/* 如果LCUI没有初始化过 */
 	if( !LCUI_Sys.init ) {
+		/* 标记已经初始化 */
 		LCUI_Sys.init = TRUE;
 		LCUI_Sys.status = ACTIVE;
+		/* 初始化随机数种子 */
 		srand(time(NULL));
-		signal(SIGTTOU, SIG_IGN);	/* 忽略SIGTTOU信号 */
+		/* 打印版权信息 */
 		Print_LCUI_Copyright_Text();
-		timer_list_init( &LCUI_Sys.timer_list );	/* 初始化定时器列表 */
-		Thread_TreeNode_Init (&LCUI_Sys.thread_tree);	/* 初始化根线程结点 */
-		LCUI_Sys.thread_tree.tid = thread_self();	/* 当前线程ID作为根结点 */
-		LCUI_Sys.self_id = thread_self();		/* 保存线程ID */
+		/* 初始化根线程结点 */
+		Thread_TreeNode_Init (&LCUI_Sys.thread_tree);	
+		/* 当前线程ID作为根结点 */
+		LCUI_Sys.thread_tree.tid = thread_self();
+		/* 保存线程ID */
+		LCUI_Sys.self_id = thread_self();
 		
 		LCUI_Sys.focus_widget = NULL; 
 		
 		/* 设定最大空闲时间 */
 		LCUI_Sys.max_app_idle_time = MAX_APP_IDLE_TIME;
 		LCUI_Sys.max_lcui_idle_time = MAX_LCUI_IDLE_TIME;
-		EventQueue_Init(&LCUI_Sys.key_event);	/* 初始化按键事件队列 */
-		LCUI_Font_Init (&LCUI_Sys.default_font);/* 初始化默认的字体数据 */
-		LCUI_AppList_Init (&LCUI_Sys.app_list); /* 初始化LCUI程序数据 */
-		RectQueue_Init (&LCUI_Sys.update_area);	/* 初始化屏幕区域更新队列 */ 
-		WidgetQueue_Init (&LCUI_Sys.widget_list); /* 初始化部件队列 */
+		/* 初始化按键事件队列 */
+		EventQueue_Init( &LCUI_Sys.key_event );
+		/* 初始化默认的字体数据 */
+		LCUI_Font_Init(&LCUI_Sys.default_font);
+		/* 初始化LCUI程序数据 */
+		LCUI_AppList_Init( &LCUI_Sys.app_list );
+		/* 初始化屏幕区域更新队列 */ 
+		RectQueue_Init( &LCUI_Sys.update_area );
+		/* 初始化部件队列 */
+		WidgetQueue_Init( &LCUI_Sys.widget_list ); 
+		/* 让定时器处理模块开始工作 */
+		timer_thread_start(	&LCUI_Sys.timer_thread, 
+					&LCUI_Sys.timer_list );
 		/* 初始化用于储存已按下的键的键值队列 */
-		Queue_Init(&LCUI_Sys.press_key, sizeof(int), NULL);
-		/* 创建用于处理定时器列表的线程 */
-		thread_create( &LCUI_Sys.timer_thread, NULL, 
-			timer_list_process, &LCUI_Sys.timer_list );
+		Queue_Init( &LCUI_Sys.press_key, sizeof(int), NULL );
 		/* 记录程序信息 */
 		temp = LCUI_AppList_Add();
 		if(temp != 0) {
@@ -681,6 +351,41 @@ int Need_Main_Loop(LCUI_App *app)
 		return 0;
 	}
 	return 1;
+}
+
+
+static BOOL
+Have_Task( LCUI_App *app )
+/* 功能：检测是否有任务 */
+{
+	if( !app ) {
+		return FALSE; 
+	}
+	if(Queue_Get_Total(&app->task_queue) > 0) {
+		return TRUE; 
+	}
+	return FALSE;
+}
+
+static int 
+Run_Task( LCUI_App *app )
+/* 功能：执行任务 */
+{ 
+	static LCUI_Task *task;
+	task = (LCUI_Task*)Queue_Get( &app->task_queue, 0 );
+	//clock_t start = clock();
+	//printf("run task %p\n", task->func);
+	/* 调用函数指针指向的函数，并传递参数 */
+	task->func( task->arg[0], task->arg[1] );
+	/* 若需要在调用回调函数后销毁参数 */
+	if( task->destroy_arg[0] ) {
+		free( task->arg[0] );
+	}
+	if( task->destroy_arg[1] ) {
+		free( task->arg[1] );
+	}
+	//printf("task %p use time: %ldus\n", task->func, clock()-start);
+	return Queue_Delete(&app->task_queue, 0);
 }
 
 int LCUI_Main ()

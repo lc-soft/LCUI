@@ -15,7 +15,6 @@ int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 	Graph_Fill_Color(graph, RGB(250,250,250));/* 填充白色 */
 	Graph_Fill_Alpha(graph, 255);
 	
-	Graph_Lock( graph, 1 );
 	/* 四个角上的一个像素点完全透明 */
 	graph->rgba[3][0] = 0;
 	graph->rgba[3][width-1] = 0;
@@ -63,7 +62,6 @@ int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 	n = width*(height-2);
 	memset(graph->rgba[0]+n+1, 225, width-2); 
 	memset(graph->rgba[1]+n+1, 225, width-2); 
-	memset(graph->rgba[2]+n+1, 225, width-2); 
-	Graph_Unlock( graph );
+	memset(graph->rgba[2]+n+1, 225, width-2);
 	return 0;
 }

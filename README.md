@@ -1,5 +1,4 @@
 # The LCUI Project
-
 ![LCUI Logo](https://raw.github.com/lc-soft/LCUI/gh-pages/files/images/lc-soft-logo.png)
 
 ## Screenshort

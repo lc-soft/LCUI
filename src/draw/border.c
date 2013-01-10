@@ -127,6 +127,9 @@ Graph_Draw_RoundBorder_LeftTop(
 		 && radius-x <= max_x ) {
 			pos = center_pos - x;
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 		
 		if( hide_outarea && des->have_alpha ) {
@@ -164,6 +167,9 @@ Graph_Draw_RoundBorder_LeftTop(
 		/* 开始填充当前点右边的n-1个像素点 */
 		for(i=0; i<n-1; ++i,++pos) {
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 	}
 	return 0;
@@ -225,6 +231,9 @@ Graph_Draw_RoundBorder_TopLeft(
 		 && radius-y <= max_y ) {
 			pos = center_pos - y * des->width - x;
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 
 		if( hide_outarea && des->have_alpha ) {
@@ -268,6 +277,9 @@ Graph_Draw_RoundBorder_TopLeft(
 		/* 开始填充当前点下边的n-1个像素点 */
 		for(i=0; i<n-1; ++i,pos+=des->width) {
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 	}
 	return 0;
@@ -327,6 +339,9 @@ Graph_Draw_RoundBorder_RightTop(
 		 && radius+x <= max_x ) {
 			pos = center_pos + x;
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 		
 		if( hide_outarea && des->have_alpha ) {
@@ -353,6 +368,9 @@ Graph_Draw_RoundBorder_RightTop(
 		}
 		for(i=0; i<n; ++i,--pos) {
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 	}
 	return 0;
@@ -414,6 +432,9 @@ Graph_Draw_RoundBorder_TopRight(
 		 && radius-y <= max_y ) {
 			pos = center_pos - y * des->width + x;
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 		if( hide_outarea && des->have_alpha ) {
 			if( radius-y < min_y ) {
@@ -448,6 +469,9 @@ Graph_Draw_RoundBorder_TopRight(
 		}
 		for(i=0; i<n-1; ++i,pos+=des->width) {
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 	}
 	return 0;
@@ -510,6 +534,9 @@ Graph_Draw_RoundBorder_LeftBottom(
 		 && radius-x <= max_x ) {
 			pos = center_pos - x;
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 		if( hide_outarea && des->have_alpha ) {
 			pos = center_pos - center.x;
@@ -537,6 +564,9 @@ Graph_Draw_RoundBorder_LeftBottom(
 		}
 		for(i=0; i<n-1; ++i,++pos) {
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 	}
 	return 0;
@@ -550,7 +580,7 @@ Graph_Draw_RoundBorder_BottomLeft(
 /* 绘制左下角的圆角，从下边框的左端到左边框的下端绘制一条圆角线 */
 {
 	LCUI_Rect real_rect;
-	int pos, center_pos, y, x, i, n;
+	int tmp_pos, pos, center_pos, y, x, i, n;
 	int max_x, max_y, min_x, min_y;
 	
 	if( line_width <= 0 && !hide_outarea ) {
@@ -593,20 +623,23 @@ Graph_Draw_RoundBorder_BottomLeft(
 		
 		y = sqrt( pow(radius, 2) - x*x );
 		
+		if( radius+y > max_y ) {
+			pos = center_pos;
+			pos += (max_y-radius)*des->width;
+		} else {
+			pos = center_pos + y * des->width - x;
+		}
+		
 		if( line_width > 0 && radius+y >= min_y 
 		 && radius+y <= max_y ) {
-			pos = center_pos + y * des->width - x;
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 		
 		if( hide_outarea && des->have_alpha ) {
-			/* 计算起点坐标 */
-			if( radius+y > max_y ) {
-				pos = center_pos;
-				pos += (max_y-radius)*des->width;
-			} else {
-				pos = center_pos + y * des->width - x;
-			}
+			tmp_pos = pos;
 			if( radius+y < min_y ) {
 				n = max_y - min_y;
 			} else {
@@ -614,9 +647,9 @@ Graph_Draw_RoundBorder_BottomLeft(
 			}
 			/* 加上圆与背景图的下边距 */
 			n += (real_rect.height-center.y-radius);
-			pos+=des->width;
-			for(i=0; i<n; ++i,pos+=des->width) {
-				des->rgba[3][pos]=0;
+			tmp_pos+=des->width;
+			for(i=0; i<n; ++i,tmp_pos+=des->width) {
+				des->rgba[3][tmp_pos]=0;
 			}
 		}
 		/* 计算需要向上填充的像素点的个数n */
@@ -624,10 +657,7 @@ Graph_Draw_RoundBorder_BottomLeft(
 		/* 判断是否超过圆的x轴对称线 */
 		n = n<radius ? y:line_width;
 		if( radius+y > max_y ) {
-			pos = center_pos + (max_y-radius)*des->width;
 			n -= (radius+y-max_y);
-		} else {
-			pos = center_pos + y * des->width - x;
 		}
 		/* 从上一行像素点开始 */
 		pos -= des->width;
@@ -637,6 +667,9 @@ Graph_Draw_RoundBorder_BottomLeft(
 		/* 开始填充当前点下边的n-1个像素点 */
 		for(i=0; i<n-1; ++i,pos-=des->width) {
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 	}
 	return 0;
@@ -696,6 +729,9 @@ Graph_Draw_RoundBorder_RightBottom(
 		 && radius+x < max_x ) {
 			pos = center_pos + x;
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 		
 		if( hide_outarea && des->have_alpha ) {
@@ -721,6 +757,9 @@ Graph_Draw_RoundBorder_RightBottom(
 		}
 		for(i=0; i<n; ++i,--pos) {
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 	}
 	return 0;
@@ -781,6 +820,9 @@ Graph_Draw_RoundBorder_BottomRight(
 		 && radius+y < max_y ) {
 			pos = center_pos + y * des->width + x;
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 		if( hide_outarea && des->have_alpha ) {
 			if( radius+y > max_y ) {
@@ -815,6 +857,9 @@ Graph_Draw_RoundBorder_BottomRight(
 		pos -= des->width;
 		for(i=0; i<n-1; ++i,pos-=des->width) {
 			fill_pixel( des->rgba, pos, line_color );
+			if( des->have_alpha ) {
+				des->rgba[3][pos] = 255;
+			}
 		}
 	}
 	return 0;
@@ -835,8 +880,6 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	h[0] = des->height - border.bottom_left_radius;
 	w[1] = des->width - border.bottom_right_radius;
 	h[1] = des->height - border.bottom_right_radius;
-	
-	Graph_Lock(des, 1);
 	
 	/* 绘制左上角的圆角，先引用左上角区域，再将圆绘制到这个区域里 */
 	radius = border.top_left_radius;
@@ -955,6 +998,5 @@ int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 		}
 	}
 	/* 边框线绘制完成 */
-	Graph_Unlock(des);
 	return 0;
 }

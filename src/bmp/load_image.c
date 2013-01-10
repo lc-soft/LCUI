@@ -31,10 +31,10 @@ int Load_Image(const char *filepath, LCUI_Graph *out)
  * */
 {
 	FILE *fp;
-	int result = 0;   /* 错误代号为0 */
+	int result = 0;
 	
 	Graph_Init(out); 
-	out->have_alpha = IS_FALSE;
+	out->have_alpha = FALSE;
 	/*fp是全局变量，其它函数会用到它*/
 	if ((fp = fopen(filepath,"r")) == NULL) {
 		perror(filepath);
@@ -47,11 +47,11 @@ int Load_Image(const char *filepath, LCUI_Graph *out)
 				fclose(fp);
 				result = detect_image(filepath, out); 
 			} else {
-				result = SHORT_FILE;//文件过小 
+				result = SHORT_FILE;// 文件过小 
 				fclose(fp);
 			}
 		}
 	}
-	return result;   /* 返回错误代码 */
+	return result;
 }
 

@@ -54,8 +54,13 @@
 #ifndef __LCUI_BUILD_UNIX_H__
 #define __LCUI_BUILD_UNIX_H__
 
+#define LC_KERNEL_TIMER_H	<LCUI/kernel/timer.h>
+#define LC_KERNEL_DEV_H		<LCUI/kernel/device.h>
+#define LC_KERNEL_MAIN_H	<LCUI/kernel/main.h>
+
 #define LC_LCUI_H	<LCUI/LCUI.h>
 #define LC_LCUI_HPP	<LCUI/LCUI.hpp>
+
 #define LC_MISC_H	<LCUI/LCUI_Misc.h>
 #define LC_FONT_H	<LCUI/LCUI_Font.h>
 #define LC_GRAPH_H	<LCUI/LCUI_Graph.h>

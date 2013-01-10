@@ -194,6 +194,7 @@ AC_OUTPUT([Makefile
                  include/LCUI/font/Makefile
                  include/LCUI/draw/Makefile
                  include/LCUI/widget/Makefile
+                 include/LCUI/kernel/Makefile
                  src/Makefile
                  src/font/Makefile
                  src/font/in-core/Makefile
@@ -202,6 +203,7 @@ AC_OUTPUT([Makefile
                  src/thread/Makefile
                  src/bmp/Makefile
                  src/misc/Makefile
+                 src/kernel/Makefile
                  src/input/Makefile
                  src/output/Makefile
                  src/widget/Makefile

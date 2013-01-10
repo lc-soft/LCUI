@@ -110,13 +110,6 @@ void Send_Task_To_App(LCUI_Func *func_data);
  * 说明：LCUI_Func结构体中的成员变量 id，保存的是目标程序的id
  */ 
 
-BOOL
-Have_Task( LCUI_App *app );
-/* 功能：检测是否有任务 */ 
-
-int Run_Task(LCUI_App *app);
-/* 功能：执行任务 */ 
-
 int AppTask_Custom_Add(int mode, LCUI_Func *func_data);
 /*
  * 功能：使用自定义方式添加程序任务

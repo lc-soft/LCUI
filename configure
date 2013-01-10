@@ -12601,7 +12601,7 @@ _ACEOF
 fi
 
 ##输出文件
-ac_config_files="$ac_config_files Makefile lcui.pc include/Makefile include/LCUI/Makefile include/LCUI/font/Makefile include/LCUI/draw/Makefile include/LCUI/widget/Makefile src/Makefile src/font/Makefile src/font/in-core/Makefile src/draw/Makefile src/draw/in-core/Makefile src/thread/Makefile src/bmp/Makefile src/misc/Makefile src/input/Makefile src/output/Makefile src/widget/Makefile test/Makefile test/mora/Makefile test/photoviewer/Makefile test/clock/Makefile test/screenlock/Makefile"
+ac_config_files="$ac_config_files Makefile lcui.pc include/Makefile include/LCUI/Makefile include/LCUI/font/Makefile include/LCUI/draw/Makefile include/LCUI/widget/Makefile include/LCUI/kernel/Makefile src/Makefile src/font/Makefile src/font/in-core/Makefile src/draw/Makefile src/draw/in-core/Makefile src/thread/Makefile src/bmp/Makefile src/misc/Makefile src/kernel/Makefile src/input/Makefile src/output/Makefile src/widget/Makefile test/Makefile test/mora/Makefile test/photoviewer/Makefile test/clock/Makefile test/screenlock/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13619,6 +13619,7 @@ do
     "include/LCUI/font/Makefile") CONFIG_FILES="$CONFIG_FILES include/LCUI/font/Makefile" ;;
     "include/LCUI/draw/Makefile") CONFIG_FILES="$CONFIG_FILES include/LCUI/draw/Makefile" ;;
     "include/LCUI/widget/Makefile") CONFIG_FILES="$CONFIG_FILES include/LCUI/widget/Makefile" ;;
+    "include/LCUI/kernel/Makefile") CONFIG_FILES="$CONFIG_FILES include/LCUI/kernel/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/font/Makefile") CONFIG_FILES="$CONFIG_FILES src/font/Makefile" ;;
     "src/font/in-core/Makefile") CONFIG_FILES="$CONFIG_FILES src/font/in-core/Makefile" ;;
@@ -13627,6 +13628,7 @@ do
     "src/thread/Makefile") CONFIG_FILES="$CONFIG_FILES src/thread/Makefile" ;;
     "src/bmp/Makefile") CONFIG_FILES="$CONFIG_FILES src/bmp/Makefile" ;;
     "src/misc/Makefile") CONFIG_FILES="$CONFIG_FILES src/misc/Makefile" ;;
+    "src/kernel/Makefile") CONFIG_FILES="$CONFIG_FILES src/kernel/Makefile" ;;
     "src/input/Makefile") CONFIG_FILES="$CONFIG_FILES src/input/Makefile" ;;
     "src/output/Makefile") CONFIG_FILES="$CONFIG_FILES src/output/Makefile" ;;
     "src/widget/Makefile") CONFIG_FILES="$CONFIG_FILES src/widget/Makefile" ;;
