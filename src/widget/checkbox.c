@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_CheckBox.c -- LCUI's CheckBox widget
+ * checkbox.c -- LCUI's CheckBox widget
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_CheckBox.c -- LCUI 的复选框部件
+ * checkbox.c -- LCUI 的复选框部件
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -230,17 +230,13 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
-		case WIDGET_STATUS_CLICKING : 
+		case WIDGET_STATUS_ACTIVE : 
 			if( check_box->on ) {
 				p = &check_box->img_on_down;
 			} else {
 				p = &check_box->img_off_down;
 			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
-			break;
-		case WIDGET_STATUS_CLICKED : 
-			break;
-		case WIDGET_STATUS_FOCUS : 
 			break;
 		case WIDGET_STATUS_DISABLE :
 			if( check_box->on ) {
@@ -282,17 +278,13 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
-		case WIDGET_STATUS_CLICKING : 
+		case WIDGET_STATUS_ACTIVE : 
 			if( check_box->on ) {
 				Load_Graph_Default_CheckBox_On_Selected(p);
 			} else {
 				Load_Graph_Default_CheckBox_Off_Selected(p);
 			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
-			break;
-		case WIDGET_STATUS_CLICKED : 
-			break;
-		case WIDGET_STATUS_FOCUS : 
 			break;
 		case WIDGET_STATUS_DISABLE :
 			if( check_box->on ) {

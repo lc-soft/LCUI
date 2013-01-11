@@ -223,12 +223,10 @@ ALIGN_TYPE;
 /*----------------- 部件的几种状态 ------------------*/
 typedef enum _WIDGET_STATUS
 {
-	WIDGET_STATUS_NORMAL,	/* 普通状态 */
-	WIDGET_STATUS_CLICKED,	/* 被鼠标点击，已松开 */
-	WIDGET_STATUS_OVERLAY,	/* 被鼠标覆盖 */
-	WIDGET_STATUS_CLICKING,	/* 被鼠标点击，未松开 */
-	WIDGET_STATUS_FOCUS,	/* 焦点 */
-	WIDGET_STATUS_DISABLE	/* 不可用 */
+	WIDGET_STATUS_NORMAL = 0,	/* 普通状态 */
+	WIDGET_STATUS_DISABLE = 1,	/* 禁用状态 */
+	WIDGET_STATUS_OVERLAY = 2,	/* 被鼠标游标覆盖 */
+	WIDGET_STATUS_ACTIVE = 3,	/* 被鼠标游标点击 */
 }
 WIDGET_STATUS;
 /*-------------------------------------------------*/

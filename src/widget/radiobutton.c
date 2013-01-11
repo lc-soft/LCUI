@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_RadioButton.c -- LCUI‘s RadioButton widget
+ * radiobutton.c -- LCUI‘s RadioButton widget
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_RadioButton.c -- LCUI 的单选框部件
+ * radiobutton.c -- LCUI 的单选框部件
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -282,17 +282,13 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		case WIDGET_STATUS_CLICKING : 
+		case WIDGET_STATUS_ACTIVE : 
 			if(radio_button->on) {
 				p = &radio_button->img_on_down;
 			} else {
 				p = &radio_button->img_off_down;
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
-			break;
-		case WIDGET_STATUS_CLICKED : 
-			break;
-		case WIDGET_STATUS_FOCUS : 
 			break;
 		case WIDGET_STATUS_DISABLE :
 			if(radio_button->on) {
@@ -335,17 +331,13 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		    case WIDGET_STATUS_CLICKING : 
+		    case WIDGET_STATUS_ACTIVE : 
 			if(radio_button->on) {
 				Load_Graph_Default_RadioButton_On_Pressed(p);
 			} else {
 				Load_Graph_Default_RadioButton_Off_Pressed(p);
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
-			break;
-		    case WIDGET_STATUS_CLICKED : 
-			break;
-		    case WIDGET_STATUS_FOCUS : 
 			break;
 		    case WIDGET_STATUS_DISABLE :
 			break;

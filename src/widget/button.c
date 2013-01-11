@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Button.c -- LCUI‘s Button widget
+ * button.c -- LCUI‘s Button widget
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Button.c -- LCUI 的按钮部件
+ * button.c -- LCUI 的按钮部件
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -86,7 +86,7 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 				color = RGB(50, 180, 240); /* 浅蓝色 */
 			}
 			break;
-		case WIDGET_STATUS_CLICKING :
+		case WIDGET_STATUS_ACTIVE :
 			if(Graph_Valid(&button->btn_down)) {
 				/* 缩放图像 */
 				Graph_Zoom(&button->btn_down, &widget->graph, 
@@ -96,28 +96,6 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 				no_bitmap = 1;
 				color = RGB(255, 50, 50); /* 红色 */
 			}
-			break;
-		case WIDGET_STATUS_CLICKED :
-			if(Graph_Valid(&button->btn_down)) {
-				/* 缩放图像 */
-				Graph_Zoom(&button->btn_down, &widget->graph, 
-					CUSTOM, widget->size);
-				no_bitmap = 0;
-			} else {
-				no_bitmap = 1;
-				color = RGB(220, 220, 220); /* 灰色 */
-			} 
-			break;
-		case WIDGET_STATUS_FOCUS :
-			if(Graph_Valid(&button->btn_focus)) {
-				/* 缩放图像 */
-				Graph_Zoom(&button->btn_focus, &widget->graph, 
-					CUSTOM, widget->size );
-				no_bitmap = 0;
-			} else {
-				no_bitmap = 1;
-				color = RGB(50, 50, 255); /* 蓝色 */
-			} 
 			break;
 		case WIDGET_STATUS_DISABLE :
 			if(Graph_Valid(&button->btn_disable)) {
@@ -157,22 +135,11 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 			 Border(1, BORDER_STYLE_SOLID, RGB(50,50,255)) );
 			Graph_Fill_Alpha(&widget->graph, 255);
 			break;
-		case WIDGET_STATUS_CLICKING :
+		case WIDGET_STATUS_ACTIVE :
 			color = RGB(80, 170, 255);
 			Graph_Fill_Color(&widget->graph, color);
 			Graph_Draw_Border(&widget->graph, 
 			 Border(1, BORDER_STYLE_SOLID, RGB(50,50,255)) );
-			Graph_Fill_Alpha(&widget->graph, 255);
-			break;
-		case WIDGET_STATUS_CLICKED :
-			color = RGB(80, 170, 255);
-			Graph_Fill_Color(&widget->graph, color);
-			Graph_Draw_Border(&widget->graph, 
-			 Border(1, BORDER_STYLE_SOLID, RGB(50,50,255)) );
-			Graph_Fill_Alpha(&widget->graph, 255);
-			break;
-		case WIDGET_STATUS_FOCUS :
-			color = RGB(50, 50, 255);
 			Graph_Fill_Alpha(&widget->graph, 255);
 			break;
 		case WIDGET_STATUS_DISABLE :
@@ -191,14 +158,8 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 		case WIDGET_STATUS_OVERLAY :
 			color = RGB(50, 180, 240);  
 			break;
-		case WIDGET_STATUS_CLICKING :
+		case WIDGET_STATUS_ACTIVE :
 			color = RGB(255, 50, 50); 
-			break;
-		case WIDGET_STATUS_CLICKED :
-			color = RGB(220, 220, 220); 
-			break;
-		case WIDGET_STATUS_FOCUS :
-			color = RGB(50, 50, 255);
 			break;
 		case WIDGET_STATUS_DISABLE :
 			color = RGB(190, 190, 190); 

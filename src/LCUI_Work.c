@@ -586,7 +586,7 @@ Widget_Clicked(LCUI_MouseEvent *event)
 		}
 		/* 如果当前鼠标指针覆盖到的部件已被启用 */  
 		if( event->widget->enabled && widget->enabled ) {
-			Set_Widget_Status (widget, WIDGET_STATUS_CLICKING); 
+			Set_Widget_Status (widget, WIDGET_STATUS_ACTIVE); 
 		} else {
 			Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
 		}
@@ -619,7 +619,7 @@ Widget_Clicked(LCUI_MouseEvent *event)
 				break;
 			}
 			if(widget->enabled) {
-				Set_Widget_Status (widget, WIDGET_STATUS_CLICKED);
+				Set_Widget_Status (widget, WIDGET_STATUS_ACTIVE);
 				Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
 				break;
 			}
