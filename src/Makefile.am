@@ -17,12 +17,13 @@ LCUI_LDFLAGS=-version-info 2:0:0
 ##如果新接口删除了前面接口的元素，那么应该将 age重置为 0。这是一个新的，但是不向后兼容的版本。
 
 LCUI_SOURCES = \
-	LCUI_Queue.c	\
-	LCUI_Graph.c	\
-	LCUI_Work.c	\
-	LCUI_Cursor.c	\
-	LCUI_Widget.c	\
-	LCUI_Error.c 	\
+	LCUI_Queue.c		\
+	LCUI_Graph.c		\
+	LCUI_GraphLayer.c	\
+	LCUI_Work.c		\
+	LCUI_Cursor.c		\
+	LCUI_Widget.c		\
+	LCUI_Error.c 		\
 	LCUI_Thread.c
 
 LCUI_LIBADD = \
