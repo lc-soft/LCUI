@@ -1,5 +1,6 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
+#include LC_GRAPH_H
 
 typedef struct _LCUI_GraphLayer LCUI_GraphLayer;
 
@@ -25,17 +26,60 @@ struct _LCUI_GraphLayer
  * 
  * */
 
+/* 释放图层占用的内存资源 */
+void GraphLayer_Free( LCUI_GraphLayer *glayer )
+{
+	int i, total;
+	LCUI_Queue *queue;
+	LCUI_GraphLayer *tmp_glayer;
+	
+	/* 从父图层中的子图层队列中移除自己 */
+	if( glayer->parent ) {
+		queue = &glayer->parent->child;
+		total = Queue_Get_Total( queue );
+		for( i=0; i<total; ++i ) {
+			tmp_glayer = Queue_Get( queue, i );
+			if( tmp_glayer == glayer ) {
+				Queue_Delete( queue, i );
+				break;
+			}
+		}
+	}
+	free( glayer );
+}
+
 /* 创建新的图层 */
 LCUI_GraphLayer *
 GraphLayer_New( void )
 {
-	return NULL;
+	LCUI_GraphLayer * glayer;
+	
+	glayer = malloc( sizeof( LCUI_GraphLayer ) );
+	if( glayer == NULL ) {
+		return NULL;
+	}
+	
+	glayer->visible = FALSE;
+	glayer->x = glayer->y = glayer->z = 0;
+	glayer->parent = NULL;
+	Graph_Init( &glayer->graph );
+	Queue_Init( &glayer->child, 0, NULL );
+	Queue_Using_Pointer( &glayer->child ); /* 队列用于存储指针 */
+	RectQueue_Init( &glayer->invalid_area );
+	
+	return glayer;
 }
 
 /* 添加子图层至容器图层中 */
 int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 				LCUI_GraphLayer *glayer )
 {
+	if( !des_ctnr ) {
+		return -1;
+	}
+	/* 根据队列中的z值，将子图层存放在队列中适当的位置 */
+	// code ......
+	
 	return 0;
 }
 
