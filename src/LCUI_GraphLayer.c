@@ -7,16 +7,13 @@ typedef struct _LCUI_GraphLayer LCUI_GraphLayer;
 struct _LCUI_GraphLayer
 {
 	BOOL visible;	/* 图层是否可见 */
+	int z_index;	/* 图层的堆叠顺序，值越大，图层显示位置越靠前 */
+	LCUI_Pos pos;	/* 图层的xy轴坐标 */
 	
-	int x, y, z;	/* 
-			* 表示X、Y、Z轴的坐标，XY轴就是一个平面坐标系，原点在屏幕
-			* 左上角；而z表示图层的堆叠顺序，z的值越大，图层显示位置越
-			* 靠前。
-			* */
-	LCUI_GraphLayer *parent;	/* 该图层的容器图层 */
-	LCUI_Queue child;		/* 该图层中内的子图层记录 */
-	LCUI_Queue invalid_area;	/* 记录无效区域 */
-	LCUI_Graph graph;		/* 图层像素数据 */
+	LCUI_GraphLayer	*parent;	/* 该图层的容器图层 */
+	LCUI_Queue		child;		/* 该图层中内的子图层记录 */
+	LCUI_Queue		invalid_area;	/* 记录无效区域 */
+	LCUI_Graph		graph;		/* 图层像素数据 */
 };
 
 /*
@@ -26,25 +23,33 @@ struct _LCUI_GraphLayer
  * 
  * */
 
-/* 释放图层占用的内存资源 */
-void GraphLayer_Free( LCUI_GraphLayer *glayer )
+/* 将子图层从父图层中的子图层队列中移除 */
+int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 {
 	int i, total;
 	LCUI_Queue *queue;
 	LCUI_GraphLayer *tmp_glayer;
 	
-	/* 从父图层中的子图层队列中移除自己 */
-	if( glayer->parent ) {
-		queue = &glayer->parent->child;
-		total = Queue_Get_Total( queue );
-		for( i=0; i<total; ++i ) {
-			tmp_glayer = Queue_Get( queue, i );
-			if( tmp_glayer == glayer ) {
-				Queue_Delete( queue, i );
-				break;
-			}
+	if( !child_glayer || !child_glayer->parent ) {
+		return -1;
+	}
+	
+	queue = &child_glayer->parent->child;
+	total = Queue_Get_Total( queue );
+	for( i=0; i<total; ++i ) {
+		tmp_glayer = Queue_Get( queue, i );
+		if( tmp_glayer == child_glayer ) {
+			Queue_Delete_Pointer( queue, i );
+			return 0;
 		}
 	}
+	return 1;
+}
+
+/* 释放图层占用的内存资源 */
+void GraphLayer_Free( LCUI_GraphLayer *glayer )
+{
+	GraphLayer_DeleteChild( glayer );
 	free( glayer );
 }
 
@@ -60,7 +65,7 @@ GraphLayer_New( void )
 	}
 	
 	glayer->visible = FALSE;
-	glayer->x = glayer->y = glayer->z = 0;
+	glayer->pos.x = glayer->pos.y = glayer->z_index = 0;
 	glayer->parent = NULL;
 	Graph_Init( &glayer->graph );
 	Queue_Init( &glayer->child, 0, NULL );
@@ -74,12 +79,31 @@ GraphLayer_New( void )
 int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 				LCUI_GraphLayer *glayer )
 {
+	int i, total;
+	LCUI_GraphLayer *tmp_child;
+	/* 容器图层必须有效 */
 	if( !des_ctnr ) {
 		return -1;
 	}
+	/* 子图层必须有效，并且不能有父图层 */
+	if( !glayer || glayer->parent ) {
+		return -2;
+	}
 	/* 根据队列中的z值，将子图层存放在队列中适当的位置 */
-	// code ......
-	
+	total = Queue_Get_Total( &des_ctnr->child );
+	for( i=0; i<total; ++i ) {
+		tmp_child = Queue_Get( &des_ctnr->child, i );
+		/* 如果比当前位置的图层的z值小，那就对比下一个位置的图层 */
+		if( glayer->z_index < tmp_child->z_index ) {
+			continue;
+		}
+		/* 将新图层插入至该位置 */
+		Queue_Insert_Pointer( &des_ctnr->child, i, glayer );
+	}
+	/* 如果没找到位置，则直接添加至末尾 */
+	if( i >= total ) {
+		Queue_Add_Pointer( &des_ctnr->child, glayer );
+	}
 	return 0;
 }
 
@@ -87,17 +111,34 @@ int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 int GraphLayer_MoveChild(	LCUI_GraphLayer *new_ctnr, 
 				LCUI_GraphLayer *glayer )
 {
+	int ret;
+	ret = GraphLayer_DeleteChild( glayer );
+	if( ret != 0 ) {
+		return -1;
+	}
+	ret = GraphLayer_AddChild( new_ctnr, glayer );
+	if( ret != 0 ) {
+		return -2;
+	}
 	return 0;
 }
 
 /* 设定图层的XY轴坐标 */
-int GraphLayer_SetXY( LCUI_GraphLayer *glayer, int x, int y )
+int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y )
 {
+	if( !glayer ) {
+		return -1;
+	}
+	
+	if( glayer->visible ) {
+		
+	}
+	
 	return 0;
 }
 
 /* 设定图层的Z轴坐标 */
-int GraphLayer_SetZ( LCUI_GraphLayer *glayer, int z )
+int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z )
 {
 	return 0;
 }
@@ -126,5 +167,20 @@ int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 /* 添加图层内的无效区域的记录 */
 int GraphLayer_InvalidArea( LCUI_GraphLayer *ctnr, LCUI_Rect area )
 {
-	return 0;
+	if( !ctnr ) {
+		return -1;
+	}
+	return RectQueue_Add( &ctnr->invalid_area, area );
 } 
+
+/* 显示图层 */
+int GraphLayer_Show( LCUI_GraphLayer *glayer )
+{
+	return 0;
+}
+
+/* 隐藏图层 */
+int GraphLayer_Hide( LCUI_GraphLayer *glayer )
+{
+	return 0;
+}
