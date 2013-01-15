@@ -99,6 +99,7 @@ int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 		}
 		/* 将新图层插入至该位置 */
 		Queue_Insert_Pointer( &des_ctnr->child, i, glayer );
+		break;
 	}
 	/* 如果没找到位置，则直接添加至末尾 */
 	if( i >= total ) {
@@ -123,23 +124,118 @@ int GraphLayer_MoveChild(	LCUI_GraphLayer *new_ctnr,
 	return 0;
 }
 
+/* 添加图层内的无效区域的记录 */
+int GraphLayer_InvalidArea( LCUI_GraphLayer *ctnr, LCUI_Rect area )
+{
+	if( !ctnr ) {
+		return -1;
+	}
+	return RectQueue_Add( &ctnr->invalid_area, area );
+} 
+
+/* 获取图层矩形 */
+LCUI_Rect GraphLayer_GetRect( LCUI_GraphLayer *glayer )
+{
+	LCUI_Rect rect;
+	rect.x = glayer->pos.x;
+	rect.y = glayer->pos.y;
+	rect.width = glayer->graph.width;
+	rect.height = glayer->graph.height;
+	return rect;
+}
+
 /* 设定图层的XY轴坐标 */
 int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y )
 {
+	LCUI_Rect rect;
+	
 	if( !glayer ) {
 		return -1;
 	}
 	
+	/* 如果图层是显示的，那就需要添加无效区域 */
 	if( glayer->visible ) {
-		
+		rect = GraphLayer_GetRect( glayer );
+		GraphLayer_InvalidArea( glayer->parent, rect );
+		glayer->pos.x = x;
+		glayer->pos.y = y;
+		rect.x = x;
+		rect.y = y;
+		GraphLayer_InvalidArea( glayer->parent, rect );
+	} else {
+		/* 否则，直接改坐标 */
+		glayer->pos.x = x;
+		glayer->pos.y = y;
 	}
 	
 	return 0;
 }
 
 /* 设定图层的Z轴坐标 */
-int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z )
+int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index )
 {
+	int i, total, src_pos = -1, des_pos = -1;
+	LCUI_GraphLayer *tmp_child;
+	LCUI_Queue *queue;
+	
+	if( !glayer ) {
+		return -1;
+	}
+	
+	glayer->z_index = z_index;
+	if( !glayer->parent ) {
+		return 1;
+	}
+	queue = &glayer->parent->child;
+	total = Queue_Get_Total( queue );
+	for( i=0; i<total; ++i ) {
+		tmp_child = Queue_Get( queue, i );
+		if( glayer == tmp_child ) {
+			/* 找到自己的位置 */
+			src_pos = i;
+			continue;
+		} else if( z_index < tmp_child->z_index ) {
+			continue;
+		}
+		/* 找到需要移动至的位置 */
+		des_pos = i;
+		/* 如果已经找到自己的位置 */
+		if( src_pos != -1 ) {
+			break;
+		}
+	}
+	/* 如果没有找到自己的位置或者目标位置 */
+	if( -1 == src_pos || -1 == des_pos ) {
+		return 2;
+	}
+	Queue_Move( queue, des_pos, src_pos );
+	return 0;
+}
+
+/* 调整图层的大小 */
+int GraphLayer_Resize( LCUI_GraphLayer *glayer, int w, int h )
+{
+	LCUI_Rect rect;
+	
+	if( !glayer ) {
+		return -1;
+	}
+	/* 尺寸没有变化的话就返回 */
+	if( glayer->graph.width == w && glayer->graph.height == h) {
+		return 1;
+	}
+	
+	rect = GraphLayer_GetRect( glayer );
+	/* 设置改变尺寸前的图层区域为无效区域 */
+	GraphLayer_InvalidArea( glayer->parent, rect );
+	/* 调整图层尺寸 */
+	if( 0 != Graph_Create( &glayer->graph, w, h ) ) {
+			return -2;
+	}
+	rect.width = w;
+	rect.height = h;
+	/* 设置改变尺寸后的图层区域为无效区域 */
+	GraphLayer_InvalidArea( glayer->parent, rect );
 	return 0;
 }
 
@@ -154,7 +250,10 @@ GraphLayer_ChildAt( LCUI_GraphLayer *ctnr, int x, int y )
 int GraphLayer_GetSelfGraph(	LCUI_GraphLayer *glayer, 
 				LCUI_Graph *graph )
 {
-	return 0;
+	LCUI_Rect rect;
+	rect = Rect( 0, 0, glayer->graph.width, glayer->graph.height );
+	/* 引用图层图形 */
+	return Quote_Graph( graph, &glayer->graph, rect );
 }
 
 /* 获取该图层和子图层混合后的图形数据 */
@@ -164,23 +263,38 @@ int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 	return 0;
 }
 
-/* 添加图层内的无效区域的记录 */
-int GraphLayer_InvalidArea( LCUI_GraphLayer *ctnr, LCUI_Rect area )
-{
-	if( !ctnr ) {
-		return -1;
-	}
-	return RectQueue_Add( &ctnr->invalid_area, area );
-} 
-
 /* 显示图层 */
 int GraphLayer_Show( LCUI_GraphLayer *glayer )
 {
+	LCUI_Rect rect;
+	
+	if( !glayer ) {
+		return -1;
+	}
+	if( glayer->visible ) {
+		return 1;
+	}
+	
+	glayer->visible = TRUE;
+	rect = GraphLayer_GetRect( glayer );
+	GraphLayer_InvalidArea( glayer->parent, rect );
 	return 0;
 }
 
 /* 隐藏图层 */
 int GraphLayer_Hide( LCUI_GraphLayer *glayer )
 {
+	LCUI_Rect rect;
+	
+	if( !glayer ) {
+		return -1;
+	}
+	if( !glayer->visible ) {
+		return 1;
+	}
+	
+	glayer->visible = FALSE;
+	rect = GraphLayer_GetRect( glayer );
+	GraphLayer_InvalidArea( glayer->parent, rect );
 	return 0;
 }
