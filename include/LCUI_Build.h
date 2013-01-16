@@ -79,6 +79,8 @@
 #define LC_THREAD_HPP	<LCUI/LCUI_Thread.hpp> 
 #define LC_RES_H	<LCUI/LCUI_Resources.h> 
 
+#define LC_GRAPHLAYER_H		<LCUI/LCUI_GraphLayer.h>
+
 #define LC_DRAW_BORDER_H	<LCUI/draw/border.h>
 
 #define LC_CHARSET_H	<LCUI/font/charset.h>
