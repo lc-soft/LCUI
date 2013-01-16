@@ -9,7 +9,7 @@ struct _LCUI_GraphLayer
 	BOOL		visible;	/* 图层是否可见 */
 	BOOL		inherit_alpha;	/* 是否继承父图层的透明度 */
 	int		z_index;	/* 图层的堆叠顺序，值越大，图层显示位置越靠前 */
-	LCUI_Pos	pos;	/* 图层的xy轴坐标 */
+	LCUI_Pos	pos;		/* 图层的xy轴坐标 */
 	
 	LCUI_GraphLayer	*parent;	/* 该图层的容器图层 */
 	LCUI_Queue		child;		/* 该图层中内的子图层记录 */
@@ -51,6 +51,9 @@ int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 void GraphLayer_Free( LCUI_GraphLayer *glayer )
 {
 	GraphLayer_DeleteChild( glayer );
+	Graph_Free( &glayer->graph );
+	Destroy_Queue( &glayer->child );
+	Destroy_Queue( &glayer->invalid_area );
 	free( glayer );
 }
 
@@ -66,6 +69,7 @@ GraphLayer_New( void )
 	}
 	
 	glayer->visible = FALSE;
+	glayer->inherit_alpha = TRUE;
 	glayer->pos.x = glayer->pos.y = glayer->z_index = 0;
 	glayer->parent = NULL;
 	Graph_Init( &glayer->graph );
@@ -106,6 +110,7 @@ int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 	if( i >= total ) {
 		Queue_Add_Pointer( &des_ctnr->child, glayer );
 	}
+	glayer->parent = des_ctnr;
 	return 0;
 }
 
@@ -345,11 +350,8 @@ LCUI_Pos GraphLayer_GetGlobalPos(
 	LCUI_GraphLayer *root_glayer, LCUI_GraphLayer *glayer )
 {
 	LCUI_Pos pos;
-	if( !glayer || !root_glayer ) {
+	if( !glayer || !root_glayer || glayer == root_glayer ) {
 		return Pos(0,0);
-	}
-	if( glayer == root_glayer ) {
-		return glayer->pos;
 	}
 	pos = GraphLayer_GetGlobalPos( root_glayer, glayer->parent );
 	pos = Pos_Add( pos, glayer->pos );
@@ -377,15 +379,19 @@ __GraphLayer_GetLayers(
 	child_list = &glayer->child;
 	/* 从底到顶遍历子部件 */
 	total = Queue_Get_Total( child_list );
+	//_DEBUG_MSG( "root: %p, cur: %p, child total: %d\n",
+	//		root_glayer, glayer, total );
 	/* 从尾到首，从底到顶，遍历图层 */
 	for( i=total-1; i>=0; --i ) {
 		child = Queue_Get( child_list, i );
-		if( !child || child->visible ) {
+		if( !child || !child->visible ) {
 			continue;
 		}
 		
 		tmp = GraphLayer_GetValidRect( root_glayer, child );
 		pos = GraphLayer_GetGlobalPos( root_glayer, child );
+		//_DEBUG_MSG( "child: %p, pos: %d,%d, valid rect: %d,%d, %d, %d\n", 
+		//	child, pos.x, pos.y, tmp.x, tmp.y, tmp.width, tmp.height);
 		tmp.x += pos.x;
 		tmp.y += pos.y;
 		if( !Rect_Valid(tmp) ) {
@@ -457,6 +463,7 @@ int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 	Graph_Create( graph_buff, rect.width, rect.height );
 	GraphLayer_GetLayers( ctnr, rect, &glayerQ ); 
 	total = Queue_Get_Total( &glayerQ ); 
+	//_DEBUG_MSG( "total: %d\n", total );
 	if( total <= 0 ) {
 		Graph_Cut ( &ctnr->graph, rect, graph_buff );
 		Destroy_Queue( &glayerQ );
@@ -484,12 +491,13 @@ int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 	}
 skip_loop:
 	total = Queue_Get_Total( &glayerQ );
+	//_DEBUG_MSG( "total: %d\n", total );
 	if(i <= 0){
 		Graph_Cut (&ctnr->graph, rect, graph_buff );
 	}
 	for(i=0; i<total; ++i) {
 		glayer = Queue_Get( &glayerQ, i ); 
-		pos = GraphLayer_GetGlobalPos( ctnr, glayer ); 
+		pos = GraphLayer_GetGlobalPos( ctnr, glayer );
 		valid_area = GraphLayer_GetValidRect( ctnr, glayer );
 		Quote_Graph( &tmp_graph, &glayer->graph, valid_area ); 
 		/* 获取相对坐标 */
@@ -505,7 +513,6 @@ skip_loop:
 			glayer->graph.alpha = alpha;
 			Graph_Mix( graph_buff, &tmp_graph, pos );
 			glayer->graph.alpha = tmp_alpha;
-			
 		}
 	}
 	Destroy_Queue( &glayerQ );
