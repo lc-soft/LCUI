@@ -45,7 +45,7 @@ noinst_PROGRAMS = helloworld$(EXEEXT) test_font$(EXEEXT) \
 	test_widget_1$(EXEEXT) test_widget_2$(EXEEXT) \
 	test_widget_3$(EXEEXT) test_timer$(EXEEXT) \
 	test_textbox$(EXEEXT) test_scrollbar$(EXEEXT) \
-	graph2array$(EXEEXT)
+	graph2array$(EXEEXT) test_graphlayer$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -78,6 +78,9 @@ test_font_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_gaussian_blur_OBJECTS = test_gaussian_blur.$(OBJEXT)
 test_gaussian_blur_OBJECTS = $(am_test_gaussian_blur_OBJECTS)
 test_gaussian_blur_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_test_graphlayer_OBJECTS = test_graphlayer.$(OBJEXT)
+test_graphlayer_OBJECTS = $(am_test_graphlayer_OBJECTS)
+test_graphlayer_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_label_OBJECTS = test_label.$(OBJEXT)
 test_label_OBJECTS = $(am_test_label_OBJECTS)
 test_label_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -152,25 +155,25 @@ am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(graph2array_SOURCES) $(helloworld_SOURCES) \
 	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
 	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
-	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
-	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
-	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
-	$(test_scrollbar_SOURCES) $(test_textbox_SOURCES) \
-	$(test_timer_SOURCES) $(test_viewimage_SOURCES) \
-	$(test_widget_1_SOURCES) $(test_widget_2_SOURCES) \
-	$(test_widget_3_SOURCES) $(test_window_SOURCES) \
-	$(ts_calibrate_SOURCES)
+	$(test_graphlayer_SOURCES) $(test_label_SOURCES) \
+	$(test_lcui_graph_mix_SOURCES) $(test_loading_SOURCES) \
+	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
+	$(test_rect_cut_SOURCES) $(test_scrollbar_SOURCES) \
+	$(test_textbox_SOURCES) $(test_timer_SOURCES) \
+	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
+	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
+	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 DIST_SOURCES = $(graph2array_SOURCES) $(helloworld_SOURCES) \
 	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
 	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
-	$(test_label_SOURCES) $(test_lcui_graph_mix_SOURCES) \
-	$(test_loading_SOURCES) $(test_progressbar_SOURCES) \
-	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
-	$(test_scrollbar_SOURCES) $(test_textbox_SOURCES) \
-	$(test_timer_SOURCES) $(test_viewimage_SOURCES) \
-	$(test_widget_1_SOURCES) $(test_widget_2_SOURCES) \
-	$(test_widget_3_SOURCES) $(test_window_SOURCES) \
-	$(ts_calibrate_SOURCES)
+	$(test_graphlayer_SOURCES) $(test_label_SOURCES) \
+	$(test_lcui_graph_mix_SOURCES) $(test_loading_SOURCES) \
+	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
+	$(test_rect_cut_SOURCES) $(test_scrollbar_SOURCES) \
+	$(test_textbox_SOURCES) $(test_timer_SOURCES) \
+	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
+	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
+	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -381,6 +384,8 @@ test_scrollbar_SOURCES = test_scrollbar.c
 test_scrollbar_LDADD = $(top_builddir)/src/libLCUI.la
 graph2array_SOURCES = graph2array.c
 graph2array_LDADD = $(top_builddir)/src/libLCUI.la
+test_graphlayer_SOURCES = test_graphlayer.c
+test_graphlayer_LDADD = $(top_builddir)/src/libLCUI.la
 all: all-recursive
 
 .SUFFIXES:
@@ -442,6 +447,9 @@ test_font$(EXEEXT): $(test_font_OBJECTS) $(test_font_DEPENDENCIES)
 test_gaussian_blur$(EXEEXT): $(test_gaussian_blur_OBJECTS) $(test_gaussian_blur_DEPENDENCIES) 
 	@rm -f test_gaussian_blur$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_gaussian_blur_OBJECTS) $(test_gaussian_blur_LDADD) $(LIBS)
+test_graphlayer$(EXEEXT): $(test_graphlayer_OBJECTS) $(test_graphlayer_DEPENDENCIES) 
+	@rm -f test_graphlayer$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_graphlayer_OBJECTS) $(test_graphlayer_LDADD) $(LIBS)
 test_label$(EXEEXT): $(test_label_OBJECTS) $(test_label_DEPENDENCIES) 
 	@rm -f test_label$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_label_OBJECTS) $(test_label_LDADD) $(LIBS)
@@ -500,6 +508,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_checkbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_gaussian_blur.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_graphlayer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_label.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_lcui_graph_mix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_loading.Po@am__quote@
