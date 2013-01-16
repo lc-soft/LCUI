@@ -305,8 +305,8 @@ int Graph_Is_Opaque(LCUI_Graph *graph)
 void Print_Graph_Info(LCUI_Graph *pic)
 /* 功能：打印图像的信息 */
 {
-	printf("address:%p\n",pic);
-	if( pic ) {
+	printf("address:%p\n", pic);
+	if( !pic ) {
 		return;
 	}
 	
