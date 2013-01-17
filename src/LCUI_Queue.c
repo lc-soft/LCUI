@@ -488,6 +488,16 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 	return pos;
 }
 
+/* 打印队列信息，一般用于调试 */
+void Print_Queue_Info( LCUI_Queue *queue )
+{
+	printf(
+		"queue: %p, total: %d, max: %d, data_mode: %d\n"
+		"data_array: %p, node: %p\n",
+		queue, queue->total_num, queue->max_num, queue->data_mode,
+		queue->data_array, queue->data_head_node.data
+	);
+}
 
 int Queue_Add(LCUI_Queue * queue, const void *data) 
 /* 
@@ -818,15 +828,16 @@ Destroy_Widget(LCUI_Widget *widget)
 	String_Free(&widget->type);
 	String_Free(&widget->style);
 	
-	/* 释放储存图形数据的结构体 */
-	Graph_Free(&widget->graph);
+	GraphLayer_Free( widget->main_glayer );
+	GraphLayer_Free( widget->client_glayer );
+	
 	Graph_Free(&widget->background_image);
 	
 	/* 销毁部件的队列 */
 	Destroy_Queue(&widget->child);
 	Destroy_Queue(&widget->event);
-	Destroy_Queue(&widget->data);
-	Destroy_Queue(&widget->update_area);
+	Destroy_Queue(&widget->data_buff);
+	Destroy_Queue(&widget->invalid_area);
 	
 	widget->visible = FALSE;
 	widget->enabled = TRUE;
