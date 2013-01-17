@@ -11,11 +11,10 @@ struct _LCUI_GraphLayer
 	BOOL		visible;	/* 图层是否可见 */
 	BOOL		inherit_alpha;	/* 是否继承父图层的透明度 */
 	int		z_index;	/* 图层的堆叠顺序，值越大，图层显示位置越靠前 */
-	LCUI_Pos	pos;	/* 图层的xy轴坐标 */
+	LCUI_Pos	pos;		/* 图层的xy轴坐标 */
 	
 	LCUI_GraphLayer	*parent;	/* 该图层的容器图层 */
 	LCUI_Queue		child;		/* 该图层中内的子图层记录 */
-	LCUI_Queue		invalid_area;	/* 记录无效区域 */
 	LCUI_Graph		graph;		/* 图层像素数据 */
 };
 
@@ -37,14 +36,23 @@ int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 int GraphLayer_MoveChild(	LCUI_GraphLayer *new_ctnr, 
 				LCUI_GraphLayer *glayer );
 
-/* 添加图层内的无效区域的记录 */
-int GraphLayer_InvalidArea( LCUI_GraphLayer *ctnr, LCUI_Rect area );
-
 /* 获取图层矩形 */
 LCUI_Rect GraphLayer_GetRect( LCUI_GraphLayer *glayer );
 
+/* 获取图层尺寸 */
+LCUI_Size GraphLayer_GetSize( LCUI_GraphLayer *glayer );
+
+/* 获取图层的全局透明度 */
+uchar_t GraphLayer_GetAlpha( LCUI_GraphLayer *glayer );
+
+/* 图层是否继承父图层的透明度 */
+void GraphLayer_InerntAlpha( LCUI_GraphLayer *glayer, BOOL flag );
+
 /* 设定图层的XY轴坐标 */
 int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y );
+
+/* 设定图层的全局透明度 */
+void GraphLayer_SetAlpha( LCUI_GraphLayer *glayer, uchar_t alpha );
 
 /* 设定图层的Z轴坐标 */
 int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index );
@@ -56,9 +64,8 @@ int GraphLayer_Resize( LCUI_GraphLayer *glayer, int w, int h );
 LCUI_GraphLayer *
 GraphLayer_ChildAt( LCUI_GraphLayer *ctnr, int x, int y );
 
-/* 获取图层自身的图形数据 */
-int GraphLayer_GetSelfGraph(	LCUI_GraphLayer *glayer, 
-				LCUI_Graph *graph );
+/* 获取指向图层自身图形数据的指针 */
+LCUI_Graph *GraphLayer_GetSelfGraph(	LCUI_GraphLayer *glayer );
 
 /* 获取指定根图层中的子图层的有效区域 */
 LCUI_Rect GraphLayer_GetValidRect(

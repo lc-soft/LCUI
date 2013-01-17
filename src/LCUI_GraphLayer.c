@@ -2,21 +2,6 @@
 #include LC_LCUI_H
 #include LC_GRAPH_H
 
-typedef struct _LCUI_GraphLayer LCUI_GraphLayer;
-
-struct _LCUI_GraphLayer
-{
-	BOOL		visible;	/* 图层是否可见 */
-	BOOL		inherit_alpha;	/* 是否继承父图层的透明度 */
-	int		z_index;	/* 图层的堆叠顺序，值越大，图层显示位置越靠前 */
-	LCUI_Pos	pos;		/* 图层的xy轴坐标 */
-	
-	LCUI_GraphLayer	*parent;	/* 该图层的容器图层 */
-	LCUI_Queue		child;		/* 该图层中内的子图层记录 */
-	LCUI_Queue		invalid_area;	/* 记录无效区域 */
-	LCUI_Graph		graph;		/* 图层像素数据 */
-};
-
 /*
  * 一些英文单词的缩写
  * ctnr: Container 容器
@@ -53,7 +38,6 @@ void GraphLayer_Free( LCUI_GraphLayer *glayer )
 	GraphLayer_DeleteChild( glayer );
 	Graph_Free( &glayer->graph );
 	Destroy_Queue( &glayer->child );
-	Destroy_Queue( &glayer->invalid_area );
 	free( glayer );
 }
 
@@ -74,9 +58,7 @@ GraphLayer_New( void )
 	glayer->parent = NULL;
 	Graph_Init( &glayer->graph );
 	Queue_Init( &glayer->child, 0, NULL );
-	Queue_Using_Pointer( &glayer->child ); /* 队列用于存储指针 */
-	RectQueue_Init( &glayer->invalid_area );
-	
+	Queue_Using_Pointer( &glayer->child ); /* 队列用于存储指针 */ 
 	return glayer;
 }
 
@@ -130,15 +112,6 @@ int GraphLayer_MoveChild(	LCUI_GraphLayer *new_ctnr,
 	return 0;
 }
 
-/* 添加图层内的无效区域的记录 */
-int GraphLayer_InvalidArea( LCUI_GraphLayer *ctnr, LCUI_Rect area )
-{
-	if( !ctnr ) {
-		return -1;
-	}
-	return RectQueue_Add( &ctnr->invalid_area, area );
-} 
-
 /* 获取图层矩形 */
 LCUI_Rect GraphLayer_GetRect( LCUI_GraphLayer *glayer )
 {
@@ -150,31 +123,42 @@ LCUI_Rect GraphLayer_GetRect( LCUI_GraphLayer *glayer )
 	return rect;
 }
 
+/* 获取图层尺寸 */
+LCUI_Size GraphLayer_GetSize( LCUI_GraphLayer *glayer )
+{
+	LCUI_Size size;
+	size.w = glayer->graph.width;
+	size.h = glayer->graph.height;
+	return size;
+}
+
+/* 获取图层的全局透明度 */
+uchar_t GraphLayer_GetAlpha( LCUI_GraphLayer *glayer )
+{
+	return glayer->graph.alpha;
+}
+
+/* 图层是否继承父图层的透明度 */
+void GraphLayer_InerntAlpha( LCUI_GraphLayer *glayer, BOOL flag )
+{
+	glayer->inherit_alpha = flag;
+}
+
 /* 设定图层的XY轴坐标 */
 int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y )
 {
-	LCUI_Rect rect;
-	
 	if( !glayer ) {
 		return -1;
 	}
-	
-	/* 如果图层是显示的，那就需要添加无效区域 */
-	if( glayer->visible ) {
-		rect = GraphLayer_GetRect( glayer );
-		GraphLayer_InvalidArea( glayer->parent, rect );
-		glayer->pos.x = x;
-		glayer->pos.y = y;
-		rect.x = x;
-		rect.y = y;
-		GraphLayer_InvalidArea( glayer->parent, rect );
-	} else {
-		/* 否则，直接改坐标 */
-		glayer->pos.x = x;
-		glayer->pos.y = y;
-	}
-	
+	glayer->pos.x = x;
+	glayer->pos.y = y;
 	return 0;
+}
+
+/* 设定图层的全局透明度 */
+void GraphLayer_SetAlpha( LCUI_GraphLayer *glayer, uchar_t alpha )
+{
+	glayer->graph.alpha = alpha;
 }
 
 /* 设定图层的Z轴坐标 */
@@ -221,8 +205,6 @@ int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index )
 /* 调整图层的大小 */
 int GraphLayer_Resize( LCUI_GraphLayer *glayer, int w, int h )
 {
-	LCUI_Rect rect;
-	
 	if( !glayer ) {
 		return -1;
 	}
@@ -231,17 +213,10 @@ int GraphLayer_Resize( LCUI_GraphLayer *glayer, int w, int h )
 		return 1;
 	}
 	
-	rect = GraphLayer_GetRect( glayer );
-	/* 设置改变尺寸前的图层区域为无效区域 */
-	GraphLayer_InvalidArea( glayer->parent, rect );
 	/* 调整图层尺寸 */
 	if( 0 != Graph_Create( &glayer->graph, w, h ) ) {
 			return -2;
 	}
-	rect.width = w;
-	rect.height = h;
-	/* 设置改变尺寸后的图层区域为无效区域 */
-	GraphLayer_InvalidArea( glayer->parent, rect );
 	return 0;
 }
 
@@ -252,14 +227,10 @@ GraphLayer_ChildAt( LCUI_GraphLayer *ctnr, int x, int y )
 	return NULL;
 }
 
-/* 获取图层自身的图形数据 */
-int GraphLayer_GetSelfGraph(	LCUI_GraphLayer *glayer, 
-				LCUI_Graph *graph )
+/* 获取指向图层自身图形数据的指针 */
+LCUI_Graph *GraphLayer_GetSelfGraph(	LCUI_GraphLayer *glayer )
 {
-	LCUI_Rect rect;
-	rect = Rect( 0, 0, glayer->graph.width, glayer->graph.height );
-	/* 引用图层图形 */
-	return Quote_Graph( graph, &glayer->graph, rect );
+	return &glayer->graph;
 }
 
 /* 获取指定根图层中的子图层的有效区域 */
@@ -522,8 +493,6 @@ skip_loop:
 /* 显示图层 */
 int GraphLayer_Show( LCUI_GraphLayer *glayer )
 {
-	LCUI_Rect rect;
-	
 	if( !glayer ) {
 		return -1;
 	}
@@ -532,16 +501,12 @@ int GraphLayer_Show( LCUI_GraphLayer *glayer )
 	}
 	
 	glayer->visible = TRUE;
-	rect = GraphLayer_GetRect( glayer );
-	GraphLayer_InvalidArea( glayer->parent, rect );
 	return 0;
 }
 
 /* 隐藏图层 */
 int GraphLayer_Hide( LCUI_GraphLayer *glayer )
 {
-	LCUI_Rect rect;
-	
 	if( !glayer ) {
 		return -1;
 	}
@@ -550,7 +515,5 @@ int GraphLayer_Hide( LCUI_GraphLayer *glayer )
 	}
 	
 	glayer->visible = FALSE;
-	rect = GraphLayer_GetRect( glayer );
-	GraphLayer_InvalidArea( glayer->parent, rect );
 	return 0;
 }
