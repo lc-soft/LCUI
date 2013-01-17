@@ -164,6 +164,9 @@ int Queue_Replace(LCUI_Queue * queue, int pos, const void *data);
 int Queue_Replace_Pointer(LCUI_Queue * queue, int pos, const void *data);
 /* 功能：覆盖队列中指定位置的成员指针 */
 
+/* 打印队列信息，一般用于调试 */
+void Print_Queue_Info( LCUI_Queue *queue );
+
 int Queue_Add(LCUI_Queue * queue, const void *data) ;
 /* 
  * 功能：将新的成员添加至队列 
