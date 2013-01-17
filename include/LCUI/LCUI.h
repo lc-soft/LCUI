@@ -525,96 +525,6 @@ typedef enum _AUTOSIZE_MODE
 AUTOSIZE_MODE;
 /*----------------------------------------------------*/
 
-/******************************* 部件 **********************************/
-struct _LCUI_Widget 
-{
-	LCUI_ID app_id; /* 所属程序的ID */
-	
-	LCUI_Pos pos;	/* 已计算出的实际位置 */
-	LCUI_Pos max_pos;
-	LCUI_Pos min_pos;
-	/*------------ 位置限制（描述） ---------------*/ 
-	PX_P_t x, y;
-	PX_P_t max_x, min_x;
-	PX_P_t max_y, min_y;
-	/*------------------ END -------------------*/
-	
-	LCUI_Size size; /* 已计算出的实际尺寸，单位为像素 */
-	LCUI_Size max_size;
-	LCUI_Size min_size;
-	
-	/*------------ 尺寸限制（描述） ---------------*/ 
-	PX_P_t w, h;
-	PX_P_t max_w, min_w;
-	PX_P_t max_h, min_h;
-	/*------------------ END -------------------*/
-	
-	WIDGET_STATUS status;	/* 部件的状态 */
-	BOOL status_response;	/* 是否响应部件的状态改变 */
-	
-	BOOL enabled;	/* 是否启用 */
-	BOOL visible;	/* 是否可见 */
-	BOOL inherit_alpha; /* 是否继承父部件的透明度 */
-	
-	BOOL		auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
-	AUTOSIZE_MODE	auto_size_mode;	/* 自动尺寸调整模式 */
-	
-	BOOL		focus;		/* 指定该部件是否需要焦点 */
-	LCUI_Widget*	focus_widget;	/* 获得焦点的子部件 */
-	
-	int z_index;	/* 堆叠顺序 */
-	
-	int		clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“不小于”才使条件成立 */
-	uchar_t	clickable_area_alpha;	/* 指定部件图层中的区域的alpha值小于/不小于多少时可被鼠标点击，默认为0，最大为255 */
-	
-	LCUI_String	type;		/* 部件的类型 */
-	LCUI_ID	type_id;	/* 部件的类型ID */
-	LCUI_String	style;		/* 部件的风格，对某些部件有效 */
-	LCUI_ID	style_id;	/* 部件的风格的ID */
-	LCUI_Widget	*parent;	/* 父部件 */
-	LCUI_Queue	child;		/* 子部件集 */
-	
-	/*----------------- 部件布局相关 ----------------*/
-	POS_TYPE	pos_type;	/* 位置类型 */
-	ALIGN_TYPE	align;		/* 布局 */
-	LCUI_Pos	offset;		/* x，y轴的偏移量 */
-	DOCK_TYPE	dock;		/* 停靠位置 */
-	/*------------------ END ----------------------*/
-	
-	/*------------ 外边距和内边距 ---------------*/ 
-	LCUI_Margin	margin;
-	LCUI_Padding	padding;
-	/*---------------- END -------------------*/
-	
-	LCUI_Border	border;		/* 边框 */
-	
-	LCUI_RGB  back_color;  /* 背景色 */
-	LCUI_RGB  fore_color;  /* 前景色 */
-	
-	int		bg_mode;  /* 背景模式，指定在无背景时是使用透明背景还是使用背景色填充 */
-	int		background_image_layout; /* 背景图的布局 */
-	LCUI_Graph	background_image;	 /* 背景图 */
-	
-	void *private_data;   /* 该部件私有数据的指针，其它的是各个部件公用的数据 */ 
-	
-	LCUI_Queue	event;		/* 保存部件的事件关联的数据 */
-	LCUI_Queue	update_area;	/* 部件内需要刷新的区域 */
-	LCUI_Queue	data;		/* 记录需要进行更新的数据 */ 
-	LCUI_Graph	graph;		/* 部件的图层 */ 
-	
-	/* 以下是函数指针，闲函数名太长的话，可以直接用下面的 */
-	void (*resize)(LCUI_Widget*, LCUI_Size);
-	void (*move)(LCUI_Widget*, LCUI_Pos); 
-	void (*show)(LCUI_Widget*);
-	void (*hide)(LCUI_Widget*);
-	void (*disable)(LCUI_Widget*);
-	void (*enable)(LCUI_Widget*);
-	void (*set_align)(LCUI_Widget*, ALIGN_TYPE, LCUI_Pos); 
-	void (*set_alpha)(LCUI_Widget*, unsigned char); 
-	void (*set_border)(LCUI_Widget*, LCUI_Border);
-};
-/**********************************************************************/
-
 /***********  储存游标的位置 **************/
 struct _LCUI_Cursor
 {
@@ -633,6 +543,7 @@ struct _LCUI_Cursor
 		fflush(stdout); \
 	}
 
+#include LC_GRAPHLAYER_H
 #include LC_KERNEL_MAIN_H
 #include LC_KERNEL_DEV_H
 #include LC_KERNEL_TIMER_H

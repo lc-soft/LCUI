@@ -203,14 +203,14 @@ Exec_Update_PictureBox(LCUI_Widget *widget)
 {
 	LCUI_Pos pos;
 	LCUI_PictureBox *pic_box;
-	LCUI_Graph graph, *p;
+	LCUI_Graph graph, *widget_graph, *p;
 	
 	pos = Pos(0,0);
-	Graph_Init(&graph); 
+	Graph_Init(&graph);
 	pic_box  = (LCUI_PictureBox*)Get_Widget_PrivData(widget);
-	
+	widget_graph = Widget_GetSelfGraph( widget );
 	//print_widget_info(widget);
-	//Print_Graph_Info(&widget->graph);
+	//Print_Graph_Info(widget_graph);
 	//Print_Graph_Info(pic_box->image);
 	//printf("Exec_Update_PictureBox(): 1\n");
 	if(! Graph_Valid(pic_box->image)) {
@@ -280,9 +280,9 @@ Exec_Update_PictureBox(LCUI_Widget *widget)
 	//pic_box->read_box.x + pic_box->read_box.width, pic_box->buff_graph.width, 
 	//pic_box->read_box.y + pic_box->read_box.height, pic_box->buff_graph.height);
 	if(!Graph_Valid(&widget->background_image)) {
-		Graph_Replace(&widget->graph, &graph, pos);
+		Graph_Replace( widget_graph, &graph, pos );
 	} else {
-		Graph_Mix(&widget->graph, &graph, pos);
+		Graph_Mix( widget_graph, &graph, pos );
 	}
 	Graph_Free(&graph);
 	//printf("scale: %.4f\n", pic_box->scale);

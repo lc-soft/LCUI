@@ -99,10 +99,10 @@ int Add_Screen_Refresh_Area (LCUI_Rect rect)
 	//	abort();
 	//}
 	/* 为队列加上“写”锁，以确保正常操作队列 */
-	Queue_Using( &LCUI_Sys.update_area, RWLOCK_WRITE );
-	ret = RectQueue_Add ( &LCUI_Sys.update_area, rect );
+	Queue_Using( &LCUI_Sys.invalid_area, RWLOCK_WRITE );
+	ret = RectQueue_Add ( &LCUI_Sys.invalid_area, rect );
 	/* 队列使用结束，解开锁 */
-	Queue_End_Use( &LCUI_Sys.update_area );
+	Queue_End_Use( &LCUI_Sys.invalid_area );
 	return ret;
 }
 
@@ -118,205 +118,21 @@ LCUI_Pos Get_Screen_Center_Point()
 	return Pos(LCUI_Sys.screen.size.w/2.0, LCUI_Sys.screen.size.h/2.0);
 }
 
-int Widget_Layer_Is_Opaque(LCUI_Widget *widget)
-/* 功能：判断部件图形是否不透明 */
-{ 
-	return Graph_Is_Opaque(&widget->graph);
-}
-
-int Widget_Layer_Not_Visible(LCUI_Widget *widget)
-/* 功能：检测部件图形是否完全透明 */
-{
-	if(Graph_Is_Opaque(&widget->graph) == -1) {
-		return 1;
-	}
-	return 0;
-}
-
-void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue)
-/* 
- * 功能：获取与指定区域重叠的部件 
- * 说明：得到的队列，队列中的部件排列顺序为：底-》上 == 左-》右
- * */
-{
-	int i, flag, total;
-	LCUI_Pos pos;
-	LCUI_Rect tmp;
-	LCUI_Widget *child; 
-	LCUI_Queue *widget_list;
-
-	if(widget == NULL) {
-		widget_list = &LCUI_Sys.widget_list; 
-	} else {
-		if( !widget->visible ) {
-			return;
-		}
-		widget_list = &widget->child; 
-	}
-	flag = 0;
-	
-filter_widget:;
-	/* 从底到顶遍历子部件 */
-	total = Queue_Get_Total(widget_list);
-	for(i=total-1; i>=0; --i) {
-		child = (LCUI_Widget*)Queue_Get(widget_list, i);
-		if( child == NULL ) {
-			continue;
-		}
-		
-		if( flag==0 ) {
-			/* 过滤定位类型不为static的部件 */
-			if( child->pos_type != POS_TYPE_STATIC ) {
-				continue;
-			}
-		}
-		else if( flag==1 ) {
-			/* 过滤定位类型不为relative的部件 */
-			if( child->pos_type != POS_TYPE_RELATIVE ) {
-				continue;
-			}
-		}
-		else if( flag==2 ) {
-			/* 过滤定位类型为relative和static的部件 */
-			if( child->pos_type == POS_TYPE_RELATIVE
-			 && child->pos_type == POS_TYPE_STATIC ) {
-				continue;
-			}
-		} 
-		/* 过滤掉不可见的子部件 */ 
-		if( !child->visible ) {
-			continue;
-		}
-		
-		tmp = Get_Widget_Valid_Rect(child); 
-		pos = Get_Widget_Global_Pos(child);
-		tmp.x += pos.x;
-		tmp.y += pos.y;
-		if(!Rect_Valid(tmp)){
-			continue;
-		}
-		if (Rect_Is_Overlay(tmp, rect)) { 
-			/* 记录与该区域重叠的部件 */
-			Queue_Add_Pointer(queue, child);
-			/* 递归调用 */
-			Get_Overlay_Widget(rect, child, queue);  
-		}
-	}
-	++flag;
-	if(flag < 3) {
-		goto filter_widget;
-	} 
-}
-
-
-int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph)
 /* 获取屏幕中指定区域内实际要显示的图形 */
+void Get_Screen_Real_Graph ( LCUI_Rect rect, LCUI_Graph *graph )
 {
-	static int i, total; 
-	static uchar_t tmp_alpha, alpha;
-	static LCUI_Pos pos, widget_pos;
-	static LCUI_Widget *widget; 
-	static LCUI_Queue widget_buff;
-	static LCUI_Rect valid_area;
-	static LCUI_Graph buff;
-	
-	/* 检测这个区域是否有效 */
-	if (rect.x < 0 || rect.y < 0) {
-		return -1; 
+	LCUI_Pos pos;
+	GraphLayer_GetGraph( LCUI_Sys.root_glayer, graph, rect );
+	if ( !LCUI_Sys.cursor.visible ) { /* 如果游标可见 */
+		return;
 	}
-	if (rect.x + rect.width > Get_Screen_Width () 
-	 || rect.y + rect.height > Get_Screen_Height ()) {
-		 return -1;
+	/* 如果该区域与游标的图形区域重叠 */ 
+	if ( Rect_Is_Overlay( rect, Get_Cursor_Rect()) ) {
+		pos.x = LCUI_Sys.cursor.pos.x - rect.x;
+		pos.y = LCUI_Sys.cursor.pos.y - rect.y;
+		/* 将图形合成 */ 
+		Graph_Mix( graph, &LCUI_Sys.cursor.graph, pos );
 	}
-	if (rect.width <= 0 && rect.height <= 0) {
-		return -2;
-	}
-	
-	Graph_Init(&buff);
-	Queue_Init(&widget_buff, sizeof(LCUI_Widget), NULL);
-	Queue_Using_Pointer(&widget_buff); /* 只用于存放指针 */
-	
-	graph->have_alpha = FALSE; 
-	buff.have_alpha = TRUE;
-	/* 根据指定的尺寸，分配内存空间，用于储存图形数据 */
-	Graph_Create( graph, rect.width, rect.height );
-	/* 获取与该区域重叠的部件，并记录至队列widget_buff中 */
-	Get_Overlay_Widget( rect, NULL, &widget_buff ); 
-	total = Queue_Get_Total( &widget_buff ); 
-	
-	if( total > 0 ) {
-		//printf("\nrect(%d,%d,%d,%d)\n",
-		//rect.x, rect.y, rect.width, rect.height );
-		//printf("list cover widget:\n");
-		for(i=total-1; i>=0; --i) {
-			widget = Queue_Get( &widget_buff, i );
-			valid_area = Get_Widget_Valid_Rect( widget ); 
-			widget_pos = Get_Widget_Global_Pos( widget );
-			valid_area.x += widget_pos.x;
-			valid_area.y += widget_pos.y;
-			pos = Get_Widget_Global_Pos( widget );
-			/* 检测图层属性 */
-			switch( Graph_Is_Opaque(&widget->graph) ) {
-			    case -1: 
-				/* 如果完全不可见，直接从队列中移除 */
-				Queue_Delete_Pointer(&widget_buff, i);
-				break;
-			    case 0: break;
-			    case 1:
-				/* 如果不透明，并且图层区域包含需刷新的区域 */
-				if( Rect_Include_Rect(valid_area, rect) ) { 
-					goto skip_loop;
-				}
-				break;
-			    default:break;
-			} 
-		}
-skip_loop:
-		total = Queue_Get_Total(&widget_buff);
-		//printf("list end, total: %d\n", i);
-		//i = -1;
-		if(i <= 0){
-			i=0;
-			Graph_Cut (&LCUI_Sys.screen.buff, rect, graph);
-		}
-		for(; i<total; ++i) {
-			widget = Queue_Get( &widget_buff, i ); 
-			pos = Get_Widget_Global_Pos( widget );
-			/* 引用部件中的有效区域中的图形 */
-			valid_area = Get_Widget_Valid_Rect( widget );
-			Quote_Graph( &buff, &widget->graph, valid_area ); 
-			/* 获取相对坐标 */
-			pos.x = pos.x - rect.x + valid_area.x;
-			pos.y = pos.y - rect.y + valid_area.y;
-			/* 如果该部件没有继承父部件的透明度 */
-			if( !widget->inherit_alpha ) {
-				Graph_Mix( graph, &buff, pos );
-			} else {
-				/* 否则，计算该部件应有的透明度 */
-				alpha = _Get_Widget_RealAlpha( widget );
-				tmp_alpha = widget->graph.alpha;
-				widget->graph.alpha = alpha;
-				Graph_Mix( graph, &buff, pos );
-				widget->graph.alpha = tmp_alpha;
-				
-			}
-		}
-	} else {/* 否则，直接贴背景图 */ 
-		Graph_Cut ( &LCUI_Sys.screen.buff, rect, graph );
-	}
-
-	if ( LCUI_Sys.cursor.visible ) { /* 如果游标可见 */
-		/* 如果该区域与游标的图形区域重叠 */ 
-		if ( Rect_Is_Overlay( rect, Get_Cursor_Rect()) ) {
-			pos.x = LCUI_Sys.cursor.pos.x - rect.x;
-			pos.y = LCUI_Sys.cursor.pos.y - rect.y;
-			/* 将图形合成 */ 
-			Graph_Mix (graph, &LCUI_Sys.cursor.graph, pos);
-		}
-	} 
-	/* 释放队列占用的内存空间 */
-	Destroy_Queue(&widget_buff);
-	return 0;
 }
 
 static void Handle_Screen_Update()
@@ -329,26 +145,25 @@ static void Handle_Screen_Update()
 	Graph_Init(&fill_area);
 	/* 锁住队列，其它线程不能访问 */
 	//_DEBUG_MSG("enter\n");
-	Queue_Lock(&LCUI_Sys.update_area); 
+	Queue_Lock( &LCUI_Sys.invalid_area );
 	while(LCUI_Active()) {
 		//_DEBUG_MSG("total area: %d\n", 
-		//Queue_Get_Total( &LCUI_Sys.update_area ));
+		//Queue_Get_Total( &LCUI_Sys.invalid_area ));
 		/* 如果从队列中获取数据成功 */
-		if ( RectQueue_Get(&rect, 0, &LCUI_Sys.update_area) ) { 
-			/* 获取内存中对应区域的图形数据 */  
-			Get_Screen_Real_Graph (rect, &graph); 
-			//_DEBUG_MSG("get screen area: %d,%d,%d,%d\n", 
-			//rect.x, rect.y, rect.width, rect.height);
-			/* 写入至帧缓冲，让屏幕显示图形 */
-			Graph_Display (&graph, Pos(rect.x, rect.y)); 
-			/* 移除队列中的成员 */ 
-			Queue_Delete (&LCUI_Sys.update_area, 0); 
-		} else {
+		if ( !RectQueue_Get(&rect, 0, &LCUI_Sys.invalid_area) ) {
 			break;
 		}
+		/* 获取内存中对应区域的图形数据 */ 
+		Get_Screen_Real_Graph ( rect, &graph );
+		//_DEBUG_MSG("get screen area: %d,%d,%d,%d\n", 
+		//rect.x, rect.y, rect.width, rect.height);
+		/* 写入至帧缓冲，让屏幕显示图形 */
+		Graph_Display( &graph, Pos(rect.x, rect.y) );
+		/* 移除队列中的成员 */ 
+		Queue_Delete( &LCUI_Sys.invalid_area, 0 );
 	}
 	/* 解锁队列 */
-	Queue_UnLock(&LCUI_Sys.update_area); 
+	Queue_UnLock( &LCUI_Sys.invalid_area );
 	//_DEBUG_MSG("quit\n");
 	Graph_Free(&graph);
 }
@@ -373,7 +188,31 @@ static void *autoquit()
 }
 #endif
 
-static void *Handle_Area_Update ()
+
+static void 
+Handle_Refresh_Area( void )
+/*
+ * 功能：处理已记录的刷新区域
+ * 说明：此函数会将各个部件的rect队列中的处理掉，并将
+ * 最终的局部刷新区域数据添加至屏幕刷新区域队列中，等
+ * 待LCUI来处理。
+ **/
+{ 
+	/* 如果flag标志的值为IS_TRUE */ 
+	if ( LCUI_Sys.need_sync_area ) {
+		/* 转移部件内记录的区域至主记录中 */ 
+		Widget_SyncInvalidArea( NULL );
+		/* 
+		 * 复位标志，这是为了避免每次进入本函数时都要进入递归，并对各
+		 * 个部件的矩形数据进行移动，因为这是浪费时间，降低了程序的效
+		 * 率 
+		 * */
+		LCUI_Sys.need_sync_area = FALSE; 
+	} 
+}
+
+static void *
+Handle_Area_Update ()
 /* 功能：进行屏幕内容更新 */
 {
 #ifdef need_autoquit

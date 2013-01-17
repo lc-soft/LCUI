@@ -80,23 +80,8 @@ int Get_Screen_Bits();
 LCUI_Pos Get_Screen_Center_Point();
 /* 功能：获取屏幕中心点的坐标 */ 
 
-int Widget_Layer_Is_Opaque(LCUI_Widget *widget);
-/* 功能：判断部件图形是否不透明 */ 
-
-int Widget_Layer_Not_Visible(LCUI_Widget *widget);
-/* 功能：检测部件图形是否完全透明 */ 
-
-void Get_Overlay_Widget(LCUI_Rect rect, LCUI_Widget *widget, LCUI_Queue *queue);
-/* 
- * 功能：获取与指定区域重叠的部件 
- * 说明：得到的队列，队列中的部件排列顺序为：底-》上 == 左-》右
- * */
-
-int Get_Screen_Real_Graph (LCUI_Rect rect, LCUI_Graph * graph);
-/* 
- * 功能：获取屏幕中指定区域内实际要显示的图形 
- * 说明：指定的区域必须是与部件区域不部分重叠的
- * */ 
+/* 获取屏幕中指定区域内实际要显示的图形 */
+void Get_Screen_Real_Graph ( LCUI_Rect rect, LCUI_Graph *graph );
 
 int Enable_Graph_Display();
 /* 功能：启用图形输出 */ 

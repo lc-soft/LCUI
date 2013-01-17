@@ -202,8 +202,8 @@ int Screen_Init()
 	struct fb_var_screeninfo fb_vinfo;
 	struct fb_fix_screeninfo fb_fix;
 	struct fb_cmap oldcmap = {0,256,rr,gg,bb} ;
-	
 	char *fb_dev;
+	LCUI_Graph *graph;
 	/* 获取环境变量中指定的帧缓冲设备的位置 */
 	fb_dev = getenv("LCUI_FB_DEVICE");
 	if(fb_dev == NULL) {
@@ -245,30 +245,37 @@ int Screen_Init()
 		printf("success\n");
 	}
 	
-	Graph_Init(&LCUI_Sys.screen.buff); /* 初始化图形数据 */
-	
-	LCUI_Sys.screen.buff.type = TYPE_BMP;/* bmp位图 */
 	LCUI_Sys.screen.size.w = fb_vinfo.xres; /* 保存屏幕尺寸 */
 	LCUI_Sys.screen.size.h = fb_vinfo.yres; 
-	
+	/* 初始化根图层 */
+	LCUI_Sys.root_glayer = GraphLayer_New();
+	/* 调整根图层的尺寸 */
+	GraphLayer_Resize( LCUI_Sys.root_glayer, 
+		fb_vinfo.xres, fb_vinfo.yres );
+	/* 获取指向根图层图形数据的指针 */
+	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
 	/* 保存当前屏幕内容，以便退出LCUI后还原 */
-	Get_Screen_Graph(&LCUI_Sys.screen.buff); 
+	Get_Screen_Graph( graph );
 	return 0;
 }
 
 int Screen_Destroy()
 {
 	int err;
+	LCUI_Graph *graph;
+	
 	LCUI_Sys.status = KILLED;
+	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
 	/* 恢复屏幕初始内容 */ 
-	Graph_Display (&LCUI_Sys.screen.buff, Pos(0, 0));	
+	Graph_Display( graph, Pos(0, 0) );
 	/* 解除帧缓冲在内存中的映射 */
-	err = munmap (LCUI_Sys.screen.fb_mem, LCUI_Sys.screen.smem_len);
+	err = munmap( LCUI_Sys.screen.fb_mem, LCUI_Sys.screen.smem_len );
 	if (err != 0) {
 		perror ("munmap()");
 		return err;
 	}
-	close (LCUI_Sys.screen.fb_dev_fd);  
+	close (LCUI_Sys.screen.fb_dev_fd);
+	GraphLayer_Free( LCUI_Sys.root_glayer );
 	return 0;
 }
 

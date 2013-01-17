@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Menu.c -- LCUI's Menu widget
+ * menu.c -- LCUI's Menu widget
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Menu.c -- LCUI 的菜单部件
+ * menu.c -- LCUI 的菜单部件
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -64,15 +64,18 @@ static void Menu_Init(LCUI_Widget *widget)
 /* 功能：初始化菜单的数据结构体 */
 {
 	/* 获取私有结构体指针，并分配内存 */
-	LCUI_Menu *menu = Widget_Create_PrivData(widget, sizeof(LCUI_Menu));
+	LCUI_Menu *menu;
+	LCUI_Graph *graph;
 	
+	menu = Widget_Create_PrivData(widget, sizeof(LCUI_Menu));
+	graph = Widget_GetSelfGraph( widget );
 	menu->parent_menu = NULL;
 	menu->widget_link = NULL;
 	menu->mini_width  = 50;
 	WidgetQueue_Init(&menu->child_menu);
 	Queue_Using_Pointer(&menu->child_menu);
 	
-	Graph_Draw_Border(&widget->graph, 
+	Graph_Draw_Border( graph, 
 	 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)) );
 	
 	Set_Widget_BG_Mode(widget, BG_MODE_FILL_BACKCOLOR);

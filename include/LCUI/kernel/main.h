@@ -22,7 +22,6 @@ LCUI_App;
 typedef struct _LCUI_Screen
 {
 	LCUI_Size	size;		/* 屏幕尺寸 */
-	LCUI_Graph	buff;		/* 保存启动LCUI前的屏幕内容 */
 	char		*fb_dev_name;	/* 图形输出设备的名称 */
 	uchar_t	*fb_mem;	/* 指向图像输出设备映射到的内存的指针 */
 	int		fb_dev_fd;	/* 图形显示设备的句柄 */
@@ -37,7 +36,7 @@ typedef struct _LCUI_System
 {
 	int status;		/* 状态 */ 
 	BOOL init;		/* 指示LCUI是否初始化过 */
-	BOOL need_shift_area;	/* 指示是否需要转移部件中记录的区域数据 */ 
+	BOOL need_sync_area;	/* 指示是否需要转移部件中记录的区域数据 */ 
 	
 	thread_t self_id;		/* 保存LCUI主程序的线程的ID */
 	thread_t display_thread;	/* 保存核心处理的线程的ID */
@@ -57,10 +56,12 @@ typedef struct _LCUI_System
 	LCUI_Queue	dev_list;	/* 设备列表 */
 	LCUI_Queue	widget_list;	/* 部件队列，对应它的显示顺序 */
 	LCUI_Widget	*focus_widget;	/* 获得焦点的部件 */
-	LCUI_Queue	update_area;	/* 需要刷新的区域 */
+	LCUI_Queue	invalid_area;	/* 需要刷新的区域 */
 	LCUI_Queue	timer_list;	/* 定时器列表 */
 	LCUI_Queue	app_list;	/* LCUI程序列表 */ 
 	LCUI_Font	default_font;	/* 默认的字体数据 */ 
+	
+	LCUI_GraphLayer *root_glayer;
 }
 LCUI_System;
 /***********************************************************************/

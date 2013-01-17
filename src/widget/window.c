@@ -165,13 +165,14 @@ static void
 Exec_Update_Window( LCUI_Widget *win_p )
 {
 	LCUI_Size size;
+	LCUI_Graph *graph;
 	LCUI_Widget *titlebar;
 	LCUI_Widget *client_area;
 	LCUI_RGB border_color, back_color;
 	
 	titlebar = Get_Window_TitleBar(win_p);
 	client_area = Get_Window_Client_Area(win_p);
-	
+	graph = Widget_GetSelfGraph( win_p );
 	/* 按不同的风格来处理 */ 
 	switch( win_p->style_id ) {
 	    case WINDOW_STYLE_NONE:  /* 没有边框 */
@@ -239,7 +240,7 @@ union_draw_method:;
 		Set_Widget_Border( client_area,
 		 Border(1, BORDER_STYLE_SOLID, border_color));
 		Set_Widget_Backcolor( win_p, back_color );
-		Graph_Fill_Color( &win_p->graph, back_color );
+		Graph_Fill_Color( graph, back_color );
 		Set_Widget_Backcolor( client_area, RGB(255,255,255) );
 		Set_Widget_Background_Image( titlebar, NULL, 0 );
 		Set_Widget_BG_Mode( titlebar, BG_MODE_TRANSPARENT ); 
@@ -250,10 +251,10 @@ union_draw_method:;
 		Resize_Widget( titlebar, Size(size.h, 25) );
 		Resize_Widget( client_area, Size(size.w, size.h - 25) );
 		Set_Widget_Dock( titlebar, DOCK_TYPE_TOP ); 
-		Set_Widget_Dock( client_area, DOCK_TYPE_BOTTOM ); 
+		Set_Widget_Dock( client_area, DOCK_TYPE_BOTTOM );
 		Show_Widget( titlebar );
 		Show_Widget( client_area ); 
-		
+		break;
 	    default:
 			//
 		break;

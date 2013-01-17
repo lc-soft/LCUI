@@ -381,7 +381,9 @@ static void
 Exec_TextBox_Draw( LCUI_Widget *widget )
 /* 处理文本框的图形渲染 */
 {
-	Draw_Empty_Slot( &widget->graph, widget->size.w, widget->size.h );
+	LCUI_Graph *graph;
+	graph = Widget_GetSelfGraph( widget );
+	Draw_Empty_Slot( graph, widget->size.w, widget->size.h );
 }
 
 static LCUI_Widget *

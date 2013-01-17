@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_ActiveBox.c -- ActiveBox widget, play simple dynamic picture
+ * activebox.c -- ActiveBox widget, play simple dynamic picture
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_ActiveBox.c -- ActiveBox部件, 播放简单的动态图像
+ * activebox.c -- ActiveBox部件, 播放简单的动态图像
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -505,15 +505,23 @@ Exec_Update_ActiveBox(LCUI_Widget *widget)
 /* 功能：更新ActiveBox部件内显示的图像 */
 {
 	LCUI_Rect rect;
-	LCUI_Frames *frames = ActiveBox_Get_Frames(widget);
-	LCUI_Graph *graph = Frames_Get_Slot(frames);
-	LCUI_Pos pos = Align_Get_Pos(Get_Widget_Size(widget), 
+	LCUI_Frames *frames;
+	LCUI_Graph *frame_graph, *widget_graph;
+	LCUI_Pos pos;
+	
+	frames = ActiveBox_Get_Frames(widget);
+	widget_graph = Widget_GetSelfGraph( widget );
+	frame_graph = Frames_Get_Slot(frames);
+	pos = Align_Get_Pos(Get_Widget_Size(widget), 
 				frames->size, ALIGN_MIDDLE_CENTER);
 
-	Graph_Fill_Alpha(&widget->graph, 0);
-	Graph_Replace(&widget->graph, graph, pos);  
-	rect = Rect(pos.x, pos.y, graph->width, graph->height);
-	Add_Widget_Refresh_Area(widget, rect);
+	Graph_Fill_Alpha( widget_graph, 0 );
+	Graph_Replace( widget_graph, frame_graph, pos );
+	rect.x = pos.x;
+	rect.y = pos.y;
+	rect.width = frame_graph->width;
+	rect.height = frame_graph->height;
+	Widget_InvalidArea( widget, rect );
 }
 
 static void 

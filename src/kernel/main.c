@@ -271,7 +271,7 @@ int LCUI_Init(int argc, char *argv[])
 		/* 初始化LCUI程序数据 */
 		LCUI_AppList_Init( &LCUI_Sys.app_list );
 		/* 初始化屏幕区域更新队列 */ 
-		RectQueue_Init( &LCUI_Sys.update_area );
+		RectQueue_Init( &LCUI_Sys.invalid_area );
 		/* 初始化部件队列 */
 		WidgetQueue_Init( &LCUI_Sys.widget_list ); 
 		/* 让定时器处理模块开始工作 */

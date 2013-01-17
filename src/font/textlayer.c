@@ -720,12 +720,13 @@ __TextLayer_OldArea_Erase( LCUI_Widget *widget, LCUI_TextLayer *layer )
  *  */
 {
 	static int i, j, x, y, rows, len;
-	static LCUI_Graph slot;
+	static LCUI_Graph *graph, slot;
 	static Text_RowData *row_ptr;
 	static LCUI_CharData *char_ptr;
 	static LCUI_Rect area;
 	
 	Graph_Init( &slot );
+	graph = Widget_GetSelfGraph( widget );
 	rows = Queue_Get_Total( &layer->rows_data );
 	for(y=layer->old_offset_pos.y,i=0; y<0 && i<rows; ++i) {
 		row_ptr = Queue_Get( &layer->rows_data, i );
@@ -774,12 +775,12 @@ __TextLayer_OldArea_Erase( LCUI_Widget *widget, LCUI_TextLayer *layer )
 		area.y = y;
 		area.width = x;
 		/* 引用部件图层中的区域 */
-		Quote_Graph( &slot, &widget->graph, area );
+		Quote_Graph( &slot, graph, area );
 		/* 将该区域的alpha通道填充为0 */
 		Graph_Fill_Alpha( &slot, 0 );
 		//printf("area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
 		/* 添加刷新区域 */
-		Add_Widget_Refresh_Area( widget, area );
+		Widget_InvalidArea( widget, area );
 		y += row_ptr->max_size.h;
 		if( y > widget->size.h ) {
 			break;
@@ -796,13 +797,15 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	BOOL draw_all = FALSE;
 	int i, j, n, rows, size;
 	LCUI_RGB color;
-	LCUI_Graph slot;
+	LCUI_Graph slot, *graph;
 	LCUI_CharData *p_data;
 	Text_RowData *p_row;
 	
 	//clock_t start;
 	//start = clock();
 	//printf("TextLayer_Draw(): enter\n");
+	
+	graph = Widget_GetSelfGraph( widget );
 	/* 如果文本缓存区内有数据 */
 	if( layer->need_proc_buff ) {
 		__TextLayer_Text( layer );
@@ -827,10 +830,10 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 		area.x += layer->offset_pos.x;
 		area.y += layer->offset_pos.y;
 		Queue_Delete( &layer->clear_area, 0 );
-		Quote_Graph( &slot, &widget->graph, area );
+		Quote_Graph( &slot, graph, area );
 		/* 将该区域的alpha通道填充为0 */
 		Graph_Fill_Alpha( &slot, 0 );
-		Add_Widget_Refresh_Area( widget, area ); 
+		Widget_InvalidArea( widget, area ); 
 		//printf("refresh area: %d,%d,%d,%d\n",
 		//area.x, area.y, area.width, area.height);
 	}
@@ -886,10 +889,10 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 				area.height = p_data->bitmap.rows;
 				area.width = p_data->bitmap.width;
 				/* 贴上字体位图 */
-				FontBMP_Mix( &widget->graph, Pos(area.x, area.y),
+				FontBMP_Mix( graph, Pos(area.x, area.y),
 					&p_data->bitmap, color, mode );
 				/* 记录该区域，以刷新显示到屏幕上 */
-				Add_Widget_Refresh_Area( widget, area );
+				Widget_InvalidArea( widget, area );
 			}
 			pos.x += p_data->bitmap.advance.x;
 			if( pos.x > widget->size.w ) {

@@ -124,10 +124,13 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 /* 功能：更新进度条的图形 */
 {
 	LCUI_ProgressBar *pb;
+	LCUI_Graph *widget_graph;
+	
+	widget_graph = Widget_GetSelfGraph( widget );
 	pb = Get_Widget_PrivData(widget);
 	if(Strcmp(&widget->style, "dynamic") == 0) {
 		/* 绘制空槽 */
-		Draw_Empty_Slot(&widget->graph, widget->size.w, widget->size.h);
+		Draw_Empty_Slot(widget_graph, widget->size.w, widget->size.h);
 		/* 载入两个图形 */
 		if(!Graph_Valid(&pb->fore_graph)) {
 			Load_Graph_ProgressBar_Fore(&pb->fore_graph);  

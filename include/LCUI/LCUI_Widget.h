@@ -42,21 +42,6 @@
 #ifndef __LCUI_WIDGET_H__
 #define __LCUI_WIDGET_H__
 
-/* 定义数据类型标识 */
-typedef enum DATATYPE
-{
-	DATATYPE_POS,
-	DATATYPE_POS_TYPE,
-	DATATYPE_SIZE,
-	DATATYPE_GRAPH,
-	DATATYPE_UPDATE,
-	DATATYPE_STATUS,   
-	DATATYPE_SHOW,
-	DATATYPE_HIDE,
-	DATATYPE_AREA
-}
-DATATYPE;
-
 /***************** 部件相关函数的类型 *******************/
 typedef enum _FuncType
 {
@@ -70,14 +55,104 @@ typedef enum _FuncType
 }FuncType;
 /****************************************************/
 
+#include LC_GRAPHLAYER_H
+
+/******************************* 部件 **********************************/
+typedef struct _LCUI_Widget LCUI_Widget;
+
+struct _LCUI_Widget 
+{
+	LCUI_ID app_id; /* 所属程序的ID */
+	
+	LCUI_Pos pos;	/* 已计算出的实际位置 */
+	LCUI_Pos max_pos;
+	LCUI_Pos min_pos;
+	/*------------ 位置限制（描述） ---------------*/ 
+	PX_P_t x, y;
+	PX_P_t max_x, min_x;
+	PX_P_t max_y, min_y;
+	/*------------------ END -------------------*/
+	
+	LCUI_Size size; /* 已计算出的实际尺寸，单位为像素 */
+	LCUI_Size max_size;
+	LCUI_Size min_size;
+	
+	/*------------ 尺寸限制（描述） ---------------*/ 
+	PX_P_t w, h;
+	PX_P_t max_w, min_w;
+	PX_P_t max_h, min_h;
+	/*------------------ END -------------------*/
+	
+	WIDGET_STATUS status;	/* 部件的状态 */
+	BOOL status_response;	/* 是否响应部件的状态改变 */
+	
+	BOOL enabled;	/* 是否启用 */
+	BOOL visible;	/* 是否可见 */
+	
+	BOOL		auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
+	AUTOSIZE_MODE	auto_size_mode;	/* 自动尺寸调整模式 */
+	
+	BOOL		focus;		/* 指定该部件是否需要焦点 */
+	LCUI_Widget*	focus_widget;	/* 获得焦点的子部件 */
+	
+	int		clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“不小于”才使条件成立 */
+	uchar_t	clickable_area_alpha;	/* 指定部件图层中的区域的alpha值小于/不小于多少时可被鼠标点击，默认为0，最大为255 */
+	
+	LCUI_String	type;		/* 部件的类型 */
+	LCUI_ID	type_id;	/* 部件的类型ID */
+	LCUI_String	style;		/* 部件的风格，对某些部件有效 */
+	LCUI_ID	style_id;	/* 部件的风格的ID */
+	LCUI_Widget	*parent;	/* 父部件 */
+	LCUI_Queue	child;		/* 子部件集 */
+	
+	/*----------------- 部件布局相关 ----------------*/
+	POS_TYPE	pos_type;	/* 位置类型 */
+	ALIGN_TYPE	align;		/* 布局 */
+	LCUI_Pos	offset;		/* x，y轴的偏移量 */
+	DOCK_TYPE	dock;		/* 停靠位置 */
+	/*------------------ END ----------------------*/
+	
+	/*------------ 外边距和内边距 ---------------*/ 
+	LCUI_Margin	margin;
+	LCUI_Padding	padding;
+	/*---------------- END -------------------*/
+	
+	LCUI_Border	border;		/* 边框 */
+	
+	LCUI_RGB  back_color;  /* 背景色 */
+	LCUI_RGB  fore_color;  /* 前景色 */
+	
+	int		bg_mode;  /* 背景模式，指定在无背景时是使用透明背景还是使用背景色填充 */
+	int		background_image_layout; /* 背景图的布局 */
+	LCUI_Graph	background_image;	 /* 背景图 */
+	
+	void *private_data;   /* 该部件私有数据的指针，其它的是各个部件公用的数据 */ 
+	
+	LCUI_Queue event; /* 保存部件的事件关联的数据 */
+	LCUI_Queue data_buff; /* 记录需要进行更新的数据 */ 
+	LCUI_Queue invalid_area; /* 记录无效区域 */
+	LCUI_GraphLayer* main_glayer; /* 部件的主图层 */
+	LCUI_GraphLayer* client_glayer; /* 客户区图层 */
+	
+	/* 以下是函数指针，闲函数名太长的话，可以直接用下面的 */
+	void (*resize)(LCUI_Widget*, LCUI_Size);
+	void (*move)(LCUI_Widget*, LCUI_Pos); 
+	void (*show)(LCUI_Widget*);
+	void (*hide)(LCUI_Widget*);
+	void (*disable)(LCUI_Widget*);
+	void (*enable)(LCUI_Widget*);
+	void (*set_align)(LCUI_Widget*, ALIGN_TYPE, LCUI_Pos); 
+	void (*set_alpha)(LCUI_Widget*, unsigned char); 
+	void (*set_border)(LCUI_Widget*, LCUI_Border);
+};
+/**********************************************************************/
+
+
 LCUI_BEGIN_HEADER
 
 /***************************** Widget *********************************/
 LCUI_Size Get_Widget_Size(LCUI_Widget *widget);
 /* 功能：获取部件的尺寸 */ 
-
-uchar_t _Get_Widget_RealAlpha( LCUI_Widget *widget );
-/* 获取部件实际的全局透明度 */
 
 LCUI_Size _Get_Widget_Size(LCUI_Widget *widget);
 /* 功能：通过计算获取部件的尺寸 */
@@ -124,8 +199,11 @@ void print_widget_info(LCUI_Widget *widget);
  * 说明：在调试时需要用到它，用于确定widget是否有问题
  *  */ 
 
-int Add_Widget_Refresh_Area (LCUI_Widget * widget, LCUI_Rect rect);
-/* 功能：在指定部件的内部区域内设定需要刷新的区域 */ 
+/* 在指定部件的内部区域内设定需要刷新的区域 */
+int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect );
+
+/* 转移子部件中的无效区域至父部件的无效区域记录中 */
+int Widget_SyncInvalidArea( LCUI_Widget *widget );
 
 void Response_Status_Change(LCUI_Widget *widget);
 /* 
@@ -134,17 +212,6 @@ void Response_Status_Change(LCUI_Widget *widget);
  * 这对于一些部件是多余的，没必要重绘，影响效率。如果想让部件能像按钮那样，鼠标移动到它
  * 上面时以及鼠标点击它时，都会改变按钮的图形样式，那就需要用这个函数设置一下。
  *  */ 
-
-void Shift_Widget_Refresh_Area(LCUI_Widget *widget);
-/* 功能：转移部件的rect队列成员至父部件中 */ 
-
-void Handle_Refresh_Area();
-/*
- * 功能：处理已记录的刷新区域
- * 说明：此函数会将各个部件的rect队列中的处理掉，并将
- * 最终的局部刷新区域数据添加至屏幕刷新区域队列中，等
- * 待LCUI来处理。
- **/ 
 
 LCUI_Widget *Get_Parent_Widget(LCUI_Widget *widget, char *widget_type);
 /*
@@ -273,8 +340,8 @@ void Enable_Widget(LCUI_Widget *widget);
 void Disable_Widget(LCUI_Widget *widget);
 /* 功能：禁用部件 */ 
 
-void Widget_Visible(LCUI_Widget *widget, int flag);
-/* 功能：定义部件是否可见 */ 
+/* 指定部件是否可见 */
+void Widget_Visible( LCUI_Widget *widget, BOOL flag );
 
 void Set_Widget_Pos(LCUI_Widget *widget, LCUI_Pos pos);
 /* 
@@ -320,6 +387,15 @@ void Exec_Update_Widget(LCUI_Widget *widget);
 
 void Exec_Draw_Widget(LCUI_Widget *widget);
 /* 功能：执行部件图形更新操作 */ 
+
+/* 获取指向部件自身图形数据的指针 */
+LCUI_Graph *Widget_GetSelfGraph( LCUI_Widget *widget );
+
+/* 获取部件实际显示的图形 */
+int Widget_GetGraph( 
+		LCUI_Widget *widget, 
+		LCUI_Graph *graph_buff, 
+		LCUI_Rect rect );
 
 LCUI_Pos Get_Widget_Valid_Pos( LCUI_Widget *widget, LCUI_Pos pos );
 /* 获取有效化后的坐标数据，其实就是将在限制范围外的坐标处理成在限制范围内的 */
@@ -453,8 +529,8 @@ void Register_Default_Widget_Type();
 
 
 /*************************** Container ********************************/
-void Widget_Container_Add(LCUI_Widget *container, LCUI_Widget *widget);
-/* 功能：将部件添加至作为容器的部件内 */ 
+/* 将部件添加至作为容器的部件内 */
+int Widget_Container_Add( LCUI_Widget *ctnr, LCUI_Widget *widget );
 
 int _Get_Widget_Container_Width(LCUI_Widget *widget);
 /* 通过计算得出指定部件的容器的宽度，单位为像素 */ 
