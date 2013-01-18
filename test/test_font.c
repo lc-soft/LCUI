@@ -124,23 +124,25 @@ void *change_fonttype()
 
 int main(int argc, char *argv[])
 {
-	thread_t t; 
+	//thread_t t; 
+	setenv( "LCUI_FONTFILE", "../fonts/simsun.ttc", TRUE );
 	LCUI_Init(argc, argv);
 	window = Create_Widget("window");
 	text = Create_Widget("label"); 
-	filename = scan_fontfile("../fonts/", &total_files); 
+	//filename = scan_fontfile("../fonts/", &total_files); 
 	Resize_Widget(window, Size(320, 240));
+	Set_Window_Title_Text( window, "测试simsun.ttc" );
 	Label_Text( text, 
-		"<size=25px><color=0,0,0>abcdefghijklmn</color>\n"
-		"<color=165,42,42>opqrstuvwxyz</color>\n" 
-		"<color=30,144,255>ABCDEFGHIJKLMN</color>\n"
-		"<color=0,75,65>OPQRSTUVWXYZ</color>\n"
-		"<color=255,0,0>1234567890.:,;(*!?)</color>\n"
-		"<color=0,215,0>中国创造，慧及全球！</color></size>");
+		"<size=10px>10px: 汉字，abcdefghijklmn,opqrstuvwxyz</size>\n"
+		"<size=11px>11px: 汉字，abcdefghijklmn,opqrstuvwxyz</size>\n" 
+		"<size=12px>12px: 汉字，ABCDEFGHIJKLMN,OPQRSTUVWXYZ</size>\n"
+		"<size=14px>14px: 汉字，ABCDEFGHIJKLMN,OPQRSTUVWXYZ</size>\n"
+		"<size=16px>16px: 汉字，1234567890.:,;(*!?)</size>\n"
+		"<size=18px>18px: 中国创造，慧及全球！</size>");
 	Set_Widget_Align(text, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	Window_Client_Area_Add(window, text);
 	Show_Widget(text);
 	Show_Widget(window); 
-	LCUI_Thread_Create(&t, NULL, change_fonttype, NULL);
+	//LCUI_Thread_Create(&t, NULL, change_fonttype, NULL);
 	return LCUI_Main();
 }

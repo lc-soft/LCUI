@@ -210,9 +210,9 @@ void LCUI_Font_Init(LCUI_Font *font)
 	//font->space = 1;
 	//font->linegap = 0;
 	font->status = KILLED;
+#ifdef USE_FREETYPE
 	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT;
 	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_MONOCHROME;
-#ifdef USE_FREETYPE
 	font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT; 
 	font->render_mode = FT_RENDER_MODE_MONO;
 #else

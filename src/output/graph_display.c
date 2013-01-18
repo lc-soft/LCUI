@@ -197,16 +197,10 @@ Handle_Refresh_Area( void )
  * 最终的局部刷新区域数据添加至屏幕刷新区域队列中，等
  * 待LCUI来处理。
  **/
-{ 
-	/* 如果flag标志的值为IS_TRUE */ 
+{
 	if ( LCUI_Sys.need_sync_area ) {
-		/* 转移部件内记录的区域至主记录中 */ 
+		/* 同步部件内记录的区域至主记录中 */ 
 		Widget_SyncInvalidArea( NULL );
-		/* 
-		 * 复位标志，这是为了避免每次进入本函数时都要进入递归，并对各
-		 * 个部件的矩形数据进行移动，因为这是浪费时间，降低了程序的效
-		 * 率 
-		 * */
 		LCUI_Sys.need_sync_area = FALSE; 
 	} 
 }

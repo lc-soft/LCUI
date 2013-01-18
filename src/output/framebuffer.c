@@ -256,6 +256,8 @@ int Screen_Init()
 	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
 	/* 保存当前屏幕内容，以便退出LCUI后还原 */
 	Get_Screen_Graph( graph );
+	/* 显示根图层 */
+	GraphLayer_Show( LCUI_Sys.root_glayer );
 	return 0;
 }
 

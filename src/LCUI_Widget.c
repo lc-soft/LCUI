@@ -693,14 +693,14 @@ int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 		LCUI_Sys.need_sync_area = TRUE; 
 	}
 	/* 以“写”模式使用该队列 */
-	//Queue_Using( &widget->invalid_area, RWLOCK_WRITE );
+	Queue_Using( &widget->invalid_area, RWLOCK_WRITE );
 	/* 保存至队列中 */
 	if(0 != Queue_Add( &widget->invalid_area, &rect ) ) {
-		//Queue_End_Use( &widget->invalid_area );
+		Queue_End_Use( &widget->invalid_area );
 		return -1;
 	}
 	/* 使用结束 */
-	//Queue_End_Use( &widget->invalid_area );
+	Queue_End_Use( &widget->invalid_area );
 	return 0;
 }
 
@@ -1150,8 +1150,13 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	GraphLayer_AddChild( LCUI_Sys.root_glayer, widget.main_glayer );
 	/* 继承主图层的透明度 */
 	GraphLayer_InerntAlpha( widget.client_glayer, TRUE );
-	/* 部件图形设为有alpha通道 */
+	/* 设定图层属性 */
 	widget.main_glayer->graph.have_alpha = TRUE;
+	widget.client_glayer->graph.have_alpha = TRUE;
+	//widget.client_glayer->graph.is_opaque = FALSE;
+	//widget.client_glayer->graph.not_visible = TRUE;
+	/* 显示图层 */
+	GraphLayer_Show( widget.client_glayer );
 	
 	Graph_Init( &widget.background_image );	/* 初始化背景图数据 */
 	RectQueue_Init( &widget.invalid_area );	/* 初始化无效区域记录 */
@@ -1163,7 +1168,7 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	
 	/* 最后，将该部件数据添加至部件队列中 */
 	pos = Queue_Add(&LCUI_Sys.widget_list, &widget);
-	p = (LCUI_Widget*)Queue_Get(&LCUI_Sys.widget_list, pos);
+	p = Queue_Get(&LCUI_Sys.widget_list, pos);
 	
 	if( !widget_type ) {
 		return p;
@@ -1503,6 +1508,7 @@ void Exec_Move_Widget( LCUI_Widget *widget, LCUI_Pos pos )
 		/* 否则，直接改坐标 */
 		widget->pos = pos;
 	}
+	GraphLayer_SetPos( widget->main_glayer, pos.x, pos.y );
 }
 
 void Exec_Hide_Widget(LCUI_Widget *widget)
@@ -1623,12 +1629,13 @@ void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size)
 	} else {
 		widget->size = size;
 	}
-	
+	//_DEBUG_MSG("size: %d, %d\n", size.w, size.h);
 	GraphLayer_Resize( widget->main_glayer, size.w, size.h );
 	/* 调整客户区图层尺寸 */
 	size.w -= (widget->padding.left + widget->padding.right);
 	size.h -= (widget->padding.top + widget->padding.bottom);
-	GraphLayer_Resize( widget->main_glayer, size.w, size.h );
+	//_DEBUG_MSG("size: %d, %d\n", size.w, size.h);
+	GraphLayer_Resize( widget->client_glayer, size.w, size.h );
 	
 	/* 获取改变部件尺寸时需要调用的函数 */
 	func_resize = Get_WidgetFunc_By_ID( widget->type_id, FUNC_TYPE_RESIZE );
@@ -1667,10 +1674,9 @@ void Exec_Update_Widget(LCUI_Widget *widget)
 	func_update = Get_WidgetFunc_By_ID( widget->type_id, FUNC_TYPE_UPDATE );
 	GraphLayer_SetPos( widget->client_glayer, 
 			widget->padding.left, widget->padding.top );
-	size.w = widget->size.w;
+	size = widget->size;
 	size.w -= (widget->padding.left + widget->padding.right);
-	size.h = widget->size.h;
-	size.h = (widget->padding.top + widget->padding.bottom);
+	size.h -= (widget->padding.top + widget->padding.bottom);
 	GraphLayer_Resize( widget->client_glayer, size.w, size.h );
 	func_update( widget );
 }

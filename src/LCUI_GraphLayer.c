@@ -68,6 +68,7 @@ int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 {
 	int i, total;
 	LCUI_GraphLayer *tmp_child;
+	
 	/* 容器图层必须有效 */
 	if( !des_ctnr ) {
 		return -1;
@@ -342,9 +343,11 @@ __GraphLayer_GetLayers(
 	LCUI_Queue *child_list;
 
 	if( !glayer ) {
+		//_DEBUG_MSG("!glayer\n");
 		return -1;
 	}
 	if( !glayer->visible ) {
+		//_DEBUG_MSG("!glayer_visible\n");
 		return 1;
 	}
 	child_list = &glayer->child;
@@ -363,6 +366,7 @@ __GraphLayer_GetLayers(
 		pos = GraphLayer_GetGlobalPos( root_glayer, child );
 		//_DEBUG_MSG( "child: %p, pos: %d,%d, valid rect: %d,%d, %d, %d\n", 
 		//	child, pos.x, pos.y, tmp.x, tmp.y, tmp.width, tmp.height);
+		//Print_Graph_Info( &child->graph );
 		tmp.x += pos.x;
 		tmp.y += pos.y;
 		if( !Rect_Valid(tmp) ) {
@@ -382,6 +386,8 @@ int GraphLayer_GetLayers(
 	LCUI_GraphLayer *glayer, 
 	LCUI_Rect rect, LCUI_Queue *queue )
 {
+	//_DEBUG_MSG("rect: %d,%d,%d,%d\n", 
+	//rect.x, rect.y, rect.width, rect.height);
 	return __GraphLayer_GetLayers( glayer, glayer, rect, queue );
 }
 
@@ -467,13 +473,23 @@ skip_loop:
 		Graph_Cut (&ctnr->graph, rect, graph_buff );
 	}
 	for(i=0; i<total; ++i) {
-		glayer = Queue_Get( &glayerQ, i ); 
+		glayer = Queue_Get( &glayerQ, i );
+		//_DEBUG_MSG("%p = Queue_Get( %p, %d )\n", glayer, &glayerQ, i);
+		if( !glayer ) {
+			continue;
+		}
 		pos = GraphLayer_GetGlobalPos( ctnr, glayer );
 		valid_area = GraphLayer_GetValidRect( ctnr, glayer );
 		Quote_Graph( &tmp_graph, &glayer->graph, valid_area ); 
+		//_DEBUG_MSG("valid area: %d,%d,%d,%d, pos: %d,%d, size: %d,%d\n", 
+		//	valid_area.x, valid_area.y, valid_area.width, valid_area.height,
+		//	pos.x, pos.y, glayer->graph.width, glayer->graph.height
+		//	);
+			
 		/* 获取相对坐标 */
 		pos.x = pos.x - rect.x + valid_area.x;
 		pos.y = pos.y - rect.y + valid_area.y;
+		//_DEBUG_MSG("mix pos: %d,%d\n", pos.x, pos.y);
 		/* 如果该图层没有继承父图层的透明度 */
 		if( !glayer->inherit_alpha ) {
 			Graph_Mix( graph_buff, &tmp_graph, pos );
