@@ -678,8 +678,6 @@ void print_widget_info(LCUI_Widget *widget)
 	}
 }
 
-static int add_count = 0;
-
 /* 在指定部件的内部区域内设定需要刷新的区域 */
 int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 {
@@ -698,12 +696,6 @@ int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 	//_DEBUG_MSG("add rect: %d,%d,%d,%d\n", 
 	//	rect.x, rect.y, rect.width, rect.height );
 	
-	if( rect.width == 312 && rect.height == 210 ) {
-		add_count ++;
-		if( add_count >= 80 ) {
-			abort();
-		}
-	}
 	/* 以“写”模式使用该队列 */
 	Queue_Using( &widget->invalid_area, RWLOCK_WRITE );
 	/* 保存至队列中 */

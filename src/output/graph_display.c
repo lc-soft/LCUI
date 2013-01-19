@@ -135,7 +135,8 @@ void Get_Screen_Real_Graph ( LCUI_Rect rect, LCUI_Graph *graph )
 	}
 }
 
-static void Handle_Screen_Update()
+static void 
+Handle_Screen_Update()
 /* 功能：进行屏幕内容更新 */
 { 
 	LCUI_Rect rect;
@@ -205,14 +206,28 @@ Handle_Refresh_Area( void )
 	} 
 }
 
+static int fps = 0, fps_count = 0;
+
+/* 刷新FPS计数 */
+static void 
+refresh_fps_count( void )
+{
+	fps = fps_count;
+	fps_count = 0;
+	//printf("FPS: %d\n", fps);
+}
+
 static void *
 Handle_Area_Update ()
 /* 功能：进行屏幕内容更新 */
 {
 #ifdef need_autoquit
-	pthread_t t;
+	thread_t t;
 	LCUI_Thread_Create(&t, NULL, autoquit, NULL);
 #endif
+	int timer_id;
+	/* 添加个定时器，每隔1秒刷新FPS计数 */
+	timer_id = set_timer( 1000, refresh_fps_count, TRUE );
 	//_DEBUG_MSG("enter\n");
 	while(LCUI_Active()) {
 		Handle_All_WidgetUpdate();/* 处理所有部件更新 */ 
@@ -222,7 +237,11 @@ Handle_Area_Update ()
 #ifdef need_autoquit
 		auto_flag = 1;
 #endif
+		/* 累计当前更新的帧数 */
+		++fps_count;
 	}
+	/* 释放定时器 */
+	free_timer( timer_id );
 	//_DEBUG_MSG("exit\n");
 	thread_exit(NULL);
 }
