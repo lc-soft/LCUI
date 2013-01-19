@@ -678,6 +678,8 @@ void print_widget_info(LCUI_Widget *widget)
 	}
 }
 
+static int add_count = 0;
+
 /* 在指定部件的内部区域内设定需要刷新的区域 */
 int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 {
@@ -692,6 +694,15 @@ int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 	rect = Get_Valid_Area( Get_Widget_Size(widget), rect );
 	if( widget->visible ) {
 		LCUI_Sys.need_sync_area = TRUE; 
+	}
+	//_DEBUG_MSG("add rect: %d,%d,%d,%d\n", 
+	//	rect.x, rect.y, rect.width, rect.height );
+	
+	if( rect.width == 312 && rect.height == 210 ) {
+		add_count ++;
+		if( add_count >= 80 ) {
+			abort();
+		}
 	}
 	/* 以“写”模式使用该队列 */
 	Queue_Using( &widget->invalid_area, RWLOCK_WRITE );
@@ -1432,9 +1443,16 @@ void Set_Widget_Pos(LCUI_Widget *widget, LCUI_Pos pos)
 void Set_Widget_Padding( LCUI_Widget *widget, LCUI_Padding padding )
 /* 设置部件的内边距 */
 {
+	LCUI_Size size;
 	widget->padding = padding;
+	/* 根据设定的内边距，设置client图层的尺寸及位置 */
+	GraphLayer_SetPos( widget->client_glayer, 
+			widget->padding.left, widget->padding.top );
+	size = widget->size;
+	size.w -= (widget->padding.left + widget->padding.right);
+	size.h -= (widget->padding.top + widget->padding.bottom);
+	GraphLayer_Resize( widget->client_glayer, size.w, size.h );
 	/* 更新子部件的位置 */
-	Update_Widget( widget );
 	Update_Child_Widget_Pos( widget );
 }
 
@@ -1491,7 +1509,7 @@ void Exec_Move_Widget( LCUI_Widget *widget, LCUI_Pos pos )
 	if(pos.y < min_pos.y) {
 		pos.y = min_pos.y;
 	}
-	/* 如果图层是显示的，那就需要添加无效区域 */
+	/* 如果图层是显示的，并且位置变动，那就需要添加无效区域 */
 	if( widget->visible ) {
 		rect = Get_Widget_Rect( widget );
 		Widget_InvalidArea( widget->parent, rect );
@@ -1669,16 +1687,9 @@ void Exec_Refresh_Widget(LCUI_Widget *widget)
 void Exec_Update_Widget(LCUI_Widget *widget)
 /* 功能：执行部件的更新操作 */
 {
-	LCUI_Size size;
 	void ( *func_update ) (LCUI_Widget*); 
 	/* 获取函数 */
 	func_update = Get_WidgetFunc_By_ID( widget->type_id, FUNC_TYPE_UPDATE );
-	GraphLayer_SetPos( widget->client_glayer, 
-			widget->padding.left, widget->padding.top );
-	size = widget->size;
-	size.w -= (widget->padding.left + widget->padding.right);
-	size.h -= (widget->padding.top + widget->padding.bottom);
-	GraphLayer_Resize( widget->client_glayer, size.w, size.h );
 	func_update( widget );
 }
 

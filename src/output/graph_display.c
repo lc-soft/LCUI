@@ -148,7 +148,7 @@ static void Handle_Screen_Update()
 	Queue_Lock( &LCUI_Sys.invalid_area );
 	while(LCUI_Active()) {
 		//_DEBUG_MSG("total area: %d\n", 
-		//Queue_Get_Total( &LCUI_Sys.invalid_area ));
+		//	Queue_Get_Total( &LCUI_Sys.invalid_area ));
 		/* 如果从队列中获取数据成功 */
 		if ( !RectQueue_Get(&rect, 0, &LCUI_Sys.invalid_area) ) {
 			break;
