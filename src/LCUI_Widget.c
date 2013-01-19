@@ -85,6 +85,7 @@ int Widget_Container_Add( LCUI_Widget *ctnr, LCUI_Widget *widget )
 	LCUI_GraphLayer *ctnr_glayer;
 	LCUI_Queue *old_queue, *new_queue;
 	
+	//_DEBUG_MSG("ctnr widget: %p, widget: %p\n", ctnr, widget);
 	if( !widget || ctnr == widget->parent ) {
 		return -1;
 	}

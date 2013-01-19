@@ -26,9 +26,11 @@ int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 		tmp_glayer = Queue_Get( queue, i );
 		if( tmp_glayer == child_glayer ) {
 			Queue_Delete_Pointer( queue, i );
+			child_glayer->parent = NULL;
 			return 0;
 		}
 	}
+	child_glayer->parent = NULL;
 	return 1;
 }
 
@@ -68,13 +70,14 @@ int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 {
 	int i, total;
 	LCUI_GraphLayer *tmp_child;
-	
+	//_DEBUG_MSG( "des_ctnr: %p, glayer: %p\n", des_ctnr, glayer );
 	/* 容器图层必须有效 */
 	if( !des_ctnr ) {
 		return -1;
 	}
 	/* 子图层必须有效，并且不能有父图层 */
 	if( !glayer || glayer->parent ) {
+		//_DEBUG_MSG( "!glayer || glayer->parent\n" );
 		return -2;
 	}
 	/* 根据队列中的z值，将子图层存放在队列中适当的位置 */
@@ -102,6 +105,7 @@ int GraphLayer_MoveChild(	LCUI_GraphLayer *new_ctnr,
 				LCUI_GraphLayer *glayer )
 {
 	int ret;
+	//_DEBUG_MSG( "new_ctnr: %p, glayer: %p\n", new_ctnr, glayer );
 	ret = GraphLayer_DeleteChild( glayer );
 	if( ret != 0 ) {
 		return -1;
