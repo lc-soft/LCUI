@@ -5,10 +5,13 @@
 #include LC_WIDGET_H
 #include LC_WINDOW_H
 #include LC_GRAPH_H
+#include LC_DISPLAY_H
 #include LC_MISC_H
 #include LC_LABEL_H 
 #include <unistd.h>
 #include <math.h>
+
+static LCUI_Widget *window = NULL;
 
 static void 
 test_move_widget(
@@ -28,6 +31,7 @@ test_move_widget(
 	}
 	
 	int i, j, z;
+	char str[256];
 	double w, h, l, n, x, y; 
 	
 	LCUI_Pos pos; 
@@ -52,8 +56,7 @@ test_move_widget(
 	
 	for(i=0; i<j; i++) {
 		bg_rect = Get_Widget_Rect(bg);
-		x += w;
-		y += h;
+		x += w; y += h;
 		pos = Pos(x, y);
 		Move_Widget(widget, pos);
 		fg_rect = Get_Widget_Rect(widget);
@@ -69,20 +72,27 @@ test_move_widget(
 		for(; z<5; z++) {
 			Resize_Widget(child_area[z], Size(0, 0));
 		}
+		sprintf( str, "测试矩形裁剪功能(FPS:%d)", LCUI_GetFPS() );
+		Set_Window_Title_Text( window, str );
 		usleep(10000);/* 停顿0.01秒 */
 	} 
 }
 
 static void *
-test(void *arg)
+test()
 {
 	int i; 
 	/* 6个位置的坐标 */
-	LCUI_Pos pos[6]={{0, 0},{220, 0},{220, 55},{0, 55},{0, 110},{220, 110}};
+	LCUI_Pos pos[6]={
+		{0, 0},{220, 0},{220, 55},{0, 55},{0, 110},{220, 110}
+	};
 	/* 5个区域的颜色 */
-	LCUI_RGB color[5]={{255,165,0}, {165,32,42}, {255,192,203}, {127,127,127}, {139,105,20}};
+	LCUI_RGB color[5]={
+		{255,165,0}, {165,32,42}, {255,192,203}, 
+		{127,127,127}, {139,105,20}
+	};
 	LCUI_Widget *bg, *label[5], *fg, *area[5];
-	LCUI_Widget *window = (LCUI_Widget*)arg; 
+	
 	/* 创建前景和背景区域 */
 	bg = Create_Widget(NULL);
 	fg = Create_Widget(NULL);
@@ -100,7 +110,7 @@ test(void *arg)
 	Set_Widget_Align(bg, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	/* 调整背景区域的尺寸 */
 	Resize_Widget(bg, Size(110, 110)); 
-	Resize_Widget(fg, Size(100, 100)); //你可以把尺寸调得更大
+	Resize_Widget(fg, Size(100, 100));
 	/* 将前景和背景区域加入至窗口客户区 */
 	Window_Client_Area_Add(window, bg);  
 	Window_Client_Area_Add(window, fg);  
@@ -137,14 +147,12 @@ test(void *arg)
 
 int main(int argc, char*argv[]) 
 {
-	thread_t t; 
-	LCUI_Widget * window;
-	
-	LCUI_Init(argc, argv); 
-	window  = Create_Widget("window"); 
-	Resize_Widget(window, Size(320, 240)); 
-	Set_Window_Title_Text(window, "测试矩形裁剪功能");  
+	thread_t t;
+	LCUI_Init( argc, argv ); 
+	window = Create_Widget("window"); 
+	Resize_Widget( window, Size(320, 240) );
+	Set_Window_Title_Text( window, "测试矩形裁剪功能" );
 	/* 创建一个线程，以让区域移动 */
-	LCUI_Thread_Create(&t, NULL, test, (void*)window);
+	LCUI_Thread_Create(&t, NULL, test, NULL);
 	return LCUI_Main();
 }
