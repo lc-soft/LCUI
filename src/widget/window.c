@@ -395,16 +395,18 @@ static void
 Show_Window(LCUI_Widget *win_p)
 /* 功能：在窗口显示时，进行相关处理 */
 {
-	LCUI_Size size;
+	LCUI_Size ctnr_size, size;
 	LCUI_Pos pos;
 	LCUI_Window *win;
 	
 	win = (LCUI_Window*)Get_Widget_PrivData(win_p); 
 	win->count++;
-	if(win->count == 1) {/* 如果是第一次显示 */ 
-		size = _Get_Widget_Container_Size( win_p ); 
-		pos = Align_Get_Pos( size, _Get_Widget_Size(win_p), win->init_align );
-		Exec_Move_Widget( win_p, pos );
+	/* 如果是第一次显示 */
+	if(win->count == 1) { 
+		ctnr_size = _Get_Widget_Container_Size( win_p );
+		size = _Get_Widget_Size( win_p );
+		pos = Align_Get_Pos( ctnr_size, size, win->init_align );
+		Move_Widget( win_p, pos );
 	}
 	//有待扩展 
 }
