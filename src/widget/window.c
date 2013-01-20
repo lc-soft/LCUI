@@ -83,9 +83,12 @@ Move_Window(LCUI_Widget *titlebar, LCUI_DragEvent *event)
 	LCUI_Widget *window;
 	
 	window = titlebar->parent;
-	if( window == NULL) {
+	if( !window ) {
 		return;
 	}
+	//_DEBUG_MSG( "new:%d,%d, cursor:%d,%d\n", 
+	//event->new_pos.x, event->new_pos.y, 
+	//event->cursor_pos.x, event->cursor_pos.y );
 	/* 将新全局坐标减去标题栏的全局坐标，得到偏移坐标 */
 	pos = Get_Widget_Global_Pos( titlebar );
 	offset = Pos_Sub( event->new_pos, pos );

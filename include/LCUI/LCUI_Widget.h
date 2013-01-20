@@ -240,11 +240,8 @@ void Set_Widget_Style(LCUI_Widget *widget, char *style);
 void Set_Widget_StyleID(LCUI_Widget *widget, int style_id);
 /* 设定部件的风格ID */
 
-LCUI_Widget *Get_Widget_By_Pos(LCUI_Widget *widget, LCUI_Pos pos);
-/* 功能：获取部件中包含指定坐标的点的子部件 */ 
-
-LCUI_Widget *Get_Cursor_Overlay_Widget();
-/* 功能：获取鼠标光标当前覆盖的部件 */ 
+/* 获取与指定坐标层叠的部件 */
+LCUI_Widget *Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos );
 
 int Widget_Is_Active(LCUI_Widget *widget);
 /* 功能：判断部件是否为活动状态 */ 

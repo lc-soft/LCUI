@@ -467,10 +467,10 @@ LCUI_Pos GlobalPos_ConvTo_RelativePos(LCUI_Widget *widget, LCUI_Pos global_pos)
 	if( widget == NULL || widget->parent == NULL) {
 		return global_pos;
 	}
-	widget = widget->parent; 
-	global_pos.x -= widget->padding.left;
-	global_pos.y -= widget->padding.top; 
+	widget = widget->parent;
 	while( widget ) {
+		global_pos.x -= widget->padding.left;
+		global_pos.y -= widget->padding.top; 
 		global_pos.x -= widget->pos.x;
 		global_pos.y -= widget->pos.y; 
 		widget = widget->parent;
@@ -887,67 +887,66 @@ void Set_Widget_StyleID(LCUI_Widget *widget, int style_id)
 	Draw_Widget( widget );
 }
 
-LCUI_Widget *Get_Widget_By_Pos( LCUI_Widget *widget, LCUI_Pos pos )
-/* 功能：获取部件中包含指定坐标的点的子部件 */
+/* 获取与指定坐标层叠的部件 */
+LCUI_Widget *Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 {
 	int i, total, temp;
-	LCUI_Widget *child, *w;
+	LCUI_Widget *child, *widget;
 	LCUI_Queue *widget_list;
+	LCUI_Pos tmp_pos;
+	LCUI_RGBA pixel;
+	LCUI_Graph *graph;
 	
-	if( widget ) {
-		widget_list = &widget->child;
-#ifdef NEED_THIS_CODE
-		LCUI_Pos tmp_pos;
-		LCUI_RGBA pixel;
+	if( ctnr ) {
+		widget_list = &ctnr->child;
 		/* 判断 鼠标坐标对应部件图层中的像素点的透明度 是否符合要求，
 		 * 如果透明度小于/不小于clickable_area_alpha的值，那么，无视
 		 * 该部件。
 		 *  */ 
-		tmp_pos = Pos_Sub( pos, widget->pos ); 
-		if( Get_Graph_Pixel( &widget->graph, tmp_pos, &pixel )) {
+		tmp_pos = Pos_Sub( pos, ctnr->pos ); 
+		graph = Widget_GetSelfGraph( ctnr );
+		if( Get_Graph_Pixel( graph, tmp_pos, &pixel )) {
 			//printf("mode: %d, pixel alpha: %d, alpha: %d\n",
 			//widget->clickable_mode, pixel.alpha, widget->clickable_area_alpha );
-			if( (widget->clickable_mode == 0 
-			 && pixel.alpha < widget->clickable_area_alpha )
-			 || (widget->clickable_mode == 1 
-			 && pixel.alpha >= widget->clickable_area_alpha ) ) { 
+			if( (ctnr->clickable_mode == 0 
+			 && pixel.alpha < ctnr->clickable_area_alpha )
+			 || (ctnr->clickable_mode == 1 
+			 && pixel.alpha >= ctnr->clickable_area_alpha ) ) { 
 				//printf("Ignore widget\n");
 				return NULL;
 			}
 		}/* else {
 			printf("get graph pixel error\n");
 		} */
-#endif
+		/* 减去内边距 */
+		pos.x -= ctnr->padding.left;
+		pos.y -= ctnr->padding.top;
 	} else {
 		widget_list = &LCUI_Sys.widget_list;
 	}
 	
-	w = widget; 
+	widget = ctnr; 
 	total = Queue_Get_Total( widget_list );
 	for(i=0; i<total; ++i) {/* 从顶到底遍历子部件 */
 		child = Queue_Get( widget_list, i ); 
 		if( !child || !child->visible ) { 
 			continue;
 		}
-		
 		temp = Rect_Inside_Point( pos, Get_Widget_Rect(child) );
 		/* 如果这个点被包含在部件区域内 */
 		if(temp != 1) {
 			continue;
 		}
-		/* 递归调用，改变相对坐标 */
-		w = Get_Widget_By_Pos( child, Pos_Sub( pos, child->pos) );
-		if( !w ) {
-			w = widget;
+		/* 改变相对坐标 */
+		tmp_pos.x = pos.x - child->pos.x;
+		tmp_pos.y = pos.y - child->pos.y;
+		widget = Widget_At( child, tmp_pos );
+		if( !widget ) {
+			widget = ctnr;
 		}
 		break;
 	}
-	return w; 
-}
-LCUI_Widget *Get_Cursor_Overlay_Widget()
-/* 功能：获取鼠标光标当前覆盖的部件 */
-{ 
-	return Get_Widget_By_Pos( NULL, Get_Cursor_Pos() );
+	return widget; 
 }
 
 int Widget_Is_Active(LCUI_Widget *widget)
@@ -1136,10 +1135,13 @@ LCUI_Pos Count_Widget_Pos(LCUI_Widget *widget)
 /* 功能：累计部件的位置坐标 */
 {
 	LCUI_Pos pos;
+	
 	if( !widget->parent ) {
 		return widget->pos; 
 	}
-	pos = Count_Widget_Pos(widget->parent); 
+	pos = Count_Widget_Pos(widget->parent);
+	pos.x += widget->parent->padding.left;
+	pos.y += widget->parent->padding.top;
 	pos = Pos_Add(pos, widget->pos);
 	return pos;
 }

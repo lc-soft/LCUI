@@ -271,7 +271,7 @@ static BOOL proc_mouse( void *arg )
 	//printf("x:%d, y:%d, button:%d\n", pos.x, pos.y, button);
 	mouse_event.global_pos = pos; 
 	
-	mouse_event.widget = Get_Cursor_Overlay_Widget(); 
+	mouse_event.widget = Widget_At( NULL, pos ); 
 	if( mouse_event.widget ) {
 		mouse_event.pos = GlobalPos_ConvTo_RelativePos( mouse_event.widget, pos );
 	} else { 

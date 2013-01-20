@@ -45,6 +45,7 @@
 #include LC_ERROR_H
 #include LC_INPUT_H
 #include LC_WIDGET_H
+#include LC_CURSOR_H
 #include <unistd.h>
 
 /***************************** Func ***********************************/
@@ -526,7 +527,8 @@ _Start_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
 {
 	drag_event.cursor_pos = event->global_pos;
 	/* 用全局坐标减去部件的全局坐标，得到偏移坐标 */ 
-	__offset_pos = Pos_Sub( event->global_pos, Get_Widget_Global_Pos( widget ) );
+	__offset_pos = Get_Widget_Global_Pos( widget );
+	__offset_pos = Pos_Sub( event->global_pos, __offset_pos );
 	/* 得出部件的新全局坐标 */
 	drag_event.new_pos = Pos_Sub( event->global_pos, __offset_pos );
 	drag_event.first_click = 1;
@@ -650,7 +652,7 @@ Tracking_Mouse_Move (LCUI_MouseEvent *event)
 	LCUI_Widget *widget;
 	
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
-	widget = Get_Cursor_Overlay_Widget();
+	widget = Widget_At( NULL, Get_Cursor_Pos() );
 	if( !widget ) {
 		goto skip_widget_check;
 	}

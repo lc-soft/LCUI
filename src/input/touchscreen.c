@@ -101,7 +101,7 @@ static BOOL proc_touchscreen()
 	Set_Cursor_Pos ( pos );
 	
 	mouse_event.global_pos = pos;
-	mouse_event.widget = Get_Cursor_Overlay_Widget(); 
+	mouse_event.widget = Widget_At( NULL, pos );
 	if( mouse_event.widget ) {
 		mouse_event.pos = GlobalPos_ConvTo_RelativePos( mouse_event.widget, pos );
 	} else { 
