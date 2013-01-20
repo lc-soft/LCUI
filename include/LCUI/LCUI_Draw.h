@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Draw.h -- LCUI��ͼ�λ���ģ��
+ * LCUI_Draw.h -- LCUI的图形绘制模块
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #ifndef __LCUI_DRAW_H__
@@ -48,37 +48,37 @@ LCUI_BEGIN_HEADER
 
 int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des);
 /* 
- * ���ܣ���תͼ��
- * ˵����ָ����ת���ĵ������Լ���ת�Ƕȣ����ɵõ���ת���ͼ��
- * ��Դ����ο��Ի�������ش���
- * �㷨�д��Ż����ơ�
+ * 功能：旋转图形
+ * 说明：指定旋转中心点坐标以及旋转角度，即可得到旋转后的图形
+ * 本源代码参考自互联网相关代码
+ * 算法有待优化完善。
  */
 
 int load_bmp(const char *filepath, LCUI_Graph *out);
-/* �򿪲�����BMPͼƬ�ļ��ڵ�ͼ������ */
+/* 打开并载入BMP图片文件内的图形数据 */
 
 int load_jpeg(const char *filepath, LCUI_Graph *out);
-/* ���ܣ����벢����jpgͼƬ */
+/* 功能：载入并解码jpg图片 */
 
 int load_png(const char *filepath, LCUI_Graph *out);
-/* ����PNGͼƬ�е�ͼ������ */
+/* 载入PNG图片中的图形数据 */
 
 int write_png(const char *file_name, LCUI_Graph *graph);
-/* ��ͼ������д����png�ļ� */
+/* 将图像数据写入至png文件 */
 
 int Load_Image(const char *filepath, LCUI_Graph *out);
 /* 
- * ���ܣ�����ָ��ͼƬ�ļ���ͼ������
- * ˵������ͼƬ�ļ������������ڴ棬�򿪵�ͼƬ�ļ�Խ��ռ�õ��ڴ�Ҳ��Խ�� 
+ * 功能：载入指定图片文件的图形数据
+ * 说明：打开图片文件，并解码至内存，打开的图片文件越大，占用的内存也就越大 
  * */
 
 int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
-/* ��ͼ����и�˹ģ������ */ 
+/* 对图像进行高斯模糊处理 */ 
 
 int Graph_Smooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
-/* ��ͼ�����ģ������ */
+/* 对图像进行模糊处理 */
 int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height);
-/* ���ܣ����ƽ������Ŀղ� */ 
+/* 功能：绘制进度条的空槽 */ 
 
 LCUI_END_HEADER
 
