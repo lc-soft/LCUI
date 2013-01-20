@@ -246,10 +246,14 @@ Handle_Area_Update ()
 	thread_exit(NULL);
 }
 
-
-
 extern int Screen_Init();
 extern int Screen_Destroy();
+
+/* 获取当前FPS */
+int LCUI_GetFPS( void )
+{
+	return fps;
+}
 
 int Enable_Graph_Display()
 /* 功能：启用图形输出 */
