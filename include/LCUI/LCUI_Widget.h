@@ -446,8 +446,8 @@ void __Update_Widget(LCUI_Widget *widget);
  * 说明：与上个函数功能一样，但是，可以允许队列中有两条相同记录。
  * */
 
-void Front_Widget(LCUI_Widget *widget);
-/* 功能：将指定部件的显示位置移动到最前端 */ 
+/* 将指定部件显示在同等z-index值的部件的前端 */
+int Front_Widget( LCUI_Widget *widget );
 
 void Show_Widget(LCUI_Widget *widget);
 /* 功能：显示部件 */ 

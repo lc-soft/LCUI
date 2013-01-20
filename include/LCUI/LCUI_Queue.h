@@ -196,12 +196,6 @@ void WidgetQueue_Init(LCUI_Queue *queue);
 
 int WidgetQueue_Get_Pos(LCUI_Queue *queue, LCUI_Widget *widget);
 /* 功能：从部件队列中获取指定部件的排列位置 */ 
-
-int WidgetQueue_Move(LCUI_Queue *queue, int pos, LCUI_Widget *widget);
-/* 
- * 功能：移动指定部件在队列中的位置
- * 返回值：成功则返回部件的新位置，失败返回-1
- * */ 
 /************************ WidgetQueue End ******************************/
 
 
