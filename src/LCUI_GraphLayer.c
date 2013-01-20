@@ -183,13 +183,14 @@ int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index )
 	}
 	queue = &glayer->parent->child;
 	total = Queue_Get_Total( queue );
+
 	for( i=0; i<total; ++i ) {
 		tmp_child = Queue_Get( queue, i );
 		if( glayer == tmp_child ) {
 			/* 找到自己的位置 */
 			src_pos = i;
 			continue;
-		} else if( z_index < tmp_child->z_index ) {
+		} else if( glayer->z_index < tmp_child->z_index ) {
 			continue;
 		}
 		/* 找到需要移动至的位置 */
@@ -202,6 +203,10 @@ int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index )
 	/* 如果没有找到自己的位置或者目标位置 */
 	if( -1 == src_pos || -1 == des_pos ) {
 		return 2;
+	}
+	/* 若目标位置就在源位置后面，那就不需要移动位置 */
+	if( src_pos+1 == des_pos ) {
+		return 3;
 	}
 	Queue_Move( queue, des_pos, src_pos );
 	return 0;
@@ -507,6 +512,41 @@ skip_loop:
 		}
 	}
 	Destroy_Queue( &glayerQ );
+	return 0;
+}
+
+/* 将指定图层显示在同等z-index值图层的前端 */
+int GraphLayer_Front( LCUI_GraphLayer *glayer )
+{
+	int i, total, src_pos = -1, des_pos = -1;
+	LCUI_GraphLayer *tmp_child;
+	LCUI_Queue *queue;
+	
+	if( !glayer || !glayer->parent ) {
+		return -1;
+	}
+	queue = &glayer->parent->child;
+	total = Queue_Get_Total( queue );
+	for( i=0; i<total; ++i ) {
+		tmp_child = Queue_Get( queue, i );
+		if( glayer == tmp_child ) {
+			src_pos = i;
+			continue;
+		} else if( glayer->z_index < tmp_child->z_index ) {
+			continue;
+		}
+		des_pos = i;
+		if( src_pos != -1 ) {
+			break;
+		}
+	}
+	if( -1 == src_pos || -1 == des_pos ) {
+		return 1;
+	}
+	if( src_pos+1 == des_pos ) {
+		return 2;
+	}
+	Queue_Move( queue, des_pos, src_pos );
 	return 0;
 }
 
