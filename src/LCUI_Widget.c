@@ -687,8 +687,10 @@ int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 	if (rect.width <= 0 || rect.height <= 0) { 
 		return -1;
 	}
-	
-	/* 调整矩形位置及尺寸 */
+	/* 加上内边距 */
+	rect.x += widget->padding.left;
+	rect.y += widget->padding.top;
+	/* 根据部件所在容器的尺寸，调整矩形位置及尺寸 */
 	rect = Get_Valid_Area( Get_Widget_Size(widget), rect );
 	if( widget->visible ) {
 		LCUI_Sys.need_sync_area = TRUE; 
@@ -955,94 +957,6 @@ int Widget_Is_Active(LCUI_Widget *widget)
 		return 1;
 	}
 	return 0;
-}
-
-LCUI_Rect Get_Widget_Valid_Rect(LCUI_Widget *widget)
-/* 
- * 功能：获取部件在屏幕中实际显示的区域 
- * 说明：返回的是部件需要裁剪的区域
- * */
-{
-	int temp; 
-	LCUI_Pos pos;
-	LCUI_Rect area;
-	LCUI_Rect cut_rect;
-	
-	cut_rect.x = 0;
-	cut_rect.y = 0;
-	cut_rect.width = widget->size.w;
-	cut_rect.height = widget->size.h;
-	pos = widget->pos;
-	
-	if( !widget->parent ) {
-		area.x = area.y = 0;
-		area.width = Get_Screen_Width();
-		area.height = Get_Screen_Height(); 
-	} else {
-		area.x = widget->parent->padding.left;
-		area.y = widget->parent->padding.top;
-		area.width = _Get_Widget_Container_Width( widget );
-		area.height = _Get_Widget_Container_Height( widget );
-	}
-	/* 获取需裁剪的区域 */
-	if(pos.x < area.x) {
-		cut_rect.x = area.x - pos.x; 
-		cut_rect.width -= cut_rect.x;
-	}
-	if(pos.x + widget->size.w - area.x > area.width) {
-		cut_rect.width -= pos.x;
-		cut_rect.width += area.x;
-		cut_rect.width -= widget->size.w;
-		cut_rect.width += area.width;
-	}
-	if(pos.y < area.y) {
-		cut_rect.y = area.y - pos.y; 
-		cut_rect.height -= cut_rect.y;
-	}
-	if(pos.y + widget->size.h - area.y > area.height) {
-		cut_rect.height -= pos.y;
-		cut_rect.height += area.y;
-		cut_rect.height -= widget->size.h;
-		cut_rect.height += area.height;
-	}
-	if( !widget->parent ) {
-		return cut_rect;
-	}
-		
-	LCUI_Rect rect;
-	/* 获取父部件的有效显示范围 */
-	rect = Get_Widget_Valid_Rect( widget->parent );
-	/* 如果父部件需要裁剪，那么，子部件根据情况，也需要进行裁剪 */
-	if(rect.x > area.x) {/* 如果裁剪区域的x轴坐标大于容器区域的x轴起点坐标 */
-		/* 裁剪区域和部件区域是在同一容器中，只要得出两个区域的重叠区域即可 */
-		temp = pos.x + cut_rect.x;
-		if(temp < rect.x) { /* 如果部件的 x轴坐标+裁剪起点x轴坐标 小于它 */
-			temp = rect.x - pos.x;		/* 得出新的裁剪区域起点x轴坐标 */
-			cut_rect.width -= (temp - cut_rect.x);/* 改变裁剪区域的宽度 */
-			cut_rect.x = temp;			/* 改变部件的裁剪区域的x坐标 */
-		}
-	}
-	if(rect.y > area.y) {
-		temp = pos.y + cut_rect.y;
-		if(pos.y < rect.y) {
-			temp = rect.y - pos.y;
-			cut_rect.height -= (temp - cut_rect.y);
-			cut_rect.y = temp;
-		}
-	}
-	if(rect.x+rect.width < area.x+area.width) {/* 如果父部件裁剪区域的宽度小于容器区域的宽度 */
-		temp = pos.x+cut_rect.x+cut_rect.width;
-		if(temp > rect.x+rect.width) {/* 如果部件裁剪区域左边部分与父部件裁剪区域重叠 */
-			cut_rect.width -= (temp-(rect.x+rect.width));
-		}
-	}
-	if(rect.y+rect.height < area.y+area.height) {
-		temp = pos.y+cut_rect.y+cut_rect.height;
-		if(temp > rect.y+rect.height) {
-			cut_rect.height -= (temp-(rect.y+rect.height));
-		}
-	}
-	return cut_rect;
 }
 
 int Empty_Widget()
@@ -1504,6 +1418,8 @@ void Exec_Move_Widget( LCUI_Widget *widget, LCUI_Pos pos )
 	/* 如果图层是显示的，并且位置变动，那就需要添加无效区域 */
 	if( widget->visible ) {
 		rect = Get_Widget_Rect( widget );
+		//_DEBUG_MSG("old:%d,%d,%d,%d\n", 
+		// rect.x, rect.y, rect.width, rect.height);
 		Widget_InvalidArea( widget->parent, rect );
 		widget->pos = pos;
 		if( widget->parent ) {
@@ -1514,6 +1430,10 @@ void Exec_Move_Widget( LCUI_Widget *widget, LCUI_Pos pos )
 			rect.x = pos.x;
 			rect.y = pos.y;
 		}
+		rect.x = pos.x;
+		rect.y = pos.y;
+		//_DEBUG_MSG("new:%d,%d,%d,%d\n",
+		// rect.x, rect.y, rect.width, rect.height);
 		Widget_InvalidArea( widget->parent, rect );
 	} else {
 		/* 否则，直接改坐标 */
@@ -1670,9 +1590,9 @@ void Widget_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode )
 void Exec_Refresh_Widget(LCUI_Widget *widget)
 /* 功能：执行刷新显示指定部件的整个区域图形的操作 */
 { 
-	DEBUG_MSG("refresh widget: %d,%d,%d,%d\n", 
-		Get_Widget_Rect(widget).x, Get_Widget_Rect(widget).y, 
-		Get_Widget_Rect(widget).width, Get_Widget_Rect(widget).height );
+	//_DEBUG_MSG("refresh widget: %d,%d,%d,%d\n", 
+	//	Get_Widget_Rect(widget).x, Get_Widget_Rect(widget).y, 
+	//	Get_Widget_Rect(widget).width, Get_Widget_Rect(widget).height );
 	Widget_InvalidArea( widget->parent, Get_Widget_Rect(widget) );
 }
 
