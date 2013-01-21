@@ -20,6 +20,7 @@ LCUI_SOURCES = \
 	LCUI_Queue.c		\
 	LCUI_Graph.c		\
 	LCUI_GraphLayer.c	\
+	LCUI_StyleLibrary.c	\
 	LCUI_Work.c		\
 	LCUI_Cursor.c		\
 	LCUI_Widget.c		\
