@@ -19,7 +19,7 @@ typedef struct {
 LCUI_BEGIN_HEADER
 
 /* 初始化样式库 */
-void StypeLib_Init( LCUI_StyleLibrary *lib );
+void StyleLib_Init( LCUI_StyleLibrary *lib );
 
 void StyleAttr_Init( LCUI_StyleAttr *attr );
 
@@ -53,8 +53,8 @@ int StyleClass_GetStyleAttrValue(	LCUI_StyleClass *style_class,
 					const char *attr_name,
 					char *attr_buff );
 
-/* 为样式类添加样式属性值 */
-int StyleLib_SetStyleAttrValue(	LCUI_StyleClass *style_class,
+/* 为样式类添加样式属性 */
+int StyleClass_SetStyleAttr(	LCUI_StyleClass *style_class,
 				const char *pseudo_class_name,
 				const char *attr_name,
 				const char *attr_value );

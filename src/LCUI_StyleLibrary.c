@@ -1,8 +1,10 @@
+//#define DEBUG1
+
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_STYLE_LIBRARY_H
 /* 初始化样式库 */
-void StypeLib_Init( LCUI_StyleLibrary *lib )
+void StyleLib_Init( LCUI_StyleLibrary *lib )
 {
 	Queue_Init(	&lib->style_classes, 
 			sizeof(LCUI_StyleClass), 
@@ -123,8 +125,8 @@ int StyleClass_GetStyleAttrValue(	LCUI_StyleClass *style_class,
 	return 0;
 }
 
-/* 为样式类添加样式属性值 */
-int StyleLib_SetStyleAttrValue(	LCUI_StyleClass *style_class,
+/* 为样式类添加样式属性 */
+int StyleClass_SetStyleAttr(	LCUI_StyleClass *style_class,
 				const char *pseudo_class_name,
 				const char *attr_name,
 				const char *attr_value )
@@ -159,6 +161,73 @@ int StyleLib_SetStyleAttrValue(	LCUI_StyleClass *style_class,
 int StyleLib_AddStyleFromString(	LCUI_StyleLibrary *lib,
 					const char *style_string )
 {
+	int		i;
+	const char	*cur, *max;
+	char		name_buff[256], value_buff[256];
+	BOOL		save_class_name = FALSE, 
+			save_attr_name = FALSE, 
+			save_attr_value = FALSE;
+	
+	LCUI_StyleClass *cur_style = NULL;
+	
+	cur = style_string;
+	max = cur + strlen( style_string );
+	for( i=0; cur < max; ++cur ) {
+		DEBUG_MSG1("*cur: %c\n", *cur);
+		DEBUG_MSG1("%d,%d\n", save_class_name, save_attr_name);
+		switch( *cur ) {
+		case '\n':
+		case '\t':break;
+		case '}':
+		case ' ':
+			if( save_attr_name ) {
+				i = 0; break;
+			} else if( save_attr_value && i == 0 ) {
+				break;
+			} else {
+				break;
+			}
+		case ';':
+			if( save_attr_value ) {
+				value_buff[i] = 0; i = 0;
+				StyleClass_SetStyleAttr( cur_style, NULL, name_buff, value_buff );
+				save_attr_name = TRUE;
+				save_attr_value = FALSE;
+				DEBUG_MSG1("add attr: %s = %s\n", name_buff, value_buff);
+				break;
+			}
+		case ':':
+			if( save_attr_name ) {
+				name_buff[i] = 0; i = 0;
+				save_attr_name = FALSE;
+				save_attr_value = TRUE;
+				DEBUG_MSG1("end save, attr name: %s\n", name_buff);
+				break;
+			}
+		case '{': 
+			if( save_class_name ) {
+				name_buff[i] = 0; i = 0;
+				save_class_name = FALSE;
+				save_attr_name = TRUE;
+				cur_style = StyleLib_AddStyleClass( lib, name_buff );
+				DEBUG_MSG1("add class: %s\n", name_buff);
+				break;
+			}
+		case '.':
+			if( !save_class_name ) {
+				save_class_name = TRUE; i = 0; break;
+			}
+		default:
+			if( save_class_name || save_attr_name ) {
+				DEBUG_MSG1("name_buff[%d]: %c\n", i, *cur);
+				name_buff[i] = *cur; ++i;
+			} else if( save_attr_value ) {
+				DEBUG_MSG1("value_buff[%d]: %c\n", i, *cur);
+				value_buff[i] = *cur; ++i;
+			}
+			break;
+		}
+	}
 	return 0;
 }
 
