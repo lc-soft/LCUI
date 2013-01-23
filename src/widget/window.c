@@ -399,14 +399,14 @@ Show_Window(LCUI_Widget *win_p)
 	LCUI_Pos pos;
 	LCUI_Window *win;
 	
-	win = (LCUI_Window*)Get_Widget_PrivData(win_p); 
+	win = Get_Widget_PrivData( win_p );
 	win->count++;
 	/* 如果是第一次显示 */
-	if(win->count == 1) { 
+	if(win->count == 1) {
 		ctnr_size = _Get_Widget_Container_Size( win_p );
 		size = _Get_Widget_Size( win_p );
 		pos = Align_Get_Pos( ctnr_size, size, win->init_align );
-		Move_Widget( win_p, pos );
+		Exec_Move_Widget( win_p, pos );
 	}
 	//有待扩展 
 }
