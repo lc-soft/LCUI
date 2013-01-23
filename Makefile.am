@@ -7,6 +7,7 @@ pkgconfig_DATA = $(PACKAGE).pc
 
 EXTRA_DIST=README README.zh-cn.md README.md fonts/README.zh-cn \
 docs/LICENSE.TXT docs/CHANGES docs/CHANGES.zh-cn docs/FAQ docs/FAQ.zh-cn\
+docs/CodingStyle.zh-cn.md \
 docs/html/zh-cn/design/index.html \
 docs/html/us-en/design/index.html \
 test/README.zh-cn \
