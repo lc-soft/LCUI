@@ -6,6 +6,7 @@
 
 不管你的屏幕有多大，每一行的代码长度应该限制在80列以内，在阅读代码时，视线主要从上往下
 移动，每行代码太长的话，视线移动范围会变大，容易引起视觉疲劳。
+
 而在github等一些网站上，网页会限制每行能显示的字符数，如果网页是自动对超出范围的字符进
 行换行，那么代码过长可能会使整个代码变的混乱；如果是显示滚动条，通过拖动滚动条浏览未显
 示出来的代码，这很麻烦。
@@ -13,6 +14,7 @@
 ##函数
 
 函数名的命名方式为：函数类/对象/模块名_操作+对象属性
+
 每个单词首字母应该大写，这样更容易区分出单词，因为个人感觉多（M）个单词缩写的混合体会让
 人误以为是几（N，N<M）个单词。
 
@@ -39,17 +41,17 @@
 如果改了后还是比较长的话，可以对参数列表进行修改：
 
 	static MyType* 
-	ObjectName_OperateAttribute(	XXXX *object,	XXXX arg1,
-					XXXX arg2,	XXXX arg3 )
+	ObjectName_OperateAttribute(    XXXX *object,   XXXX arg1,
+	                                XXXX arg2,      XXXX arg3 )
 
-使用制表符缩进，调整参数列表中的参数的位置。
+使用制表符缩进，调整参数列表中的参数的位置，保持对齐。
 
 如果还是比较长的话，可以将函数名中的单词改成缩写，或者使用其它意思相同但比较短的单词，
 像这样：
 
 	static MyType* 
-	ObjName_OptAttr(	XXXX *object, XXXX arg1,
-				XXXX arg2, XXXX arg3 )
+	ObjName_OptAttr( XXXX *object, XXXX arg1,
+	                 XXXX arg2,    XXXX arg3 )
 
 调用函数时，代码应该类似于这样：
 
@@ -60,7 +62,3 @@
 	func (arg1, arg2, arg3, arg4);
 
 函数名与()之间空一格。
-
-
-
-
