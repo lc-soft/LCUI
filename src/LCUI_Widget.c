@@ -695,6 +695,7 @@ int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 	if( widget->visible ) {
 		LCUI_Sys.need_sync_area = TRUE; 
 	}
+	
 	//_DEBUG_MSG("add rect: %d,%d,%d,%d\n", 
 	//	rect.x, rect.y, rect.width, rect.height );
 	
@@ -1400,7 +1401,6 @@ void Exec_Move_Widget( LCUI_Widget *widget, LCUI_Pos pos )
 	if( !widget ) {
 		return;
 	}
-	//_DEBUG_MSG("pos: %d,%d\n", pos.x, pos.y);
 	max_pos = Get_Widget_MaxPos( widget );
 	min_pos = Get_Widget_MinPos( widget );
 	
@@ -1424,14 +1424,6 @@ void Exec_Move_Widget( LCUI_Widget *widget, LCUI_Pos pos )
 		// rect.x, rect.y, rect.width, rect.height);
 		Widget_InvalidArea( widget->parent, rect );
 		widget->pos = pos;
-		if( widget->parent ) {
-			/* 加上容器的内边距 */
-			rect.x = pos.x + widget->parent->padding.left;
-			rect.y = pos.y + widget->parent->padding.top;
-		} else {
-			rect.x = pos.x;
-			rect.y = pos.y;
-		}
 		rect.x = pos.x;
 		rect.y = pos.y;
 		//_DEBUG_MSG("new:%d,%d,%d,%d\n",
@@ -1472,15 +1464,14 @@ void Exec_Show_Widget(LCUI_Widget *widget)
 		return; 
 	}
 	
-	Widget_Visible( widget, TRUE ); /* 部件可见 */
-	if( widget->focus ) {
-		Set_Focus( widget );	/* 将焦点给该部件 */
-	}
-	
 	/* 调用该部件在显示时需要用到的函数 */
 	func_show = Get_WidgetFunc_By_ID(widget->type_id, FUNC_TYPE_SHOW); 
 	func_show( widget );
 	
+	Widget_Visible( widget, TRUE ); /* 部件可见 */
+	if( widget->focus ) {
+		Set_Focus( widget );	/* 将焦点给该部件 */
+	}
 	Refresh_Widget( widget ); /* 刷新部件所在区域的图形显示 */
 }
 
@@ -1687,7 +1678,7 @@ void Move_Widget(LCUI_Widget *widget, LCUI_Pos new_pos)
 {
 	if( !widget ) {
 		return; 
-	} 
+	}
 	widget->x.px = new_pos.x;
 	widget->y.px = new_pos.y;
 	/* 记录部件的更新数据，等待进行更新 */
@@ -1704,10 +1695,13 @@ void Exec_Update_Widget_Pos( LCUI_Widget *widget )
 /* 更新部件的位置，以及位置变动范围 */
 {
 	LCUI_Pos pos; 
-	pos = _Get_Widget_Pos( widget ); 
+	pos = _Get_Widget_Pos( widget );
 	widget->max_pos = _Get_Widget_MaxPos( widget );
 	widget->min_pos = _Get_Widget_MinPos( widget );
-	Exec_Move_Widget(widget, pos);
+	/* 只有在部件对齐方式不为ALIGN_NONE，或者计算的坐标不为(0,0)时改变位置 */
+	if( widget->align != ALIGN_NONE || (pos.x != 0 && pos.y != 0)) {
+		Exec_Move_Widget( widget, pos );
+	}
 }
 
 void Update_Widget_Size( LCUI_Widget *widget )
@@ -2071,46 +2065,46 @@ Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type, int flag)
 		tmp_ptr = Queue_Get( &widget->data_buff, i );
 		if( !tmp_ptr ) { 
 			continue;
-		} 
-		/* 如果已经存在 */ 
-		if(tmp_ptr->type == temp.type) {
-			++n_found;
-			/* 如果已存在的数量少于2 */
-			if( flag == 1 && n_found < 2 ) {
-				continue;
-			}
-			/* 否则，需要进行替换 */
-			if( type == DATATYPE_AREA ) {
-				DEBUG_MSG("search result: the recod at %d\n", i);
-			}
-			switch(type) {
-			    case DATATYPE_POS :
-				if(temp.valid) {
-					tmp_ptr->data.pos = temp.data.pos;
-				}
-				break;
-			    case DATATYPE_SIZE :
-				if(temp.valid) {
-					tmp_ptr->data.size = temp.data.size;
-				}
-				break;
-			    case DATATYPE_STATUS :
-				if(temp.valid) {
-					tmp_ptr->data.status = temp.data.status;
-				}
-				break;
-			    case DATATYPE_GRAPH	: 
-			    case DATATYPE_AREA:
-			    case DATATYPE_HIDE:
-			    case DATATYPE_POS_TYPE:
-			    case DATATYPE_UPDATE:
-			    case DATATYPE_SHOW:
-				temp.valid = FALSE;
-				break;
-			    default: return -1;
+		}
+		if(tmp_ptr->type != temp.type) {
+			continue;
+		}
+		++n_found;
+		/* 如果已存在的数量少于2 */
+		if( flag == 1 && n_found < 2 ) {
+			continue;
+		}
+		/* 否则，需要进行替换 */
+		if( type == DATATYPE_AREA ) {
+			DEBUG_MSG("search result: the recod at %d\n", i);
+		}
+		switch(type) {
+		    case DATATYPE_POS :
+			if(temp.valid) {
+				tmp_ptr->data.pos = temp.data.pos;
 			}
 			break;
+		    case DATATYPE_SIZE :
+			if(temp.valid) {
+				tmp_ptr->data.size = temp.data.size;
+			}
+			break;
+		    case DATATYPE_STATUS :
+			if(temp.valid) {
+				tmp_ptr->data.status = temp.data.status;
+			}
+			break;
+		    case DATATYPE_GRAPH	: 
+		    case DATATYPE_AREA:
+		    case DATATYPE_HIDE:
+		    case DATATYPE_POS_TYPE:
+		    case DATATYPE_UPDATE:
+		    case DATATYPE_SHOW:
+			temp.valid = FALSE;
+			break;
+		    default: return -1;
 		}
+		break;
 	}
 	/* 未找到，则添加新的 */
 	if( i>= total ) {
