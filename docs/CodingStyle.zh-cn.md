@@ -46,6 +46,7 @@
 
 如果还是比较长的话，可以将函数名中的单词改成缩写，或者使用其它意思相同但比较短的单词，
 像这样：
+
 	static MyType* 
 	ObjName_OptAttr(	XXXX *object, XXXX arg1,
 				XXXX arg2, XXXX arg3 )
