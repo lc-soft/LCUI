@@ -41,7 +41,6 @@
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include LC_MISC_H
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 #include LC_DISPLAY_H
@@ -61,25 +60,24 @@ LCUI_Mouse;
 /*************************************************************/
 
 static LCUI_Mouse mouse_data;
-static LCUI_MouseEvent mouse_event;
 
 /****************************** Mouse *********************************/
-int Mouse_LeftButton(LCUI_MouseEvent *event)
+int Mouse_LeftButton( LCUI_Event *event )
 /*
  * 功能：检测鼠标事件中鼠标左键的状态
  * 说明：该函数只适用于响应鼠标按键状态发生改变时，判断按键状态。
  * 返回值：
- *   -2  事件指针为NULL
+ *   -2  事件无效
  *   -1  键值不是鼠标左键的键值
  *   0   鼠标左键已经释放
  *   1   鼠标左键处于按下状态
  **/
 {
-	if(NULL == event) {
+	if( !event ) {
 		return -2;
 	}
-	else if(event->key.code == MOUSE_LEFT_KEY) {
-		return event->key.status; 
+	else if(event->button.button == MOUSE_LEFT_KEY) {
+		return event->button.state;
 	}
 	return -1;
 }
@@ -104,12 +102,12 @@ int Mouse_RightButton(LCUI_MouseEvent *event)
 	return -1;
 }
 
-int Click_LeftButton (LCUI_MouseEvent *event)
+int Click_LeftButton (LCUI_Event *event)
 /* 功能：检测是否是按鼠标左键 */
 {
 	/* 如果按下的是鼠标左键，并且之前没有按住它 */
 	if (Mouse_LeftButton(event) == PRESSED
-		&& !Find_Pressed_Key(event->key.code)) {
+		&& !Find_Pressed_Key(event->button.button)) {
 		return 1;
 	}
 	return 0;
@@ -155,12 +153,14 @@ int KeyQueue_Find(LCUI_Queue *queue, int key_code)
 	return -1;
 } 
 
-static void Press_MouseKey(LCUI_MouseEvent *event, int key_code)
-/* 功能：记录被按下的指定键的键值，并发布相应事件 */
+/* 记录被按下的指定键的键值，并添加LCUI_MOUSEBUTTONDOWN事件 */
+static void Press_MouseKey( LCUI_Pos pos, int key_code )
 {
-	int temp; 
+	int temp;
+	LCUI_Event event;
+	
 	/* 若该键已经按下，就不需要再添加至队列了 */
-	temp = KeyQueue_Find(&LCUI_Sys.press_key, key_code);
+	temp = KeyQueue_Find( &LCUI_Sys.press_key, key_code );
 	if(temp >= 0) {
 		return;
 	}
@@ -168,63 +168,84 @@ static void Press_MouseKey(LCUI_MouseEvent *event, int key_code)
 	if( temp < 0 ) {
 		return;
 	}
-	event->key.code = key_code; /* 保存键值 */
-	event->key.status = PRESSED;/* 保存状态 */
-	Send_Mouse_Event(MOUSE_EVENT_CLICK, event); 
+	event.type = LCUI_MOUSEBUTTONDOWN;
+	event.button.x = pos.x;
+	event.button.y = pos.y;
+	event.button.button = key_code;
+	event.button.state = PRESSED;
+	LCUI_PushEvent( &event );
 }
 
-static void Free_MouseKey(LCUI_MouseEvent *event, int key_code)
-/* 功能：记录被释放的指定键的键值，并发布相应事件 */
+/* 记录被释放的指定键的键值，并添加LCUI_MOUSEBUTTONUP事件 */
+static void Free_MouseKey( LCUI_Pos pos, int key_code )
 {
-	int pos; 
-	pos = KeyQueue_Find(&LCUI_Sys.press_key, key_code);
-	if(pos < 0) {
+	int n;
+	LCUI_Event event;
+	
+	n = KeyQueue_Find(&LCUI_Sys.press_key, key_code);
+	if(n < 0) {
 		return; 
 	}
-	if( Queue_Delete(&LCUI_Sys.press_key, pos) ) {
-		event->key.code = key_code;
-		event->key.status = FREE; 
-		Send_Mouse_Event(MOUSE_EVENT_CLICK, event);
+	if( Queue_Delete(&LCUI_Sys.press_key, n) ) {
+		event.type = LCUI_MOUSEBUTTONUP;
+		event.button.x = pos.x;
+		event.button.y = pos.y;
+		event.button.button = key_code;
+		event.button.state = FREE;
+		LCUI_PushEvent( &event );
 	}
 }
 
-void Handle_Mouse_Event(int button_type, LCUI_MouseEvent *event)
 /* 功能：处理鼠标产生的事件 */
+void Handle_Mouse_Event( LCUI_Pos new_pos, int button_type )
 {
-	static LCUI_Pos old_pos;/* 保存鼠标之前的坐标 */
+	int key_state = FREE;
+	static LCUI_Pos old_pos;
+	
 	switch (button_type) {
 	    case 1:		/* 鼠标左键被按下 */
-		Press_MouseKey(event, MOUSE_LEFT_KEY); 
-		Free_MouseKey(event, MOUSE_RIGHT_KEY);
+		Press_MouseKey( new_pos, MOUSE_LEFT_KEY );
+		key_state = PRESSED;
+		Free_MouseKey( new_pos, MOUSE_RIGHT_KEY );
 		break;
 	    case 2:		/* 鼠标右键被按下 */
-		Press_MouseKey(event, MOUSE_RIGHT_KEY); 
-		Free_MouseKey(event, MOUSE_LEFT_KEY); 
+		Press_MouseKey( new_pos, MOUSE_RIGHT_KEY );
+		Free_MouseKey( new_pos, MOUSE_LEFT_KEY );
+		key_state = FREE;
 		break;
 	    case 3:		/* 鼠标左右键被按下 */
-		Press_MouseKey(event, MOUSE_RIGHT_KEY); 
-		Press_MouseKey(event, MOUSE_LEFT_KEY); 
+		Press_MouseKey( new_pos, MOUSE_RIGHT_KEY ); 
+		Press_MouseKey( new_pos, MOUSE_LEFT_KEY ); 
+		key_state = PRESSED;
 		break;
 	    default:		/* 默认是释放的 */
-		Free_MouseKey(event, MOUSE_RIGHT_KEY); 
-		Free_MouseKey(event, MOUSE_LEFT_KEY); 
+		Free_MouseKey( new_pos, MOUSE_RIGHT_KEY );
+		Free_MouseKey( new_pos, MOUSE_LEFT_KEY );
+		key_state = FREE;
 		break;
 	}
 	
 	/* 如果鼠标位置有改变 */
-	if(Pos_Cmp(event->global_pos, old_pos) != 0) {
-		Send_Mouse_Event(MOUSE_EVENT_MOVE, event);/* 触发事件 */ 
-		old_pos = event->global_pos;
+	if(Pos_Cmp( new_pos, old_pos ) != 0) {
+		LCUI_Event event;
+		event.type = LCUI_MOUSEMOTION;
+		event.motion.x = new_pos.x;
+		event.motion.y = new_pos.y;
+		event.motion.xrel = new_pos.x - old_pos.x;
+		event.motion.yrel = new_pos.y - old_pos.y;
+		event.motion.state = key_state;
+		LCUI_PushEvent( &event );
+		old_pos = new_pos;
 	}
 }
 
 static BOOL proc_mouse( void *arg )
 {
-	int  temp, button, retval; 
-	char buf[6]; 
-	fd_set readfds; 
-	struct timeval tv;
-	LCUI_Pos pos; 
+	static int  tmp; 
+	static char buf[6]; 
+	static fd_set readfds; 
+	static struct timeval tv;
+	static LCUI_Pos pos;
 	
 	if (mouse_data.status == REMOVE || mouse_data.fd < 0) {
 		return FALSE;
@@ -236,17 +257,17 @@ static BOOL proc_mouse( void *arg )
 	FD_ZERO (&readfds);
 	FD_SET (mouse_data.fd, &readfds);
 
-	retval = select (mouse_data.fd + 1, &readfds, NULL, NULL, &tv);
-	if (retval == 0) {
+	tmp = select (mouse_data.fd+1, &readfds, NULL, NULL, &tv);
+	if (tmp == 0) {
 		//printf("Time out!\n");
 		return FALSE;
 	}
 	if ( !FD_ISSET (mouse_data.fd, &readfds) ) {
 		return FALSE;
 	}
-	temp = read (mouse_data.fd, buf, 6);
-	if (temp <= 0){
-		if (temp < 0) {
+	tmp = read (mouse_data.fd, buf, 6);
+	if (tmp <= 0){
+		if (tmp < 0) {
 			mouse_data.status = REMOVE;
 		}
 		return FALSE;
@@ -263,22 +284,10 @@ static BOOL proc_mouse( void *arg )
 		pos.y = Get_Screen_Height ();
 	}
 	pos.x = pos.x<0 ? 0:pos.x; 
-	pos.y = pos.y<0 ? 0:pos.y; 
-	/* 设定游标位置 */ 
-	Set_Cursor_Pos (pos);
+	pos.y = pos.y<0 ? 0:pos.y;
 	
-	button = (buf[0] & 0x07);
-	//printf("x:%d, y:%d, button:%d\n", pos.x, pos.y, button);
-	mouse_event.global_pos = pos; 
-	
-	mouse_event.widget = Widget_At( NULL, pos ); 
-	if( mouse_event.widget ) {
-		mouse_event.pos = GlobalPos_ConvTo_RelativePos( mouse_event.widget, pos );
-	} else { 
-		mouse_event.pos = pos;
-	}
 	/* 处理鼠标事件 */
-	Handle_Mouse_Event( button, &mouse_event );
+	Handle_Mouse_Event( pos, buf[0] & 0x07 );
 	return TRUE;
 }
 

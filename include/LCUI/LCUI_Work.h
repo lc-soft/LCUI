@@ -182,6 +182,17 @@ int Widget_Clicked_Event_Connect (
 void Widget_Event_Init();
 /* 功能：初始化部件事件处理 */ 
 
+/* 响应鼠标按键按下事件 */
+void LCUI_HandleMouseButtonDown( LCUI_Event *event );
+
+/* 响应鼠标按键释放事件 */
+void LCUI_HandleMouseButtonUp( LCUI_Event *event );
+
+/* 
+ * 功能：跟踪鼠标移动，处理触发的基本事件
+ * 说明：这只是根据鼠标事件来处理部件状态的切换
+ * */
+void LCUI_HandleMouseMotion( LCUI_Event *event );
 
 /*--------------------------- Focus Proc ------------------------------*/
 BOOL 

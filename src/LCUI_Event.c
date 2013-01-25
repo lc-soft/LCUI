@@ -1,52 +1,109 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_ERROR_H
-#include LC_EVENT_H
+#include <unistd.h>
 
-void AppEventQueue_Init( LCUI_App *app )
+static LCUI_Queue events;
+static BOOL active = FALSE;
+static thread_t eventloop_thread = -1;
+
+void LCUI_EventsInit( void )
 {
-	Queue_Init( &app->events, sizeof(LCUI_Event), NULL );
+	Queue_Init( &events, sizeof(LCUI_Event), NULL );
 }
 
-BOOL _LCUI_PollEvent( LCUI_App *app, LCUI_Event *event )
+void LCUI_DestroyEvents( void )
 {
-	LCUI_Event *tmp;
-	
-	if( !app ) {
-		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP );
-	}
-	Queue_Lock( &app->events );
-	tmp = Queue_Get( &app->events, 0 );
-	if( !tmp ) {
-		Queue_UnLock( &app->events );
-		return FALSE;
-	}
-	*event = *tmp;
-	Queue_Delete( &app->events, 0 );
-	Queue_UnLock( &app->events );
-	return TRUE;
+	Destroy_Queue( &events );
 }
 
 BOOL LCUI_PollEvent( LCUI_Event *event )
 {
-	return _LCUI_PollEvent( Get_Self_AppPointer(), event );
-}
-
-BOOL _LCUI_PushEvent( LCUI_App *app, LCUI_Event *event )
-{
-	if( !app ) {
-		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP );
-	}
-	Queue_Lock( &app->events );
-	if(Queue_Add( &app->events, event ) < 0) {
-		Queue_UnLock( &app->events );
+	LCUI_Event *tmp;
+	
+	if( !active ) {
 		return FALSE;
 	}
-	Queue_UnLock( &app->events );
+	
+	Queue_Lock( &events );
+	tmp = Queue_Get( &events, 0 );
+	if( !tmp ) {
+		Queue_UnLock( &events );
+		return FALSE;
+	}
+	*event = *tmp;
+	Queue_Delete( &events, 0 );
+	Queue_UnLock( &events );
 	return TRUE;
+}
+
+static void *LCUI_EventLoop( void *unused )
+{
+	LCUI_Event event;
+	int need_delay = FALSE, delay_time = 1500;
+	
+	while( active ) {
+		need_delay = TRUE;
+		while( LCUI_PollEvent( &event ) ) {
+			need_delay = FALSE;
+			switch( event.type ) {
+			case LCUI_KEYDOWN:
+				
+				break;
+			case LCUI_MOUSEMOTION:
+				LCUI_HandleMouseMotion( &event );
+				break;
+			case LCUI_MOUSEBUTTONDOWN:
+				LCUI_HandleMouseButtonDown( &event );
+				break;
+			case LCUI_MOUSEBUTTONUP:
+				LCUI_HandleMouseButtonUp( &event );
+				break;
+			case LCUI_USEREVENT:
+				
+				break;
+			}
+		}
+		if( need_delay ) {
+			if( delay_time <= 15000 ) {
+				delay_time += 1500;
+			}
+			usleep( delay_time );
+		} else {
+			delay_time = 1500;
+		}
+	}
+	thread_exit( NULL );
+}
+
+void LCUI_StopEventThread( void )
+{
+	if( !active ) {
+		return;
+	}
+	active = FALSE;
+	thread_join( eventloop_thread, NULL );
+}
+
+int LCUI_StartEventThread( void )
+{
+	LCUI_StopEventThread();
+	active = TRUE;
+	return thread_create(	&eventloop_thread, NULL, 
+				LCUI_EventLoop, NULL );
 }
 
 BOOL LCUI_PushEvent( LCUI_Event *event )
 {
-	return _LCUI_PushEvent( Get_Self_AppPointer(), event );
+	if( !active ) {
+		return FALSE;
+	}
+	Queue_Lock( &events );
+	if(Queue_Add( &events, event ) < 0) {
+		Queue_UnLock( &events );
+		return FALSE;
+	}
+	Queue_UnLock( &events );
+	return TRUE;
 }
+

@@ -10,10 +10,6 @@ typedef struct {
 
 typedef struct {
 	uint8_t type;
-} LCUI_QuitEvent;
-
-typedef struct {
-	uint8_t type;
 	int code;
 	void *data1;
 	void *data2;
@@ -47,18 +43,18 @@ typedef union {
 	LCUI_KeyboardEvent key;
 	LCUI_MouseMotionEvent motion;
 	LCUI_MouseButtonEvent button;
-	LCUI_QuitEvent quit;
 	LCUI_UserEvent user;
 } LCUI_Event;
 
-void AppEventQueue_Init( LCUI_App *app );
+void LCUI_EventsInit( void );
 
-BOOL _LCUI_PollEvent( LCUI_App *app, LCUI_Event *event );
+void LCUI_DestroyEvents( void );
 
 BOOL LCUI_PollEvent( LCUI_Event *event );
 
-BOOL _LCUI_PushEvent( LCUI_App *app, LCUI_Event *event );
+void LCUI_StopEventThread( void );
+
+int LCUI_StartEventThread( void );
 
 BOOL LCUI_PushEvent( LCUI_Event *event );
-
 #endif

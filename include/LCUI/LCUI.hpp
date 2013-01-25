@@ -54,7 +54,7 @@ typedef class _LCUIApp
 	}
 	void quit()
 	{
-		Main_Loop_Quit();
+		LCUI_StopMainLoop();
 	}
 }LCUIApp;
 

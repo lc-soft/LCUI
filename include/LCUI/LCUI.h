@@ -381,6 +381,7 @@ struct _LCUI_WString
 /*****************************************/
 
 #include LC_QUEUE_H
+#include LC_EVENT_H
 #include LC_WORK_H
 #include LC_THREAD_H
 

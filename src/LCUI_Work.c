@@ -40,8 +40,6 @@
 //#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include LC_WORK_H 
-#include LC_MISC_H
 #include LC_ERROR_H
 #include LC_INPUT_H
 #include LC_WIDGET_H
@@ -523,14 +521,15 @@ Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
 }
 
 static void 
-_Start_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
+_Start_DragEvent( LCUI_Widget *widget, LCUI_Event *event )
 {
-	drag_event.cursor_pos = event->global_pos;
+	drag_event.cursor_pos.x = event->button.x;
+	drag_event.cursor_pos.y = event->button.y;
 	/* 用全局坐标减去部件的全局坐标，得到偏移坐标 */ 
 	__offset_pos = Get_Widget_Global_Pos( widget );
-	__offset_pos = Pos_Sub( event->global_pos, __offset_pos );
+	__offset_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
 	/* 得出部件的新全局坐标 */
-	drag_event.new_pos = Pos_Sub( event->global_pos, __offset_pos );
+	drag_event.new_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
 	drag_event.first_click = 1;
 	drag_event.end_click = 0;
 	/* 处理部件的拖动事件 */
@@ -538,121 +537,137 @@ _Start_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
 }
 
 static void 
-_Doing_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
+_Doing_DragEvent( LCUI_Widget *widget, LCUI_Event *event )
 {
-	drag_event.cursor_pos = event->global_pos;
-	drag_event.new_pos = Pos_Sub( event->global_pos, __offset_pos );
+	drag_event.cursor_pos.x = event->button.x;
+	drag_event.cursor_pos.y = event->button.y;
+	drag_event.new_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
 	drag_event.first_click = 0;
 	drag_event.end_click = 0;
 	Handle_Event( &widget->event, EVENT_DRAG );
 }
 
 static void 
-_End_DragEvent( LCUI_Widget *widget, LCUI_MouseEvent *event )
+_End_DragEvent( LCUI_Widget *widget, LCUI_Event *event )
 {
-	drag_event.cursor_pos = event->global_pos;
-	drag_event.new_pos = Pos_Sub( event->global_pos, __offset_pos );
+	drag_event.cursor_pos.x = event->button.x;
+	drag_event.cursor_pos.y = event->button.y;
+	drag_event.new_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
 	drag_event.first_click = 0;
 	drag_event.end_click = 1;
 	Handle_Event( &widget->event, EVENT_DRAG );
 }
 
-static void 
-Widget_Clicked(LCUI_MouseEvent *event)
-/*
- * 功能：用于处理click事件，并保存被点击后的部件的指针
- * 说明：在鼠标左键被按下/释放时，都会调用这个函数
- **/
+/* 响应鼠标按键按下事件 */
+void LCUI_HandleMouseButtonDown( LCUI_Event *event )
 {
-	LCUI_Widget *widget;
-	if( !event ) {
+	LCUI_Widget *tmp_widget, *widget;
+	LCUI_Pos pos;
+	
+	if( !event || Mouse_LeftButton(event) < 0 ) {
 		return;
 	}
 	
-	widget = event->widget;
-	switch( Mouse_LeftButton(event) ) {
-	    case PRESSED:
-		DEBUG_MSG("mouse left button pressed\n");
-		click_widget = widget;
-		/* 焦点转移给该部件 */
-		Set_Focus( widget );
-		if( Widget_Have_Event( widget, EVENT_DRAG ) ) {
-			/* 开始处理部件的拖动 */
-			DEBUG_MSG("widget have EVENT_DRAG\n");
-			_Start_DragEvent( widget, event );
-		}
-		widget = Get_ResponseStatusChange_Widget( widget ); 
-		if( !widget ) {
-			DEBUG_MSG("widget not response status change\n");
-			break;
-		}
-		/* 如果当前鼠标指针覆盖到的部件已被启用 */  
-		if( event->widget->enabled && widget->enabled ) {
-			Set_Widget_Status (widget, WIDGET_STATUS_ACTIVE); 
-		} else {
-			Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
-		}
-		break;
-		
-	    case FREE: 
-		DEBUG_MSG("mouse left button free\n");
-		if( !click_widget ) {
-			/* 如果是点击屏幕空白处，则复位焦点 */
-			Reset_Focus( NULL );
-			break;
-		}
-		if( Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
-			DEBUG_MSG("end drag\n");
-			_End_DragEvent( click_widget, event );
-		}
-		if(click_widget == widget) {
-			click_widget = NULL;
-			/* 如果点击时和点击后都在同一个按钮部件内进行的,
-			 * 触发CLICKED事件，将部件中关联该事件的回调函数发送至
-			 * 任务队列，使之在主循环中执行 
-			 * */
-			
-			widget = Get_ResponseEvent_Widget( event->widget, EVENT_CLICKED );
-			if( widget && widget->enabled ) {
-				Handle_Event(&widget->event, EVENT_CLICKED);
-			}
-			widget = Get_ResponseStatusChange_Widget(event->widget);
-			if( !widget ) {
-				break;
-			}
-			if(widget->enabled) {
-				Set_Widget_Status (widget, WIDGET_STATUS_ACTIVE);
-				Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
-				break;
-			}
-			Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
-			break;
-		}
-		/* 否则，将恢复之前点击的鼠标的状态 */ 
-		widget = Get_ResponseStatusChange_Widget(click_widget);
-		click_widget = NULL;
-		if( !widget ) {
-			break;
-		}
-		if(widget->enabled) {
-			Set_Widget_Status (widget, WIDGET_STATUS_NORMAL);
-		} else {
-			Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
-		}
+	pos.x = event->button.x;
+	pos.y = event->button.y;
+	widget = Widget_At( NULL, pos );
+	
+	DEBUG_MSG("mouse left button pressed\n");
+	click_widget = widget;
+	/* 焦点转移给该部件 */
+	Set_Focus( widget );
+	if( Widget_Have_Event( widget, EVENT_DRAG ) ) {
+		/* 开始处理部件的拖动 */
+		DEBUG_MSG("widget have EVENT_DRAG\n");
+		_Start_DragEvent( widget, event );
+	}
+	tmp_widget = Get_ResponseStatusChange_Widget( widget ); 
+	if( !tmp_widget ) {
+		DEBUG_MSG("widget not response status change\n");
+		return;
+	}
+	/* 如果当前鼠标指针覆盖到的部件已被启用 */  
+	if( widget->enabled && tmp_widget->enabled ) {
+		Set_Widget_Status (tmp_widget, WIDGET_STATUS_ACTIVE); 
+	} else {
+		Set_Widget_Status (tmp_widget, WIDGET_STATUS_DISABLE);
 	}
 }
 
-static void 
-Tracking_Mouse_Move (LCUI_MouseEvent *event)
+/* 响应鼠标按键释放事件 */
+void LCUI_HandleMouseButtonUp( LCUI_Event *event )
+{
+	LCUI_Widget *tmp_widget, *widget;
+	LCUI_Pos pos;
+	
+	if( !event || Mouse_LeftButton(event) < 0 ) {
+		return;
+	}
+	
+	pos.x = event->button.x;
+	pos.y = event->button.y;
+	widget = Widget_At( NULL, pos );
+	
+	DEBUG_MSG("mouse left button free\n");
+	if( !click_widget ) {
+		/* 如果是点击屏幕空白处，则复位焦点 */
+		Reset_Focus( NULL );
+		return;
+	}
+	if( Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
+		DEBUG_MSG("end drag\n");
+		_End_DragEvent( click_widget, event );
+	}
+	if(click_widget == widget) {
+		click_widget = NULL;
+		/* 如果点击时和点击后都在同一个按钮部件内进行的,
+		 * 触发CLICKED事件，将部件中关联该事件的回调函数发送至
+		 * 任务队列，使之在主循环中执行 
+		 * */
+		
+		tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_CLICKED );
+		if( tmp_widget && tmp_widget->enabled ) {
+			Handle_Event(&tmp_widget->event, EVENT_CLICKED);
+		}
+		tmp_widget = Get_ResponseStatusChange_Widget( widget );
+		if( !tmp_widget ) {
+			return;
+		}
+		if(tmp_widget->enabled) {
+			Set_Widget_Status (widget, WIDGET_STATUS_ACTIVE);
+			Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
+			return;
+		}
+		Set_Widget_Status (tmp_widget, WIDGET_STATUS_DISABLE);
+		return;
+	}
+	/* 否则，将恢复之前点击的鼠标的状态 */ 
+	widget = Get_ResponseStatusChange_Widget(click_widget);
+	click_widget = NULL;
+	if( !widget ) {
+		return;
+	}
+	if(widget->enabled) {
+		Set_Widget_Status (widget, WIDGET_STATUS_NORMAL);
+	} else {
+		Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
+	}
+}
+
 /* 
  * 功能：跟踪鼠标移动，处理触发的基本事件
  * 说明：这只是根据鼠标事件来处理部件状态的切换
  * */
+void LCUI_HandleMouseMotion( LCUI_Event *event )
 {
+	LCUI_Pos pos;
 	LCUI_Widget *widget;
 	
+	pos.x = event->motion.x;
+	pos.y = event->motion.y;
+	Set_Cursor_Pos( pos );
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
-	widget = Widget_At( NULL, Get_Cursor_Pos() );
+	widget = Widget_At( NULL, pos );
 	if( !widget ) {
 		goto skip_widget_check;
 	}
@@ -695,7 +710,7 @@ skip_widget_check:;
 	} 
 	overlay_widget = widget;
 	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */ 
-	if( click_widget && Mouse_LeftButton (event) == PRESSED 
+	if( click_widget && event->motion.state == PRESSED 
 	 && Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
 		_Doing_DragEvent( click_widget, event );
 	}
@@ -708,8 +723,6 @@ void
 Widget_Event_Init()
 /* 功能：初始化部件事件处理 */
 {
-	LCUI_MouseEvent_Connect( Tracking_Mouse_Move, MOUSE_EVENT_MOVE );
-	LCUI_MouseEvent_Connect( Widget_Clicked, MOUSE_EVENT_CLICK );
 	LCUI_KeyboardEvent_Connect( WidgetFocusProc, NULL );
 }
 

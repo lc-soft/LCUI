@@ -83,8 +83,8 @@ void LCUI_App_Init( LCUI_App *app )
 /* 功能：初始化程序数据结构体 */
 {
 	app->id = 0;
+	app->stop_loop = FALSE;
 	FuncQueue_Init( &app->tasks );
-	AppEventQueue_Init( app );
 	//EventQueue_Init(&app->key_event);
 	WidgetLib_Init(&app->widget_lib);
 	app->encoding_type = ENCODEING_TYPE_UTF8;
@@ -99,10 +99,13 @@ static void LCUI_Quit( void )
 	LCUI_Sys.status = KILLED;	/* 状态标志置为KILLED */
 	LCUI_Font_Free ();		/* 释放LCUI的默认字体数据占用的内存资源 */
 	Disable_Graph_Display();	/* 禁用图形显示 */ 
-	Destroy_Queue(&LCUI_Sys.key_event);/* 销毁按键事件数据队列 */
 	Disable_Mouse_Input();		/* 禁用鼠标输入 */ 
 	Disable_TouchScreen_Input();	/* 禁用触屏支持 */ 
 	Disable_Key_Input();		/* 禁用按键输入 */ 
+	Destroy_Queue( &LCUI_Sys.key_event );/* 销毁按键事件数据队列 */
+	Destroy_Queue( &LCUI_Sys.mouse_event );
+	LCUI_StopEventThread();
+	LCUI_DestroyEvents();
 	timer_thread_destroy( LCUI_Sys.timer_thread, &LCUI_Sys.timer_list );
 }
 
@@ -184,12 +187,16 @@ static int App_Quit()
 	return LCUI_AppList_Delete(app->id); 
 }
 
+BOOL MainLoop_Active( LCUI_App *app )
+{
+	return !app->stop_loop;
+}
 /* 退出主循环 */
 void LCUI_StopMainLoop( void )
 { 
-	LCUI_Event event;
-	event.type = LCUI_QUIT;
-	LCUI_PushEvent( &event );
+	LCUI_App *app;
+	app = Get_Self_AppPointer();
+	app->stop_loop = TRUE;
 }
 /*********************** App Management End ***************************/
 
@@ -223,6 +230,7 @@ static void LCUI_IO_Init()
 	Keyboard_Init();
 	TouchScreen_Init();
 }
+
 
 BOOL LCUI_Active()
 /* 功能：检测LCUI是否活动 */
@@ -259,9 +267,9 @@ int LCUI_Init(int argc, char *argv[])
 		
 		LCUI_Sys.focus_widget = NULL; 
 		
-		/* 设定最大空闲时间 */
-		LCUI_Sys.max_app_idle_time = MAX_APP_IDLE_TIME;
-		LCUI_Sys.max_lcui_idle_time = MAX_LCUI_IDLE_TIME;
+		LCUI_EventsInit();
+		LCUI_StartEventThread();
+		
 		/* 初始化按键事件队列 */
 		EventQueue_Init( &LCUI_Sys.key_event );
 		/* 初始化默认的字体数据 */
@@ -344,7 +352,6 @@ int LCUI_Main ()
  *  */
 {
 	LCUI_App *app;
-	LCUI_Event event;
 	int idle_time = 1500;
 	
 	app = Get_Self_AppPointer();
@@ -353,44 +360,22 @@ int LCUI_Main ()
 		return -1;
 	}
 	/* 循环条件是程序不需要关闭 */ 
-	while(1) { 
+	while( MainLoop_Active( app ) ) {
 		if(Empty_Widget()) {
 			break;
-		}
-		while( _LCUI_PollEvent( app, &event ) ) {
-			switch( event.type ) {
-			case LCUI_KEYDOWN:
-				
-				break;
-			case LCUI_MOUSEMOTION:
-				
-				break;
-			case LCUI_MOUSEBUTTONDOWN:
-				
-				break;
-			case LCUI_MOUSEBUTTONUP:
-				
-				break;
-			case LCUI_QUIT:
-				goto app_quit;
-			case LCUI_USEREVENT:
-				
-				break;
-			}
 		}
 		/* 如果有需要执行的任务 */
 		if( Have_Task(app) ) {
 			idle_time = 1500;
 			Run_Task( app ); 
-		} else {/* 否则暂停一段时间 */
+		} else { /* 否则暂停一段时间 */
 			usleep (idle_time);
-			idle_time += 1500; /* 每次循环的空闲时间越来越长 */
-			if (idle_time >= LCUI_Sys.max_app_idle_time) {
-				idle_time = LCUI_Sys.max_app_idle_time;
+			idle_time += 1500;
+			if (idle_time >= MAX_APP_IDLE_TIME) {
+				idle_time = MAX_APP_IDLE_TIME;
 			}
 		}
 	}
-app_quit:
 	/* 直接关闭程序，并释放资源 */ 
 	return App_Quit ();
 }

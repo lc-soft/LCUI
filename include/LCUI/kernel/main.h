@@ -8,6 +8,7 @@ LCUI_BEGIN_HEADER
 typedef struct _LCUI_App 
 {
 	LCUI_ID id; /* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
+	BOOL stop_loop;
 	
 	LCUI_Queue	tasks;	/* 程序的任务队列 */
 	LCUI_Queue	events;		/* 事件队列 */
@@ -43,9 +44,6 @@ typedef struct _LCUI_System
 	thread_t timer_thread;		/* 定时器列表处理线程的ID */
 	thread_t dev_thread;		/* 设备输入数据处理线程的ID */
 	Thread_TreeNode thread_tree; /* 线程关系树 */
-	
-	LCUI_ID max_app_idle_time;	/* 程序最大的空闲时间 */
-	LCUI_ID max_lcui_idle_time;	/* LCUI最大的空闲时间 */
 	
 	LCUI_Cursor	cursor;		/* 游标 */
 	

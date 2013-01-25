@@ -61,9 +61,6 @@ LCUI_TS;
 /**********************************/
 
 static LCUI_TS ts_data;
-#ifdef USE_TSLIB
-static LCUI_MouseEvent mouse_event;
-#endif
 
 static BOOL proc_touchscreen()
 {
@@ -97,18 +94,8 @@ static BOOL proc_touchscreen()
 	}
 	pos.x = pos.x<0 ? 0:pos.x; 
 	pos.y = pos.y<0 ? 0:pos.y; 
-	/* 设定游标位置 */ 
-	Set_Cursor_Pos ( pos );
-	
-	mouse_event.global_pos = pos;
-	mouse_event.widget = Widget_At( NULL, pos );
-	if( mouse_event.widget ) {
-		mouse_event.pos = GlobalPos_ConvTo_RelativePos( mouse_event.widget, pos );
-	} else { 
-		mouse_event.pos = pos;
-	}
 	button = samp.pressure > 0 ? 1:0;
-	Handle_Mouse_Event(button, &mouse_event); 
+	Handle_Mouse_Event( pos, button );
 	//printf("%ld.%06ld: %6d %6d %6d\n", samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure); 
 	return TRUE;
 #else
