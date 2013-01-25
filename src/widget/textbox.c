@@ -603,7 +603,7 @@ Process_TextBox_Drag(LCUI_Widget *widget, LCUI_DragEvent *event)
 }
 
 void 
-Process_TextBox_Clicked(LCUI_Widget *widget, LCUI_Event *event)
+Process_TextBox_Clicked(LCUI_Widget *widget, LCUI_EventSlot *event)
 /* 处理鼠标对文本框的点击事件 */
 {
 	

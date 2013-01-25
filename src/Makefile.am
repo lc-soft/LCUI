@@ -18,6 +18,7 @@ LCUI_LDFLAGS=-version-info 2:0:0
 
 LCUI_SOURCES = \
 	LCUI_Queue.c		\
+	LCUI_Event.c		\
 	LCUI_Graph.c		\
 	LCUI_GraphLayer.c	\
 	LCUI_StyleLibrary.c	\

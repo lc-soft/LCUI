@@ -7,6 +7,7 @@ LCUI_Display.h \
 LCUI_Font.h \
 LCUI_Misc.h \
 LCUI_Work.h \
+LCUI_Event.h \
 LCUI_Graph.h LCUI_Graph.hpp \
 LCUI_StyleLibrary.h \
 LCUI_GraphLayer.h \

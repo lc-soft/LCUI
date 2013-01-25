@@ -119,7 +119,7 @@ void Send_Mouse_Event(int event_id, LCUI_MouseEvent *event)
 /* 功能：向已关联鼠标事件的程序发送任务 */
 {
 	int i[2], total[2];
-	LCUI_Event *temp;
+	LCUI_EventSlot *temp;
 	LCUI_Func *func;
 	total[0] = Queue_Get_Total( &LCUI_Sys.mouse_event );
 	for(i[0]=0; i[0]<total[0]; ++i[0]) {

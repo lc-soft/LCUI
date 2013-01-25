@@ -85,6 +85,9 @@ int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 				LCUI_Graph *graph_buff,
 				LCUI_Rect rect );
 
+/* 将指定图层显示在同等z-index值图层的前端 */
+int GraphLayer_Front( LCUI_GraphLayer *glayer );
+
 /* 显示图层 */
 int GraphLayer_Show( LCUI_GraphLayer *glayer );
 

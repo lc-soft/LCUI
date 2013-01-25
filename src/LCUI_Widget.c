@@ -2229,9 +2229,9 @@ void Handle_All_WidgetUpdate()
 
 typedef struct _WidgetTypeData
 { 
-	LCUI_String		type;	 /* 部件类型，用字符串描述 */
-	LCUI_ID		type_id; /* 类型ID */
-	LCUI_FuncQueue	func;	 /* 部件相关的函数 */
+	LCUI_String	type;	 /* 部件类型，用字符串描述 */
+	LCUI_ID	type_id; /* 类型ID */
+	LCUI_Queue	func;	 /* 部件相关的函数 */
 }
 WidgetTypeData;
 

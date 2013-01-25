@@ -77,7 +77,7 @@ Send_Task_To_App(LCUI_Func *func_data)
 	if( !app ) {
 		return;
 	}
-	Queue_Add( &app->task_queue, func_data );
+	Queue_Add( &app->tasks, func_data );
 }
 
 static void
@@ -95,26 +95,26 @@ __destroy_apptask( LCUI_Func *func_data )
 }
 
 int 
-AppTask_Custom_Add(int mode, LCUI_Func *func_data)
+AppTask_CustomAdd(int mode, LCUI_Func *func_data)
 /*
  * 功能：使用自定义方式添加程序任务
  * 用法示例：
  * 在函数的各参数与队列中的函数及各参数不重复时，添加它
- * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT | AND_ARG_F | AND_ARG_S, func_data);
+ * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT | AND_ARG_F | AND_ARG_S, func_data);
  * 只要函数和参数1不重复则添加
- * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT | AND_ARG_F, func_data);
+ * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT | AND_ARG_F, func_data);
  * 要函数不重复则添加
- * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT, func_data);
+ * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT, func_data);
  * 添加新的，不管是否有重复的
- * AppTask_Custom_Add(ADD_MODE_ADD_NEW, func_data);
+ * AppTask_CustomAdd(ADD_MODE_ADD_NEW, func_data);
  * 有相同函数则覆盖，没有则新增
- * AppTask_Custom_Add(ADD_MODE_REPLACE, func_data);
+ * AppTask_CustomAdd(ADD_MODE_REPLACE, func_data);
  * */
 {
 	int total, i;
 	/* 先获取程序数据结构体指针 */
 	LCUI_App *app;
-	LCUI_FuncQueue *queue;
+	LCUI_Queue *queue;
 	LCUI_Func *temp = NULL;
 	
 	if( func_data->id == (LCUI_ID)0 ) {
@@ -125,7 +125,7 @@ AppTask_Custom_Add(int mode, LCUI_Func *func_data)
 	if( !app ) {
 		return -1;
 	}
-	queue = &app->task_queue;
+	queue = &app->tasks;
 	total = Queue_Get_Total(queue);
 	/* 如果模式是“添加新的”模式 */
 	if( mode == ADD_MODE_ADD_NEW ) {
@@ -214,21 +214,21 @@ static void
 Destroy_Event(void *arg)
 /* 功能：销毁事件数据 */
 {
-	LCUI_Event *event = (LCUI_Event*)arg;
+	LCUI_EventSlot *event = (LCUI_EventSlot*)arg;
 	if(event != NULL) {
 		Destroy_Queue(&event->func_data); 
 	}
 }
 
 void 
-EventQueue_Init(LCUI_EventQueue * queue)
+EventQueue_Init(LCUI_Queue * queue)
 /* 功能：初始化事件队列 */
 {
 	/* 
-	 * 由于LCUI_Event结构体的成员中有函数队列，销毁事件时需要把该队列销毁，所以需
+	 * 由于LCUI_EventSlot结构体的成员中有函数队列，销毁事件时需要把该队列销毁，所以需
 	 * 要Destroy_Event()作为析构函数 
 	 * */
-	Queue_Init(queue, sizeof(LCUI_Event), Destroy_Event);
+	Queue_Init(queue, sizeof(LCUI_EventSlot), Destroy_Event);
 }
 
 
@@ -260,16 +260,16 @@ Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
 	return TRUE;
 }
 
-LCUI_Event *
-Find_Event(LCUI_EventQueue *queue, int event_id)
+LCUI_EventSlot *
+EventQueue_Find(LCUI_Queue *queue, int event_id)
 /* 功能：根据事件的ID，获取指向该事件的指针 */
 {
-	LCUI_Event *event; 
+	LCUI_EventSlot *event; 
 	int i, total;  
 	total = Queue_Get_Total(queue);
 	if (total > 0) {
 		for (i = 0; i < total; ++i) {
-			event = (LCUI_Event*)Queue_Get(queue, i);
+			event = (LCUI_EventSlot*)Queue_Get(queue, i);
 			if(event->id == event_id) {
 				return event;
 			}
@@ -280,15 +280,15 @@ Find_Event(LCUI_EventQueue *queue, int event_id)
 }
 
 int 
-EventQueue_Add(LCUI_EventQueue *queue, int event_id, LCUI_Func *func)
+EventQueue_Add(LCUI_Queue *queue, int event_id, LCUI_Func *func)
 /* 功能：记录事件及对应回调函数至队列 */
 {
-	LCUI_Event *event;
+	LCUI_EventSlot *event;
 	
-	event = Find_Event(queue, event_id);
+	event = EventQueue_Find(queue, event_id);
 	if ( !event ) {/* 如果没有，就添加一个新事件类型 */ 
 		int pos;
-		LCUI_Event new_event;
+		LCUI_EventSlot new_event;
 		new_event.id = event_id;
 		Queue_Init(&new_event.func_data, sizeof(LCUI_Func), NULL);
 		pos = Queue_Add(queue, &new_event);/* 将新数据追加至队列 */
@@ -340,11 +340,11 @@ Handle_Widget_KeyboardEvent( LCUI_Widget *widget, LCUI_Key key )
 	}
 	
 	LCUI_Key *key_data;
-	LCUI_Event *event;
+	LCUI_EventSlot *event;
 	LCUI_Func *func;
 	int total, i;
 	
-	event = Find_Event( &widget->event, EVENT_KEYBOARD );
+	event = EventQueue_Find( &widget->event, EVENT_KEYBOARD );
 	if( !event ) {
 		return -2;
 	}
@@ -361,22 +361,22 @@ Handle_Widget_KeyboardEvent( LCUI_Widget *widget, LCUI_Key key )
 		func->arg[1] = key_data;
 		func->destroy_arg[1] = TRUE;
 		/* 添加至程序的任务队列 */ 
-		AppTask_Custom_Add( ADD_MODE_ADD_NEW, func );
+		AppTask_CustomAdd( ADD_MODE_ADD_NEW, func );
 	}
 	return 0;
 }
 
 int 
-Handle_Event(LCUI_EventQueue *queue, int event_id)
+Handle_Event(LCUI_Queue *queue, int event_id)
 /* 
  * 功能：处理指定ID的事件
  * 说明：本函数会将事件队列中与指定ID的事件关联的回调函数 添加至程序的任务队列
  * */
 {
-	LCUI_Event *event;
+	LCUI_EventSlot *event;
 	LCUI_Func *func;
 	int total, i;
-	event = Find_Event(queue, event_id);
+	event = EventQueue_Find(queue, event_id);
 	if( !event ) {
 		return -1;
 	}
@@ -384,7 +384,7 @@ Handle_Event(LCUI_EventQueue *queue, int event_id)
 	for (i = 0; i < total; ++i) {
 		func = Queue_Get(&event->func_data, i);
 		/* 添加至程序的任务队列 */ 
-		AppTask_Custom_Add(ADD_MODE_REPLACE | AND_ARG_F, func);
+		AppTask_CustomAdd(ADD_MODE_REPLACE | AND_ARG_F, func);
 	}
 	return 0;
 }
@@ -489,12 +489,12 @@ static BOOL
 Widget_Have_Event(LCUI_Widget *widget, int event_id)
 /* 检测部件是否关联了指定事件 */
 { 
-	LCUI_Event *event;
+	LCUI_EventSlot *event;
 	
 	if( !widget ) {
 		return FALSE;
 	}
-	event = Find_Event( &widget->event, event_id );
+	event = EventQueue_Find( &widget->event, event_id );
 	if( !event ) {
 		return FALSE;
 	}
@@ -901,7 +901,7 @@ WidgetFocusProc( LCUI_Key *key_data, void *arg )
 		}
 		widget = focus_widget;
 		/* 保存已关联按键事件的部件指针 */
-		if( Find_Event( &widget->event, EVENT_KEYBOARD ) ) {
+		if( EventQueue_Find( &widget->event, EVENT_KEYBOARD ) ) {
 			tmp = widget;
 		}
 	}

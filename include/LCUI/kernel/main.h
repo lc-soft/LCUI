@@ -7,10 +7,10 @@ LCUI_BEGIN_HEADER
 /************************ LCUI程序的数据 *******************************/
 typedef struct _LCUI_App 
 {
-	BOOL		stop_loop;	/* 一个标志，用于指示是否停止主循环 */
-	LCUI_ID	id;		/* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
+	LCUI_ID id; /* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
 	
-	LCUI_Queue	task_queue;	/* 程序的任务队列 */
+	LCUI_Queue	tasks;	/* 程序的任务队列 */
+	LCUI_Queue	events;		/* 事件队列 */
 	LCUI_Queue	widget_lib;	/* 部件类型库 */
 	
 	int encoding_type;	/* 字符编码类型，默认为UTF-8 */
@@ -75,8 +75,8 @@ LCUI_App *Find_App(LCUI_ID id);
 LCUI_App* Get_Self_AppPointer();
 /* 功能：获取程序的指针 */ 
 
-void Main_Loop_Quit();
-/* 功能：让程序退出主循环 */
+/* 退出主循环 */
+void LCUI_StopMainLoop( void );
 /*********************** App Management End ***************************/
 
 BOOL LCUI_Active();
@@ -87,9 +87,6 @@ int LCUI_Init(int argc, char *argv[]);
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */ 
-
-int Need_Main_Loop(LCUI_App *app);
-/* 功能：检测主循环是否需要继续进行 */ 
 
 int LCUI_Main ();
 /* 

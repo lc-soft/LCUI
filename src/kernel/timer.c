@@ -126,7 +126,7 @@ timer_list_process( void *arg )
 		func_data.id = timer->app_id;
 		func_data.func = timer->callback_func;
 		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */
-		AppTask_Custom_Add( ADD_MODE_REPLACE, &func_data );
+		AppTask_CustomAdd( ADD_MODE_REPLACE, &func_data );
 	}
 	LCUI_Thread_Exit(NULL);
 }

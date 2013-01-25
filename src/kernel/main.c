@@ -4,6 +4,7 @@
 #include LC_GRAPH_H
 #include LC_RES_H
 #include LC_DISPLAY_H
+#include LC_EVENT_H
 #include LC_CURSOR_H 
 #include LC_INPUT_H
 #include LC_ERROR_H
@@ -78,18 +79,18 @@ LCUI_App* Get_Self_AppPointer()
 }
 
 
-void LCUI_App_Init(LCUI_App *app)
+void LCUI_App_Init( LCUI_App *app )
 /* 功能：初始化程序数据结构体 */
 {
 	app->id = 0;
-	app->stop_loop = IS_FALSE;
-	FuncQueue_Init(&app->task_queue); 
+	FuncQueue_Init( &app->tasks );
+	AppEventQueue_Init( app );
 	//EventQueue_Init(&app->key_event);
 	WidgetLib_Init(&app->widget_lib);
 	app->encoding_type = ENCODEING_TYPE_UTF8;
 }
 
-static void LCUI_Quit ()
+static void LCUI_Quit( void )
 /*
  * 功能：退出LCUI
  * 说明：在没有任何LCUI程序时，LCUI会调用本函数来恢复运行LCUI前的现场。
@@ -183,20 +184,17 @@ static int App_Quit()
 	return LCUI_AppList_Delete(app->id); 
 }
 
-void Main_Loop_Quit()
-/* 功能：让程序退出主循环 */
+/* 退出主循环 */
+void LCUI_StopMainLoop( void )
 { 
-	LCUI_App *app = Get_Self_AppPointer();
-	if( !app ) {
-		printf("Main_Loop_Quit(): "APP_ERROR_UNRECORDED_APP);
-		return;
-	}
-	app->stop_loop = TRUE; 
+	LCUI_Event event;
+	event.type = LCUI_QUIT;
+	LCUI_PushEvent( &event );
 }
 /*********************** App Management End ***************************/
 
 
-static void Print_LCUI_Copyright_Text()
+static void LCUI_ShowCopyrightText()
 /* 功能：打印LCUI的信息 */
 {
 	printf(
@@ -251,7 +249,7 @@ int LCUI_Init(int argc, char *argv[])
 		/* 初始化随机数种子 */
 		srand(time(NULL));
 		/* 打印版权信息 */
-		Print_LCUI_Copyright_Text();
+		LCUI_ShowCopyrightText();
 		/* 初始化根线程结点 */
 		Thread_TreeNode_Init (&LCUI_Sys.thread_tree);	
 		/* 当前线程ID作为根结点 */
@@ -305,16 +303,6 @@ int LCUI_Init(int argc, char *argv[])
 	return 0;
 }
 
-int Need_Main_Loop(LCUI_App *app)
-/* 功能：检测主循环是否需要继续进行 */
-{
-	if( app->stop_loop ) {
-		return 0;
-	}
-	return 1;
-}
-
-
 static BOOL
 Have_Task( LCUI_App *app )
 /* 功能：检测是否有任务 */
@@ -322,7 +310,7 @@ Have_Task( LCUI_App *app )
 	if( !app ) {
 		return FALSE; 
 	}
-	if(Queue_Get_Total(&app->task_queue) > 0) {
+	if(Queue_Get_Total(&app->tasks) > 0) {
 		return TRUE; 
 	}
 	return FALSE;
@@ -333,7 +321,7 @@ Run_Task( LCUI_App *app )
 /* 功能：执行任务 */
 { 
 	static LCUI_Task *task;
-	task = (LCUI_Task*)Queue_Get( &app->task_queue, 0 );
+	task = (LCUI_Task*)Queue_Get( &app->tasks, 0 );
 	//clock_t start = clock();
 	//printf("run task %p\n", task->func);
 	/* 调用函数指针指向的函数，并传递参数 */
@@ -346,7 +334,7 @@ Run_Task( LCUI_App *app )
 		free( task->arg[1] );
 	}
 	//printf("task %p use time: %ldus\n", task->func, clock()-start);
-	return Queue_Delete(&app->task_queue, 0);
+	return Queue_Delete(&app->tasks, 0);
 }
 
 int LCUI_Main ()
@@ -356,28 +344,39 @@ int LCUI_Main ()
  *  */
 {
 	LCUI_App *app;
-	LCUI_ID idle_time = 1500;
-	LCUI_Graph graph;
+	LCUI_Event event;
+	int idle_time = 1500;
 	
-	Graph_Init(&graph);
-//#define NEED_CATCH_SCREEN
-#ifdef NEED_CATCH_SCREEN
-	LCUI_Rect area;
-	area.x = (Get_Screen_Width()-320)/2;
-	area.y = (Get_Screen_Height()-240)/2;
-	area.width = 320;
-	area.height = 240;
-	start_record_screen( area );
-#endif
 	app = Get_Self_AppPointer();
 	if( !app ) {
 		printf("LCUI_Main(): "APP_ERROR_UNRECORDED_APP);
 		return -1;
 	}
 	/* 循环条件是程序不需要关闭 */ 
-	while (Need_Main_Loop(app)) { 
-		if(Empty_Widget()) {/* 没有部件，就不需要循环 */
+	while(1) { 
+		if(Empty_Widget()) {
 			break;
+		}
+		while( _LCUI_PollEvent( app, &event ) ) {
+			switch( event.type ) {
+			case LCUI_KEYDOWN:
+				
+				break;
+			case LCUI_MOUSEMOTION:
+				
+				break;
+			case LCUI_MOUSEBUTTONDOWN:
+				
+				break;
+			case LCUI_MOUSEBUTTONUP:
+				
+				break;
+			case LCUI_QUIT:
+				goto app_quit;
+			case LCUI_USEREVENT:
+				
+				break;
+			}
 		}
 		/* 如果有需要执行的任务 */
 		if( Have_Task(app) ) {
@@ -385,13 +384,15 @@ int LCUI_Main ()
 			Run_Task( app ); 
 		} else {/* 否则暂停一段时间 */
 			usleep (idle_time);
-			idle_time += 1500;	/* 每次循环的空闲时间越来越长 */
+			idle_time += 1500; /* 每次循环的空闲时间越来越长 */
 			if (idle_time >= LCUI_Sys.max_app_idle_time) {
 				idle_time = LCUI_Sys.max_app_idle_time;
 			}
 		}
 	}
-	return App_Quit ();	/* 直接关闭程序，并释放资源 */ 
+app_quit:
+	/* 直接关闭程序，并释放资源 */ 
+	return App_Quit ();
 }
 
 int Get_LCUI_Version(char *out)

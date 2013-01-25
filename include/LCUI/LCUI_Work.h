@@ -45,10 +45,6 @@
 #define RELATIVE_POS	1 /* 相对坐标 */
 #define NORMAL_POS	0 /*普通坐标 */
 
-typedef LCUI_Queue LCUI_EventQueue;
-typedef LCUI_Queue LCUI_FuncQueue;
-typedef LCUI_Queue LCUI_TaskQueue;
-
 typedef enum _WidgetEvent_ID
 {
 	EVENT_DRAG,	/* 部件的拖动事件 */
@@ -69,8 +65,7 @@ typedef struct _LCUI_DragEvent
 }
 LCUI_DragEvent; 
 
-typedef struct _LCUI_Func
-{
+typedef struct {
 	/* 
 	 * 函数ID，部件库需要这ID标识函数类型，往程序的任务队列添加
 	 * 任务也需要该ID来标识目标程序ID 
@@ -81,16 +76,13 @@ typedef struct _LCUI_Func
 	/* 以下参数该怎么传给回调函数，具体要看是如何处理事件的 */  
 	void *arg[2];		/* 传给函数的两个参数 */
 	BOOL destroy_arg[2];	/* 指定是否在调用完回调函数后，销毁参数 */
-}
-LCUI_Func, LCUI_Task;
+} LCUI_Func, LCUI_Task;
 
 
-typedef struct _LCUI_Event
-{
+typedef struct {
 	int id;			/* 记录事件ID */
 	LCUI_Queue func_data;	/* 记录被关联的回调函数数据 */
-}
-LCUI_Event;
+} LCUI_EventSlot;
 
 
 LCUI_BEGIN_HEADER
@@ -110,26 +102,26 @@ void Send_Task_To_App(LCUI_Func *func_data);
  * 说明：LCUI_Func结构体中的成员变量 id，保存的是目标程序的id
  */ 
 
-int AppTask_Custom_Add(int mode, LCUI_Func *func_data);
+int AppTask_CustomAdd(int mode, LCUI_Func *func_data);
 /*
  * 功能：使用自定义方式添加程序任务
  * 用法示例：
  * 在函数的各参数与队列中的函数及各参数不重复时，添加它
- * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT | AND_ARG_F | AND_ARG_S, func_data);
+ * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT | AND_ARG_F | AND_ARG_S, func_data);
  * 只要函数和参数1不重复则添加
- * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT | AND_ARG_F, func_data);
+ * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT | AND_ARG_F, func_data);
  * 要函数不重复则添加
- * AppTask_Custom_Add(ADD_MODE_NOT_REPEAT, func_data);
+ * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT, func_data);
  * 添加新的，不管是否有重复的
- * AppTask_Custom_Add(ADD_MODE_ADD_NEW, func_data);
+ * AppTask_CustomAdd(ADD_MODE_ADD_NEW, func_data);
  * 有相同函数则覆盖，没有则新增
- * AppTask_Custom_Add(ADD_MODE_REPLACE, func_data);
+ * AppTask_CustomAdd(ADD_MODE_REPLACE, func_data);
  * */ 
 /**************************** Task End ********************************/
 
 
 /***************************** Event ***********************************/ 
-void EventQueue_Init(LCUI_EventQueue * queue);
+void EventQueue_Init(LCUI_Queue * queue);
 /* 功能：初始化事件队列 */ 
 
 BOOL Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2);
@@ -138,10 +130,10 @@ BOOL Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2);
  * 说明：此函数会申请内存空间，并返回指向该空间的指针
  * */ 
 
-LCUI_Event *Find_Event(LCUI_EventQueue *queue, int event_id);
+LCUI_EventSlot *EventQueue_Find(LCUI_Queue *queue, int event_id);
 /* 功能：根据事件的ID，获取指向该事件的指针 */ 
 
-int EventQueue_Add(LCUI_EventQueue *queue, int event_id, LCUI_Func *func);
+int EventQueue_Add(LCUI_Queue *queue, int event_id, LCUI_Func *func);
 /* 功能：记录事件及对应回调函数至队列 */ 
 
 int LCUI_MouseEvent_Connect (void (*func) (), int event_id);
@@ -151,7 +143,7 @@ int LCUI_MouseEvent_Connect (void (*func) (), int event_id);
  * 添加至程序的任务队列，等待程序在主循环中处理
  **/ 
 
-int Handle_Event(LCUI_EventQueue *queue, int event_id);
+int Handle_Event(LCUI_Queue *queue, int event_id);
 /* 
  * 功能：处理指定ID的事件
  * 说明：本函数会将事件队列中与指定ID的事件关联的回调函数 添加至程序的任务队列

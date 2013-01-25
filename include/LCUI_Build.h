@@ -64,6 +64,7 @@
 #define LC_LCUI_HPP	<LCUI/LCUI.hpp>
 
 #define LC_MISC_H	<LCUI/LCUI_Misc.h>
+#define LC_EVENT_H	<LCUI/LCUI_Event.h>
 #define LC_FONT_H	<LCUI/LCUI_Font.h>
 #define LC_GRAPH_H	<LCUI/LCUI_Graph.h>
 #define LC_GRAPH_HPP	<LCUI/LCUI_Graph.hpp>

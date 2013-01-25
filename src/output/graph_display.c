@@ -87,10 +87,7 @@ int Add_Screen_Refresh_Area (LCUI_Rect rect)
 	int ret;
 	if (rect.width <= 0 || rect.height <= 0) {
 		return -1; 
-	} 
-	DEBUG_MSG("add screen area: %d,%d,%d,%d\n", 
-	rect.x, rect.y, rect.width, rect.height);
-	
+	}
 	rect = Get_Valid_Area(Get_Screen_Size(), rect); 
 	//if( rect.width == 320 && rect.height == 240 ) {
 		//++debug_count;
