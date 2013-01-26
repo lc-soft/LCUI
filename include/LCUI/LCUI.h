@@ -381,8 +381,6 @@ struct _LCUI_WString
 /*****************************************/
 
 #include LC_QUEUE_H
-#include LC_EVENT_H
-#include LC_WORK_H
 #include LC_THREAD_H
 
 /***************************** 图层数据 ********************************/
@@ -544,11 +542,14 @@ struct _LCUI_Cursor
 		fflush(stdout); \
 	}
 
+#include LC_MISC_H
 #include LC_GRAPHLAYER_H
 #include LC_KERNEL_MAIN_H
 #include LC_KERNEL_DEV_H
 #include LC_KERNEL_TIMER_H
-#include LC_MISC_H
+#include LC_KERNEL_EVENT_H
+#include LC_KERNEL_TASK_H
+#include LC_WORK_H
 
 /* 如果是使用C++语言，那么就包含LCUI的C++版头文件 */
 #ifdef __cplusplus

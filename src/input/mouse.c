@@ -334,7 +334,7 @@ int Mouse_Init()
 	mouse_data.status = REMOVE;	/* 鼠标为移除状态 */
 	mouse_data.move_speed = 1;	/* 移动数度为1 */
 	/* 初始化鼠标事件信息队列 */ 
-	EventQueue_Init( &LCUI_Sys.mouse_event ); 
+	EventSlots_Init( &LCUI_Sys.mouse_event ); 
 	/* 启用鼠标输入处理 */
 	nobuff_printf("enable mouse input: ");
 	/* 注册鼠标设备 */

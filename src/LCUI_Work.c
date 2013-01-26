@@ -73,7 +73,7 @@ Destroy_Event(void *arg)
 }
 
 void 
-EventQueue_Init(LCUI_Queue * queue)
+EventSlots_Init(LCUI_Queue * queue)
 /* 功能：初始化事件队列 */
 {
 	/* 
@@ -113,7 +113,7 @@ Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2)
 }
 
 LCUI_EventSlot *
-EventQueue_Find(LCUI_Queue *queue, int event_id)
+EventSlots_Find(LCUI_Queue *queue, int event_id)
 /* 功能：根据事件的ID，获取指向该事件的指针 */
 {
 	LCUI_EventSlot *event; 
@@ -132,12 +132,12 @@ EventQueue_Find(LCUI_Queue *queue, int event_id)
 }
 
 int 
-EventQueue_Add(LCUI_Queue *queue, int event_id, LCUI_Func *func)
+EventSlots_Add(LCUI_Queue *queue, int event_id, LCUI_Func *func)
 /* 功能：记录事件及对应回调函数至队列 */
 {
 	LCUI_EventSlot *event;
 	
-	event = EventQueue_Find(queue, event_id);
+	event = EventSlots_Find(queue, event_id);
 	if ( !event ) {/* 如果没有，就添加一个新事件类型 */ 
 		int pos;
 		LCUI_EventSlot new_event;
@@ -169,7 +169,7 @@ LCUI_MouseEvent_Connect (void (*func) (), int event_id)
 	 * 中，等到处理鼠标事件时，会将按键状态作为该函
 	 * 数的第二个参数并转移至程序的任务队列 
 	 **/ 
-	EventQueue_Add(&LCUI_Sys.mouse_event, event_id, &func_data); 
+	EventSlots_Add(&LCUI_Sys.mouse_event, event_id, &func_data); 
 	return 0;
 }
 
@@ -196,7 +196,7 @@ Handle_Widget_KeyboardEvent( LCUI_Widget *widget, LCUI_Key key )
 	LCUI_Func *func;
 	int total, i;
 	
-	event = EventQueue_Find( &widget->event, EVENT_KEYBOARD );
+	event = EventSlots_Find( &widget->event, EVENT_KEYBOARD );
 	if( !event ) {
 		return -2;
 	}
@@ -228,7 +228,7 @@ Handle_Event(LCUI_Queue *queue, int event_id)
 	LCUI_EventSlot *event;
 	LCUI_Func *func;
 	int total, i;
-	event = EventQueue_Find(queue, event_id);
+	event = EventSlots_Find(queue, event_id);
 	if( !event ) {
 		return -1;
 	}
@@ -256,7 +256,7 @@ Widget_Event_Connect (	LCUI_Widget *widget,
 	if( !widget ) {
 		return -1;
 	}
-	EventQueue_Add( &widget->event, event_id, func_data );
+	EventSlots_Add( &widget->event, event_id, func_data );
 	return 0;
 }
 
@@ -346,7 +346,7 @@ Widget_Have_Event(LCUI_Widget *widget, int event_id)
 	if( !widget ) {
 		return FALSE;
 	}
-	event = EventQueue_Find( &widget->event, event_id );
+	event = EventSlots_Find( &widget->event, event_id );
 	if( !event ) {
 		return FALSE;
 	}
@@ -726,7 +726,7 @@ Widget_FocusIn_Event_Connect(	LCUI_Widget *widget,
 	if( !Get_FuncData(&func_data, func, (void*)widget, arg) ) {
 		return FALSE;
 	}
-	EventQueue_Add(&widget->event, EVENT_FOCUS_IN, &func_data);
+	EventSlots_Add(&widget->event, EVENT_FOCUS_IN, &func_data);
 	return TRUE;
 }
 
@@ -745,7 +745,7 @@ Widget_FocusOut_Event_Connect(	LCUI_Widget *widget,
 	if( !Get_FuncData(&func_data, func, (void*)widget, arg) ) {
 		return FALSE;
 	}
-	EventQueue_Add(&widget->event, EVENT_FOCUS_OUT, &func_data);
+	EventSlots_Add(&widget->event, EVENT_FOCUS_OUT, &func_data);
 	return TRUE;
 }
 
@@ -767,7 +767,7 @@ WidgetFocusProc( LCUI_Key *key_data, void *arg )
 		}
 		widget = focus_widget;
 		/* 保存已关联按键事件的部件指针 */
-		if( EventQueue_Find( &widget->event, EVENT_KEYBOARD ) ) {
+		if( EventSlots_Find( &widget->event, EVENT_KEYBOARD ) ) {
 			tmp = widget;
 		}
 	}

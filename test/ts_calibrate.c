@@ -322,7 +322,7 @@ void *calibrate_func(void *widget)
 		printf("error: your device can not support touch screen!\n");
 	}
 	/* 退出主循环 */
-	Main_Loop_Quit();
+	LCUI_StopMainLoop();
 	LCUI_Thread_Exit(NULL);
 }
 
@@ -343,7 +343,7 @@ void Get_Path(char *filepath, char *out_path)
 void quit_window( LCUI_Widget *widget, LCUI_Key *key )
 {
 	if( key->code == KEY_ESC ) {
-		Main_Loop_Quit();
+		LCUI_StopMainLoop();
 	}
 }
 
@@ -393,7 +393,7 @@ int main(int argc,char*argv[])
 	/* 设定部件对齐方式以及偏移距离 */
 	Set_Widget_Align(label, ALIGN_MIDDLE_CENTER, Pos(0, label->size.h + 1)); 
 	
-	/* 将返回键与Main_Loop_Quit函数关联，当返回键被按下后，程序退出主循环 */
+	/* 将返回键与LCUI_StopMainLoop函数关联，当返回键被按下后，程序退出主循环 */
 	Widget_Keyboard_Event_Connect( window, quit_window );
 	/* 将这两个部件放入窗口客户区内 */
 	Window_Client_Area_Add(window, label);

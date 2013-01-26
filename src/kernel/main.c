@@ -4,7 +4,6 @@
 #include LC_GRAPH_H
 #include LC_RES_H
 #include LC_DISPLAY_H
-#include LC_EVENT_H
 #include LC_CURSOR_H 
 #include LC_INPUT_H
 #include LC_ERROR_H
@@ -84,8 +83,8 @@ void LCUI_App_Init( LCUI_App *app )
 {
 	app->id = 0;
 	app->stop_loop = FALSE;
-	Tasks_Init( &app->tasks );
-	//EventQueue_Init(&app->key_event);
+	AppTasks_Init( &app->tasks );
+	//EventSlots_Init(&app->key_event);
 	WidgetLib_Init(&app->widget_lib);
 	app->encoding_type = ENCODEING_TYPE_UTF8;
 }
@@ -271,7 +270,7 @@ int LCUI_Init(int argc, char *argv[])
 		LCUI_StartEventThread();
 		
 		/* 初始化按键事件队列 */
-		EventQueue_Init( &LCUI_Sys.key_event );
+		EventSlots_Init( &LCUI_Sys.key_event );
 		/* 初始化默认的字体数据 */
 		LCUI_Font_Init(&LCUI_Sys.default_font);
 		/* 初始化LCUI程序数据 */

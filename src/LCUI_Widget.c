@@ -1078,7 +1078,7 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	
 	Graph_Init( &widget.background_image );	/* 初始化背景图数据 */
 	RectQueue_Init( &widget.invalid_area );	/* 初始化无效区域记录 */
-	EventQueue_Init( &widget.event );	/* 初始化部件的事件数据队列 */
+	EventSlots_Init( &widget.event );	/* 初始化部件的事件数据队列 */
 	WidgetQueue_Init( &widget.child );	/* 初始化子部件集 */
 	WidgetData_Init( &widget.data_buff );	/* 初始化数据更新队列 */ 
 	String_Init( &widget.type );
