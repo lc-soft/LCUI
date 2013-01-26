@@ -171,7 +171,7 @@ void Send_Keyboard_Event( LCUI_Key key )
 		func->arg[0] = key_data;
 		func->destroy_arg[0] = TRUE;
 		/* 添加至程序的任务队列 */
-		Send_Task_To_App( func );
+		AppTasks_Add( func );
 	} 
 }
 

@@ -40,12 +40,11 @@ BOOL LCUI_PollEvent( LCUI_Event *event )
 static void *LCUI_EventLoop( void *unused )
 {
 	LCUI_Event event;
-	int need_delay = FALSE, delay_time = 1500;
+	int delay_time = 1500;
 	
 	while( active ) {
-		need_delay = TRUE;
-		while( LCUI_PollEvent( &event ) ) {
-			need_delay = FALSE;
+		if( LCUI_PollEvent( &event ) ) {
+			delay_time = 1500;
 			switch( event.type ) {
 			case LCUI_KEYDOWN:
 				
@@ -63,14 +62,11 @@ static void *LCUI_EventLoop( void *unused )
 				
 				break;
 			}
-		}
-		if( need_delay ) {
+		} else {
 			if( delay_time <= 15000 ) {
 				delay_time += 1500;
 			}
 			usleep( delay_time );
-		} else {
-			delay_time = 1500;
 		}
 	}
 	thread_exit( NULL );

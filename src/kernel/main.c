@@ -84,7 +84,7 @@ void LCUI_App_Init( LCUI_App *app )
 {
 	app->id = 0;
 	app->stop_loop = FALSE;
-	FuncQueue_Init( &app->tasks );
+	Tasks_Init( &app->tasks );
 	//EventQueue_Init(&app->key_event);
 	WidgetLib_Init(&app->widget_lib);
 	app->encoding_type = ENCODEING_TYPE_UTF8;
@@ -370,9 +370,8 @@ int LCUI_Main ()
 			Run_Task( app ); 
 		} else { /* 否则暂停一段时间 */
 			usleep (idle_time);
-			idle_time += 1500;
-			if (idle_time >= MAX_APP_IDLE_TIME) {
-				idle_time = MAX_APP_IDLE_TIME;
+			if (idle_time < MAX_APP_IDLE_TIME) {
+				idle_time += 1500;
 			}
 		}
 	}

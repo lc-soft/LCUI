@@ -130,7 +130,7 @@ void Send_Mouse_Event(int event_id, LCUI_MouseEvent *event)
 			func = Queue_Get(&temp->func_data, i[1]);
 			func->arg[0] = event;
 			func->arg[1] = NULL;
-			Send_Task_To_App( func );
+			AppTasks_Add( func );
 		}
 	}
 }
@@ -285,7 +285,8 @@ static BOOL proc_mouse( void *arg )
 	}
 	pos.x = pos.x<0 ? 0:pos.x; 
 	pos.y = pos.y<0 ? 0:pos.y;
-	
+	/* 应用鼠标游标的位置变更 */
+	Set_Cursor_Pos( pos );
 	/* 处理鼠标事件 */
 	Handle_Mouse_Event( pos, buf[0] & 0x07 );
 	return TRUE;

@@ -95,28 +95,33 @@ void FuncQueue_Init(LCUI_Queue *queue);
 /* 功能：初始化函数指针队列 */ 
 
 /****************************** Task **********************************/
+void Tasks_Init( LCUI_Queue *tasks );
 
-void Send_Task_To_App(LCUI_Func *func_data);
+int Tasks_Add( LCUI_Queue *tasks, LCUI_Task *task );
+
 /*
  * 功能：发送任务给程序，使这个程序进行指定任务
- * 说明：LCUI_Func结构体中的成员变量 id，保存的是目标程序的id
- */ 
+ * 说明：LCUI_Task结构体中的成员变量 id，保存的是目标程序的id
+ */
+void AppTasks_Add( LCUI_Task *task );
 
-int AppTask_CustomAdd(int mode, LCUI_Func *func_data);
+int Tasks_CustomAdd( LCUI_Queue *tasks, int mode, LCUI_Task *task );
+
 /*
  * 功能：使用自定义方式添加程序任务
  * 用法示例：
  * 在函数的各参数与队列中的函数及各参数不重复时，添加它
- * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT | AND_ARG_F | AND_ARG_S, func_data);
+ * AppTasks_CustomAdd(ADD_MODE_NOT_REPEAT | AND_ARG_F | AND_ARG_S, task);
  * 只要函数和参数1不重复则添加
- * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT | AND_ARG_F, func_data);
+ * AppTasks_CustomAdd(ADD_MODE_NOT_REPEAT | AND_ARG_F, task);
  * 要函数不重复则添加
- * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT, func_data);
+ * AppTasks_CustomAdd(ADD_MODE_NOT_REPEAT, task);
  * 添加新的，不管是否有重复的
- * AppTask_CustomAdd(ADD_MODE_ADD_NEW, func_data);
+ * AppTasks_CustomAdd(ADD_MODE_ADD_NEW, task);
  * 有相同函数则覆盖，没有则新增
- * AppTask_CustomAdd(ADD_MODE_REPLACE, func_data);
- * */ 
+ * AppTasks_CustomAdd(ADD_MODE_REPLACE, task);
+ * */
+int AppTasks_CustomAdd( int mode, LCUI_Task *task );
 /**************************** Task End ********************************/
 
 

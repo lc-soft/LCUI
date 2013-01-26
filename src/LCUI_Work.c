@@ -61,152 +61,6 @@ FuncQueue_Init(LCUI_Queue *queue)
 	Queue_Init(queue, sizeof(LCUI_Func), NULL);
 }
 
-/****************************** Task **********************************/
-
-void 
-Send_Task_To_App(LCUI_Func *func_data)
-/*
- * 功能：发送任务给程序，使这个程序进行指定任务
- * 说明：LCUI_Func结构体中的成员变量 id，保存的是目标程序的id
- */
-{ 
-	LCUI_App *app;
-	app = Find_App( func_data->id );
-	if( !app ) {
-		return;
-	}
-	Queue_Add( &app->tasks, func_data );
-}
-
-static void
-__destroy_apptask( LCUI_Func *func_data )
-/* 销毁程序任务 */
-{
-	if( func_data->destroy_arg[0] && func_data->arg[0] ) {
-		free( func_data->arg[0] );
-		func_data->arg[0] = NULL;
-	}
-	if( func_data->destroy_arg[1] && func_data->arg[1] ) {
-		free( func_data->arg[1] );
-		func_data->arg[1] = NULL;
-	}
-}
-
-int 
-AppTask_CustomAdd(int mode, LCUI_Func *func_data)
-/*
- * 功能：使用自定义方式添加程序任务
- * 用法示例：
- * 在函数的各参数与队列中的函数及各参数不重复时，添加它
- * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT | AND_ARG_F | AND_ARG_S, func_data);
- * 只要函数和参数1不重复则添加
- * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT | AND_ARG_F, func_data);
- * 要函数不重复则添加
- * AppTask_CustomAdd(ADD_MODE_NOT_REPEAT, func_data);
- * 添加新的，不管是否有重复的
- * AppTask_CustomAdd(ADD_MODE_ADD_NEW, func_data);
- * 有相同函数则覆盖，没有则新增
- * AppTask_CustomAdd(ADD_MODE_REPLACE, func_data);
- * */
-{
-	int total, i;
-	/* 先获取程序数据结构体指针 */
-	LCUI_App *app;
-	LCUI_Queue *queue;
-	LCUI_Func *temp = NULL;
-	
-	if( func_data->id == (LCUI_ID)0 ) {
-		app = Get_Self_AppPointer();
-	} else {
-		app = Find_App( func_data->id );
-	}
-	if( !app ) {
-		return -1;
-	}
-	queue = &app->tasks;
-	total = Queue_Get_Total(queue);
-	/* 如果模式是“添加新的”模式 */
-	if( mode == ADD_MODE_ADD_NEW ) {
-		Queue_Add(queue, func_data); 
-		return 0;
-	}
-	
-	//printf("mode: %d\n", mode);
-	for (i = 0; i < total; ++i) {
-		//printf("1\n");
-		temp = Queue_Get(queue, i);
-		/* 如果指针无效，或者函数指针已有记录 */
-		if( !temp || temp->func != func_data->func ) {
-			continue;
-		}
-		/* 如果要求的是不重复模式 */ 
-		if(Check_Option(mode, ADD_MODE_NOT_REPEAT)) {
-			/* 如果要求是第1个参数不能重复 */
-			if(Check_Option(mode, AND_ARG_F)) {
-				//printf("ADD_MODE_NOT_REPEAT, AND_ARG_F\n");
-				//printf("old:%p, new:%p\n", queue->queue[i].arg_f, arg_f);
-				/* 如果要求是第2个参数也不能重复 */
-				if(Check_Option(mode, AND_ARG_S)) {
-					/* 如果函数以及参数1和2都一样 */ 
-					if(temp->arg[0] == func_data->arg[0] 
-					&& temp->arg[1] == func_data->arg[1]) {
-						__destroy_apptask( func_data );
-						return -1; 
-					}
-				} else {/* 否则，只是要求函数以及第1个参数不能全部重复 */
-					if(temp->arg[0] == func_data->arg[0]) { 
-						__destroy_apptask( func_data );
-						return -1; 
-					}
-				}
-			}/* 否则，如果只是要求是第2个参数不能重复 */
-			else if(Check_Option(mode, AND_ARG_S)) {
-				if(temp->arg[1] == func_data->arg[1] ) {
-					__destroy_apptask( func_data );
-					return -1; 
-				}
-			} else {/* 否则，只是要求函数不同 */ 
-				__destroy_apptask( func_data );
-				return -1; 
-			}
-		}/* 如果要求的是替换模式 */
-		else if(Check_Option(mode, ADD_MODE_REPLACE)) {
-			//printf("ADD_MODE_REPLACE\n");
-			/* 如果要求是第1个参数相同 */
-			if( Check_Option(mode, AND_ARG_F) ) {
-				/* 如果要求是第2个参数也相同 */
-				if( Check_Option(mode, AND_ARG_S) ) {
-					if(temp->arg[0] == func_data->arg[0] 
-					&& temp->arg[1] == func_data->arg[1]
-					) {
-						break; 
-					}
-				} else {/* 否则，只是要求函数以及第1个参数全部相同 */
-					if(temp->arg[0] == func_data->arg[0]) {
-				//		printf("ARG_F\n");
-						break; 
-					}
-				}
-			}/* 否则，如果只是要求第2个参数不能相同 */
-			else if(Check_Option(mode, AND_ARG_S)) {
-				if(temp->arg[1] == func_data->arg[1]) {
-					break; 
-				}
-			} else { 
-				break; 
-			}
-		}
-	}
-	
-	if(i == total) {
-		Queue_Add(queue, func_data); 
-	} else {
-		Queue_Replace( queue, i, func_data ); 
-	}
-	return 0;
-}
-/**************************** Task End ********************************/
-
 /***************************** Event ***********************************/
 static void 
 Destroy_Event(void *arg)
@@ -359,7 +213,7 @@ Handle_Widget_KeyboardEvent( LCUI_Widget *widget, LCUI_Key key )
 		func->arg[1] = key_data;
 		func->destroy_arg[1] = TRUE;
 		/* 添加至程序的任务队列 */ 
-		AppTask_CustomAdd( ADD_MODE_ADD_NEW, func );
+		AppTasks_CustomAdd( ADD_MODE_ADD_NEW, func );
 	}
 	return 0;
 }
@@ -382,7 +236,7 @@ Handle_Event(LCUI_Queue *queue, int event_id)
 	for (i = 0; i < total; ++i) {
 		func = Queue_Get(&event->func_data, i);
 		/* 添加至程序的任务队列 */ 
-		AppTask_CustomAdd(ADD_MODE_REPLACE | AND_ARG_F, func);
+		AppTasks_CustomAdd(ADD_MODE_REPLACE | AND_ARG_F, func);
 	}
 	return 0;
 }
@@ -537,10 +391,10 @@ _Start_DragEvent( LCUI_Widget *widget, LCUI_Event *event )
 }
 
 static void 
-_Doing_DragEvent( LCUI_Widget *widget, LCUI_Event *event )
+_Doing_DragEvent( LCUI_Widget *widget, LCUI_MouseMotionEvent *event )
 {
-	drag_event.cursor_pos.x = event->button.x;
-	drag_event.cursor_pos.y = event->button.y;
+	drag_event.cursor_pos.x = event->x;
+	drag_event.cursor_pos.y = event->y;
 	drag_event.new_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
 	drag_event.first_click = 0;
 	drag_event.end_click = 0;
@@ -665,7 +519,6 @@ void LCUI_HandleMouseMotion( LCUI_Event *event )
 	
 	pos.x = event->motion.x;
 	pos.y = event->motion.y;
-	Set_Cursor_Pos( pos );
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
 	widget = Widget_At( NULL, pos );
 	if( !widget ) {
@@ -712,7 +565,7 @@ skip_widget_check:;
 	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */ 
 	if( click_widget && event->motion.state == PRESSED 
 	 && Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
-		_Doing_DragEvent( click_widget, event );
+		_Doing_DragEvent( click_widget, &event->motion );
 	}
 }
 

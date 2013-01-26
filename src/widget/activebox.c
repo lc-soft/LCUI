@@ -395,7 +395,7 @@ Process_Frames()
 		for(i=0; i<total; ++i){
 			func = Queue_Get( &frames->func_data, i );
 			func->arg[0] = slot;
-			AppTask_CustomAdd( ADD_MODE_REPLACE | AND_ARG_S, func );
+			AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_S, func );
 		} 
 	}
 }
