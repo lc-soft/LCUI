@@ -55,33 +55,63 @@ typedef enum _FuncType
 }FuncType;
 /****************************************************/
 
-#include LC_GRAPHLAYER_H
-
 /******************************* 部件 **********************************/
-typedef struct _LCUI_Widget LCUI_Widget;
+typedef enum {
+	NO_REPEAT,	/* 不重复排列 */
+	REPEAT,		/* 重复排列 */
+	REPEAT_X,	/* 在X轴重复排列 */
+	REPEAT_Y,	/* 在Y轴重复排列 */
+} REPEAT_TYPE;
 
-struct _LCUI_Widget 
-{
-	LCUI_ID app_id; /* 所属程序的ID */
-	
+typedef struct {
+	BOOL transparent;	/* 是否透明 */
+	LCUI_Graph image;	/* 背景图 */
+	LCUI_RGB color;	/* 背景色 */
+	REPEAT_TYPE repeat;	/* 背景图的重复排列模式 */
+	ALIGN_TYPE align;	/* 背景图的对其方式 */
+	LCUI_Pos offset;	/* 偏移距离 */
+} LCUI_Background;
+
+typedef struct {
 	LCUI_Pos pos;	/* 已计算出的实际位置 */
 	LCUI_Pos max_pos;
 	LCUI_Pos min_pos;
-	/*------------ 位置限制（描述） ---------------*/ 
+	/*------------ 位置（描述） ---------------*/ 
 	PX_P_t x, y;
 	PX_P_t max_x, min_x;
 	PX_P_t max_y, min_y;
-	/*------------------ END -------------------*/
+	/*-------------- END -------------------*/
 	
 	LCUI_Size size; /* 已计算出的实际尺寸，单位为像素 */
 	LCUI_Size max_size;
 	LCUI_Size min_size;
 	
-	/*------------ 尺寸限制（描述） ---------------*/ 
+	/*------------ 尺寸（描述） ---------------*/ 
 	PX_P_t w, h;
 	PX_P_t max_w, min_w;
 	PX_P_t max_h, min_h;
-	/*------------------ END -------------------*/
+	/*--------------- END -------------------*/
+	
+	/*----------------- 部件布局相关 ----------------*/
+	POS_TYPE	pos_type;	/* 位置类型 */
+	ALIGN_TYPE	align;		/* 布局 */
+	LCUI_Pos	offset;		/* x，y轴的偏移量 */
+	DOCK_TYPE	dock;		/* 停靠位置 */
+	/*------------------ END ----------------------*/
+	
+	/*------------ 外边距和内边距 ---------------*/ 
+	LCUI_Margin	margin;
+	LCUI_Padding	padding;
+	/*---------------- END -------------------*/
+	
+	LCUI_Border border;		/* 边框 */
+	LCUI_Background background;	/* 背景 */
+} LCUI_WidgetStyle;
+
+typedef struct _LCUI_Widget LCUI_Widget;
+
+struct _LCUI_Widget {
+	LCUI_ID app_id; /* 所属程序的ID */
 	
 	WIDGET_STATUS status;	/* 部件的状态 */
 	BOOL status_response;	/* 是否响应部件的状态改变 */
@@ -98,41 +128,23 @@ struct _LCUI_Widget
 	int		clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“不小于”才使条件成立 */
 	uchar_t	clickable_area_alpha;	/* 指定部件图层中的区域的alpha值小于/不小于多少时可被鼠标点击，默认为0，最大为255 */
 	
-	LCUI_String	type;		/* 部件的类型 */
-	LCUI_ID	type_id;	/* 部件的类型ID */
-	LCUI_String	style;		/* 部件的风格，对某些部件有效 */
-	LCUI_ID	style_id;	/* 部件的风格的ID */
-	LCUI_Widget	*parent;	/* 父部件 */
-	LCUI_Queue	child;		/* 子部件集 */
+	LCUI_String	type_name;	/* 类型名 */
+	LCUI_String	style_name;	/* 风格名，对某些部件有效 */
+	LCUI_ID	type_id;	/* 类型编号 */
+	LCUI_ID	style_id;	/* 风格编号 */
 	
-	/*----------------- 部件布局相关 ----------------*/
-	POS_TYPE	pos_type;	/* 位置类型 */
-	ALIGN_TYPE	align;		/* 布局 */
-	LCUI_Pos	offset;		/* x，y轴的偏移量 */
-	DOCK_TYPE	dock;		/* 停靠位置 */
-	/*------------------ END ----------------------*/
+	LCUI_WidgetStyle style; /* 部件的样式数据 */
 	
-	/*------------ 外边距和内边距 ---------------*/ 
-	LCUI_Margin	margin;
-	LCUI_Padding	padding;
-	/*---------------- END -------------------*/
+	void *private_data;   /* 指针，指向部件私有数据，供预先注册的回调函数利用 */
 	
-	LCUI_Border	border;		/* 边框 */
+	LCUI_Widget *parent;		/* 父部件 */
+	LCUI_Queue child;		/* 子部件集 */
+	LCUI_Queue event;		/* 保存部件的事件关联的数据 */
+	LCUI_Queue data_buff;		/* 记录需要进行更新的数据 */ 
+	LCUI_Queue invalid_area;	/* 记录无效区域 */
 	
-	LCUI_RGB  back_color;  /* 背景色 */
-	LCUI_RGB  fore_color;  /* 前景色 */
-	
-	int		bg_mode;  /* 背景模式，指定在无背景时是使用透明背景还是使用背景色填充 */
-	int		background_image_layout; /* 背景图的布局 */
-	LCUI_Graph	background_image;	 /* 背景图 */
-	
-	void *private_data;   /* 该部件私有数据的指针，其它的是各个部件公用的数据 */ 
-	
-	LCUI_Queue event; /* 保存部件的事件关联的数据 */
-	LCUI_Queue data_buff; /* 记录需要进行更新的数据 */ 
-	LCUI_Queue invalid_area; /* 记录无效区域 */
-	LCUI_GraphLayer* main_glayer; /* 部件的主图层 */
-	LCUI_GraphLayer* client_glayer; /* 客户区图层 */
+	LCUI_GraphLayer* main_glayer;		/* 部件的主图层 */
+	LCUI_GraphLayer* client_glayer;	/* 客户区图层 */
 	
 	/* 以下是函数指针，闲函数名太长的话，可以直接用下面的 */
 	void (*resize)(LCUI_Widget*, LCUI_Size);
@@ -145,6 +157,7 @@ struct _LCUI_Widget
 	void (*set_alpha)(LCUI_Widget*, unsigned char); 
 	void (*set_border)(LCUI_Widget*, LCUI_Border);
 };
+
 /**********************************************************************/
 
 
