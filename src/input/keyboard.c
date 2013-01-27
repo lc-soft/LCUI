@@ -152,33 +152,9 @@ int Find_Pressed_Key(int key)
 	return 0;
 }
 
-
-void Send_Keyboard_Event( LCUI_Key key )
-{
-	LCUI_Key *key_data;
-	LCUI_Func *func;
-	int total, i;
-	
-	total = Queue_Get_Total( &LCUI_Sys.key_event );
-	if( total <= 0 ) {
-		return;
-	}
-	key_data = (LCUI_Key*)malloc( sizeof(LCUI_Key) );
-	memcpy( key_data, &key, sizeof(LCUI_Key) );
-	for (i = 0; i < total; ++i) {
-		func = Queue_Get( &LCUI_Sys.key_event, i );
-		/* 为第二个参数分配了内存，需要在调用完回调函数后销毁它 */
-		func->arg[0] = key_data;
-		func->destroy_arg[0] = TRUE;
-		/* 添加至程序的任务队列 */
-		AppTasks_Add( func );
-	} 
-}
-
-
 static BOOL proc_keyboard()
 {
-	LCUI_Key key;
+	LCUI_Event event;
 	LCUI_Rect area;
 	LCUI_Graph graph;
 	
@@ -191,11 +167,14 @@ static BOOL proc_keyboard()
 	if ( !Check_Key ()) {
 		return FALSE;
 	}
-	key.code = Get_Key (); 
+	
+	event.type = LCUI_KEYDOWN;
+	event.key.key_code = Get_Key ();
+	
 	#define __NEED_CATCHSCREEN__
 	#ifdef __NEED_CATCHSCREEN__
 	//当按下c键后，可以进行截图，只截取指定区域的图形
-	if(key.code == 'c') {
+	if(event.key.key_code == 'c') {
 		time_t rawtime;
 		struct tm * timeinfo;
 		char filename[100];
@@ -209,13 +188,12 @@ static BOOL proc_keyboard()
 		Catch_Screen_Graph_By_FB( area, &graph );
 		write_png(filename, &graph);
 	}
-	else if(key.code == 'r') {
+	else if(event.key.key_code == 'r') {
 		/* 如果按下r键，就录制指定区域的图像 */
 		start_record_screen( area );
 	}
 	#endif
-	/* 处理程序中关联的按键事件 */
-	Send_Keyboard_Event( key );
+	LCUI_PushEvent( &event );
 	Graph_Free(&graph);
 	return TRUE;
 }

@@ -547,8 +547,8 @@ struct _LCUI_Cursor
 #include LC_KERNEL_MAIN_H
 #include LC_KERNEL_DEV_H
 #include LC_KERNEL_TIMER_H
-#include LC_KERNEL_EVENT_H
 #include LC_KERNEL_TASK_H
+#include LC_KERNEL_EVENT_H
 #include LC_WORK_H
 
 /* 如果是使用C++语言，那么就包含LCUI的C++版头文件 */

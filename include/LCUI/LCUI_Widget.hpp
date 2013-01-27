@@ -245,7 +245,7 @@ int LCUIWidget::connectKeyboardEvent( void (*func)(LCUI_Widget*, LCUI_Key *) )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	return Widget_Keyboard_Event_Connect( widget, func );
+	return Widget_KeyboardEvent_Connect( widget, func );
 }
 
 int LCUIWidget::connectFocusInEvent( void (*func)(LCUI_Widget*, void*), void *arg )

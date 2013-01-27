@@ -62,7 +62,7 @@ LCUI_Mouse;
 static LCUI_Mouse mouse_data;
 
 /****************************** Mouse *********************************/
-int Mouse_LeftButton( LCUI_Event *event )
+int Mouse_LeftButton( LCUI_MouseButtonEvent *event )
 /*
  * 功能：检测鼠标事件中鼠标左键的状态
  * 说明：该函数只适用于响应鼠标按键状态发生改变时，判断按键状态。
@@ -76,8 +76,8 @@ int Mouse_LeftButton( LCUI_Event *event )
 	if( !event ) {
 		return -2;
 	}
-	else if(event->button.button == MOUSE_LEFT_KEY) {
-		return event->button.state;
+	else if(event->button == MOUSE_LEFT_KEY) {
+		return event->state;
 	}
 	return -1;
 }
@@ -111,28 +111,6 @@ int Click_LeftButton (LCUI_Event *event)
 		return 1;
 	}
 	return 0;
-}
-
-void Send_Mouse_Event(int event_id, LCUI_MouseEvent *event)
-/* 功能：向已关联鼠标事件的程序发送任务 */
-{
-	int i[2], total[2];
-	LCUI_EventSlot *temp;
-	LCUI_Func *func;
-	total[0] = Queue_Get_Total( &LCUI_Sys.mouse_event );
-	for(i[0]=0; i[0]<total[0]; ++i[0]) {
-		temp = Queue_Get( &LCUI_Sys.mouse_event , i[0]);
-		if( !temp || temp->id != event_id) {
-			continue;
-		}
-		total[1] = Queue_Get_Total(&temp->func_data);
-		for(i[1]=0; i[1]<total[1]; ++i[1]) {
-			func = Queue_Get(&temp->func_data, i[1]);
-			func->arg[0] = event;
-			func->arg[1] = NULL;
-			AppTasks_Add( func );
-		}
-	}
 }
 
 int KeyQueue_Find(LCUI_Queue *queue, int key_code)
@@ -197,7 +175,7 @@ static void Free_MouseKey( LCUI_Pos pos, int key_code )
 }
 
 /* 功能：处理鼠标产生的事件 */
-void Handle_Mouse_Event( LCUI_Pos new_pos, int button_type )
+void LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type )
 {
 	int key_state = FREE;
 	static LCUI_Pos old_pos;
@@ -288,7 +266,7 @@ static BOOL proc_mouse( void *arg )
 	/* 应用鼠标游标的位置变更 */
 	Set_Cursor_Pos( pos );
 	/* 处理鼠标事件 */
-	Handle_Mouse_Event( pos, buf[0] & 0x07 );
+	LCUI_PushMouseEvent( pos, buf[0] & 0x07 );
 	return TRUE;
 }
 
@@ -334,7 +312,7 @@ int Mouse_Init()
 	mouse_data.status = REMOVE;	/* 鼠标为移除状态 */
 	mouse_data.move_speed = 1;	/* 移动数度为1 */
 	/* 初始化鼠标事件信息队列 */ 
-	EventSlots_Init( &LCUI_Sys.mouse_event ); 
+	EventSlots_Init( &LCUI_Sys.sys_event_slots ); 
 	/* 启用鼠标输入处理 */
 	nobuff_printf("enable mouse input: ");
 	/* 注册鼠标设备 */

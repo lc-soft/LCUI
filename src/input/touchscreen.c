@@ -95,7 +95,7 @@ static BOOL proc_touchscreen()
 	pos.x = pos.x<0 ? 0:pos.x; 
 	pos.y = pos.y<0 ? 0:pos.y; 
 	button = samp.pressure > 0 ? 1:0;
-	Handle_Mouse_Event( pos, button );
+	LCUI_PushMouseEvent( pos, button );
 	//printf("%ld.%06ld: %6d %6d %6d\n", samp.tv.tv_sec, samp.tv.tv_usec, samp.x, samp.y, samp.pressure); 
 	return TRUE;
 #else

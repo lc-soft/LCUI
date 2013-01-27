@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_TextBox.c -- LCUI's TextBox widget
+ * textbox.c -- LCUI's TextBox widget
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_TextBox.c -- LCUI 的文本框部件
+ * textbox.c -- LCUI 的文本框部件
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -152,7 +152,7 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_DragEvent *event )
 }
 
 static void
-TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
+TextBox_Input( LCUI_Widget *widget, LCUI_KeyboardEvent *event )
 {
 	static char buff[5];
 	static int cols, flag, rows;
@@ -160,13 +160,13 @@ TextBox_Input( LCUI_Widget *widget, LCUI_Key *key )
 	static LCUI_TextLayer *layer;
 	static LCUI_TextBox *textbox;
 	
-	//printf("you input %d\n", key->code);
+	//_DEBUG_MSG("you input: %d\n", event->key_code);
 	layer = TextBox_Get_TextLayer( widget );
 	textbox = Get_Widget_PrivData( widget );
 	cur_pos = TextLayer_Get_Cursor_Pos( layer );
 	cols = TextLayer_Get_RowLen( layer, cur_pos.y );
 	rows = TextLayer_Get_Rows( layer ); 
-	switch( key->code ) {
+	switch( event->key_code ) {
 	    case KEY_HOMEPAGE: //home键移动光标至行首
 		cur_pos.x = 0;
 		goto mv_cur_pos;
@@ -225,31 +225,31 @@ mv_cur_pos:;
 		}
 		/* 处理文本框的字符输入限制 */
 		if( Check_Option( textbox->limit_mode, ONLY_0_TO_9 ) ) {
-			if( key->code >= '0' && key->code <= '9' ) {
+			if( event->key_code >= '0' && event->key_code <= '9' ) {
 				++flag;
 			}
 		}
 		if( Check_Option( textbox->limit_mode, ONLY_a_TO_z ) ) {
-			if( key->code >= 'a' && key->code <= 'z' ) {
+			if( event->key_code >= 'a' && event->key_code <= 'z' ) {
 				++flag;
 			}
 		}
 		if( Check_Option( textbox->limit_mode, ONLY_A_TO_Z ) ) {
-			if( key->code >= 'A' && key->code <= 'Z' ) {
+			if( event->key_code >= 'A' && event->key_code <= 'Z' ) {
 				++flag;
 			}
 		}
 		if( Check_Option( textbox->limit_mode, ONLY_UNDERLINE ) ) {
-			if( key->code == '_' ) {
+			if( event->key_code == '_' ) {
 				++flag;
 			}
 		}
-		//_DEBUG_MSG("input char: %c, %d\n", key->code, flag);
+		//_DEBUG_MSG("input char: %c, %d\n", event->key_code, flag);
 		/* 如果该ASCII码代表的字符是可见的 */
-		if( flag == 1 && (key->code == 10 || 
-			(key->code > 31 && key->code < 126)) ) {
+		if( flag == 1 && (event->key_code == 10 || 
+			(event->key_code > 31 && event->key_code < 126)) ) {
 			//wchar_t *text;
-			buff[0] = key->code;
+			buff[0] = event->key_code;
 			buff[1] = 0;
 			TextBox_Text_Add( widget, buff);
 			//text = TextLayer_Get_Text( layer );
@@ -365,7 +365,7 @@ TextBox_Init( LCUI_Widget *widget )
 	Widget_FocusOut_Event_Connect( widget, hide_textbox_cursor, NULL );
 	Widget_FocusIn_Event_Connect( widget, _put_textbox_cursor, NULL );
 	/* 关联按键输入事件 */
-	Widget_Keyboard_Event_Connect( widget, TextBox_Input );
+	Widget_KeyboardEvent_Connect( widget, TextBox_Input );
 	/* 默认不启用多行文本模式 */
 	TextBox_Multiline( widget, FALSE );
 }

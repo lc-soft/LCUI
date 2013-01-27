@@ -48,9 +48,9 @@ typedef struct _LCUI_System
 	LCUI_Cursor	cursor;		/* 游标 */
 	
 	LCUI_Screen	screen;		/* 屏幕信息 */
-	LCUI_Queue	mouse_event;	/* 鼠标事件 */
+	LCUI_Queue	sys_event_slots; /* 事件槽记录 */
+	LCUI_Queue	user_event_slots; /* 事件槽记录 */
 	LCUI_Queue	press_key;	/* 保存已被按下的按键的键值 */
-	LCUI_Queue	key_event;	/* 保存与按键事件关联的数据 */
 	LCUI_Queue	dev_list;	/* 设备列表 */
 	LCUI_Queue	widget_list;	/* 部件队列，对应它的显示顺序 */
 	LCUI_Widget	*focus_widget;	/* 获得焦点的部件 */

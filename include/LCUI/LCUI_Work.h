@@ -65,12 +65,6 @@ typedef struct _LCUI_DragEvent
 }
 LCUI_DragEvent; 
 
-typedef struct {
-	int id;			/* 记录事件ID */
-	LCUI_Queue func_data;	/* 记录被关联的回调函数数据 */
-} LCUI_EventSlot;
-
-
 LCUI_BEGIN_HEADER
 
 /***************************** Func ***********************************/
@@ -79,35 +73,6 @@ void NULL_Func();
 
 void FuncQueue_Init(LCUI_Queue *queue);
 /* 功能：初始化函数指针队列 */ 
-
-/***************************** Event ***********************************/ 
-void EventSlots_Init(LCUI_Queue * queue);
-/* 功能：初始化事件队列 */ 
-
-BOOL Get_FuncData(LCUI_Func *p, void (*func) (), void *arg1, void *arg2);
-/* 
- * 功能：将函数指针以及两个参数，转换成LCUI_Func类型的指针
- * 说明：此函数会申请内存空间，并返回指向该空间的指针
- * */ 
-
-LCUI_EventSlot *EventSlots_Find(LCUI_Queue *queue, int event_id);
-/* 功能：根据事件的ID，获取指向该事件的指针 */ 
-
-int EventSlots_Add(LCUI_Queue *queue, int event_id, LCUI_Func *func);
-/* 功能：记录事件及对应回调函数至队列 */ 
-
-int LCUI_MouseEvent_Connect (void (*func) (), int event_id);
-/* 
- * 功能：将函数与鼠标的相关事件相关联
- * 说明：当鼠标事件触发后，会先将已关联该事件的函数指针及相关事件的指针
- * 添加至程序的任务队列，等待程序在主循环中处理
- **/ 
-
-int Handle_Event(LCUI_Queue *queue, int event_id);
-/* 
- * 功能：处理指定ID的事件
- * 说明：本函数会将事件队列中与指定ID的事件关联的回调函数 添加至程序的任务队列
- * */ 
 
 /********************* 处理部件拖动/点击事件 ******************************/
 int Widget_Drag_Event_Connect ( 
@@ -119,15 +84,13 @@ int Widget_Drag_Event_Connect (
  * 说明：建立连接后，但部件被点击，拖动，释放，都会调用回调函数
  * */ 
 
-int 
-Widget_Keyboard_Event_Connect (
-			LCUI_Widget *widget,
-			void (*func)(LCUI_Widget*, LCUI_Key *)
-);
 /* 
  * 功能：将回调函数与部件的按键输入事件进行连接 
  * 说明：建立连接后，当部件处于焦点状态，并使用键盘进行输入时，会调用该回调函数
  * */
+int Widget_KeyboardEvent_Connect (
+		LCUI_Widget *widget,
+		void (*func)(LCUI_Widget*, LCUI_KeyboardEvent *) );
 
 int Widget_Clicked_Event_Connect (
 			LCUI_Widget *widget,
@@ -141,18 +104,6 @@ int Widget_Clicked_Event_Connect (
 
 void Widget_Event_Init();
 /* 功能：初始化部件事件处理 */ 
-
-/* 响应鼠标按键按下事件 */
-void LCUI_HandleMouseButtonDown( LCUI_Event *event );
-
-/* 响应鼠标按键释放事件 */
-void LCUI_HandleMouseButtonUp( LCUI_Event *event );
-
-/* 
- * 功能：跟踪鼠标移动，处理触发的基本事件
- * 说明：这只是根据鼠标事件来处理部件状态的切换
- * */
-void LCUI_HandleMouseMotion( LCUI_Event *event );
 
 /*--------------------------- Focus Proc ------------------------------*/
 BOOL 

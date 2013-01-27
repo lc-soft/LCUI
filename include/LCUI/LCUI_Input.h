@@ -88,7 +88,7 @@
 LCUI_BEGIN_HEADER
 
 /****************************** Mouse *********************************/
-int Mouse_LeftButton( LCUI_Event *event );
+int Mouse_LeftButton( LCUI_MouseButtonEvent *event );
 /*
  * 功能：检测鼠标事件中鼠标左键的状态
  * 说明：该函数只适用于响应鼠标按键状态发生改变时，判断按键状态。
@@ -122,7 +122,7 @@ int KeyQueue_Find(LCUI_Queue *queue, int key_code);
 /* 功能:在按键键值队列里查找指定键值的位置 */ 
 
 /* 功能：处理鼠标产生的事件 */
-void Handle_Mouse_Event( LCUI_Pos new_pos, int button_type );
+void LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type );
 
 int Check_Mouse_Support();
 /* 功能：检测鼠标的支持 */ 

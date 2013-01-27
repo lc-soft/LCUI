@@ -101,10 +101,12 @@ static void LCUI_Quit( void )
 	Disable_Mouse_Input();		/* 禁用鼠标输入 */ 
 	Disable_TouchScreen_Input();	/* 禁用触屏支持 */ 
 	Disable_Key_Input();		/* 禁用按键输入 */ 
-	Destroy_Queue( &LCUI_Sys.key_event );/* 销毁按键事件数据队列 */
-	Destroy_Queue( &LCUI_Sys.mouse_event );
+	/* 停止事件循环 */
 	LCUI_StopEventThread();
 	LCUI_DestroyEvents();
+	/* 销毁事件槽记录 */
+	Destroy_Queue( &LCUI_Sys.sys_event_slots );
+	Destroy_Queue( &LCUI_Sys.user_event_slots );
 	timer_thread_destroy( LCUI_Sys.timer_thread, &LCUI_Sys.timer_list );
 }
 
@@ -266,11 +268,13 @@ int LCUI_Init(int argc, char *argv[])
 		
 		LCUI_Sys.focus_widget = NULL; 
 		
+		/* 初始化事件槽记录 */
+		EventSlots_Init( &LCUI_Sys.sys_event_slots );
+		EventSlots_Init( &LCUI_Sys.user_event_slots );
+		
 		LCUI_EventsInit();
 		LCUI_StartEventThread();
 		
-		/* 初始化按键事件队列 */
-		EventSlots_Init( &LCUI_Sys.key_event );
 		/* 初始化默认的字体数据 */
 		LCUI_Font_Init(&LCUI_Sys.default_font);
 		/* 初始化LCUI程序数据 */
