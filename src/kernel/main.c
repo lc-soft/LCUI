@@ -95,7 +95,7 @@ static void LCUI_Quit( void )
  * 说明：在没有任何LCUI程序时，LCUI会调用本函数来恢复运行LCUI前的现场。
  * */
 {
-	LCUI_Sys.status = KILLED;	/* 状态标志置为KILLED */
+	LCUI_Sys.state = KILLED;	/* 状态标志置为KILLED */
 	LCUI_Font_Free ();		/* 释放LCUI的默认字体数据占用的内存资源 */
 	Disable_Graph_Display();	/* 禁用图形显示 */ 
 	Disable_Mouse_Input();		/* 禁用鼠标输入 */ 
@@ -236,7 +236,7 @@ static void LCUI_IO_Init()
 BOOL LCUI_Active()
 /* 功能：检测LCUI是否活动 */
 {
-	if(LCUI_Sys.status == ACTIVE) {
+	if(LCUI_Sys.state == ACTIVE) {
 		return TRUE;
 	}
 	return FALSE;
@@ -254,7 +254,7 @@ int LCUI_Init(int argc, char *argv[])
 	if( !LCUI_Sys.init ) {
 		/* 标记已经初始化 */
 		LCUI_Sys.init = TRUE;
-		LCUI_Sys.status = ACTIVE;
+		LCUI_Sys.state = ACTIVE;
 		/* 初始化随机数种子 */
 		srand(time(NULL));
 		/* 打印版权信息 */

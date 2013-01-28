@@ -69,7 +69,7 @@ struct _LCUI_CheckBox
 
 LCUI_BEGIN_HEADER
 
-int Get_CheckBox_Status(LCUI_Widget *widget);
+int Get_CheckBox_State(LCUI_Widget *widget);
 /* 功能：获取复选框的状态 */ 
 
 int CheckBox_Is_On(LCUI_Widget *widget);

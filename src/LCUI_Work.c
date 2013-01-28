@@ -62,7 +62,7 @@ FuncQueue_Init(LCUI_Queue *queue)
 }
 
 /****************** 处理部件拖动/点击事件的相关代码 ************************/
-static LCUI_Widget *click_widget = NULL, *overlay_widget = NULL;
+static LCUI_Widget *click_widget = NULL;
 static LCUI_Pos __offset_pos = {0, 0};  /* 点击部件时保存的偏移坐标 */ 
 static LCUI_DragEvent drag_event;
 
@@ -133,27 +133,6 @@ Widget_Clicked_Event_Connect (
 		return -2;
 	}
 	return Widget_Event_Connect( widget, EVENT_CLICKED, &func_data );
-}
-
-static LCUI_Widget *
-Get_ResponseStatusChange_Widget(LCUI_Widget *widget)
-/* 
- * 功能：查找能响应状态改变的部件 
- * 说明：此函数用于检查部件以及它的上级所有父部件，第一个有响应状态改变的部件的指针将会
- * 作为本函数的返回值。
- * */
-{
-	if( !widget ) {
-		return NULL;
-	}
-	if( widget->status_response ) {
-		return widget;/* 如果部件响应状态改变，那就返回该部件的指针 */
-	}
-	if( !widget->parent ) {
-		return NULL; /* 如果父部件为空，那就没找到，返回NULL */
-	} else {/* 否则，在它的父级部件中找 */
-		return Get_ResponseStatusChange_Widget(widget->parent); 
-	}
 }
 
 static BOOL
@@ -231,11 +210,86 @@ _End_DragEvent( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 	EventSlots_DispatchEvent( &widget->event, EVENT_DRAG );
 }
 
+typedef struct {
+	BOOL need_delete;
+	LCUI_Widget *widget;
+} widget_item;
+
+LCUI_Queue widget_list;
+
+static void 
+widget_list_reset( void )
+{
+	int i, n;
+	widget_item *item;
+	n = Queue_Get_Total( &widget_list );
+	for(i=0; i<n; ++i) {
+		item = Queue_Get( &widget_list, i );
+		item->need_delete = TRUE;
+	}
+}
+
+/* 清理部件列表中需要移除的部件，并将部件状态设置为NORMAL */
+static void
+widget_list_clear( void )
+{
+	int i, n;
+	widget_item *item;
+	n = Queue_Get_Total( &widget_list );
+	for(i=0; i<n; ++i) {
+		item = Queue_Get( &widget_list, i );
+		if( !item->need_delete ) {
+			continue;
+		}
+		Widget_SetState( item->widget, WIDGET_STATE_NORMAL );
+		Queue_Delete( &widget_list, i );
+		n = Queue_Get_Total( &widget_list );
+		--i;
+	}
+}
+
+/* 添加部件至列表里，如果已存在，则标记该部件不需要删除 */
+static int
+widget_list_add( LCUI_Widget *widget )
+{
+	int i, n;
+	widget_item new_item, *item;
+	n = Queue_Get_Total( &widget_list );
+	for(i=0; i<n; ++i) {
+		item = Queue_Get( &widget_list, i );
+		if( item->widget == widget ) {
+			item->need_delete = FALSE;
+			return 1;
+		}
+	}
+	new_item.need_delete = FALSE;
+	new_item.widget = widget;
+	Queue_Add( &widget_list, &new_item );
+	return 0;
+}
+
+/* 设定部件状态，该函数会将该部件及上级所有父部件添加至列表里，每次调用该函数时，会更新
+ * 列表中的部件记录，若部件在更新前后都在列表中有记录，则该部件及上级所有父部件都会应用
+ * 此状态，否则，移除多余的部件，并恢复部件的状态为NORMAL */
+static void
+widget_list_set_state( LCUI_Widget *widget, WIDGET_STATE state )
+{
+	widget_list_reset();
+	if( widget ) {
+		while( widget ) {
+			widget_list_add( widget );
+			Widget_SetState( widget, state );
+			widget = widget->parent;
+		}
+	}
+	widget_list_clear();
+}
+
 /* 响应鼠标按键按下事件 */
 static void 
 LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 {
-	LCUI_Widget *tmp_widget, *widget;
+	LCUI_Widget *widget;
 	LCUI_Pos pos;
 	
 	if( !event || Mouse_LeftButton(event) < 0 ) {
@@ -255,17 +309,7 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 		DEBUG_MSG("widget have EVENT_DRAG\n");
 		_Start_DragEvent( widget, event );
 	}
-	tmp_widget = Get_ResponseStatusChange_Widget( widget ); 
-	if( !tmp_widget ) {
-		DEBUG_MSG("widget not response status change\n");
-		return;
-	}
-	/* 如果当前鼠标指针覆盖到的部件已被启用 */  
-	if( widget->enabled && tmp_widget->enabled ) {
-		Set_Widget_Status (tmp_widget, WIDGET_STATUS_ACTIVE); 
-	} else {
-		Set_Widget_Status (tmp_widget, WIDGET_STATUS_DISABLE);
-	}
+	widget_list_set_state( widget, WIDGET_STATE_ACTIVE );
 }
 
 /* 响应鼠标按键释放事件 */
@@ -294,39 +338,19 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 		_End_DragEvent( click_widget, event );
 	}
 	if(click_widget == widget) {
-		click_widget = NULL;
-		/* 如果点击时和点击后都在同一个按钮部件内进行的,
+		/* 
+		 * 如果点击时和点击后都在同一个按钮部件内进行的,
 		 * 触发CLICKED事件，将部件中关联该事件的回调函数发送至
 		 * 任务队列，使之在主循环中执行 
 		 * */
-		
 		tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_CLICKED );
 		if( tmp_widget && tmp_widget->enabled ) {
 			EventSlots_DispatchEvent(&tmp_widget->event, EVENT_CLICKED);
 		}
-		tmp_widget = Get_ResponseStatusChange_Widget( widget );
-		if( !tmp_widget ) {
-			return;
-		}
-		if(tmp_widget->enabled) {
-			Set_Widget_Status (widget, WIDGET_STATUS_ACTIVE);
-			Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
-			return;
-		}
-		Set_Widget_Status (tmp_widget, WIDGET_STATUS_DISABLE);
-		return;
+		widget_list_set_state (widget, WIDGET_STATE_ACTIVE);
 	}
-	/* 否则，将恢复之前点击的鼠标的状态 */ 
-	widget = Get_ResponseStatusChange_Widget(click_widget);
+	widget_list_set_state (widget, WIDGET_STATE_OVERLAY);
 	click_widget = NULL;
-	if( !widget ) {
-		return;
-	}
-	if(widget->enabled) {
-		Set_Widget_Status (widget, WIDGET_STATUS_NORMAL);
-	} else {
-		Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
-	}
 }
 
 static void 
@@ -348,48 +372,11 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	pos.x = event->x;
 	pos.y = event->y;
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
-	widget = Widget_At( NULL, pos );
-	if( !widget ) {
-		goto skip_widget_check;
+	widget = Widget_At (NULL, pos);
+	/* 如果没有部件处于按住状态 */
+	if( !click_widget ) {
+		widget_list_set_state (widget, WIDGET_STATE_OVERLAY);
 	}
-	/* 获取能响应状态改变的部件的指针 */
-	widget = Get_ResponseStatusChange_Widget(widget); 
-	if( !widget || overlay_widget == widget ) {
-		goto skip_widget_check;
-	}
-	if ( widget->enabled ) {
-		DEBUG_MSG("widget not enabled");
-		if( !click_widget  ) {
-			DEBUG_MSG("leftbutton is free, widget overlay\n\n");
-			Set_Widget_Status (widget, WIDGET_STATUS_OVERLAY);
-		}
-	} else {
-		Set_Widget_Status (widget, WIDGET_STATUS_DISABLE);
-	}
-	
-	/* 如果之前有覆盖到的部件 */
-	if (overlay_widget && !click_widget ) {
-		if ( overlay_widget->enabled ) {
-			Set_Widget_Status (overlay_widget, WIDGET_STATUS_NORMAL);
-		} else {
-			Set_Widget_Status (overlay_widget, WIDGET_STATUS_DISABLE);
-		}
-	}
-	/* 保存当前覆盖到的按钮部件指针 */
-	overlay_widget = widget;
-	return;
-
-skip_widget_check:;
-
-	/* 如果鼠标指针在之前有覆盖到的部件 */
-	if( overlay_widget != widget && !click_widget ) {
-		if ( overlay_widget->enabled ) {
-			Set_Widget_Status (overlay_widget, WIDGET_STATUS_NORMAL); 
-		} else {
-			Set_Widget_Status (overlay_widget, WIDGET_STATUS_DISABLE);
-		}
-	} 
-	overlay_widget = widget;
 	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */ 
 	if( click_widget && event->state == PRESSED 
 	 && Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
@@ -439,6 +426,7 @@ void
 Widget_Event_Init()
 /* 功能：初始化部件事件处理 */
 {
+	Queue_Init( &widget_list, sizeof(widget_item), NULL );
 	LCUI_MouseButtonEvent_Connect( LCUI_HandleMouseButton, NULL );
 	LCUI_MouseMotionEvent_Connect( LCUI_HandleMouseMotion, NULL );
 	LCUI_KeyboardEvent_Connect( WidgetFocusProc, NULL );

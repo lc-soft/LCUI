@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * keyboard.c -- ¼üÅÌÖ§³Ö
+ * keyboard.c -- é”®ç›˜æ”¯æŒ
  *
- * °æÈ¨ËùÓÐ (C) 2012 ¹éÊôÓÚ 
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012 å½’å±žäºŽ 
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼þÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾ÝGPLv2Ðí¿ÉÐ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ðí¿ÉÖ¤µÚ¶þ°æ µÄÓ¢ÎÄËõÐ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌÐøÊ¹ÓÃ¡¢ÐÞ¸Ä»ò·¢²¼±¾ÎÄ¼þ£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öÐí¿ÉÐ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜Žæ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’ŒæŽ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔðÈÎ£¬ÉõÖÁÃ»ÓÐÊÊÏúÐÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒþº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ðí¿ÉÐ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºŽä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼þµÄGPLv2Ðí¿ÉÐ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼þÖÐ£¬Èç¹û
- * Ã»ÓÐ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºŽæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æžœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -59,14 +59,14 @@ int Set_Raw(int t)
 		if(tcgetattr(fd, &tm) < 0) {
 			return -1; 
 		} 
-		/* ÉèÖÃÖÕ¶ËÎªÎÞ»ØÏÔÎÞ»º³åÄ£Ê½ */
+		/* è®¾ç½®ç»ˆç«¯ä¸ºæ— å›žæ˜¾æ— ç¼“å†²æ¨¡å¼ */
 		tm.c_lflag &= ~(ICANON|ECHO);
 		tm.c_cc[VMIN] = 1;
 		tm.c_cc[VTIME] = 0;
 		if(tcsetattr(fd, TCSANOW, &tm) < 0) {
 			return -1; 
 		}
-		printf("\033[?25l");/* Òþ²Ø¹â±ê */
+		printf("\033[?25l");/* éšè—å…‰æ ‡ */
 	} else {
 		tm.c_lflag |= ICANON;
 		tm.c_lflag |= ECHO;
@@ -75,17 +75,17 @@ int Set_Raw(int t)
 		if(tcsetattr(fd,TCSANOW,&tm)<0) {
 			return -1;
 		}
-		printf("\033[?25h"); /* ÏÔÊ¾¹â±ê */ 
+		printf("\033[?25h"); /* æ˜¾ç¤ºå…‰æ ‡ */ 
 	}
 	return 0;
 }
 
 int Check_Key(void)  
 /* 
- * ¹¦ÄÜ£º¼ì²âÊÇ·ñÓÐ°´¼üÊäÈë 
- * ·µ»ØÖµ£º
- *   1   ÓÐ°´¼üÊäÈë
- *   2   ÎÞ°´¼üÊäÈë
+ * åŠŸèƒ½ï¼šæ£€æµ‹æ˜¯å¦æœ‰æŒ‰é”®è¾“å…¥ 
+ * è¿”å›žå€¼ï¼š
+ *   1   æœ‰æŒ‰é”®è¾“å…¥
+ *   2   æ— æŒ‰é”®è¾“å…¥
  * */
 {
 	struct termios oldt;//, newt;  
@@ -97,11 +97,11 @@ int Check_Key(void)
 	//tcsetattr(STDIN_FILENO, TCSANOW, &newt);  
 	oldf = fcntl(STDIN_FILENO, F_GETFL, 0);  
 	fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);  
-	ch = getchar();  /* »ñÈ¡Ò»¸ö×Ö·û */
+	ch = getchar();  /* èŽ·å–ä¸€ä¸ªå­—ç¬¦ */
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  
 	fcntl(STDIN_FILENO, F_SETFL, oldf);  
 	if(ch != EOF)  
-	{/* Èç¹û×Ö·ûÓÐÐ§£¬½«×Ö·û·Å»ØÊäÈë»º³åÇøÖÐ */
+	{/* å¦‚æžœå­—ç¬¦æœ‰æ•ˆï¼Œå°†å­—ç¬¦æ”¾å›žè¾“å…¥ç¼“å†²åŒºä¸­ */
 		ungetc(ch, stdin);  
 		return 1;  
 	} 
@@ -110,19 +110,19 @@ int Check_Key(void)
 
 
 int Get_Key(void)
-/* ¹¦ÄÜ£º»ñÈ¡±»°´ÏÂµÄ°´¼üµÄ¼üÖµ */
+/* åŠŸèƒ½ï¼šèŽ·å–è¢«æŒ‰ä¸‹çš„æŒ‰é”®çš„é”®å€¼ */
 { 
 	int k,c;
 	static int input, count = 0;
 	++count;
-	k = fgetc(stdin); /* »ñÈ¡ÊäÈë»º³åÖÐµÄ×Ö·û */
+	k = fgetc(stdin); /* èŽ·å–è¾“å…¥ç¼“å†²ä¸­çš„å­—ç¬¦ */
 	input += k; 
-	if(Check_Key()) {/* Èç¹û»¹ÓÐ×Ö·ûÔÚ»º³åÖÐ */
-		Get_Key(); /* µÝ¹éµ÷ÓÃ */
+	if(Check_Key()) {/* å¦‚æžœè¿˜æœ‰å­—ç¬¦åœ¨ç¼“å†²ä¸­ */
+		Get_Key(); /* é€’å½’è°ƒç”¨ */
 	}
 	c = input;
 	--count;
-	if(count == 0) {/* µÝ¹é½áÊøºó¾ÍÖÃ0 */
+	if(count == 0) {/* é€’å½’ç»“æŸåŽå°±ç½®0 */
 		input = 0;
 	}
 	if(c == 3) {
@@ -133,10 +133,10 @@ int Get_Key(void)
 
 int Find_Pressed_Key(int key)
 /*
- * ¹¦ÄÜ£º¼ì²âÖ¸¶¨¼üÖµµÄ°´¼üÊÇ·ñ´¦ÓÚ°´ÏÂ×´Ì¬
- * ·µ»ØÖµ£º
- *   1 ´æÔÚ
- *   0 ²»´æÔÚ
+ * åŠŸèƒ½ï¼šæ£€æµ‹æŒ‡å®šé”®å€¼çš„æŒ‰é”®æ˜¯å¦å¤„äºŽæŒ‰ä¸‹çŠ¶æ€
+ * è¿”å›žå€¼ï¼š
+ *   1 å­˜åœ¨
+ *   0 ä¸å­˜åœ¨
  **/
 {
 	int t;
@@ -163,7 +163,7 @@ static BOOL proc_keyboard()
 	area.height = 240;
 	area.x = (Get_Screen_Width()-area.width)/2;
 	area.y = (Get_Screen_Height()-area.height)/2;
-	 /* Èç¹ûÃ»ÓÐ°´¼üÊäÈë */ 
+	 /* å¦‚æžœæ²¡æœ‰æŒ‰é”®è¾“å…¥ */ 
 	if ( !Check_Key ()) {
 		return FALSE;
 	}
@@ -173,13 +173,13 @@ static BOOL proc_keyboard()
 	
 	#define __NEED_CATCHSCREEN__
 	#ifdef __NEED_CATCHSCREEN__
-	//µ±°´ÏÂc¼üºó£¬¿ÉÒÔ½øÐÐ½ØÍ¼£¬Ö»½ØÈ¡Ö¸¶¨ÇøÓòµÄÍ¼ÐÎ
+	//å½“æŒ‰ä¸‹cé”®åŽï¼Œå¯ä»¥è¿›è¡Œæˆªå›¾ï¼Œåªæˆªå–æŒ‡å®šåŒºåŸŸçš„å›¾å½¢
 	if(event.key.key_code == 'c') {
 		time_t rawtime;
 		struct tm * timeinfo;
 		char filename[100];
 		time ( &rawtime );
-		timeinfo = localtime ( &rawtime ); /* »ñÈ¡ÏµÍ³µ±Ç°Ê±¼ä */ 
+		timeinfo = localtime ( &rawtime ); /* èŽ·å–ç³»ç»Ÿå½“å‰æ—¶é—´ */ 
 		sprintf(filename, "%4d-%02d-%02d-%02d-%02d-%02d.png",
 			timeinfo->tm_year+1900, timeinfo->tm_mon+1, 
 			timeinfo->tm_mday, timeinfo->tm_hour, 
@@ -189,7 +189,7 @@ static BOOL proc_keyboard()
 		write_png(filename, &graph);
 	}
 	else if(event.key.key_code == 'r') {
-		/* Èç¹û°´ÏÂr¼ü£¬¾ÍÂ¼ÖÆÖ¸¶¨ÇøÓòµÄÍ¼Ïñ */
+		/* å¦‚æžœæŒ‰ä¸‹ré”®ï¼Œå°±å½•åˆ¶æŒ‡å®šåŒºåŸŸçš„å›¾åƒ */
 		start_record_screen( area );
 	}
 	#endif
@@ -199,16 +199,16 @@ static BOOL proc_keyboard()
 }
 
 BOOL Enable_Key_Input()
-/* ¹¦ÄÜ£ºÆôÓÃ°´¼üÊäÈë´¦Àí */
+/* åŠŸèƒ½ï¼šå¯ç”¨æŒ‰é”®è¾“å…¥å¤„ç† */
 {
-	Set_Raw(1);/* ÉèÖÃÖÕ¶ËÊôÐÔ */
+	Set_Raw(1);/* è®¾ç½®ç»ˆç«¯å±žæ€§ */
 	return TRUE;
 }
 
 BOOL Disable_Key_Input()
-/* ¹¦ÄÜ£º³·Ïú°´¼üÊäÈë´¦Àí */
+/* åŠŸèƒ½ï¼šæ’¤é”€æŒ‰é”®è¾“å…¥å¤„ç† */
 {
-	Set_Raw(0);/* »Ö¸´ÖÕ¶ËÊôÐÔ */
+	Set_Raw(0);/* æ¢å¤ç»ˆç«¯å±žæ€§ */
 	return TRUE;
 }
 

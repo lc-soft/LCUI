@@ -83,7 +83,7 @@ void Set_RadioButton_On(LCUI_Widget *widget);
 void Set_RadioButton_Off(LCUI_Widget *widget);
 /* 功能：设定单选框为未选中状态 */ 
 
-int Get_RadioButton_Status(LCUI_Widget *widget);
+int Get_RadioButton_State(LCUI_Widget *widget);
 /* 功能：获取单选框的状态 */ 
 
 int RadioButton_Is_On(LCUI_Widget *widget);
@@ -92,7 +92,7 @@ int RadioButton_Is_On(LCUI_Widget *widget);
 int RadioButton_Is_Off(LCUI_Widget *widget);
 /* 功能：检测单选框是否未选中 */ 
 
-void Switch_RadioButton_Status(LCUI_Widget *widget, void *arg);
+void Switch_RadioButton_State(LCUI_Widget *widget, void *arg);
 /* 
  * 功能：切换单选框的状态
  * 说明：这个状态，指的是打勾与没打勾的两种状态

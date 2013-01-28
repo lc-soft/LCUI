@@ -53,7 +53,7 @@
 /********************** 鼠标相关信息 ***************************/
 typedef struct _LCUI_Mouse
 {
-	int fd, status;		 /* 句柄，状态 */
+	int fd, state;		 /* 句柄，状态 */
 	float move_speed;	 /* 鼠标移动速度，1.0为正常速度 */
 }
 LCUI_Mouse;
@@ -97,17 +97,17 @@ int Mouse_RightButton(LCUI_MouseEvent *event)
 		return -2;
 	}
 	else if(event->key.code == MOUSE_RIGHT_KEY) {
-		return event->key.status; 
+		return event->key.state; 
 	}
 	return -1;
 }
 
-int Click_LeftButton (LCUI_Event *event)
+int Click_LeftButton (LCUI_MouseButtonEvent *event)
 /* 功能：检测是否是按鼠标左键 */
 {
 	/* 如果按下的是鼠标左键，并且之前没有按住它 */
 	if (Mouse_LeftButton(event) == PRESSED
-		&& !Find_Pressed_Key(event->button.button)) {
+		&& !Find_Pressed_Key(event->button)) {
 		return 1;
 	}
 	return 0;
@@ -225,7 +225,7 @@ static BOOL proc_mouse( void *arg )
 	static struct timeval tv;
 	static LCUI_Pos pos;
 	
-	if (mouse_data.status == REMOVE || mouse_data.fd < 0) {
+	if (mouse_data.state == REMOVE || mouse_data.fd < 0) {
 		return FALSE;
 	}
 	/* 设定select等待I/o的最长时间 */
@@ -246,7 +246,7 @@ static BOOL proc_mouse( void *arg )
 	tmp = read (mouse_data.fd, buf, 6);
 	if (tmp <= 0){
 		if (tmp < 0) {
-			mouse_data.status = REMOVE;
+			mouse_data.state = REMOVE;
 		}
 		return FALSE;
 	}
@@ -275,7 +275,7 @@ BOOL Enable_Mouse_Input()
 {
 	char *msdev;
 	
-	if(mouse_data.status != REMOVE) {
+	if(mouse_data.state != REMOVE) {
 		return FALSE;
 	}
 	msdev = getenv("LCUI_MOUSE_DEVICE");
@@ -285,10 +285,10 @@ BOOL Enable_Mouse_Input()
 	if ((mouse_data.fd = open (MS_DEV, O_RDONLY)) < 0) {
 		printf("failed to open %s.\n", msdev );
 		perror(NULL);
-		mouse_data.status = REMOVE; 
+		mouse_data.state = REMOVE; 
 		return FALSE;
 	}
-	mouse_data.status = INSIDE;
+	mouse_data.state = INSIDE;
 	printf("open %s successfuly.\n", msdev);
 	return TRUE; 
 }
@@ -296,12 +296,12 @@ BOOL Enable_Mouse_Input()
 BOOL Disable_Mouse_Input()
 /* 功能：禁用鼠标输入处理 */
 {
-	if(mouse_data.status != INSIDE) {
+	if(mouse_data.state != INSIDE) {
 		return FALSE;
 	}
 	Hide_Cursor();
 	close (mouse_data.fd); 
-	mouse_data.status = REMOVE;
+	mouse_data.state = REMOVE;
 	return TRUE;
 }
 
@@ -309,7 +309,7 @@ int Mouse_Init()
 /* 初始化鼠标 */
 {
 	mouse_data.fd = -1;  
-	mouse_data.status = REMOVE;	/* 鼠标为移除状态 */
+	mouse_data.state = REMOVE;	/* 鼠标为移除状态 */
 	mouse_data.move_speed = 1;	/* 移动数度为1 */
 	/* 初始化鼠标事件信息队列 */ 
 	EventSlots_Init( &LCUI_Sys.sys_event_slots ); 

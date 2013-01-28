@@ -60,7 +60,7 @@ timer_list_sub( LCUI_Queue *timer_list, int time )
 	for(i=0; i<total; ++i) {
 		timer = Queue_Get( timer_list , i);
 		/* 忽略无效的定时器，或者状态为暂停的定时器 */
-		if( !timer || timer->status == 0) {
+		if( !timer || timer->state == 0) {
 			continue;
 		}
 		timer->cur_ms -= time;
@@ -78,7 +78,7 @@ timer_list_update( LCUI_Queue *timer_list )
 	total = Queue_Get_Total( timer_list ); 
 	for(i=0; i<total; ++i){
 		timer = Queue_Get( timer_list , i);
-		if(timer->status == 1) {
+		if(timer->state == 1) {
 			break;
 		}
 	}
@@ -161,7 +161,7 @@ find_timer( int timer_id )
 int set_timer( long int n_ms, void (*callback_func)(void), BOOL reuse )
 {
 	timer_data timer;
-	timer.status = 1;
+	timer.state = 1;
 	timer.total_ms = timer.cur_ms = n_ms;
 	timer.callback_func = callback_func;
 	timer.reuse = reuse;
@@ -211,7 +211,7 @@ int pause_timer( int timer_id )
 	timer_data *timer;
 	timer = find_timer( timer_id );
 	if( timer ) {
-		timer->status = 0;
+		timer->state = 0;
 		return 0;
 	}
 	return -1;
@@ -223,7 +223,7 @@ int continue_timer( int timer_id )
 	timer_data *timer;
 	timer = find_timer( timer_id );
 	if( timer ) {
-		timer->status = 1;
+		timer->state = 1;
 		return 0;
 	}
 	return -1;

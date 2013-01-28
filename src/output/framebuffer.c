@@ -266,7 +266,7 @@ int Screen_Destroy()
 	int err;
 	LCUI_Graph *graph;
 	
-	LCUI_Sys.status = KILLED;
+	LCUI_Sys.state = KILLED;
 	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
 	/* 恢复屏幕初始内容 */ 
 	Graph_Display( graph, Pos(0, 0) );

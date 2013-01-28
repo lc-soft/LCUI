@@ -100,7 +100,7 @@ void thread_rwlock_init(thread_rwlock *rwlock)
 		thread_perror("rwlock init", error); 
 	}
 	rwlock->host = 0;
-	rwlock->status = RWLOCK_FREE;
+	rwlock->state = RWLOCK_FREE;
 }
 
 void thread_rwlock_destroy(thread_rwlock *rwlock)
@@ -120,7 +120,7 @@ void thread_rwlock_destroy(thread_rwlock *rwlock)
 		thread_perror("rwlock destroy", error);
 	}
 	rwlock->host = 0; 
-	rwlock->status = RWLOCK_FREE;
+	rwlock->state = RWLOCK_FREE;
 }
 	
 int thread_wait_mutex(thread_rwlock *rwlock)
@@ -161,7 +161,7 @@ int thread_rwlock_rdlock(thread_rwlock *rwlock)
 /* 功能：设定“读”锁 */
 { 
 	thread_wait_mutex(rwlock);/* 等待互斥锁可用 */ 
-	rwlock->status = RWLOCK_READ;
+	rwlock->state = RWLOCK_READ;
 	return pthread_rwlock_rdlock(&rwlock->lock); 
 }
 
@@ -169,21 +169,21 @@ int thread_rwlock_wrlock(thread_rwlock *rwlock)
 /* 功能：设定“写”锁 */
 {
 	thread_wait_mutex(rwlock);
-	rwlock->status = RWLOCK_WRITE;
+	rwlock->state = RWLOCK_WRITE;
 	return pthread_rwlock_wrlock(&rwlock->lock);
 }
 
 int thread_rwlock_unlock(thread_rwlock *rwlock)
 /* 功能：解开读写锁 */
 {
-	rwlock->status = RWLOCK_FREE;
+	rwlock->state = RWLOCK_FREE;
 	return pthread_rwlock_unlock(&rwlock->lock);
 }
 
-rwlock_status thread_rwlock_get_status(thread_rwlock *rwlock)
+rwlock_state thread_rwlock_get_state(thread_rwlock *rwlock)
 /* 功能：获取读写锁的状态 */
 {
-	return rwlock->status;
+	return rwlock->state;
 }
 
 int thread_mutex_lock(thread_rwlock *rwlock)

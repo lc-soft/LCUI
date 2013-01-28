@@ -64,15 +64,27 @@ typedef enum {
 } REPEAT_TYPE;
 
 typedef struct {
-	BOOL transparent;	/* 是否透明 */
-	LCUI_Graph image;	/* 背景图 */
-	LCUI_RGB color;	/* 背景色 */
-	REPEAT_TYPE repeat;	/* 背景图的重复排列模式 */
-	ALIGN_TYPE align;	/* 背景图的对其方式 */
-	LCUI_Pos offset;	/* 偏移距离 */
+	BOOL transparent; /* 是否透明 */
+	LCUI_Graph image; /* 背景图 */
+	LCUI_RGB color; /* 背景色 */
+	REPEAT_TYPE repeat; /* 背景图的重复排列模式 */
+	ALIGN_TYPE align; /* 背景图的对其方式 */
+	LCUI_Pos offset; /* 偏移距离 */
 } LCUI_Background;
 
-typedef struct {
+typedef struct _LCUI_Widget LCUI_Widget;
+
+struct _LCUI_Widget {
+	LCUI_ID app_id; /* 所属程序的ID */
+	
+	LCUI_ID type_id;	/* 类型编号 */
+	LCUI_ID style_id;	/* 风格编号 */
+	LCUI_String type_name;	/* 类型名 */
+	LCUI_String style_name; /* 风格名，对某些部件有效 */
+	
+	BOOL enabled;	/* 是否启用 */
+	BOOL visible;	/* 是否可见 */
+	
 	LCUI_Pos pos;	/* 已计算出的实际位置 */
 	LCUI_Pos max_pos;
 	LCUI_Pos min_pos;
@@ -104,38 +116,9 @@ typedef struct {
 	LCUI_Padding	padding;
 	/*---------------- END -------------------*/
 	
+	LCUI_RGB color;		/* 前景颜色 */
 	LCUI_Border border;		/* 边框 */
 	LCUI_Background background;	/* 背景 */
-} LCUI_WidgetStyle;
-
-typedef struct _LCUI_Widget LCUI_Widget;
-
-struct _LCUI_Widget {
-	LCUI_ID app_id; /* 所属程序的ID */
-	
-	WIDGET_STATUS status;	/* 部件的状态 */
-	BOOL status_response;	/* 是否响应部件的状态改变 */
-	
-	BOOL enabled;	/* 是否启用 */
-	BOOL visible;	/* 是否可见 */
-	
-	BOOL		auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
-	AUTOSIZE_MODE	auto_size_mode;	/* 自动尺寸调整模式 */
-	
-	BOOL		focus;		/* 指定该部件是否需要焦点 */
-	LCUI_Widget*	focus_widget;	/* 获得焦点的子部件 */
-	
-	int		clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“不小于”才使条件成立 */
-	uchar_t	clickable_area_alpha;	/* 指定部件图层中的区域的alpha值小于/不小于多少时可被鼠标点击，默认为0，最大为255 */
-	
-	LCUI_String	type_name;	/* 类型名 */
-	LCUI_String	style_name;	/* 风格名，对某些部件有效 */
-	LCUI_ID	type_id;	/* 类型编号 */
-	LCUI_ID	style_id;	/* 风格编号 */
-	
-	LCUI_WidgetStyle style; /* 部件的样式数据 */
-	
-	void *private_data;   /* 指针，指向部件私有数据，供预先注册的回调函数利用 */
 	
 	LCUI_Widget *parent;		/* 父部件 */
 	LCUI_Queue child;		/* 子部件集 */
@@ -143,8 +126,22 @@ struct _LCUI_Widget {
 	LCUI_Queue data_buff;		/* 记录需要进行更新的数据 */ 
 	LCUI_Queue invalid_area;	/* 记录无效区域 */
 	
+	WIDGET_STATE state;	/* 部件当前状态 */
+	int valid_state;	/* 对部件有效的状态 */
+	
+	BOOL auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
+	AUTOSIZE_MODE auto_size_mode;	/* 自动尺寸调整模式 */
+	
+	BOOL focus;		/* 指定该部件是否需要焦点 */
+	LCUI_Widget* focus_widget;	/* 获得焦点的子部件 */
+	
+	int clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“不小于”才使条件成立 */
+	uchar_t clickable_area_alpha;	/* 指定部件图层中的区域的alpha值小于/不小于多少时可被鼠标点击，默认为0，最大为255 */
+	
 	LCUI_GraphLayer* main_glayer;		/* 部件的主图层 */
 	LCUI_GraphLayer* client_glayer;	/* 客户区图层 */
+	
+	void *private_data;   /* 指针，指向部件私有数据，供预先注册的回调函数利用 */
 	
 	/* 以下是函数指针，闲函数名太长的话，可以直接用下面的 */
 	void (*resize)(LCUI_Widget*, LCUI_Size);
@@ -218,13 +215,16 @@ int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect );
 /* 转移子部件中的无效区域至父部件的无效区域记录中 */
 int Widget_SyncInvalidArea( LCUI_Widget *widget );
 
-void Response_Status_Change(LCUI_Widget *widget);
 /* 
  * 功能：让指定部件响应部件状态的改变
  * 说明：部件创建时，默认是不响应状态改变的，因为每次状态改变后，都要调用函数重绘部件，
  * 这对于一些部件是多余的，没必要重绘，影响效率。如果想让部件能像按钮那样，鼠标移动到它
  * 上面时以及鼠标点击它时，都会改变按钮的图形样式，那就需要用这个函数设置一下。
- *  */ 
+ * 用法：
+ * Widget_SetValidState( widget, WIDGET_STATE_NORMAL );
+ * Widget_SetValidState( widget, WIDGET_STATE_OVERLAY | WIDGET_STATE_ACTIVE );
+ *  */
+void Widget_SetValidState( LCUI_Widget *widget, int state );
 
 LCUI_Widget *Get_Parent_Widget(LCUI_Widget *widget, char *widget_type);
 /*
@@ -468,8 +468,8 @@ void Show_Widget(LCUI_Widget *widget);
 void Hide_Widget(LCUI_Widget *widget);
 /* 功能：隐藏部件 */ 
 
-void Set_Widget_Status(LCUI_Widget *widget, int status);
-/* 功能：设定部件的状态 */ 
+/* 改变部件的状态 */
+int Widget_SetState( LCUI_Widget *widget, int state );
 /************************* Widget End *********************************/
 
 

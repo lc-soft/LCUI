@@ -204,8 +204,7 @@ BG_MODE;
 /*****************************************/
 
 /*----------------- 部件对齐方式 -------------------*/
-typedef enum _ALIGN_TYPE
-{
+typedef enum {
 	ALIGN_NONE,		/* 无 */
 	ALIGN_TOP_LEFT,	  	/* 向左上角对齐 */
 	ALIGN_TOP_CENTER,	/* 向上中间对齐 */
@@ -216,19 +215,16 @@ typedef enum _ALIGN_TYPE
 	ALIGN_BOTTOM_LEFT,	/* 向底部偏左对齐 */
 	ALIGN_BOTTOM_CENTER,	/* 向底部居中对齐 */
 	ALIGN_BOTTOM_RIGHT	/* 向底部偏右对齐 */
-}
-ALIGN_TYPE;
+} ALIGN_TYPE;
 /*-------------------------------------------------*/
 
 /*----------------- 部件的几种状态 ------------------*/
-typedef enum _WIDGET_STATUS
-{
-	WIDGET_STATUS_NORMAL = 0,	/* 普通状态 */
-	WIDGET_STATUS_DISABLE = 1,	/* 禁用状态 */
-	WIDGET_STATUS_OVERLAY = 2,	/* 被鼠标游标覆盖 */
-	WIDGET_STATUS_ACTIVE = 3,	/* 被鼠标游标点击 */
-}
-WIDGET_STATUS;
+typedef enum {
+	WIDGET_STATE_NORMAL = 1,	/* 普通状态 */
+	WIDGET_STATE_DISABLE = 1<<1,	/* 禁用状态 */
+	WIDGET_STATE_OVERLAY = 1<<2,	/* 被鼠标游标覆盖 */
+	WIDGET_STATE_ACTIVE = 1<<3,	/* 被鼠标点击 */
+} WIDGET_STATE;
 /*-------------------------------------------------*/
 
 /****************** 图像的处理方式 *****************/
@@ -283,7 +279,7 @@ typedef unsigned int uint_t;
 struct _LCUI_Key
 {
 	int code;
-	int status;
+	int state;
 };
 /******************************/
 
@@ -416,7 +412,7 @@ struct _LCUI_Font/* 字体信息数据 */
 	void*		ft_face;	/* FreeType2的face对象的句柄 */
 	int		load_flags;	/* 字形载入标志 */
 	int		render_mode;	/* 字形转换模式标志 */
-	int		status;		/* 状态，是否打开了字体库 */
+	int		state;		/* 状态，是否打开了字体库 */
 };
 /************************************************************************/
 

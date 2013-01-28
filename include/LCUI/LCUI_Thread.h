@@ -55,13 +55,13 @@
 #ifndef __LCUI_THREAD_H__
 #define __LCUI_THREAD_H__ 
 
-typedef enum _rwlock_status
+typedef enum _rwlock_state
 {
 	RWLOCK_FREE,
 	RWLOCK_READ,
 	RWLOCK_WRITE
 }
-rwlock_status;
+rwlock_state;
 
 #define POSIX_THREAD
 #ifdef POSIX_THREAD
@@ -76,7 +76,7 @@ typedef struct _thread_rwlock
 	pthread_rwlock_t lock;
 	//pthread_cond_t cond;
 	pthread_mutex_t mutex; 
-	rwlock_status status;
+	rwlock_state state;
 }
 thread_rwlock;
 #else
@@ -140,7 +140,7 @@ int thread_rwlock_wrlock(thread_rwlock *rwlock);
 int thread_rwlock_unlock(thread_rwlock *rwlock);
 /* 功能：解开读写锁 */ 
 
-rwlock_status thread_rwlock_get_status(thread_rwlock *rwlock);
+rwlock_state thread_rwlock_get_state(thread_rwlock *rwlock);
 /* 功能：获取读写锁的状态 */ 
 
 int thread_mutex_lock(thread_rwlock *rwlock);

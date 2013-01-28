@@ -63,7 +63,7 @@ struct _LCUI_Frame
 /************************** 保存动画的信息 **********************/
 struct _LCUI_Frames
 {
-	int status;		/* 状态，播放还是暂停 */
+	int state;		/* 状态，播放还是暂停 */
 	LCUI_Queue pic;	/* 用于记录该动画的所有帧 */
 	int current;		/* 记录当前显示的帧序号 */
 	LCUI_Size size;	/* 动画的尺寸 */

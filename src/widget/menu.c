@@ -263,13 +263,13 @@ int Show_Child_Menu(LCUI_Widget *item)
 {
 	/* 如果该菜单项没有父部件或者父部件不是菜单，直接退出函数 */
 	if(item->parent == NULL) return 0;
-	if(Strcmp(&item->parent->type, "menu") != 0) 
+	if(Strcmp(&item->parent->type_name, "menu") != 0) 
 	{
 		LCUI_Widget *t;
 		t = item;
 		while(t->parent != NULL)
 		{
-			if(Strcmp(&t->parent->type, "menu") == 0)
+			if(Strcmp(&t->parent->type_name, "menu") == 0)
 			{
 				item = t;
 				break;
@@ -277,7 +277,7 @@ int Show_Child_Menu(LCUI_Widget *item)
 			t = t->parent;
 		}
 		/* 再判断一次，如果父部件不是菜单，就退出函数 */
-		if(Strcmp(&item->parent->type, "menu") != 0) 
+		if(Strcmp(&item->parent->type_name, "menu") != 0) 
 			return 0;
 	}
 	

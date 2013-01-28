@@ -101,7 +101,7 @@ int Queue_Using (LCUI_Queue * queue, int mode)
 int Queue_End_Use (LCUI_Queue * queue) 
 /* 功能：储存矩形数据的队列为空闲状态 */
 {
-	//switch(queue->lock.status) {
+	//switch(queue->lock.state) {
 	    //case RWLOCK_WRITE:printf("end use, queue: %p, befor mode: write\n", queue);break;
 	    //case RWLOCK_READ:printf("end use, queue: %p, befor mode: read\n", queue);break;
 	    //case RWLOCK_FREE:printf("end use, queue: %p, befor mode: free\n", queue);break;
@@ -825,13 +825,13 @@ Destroy_Widget(LCUI_Widget *widget)
 	widget->parent = NULL;
 	
 	/* 释放字符串 */
-	String_Free(&widget->type);
-	String_Free(&widget->style);
+	String_Free(&widget->type_name);
+	String_Free(&widget->style_name);
 	
 	GraphLayer_Free( widget->main_glayer );
 	GraphLayer_Free( widget->client_glayer );
 	
-	Graph_Free(&widget->background_image);
+	Graph_Free(&widget->background.image);
 	
 	/* 销毁部件的队列 */
 	Destroy_Queue(&widget->child);

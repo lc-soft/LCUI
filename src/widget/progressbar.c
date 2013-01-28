@@ -128,7 +128,7 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 	
 	widget_graph = Widget_GetSelfGraph( widget );
 	pb = Get_Widget_PrivData(widget);
-	if(Strcmp(&widget->style, "dynamic") == 0) {
+	if(Strcmp(&widget->style_name, "dynamic") == 0) {
 		/* 绘制空槽 */
 		Draw_Empty_Slot(widget_graph, widget->size.w, widget->size.h);
 		/* 载入两个图形 */
@@ -144,7 +144,7 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 		Set_PictureBox_Image_From_Graph(pb->img_pic_box, &pb->flash_image);
 		Set_Widget_Padding( widget, Padding(1,1,1,1) );
 	} else {
-		Strcpy(&widget->style, "classic");
+		Strcpy(&widget->style_name, "classic");
 		if(!Graph_Valid(&pb->fore_graph)) {
 			Graph_Create(&pb->fore_graph, 10, widget->size.h); 
 		}
@@ -219,7 +219,7 @@ Show_ProgressBar(LCUI_Widget *widget)
 	LCUI_ProgressBar *pb;
 	
 	pb = Get_Widget_PrivData(widget);
-	if(Strcmp(&widget->style, "dynamic") == 0) {
+	if(Strcmp(&widget->style_name, "dynamic") == 0) {
 		if(pb->thread == 0) {
 			Show_Widget(pb->img_pic_box);
 			LCUI_Thread_Create(&pb->thread, NULL, Move_Flash_Img, (void*)widget);

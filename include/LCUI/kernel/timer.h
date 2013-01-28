@@ -5,7 +5,7 @@
 
 typedef struct _timer_data
 {
-	int status;		/* 状态 */
+	int state;		/* 状态 */
 	BOOL reuse;		/* 是否重复使用该定时器 */
 	LCUI_ID app_id;	/* 所属程序ID */
 	long int id;		/* 定时器ID */

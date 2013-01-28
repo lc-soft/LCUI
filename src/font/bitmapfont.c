@@ -209,7 +209,7 @@ void LCUI_Font_Init(LCUI_Font *font)
 	String_Init(&font->style_name);
 	//font->space = 1;
 	//font->linegap = 0;
-	font->status = KILLED;
+	font->state = KILLED;
 #ifdef USE_FREETYPE
 	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT;
 	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_MONOCHROME;
@@ -243,15 +243,15 @@ void Font_Init(LCUI_Font *in)
 	String_Init(&in->family_name);
 	String_Init(&in->style_name);
 	/* 如果缺省字体的状态是活动的，那就拷贝 */
-	if(LCUI_Sys.default_font.status == ACTIVE) {
-		in->status = ACTIVE;
+	if(LCUI_Sys.default_font.state == ACTIVE) {
+		in->state = ACTIVE;
 		LCUI_Strcpy(&in->family_name, &LCUI_Sys.default_font.family_name);
 		LCUI_Strcpy(&in->style_name, &LCUI_Sys.default_font.style_name);
 		LCUI_Strcpy(&in->font_file, &LCUI_Sys.default_font.font_file);
 		in->ft_lib = LCUI_Sys.default_font.ft_lib;
 		in->ft_face = LCUI_Sys.default_font.ft_face;
 	} else {
-		in->status = KILLED;
+		in->state = KILLED;
 		in->ft_lib = NULL;
 		in->ft_face = NULL;
 	}
@@ -265,8 +265,8 @@ void Font_Free(LCUI_Font *in)
 	String_Free(&in->font_file);
 	String_Free(&in->family_name);
 	String_Free(&in->style_name);
-	if(in->status == ACTIVE) { 
-		in->status = KILLED;
+	if(in->state == ACTIVE) { 
+		in->state = KILLED;
 		if(in->type == CUSTOM) { 
 #ifdef USE_FREETYPE
 			FT_Done_Face(in->ft_face);
@@ -286,8 +286,8 @@ void LCUI_Font_Free()
 	String_Free(&LCUI_Sys.default_font.family_name);
 	String_Free(&LCUI_Sys.default_font.style_name);
 	/* 如果缺省字体的状态是活动的，那就拷贝 */
-	if(LCUI_Sys.default_font.status == ACTIVE) {
-		LCUI_Sys.default_font.status = KILLED;
+	if(LCUI_Sys.default_font.state == ACTIVE) {
+		LCUI_Sys.default_font.state = KILLED;
 #ifdef USE_FREETYPE
 		FT_Done_Face(LCUI_Sys.default_font.ft_face);
 		FT_Done_FreeType(LCUI_Sys.default_font.ft_lib); 
@@ -398,7 +398,7 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 	FT_Error	face_error = 0, lib_error = 0;
 	
 	type = font_data->type;
-	if(font_data->status == ACTIVE) {
+	if(font_data->state == ACTIVE) {
 		/* 如果字体文件路径无效，或该路径和默认的字体文件路径一样，则退出函数 */
 		if( !fontfile || !Strcmp(&font_data->font_file, fontfile) ) {
 			return 0;
@@ -448,7 +448,7 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
 	Strcpy(&font_data->style_name, face->style_name);
 	Strcpy(&font_data->font_file, fontfile);
 	font_data->type = type;
-	font_data->status = ACTIVE;
+	font_data->state = ACTIVE;
 	font_data->ft_lib = library;
 	font_data->ft_face = face;
 	return 0;

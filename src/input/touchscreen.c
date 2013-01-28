@@ -55,7 +55,7 @@
 typedef struct _LCUI_TS
 {
 	void *td;
-	int status;
+	int state;
 }
 LCUI_TS;
 /**********************************/
@@ -69,7 +69,7 @@ static BOOL proc_touchscreen()
 	int button, ret;
 	static LCUI_Pos pos;
 	
-	if (ts_data.status != INSIDE) {
+	if (ts_data.state != INSIDE) {
 		return FALSE;
 	}
 
@@ -109,7 +109,7 @@ BOOL Enable_TouchScreen_Input()
 #ifdef USE_TSLIB
 	char *tsdevice;
 	char str[256];
-	if (ts_data.status != INSIDE) {
+	if (ts_data.state != INSIDE) {
 		tsdevice = getenv("TSLIB_TSDEVICE");
 		if( tsdevice ) {
 			ts_data.td = ts_open(tsdevice, 0);
@@ -120,16 +120,16 @@ BOOL Enable_TouchScreen_Input()
 		if (!ts_data.td) {
 			sprintf (str, "ts_open: %s", tsdevice);
 			perror (str);
-			ts_data.status = REMOVE;
+			ts_data.state = REMOVE;
 			return FALSE;
 		}
 
 		if (ts_config (ts_data.td)) {
 			perror ("ts_config");
-			ts_data.status = REMOVE;
+			ts_data.state = REMOVE;
 			return FALSE;
 		}
-		ts_data.status = INSIDE;
+		ts_data.state = INSIDE;
 	}
 	return TRUE;
 #else
@@ -141,9 +141,9 @@ BOOL Disable_TouchScreen_Input()
 /* 功能：撤销触屏输入处理 */
 {
 #ifdef USE_TSLIB
-	if(ts_data.status == INSIDE) {
+	if(ts_data.state == INSIDE) {
 		ts_close(ts_data.td);
-		ts_data.status = REMOVE;
+		ts_data.state = REMOVE;
 		return TRUE;
 	}
 	return FALSE;
@@ -162,7 +162,7 @@ void TouchScreen_Init()
 /* 初始化触屏设备 */
 {
 	ts_data.td = NULL;
-	ts_data.status = REMOVE;
+	ts_data.state = REMOVE;
 	LCUI_Dev_Add( Enable_TouchScreen_Input, proc_touchscreen,
 			Disable_TouchScreen_Input );
 }

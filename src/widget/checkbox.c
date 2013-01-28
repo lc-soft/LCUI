@@ -67,7 +67,7 @@ void Set_CheckBox_Off(LCUI_Widget *widget)
 	Draw_Widget(widget);
 }
 
-int Get_CheckBox_Status(LCUI_Widget *widget)
+int Get_CheckBox_State(LCUI_Widget *widget)
 /* 功能：获取复选框的状态 */
 {
 	LCUI_CheckBox *check_box;
@@ -78,7 +78,7 @@ int Get_CheckBox_Status(LCUI_Widget *widget)
 int CheckBox_Is_On(LCUI_Widget *widget)
 /* 功能：检测复选框是否被选中 */
 {
-	if( Get_CheckBox_Status(widget)) {
+	if( Get_CheckBox_State(widget)) {
 		return 1;
 	}
 	return 0;
@@ -87,13 +87,13 @@ int CheckBox_Is_On(LCUI_Widget *widget)
 int CheckBox_Is_Off(LCUI_Widget *widget)
 /* 功能：检测复选框是否未选中 */
 {
-	if( Get_CheckBox_Status(widget) ) {
+	if( Get_CheckBox_State(widget) ) {
 		return 0;
 	}
 	return 1;
 }
 
-void Switch_CheckBox_Status(LCUI_Widget *widget, void *arg)
+void Switch_CheckBox_State(LCUI_Widget *widget, void *arg)
 /* 
  * 功能：切换复选框的状态
  * 说明：这个状态，指的是打勾与没打勾的两种状态
@@ -123,6 +123,7 @@ static void
 CheckBox_Init(LCUI_Widget *widget)
 /* 初始化复选框部件的数据 */
 {
+	int valid_state;
 	LCUI_Widget *container[2];
 	LCUI_CheckBox *check_box;
 	
@@ -175,9 +176,11 @@ CheckBox_Init(LCUI_Widget *widget)
 	Show_Widget(container[0]);
 	Show_Widget(container[1]);
 	/* 关联鼠标左键点击事件 */
-	Widget_Clicked_Event_Connect(widget, Switch_CheckBox_Status, NULL);
+	Widget_Clicked_Event_Connect(widget, Switch_CheckBox_State, NULL);
 	/* 响应状态改变 */
-	Response_Status_Change(widget);
+	valid_state = (WIDGET_STATE_NORMAL | WIDGET_STATE_ACTIVE);
+	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);
+	Widget_SetValidState( widget, valid_state );
 }
 
 static void 
@@ -208,13 +211,13 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 	
 	check_box = Get_Widget_PrivData(widget); 
 								
-	if(Strcmp(&widget->style, "custom") == 0) {
+	if(Strcmp(&widget->style_name, "custom") == 0) {
 		/* 如果为自定义风格，那就使用用户指定的图形，具体可参考按钮部件的处理方法 */ 
 		if( !widget->enabled ) {
-			widget->status = WIDGET_STATUS_DISABLE;
+			widget->state = WIDGET_STATE_DISABLE;
 		}
-		switch(widget->status){
-		case WIDGET_STATUS_NORMAL:
+		switch(widget->state){
+		case WIDGET_STATE_NORMAL:
 			if( check_box->on ) {
 				p = &check_box->img_on_normal;
 			} else {
@@ -222,7 +225,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
-		case WIDGET_STATUS_OVERLAY :
+		case WIDGET_STATE_OVERLAY :
 			if( check_box->on ) {
 				p = &check_box->img_on_over;
 			} else {
@@ -230,7 +233,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
-		case WIDGET_STATUS_ACTIVE : 
+		case WIDGET_STATE_ACTIVE : 
 			if( check_box->on ) {
 				p = &check_box->img_on_down;
 			} else {
@@ -238,7 +241,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
-		case WIDGET_STATUS_DISABLE :
+		case WIDGET_STATE_DISABLE :
 			if( check_box->on ) {
 				p = &check_box->img_on_disable;
 			} else {
@@ -250,9 +253,9 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			break;
 		} 
 	} else {/* 如果按钮的风格为缺省 */
-		Strcpy(&widget->style, "default");
+		Strcpy(&widget->style_name, "default");
 		if( !widget->enabled ) {
-			widget->status = WIDGET_STATUS_DISABLE;
+			widget->state = WIDGET_STATE_DISABLE;
 		}
 		/* 先释放PictureBox部件中保存的图形数据的指针 */
 		p = Get_PictureBox_Graph(check_box->imgbox);
@@ -261,8 +264,8 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 		/* 由于本函数在退出后，使用局部变量保存的图形数据会无效，因此，申请内存空间来储存 */
 		p = (LCUI_Graph*)calloc(1,sizeof(LCUI_Graph));
 		
-		switch(widget->status) { 
-		case WIDGET_STATUS_NORMAL:
+		switch(widget->state) { 
+		case WIDGET_STATE_NORMAL:
 			if( check_box->on ) {
 				Load_Graph_Default_CheckBox_On_Normal(p);
 			} else {
@@ -270,7 +273,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
-		case WIDGET_STATUS_OVERLAY :
+		case WIDGET_STATE_OVERLAY :
 			if( check_box->on ) {
 				Load_Graph_Default_CheckBox_On_Selected(p);
 			} else {
@@ -278,7 +281,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
-		case WIDGET_STATUS_ACTIVE : 
+		case WIDGET_STATE_ACTIVE : 
 			if( check_box->on ) {
 				Load_Graph_Default_CheckBox_On_Selected(p);
 			} else {
@@ -286,7 +289,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
 			break;
-		case WIDGET_STATUS_DISABLE :
+		case WIDGET_STATE_DISABLE :
 			if( check_box->on ) {
 				Load_Graph_Default_CheckBox_On_Disabled(p);
 			} else {

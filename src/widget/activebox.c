@@ -79,7 +79,7 @@ Create_Frames(LCUI_Size size)
 	Graph_Init(&frames.slot);
 	frames.slot.have_alpha = TRUE;
 	frames.current = 0;
-	frames.status = 0;
+	frames.state = 0;
 	frames.size = size; 
 	if( !database_init ) {
 		Queue_Init(&frames_database, sizeof(LCUI_Frames), NULL); 
@@ -257,7 +257,7 @@ Frames_Stream_Time_Sub(int time)
 	DEBUG_MSG("start\n");
 	for(i=0; i<total; ++i) {
 		frames = Queue_Get(&frames_stream, i);  
-		if( !frames || frames->status == 0 ) {
+		if( !frames || frames->state == 0 ) {
 			continue;
 		}
 		if(frames->current > 0) {
@@ -311,7 +311,7 @@ Frames_Stream_Update( int *sleep_time )
 	total = Queue_Get_Total(&frames_stream); 
 	for(i=0; i<total; ++i){
 		frames = Queue_Get(&frames_stream, i);
-		if(frames->status == 1) {
+		if(frames->state == 1) {
 			break;
 		}
 	}
@@ -324,7 +324,7 @@ Frames_Stream_Update( int *sleep_time )
 	 * */
 	for(i=0; i<total; ++i){
 		temp = Queue_Get( &frames_stream, i );
-		if( frames->status == 1 && temp->current == 0 ) {
+		if( frames->state == 1 && temp->current == 0 ) {
 			frames = temp;
 			break;
 		}
@@ -408,7 +408,7 @@ int Frames_Play(LCUI_Frames *frames)
 	if( !frames ) {
 		return -1; 
 	}
-	frames->status = 1;
+	frames->state = 1;
 	if(__timer_id == -1){
 		Queue_Init( &frames_stream, sizeof(LCUI_Frames), NULL );
 		Queue_Using_Pointer( &frames_stream );
@@ -437,7 +437,7 @@ int Frames_Pause(LCUI_Frames *frames)
 	if( !frames ) {
 		return -1;
 	}
-	frames->status = 0;
+	frames->state = 0;
 	return 0;
 }
 /*********************** End Frames Process ***************************/

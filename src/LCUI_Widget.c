@@ -670,7 +670,7 @@ void print_widget_info(LCUI_Widget *widget)
 {
 	if( widget ) {
 		printf("widget: %p, type: %s, visible: %d, pos: (%d,%d), size: (%d, %d)\n",
-			widget, widget->type.string, widget->visible,
+			widget, widget->type_name.string, widget->visible,
 			widget->pos.x, widget->pos.y,
 			widget->size.w, widget->size.h);  
 	} else {
@@ -744,15 +744,19 @@ int Widget_SyncInvalidArea( LCUI_Widget *widget )
 	return 0;
 }
 
-void Response_Status_Change(LCUI_Widget *widget)
+
 /* 
  * 功能：让指定部件响应部件状态的改变
  * 说明：部件创建时，默认是不响应状态改变的，因为每次状态改变后，都要调用函数重绘部件，
  * 这对于一些部件是多余的，没必要重绘，影响效率。如果想让部件能像按钮那样，鼠标移动到它
  * 上面时以及鼠标点击它时，都会改变按钮的图形样式，那就需要用这个函数设置一下。
- *  */
+ * 用法：
+ * Widget_SetValidState( widget, WIDGET_STATE_NORMAL );
+ * Widget_SetValidState( widget, WIDGET_STATE_OVERLAY | WIDGET_STATE_ACTIVE );
+ * */
+void Widget_SetValidState( LCUI_Widget *widget, int state )
 {
-	widget->status_response = TRUE;
+	widget->valid_state = state;
 }
 
 LCUI_Widget *Get_Parent_Widget(LCUI_Widget *widget, char *widget_type)
@@ -769,7 +773,7 @@ LCUI_Widget *Get_Parent_Widget(LCUI_Widget *widget, char *widget_type)
 	temp = widget;
 	while( temp->parent ) {
 		if(temp->parent
-		  && Strcmp(&temp->parent->type, widget_type) == 0
+		  && Strcmp(&temp->parent->type_name, widget_type) == 0
 		) {/* 如果指针有效，并且类型符合要求 */
 			return temp->parent; /* 返回部件的指针 */
 		}
@@ -871,13 +875,13 @@ Focus_Widget( LCUI_Widget *widget )
 LCUI_String Get_Widget_Style(LCUI_Widget *widget)
 /* 功能：获取部件的类型 */
 {
-	return widget->style;
+	return widget->style_name;
 }
 
 void Set_Widget_Style(LCUI_Widget *widget, char *style)
 /* 功能：设定部件的风格 */
 {
-	Strcpy(&widget->style, style); 
+	Strcpy(&widget->style_name, style); 
 	Draw_Widget( widget );
 }
 
@@ -953,7 +957,7 @@ LCUI_Widget *Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 int Widget_Is_Active(LCUI_Widget *widget)
 /* 功能：判断部件是否为活动状态 */
 {
-	if(widget->status != KILLED) {
+	if(widget->state != KILLED) {
 		return 1;
 	}
 	return 0;
@@ -1000,7 +1004,7 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	widget.auto_size		= FALSE;
 	widget.auto_size_mode		= AUTOSIZE_MODE_GROW_AND_SHRINK;
 	widget.type_id			= 0;
-	widget.status			= WIDGET_STATUS_NORMAL;
+	widget.state			= WIDGET_STATE_NORMAL;
 	widget.app_id			= app->id; 
 	widget.parent			= NULL;
 	widget.enabled			= TRUE;
@@ -1015,11 +1019,11 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	widget.dock			= DOCK_TYPE_NONE;
 	widget.offset			= Pos(0, 0); 
 	widget.pos_type			= POS_TYPE_ABSOLUTE;
-	widget.back_color		= RGB(238,243,250);
-	widget.fore_color		= RGB(0,0,0);
+	widget.background.color		= RGB(238,243,250);
+	widget.color			= RGB(0,0,0);
 	widget.private_data		= NULL;
-	widget.bg_mode			= BG_MODE_TRANSPARENT;
-	widget.status_response		= 0;
+	widget.background.transparent	= BG_MODE_TRANSPARENT;
+	widget.valid_state		= 0;
 	widget.clickable_mode		= 0;
 	widget.clickable_area_alpha	= 0;
 	/*------------------------- END --------------------------*/
@@ -1076,13 +1080,13 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 	/* 显示图层 */
 	GraphLayer_Show( widget.client_glayer );
 	
-	Graph_Init( &widget.background_image );	/* 初始化背景图数据 */
+	Graph_Init( &widget.background.image );	/* 初始化背景图数据 */
 	RectQueue_Init( &widget.invalid_area );	/* 初始化无效区域记录 */
 	EventSlots_Init( &widget.event );	/* 初始化部件的事件数据队列 */
 	WidgetQueue_Init( &widget.child );	/* 初始化子部件集 */
 	WidgetData_Init( &widget.data_buff );	/* 初始化数据更新队列 */ 
-	String_Init( &widget.type );
-	String_Init( &widget.style );
+	String_Init( &widget.type_name );
+	String_Init( &widget.style_name );
 	
 	/* 最后，将该部件数据添加至部件队列中 */
 	pos = Queue_Add(&LCUI_Sys.widget_list, &widget);
@@ -1097,7 +1101,7 @@ LCUI_Widget *Create_Widget( const char *widget_type )
 		return NULL;
 	}
 	/* 保存部件类型 */
-	Strcpy(&p->type, widget_type);
+	Strcpy(&p->type_name, widget_type);
 	p->type_id = WidgetType_Get_ID(widget_type);	/* 获取类型ID */
 	/* 获取初始化部件私有结构体数据的函数指针 */ 
 	func_init = Get_WidgetFunc_By_ID(p->type_id, FUNC_TYPE_INIT);
@@ -1159,7 +1163,7 @@ void Set_Widget_BG_Mode(LCUI_Widget *widget, BG_MODE bg_mode)
  * 说明：背景模式决定了部件在没有背景图的时候是使用背景色填充还是完全透明。
  **/
 {
-	widget->bg_mode = bg_mode;
+	widget->background.transparent = bg_mode;
 }
 
 void Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode )
@@ -1296,7 +1300,7 @@ void Set_Widget_Border(LCUI_Widget *widget, LCUI_Border border)
 void Set_Widget_Backcolor(LCUI_Widget *widget, LCUI_RGB color)
 /* 功能：设定部件的背景色 */
 {
-	widget->back_color = color;
+	widget->background.color = color;
 	Draw_Widget(widget);
 	Refresh_Widget(widget);
 }
@@ -1305,11 +1309,11 @@ int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag)
 /* 功能：为部件填充背景图像 */
 {
 	if( !img ) {
-		Graph_Free(&widget->background_image);
+		Graph_Free(&widget->background.image);
 	} else {
-		widget->background_image_layout = flag;
+		widget->background.align = flag;
 		/* 填充背景图像 */
-		Graph_Copy(&widget->background_image, img);
+		Graph_Copy(&widget->background.image, img);
 	}
 	Draw_Widget(widget); 
 	return 0;
@@ -1319,14 +1323,14 @@ void Enable_Widget(LCUI_Widget *widget)
 /* 功能：启用部件 */
 {
 	widget->enabled = TRUE; 
-	Set_Widget_Status(widget, WIDGET_STATUS_NORMAL);
+	Widget_SetState(widget, WIDGET_STATE_NORMAL);
 }
 
 void Disable_Widget(LCUI_Widget *widget)
 /* 功能：禁用部件 */
 {
 	widget->enabled = FALSE; 
-	Set_Widget_Status( widget, WIDGET_STATUS_DISABLE );
+	Widget_SetState( widget, WIDGET_STATE_DISABLE );
 }
 
 /* 指定部件是否可见 */
@@ -1609,19 +1613,19 @@ void Exec_Draw_Widget(LCUI_Widget *widget)
 	}
 	
 	graph = Widget_GetSelfGraph( widget );
-	if(Graph_Valid(&widget->background_image)) {/* 如果有背景图 */
+	if(Graph_Valid(&widget->background.image)) {/* 如果有背景图 */
 		/* alpha通道中的每个像素的透明值为255，整个部件的图形不透明 */
 		Graph_Fill_Alpha( graph, 255 );
 		Graph_Fill_Image( graph, 
-				&widget->background_image, 
-				widget->background_image_layout,
-				widget->back_color
+				&widget->background.image, 
+				widget->background.align,
+				widget->background.color
 		); /* 填充背景色 */
 	} else {/* 否则根据背景模式来处理 */ 
-		switch(widget->bg_mode) {
+		switch(widget->background.transparent) {
 		    case BG_MODE_FILL_BACKCOLOR: /* 填充背景色 */
 			Graph_Fill_Alpha( graph, 255 );
-			Graph_Fill_Color( graph, widget->back_color );
+			Graph_Fill_Color( graph, widget->background.color );
 			break;
 				
 		    case BG_MODE_TRANSPARENT: /* 完全透明 */
@@ -1980,13 +1984,21 @@ void Hide_Widget(LCUI_Widget *widget)
 	Record_WidgetUpdate( widget, NULL, DATATYPE_HIDE, 0 ); 
 }
 
-void Set_Widget_Status(LCUI_Widget *widget, int status)
-/* 功能：设定部件的状态 */
+/* 改变部件的状态 */
+int Widget_SetState( LCUI_Widget *widget, int state )
 {
 	if( !widget ) {
-		return; 
+		return -1;
 	}
-	Record_WidgetUpdate( widget, &status, DATATYPE_STATUS, 0 ); 
+	/* 如果该状态不被该部件支持 */
+	if( (widget->valid_state & state) != state ) {
+		return 1;
+	}
+	if( !widget->enabled ) {
+		state = WIDGET_STATE_DISABLE;
+	}
+	Record_WidgetUpdate( widget, &state, DATATYPE_STATUS, 0 );
+	return 0;
 }
 /************************* Widget End *********************************/
 
@@ -1997,7 +2009,7 @@ typedef union union_widget_data
 {
 	LCUI_Pos pos;
 	LCUI_Size size;
-	int status;
+	int state;
 }
 u_wdata;
 
@@ -2047,7 +2059,7 @@ Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type, int flag)
 		break;
 	    case DATATYPE_STATUS :
 		if(temp.valid) {
-			temp.data.status = *((int*)data);
+			temp.data.state = *((int*)data);
 		}
 		break;
 	    case DATATYPE_GRAPH	: 
@@ -2091,7 +2103,7 @@ Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type, int flag)
 			break;
 		    case DATATYPE_STATUS :
 			if(temp.valid) {
-				tmp_ptr->data.status = temp.data.status;
+				tmp_ptr->data.state = temp.data.state;
 			}
 			break;
 		    case DATATYPE_GRAPH	: 
@@ -2166,7 +2178,11 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 			Exec_Update_Widget( widget );
 			break;
 		    case DATATYPE_STATUS:
-			widget->status = temp->data.status;
+			/* 只有状态不一样才重绘部件 */
+			if( widget->state == temp->data.state ) {
+				break;
+			}
+			widget->state = temp->data.state;
 			/* 改变部件状态后需要进行重绘，所以不用break */
 		    case DATATYPE_GRAPH	:
 			Exec_Draw_Widget(widget); 
@@ -2533,4 +2549,3 @@ void Register_Default_Widget_Type()
 	Register_ScrollBar();
 }
 /************************ Widget Library End **************************/
-

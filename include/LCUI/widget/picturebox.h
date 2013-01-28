@@ -44,9 +44,9 @@
 
 typedef struct _LCUI_PictureBox	LCUI_PictureBox;
 /******************* 图像状态 *******************/
-#define IMAGE_STATUS_LOADING   1
-#define IMAGE_STATUS_FAIL     -1
-#define IMAGE_STATUS_SUCCESS   0
+#define IMAGE_STATE_LOADING   1
+#define IMAGE_STATE_FAIL     -1
+#define IMAGE_STATE_SUCCESS   0
 /**********************************************/
 
 
@@ -62,7 +62,7 @@ struct _LCUI_PictureBox
 	LCUI_Graph	error_image;	/* 当加载图像失败时显示的图像 */
 	LCUI_Graph	initial_image;	/* 正在加载另一图像时显示的图像 */ 
 	
-	int		image_status;	/* 图片状态(LOADING / FAIL / SUCCESS) */
+	int		image_state;	/* 图片状态(LOADING / FAIL / SUCCESS) */
 };
 /****************************** END ***********************************/
 

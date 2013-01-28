@@ -110,7 +110,7 @@ int Mouse_RightButton(LCUI_MouseEvent *event);
  *   1   鼠标右键处于按下状态
  **/ 
 
-int Click_LeftButton (LCUI_Event *event);
+int Click_LeftButton (LCUI_MouseButtonEvent *event);
 /*
  * 功能：检测是否是按鼠标左键
  **/ 

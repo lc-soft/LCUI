@@ -95,7 +95,7 @@ Update_Label(LCUI_Widget *widget)
 	LCUI_Label *label;
 	
 	label = Get_Widget_PrivData( widget );
-	if(!Graph_Valid(&widget->background_image)) {
+	if(!Graph_Valid(&widget->background.image)) {
 		mode = GRAPH_MIX_FLAG_REPLACE; /* 替换模式 */
 	} else {
 		mode = GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */ 

@@ -279,7 +279,7 @@ Exec_Update_PictureBox(LCUI_Widget *widget)
 	//pic_box->read_box.width, pic_box->read_box.height, 
 	//pic_box->read_box.x + pic_box->read_box.width, pic_box->buff_graph.width, 
 	//pic_box->read_box.y + pic_box->read_box.height, pic_box->buff_graph.height);
-	if(!Graph_Valid(&widget->background_image)) {
+	if(!Graph_Valid(&widget->background.image)) {
 		Graph_Replace( widget_graph, &graph, pos );
 	} else {
 		Graph_Mix( widget_graph, &graph, pos );
@@ -399,7 +399,7 @@ void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 				default : break;
 			}
 			break;
-		} else if(pic_box->image_status == IMAGE_STATUS_LOADING) {
+		} else if(pic_box->image_state == IMAGE_STATE_LOADING) {
 			/* 使用对应的图片 */ 
 			if(Graph_Valid(&pic_box->initial_image)) { 
 				graph = &pic_box->initial_image; 
@@ -410,7 +410,7 @@ void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 		else { /* 使用对应的图片 */ 
 			if(Graph_Valid(&pic_box->error_image)) {
 				graph = &pic_box->error_image; 
-				pic_box->image_status = IMAGE_STATUS_FAIL;
+				pic_box->image_state = IMAGE_STATE_FAIL;
 			} else {
 				return;
 			} 
@@ -454,16 +454,16 @@ int Set_PictureBox_Image_From_File(LCUI_Widget *widget, char *image_file)
 	}
 	graph = data.image;
 	
-	pic_box->image_status = IMAGE_STATUS_LOADING; /* 图片状态为正在载入 */
+	pic_box->image_state = IMAGE_STATE_LOADING; /* 图片状态为正在载入 */
 	Set_PictureBox_Image_From_Graph(widget, NULL);
 	ret = Load_Image( image_file, graph );/* 载入图片文件 */
 	if( ret == 0 ) {
 		/* 载入成功 */
-		pic_box->image_status = IMAGE_STATUS_SUCCESS; 
+		pic_box->image_state = IMAGE_STATE_SUCCESS; 
 		Set_PictureBox_Image_From_Graph(widget, graph);
 	} else {
 		/* 载入失败 */
-		pic_box->image_status = IMAGE_STATUS_FAIL;
+		pic_box->image_state = IMAGE_STATE_FAIL;
 		Set_PictureBox_Image_From_Graph(widget, NULL);
 	}
 	return ret;

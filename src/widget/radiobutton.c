@@ -143,7 +143,7 @@ void Set_RadioButton_Off(LCUI_Widget *widget)
 	Draw_Widget(widget);
 }
 
-int Get_RadioButton_Status(LCUI_Widget *widget)
+int Get_RadioButton_state(LCUI_Widget *widget)
 /* 功能：获取单选框的状态 */
 {
 	LCUI_RadioButton *radio_button;
@@ -154,7 +154,7 @@ int Get_RadioButton_Status(LCUI_Widget *widget)
 int RadioButton_Is_On(LCUI_Widget *widget)
 /* 功能：检测单选框是否被选中 */
 {
-	if(IS_TRUE == Get_RadioButton_Status(widget))
+	if(IS_TRUE == Get_RadioButton_state(widget))
 		return 1;
 	
 	return 0;
@@ -163,13 +163,13 @@ int RadioButton_Is_On(LCUI_Widget *widget)
 int RadioButton_Is_Off(LCUI_Widget *widget)
 /* 功能：检测单选框是否未选中 */
 {
-	if(IS_TRUE == Get_RadioButton_Status(widget))
+	if(IS_TRUE == Get_RadioButton_state(widget))
 		return 0;
 	
 	return 1;
 }
 
-void Switch_RadioButton_Status(LCUI_Widget *widget, void *arg)
+void Switch_RadioButton_State(LCUI_Widget *widget, void *arg)
 /* 
  * 功能：切换单选框的状态
  * 说明：这个状态，指的是打勾与没打勾的两种状态
@@ -195,6 +195,7 @@ static void
 RadioButton_Init(LCUI_Widget *widget)
 /* 功能：初始化单选框部件的数据 */
 {
+	int valid_state;
 	LCUI_Widget *container[2];
 	LCUI_RadioButton *radio_button;
 	
@@ -246,8 +247,11 @@ RadioButton_Init(LCUI_Widget *widget)
 	Show_Widget(container[0]);
 	Show_Widget(container[1]);
 	
-	Widget_Clicked_Event_Connect(widget, Switch_RadioButton_Status, NULL);
-	Response_Status_Change(widget);
+	Widget_Clicked_Event_Connect(widget, Switch_RadioButton_State, NULL);
+	
+	valid_state = (WIDGET_STATE_NORMAL | WIDGET_STATE_ACTIVE);
+	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);
+	Widget_SetValidState( widget, valid_state);
 }
 
 
@@ -259,14 +263,14 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 	
 	radio_button = Get_Widget_PrivData(widget);
 	/* 如果为自定义风格，那就使用用户指定的图形 */ 	
-	if(Strcmp(&widget->style, "custom") == 0) {
+	if(Strcmp(&widget->style_name, "custom") == 0) {
 		//printf("custom\n"); 
 		if(widget->enabled == IS_FALSE) 
-			widget->status = WIDGET_STATUS_DISABLE;
+			widget->state = WIDGET_STATE_DISABLE;
 			
-		switch(widget->status)
+		switch(widget->state)
 		{/* 判断按钮的状态，以选择相应的背景色 */
-		case WIDGET_STATUS_NORMAL:
+		case WIDGET_STATE_NORMAL:
 			if(radio_button->on) {
 				p = &radio_button->img_on_normal;
 			} else {
@@ -274,7 +278,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		case WIDGET_STATUS_OVERLAY :
+		case WIDGET_STATE_OVERLAY :
 			if(radio_button->on) {
 				p = &radio_button->img_on_over;
 			} else {
@@ -282,7 +286,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		case WIDGET_STATUS_ACTIVE : 
+		case WIDGET_STATE_ACTIVE : 
 			if(radio_button->on) {
 				p = &radio_button->img_on_down;
 			} else {
@@ -290,7 +294,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		case WIDGET_STATUS_DISABLE :
+		case WIDGET_STATE_DISABLE :
 			if(radio_button->on) {
 				p = &radio_button->img_on_disable;
 			} else {
@@ -302,9 +306,9 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			break;
 		} 
 	} else {/* 如果按钮的风格为缺省 */
-		Strcpy(&widget->style, "default");
+		Strcpy(&widget->style_name, "default");
 		if( !widget->enabled ) {
-			widget->status = WIDGET_STATUS_DISABLE;
+			widget->state = WIDGET_STATE_DISABLE;
 		}
 		/* 先释放PictureBox部件中保存的图形数据的指针 */
 		p = Get_PictureBox_Graph(radio_button->imgbox);
@@ -313,9 +317,9 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 		/* 由于本函数在退出后，使用局部变量保存的图形数据会无效，因此，申请内存空间来储存 */
 		p = (LCUI_Graph*)calloc(1,sizeof(LCUI_Graph));
 		
-		switch(widget->status)
+		switch(widget->state)
 		{/* 判断按钮的状态，以选择相应的背景色 */
-		    case WIDGET_STATUS_NORMAL:
+		    case WIDGET_STATE_NORMAL:
 			if(radio_button->on) {
 				Load_Graph_Default_RadioButton_On_Normal(p);
 			} else {
@@ -323,7 +327,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		    case WIDGET_STATUS_OVERLAY :
+		    case WIDGET_STATE_OVERLAY :
 			if(radio_button->on) {
 				Load_Graph_Default_RadioButton_On_Selected(p);
 			} else {
@@ -331,7 +335,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		    case WIDGET_STATUS_ACTIVE : 
+		    case WIDGET_STATE_ACTIVE : 
 			if(radio_button->on) {
 				Load_Graph_Default_RadioButton_On_Pressed(p);
 			} else {
@@ -339,7 +343,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			}
 			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
 			break;
-		    case WIDGET_STATUS_DISABLE :
+		    case WIDGET_STATE_DISABLE :
 			break;
 			default :
 			break;

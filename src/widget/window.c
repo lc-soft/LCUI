@@ -271,7 +271,7 @@ Get_Parent_Window(LCUI_Widget *widget)
 	if( !widget || !widget->parent ) {
 		return NULL;
 	}
-	if(strcmp(widget->parent->type.string, "window") == 0) {
+	if(strcmp(widget->parent->type_name.string, "window") == 0) {
 		return widget->parent;
 	}
 	

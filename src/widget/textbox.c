@@ -119,13 +119,13 @@ static void
 blink_cursor()
 /* 闪烁文本框中的光标 */
 {
-	static int cur_status = 0;
-	if(cur_status == 0) {
+	static int cur_state = 0;
+	if(cur_state == 0) {
 		show_textbox_cursor();
-		cur_status = 1;
+		cur_state = 1;
 	} else {
 		hide_textbox_cursor();
-		cur_status = 0;
+		cur_state = 0;
 	}
 }
 
