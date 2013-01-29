@@ -55,13 +55,13 @@ Label_Init(LCUI_Widget *widget)
 	LCUI_Label *label;
 	/* label部件不需要焦点 */
 	widget->focus = FALSE;
-	label = Widget_Create_PrivData( widget, sizeof(LCUI_Label) );
+	label = WidgetPrivData_New( widget, sizeof(LCUI_Label) );
 	label->auto_size = TRUE;
 	/* 初始化文本图层 */
 	TextLayer_Init( &label->layer ); 
 	/* 启用多行文本显示 */
 	TextLayer_Multiline( &label->layer, TRUE );
-	Widget_AutoSize( widget, FALSE, 0 );
+	Widget_SetAutoSize( widget, FALSE, 0 );
 	/* 启用样式标签的支持 */
 	TextLayer_Using_StyleTags( &label->layer, TRUE );
 }
@@ -72,7 +72,7 @@ Destroy_Label(LCUI_Widget *widget)
 {
 	LCUI_Label *label;
 	
-	label = Get_Widget_PrivData( widget );
+	label = Widget_GetPrivData( widget );
 	Destroy_TextLayer( &label->layer );
 }
 
@@ -82,7 +82,7 @@ Refresh_Label_FontBitmap(LCUI_Widget *widget)
 {
 	LCUI_Label *label;
 	
-	label = Get_Widget_PrivData( widget );
+	label = Widget_GetPrivData( widget );
 	TextLayer_Refresh( &label->layer ); 
 }
 
@@ -94,7 +94,7 @@ Update_Label(LCUI_Widget *widget)
 	LCUI_Size max;
 	LCUI_Label *label;
 	
-	label = Get_Widget_PrivData( widget );
+	label = Widget_GetPrivData( widget );
 	if(!Graph_Valid(&widget->background.image)) {
 		mode = GRAPH_MIX_FLAG_REPLACE; /* 替换模式 */
 	} else {
@@ -107,7 +107,7 @@ Update_Label(LCUI_Widget *widget)
 	if( widget->dock == DOCK_TYPE_NONE && label->auto_size
 	 && Size_Cmp( max, widget->size ) != 0 ) {
 		/* 如果开启了自动调整大小,并且尺寸有改变 */ 
-		Resize_Widget(widget, max );
+		Widget_Resize(widget, max );
 		Refresh_Widget(widget);
 	}
 }
@@ -132,14 +132,14 @@ Label_Text(LCUI_Widget *widget, const char *fmt, ...)
     
 	LCUI_Label *label;
 	
-	label = Get_Widget_PrivData( widget ); 
+	label = Widget_GetPrivData( widget ); 
 	
 	va_list ap;
 	va_start( ap, fmt );
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
 	va_end( ap );
 	TextLayer_Text( &label->layer, text );
-	Update_Widget( widget ); 
+	Widget_Update( widget ); 
 }
 
 int 
@@ -148,9 +148,9 @@ Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 {
 	LCUI_Label *label;
 	
-	label = Get_Widget_PrivData( widget );
+	label = Widget_GetPrivData( widget );
 	TextLayer_Text_Set_Default_Style( &label->layer, style );
-	Draw_Widget( widget ); 
+	Widget_Draw( widget ); 
 	return 0;
 }
 
@@ -160,7 +160,7 @@ Label_Get_TextLayer( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
 	
-	label = Get_Widget_PrivData( widget );
+	label = Widget_GetPrivData( widget );
 	return &label->layer;
 }
 
@@ -179,10 +179,10 @@ Label_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode )
 {
 	LCUI_Label *label;
 	
-	label = Get_Widget_PrivData( widget );
+	label = Widget_GetPrivData( widget );
 	label->auto_size = flag;
 	label->mode = mode;
-	Update_Widget( widget );
+	Widget_Update( widget );
 }
 /*-------------------------- End Public ------------------------------*/
 

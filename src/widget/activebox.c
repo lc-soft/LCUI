@@ -442,7 +442,7 @@ LCUI_Frames *
 ActiveBox_Get_Frames(LCUI_Widget *widget)
 {
 	LCUI_ActiveBox *actbox;
-	actbox = (LCUI_ActiveBox *)Get_Widget_PrivData(widget);
+	actbox = (LCUI_ActiveBox *)Widget_GetPrivData(widget);
 	return actbox->frames;
 }
 
@@ -451,7 +451,7 @@ ActiveBox_Refresh_Frame(LCUI_Graph *frame, void *arg)
 /* 功能：刷新动画当前帧的显示 */
 {
 	LCUI_Widget *widget = (LCUI_Widget*)arg;
-	Draw_Widget(widget); 
+	Widget_Draw(widget); 
 }
 
 int ActiveBox_Set_Frames_Size(LCUI_Widget *widget, LCUI_Size new_size)
@@ -489,7 +489,7 @@ ActiveBox_Init(LCUI_Widget *widget)
 /* 功能：初始化ActiveBox部件 */
 {
 	LCUI_ActiveBox *actbox;
-	actbox = (LCUI_ActiveBox *)Widget_Create_PrivData(widget, 
+	actbox = (LCUI_ActiveBox *)WidgetPrivData_New(widget, 
 					sizeof(LCUI_ActiveBox)); 
 	actbox->frames = Create_Frames(Size(50,50));
 	Frames_Add_Func( actbox->frames, ActiveBox_Refresh_Frame, widget );
@@ -507,7 +507,7 @@ Exec_Update_ActiveBox(LCUI_Widget *widget)
 	frames = ActiveBox_Get_Frames(widget);
 	widget_graph = Widget_GetSelfGraph( widget );
 	frame_graph = Frames_Get_Slot(frames);
-	pos = Align_Get_Pos(Get_Widget_Size(widget), 
+	pos = Align_Get_Pos(Widget_GetSize(widget), 
 				frames->size, ALIGN_MIDDLE_CENTER);
 
 	Graph_Fill_Alpha( widget_graph, 0 );

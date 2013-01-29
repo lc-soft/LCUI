@@ -155,7 +155,7 @@ static void LCUI_Destroy_App(LCUI_App *app)
 	}
 	
 	LCUI_App_Thread_Cancel(app->id); /* 撤销这个程序的所有线程 */
-	LCUI_Destroy_App_Widgets(app->id); /* 销毁这个程序的所有部件 */
+	LCUIApp_DestroyAllWidgets(app->id); /* 销毁这个程序的所有部件 */
 }
 
 static void LCUI_AppList_Init()

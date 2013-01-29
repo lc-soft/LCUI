@@ -52,7 +52,7 @@ Destroy_PictureBox(LCUI_Widget* widget)
 /* 功能：释放图片盒子占用的内存资源 */
 {
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget);
+				Widget_GetPrivData(widget);
 	Graph_Free(&pic_box->buff_graph); 
 	Graph_Free(&pic_box->error_image);
 	Graph_Free(&pic_box->initial_image); 
@@ -64,7 +64,7 @@ PictureBox_Init(LCUI_Widget *widget)
 {
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Widget_Create_PrivData(widget, sizeof(LCUI_PictureBox));;
+	pic_box = WidgetPrivData_New(widget, sizeof(LCUI_PictureBox));;
 	
 	Rect_Init(&pic_box->read_box);
 	pic_box->image		= NULL; 
@@ -81,7 +81,7 @@ LCUI_Rect Get_PictureBox_View_Area(LCUI_Widget *widget)
 {
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	return pic_box->read_box;
 }
 
@@ -100,7 +100,7 @@ static int Update_BuffGraph(LCUI_Widget *widget)
 	float width = 0,height = 0;
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	if(!Graph_Valid(pic_box->image)) {
 		return -1;
 	}
@@ -124,7 +124,7 @@ static int Update_ReadBox(LCUI_Widget *widget)
 	float width = 0,height = 0;
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	if(!Graph_Valid(pic_box->image)) {
 		return -1;
 	}
@@ -207,7 +207,7 @@ Exec_Update_PictureBox(LCUI_Widget *widget)
 	
 	pos = Pos(0,0);
 	Graph_Init(&graph);
-	pic_box  = (LCUI_PictureBox*)Get_Widget_PrivData(widget);
+	pic_box  = (LCUI_PictureBox*)Widget_GetPrivData(widget);
 	widget_graph = Widget_GetSelfGraph( widget );
 	//print_widget_info(widget);
 	//Print_Graph_Info(widget_graph);
@@ -294,7 +294,7 @@ float Get_PictureBox_Zoom_Scale(LCUI_Widget *widget)
 /* 功能：获取图片盒子的缩放比例 */
 {
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-			Get_Widget_PrivData(widget);
+			Widget_GetPrivData(widget);
 	return pic_box->scale;
 }
 
@@ -341,7 +341,7 @@ void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 	LCUI_Graph *graph = image; 
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	for(i = 0;i < 2; ++i) {
 		/* 如果image有效 */ 
 		if(Graph_Valid(graph)) {
@@ -425,7 +425,7 @@ void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image)
 			Queue_Delete(&picbox_graph_mem, i);
 		}
 	}
-	Draw_Widget(widget);
+	Widget_Draw(widget);
 }
 
 
@@ -437,7 +437,7 @@ int Set_PictureBox_Image_From_File(LCUI_Widget *widget, char *image_file)
 	LCUI_PictureBox *pic_box;
 	LCUI_Graph *graph;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	if( !graph_mem_init ) {
 		Queue_Init( &picbox_graph_mem, 
 			sizeof(graph_data), destroy_graph_data);
@@ -474,7 +474,7 @@ int Set_PictureBox_ErrorImage(LCUI_Widget *widget, LCUI_Graph *pic)
 {
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	
 	if(Graph_Valid(pic)) {
 		Graph_Copy(&pic_box->error_image, pic);
@@ -488,7 +488,7 @@ int Set_PictureBox_InitImage(LCUI_Widget *widget, LCUI_Graph *pic)
 {
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	
 	if(Graph_Valid(pic)) {
 		Graph_Copy(&pic_box->initial_image, pic);
@@ -503,7 +503,7 @@ void Set_PictureBox_Size_Mode(LCUI_Widget *widget, int mode)
 	LCUI_PictureBox *pic_box;
 	LCUI_Size my_size;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	
 	if(pic_box->size_mode == mode) {
 		return;
@@ -514,7 +514,7 @@ void Set_PictureBox_Size_Mode(LCUI_Widget *widget, int mode)
 	if( !pic_box->image ) {
 		return; 
 	}
-	my_size = _Get_Widget_Size( widget );
+	my_size = _Widget_GetSize( widget );
 	switch(mode) {
 	case SIZE_MODE_BLOCK_ZOOM:
 	case SIZE_MODE_ZOOM:
@@ -533,7 +533,7 @@ void Set_PictureBox_Size_Mode(LCUI_Widget *widget, int mode)
 		break;
 	default: pic_box->scale = 1.0; break;
 	}
-	Draw_Widget(widget);
+	Widget_Draw(widget);
 }
 
 
@@ -543,7 +543,7 @@ void Resize_PictureBox_View_Area(LCUI_Widget *widget, int width, int height)
 	LCUI_Pos start, center_pos;
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	
 	if(width <= 0 || height <= 0) {
 		return;
@@ -576,7 +576,7 @@ void Resize_PictureBox_View_Area(LCUI_Widget *widget, int width, int height)
 	pic_box->read_box.width = width;
 	pic_box->read_box.height = height;
 	/* 更新图片盒子内的图像 */
-	Draw_Widget(widget);
+	Widget_Draw(widget);
 	Refresh_Widget(widget); 
 }
 
@@ -585,7 +585,7 @@ LCUI_Graph *Get_PictureBox_Graph(LCUI_Widget *widget)
 {
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	return pic_box->image;
 }
 
@@ -596,7 +596,7 @@ int Move_PictureBox_View_Area(LCUI_Widget *widget, LCUI_Pos des_pos)
 	LCUI_Graph *p;
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	
 	if(!Graph_Valid(pic_box->image)) {
 		return -1;
@@ -632,7 +632,7 @@ int Move_PictureBox_View_Area(LCUI_Widget *widget, LCUI_Pos des_pos)
 	pic_box->read_box.center_x = (des_pos.x + size.w/2.0)/p->width;
 	pic_box->read_box.center_y = (des_pos.y + size.h/2.0)/p->height;
 	
-	Draw_Widget(widget);
+	Widget_Draw(widget);
 	//用于调试
 	//printf("read box: %d,%d,%d,%d; %d/%d, %d/%d\n", 
 	//pic_box->read_box.x, pic_box->read_box.y, 
@@ -649,7 +649,7 @@ int Zoom_PictureBox_View_Area(LCUI_Widget *widget, float scale)
 	LCUI_Graph buff, temp;
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = Get_Widget_PrivData(widget);
+	pic_box = Widget_GetPrivData(widget);
 	if(!Graph_Valid(pic_box->image)) {
 		return -1;
 	}
@@ -669,7 +669,7 @@ int Zoom_PictureBox_View_Area(LCUI_Widget *widget, float scale)
 	pic_box->scale = scale; 
 	Update_BuffGraph(widget); 
 	Update_ReadBox(widget);
-	Draw_Widget(widget);
+	Widget_Draw(widget);
 	Refresh_Widget(widget);
 	return 0;
 }
@@ -678,7 +678,7 @@ static void Exec_Resize_PictureBox(LCUI_Widget *widget)
 /* 功能：改变PictureBox部件的尺寸 */
 {
 	LCUI_PictureBox *pic_box = (LCUI_PictureBox*)
-				Get_Widget_PrivData(widget);
+				Widget_GetPrivData(widget);
 	float scale_x, scale_y;
 	if( widget->size.w <= 0 || widget->size.h <= 0 ) {
 		Refresh_Widget(widget); 

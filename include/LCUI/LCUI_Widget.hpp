@@ -89,7 +89,7 @@ private:
 
 LCUIWidget::LCUIWidget( const char* widget_type )
 {
-	widget = Create_Widget( widget_type );
+	widget = Widget_New( widget_type );
 }
 
 LCUIWidget::~LCUIWidget( void )
@@ -108,7 +108,7 @@ int LCUIWidget::resize( LCUI_Size new_size )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Resize_Widget( widget , new_size );
+	Widget_Resize( widget , new_size );
 	return 0;
 }
 
@@ -117,7 +117,7 @@ int LCUIWidget::move( LCUI_Pos new_pos )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Move_Widget( widget , new_pos );
+	Widget_Move( widget , new_pos );
 	return 0;
 }
 
@@ -126,7 +126,7 @@ int LCUIWidget::show( void )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Show_Widget( widget );
+	Widget_Show( widget );
 	return 0;
 }
 
@@ -135,7 +135,7 @@ int LCUIWidget::hide( void )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Hide_Widget( widget );
+	Widget_Hide( widget );
 	return 0;
 }
 
@@ -153,7 +153,7 @@ int LCUIWidget::draw( void )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Draw_Widget( widget );
+	Widget_Draw( widget );
 	return 0;
 }
 
@@ -162,7 +162,7 @@ int LCUIWidget::enable( void )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Enable_Widget( widget );
+	Widget_Enable( widget );
 	return 0;
 }
 
@@ -171,7 +171,7 @@ int LCUIWidget::disable( void )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Disable_Widget( widget );
+	Widget_Disable( widget );
 	return 0;
 }
 
@@ -180,7 +180,7 @@ int LCUIWidget::setAlpha( unsigned char alpha )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Set_Widget_Alpha( widget , alpha );
+	Widget_SetAlpha( widget , alpha );
 	return 0;
 }
 int LCUIWidget::setAlign( ALIGN_TYPE align, LCUI_Pos offset_pos )
@@ -188,7 +188,7 @@ int LCUIWidget::setAlign( ALIGN_TYPE align, LCUI_Pos offset_pos )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Set_Widget_Align( widget , align, offset_pos );
+	Widget_SetAlign( widget , align, offset_pos );
 	return 0;
 }
 int LCUIWidget::setBorder( LCUI_RGB color, LCUI_Border border )
@@ -196,7 +196,7 @@ int LCUIWidget::setBorder( LCUI_RGB color, LCUI_Border border )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Set_Widget_Border( widget , color, border );
+	Widget_SetBorder( widget , color, border );
 	return 0;
 }
 int LCUIWidget::setBackgroundImage( LCUI_Graph *img, int flag )
@@ -220,7 +220,7 @@ int LCUIWidget::setDock( DOCK_TYPE dock )
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	Set_Widget_Dock( widget, dock );
+	Widget_SetDock( widget, dock );
 	return 0;
 }
 

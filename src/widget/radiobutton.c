@@ -59,7 +59,7 @@ void RadioButton_Delete_Mutex(LCUI_Widget *widget)
 	LCUI_Widget *tmp;
 	LCUI_RadioButton *rb;
 	
-	rb = (LCUI_RadioButton *)Get_Widget_PrivData(widget);
+	rb = (LCUI_RadioButton *)Widget_GetPrivData(widget);
 	total = Queue_Get_Total(rb->mutex);
 	for(i=0; i<total; ++i) {
 		tmp = (LCUI_Widget*)Queue_Get(rb->mutex, i);
@@ -81,8 +81,8 @@ void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 		mutex_lib_init = 1;
 	}
 	
-	rb_a = (LCUI_RadioButton *)Get_Widget_PrivData(a);
-	rb_b = (LCUI_RadioButton *)Get_Widget_PrivData(b);
+	rb_a = (LCUI_RadioButton *)Widget_GetPrivData(a);
+	rb_b = (LCUI_RadioButton *)Widget_GetPrivData(b);
 	
 	if( !rb_a->mutex ) {
 		if( !rb_b->mutex ) {
@@ -121,7 +121,7 @@ void Set_RadioButton_On(LCUI_Widget *widget)
 	LCUI_Widget *other;
 	int i, total;
 	
-	radio_button = Get_Widget_PrivData(widget); 
+	radio_button = Widget_GetPrivData(widget); 
 	/* 如果与其它部件有互斥关系，就将其它单选框部件的状态改为“未选中”状态 */
 	if( radio_button->mutex ) {
 		total = Queue_Get_Total(radio_button->mutex);
@@ -131,23 +131,23 @@ void Set_RadioButton_On(LCUI_Widget *widget)
 		}
 	}
 	radio_button->on = TRUE;
-	Draw_Widget(widget);
+	Widget_Draw(widget);
 }
 
 void Set_RadioButton_Off(LCUI_Widget *widget)
 /* 功能：设定单选框为未选中状态 */
 {
 	LCUI_RadioButton *radio_button;
-	radio_button = Get_Widget_PrivData(widget); 
+	radio_button = Widget_GetPrivData(widget); 
 	radio_button->on = FALSE;
-	Draw_Widget(widget);
+	Widget_Draw(widget);
 }
 
 int Get_RadioButton_state(LCUI_Widget *widget)
 /* 功能：获取单选框的状态 */
 {
 	LCUI_RadioButton *radio_button;
-	radio_button = Get_Widget_PrivData(widget); 
+	radio_button = Widget_GetPrivData(widget); 
 	return radio_button->on;
 }
 
@@ -186,9 +186,9 @@ void RadioButton_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
 		return;
 	}
 	LCUI_Widget *imgbox = Get_RadioButton_ImgBox(widget);
-	Resize_Widget(imgbox, size);
+	Widget_Resize(imgbox, size);
 	/* 由于没有布局盒子，不能自动调整部件间的间隔，暂时用这个方法 */
-	Set_Widget_Align(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
+	Widget_SetAlign(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
 }
 
 static void 
@@ -199,7 +199,7 @@ RadioButton_Init(LCUI_Widget *widget)
 	LCUI_Widget *container[2];
 	LCUI_RadioButton *radio_button;
 	
-	radio_button = Widget_Create_PrivData(widget, sizeof(LCUI_RadioButton));
+	radio_button = WidgetPrivData_New(widget, sizeof(LCUI_RadioButton));
 	radio_button->on = FALSE;
 	/* 初始化图片数据 */ 
 	Graph_Init(&radio_button->img_off_disable);
@@ -215,16 +215,16 @@ RadioButton_Init(LCUI_Widget *widget)
 	
 	radio_button->mutex = NULL;
 	
-	radio_button->label = Create_Widget("label");/* 创建label部件 */
-	radio_button->imgbox = Create_Widget("picture_box"); /* 创建图像框部件 */
+	radio_button->label = Widget_New("label");/* 创建label部件 */
+	radio_button->imgbox = Widget_New("picture_box"); /* 创建图像框部件 */
 	/* 创建两个容器，用于调整上面两个部件的位置 */
-	container[0] = Create_Widget(NULL);
-	container[1] = Create_Widget(NULL);
+	container[0] = Widget_New(NULL);
+	container[1] = Widget_New(NULL);
 	
 	/* 启用这些部件的自动尺寸调整的功能 */
-	Widget_AutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
-	Widget_AutoSize( container[0], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
-	Widget_AutoSize( container[1], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
+	Widget_SetAutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
+	Widget_SetAutoSize( container[0], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
+	Widget_SetAutoSize( container[1], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
 	
 	Widget_Container_Add(container[0], radio_button->imgbox);
 	Widget_Container_Add(container[1], radio_button->label);
@@ -232,20 +232,20 @@ RadioButton_Init(LCUI_Widget *widget)
 	Widget_Container_Add(widget, container[1]);
 	
 	/* 调整尺寸 */
-	Resize_Widget(radio_button->imgbox, Size(15, 15));
+	Widget_Resize(radio_button->imgbox, Size(15, 15));
 	/* 调整布局 */
-	Set_Widget_Align(container[0], ALIGN_MIDDLE_LEFT, Pos(0,0));
-	Set_Widget_Align(container[1], ALIGN_MIDDLE_LEFT, Pos(17,0));
-	Set_Widget_Align(radio_button->imgbox, ALIGN_MIDDLE_CENTER, Pos(0,0));
-	Set_Widget_Align(radio_button->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
+	Widget_SetAlign(container[0], ALIGN_MIDDLE_LEFT, Pos(0,0));
+	Widget_SetAlign(container[1], ALIGN_MIDDLE_LEFT, Pos(17,0));
+	Widget_SetAlign(radio_button->imgbox, ALIGN_MIDDLE_CENTER, Pos(0,0));
+	Widget_SetAlign(radio_button->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	
 	Set_PictureBox_Size_Mode(radio_button->imgbox, SIZE_MODE_STRETCH);
 	
 	/* 显示之 */
-	Show_Widget(radio_button->label);
-	Show_Widget(radio_button->imgbox);
-	Show_Widget(container[0]);
-	Show_Widget(container[1]);
+	Widget_Show(radio_button->label);
+	Widget_Show(radio_button->imgbox);
+	Widget_Show(container[0]);
+	Widget_Show(container[1]);
 	
 	Widget_Clicked_Event_Connect(widget, Switch_RadioButton_State, NULL);
 	
@@ -261,7 +261,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 	LCUI_Graph *p;
 	LCUI_RadioButton *radio_button;
 	
-	radio_button = Get_Widget_PrivData(widget);
+	radio_button = Widget_GetPrivData(widget);
 	/* 如果为自定义风格，那就使用用户指定的图形 */ 	
 	if(Strcmp(&widget->style_name, "custom") == 0) {
 		//printf("custom\n"); 
@@ -356,7 +356,7 @@ LCUI_Widget *Get_RadioButton_Label(LCUI_Widget *widget)
 {
 	LCUI_RadioButton *radio_button;
 	
-	radio_button = Get_Widget_PrivData(widget); 
+	radio_button = Widget_GetPrivData(widget); 
 	if( !radio_button ) {
 		return NULL;
 	}
@@ -368,7 +368,7 @@ LCUI_Widget *Get_RadioButton_ImgBox(LCUI_Widget *widget)
 {
 	LCUI_RadioButton *radio_button;
 	
-	radio_button = Get_Widget_PrivData(widget); 
+	radio_button = Widget_GetPrivData(widget); 
 	if( !radio_button ) {
 		return NULL;
 	}
@@ -395,7 +395,7 @@ LCUI_Widget *Create_RadioButton_With_Text(const char *fmt, ...)
 /* 功能：创建一个带文本内容的单选框 */
 {
 	char text[LABEL_TEXT_MAX_SIZE];
-	LCUI_Widget *widget = Create_Widget("radio_button");
+	LCUI_Widget *widget = Widget_New("radio_button");
 	
 	memset(text, 0, sizeof(text)); 
     

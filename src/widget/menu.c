@@ -67,7 +67,7 @@ static void Menu_Init(LCUI_Widget *widget)
 	LCUI_Menu *menu;
 	LCUI_Graph *graph;
 	
-	menu = Widget_Create_PrivData(widget, sizeof(LCUI_Menu));
+	menu = WidgetPrivData_New(widget, sizeof(LCUI_Menu));
 	graph = Widget_GetSelfGraph( widget );
 	menu->parent_menu = NULL;
 	menu->widget_link = NULL;
@@ -103,12 +103,12 @@ void Show_Menu(LCUI_Widget *src, LCUI_Widget *des_menu)
 	}
 	int height, width;
 	LCUI_Pos src_pos, display_pos;  
-	LCUI_Menu *menu = Get_Widget_PrivData(des_menu);
+	LCUI_Menu *menu = Widget_GetPrivData(des_menu);
 	height = Get_Screen_Height();
 	width = Get_Screen_Width();
 	
 	/* 通过部件的全局坐标以及尺寸,得出菜单的显示位置 */
-	src_pos = Get_Widget_Global_Pos(src);
+	src_pos = Widget_GetGlobalPos(src);
 	display_pos.x = src_pos.x;
 	display_pos.y = src_pos.y + src->size.h;
 	
@@ -126,8 +126,8 @@ void Show_Menu(LCUI_Widget *src, LCUI_Widget *des_menu)
 		display_pos.y = 0;
 	
 	menu->widget_link = src;/* 保存与之关联的部件 */
-	Move_Widget(des_menu, display_pos);
-	Show_Widget(des_menu);
+	Widget_Move(des_menu, display_pos);
+	Widget_Show(des_menu);
 }
 
 void Side_Show_Menu(LCUI_Widget *src, void *arg)
@@ -145,13 +145,13 @@ void Side_Show_Menu(LCUI_Widget *src, void *arg)
 	}
 	int height, width;
 	LCUI_Pos src_pos, display_pos;  
-	LCUI_Menu *menu = Get_Widget_PrivData(des_menu);
+	LCUI_Menu *menu = Widget_GetPrivData(des_menu);
 	
 	height = Get_Screen_Height();
 	width = Get_Screen_Width();
 	
 	/* 通过部件的全局坐标以及尺寸,得出菜单的显示位置 */
-	src_pos = Get_Widget_Global_Pos(src);
+	src_pos = Widget_GetGlobalPos(src);
 	display_pos.x = src_pos.x + src->size.w;
 	display_pos.y = src_pos.y;
 	
@@ -169,8 +169,8 @@ void Side_Show_Menu(LCUI_Widget *src, void *arg)
 		display_pos.y = 0;
 		
 	menu->widget_link = src;/* 保存与之关联的部件 */
-	Move_Widget(des_menu, display_pos);
-	Show_Widget(des_menu);  
+	Widget_Move(des_menu, display_pos);
+	Widget_Show(des_menu);  
 }
 
 
@@ -182,7 +182,7 @@ void Hide_Menu(LCUI_Widget *menu)
 {
 	if(menu == NULL) return;
 	int i;
-	LCUI_Menu *data = Get_Widget_PrivData(menu);
+	LCUI_Menu *data = Widget_GetPrivData(menu);
 	LCUI_Widget *widget;
 	for(i=0; ;i++)
 	{/* 获取子菜单队列中的部件指针 */
@@ -190,7 +190,7 @@ void Hide_Menu(LCUI_Widget *menu)
 		if(widget == NULL) break;/* 如果获取失败，退出循环 */
 		Hide_Menu(widget);/* 递归调用 */
 	}
-	Hide_Widget(menu);
+	Widget_Hide(menu);
 }
 
 
@@ -199,12 +199,12 @@ LCUI_Widget *Get_Child_Menu(LCUI_Widget *des_menu, LCUI_Widget *item)
 {
 	int i;
 	LCUI_Widget *widget;
-	LCUI_Menu *menu = (LCUI_Menu*)Get_Widget_PrivData(des_menu);
+	LCUI_Menu *menu = (LCUI_Menu*)Widget_GetPrivData(des_menu);
 	LCUI_Menu *tmp_menu;
 	for(i=0; ; ++i)
 	{
 		widget = (LCUI_Widget*)Queue_Get(&menu->child_menu, i);
-		tmp_menu = (LCUI_Menu*)Get_Widget_PrivData(widget);
+		tmp_menu = (LCUI_Menu*)Widget_GetPrivData(widget);
 		if(tmp_menu->widget_link == item)
 		{/* 如果这个菜单和item关联 */
 			return widget;
@@ -219,14 +219,14 @@ void Hide_Other_Menu(LCUI_Widget *des_menu, LCUI_Widget *item)
 	if(des_menu == NULL) return;
 	int i;
 	LCUI_Widget *widget;
-	LCUI_Menu *menu = (LCUI_Menu*)Get_Widget_PrivData(des_menu);
+	LCUI_Menu *menu = (LCUI_Menu*)Widget_GetPrivData(des_menu);
 	LCUI_Menu *tmp_menu;
 	for(i=0; ; ++i)
 	{
 		/* 获取子菜单指针 */
 		widget = (LCUI_Widget*)Queue_Get(&menu->child_menu, i); 
 		if(widget == NULL) break;
-		tmp_menu = (LCUI_Menu*)Get_Widget_PrivData(widget);
+		tmp_menu = (LCUI_Menu*)Widget_GetPrivData(widget);
 		if(tmp_menu->widget_link != item)
 		{/* 如果这个菜单不是和item关联的 */
 			/* 隐藏这个部件关联的菜单 */
@@ -246,7 +246,7 @@ void Auto_Hide_Menu(LCUI_MouseEvent *event)
 	if(event->widget != NULL)
 	{/* 如果当前鼠标指针在部件上 */
 		/* 获取该部件的类型为菜单的父部件，因为有时会遇到嵌套类型的部件 */
-		menu = Get_Parent_Widget(event->widget, "menu");
+		menu = Widget_GetParent(event->widget, "menu");
 		if(menu != NULL)
 		{/* 如果该部件是菜单里的 */
 			/* 显示与当前部件关联的子菜单 */
@@ -284,7 +284,7 @@ int Show_Child_Menu(LCUI_Widget *item)
 	LCUI_Widget *child_menu;
 	LCUI_Menu *menu, *tmp;
 	int i;
-	menu = (LCUI_Menu*)Get_Widget_PrivData(item->parent); 
+	menu = (LCUI_Menu*)Widget_GetPrivData(item->parent); 
 	for(i=0; ; i++)
 	{/* 获取各个子菜单的指针 */
 		child_menu = (LCUI_Widget*)Queue_Get(&menu->child_menu, i);
@@ -293,7 +293,7 @@ int Show_Child_Menu(LCUI_Widget *item)
 		else
 		{
 			/* 获取子菜单的私有数据结构体的指针 */
-			tmp = (LCUI_Menu*)Get_Widget_PrivData(child_menu); 
+			tmp = (LCUI_Menu*)Widget_GetPrivData(child_menu); 
 			if(item == tmp->widget_link)
 			{/* 如果这个菜单项是与子菜单链接的那个部件 */
 				Side_Show_Menu(item, child_menu);/* 显示在这个部件的侧边 */
@@ -312,9 +312,9 @@ LCUI_Widget *Create_Child_Menu(LCUI_Widget *parent_menu, LCUI_Widget *item)
 {
 	LCUI_Widget *child_menu;
 	LCUI_Menu *menu, *pa_menu;
-	child_menu = Create_Widget("menu");
-	pa_menu = (LCUI_Menu*)Get_Widget_PrivData(parent_menu);
-	menu = (LCUI_Menu*)Get_Widget_PrivData(child_menu);
+	child_menu = Widget_New("menu");
+	pa_menu = (LCUI_Menu*)Widget_GetPrivData(parent_menu);
+	menu = (LCUI_Menu*)Widget_GetPrivData(child_menu);
 	menu->parent_menu = parent_menu;/* 记录父级菜单 */
 	menu->widget_link = item; /* 记录与子菜单关联部件 */
 	Queue_Add(&pa_menu->child_menu, child_menu);/* 添加至父菜单的子菜单队列 */
@@ -339,9 +339,9 @@ LCUI_Widget *Create_Menu_Item(LCUI_Widget *menu, const char *fmt, ...)
 	/* 菜单栏中的选项，我用按钮来实现 */
 	LCUI_Widget *item = Create_Button_With_Text(text);
 	if(item == NULL) return NULL;
-	Set_Widget_Style(item, "menu_style");
+	Widget_SetStyleName(item, "menu_style");
 	Widget_Container_Add(menu, item); /* 将item放入容器 */
-	Show_Widget(item); /* 显示之 */
+	Widget_Show(item); /* 显示之 */
 	return item;
 }
 

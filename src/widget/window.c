@@ -59,7 +59,7 @@ Get_Window_TitleBar(LCUI_Widget *window)
 /* 功能：获取窗口标题栏的指针 */
 { 
 	LCUI_Window *win_p; 
-	win_p = (LCUI_Window *)Get_Widget_PrivData(window); 
+	win_p = (LCUI_Window *)Widget_GetPrivData(window); 
 	if(win_p == NULL) {
 		return NULL;
 	}
@@ -71,7 +71,7 @@ Get_Window_Client_Area(LCUI_Widget *window)
 /* 功能：获取窗口客户区的指针 */
 {
 	LCUI_Window *win_p;
-	win_p = (LCUI_Window *)Get_Widget_PrivData(window); 
+	win_p = (LCUI_Window *)Widget_GetPrivData(window); 
 	return win_p->client_area;	
 }
 
@@ -90,15 +90,15 @@ Move_Window(LCUI_Widget *titlebar, LCUI_DragEvent *event)
 	//event->new_pos.x, event->new_pos.y, 
 	//event->cursor_pos.x, event->cursor_pos.y );
 	/* 将新全局坐标减去标题栏的全局坐标，得到偏移坐标 */
-	pos = Get_Widget_Global_Pos( titlebar );
+	pos = Widget_GetGlobalPos( titlebar );
 	offset = Pos_Sub( event->new_pos, pos );
-	pos = Get_Widget_Global_Pos( window );
+	pos = Widget_GetGlobalPos( window );
 	/* 将偏移坐标加在窗口全局坐标上，得出窗口的新全局坐标 */
 	pos = Pos_Add( pos, offset );
 	/* 转换成在容器区域内的相对坐标 */
 	pos = GlobalPos_ConvTo_RelativePos( window, pos );
 	/* 移动窗口的位置 */
-	Move_Widget( window, pos );
+	Widget_Move( window, pos );
 }
 
 void 
@@ -110,7 +110,7 @@ Set_Window_Title_Icon(LCUI_Widget *window, LCUI_Graph *icon)
 	LCUI_TitleBar *title_data;
 	
 	title_widget = Get_Window_TitleBar(window);
-	title_data = (LCUI_TitleBar *)Get_Widget_PrivData(title_widget);
+	title_data = (LCUI_TitleBar *)Widget_GetPrivData(title_widget);
 	
 	image = Get_PictureBox_Graph(title_data->icon_box);
 	Graph_Free(image);/* 释放PictureBox部件内的图像占用的资源 */
@@ -119,8 +119,8 @@ Set_Window_Title_Icon(LCUI_Widget *window, LCUI_Graph *icon)
 	}
 	/* 设置新图标 */
 	Set_PictureBox_Image_From_Graph(title_data->icon_box, icon);
-	Set_Widget_Align(title_data->icon_box, ALIGN_MIDDLE_LEFT, Pos(3,0));
-	Set_Widget_Align(title_data->label, ALIGN_MIDDLE_LEFT, Pos(23,0));
+	Widget_SetAlign(title_data->icon_box, ALIGN_MIDDLE_LEFT, Pos(3,0));
+	Widget_SetAlign(title_data->label, ALIGN_MIDDLE_LEFT, Pos(23,0));
  
 }
 
@@ -132,9 +132,9 @@ Window_TitleBar_Init(LCUI_Widget *titlebar)
 	LCUI_TitleBar *t;
 	
 	Graph_Init(&img);
-	t = Widget_Create_PrivData(titlebar, sizeof(LCUI_TitleBar));
-	t->icon_box = Create_Widget("picture_box");
-	t->label = Create_Widget("label");
+	t = WidgetPrivData_New(titlebar, sizeof(LCUI_TitleBar));
+	t->icon_box = Widget_New("picture_box");
+	t->label = Widget_New("label");
 	/* 窗口图标和标题文字不可获得焦点，并忽略鼠标点击 */
 	t->label->focus = FALSE;
 	t->icon_box->focus = FALSE;
@@ -144,14 +144,14 @@ Window_TitleBar_Init(LCUI_Widget *titlebar)
 	Widget_Container_Add(titlebar, t->icon_box);
 	Widget_Container_Add(titlebar, t->label);
 	
-	Resize_Widget(t->icon_box, Size(18,18));
+	Widget_Resize(t->icon_box, Size(18,18));
 	Set_PictureBox_Size_Mode(t->icon_box, SIZE_MODE_CENTER);
 	
-	Show_Widget(t->icon_box);
-	Show_Widget(t->label);
+	Widget_Show(t->icon_box);
+	Widget_Show(t->label);
 	
-	Set_Widget_Align(t->icon_box, ALIGN_MIDDLE_LEFT, Pos(0,0));
-	Set_Widget_Align(t->label, ALIGN_MIDDLE_LEFT, Pos(2,-2));
+	Widget_SetAlign(t->icon_box, ALIGN_MIDDLE_LEFT, Pos(0,0));
+	Widget_SetAlign(t->label, ALIGN_MIDDLE_LEFT, Pos(2,-2));
 	Load_Graph_Default_TitleBar_BG(&img);
 	Set_Widget_Background_Image(titlebar, &img, LAYOUT_STRETCH);
 }
@@ -180,36 +180,36 @@ Exec_Update_Window( LCUI_Widget *win_p )
 	switch( win_p->style_id ) {
 	    case WINDOW_STYLE_NONE:  /* 没有边框 */
 		/* 先计算坐标和尺寸 */
-		Set_Widget_Dock( client_area, DOCK_TYPE_FILL );
-		Hide_Widget( titlebar );/* 隐藏标题栏 */
-		Show_Widget( client_area );/* 客户区需要显示 */
+		Widget_SetDock( client_area, DOCK_TYPE_FILL );
+		Widget_Hide( titlebar );/* 隐藏标题栏 */
+		Widget_Show( client_area );/* 客户区需要显示 */
 		break;
 			
 	    case WINDOW_STYLE_LINE: /* 线条边框 */
-		Set_Widget_Border(win_p,
+		Widget_SetBorder(win_p,
 		 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)));
-		Set_Widget_Padding( win_p, Padding(1,1,1,1) );
-		Set_Widget_Dock( client_area, DOCK_TYPE_FILL );
-		Hide_Widget( titlebar );
-		Show_Widget( client_area );
+		Widget_SetPadding( win_p, Padding(1,1,1,1) );
+		Widget_SetDock( client_area, DOCK_TYPE_FILL );
+		Widget_Hide( titlebar );
+		Widget_Show( client_area );
 		break;
 		
 	    case WINDOW_STYLE_STANDARD: /* 标准边框 */ 
-		Set_Widget_Border(win_p,
+		Widget_SetBorder(win_p,
 		 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)));
-		Set_Widget_Padding(win_p, Padding(1,1,1,1)); 
+		Widget_SetPadding(win_p, Padding(1,1,1,1)); 
 		
-		size = Get_Container_Size( win_p );
+		size = Widget_GetContainerSize( win_p );
 		
-		Resize_Widget(titlebar, Size(size.w, 25));
-		Resize_Widget(client_area, Size(size.w, size.h - 25));
+		Widget_Resize(titlebar, Size(size.w, 25));
+		Widget_Resize(client_area, Size(size.w, size.h - 25));
 		/* 标题栏向顶部停靠 */
-		Set_Widget_Dock( titlebar, DOCK_TYPE_TOP );
+		Widget_SetDock( titlebar, DOCK_TYPE_TOP );
 		/* 客户区向底部停靠 */
-		Set_Widget_Dock( client_area, DOCK_TYPE_BOTTOM );
+		Widget_SetDock( client_area, DOCK_TYPE_BOTTOM );
 		/* 标题栏和客户区都需要显示 */
-		Show_Widget( titlebar ); 
-		Show_Widget( client_area ); 
+		Widget_Show( titlebar ); 
+		Widget_Show( client_area ); 
 		break;
 			
 	    case WINDOW_STYLE_PURE_BLUE: 
@@ -233,14 +233,14 @@ Exec_Update_Window( LCUI_Widget *win_p )
 		border_color = RGB(80,0,65); 
 union_draw_method:;
 		/* 若窗口未获得焦点 */
-		if( !Focus_Widget( win_p ) ) {
+		if( !Widget_GetFocus( win_p ) ) {
 			back_color = RGB(255,255,255);
 			border_color = RGB(50,50,50); 
 		}
 		
-		Set_Widget_Border( win_p,
+		Widget_SetBorder( win_p,
 		 Border(1, BORDER_STYLE_SOLID, border_color));
-		Set_Widget_Border( client_area,
+		Widget_SetBorder( client_area,
 		 Border(1, BORDER_STYLE_SOLID, border_color));
 		Set_Widget_Backcolor( win_p, back_color );
 		Graph_Fill_Color( graph, back_color );
@@ -248,15 +248,15 @@ union_draw_method:;
 		Set_Widget_Background_Image( titlebar, NULL, 0 );
 		Set_Widget_BG_Mode( titlebar, BG_MODE_TRANSPARENT ); 
 		Set_Widget_BG_Mode( client_area, BG_MODE_FILL_BACKCOLOR ); 
-		Set_Widget_Padding( win_p, Padding(1,4,4,4) );
-		Set_Widget_Padding( client_area, Padding(1,1,1,1) );
-		size = Get_Container_Size( win_p );
-		Resize_Widget( titlebar, Size(size.h, 25) );
-		Resize_Widget( client_area, Size(size.w, size.h - 25) );
-		Set_Widget_Dock( titlebar, DOCK_TYPE_TOP ); 
-		Set_Widget_Dock( client_area, DOCK_TYPE_BOTTOM );
-		Show_Widget( titlebar );
-		Show_Widget( client_area ); 
+		Widget_SetPadding( win_p, Padding(1,4,4,4) );
+		Widget_SetPadding( client_area, Padding(1,1,1,1) );
+		size = Widget_GetContainerSize( win_p );
+		Widget_Resize( titlebar, Size(size.h, 25) );
+		Widget_Resize( client_area, Size(size.w, size.h - 25) );
+		Widget_SetDock( titlebar, DOCK_TYPE_TOP ); 
+		Widget_SetDock( client_area, DOCK_TYPE_BOTTOM );
+		Widget_Show( titlebar );
+		Widget_Show( client_area ); 
 		break;
 	    default:
 			//
@@ -290,7 +290,7 @@ Quit_Parent_Window(LCUI_Widget *btn, void *arg)
 	//LCUI_Widget *win_p = Get_Parent_Window(btn);
 	//if(win_p == NULL) 
 	//	puts(QUIT_PARENT_WINDOW_ERROR);
-	//Delete_Widget(win_p);
+	//Widget_Destroy(win_p);
 }
 
 static void 
@@ -308,7 +308,7 @@ Window_FocusOut( LCUI_Widget *window, void *arg )
 /* 在窗口失去焦点时会调用此函数 */
 {
 	//printf( "Window_FocusOut!\n" );
-	Update_Widget( window );
+	Widget_Update( window );
 }
 
 static void
@@ -316,8 +316,8 @@ Window_FocusIn( LCUI_Widget *window, void *arg )
 /* 在窗口获得焦点时会调用此函数 */
 {
 	//printf( "Window_FocusIn!\n" );
-	Front_Widget( window ); /* 前置窗口 */
-	Update_Widget( window ); /* 更新窗口 */
+	Widget_Front( window ); /* 前置窗口 */
+	Widget_Update( window ); /* 更新窗口 */
 }
 
 static void 
@@ -329,16 +329,16 @@ Window_Init(LCUI_Widget *win_p)
 	LCUI_Widget *btn_close;
 	LCUI_Window *win;
 	
-	win = Widget_Create_PrivData(win_p, sizeof(LCUI_Window));
+	win = WidgetPrivData_New(win_p, sizeof(LCUI_Window));
 	
 	win->hide_style	= NONE;
 	win->show_style	= NONE;
 	win->count	= 0;
 	win->init_align	= ALIGN_MIDDLE_CENTER;
 	
-	titlebar = Create_Widget("titlebar"); 
-	client_area = Create_Widget(NULL); 
-	btn_close = Create_Widget("button"); 
+	titlebar = Widget_New("titlebar"); 
+	client_area = Widget_New(NULL); 
+	btn_close = Widget_New("button"); 
 	
 	titlebar->focus = FALSE;
 	
@@ -354,10 +354,10 @@ Window_Init(LCUI_Widget *win_p)
 	Load_Graph_Default_TitleBar_CloseBox_Down(&btn_down);
 	Load_Graph_Default_TitleBar_CloseBox_HighLight(&btn_highlight);
 	/* 显示在左上角 */
-	Set_Widget_Align(btn_close, ALIGN_TOP_RIGHT, Pos(0, -2)); 
+	Widget_SetAlign(btn_close, ALIGN_TOP_RIGHT, Pos(0, -2)); 
 	/* 将尺寸改成和图片一样 */
-	Widget_AutoSize( btn_close, FALSE, 0 );
-	Resize_Widget(btn_close, Size(btn_normal.width, btn_normal.height));
+	Widget_SetAutoSize( btn_close, FALSE, 0 );
+	Widget_Resize(btn_close, Size(btn_normal.width, btn_normal.height));
 	Custom_Button_Style(btn_close, &btn_normal, &btn_highlight, &btn_down, NULL, NULL);
 	/* 关联按钮的点击事件，当按钮被点击后，调用Quit_Window函数 */
 	Widget_Clicked_Event_Connect(btn_close, Quit_Parent_Window, NULL);
@@ -379,8 +379,8 @@ Window_Init(LCUI_Widget *win_p)
 	Widget_Container_Add(win_p, titlebar);
 	Widget_Container_Add(win_p, client_area);
 	/* 窗口初始尺寸 */
-	Resize_Widget(win_p, Size(100, 50));
-	Show_Widget(btn_close);
+	Widget_Resize(win_p, Size(100, 50));
+	Widget_Show(btn_close);
 	/* 关联拖动事件，让鼠标能够拖动标题栏并使窗口移动 */
 	Widget_Drag_Event_Connect(titlebar, Move_Window); 
 	/* 
@@ -399,14 +399,14 @@ Show_Window(LCUI_Widget *win_p)
 	LCUI_Pos pos;
 	LCUI_Window *win;
 	
-	win = Get_Widget_PrivData( win_p );
+	win = Widget_GetPrivData( win_p );
 	win->count++;
 	/* 如果是第一次显示 */
 	if(win->count == 1) {
-		ctnr_size = _Get_Widget_Container_Size( win_p );
-		size = _Get_Widget_Size( win_p );
+		ctnr_size = Widget_GetContainerSize( win_p->parent );
+		size = _Widget_GetSize( win_p );
 		pos = Align_Get_Pos( ctnr_size, size, win->init_align );
-		Exec_Move_Widget( win_p, pos );
+		Widget_ExecMove( win_p, pos );
 	}
 	//有待扩展 
 }
@@ -423,7 +423,7 @@ Set_Window_Title_Text(LCUI_Widget *win_p, const char *text)
 /* 功能：为窗口设置标题文字 */
 { 
 	LCUI_Widget *titlebar = Get_Window_TitleBar(win_p); 
-	LCUI_TitleBar *title = Get_Widget_PrivData(titlebar); 
+	LCUI_TitleBar *title = Widget_GetPrivData(titlebar); 
 	Label_Text(title->label, text);
 }
 

@@ -58,7 +58,7 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 	
 	DEBUG_MSG("Exec_Update_Button(): enter\n");
 	graph = Widget_GetSelfGraph( widget );
-	button = (LCUI_Button *)Get_Widget_PrivData(widget);
+	button = (LCUI_Button *)Widget_GetPrivData(widget);
 	/* 根据按钮的不同风格来处理 */
 	if(Strcmp(&widget->style_name, "custom") == 0) {
 		int no_bitmap = 0;
@@ -188,7 +188,7 @@ static void Button_Init(LCUI_Widget *widget)
 	int valid_state;
 	LCUI_Button *button;
 	
-	button = Widget_Create_PrivData(widget, sizeof(LCUI_Button));
+	button = WidgetPrivData_New(widget, sizeof(LCUI_Button));
 	 
 	/* 初始化图像数据 */ 
 	Graph_Init(&button->btn_disable);
@@ -201,20 +201,20 @@ static void Button_Init(LCUI_Widget *widget)
 	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);
 	Widget_SetValidState( widget, valid_state );
 	
-	button->label = Create_Widget("label");/* 创建label部件 */ 
+	button->label = Widget_New("label");/* 创建label部件 */ 
 	/* 将按钮部件作为label部件的容器 */
 	Widget_Container_Add(widget, button->label);
 	/* label部件居中显示 */
-	Set_Widget_Align(button->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
-	Show_Widget(button->label); /* 显示label部件 */
+	Widget_SetAlign(button->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
+	Widget_Show(button->label); /* 显示label部件 */
 	/* 启用自动尺寸调整，以适应内容 */
-	Widget_AutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK);
+	Widget_SetAutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK);
 }
 
 
 static void Destroy_Button(LCUI_Widget *widget)
 {
-	LCUI_Button *button = (LCUI_Button*)Get_Widget_PrivData(widget);
+	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivData(widget);
 	/* 释放图像数据占用的内存 */ 
 	Graph_Free(&button->btn_disable);
 	Graph_Free(&button->btn_normal);
@@ -227,7 +227,7 @@ static void Destroy_Button(LCUI_Widget *widget)
 LCUI_Widget *Get_Button_Label(LCUI_Widget *widget)
 /* 功能：获取嵌套在按钮部件里的label部件 */
 {
-	LCUI_Button *button = (LCUI_Button*)Get_Widget_PrivData(widget);
+	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivData(widget);
 	return button->label;
 }
 
@@ -236,7 +236,7 @@ void Custom_Button_Style(	LCUI_Widget *widget, LCUI_Graph *normal,
 				LCUI_Graph *focus, LCUI_Graph *disable)
 /* 功能：自定义按钮在各种状态下显示的位图 */
 {
-	LCUI_Button *button = (LCUI_Button*)Get_Widget_PrivData(widget);
+	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivData(widget);
 	/* 如果图形有效，就拷贝 */
 	if(Graph_Valid(normal)) Graph_Copy(&button->btn_normal, normal);
 	if(Graph_Valid(over)) Graph_Copy(&button->btn_over, over);
@@ -244,15 +244,15 @@ void Custom_Button_Style(	LCUI_Widget *widget, LCUI_Graph *normal,
 	if(Graph_Valid(focus)) Graph_Copy(&button->btn_focus, focus);
 	if(Graph_Valid(disable)) Graph_Copy(&button->btn_disable, disable);
 	/* 设定为自定义风格 */
-	Set_Widget_Style(widget, "custom");
-	Draw_Widget(widget); /* 重新绘制部件 */
+	Widget_SetStyleName(widget, "custom");
+	Widget_Draw(widget); /* 重新绘制部件 */
 }
 
 void Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...)
 /* 功能：设定按钮部件显示的文本内容 */
 {
 	char text[LABEL_TEXT_MAX_SIZE];
-	LCUI_Button *button = (LCUI_Button*)Get_Widget_PrivData(widget);
+	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivData(widget);
 	LCUI_Widget *label = button->label;  
 	
 	memset(text, 0, sizeof(text));
@@ -270,7 +270,7 @@ LCUI_Widget *Create_Button_With_Text(const char *fmt, ...)
 /* 功能：创建一个带文本内容的按钮 */
 {
 	char text[LABEL_TEXT_MAX_SIZE];
-	LCUI_Widget *widget = Create_Widget("button");
+	LCUI_Widget *widget = Widget_New("button");
 	
 	memset(text, 0, sizeof(text)); 
     

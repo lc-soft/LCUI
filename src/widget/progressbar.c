@@ -54,7 +54,7 @@ Get_ProgressBar_Flash_Img_Widget(LCUI_Widget *widget)
 /* 功能：获取进度条上闪光图形所在的PictureBox部件 */
 {
 	LCUI_ProgressBar *pb;
-	pb = Get_Widget_PrivData(widget);
+	pb = Widget_GetPrivData(widget);
 	return pb->img_pic_box;
 }
 
@@ -63,7 +63,7 @@ Destroy_ProgressBar(LCUI_Widget *widget)
 /* 功能：释放进度条部件占用的内存资源 */
 {
 	LCUI_ProgressBar *pb;
-	pb = Get_Widget_PrivData(widget);
+	pb = Widget_GetPrivData(widget);
 	Graph_Free(&pb->fore_graph);
 	Graph_Free(&pb->flash_image);
 }
@@ -74,7 +74,7 @@ ProgressBar_Init(LCUI_Widget *widget)
 {
 	LCUI_ProgressBar *pb;
 	
-	pb = Widget_Create_PrivData (widget, sizeof(LCUI_ProgressBar));
+	pb = WidgetPrivData_New (widget, sizeof(LCUI_ProgressBar));
 	pb->thread = 0;
 	Graph_Init(&pb->fore_graph); 
 	Graph_Init(&pb->flash_image);
@@ -84,20 +84,20 @@ ProgressBar_Init(LCUI_Widget *widget)
 	pb->value = 0;
 	
 	LCUI_Widget *f_pb, *img_pb;
-	f_pb = Create_Widget("picture_box"); 
-	img_pb = Create_Widget("picture_box");
+	f_pb = Widget_New("picture_box"); 
+	img_pb = Widget_New("picture_box");
 	/* 以自己为容器，将这些部件放进去 */
 	Widget_Container_Add( f_pb, img_pb );
 	Widget_Container_Add( widget, f_pb ); 
 	/* 没有背景图时就填充背景色 */
 	Set_Widget_BG_Mode( widget, BG_MODE_FILL_BACKCOLOR );
 	/* 进度条为经典风格 */
-	Set_Widget_Style( widget, "classic" ); 
+	Widget_SetStyleName( widget, "classic" ); 
 	
 	Set_PictureBox_Size_Mode( f_pb, SIZE_MODE_STRETCH ); 
 	
-	Show_Widget(f_pb); 
-	Show_Widget(img_pb);
+	Widget_Show(f_pb); 
+	Widget_Show(img_pb);
 	
 	pb->fore_pic_box = f_pb; 
 	pb->img_pic_box = img_pb;
@@ -111,12 +111,12 @@ Exec_Update_ProgressBar(LCUI_Widget *widget)
 	static char scale_str[15];
 	static LCUI_ProgressBar *pb;
 	
-	pb = Get_Widget_PrivData(widget);
+	pb = Widget_GetPrivData(widget);
 	/* 计算进度条的长度 */ 
 	scale = 100.0 * pb->value / pb->max_value;
 	sprintf( scale_str, "%.2lf%%", scale );
 	/* 改变进度条的尺寸 */
-	Set_Widget_Size( pb->fore_pic_box, scale_str, "100%" );
+	Widget_SetSize( pb->fore_pic_box, scale_str, "100%" );
 }
 
 static void 
@@ -127,7 +127,7 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 	LCUI_Graph *widget_graph;
 	
 	widget_graph = Widget_GetSelfGraph( widget );
-	pb = Get_Widget_PrivData(widget);
+	pb = Widget_GetPrivData(widget);
 	if(Strcmp(&widget->style_name, "dynamic") == 0) {
 		/* 绘制空槽 */
 		Draw_Empty_Slot(widget_graph, widget->size.w, widget->size.h);
@@ -139,10 +139,10 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 			Load_Graph_ProgressBar_Img(&pb->flash_image);
 		}
 		
-		Resize_Widget(pb->img_pic_box, Get_Graph_Size(&pb->flash_image));
+		Widget_Resize(pb->img_pic_box, Get_Graph_Size(&pb->flash_image));
 		/* 让图片盒子显示这个图形 */
 		Set_PictureBox_Image_From_Graph(pb->img_pic_box, &pb->flash_image);
-		Set_Widget_Padding( widget, Padding(1,1,1,1) );
+		Widget_SetPadding( widget, Padding(1,1,1,1) );
 	} else {
 		Strcpy(&widget->style_name, "classic");
 		if(!Graph_Valid(&pb->fore_graph)) {
@@ -152,9 +152,9 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 		Graph_Fill_Alpha(&pb->fore_graph, 255);
 		Set_Widget_Backcolor( widget, RGB(255,255,255) );
 		Set_Widget_BG_Mode( widget, BG_MODE_FILL_BACKCOLOR );
-		Set_Widget_Border( widget,
+		Widget_SetBorder( widget,
 		 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)) );
-		Set_Widget_Padding( widget, Padding(1,1,1,1) );
+		Widget_SetPadding( widget, Padding(1,1,1,1) );
 	}
 	
 	/* 让图片盒子显示这个图形 */
@@ -165,30 +165,30 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 void Set_ProgressBar_Max_Value(LCUI_Widget *widget, int max_value)
 /* 功能：设定进度条最大值 */
 {
-	LCUI_ProgressBar *pb = Get_Widget_PrivData(widget);
+	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
 	pb->max_value = max_value; 
-	Update_Widget(widget); 
+	Widget_Update(widget); 
 }
 
 int Get_ProgressBar_Max_Value(LCUI_Widget *widget)
 /* 功能：获取进度条最大值 */
 {
-	LCUI_ProgressBar *pb = Get_Widget_PrivData(widget);
+	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
 	return pb->max_value;
 }
 
 void Set_ProgressBar_Value(LCUI_Widget *widget, int value)
 /* 功能：设定进度条当前值 */
 {
-	LCUI_ProgressBar *pb = Get_Widget_PrivData(widget);
+	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
 	pb->value = value; 
-	Update_Widget(widget);
+	Widget_Update(widget);
 }
 
 int Get_ProgressBar_Value(LCUI_Widget *widget)
 /* 功能：获取进度条当前值 */
 {
-	LCUI_ProgressBar *pb = Get_Widget_PrivData(widget);
+	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
 	return pb->value;
 }
 
@@ -199,12 +199,12 @@ Move_Flash_Img(void *arg)
 	int x=0;
 	LCUI_Widget *widget = (LCUI_Widget*)arg;
 	LCUI_Widget *flash = Get_ProgressBar_Flash_Img_Widget(widget);
-	LCUI_ProgressBar *pb = Get_Widget_PrivData(widget);
+	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
 	while(1) {
 		for(x=(0-flash->size.w); 
 			x<=flash->parent->size.w; 
 			x+=(pb->img_move_speed/20.0+0.5)) {
-			Move_Widget(flash, Pos(x , flash->pos.y));
+			Widget_Move(flash, Pos(x , flash->pos.y));
 			usleep(50000);
 		}
 		usleep(pb->sleep_time);
@@ -218,14 +218,14 @@ Show_ProgressBar(LCUI_Widget *widget)
 {
 	LCUI_ProgressBar *pb;
 	
-	pb = Get_Widget_PrivData(widget);
+	pb = Widget_GetPrivData(widget);
 	if(Strcmp(&widget->style_name, "dynamic") == 0) {
 		if(pb->thread == 0) {
-			Show_Widget(pb->img_pic_box);
+			Widget_Show(pb->img_pic_box);
 			LCUI_Thread_Create(&pb->thread, NULL, Move_Flash_Img, (void*)widget);
 		}
 	} else {
-		Hide_Widget(pb->img_pic_box);
+		Widget_Hide(pb->img_pic_box);
 		if(pb->thread != 0) {/* 否则，如果线程ID不为0，就撤销线程 */
 			LCUI_Thread_Cancel(pb->thread);
 			pb->thread = 0;

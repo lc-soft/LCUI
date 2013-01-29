@@ -53,25 +53,25 @@ void Set_CheckBox_On(LCUI_Widget *widget)
 /* 功能：设定复选框为选中状态 */
 {
 	LCUI_CheckBox *check_box;
-	check_box = Get_Widget_PrivData(widget); 
+	check_box = Widget_GetPrivData(widget); 
 	check_box->on = TRUE;
-	Draw_Widget(widget);
+	Widget_Draw(widget);
 }
 
 void Set_CheckBox_Off(LCUI_Widget *widget)
 /* 功能：设定复选框为未选中状态 */
 {
 	LCUI_CheckBox *check_box;
-	check_box = Get_Widget_PrivData(widget); 
+	check_box = Widget_GetPrivData(widget); 
 	check_box->on = FALSE;
-	Draw_Widget(widget);
+	Widget_Draw(widget);
 }
 
 int Get_CheckBox_State(LCUI_Widget *widget)
 /* 功能：获取复选框的状态 */
 {
 	LCUI_CheckBox *check_box;
-	check_box = Get_Widget_PrivData(widget); 
+	check_box = Widget_GetPrivData(widget); 
 	return check_box->on;
 }
 
@@ -114,9 +114,9 @@ void CheckBox_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
 	}
 		
 	LCUI_Widget *imgbox = Get_CheckBox_ImgBox(widget);
-	Resize_Widget(imgbox, size);
+	Widget_Resize(imgbox, size);
 	/* 由于没有布局盒子，不能自动调整部件间的间隔，暂时用这个方法 */
-	Set_Widget_Align(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
+	Widget_SetAlign(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
 }
 
 static void 
@@ -127,7 +127,7 @@ CheckBox_Init(LCUI_Widget *widget)
 	LCUI_Widget *container[2];
 	LCUI_CheckBox *check_box;
 	
-	check_box = Widget_Create_PrivData(widget, sizeof(LCUI_CheckBox));
+	check_box = WidgetPrivData_New(widget, sizeof(LCUI_CheckBox));
 	
 	check_box->on = FALSE;
 	/* 初始化图像数据 */ 
@@ -142,16 +142,16 @@ CheckBox_Init(LCUI_Widget *widget)
 	Graph_Init(&check_box->img_on_down);
 	Graph_Init(&check_box->img_on_over);
 	/* 创建所需的部件 */
-	check_box->label = Create_Widget("label");
-	check_box->imgbox = Create_Widget("picture_box");  
+	check_box->label = Widget_New("label");
+	check_box->imgbox = Widget_New("picture_box");  
 	/* 创建两个容器，用于调整上面两个部件的位置 */
-	container[0] = Create_Widget(NULL);
-	container[1] = Create_Widget(NULL);
+	container[0] = Widget_New(NULL);
+	container[1] = Widget_New(NULL);
 	
 	/* 启用这些部件的自动尺寸调整的功能 */
-	Widget_AutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
-	Widget_AutoSize( container[0], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
-	Widget_AutoSize( container[1], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
+	Widget_SetAutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
+	Widget_SetAutoSize( container[0], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
+	Widget_SetAutoSize( container[1], TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK );
 	
 	Widget_Container_Add(container[0], check_box->imgbox);
 	Widget_Container_Add(container[1], check_box->label);
@@ -159,22 +159,22 @@ CheckBox_Init(LCUI_Widget *widget)
 	Widget_Container_Add(widget, container[1]);
 	
 	/* 调整尺寸 */
-	Resize_Widget(check_box->imgbox, Size(15, 15));
-	//Resize_Widget(container[0], Size(18,18));
-	//Resize_Widget(widget, Size(18,18));
+	Widget_Resize(check_box->imgbox, Size(15, 15));
+	//Widget_Resize(container[0], Size(18,18));
+	//Widget_Resize(widget, Size(18,18));
 	/* 调整布局 */
-	Set_Widget_Align(container[0], ALIGN_MIDDLE_LEFT, Pos(0,0));
-	Set_Widget_Align(container[1], ALIGN_MIDDLE_LEFT, Pos(17,0));
-	Set_Widget_Align(check_box->imgbox, ALIGN_MIDDLE_CENTER, Pos(0,0));
-	Set_Widget_Align(check_box->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
+	Widget_SetAlign(container[0], ALIGN_MIDDLE_LEFT, Pos(0,0));
+	Widget_SetAlign(container[1], ALIGN_MIDDLE_LEFT, Pos(17,0));
+	Widget_SetAlign(check_box->imgbox, ALIGN_MIDDLE_CENTER, Pos(0,0));
+	Widget_SetAlign(check_box->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	/* 设置图像框的尺寸模式为拉伸 */
 	Set_PictureBox_Size_Mode(check_box->imgbox, SIZE_MODE_STRETCH);
 	
 	/* 显示之 */
-	Show_Widget(check_box->label);
-	Show_Widget(check_box->imgbox);
-	Show_Widget(container[0]);
-	Show_Widget(container[1]);
+	Widget_Show(check_box->label);
+	Widget_Show(check_box->imgbox);
+	Widget_Show(container[0]);
+	Widget_Show(container[1]);
 	/* 关联鼠标左键点击事件 */
 	Widget_Clicked_Event_Connect(widget, Switch_CheckBox_State, NULL);
 	/* 响应状态改变 */
@@ -188,7 +188,7 @@ Destroy_CheckBox(LCUI_Widget *widget)
 /* 释放复选框部件占用的资源 */
 {
 	LCUI_CheckBox *check_box = (LCUI_CheckBox *)
-			Get_Widget_PrivData(widget); 
+			Widget_GetPrivData(widget); 
 	/* 释放图像数据占用的内存资源 */ 
 	Graph_Free(&check_box->img_off_disable);
 	Graph_Free(&check_box->img_off_normal);
@@ -209,7 +209,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 	LCUI_Graph *p;
 	LCUI_CheckBox *check_box;
 	
-	check_box = Get_Widget_PrivData(widget); 
+	check_box = Widget_GetPrivData(widget); 
 								
 	if(Strcmp(&widget->style_name, "custom") == 0) {
 		/* 如果为自定义风格，那就使用用户指定的图形，具体可参考按钮部件的处理方法 */ 
@@ -307,7 +307,7 @@ LCUI_Widget *Get_CheckBox_Label(LCUI_Widget *widget)
 {
 	LCUI_CheckBox *check_box;
 	
-	check_box = Get_Widget_PrivData(widget); 
+	check_box = Widget_GetPrivData(widget); 
 	if( !check_box ) {
 		return NULL;
 	}
@@ -319,7 +319,7 @@ LCUI_Widget *Get_CheckBox_ImgBox(LCUI_Widget *widget)
 {
 	LCUI_CheckBox *check_box;
 	
-	check_box = Get_Widget_PrivData(widget);
+	check_box = Widget_GetPrivData(widget);
 	if( !check_box ) {
 		return NULL;
 	}
@@ -349,7 +349,7 @@ LCUI_Widget *Create_CheckBox_With_Text(const char *fmt, ...)
 	char text[LABEL_TEXT_MAX_SIZE];
 	LCUI_Widget *widget;
 	
-	widget = Create_Widget("check_box");
+	widget = Widget_New("check_box");
 	
 	memset(text, 0, sizeof(text)); 
     

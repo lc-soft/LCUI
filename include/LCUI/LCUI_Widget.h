@@ -161,24 +161,24 @@ struct _LCUI_Widget {
 LCUI_BEGIN_HEADER
 
 /***************************** Widget *********************************/
-LCUI_Size Get_Widget_Size(LCUI_Widget *widget);
+LCUI_Size Widget_GetSize(LCUI_Widget *widget);
 /* 功能：获取部件的尺寸 */ 
 
-LCUI_Size _Get_Widget_Size(LCUI_Widget *widget);
+LCUI_Size _Widget_GetSize(LCUI_Widget *widget);
 /* 功能：通过计算获取部件的尺寸 */
 
-int Get_Widget_Height(LCUI_Widget *widget);
+int Widget_GetHeight(LCUI_Widget *widget);
 
-int _Get_Widget_Height(LCUI_Widget *widget);
+int _Widget_GetHeight(LCUI_Widget *widget);
 
-int Get_Widget_Width(LCUI_Widget *widget);
+int Widget_GetWidth(LCUI_Widget *widget);
 
 int _Get_Widget_Width(LCUI_Widget *widget);
 
-LCUI_Rect Get_Widget_Rect(LCUI_Widget *widget);
+LCUI_Rect Widget_GetRect(LCUI_Widget *widget);
 /* 功能：获取部件的区域 */ 
 
-LCUI_Pos Get_Widget_Pos(LCUI_Widget *widget);
+LCUI_Pos Widget_GetPos(LCUI_Widget *widget);
 /* 
  * 功能：获取部件相对于容器部件的位置
  * 说明：该位置相对于容器部件的左上角点，忽略容器部件的内边距。
@@ -197,7 +197,7 @@ LCUI_Pos GlobalPos_ConvTo_RelativePos(LCUI_Widget *widget, LCUI_Pos global_pos);
  * 说明：传入的全局坐标，将根据传入的部件指针，转换成相对于该部件所在容器区域的坐标
  *  */
  
-void *Get_Widget_PrivData(LCUI_Widget *widget);
+void *Widget_GetPrivData(LCUI_Widget *widget);
 /* 功能：获取部件的私有数据结构体的指针 */ 
 
 LCUI_Widget *Get_Widget_Parent(LCUI_Widget *widget);
@@ -226,32 +226,31 @@ int Widget_SyncInvalidArea( LCUI_Widget *widget );
  *  */
 void Widget_SetValidState( LCUI_Widget *widget, int state );
 
-LCUI_Widget *Get_Parent_Widget(LCUI_Widget *widget, char *widget_type);
 /*
  * 功能：获取部件的指定类型的父部件的指针
  * 说明：本函数会在部件关系链中往头部查找父部件指针，并判断这个父部件是否为制定类型
  * 返回值：没有符合要求的父级部件就返回NULL，否则返回部件指针
- **/ 
+ **/
+LCUI_Widget *Widget_GetParent(LCUI_Widget *widget, char *widget_type);
 
-int LCUI_Destroy_App_Widgets(LCUI_ID app_id);
-/* 功能：销毁指定ID的程序的所有部件 */ 
+/* 销毁指定ID的程序的所有部件 */
+void LCUIApp_DestroyAllWidgets( LCUI_ID app_id );
 
 LCUI_Widget *
 Get_FocusWidget( LCUI_Widget *widget );
 /* 获取指定部件内的已获得焦点的子部件 */ 
 
-BOOL 
-Focus_Widget( LCUI_Widget *widget );
 /* 检测指定部件是否处于焦点状态 */
+BOOL Widget_GetFocus( LCUI_Widget *widget );
 
-LCUI_String Get_Widget_Style(LCUI_Widget *widget);
-/* 功能：获取部件的类型 */ 
+/* 获取部件的风格名称 */
+LCUI_String Widget_GetStyleName( LCUI_Widget *widget );
 
-void Set_Widget_Style(LCUI_Widget *widget, char *style);
-/* 功能：设定部件的风格 */ 
+/* 设定部件的风格名称 */
+void Widget_SetStyleName( LCUI_Widget *widget, const char *style_name );
 
-void Set_Widget_StyleID(LCUI_Widget *widget, int style_id);
 /* 设定部件的风格ID */
+void Widget_SetStyleID( LCUI_Widget *widget, int style_id );
 
 /* 获取与指定坐标层叠的部件 */
 LCUI_Widget *Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos );
@@ -267,23 +266,19 @@ int Empty_Widget();
  *   0  程序的部件列表不为空
  * */ 
 
-void *Widget_Create_PrivData(LCUI_Widget *widget, size_t size);
-/* 功能：为部件私有结构体指针分配内存 */ 
+/* 功能：为部件私有结构体指针分配内存 */
+void *WidgetPrivData_New( LCUI_Widget *widget, size_t size );
 
-LCUI_Widget *Create_Widget( const char *widget_type );
 /* 
- * 功能：创建指定类型的窗口部件
- * 说明：创建出来的部件，默认是没有背景图时透明。
+ * 功能：创建指定类型的部件
  * 返回值：成功则部件的指针，失败则返回NULL
- */ 
+ */
+LCUI_Widget *Widget_New( const char *widget_type );
 
-void Delete_Widget(LCUI_Widget *widget);
-/* 功能：删除一个部件 */ 
+/* 销毁部件 */
+void Widget_Destroy( LCUI_Widget *widget );
 
-LCUI_Pos Count_Widget_Pos(LCUI_Widget *widget);
-/* 功能：累计部件的位置坐标 */ 
-
-LCUI_Pos Get_Widget_Global_Pos(LCUI_Widget *widget);
+LCUI_Pos Widget_GetGlobalPos(LCUI_Widget *widget);
 /* 功能：获取部件的全局坐标 */ 
 
 void Set_Widget_BG_Mode(LCUI_Widget *widget, BG_MODE bg_mode);
@@ -295,41 +290,41 @@ void Set_Widget_BG_Mode(LCUI_Widget *widget, BG_MODE bg_mode);
 void Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode );
 /* 设定部件可被点击的区域的透明度 */
 
-void Set_Widget_Align(LCUI_Widget *widget, ALIGN_TYPE align, LCUI_Pos offset);
+void Widget_SetAlign(LCUI_Widget *widget, ALIGN_TYPE align, LCUI_Pos offset);
 /* 功能：设定部件的对齐方式以及偏移距离 */ 
 
-void Set_Widget_Size( LCUI_Widget *widget, char *width, char *height );
+void Widget_SetSize( LCUI_Widget *widget, char *width, char *height );
 /* 
  * 功能：设定部件的尺寸大小
  * 说明：如果设定了部件的停靠位置，并且该停靠类型默认限制了宽/高，那么部件的宽/高就不能被改变。
  * 用法示例：
- * Set_Widget_Size( widget, "100px", "50px" ); 部件尺寸最大为100x50像素
- * Set_Widget_Size( widget, "100%", "50px" ); 部件宽度等于容器宽度，高度为50像素
- * Set_Widget_Size( widget, "50", "50" ); 部件尺寸最大为50x50像素，px可以省略 
- * Set_Widget_Size( widget, NULL, "50%" ); 部件宽度保持原样，高度为容器高度的一半
+ * Widget_SetSize( widget, "100px", "50px" ); 部件尺寸最大为100x50像素
+ * Widget_SetSize( widget, "100%", "50px" ); 部件宽度等于容器宽度，高度为50像素
+ * Widget_SetSize( widget, "50", "50" ); 部件尺寸最大为50x50像素，px可以省略 
+ * Widget_SetSize( widget, NULL, "50%" ); 部件宽度保持原样，高度为容器高度的一半
  * */ 
 
-void Set_Widget_Dock( LCUI_Widget *widget, DOCK_TYPE dock );
+void Widget_SetDock( LCUI_Widget *widget, DOCK_TYPE dock );
 /* 设定部件的停靠类型 */ 
 
-int Set_Widget_MaxSize( LCUI_Widget *widget, char *width, char *height );
+int Widget_SetMaxSize( LCUI_Widget *widget, char *width, char *height );
 /* 
  * 功能：设定部件的最大尺寸 
  * 说明：当值为0时，部件的尺寸不受限制，用法示例可参考Set_Widget_Size()函数 
  * */ 
 
-int Set_Widget_MinSize( LCUI_Widget *widget, char *width, char *height );
+int Widget_SetMinSize( LCUI_Widget *widget, char *width, char *height );
 /* 
  * 功能：设定部件的最小尺寸 
  * 说明：用法示例可参考Set_Widget_Size()函数 
  * */
-void Limit_Widget_Size(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_size);
+void Widget_LimitSize(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_size);
 /* 功能：限制部件的尺寸变动范围 */ 
 
-void Limit_Widget_Pos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos);
+void Widget_LimitPos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos);
 /* 功能：限制部件的移动范围 */ 
 
-void Set_Widget_Border(LCUI_Widget *widget, LCUI_Border border);
+void Widget_SetBorder(LCUI_Widget *widget, LCUI_Border border);
 /* 功能：设定部件的边框 */ 
 
 void Set_Widget_Backcolor(LCUI_Widget *widget, LCUI_RGB color);
@@ -338,58 +333,72 @@ void Set_Widget_Backcolor(LCUI_Widget *widget, LCUI_RGB color);
 int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag);
 /* 功能：为部件填充背景图像 */ 
 
-void Enable_Widget(LCUI_Widget *widget);
+/* 设定部件的背景图像 */
+void Widget_SetBackgroundImage( LCUI_Widget *widget, LCUI_Graph *img );
+
+/* 设定部件的背景颜色 */
+void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color );
+
+/* 设定部件的背景图像对齐方式 */
+void Widget_SetBackgroundAlign(	LCUI_Widget *widget, ALIGN_TYPE align, 
+				LCUI_Pos offset );
+
+/* 设定部件的背景图像的重复方式 */
+void Widget_SetBackgroundRepeat( LCUI_Widget *widget, REPEAT_TYPE repeat );
+
+void Widget_Enable(LCUI_Widget *widget);
 /* 功能：启用部件 */ 
 
-void Disable_Widget(LCUI_Widget *widget);
+void Widget_Disable(LCUI_Widget *widget);
 /* 功能：禁用部件 */ 
 
 /* 指定部件是否可见 */
 void Widget_Visible( LCUI_Widget *widget, BOOL flag );
 
-void Set_Widget_Pos(LCUI_Widget *widget, LCUI_Pos pos);
+void Widget_SetPos(LCUI_Widget *widget, LCUI_Pos pos);
 /* 
  * 功能：设定部件的位置 
  * 说明：只修改坐标，不进行局部刷新
  * */ 
 
-void Set_Widget_Padding( LCUI_Widget *widget, LCUI_Padding padding );
+void Widget_SetPadding( LCUI_Widget *widget, LCUI_Padding padding );
 /* 设置部件的内边距 */
 
-void Set_Widget_PosType( LCUI_Widget *widget, POS_TYPE pos_type );
+void Widget_SetPosType( LCUI_Widget *widget, POS_TYPE pos_type );
 /* 设定部件的定位类型 */
 
-void Set_Widget_Alpha(LCUI_Widget *widget, unsigned char alpha);
+void Widget_SetAlpha(LCUI_Widget *widget, unsigned char alpha);
 /* 功能：设定部件的透明度 */ 
 
-void Exec_Move_Widget(LCUI_Widget *widget, LCUI_Pos pos);
+void Widget_ExecMove(LCUI_Widget *widget, LCUI_Pos pos);
 /*
  * 功能：执行移动部件位置的操作
  * 说明：更改部件位置，并添加局部刷新区域
  **/ 
 
-void Exec_Hide_Widget(LCUI_Widget *widget);
+void Widget_ExecHide(LCUI_Widget *widget);
 /* 功能：执行隐藏部件的操作 */ 
 
-void Exec_Show_Widget(LCUI_Widget *widget);
+void Widget_ExecShow(LCUI_Widget *widget);
 /* 功能：执行显示部件的任务 */ 
 
-void Auto_Resize_Widget(LCUI_Widget *widget);
-/* 功能：自动调整部件大小，以适应其内容大小 */ 
+/* 自动调整部件大小，以适应其内容大小 */
+void Widget_AutoResize(LCUI_Widget *widget);
 
-void Exec_Resize_Widget(LCUI_Widget *widget, LCUI_Size size);
+void Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size);
 /* 功能：执行改变部件尺寸的操作 */ 
 
-void Widget_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode );
 /* 启用或禁用部件的自动尺寸调整功能 */
+void Widget_SetAutoSize(	LCUI_Widget *widget,
+				BOOL flag, AUTOSIZE_MODE mode );
 
-void Exec_Refresh_Widget(LCUI_Widget *widget);
+void Widget_ExecRefresh(LCUI_Widget *widget);
 /* 功能：执行刷新显示指定部件的整个区域图形的操作 */ 
 
-void Exec_Update_Widget(LCUI_Widget *widget);
+void Widget_ExecUpdate(LCUI_Widget *widget);
 /* 功能：执行部件的更新操作 */
 
-void Exec_Draw_Widget(LCUI_Widget *widget);
+void Widget_ExecDraw(LCUI_Widget *widget);
 /* 功能：执行部件图形更新操作 */ 
 
 /* 获取指向部件自身图形数据的指针 */
@@ -401,10 +410,10 @@ int Widget_GetGraph(
 		LCUI_Graph *graph_buff, 
 		LCUI_Rect rect );
 
-LCUI_Pos Get_Widget_Valid_Pos( LCUI_Widget *widget, LCUI_Pos pos );
+LCUI_Pos Widget_GetValidPos( LCUI_Widget *widget, LCUI_Pos pos );
 /* 获取有效化后的坐标数据，其实就是将在限制范围外的坐标处理成在限制范围内的 */
 
-void Move_Widget(LCUI_Widget *widget, LCUI_Pos new_pos);
+void Widget_Move(LCUI_Widget *widget, LCUI_Pos new_pos);
 /* 
  * 功能：移动部件位置
  * 说明：如果部件的布局为ALIGN_NONE，那么，就可以移动它的位置，否则，无法移动位置
@@ -420,7 +429,7 @@ void Update_Child_Widget_Pos(LCUI_Widget *widget);
  * 调整位置。
  * */ 
 
-void Update_Widget_Size( LCUI_Widget *widget );
+void Widget_UpdateSize( LCUI_Widget *widget );
 /* 部件尺寸更新 */ 
 
 void Update_Child_Widget_Size(LCUI_Widget *widget);
@@ -441,13 +450,13 @@ void Move_Widget_To_Pos(LCUI_Widget *widget, LCUI_Pos des_pos, int speed);
 void Refresh_Widget(LCUI_Widget *widget);
 /* 功能：刷新显示指定部件的整个区域图形 */ 
 
-void Resize_Widget(LCUI_Widget *widget, LCUI_Size new_size);
-/* 功能：改变部件的尺寸 */ 
+/* 调整部件的尺寸 */
+void Widget_Resize( LCUI_Widget *widget, LCUI_Size new_size );
 
-void Draw_Widget(LCUI_Widget *widget);
+void Widget_Draw(LCUI_Widget *widget);
 /* 功能：重新绘制部件 */ 
 
-void Update_Widget(LCUI_Widget *widget);
+void Widget_Update(LCUI_Widget *widget);
 /* 
  * 功能：让部件根据已设定的属性，进行相应数据的更新
  * 说明：此记录会添加至队列，如果队列中有一条相同记录，则覆盖上条记录。
@@ -460,12 +469,12 @@ void __Update_Widget(LCUI_Widget *widget);
  * */
 
 /* 将指定部件显示在同等z-index值的部件的前端 */
-int Front_Widget( LCUI_Widget *widget );
+int Widget_Front( LCUI_Widget *widget );
 
-void Show_Widget(LCUI_Widget *widget);
+void Widget_Show(LCUI_Widget *widget);
 /* 功能：显示部件 */ 
 
-void Hide_Widget(LCUI_Widget *widget);
+void Widget_Hide(LCUI_Widget *widget);
 /* 功能：隐藏部件 */ 
 
 /* 改变部件的状态 */
@@ -478,7 +487,7 @@ int Widget_SetState( LCUI_Widget *widget, int state );
 int Handle_WidgetUpdate(LCUI_Widget *widget);
 /* 功能：处理部件的更新 */ 
 
-void Handle_All_WidgetUpdate();
+void Handle_AllWidgetUpdate();
 /* 功能：处理所有部件的更新 */ 
 /************************ Widget Update End ***************************/
 
@@ -545,17 +554,14 @@ int _Get_Widget_Container_Width(LCUI_Widget *widget);
 int _Get_Widget_Container_Height(LCUI_Widget *widget);
 /* 通过计算得出指定部件的容器的高度，单位为像素 */ 
 
-LCUI_Size _Get_Widget_Container_Size( LCUI_Widget *widget );
-/* 获取部件所在容器的尺寸 */
+/* 获取容器的宽度 */
+int Widget_GetContainerWidth( LCUI_Widget *widget );
 
-int Get_Container_Width( LCUI_Widget *widget );
-/* 获取容器的宽度 */ 
-
-int Get_Container_Height( LCUI_Widget *widget );
 /* 获取容器的高度 */
+int Widget_GetContainerHeight( LCUI_Widget *widget );
 
-LCUI_Size Get_Container_Size( LCUI_Widget *widget );
 /* 获取容器的尺寸 */
+LCUI_Size Widget_GetContainerSize( LCUI_Widget *widget );
 /************************* Container End ******************************/
 
 

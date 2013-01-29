@@ -178,7 +178,7 @@ _Start_DragEvent( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 	drag_event.cursor_pos.x = event->x;
 	drag_event.cursor_pos.y = event->y;
 	/* 用全局坐标减去部件的全局坐标，得到偏移坐标 */ 
-	__offset_pos = Get_Widget_Global_Pos( widget );
+	__offset_pos = Widget_GetGlobalPos( widget );
 	__offset_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
 	/* 得出部件的新全局坐标 */
 	drag_event.new_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
