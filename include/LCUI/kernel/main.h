@@ -67,11 +67,14 @@ LCUI_System;
 extern LCUI_System  LCUI_Sys;
 
 /************************* App Management *****************************/
-LCUI_App *Find_App(LCUI_ID id);
-/* 功能：根据程序的ID，获取指向程序数据结构的指针 */ 
+/* 根据程序的ID，获取指向程序数据结构的指针 */
+LCUI_App *LCUIApp_Find( LCUI_ID id );
 
-LCUI_App* Get_Self_AppPointer();
-/* 功能：获取程序的指针 */ 
+/* 获取指向程序数据的指针 */
+LCUI_App* LCUIApp_GetSelf( void );
+
+/* 获取程序ID */
+LCUI_ID LCUIApp_GetSelfID( void );
 
 /* 退出主循环 */
 void LCUI_StopMainLoop( void );

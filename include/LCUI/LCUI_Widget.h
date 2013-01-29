@@ -494,11 +494,11 @@ int WidgetFunc_Add(
  * 返回值：部件类型不存在，返回-1，其它错误返回-2
  **/ 
 
-int WidgetType_Add(char *type);
 /*
  * 功能：添加一个新的部件类型至部件库
  * 返回值：如果添加的新部件类型已存在，返回-1，成功则返回0
- **/ 
+ **/
+int WidgetType_Add( const char *type_name );
 
 void WidgetLib_Init(LCUI_Queue *w_lib);
 /* 功能：初始化部件库 */ 
@@ -515,7 +515,7 @@ void NULL_Widget_Func(LCUI_Widget *widget);
 LCUI_ID WidgetType_Get_ID(const char *widget_type);
 /* 功能：获取指定类型部件的类型ID */ 
 
-int Get_Widget_Type_By_ID(LCUI_ID id, char *widget_type);
+int WidgetType_GetByID(LCUI_ID id, char *widget_type);
 /* 功能：获取指定类型ID的类型名称 */ 
 
 void ( *Get_WidgetFunc_By_ID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*);
@@ -526,6 +526,9 @@ void ( *Get_WidgetFunc(const char *widget_type, FuncType func_type) ) (LCUI_Widg
 
 int WidgetType_Valid(const char *widget_type);
 /* 功能：检测指定部件类型是否有效 */ 
+
+/* 调用指定类型的部件函数 */
+void WidgetFunc_Call( LCUI_Widget *widget, FuncType type );
 
 void Register_Default_Widget_Type();
 /* 功能：为程序的部件库添加默认的部件类型 */ 

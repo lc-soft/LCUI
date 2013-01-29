@@ -27,8 +27,8 @@ void end_count_time()
 }
 
 /************************* App Management *****************************/
-LCUI_App *Find_App(LCUI_ID id)
-/* 功能：根据程序的ID，获取指向程序数据结构的指针 */
+/* 根据程序的ID，获取指向程序数据结构的指针 */
+LCUI_App *LCUIApp_Find( LCUI_ID id )
 {
 	LCUI_App *app; 
 	int i, total;
@@ -46,8 +46,8 @@ LCUI_App *Find_App(LCUI_ID id)
 	return NULL;
 }
 
-LCUI_App* Get_Self_AppPointer()
-/* 功能：获取程序的指针 */
+/* 获取指向程序数据的指针 */
+LCUI_App* LCUIApp_GetSelf( void )
 {
 	thread_t id;
 	Thread_TreeNode *ttn;
@@ -58,7 +58,7 @@ LCUI_App* Get_Self_AppPointer()
 	|| id == LCUI_Sys.self_id
 	|| id == LCUI_Sys.timer_thread )
 	{/* 由于内核及其它线程ID没有被记录，只有直接返回LCUI主程序的线程ID了 */
-		return Find_App(LCUI_Sys.self_id);
+		return LCUIApp_Find(LCUI_Sys.self_id);
 	}
 	/* 获取父线程的ID */
 	ttn = Search_Thread_Tree(&LCUI_Sys.thread_tree, id);
@@ -74,9 +74,14 @@ LCUI_App* Get_Self_AppPointer()
 		}
 	}
 	
-	return Find_App(ttn->tid);
+	return LCUIApp_Find(ttn->tid);
 }
 
+/* 获取程序ID */
+LCUI_ID LCUIApp_GetSelfID( void )
+{
+	return thread_self();
+}
 
 void LCUI_App_Init( LCUI_App *app )
 /* 功能：初始化程序数据结构体 */
@@ -179,7 +184,7 @@ static int App_Quit()
 /* 功能：退出程序 */
 {
 	LCUI_App *app;
-	app = Get_Self_AppPointer();
+	app = LCUIApp_GetSelf();
 	if( !app ) {
 		printf("App_Quit(): "APP_ERROR_UNRECORDED_APP);
 		return -1;
@@ -196,7 +201,7 @@ BOOL MainLoop_Active( LCUI_App *app )
 void LCUI_StopMainLoop( void )
 { 
 	LCUI_App *app;
-	app = Get_Self_AppPointer();
+	app = LCUIApp_GetSelf();
 	app->stop_loop = TRUE;
 }
 /*********************** App Management End ***************************/
@@ -357,7 +362,7 @@ int LCUI_Main ()
 	LCUI_App *app;
 	int idle_time = 1500;
 	
-	app = Get_Self_AppPointer();
+	app = LCUIApp_GetSelf();
 	if( !app ) {
 		printf("LCUI_Main(): "APP_ERROR_UNRECORDED_APP);
 		return -1;

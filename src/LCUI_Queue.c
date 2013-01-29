@@ -841,12 +841,9 @@ Destroy_Widget(LCUI_Widget *widget)
 	
 	widget->visible = FALSE;
 	widget->enabled = TRUE;
-	
-	void (*func)(LCUI_Widget*);
-	func = Get_WidgetFunc_By_ID(widget->type_id, 
-				FUNC_TYPE_DESTROY);
-	func(widget); /* 调用之，释放private指针指向的内存空间 */
-	free(widget->private_data);/* 释放这个指向部件私有数据结构体的指针 */
+	/* 调用回调函数销毁部件私有数据 */
+	WidgetFunc_Call( widget, FUNC_TYPE_DESTROY );
+	free( widget->private_data );
 }
 
 void WidgetQueue_Init(LCUI_Queue *queue)

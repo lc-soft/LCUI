@@ -193,7 +193,7 @@ BOOL Get_FuncData(	LCUI_Func *p_buff,
 			void *arg1, void *arg2 )
 {
 	LCUI_App *app;
-	app = Get_Self_AppPointer();
+	app = LCUIApp_GetSelf();
 	
 	if( !app ) {
 		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);

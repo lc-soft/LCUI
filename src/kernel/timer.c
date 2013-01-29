@@ -166,7 +166,7 @@ int set_timer( long int n_ms, void (*callback_func)(void), BOOL reuse )
 	timer.callback_func = callback_func;
 	timer.reuse = reuse;
 	timer.id = rand();
-	timer.app_id = Get_Self_AppPointer()->id;
+	timer.app_id = LCUIApp_GetSelf()->id;
 	if( 0 > Queue_Add( &LCUI_Sys.timer_list, &timer ) ) {
 		return -1;
 	}

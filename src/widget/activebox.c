@@ -175,15 +175,10 @@ int Frames_Add_Func(	LCUI_Frames *des,
 	if( !des ) {
 		return -1;
 	}
-	LCUI_App *app;
-	app = Get_Self_AppPointer();
-	if( !app ) {
-		return -2;
-	}
 	
 	LCUI_Func func_data;
 	func_data.func = func;
-	func_data.id = app->id;
+	func_data.id = LCUIApp_GetSelfID();
 	func_data.arg[0] = NULL;
 	func_data.arg[1] = arg;
 	/* 如果不将该标志置为FALSE，会是确定的值，导致在执行任务后的销毁参数时出现段错误 */

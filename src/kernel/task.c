@@ -27,7 +27,7 @@ void AppTasks_Init( LCUI_Queue *tasks )
 int AppTasks_Add( LCUI_Task *task )
 {
 	LCUI_App *app;
-	app = Find_App( task->id );
+	app = LCUIApp_Find( task->id );
 	if( !app ) {
 		return -1;
 	}
@@ -138,9 +138,9 @@ int AppTasks_CustomAdd( int mode, LCUI_Task *task )
 	LCUI_App *app;
 	
 	if( task->id == (LCUI_ID)0 ) {
-		app = Get_Self_AppPointer();
+		app = LCUIApp_GetSelf();
 	} else {
-		app = Find_App( task->id );
+		app = LCUIApp_Find( task->id );
 	}
 	if( !app ) {
 		return -1;

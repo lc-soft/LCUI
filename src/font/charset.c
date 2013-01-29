@@ -78,7 +78,7 @@ int Get_EncodingType()
 /* 获取字符编码类型 */
 {
 	LCUI_App *app;
-	app = Get_Self_AppPointer();
+	app = LCUIApp_GetSelf();
 	if( !app ) {
 		return -1;
 	}
@@ -88,7 +88,7 @@ int Get_EncodingType()
 static int Set_EncodingType(int type)
 {
 	LCUI_App *app;
-	app = Get_Self_AppPointer();
+	app = LCUIApp_GetSelf();
 	if( !app ) {
 		return -1;
 	}
