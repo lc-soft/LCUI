@@ -75,7 +75,7 @@ public:
 	int setStyle( char *style );
 	int setStyleID( int style_id );
 
-	int connectDragEvent( void (*func)(LCUI_Widget*, LCUI_DragEvent *) );
+	int connectDragEvent( void (*func)(LCUI_Widget*, LCUI_WidgetDragEvent *) );
 	int connectClickedEvent( void (*func)(LCUI_Widget*, void *), void *arg );
 	int connectKeyboardEvent( void (*func)(LCUI_Widget*, LCUI_Key *) );
 	int connectFocusInEvent( void (*func)(LCUI_Widget*, void*), void *arg );
@@ -224,12 +224,12 @@ int LCUIWidget::setDock( DOCK_TYPE dock )
 	return 0;
 }
 
-int LCUIWidget::connectDragEvent( void (*func)(LCUI_Widget*, LCUI_DragEvent *) )
+int LCUIWidget::connectDragEvent( void (*func)(LCUI_Widget*, LCUI_WidgetDragEvent *) )
 {
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	return Widget_Drag_Event_Connect( widget, func );
+	return Widget_DragEvent_Connect( widget, func );
 }
 
 int LCUIWidget::connectClickedEvent( void (*func)(LCUI_Widget*, void *), void *arg )
@@ -237,7 +237,7 @@ int LCUIWidget::connectClickedEvent( void (*func)(LCUI_Widget*, void *), void *a
 	if( !widget ) {
 		return WIDGET_IS_NULL;
 	}
-	return Widget_Clicked_Event_Connect( widget, func, arg );
+	return Widget_ClickedEvent_Connect( widget, func, arg );
 }
 
 int LCUIWidget::connectKeyboardEvent( void (*func)(LCUI_Widget*, LCUI_Key *) )

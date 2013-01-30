@@ -76,7 +76,7 @@ static LCUI_Widget *active_textbox = NULL;
 static int __timer_id = -1;
 
 static void
-_put_textbox_cursor( LCUI_Widget *widget, void *arg )
+_put_textbox_cursor( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	active_textbox = widget;
 }
@@ -130,7 +130,7 @@ blink_cursor()
 }
 
 static void 
-TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_DragEvent *event )
+TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
 	static LCUI_Pos pos;
 	static LCUI_TextBox *tb;
@@ -141,7 +141,7 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_DragEvent *event )
 	layer = TextBox_Get_TextLayer( widget );
 	tb = Widget_GetPrivData( active_textbox );
 	/* 全局坐标转换成相对坐标 */
-	pos = GlobalPos_ConvTo_RelativePos( tb->text, event->cursor_pos );
+	pos = GlobalPos_ConvTo_RelativePos( tb->text, event->drag.cursor_pos );
 	//printf("pos: %d,%d\n", pos.x, pos.y);
 	/* 根据像素坐标，设定文本光标的位置 */
 	TextLayer_Set_Cursor_PixelPos( layer, pos );
@@ -152,7 +152,7 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_DragEvent *event )
 }
 
 static void
-TextBox_Input( LCUI_Widget *widget, LCUI_KeyboardEvent *event )
+TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
 	static char buff[5];
 	static int cols, flag, rows;
@@ -160,13 +160,13 @@ TextBox_Input( LCUI_Widget *widget, LCUI_KeyboardEvent *event )
 	static LCUI_TextLayer *layer;
 	static LCUI_TextBox *textbox;
 	
-	//_DEBUG_MSG("you input: %d\n", event->key_code);
+	//_DEBUG_MSG("you input: %d\n", event->key.key_code);
 	layer = TextBox_Get_TextLayer( widget );
 	textbox = Widget_GetPrivData( widget );
 	cur_pos = TextLayer_Get_Cursor_Pos( layer );
 	cols = TextLayer_Get_RowLen( layer, cur_pos.y );
 	rows = TextLayer_Get_Rows( layer ); 
-	switch( event->key_code ) {
+	switch( event->key.key_code ) {
 	    case KEY_HOMEPAGE: //home键移动光标至行首
 		cur_pos.x = 0;
 		goto mv_cur_pos;
@@ -225,31 +225,31 @@ mv_cur_pos:;
 		}
 		/* 处理文本框的字符输入限制 */
 		if( Check_Option( textbox->limit_mode, ONLY_0_TO_9 ) ) {
-			if( event->key_code >= '0' && event->key_code <= '9' ) {
+			if( event->key.key_code >= '0' && event->key.key_code <= '9' ) {
 				++flag;
 			}
 		}
 		if( Check_Option( textbox->limit_mode, ONLY_a_TO_z ) ) {
-			if( event->key_code >= 'a' && event->key_code <= 'z' ) {
+			if( event->key.key_code >= 'a' && event->key.key_code <= 'z' ) {
 				++flag;
 			}
 		}
 		if( Check_Option( textbox->limit_mode, ONLY_A_TO_Z ) ) {
-			if( event->key_code >= 'A' && event->key_code <= 'Z' ) {
+			if( event->key.key_code >= 'A' && event->key.key_code <= 'Z' ) {
 				++flag;
 			}
 		}
 		if( Check_Option( textbox->limit_mode, ONLY_UNDERLINE ) ) {
-			if( event->key_code == '_' ) {
+			if( event->key.key_code == '_' ) {
 				++flag;
 			}
 		}
-		//_DEBUG_MSG("input char: %c, %d\n", event->key_code, flag);
+		//_DEBUG_MSG("input char: %c, %d\n", event->key.key_code, flag);
 		/* 如果该ASCII码代表的字符是可见的 */
-		if( flag == 1 && (event->key_code == 10 || 
-			(event->key_code > 31 && event->key_code < 126)) ) {
+		if( flag == 1 && (event->key.key_code == 10 || 
+			(event->key.key_code > 31 && event->key.key_code < 126)) ) {
 			//wchar_t *text;
-			buff[0] = event->key_code;
+			buff[0] = event->key.key_code;
 			buff[1] = 0;
 			TextBox_Text_Add( widget, buff);
 			//text = TextLayer_Get_Text( layer );
@@ -360,12 +360,12 @@ TextBox_Init( LCUI_Widget *widget )
 	if( __timer_id == -1 ) {
 		__timer_id = set_timer( 500, blink_cursor, TRUE );
 	}
-	Widget_Drag_Event_Connect( widget, TextBox_TextLayer_Click );
+	Widget_Event_Connect( widget, EVENT_DRAG, TextBox_TextLayer_Click );
 	/* 关联 FOCUS_OUT 和 FOCUS_IN 事件 */
-	Widget_FocusOut_Event_Connect( widget, hide_textbox_cursor, NULL );
-	Widget_FocusIn_Event_Connect( widget, _put_textbox_cursor, NULL );
+	Widget_Event_Connect( widget, EVENT_FOCUS_OUT, hide_textbox_cursor );
+	Widget_Event_Connect( widget, EVENT_FOCUS_IN, _put_textbox_cursor );
 	/* 关联按键输入事件 */
-	Widget_KeyboardEvent_Connect( widget, TextBox_Input );
+	Widget_Event_Connect( widget, EVENT_KEYBOARD, TextBox_Input );
 	/* 默认不启用多行文本模式 */
 	TextBox_Multiline( widget, FALSE );
 }
@@ -596,7 +596,7 @@ Exec_TextBox_Resize( LCUI_Widget *widget )
 }
 
 void 
-Process_TextBox_Drag(LCUI_Widget *widget, LCUI_DragEvent *event)
+Process_TextBox_Drag(LCUI_Widget *widget, LCUI_WidgetDragEvent *event)
 /* 处理鼠标对文本框的拖动事件 */
 {
 	

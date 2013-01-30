@@ -87,12 +87,6 @@ EventSlots_Find( LCUI_Queue *slots, int event_id );
 /* 添加事件槽与事件的关联记录 */
 int EventSlots_Add( LCUI_Queue *slots, int event_id, LCUI_Func *func );
 
-/* 
- * 功能：将指定ID的事件分发到已注册的回调函数
- * 说明：本函数会将事件槽记录中与指定ID的事件关联的回调函数 添加至程序的任务队列
- * */
-int EventSlots_DispatchEvent( LCUI_Queue *slots, int event_id );
-
 /* 将回调函数与键盘按键事件进行连接 */
 int LCUI_KeyboardEvent_Connect( 
 		void (*func)(LCUI_KeyboardEvent*, void*), 

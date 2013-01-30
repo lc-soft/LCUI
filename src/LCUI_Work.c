@@ -64,75 +64,56 @@ FuncQueue_Init(LCUI_Queue *queue)
 /****************** 处理部件拖动/点击事件的相关代码 ************************/
 static LCUI_Widget *click_widget = NULL;
 static LCUI_Pos __offset_pos = {0, 0};  /* 点击部件时保存的偏移坐标 */ 
-static LCUI_DragEvent drag_event;
+static LCUI_WidgetEvent widget_event;
 
-int 
-Widget_Event_Connect (	LCUI_Widget *widget, 
-			WidgetEvent_ID event_id, 
-			LCUI_Func *func_data )
 /* 将回调函数与部件的指定事件进行关联 */
+int Widget_Event_Connect ( LCUI_Widget *widget, WidgetEventType event_id, 
+			void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) )
+{
+	LCUI_Func func_data;
+	if( !widget ) {
+		return -1;
+	}
+	if( !Get_FuncData(&func_data, func, widget, NULL) ) {
+		return -2;
+	}
+	//_DEBUG_MSG("widget: %p, event id: %d, callback func: %p\n", 
+	//		widget, event_id, func_data->func);
+	EventSlots_Add( &widget->event, event_id, &func_data );
+	return 0;
+}
+
+int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
 	if( !widget ) {
 		return -1;
 	}
-	//_DEBUG_MSG("widget: %p, event id: %d, callback func: %p\n", 
-	//		widget, event_id, func_data->func);
-	EventSlots_Add( &widget->event, event_id, func_data );
+	
+	int i,n;
+	LCUI_EventSlot *slot;
+	LCUI_Task *task;
+	LCUI_WidgetEvent *p_buff;
+	
+	slot = EventSlots_Find( &widget->event, event->type );
+	if( !slot ) {
+		return -2;
+	}
+	n = Queue_Get_Total( &slot->func_data );
+	for(i=0; i<n; ++i) {
+		task = Queue_Get( &slot->func_data, i );
+		p_buff = malloc( sizeof(LCUI_WidgetEvent) );
+		if( !p_buff ) {
+			char str[256];
+			sprintf( str,"%s()", __FUNCTION__ );
+			perror( str );
+			abort();
+		}
+		*p_buff = *event;
+		task->arg[1] = p_buff;
+		task->destroy_arg[1] = TRUE;
+		AppTasks_Add( task );
+	}
 	return 0;
-}
-
-int 
-Widget_Drag_Event_Connect ( LCUI_Widget *widget, 
-		void (*func)(LCUI_Widget*, LCUI_DragEvent *)
-)
-/* 
- * 功能：将回调函数与部件的拖动事件进行连接 
- * 说明：建立连接后，当部件被点击，拖动，释放，都会调用回调函数
- * */
-{
-	LCUI_DragEvent *p;
-	LCUI_Func func_data;
-	
-	p = &drag_event;
-	if( !Get_FuncData(&func_data, func, widget, p) ) {
-		return -2;
-	}
-	return Widget_Event_Connect( widget, EVENT_DRAG, &func_data );
-}
-
-/* 
- * 功能：将回调函数与部件的按键输入事件进行连接 
- * 说明：建立连接后，当部件处于焦点状态，并使用键盘进行输入时，会调用该回调函数
- * */
-int Widget_KeyboardEvent_Connect (
-		LCUI_Widget *widget,
-		void (*func)(LCUI_Widget*, LCUI_KeyboardEvent *) )
-{
-	LCUI_Func func_data;
-	
-	if( !Get_FuncData(&func_data, func, (void*)widget, NULL) ) {
-		return -1;
-	}
-	return Widget_Event_Connect( widget, EVENT_KEYBOARD, &func_data );
-}
-
-int 
-Widget_Clicked_Event_Connect (
-			LCUI_Widget *widget,
-			void (*func)(LCUI_Widget*, void *), 
-			void *arg
-)
-/* 
- * 功能：将回调函数与部件的点击事件进行连接 
- * 说明：建立连接后，当部件被鼠标点击，会调用回调函数
- * */
-{
-	LCUI_Func func_data;
-	
-	if( !Get_FuncData(&func_data, func, (void*)widget, arg) ) {
-		return -2;
-	}
-	return Widget_Event_Connect( widget, EVENT_CLICKED, &func_data );
 }
 
 static BOOL
@@ -175,39 +156,42 @@ Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
 static void 
 _Start_DragEvent( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 {
-	drag_event.cursor_pos.x = event->x;
-	drag_event.cursor_pos.y = event->y;
+	widget_event.type = EVENT_DRAG;
+	widget_event.drag.cursor_pos.x = event->x;
+	widget_event.drag.cursor_pos.y = event->y;
 	/* 用全局坐标减去部件的全局坐标，得到偏移坐标 */ 
 	__offset_pos = Widget_GetGlobalPos( widget );
-	__offset_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
+	__offset_pos = Pos_Sub( widget_event.drag.cursor_pos, __offset_pos );
 	/* 得出部件的新全局坐标 */
-	drag_event.new_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
-	drag_event.first_click = 1;
-	drag_event.end_click = 0;
+	widget_event.drag.new_pos = Pos_Sub( widget_event.drag.cursor_pos, __offset_pos );
+	widget_event.drag.first_click = 1;
+	widget_event.drag.end_click = 0;
 	/* 处理部件的拖动事件 */
-	EventSlots_DispatchEvent( &widget->event, EVENT_DRAG );
+	Widget_DispatchEvent( widget, &widget_event );
 }
 
 static void 
 _Doing_DragEvent( LCUI_Widget *widget, LCUI_MouseMotionEvent *event )
 {
-	drag_event.cursor_pos.x = event->x;
-	drag_event.cursor_pos.y = event->y;
-	drag_event.new_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
-	drag_event.first_click = 0;
-	drag_event.end_click = 0;
-	EventSlots_DispatchEvent( &widget->event, EVENT_DRAG );
+	widget_event.type = EVENT_DRAG;
+	widget_event.drag.cursor_pos.x = event->x;
+	widget_event.drag.cursor_pos.y = event->y;
+	widget_event.drag.new_pos = Pos_Sub( widget_event.drag.cursor_pos, __offset_pos );
+	widget_event.drag.first_click = 0;
+	widget_event.drag.end_click = 0;
+	Widget_DispatchEvent( widget, &widget_event );
 }
 
 static void 
 _End_DragEvent( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 {
-	drag_event.cursor_pos.x = event->x;
-	drag_event.cursor_pos.y = event->y;
-	drag_event.new_pos = Pos_Sub( drag_event.cursor_pos, __offset_pos );
-	drag_event.first_click = 0;
-	drag_event.end_click = 1;
-	EventSlots_DispatchEvent( &widget->event, EVENT_DRAG );
+	widget_event.type = EVENT_DRAG;
+	widget_event.drag.cursor_pos.x = event->x;
+	widget_event.drag.cursor_pos.y = event->y;
+	widget_event.drag.new_pos = Pos_Sub( widget_event.drag.cursor_pos, __offset_pos );
+	widget_event.drag.first_click = 0;
+	widget_event.drag.end_click = 1;
+	Widget_DispatchEvent( widget, &widget_event );
 }
 
 typedef struct {
@@ -317,12 +301,13 @@ static void
 LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 {
 	LCUI_Widget *tmp_widget, *widget;
+	LCUI_WidgetEvent tmp_event;
 	LCUI_Pos pos;
 	
 	if( !event || Mouse_LeftButton(event) < 0 ) {
 		return;
 	}
-	
+	tmp_event.type = EVENT_CLICKED;
 	pos.x = event->x;
 	pos.y = event->y;
 	widget = Widget_At( NULL, pos );
@@ -345,7 +330,7 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 		 * */
 		tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_CLICKED );
 		if( tmp_widget && tmp_widget->enabled ) {
-			EventSlots_DispatchEvent(&tmp_widget->event, EVENT_CLICKED);
+			Widget_DispatchEvent( tmp_widget, &tmp_event);
 		}
 		widget_list_set_state (widget, WIDGET_STATE_ACTIVE);
 	}
@@ -385,7 +370,7 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 }
 
 static int 
-Widget_DispacthKeyboardEvent(	LCUI_Widget *widget, 
+Widget_DispatchKeyboardEvent(	LCUI_Widget *widget, 
 				LCUI_KeyboardEvent *event )
 {
 	if( !widget ) {
@@ -458,6 +443,7 @@ Set_Focus( LCUI_Widget *widget )
 	}
 	
 	LCUI_Widget **focus_widget;
+	LCUI_WidgetEvent event;
 	
 	if( widget->parent ) {
 		focus_widget = &widget->parent->focus_widget;
@@ -467,10 +453,12 @@ Set_Focus( LCUI_Widget *widget )
 	if( *focus_widget ) {
 		/* 如果上次和这次的部件不一样 */
 		if( *focus_widget != widget ) {
-			EventSlots_DispatchEvent( &(*focus_widget)->event, EVENT_FOCUS_OUT );
+			event.type = EVENT_FOCUS_OUT;
+			Widget_DispatchEvent( *focus_widget, &event );
 		}
 	}
-	EventSlots_DispatchEvent( &widget->event, EVENT_FOCUS_IN );
+	event.type = EVENT_FOCUS_IN;
+	Widget_DispatchEvent( widget, &event );
 	/* 保存新焦点位置 */
 	*focus_widget = widget;
 	return TRUE;
@@ -490,6 +478,7 @@ Cancel_Focus( LCUI_Widget *widget )
 	int i, total, focus_pos;
 	LCUI_Widget *other_widget, **focus_widget;
 	LCUI_Queue *queue_ptr;
+	LCUI_WidgetEvent event;
 	
 	if( widget->parent ) {
 		focus_widget = &widget->parent->focus_widget;
@@ -498,6 +487,8 @@ Cancel_Focus( LCUI_Widget *widget )
 		focus_widget = &LCUI_Sys.focus_widget;
 		queue_ptr = &LCUI_Sys.widget_list;
 	}
+	event.type = EVENT_FOCUS_OUT;
+	Widget_DispatchEvent( widget, &event );
 	/* 寻找可获得焦点的其它部件 */
 	total = Queue_Get_Total( queue_ptr );
 	focus_pos = WidgetQueue_Get_Pos( queue_ptr, *focus_widget );
@@ -505,7 +496,8 @@ Cancel_Focus( LCUI_Widget *widget )
 		other_widget = Queue_Get( queue_ptr, i);
 		if( other_widget && other_widget->visible
 		 && other_widget->focus ) {
-			EventSlots_DispatchEvent( &widget->event, EVENT_FOCUS_IN );
+			event.type = EVENT_FOCUS_IN;
+			Widget_DispatchEvent( widget, &event );
 			*focus_widget = other_widget;
 			break;
 		}
@@ -518,7 +510,8 @@ Cancel_Focus( LCUI_Widget *widget )
 		other_widget = Queue_Get( queue_ptr, i);
 		if( other_widget && other_widget->visible
 		 && other_widget->focus ) {
-			EventSlots_DispatchEvent( &widget->event, EVENT_FOCUS_IN );
+			event.type = EVENT_FOCUS_IN;
+			Widget_DispatchEvent( widget, &event );
 			*focus_widget = other_widget;
 			break;
 		}
@@ -535,6 +528,7 @@ Reset_Focus( LCUI_Widget* widget )
 /* 复位指定部件内的子部件的焦点 */
 {	
 	LCUI_Widget** focus_widget;
+	LCUI_WidgetEvent event;
 	
 	if( widget ) {
 		focus_widget = &widget->focus_widget; 
@@ -542,7 +536,8 @@ Reset_Focus( LCUI_Widget* widget )
 		focus_widget = &LCUI_Sys.focus_widget; 
 	}
 	if( *focus_widget ) {
-		EventSlots_DispatchEvent( &(*focus_widget)->event, EVENT_FOCUS_OUT );
+		event.type = EVENT_FOCUS_OUT;
+		Widget_DispatchEvent( *focus_widget, &event );
 	}
 	
 	*focus_widget = NULL;
@@ -564,44 +559,6 @@ int Return_FocusToParent()
 	return 0;
 }
 
-BOOL 
-Widget_FocusIn_Event_Connect(	LCUI_Widget *widget, 
-				void (*func)(LCUI_Widget*, void*), 
-				void *arg )
-/* 将回调函数与FOCUS_IN事件连接，当部件得到焦点时，会调用该回调函数 */
-{
-	if( !widget ) {
-		return FALSE;
-	}
-	
-	LCUI_Func func_data;
-	
-	if( !Get_FuncData(&func_data, func, (void*)widget, arg) ) {
-		return FALSE;
-	}
-	EventSlots_Add(&widget->event, EVENT_FOCUS_IN, &func_data);
-	return TRUE;
-}
-
-BOOL 
-Widget_FocusOut_Event_Connect(	LCUI_Widget *widget, 
-				void (*func)(LCUI_Widget*, void*), 
-				void *arg )
-/* 将回调函数与FOCUS_OUT事件连接，当部件失去焦点时，会调用该回调函数 */
-{
-	if( !widget ) {
-		return FALSE;
-	}
-	
-	LCUI_Func func_data;
-	
-	if( !Get_FuncData(&func_data, func, (void*)widget, arg) ) {
-		return FALSE;
-	}
-	EventSlots_Add(&widget->event, EVENT_FOCUS_OUT, &func_data);
-	return TRUE;
-}
-
 static void 
 WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
 {
@@ -611,7 +568,7 @@ WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
 		focus_widget = Get_FocusWidget( widget );
 		if( !focus_widget ) {
 			if( tmp ) {
-				Widget_DispacthKeyboardEvent( tmp, event );;
+				Widget_DispatchKeyboardEvent( tmp, event );
 			}
 			break;
 		}

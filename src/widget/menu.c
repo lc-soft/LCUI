@@ -318,7 +318,7 @@ LCUI_Widget *Create_Child_Menu(LCUI_Widget *parent_menu, LCUI_Widget *item)
 	menu->parent_menu = parent_menu;/* 记录父级菜单 */
 	menu->widget_link = item; /* 记录与子菜单关联部件 */
 	Queue_Add(&pa_menu->child_menu, child_menu);/* 添加至父菜单的子菜单队列 */
-	Widget_Clicked_Event_Connect(item, Side_Show_Menu, child_menu);
+	//Widget_ClickedEvent_Connect(item, Side_Show_Menu, child_menu);
 	return child_menu; /* 将创建的子菜单部件的指针返回给上一级函数 */
 }
 

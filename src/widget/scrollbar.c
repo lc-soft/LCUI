@@ -91,18 +91,17 @@ Move_ScrollBar( LCUI_Widget *widget, LCUI_Pos new_pos )
 }
 
 static void 
-ScrollBar_Drag( LCUI_Widget *widget, LCUI_DragEvent *event )
+ScrollBar_Drag( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
 	static LCUI_Pos pos, offset;
 	static LCUI_ScrollBar *scrollbar;
-	
 	if( !widget->parent ) {
 		return;
 	}
 	
 	scrollbar = Widget_GetPrivData( widget->parent );
 	pos = Widget_GetGlobalPos( widget );
-	offset = Pos_Sub( event->new_pos, pos ); 
+	offset = Pos_Sub( event->drag.new_pos, pos ); 
 	pos = Pos_Add( pos, offset ); 
 	pos = GlobalPos_ConvTo_RelativePos( widget, pos );
 	
@@ -144,7 +143,7 @@ ScrollBar_Init( LCUI_Widget *widget )
 	Widget_SetBackgroundColor( widget, RGB(200,200,200) );
 	Widget_SetBackgroundTransparent( widget, FALSE );
 	Widget_Show( scrollbar->widget );
-	Widget_Drag_Event_Connect( scrollbar->widget, ScrollBar_Drag );
+	Widget_Event_Connect( scrollbar->widget, EVENT_DRAG, ScrollBar_Drag );
 }
 
 static void 

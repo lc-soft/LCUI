@@ -93,11 +93,11 @@ int CheckBox_Is_Off(LCUI_Widget *widget)
 	return 1;
 }
 
-void Switch_CheckBox_State(LCUI_Widget *widget, void *arg)
 /* 
  * 功能：切换复选框的状态
- * 说明：这个状态，指的是打勾与没打勾的两种状态
+ * 说明：这个状态指的是打勾与没打勾的两种状态
  *  */
+void Switch_CheckBox_State(LCUI_Widget *widget, LCUI_WidgetEvent *event)
 { 
 	if(CheckBox_Is_On(widget)) {
 		Set_CheckBox_Off(widget);
@@ -176,7 +176,7 @@ CheckBox_Init(LCUI_Widget *widget)
 	Widget_Show(container[0]);
 	Widget_Show(container[1]);
 	/* 关联鼠标左键点击事件 */
-	Widget_Clicked_Event_Connect(widget, Switch_CheckBox_State, NULL);
+	Widget_Event_Connect( widget, EVENT_CLICKED, Switch_CheckBox_State );
 	/* 响应状态改变 */
 	valid_state = (WIDGET_STATE_NORMAL | WIDGET_STATE_ACTIVE);
 	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);

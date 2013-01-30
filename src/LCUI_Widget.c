@@ -1597,7 +1597,7 @@ void Widget_SetBorder(LCUI_Widget *widget, LCUI_Border border)
 {
 	widget->border = border;
 	Widget_Draw( widget );
-	Widget_InvalidArea( widget, Widget_GetRect(widget) );
+	Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
 }
 
 /* 设定部件的背景图像 */

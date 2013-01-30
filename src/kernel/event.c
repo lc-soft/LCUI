@@ -256,29 +256,6 @@ int EventSlots_Add( LCUI_Queue *slots, int event_id, LCUI_Func *func )
 	return 0;
 }
 
-/* 
- * 功能：将指定ID的事件分发到已注册的回调函数
- * 说明：本函数会将事件槽记录中与指定ID的事件关联的回调函数 添加至程序的任务队列
- * */
-int EventSlots_DispatchEvent( LCUI_Queue *slots, int event_id )
-{
-	int total, i;
-	LCUI_Func *func;
-	LCUI_EventSlot *slot;
-	
-	slot = EventSlots_Find( slots, event_id );
-	if( !slot ) {
-		return -1;
-	}
-	total = Queue_Get_Total( &slot->func_data );
-	for (i = 0; i < total; ++i) {
-		func = Queue_Get( &slot->func_data, i );
-		/* 添加至程序的任务队列，若函数和第一个参数一样，则进行覆盖 */ 
-		AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_F, func );
-	}
-	return 0;
-}
-
 /* 将回调函数与键盘按键事件进行连接 */
 int LCUI_KeyboardEvent_Connect( 
 		void (*func)(LCUI_KeyboardEvent*, void*), 

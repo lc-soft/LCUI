@@ -148,6 +148,7 @@ struct _LCUI_Widget {
 
 /**********************************************************************/
 
+#include LC_WORK_H
 
 LCUI_BEGIN_HEADER
 

@@ -45,25 +45,36 @@
 #define RELATIVE_POS	1 /* 相对坐标 */
 #define NORMAL_POS	0 /*普通坐标 */
 
-typedef enum _WidgetEvent_ID
-{
+typedef enum {
 	EVENT_DRAG,	/* 部件的拖动事件 */
 	EVENT_CLICKED,	/* 部件的点击事件 */
 	EVENT_MOVE,	/* 部件的移动事件 */
 	EVENT_KEYBOARD,	/* 按键事件 */
 	EVENT_FOCUS_IN,	/* 得到焦点 */
 	EVENT_FOCUS_OUT	/* 失去焦点 */
-}
-WidgetEvent_ID; 
+} WidgetEventType; 
 
-typedef struct _LCUI_DragEvent
-{
+typedef struct {
+	uint8_t type;
 	LCUI_Pos new_pos;	/* 部件的新全局坐标 */
 	LCUI_Pos cursor_pos;	/* 鼠标游标的坐标 */
 	int first_click;	/* 标志，是否为首次点击 */ 
 	int end_click;		/* 标志，是否已经结束拖动 */
-}
-LCUI_DragEvent; 
+} LCUI_WidgetDragEvent; 
+
+typedef struct {
+	uint8_t type;
+	BOOL focus;
+} LCUI_WidgetFocusEvent;
+
+typedef LCUI_KeyboardEvent LCUI_WidgetKeyboardEvent;
+
+typedef union {
+	uint8_t type;
+	LCUI_WidgetDragEvent drag;
+	LCUI_WidgetKeyboardEvent key;
+	LCUI_WidgetFocusEvent focus;
+} LCUI_WidgetEvent;
 
 LCUI_BEGIN_HEADER
 
@@ -75,32 +86,9 @@ void FuncQueue_Init(LCUI_Queue *queue);
 /* 功能：初始化函数指针队列 */ 
 
 /********************* 处理部件拖动/点击事件 ******************************/
-int Widget_Drag_Event_Connect ( 
-				LCUI_Widget *widget, 
-				void (*func)(LCUI_Widget*, LCUI_DragEvent *)
-);
-/* 
- * 功能：将回调函数与部件的拖动事件进行连接 
- * 说明：建立连接后，但部件被点击，拖动，释放，都会调用回调函数
- * */ 
-
-/* 
- * 功能：将回调函数与部件的按键输入事件进行连接 
- * 说明：建立连接后，当部件处于焦点状态，并使用键盘进行输入时，会调用该回调函数
- * */
-int Widget_KeyboardEvent_Connect (
-		LCUI_Widget *widget,
-		void (*func)(LCUI_Widget*, LCUI_KeyboardEvent *) );
-
-int Widget_Clicked_Event_Connect (
-			LCUI_Widget *widget,
-			void (*func)(LCUI_Widget*, void *), 
-			void *arg
-);
-/* 
- * 功能：将回调函数与部件的点击事件进行连接 
- * 说明：建立连接后，当部件被鼠标点击，会调用回调函数
- * */
+/* 将回调函数与部件的指定事件进行关联 */
+int Widget_Event_Connect ( LCUI_Widget *widget, WidgetEventType event_id, 
+			void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) );
 
 void Widget_Event_Init();
 /* 功能：初始化部件事件处理 */ 
@@ -125,17 +113,6 @@ BOOL
 Reset_Focus( LCUI_Widget* widget );
 /* 复位指定部件内的子部件的焦点 */ 
 
-BOOL 
-Widget_FocusIn_Event_Connect(	LCUI_Widget *widget, 
-				void (*func)(LCUI_Widget*, void*), 
-				void *arg );
-/* 将回调函数与FOCUS_IN事件连接，当部件得到焦点时，会调用该回调函数 */ 
-
-BOOL 
-Widget_FocusOut_Event_Connect(	LCUI_Widget *widget, 
-				void (*func)(LCUI_Widget*, void*), 
-				void *arg );
-/* 将回调函数与FOCUS_OUT事件连接，当部件失去焦点时，会调用该回调函数 */ 
 /*------------------------- End Focus Proc ----------------------------*/
 
 /*************************** Event End *********************************/

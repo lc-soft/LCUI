@@ -75,9 +75,9 @@ Get_Window_Client_Area(LCUI_Widget *window)
 	return win_p->client_area;	
 }
 
+/* 处理鼠标移动事件 */
 static void 
-Move_Window(LCUI_Widget *titlebar, LCUI_DragEvent *event)
-/* 功能：处理鼠标移动事件 */
+Move_Window(LCUI_Widget *titlebar, LCUI_WidgetEvent *event)
 {
 	LCUI_Pos pos, offset;
 	LCUI_Widget *window;
@@ -91,7 +91,7 @@ Move_Window(LCUI_Widget *titlebar, LCUI_DragEvent *event)
 	//event->cursor_pos.x, event->cursor_pos.y );
 	/* 将新全局坐标减去标题栏的全局坐标，得到偏移坐标 */
 	pos = Widget_GetGlobalPos( titlebar );
-	offset = Pos_Sub( event->new_pos, pos );
+	offset = Pos_Sub( event->drag.new_pos, pos );
 	pos = Widget_GetGlobalPos( window );
 	/* 将偏移坐标加在窗口全局坐标上，得出窗口的新全局坐标 */
 	pos = Pos_Add( pos, offset );
@@ -172,6 +172,7 @@ Exec_Update_Window( LCUI_Widget *win_p )
 	LCUI_Graph *graph;
 	LCUI_Widget *titlebar;
 	LCUI_Widget *client_area;
+	LCUI_Border border;
 	LCUI_RGB border_color, back_color;
 	
 	titlebar = Get_Window_TitleBar(win_p);
@@ -238,11 +239,9 @@ union_draw_method:;
 			back_color = RGB(255,255,255);
 			border_color = RGB(50,50,50); 
 		}
-		
-		Widget_SetBorder( win_p,
-		 Border(1, BORDER_STYLE_SOLID, border_color));
-		Widget_SetBorder( client_area,
-		 Border(1, BORDER_STYLE_SOLID, border_color));
+		border = Border(1, BORDER_STYLE_SOLID, border_color);
+		Widget_SetBorder( client_area, border);
+		Widget_SetBorder( win_p, border);
 		Widget_SetBackgroundColor( win_p, back_color );
 		Graph_Fill_Color( graph, back_color );
 		Widget_SetBackgroundColor( client_area, RGB(255,255,255) );
@@ -282,7 +281,7 @@ Get_Parent_Window(LCUI_Widget *widget)
 
 
 static void 
-Quit_Parent_Window(LCUI_Widget *btn, void *arg)
+Quit_Parent_Window(LCUI_Widget *btn, LCUI_WidgetEvent *unused)
 /* 功能：退出部件btn所在的窗口 */
 {
 	//printf("Quit_Parent_Window start\n");
@@ -306,18 +305,18 @@ Destroy_Window(LCUI_Widget *win_p)
 }
 
 static void
-Window_FocusOut( LCUI_Widget *window, void *arg )
+Window_FocusOut( LCUI_Widget *window, LCUI_WidgetEvent *unused )
 /* 在窗口失去焦点时会调用此函数 */
 {
-	//printf( "Window_FocusOut!\n" );
+	//_DEBUG_MSG( "%p, Window_FocusOut!\n", window );
 	Widget_Update( window );
 }
 
 static void
-Window_FocusIn( LCUI_Widget *window, void *arg )
+Window_FocusIn( LCUI_Widget *window, LCUI_WidgetEvent *unused )
 /* 在窗口获得焦点时会调用此函数 */
 {
-	//printf( "Window_FocusIn!\n" );
+	//_DEBUG_MSG( "%p, Window_FocusIn!\n",window );
 	Widget_Front( window ); /* 前置窗口 */
 	Widget_Update( window ); /* 更新窗口 */
 }
@@ -362,7 +361,7 @@ Window_Init(LCUI_Widget *win_p)
 	Widget_Resize(btn_close, Size(btn_normal.width, btn_normal.height));
 	Custom_Button_Style(btn_close, &btn_normal, &btn_highlight, &btn_down, NULL, NULL);
 	/* 关联按钮的点击事件，当按钮被点击后，调用Quit_Window函数 */
-	Widget_Clicked_Event_Connect(btn_close, Quit_Parent_Window, NULL);
+	Widget_Event_Connect( btn_close, EVENT_CLICKED, Quit_Parent_Window );
 	/* 释放图形数据 */
 	Graph_Free(&btn_highlight);
 	Graph_Free(&btn_down);
@@ -384,13 +383,13 @@ Window_Init(LCUI_Widget *win_p)
 	Widget_Resize(win_p, Size(100, 50));
 	Widget_Show(btn_close);
 	/* 关联拖动事件，让鼠标能够拖动标题栏并使窗口移动 */
-	Widget_Drag_Event_Connect(titlebar, Move_Window); 
+	Widget_Event_Connect(titlebar, EVENT_DRAG, Move_Window );
 	/* 
 	 * 由于需要在窗口获得/失去焦点时进行相关处理，因此需要将回调函数 与部件
 	 * 的FOCUS_IN和FOCUS_OUT事件 进行关联
 	 * */
-	Widget_FocusOut_Event_Connect( win_p, Window_FocusOut, NULL );
-	Widget_FocusIn_Event_Connect( win_p, Window_FocusIn, NULL );
+	Widget_Event_Connect( win_p, EVENT_FOCUS_OUT, Window_FocusOut );
+	Widget_Event_Connect( win_p, EVENT_FOCUS_IN, Window_FocusIn );
 }
 
 static void 

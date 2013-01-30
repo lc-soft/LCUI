@@ -169,11 +169,11 @@ int RadioButton_Is_Off(LCUI_Widget *widget)
 	return 1;
 }
 
-void Switch_RadioButton_State(LCUI_Widget *widget, void *arg)
 /* 
  * 功能：切换单选框的状态
  * 说明：这个状态，指的是打勾与没打勾的两种状态
  *  */
+void Switch_RadioButton_State(LCUI_Widget *widget, LCUI_WidgetEvent *arg)
 { 
 	if(RadioButton_Is_Off(widget))
 		Set_RadioButton_On(widget); 
@@ -247,7 +247,7 @@ RadioButton_Init(LCUI_Widget *widget)
 	Widget_Show(container[0]);
 	Widget_Show(container[1]);
 	
-	Widget_Clicked_Event_Connect(widget, Switch_RadioButton_State, NULL);
+	Widget_Event_Connect( widget, EVENT_CLICKED, Switch_RadioButton_State );
 	
 	valid_state = (WIDGET_STATE_NORMAL | WIDGET_STATE_ACTIVE);
 	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);

@@ -78,6 +78,12 @@ int CheckBox_Is_On(LCUI_Widget *widget);
 int CheckBox_Is_Off(LCUI_Widget *widget);
 /* 功能：检测复选框是否未选中 */ 
 
+/* 
+ * 功能：切换复选框的状态
+ * 说明：这个状态指的是打勾与没打勾的两种状态
+ *  */
+void Switch_CheckBox_State(LCUI_Widget *widget, LCUI_WidgetEvent *event);
+
 void CheckBox_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size);
 /* 功能：设定复选框中的图像框的尺寸 */ 
 
