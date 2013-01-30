@@ -5,17 +5,17 @@
 #include <memory.h>
 
 int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
-/* ¹¦ÄÜ£º»æÖÆ½ø¶ÈÌõµÄ¿Õ²Û */
+/* åŠŸèƒ½ï¼šç»˜åˆ¶è¿›åº¦æ¡çš„ç©ºæ§½ */
 {
 	if(width < 4 || height < 4) {
 		return -1;
 	}
 	graph->have_alpha = IS_TRUE;
-	Graph_Create(graph, width, height); /* ÉêÇëÄÚ´æ */
-	Graph_Fill_Color(graph, RGB(250,250,250));/* Ìî³ä°×É« */
+	Graph_Create(graph, width, height); /* ç”³è¯·å†…å­˜ */
+	Graph_Fill_Color(graph, RGB(250,250,250));/* å¡«å……ç™½è‰² */
 	Graph_Fill_Alpha(graph, 255);
 	
-	/* ËÄ¸ö½ÇÉÏµÄÒ»¸öÏñËØµãÍêÈ«Í¸Ã÷ */
+	/* å››ä¸ªè§’ä¸Šçš„ä¸€ä¸ªåƒç´ ç‚¹å®Œå…¨é€æ˜ */
 	graph->rgba[3][0] = 0;
 	graph->rgba[3][width-1] = 0;
 	graph->rgba[3][width*(height-1)] = 0;
@@ -23,7 +23,7 @@ int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 	
 	int i, n;
 	unsigned char c;
-	/* »æÖÆ×ó±ßºÍÓÒ±ßµÄÊúÏßÌõ */
+	/* ç»˜åˆ¶å·¦è¾¹å’Œå³è¾¹çš„ç«–çº¿æ¡ */
 	for(i=0; i<height; ++i)
 	{
 		n = i*width; 
@@ -44,7 +44,7 @@ int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 		graph->rgba[2][n-1] = 230;
 	}
 	
-	/* »æÖÆ¶¥¶ËµÄÏßÌõ */
+	/* ç»˜åˆ¶é¡¶ç«¯çš„çº¿æ¡ */
 	memset(graph->rgba[0], 180, width);
 	memset(graph->rgba[1], 180, width);
 	memset(graph->rgba[2], 180, width);
@@ -53,7 +53,7 @@ int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 	memset(graph->rgba[1]+width+1, 240, width-2); 
 	memset(graph->rgba[2]+width+1, 240, width-2); 
 	
-	/* »æÖÆµ×¶ËµÄÏßÌõ */
+	/* ç»˜åˆ¶åº•ç«¯çš„çº¿æ¡ */
 	n = width*(height-1);
 	memset(graph->rgba[0]+n, 140, width);
 	memset(graph->rgba[1]+n, 140, width);

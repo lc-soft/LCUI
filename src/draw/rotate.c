@@ -16,43 +16,43 @@ static double radian(int angle)
 
 int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 /* 
- * ¹¦ÄÜ£ºĞı×ªÍ¼ĞÎ
- * ËµÃ÷£ºÖ¸¶¨Ğı×ªÖĞĞÄµã×ø±êÒÔ¼°Ğı×ª½Ç¶È£¬¼´¿ÉµÃµ½Ğı×ªºóµÄÍ¼ĞÎ
- * ±¾Ô´´úÂë²Î¿¼×Ô»¥ÁªÍøÏà¹Ø´úÂë
- * Ëã·¨ÓĞ´ıÓÅ»¯ÍêÉÆ¡£
+ * åŠŸèƒ½ï¼šæ—‹è½¬å›¾å½¢
+ * è¯´æ˜ï¼šæŒ‡å®šæ—‹è½¬ä¸­å¿ƒç‚¹åæ ‡ä»¥åŠæ—‹è½¬è§’åº¦ï¼Œå³å¯å¾—åˆ°æ—‹è½¬åçš„å›¾å½¢
+ * æœ¬æºä»£ç å‚è€ƒè‡ªäº’è”ç½‘ç›¸å…³ä»£ç 
+ * ç®—æ³•æœ‰å¾…ä¼˜åŒ–å®Œå–„ã€‚
  */
 {
 	if(!Graph_Valid(src)) {
 		return -1;
 	}
-	// Ô´Í¼ÏñµÄ¿í¶ÈºÍ¸ß¶È
+	// æºå›¾åƒçš„å®½åº¦å’Œé«˜åº¦
 	int	width, height;
-	// Ğı×ªºóÍ¼ÏñµÄ¿í¶ÈºÍ¸ß¶È   
+	// æ—‹è½¬åå›¾åƒçš„å®½åº¦å’Œé«˜åº¦   
 	int	new_width,new_height; 
-	// Ğı×ª½Ç¶È£¨»¡¶È£©   
+	// æ—‹è½¬è§’åº¦ï¼ˆå¼§åº¦ï¼‰   
 	float   fRotateAngle; 
-	// Ğı×ª½Ç¶ÈµÄÕıÏÒºÍÓàÏÒ   
+	// æ—‹è½¬è§’åº¦çš„æ­£å¼¦å’Œä½™å¼¦   
 	float   fSina, fCosa; 
-	// Ô´Í¼ËÄ¸ö½ÇµÄ×ø±ê£¨ÒÔÍ¼ÏñÖĞĞÄÎª×ø±êÏµÔ­µã£©   
+	// æºå›¾å››ä¸ªè§’çš„åæ ‡ï¼ˆä»¥å›¾åƒä¸­å¿ƒä¸ºåæ ‡ç³»åŸç‚¹ï¼‰   
 	float   fSrcX1,fSrcY1,fSrcX2,fSrcY2,fSrcX3,fSrcY3,fSrcX4,fSrcY4;
-	// Ğı×ªºóËÄ¸ö½ÇµÄ×ø±ê£¨ÒÔÍ¼ÏñÖĞĞÄÎª×ø±êÏµÔ­µã£©   
+	// æ—‹è½¬åå››ä¸ªè§’çš„åæ ‡ï¼ˆä»¥å›¾åƒä¸­å¿ƒä¸ºåæ ‡ç³»åŸç‚¹ï¼‰   
 	float   fDstX1,fDstY1,fDstX2,fDstY2,fDstX3,fDstY3,fDstX4,fDstY4;
 	
-	// Á½¸öÖĞ¼ä³£Á¿   
+	// ä¸¤ä¸ªä¸­é—´å¸¸é‡   
 	float   f1,f2; 
-	// »ñÈ¡Í¼ÏñµÄ"¿í¶È"£¨4µÄ±¶Êı£©   
+	// è·å–å›¾åƒçš„"å®½åº¦"ï¼ˆ4çš„å€æ•°ï¼‰   
 	width = src->width; 
-	// »ñÈ¡Í¼ÏñµÄ¸ß¶È   
+	// è·å–å›¾åƒçš„é«˜åº¦   
 	height = src->height;   
 	   
-	// ½«Ğı×ª½Ç¶È´Ó¶È×ª»»µ½»¡¶È   
+	// å°†æ—‹è½¬è§’åº¦ä»åº¦è½¬æ¢åˆ°å¼§åº¦   
 	fRotateAngle = (float) radian(rotate_angle); 
-	// ¼ÆËãĞı×ª½Ç¶ÈµÄÕıÏÒ   
+	// è®¡ç®—æ—‹è½¬è§’åº¦çš„æ­£å¼¦   
 	fSina = (float) sin((double)fRotateAngle); 
-	// ¼ÆËãĞı×ª½Ç¶ÈµÄÓàÏÒ   
+	// è®¡ç®—æ—‹è½¬è§’åº¦çš„ä½™å¼¦   
 	fCosa = (float) cos((double)fRotateAngle);   
 	
-	// ¼ÆËãÔ­Í¼µÄËÄ¸ö½ÇµÄ×ø±ê£¨ÒÔÍ¼ÏñÖĞĞÄÎª×ø±êÏµÔ­µã£©   
+	// è®¡ç®—åŸå›¾çš„å››ä¸ªè§’çš„åæ ‡ï¼ˆä»¥å›¾åƒä¸­å¿ƒä¸ºåæ ‡ç³»åŸç‚¹ï¼‰   
 	fSrcX1 = (float) (- (width  - 1) / 2);   
 	fSrcY1 = (float) (  (height - 1) / 2);   
 	fSrcX2 = (float) (  (width  - 1) / 2);   
@@ -62,7 +62,7 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 	fSrcX4 = (float) (  (width  - 1) / 2);   
 	fSrcY4 = (float) (- (height - 1) / 2);   
 	   
-	// ¼ÆËãĞÂÍ¼ËÄ¸ö½ÇµÄ×ø±ê£¨ÒÔÍ¼ÏñÖĞĞÄÎª×ø±êÏµÔ­µã£©   
+	// è®¡ç®—æ–°å›¾å››ä¸ªè§’çš„åæ ‡ï¼ˆä»¥å›¾åƒä¸­å¿ƒä¸ºåæ ‡ç³»åŸç‚¹ï¼‰   
 	fDstX1 =  fCosa * fSrcX1 + fSina * fSrcY1;   
 	fDstY1 = -fSina * fSrcX1 + fCosa * fSrcY1;   
 	fDstX2 =  fCosa * fSrcX2 + fSina * fSrcY2;   
@@ -72,40 +72,40 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 	fDstX4 =  fCosa * fSrcX4 + fSina * fSrcY4;   
 	fDstY4 = -fSina * fSrcX4 + fCosa * fSrcY4;   
 	   
-	// ¼ÆËãĞı×ªºóµÄÍ¼ÏñÊµ¼Ê¿í¶È   
+	// è®¡ç®—æ—‹è½¬åçš„å›¾åƒå®é™…å®½åº¦   
 	new_width  = (long) ( max( fabs(fDstX4 - fDstX1), fabs(fDstX3 - fDstX2) ) + 0.5);   
-	// ¼ÆËãĞı×ªºóµÄÍ¼Ïñ¸ß¶È   
+	// è®¡ç®—æ—‹è½¬åçš„å›¾åƒé«˜åº¦   
 	new_height = (long) ( max( fabs(fDstY4 - fDstY1), fabs(fDstY3 - fDstY2) )  + 0.5);   
 	   
-	// Á½¸ö³£Êı£¬ÕâÑù²»ÓÃÒÔºóÃ¿´Î¶¼¼ÆËãÁË   
+	// ä¸¤ä¸ªå¸¸æ•°ï¼Œè¿™æ ·ä¸ç”¨ä»¥åæ¯æ¬¡éƒ½è®¡ç®—äº†   
 	f1 = (float) (-0.5*(new_width-1)*fCosa-0.5*(new_height-1)*fSina+0.5*(width-1)); 
 	f2 = (float) (0.5*(new_width-1)*fSina-0.5*(new_height-1)*fCosa+0.5*(height-1));   
 	   
 	if(Graph_Valid(des)) {
-		Graph_Free(des);/* ÏÈ½«Õâ¸öÄÚ´æÊÍ·Å */
+		Graph_Free(des);/* å…ˆå°†è¿™ä¸ªå†…å­˜é‡Šæ”¾ */
 	}
 	des->have_alpha = src->have_alpha;
-	// ·ÖÅäÄÚ´æ£¬´¢´æĞÂµÄÍ¼ĞÎ
+	// åˆ†é…å†…å­˜ï¼Œå‚¨å­˜æ–°çš„å›¾å½¢
 	if(Graph_Create(des, new_width, new_height) != 0) {
 		return -1;
 	}
 
 	long m, n, z;
 	long src_x, src_y, des_x, des_y;
-	// Õë¶ÔÍ¼ÏñÃ¿ĞĞ½øĞĞ²Ù×÷
+	// é’ˆå¯¹å›¾åƒæ¯è¡Œè¿›è¡Œæ“ä½œ
 	for(des_y = 0; des_y < new_height; ++des_y) {
 		m = new_width * des_y;
-		// Õë¶ÔÍ¼ÏñÃ¿ÁĞ½øĞĞ²Ù×÷   
+		// é’ˆå¯¹å›¾åƒæ¯åˆ—è¿›è¡Œæ“ä½œ   
 		for(des_x = 0; des_x < new_width; ++des_x) {
 			n = m + des_x;
-			// ¼ÆËã¸ÃÏóËØÔÚÔ´Í¼ÖĞµÄ×ø±ê   
+			// è®¡ç®—è¯¥è±¡ç´ åœ¨æºå›¾ä¸­çš„åæ ‡   
 			src_y = (long) (-((float) des_x) * fSina + ((float) des_y) * fCosa + f2 + 0.5);   
 			src_x = (long) ( ((float) des_x) * fCosa + ((float) des_y) * fSina + f1 + 0.5);   
 			   
-			// ÅĞ¶ÏÊÇ·ñÔÚÔ´Í¼·¶Î§ÄÚ   
+			// åˆ¤æ–­æ˜¯å¦åœ¨æºå›¾èŒƒå›´å†…   
 			if( (src_x >= 0) && (src_x < width) 
 			&& (src_y >= 0) && (src_y < height)) {
-				// Ö¸ÏòÔ´DIBµÚi0ĞĞ£¬µÚj0¸öÏóËØµÄÖ¸Õë
+				// æŒ‡å‘æºDIBç¬¬i0è¡Œï¼Œç¬¬j0ä¸ªè±¡ç´ çš„æŒ‡é’ˆ
 				z = width * src_y + src_x;
 				des->rgba[0][n] = src->rgba[0][z];
 				des->rgba[1][n] = src->rgba[1][z];
@@ -114,7 +114,7 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 					des->rgba[3][n] = src->rgba[3][z];
 				}
 			} else {
-				// ¶ÔÓÚÔ´Í¼ÖĞÃ»ÓĞµÄÏóËØ£¬Ö±½Ó¸³ÖµÎª255   
+				// å¯¹äºæºå›¾ä¸­æ²¡æœ‰çš„è±¡ç´ ï¼Œç›´æ¥èµ‹å€¼ä¸º255   
 				des->rgba[0][n] = 255;
 				des->rgba[1][n] = 255;
 				des->rgba[2][n] = 255;

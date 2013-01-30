@@ -63,11 +63,23 @@ fill_pixel( uchar_t **buff, int pos, LCUI_RGB color )
 __attribute__((always_inline));
 
 extern inline void 
+mix_pixel( uchar_t **buff, int pos, LCUI_RGB color, uchar_t alpha ) 
+__attribute__((always_inline));
+
+extern inline void 
 fill_pixel( uchar_t **buff, int pos, LCUI_RGB color ) 
 {
 	buff[0][pos] = color.red;
 	buff[1][pos] = color.green;
 	buff[2][pos] = color.blue;
+}
+
+extern inline void
+mix_pixel( uchar_t **buff, int pos, LCUI_RGB color, uchar_t alpha ) 
+{
+	ALPHA_BLENDING( color.red, buff[0][pos], alpha );
+	ALPHA_BLENDING( color.blue, buff[1][pos], alpha );
+	ALPHA_BLENDING( color.green, buff[2][pos], alpha );
 }
 
 static int
@@ -186,6 +198,8 @@ Graph_Draw_RoundBorder_TopLeft(
 	LCUI_Rect real_rect;
 	int pos, center_pos, y, x, i, n;
 	int max_x, max_y, min_x, min_y;
+	double tmp_pos;
+	uchar_t alpha[2];
 	
 	if( line_width <= 0 && !hide_outarea ) {
 		return 1;
@@ -224,8 +238,10 @@ Graph_Draw_RoundBorder_TopLeft(
 		if( radius-x >= max_x || radius-x < min_x ) {
 			continue;
 		}
-		
-		y = sqrt( pow(radius, 2) - x*x );
+		tmp_pos = sqrt( pow(radius, 2) - x*x );
+		y = (int)tmp_pos;
+		alpha[1] = 255/(tmp_pos - y);
+		alpha[0] = 255-alpha[1];
 		
 		if( line_width > 0 && radius-y >= min_y 
 		 && radius-y <= max_y ) {
@@ -274,7 +290,7 @@ Graph_Draw_RoundBorder_TopLeft(
 			/* 重新确定需要填充的像素点的个数n */
 			n = max_y - radius + y;
 		}
-		/* 开始填充当前点下边的n-1个像素点 */
+		/* 开始填充当前点下边的n-2个像素点 */
 		for(i=0; i<n-1; ++i,pos+=des->width) {
 			fill_pixel( des->rgba, pos, line_color );
 			if( des->have_alpha ) {
