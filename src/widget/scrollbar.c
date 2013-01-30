@@ -141,8 +141,8 @@ ScrollBar_Init( LCUI_Widget *widget )
 	Widget_SetBorder( widget,
 	 Border(1, BORDER_STYLE_SOLID, RGB(100,100,100)) );
 	Widget_SetPadding( widget, Padding(1,1,1,1) );
-	Set_Widget_Backcolor( widget, RGB(200,200,200) );
-	Set_Widget_BG_Mode( widget, BG_MODE_FILL_BACKCOLOR );
+	Widget_SetBackgroundColor( widget, RGB(200,200,200) );
+	Widget_SetBackgroundTransparent( widget, FALSE );
 	Widget_Show( scrollbar->widget );
 	Widget_Drag_Event_Connect( scrollbar->widget, ScrollBar_Drag );
 }

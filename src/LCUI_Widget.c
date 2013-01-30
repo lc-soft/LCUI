@@ -1292,6 +1292,14 @@ void *WidgetPrivData_New( LCUI_Widget *widget, size_t size )
 	return widget->private_data;
 }
 
+static void Widget_BackgroundInit( LCUI_Widget *widget )
+{
+	Graph_Init( &widget->background.image );
+	widget->background.color = RGB(255,255,255);
+	widget->background.transparent = TRUE;
+	widget->background.layout = LAYOUT_NONE;
+}
+
 /* 
  * 功能：创建指定类型的部件
  * 返回值：成功则部件的指针，失败则返回NULL
@@ -1328,10 +1336,8 @@ LCUI_Widget *Widget_New( const char *widget_type )
 	widget->dock			= DOCK_TYPE_NONE;
 	widget->offset			= Pos(0, 0); 
 	widget->pos_type		= POS_TYPE_ABSOLUTE;
-	widget->background.color	= RGB(238,243,250);
 	widget->color			= RGB(0,0,0);
 	widget->private_data		= NULL;
-	widget->background.transparent	= BG_MODE_TRANSPARENT;
 	widget->valid_state		= 0;
 	widget->clickable_mode		= 0;
 	widget->clickable_area_alpha	= 0;
@@ -1372,6 +1378,9 @@ LCUI_Widget *Widget_New( const char *widget_type )
 	Border_Init( &widget->border );
 	Padding_Init( &widget->padding );
 	Margin_Init( &widget->margin );
+	
+	Widget_BackgroundInit( widget );
+	
 	/* 创建两个图层 */
 	widget->main_glayer = GraphLayer_New();
 	widget->client_glayer = GraphLayer_New();
@@ -1389,8 +1398,7 @@ LCUI_Widget *Widget_New( const char *widget_type )
 	/* 显示图层 */
 	GraphLayer_Show( widget->client_glayer );
 	
-	Graph_Init( &widget->background.image );	/* 初始化背景图数据 */
-	RectQueue_Init( &widget->invalid_area );	/* 初始化无效区域记录 */
+	RectQueue_Init( &widget->invalid_area ); /* 初始化无效区域记录 */
 	EventSlots_Init( &widget->event );	/* 初始化部件的事件数据队列 */
 	WidgetQueue_Init( &widget->child );	/* 初始化子部件集 */
 	WidgetData_Init( &widget->data_buff );	/* 初始化数据更新队列 */ 
@@ -1460,15 +1468,6 @@ static LCUI_Pos Widget_CountPos( LCUI_Widget *widget )
 LCUI_Pos Widget_GetGlobalPos(LCUI_Widget *widget)
 {
 	return Widget_CountPos(widget);
-}
-
-void Set_Widget_BG_Mode(LCUI_Widget *widget, BG_MODE bg_mode)
-/*
- * 功能：改变部件的背景模式
- * 说明：背景模式决定了部件在没有背景图的时候是使用背景色填充还是完全透明。
- **/
-{
-	widget->background.transparent = bg_mode;
 }
 
 void Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode )
@@ -1601,51 +1600,40 @@ void Widget_SetBorder(LCUI_Widget *widget, LCUI_Border border)
 	Widget_InvalidArea( widget, Widget_GetRect(widget) );
 }
 
-void Set_Widget_Backcolor(LCUI_Widget *widget, LCUI_RGB color)
-/* 功能：设定部件的背景色 */
-{
-	widget->background.color = color;
-	Widget_Draw(widget);
-	Refresh_Widget(widget);
-}
-
-int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag)
-/* 功能：为部件填充背景图像 */
-{
-	if( !img ) {
-		Graph_Free(&widget->background.image);
-	} else {
-		widget->background.align = flag;
-		/* 填充背景图像 */
-		Graph_Copy(&widget->background.image, img);
-	}
-	Widget_Draw(widget); 
-	return 0;
-}
-
 /* 设定部件的背景图像 */
 void Widget_SetBackgroundImage( LCUI_Widget *widget, LCUI_Graph *img )
 {
-	
+	if(!widget || !Graph_Valid(img)) {
+		return;
+	}
+	widget->background.image = *img;
+}
+
+/* 设定背景图的布局 */
+void Widget_SetBackgroundLayout( LCUI_Widget *widget, LAYOUT_TYPE layout )
+{
+	if(!widget) {
+		return;
+	}
+	widget->background.layout = layout;
 }
 
 /* 设定部件的背景颜色 */
 void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color )
 {
-	
+	if(!widget) {
+		return;
+	}
+	widget->background.color = color;
 }
 
-/* 设定部件的背景图像对齐方式 */
-void Widget_SetBackgroundAlign(	LCUI_Widget *widget, ALIGN_TYPE align, 
-				LCUI_Pos offset )
+/* 设定部件背景是否透明 */
+void Widget_SetBackgroundTransparent( LCUI_Widget *widget, BOOL flag )
 {
-	
-}
-
-/* 设定部件的背景图像的重复方式 */
-void Widget_SetBackgroundRepeat( LCUI_Widget *widget, REPEAT_TYPE repeat )
-{
-	
+	if(!widget) {
+		return;
+	}
+	widget->background.transparent = flag;
 }
 
 void Widget_Enable(LCUI_Widget *widget)
@@ -1920,41 +1908,36 @@ void Widget_ExecUpdate(LCUI_Widget *widget)
 	WidgetFunc_Call( widget, FUNC_TYPE_UPDATE );
 }
 
+void Widget_ExecDrawBackground( LCUI_Widget *widget )
+{
+	LCUI_Graph *graph;
+	LCUI_Background *bg;
+	
+	graph = Widget_GetSelfGraph( widget );
+	bg = &widget->background;
+	/* 如果背景透明那就不绘制背景了 */
+	if(widget->background.transparent) {
+		Graph_Fill_Alpha( graph, 0 );
+		return;
+	}
+	Graph_Fill_Alpha( graph, 255 );
+	Graph_Fill_Image( graph, &bg->image, bg->layout, bg->color );
+}
+
 void Widget_ExecDraw(LCUI_Widget *widget)
 /* 功能：执行部件图形更新操作 */
 { 
 	LCUI_Graph *graph;
-	
 	if( !widget ) {
 		return;
 	}
-	
-	graph = Widget_GetSelfGraph( widget );
-	if(Graph_Valid(&widget->background.image)) {/* 如果有背景图 */
-		/* alpha通道中的每个像素的透明值为255，整个部件的图形不透明 */
-		Graph_Fill_Alpha( graph, 255 );
-		Graph_Fill_Image( graph, 
-				&widget->background.image, 
-				widget->background.align,
-				widget->background.color
-		); /* 填充背景色 */
-	} else {/* 否则根据背景模式来处理 */ 
-		switch(widget->background.transparent) {
-		    case BG_MODE_FILL_BACKCOLOR: /* 填充背景色 */
-			Graph_Fill_Alpha( graph, 255 );
-			Graph_Fill_Color( graph, widget->background.color );
-			break;
-				
-		    case BG_MODE_TRANSPARENT: /* 完全透明 */
-			Graph_Fill_Alpha( graph, 0 );
-			break;
-		    default:break;
-		}
-	}
-	
+	/* 绘制背景图 */
+	Widget_ExecDrawBackground( widget );
 	WidgetFunc_Call( widget, FUNC_TYPE_DRAW );
+	graph = Widget_GetSelfGraph( widget );
 	/* 绘制边框线 */
 	Graph_Draw_Border( graph, widget->border );
+	Graph_Update_Attr( graph );
 }
 
 /* 获取指向部件自身图形数据的指针 */

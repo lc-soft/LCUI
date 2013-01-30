@@ -78,7 +78,7 @@ static void Menu_Init(LCUI_Widget *widget)
 	Graph_Draw_Border( graph, 
 	 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)) );
 	
-	Set_Widget_BG_Mode(widget, BG_MODE_FILL_BACKCOLOR);
+	Widget_SetBackgroundTransparent( widget, FALSE );
 	//LCUI_MouseEvent_Connect(Auto_Hide_Menu, MOUSE_EVENT_MOVE);
 }
 

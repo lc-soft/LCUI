@@ -349,8 +349,8 @@ TextBox_Init( LCUI_Widget *widget )
 	
 	TextLayer_Using_StyleTags( Label_Get_TextLayer(textbox->text), FALSE );
 	Widget_SetPadding( widget, Padding(2,2,2,2) );
-	Set_Widget_Backcolor( textbox->cursor, RGB(0,0,0) );
-	Set_Widget_BG_Mode( textbox->cursor, BG_MODE_FILL_BACKCOLOR );
+	Widget_SetBackgroundColor( textbox->cursor, RGB(0,0,0) );
+	Widget_SetBackgroundTransparent( widget, FALSE );
 	
 	Widget_Resize( textbox->cursor, Size(1, 14) );
 	/* 设置可点击区域的alpha值要满足的条件 */

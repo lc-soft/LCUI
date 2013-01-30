@@ -90,7 +90,7 @@ ProgressBar_Init(LCUI_Widget *widget)
 	Widget_Container_Add( f_pb, img_pb );
 	Widget_Container_Add( widget, f_pb ); 
 	/* 没有背景图时就填充背景色 */
-	Set_Widget_BG_Mode( widget, BG_MODE_FILL_BACKCOLOR );
+	Widget_SetBackgroundTransparent( widget, FALSE );
 	/* 进度条为经典风格 */
 	Widget_SetStyleName( widget, "classic" ); 
 	
@@ -150,8 +150,8 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 		}
 		Graph_Fill_Color(&pb->fore_graph, RGB(80,80,200));
 		Graph_Fill_Alpha(&pb->fore_graph, 255);
-		Set_Widget_Backcolor( widget, RGB(255,255,255) );
-		Set_Widget_BG_Mode( widget, BG_MODE_FILL_BACKCOLOR );
+		Widget_SetBackgroundColor( widget, RGB(255,255,255) );
+		Widget_SetBackgroundTransparent( widget, FALSE );
 		Widget_SetBorder( widget,
 		 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)) );
 		Widget_SetPadding( widget, Padding(1,1,1,1) );

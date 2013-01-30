@@ -153,7 +153,8 @@ Window_TitleBar_Init(LCUI_Widget *titlebar)
 	Widget_SetAlign(t->icon_box, ALIGN_MIDDLE_LEFT, Pos(0,0));
 	Widget_SetAlign(t->label, ALIGN_MIDDLE_LEFT, Pos(2,-2));
 	Load_Graph_Default_TitleBar_BG(&img);
-	Set_Widget_Background_Image(titlebar, &img, LAYOUT_STRETCH);
+	Widget_SetBackgroundImage( titlebar, &img );
+	Widget_SetBackgroundLayout( titlebar, LAYOUT_STRETCH );
 }
 
 LCUI_Size 
@@ -242,12 +243,13 @@ union_draw_method:;
 		 Border(1, BORDER_STYLE_SOLID, border_color));
 		Widget_SetBorder( client_area,
 		 Border(1, BORDER_STYLE_SOLID, border_color));
-		Set_Widget_Backcolor( win_p, back_color );
+		Widget_SetBackgroundColor( win_p, back_color );
 		Graph_Fill_Color( graph, back_color );
-		Set_Widget_Backcolor( client_area, RGB(255,255,255) );
-		Set_Widget_Background_Image( titlebar, NULL, 0 );
-		Set_Widget_BG_Mode( titlebar, BG_MODE_TRANSPARENT ); 
-		Set_Widget_BG_Mode( client_area, BG_MODE_FILL_BACKCOLOR ); 
+		Widget_SetBackgroundColor( client_area, RGB(255,255,255) );
+		Widget_SetBackgroundImage( titlebar, NULL );
+		Widget_SetBackgroundLayout( titlebar, 0 );
+		Widget_SetBackgroundTransparent( titlebar, TRUE );
+		Widget_SetBackgroundTransparent( client_area, FALSE );
 		Widget_SetPadding( win_p, Padding(1,4,4,4) );
 		Widget_SetPadding( client_area, Padding(1,1,1,1) );
 		size = Widget_GetContainerSize( win_p );
@@ -370,7 +372,7 @@ Window_Init(LCUI_Widget *win_p)
 	win->titlebar = titlebar;
 	win->btn_close = btn_close;
 	/* 没有背景图就填充背景色 */
-	Set_Widget_BG_Mode(win_p, BG_MODE_FILL_BACKCOLOR);
+	Widget_SetBackgroundTransparent( win_p, FALSE );
 	/* 部件的风格ID */
 	win_p->style_id = WINDOW_STYLE_PURE_BLUE;
 	

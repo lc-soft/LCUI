@@ -1096,21 +1096,23 @@ int Graph_Put_Image(LCUI_Graph *graph, LCUI_Graph *image, int flag)
 	return 0;
 }
 
-int Graph_Fill_Image(LCUI_Graph *graph, LCUI_Graph *bg, int flag, LCUI_RGB color)
-/* 功能：为指定图形填充背景图像 */
+/* 为指定图形填充背景图像 */
+int Graph_Fill_Image(	LCUI_Graph *graph,	LCUI_Graph *bg, 
+			int layout,		LCUI_RGB color )
 {
-	Graph_Fill_Color(graph, color); /* 填充背景色 */
+	LCUI_Pos pos;
+	LCUI_Graph temp_bg;
+	
+	/* 填充背景色 */
+	Graph_Fill_Color(graph, color); 
 	if(!Graph_Valid(bg) || graph == NULL) {
 		return -1; 
 	}
 	
-	LCUI_Pos pos;
-	LCUI_Graph temp_bg;
-	
 	pos = Pos(0,0);
 	Graph_Init(&temp_bg);
 	
-	switch( flag ) {
+	switch( layout ) {
 	    case LAYOUT_ZOOM:/* 缩放 */
 		Graph_Zoom( bg, &temp_bg, DEFAULT,
 			Size(graph->width, graph->height) );

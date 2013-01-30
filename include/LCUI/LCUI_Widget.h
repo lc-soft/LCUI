@@ -56,20 +56,11 @@ typedef enum _FuncType
 /****************************************************/
 
 /******************************* 部件 **********************************/
-typedef enum {
-	NO_REPEAT,	/* 不重复排列 */
-	REPEAT,		/* 重复排列 */
-	REPEAT_X,	/* 在X轴重复排列 */
-	REPEAT_Y,	/* 在Y轴重复排列 */
-} REPEAT_TYPE;
-
 typedef struct {
 	BOOL transparent; /* 是否透明 */
 	LCUI_Graph image; /* 背景图 */
 	LCUI_RGB color; /* 背景色 */
-	REPEAT_TYPE repeat; /* 背景图的重复排列模式 */
-	ALIGN_TYPE align; /* 背景图的对其方式 */
-	LCUI_Pos offset; /* 偏移距离 */
+	ALIGN_TYPE layout; /* 背景图的布局 */
 } LCUI_Background;
 
 typedef struct _LCUI_Widget LCUI_Widget;
@@ -327,24 +318,17 @@ void Widget_LimitPos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos);
 void Widget_SetBorder(LCUI_Widget *widget, LCUI_Border border);
 /* 功能：设定部件的边框 */ 
 
-void Set_Widget_Backcolor(LCUI_Widget *widget, LCUI_RGB color);
-/* 功能：设定部件的背景色 */ 
-
-int Set_Widget_Background_Image(LCUI_Widget *widget, LCUI_Graph *img, int flag);
-/* 功能：为部件填充背景图像 */ 
-
 /* 设定部件的背景图像 */
 void Widget_SetBackgroundImage( LCUI_Widget *widget, LCUI_Graph *img );
+
+/* 设定背景图的布局 */
+void Widget_SetBackgroundLayout( LCUI_Widget *widget, LAYOUT_TYPE layout );
 
 /* 设定部件的背景颜色 */
 void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color );
 
-/* 设定部件的背景图像对齐方式 */
-void Widget_SetBackgroundAlign(	LCUI_Widget *widget, ALIGN_TYPE align, 
-				LCUI_Pos offset );
-
-/* 设定部件的背景图像的重复方式 */
-void Widget_SetBackgroundRepeat( LCUI_Widget *widget, REPEAT_TYPE repeat );
+/* 设定部件背景是否透明 */
+void Widget_SetBackgroundTransparent( LCUI_Widget *widget, BOOL flag );
 
 void Widget_Enable(LCUI_Widget *widget);
 /* 功能：启用部件 */ 
