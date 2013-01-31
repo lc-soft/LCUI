@@ -248,7 +248,7 @@ Exec_Update_PictureBox(LCUI_Widget *widget)
 		break;
 		
 	case SIZE_MODE_TILE:/* 平铺模式 */ 
-		Graph_Tile( pic_box->image, &graph, widget->size.w, widget->size.h); 
+		Graph_Tile( pic_box->image, &graph, TRUE );
 		break;
 		
 	case SIZE_MODE_CENTER:

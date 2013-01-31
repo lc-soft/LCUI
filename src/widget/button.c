@@ -49,6 +49,66 @@
 #include LC_MISC_H
 #include LC_INPUT_H
 
+static void Button_ExecDefalutUpdate( LCUI_Widget *widget )
+{
+	LCUI_Border border;
+	
+	border = Border(1, BORDER_STYLE_SOLID, RGB(170,170,170));
+	Border_Radius( &border, 2 );
+	Widget_SetBorder( widget, border );
+	Widget_SetBackgroundTransparent( widget, FALSE );
+	
+	switch( widget->state ) {
+	case WIDGET_STATE_NORMAL:
+		Widget_SetBackgroundColor( widget, RGB(225,225,225) );
+		break;
+	case WIDGET_STATE_OVERLAY :
+		Widget_SetBackgroundColor( widget, RGB(170,215,230) );
+		break;
+	case WIDGET_STATE_ACTIVE :
+		Widget_SetBackgroundColor( widget, RGB(255,180,45) );
+		break;
+	case WIDGET_STATE_DISABLE :
+		Widget_SetBackgroundColor( widget, RGB(200,200,200) );
+		break;
+		default : break;
+	}
+}
+
+static void Button_ExecCustomUpdate( LCUI_Widget *widget )
+{
+	LCUI_Button *btn;
+	LCUI_Graph *img;
+	
+	btn = Widget_GetPrivData( widget );
+	switch(widget->state) {
+	case WIDGET_STATE_NORMAL: img = &btn->btn_normal; break;
+	case WIDGET_STATE_OVERLAY: img = &btn->btn_over; break;
+	case WIDGET_STATE_ACTIVE: img = &btn->btn_down; break;
+	case WIDGET_STATE_DISABLE: img = &btn->btn_disable; break;
+	default : img = NULL; break;
+	}
+	/* 如果图像不可用，则使用默认样式 */
+	if( !Graph_Valid(img) ) {
+		Button_ExecDefalutUpdate( widget );
+	} else {
+		Widget_SetBackgroundImage( widget, img );
+		Widget_SetBackgroundTransparent( widget, TRUE );
+		Widget_SetBackgroundLayout( widget, LAYOUT_STRETCH );
+	}
+}
+
+static void Button_ExecUpdate( LCUI_Widget *widget )
+{
+	if(Strcmp(&widget->style_name, "custom") == 0) {
+		Button_ExecCustomUpdate( widget );
+	} else {
+		Button_ExecDefalutUpdate( widget );
+	}
+	Refresh_Widget( widget );
+}
+
+#ifdef use_this_code
 static void Exec_Update_Button(LCUI_Widget *widget)
 /* 功能：更新按钮的图形数据 */
 {
@@ -66,64 +126,7 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 			widget->state = WIDGET_STATE_DISABLE;
 		}
 		/* 判断按钮的状态，以选择相应的背景色 */
-		switch(widget->state) {
-		case WIDGET_STATE_NORMAL:
-			/* 如果已为按钮的normal状态设定有效的自定义图形 */
-			if(Graph_Valid(&button->btn_normal)) {
-				/* 缩放图像 */ 
-				Graph_Zoom(&button->btn_normal, graph, 
-						CUSTOM, widget->size);
-				no_bitmap = 0;/* 标记有位图 */
-			} else {
-				no_bitmap = 1;/* 标记无位图 */
-				/* 需填充的颜色，具体可用颜色选择器查看其它颜色的RGB值 */
-				color = RGB(100, 150, 255); 
-			}
-			break;
-		case WIDGET_STATE_OVERLAY :
-			if(Graph_Valid(&button->btn_over)) { 
-				Graph_Zoom(&button->btn_over, graph, 
-					CUSTOM, widget->size);
-				no_bitmap = 0;
-			} else {
-				no_bitmap = 1;
-				color = RGB(50, 180, 240); /* 浅蓝色 */
-			}
-			break;
-		case WIDGET_STATE_ACTIVE :
-			if(Graph_Valid(&button->btn_down)) {
-				/* 缩放图像 */
-				Graph_Zoom(&button->btn_down, graph, 
-					CUSTOM, widget->size);
-				no_bitmap = 0;
-			} else {
-				no_bitmap = 1;
-				color = RGB(255, 50, 50); /* 红色 */
-			}
-			break;
-		case WIDGET_STATE_DISABLE :
-			if(Graph_Valid(&button->btn_disable)) {
-				/* 缩放图像 */
-				Graph_Zoom(&button->btn_disable, graph, 
-					CUSTOM, widget->size );
-				no_bitmap = 0;
-			} else {
-				no_bitmap = 1;
-				color = RGB(190, 190, 190); /* 灰色 */
-			} 
-			break;
-			default : break;
-		}
-		if(no_bitmap == 1) {/* 如果没有位图 */
-			/* alpha通道的值改为255，不透明 */
-			Graph_Fill_Alpha(graph, 255);
-			/* 为部件填充背景图 */
-			Graph_Fill_Image( graph, 
-				&widget->background.image, 0, color);
-			/* 然后绘制按钮边框，实线，黑色的 */
-			Graph_Draw_Border(graph, 
-			 Border(1, BORDER_STYLE_SOLID, RGB(0,0,0)) );
-		}
+
 	}
 	else if(Strcmp(&widget->style_name, "menu_style") == 0){
 		/* 菜单默认使用的按钮风格 */ 
@@ -180,7 +183,7 @@ static void Exec_Update_Button(LCUI_Widget *widget)
 	Refresh_Widget(widget); 
 	DEBUG_MSG("Exec_Update_Button(): quit\n");
 }
-
+#endif
 
 static void Button_Init(LCUI_Widget *widget)
 /* 功能：初始化按钮部件的数据 */
@@ -200,7 +203,6 @@ static void Button_Init(LCUI_Widget *widget)
 	valid_state = (WIDGET_STATE_NORMAL | WIDGET_STATE_ACTIVE);
 	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);
 	Widget_SetValidState( widget, valid_state );
-	
 	button->label = Widget_New("label");/* 创建label部件 */ 
 	/* 将按钮部件作为label部件的容器 */
 	Widget_Container_Add(widget, button->label);
@@ -292,8 +294,7 @@ void Register_Button()
 	
 	/* 为部件类型关联相关函数 */
 	WidgetFunc_Add("button", Button_Init,		FUNC_TYPE_INIT);
-	WidgetFunc_Add("button", Exec_Update_Button,	FUNC_TYPE_UPDATE); 
-	WidgetFunc_Add("button", Exec_Update_Button,	FUNC_TYPE_DRAW); 
+	WidgetFunc_Add("button", Button_ExecUpdate,	FUNC_TYPE_UPDATE);
 	WidgetFunc_Add("button", Destroy_Button,	FUNC_TYPE_DESTROY); 
 }
 

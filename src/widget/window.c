@@ -456,7 +456,6 @@ Register_Window()
 	WidgetFunc_Add("titlebar", Window_TitleBar_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("window", Window_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("window", Exec_Update_Window, FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("window", Exec_Update_Window, FUNC_TYPE_DRAW);
 	WidgetFunc_Add("window", Show_Window, FUNC_TYPE_SHOW);
 	WidgetFunc_Add("window", Hide_Window, FUNC_TYPE_HIDE);
 	WidgetFunc_Add("window", Destroy_Window, FUNC_TYPE_DESTROY);
