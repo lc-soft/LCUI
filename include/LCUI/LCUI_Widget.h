@@ -42,6 +42,8 @@
 #ifndef __LCUI_WIDGET_H__
 #define __LCUI_WIDGET_H__
 
+#include LC_DRAW_BORDER_H
+
 /***************** 部件相关函数的类型 *******************/
 typedef enum _FuncType
 {
@@ -55,6 +57,49 @@ typedef enum _FuncType
 }FuncType;
 /****************************************************/
 
+/***************************** 定位类型 ********************************/
+typedef enum _POS_TYPE
+{
+	POS_TYPE_STATIC,
+	POS_TYPE_RELATIVE,
+	POS_TYPE_ABSOLUTE,
+	POS_TYPE_FIXED,
+}
+POS_TYPE;
+/*
+ * absolute:
+ * 	绝对定位，相对于 static 定位以外的第一个父元素进行定位。
+ * 	元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
+ * fixed：
+ * 	绝对定位，相对于屏幕进行定位。
+ * 	元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。 
+ * static：
+ * 	默认值。没有定位，忽略 top, bottom, left, right 或者 z-index。 
+ */
+/**********************************************************************/
+
+/*------------ 部件停靠类型 --------------*/
+typedef enum _DOCK_TYPE
+{
+	DOCK_TYPE_NONE,
+	DOCK_TYPE_TOP,
+	DOCK_TYPE_LEFT,
+	DOCK_TYPE_RIGHT,
+	DOCK_TYPE_FILL,
+	DOCK_TYPE_BOTTOM
+}
+DOCK_TYPE;
+/*---------------- END -----------------*/
+
+/*----------------- 部件的几种状态 ------------------*/
+typedef enum {
+	WIDGET_STATE_NORMAL = 1,	/* 普通状态 */
+	WIDGET_STATE_DISABLE = 1<<1,	/* 禁用状态 */
+	WIDGET_STATE_OVERLAY = 1<<2,	/* 被鼠标游标覆盖 */
+	WIDGET_STATE_ACTIVE = 1<<3,	/* 被鼠标点击 */
+} WIDGET_STATE;
+/*-------------------------------------------------*/
+
 /******************************* 部件 **********************************/
 typedef struct {
 	BOOL transparent; /* 是否透明 */
@@ -63,7 +108,6 @@ typedef struct {
 	ALIGN_TYPE layout; /* 背景图的布局 */
 } LCUI_Background;
 
-typedef struct _LCUI_Widget LCUI_Widget;
 
 struct _LCUI_Widget {
 	LCUI_ID app_id; /* 所属程序的ID */
@@ -272,12 +316,6 @@ void Widget_Destroy( LCUI_Widget *widget );
 
 LCUI_Pos Widget_GetGlobalPos(LCUI_Widget *widget);
 /* 功能：获取部件的全局坐标 */ 
-
-void Set_Widget_BG_Mode(LCUI_Widget *widget, BG_MODE bg_mode);
-/*
- * 功能：改变部件的背景模式
- * 说明：背景模式决定了部件在没有背景图的时候是使用背景色填充还是完全透明。
- **/ 
 
 void Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode );
 /* 设定部件可被点击的区域的透明度 */

@@ -180,15 +180,8 @@ int Get_Screen_Graph(LCUI_Graph *out);
 int Graph_Fill_Color(LCUI_Graph *pic, LCUI_RGB color);
 /* 功能：为传入的图形填充颜色 */ 
 
-int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height);
-/* 
- * 功能：平铺图形
- * 参数说明：
- * src 原始图形
- * out 填充后的图形
- * width 填充的宽度
- * height 填充的高度
- **/ 
+/* 平铺图形 */
+int Graph_Tile(	LCUI_Graph *src, LCUI_Graph *des_buff, BOOL replace );
 
 int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos);
 /* 

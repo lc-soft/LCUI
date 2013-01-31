@@ -102,6 +102,10 @@ Set_Focus( LCUI_Widget *widget );
  * EVENT_FOCUS_IN事件。
  * */ 
 
+/* 获取指定部件内的已获得焦点的子部件 */
+LCUI_Widget *
+Get_FocusWidget( LCUI_Widget *widget );
+
 BOOL 
 Cancel_Focus( LCUI_Widget *widget );
 /* 

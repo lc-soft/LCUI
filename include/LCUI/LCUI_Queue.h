@@ -187,6 +187,8 @@ int Queue_Cat( LCUI_Queue *des, LCUI_Queue *src );
 int Queue_Empty(LCUI_Queue *queue);
 /* 功能：检测队列是否为空 */ 
 
+/* 查找指定成员指针所在队列中的位置 */
+int Queue_Find( LCUI_Queue *queue, const void *p );
 /************************ LCUI_Queue End ******************************/
 
 /************************** WidgetQueue ********************************/ 
@@ -194,8 +196,6 @@ int Queue_Empty(LCUI_Queue *queue);
 void WidgetQueue_Init(LCUI_Queue *queue);
 /* 功能：初始化部件队列 */ 
 
-int WidgetQueue_Get_Pos(LCUI_Queue *queue, LCUI_Widget *widget);
-/* 功能：从部件队列中获取指定部件的排列位置 */ 
 /************************ WidgetQueue End ******************************/
 
 

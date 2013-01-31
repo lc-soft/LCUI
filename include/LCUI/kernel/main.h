@@ -53,7 +53,6 @@ typedef struct _LCUI_System
 	LCUI_Queue	press_key;	/* 保存已被按下的按键的键值 */
 	LCUI_Queue	dev_list;	/* 设备列表 */
 	LCUI_Queue	widget_list;	/* 部件队列，对应它的显示顺序 */
-	LCUI_Widget	*focus_widget;	/* 获得焦点的部件 */
 	LCUI_Queue	invalid_area;	/* 需要刷新的区域 */
 	LCUI_Queue	timer_list;	/* 定时器列表 */
 	LCUI_Queue	app_list;	/* LCUI程序列表 */ 
