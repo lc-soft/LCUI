@@ -1,7 +1,7 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
-
+#include LC_DRAW_BORDER_H
 #include <math.h>
 
 void Border_Init( LCUI_Border *border )

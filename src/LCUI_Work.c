@@ -64,8 +64,24 @@ FuncQueue_Init(LCUI_Queue *queue)
 /****************** 处理部件拖动/点击事件的相关代码 ************************/
 static LCUI_Widget *click_widget = NULL;
 static LCUI_Pos __offset_pos = {0, 0};  /* 点击部件时保存的偏移坐标 */ 
-static LCUI_WidgetEvent widget_event;
 
+static int 
+WidgetQueue_Get_Pos(LCUI_Queue *queue, LCUI_Widget *widget)
+/* 功能：从部件队列中获取指定部件的排列位置 */
+{
+	LCUI_Widget *temp;
+	int i, result = -1, total; 
+	
+	total = Queue_Get_Total(queue); 
+	for(i = 0; i < total; ++i) {
+		temp = Queue_Get(queue, i);
+		if(temp == widget) { 
+			result = i; 
+			break;
+		}
+	} 
+	return result;
+}
 /* 将回调函数与部件的指定事件进行关联 */
 int Widget_Event_Connect ( LCUI_Widget *widget, WidgetEventType event_id, 
 			void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) )
@@ -156,6 +172,7 @@ Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
 static void 
 _Start_DragEvent( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 {
+	LCUI_WidgetEvent widget_event;
 	widget_event.type = EVENT_DRAG;
 	widget_event.drag.cursor_pos.x = event->x;
 	widget_event.drag.cursor_pos.y = event->y;
@@ -173,6 +190,7 @@ _Start_DragEvent( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 static void 
 _Doing_DragEvent( LCUI_Widget *widget, LCUI_MouseMotionEvent *event )
 {
+	LCUI_WidgetEvent widget_event;
 	widget_event.type = EVENT_DRAG;
 	widget_event.drag.cursor_pos.x = event->x;
 	widget_event.drag.cursor_pos.y = event->y;
@@ -185,6 +203,7 @@ _Doing_DragEvent( LCUI_Widget *widget, LCUI_MouseMotionEvent *event )
 static void 
 _End_DragEvent( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 {
+	LCUI_WidgetEvent widget_event;
 	widget_event.type = EVENT_DRAG;
 	widget_event.drag.cursor_pos.x = event->x;
 	widget_event.drag.cursor_pos.y = event->y;
@@ -421,9 +440,9 @@ Widget_Event_Init()
 
 
 /*--------------------------- Focus Proc ------------------------------*/
+static LCUI_Widget *root_focus_widget = NULL;
 
-BOOL 
-Set_Focus( LCUI_Widget *widget )
+BOOL Set_Focus( LCUI_Widget *widget )
 /* 
  * 功能：为部件设置焦点
  * 说明：上个获得焦点的部件会得到EVENT_FOCUS_OUT事件，而当前获得焦点的部件会得到
@@ -448,7 +467,7 @@ Set_Focus( LCUI_Widget *widget )
 	if( widget->parent ) {
 		focus_widget = &widget->parent->focus_widget;
 	} else {
-		focus_widget = &LCUI_Sys.focus_widget; 
+		focus_widget = &root_focus_widget; 
 	}
 	if( *focus_widget ) {
 		/* 如果上次和这次的部件不一样 */
@@ -462,6 +481,56 @@ Set_Focus( LCUI_Widget *widget )
 	/* 保存新焦点位置 */
 	*focus_widget = widget;
 	return TRUE;
+}
+
+/* 获取指定部件内的已获得焦点的子部件 */
+LCUI_Widget *
+Get_FocusWidget( LCUI_Widget *widget )
+{
+	int i, focus_pos, total;
+	LCUI_Widget **focus_widget;
+	LCUI_Queue *queue_ptr;
+	
+	//printf( "Get_FocusWidget(）： widget: %p\n", widget );
+	//print_widget_info( widget );
+	if( !widget ) {
+		queue_ptr = &LCUI_Sys.widget_list;
+		focus_widget = &root_focus_widget;
+	} else {
+		/* 如果部件不需要焦点，则返回NULL */
+		if( !widget->focus ) {
+			return NULL;
+		}
+		queue_ptr = &widget->child;
+		focus_widget = &widget->focus_widget;
+	}
+	
+	if( !focus_widget ) { 
+		return NULL;
+	}
+	
+	total = Queue_Get_Total( queue_ptr );
+	if( total <= 0 ) {
+		return NULL;
+	}
+	focus_pos = WidgetQueue_Get_Pos( queue_ptr, *focus_widget );
+	if( focus_pos < 0 ) {
+		*focus_widget = NULL; 
+		return NULL;
+	}
+	/* 查找可获取焦点的有效部件 */
+	for( i=focus_pos; i<total; ++i ) {
+		widget = Queue_Get( queue_ptr, i ); 
+		if( widget && widget->focus ) {
+			break;
+		}
+	}
+	if( i>=total ) {
+		*focus_widget = NULL; 
+		widget = NULL;
+	}
+	
+	return widget;
 }
 
 BOOL 
@@ -484,7 +553,7 @@ Cancel_Focus( LCUI_Widget *widget )
 		focus_widget = &widget->parent->focus_widget;
 		queue_ptr = &widget->parent->child;
 	} else {
-		focus_widget = &LCUI_Sys.focus_widget;
+		focus_widget = &root_focus_widget;
 		queue_ptr = &LCUI_Sys.widget_list;
 	}
 	event.type = EVENT_FOCUS_OUT;
@@ -533,7 +602,7 @@ Reset_Focus( LCUI_Widget* widget )
 	if( widget ) {
 		focus_widget = &widget->focus_widget; 
 	} else {
-		focus_widget = &LCUI_Sys.focus_widget; 
+		focus_widget = &root_focus_widget; 
 	}
 	if( *focus_widget ) {
 		event.type = EVENT_FOCUS_OUT;

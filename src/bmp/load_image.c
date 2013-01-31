@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 static int detect_image(const char *filepath, LCUI_Graph *out)
-/* ¹¦ÄÜ£º¼ì²âÍ¼Æ¬¸ñÊ½£¬²¢½âÂëÍ¼Æ¬ */
+/* åŠŸèƒ½ï¼šæ£€æµ‹å›¾ç‰‡æ ¼å¼ï¼Œå¹¶è§£ç å›¾ç‰‡ */
 {
 	int result = 1;
 	if (result == 1) {
@@ -26,8 +26,8 @@ static int detect_image(const char *filepath, LCUI_Graph *out)
 
 int Load_Image(const char *filepath, LCUI_Graph *out)
 /* 
- * ¹¦ÄÜ£ºÔØÈëÖ¸¶¨Í¼Æ¬ÎÄ¼şµÄÍ¼ĞÎÊı¾İ
- * ËµÃ÷£º´ò¿ªÍ¼Æ¬ÎÄ¼ş£¬²¢½âÂëÖÁÄÚ´æ£¬´ò¿ªµÄÍ¼Æ¬ÎÄ¼şÔ½´ó£¬Õ¼ÓÃµÄÄÚ´æÒ²¾ÍÔ½´ó 
+ * åŠŸèƒ½ï¼šè½½å…¥æŒ‡å®šå›¾ç‰‡æ–‡ä»¶çš„å›¾å½¢æ•°æ®
+ * è¯´æ˜ï¼šæ‰“å¼€å›¾ç‰‡æ–‡ä»¶ï¼Œå¹¶è§£ç è‡³å†…å­˜ï¼Œæ‰“å¼€çš„å›¾ç‰‡æ–‡ä»¶è¶Šå¤§ï¼Œå ç”¨çš„å†…å­˜ä¹Ÿå°±è¶Šå¤§ 
  * */
 {
 	FILE *fp;
@@ -35,19 +35,19 @@ int Load_Image(const char *filepath, LCUI_Graph *out)
 	
 	Graph_Init(out); 
 	out->have_alpha = FALSE;
-	/*fpÊÇÈ«¾Ö±äÁ¿£¬ÆäËüº¯Êı»áÓÃµ½Ëü*/
+	/*fpæ˜¯å…¨å±€å˜é‡ï¼Œå…¶å®ƒå‡½æ•°ä¼šç”¨åˆ°å®ƒ*/
 	if ((fp = fopen(filepath,"r")) == NULL) {
 		perror(filepath);
 		result = OPEN_ERROR; 
 	} else {
 		fgetc(fp);
-		if (!ferror (fp)) {/*rÈç¹ûÃ»³ö´í*/
+		if (!ferror (fp)) {/*rå¦‚æœæ²¡å‡ºé”™*/
 			fseek(fp,0,SEEK_END);
 			if (ftell(fp)>4) {
 				fclose(fp);
 				result = detect_image(filepath, out); 
 			} else {
-				result = SHORT_FILE;// ÎÄ¼ş¹ıĞ¡ 
+				result = SHORT_FILE;// æ–‡ä»¶è¿‡å° 
 				fclose(fp);
 			}
 		}

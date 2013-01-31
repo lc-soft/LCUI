@@ -271,8 +271,6 @@ int LCUI_Init(int argc, char *argv[])
 		/* 保存线程ID */
 		LCUI_Sys.self_id = thread_self();
 		
-		LCUI_Sys.focus_widget = NULL; 
-		
 		/* 初始化事件槽记录 */
 		EventSlots_Init( &LCUI_Sys.sys_event_slots );
 		EventSlots_Init( &LCUI_Sys.user_event_slots );

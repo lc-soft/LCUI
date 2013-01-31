@@ -775,60 +775,25 @@ int Graph_Fill_Color(LCUI_Graph *graph, LCUI_RGB color)
 	return 0; 
 }
 
-int Graph_Tile(LCUI_Graph *src, LCUI_Graph *out, int width, int height)
-/* 
- * 功能：平铺图形
- * 参数说明：
- * src 原始图形
- * out 填充后的图形
- * width 填充的宽度
- * height 填充的高度
- **/
+/* 平铺图形 */
+int Graph_Tile(	LCUI_Graph *src, LCUI_Graph *des_buff, BOOL replace )
 {
-	if(!Graph_Valid(src) || out == NULL 
-	 || width <=0 || height <= 0) {
+	int ret = 0;
+	LCUI_Pos pos;
+	
+	if(!Graph_Valid(src) || !Graph_Valid(des_buff)) {
 		return -1;
 	}
-		
-	int x,y,w,h,temp = 0,count, m;
-		
-	if( Graph_Create(out, width, height) != 0) {
-		return -2;
-	}
-	
-	if(Graph_Have_Alpha(src)) {
-		for(y = 0;y < height;++y) {
-			h = y % src->height;
-			m = h * src->width;
-			for(x = 0;x < width;++x,++temp) {
-				w = x % src->width;
-				count = m + w;
-				out->rgba[0][temp] = ALPHA_BLENDING(src->rgba[0][count], out->rgba[0][temp], src->rgba[3][count]);
-				out->rgba[1][temp] = ALPHA_BLENDING(src->rgba[1][count], out->rgba[1][temp], src->rgba[3][count]);
-				out->rgba[2][temp] = ALPHA_BLENDING(src->rgba[2][count], out->rgba[2][temp], src->rgba[3][count]);
-				//out->rgba[0][temp] = (src->rgba[0][count] * src->rgba[3][count] + out->rgba[0][temp] * (255 - src->rgba[3][count])) /255;
-				//out->rgba[1][temp] = (src->rgba[1][count] * src->rgba[3][count] + out->rgba[1][temp] * (255 - src->rgba[3][count])) /255;
-				//out->rgba[2][temp] = (src->rgba[2][count] * src->rgba[3][count] + out->rgba[2][temp] * (255 - src->rgba[3][count])) /255;
-			} 
-		}
-	} else {
-		if(Graph_Have_Alpha(out)) {
-			Graph_Fill_Alpha(out, 255);
-		}
-		for(y = 0;y < height;++y) {
-			h = y%src->height;
-			m = h * src->width;
-			for(x = 0;x < width;++x) {
-				w = x % src->width;
-				count = m + w;
-				out->rgba[0][temp] = src->rgba[0][count];
-				out->rgba[1][temp] = src->rgba[1][count];
-				out->rgba[2][temp] = src->rgba[2][count];
-				++temp;
+	for(pos.y=0; pos.y<des_buff->height; pos.y+=src->height) {
+		for(pos.x=0; pos.x<des_buff->width; pos.x+=src->width) {
+			if( replace ) {
+				ret += Graph_Replace( des_buff, src, pos );
+			} else {
+				ret += Graph_Mix( des_buff, src, pos );
 			}
 		}
-	} 
-	return 0;
+	}
+	return ret;
 }
 
 int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
@@ -1098,46 +1063,58 @@ int Graph_Put_Image(LCUI_Graph *graph, LCUI_Graph *image, int flag)
 
 /* 为指定图形填充背景图像 */
 int Graph_Fill_Image(	LCUI_Graph *graph,	LCUI_Graph *bg, 
-			int layout,		LCUI_RGB color )
+			int mode,		LCUI_RGB color )
 {
+	LCUI_Size size;
 	LCUI_Pos pos;
 	LCUI_Graph temp_bg;
+	BOOL replace_mix;
 	
+	if( Check_Option( mode, GRAPH_MIX_FLAG_REPLACE ) ) {
+		/* 将alpha通道置为0 */
+		Graph_Fill_Alpha( graph, 0 );
+		replace_mix = TRUE;
+	} else {
+		/* 填充背景色，将alpha通道置为255 */
+		Graph_Fill_Color( graph, color );
+		Graph_Fill_Alpha( graph, 255 );
+		replace_mix = FALSE;
+	}
 	/* 填充背景色 */
-	Graph_Fill_Color(graph, color); 
-	if(!Graph_Valid(bg) || graph == NULL) {
+	if(!Graph_Valid(bg) || !Graph_Valid(graph)) {
 		return -1; 
 	}
-	
-	pos = Pos(0,0);
+	size.w = graph->width;
+	size.h = graph->height;
 	Graph_Init(&temp_bg);
-	
-	switch( layout ) {
-	    case LAYOUT_ZOOM:/* 缩放 */
-		Graph_Zoom( bg, &temp_bg, DEFAULT,
-			Size(graph->width, graph->height) );
-		pos.x = (graph->width - temp_bg.width) / 2.0;
-		pos.y = (graph->height - temp_bg.height) / 2.0;
-		Graph_Mix(graph, &temp_bg, pos);
-		break;
-	    case LAYOUT_STRETCH:/* 拉伸 */
-		Graph_Zoom( bg,  &temp_bg, CUSTOM, 
-			Size(graph->width, graph->height) );
-		Graph_Mix(graph, &temp_bg, pos);
-		break;
-	    case LAYOUT_CENTER:/* 居中 */
-		pos.x = (graph->width - bg->width) / 2.0;
-		pos.y = (graph->height - bg->height) / 2.0;
-		Graph_Mix(graph, bg, pos);
-		break;
-	    case LAYOUT_TILE:/* 平铺 */
-		Graph_Tile(bg, graph, graph->width, graph->height);
-		break;
-	    default: 
-		Graph_Mix(graph, bg, pos);
-		break;
+	pos = Pos(0,0);
+	/* 平铺 */
+	if( Check_Option( mode, LAYOUT_TILE ) ) {
+		return Graph_Tile( bg, graph, replace_mix );
 	}
-	Graph_Free(&temp_bg);
+	/* 缩放 */
+	if( Check_Option( mode, LAYOUT_ZOOM ) ) {
+		Graph_Zoom( bg, &temp_bg, DEFAULT, size );
+		pos.x = (size.w - temp_bg.width) / 2.0;
+		pos.y = (size.h - temp_bg.height) / 2.0;
+		bg = &temp_bg;
+	}
+	/* 拉伸 */
+	else if( Check_Option( mode, LAYOUT_STRETCH ) ) {
+		Graph_Zoom( bg,  &temp_bg, CUSTOM, size );
+		bg = &temp_bg;
+	}
+	/* 居中 */
+	else if( Check_Option( mode, LAYOUT_CENTER ) ) {
+		pos.x = (size.w - bg->width) / 2.0;
+		pos.y = (size.h - bg->height) / 2.0;
+	} 
+	if( replace_mix ) {
+		Graph_Replace( graph, bg, pos );
+	} else {
+		Graph_Mix( graph, bg, pos );
+	}
+	Graph_Free( &temp_bg );
 	return 0; 
 }
 

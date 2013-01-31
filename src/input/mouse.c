@@ -62,7 +62,6 @@ LCUI_Mouse;
 static LCUI_Mouse mouse_data;
 
 /****************************** Mouse *********************************/
-int Mouse_LeftButton( LCUI_MouseButtonEvent *event )
 /*
  * 功能：检测鼠标事件中鼠标左键的状态
  * 说明：该函数只适用于响应鼠标按键状态发生改变时，判断按键状态。
@@ -72,6 +71,7 @@ int Mouse_LeftButton( LCUI_MouseButtonEvent *event )
  *   0   鼠标左键已经释放
  *   1   鼠标左键处于按下状态
  **/
+int Mouse_LeftButton( LCUI_MouseButtonEvent *event )
 {
 	if( !event ) {
 		return -2;
@@ -82,7 +82,6 @@ int Mouse_LeftButton( LCUI_MouseButtonEvent *event )
 	return -1;
 }
 
-int Mouse_RightButton(LCUI_MouseEvent *event)
 /*
  * 功能：检测鼠标事件中鼠标右键的状态
  * 说明：该函数只适用于响应鼠标按键状态发生改变时，判断按键状态。
@@ -92,12 +91,13 @@ int Mouse_RightButton(LCUI_MouseEvent *event)
  *   0   鼠标右键已经释放
  *   1   鼠标右键处于按下状态
  **/
+int Mouse_RightButton( LCUI_MouseButtonEvent *event )
 {
 	if(NULL == event) {
 		return -2;
 	}
-	else if(event->key.code == MOUSE_RIGHT_KEY) {
-		return event->key.state; 
+	else if(event->button == MOUSE_RIGHT_KEY) {
+		return event->state; 
 	}
 	return -1;
 }

@@ -42,11 +42,9 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
-#include LC_MISC_H
 #include LC_GRAPH_H
 #include LC_DISPLAY_H
 #include LC_DRAW_H
-#include LC_MEM_H
 #include LC_FONT_H 
 #include LC_ERROR_H 
 #include LC_CURSOR_H
@@ -397,7 +395,6 @@ void Register_Default_Widget_Type()
 int Widget_Container_Add( LCUI_Widget *ctnr, LCUI_Widget *widget )
 {
 	int pos;
-	LCUI_Widget **focus_widget;
 	LCUI_GraphLayer *ctnr_glayer;
 	LCUI_Queue *old_queue, *new_queue;
 	
@@ -417,19 +414,16 @@ int Widget_Container_Add( LCUI_Widget *ctnr, LCUI_Widget *widget )
 	/* 如果部件有父部件，那就在父部件的子部件队列中 */ 
 	if( widget->parent ) {
 		old_queue = &widget->parent->child; 
-		focus_widget = &widget->focus_widget;
 	} else {/* 否则没有部件，那么这个部件在创建时就储存至系统部件队列中 */
 		old_queue = &LCUI_Sys.widget_list;
-		focus_widget = &LCUI_Sys.focus_widget;
 	}
-	
 	/* 若部件已获得过焦点，则复位之前容器中的焦点 */
 	if( Widget_GetFocus( widget ) ) {
-		*focus_widget = NULL;
+		Reset_Focus( widget->parent );
 	}
 	
 	/* 改变该部件的容器，需要将它从之前的容器中移除 */
-	pos = WidgetQueue_Get_Pos(old_queue, widget);
+	pos = Queue_Find( old_queue, widget );
 	if(pos >= 0) {
 		Queue_Delete_Pointer(old_queue, pos);
 	}
@@ -1113,56 +1107,6 @@ void LCUIApp_DestroyAllWidgets( LCUI_ID app_id )
 }
 
 
-LCUI_Widget *
-Get_FocusWidget( LCUI_Widget *widget )
-/* 获取指定部件内的已获得焦点的子部件 */
-{
-	int i, focus_pos, total;
-	LCUI_Widget **focus_widget;
-	LCUI_Queue *queue_ptr;
-	
-	//printf( "Get_FocusWidget(）： widget: %p\n", widget );
-	//print_widget_info( widget );
-	if( !widget ) {
-		queue_ptr = &LCUI_Sys.widget_list;
-		focus_widget = &LCUI_Sys.focus_widget;
-	} else {
-		/* 如果部件不需要焦点，则返回NULL */
-		if( !widget->focus ) {
-			return NULL;
-		}
-		queue_ptr = &widget->child;
-		focus_widget = &widget->focus_widget;
-	}
-	
-	if( !focus_widget ) { 
-		return NULL;
-	}
-	
-	total = Queue_Get_Total( queue_ptr );
-	if( total <= 0 ) {
-		return NULL;
-	}
-	focus_pos = WidgetQueue_Get_Pos( queue_ptr, *focus_widget );
-	if( focus_pos < 0 ) {
-		*focus_widget = NULL; 
-		return NULL;
-	}
-	/* 查找可获取焦点的有效部件 */
-	for( i=focus_pos; i<total; ++i ) {
-		widget = Queue_Get( queue_ptr, i ); 
-		if( widget && widget->focus ) {
-			break;
-		}
-	}
-	if( i>=total ) {
-		*focus_widget = NULL; 
-		widget = NULL;
-	}
-	
-	return widget;
-}
-
 /* 检测指定部件是否处于焦点状态 */
 BOOL Widget_GetFocus( LCUI_Widget *widget )
 {
@@ -1299,6 +1243,45 @@ static void Widget_BackgroundInit( LCUI_Widget *widget )
 	widget->background.transparent = TRUE;
 	widget->background.layout = LAYOUT_NONE;
 }
+
+
+static void 
+Destroy_Widget(LCUI_Widget *widget)
+/*
+ * 功能：销毁一个部件
+ * 说明：如果这个部件有子部件，将对它进行销毁
+ * */
+{
+	widget->parent = NULL;
+	
+	/* 释放字符串 */
+	String_Free(&widget->type_name);
+	String_Free(&widget->style_name);
+	
+	GraphLayer_Free( widget->main_glayer );
+	GraphLayer_Free( widget->client_glayer );
+	
+	Graph_Free(&widget->background.image);
+	
+	/* 销毁部件的队列 */
+	Destroy_Queue(&widget->child);
+	Destroy_Queue(&widget->event);
+	Destroy_Queue(&widget->data_buff);
+	Destroy_Queue(&widget->invalid_area);
+	
+	widget->visible = FALSE;
+	widget->enabled = TRUE;
+	/* 调用回调函数销毁部件私有数据 */
+	WidgetFunc_Call( widget, FUNC_TYPE_DESTROY );
+	free( widget->private_data );
+}
+
+void WidgetQueue_Init(LCUI_Queue *queue)
+/* 功能：初始化部件队列 */
+{
+	Queue_Init(queue, sizeof(LCUI_Widget), Destroy_Widget);
+}
+
 
 /* 
  * 功能：创建指定类型的部件
@@ -1603,7 +1586,11 @@ void Widget_SetBorder(LCUI_Widget *widget, LCUI_Border border)
 /* 设定部件的背景图像 */
 void Widget_SetBackgroundImage( LCUI_Widget *widget, LCUI_Graph *img )
 {
-	if(!widget || !Graph_Valid(img)) {
+	if(!widget) {
+		return;
+	}
+	if( !Graph_Valid(img) ) {
+		Graph_Init( &widget->background.image );
 		return;
 	}
 	widget->background.image = *img;
@@ -1910,18 +1897,20 @@ void Widget_ExecUpdate(LCUI_Widget *widget)
 
 void Widget_ExecDrawBackground( LCUI_Widget *widget )
 {
+	int fill_mode;
 	LCUI_Graph *graph;
 	LCUI_Background *bg;
 	
 	graph = Widget_GetSelfGraph( widget );
 	bg = &widget->background;
-	/* 如果背景透明那就不绘制背景了 */
+	/* 如果背景透明，则使用覆盖模式将背景图绘制到部件上 */
 	if(widget->background.transparent) {
-		Graph_Fill_Alpha( graph, 0 );
-		return;
+		fill_mode = GRAPH_MIX_FLAG_REPLACE;
+	} else { /* 否则，使用叠加模式 */
+		fill_mode = GRAPH_MIX_FLAG_OVERLAY;
 	}
-	Graph_Fill_Alpha( graph, 255 );
-	Graph_Fill_Image( graph, &bg->image, bg->layout, bg->color );
+	fill_mode |= bg->layout;
+	Graph_Fill_Image( graph, &bg->image, fill_mode, bg->color );
 }
 
 void Widget_ExecDraw(LCUI_Widget *widget)
@@ -1931,8 +1920,11 @@ void Widget_ExecDraw(LCUI_Widget *widget)
 	if( !widget ) {
 		return;
 	}
-	/* 绘制背景图 */
+	/* 先更新一次部件 */
+	WidgetFunc_Call( widget, FUNC_TYPE_UPDATE );
+	/* 然后根据部件样式，绘制背景图形 */
 	Widget_ExecDrawBackground( widget );
+	/* 再调用函数进行绘制 */
 	WidgetFunc_Call( widget, FUNC_TYPE_DRAW );
 	graph = Widget_GetSelfGraph( widget );
 	/* 绘制边框线 */

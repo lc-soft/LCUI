@@ -546,6 +546,22 @@ int Queue_Empty(LCUI_Queue *queue)
 	return 1;
 }
 
+/* 查找指定成员指针所在队列中的位置 */
+int Queue_Find( LCUI_Queue *queue, const void *p )
+{
+	void *tmp;
+	int i, total; 
+	
+	total = Queue_Get_Total( queue );
+	for(i=0; i<total; ++i) {
+		tmp = Queue_Get( queue, i );
+		if( tmp == p ) { 
+			return i;
+		}
+	} 
+	return -1;
+}
+
 static BOOL 
 Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag) 
 /* 
@@ -812,65 +828,6 @@ int main()
 
 
 /************************ LCUI_Queue End ******************************/
-
-/************************** WidgetQueue ********************************/
-
-static void 
-Destroy_Widget(LCUI_Widget *widget)
-/*
- * 功能：销毁一个部件
- * 说明：如果这个部件有子部件，将对它进行销毁
- * */
-{
-	widget->parent = NULL;
-	
-	/* 释放字符串 */
-	String_Free(&widget->type_name);
-	String_Free(&widget->style_name);
-	
-	GraphLayer_Free( widget->main_glayer );
-	GraphLayer_Free( widget->client_glayer );
-	
-	Graph_Free(&widget->background.image);
-	
-	/* 销毁部件的队列 */
-	Destroy_Queue(&widget->child);
-	Destroy_Queue(&widget->event);
-	Destroy_Queue(&widget->data_buff);
-	Destroy_Queue(&widget->invalid_area);
-	
-	widget->visible = FALSE;
-	widget->enabled = TRUE;
-	/* 调用回调函数销毁部件私有数据 */
-	WidgetFunc_Call( widget, FUNC_TYPE_DESTROY );
-	free( widget->private_data );
-}
-
-void WidgetQueue_Init(LCUI_Queue *queue)
-/* 功能：初始化部件队列 */
-{
-	Queue_Init(queue, sizeof(LCUI_Widget), Destroy_Widget);
-}
-
-int WidgetQueue_Get_Pos(LCUI_Queue *queue, LCUI_Widget *widget)
-/* 功能：从部件队列中获取指定部件的排列位置 */
-{
-	LCUI_Widget *temp;
-	int i, result = -1, total; 
-	
-	total = Queue_Get_Total(queue); 
-	for(i = 0; i < total; ++i) {
-		temp = Queue_Get(queue, i);
-		if(temp == widget) { 
-			result = i; 
-			break;
-		}
-	} 
-	return result;
-}
-
-/************************ WidgetQueue End ******************************/
-
 
 /************************* RectQueue **********************************/
 void RectQueue_Init(LCUI_Queue *queue)
