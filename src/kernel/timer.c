@@ -41,6 +41,7 @@ timer_list_sort( LCUI_Queue *timer_list )
 			}
 			if( b_timer->cur_ms < a_timer->cur_ms ) {
 				Queue_Swap( timer_list , j, i);
+				a_timer = b_timer;
 			}
 		}
 	}

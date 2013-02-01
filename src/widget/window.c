@@ -285,7 +285,7 @@ Quit_Parent_Window(LCUI_Widget *btn, LCUI_WidgetEvent *unused)
 /* 功能：退出部件btn所在的窗口 */
 {
 	//printf("Quit_Parent_Window start\n");
-	LCUI_StopMainLoop();
+	LCUI_MainLoop_Quit( NULL );
 	//printf("Quit_Parent_Window end\n");
 	//return;
 	//LCUI_Widget *win_p = Get_Parent_Window(btn);

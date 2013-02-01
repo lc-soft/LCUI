@@ -8,7 +8,6 @@ LCUI_BEGIN_HEADER
 typedef struct _LCUI_App 
 {
 	LCUI_ID id; /* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
-	BOOL stop_loop;
 	
 	LCUI_Queue	tasks;	/* 程序的任务队列 */
 	LCUI_Queue	events;		/* 事件队列 */
@@ -63,6 +62,12 @@ typedef struct _LCUI_System
 LCUI_System;
 /***********************************************************************/
 
+typedef struct {
+	BOOL quit;
+	BOOL running;
+	int level;
+} LCUI_MainLoop;
+
 extern LCUI_System  LCUI_Sys;
 
 /************************* App Management *****************************/
@@ -74,10 +79,20 @@ LCUI_App* LCUIApp_GetSelf( void );
 
 /* 获取程序ID */
 LCUI_ID LCUIApp_GetSelfID( void );
-
-/* 退出主循环 */
-void LCUI_StopMainLoop( void );
 /*********************** App Management End ***************************/
+
+/* 新建一个主循环 */
+LCUI_MainLoop *LCUI_MainLoop_New( void );
+
+/* 设定主循环等级，level值越高，处理主循环退出时，也越早处理该循环 */
+int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level );
+
+/* 运行目标循环 */
+int LCUI_MainLoop_Run( LCUI_MainLoop *loop );
+
+/* 标记目标主循环需要退出 */
+int LCUI_MainLoop_Quit( LCUI_MainLoop *loop );
+
 
 BOOL LCUI_Active();
 /* 功能：检测LCUI是否活动 */ 
@@ -88,11 +103,11 @@ int LCUI_Init(int argc, char *argv[]);
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */ 
 
-int LCUI_Main ();
 /* 
  * 功能：LCUI程序的主循环
  * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
- *  */ 
+ *  */
+int LCUI_Main( void );
 
 int Get_LCUI_Version(char *out);
 /* 功能：获取LCUI的版本 */ 
