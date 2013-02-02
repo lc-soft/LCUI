@@ -65,7 +65,8 @@ typedef enum DATATYPE
 	DATATYPE_STATUS,   
 	DATATYPE_SHOW,
 	DATATYPE_HIDE,
-	DATATYPE_AREA
+	DATATYPE_AREA,
+	DATATYPE_DESTROY
 }
 DATATYPE;
 
@@ -1257,7 +1258,6 @@ Destroy_Widget(LCUI_Widget *widget)
 	/* 释放字符串 */
 	String_Free(&widget->type_name);
 	String_Free(&widget->style_name);
-	
 	GraphLayer_Free( widget->main_glayer );
 	GraphLayer_Free( widget->client_glayer );
 	
@@ -1407,29 +1407,30 @@ LCUI_Widget *Widget_New( const char *widget_type )
 }
 
 /* 销毁部件 */
-void Widget_Destroy( LCUI_Widget *widget )
+static void Widget_ExecDestroy( LCUI_Widget *widget )
 {
 	int i, total;
-	LCUI_Queue *p;
+	LCUI_Queue *child_list;
 	LCUI_Widget *tmp;
 	
 	if( !widget ) {
 		return;
 	}
 	if( !widget->parent ) {
-		p = &LCUI_Sys.widget_list;
+		child_list = &LCUI_Sys.widget_list;
 	} else {
-		p = &widget->parent->child; 
+		child_list = &widget->parent->child; 
 	}
-	
-	total = Queue_Get_Total(p);
+	Queue_Lock( child_list );
+	total = Queue_Get_Total(child_list);
 	for(i=0; i<total; ++i) {
-		tmp = Queue_Get(p, i);
+		tmp = Queue_Get(child_list, i);
 		if(tmp == widget) {
-			Queue_Delete(p, i);
+			Queue_Delete(child_list, i);
 			break;
 		}
-	}	
+	}
+	Queue_UnLock( child_list );
 }
 
 /* 累计部件的位置坐标 */
@@ -2189,6 +2190,16 @@ void Widget_Draw(LCUI_Widget *widget)
 	Record_WidgetUpdate( widget, NULL, DATATYPE_GRAPH, 0 );
 }
 
+/* 销毁部件 */
+void Widget_Destroy( LCUI_Widget *widget )
+{
+	if( !widget ) {
+		return; 
+	}
+	Record_WidgetUpdate( widget, NULL, DATATYPE_DESTROY, 0 );
+}
+
+
 void Widget_Update(LCUI_Widget *widget)
 /* 
  * 功能：让部件根据已设定的属性，进行相应数据的更新
@@ -2360,6 +2371,7 @@ Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type, int flag)
 	    case DATATYPE_POS_TYPE:
 	    case DATATYPE_UPDATE:
 	    case DATATYPE_SHOW:
+	    case DATATYPE_DESTROY:
 		temp.valid = FALSE;
 		break;
 	    default: return -1;
@@ -2487,7 +2499,15 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 			break;
 		    case DATATYPE_AREA:
 			Widget_ExecRefresh(widget);
-			break;
+			break;	
+		    case DATATYPE_DESTROY:
+			/* 添加刷新区域 */
+			Widget_ExecRefresh(widget);
+			/* 解锁队列 */
+			Queue_UnLock( &widget->data_buff );
+			/* 开始销毁部件数据 */
+			Widget_ExecDestroy(widget);
+			return 0;
 		    default: break;
 		} 
 		Queue_Delete( &widget->data_buff, 0 );
