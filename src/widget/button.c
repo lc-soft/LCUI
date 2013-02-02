@@ -100,7 +100,7 @@ static void Button_ExecCustomUpdate( LCUI_Widget *widget )
 
 static void Button_ExecUpdate( LCUI_Widget *widget )
 {
-	if(Strcmp(&widget->style_name, "custom") == 0) {
+	if(widget->style_id == BUTTON_STYLE_CUSTOM) {
 		Button_ExecCustomUpdate( widget );
 	} else {
 		Button_ExecDefalutUpdate( widget );
@@ -192,7 +192,6 @@ static void Button_Init(LCUI_Widget *widget)
 	LCUI_Button *button;
 	
 	button = WidgetPrivData_New(widget, sizeof(LCUI_Button));
-	 
 	/* 初始化图像数据 */ 
 	Graph_Init(&button->btn_disable);
 	Graph_Init(&button->btn_normal);
@@ -211,20 +210,8 @@ static void Button_Init(LCUI_Widget *widget)
 	Widget_Show(button->label); /* 显示label部件 */
 	/* 启用自动尺寸调整，以适应内容 */
 	Widget_SetAutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK);
+	Widget_SetStyleID( widget, BUTTON_STYLE_DEFAULT );
 }
-
-
-static void Destroy_Button(LCUI_Widget *widget)
-{
-	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivData(widget);
-	/* 释放图像数据占用的内存 */ 
-	Graph_Free(&button->btn_disable);
-	Graph_Free(&button->btn_normal);
-	Graph_Free(&button->btn_focus);
-	Graph_Free(&button->btn_down);
-	Graph_Free(&button->btn_over);
-}
-
 
 LCUI_Widget *Get_Button_Label(LCUI_Widget *widget)
 /* 功能：获取嵌套在按钮部件里的label部件 */
@@ -233,20 +220,40 @@ LCUI_Widget *Get_Button_Label(LCUI_Widget *widget)
 	return button->label;
 }
 
-void Custom_Button_Style(	LCUI_Widget *widget, LCUI_Graph *normal, 
+/* 自定义按钮在各种状态下显示的位图 */
+void Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal, 
 				LCUI_Graph *over, LCUI_Graph *down, 
 				LCUI_Graph *focus, LCUI_Graph *disable)
-/* 功能：自定义按钮在各种状态下显示的位图 */
 {
-	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivData(widget);
-	/* 如果图形有效，就拷贝 */
-	if(Graph_Valid(normal)) Graph_Copy(&button->btn_normal, normal);
-	if(Graph_Valid(over)) Graph_Copy(&button->btn_over, over);
-	if(Graph_Valid(down)) Graph_Copy(&button->btn_down, down);
-	if(Graph_Valid(focus)) Graph_Copy(&button->btn_focus, focus);
-	if(Graph_Valid(disable)) Graph_Copy(&button->btn_disable, disable);
+	LCUI_Button *btn_data;
+	btn_data = Widget_GetPrivData(widget);
+	if( Graph_Valid(normal) ) {
+		btn_data->btn_normal = *normal;
+	} else {
+		Graph_Init( &btn_data->btn_normal );
+	}
+	if( Graph_Valid(over) ) {
+		btn_data->btn_over = *over;
+	} else {
+		Graph_Init( &btn_data->btn_over );
+	}
+	if( Graph_Valid(down) ) {
+		btn_data->btn_down = *down;
+	} else {
+		Graph_Init( &btn_data->btn_down );
+	}
+	if( Graph_Valid(focus) ) {
+		btn_data->btn_focus = *focus;
+	} else {
+		Graph_Init( &btn_data->btn_focus );
+	}
+	if( Graph_Valid(disable) ) {
+		btn_data->btn_disable = *disable;
+	} else {
+		Graph_Init( &btn_data->btn_disable );
+	}
 	/* 设定为自定义风格 */
-	Widget_SetStyleName(widget, "custom");
+	Widget_SetStyleID(widget, BUTTON_STYLE_CUSTOM);
 	Widget_Draw(widget); /* 重新绘制部件 */
 }
 
@@ -295,6 +302,5 @@ void Register_Button()
 	/* 为部件类型关联相关函数 */
 	WidgetFunc_Add("button", Button_Init,		FUNC_TYPE_INIT);
 	WidgetFunc_Add("button", Button_ExecUpdate,	FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("button", Destroy_Button,	FUNC_TYPE_DESTROY); 
 }
 

@@ -195,6 +195,173 @@ static int App_Quit()
 /*********************** App Management End ***************************/
 
 
+
+/*--------------------------- Main Loop -------------------------------*/
+static BOOL init_mainloop_queue = FALSE;
+static LCUI_Queue mainloop_queue;
+
+static void LCUI_MainLoopQueue_Init( void )
+{
+	Queue_Init( &mainloop_queue, sizeof(LCUI_MainLoop), NULL );
+}
+
+/* 查找处于运行状态的主循环 */
+static LCUI_MainLoop *
+LCUI_MainLoopQueue_Find( void )
+{
+	int i, total;
+	LCUI_MainLoop *loop;
+	
+	total = Queue_Get_Total( &mainloop_queue );
+	for(i=0; i<total; ++i) {
+		loop = Queue_Get( &mainloop_queue, i );
+		if( loop->running ) {
+			return loop;
+		}
+	}
+	return NULL;
+}
+
+static void
+LCUI_MainLoopQueue_Sort( void )
+{
+	int i, j, total;
+	LCUI_MainLoop *cur_loop, *next_loop;
+	
+	total = Queue_Get_Total( &mainloop_queue );
+	for(i=0; i<total; ++i) {
+		cur_loop = Queue_Get( &mainloop_queue, i );
+		if( !cur_loop ) {
+			continue;
+		}
+		for(j=i+1; j<total; ++j) {
+			next_loop = Queue_Get( &mainloop_queue, j );
+			if( !next_loop ) {
+				continue; 
+			}
+			if( next_loop->level > cur_loop->level ) {
+				Queue_Swap( &mainloop_queue, j, i);
+				cur_loop = next_loop;
+			}
+		}
+	}
+}
+
+/* 新建一个主循环 */
+LCUI_MainLoop *LCUI_MainLoop_New( void )
+{
+	LCUI_MainLoop *loop;
+	
+	if( !init_mainloop_queue ) {
+		LCUI_MainLoopQueue_Init();
+		init_mainloop_queue = TRUE;
+	}
+	loop = malloc(sizeof(LCUI_MainLoop));
+	if( !loop ) {
+		return NULL;
+	}
+	loop->quit = FALSE;
+	loop->level = Queue_Get_Total( &mainloop_queue );
+	loop->running = FALSE;
+	Queue_Add_Pointer( &mainloop_queue, loop );
+	/* 重新对主循环队列进行排序 */
+	LCUI_MainLoopQueue_Sort();
+	return loop;
+}
+
+/* 设定主循环等级，level值越高，处理主循环退出时，也越早处理该循环 */
+int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
+{
+	if( loop == NULL ) {
+		return -1;
+	}
+	loop->level = level;
+	LCUI_MainLoopQueue_Sort();
+	return 0;
+}
+
+
+static BOOL
+LCUIApp_HaveTask( LCUI_App *app )
+{
+	if( !app ) {
+		return FALSE; 
+	}
+	if(Queue_Get_Total(&app->tasks) > 0) {
+		return TRUE; 
+	}
+	return FALSE;
+}
+
+static int 
+LCUIApp_RunTask( LCUI_App *app )
+{ 
+	LCUI_Task *task;
+	task = Queue_Get( &app->tasks, 0 );
+	if( task == NULL ) {
+		return -1;
+	}
+	Queue_Delete_Pointer( &app->tasks, 0 );
+	if( task->func == NULL ) {
+		return -2;
+	}
+	/* 调用函数指针指向的函数，并传递参数 */
+	task->func( task->arg[0], task->arg[1] );
+	/* 若需要在调用回调函数后销毁参数 */
+	if( task->destroy_arg[0] ) {
+		free( task->arg[0] );
+	}
+	if( task->destroy_arg[1] ) {
+		free( task->arg[1] );
+	}
+	free( task );
+	return 0;
+}
+
+/* 运行目标循环 */
+int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
+{
+	LCUI_App *app;
+	int idle_time = 1500;
+	
+	app = LCUIApp_GetSelf();
+	if( !app ) {
+		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
+		return -1;
+	}
+	_DEBUG_MSG("loop: %p, enter\n", loop);
+	loop->running = TRUE;
+	while( !loop->quit ) {
+		if( LCUIApp_HaveTask(app) ) {
+			idle_time = 1500;
+			LCUIApp_RunTask( app ); 
+		} else {
+			usleep (idle_time);
+			if (idle_time < MAX_APP_IDLE_TIME) {
+				idle_time += 1500;
+			}
+		}
+	}
+	loop->running = FALSE;
+	_DEBUG_MSG("loop: %p, exit\n", loop);
+	return 0;
+}
+
+/* 标记目标主循环需要退出 */
+int LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
+{
+	if( loop == NULL ) {
+		loop = LCUI_MainLoopQueue_Find();
+		if( loop == NULL ) {
+			return -1;
+		}
+	}
+	loop->quit = TRUE;
+	return 0;
+}
+/*----------------------- End MainLoop -------------------------------*/
+
+
 static void LCUI_ShowCopyrightText()
 /* 功能：打印LCUI的信息 */
 {
@@ -305,163 +472,6 @@ int LCUI_Init(int argc, char *argv[])
 	return 0;
 }
 
-static BOOL
-Have_Task( LCUI_App *app )
-/* 功能：检测是否有任务 */
-{
-	if( !app ) {
-		return FALSE; 
-	}
-	if(Queue_Get_Total(&app->tasks) > 0) {
-		return TRUE; 
-	}
-	return FALSE;
-}
-
-static int 
-Run_Task( LCUI_App *app )
-/* 功能：执行任务 */
-{ 
-	static LCUI_Task *task;
-	task = (LCUI_Task*)Queue_Get( &app->tasks, 0 );
-	//clock_t start = clock();
-	//printf("run task %p\n", task->func);
-	/* 调用函数指针指向的函数，并传递参数 */
-	task->func( task->arg[0], task->arg[1] );
-	/* 若需要在调用回调函数后销毁参数 */
-	if( task->destroy_arg[0] ) {
-		free( task->arg[0] );
-	}
-	if( task->destroy_arg[1] ) {
-		free( task->arg[1] );
-	}
-	//printf("task %p use time: %ldus\n", task->func, clock()-start);
-	return Queue_Delete(&app->tasks, 0);
-}
-
-/*--------------------------- Main Loop -------------------------------*/
-static BOOL init_mainloop_queue = FALSE;
-static LCUI_Queue mainloop_queue;
-
-static void LCUI_MainLoopQueue_Init( void )
-{
-	Queue_Init( &mainloop_queue, sizeof(LCUI_MainLoop), NULL );
-}
-
-/* 查找处于运行状态的主循环 */
-static LCUI_MainLoop *
-LCUI_MainLoopQueue_Find( void )
-{
-	int i, total;
-	LCUI_MainLoop *loop;
-	
-	total = Queue_Get_Total( &mainloop_queue );
-	for(i=0; i<total; ++i) {
-		loop = Queue_Get( &mainloop_queue, i );
-		if( loop->running ) {
-			return loop;
-		}
-	}
-	return NULL;
-}
-
-static void
-LCUI_MainLoopQueue_Sort( void )
-{
-	int i, j, total;
-	LCUI_MainLoop *cur_loop, *next_loop;
-	
-	total = Queue_Get_Total( &mainloop_queue );
-	for(i=0; i<total; ++i) {
-		cur_loop = Queue_Get( &mainloop_queue, i );
-		if( !cur_loop ) {
-			continue;
-		}
-		for(j=i+1; j<total; ++j) {
-			next_loop = Queue_Get( &mainloop_queue, j );
-			if( !next_loop ) {
-				continue; 
-			}
-			if( next_loop->level > cur_loop->level ) {
-				Queue_Swap( &mainloop_queue, j, i);
-				cur_loop = next_loop;
-			}
-		}
-	}
-}
-
-/* 新建一个主循环 */
-LCUI_MainLoop *LCUI_MainLoop_New( void )
-{
-	LCUI_MainLoop *loop;
-	
-	if( !init_mainloop_queue ) {
-		LCUI_MainLoopQueue_Init();
-		init_mainloop_queue = TRUE;
-	}
-	loop = malloc(sizeof(LCUI_MainLoop));
-	if( !loop ) {
-		return NULL;
-	}
-	loop->quit = FALSE;
-	loop->level = 0;
-	loop->running = FALSE;
-	Queue_Add_Pointer( &mainloop_queue, loop );
-	/* 重新对主循环队列进行排序 */
-	LCUI_MainLoopQueue_Sort();
-	return loop;
-}
-
-/* 设定主循环等级，level值越高，处理主循环退出时，也越早处理该循环 */
-int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
-{
-	if( loop == NULL ) {
-		return -1;
-	}
-	loop->level = level;
-	LCUI_MainLoopQueue_Sort();
-	return 0;
-}
-
-/* 运行目标循环 */
-int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
-{
-	LCUI_App *app;
-	int idle_time = 1500;
-	
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
-		return -1;
-	}
-	loop->running = TRUE;
-	while( !loop->quit ) {
-		if( Have_Task(app) ) {
-			idle_time = 1500;
-			Run_Task( app ); 
-		} else {
-			usleep (idle_time);
-			if (idle_time < MAX_APP_IDLE_TIME) {
-				idle_time += 1500;
-			}
-		}
-	}
-	loop->running = FALSE;
-	return 0;
-}
-
-/* 标记目标主循环需要退出 */
-int LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
-{
-	if( loop == NULL ) {
-		loop = LCUI_MainLoopQueue_Find();
-		if( loop == NULL ) {
-			return -1;
-		}
-	}
-	loop->quit = TRUE;
-	return 0;
-}
 
 /* 
  * 功能：LCUI程序的主循环
@@ -475,8 +485,8 @@ int LCUI_Main( void )
 	return App_Quit ();
 }
 
-int Get_LCUI_Version(char *out)
-/* 功能：获取LCUI的版本 */
+/* 获取LCUI的版本 */
+int LCUI_GetSelfVersion( char *out )
 {
 	return sprintf(out, "%s", LCUI_VERSION);
 }

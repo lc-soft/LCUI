@@ -58,12 +58,17 @@ struct _LCUI_Button
 };
 /****************************************************/
 
+typedef enum {
+	BUTTON_STYLE_DEFAULT,
+	BUTTON_STYLE_CUSTOM
+} BUTTON_STYLE;
+
 LCUI_BEGIN_HEADER
 
 LCUI_Widget *Get_Button_Label(LCUI_Widget *widget);
 /* 功能：获取嵌套在按钮部件里的label部件 */ 
 
-void Custom_Button_Style(	LCUI_Widget *widget, LCUI_Graph *normal, 
+void Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal, 
 				LCUI_Graph *over, LCUI_Graph *down, 
 				LCUI_Graph *focus, LCUI_Graph *disable);
 /* 功能：自定义按钮在各种状态下显示的位图 */ 

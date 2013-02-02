@@ -37,6 +37,9 @@ int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 /* 释放图层占用的内存资源 */
 void GraphLayer_Free( LCUI_GraphLayer *glayer )
 {
+	if( glayer == NULL ) {
+		return;
+	}
 	GraphLayer_DeleteChild( glayer );
 	Graph_Free( &glayer->graph );
 	Destroy_Queue( &glayer->child );

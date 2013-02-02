@@ -55,17 +55,17 @@ public:
 
 void LCUIWindow::setTitleIcon( LCUI_Graph *icon )
 {
-	Set_Window_Title_Icon( getWidget(), icon );
+	Window_SetTitleIcon( getWidget(), icon );
 }
 
 void LCUIWindow::setTitleIcon( LCUIGraph &icon )
 {
-	Set_Window_Title_Icon( getWidget(), icon.getGraph() );
+	Window_SetTitleIcon( getWidget(), icon.getGraph() );
 }
 
 void LCUIWindow::setTitleText( const char *text )
 {
-	Set_Window_Title_Text( getWidget(), text );
+	Window_SetTitleText( getWidget(), text );
 }
 
 void LCUIWindow::addToTitleBar( LCUIWidget &obj )
@@ -75,7 +75,7 @@ void LCUIWindow::addToTitleBar( LCUIWidget &obj )
 
 void LCUIWindow::addToClientArea( LCUIWidget &obj )
 {
-	Window_Client_Area_Add( getWidget(), obj.getWidget() );
+	Window_ClientArea_Add( getWidget(), obj.getWidget() );
 }
 #endif
 

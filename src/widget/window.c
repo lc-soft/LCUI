@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Window.c -- LCUI's window widget
+ * window.c -- LCUI's window widget
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Window.c -- LCUI 的窗口部件
+ * window.c -- LCUI 的窗口部件
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -55,7 +55,7 @@
 #include LC_ERROR_H
 
 LCUI_Widget *
-Get_Window_TitleBar(LCUI_Widget *window)
+Window_GetTitleBar(LCUI_Widget *window)
 /* 功能：获取窗口标题栏的指针 */
 { 
 	LCUI_Window *win_p; 
@@ -67,7 +67,7 @@ Get_Window_TitleBar(LCUI_Widget *window)
 }
 
 LCUI_Widget *
-Get_Window_Client_Area(LCUI_Widget *window)
+Window_GetClientArea(LCUI_Widget *window)
 /* 功能：获取窗口客户区的指针 */
 {
 	LCUI_Window *win_p;
@@ -75,9 +75,18 @@ Get_Window_Client_Area(LCUI_Widget *window)
 	return win_p->client_area;	
 }
 
+/* 获取窗口右上角关闭按钮 */
+LCUI_Widget *
+Window_GetCloseButton( LCUI_Widget *window )
+{
+	LCUI_Window *win_p;
+	win_p = Widget_GetPrivData( window );
+	return win_p->btn_close;
+}
+
 /* 处理鼠标移动事件 */
 static void 
-Move_Window(LCUI_Widget *titlebar, LCUI_WidgetEvent *event)
+Window_ExecMove(LCUI_Widget *titlebar, LCUI_WidgetEvent *event)
 {
 	LCUI_Pos pos, offset;
 	LCUI_Widget *window;
@@ -102,14 +111,14 @@ Move_Window(LCUI_Widget *titlebar, LCUI_WidgetEvent *event)
 }
 
 void 
-Set_Window_Title_Icon(LCUI_Widget *window, LCUI_Graph *icon)
+Window_SetTitleIcon(LCUI_Widget *window, LCUI_Graph *icon)
 /* 功能：自定义指定窗口的标题栏图标 */
 {
 	LCUI_Graph *image;
 	LCUI_Widget *title_widget;
 	LCUI_TitleBar *title_data;
 	
-	title_widget = Get_Window_TitleBar(window);
+	title_widget = Window_GetTitleBar(window);
 	title_data = (LCUI_TitleBar *)Widget_GetPrivData(title_widget);
 	
 	image = Get_PictureBox_Graph(title_data->icon_box);
@@ -157,16 +166,8 @@ Window_TitleBar_Init(LCUI_Widget *titlebar)
 	Widget_SetBackgroundLayout( titlebar, LAYOUT_STRETCH );
 }
 
-LCUI_Size 
-Get_Window_Client_Size(LCUI_Widget *win_p)
-/* 功能：获取窗口的客户区的尺寸 */
-{
-	LCUI_Widget *client_area = Get_Window_Client_Area(win_p);
-	return client_area->size;
-}
-
 static void
-Exec_Update_Window( LCUI_Widget *win_p )
+Window_ExecUpdate( LCUI_Widget *win_p )
 {
 	LCUI_Size size;
 	LCUI_Graph *graph;
@@ -175,8 +176,8 @@ Exec_Update_Window( LCUI_Widget *win_p )
 	LCUI_Border border;
 	LCUI_RGB border_color, back_color;
 	
-	titlebar = Get_Window_TitleBar(win_p);
-	client_area = Get_Window_Client_Area(win_p);
+	titlebar = Window_GetTitleBar(win_p);
+	client_area = Window_GetClientArea(win_p);
 	graph = Widget_GetSelfGraph( win_p );
 	/* 按不同的风格来处理 */ 
 	switch( win_p->style_id ) {
@@ -265,65 +266,26 @@ union_draw_method:;
 	}
 }
 
-LCUI_Widget *
-Get_Parent_Window(LCUI_Widget *widget)
-/* 功能：获取指定部件所在的窗口 */
-{
-	if( !widget || !widget->parent ) {
-		return NULL;
-	}
-	if(strcmp(widget->parent->type_name.string, "window") == 0) {
-		return widget->parent;
-	}
-	
-	return Get_Parent_Window(widget->parent);
-}
-
-
-static void 
-Quit_Parent_Window(LCUI_Widget *btn, LCUI_WidgetEvent *unused)
-/* 功能：退出部件btn所在的窗口 */
-{
-	//printf("Quit_Parent_Window start\n");
-	LCUI_MainLoop_Quit( NULL );
-	//printf("Quit_Parent_Window end\n");
-	//return;
-	//LCUI_Widget *win_p = Get_Parent_Window(btn);
-	//if(win_p == NULL) 
-	//	puts(QUIT_PARENT_WINDOW_ERROR);
-	//Widget_Destroy(win_p);
-}
-
-static void 
-Destroy_Window(LCUI_Widget *win_p)
-/*
- * 功能：释放window部件占用的内存资源
- * 说明：类似于析构函数
- **/
-{
-	//由于没有指针变量申请过内存，因此不需要释放指针变量
-}
-
+/* 在窗口失去焦点时会调用此函数 */
 static void
 Window_FocusOut( LCUI_Widget *window, LCUI_WidgetEvent *unused )
-/* 在窗口失去焦点时会调用此函数 */
 {
 	//_DEBUG_MSG( "%p, Window_FocusOut!\n", window );
 	Widget_Update( window );
 }
 
+/* 在窗口获得焦点时会调用此函数 */
 static void
 Window_FocusIn( LCUI_Widget *window, LCUI_WidgetEvent *unused )
-/* 在窗口获得焦点时会调用此函数 */
 {
 	//_DEBUG_MSG( "%p, Window_FocusIn!\n",window );
 	Widget_Front( window ); /* 前置窗口 */
 	Widget_Update( window ); /* 更新窗口 */
 }
 
-static void 
-Window_Init(LCUI_Widget *win_p)
 /* 初始化window部件相关数据 */
+static void 
+Window_Init( LCUI_Widget *win_p )
 {
 	LCUI_Widget *titlebar;
 	LCUI_Widget *client_area;
@@ -359,13 +321,7 @@ Window_Init(LCUI_Widget *win_p)
 	/* 将尺寸改成和图片一样 */
 	Widget_SetAutoSize( btn_close, FALSE, 0 );
 	Widget_Resize(btn_close, Size(btn_normal.width, btn_normal.height));
-	Custom_Button_Style(btn_close, &btn_normal, &btn_highlight, &btn_down, NULL, NULL);
-	/* 关联按钮的点击事件，当按钮被点击后，调用Quit_Window函数 */
-	Widget_Event_Connect( btn_close, EVENT_CLICKED, Quit_Parent_Window );
-	/* 释放图形数据 */
-	Graph_Free(&btn_highlight);
-	Graph_Free(&btn_down);
-	Graph_Free(&btn_normal);
+	Button_CustomStyle(btn_close, &btn_normal, &btn_highlight, &btn_down, NULL, NULL);
 	/* 保存部件指针 */
 	win->client_area = client_area;
 	win->titlebar = titlebar;
@@ -383,7 +339,7 @@ Window_Init(LCUI_Widget *win_p)
 	Widget_Resize(win_p, Size(100, 50));
 	Widget_Show(btn_close);
 	/* 关联拖动事件，让鼠标能够拖动标题栏并使窗口移动 */
-	Widget_Event_Connect(titlebar, EVENT_DRAG, Move_Window );
+	Widget_Event_Connect(titlebar, EVENT_DRAG, Window_ExecMove );
 	/* 
 	 * 由于需要在窗口获得/失去焦点时进行相关处理，因此需要将回调函数 与部件
 	 * 的FOCUS_IN和FOCUS_OUT事件 进行关联
@@ -393,7 +349,7 @@ Window_Init(LCUI_Widget *win_p)
 }
 
 static void 
-Show_Window(LCUI_Widget *win_p)
+Window_ExecShow(LCUI_Widget *win_p)
 /* 功能：在窗口显示时，进行相关处理 */
 {
 	LCUI_Size ctnr_size, size;
@@ -413,26 +369,26 @@ Show_Window(LCUI_Widget *win_p)
 }
 
 static void 
-Hide_Window(LCUI_Widget *win_p)
+Window_ExecHide(LCUI_Widget *win_p)
 /* 功能：在隐藏窗口时使用视觉特效 */
 {
 	//有待扩展
 }
 
 void 
-Set_Window_Title_Text(LCUI_Widget *win_p, const char *text)
+Window_SetTitleText(LCUI_Widget *win_p, const char *text)
 /* 功能：为窗口设置标题文字 */
 { 
-	LCUI_Widget *titlebar = Get_Window_TitleBar(win_p); 
+	LCUI_Widget *titlebar = Window_GetTitleBar(win_p); 
 	LCUI_TitleBar *title = Widget_GetPrivData(titlebar); 
 	Label_Text(title->label, text);
 }
 
 void 
-Window_Client_Area_Add(LCUI_Widget *window, LCUI_Widget *widget)
+Window_ClientArea_Add(LCUI_Widget *window, LCUI_Widget *widget)
 /* 功能：将部件添加至窗口客户区 */
 {
-	LCUI_Widget *w = Get_Window_Client_Area(window);
+	LCUI_Widget *w = Window_GetClientArea(window);
 	Widget_Container_Add(w, widget);
 }
 
@@ -440,8 +396,24 @@ void
 Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget)
 /* 功能：将部件添加至窗口标题栏 */
 {
-	LCUI_Widget *w = Get_Window_TitleBar(window);
+	LCUI_Widget *w = Window_GetTitleBar(window);
 	Widget_Container_Add(w, widget);
+}
+
+
+/* 新建一个窗口 */
+LCUI_Widget *
+Window_New( const char *title, LCUI_Graph *icon, LCUI_Size size )
+{
+	LCUI_Widget *wnd;
+	wnd = Widget_New("window");
+	if( wnd == NULL ) {
+		return NULL;
+	}
+	Window_SetTitleText( wnd, title );
+	Window_SetTitleIcon( wnd, icon );
+	Widget_Resize( wnd, size );
+	return wnd;
 }
 
 void 
@@ -455,9 +427,8 @@ Register_Window()
 	/* 为部件类型关联相关函数 */ 
 	WidgetFunc_Add("titlebar", Window_TitleBar_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("window", Window_Init, FUNC_TYPE_INIT);
-	WidgetFunc_Add("window", Exec_Update_Window, FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("window", Show_Window, FUNC_TYPE_SHOW);
-	WidgetFunc_Add("window", Hide_Window, FUNC_TYPE_HIDE);
-	WidgetFunc_Add("window", Destroy_Window, FUNC_TYPE_DESTROY);
+	WidgetFunc_Add("window", Window_ExecUpdate, FUNC_TYPE_UPDATE);
+	WidgetFunc_Add("window", Window_ExecShow, FUNC_TYPE_SHOW);
+	WidgetFunc_Add("window", Window_ExecHide, FUNC_TYPE_HIDE);
 }
 

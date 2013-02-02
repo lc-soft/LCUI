@@ -70,7 +70,7 @@ typedef struct {
 
 extern LCUI_System  LCUI_Sys;
 
-/************************* App Management *****************************/
+/*------------------------------ LCUIApp -----------------------------*/
 /* 根据程序的ID，获取指向程序数据结构的指针 */
 LCUI_App *LCUIApp_Find( LCUI_ID id );
 
@@ -79,8 +79,9 @@ LCUI_App* LCUIApp_GetSelf( void );
 
 /* 获取程序ID */
 LCUI_ID LCUIApp_GetSelfID( void );
-/*********************** App Management End ***************************/
+/*--------------------------- End LCUIApp ----------------------------*/
 
+/*--------------------------- Main Loop ------------------------------*/
 /* 新建一个主循环 */
 LCUI_MainLoop *LCUI_MainLoop_New( void );
 
@@ -93,6 +94,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop *loop );
 /* 标记目标主循环需要退出 */
 int LCUI_MainLoop_Quit( LCUI_MainLoop *loop );
 
+/*----------------------- End MainLoop -------------------------------*/
 
 BOOL LCUI_Active();
 /* 功能：检测LCUI是否活动 */ 
@@ -109,8 +111,8 @@ int LCUI_Init(int argc, char *argv[]);
  *  */
 int LCUI_Main( void );
 
-int Get_LCUI_Version(char *out);
-/* 功能：获取LCUI的版本 */ 
+/* 获取LCUI的版本 */
+int LCUI_GetSelfVersion( char *out );
 
 int Get_EncodingType();
 /* 获取字符编码类型 */

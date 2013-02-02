@@ -346,8 +346,9 @@ struct _LCUI_Graph
 	LCUI_Pos pos;		/* 在引用另一个图层中的图形时，会保存区域的起点位置 */
 	int width, height;	/* 尺寸 */
 	
-	uchar_t**	rgba;	/* 图片数组 */
 	uchar_t	alpha;	/* 全局透明度，表示整张图片的透明度，默认为255 */
+	uchar_t**	rgba;	/* 像素数据缓冲区 */
+	size_t		mem_size; /* 像素数据缓冲区大小 */
 	
 	BOOL have_alpha;	/* 标志，指定是否需要透明度，分配内存时会根据它分配 */
 	BOOL is_opaque;		/* 标志，指定该图形是否为不透明 */
