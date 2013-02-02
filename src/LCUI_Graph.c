@@ -334,6 +334,7 @@ void Graph_Init(LCUI_Graph *pic)
 	pic->not_visible = FALSE;
 	pic->rgba	= NULL;
 	pic->alpha	= 255;
+	pic->mem_size	= 0;
 	pic->pos	= Pos(0, 0);
 	pic->width	= 0;
 	pic->height	= 0;
@@ -406,19 +407,18 @@ int Graph_Create(LCUI_Graph *graph, int width, int height)
 	
 	if( Graph_Valid(graph) ) {
 		/* 如果现有图形尺寸大于要创建的图形的尺寸，直接改尺寸即可 */
-		if(graph->width*graph->height > width*height) {
+		if(graph->mem_size >= (size_t)width*height) {
 			graph->width  = width;
 			graph->height = height;
-			return 1;
+			return 0;
 		}
 		Graph_Free( graph ); 
 	}
-	
+	graph->mem_size = (size_t)width*height;
 	graph->rgba = New_Graph( width, height, graph->have_alpha ); 
 	if(NULL == graph->rgba) {
 		graph->width  = 0;
 		graph->height = 0;
-		Graph_Unlock( graph ); 
 		return -1;
 	}
 	
@@ -621,7 +621,6 @@ void Graph_Zoom(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 	if(!Graph_Valid(in)) {
 		return; 
 	}
-	
 	if(size.w <=0 || size.h <= 0) { 
 		Graph_Free(out);
 		return;
@@ -638,8 +637,9 @@ void Graph_Zoom(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 		else scale_x = scale_y;
 	}
 	out->have_alpha = in->have_alpha;
-	Graph_Create(out, size.w, size.h);/* 申请内存 */
-	
+	if( Graph_Create(out, size.w, size.h) < 0) {
+		return;
+	}
 	for (y=0; y < size.h; ++y)  {
 		pos.y = y*scale_y;
 		k = y*size.w;
@@ -648,11 +648,11 @@ void Graph_Zoom(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 			pos.x = x*scale_x; 
 			temp  = k + x;
 			count = m + pos.x;
-			out->rgba[0][temp] = in->rgba[0][count];
-			out->rgba[1][temp] = in->rgba[1][count];
-			out->rgba[2][temp] = in->rgba[2][count];
-			if(Graph_Have_Alpha(in)) {
-				out->rgba[3][temp] = in->rgba[3][count];
+			out->rgba[0][temp] = src->rgba[0][count];
+			out->rgba[1][temp] = src->rgba[1][count];
+			out->rgba[2][temp] = src->rgba[2][count];
+			if(in->have_alpha) {
+				out->rgba[3][temp] = src->rgba[3][count];
 			}
 		}
 	} 
@@ -1101,7 +1101,7 @@ int Graph_Fill_Image(	LCUI_Graph *graph,	LCUI_Graph *bg,
 	}
 	/* 拉伸 */
 	else if( Check_Option( mode, LAYOUT_STRETCH ) ) {
-		Graph_Zoom( bg,  &temp_bg, CUSTOM, size );
+		Graph_Zoom( bg, &temp_bg, CUSTOM, size );
 		bg = &temp_bg;
 	}
 	/* 居中 */
