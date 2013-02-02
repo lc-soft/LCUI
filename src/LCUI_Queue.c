@@ -584,10 +584,9 @@ Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 		for (i = pos; i < queue->total_num - 1; ++i) {
 			queue->data_array[i] = queue->data_array[i + 1]; 
 		}
-
+		/* 根据flag的值，对末尾的成员进行响应处理 */
 		if(flag == 1) {
 			queue->data_array[i] = save;
-			memset(queue->data_array[i], 0, queue->element_size);
 		} else {
 			queue->data_array[i] = NULL;
 		}
@@ -627,19 +626,15 @@ Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 			p_src->data = NULL;
 		}
 	} 
-	/* 
-	 * 如果是使用本函数转移队列成员至另一个队列，该队列成员还是在同一个内存空间，
-	 * 只不过，记录该成员的内存地址的队列不同。这种操作，本函数不会在源队列中保留
-	 * 该成员的地址，因为源队列可能会被销毁，销毁时也会free掉队列中每个成员，而
-	 * 目标队列未被销毁，且正在使用之前转移过来的成员，这会产生错误。
-	 *  */
 	--queue->total_num;
 	
 	if(flag == 1) { 
 		/* 对该位置的成员进行析构处理 */
 		if( queue->destroy_func ) {
 			queue->destroy_func(save);
-		} 
+		}
+		/* 置零该内存空间 */
+		memset(save, 0, queue->element_size);
 		/* 不需要释放内存，只有在调用Destroy_Queue函数时才全部释放 */
 		//free(save); 
 	}
