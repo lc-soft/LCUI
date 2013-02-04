@@ -362,8 +362,8 @@ TextBox_Init( LCUI_Widget *widget )
 	}
 	Widget_Event_Connect( widget, EVENT_DRAG, TextBox_TextLayer_Click );
 	/* 关联 FOCUS_OUT 和 FOCUS_IN 事件 */
-	Widget_Event_Connect( widget, EVENT_FOCUS_OUT, hide_textbox_cursor );
-	Widget_Event_Connect( widget, EVENT_FOCUS_IN, _put_textbox_cursor );
+	Widget_Event_Connect( widget, EVENT_FOCUSOUT, hide_textbox_cursor );
+	Widget_Event_Connect( widget, EVENT_FOCUSIN, _put_textbox_cursor );
 	/* 关联按键输入事件 */
 	Widget_Event_Connect( widget, EVENT_KEYBOARD, TextBox_Input );
 	/* 默认不启用多行文本模式 */

@@ -344,8 +344,8 @@ Window_Init( LCUI_Widget *win_p )
 	 * 由于需要在窗口获得/失去焦点时进行相关处理，因此需要将回调函数 与部件
 	 * 的FOCUS_IN和FOCUS_OUT事件 进行关联
 	 * */
-	Widget_Event_Connect( win_p, EVENT_FOCUS_OUT, Window_FocusOut );
-	Widget_Event_Connect( win_p, EVENT_FOCUS_IN, Window_FocusIn );
+	Widget_Event_Connect( win_p, EVENT_FOCUSOUT, Window_FocusOut );
+	Widget_Event_Connect( win_p, EVENT_FOCUSIN, Window_FocusIn );
 }
 
 static void 

@@ -1084,6 +1084,31 @@ LCUI_Widget *Widget_GetParent(LCUI_Widget *widget, char *widget_type)
 	return NULL;
 }
 
+/* 获取指定ID的子部件 */
+LCUI_Widget *Widget_GetChildByID( LCUI_Widget *widget, LCUI_ID id )
+{
+	int i, n;
+	LCUI_Widget *child;
+	LCUI_Queue *child_list;
+	
+	if( widget ) {
+		child_list = &widget->child;
+	} else {
+		child_list = &LCUI_Sys.widget_list;
+	}
+	n = Queue_Get_Total( child_list );
+	for(i=0; i<n; ++i) {
+		child = Queue_Get( child_list, i );
+		if( !child ) {
+			continue;
+		}
+		if( child->self_id == id ) {
+			return child;
+		}
+	}
+	return NULL;
+}
+
 /* 销毁指定ID的程序的所有部件 */
 void LCUIApp_DestroyAllWidgets( LCUI_ID app_id )
 {
@@ -1524,7 +1549,7 @@ void Widget_LimitSize(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_siz
 	if(max_size.h < min_size.h) {
 		max_size.h = min_size.h;
 	}
-		
+	
 	widget->min_w.px = min_size.w;
 	widget->min_h.px = min_size.h;
 	widget->min_w.which_one = 0;
@@ -1819,7 +1844,7 @@ void Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 /* 功能：执行改变部件尺寸的操作 */
 {
 	LCUI_Size max_size, min_size;
-	void ( *func_resize ) (LCUI_Widget*);
+	LCUI_WidgetEvent event;
 	
 	if( !widget ) {
 		return;
@@ -1844,6 +1869,10 @@ void Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 	if(size.h < min_size.h) {
 		size.h = min_size.h;
 	}
+	/* 记录事件数据 */
+	event.type = EVENT_RESIZE;
+	event.resize.new_size = size;
+	event.resize.old_size = widget->size;
 	
 	if( widget->visible ) {
 		LCUI_Rect rect;
@@ -1864,9 +1893,7 @@ void Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 	//_DEBUG_MSG("size: %d, %d\n", size.w, size.h);
 	GraphLayer_Resize( widget->client_glayer, size.w, size.h );
 	
-	/* 获取改变部件尺寸时需要调用的函数 */
-	func_resize = WidgetFunc_GetByID( widget->type_id, FUNC_TYPE_RESIZE );
-	func_resize( widget );
+	WidgetFunc_Call( widget, FUNC_TYPE_RESIZE );
 	Refresh_Widget( widget );
 	/* 更新子部件的位置及尺寸 */  
 	Update_Child_Widget_Size( widget );
@@ -1874,6 +1901,8 @@ void Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 	/* 如果需要让它的容器能够自动调整大小 */
 		Widget_AutoResize( widget->parent );
 	}
+	/* 处理部件的RESIZE事件 */
+	Widget_DispatchEvent( widget, &event );
 }
 
 /* 启用或禁用部件的自动尺寸调整功能 */
@@ -2061,6 +2090,19 @@ void Update_Child_Widget_Pos(LCUI_Widget *widget)
 	Update_StaticPosType_ChildWidget( widget );
 }
 
+/* 设定部件的高度，单位为像素 */
+void Widget_SetHeight( LCUI_Widget *widget, int height )
+{
+	switch( widget->dock ) {
+	    case DOCK_TYPE_NONE:
+	    case DOCK_TYPE_TOP:
+	    case DOCK_TYPE_BOTTOM:
+		widget->h.which_one = 0;
+		widget->h.px = height;
+		break;
+	    default: return;
+	}
+}
 
 void Widget_SetSize( LCUI_Widget *widget, char *width, char *height )
 /* 

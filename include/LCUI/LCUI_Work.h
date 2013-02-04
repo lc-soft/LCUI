@@ -49,10 +49,17 @@ typedef enum {
 	EVENT_DRAG,	/* 部件的拖动事件 */
 	EVENT_CLICKED,	/* 部件的点击事件 */
 	EVENT_MOVE,	/* 部件的移动事件 */
+	EVENT_RESIZE,	/* 部件尺寸改变 */
 	EVENT_KEYBOARD,	/* 按键事件 */
-	EVENT_FOCUS_IN,	/* 得到焦点 */
-	EVENT_FOCUS_OUT	/* 失去焦点 */
+	EVENT_FOCUSIN,	/* 得到焦点 */
+	EVENT_FOCUSOUT	/* 失去焦点 */
 } WidgetEventType; 
+
+typedef struct {
+	uint8_t type;
+	LCUI_Size old_size;
+	LCUI_Size new_size;
+} LCUI_WidgetResizeEvent;
 
 typedef struct {
 	uint8_t type;
@@ -74,6 +81,7 @@ typedef union {
 	LCUI_WidgetDragEvent drag;
 	LCUI_WidgetKeyboardEvent key;
 	LCUI_WidgetFocusEvent focus;
+	LCUI_WidgetResizeEvent resize;
 } LCUI_WidgetEvent;
 
 LCUI_BEGIN_HEADER
@@ -90,6 +98,9 @@ void FuncQueue_Init(LCUI_Queue *queue);
 int Widget_Event_Connect ( LCUI_Widget *widget, WidgetEventType event_id, 
 			void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) );
 
+/* 处理与部件事件关联的回调函数 */
+int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event );
+
 void Widget_Event_Init();
 /* 功能：初始化部件事件处理 */ 
 
@@ -98,8 +109,8 @@ BOOL
 Set_Focus( LCUI_Widget *widget );
 /* 
  * 功能：为部件设置焦点
- * 说明：上个获得焦点的部件会得到EVENT_FOCUS_OUT事件，而当前获得焦点的部件会得到
- * EVENT_FOCUS_IN事件。
+ * 说明：上个获得焦点的部件会得到EVENT_FOCUSOUT事件，而当前获得焦点的部件会得到
+ * EVENT_FOCUSIN事件。
  * */ 
 
 /* 获取指定部件内的已获得焦点的子部件 */
@@ -110,7 +121,7 @@ BOOL
 Cancel_Focus( LCUI_Widget *widget );
 /* 
  * 功能：取消指定部件的焦点
- * 说明：该部件会得到EVENT_FOCUS_OUT事件，并且，会将焦点转移至其它部件
+ * 说明：该部件会得到EVENT_FOCUSOUT事件，并且，会将焦点转移至其它部件
  * */ 
 
 BOOL

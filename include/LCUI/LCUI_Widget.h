@@ -270,6 +270,9 @@ void Widget_SetValidState( LCUI_Widget *widget, int state );
  **/
 LCUI_Widget *Widget_GetParent(LCUI_Widget *widget, char *widget_type);
 
+/* 获取指定ID的子部件 */
+LCUI_Widget *Widget_GetChildByID( LCUI_Widget *widget, LCUI_ID id );
+
 /* 销毁指定ID的程序的所有部件 */
 void LCUIApp_DestroyAllWidgets( LCUI_ID app_id );
 
@@ -323,6 +326,9 @@ void Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode );
 
 void Widget_SetAlign(LCUI_Widget *widget, ALIGN_TYPE align, LCUI_Pos offset);
 /* 功能：设定部件的对齐方式以及偏移距离 */ 
+
+/* 设定部件的高度，单位为像素 */
+void Widget_SetHeight( LCUI_Widget *widget, int height );
 
 void Widget_SetSize( LCUI_Widget *widget, char *width, char *height );
 /* 

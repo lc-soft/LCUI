@@ -99,6 +99,7 @@ int Widget_Event_Connect ( LCUI_Widget *widget, WidgetEventType event_id,
 	return 0;
 }
 
+/* 处理与部件事件关联的回调函数 */
 int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
 	if( !widget ) {
@@ -485,8 +486,8 @@ static LCUI_Widget *root_focus_widget = NULL;
 BOOL Set_Focus( LCUI_Widget *widget )
 /* 
  * 功能：为部件设置焦点
- * 说明：上个获得焦点的部件会得到EVENT_FOCUS_OUT事件，而当前获得焦点的部件会得到
- * EVENT_FOCUS_IN事件。
+ * 说明：上个获得焦点的部件会得到EVENT_FOCUSOUT事件，而当前获得焦点的部件会得到
+ * EVENT_FOCUSIN事件。
  * */
 {
 	if( widget ) {
@@ -512,11 +513,11 @@ BOOL Set_Focus( LCUI_Widget *widget )
 	if( *focus_widget ) {
 		/* 如果上次和这次的部件不一样 */
 		if( *focus_widget != widget ) {
-			event.type = EVENT_FOCUS_OUT;
+			event.type = EVENT_FOCUSOUT;
 			Widget_DispatchEvent( *focus_widget, &event );
 		}
 	}
-	event.type = EVENT_FOCUS_IN;
+	event.type = EVENT_FOCUSIN;
 	Widget_DispatchEvent( widget, &event );
 	/* 保存新焦点位置 */
 	*focus_widget = widget;
@@ -577,7 +578,7 @@ BOOL
 Cancel_Focus( LCUI_Widget *widget )
 /* 
  * 功能：取消指定部件的焦点
- * 说明：该部件会得到EVENT_FOCUS_OUT事件，并且，会将焦点转移至其它部件
+ * 说明：该部件会得到EVENT_FOCUSOUT事件，并且，会将焦点转移至其它部件
  * */
 {
 	if( !widget || !widget->focus ) {
@@ -600,7 +601,7 @@ Cancel_Focus( LCUI_Widget *widget )
 	if( *focus_widget != widget ) {
 		return FALSE;
 	}
-	event.type = EVENT_FOCUS_OUT;
+	event.type = EVENT_FOCUSOUT;
 	Widget_DispatchEvent( widget, &event );
 	/* 寻找可获得焦点的其它部件 */
 	total = Queue_Get_Total( queue_ptr );
@@ -609,7 +610,7 @@ Cancel_Focus( LCUI_Widget *widget )
 		other_widget = Queue_Get( queue_ptr, i);
 		if( other_widget && other_widget->visible
 		 && other_widget->focus ) {
-			event.type = EVENT_FOCUS_IN;
+			event.type = EVENT_FOCUSIN;
 			Widget_DispatchEvent( widget, &event );
 			*focus_widget = other_widget;
 			break;
@@ -623,7 +624,7 @@ Cancel_Focus( LCUI_Widget *widget )
 		other_widget = Queue_Get( queue_ptr, i);
 		if( other_widget && other_widget->visible
 		 && other_widget->focus ) {
-			event.type = EVENT_FOCUS_IN;
+			event.type = EVENT_FOCUSIN;
 			Widget_DispatchEvent( other_widget, &event );
 			*focus_widget = other_widget;
 			break;
@@ -649,7 +650,7 @@ Reset_Focus( LCUI_Widget* widget )
 		focus_widget = &root_focus_widget; 
 	}
 	if( *focus_widget ) {
-		event.type = EVENT_FOCUS_OUT;
+		event.type = EVENT_FOCUSOUT;
 		Widget_DispatchEvent( *focus_widget, &event );
 	}
 	
