@@ -194,6 +194,7 @@ struct _LCUI_Widget {
 /**********************************************************************/
 
 #include LC_WORK_H
+#include LC_GUI_MSGBOX_H
 
 LCUI_BEGIN_HEADER
 

@@ -59,8 +59,8 @@ int Get_Screen_Height ();
  * 返回值：屏幕的高度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
  * */ 
 
-LCUI_Size Get_Screen_Size ();
-/* 功能：获取屏幕尺寸 */ 
+/* 获取屏幕尺寸 */
+LCUI_Size Get_Screen_Size( void );
 
 void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color);
 /* 功能：填充指定位置的像素点的颜色 */ 

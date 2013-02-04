@@ -1,0 +1,39 @@
+#ifndef __LCUI_GUI_MESSAGEBOX_H__
+#define __LCUI_GUI_MESSAGEBOX_H__
+
+typedef enum {
+	MB_ICON_NONE,
+	MB_ICON_ERROR,
+	MB_ICON_HELP,
+	MB_ICON_INFO,
+	MB_ICON_WARNING
+} MB_ICON_TYPE;
+
+typedef enum {
+	MB_BTN_OK,
+	MB_BTN_OKCANCEL,
+	MB_BTN_ABORTRETRYIGNORE,
+	MB_BTN_RETRYCANCEL,
+	MB_BTN_YESNO,
+	MB_BTN_YESNOCANCEL
+} MB_BTN_TYPE;
+
+typedef enum {
+	MB_BTN_IS_OK,
+	MB_BTN_IS_CANCEL,
+	MB_BTN_IS_ABORT,
+	MB_BTN_IS_RETRY,
+	MB_BTN_IS_IGNORE,
+	MB_BTN_IS_YES,
+	MB_BTN_IS_NO,
+	MB_BTN_IS_QUIT
+} MB_BTN;
+
+LCUI_BEGIN_HEADER
+
+int LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text, 
+			const char *title, MB_BTN_TYPE button );
+
+LCUI_END_HEADER
+
+#endif

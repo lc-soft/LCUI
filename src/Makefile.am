@@ -39,6 +39,7 @@ LCUI_LIBADD = \
 	output/liboutput.la \
 	thread/libthread.la \
 	widget/libwidget.la \
+	gui/libgui.la \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
 	$(THREAD_LIBS) \
@@ -46,7 +47,7 @@ LCUI_LIBADD = \
 	$(ICONV_LIBS) \
 	$(TS_LIBS)
 
-SUBDIRS = bmp misc draw kernel font input output thread widget
+SUBDIRS = bmp misc draw kernel font input output thread widget gui
 
 ##库的编译需要这样
 lib_LTLIBRARIES = libLCUI.la

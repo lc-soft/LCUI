@@ -74,8 +74,8 @@ int Get_Screen_Height ()
 	return LCUI_Sys.screen.size.h; 
 }
 
-LCUI_Size Get_Screen_Size ()
-/* 功能：获取屏幕尺寸 */
+/* 获取屏幕尺寸 */
+LCUI_Size Get_Screen_Size( void )
 {
 	return LCUI_Sys.screen.size; 
 }

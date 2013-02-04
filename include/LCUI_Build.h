@@ -106,6 +106,9 @@
 #define LC_ACTIVEBOX_H	<LCUI/widget/activebox.h> 
 #define LC_TEXTBOX_H	<LCUI/widget/textbox.h>
 #define LC_SCROLLBAR_H	<LCUI/widget/scrollbar.h>
+
+#define LC_GUI_MSGBOX_H	<LCUI/gui/messagebox.h>
+
 #endif
 
 #define _DEBUG_MSG(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)

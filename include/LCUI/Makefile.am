@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign
-SUBDIRS=widget font kernel draw
+SUBDIRS=widget font kernel draw gui
 ##一些需要安装的头文件
 # Headers which are installed to support the library
 INSTINCLUDES=LCUI.h LCUI.hpp\
