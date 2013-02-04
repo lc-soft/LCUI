@@ -2309,50 +2309,6 @@ int Widget_Front( LCUI_Widget *widget )
 	return 0;
 }
 
-/* 将指定部件显示在同等z-index值的部件的前端 */
-int __Widget_Front( LCUI_Widget *widget )
-{
-	LCUI_Queue *queue;
-	LCUI_Widget *tmp_child;
-	int i, total, src_pos = -1, des_pos = -1;
-	
-	if( !widget ) {
-		return -1;
-	}
-	/* 获取指向队列的指针 */
-	if( !widget->parent ) {
-		queue = &LCUI_Sys.widget_list;
-	} else {
-		queue = &widget->parent->child;
-	}
-	total = Queue_Get_Total( queue );
-	for( i=0; i<total; ++i ) {
-		tmp_child = Queue_Get( queue, i );
-		if( widget == tmp_child ) {
-			src_pos = i;
-			continue;
-		} else if( widget->main_glayer->z_index 
-			< tmp_child->main_glayer->z_index ) {
-			continue;
-		}
-		des_pos = i;
-		if( src_pos != -1 ) {
-			break;
-		}
-	}
-	if( -1 == src_pos || -1 == des_pos ) {
-		return 1;
-	}
-	if( src_pos+1 == des_pos ) {
-		return 2;
-	}
-	/* 将该部件移动至队列前端 */
-	Queue_Move( queue, des_pos, src_pos );
-	/* 将部件图层靠前显示 */
-	GraphLayer_Front( widget->main_glayer );
-	return 0;
-} 
-
 void Widget_Show(LCUI_Widget *widget)
 /* 功能：显示部件 */
 {
