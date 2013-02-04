@@ -596,6 +596,10 @@ Cancel_Focus( LCUI_Widget *widget )
 		focus_widget = &root_focus_widget;
 		queue_ptr = &LCUI_Sys.widget_list;
 	}
+	/* 如果该部件并没获得焦点 */
+	if( *focus_widget != widget ) {
+		return FALSE;
+	}
 	event.type = EVENT_FOCUS_OUT;
 	Widget_DispatchEvent( widget, &event );
 	/* 寻找可获得焦点的其它部件 */
@@ -620,7 +624,7 @@ Cancel_Focus( LCUI_Widget *widget )
 		if( other_widget && other_widget->visible
 		 && other_widget->focus ) {
 			event.type = EVENT_FOCUS_IN;
-			Widget_DispatchEvent( widget, &event );
+			Widget_DispatchEvent( other_widget, &event );
 			*focus_widget = other_widget;
 			break;
 		}

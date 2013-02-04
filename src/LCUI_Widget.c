@@ -2208,6 +2208,7 @@ void Widget_Destroy( LCUI_Widget *widget )
 	if( !widget ) {
 		return; 
 	}
+	Cancel_Focus( widget ); /* 取消焦点 */
 	Record_WidgetUpdate( widget, NULL, DATATYPE_DESTROY, 0 );
 }
 
@@ -2322,8 +2323,9 @@ void Widget_Hide(LCUI_Widget *widget)
 /* 功能：隐藏部件 */
 {
 	if( !widget ) {
-		return; 
+		return;
 	}
+	Cancel_Focus( widget ); /* 取消焦点 */
 	Record_WidgetUpdate( widget, NULL, DATATYPE_HIDE, 0 ); 
 }
 
