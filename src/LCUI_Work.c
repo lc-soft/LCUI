@@ -271,6 +271,41 @@ widget_list_add( LCUI_Widget *widget )
 	return 0;
 }
 
+/* 判断指定部件是否被允许响应事件 */
+static BOOL widget_allow_response( LCUI_Widget *widget )
+{
+	int i, n;
+	LCUI_Queue *child_list;
+	LCUI_Widget *child, *up_widget;
+	
+	if( widget == NULL ) {
+		return TRUE;
+	}
+	up_widget = widget->parent;
+	while( widget ) {
+		if( up_widget == NULL ) {
+			child_list = &LCUI_Sys.widget_list;
+		} else {
+			child_list = &up_widget->child;
+		}
+		n = Queue_Get_Total( child_list );
+		for(i=0; i<n; ++i) {
+			child = Queue_Get( child_list, i );
+			if( !child || !child->visible ) {
+				continue;
+			}
+			if( child->modal && child != widget ) {
+				return FALSE;
+			}
+		}
+		widget = up_widget;
+		if( widget ) {
+			up_widget = widget->parent;
+		}
+	}
+	return TRUE;
+}
+
 /* 设定部件状态，该函数会将该部件及上级所有父部件添加至列表里，每次调用该函数时，会更新
  * 列表中的部件记录，若部件在更新前后都在列表中有记录，则该部件及上级所有父部件都会应用
  * 此状态，否则，移除多余的部件，并恢复部件的状态为NORMAL */
@@ -303,13 +338,14 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 	pos.y = event->y;
 	widget = Widget_At( NULL, pos );
 	
-	DEBUG_MSG("mouse left button pressed\n");
+	if( !widget_allow_response(widget) ) {
+		return;
+	}
 	click_widget = widget;
 	/* 焦点转移给该部件 */
 	Set_Focus( widget );
 	if( Widget_Have_Event( widget, EVENT_DRAG ) ) {
 		/* 开始处理部件的拖动 */
-		DEBUG_MSG("widget have EVENT_DRAG\n");
 		_Start_DragEvent( widget, event );
 	}
 	widget_list_set_state( widget, WIDGET_STATE_ACTIVE );
@@ -330,6 +366,10 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 	pos.x = event->x;
 	pos.y = event->y;
 	widget = Widget_At( NULL, pos );
+	
+	if( !widget_allow_response(widget) ) {
+		return;
+	}
 	
 	DEBUG_MSG("mouse left button free\n");
 	if( !click_widget ) {
@@ -378,7 +418,7 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
 	widget = Widget_At (NULL, pos);
 	/* 如果没有部件处于按住状态 */
-	if( !click_widget ) {
+	if( widget_allow_response(widget) && !click_widget ) {
 		widget_list_set_state (widget, WIDGET_STATE_OVERLAY);
 	}
 	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */ 

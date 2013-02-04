@@ -169,49 +169,44 @@ void GraphLayer_SetAlpha( LCUI_GraphLayer *glayer, uchar_t alpha )
 	glayer->graph.alpha = alpha;
 }
 
-/* 设定图层的Z轴坐标 */
+/* 设定图层的Z轴坐标，调用此函数后，需要调用GraphLayer_Sort函数对图层列表进行排序 */
 int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index )
+{	
+	if( !glayer ) {
+		return -1;
+	}
+	glayer->z_index = z_index;
+	return 0;
+}
+
+/* 根据子图层的z-index值，对目标图层的子图层进行排序 */
+int GraphLayer_Sort( LCUI_GraphLayer *glayer )
 {
-	int i, total, src_pos = -1, des_pos = -1;
-	LCUI_GraphLayer *tmp_child;
-	LCUI_Queue *queue;
+	LCUI_GraphLayer *child_a, *child_b;
+	int i, j, total;
 	
 	if( !glayer ) {
 		return -1;
 	}
-	
-	glayer->z_index = z_index;
-	if( !glayer->parent ) {
-		return 1;
-	}
-	queue = &glayer->parent->child;
-	total = Queue_Get_Total( queue );
-
-	for( i=0; i<total; ++i ) {
-		tmp_child = Queue_Get( queue, i );
-		if( glayer == tmp_child ) {
-			/* 找到自己的位置 */
-			src_pos = i;
-			continue;
-		} else if( glayer->z_index < tmp_child->z_index ) {
+	Queue_Lock( &glayer->child );
+	total = Queue_Get_Total( &glayer->child );
+	for(i=0; i<total; ++i) {
+		child_a = Queue_Get( &glayer->child, i );
+		if( !child_a ) {
 			continue;
 		}
-		/* 找到需要移动至的位置 */
-		des_pos = i;
-		/* 如果已经找到自己的位置 */
-		if( src_pos != -1 ) {
-			break;
+		for(j=i+1; j<total; ++j) {
+			child_b = Queue_Get( &glayer->child, j );
+			if( !child_b ) {
+				continue;
+			}
+			if( child_b->z_index > child_a->z_index ) {
+				Queue_Swap( &glayer->child, j, i);
+				child_a = child_b;
+			}
 		}
 	}
-	/* 如果没有找到自己的位置或者目标位置 */
-	if( -1 == src_pos || -1 == des_pos ) {
-		return 2;
-	}
-	/* 若目标位置就在源位置后面，那就不需要移动位置 */
-	if( src_pos+1 == des_pos ) {
-		return 3;
-	}
-	Queue_Move( queue, des_pos, src_pos );
+	Queue_UnLock( &glayer->child );
 	return 0;
 }
 

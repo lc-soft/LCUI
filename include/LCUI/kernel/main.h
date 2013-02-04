@@ -9,11 +9,10 @@ typedef struct _LCUI_App
 {
 	LCUI_ID id; /* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
 	
-	LCUI_Queue	tasks;	/* 程序的任务队列 */
-	LCUI_Queue	events;		/* 事件队列 */
-	LCUI_Queue	widget_lib;	/* 部件类型库 */
-	
-	int encoding_type;	/* 字符编码类型，默认为UTF-8 */
+	LCUI_Queue tasks;	/* 程序的任务队列 */
+	LCUI_Queue events;	/* 事件队列 */
+	LCUI_Queue widget_lib;	/* 部件类型库 */
+	int encoding_type;	/* 使用的字符编码类型，默认为UTF-8 */
 }
 LCUI_App;
 /**********************************************************************/

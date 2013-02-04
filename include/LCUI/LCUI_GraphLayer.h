@@ -54,8 +54,11 @@ int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y );
 /* 设定图层的全局透明度 */
 void GraphLayer_SetAlpha( LCUI_GraphLayer *glayer, uchar_t alpha );
 
-/* 设定图层的Z轴坐标 */
+/* 设定图层的Z轴坐标，调用此函数后，需要调用GraphLayer_Sort函数对图层列表进行排序 */
 int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index );
+
+/* 根据子图层的z-index值，对目标图层的子图层进行排序 */
+int GraphLayer_Sort( LCUI_GraphLayer *glayer );
 
 /* 调整图层的大小 */
 int GraphLayer_Resize( LCUI_GraphLayer *glayer, int w, int h );

@@ -110,8 +110,8 @@ typedef struct {
 
 
 struct _LCUI_Widget {
-	LCUI_ID app_id; /* 所属程序的ID */
-	
+	LCUI_ID app_id;	/* 所属程序的ID */
+	LCUI_ID self_id;	/* 自身ID */
 	LCUI_ID type_id;	/* 类型编号 */
 	LCUI_ID style_id;	/* 风格编号 */
 	LCUI_String type_name;	/* 类型名 */
@@ -119,6 +119,7 @@ struct _LCUI_Widget {
 	
 	BOOL enabled;	/* 是否启用 */
 	BOOL visible;	/* 是否可见 */
+	BOOL modal;	/* 是否为模态部件 */
 	
 	LCUI_Pos pos;	/* 已计算出的实际位置 */
 	LCUI_Pos max_pos;
@@ -333,6 +334,9 @@ void Widget_SetSize( LCUI_Widget *widget, char *width, char *height );
  * Widget_SetSize( widget, "50", "50" ); 部件尺寸最大为50x50像素，px可以省略 
  * Widget_SetSize( widget, NULL, "50%" ); 部件宽度保持原样，高度为容器高度的一半
  * */ 
+
+/* 指定部件是否为模态部件 */
+void Widget_SetModal( LCUI_Widget *widget, BOOL is_modal );
 
 void Widget_SetDock( LCUI_Widget *widget, DOCK_TYPE dock );
 /* 设定部件的停靠类型 */ 

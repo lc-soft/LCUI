@@ -1304,7 +1304,9 @@ LCUI_Widget *Widget_New( const char *widget_type )
 	widget->auto_size		= FALSE;
 	widget->auto_size_mode		= AUTOSIZE_MODE_GROW_AND_SHRINK;
 	widget->type_id			= 0;
+	widget->modal			= FALSE;
 	widget->state			= WIDGET_STATE_NORMAL;
+	widget->self_id			= 0;
 	widget->app_id			= app->id; 
 	widget->parent			= NULL;
 	widget->enabled			= TRUE;
@@ -1772,6 +1774,7 @@ void Widget_ExecShow(LCUI_Widget *widget)
 	if( widget->focus ) {
 		Set_Focus( widget );	/* 将焦点给该部件 */
 	}
+	Widget_Front(widget); /* 改变部件的排列位置 */
 	Refresh_Widget( widget ); /* 刷新部件所在区域的图形显示 */
 }
 
@@ -2088,6 +2091,15 @@ void Widget_SetSize( LCUI_Widget *widget, char *width, char *height )
 	Widget_UpdateSize( widget );
 }
 
+/* 指定部件是否为模态部件 */
+void Widget_SetModal( LCUI_Widget *widget, BOOL is_modal )
+{
+	if( !widget ) {
+		return;
+	}
+	widget->modal = is_modal;
+}
+
 void Widget_SetDock( LCUI_Widget *widget, DOCK_TYPE dock )
 /* 设定部件的停靠类型 */
 {
@@ -2224,8 +2236,81 @@ void __Update_Widget(LCUI_Widget *widget)
 	Record_WidgetUpdate( widget, NULL, DATATYPE_UPDATE, 1 );
 }
 
+
 /* 将指定部件显示在同等z-index值的部件的前端 */
 int Widget_Front( LCUI_Widget *widget )
+{
+	LCUI_Widget *child;
+	LCUI_Queue *widget_list;
+	LCUI_GraphLayer *container_glayer;
+	int i, n, zindex, src_pos = 0, des_pos = 0;
+	
+	if( widget ) {
+		if( widget->parent ) {
+			widget_list = &widget->parent->child;
+			container_glayer = widget->parent->client_glayer;
+		} else {
+			widget_list = &LCUI_Sys.widget_list;
+			container_glayer = LCUI_Sys.root_glayer;
+		}
+	} else {
+		return -1;
+	}
+	
+	Queue_Lock( widget_list );
+	n = Queue_Get_Total( widget_list );
+	zindex = n;
+	if( widget->modal ) {
+		/* 先设置自己的z-index值为当前容器中最大的 */
+		GraphLayer_SetZIndex( widget->main_glayer, zindex );
+		des_pos = 0;
+		--zindex;
+	}
+	/* 先设置模态部件的z-index值，保证 模态部件 显示在 非模态部件 的前端 */
+	for( i=0; i<n; ++i ) {
+		child = Queue_Get( widget_list, i );
+		if( !child || !child->modal ) {
+			continue;
+		}
+		/* 忽略掉自己 */
+		if( child == widget ) {
+			src_pos = i;
+			continue;
+		}
+		GraphLayer_SetZIndex( child->main_glayer, zindex );
+		--zindex;
+	}
+	
+	if( !widget->modal ) {
+		GraphLayer_SetZIndex( widget->main_glayer, zindex );
+		des_pos = n - zindex;
+		--zindex;
+	}
+	/* 然后设置非模态部件的z-index值 */
+	for( i=0; i<n; ++i ) {
+		child = Queue_Get( widget_list, i );
+		/* 忽略无效部件或者模态部件 */
+		if( !child || child->modal ) {
+			continue;
+		}
+		/* 忽略掉自己 */
+		if( child == widget ) {
+			src_pos = i;
+			continue;
+		}
+		GraphLayer_SetZIndex( child->main_glayer, zindex );
+		--zindex;
+	}
+	/* 最后，调整部件在队列中的位置 */
+	Queue_Move( widget_list, des_pos, src_pos );
+	/* 对容器图层中的子图层列表进行排序 */
+	GraphLayer_Sort( container_glayer );
+	Queue_UnLock( widget_list );
+	return 0;
+}
+
+/* 将指定部件显示在同等z-index值的部件的前端 */
+int __Widget_Front( LCUI_Widget *widget )
 {
 	LCUI_Queue *queue;
 	LCUI_Widget *tmp_child;
@@ -2274,7 +2359,6 @@ void Widget_Show(LCUI_Widget *widget)
 	if( !widget ) {
 		return; 
 	}
-	Widget_Front(widget); /* 改变部件的排列位置 */
 	Record_WidgetUpdate( widget, NULL, DATATYPE_SHOW, 0 );
 }
 
