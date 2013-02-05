@@ -1558,6 +1558,8 @@ void Widget_LimitSize(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_siz
 	widget->max_h.px = max_size.h;
 	widget->max_w.which_one = 0;
 	widget->max_h.which_one = 0;
+	widget->min_size = min_size;
+	widget->max_size = max_size;
 }
 
 void Widget_LimitPos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos)
@@ -1843,7 +1845,6 @@ void Widget_AutoResize(LCUI_Widget *widget)
 void Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 /* 功能：执行改变部件尺寸的操作 */
 {
-	LCUI_Size max_size, min_size;
 	LCUI_WidgetEvent event;
 	
 	if( !widget ) {
@@ -1854,21 +1855,6 @@ void Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 		return;
 	}
 	
-	max_size = Widget_GetMaxSize( widget );
-	min_size = Widget_GetMinSize( widget );
-	/* 根据指定的部件的尺寸范围，调整尺寸 */
-	if(size.w > max_size.w) {
-		size.w = max_size.w;
-	}
-	if(size.h > max_size.h) {
-		size.h = max_size.h;
-	}
-	if(size.w < min_size.w) {
-		size.w = min_size.w;
-	}
-	if(size.h < min_size.h) {
-		size.h = min_size.h;
-	}
 	/* 记录事件数据 */
 	event.type = EVENT_RESIZE;
 	event.resize.new_size = size;
@@ -2223,8 +2209,24 @@ void Refresh_Widget(LCUI_Widget *widget)
 /* 调整部件的尺寸 */
 void Widget_Resize( LCUI_Widget *widget, LCUI_Size new_size )
 {
+	LCUI_Size max_size, min_size;
 	if( !widget || new_size.w < 0 || new_size.h < 0) {
 		return;
+	}
+	max_size = Widget_GetMaxSize( widget );
+	min_size = Widget_GetMinSize( widget );
+	/* 根据指定的部件的尺寸范围，调整尺寸 */
+	if(new_size.w > max_size.w) {
+		new_size.w = max_size.w;
+	}
+	if(new_size.h > max_size.h) {
+		new_size.h = max_size.h;
+	}
+	if(new_size.w < min_size.w) {
+		new_size.w = min_size.w;
+	}
+	if(new_size.h < min_size.h) {
+		new_size.h = min_size.h;
 	}
 	widget->w.px = new_size.w;
 	widget->h.px = new_size.h;
