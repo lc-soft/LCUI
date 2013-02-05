@@ -329,7 +329,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
 		return -1;
 	}
-	_DEBUG_MSG("loop: %p, enter\n", loop);
+	DEBUG_MSG("loop: %p, enter\n", loop);
 	loop->running = TRUE;
 	while( !loop->quit ) {
 		if( LCUIApp_HaveTask(app) ) {
@@ -343,7 +343,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 		}
 	}
 	loop->running = FALSE;
-	_DEBUG_MSG("loop: %p, exit\n", loop);
+	DEBUG_MSG("loop: %p, exit\n", loop);
 	return 0;
 }
 

@@ -104,12 +104,10 @@ msgbox_mainloop_quit( LCUI_Widget *btn, LCUI_WidgetEvent *unused )
 	MB_data *data;
 	
 	msgbox = Widget_GetParent( btn, "window" );
-	_DEBUG_MSG("msgbox: %p\n", msgbox);
 	data = msgbox_data_find( msgbox );
 	if( !data ) {
 		return;
 	}
-	_DEBUG_MSG("btn: %p, id: %ld\n", btn, btn->self_id);
 	data->clicked_button = btn->self_id;
 	LCUI_MainLoop_Quit( data->mainloop );
 }
@@ -146,18 +144,18 @@ auto_resize_msgbox(LCUI_Widget *textlabel, LCUI_WidgetEvent *event )
 		area_height = MB_MSG_AREA_HEIGHT;
 	}
 	
-	_DEBUG_MSG("area_height: %d\n", area_height);
+	DEBUG_MSG("area_height: %d\n", area_height);
 	/* 加上按钮区域的固定高度 */
 	msgbox_size.h = area_height + MB_BTN_AREA_HEIGHT;
 	/* 加上窗口边框尺寸 */
 	msgbox_size.w += 14;
 	msgbox_size.h += 30;
 
-	_DEBUG_MSG("widget: %p, old size: (%d,%d), new size: (%d,%d)\n",
+	DEBUG_MSG("widget: %p, old size: (%d,%d), new size: (%d,%d)\n",
 		textlabel, 
 		event->resize.old_size.w, event->resize.old_size.h, 
 		event->resize.new_size.w, event->resize.new_size.h);
-	_DEBUG_MSG("msgbox size: (%d,%d)\n", msgbox_size.w, msgbox_size.h);
+	DEBUG_MSG("msgbox size: (%d,%d)\n", msgbox_size.w, msgbox_size.h);
 	
 	/* 获取消息框内的消息区域的指针 */
 	msg_area = Widget_GetChildByID(	Window_GetClientArea(msgbox), 
