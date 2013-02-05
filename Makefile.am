@@ -43,6 +43,7 @@ test/test_scrollbar.c \
 test/graph2array.c \
 test/test_graphlayer.c \
 test/test_stylelib.c \
+test/test_messagebox.c \
 test/mora/mora.c \
 test/mora/README.zh-cn \
 test/mora/drawable/btn_down.png \

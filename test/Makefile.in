@@ -46,7 +46,7 @@ noinst_PROGRAMS = helloworld$(EXEEXT) test_font$(EXEEXT) \
 	test_widget_3$(EXEEXT) test_timer$(EXEEXT) \
 	test_textbox$(EXEEXT) test_scrollbar$(EXEEXT) \
 	graph2array$(EXEEXT) test_graphlayer$(EXEEXT) \
-	test_stylelib$(EXEEXT)
+	test_stylelib$(EXEEXT) test_messagebox$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -91,6 +91,9 @@ test_lcui_graph_mix_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_loading_OBJECTS = test_loading.$(OBJEXT)
 test_loading_OBJECTS = $(am_test_loading_OBJECTS)
 test_loading_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_test_messagebox_OBJECTS = test_messagebox.$(OBJEXT)
+test_messagebox_OBJECTS = $(am_test_messagebox_OBJECTS)
+test_messagebox_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_progressbar_OBJECTS = test_progressbar.$(OBJEXT)
 test_progressbar_OBJECTS = $(am_test_progressbar_OBJECTS)
 test_progressbar_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -161,25 +164,25 @@ SOURCES = $(graph2array_SOURCES) $(helloworld_SOURCES) \
 	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
 	$(test_graphlayer_SOURCES) $(test_label_SOURCES) \
 	$(test_lcui_graph_mix_SOURCES) $(test_loading_SOURCES) \
-	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
-	$(test_rect_cut_SOURCES) $(test_scrollbar_SOURCES) \
-	$(test_stylelib_SOURCES) $(test_textbox_SOURCES) \
-	$(test_timer_SOURCES) $(test_viewimage_SOURCES) \
-	$(test_widget_1_SOURCES) $(test_widget_2_SOURCES) \
-	$(test_widget_3_SOURCES) $(test_window_SOURCES) \
-	$(ts_calibrate_SOURCES)
+	$(test_messagebox_SOURCES) $(test_progressbar_SOURCES) \
+	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
+	$(test_scrollbar_SOURCES) $(test_stylelib_SOURCES) \
+	$(test_textbox_SOURCES) $(test_timer_SOURCES) \
+	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
+	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
+	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 DIST_SOURCES = $(graph2array_SOURCES) $(helloworld_SOURCES) \
 	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
 	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
 	$(test_graphlayer_SOURCES) $(test_label_SOURCES) \
 	$(test_lcui_graph_mix_SOURCES) $(test_loading_SOURCES) \
-	$(test_progressbar_SOURCES) $(test_radiobtn_SOURCES) \
-	$(test_rect_cut_SOURCES) $(test_scrollbar_SOURCES) \
-	$(test_stylelib_SOURCES) $(test_textbox_SOURCES) \
-	$(test_timer_SOURCES) $(test_viewimage_SOURCES) \
-	$(test_widget_1_SOURCES) $(test_widget_2_SOURCES) \
-	$(test_widget_3_SOURCES) $(test_window_SOURCES) \
-	$(ts_calibrate_SOURCES)
+	$(test_messagebox_SOURCES) $(test_progressbar_SOURCES) \
+	$(test_radiobtn_SOURCES) $(test_rect_cut_SOURCES) \
+	$(test_scrollbar_SOURCES) $(test_stylelib_SOURCES) \
+	$(test_textbox_SOURCES) $(test_timer_SOURCES) \
+	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
+	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
+	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -394,6 +397,8 @@ test_stylelib_SOURCES = test_stylelib.c
 test_stylelib_LDADD = $(top_builddir)/src/libLCUI.la
 test_graphlayer_SOURCES = test_graphlayer.c
 test_graphlayer_LDADD = $(top_builddir)/src/libLCUI.la
+test_messagebox_SOURCES = test_messagebox.c
+test_messagebox_LDADD = $(top_builddir)/src/libLCUI.la
 all: all-recursive
 
 .SUFFIXES:
@@ -467,6 +472,9 @@ test_lcui_graph_mix$(EXEEXT): $(test_lcui_graph_mix_OBJECTS) $(test_lcui_graph_m
 test_loading$(EXEEXT): $(test_loading_OBJECTS) $(test_loading_DEPENDENCIES) 
 	@rm -f test_loading$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_loading_OBJECTS) $(test_loading_LDADD) $(LIBS)
+test_messagebox$(EXEEXT): $(test_messagebox_OBJECTS) $(test_messagebox_DEPENDENCIES) 
+	@rm -f test_messagebox$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_messagebox_OBJECTS) $(test_messagebox_LDADD) $(LIBS)
 test_progressbar$(EXEEXT): $(test_progressbar_OBJECTS) $(test_progressbar_DEPENDENCIES) 
 	@rm -f test_progressbar$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_progressbar_OBJECTS) $(test_progressbar_LDADD) $(LIBS)
@@ -523,6 +531,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_label.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_lcui_graph_mix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_loading.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_messagebox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_progressbar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_radiobtn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_rect_cut.Po@am__quote@
