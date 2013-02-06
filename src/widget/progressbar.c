@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_ProgressBar.c -- LCUI's ProgressBar widget
+ * progressbar.c -- LCUI's ProgressBar widget
  * Copyright (C) 2012 by
  * Liu Chao
  * 
@@ -20,7 +20,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_ProgressBar.c -- LCUI 的进度条部件
+ * progressbar.c -- LCUI 的进度条部件
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -49,9 +49,9 @@
 
 #include <unistd.h>
 
-LCUI_Widget *
-Get_ProgressBar_Flash_Img_Widget(LCUI_Widget *widget)
 /* 功能：获取进度条上闪光图形所在的PictureBox部件 */
+static LCUI_Widget *
+ProgressBar_GetMoveingLight(LCUI_Widget *widget)
 {
 	LCUI_ProgressBar *pb;
 	pb = Widget_GetPrivData(widget);
@@ -104,7 +104,7 @@ ProgressBar_Init(LCUI_Widget *widget)
 }
 
 static void 
-Exec_Update_ProgressBar(LCUI_Widget *widget)
+ProgressBar_ExecUpdate(LCUI_Widget *widget)
 /* 功能：更新进度条数据 */
 {
 	static double scale;
@@ -120,7 +120,7 @@ Exec_Update_ProgressBar(LCUI_Widget *widget)
 }
 
 static void 
-Exec_Draw_ProgressBar(LCUI_Widget *widget)
+ProgressBar_ExecDraw(LCUI_Widget *widget)
 /* 功能：更新进度条的图形 */
 {
 	LCUI_ProgressBar *pb;
@@ -158,11 +158,10 @@ Exec_Draw_ProgressBar(LCUI_Widget *widget)
 	}
 	
 	/* 让图片盒子显示这个图形 */
-	Set_PictureBox_Image_From_Graph(pb->fore_pic_box, &pb->fore_graph); 
-	Exec_Update_ProgressBar( widget );
+	Set_PictureBox_Image_From_Graph(pb->fore_pic_box, &pb->fore_graph);
 }
 
-void Set_ProgressBar_Max_Value(LCUI_Widget *widget, int max_value)
+void ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value)
 /* 功能：设定进度条最大值 */
 {
 	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
@@ -170,14 +169,14 @@ void Set_ProgressBar_Max_Value(LCUI_Widget *widget, int max_value)
 	Widget_Update(widget); 
 }
 
-int Get_ProgressBar_Max_Value(LCUI_Widget *widget)
+int ProgressBar_GetMaxValue(LCUI_Widget *widget)
 /* 功能：获取进度条最大值 */
 {
 	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
 	return pb->max_value;
 }
 
-void Set_ProgressBar_Value(LCUI_Widget *widget, int value)
+void ProgressBar_SetValue(LCUI_Widget *widget, int value)
 /* 功能：设定进度条当前值 */
 {
 	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
@@ -185,7 +184,7 @@ void Set_ProgressBar_Value(LCUI_Widget *widget, int value)
 	Widget_Update(widget);
 }
 
-int Get_ProgressBar_Value(LCUI_Widget *widget)
+int ProgressBar_GetValue(LCUI_Widget *widget)
 /* 功能：获取进度条当前值 */
 {
 	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
@@ -193,12 +192,12 @@ int Get_ProgressBar_Value(LCUI_Widget *widget)
 }
 
 static void *
-Move_Flash_Img(void *arg)
+ProgressBar_ProcMoveingLight(void *arg)
 /* 功能：移动进度条中闪光的位置 */
 {
 	int x=0;
 	LCUI_Widget *widget = (LCUI_Widget*)arg;
-	LCUI_Widget *flash = Get_ProgressBar_Flash_Img_Widget(widget);
+	LCUI_Widget *flash = ProgressBar_GetMoveingLight(widget);
 	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
 	while(1) {
 		for(x=(0-flash->size.w); 
@@ -213,7 +212,7 @@ Move_Flash_Img(void *arg)
 }
 
 static void 
-Show_ProgressBar(LCUI_Widget *widget)
+ProgressBar_ExecShow(LCUI_Widget *widget)
 /* 功能：在显示进度条时，处理其它操作 */
 {
 	LCUI_ProgressBar *pb;
@@ -222,7 +221,7 @@ Show_ProgressBar(LCUI_Widget *widget)
 	if(Strcmp(&widget->style_name, "dynamic") == 0) {
 		if(pb->thread == 0) {
 			Widget_Show(pb->img_pic_box);
-			LCUI_Thread_Create(&pb->thread, NULL, Move_Flash_Img, (void*)widget);
+			LCUI_Thread_Create(&pb->thread, NULL, ProgressBar_ProcMoveingLight, (void*)widget);
 		}
 	} else {
 		Widget_Hide(pb->img_pic_box);
@@ -241,9 +240,9 @@ void Register_ProgressBar()
 	
 	/* 为部件类型关联相关函数 */
 	WidgetFunc_Add("progress_bar",	ProgressBar_Init,	FUNC_TYPE_INIT);
-	WidgetFunc_Add("progress_bar",	Exec_Update_ProgressBar,FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("progress_bar",	Exec_Draw_ProgressBar,	FUNC_TYPE_DRAW);
-	WidgetFunc_Add("progress_bar",	Show_ProgressBar,	FUNC_TYPE_SHOW); 
+	WidgetFunc_Add("progress_bar",	ProgressBar_ExecUpdate,FUNC_TYPE_UPDATE);
+	WidgetFunc_Add("progress_bar",	ProgressBar_ExecDraw,	FUNC_TYPE_DRAW);
+	WidgetFunc_Add("progress_bar",	ProgressBar_ExecShow,	FUNC_TYPE_SHOW); 
 	WidgetFunc_Add("progress_bar",	Destroy_ProgressBar,	FUNC_TYPE_DESTROY); 
 }
 

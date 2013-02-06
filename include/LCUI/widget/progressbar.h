@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_ProgressBar.h -- LCUI's ProgressBar widget
+ * progressbar.h -- LCUI's ProgressBar widget
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_ProgressBar.h -- LCUI 的进度条部件
+ * progresspar.h -- LCUI 的进度条部件
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -64,19 +64,16 @@ struct _LCUI_ProgressBar
 
 LCUI_BEGIN_HEADER
 
-LCUI_Widget *Get_ProgressBar_Flash_Img_Widget(LCUI_Widget *widget);
-/* 功能：获取进度条上闪光图形所在的PictureBox部件 */ 
-
-void Set_ProgressBar_Max_Value(LCUI_Widget *widget, int max_value);
+void ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value);
 /* 功能：设定进度条最大值 */ 
 
-int Get_ProgressBar_Max_Value(LCUI_Widget *widget);
+int ProgressBar_GetMaxValue(LCUI_Widget *widget);
 /* 功能：获取进度条最大值 */ 
 
-void Set_ProgressBar_Value(LCUI_Widget *widget, int value);
+void ProgressBar_SetValue(LCUI_Widget *widget, int value);
 /* 功能：设定进度条当前值 */ 
 
-int Get_ProgressBar_Value(LCUI_Widget *widget);
+int ProgressBar_GetValue(LCUI_Widget *widget);
 /* 功能：获取进度条当前值 */ 
 
 LCUI_END_HEADER
