@@ -73,12 +73,6 @@ typedef struct _LCUI_Window
 	LCUI_Widget *titlebar;		/* 标题栏 */
 	LCUI_Widget *client_area;	/* 客户区 */
 	LCUI_Widget *btn_close;	/* 关闭按钮 */
-	int hide_style;			/* 窗口隐藏时使用的特效 */
-	int show_style;			/* 窗口显示时使用的特效 */
-	int resize_style;		/* 窗口改变尺寸时使用的特效 */
-	int count;			/* 显示次数计数 */
-	
-	ALIGN_TYPE init_align;		/* 窗口初始显示位置 */
 }
 LCUI_Window;
 /***********************************************************/

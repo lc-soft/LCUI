@@ -94,7 +94,7 @@ ProgressBar_Init(LCUI_Widget *widget)
 	/* 进度条为经典风格 */
 	Widget_SetStyleName( widget, "classic" ); 
 	
-	Set_PictureBox_Size_Mode( f_pb, SIZE_MODE_STRETCH ); 
+	PictureBox_SetSizeMode( f_pb, SIZE_MODE_STRETCH ); 
 	
 	Widget_Show(f_pb); 
 	Widget_Show(img_pb);
@@ -141,7 +141,7 @@ ProgressBar_ExecDraw(LCUI_Widget *widget)
 		
 		Widget_Resize(pb->img_pic_box, Get_Graph_Size(&pb->flash_image));
 		/* 让图片盒子显示这个图形 */
-		Set_PictureBox_Image_From_Graph(pb->img_pic_box, &pb->flash_image);
+		PictureBox_SetImage(pb->img_pic_box, &pb->flash_image);
 		Widget_SetPadding( widget, Padding(1,1,1,1) );
 	} else {
 		Strcpy(&widget->style_name, "classic");
@@ -158,7 +158,7 @@ ProgressBar_ExecDraw(LCUI_Widget *widget)
 	}
 	
 	/* 让图片盒子显示这个图形 */
-	Set_PictureBox_Image_From_Graph(pb->fore_pic_box, &pb->fore_graph);
+	PictureBox_SetImage(pb->fore_pic_box, &pb->fore_graph);
 }
 
 void ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value)

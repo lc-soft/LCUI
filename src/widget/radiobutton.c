@@ -239,7 +239,7 @@ RadioButton_Init(LCUI_Widget *widget)
 	Widget_SetAlign(radio_button->imgbox, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	Widget_SetAlign(radio_button->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	
-	Set_PictureBox_Size_Mode(radio_button->imgbox, SIZE_MODE_STRETCH);
+	PictureBox_SetSizeMode(radio_button->imgbox, SIZE_MODE_STRETCH);
 	
 	/* 显示之 */
 	Widget_Show(radio_button->label);
@@ -276,7 +276,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			} else {
 				p = &radio_button->img_off_normal;
 			}
-			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
+			PictureBox_SetImage(radio_button->imgbox, p);
 			break;
 		case WIDGET_STATE_OVERLAY :
 			if(radio_button->on) {
@@ -284,7 +284,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			} else {
 				p = &radio_button->img_off_over;
 			}
-			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
+			PictureBox_SetImage(radio_button->imgbox, p);
 			break;
 		case WIDGET_STATE_ACTIVE : 
 			if(radio_button->on) {
@@ -292,7 +292,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			} else {
 				p = &radio_button->img_off_down;
 			}
-			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
+			PictureBox_SetImage(radio_button->imgbox, p);
 			break;
 		case WIDGET_STATE_DISABLE :
 			if(radio_button->on) {
@@ -300,7 +300,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			} else {
 				p = &radio_button->img_off_disable;
 			}
-			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p); 
+			PictureBox_SetImage(radio_button->imgbox, p); 
 			break;
 			default :
 			break;
@@ -311,7 +311,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			widget->state = WIDGET_STATE_DISABLE;
 		}
 		/* 先释放PictureBox部件中保存的图形数据的指针 */
-		p = Get_PictureBox_Graph(radio_button->imgbox);
+		p = PictureBox_GetImage(radio_button->imgbox);
 		Graph_Free(p);
 		
 		/* 由于本函数在退出后，使用局部变量保存的图形数据会无效，因此，申请内存空间来储存 */
@@ -325,7 +325,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			} else {
 				Load_Graph_Default_RadioButton_Off_Normal(p);
 			}
-			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
+			PictureBox_SetImage(radio_button->imgbox, p);
 			break;
 		    case WIDGET_STATE_OVERLAY :
 			if(radio_button->on) {
@@ -333,7 +333,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			} else {
 				Load_Graph_Default_RadioButton_Off_Selected(p);
 			}
-			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
+			PictureBox_SetImage(radio_button->imgbox, p);
 			break;
 		    case WIDGET_STATE_ACTIVE : 
 			if(radio_button->on) {
@@ -341,7 +341,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			} else {
 				Load_Graph_Default_RadioButton_Off_Pressed(p);
 			}
-			Set_PictureBox_Image_From_Graph(radio_button->imgbox, p);
+			PictureBox_SetImage(radio_button->imgbox, p);
 			break;
 		    case WIDGET_STATE_DISABLE :
 			break;

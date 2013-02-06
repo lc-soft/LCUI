@@ -402,8 +402,8 @@ int LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text,
 	/* 设定图标框的默认尺寸 */
 	Widget_Resize( iconbox, MB_ICONBOX_SIZE );
 	/* 为图标框设置需显示的图标 */
-	Set_PictureBox_Image_From_Graph( iconbox, &icon );
-	Set_PictureBox_Size_Mode( iconbox, SIZE_MODE_CENTER );
+	PictureBox_SetImage( iconbox, &icon );
+	PictureBox_SetSizeMode( iconbox, SIZE_MODE_CENTER );
 	/* 判断是否有图标，并调整文本位置 */
 	if( icon_type == MB_ICON_NONE ) {
 		icon_flag = MSGBOX_NONE_ICON;

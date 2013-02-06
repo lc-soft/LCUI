@@ -168,7 +168,7 @@ CheckBox_Init(LCUI_Widget *widget)
 	Widget_SetAlign(check_box->imgbox, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	Widget_SetAlign(check_box->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	/* 设置图像框的尺寸模式为拉伸 */
-	Set_PictureBox_Size_Mode(check_box->imgbox, SIZE_MODE_STRETCH);
+	PictureBox_SetSizeMode(check_box->imgbox, SIZE_MODE_STRETCH);
 	
 	/* 显示之 */
 	Widget_Show(check_box->label);
@@ -223,7 +223,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			} else {
 				p = &check_box->img_off_normal;
 			}
-			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
+			PictureBox_SetImage(check_box->imgbox, p);
 			break;
 		case WIDGET_STATE_OVERLAY :
 			if( check_box->on ) {
@@ -231,7 +231,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			} else {
 				p = &check_box->img_off_over;
 			}
-			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
+			PictureBox_SetImage(check_box->imgbox, p);
 			break;
 		case WIDGET_STATE_ACTIVE : 
 			if( check_box->on ) {
@@ -239,7 +239,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			} else {
 				p = &check_box->img_off_down;
 			}
-			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
+			PictureBox_SetImage(check_box->imgbox, p);
 			break;
 		case WIDGET_STATE_DISABLE :
 			if( check_box->on ) {
@@ -247,7 +247,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			} else {
 				p = &check_box->img_off_disable;
 			}
-			Set_PictureBox_Image_From_Graph(check_box->imgbox, p); 
+			PictureBox_SetImage(check_box->imgbox, p); 
 			break;
 			default :
 			break;
@@ -258,7 +258,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			widget->state = WIDGET_STATE_DISABLE;
 		}
 		/* 先释放PictureBox部件中保存的图形数据的指针 */
-		p = Get_PictureBox_Graph(check_box->imgbox);
+		p = PictureBox_GetImage(check_box->imgbox);
 		Graph_Free(p);
 		
 		/* 由于本函数在退出后，使用局部变量保存的图形数据会无效，因此，申请内存空间来储存 */
@@ -271,7 +271,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			} else {
 				Load_Graph_Default_CheckBox_Off_Normal(p);
 			}
-			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
+			PictureBox_SetImage(check_box->imgbox, p);
 			break;
 		case WIDGET_STATE_OVERLAY :
 			if( check_box->on ) {
@@ -279,7 +279,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			} else {
 				Load_Graph_Default_CheckBox_Off_Selected(p);
 			}
-			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
+			PictureBox_SetImage(check_box->imgbox, p);
 			break;
 		case WIDGET_STATE_ACTIVE : 
 			if( check_box->on ) {
@@ -287,7 +287,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			} else {
 				Load_Graph_Default_CheckBox_Off_Selected(p);
 			}
-			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
+			PictureBox_SetImage(check_box->imgbox, p);
 			break;
 		case WIDGET_STATE_DISABLE :
 			if( check_box->on ) {
@@ -295,7 +295,7 @@ Exec_Draw_CheckBox(LCUI_Widget *widget)
 			} else {
 				Load_Graph_Default_CheckBox_Off_Disabled(p);
 			}
-			Set_PictureBox_Image_From_Graph(check_box->imgbox, p);
+			PictureBox_SetImage(check_box->imgbox, p);
 			break;
 			default : break;
 		}

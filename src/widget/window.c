@@ -106,6 +106,8 @@ Window_ExecMove(LCUI_Widget *titlebar, LCUI_WidgetEvent *event)
 	pos = Pos_Add( pos, offset );
 	/* 转换成在容器区域内的相对坐标 */
 	pos = GlobalPos_ConvTo_RelativePos( window, pos );
+	/* 解除之前设定的align */
+	Widget_SetAlign( window, ALIGN_NONE, Pos(0,0) );
 	/* 移动窗口的位置 */
 	Widget_Move( window, pos );
 }
@@ -121,13 +123,13 @@ Window_SetTitleIcon(LCUI_Widget *window, LCUI_Graph *icon)
 	title_widget = Window_GetTitleBar(window);
 	title_data = (LCUI_TitleBar *)Widget_GetPrivData(title_widget);
 	
-	image = Get_PictureBox_Graph(title_data->icon_box);
+	image = PictureBox_GetImage(title_data->icon_box);
 	Graph_Free(image);/* 释放PictureBox部件内的图像占用的资源 */
 	if(icon == NULL) {
 		return;
 	}
 	/* 设置新图标 */
-	Set_PictureBox_Image_From_Graph(title_data->icon_box, icon);
+	PictureBox_SetImage(title_data->icon_box, icon);
 	Widget_SetAlign(title_data->icon_box, ALIGN_MIDDLE_LEFT, Pos(3,0));
 	Widget_SetAlign(title_data->label, ALIGN_MIDDLE_LEFT, Pos(23,0));
  
@@ -154,7 +156,7 @@ Window_TitleBar_Init(LCUI_Widget *titlebar)
 	Widget_Container_Add(titlebar, t->label);
 	
 	Widget_Resize(t->icon_box, Size(18,18));
-	Set_PictureBox_Size_Mode(t->icon_box, SIZE_MODE_CENTER);
+	PictureBox_SetSizeMode(t->icon_box, SIZE_MODE_CENTER);
 	
 	Widget_Show(t->icon_box);
 	Widget_Show(t->label);
@@ -294,11 +296,6 @@ Window_Init( LCUI_Widget *win_p )
 	
 	win = WidgetPrivData_New(win_p, sizeof(LCUI_Window));
 	
-	win->hide_style	= NONE;
-	win->show_style	= NONE;
-	win->count	= 0;
-	win->init_align	= ALIGN_MIDDLE_CENTER;
-	
 	titlebar = Widget_New("titlebar"); 
 	client_area = Widget_New(NULL); 
 	btn_close = Widget_New("button"); 
@@ -346,34 +343,10 @@ Window_Init( LCUI_Widget *win_p )
 	 * */
 	Widget_Event_Connect( win_p, EVENT_FOCUSOUT, Window_FocusOut );
 	Widget_Event_Connect( win_p, EVENT_FOCUSIN, Window_FocusIn );
+	/* 设置窗口部件的初始位置 */
+	Widget_SetAlign( win_p, ALIGN_MIDDLE_CENTER, Pos(0,0) );
 }
 
-static void 
-Window_ExecShow(LCUI_Widget *win_p)
-/* 功能：在窗口显示时，进行相关处理 */
-{
-	LCUI_Size ctnr_size, size;
-	LCUI_Pos pos;
-	LCUI_Window *win;
-	
-	win = Widget_GetPrivData( win_p );
-	win->count++;
-	/* 如果是第一次显示 */
-	if(win->count == 1) {
-		ctnr_size = Widget_GetContainerSize( win_p->parent );
-		size = _Widget_GetSize( win_p );
-		pos = Align_Get_Pos( ctnr_size, size, win->init_align );
-		Widget_ExecMove( win_p, pos );
-	}
-	//有待扩展 
-}
-
-static void 
-Window_ExecHide(LCUI_Widget *win_p)
-/* 功能：在隐藏窗口时使用视觉特效 */
-{
-	//有待扩展
-}
 
 void 
 Window_SetTitleText(LCUI_Widget *win_p, const char *text)
@@ -428,7 +401,5 @@ Register_Window()
 	WidgetFunc_Add("titlebar", Window_TitleBar_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("window", Window_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("window", Window_ExecUpdate, FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("window", Window_ExecShow, FUNC_TYPE_SHOW);
-	WidgetFunc_Add("window", Window_ExecHide, FUNC_TYPE_HIDE);
 }
 

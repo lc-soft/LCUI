@@ -68,41 +68,41 @@ struct _LCUI_PictureBox
 
 LCUI_BEGIN_HEADER
 
-LCUI_Rect Get_PictureBox_View_Area(LCUI_Widget *widget);
-/* 功能：获取图片盒子的图片显示的区域 */ 
+/* 获取图片盒子的图片显示的区域 */
+LCUI_Rect PictureBox_GetViewArea( LCUI_Widget *widget );
 
-LCUI_Pos Get_PictureBox_View_Area_Pos(LCUI_Widget *widget);
-/* 功能：获取获取图片盒子的图片显示的区域的坐标 */
+/* 获取获取图片盒子的图片显示的区域的坐标 */
+LCUI_Pos PictureBox_GetViewAreaPos( LCUI_Widget *widget );
 
-float Get_PictureBox_Zoom_Scale(LCUI_Widget *widget);
-/* 功能：获取图片盒子的缩放比例 */ 
+/* 获取缩放比例 */
+float PictureBox_GetScale( LCUI_Widget *widget );
 
-void Set_PictureBox_Image_From_Graph(LCUI_Widget *widget, LCUI_Graph *image);
-/* 功能：添加一个图片数据至图片盒子 */ 
+/* 设定PictureBox部件显示的图像 */
+void PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image );
 
-int Set_PictureBox_Image_From_File(LCUI_Widget *widget, char *image_file);
-/* 功能：添加一个图片文件，并载入至图片盒子 */ 
+/* 设定图片文件中的图像为PictureBox部件显示的图像 */
+int PictureBox_SetImageFile( LCUI_Widget *widget, char *image_file );
 
-int Set_PictureBox_ErrorImage(LCUI_Widget *widget, LCUI_Graph *pic);
-/* 功能：设定当加载图像失败时显示的图像 */ 
+/* 设定当加载图像失败时显示的图像 */
+int PictureBox_SetErrorImage( LCUI_Widget *widget, LCUI_Graph *pic );
 
-int Set_PictureBox_InitImage(LCUI_Widget *widget, LCUI_Graph *pic);
-/* 功能：设定正在加载另一图像时显示的图像 */ 
+/* 设定正在加载另一图像时显示的图像 */
+int PictureBox_SetInitImage( LCUI_Widget *widget, LCUI_Graph *pic );
 
-void Set_PictureBox_Size_Mode(LCUI_Widget *widget, int mode);
-/* 功能：设定图片盒子的图像显示模式 */ 
+/* 设定图像显示模式 */
+void PictureBox_SetSizeMode( LCUI_Widget *widget, int mode );
 
-void Resize_PictureBox_View_Area(LCUI_Widget *widget, int width, int height);
-/* 功能：设定PictureBox部件的图片显示区域的大小 */ 
+/* 设定PictureBox部件的图片显示区域的大小 */
+void PictureBox_ResizeViewArea( LCUI_Widget *widget, int width, int height );
 
-LCUI_Graph *Get_PictureBox_Graph(LCUI_Widget *widget);
-/* 功能：获取PictureBox部件内的图像指针 */ 
+/* 获取PictureBox部件内的图像 */
+LCUI_Graph *PictureBox_GetImage( LCUI_Widget *widget );
 
-int Move_PictureBox_View_Area(LCUI_Widget *widget, LCUI_Pos des_pos);
-/* 功能：移动图片盒子内的图片的显示区域的位置 */ 
+/* 移动PictureBox部件内的图片的显示区域的位置 */
+int PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos );
 
-int Zoom_PictureBox_View_Area(LCUI_Widget *widget, float scale);
-/* 功能：缩放PictureBox部件的图片浏览区域 */ 
+/* 缩放PictureBox部件的图片浏览区域 */
+int PictureBox_ZoomViewArea( LCUI_Widget *widget, float scale );
 
 LCUI_END_HEADER
 
