@@ -64,6 +64,43 @@ static LCUI_Queue frames_stream;
 static int database_init = FALSE;
 static int __timer_id = -1;
 
+static void 
+Frames_CallFunc( LCUI_Frames *frames )
+{
+	int i, total;
+	LCUI_Func *func;
+	LCUI_Graph *slot;
+	
+	total = Queue_Get_Total( &frames->func_data );
+	slot = Frames_GetGraphSlot( frames ); 
+	for(i=0; i<total; ++i){
+		func = Queue_Get( &frames->func_data, i );
+		func->arg[0] = slot;
+		AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_S, func );
+	} 
+}
+
+/* 将动画当前帧的图像写入至槽中 */
+static int
+Frames_UpdateGraphSlot( LCUI_Frames *frames, int num )
+{
+	LCUI_Pos pos;
+	LCUI_Frame *frame;
+	frame = Queue_Get( &frames->pic, num );
+	if( !frame ) {
+		return -1;
+	}
+	if(!Graph_Valid(&frames->slot)){
+		return -2;
+	}
+	Graph_Fill_Alpha(&frames->slot, 0);
+	if(0 < Queue_Get_Total(&frames->pic)) {
+		pos = Frames_GetFrameMixPos(frames, frame);
+		Graph_Replace(&frames->slot, frame->pic, pos); 
+	}
+	return 0;
+}
+
 LCUI_Frames* 
 Create_Frames(LCUI_Size size)
 /* 
@@ -91,7 +128,7 @@ Create_Frames(LCUI_Size size)
 	return p;
 }
 
-LCUI_Pos Frame_Get_Pos(LCUI_Frames *stream, LCUI_Frame *frame)
+LCUI_Pos Frames_GetFrameMixPos(LCUI_Frames *stream, LCUI_Frame *frame)
 /* 功能：获取指定帧在整个动画容器中的位置 */
 {
 	LCUI_Pos pos;
@@ -123,7 +160,7 @@ int Resize_Frames(LCUI_Frames *p, LCUI_Size new_size)
 		frame = Queue_Get(&p->pic, i);
 		graph = frame->pic->src;
 		size = Get_Graph_Size(graph);
-		pos = Frame_Get_Pos(p, frame);
+		pos = Frames_GetFrameMixPos(p, frame);
 		if(pos.x+size.w > new_size.w){
 			size.w = new_size.w - pos.x;
 			size.w<0 ? size.w=0 :1;
@@ -135,10 +172,12 @@ int Resize_Frames(LCUI_Frames *p, LCUI_Size new_size)
 		Quote_Graph(frame->pic, graph, Rect(0,0,size.w, size.h));
 	}
 	Graph_Create(&p->slot, new_size.w, new_size.h);
+	Frames_UpdateGraphSlot( p, p->current );
+	Frames_CallFunc( p );
 	return 0;
 }
 
-int Add_Frame(	LCUI_Frames *des, LCUI_Graph *pic, 
+int Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic, 
 		LCUI_Pos offset, int sleep_time )
 /* 
  * 功能：为动画添加帧 
@@ -164,7 +203,7 @@ int Add_Frame(	LCUI_Frames *des, LCUI_Graph *pic,
 	return 0;
 }
 
-int Frames_Add_Func(	LCUI_Frames *des, 
+int Frames_AddFunc(	LCUI_Frames *des, 
 			void (*func)(LCUI_Graph*, void*), 
 			void *arg )
 /* 
@@ -189,7 +228,7 @@ int Frames_Add_Func(	LCUI_Frames *des,
 } 
 
 static void 
-Frames_Stream_Sort()
+FramesStream_Sort()
 /* 功能：对动画流进行排序 */
 {
 	int i, j, pos, total;
@@ -240,7 +279,7 @@ Frames_Stream_Sort()
 }
 
 static void 
-Frames_Stream_Time_Sub(int time)
+FramesStream_TimeSub(int time)
 /* 功能：将各个动画的当前帧的等待时间与指定时间相减 */
 {
 	LCUI_Frame *frame;
@@ -273,7 +312,7 @@ Frames_Stream_Time_Sub(int time)
 }
 
 LCUI_Frame *
-Frames_Get_Frame(LCUI_Frames *src)
+Frames_GetFrame(LCUI_Frames *src)
 /* 功能：获取当前帧 */
 {
 	LCUI_Frame *p;
@@ -282,7 +321,7 @@ Frames_Get_Frame(LCUI_Frames *src)
 }
 
 LCUI_Graph *
-Frames_Get_Slot(LCUI_Frames *src)
+Frames_GetGraphSlot(LCUI_Frames *src)
 /* 功能：获取当前帧的图像 */
 {
 	LCUI_Graph *p;
@@ -294,7 +333,7 @@ Frames_Get_Slot(LCUI_Frames *src)
 }
 
 static LCUI_Frames *
-Frames_Stream_Update( int *sleep_time )
+FramesStream_Update( int *sleep_time )
 /* 功能：更新流中的动画至下一帧 */
 { 
 	int i, total;
@@ -332,7 +371,7 @@ Frames_Stream_Update( int *sleep_time )
 		DEBUG_MSG("current time: %ld\n", frame->current_time);
 		if(frame->current_time > 0) {
 			*sleep_time = frame->current_time;
-			Frames_Stream_Time_Sub( frame->current_time ); 
+			FramesStream_TimeSub( frame->current_time ); 
 		}
 		
 		frame->current_time = frame->sleep_time; 
@@ -352,19 +391,12 @@ Frames_Stream_Update( int *sleep_time )
 	
 	used_time = clock();/* 开始计时 */
 	/* 将该动画当前帧的图像写入至槽中 */
-	if(Graph_Valid(&frames->slot)){
-		LCUI_Pos pos;
-		Graph_Fill_Alpha(&frames->slot, 0);
-		if(0 < Queue_Get_Total(&frames->pic)) {
-			pos = Frame_Get_Pos(frames, frame);
-			Graph_Replace(&frames->slot, frame->pic, pos); 
-		}
-	}
+	Frames_UpdateGraphSlot( frames, frames->current-1 );
 	used_time = clock()-used_time;
 	if(used_time > 0) {
-		Frames_Stream_Time_Sub(used_time);
+		FramesStream_TimeSub(used_time);
 	}
-	Frames_Stream_Sort(); /* 重新排序 */
+	FramesStream_Sort(); /* 重新排序 */
 	DEBUG_MSG("current frame: %d\n", frames->current);
 	DEBUG_MSG("end\n");
 	return frames;
@@ -374,24 +406,16 @@ static void
 Process_Frames()
 /* 功能：处理动画的每一帧的更新 */
 {
-	int i, total, sleep_time = 10;
-	LCUI_Func *func;
-	LCUI_Graph *slot;
+	int sleep_time = 10;
 	LCUI_Frames *frames;
 	
 	while(!LCUI_Active()) {
 		usleep(10000);
 	}
-	frames = Frames_Stream_Update( &sleep_time ); 
+	frames = FramesStream_Update( &sleep_time ); 
 	reset_timer( __timer_id, sleep_time );
 	if( frames ) {
-		total = Queue_Get_Total( &frames->func_data );
-		slot = Frames_Get_Slot( frames ); 
-		for(i=0; i<total; ++i){
-			func = Queue_Get( &frames->func_data, i );
-			func->arg[0] = slot;
-			AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_S, func );
-		} 
+		Frames_CallFunc( frames );
 	}
 }
 
@@ -439,7 +463,7 @@ int Frames_Pause(LCUI_Frames *frames)
 
 /************************** ActiveBox *********************************/
 LCUI_Frames *
-ActiveBox_Get_Frames(LCUI_Widget *widget)
+ActiveBox_GetFrames(LCUI_Widget *widget)
 {
 	LCUI_ActiveBox *actbox;
 	actbox = (LCUI_ActiveBox *)Widget_GetPrivData(widget);
@@ -447,40 +471,40 @@ ActiveBox_Get_Frames(LCUI_Widget *widget)
 }
 
 static void 
-ActiveBox_Refresh_Frame(LCUI_Graph *frame, void *arg)
+ActiveBox_RefreshFrame(LCUI_Graph *frame, void *arg)
 /* 功能：刷新动画当前帧的显示 */
 {
 	LCUI_Widget *widget = (LCUI_Widget*)arg;
 	Widget_Draw(widget); 
 }
 
-int ActiveBox_Set_Frames_Size(LCUI_Widget *widget, LCUI_Size new_size)
+int ActiveBox_SetFramesSize(LCUI_Widget *widget, LCUI_Size new_size)
 /* 功能：设定动画尺寸 */
 { 
-	LCUI_Frames *frames = ActiveBox_Get_Frames(widget);
+	LCUI_Frames *frames = ActiveBox_GetFrames(widget);
 	return Resize_Frames(frames, new_size); 
 }
 
 int ActiveBox_Play(LCUI_Widget *widget)
 /* 功能：播放动画 */
 {
-	LCUI_Frames *frames = ActiveBox_Get_Frames(widget);
+	LCUI_Frames *frames = ActiveBox_GetFrames(widget);
 	return Frames_Play(frames); 
 }
 
 int ActiveBox_Pause(LCUI_Widget *widget)
 /* 功能：暂停动画 */
 {
-	LCUI_Frames *frames = ActiveBox_Get_Frames(widget);
+	LCUI_Frames *frames = ActiveBox_GetFrames(widget);
 	return Frames_Pause(frames);
 }
 
-int ActiveBox_Add_Frame(	LCUI_Widget *widget, LCUI_Graph *pic, 
+int ActiveBox_AddFrame(	LCUI_Widget *widget, LCUI_Graph *pic, 
 				LCUI_Pos offset, int sleep_time )
 /* 功能：为ActiveBox部件内的动画添加一帧图像 */
 {
-	LCUI_Frames *frames = ActiveBox_Get_Frames(widget);
-	return Add_Frame(frames, pic, offset, sleep_time);
+	LCUI_Frames *frames = ActiveBox_GetFrames(widget);
+	return Frames_AddFrame(frames, pic, offset, sleep_time);
 }
 
 
@@ -489,29 +513,28 @@ ActiveBox_Init(LCUI_Widget *widget)
 /* 功能：初始化ActiveBox部件 */
 {
 	LCUI_ActiveBox *actbox;
-	actbox = (LCUI_ActiveBox *)WidgetPrivData_New(widget, 
-					sizeof(LCUI_ActiveBox)); 
+	actbox = WidgetPrivData_New(widget, sizeof(LCUI_ActiveBox)); 
 	actbox->frames = Create_Frames(Size(50,50));
-	Frames_Add_Func( actbox->frames, ActiveBox_Refresh_Frame, widget );
+	Frames_AddFunc( actbox->frames, ActiveBox_RefreshFrame, widget );
 }
 
 static void 
-Exec_Update_ActiveBox(LCUI_Widget *widget)
+ActiveBox_ExecUpdate(LCUI_Widget *widget)
 /* 功能：更新ActiveBox部件内显示的图像 */
 {
 	LCUI_Rect rect;
 	LCUI_Frames *frames;
-	LCUI_Graph *frame_graph, *widget_graph;
+	LCUI_Graph *frame_graph;
 	LCUI_Pos pos;
 	
-	frames = ActiveBox_Get_Frames(widget);
-	widget_graph = Widget_GetSelfGraph( widget );
-	frame_graph = Frames_Get_Slot(frames);
-	pos = Align_Get_Pos(Widget_GetSize(widget), 
+	frames = ActiveBox_GetFrames( widget );
+	frame_graph = Frames_GetGraphSlot( frames );
+	pos = Align_Get_Pos( Widget_GetSize(widget), 
 				frames->size, ALIGN_MIDDLE_CENTER);
 
-	Graph_Fill_Alpha( widget_graph, 0 );
-	Graph_Replace( widget_graph, frame_graph, pos );
+	Widget_SetBackgroundTransparent( widget, TRUE );
+	Widget_SetBackgroundImage( widget, frame_graph );
+	Widget_SetBackgroundLayout( widget, LAYOUT_NONE );
 	rect.x = pos.x;
 	rect.y = pos.y;
 	rect.width = frame_graph->width;
@@ -529,9 +552,8 @@ void Register_ActiveBox()
 {
 	WidgetType_Add("active_box"); 
 	WidgetFunc_Add("active_box", ActiveBox_Init, FUNC_TYPE_INIT);
-	WidgetFunc_Add("active_box", Exec_Update_ActiveBox, FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("active_box", Exec_Update_ActiveBox, FUNC_TYPE_DRAW);
-	WidgetFunc_Add("active_box", Destroy_ActiveBox,	 FUNC_TYPE_DESTROY); 
+	WidgetFunc_Add("active_box", ActiveBox_ExecUpdate, FUNC_TYPE_UPDATE);
+	WidgetFunc_Add("active_box", Destroy_ActiveBox,	 FUNC_TYPE_DESTROY);
 }
 
 /************************** End ActiveBox *****************************/

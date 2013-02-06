@@ -81,13 +81,13 @@ LCUI_Frames* Create_Frames(LCUI_Size size);
  * 说明：该容器用于记录动画的每一帧的信息，需要指定该容器的尺寸。
  *  */ 
 
-LCUI_Pos Frame_Get_Pos(LCUI_Frames *stream, LCUI_Frame *frame);
+LCUI_Pos Frames_GetFrameMixPos(LCUI_Frames *stream, LCUI_Frame *frame);
 /* 功能：获取指定帧在整个动画容器中的位置 */ 
 
 int Resize_Frames(LCUI_Frames *p, LCUI_Size new_size);
 /* 功能：调整动画的容器尺寸 */ 
 
-int Add_Frame(	LCUI_Frames *des, LCUI_Graph *pic, 
+int Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic, 
 		LCUI_Pos offset, int sleep_time );
 /* 
  * 功能：为动画添加帧 
@@ -97,7 +97,7 @@ int Add_Frame(	LCUI_Frames *des, LCUI_Graph *pic,
  * sleep_time表示该帧的显示时长，单位为：10毫秒
  * */ 
 
-int Frames_Add_Func(	LCUI_Frames *des, 
+int Frames_AddFunc(	LCUI_Frames *des, 
 			void (*func)(LCUI_Graph*, void*), 
 			void *arg );
 /* 
@@ -105,10 +105,10 @@ int Frames_Add_Func(	LCUI_Frames *des,
  * 说明：关联回调函数后，动画每更新一帧都会调用这个函数
  * */ 
 
-LCUI_Frame *Frames_Get_Frame(LCUI_Frames *src);
+LCUI_Frame *Frames_GetFrame(LCUI_Frames *src);
 /* 功能：获取当前帧 */ 
 
-LCUI_Graph *Frames_Get_Slot(LCUI_Frames *src);
+LCUI_Graph *Frames_GetGraphSlot(LCUI_Frames *src);
 /* 功能：获取当前帧的图像 */ 
 
 int Frames_Play(LCUI_Frames *frames);
@@ -119,9 +119,9 @@ int Frames_Pause(LCUI_Frames *frames);
 /*********************** End Frames Process ***************************/
 
 /************************** ActiveBox *********************************/
-LCUI_Frames *ActiveBox_Get_Frames(LCUI_Widget *widget);
+LCUI_Frames *ActiveBox_GetFrames(LCUI_Widget *widget);
 
-int ActiveBox_Set_Frames_Size(LCUI_Widget *widget, LCUI_Size new_size);
+int ActiveBox_SetFramesSize(LCUI_Widget *widget, LCUI_Size new_size);
 /* 功能：设定动画尺寸 */ 
 
 int ActiveBox_Play(LCUI_Widget *widget);
@@ -130,7 +130,7 @@ int ActiveBox_Play(LCUI_Widget *widget);
 int ActiveBox_Pause(LCUI_Widget *widget);
 /* 功能：暂停动画 */ 
 
-int ActiveBox_Add_Frame(	LCUI_Widget *widget, LCUI_Graph *pic, 
+int ActiveBox_AddFrame(	LCUI_Widget *widget, LCUI_Graph *pic, 
 				LCUI_Pos offset, int sleep_time );
 /* 功能：为ActiveBox部件内的动画添加一帧图像 */ 
 /************************** End ActiveBox *****************************/
