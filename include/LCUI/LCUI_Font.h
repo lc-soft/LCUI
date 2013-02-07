@@ -42,13 +42,13 @@
 #define __LCUI_FONT_H__
 
 #include <stdint.h>
-
 LCUI_BEGIN_HEADER
 
 #include LC_CHARSET_H
 #include LC_FONTBMP_H
 #include LC_TEXTSTYLE_H
 #include LC_TEXTLAYER_H
+#include LC_FONTLIB_H
 
 LCUI_END_HEADER
 

@@ -39,45 +39,62 @@ static LCUI_Queue famliy_table, style_table;
 static LCUI_Queue font_database;
 
 /* 初始化字体的字族信息表 */
-void FontLIB_FamliyTableInit( void )
+static void FontLIB_FamliyTableInit( void )
 {
 	Queue_Init( &famliy_table, sizeof(LCUI_FontFamliy), NULL );
 }
 
 /* 初始化字体的样式信息表 */
-void FontLIB_StyleTableInit( void )
+static void FontLIB_StyleTableInit( void )
 {
 	Queue_Init( &style_table, sizeof(LCUI_FontStyle), NULL );
 }
 
-void FontLIB_DestroyBMP( LCUI_FontBMPItem *bmp )
+static void FontLIB_DestroyBMP( LCUI_FontBMPItem *bmp )
 {
-	
+	if( bmp->bitmap ) {
+		free( bmp->bitmap );
+	}
 }
 
-void FontLIB_DestroyStyle( LCUI_FontStyleItem *style )
+static void FontLIB_DestroyStyle( LCUI_FontStyleItem *style )
 {
-	
+	Destroy_Queue( &style->font_bmp );
 }
 
-void FontLIB_DestroyFamliy( LCUI_FontFamliyItem *famliy )
+static void FontLIB_DestroyFamliy( LCUI_FontFamliyItem *famliy )
 {
-	
+	Destroy_Queue( &famliy->font_style );
 }
 
-void FontLIB_Destroy( LCUI_FontDataItem *font )
+static void FontLIB_Destroy( LCUI_FontDataItem *font )
 {
-	
+	Destroy_Queue( &font->font_famliy );
 }
 
-void FontLIB_FamliyInit( LCUI_FontFamliyItem *item )
+void FontLIB_DestroyAll( void )
+{
+	if( !database_init ) {
+		return;
+	}
+	Destroy_Queue( &font_database );
+}
+
+static void FontLIB_StyleInit( LCUI_FontStyleItem *item )
+{
+	Queue_Init(	&item->font_bmp, 
+			sizeof(LCUI_FontBMPItem), 
+			FontLIB_DestroyBMP );
+}
+
+static void FontLIB_FamliyInit( LCUI_FontFamliyItem *item )
 {
 	Queue_Init(	&item->font_style, 
 			sizeof(LCUI_FontStyleItem), 
 			FontLIB_DestroyStyle );
 }
 
-void FontLIB_DataInit( LCUI_FontDataItem *item )
+static void FontLIB_DataInit( LCUI_FontDataItem *item )
 {
 	Queue_Init(	&item->font_famliy, 
 			sizeof(LCUI_FontFamliyItem), 
@@ -98,41 +115,6 @@ void FontLIB_Init( void )
 	FontLIB_StyleTableInit();
 }
 
-LCUI_FontBMPItem *
-FontLIB_GetBMPItem( LCUI_FontStyleItem *item, int pixel_size )
-{
-	return NULL;
-}
-
-LCUI_FontStyleItem *
-FontLIB_GetStyleItemByID( LCUI_FontFamliyItem *item, int style_id )
-{
-	return NULL;
-}
-
-LCUI_FontStyleItem *
-FontLIB_GetStyleItem( LCUI_FontFamliyItem *item, const char *style_name )
-{
-	return NULL;
-}
-
-LCUI_FontFamliyItem *
-FontLIB_GetFamliyItemByID( LCUI_FontDataItem *item, int famliy_id )
-{
-	return NULL;
-}
-
-LCUI_FontFamliyItem *
-FontLIB_GetFamliyItem( LCUI_FontDataItem *item, const char *famliy_name )
-{
-	return NULL;
-}
-
-LCUI_FontDataItem *
-FontLIB_GetDataItem( wchar_t char_code )
-{
-	return NULL;
-}
 
 /* 获取字体的风格ID */
 int FontLIB_GetStyleID( const char *style_name )
@@ -192,13 +174,156 @@ int FontLIB_GetFamliyID( const char *famliy_name )
 	return item->famliy_id;
 }
 
-/* 添加一个字体位图数据至数据库中 */
+
+static LCUI_FontBMPItem *
+FontLIB_GetBMPItem( LCUI_FontStyleItem *style_item, int pixel_size )
+{
+	int i, n;
+	LCUI_FontBMPItem *item;
+	
+	n = Queue_Get_Total( &style_item->font_bmp );
+	for( i=0; i<n; ++i ) {
+		item = Queue_Get( &style_item->font_bmp, i );
+		if( !item ) {
+			continue;
+		}
+		if( item->pixel_size == pixel_size ) {
+			return item;
+		}
+	}
+	return NULL;
+}
+
+static LCUI_FontStyleItem *
+FontLIB_GetStyleItemByID( LCUI_FontFamliyItem *famliy_item, int style_id )
+{
+	int i, n;
+	LCUI_FontStyleItem *item;
+	
+	n = Queue_Get_Total( &famliy_item->font_style);
+	for( i=0; i<n; ++i ) {
+		item = Queue_Get( &famliy_item->font_style, i );
+		if( !item ) {
+			continue;
+		}
+		if( item->style_id == style_id ) {
+			return item;
+		}
+	}
+	return NULL;
+}
+
+static LCUI_FontFamliyItem *
+FontLIB_GetFamliyItemByID( LCUI_FontDataItem *data_item, int famliy_id )
+{
+	int i, n;
+	LCUI_FontFamliyItem *item;
+	
+	n = Queue_Get_Total( &data_item->font_famliy );
+	for( i=0; i<n; ++i ) {
+		item = Queue_Get( &data_item->font_famliy, i );
+		if( !item ) {
+			continue;
+		}
+		if( item->famliy_id == famliy_id ) {
+			return item;
+		}
+	}
+	return NULL;
+}
+
+static LCUI_FontDataItem *
+FontLIB_GetDataItem( wchar_t char_code )
+{
+	int i, n;
+	LCUI_FontDataItem *item;
+	
+	n = Queue_Get_Total( &font_database );
+	for( i=0; i<n; ++i ) {
+		item = Queue_Get( &font_database, i );
+		if( !item ) {
+			continue;
+		}
+		if( item->char_code == char_code ) {
+			return item;
+		}
+	}
+	return NULL;
+}
+
+/* 
+ * 添加一个字体位图数据至数据库中
+ * 注意：调用此函数后，作为参数fontbmp_buff的变量，不能被free掉，否则，数据库中记录
+ * 的此数据会无效 
+ * */
 LCUI_FontBMP *
 FontLIB_Add(	wchar_t char_code,	int famliy_id,
 		int style_id,		int pixel_size,	
-		LCUI_FontBMP *font_bmp )
+		LCUI_FontBMP *fontbmp_buff )
 {
-	return NULL;
+	LCUI_FontDataItem *font;
+	LCUI_FontFamliyItem *famliy;
+	LCUI_FontStyleItem *style;
+	LCUI_FontBMPItem *bmp;
+	
+	if( !database_init ) {
+		return NULL;
+	}
+	/* 获取字体数据句柄，如果获取失败，则新增 */
+	font = FontLIB_GetDataItem( char_code );
+	if( !font ) {
+		font = malloc( sizeof(LCUI_FontDataItem) );
+		if( !font ) {
+			return NULL;
+		}
+		FontLIB_DataInit( font );
+		Queue_Add_Pointer( &font_database, font );
+	}
+	
+	/* 获取字体字族句柄，如果获取失败，则新增 */
+	famliy = FontLIB_GetFamliyItemByID( font, famliy_id );
+	if( !famliy ) {
+		famliy = malloc( sizeof(LCUI_FontFamliyItem) );
+		if( !famliy ) {
+			return NULL;
+		}
+		FontLIB_FamliyInit( famliy );
+		Queue_Add_Pointer( &font->font_famliy, famliy );
+	}
+	
+	/* 获取字体风格句柄，如果获取失败，则新增 */
+	style = FontLIB_GetStyleItemByID( famliy, style_id );
+	if( !style ) {
+		style = malloc( sizeof(LCUI_FontStyleItem) );
+		if( !style ) {
+			return NULL;
+		}
+		FontLIB_StyleInit( style );
+		Queue_Add_Pointer( &famliy->font_style, style );
+	}
+	
+	/* 获取字体位图句柄，如果获取失败，则新增 */
+	bmp = FontLIB_GetBMPItem( style, pixel_size );
+	if( !bmp ) {
+		bmp = malloc( sizeof(LCUI_FontBMPItem) );
+		if( !bmp ) {
+			return NULL;
+		}
+		bmp->pixel_size = pixel_size;
+		bmp->bitmap = NULL;
+		Queue_Add_Pointer( &style->font_bmp, bmp );
+	}
+	
+	/* 如果该指针为NULL，那么就申请一块空间 */
+	if( NULL == bmp->bitmap ) {
+		bmp->bitmap = malloc( sizeof(LCUI_FontBMP) );
+		if( !bmp->bitmap ) {
+			return NULL;
+		}
+	}
+	/* 拷贝数据至该空间内 */
+	memcpy( bmp->bitmap, fontbmp_buff, sizeof(LCUI_FontBMP) );
+	return bmp->bitmap;
 }
 
 /* 获取字体位图数据 */
@@ -206,5 +331,30 @@ LCUI_FontBMP *
 FontLIB_GetFontBMP(	wchar_t char_code,	int famliy_id,
 			int style_id,		int pixel_size	)
 {
-	return NULL;
+	LCUI_FontDataItem *font;
+	LCUI_FontFamliyItem *famliy;
+	LCUI_FontStyleItem *style;
+	LCUI_FontBMPItem *bmp;
+	
+	if( !database_init ) {
+		return NULL;
+	}
+	
+	font = FontLIB_GetDataItem( char_code );
+	if( !font ) {
+		return NULL;
+	}
+	famliy = FontLIB_GetFamliyItemByID( font, famliy_id );
+	if( !famliy ) {
+		return NULL;
+	}
+	style = FontLIB_GetStyleItemByID( famliy, style_id );
+	if( !style ) {
+		return NULL;
+	}
+	bmp = FontLIB_GetBMPItem( style, pixel_size );
+	if( !bmp ) {
+		return NULL;
+	}
+	return bmp->bitmap;
 }
