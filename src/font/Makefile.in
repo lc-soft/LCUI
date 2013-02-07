@@ -47,7 +47,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libfont_la_LIBADD =
-am_libfont_la_OBJECTS = bitmapfont.lo charset.lo textlayer.lo
+am_libfont_la_OBJECTS = fontlibrary.lo bitmapfont.lo charset.lo \
+	textlayer.lo
 libfont_la_OBJECTS = $(am_libfont_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -249,7 +250,7 @@ SUBDIRS = in-core
 AUTOMAKE_OPTIONS = foreign 
 INCLUDES = -I$(abs_top_srcdir)/include 
 noinst_LTLIBRARIES = libfont.la
-libfont_la_SOURCES = bitmapfont.c charset.c textlayer.c
+libfont_la_SOURCES = fontlibrary.c bitmapfont.c charset.c textlayer.c
 all: all-recursive
 
 .SUFFIXES:
@@ -304,6 +305,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitmapfont.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/charset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fontlibrary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/textlayer.Plo@am__quote@
 
 .c.o:
