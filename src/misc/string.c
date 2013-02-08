@@ -89,15 +89,13 @@ int LCUI_Strcmp(LCUI_String *str1, LCUI_String *str2)
 int LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2)
 /* LCUI_String ×Ö·û´®¿½±´ */
 {
-	if( str1->size <=0 || str2->size <= 0 ) {
+	if( str2->size <= 0 ) {
 		return -1;
 	}
 	if(str1->size > 0) {
-		if( str2->size > str1->size ) { 
-			free( str1->string );
-			str1->string = (char*)calloc(str2->size+1, sizeof(char));
-		}
+		free( str1->string );
 	}
+	str1->string = (char*)calloc(str2->size+1, sizeof(char));
 	strcpy( str1->string, str2->string );
 	str1->size = str2->size;
 	return 0;
@@ -113,7 +111,7 @@ void String_Free(LCUI_String *in)
 
 void WChar_T_Free(LCUI_WChar_T *ch) 
 {
-	FontBMP_Free(&ch->bitmap);
+	ch->bitmap = NULL;
 }
 
 void WString_Free(LCUI_WString *str) 
