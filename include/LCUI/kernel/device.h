@@ -20,11 +20,11 @@ int LCUI_Dev_Add(	BOOL (*init_func)(),
 			BOOL (*proc_func)(), 
 			BOOL (*destroy_func)() );
 
-/* 初始化设备 */
-int LCUI_Dev_Init();
+/* 初始化设备处理模块 */
+int LCUIModule_Device_Init();
 
-/* 撤销设备线程 */
-void LCUI_Dev_Destroy();
+/* 停用设备处理模块 */
+void LCUIModule_Device_End();
 
 LCUI_END_HEADER
 

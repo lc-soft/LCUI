@@ -131,8 +131,8 @@ BOOL Enable_Mouse_Input();
 BOOL Disable_Mouse_Input();
 /* 功能：禁用鼠标输入处理 */ 
 
-int Mouse_Init();
-/* 初始化鼠标 */
+/* 初始化鼠标输入模块 */
+int LCUIModule_Mouse_Init( void );
 /**************************** Mouse End *******************************/
 
 
@@ -159,13 +159,8 @@ int Find_Pressed_Key(int key);
  *   0 不存在
  **/ 
 
-BOOL Enable_Key_Input();
-/* 功能：启用按键输入处理 */
-
-BOOL Disable_Key_Input();
-/* 功能：撤销按键输入处理 */
-
-void Keyboard_Init();
+/* 初始化键盘输入模块 */
+void LCUIModule_Keyboard_Init( void );
 /*************************** Key End **********************************/
 
 
@@ -182,8 +177,8 @@ BOOL Disable_TouchScreen_Input();
 void *Get_TouchScreen();
 /* 获取触屏设备文件句柄 */
 
-void TouchScreen_Init();
-/* 初始化触屏设备 */
+/* 初始化触屏输入模块 */
+void LCUIModule_TouchScreen_Init( void );
 /*********************** TouchScreen End *******************************/
 
 LCUI_END_HEADER

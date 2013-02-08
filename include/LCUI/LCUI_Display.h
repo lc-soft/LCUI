@@ -86,11 +86,11 @@ void Get_Screen_Real_Graph ( LCUI_Rect rect, LCUI_Graph *graph );
 /* 获取当前FPS */
 int LCUI_GetFPS( void );
 
-int Enable_Graph_Display();
-/* 功能：启用图形输出 */ 
+/* 初始化图形输出模块 */
+int LCUIModule_Video_Init( void );
 
-int Disable_Graph_Display();
-/* 功能：禁用图形输出 */ 
+/* 停用图形输出模块 */
+int LCUIModule_Video_End( void );
 
 LCUI_END_HEADER
 

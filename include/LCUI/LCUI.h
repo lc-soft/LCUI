@@ -314,7 +314,7 @@ struct _LCUI_FontBMP
 struct _LCUI_WChar_T
 {
 	wchar_t		char_code;	/* 字符码 */
-	LCUI_FontBMP	bitmap;		/* 字符的位图数据 */
+	LCUI_FontBMP	*bitmap;	/* 字符的位图数据 */
 	LCUI_RGB	color;		/* 该文字的配色 */
 	BOOL		update;		/* 标明这个字符是否需要刷新 */ 
 	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */		   

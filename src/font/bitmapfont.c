@@ -191,24 +191,18 @@ void Set_Default_Font(char *fontfile)
 	}
 }
 
-void LCUI_Font_Init(LCUI_Font *font)
-/* 
- * 功能：初始化LCUI的Font结构体数据 
- * 说明：本函数在LCUI初始化时调用，LCUI_Font结构体中记录着字体相关的数据
- * */
-{ 
+/* 初始化字体处理模块 */
+void LCUIModule_Font_Init( void )
+{
 	char *p;
+	LCUI_Font *font;
+	
+	font = &LCUI_Sys.default_font;
 	printf("loading fontfile...\n");/* 无缓冲打印内容 */
 	font->type = DEFAULT;
-	//font->size = 12;
-	//font->fore_color.red = 0;
-	//font->fore_color.green = 0;
-	//font->fore_color.blue = 0;
-	String_Init(&font->font_file);
-	String_Init(&font->family_name);
-	String_Init(&font->style_name);
-	//font->space = 1;
-	//font->linegap = 0;
+	String_Init( &font->font_file );
+	String_Init( &font->family_name );
+	String_Init( &font->style_name );
 	font->state = KILLED;
 #ifdef USE_FREETYPE
 	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT;
@@ -229,6 +223,26 @@ void LCUI_Font_Init(LCUI_Font *font)
 	/* 打开默认字体文件 */
 	Open_Fontfile(&LCUI_Sys.default_font, default_font);
 	FontLIB_Init();
+}
+
+/* 停用字体处理模块 */
+void LCUIModule_Font_End( void )
+{
+	/* 释放字符串 */
+	String_Free( &LCUI_Sys.default_font.font_file );
+	String_Free( &LCUI_Sys.default_font.family_name );
+	String_Free( &LCUI_Sys.default_font.style_name );
+	/* 如果缺省字体的状态是活动的，那就拷贝 */
+	if(LCUI_Sys.default_font.state == ACTIVE) {
+		LCUI_Sys.default_font.state = KILLED;
+#ifdef USE_FREETYPE
+		FT_Done_Face(LCUI_Sys.default_font.ft_face);
+		FT_Done_FreeType(LCUI_Sys.default_font.ft_lib); 
+#endif
+		LCUI_Sys.default_font.ft_lib = NULL;
+		LCUI_Sys.default_font.ft_face = NULL;
+	}
+	FontLIB_DestroyAll();
 }
 
 void Font_Init(LCUI_Font *in)
@@ -278,26 +292,6 @@ void Font_Free(LCUI_Font *in)
 		in->ft_face = NULL;
 	}
 }
-
-void LCUI_Font_Free()
-/* 功能：释放LCUI默认的Font结构体数据占用的内存资源 */
-{ 
-	/* 释放字符串 */
-	String_Free(&LCUI_Sys.default_font.font_file);
-	String_Free(&LCUI_Sys.default_font.family_name);
-	String_Free(&LCUI_Sys.default_font.style_name);
-	/* 如果缺省字体的状态是活动的，那就拷贝 */
-	if(LCUI_Sys.default_font.state == ACTIVE) {
-		LCUI_Sys.default_font.state = KILLED;
-#ifdef USE_FREETYPE
-		FT_Done_Face(LCUI_Sys.default_font.ft_face);
-		FT_Done_FreeType(LCUI_Sys.default_font.ft_lib); 
-#endif
-		LCUI_Sys.default_font.ft_lib = NULL;
-		LCUI_Sys.default_font.ft_face = NULL;
-	}
-}
-
 
 int Show_FontBMP(LCUI_FontBMP *fontbmp)
 /* 功能：在屏幕打印以0和1表示字体位图 */

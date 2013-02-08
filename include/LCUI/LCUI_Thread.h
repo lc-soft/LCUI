@@ -197,6 +197,12 @@ int LCUI_Thread_Tree_Cancel(Thread_TreeNode *ttn);
 int LCUI_App_Thread_Cancel(LCUI_ID app_id);
 /* 功能：撤销指定ID的程序的全部线程 */ 
 
+/* 初始化线程模块 */
+void LCUIModule_Thread_Init( void );
+
+/* 停用线程模块 */
+void LCUIModule_Thread_End( void );
+
 LCUI_END_HEADER
 
 

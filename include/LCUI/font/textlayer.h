@@ -13,7 +13,7 @@ typedef struct _LCUI_CharData
 	//BOOL using_quote:2;	/* 标志，表示是否引用了现成的文本样式 */
 	
 	wchar_t char_code;	/* 字符码 */
-	LCUI_FontBMP bitmap;	/* 字体位图 */
+	LCUI_FontBMP *bitmap;	/* 字体位图数据 */
 	LCUI_TextStyle *data;	/* 文本样式数据 */
 }
 LCUI_CharData;

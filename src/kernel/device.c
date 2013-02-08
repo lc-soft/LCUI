@@ -64,16 +64,16 @@ proc_dev_list ( void *arg )
 	thread_exit(NULL);
 }
 
-/* 初始化设备 */
-int LCUI_Dev_Init()
+/* 初始化设备处理模块 */
+int LCUIModule_Device_Init()
 {
 	dev_list_init( &LCUI_Sys.dev_list );
 	return thread_create( &LCUI_Sys.dev_thread, NULL, 
 			proc_dev_list, &LCUI_Sys.dev_list );
 }
 
-/* 撤销设备线程 */
-void LCUI_Dev_Destroy()
+/* 停用设备处理模块 */
+void LCUIModule_Device_End()
 {
 	int total, i;
 	dev_func_data *data_ptr;

@@ -27,11 +27,11 @@ void Set_Default_Font(char *fontfile);
  * 说明：需要在LCUI初始化前使用，因为LCUI初始化时会打开默认的字体文件
  *  */
 
-void LCUI_Font_Init(LCUI_Font *font);
-/* 
- * 功能：初始化LCUI的Font结构体数据 
- * 说明：本函数在LCUI初始化时调用，LCUI_Font结构体中记录着字体相关的数据
- * */
+/* 初始化字体处理模块 */
+void LCUIModule_Font_Init( void );
+
+/* 停用字体处理模块 */
+void LCUIModule_Font_End( void );
 
 void Font_Init(LCUI_Font *in);
 /* 
@@ -56,11 +56,6 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 int Open_Fontfile(LCUI_Font *font_data, char *fontfile);
 /* 打开指定路径中的字体文件，并保存数据至LCUI_Font结构体中 */
 
-int 
-Get_FontBMP(	LCUI_Font *font_data, wchar_t ch, 
-		int pixel_size, LCUI_FontBMP *out_bitmap);
-/*
- * 功能：获取单个wchar_t型字符的字体位图数据
- * 说明：LCUI_Font结构体中储存着已被打开的字体文件句柄和face对象的句柄，如果字体文件
- * 已经被成功打开一次，此函数不会再次打开字体文件。
- */
+/* 获取现有的字体位图数据 */
+LCUI_FontBMP *
+Get_ExistFontBMP( LCUI_Font *font_data, wchar_t ch, int pixel_size );

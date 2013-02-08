@@ -279,3 +279,20 @@ int LCUI_App_Thread_Cancel(LCUI_ID app_id)
 	}
 	return 0; 
 }
+
+/* 初始化线程模块 */
+void LCUIModule_Thread_Init( void )
+{
+	/* 初始化根线程结点 */
+	Thread_TreeNode_Init( &LCUI_Sys.thread_tree );
+	/* 当前线程ID作为根结点 */
+	LCUI_Sys.thread_tree.tid = thread_self();
+	/* 保存线程ID */
+	LCUI_Sys.self_id = thread_self();
+}
+
+/* 停用线程模块 */
+void LCUIModule_Thread_End( void )
+{
+	
+}

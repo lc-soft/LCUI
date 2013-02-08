@@ -49,6 +49,12 @@ int timer_thread_start( thread_t *tid, LCUI_Queue *list );
 /* 停止定时器的处理线程，并销毁定时器列表 */
 void timer_thread_destroy( thread_t tid, LCUI_Queue *list );
 
+/* 初始化定时器模块 */
+void LCUIModule_Timer_Init( void );
+
+/* 停用定时器模块 */
+void LCUIModule_Timer_End( void );
+
 LCUI_END_HEADER
 
 #endif

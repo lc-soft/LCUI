@@ -198,21 +198,23 @@ static BOOL proc_keyboard()
 	return TRUE;
 }
 
-BOOL Enable_Key_Input()
-/* 功能：启用按键输入处理 */
+/* 键盘输入模块的初始化 */
+static BOOL Enable_Keyboard_Input( void )
 {
 	Set_Raw(1);/* 设置终端属性 */
 	return TRUE;
 }
 
-BOOL Disable_Key_Input()
-/* 功能：撤销按键输入处理 */
+/* 键盘输入模块的销毁 */
+static BOOL Disable_Keyboard_Input( void )
 {
 	Set_Raw(0);/* 恢复终端属性 */
 	return TRUE;
 }
 
-void Keyboard_Init()
+/* 初始化键盘输入模块 */
+void LCUIModule_Keyboard_Init( void )
 {
-	LCUI_Dev_Add( Enable_Key_Input, proc_keyboard, Disable_Key_Input);
+	LCUI_Dev_Add( Enable_Keyboard_Input, proc_keyboard, Disable_Keyboard_Input );
 }
+

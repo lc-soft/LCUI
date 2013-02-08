@@ -219,7 +219,7 @@ typedef struct {
 	LCUI_Widget *widget;
 } widget_item;
 
-LCUI_Queue widget_list;
+static LCUI_Queue widget_list;
 
 static void 
 widget_list_reset( void )
@@ -467,16 +467,22 @@ Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 static void 
 WidgetFocusProc( LCUI_KeyboardEvent *event, void *arg );
 
-void 
-Widget_Event_Init()
-/* 功能：初始化部件事件处理 */
+/* 初始化部件模块 */
+void LCUIModule_Widget_Init( void )
 {
+	WidgetQueue_Init( &LCUI_Sys.widget_list );
 	Queue_Init( &widget_list, sizeof(widget_item), NULL );
 	LCUI_MouseButtonEvent_Connect( LCUI_HandleMouseButton, NULL );
 	LCUI_MouseMotionEvent_Connect( LCUI_HandleMouseMotion, NULL );
 	LCUI_KeyboardEvent_Connect( WidgetFocusProc, NULL );
 }
 
+/* 停用部件模块 */
+void LCUIModule_Widget_End( void )
+{
+	Destroy_Queue( &LCUI_Sys.widget_list );
+	Destroy_Queue( &widget_list );
+}
 /*************************** Event End *********************************/
 
 

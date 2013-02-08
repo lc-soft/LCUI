@@ -158,8 +158,8 @@ void *Get_TouchScreen()
 	return ts_data.td;
 }
 
-void TouchScreen_Init()
-/* 初始化触屏设备 */
+/* 初始化触屏输入模块 */
+void LCUIModule_TouchScreen_Init( void )
 {
 	ts_data.td = NULL;
 	ts_data.state = REMOVE;

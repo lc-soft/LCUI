@@ -8,13 +8,13 @@ static BOOL active = FALSE;
 static thread_t eventloop_thread = -1;
 
 /* 事件队列初始化 */
-void LCUI_EventsInit( void )
+static void LCUI_EventsInit( void )
 {
 	Queue_Init( &events, sizeof(LCUI_Event), NULL );
 }
 
 /* 销毁事件队列 */
-void LCUI_DestroyEvents( void )
+static void LCUI_DestroyEvents( void )
 {
 	Destroy_Queue( &events );
 }
@@ -138,7 +138,7 @@ static void *LCUI_EventLoop( void *unused )
 }
 
 /* 停用事件线程 */
-void LCUI_StopEventThread( void )
+static void LCUI_StopEventThread( void )
 {
 	if( !active ) {
 		return;
@@ -148,12 +148,30 @@ void LCUI_StopEventThread( void )
 }
 
 /* 启动事件线程 */
-int LCUI_StartEventThread( void )
+static int LCUI_StartEventThread( void )
 {
 	LCUI_StopEventThread();
 	active = TRUE;
 	return thread_create(	&eventloop_thread, NULL, 
 				LCUI_EventLoop, NULL );
+}
+
+/* 初始化事件模块 */
+void LCUIModule_Event_Init( void )
+{
+	EventSlots_Init( &LCUI_Sys.sys_event_slots );
+	EventSlots_Init( &LCUI_Sys.user_event_slots );
+	LCUI_EventsInit();
+	LCUI_StartEventThread();
+}
+
+/* 停用事件模块 */
+void LCUIModule_Event_End( void )
+{
+	LCUI_StopEventThread();
+	LCUI_DestroyEvents();
+	Destroy_Queue( &LCUI_Sys.sys_event_slots );
+	Destroy_Queue( &LCUI_Sys.user_event_slots );
 }
 
 /* 添加事件至事件队列中 */

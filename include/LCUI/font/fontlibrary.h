@@ -12,7 +12,7 @@ void FontLIB_Init( void );
 int FontLIB_GetStyleID( const char *style_name );
 
 /* 获取字体的字族ID */
-int FontLIB_GetFamliyID( const char *famliy_name );
+int FontLIB_GetFamliyID( const char *family_name );
 
 /* 
  * 添加一个字体位图数据至数据库中
@@ -20,13 +20,13 @@ int FontLIB_GetFamliyID( const char *famliy_name );
  * 的此数据会无效 
  * */
 LCUI_FontBMP *
-FontLIB_Add(	wchar_t char_code,	int famliy_id,
+FontLIB_Add(	wchar_t char_code,	int family_id,
 		int style_id,		int pixel_size,	
 		LCUI_FontBMP *fontbmp_buff );
 
 /* 获取字体位图数据 */
 LCUI_FontBMP *
-FontLIB_GetFontBMP(	wchar_t char_code,	int famliy_id,
+FontLIB_GetFontBMP(	wchar_t char_code,	int family_id,
 			int style_id,		int pixel_size	);
 
 LCUI_END_HEADER

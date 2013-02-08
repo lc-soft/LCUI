@@ -93,6 +93,11 @@ void LCUI_App_Init( LCUI_App *app )
 	app->encoding_type = ENCODEING_TYPE_UTF8;
 }
 
+static void LCUIModule_Cursor_End( void )
+{
+	Graph_Free( &LCUI_Sys.cursor.graph );
+}
+
 static void LCUI_Quit( void )
 /*
  * 功能：退出LCUI
@@ -100,18 +105,17 @@ static void LCUI_Quit( void )
  * */
 {
 	LCUI_Sys.state = KILLED;	/* 状态标志置为KILLED */
-	LCUI_Font_Free ();		/* 释放LCUI的默认字体数据占用的内存资源 */
-	Disable_Graph_Display();	/* 禁用图形显示 */ 
-	Disable_Mouse_Input();		/* 禁用鼠标输入 */ 
-	Disable_TouchScreen_Input();	/* 禁用触屏支持 */ 
-	Disable_Key_Input();		/* 禁用按键输入 */ 
-	/* 停止事件循环 */
-	LCUI_StopEventThread();
-	LCUI_DestroyEvents();
-	/* 销毁事件槽记录 */
-	Destroy_Queue( &LCUI_Sys.sys_event_slots );
-	Destroy_Queue( &LCUI_Sys.user_event_slots );
-	timer_thread_destroy( LCUI_Sys.timer_thread, &LCUI_Sys.timer_list );
+	LCUIModule_Thread_End();
+	LCUIModule_Event_End();
+	LCUIModule_Cursor_End();
+	LCUIModule_Widget_End();
+	LCUIModule_Font_End();
+	LCUIModule_Timer_End();
+	//LCUIModule_Keyboard_End();
+	//LCUIModule_Mouse_End();
+	//LCUIModule_TouchScreen_End();
+	LCUIModule_Device_End();
+	LCUIModule_Video_End();
 }
 
 
@@ -374,24 +378,14 @@ static void LCUI_ShowCopyrightText()
 	"========================================\n" );
 }
 
-static void Cursor_Init()
-/* 功能：初始化游标数据 */
+/* 初始化游标数据 */
+static void LCUIModule_Cursor_Init( void )
 {
 	LCUI_Graph pic;
-	Graph_Init(&pic);
-	Load_Graph_Default_Cursor(&pic);/* 载入自带的游标的图形数据 */ 
-	Set_Cursors_Graph(&pic); 
+	Graph_Init( &pic );
+	Load_Graph_Default_Cursor( &pic );/* 载入自带的游标的图形数据 */ 
+	Set_Cursors_Graph( &pic );
 }
-
-static void LCUI_IO_Init()
-/* 功能：初始化输入输出功能 */
-{
-	Mouse_Init();
-	Cursor_Init();
-	Keyboard_Init();
-	TouchScreen_Init();
-}
-
 
 BOOL LCUI_Active()
 /* 功能：检测LCUI是否活动 */
@@ -412,54 +406,35 @@ int LCUI_Init(int argc, char *argv[])
 	int temp;
 	/* 如果LCUI没有初始化过 */
 	if( !LCUI_Sys.init ) {
-		/* 标记已经初始化 */
 		LCUI_Sys.init = TRUE;
 		LCUI_Sys.state = ACTIVE;
-		/* 初始化随机数种子 */
 		srand(time(NULL));
-		/* 打印版权信息 */
 		LCUI_ShowCopyrightText();
-		/* 初始化根线程结点 */
-		Thread_TreeNode_Init (&LCUI_Sys.thread_tree);	
-		/* 当前线程ID作为根结点 */
-		LCUI_Sys.thread_tree.tid = thread_self();
-		/* 保存线程ID */
-		LCUI_Sys.self_id = thread_self();
 		
-		/* 初始化事件槽记录 */
-		EventSlots_Init( &LCUI_Sys.sys_event_slots );
-		EventSlots_Init( &LCUI_Sys.user_event_slots );
-		
-		LCUI_EventsInit();
-		LCUI_StartEventThread();
-		
-		/* 初始化默认的字体数据 */
-		LCUI_Font_Init(&LCUI_Sys.default_font);
-		/* 初始化LCUI程序数据 */
 		LCUI_AppList_Init( &LCUI_Sys.app_list );
-		/* 初始化屏幕区域更新队列 */ 
 		RectQueue_Init( &LCUI_Sys.invalid_area );
-		/* 初始化部件队列 */
-		WidgetQueue_Init( &LCUI_Sys.widget_list ); 
-		/* 让定时器处理模块开始工作 */
-		timer_thread_start(	&LCUI_Sys.timer_thread, 
-					&LCUI_Sys.timer_list );
-		/* 初始化用于储存已按下的键的键值队列 */
 		Queue_Init( &LCUI_Sys.press_key, sizeof(int), NULL );
-		/* 记录程序信息 */
+		/* 注册程序 */
 		temp = LCUI_AppList_Add();
 		if(temp != 0) {
 			printf(APP_ERROR_REGISTER_ERROR);
 			abort();
 		}
-		
-		LCUI_Dev_Init();
-		LCUI_IO_Init();		/* 初始化输入输出设备 */ 
-		Widget_Event_Init();	/* 初始化部件事件处理 */
-		Enable_Graph_Display();	/* 启用图形输出 */ 
-		/* 鼠标游标居中 */
+		/* 初始化各个模块 */
+		LCUIModule_Thread_Init();
+		LCUIModule_Event_Init();
+		LCUIModule_Font_Init();
+		LCUIModule_Timer_Init();
+		LCUIModule_Device_Init();
+		LCUIModule_Keyboard_Init();
+		LCUIModule_Mouse_Init();
+		LCUIModule_TouchScreen_Init();
+		LCUIModule_Video_Init();
+		LCUIModule_Cursor_Init();
+		LCUIModule_Widget_Init();
+		/* 让鼠标游标居中显示 */
 		Set_Cursor_Pos( Get_Screen_Center_Point() );  
-		Show_Cursor();	/* 显示鼠标游标 */ 
+		Show_Cursor();
 	} else {
 		temp = LCUI_AppList_Add();
 		if(temp != 0) {

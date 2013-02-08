@@ -101,8 +101,11 @@ int Widget_Event_Connect ( LCUI_Widget *widget, WidgetEventType event_id,
 /* 处理与部件事件关联的回调函数 */
 int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event );
 
-void Widget_Event_Init();
-/* 功能：初始化部件事件处理 */ 
+/* 初始化部件模块 */
+void LCUIModule_Widget_Init( void );
+
+/* 停用部件模块 */
+void LCUIModule_Widget_End( void );
 
 /*--------------------------- Focus Proc ------------------------------*/
 BOOL 

@@ -305,14 +305,12 @@ BOOL Disable_Mouse_Input()
 	return TRUE;
 }
 
-int Mouse_Init()
-/* 初始化鼠标 */
+/* 初始化鼠标输入模块 */
+int LCUIModule_Mouse_Init( void )
 {
 	mouse_data.fd = -1;  
 	mouse_data.state = REMOVE;	/* 鼠标为移除状态 */
 	mouse_data.move_speed = 1;	/* 移动数度为1 */
-	/* 初始化鼠标事件信息队列 */ 
-	EventSlots_Init( &LCUI_Sys.sys_event_slots ); 
 	/* 启用鼠标输入处理 */
 	nobuff_printf("enable mouse input: ");
 	/* 注册鼠标设备 */

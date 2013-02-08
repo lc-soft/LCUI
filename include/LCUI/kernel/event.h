@@ -54,20 +54,14 @@ typedef struct {
 
 LCUI_BEGIN_HEADER
 
-/* 事件队列初始化 */
-void LCUI_EventsInit( void );
+/* 初始化事件模块 */
+void LCUIModule_Event_Init( void );
 
-/* 销毁事件队列 */
-void LCUI_DestroyEvents( void );
+/* 停用事件模块 */
+void LCUIModule_Event_End( void );
 
 /* 从事件队列中获取事件 */
 BOOL LCUI_PollEvent( LCUI_Event *event );
-
-/* 停用事件线程 */
-void LCUI_StopEventThread( void );
-
-/* 启动事件线程 */
-int LCUI_StartEventThread( void );
 
 /* 添加事件至事件队列中 */
 BOOL LCUI_PushEvent( LCUI_Event *event );

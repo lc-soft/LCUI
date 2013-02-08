@@ -261,6 +261,18 @@ void timer_thread_destroy( thread_t tid, LCUI_Queue *list )
 	/* 销毁定时器列表 */
 	timer_list_destroy( list ); 
 }
+
+/* 初始化定时器模块 */
+void LCUIModule_Timer_Init( void )
+{
+	timer_thread_start( &LCUI_Sys.timer_thread, &LCUI_Sys.timer_list );
+}
+
+/* 停用定时器模块 */
+void LCUIModule_Timer_End( void )
+{
+	timer_thread_destroy( LCUI_Sys.timer_thread, &LCUI_Sys.timer_list );
+}
 /*---------------------------- End Public -----------------------------*/
 
 /*---------------------------- End Timer ------------------------------*/
