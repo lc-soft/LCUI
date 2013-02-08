@@ -138,9 +138,6 @@ AC_C_RESTRICT
 AC_TYPE_UINT32_T
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_MMAP
-AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset munmap select strcasecmp sysinfo])
 
 #根据之前的检测结果，定义相应宏
