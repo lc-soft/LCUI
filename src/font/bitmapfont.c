@@ -227,7 +227,8 @@ void LCUI_Font_Init(LCUI_Font *font)
 		strcpy(default_font, p); 
 	}
 	/* 打开默认字体文件 */
-	Open_Fontfile(&LCUI_Sys.default_font, default_font); 
+	Open_Fontfile(&LCUI_Sys.default_font, default_font);
+	FontLIB_Init();
 }
 
 void Font_Init(LCUI_Font *in)
@@ -522,8 +523,9 @@ Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 
 #endif
 
-int 
-Get_FontBMP(	LCUI_Font *font_data, wchar_t ch, 
+
+static int 
+Get_NewFontBMP(	LCUI_Font *font_data, wchar_t ch, 
 		int pixel_size, LCUI_FontBMP *out_bitmap)
 /*
  * 功能：获取单个wchar_t型字符的字体位图数据
@@ -538,27 +540,13 @@ Get_FontBMP(	LCUI_Font *font_data, wchar_t ch,
 	FT_Face		p_FT_Face = NULL;   /* face对象的句柄 */ 
 	FT_Error	error;
 	
-	if( font_data ) {
-	 /* 如果font_data有效，则打开font_data中的指定的字体文件，并将字体文件
-	  * 和face对象的句柄保存至结构体中。
-	  * 当然，如果LCUI_Font结构体有有效的字体文件和face对象的句柄，就不会再重新
-	  * 打开字体文件。
-	  */
-		if( !font_data->ft_face || !font_data->ft_lib ) { 
-			error = Open_Fontfile( font_data, 
-					font_data->font_file.string);
-			if( error ) {
-				Get_Default_FontBMP( ch, out_bitmap );
-				return 1;
-			}
-		}
-		/* 引用face对象句柄 */
+	if( font_data && font_data->ft_face ) {
 		p_FT_Face = font_data->ft_face; 
 	} else {
-		/* 使用内置的字体位图 */
 		Get_Default_FontBMP( ch, out_bitmap );
 		return -1;
 	}
+	
 	/* 设定为UNICODE，默认的也是 */
 	FT_Select_Charmap( p_FT_Face, FT_ENCODING_UNICODE ); 
 	/* 设定字体尺寸 */
@@ -585,4 +573,44 @@ Get_FontBMP(	LCUI_Font *font_data, wchar_t ch,
 #endif
 }
 
+/* 获取现有的字体位图数据 */
+LCUI_FontBMP *
+Get_ExistFontBMP( LCUI_Font *font_data, wchar_t ch, int pixel_size )
+{
+	LCUI_FontBMP *font_bmp, bmp_buff;
+	int error, family_id, style_id;
 
+#ifdef USE_FREETYPE
+	if( !font_data ) {
+		goto get_default;
+	} else {
+		if( !font_data->ft_face || !font_data->ft_lib ) { 
+			error = Open_Fontfile( font_data, 
+					font_data->font_file.string );
+					
+			if( error ) {
+				goto get_default;
+			}
+		}
+	}
+	family_id = FontLIB_GetFamliyID( font_data->family_name.string );
+	style_id = FontLIB_GetStyleID( font_data->style_name.string );
+	goto skip_get_default;
+	
+get_default:;
+	family_id = FontLIB_GetFamliyID( "default" );
+	style_id = FontLIB_GetStyleID( "default" );
+	
+skip_get_default:;
+#else
+	family_id = FontLIB_GetFamliyID( "defalut" );
+	style_id = FontLIB_GetStyleID( "defalut" );
+#endif
+	font_bmp = FontLIB_GetFontBMP( ch, family_id, style_id, pixel_size );
+	if( !font_bmp ) {
+		Get_NewFontBMP( font_data, ch, pixel_size, &bmp_buff );
+		font_bmp = FontLIB_Add( ch, family_id, style_id, 
+					pixel_size, &bmp_buff );
+	}
+	return font_bmp;
+}

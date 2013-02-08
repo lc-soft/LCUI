@@ -175,8 +175,8 @@ Destroy_Special_KeyWord(Special_KeyWord *key)
 static void 
 Destroy_CharData(LCUI_CharData *data)
 { 
-	FontBMP_Free( &data->bitmap );
-	free( data->data );
+	//FontBMP_Free( &data->bitmap );
+	//free( data->data );
 	//if( data->using_quote == IS_FALSE ) {
 		//free( data->data );
 	//}
@@ -498,14 +498,13 @@ TextLayer_Clear(
 	LCUI_CharData *char_ptr )
 {
 	static LCUI_Rect area;
-	
 	//printf("pos: %d,%d, max_h: %d\n", pos.x, pos.y, max_h);
 	/* 计算区域范围 */
-	area.x = pos.x + char_ptr->bitmap.left;
+	area.x = pos.x + char_ptr->bitmap->left;
 	area.y = pos.y + max_h-1;
-	area.y -= char_ptr->bitmap.top;
-	area.width = char_ptr->bitmap.width;
-	area.height = char_ptr->bitmap.rows;
+	area.y -= char_ptr->bitmap->top;
+	area.width = char_ptr->bitmap->width;
+	area.height = char_ptr->bitmap->rows;
 	/* 记录需刷新的区域 */
 	RectQueue_Add( &layer->clear_area, area );
 	//printf("record area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
@@ -529,7 +528,7 @@ TextLayer_Get_Char_BMP ( LCUI_TextStyle *default_style, LCUI_CharData *data )
 			pixel_size = default_style->pixel_size;
 		}
 	}
-	Get_FontBMP( &font, data->char_code, pixel_size, &data->bitmap );  
+	data->bitmap = Get_ExistFontBMP( &font, data->char_code, pixel_size );
 }
 
 static int 
@@ -626,7 +625,7 @@ TextLayer_Update_RowSize (LCUI_TextLayer *layer, int row )
 				continue;
 			}
 		}
-		size.w += char_data->bitmap.advance.x;
+		size.w += char_data->bitmap->advance.x;
 		if( char_data->data ) {
 			if( char_data->data->_pixel_size ) {
 				if( size.h < char_data->data->pixel_size + 2) {
@@ -676,7 +675,7 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	layer->password_char.need_update = FALSE;
 	layer->password_char.data = NULL;
 	layer->password_char.char_code = 0;
-	FontBMP_Init( &layer->password_char.bitmap );
+	layer->password_char.bitmap = NULL;
 	
 	layer->default_data.pixel_size = 12;
 	layer->current_src_pos = 0;
@@ -749,10 +748,10 @@ __TextLayer_OldArea_Erase( LCUI_Widget *widget, LCUI_TextLayer *layer )
 			if( !char_ptr ) {
 				continue;
 			}
-			if( x+char_ptr->bitmap.advance.x >= 0 ) {
+			if( x+char_ptr->bitmap->advance.x >= 0 ) {
 				break;
 			}
-			x += char_ptr->bitmap.advance.x;
+			x += char_ptr->bitmap->advance.x;
 		}
 		
 		area.height = layer->default_data.pixel_size+2;
@@ -762,11 +761,11 @@ __TextLayer_OldArea_Erase( LCUI_Widget *widget, LCUI_TextLayer *layer )
 				continue;
 			}
 			area.y = row_ptr->max_size.h-1;
-			area.y -= char_ptr->bitmap.top;
-			if( area.y + char_ptr->bitmap.rows > area.height ) {
-				area.height = area.y + char_ptr->bitmap.rows;
+			area.y -= char_ptr->bitmap->top;
+			if( area.y + char_ptr->bitmap->rows > area.height ) {
+				area.height = area.y + char_ptr->bitmap->rows;
 			}
-			x += char_ptr->bitmap.advance.x;
+			x += char_ptr->bitmap->advance.x;
 			if( x > widget->size.w ) {
 				break;
 			}
@@ -864,8 +863,8 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 				p_data = &layer->password_char;
 			}
 			/* 如果当前字的位图的X轴跨距不在有效绘制区域内 */
-			if( pos.x + p_data->bitmap.advance.x <= 0) {
-				pos.x += p_data->bitmap.advance.x;
+			if( pos.x + p_data->bitmap->advance.x <= 0) {
+				pos.x += p_data->bitmap->advance.x;
 				continue;
 			}
 			/* 获取该字体位图的大致尺寸 */
@@ -883,18 +882,18 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 			//	i, p_data, p_data->char_code ); 
 				p_data->need_update = FALSE;
 				/* 计算区域范围 */
-				area.x = pos.x + p_data->bitmap.left;
+				area.x = pos.x + p_data->bitmap->left;
 				area.y = pos.y + p_row->max_size.h-1;
-				area.y -= p_data->bitmap.top;
-				area.height = p_data->bitmap.rows;
-				area.width = p_data->bitmap.width;
+				area.y -= p_data->bitmap->top;
+				area.height = p_data->bitmap->rows;
+				area.width = p_data->bitmap->width;
 				/* 贴上字体位图 */
 				FontBMP_Mix( graph, Pos(area.x, area.y),
-					&p_data->bitmap, color, mode );
+					p_data->bitmap, color, mode );
 				/* 记录该区域，以刷新显示到屏幕上 */
 				Widget_InvalidArea( widget, area );
 			}
-			pos.x += p_data->bitmap.advance.x;
+			pos.x += p_data->bitmap->advance.x;
 			if( pos.x > widget->size.w ) {
 				break;
 			}
@@ -1028,7 +1027,7 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 		if( !char_ptr ) {
 			continue;
 		}
-		pos.x += char_ptr->bitmap.advance.x;
+		pos.x += char_ptr->bitmap->advance.x;
 	}
 	
 	for( i=char_pos.x; i<len; ++i ) {
@@ -1040,7 +1039,7 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 		TextLayer_Clear( layer, pos, row_ptr->max_size.h, char_ptr );
 		/* 标记该字的位图需要重绘 */
 		char_ptr->need_update = TRUE;
-		pos.x += char_ptr->bitmap.advance.x;
+		pos.x += char_ptr->bitmap->advance.x;
 	}
 }
 
@@ -1101,12 +1100,10 @@ TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style )
 skip_style_cmp:;
 			if(char_ptr->need_update) {
 				TextLayer_Clear( layer, pos, row_ptr->max_size.h, char_ptr );
-				pos.x += char_ptr->bitmap.advance.x;
-				/* 重新获取字体位图 */
-				FontBMP_Free(&char_ptr->bitmap); 
+				pos.x += char_ptr->bitmap->advance.x;
 				TextLayer_Get_Char_BMP ( &layer->default_data, char_ptr );
 			} else {
-				pos.x += char_ptr->bitmap.advance.x;
+				pos.x += char_ptr->bitmap->advance.x;
 			}
 		}
 		pos.y += row_ptr->max_size.h; 
@@ -1238,7 +1235,7 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text )
 	DEBUG_MSG1( "total char: %d\n", total );
 	DEBUG_MSG1( "total row: %d\n", total_row );
 	
-	FontBMP_Init( &char_data.bitmap );
+	char_data.bitmap = NULL;
 	/* 先记录这一行需要刷新的区域，起点为光标所在位置 */
 	TextLayer_CharLater_Refresh( layer, cur_pos );
 	for(p=buff, finish=buff+total; p<finish; ++p) { 
@@ -1267,8 +1264,8 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text )
 			/* 被忽略的字符的属性都一样，所以只需赋一次值 */
 			char_data.data = NULL;
 			char_data.display = FALSE; 
-			char_data.need_update = FALSE; 
-			FontBMP_Init( &char_data.bitmap ); 
+			char_data.need_update = FALSE;
+			char_data.bitmap = NULL;
 		}
 		while(n_ignore > 0) {
 			DEBUG_MSG2( "ignore = %d\n", n_ignore );
@@ -1365,10 +1362,10 @@ TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
 				DEBUG_MSG1("no display\n");
 				continue;
 			}
-			if( FontBMP_Valid( &char_ptr->bitmap ) ) {
+			if( FontBMP_Valid( char_ptr->bitmap ) ) {
 				DEBUG_MSG1("have FontBMP\n");
 				if( !refresh ) {
-					pos.x += char_ptr->bitmap.advance.x;
+					pos.x += char_ptr->bitmap->advance.x;
 					continue;
 				}
 			} else {
@@ -1376,10 +1373,10 @@ TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
 				DEBUG_MSG1( "generate FontBMP, char code: %d\n", char_ptr->char_code );
 				TextLayer_Get_Char_BMP ( &layer->default_data, char_ptr );
 			}
-			DEBUG_MSG1( "char_data->bitmap.advance.x: %d\n", char_ptr->bitmap.advance.x );
+			DEBUG_MSG1( "char_data->bitmap->advance.x: %d\n", char_ptr->bitmap->advance.x );
 			TextLayer_Clear( layer, pos, row_ptr->max_size.h, char_ptr );
 			char_ptr->need_update = TRUE;
-			pos.x += char_ptr->bitmap.advance.x;
+			pos.x += char_ptr->bitmap->advance.x;
 		}
 		refresh = FALSE;
 		/* 更新当前行的尺寸 */
@@ -1408,7 +1405,7 @@ TextLayer_Print_Info( LCUI_TextLayer *layer )
 			char_ptr = Queue_Get( &row_ptr->string, i );
 			printf( "char code: %d, display: %d\n", 
 			char_ptr->char_code, char_ptr->display );
-			Print_FontBMP_Info( &char_ptr->bitmap );
+			Print_FontBMP_Info( char_ptr->bitmap );
 		}
 	}
 	printf("\n\n");
@@ -1629,7 +1626,7 @@ TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 		if( !char_ptr ) {
 			continue;
 		}
-		tmp = char_ptr->bitmap.advance.x;
+		tmp = char_ptr->bitmap->advance.x;
 		if( pixel_pos.x >= tmp/2 ) {
 			pixel_pos.x -= tmp;
 			new_pos.x += tmp;
@@ -1704,7 +1701,7 @@ TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos )
 		if( !char_ptr ) {
 			continue;
 		}
-		pixel_pos.x += char_ptr->bitmap.advance.x;
+		pixel_pos.x += char_ptr->bitmap->advance.x;
 		//printf("TextLayer_Set_Cursor_Pos(): pixel pos x: %d, total: %d, cols: %d, pos.x: %d\n", 
 		//pixel_pos.x, total, cols, pos.x);
 	}
@@ -1845,7 +1842,7 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 			continue;
 		}
 		TextLayer_Clear( layer, pixel_pos, row_ptr->max_size.h, char_ptr );
-		pixel_pos.x += char_ptr->bitmap.advance.x;
+		pixel_pos.x += char_ptr->bitmap->advance.x;
 		/* 将该字从源文本中移除 */
 		TextLayer_Text_DeleteChar( layer, char_ptr, left_or_right );
 		/* 该字在这行的字体位图也需要删除 */
@@ -1952,9 +1949,9 @@ TextLayer_Get_Char_PixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 		}
 		/* 如果设定了屏蔽字符 */
 		if( layer->password_char.char_code > 0 ) {
-			pixel_pos.x += layer->password_char.bitmap.advance.x;
+			pixel_pos.x += layer->password_char.bitmap->advance.x;
 		} else {
-			pixel_pos.x += char_ptr->bitmap.advance.x;
+			pixel_pos.x += char_ptr->bitmap->advance.x;
 		}
 	}
 	/* 微调位置 */
