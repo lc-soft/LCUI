@@ -530,6 +530,16 @@ BOOL Set_Focus( LCUI_Widget *widget )
 	return TRUE;
 }
 
+/* 设定部件是否能够获取焦点 */
+void Widget_SetFocus( LCUI_Widget *widget, BOOL flag )
+{
+	/* 如果该部件已经获得焦点，并且要设置它不能获取焦点，则取消当前焦点 */
+	if( Widget_GetFocus(widget) && !flag ) {
+		Cancel_Focus( widget );
+	}
+	widget->focus = flag;
+}
+
 /* 获取指定部件内的已获得焦点的子部件 */
 LCUI_Widget *
 Get_FocusWidget( LCUI_Widget *widget )
@@ -686,6 +696,8 @@ WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
 	
 	while( 1 ) {
 		focus_widget = Get_FocusWidget( widget );
+		//_DEBUG_MSG("focus_widget: %p\n", focus_widget);
+		//print_widget_info( focus_widget );
 		if( !focus_widget ) {
 			if( tmp ) {
 				Widget_DispatchKeyboardEvent( tmp, event );

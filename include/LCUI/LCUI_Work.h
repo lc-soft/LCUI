@@ -116,6 +116,9 @@ Set_Focus( LCUI_Widget *widget );
  * EVENT_FOCUSIN事件。
  * */ 
 
+/* 设定部件是否能够获取焦点 */
+void Widget_SetFocus( LCUI_Widget *widget, BOOL flag );
+
 /* 获取指定部件内的已获得焦点的子部件 */
 LCUI_Widget *
 Get_FocusWidget( LCUI_Widget *widget );

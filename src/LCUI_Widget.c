@@ -1605,10 +1605,18 @@ void _Limit_Widget_Size( LCUI_Widget *widget, char *w_str, char*h_str )
 	
 }
 
-void Widget_SetBorder(LCUI_Widget *widget, LCUI_Border border)
-/* 功能：设定部件的边框 */
+/* 设定部件的边框 */
+void Widget_SetBorder( LCUI_Widget *widget, LCUI_Border border )
 {
 	widget->border = border;
+	Widget_Draw( widget );
+	Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
+}
+
+/* 设定部件边框的四个角的圆角半径 */
+void Widget_SetBorderRadius( LCUI_Widget *widget, int radius )
+{
+	Border_Radius( &widget->border, radius );
 	Widget_Draw( widget );
 	Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
 }

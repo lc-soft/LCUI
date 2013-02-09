@@ -560,7 +560,7 @@ TextBox_ExecUpdateStyle( LCUI_Widget *widget )
 	Widget_SetBackgroundColor( widget, RGB(255,255,255) );
 	Widget_SetBackgroundTransparent( widget, FALSE );
 	/* 如果该部件已经获得焦点 */
-	if( widget == Get_FocusWidget( widget->parent ) ) {
+	if( Widget_GetFocus( widget ) ) {
 		border = Border( 1, BORDER_STYLE_SOLID, RGB(55,123,203) );
 		Widget_SetBorder( widget, border );
 		return;

@@ -365,8 +365,11 @@ void Widget_LimitSize(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_siz
 void Widget_LimitPos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos);
 /* 功能：限制部件的移动范围 */ 
 
-void Widget_SetBorder(LCUI_Widget *widget, LCUI_Border border);
-/* 功能：设定部件的边框 */ 
+/* 设定部件的边框 */
+void Widget_SetBorder( LCUI_Widget *widget, LCUI_Border border );
+
+/* 设定部件边框的四个角的圆角半径 */
+void Widget_SetBorderRadius( LCUI_Widget *widget, int radius );
 
 /* 设定部件的背景图像 */
 void Widget_SetBackgroundImage( LCUI_Widget *widget, LCUI_Graph *img );
