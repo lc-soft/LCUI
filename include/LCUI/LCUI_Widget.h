@@ -284,6 +284,9 @@ Get_FocusWidget( LCUI_Widget *widget );
 /* 检测指定部件是否处于焦点状态 */
 BOOL Widget_GetFocus( LCUI_Widget *widget );
 
+/* 检测指定部件是否获得全局焦点，也就是该部件以及上级所有父部件是否都得到了焦点 */
+BOOL Widget_GetGlobalFocus( LCUI_Widget *widget );
+
 /* 获取部件的风格名称 */
 LCUI_String Widget_GetStyleName( LCUI_Widget *widget );
 

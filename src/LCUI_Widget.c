@@ -1148,6 +1148,15 @@ BOOL Widget_GetFocus( LCUI_Widget *widget )
 	return FALSE;
 }
 
+/* 检测指定部件是否获得全局焦点，也就是该部件以及上级所有父部件是否都得到了焦点 */
+BOOL Widget_GetGlobalFocus( LCUI_Widget *widget )
+{
+	if( Widget_GetFocus(widget) ) {
+		return Widget_GetFocus( widget->parent );
+	}
+	return FALSE;
+}
+
 /* 获取部件的风格名称 */
 LCUI_String Widget_GetStyleName( LCUI_Widget *widget )
 {
@@ -1807,7 +1816,7 @@ void Widget_ExecShow(LCUI_Widget *widget)
 	WidgetFunc_Call(widget, FUNC_TYPE_SHOW);
 	Widget_Visible( widget, TRUE ); /* 部件可见 */
 	if( widget->focus ) {
-		Set_Focus( widget );	/* 将焦点给该部件 */
+		//Set_Focus( widget );	/* 将焦点给该部件 */
 	}
 	Widget_Front(widget); /* 改变部件的排列位置 */
 	Refresh_Widget( widget ); /* 刷新部件所在区域的图形显示 */

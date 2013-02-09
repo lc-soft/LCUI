@@ -695,6 +695,7 @@ WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
 	LCUI_Widget *widget = NULL, *tmp = NULL, *focus_widget;
 	
 	while( 1 ) {
+		/* 获取当前容器中已获得焦点的部件 */
 		focus_widget = Get_FocusWidget( widget );
 		//_DEBUG_MSG("focus_widget: %p\n", focus_widget);
 		//print_widget_info( focus_widget );
@@ -704,6 +705,7 @@ WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
 			}
 			break;
 		}
+		/* 切换到子部件 */
 		widget = focus_widget;
 		/* 保存已关联按键事件的部件指针 */
 		if( EventSlots_Find( &widget->event, EVENT_KEYBOARD ) ) {

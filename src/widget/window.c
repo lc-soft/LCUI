@@ -84,6 +84,11 @@ Window_GetCloseButton( LCUI_Widget *window )
 	return win_p->btn_close;
 }
 
+static void Window_ExecShow( LCUI_Widget *widget )
+{
+	Set_Focus( widget );
+}
+
 /* 处理鼠标移动事件 */
 static void 
 Window_ExecMove(LCUI_Widget *titlebar, LCUI_WidgetEvent *event)
@@ -399,6 +404,7 @@ Register_Window()
 	
 	/* 为部件类型关联相关函数 */ 
 	WidgetFunc_Add("titlebar", Window_TitleBar_Init, FUNC_TYPE_INIT);
+	WidgetFunc_Add("window", Window_ExecShow, FUNC_TYPE_SHOW);
 	WidgetFunc_Add("window", Window_Init, FUNC_TYPE_INIT);
 	WidgetFunc_Add("window", Window_ExecUpdate, FUNC_TYPE_UPDATE);
 }
