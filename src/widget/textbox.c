@@ -76,33 +76,44 @@ static LCUI_Widget *active_textbox = NULL;
 static int __timer_id = -1;
 
 static void
-_put_textbox_cursor( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+_putin_textbox_cursor( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	active_textbox = widget;
+	Widget_Draw( widget );
 }
 
+static void
+_putout_textbox_cursor( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+{
+	LCUI_TextBox *tb;
+	
+	if( widget == active_textbox ) {
+		active_textbox = NULL;
+	}
+	tb = Widget_GetPrivData( widget );
+	Widget_Hide( tb->cursor );
+	Widget_Draw( widget );
+}
 
 static void 
-hide_textbox_cursor( )
+hide_textbox_cursor( LCUI_Widget *widget  )
 {
-	if( !active_textbox ) {
+	LCUI_TextBox *tb;
+	if( widget == NULL ) {
 		return;
 	}
-	
-	LCUI_TextBox *tb;
-	tb = Widget_GetPrivData( active_textbox );
+	tb = Widget_GetPrivData( widget );
 	Widget_Hide( tb->cursor );
 }
 
 static void 
-show_textbox_cursor( )
+show_textbox_cursor( LCUI_Widget *widget )
 {
-	if( !active_textbox ) {
+	LCUI_TextBox *tb;
+	if( widget == NULL ) {
 		return;
 	}
-	
-	LCUI_TextBox *tb;
-	tb = Widget_GetPrivData( active_textbox );
+	tb = Widget_GetPrivData( widget );
 	Widget_Show( tb->cursor );
 }
 
@@ -121,10 +132,10 @@ blink_cursor()
 {
 	static int cur_state = 0;
 	if(cur_state == 0) {
-		show_textbox_cursor();
+		show_textbox_cursor( active_textbox );
 		cur_state = 1;
 	} else {
-		hide_textbox_cursor();
+		hide_textbox_cursor( active_textbox );
 		cur_state = 0;
 	}
 }
@@ -311,8 +322,9 @@ TextBox_Init( LCUI_Widget *widget )
 {
 	LCUI_TextBox *textbox;
 	
+	widget->valid_state = WIDGET_STATE_ACTIVE | WIDGET_STATE_OVERLAY;
+	widget->valid_state |= (WIDGET_STATE_NORMAL | WIDGET_STATE_DISABLE);
 	textbox = WidgetPrivData_New(widget, sizeof(LCUI_TextBox));
-	
 	textbox->text = Widget_New( "label" );
 	textbox->cursor = Widget_New( NULL );
 	textbox->scrollbar[0] = Widget_New( "scrollbar" );
@@ -350,20 +362,22 @@ TextBox_Init( LCUI_Widget *widget )
 	TextLayer_Using_StyleTags( Label_Get_TextLayer(textbox->text), FALSE );
 	Widget_SetPadding( widget, Padding(2,2,2,2) );
 	Widget_SetBackgroundColor( textbox->cursor, RGB(0,0,0) );
+	Widget_SetBackgroundTransparent( textbox->cursor, FALSE );
 	Widget_SetBackgroundTransparent( widget, FALSE );
 	
 	Widget_Resize( textbox->cursor, Size(1, 14) );
 	/* 设置可点击区域的alpha值要满足的条件 */
 	Set_Widget_ClickableAlpha( textbox->cursor, 0, 1 );
 	Set_Widget_ClickableAlpha( textbox->text, 0, 1 );
+	
 	/* 设定定时器，每1秒闪烁一次 */
 	if( __timer_id == -1 ) {
 		__timer_id = set_timer( 500, blink_cursor, TRUE );
 	}
 	Widget_Event_Connect( widget, EVENT_DRAG, TextBox_TextLayer_Click );
 	/* 关联 FOCUS_OUT 和 FOCUS_IN 事件 */
-	Widget_Event_Connect( widget, EVENT_FOCUSOUT, hide_textbox_cursor );
-	Widget_Event_Connect( widget, EVENT_FOCUSIN, _put_textbox_cursor );
+	Widget_Event_Connect( widget, EVENT_FOCUSOUT, _putout_textbox_cursor );
+	Widget_Event_Connect( widget, EVENT_FOCUSIN, _putin_textbox_cursor );
 	/* 关联按键输入事件 */
 	Widget_Event_Connect( widget, EVENT_KEYBOARD, TextBox_Input );
 	/* 默认不启用多行文本模式 */
@@ -375,15 +389,6 @@ Destroy_TextBox( LCUI_Widget *widget )
 /* 销毁文本框占用的资源 */
 {
 	
-}
-
-static void 
-Exec_TextBox_Draw( LCUI_Widget *widget )
-/* 处理文本框的图形渲染 */
-{
-	LCUI_Graph *graph;
-	graph = Widget_GetSelfGraph( widget );
-	Draw_Empty_Slot( graph, widget->size.w, widget->size.h );
 }
 
 static LCUI_Widget *
@@ -546,9 +551,64 @@ __TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 	TextBox_Cursor_Move( widget, cur_pos );
 }
 
+/* 更新当前文本框的样式 */
 static void
-Exec_TextBox_Update( LCUI_Widget *widget )
-/* 更新文本框的文本图层 */
+TextBox_ExecUpdateStyle( LCUI_Widget *widget )
+{
+	LCUI_Border border;
+	
+	Widget_SetBackgroundColor( widget, RGB(255,255,255) );
+	Widget_SetBackgroundTransparent( widget, FALSE );
+	/* 如果该部件已经获得焦点 */
+	if( widget == Get_FocusWidget( widget->parent ) ) {
+		border = Border( 1, BORDER_STYLE_SOLID, RGB(55,123,203) );
+		Widget_SetBorder( widget, border );
+		return;
+	}
+	Border_Radius( &border, 0 );
+	/* 根据不同的状态，设定不同的边框样式 */
+	switch( widget->state ) {
+	case WIDGET_STATE_NORMAL:
+		border.left_width = 1;
+		border.left_style = BORDER_STYLE_SOLID;
+		border.left_color = RGB(204,204,204);
+		border.top_width = 1;
+		border.top_style = BORDER_STYLE_SOLID;
+		border.top_color = RGB(204,204,204);
+		border.right_width = 1;
+		border.right_style = BORDER_STYLE_SOLID;
+		border.right_color = RGB(221,221,221);
+		border.bottom_width = 1;
+		border.bottom_style = BORDER_STYLE_SOLID;
+		border.bottom_color = RGB(221,221,221);
+		break;
+	case WIDGET_STATE_OVERLAY :
+		border.left_width = 1;
+		border.left_style = BORDER_STYLE_SOLID;
+		border.left_color = RGB(171,171,171);
+		border.top_width = 1;
+		border.top_style = BORDER_STYLE_SOLID;
+		border.top_color = RGB(171,171,171);
+		border.right_width = 1;
+		border.right_style = BORDER_STYLE_SOLID;
+		border.right_color = RGB(204,204,204);
+		border.bottom_width = 1;
+		border.bottom_style = BORDER_STYLE_SOLID;
+		border.bottom_color = RGB(204,204,204);
+		break;
+	case WIDGET_STATE_ACTIVE :
+		border = Border( 1, BORDER_STYLE_SOLID, RGB(55,123,203) );
+		break;
+	case WIDGET_STATE_DISABLE :
+		break;
+		default : break;
+	}
+	Widget_SetBorder( widget, border );
+}
+
+/* 更新文本框的样式以及文本图层相关的数据 */
+static void
+TextBox_ExecUpdate( LCUI_Widget *widget )
 {
 	LCUI_TextBlock *text_ptr;
 	LCUI_TextBox *textbox;
@@ -580,19 +640,17 @@ Exec_TextBox_Update( LCUI_Widget *widget )
 		/* 标记下次继续更新 */
 		__Update_Widget( widget );
 	}
-	/* 更新文本图层的内容 */
-	Widget_ExecUpdate( TextBox_Get_Label( widget ) );
-	/* 更新滚动条的长度 */
-	TextBox_ScrollBar_Update_Size( widget );
-	/* 更新文本框内的光标 */
-	TextBox_Cursor_Update( widget );
+	TextBox_ExecUpdateStyle( widget ); /* 更新文本框的样式 */
+	Widget_ExecUpdate( TextBox_Get_Label( widget ) ); /* 更新文本图层的内容 */
+	TextBox_ScrollBar_Update_Size( widget ); /* 更新滚动条的长度 */
+	TextBox_Cursor_Update( widget ); /* 更新文本框内的光标 */
 }
 
 static void
 Exec_TextBox_Resize( LCUI_Widget *widget )
 /* 在文本框改变尺寸后，进行附加处理 */
 {
-	Exec_TextBox_Update( widget );
+	TextBox_ExecUpdate( widget );
 }
 
 void 
@@ -619,8 +677,7 @@ void Register_TextBox()
 {
 	WidgetType_Add ( "text_box" );
 	WidgetFunc_Add ( "text_box", TextBox_Init, FUNC_TYPE_INIT );
-	WidgetFunc_Add ( "text_box", Exec_TextBox_Draw, FUNC_TYPE_DRAW );
-	WidgetFunc_Add ( "text_box", Exec_TextBox_Update, FUNC_TYPE_UPDATE );
+	WidgetFunc_Add ( "text_box", TextBox_ExecUpdate, FUNC_TYPE_UPDATE );
 	WidgetFunc_Add ( "text_box", Exec_TextBox_Resize, FUNC_TYPE_RESIZE );
 	WidgetFunc_Add ( "text_box", Destroy_TextBox, FUNC_TYPE_DESTROY );
 }
@@ -942,7 +999,10 @@ TextBox_Cursor_Update( LCUI_Widget *widget )
 	pixel_pos = TextLayer_Get_Cursor_PixelPos( layer );
 	Widget_Move( cursor, pixel_pos );
 	Widget_Resize( cursor, size );
-	Widget_Show( cursor ); /* 让光标在更新时显示 */
+	/* 若当前文本框处于焦点状态，则让光标在更新时显示 */
+	if( active_textbox == widget ) {
+		Widget_Show( cursor );
+	}
 	return pixel_pos;
 }
 
@@ -962,8 +1022,9 @@ TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
 	pixel_pos = TextLayer_Set_Cursor_Pos( layer, new_pos );
 	Widget_Move( cursor, pixel_pos );
 	Widget_Resize( cursor, size );
-	/* 让光标在更新时显示 */
-	Widget_Show( cursor ); 
+	if( active_textbox == widget ) {
+		Widget_Show( cursor );
+	}
 	/* 更新文本显示区域 */
 	TextBox_ViewArea_Update( widget );
 	return pixel_pos;
