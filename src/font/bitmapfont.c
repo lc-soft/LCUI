@@ -266,10 +266,10 @@ static int
 Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 /* 转换FT_GlyphSlot类型数据为LCUI_FontBMP */
 {
-	static FT_Error	error;
-	static size_t		size;
-	static FT_BitmapGlyph  bitmap_glyph;
-	static FT_Glyph        glyph;
+	int error;
+	size_t size;
+	FT_BitmapGlyph bitmap_glyph;
+	FT_Glyph  glyph;
 	
 	/* 从字形槽中提取一个字形图像 
 	 * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
