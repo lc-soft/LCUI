@@ -75,7 +75,7 @@ static int font_count = 0;
 static FT_Library library = NULL;
 static BOOL database_init = FALSE;
 static LCUI_Queue font_database, fontbitmap_database;
-static LCUI_FontInfo *default_font = NULL;
+static LCUI_FontInfo *default_font = NULL, *in_core_font = NULL;
 
 static void FontLIB_DestroyBMP( LCUI_FontBMPItem *bmp )
 {
@@ -347,7 +347,10 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 		FontLIB_CharInit( font );
 		Queue_Add_Pointer( &fontbitmap_database, font );
 	}
-	
+	/* 但字体ID不大于0时，使用内置字体 */
+	if( font_id <= 0 ) {
+		font_id = in_core_font->id;
+	}
 	/* 获取字体字族句柄，如果获取失败，则新增 */
 	data = FontLIB_GetDataItem( font, font_id );
 	if( !data ) {
@@ -399,6 +402,9 @@ FontLIB_GetFontBMP( wchar_t char_code, int font_id, int pixel_size )
 	font = FontLIB_GetCharItem( char_code );
 	if( !font ) {
 		return NULL;
+	}
+	if( font_id <= 0 ) {
+		font_id = in_core_font->id;
 	}
 	data = FontLIB_GetDataItem( font, font_id );
 	if( !data ) {
@@ -462,6 +468,17 @@ int FontLIB_DeleteFontInfo( int id )
 	return 0;
 }
 
+static int FontLIB_AddInCoreFontInfo( void )
+{
+	int font_id;
+	font_id = FontLIB_AddFontInfo( "in-core.font_8x8", "default", "\0", NULL );
+	in_core_font = FontLIB_GetFont( font_id );
+	if( !in_core_font ) {
+		return -1;
+	}
+	return font_id;
+}
+
 /* 初始化字体处理模块 */
 void LCUIModule_Font_Init( void )
 {
@@ -474,6 +491,7 @@ void LCUIModule_Font_Init( void )
 		p = LCUI_DEFAULT_FONTFILE;
 	}
 	FontLIB_Init(); /* 初始化字体数据库 */
+	FontLIB_AddInCoreFontInfo(); /* 添加内置的字体信息 */
 	font_id = FontLIB_LoadFontFile( p ); /* 载入默认的字体至库中 */
 	FontLIB_SetDefaultFont( font_id ); /* 设定该字体为默认字体 */
 }

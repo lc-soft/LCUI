@@ -379,6 +379,7 @@ Get_ExistFontBMP( int font_id, wchar_t ch, int pixel_size )
 	if( font_bmp ) {
 		return font_bmp;
 	}
+	FontBMP_Init( &bmp_buff );
 	Get_NewFontBMP( font_id, ch, pixel_size, &bmp_buff );
 	font_bmp = FontLIB_AddFontBMP( ch, font_id, pixel_size, &bmp_buff );
 	return font_bmp;
