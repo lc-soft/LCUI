@@ -49,7 +49,7 @@
 	#include FT_GLYPH_H
 	#include FT_OUTLINE_H
 	#define LCUI_FONT_RENDER_MODE	FT_RENDER_MODE_MONO
-	#define LCUI_FONT_LOAD_FALGS	(FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT)
+	#define LCUI_FONT_LOAD_FALGS	(FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT | FT_LOAD_NO_BITMAP)
 #else
 	typedef void* FT_Library;
 	typedef void* FT_Face;
@@ -62,6 +62,12 @@ LCUI_BEGIN_HEADER
 #include LC_TEXTSTYLE_H
 #include LC_TEXTLAYER_H
 #include LC_FONTLIB_H
+
+/* 初始化字体处理模块 */
+void LCUIModule_Font_Init( void );
+
+/* 停用字体处理模块 */
+void LCUIModule_Font_End( void );
 
 LCUI_END_HEADER
 
