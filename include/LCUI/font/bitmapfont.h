@@ -58,4 +58,4 @@ int Open_Fontfile(LCUI_Font *font_data, char *fontfile);
 
 /* 获取现有的字体位图数据 */
 LCUI_FontBMP *
-Get_ExistFontBMP( LCUI_Font *font_data, wchar_t ch, int pixel_size );
+Get_ExistFontBMP( int font_id, wchar_t ch, int pixel_size );

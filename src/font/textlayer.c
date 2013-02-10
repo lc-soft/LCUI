@@ -94,8 +94,7 @@ TextStyle_Init ( LCUI_TextStyle *data )
 	data->_family = FALSE;
 	data->_back_color = FALSE;
 	data->_fore_color = FALSE;
-	
-	memset( data->family, 0, sizeof(data->family) );
+	data->font_id = FontLIB_GetDefaultFontID();
 	data->style = FONT_STYLE_NORMAL;
 	data->weight = FONT_WEIGHT_NORMAL;
 	data->decoration = FONT_DECORATION_NONE;
@@ -108,7 +107,7 @@ void
 TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily )
 /* 设置字体族 */
 {
-	strncpy( style->family, fontfamily, sizeof(style->family) );
+	style->font_id = FontLIB_GetFontIDByFamilyName( fontfamily );
 }
 
 void
@@ -528,7 +527,7 @@ TextLayer_Get_Char_BMP ( LCUI_TextStyle *default_style, LCUI_CharData *data )
 			pixel_size = default_style->pixel_size;
 		}
 	}
-	data->bitmap = Get_ExistFontBMP( &font, data->char_code, pixel_size );
+	data->bitmap = Get_ExistFontBMP( default_style->font_id, data->char_code, pixel_size );
 }
 
 static int 
@@ -1078,7 +1077,7 @@ TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style )
 				char_ptr->need_update = TRUE; 
 			}
 			if(!old_style->_family) {
-				strcpy(old_style->family, style.family);
+				old_style->font_id = style.font_id;
 				char_ptr->need_update = TRUE; 
 			}
 			if(!old_style->_weight) {

@@ -8,11 +8,20 @@ void FontLIB_DestroyAll( void );
 /* 初始化字体数据库 */
 void FontLIB_Init( void );
 
-/* 获取字体的风格ID */
-int FontLIB_GetStyleID( const char *style_name );
+/* 通过字体文件路径来查找字体信息，并获取字体ID */
+int FontLIB_FindInfoByFilePath( const char *filepath );
 
-/* 获取字体的字族ID */
-int FontLIB_GetFamliyID( const char *family_name );
+/* 获取指定字族名的字体ID */
+int FontLIB_GetFontIDByFamilyName( const char *family_name );
+
+/* 获取指定字体ID的字体face对象句柄 */
+FT_Face FontLIB_GetFontFace( int font_id );
+
+/* 获取默认的字体ID */
+int FontLIB_GetDefaultFontID( void );
+
+/* 设定默认的字体 */
+void FontLIB_SetDefaultFont( int id );
 
 /* 
  * 添加一个字体位图数据至数据库中
@@ -20,14 +29,15 @@ int FontLIB_GetFamliyID( const char *family_name );
  * 的此数据会无效 
  * */
 LCUI_FontBMP *
-FontLIB_Add(	wchar_t char_code,	int family_id,
-		int style_id,		int pixel_size,	
-		LCUI_FontBMP *fontbmp_buff );
+FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
+			int pixel_size,	 LCUI_FontBMP *fontbmp_buff );
 
 /* 获取字体位图数据 */
 LCUI_FontBMP *
-FontLIB_GetFontBMP(	wchar_t char_code,	int family_id,
-			int style_id,		int pixel_size	);
+FontLIB_GetFontBMP( wchar_t char_code, int font_id, int pixel_size );
+
+/* 载入字体值数据库中 */
+int FontLIB_LoadFontFile( const char *filepath );
 
 LCUI_END_HEADER
 

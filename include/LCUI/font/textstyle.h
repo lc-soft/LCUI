@@ -35,7 +35,7 @@ typedef struct _LCUI_TextStyle
 	BOOL _fore_color:1;
 	BOOL _pixel_size:1;
 	
-	char family[256];
+	int font_id;
 	enum_font_style	style		:3;
 	enum_font_weight	weight		:3;
 	enum_font_decoration	decoration	:4;
