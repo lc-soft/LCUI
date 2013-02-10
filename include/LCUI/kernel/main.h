@@ -53,9 +53,7 @@ typedef struct _LCUI_System
 	LCUI_Queue	widget_list;	/* 部件队列，对应它的显示顺序 */
 	LCUI_Queue	invalid_area;	/* 需要刷新的区域 */
 	LCUI_Queue	timer_list;	/* 定时器列表 */
-	LCUI_Queue	app_list;	/* LCUI程序列表 */ 
-	LCUI_Font	default_font;	/* 默认的字体数据 */ 
-	
+	LCUI_Queue	app_list;	/* LCUI程序列表 */
 	LCUI_GraphLayer *root_glayer;
 }
 LCUI_System;

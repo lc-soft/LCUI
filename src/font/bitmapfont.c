@@ -39,9 +39,9 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#define USE_FREETYPE
+//#define USE_FREETYPE
 //#define DEBUG
-//#include "config.h"
+#include "config.h"
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_MISC_H
@@ -169,109 +169,6 @@ void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 	out_bitmap->advance.y = 8;
 }
 
-/* 初始化字体处理模块 */
-void LCUIModule_Font_Init( void )
-{
-	char *p;
-	int font_id;
-	LCUI_Font *font;
-	
-	font = &LCUI_Sys.default_font;
-	printf("loading fontfile...\n");/* 无缓冲打印内容 */
-	font->type = DEFAULT;
-	String_Init( &font->font_file );
-	String_Init( &font->family_name );
-	String_Init( &font->style_name );
-	font->state = KILLED;
-#ifdef USE_FREETYPE
-	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP | FT_LOAD_FORCE_AUTOHINT;
-	//font->load_flags = FT_LOAD_RENDER | FT_LOAD_MONOCHROME;
-	font->load_flags = FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT; 
-	font->render_mode = FT_RENDER_MODE_MONO;
-#else
-	font->load_flags = 0;
-	font->render_mode = 0;
-#endif
-	font->ft_lib = NULL;
-	font->ft_face = NULL;
-	/* 如果在环境变量中定义了字体文件路径，那就使用它 */
-	p = getenv("LCUI_FONTFILE");
-	if( !p ) {
-		p = LCUI_DEFAULT_FONTFILE;
-	}
-	FontLIB_Init(); /* 初始化字体数据库 */
-	font_id = FontLIB_LoadFontFile( p ); /* 载入默认的字体至库中 */
-	FontLIB_SetDefaultFont( font_id ); /* 设定该字体为默认字体 */
-}
-
-/* 停用字体处理模块 */
-void LCUIModule_Font_End( void )
-{
-	/* 释放字符串 */
-	String_Free( &LCUI_Sys.default_font.font_file );
-	String_Free( &LCUI_Sys.default_font.family_name );
-	String_Free( &LCUI_Sys.default_font.style_name );
-	/* 如果缺省字体的状态是活动的，那就拷贝 */
-	if(LCUI_Sys.default_font.state == ACTIVE) {
-		LCUI_Sys.default_font.state = KILLED;
-#ifdef USE_FREETYPE
-		FT_Done_Face(LCUI_Sys.default_font.ft_face);
-		FT_Done_FreeType(LCUI_Sys.default_font.ft_lib); 
-#endif
-		LCUI_Sys.default_font.ft_lib = NULL;
-		LCUI_Sys.default_font.ft_face = NULL;
-	}
-	FontLIB_DestroyAll();
-}
-
-void Font_Init(LCUI_Font *in)
-/* 
- * 功能：初始化Font结构体数据
- * 说明：默认是继承系统的字体数据
- * */
-{
-	/* 字体类型为LCUI默认的 */
-	in->type = DEFAULT;
-	/* 初始化字符串 */
-	String_Init(&in->font_file);
-	String_Init(&in->family_name);
-	String_Init(&in->style_name);
-	/* 如果缺省字体的状态是活动的，那就拷贝 */
-	if(LCUI_Sys.default_font.state == ACTIVE) {
-		in->state = ACTIVE;
-		LCUI_Strcpy(&in->family_name, &LCUI_Sys.default_font.family_name);
-		LCUI_Strcpy(&in->style_name, &LCUI_Sys.default_font.style_name);
-		LCUI_Strcpy(&in->font_file, &LCUI_Sys.default_font.font_file);
-		in->ft_lib = LCUI_Sys.default_font.ft_lib;
-		in->ft_face = LCUI_Sys.default_font.ft_face;
-	} else {
-		in->state = KILLED;
-		in->ft_lib = NULL;
-		in->ft_face = NULL;
-	}
-	in->load_flags = LCUI_Sys.default_font.load_flags;
-	in->render_mode = LCUI_Sys.default_font.render_mode;
-}
-
-void Font_Free(LCUI_Font *in)
-/* 功能：释放Font结构体数据占用的内存资源 */
-{
-	String_Free(&in->font_file);
-	String_Free(&in->family_name);
-	String_Free(&in->style_name);
-	if(in->state == ACTIVE) { 
-		in->state = KILLED;
-		if(in->type == CUSTOM) { 
-#ifdef USE_FREETYPE
-			FT_Done_Face(in->ft_face);
-			FT_Done_FreeType(in->ft_lib);
-#endif
-		}
-		in->ft_lib = NULL;
-		in->ft_face = NULL;
-	}
-}
-
 int Show_FontBMP(LCUI_FontBMP *fontbmp)
 /* 功能：在屏幕打印以0和1表示字体位图 */
 {
@@ -360,76 +257,6 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 		}
 	}
 	return 0;
-}
-
-int Open_Fontfile(LCUI_Font *font_data, char *fontfile)
-/* 打开指定路径中的字体文件，并保存数据至LCUI_Font结构体中 */
-{
-#ifdef USE_FREETYPE
-	int		type;
-	FT_Library	library;
-	FT_Face	face;
-	FT_Error	face_error = 0, lib_error = 0;
-	
-	type = font_data->type;
-	if(font_data->state == ACTIVE) {
-		/* 如果字体文件路径无效，或该路径和默认的字体文件路径一样，则退出函数 */
-		if( !fontfile || !Strcmp(&font_data->font_file, fontfile) ) {
-			return 0;
-		}
-		else if( Strcmp(&font_data->font_file, 
-				LCUI_Sys.default_font.font_file.string)) {
-			/* 否则，如果不一样，就将type赋值为CUSTOM，表示自定义 */
-			type = CUSTOM;
-		}
-	}
-	else if( !fontfile ) {
-		return -1;
-	}
-	/* 初始化FreeType库 */
-	lib_error = FT_Init_FreeType( & library);
-	/* 当初始化库时发生了一个错误 */
-	if (lib_error) {
-		printf("open fontfile: "FT_INIT_ERROR);
-		return - 1 ;
-	}
-	
-	face_error = FT_New_Face( library, fontfile , 0 , &face );
-	if(face_error) {
-		FT_Done_FreeType(library);
-		if ( face_error == FT_Err_Unknown_File_Format ) {
-			/* 未知文件格式 */ 
-			printf("open fontfile: "FT_UNKNOWN_FILE_FORMAT);
-		} else  {
-			/* 打开错误 */
-			printf("open fontfile: "FT_OPEN_FILE_ERROR);
-		}
-		/* 打印错误信息 */
-		perror(fontfile);
-		return -1;
-	}
-	/* 打印字体信息 */
-	printf(	"=============== font info ==============\n" 
-		"family name: %s\n"
-		"style name : %s\n"
-		"========================================\n" ,
-		face->family_name,
-		face->style_name );
-	/* 先处理掉之前保存的字体信息 */
-	Font_Free( font_data );
-	/* 保存新的字体信息 */
-	Strcpy(&font_data->family_name, face->family_name);
-	Strcpy(&font_data->style_name, face->style_name);
-	Strcpy(&font_data->font_file, fontfile);
-	font_data->type = type;
-	font_data->state = ACTIVE;
-	font_data->ft_lib = library;
-	font_data->ft_face = face;
-	return 0;
-#else
-	printf("warning: not font engine support!\n");
-	return -1;
-#endif
 }
 
 /* 如果定义了USE_FREETYPE宏定义，则使用FreeType字体引擎处理字体数据 */

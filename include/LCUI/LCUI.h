@@ -356,21 +356,6 @@ struct _LCUI_Graph
 };
 /**********************************************************************/
 
-/******************************保存字体信息********************************/
-struct _LCUI_Font/* 字体信息数据 */
-{
-	int		type;		/* 类型(DEFAULT / CUSTOM) */ 
-	LCUI_String	font_file;	/* 字体文件的路径 */
-	LCUI_String	family_name;	/* 字体名称 */
-	LCUI_String	style_name;	/* 字体风格名称 */ 
-	void*		ft_lib;		/* FreeType2库的句柄  */
-	void*		ft_face;	/* FreeType2的face对象的句柄 */
-	int		load_flags;	/* 字形载入标志 */
-	int		render_mode;	/* 字形转换模式标志 */
-	int		state;		/* 状态，是否打开了字体库 */
-};
-/************************************************************************/
-
 /*---------------- 用于表示像素或百分比 -----------------*/
 typedef struct _PX_P_t
 {

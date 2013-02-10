@@ -513,9 +513,7 @@ static void
 TextLayer_Get_Char_BMP ( LCUI_TextStyle *default_style, LCUI_CharData *data )
 /* 获取字体位图，字体的样式由文本图层中记录的字体样式决定 */
 {
-	LCUI_Font font;
 	int pixel_size;
-	Font_Init( &font );
 	/* 获取字体尺寸 */
 	if( !data->data ) {
 		pixel_size = default_style->pixel_size;
@@ -527,7 +525,8 @@ TextLayer_Get_Char_BMP ( LCUI_TextStyle *default_style, LCUI_CharData *data )
 			pixel_size = default_style->pixel_size;
 		}
 	}
-	data->bitmap = Get_ExistFontBMP( default_style->font_id, data->char_code, pixel_size );
+	data->bitmap = Get_ExistFontBMP( default_style->font_id, 
+			data->char_code, pixel_size );
 }
 
 static int 
