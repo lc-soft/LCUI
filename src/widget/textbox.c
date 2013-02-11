@@ -157,7 +157,7 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	/* 根据像素坐标，设定文本光标的位置 */
 	TextLayer_Set_Cursor_PixelPos( layer, pos );
 	/* 获取光标的当前位置 */
-	pos = TextLayer_Get_Cursor_Pos( layer );
+	pos = TextLayer_Cursor_GetPos( layer );
 	/* 主要是调用该函数更新当前文本浏览区域，以使光标处于显示区域内 */
 	TextBox_Cursor_Move( widget, pos );
 }
@@ -174,7 +174,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	//_DEBUG_MSG("you input: %d\n", event->key.key_code);
 	layer = TextBox_Get_TextLayer( widget );
 	textbox = Widget_GetPrivData( widget );
-	cur_pos = TextLayer_Get_Cursor_Pos( layer );
+	cur_pos = TextLayer_Cursor_GetPos( layer );
 	cols = TextLayer_Get_RowLen( layer, cur_pos.y );
 	rows = TextLayer_Get_Rows( layer ); 
 	switch( event->key.key_code ) {
@@ -550,7 +550,7 @@ __TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 	
 	layer = TextBox_Get_TextLayer( widget );
 	TextLayer_Text_Add( layer, new_text );
-	cur_pos = TextLayer_Get_Cursor_Pos( layer );
+	cur_pos = TextLayer_Cursor_GetPos( layer );
 	TextBox_Cursor_Move( widget, cur_pos );
 }
 
@@ -699,6 +699,8 @@ TextBox_ViewArea_Get_Pos( LCUI_Widget *widget )
 	return pos;
 }
 
+LCUI_Widget *debug_widget = NULL;
+
 int
 TextBox_ViewArea_Update( LCUI_Widget *widget )
 /* 更新文本框的文本显示区域 */
@@ -709,7 +711,7 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	static LCUI_Size layer_size, area_size;
 	static LCUI_Widget *scrollbar[2];
 	static LCUI_TextLayer *layer;
-	//printf("TextBox_ViewArea_Update(): enter\n");
+	//_DEBUG_MSG("enter\n");
 	/* 获取显示区域的尺寸 */
 	area_size = Widget_GetContainerSize( widget );
 	/* 获取滚动条 */
@@ -735,17 +737,18 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	/* 获取显示区域的位置 */
 	area_pos = TextBox_ViewArea_Get_Pos( widget );
 	/* 获取光标的坐标 */
-	cursor_pos = TextLayer_Get_Cursor_FixedPixelPos( layer );
+	cursor_pos = TextLayer_Cursor_GetFixedPixelPos( layer );
 	/* 获取当前行的最大高度作为光标的高度 */
-	cursor_h = TextLayer_CurRow_Get_MaxHeight( layer );
+	cursor_h = TextLayer_CurRow_GetMaxHeight( layer );
 	
+	debug_widget = ScrollBar_GetWidget( scrollbar[0] );
 	/* 设定滚动条的数据中的最大值 */
 	ScrollBar_Set_MaxNum( scrollbar[0], layer_size.h - area_size.h );
 	
-	DEBUG_MSG("cursor_pos: %d,%d\n", cursor_pos.x, cursor_pos.y);
-	DEBUG_MSG("area_rect: %d,%d,%d,%d\n", 
-		area_pos.x, area_pos.y,area_size.w, area_size.h );
-	DEBUG_MSG("layer_size: %d,%d\n", layer_size.w, layer_size.h);
+	//_DEBUG_MSG("cursor_pos: %d,%d\n", cursor_pos.x, cursor_pos.y);
+	//_DEBUG_MSG("area_rect: %d,%d,%d,%d\n", 
+	//	area_pos.x, area_pos.y,area_size.w, area_size.h );
+	//_DEBUG_MSG("layer_size: %d,%d\n", layer_size.w, layer_size.h);
 	
 	/* 检测光标Y轴坐标是否超出显示区域的范围 */
 	if( cursor_pos.y < area_pos.y ) {
@@ -766,7 +769,7 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	/* 获取滚动条的数据，供滚动文本层利用 */
 	scrollbar_data = ScrollBar_Get_Data( scrollbar[0] );
 	
-	//printf("scrollbar_data: size: %d / %d, num: %d / %d\n", 
+	//_DEBUG_MSG("scrollbar_data: size: %d / %d, num: %d / %d\n", 
 	//scrollbar_data.current_size, scrollbar_data.max_size, 
 	//scrollbar_data.current_num, scrollbar_data.max_num);
 	/* 根据数据，滚动文本图层至响应的位置，也就是移动文本显示区域 */
@@ -792,11 +795,11 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	/* 获取滚动条的数据，供滚动文本层利用 */
 	scrollbar_data = ScrollBar_Get_Data( scrollbar[1] );
 	
-	//printf("scrollbar_data: size: %d / %d, num: %d / %d\n", 
+	//_DEBUG_MSG("scrollbar_data: size: %d / %d, num: %d / %d\n", 
 	//scrollbar_data.current_size, scrollbar_data.max_size, 
 	//scrollbar_data.current_num, scrollbar_data.max_num);
 	TextBox_HoriScroll_TextLayer( scrollbar_data, widget );
-	//printf("TextBox_ViewArea_Update(): quit\n");
+	//_DEBUG_MSG("quit\n");
 	return 0;
 }
 
@@ -973,7 +976,7 @@ int TextBox_Text_Backspace(LCUI_Widget *widget, int n)
 	
 	layer = TextBox_Get_TextLayer( widget );
 	TextLayer_Text_Backspace( layer, n );
-	cur_pos = TextLayer_Get_Cursor_Pos( layer );
+	cur_pos = TextLayer_Cursor_GetPos( layer );
 	TextBox_Cursor_Move( widget, cur_pos );
 	Widget_Update( widget );
 	return 0;
@@ -998,8 +1001,8 @@ TextBox_Cursor_Update( LCUI_Widget *widget )
 	layer = TextBox_Get_TextLayer( widget );
 	cursor = TextBox_Get_Cursor( widget );
 	size.w = 1;
-	size.h = TextLayer_CurRow_Get_MaxHeight( layer );
-	pixel_pos = TextLayer_Get_Cursor_PixelPos( layer );
+	size.h = TextLayer_CurRow_GetMaxHeight( layer );
+	pixel_pos = TextLayer_Cursor_GetPixelPos( layer );
 	Widget_Move( cursor, pixel_pos );
 	Widget_Resize( cursor, size );
 	/* 若当前文本框处于焦点状态，则让光标在更新时显示 */
@@ -1021,8 +1024,8 @@ TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
 	layer = TextBox_Get_TextLayer( widget );
 	cursor = TextBox_Get_Cursor( widget );
 	size.w = 1;
-	size.h = TextLayer_CurRow_Get_MaxHeight( layer );
-	pixel_pos = TextLayer_Set_Cursor_Pos( layer, new_pos );
+	size.h = TextLayer_CurRow_GetMaxHeight( layer );
+	pixel_pos = TextLayer_Cursor_SetPos( layer, new_pos );
 	Widget_Move( cursor, pixel_pos );
 	Widget_Resize( cursor, size );
 	if( active_textbox == widget ) {

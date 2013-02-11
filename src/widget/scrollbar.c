@@ -92,6 +92,7 @@ Move_ScrollBar( LCUI_Widget *widget, LCUI_Pos new_pos )
 		scale = new_pos.x * 1.0 / size;
 		scrollbar->data.current_num = scale * scrollbar->data.max_num;
 	}
+	//_DEBUG_MSG("widget:%p, pos: %d,%d\n", widget, new_pos.x, new_pos.y);
 	Widget_Move( widget, new_pos );
 }
 
@@ -165,7 +166,8 @@ ScrollBar_Update( LCUI_Widget *widget )
 	/* 计算比例，之后转换成字符串 */
 	scale = scrollbar->data.current_size*1.0 / scrollbar->data.max_size; 
 	sprintf( scale_str, "%.2lf%%", scale*100 );
-	//printf( "ScrollBar_Update(): scale: %s\n", scale_str );
+	//_DEBUG_MSG("current_num: %d, max_num: %d\n", 
+	//scrollbar->data.current_num, scrollbar->data.max_num);
 	/* 判断滚动条的方向 */
 	if( scrollbar->direction == 0 ) { /* 纵向 */
 		Widget_SetSize( scrollbar->widget, NULL, scale_str );
@@ -175,10 +177,10 @@ ScrollBar_Update( LCUI_Widget *widget )
 		
 		scale = scrollbar->data.current_num*1.0 / scrollbar->data.max_num;
 		pos = scale * max_len;
-		//printf("ScrollBar_Update(), num: %d / %d\n", 
+		//_DEBUG_MSG("num: %d / %d\n", 
 		//scrollbar->data.current_num, scrollbar->data.max_num);
-		//printf("ScrollBar_Update(), scale: %.2f\n", scale);
-		//printf("ScrollBar_Update(), y: %d\n", pos);
+		//_DEBUG_MSG("ScrollBar_Update(), scale: %.2f\n", scale);
+		//_DEBUG_MSG("ScrollBar_Update(), y: %d\n", pos);
 		/* 移动滚动条 */
 		Widget_Move( scrollbar->widget, Pos(0,pos) );
 	} else { /* 横向 */ 
@@ -225,6 +227,15 @@ ScrollBar_Get_Data ( LCUI_Widget *widget )
 	
 	scrollbar = Widget_GetPrivData( widget );
 	return scrollbar->data;
+}
+
+/* 获取滚动条部件的滑块 */
+LCUI_Widget *ScrollBar_GetWidget( LCUI_Widget *widget )
+{
+	LCUI_ScrollBar *scrollbar;
+	
+	scrollbar = Widget_GetPrivData( widget );
+	return scrollbar->widget;
 }
 
 void 

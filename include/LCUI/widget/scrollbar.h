@@ -63,6 +63,9 @@ ScrollBar_Data
 ScrollBar_Get_Data ( LCUI_Widget *widget );
 /* 获取滚动条的数据 */
 
+/* 获取滚动条部件的滑块 */
+LCUI_Widget *ScrollBar_GetWidget( LCUI_Widget *widget );
+
 void 
 ScrollBar_Set_MaxNum( LCUI_Widget *widget, int max_num );
 

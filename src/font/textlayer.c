@@ -1203,7 +1203,7 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text )
 		src_pos = Queue_Get_Total( &layer->text_source_data );
 		des_pos = cur_pos;
 	} else {/* 否则，是将文本插入至光标所在位置 */
-		cur_pos = TextLayer_Get_Cursor_Pos( layer );
+		cur_pos = TextLayer_Cursor_GetPos( layer );
 		DEBUG_MSG1( "cur_pos: %d,%d\n", cur_pos.x, cur_pos.y );
 		cur_row_ptr = Queue_Get( &layer->rows_data, cur_pos.y );
 		DEBUG_MSG1( "cur_row_ptr: %p\n", cur_row_ptr );
@@ -1534,7 +1534,7 @@ TextLayer_Get_CurChar( LCUI_TextLayer *layer )
 	LCUI_CharData *char_ptr;
 	Text_RowData *row_ptr;
 	
-	pos = TextLayer_Get_Cursor_Pos( layer );
+	pos = TextLayer_Cursor_GetPos( layer );
 	row_ptr = Queue_Get( &layer->rows_data, pos.y );
 	if( !row_ptr ) {
 		return NULL;
@@ -1656,7 +1656,7 @@ TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 }
 
 LCUI_Pos
-TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos )
+TextLayer_Cursor_SetPos( LCUI_TextLayer *layer, LCUI_Pos pos )
 /* 设定光标在文本框中的位置，并返回该光标的坐标，单位为像素 */
 {
 	LCUI_Pos pixel_pos;
@@ -1700,7 +1700,7 @@ TextLayer_Set_Cursor_Pos( LCUI_TextLayer *layer, LCUI_Pos pos )
 			continue;
 		}
 		pixel_pos.x += char_ptr->bitmap->advance.x;
-		//printf("TextLayer_Set_Cursor_Pos(): pixel pos x: %d, total: %d, cols: %d, pos.x: %d\n", 
+		//printf("TextLayer_Cursor_SetPos(): pixel pos x: %d, total: %d, cols: %d, pos.x: %d\n", 
 		//pixel_pos.x, total, cols, pos.x);
 	}
 	//printf("layer->current_des_pos: %d,%d,  pos: %d,%d\n",
@@ -1775,7 +1775,7 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 		return -1;
 	}
 	/* 确定起点位置的XY轴坐标 */
-	pixel_pos = TextLayer_Get_Char_PixelPos( layer, start_pos );
+	pixel_pos = TextLayer_Char_GetPixelPos( layer, start_pos );
 	
 	rows = Queue_Get_Total( &layer->rows_data );
 	row_ptr = Queue_Get( &layer->rows_data, start_pos.y );
@@ -1871,7 +1871,7 @@ TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 		return -2;
 	}
 	/* 计算当前光标所在字的位置 */
-	char_pos = TextLayer_Get_Cursor_Pos( layer );
+	char_pos = TextLayer_Cursor_GetPos( layer );
 	DEBUG_MSG2( "before: %d,%d\n", char_pos.x, char_pos.y );
 	for( i=n; char_pos.y>=0; --char_pos.y ) {
 		row_ptr = Queue_Get( &layer->rows_data, char_pos.y );
@@ -1894,13 +1894,13 @@ TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 	/* 开始删除文字 */
 	_TextLayer_Text_Delete( layer, char_pos, n );
 	/* 删除完后，需要将光标向左移动一个位置 */
-	TextLayer_Set_Cursor_Pos( layer, char_pos );
+	TextLayer_Cursor_SetPos( layer, char_pos );
 	return 0;
 }
 
 
 LCUI_Pos 
-TextLayer_Get_Char_PixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
+TextLayer_Char_GetPixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 /* 获取显示出来的文字相对于文本图层的坐标，单位为像素 */
 {
 	LCUI_Pos pixel_pos;
@@ -1909,7 +1909,7 @@ TextLayer_Get_Char_PixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 	int rows, cols, total;
 	
 	pixel_pos.x = pixel_pos.y = 0;
-	char_pos = TextLayer_Get_Cursor_Pos( layer );
+	char_pos = TextLayer_Cursor_GetPos( layer );
 	total = Queue_Get_Total( &layer->rows_data );
 	if( char_pos.y >= total ) {
 		char_pos.y = total-1;
@@ -1958,28 +1958,28 @@ TextLayer_Get_Char_PixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 }
 
 LCUI_Pos
-TextLayer_Get_Cursor_Pos( LCUI_TextLayer *layer )
+TextLayer_Cursor_GetPos( LCUI_TextLayer *layer )
 /* 获取光标在文本框中的位置，也就是光标在哪一行的哪个字后面 */
 {
 	return layer->current_des_pos;
 }
 
 LCUI_Pos
-TextLayer_Get_Cursor_FixedPixelPos( LCUI_TextLayer *layer )
+TextLayer_Cursor_GetFixedPixelPos( LCUI_TextLayer *layer )
 /* 获取文本图层的光标位置，单位为像素 */
 {
 	LCUI_Pos pos;
-	pos = TextLayer_Get_Cursor_Pos( layer );
-	pos = TextLayer_Get_Char_PixelPos( layer, pos );
+	pos = TextLayer_Cursor_GetPos( layer );
+	pos = TextLayer_Char_GetPixelPos( layer, pos );
 	return pos;
 }
 
 LCUI_Pos
-TextLayer_Get_Cursor_PixelPos( LCUI_TextLayer *layer )
+TextLayer_Cursor_GetPixelPos( LCUI_TextLayer *layer )
 /* 获取文本图层的光标相对于容器位置，单位为像素 */
 {
 	LCUI_Pos pos;
-	pos = TextLayer_Get_Cursor_FixedPixelPos( layer );
+	pos = TextLayer_Cursor_GetFixedPixelPos( layer );
 	/* 加上偏移坐标 */
 	pos = Pos_Add( pos, layer->offset_pos );
 	return pos;
@@ -2005,7 +2005,7 @@ TextLayer_Get_RowLen( LCUI_TextLayer *layer, int row )
 }
 
 int 
-TextLayer_CurRow_Get_MaxHeight( LCUI_TextLayer *layer )
+TextLayer_CurRow_GetMaxHeight( LCUI_TextLayer *layer )
 /* 获取当前行的最大高度 */
 {
 	Text_RowData *row_ptr;

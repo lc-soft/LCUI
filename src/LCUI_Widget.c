@@ -1897,15 +1897,14 @@ void Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 	GraphLayer_Resize( widget->client_glayer, size.w, size.h );
 	
 	WidgetFunc_Call( widget, FUNC_TYPE_RESIZE );
-	Refresh_Widget( widget );
-	/* 更新子部件的位置及尺寸 */  
-	Update_Child_Widget_Size( widget );
+	//Refresh_Widget( widget );
+	
+	Update_Child_Widget_Size( widget ); /* 更新子部件的位置及尺寸 */  
 	if( widget->parent && widget->parent->auto_size ) {
-	/* 如果需要让它的容器能够自动调整大小 */
+		/* 如果需要让它的容器能够自动调整大小 */
 		Widget_AutoResize( widget->parent );
 	}
-	/* 处理部件的RESIZE事件 */
-	Widget_DispatchEvent( widget, &event );
+	Widget_DispatchEvent( widget, &event ); /* 处理部件的RESIZE事件 */
 }
 
 /* 启用或禁用部件的自动尺寸调整功能 */
@@ -2494,23 +2493,28 @@ Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type, int flag)
 			continue;
 		}
 		/* 否则，需要进行替换 */
-		if( type == DATATYPE_AREA ) {
-			DEBUG_MSG("search result: the recod at %d\n", i);
-		}
 		switch(type) {
 		    case DATATYPE_POS :
 			if(temp.valid) {
 				tmp_ptr->data.pos = temp.data.pos;
+				tmp_ptr->valid = TRUE;
+			} else {
+				tmp_ptr->valid = FALSE;
 			}
 			break;
 		    case DATATYPE_SIZE :
 			if(temp.valid) {
 				tmp_ptr->data.size = temp.data.size;
+				tmp_ptr->valid = TRUE;
+			} else {
+				tmp_ptr->valid = FALSE;
 			}
 			break;
 		    case DATATYPE_STATUS :
 			if(temp.valid) {
 				tmp_ptr->data.state = temp.data.state;
+			} else {
+				tmp_ptr->valid = FALSE;
 			}
 			break;
 		    case DATATYPE_GRAPH	: 
@@ -2528,9 +2532,6 @@ Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type, int flag)
 	/* 未找到，则添加新的 */
 	if( i>= total ) {
 		result = Queue_Add( &widget->data_buff, &temp );
-		if( type == DATATYPE_AREA ) {
-			DEBUG_MSG("queue add, the widget data at: %d\n", result);
-		}
 	}
 	return result;
 }
@@ -2552,7 +2553,6 @@ int Handle_WidgetUpdate(LCUI_Widget *widget)
 		if( !temp ) {
 			continue;
 		}
-		//_DEBUG_MSG("2, temp->type: %d\n\n", temp->type);
 		/* 根据不同的类型来进行处理 */
 		switch(temp->type) {
 		    case DATATYPE_SIZE	:
