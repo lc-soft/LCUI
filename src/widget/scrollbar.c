@@ -67,23 +67,28 @@ Move_ScrollBar( LCUI_Widget *widget, LCUI_Pos new_pos )
 	double scale;
 	int size;
 	LCUI_ScrollBar *scrollbar;
-	
+	//_DEBUG_MSG("new_pos: %d,%d\n", new_pos.x, new_pos.y);
 	scrollbar = Widget_GetPrivData( widget->parent );
 	/* 使该坐标在限制范围内 */
 	new_pos = Widget_GetValidPos( widget, new_pos );
 	/* 判断滚动条的方向 */
 	if( scrollbar->direction == 0 ) { /* 纵向 */
 		/* 先得到容器高度 */
-		size = Widget_GetContainerHeight( widget );//_Get_Widget_Container_Height( widget );
+		size = Widget_GetContainerHeight( widget->parent );
+		//_DEBUG_MSG("1,size: %d\n", size);
 		/* 减去自身高度 */
 		size -= _Widget_GetHeight( widget );
+		//_DEBUG_MSG("2,size: %d\n", size);
 		/* 再用当前坐标除以size，得到比例 */
 		scale = new_pos.y * 1.0 / size;
+		//_DEBUG_MSG("%.2f = %d * 1.0 / %d\n", scale, new_pos.y, size);
 		/* 将max_num乘以比例，得出current_num的值 */
 		scrollbar->data.current_num = scale * scrollbar->data.max_num;
+		//_DEBUG_MSG("current_num: %d, scale: %.2f, max_num: %d\n", 
+		//scrollbar->data.current_num, scale, scrollbar->data.max_num);
 	} else { /* 横向 */
-		size = _Get_Widget_Container_Width( widget );
-		size -= _Get_Widget_Width( widget );
+		size = Widget_GetContainerWidth( widget->parent );
+		size -= _Widget_GetWidth( widget );
 		scale = new_pos.x * 1.0 / size;
 		scrollbar->data.current_num = scale * scrollbar->data.max_num;
 	}
@@ -108,6 +113,8 @@ ScrollBar_Drag( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	Move_ScrollBar( widget, pos );
 	/* 若函数指针有效，则调用回调函数 */
 	if( scrollbar->callback_func ) {
+		//_DEBUG_MSG("current_num: %d, max_num: %d\n", 
+		//scrollbar->data.current_num, scrollbar->data.max_num);
 		scrollbar->callback_func( scrollbar->data, scrollbar->arg );
 	}
 }
@@ -177,7 +184,7 @@ ScrollBar_Update( LCUI_Widget *widget )
 	} else { /* 横向 */ 
 		Widget_SetSize( scrollbar->widget, scale_str, NULL );
 		max_len = Widget_GetContainerWidth( widget );
-		max_len -= _Get_Widget_Width( scrollbar->widget );
+		max_len -= _Widget_GetWidth( scrollbar->widget );
 		Widget_LimitPos( scrollbar->widget, Pos(0,0), Pos(max_len,0) );
 		scale = scrollbar->data.current_num*1.0 / scrollbar->data.max_num;
 		pos = scale * max_len;

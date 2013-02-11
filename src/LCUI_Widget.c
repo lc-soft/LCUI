@@ -482,7 +482,7 @@ int Widget_GetContainerWidth( LCUI_Widget *widget )
 	if( !widget ) {
 		return Get_Screen_Width();
 	}
-	width = _Get_Widget_Width( widget );
+	width = _Widget_GetWidth( widget );
 	width -= (widget->padding.left + widget->padding.right);
 	return width;
 }
@@ -893,7 +893,7 @@ int _Widget_GetHeight(LCUI_Widget *widget)
 	return widget->h.scale * _Get_Widget_Container_Height( widget );
 }
 
-int _Get_Widget_Width(LCUI_Widget *widget)
+int _Widget_GetWidth(LCUI_Widget *widget)
 {
 	if(widget->w.which_one == 0) {
 		return widget->w.px;
@@ -934,7 +934,7 @@ LCUI_Size _Widget_GetSize(LCUI_Widget *widget)
 /* 功能：通过计算获取部件的尺寸 */
 {
 	LCUI_Size size;
-	size.w = _Get_Widget_Width( widget );
+	size.w = _Widget_GetWidth( widget );
 	size.h = _Widget_GetHeight( widget );
 	return size;
 }

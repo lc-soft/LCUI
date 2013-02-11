@@ -279,14 +279,14 @@ TextBox_HoriScroll_TextLayer( ScrollBar_Data data, void *arg )
 	LCUI_Widget *widget;
 	
 	widget = (LCUI_Widget *)arg;
-	//printf("1, data: size: %d / %d, num: %d / %d\n", 
+	//_DEBUG_MSG("data: size: %d / %d, num: %d / %d\n", 
 	//data.current_size, data.max_size, data.current_num, data.max_num);
 	LCUI_Pos pos;
 	
 	pos = TextBox_ViewArea_Get_Pos( arg );
 	pos.x = 0 - data.current_num;
 	pos.y = 0 - pos.y;
-	//printf("1, offset.x: %d\n", pos.x);
+	//_DEBUG_MSG("offset.x: %d\n", pos.x);
 	TextBox_TextLayer_Set_Offset( widget, pos );
 	Widget_Update( widget );
 }
@@ -298,14 +298,14 @@ TextBox_VertScroll_TextLayer( ScrollBar_Data data, void *arg )
 	LCUI_Widget *widget;
 	
 	widget = (LCUI_Widget *)arg;
-	//printf("2, data: size: %d / %d, num: %d / %d\n", 
+	//_DEBUG_MSG("data: size: %d / %d, num: %d / %d\n", 
 	//data.current_size, data.max_size, data.current_num, data.max_num);
 	LCUI_Pos pos;
 	
 	pos = TextBox_ViewArea_Get_Pos( arg );
 	pos.y = 0 - data.current_num;
 	pos.x = 0 - pos.x;
-	//printf("2, offset.y: %d\n", pos.y);
+	//_DEBUG_MSG("offset.y: %d\n", pos.y);
 	TextBox_TextLayer_Set_Offset( widget, pos );
 	Widget_Update( widget );
 }
@@ -403,7 +403,7 @@ TextBox_Get_Scrollbar( LCUI_Widget *widget, int which )
 }
 
 static void 
-TextBox_ScrollBar_Update_Size( LCUI_Widget *widget )
+TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 /* 更新滚动条的长度 */
 {
 	int tmp;
@@ -472,7 +472,7 @@ TextBox_ScrollBar_Update_Size( LCUI_Widget *widget )
 }
 
 static int
-TextBox_ScrollBar_Update_Pos( LCUI_Widget *widget )
+TextBox_ScrollBar_UpdatePos( LCUI_Widget *widget )
 /* 更新滚动条的位置 */
 {
 	static ScrollBar_Data scrollbar_data;
@@ -482,6 +482,7 @@ TextBox_ScrollBar_Update_Pos( LCUI_Widget *widget )
 	static LCUI_TextLayer *layer;
 	
 	area_size = Widget_GetContainerSize( widget ); 
+	//_DEBUG_MSG("area_size: (%d,%d)\n", area_size.w, area_size.h);
 	scrollbar[0] = TextBox_Get_Scrollbar( widget, 0 );
 	scrollbar[1] = TextBox_Get_Scrollbar( widget, 1 ); 
 	if( scrollbar[0]->visible ) {
@@ -500,10 +501,12 @@ TextBox_ScrollBar_Update_Pos( LCUI_Widget *widget )
 		return 1;
 	}
 	layer_size = TextLayer_Get_Size( layer );
+	//_DEBUG_MSG("layer_size: (%d,%d)\n", layer_size.w, layer_size.h);
 	if( layer_size.h <= 0 || layer_size.w <= 0 ) {
 		return -2;
 	}
 	area_pos = TextBox_ViewArea_Get_Pos( widget );
+	//_DEBUG_MSG("area_pos: (%d,%d)\n", area_pos.x, area_pos.y);
 	ScrollBar_Set_MaxNum( scrollbar[0], layer_size.h - area_size.h );
 	
 	if( area_pos.y + area_size.h > layer_size.h ) {
@@ -636,13 +639,13 @@ TextBox_ExecUpdate( LCUI_Widget *widget )
 		/* 删除该文本块 */
 		Queue_Delete( &textbox->text_block_buff, 0 );
 		/* 更新滚动条的位置 */
-		TextBox_ScrollBar_Update_Pos( widget );
+		TextBox_ScrollBar_UpdatePos( widget );
 		/* 标记下次继续更新 */
 		__Update_Widget( widget );
 	}
 	TextBox_ExecUpdateStyle( widget ); /* 更新文本框的样式 */
 	Widget_ExecUpdate( TextBox_Get_Label( widget ) ); /* 更新文本图层的内容 */
-	TextBox_ScrollBar_Update_Size( widget ); /* 更新滚动条的长度 */
+	TextBox_ScrollBar_UpdateSize( widget ); /* 更新滚动条的长度 */
 	TextBox_Cursor_Update( widget ); /* 更新文本框内的光标 */
 }
 

@@ -211,7 +211,7 @@ int _Widget_GetHeight(LCUI_Widget *widget);
 
 int Widget_GetWidth(LCUI_Widget *widget);
 
-int _Get_Widget_Width(LCUI_Widget *widget);
+int _Widget_GetWidth(LCUI_Widget *widget);
 
 LCUI_Rect Widget_GetRect(LCUI_Widget *widget);
 /* 功能：获取部件的区域 */ 
