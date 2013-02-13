@@ -997,10 +997,10 @@ int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 	if( widget->visible ) {
 		LCUI_Sys.need_sync_area = TRUE; 
 	}
-	
-	//_DEBUG_MSG("add rect: %d,%d,%d,%d\n", 
-	//	rect.x, rect.y, rect.width, rect.height );
-	
+	//if( widget->type_name.string && strcmp(widget->type_name.string, "text_box") == 0 ) {	
+	//	_DEBUG_MSG("add rect: %d,%d,%d,%d\n", 
+	//		rect.x, rect.y, rect.width, rect.height );
+	//}
 	/* 以“写”模式使用该队列 */
 	Queue_Using( &widget->invalid_area, RWLOCK_WRITE );
 	/* 保存至队列中 */
@@ -1771,6 +1771,9 @@ void Widget_ExecMove( LCUI_Widget *widget, LCUI_Pos pos )
 	}
 	if(pos.y < min_pos.y) {
 		pos.y = min_pos.y;
+	}
+	if( pos.x == widget->pos.x && pos.y == widget->pos.y ) {
+		return;
 	}
 	/* 如果图层是显示的，并且位置变动，那就需要添加无效区域 */
 	if( widget->visible ) {

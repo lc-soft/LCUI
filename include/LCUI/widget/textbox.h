@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_TextBox.h -- Function declaration for TextBox widget 
+ * textbox.h -- Function declaration for TextBox widget 
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_TextBox.h -- 一些文本框部件的操作函数的声明
+ * textbox.h -- 一些文本框部件的操作函数的声明
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -50,11 +50,11 @@
 LCUI_BEGIN_HEADER
 
 LCUI_Widget*
-TextBox_Get_Label( LCUI_Widget *widget );
+TextBox_GetLabel( LCUI_Widget *widget );
 /* 获取文本框部件内的label部件指针 */
 
 LCUI_Pos
-TextBox_ViewArea_Get_Pos( LCUI_Widget *widget );
+TextBox_ViewArea_GetPos( LCUI_Widget *widget );
 /* 获取文本显示区域的位置 */
 
 int
@@ -62,13 +62,13 @@ TextBox_ViewArea_Update( LCUI_Widget *widget );
 /* 更新文本框的文本显示区域 */
 
 LCUI_Widget *
-TextBox_Get_Cursor( LCUI_Widget *widget );
+TextBox_GetCursor( LCUI_Widget *widget );
 /* 获取文本框部件内的光标 */
 
 void TextBox_Text(LCUI_Widget *widget, char *new_text);
 /* 设定文本框显示的文本 */
 
-void TextBox_TextLayer_Set_Offset( LCUI_Widget *widget, LCUI_Pos offset_pos );
+void TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos );
 /* 为文本框内的文本图层设置偏移 */
 
 void TextBox_Text_Add(LCUI_Widget *widget, char *new_text);
@@ -82,6 +82,9 @@ int TextBox_Text_Backspace(LCUI_Widget *widget, int n);
 
 int TextBox_Text_Delete(LCUI_Widget *widget, int n);
 /* 删除光标右边处n个字符 */
+
+/* 获取文本框内的文本总长度 */
+int TextBox_Text_GetTotalLength( LCUI_Widget *widget );
 
 LCUI_Pos 
 TextBox_Cursor_Update( LCUI_Widget *widget );

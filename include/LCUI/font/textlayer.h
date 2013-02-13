@@ -79,12 +79,14 @@ void
 TextLayer_Refresh( LCUI_TextLayer *layer );
 /* 标记文本图层中每个字的位图，等待绘制文本图层时进行更新 */
 
-void
-TextLayer_Set_Offset( LCUI_TextLayer *layer, LCUI_Pos offset_pos );
-/* 设定文本图层的偏移位置 */
+/* 
+ * 功能：设定文本图层的偏移位置
+ * 返回值：需要对图层进行重绘时返回0，否则返回1
+ *  */
+int TextLayer_SetOffset( LCUI_TextLayer *layer, LCUI_Pos offset_pos );
 
 LCUI_Size 
-TextLayer_Get_Size ( LCUI_TextLayer *layer );
+TextLayer_GetSize ( LCUI_TextLayer *layer );
 /* 获取文本图层的实际尺寸 */
 
 wchar_t *
@@ -112,7 +114,7 @@ TextLayer_Row_Set_End( LCUI_TextLayer *layer, uint_t row, uint_t start_cols );
 /* 为指定行设定结束点，结束点及后面的数据将被删除，但不记录残余文本位图区域 */
 
 int
-TextLayer_Text_Get_Length( LCUI_TextLayer *layer );
+TextLayer_Text_GetTotalLength( LCUI_TextLayer *layer );
 /* 获取文本位图中的文本长度 */
 
 void
@@ -196,7 +198,7 @@ TextLayer_CurRow_GetMaxHeight( LCUI_TextLayer *layer );
 /* 获取当前行的最大高度 */
 
 int 
-TextLayer_Get_Rows( LCUI_TextLayer *layer );
+TextLayer_GetRows( LCUI_TextLayer *layer );
 /* 获取文本行数 */
 
 int 
@@ -212,7 +214,7 @@ TextLayer_Cut_Select_Text( LCUI_TextLayer *layer );
 /* 剪切文本图层内被选中的文本 */
 
 void 
-TextLayer_Using_StyleTags( LCUI_TextLayer *layer, BOOL flag );
+TextLayer_UsingStyleTags( LCUI_TextLayer *layer, BOOL flag );
 /* 指定文本图层是否处理样式标签 */
 
 void 

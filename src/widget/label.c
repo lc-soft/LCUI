@@ -63,7 +63,7 @@ Label_Init(LCUI_Widget *widget)
 	TextLayer_Multiline( &label->layer, TRUE );
 	Widget_SetAutoSize( widget, FALSE, 0 );
 	/* 启用样式标签的支持 */
-	TextLayer_Using_StyleTags( &label->layer, TRUE );
+	TextLayer_UsingStyleTags( &label->layer, TRUE );
 }
 
 static void 
@@ -103,7 +103,7 @@ Update_Label(LCUI_Widget *widget)
 	/* 先绘制文本位图，在绘制前它会更新位图尺寸 */
 	TextLayer_Draw( widget, &label->layer, mode );
 	/* 获取尺寸 */
-	max = TextLayer_Get_Size( &label->layer );
+	max = TextLayer_GetSize( &label->layer );
 	if( widget->dock == DOCK_TYPE_NONE && label->auto_size
 	 && Size_Cmp( max, widget->size ) != 0 ) {
 		/* 如果开启了自动调整大小,并且尺寸有改变 */ 
