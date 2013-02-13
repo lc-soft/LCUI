@@ -345,6 +345,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 			return NULL;
 		}
 		FontLIB_CharInit( font );
+		font->char_code = char_code; /* 记录字符的编码 */
 		Queue_Add_Pointer( &fontbitmap_database, font );
 	}
 	/* 但字体ID不大于0时，使用内置字体 */
@@ -359,7 +360,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 			return NULL;
 		}
 		FontLIB_DataInit( data );
-		data->font_id = font_id;
+		data->font_id = font_id; /* 记录该字符使用的字体ID */
 		Queue_Add_Pointer( &font->data, data );
 	}
 	
@@ -370,7 +371,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 		if( !bmp ) {
 			return NULL;
 		}
-		bmp->pixel_size = pixel_size;
+		bmp->pixel_size = pixel_size; /* 记录该字符的像素尺寸 */
 		bmp->bitmap = NULL;
 		Queue_Add_Pointer( &data->font_bmp, bmp );
 	}
