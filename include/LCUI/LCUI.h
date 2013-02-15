@@ -208,23 +208,10 @@ typedef enum _LAYOUT_TYPE
 
 typedef unsigned long int LCUI_ID; 
 /* 先使用typedef为结构体创建同义字，之后再定义结构体 */
-typedef struct	_LCUI_Cursor		LCUI_Cursor;
-typedef struct	_LCUI_WString		LCUI_WString;
-typedef struct	_LCUI_WChar_T		LCUI_WChar_T;
-typedef struct	_LCUI_Rect		LCUI_Rect; 
-typedef struct	_LCUI_String		LCUI_String;
-typedef struct	_LCUI_RGB		LCUI_RGB;
-typedef struct	_LCUI_RGBA		LCUI_RGBA;
-typedef struct	_LCUI_FontBMP		LCUI_FontBMP;
-typedef struct	_LCUI_Graph		LCUI_Graph;
-typedef struct	_LCUI_Font		LCUI_Font;
 typedef struct	_LCUI_Widget		LCUI_Widget;
 typedef struct	_LCUI_Key		LCUI_Key;
-typedef struct	_LCUI_Pos		LCUI_Pos;
-typedef struct	_LCUI_Size		LCUI_Size;
 typedef struct	_Thread_Queue		Thread_Queue;
 typedef struct	_Thread_TreeNode	Thread_TreeNode;
-typedef struct	_Pixel			Pixel;
 
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
@@ -237,67 +224,59 @@ struct _LCUI_Key
 };
 /******************************/
 
-/************ 保存RGB配色数据 *************/
-struct _LCUI_RGB
-{
+/*--------- RGB配色数据 ---------*/
+typedef struct {
 	uchar_t red;
 	uchar_t green;
 	uchar_t blue;
-}; 
-/****************************************/
+} LCUI_RGB;
+/*----------- END -------------*/
 
-/************ 保存RGBA配色数据 *************/
-struct _LCUI_RGBA
-{
+/*--------- RGBA配色数据 --------*/
+typedef struct {
 	uchar_t red;
 	uchar_t green;
 	uchar_t blue;
 	uchar_t alpha;
-}; 
-/****************************************/
+} LCUI_RGBA;
+/*----------- END -------------*/
 
-/*********** 坐标 ************/
-struct _LCUI_Pos
-{
+/*------- 二维坐标 --------*/
+typedef struct {
 	int x, y;
-};
-/*****************************/
+} LCUI_Pos;
+/*--------- END ----------*/
 
-/************* 尺寸 *************/
-struct _LCUI_Size
-{
+/*------- 尺寸 --------*/
+typedef struct {
 	int w, h;
-};
-/*******************************/
+} LCUI_Size;
+/*------- END --------*/
 
-/*************** 记录像素点信息 *******************/
-struct _Pixel
-{
+/*------------- 像素点信息 ------------*/
+typedef struct {
 	LCUI_Pos pos;	/* 位置 */ 
 	LCUI_RGB rgb;	/* RGBA值 */
-};
-/***********************************************/
+} Pixel;
+/*--------------- END ---------------*/
 
-/*********** 字符串 ***********/
-struct _LCUI_String
-{
+/*---------------- 字符串 ----------------*/
+typedef struct {
 	char   *string; /* 字符串内容 */
 	size_t size;	/* 占用的空间大小 */
-};
-/*****************************/
+} LCUI_String;
+/*----------------- END -----------------*/
 
-/****************** 区域数据1 **********************/
-struct _LCUI_Rect /* 可记录需刷新的区域 */
-{
+/*------------------- 区域数据 ---------------------*/
+typedef struct {
 	int x,y;
 	int width,height;
 	double center_x,center_y; /* 中心点的坐标 */
-};
-/**************************************************/
+} LCUI_Rect;
+/*--------------------- END ----------------------*/
 
-/********** 保存字体位图数据 ***************/
-struct _LCUI_FontBMP
-{
+/*---------------- 字体位图数据 ------------------*/
+typedef struct {
 	int top;		/* 与顶边框的距离 */
 	int left;		/* 与左边框的距离 */
 	int width;		/* 位图宽度 */
@@ -307,35 +286,33 @@ struct _LCUI_FontBMP
 	short num_grays;
 	char pixel_mode;
 	LCUI_Pos advance;	/* XY轴的跨距 */
-};
-/*****************************************/
+} LCUI_FontBMP;
+/*------------------- END ---------------------*/
 
-/************************wchar_t型字符***************************/
-struct _LCUI_WChar_T
-{
+/*------------------------ 宽字符位图及相关数据 --------------------------*/
+typedef struct {
 	wchar_t		char_code;	/* 字符码 */
 	LCUI_FontBMP	*bitmap;	/* 字符的位图数据 */
 	LCUI_RGB	color;		/* 该文字的配色 */
 	BOOL		update;		/* 标明这个字符是否需要刷新 */ 
 	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */		   
-};
-/****************************************************************/
+} LCUI_WChar_T;
+/*----------------------------- END ----------------------------------*/
 
-/************** wchar_t型字符串 ***********/
-struct _LCUI_WString
-{
+/*------- wchar_t型字符串 -------*/
+typedef struct {
 	LCUI_WChar_T *string;
 	int	update;
 	size_t size;
-};
-/*****************************************/
+} LCUI_WString;
+/*----------- END -------------*/
 
 #include LC_QUEUE_H
 #include LC_THREAD_H
 
-/***************************** 图层数据 ********************************/
-struct _LCUI_Graph
-{
+/*---------------------------- 图形数据 -------------------------------*/
+typedef struct _LCUI_Graph LCUI_Graph;
+struct _LCUI_Graph {
 	int	type;		/* 图片类型 */
 	int	bit_depth;	/* 位深 */
 	
@@ -354,53 +331,45 @@ struct _LCUI_Graph
 	BOOL is_opaque;		/* 标志，指定该图形是否为不透明 */
 	BOOL not_visible;	/* 标志，指定该图形是否不可见，也就是全透明 */
 };
-/**********************************************************************/
+/*------------------------------ END ---------------------------------*/
 
 /*---------------- 用于表示像素或百分比 -----------------*/
-typedef struct _PX_P_t
-{
+typedef struct {
 	BOOL which_one;		/* 指定用哪个类型的变量 */
 	int px;			/* 数值，单位为像素 */
 	double scale;		/* 比例 */
-}
-PX_P_t;
+} PX_P_t;
 /*---------------------- END -------------------------*/
 
 /*----------------- 用于表示字体大小 --------------------*/
-typedef struct _PX_PT_t
-{
+typedef struct {
 	BOOL which_one;		/* 指定用哪个类型的变量 */
 	int px;			/* pixel, 字体大小（像素） */
 	int pt;			/* point，字体大小（点数） */
-}
-PX_PT_t;
+} PX_PT_t;
 /*---------------------- END -------------------------*/
 
 /*------------------- 内边距和外边距 --------------------*/
-typedef struct _LCUI_Margin
-{
+typedef struct {
 	int top, bottom, left, right;
-}
-LCUI_Margin, LCUI_Padding;
+} LCUI_Margin, LCUI_Padding;
 /*---------------------- END -------------------------*/
 
 /*----------------- 自动尺寸调整模式 --------------------*/
-typedef enum _AUTOSIZE_MODE
-{
+typedef enum {
 	AUTOSIZE_MODE_GROW_AND_SHRINK,	/* 增大和缩小 */
 	AUTOSIZE_MODE_GROW_ONLY		/* 只增大 */
 }
 AUTOSIZE_MODE;
-/*----------------------------------------------------*/
+/*---------------------- END --------------------------*/
 
-/***********  储存游标的位置 **************/
-struct _LCUI_Cursor
-{
+/*---------------- 鼠标游标数据 -------------------*/
+typedef struct {
 	LCUI_Pos	pos;	/* 坐标 */
 	int		visible;/* 是否可见 */
 	LCUI_Graph	graph;	/* 游标的图形 */
-};
-/****************************************/
+} LCUI_Cursor;
+/*------------------- END -----------------------*/
 
 /*----------------- 对齐方式 -------------------*/
 typedef enum {
