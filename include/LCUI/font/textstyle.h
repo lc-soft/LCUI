@@ -1,3 +1,5 @@
+#ifndef __LCUI_TEXTSTYLE_H__
+#define __LCUI_TEXTSTYLE_H__
 
 typedef enum _font_style
 { 
@@ -46,3 +48,68 @@ typedef struct _LCUI_TextStyle
 	int pixel_size;	
 }
 LCUI_TextStyle;
+
+typedef enum {
+	TAG_ID_FAMILY = 0,
+	TAG_ID_STYLE = 1,
+	TAG_ID_WIEGHT = 2,
+	TAG_ID_DECORATION = 3,
+	TAG_ID_SIZE = 4,
+	TAG_ID_COLOR = 5
+} StyleTag_ID;
+
+typedef struct {
+	StyleTag_ID tag;
+	void *style;
+} StyleTag_Data;
+
+LCUI_BEGIN_HEADER
+
+/* 初始化字体样式数据 */
+void TextStyle_Init ( LCUI_TextStyle *data );
+
+/* 设置字体族 */
+void TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily );
+
+/* 设置字体大小 */
+void TextStyle_FontSize( LCUI_TextStyle *style, int fontsize );
+
+/* 设置字体颜色 */
+void TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color );
+
+/* 设置字体背景颜色 */
+void TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color );
+
+/* 设置字体样式 */
+void TextStyle_FontStyle( LCUI_TextStyle *style, enum_font_style fontstyle );
+
+void TextStyle_FontWeight( LCUI_TextStyle *style, enum_font_weight fontweight );
+
+/* 设置字体下划线 */
+void TextStyle_FontDecoration( LCUI_TextStyle *style, enum_font_decoration decoration );
+
+int TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b );
+
+/*-------------------------- StyleTag --------------------------------*/
+#define MAX_TAG_NUM 2
+
+/* 初始化样式标签库 */
+void StyleTag_Init( LCUI_Queue *tags );
+
+/* 添加样式标签 */
+int StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data );
+
+/* 获取当前的样式数据 */
+LCUI_TextStyle *StyleTag_GetCurrentStyle ( LCUI_Queue *tags );
+
+/* 处理样式标签 */
+wchar_t *StyleTag_ProcessTag( LCUI_Queue *tags, wchar_t *str );
+
+/* 处理样式结束标签 */
+wchar_t *StyleTag_ProcessEndingTag( LCUI_Queue *tags, wchar_t *str );
+
+/*------------------------- End StyleTag -----------------------------*/
+
+LCUI_END_HEADER
+
+#endif

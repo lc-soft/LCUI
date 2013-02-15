@@ -54,20 +54,6 @@
 #include <string.h>
 
 typedef struct _Special_KeyWord	Special_KeyWord;
-typedef struct _tag_style_data	tag_style_data;
-
-typedef enum _tag_id	enum_tag_id;
-
-enum _tag_id
-{
-	TAG_ID_FAMILY = 0,
-	TAG_ID_STYLE = 1,
-	TAG_ID_WIEGHT = 2,
-	TAG_ID_DECORATION = 3,
-	TAG_ID_SIZE = 4,
-	TAG_ID_COLOR = 5
-};
-
 /*************************** 特殊关键词 *****************************/
 struct _Special_KeyWord
 {
@@ -76,94 +62,6 @@ struct _Special_KeyWord
 	LCUI_Queue *text_source_data;	/* 关键词所属的源文本 */
 };
 /******************************************************************/
-
-struct _tag_style_data 
-{
-	enum_tag_id tag;
-	void *style;
-};
-
-/**************************** TextStyle *******************************/
-void 
-TextStyle_Init ( LCUI_TextStyle *data )
-/* 初始化字体样式数据 */
-{
-	data->_style = FALSE;
-	data->_weight = FALSE;
-	data->_decoration = FALSE;
-	data->_family = FALSE;
-	data->_back_color = FALSE;
-	data->_fore_color = FALSE;
-	data->font_id = FontLIB_GetDefaultFontID();
-	data->style = FONT_STYLE_NORMAL;
-	data->weight = FONT_WEIGHT_NORMAL;
-	data->decoration = FONT_DECORATION_NONE;
-	data->fore_color = RGB(0,0,0);
-	data->back_color = RGB(255,255,255);
-	data->pixel_size = 12;
-}
-
-void
-TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily )
-/* 设置字体族 */
-{
-	style->font_id = FontLIB_GetFontIDByFamilyName( fontfamily );
-}
-
-void
-TextStyle_FontSize( LCUI_TextStyle *style, int fontsize )
-/* 设置字体大小 */
-{
-	style->pixel_size = fontsize;
-}
-
-void
-TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color )
-/* 设置字体颜色 */
-{
-	style->fore_color = color;
-}
-
-void
-TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color )
-/* 设置字体背景颜色 */
-{
-	style->back_color = color;
-}
-
-void
-TextStyle_FontStyle( LCUI_TextStyle *style, enum_font_style fontstyle )
-/* 设置字体样式 */
-{
-	style->style = fontstyle;
-}
-
-void
-TextStyle_FontWeight( LCUI_TextStyle *style, enum_font_weight fontweight ) 
-{
-	style->weight = fontweight;
-}
-
-void
-TextStyle_FontDecoration( LCUI_TextStyle *style, enum_font_decoration decoration )
-/* 设置字体下划线 */
-{
-	style->decoration = decoration;
-}
-
-int 
-TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b )
-{
-	return 0;
-}
-
-/************************** End TextStyle *****************************/
-
-static void 
-destroy_tag_style_data( tag_style_data *data )
-{ 
-	//free( data->style );
-}
 
 static void 
 Destroy_Special_KeyWord(Special_KeyWord *key)
@@ -187,314 +85,9 @@ Destroy_Text_RowData(Text_RowData *data)
 	Destroy_Queue ( &data->string );
 }
 
-
-/*----------------------------- Tag Proc -----------------------------*/
-static void 
-TextLayer_TagStyle_Add( LCUI_TextLayer *layer, tag_style_data *data )
-/* 将字体样式数据加入队列 */
-{
-	Queue_Add( &layer->tag_buff, data );
-}
-
-#define MAX_TAG_NUM 2
-
-static LCUI_TextStyle *
-TextLayer_Get_Current_TextStyle ( LCUI_TextLayer *layer )
-/* 获取当前的字体样式数据 */
-{
-	int i, total, equal = 0,flags[MAX_TAG_NUM];
-	LCUI_TextStyle *data;
-	tag_style_data *p;
-	
-	data = (LCUI_TextStyle*) malloc (sizeof(LCUI_TextStyle));
-	TextStyle_Init( data );
-	memset( flags, 0, sizeof(flags) );
-	total = Queue_Get_Total( &layer->tag_buff );
-	if(total <= 0) {
-		free( data );
-		return NULL;
-	}
-	/* 从样式数据队列中获取字体样式数据 */
-	for(equal=0,i=total-1; i>=0; --i) {
-		p = Queue_Get( &layer->tag_buff, i );
-		DEBUG_MSG("tag id: %d\n", p->tag);
-		switch( p->tag ) {
-		    case TAG_ID_COLOR: 
-			if( flags[0] == 0 ) {
-				data->_fore_color = TRUE;
-				data->fore_color = *((LCUI_RGB*)p->style);
-				DEBUG_MSG("color: %d,%d,%d\n", data->fore_color.red,
-				 data->fore_color.green, data->fore_color.blue);
-				flags[0] = 1;
-				++equal;
-			}
-			break;
-		    case TAG_ID_SIZE:
-			if( flags[1] == 0 ) {
-				PX_PT_t pxpt;
-				pxpt = *((PX_PT_t*)p->style);
-				data->_pixel_size = TRUE;
-				data->pixel_size = pxpt.px;
-				flags[1] = 1;
-				++equal;
-			}
-			break;
-		    default: break;
-		}
-		if(equal == MAX_TAG_NUM) {
-			break;
-		}
-	}
-	if( equal == 0 ) {
-		free( data );
-		return NULL;
-	}
-	return data;
-}
-
-static void 
-TextLayer_TagStyle_Delete( LCUI_TextLayer *layer, enum_tag_id tag)
-/* 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
-{
-	int i, total;
-	tag_style_data *p; 
-	 
-	total = Queue_Get_Total( &layer->tag_buff );
-	DEBUG_MSG("delete start, total tag: %d\n", Queue_Get_Total( &layer->tag_buff ));
-	if(total <= 0) {
-		return;
-	}
-	for(i=total-1; i>=0; --i) {
-		p = Queue_Get( &layer->tag_buff, i );
-		if( p->tag == tag ) {
-			Queue_Delete( &layer->tag_buff, i );
-			break;
-		}
-	} 
-	DEBUG_MSG("delete end, total tag: %d\n", Queue_Get_Total( &layer->tag_buff ));
-}
-
-void clear_space(char *in, char *out)
-/* 清除字符串中的空格 */
-{
-	int j, i, len = strlen(in);
-	for(j=i=0; i<len; ++i) {
-		if(in[i] == ' ') {
-			continue;
-		}
-		out[j] = in[i];
-		++j;
-	}
-	out[j] = 0;
-}
-
-static wchar_t *
-get_style_endtag ( wchar_t *str, char *out_tag_name )
-/* 在字符串中获取样式的结束标签，输出的是标签名 */
-{
-	wchar_t *p;
-	int i, j, len, tag_found = 0;
-	
-	len = wcslen ( str );
-	//printf("string: %S\n", str);
-	if(str[0] != '<' || str[1] != '/') { 
-		return NULL;
-	} 
-	/* 匹配标签,获取标签名 */
-	for(j=0,i=2; i<len; ++i) {
-		switch(str[i]) {
-		    case ' ': 
-			if(  tag_found == 0 ) {
-				break;
-			} 
-			return NULL;
-		    case '>': goto end_tag_search;
-		    default: out_tag_name[j] = str[i]; ++j; break;
-		}
-	}
-	
-end_tag_search:;
-
-	out_tag_name[j] = 0;
-	if( j < 1 ) { 
-		return NULL;
-	}
-	p = &str[i];
-	return p;
-}
-
-static wchar_t *
-get_style_tag( wchar_t *str, const char *tag, char *out_tag_data )
-/* 在字符串中获取指定样式标签中的数据 */
-{
-	wchar_t *p;
-	int i, j, len, tag_len; 
-	
-	len = wcslen ( str );
-	DEBUG_MSG2("len = %d\n", len);
-	tag_len = strlen ( tag );
-	if(str[0] != '<') {
-		DEBUG_MSG2("str[0] != '<'\n");
-		return NULL;
-	} 
-	/* 匹配标签前半部分 */
-	for(j=0,i=1; i<len; ++i) {
-		if( str[i] == ' ' ) { 
-			if( j == 0 || j >= tag_len ) { 
-				continue;
-			}
-			return NULL;
-		}
-		else if( str[i] == tag[j] ) { 
-			++j;
-		} else { 
-			/* 如果标签名部分已经匹配完 */
-			if( j>= tag_len ) { 
-				if( str[i] == '=' ) {
-					++i; 
-					break;
-				}
-			}
-			/* 否则，有误 */
-			return NULL;
-		}
-	}
-	DEBUG_MSG2("tag is: %s\n", tag);
-	/* 获取标签后半部分 */
-	for(j=0; i<len; ++i) {
-		DEBUG_MSG2("str[%d]: %c\n", i, str[i]);
-		if( str[i] == ' ' ) {
-			continue; 
-		} else {
-			/* 标签结束，退出 */
-			if( str[i] == '>' ) {
-				break;
-			}
-			/* 保存标签内的数据 */
-			out_tag_data[j] = str[i];
-			++j;
-		}
-	}
-	out_tag_data[j] = 0;
-	DEBUG_MSG2("out_tag_data: %s\n", out_tag_data);
-	if(i >= len ) {
-		return NULL;
-	}
-	p = &str[i];
-	return p;
-}
-
-static wchar_t *
-covernt_tag_to_style_data (wchar_t *str, tag_style_data *out_data)
-/* 根据字符串中的标签得到相应的样式数据，并返回指向标签后面字符的指针 */
-{
-	wchar_t *p, *q; 
-	char tag_data[256];
-	
-	p = str; 
-	DEBUG_MSG("covernt_tag_to_style_data(): enter\n");
-	if( (q = get_style_tag ( p, "color", tag_data)) ) {
-		int r,g,b, len, i, j;
-		LCUI_RGB rgb;
-		
-		p = q;
-		DEBUG_MSG("is color style tag, data: %s\n", tag_data);
-		len = strlen(tag_data); 
-		for(j=0,i=0; i<len; ++i) {
-			if(tag_data[i] == ',') {
-				++j;
-			}
-		}
-		if(j == 2) {
-			sscanf( tag_data, "%d,%d,%d", &r, &g, &b ); 
-		}
-		else if(tag_data[0] == '#') {
-			switch(len) {
-			    case 4: 
-				sscanf( tag_data, "#%1X%1X%1X", &r, &g, &b );
-				r<<=4; g<<=4; b<<=4;
-				break;
-			    case 7:
-				sscanf( tag_data, "#%2X%2X%2X", &r, &g, &b ); 
-				break;
-			    default:
-				r=0; g=0; b=0;
-				break;
-			}
-		} else {
-			r=0; g=0; b=0;
-		}
-		DEBUG_MSG("color: %d,%d,%d\n", r,g,b);
-		rgb = RGB(r, g, b);
-		out_data->tag = TAG_ID_COLOR;
-		out_data->style = malloc( sizeof(LCUI_RGB) );
-		memcpy( out_data->style, &rgb, sizeof(LCUI_RGB) );
-	}
-	else if( (q = get_style_tag ( p, "size", tag_data)) ) {
-		PX_PT_t pxpt;
-		p = q;
-		if( get_PX_PT_t( tag_data, &pxpt ) != 0) {
-			return NULL;
-		}
-		out_data->tag = TAG_ID_SIZE;
-		out_data->style = malloc( sizeof(PX_PT_t) );
-		memcpy( out_data->style, &pxpt, sizeof(PX_PT_t) );
-	} else {
-		p = NULL;
-	}
-	DEBUG_MSG("covernt_tag_to_style_data(): quit\n");
-	return p;
-}
-
-static wchar_t *
-handle_style_tag( LCUI_TextLayer *layer, wchar_t *str )
-{
-	wchar_t *q;
-	tag_style_data data;
-	
-	/* 开始处理样式标签 */
-	q = covernt_tag_to_style_data ( str, &data );
-	DEBUG_MSG2("handle_style_tag():%p\n", q);
-	if( q ) {
-		DEBUG_MSG2("add style data\n");
-		/* 将标签样式数据加入队列 */
-		TextLayer_TagStyle_Add( layer, &data ); 
-	}
-	return q;
-}
-
-static wchar_t *
-handle_style_endtag( LCUI_TextLayer *layer, wchar_t *str )
-/* 处理样式的结束标签 */
-{
-	wchar_t *p;
-	char tag_name[256];
-	/* 获取标签名 */
-	p = get_style_endtag( str, tag_name );
-	if( p == NULL ) {
-		return NULL;
-	}
-	if( strcasecmp(tag_name, "color") == 0 ) {
-		/* 消除该标签添加的字体样式 */
-		TextLayer_TagStyle_Delete ( layer, TAG_ID_COLOR );
-	} 
-	else if( strcasecmp(tag_name, "size") == 0 ) {
-		/* 消除该标签添加的字体样式 */
-		TextLayer_TagStyle_Delete ( layer, TAG_ID_SIZE );
-	} else {
-		return NULL;
-	}
-	return p;
-}
-
-/*--------------------------- End Tag Proc ----------------------------*/
-
 static void
-TextLayer_Clear( 
-	LCUI_TextLayer *layer,
-	LCUI_Pos pos, 
-	int max_h, 
-	LCUI_CharData *char_ptr )
+TextLayer_Clear(	LCUI_TextLayer *layer, LCUI_Pos pos, 
+			int max_h, LCUI_CharData *char_ptr )
 {
 	static LCUI_Rect area;
 	//printf("pos: %d,%d, max_h: %d\n", pos.x, pos.y, max_h);
@@ -599,7 +192,7 @@ TextLayer_Update_RowSize (LCUI_TextLayer *layer, int row )
 	
 	row_data = Queue_Get( &layer->rows_data, row );
 	total = Queue_Get_Total( &row_data->string ); 
-	style = TextLayer_Get_Current_TextStyle( layer ); 
+	style = StyleTag_GetCurrentStyle( &layer->tag_buff ); 
 	size = Size(0,14);
 	if( !style ) {
 		if(layer->default_data.pixel_size > 0) {
@@ -663,7 +256,7 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	Queue_Init( &layer->text_source_data, sizeof(LCUI_CharData), Destroy_CharData );
 	Queue_Set_DataMode( &layer->text_source_data, QUEUE_DATA_MODE_LINKED_LIST ); 
 	Queue_Init( &layer->rows_data, sizeof(Text_RowData), Destroy_Text_RowData ); 
-	Queue_Init( &layer->tag_buff, sizeof(tag_style_data), destroy_tag_style_data );
+	StyleTag_Init( &layer->tag_buff );
 	Queue_Init( &layer->style_data, sizeof(LCUI_TextStyle), NULL );
 	RectQueue_Init( &layer->clear_area );
 	/* 初始化屏蔽符的数据 */
@@ -1244,13 +837,13 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text )
 		DEBUG_MSG2( "1, char: %c\n", *p );
 		if( layer->using_style_tags ) {
 			/* 处理样式的结束标签 */ 
-			q = handle_style_endtag ( layer, p );
+			q = StyleTag_ProcessEndingTag( &layer->tag_buff, p );
 			if( q ) {
 				/* 计算需忽略的字符数 */
 				n_ignore = q-p+1;
 			} else {
 				/* 处理样式标签 */
-				q = handle_style_tag ( layer, p ); 
+				q = StyleTag_ProcessTag( &layer->tag_buff, p );
 				if( q ) {
 					n_ignore = q-p+1;
 				}
@@ -1319,7 +912,7 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text )
 		char_data.char_code = *p;
 		char_data.display = TRUE; 
 		char_data.need_update = TRUE; 
-		char_data.data = TextLayer_Get_Current_TextStyle( layer );
+		char_data.data = StyleTag_GetCurrentStyle( &layer->tag_buff );
 		/* 插入至源文本中 */
 		Queue_Insert( &layer->text_source_data, src_pos, &char_data );
 		/* 获取源文本中的字符数据的指针 */
