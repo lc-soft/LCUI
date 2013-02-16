@@ -208,7 +208,7 @@ ProgressBar_ProcMoveingLight(void *arg)
 		}
 		usleep(pb->sleep_time);
 	}
-	LCUI_Thread_Exit(NULL);
+	LCUIThread_Exit(NULL);
 }
 
 static void 
@@ -221,12 +221,12 @@ ProgressBar_ExecShow(LCUI_Widget *widget)
 	if(Strcmp(&widget->style_name, "dynamic") == 0) {
 		if(pb->thread == 0) {
 			Widget_Show(pb->img_pic_box);
-			LCUI_Thread_Create(&pb->thread, ProgressBar_ProcMoveingLight, (void*)widget);
+			LCUIThread_Create(&pb->thread, ProgressBar_ProcMoveingLight, (void*)widget);
 		}
 	} else {
 		Widget_Hide(pb->img_pic_box);
 		if(pb->thread != 0) {/* 否则，如果线程ID不为0，就撤销线程 */
-			LCUI_Thread_Cancel(pb->thread);
+			LCUIThread_Cancel(pb->thread);
 			pb->thread = 0;
 		}
 	}

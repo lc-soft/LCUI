@@ -57,7 +57,7 @@ class LCUIThread
 			void *(*start_rtn)(void*),
 			void * arg )
 	{
-		return LCUI_Thread_Create(&tid, attr, start_rtn, arg);
+		return LCUIThread_Create(&tid, attr, start_rtn, arg);
 	}
 	int rdlock()
 	{
@@ -81,15 +81,15 @@ class LCUIThread
 	}
 	int cancel()
 	{
-		return LCUI_Thread_Cancel(tid);
+		return LCUIThread_Cancel(tid);
 	}
 	int join(void **retval)
 	{
-		return LCUI_Thread_Join(tid, retval);
+		return LCUIThread_Join(tid, retval);
 	}
 	void exit(void* retval) __attribute__ ((__noreturn__))
 	{
-		LCUI_Thread_Exit(retval);
+		LCUIThread_Exit(retval);
 	}
 	thread_t getid()
 	{

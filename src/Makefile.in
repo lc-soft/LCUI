@@ -80,7 +80,7 @@ am__DEPENDENCIES_2 = bmp/libbmp.la draw/libdraw.la \
 libLCUI_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__objects_1 = LCUI_Queue.lo LCUI_Graph.lo LCUI_GraphLayer.lo \
 	LCUI_StyleLibrary.lo LCUI_Work.lo LCUI_Cursor.lo \
-	LCUI_Widget.lo LCUI_Error.lo LCUI_Thread.lo
+	LCUI_Widget.lo LCUI_Error.lo
 am_libLCUI_la_OBJECTS = $(am__objects_1)
 libLCUI_la_OBJECTS = $(am_libLCUI_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -295,8 +295,7 @@ LCUI_SOURCES = \
 	LCUI_Work.c		\
 	LCUI_Cursor.c		\
 	LCUI_Widget.c		\
-	LCUI_Error.c 		\
-	LCUI_Thread.c
+	LCUI_Error.c
 
 LCUI_LIBADD = \
 	bmp/libbmp.la	\
@@ -404,7 +403,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_GraphLayer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Queue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_StyleLibrary.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Thread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Widget.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Work.Plo@am__quote@
 

@@ -50,7 +50,6 @@ LCUI_App *LCUIApp_Find( LCUI_ID id )
 LCUI_App* LCUIApp_GetSelf( void )
 {
 	thread_t id;
-	Thread_TreeNode *ttn;
 	
 	id = thread_self(); /* 获取本线程ID */  
 	if(id == LCUI_Sys.display_thread 
@@ -60,21 +59,8 @@ LCUI_App* LCUIApp_GetSelf( void )
 	{/* 由于内核及其它线程ID没有被记录，只有直接返回LCUI主程序的线程ID了 */
 		return LCUIApp_Find(LCUI_Sys.self_id);
 	}
-	/* 获取父线程的ID */
-	ttn = Search_Thread_Tree(&LCUI_Sys.thread_tree, id);
-	/* 
-	 * 往父级遍历，直至父级指针为NULL，因为根线程是没
-	 * 有父线程结点指针的，程序的线程ID都在根线程里的
-	 * 子线程ID队列中 
-	 * */
-	while( ttn->parent ) { 
-		ttn = ttn->parent; 
-		if( ttn && !ttn->parent ) { 
-			break;
-		}
-	}
-	
-	return LCUIApp_Find(ttn->tid);
+	id = LCUIThread_GetRootThreadID( id );
+	return LCUIApp_Find( id );
 }
 
 /* 获取程序ID */
@@ -156,9 +142,8 @@ static void LCUI_Destroy_App(LCUI_App *app)
 	if( !app ) {
 		return;
 	}
-	
-	LCUI_App_Thread_Cancel(app->id); /* 撤销这个程序的所有线程 */
-	LCUIApp_DestroyAllWidgets(app->id); /* 销毁这个程序的所有部件 */
+	LCUIApp_CancelAllThreads( app->id ); /* 撤销这个程序的所有线程 */
+	LCUIApp_DestroyAllWidgets( app->id ); /* 销毁这个程序的所有部件 */
 }
 
 static void LCUI_AppList_Init()

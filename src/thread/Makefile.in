@@ -47,7 +47,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libthread_la_LIBADD =
-am_libthread_la_OBJECTS = thread.lo mutex.lo
+am_libthread_la_OBJECTS = LCUI_Thread.lo thread.lo mutex.lo
 libthread_la_OBJECTS = $(am_libthread_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -211,7 +211,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign 
 INCLUDES = -I$(abs_top_srcdir)/include 
-libthread_la_SOURCES = pthread/thread.c pthread/mutex.c
+libthread_la_SOURCES = LCUI_Thread.c pthread/thread.c pthread/mutex.c
 noinst_LTLIBRARIES = libthread.la
 all: all-am
 
@@ -265,6 +265,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LCUI_Thread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mutex.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thread.Plo@am__quote@
 

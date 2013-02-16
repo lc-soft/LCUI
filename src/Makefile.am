@@ -24,8 +24,7 @@ LCUI_SOURCES = \
 	LCUI_Work.c		\
 	LCUI_Cursor.c		\
 	LCUI_Widget.c		\
-	LCUI_Error.c 		\
-	LCUI_Thread.c
+	LCUI_Error.c
 
 LCUI_LIBADD = \
 	bmp/libbmp.la	\

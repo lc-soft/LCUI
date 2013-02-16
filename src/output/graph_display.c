@@ -220,7 +220,7 @@ Handle_Area_Update ()
 {
 #ifdef need_autoquit
 	thread_t t;
-	LCUI_Thread_Create(&t, NULL, autoquit, NULL);
+	LCUIThread_Create(&t, NULL, autoquit, NULL);
 #endif
 	int timer_id;
 	/* 添加个定时器，每隔1秒刷新FPS计数 */

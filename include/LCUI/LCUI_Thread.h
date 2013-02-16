@@ -73,24 +73,6 @@
 
 LCUI_BEGIN_HEADER
 
-/************ 线程队列 **************/
-struct _Thread_Queue
-{
-	Thread_TreeNode **queue;	/* 储存队列成员 */
-	int max_num;			/* 最大成员数量 */
-	int total_num;			/* 当前成员总数 */
-};
-/***********************************/
-
-/************ 线程树的结点 ***************/
-struct _Thread_TreeNode
-{
-	Thread_TreeNode *parent;	/* 父线程结点指针 */
-	thread_t tid;			/* 父线程ID */
-	Thread_Queue child;		/* 子线程队列 */
-};
-/***************************************/
-
 thread_t thread_self( void );
 
 int thread_create(	thread_t *__newthread,
@@ -113,50 +95,27 @@ int thread_mutex_lock( mutex_t *mutex );
 int thread_mutex_unlock( mutex_t *mutex );
 
 
-void Thread_TreeNode_Init(Thread_TreeNode *ttn);
-/* 功能：初始化线程树结点 */
+/* 获取指定线程的根线程ID */
+thread_t LCUIThread_GetRootThreadID( thread_t tid );
 
-Thread_TreeNode *
-Search_Thread_Tree(Thread_TreeNode *ttn, thread_t tid);
-/*
- * 功能：从指定线程树的结点中搜索匹配的线程ID，并返回线程树结点的指针
- * 提示：该遍历树的算法比较简陋，有待完善。
- **/
+/* 创建并运行一个线程 */
+int LCUIThread_Create( thread_t *tidp, void *(*start_rtn)(void*), void * arg );
 
-Thread_TreeNode *
-Thread_TreeNode_Add_New(Thread_TreeNode *ttn, thread_t tid);
-/* 功能：在线程树中添加新的结点 */
-
-int Thread_TreeNode_Delete(Thread_TreeNode *ttn, thread_t tid);
-/* 功能：在线程树中删除一个结点 */
-
-int LCUI_Thread_Create( thread_t *tidp,
-			void *(*start_rtn)(void*),
-			void * arg );
-/*
- * 功能：创建一个线程
- * 说明：主要是调用pthread_create函数来创建线程，并进行附加处理
- * */
-
-int LCUI_Thread_Join(thread_t thread, void **retval);
+int LCUIThread_Join(thread_t thread, void **retval);
 /* 功能：等待一个线程的结束 */
 
-int LCUI_Thread_Cancel(thread_t thread);
+int LCUIThread_Cancel(thread_t thread);
 /* 功能：撤销一个线程 */
 
-void LCUI_Thread_Exit(void* retval)  __attribute__ ((__noreturn__));
+void LCUIThread_Exit(void* retval)  __attribute__ ((__noreturn__));
 /*
  * 功能：终止调用它的线程并返回一个指向某个对象的指针
- * 说明：线程通过调用LCUI_Thread_Exit函数终止执行，就如同进程在结
+ * 说明：线程通过调用LCUIThread_Exit函数终止执行，就如同进程在结
  * 束时调用exit函数一样。
  * */
 
-
-int LCUI_Thread_Tree_Cancel(Thread_TreeNode *ttn);
-/* 功能：撤销线程关系树的结点中的线程以及它的所有子线程 */
-
-int LCUI_App_Thread_Cancel(LCUI_ID app_id);
-/* 功能：撤销指定ID的程序的全部线程 */
+/* 撤销指定ID的程序的全部子线程 */
+int LCUIApp_CancelAllThreads( LCUI_ID app_id );
 
 /* 初始化线程模块 */
 void LCUIModule_Thread_Init( void );

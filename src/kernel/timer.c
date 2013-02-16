@@ -129,7 +129,7 @@ timer_list_process( void *arg )
 		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */
 		AppTasks_CustomAdd( ADD_MODE_REPLACE, &func_data );
 	}
-	LCUI_Thread_Exit(NULL);
+	LCUIThread_Exit(NULL);
 }
 
 static timer_data *

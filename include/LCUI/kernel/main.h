@@ -41,7 +41,6 @@ typedef struct _LCUI_System
 	thread_t display_thread;	/* 保存核心处理的线程的ID */
 	thread_t timer_thread;		/* 定时器列表处理线程的ID */
 	thread_t dev_thread;		/* 设备输入数据处理线程的ID */
-	Thread_TreeNode thread_tree; /* 线程关系树 */
 	
 	LCUI_Cursor	cursor;		/* 游标 */
 	

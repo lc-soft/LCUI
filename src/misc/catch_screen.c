@@ -133,7 +133,7 @@ static void *catch()
 		write_png( filename, &graph );
 		usleep(35000);
 	}
-	LCUI_Thread_Exit(NULL);
+	LCUIThread_Exit(NULL);
 }
 
 int start_record_screen( LCUI_Rect area )
@@ -144,7 +144,7 @@ int start_record_screen( LCUI_Rect area )
 	}
 	need_break = FALSE;
 	target_area = area;
-	return LCUI_Thread_Create(&t, catch, NULL );
+	return LCUIThread_Create(&t, catch, NULL );
 }
 
 int end_catch_screen()
@@ -154,5 +154,5 @@ int end_catch_screen()
 		return -1;
 	}
 	need_break = TRUE;
-	return LCUI_Thread_Join(t, NULL);
+	return LCUIThread_Join(t, NULL);
 }
