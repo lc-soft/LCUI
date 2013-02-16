@@ -65,9 +65,8 @@ ALPHA_BLENDING( uchar_t fore, uchar_t back, uchar_t alpha )
 LCUI_RGB RGB ( uchar_t red, uchar_t green, uchar_t blue ) ;
 /* 将三个颜色值转换成LCUI_RGB型数据 */
 
-void Graph_Lock(LCUI_Graph *pic, int mode);
-/* 功能：以指定模式使用图像数据
- * 说明：参数mode的值为0时，以“读”模式使用数据，其它值时，以“写模式使用数据” */ 
+/* 为图形数据设定互斥锁 */
+void Graph_Lock( LCUI_Graph *graph );
 
 void Graph_Update_Attr( LCUI_Graph *buff );
 /* 更新图层的属性 */

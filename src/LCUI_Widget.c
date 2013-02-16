@@ -1001,15 +1001,14 @@ int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 	//	_DEBUG_MSG("add rect: %d,%d,%d,%d\n", 
 	//		rect.x, rect.y, rect.width, rect.height );
 	//}
-	/* 以“写”模式使用该队列 */
-	Queue_Using( &widget->invalid_area, RWLOCK_WRITE );
+	
+	Queue_Lock( &widget->invalid_area );
 	/* 保存至队列中 */
 	if(0 != Queue_Add( &widget->invalid_area, &rect ) ) {
-		Queue_End_Use( &widget->invalid_area );
+		Queue_UnLock( &widget->invalid_area );
 		return -1;
 	}
-	/* 使用结束 */
-	Queue_End_Use( &widget->invalid_area );
+	Queue_UnLock( &widget->invalid_area );
 	return 0;
 }
 
@@ -1310,8 +1309,8 @@ Destroy_Widget(LCUI_Widget *widget)
 	free( widget->private_data );
 }
 
+/* 初始化部件队列 */
 void WidgetQueue_Init(LCUI_Queue *queue)
-/* 功能：初始化部件队列 */
 {
 	Queue_Init(queue, sizeof(LCUI_Widget), Destroy_Widget);
 }

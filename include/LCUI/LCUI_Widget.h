@@ -313,6 +313,9 @@ int Empty_Widget();
 /* 功能：为部件私有结构体指针分配内存 */
 void *WidgetPrivData_New( LCUI_Widget *widget, size_t size );
 
+/* 初始化部件队列 */
+void WidgetQueue_Init(LCUI_Queue *queue);
+
 /* 
  * 功能：创建指定类型的部件
  * 返回值：成功则部件的指针，失败则返回NULL

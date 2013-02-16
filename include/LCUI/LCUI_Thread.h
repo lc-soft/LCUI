@@ -55,33 +55,23 @@
 #ifndef __LCUI_THREAD_H__
 #define __LCUI_THREAD_H__ 
 
-typedef enum _rwlock_state
-{
-	RWLOCK_FREE,
-	RWLOCK_READ,
-	RWLOCK_WRITE
-}
-rwlock_state;
-
-#define POSIX_THREAD
-#ifdef POSIX_THREAD
-#include <pthread.h>
-
-typedef pthread_t thread_t;
-typedef pthread_attr_t thread_attr_t;
-
-typedef struct _thread_rwlock
-{
-	pthread_t host;
-	pthread_rwlock_t lock;
-	//pthread_cond_t cond;
-	pthread_mutex_t mutex; 
-	rwlock_state state;
-}
-thread_rwlock;
-#else
-
+#ifndef LCUI_THREAD_PTHREAD
+#define LCUI_THREAD_PTHREAD
 #endif
+
+#ifdef LCUI_THREAD_PTHREAD
+	#include <pthread.h>
+	typedef pthread_mutex_t mutex_t;
+	typedef pthread_t thread_t;
+#elif LCUI_THREAD_WIN32
+	#include <windows.h>
+	typedef HANDLE mutex_t;
+	typedef HANDLE thread_t;
+#else
+	#error 'Need thread implementation for this platform'
+#endif
+
+LCUI_BEGIN_HEADER
 
 /************ 线程队列 **************/
 struct _Thread_Queue
@@ -101,101 +91,72 @@ struct _Thread_TreeNode
 };
 /***************************************/
 
-LCUI_BEGIN_HEADER
-
-/************************ thread management ***************************/ 
-thread_t thread_self();
+thread_t thread_self( void );
 
 int thread_create(	thread_t *__newthread,
-			const thread_attr_t *__attr,
 			void *(*__start_routine) (void *),
 			void *__arg );
 
-int thread_cancel(thread_t __th);
+int thread_cancel( thread_t __th );
 
-int thread_join(thread_t __th, void **__thread_return);
+int thread_join( thread_t __th, void **__thread_return );
 
-void thread_exit(void *__retval) __attribute__ ((__noreturn__));;
-/********************* end thread management ***************************/ 
+void thread_exit( void *__retval ) __attribute__ ((__noreturn__));
 
 
-/************************ thread R/W lock *****************************/ 
-void thread_perror(char *msg, int err);
+int thread_mutex_init( mutex_t *mutex );
 
-void thread_rwlock_init(thread_rwlock *rwlock);
-/* 功能：初始化读写锁 */ 
+int thread_mutex_destroy( mutex_t *mutex );
 
-void thread_rwlock_destroy(thread_rwlock *rwlock);
-/* 功能：销毁读写锁 */ 
-	
-int thread_wait_mutex(thread_rwlock *rwlock);
-/* 功能：等待互斥锁为解锁状态 */ 
+int thread_mutex_lock( mutex_t *mutex );
 
-int thread_rwlock_rdlock(thread_rwlock *rwlock);
-/* 功能：设定“读”锁 */ 
-
-int thread_rwlock_wrlock(thread_rwlock *rwlock);
-/* 功能：设定“写”锁 */ 
-
-int thread_rwlock_unlock(thread_rwlock *rwlock);
-/* 功能：解开读写锁 */ 
-
-rwlock_state thread_rwlock_get_state(thread_rwlock *rwlock);
-/* 功能：获取读写锁的状态 */ 
-
-int thread_mutex_lock(thread_rwlock *rwlock);
-/* 功能：设定互斥锁 */ 
-
-int thread_mutex_unlock(thread_rwlock *rwlock);
-/* 功能：解开互斥锁 */ 
-
-/*********************** End thread R/W lock **************************/
+int thread_mutex_unlock( mutex_t *mutex );
 
 
 void Thread_TreeNode_Init(Thread_TreeNode *ttn);
-/* 功能：初始化线程树结点 */ 
+/* 功能：初始化线程树结点 */
 
 Thread_TreeNode *
 Search_Thread_Tree(Thread_TreeNode *ttn, thread_t tid);
 /*
  * 功能：从指定线程树的结点中搜索匹配的线程ID，并返回线程树结点的指针
  * 提示：该遍历树的算法比较简陋，有待完善。
- **/ 
+ **/
 
 Thread_TreeNode *
 Thread_TreeNode_Add_New(Thread_TreeNode *ttn, thread_t tid);
-/* 功能：在线程树中添加新的结点 */ 
+/* 功能：在线程树中添加新的结点 */
 
 int Thread_TreeNode_Delete(Thread_TreeNode *ttn, thread_t tid);
-/* 功能：在线程树中删除一个结点 */ 
+/* 功能：在线程树中删除一个结点 */
 
 int LCUI_Thread_Create( thread_t *tidp,
-			const thread_attr_t *attr,
 			void *(*start_rtn)(void*),
 			void * arg );
 /*
  * 功能：创建一个线程
  * 说明：主要是调用pthread_create函数来创建线程，并进行附加处理
- * */ 
+ * */
 
 int LCUI_Thread_Join(thread_t thread, void **retval);
-/* 功能：等待一个线程的结束 */ 
+/* 功能：等待一个线程的结束 */
 
 int LCUI_Thread_Cancel(thread_t thread);
-/* 功能：撤销一个线程 */ 
+/* 功能：撤销一个线程 */
 
-void LCUI_Thread_Exit(void* retval) __attribute__ ((__noreturn__));
+void LCUI_Thread_Exit(void* retval)  __attribute__ ((__noreturn__));
 /*
  * 功能：终止调用它的线程并返回一个指向某个对象的指针
  * 说明：线程通过调用LCUI_Thread_Exit函数终止执行，就如同进程在结
  * 束时调用exit函数一样。
- * */ 
+ * */
+
 
 int LCUI_Thread_Tree_Cancel(Thread_TreeNode *ttn);
-/* 功能：撤销线程关系树的结点中的线程以及它的所有子线程 */ 
+/* 功能：撤销线程关系树的结点中的线程以及它的所有子线程 */
 
 int LCUI_App_Thread_Cancel(LCUI_ID app_id);
-/* 功能：撤销指定ID的程序的全部线程 */ 
+/* 功能：撤销指定ID的程序的全部线程 */
 
 /* 初始化线程模块 */
 void LCUIModule_Thread_Init( void );

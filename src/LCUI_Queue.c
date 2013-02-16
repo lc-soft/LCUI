@@ -69,50 +69,22 @@
 #include <unistd.h>
 
 /************************ LCUI_Queue **********************************/
-int Queue_Lock (LCUI_Queue *queue)
-/* 功能：锁定一个队列，使之只能被一个线程使用 */
+/* 为队列设定互斥锁，使之只能被一个线程使用 */
+int Queue_Lock( LCUI_Queue *queue )
 { 
-	return thread_mutex_lock(&queue->lock);
+	return thread_mutex_lock( &queue->mutex );
 }
 
-int Queue_UnLock (LCUI_Queue *queue)
-/* 功能：解开队列锁 */
+/* 解开队列的互斥锁 */
+int Queue_UnLock( LCUI_Queue *queue )
 {
-	return thread_mutex_unlock(&queue->lock);
-}
-
-int Queue_Using (LCUI_Queue * queue, int mode) 
-/* 
- * 功能：设定队列的状态为“使用” 
- * 说明：参数mode需要是QUEUE_MODE_READ和QUEUE_MODE_WRITE这两种之一。
- * QUEUE_MODE_READ 表示“读”模式，由于是读，可以和其它以“读”模式访问本队列的线程共享。
- * QUEUE_MODE_WRITE 表示“写”模式，写只能由一个线程写，其它线程既不能读也不能写。
- * */
-{ 
-	if(mode == QUEUE_MODE_READ) {
-	//	printf("use, queue: %p, mode: read\n", queue);
-		return thread_rwlock_rdlock(&queue->lock); 
-	} else {
-		//printf("use, queue: %p, mode: write\n", queue);
-		return thread_rwlock_wrlock(&queue->lock);  
-	}
-}
-
-int Queue_End_Use (LCUI_Queue * queue) 
-/* 功能：储存矩形数据的队列为空闲状态 */
-{
-	//switch(queue->lock.state) {
-	    //case RWLOCK_WRITE:printf("end use, queue: %p, befor mode: write\n", queue);break;
-	    //case RWLOCK_READ:printf("end use, queue: %p, befor mode: read\n", queue);break;
-	    //case RWLOCK_FREE:printf("end use, queue: %p, befor mode: free\n", queue);break;
-	//}
-	return thread_rwlock_unlock(&queue->lock); 
+	return thread_mutex_unlock( &queue->mutex );
 }
 
 void Queue_Init (LCUI_Queue * queue, size_t element_size, void (*func) ()) 
 /* 功能：初始化队列 */
 {
-	thread_rwlock_init(&queue->lock);
+	thread_mutex_init( &queue->mutex );
 	queue->member_type	= 0;
 	queue->data_mode	= 0;
 	queue->data_array	= NULL;
@@ -215,7 +187,7 @@ void Destroy_Queue(LCUI_Queue * queue)
 	queue->data_head_node.next = NULL;
 	queue->total_num = 0;
 	queue->max_num = 0;
-	thread_rwlock_destroy(&queue->lock);
+	thread_mutex_destroy( &queue->mutex );
 }
 
 

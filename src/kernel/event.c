@@ -152,8 +152,7 @@ static int LCUI_StartEventThread( void )
 {
 	LCUI_StopEventThread();
 	active = TRUE;
-	return thread_create(	&eventloop_thread, NULL, 
-				LCUI_EventLoop, NULL );
+	return thread_create( &eventloop_thread, LCUI_EventLoop, NULL );
 }
 
 /* 初始化事件模块 */

@@ -68,7 +68,7 @@ proc_dev_list ( void *arg )
 int LCUIModule_Device_Init()
 {
 	dev_list_init( &LCUI_Sys.dev_list );
-	return thread_create( &LCUI_Sys.dev_thread, NULL, 
+	return thread_create( &LCUI_Sys.dev_thread,
 			proc_dev_list, &LCUI_Sys.dev_list );
 }
 

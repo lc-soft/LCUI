@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * catch_screen.c -- ��Ļ��ͼ֧��
+ * catch_screen.c -- 屏幕截图支持
  *
- * ��Ȩ���� (C) 2012 ������ 
- * ����
+ * 版权所有 (C) 2012 归属于 
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 
@@ -50,8 +50,8 @@
 
 void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 /* 
- * ���ܣ�ͨ���ڴ��е�ͼ�����ݣ���������Ļ����ʾ��ͼ��
- * ˵����Ч�ʽϵͣ���Ϊ��Ҫ���кϳɡ�
+ * 功能：通过内存中的图像数据，捕获将在屏幕上显示的图像
+ * 说明：效率较低，因为需要进行合成。
  *  */
 {
 	Get_Screen_Real_Graph(area, out);
@@ -59,19 +59,19 @@ void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 
 void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 /* 
- * ���ܣ�ֱ�Ӷ�ȡ֡�����е�ͼ������
- * ˵����Ч�ʽϸߣ��������ͼ���п��ܻ������⡣
+ * 功能：直接读取帧缓冲中的图像数据
+ * 说明：效率较高，但捕获的图像有可能会有问题。
  * */
 {
 	LCUI_Rect cut_rect;
 	unsigned char *dest;
-	dest = LCUI_Sys.screen.fb_mem;	/* ָ��֡���� */
+	dest = LCUI_Sys.screen.fb_mem;	/* 指向帧缓冲 */
 	int x, y, n, k, count;
 	
 	if( !LCUI_Active() ) {
 		return;
 	}
-	/* �����Ҫ�ü�ͼ�� */
+	/* 如果需要裁剪图形 */
 	if ( Get_Cut_Area ( Get_Screen_Size(), area,&cut_rect ) ){
 		if(!Rect_Valid(cut_rect)) {
 			return;
@@ -84,8 +84,8 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 	}
 	
 	Graph_Create(out, area.width, area.height);
-	Graph_Lock (out, 1); 
-	/* ֻ����������32λ��ʾ������ʾ��ͼ�Σ��д����� */
+	Graph_Lock (out); 
+	/* 只能正常捕获32位显示器中显示的图形，有待完善 */
 	for (n=0,y=0; y < area.height; ++y) {
 		k = (area.y + y) * LCUI_Sys.screen.size.w + area.x;
 		for (x = 0; x < area.width; ++x) {
@@ -104,7 +104,7 @@ static int need_break = FALSE;
 static pthread_t t = 0;
 static LCUI_Rect target_area;
 static void *catch()
-/* �ڽ�ȡ����ʱ�������������������Ļ���� */
+/* 在截取动画时，会用这个函数捕获屏幕内容 */
 {
 	LCUI_Graph graph;
 	LCUI_Rect area;
@@ -137,18 +137,18 @@ static void *catch()
 }
 
 int start_record_screen( LCUI_Rect area )
-/* ¼����Ļָ����������� */
+/* 录制屏幕指定区域的内容 */
 {
 	if( t != 0 ) {
 		return -1;
 	}
 	need_break = FALSE;
 	target_area = area;
-	return LCUI_Thread_Create(&t, NULL, catch, NULL );
+	return LCUI_Thread_Create(&t, catch, NULL );
 }
 
 int end_catch_screen()
-/* ����¼�� */
+/* 结束录制 */
 {
 	if( t == 0 ) {
 		return -1;

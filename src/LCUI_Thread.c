@@ -67,7 +67,6 @@ void Thread_TreeNode_Init(Thread_TreeNode *ttn)
 	ttn->parent = NULL;
 }
 
-
 Thread_TreeNode *
 Search_Thread_Tree(Thread_TreeNode *ttn, thread_t tid)
 /*
@@ -181,7 +180,6 @@ int Thread_TreeNode_Delete(Thread_TreeNode *ttn, thread_t tid)
 }
 
 int LCUI_Thread_Create( thread_t *tidp,
-			const thread_attr_t *attr,
 			void *(*start_rtn)(void*),
 			void * arg )
 /*
@@ -201,7 +199,7 @@ int LCUI_Thread_Create( thread_t *tidp,
 		}
 	}
 	/* 调用pthread_create函数来创建线程 */
-	thread_create(tidp, attr, start_rtn, arg);
+	thread_create(tidp, start_rtn, arg);
 	//printf("create thread:%lu, parent thread:%lu\n", *tidp, t);
 	Thread_TreeNode_Add_New(tt, *tidp);/* 将得到的线程ID添加至结点 */
 	return 0;

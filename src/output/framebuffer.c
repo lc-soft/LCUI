@@ -45,7 +45,6 @@
 #include LC_GRAPH_H
 #include LC_DISPLAY_H 
 
-#ifdef GRAPH_OUTPUT_USE_FRAMEBUFFER
 #include <stdio.h>
 #include <stdlib.h>
 #include <linux/fb.h> 
@@ -317,7 +316,7 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 		pic = &temp;
 	}
 	
-	Graph_Lock (pic, 0);
+	Graph_Lock( pic );
 	/* 获取显示器的位数 */
 	bits = Get_Screen_Bits(); 
 	switch(bits) {
@@ -416,5 +415,3 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 	Graph_Free (&temp);
 	return 0;
 }
-
-#endif

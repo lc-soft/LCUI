@@ -41,8 +41,6 @@
 #ifndef __LCUI_QUEUE_H__
 #define __LCUI_QUEUE_H__
 
-#include LC_THREAD_H
-
 /********* 队列的使用模式 *******/
 #define QUEUE_MODE_FREE		0
 #define QUEUE_MODE_READ		1
@@ -54,6 +52,8 @@
 
 typedef struct _LCUI_Queue	LCUI_Queue;
 typedef struct _LCUI_Node	LCUI_Node;
+
+#include LC_THREAD_H
 
 typedef enum _Queue_DataMode
 {
@@ -74,7 +74,7 @@ struct _LCUI_Node
 /****************************** 队列 ***********************************/
 struct _LCUI_Queue
 { 
-	thread_rwlock lock;	/* 读写锁 */
+	mutex_t mutex;
 	int member_type:2;	/* 成员类型 */ 
 	int data_mode:2;	/* 数据储存方式（数组/链表） */
 	
@@ -91,22 +91,11 @@ struct _LCUI_Queue
 LCUI_BEGIN_HEADER
 
 /************************ LCUI_Queue **********************************/
-int Queue_Lock (LCUI_Queue *queue);
-/* 功能：锁定一个队列，使之只能被一个线程使用 */ 
+/* 为队列设定互斥锁，使之只能被一个线程使用 */
+int Queue_Lock( LCUI_Queue *queue );
 
-int Queue_UnLock (LCUI_Queue *queue);
-/* 功能：解开队列锁 */ 
-
-int Queue_Using (LCUI_Queue * queue, int mode) ;
-/* 
- * 功能：设定队列的状态为“使用” 
- * 说明：参数mode需要是QUEUE_MODE_READ和QUEUE_MODE_WRITE这两种之一。
- * QUEUE_MODE_READ 表示“读”模式，由于是读，可以和其它以“读”模式访问本队列的线程共享。
- * QUEUE_MODE_WRITE 表示“写”模式，写只能由一个线程写，其它线程既不能读也不能写。
- * */ 
-
-int Queue_End_Use (LCUI_Queue * queue) ;
-/* 功能：储存矩形数据的队列为空闲状态 */ 
+/* 解开队列的互斥锁 */
+int Queue_UnLock( LCUI_Queue *queue );
 
 void Queue_Init (LCUI_Queue * queue, size_t element_size, void (*func) ()) ;
 /* 功能：初始化队列 */ 
@@ -190,14 +179,6 @@ int Queue_Empty(LCUI_Queue *queue);
 /* 查找指定成员指针所在队列中的位置 */
 int Queue_Find( LCUI_Queue *queue, const void *p );
 /************************ LCUI_Queue End ******************************/
-
-/************************** WidgetQueue ********************************/ 
-
-void WidgetQueue_Init(LCUI_Queue *queue);
-/* 功能：初始化部件队列 */ 
-
-/************************ WidgetQueue End ******************************/
-
 
 /************************* RectQueue **********************************/
 void RectQueue_Init(LCUI_Queue *queue);

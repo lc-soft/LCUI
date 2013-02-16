@@ -156,7 +156,7 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 		printf("write_png(): Error during writing header\n");
 		return -1;
 	}
-	Graph_Lock(graph, 0);
+	Graph_Lock(graph);
 	if(Graph_Have_Alpha(graph)) {
 		color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 	} else {

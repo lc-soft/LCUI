@@ -95,11 +95,11 @@ int Add_Screen_Refresh_Area (LCUI_Rect rect)
 	//if( debug_count >= 20 ) {
 	//	abort();
 	//}
-	/* 为队列加上“写”锁，以确保正常操作队列 */
-	Queue_Using( &LCUI_Sys.invalid_area, RWLOCK_WRITE );
+	
+	Queue_Lock( &LCUI_Sys.invalid_area );
 	ret = RectQueue_Add ( &LCUI_Sys.invalid_area, rect );
 	/* 队列使用结束，解开锁 */
-	Queue_End_Use( &LCUI_Sys.invalid_area );
+	Queue_UnLock( &LCUI_Sys.invalid_area );
 	return ret;
 }
 
@@ -257,7 +257,7 @@ int LCUIModule_Video_Init( void )
 {
 	Screen_Init();
 	return thread_create( &LCUI_Sys.display_thread, 
-			NULL, Handle_Area_Update, NULL );
+			Handle_Area_Update, NULL );
 }
 
 /* 停用图形输出模块 */

@@ -616,6 +616,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+LCUI_VIDEO_DRIVER
+LCUI_THREAD_NAME
 JPEG_LIBS
 PNG_LIBS
 TS_LIBS
@@ -11608,6 +11610,7 @@ if test "${with_pthread+set}" = set; then :
 fi
 
 if test "x$with_pthread" != "xno"; then
+    ##检测是否有pthread函数库，测试调用pthread_create函数，若成功则want_thread=yes，否则want_thread=no
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for pthread_create in -lpthread" >&5
 $as_echo_n "checking for pthread_create in -lpthread... " >&6; }
 if ${ac_cv_lib_pthread_pthread_create+:} false; then :
@@ -11652,6 +11655,7 @@ fi
 
     if test "x$want_thread" != "xno"; then
 	THREAD_LIBS=-lpthread
+	##检测pthread.h头文件
 	for ac_header in pthread.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "pthread.h" "ac_cv_header_pthread_h" "$ac_includes_default"
@@ -11666,6 +11670,7 @@ fi
 
 done
 
+	##让THREAD_LIBS变量能够在每个Makefile中能用到
 
     fi
 fi
@@ -12223,13 +12228,15 @@ _ACEOF
 
 fi
 
+LCUI_THREAD_NAME=none
 if test "$want_thread" = "yes"; then
     if test "$thread_name" = "pthread"; then
 
 cat >>confdefs.h <<_ACEOF
-#define USE_PTHREAD 1
+#define LCUI_THREAD_PTHREAD 1
 _ACEOF
 
+	LCUI_THREAD_NAME=pthread
     else
         thread_name=none
     fi
@@ -12237,29 +12244,23 @@ else
     thread_name=none
 fi
 
+
+LCUI_VIDEO_DRIVER=dummy
 if test "$want_graph_display" = "yes"; then
     if test "$graph_output_dev" = "framebuffer"; then
 
 cat >>confdefs.h <<_ACEOF
-#define GRAPH_OUTPUT_USE_FRAMEBUFFER 1
+#define LCUI_VIDEO_DRIVER_FRAMEBUFFER 1
 _ACEOF
 
+        LCUI_VIDEO_DRIVER=framebuffer
     else
-
-cat >>confdefs.h <<_ACEOF
-#define GRAPH_OUTPUT_USE_DUMMY 1
-_ACEOF
-
         graph_output_dev=none
     fi
 else
-
-cat >>confdefs.h <<_ACEOF
-#define GRAPH_OUTPUT_USE_DUMMY 1
-_ACEOF
-
     graph_output_dev=none
 fi
+
 
 ##输出文件
 ac_config_files="$ac_config_files Makefile lcui.pc include/Makefile include/LCUI/Makefile include/LCUI/font/Makefile include/LCUI/draw/Makefile include/LCUI/widget/Makefile include/LCUI/kernel/Makefile include/LCUI/gui/Makefile src/Makefile src/font/Makefile src/font/in-core/Makefile src/draw/Makefile src/draw/in-core/Makefile src/thread/Makefile src/bmp/Makefile src/misc/Makefile src/kernel/Makefile src/input/Makefile src/output/Makefile src/widget/Makefile src/gui/Makefile test/Makefile test/mora/Makefile test/photoviewer/Makefile test/clock/Makefile test/screenlock/Makefile"

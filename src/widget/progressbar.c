@@ -221,7 +221,7 @@ ProgressBar_ExecShow(LCUI_Widget *widget)
 	if(Strcmp(&widget->style_name, "dynamic") == 0) {
 		if(pb->thread == 0) {
 			Widget_Show(pb->img_pic_box);
-			LCUI_Thread_Create(&pb->thread, NULL, ProgressBar_ProcMoveingLight, (void*)widget);
+			LCUI_Thread_Create(&pb->thread, ProgressBar_ProcMoveingLight, (void*)widget);
 		}
 	} else {
 		Widget_Hide(pb->img_pic_box);

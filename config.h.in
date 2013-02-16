@@ -1,11 +1,5 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if you disable graph display support */
-#undef GRAPH_OUTPUT_USE_DUMMY
-
-/* Define to 1 if you select FrameBuffer for graph display support */
-#undef GRAPH_OUTPUT_USE_FRAMEBUFFER
-
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
@@ -96,6 +90,12 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
+/* Define to 1 if you using pthread support */
+#undef LCUI_THREAD_PTHREAD
+
+/* Define to 1 if you select FrameBuffer for graph display support */
+#undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
@@ -135,9 +135,6 @@
 
 /* Define to 1 if you have the libpng */
 #undef USE_LIBPNG
-
-/* Define to 1 if you select pthread for thread support */
-#undef USE_PTHREAD
 
 /* Define to 1 if you have the tslib */
 #undef USE_TSLIB

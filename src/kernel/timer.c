@@ -249,7 +249,7 @@ int timer_thread_start( thread_t *tid, LCUI_Queue *list )
 	timer_list_init( list );
 	timer_thread_active = TRUE;
 	/* 创建用于处理定时器列表的线程 */
-	return thread_create( tid, NULL, timer_list_process, list );
+	return thread_create( tid, timer_list_process, list );
 }
 
 /* 停止定时器的处理线程，并销毁定时器列表 */

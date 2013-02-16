@@ -57,22 +57,16 @@ LCUI_RGB RGB ( uchar_t red, uchar_t green, uchar_t blue )
 	return color;
 }
 
-void Graph_Lock(LCUI_Graph *pic, int mode)
-/* 功能：以指定模式使用图像数据
- * 说明：参数mode的值为0时，以“读”模式使用数据，其它值时，以“写模式使用数据” */
+/* 为图形数据设定互斥锁 */
+void Graph_Lock( LCUI_Graph *graph )
 {
 	LCUI_Graph *src;
-	src = Get_Quote_Graph(pic);
-	
-	if(mode == 0) {
-		thread_rwlock_rdlock(&src->lock);
-	} else {
-		thread_rwlock_wrlock(&src->lock);
-	}
+	src = Get_Quote_Graph(graph);
+	thread_mutex_lock( &src->mutex );
 }
 
-void Graph_Update_Attr( LCUI_Graph *buff )
 /* 更新图层的属性 */
+void Graph_Update_Attr( LCUI_Graph *buff )
 {
 	LCUI_Graph *src;
 	LCUI_Rect src_rect;
@@ -145,12 +139,12 @@ void Graph_Update_Attr( LCUI_Graph *buff )
 	}
 }
 
-void Graph_Unlock(LCUI_Graph *pic)
-/* 解除锁，以结束图像数据的使用 */
+/* 解除互斥锁，以结束图像数据的使用 */
+void Graph_Unlock( LCUI_Graph *graph )
 {
 	LCUI_Graph *src;
-	src = Get_Quote_Graph(pic);
-	thread_rwlock_unlock(&src->lock);
+	src = Get_Quote_Graph(graph);
+	thread_mutex_unlock( &src->mutex );
 }
 
 
@@ -340,7 +334,7 @@ void Graph_Init(LCUI_Graph *pic)
 	pic->height	= 0;
 	pic->type	= DEFAULT;
 	pic->bit_depth	= 8;	/* 位深 */
-	thread_rwlock_init(&pic->lock);	/* 读/写/互斥锁 */
+	thread_mutex_init( &pic->mutex );
 }
 
 static uchar_t** 

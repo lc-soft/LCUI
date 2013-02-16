@@ -47,10 +47,13 @@ want_thread=no
 thread_name=pthread
 AC_ARG_WITH(pthread, [  --with-pthread          use pthread	(default)])
 if test "x$with_pthread" != "xno"; then
+    ##检测是否有pthread函数库，测试调用pthread_create函数，若成功则want_thread=yes，否则want_thread=no
     AC_CHECK_LIB([pthread], [pthread_create], want_thread=yes, want_thread=no)
     if test "x$want_thread" != "xno"; then
 	THREAD_LIBS=-lpthread
+	##检测pthread.h头文件
 	AC_CHECK_HEADERS([pthread.h],want_thread=yes,want_thread=no)
+	##让THREAD_LIBS变量能够在每个Makefile中能用到
 	AC_SUBST(THREAD_LIBS)
     fi
 fi
@@ -161,27 +164,31 @@ if test "$want_iconv" = "yes"; then
     AC_DEFINE_UNQUOTED(USE_LIBICONV, 1, Define to 1 if you have the libiconv)
 fi
 
+LCUI_THREAD_NAME=none
 if test "$want_thread" = "yes"; then
     if test "$thread_name" = "pthread"; then
-        AC_DEFINE_UNQUOTED(USE_PTHREAD, 1, Define to 1 if you select pthread for thread support)
+        AC_DEFINE_UNQUOTED(LCUI_THREAD_PTHREAD, 1, Define to 1 if you using pthread support)
+	LCUI_THREAD_NAME=pthread
     else 
         thread_name=none
     fi
 else 
     thread_name=none
 fi
+AC_SUBST(LCUI_THREAD_NAME)
 
+LCUI_VIDEO_DRIVER=dummy
 if test "$want_graph_display" = "yes"; then
     if test "$graph_output_dev" = "framebuffer"; then
-        AC_DEFINE_UNQUOTED(GRAPH_OUTPUT_USE_FRAMEBUFFER, 1, Define to 1 if you select FrameBuffer for graph display support) 
+        AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_FRAMEBUFFER, 1, Define to 1 if you select FrameBuffer for graph display support) 
+        LCUI_VIDEO_DRIVER=framebuffer
     else 
-        AC_DEFINE_UNQUOTED(GRAPH_OUTPUT_USE_DUMMY, 1, Define to 1 if you disable graph display support) 
         graph_output_dev=none
     fi
-else 
-    AC_DEFINE_UNQUOTED(GRAPH_OUTPUT_USE_DUMMY, 1, Define to 1 if you disable graph display support) 
+else
     graph_output_dev=none 
 fi
+AC_SUBST(LCUI_VIDEO_DRIVER)
 
 ##输出文件
 AC_OUTPUT([Makefile
