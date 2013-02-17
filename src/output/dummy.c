@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Font.h -- The font handling module of LCUI
+ * dummy.c --  if not found graphical output support, use this sourcefile
  * 
  * Copyright (C) 2012 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Font.h -- LCUI的字体处理模块
+ * dummy.c -- 通常在找不到合适的图形输出支持的情况下，使用该源文件，用虚设函数凑数
  *
  * 版权所有 (C) 2012 归属于 
  * 刘超
@@ -38,38 +38,33 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-#ifndef __LCUI_FONT_H__
-#define __LCUI_FONT_H__
 
-#include <stdint.h>
+#include <LCUI_Build.h>
+#include LC_LCUI_H
 
-#ifdef LCUI_FONT_ENGINE_FREETYPE
-	#include <ft2build.h>
-	#include FT_FREETYPE_H
-	#include FT_GLYPH_H
-	#include FT_OUTLINE_H
-	#define LCUI_FONT_RENDER_MODE	FT_RENDER_MODE_MONO
-	#define LCUI_FONT_LOAD_FALGS	(FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT | FT_LOAD_NO_BITMAP)
-#else
-	typedef void* FT_Library;
-	typedef void* FT_Face;
+#ifdef LCUI_VIDEO_DRIVER_NONE
+void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color)
+{
+	return;
+}
+
+int Get_Screen_Graph(LCUI_Graph *out)
+{
+	return -1;
+}
+
+int Screen_Init()
+{
+	return -1;
+}
+
+int Screen_Destroy()
+{
+	return -1;
+}
+
+int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
+{
+	return -1;
+}
 #endif
-
-LCUI_BEGIN_HEADER
-
-#include LC_CHARSET_H
-#include LC_FONTBMP_H
-#include LC_TEXTSTYLE_H
-#include LC_TEXTLAYER_H
-#include LC_FONTLIB_H
-
-/* 初始化字体处理模块 */
-void LCUIModule_Font_Init( void );
-
-/* 停用字体处理模块 */
-void LCUIModule_Font_End( void );
-
-LCUI_END_HEADER
-
-
-#endif /* __LCUI_FONTS_H__ */

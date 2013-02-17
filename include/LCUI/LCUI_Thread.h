@@ -101,11 +101,11 @@ thread_t LCUIThread_GetRootThreadID( thread_t tid );
 /* 创建并运行一个线程 */
 int LCUIThread_Create( thread_t *tidp, void *(*start_rtn)(void*), void * arg );
 
-int LCUIThread_Join(thread_t thread, void **retval);
-/* 功能：等待一个线程的结束 */
+/* 等待一个线程的结束 */
+int LCUIThread_Join( thread_t thread, void **retval );
 
-int LCUIThread_Cancel(thread_t thread);
-/* 功能：撤销一个线程 */
+/* 撤销一个线程 */
+int LCUIThread_Cancel( thread_t thread );
 
 void LCUIThread_Exit(void* retval)  __attribute__ ((__noreturn__));
 /*

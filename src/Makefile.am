@@ -42,7 +42,7 @@ LCUI_LIBADD = \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
 	$(THREAD_LIBS) \
-	$(FREETYPE_LIBS) \
+	$(FONT_LIBS) \
 	$(ICONV_LIBS) \
 	$(TS_LIBS)
 

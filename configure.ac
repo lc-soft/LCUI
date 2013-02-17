@@ -14,7 +14,7 @@ AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([include/LCUI_Build.h])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([include/LCUI/LCUI_Config.h])
 
 # Make --enable-silent-rules the default.
 # To get verbose build output you may configure
@@ -57,29 +57,41 @@ if test "x$with_pthread" != "xno"; then
 	AC_SUBST(THREAD_LIBS)
     fi
 fi
+
 ##检测是否有freetype库
-want_freetype=no
-AC_ARG_WITH(freetype, [  --with-freetype         use freetype	(default)])
-if test "x$with_freetype" != "xno"; then
-    AC_CHECK_LIB([freetype], [FT_Init_FreeType], want_freetype=yes, want_freetype=no)
-    if test "x$want_freetype" != "xno"; then
-	FREETYPE_LIBS=-lfreetype
-	AC_CHECK_HEADERS([ft2build.h],want_freetype=yes,want_freetype=no)
-	AC_SUBST(FREETYPE_LIBS)
-    fi
+want_font_engine="yes"
+font_engine_name="freetype"
+AC_ARG_ENABLE(font-engine, AC_HELP_STRING([--enable-font-engine], 
+[turn on font-engine [[default=yes]]]), want_font_engine=$enableval)
+if test "$want_font_engine" = "yes"; then
+	AC_CHECK_LIB([freetype], [FT_Init_FreeType], want_font_engine="yes", want_font_engine="no")
+	if test "$want_font_engine" = "yes"; then
+		AC_CHECK_HEADERS([ft2build.h], 
+		[want_font_engine="yes"], [want_font_engine="no"])
+	fi
+	if test "$want_font_engine" = "yes"; then
+		FONT_LIBS=-lfreetype
+		AC_SUBST(FONT_LIBS)
+	else
+		want_font_engine="no"
+		font_engine_name="none"
+	fi
+else 
+	want_font_engine="no"
+	font_engine_name="none"
 fi
 
 ## 检测图形输出设备
-want_graph_display=yes
-graph_output_dev="framebuffer" 
-AC_ARG_ENABLE(graph-display, AC_HELP_STRING([--enable-graph-display], 
-[turn on graph display [[default=yes]]]), want_graph_display=$enableval)
-if test $want_graph_display = "yes"; then
+want_video_output=yes
+video_driver_name="framebuffer" 
+AC_ARG_ENABLE(video-output, AC_HELP_STRING([--enable-video-output], 
+[turn on video-output [[default=yes]]]), want_video_output=$enableval)
+if test "$want_video_output" = "yes"; then
 	AC_CHECK_HEADERS([linux/fb.h],
-	[graph_output_dev="framebuffer"], [graph_output_dev="none"])
+	[video_driver_name="framebuffer"], [video_driver_name="none"])
 else 
-	want_graph_display=no
-	graph_output_dev=none
+	want_video_output=no
+	video_driver_name=none
 fi
 
 want_ts=no
@@ -156,39 +168,36 @@ if test "$want_ts" = "yes"; then
     AC_DEFINE_UNQUOTED(USE_TSLIB, 1, Define to 1 if you have the tslib)
 fi
 
-if test "$want_freetype" = "yes"; then
-    AC_DEFINE_UNQUOTED(USE_FREETYPE, 1,  Define to 1 if you have the FreeType font engine)
+font_engine_name="none"
+if test "$want_font_engine" = "yes"; then
+    font_engine_name="freetype"
+    AC_DEFINE_UNQUOTED(LCUI_FONT_ENGINE_FREETYPE, 1,  Define to 1 if you have the FreeType font engine)
+    
 fi
 
 if test "$want_iconv" = "yes"; then
     AC_DEFINE_UNQUOTED(USE_LIBICONV, 1, Define to 1 if you have the libiconv)
 fi
 
-LCUI_THREAD_NAME=none
 if test "$want_thread" = "yes"; then
     if test "$thread_name" = "pthread"; then
         AC_DEFINE_UNQUOTED(LCUI_THREAD_PTHREAD, 1, Define to 1 if you using pthread support)
-	LCUI_THREAD_NAME=pthread
     else 
-        thread_name=none
+        AC_DEFINE_UNQUOTED(LCUI_THREAD_NONE, 1, Define to 1 if not have thread support)
     fi
 else 
-    thread_name=none
+    AC_DEFINE_UNQUOTED(LCUI_THREAD_NONE, 1, Define to 1 if not have thread support)
 fi
-AC_SUBST(LCUI_THREAD_NAME)
 
-LCUI_VIDEO_DRIVER=dummy
-if test "$want_graph_display" = "yes"; then
-    if test "$graph_output_dev" = "framebuffer"; then
-        AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_FRAMEBUFFER, 1, Define to 1 if you select FrameBuffer for graph display support) 
-        LCUI_VIDEO_DRIVER=framebuffer
+if test "$want_video_output" = "yes"; then
+    if test "$video_driver_name" = "framebuffer"; then
+        AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_FRAMEBUFFER, 1, Define to 1 if you select FrameBuffer for video support) 
     else 
-        graph_output_dev=none
+        AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_NONE, 1, Define to 1 if not have video output support)
     fi
 else
-    graph_output_dev=none 
+    AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_NONE, 1, Define to 1 if not have video output support)
 fi
-AC_SUBST(LCUI_VIDEO_DRIVER)
 
 ##输出文件
 AC_OUTPUT([Makefile
@@ -220,12 +229,12 @@ AC_OUTPUT([Makefile
                  test/screenlock/Makefile])
 echo
 echo
-echo -e "Build with tslib support ............. : $want_ts"
-echo -e "Build with libpng support ............ : $want_png"
-echo -e "Build with libjpeg support ........... : $want_jpeg"
-echo -e "Build with libiconv support .......... : $want_iconv"
-echo -e "Build with freetype support .......... : $want_freetype"
-echo -e "Build with thread support ............ : $thread_name"
-echo -e "Build with graph display support ..... : $graph_output_dev"
+echo -e "Build with tslib support ........... : $want_ts"
+echo -e "Build with libpng support .......... : $want_png"
+echo -e "Build with libjpeg support ......... : $want_jpeg"
+echo -e "Build with libiconv support ........ : $want_iconv"
+echo -e "Build with font-engine support ..... : $font_engine_name"
+echo -e "Build with thread support .......... : $thread_name"
+echo -e "Build with video support ........... : $video_driver_name"
 echo 
 

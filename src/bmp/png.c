@@ -1,13 +1,11 @@
-#include "config.h"
 #include <LCUI_Build.h>
+#include LC_LCUI_H
+#include LC_ERROR_H
+#include LC_GRAPH_H
 
 #ifdef USE_LIBPNG
 #include <png.h>
 #endif
-
-#include LC_LCUI_H
-#include LC_ERROR_H
-#include LC_GRAPH_H
 
 #include <stdlib.h>
 

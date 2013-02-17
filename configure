@@ -616,12 +616,10 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-LCUI_VIDEO_DRIVER
-LCUI_THREAD_NAME
 JPEG_LIBS
 PNG_LIBS
 TS_LIBS
-FREETYPE_LIBS
+FONT_LIBS
 THREAD_LIBS
 ICONV_LIBS
 CPP
@@ -751,8 +749,8 @@ with_sysroot
 enable_libtool_lock
 with_iconv
 with_pthread
-with_freetype
-enable_graph_display
+enable_font_engine
+enable_video_output
 with_ts
 with_png
 with_jpeg
@@ -1397,7 +1395,8 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --enable-graph-display  turn on graph display [[default=yes]]
+  --enable-font-engine    turn on font-engine [[default=yes]]
+  --enable-video-output   turn on video-output [[default=yes]]
   --enable-debug          turn on debugging [[default=no]]
 
 Optional Packages:
@@ -1410,7 +1409,6 @@ Optional Packages:
                         (or the compiler's sysroot if not specified).
   --with-iconv            use libiconv	(default)
   --with-pthread          use pthread	(default)
-  --with-freetype         use freetype	(default)
   --with-ts               use tslib	(default)
   --with-png              use libpng	(default)
   --with-jpeg             use libjpeg	(default)
@@ -2936,7 +2934,7 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 
-ac_config_headers="$ac_config_headers config.h"
+ac_config_headers="$ac_config_headers include/LCUI/LCUI_Config.h"
 
 
 # Make --enable-silent-rules the default.
@@ -11674,16 +11672,17 @@ done
 
     fi
 fi
-##检测是否有freetype库
-want_freetype=no
 
-# Check whether --with-freetype was given.
-if test "${with_freetype+set}" = set; then :
-  withval=$with_freetype;
+##检测是否有freetype库
+want_font_engine="yes"
+font_engine_name="freetype"
+# Check whether --enable-font-engine was given.
+if test "${enable_font_engine+set}" = set; then :
+  enableval=$enable_font_engine; want_font_engine=$enableval
 fi
 
-if test "x$with_freetype" != "xno"; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for FT_Init_FreeType in -lfreetype" >&5
+if test "$want_font_engine" = "yes"; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for FT_Init_FreeType in -lfreetype" >&5
 $as_echo_n "checking for FT_Init_FreeType in -lfreetype... " >&6; }
 if ${ac_cv_lib_freetype_FT_Init_FreeType+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -11720,40 +11719,48 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_freetype_FT_Init_FreeType" >&5
 $as_echo "$ac_cv_lib_freetype_FT_Init_FreeType" >&6; }
 if test "x$ac_cv_lib_freetype_FT_Init_FreeType" = xyes; then :
-  want_freetype=yes
+  want_font_engine="yes"
 else
-  want_freetype=no
+  want_font_engine="no"
 fi
 
-    if test "x$want_freetype" != "xno"; then
-	FREETYPE_LIBS=-lfreetype
-	for ac_header in ft2build.h
+	if test "$want_font_engine" = "yes"; then
+		for ac_header in ft2build.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "ft2build.h" "ac_cv_header_ft2build_h" "$ac_includes_default"
 if test "x$ac_cv_header_ft2build_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_FT2BUILD_H 1
 _ACEOF
- want_freetype=yes
+ want_font_engine="yes"
 else
-  want_freetype=no
+  want_font_engine="no"
 fi
 
 done
 
+	fi
+	if test "$want_font_engine" = "yes"; then
+		FONT_LIBS=-lfreetype
 
-    fi
+	else
+		want_font_engine="no"
+		font_engine_name="none"
+	fi
+else
+	want_font_engine="no"
+	font_engine_name="none"
 fi
 
 ## 检测图形输出设备
-want_graph_display=yes
-graph_output_dev="framebuffer"
-# Check whether --enable-graph-display was given.
-if test "${enable_graph_display+set}" = set; then :
-  enableval=$enable_graph_display; want_graph_display=$enableval
+want_video_output=yes
+video_driver_name="framebuffer"
+# Check whether --enable-video-output was given.
+if test "${enable_video_output+set}" = set; then :
+  enableval=$enable_video_output; want_video_output=$enableval
 fi
 
-if test $want_graph_display = "yes"; then
+if test "$want_video_output" = "yes"; then
 	for ac_header in linux/fb.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "linux/fb.h" "ac_cv_header_linux_fb_h" "$ac_includes_default"
@@ -11761,16 +11768,16 @@ if test "x$ac_cv_header_linux_fb_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_LINUX_FB_H 1
 _ACEOF
- graph_output_dev="framebuffer"
+ video_driver_name="framebuffer"
 else
-  graph_output_dev="none"
+  video_driver_name="none"
 fi
 
 done
 
 else
-	want_graph_display=no
-	graph_output_dev=none
+	want_video_output=no
+	video_driver_name=none
 fi
 
 want_ts=no
@@ -12212,11 +12219,14 @@ _ACEOF
 
 fi
 
-if test "$want_freetype" = "yes"; then
+font_engine_name="none"
+if test "$want_font_engine" = "yes"; then
+    font_engine_name="freetype"
 
 cat >>confdefs.h <<_ACEOF
-#define USE_FREETYPE 1
+#define LCUI_FONT_ENGINE_FREETYPE 1
 _ACEOF
+
 
 fi
 
@@ -12228,7 +12238,6 @@ _ACEOF
 
 fi
 
-LCUI_THREAD_NAME=none
 if test "$want_thread" = "yes"; then
     if test "$thread_name" = "pthread"; then
 
@@ -12236,31 +12245,42 @@ cat >>confdefs.h <<_ACEOF
 #define LCUI_THREAD_PTHREAD 1
 _ACEOF
 
-	LCUI_THREAD_NAME=pthread
     else
-        thread_name=none
+
+cat >>confdefs.h <<_ACEOF
+#define LCUI_THREAD_NONE 1
+_ACEOF
+
     fi
 else
-    thread_name=none
+
+cat >>confdefs.h <<_ACEOF
+#define LCUI_THREAD_NONE 1
+_ACEOF
+
 fi
 
-
-LCUI_VIDEO_DRIVER=dummy
-if test "$want_graph_display" = "yes"; then
-    if test "$graph_output_dev" = "framebuffer"; then
+if test "$want_video_output" = "yes"; then
+    if test "$video_driver_name" = "framebuffer"; then
 
 cat >>confdefs.h <<_ACEOF
 #define LCUI_VIDEO_DRIVER_FRAMEBUFFER 1
 _ACEOF
 
-        LCUI_VIDEO_DRIVER=framebuffer
     else
-        graph_output_dev=none
+
+cat >>confdefs.h <<_ACEOF
+#define LCUI_VIDEO_DRIVER_NONE 1
+_ACEOF
+
     fi
 else
-    graph_output_dev=none
-fi
 
+cat >>confdefs.h <<_ACEOF
+#define LCUI_VIDEO_DRIVER_NONE 1
+_ACEOF
+
+fi
 
 ##输出文件
 ac_config_files="$ac_config_files Makefile lcui.pc include/Makefile include/LCUI/Makefile include/LCUI/font/Makefile include/LCUI/draw/Makefile include/LCUI/widget/Makefile include/LCUI/kernel/Makefile include/LCUI/gui/Makefile src/Makefile src/font/Makefile src/font/in-core/Makefile src/draw/Makefile src/draw/in-core/Makefile src/thread/Makefile src/bmp/Makefile src/misc/Makefile src/kernel/Makefile src/input/Makefile src/output/Makefile src/widget/Makefile src/gui/Makefile test/Makefile test/mora/Makefile test/photoviewer/Makefile test/clock/Makefile test/screenlock/Makefile"
@@ -13271,7 +13291,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
+    "include/LCUI/LCUI_Config.h") CONFIG_HEADERS="$CONFIG_HEADERS include/LCUI/LCUI_Config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
@@ -14662,12 +14682,12 @@ fi
 
 echo
 echo
-echo -e "Build with tslib support ............. : $want_ts"
-echo -e "Build with libpng support ............ : $want_png"
-echo -e "Build with libjpeg support ........... : $want_jpeg"
-echo -e "Build with libiconv support .......... : $want_iconv"
-echo -e "Build with freetype support .......... : $want_freetype"
-echo -e "Build with thread support ............ : $thread_name"
-echo -e "Build with graph display support ..... : $graph_output_dev"
+echo -e "Build with tslib support ........... : $want_ts"
+echo -e "Build with libpng support .......... : $want_png"
+echo -e "Build with libjpeg support ......... : $want_jpeg"
+echo -e "Build with libiconv support ........ : $want_iconv"
+echo -e "Build with font-engine support ..... : $font_engine_name"
+echo -e "Build with thread support .......... : $thread_name"
+echo -e "Build with video support ........... : $video_driver_name"
 echo
 

@@ -1,5 +1,6 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
+#ifdef LCUI_THREAD_PTHREAD
 
 thread_t thread_self( void )
 {
@@ -27,3 +28,4 @@ void thread_exit( void *__retval )
 {
 	pthread_exit(__retval);
 }
+#endif

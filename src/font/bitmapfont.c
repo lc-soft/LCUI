@@ -39,9 +39,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-//#define USE_FREETYPE
+//#define LCUI_FONT_ENGINE_FREETYPE
 //#define DEBUG
-#include "config.h"
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_MISC_H
@@ -259,8 +258,8 @@ int FontBMP_Mix( LCUI_Graph	*graph, LCUI_Pos	des_pos,
 	return 0;
 }
 
-/* 如果定义了USE_FREETYPE宏定义，则使用FreeType字体引擎处理字体数据 */
-#ifdef USE_FREETYPE
+/* 如果定义了LCUI_FONT_ENGINE_FREETYPE宏定义，则使用FreeType字体引擎处理字体数据 */
+#ifdef LCUI_FONT_ENGINE_FREETYPE
 
 static int 
 Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
@@ -327,7 +326,7 @@ Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 int Get_NewFontBMP(	int font_id, wchar_t ch, int pixel_size, 
 			LCUI_FontBMP *out_bitmap )
 {
-#ifdef USE_FREETYPE
+#ifdef LCUI_FONT_ENGINE_FREETYPE
 	size_t size;
 	BOOL have_space = FALSE;
 	

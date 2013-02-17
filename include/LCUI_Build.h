@@ -64,7 +64,7 @@
 
 #define LC_LCUI_H	<LCUI/LCUI.h>
 #define LC_LCUI_HPP	<LCUI/LCUI.hpp>
-
+#define LC_CONFIG_H	<LCUI/LCUI_Config.h>
 #define LC_MISC_H	<LCUI/LCUI_Misc.h>
 #define LC_FONT_H	<LCUI/LCUI_Font.h>
 #define LC_FONTLIB_H	<LCUI/font/fontlibrary.h>

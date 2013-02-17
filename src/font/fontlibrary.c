@@ -39,7 +39,6 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
  
-#include "config.h"
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_ERROR_H
@@ -107,7 +106,7 @@ void FontLIB_DestroyAll( void )
 	database_init = FALSE;
 	Destroy_Queue( &font_database );
 	Destroy_Queue( &fontbitmap_database );
-#ifdef USE_FREETYPE
+#ifdef LCUI_FONT_ENGINE_FREETYPE
 	FT_Done_FreeType( library );
 #endif
 }
@@ -139,7 +138,7 @@ void FontLIB_Init( void )
 	Queue_Init(	&font_database, 
 			sizeof(LCUI_FontInfo), 
 			FontLIB_DestroyFontInfo );
-#ifdef USE_FREETYPE
+#ifdef LCUI_FONT_ENGINE_FREETYPE
 	/* 当初始化库时发生了一个错误 */
 	if ( FT_Init_FreeType( &library ) ) {
 		printf("%s: %s", __FUNCTION__, FT_INIT_ERROR);
@@ -432,7 +431,7 @@ int FontLIB_LoadFontFile( const char *filepath )
 		return -1;
 	}
 	
-#ifdef USE_FREETYPE
+#ifdef LCUI_FONT_ENGINE_FREETYPE
 	FT_Face face;
 	error_code = FT_New_Face( library, filepath , 0 , &face );
 	if( error_code ) {

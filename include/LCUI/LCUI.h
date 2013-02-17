@@ -52,6 +52,8 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include LC_CONFIG_H
+
 /* 打开文件时的错误 */
 #define SHORT_FILE	1
 #define BIG_FILE	2
@@ -105,8 +107,6 @@ typedef enum _BOOL
 	IS_TRUE = 1
 }
 BOOL;
-
-#define FORCE	2
 
 /* 触屏校准后的文件 */
 #define LCUI_CALIBFILE "/mnt/Data/LC-SOFT/pointercal"
@@ -210,8 +210,6 @@ typedef unsigned long int LCUI_ID;
 /* 先使用typedef为结构体创建同义字，之后再定义结构体 */
 typedef struct	_LCUI_Widget		LCUI_Widget;
 typedef struct	_LCUI_Key		LCUI_Key;
-typedef struct	_Thread_Queue		Thread_Queue;
-typedef struct	_Thread_TreeNode	Thread_TreeNode;
 
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;

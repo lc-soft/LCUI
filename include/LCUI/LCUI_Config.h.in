@@ -1,4 +1,4 @@
-/* config.h.in.  Generated from configure.ac by autoheader.  */
+/* include/LCUI/LCUI_Config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
@@ -90,11 +90,20 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
+/* Define to 1 if you have the FreeType font engine */
+#undef LCUI_FONT_ENGINE_FREETYPE
+
+/* Define to 1 if not have thread support */
+#undef LCUI_THREAD_NONE
+
 /* Define to 1 if you using pthread support */
 #undef LCUI_THREAD_PTHREAD
 
-/* Define to 1 if you select FrameBuffer for graph display support */
+/* Define to 1 if you select FrameBuffer for video support */
 #undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+
+/* Define to 1 if not have video output support */
+#undef LCUI_VIDEO_DRIVER_NONE
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
@@ -123,9 +132,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* Define to 1 if you have the FreeType font engine */
-#undef USE_FREETYPE
 
 /* Define to 1 if you have the libiconv */
 #undef USE_LIBICONV

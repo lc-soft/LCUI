@@ -42,17 +42,17 @@ am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/config.h
+CONFIG_HEADER = $(top_builddir)/include/LCUI/LCUI_Config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 liboutput_la_LIBADD =
-am_liboutput_la_OBJECTS = $(LCUI_VIDEO_DRIVER).lo graph_display.lo
+am_liboutput_la_OBJECTS = dummy.lo framebuffer.lo graph_display.lo
 liboutput_la_OBJECTS = $(am_liboutput_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include/LCUI
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -108,7 +108,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
-FREETYPE_LIBS = @FREETYPE_LIBS@
+FONT_LIBS = @FONT_LIBS@
 GREP = @GREP@
 ICONV_LIBS = @ICONV_LIBS@
 INSTALL = @INSTALL@
@@ -117,8 +117,6 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 JPEG_LIBS = @JPEG_LIBS@
-LCUI_THREAD_NAME = @LCUI_THREAD_NAME@
-LCUI_VIDEO_DRIVER = @LCUI_VIDEO_DRIVER@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
@@ -212,7 +210,7 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign 
 INCLUDES = -I$(abs_top_srcdir)/include 
 noinst_LTLIBRARIES = liboutput.la 
-liboutput_la_SOURCES = $(LCUI_VIDEO_DRIVER).c graph_display.c
+liboutput_la_SOURCES = dummy.c framebuffer.c graph_display.c
 all: all-am
 
 .SUFFIXES:
@@ -265,7 +263,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/$(LCUI_VIDEO_DRIVER).Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dummy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/framebuffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/graph_display.Plo@am__quote@
 
 .c.o:
