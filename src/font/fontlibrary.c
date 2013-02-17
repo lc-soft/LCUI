@@ -420,7 +420,7 @@ FontLIB_GetFontBMP( wchar_t char_code, int font_id, int pixel_size )
 /* 载入字体值数据库中 */
 int FontLIB_LoadFontFile( const char *filepath )
 {
-	int id, error_code;
+	int id;
 	
 	if( !filepath ) {
 		return -1;
@@ -433,8 +433,9 @@ int FontLIB_LoadFontFile( const char *filepath )
 	
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 	FT_Face face;
+	int error_code;
 	error_code = FT_New_Face( library, filepath , 0 , &face );
-	if( error_code ) {
+	if( error_code != 0 ) {
 		FT_Done_FreeType( library );
 		printf("%s: ", __FUNCTION__);
 		if ( error_code == FT_Err_Unknown_File_Format ) {
