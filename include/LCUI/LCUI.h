@@ -81,8 +81,6 @@
 
 #define NONE	0 /* 无 */
 
-#define VIEW	0 /* 显示 */
-#define HIDE	1 /* 隐藏  */ 
 
 #define DEFAULT	0 /* 缺省 */
 #define CUSTOM	1 /* 自定义 */
@@ -144,21 +142,6 @@ typedef enum _LAYOUT_TYPE
 #define AND_ARG_F	1<<3	/* 第一个参数 */
 #define AND_ARG_S 	1<<4	/* 第二个参数 */ 
 /*****************************************/
-
-#define LCUI_Menu_Style_Default	20
-#define LCUI_Style_Default	1
-#define LCUI_Style_Standard	2 /* LCUI标准风格 */
-#define Custom_Style		5
-#define NONE			0
-
-/* 部件的位置类型 */
-#define POS_TYPE_IN_WIDGET	1
-#define POS_TYPE_IN_SCREEN	0
-
-#define ICON_CUSTOM 2
-#define ICON_LCUI   1
-#define ICON_None   0
-
 
 /****************** 图像的处理方式 *****************/
 #define FILL_MODE_ZOOM		LAYOUT_ZOOM	/* 缩放 */
