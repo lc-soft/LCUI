@@ -53,8 +53,6 @@
 typedef struct _LCUI_Queue	LCUI_Queue;
 typedef struct _LCUI_Node	LCUI_Node;
 
-#include LC_THREAD_H
-
 typedef enum _Queue_DataMode
 {
 	QUEUE_DATA_MODE_ARRAY = 0,

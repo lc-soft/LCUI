@@ -54,6 +54,15 @@
 
 #include LC_CONFIG_H
 
+#ifdef WIN32
+#define LCUI_BUILD_IN_WIN32
+#define LCUI_THREAD_WIN32
+#define LCUI_VIDEO_DRIVER_WIN32
+#undef LCUI_THREAD_PTHREAD
+#undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+#endif
+
+
 /* 打开文件时的错误 */
 #define SHORT_FILE	1
 #define BIG_FILE	2
@@ -72,15 +81,6 @@
 #define KILLED	-1
 #define REMOVE	-1
 #define INSIDE	1
-
-#define NO_ALPHA	0	 /* 无alpha通道 */
-#define HAVE_ALPHA	1	 /* 有alpha通道 */
-
-#define YES	1 /* 是 */
-#define NO	0 /* 否 */
-
-#define NONE	0 /* 无 */
-
 
 #define DEFAULT	0 /* 缺省 */
 #define CUSTOM	1 /* 自定义 */
@@ -288,8 +288,8 @@ typedef struct {
 } LCUI_WString;
 /*----------- END -------------*/
 
-#include LC_QUEUE_H
 #include LC_THREAD_H
+#include LC_QUEUE_H
 
 /*---------------------------- 图形数据 -------------------------------*/
 typedef struct _LCUI_Graph LCUI_Graph;
