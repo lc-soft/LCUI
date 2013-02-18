@@ -215,6 +215,8 @@ AC_OUTPUT([Makefile
                  src/draw/Makefile
                  src/draw/in-core/Makefile
                  src/thread/Makefile
+                 src/thread/win32/Makefile
+                 src/thread/pthread/Makefile
                  src/bmp/Makefile
                  src/misc/Makefile
                  src/kernel/Makefile

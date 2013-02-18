@@ -103,7 +103,7 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 static int need_break = FALSE;
 static pthread_t t = 0;
 static LCUI_Rect target_area;
-static void *catch()
+static void catch()
 /* 在截取动画时，会用这个函数捕获屏幕内容 */
 {
 	LCUI_Graph graph;

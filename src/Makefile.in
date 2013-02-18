@@ -73,10 +73,12 @@ am__DEPENDENCIES_2 = bmp/libbmp.la draw/libdraw.la \
 	draw/in-core/libdraw_incore.la misc/libmisc.la \
 	kernel/libkernel.la font/libfont.la \
 	font/in-core/libfont_incore.la input/libinput.la \
-	output/liboutput.la thread/libthread.la widget/libwidget.la \
-	gui/libgui.la $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	output/liboutput.la thread/libthread.la \
+	thread/win32/libthread.la thread/pthread/libthread.la \
+	widget/libwidget.la gui/libgui.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 libLCUI_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__objects_1 = LCUI_Queue.lo LCUI_Graph.lo LCUI_GraphLayer.lo \
 	LCUI_StyleLibrary.lo LCUI_Work.lo LCUI_Cursor.lo \
@@ -306,6 +308,8 @@ LCUI_LIBADD = \
 	input/libinput.la \
 	output/liboutput.la \
 	thread/libthread.la \
+	thread/win32/libthread.la \
+	thread/pthread/libthread.la \
 	widget/libwidget.la \
 	gui/libgui.la \
 	$(JPEG_LIBS) \

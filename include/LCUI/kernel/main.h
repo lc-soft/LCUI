@@ -37,10 +37,10 @@ typedef struct _LCUI_System
 	BOOL init;		/* 指示LCUI是否初始化过 */
 	BOOL need_sync_area;	/* 指示是否需要转移部件中记录的区域数据 */ 
 	
-	thread_t self_id;		/* 保存LCUI主程序的线程的ID */
-	thread_t display_thread;	/* 保存核心处理的线程的ID */
-	thread_t timer_thread;		/* 定时器列表处理线程的ID */
-	thread_t dev_thread;		/* 设备输入数据处理线程的ID */
+	LCUI_Thread self_id;		/* 保存LCUI主程序的线程的ID */
+	LCUI_Thread display_thread;	/* 保存核心处理的线程的ID */
+	LCUI_Thread timer_thread;	/* 定时器列表处理线程的ID */
+	LCUI_Thread dev_thread;	/* 设备输入数据处理线程的ID */
 	
 	LCUI_Cursor	cursor;		/* 游标 */
 	

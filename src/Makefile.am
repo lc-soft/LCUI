@@ -37,6 +37,8 @@ LCUI_LIBADD = \
 	input/libinput.la \
 	output/liboutput.la \
 	thread/libthread.la \
+	thread/win32/libthread.la \
+	thread/pthread/libthread.la \
 	widget/libwidget.la \
 	gui/libgui.la \
 	$(JPEG_LIBS) \

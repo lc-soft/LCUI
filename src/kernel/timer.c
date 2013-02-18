@@ -99,7 +99,7 @@ timer_list_update( LCUI_Queue *timer_list )
 static BOOL timer_thread_active = TRUE;
 
 /* 一个线程，用于处理定时器 */
-static void *
+static void 
 timer_list_process( void *arg )
 {
 	int sleep_time = 1000;
@@ -243,21 +243,21 @@ int reset_timer( int timer_id, long int n_ms )
 }
 
 /* 创建一个线程以处理定时器 */
-int timer_thread_start( thread_t *tid, LCUI_Queue *list )
+int timer_thread_start( LCUI_Thread *tid, LCUI_Queue *list )
 {
 	/* 初始化列表 */
 	timer_list_init( list );
 	timer_thread_active = TRUE;
 	/* 创建用于处理定时器列表的线程 */
-	return thread_create( tid, timer_list_process, list );
+	return LCUIThread_Create( tid, timer_list_process, list );
 }
 
 /* 停止定时器的处理线程，并销毁定时器列表 */
-void timer_thread_destroy( thread_t tid, LCUI_Queue *list )
+void timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
 {
 	timer_thread_active = FALSE;
 	/* 等待定时器处理线程的退出 */
-	thread_join( tid, NULL ); 
+	LCUIThread_Join( tid, NULL ); 
 	/* 销毁定时器列表 */
 	timer_list_destroy( list ); 
 }

@@ -1,23 +1,28 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
+#include LC_THREAD_H
 #ifdef LCUI_THREAD_PTHREAD
 
-int thread_mutex_init( mutex_t *mutex )
+/* init the mutex */
+int LCUIMutex_Init( LCUI_Mutex *mutex )
 {
 	return pthread_mutex_init( mutex, NULL );
 }
 
-int thread_mutex_destroy( mutex_t *mutex )
+/* Free the mutex */
+void LCUIMutex_Destroy( LCUI_Mutex *mutex )
 {
-	return pthread_mutex_destroy( mutex );
+	pthread_mutex_destroy( mutex );
 }
 
-int thread_mutex_lock( mutex_t *mutex )
+/* Lock the mutex */
+int LCUIMutex_Lock( LCUI_Mutex *mutex )
 {
 	return pthread_mutex_lock( mutex );
 }
 
-int thread_mutex_unlock( mutex_t *mutex )
+/* Unlock the mutex */
+int LCUIMutex_UnLock( LCUI_Mutex *mutex )
 {
 	return pthread_mutex_unlock( mutex );
 }

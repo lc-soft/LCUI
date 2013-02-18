@@ -214,12 +214,12 @@ refresh_fps_count( void )
 	//printf("FPS: %d\n", fps);
 }
 
-static void *
+static void
 Handle_Area_Update ()
 /* 功能：进行屏幕内容更新 */
 {
 #ifdef need_autoquit
-	thread_t t;
+	LCUI_Thread t;
 	LCUIThread_Create(&t, NULL, autoquit, NULL);
 #endif
 	int timer_id;
@@ -240,7 +240,7 @@ Handle_Area_Update ()
 	/* 释放定时器 */
 	free_timer( timer_id );
 	//_DEBUG_MSG("exit\n");
-	thread_exit(NULL);
+	LCUIThread_Exit(NULL);
 }
 
 extern int Screen_Init();
@@ -256,7 +256,7 @@ int LCUI_GetFPS( void )
 int LCUIModule_Video_Init( void )
 {
 	Screen_Init();
-	return thread_create( &LCUI_Sys.display_thread, 
+	return _LCUIThread_Create( &LCUI_Sys.display_thread, 
 			Handle_Area_Update, NULL );
 }
 
@@ -264,5 +264,5 @@ int LCUIModule_Video_Init( void )
 int LCUIModule_Video_End( void )
 {
 	Screen_Destroy();
-	return thread_join( LCUI_Sys.display_thread, NULL );
+	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
 }

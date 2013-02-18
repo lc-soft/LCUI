@@ -297,7 +297,7 @@ struct _LCUI_Graph {
 	int	type;		/* 图片类型 */
 	int	bit_depth;	/* 位深 */
 	
-	mutex_t mutex;	/* 锁，用于数据保护 */
+	LCUI_Mutex mutex;	/* 锁，用于数据保护 */
 	
 	BOOL quote;		/* 指示是否引用其它图层中的图形 */
 	LCUI_Graph *src;	/* 所引用的对象 */

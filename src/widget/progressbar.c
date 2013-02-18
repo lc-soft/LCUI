@@ -191,7 +191,7 @@ int ProgressBar_GetValue(LCUI_Widget *widget)
 	return pb->value;
 }
 
-static void *
+static void
 ProgressBar_ProcMoveingLight(void *arg)
 /* 功能：移动进度条中闪光的位置 */
 {

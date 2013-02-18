@@ -74,7 +74,7 @@ struct _LCUI_Node
 /****************************** 队列 ***********************************/
 struct _LCUI_Queue
 { 
-	mutex_t mutex;
+	LCUI_Mutex mutex;
 	int member_type:2;	/* 成员类型 */ 
 	int data_mode:2;	/* 数据储存方式（数组/链表） */
 	

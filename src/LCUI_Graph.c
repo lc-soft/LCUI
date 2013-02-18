@@ -62,7 +62,7 @@ void Graph_Lock( LCUI_Graph *graph )
 {
 	LCUI_Graph *src;
 	src = Get_Quote_Graph(graph);
-	thread_mutex_lock( &src->mutex );
+	LCUIMutex_Lock( &src->mutex );
 }
 
 /* 更新图层的属性 */
@@ -144,7 +144,7 @@ void Graph_Unlock( LCUI_Graph *graph )
 {
 	LCUI_Graph *src;
 	src = Get_Quote_Graph(graph);
-	thread_mutex_unlock( &src->mutex );
+	LCUIMutex_UnLock( &src->mutex );
 }
 
 
@@ -334,7 +334,7 @@ void Graph_Init(LCUI_Graph *pic)
 	pic->height	= 0;
 	pic->type	= DEFAULT;
 	pic->bit_depth	= 8;	/* 位深 */
-	thread_mutex_init( &pic->mutex );
+	LCUIMutex_Init( &pic->mutex );
 }
 
 static uchar_t** 
@@ -476,6 +476,7 @@ void Graph_Free(LCUI_Graph *pic)
 			pic->width = 0;
 			pic->height = 0;
 		}
+		LCUIMutex_Destroy( &pic->mutex );
 	}
 }
 

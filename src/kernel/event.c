@@ -5,7 +5,7 @@
 
 static LCUI_Queue events;
 static BOOL active = FALSE;
-static thread_t eventloop_thread = -1;
+static LCUI_Thread eventloop_thread = -1;
 
 /* 事件队列初始化 */
 static void LCUI_EventsInit( void )
@@ -107,7 +107,7 @@ LCUI_DispatchUserEvent( LCUI_Event *event )
 }
 
 /* 事件循环处理 */
-static void *LCUI_EventLoop( void *unused )
+static void LCUI_EventLoop( void *unused )
 {
 	LCUI_Event event;
 	int delay_time = 1500;
@@ -134,7 +134,7 @@ static void *LCUI_EventLoop( void *unused )
 			usleep( delay_time );
 		}
 	}
-	thread_exit( NULL );
+	_LCUIThread_Exit( NULL );
 }
 
 /* 停用事件线程 */
@@ -144,7 +144,7 @@ static void LCUI_StopEventThread( void )
 		return;
 	}
 	active = FALSE;
-	thread_join( eventloop_thread, NULL );
+	_LCUIThread_Join( eventloop_thread, NULL );
 }
 
 /* 启动事件线程 */
@@ -152,7 +152,7 @@ static int LCUI_StartEventThread( void )
 {
 	LCUI_StopEventThread();
 	active = TRUE;
-	return thread_create( &eventloop_thread, LCUI_EventLoop, NULL );
+	return _LCUIThread_Create( &eventloop_thread, LCUI_EventLoop, NULL );
 }
 
 /* 初始化事件模块 */

@@ -49,9 +49,9 @@ LCUI_App *LCUIApp_Find( LCUI_ID id )
 /* 获取指向程序数据的指针 */
 LCUI_App* LCUIApp_GetSelf( void )
 {
-	thread_t id;
+	LCUI_Thread id;
 	
-	id = thread_self(); /* 获取本线程ID */  
+	id = LCUIThread_SelfID(); /* 获取本线程ID */  
 	if(id == LCUI_Sys.display_thread 
 	|| id == LCUI_Sys.dev_thread
 	|| id == LCUI_Sys.self_id
@@ -66,7 +66,7 @@ LCUI_App* LCUIApp_GetSelf( void )
 /* 获取程序ID */
 LCUI_ID LCUIApp_GetSelfID( void )
 {
-	return thread_self();
+	return LCUIThread_SelfID();
 }
 
 void LCUI_App_Init( LCUI_App *app )
@@ -163,7 +163,7 @@ static int LCUI_AppList_Add ()
 	
 	/* 初始化程序数据结构体 */
 	LCUI_App_Init (&app);
-	app.id	= thread_self(); /* 保存ID */ 
+	app.id	= LCUIThread_SelfID(); /* 保存ID */ 
 	Queue_Add(&LCUI_Sys.app_list, &app);/* 添加至队列 */
 	return 0;
 }

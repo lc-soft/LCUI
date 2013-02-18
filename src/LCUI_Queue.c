@@ -72,19 +72,19 @@
 /* 为队列设定互斥锁，使之只能被一个线程使用 */
 int Queue_Lock( LCUI_Queue *queue )
 { 
-	return thread_mutex_lock( &queue->mutex );
+	return LCUIMutex_Lock( &queue->mutex );
 }
 
 /* 解开队列的互斥锁 */
 int Queue_UnLock( LCUI_Queue *queue )
 {
-	return thread_mutex_unlock( &queue->mutex );
+	return LCUIMutex_UnLock( &queue->mutex );
 }
 
 void Queue_Init (LCUI_Queue * queue, size_t element_size, void (*func) ()) 
 /* 功能：初始化队列 */
 {
-	thread_mutex_init( &queue->mutex );
+	LCUIMutex_Init( &queue->mutex );
 	queue->member_type	= 0;
 	queue->data_mode	= 0;
 	queue->data_array	= NULL;
@@ -187,7 +187,7 @@ void Destroy_Queue(LCUI_Queue * queue)
 	queue->data_head_node.next = NULL;
 	queue->total_num = 0;
 	queue->max_num = 0;
-	thread_mutex_destroy( &queue->mutex );
+	LCUIMutex_Destroy( &queue->mutex );
 }
 
 

@@ -55,64 +55,60 @@
 #ifndef __LCUI_THREAD_H__
 #define __LCUI_THREAD_H__ 
 
-#ifndef LCUI_THREAD_PTHREAD
-#define LCUI_THREAD_PTHREAD
-#endif
-
 #ifdef LCUI_THREAD_PTHREAD
-	#include <pthread.h>
-	typedef pthread_mutex_t mutex_t;
-	typedef pthread_t thread_t;
-#elif LCUI_THREAD_WIN32
-	#include <windows.h>
-	typedef HANDLE mutex_t;
-	typedef HANDLE thread_t;
+#include <pthread.h>
+typedef pthread_t LCUI_Thread;
+typedef pthread_mutex_t LCUI_Mutex;
 #else
-	#error 'Need thread implementation for this platform'
+#ifdef LCUI_THREAD_WIN32
+#include <windows.h>
+typedef HANDLE LCUI_Mutex;
+typedef unsigned int LCUI_Thread;
+#else
+#error 'Need thread implementation for this platform'
+#endif
 #endif
 
 LCUI_BEGIN_HEADER
 
-thread_t thread_self( void );
+/* init the mutex */
+int LCUIMutex_Init( LCUI_Mutex *mutex );
 
-int thread_create(	thread_t *__newthread,
-			void *(*__start_routine) (void *),
-			void *__arg );
+/* Free the mutex */
+void LCUIMutex_Destroy( LCUI_Mutex *mutex );
 
-int thread_cancel( thread_t __th );
+/* Lock the mutex */
+int LCUIMutex_Lock( LCUI_Mutex *mutex );
 
-int thread_join( thread_t __th, void **__thread_return );
+/* Unlock the mutex */
+int LCUIMutex_UnLock( LCUI_Mutex *mutex );
 
-void thread_exit( void *__retval ) __attribute__ ((__noreturn__));
 
+int _LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg );
 
-int thread_mutex_init( mutex_t *mutex );
+LCUI_Thread LCUIThread_SelfID( void );
 
-int thread_mutex_destroy( mutex_t *mutex );
+void _LCUIThread_Exit( void *retval );
 
-int thread_mutex_lock( mutex_t *mutex );
+void _LCUIThread_Cancel( LCUI_Thread thread );
 
-int thread_mutex_unlock( mutex_t *mutex );
+int _LCUIThread_Join( LCUI_Thread thread, void **retval );
 
 
 /* 获取指定线程的根线程ID */
-thread_t LCUIThread_GetRootThreadID( thread_t tid );
+LCUI_Thread LCUIThread_GetRootThreadID( LCUI_Thread tid );
 
 /* 创建并运行一个线程 */
-int LCUIThread_Create( thread_t *tidp, void *(*start_rtn)(void*), void * arg );
+int LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg );
 
-/* 等待一个线程的结束 */
-int LCUIThread_Join( thread_t thread, void **retval );
+/* 等待一个线程的结束，并释放该线程的资源 */
+int LCUIThread_Join( LCUI_Thread thread, void **retval );
 
 /* 撤销一个线程 */
-int LCUIThread_Cancel( thread_t thread );
+void LCUIThread_Cancel( LCUI_Thread thread );
 
-void LCUIThread_Exit(void* retval)  __attribute__ ((__noreturn__));
-/*
- * 功能：终止调用它的线程并返回一个指向某个对象的指针
- * 说明：线程通过调用LCUIThread_Exit函数终止执行，就如同进程在结
- * 束时调用exit函数一样。
- * */
+/* 记录指针作为返回值，并退出线程 */
+void LCUIThread_Exit( void* retval );
 
 /* 撤销指定ID的程序的全部子线程 */
 int LCUIApp_CancelAllThreads( LCUI_ID app_id );
