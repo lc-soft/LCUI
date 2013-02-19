@@ -107,7 +107,7 @@ int Click_LeftButton (LCUI_MouseButtonEvent *event)
 {
 	/* 如果按下的是鼠标左键，并且之前没有按住它 */
 	if (Mouse_LeftButton(event) == PRESSED
-		&& !Find_Pressed_Key(event->button)) {
+		&& !KeyHit(event->button)) {
 		return 1;
 	}
 	return 0;

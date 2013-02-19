@@ -50,7 +50,6 @@
 #include LC_CURSOR_H
 #include LC_INPUT_H
 
-#include <unistd.h>
 #include <math.h>
 #include <limits.h>
 
@@ -2211,7 +2210,7 @@ void Move_Widget_To_Pos(LCUI_Widget *widget, LCUI_Pos des_pos, int speed)
 		x += w;
 		y += h;
 		Widget_Move(widget, Pos(x, y));
-		usleep(10000);/* 停顿0.01秒 */
+		LCUI_MSleep(10);/* 停顿0.01秒 */
 	}
 }
 

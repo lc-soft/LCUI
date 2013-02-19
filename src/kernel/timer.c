@@ -1,6 +1,5 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include <unistd.h>
 
 /*----------------------------- Timer --------------------------------*/
 /*----------------------------- Private ------------------------------*/
@@ -87,7 +86,7 @@ timer_list_update( LCUI_Queue *timer_list )
 		return NULL; 
 	}
 	if(timer->cur_ms > 0) {
-		usleep( timer->cur_ms*1000 ); 
+		LCUI_MSleep( timer->cur_ms ); 
 	}
 	/* 减少列表中所有定时器的剩余等待时间 */
 	timer_list_sub( timer_list, timer->cur_ms );
@@ -102,7 +101,7 @@ static BOOL timer_thread_active = TRUE;
 static void 
 timer_list_process( void *arg )
 {
-	int sleep_time = 1000;
+	int sleep_time = 1;
 	LCUI_Func func_data;
 	LCUI_Queue *timer_list;
 	timer_data *timer;
@@ -112,18 +111,18 @@ timer_list_process( void *arg )
 	func_data.arg[1] = NULL;
 	
 	while( !LCUI_Active() ) {
-		usleep(10000);
+		LCUI_MSleep(10);
 	}
 	while( LCUI_Active() || timer_thread_active ) { 
 		timer = timer_list_update( timer_list );
 		if( !timer ) {
-			usleep( sleep_time );
-			if(sleep_time < 500000) {
-				sleep_time += 1000;
+			LCUI_MSleep( sleep_time );
+			if(sleep_time < 500) {
+				sleep_time += 1;
 			}
 			continue;
 		}
-		sleep_time = 1000;
+		sleep_time = 1;
 		func_data.id = timer->app_id;
 		func_data.func = timer->callback_func;
 		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */

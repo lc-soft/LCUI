@@ -10,21 +10,7 @@
 #include LC_FONT_H 
 #include LC_WIDGET_H
 
-#include <unistd.h>
-#include <signal.h>
-
 LCUI_System LCUI_Sys; 
-
-static clock_t start_time;
-void count_time()
-{
-	start_time = clock();
-}
-
-void end_count_time()
-{
-	printf("%ldms\n",clock()-start_time);
-}
 
 /************************* App Management *****************************/
 /* 根据程序的ID，获取指向程序数据结构的指针 */
@@ -311,7 +297,7 @@ LCUIApp_RunTask( LCUI_App *app )
 int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 {
 	LCUI_App *app;
-	int idle_time = 1500;
+	int idle_time = 1;
 	
 	app = LCUIApp_GetSelf();
 	if( !app ) {
@@ -322,12 +308,12 @@ int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 	loop->running = TRUE;
 	while( !loop->quit ) {
 		if( LCUIApp_HaveTask(app) ) {
-			idle_time = 1500;
+			idle_time = 1;
 			LCUIApp_RunTask( app ); 
 		} else {
-			usleep (idle_time);
+			LCUI_MSleep (idle_time);
 			if (idle_time < MAX_APP_IDLE_TIME) {
-				idle_time += 1500;
+				idle_time += 1;
 			}
 		}
 	}

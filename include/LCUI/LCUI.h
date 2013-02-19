@@ -54,12 +54,16 @@
 
 #include LC_CONFIG_H
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32)
 #define LCUI_BUILD_IN_WIN32
 #define LCUI_THREAD_WIN32
 #define LCUI_VIDEO_DRIVER_WIN32
 #undef LCUI_THREAD_PTHREAD
 #undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+#else
+#define LCUI_BUILD_IN_LINUX
+#define LCUI_KEYBOARD_DRIVER_LINUX
+#define LCUI_MOUSE_DRIVER_LINUX
 #endif
 
 
@@ -367,8 +371,8 @@ typedef enum {
 } ALIGN_TYPE;
 /*---------------------------------------------*/
 
-#define MAX_APP_IDLE_TIME	50000
-#define MAX_LCUI_IDLE_TIME	50000
+#define MAX_APP_IDLE_TIME	50
+#define MAX_LCUI_IDLE_TIME	50
 
 #define nobuff_printf(format, ...) \
 	{ \

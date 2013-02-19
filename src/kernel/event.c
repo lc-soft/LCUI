@@ -110,11 +110,11 @@ LCUI_DispatchUserEvent( LCUI_Event *event )
 static void LCUI_EventLoop( void *unused )
 {
 	LCUI_Event event;
-	int delay_time = 1500;
+	int delay_time = 1;
 	
 	while( active ) {
 		if( LCUI_PollEvent( &event ) ) {
-			delay_time = 1500;
+			delay_time = 1;
 			switch( event.type ) {
 			case LCUI_KEYDOWN:
 			case LCUI_KEYUP:
@@ -128,10 +128,10 @@ static void LCUI_EventLoop( void *unused )
 				break;
 			}
 		} else {
-			if( delay_time <= 15000 ) {
-				delay_time += 1500;
+			if( delay_time <= 15 ) {
+				delay_time += 1;
 			}
-			usleep( delay_time );
+			LCUI_MSleep( delay_time );
 		}
 	}
 	_LCUIThread_Exit( NULL );

@@ -47,8 +47,6 @@
 #include LC_PICBOX_H 
 #include LC_RES_H 
 
-#include <unistd.h>
-
 /* 功能：获取进度条上闪光图形所在的PictureBox部件 */
 static LCUI_Widget *
 ProgressBar_GetMoveingLight(LCUI_Widget *widget)
@@ -79,7 +77,7 @@ ProgressBar_Init(LCUI_Widget *widget)
 	Graph_Init(&pb->fore_graph); 
 	Graph_Init(&pb->flash_image);
 	pb->img_move_speed = 200;
-	pb->sleep_time = 100000;
+	pb->sleep_time = 100;
 	pb->max_value = 1;
 	pb->value = 0;
 	
@@ -204,9 +202,9 @@ ProgressBar_ProcMoveingLight(void *arg)
 			x<=flash->parent->size.w; 
 			x+=(pb->img_move_speed/20.0+0.5)) {
 			Widget_Move(flash, Pos(x , flash->pos.y));
-			usleep(50000);
+			LCUI_MSleep(50);
 		}
-		usleep(pb->sleep_time);
+		LCUI_MSleep(pb->sleep_time);
 	}
 	LCUIThread_Exit(NULL);
 }

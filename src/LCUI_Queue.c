@@ -66,7 +66,6 @@
 #include LC_GRAPH_H
 #include LC_WIDGET_H 
 #include LC_ERROR_H
-#include <unistd.h>
 
 /************************ LCUI_Queue **********************************/
 /* 为队列设定互斥锁，使之只能被一个线程使用 */

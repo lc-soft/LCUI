@@ -149,13 +149,8 @@ BOOL LCUIKeyboard_Hit( void );
 /* 功能：获取被按下的按键的键值 */
 int LCUIKeyboard_Get( void );
 
-int Find_Pressed_Key(int key);
-/*
- * 功能：检测指定键值的按键是否处于按下状态
- * 返回值：
- *   1 存在
- *   0 不存在
- **/
+/* 检测指定键值的按键是否处于按下状态 */
+BOOL KeyHit( int key_code );
 
 /* 初始化键盘输入模块 */
 void LCUIModule_Keyboard_Init( void );

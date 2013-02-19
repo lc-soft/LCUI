@@ -1,9 +1,7 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include <unistd.h>
 
 /*----------------------------- Device -------------------------------*/
-
 /* 设备列表初始化 */
 static void 
 dev_list_init( LCUI_Queue *dev_list )
@@ -39,7 +37,7 @@ proc_dev_list ( void *arg )
 {
 	LCUI_Queue *dev_list;
 	dev_func_data *data_ptr;
-	int total, i, result, sleep_time = 1000;
+	int total, i, result, sleep_time = 1;
 	
 	dev_list = (LCUI_Queue *)arg;
 	while( LCUI_Active() ) {
@@ -53,11 +51,11 @@ proc_dev_list ( void *arg )
 			result += data_ptr->proc_func();
 		}
 		if( result > 0 ) {
-			sleep_time = 1000;
+			sleep_time = 1;
 		} else {
-			usleep( sleep_time );
-			if( sleep_time < 100000 ) {
-				sleep_time += 1000;
+			LCUI_MSleep( sleep_time );
+			if( sleep_time < 100 ) {
+				sleep_time += 1;
 			}
 		}
 	}

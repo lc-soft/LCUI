@@ -48,8 +48,6 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
-#include <unistd.h>
-
 int Get_Screen_Width ()
 /*
  * 功能：获取屏幕宽度
@@ -80,7 +78,6 @@ LCUI_Size Get_Screen_Size( void )
 	return LCUI_Sys.screen.size; 
 }
 
-//static int debug_count = 0;
 int Add_Screen_Refresh_Area (LCUI_Rect rect)
 /* 功能：在整个屏幕内添加需要刷新的区域 */
 {
@@ -88,14 +85,7 @@ int Add_Screen_Refresh_Area (LCUI_Rect rect)
 	if (rect.width <= 0 || rect.height <= 0) {
 		return -1; 
 	}
-	rect = Get_Valid_Area(Get_Screen_Size(), rect); 
-	//if( rect.width == 320 && rect.height == 240 ) {
-		//++debug_count;
-	//}
-	//if( debug_count >= 20 ) {
-	//	abort();
-	//}
-	
+	rect = Get_Valid_Area(Get_Screen_Size(), rect);
 	Queue_Lock( &LCUI_Sys.invalid_area );
 	ret = RectQueue_Add ( &LCUI_Sys.invalid_area, rect );
 	/* 队列使用结束，解开锁 */
@@ -166,27 +156,6 @@ Handle_Screen_Update()
 	Graph_Free(&graph);
 }
 
-//#define need_autoquit
-#ifdef need_autoquit
-static int auto_flag = 0;
-static void *autoquit()
-/* 在超时后，会自动终止程序，用于调试 */
-{
-	LCUI_ID time = 0;
-	while(time <5000000) {
-		if(auto_flag == 0) {
-			usleep(10000);
-			time += 10000;
-		} else {
-			auto_flag = 0;
-			time = 0;
-		}
-	}
-	exit(-1);
-}
-#endif
-
-
 static void 
 Handle_Refresh_Area( void )
 /*
@@ -218,28 +187,19 @@ static void
 Handle_Area_Update ()
 /* 功能：进行屏幕内容更新 */
 {
-#ifdef need_autoquit
-	LCUI_Thread t;
-	LCUIThread_Create(&t, NULL, autoquit, NULL);
-#endif
 	int timer_id;
 	/* 添加个定时器，每隔1秒刷新FPS计数 */
 	timer_id = set_timer( 1000, refresh_fps_count, TRUE );
 	//_DEBUG_MSG("enter\n");
 	while(LCUI_Active()) {
-		Handle_AllWidgetUpdate();/* 处理所有部件更新 */ 
-		usleep(5000);/* 停顿一段时间，让程序主循环处理任务 */
+		Handle_AllWidgetUpdate(); /* 处理所有部件更新 */ 
+		LCUI_MSleep(5); /* 停顿一段时间，让程序主循环处理任务 */
 		Handle_Refresh_Area(); /* 处理需要刷新的区域 */
-		Handle_Screen_Update();/* 处理屏幕更新 */ 
-#ifdef need_autoquit
-		auto_flag = 1;
-#endif
-		/* 累计当前更新的帧数 */
-		++fps_count;
+		Handle_Screen_Update(); /* 处理屏幕更新 */
+		++fps_count; /* 累计当前更新的帧数 */
 	}
 	/* 释放定时器 */
 	free_timer( timer_id );
-	//_DEBUG_MSG("exit\n");
 	LCUIThread_Exit(NULL);
 }
 

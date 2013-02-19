@@ -40,7 +40,6 @@
  * ****************************************************************************/
 //#define DEBUG
 #include <LCUI_Build.h>
-#include <unistd.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H 
 #include LC_MISC_H
@@ -410,7 +409,7 @@ Process_Frames()
 	LCUI_Frames *frames;
 	
 	while(!LCUI_Active()) {
-		usleep(10000);
+		LCUI_MSleep(10);
 	}
 	frames = FramesStream_Update( &sleep_time ); 
 	reset_timer( __timer_id, sleep_time );

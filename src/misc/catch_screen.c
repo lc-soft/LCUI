@@ -46,8 +46,6 @@
 #include LC_DRAW_H
 #include LC_DISPLAY_H
 
-#include <unistd.h>
-
 void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 /* 
  * 功能：通过内存中的图像数据，捕获将在屏幕上显示的图像
@@ -131,7 +129,7 @@ static void catch()
 		
 		Catch_Screen_Graph_By_FB( area, &graph );
 		write_png( filename, &graph );
-		usleep(35000);
+		LCUI_MSleep(35);
 	}
 	LCUIThread_Exit(NULL);
 }

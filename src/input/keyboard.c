@@ -41,14 +41,19 @@
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
+
+#ifdef LCUI_KEYBOARD_DRIVER_LINUX
+
+#define __NEED_CATCHSCREEN__
+#ifdef __NEED_CATCHSCREEN__
 #include LC_GRAPH_H
 #include LC_DRAW_H
 #include LC_DISPLAY_H
+#endif
 
 #include <termios.h>
 #include <unistd.h>
 #include <sys/fcntl.h>
-
 
 static struct termios tm;//, tm_old; 
 static int fd = STDIN_FILENO;
@@ -131,38 +136,25 @@ int LCUIKeyboard_Get( void )
 	return c; 
 }
 
-int Find_Pressed_Key(int key)
-/*
- * 功能：检测指定键值的按键是否处于按下状态
- * 返回值：
- *   1 存在
- *   0 不存在
- **/
+/* 检测指定键值的按键是否处于按下状态 */
+BOOL KeyHit( int key_code )
 {
-	int t;
+	int *t;
 	int i, total;
 	
 	total = Queue_Get_Total(&LCUI_Sys.press_key);
 	for(i=0; i<total; ++i) {
-		t = *(int*)Queue_Get(&LCUI_Sys.press_key, i);
-		if(t == key) {
-			return 1;
+		t = Queue_Get(&LCUI_Sys.press_key, i);
+		if( t && *t == key_code ) {
+			return TRUE;
 		}
 	}
-	return 0;
+	return FALSE;
 }
 
 static BOOL proc_keyboard()
 {
 	LCUI_Event event;
-	LCUI_Rect area;
-	LCUI_Graph graph;
-	
-	Graph_Init(&graph);
-	area.width = 320;
-	area.height = 240;
-	area.x = (Get_Screen_Width()-area.width)/2;
-	area.y = (Get_Screen_Height()-area.height)/2;
 	 /* 如果没有按键输入 */ 
 	if ( !LCUIKeyboard_Hit() ) {
 		return FALSE;
@@ -171,13 +163,20 @@ static BOOL proc_keyboard()
 	event.type = LCUI_KEYDOWN;
 	event.key.key_code = LCUIKeyboard_Get();
 	
-	#define __NEED_CATCHSCREEN__
 	#ifdef __NEED_CATCHSCREEN__
+	LCUI_Rect area;
+	area.width = 320;
+	area.height = 240;
+	area.x = (Get_Screen_Width()-area.width)/2;
+	area.y = (Get_Screen_Height()-area.height)/2;
 	//当按下c键后，可以进行截图，只截取指定区域的图形
 	if(event.key.key_code == 'c') {
 		time_t rawtime;
 		struct tm * timeinfo;
 		char filename[100];
+		LCUI_Graph graph;
+		
+		Graph_Init(&graph);
 		time ( &rawtime );
 		timeinfo = localtime ( &rawtime ); /* 获取系统当前时间 */ 
 		sprintf(filename, "%4d-%02d-%02d-%02d-%02d-%02d.png",
@@ -187,6 +186,7 @@ static BOOL proc_keyboard()
 		);
 		Catch_Screen_Graph_By_FB( area, &graph );
 		write_png(filename, &graph);
+		Graph_Free(&graph);
 	}
 	else if(event.key.key_code == 'r') {
 		/* 如果按下r键，就录制指定区域的图像 */
@@ -194,7 +194,6 @@ static BOOL proc_keyboard()
 	}
 	#endif
 	LCUI_PushEvent( &event );
-	Graph_Free(&graph);
 	return TRUE;
 }
 
@@ -218,3 +217,4 @@ void LCUIModule_Keyboard_Init( void )
 	LCUI_Dev_Add( Enable_Keyboard_Input, proc_keyboard, Disable_Keyboard_Input );
 }
 
+#endif

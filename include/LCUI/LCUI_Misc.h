@@ -44,6 +44,12 @@
 
 LCUI_BEGIN_HEADER
 
+/* 秒级延时 */
+void LCUI_Sleep( unsigned int s );
+
+/* 毫秒级延时 */
+void LCUI_MSleep( unsigned int ms );
+
 /******************************** Misc *********************************/
 int Check_Option(int result, int option);
 /* 功能：检测result是否包含option */
