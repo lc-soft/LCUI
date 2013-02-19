@@ -137,19 +137,17 @@ int LCUIModule_Mouse_Init( void );
 
 
 /***************************** Key *************************************/ 
-int Set_Raw(int t);
+/* 初始化键盘输入 */
+int LCUIKeyboard_Init( void );
 
-int Check_Key(void);
-/* 
- * 功能：检测是否有按键输入 
- * 返回值：
- *   1   有按键输入
- *   2   无按键输入
- * */ 
+/* 停用键盘输入 */
+int LCUIKeyboard_End( void );
 
+/* 检测是否有按键按下 */
+BOOL LCUIKeyboard_Hit( void );
 
-int Get_Key(void);
-/* 功能：获取被按下的按键的键值 */ 
+/* 功能：获取被按下的按键的键值 */
+int LCUIKeyboard_Get( void );
 
 int Find_Pressed_Key(int key);
 /*
@@ -157,7 +155,7 @@ int Find_Pressed_Key(int key);
  * 返回值：
  *   1 存在
  *   0 不存在
- **/ 
+ **/
 
 /* 初始化键盘输入模块 */
 void LCUIModule_Keyboard_Init( void );

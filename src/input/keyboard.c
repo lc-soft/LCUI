@@ -53,44 +53,42 @@
 static struct termios tm;//, tm_old; 
 static int fd = STDIN_FILENO;
 
-int Set_Raw(int t)
+/* 初始化键盘输入 */
+int LCUIKeyboard_Init( void )
 {
-	if (t > 0) {
-		if(tcgetattr(fd, &tm) < 0) {
-			return -1; 
-		} 
-		/* 设置终端为无回显无缓冲模式 */
-		tm.c_lflag &= ~(ICANON|ECHO);
-		tm.c_cc[VMIN] = 1;
-		tm.c_cc[VTIME] = 0;
-		if(tcsetattr(fd, TCSANOW, &tm) < 0) {
-			return -1; 
-		}
-		printf("\033[?25l");/* 隐藏光标 */
-	} else {
-		tm.c_lflag |= ICANON;
-		tm.c_lflag |= ECHO;
-		tm.c_cc[VMIN] = 1;
-		tm.c_cc[VTIME] = 0;
-		if(tcsetattr(fd,TCSANOW,&tm)<0) {
-			return -1;
-		}
-		printf("\033[?25h"); /* 显示光标 */ 
+	if(tcgetattr(fd, &tm) < 0) {
+		return -1; 
+	} 
+	/* 设置终端为无回显无缓冲模式 */
+	tm.c_lflag &= ~(ICANON|ECHO);
+	tm.c_cc[VMIN] = 1;
+	tm.c_cc[VTIME] = 0;
+	if(tcsetattr(fd, TCSANOW, &tm) < 0) {
+		return -1; 
 	}
+	printf("\033[?25l");/* 隐藏光标 */
 	return 0;
 }
 
-int Check_Key(void)  
-/* 
- * 功能：检测是否有按键输入 
- * 返回值：
- *   1   有按键输入
- *   2   无按键输入
- * */
+/* 停用键盘输入 */
+int LCUIKeyboard_End( void )
+{
+	tm.c_lflag |= ICANON;
+	tm.c_lflag |= ECHO;
+	tm.c_cc[VMIN] = 1;
+	tm.c_cc[VTIME] = 0;
+	if(tcsetattr(fd,TCSANOW,&tm)<0) {
+		return -1;
+	}
+	printf("\033[?25h"); /* 显示光标 */ 
+	return 0;
+}
+
+/* 检测是否有按键按下 */
+BOOL LCUIKeyboard_Hit( void )
 {
 	struct termios oldt;//, newt;  
-	int ch;  
-	int oldf;  
+	int ch, oldf;  
 	tcgetattr(STDIN_FILENO, &oldt);  
 	//newt = oldt;  
 	//newt.c_lflag &= ~(ICANON | ECHO);  
@@ -99,30 +97,32 @@ int Check_Key(void)
 	fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);  
 	ch = getchar();  /* 获取一个字符 */
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  
-	fcntl(STDIN_FILENO, F_SETFL, oldf);  
-	if(ch != EOF)  
-	{/* 如果字符有效，将字符放回输入缓冲区中 */
+	fcntl(STDIN_FILENO, F_SETFL, oldf); 
+	/* 如果字符有效，将字符放回输入缓冲区中 */
+	if(ch != EOF) {
 		ungetc(ch, stdin);  
-		return 1;  
+		return TRUE;
 	} 
-	return 0;
+	return FALSE;
 }
 
-
-int Get_Key(void)
 /* 功能：获取被按下的按键的键值 */
+int LCUIKeyboard_Get( void )
 { 
 	int k,c;
-	static int input, count = 0;
+	static int input = 0, count = 0;
 	++count;
-	k = fgetc(stdin); /* 获取输入缓冲中的字符 */
-	input += k; 
-	if(Check_Key()) {/* 如果还有字符在缓冲中 */
-		Get_Key(); /* 递归调用 */
+	/* 获取输入缓冲中的字符 */
+	k = fgetc(stdin);
+	input += k;
+	/* 如果还有字符在缓冲中 */
+	if(LCUIKeyboard_Hit()) {
+		LCUIKeyboard_Get();
 	}
 	c = input;
 	--count;
-	if(count == 0) {/* 递归结束后就置0 */
+	/* 递归结束后就置0 */
+	if(count == 0) {
 		input = 0;
 	}
 	if(c == 3) {
@@ -164,12 +164,12 @@ static BOOL proc_keyboard()
 	area.x = (Get_Screen_Width()-area.width)/2;
 	area.y = (Get_Screen_Height()-area.height)/2;
 	 /* 如果没有按键输入 */ 
-	if ( !Check_Key ()) {
+	if ( !LCUIKeyboard_Hit() ) {
 		return FALSE;
 	}
 	
 	event.type = LCUI_KEYDOWN;
-	event.key.key_code = Get_Key ();
+	event.key.key_code = LCUIKeyboard_Get();
 	
 	#define __NEED_CATCHSCREEN__
 	#ifdef __NEED_CATCHSCREEN__
@@ -201,14 +201,14 @@ static BOOL proc_keyboard()
 /* 键盘输入模块的初始化 */
 static BOOL Enable_Keyboard_Input( void )
 {
-	Set_Raw(1);/* 设置终端属性 */
+	LCUIKeyboard_Init(); /* 设置终端属性 */
 	return TRUE;
 }
 
 /* 键盘输入模块的销毁 */
 static BOOL Disable_Keyboard_Input( void )
 {
-	Set_Raw(0);/* 恢复终端属性 */
+	LCUIKeyboard_End(); /* 恢复终端属性 */
 	return TRUE;
 }
 
