@@ -113,24 +113,6 @@ int Click_LeftButton (LCUI_MouseButtonEvent *event)
 	return 0;
 }
 
-int KeyQueue_Find(LCUI_Queue *queue, int key_code)
-/* 功能:在按键键值队列里查找指定键值的位置 */
-{
-	int *key; 
-	int i, total;  
-	total = Queue_Get_Total(queue);
-	if( total <= 0 ) {
-		return -1;
-	}
-	for (i = 0; i < total; ++i) {
-		key = (int*)Queue_Get(queue, i);
-		if(*key == key_code) {
-			return i;
-		}
-	}
-	return -1;
-} 
-
 /* 记录被按下的指定键的键值，并添加LCUI_MOUSEBUTTONDOWN事件 */
 static void LCUIMouse_ButtonDown( LCUI_Pos pos, int key_code )
 {

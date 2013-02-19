@@ -190,10 +190,6 @@ int Click_LeftButton (LCUI_MouseButtonEvent *event);
  * 功能：检测是否是按鼠标左键
  **/ 
 
-
-int KeyQueue_Find(LCUI_Queue *queue, int key_code);
-/* 功能:在按键键值队列里查找指定键值的位置 */ 
-
 /* 功能：处理鼠标产生的事件 */
 void LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type );
 
