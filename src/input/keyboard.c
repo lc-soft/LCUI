@@ -137,7 +137,7 @@ int LCUIKeyboard_Get( void )
 }
 
 /* 检测指定键值的按键是否处于按下状态 */
-BOOL KeyHit( int key_code )
+BOOL LCUIKey_Hit( int key_code )
 {
 	int *t;
 	int i, total;
@@ -150,6 +150,21 @@ BOOL KeyHit( int key_code )
 		}
 	}
 	return FALSE;
+}
+
+/* 标记指定键值的按键已释放” */
+void LCUIKey_Free( int key_code )
+{
+	int *t;
+	int i, total;
+	
+	total = Queue_Get_Total(&LCUI_Sys.press_key);
+	for(i=0; i<total; ++i) {
+		t = Queue_Get(&LCUI_Sys.press_key, i);
+		if( t && *t == key_code ) {
+			Queue_Delete( &LCUI_Sys.press_key, i );
+		}
+	}
 }
 
 static BOOL proc_keyboard()

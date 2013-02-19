@@ -220,6 +220,7 @@ int LCUIModule_Video_Init( void )
 		return -1;
 	}
 	LCUIScreen_Init();
+	i_am_init = TRUE;
 	RectQueue_Init( &screen_invalid_area );
 	return _LCUIThread_Create( &LCUI_Sys.display_thread, 
 			LCUIScreen_Update, NULL );
@@ -232,6 +233,7 @@ int LCUIModule_Video_End( void )
 		return -1;
 	}
 	LCUIScreen_Destroy();
+	i_am_init = FALSE;
 	Destroy_Queue( &screen_invalid_area );
 	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
 }

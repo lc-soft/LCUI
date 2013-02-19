@@ -150,7 +150,10 @@ BOOL LCUIKeyboard_Hit( void );
 int LCUIKeyboard_Get( void );
 
 /* 检测指定键值的按键是否处于按下状态 */
-BOOL KeyHit( int key_code );
+BOOL LCUIKey_Hit( int key_code );
+
+/* 标记指定键值的按键已释放” */
+void LCUIKey_Free( int key_code );
 
 /* 初始化键盘输入模块 */
 void LCUIModule_Keyboard_Init( void );
