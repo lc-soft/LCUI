@@ -51,7 +51,7 @@
 void Refresh_Cursor ()
 /* 功能：刷新鼠标游标在屏幕上显示的图形 */
 {
-	Add_Screen_Refresh_Area ( Get_Cursor_Rect() );
+	LCUIScreen_InvalidArea ( Get_Cursor_Rect() );
 }
 
 void Show_Cursor ()
@@ -92,7 +92,7 @@ void Set_Cursor_Pos (LCUI_Pos pos)
  	/* 刷新游标的显示 */ 
 	Refresh_Cursor ();
 	/* 刷新游标原来的区域中的图形 */		
-	Add_Screen_Refresh_Area ( old );
+	LCUIScreen_InvalidArea ( old );
 }
 
 int Set_Cursors_Graph (LCUI_Graph * graph)

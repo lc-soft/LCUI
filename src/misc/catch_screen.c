@@ -52,7 +52,7 @@ void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
  * 说明：效率较低，因为需要进行合成。
  *  */
 {
-	Get_Screen_Real_Graph(area, out);
+	LCUIScreen_GetRealGraph(area, out);
 }
 
 void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
@@ -70,7 +70,7 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 		return;
 	}
 	/* 如果需要裁剪图形 */
-	if ( Get_Cut_Area ( Get_Screen_Size(), area,&cut_rect ) ){
+	if ( Get_Cut_Area ( LCUIScreen_GetSize(), area,&cut_rect ) ){
 		if(!Rect_Valid(cut_rect)) {
 			return;
 		}

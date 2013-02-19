@@ -175,12 +175,6 @@ int Graph_Cut(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out);
 int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out);
 /* 功能：将图像进行水平翻转 */
 
-int Get_Screen_Graph(LCUI_Graph *out);
-/* 
- * 功能：获取屏幕上显示的图像
- * 说明：自动分配内存给指针，并把数据拷贝至指针的内存 
- * */ 
-
 int Graph_Fill_Color(LCUI_Graph *pic, LCUI_RGB color);
 /* 功能：为传入的图形填充颜色 */ 
 

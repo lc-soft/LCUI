@@ -255,11 +255,11 @@ static BOOL proc_mouse( void *arg )
 	pos.x += (buf[1] * mouse_data.move_speed); 
 	pos.y -= (buf[2] * mouse_data.move_speed);
 
-	if (pos.x > Get_Screen_Width ()) {
-		pos.x = Get_Screen_Width ();
+	if (pos.x > LCUIScreen_GetWidth ()) {
+		pos.x = LCUIScreen_GetWidth ();
 	}
-	if (pos.y > Get_Screen_Height ()) {
-		pos.y = Get_Screen_Height ();
+	if (pos.y > LCUIScreen_GetHeight ()) {
+		pos.y = LCUIScreen_GetHeight ();
 	}
 	pos.x = pos.x<0 ? 0:pos.x; 
 	pos.y = pos.y<0 ? 0:pos.y;

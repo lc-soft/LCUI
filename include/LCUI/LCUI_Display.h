@@ -44,47 +44,48 @@
 
 LCUI_BEGIN_HEADER
 
-int Graph_Display (LCUI_Graph * src, LCUI_Pos pos);
-/* 功能：显示图形 */
+/* 
+ * 功能：在屏幕上指定位置放置图形
+ * 说明：此函数使用帧缓冲（FrameBuffer）进行图形输出
+ * *注：主要代码参考自mgaveiw的mga_vfb.c文件中的write_to_fb函数.
+ * */
+int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos );
 
-int Get_Screen_Width ();
 /*
  * 功能：获取屏幕宽度
  * 返回值：屏幕的宽度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
- * */ 
+ * */
+int LCUIScreen_GetWidth( void );
 
-int Get_Screen_Height ();
 /*
  * 功能：获取屏幕高度
  * 返回值：屏幕的高度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
- * */ 
+ * */
+int LCUIScreen_GetHeight( void );
 
 /* 获取屏幕尺寸 */
-LCUI_Size Get_Screen_Size( void );
+LCUI_Size LCUIScreen_GetSize( void );
 
-void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color);
-/* 功能：填充指定位置的像素点的颜色 */ 
+/* 填充指定位置的像素点的颜色 */
+void LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color );
 
-int Get_Screen_Graph(LCUI_Graph *out);
-/* 
- * 功能：获取屏幕上显示的图像
- * 说明：自动分配内存给指针，并把数据拷贝至指针的内存 
- * */ 
+/* 获取屏幕内显示的图像 */
+int LCUIScreen_GetGraph( LCUI_Graph *out );
 
-int Add_Screen_Refresh_Area (LCUI_Rect rect);
-/* 功能：在整个屏幕内添加需要刷新的区域 */ 
+/* 设置屏幕内的指定区域为无效区域，以便刷新该区域内的图形显示 */
+int LCUIScreen_InvalidArea( LCUI_Rect rect );
 
-int Get_Screen_Bits();
-/* 功能：获取屏幕中的每个像素的表示所用的位数 */ 
+/* 功能：获取屏幕中的每个像素的表示所用的位数 */
+int LCUIScreen_GetBits( void );
 
-LCUI_Pos Get_Screen_Center_Point();
-/* 功能：获取屏幕中心点的坐标 */ 
+/* 获取屏幕中心点的坐标 */
+LCUI_Pos LCUIScreen_GetCenter( void );
 
 /* 获取屏幕中指定区域内实际要显示的图形 */
-void Get_Screen_Real_Graph ( LCUI_Rect rect, LCUI_Graph *graph );
+void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph );
 
 /* 获取当前FPS */
-int LCUI_GetFPS( void );
+int LCUIScreen_GetFPS( void );
 
 /* 初始化图形输出模块 */
 int LCUIModule_Video_Init( void );

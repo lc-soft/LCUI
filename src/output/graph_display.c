@@ -48,11 +48,14 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
-int Get_Screen_Width ()
+static BOOL i_am_init = FALSE;
+static LCUI_Queue screen_invalid_area;
+
 /*
  * 功能：获取屏幕宽度
  * 返回值：屏幕的宽度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
  * */
+int LCUIScreen_GetWidth( void )
 {
 	if ( !LCUI_Sys.init ) {
 		return 0; 
@@ -60,11 +63,11 @@ int Get_Screen_Width ()
 	return LCUI_Sys.screen.size.w; 
 }
 
-int Get_Screen_Height ()
 /*
  * 功能：获取屏幕高度
  * 返回值：屏幕的高度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
  * */
+int LCUIScreen_GetHeight( void )
 {
 	if ( !LCUI_Sys.init ) {
 		return 0; 
@@ -73,40 +76,39 @@ int Get_Screen_Height ()
 }
 
 /* 获取屏幕尺寸 */
-LCUI_Size Get_Screen_Size( void )
+LCUI_Size LCUIScreen_GetSize( void )
 {
 	return LCUI_Sys.screen.size; 
 }
 
-int Add_Screen_Refresh_Area (LCUI_Rect rect)
-/* 功能：在整个屏幕内添加需要刷新的区域 */
+/* 设置屏幕内的指定区域为无效区域，以便刷新该区域内的图形显示 */
+int LCUIScreen_InvalidArea( LCUI_Rect rect )
 {
 	int ret;
 	if (rect.width <= 0 || rect.height <= 0) {
-		return -1; 
+		return -1;
 	}
-	rect = Get_Valid_Area(Get_Screen_Size(), rect);
-	Queue_Lock( &LCUI_Sys.invalid_area );
-	ret = RectQueue_Add ( &LCUI_Sys.invalid_area, rect );
-	/* 队列使用结束，解开锁 */
-	Queue_UnLock( &LCUI_Sys.invalid_area );
+	rect = Get_Valid_Area(LCUIScreen_GetSize(), rect);
+	Queue_Lock( &screen_invalid_area );
+	ret = RectQueue_Add ( &screen_invalid_area, rect );
+	Queue_UnLock( &screen_invalid_area );
 	return ret;
 }
 
-int Get_Screen_Bits()
 /* 功能：获取屏幕中的每个像素的表示所用的位数 */
+int LCUIScreen_GetBits( void )
 {
 	return LCUI_Sys.screen.bits;
 }
 
-LCUI_Pos Get_Screen_Center_Point()
-/* 功能：获取屏幕中心点的坐标 */
+/* 获取屏幕中心点的坐标 */
+LCUI_Pos LCUIScreen_GetCenter( void )
 {
 	return Pos(LCUI_Sys.screen.size.w/2.0, LCUI_Sys.screen.size.h/2.0);
 }
 
 /* 获取屏幕中指定区域内实际要显示的图形 */
-void Get_Screen_Real_Graph ( LCUI_Rect rect, LCUI_Graph *graph )
+void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 {
 	LCUI_Pos pos;
 	GraphLayer_GetGraph( LCUI_Sys.root_glayer, graph, rect );
@@ -123,7 +125,7 @@ void Get_Screen_Real_Graph ( LCUI_Rect rect, LCUI_Graph *graph )
 }
 
 static void 
-Handle_Screen_Update()
+LCUIScreen_UpdateInvalidArea()
 /* 功能：进行屏幕内容更新 */
 { 
 	LCUI_Rect rect;
@@ -133,37 +135,36 @@ Handle_Screen_Update()
 	Graph_Init(&fill_area);
 	/* 锁住队列，其它线程不能访问 */
 	//_DEBUG_MSG("enter\n");
-	Queue_Lock( &LCUI_Sys.invalid_area );
+	Queue_Lock( &screen_invalid_area );
 	while(LCUI_Active()) {
 		//_DEBUG_MSG("total area: %d\n", 
-		//	Queue_Get_Total( &LCUI_Sys.invalid_area ));
+		//	Queue_Get_Total( &screen_invalid_area ));
 		/* 如果从队列中获取数据成功 */
-		if ( !RectQueue_Get(&rect, 0, &LCUI_Sys.invalid_area) ) {
+		if ( !RectQueue_Get(&rect, 0, &screen_invalid_area) ) {
 			break;
 		}
 		/* 获取内存中对应区域的图形数据 */ 
-		Get_Screen_Real_Graph ( rect, &graph );
+		LCUIScreen_GetRealGraph ( rect, &graph );
 		//_DEBUG_MSG("get screen area: %d,%d,%d,%d\n", 
 		//rect.x, rect.y, rect.width, rect.height);
 		/* 写入至帧缓冲，让屏幕显示图形 */
-		Graph_Display( &graph, Pos(rect.x, rect.y) );
+		LCUIScreen_PutGraph( &graph, Pos(rect.x, rect.y) );
 		/* 移除队列中的成员 */ 
-		Queue_Delete( &LCUI_Sys.invalid_area, 0 );
+		Queue_Delete( &screen_invalid_area, 0 );
 	}
 	/* 解锁队列 */
-	Queue_UnLock( &LCUI_Sys.invalid_area );
+	Queue_UnLock( &screen_invalid_area );
 	//_DEBUG_MSG("quit\n");
 	Graph_Free(&graph);
 }
 
-static void 
-Handle_Refresh_Area( void )
 /*
- * 功能：处理已记录的刷新区域
- * 说明：此函数会将各个部件的rect队列中的处理掉，并将
- * 最终的局部刷新区域数据添加至屏幕刷新区域队列中，等
- * 待LCUI来处理。
+ * 功能：处理已记录的无效区域
+ * 说明：此函数会将各个部件的rect队列中的处理掉，并将最终的无效区域添加至屏幕无效区域
+ * 队列中，等待LCUI来处理。
  **/
+static void 
+LCUIScreen_SyncInvalidArea( void )
 {
 	if ( LCUI_Sys.need_sync_area ) {
 		/* 同步部件内记录的区域至主记录中 */ 
@@ -183,19 +184,25 @@ refresh_fps_count( void )
 	//printf("FPS: %d\n", fps);
 }
 
+/* 获取当前FPS */
+int LCUIScreen_GetFPS( void )
+{
+	return fps;
+}
+
+
+/* 更新屏幕内的图形显示 */
 static void
-Handle_Area_Update ()
-/* 功能：进行屏幕内容更新 */
+LCUIScreen_Update( void* unused )
 {
 	int timer_id;
 	/* 添加个定时器，每隔1秒刷新FPS计数 */
 	timer_id = set_timer( 1000, refresh_fps_count, TRUE );
-	//_DEBUG_MSG("enter\n");
 	while(LCUI_Active()) {
 		Handle_AllWidgetUpdate(); /* 处理所有部件更新 */ 
-		LCUI_MSleep(5); /* 停顿一段时间，让程序主循环处理任务 */
-		Handle_Refresh_Area(); /* 处理需要刷新的区域 */
-		Handle_Screen_Update(); /* 处理屏幕更新 */
+		LCUI_MSleep(5);
+		LCUIScreen_SyncInvalidArea();
+		LCUIScreen_UpdateInvalidArea();
 		++fps_count; /* 累计当前更新的帧数 */
 	}
 	/* 释放定时器 */
@@ -203,26 +210,28 @@ Handle_Area_Update ()
 	LCUIThread_Exit(NULL);
 }
 
-extern int Screen_Init();
-extern int Screen_Destroy();
-
-/* 获取当前FPS */
-int LCUI_GetFPS( void )
-{
-	return fps;
-}
+extern int LCUIScreen_Init(void);
+extern int LCUIScreen_Destroy(void);
 
 /* 初始化图形输出模块 */
 int LCUIModule_Video_Init( void )
 {
-	Screen_Init();
+	if( i_am_init ) {
+		return -1;
+	}
+	LCUIScreen_Init();
+	RectQueue_Init( &screen_invalid_area );
 	return _LCUIThread_Create( &LCUI_Sys.display_thread, 
-			Handle_Area_Update, NULL );
+			LCUIScreen_Update, NULL );
 }
 
 /* 停用图形输出模块 */
 int LCUIModule_Video_End( void )
 {
-	Screen_Destroy();
+	if( !i_am_init ) {
+		return -1;
+	}
+	LCUIScreen_Destroy();
+	Destroy_Queue( &screen_invalid_area );
 	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
 }

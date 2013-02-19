@@ -449,7 +449,7 @@ int LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text,
 	btn_close = Window_GetCloseButton( msgbox );
 	btn_close->self_id = MB_BTN_IS_QUIT;
 	/* 限制消息框的尺寸 */
-	max_size = Get_Screen_Size();
+	max_size = LCUIScreen_GetSize();
 	Widget_LimitSize( msgbox, min_size, max_size );
 	/* 设置为模态部件 */
 	Widget_SetModal( msgbox, TRUE );

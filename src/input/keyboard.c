@@ -167,8 +167,8 @@ static BOOL proc_keyboard()
 	LCUI_Rect area;
 	area.width = 320;
 	area.height = 240;
-	area.x = (Get_Screen_Width()-area.width)/2;
-	area.y = (Get_Screen_Height()-area.height)/2;
+	area.x = (LCUIScreen_GetWidth()-area.width)/2;
+	area.y = (LCUIScreen_GetHeight()-area.height)/2;
 	//当按下c键后，可以进行截图，只截取指定区域的图形
 	if(event.key.key_code == 'c') {
 		time_t rawtime;

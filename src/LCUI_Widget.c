@@ -442,7 +442,7 @@ int _Get_Widget_Container_Width(LCUI_Widget *widget)
 	int width;
 	widget = widget->parent;
 	if( !widget ) {
-		return Get_Screen_Width();
+		return LCUIScreen_GetWidth();
 	}
 	if( widget->w.which_one == 0 ) {
 		width = widget->w.px;
@@ -461,7 +461,7 @@ int _Get_Widget_Container_Height(LCUI_Widget *widget)
 	int height;
 	widget = widget->parent;
 	if( !widget ) {
-		return Get_Screen_Height();
+		return LCUIScreen_GetHeight();
 	}
 	if( widget->h.which_one == 0 ) {
 		height = widget->h.px;
@@ -479,7 +479,7 @@ int Widget_GetContainerWidth( LCUI_Widget *widget )
 {
 	int width;
 	if( !widget ) {
-		return Get_Screen_Width();
+		return LCUIScreen_GetWidth();
 	}
 	width = _Widget_GetWidth( widget );
 	width -= (widget->padding.left + widget->padding.right);
@@ -491,7 +491,7 @@ int Widget_GetContainerHeight( LCUI_Widget *widget )
 {
 	int height;
 	if( !widget ) {
-		return Get_Screen_Height();
+		return LCUIScreen_GetHeight();
 	}
 	height = _Widget_GetHeight( widget );
 	height -= (widget->padding.top + widget->padding.bottom);
@@ -983,7 +983,7 @@ void print_widget_info(LCUI_Widget *widget)
 int Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 {
 	if( !widget ) { 
-		return Add_Screen_Refresh_Area( rect );
+		return LCUIScreen_InvalidArea( rect );
 	}
 	if (rect.width <= 0 || rect.height <= 0) { 
 		return -1;

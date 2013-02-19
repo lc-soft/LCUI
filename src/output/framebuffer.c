@@ -55,9 +55,8 @@
 #include <errno.h>
 #include <unistd.h>
 
-
-void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color)
-/* 功能：填充指定位置的像素点的颜色 */
+/* 填充指定位置的像素点的颜色 */
+void LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
 {
 	int k;
 	uchar_t *dest;
@@ -70,11 +69,8 @@ void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color)
 	dest[k + 2] = color.red; 
 }
 
-int Get_Screen_Graph(LCUI_Graph *out)
-/* 
- * 功能：获取屏幕上显示的图像
- * 说明：自动分配内存给指针，并把数据拷贝至指针的内存 
- * */
+/* 获取屏幕内显示的图像 */
+int LCUIScreen_GetGraph( LCUI_Graph *out )
 {
 	uchar_t  *dest;
 	int i, temp, h, w;
@@ -90,7 +86,7 @@ int Get_Screen_Graph(LCUI_Graph *out)
 	}
 	/* 指针指向帧缓冲的内存 */
 	dest = LCUI_Sys.screen.fb_mem;
-	switch( Get_Screen_Bits() ) {
+	switch( LCUIScreen_GetBits() ) {
 	    case 32:
 		for (i=0,h=0; h < LCUI_Sys.screen.size.h; ++h) {
 			for (w = 0; w < LCUI_Sys.screen.size.w; ++w) {
@@ -195,8 +191,8 @@ static void print_screeninfo(
 	);
 }
 
-int Screen_Init()
-/* 功能：初始化屏幕 */
+/* 初始化屏幕 */
+int LCUIScreen_Init( void )
 {
 	__u16 rr[256],gg[256],bb[256];
 	struct fb_var_screeninfo fb_vinfo;
@@ -255,13 +251,14 @@ int Screen_Init()
 	/* 获取指向根图层图形数据的指针 */
 	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
 	/* 保存当前屏幕内容，以便退出LCUI后还原 */
-	Get_Screen_Graph( graph );
+	LCUIScreen_GetGraph( graph );
 	/* 显示根图层 */
 	GraphLayer_Show( LCUI_Sys.root_glayer );
 	return 0;
 }
 
-int Screen_Destroy()
+/* 销毁屏幕占用的内存资源 */
+int LCUIScreen_Destroy( void )
 {
 	int err;
 	LCUI_Graph *graph;
@@ -269,7 +266,7 @@ int Screen_Destroy()
 	LCUI_Sys.state = KILLED;
 	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
 	/* 恢复屏幕初始内容 */ 
-	Graph_Display( graph, Pos(0, 0) );
+	LCUIScreen_PutGraph( graph, Pos(0, 0) );
 	/* 解除帧缓冲在内存中的映射 */
 	err = munmap( LCUI_Sys.screen.fb_mem, LCUI_Sys.screen.smem_len );
 	if (err != 0) {
@@ -281,12 +278,12 @@ int Screen_Destroy()
 	return 0;
 }
 
-int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 /* 
- * 功能：显示图形 
+ * 功能：在屏幕上指定位置放置图形
  * 说明：此函数使用帧缓冲（FrameBuffer）进行图形输出
  * *注：主要代码参考自mgaveiw的mga_vfb.c文件中的write_to_fb函数.
  * */
+int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 {
 	int bits;
 	uchar_t *dest;
@@ -304,7 +301,7 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 	pic = src; 
 	Graph_Init (&temp);
 	
-	if ( Get_Cut_Area ( Get_Screen_Size(), 
+	if ( Get_Cut_Area ( LCUIScreen_GetSize(), 
 			Rect ( pos.x, pos.y, src->width, src->height ), 
 			&cut_rect
 		) ) {/* 如果需要裁剪图形 */
@@ -319,7 +316,7 @@ int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
 	
 	Graph_Lock( pic );
 	/* 获取显示器的位数 */
-	bits = Get_Screen_Bits(); 
+	bits = LCUIScreen_GetBits(); 
 	switch(bits) {
 	    case 32:/* 32位，其中RGB各占8位，剩下的8位用于alpha，共4个字节 */ 
 		k = pos.y * LCUI_Sys.screen.size.w + pos.x;

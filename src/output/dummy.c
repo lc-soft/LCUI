@@ -43,27 +43,27 @@
 #include LC_LCUI_H
 
 #ifdef LCUI_VIDEO_DRIVER_NONE
-void Fill_Pixel(LCUI_Pos pos, LCUI_RGB color)
+void LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
 {
 	return;
 }
 
-int Get_Screen_Graph(LCUI_Graph *out)
+int LCUIScreen_GetGraph( LCUI_Graph *out )
 {
 	return -1;
 }
 
-int Screen_Init()
+int LCUIScreen_Init( void )
 {
 	return -1;
 }
 
-int Screen_Destroy()
+int LCUIScreen_Destroy( void )
 {
 	return -1;
 }
 
-int Graph_Display (LCUI_Graph * src, LCUI_Pos pos)
+int LCUIScreen_PutGraph (LCUI_Graph * src, LCUI_Pos pos)
 {
 	return -1;
 }

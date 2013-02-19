@@ -383,7 +383,6 @@ int LCUI_Init(int argc, char *argv[])
 		LCUI_ShowCopyrightText();
 		
 		LCUI_AppList_Init( &LCUI_Sys.app_list );
-		RectQueue_Init( &LCUI_Sys.invalid_area );
 		Queue_Init( &LCUI_Sys.press_key, sizeof(int), NULL );
 		/* 注册程序 */
 		temp = LCUI_AppList_Add();
@@ -404,7 +403,7 @@ int LCUI_Init(int argc, char *argv[])
 		LCUIModule_Cursor_Init();
 		LCUIModule_Widget_Init();
 		/* 让鼠标游标居中显示 */
-		Set_Cursor_Pos( Get_Screen_Center_Point() );  
+		Set_Cursor_Pos( LCUIScreen_GetCenter() );  
 		Show_Cursor();
 	} else {
 		temp = LCUI_AppList_Add();

@@ -85,11 +85,11 @@ static BOOL proc_touchscreen()
 	pos.x = samp.x;
 	pos.y = samp.y;
 	
-	if (pos.x > Get_Screen_Width ()) {
-		pos.x = Get_Screen_Width ();
+	if (pos.x > LCUIScreen_GetWidth ()) {
+		pos.x = LCUIScreen_GetWidth ();
 	}
-	if (pos.y > Get_Screen_Height ()) {
-		pos.y = Get_Screen_Height ();
+	if (pos.y > LCUIScreen_GetHeight ()) {
+		pos.y = LCUIScreen_GetHeight ();
 	}
 	pos.x = pos.x<0 ? 0:pos.x; 
 	pos.y = pos.y<0 ? 0:pos.y; 
