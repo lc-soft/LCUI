@@ -124,6 +124,7 @@ void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 	}
 }
 
+#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 static void 
 LCUIScreen_UpdateInvalidArea()
 /* 功能：进行屏幕内容更新 */
@@ -184,13 +185,6 @@ refresh_fps_count( void )
 	//printf("FPS: %d\n", fps);
 }
 
-/* 获取当前FPS */
-int LCUIScreen_GetFPS( void )
-{
-	return fps;
-}
-
-
 /* 更新屏幕内的图形显示 */
 static void
 LCUIScreen_Update( void* unused )
@@ -209,6 +203,17 @@ LCUIScreen_Update( void* unused )
 	free_timer( timer_id );
 	LCUIThread_Exit(NULL);
 }
+#endif
+
+/* 获取当前FPS */
+int LCUIScreen_GetFPS( void )
+{
+	return fps;
+}
+
+
+#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+#endif
 
 extern int LCUIScreen_Init(void);
 extern int LCUIScreen_Destroy(void);
@@ -222,8 +227,12 @@ int LCUIModule_Video_Init( void )
 	LCUIScreen_Init();
 	i_am_init = TRUE;
 	RectQueue_Init( &screen_invalid_area );
+#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 	return _LCUIThread_Create( &LCUI_Sys.display_thread, 
 			LCUIScreen_Update, NULL );
+#else 
+	return 0;
+#endif
 }
 
 /* 停用图形输出模块 */
@@ -235,5 +244,9 @@ int LCUIModule_Video_End( void )
 	LCUIScreen_Destroy();
 	i_am_init = FALSE;
 	Destroy_Queue( &screen_invalid_area );
+#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
+#else 
+	return 0;
+#endif
 }

@@ -42,42 +42,117 @@
 #ifndef __LCUI_INPUT_H__
 #define __LCUI_INPUT_H__
 
-#define KEY_ESC    27
+#ifdef LCUI_KEYBOARD_DRIVER_LINUX
 
-#define KEY_ENTER	10
-#define KEY_BACKSPACE	127
-#define KEY_DELETE	295
-#define KEY_HOMEPAGE	293
-#define KEY_END		296
+#define LCUIKEY_ESC		27
+#define LCUIKEY_ENTER		10
+#define LCUIKEY_BACKSPACE	127
+#define LCUIKEY_DELETE		295
+#define LCUIKEY_HOMEPAGE	293
+#define LCUIKEY_END		296
 
-#define _PC_
+#define LCUIKEY_SPACE	' '
+#define LCUIKEY_0	'0'
+#define LCUIKEY_1	'1'
+#define LCUIKEY_2	'2'
+#define LCUIKEY_3	'3'
+#define LCUIKEY_4	'4'
+#define LCUIKEY_5	'5'
+#define LCUIKEY_6	'6'
+#define LCUIKEY_7	'7'
+#define LCUIKEY_8	'8'
+#define LCUIKEY_9	'9'
+
+#define LCUIKEY_A	'A'
+#define LCUIKEY_B	'B'
+#define LCUIKEY_C	'C'
+#define LCUIKEY_D	'D'
+#define LCUIKEY_E	'E'
+#define LCUIKEY_F	'F'
+#define LCUIKEY_G	'G'
+#define LCUIKEY_H	'H'
+#define LCUIKEY_I	'I'
+#define LCUIKEY_J	'J'
+#define LCUIKEY_K	'K'
+#define LCUIKEY_L	'L'
+#define LCUIKEY_M	'M'
+#define LCUIKEY_N	'N'
+#define LCUIKEY_O	'O'
+#define LCUIKEY_P	'P'
+#define LCUIKEY_Q	'Q'
+#define LCUIKEY_R	'R'
+#define LCUIKEY_S	'S'
+#define LCUIKEY_T	'T'
+#define LCUIKEY_U	'U'
+#define LCUIKEY_V	'V'
+#define LCUIKEY_W	'W'
+#define LCUIKEY_X	'X'
+#define LCUIKEY_Y	'Y'
+#define LCUIKEY_Z	'Z'
+
+#define LCUIKEY_a	'a'
+#define LCUIKEY_b	'b'
+#define LCUIKEY_c	'c'
+#define LCUIKEY_d	'd'
+#define LCUIKEY_e	'e'
+#define LCUIKEY_f	'f'
+#define LCUIKEY_g	'g'
+#define LCUIKEY_h	'h'
+#define LCUIKEY_i	'i'
+#define LCUIKEY_j	'j'
+#define LCUIKEY_k	'k'
+#define LCUIKEY_l	'l'
+#define LCUIKEY_m	'm'
+#define LCUIKEY_n	'n'
+#define LCUIKEY_o	'o'
+#define LCUIKEY_p	'p'
+#define LCUIKEY_q	'q'
+#define LCUIKEY_r	'r'
+#define LCUIKEY_s	's'
+#define LCUIKEY_t	'i'
+#define LCUIKEY_u	'u'
+#define LCUIKEY_v	'v'
+#define LCUIKEY_w	'w'
+#define LCUIKEY_x	'x'
+#define LCUIKEY_y	'y'
+#define LCUIKEY_z	'z'
+
 
 /* 这个是诺亚舟NP1500学习机的游戏键A和B键的键值 */
 #define KEY_AA      342
 #define KEY_BB      343
 
+#define _PC_
 #ifndef _PC_
-
-#define KEY_DOWN	172
-#define KEY_UP		171
-#define KEY_LEFT	174
-#define KEY_RIGHT	173
-
+#define LCUIKEY_DOWN	172
+#define LCUIKEY_UP	171
+#define LCUIKEY_LEFT	174
+#define LCUIKEY_RIGHT	173
 #else
-
-#define KEY_DOWN    184
-#define KEY_UP      183
-#define KEY_LEFT    186
-#define KEY_RIGHT   185
-
+#define LCUIKEY_DOWN    184
+#define LCUIKEY_UP      183
+#define LCUIKEY_LEFT    186
+#define LCUIKEY_RIGHT   185
 #endif
 
-/*
-#define KEY_DOWN    264
-#define KEY_UP      260
-#define KEY_LEFT    272
-#define KEY_RIGHT   268
- */
+#else /* WIN32 的键盘键值 */
+#include <winuser.h>
+
+#define LCUIKEY_ESC		VK_ESCAPE
+#define LCUIKEY_ENTER		VK_RETURN
+#define LCUIKEY_BACKSPACE	VK_BACKSPACE
+#define LCUIKEY_DELETE		VK_DELETE
+#define LCUIKEY_HOMEPAGE	VK_HOME
+#define LCUIKEY_END		VK_END
+#define LCUIKEY_SPACE		VK_SPACE
+#define LCUIKEY_TAB		VK_TAB
+
+#define LCUIKEY_DOWN    VK_DOWN
+#define LCUIKEY_UP      VK_UP
+#define LCUIKEY_LEFT    VK_LEFT
+#define LCUIKEY_RIGHT   VK_RIGHT
+
+#endif
 
 #define	PRESSED	10
 #define	FREE	5
@@ -143,20 +218,29 @@ int LCUIKeyboard_Init( void );
 /* 停用键盘输入 */
 int LCUIKeyboard_End( void );
 
+/* 添加键盘的按键按下事件 */
+void LCUIKeyboard_HitKey( int key_code );
+
+/* 添加键盘的按键释放事件 */
+void LCUIKeyboard_FreeKey( int key_code );
+
 /* 检测是否有按键按下 */
-BOOL LCUIKeyboard_Hit( void );
+BOOL LCUIKeyboard_IsHit( void );
 
 /* 功能：获取被按下的按键的键值 */
 int LCUIKeyboard_Get( void );
 
 /* 检测指定键值的按键是否处于按下状态 */
-BOOL LCUIKey_Hit( int key_code );
+BOOL LCUIKey_IsHit( int key_code );
 
-/* 标记指定键值的按键已释放” */
+/* 标记指定键值的按键已释放 */
 void LCUIKey_Free( int key_code );
 
 /* 初始化键盘输入模块 */
 void LCUIModule_Keyboard_Init( void );
+
+/* 停用键盘输入模块 */
+void LCUIModule_Keyboard_End( void );
 /*************************** Key End **********************************/
 
 

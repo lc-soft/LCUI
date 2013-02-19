@@ -178,15 +178,15 @@ TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	cols = TextLayer_Get_RowLen( layer, cur_pos.y );
 	rows = TextLayer_GetRows( layer ); 
 	switch( event->key.key_code ) {
-	    case KEY_HOMEPAGE: //home键移动光标至行首
+	    case LCUIKEY_HOMEPAGE: //home键移动光标至行首
 		cur_pos.x = 0;
 		goto mv_cur_pos;
 		
-	    case KEY_END: //end键移动光标至行尾
+	    case LCUIKEY_END: //end键移动光标至行尾
 		cur_pos.x = cols;
 		goto mv_cur_pos;
 		
-	    case KEY_LEFT:
+	    case LCUIKEY_LEFT:
 		if( cur_pos.x > 0 ) {
 			cur_pos.x--;
 		} else if( cur_pos.y > 0 ) {
@@ -195,7 +195,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 		}
 		goto mv_cur_pos;
 		
-	    case KEY_RIGHT:
+	    case LCUIKEY_RIGHT:
 		if( cur_pos.x < cols ) {
 			cur_pos.x++;
 		} else if( cur_pos.y < rows-1 ) {
@@ -204,13 +204,13 @@ TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 		}
 		goto mv_cur_pos;
 		
-	    case KEY_UP:
+	    case LCUIKEY_UP:
 		if( cur_pos.y > 0 ) {
 			cur_pos.y--;
 		}
 		goto mv_cur_pos;
 		
-	    case KEY_DOWN:
+	    case LCUIKEY_DOWN:
 		if( cur_pos.y < rows-1 ) {
 			cur_pos.y++;
 		}
@@ -219,11 +219,11 @@ mv_cur_pos:;
 		TextBox_Cursor_Move( widget,cur_pos );
 		break;
 		
-	    case KEY_BACKSPACE: //删除光标左边的字符
+	    case LCUIKEY_BACKSPACE: //删除光标左边的字符
 		TextBox_Text_Backspace( widget, 1 );
 		break;
 		
-	    case KEY_DELETE:
+	    case LCUIKEY_DELETE:
 		//删除光标右边的字符
 		
 		break;

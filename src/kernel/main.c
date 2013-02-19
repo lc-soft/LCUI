@@ -83,7 +83,7 @@ static void LCUI_Quit( void )
 	LCUIModule_Widget_End();
 	LCUIModule_Font_End();
 	LCUIModule_Timer_End();
-	//LCUIModule_Keyboard_End();
+	LCUIModule_Keyboard_End();
 	//LCUIModule_Mouse_End();
 	//LCUIModule_TouchScreen_End();
 	LCUIModule_Device_End();
@@ -383,7 +383,6 @@ int LCUI_Init(int argc, char *argv[])
 		LCUI_ShowCopyrightText();
 		
 		LCUI_AppList_Init( &LCUI_Sys.app_list );
-		Queue_Init( &LCUI_Sys.press_key, sizeof(int), NULL );
 		/* 注册程序 */
 		temp = LCUI_AppList_Add();
 		if(temp != 0) {

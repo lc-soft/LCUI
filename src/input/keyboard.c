@@ -57,10 +57,49 @@
 
 static struct termios tm;//, tm_old; 
 static int fd = STDIN_FILENO;
+#endif
+
+/* 检测指定键值的按键是否处于按下状态 */
+BOOL LCUIKey_IsHit( int key_code )
+{
+	int *t;
+	int i, total;
+	
+	total = Queue_Get_Total(&LCUI_Sys.press_key);
+	for(i=0; i<total; ++i) {
+		t = Queue_Get(&LCUI_Sys.press_key, i);
+		if( t && *t == key_code ) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+/* 添加已被按下的按键 */
+void LCUIKey_Hit( int key_code )
+{
+	Queue_Add( &LCUI_Sys.press_key, &key_code );
+}
+
+/* 标记指定键值的按键已释放 */
+void LCUIKey_Free( int key_code )
+{
+	int *t;
+	int i, total;
+	
+	total = Queue_Get_Total(&LCUI_Sys.press_key);
+	for(i=0; i<total; ++i) {
+		t = Queue_Get(&LCUI_Sys.press_key, i);
+		if( t && *t == key_code ) {
+			Queue_Delete( &LCUI_Sys.press_key, i );
+		}
+	}
+}
 
 /* 初始化键盘输入 */
 int LCUIKeyboard_Init( void )
 {
+#ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	if(tcgetattr(fd, &tm) < 0) {
 		return -1; 
 	} 
@@ -72,12 +111,14 @@ int LCUIKeyboard_Init( void )
 		return -1; 
 	}
 	printf("\033[?25l");/* 隐藏光标 */
+#endif
 	return 0;
 }
 
 /* 停用键盘输入 */
 int LCUIKeyboard_End( void )
 {
+#ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	tm.c_lflag |= ICANON;
 	tm.c_lflag |= ECHO;
 	tm.c_cc[VMIN] = 1;
@@ -86,12 +127,34 @@ int LCUIKeyboard_End( void )
 		return -1;
 	}
 	printf("\033[?25h"); /* 显示光标 */ 
+#endif
 	return 0;
 }
 
-/* 检测是否有按键按下 */
-BOOL LCUIKeyboard_Hit( void )
+/* 添加键盘的按键按下事件 */
+void LCUIKeyboard_HitKey( int key_code )
 {
+	LCUI_Event event;
+	event.type = LCUI_KEYDOWN;
+	event.key.key_code = key_code;
+	LCUIKey_Hit( key_code );
+	LCUI_PushEvent( &event );
+}
+
+/* 添加键盘的按键释放事件 */
+void LCUIKeyboard_FreeKey( int key_code )
+{
+	LCUI_Event event;
+	event.type = LCUI_KEYUP;
+	event.key.key_code = key_code;
+	LCUIKey_Free( key_code );
+	LCUI_PushEvent( &event );
+}
+
+/* 检测是否有按键按下 */
+BOOL LCUIKeyboard_IsHit( void )
+{
+#ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	struct termios oldt;//, newt;  
 	int ch, oldf;  
 	tcgetattr(STDIN_FILENO, &oldt);  
@@ -109,11 +172,17 @@ BOOL LCUIKeyboard_Hit( void )
 		return TRUE;
 	} 
 	return FALSE;
+#endif
+	if( Queue_Get_Total( &LCUI_Sys.press_key ) > 0) {
+		return TRUE;
+	}
+	return FALSE;
 }
 
-/* 功能：获取被按下的按键的键值 */
+/* 获取被按下的按键的键值 */
 int LCUIKeyboard_Get( void )
 { 
+#ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	int k,c;
 	static int input = 0, count = 0;
 	++count;
@@ -121,7 +190,7 @@ int LCUIKeyboard_Get( void )
 	k = fgetc(stdin);
 	input += k;
 	/* 如果还有字符在缓冲中 */
-	if(LCUIKeyboard_Hit()) {
+	if(LCUIKeyboard_IsHit()) {
 		LCUIKeyboard_Get();
 	}
 	c = input;
@@ -134,44 +203,25 @@ int LCUIKeyboard_Get( void )
 		exit(1);
 	}
 	return c; 
-}
-
-/* 检测指定键值的按键是否处于按下状态 */
-BOOL LCUIKey_Hit( int key_code )
-{
-	int *t;
-	int i, total;
-	
-	total = Queue_Get_Total(&LCUI_Sys.press_key);
-	for(i=0; i<total; ++i) {
-		t = Queue_Get(&LCUI_Sys.press_key, i);
-		if( t && *t == key_code ) {
-			return TRUE;
-		}
+#else 
+	int *key_ptr;
+	while( Queue_Get_Total(&LCUI_Sys.press_key) == 0 ) {
+		LCUI_MSleep(100);
 	}
-	return FALSE;
-}
-
-/* 标记指定键值的按键已释放” */
-void LCUIKey_Free( int key_code )
-{
-	int *t;
-	int i, total;
-	
-	total = Queue_Get_Total(&LCUI_Sys.press_key);
-	for(i=0; i<total; ++i) {
-		t = Queue_Get(&LCUI_Sys.press_key, i);
-		if( t && *t == key_code ) {
-			Queue_Delete( &LCUI_Sys.press_key, i );
-		}
+	key_ptr = Queue_Get( &LCUI_Sys.press_key, 0 );
+	if( key_ptr ) {
+		return *key_ptr;
 	}
+	return -1;
+#endif
 }
 
+#ifdef LCUI_KEYBOARD_DRIVER_LINUX
 static BOOL proc_keyboard()
 {
 	LCUI_Event event;
 	 /* 如果没有按键输入 */ 
-	if ( !LCUIKeyboard_Hit() ) {
+	if ( !LCUIKeyboard_IsHit() ) {
 		return FALSE;
 	}
 	
@@ -225,11 +275,19 @@ static BOOL Disable_Keyboard_Input( void )
 	LCUIKeyboard_End(); /* 恢复终端属性 */
 	return TRUE;
 }
+#endif
 
 /* 初始化键盘输入模块 */
 void LCUIModule_Keyboard_Init( void )
 {
+	Queue_Init( &LCUI_Sys.press_key, sizeof(int), NULL );
+#ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	LCUI_Dev_Add( Enable_Keyboard_Input, proc_keyboard, Disable_Keyboard_Input );
+#endif
 }
 
-#endif
+/* 停用键盘输入模块 */
+void LCUIModule_Keyboard_End( void )
+{
+	Destroy_Queue( &LCUI_Sys.press_key );
+}

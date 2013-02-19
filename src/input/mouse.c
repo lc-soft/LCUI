@@ -107,7 +107,7 @@ int Click_LeftButton (LCUI_MouseButtonEvent *event)
 {
 	/* 如果按下的是鼠标左键，并且之前没有按住它 */
 	if (Mouse_LeftButton(event) == PRESSED
-		&& !LCUIKey_Hit(event->button)) {
+		&& !LCUIKey_IsHit(event->button)) {
 		return 1;
 	}
 	return 0;
@@ -138,7 +138,7 @@ static void LCUIMouse_ButtonDown( LCUI_Pos pos, int key_code )
 	LCUI_Event event;
 	
 	/* 若该键已经按下，就不需要再添加至队列了 */
-	if( LCUIKey_Hit( key_code ) ) {
+	if( LCUIKey_IsHit( key_code ) ) {
 		return;
 	}
 	temp = Queue_Add(&LCUI_Sys.press_key, &key_code);
@@ -158,7 +158,7 @@ static void LCUIMouse_ButtonFree( LCUI_Pos pos, int key_code )
 {
 	LCUI_Event event;
 	
-	if( !LCUIKey_Hit( key_code ) ) {
+	if( !LCUIKey_IsHit( key_code ) ) {
 		return; 
 	}
 	LCUIKey_Free( key_code );
