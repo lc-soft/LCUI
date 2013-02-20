@@ -10,6 +10,8 @@
 #include LC_FONT_H 
 #include LC_WIDGET_H
 
+#include <time.h>
+
 LCUI_System LCUI_Sys; 
 
 /************************* App Management *****************************/
@@ -43,16 +45,16 @@ LCUI_App* LCUIApp_GetSelf( void )
 	|| id == LCUI_Sys.self_id
 	|| id == LCUI_Sys.timer_thread )
 	{/* 由于内核及其它线程ID没有被记录，只有直接返回LCUI主程序的线程ID了 */
-		return LCUIApp_Find(LCUI_Sys.self_id);
+		return LCUIApp_Find((LCUI_ID)LCUI_Sys.self_id);
 	}
 	id = LCUIThread_GetRootThreadID( id );
-	return LCUIApp_Find( id );
+	return LCUIApp_Find( (LCUI_ID)id );
 }
 
 /* 获取程序ID */
 LCUI_ID LCUIApp_GetSelfID( void )
 {
-	return LCUIThread_SelfID();
+	return (LCUI_ID)LCUIThread_SelfID();
 }
 
 void LCUI_App_Init( LCUI_App *app )

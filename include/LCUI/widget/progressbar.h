@@ -48,7 +48,7 @@ typedef struct _LCUI_ProgressBar		LCUI_ProgressBar;
 /*************** 进度条 ********************/
 struct _LCUI_ProgressBar
 {
-	pthread_t thread;	/* 线程 */
+	LCUI_Thread thread;	/* 线程 */
 	LCUI_Graph fore_graph;		/* 前景图形 */ 
 	LCUI_Graph flash_image;	/* 附加的图形，实现进度条上移动的的闪光 */
 	
