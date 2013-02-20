@@ -235,7 +235,7 @@ int LCUIApp_CancelAllThreads( LCUI_ID app_id )
 {
 	int i, n;
 	Thread_TreeNode *ttn, *child;
-	ttn = ThreadTree_Find(&thread_tree, app_id);
+	ttn = ThreadTree_Find(&thread_tree, (LCUI_Thread)app_id);
 	if(ttn == NULL) {
 		return -1;
 	}

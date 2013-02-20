@@ -3,6 +3,7 @@
 #include LC_THREAD_H
 
 #ifdef LCUI_THREAD_WIN32
+#include <process.h>
 
 typedef struct _LCUI_ThreadData {
 	HANDLE handle;
@@ -25,7 +26,7 @@ static unsigned __stdcall run_thread(void *arg)
 
 int _LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 {
-	LCUI_Thread *thread_ptr;
+	LCUI_ThreadData *thread_ptr;
 	if(!db_init) {
 		db_init = TRUE;
 		Queue_Init(&thread_database, sizeof(LCUI_ThreadData), NULL);
@@ -103,7 +104,7 @@ void _LCUIThread_Cancel( LCUI_Thread thread )
 	LCUI_ThreadData *data_ptr;
 	data_ptr = _LCUIThread_Self();
 	TerminateThread( data_ptr->handle, FALSE );
-	_LCUIThread_Destroy( data_ptr );
+	_LCUIThread_Destroy( data_ptr->tid );
 }
 
 int _LCUIThread_Join( LCUI_Thread thread, void **retval )
@@ -115,6 +116,6 @@ int _LCUIThread_Join( LCUI_Thread thread, void **retval )
 	if( retval ) {
 		*retval = data_ptr->retval;
 	}
-	return _LCUIThread_Destroy( data_ptr );
+	return _LCUIThread_Destroy( data_ptr->tid );
 }
 #endif
