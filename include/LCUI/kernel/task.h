@@ -12,7 +12,7 @@ typedef struct {
 	
 	/* 以下参数该怎么传给回调函数，具体要看是如何处理事件的 */  
 	void *arg[2];		/* 传给函数的两个参数 */
-	BOOL destroy_arg[2];	/* 指定是否在调用完回调函数后，销毁参数 */
+	LCUI_BOOL destroy_arg[2];	/* 指定是否在调用完回调函数后，销毁参数 */
 } LCUI_Func, LCUI_Task;
 
 LCUI_BEGIN_HEADER

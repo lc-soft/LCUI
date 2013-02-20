@@ -147,7 +147,7 @@ uchar_t GraphLayer_GetAlpha( LCUI_GraphLayer *glayer )
 }
 
 /* 图层是否继承父图层的透明度 */
-void GraphLayer_InerntAlpha( LCUI_GraphLayer *glayer, BOOL flag )
+void GraphLayer_InerntAlpha( LCUI_GraphLayer *glayer, LCUI_BOOL flag )
 {
 	glayer->inherit_alpha = flag;
 }

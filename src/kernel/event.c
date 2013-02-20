@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 static LCUI_Queue events;
-static BOOL active = FALSE;
+static LCUI_BOOL active = FALSE;
 static LCUI_Thread eventloop_thread = -1;
 
 /* 事件队列初始化 */
@@ -20,7 +20,7 @@ static void LCUI_DestroyEvents( void )
 }
 
 /* 从事件队列中获取事件 */
-BOOL LCUI_PollEvent( LCUI_Event *event )
+LCUI_BOOL LCUI_PollEvent( LCUI_Event *event )
 {
 	LCUI_Event *tmp;
 	
@@ -174,7 +174,7 @@ void LCUIModule_Event_End( void )
 }
 
 /* 添加事件至事件队列中 */
-BOOL LCUI_PushEvent( LCUI_Event *event )
+LCUI_BOOL LCUI_PushEvent( LCUI_Event *event )
 {
 	if( !active ) {
 		return FALSE;
@@ -205,7 +205,7 @@ void EventSlots_Init( LCUI_Queue *slots )
 }
 
 /* 将函数指针以及两个参数，转换成LCUI_Func类型，保存至p_buff指向的缓冲区中 */
-BOOL Get_FuncData(	LCUI_Func *p_buff, 
+LCUI_BOOL Get_FuncData(	LCUI_Func *p_buff, 
 			void (*func) (),
 			void *arg1, void *arg2 )
 {

@@ -1132,7 +1132,7 @@ void LCUIApp_DestroyAllWidgets( LCUI_ID app_id )
 
 
 /* 检测指定部件是否处于焦点状态 */
-BOOL Widget_GetFocus( LCUI_Widget *widget )
+LCUI_BOOL Widget_GetFocus( LCUI_Widget *widget )
 {
 	LCUI_Widget *tmp;
 	
@@ -1147,7 +1147,7 @@ BOOL Widget_GetFocus( LCUI_Widget *widget )
 }
 
 /* 检测指定部件是否获得全局焦点，也就是该部件以及上级所有父部件是否都得到了焦点 */
-BOOL Widget_GetGlobalFocus( LCUI_Widget *widget )
+LCUI_BOOL Widget_GetGlobalFocus( LCUI_Widget *widget )
 {
 	if( Widget_GetFocus(widget) ) {
 		return Widget_GetFocus( widget->parent );
@@ -1660,7 +1660,7 @@ void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color )
 }
 
 /* 设定部件背景是否透明 */
-void Widget_SetBackgroundTransparent( LCUI_Widget *widget, BOOL flag )
+void Widget_SetBackgroundTransparent( LCUI_Widget *widget, LCUI_BOOL flag )
 {
 	if(!widget) {
 		return;
@@ -1683,7 +1683,7 @@ void Widget_Disable(LCUI_Widget *widget)
 }
 
 /* 指定部件是否可见 */
-void Widget_Visible( LCUI_Widget *widget, BOOL flag )
+void Widget_Visible( LCUI_Widget *widget, LCUI_BOOL flag )
 {
 	widget->visible = flag;
 	if( flag ) {
@@ -1910,7 +1910,7 @@ void Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 
 /* 启用或禁用部件的自动尺寸调整功能 */
 void Widget_SetAutoSize(	LCUI_Widget *widget,
-				BOOL flag, AUTOSIZE_MODE mode )
+				LCUI_BOOL flag, AUTOSIZE_MODE mode )
 {
 	widget->auto_size = flag;
 	widget->auto_size_mode = mode;
@@ -2137,7 +2137,7 @@ void Widget_SetSize( LCUI_Widget *widget, char *width, char *height )
 }
 
 /* 指定部件是否为模态部件 */
-void Widget_SetModal( LCUI_Widget *widget, BOOL is_modal )
+void Widget_SetModal( LCUI_Widget *widget, LCUI_BOOL is_modal )
 {
 	if( !widget ) {
 		return;

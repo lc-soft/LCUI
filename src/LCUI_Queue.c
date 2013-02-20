@@ -533,7 +533,7 @@ int Queue_Find( LCUI_Queue *queue, const void *p )
 	return -1;
 }
 
-static BOOL 
+static LCUI_BOOL 
 Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag) 
 /* 
  * 功能：从队列中删除一个成员，并重新排列队列

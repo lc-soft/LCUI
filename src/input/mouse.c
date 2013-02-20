@@ -196,7 +196,7 @@ void LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type )
 }
 
 #ifdef LCUI_MOUSE_DRIVER_LINUX
-static BOOL proc_mouse( void *arg )
+static LCUI_BOOL proc_mouse( void *arg )
 {
 	static int  tmp; 
 	static char buf[6]; 
@@ -250,7 +250,7 @@ static BOOL proc_mouse( void *arg )
 }
 #endif
 
-BOOL Enable_Mouse_Input()
+LCUI_BOOL Enable_Mouse_Input()
 /* 功能：启用鼠标输入处理 */
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
@@ -275,7 +275,7 @@ BOOL Enable_Mouse_Input()
 	return TRUE; 
 }
 
-BOOL Disable_Mouse_Input()
+LCUI_BOOL Disable_Mouse_Input()
 /* 功能：禁用鼠标输入处理 */
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX

@@ -51,7 +51,7 @@
 
 #include <iconv.h>
 
-BOOL FontBMP_Valid(LCUI_FontBMP *bitmap)
+LCUI_BOOL FontBMP_Valid(LCUI_FontBMP *bitmap)
 /*
  * 功能：检测位图数据是否有效
  * 返回值：有效返回帧，无效返回假
@@ -328,7 +328,7 @@ int Get_NewFontBMP(	int font_id, wchar_t ch, int pixel_size,
 {
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 	size_t size;
-	BOOL have_space = FALSE;
+	LCUI_BOOL have_space = FALSE;
 	
 	FT_Face face;
 	int error;

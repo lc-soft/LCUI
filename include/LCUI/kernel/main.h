@@ -34,8 +34,8 @@ LCUI_Screen;
 typedef struct _LCUI_System
 {
 	int state;		/* 状态 */ 
-	BOOL init;		/* 指示LCUI是否初始化过 */
-	BOOL need_sync_area;	/* 指示是否需要转移部件中记录的区域数据 */ 
+	LCUI_BOOL init;		/* 指示LCUI是否初始化过 */
+	LCUI_BOOL need_sync_area;	/* 指示是否需要转移部件中记录的区域数据 */ 
 	
 	LCUI_Thread self_id;		/* 保存LCUI主程序的线程的ID */
 	LCUI_Thread display_thread;	/* 保存核心处理的线程的ID */
@@ -58,8 +58,8 @@ LCUI_System;
 /***********************************************************************/
 
 typedef struct {
-	BOOL quit;
-	BOOL running;
+	LCUI_BOOL quit;
+	LCUI_BOOL running;
 	int level;
 } LCUI_MainLoop;
 
@@ -91,7 +91,7 @@ int LCUI_MainLoop_Quit( LCUI_MainLoop *loop );
 
 /*----------------------- End MainLoop -------------------------------*/
 
-BOOL LCUI_Active();
+LCUI_BOOL LCUI_Active();
 /* 功能：检测LCUI是否活动 */ 
 
 int LCUI_Init(int argc, char *argv[]);

@@ -6,7 +6,7 @@
 typedef struct _timer_data
 {
 	int state;		/* 状态 */
-	BOOL reuse;		/* 是否重复使用该定时器 */
+	LCUI_BOOL reuse;		/* 是否重复使用该定时器 */
 	LCUI_ID app_id;	/* 所属程序ID */
 	long int id;		/* 定时器ID */
 	long int total_ms;	/* 定时总时间（单位：毫秒） */
@@ -22,7 +22,7 @@ LCUI_BEGIN_HEADER
  * 说明：时间单位为毫秒，调用后会返回该定时器的标识符; 
  * 如果要用于循环定时处理某些任务，可将 reuse 置为 1，否则置于 0。
  * */
-int set_timer( long int n_ms, void (*callback_func)(void), BOOL reuse );
+int set_timer( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse );
 
 /*
  * 功能：释放定时器

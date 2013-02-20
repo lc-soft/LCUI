@@ -60,7 +60,7 @@ static int fd = STDIN_FILENO;
 #endif
 
 /* 检测指定键值的按键是否处于按下状态 */
-BOOL LCUIKey_IsHit( int key_code )
+LCUI_BOOL LCUIKey_IsHit( int key_code )
 {
 	int *t;
 	int i, total;
@@ -152,7 +152,7 @@ void LCUIKeyboard_FreeKey( int key_code )
 }
 
 /* 检测是否有按键按下 */
-BOOL LCUIKeyboard_IsHit( void )
+LCUI_BOOL LCUIKeyboard_IsHit( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	struct termios oldt;//, newt;  
@@ -217,7 +217,7 @@ int LCUIKeyboard_Get( void )
 }
 
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
-static BOOL proc_keyboard()
+static LCUI_BOOL proc_keyboard()
 {
 	LCUI_Event event;
 	 /* 如果没有按键输入 */ 
@@ -263,14 +263,14 @@ static BOOL proc_keyboard()
 }
 
 /* 键盘输入模块的初始化 */
-static BOOL Enable_Keyboard_Input( void )
+static LCUI_BOOL Enable_Keyboard_Input( void )
 {
 	LCUIKeyboard_Init(); /* 设置终端属性 */
 	return TRUE;
 }
 
 /* 键盘输入模块的销毁 */
-static BOOL Disable_Keyboard_Input( void )
+static LCUI_BOOL Disable_Keyboard_Input( void )
 {
 	LCUIKeyboard_End(); /* 恢复终端属性 */
 	return TRUE;

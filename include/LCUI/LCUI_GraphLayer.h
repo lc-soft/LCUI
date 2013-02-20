@@ -8,8 +8,8 @@ typedef struct _LCUI_GraphLayer LCUI_GraphLayer;
 
 struct _LCUI_GraphLayer
 {
-	BOOL		visible;	/* 图层是否可见 */
-	BOOL		inherit_alpha;	/* 是否继承父图层的透明度 */
+	LCUI_BOOL		visible;	/* 图层是否可见 */
+	LCUI_BOOL		inherit_alpha;	/* 是否继承父图层的透明度 */
 	int		z_index;	/* 图层的堆叠顺序，值越大，图层显示位置越靠前 */
 	LCUI_Pos	pos;		/* 图层的xy轴坐标 */
 	
@@ -46,7 +46,7 @@ LCUI_Size GraphLayer_GetSize( LCUI_GraphLayer *glayer );
 uchar_t GraphLayer_GetAlpha( LCUI_GraphLayer *glayer );
 
 /* 图层是否继承父图层的透明度 */
-void GraphLayer_InerntAlpha( LCUI_GraphLayer *glayer, BOOL flag );
+void GraphLayer_InerntAlpha( LCUI_GraphLayer *glayer, LCUI_BOOL flag );
 
 /* 设定图层的XY轴坐标 */
 int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y );

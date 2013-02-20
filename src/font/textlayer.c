@@ -378,7 +378,7 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 {
 	LCUI_Rect area;
 	LCUI_Pos pos, mix_pos;
-	BOOL draw_all = FALSE, redraw_row;
+	LCUI_BOOL draw_all = FALSE, redraw_row;
 	int i, j, n, rows, size;
 	LCUI_RGB color;
 	LCUI_Graph slot, *graph;
@@ -707,7 +707,7 @@ skip_style_cmp:;
 }
 
 void 
-TextLayer_ReadOnly( LCUI_TextLayer *layer, BOOL flag )
+TextLayer_ReadOnly( LCUI_TextLayer *layer, LCUI_BOOL flag )
 /* 指定文本图层中的文本是否为只读 */
 {
 	layer->read_only = flag;
@@ -773,7 +773,7 @@ void
 TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text )
 /* 对文本进行预处理，处理后的数据保存至layer里 */ 
 {
-	BOOL refresh = TRUE;
+	LCUI_BOOL refresh = TRUE;
 	LCUI_Pos cur_pos, des_pos;
 	int total, cur_len, row, src_pos, total_row, n_ignore = 0;
 	wchar_t *finish, *buff, *p, *q;
@@ -936,7 +936,7 @@ void
 TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
 /* 为文本图层中的文本生成位图，已存在位图的文字将不重新生成 */
 {
-	BOOL refresh = FALSE;
+	LCUI_BOOL refresh = FALSE;
 	LCUI_Pos pos;
 	int i, j, len, rows;
 	Text_RowData *row_ptr;
@@ -1354,7 +1354,7 @@ static int
 _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 /* 以start_pos为起点，删除n个文字 */
 {
-	BOOL refresh = TRUE;
+	LCUI_BOOL refresh = TRUE;
 	LCUI_CharData *char_ptr;
 	LCUI_Pos tmp_pos, pixel_pos;
 	int left_or_right, rows, cols;
@@ -1660,14 +1660,14 @@ TextLayer_Cut_Select_Text( LCUI_TextLayer *layer )
 }
 
 void 
-TextLayer_UsingStyleTags( LCUI_TextLayer *layer, BOOL flag )
+TextLayer_UsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL flag )
 /* 指定文本图层是否处理样式标签 */
 {
 	layer->using_style_tags = flag;
 }
 
 void 
-TextLayer_Multiline( LCUI_TextLayer *layer, BOOL flag )
+TextLayer_Multiline( LCUI_TextLayer *layer, LCUI_BOOL flag )
 /* 指定文本图层是否启用多行文本显示 */
 {
 	layer->enable_multiline = flag;

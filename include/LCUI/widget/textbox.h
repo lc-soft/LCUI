@@ -103,11 +103,11 @@ int TextBox_Copy_Select_Text(LCUI_Widget *widget);
 int TextBox_Cut_Select_Text(LCUI_Widget *widget);
 /* 剪切文本框内被选中的文本 */
 
-void TextBox_Using_StyleTags(LCUI_Widget *widget, BOOL flag);
+void TextBox_Using_StyleTags(LCUI_Widget *widget, LCUI_BOOL flag);
 /* 指定文本框是否处理控制符 */
 
 void 
-TextBox_Multiline( LCUI_Widget *widget, BOOL flag );
+TextBox_Multiline( LCUI_Widget *widget, LCUI_BOOL flag );
 /* 指定文本框是否启用多行文本显示 */
 
 void

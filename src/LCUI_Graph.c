@@ -166,7 +166,7 @@ LCUI_RGBA RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore)
 	return back;
 }
 
-BOOL Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel)
+LCUI_BOOL Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel)
 /* 功能：获取图像中指定坐标的像素点的颜色 */
 {
 	int i;
@@ -208,7 +208,7 @@ LCUI_Size Get_Graph_Size(LCUI_Graph *pic)
 	return Size(pic->width, pic->height);
 }
 
-BOOL Graph_Is_PNG(LCUI_Graph *pic)
+LCUI_BOOL Graph_Is_PNG(LCUI_Graph *pic)
 /* 
  * 功能：判断图像是否为png
  * 返回值：是则返回1，否则返回0
@@ -220,7 +220,7 @@ BOOL Graph_Is_PNG(LCUI_Graph *pic)
 	return FALSE;
 }
 
-BOOL Graph_Is_BMP(LCUI_Graph *pic)
+LCUI_BOOL Graph_Is_BMP(LCUI_Graph *pic)
 /* 
  * 功能：判断图像是否为bmp
  * 返回值：是则返回1，否则返回0
@@ -232,7 +232,7 @@ BOOL Graph_Is_BMP(LCUI_Graph *pic)
 	return FALSE;
 }
 
-BOOL Graph_Is_JPG(LCUI_Graph *pic)
+LCUI_BOOL Graph_Is_JPG(LCUI_Graph *pic)
 /* 
  * 功能：判断图像是否为jpg 
  * 返回值：是则返回1，否则返回0
@@ -244,7 +244,7 @@ BOOL Graph_Is_JPG(LCUI_Graph *pic)
 	return FALSE;
 }
 
-BOOL Graph_Have_Alpha(LCUI_Graph *pic)
+LCUI_BOOL Graph_Have_Alpha(LCUI_Graph *pic)
 /* 
  * 功能：判断图像是否带有带alpha通道 
  * 返回值：是则返回1，否则返回0
@@ -257,7 +257,7 @@ BOOL Graph_Have_Alpha(LCUI_Graph *pic)
 	return 0; 
 }
 
-BOOL Graph_Valid(LCUI_Graph *pic)
+LCUI_BOOL Graph_Valid(LCUI_Graph *pic)
 /*
  * 功能：检测图形数据是否有效
  * 返回值：有效返回1，无效返回0
@@ -771,7 +771,7 @@ int Graph_Fill_Color(LCUI_Graph *graph, LCUI_RGB color)
 }
 
 /* 平铺图形 */
-int Graph_Tile(	LCUI_Graph *src, LCUI_Graph *des_buff, BOOL replace )
+int Graph_Tile(	LCUI_Graph *src, LCUI_Graph *des_buff, LCUI_BOOL replace )
 {
 	int ret = 0;
 	LCUI_Pos pos;
@@ -1063,7 +1063,7 @@ int Graph_Fill_Image(	LCUI_Graph *graph,	LCUI_Graph *bg,
 	LCUI_Size size;
 	LCUI_Pos pos;
 	LCUI_Graph temp_bg;
-	BOOL replace_mix;
+	LCUI_BOOL replace_mix;
 	
 	if( Check_Option( mode, GRAPH_MIX_FLAG_REPLACE ) ) {
 		/* 将alpha通道置为0 */

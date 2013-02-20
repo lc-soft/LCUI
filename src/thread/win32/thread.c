@@ -12,7 +12,7 @@ typedef struct _LCUI_ThreadData {
 	void *arg;
 } LCUI_ThreadData;
 
-static BOOL db_init = FALSE;
+static LCUI_BOOL db_init = FALSE;
 static LCUI_Queue thread_database;
 
 static unsigned __stdcall run_thread(void *arg)

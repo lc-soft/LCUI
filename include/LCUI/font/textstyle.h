@@ -29,13 +29,13 @@ enum_font_decoration;
 
 typedef struct _LCUI_TextStyle
 {
-	BOOL _family:1;
-	BOOL _style:1;
-	BOOL _weight:1;
-	BOOL _decoration:1;
-	BOOL _back_color:1;
-	BOOL _fore_color:1;
-	BOOL _pixel_size:1;
+	LCUI_BOOL _family:1;
+	LCUI_BOOL _style:1;
+	LCUI_BOOL _weight:1;
+	LCUI_BOOL _decoration:1;
+	LCUI_BOOL _back_color:1;
+	LCUI_BOOL _fore_color:1;
+	LCUI_BOOL _pixel_size:1;
 	
 	int font_id;
 	enum_font_style	style		:3;

@@ -172,7 +172,7 @@ static int App_Quit()
 
 
 /*--------------------------- Main Loop -------------------------------*/
-static BOOL init_mainloop_queue = FALSE;
+static LCUI_BOOL init_mainloop_queue = FALSE;
 static LCUI_Queue mainloop_queue;
 
 static void LCUI_MainLoopQueue_Init( void )
@@ -256,7 +256,7 @@ int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
 }
 
 
-static BOOL
+static LCUI_BOOL
 LCUIApp_HaveTask( LCUI_App *app )
 {
 	if( !app ) {
@@ -358,7 +358,7 @@ static void LCUIModule_Cursor_Init( void )
 	Set_Cursors_Graph( &pic );
 }
 
-BOOL LCUI_Active()
+LCUI_BOOL LCUI_Active()
 /* 功能：检测LCUI是否活动 */
 {
 	if(LCUI_Sys.state == ACTIVE) {

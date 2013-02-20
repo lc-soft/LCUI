@@ -4,9 +4,9 @@
 
 typedef struct _dev_func_data
 {
-	BOOL (*init_func)();
-	BOOL (*proc_func)();
-	BOOL (*destroy_func)();
+	LCUI_BOOL (*init_func)();
+	LCUI_BOOL (*proc_func)();
+	LCUI_BOOL (*destroy_func)();
 }
 dev_func_data;
 
@@ -16,9 +16,9 @@ LCUI_BEGIN_HEADER
  * 功能：注册设备
  * 说明：为指定设备添加处理函数
  * */
-int LCUI_Dev_Add(	BOOL (*init_func)(), 
-			BOOL (*proc_func)(), 
-			BOOL (*destroy_func)() );
+int LCUI_Dev_Add(	LCUI_BOOL (*init_func)(), 
+			LCUI_BOOL (*proc_func)(), 
+			LCUI_BOOL (*destroy_func)() );
 
 /* 初始化设备处理模块 */
 int LCUIModule_Device_Init();

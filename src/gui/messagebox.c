@@ -36,7 +36,7 @@ typedef struct {
 	MB_BTN clicked_button;
 } MB_data;
 
-static BOOL msgbox_list_init = FALSE;
+static LCUI_BOOL msgbox_list_init = FALSE;
 static LCUI_Queue msgbox_list;
 
 static LCUI_MainLoop*

@@ -67,6 +67,11 @@ ALPHA_BLENDING( uchar_t fore, uchar_t back, uchar_t alpha )
 
 #endif
 
+/* 解除RGB宏 */
+#ifdef RGB
+#undef RGB
+#endif
+
 LCUI_RGB RGB ( uchar_t red, uchar_t green, uchar_t blue ) ;
 /* 将三个颜色值转换成LCUI_RGB型数据 */
 
@@ -82,7 +87,7 @@ void Graph_Unlock(LCUI_Graph *pic);
 LCUI_RGBA RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore);
 /* 功能：混合两个像素点的颜色 */ 
 
-BOOL Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel);
+LCUI_BOOL Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel);
 /* 功能：获取图像中指定坐标的像素点的颜色 */
 
 int Get_Graph_Type(LCUI_Graph *pic);
@@ -91,31 +96,31 @@ int Get_Graph_Type(LCUI_Graph *pic);
 LCUI_Size Get_Graph_Size(LCUI_Graph *pic);
 /* 功能：获取图形的尺寸 */ 
 
-BOOL Graph_Is_PNG(LCUI_Graph *pic);
+LCUI_BOOL Graph_Is_PNG(LCUI_Graph *pic);
 /* 
  * 功能：判断图像是否为png
  * 返回值：是则返回1，否则返回0
  * */ 
 
-BOOL Graph_Is_BMP(LCUI_Graph *pic);
+LCUI_BOOL Graph_Is_BMP(LCUI_Graph *pic);
 /* 
  * 功能：判断图像是否为bmp
  * 返回值：是则返回1，否则返回0
  * */ 
 
-BOOL Graph_Is_JPG(LCUI_Graph *pic);
+LCUI_BOOL Graph_Is_JPG(LCUI_Graph *pic);
 /* 
  * 功能：判断图像是否为jpg 
  * 返回值：是则返回1，否则返回0
  * */ 
 
-BOOL Graph_Have_Alpha(LCUI_Graph *pic);
+LCUI_BOOL Graph_Have_Alpha(LCUI_Graph *pic);
 /* 
  * 功能：判断图像是否带有带alpha通道 
  * 返回值：是则返回1，否则返回0
  * */ 
 
-BOOL Graph_Valid(LCUI_Graph *pic);
+LCUI_BOOL Graph_Valid(LCUI_Graph *pic);
 /*
  * 功能：检测图形数据是否有效
  * 返回值：有效返回1，无效返回0
@@ -179,7 +184,7 @@ int Graph_Fill_Color(LCUI_Graph *pic, LCUI_RGB color);
 /* 功能：为传入的图形填充颜色 */ 
 
 /* 平铺图形 */
-int Graph_Tile(	LCUI_Graph *src, LCUI_Graph *des_buff, BOOL replace );
+int Graph_Tile(	LCUI_Graph *src, LCUI_Graph *des_buff, LCUI_BOOL replace );
 
 int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos);
 /* 

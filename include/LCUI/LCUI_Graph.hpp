@@ -50,9 +50,9 @@ class LCUIGraph
 public:
 	LCUIGraph();
 	~LCUIGraph();
-	BOOL isValid( void );
+	LCUI_BOOL isValid( void );
 	int isOpaque( void );
-	BOOL haveAlpha( void );
+	LCUI_BOOL haveAlpha( void );
 	int create( int, int );
 	void copyTo( LCUIGraph & );
 	int quote( LCUIGraph &, LCUI_Rect );
@@ -80,7 +80,7 @@ LCUIGraph::~LCUIGraph()
 {
 	Graph_Free( &graph );
 }
-BOOL LCUIGraph::isValid( void )
+LCUI_BOOL LCUIGraph::isValid( void )
 {
 	return Graph_Valid( &graph );
 }
@@ -88,7 +88,7 @@ int LCUIGraph::isOpaque( void )
 {
 	return Graph_Is_Opaque( &graph );
 }
-BOOL LCUIGraph::haveAlpha( void )
+LCUI_BOOL LCUIGraph::haveAlpha( void )
 {
 	return Graph_Have_Alpha( &graph );
 }

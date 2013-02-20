@@ -86,7 +86,7 @@ static int
 Graph_Draw_RoundBorder_LeftTop( 
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
-	LCUI_RGB line_color,	BOOL hide_outarea )
+	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
 /* 绘制左上角的圆角，从左边框的上端到上边框的左端绘制一条圆角线 */
 {
 	LCUI_Rect real_rect;
@@ -192,7 +192,7 @@ static int
 Graph_Draw_RoundBorder_TopLeft( 
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
-	LCUI_RGB line_color,	BOOL hide_outarea )
+	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
 /* 绘制左上角的圆角，从上边框的左端到左边框的上端绘制一条圆角线 */
 {
 	LCUI_Rect real_rect;
@@ -305,7 +305,7 @@ static int
 Graph_Draw_RoundBorder_RightTop( 
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
-	LCUI_RGB line_color,	BOOL hide_outarea )
+	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
 /* 绘制右上角的圆角，从右边框的上端到上边框的右端绘制一条圆角线 */
 {
 	LCUI_Rect real_rect;
@@ -397,7 +397,7 @@ static int
 Graph_Draw_RoundBorder_TopRight( 
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
-	LCUI_RGB line_color,	BOOL hide_outarea )
+	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
 /* 绘制右上角的圆角，从上边框的右端到右边框的上端绘制一条圆角线 */
 {
 	LCUI_Rect real_rect;
@@ -497,7 +497,7 @@ static int
 Graph_Draw_RoundBorder_LeftBottom(
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
-	LCUI_RGB line_color,	BOOL hide_outarea )
+	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
 /* 绘制左下角的圆角，从左边框的下端到下边框的左端绘制一条圆角线 */
 {
 	LCUI_Rect real_rect;
@@ -592,7 +592,7 @@ static int
 Graph_Draw_RoundBorder_BottomLeft(
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
-	LCUI_RGB line_color,	BOOL hide_outarea )
+	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
 /* 绘制左下角的圆角，从下边框的左端到左边框的下端绘制一条圆角线 */
 {
 	LCUI_Rect real_rect;
@@ -695,7 +695,7 @@ static int
 Graph_Draw_RoundBorder_RightBottom( 
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
-	LCUI_RGB line_color,	BOOL hide_outarea )
+	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
 /* 绘制右下角的圆角，从右边框的下端到下边框的右端绘制一条圆角线 */
 {
 	LCUI_Rect real_rect;
@@ -785,7 +785,7 @@ static int
 Graph_Draw_RoundBorder_BottomRight(
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
-	LCUI_RGB line_color,	BOOL hide_outarea )
+	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
 /* 绘制右下角的圆角，从下边框的右端到右边框的下端绘制一条圆角线 */
 {
 	LCUI_Rect real_rect;

@@ -72,7 +72,7 @@ typedef struct {
 
 static int font_count = 0;
 static FT_Library library = NULL;
-static BOOL database_init = FALSE;
+static LCUI_BOOL database_init = FALSE;
 static LCUI_Queue font_database, fontbitmap_database;
 static LCUI_FontInfo *default_font = NULL, *in_core_font = NULL;
 

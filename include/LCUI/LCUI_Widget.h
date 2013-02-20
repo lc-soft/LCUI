@@ -102,7 +102,7 @@ typedef enum {
 
 /******************************* 部件 **********************************/
 typedef struct {
-	BOOL transparent; /* 是否透明 */
+	LCUI_BOOL transparent; /* 是否透明 */
 	LCUI_Graph image; /* 背景图 */
 	LCUI_RGB color; /* 背景色 */
 	ALIGN_TYPE layout; /* 背景图的布局 */
@@ -117,9 +117,9 @@ struct _LCUI_Widget {
 	LCUI_String type_name;	/* 类型名 */
 	LCUI_String style_name; /* 风格名，对某些部件有效 */
 	
-	BOOL enabled;	/* 是否启用 */
-	BOOL visible;	/* 是否可见 */
-	BOOL modal;	/* 是否为模态部件 */
+	LCUI_BOOL enabled;	/* 是否启用 */
+	LCUI_BOOL visible;	/* 是否可见 */
+	LCUI_BOOL modal;	/* 是否为模态部件 */
 	
 	LCUI_Pos pos;	/* 已计算出的实际位置 */
 	LCUI_Pos max_pos;
@@ -165,10 +165,10 @@ struct _LCUI_Widget {
 	WIDGET_STATE state;	/* 部件当前状态 */
 	int valid_state;	/* 对部件有效的状态 */
 	
-	BOOL auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
+	LCUI_BOOL auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
 	AUTOSIZE_MODE auto_size_mode;	/* 自动尺寸调整模式 */
 	
-	BOOL focus;		/* 指定该部件是否需要焦点 */
+	LCUI_BOOL focus;		/* 指定该部件是否需要焦点 */
 	LCUI_Widget* focus_widget;	/* 获得焦点的子部件 */
 	
 	int clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“不小于”才使条件成立 */
@@ -282,10 +282,10 @@ Get_FocusWidget( LCUI_Widget *widget );
 /* 获取指定部件内的已获得焦点的子部件 */ 
 
 /* 检测指定部件是否处于焦点状态 */
-BOOL Widget_GetFocus( LCUI_Widget *widget );
+LCUI_BOOL Widget_GetFocus( LCUI_Widget *widget );
 
 /* 检测指定部件是否获得全局焦点，也就是该部件以及上级所有父部件是否都得到了焦点 */
-BOOL Widget_GetGlobalFocus( LCUI_Widget *widget );
+LCUI_BOOL Widget_GetGlobalFocus( LCUI_Widget *widget );
 
 /* 获取部件的风格名称 */
 LCUI_String Widget_GetStyleName( LCUI_Widget *widget );
@@ -349,7 +349,7 @@ void Widget_SetSize( LCUI_Widget *widget, char *width, char *height );
  * */ 
 
 /* 指定部件是否为模态部件 */
-void Widget_SetModal( LCUI_Widget *widget, BOOL is_modal );
+void Widget_SetModal( LCUI_Widget *widget, LCUI_BOOL is_modal );
 
 void Widget_SetDock( LCUI_Widget *widget, DOCK_TYPE dock );
 /* 设定部件的停靠类型 */ 
@@ -387,7 +387,7 @@ void Widget_SetBackgroundLayout( LCUI_Widget *widget, LAYOUT_TYPE layout );
 void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color );
 
 /* 设定部件背景是否透明 */
-void Widget_SetBackgroundTransparent( LCUI_Widget *widget, BOOL flag );
+void Widget_SetBackgroundTransparent( LCUI_Widget *widget, LCUI_BOOL flag );
 
 void Widget_Enable(LCUI_Widget *widget);
 /* 功能：启用部件 */ 
@@ -396,7 +396,7 @@ void Widget_Disable(LCUI_Widget *widget);
 /* 功能：禁用部件 */ 
 
 /* 指定部件是否可见 */
-void Widget_Visible( LCUI_Widget *widget, BOOL flag );
+void Widget_Visible( LCUI_Widget *widget, LCUI_BOOL flag );
 
 void Widget_SetPos(LCUI_Widget *widget, LCUI_Pos pos);
 /* 
@@ -433,7 +433,7 @@ void Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size);
 
 /* 启用或禁用部件的自动尺寸调整功能 */
 void Widget_SetAutoSize(	LCUI_Widget *widget,
-				BOOL flag, AUTOSIZE_MODE mode );
+				LCUI_BOOL flag, AUTOSIZE_MODE mode );
 
 void Widget_ExecRefresh(LCUI_Widget *widget);
 /* 功能：执行刷新显示指定部件的整个区域图形的操作 */ 

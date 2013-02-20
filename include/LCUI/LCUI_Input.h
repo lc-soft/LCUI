@@ -196,10 +196,10 @@ void LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type );
 int Check_Mouse_Support();
 /* 功能：检测鼠标的支持 */ 
 
-BOOL Enable_Mouse_Input();
+LCUI_BOOL Enable_Mouse_Input();
 /* 功能：启用鼠标输入处理 */ 
 
-BOOL Disable_Mouse_Input();
+LCUI_BOOL Disable_Mouse_Input();
 /* 功能：禁用鼠标输入处理 */ 
 
 /* 初始化鼠标输入模块 */
@@ -221,13 +221,13 @@ void LCUIKeyboard_HitKey( int key_code );
 void LCUIKeyboard_FreeKey( int key_code );
 
 /* 检测是否有按键按下 */
-BOOL LCUIKeyboard_IsHit( void );
+LCUI_BOOL LCUIKeyboard_IsHit( void );
 
 /* 功能：获取被按下的按键的键值 */
 int LCUIKeyboard_Get( void );
 
 /* 检测指定键值的按键是否处于按下状态 */
-BOOL LCUIKey_IsHit( int key_code );
+LCUI_BOOL LCUIKey_IsHit( int key_code );
 
 /* 标记指定键值的按键已释放 */
 void LCUIKey_Free( int key_code );
@@ -244,10 +244,10 @@ void LCUIModule_Keyboard_End( void );
 int Check_TouchScreen_Support();
 /* 功能：检测是否支持触瓶 */ 
 
-BOOL Enable_TouchScreen_Input();
+LCUI_BOOL Enable_TouchScreen_Input();
 /* 功能：启用鼠标输入处理 */ 
 
-BOOL Disable_TouchScreen_Input();
+LCUI_BOOL Disable_TouchScreen_Input();
 /* 功能：撤销鼠标输入处理 */ 
 
 void *Get_TouchScreen();

@@ -48,7 +48,7 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
-static BOOL i_am_init = FALSE;
+static LCUI_BOOL i_am_init = FALSE;
 static LCUI_Queue screen_invalid_area;
 
 /*

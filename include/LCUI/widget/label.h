@@ -45,7 +45,7 @@
 
 typedef struct _LCUI_Label 
 {
-	BOOL auto_size;		/* 指定是否根据文本图层的尺寸来调整部件尺寸 */
+	LCUI_BOOL auto_size;		/* 指定是否根据文本图层的尺寸来调整部件尺寸 */
 	AUTOSIZE_MODE mode;	/* 自动尺寸调整的模式 */
 	LCUI_TextLayer layer;	/* 文本图层 */
 }
@@ -71,7 +71,7 @@ Label_Refresh( LCUI_Widget *widget );
 /* 刷新label部件显示的文本 */
 
 void
-Label_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode );
+Label_AutoSize( LCUI_Widget *widget, LCUI_BOOL flag, AUTOSIZE_MODE mode );
 /* 启用或禁用Label部件的自动尺寸调整功能 */ 
 /*-------------------------- End Public ------------------------------*/
 

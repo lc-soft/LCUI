@@ -71,7 +71,7 @@ typedef struct {
 
 typedef struct {
 	uint8_t type;
-	BOOL focus;
+	LCUI_BOOL focus;
 } LCUI_WidgetFocusEvent;
 
 typedef LCUI_KeyboardEvent LCUI_WidgetKeyboardEvent;
@@ -108,7 +108,7 @@ void LCUIModule_Widget_Init( void );
 void LCUIModule_Widget_End( void );
 
 /*--------------------------- Focus Proc ------------------------------*/
-BOOL 
+LCUI_BOOL 
 Set_Focus( LCUI_Widget *widget );
 /* 
  * 功能：为部件设置焦点
@@ -117,20 +117,20 @@ Set_Focus( LCUI_Widget *widget );
  * */ 
 
 /* 设定部件是否能够获取焦点 */
-void Widget_SetFocus( LCUI_Widget *widget, BOOL flag );
+void Widget_SetFocus( LCUI_Widget *widget, LCUI_BOOL flag );
 
 /* 获取指定部件内的已获得焦点的子部件 */
 LCUI_Widget *
 Get_FocusWidget( LCUI_Widget *widget );
 
-BOOL 
+LCUI_BOOL 
 Cancel_Focus( LCUI_Widget *widget );
 /* 
  * 功能：取消指定部件的焦点
  * 说明：该部件会得到EVENT_FOCUSOUT事件，并且，会将焦点转移至其它部件
  * */ 
 
-BOOL
+LCUI_BOOL
 Reset_Focus( LCUI_Widget* widget );
 /* 复位指定部件内的子部件的焦点 */ 
 

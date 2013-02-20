@@ -174,7 +174,7 @@ Label_Refresh( LCUI_Widget *widget )
 }
 
 void
-Label_AutoSize( LCUI_Widget *widget, BOOL flag, AUTOSIZE_MODE mode )
+Label_AutoSize( LCUI_Widget *widget, LCUI_BOOL flag, AUTOSIZE_MODE mode )
 /* 启用或禁用Label部件的自动尺寸调整功能 */
 {
 	LCUI_Label *label;

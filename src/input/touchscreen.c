@@ -61,7 +61,7 @@ LCUI_TS;
 
 static LCUI_TS ts_data;
 
-static BOOL proc_touchscreen()
+static LCUI_BOOL proc_touchscreen()
 {
 #ifdef USE_TSLIB
 	struct ts_sample samp;
@@ -102,7 +102,7 @@ static BOOL proc_touchscreen()
 #endif
 }
 
-BOOL Enable_TouchScreen_Input()
+LCUI_BOOL Enable_TouchScreen_Input()
 /* 功能：启用触屏输入处理 */
 { 
 #ifdef USE_TSLIB
@@ -136,7 +136,7 @@ BOOL Enable_TouchScreen_Input()
 #endif
 }
 
-BOOL Disable_TouchScreen_Input()
+LCUI_BOOL Disable_TouchScreen_Input()
 /* 功能：撤销触屏输入处理 */
 {
 #ifdef USE_TSLIB

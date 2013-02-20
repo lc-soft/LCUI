@@ -8,9 +8,9 @@
 /********* 保存字体相关数据以及位图 ********/
 typedef struct _LCUI_CharData
 {
-	BOOL display:1;		/* 标志，是否需要显示该字 */
-	BOOL need_update:1;	/* 标志，表示是否需要刷新该字的字体位图数据 */
-	//BOOL using_quote:2;	/* 标志，表示是否引用了现成的文本样式 */
+	LCUI_BOOL display:1;		/* 标志，是否需要显示该字 */
+	LCUI_BOOL need_update:1;	/* 标志，表示是否需要刷新该字的字体位图数据 */
+	//LCUI_BOOL using_quote:2;	/* 标志，表示是否引用了现成的文本样式 */
 	
 	wchar_t char_code;	/* 字符码 */
 	LCUI_FontBMP *bitmap;	/* 字体位图数据 */
@@ -32,14 +32,14 @@ Text_RowData;
 
 typedef struct _LCUI_TextLayer
 {
-	BOOL read_only		:1;	/* 指示文本内容是否为只读 */
-	BOOL using_code_mode	:1;	/* 指示是否开启代码模式 */
-	BOOL using_style_tags	:1;	/* 指示是否处理样式标签 */
-	BOOL enable_word_wrap	:1;	/* 指示是否自动换行 */
-	BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */ 
-	BOOL need_proc_buff	:1;	/* 指示是否处理缓冲区内的文本 */
-	BOOL need_scroll_layer	:1;	/* 指示是否需要滚动图层 */
-	BOOL have_select	:1;	/* 标记，指示是否在文本图层中选择了文本 */
+	LCUI_BOOL read_only		:1;	/* 指示文本内容是否为只读 */
+	LCUI_BOOL using_code_mode	:1;	/* 指示是否开启代码模式 */
+	LCUI_BOOL using_style_tags	:1;	/* 指示是否处理样式标签 */
+	LCUI_BOOL enable_word_wrap	:1;	/* 指示是否自动换行 */
+	LCUI_BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */ 
+	LCUI_BOOL need_proc_buff	:1;	/* 指示是否处理缓冲区内的文本 */
+	LCUI_BOOL need_scroll_layer	:1;	/* 指示是否需要滚动图层 */
+	LCUI_BOOL have_select	:1;	/* 标记，指示是否在文本图层中选择了文本 */
 	uint32_t start, end;	/* 被选中的文本的范围 */ 
 	
 	LCUI_Queue color_keyword;	/* 记录需要使用指定风格的关键字 */
@@ -56,7 +56,7 @@ typedef struct _LCUI_TextLayer
 	uint32_t max_text_len;		/* 最大文本长度 */
 	LCUI_CharData password_char;	/* 该字符用于屏蔽单行，为0时则不屏蔽 */
 	
-	BOOL show_cursor;	/* 指定是否需要显示文本光标 */
+	LCUI_BOOL show_cursor;	/* 指定是否需要显示文本光标 */
 	
 	LCUI_String text_buff;
 	LCUI_TextStyle default_data;	/* 缺省状态下使用的文本样式数据 */
@@ -102,7 +102,7 @@ TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style );
 /* 设定默认的文本样式，需要调用TextLayer_Draw函数进行文本位图更新 */
 
 void 
-TextLayer_ReadOnly( LCUI_TextLayer *layer, BOOL flag );
+TextLayer_ReadOnly( LCUI_TextLayer *layer, LCUI_BOOL flag );
 /* 指定文本图层中的文本是否为只读 */
 
 void
@@ -214,11 +214,11 @@ TextLayer_Cut_Select_Text( LCUI_TextLayer *layer );
 /* 剪切文本图层内被选中的文本 */
 
 void 
-TextLayer_UsingStyleTags( LCUI_TextLayer *layer, BOOL flag );
+TextLayer_UsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL flag );
 /* 指定文本图层是否处理样式标签 */
 
 void 
-TextLayer_Multiline( LCUI_TextLayer *layer, BOOL flag );
+TextLayer_Multiline( LCUI_TextLayer *layer, LCUI_BOOL flag );
 /* 指定文本图层是否启用多行文本显示 */
 
 #endif

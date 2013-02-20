@@ -1,6 +1,6 @@
 extern uchar_t const *in_core_font_8x8();
 
-BOOL FontBMP_Valid(LCUI_FontBMP *bitmap);
+LCUI_BOOL FontBMP_Valid(LCUI_FontBMP *bitmap);
 /*
  * 功能：检测位图数据是否有效
  * 返回值：有效返回帧，无效返回假

@@ -78,8 +78,6 @@
 #define TYPE_JPG	2
 #define TYPE_BMP	3
 
-#define PNG_BYTES_TO_CHECK 4
-
 /* 状态 */ 
 #define ACTIVE	1
 #define KILLED	-1
@@ -103,12 +101,12 @@
 #define TRUE 1
 #endif
 
-typedef enum _BOOL
+typedef enum _LCUI_BOOL
 {
 	IS_FALSE = 0,
 	IS_TRUE = 1
 }
-BOOL;
+LCUI_BOOL;
 
 /* 触屏校准后的文件 */
 #define LCUI_CALIBFILE "/mnt/Data/LC-SOFT/pointercal"
@@ -155,20 +153,6 @@ typedef enum _LAYOUT_TYPE
 #define FILL_MODE_NONE		LAYOUT_NONE	/* 无 */
 #define FILL_MODE_NORMAL	LAYOUT_NORMAL 
 /*************************************************/
-
-/* 消息盒子里显示的图标 */
-#define ICON_Warning	1
-#define ICON_Error	2
-#define ICON_Question	3
-#define ICON_Asterisk	4
-/* 消息盒子使用的按键方案 */
-#define MB_None			0
-#define MB_Abort_Retry_Ignore	1
-#define MB_OK			2
-#define MB_OK_Cancel		3
-#define MB_Retry_Cancel		4
-#define MB_Yes_No		5
-#define MB_Yes_No_Cancel	6
 
 /****************** 图像的处理方式 *****************/
 /* 缩放，缩放比例随着PictureBox部件的尺寸的改变而改变 */
@@ -279,7 +263,7 @@ typedef struct {
 	wchar_t		char_code;	/* 字符码 */
 	LCUI_FontBMP	*bitmap;	/* 字符的位图数据 */
 	LCUI_RGB	color;		/* 该文字的配色 */
-	BOOL		update;		/* 标明这个字符是否需要刷新 */ 
+	LCUI_BOOL		update;		/* 标明这个字符是否需要刷新 */ 
 	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */		   
 } LCUI_WChar_T;
 /*----------------------------- END ----------------------------------*/
@@ -303,7 +287,7 @@ struct _LCUI_Graph {
 	
 	LCUI_Mutex mutex;	/* 锁，用于数据保护 */
 	
-	BOOL quote;		/* 指示是否引用其它图层中的图形 */
+	LCUI_BOOL quote;		/* 指示是否引用其它图层中的图形 */
 	LCUI_Graph *src;	/* 所引用的对象 */
 	LCUI_Pos pos;		/* 在引用另一个图层中的图形时，会保存区域的起点位置 */
 	int width, height;	/* 尺寸 */
@@ -312,15 +296,15 @@ struct _LCUI_Graph {
 	uchar_t**	rgba;	/* 像素数据缓冲区 */
 	size_t		mem_size; /* 像素数据缓冲区大小 */
 	
-	BOOL have_alpha;	/* 标志，指定是否需要透明度，分配内存时会根据它分配 */
-	BOOL is_opaque;		/* 标志，指定该图形是否为不透明 */
-	BOOL not_visible;	/* 标志，指定该图形是否不可见，也就是全透明 */
+	LCUI_BOOL have_alpha;	/* 标志，指定是否需要透明度，分配内存时会根据它分配 */
+	LCUI_BOOL is_opaque;		/* 标志，指定该图形是否为不透明 */
+	LCUI_BOOL not_visible;	/* 标志，指定该图形是否不可见，也就是全透明 */
 };
 /*------------------------------ END ---------------------------------*/
 
 /*---------------- 用于表示像素或百分比 -----------------*/
 typedef struct {
-	BOOL which_one;		/* 指定用哪个类型的变量 */
+	LCUI_BOOL which_one;		/* 指定用哪个类型的变量 */
 	int px;			/* 数值，单位为像素 */
 	double scale;		/* 比例 */
 } PX_P_t;
@@ -328,7 +312,7 @@ typedef struct {
 
 /*----------------- 用于表示字体大小 --------------------*/
 typedef struct {
-	BOOL which_one;		/* 指定用哪个类型的变量 */
+	LCUI_BOOL which_one;		/* 指定用哪个类型的变量 */
 	int px;			/* pixel, 字体大小（像素） */
 	int pt;			/* point，字体大小（点数） */
 } PX_PT_t;

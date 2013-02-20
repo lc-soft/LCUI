@@ -133,7 +133,7 @@ int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	return 0;
 }
 
-static BOOL
+static LCUI_BOOL
 Widget_Have_Event(LCUI_Widget *widget, int event_id)
 /* 检测部件是否关联了指定事件 */
 { 
@@ -215,7 +215,7 @@ _End_DragEvent( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 }
 
 typedef struct {
-	BOOL need_delete;
+	LCUI_BOOL need_delete;
 	LCUI_Widget *widget;
 } widget_item;
 
@@ -273,7 +273,7 @@ widget_list_add( LCUI_Widget *widget )
 }
 
 /* 判断指定部件是否被允许响应事件 */
-static BOOL widget_allow_response( LCUI_Widget *widget )
+static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
 {
 	int i, n;
 	LCUI_Queue *child_list;
@@ -489,7 +489,7 @@ void LCUIModule_Widget_End( void )
 /*--------------------------- Focus Proc ------------------------------*/
 static LCUI_Widget *root_focus_widget = NULL;
 
-BOOL Set_Focus( LCUI_Widget *widget )
+LCUI_BOOL Set_Focus( LCUI_Widget *widget )
 /* 
  * 功能：为部件设置焦点
  * 说明：上个获得焦点的部件会得到EVENT_FOCUSOUT事件，而当前获得焦点的部件会得到
@@ -531,7 +531,7 @@ BOOL Set_Focus( LCUI_Widget *widget )
 }
 
 /* 设定部件是否能够获取焦点 */
-void Widget_SetFocus( LCUI_Widget *widget, BOOL flag )
+void Widget_SetFocus( LCUI_Widget *widget, LCUI_BOOL flag )
 {
 	/* 如果该部件已经获得焦点，并且要设置它不能获取焦点，则取消当前焦点 */
 	if( Widget_GetFocus(widget) && !flag ) {
@@ -590,7 +590,7 @@ Get_FocusWidget( LCUI_Widget *widget )
 	return widget;
 }
 
-BOOL 
+LCUI_BOOL 
 Cancel_Focus( LCUI_Widget *widget )
 /* 
  * 功能：取消指定部件的焦点
@@ -653,7 +653,7 @@ Cancel_Focus( LCUI_Widget *widget )
 	return TRUE;
 }
 
-BOOL
+LCUI_BOOL
 Reset_Focus( LCUI_Widget* widget )
 /* 复位指定部件内的子部件的焦点 */
 {	

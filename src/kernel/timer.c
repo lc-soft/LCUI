@@ -95,7 +95,7 @@ timer_list_update( LCUI_Queue *timer_list )
 	return timer;
 }
 
-static BOOL timer_thread_active = TRUE;
+static LCUI_BOOL timer_thread_active = TRUE;
 
 /* 一个线程，用于处理定时器 */
 static void 
@@ -158,7 +158,7 @@ find_timer( int timer_id )
  * 说明：时间单位为毫秒，调用后会返回该定时器的标识符; 
  * 如果要用于循环定时处理某些任务，可将 reuse 置为 1，否则置于 0。
  * */
-int set_timer( long int n_ms, void (*callback_func)(void), BOOL reuse )
+int set_timer( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse )
 {
 	timer_data timer;
 	timer.state = 1;

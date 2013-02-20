@@ -164,7 +164,7 @@ int StyleLib_AddStyleFromString(	LCUI_StyleLibrary *lib,
 	int		i;
 	const char	*cur, *max;
 	char		name_buff[256], value_buff[256];
-	BOOL		save_class_name = FALSE, 
+	LCUI_BOOL	save_class_name = FALSE, 
 			save_attr_name = FALSE, 
 			save_attr_value = FALSE;
 	

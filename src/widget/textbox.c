@@ -1078,7 +1078,7 @@ int TextBox_Cut_Select_Text(LCUI_Widget *widget)
 	return TextLayer_Cut_Select_Text( layer );
 }
 
-void TextBox_Using_StyleTags(LCUI_Widget *widget, BOOL flag)
+void TextBox_Using_StyleTags(LCUI_Widget *widget, LCUI_BOOL flag)
 /* 指定文本框是否处理控制符 */
 {
 	LCUI_TextLayer *layer;
@@ -1087,7 +1087,7 @@ void TextBox_Using_StyleTags(LCUI_Widget *widget, BOOL flag)
 }
 
 void 
-TextBox_Multiline( LCUI_Widget *widget, BOOL flag )
+TextBox_Multiline( LCUI_Widget *widget, LCUI_BOOL flag )
 /* 指定文本框是否启用多行文本显示 */
 {
 	LCUI_TextLayer *layer;
