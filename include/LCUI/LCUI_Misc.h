@@ -167,6 +167,13 @@ int Rect_Valid(LCUI_Rect r);
 
 
 /***************************** String *********************************/
+#ifdef LCUI_BUILD_IN_WIN32
+#define strcasecmp(str1, str2)	lcui_strcasecmp(str1, str2)
+#endif
+
+/* 不区分大小写，对比两个字符串 */
+int lcui_strcasecmp( const char *str1, const char *str2 );
+
 void String_Init(LCUI_String *in);
 /* 功能：初始化String结构体中的数据 */ 
 

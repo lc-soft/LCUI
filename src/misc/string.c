@@ -43,6 +43,33 @@
 #include LC_LCUI_H 
 #include LC_FONT_H
 
+/* 将字母转换成大写 */
+static char uppercase( char ch )
+{
+	if( 'a' <= ch && ch <= 'z' ) {
+		return ch - 32;
+	}
+	return ch;
+}
+
+/* 不区分大小写，对比两个字符串 */
+int lcui_strcasecmp( const char *str1, const char *str2 )
+{
+	const char *p1, *p2;
+	for(p1=str1, p2=str2; *p1!=0 || *p2!=0; ++p1, ++p2) {
+		if(uppercase(*p1) == uppercase(*p2)) {
+			continue;
+		}
+		return *p1-*p2;
+	}
+	if( *p1 != 0 ) {
+		return 1;
+	} else if( *p2 != 0 ) {
+		return -1;
+	}
+	return 0;
+}
+
 void String_Init(LCUI_String *in)
 /* 功能：初始化String结构体中的数据 */
 {

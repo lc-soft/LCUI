@@ -45,6 +45,7 @@
 #include LC_GRAPH_H
 #include LC_DRAW_H
 #include LC_DISPLAY_H
+#include <time.h>
 
 void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 /* 
@@ -99,7 +100,7 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 }
 
 static int need_break = FALSE;
-static pthread_t t = 0;
+static LCUI_Thread t = 0;
 static LCUI_Rect target_area;
 static void catch()
 /* 在截取动画时，会用这个函数捕获屏幕内容 */
