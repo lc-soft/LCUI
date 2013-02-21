@@ -28,11 +28,6 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 {
 #ifdef USE_LIBJPEG
 	FILE *fp;
-	fp = fopen(filepath,"r");
-	if(fp == NULL) {
-		return -1;
-	}
-	
 	int row_stride,jaka;
 	int x,y, m, n, k;
 	short int JPsyg;
@@ -41,6 +36,11 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 	struct my_error_mgr jerr;
 	JSAMPARRAY buffer;
 
+	fp = fopen(filepath,"r");
+	if(fp == NULL) {
+		return -1;
+	}
+	
 	if( fread( &JPsyg, sizeof(short int), 1, fp ) ) {
 		if ( JPsyg != -9985 ) {  /* 如果不是jpg图片 */
 			return 1; 

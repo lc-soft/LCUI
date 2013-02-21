@@ -45,60 +45,6 @@
 
 #ifdef __cplusplus
 
-class LCUIThread
-{
-	public:
-	LCUIThread()
-	{
-		tid = 0;
-		thread_rwlock_init(&lock);
-	}
-	int create( const thread_attr_t *attr,
-			void *(*start_rtn)(void*),
-			void * arg )
-	{
-		return LCUIThread_Create(&tid, attr, start_rtn, arg);
-	}
-	int rdlock()
-	{
-		return thread_rwlock_rdlock(&lock);
-	}
-	int wrlock()
-	{
-		return thread_rwlock_wrlock(&lock);
-	}
-	int unlock()
-	{
-		return thread_rwlock_unlock(&lock);
-	}
-	int mutex_lock()
-	{
-		return thread_mutex_lock(&lock);
-	}
-	int mutex_unlock()
-	{
-		return thread_mutex_unlock(&lock);
-	}
-	int cancel()
-	{
-		return LCUIThread_Cancel(tid);
-	}
-	int join(void **retval)
-	{
-		return LCUIThread_Join(tid, retval);
-	}
-	void exit(void* retval) __attribute__ ((__noreturn__))
-	{
-		LCUIThread_Exit(retval);
-	}
-	thread_t getid()
-	{
-		return tid;
-	}
-	private:
-	thread_t tid;
-	thread_rwlock lock;
-};
 #endif
 
 #endif

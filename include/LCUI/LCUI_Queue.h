@@ -95,8 +95,8 @@ int Queue_Lock( LCUI_Queue *queue );
 /* 解开队列的互斥锁 */
 int Queue_UnLock( LCUI_Queue *queue );
 
-void Queue_Init (LCUI_Queue * queue, size_t element_size, void (*func) ()) ;
-/* 功能：初始化队列 */ 
+/* 初始化队列 */
+void Queue_Init (LCUI_Queue * queue, size_t element_size, void (*func) (void*)) ;
 
 void Queue_Using_Pointer(LCUI_Queue * queue);
 /* 

@@ -427,11 +427,10 @@ void Graph_Copy(LCUI_Graph *des, LCUI_Graph *src)
  * 说明：将src的数据拷贝至des 
  * */
 {
+	int size;
 	if( !des ) {
 		return;
 	}
-	
-	int size;
 	
 	if( Graph_Valid(src) ) { 
 		if( Graph_Have_Alpha(src) ) {
@@ -518,7 +517,7 @@ LCUI_Rect Get_Graph_Valid_Rect(LCUI_Graph *graph)
 {
 	LCUI_Pos pos;
 	int w, h, temp; 
-	LCUI_Rect cut_rect;
+	LCUI_Rect rect, cut_rect;
 	
 	pos = graph->pos; 
 	cut_rect.x = pos.x;
@@ -549,7 +548,6 @@ LCUI_Rect Get_Graph_Valid_Rect(LCUI_Graph *graph)
 		cut_rect.height -= (pos.y +  graph->height - h); 
 	}
 	
-	LCUI_Rect rect;
 	/* 获取引用的图像的有效显示范围 */
 	rect = Get_Graph_Valid_Rect(graph->src);
 	/* 如果引用的图像需要裁剪，那么，该图像根据情况，也需要进行裁剪 */
@@ -741,8 +739,10 @@ int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)
 int Graph_Fill_Color(LCUI_Graph *graph, LCUI_RGB color)
 /* 功能：为传入的图形填充颜色 */
 {
-	uchar_t *r_ptr, *g_ptr, *b_ptr;
+	int i, pos;
+	size_t size;
 	LCUI_Rect src_rect;
+	uchar_t *r_ptr, *g_ptr, *b_ptr;
 	
 	src_rect = Get_Graph_Valid_Rect( graph ); 
 	graph = Get_Quote_Graph( graph );
@@ -750,9 +750,6 @@ int Graph_Fill_Color(LCUI_Graph *graph, LCUI_RGB color)
 	if(! Graph_Valid(graph) ) {
 		return -1;
 	} 
-	
-	int i, pos;
-	size_t size;
 	
 	size = sizeof(uchar_t) * src_rect.width;
 	pos = src_rect.x + src_rect.y * graph->width;
@@ -1116,6 +1113,8 @@ int Graph_Fill_Image(	LCUI_Graph *graph,	LCUI_Graph *bg,
 int Graph_Fill_Alpha(LCUI_Graph *src, uchar_t alpha)
 /* 功能：填充图形的alpha通道的所有值 */
 {
+	int i;
+	size_t size;
 	uchar_t *ptr;
 	LCUI_Rect src_rect;
 	
@@ -1130,9 +1129,6 @@ int Graph_Fill_Alpha(LCUI_Graph *src, uchar_t alpha)
 	if( !Graph_Have_Alpha(src) ) {
 		return -1;
 	}
-	
-	int i;
-	size_t size;
 	
 	size = sizeof(uchar_t) * src_rect.width;
 	ptr = src->rgba[3] + src_rect.x + src_rect.y * src->width;

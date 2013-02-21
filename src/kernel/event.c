@@ -1,7 +1,6 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_ERROR_H
-#include <unistd.h>
 
 static LCUI_Queue events;
 static LCUI_BOOL active = FALSE;

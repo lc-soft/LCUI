@@ -124,9 +124,11 @@ static int LCUI_AppList_Delete (LCUI_ID app_id)
 	return 0;
 }
 
-static void LCUI_Destroy_App(LCUI_App *app)
+static void LCUI_Destroy_App( void* arg )
 /* 功能：销毁程序相关信息 */
 {
+	LCUI_App *app;
+	app = (LCUI_App *)arg;
 	if( !app ) {
 		return;
 	}

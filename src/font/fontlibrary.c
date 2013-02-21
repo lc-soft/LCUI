@@ -76,24 +76,30 @@ static LCUI_BOOL database_init = FALSE;
 static LCUI_Queue font_database, fontbitmap_database;
 static LCUI_FontInfo *default_font = NULL, *in_core_font = NULL;
 
-static void FontLIB_DestroyBMP( LCUI_FontBMPItem *bmp )
+static void FontLIB_DestroyBMP( void *arg )
 {
+	LCUI_FontBMPItem *bmp;
+	bmp = (LCUI_FontBMPItem *)arg;
 	if( bmp->bitmap ) {
 		free( bmp->bitmap );
 	}
 }
 
-static void FontLIB_DestroyData( LCUI_FontDataItem *data )
+static void FontLIB_DestroyData( void *arg )
 {
+	LCUI_FontDataItem *data;
+	data = (LCUI_FontDataItem *)arg;
 	Destroy_Queue( &data->font_bmp );
 }
 
-static void FontLIB_Destroy( LCUI_FontCharItem *font )
+static void FontLIB_Destroy( void *arg )
 {
+	LCUI_FontCharItem *font;
+	font = (LCUI_FontCharItem *)arg;
 	Destroy_Queue( &font->data );
 }
 
-static void FontLIB_DestroyFontInfo( LCUI_FontInfo *info )
+static void FontLIB_DestroyFontInfo( void *arg )
 {
 	
 }
@@ -421,7 +427,10 @@ FontLIB_GetFontBMP( wchar_t char_code, int font_id, int pixel_size )
 int FontLIB_LoadFontFile( const char *filepath )
 {
 	int id;
-	
+#ifdef LCUI_FONT_ENGINE_FREETYPE
+	FT_Face face;
+	int error_code;
+#endif
 	if( !filepath ) {
 		return -1;
 	}
@@ -432,8 +441,6 @@ int FontLIB_LoadFontFile( const char *filepath )
 	}
 	
 #ifdef LCUI_FONT_ENGINE_FREETYPE
-	FT_Face face;
-	int error_code;
 	error_code = FT_New_Face( library, filepath , 0 , &face );
 	if( error_code != 0 ) {
 		FT_Done_FreeType( library );

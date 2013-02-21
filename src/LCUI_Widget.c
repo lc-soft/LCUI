@@ -140,14 +140,16 @@ int WidgetFunc_Add(	const char *type_name,
  **/
 int WidgetType_Add( const char *type_name )
 {
+	int total, i; 
+	LCUI_App *app;
 	WidgetTypeData *wd, new_wd;
-	LCUI_App *app = LCUIApp_GetSelf();
+
+	app = LCUIApp_GetSelf();
 	if( !app ) {
 		printf("WidgetType_Add():"APP_ERROR_UNRECORDED_APP);
 		exit(-1);
 	}
 	
-	int total, i; 
 	//printf("WidgetType_Add(): add widget type: %s\n", type);
 	total = Queue_Get_Total(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
@@ -184,14 +186,14 @@ void WidgetLib_Init(LCUI_Queue *w_lib)
 int WidgetType_Delete(const char *type)
 /* 功能：删除指定部件类型的相关数据 */
 {
+	int total,  i; 
+	LCUI_App *app;
 	WidgetTypeData *wd;
-	LCUI_App *app = LCUIApp_GetSelf();
-	
+
+	app = LCUIApp_GetSelf();
 	if( !app ) {
 		return -2;
 	}
-	
-	int total,  i; 
 	
 	total = Queue_Get_Total(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
@@ -216,9 +218,9 @@ void NULL_Widget_Func(LCUI_Widget *widget)
 LCUI_ID WidgetType_Get_ID(const char *widget_type)
 /* 功能：获取指定类型部件的类型ID */
 { 
-	WidgetTypeData *wd;
 	int total, i; 
 	LCUI_App *app;
+	WidgetTypeData *wd;
 	
 	app = LCUIApp_GetSelf();
 	if( !app ) {
@@ -239,11 +241,14 @@ LCUI_ID WidgetType_Get_ID(const char *widget_type)
 int WidgetType_GetByID(LCUI_ID id, char *widget_type)
 /* 功能：获取指定类型ID的类型名称 */
 {
-	WidgetTypeData *wd;
-	LCUI_App *app = LCUIApp_GetSelf();
-	if( !app ) return -2;
-	
 	int total, i; 
+	LCUI_App *app;
+	WidgetTypeData *wd;
+
+	app = LCUIApp_GetSelf();
+	if( !app ) {
+		return -2;
+	}
 	
 	total = Queue_Get_Total(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
@@ -260,13 +265,16 @@ int WidgetType_GetByID(LCUI_ID id, char *widget_type)
 /* 获取指定部件类型ID的函数的函数指针 */
 void ( *WidgetFunc_GetByID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*)
 {
+	LCUI_App *app;
 	LCUI_Func *f = NULL; 
 	WidgetTypeData *wd;
-	LCUI_App *app = LCUIApp_GetSelf();
-	if( !app ) 
-		return NULL_Widget_Func;
-	
 	int total, i, found = 0; 
+	
+	app = LCUIApp_GetSelf();
+	if( !app ) {
+		return NULL_Widget_Func;
+	}
+	
 	//printf("WidgetFunc_GetByID(): widget type id: %lu, func type: %d\n", id, func_type);
 	total = Queue_Get_Total(&app->widget_lib); 
 	for(i = 0; i < total; ++i) {
@@ -282,7 +290,7 @@ void ( *WidgetFunc_GetByID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*)
 			}
 			/* 如果已经存在 */
 			if(found == 1) {
-				return f->func; 
+				return (void(*)(LCUI_Widget*))f->func; 
 			} else {
 				//printf("WidgetFunc_GetByID(): warning: widget func not found!\n");
 				return NULL_Widget_Func;
@@ -296,14 +304,15 @@ void ( *WidgetFunc_GetByID(LCUI_ID id, FuncType func_type) ) (LCUI_Widget*)
 void ( *WidgetFunc_Get(const char *widget_type, FuncType func_type) ) (LCUI_Widget*)
 /* 功能：获取指定类型部件的函数的函数指针 */
 {
-	LCUI_Func *f = NULL; 
+	LCUI_App *app;
+	int total, i, found = 0; 
 	WidgetTypeData *wd;
-	LCUI_App *app = LCUIApp_GetSelf();
+	LCUI_Func *f = NULL; 
+	
+	app = LCUIApp_GetSelf();
 	if( !app ) {
 		return NULL_Widget_Func;
 	}
-	
-	int total, i, found = 0; 
 	
 	total = Queue_Get_Total(&app->widget_lib);
 	//printf("WidgetFunc_Get(): widget type: %s, func type: %d\n", widget_type, func_type);
@@ -320,7 +329,7 @@ void ( *WidgetFunc_Get(const char *widget_type, FuncType func_type) ) (LCUI_Widg
 			}
 			/* 如果已经存在 */
 			if(found == 1) {
-				return f->func; 
+				return (void(*)(LCUI_Widget*))f->func; 
 			} else {
 				//printf("WidgetFunc_Get(): warning: widget func not found!\n");
 				return NULL_Widget_Func; 
@@ -334,18 +343,21 @@ void ( *WidgetFunc_Get(const char *widget_type, FuncType func_type) ) (LCUI_Widg
 int WidgetType_Valid(const char *widget_type)
 /* 功能：检测指定部件类型是否有效 */
 { 
-	WidgetTypeData *wd;
-	LCUI_App *app = LCUIApp_GetSelf();
-	
-	if( !app ) return 0;
-	
 	int total, i; 
+	WidgetTypeData *wd;
+	LCUI_App *app;
+
+	app = LCUIApp_GetSelf();
+	if( !app ) {
+		return 0;
+	}
 	
 	total = Queue_Get_Total(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
-		if(Strcmp(&wd->type_name, widget_type) == 0)/* 如果类型一致 */ 
+		if(Strcmp(&wd->type_name, widget_type) == 0) {/* 如果类型一致 */ 
 			return 1; 
+		}
 	}
 	
 	return 0;
@@ -2051,12 +2063,12 @@ void Update_Child_Widget_Size(LCUI_Widget *widget)
  * 说明：当部件尺寸改变后，有的部件的尺寸以及位置是按百分比算的，需要重新计算。
  * */
 {
+	int i, total;
+	LCUI_Widget *child;
+
 	if( !widget ) {
 		return;
 	}
-	
-	LCUI_Widget *child;
-	int i, total;
 	total = Queue_Get_Total(&widget->child); 
 	for(i=0; i<total; ++i) {
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
@@ -2189,11 +2201,12 @@ void Move_Widget_To_Pos(LCUI_Widget *widget, LCUI_Pos des_pos, int speed)
  * 说明：des_pos是目标位置，speed是该部件的移动速度，单位为：像素/秒
  * */
 {
+	int i, j;
+	double w, h, l, n, x, y; 
+
 	if(speed <= 0) {
 		return;
 	}
-	int i, j;
-	double w, h, l, n, x, y; 
 	x = Widget_GetPos(widget).x;
 	y = Widget_GetPos(widget).y;
 	/* 求两点之间的距离 */

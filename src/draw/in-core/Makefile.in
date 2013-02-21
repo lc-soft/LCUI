@@ -47,8 +47,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libdraw_incore_la_LIBADD =
-am_libdraw_incore_la_OBJECTS = checkbox.lo cursor.lo icon.lo \
-	mosaics.lo progressbar.lo radiobutton.lo titlebar.lo
+am_libdraw_incore_la_OBJECTS = img_checkbox.lo img_cursor.lo \
+	img_icon.lo img_mosaics.lo img_progressbar.lo \
+	img_radiobutton.lo img_titlebar.lo
 libdraw_incore_la_OBJECTS = $(am_libdraw_incore_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -212,13 +213,13 @@ AUTOMAKE_OPTIONS = foreign
 INCLUDES = -I$(abs_top_srcdir)/include 
 noinst_LTLIBRARIES = libdraw_incore.la
 libdraw_incore_la_SOURCES = \
-	checkbox.c	\
-	cursor.c	\
-	icon.c		\
-	mosaics.c	\
-	progressbar.c	\
-	radiobutton.c	\
-	titlebar.c
+	img_checkbox.c		\
+	img_cursor.c		\
+	img_icon.c		\
+	img_mosaics.c		\
+	img_progressbar.c	\
+	img_radiobutton.c	\
+	img_titlebar.c
 
 all: all-am
 
@@ -272,13 +273,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/checkbox.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cursor.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/icon.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mosaics.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/progressbar.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/radiobutton.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/titlebar.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_checkbox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_cursor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_icon.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_mosaics.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_progressbar.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_radiobutton.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_titlebar.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

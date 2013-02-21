@@ -4,7 +4,7 @@
 
 #include <math.h>
 
-static long max(long a, long b)
+static int getmax(int a, int b)
 {
 	return a > b ? a:b;
 }
@@ -22,45 +22,40 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
  * 算法有待优化完善。
  */
 {
+	int	width, height;
+	int	new_width,new_height; 
+	int m, n, z;
+	int src_x, src_y, des_x, des_y;
+	double   fRotateAngle; 
+	double   fSina, fCosa; 
+	double   fSrcX1,fSrcY1,fSrcX2,fSrcY2,fSrcX3,fSrcY3,fSrcX4,fSrcY4;
+	double   fDstX1,fDstY1,fDstX2,fDstY2,fDstX3,fDstY3,fDstX4,fDstY4;
+	double   f1,f2; 
+
 	if(!Graph_Valid(src)) {
 		return -1;
 	}
-	// 源图像的宽度和高度
-	int	width, height;
-	// 旋转后图像的宽度和高度   
-	int	new_width,new_height; 
-	// 旋转角度（弧度）   
-	float   fRotateAngle; 
-	// 旋转角度的正弦和余弦   
-	float   fSina, fCosa; 
-	// 源图四个角的坐标（以图像中心为坐标系原点）   
-	float   fSrcX1,fSrcY1,fSrcX2,fSrcY2,fSrcX3,fSrcY3,fSrcX4,fSrcY4;
-	// 旋转后四个角的坐标（以图像中心为坐标系原点）   
-	float   fDstX1,fDstY1,fDstX2,fDstY2,fDstX3,fDstY3,fDstX4,fDstY4;
-	
-	// 两个中间常量   
-	float   f1,f2; 
 	// 获取图像的"宽度"（4的倍数）   
 	width = src->width; 
 	// 获取图像的高度   
 	height = src->height;   
 	   
 	// 将旋转角度从度转换到弧度   
-	fRotateAngle = (float) radian(rotate_angle); 
+	fRotateAngle = (double) radian(rotate_angle); 
 	// 计算旋转角度的正弦   
-	fSina = (float) sin((double)fRotateAngle); 
+	fSina = (double) sin((double)fRotateAngle); 
 	// 计算旋转角度的余弦   
-	fCosa = (float) cos((double)fRotateAngle);   
+	fCosa = (double) cos((double)fRotateAngle);   
 	
 	// 计算原图的四个角的坐标（以图像中心为坐标系原点）   
-	fSrcX1 = (float) (- (width  - 1) / 2);   
-	fSrcY1 = (float) (  (height - 1) / 2);   
-	fSrcX2 = (float) (  (width  - 1) / 2);   
-	fSrcY2 = (float) (  (height - 1) / 2);   
-	fSrcX3 = (float) (- (width  - 1) / 2);   
-	fSrcY3 = (float) (- (height - 1) / 2);   
-	fSrcX4 = (float) (  (width  - 1) / 2);   
-	fSrcY4 = (float) (- (height - 1) / 2);   
+	fSrcX1 = (double) (- (width  - 1) / 2);   
+	fSrcY1 = (double) (  (height - 1) / 2);   
+	fSrcX2 = (double) (  (width  - 1) / 2);   
+	fSrcY2 = (double) (  (height - 1) / 2);   
+	fSrcX3 = (double) (- (width  - 1) / 2);   
+	fSrcY3 = (double) (- (height - 1) / 2);   
+	fSrcX4 = (double) (  (width  - 1) / 2);   
+	fSrcY4 = (double) (- (height - 1) / 2);   
 	   
 	// 计算新图四个角的坐标（以图像中心为坐标系原点）   
 	fDstX1 =  fCosa * fSrcX1 + fSina * fSrcY1;   
@@ -73,13 +68,13 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 	fDstY4 = -fSina * fSrcX4 + fCosa * fSrcY4;   
 	   
 	// 计算旋转后的图像实际宽度   
-	new_width  = (long) ( max( fabs(fDstX4 - fDstX1), fabs(fDstX3 - fDstX2) ) + 0.5);   
+	new_width  = (long) ( getmax( (int)fabs(fDstX4 - fDstX1), (int)fabs(fDstX3 - fDstX2) ) + 0.5);   
 	// 计算旋转后的图像高度   
-	new_height = (long) ( max( fabs(fDstY4 - fDstY1), fabs(fDstY3 - fDstY2) )  + 0.5);   
+	new_height = (long) (getmax( (int)fabs(fDstY4 - fDstY1), (int)fabs(fDstY3 - fDstY2) )  + 0.5);   
 	   
 	// 两个常数，这样不用以后每次都计算了   
-	f1 = (float) (-0.5*(new_width-1)*fCosa-0.5*(new_height-1)*fSina+0.5*(width-1)); 
-	f2 = (float) (0.5*(new_width-1)*fSina-0.5*(new_height-1)*fCosa+0.5*(height-1));   
+	f1 = (double) (-0.5*(new_width-1)*fCosa-0.5*(new_height-1)*fSina+0.5*(width-1)); 
+	f2 = (double) (0.5*(new_width-1)*fSina-0.5*(new_height-1)*fCosa+0.5*(height-1));   
 	   
 	if(Graph_Valid(des)) {
 		Graph_Free(des);/* 先将这个内存释放 */
@@ -90,8 +85,6 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 		return -1;
 	}
 
-	long m, n, z;
-	long src_x, src_y, des_x, des_y;
 	// 针对图像每行进行操作
 	for(des_y = 0; des_y < new_height; ++des_y) {
 		m = new_width * des_y;
@@ -99,8 +92,8 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 		for(des_x = 0; des_x < new_width; ++des_x) {
 			n = m + des_x;
 			// 计算该象素在源图中的坐标   
-			src_y = (long) (-((float) des_x) * fSina + ((float) des_y) * fCosa + f2 + 0.5);   
-			src_x = (long) ( ((float) des_x) * fCosa + ((float) des_y) * fSina + f1 + 0.5);   
+			src_y = (long) (-((double) des_x) * fSina + ((double) des_y) * fCosa + f2 + 0.5);   
+			src_x = (long) ( ((double) des_x) * fCosa + ((double) des_y) * fSina + f1 + 0.5);   
 			   
 			// 判断是否在源图范围内   
 			if( (src_x >= 0) && (src_x < width) 

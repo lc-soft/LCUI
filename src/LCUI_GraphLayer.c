@@ -247,8 +247,7 @@ LCUI_Rect GraphLayer_GetValidRect(
 {
 	int temp; 
 	LCUI_Pos pos;
-	LCUI_Rect area;
-	LCUI_Rect cut_rect;
+	LCUI_Rect area, rect, cut_rect;
 	
 	if( !glayer ) {
 		return Rect(0,0,0,0);
@@ -291,7 +290,6 @@ LCUI_Rect GraphLayer_GetValidRect(
 		cut_rect.height += area.height;
 	}
 	
-	LCUI_Rect rect;
 	rect = GraphLayer_GetValidRect( root_glayer, glayer->parent );
 	if(rect.x > area.x) {
 		temp = pos.x + cut_rect.x;

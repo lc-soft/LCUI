@@ -142,18 +142,18 @@ LCUI_Pos Frames_GetFrameMixPos(LCUI_Frames *stream, LCUI_Frame *frame)
 int Resize_Frames(LCUI_Frames *p, LCUI_Size new_size)
 /* 功能：调整动画的容器尺寸 */
 {
+	int i, total;
+	LCUI_Pos pos;
+	LCUI_Frame *frame;
+	LCUI_Graph *graph;
+	LCUI_Size size;
+	
 	if(new_size.w <= 0 || new_size.h <= 0)	{
 		return -1;
 	}
 	if( !p ) {
 		return -2;
 	}
-	
-	int i, total;
-	LCUI_Pos pos;
-	LCUI_Frame *frame;
-	LCUI_Graph *graph;
-	LCUI_Size size;
 	
 	p->size = new_size;
 	total = Queue_Get_Total(&p->pic);
@@ -188,6 +188,7 @@ int Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic,
  * sleep_time表示该帧的显示时长（单位：毫秒）
  * */
 {
+	LCUI_Frame frame;
 	if( !des ) {
 		return -1;
 	}
@@ -195,7 +196,6 @@ int Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic,
 		return -2;
 	}
 	
-	LCUI_Frame frame;
 	frame.offset = offset;
 	frame.sleep_time = sleep_time;
 	frame.pic = pic;
@@ -212,11 +212,11 @@ int Frames_AddFunc(	LCUI_Frames *des,
  * 说明：关联回调函数后，动画每更新一帧都会调用这个函数
  * */
 {
+	LCUI_Func func_data;
 	if( !des ) {
 		return -1;
 	}
 	
-	LCUI_Func func_data;
 	func_data.func = func;
 	func_data.id = LCUIApp_GetSelfID();
 	func_data.arg[0] = NULL;
@@ -404,7 +404,7 @@ FramesStream_Update( int *sleep_time )
 }
 
 static void 
-Process_Frames()
+Process_Frames( void )
 /* 功能：处理动画的每一帧的更新 */
 {
 	int sleep_time = 10;

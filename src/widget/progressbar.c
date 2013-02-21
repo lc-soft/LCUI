@@ -71,6 +71,7 @@ ProgressBar_Init(LCUI_Widget *widget)
 /* 功能：初始化进度条的数据结构体 */
 {
 	LCUI_ProgressBar *pb;
+	LCUI_Widget *f_pb, *img_pb;
 	
 	pb = WidgetPrivData_New (widget, sizeof(LCUI_ProgressBar));
 	pb->thread = 0;
@@ -81,7 +82,6 @@ ProgressBar_Init(LCUI_Widget *widget)
 	pb->max_value = 1;
 	pb->value = 0;
 	
-	LCUI_Widget *f_pb, *img_pb;
 	f_pb = Widget_New("picture_box"); 
 	img_pb = Widget_New("picture_box");
 	/* 以自己为容器，将这些部件放进去 */

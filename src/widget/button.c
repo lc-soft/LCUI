@@ -260,13 +260,15 @@ void Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal,
 void Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...)
 /* 功能：设定按钮部件显示的文本内容 */
 {
+	va_list ap; 
+	LCUI_Button *button;
+	LCUI_Widget *label;
 	char text[LABEL_TEXT_MAX_SIZE];
-	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivData(widget);
-	LCUI_Widget *label = button->label;  
 	
+	button = (LCUI_Button*)Widget_GetPrivData(widget);
+	label = button->label;
 	memset(text, 0, sizeof(text));
 	/* 由于是可变参数，让vsnprintf函数根据参数将字符串保存至text中 */
-	va_list ap; 
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
 	va_end(ap);
@@ -278,12 +280,12 @@ void Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...)
 LCUI_Widget *Create_Button_With_Text(const char *fmt, ...)
 /* 功能：创建一个带文本内容的按钮 */
 {
-	char text[LABEL_TEXT_MAX_SIZE];
-	LCUI_Widget *widget = Widget_New("button");
-	
-	memset(text, 0, sizeof(text)); 
-    
 	va_list ap; 
+	LCUI_Widget *widget;
+	char text[LABEL_TEXT_MAX_SIZE];
+
+	widget = Widget_New("button");
+	memset(text, 0, sizeof(text)); 
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
 	va_end(ap); 

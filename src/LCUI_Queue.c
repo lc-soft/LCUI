@@ -80,8 +80,8 @@ int Queue_UnLock( LCUI_Queue *queue )
 	return LCUIMutex_UnLock( &queue->mutex );
 }
 
-void Queue_Init (LCUI_Queue * queue, size_t element_size, void (*func) ()) 
-/* 功能：初始化队列 */
+/* 初始化队列 */
+void Queue_Init (LCUI_Queue * queue, size_t element_size, void (*func) (void*)) 
 {
 	LCUIMutex_Init( &queue->mutex );
 	queue->member_type	= 0;

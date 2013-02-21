@@ -127,14 +127,11 @@ void
 Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 /* 功能：设定与标签关联的文本内容 */
 {
+	va_list ap;
+	LCUI_Label *label;
 	char text[LABEL_TEXT_MAX_SIZE];
 	memset(text, 0, sizeof(text)); 
-    
-	LCUI_Label *label;
-	
 	label = Widget_GetPrivData( widget ); 
-	
-	va_list ap;
 	va_start( ap, fmt );
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
 	va_end( ap );

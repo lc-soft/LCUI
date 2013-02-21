@@ -56,13 +56,13 @@ typedef enum {
 } WidgetEventType; 
 
 typedef struct {
-	uint8_t type;
+	uchar_t type;
 	LCUI_Size old_size;
 	LCUI_Size new_size;
 } LCUI_WidgetResizeEvent;
 
 typedef struct {
-	uint8_t type;
+	unsigned char type;
 	LCUI_Pos new_pos;	/* 部件的新全局坐标 */
 	LCUI_Pos cursor_pos;	/* 鼠标游标的坐标 */
 	int first_click;	/* 标志，是否为首次点击 */ 
@@ -70,14 +70,14 @@ typedef struct {
 } LCUI_WidgetDragEvent; 
 
 typedef struct {
-	uint8_t type;
+	unsigned char type;
 	LCUI_BOOL focus;
 } LCUI_WidgetFocusEvent;
 
 typedef LCUI_KeyboardEvent LCUI_WidgetKeyboardEvent;
 
 typedef union {
-	uint8_t type;
+	unsigned char type;
 	LCUI_WidgetDragEvent drag;
 	LCUI_WidgetKeyboardEvent key;
 	LCUI_WidgetFocusEvent focus;

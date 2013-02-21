@@ -109,11 +109,12 @@ void Switch_CheckBox_State(LCUI_Widget *widget, LCUI_WidgetEvent *event)
 void CheckBox_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
 /* 功能：设定复选框中的图像框的尺寸 */
 {
+	LCUI_Widget *imgbox;
 	if(size.w <= 0 && size.h <= 0) {
 		return;
 	}
 		
-	LCUI_Widget *imgbox = Get_CheckBox_ImgBox(widget);
+	imgbox = Get_CheckBox_ImgBox(widget);
 	Widget_Resize(imgbox, size);
 	/* 由于没有布局盒子，不能自动调整部件间的间隔，暂时用这个方法 */
 	Widget_SetAlign(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
@@ -330,12 +331,11 @@ LCUI_Widget *Get_CheckBox_ImgBox(LCUI_Widget *widget)
 void Set_CheckBox_Text(LCUI_Widget *widget, const char *fmt, ...)
 /* 功能：设定与复选框部件关联的文本内容 */
 {
+	va_list ap;
+	LCUI_Widget *label;
 	char text[LABEL_TEXT_MAX_SIZE];
-	LCUI_Widget *label = Get_CheckBox_Label(widget); 
-	
+	label = Get_CheckBox_Label(widget); 
 	memset(text, 0, sizeof(text)); 
-    
-	va_list ap; 
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
 	va_end(ap);
@@ -346,14 +346,12 @@ void Set_CheckBox_Text(LCUI_Widget *widget, const char *fmt, ...)
 LCUI_Widget *Create_CheckBox_With_Text(const char *fmt, ...)
 /* 功能：创建一个带文本内容的复选框 */
 {
-	char text[LABEL_TEXT_MAX_SIZE];
+	va_list ap; 
 	LCUI_Widget *widget;
+	char text[LABEL_TEXT_MAX_SIZE];
 	
 	widget = Widget_New("check_box");
-	
 	memset(text, 0, sizeof(text)); 
-    
-	va_list ap; 
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
 	va_end(ap); 

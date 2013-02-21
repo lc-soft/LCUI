@@ -102,7 +102,7 @@ LCUI_Graph *PictureBox_GetImage( LCUI_Widget *widget );
 int PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos );
 
 /* 缩放PictureBox部件的图片浏览区域 */
-int PictureBox_ZoomViewArea( LCUI_Widget *widget, float scale );
+int PictureBox_ZoomViewArea( LCUI_Widget *widget, double scale );
 
 LCUI_END_HEADER
 

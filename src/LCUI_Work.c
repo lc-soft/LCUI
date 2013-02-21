@@ -44,7 +44,6 @@
 #include LC_INPUT_H
 #include LC_WIDGET_H
 #include LC_CURSOR_H
-#include <unistd.h>
 
 /***************************** Func ***********************************/
 void 
@@ -102,14 +101,15 @@ int Widget_Event_Connect ( LCUI_Widget *widget, WidgetEventType event_id,
 /* 处理与部件事件关联的回调函数 */
 int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
-	if( !widget ) {
-		return -1;
-	}
-	
 	int i,n;
+	char str[256];
 	LCUI_EventSlot *slot;
 	LCUI_Task *task;
 	LCUI_WidgetEvent *p_buff;
+	
+	if( !widget ) {
+		return -1;
+	}
 	
 	slot = EventSlots_Find( &widget->event, event->type );
 	if( !slot ) {
@@ -120,7 +120,6 @@ int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 		task = Queue_Get( &slot->func_data, i );
 		p_buff = malloc( sizeof(LCUI_WidgetEvent) );
 		if( !p_buff ) {
-			char str[256];
 			sprintf( str,"%s()", __FUNCTION__ );
 			perror( str );
 			abort();
@@ -433,14 +432,14 @@ static int
 Widget_DispatchKeyboardEvent(	LCUI_Widget *widget, 
 				LCUI_KeyboardEvent *event )
 {
-	if( !widget ) {
-		return -1;
-	}
-	
 	int i,n;
 	LCUI_EventSlot *slot;
 	LCUI_Task *task;
 	LCUI_KeyboardEvent *p_buff;
+
+	if( !widget ) {
+		return -1;
+	}
 	
 	slot = EventSlots_Find( &widget->event, EVENT_KEYBOARD );
 	if( !slot ) {
@@ -496,6 +495,9 @@ LCUI_BOOL Set_Focus( LCUI_Widget *widget )
  * EVENT_FOCUSIN事件。
  * */
 {
+	LCUI_Widget **focus_widget;
+	LCUI_WidgetEvent event;
+	
 	if( widget ) {
 		/* 先处理上级部件的焦点 */
 		if( widget->parent ) {
@@ -507,9 +509,6 @@ LCUI_BOOL Set_Focus( LCUI_Widget *widget )
 	} else {
 		return FALSE;
 	}
-	
-	LCUI_Widget **focus_widget;
-	LCUI_WidgetEvent event;
 	
 	if( widget->parent ) {
 		focus_widget = &widget->parent->focus_widget;
@@ -597,14 +596,14 @@ Cancel_Focus( LCUI_Widget *widget )
  * 说明：该部件会得到EVENT_FOCUSOUT事件，并且，会将焦点转移至其它部件
  * */
 {
-	if( !widget || !widget->focus ) {
-		return FALSE;
-	}
-	
 	int i, total, focus_pos;
 	LCUI_Widget *other_widget, **focus_widget;
 	LCUI_Queue *queue_ptr;
 	LCUI_WidgetEvent event;
+	
+	if( !widget || !widget->focus ) {
+		return FALSE;
+	}
 	
 	if( widget->parent ) {
 		focus_widget = &widget->parent->focus_widget;

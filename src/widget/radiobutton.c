@@ -52,6 +52,12 @@
 static LCUI_Queue mutex_lib;
 static int mutex_lib_init = 0; /* 标志，是否初始化过 */
 
+static void __Destroy_MutexData( void *arg )
+{
+	LCUI_Queue *queue;
+	queue = (LCUI_Queue*)arg;
+	Destroy_Queue( queue );
+}
 void RadioButton_Delete_Mutex(LCUI_Widget *widget)
 /* 功能：将单选框从互斥关系链中移除 */
 {
@@ -77,7 +83,7 @@ void RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 	LCUI_Queue *p, queue;
 	LCUI_RadioButton *rb_a, *rb_b;
 	if(mutex_lib_init == 0) {
-		Queue_Init(&mutex_lib, sizeof(LCUI_Queue), Destroy_Queue);
+		Queue_Init(&mutex_lib, sizeof(LCUI_Queue), __Destroy_MutexData);
 		mutex_lib_init = 1;
 	}
 	
@@ -182,10 +188,11 @@ void Switch_RadioButton_State(LCUI_Widget *widget, LCUI_WidgetEvent *arg)
 void RadioButton_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
 /* 功能：设定单选框中的图像框的尺寸 */
 {
+	LCUI_Widget *imgbox;
 	if(size.w <= 0 && size.h <= 0) {
 		return;
 	}
-	LCUI_Widget *imgbox = Get_RadioButton_ImgBox(widget);
+	imgbox = Get_RadioButton_ImgBox(widget);
 	Widget_Resize(imgbox, size);
 	/* 由于没有布局盒子，不能自动调整部件间的间隔，暂时用这个方法 */
 	Widget_SetAlign(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
@@ -378,12 +385,12 @@ LCUI_Widget *Get_RadioButton_ImgBox(LCUI_Widget *widget)
 void Set_RadioButton_Text(LCUI_Widget *widget, const char *fmt, ...)
 /* 功能：设定与单选框部件关联的文本内容 */
 {
-	char text[LABEL_TEXT_MAX_SIZE];
-	LCUI_Widget *label = Get_RadioButton_Label(widget); 
-	
-	memset(text, 0, sizeof(text)); 
-    
 	va_list ap; 
+	LCUI_Widget *label;
+	char text[LABEL_TEXT_MAX_SIZE];
+
+	label = Get_RadioButton_Label(widget); 
+	memset(text, 0, sizeof(text)); 
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
 	va_end(ap);
@@ -394,12 +401,11 @@ void Set_RadioButton_Text(LCUI_Widget *widget, const char *fmt, ...)
 LCUI_Widget *Create_RadioButton_With_Text(const char *fmt, ...)
 /* 功能：创建一个带文本内容的单选框 */
 {
-	char text[LABEL_TEXT_MAX_SIZE];
-	LCUI_Widget *widget = Widget_New("radio_button");
-	
-	memset(text, 0, sizeof(text)); 
-    
 	va_list ap; 
+	LCUI_Widget *widget;
+	char text[LABEL_TEXT_MAX_SIZE];
+	widget = Widget_New("radio_button");
+	memset(text, 0, sizeof(text)); 
 	va_start(ap, fmt);
 	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
 	va_end(ap); 

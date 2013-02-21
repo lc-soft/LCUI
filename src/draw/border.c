@@ -57,7 +57,7 @@ void Border_Radius( LCUI_Border *border, int radius )
 	border->bottom_right_radius = radius;
 }
 
-
+#ifdef LCUI_BUILD_IN_LINUX
 extern inline void 
 fill_pixel( uchar_t **buff, int pos, LCUI_RGB color ) 
 __attribute__((always_inline));
@@ -65,6 +65,11 @@ __attribute__((always_inline));
 extern inline void 
 mix_pixel( uchar_t **buff, int pos, LCUI_RGB color, uchar_t alpha ) 
 __attribute__((always_inline));
+#endif
+
+#if defined(WIN32) && !defined(__cplusplus)
+#define inline __inline
+#endif
 
 extern inline void 
 fill_pixel( uchar_t **buff, int pos, LCUI_RGB color ) 
@@ -133,7 +138,7 @@ Graph_Draw_RoundBorder_LeftTop(
 			continue;
 		}
 		/* 计算出x轴整数坐标 */
-		x = sqrt( pow(radius, 2) - y*y );
+		x = (int)sqrt( pow(radius, 2) - y*y );
 		
 		if( line_width > 0 && radius-x >= min_x 
 		 && radius-x <= max_x ) {
@@ -240,7 +245,7 @@ Graph_Draw_RoundBorder_TopLeft(
 		}
 		tmp_pos = sqrt( pow(radius, 2) - x*x );
 		y = (int)tmp_pos;
-		alpha[1] = 255/(tmp_pos - y);
+		alpha[1] =(uchar_t)( 255/(tmp_pos - y));
 		alpha[0] = 255-alpha[1];
 		
 		if( line_width > 0 && radius-y >= min_y 
@@ -349,7 +354,7 @@ Graph_Draw_RoundBorder_RightTop(
 		if( radius-y >= max_y || radius-y < min_y ) {
 			continue;
 		}
-		x = sqrt( pow(radius, 2) - y*y );
+		x = (int)sqrt( pow(radius, 2) - y*y );
 		
 		if( line_width > 0 && radius+x >= min_x 
 		 && radius+x <= max_x ) {
@@ -442,7 +447,7 @@ Graph_Draw_RoundBorder_TopRight(
 			continue;
 		}
 		
-		y = sqrt( pow(radius, 2) - x*x );
+		y = (int)sqrt( pow(radius, 2) - x*x );
 		
 		if( line_width > 0 && radius-y >= min_y 
 		 && radius-y <= max_y ) {
@@ -544,7 +549,7 @@ Graph_Draw_RoundBorder_LeftBottom(
 		if( radius+y >= max_y || radius+y < min_y ) {
 			continue;
 		}
-		x = sqrt( pow(radius, 2) - y*y );
+		x = (int)sqrt( pow(radius, 2) - y*y );
 		
 		if( line_width > 0 && radius-x >= min_x 
 		 && radius-x <= max_x ) {
@@ -637,7 +642,7 @@ Graph_Draw_RoundBorder_BottomLeft(
 			continue;
 		}
 		
-		y = sqrt( pow(radius, 2) - x*x );
+		y = (int)sqrt( pow(radius, 2) - x*x );
 		
 		if( radius+y > max_y ) {
 			pos = center_pos;
@@ -739,7 +744,7 @@ Graph_Draw_RoundBorder_RightBottom(
 		if( radius+y >= max_y || radius+y < min_y ) {
 			continue;
 		}
-		x = sqrt( pow(radius, 2) - y*y );
+		x = (int)sqrt( pow(radius, 2) - y*y );
 		
 		if( line_width > 0 && radius+x >= min_x 
 		 && radius+x < max_x ) {
@@ -830,7 +835,7 @@ Graph_Draw_RoundBorder_BottomRight(
 			continue;
 		}
 		
-		y = sqrt( pow(radius, 2) - x*x );
+		y = (int)sqrt( pow(radius, 2) - x*x );
 		
 		if( line_width > 0 && radius+y >= min_y 
 		 && radius+y < max_y ) {
@@ -884,14 +889,13 @@ Graph_Draw_RoundBorder_BottomRight(
 int Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 /* 简单的为图形边缘绘制边框 */
 {
-	if( !Graph_Valid(des) ) {
-		return -1;
-	}
-	
 	LCUI_Graph des_area;
 	LCUI_Rect rect;
 	int  radius, x, y,count, k, w[2], h[2], start_x, start_y;
 	
+	if( !Graph_Valid(des) ) {
+		return -1;
+	}
 	w[0] = des->width - border.top_right_radius;
 	h[0] = des->height - border.bottom_left_radius;
 	w[1] = des->width - border.bottom_right_radius;

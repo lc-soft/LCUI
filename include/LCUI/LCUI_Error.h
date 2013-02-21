@@ -52,13 +52,9 @@
 
 #define INIT_ERROR_OPEN_FB_DEV_ERROR  "初始化错误:打开图形输出设备出错"
 #define INIT_ERROR_FONTFILE_ERROR     "初始化错误:默认字体文件打开出错"
-#define INIT_ERROR_MALLOC_GRAPH_ERROR "初始化错误:无法分配足够的内存空间"
 
 #define WIDGET_ERROR_GRAPH_ERROR	"部件错误:未为部件开辟内存空间!\n"
 #define WIDGET_ERROR_TYPE_NOT_FOUND	"部件错误:未找到该类型的部件!\n"
-
-#define QUIT_PARENT_WINDOW_ERROR	"Quit_Parent_Window()错误:部件没有父窗口"
-
 
 #define LABLE_MALLOC_ERROR            "Lable_Text():无法分配足够的内存!\n"
 #define WINDOWS_NUM_TOO_MUCH          "无法创建窗口!\n"

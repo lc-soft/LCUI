@@ -41,7 +41,6 @@
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
-#include <unistd.h>
 
 typedef struct _Thread_TreeNode Thread_TreeNode;
 struct _Thread_TreeNode
@@ -53,8 +52,10 @@ struct _Thread_TreeNode
 
 static Thread_TreeNode thread_tree;
 
-static void Destroy_TreeNode( Thread_TreeNode *ttn )
+static void Destroy_TreeNode( void *arg )
 {
+	Thread_TreeNode *ttn;
+	ttn = (Thread_TreeNode *)arg;
 	Destroy_Queue( &ttn->child );
 }
 
@@ -70,15 +71,15 @@ static void Thread_TreeNode_Init( Thread_TreeNode *ttn )
 static Thread_TreeNode *
 ThreadTree_Find( Thread_TreeNode *ttn, LCUI_Thread tid )
 { 
+	int i, n;
+	Thread_TreeNode *new_ttn;\
+
 	if(NULL == ttn) {
 		return NULL;
 	}
 	if(ttn->tid == tid) {
 		return ttn;
 	}
-	
-	int i, n;
-	Thread_TreeNode *new_ttn;
 	
 	n = Queue_Get_Total( &ttn->child );
 	for(i=0; i<n; ++i) {

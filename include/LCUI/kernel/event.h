@@ -1,32 +1,30 @@
 #ifndef __LCUI_KERNEL_EVENT_H__
 #define __LCUI_KERNEL_EVENT_H__
 
-#include <inttypes.h>
-
 typedef struct {
-	uint8_t type;
+	unsigned char type;
 	int key_code;
 } LCUI_KeyboardEvent;
 
 typedef struct {
-	uint8_t type;
+	unsigned char type;
 	int code;
 	void *data1;
 	void *data2;
 } LCUI_UserEvent;
 
 typedef struct{
-	uint8_t type;
-	uint8_t state;
-	uint16_t x, y;
-	uint16_t xrel, yrel;
+	unsigned char type;
+	unsigned char state;
+	unsigned int x, y;
+	unsigned int xrel, yrel;
 } LCUI_MouseMotionEvent;
 
 typedef struct {
-	uint8_t type;
-	uint8_t button;
-	uint8_t state;
-	uint16_t x, y;
+	unsigned char type;
+	unsigned char button;
+	unsigned char state;
+	unsigned int x, y;
 } LCUI_MouseButtonEvent;
 
 typedef enum {
@@ -40,7 +38,7 @@ typedef enum {
 } LCUI_EVENT_TYPE;
 
 typedef union {
-	uint8_t type;
+	unsigned char type;
 	LCUI_KeyboardEvent key;
 	LCUI_MouseMotionEvent motion;
 	LCUI_MouseButtonEvent button;

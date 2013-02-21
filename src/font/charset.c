@@ -47,6 +47,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef LCUI_BUILD_IN_LINUX
 #include <iconv.h>
 
 /* 编码转换，从一种编码转为另一种编码，主要是调用iconv的API实现字符编码转换 */
@@ -73,6 +75,7 @@ code_convert(	char *src_charset,	char *des_charset,
 	iconv_close(cd);
 	return 0;
 }
+#endif
 
 int Get_EncodingType()
 /* 获取字符编码类型 */
@@ -85,6 +88,7 @@ int Get_EncodingType()
 	return app->encoding_type;
 }
 
+#ifdef LCUI_BUILD_IN_LINUX
 static int Set_EncodingType(int type)
 {
 	LCUI_App *app;
@@ -104,6 +108,7 @@ int Using_GB2312()
 {
 	return Set_EncodingType(ENCODEING_TYPE_GB2312);
 }
+#endif
 
 #define MAX_SAVE_NUM   20
 static wchar_t 
@@ -186,6 +191,7 @@ utf8_to_unicode(char *in_utf8_str, wchar_t **out_unicode)
 	return j;
 }
 
+#ifdef LCUI_BUILD_IN_LINUX
 static int 
 gb2312_to_unicode(char *in_gb2312_str, wchar_t **out_unicode)
 /* 功能：将GB2312编码的字符串转换成Unicode编码字符串 */
@@ -206,6 +212,7 @@ gb2312_to_unicode(char *in_gb2312_str, wchar_t **out_unicode)
 	free(buff);
 	return len;
 }
+#endif
 
 int Char_To_Wchar_T(char *in_text, wchar_t **unicode_text)
 /*
@@ -218,7 +225,9 @@ int Char_To_Wchar_T(char *in_text, wchar_t **unicode_text)
 {
 	switch(Get_EncodingType()) {
 	    case ENCODEING_TYPE_GB2312:
+#ifdef LCUI_BUILD_IN_LINUX
 		return gb2312_to_unicode(in_text, unicode_text); 
+#endif
 	    case ENCODEING_TYPE_UTF8:
 	    default: 
 		return utf8_to_unicode(in_text, unicode_text); 

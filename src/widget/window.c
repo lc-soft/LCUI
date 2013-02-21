@@ -298,19 +298,15 @@ Window_Init( LCUI_Widget *win_p )
 	LCUI_Widget *client_area;
 	LCUI_Widget *btn_close;
 	LCUI_Window *win;
+	static LCUI_Graph btn_highlight, btn_normal, btn_down; 
 	
 	win = WidgetPrivData_New(win_p, sizeof(LCUI_Window));
 	
 	titlebar = Widget_New("titlebar"); 
 	client_area = Widget_New(NULL); 
 	btn_close = Widget_New("button"); 
-	
 	titlebar->focus = FALSE;
-	
 	Set_Focus( client_area );
-	
-	static LCUI_Graph btn_highlight, btn_normal, btn_down; 
-	
 	Graph_Init(&btn_down);
 	Graph_Init(&btn_highlight);
 	Graph_Init(&btn_normal);

@@ -7,6 +7,9 @@
 int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 /* 功能：绘制进度条的空槽 */
 {
+	int i, n;
+	unsigned char c;
+
 	if(width < 4 || height < 4) {
 		return -1;
 	}
@@ -21,8 +24,6 @@ int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 	graph->rgba[3][width*(height-1)] = 0;
 	graph->rgba[3][width*height-1] = 0;
 	
-	int i, n;
-	unsigned char c;
 	/* 绘制左边和右边的竖线条 */
 	for(i=0; i<height; ++i)
 	{

@@ -46,6 +46,7 @@
 #include LC_DISPLAY_H
 #include LC_INPUT_H 
  
+#ifdef LCUI_MOUSE_DRIVER_LINUX
 #include <errno.h>
 #include <unistd.h> 
 #include <fcntl.h> 
@@ -60,6 +61,7 @@ LCUI_Mouse;
 /*************************************************************/
 
 static LCUI_Mouse mouse_data;
+#endif
 
 /****************************** Mouse *********************************/
 /*

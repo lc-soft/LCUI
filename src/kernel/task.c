@@ -3,8 +3,10 @@
 
 /* 销毁程序任务 */
 static void
-Destroy_Task( LCUI_Task *task )
+Destroy_Task( void *arg )
 {
+	LCUI_Task *task;
+	task = (LCUI_Task *)arg;
 	if( task->destroy_arg[0] && task->arg[0] ) {
 		free( task->arg[0] );
 		task->arg[0] = NULL;

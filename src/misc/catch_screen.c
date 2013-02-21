@@ -64,8 +64,9 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 {
 	LCUI_Rect cut_rect;
 	unsigned char *dest;
-	dest = LCUI_Sys.screen.fb_mem;	/* 指向帧缓冲 */
 	int x, y, n, k, count;
+
+	dest = LCUI_Sys.screen.fb_mem;	/* 指向帧缓冲 */
 	
 	if( !LCUI_Active() ) {
 		return;
@@ -75,7 +76,6 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 		if(!Rect_Valid(cut_rect)) {
 			return;
 		}
-			
 		area.x += cut_rect.x;
 		area.y += cut_rect.y;
 		area.width = cut_rect.width;
@@ -102,7 +102,7 @@ void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 static int need_break = FALSE;
 static LCUI_Thread t = 0;
 static LCUI_Rect target_area;
-static void catch()
+static void catch( void *unused )
 /* 在截取动画时，会用这个函数捕获屏幕内容 */
 {
 	LCUI_Graph graph;

@@ -14,8 +14,8 @@
 #define TEXT_MB_BTN_ABORT	"终止"
 #define TEXT_MB_BTN_IGNORE	"忽略"
 #define TEXT_MB_BTN_RETRY	"重试"
-#define TEXT_MB_BTN_YES		"是"
-#define TEXT_MB_BTN_NO		"否"
+#define TEXT_MB_BTN_YES		" 是 "
+#define TEXT_MB_BTN_NO		" 否 "
 
 #define WIDGET_ID_MB_MSG_AREA	30
 

@@ -71,7 +71,7 @@ int TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b )
 #define MAX_TAG_NUM 2
 
 static void 
-Destroy_StyleTag_Data( StyleTag_Data *data )
+Destroy_StyleTag_Data( void *arg )
 { 
 	//free( data->style );
 }
@@ -91,6 +91,7 @@ int StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data )
 /* 获取当前的样式数据 */
 LCUI_TextStyle *StyleTag_GetCurrentStyle ( LCUI_Queue *tags )
 {
+	PX_PT_t pxpt;
 	StyleTag_Data *tag_data;
 	LCUI_TextStyle *style_data;
 	int i, total, equal = 0, flags[MAX_TAG_NUM];
@@ -125,7 +126,6 @@ LCUI_TextStyle *StyleTag_GetCurrentStyle ( LCUI_Queue *tags )
 			if( flags[1] != 0 ) {
 				break;
 			}
-			PX_PT_t pxpt;
 			pxpt = *((PX_PT_t*)tag_data->style);
 			style_data->_pixel_size = TRUE;
 			style_data->pixel_size = pxpt.px;

@@ -4,6 +4,8 @@
 #include LC_GRAPH_H
 
 #ifdef USE_LIBPNG
+/* 需要将png头文件中使用的__restrict改为restrict才能在VS2012下编译通过 */
+#define __restrict restrict
 #include <png.h>
 #endif
 
@@ -15,16 +17,16 @@ int load_png(const char *filepath, LCUI_Graph *out)
 {
 #ifdef USE_LIBPNG
 	FILE *pic_fp;
+	png_structp png_ptr;
+	png_infop   info_ptr;
+	char buf[PNG_BYTES_TO_CHECK];
+	int   i, j, temp, pos, color_type, channels;
+	png_bytep* row_pointers;
+
 	pic_fp = fopen(filepath, "rb");
 	if(pic_fp == NULL) {/* 文件打开失败 */
 		return -1;
 	}
-	
-	/* 初始化各种结构 */
-	png_structp png_ptr;
-	png_infop   info_ptr;
-	char        buf[PNG_BYTES_TO_CHECK];
-	int         i, j, temp, pos, color_type, channels;
 	
 	png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 	info_ptr = png_create_info_struct(png_ptr);
@@ -49,7 +51,6 @@ int load_png(const char *filepath, LCUI_Graph *out)
 	color_type     = png_get_color_type(png_ptr, info_ptr);/*颜色类型*/
 	
 	/* row_pointers里边就是rgba数据 */
-	png_bytep* row_pointers;
 	row_pointers = png_get_rows(png_ptr, info_ptr);
 	
 	out->type = TYPE_PNG;  /* 图片类型为png */
@@ -113,9 +114,9 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 /* 将图像数据写入至png文件 */
 {
 #ifdef USE_LIBPNG
+	FILE *fp;
 	int j, i, temp, pos;
 	png_byte color_type; 
-
 	png_structp png_ptr;
 	png_infop info_ptr; 
 	png_bytep * row_pointers;
@@ -126,7 +127,7 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 	}
 	
 	/* create file */
-	FILE *fp = fopen(file_name, "wb");
+	fp = fopen(file_name, "wb");
 	if (!fp) {
 		printf("write_png(): File %s could not be opened for writing\n", file_name);
 		return -1;

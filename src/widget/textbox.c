@@ -127,7 +127,7 @@ TextBox_GetTextLayer( LCUI_Widget *widget )
 }
 
 static void 
-blink_cursor()
+blink_cursor( void )
 /* 闪烁文本框中的光标 */
 {
 	static int cur_state = 0;
@@ -276,12 +276,12 @@ static void
 TextBox_HoriScroll_TextLayer( ScrollBar_Data data, void *arg )
 /* 水平滚动文本框内的文本图层 */
 {
+	LCUI_Pos pos;
 	LCUI_Widget *widget;
 	
 	widget = (LCUI_Widget *)arg;
 	//_DEBUG_MSG("data: size: %d / %d, num: %d / %d\n", 
 	//data.current_size, data.max_size, data.current_num, data.max_num);
-	LCUI_Pos pos;
 	
 	pos = TextBox_ViewArea_GetPos( arg );
 	pos.x = 0 - data.current_num;
@@ -294,13 +294,12 @@ static void
 TextBox_VertScroll_TextLayer( ScrollBar_Data data, void *arg )
 /* 垂直滚动文本框内的文本图层 */
 {
+	LCUI_Pos pos;
 	LCUI_Widget *widget;
 	
 	widget = (LCUI_Widget *)arg;
 	//_DEBUG_MSG("data: size: %d / %d, num: %d / %d\n", 
 	//data.current_size, data.max_size, data.current_num, data.max_num);
-	LCUI_Pos pos;
-	
 	pos = TextBox_ViewArea_GetPos( arg );
 	pos.y = 0 - data.current_num;
 	pos.x = 0 - pos.x;
@@ -309,8 +308,10 @@ TextBox_VertScroll_TextLayer( ScrollBar_Data data, void *arg )
 }
 
 static void
-destroy_textblock( LCUI_TextBlock *ptr )
+destroy_textblock( void *arg )
 {
+	LCUI_TextBlock *ptr;
+	ptr = (LCUI_TextBlock *)arg;
 	free( ptr->text );
 }
 
@@ -425,7 +426,11 @@ TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 	if( layer->enable_multiline && area_size.h > 0 
 	  && layer_size.h > area_size.h ) {
 		tmp = area_size.w - Widget_GetWidth( scrollbar[0] );
+#ifdef LCUI_BUILD_IN_LINUX
 		snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
+#else
+		sprintf_s( size_str, sizeof(size_str)-1, "%dpx", tmp );
+#endif
 		Widget_SetSize( label, size_str, NULL );
 		
 		/* 修改滚动条中记录的最大值和当前值，让滚动条在更新后有相应的长度 */
@@ -435,7 +440,11 @@ TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 		/* 如果横向滚动条可见 */
 		if( scrollbar[1]->visible ) {
 			tmp = area_size.h - Widget_GetHeight( scrollbar[1] );
+#ifdef LCUI_BUILD_IN_LINUX
 			snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
+#else
+			sprintf_s( size_str, sizeof(size_str)-1, "%dpx", tmp );
+#endif
 			Widget_SetSize( scrollbar[0], NULL, size_str );
 		} else {
 			Widget_SetSize( scrollbar[0], NULL, "100%" );
@@ -449,7 +458,11 @@ TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 	if( layer->enable_multiline &&
 	 area_size.w > 0 && layer_size.w > area_size.w ) {
 		tmp = area_size.h - Widget_GetHeight( scrollbar[1] );
+#ifdef LCUI_BUILD_IN_LINUX
 		snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
+#else
+		sprintf_s( size_str, sizeof(size_str)-1, "%dpx", tmp );
+#endif
 		Widget_SetSize( label, NULL, size_str );
 		
 		ScrollBar_Set_MaxSize( scrollbar[1], layer_size.w );
@@ -458,7 +471,11 @@ TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 		
 		if( scrollbar[0]->visible ) {
 			tmp = area_size.w - Widget_GetWidth( scrollbar[0] );
+#ifdef LCUI_BUILD_IN_LINUX
 			snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
+#else
+			sprintf_s( size_str, sizeof(size_str)-1, "%dpx", tmp );
+#endif
 			Widget_SetSize( scrollbar[1], size_str, NULL );
 		} else {
 			Widget_SetSize( scrollbar[1], "100%", NULL );

@@ -10,11 +10,10 @@ int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 /* 对图像进行高斯模糊处理 */
 {
 	LCUI_Graph temp;
-	
-	int32_t kcenter, i;
-	uint_t x, y, ksize;
-	uint_t temp_pos, temp_start_pos;
-	uint_t a_src_pos, b_src_pos, src_start_pos;
+	int kcenter, i;
+	int x, y, ksize;
+	int temp_pos, temp_start_pos;
+	int a_src_pos, b_src_pos, src_start_pos;
 	double amul, bmul, gmul, rmul, *kvalue_ptr;
 	double *kernel, scale, cons, sum = 0;
 	const double PI = 3.141592653;

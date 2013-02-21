@@ -386,6 +386,7 @@ int Check_Rect_Overlap (	int ax, int ay, int aw, int ah,
  * 返回值：两不重叠返回0，重叠则返回1。
  */
 {
+	int m, n = 0, x[4], y[4];
 	/* 检测两个矩形是否成十字架式叠加 */
 	if(ax < bx && ay > by && ax + aw > bx + bw && ay + ah < by + bh) {
 		return 1;
@@ -398,7 +399,6 @@ int Check_Rect_Overlap (	int ax, int ay, int aw, int ah,
 	 * 因为局部区域刷新就是靠这个函数得知区域是否与部件
 	 * 矩形是否重叠。 
 	 * */
-	int m, n = 0, x[4], y[4];
 	x[0] = ax;
 	y[0] = ay;
 	x[1] = ax + aw - 1;

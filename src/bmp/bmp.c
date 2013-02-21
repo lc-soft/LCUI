@@ -20,15 +20,16 @@ int load_bmp(const char *filepath, LCUI_Graph *out)
 /* 打开并载入BMP图片文件内的图形数据 */
 {
 	FILE *fp;
+	bmp_head bmp;    
+	int size, m, n, x, y, temp, tempi, rle,pocz, omin;
+	unsigned char rozp;
+	unsigned char **bak_rgba;
+
 	fp = fopen(filepath,"r");
 	if(fp == NULL) {
 		return -1;
 	}
 	
-	bmp_head bmp;    
-	int m, n, x, y, temp, tempi, rle,pocz, omin;
-	unsigned char rozp;
-	unsigned char **bak_rgba;
 	/* 检测是否为bmp图片 */ 
 	temp = fread(&bmp, 1, sizeof(bmp_head),fp);
 	if (temp < sizeof(bmp_head) || bmp.BMPsyg != 19778) {
@@ -52,7 +53,6 @@ int load_bmp(const char *filepath, LCUI_Graph *out)
 		return 1;
 	}
 	
-	int size;
 	size = out->width * out->height * sizeof(unsigned char);
 	bak_rgba = (unsigned char**)malloc(3 * sizeof(unsigned char*));
 	bak_rgba[0] = (unsigned char*)malloc(size);

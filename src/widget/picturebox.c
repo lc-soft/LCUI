@@ -339,9 +339,11 @@ void PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 { 
 	int i;
 	float scale_x,scale_y;
-	LCUI_Graph *graph = image; 
+	LCUI_Graph *graph; 
 	LCUI_PictureBox *pic_box;
-	
+	graph_data *data;
+
+	graph = image;
 	pic_box = Widget_GetPrivData(widget);
 	for(i = 0;i < 2; ++i) {
 		/* 如果image有效 */ 
@@ -418,7 +420,6 @@ void PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 		}
 	} 
 	/* 如果记录中有该部件，那判断该部件使用的图像是否为同一个，不一样就释放之前的 */
-	graph_data *data;
 	i = find_widget_data(widget);
 	if(i >= 0) {
 		data = (graph_data*)Queue_Get(&picbox_graph_mem, i); 
@@ -501,16 +502,15 @@ int PictureBox_SetInitImage( LCUI_Widget *widget, LCUI_Graph *pic )
 /* 设定图像显示模式 */
 void PictureBox_SetSizeMode( LCUI_Widget *widget, int mode )
 {
-	LCUI_PictureBox *pic_box;
 	LCUI_Size my_size;
+	float scale_x,scale_y;
+	LCUI_PictureBox *pic_box;
 	
 	pic_box = Widget_GetPrivData(widget);
-	
 	if(pic_box->size_mode == mode) {
 		return;
 	}
 	
-	float scale_x,scale_y;
 	pic_box->size_mode = mode;
 	if( !pic_box->image ) {
 		return; 
@@ -645,7 +645,7 @@ int PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos )
 }
 
 /* 缩放PictureBox部件的图片浏览区域 */
-int PictureBox_ZoomViewArea( LCUI_Widget *widget, float scale )
+int PictureBox_ZoomViewArea( LCUI_Widget *widget, double scale )
 {
 	LCUI_Graph buff, temp;
 	LCUI_PictureBox *pic_box;

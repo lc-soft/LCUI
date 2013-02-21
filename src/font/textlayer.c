@@ -64,24 +64,22 @@ struct _Special_KeyWord
 /******************************************************************/
 
 static void 
-Destroy_Special_KeyWord(Special_KeyWord *key)
+Destroy_Special_KeyWord( void *arg )
 {
 	/* 在该关键词所属的原文本中查找组成该关键词的字，并修改字所使用的字体数据 */
 }
 
 static void 
-Destroy_CharData(LCUI_CharData *data)
-{ 
-	//FontBMP_Free( &data->bitmap );
-	//free( data->data );
-	//if( data->using_quote == IS_FALSE ) {
-		//free( data->data );
-	//}
+Destroy_CharData( void *arg )
+{
+	
 }
 
 static void 
-Destroy_Text_RowData(Text_RowData *data)
+Destroy_Text_RowData( void *arg )
 {
+	Text_RowData *data;
+	data = (Text_RowData *)arg;
 	Destroy_Queue ( &data->string );
 }
 

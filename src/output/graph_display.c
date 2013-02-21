@@ -208,7 +208,11 @@ LCUIScreen_Update( void* unused )
 /* 获取当前FPS */
 int LCUIScreen_GetFPS( void )
 {
+#ifdef LCUI_BUILD_IN_LINUX
 	return fps;
+#else
+	return 0;
+#endif
 }
 
 

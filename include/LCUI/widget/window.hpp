@@ -41,42 +41,6 @@
 #ifndef __LCUI_WINDOW_HPP_
 #define __LCUI_WINDOW_HPP_ 
 
-/* LCUIWindow¿‡ºÃ≥–◊‘LCUIWidget¿‡ */
-class LCUIWindow:public LCUIWidget
-{
-public:
-	LCUIWindow():LCUIWidget("window"){};
-	void setTitleIcon( LCUI_Graph* );
-	void setTitleIcon( LCUIGraph & );
-	void setTitleText( const char* );
-	void addToTitleBar( LCUIWidget& );
-	void addToClientArea( LCUIWidget& );
-};
-
-void LCUIWindow::setTitleIcon( LCUI_Graph *icon )
-{
-	Window_SetTitleIcon( getWidget(), icon );
-}
-
-void LCUIWindow::setTitleIcon( LCUIGraph &icon )
-{
-	Window_SetTitleIcon( getWidget(), icon.getGraph() );
-}
-
-void LCUIWindow::setTitleText( const char *text )
-{
-	Window_SetTitleText( getWidget(), text );
-}
-
-void LCUIWindow::addToTitleBar( LCUIWidget &obj )
-{
-	Window_TitleBar_Add( getWidget(), obj.getWidget() );
-}
-
-void LCUIWindow::addToClientArea( LCUIWidget &obj )
-{
-	Window_ClientArea_Add( getWidget(), obj.getWidget() );
-}
 #endif
 
 
