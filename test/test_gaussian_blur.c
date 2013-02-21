@@ -4,6 +4,7 @@
 #include LC_LCUI_H
 #include LC_DRAW_H
 #include LC_GRAPH_H
+#include <time.h>
 
 int main(int argc, char *argv[])
 {
@@ -16,6 +17,7 @@ int main(int argc, char *argv[])
 	if(argc == 2) {
 		/* 载入图片文件 */
 		if( Load_Image( argv[1], &graph ) != 0) {
+			printf("can not load images!\n");
 			return -1;
 		}
 		/* 开始计时 */
@@ -25,7 +27,7 @@ int main(int argc, char *argv[])
 		printf("smooth, use time: %ld us\n", clock()-start);
 		start = clock();
 		/* 将图像数据保存至文件 */
-		write_png( "./output.png", &slot );
+		write_png( "output.png", &slot );
 		printf("write, use time: %ld us\n", clock()-start);
 		/* 释放资源 */
 		Graph_Free( &slot );
