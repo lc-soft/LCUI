@@ -24,8 +24,8 @@ int load_png(const char *filepath, LCUI_Graph *out)
 	png_bytep* row_pointers;
 
 	pic_fp = fopen(filepath, "rb");
-	if(pic_fp == NULL) {/* 文件打开失败 */
-		return -1;
+	if(pic_fp == NULL) { 
+		return FILE_ERROR_OPEN_ERROR;
 	}
 	
 	png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
@@ -37,7 +37,7 @@ int load_png(const char *filepath, LCUI_Graph *out)
 	temp = png_sig_cmp((void*)buf,(png_size_t)0,PNG_BYTES_TO_CHECK);
 	
 	if (temp != 0) {/* 如果不是PNG图片文件 */
-		return 1;
+		return FILE_ERROR_UNKNOWN_FORMAT;
 	}
 	
 	rewind(pic_fp);
@@ -100,7 +100,7 @@ int load_png(const char *filepath, LCUI_Graph *out)
 			++pos;
 		} 
 	} else {
-		return 1;
+		return FILE_ERROR_UNKNOWN_FORMAT;
 	}
 	/* 撤销数据占用的内存 */
 	png_destroy_read_struct(&png_ptr, &info_ptr, 0);

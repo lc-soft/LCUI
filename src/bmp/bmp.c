@@ -20,35 +20,33 @@ int load_bmp(const char *filepath, LCUI_Graph *out)
 /* 打开并载入BMP图片文件内的图形数据 */
 {
 	FILE *fp;
-	bmp_head bmp;    
+	bmp_head bmp;
 	int size, m, n, x, y, temp, tempi, rle,pocz, omin;
 	unsigned char rozp;
 	unsigned char **bak_rgba;
-
+	
 	fp = fopen(filepath,"r");
 	if(fp == NULL) {
-		return -1;
+		return FILE_ERROR_OPEN_ERROR;
 	}
 	
 	/* 检测是否为bmp图片 */ 
 	temp = fread(&bmp, 1, sizeof(bmp_head),fp);
 	if (temp < sizeof(bmp_head) || bmp.BMPsyg != 19778) {
-		return 1; 
+		return FILE_ERROR_UNKNOWN_FORMAT; 
 	}
 	
 	pocz = bmp.nic[4];
 	out->bit_depth = bmp.depth;
 	rle = bmp.rle;
 	if ((out->bit_depth != 32) && (out->bit_depth != 24) 
-		&& (out->bit_depth != 8) && (out->bit_depth !=4))
-	{ 
+		&& (out->bit_depth != 8) && (out->bit_depth !=4)) { 
 		printf("错误(bmp):位深 %i 不支持!\n",out->bit_depth);
-		return 2;
+		return  FILE_ERROR_UNKNOWN_FORMAT;
 	}
-	out->have_alpha = IS_FALSE;     /* 没有透明效果 */
+	out->have_alpha = FALSE;     /* 没有透明效果 */
 	temp = Graph_Create(out, bmp.ix, bmp.iy);
-	if(temp != 0)
-	{
+	if(temp != 0) {
 		printf("错误(bmp):无法分配足够的内存供存储数据!\n");
 		return 1;
 	}
@@ -183,5 +181,5 @@ int load_bmp(const char *filepath, LCUI_Graph *out)
 	free(bak_rgba[2]);
 	free(bak_rgba);
 	fclose(fp);
-	return 0;	
+	return 0;
 }

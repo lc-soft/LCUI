@@ -11,14 +11,14 @@
 static int detect_image(const char *filepath, LCUI_Graph *out)
 /* 功能：检测图片格式，并解码图片 */
 {
-	int result = 1;
-	if (result == 1) {
+	int result = FILE_ERROR_UNKNOWN_FORMAT;
+	if (result == FILE_ERROR_UNKNOWN_FORMAT) {
 		result = load_png(filepath, out);  
 	}
-	if (result == 1) {
+	if (result == FILE_ERROR_UNKNOWN_FORMAT) {
 		result = load_jpeg(filepath, out);  
 	}
-	if (result == 1) {
+	if (result == FILE_ERROR_UNKNOWN_FORMAT) {
 		result = load_bmp(filepath, out); 
 	}
 	return result;
@@ -35,10 +35,9 @@ int Load_Image(const char *filepath, LCUI_Graph *out)
 	
 	Graph_Init(out); 
 	out->have_alpha = FALSE;
-	/* fp是全局变量，其它函数会用到它 */
-	if ((fp = fopen(filepath,"r")) == NULL) {
-		perror(filepath);
-		result = OPEN_ERROR; 
+	fp = fopen(filepath,"r");
+	if ( fp== NULL ) {
+		result = FILE_ERROR_OPEN_ERROR; 
 	} else {
 		fgetc(fp);
 		if (!ferror (fp)) { /* 如果没出错 */
@@ -47,10 +46,15 @@ int Load_Image(const char *filepath, LCUI_Graph *out)
 				fclose(fp);
 				result = detect_image(filepath, out); 
 			} else {
-				result = SHORT_FILE; /* 文件过小 */
+				result = FILE_ERROR_SHORT_FILE; /* 文件过小 */
 				fclose(fp);
 			}
 		}
+	}
+	switch(result) {
+	case FILE_ERROR_SHORT_FILE: printf("error: file is too short!\n");break;
+	case FILE_ERROR_OPEN_ERROR: perror(filepath);break;
+	case FILE_ERROR_UNKNOWN_FORMAT: printf("error: unknown format!\n");break;
 	}
 	return result;
 }

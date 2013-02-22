@@ -38,14 +38,14 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 
 	fp = fopen(filepath,"r");
 	if(fp == NULL) {
-		return -1;
+		return FILE_ERROR_OPEN_ERROR;
 	}
 	
 	if( fread( &JPsyg, sizeof(short int), 1, fp ) ) {
 		if ( JPsyg != -9985 ) {  /* 如果不是jpg图片 */
-			return 1; 
+			return  FILE_ERROR_UNKNOWN_FORMAT; 
 		}
-	} 
+	}
 	rewind(fp);
 	cinfo.err = jpeg_std_error(&jerr.pub);
 	jerr.pub.error_exit = my_error_exit;
@@ -58,15 +58,15 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 	jpeg_stdio_src(&cinfo,fp);
 	(void) jpeg_read_header(&cinfo,IS_TRUE);
 	(void) jpeg_start_decompress(&cinfo);    
-
+	
 	jaka = cinfo.num_components;
 	
 	//if (jaka==3) printf("color\n"); else printf("grayscale\n");
 	out->have_alpha = FALSE; /* 设置为无透明度 */
 	n = Graph_Create(out, cinfo.output_width, cinfo.output_height);
 	if( n != 0 ){
-		printf("load_jpeg(): error: "MALLOC_ERROR);
-		return 1;
+		printf("%s (): error: "__FUNCTION__, MALLOC_ERROR);
+		exit(-1);
 	}
 	
 	row_stride = cinfo.output_width * cinfo.output_components;
