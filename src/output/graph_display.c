@@ -47,7 +47,9 @@
 #include LC_DISPLAY_H
 #include LC_WIDGET_H
 #include LC_CURSOR_H
-
+#ifdef LCUI_BUILD_IN_WIN32
+#include <Windows.h>
+#endif
 static LCUI_BOOL i_am_init = FALSE;
 static LCUI_Queue screen_invalid_area;
 
@@ -85,6 +87,11 @@ LCUI_Size LCUIScreen_GetSize( void )
 int LCUIScreen_InvalidArea( LCUI_Rect rect )
 {
 	int ret;
+#ifdef LCUI_BUILD_IN_WIN32
+	MSG msg;
+	HWND hWnd;
+	RECT win32_rect;
+#endif
 	if (rect.width <= 0 || rect.height <= 0) {
 		return -1;
 	}
@@ -92,6 +99,15 @@ int LCUIScreen_InvalidArea( LCUI_Rect rect )
 	Queue_Lock( &screen_invalid_area );
 	ret = RectQueue_Add ( &screen_invalid_area, rect );
 	Queue_UnLock( &screen_invalid_area );
+#ifdef LCUI_BUILD_IN_WIN32
+	hWnd = Win32_GetSelfHWND();
+	win32_rect.left = rect.x;
+	win32_rect.top = rect.y;
+	win32_rect.right = rect.x + rect.width;
+	win32_rect.bottom = rect.y + rect.height;
+	InvalidateRect( hWnd, &win32_rect, FALSE );
+	PostMessage( hWnd, WM_PAINT, 0,0 );
+#endif
 	return ret;
 }
 
@@ -158,6 +174,7 @@ LCUIScreen_UpdateInvalidArea()
 	//_DEBUG_MSG("quit\n");
 	Graph_Free(&graph);
 }
+#endif
 
 /*
  * 功能：处理已记录的无效区域
@@ -196,14 +213,15 @@ LCUIScreen_Update( void* unused )
 		Handle_AllWidgetUpdate(); /* 处理所有部件更新 */ 
 		LCUI_MSleep(5);
 		LCUIScreen_SyncInvalidArea();
+#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 		LCUIScreen_UpdateInvalidArea();
+#endif
 		++fps_count; /* 累计当前更新的帧数 */
 	}
 	/* 释放定时器 */
 	free_timer( timer_id );
 	LCUIThread_Exit(NULL);
 }
-#endif
 
 /* 获取当前FPS */
 int LCUIScreen_GetFPS( void )
@@ -231,12 +249,8 @@ int LCUIModule_Video_Init( void )
 	LCUIScreen_Init();
 	i_am_init = TRUE;
 	RectQueue_Init( &screen_invalid_area );
-#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 	return _LCUIThread_Create( &LCUI_Sys.display_thread, 
 			LCUIScreen_Update, NULL );
-#else 
-	return 0;
-#endif
 }
 
 /* 停用图形输出模块 */
@@ -248,9 +262,5 @@ int LCUIModule_Video_End( void )
 	LCUIScreen_Destroy();
 	i_am_init = FALSE;
 	Destroy_Queue( &screen_invalid_area );
-#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
-#else 
-	return 0;
-#endif
 }
