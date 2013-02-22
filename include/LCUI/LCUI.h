@@ -52,16 +52,18 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include LC_CONFIG_H
-
 #if defined(WIN32) || defined(_WIN32)
 #define LCUI_BUILD_IN_WIN32
 #define LCUI_THREAD_WIN32
 #define LCUI_VIDEO_DRIVER_WIN32
+#define LCUI_FONT_ENGINE_FREETYPE
+#define USE_LIBPNG
+#define USE_LIBJPEG
+#undef USE_TSLIB
 #undef LCUI_THREAD_PTHREAD
 #undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
-#undef USE_TSLIB
 #else
+#include LC_CONFIG_H
 #define LCUI_BUILD_IN_LINUX
 #define LCUI_KEYBOARD_DRIVER_LINUX
 #define LCUI_MOUSE_DRIVER_LINUX
@@ -69,10 +71,10 @@
 
 
 /* 打开文件时的错误 */
-#define SHORT_FILE	1
-#define BIG_FILE	2
-#define UNKNOWN_FORMAT	3
-#define OPEN_ERROR	4
+#define FILE_ERROR_OPEN_ERROR		-1
+#define FILE_ERROR_SHORT_FILE		-2
+#define FILE_ERROR_BIG_FILE		-3
+#define FILE_ERROR_UNKNOWN_FORMAT	-4
 
 /* 图像类型 */
 #define TYPE_PNG	1
@@ -112,9 +114,12 @@ LCUI_BOOL;
 /* 触屏校准后的文件 */
 #define LCUI_CALIBFILE "/mnt/Data/LC-SOFT/pointercal"
 
+#ifdef LCUI_BUILD_IN_LINUX
 /* 默认的字体文件路径 */
 #define LCUI_DEFAULT_FONTFILE	"../fonts/msyh.ttf"
-
+#else
+#define LCUI_DEFAULT_FONTFILE	"C:/Windows/Fonts/msyh.ttf"
+#endif
 /* 鼠标事件 */
 #define MOUSE_EVENT_MOVE	1
 #define MOUSE_EVENT_CLICK	2

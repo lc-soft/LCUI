@@ -44,6 +44,15 @@
 
 LCUI_BEGIN_HEADER
 
+#ifdef LCUI_BUILD_IN_WIN32
+#define WIN32_WINDOW_WIDTH 800
+#define WIN32_WINDOW_HEIGHT 600
+
+HWND Win32_GetSelfHWND( void );
+
+void Win32_SetSelfHWND( HWND hwnd );
+#endif
+
 /* 
  * 功能：在屏幕上指定位置放置图形
  * 说明：此函数使用帧缓冲（FrameBuffer）进行图形输出
