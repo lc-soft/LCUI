@@ -62,6 +62,14 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 5. 等待编译成功完成，如果在编译过程中遇到错误，请检查您的系统中是否有完整的编译环境。
 6. 使用make install命令安装 LCUI 的函数库和头文件。
 
+windows系统上构建本项目方法，有两种：
+1. 使用Visual Studio进行编译，你只需要使用Visual Studi打开build/VisualStudio/
+目录下的LCUI.sln文件，然后生成解决方案即可。
+2. 使用Cygwin或MSYS，可按照上述1至6的步骤进行构建，在完成步骤3后，请修改include/LCUI/
+目录下的LCUI_Config.h文件，定义LCUI_BUILD_IN_WIN32宏，若有LCUI_BUILD_IN_LINUX宏，
+请删除它。
+
+
 ### 系统需求
 
 * 字体处理： freetype2
