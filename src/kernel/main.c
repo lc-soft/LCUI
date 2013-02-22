@@ -124,7 +124,7 @@ static int LCUI_AppList_Delete (LCUI_ID app_id)
 	return 0;
 }
 
-static void LCUI_Destroy_App( void* arg )
+static void LCUI_Destroy_App( void *arg )
 /* 功能：销毁程序相关信息 */
 {
 	LCUI_App *app;
@@ -302,7 +302,9 @@ int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 {
 	LCUI_App *app;
 	int idle_time = 1;
-	
+#ifdef LCUI_BUILD_IN_WIN32
+	MSG msg;
+#endif
 	app = LCUIApp_GetSelf();
 	if( !app ) {
 		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
@@ -320,6 +322,14 @@ int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 				idle_time += 1;
 			}
 		}
+#ifdef LCUI_BUILD_IN_WIN32
+		if( GetMessage (&msg, NULL, 0, 0) ) {
+			TranslateMessage (&msg) ;
+			DispatchMessage (&msg) ;
+		} else {
+			loop->quit = FALSE;
+		}
+#endif
 	}
 	loop->running = FALSE;
 	DEBUG_MSG("loop: %p, exit\n", loop);

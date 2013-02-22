@@ -266,4 +266,3 @@ void LCUIModule_Thread_End( void )
 {
 	Destroy_Queue( &thread_tree.child );
 }
-

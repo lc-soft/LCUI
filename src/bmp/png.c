@@ -4,7 +4,7 @@
 #include LC_GRAPH_H
 
 #ifdef USE_LIBPNG
-/* ĞèÒª½«pngÍ·ÎÄ¼şÖĞÊ¹ÓÃµÄ__restrict¸ÄÎªrestrict²ÅÄÜÔÚVS2012ÏÂ±àÒëÍ¨¹ı */
+/* éœ€è¦å°†pngå¤´æ–‡ä»¶ä¸­ä½¿ç”¨çš„__restrictæ”¹ä¸ºrestrictæ‰èƒ½åœ¨VS2012ä¸‹ç¼–è¯‘é€šè¿‡ */
 #define __restrict restrict
 #include <png.h>
 #endif
@@ -13,7 +13,7 @@
 
 #define PNG_BYTES_TO_CHECK 4
 int load_png(const char *filepath, LCUI_Graph *out)
-/* ÔØÈëPNGÍ¼Æ¬ÖĞµÄÍ¼ĞÎÊı¾İ */
+/* è½½å…¥PNGå›¾ç‰‡ä¸­çš„å›¾å½¢æ•°æ® */
 {
 #ifdef USE_LIBPNG
 	FILE *pic_fp;
@@ -31,32 +31,32 @@ int load_png(const char *filepath, LCUI_Graph *out)
 	png_ptr  = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 	info_ptr = png_create_info_struct(png_ptr);
 	
-	setjmp(png_jmpbuf(png_ptr)); /* Õâ¾äºÜÖØÒª */
+	setjmp(png_jmpbuf(png_ptr)); /* è¿™å¥å¾ˆé‡è¦ */
 	
 	temp = fread(buf,1,PNG_BYTES_TO_CHECK,pic_fp);
 	temp = png_sig_cmp((void*)buf,(png_size_t)0,PNG_BYTES_TO_CHECK);
 	
-	if (temp != 0) {/* Èç¹û²»ÊÇPNGÍ¼Æ¬ÎÄ¼ş */
+	if (temp != 0) {/* å¦‚æœä¸æ˜¯PNGå›¾ç‰‡æ–‡ä»¶ */
 		return FILE_ERROR_UNKNOWN_FORMAT;
 	}
 	
 	rewind(pic_fp);
-	/* ¿ªÊ¼¶ÁÎÄ¼ş */
+	/* å¼€å§‹è¯»æ–‡ä»¶ */
 	png_init_io(png_ptr, pic_fp); 
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0);
 
-	/*»ñÈ¡¿í¶È£¬¸ß¶È£¬Î»Éî£¬ÑÕÉ«ÀàĞÍ*/
-	channels       = png_get_channels(png_ptr, info_ptr);/*»ñÈ¡Í¨µÀÊı*/
+	/*è·å–å®½åº¦ï¼Œé«˜åº¦ï¼Œä½æ·±ï¼Œé¢œè‰²ç±»å‹*/
+	channels       = png_get_channels(png_ptr, info_ptr);/*è·å–é€šé“æ•°*/
 	out->bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-	color_type     = png_get_color_type(png_ptr, info_ptr);/*ÑÕÉ«ÀàĞÍ*/
+	color_type     = png_get_color_type(png_ptr, info_ptr);/*é¢œè‰²ç±»å‹*/
 	
-	/* row_pointersÀï±ß¾ÍÊÇrgbaÊı¾İ */
+	/* row_pointersé‡Œè¾¹å°±æ˜¯rgbaæ•°æ® */
 	row_pointers = png_get_rows(png_ptr, info_ptr);
 	
-	out->type = TYPE_PNG;  /* Í¼Æ¬ÀàĞÍÎªpng */
-	/*Èç¹ûÊÇRGB+alphaÍ¨µÀ£¬»òÕßRGB+ÆäËü×Ö½Ú*/
+	out->type = TYPE_PNG;  /* å›¾ç‰‡ç±»å‹ä¸ºpng */
+	/*å¦‚æœæ˜¯RGB+alphaé€šé“ï¼Œæˆ–è€…RGB+å…¶å®ƒå­—èŠ‚*/
 	if(channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
-		/* ¿ªÊ¼·ÖÅäÄÚ´æ */
+		/* å¼€å§‹åˆ†é…å†…å­˜ */
 		out->have_alpha = IS_TRUE; 
 		temp = Graph_Create( out, 
 				png_get_image_width(png_ptr, info_ptr), 
@@ -79,7 +79,7 @@ int load_png(const char *filepath, LCUI_Graph *out)
 		} 
 	}
 	else if(channels == 3 || color_type == PNG_COLOR_TYPE_RGB) {
-	/*Èç¹ûÊÇRGBÍ¨µÀ*/
+	/*å¦‚æœæ˜¯RGBé€šé“*/
 		out->have_alpha = IS_FALSE;
 		temp = Graph_Create( out, 
 				png_get_image_width(png_ptr, info_ptr), 
@@ -102,7 +102,7 @@ int load_png(const char *filepath, LCUI_Graph *out)
 	} else {
 		return FILE_ERROR_UNKNOWN_FORMAT;
 	}
-	/* ³·ÏúÊı¾İÕ¼ÓÃµÄÄÚ´æ */
+	/* æ’¤é”€æ•°æ®å ç”¨çš„å†…å­˜ */
 	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 #else
 	printf("warning: not PNG support!"); 
@@ -111,7 +111,7 @@ int load_png(const char *filepath, LCUI_Graph *out)
 }
 
 int write_png(const char *file_name, LCUI_Graph *graph)
-/* ½«Í¼ÏñÊı¾İĞ´ÈëÖÁpngÎÄ¼ş */
+/* å°†å›¾åƒæ•°æ®å†™å…¥è‡³pngæ–‡ä»¶ */
 {
 #ifdef USE_LIBPNG
 	FILE *fp;

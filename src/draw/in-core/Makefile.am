@@ -9,5 +9,3 @@ libdraw_incore_la_SOURCES = \
 	img_progressbar.c	\
 	img_radiobutton.c	\
 	img_titlebar.c
-
-

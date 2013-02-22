@@ -1291,12 +1291,14 @@ static void Widget_BackgroundInit( LCUI_Widget *widget )
 
 
 static void 
-Destroy_Widget(LCUI_Widget *widget)
+Destroy_Widget( void *arg )
 /*
  * 功能：销毁一个部件
  * 说明：如果这个部件有子部件，将对它进行销毁
  * */
 {
+	LCUI_Widget *widget;
+	widget = (LCUI_Widget *)arg;
 	widget->parent = NULL;
 	
 	/* 释放字符串 */

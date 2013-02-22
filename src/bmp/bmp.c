@@ -3,7 +3,7 @@
 #include LC_GRAPH_H
 #include LC_ERROR_H 
 
-/* Õâ¸ö½á¹¹ÌåÓÃÓÚ´æ´¢bmpÎÄ¼şµÄÎÄ¼şÍ·µÄĞÅÏ¢ */
+/* è¿™ä¸ªç»“æ„ä½“ç”¨äºå­˜å‚¨bmpæ–‡ä»¶çš„æ–‡ä»¶å¤´çš„ä¿¡æ¯ */
 typedef struct bmp_head {
 	short int BMPsyg;
 	short int nic[8];
@@ -17,7 +17,7 @@ typedef struct bmp_head {
 } bmp_head;
 
 int load_bmp(const char *filepath, LCUI_Graph *out)
-/* ´ò¿ª²¢ÔØÈëBMPÍ¼Æ¬ÎÄ¼şÄÚµÄÍ¼ĞÎÊı¾İ */
+/* æ‰“å¼€å¹¶è½½å…¥BMPå›¾ç‰‡æ–‡ä»¶å†…çš„å›¾å½¢æ•°æ® */
 {
 	FILE *fp;
 	bmp_head bmp;
@@ -30,7 +30,7 @@ int load_bmp(const char *filepath, LCUI_Graph *out)
 		return FILE_ERROR_OPEN_ERROR;
 	}
 	
-	/* ¼ì²âÊÇ·ñÎªbmpÍ¼Æ¬ */ 
+	/* æ£€æµ‹æ˜¯å¦ä¸ºbmpå›¾ç‰‡ */ 
 	temp = fread(&bmp, 1, sizeof(bmp_head),fp);
 	if (temp < sizeof(bmp_head) || bmp.BMPsyg != 19778) {
 		return FILE_ERROR_UNKNOWN_FORMAT; 
@@ -41,13 +41,13 @@ int load_bmp(const char *filepath, LCUI_Graph *out)
 	rle = bmp.rle;
 	if ((out->bit_depth != 32) && (out->bit_depth != 24) 
 		&& (out->bit_depth != 8) && (out->bit_depth !=4)) { 
-		printf("´íÎó(bmp):Î»Éî %i ²»Ö§³Ö!\n",out->bit_depth);
+		printf("é”™è¯¯(bmp):ä½æ·± %i ä¸æ”¯æŒ!\n",out->bit_depth);
 		return  FILE_ERROR_UNKNOWN_FORMAT;
 	}
-	out->have_alpha = FALSE;     /* Ã»ÓĞÍ¸Ã÷Ğ§¹û */
+	out->have_alpha = FALSE;     /* æ²¡æœ‰é€æ˜æ•ˆæœ */
 	temp = Graph_Create(out, bmp.ix, bmp.iy);
 	if(temp != 0) {
-		printf("´íÎó(bmp):ÎŞ·¨·ÖÅä×ã¹»µÄÄÚ´æ¹©´æ´¢Êı¾İ!\n");
+		printf("é”™è¯¯(bmp):æ— æ³•åˆ†é…è¶³å¤Ÿçš„å†…å­˜ä¾›å­˜å‚¨æ•°æ®!\n");
 		return 1;
 	}
 	
@@ -58,7 +58,7 @@ int load_bmp(const char *filepath, LCUI_Graph *out)
 	bak_rgba[2] = (unsigned char*)malloc(size);
 	
 	if(!bak_rgba || !bak_rgba[0] || !bak_rgba[1] || !bak_rgba[2]){
-		printf("´íÎó(bmp):ÎŞ·¨·ÖÅä×ã¹»µÄÄÚ´æ¹©´æ´¢Êı¾İ!\n");
+		printf("é”™è¯¯(bmp):æ— æ³•åˆ†é…è¶³å¤Ÿçš„å†…å­˜ä¾›å­˜å‚¨æ•°æ®!\n");
 		return 1;
 	}
 	rozp = ftell(fp);
@@ -175,7 +175,7 @@ int load_bmp(const char *filepath, LCUI_Graph *out)
 		} /* end RLE */ 
 	break;
 	}
-	out->type = TYPE_BMP;     /* Í¼Æ¬ÀàĞÍÎªbmp */
+	out->type = TYPE_BMP;     /* å›¾ç‰‡ç±»å‹ä¸ºbmp */
 	free(bak_rgba[0]);
 	free(bak_rgba[1]);
 	free(bak_rgba[2]);

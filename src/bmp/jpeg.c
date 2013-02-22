@@ -24,7 +24,7 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 #endif
 
 int load_jpeg(const char *filepath, LCUI_Graph *out)
-/* ¹¦ÄÜ£ºÔØÈë²¢½âÂëjpgÍ¼Æ¬ */
+/* åŠŸèƒ½ï¼šè½½å…¥å¹¶è§£ç jpgå›¾ç‰‡ */
 {
 #ifdef USE_LIBJPEG
 	FILE *fp;
@@ -42,7 +42,7 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 	}
 	
 	if( fread( &JPsyg, sizeof(short int), 1, fp ) ) {
-		if ( JPsyg != -9985 ) {  /* Èç¹û²»ÊÇjpgÍ¼Æ¬ */
+		if ( JPsyg != -9985 ) {  /* å¦‚æžœä¸æ˜¯jpgå›¾ç‰‡ */
 			return  FILE_ERROR_UNKNOWN_FORMAT; 
 		}
 	}
@@ -62,10 +62,10 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 	jaka = cinfo.num_components;
 	
 	//if (jaka==3) printf("color\n"); else printf("grayscale\n");
-	out->have_alpha = FALSE; /* ÉèÖÃÎªÎÞÍ¸Ã÷¶È */
+	out->have_alpha = FALSE; /* è®¾ç½®ä¸ºæ— é€æ˜Žåº¦ */
 	n = Graph_Create(out, cinfo.output_width, cinfo.output_height);
 	if( n != 0 ){
-		printf("%s (): error: "__FUNCTION__, MALLOC_ERROR);
+		printf("%s (): error: %s",__FUNCTION__, MALLOC_ERROR);
 		exit(-1);
 	}
 	
@@ -93,7 +93,7 @@ int load_jpeg(const char *filepath, LCUI_Graph *out)
 			}
 		} 
 	}
-	out->type = TYPE_JPG;//Í¼Æ¬ÀàÐÍÎªjpg
+	out->type = TYPE_JPG;//å›¾ç‰‡ç±»åž‹ä¸ºjpg
 	(void) jpeg_finish_decompress(&cinfo);
 	jpeg_destroy_decompress(&cinfo);
 	fclose(fp);

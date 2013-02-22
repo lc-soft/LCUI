@@ -305,4 +305,3 @@ void Register_Button()
 	WidgetFunc_Add("button", Button_Init,		FUNC_TYPE_INIT);
 	WidgetFunc_Add("button", Button_ExecUpdate,	FUNC_TYPE_UPDATE);
 }
-
