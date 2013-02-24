@@ -219,6 +219,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\messagebox.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -428,5 +431,10 @@
     <Text Include="..\..\..\docs\LICENSE.TXT">
       <Filter>docs</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LCUI.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
