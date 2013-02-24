@@ -66,39 +66,39 @@ typedef struct {
 extern LCUI_System  LCUI_Sys;
 
 #ifdef LCUI_BUILD_IN_WIN32
-void Win32_LCUI_Init( HINSTANCE hInstance );
+LCUI_EXPORT(void) Win32_LCUI_Init( HINSTANCE hInstance );
 #endif
 
 /*------------------------------ LCUIApp -----------------------------*/
 /* 根据程序的ID，获取指向程序数据结构的指针 */
-LCUI_App *LCUIApp_Find( LCUI_ID id );
+LCUI_EXPORT(LCUI_App*) LCUIApp_Find( LCUI_ID id );
 
 /* 获取指向程序数据的指针 */
-LCUI_App* LCUIApp_GetSelf( void );
+LCUI_EXPORT(LCUI_App*) LCUIApp_GetSelf( void );
 
 /* 获取程序ID */
-LCUI_ID LCUIApp_GetSelfID( void );
+LCUI_EXPORT(LCUI_ID) LCUIApp_GetSelfID( void );
 /*--------------------------- End LCUIApp ----------------------------*/
 
 /*--------------------------- Main Loop ------------------------------*/
 /* 新建一个主循环 */
-LCUI_MainLoop *LCUI_MainLoop_New( void );
+LCUI_EXPORT(LCUI_MainLoop*) LCUI_MainLoop_New( void );
 
 /* 设定主循环等级，level值越高，处理主循环退出时，也越早处理该循环 */
-int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level );
+LCUI_EXPORT(int) LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level );
 
 /* 运行目标循环 */
-int LCUI_MainLoop_Run( LCUI_MainLoop *loop );
+LCUI_EXPORT(int) LCUI_MainLoop_Run( LCUI_MainLoop *loop );
 
 /* 标记目标主循环需要退出 */
-int LCUI_MainLoop_Quit( LCUI_MainLoop *loop );
+LCUI_EXPORT(int) LCUI_MainLoop_Quit( LCUI_MainLoop *loop );
 
 /*----------------------- End MainLoop -------------------------------*/
 
-LCUI_BOOL LCUI_Active();
+LCUI_EXPORT(LCUI_BOOL) LCUI_Active();
 /* 功能：检测LCUI是否活动 */ 
 
-int LCUI_Init(int argc, char *argv[]);
+LCUI_EXPORT(int) LCUI_Init(int argc, char *argv[]);
 /* 
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
@@ -108,19 +108,10 @@ int LCUI_Init(int argc, char *argv[]);
  * 功能：LCUI程序的主循环
  * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
  *  */
-int LCUI_Main( void );
+LCUI_EXPORT(int) LCUI_Main( void );
 
 /* 获取LCUI的版本 */
-int LCUI_GetSelfVersion( char *out );
-
-int Get_EncodingType();
-/* 获取字符编码类型 */
-
-int Using_GB2312();
-/* 
- * 说明：如果你的系统只能使用GB2312编码，不能使用UTF-8编码，可以使用这
- * 个函数进行设置，让相关函数正常转换字符编码 
- * */ 
+LCUI_EXPORT(int) LCUI_GetSelfVersion( char *out );
 
 LCUI_END_HEADER
 

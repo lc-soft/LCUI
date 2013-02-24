@@ -42,6 +42,8 @@
 #ifndef __LCUI_ACTIVEBOX_H__
 #define __LCUI_ACTIVEBOX_H__
 
+LCUI_BEGIN_HEADER
+
 typedef struct _LCUI_Frames		LCUI_Frames;
 typedef struct _LCUI_Frame		LCUI_Frame;
 typedef struct _LCUI_ActiveBox	LCUI_ActiveBox;
@@ -72,23 +74,25 @@ struct _LCUI_Frames
 };
 /*************************************************************/
 
-LCUI_BEGIN_HEADER
-
 /*********************** Frames Process *******************************/
-LCUI_Frames* Create_Frames(LCUI_Size size);
+LCUI_EXPORT(LCUI_Frames*)
+Create_Frames(LCUI_Size size);
 /* 
  * 功能：创建一个能存放动画数据的容器
  * 说明：该容器用于记录动画的每一帧的信息，需要指定该容器的尺寸。
  *  */ 
 
-LCUI_Pos Frames_GetFrameMixPos(LCUI_Frames *stream, LCUI_Frame *frame);
+LCUI_EXPORT(LCUI_Pos)
+Frames_GetFrameMixPos( LCUI_Frames *stream, LCUI_Frame *frame );
 /* 功能：获取指定帧在整个动画容器中的位置 */ 
 
-int Resize_Frames(LCUI_Frames *p, LCUI_Size new_size);
+LCUI_EXPORT(int)
+Resize_Frames( LCUI_Frames *p, LCUI_Size new_size );
 /* 功能：调整动画的容器尺寸 */ 
 
-int Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic, 
-		LCUI_Pos offset, int sleep_time );
+LCUI_EXPORT(int)
+Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic, 
+			LCUI_Pos offset, int sleep_time );
 /* 
  * 功能：为动画添加帧 
  * 说明：
@@ -97,41 +101,51 @@ int Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic,
  * sleep_time表示该帧的显示时长，单位为：10毫秒
  * */ 
 
-int Frames_AddFunc(	LCUI_Frames *des, 
-			void (*func)(LCUI_Graph*, void*), 
-			void *arg );
+LCUI_EXPORT(int)
+Frames_AddFunc(	LCUI_Frames *des, 
+		void (*func)(LCUI_Graph*, void*), 
+		void *arg );
 /* 
  * 功能：为动画关联回调函数 
  * 说明：关联回调函数后，动画每更新一帧都会调用这个函数
  * */ 
 
-LCUI_Frame *Frames_GetFrame(LCUI_Frames *src);
+LCUI_EXPORT(LCUI_Frame*)
+Frames_GetFrame(LCUI_Frames *src);
 /* 功能：获取当前帧 */ 
 
-LCUI_Graph *Frames_GetGraphSlot(LCUI_Frames *src);
+LCUI_EXPORT(LCUI_Graph*)
+Frames_GetGraphSlot(LCUI_Frames *src);
 /* 功能：获取当前帧的图像 */ 
 
-int Frames_Play(LCUI_Frames *frames);
+LCUI_EXPORT(int)
+Frames_Play(LCUI_Frames *frames);
 /* 功能：播放动画 */ 
 
-int Frames_Pause(LCUI_Frames *frames);
+LCUI_EXPORT(int)
+Frames_Pause(LCUI_Frames *frames);
 /* 功能：暂停动画 */ 
 /*********************** End Frames Process ***************************/
 
 /************************** ActiveBox *********************************/
-LCUI_Frames *ActiveBox_GetFrames(LCUI_Widget *widget);
+LCUI_EXPORT(LCUI_Frames*)
+ActiveBox_GetFrames(LCUI_Widget *widget);
 
-int ActiveBox_SetFramesSize(LCUI_Widget *widget, LCUI_Size new_size);
+LCUI_EXPORT(int)
+ActiveBox_SetFramesSize(LCUI_Widget *widget, LCUI_Size new_size);
 /* 功能：设定动画尺寸 */ 
 
-int ActiveBox_Play(LCUI_Widget *widget);
+LCUI_EXPORT(int)
+ActiveBox_Play(LCUI_Widget *widget);
 /* 功能：播放动画 */ 
 
-int ActiveBox_Pause(LCUI_Widget *widget);
+LCUI_EXPORT(int)
+ActiveBox_Pause(LCUI_Widget *widget);
 /* 功能：暂停动画 */ 
 
-int ActiveBox_AddFrame(	LCUI_Widget *widget, LCUI_Graph *pic, 
-				LCUI_Pos offset, int sleep_time );
+LCUI_EXPORT(int)
+ActiveBox_AddFrame(	LCUI_Widget *widget, LCUI_Graph *pic, 
+			LCUI_Pos offset, int sleep_time );
 /* 功能：为ActiveBox部件内的动画添加一帧图像 */ 
 /************************** End ActiveBox *****************************/
 

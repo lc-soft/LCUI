@@ -69,7 +69,6 @@
 #define LCUI_MOUSE_DRIVER_LINUX
 #endif
 
-
 /* 打开文件时的错误 */
 #define FILE_ERROR_OPEN_ERROR		-1
 #define FILE_ERROR_SHORT_FILE		-2
@@ -104,13 +103,6 @@
 #define TRUE 1
 #endif
 
-typedef enum _LCUI_BOOL
-{
-	IS_FALSE = 0,
-	IS_TRUE = 1
-}
-LCUI_BOOL;
-
 /* 触屏校准后的文件 */
 #define LCUI_CALIBFILE "/mnt/Data/LC-SOFT/pointercal"
 
@@ -129,18 +121,6 @@ LCUI_BOOL;
 /* 定义图形的混合方式 */
 #define GRAPH_MIX_FLAG_OVERLAY	 1<<7
 #define GRAPH_MIX_FLAG_REPLACE	 1<<8
-
-/****************** 图像的布局 *****************/
-typedef enum _LAYOUT_TYPE
-{
-	LAYOUT_ZOOM	= 1,	  /* 缩放 */
-	LAYOUT_STRETCH	= 2,	  /* 拉伸 */
-	LAYOUT_CENTER	= 3,	  /* 居中 */
-	LAYOUT_TILE	= 4,	  /* 平铺 */
-	LAYOUT_NONE	= 0,	  /* 无 */
-	LAYOUT_NORMAL	= 0 
-}LAYOUT_TYPE;
-/**********************************************/
 
 /************ 任务的添加模式 ***************/
 #define ADD_MODE_ADD_NEW	0 /* 新增 */
@@ -182,6 +162,27 @@ typedef enum _LAYOUT_TYPE
 #define ImageBeforeText	13   /* 图片在左，文字在右 */
 #define TextBeforeImage	14   /* 图片在右，文字在左 */
 /***************************************************/
+
+LCUI_BEGIN_HEADER
+
+typedef enum _LCUI_BOOL
+{
+	IS_FALSE = 0,
+	IS_TRUE = 1
+}
+LCUI_BOOL;
+
+/****************** 图像的布局 *****************/
+typedef enum _LAYOUT_TYPE
+{
+	LAYOUT_ZOOM	= 1,	  /* 缩放 */
+	LAYOUT_STRETCH	= 2,	  /* 拉伸 */
+	LAYOUT_CENTER	= 3,	  /* 居中 */
+	LAYOUT_TILE	= 4,	  /* 平铺 */
+	LAYOUT_NONE	= 0,	  /* 无 */
+	LAYOUT_NORMAL	= 0 
+}LAYOUT_TYPE;
+/**********************************************/
 
 typedef unsigned long int LCUI_ID; 
 /* 先使用typedef为结构体创建同义字，之后再定义结构体 */
@@ -282,8 +283,12 @@ typedef struct {
 } LCUI_WString;
 /*----------- END -------------*/
 
+LCUI_END_HEADER
+
 #include LC_THREAD_H
 #include LC_QUEUE_H
+
+LCUI_BEGIN_HEADER
 
 /*---------------------------- 图形数据 -------------------------------*/
 typedef struct _LCUI_Graph LCUI_Graph;
@@ -360,6 +365,8 @@ typedef enum {
 	ALIGN_BOTTOM_RIGHT	/* 向底部偏右对齐 */
 } ALIGN_TYPE;
 /*---------------------------------------------*/
+
+LCUI_END_HEADER
 
 #define MAX_APP_IDLE_TIME	50
 #define MAX_LCUI_IDLE_TIME	50

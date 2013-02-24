@@ -46,7 +46,8 @@ LCUI_BEGIN_HEADER
 
 #include LC_DRAW_BORDER_H
 
-int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des);
+LCUI_EXPORT(int)
+Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des);
 /* 
  * 功能：旋转图形
  * 说明：指定旋转中心点坐标以及旋转角度，即可得到旋转后的图形
@@ -54,30 +55,39 @@ int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des);
  * 算法有待优化完善。
  */
 
-int load_bmp(const char *filepath, LCUI_Graph *out);
+LCUI_EXPORT(int)
+load_bmp(const char *filepath, LCUI_Graph *out);
 /* 打开并载入BMP图片文件内的图形数据 */
 
-int load_jpeg(const char *filepath, LCUI_Graph *out);
+LCUI_EXPORT(int)
+load_jpeg(const char *filepath, LCUI_Graph *out);
 /* 功能：载入并解码jpg图片 */
 
-int load_png(const char *filepath, LCUI_Graph *out);
+LCUI_EXPORT(int)
+load_png(const char *filepath, LCUI_Graph *out);
 /* 载入PNG图片中的图形数据 */
 
-int write_png(const char *file_name, LCUI_Graph *graph);
+LCUI_EXPORT(int)
+write_png(const char *file_name, LCUI_Graph *graph);
 /* 将图像数据写入至png文件 */
 
-int Load_Image(const char *filepath, LCUI_Graph *out);
+LCUI_EXPORT(int)
+Load_Image(const char *filepath, LCUI_Graph *out);
 /* 
  * 功能：载入指定图片文件的图形数据
  * 说明：打开图片文件，并解码至内存，打开的图片文件越大，占用的内存也就越大 
  * */
 
-int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
+LCUI_EXPORT(int)
+GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
 /* 对图像进行高斯模糊处理 */ 
 
-int Graph_Smooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
+LCUI_EXPORT(int)
+Graph_Smooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
 /* 对图像进行模糊处理 */
-int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height);
+
+LCUI_EXPORT(int)
+Draw_Empty_Slot(LCUI_Graph *graph, int width, int height);
 /* 功能：绘制进度条的空槽 */ 
 
 LCUI_END_HEADER

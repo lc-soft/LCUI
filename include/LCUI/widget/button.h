@@ -42,6 +42,8 @@
 #ifndef __LCUI_BUTTON_H__
 #define __LCUI_BUTTON_H__
 
+LCUI_BEGIN_HEADER
+
 typedef struct _LCUI_Button LCUI_Button;
 
 /***********************按钮**************************/
@@ -63,20 +65,22 @@ typedef enum {
 	BUTTON_STYLE_CUSTOM
 } BUTTON_STYLE;
 
-LCUI_BEGIN_HEADER
-
-LCUI_Widget *Get_Button_Label(LCUI_Widget *widget);
+LCUI_EXPORT(LCUI_Widget*)
+Get_Button_Label(LCUI_Widget *widget);
 /* 功能：获取嵌套在按钮部件里的label部件 */ 
 
-void Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal, 
-				LCUI_Graph *over, LCUI_Graph *down, 
-				LCUI_Graph *focus, LCUI_Graph *disable);
+LCUI_EXPORT(void)
+Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal, 
+			LCUI_Graph *over, LCUI_Graph *down, 
+			LCUI_Graph *focus, LCUI_Graph *disable);
 /* 功能：自定义按钮在各种状态下显示的位图 */ 
 
-void Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...);
+LCUI_EXPORT(void)
+Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...);
 /* 功能：设定按钮部件显示的文本内容 */ 
 
-LCUI_Widget *Create_Button_With_Text(const char *fmt, ...);
+LCUI_EXPORT(LCUI_Widget*)
+Create_Button_With_Text(const char *fmt, ...);
 /* 功能：创建一个带文本内容的按钮 */ 
 
 LCUI_END_HEADER

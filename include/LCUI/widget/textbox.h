@@ -49,76 +49,87 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_Widget*
+LCUI_EXPORT(LCUI_Widget*)
 TextBox_GetLabel( LCUI_Widget *widget );
 /* 获取文本框部件内的label部件指针 */
 
-LCUI_Pos
+LCUI_EXPORT(LCUI_Pos)
 TextBox_ViewArea_GetPos( LCUI_Widget *widget );
 /* 获取文本显示区域的位置 */
 
-int
+LCUI_EXPORT(int)
 TextBox_ViewArea_Update( LCUI_Widget *widget );
 /* 更新文本框的文本显示区域 */
 
-LCUI_Widget *
+LCUI_EXPORT(LCUI_Widget*)
 TextBox_GetCursor( LCUI_Widget *widget );
 /* 获取文本框部件内的光标 */
 
-void TextBox_Text(LCUI_Widget *widget, char *new_text);
+LCUI_EXPORT(void)
+TextBox_Text(LCUI_Widget *widget, char *new_text);
 /* 设定文本框显示的文本 */
 
-void TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos );
+LCUI_EXPORT(void)
+TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos );
 /* 为文本框内的文本图层设置偏移 */
 
-void TextBox_Text_Add(LCUI_Widget *widget, char *new_text);
+LCUI_EXPORT(void)
+TextBox_Text_Add(LCUI_Widget *widget, char *new_text);
 /* 在光标处添加文本 */
 
-void TextBox_Text_Append(LCUI_Widget *widget, char *new_text);
+LCUI_EXPORT(void)
+TextBox_Text_Append(LCUI_Widget *widget, char *new_text);
 /* 在文本末尾追加文本 */
 
-int TextBox_Text_Backspace(LCUI_Widget *widget, int n);
+LCUI_EXPORT(int)
+TextBox_Text_Backspace(LCUI_Widget *widget, int n);
 /* 删除光标左边处n个字符 */
 
-int TextBox_Text_Delete(LCUI_Widget *widget, int n);
+LCUI_EXPORT(int)
+TextBox_Text_Delete(LCUI_Widget *widget, int n);
 /* 删除光标右边处n个字符 */
 
 /* 获取文本框内的文本总长度 */
-int TextBox_Text_GetTotalLength( LCUI_Widget *widget );
+LCUI_EXPORT(int)
+TextBox_Text_GetTotalLength( LCUI_Widget *widget );
 
-LCUI_Pos 
+LCUI_EXPORT(LCUI_Pos)
 TextBox_Cursor_Update( LCUI_Widget *widget );
 /* 更新文本框的光标，返回该光标的像素坐标 */
 
-LCUI_Pos
+LCUI_EXPORT(LCUI_Pos)
 TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos );
 /* 移动文本框内的光标,返回该光标的像素坐标 */
 
-int TextBox_Get_Select_Text( LCUI_Widget *widget, char *out_text );
+LCUI_EXPORT(int)
+TextBox_Get_Select_Text( LCUI_Widget *widget, char *out_text );
 /* 获取文本框内被选中的文本 */
 
-int TextBox_Copy_Select_Text(LCUI_Widget *widget);
+LCUI_EXPORT(int)
+TextBox_Copy_Select_Text(LCUI_Widget *widget);
 /* 复制文本框内被选中的文本 */
 
-int TextBox_Cut_Select_Text(LCUI_Widget *widget);
+LCUI_EXPORT(int)
+TextBox_Cut_Select_Text(LCUI_Widget *widget);
 /* 剪切文本框内被选中的文本 */
 
-void TextBox_Using_StyleTags(LCUI_Widget *widget, LCUI_BOOL flag);
+LCUI_EXPORT(void)
+TextBox_Using_StyleTags(LCUI_Widget *widget, LCUI_BOOL flag);
 /* 指定文本框是否处理控制符 */
 
-void 
+LCUI_EXPORT(void)
 TextBox_Multiline( LCUI_Widget *widget, LCUI_BOOL flag );
 /* 指定文本框是否启用多行文本显示 */
 
-void
+LCUI_EXPORT(void)
 TextBox_Text_Set_MaxLength( LCUI_Widget *widget, int max );
 /* 设置文本框中能够输入的最大字符数 */
 
-void
+LCUI_EXPORT(void)
 TextBox_Text_Set_PasswordChar( LCUI_Widget *widget, wchar_t ch );
 /* 为文本框设置屏蔽字符 */
 
-void
+LCUI_EXPORT(void)
 TextBox_Text_Limit( LCUI_Widget *widget, int mode );
 /* 
  * 功能：限制能对文本框输入的字符 

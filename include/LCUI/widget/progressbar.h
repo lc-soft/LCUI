@@ -43,7 +43,9 @@
 #ifndef __LCUI_PROGBAR_H__
 #define __LCUI_PROGBAR_H__
 
-typedef struct _LCUI_ProgressBar		LCUI_ProgressBar;
+LCUI_BEGIN_HEADER
+
+typedef struct _LCUI_ProgressBar LCUI_ProgressBar;
 
 /*************** 进度条 ********************/
 struct _LCUI_ProgressBar
@@ -61,19 +63,20 @@ struct _LCUI_ProgressBar
 	int value;	/* 当前进度的值 */
 };
 
-
-LCUI_BEGIN_HEADER
-
-void ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value);
+LCUI_EXPORT(void)
+ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value);
 /* 功能：设定进度条最大值 */ 
 
-int ProgressBar_GetMaxValue(LCUI_Widget *widget);
+LCUI_EXPORT(int)
+ProgressBar_GetMaxValue(LCUI_Widget *widget);
 /* 功能：获取进度条最大值 */ 
 
-void ProgressBar_SetValue(LCUI_Widget *widget, int value);
+LCUI_EXPORT(void)
+ProgressBar_SetValue(LCUI_Widget *widget, int value);
 /* 功能：设定进度条当前值 */ 
 
-int ProgressBar_GetValue(LCUI_Widget *widget);
+LCUI_EXPORT(int)
+ProgressBar_GetValue(LCUI_Widget *widget);
 /* 功能：获取进度条当前值 */ 
 
 LCUI_END_HEADER

@@ -42,6 +42,8 @@
 #ifndef __LCUI_CHECKBOX_H__
 #define __LCUI_CHECKBOX_H__
 
+LCUI_BEGIN_HEADER
+
 typedef struct _LCUI_CheckBox LCUI_CheckBox;
 
 /*********************** 复选框 **************************/
@@ -67,36 +69,43 @@ struct _LCUI_CheckBox
 };
 /****************************************************/
 
-LCUI_BEGIN_HEADER
-
-int Get_CheckBox_State(LCUI_Widget *widget);
+LCUI_EXPORT(int)
+Get_CheckBox_State(LCUI_Widget *widget);
 /* 功能：获取复选框的状态 */ 
 
-int CheckBox_Is_On(LCUI_Widget *widget);
+LCUI_EXPORT(int)
+CheckBox_Is_On(LCUI_Widget *widget);
 /* 功能：检测复选框是否被选中 */ 
 
-int CheckBox_Is_Off(LCUI_Widget *widget);
+LCUI_EXPORT(int)
+CheckBox_Is_Off(LCUI_Widget *widget);
 /* 功能：检测复选框是否未选中 */ 
 
 /* 
  * 功能：切换复选框的状态
  * 说明：这个状态指的是打勾与没打勾的两种状态
  *  */
-void Switch_CheckBox_State(LCUI_Widget *widget, LCUI_WidgetEvent *event);
+LCUI_EXPORT(void)
+Switch_CheckBox_State(LCUI_Widget *widget, LCUI_WidgetEvent *event);
 
-void CheckBox_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size);
+LCUI_EXPORT(void)
+CheckBox_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size);
 /* 功能：设定复选框中的图像框的尺寸 */ 
 
-LCUI_Widget *Get_CheckBox_Label(LCUI_Widget *widget);
+LCUI_EXPORT(LCUI_Widget*)
+Get_CheckBox_Label(LCUI_Widget *widget);
 /* 功能：获取复选框部件中的label部件的指针 */ 
 
-LCUI_Widget *Get_CheckBox_ImgBox(LCUI_Widget *widget);
+LCUI_EXPORT(LCUI_Widget*)
+Get_CheckBox_ImgBox(LCUI_Widget *widget);
 /* 功能：获取复选框部件中的PictureBox部件的指针 */ 
 
-void Set_CheckBox_Text(LCUI_Widget *widget, const char *fmt, ...);
+LCUI_EXPORT(void)
+Set_CheckBox_Text(LCUI_Widget *widget, const char *fmt, ...);
 /* 功能：设定与复选框部件关联的文本内容 */ 
 
-LCUI_Widget *Create_CheckBox_With_Text(const char *fmt, ...);
+LCUI_EXPORT(LCUI_Widget*)
+Create_CheckBox_With_Text(const char *fmt, ...);
 /* 功能：创建一个带文本内容的复选框 */ 
 
 LCUI_END_HEADER

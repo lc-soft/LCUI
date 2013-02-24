@@ -72,52 +72,69 @@ typedef unsigned int LCUI_Thread;
 LCUI_BEGIN_HEADER
 
 /* init the mutex */
-int LCUIMutex_Init( LCUI_Mutex *mutex );
+LCUI_EXPORT(int)
+LCUIMutex_Init( LCUI_Mutex *mutex );
 
 /* Free the mutex */
-void LCUIMutex_Destroy( LCUI_Mutex *mutex );
+LCUI_EXPORT(void)
+LCUIMutex_Destroy( LCUI_Mutex *mutex );
 
 /* Lock the mutex */
-int LCUIMutex_Lock( LCUI_Mutex *mutex );
+LCUI_EXPORT(int)
+LCUIMutex_Lock( LCUI_Mutex *mutex );
 
 /* Unlock the mutex */
-int LCUIMutex_UnLock( LCUI_Mutex *mutex );
+LCUI_EXPORT(int)
+LCUIMutex_UnLock( LCUI_Mutex *mutex );
 
 
-int _LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg );
+LCUI_EXPORT(int)
+_LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg );
 
-LCUI_Thread LCUIThread_SelfID( void );
+LCUI_EXPORT(LCUI_Thread)
+LCUIThread_SelfID( void );
 
-void _LCUIThread_Exit( void *retval );
+LCUI_EXPORT(void)
+_LCUIThread_Exit( void *retval );
 
-void _LCUIThread_Cancel( LCUI_Thread thread );
+LCUI_EXPORT(void)
+_LCUIThread_Cancel( LCUI_Thread thread );
 
-int _LCUIThread_Join( LCUI_Thread thread, void **retval );
+LCUI_EXPORT(int)
+_LCUIThread_Join( LCUI_Thread thread, void **retval );
 
 
 /* 获取指定线程的根线程ID */
-LCUI_Thread LCUIThread_GetRootThreadID( LCUI_Thread tid );
+LCUI_EXPORT(LCUI_Thread)
+LCUIThread_GetRootThreadID( LCUI_Thread tid );
 
 /* 创建并运行一个线程 */
-int LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg );
+LCUI_EXPORT(int)
+LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg );
 
 /* 等待一个线程的结束，并释放该线程的资源 */
-int LCUIThread_Join( LCUI_Thread thread, void **retval );
+LCUI_EXPORT(int)
+LCUIThread_Join( LCUI_Thread thread, void **retval );
 
 /* 撤销一个线程 */
-void LCUIThread_Cancel( LCUI_Thread thread );
+LCUI_EXPORT(void)
+LCUIThread_Cancel( LCUI_Thread thread );
 
 /* 记录指针作为返回值，并退出线程 */
-void LCUIThread_Exit( void* retval );
+LCUI_EXPORT(void)
+LCUIThread_Exit( void* retval );
 
 /* 撤销指定ID的程序的全部子线程 */
-int LCUIApp_CancelAllThreads( LCUI_ID app_id );
+LCUI_EXPORT(int)
+LCUIApp_CancelAllThreads( LCUI_ID app_id );
 
 /* 初始化线程模块 */
-void LCUIModule_Thread_Init( void );
+LCUI_EXPORT(void)
+LCUIModule_Thread_Init( void );
 
 /* 停用线程模块 */
-void LCUIModule_Thread_End( void );
+LCUI_EXPORT(void)
+LCUIModule_Thread_End( void );
 
 LCUI_END_HEADER
 

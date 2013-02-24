@@ -1,6 +1,8 @@
 #ifndef __LCUI_GUI_MESSAGEBOX_H__
 #define __LCUI_GUI_MESSAGEBOX_H__
 
+LCUI_BEGIN_HEADER
+
 typedef enum {
 	MB_ICON_NONE,
 	MB_ICON_ERROR,
@@ -28,8 +30,6 @@ typedef enum {
 	MB_BTN_IS_NO,
 	MB_BTN_IS_QUIT
 } MB_BTN;
-
-LCUI_BEGIN_HEADER
 
 /* LCUI的消息框
  * 参数：
@@ -61,7 +61,8 @@ LCUI_BEGIN_HEADER
  * 	MB_BTN_IS_NO	: "否"按钮
  * 	MB_BTN_IS_QUIT	: 窗口右上角的关闭按钮
  *  */
-int LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text, 
+LCUI_EXPORT(int)
+LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text, 
 			const char *title, MB_BTN_TYPE button );
 LCUI_END_HEADER
 

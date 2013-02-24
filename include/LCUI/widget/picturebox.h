@@ -42,6 +42,8 @@
 #ifndef __LCUI_PICTURE_BOX_H_
 #define __LCUI_PICTURE_BOX_H_
 
+LCUI_BEGIN_HEADER
+
 typedef struct _LCUI_PictureBox	LCUI_PictureBox;
 /******************* 图像状态 *******************/
 #define IMAGE_STATE_LOADING   1
@@ -66,43 +68,53 @@ struct _LCUI_PictureBox
 };
 /****************************** END ***********************************/
 
-LCUI_BEGIN_HEADER
-
 /* 获取图片盒子的图片显示的区域 */
-LCUI_Rect PictureBox_GetViewArea( LCUI_Widget *widget );
+LCUI_EXPORT(LCUI_Rect)
+PictureBox_GetViewArea( LCUI_Widget *widget );
 
 /* 获取获取图片盒子的图片显示的区域的坐标 */
-LCUI_Pos PictureBox_GetViewAreaPos( LCUI_Widget *widget );
+LCUI_EXPORT(LCUI_Pos)
+PictureBox_GetViewAreaPos( LCUI_Widget *widget );
 
 /* 获取缩放比例 */
-float PictureBox_GetScale( LCUI_Widget *widget );
+LCUI_EXPORT(float)
+PictureBox_GetScale( LCUI_Widget *widget );
 
 /* 设定PictureBox部件显示的图像 */
-void PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image );
+LCUI_EXPORT(void)
+PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image );
 
 /* 设定图片文件中的图像为PictureBox部件显示的图像 */
-int PictureBox_SetImageFile( LCUI_Widget *widget, char *image_file );
+LCUI_EXPORT(int)
+PictureBox_SetImageFile( LCUI_Widget *widget, char *image_file );
 
 /* 设定当加载图像失败时显示的图像 */
-int PictureBox_SetErrorImage( LCUI_Widget *widget, LCUI_Graph *pic );
+LCUI_EXPORT(int)
+PictureBox_SetErrorImage( LCUI_Widget *widget, LCUI_Graph *pic );
 
 /* 设定正在加载另一图像时显示的图像 */
-int PictureBox_SetInitImage( LCUI_Widget *widget, LCUI_Graph *pic );
+LCUI_EXPORT(int)
+PictureBox_SetInitImage( LCUI_Widget *widget, LCUI_Graph *pic );
 
 /* 设定图像显示模式 */
-void PictureBox_SetSizeMode( LCUI_Widget *widget, int mode );
+LCUI_EXPORT(void)
+PictureBox_SetSizeMode( LCUI_Widget *widget, int mode );
 
 /* 设定PictureBox部件的图片显示区域的大小 */
-void PictureBox_ResizeViewArea( LCUI_Widget *widget, int width, int height );
+LCUI_EXPORT(void)
+PictureBox_ResizeViewArea( LCUI_Widget *widget, int width, int height );
 
 /* 获取PictureBox部件内的图像 */
-LCUI_Graph *PictureBox_GetImage( LCUI_Widget *widget );
+LCUI_EXPORT(LCUI_Graph*)
+PictureBox_GetImage( LCUI_Widget *widget );
 
 /* 移动PictureBox部件内的图片的显示区域的位置 */
-int PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos );
+LCUI_EXPORT(int)
+PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos );
 
 /* 缩放PictureBox部件的图片浏览区域 */
-int PictureBox_ZoomViewArea( LCUI_Widget *widget, double scale );
+LCUI_EXPORT(int)
+PictureBox_ZoomViewArea( LCUI_Widget *widget, double scale );
 
 LCUI_END_HEADER
 

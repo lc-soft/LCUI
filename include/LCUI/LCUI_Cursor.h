@@ -43,30 +43,30 @@
 #define __LCUI_CURSOR_H__
 
 LCUI_BEGIN_HEADER
+	
+/* 刷新鼠标游标在屏幕上显示的图形 */
+LCUI_EXPORT(void) LCUICursor_Refresh( void );
 
-void Refresh_Cursor ();
-/* 功能：刷新鼠标游标在屏幕上显示的图形 */ 
+/* 显示鼠标游标 */
+LCUI_EXPORT(void) LCUICursor_Show( void );
 
-void Show_Cursor ();
-/* 功能：显示鼠标游标 */ 
+/* 隐藏鼠标游标 */
+LCUI_EXPORT(void) LCUICursor_Hide( void );
 
-void Hide_Cursor ();
-/* 功能：隐藏鼠标游标 */ 
+/* 获取鼠标游标的区域范围 */
+LCUI_EXPORT(LCUI_Rect) LCUICursor_GetRect( void );
 
-LCUI_Rect Get_Cursor_Rect();
-/* 功能：获取鼠标游标的区域范围 */ 
+/* 设定游标的位置 */
+LCUI_EXPORT(void) LCUICursor_SetPos( LCUI_Pos pos );
 
-void Set_Cursor_Pos (LCUI_Pos pos);
-/* 功能：设定游标的位置 */ 
-
-int Set_Cursors_Graph (LCUI_Graph * graph);
 /* 
  * 功能：设定游标的图形
  * 返回值：设定成功返回0，失败则返回-1
-*/ 
+*/
+LCUI_EXPORT(int) LCUICursor_SetGraph( LCUI_Graph *graph );
 
-LCUI_Pos Get_Cursor_Pos ();
-/* 功能：获取鼠标指针的位置 */ 
+/* 获取鼠标指针的位置 */
+LCUI_EXPORT(LCUI_Pos) LCUICursor_GetPos( void );
 
 LCUI_END_HEADER
 

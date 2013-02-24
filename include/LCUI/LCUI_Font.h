@@ -64,10 +64,12 @@ LCUI_BEGIN_HEADER
 #include LC_FONTLIB_H
 
 /* 初始化字体处理模块 */
-void LCUIModule_Font_Init( void );
+LCUI_EXPORT(void)
+LCUIModule_Font_Init( void );
 
 /* 停用字体处理模块 */
-void LCUIModule_Font_End( void );
+LCUI_EXPORT(void)
+LCUIModule_Font_End( void );
 
 LCUI_END_HEADER
 

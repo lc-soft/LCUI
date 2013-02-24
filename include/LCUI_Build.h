@@ -51,8 +51,26 @@
 #define LCUI_END_HEADER
 #endif
 
-#ifndef __LCUI_BUILD_UNIX_H__
-#define __LCUI_BUILD_UNIX_H__
+#ifndef __LCUI_BUILD_H__
+#define __LCUI_BUILD_H__
+
+#if defined(__GNUC__)
+#  define LCUI_EXPORT(type) extern type
+#elif (defined(_MSC_VER) && _MSC_VER < 800) ||\
+    (defined(__BORLANDC__) && __BORLANDC__ < 0x500)
+  /* older Borland and MSC
+   * compilers used '__export' and required this to be after
+   * the type.
+   */
+#  define LCUI_EXPORT(type) type __export 
+#else /* newer compiler */
+#  ifdef LCUI_EXPORTS
+#    define LCUI_EXPORT(type) extern __declspec(dllexport) type 
+#  else
+#    define LCUI_EXPORT(type) extern __declspec(dllimport) type 
+#  endif
+#endif /* compiler */
+
 
 #define LC_STYLE_LIBRARY_H	<LCUI/LCUI_StyleLibrary.h>
 
