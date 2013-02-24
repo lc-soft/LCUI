@@ -511,10 +511,10 @@ Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area)
 	}
 	//printf("Quote_Graph(), before, area: %d,%d,%d,%d\n",
 	//	area.x, area.y, area.width, area.height);
-	area = Get_Valid_Area(Size(src->width, src->height), area);
+	area = LCUIRect_ValidArea(Size(src->width, src->height), area);
 	//printf("Quote_Graph(), after, area: %d,%d,%d,%d\n",
 	//	area.x, area.y, area.width, area.height);
-	if(!Rect_Valid( area )) { 
+	if(!LCUIRect_IsValid( area )) { 
 		des->src = NULL;
 		des->pos.x = 0;
 		des->pos.y = 0;
@@ -685,7 +685,7 @@ Graph_Cut(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 	
 	out->have_alpha = src->have_alpha;
 	out->alpha = src->alpha;
-	rect = Get_Valid_Area(Size(src->width, src->height), rect); 
+	rect = LCUIRect_ValidArea(Size(src->width, src->height), rect); 
 	
 	if(Graph_Valid(src) && rect.width > 0 && rect.height > 0);
 	else {
@@ -846,7 +846,7 @@ Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 		return -1;
 	}
 	/* 如果前景图尺寸超出背景图的范围，需要更改前景图的像素读取范围 */ 
-	if( Get_Cut_Area(
+	if( LCUIRect_GetCutArea(
 		Size( des_rect.width, des_rect.height),
 		Rect( des_pos.x, des_pos.y, 
 			src_rect.width, src_rect.height ),
@@ -966,7 +966,7 @@ Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 	|| back_graph->width < 0 || back_graph->height < 0 ) {
 		return -1;
 	}
-	if( Get_Cut_Area(
+	if( LCUIRect_GetCutArea(
 		Size( back_graph->width, back_graph->height),
 		Rect( des_pos.x, des_pos.y, 
 			fore_graph->width, fore_graph->height ),

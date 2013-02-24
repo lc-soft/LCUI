@@ -863,7 +863,7 @@ RectQueue_Add (LCUI_Queue * queue, LCUI_Rect rect)
 	//if(debug_mark)
 	//	printf("New : [%d,%d] %d,%d\n", rect.x, rect.y, rect.width, rect.height);
 	
-	if(!Rect_Valid(rect)) {
+	if(!LCUIRect_IsValid(rect)) {
 		//printf("not valid\n");
 		return -1;
 	}
@@ -875,31 +875,31 @@ RectQueue_Add (LCUI_Queue * queue, LCUI_Rect rect)
 			//if(debug_mark)
 			//  printf("temp : [%d,%d] %d,%d\n", t_rect.x, t_rect.y, t_rect.width, t_rect.height);
 			
-			if (!Rect_Valid(t_rect)) {
+			if (!LCUIRect_IsValid(t_rect)) {
 			/* 删除这个矩形数据，因为它是无效的 */
 				Queue_Delete (queue, i); 
-			} else if (Rect_Include_Rect (rect, t_rect)) {
+			} else if (LCUIRect_IncludeRect (rect, t_rect)) {
 			/* 删除这个矩形数据，因为它已经被新增的矩形区域包含 */
 				Queue_Delete (queue, i); 
-			} else if (Rect_Include_Rect (t_rect, rect)) {
+			} else if (LCUIRect_IncludeRect (t_rect, rect)) {
 			/* 如果新增的矩形数据与已存在的矩形数据属于包含关系 */
 				//if(debug_mark) 
 				//  printf("Include 2\n");
 				  
 				flag = 1;
 				break;
-			} else if(Rect_Equal(rect, t_rect)) {
+			} else if(LCUIRect_Equal(rect, t_rect)) {
 			/* 相等的就不需要了 */
 				//if(debug_mark)
 				//  printf("Equal || not valid\n");
 				
 				flag = 1;
 				break;
-			} else if(Rect_Is_Overlay(rect, t_rect)) {
+			} else if(LCUIRect_Overlay(rect, t_rect)) {
 				/* 如果新增的矩形与队列中的矩形重叠 */ 
 				/* 将矩形分离成若干个不重叠的矩形，之后将它们添加进去 */
-				//printf("Rect_Is_Overlay(rect, t_rect)\n");
-				Cut_Overlay_Rect(t_rect, rect, &rect_buff);
+				//printf("LCUIRect_Overlay(rect, t_rect)\n");
+				LCUIRect_Cut(t_rect, rect, &rect_buff);
 				//debug_mark = 1;
 				Queue_Copy(queue, &rect_buff);
 				//debug_mark = 0;

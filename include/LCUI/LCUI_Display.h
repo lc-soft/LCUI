@@ -61,6 +61,13 @@ LCUI_EXPORT(void) Win32_SetSelfHWND( HWND hwnd );
 LCUI_EXPORT(int)
 LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos );
 
+/* 
+ * 功能：直接读取帧缓冲中的图像数据
+ * 说明：效率较高，但捕获的图像有可能会有问题。
+ * */
+LCUI_EXPORT(void)
+LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out );
+
 /*
  * 功能：获取屏幕宽度
  * 返回值：屏幕的宽度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效

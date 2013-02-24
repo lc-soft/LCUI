@@ -71,17 +71,17 @@ lcui_strcasecmp( const char *str1, const char *str2 )
 	return 0;
 }
 
+/* 初始化字符串 */
 LCUI_EXPORT(void)
-String_Init(LCUI_String *in)
-/* 功能：初始化String结构体中的数据 */
+LCUIString_Init( LCUI_String *in )
 {
 	in->size = 0;
 	in->string = NULL;
 }
 
+/* 拷贝源字符串至目标字符串中 */
 LCUI_EXPORT(void)
-Strcpy (LCUI_String * des, const char *src)
-/* 功能：拷贝字符串至String结构体数据中 */
+_LCUIString_Copy( LCUI_String * des, const char *src )
 {
 	if(des == NULL) {
 		return;
@@ -99,18 +99,19 @@ Strcpy (LCUI_String * des, const char *src)
 	}
 }
 
+/* LCUI_String 字符串对比 */
 LCUI_EXPORT(int)
-Strcmp(LCUI_String *str1, const char *str2)
-/* 功能：对比str1与str2 */
+_LCUIString_Cmp( LCUI_String *str1, const char *str2 )
 {
-	if (str1 != NULL && str1->size > 0 && str2 != NULL) 
+	if (str1 != NULL && str1->size > 0 && str2 != NULL) {
 		return strcmp(str1->string, str2); 
-	else return -1;
+	}
+	return -1;
 }
 
-LCUI_EXPORT(int)
-LCUI_Strcmp(LCUI_String *str1, LCUI_String *str2)
 /* LCUI_String 字符串对比 */
+LCUI_EXPORT(int)
+LCUIString_Cmp( LCUI_String *str1, LCUI_String *str2 )
 {
 	if( str1->size > 0 && str2->size > 0 ) {
 		return strcmp(str1->string, str2->string);
@@ -118,9 +119,9 @@ LCUI_Strcmp(LCUI_String *str1, LCUI_String *str2)
 	return 0;
 }
 
+/* 拷贝源字符串至目标字符串中 */
 LCUI_EXPORT(int)
-LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2)
-/* LCUI_String 字符串拷贝 */
+LCUIString_Copy( LCUI_String *str1, LCUI_String *str2 )
 {
 	if( str2->size <= 0 ) {
 		return -1;
@@ -135,7 +136,7 @@ LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2)
 }
 
 LCUI_EXPORT(void)
-String_Free(LCUI_String *in) 
+LCUIString_Free( LCUI_String *in )
 {
 	if(in->size > 0) {
 		free(in->string); 
@@ -143,23 +144,24 @@ String_Free(LCUI_String *in)
 	in->string = NULL;
 }
 
+/* 释放宽字符占用的资源 */
 LCUI_EXPORT(void)
-WChar_T_Free(LCUI_WChar_T *ch) 
+LCUIWchar_Free( LCUI_WChar_T *ch )
 {
 	ch->bitmap = NULL;
 }
 
+/* 释放宽字符串占用的资源 */
 LCUI_EXPORT(void)
-WString_Free(LCUI_WString *str) 
+LCUIWString_Free( LCUI_WString *str )
 {
 	int i;
-	if(str != NULL) {
-		if(str->size > 0 && str->string != NULL) {
-			for(i = 0; i < str->size; ++i) {
-				WChar_T_Free(&str->string[i]); 
-			}
-			free(str->string);
-			str->string = NULL;
-		}
+	if(!str || str->size <= 0 || !str->string) {
+		return;
 	}
+	for(i = 0; i < str->size; ++i) {
+		LCUIWchar_Free(&str->string[i]); 
+	}
+	free(str->string);
+	str->string = NULL;
 }

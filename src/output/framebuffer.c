@@ -301,11 +301,11 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	pic = src; 
 	Graph_Init (&temp);
 	
-	if ( Get_Cut_Area ( LCUIScreen_GetSize(), 
+	if ( LCUIRect_GetCutArea ( LCUIScreen_GetSize(), 
 			Rect ( pos.x, pos.y, src->width, src->height ), 
 			&cut_rect
 		) ) {/* 如果需要裁剪图形 */
-		if(!Rect_Valid(cut_rect)) {
+		if(!LCUIRect_IsValid(cut_rect)) {
 			return -2;
 		}
 		pos.x += cut_rect.x;
@@ -413,4 +413,50 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	Graph_Free (&temp);
 	return 0;
 }
+
+
+/* 
+ * 功能：直接读取帧缓冲中的图像数据
+ * 说明：效率较高，但捕获的图像有可能会有问题。
+ * */
+LCUI_EXPORT(void)
+LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out )
+{
+	LCUI_Rect cut_rect;
+	unsigned char *dest;
+	int x, y, n, k, count;
+
+	dest = LCUI_Sys.screen.fb_mem;	/* 指向帧缓冲 */
+	
+	if( !LCUI_Active() ) {
+		return;
+	}
+	/* 如果需要裁剪图形 */
+	if ( LCUIRect_GetCutArea ( LCUIScreen_GetSize(), area,&cut_rect ) ){
+		if(!LCUIRect_IsValid(cut_rect)) {
+			return;
+		}
+		area.x += cut_rect.x;
+		area.y += cut_rect.y;
+		area.width = cut_rect.width;
+		area.height = cut_rect.height;
+	}
+	
+	Graph_Create(out, area.width, area.height);
+	Graph_Lock (out); 
+	/* 只能正常捕获32位显示器中显示的图形，有待完善 */
+	for (n=0,y=0; y < area.height; ++y) {
+		k = (area.y + y) * LCUI_Sys.screen.size.w + area.x;
+		for (x = 0; x < area.width; ++x) {
+			count = k + x;
+			count = count << 2;  
+			out->rgba[2][n] = dest[count];
+			out->rgba[1][n] = dest[count + 1];
+			out->rgba[0][n] = dest[count + 2];
+			++n;
+		}
+	}
+	Graph_Unlock (out);
+}
+
 #endif

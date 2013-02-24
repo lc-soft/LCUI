@@ -212,7 +212,7 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 		return -2;
 	}
 	/* 获取需要裁剪的区域 */
-	if( Get_Cut_Area( Size( des_rect.width, des_rect.height ),
+	if( LCUIRect_GetCutArea( Size( des_rect.width, des_rect.height ),
 		Rect( des_pos.x, des_pos.y, bitmap->width, bitmap->rows ),
 		&cut
 	)) {

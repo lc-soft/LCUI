@@ -390,10 +390,10 @@ __GraphLayer_GetLayers(
 		//Print_Graph_Info( &child->graph );
 		tmp.x += pos.x;
 		tmp.y += pos.y;
-		if( !Rect_Valid(tmp) ) {
+		if( !LCUIRect_IsValid(tmp) ) {
 			continue;
 		}
-		if( Rect_Is_Overlay(tmp, rect) ) {
+		if( LCUIRect_Overlay(tmp, rect) ) {
 			Queue_Add_Pointer( queue, child );
 			__GraphLayer_GetLayers(	root_glayer, 
 						child, rect, queue );
@@ -482,7 +482,7 @@ GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 			break;
 		    case 0: break;
 		    case 1:
-			if( Rect_Include_Rect(valid_area, rect) ) { 
+			if( LCUIRect_IncludeRect(valid_area, rect) ) { 
 				goto skip_loop;
 			}
 			break;

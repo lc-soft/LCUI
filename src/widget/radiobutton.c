@@ -278,7 +278,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 	
 	radio_button = Widget_GetPrivData(widget);
 	/* 如果为自定义风格，那就使用用户指定的图形 */ 	
-	if(Strcmp(&widget->style_name, "custom") == 0) {
+	if(_LCUIString_Cmp(&widget->style_name, "custom") == 0) {
 		//printf("custom\n"); 
 		if(widget->enabled == IS_FALSE) 
 			widget->state = WIDGET_STATE_DISABLE;
@@ -321,7 +321,7 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 			break;
 		} 
 	} else {/* 如果按钮的风格为缺省 */
-		Strcpy(&widget->style_name, "default");
+		_LCUIString_Copy(&widget->style_name, "default");
 		if( !widget->enabled ) {
 			widget->state = WIDGET_STATE_DISABLE;
 		}

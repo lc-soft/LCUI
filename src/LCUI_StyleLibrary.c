@@ -15,14 +15,14 @@ StyleLib_Init( LCUI_StyleLibrary *lib )
 LCUI_EXPORT(void)
 StyleAttr_Init( LCUI_StyleAttr *attr )
 {
-	String_Init( &attr->attr_name );
-	String_Init( &attr->attr_value );
+	LCUIString_Init( &attr->attr_name );
+	LCUIString_Init( &attr->attr_value );
 }
 
 LCUI_EXPORT(void)
 StyleClass_Init( LCUI_StyleClass *style_class )
 {
-	String_Init( &style_class->class_name );
+	LCUIString_Init( &style_class->class_name );
 	Queue_Init(	&style_class->style_attr,
 			sizeof(LCUI_StyleAttr),
 			NULL );
@@ -45,7 +45,7 @@ StyleLib_GetStyleClass(	LCUI_StyleLibrary *lib,
 		if( !p ) {
 			continue;
 		}
-		if( Strcmp( &p->class_name, class_name) == 0 ) {
+		if( _LCUIString_Cmp( &p->class_name, class_name) == 0 ) {
 			return p;
 		}
 	}
@@ -70,7 +70,7 @@ StyleLib_AddStyleClass(	LCUI_StyleLibrary *lib,
 	}
 	StyleClass_Init( style_class );
 	/* 保存类名 */
-	Strcpy( &style_class->class_name, class_name );
+	_LCUIString_Copy( &style_class->class_name, class_name );
 	Queue_Add_Pointer( &lib->style_classes, style_class );
 	return style_class;
 }
@@ -93,7 +93,7 @@ StyleLib_GetStyleAttr(	LCUI_StyleClass *style_class,
 		if( !p ) {
 			continue;
 		}
-		if( Strcmp( &p->attr_name, attr_name ) == 0 ) {
+		if( _LCUIString_Cmp( &p->attr_name, attr_name ) == 0 ) {
 			return p;
 		}
 	}
@@ -146,7 +146,7 @@ StyleClass_SetStyleAttr(	LCUI_StyleClass *style_class,
 			style_class, pseudo_class_name, attr_name );
 	/* 如果已存在该属性，则覆盖属性值 */
 	if( style_attr ) {
-		Strcpy( &style_attr->attr_value, attr_value );
+		_LCUIString_Copy( &style_attr->attr_value, attr_value );
 		return 0;
 	}
 	/* 否则，就需要新增属性项了 */
@@ -156,8 +156,8 @@ StyleClass_SetStyleAttr(	LCUI_StyleClass *style_class,
 	}
 	StyleAttr_Init( style_attr );
 	/* 保存属性名和属性值 */
-	Strcpy( &style_attr->attr_name, attr_name );
-	Strcpy( &style_attr->attr_value, attr_value );
+	_LCUIString_Copy( &style_attr->attr_name, attr_name );
+	_LCUIString_Copy( &style_attr->attr_value, attr_value );
 	Queue_Add_Pointer( &style_class->style_attr, style_attr );
 	return 0;
 }

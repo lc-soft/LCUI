@@ -94,7 +94,7 @@ LCUIScreen_InvalidArea( LCUI_Rect rect )
 	if (rect.width <= 0 || rect.height <= 0) {
 		return -1;
 	}
-	rect = Get_Valid_Area(LCUIScreen_GetSize(), rect);
+	rect = LCUIRect_ValidArea(LCUIScreen_GetSize(), rect);
 	Queue_Lock( &screen_invalid_area );
 	ret = RectQueue_Add ( &screen_invalid_area, rect );
 	Queue_UnLock( &screen_invalid_area );
@@ -125,7 +125,7 @@ LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 		return;
 	}
 	/* 如果该区域与游标的图形区域重叠 */ 
-	if ( Rect_Is_Overlay( rect, LCUICursor_GetRect()) ) {
+	if ( LCUIRect_Overlay( rect, LCUICursor_GetRect()) ) {
 		pos.x = LCUI_Sys.cursor.pos.x - rect.x;
 		pos.y = LCUI_Sys.cursor.pos.y - rect.y;
 		/* 将图形合成 */ 

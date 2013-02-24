@@ -216,4 +216,9 @@ LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	return 0;
 }
 
+LCUI_EXPORT(void)
+LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out )
+{
+	return;
+}
 #endif

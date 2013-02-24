@@ -270,7 +270,7 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	layer->max_text_len = 512000;
 	TextStyle_Init ( &layer->default_data );
 	
-	String_Init( &layer->text_buff );
+	LCUIString_Init( &layer->text_buff );
 	//TextLayer_Text_Add_NewRow ( layer );/* 添加新行 */
 }
 
@@ -283,7 +283,7 @@ Destroy_TextLayer( LCUI_TextLayer *layer )
 	Destroy_Queue( &layer->tag_buff );
 	Destroy_Queue( &layer->style_data );
 	Destroy_Queue( &layer->clear_area );
-	String_Free( &layer->text_buff );
+	LCUIString_Free( &layer->text_buff );
 }
 
 static int
@@ -1013,7 +1013,7 @@ TextLayer_Text( LCUI_TextLayer *layer, char *new_text )
  *  */
 {
 	/* 将文本存储至缓冲区 */
-	Strcpy( &layer->text_buff, new_text );
+	_LCUIString_Copy( &layer->text_buff, new_text );
 	/* 标记，需要处理缓冲区 */
 	layer->need_proc_buff = TRUE;
 }

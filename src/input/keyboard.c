@@ -264,7 +264,7 @@ static LCUI_BOOL proc_keyboard(void)
 	}
 	else if(event.key.key_code == 'r') {
 		/* 如果按下r键，就录制指定区域的图像 */
-		start_record_screen( area );
+		LCUIScreen_StartRecord( area );
 	}
 	#endif
 	LCUI_PushEvent( &event );

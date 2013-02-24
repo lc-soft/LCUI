@@ -156,7 +156,7 @@ WidgetType_Add( const char *type_name )
 	total = Queue_Get_Total(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
-		if(Strcmp(&wd->type_name, type_name) == 0) {
+		if(_LCUIString_Cmp(&wd->type_name, type_name) == 0) {
 			//printf("WidgetType_Add(): the widget type is already registered\n");
 			return -1;
 		}
@@ -166,8 +166,8 @@ WidgetType_Add( const char *type_name )
 	FuncQueue_Init(&new_wd.func);
 	new_wd.type_id = rand(); /* 用随机数作为类型ID */
 	//printf("WidgetType_Add(): widget type id: %ld\n", new_wd.type_id); 
-	String_Init( &new_wd.type_name );
-	Strcpy( &new_wd.type_name, type_name );
+	LCUIString_Init( &new_wd.type_name );
+	_LCUIString_Copy( &new_wd.type_name, type_name );
 	Queue_Add( &app->widget_lib, &new_wd );
 	return 0;
 }
@@ -202,7 +202,7 @@ WidgetType_Delete(const char *type)
 	total = Queue_Get_Total(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
-		if(Strcmp(&wd->type_name, type) == 0) {/* 如果类型一致 */
+		if(_LCUIString_Cmp(&wd->type_name, type) == 0) {/* 如果类型一致 */
 			return Queue_Delete(&app->widget_lib, i);
 		}
 	} 
@@ -236,7 +236,7 @@ WidgetType_Get_ID(const char *widget_type)
 	total = Queue_Get_Total(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
-		if(Strcmp(&wd->type_name, widget_type) == 0) {
+		if(_LCUIString_Cmp(&wd->type_name, widget_type) == 0) {
 			return wd->type_id;
 		}
 	}
@@ -327,7 +327,7 @@ WidgetFunc_Get(const char *widget_type, FuncType func_type )
 	//printf("WidgetFunc_Get(): widget type: %s, func type: %d\n", widget_type, func_type);
 	for(i = 0; i < total; ++i) {
 		wd = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
-		if(Strcmp(&wd->type_name, widget_type) == 0) { /* 如果类型一致 */ 
+		if(_LCUIString_Cmp(&wd->type_name, widget_type) == 0) { /* 如果类型一致 */ 
 			total = Queue_Get_Total(&wd->func);
 			for(i=0; i<total; i++) {
 				f = Queue_Get(&wd->func, i);
@@ -365,7 +365,7 @@ WidgetType_Valid(const char *widget_type)
 	total = Queue_Get_Total(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
-		if(Strcmp(&wd->type_name, widget_type) == 0) {/* 如果类型一致 */ 
+		if(_LCUIString_Cmp(&wd->type_name, widget_type) == 0) {/* 如果类型一致 */ 
 			return 1; 
 		}
 	}
@@ -1054,7 +1054,7 @@ Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 	rect.x += widget->padding.left;
 	rect.y += widget->padding.top;
 	/* 根据部件所在容器的尺寸，调整矩形位置及尺寸 */
-	rect = Get_Valid_Area( Widget_GetSize(widget), rect );
+	rect = LCUIRect_ValidArea( Widget_GetSize(widget), rect );
 	if( widget->visible ) {
 		LCUI_Sys.need_sync_area = TRUE; 
 	}
@@ -1138,7 +1138,7 @@ Widget_GetParent(LCUI_Widget *widget, char *widget_type)
 	temp = widget;
 	while( temp->parent ) {
 		if(temp->parent
-		  && Strcmp(&temp->parent->type_name, widget_type) == 0
+		  && _LCUIString_Cmp(&temp->parent->type_name, widget_type) == 0
 		) {/* 如果指针有效，并且类型符合要求 */
 			return temp->parent; /* 返回部件的指针 */
 		}
@@ -1235,7 +1235,7 @@ Widget_GetStyleName( LCUI_Widget *widget )
 LCUI_EXPORT(void)
 Widget_SetStyleName( LCUI_Widget *widget, const char *style_name )
 {
-	Strcpy(&widget->style_name, style_name); 
+	_LCUIString_Copy(&widget->style_name, style_name); 
 	Widget_Draw( widget );
 }
 
@@ -1293,7 +1293,7 @@ Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 		if( !child || !child->visible ) { 
 			continue;
 		}
-		temp = Rect_Inside_Point( pos, Widget_GetRect(child) );
+		temp = LCUIRect_IncludePoint( pos, Widget_GetRect(child) );
 		/* 如果这个点被包含在部件区域内 */
 		if(temp != 1) {
 			continue;
@@ -1366,8 +1366,8 @@ Destroy_Widget( void *arg )
 	widget->parent = NULL;
 	
 	/* 释放字符串 */
-	String_Free(&widget->type_name);
-	String_Free(&widget->style_name);
+	LCUIString_Free(&widget->type_name);
+	LCUIString_Free(&widget->style_name);
 	GraphLayer_Free( widget->main_glayer );
 	GraphLayer_Free( widget->client_glayer );
 	
@@ -1499,8 +1499,8 @@ Widget_New( const char *widget_type )
 	EventSlots_Init( &widget->event );	/* 初始化部件的事件数据队列 */
 	WidgetQueue_Init( &widget->child );	/* 初始化子部件集 */
 	WidgetData_Init( &widget->data_buff );	/* 初始化数据更新队列 */ 
-	String_Init( &widget->type_name );
-	String_Init( &widget->style_name );
+	LCUIString_Init( &widget->type_name );
+	LCUIString_Init( &widget->style_name );
 	
 	/* 最后，将该部件数据添加至部件队列中 */
 	Queue_Add_Pointer( &LCUI_Sys.widget_list, widget );
@@ -1513,7 +1513,7 @@ Widget_New( const char *widget_type )
 		return NULL;
 	}
 	/* 保存部件类型 */
-	Strcpy( &widget->type_name, widget_type );
+	_LCUIString_Copy( &widget->type_name, widget_type );
 	widget->type_id = WidgetType_Get_ID( widget_type );
 	/* 调用部件的回调函数，对部件私有数据进行初始化 */
 	WidgetFunc_Call( widget, FUNC_TYPE_INIT );

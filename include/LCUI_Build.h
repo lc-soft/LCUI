@@ -84,6 +84,11 @@
 #define LC_LCUI_HPP	<LCUI/LCUI.hpp>
 #define LC_CONFIG_H	<LCUI/LCUI_Config.h>
 #define LC_MISC_H	<LCUI/LCUI_Misc.h>
+
+#define LC_MISC_STRING_H	<LCUI/misc/string.h>
+#define LC_MISC_RECT_H		<LCUI/misc/rect.h>
+#define LC_MISC_DELAY_H		<LCUI/misc/delay.h>
+
 #define LC_FONT_H	<LCUI/LCUI_Font.h>
 #define LC_FONTLIB_H	<LCUI/font/fontlibrary.h>
 #define LC_GRAPH_H	<LCUI/LCUI_Graph.h>

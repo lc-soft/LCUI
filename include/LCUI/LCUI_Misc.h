@@ -42,15 +42,11 @@
 #ifndef __LCUI_MISC_H__
 #define __LCUI_MISC_H__
 
+#include LC_MISC_DELAY_H
+#include LC_MISC_RECT_H
+#include LC_MISC_STRING_H
+
 LCUI_BEGIN_HEADER
-
-/* 秒级延时 */
-LCUI_EXPORT(void)
-LCUI_Sleep( unsigned int s );
-
-/* 毫秒级延时 */
-LCUI_EXPORT(void)
-LCUI_MSleep( unsigned int ms );
 
 /******************************** Misc *********************************/
 LCUI_EXPORT(int)
@@ -98,139 +94,6 @@ Pos_Sub(LCUI_Pos a, LCUI_Pos b);
 /* 功能：求两个LCUI_Pos类型变量的差 */ 
 /*************************** End Misc *********************************/
 
-/****************************** Rect **********************************/
-LCUI_EXPORT(void)
-Rect_Init(LCUI_Rect *rect);
-/* 功能：初始化矩形区域的数据 */ 
-
-LCUI_EXPORT(int)
-Rect_Cross_Overlay(LCUI_Rect a, LCUI_Rect b);
-/* 
- * 功能：检测两个矩形是否成十字架式叠加 
- * 返回值：
- *  1 a竖，b横
- * -1 a衡，b竖
- *  0 不叠加
- **/
-
-LCUI_EXPORT(int)
-Get_Cut_Area(LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut);
-/* 
- * 功能：获取需裁剪的区域
- * 说明：指定容器尺寸和容器中的区域位置及尺寸，即可得到该区域中需要进行裁剪区域
- *  */
-
-LCUI_EXPORT(LCUI_Rect)
-Get_Valid_Area(LCUI_Size container, LCUI_Rect rect);
-/* 
- * 功能：获取指定区域在容器中的有效显示区域 
- * 说明：指定容器的区域大小，再指定容器中的区域位置及大小，就能得到该容器实际能显示
- * 出的该区域范围。
- * */ 
-
-LCUI_EXPORT(int)
-Rect_Include_Rect (LCUI_Rect a, LCUI_Rect b);
-/*
- * 功能：检测两个矩形中，A矩形是否包含B矩形
- * 返回值：两不矩形属于包含关系返回1，否则返回0。
- * */ 
- 
-LCUI_EXPORT(int)
-Cut_Overlay_Rect ( LCUI_Rect old_rect, LCUI_Rect new_rect, LCUI_Queue *rq );
-/*
- * 功能：将有重叠部分的两个矩形，进行分割，并得到分割后的矩形
- * 说明：主要用于局部区域刷新里，添加的需刷新的区域有可能会与已添加的区域重叠，为避免
- * 重复刷新同一块区域，需要在添加时对矩形进行分割，得到完全重叠和不重叠的矩形。
- * 参数说明：
- * old ： 已存在的矩形区域
- * new ： 将要添加的矩形区域
- * rq  ： 指向矩形的队列的指针
- * 注意！传递参数时，请勿颠倒old和new位置。
- **/ 
-
-LCUI_EXPORT(int)
-Get_Overlay_Rect(LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out);
-/* 功能：获取两矩形重叠部分的矩形 */ 
-
-LCUI_EXPORT(LCUI_Rect)
-Rect (int x, int y, int width, int height);
-/* 功能：将数值转换成LCUI_Rect型结构体 */ 
-
-LCUI_EXPORT(int)
-Rect_Inside_Point (LCUI_Pos pos, LCUI_Rect rect);
-/* 功能：检测一个点是否被矩形包含 */ 
-
-LCUI_EXPORT(int)
-Check_Rect_Overlap (	int ax, int ay, int aw, int ah, 
-			int bx, int by, int bw, int bh );
-/*
- * 功能：检测两个矩形是否重叠
- * 参数说明：
- * ax ：矩形A的左上角起点所在x轴的坐标
- * ay ：矩形A的左上角起点所在y轴的坐标
- * aw ：矩形A的宽度
- * ah ：矩形A的高度
- * bx ：矩形B的左上角起点所在x轴的坐标
- * by ：矩形B的左上角起点所在y轴的坐标
- * bw ：矩形B的宽度
- * bh ：矩形B的高度
- * 返回值：两不重叠返回0，重叠则返回1。
- */ 
-
-LCUI_EXPORT(int)
-Rect_Is_Overlay (LCUI_Rect a, LCUI_Rect b);
-/* 功能：检测两个矩形是否重叠 */ 
-
-LCUI_EXPORT(int)
-Rect_Equal (LCUI_Rect a, LCUI_Rect b);
-/* 功能：判断两个矩形是否相等 */ 
-
-LCUI_EXPORT(int)
-Rect_Valid(LCUI_Rect r);
-/* 功能：判断矩形是否有效 */ 
-/************************** End Rect **********************************/
-
-
-/***************************** String *********************************/
-#ifdef LCUI_BUILD_IN_WIN32
-#define strcasecmp(str1, str2)	lcui_strcasecmp(str1, str2)
-#endif
-
-/* 不区分大小写，对比两个字符串 */
-LCUI_EXPORT(int)
-lcui_strcasecmp( const char *str1, const char *str2 );
-
-LCUI_EXPORT(void)
-String_Init(LCUI_String *in);
-/* 功能：初始化String结构体中的数据 */ 
-
-LCUI_EXPORT(void)
-Strcpy (LCUI_String * des, const char *src);
-/* 功能：拷贝字符串至String结构体数据中 */ 
-
-LCUI_EXPORT(int)
-Strcmp(LCUI_String *str1, const char *str2);
-/* 功能：对比str1与str2 */ 
-
-LCUI_EXPORT(int)
-LCUI_Strcmp(LCUI_String *str1, LCUI_String *str2);
-/* LCUI_String 字符串对比 */ 
-
-LCUI_EXPORT(int)
-LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2);
-/* LCUI_String 字符串拷贝 */ 
-
-LCUI_EXPORT(void)
-String_Free(LCUI_String *in);
-
-LCUI_EXPORT(void)
-WChar_T_Free(LCUI_WChar_T *ch);
-
-LCUI_EXPORT(void)
-WString_Free(LCUI_WString *str);
-/************************** End String ********************************/
-
-
 LCUI_EXPORT(void) PX_P_t_init( PX_P_t *combo_num );
 /* 初始化PX_P_t */ 
 
@@ -260,11 +123,11 @@ Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out);
  * */
 
 LCUI_EXPORT(int)
-start_record_screen( LCUI_Rect area );
+LCUIScreen_StartRecord( LCUI_Rect area );
 /* 录制屏幕指定区域的内容 */
 
 LCUI_EXPORT(int)
-end_catch_screen();
+LCUIScreen_EndRecord();
 /* 结束录制 */
 
 LCUI_END_HEADER
