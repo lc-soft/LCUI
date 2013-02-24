@@ -24,7 +24,8 @@ static unsigned __stdcall run_thread(void *arg)
 	return 0;
 }
 
-int _LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
+LCUI_EXPORT(int)
+_LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 {
 	LCUI_ThreadData *thread_ptr;
 	if(!db_init) {
@@ -84,12 +85,14 @@ static int _LCUIThread_Destroy( LCUI_Thread thread )
 	return -2;
 }
 
-LCUI_Thread LCUIThread_SelfID( void )
+LCUI_EXPORT(LCUI_Thread)
+LCUIThread_SelfID( void )
 {
 	return GetCurrentThreadId();
 }
 
-void _LCUIThread_Exit( void *retval )
+LCUI_EXPORT(void)
+_LCUIThread_Exit( void *retval )
 {
 	LCUI_ThreadData *thread;
 	thread = _LCUIThread_Self();
@@ -99,7 +102,8 @@ void _LCUIThread_Exit( void *retval )
 	thread->retval = retval;
 }
 
-void _LCUIThread_Cancel( LCUI_Thread thread )
+LCUI_EXPORT(void)
+_LCUIThread_Cancel( LCUI_Thread thread )
 {
 	LCUI_ThreadData *data_ptr;
 	data_ptr = _LCUIThread_Self();
@@ -107,7 +111,8 @@ void _LCUIThread_Cancel( LCUI_Thread thread )
 	_LCUIThread_Destroy( data_ptr->tid );
 }
 
-int _LCUIThread_Join( LCUI_Thread thread, void **retval )
+LCUI_EXPORT(int)
+_LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
 	LCUI_ThreadData *data_ptr;
 	data_ptr = _LCUIThread_Self();

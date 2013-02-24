@@ -38,7 +38,9 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
- 
+#include <LCUI_Build.h>
+#include LC_LCUI_H
+
 #define FONTDATAMAX 2048
 /* 以下是缺省时使用的字体位图 */
 static unsigned char const fontdata_8x8[FONTDATAMAX] = {
@@ -2605,8 +2607,7 @@ static unsigned char const fontdata_8x8[FONTDATAMAX] = {
 
 };
 
-unsigned char const *in_core_font_8x8()
+LCUI_EXPORT(uchar_t const*) in_core_font_8x8( void )
 { 
 	return fontdata_8x8;
 }
-

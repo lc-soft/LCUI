@@ -123,7 +123,7 @@ Draw_Label(LCUI_Widget *widget)
 /*-------------------------- End Private -----------------------------*/
 
 /*---------------------------- Public --------------------------------*/
-void 
+LCUI_EXPORT(void)
 Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 /* 功能：设定与标签关联的文本内容 */
 {
@@ -139,7 +139,7 @@ Label_Text(LCUI_Widget *widget, const char *fmt, ...)
 	Widget_Update( widget ); 
 }
 
-int 
+LCUI_EXPORT(int)
 Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 /* 为Label部件内显示的文本设定文本样式 */
 {
@@ -151,7 +151,7 @@ Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 	return 0;
 }
 
-LCUI_TextLayer *
+LCUI_EXPORT(LCUI_TextLayer*)
 Label_Get_TextLayer( LCUI_Widget *widget )
 /* 获取label部件内的文本图层的指针 */
 {
@@ -161,7 +161,7 @@ Label_Get_TextLayer( LCUI_Widget *widget )
 	return &label->layer;
 }
 
-void
+LCUI_EXPORT(void)
 Label_Refresh( LCUI_Widget *widget )
 /* 刷新label部件显示的文本 */
 {
@@ -170,7 +170,7 @@ Label_Refresh( LCUI_Widget *widget )
 	TextLayer_Refresh( layer );
 }
 
-void
+LCUI_EXPORT(void)
 Label_AutoSize( LCUI_Widget *widget, LCUI_BOOL flag, AUTOSIZE_MODE mode )
 /* 启用或禁用Label部件的自动尺寸调整功能 */
 {
@@ -184,7 +184,7 @@ Label_AutoSize( LCUI_Widget *widget, LCUI_BOOL flag, AUTOSIZE_MODE mode )
 /*-------------------------- End Public ------------------------------*/
 
 
-void 
+LCUI_EXPORT(void)
 Register_Label()
 /* 注册label部件类型 */
 {

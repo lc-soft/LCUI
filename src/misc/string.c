@@ -53,7 +53,8 @@ static char uppercase( char ch )
 }
 
 /* 不区分大小写，对比两个字符串 */
-int lcui_strcasecmp( const char *str1, const char *str2 )
+LCUI_EXPORT(int)
+lcui_strcasecmp( const char *str1, const char *str2 )
 {
 	const char *p1, *p2;
 	for(p1=str1, p2=str2; *p1!=0 || *p2!=0; ++p1, ++p2) {
@@ -70,14 +71,16 @@ int lcui_strcasecmp( const char *str1, const char *str2 )
 	return 0;
 }
 
-void String_Init(LCUI_String *in)
+LCUI_EXPORT(void)
+String_Init(LCUI_String *in)
 /* 功能：初始化String结构体中的数据 */
 {
 	in->size = 0;
 	in->string = NULL;
 }
 
-void Strcpy (LCUI_String * des, const char *src)
+LCUI_EXPORT(void)
+Strcpy (LCUI_String * des, const char *src)
 /* 功能：拷贝字符串至String结构体数据中 */
 {
 	if(des == NULL) {
@@ -96,7 +99,8 @@ void Strcpy (LCUI_String * des, const char *src)
 	}
 }
 
-int Strcmp(LCUI_String *str1, const char *str2)
+LCUI_EXPORT(int)
+Strcmp(LCUI_String *str1, const char *str2)
 /* 功能：对比str1与str2 */
 {
 	if (str1 != NULL && str1->size > 0 && str2 != NULL) 
@@ -104,7 +108,8 @@ int Strcmp(LCUI_String *str1, const char *str2)
 	else return -1;
 }
 
-int LCUI_Strcmp(LCUI_String *str1, LCUI_String *str2)
+LCUI_EXPORT(int)
+LCUI_Strcmp(LCUI_String *str1, LCUI_String *str2)
 /* LCUI_String 字符串对比 */
 {
 	if( str1->size > 0 && str2->size > 0 ) {
@@ -113,7 +118,8 @@ int LCUI_Strcmp(LCUI_String *str1, LCUI_String *str2)
 	return 0;
 }
 
-int LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2)
+LCUI_EXPORT(int)
+LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2)
 /* LCUI_String 字符串拷贝 */
 {
 	if( str2->size <= 0 ) {
@@ -128,7 +134,8 @@ int LCUI_Strcpy(LCUI_String *str1, LCUI_String *str2)
 	return 0;
 }
 
-void String_Free(LCUI_String *in) 
+LCUI_EXPORT(void)
+String_Free(LCUI_String *in) 
 {
 	if(in->size > 0) {
 		free(in->string); 
@@ -136,12 +143,14 @@ void String_Free(LCUI_String *in)
 	in->string = NULL;
 }
 
-void WChar_T_Free(LCUI_WChar_T *ch) 
+LCUI_EXPORT(void)
+WChar_T_Free(LCUI_WChar_T *ch) 
 {
 	ch->bitmap = NULL;
 }
 
-void WString_Free(LCUI_WString *str) 
+LCUI_EXPORT(void)
+WString_Free(LCUI_WString *str) 
 {
 	int i;
 	if(str != NULL) {

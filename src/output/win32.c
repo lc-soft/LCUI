@@ -3,6 +3,8 @@
 
 #ifdef LCUI_VIDEO_DRIVER_WIN32
 #include LC_GRAPH_H
+#include LC_INPUT_H
+#include LC_CURSOR_H
 #include LC_DISPLAY_H
 #include <Windows.h>
 
@@ -12,7 +14,8 @@ static HDC hdc_client, hdc_framebuffer;
 static HBITMAP client_bitmap;
 static HINSTANCE win32_hInstance = NULL;
 
-void Win32_LCUI_Init( HINSTANCE hInstance )
+LCUI_EXPORT(void)
+Win32_LCUI_Init( HINSTANCE hInstance )
 {
 	win32_hInstance = hInstance;
 }
@@ -20,21 +23,25 @@ void Win32_LCUI_Init( HINSTANCE hInstance )
 static LRESULT CALLBACK 
 Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	static LCUI_BOOL need_write = TRUE;
-	RECT rect;
 	LCUI_Rect area;
 	PAINTSTRUCT ps;
-	HDC hdcClient,hdcArea;
 	LCUI_Graph graph;
 	
+	Win32_LCUIMouse_UpdatePos();
+
 	switch (message) {
 	case WM_KEYDOWN:
 		printf("WM_KEYDOWN: %ld\n",lParam);
-	case WM_LBUTTONDOWN:
 		break;
-	case WM_MOUSEMOVE:
+	case WM_KEYUP:
+		break;
+	case WM_LBUTTONDOWN:
+		Win32_LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
 		break;
 	case WM_LBUTTONUP:
+		Win32_LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
+		break;
+	case WM_MOUSEMOVE:
 		break;
 	case WM_PAINT: 
 		Graph_Init( &graph );
@@ -53,37 +60,40 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 		EndPaint( hwnd, &ps );
 		Graph_Free( &graph );
 		return 0;
-		break;
 	case WM_DESTROY:
 		PostQuitMessage (0) ;
-		return 0 ;
+		return 0;
 	}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
 
-HWND Win32_GetSelfHWND( void )
+LCUI_EXPORT(HWND)
+Win32_GetSelfHWND( void )
 {
 	return current_hwnd;
 }
 
-void Win32_SetSelfHWND( HWND hwnd )
+LCUI_EXPORT(void)
+Win32_SetSelfHWND( HWND hwnd )
 {
 	current_hwnd = hwnd;
 }
 
-void LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
+LCUI_EXPORT(void)
+LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
 {
 	return;
 }
 
-int LCUIScreen_GetGraph( LCUI_Graph *out )
+LCUI_EXPORT(int)
+LCUIScreen_GetGraph( LCUI_Graph *out )
 {
 	return -1;
 }
 
-int LCUIScreen_Init( void )
+LCUI_EXPORT(int)
+LCUIScreen_Init( void )
 {
-	MSG msg;
 	RECT client_rect;
 	LCUI_Graph *graph;
 	WNDCLASS wndclass;
@@ -144,9 +154,9 @@ int LCUIScreen_Init( void )
 	return 0;
 }
 
-int LCUIScreen_Destroy( void )
+LCUI_EXPORT(int)
+LCUIScreen_Destroy( void )
 {
-	int err;
 	LCUI_Graph *graph;
 	
 	LCUI_Sys.state = KILLED;
@@ -158,12 +168,11 @@ int LCUIScreen_Destroy( void )
 	return 0;
 }
 
-int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
+LCUI_EXPORT(int)
+LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 {
-	int bits;
 	uchar_t *dest;
-	unsigned int x, y, n, k, count;
-	unsigned int temp1, temp2, temp3, i; 
+	int x, y, n, k, count;
 	LCUI_Rect cut_rect;
 	LCUI_Graph temp, *pic;
 

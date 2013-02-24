@@ -4,7 +4,8 @@
 #include LC_GRAPH_H
 
 /* 初始化字体样式数据 */
-void TextStyle_Init ( LCUI_TextStyle *data )
+LCUI_EXPORT(void)
+TextStyle_Init ( LCUI_TextStyle *data )
 {
 	data->_style = FALSE;
 	data->_weight = FALSE;
@@ -22,47 +23,55 @@ void TextStyle_Init ( LCUI_TextStyle *data )
 }
 
 /* 设置字体族 */
-void TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily )
+LCUI_EXPORT(void)
+TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily )
 {
 	style->font_id = FontLIB_GetFontIDByFamilyName( fontfamily );
 }
 
 /* 设置字体大小 */
-void TextStyle_FontSize( LCUI_TextStyle *style, int fontsize )
+LCUI_EXPORT(void)
+TextStyle_FontSize( LCUI_TextStyle *style, int fontsize )
 {
 	style->pixel_size = fontsize;
 }
 
 /* 设置字体颜色 */
-void TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color )
+LCUI_EXPORT(void)
+TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color )
 {
 	style->fore_color = color;
 }
 
 /* 设置字体背景颜色 */
-void TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color )
+LCUI_EXPORT(void)
+TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color )
 {
 	style->back_color = color;
 }
 
 /* 设置字体样式 */
-void TextStyle_FontStyle( LCUI_TextStyle *style, enum_font_style fontstyle )
+LCUI_EXPORT(void)
+TextStyle_FontStyle( LCUI_TextStyle *style, enum_font_style fontstyle )
 {
 	style->style = fontstyle;
 }
 
-void TextStyle_FontWeight( LCUI_TextStyle *style, enum_font_weight fontweight ) 
+LCUI_EXPORT(void)
+TextStyle_FontWeight( LCUI_TextStyle *style, enum_font_weight fontweight ) 
 {
 	style->weight = fontweight;
 }
 
-void TextStyle_FontDecoration( LCUI_TextStyle *style, enum_font_decoration decoration )
+LCUI_EXPORT(void)
+TextStyle_FontDecoration( LCUI_TextStyle *style, enum_font_decoration decoration )
 /* 设置字体下划线 */
 {
 	style->decoration = decoration;
 }
 
-int TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b )
+LCUI_EXPORT(int)
+TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b )
 {
 	return 0;
 }
@@ -77,19 +86,22 @@ Destroy_StyleTag_Data( void *arg )
 }
 
 /* 初始化样式标签库 */
-void StyleTag_Init( LCUI_Queue *tags )
+LCUI_EXPORT(void)
+StyleTag_Init( LCUI_Queue *tags )
 {
 	Queue_Init( tags, sizeof(StyleTag_Data), Destroy_StyleTag_Data );
 }
 
 /* 添加样式标签 */
-int StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data )
+LCUI_EXPORT(int)
+StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data )
 {
 	return Queue_Add( tags, data );
 }
 
 /* 获取当前的样式数据 */
-LCUI_TextStyle *StyleTag_GetCurrentStyle ( LCUI_Queue *tags )
+LCUI_EXPORT(LCUI_TextStyle*)
+StyleTag_GetCurrentStyle ( LCUI_Queue *tags )
 {
 	PX_PT_t pxpt;
 	StyleTag_Data *tag_data;
@@ -167,7 +179,8 @@ StyleTag_Delete( LCUI_Queue *tags, StyleTag_ID tag )
 	DEBUG_MSG("delete end, total tag: %d\n", Queue_Get_Total( tags ));
 }
 
-void clear_space(char *in, char *out)
+LCUI_EXPORT(void)
+clear_space(char *in, char *out)
 /* 清除字符串中的空格 */
 {
 	int j, i, len = strlen(in);
@@ -340,7 +353,8 @@ covernt_tag_to_style_data (wchar_t *str, StyleTag_Data *out_data)
 }
 
 /* 处理样式标签 */
-wchar_t *StyleTag_ProcessTag( LCUI_Queue *tags, wchar_t *str )
+LCUI_EXPORT(wchar_t*)
+StyleTag_ProcessTag( LCUI_Queue *tags, wchar_t *str )
 {
 	wchar_t *q;
 	StyleTag_Data data;
@@ -357,7 +371,8 @@ wchar_t *StyleTag_ProcessTag( LCUI_Queue *tags, wchar_t *str )
 }
 
 /* 处理样式结束标签 */
-wchar_t *StyleTag_ProcessEndingTag( LCUI_Queue *tags, wchar_t *str )
+LCUI_EXPORT(wchar_t*)
+StyleTag_ProcessEndingTag( LCUI_Queue *tags, wchar_t *str )
 {
 	wchar_t *p;
 	char tag_name[256];

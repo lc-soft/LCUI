@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 #define PNG_BYTES_TO_CHECK 4
-int load_png(const char *filepath, LCUI_Graph *out)
+LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 /* 载入PNG图片中的图形数据 */
 {
 #ifdef USE_LIBPNG

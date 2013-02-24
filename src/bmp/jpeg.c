@@ -23,7 +23,7 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 }
 #endif
 
-int load_jpeg(const char *filepath, LCUI_Graph *out)
+LCUI_EXPORT(int) load_jpeg(const char *filepath, LCUI_Graph *out)
 /* 功能：载入并解码jpg图片 */
 {
 #ifdef USE_LIBJPEG

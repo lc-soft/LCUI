@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int Load_Graph_Default_Cursor(LCUI_Graph *pic)
+LCUI_EXPORT(int) Load_Graph_Default_Cursor(LCUI_Graph *pic)
 /* 功能：载入默认的鼠标指针的图形 */
 {
 	unsigned char red[]={

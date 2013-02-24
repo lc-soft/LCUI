@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int Load_Graph_Default_RadioButton_Off_Normal ( LCUI_Graph *buff )
+LCUI_EXPORT(int) Load_Graph_Default_RadioButton_Off_Normal ( LCUI_Graph *buff )
 {
 	int ret;
 	unsigned char red[] = {
@@ -161,7 +161,7 @@ int Load_Graph_Default_RadioButton_Off_Normal ( LCUI_Graph *buff )
 	return ret;
 }	
 
-int Load_Graph_Default_RadioButton_Off_Selected ( LCUI_Graph *buff )
+LCUI_EXPORT(int) Load_Graph_Default_RadioButton_Off_Selected ( LCUI_Graph *buff )
 {
 	int ret;
 	unsigned char red[] = {
@@ -275,12 +275,12 @@ int Load_Graph_Default_RadioButton_Off_Selected ( LCUI_Graph *buff )
 	return ret;
 }
 	
-int Load_Graph_Default_RadioButton_Off_Pressed(LCUI_Graph *pic)
+LCUI_EXPORT(int) Load_Graph_Default_RadioButton_Off_Pressed(LCUI_Graph *pic)
 {
 	return -1;
 }
 
-int Load_Graph_Default_RadioButton_On_Normal ( LCUI_Graph *buff )
+LCUI_EXPORT(int) Load_Graph_Default_RadioButton_On_Normal ( LCUI_Graph *buff )
 {
 	int ret;
 	unsigned char red[] = {
@@ -394,7 +394,7 @@ int Load_Graph_Default_RadioButton_On_Normal ( LCUI_Graph *buff )
 	return ret;
 }
 	
-int Load_Graph_Default_RadioButton_On_Selected ( LCUI_Graph *buff )
+LCUI_EXPORT(int) Load_Graph_Default_RadioButton_On_Selected ( LCUI_Graph *buff )
 {
 	int ret;
 	unsigned char red[] = {
@@ -508,7 +508,7 @@ int Load_Graph_Default_RadioButton_On_Selected ( LCUI_Graph *buff )
 	return ret;
 }
 	
-int Load_Graph_Default_RadioButton_On_Pressed(LCUI_Graph *pic)
+LCUI_EXPORT(int) Load_Graph_Default_RadioButton_On_Pressed(LCUI_Graph *pic)
 {
 	return -1;
 }

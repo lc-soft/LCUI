@@ -48,31 +48,32 @@
 #include LC_MISC_H
 #include LC_MEM_H
 
-void Refresh_Cursor ()
-/* 功能：刷新鼠标游标在屏幕上显示的图形 */
+/* 刷新鼠标游标在屏幕上显示的图形 */
+LCUI_EXPORT(void)
+LCUICursor_Refresh( void )
 {
-	LCUIScreen_InvalidArea ( Get_Cursor_Rect() );
+	LCUIScreen_InvalidArea ( LCUICursor_GetRect() );
 }
 
-void Show_Cursor ()
-/* 功能：显示鼠标游标 */
+/* 显示鼠标游标 */
+LCUI_EXPORT(void)
+LCUICursor_Show( void )
 {
 	LCUI_Sys.cursor.visible = TRUE;	/* 标识游标为可见 */
-	Refresh_Cursor ();		/* 刷新游标的显示 */
+	LCUICursor_Refresh();
 }
 
-
-
-void Hide_Cursor ()
-/* 功能：隐藏鼠标游标 */
+/* 隐藏鼠标游标 */
+LCUI_EXPORT(void)
+LCUICursor_Hide( void )
 {
 	LCUI_Sys.cursor.visible = FALSE;
-	Refresh_Cursor ();
+	LCUICursor_Refresh();
 }
 
-
-LCUI_Rect Get_Cursor_Rect()
-/* 功能：获取鼠标游标的区域范围 */
+/* 获取鼠标游标的区域范围 */
+LCUI_EXPORT(LCUI_Rect)
+LCUICursor_GetRect( void )
 {
 	LCUI_Rect rect;
 	rect.x = LCUI_Sys.cursor.pos.x;
@@ -82,35 +83,44 @@ LCUI_Rect Get_Cursor_Rect()
 	return rect;
 }
 
-void Set_Cursor_Pos (LCUI_Pos pos)
-/* 功能：设定游标的位置 */
+/* 设定游标的位置 */
+LCUI_EXPORT(void)
+LCUICursor_SetPos( LCUI_Pos pos )
 {
 	LCUI_Rect old;
-	old = Get_Cursor_Rect();
+	LCUI_Pos old_pos;
+
+	old_pos = LCUICursor_GetPos();
+	if( old_pos.x == pos.x && old_pos.y == pos.y ) {
+		return;
+	}
+	old = LCUICursor_GetRect();
  	LCUI_Sys.cursor.pos = pos; 
  	DEBUG_MSG("cursor new pos: %d, %d\n", pos.x, pos.y);
  	/* 刷新游标的显示 */ 
-	Refresh_Cursor ();
-	/* 刷新游标原来的区域中的图形 */		
+	LCUICursor_Refresh();
+	/* 刷新游标原来的区域中的图形 */	
 	LCUIScreen_InvalidArea ( old );
 }
 
-int Set_Cursors_Graph (LCUI_Graph * graph)
 /* 
  * 功能：设定游标的图形
  * 返回值：设定成功返回0，失败则返回-1
 */
+LCUI_EXPORT(int)
+LCUICursor_SetGraph( LCUI_Graph *graph )
 {
 	if (Graph_Valid (graph)) {
 		Graph_Copy (&LCUI_Sys.cursor.graph, graph);
-		Refresh_Cursor();
+		LCUICursor_Refresh();
 		return 0;
 	}
 	return -1;
 }
 
-LCUI_Pos Get_Cursor_Pos ()
-/* 功能：获取鼠标指针的位置 */
+/* 获取鼠标指针的位置 */
+LCUI_EXPORT(LCUI_Pos)
+LCUICursor_GetPos( void )
 {
 	return LCUI_Sys.cursor.pos; 
 }

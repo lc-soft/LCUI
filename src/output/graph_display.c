@@ -57,7 +57,8 @@ static LCUI_Queue screen_invalid_area;
  * 功能：获取屏幕宽度
  * 返回值：屏幕的宽度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
  * */
-int LCUIScreen_GetWidth( void )
+LCUI_EXPORT(int)
+LCUIScreen_GetWidth( void )
 {
 	if ( !LCUI_Sys.init ) {
 		return 0; 
@@ -69,7 +70,8 @@ int LCUIScreen_GetWidth( void )
  * 功能：获取屏幕高度
  * 返回值：屏幕的高度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
  * */
-int LCUIScreen_GetHeight( void )
+LCUI_EXPORT(int)
+LCUIScreen_GetHeight( void )
 {
 	if ( !LCUI_Sys.init ) {
 		return 0; 
@@ -78,20 +80,17 @@ int LCUIScreen_GetHeight( void )
 }
 
 /* 获取屏幕尺寸 */
-LCUI_Size LCUIScreen_GetSize( void )
+LCUI_EXPORT(LCUI_Size)
+LCUIScreen_GetSize( void )
 {
 	return LCUI_Sys.screen.size; 
 }
 
 /* 设置屏幕内的指定区域为无效区域，以便刷新该区域内的图形显示 */
-int LCUIScreen_InvalidArea( LCUI_Rect rect )
+LCUI_EXPORT(int)
+LCUIScreen_InvalidArea( LCUI_Rect rect )
 {
 	int ret;
-#ifdef LCUI_BUILD_IN_WIN32
-	MSG msg;
-	HWND hWnd;
-	RECT win32_rect;
-#endif
 	if (rect.width <= 0 || rect.height <= 0) {
 		return -1;
 	}
@@ -99,32 +98,26 @@ int LCUIScreen_InvalidArea( LCUI_Rect rect )
 	Queue_Lock( &screen_invalid_area );
 	ret = RectQueue_Add ( &screen_invalid_area, rect );
 	Queue_UnLock( &screen_invalid_area );
-#ifdef LCUI_BUILD_IN_WIN32
-	hWnd = Win32_GetSelfHWND();
-	win32_rect.left = rect.x;
-	win32_rect.top = rect.y;
-	win32_rect.right = rect.x + rect.width;
-	win32_rect.bottom = rect.y + rect.height;
-	InvalidateRect( hWnd, &win32_rect, FALSE );
-	PostMessage( hWnd, WM_PAINT, 0,0 );
-#endif
 	return ret;
 }
 
 /* 功能：获取屏幕中的每个像素的表示所用的位数 */
-int LCUIScreen_GetBits( void )
+LCUI_EXPORT(int)
+LCUIScreen_GetBits( void )
 {
 	return LCUI_Sys.screen.bits;
 }
 
 /* 获取屏幕中心点的坐标 */
-LCUI_Pos LCUIScreen_GetCenter( void )
+LCUI_EXPORT(LCUI_Pos)
+LCUIScreen_GetCenter( void )
 {
 	return Pos(LCUI_Sys.screen.size.w/2.0, LCUI_Sys.screen.size.h/2.0);
 }
 
 /* 获取屏幕中指定区域内实际要显示的图形 */
-void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
+LCUI_EXPORT(void)
+LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 {
 	LCUI_Pos pos;
 	GraphLayer_GetGraph( LCUI_Sys.root_glayer, graph, rect );
@@ -132,7 +125,7 @@ void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 		return;
 	}
 	/* 如果该区域与游标的图形区域重叠 */ 
-	if ( Rect_Is_Overlay( rect, Get_Cursor_Rect()) ) {
+	if ( Rect_Is_Overlay( rect, LCUICursor_GetRect()) ) {
 		pos.x = LCUI_Sys.cursor.pos.x - rect.x;
 		pos.y = LCUI_Sys.cursor.pos.y - rect.y;
 		/* 将图形合成 */ 
@@ -140,11 +133,28 @@ void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 	}
 }
 
-#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+
+#ifdef LCUI_BUILD_IN_WIN32
+static void Win32_Clinet_InvalidArea( LCUI_Rect rect )
+{
+	HWND hWnd;
+	RECT win32_rect;
+
+	hWnd = Win32_GetSelfHWND();
+	win32_rect.left = rect.x;
+	win32_rect.top = rect.y;
+	win32_rect.right = rect.x + rect.width;
+	win32_rect.bottom = rect.y + rect.height;
+	InvalidateRect( hWnd, &win32_rect, FALSE );
+	PostMessage( hWnd, WM_PAINT, 0,0 );
+}
+#endif
+
 static void 
 LCUIScreen_UpdateInvalidArea()
 /* 功能：进行屏幕内容更新 */
 { 
+#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 	LCUI_Rect rect;
 	LCUI_Graph fill_area, graph;
 	
@@ -173,8 +183,20 @@ LCUIScreen_UpdateInvalidArea()
 	Queue_UnLock( &screen_invalid_area );
 	//_DEBUG_MSG("quit\n");
 	Graph_Free(&graph);
-}
+#else
+	LCUI_Rect rect;
+	Queue_Lock( &screen_invalid_area );
+	while(LCUI_Active()) {
+		if ( !RectQueue_Get(&rect, 0, &screen_invalid_area) ) {
+			break;
+		}
+		Win32_Clinet_InvalidArea( rect );
+		Queue_Delete( &screen_invalid_area, 0 );
+	}
+	/* 解锁队列 */
+	Queue_UnLock( &screen_invalid_area );
 #endif
+}
 
 /*
  * 功能：处理已记录的无效区域
@@ -213,9 +235,7 @@ LCUIScreen_Update( void* unused )
 		Handle_AllWidgetUpdate(); /* 处理所有部件更新 */ 
 		LCUI_MSleep(5);
 		LCUIScreen_SyncInvalidArea();
-#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 		LCUIScreen_UpdateInvalidArea();
-#endif
 		++fps_count; /* 累计当前更新的帧数 */
 	}
 	/* 释放定时器 */
@@ -224,7 +244,8 @@ LCUIScreen_Update( void* unused )
 }
 
 /* 获取当前FPS */
-int LCUIScreen_GetFPS( void )
+LCUI_EXPORT(int)
+LCUIScreen_GetFPS( void )
 {
 #ifdef LCUI_BUILD_IN_LINUX
 	return fps;
@@ -241,7 +262,8 @@ extern int LCUIScreen_Init(void);
 extern int LCUIScreen_Destroy(void);
 
 /* 初始化图形输出模块 */
-int LCUIModule_Video_Init( void )
+LCUI_EXPORT(int)
+LCUIModule_Video_Init( void )
 {
 	if( i_am_init ) {
 		return -1;
@@ -254,7 +276,8 @@ int LCUIModule_Video_Init( void )
 }
 
 /* 停用图形输出模块 */
-int LCUIModule_Video_End( void )
+LCUI_EXPORT(int)
+LCUIModule_Video_End( void )
 {
 	if( !i_am_init ) {
 		return -1;

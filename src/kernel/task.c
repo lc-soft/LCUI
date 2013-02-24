@@ -17,7 +17,8 @@ Destroy_Task( void *arg )
 	}
 }
 
-void AppTasks_Init( LCUI_Queue *tasks )
+LCUI_EXPORT(void)
+AppTasks_Init( LCUI_Queue *tasks )
 {
 	Queue_Init( tasks, sizeof(LCUI_Task), Destroy_Task );
 }
@@ -26,7 +27,8 @@ void AppTasks_Init( LCUI_Queue *tasks )
  * 功能：发送任务给程序，使这个程序进行指定任务
  * 说明：LCUI_Task结构体中的成员变量 id，保存的是目标程序的id
  */
-int AppTasks_Add( LCUI_Task *task )
+LCUI_EXPORT(int)
+AppTasks_Add( LCUI_Task *task )
 {
 	LCUI_App *app;
 	app = LCUIApp_Find( task->id );
@@ -134,7 +136,8 @@ Tasks_CustomAdd( LCUI_Queue *tasks, int mode, LCUI_Task *task )
  * 有相同函数则覆盖，没有则新增
  * AppTasks_CustomAdd(ADD_MODE_REPLACE, task);
  * */
-int AppTasks_CustomAdd( int mode, LCUI_Task *task )
+LCUI_EXPORT(int)
+AppTasks_CustomAdd( int mode, LCUI_Task *task )
 {
 	/* 先获取程序数据结构体指针 */
 	LCUI_App *app;

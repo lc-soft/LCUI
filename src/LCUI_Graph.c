@@ -46,7 +46,8 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
-LCUI_RGB RGB ( uchar_t red, uchar_t green, uchar_t blue )
+LCUI_EXPORT(LCUI_RGB)
+RGB ( uchar_t red, uchar_t green, uchar_t blue )
 /* 将三个颜色值转换成LCUI_RGB型数据 */
 {
 	LCUI_RGB color;
@@ -58,7 +59,8 @@ LCUI_RGB RGB ( uchar_t red, uchar_t green, uchar_t blue )
 }
 
 /* 为图形数据设定互斥锁 */
-void Graph_Lock( LCUI_Graph *graph )
+LCUI_EXPORT(void)
+Graph_Lock( LCUI_Graph *graph )
 {
 	LCUI_Graph *src;
 	src = Get_Quote_Graph(graph);
@@ -66,12 +68,13 @@ void Graph_Lock( LCUI_Graph *graph )
 }
 
 /* 更新图层的属性 */
-void Graph_Update_Attr( LCUI_Graph *buff )
+LCUI_EXPORT(void)
+Graph_Update_Attr( LCUI_Graph *buff )
 {
 	LCUI_Graph *src;
 	LCUI_Rect src_rect;
 	int flag;
-	unsigned int x=0, y=0, pos, start_pos;
+	int x=0, y=0, pos, start_pos;
 	
 	src = Get_Quote_Graph( buff );
 	src_rect = Get_Graph_Valid_Rect( buff );
@@ -140,7 +143,8 @@ void Graph_Update_Attr( LCUI_Graph *buff )
 }
 
 /* 解除互斥锁，以结束图像数据的使用 */
-void Graph_Unlock( LCUI_Graph *graph )
+LCUI_EXPORT(void)
+Graph_Unlock( LCUI_Graph *graph )
 {
 	LCUI_Graph *src;
 	src = Get_Quote_Graph(graph);
@@ -148,7 +152,8 @@ void Graph_Unlock( LCUI_Graph *graph )
 }
 
 
-LCUI_RGBA RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore)
+LCUI_EXPORT(LCUI_RGBA)
+RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore)
 /* 功能：混合两个像素点的颜色 */
 {
 	if(fore.alpha == 255) {
@@ -166,7 +171,8 @@ LCUI_RGBA RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore)
 	return back;
 }
 
-LCUI_BOOL Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel)
+LCUI_EXPORT(LCUI_BOOL)
+Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel)
 /* 功能：获取图像中指定坐标的像素点的颜色 */
 {
 	int i;
@@ -193,13 +199,15 @@ LCUI_BOOL Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel)
 	return TRUE;
 }
 
-int Get_Graph_Type(LCUI_Graph *pic)
+LCUI_EXPORT(int)
+Get_Graph_Type(LCUI_Graph *pic)
 /* 返回图形的类型 */
 {
 	return pic->type;
 }
 
-LCUI_Size Get_Graph_Size(LCUI_Graph *pic)
+LCUI_EXPORT(LCUI_Size)
+Get_Graph_Size(LCUI_Graph *pic)
 /* 功能：获取图形的尺寸 */
 {
 	if(NULL == pic) {
@@ -208,7 +216,8 @@ LCUI_Size Get_Graph_Size(LCUI_Graph *pic)
 	return Size(pic->width, pic->height);
 }
 
-LCUI_BOOL Graph_Is_PNG(LCUI_Graph *pic)
+LCUI_EXPORT(LCUI_BOOL)
+Graph_Is_PNG(LCUI_Graph *pic)
 /* 
  * 功能：判断图像是否为png
  * 返回值：是则返回1，否则返回0
@@ -220,7 +229,8 @@ LCUI_BOOL Graph_Is_PNG(LCUI_Graph *pic)
 	return FALSE;
 }
 
-LCUI_BOOL Graph_Is_BMP(LCUI_Graph *pic)
+LCUI_EXPORT(LCUI_BOOL)
+Graph_Is_BMP(LCUI_Graph *pic)
 /* 
  * 功能：判断图像是否为bmp
  * 返回值：是则返回1，否则返回0
@@ -232,7 +242,8 @@ LCUI_BOOL Graph_Is_BMP(LCUI_Graph *pic)
 	return FALSE;
 }
 
-LCUI_BOOL Graph_Is_JPG(LCUI_Graph *pic)
+LCUI_EXPORT(LCUI_BOOL)
+Graph_Is_JPG(LCUI_Graph *pic)
 /* 
  * 功能：判断图像是否为jpg 
  * 返回值：是则返回1，否则返回0
@@ -244,7 +255,8 @@ LCUI_BOOL Graph_Is_JPG(LCUI_Graph *pic)
 	return FALSE;
 }
 
-LCUI_BOOL Graph_Have_Alpha(LCUI_Graph *pic)
+LCUI_EXPORT(LCUI_BOOL)
+Graph_Have_Alpha(LCUI_Graph *pic)
 /* 
  * 功能：判断图像是否带有带alpha通道 
  * 返回值：是则返回1，否则返回0
@@ -257,7 +269,8 @@ LCUI_BOOL Graph_Have_Alpha(LCUI_Graph *pic)
 	return 0; 
 }
 
-LCUI_BOOL Graph_Valid(LCUI_Graph *pic)
+LCUI_EXPORT(LCUI_BOOL)
+Graph_Valid(LCUI_Graph *pic)
 /*
  * 功能：检测图形数据是否有效
  * 返回值：有效返回1，无效返回0
@@ -272,7 +285,8 @@ LCUI_BOOL Graph_Valid(LCUI_Graph *pic)
 	return 0;
 }
 
-int Graph_Is_Opaque(LCUI_Graph *graph)
+LCUI_EXPORT(int)
+Graph_Is_Opaque(LCUI_Graph *graph)
 /* 
  * 功能：检测图形是否为不透明 
  * 说明：完全透明则返回-1，不透明则返回1，有透明效果则返回0
@@ -296,7 +310,8 @@ int Graph_Is_Opaque(LCUI_Graph *graph)
 	return 0;
 }
 
-void Print_Graph_Info(LCUI_Graph *pic)
+LCUI_EXPORT(void)
+Print_Graph_Info(LCUI_Graph *pic)
 /* 功能：打印图像的信息 */
 {
 	printf("address:%p\n", pic);
@@ -315,7 +330,8 @@ void Print_Graph_Info(LCUI_Graph *pic)
 	}
 }
 
-void Graph_Init(LCUI_Graph *pic)
+LCUI_EXPORT(void)
+Graph_Init(LCUI_Graph *pic)
 /* 初始化图片数据结构体 */
 {
 	if( !pic ) {
@@ -387,7 +403,8 @@ New_Graph(int width, int height, int have_alpha)
 	return out_buff;
 }
 
-int Graph_Create(LCUI_Graph *graph, int width, int height)
+LCUI_EXPORT(int)
+Graph_Create(LCUI_Graph *graph, int width, int height)
 /* 功能：为图像数据分配内存资源 */
 {
 	if(width > 10000 || height > 10000) {
@@ -421,7 +438,8 @@ int Graph_Create(LCUI_Graph *graph, int width, int height)
 	return 0;
 }
 
-void Graph_Copy(LCUI_Graph *des, LCUI_Graph *src)
+LCUI_EXPORT(void)
+Graph_Copy(LCUI_Graph *des, LCUI_Graph *src)
 /* 
  * 功能：拷贝图像数据
  * 说明：将src的数据拷贝至des 
@@ -454,7 +472,8 @@ void Graph_Copy(LCUI_Graph *des, LCUI_Graph *src)
 	}
 }
 
-void Graph_Free(LCUI_Graph *pic)
+LCUI_EXPORT(void)
+Graph_Free(LCUI_Graph *pic)
 /* 功能：释放LCUI_Graph内的图像数据占用的内存资源 */
 {
 	LCUI_Graph *p;
@@ -480,7 +499,8 @@ void Graph_Free(LCUI_Graph *pic)
 }
 
 /************************ Graph Quote *********************************/
-int Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area)
+LCUI_EXPORT(int)
+Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area)
 /* 
  * 功能：引用另一个图层中指定区域里的图形 
  * 说明：src是被引用的对象，des是引用者，area是引用的src中的图形所在的区域
@@ -512,7 +532,8 @@ int Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area)
 	return 0;
 }
 
-LCUI_Rect Get_Graph_Valid_Rect(LCUI_Graph *graph)
+LCUI_EXPORT(LCUI_Rect)
+Get_Graph_Valid_Rect(LCUI_Graph *graph)
 /* 功能：获取被引用的图形所在的有效区域 */
 {
 	LCUI_Pos pos;
@@ -583,7 +604,8 @@ LCUI_Rect Get_Graph_Valid_Rect(LCUI_Graph *graph)
 	return cut_rect;
 }
 
-LCUI_Graph *Get_Quote_Graph(LCUI_Graph *graph)
+LCUI_EXPORT(LCUI_Graph*)
+Get_Quote_Graph(LCUI_Graph *graph)
 /* 
  * 功能：获取指向被引用的图形的指针 
  * 说明：如果当前图形引用了另一个图形，并且，该图形处于一条引用链中，那么，本函数会返
@@ -601,8 +623,8 @@ LCUI_Graph *Get_Quote_Graph(LCUI_Graph *graph)
 
 /************************ End Graph Quote *****************************/
 
-
-void Graph_Zoom(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
+LCUI_EXPORT(void)
+Graph_Zoom(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 /* 功能：根据指定模式，对图像进行缩放 */
 {
 	LCUI_Graph *src;
@@ -651,7 +673,8 @@ void Graph_Zoom(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size)
 	} 
 }
 
-int Graph_Cut(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
+LCUI_EXPORT(int)
+Graph_Cut(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 /* 
  * 功能：从源图形中截取出指定区域的图形 
  * 说明：裁剪出的图像数据，全局透明度和源图像一致
@@ -690,7 +713,8 @@ int Graph_Cut(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out)
 	return 0; 
 }
 
-int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)  
+LCUI_EXPORT(int)
+Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)  
 /* 功能：将图像进行水平翻转 */  
 {
 	int x, y, pos, left, temp, count;  
@@ -736,7 +760,8 @@ int Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out)
 	return 0;  
 }
 
-int Graph_Fill_Color(LCUI_Graph *graph, LCUI_RGB color)
+LCUI_EXPORT(int)
+Graph_Fill_Color(LCUI_Graph *graph, LCUI_RGB color)
 /* 功能：为传入的图形填充颜色 */
 {
 	int i, pos;
@@ -768,7 +793,8 @@ int Graph_Fill_Color(LCUI_Graph *graph, LCUI_RGB color)
 }
 
 /* 平铺图形 */
-int Graph_Tile(	LCUI_Graph *src, LCUI_Graph *des_buff, LCUI_BOOL replace )
+LCUI_EXPORT(int)
+Graph_Tile( LCUI_Graph *src, LCUI_Graph *des_buff, LCUI_BOOL replace )
 {
 	int ret = 0;
 	LCUI_Pos pos;
@@ -788,7 +814,8 @@ int Graph_Tile(	LCUI_Graph *src, LCUI_Graph *des_buff, LCUI_BOOL replace )
 	return ret;
 }
 
-int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
+LCUI_EXPORT(int)
+Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 /* 
  * 功能：将前景图与背景图混合叠加
  * 说明：back_graph是背景图像，fore_graph前景图像，混合后的数据保存在背景图中
@@ -798,7 +825,7 @@ int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 	uchar_t *r1, *g1, *a1, *b1, *r2, *g2, *b2; 
 
 	float k;
-	uint_t total, y = 0, m, n, tmp_m, tmp_n;
+	int total, y = 0, m, n, tmp_m, tmp_n;
 	LCUI_Graph *src, *des;
 	LCUI_Rect cut, src_rect, des_rect;
 	
@@ -908,8 +935,8 @@ int Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 	return 0; 
 }
 
-
-int Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
+LCUI_EXPORT(int)
+Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos)
 /* 
  * 功能：替换原图中对应位置的区域中的图形
  * 说明：与Overlay_Graph函数不同，back_graph中的图形数据会被fore_graph中的图形数据覆盖
@@ -917,7 +944,7 @@ int Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 {
 	uchar_t *r1, *g1, *a1, *a2, *b1, *r2, *g2, *b2;
 
-	uint_t y,total, m, n, tmp_m, tmp_n;
+	int y,total, m, n, tmp_m, tmp_n;
 	uchar_t j, k; 
 	
 	LCUI_Graph *src, *des;
@@ -998,7 +1025,8 @@ int Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_p
 	return 0; 
 } 
 
-int Graph_Put_Image(LCUI_Graph *graph, LCUI_Graph *image, int flag)
+LCUI_EXPORT(int)
+Graph_Put_Image(LCUI_Graph *graph, LCUI_Graph *image, int flag)
 /* 功能：将图片以指定对齐方式粘贴至背景图上 */
 {
 	LCUI_Pos pos;
@@ -1054,7 +1082,8 @@ int Graph_Put_Image(LCUI_Graph *graph, LCUI_Graph *image, int flag)
 }
 
 /* 为指定图形填充背景图像 */
-int Graph_Fill_Image(	LCUI_Graph *graph,	LCUI_Graph *bg, 
+LCUI_EXPORT(int)
+Graph_Fill_Image(	LCUI_Graph *graph,	LCUI_Graph *bg, 
 			int mode,		LCUI_RGB color )
 {
 	LCUI_Size size;
@@ -1110,7 +1139,8 @@ int Graph_Fill_Image(	LCUI_Graph *graph,	LCUI_Graph *bg,
 	return 0; 
 }
 
-int Graph_Fill_Alpha(LCUI_Graph *src, uchar_t alpha)
+LCUI_EXPORT(int)
+Graph_Fill_Alpha(LCUI_Graph *src, uchar_t alpha)
 /* 功能：填充图形的alpha通道的所有值 */
 {
 	int i;

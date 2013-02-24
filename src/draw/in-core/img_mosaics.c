@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int Load_Graph_Mosaics(LCUI_Graph *pic)
+LCUI_EXPORT(int) Load_Graph_Mosaics(LCUI_Graph *pic)
 /* 功能：载入马赛克图形 */
 {
 	unsigned char color[]={

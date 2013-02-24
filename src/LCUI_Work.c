@@ -46,14 +46,14 @@
 #include LC_CURSOR_H
 
 /***************************** Func ***********************************/
-void 
+LCUI_EXPORT(void)
 NULL_Func()
 /* 功能：空函数，不做任何操作 */
 {
 	return;
 }
 
-void 
+LCUI_EXPORT(void)
 FuncQueue_Init(LCUI_Queue *queue)
 /* 功能：初始化函数指针队列 */
 {
@@ -82,7 +82,8 @@ WidgetQueue_Get_Pos(LCUI_Queue *queue, LCUI_Widget *widget)
 	return result;
 }
 /* 将回调函数与部件的指定事件进行关联 */
-int Widget_Event_Connect ( LCUI_Widget *widget, WidgetEventType event_id, 
+LCUI_EXPORT(int)
+Widget_Event_Connect(	LCUI_Widget *widget, WidgetEventType event_id, 
 			void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) )
 {
 	LCUI_Func func_data;
@@ -400,7 +401,7 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 static void 
 LCUI_HandleMouseButton( LCUI_MouseButtonEvent *event, void *unused )
 {
-	if( event->state == PRESSED ) {
+	if( event->state == LCUIKEYSTATE_PRESSED ) {
 		LCUI_HandleMouseButtonDown( event );
 	} else {
 		LCUI_HandleMouseButtonUp( event );
@@ -422,7 +423,7 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 		widget_list_set_state (widget, WIDGET_STATE_OVERLAY);
 	}
 	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */ 
-	if( click_widget && event->state == PRESSED 
+	if( click_widget && event->state == LCUIKEYSTATE_PRESSED 
 	 && Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
 		_Doing_DragEvent( click_widget, event );
 	}
@@ -467,7 +468,8 @@ static void
 WidgetFocusProc( LCUI_KeyboardEvent *event, void *arg );
 
 /* 初始化部件模块 */
-void LCUIModule_Widget_Init( void )
+LCUI_EXPORT(void)
+LCUIModule_Widget_Init( void )
 {
 	WidgetQueue_Init( &LCUI_Sys.widget_list );
 	Queue_Init( &widget_list, sizeof(widget_item), NULL );
@@ -477,7 +479,8 @@ void LCUIModule_Widget_Init( void )
 }
 
 /* 停用部件模块 */
-void LCUIModule_Widget_End( void )
+LCUI_EXPORT(void)
+LCUIModule_Widget_End( void )
 {
 	Destroy_Queue( &LCUI_Sys.widget_list );
 	Destroy_Queue( &widget_list );
@@ -488,7 +491,8 @@ void LCUIModule_Widget_End( void )
 /*--------------------------- Focus Proc ------------------------------*/
 static LCUI_Widget *root_focus_widget = NULL;
 
-LCUI_BOOL Set_Focus( LCUI_Widget *widget )
+LCUI_EXPORT(LCUI_BOOL)
+Set_Focus( LCUI_Widget *widget )
 /* 
  * 功能：为部件设置焦点
  * 说明：上个获得焦点的部件会得到EVENT_FOCUSOUT事件，而当前获得焦点的部件会得到
@@ -530,7 +534,8 @@ LCUI_BOOL Set_Focus( LCUI_Widget *widget )
 }
 
 /* 设定部件是否能够获取焦点 */
-void Widget_SetFocus( LCUI_Widget *widget, LCUI_BOOL flag )
+LCUI_EXPORT(void)
+Widget_SetFocus( LCUI_Widget *widget, LCUI_BOOL flag )
 {
 	/* 如果该部件已经获得焦点，并且要设置它不能获取焦点，则取消当前焦点 */
 	if( Widget_GetFocus(widget) && !flag ) {
@@ -540,7 +545,7 @@ void Widget_SetFocus( LCUI_Widget *widget, LCUI_BOOL flag )
 }
 
 /* 获取指定部件内的已获得焦点的子部件 */
-LCUI_Widget *
+LCUI_EXPORT(LCUI_Widget*)
 Get_FocusWidget( LCUI_Widget *widget )
 {
 	int i, focus_pos, total;
@@ -589,7 +594,7 @@ Get_FocusWidget( LCUI_Widget *widget )
 	return widget;
 }
 
-LCUI_BOOL 
+LCUI_EXPORT(LCUI_BOOL)
 Cancel_Focus( LCUI_Widget *widget )
 /* 
  * 功能：取消指定部件的焦点
@@ -652,7 +657,7 @@ Cancel_Focus( LCUI_Widget *widget )
 	return TRUE;
 }
 
-LCUI_BOOL
+LCUI_EXPORT(LCUI_BOOL)
 Reset_Focus( LCUI_Widget* widget )
 /* 复位指定部件内的子部件的焦点 */
 {	
@@ -673,17 +678,20 @@ Reset_Focus( LCUI_Widget* widget )
 	return TRUE;
 }
 
-int Next_FocusWidget()
+LCUI_EXPORT(int)
+Next_FocusWidget()
 {
 	return 0;
 }
 
-int Prev_FocusWidget()
+LCUI_EXPORT(int)
+Prev_FocusWidget()
 {
 	return 0;
 }
 
-int Return_FocusToParent()
+LCUI_EXPORT(int)
+Return_FocusToParent()
 {
 	return 0;
 }

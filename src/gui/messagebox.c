@@ -360,7 +360,8 @@ msgbox_add_BTN_YESNOCANCEL( LCUI_Widget *btn_area )
  * 	MB_BTN_IS_NO	: "否"按钮
  * 	MB_BTN_IS_QUIT	: 窗口右上角的关闭按钮
  *  */
-int LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text, 
+LCUI_EXPORT(int)
+LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text, 
 			const char *title, MB_BTN_TYPE button )
 {
 	int ret, icon_flag;

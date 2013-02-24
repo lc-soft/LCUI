@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int Load_Graph_Icon_Error(LCUI_Graph *pic)
+LCUI_EXPORT(int) Load_Graph_Icon_Error(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为“错误”图标 */
 {
 	unsigned char red[]={
@@ -370,7 +370,7 @@ int Load_Graph_Icon_Error(LCUI_Graph *pic)
 	return value;
 }
 
-int Load_Graph_Icon_Help(LCUI_Graph *pic)
+LCUI_EXPORT(int) Load_Graph_Icon_Help(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为“帮助”图标 */
 {
 	unsigned char red[]={
@@ -692,7 +692,7 @@ int Load_Graph_Icon_Help(LCUI_Graph *pic)
 	return value;
 }
 
-int Load_Graph_Icon_Info(LCUI_Graph *pic)
+LCUI_EXPORT(int) Load_Graph_Icon_Info(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为“信息”图标 */
 {
 	unsigned char red[]={
@@ -1014,7 +1014,7 @@ int Load_Graph_Icon_Info(LCUI_Graph *pic)
 	return value;
 }
 
-int Load_Graph_Icon_Warning(LCUI_Graph *pic)
+LCUI_EXPORT(int) Load_Graph_Icon_Warning(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为“警告”图标 */
 {
 	unsigned char red[]={
@@ -1336,7 +1336,7 @@ int Load_Graph_Icon_Warning(LCUI_Graph *pic)
 	return value;
 }
 
-int Load_Graph_Icon_LCUI(LCUI_Graph *pic)
+LCUI_EXPORT(int) Load_Graph_Icon_LCUI(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为LCUI的LOGO */
 {
 	unsigned char red[]={
@@ -1822,7 +1822,7 @@ int Load_Graph_Icon_LCUI(LCUI_Graph *pic)
 	return value;
 }
 
-int Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out)
+LCUI_EXPORT(int) Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out)
 {
 	unsigned char red[]={
 		237,

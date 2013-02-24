@@ -77,7 +77,7 @@ code_convert(	char *src_charset,	char *des_charset,
 }
 #endif
 
-int Get_EncodingType()
+LCUI_EXPORT(int) Get_EncodingType(void)
 /* 获取字符编码类型 */
 {
 	LCUI_App *app;
@@ -88,9 +88,9 @@ int Get_EncodingType()
 	return app->encoding_type;
 }
 
-#ifdef LCUI_BUILD_IN_LINUX
 static int Set_EncodingType(int type)
 {
+#ifdef LCUI_BUILD_IN_LINUX
 	LCUI_App *app;
 	app = LCUIApp_GetSelf();
 	if( !app ) {
@@ -98,9 +98,12 @@ static int Set_EncodingType(int type)
 	}
 	app->encoding_type = type;
 	return 0;
+#else
+	return -2;
+#endif
 }
 
-int Using_GB2312()
+LCUI_EXPORT(int) Using_GB2312(void)
 /* 
  * 说明：如果你的系统只能使用GB2312编码，不能使用UTF-8编码，可以使用这
  * 个函数进行设置，让相关函数正常转换字符编码 
@@ -108,7 +111,6 @@ int Using_GB2312()
 {
 	return Set_EncodingType(ENCODEING_TYPE_GB2312);
 }
-#endif
 
 #define MAX_SAVE_NUM   20
 static wchar_t 
@@ -214,7 +216,7 @@ gb2312_to_unicode(char *in_gb2312_str, wchar_t **out_unicode)
 }
 #endif
 
-int Char_To_Wchar_T(char *in_text, wchar_t **unicode_text)
+LCUI_EXPORT(int) Char_To_Wchar_T(char *in_text, wchar_t **unicode_text)
 /*
  * 功能：将char型字符串转换成wchar_t字符串
  * 参数说明：

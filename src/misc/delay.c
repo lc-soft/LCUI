@@ -7,7 +7,8 @@
 #include <unistd.h>
 #endif
 /* 秒级延时 */
-void LCUI_Sleep( unsigned int s )
+LCUI_EXPORT(void)
+LCUI_Sleep( unsigned int s )
 {
 #ifdef LCUI_BUILD_IN_WIN32
 	Sleep(s*1000);
@@ -17,7 +18,8 @@ void LCUI_Sleep( unsigned int s )
 }
 
 /* 毫秒级延时 */
-void LCUI_MSleep( unsigned int ms )
+LCUI_EXPORT(void)
+LCUI_MSleep( unsigned int ms )
 {
 #ifdef LCUI_BUILD_IN_WIN32
 	Sleep(ms);

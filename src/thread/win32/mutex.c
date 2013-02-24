@@ -4,20 +4,23 @@
 
 #ifdef LCUI_THREAD_WIN32
 
-int LCUIMutex_Init( LCUI_Mutex *mutex )
+LCUI_EXPORT(int)
+LCUIMutex_Init( LCUI_Mutex *mutex )
 {
 	*mutex = CreateMutex(NULL, FALSE, NULL);
 	return 0;
 }
 
 /* Free the mutex */
-void LCUIMutex_Destroy( LCUI_Mutex *mutex )
+LCUI_EXPORT(void)
+LCUIMutex_Destroy( LCUI_Mutex *mutex )
 {
 	CloseHandle( *mutex );
 }
 
 /* Lock the mutex */
-int LCUIMutex_Lock( LCUI_Mutex *mutex )
+LCUI_EXPORT(int)
+LCUIMutex_Lock( LCUI_Mutex *mutex )
 {
 	if ( WaitForSingleObject( *mutex, INFINITE ) == WAIT_FAILED ) {
 		printf("Couldn't wait on mutex\n");
@@ -27,7 +30,8 @@ int LCUIMutex_Lock( LCUI_Mutex *mutex )
 }
 
 /* Unlock the mutex */
-int LCUIMutex_UnLock( LCUI_Mutex *mutex )
+LCUI_EXPORT(int)
+LCUIMutex_UnLock( LCUI_Mutex *mutex )
 {
 	if ( ReleaseMutex( *mutex ) == FALSE ) {
 		printf("Couldn't release mutex\n");

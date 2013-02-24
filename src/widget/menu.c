@@ -59,7 +59,8 @@
 #include LC_MENU_H
 #include LC_RES_H
 
-void Register_Menu()
+LCUI_EXPORT(void)
+Register_Menu()
 {
 	
 }

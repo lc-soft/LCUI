@@ -159,7 +159,8 @@ ProgressBar_ExecDraw(LCUI_Widget *widget)
 	PictureBox_SetImage(pb->fore_pic_box, &pb->fore_graph);
 }
 
-void ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value)
+LCUI_EXPORT(void)
+ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value)
 /* 功能：设定进度条最大值 */
 {
 	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
@@ -167,14 +168,16 @@ void ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value)
 	Widget_Update(widget); 
 }
 
-int ProgressBar_GetMaxValue(LCUI_Widget *widget)
+LCUI_EXPORT(int)
+ProgressBar_GetMaxValue(LCUI_Widget *widget)
 /* 功能：获取进度条最大值 */
 {
 	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
 	return pb->max_value;
 }
 
-void ProgressBar_SetValue(LCUI_Widget *widget, int value)
+LCUI_EXPORT(void)
+ProgressBar_SetValue(LCUI_Widget *widget, int value)
 /* 功能：设定进度条当前值 */
 {
 	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
@@ -182,7 +185,8 @@ void ProgressBar_SetValue(LCUI_Widget *widget, int value)
 	Widget_Update(widget);
 }
 
-int ProgressBar_GetValue(LCUI_Widget *widget)
+LCUI_EXPORT(int)
+ProgressBar_GetValue(LCUI_Widget *widget)
 /* 功能：获取进度条当前值 */
 {
 	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
@@ -230,7 +234,8 @@ ProgressBar_ExecShow(LCUI_Widget *widget)
 	}
 }
 
-void Register_ProgressBar()
+LCUI_EXPORT(void)
+Register_ProgressBar()
 /* 注册进度条部件类型 */
 {
 	/* 添加部件类型 */

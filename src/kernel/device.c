@@ -13,9 +13,10 @@ dev_list_init( LCUI_Queue *dev_list )
  * 功能：注册设备
  * 说明：为指定设备添加处理函数
  * */
-int LCUI_Dev_Add(	LCUI_BOOL (*init_func)(), 
-			LCUI_BOOL (*proc_func)(), 
-			LCUI_BOOL (*destroy_func)() )
+LCUI_EXPORT(int)
+LCUI_Dev_Add(	LCUI_BOOL (*init_func)(), 
+		LCUI_BOOL (*proc_func)(), 
+		LCUI_BOOL (*destroy_func)() )
 {
 	dev_func_data data;
 	
@@ -63,7 +64,8 @@ proc_dev_list ( void *arg )
 }
 
 /* 初始化设备处理模块 */
-int LCUIModule_Device_Init()
+LCUI_EXPORT(int)
+LCUIModule_Device_Init(void)
 {
 	dev_list_init( &LCUI_Sys.dev_list );
 	return _LCUIThread_Create( &LCUI_Sys.dev_thread,
@@ -71,7 +73,8 @@ int LCUIModule_Device_Init()
 }
 
 /* 停用设备处理模块 */
-void LCUIModule_Device_End()
+LCUI_EXPORT(void)
+LCUIModule_Device_End(void)
 {
 	int total, i;
 	dev_func_data *data_ptr;

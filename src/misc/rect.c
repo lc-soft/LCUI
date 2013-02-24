@@ -43,7 +43,8 @@
 #include LC_LCUI_H
 #include LC_MISC_H
 
-void Rect_Init(LCUI_Rect *rect)
+LCUI_EXPORT(void)
+Rect_Init(LCUI_Rect *rect)
 /* 功能：初始化矩形区域的数据 */
 {
 	rect->x      = 0;
@@ -54,7 +55,8 @@ void Rect_Init(LCUI_Rect *rect)
 	rect->center_y = 0;
 }
 
-int Rect_Cross_Overlay(LCUI_Rect a, LCUI_Rect b)
+LCUI_EXPORT(int)
+Rect_Cross_Overlay(LCUI_Rect a, LCUI_Rect b)
 /* 
  * 功能：检测两个矩形是否成十字架式叠加 
  * 返回值：
@@ -77,7 +79,8 @@ int Rect_Cross_Overlay(LCUI_Rect a, LCUI_Rect b)
 	return 0;
 }
 
-int Get_Cut_Area(LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut)
+LCUI_EXPORT(int)
+Get_Cut_Area(LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut)
 /* 
  * 功能：获取需裁剪的区域
  * 说明：指定容器尺寸和容器中的区域位置及尺寸，即可得到该区域中需要进行裁剪区域
@@ -118,7 +121,8 @@ int Get_Cut_Area(LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut)
 	return result;
 }
 
-LCUI_Rect Get_Valid_Area(LCUI_Size container, LCUI_Rect rect)
+LCUI_EXPORT(LCUI_Rect)
+Get_Valid_Area(LCUI_Size container, LCUI_Rect rect)
 /* 
  * 功能：获取指定区域在容器中的有效显示区域 
  * 说明：指定容器的区域大小，再指定容器中的区域位置及大小，就能得到该容器实际能显示
@@ -151,7 +155,8 @@ LCUI_Rect Get_Valid_Area(LCUI_Size container, LCUI_Rect rect)
 	return rect;
 }
 
-int Rect_Include_Rect (LCUI_Rect a, LCUI_Rect b)
+LCUI_EXPORT(int)
+Rect_Include_Rect (LCUI_Rect a, LCUI_Rect b)
 /*
  * 功能：检测两个矩形中，A矩形是否包含B矩形
  * 返回值：两不矩形属于包含关系返回1，否则返回0。
@@ -190,9 +195,9 @@ int Rect_Include_Rect (LCUI_Rect a, LCUI_Rect b)
 	return n;
 }
 
-//extern int debug_mark;
-int Cut_Overlay_Rect (	LCUI_Rect old_rect, LCUI_Rect new_rect, 
-					LCUI_Queue *rq	)
+LCUI_EXPORT(int)
+Cut_Overlay_Rect(	LCUI_Rect old_rect, LCUI_Rect new_rect, 
+			LCUI_Queue *rq	)
 /*
  * 功能：将有重叠部分的两个矩形，进行分割，并得到分割后的矩形
  * 说明：主要用于局部区域刷新里，添加的需刷新的区域有可能会与已添加的区域重叠，为避免
@@ -306,7 +311,8 @@ int Cut_Overlay_Rect (	LCUI_Rect old_rect, LCUI_Rect new_rect,
 	return 0;
 }
 
-int Get_Overlay_Rect(LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out)
+LCUI_EXPORT(int)
+Get_Overlay_Rect(LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out)
 /* 功能：获取两矩形重叠部分的矩形 */
 {
 	int x = 0,y = 0,w = 0,h = 0;
@@ -346,7 +352,8 @@ int Get_Overlay_Rect(LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out)
 	return 1;
 }
 
-LCUI_Rect Rect (int x, int y, int width, int height)
+LCUI_EXPORT(LCUI_Rect)
+Rect (int x, int y, int width, int height)
 /* 功能：将数值转换成LCUI_Rect型结构体 */
 {
 	LCUI_Rect s;
@@ -359,7 +366,8 @@ LCUI_Rect Rect (int x, int y, int width, int height)
 	return s;
 }
 
-int Rect_Inside_Point (LCUI_Pos pos, LCUI_Rect rect)
+LCUI_EXPORT(int)
+Rect_Inside_Point (LCUI_Pos pos, LCUI_Rect rect)
 /* 功能：检测一个点是否被矩形包含 */
 {
 	if (pos.x >= rect.x && pos.x < rect.x + rect.width-1 
@@ -370,8 +378,9 @@ int Rect_Inside_Point (LCUI_Pos pos, LCUI_Rect rect)
 	}
 }
 
-int Check_Rect_Overlap (	int ax, int ay, int aw, int ah, 
-				int bx, int by, int bw, int bh )
+LCUI_EXPORT(int)
+Check_Rect_Overlap (	int ax, int ay, int aw, int ah, 
+			int bx, int by, int bw, int bh )
 /*
  * 功能：检测两个矩形是否重叠
  * 参数说明：
@@ -439,14 +448,16 @@ int Check_Rect_Overlap (	int ax, int ay, int aw, int ah,
 	return n;
 }
 
-int Rect_Is_Overlay (LCUI_Rect a, LCUI_Rect b)
+LCUI_EXPORT(int)
+Rect_Is_Overlay (LCUI_Rect a, LCUI_Rect b)
 /* 功能：检测两个矩形是否重叠 */
 {
 	return Check_Rect_Overlap (a.x, a.y, a.width, a.height, b.x, b.y,
 							   b.width, b.height);
 }
 
-int Rect_Equal (LCUI_Rect a, LCUI_Rect b)
+LCUI_EXPORT(int)
+Rect_Equal (LCUI_Rect a, LCUI_Rect b)
 /* 功能：判断两个矩形是否相等 */
 {
 	if(a.x == b.x && a.y == b.y && a.width == b.width && a.height == b.height) 
@@ -454,7 +465,8 @@ int Rect_Equal (LCUI_Rect a, LCUI_Rect b)
 	return 0;
 }
 
-int Rect_Valid(LCUI_Rect r)
+LCUI_EXPORT(int)
+Rect_Valid(LCUI_Rect r)
 /* 功能：判断矩形是否有效 */
 {
 	if(r.width <= 0 || r.height <= 0) 

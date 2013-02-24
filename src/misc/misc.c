@@ -44,7 +44,8 @@
 #include LC_LCUI_H 
 #include LC_GRAPH_H
 
-int Check_Option(int result, int option)
+LCUI_EXPORT(int)
+Check_Option(int result, int option)
 /* 功能：检测result是否包含option */
 {
 	if((result & option) == option) {
@@ -53,7 +54,8 @@ int Check_Option(int result, int option)
 	return 0;
 }
 
-void Padding_Init( LCUI_Padding *padding )
+LCUI_EXPORT(void)
+Padding_Init( LCUI_Padding *padding )
 {
 	padding->left = 0;
 	padding->bottom = 0;
@@ -61,7 +63,8 @@ void Padding_Init( LCUI_Padding *padding )
 	padding->top = 0; 
 }
 
-void Margin_Init( LCUI_Margin *margin )
+LCUI_EXPORT(void)
+Margin_Init( LCUI_Margin *margin )
 {
 	margin->left = 0;
 	margin->bottom = 0;
@@ -69,7 +72,8 @@ void Margin_Init( LCUI_Margin *margin )
 	margin->top = 0; 
 }
 
-LCUI_Pos Pos(int x, int y)
+LCUI_EXPORT(LCUI_Pos)
+Pos(int x, int y)
 /* 功能：转换成LCUI_Pos类型 */
 {
 	LCUI_Pos p;
@@ -78,7 +82,8 @@ LCUI_Pos Pos(int x, int y)
 	return p;
 }
 
-LCUI_Size Size(int w, int h)
+LCUI_EXPORT(LCUI_Size)
+Size(int w, int h)
 /* 功能：转换成LCUI_Size类型 */
 {
 	LCUI_Size s;
@@ -87,7 +92,8 @@ LCUI_Size Size(int w, int h)
 	return s;
 }
 
-int Size_Cmp(LCUI_Size a, LCUI_Size b)
+LCUI_EXPORT(int)
+Size_Cmp(LCUI_Size a, LCUI_Size b)
 /* 
  * 功能：对比两个尺寸
  * 说明：a大于b，返回1， b大于a，返回-1，相等则返回0
@@ -103,7 +109,8 @@ int Size_Cmp(LCUI_Size a, LCUI_Size b)
 	}
 }
 
-LCUI_Pos Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align)
+LCUI_EXPORT(LCUI_Pos)
+Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align)
 /* 功能：根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */
 {
 	LCUI_Pos pos;
@@ -146,7 +153,8 @@ LCUI_Pos Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align)
 	return pos;
 }
 
-LCUI_Padding Padding(int top, int bottom, int left, int right)
+LCUI_EXPORT(LCUI_Padding)
+Padding(int top, int bottom, int left, int right)
 {
 	LCUI_Padding padding;
 	
@@ -158,7 +166,8 @@ LCUI_Padding Padding(int top, int bottom, int left, int right)
 	return padding;
 }
 
-LCUI_Pos Pos_Add(LCUI_Pos a, LCUI_Pos b)
+LCUI_EXPORT(LCUI_Pos)
+Pos_Add(LCUI_Pos a, LCUI_Pos b)
 /* 功能：求两个LCUI_Pos类型变量的和 */
 {
 	a.x += b.x;
@@ -166,7 +175,8 @@ LCUI_Pos Pos_Add(LCUI_Pos a, LCUI_Pos b)
 	return a;
 }
 
-int Pos_Cmp(LCUI_Pos a, LCUI_Pos b)
+LCUI_EXPORT(int)
+Pos_Cmp(LCUI_Pos a, LCUI_Pos b)
 /* 功能：对比两个坐标是否一致 */
 {
 	if(a.x != b.x || a.y != b.y) {
@@ -175,7 +185,8 @@ int Pos_Cmp(LCUI_Pos a, LCUI_Pos b)
 	return 0;
 }
 
-LCUI_Pos Pos_Sub(LCUI_Pos a, LCUI_Pos b)
+LCUI_EXPORT(LCUI_Pos)
+Pos_Sub(LCUI_Pos a, LCUI_Pos b)
 /* 功能：求两个LCUI_Pos类型变量的差 */
 {
 	a.x -= b.x;
@@ -183,7 +194,8 @@ LCUI_Pos Pos_Sub(LCUI_Pos a, LCUI_Pos b)
 	return a;
 }
 
-void PX_P_t_init( PX_P_t *combo_num )
+LCUI_EXPORT(void)
+PX_P_t_init( PX_P_t *combo_num )
 /* 初始化PX_P_t */
 {
 	combo_num->which_one = 0;
@@ -191,7 +203,8 @@ void PX_P_t_init( PX_P_t *combo_num )
 	combo_num->scale = 0.0;
 }
 
-void PX_PT_t_init( PX_PT_t *combo_num )
+LCUI_EXPORT(void)
+PX_PT_t_init( PX_PT_t *combo_num )
 /* 初始化PX_PT_t */
 {
 	combo_num->which_one = 0;
@@ -199,7 +212,8 @@ void PX_PT_t_init( PX_PT_t *combo_num )
 	combo_num->pt = 0;
 }
 
-int get_PX_P_t( char *str, PX_P_t *combo_num )
+LCUI_EXPORT(int)
+get_PX_P_t( char *str, PX_P_t *combo_num )
 /* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是百分比 */
 {
 	char buff[256];
@@ -259,7 +273,8 @@ int get_PX_P_t( char *str, PX_P_t *combo_num )
 }
 
 
-int get_PX_PT_t( char *str, PX_PT_t *combo_num )
+LCUI_EXPORT(int)
+get_PX_PT_t( char *str, PX_PT_t *combo_num )
 /* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是PT */
 {
 	char buff[256];

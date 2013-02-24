@@ -24,7 +24,7 @@ static int detect_image(const char *filepath, LCUI_Graph *out)
 	return result;
 }
 
-int Load_Image(const char *filepath, LCUI_Graph *out)
+LCUI_EXPORT(int) Load_Image(const char *filepath, LCUI_Graph *out)
 /* 
  * 功能：载入指定图片文件的图形数据
  * 说明：打开图片文件，并解码至内存，打开的图片文件越大，占用的内存也就越大 

@@ -16,7 +16,8 @@ LCUI_System LCUI_Sys;
 
 /************************* App Management *****************************/
 /* 根据程序的ID，获取指向程序数据结构的指针 */
-LCUI_App *LCUIApp_Find( LCUI_ID id )
+LCUI_EXPORT(LCUI_App*)
+LCUIApp_Find( LCUI_ID id )
 {
 	LCUI_App *app; 
 	int i, total;
@@ -35,7 +36,8 @@ LCUI_App *LCUIApp_Find( LCUI_ID id )
 }
 
 /* 获取指向程序数据的指针 */
-LCUI_App* LCUIApp_GetSelf( void )
+LCUI_EXPORT(LCUI_App*)
+LCUIApp_GetSelf( void )
 {
 	LCUI_Thread id;
 	
@@ -52,12 +54,14 @@ LCUI_App* LCUIApp_GetSelf( void )
 }
 
 /* 获取程序ID */
-LCUI_ID LCUIApp_GetSelfID( void )
+LCUI_EXPORT(LCUI_ID)
+LCUIApp_GetSelfID( void )
 {
 	return (LCUI_ID)LCUIThread_SelfID();
 }
 
-void LCUI_App_Init( LCUI_App *app )
+LCUI_EXPORT(void)
+LCUI_App_Init( LCUI_App *app )
 /* 功能：初始化程序数据结构体 */
 {
 	app->id = 0;
@@ -227,7 +231,8 @@ LCUI_MainLoopQueue_Sort( void )
 }
 
 /* 新建一个主循环 */
-LCUI_MainLoop *LCUI_MainLoop_New( void )
+LCUI_EXPORT(LCUI_MainLoop*)
+LCUI_MainLoop_New( void )
 {
 	LCUI_MainLoop *loop;
 	
@@ -249,7 +254,8 @@ LCUI_MainLoop *LCUI_MainLoop_New( void )
 }
 
 /* 设定主循环等级，level值越高，处理主循环退出时，也越早处理该循环 */
-int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
+LCUI_EXPORT(int)
+LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
 {
 	if( loop == NULL ) {
 		return -1;
@@ -298,7 +304,8 @@ LCUIApp_RunTask( LCUI_App *app )
 }
 
 /* 运行目标循环 */
-int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
+LCUI_EXPORT(int)
+LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 {
 	LCUI_App *app;
 	int idle_time = 1;
@@ -327,7 +334,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 			TranslateMessage (&msg) ;
 			DispatchMessage (&msg) ;
 		} else {
-			loop->quit = FALSE;
+			loop->quit = TRUE;
 		}
 #endif
 	}
@@ -337,7 +344,8 @@ int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 }
 
 /* 标记目标主循环需要退出 */
-int LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
+LCUI_EXPORT(int)
+LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
 {
 	if( loop == NULL ) {
 		loop = LCUI_MainLoopQueue_Find();
@@ -369,10 +377,11 @@ static void LCUIModule_Cursor_Init( void )
 	LCUI_Graph pic;
 	Graph_Init( &pic );
 	Load_Graph_Default_Cursor( &pic );/* 载入自带的游标的图形数据 */ 
-	Set_Cursors_Graph( &pic );
+	LCUICursor_SetGraph( &pic );
 }
 
-LCUI_BOOL LCUI_Active()
+LCUI_EXPORT(LCUI_BOOL)
+LCUI_Active()
 /* 功能：检测LCUI是否活动 */
 {
 	if(LCUI_Sys.state == ACTIVE) {
@@ -382,7 +391,8 @@ LCUI_BOOL LCUI_Active()
 }
 
 //extern int debug_mark;
-int LCUI_Init(int argc, char *argv[])
+LCUI_EXPORT(int)
+LCUI_Init(int argc, char *argv[])
 /* 
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
@@ -416,8 +426,8 @@ int LCUI_Init(int argc, char *argv[])
 		LCUIModule_Cursor_Init();
 		LCUIModule_Widget_Init();
 		/* 让鼠标游标居中显示 */
-		Set_Cursor_Pos( LCUIScreen_GetCenter() );  
-		Show_Cursor();
+		LCUICursor_SetPos( LCUIScreen_GetCenter() );  
+		LCUICursor_Show();
 	} else {
 		temp = LCUI_AppList_Add();
 		if(temp != 0) {
@@ -435,7 +445,8 @@ int LCUI_Init(int argc, char *argv[])
  * 功能：LCUI程序的主循环
  * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
  *  */
-int LCUI_Main( void )
+LCUI_EXPORT(int)
+LCUI_Main( void )
 {
 	LCUI_MainLoop *loop;
 	loop = LCUI_MainLoop_New();
@@ -444,7 +455,8 @@ int LCUI_Main( void )
 }
 
 /* 获取LCUI的版本 */
-int LCUI_GetSelfVersion( char *out )
+LCUI_EXPORT(int)
+LCUI_GetSelfVersion( char *out )
 {
 	return sprintf(out, "%s", LCUI_VERSION);
 }

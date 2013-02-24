@@ -104,7 +104,7 @@ static void FontLIB_DestroyFontInfo( void *arg )
 	
 }
 
-void FontLIB_DestroyAll( void )
+LCUI_EXPORT(void) FontLIB_DestroyAll( void )
 {
 	if( !database_init ) {
 		return;
@@ -133,7 +133,8 @@ static void FontLIB_CharInit( LCUI_FontCharItem *item )
 }
 
 /* 初始化字体数据库 */
-void FontLIB_Init( void )
+LCUI_EXPORT(void)
+FontLIB_Init( void )
 {
 	if( database_init ) {
 		return;
@@ -157,7 +158,8 @@ void FontLIB_Init( void )
 }
 
 /* 通过字体文件路径来查找字体信息，并获取字体ID */
-int FontLIB_FindInfoByFilePath( const char *filepath )
+LCUI_EXPORT(int)
+FontLIB_FindInfoByFilePath( const char *filepath )
 {
 	int i, n;
 	LCUI_FontInfo *item;
@@ -179,7 +181,8 @@ int FontLIB_FindInfoByFilePath( const char *filepath )
 }
 
 /* 获取指定字体ID的字体face对象句柄 */
-LCUI_FontInfo *FontLIB_GetFont( int font_id )
+LCUI_EXPORT(LCUI_FontInfo*)
+FontLIB_GetFont( int font_id )
 {
 	int i, n;
 	LCUI_FontInfo *item;
@@ -201,7 +204,8 @@ LCUI_FontInfo *FontLIB_GetFont( int font_id )
 }
 
 /* 获取指定字族名的字体ID */
-int FontLIB_GetFontIDByFamilyName( const char *family_name )
+LCUI_EXPORT(int)
+FontLIB_GetFontIDByFamilyName( const char *family_name )
 {
 	int i, n;
 	LCUI_FontInfo *item;
@@ -224,7 +228,8 @@ int FontLIB_GetFontIDByFamilyName( const char *family_name )
 }
 
 /* 获取指定字体ID的字体face对象句柄 */
-FT_Face FontLIB_GetFontFace( int font_id )
+LCUI_EXPORT(FT_Face)
+FontLIB_GetFontFace( int font_id )
 {
 	LCUI_FontInfo *info;
 	info = FontLIB_GetFont( font_id );
@@ -235,7 +240,8 @@ FT_Face FontLIB_GetFontFace( int font_id )
 }
 
 /* 获取默认的字体ID */
-int FontLIB_GetDefaultFontID( void )
+LCUI_EXPORT(int)
+FontLIB_GetDefaultFontID( void )
 {
 	if( !default_font ) {
 		return -1;
@@ -244,7 +250,8 @@ int FontLIB_GetDefaultFontID( void )
 }
 
 /* 设定默认的字体 */
-void FontLIB_SetDefaultFont( int id )
+LCUI_EXPORT(void)
+FontLIB_SetDefaultFont( int id )
 {
 	LCUI_FontInfo *p;
 	p = FontLIB_GetFont( id );
@@ -254,7 +261,7 @@ void FontLIB_SetDefaultFont( int id )
 }
 
 /* 添加字体族，并返回该字族的ID */
-int
+LCUI_EXPORT(int)
 FontLIB_AddFontInfo(	const char *family_name, const char *style_name, 
 			const char *filepath, FT_Face face )
 {
@@ -331,7 +338,7 @@ FontLIB_GetCharItem( wchar_t char_code )
  * 注意：调用此函数后，作为参数fontbmp_buff的变量，不能被free掉，否则，数据库中记录
  * 的此数据会无效 
  * */
-LCUI_FontBMP *
+LCUI_EXPORT(LCUI_FontBMP*)
 FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 			int pixel_size,	 LCUI_FontBMP *fontbmp_buff )
 {
@@ -394,7 +401,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 }
 
 /* 获取字体位图数据 */
-LCUI_FontBMP *
+LCUI_EXPORT(LCUI_FontBMP*)
 FontLIB_GetFontBMP( wchar_t char_code, int font_id, int pixel_size )
 {
 	LCUI_FontCharItem *font;
@@ -424,7 +431,8 @@ FontLIB_GetFontBMP( wchar_t char_code, int font_id, int pixel_size )
 }
 
 /* 载入字体值数据库中 */
-int FontLIB_LoadFontFile( const char *filepath )
+LCUI_EXPORT(int)
+FontLIB_LoadFontFile( const char *filepath )
 {
 	int id;
 #ifdef LCUI_FONT_ENGINE_FREETYPE

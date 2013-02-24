@@ -4,7 +4,7 @@
 
 #include <memory.h>
 
-int Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
+LCUI_EXPORT(int) Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 /* 功能：绘制进度条的空槽 */
 {
 	int i, n;

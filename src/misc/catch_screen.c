@@ -47,7 +47,8 @@
 #include LC_DISPLAY_H
 #include <time.h>
 
-void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
+LCUI_EXPORT(void)
+Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 /* 
  * 功能：通过内存中的图像数据，捕获将在屏幕上显示的图像
  * 说明：效率较低，因为需要进行合成。
@@ -56,7 +57,8 @@ void Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out)
 	LCUIScreen_GetRealGraph(area, out);
 }
 
-void Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
+LCUI_EXPORT(void)
+Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out)
 /* 
  * 功能：直接读取帧缓冲中的图像数据
  * 说明：效率较高，但捕获的图像有可能会有问题。
@@ -135,7 +137,8 @@ static void catch( void *unused )
 	LCUIThread_Exit(NULL);
 }
 
-int start_record_screen( LCUI_Rect area )
+LCUI_EXPORT(int)
+start_record_screen( LCUI_Rect area )
 /* 录制屏幕指定区域的内容 */
 {
 	if( t != 0 ) {
@@ -146,7 +149,8 @@ int start_record_screen( LCUI_Rect area )
 	return LCUIThread_Create(&t, catch, NULL );
 }
 
-int end_catch_screen()
+LCUI_EXPORT(int)
+end_catch_screen()
 /* 结束录制 */
 {
 	if( t == 0 ) {

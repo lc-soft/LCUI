@@ -97,7 +97,8 @@ ThreadTree_Find( Thread_TreeNode *ttn, LCUI_Thread tid )
 }
 
 /* 获取指定线程的根线程ID */
-LCUI_Thread LCUIThread_GetRootThreadID( LCUI_Thread tid )
+LCUI_EXPORT(LCUI_Thread)
+LCUIThread_GetRootThreadID( LCUI_Thread tid )
 {
 	Thread_TreeNode *ttn;
 	ttn = ThreadTree_Find(&thread_tree, tid);
@@ -165,7 +166,8 @@ ThreadTreeNode_Delete( Thread_TreeNode *ttn, LCUI_Thread tid )
 }
 
 /* 创建并运行一个线程 */
-int LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg )
+LCUI_EXPORT(int)
+LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg )
 {
 	Thread_TreeNode *tt;
 	LCUI_Thread cur_tid;
@@ -186,7 +188,8 @@ int LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg )
 }
 
 /* 等待一个线程的结束，并释放该线程的资源 */
-int LCUIThread_Join( LCUI_Thread thread, void **retval )
+LCUI_EXPORT(int)
+LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
 	int ret;
 	ret = _LCUIThread_Join( thread, retval );
@@ -198,14 +201,16 @@ int LCUIThread_Join( LCUI_Thread thread, void **retval )
 }
 
 /* 撤销一个线程 */
-void LCUIThread_Cancel( LCUI_Thread thread )
+LCUI_EXPORT(void)
+LCUIThread_Cancel( LCUI_Thread thread )
 {
 	_LCUIThread_Cancel( thread );
 	ThreadTreeNode_Delete( &thread_tree, thread );
 }
 
 /* 记录指针作为返回值，并退出线程 */
-void LCUIThread_Exit( void* retval )
+LCUI_EXPORT(void)
+LCUIThread_Exit( void* retval )
 {
 	_LCUIThread_Exit( retval );
 }
@@ -232,7 +237,8 @@ static void LCUIThreadTree_Cancel( Thread_TreeNode *ttn )
 }
 
 /* 撤销指定ID的程序的全部子线程 */
-int LCUIApp_CancelAllThreads( LCUI_ID app_id )
+LCUI_EXPORT(int)
+LCUIApp_CancelAllThreads( LCUI_ID app_id )
 {
 	int i, n;
 	Thread_TreeNode *ttn, *child;
@@ -254,7 +260,8 @@ int LCUIApp_CancelAllThreads( LCUI_ID app_id )
 }
 
 /* 初始化线程模块 */
-void LCUIModule_Thread_Init( void )
+LCUI_EXPORT(void)
+LCUIModule_Thread_Init( void )
 {
 	Thread_TreeNode_Init( &thread_tree ); /* 初始化根线程结点 */
 	thread_tree.tid = LCUIThread_SelfID(); /* 当前线程ID作为根结点 */
@@ -262,7 +269,8 @@ void LCUIModule_Thread_Init( void )
 }
 
 /* 停用线程模块 */
-void LCUIModule_Thread_End( void )
+LCUI_EXPORT(void)
+LCUIModule_Thread_End( void )
 {
 	Destroy_Queue( &thread_tree.child );
 }

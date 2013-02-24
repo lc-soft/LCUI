@@ -6,7 +6,7 @@
 
 #include <math.h>
 
-int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
+LCUI_EXPORT(int) GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 /* 对图像进行高斯模糊处理 */
 {
 	LCUI_Graph temp;
@@ -133,7 +133,7 @@ int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 	return 0;
 }
 
-int Graph_Smooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
+LCUI_EXPORT(int) Graph_Smooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 /* 对图像进行模糊处理 */
 {
 	return GaussianSmooth( src, des, sigma );

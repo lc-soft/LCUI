@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int Load_Graph_ProgressBar_Fore(LCUI_Graph *out)
+LCUI_EXPORT(int) Load_Graph_ProgressBar_Fore(LCUI_Graph *out)
 {
 	unsigned char red[]={
 		201,200,199,199,198,197,196,195,194,193,192,191,189,188,187,186,184,183,182,180,179,178,176,175,174,172,171,170,168,167,166,165,164,
@@ -81,7 +81,7 @@ int Load_Graph_ProgressBar_Fore(LCUI_Graph *out)
 }
 
 
-int Load_Graph_ProgressBar_Img(LCUI_Graph *out)
+LCUI_EXPORT(int) Load_Graph_ProgressBar_Img(LCUI_Graph *out)
 {
 	unsigned char alpha[]={
 		26, 30,34,37,43,47,53,58,65,70,78,84,92,98,106,112,121,129,137,143,151,157,164,168,174,179,184,188,191,193,194,194,194,

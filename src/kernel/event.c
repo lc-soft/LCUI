@@ -19,7 +19,8 @@ static void LCUI_DestroyEvents( void )
 }
 
 /* 从事件队列中获取事件 */
-LCUI_BOOL LCUI_PollEvent( LCUI_Event *event )
+LCUI_EXPORT(LCUI_BOOL)
+LCUI_PollEvent( LCUI_Event *event )
 {
 	LCUI_Event *tmp;
 	
@@ -155,7 +156,8 @@ static int LCUI_StartEventThread( void )
 }
 
 /* 初始化事件模块 */
-void LCUIModule_Event_Init( void )
+LCUI_EXPORT(void)
+LCUIModule_Event_Init( void )
 {
 	EventSlots_Init( &LCUI_Sys.sys_event_slots );
 	EventSlots_Init( &LCUI_Sys.user_event_slots );
@@ -164,7 +166,8 @@ void LCUIModule_Event_Init( void )
 }
 
 /* 停用事件模块 */
-void LCUIModule_Event_End( void )
+LCUI_EXPORT(void)
+LCUIModule_Event_End( void )
 {
 	LCUI_StopEventThread();
 	LCUI_DestroyEvents();
@@ -173,7 +176,8 @@ void LCUIModule_Event_End( void )
 }
 
 /* 添加事件至事件队列中 */
-LCUI_BOOL LCUI_PushEvent( LCUI_Event *event )
+LCUI_EXPORT(LCUI_BOOL)
+LCUI_PushEvent( LCUI_Event *event )
 {
 	if( !active ) {
 		return FALSE;
@@ -198,15 +202,17 @@ static void Destroy_EventSlot( void *arg )
 }
 
 /* 初始化事件槽记录 */
-void EventSlots_Init( LCUI_Queue *slots )
+LCUI_EXPORT(void)
+EventSlots_Init( LCUI_Queue *slots )
 {
 	Queue_Init( slots, sizeof(LCUI_EventSlot), Destroy_EventSlot);
 }
 
 /* 将函数指针以及两个参数，转换成LCUI_Func类型，保存至p_buff指向的缓冲区中 */
-LCUI_BOOL Get_FuncData(	LCUI_Func *p_buff, 
-			void (*func) (),
-			void *arg1, void *arg2 )
+LCUI_EXPORT(LCUI_BOOL)
+Get_FuncData(	LCUI_Func *p_buff, 
+		void (*func) (),
+		void *arg1, void *arg2 )
 {
 	LCUI_App *app;
 	app = LCUIApp_GetSelf();
@@ -230,7 +236,7 @@ LCUI_BOOL Get_FuncData(	LCUI_Func *p_buff,
 }
 
 /* 根据事件的ID，获取与该事件关联的事件槽 */
-LCUI_EventSlot *
+LCUI_EXPORT(LCUI_EventSlot*)
 EventSlots_Find( LCUI_Queue *slots, int event_id )
 {
 	int i, total;  
@@ -250,7 +256,8 @@ EventSlots_Find( LCUI_Queue *slots, int event_id )
 }
 
 /* 添加事件槽与事件的关联记录 */
-int EventSlots_Add( LCUI_Queue *slots, int event_id, LCUI_Func *func )
+LCUI_EXPORT(int)
+EventSlots_Add( LCUI_Queue *slots, int event_id, LCUI_Func *func )
 {
 	LCUI_EventSlot *slot;
 	
@@ -273,7 +280,8 @@ int EventSlots_Add( LCUI_Queue *slots, int event_id, LCUI_Func *func )
 }
 
 /* 将回调函数与键盘按键事件进行连接 */
-int LCUI_KeyboardEvent_Connect( 
+LCUI_EXPORT(int)
+LCUI_KeyboardEvent_Connect( 
 		void (*func)(LCUI_KeyboardEvent*, void*), 
 		void *arg )
 {
@@ -286,7 +294,8 @@ int LCUI_KeyboardEvent_Connect(
 }
 
 /* 将回调函数与鼠标移动事件进行连接 */
-int LCUI_MouseMotionEvent_Connect( 
+LCUI_EXPORT(int)
+LCUI_MouseMotionEvent_Connect( 
 		void (*func)(LCUI_MouseMotionEvent*, void*), 
 		void *arg )
 {
@@ -299,7 +308,8 @@ int LCUI_MouseMotionEvent_Connect(
 }
 
 /* 将回调函数与鼠标按键事件进行连接 */
-int LCUI_MouseButtonEvent_Connect( 
+LCUI_EXPORT(int)
+LCUI_MouseButtonEvent_Connect( 
 		void (*func)(LCUI_MouseButtonEvent*, void*), 
 		void *arg )
 {
@@ -317,7 +327,8 @@ int LCUI_MouseButtonEvent_Connect(
 }
 
 /* 将回调函数与用户自定义的事件进行连接 */
-int LCUI_UserEvent_Connect( int event_id, void (*func)(void*, void*) )
+LCUI_EXPORT(int)
+LCUI_UserEvent_Connect( int event_id, void (*func)(void*, void*) )
 {
 	LCUI_Func func_data;
 	if( !Get_FuncData( &func_data, func, NULL, NULL ) ) {
