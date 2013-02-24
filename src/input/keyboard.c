@@ -226,7 +226,7 @@ LCUIKeyboard_Get( void )
 }
 
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
-static LCUI_BOOL proc_keyboard()
+static LCUI_BOOL proc_keyboard(void)
 {
 	LCUI_Event event;
 	 /* 如果没有按键输入 */ 
@@ -292,7 +292,7 @@ LCUIModule_Keyboard_Init( void )
 {
 	Queue_Init( &LCUI_Sys.press_key, sizeof(int), NULL );
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
-	LCUI_Dev_Add( Enable_Keyboard_Input, proc_keyboard, Disable_Keyboard_Input );
+	LCUIDevice_Add( Enable_Keyboard_Input, proc_keyboard, Disable_Keyboard_Input );
 #endif
 }
 

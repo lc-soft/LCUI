@@ -212,7 +212,7 @@ LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type )
 }
 
 #ifdef LCUI_MOUSE_DRIVER_LINUX
-static LCUI_BOOL proc_mouse( void *arg )
+static LCUI_BOOL proc_mouse( void )
 {
 	static int  tmp; 
 	static char buf[6]; 
@@ -322,7 +322,7 @@ static void Win32_LCUIMouse_PushMotionEvent( LCUI_Pos pos )
 	LCUI_PushMouseMotionEvent( pos, key_state );
 }
 
-static LCUI_BOOL proc_mouse( void *arg )
+static LCUI_BOOL proc_mouse( void )
 {
 	static int  tmp; 
 	static char buf[6]; 
@@ -354,7 +354,7 @@ static LCUI_BOOL proc_mouse( void *arg )
 #endif
 
 LCUI_EXPORT(LCUI_BOOL)
-Enable_Mouse_Input()
+Enable_Mouse_Input(void)
 /* 功能：启用鼠标输入处理 */
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
@@ -385,7 +385,7 @@ Enable_Mouse_Input()
 }
 
 LCUI_EXPORT(LCUI_BOOL)
-Disable_Mouse_Input()
+Disable_Mouse_Input(void)
 /* 功能：禁用鼠标输入处理 */
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
@@ -413,7 +413,7 @@ LCUIModule_Mouse_Init( void )
 	nobuff_printf("enable mouse input: ");
 #endif
 	/* 注册鼠标设备 */
-	return LCUI_Dev_Add( Enable_Mouse_Input, 
+	return LCUIDevice_Add( Enable_Mouse_Input, 
 			proc_mouse, Disable_Mouse_Input );
 }
 /**************************** Mouse End *******************************/

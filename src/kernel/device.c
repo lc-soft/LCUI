@@ -14,9 +14,9 @@ dev_list_init( LCUI_Queue *dev_list )
  * 说明：为指定设备添加处理函数
  * */
 LCUI_EXPORT(int)
-LCUI_Dev_Add(	LCUI_BOOL (*init_func)(), 
-		LCUI_BOOL (*proc_func)(), 
-		LCUI_BOOL (*destroy_func)() )
+LCUIDevice_Add(	LCUI_BOOL (*init_func)(void), 
+		LCUI_BOOL (*proc_func)(void), 
+		LCUI_BOOL (*destroy_func)(void) )
 {
 	dev_func_data data;
 	

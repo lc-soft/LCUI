@@ -61,7 +61,7 @@ LCUI_TS;
 
 static LCUI_TS ts_data;
 
-static LCUI_BOOL proc_touchscreen()
+static LCUI_BOOL proc_touchscreen(void)
 {
 #ifdef USE_TSLIB
 	struct ts_sample samp;
@@ -103,7 +103,7 @@ static LCUI_BOOL proc_touchscreen()
 }
 
 LCUI_EXPORT(LCUI_BOOL)
-Enable_TouchScreen_Input()
+Enable_TouchScreen_Input(void)
 /* 功能：启用触屏输入处理 */
 { 
 #ifdef USE_TSLIB
@@ -138,7 +138,7 @@ Enable_TouchScreen_Input()
 }
 
 LCUI_EXPORT(LCUI_BOOL)
-Disable_TouchScreen_Input()
+Disable_TouchScreen_Input(void)
 /* 功能：撤销触屏输入处理 */
 {
 #ifdef USE_TSLIB
@@ -154,7 +154,7 @@ Disable_TouchScreen_Input()
 }
 
 LCUI_EXPORT(void*)
-Get_TouchScreen()
+Get_TouchScreen(void)
 /* 获取触屏设备文件句柄 */
 {
 	return ts_data.td;
@@ -166,6 +166,6 @@ LCUIModule_TouchScreen_Init( void )
 {
 	ts_data.td = NULL;
 	ts_data.state = REMOVE;
-	LCUI_Dev_Add( Enable_TouchScreen_Input, proc_touchscreen,
+	LCUIDevice_Add( Enable_TouchScreen_Input, proc_touchscreen,
 			Disable_TouchScreen_Input );
 }

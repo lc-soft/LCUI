@@ -36,7 +36,7 @@ LCUIApp_Find( LCUI_ID id )
 }
 
 /* 获取指向程序数据的指针 */
-LCUI_EXPORT(LCUI_App*)
+LCUI_EXPORT(LCUI_App*) 
 LCUIApp_GetSelf( void )
 {
 	LCUI_Thread id;
@@ -61,7 +61,7 @@ LCUIApp_GetSelfID( void )
 }
 
 LCUI_EXPORT(void)
-LCUI_App_Init( LCUI_App *app )
+LCUIApp_Init( LCUI_App *app )
 /* 功能：初始化程序数据结构体 */
 {
 	app->id = 0;
@@ -97,15 +97,16 @@ static void LCUI_Quit( void )
 }
 
 
-static int LCUI_AppList_Delete (LCUI_ID app_id)
-/* 功能：关闭一个LCUI程序 */
+/* 从程序列表中删除一个LCUI程序信息 */
+static int LCUIAppList_Delete( LCUI_ID app_id )
 {
 	int pos = -1;
 	LCUI_App *app; 
 	int i, total;  
 	
 	total = Queue_Get_Total(&LCUI_Sys.app_list);
-	if (total > 0) { /* 如果程序总数大于0， 查找程序信息所在队列的位置 */
+	/* 如果程序总数大于0，查找程序信息所在队列的位置 */
+	if (total > 0) { 
 		for (i = 0; i < total; ++i) {
 			app = Queue_Get(&LCUI_Sys.app_list, i);
 			if(app->id == app_id) {
@@ -121,15 +122,15 @@ static int LCUI_AppList_Delete (LCUI_ID app_id)
 	}
 	/* 从程序显示顺序队列中删除这个程序ID */ 
 	Queue_Delete (&LCUI_Sys.app_list, pos); 
-	
-	if (Queue_Empty(&LCUI_Sys.app_list)) {/* 如果程序列表为空 */  
-		LCUI_Quit (); /* 退出LCUI */ 
+	/* 如果程序列表为空,就退出LCUI */  
+	if (Queue_Empty(&LCUI_Sys.app_list)) {
+		LCUI_Quit();
 	}
 	return 0;
 }
 
-static void LCUI_Destroy_App( void *arg )
-/* 功能：销毁程序相关信息 */
+/* 销毁程序占用的资源 */
+static void LCUIApp_Destroy( void *arg )
 {
 	LCUI_App *app;
 	app = (LCUI_App *)arg;
@@ -140,39 +141,39 @@ static void LCUI_Destroy_App( void *arg )
 	LCUIApp_DestroyAllWidgets( app->id ); /* 销毁这个程序的所有部件 */
 }
 
-static void LCUI_AppList_Init()
-/* 功能：初始化程序数据表 */
+/* 初始化程序数据表 */
+static void LCUIAppList_Init(void)
 {
-	Queue_Init(&LCUI_Sys.app_list, sizeof(LCUI_App), LCUI_Destroy_App);
+	Queue_Init(&LCUI_Sys.app_list, sizeof(LCUI_App), LCUIApp_Destroy);
 }
 
-static int LCUI_AppList_Add ()
 /* 
  * 功能：创建一个LCUI程序
  * 说明：此函数会将程序信息添加至程序列表
  * 返回值：成功则返回程序的ID，失败则返回-1
  **/
+static int LCUIAppList_Add( void )
 {
 	LCUI_App app;
 	
 	/* 初始化程序数据结构体 */
-	LCUI_App_Init (&app);
+	LCUIApp_Init (&app);
 	app.id	= LCUIThread_SelfID(); /* 保存ID */ 
 	Queue_Add(&LCUI_Sys.app_list, &app);/* 添加至队列 */
 	return 0;
 }
 
-static int App_Quit()
-/* 功能：退出程序 */
+/* 退出程序 */
+static int LCUIApp_Quit(void)
 {
 	LCUI_App *app;
 	app = LCUIApp_GetSelf();
 	if( !app ) {
-		printf("App_Quit(): "APP_ERROR_UNRECORDED_APP);
+		printf("%s (): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
 		return -1;
 	} 
 	
-	return LCUI_AppList_Delete(app->id); 
+	return LCUIAppList_Delete(app->id); 
 }
 
 /*********************** App Management End ***************************/
@@ -406,9 +407,9 @@ LCUI_Init(int argc, char *argv[])
 		srand(time(NULL));
 		LCUI_ShowCopyrightText();
 		
-		LCUI_AppList_Init( &LCUI_Sys.app_list );
+		LCUIAppList_Init();
 		/* 注册程序 */
-		temp = LCUI_AppList_Add();
+		temp = LCUIAppList_Add();
 		if(temp != 0) {
 			printf(APP_ERROR_REGISTER_ERROR);
 			abort();
@@ -429,7 +430,7 @@ LCUI_Init(int argc, char *argv[])
 		LCUICursor_SetPos( LCUIScreen_GetCenter() );  
 		LCUICursor_Show();
 	} else {
-		temp = LCUI_AppList_Add();
+		temp = LCUIAppList_Add();
 		if(temp != 0) {
 			printf(APP_ERROR_REGISTER_ERROR);
 			abort();
@@ -451,7 +452,7 @@ LCUI_Main( void )
 	LCUI_MainLoop *loop;
 	loop = LCUI_MainLoop_New();
 	LCUI_MainLoop_Run( loop );
-	return App_Quit ();
+	return LCUIApp_Quit ();
 }
 
 /* 获取LCUI的版本 */
