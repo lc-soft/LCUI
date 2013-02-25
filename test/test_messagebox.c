@@ -36,12 +36,12 @@ show_msgbox( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 	MB_ICON_TYPE icon_type;
 	/* 根据所选中的单选框，得出参数 */
 	for(i=0,btn_type=0; i<6; ++i,++btn_type) {
-		if( RadioButton_Is_On(rb_btn[i]) ) {
+		if( RadioButton_IsOn(rb_btn[i]) ) {
 			break;
 		}
 	}
 	for(i=0,icon_type=0; i<5; ++i,++icon_type) {
-		if( RadioButton_Is_On(rb_icon[i]) ) {
+		if( RadioButton_IsOn(rb_icon[i]) ) {
 			break;
 		}
 	}
@@ -73,11 +73,11 @@ int main(int argc, char*argv[])
 	Widget_Show( label_btn );
 	
 	for(i=0; i<6; ++i) {
-		rb_btn[i] = Create_RadioButton_With_Text( rb_btn_text[i] );
+		rb_btn[i] = RadioButton_New( rb_btn_text[i] );
 		if( i>0 ) {
-			RadioButton_Create_Mutex( rb_btn[0], rb_btn[i] );
+			RadioButton_CreateMutex( rb_btn[0], rb_btn[i] );
 		} else {
-			Set_RadioButton_On( rb_btn[0] );
+			RadioButton_SetOn( rb_btn[0] );
 		}
 		Window_ClientArea_Add( window, rb_btn[i] );
 		y += 16;
@@ -92,11 +92,11 @@ int main(int argc, char*argv[])
 	Widget_Show( label_icon );
 	
 	for(i=0; i<5; ++i) {
-		rb_icon[i] = Create_RadioButton_With_Text( rb_icon_text[i] );
+		rb_icon[i] = RadioButton_New( rb_icon_text[i] );
 		if( i>0 ) {
-			RadioButton_Create_Mutex( rb_icon[0], rb_icon[i] );
+			RadioButton_CreateMutex( rb_icon[0], rb_icon[i] );
 		} else {
-			Set_RadioButton_On( rb_icon[0] );
+			RadioButton_SetOn( rb_icon[0] );
 		}
 		Window_ClientArea_Add( window, rb_icon[i] );
 		/* 计算当前单选框的坐标 */
@@ -110,7 +110,7 @@ int main(int argc, char*argv[])
 		Widget_Show( rb_icon[i] );
 	}
 	
-	Set_Button_Text( btn, "显示MessageBox" );
+	Button_Text( btn, "显示MessageBox" );
 	Widget_SetAlign( btn, ALIGN_BOTTOM_CENTER, Pos(0,-3) );
 	Widget_Resize( btn, Size(80, 20) );
 	Window_ClientArea_Add( window, btn );

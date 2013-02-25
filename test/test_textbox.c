@@ -43,7 +43,7 @@ int main(int argc, char*argv[])
 	Window_SetTitleText(window, "用户登录"); 
 	Label_Text( text[0], "帐号" );
 	Label_Text( text[1], "密码" );
-	Set_Button_Text( login_btn, "登录" );
+	Button_Text( login_btn, "登录" );
 	/* 调整部件的尺寸 */
 	Widget_Resize( login_btn, Size(50, 50) ); 
 	Widget_Resize( window, Size(320, 240) ); 
