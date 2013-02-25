@@ -55,39 +55,40 @@ typedef struct _ScrollBar_Data
 }
 ScrollBar_Data;
 
+/* 获取滚动条部件 */
 LCUI_EXPORT(LCUI_Widget*)
 Get_ScrollBar( LCUI_Widget *widget );
-/* 获取滚动条部件 */
 
-LCUI_EXPORT(ScrollBar_Data)
-ScrollBar_Get_Data ( LCUI_Widget *widget );
 /* 获取滚动条的数据 */
+LCUI_EXPORT(ScrollBar_Data)
+ScrollBar_GetData ( LCUI_Widget *widget );
 
 /* 获取滚动条部件的滑块 */
 LCUI_EXPORT(LCUI_Widget*)
 ScrollBar_GetWidget( LCUI_Widget *widget );
 
-LCUI_EXPORT(void )
-ScrollBar_Set_MaxNum( LCUI_Widget *widget, int max_num );
+LCUI_EXPORT(void)
+ScrollBar_SetMaxNum( LCUI_Widget *widget, int max_num );
 
 LCUI_EXPORT(void)
-ScrollBar_Set_MaxSize( LCUI_Widget *widget, int max_size );
+ScrollBar_SetMaxSize( LCUI_Widget *widget, int max_size );
 
 LCUI_EXPORT(void)
-ScrollBar_Set_CurrentNum( LCUI_Widget *widget, int current_num );
+ScrollBar_SetCurrentValue( LCUI_Widget *widget, int current_num );
 
 LCUI_EXPORT(void)
-ScrollBar_Set_CurrentSize( LCUI_Widget *widget, int current_size );
+ScrollBar_SetCurrentSize( LCUI_Widget *widget, int current_size );
 
-LCUI_EXPORT(void)
-ScrollBar_Set_Direction( LCUI_Widget *widget, int direction );
-
-LCUI_EXPORT(void)
-ScrollBar_Connect(	LCUI_Widget *widget,
-			void (*callback_func)( ScrollBar_Data, void* ),
-			void *arg );
 /* 将回调函数与滚动条部件连接 */
+LCUI_EXPORT(void)
+ScrollBar_Connect(
+	LCUI_Widget *widget,
+	void (*callback_func)( ScrollBar_Data, void* ),
+	void *arg );
 
+/* 设置滚动条是横向移动还是纵向移动 */
+LCUI_EXPORT(void)
+ScrollBar_SetDirection( LCUI_Widget *widget, int direction );
 LCUI_END_HEADER
 
 #endif

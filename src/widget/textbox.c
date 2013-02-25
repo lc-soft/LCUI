@@ -369,7 +369,7 @@ TextBox_Init( LCUI_Widget *widget )
 	Widget_SetAlign( textbox->scrollbar[0], ALIGN_TOP_RIGHT, Pos(0,0) );
 	Widget_SetAlign( textbox->scrollbar[1], ALIGN_BOTTOM_LEFT, Pos(0,0) );
 	/* 滚动条设为横向 */
-	ScrollBar_Set_Direction( textbox->scrollbar[1], 1 );
+	ScrollBar_SetDirection( textbox->scrollbar[1], 1 );
 	/* 将回调函数与滚动条连接 */
 	ScrollBar_Connect( textbox->scrollbar[0], TextBox_VertScroll_TextLayer, widget );
 	ScrollBar_Connect( textbox->scrollbar[1], TextBox_HoriScroll_TextLayer, widget );
@@ -453,8 +453,8 @@ TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 		Widget_SetSize( label, size_str, NULL );
 		
 		/* 修改滚动条中记录的最大值和当前值，让滚动条在更新后有相应的长度 */
-		ScrollBar_Set_MaxSize( scrollbar[0], layer_size.h );
-		ScrollBar_Set_CurrentSize( scrollbar[0], area_size.h );
+		ScrollBar_SetMaxSize( scrollbar[0], layer_size.h );
+		ScrollBar_SetCurrentSize( scrollbar[0], area_size.h );
 		Widget_Show( scrollbar[0] );
 		/* 如果横向滚动条可见 */
 		if( scrollbar[1]->visible ) {
@@ -484,8 +484,8 @@ TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 #endif
 		Widget_SetSize( label, NULL, size_str );
 		
-		ScrollBar_Set_MaxSize( scrollbar[1], layer_size.w );
-		ScrollBar_Set_CurrentSize( scrollbar[1], area_size.w );
+		ScrollBar_SetMaxSize( scrollbar[1], layer_size.w );
+		ScrollBar_SetCurrentSize( scrollbar[1], area_size.w );
 		Widget_Show( scrollbar[1] );
 		
 		if( scrollbar[0]->visible ) {
@@ -541,7 +541,7 @@ TextBox_ScrollBar_UpdatePos( LCUI_Widget *widget )
 	}
 	area_pos = TextBox_ViewArea_GetPos( widget );
 	//_DEBUG_MSG("area_pos: (%d,%d)\n", area_pos.x, area_pos.y);
-	ScrollBar_Set_MaxNum( scrollbar[0], layer_size.h - area_size.h );
+	ScrollBar_SetMaxNum( scrollbar[0], layer_size.h - area_size.h );
 	
 	if( area_pos.y + area_size.h > layer_size.h ) {
 		area_pos.y = layer_size.h - area_size.h;
@@ -555,13 +555,13 @@ TextBox_ScrollBar_UpdatePos( LCUI_Widget *widget )
 	if( area_pos.x < 0 ) {
 		area_pos.x = 0;
 	}
-	ScrollBar_Set_CurrentNum( scrollbar[0], area_pos.y ); 
-	scrollbar_data = ScrollBar_Get_Data( scrollbar[0] );
+	ScrollBar_SetCurrentValue( scrollbar[0], area_pos.y ); 
+	scrollbar_data = ScrollBar_GetData( scrollbar[0] );
 	TextBox_VertScroll_TextLayer( scrollbar_data, widget );
 	
-	ScrollBar_Set_MaxNum( scrollbar[1], layer_size.w - area_size.w );
-	ScrollBar_Set_CurrentNum( scrollbar[1], area_pos.x );
-	scrollbar_data = ScrollBar_Get_Data( scrollbar[1] );
+	ScrollBar_SetMaxNum( scrollbar[1], layer_size.w - area_size.w );
+	ScrollBar_SetCurrentValue( scrollbar[1], area_pos.x );
+	scrollbar_data = ScrollBar_GetData( scrollbar[1] );
 	TextBox_HoriScroll_TextLayer( scrollbar_data, widget );
 	return 0;
 }
@@ -783,7 +783,7 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	cursor_h = TextLayer_CurRow_GetMaxHeight( layer );
 	
 	/* 设定滚动条的数据中的最大值 */
-	ScrollBar_Set_MaxNum( scrollbar[0], layer_size.h - area_size.h );
+	ScrollBar_SetMaxNum( scrollbar[0], layer_size.h - area_size.h );
 	
 	//_DEBUG_MSG("cursor_pos: %d,%d\n", cursor_pos.x, cursor_pos.y);
 	//_DEBUG_MSG("area_rect: %d,%d,%d,%d\n", 
@@ -805,9 +805,9 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 		area_pos.y = 0;
 	}
 	/* 设定滚动条的数据中的当前值 */
-	ScrollBar_Set_CurrentNum( scrollbar[0], area_pos.y );
+	ScrollBar_SetCurrentValue( scrollbar[0], area_pos.y );
 	/* 获取滚动条的数据，供滚动文本层利用 */
-	scrollbar_data = ScrollBar_Get_Data( scrollbar[0] );
+	scrollbar_data = ScrollBar_GetData( scrollbar[0] );
 	
 	//_DEBUG_MSG("scrollbar_data: size: %d / %d, num: %d / %d\n", 
 	//scrollbar_data.current_size, scrollbar_data.max_size, 
@@ -816,7 +816,7 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	TextBox_VertScroll_TextLayer( scrollbar_data, widget );
 	
 	/* 设定滚动条的数据中的最大值 */
-	ScrollBar_Set_MaxNum( scrollbar[1], layer_size.w - area_size.w );
+	ScrollBar_SetMaxNum( scrollbar[1], layer_size.w - area_size.w );
 	
 	if( cursor_pos.x < area_pos.x ) {
 		area_pos.x = cursor_pos.x;
@@ -831,9 +831,9 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 		area_pos.x = 0;
 	}
 	/* 设定滚动条的数据中的当前值 */
-	ScrollBar_Set_CurrentNum( scrollbar[1], area_pos.x );
+	ScrollBar_SetCurrentValue( scrollbar[1], area_pos.x );
 	/* 获取滚动条的数据，供滚动文本层利用 */
-	scrollbar_data = ScrollBar_Get_Data( scrollbar[1] );
+	scrollbar_data = ScrollBar_GetData( scrollbar[1] );
 	
 	//_DEBUG_MSG("scrollbar_data: size: %d / %d, num: %d / %d\n", 
 	//scrollbar_data.current_size, scrollbar_data.max_size, 
