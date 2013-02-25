@@ -501,6 +501,7 @@ skip_loop:
 		if( !glayer ) {
 			continue;
 		}
+		Graph_Lock( &glayer->graph );
 		pos = GraphLayer_GetGlobalPos( ctnr, glayer );
 		valid_area = GraphLayer_GetValidRect( ctnr, glayer );
 		Quote_Graph( &tmp_graph, &glayer->graph, valid_area ); 
@@ -524,6 +525,7 @@ skip_loop:
 			Graph_Mix( graph_buff, &tmp_graph, pos );
 			glayer->graph.alpha = tmp_alpha;
 		}
+		Graph_Unlock( &glayer->graph );
 	}
 	Destroy_Queue( &glayerQ );
 	return 0;

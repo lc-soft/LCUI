@@ -483,16 +483,18 @@ Graph_Free(LCUI_Graph *pic)
 			pic->src = NULL; 
 			pic->quote = FALSE;
 		} else {
-			free(pic->rgba[0]);
-			free(pic->rgba[1]);
-			free(pic->rgba[2]);
-			if(Graph_Have_Alpha(pic)) {
-				free(pic->rgba[3]);
+			Graph_Lock( p );
+			free(p->rgba[0]);
+			free(p->rgba[1]);
+			free(p->rgba[2]);
+			if(p->have_alpha) {
+				free(p->rgba[3]);
 			}
-			free(pic->rgba);
-			pic->rgba = NULL;
-			pic->width = 0;
-			pic->height = 0;
+			free(p->rgba);
+			p->rgba = NULL;
+			p->width = 0;
+			p->height = 0;
+			Graph_Unlock( p );
 		}
 		LCUIMutex_Destroy( &pic->mutex );
 	}
