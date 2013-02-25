@@ -146,7 +146,7 @@ Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 	LCUI_Label *label;
 	
 	label = Widget_GetPrivData( widget );
-	TextLayer_Text_Set_Default_Style( &label->layer, style );
+	TextLayer_Text_SetDefaultStyle( &label->layer, style );
 	Widget_Draw( widget ); 
 	return 0;
 }

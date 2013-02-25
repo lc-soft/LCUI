@@ -638,7 +638,7 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 }
 
 LCUI_EXPORT(void)
-TextLayer_Text_Set_Default_Style( LCUI_TextLayer *layer, LCUI_TextStyle style )
+TextLayer_Text_SetDefaultStyle( LCUI_TextLayer *layer, LCUI_TextStyle style )
 /* 设定默认的文本样式，需要调用TextLayer_Draw函数进行文本位图更新 */
 {
 	LCUI_Pos pos;

@@ -383,17 +383,17 @@ WidgetFunc_Call( LCUI_Widget *widget, FuncType type )
 	func( widget );
 }
 
-extern void Register_Window();
-extern void Register_Label();
-extern void Register_Button();
-extern void Register_PictureBox();
-extern void Register_ProgressBar();
-extern void Register_Menu();
-extern void Register_CheckBox();
-extern void Register_RadioButton();
-extern void Register_ActiveBox();
-extern void Register_TextBox();
-extern void Register_ScrollBar();
+extern void Register_Window(void);
+extern void Register_Label(void);
+extern void Register_Button(void);
+extern void Register_PictureBox(void);
+extern void Register_ProgressBar(void);
+extern void Register_Menu(void);
+extern void Register_CheckBox(void);
+extern void Register_RadioButton(void);
+extern void Register_ActiveBox(void);
+extern void Register_TextBox(void);
+extern void Register_ScrollBar(void);
 
 LCUI_EXPORT(void)
 Register_Default_Widget_Type()

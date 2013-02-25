@@ -102,15 +102,15 @@ TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos );
 /* 移动文本框内的光标,返回该光标的像素坐标 */
 
 LCUI_EXPORT(int)
-TextBox_Get_Select_Text( LCUI_Widget *widget, char *out_text );
+TextBox_GetSelectedText( LCUI_Widget *widget, char *out_text );
 /* 获取文本框内被选中的文本 */
 
 LCUI_EXPORT(int)
-TextBox_Copy_Select_Text(LCUI_Widget *widget);
+TextBox_CopySelectedText(LCUI_Widget *widget);
 /* 复制文本框内被选中的文本 */
 
 LCUI_EXPORT(int)
-TextBox_Cut_Select_Text(LCUI_Widget *widget);
+TextBox_CutSelectedText(LCUI_Widget *widget);
 /* 剪切文本框内被选中的文本 */
 
 LCUI_EXPORT(void)
@@ -122,12 +122,18 @@ TextBox_Multiline( LCUI_Widget *widget, LCUI_BOOL flag );
 /* 指定文本框是否启用多行文本显示 */
 
 LCUI_EXPORT(void)
-TextBox_Text_Set_MaxLength( LCUI_Widget *widget, int max );
+TextBox_Text_SetMaxLength( LCUI_Widget *widget, int max );
 /* 设置文本框中能够输入的最大字符数 */
 
 LCUI_EXPORT(void)
-TextBox_Text_Set_PasswordChar( LCUI_Widget *widget, wchar_t ch );
+TextBox_Text_SetPasswordChar( LCUI_Widget *widget, wchar_t ch );
 /* 为文本框设置屏蔽字符 */
+
+/* 为文本框设置占位符 */
+LCUI_EXPORT(void)
+TextBox_Text_SetPlaceHolder(	LCUI_Widget *widget, 
+				LCUI_TextStyle *style,
+				const char *str );
 
 LCUI_EXPORT(void)
 TextBox_Text_Limit( LCUI_Widget *widget, int mode );
