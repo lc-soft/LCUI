@@ -48,10 +48,9 @@
 
 LCUI_BEGIN_HEADER
 
-/******************************** Misc *********************************/
+/* 检测result是否包含option */
 LCUI_EXPORT(int)
 Check_Option(int result, int option);
-/* 功能：检测result是否包含option */
 
 LCUI_EXPORT(void)
 Padding_Init( LCUI_Padding *padding );
@@ -59,76 +58,63 @@ Padding_Init( LCUI_Padding *padding );
 LCUI_EXPORT(void)
 Margin_Init( LCUI_Margin *margin );
 
+/* 转换成LCUI_Pos类型 */
 LCUI_EXPORT(LCUI_Pos)
 Pos(int x, int y);
-/* 功能：转换成LCUI_Pos类型 */ 
 
+/* 转换成LCUI_Size类型 */
 LCUI_EXPORT(LCUI_Size)
 Size(int w, int h);
-/* 功能：转换成LCUI_Size类型 */ 
 
-LCUI_EXPORT(int)
-Size_Cmp(LCUI_Size a, LCUI_Size b);
 /* 
  * 功能：对比两个尺寸
  * 说明：a大于b，返回1， b大于a，返回-1，相等则返回0
- * */ 
+ * */
+LCUI_EXPORT(int)
+Size_Cmp(LCUI_Size a, LCUI_Size b);
 
+/* 根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */
 LCUI_EXPORT(LCUI_Pos)
-Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align);
-/* 功能：根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */ 
+Align_Get_Pos( LCUI_Size container, LCUI_Size child, int align );
 
 LCUI_EXPORT(LCUI_Padding)
 Padding(int top, int bottom, int left, int right);
 
+/* 求两个LCUI_Pos类型变量的和 */
 LCUI_EXPORT(LCUI_Pos)
-Pos_Add(LCUI_Pos a, LCUI_Pos b);
-/* 功能：求两个LCUI_Pos类型变量的和 */ 
+Pos_Add( LCUI_Pos a, LCUI_Pos b );
 
+/* 对比两个坐标是否一致 */
 LCUI_EXPORT(int)
-Pos_Cmp(LCUI_Pos a, LCUI_Pos b);
-/* 功能：对比两个坐标是否一致 */ 
+Pos_Cmp( LCUI_Pos a, LCUI_Pos b );
 
+/* 求两个LCUI_Pos类型变量的差 */
 LCUI_EXPORT(LCUI_Pos)
-Pos_Sub(LCUI_Pos a, LCUI_Pos b);
-/* 功能：求两个LCUI_Pos类型变量的差 */ 
-/*************************** End Misc *********************************/
+Pos_Sub( LCUI_Pos a, LCUI_Pos b );
 
-LCUI_EXPORT(void) PX_P_t_init( PX_P_t *combo_num );
-/* 初始化PX_P_t */ 
+/* 初始化PX_P_t */
+LCUI_EXPORT(void)
+PX_P_t_init( PX_P_t *combo_num );
 
-LCUI_EXPORT(void) PX_PT_t_init( PX_PT_t *combo_num );
-/* 初始化PX_PT_t */ 
+/* 初始化PX_PT_t */
+LCUI_EXPORT(void)
+PX_PT_t_init( PX_PT_t *combo_num );
 
+/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是百分比 */
 LCUI_EXPORT(int)
 get_PX_P_t( char *str, PX_P_t *combo_num );
-/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是百分比 */ 
 
+/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是PT */
 LCUI_EXPORT(int)
 get_PX_PT_t( char *str, PX_PT_t *combo_num );
-/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是PT */ 
 
-LCUI_EXPORT(void)
-Catch_Screen_Graph_By_Cache(LCUI_Rect area, LCUI_Graph *out);
-/* 
- * 功能：通过内存中的图像数据，捕获将在屏幕上显示的图像
- * 说明：效率较低，因为需要进行合成。
- *  */ 
-
-LCUI_EXPORT(void)
-Catch_Screen_Graph_By_FB (LCUI_Rect area, LCUI_Graph *out);
-/* 
- * 功能：直接读取帧缓冲中的图像数据
- * 说明：效率较高，但捕获的图像有可能会有问题。
- * */
-
+/* 录制屏幕指定区域的内容 */
 LCUI_EXPORT(int)
 LCUIScreen_StartRecord( LCUI_Rect area );
-/* 录制屏幕指定区域的内容 */
 
-LCUI_EXPORT(int)
-LCUIScreen_EndRecord();
 /* 结束录制 */
+LCUI_EXPORT(int)
+LCUIScreen_EndRecord( void );
 
 LCUI_END_HEADER
 
