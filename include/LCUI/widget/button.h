@@ -65,23 +65,23 @@ typedef enum {
 	BUTTON_STYLE_CUSTOM
 } BUTTON_STYLE;
 
+/* 获取嵌套在按钮部件里的label部件 */
 LCUI_EXPORT(LCUI_Widget*)
-Get_Button_Label(LCUI_Widget *widget);
-/* 功能：获取嵌套在按钮部件里的label部件 */ 
+Button_GetLabel( LCUI_Widget *widget );
 
+/* 自定义按钮在各种状态下显示的位图 */
 LCUI_EXPORT(void)
 Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal, 
 			LCUI_Graph *over, LCUI_Graph *down, 
 			LCUI_Graph *focus, LCUI_Graph *disable);
-/* 功能：自定义按钮在各种状态下显示的位图 */ 
 
+/* 设定按钮部件显示的文本内容 */
 LCUI_EXPORT(void)
-Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...);
-/* 功能：设定按钮部件显示的文本内容 */ 
+Button_Text( LCUI_Widget *widget, const char *text );
 
+/* 创建一个带文本内容的按钮 */
 LCUI_EXPORT(LCUI_Widget*)
-Create_Button_With_Text(const char *fmt, ...);
-/* 功能：创建一个带文本内容的按钮 */ 
+Button_New( const char *text );
 
 LCUI_END_HEADER
 

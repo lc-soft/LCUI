@@ -46,8 +46,6 @@
 #include LC_BUTTON_H
 #include LC_GRAPH_H
 #include LC_DRAW_H
-#include LC_MISC_H
-#include LC_INPUT_H
 
 static void Button_ExecDefalutUpdate( LCUI_Widget *widget )
 {
@@ -108,8 +106,8 @@ static void Button_ExecUpdate( LCUI_Widget *widget )
 	Refresh_Widget( widget );
 }
 
-static void Button_Init(LCUI_Widget *widget)
-/* 功能：初始化按钮部件的数据 */
+/* 初始化按钮部件的数据 */
+static void Button_Init( LCUI_Widget *widget )
 {
 	int valid_state;
 	LCUI_Button *button;
@@ -136,9 +134,9 @@ static void Button_Init(LCUI_Widget *widget)
 	Widget_SetStyleID( widget, BUTTON_STYLE_DEFAULT );
 }
 
+/* 获取嵌套在按钮部件里的label部件 */
 LCUI_EXPORT(LCUI_Widget*)
-Get_Button_Label(LCUI_Widget *widget)
-/* 功能：获取嵌套在按钮部件里的label部件 */
+Button_GetLabel( LCUI_Widget *widget )
 {
 	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivData(widget);
 	return button->label;
@@ -182,47 +180,32 @@ Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal,
 	Widget_Draw(widget); /* 重新绘制部件 */
 }
 
+/* 设定按钮部件显示的文本内容 */
 LCUI_EXPORT(void)
-Set_Button_Text(LCUI_Widget *widget, const char *fmt, ...)
-/* 功能：设定按钮部件显示的文本内容 */
+Button_Text( LCUI_Widget *widget, const char *text )
 {
-	va_list ap; 
 	LCUI_Button *button;
 	LCUI_Widget *label;
-	char text[LABEL_TEXT_MAX_SIZE];
 	
 	button = (LCUI_Button*)Widget_GetPrivData(widget);
 	label = button->label;
-	memset(text, 0, sizeof(text));
-	/* 由于是可变参数，让vsnprintf函数根据参数将字符串保存至text中 */
-	va_start(ap, fmt);
-	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
-	va_end(ap);
 	/* 设定部件显示的文本 */
-	Label_Text(label, text);
+	Label_Text( label, text );
 }
 
+/* 创建一个带文本内容的按钮 */
 LCUI_EXPORT(LCUI_Widget*)
-Create_Button_With_Text(const char *fmt, ...)
-/* 功能：创建一个带文本内容的按钮 */
+Button_New( const char *text )
 {
-	va_list ap; 
 	LCUI_Widget *widget;
-	char text[LABEL_TEXT_MAX_SIZE];
-
 	widget = Widget_New("button");
-	memset(text, 0, sizeof(text)); 
-	va_start(ap, fmt);
-	vsnprintf(text, LABEL_TEXT_MAX_SIZE-1, fmt, ap);
-	va_end(ap); 
-	
-	Set_Button_Text(widget, text);
+	Button_Text(widget, text);
 	return widget;
 }
 
+/* 将按钮部件类型注册至部件库 */
 LCUI_EXPORT(void)
-Register_Button()
-/*功能：将按钮部件类型注册至部件库 */
+Register_Button(void)
 {
 	/* 添加部件类型 */
 	WidgetType_Add("button");
