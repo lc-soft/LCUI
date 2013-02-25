@@ -44,9 +44,9 @@
 #include LC_LCUI_H 
 #include LC_GRAPH_H
 
+/* 检测result是否包含option */
 LCUI_EXPORT(int)
 Check_Option(int result, int option)
-/* 功能：检测result是否包含option */
 {
 	if((result & option) == option) {
 		return 1; 
@@ -72,9 +72,9 @@ Margin_Init( LCUI_Margin *margin )
 	margin->top = 0; 
 }
 
+/* 转换成LCUI_Pos类型 */
 LCUI_EXPORT(LCUI_Pos)
 Pos(int x, int y)
-/* 功能：转换成LCUI_Pos类型 */
 {
 	LCUI_Pos p;
 	p.x = x;
@@ -82,9 +82,9 @@ Pos(int x, int y)
 	return p;
 }
 
+/* 转换成LCUI_Size类型 */
 LCUI_EXPORT(LCUI_Size)
 Size(int w, int h)
-/* 功能：转换成LCUI_Size类型 */
 {
 	LCUI_Size s;
 	s.w = w;
@@ -92,12 +92,12 @@ Size(int w, int h)
 	return s;
 }
 
-LCUI_EXPORT(int)
-Size_Cmp(LCUI_Size a, LCUI_Size b)
 /* 
  * 功能：对比两个尺寸
  * 说明：a大于b，返回1， b大于a，返回-1，相等则返回0
  * */
+LCUI_EXPORT(int)
+Size_Cmp(LCUI_Size a, LCUI_Size b)
 {
 	if(a.w > b.w || a.h > b.h) {
 		return 1;
@@ -109,9 +109,9 @@ Size_Cmp(LCUI_Size a, LCUI_Size b)
 	}
 }
 
+/* 根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */
 LCUI_EXPORT(LCUI_Pos)
-Align_Get_Pos(LCUI_Size container, LCUI_Size child, int align)
-/* 功能：根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */
+Align_Get_Pos( LCUI_Size container, LCUI_Size child, int align )
 {
 	LCUI_Pos pos;
 	pos.x = pos.y = 0; 
@@ -166,18 +166,18 @@ Padding(int top, int bottom, int left, int right)
 	return padding;
 }
 
+/* 求两个LCUI_Pos类型变量的和 */
 LCUI_EXPORT(LCUI_Pos)
-Pos_Add(LCUI_Pos a, LCUI_Pos b)
-/* 功能：求两个LCUI_Pos类型变量的和 */
+Pos_Add( LCUI_Pos a, LCUI_Pos b )
 {
 	a.x += b.x;
 	a.y += b.y;
 	return a;
 }
 
+/* 对比两个坐标是否一致 */
 LCUI_EXPORT(int)
-Pos_Cmp(LCUI_Pos a, LCUI_Pos b)
-/* 功能：对比两个坐标是否一致 */
+Pos_Cmp( LCUI_Pos a, LCUI_Pos b )
 {
 	if(a.x != b.x || a.y != b.y) {
 		return -1;
@@ -185,36 +185,36 @@ Pos_Cmp(LCUI_Pos a, LCUI_Pos b)
 	return 0;
 }
 
+/* 求两个LCUI_Pos类型变量的差 */
 LCUI_EXPORT(LCUI_Pos)
-Pos_Sub(LCUI_Pos a, LCUI_Pos b)
-/* 功能：求两个LCUI_Pos类型变量的差 */
+Pos_Sub( LCUI_Pos a, LCUI_Pos b )
 {
 	a.x -= b.x;
 	a.y -= b.y;
 	return a;
 }
 
+/* 初始化PX_P_t */
 LCUI_EXPORT(void)
 PX_P_t_init( PX_P_t *combo_num )
-/* 初始化PX_P_t */
 {
 	combo_num->which_one = 0;
 	combo_num->px = 0;
 	combo_num->scale = 0.0;
 }
 
+/* 初始化PX_PT_t */
 LCUI_EXPORT(void)
 PX_PT_t_init( PX_PT_t *combo_num )
-/* 初始化PX_PT_t */
 {
 	combo_num->which_one = 0;
 	combo_num->px = 0;
 	combo_num->pt = 0;
 }
 
+/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是百分比 */
 LCUI_EXPORT(int)
 get_PX_P_t( char *str, PX_P_t *combo_num )
-/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是百分比 */
 {
 	char buff[256];
 	int j, i, len; 
@@ -273,9 +273,9 @@ get_PX_P_t( char *str, PX_P_t *combo_num )
 }
 
 
+/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是PT */
 LCUI_EXPORT(int)
 get_PX_PT_t( char *str, PX_PT_t *combo_num )
-/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是PT */
 {
 	char buff[256];
 	int j, i, len; 

@@ -151,7 +151,7 @@ static void Win32_Clinet_InvalidArea( LCUI_Rect rect )
 #endif
 
 static void 
-LCUIScreen_UpdateInvalidArea()
+LCUIScreen_UpdateInvalidArea(void)
 /* 功能：进行屏幕内容更新 */
 { 
 #ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER

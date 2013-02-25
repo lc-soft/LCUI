@@ -258,7 +258,7 @@ static LCUI_BOOL proc_keyboard(void)
 			timeinfo->tm_mday, timeinfo->tm_hour, 
 			timeinfo->tm_min, timeinfo->tm_sec
 		);
-		Catch_Screen_Graph_By_FB( area, &graph );
+		LCUIScreen_CatchGraph( area, &graph );
 		write_png(filename, &graph);
 		Graph_Free(&graph);
 	}

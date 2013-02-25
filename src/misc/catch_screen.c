@@ -77,7 +77,7 @@ static void catch_screen( void *unused )
 		);
 		tsec = timeinfo->tm_sec;
 		
-		Catch_Screen_Graph_By_FB( area, &graph );
+		LCUIScreen_CatchGraph( area, &graph );
 		write_png( filename, &graph );
 		LCUI_MSleep(35);
 	}
