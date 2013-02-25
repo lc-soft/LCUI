@@ -58,9 +58,10 @@ static void __Destroy_MutexData( void *arg )
 	queue = (LCUI_Queue*)arg;
 	Destroy_Queue( queue );
 }
+
+/* 将单选框从互斥关系链中移除 */
 LCUI_EXPORT(void)
-RadioButton_Delete_Mutex(LCUI_Widget *widget)
-/* 功能：将单选框从互斥关系链中移除 */
+RadioButton_DeleteMutex( LCUI_Widget *widget )
 {
 	int i, total;
 	LCUI_Widget *tmp;
@@ -77,9 +78,9 @@ RadioButton_Delete_Mutex(LCUI_Widget *widget)
 	}
 }
 
+/* 为两个单选框建立互斥关系 */
 LCUI_EXPORT(void)
-RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
-/* 功能：为两个单选框建立互斥关系 */
+RadioButton_CreateMutex( LCUI_Widget *a, LCUI_Widget *b )
 {
 	int pos;
 	LCUI_Queue *p, queue;
@@ -114,16 +115,16 @@ RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b)
 			Queue_Add_Pointer(rb_a->mutex, b);
 			rb_b->mutex = rb_a->mutex;
 		} else {/* 否则，两个都和其它部件有互斥关系，需要将它们拆开，并重新建立互斥关系 */
-			RadioButton_Delete_Mutex(a);
-			RadioButton_Delete_Mutex(b);
-			RadioButton_Create_Mutex(a, b);
+			RadioButton_DeleteMutex(a);
+			RadioButton_DeleteMutex(b);
+			RadioButton_CreateMutex(a, b);
 		}
 	}
 }
 
+/* 设定单选框为选中状态 */
 LCUI_EXPORT(void)
-Set_RadioButton_On(LCUI_Widget *widget)
-/* 功能：设定单选框为选中状态 */
+RadioButton_SetOn( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
 	LCUI_Widget *other;
@@ -135,16 +136,16 @@ Set_RadioButton_On(LCUI_Widget *widget)
 		total = Queue_Get_Total(radio_button->mutex);
 		for(i=0; i<total; ++i) {
 			other = (LCUI_Widget*)Queue_Get(radio_button->mutex, i);
-			Set_RadioButton_Off(other);
+			RadioButton_SetOff(other);
 		}
 	}
 	radio_button->on = TRUE;
 	Widget_Draw(widget);
 }
 
+/* 设定单选框为未选中状态 */
 LCUI_EXPORT(void)
-Set_RadioButton_Off(LCUI_Widget *widget)
-/* 功能：设定单选框为未选中状态 */
+RadioButton_SetOff( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
 	radio_button = Widget_GetPrivData(widget); 
@@ -152,63 +153,49 @@ Set_RadioButton_Off(LCUI_Widget *widget)
 	Widget_Draw(widget);
 }
 
-LCUI_EXPORT(int)
-Get_RadioButton_state(LCUI_Widget *widget)
-/* 功能：获取单选框的状态 */
+/* 检测单选框是否被选中 */
+LCUI_EXPORT(LCUI_BOOL)
+RadioButton_IsOn( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
 	radio_button = Widget_GetPrivData(widget); 
 	return radio_button->on;
 }
 
+/* 检测单选框是否未选中 */
 LCUI_EXPORT(int)
-RadioButton_Is_On(LCUI_Widget *widget)
-/* 功能：检测单选框是否被选中 */
+RadioButton_IsOff( LCUI_Widget *widget )
 {
-	if(IS_TRUE == Get_RadioButton_state(widget))
-		return 1;
-	
-	return 0;
+	LCUI_RadioButton *radio_button;
+	radio_button = Widget_GetPrivData(widget); 
+	return !radio_button->on;
 }
 
-LCUI_EXPORT(int)
-RadioButton_Is_Off(LCUI_Widget *widget)
-/* 功能：检测单选框是否未选中 */
-{
-	if(IS_TRUE == Get_RadioButton_state(widget))
-		return 0;
-	
-	return 1;
-}
-
-/* 
- * 功能：切换单选框的状态
- * 说明：这个状态，指的是打勾与没打勾的两种状态
- *  */
-LCUI_EXPORT(void)
-Switch_RadioButton_State(LCUI_Widget *widget, LCUI_WidgetEvent *arg)
+static void
+RadioButton_Click( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 { 
-	if(RadioButton_Is_Off(widget))
-		Set_RadioButton_On(widget); 
+	if(RadioButton_IsOff(widget)) {
+		RadioButton_SetOn(widget); 
+	}
 }
 
+/* 设定单选框中的图像框的尺寸 */
 LCUI_EXPORT(void)
-RadioButton_Set_ImgBox_Size(LCUI_Widget *widget, LCUI_Size size)
-/* 功能：设定单选框中的图像框的尺寸 */
+RadioButton_ImgBox_SetSize(LCUI_Widget *widget, LCUI_Size size)
 {
 	LCUI_Widget *imgbox;
 	if(size.w <= 0 && size.h <= 0) {
 		return;
 	}
-	imgbox = Get_RadioButton_ImgBox(widget);
+	imgbox = RadioButton_GetImgBox(widget);
 	Widget_Resize(imgbox, size);
 	/* 由于没有布局盒子，不能自动调整部件间的间隔，暂时用这个方法 */
 	Widget_SetAlign(imgbox->parent, ALIGN_MIDDLE_LEFT, Pos(size.w, 0));
 }
 
+/* 初始化单选框部件的数据 */
 static void 
-RadioButton_Init(LCUI_Widget *widget)
-/* 功能：初始化单选框部件的数据 */
+RadioButton_Init( LCUI_Widget *widget )
 {
 	int valid_state;
 	LCUI_Widget *container[2];
@@ -262,16 +249,15 @@ RadioButton_Init(LCUI_Widget *widget)
 	Widget_Show(container[0]);
 	Widget_Show(container[1]);
 	
-	Widget_Event_Connect( widget, EVENT_CLICKED, Switch_RadioButton_State );
+	Widget_Event_Connect( widget, EVENT_CLICKED, RadioButton_Click );
 	
 	valid_state = (WIDGET_STATE_NORMAL | WIDGET_STATE_ACTIVE);
 	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);
 	Widget_SetValidState( widget, valid_state);
 }
 
-
-static void Exec_Update_RadioButton(LCUI_Widget *widget)
-/* 功能：更新单选框的图形数据 */
+/* 更新单选框的图形数据 */
+static void RadioButton_ExecUpdate( LCUI_Widget *widget )
 {
 	LCUI_Graph *p;
 	LCUI_RadioButton *radio_button;
@@ -366,9 +352,9 @@ static void Exec_Update_RadioButton(LCUI_Widget *widget)
 	} 
 }
 
+/* 获取单选框部件中的label部件的指针 */
 LCUI_EXPORT(LCUI_Widget*)
-Get_RadioButton_Label(LCUI_Widget *widget)
-/* 功能：获取单选框部件中的label部件的指针 */
+RadioButton_GetLabel( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
 	
@@ -379,9 +365,9 @@ Get_RadioButton_Label(LCUI_Widget *widget)
 	return radio_button->label;
 }
 
+/* 获取单选框部件中的PictureBox部件的指针 */
 LCUI_EXPORT(LCUI_Widget*)
-Get_RadioButton_ImgBox(LCUI_Widget *widget)
-/* 功能：获取单选框部件中的PictureBox部件的指针 */
+RadioButton_GetImgBox( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
 	
@@ -392,49 +378,34 @@ Get_RadioButton_ImgBox(LCUI_Widget *widget)
 	return radio_button->imgbox;
 }
 
+/* 设定与单选框部件关联的文本内容 */
 LCUI_EXPORT(void)
-Set_RadioButton_Text(LCUI_Widget *widget, const char *fmt, ...)
-/* 功能：设定与单选框部件关联的文本内容 */
+RadioButton_Text( LCUI_Widget *widget, const char *text )
 {
-	va_list ap; 
 	LCUI_Widget *label;
-	char text[LABEL_TEXT_MAX_SIZE];
-
-	label = Get_RadioButton_Label(widget); 
-	memset(text, 0, sizeof(text)); 
-	va_start(ap, fmt);
-	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
-	va_end(ap);
-
+	label = RadioButton_GetLabel(widget);
 	Label_Text(label, text); 
 }
 
+/* 创建一个带文本内容的单选框 */
 LCUI_EXPORT(LCUI_Widget*)
-Create_RadioButton_With_Text(const char *fmt, ...)
-/* 功能：创建一个带文本内容的单选框 */
+RadioButton_New( const char *text )
 {
-	va_list ap; 
 	LCUI_Widget *widget;
-	char text[LABEL_TEXT_MAX_SIZE];
 	widget = Widget_New("radio_button");
-	memset(text, 0, sizeof(text)); 
-	va_start(ap, fmt);
-	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
-	va_end(ap); 
-	
-	Set_RadioButton_Text(widget, text);
+	RadioButton_Text(widget, text);
 	return widget;
 }
 
-LCUI_EXPORT(void)
-Register_RadioButton()
 /* 注册单选框部件类型 */
+LCUI_EXPORT(void)
+Register_RadioButton(void)
 {
 	/* 添加几个部件类型 */
 	WidgetType_Add("radio_button"); 
 	
 	/* 为部件类型关联相关函数 */ 
 	WidgetFunc_Add("radio_button",	RadioButton_Init, FUNC_TYPE_INIT);
-	WidgetFunc_Add("radio_button", Exec_Update_RadioButton, FUNC_TYPE_DRAW); 
-	WidgetFunc_Add("radio_button", Exec_Update_RadioButton, FUNC_TYPE_UPDATE); 
+	WidgetFunc_Add("radio_button", RadioButton_ExecUpdate, FUNC_TYPE_DRAW); 
+	WidgetFunc_Add("radio_button", RadioButton_ExecUpdate, FUNC_TYPE_UPDATE); 
 }

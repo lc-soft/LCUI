@@ -71,56 +71,49 @@ struct _LCUI_RadioButton
 };
 /****************************************************/
 
+/* 将单选框从互斥关系链中移除 */
 LCUI_EXPORT(void)
-RadioButton_Create_Mutex(LCUI_Widget *a, LCUI_Widget *b);
-/* 功能：为两个单选框建立互斥关系 */
+RadioButton_DeleteMutex( LCUI_Widget *widget );
 
+/* 为两个单选框建立互斥关系 */
 LCUI_EXPORT(void)
-RadioButton_Delete_Mutex(LCUI_Widget *widget);
-/* 功能：将单选框从互斥关系链中移除 */
+RadioButton_CreateMutex( LCUI_Widget *a, LCUI_Widget *b );
 
+/* 设定单选框为选中状态 */
 LCUI_EXPORT(void)
-Set_RadioButton_On(LCUI_Widget *widget);
-/* 功能：设定单选框为选中状态 */ 
+RadioButton_SetOn( LCUI_Widget *widget );
 
+/* 设定单选框为未选中状态 */
 LCUI_EXPORT(void)
-Set_RadioButton_Off(LCUI_Widget *widget);
-/* 功能：设定单选框为未选中状态 */ 
+RadioButton_SetOff( LCUI_Widget *widget );
 
+/* 检测单选框是否被选中 */
+LCUI_EXPORT(LCUI_BOOL)
+RadioButton_IsOn( LCUI_Widget *widget );
+
+/* 检测单选框是否未选中 */
 LCUI_EXPORT(int)
-Get_RadioButton_State(LCUI_Widget *widget);
-/* 功能：获取单选框的状态 */ 
+RadioButton_IsOff( LCUI_Widget *widget );
 
-LCUI_EXPORT(int)
-RadioButton_Is_On(LCUI_Widget *widget);
-/* 功能：检测单选框是否被选中 */ 
-
-LCUI_EXPORT(int)
-RadioButton_Is_Off(LCUI_Widget *widget);
-/* 功能：检测单选框是否未选中 */ 
-
-/* 
- * 功能：切换单选框的状态
- * 说明：这个状态，指的是打勾与没打勾的两种状态
- *  */
+/* 设定单选框中的图像框的尺寸 */
 LCUI_EXPORT(void)
-Switch_RadioButton_State(LCUI_Widget *widget, LCUI_WidgetEvent *arg);
+RadioButton_ImgBox_SetSize(LCUI_Widget *widget, LCUI_Size size);
 
+/* 获取单选框部件中的label部件的指针 */
 LCUI_EXPORT(LCUI_Widget*)
-Get_RadioButton_Label(LCUI_Widget *widget);
-/* 功能：获取单选框部件中的label部件的指针 */ 
+RadioButton_GetLabel( LCUI_Widget *widget );
 
+/* 获取单选框部件中的PictureBox部件的指针 */
 LCUI_EXPORT(LCUI_Widget*)
-Get_RadioButton_ImgBox(LCUI_Widget *widget);
-/* 功能：获取单选框部件中的PictureBox部件的指针 */
+RadioButton_GetImgBox( LCUI_Widget *widget );
 
+/* 设定与单选框部件关联的文本内容 */
 LCUI_EXPORT(void)
-Set_RadioButton_Text(LCUI_Widget *widget, const char *fmt, ...);
-/* 功能：设定与单选框部件关联的文本内容 */ 
+RadioButton_Text( LCUI_Widget *widget, const char *text );
 
+/* 创建一个带文本内容的单选框 */
 LCUI_EXPORT(LCUI_Widget*)
-Create_RadioButton_With_Text(const char *fmt, ...);
-/* 功能：创建一个带文本内容的单选框 */ 
+RadioButton_New( const char *text );
 
 LCUI_END_HEADER
 
