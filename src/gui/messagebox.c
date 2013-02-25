@@ -175,7 +175,7 @@ msgbox_add_BTN_OK( LCUI_Widget *btn_area )
 	btn->self_id = MB_BTN_IS_OK;
 	Widget_Resize( btn, MB_BTN_SIZE );
 	Widget_SetAutoSize( btn, FALSE, 0 );
-	Set_Button_Text( btn, TEXT_MB_BTN_OK );
+	Button_Text( btn, TEXT_MB_BTN_OK );
 	Widget_Container_Add( btn_area, btn );
 	Widget_SetAlign( btn, ALIGN_MIDDLE_CENTER, Pos(0,0) );
 	Widget_Event_Connect( btn, EVENT_CLICKED, msgbox_mainloop_quit );
@@ -195,8 +195,8 @@ msgbox_add_BTN_OKCANCEL( LCUI_Widget *btn_area )
 	Widget_Resize( btn[1], MB_BTN_SIZE );
 	Widget_SetAutoSize( btn[0], FALSE, 0 );
 	Widget_SetAutoSize( btn[1], FALSE, 0 );
-	Set_Button_Text( btn[0], TEXT_MB_BTN_OK );
-	Set_Button_Text( btn[1], TEXT_MB_BTN_CANCEL );
+	Button_Text( btn[0], TEXT_MB_BTN_OK );
+	Button_Text( btn[1], TEXT_MB_BTN_CANCEL );
 	Widget_Container_Add( btn_area, btn[0] );
 	Widget_Container_Add( btn_area, btn[1] );
 	btn_size = MB_BTN_SIZE;
@@ -225,9 +225,9 @@ msgbox_add_BTN_ABORTRETRYIGNORE( LCUI_Widget *btn_area )
 	Widget_SetAutoSize( btn[0], FALSE, 0 );
 	Widget_SetAutoSize( btn[1], FALSE, 0 );
 	Widget_SetAutoSize( btn[2], FALSE, 0 );
-	Set_Button_Text( btn[0], TEXT_MB_BTN_ABORT );
-	Set_Button_Text( btn[1], TEXT_MB_BTN_RETRY );
-	Set_Button_Text( btn[2], TEXT_MB_BTN_IGNORE );
+	Button_Text( btn[0], TEXT_MB_BTN_ABORT );
+	Button_Text( btn[1], TEXT_MB_BTN_RETRY );
+	Button_Text( btn[2], TEXT_MB_BTN_IGNORE );
 	Widget_Container_Add( btn_area, btn[0] );
 	Widget_Container_Add( btn_area, btn[1] );
 	Widget_Container_Add( btn_area, btn[2] );
@@ -256,8 +256,8 @@ msgbox_add_BTN_RETRYCANCEL( LCUI_Widget *btn_area )
 	Widget_Resize( btn[1], MB_BTN_SIZE );
 	Widget_SetAutoSize( btn[0], FALSE, 0 );
 	Widget_SetAutoSize( btn[1], FALSE, 0 );
-	Set_Button_Text( btn[0], TEXT_MB_BTN_RETRY );
-	Set_Button_Text( btn[1], TEXT_MB_BTN_CANCEL );
+	Button_Text( btn[0], TEXT_MB_BTN_RETRY );
+	Button_Text( btn[1], TEXT_MB_BTN_CANCEL );
 	Widget_Container_Add( btn_area, btn[0] );
 	Widget_Container_Add( btn_area, btn[1] );
 	btn_size = MB_BTN_SIZE;
@@ -282,8 +282,8 @@ msgbox_add_BTN_YESNO( LCUI_Widget *btn_area )
 	Widget_Resize( btn[1], MB_BTN_SIZE );
 	Widget_SetAutoSize( btn[0], FALSE, 0 );
 	Widget_SetAutoSize( btn[1], FALSE, 0 );
-	Set_Button_Text( btn[0], TEXT_MB_BTN_YES );
-	Set_Button_Text( btn[1], TEXT_MB_BTN_NO );
+	Button_Text( btn[0], TEXT_MB_BTN_YES );
+	Button_Text( btn[1], TEXT_MB_BTN_NO );
 	Widget_Container_Add( btn_area, btn[0] );
 	Widget_Container_Add( btn_area, btn[1] );
 	btn_size = MB_BTN_SIZE;
@@ -312,9 +312,9 @@ msgbox_add_BTN_YESNOCANCEL( LCUI_Widget *btn_area )
 	Widget_SetAutoSize( btn[0], FALSE, 0 );
 	Widget_SetAutoSize( btn[1], FALSE, 0 );
 	Widget_SetAutoSize( btn[2], FALSE, 0 );
-	Set_Button_Text( btn[0], TEXT_MB_BTN_YES );
-	Set_Button_Text( btn[1], TEXT_MB_BTN_NO );
-	Set_Button_Text( btn[2], TEXT_MB_BTN_CANCEL );
+	Button_Text( btn[0], TEXT_MB_BTN_YES );
+	Button_Text( btn[1], TEXT_MB_BTN_NO );
+	Button_Text( btn[2], TEXT_MB_BTN_CANCEL );
 	Widget_Container_Add( btn_area, btn[0] );
 	Widget_Container_Add( btn_area, btn[1] );
 	Widget_Container_Add( btn_area, btn[2] );
