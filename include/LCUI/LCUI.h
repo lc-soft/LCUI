@@ -239,7 +239,7 @@ typedef struct {
 /*---------------- 字符串 ----------------*/
 typedef struct {
 	char   *string; /* 字符串内容 */
-	size_t size;	/* 占用的空间大小 */
+	uint_t length;	/* 长度 */
 } LCUI_String;
 /*----------------- END -----------------*/
 
@@ -270,18 +270,17 @@ typedef struct {
 	wchar_t		char_code;	/* 字符码 */
 	LCUI_FontBMP	*bitmap;	/* 字符的位图数据 */
 	LCUI_RGB	color;		/* 该文字的配色 */
-	LCUI_BOOL		update;		/* 标明这个字符是否需要刷新 */ 
+	LCUI_BOOL	update;		/* 标明这个字符是否需要刷新 */ 
 	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */		   
-} LCUI_WChar_T;
+} LCUI_WChar;
 /*----------------------------- END ----------------------------------*/
 
-/*------- wchar_t型字符串 -------*/
+/*------- 宽字符串 -------*/
 typedef struct {
-	LCUI_WChar_T *string;
-	int	update;
-	size_t size;
+	wchar_t *string;
+	uint_t length;
 } LCUI_WString;
-/*----------- END -------------*/
+/*-------- END ---------*/
 
 LCUI_END_HEADER
 

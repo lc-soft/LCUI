@@ -75,7 +75,15 @@ lcui_strcasecmp( const char *str1, const char *str2 )
 LCUI_EXPORT(void)
 LCUIString_Init( LCUI_String *in )
 {
-	in->size = 0;
+	in->length = 0;
+	in->string = NULL;
+}
+
+/* ³õÊ¼»¯¿í×Ö·û´® */
+LCUI_EXPORT(void)
+LCUIWString_Init( LCUI_WString *in )
+{
+	in->length = 0;
 	in->string = NULL;
 }
 
@@ -83,62 +91,96 @@ LCUIString_Init( LCUI_String *in )
 LCUI_EXPORT(void)
 _LCUIString_Copy( LCUI_String * des, const char *src )
 {
-	if(des == NULL) {
+	if(des == NULL || src == NULL) {
 		return;
 	}
-	if (src != NULL) {
-		if (des->size != 0) {
-			free (des->string);
-		}
-		des->size = sizeof (char) * (strlen (src) + 1);
-		des->string = calloc (1, des->size);
-		strcpy (des->string, src);
-	} else {
-		des->size = sizeof (char) * (2);
-		des->string = calloc (1, des->size);
+	if (des->length != 0) {
+		free (des->string);
 	}
+	des->length = strlen(src);
+	des->string = calloc(des->length+1, sizeof(char));
+	strcpy (des->string, src);
 }
 
-/* LCUI_String ×Ö·û´®¶Ô±È */
+/* ¿í×Ö·û´®¿½±´ */
+LCUI_EXPORT(void)
+_LCUIWString_Copy( LCUI_WString *des, const wchar_t *src )
+{
+	if(des == NULL || src == NULL) {
+		return;
+	}
+	if (des->length != 0) {
+		free (des->string);
+	}
+	des->length = wcslen(src);
+	des->string = calloc(des->length+1, sizeof(wchar_t));
+	wcscpy( des->string, src );
+}
+
+LCUI_EXPORT(void)
+LCUIWString_Copy( LCUI_WString *des_str, LCUI_WString *src_str )
+{
+	_LCUIWString_Copy( des_str, src_str->string );
+}
+
+/* ×Ö·û´®¶Ô±È */
 LCUI_EXPORT(int)
 _LCUIString_Cmp( LCUI_String *str1, const char *str2 )
 {
-	if (str1 != NULL && str1->size > 0 && str2 != NULL) {
+	if( str1 && str1->length > 0 && str2 ) {
 		return strcmp(str1->string, str2); 
 	}
 	return -1;
 }
 
-/* LCUI_String ×Ö·û´®¶Ô±È */
 LCUI_EXPORT(int)
 LCUIString_Cmp( LCUI_String *str1, LCUI_String *str2 )
 {
-	if( str1->size > 0 && str2->size > 0 ) {
-		return strcmp(str1->string, str2->string);
+	if( !str2 ) {
+		return -1;
+	}
+	return _LCUIString_Cmp( str1, str2->string );
+}
+
+/* ¿í×Ö·û´®¶Ô±È */
+LCUI_EXPORT(int)
+_LCUIWString_Cmp( LCUI_WString *str1, const wchar_t *str2 )
+{
+	if( str1->length > 0 && str2 ) {
+		return wcscmp( str1->string, str2 );
 	}
 	return 0;
 }
 
-/* ¿½±´Ô´×Ö·û´®ÖÁÄ¿±ê×Ö·û´®ÖÐ */
+LCUI_EXPORT(int)
+LCUIWString_Cmp( LCUI_WString *str1, LCUI_WString *str2 )
+{
+	if( !str2 ) {
+		return -1;
+	}
+	return _LCUIWString_Cmp( str1, str2->string );
+}
+
+/* ×Ö·û´®¿½±´ */
 LCUI_EXPORT(int)
 LCUIString_Copy( LCUI_String *str1, LCUI_String *str2 )
 {
-	if( str2->size <= 0 ) {
+	if( str2->length <= 0 ) {
 		return -1;
 	}
-	if(str1->size > 0) {
+	if(str1->length > 0) {
 		free( str1->string );
 	}
-	str1->string = (char*)calloc(str2->size+1, sizeof(char));
+	str1->string = (char*)calloc(str2->length+1, sizeof(char));
 	strcpy( str1->string, str2->string );
-	str1->size = str2->size;
+	str1->length = str2->length;
 	return 0;
 }
 
 LCUI_EXPORT(void)
 LCUIString_Free( LCUI_String *in )
 {
-	if(in->size > 0) {
+	if(in->length > 0) {
 		free(in->string); 
 	}
 	in->string = NULL;
@@ -146,7 +188,7 @@ LCUIString_Free( LCUI_String *in )
 
 /* ÊÍ·Å¿í×Ö·ûÕ¼ÓÃµÄ×ÊÔ´ */
 LCUI_EXPORT(void)
-LCUIWchar_Free( LCUI_WChar_T *ch )
+LCUIWchar_Free( LCUI_WChar *ch )
 {
 	ch->bitmap = NULL;
 }
@@ -155,12 +197,8 @@ LCUIWchar_Free( LCUI_WChar_T *ch )
 LCUI_EXPORT(void)
 LCUIWString_Free( LCUI_WString *str )
 {
-	int i;
-	if(!str || str->size <= 0 || !str->string) {
+	if(!str || str->length <= 0 || !str->string) {
 		return;
-	}
-	for(i = 0; i < str->size; ++i) {
-		LCUIWchar_Free(&str->string[i]); 
 	}
 	free(str->string);
 	str->string = NULL;
