@@ -47,36 +47,39 @@ LCUI_BEGIN_HEADER
 
 typedef struct _LCUI_Label 
 {
-	LCUI_BOOL auto_size;		/* 指定是否根据文本图层的尺寸来调整部件尺寸 */
+	LCUI_BOOL auto_size;	/* 指定是否根据文本图层的尺寸来调整部件尺寸 */
 	AUTOSIZE_MODE mode;	/* 自动尺寸调整的模式 */
+	wchar_t *text_buff;	/* 文本块缓冲 */
 	LCUI_TextLayer layer;	/* 文本图层 */
 }
 LCUI_Label;
 
-/*---------------------------- Public --------------------------------*/
-LCUI_EXPORT(void)
-Label_Text(LCUI_Widget *widget, const char *fmt, ...);
-/* 功能：设定与标签关联的文本内容 */ 
+/* 设定与标签关联的文本内容 */
+LCUI_EXPORT(int)
+Label_WText( LCUI_Widget *widget, const wchar_t *unicode_text );
 
+LCUI_EXPORT(void)
+Label_Text( LCUI_Widget *widget, const char *utf8_text );
+
+LCUI_EXPORT(void)
+Label_AText( LCUI_Widget *widget, const char *ascii_text );
+
+/* 为Label部件内显示的文本设定文本样式 */
 LCUI_EXPORT(int)
 Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
-/* 为Label部件内显示的文本设定文本样式 */ 
 
+/* 获取label部件内的文本图层的指针 */
 LCUI_EXPORT(LCUI_TextLayer*)
-Label_Get_TextLayer( LCUI_Widget *widget );
-/* 获取label部件内的文本图层的指针 */ 
+Label_GetTextLayer( LCUI_Widget *widget );
 
+/* 刷新label部件显示的文本 */
 LCUI_EXPORT(void)
 Label_Refresh( LCUI_Widget *widget );
-/* 刷新label部件显示的文本 */
 
+/* 启用或禁用Label部件的自动尺寸调整功能 */
 LCUI_EXPORT(void)
 Label_AutoSize( LCUI_Widget *widget, LCUI_BOOL flag, AUTOSIZE_MODE mode );
-/* 启用或禁用Label部件的自动尺寸调整功能 */ 
-/*-------------------------- End Public ------------------------------*/
-
 LCUI_END_HEADER
-
 
 #ifdef __cplusplus
 #include LC_LABEL_HPP

@@ -128,7 +128,7 @@ TextBox_GetTextLayer( LCUI_Widget *widget )
 {
 	LCUI_Widget *label;
 	label = TextBox_GetLabel( widget );
-	return Label_Get_TextLayer( label );
+	return Label_GetTextLayer( label );
 }
 
 static void 
@@ -377,7 +377,7 @@ TextBox_Init( LCUI_Widget *widget )
 	
 	Queue_Init( &textbox->text_block_buff, sizeof(LCUI_TextBlock), destroy_textblock );
 	
-	TextLayer_UsingStyleTags( Label_Get_TextLayer(textbox->text), FALSE );
+	TextLayer_UsingStyleTags( Label_GetTextLayer(textbox->text), FALSE );
 	Widget_SetPadding( widget, Padding(2,2,2,2) );
 	Widget_SetBackgroundColor( textbox->cursor, RGB(0,0,0) );
 	Widget_SetBackgroundTransparent( textbox->cursor, FALSE );
@@ -895,7 +895,7 @@ TextBox_TextBuff_Add( LCUI_Widget *widget, wchar_t *text, int pos_type )
 		} else {
 			size = len-i +1;
 		}
-		text_buff = malloc( sizeof(char) * size );
+		text_buff = malloc( sizeof(wchar_t) * size );
 		if( !text_buff ) {
 			return -2;
 		}

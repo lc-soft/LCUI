@@ -48,15 +48,17 @@
 #include LC_LABEL_H
 
 /*---------------------------- Private -------------------------------*/
+/* 初始化label部件数据 */
 static void 
-Label_Init(LCUI_Widget *widget)
-/* 功能：初始化label部件数据 */
+Label_ExecInit( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
 	/* label部件不需要焦点 */
 	widget->focus = FALSE;
 	label = WidgetPrivData_New( widget, sizeof(LCUI_Label) );
 	label->auto_size = TRUE;
+	/* 初始化文本块缓冲队列 */
+	label->text_buff = NULL;
 	/* 初始化文本图层 */
 	TextLayer_Init( &label->layer ); 
 	/* 启用多行文本显示 */
@@ -66,9 +68,9 @@ Label_Init(LCUI_Widget *widget)
 	TextLayer_UsingStyleTags( &label->layer, TRUE );
 }
 
+/* 释放label部件占用的资源 */
 static void 
-Destroy_Label(LCUI_Widget *widget)
-/* 功能：释放label部件占用的资源 */
+Destroy_Label( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
 	
@@ -76,9 +78,9 @@ Destroy_Label(LCUI_Widget *widget)
 	Destroy_TextLayer( &label->layer );
 }
 
+/* 刷新label部件内的字体位图 */
 static void 
-Refresh_Label_FontBitmap(LCUI_Widget *widget)
-/* 功能：刷新label部件内的字体位图 */
+Refresh_Label_FontBitmap( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
 	
@@ -86,9 +88,9 @@ Refresh_Label_FontBitmap(LCUI_Widget *widget)
 	TextLayer_Refresh( &label->layer ); 
 }
 
+/* 更新label部件 */
 static void 
-Update_Label(LCUI_Widget *widget)
-/* 功能：更新label部件 */
+Label_ExecUpdate( LCUI_Widget *widget )
 {
 	int mode; 
 	LCUI_Size max;
@@ -100,10 +102,14 @@ Update_Label(LCUI_Widget *widget)
 	} else {
 		mode = GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */ 
 	}
+	if( label->text_buff != NULL ) {
+		TextLayer_WText( &label->layer, label->text_buff );
+		free( label->text_buff );
+		label->text_buff = NULL;
+	}
 	/* 先绘制文本位图，在绘制前它会更新位图尺寸 */
 	TextLayer_Draw( widget, &label->layer, mode );
-	/* 获取尺寸 */
-	max = TextLayer_GetSize( &label->layer );
+	max = TextLayer_GetSize( &label->layer ); /* 获取尺寸 */
 	if( widget->dock == DOCK_TYPE_NONE && label->auto_size
 	 && Size_Cmp( max, widget->size ) != 0 ) {
 		/* 如果开启了自动调整大小,并且尺寸有改变 */ 
@@ -112,36 +118,61 @@ Update_Label(LCUI_Widget *widget)
 	}
 }
 
-static void 
-Draw_Label(LCUI_Widget *widget)
 /* 重绘Label部件 */
+static void 
+Label_ExecDraw( LCUI_Widget *widget )
 {
 	Refresh_Label_FontBitmap( widget );
-	Update_Label( widget );
+	Label_ExecUpdate( widget );
 }
 
 /*-------------------------- End Private -----------------------------*/
 
 /*---------------------------- Public --------------------------------*/
-LCUI_EXPORT(void)
-Label_Text(LCUI_Widget *widget, const char *fmt, ...)
-/* 功能：设定与标签关联的文本内容 */
+/* 设定与标签关联的文本内容 */
+LCUI_EXPORT(int)
+Label_WText( LCUI_Widget *widget, const wchar_t *unicode_text )
 {
-	va_list ap;
+	int len;
 	LCUI_Label *label;
-	char text[LABEL_TEXT_MAX_SIZE];
-	memset(text, 0, sizeof(text)); 
-	label = Widget_GetPrivData( widget ); 
-	va_start( ap, fmt );
-	vsnprintf(text, LABEL_TEXT_MAX_SIZE, fmt, ap);
-	va_end( ap );
-	TextLayer_Text( &label->layer, text );
-	Widget_Update( widget ); 
+	
+	len = wcslen(unicode_text);
+	label = Widget_GetPrivData( widget );
+	if( label->text_buff != NULL ) {
+		label->text_buff = realloc( label->text_buff, 
+				sizeof(wchar_t)*(len+1) );
+	} else {
+		label->text_buff = malloc( sizeof(wchar_t)*(len+1) );
+	}
+	if( label->text_buff == NULL ) {
+		return -1;
+	}
+	wcscpy( label->text_buff, unicode_text );
+	Widget_Update( widget );
+	return 0;
 }
 
+LCUI_EXPORT(void)
+Label_Text( LCUI_Widget *widget, const char *utf8_text )
+{
+	wchar_t *unicode_text;
+	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
+	Label_WText( widget, unicode_text );
+	free( unicode_text );
+}
+
+LCUI_EXPORT(void)
+Label_AText( LCUI_Widget *widget, const char *ascii_text )
+{
+	wchar_t *unicode_text;
+	LCUICharset_ASCIIToUnicode( ascii_text, &unicode_text );
+	Label_WText( widget, unicode_text );
+	free( unicode_text );
+}
+
+/* 为Label部件内显示的文本设定文本样式 */
 LCUI_EXPORT(int)
 Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
-/* 为Label部件内显示的文本设定文本样式 */
 {
 	LCUI_Label *label;
 	
@@ -151,9 +182,9 @@ Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 	return 0;
 }
 
-LCUI_EXPORT(LCUI_TextLayer*)
-Label_Get_TextLayer( LCUI_Widget *widget )
 /* 获取label部件内的文本图层的指针 */
+LCUI_EXPORT(LCUI_TextLayer*)
+Label_GetTextLayer( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
 	
@@ -161,18 +192,18 @@ Label_Get_TextLayer( LCUI_Widget *widget )
 	return &label->layer;
 }
 
+/* 刷新label部件显示的文本 */
 LCUI_EXPORT(void)
 Label_Refresh( LCUI_Widget *widget )
-/* 刷新label部件显示的文本 */
 {
 	LCUI_TextLayer *layer;
-	layer = Label_Get_TextLayer( widget );
+	layer = Label_GetTextLayer( widget );
 	TextLayer_Refresh( layer );
 }
 
+/* 启用或禁用Label部件的自动尺寸调整功能 */
 LCUI_EXPORT(void)
 Label_AutoSize( LCUI_Widget *widget, LCUI_BOOL flag, AUTOSIZE_MODE mode )
-/* 启用或禁用Label部件的自动尺寸调整功能 */
 {
 	LCUI_Label *label;
 	
@@ -184,16 +215,13 @@ Label_AutoSize( LCUI_Widget *widget, LCUI_BOOL flag, AUTOSIZE_MODE mode )
 /*-------------------------- End Public ------------------------------*/
 
 
-LCUI_EXPORT(void)
-Register_Label()
 /* 注册label部件类型 */
+LCUI_EXPORT(void)
+Register_Label(void)
 {
-	/* 添加几个部件类型 */
 	WidgetType_Add("label");
-	
-	/* 为部件类型关联相关函数 */
-	WidgetFunc_Add("label",	Label_Init,	FUNC_TYPE_INIT);
-	WidgetFunc_Add("label",	Draw_Label,	FUNC_TYPE_DRAW); 
-	WidgetFunc_Add("label",	Update_Label,	FUNC_TYPE_UPDATE); 
+	WidgetFunc_Add("label",	Label_ExecInit,	FUNC_TYPE_INIT);
+	WidgetFunc_Add("label",	Label_ExecDraw,	FUNC_TYPE_DRAW); 
+	WidgetFunc_Add("label",	Label_ExecUpdate, FUNC_TYPE_UPDATE); 
 	WidgetFunc_Add("label", Destroy_Label,	FUNC_TYPE_DESTROY);
 }
