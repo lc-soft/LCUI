@@ -49,9 +49,6 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_EXPORT(LCUI_Widget*)
-TextBox_GetLabel( LCUI_Widget *widget );
-/* 获取文本框部件内的label部件指针 */
 
 LCUI_EXPORT(LCUI_Pos)
 TextBox_ViewArea_GetPos( LCUI_Widget *widget );
@@ -61,37 +58,50 @@ LCUI_EXPORT(int)
 TextBox_ViewArea_Update( LCUI_Widget *widget );
 /* 更新文本框的文本显示区域 */
 
+/* 获取文本框部件内的label部件指针 */
+LCUI_EXPORT(LCUI_Widget*)
+TextBox_GetLabel( LCUI_Widget *widget );
+
+/* 获取文本框部件内的光标 */
 LCUI_EXPORT(LCUI_Widget*)
 TextBox_GetCursor( LCUI_Widget *widget );
-/* 获取文本框部件内的光标 */
+
+/* 获取文本框内的文本总长度 */
+LCUI_EXPORT(int)
+TextBox_Text_GetTotalLength( LCUI_Widget *widget );
+
+/* 设定文本框显示的文本 */
+LCUI_EXPORT(void)
+TextBox_WText( LCUI_Widget *widget, wchar_t *unicode_text );
 
 LCUI_EXPORT(void)
-TextBox_Text(LCUI_Widget *widget, char *new_text);
-/* 设定文本框显示的文本 */
+TextBox_Text( LCUI_Widget *widget, char *utf8_text );
 
 LCUI_EXPORT(void)
 TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos );
 /* 为文本框内的文本图层设置偏移 */
 
-LCUI_EXPORT(void)
-TextBox_Text_Add(LCUI_Widget *widget, char *new_text);
 /* 在光标处添加文本 */
+LCUI_EXPORT(void)
+TextBox_WText_Add( LCUI_Widget *widget, wchar_t *unicode_text );
 
 LCUI_EXPORT(void)
-TextBox_Text_Append(LCUI_Widget *widget, char *new_text);
+TextBox_AText_Add( LCUI_Widget *widget, char *ascii_text );
+
+LCUI_EXPORT(void)
+TextBox_Text_Add( LCUI_Widget *widget, char *utf8_text );
+
 /* 在文本末尾追加文本 */
+LCUI_EXPORT(void)
+TextBox_WText_Append( LCUI_Widget *widget, wchar_t *unicode_text );
+
+/* 在文本末尾追加文本 */
+LCUI_EXPORT(void)
+TextBox_Text_Append( LCUI_Widget *widget, char *utf8_text );
 
 LCUI_EXPORT(int)
 TextBox_Text_Backspace(LCUI_Widget *widget, int n);
 /* 删除光标左边处n个字符 */
-
-LCUI_EXPORT(int)
-TextBox_Text_Delete(LCUI_Widget *widget, int n);
-/* 删除光标右边处n个字符 */
-
-/* 获取文本框内的文本总长度 */
-LCUI_EXPORT(int)
-TextBox_Text_GetTotalLength( LCUI_Widget *widget );
 
 LCUI_EXPORT(LCUI_Pos)
 TextBox_Cursor_Update( LCUI_Widget *widget );
@@ -99,7 +109,7 @@ TextBox_Cursor_Update( LCUI_Widget *widget );
 
 LCUI_EXPORT(LCUI_Pos)
 TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos );
-/* 移动文本框内的光标,返回该光标的像素坐标 */
+/* 移动文本框内的光标 */
 
 LCUI_EXPORT(int)
 TextBox_GetSelectedText( LCUI_Widget *widget, char *out_text );

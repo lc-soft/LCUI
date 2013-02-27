@@ -72,7 +72,7 @@ LCUI_TextBox;
 typedef struct _LCUI_TextBlock
 {
 	int pos_type;	/* 指定该文本块要添加至哪个位置 */
-	char *text;	/* 指向文本所在内存空间的指针 */
+	wchar_t *text;	/* 指向文本所在内存空间的指针 */
 }
 LCUI_TextBlock;
 
@@ -566,24 +566,24 @@ TextBox_ScrollBar_UpdatePos( LCUI_Widget *widget )
 	return 0;
 }
 
-static void 
-__TextBox_Text_Append(LCUI_Widget *widget, char *new_text)
 /* 在文本末尾追加文本 */
+static void 
+__TextBox_WText_Append( LCUI_Widget *widget, wchar_t *new_text )
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
-	TextLayer_Text_Append( layer, new_text );
+	TextLayer_WText_Append( layer, new_text );
 }
 
-static void 
-__TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 /* 在光标处添加文本 */
+static void 
+__TextBox_Text_Add( LCUI_Widget *widget, wchar_t *new_text )
 {
 	LCUI_Pos cur_pos;
 	LCUI_TextLayer *layer;
 	
 	layer = TextBox_GetTextLayer( widget );
-	TextLayer_Text_Add( layer, new_text );
+	TextLayer_WText_Add( layer, new_text );
 	cur_pos = TextLayer_Cursor_GetPos( layer );
 	TextBox_Cursor_Move( widget, cur_pos );
 }
@@ -662,7 +662,7 @@ TextBox_ExecUpdate( LCUI_Widget *widget )
 			switch( text_ptr->pos_type ) {
 			    case AT_TEXT_LAST:
 				/* 将此文本块追加至文本末尾 */
-				__TextBox_Text_Append( widget, text_ptr->text );
+				__TextBox_WText_Append( widget, text_ptr->text );
 				break;
 			    case AT_CURSOR_POS:
 				/* 将此文本块插入至光标当前处 */
@@ -843,34 +843,44 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	return 0;
 }
 
+/* 获取文本框部件内的label部件指针 */
 LCUI_EXPORT(LCUI_Widget*)
 TextBox_GetLabel( LCUI_Widget *widget )
-/* 获取文本框部件内的label部件指针 */
 {
 	LCUI_TextBox *textbox;
 	textbox = Widget_GetPrivData( widget );
 	return textbox->text;
 }
 
+/* 获取文本框部件内的光标 */
 LCUI_EXPORT(LCUI_Widget*)
 TextBox_GetCursor( LCUI_Widget *widget )
-/* 获取文本框部件内的光标 */
 {
 	LCUI_TextBox *tb;
 	tb = Widget_GetPrivData( widget );
 	return tb->cursor;
 }
 
-static int
-textbuff_add_utf8_text( LCUI_TextBox* textbox, char *new_text, int pos_type )
-/* 将UTF-8编码文本添加至缓冲区内 */
+/* 获取文本框内的文本总长度 */
+LCUI_EXPORT(int)
+TextBox_Text_GetTotalLength( LCUI_Widget *widget )
 {
-	unsigned char t;
-	int i, j, count, len, size;
-	char *text_buff;
+	LCUI_TextLayer *layer;
+	layer = TextBox_GetTextLayer( widget );
+	return TextLayer_Text_GetTotalLength( layer );
+}
+
+/* 将文本添加至缓冲区内 */
+static int
+TextBox_TextBuff_Add( LCUI_Widget *widget, wchar_t *text, int pos_type )
+{
+	LCUI_TextBox *textbox;
+	int i, j, len, size;
+	wchar_t *text_buff;
 	LCUI_TextBlock text_block;
 	
-	len = strlen( new_text );
+	textbox = Widget_GetPrivData( widget );
+	len = wcslen( text );
 	//_DEBUG_MSG("len = %d\n", len);
 	switch( pos_type ) {
 		case AT_TEXT_LAST: 
@@ -889,45 +899,12 @@ textbuff_add_utf8_text( LCUI_TextBox* textbox, char *new_text, int pos_type )
 		if( !text_buff ) {
 			return -2;
 		}
-		for( count=0,j=0; i<len; ++i, ++j ) {
+		for( j=0; j<len; ++j,++i ) {
 			/* 如果大于当前块大小 */
 			if( j >= textbox->block_size ) {
-				if( count == 0 ) {
 					break;
-				} 
-				text_buff = realloc( text_buff, 
-						sizeof(char) * (j+count) );
-				if( !text_buff ) {
-					return -2;
-				}
 			}
-			if(count > 0) {
-				/* 保存一个字节 */
-				text_buff[j] = new_text[i];
-				--count;
-				continue;
-			}
-			/* 需要转存为unsigned char类型，否则位移的结果会有问题 */
-			t = new_text[i];
-			/* 根据编码信息，判断该UTF-8字符还剩多少个字节 */
-			if((t>>7) == 0); // 0xxxxxxx
-			else if((t>>5) == 6) {// 110xxxxx 
-				count = 1; 
-			}
-			else if((t>>4) == 14) {// 1110xxxx 
-				count = 2; 
-			}
-			else if((t>>3) == 30) {// 11110xxx 
-				count = 3; 
-			}
-			else if((t>>2) == 62) {// 111110xx 
-				count = 4; 
-			}
-			else if((t>>1) == 126) {// 1111110x 
-				count = 5; 
-			}
-			/* 保存一个字节 */
-			text_buff[j] = new_text[i];
+			text_buff[j] = text[i];
 			//_DEBUG_MSG("char: %d, count: %d\n", new_text[i], count);
 		}
 		--i;
@@ -939,24 +916,6 @@ textbuff_add_utf8_text( LCUI_TextBox* textbox, char *new_text, int pos_type )
 	return 0;
 }
 
-/* 获取文本框内的文本总长度 */
-LCUI_EXPORT(int)
-TextBox_Text_GetTotalLength( LCUI_Widget *widget )
-{
-	LCUI_TextLayer *layer;
-	layer = TextBox_GetTextLayer( widget );
-	return TextLayer_Text_GetTotalLength( layer );
-}
-
-/* 将文本添加至缓冲区内 */
-static void
-TextBox_TextBuff_Add( LCUI_Widget *widget, char *new_text, int pos_type )
-{
-	LCUI_TextBox *textbox;
-	textbox = Widget_GetPrivData( widget );
-	textbuff_add_utf8_text( textbox, new_text, pos_type );
-}
-
 static void
 TextBox_Text_Clear( LCUI_Widget *widget )
 {
@@ -966,17 +925,18 @@ TextBox_Text_Clear( LCUI_Widget *widget )
 	TextLayer_Text_Clear( layer );
 }
 
-LCUI_EXPORT(void)
-TextBox_Text(LCUI_Widget *widget, char *new_text)
+
 /* 设定文本框显示的文本 */
+LCUI_EXPORT(void)
+TextBox_WText( LCUI_Widget *widget, wchar_t *unicode_text )
 {
 	LCUI_TextBox *tb;
 	LCUI_TextLayer *layer;
-	/* 清空显示的文本 */
-	TextBox_Text_Clear( widget );
+	
+	TextBox_Text_Clear( widget );	/* 清空显示的文本 */
 	tb = Widget_GetPrivData( widget );
 	/* 把文本分割成块，加入至缓冲队列，让文本框分段显示 */
-	TextBox_TextBuff_Add( widget, new_text, AT_TEXT_LAST );
+	TextBox_TextBuff_Add( widget, unicode_text, AT_TEXT_LAST );
 	if( tb->show_placeholder ) {
 		layer = TextBox_GetTextLayer( widget );
 		tb->show_placeholder = FALSE;
@@ -985,6 +945,15 @@ TextBox_Text(LCUI_Widget *widget, char *new_text)
 		TextLayer_Text_SetDefaultStyle( layer, tb->textstyle_bak );
 	}
 	Widget_Update( widget );
+}
+
+LCUI_EXPORT(void)
+TextBox_Text( LCUI_Widget *widget, char *utf8_text )
+{
+	wchar_t *unicode_text;
+	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
+	TextBox_WText( widget, unicode_text );
+	free( unicode_text );
 }
 
 LCUI_EXPORT(void)
@@ -1000,16 +969,16 @@ TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos )
 	TextBox_Cursor_Update( widget );
 }
 
-LCUI_EXPORT(void)
-TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 /* 在光标处添加文本 */
+LCUI_EXPORT(void)
+TextBox_WText_Add( LCUI_Widget *widget, wchar_t *unicode_text )
 {
 	LCUI_TextBox *tb;
 	LCUI_TextLayer *layer;
 	
 	tb = Widget_GetPrivData( widget );
 	/* 把文本分割成若干块，加入至缓冲队列，让文本框分段处理显示 */ 
-	TextBox_TextBuff_Add( widget, new_text, AT_CURSOR_POS );
+	TextBox_TextBuff_Add( widget, unicode_text, AT_CURSOR_POS );
 	if( tb->show_placeholder ) {
 		layer = TextBox_GetTextLayer( widget );
 		TextLayer_Text_Clear( layer );
@@ -1021,14 +990,33 @@ TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 }
 
 LCUI_EXPORT(void)
-TextBox_Text_Append(LCUI_Widget *widget, char *new_text)
+TextBox_AText_Add( LCUI_Widget *widget, char *ascii_text )
+{
+	wchar_t *unicode_text;
+	LCUICharset_ASCIIToUnicode( ascii_text, &unicode_text );
+	TextBox_WText_Add( widget, unicode_text );
+	free( unicode_text );
+}
+
+LCUI_EXPORT(void)
+TextBox_Text_Add( LCUI_Widget *widget, char *utf8_text )
+{
+	wchar_t *unicode_text;
+	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
+	TextBox_WText_Add( widget, unicode_text );
+	free( unicode_text );
+}
+
+
 /* 在文本末尾追加文本 */
+LCUI_EXPORT(void)
+TextBox_WText_Append( LCUI_Widget *widget, wchar_t *unicode_text )
 {
 	LCUI_TextBox *tb;
 	LCUI_TextLayer *layer;
 	
 	tb = Widget_GetPrivData( widget );
-	TextBox_TextBuff_Add( widget, new_text, AT_TEXT_LAST );
+	TextBox_TextBuff_Add( widget, unicode_text, AT_TEXT_LAST );
 	if( tb->show_placeholder ) {
 		layer = TextBox_GetTextLayer( widget );
 		TextLayer_Text_Clear( layer );
@@ -1037,6 +1025,16 @@ TextBox_Text_Append(LCUI_Widget *widget, char *new_text)
 		tb->show_placeholder = FALSE;
 	}
 	Widget_Update( widget );
+}
+
+/* 在文本末尾追加文本 */
+LCUI_EXPORT(void)
+TextBox_Text_Append( LCUI_Widget *widget, char *utf8_text )
+{
+	wchar_t *unicode_text;
+	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
+	TextBox_WText_Append( widget, unicode_text );
+	free( unicode_text );
 }
 
 LCUI_EXPORT(int)
