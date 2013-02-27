@@ -686,7 +686,7 @@ TextBox_ExecUpdate( LCUI_Widget *widget )
 		textbox->textstyle_bak = layer->default_data;
 		textbox->password_char_bak = layer->password_char.char_code;
 		/* 占位符不能被屏蔽，所以设置屏蔽符为0 */
-		TextLayer_Text_Set_PasswordChar( layer, 0 );
+		TextLayer_Text_SetPasswordChar( layer, 0 );
 		/* 文本框内显示占位符 */
 		TextLayer_Text( layer, textbox->placeholder.string );
 		/* 设置占位符的样式 */
@@ -954,15 +954,7 @@ TextBox_TextBuff_Add( LCUI_Widget *widget, char *new_text, int pos_type )
 {
 	LCUI_TextBox *textbox;
 	textbox = Widget_GetPrivData( widget );
-	/* 判断当前使用的文本编码方式 */
-	switch(Get_EncodingType()) {
-	    case ENCODEING_TYPE_UTF8 :
-		textbuff_add_utf8_text( textbox, new_text, pos_type );
-		break;
-	    case ENCODEING_TYPE_GB2312 :
-		break;
-	    default: break;
-	}
+	textbuff_add_utf8_text( textbox, new_text, pos_type );
 }
 
 static void
@@ -989,7 +981,7 @@ TextBox_Text(LCUI_Widget *widget, char *new_text)
 		layer = TextBox_GetTextLayer( widget );
 		tb->show_placeholder = FALSE;
 		/* 恢复文本框的文本样式以及屏蔽符 */
-		TextLayer_Text_Set_PasswordChar( layer, tb->password_char_bak );
+		TextLayer_Text_SetPasswordChar( layer, tb->password_char_bak );
 		TextLayer_Text_SetDefaultStyle( layer, tb->textstyle_bak );
 	}
 	Widget_Update( widget );
@@ -1021,7 +1013,7 @@ TextBox_Text_Add(LCUI_Widget *widget, char *new_text)
 	if( tb->show_placeholder ) {
 		layer = TextBox_GetTextLayer( widget );
 		TextLayer_Text_Clear( layer );
-		TextLayer_Text_Set_PasswordChar( layer, tb->password_char_bak );
+		TextLayer_Text_SetPasswordChar( layer, tb->password_char_bak );
 		TextLayer_Text_SetDefaultStyle( layer, tb->textstyle_bak );
 		tb->show_placeholder = FALSE;
 	}
@@ -1040,7 +1032,7 @@ TextBox_Text_Append(LCUI_Widget *widget, char *new_text)
 	if( tb->show_placeholder ) {
 		layer = TextBox_GetTextLayer( widget );
 		TextLayer_Text_Clear( layer );
-		TextLayer_Text_Set_PasswordChar( layer, tb->password_char_bak );
+		TextLayer_Text_SetPasswordChar( layer, tb->password_char_bak );
 		TextLayer_Text_SetDefaultStyle( layer, tb->textstyle_bak );
 		tb->show_placeholder = FALSE;
 	}
@@ -1205,7 +1197,7 @@ TextBox_Text_SetPasswordChar( LCUI_Widget *widget, wchar_t ch )
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
-	TextLayer_Text_Set_PasswordChar( layer, ch );
+	TextLayer_Text_SetPasswordChar( layer, ch );
 	TextLayer_Refresh( layer );
 	Widget_Update( widget );
 }

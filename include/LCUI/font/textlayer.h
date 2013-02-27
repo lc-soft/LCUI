@@ -41,7 +41,7 @@ typedef struct _LCUI_TextLayer
 	LCUI_BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */ 
 	LCUI_BOOL need_proc_buff	:1;	/* 指示是否处理缓冲区内的文本 */
 	LCUI_BOOL need_scroll_layer	:1;	/* 指示是否需要滚动图层 */
-	LCUI_BOOL have_select	:1;	/* 标记，指示是否在文本图层中选择了文本 */
+	LCUI_BOOL have_select		:1;	/* 标记，指示是否在文本图层中选择了文本 */
 	uint32_t start, end;	/* 被选中的文本的范围 */ 
 	
 	LCUI_Queue color_keyword;	/* 记录需要使用指定风格的关键字 */
@@ -60,7 +60,7 @@ typedef struct _LCUI_TextLayer
 	
 	LCUI_BOOL show_cursor;	/* 指定是否需要显示文本光标 */
 	
-	LCUI_String text_buff;
+	LCUI_WString text_buff;
 	LCUI_TextStyle default_data;	/* 缺省状态下使用的文本样式数据 */
 }
 LCUI_TextLayer;
@@ -124,15 +124,17 @@ TextLayer_Text_Set_MaxLength( LCUI_TextLayer *layer, int max );
 /* 设定文本位图中的文本长度 */
 
 LCUI_EXPORT(void)
-TextLayer_Text_Set_PasswordChar( LCUI_TextLayer *layer, wchar_t ch );
+TextLayer_Text_SetPasswordChar( LCUI_TextLayer *layer, wchar_t ch );
 /* 
  * 设置屏蔽字符，设置后，文本框内的文本都会显示成该字符
  * 如果ch的值为0，则不对文本框里的文本进行屏蔽 
  * */
 
+/* 对文本进行预处理，处理后的数据保存至layer里 */ 
 LCUI_EXPORT(void)
-TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text );
-/* 对文本进行预处理，处理后的数据保存至layer里 */
+TextLayer_WText_Process(	LCUI_TextLayer *layer,
+				int pos_type,
+				wchar_t *new_text );
 
 LCUI_EXPORT(void)
 TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer );
@@ -143,19 +145,21 @@ TextLayer_Print_Info( LCUI_TextLayer *layer );
 /* 打印文本图层信息 */
 
 LCUI_EXPORT(void)
-TextLayer_Text( LCUI_TextLayer *layer, char *new_text );
-/* 
- * 功能：设定整个文本图层中需显示的文本
- * 说明：文本将被储存至缓冲区，等待绘制文本位图时再处理缓冲区内的文本
- *  */
+TextLayer_Text( LCUI_TextLayer *layer, const char *utf8_text );
 
 LCUI_EXPORT(int)
 TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text );
 /* 在文本末尾追加文本，不移动光标，不删除原有选中文本 */
 
 LCUI_EXPORT(int)
-TextLayer_Text_Add( LCUI_TextLayer *layer, char *new_text );
+TextLayer_WText_Add( LCUI_TextLayer *layer, wchar_t *unicode_text );
+
+LCUI_EXPORT(int)
+TextLayer_AText_Add( LCUI_TextLayer *layer, char *ascii_text );
+
 /* 在光标处添加文本，如有选中文本，将被删除 */
+LCUI_EXPORT(int)
+TextLayer_Text_Add( LCUI_TextLayer *layer, char *utf8_text );
 
 LCUI_EXPORT(LCUI_Pos)
 TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos );

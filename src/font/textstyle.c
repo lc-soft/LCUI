@@ -198,7 +198,6 @@ static wchar_t *
 get_style_endtag ( wchar_t *str, char *out_tag_name )
 /* 在字符串中获取样式的结束标签，输出的是标签名 */
 {
-	wchar_t *p;
 	int i, j, len, tag_found = 0;
 	
 	len = wcslen ( str );
@@ -225,8 +224,7 @@ end_tag_search:;
 	if( j < 1 ) { 
 		return NULL;
 	}
-	p = &str[i];
-	return p;
+	return str+i;
 }
 
 static wchar_t *

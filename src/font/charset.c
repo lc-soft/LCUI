@@ -77,41 +77,6 @@ code_convert(	char *src_charset,	char *des_charset,
 }
 #endif
 
-LCUI_EXPORT(int) Get_EncodingType(void)
-/* 获取字符编码类型 */
-{
-	LCUI_App *app;
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		return -1;
-	}
-	return app->encoding_type;
-}
-
-static int Set_EncodingType(int type)
-{
-#ifdef LCUI_BUILD_IN_LINUX
-	LCUI_App *app;
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		return -1;
-	}
-	app->encoding_type = type;
-	return 0;
-#else
-	return -2;
-#endif
-}
-
-LCUI_EXPORT(int) Using_GB2312(void)
-/* 
- * 说明：如果你的系统只能使用GB2312编码，不能使用UTF-8编码，可以使用这
- * 个函数进行设置，让相关函数正常转换字符编码 
- * */
-{
-	return Set_EncodingType(ENCODEING_TYPE_GB2312);
-}
-
 #define MAX_SAVE_NUM   20
 static wchar_t 
 covernt_code(unsigned char in[MAX_SAVE_NUM])
@@ -134,19 +99,22 @@ covernt_code(unsigned char in[MAX_SAVE_NUM])
 	return unicode;
 }
 
-static int 
-utf8_to_unicode(char *in_utf8_str, wchar_t **out_unicode)
-/* 功能：将UTF-8编码的字符串转换成Unicode编码字符串 */
+/* UTF-8转Unicode */
+LCUI_EXPORT(int)
+LCUICharset_UTF8ToUnicode( const char *src_utf8, wchar_t **des_unicode )
 {
 	wchar_t *buff;
 	unsigned char *p, t, save[MAX_SAVE_NUM];
 	unsigned int len, i, j, n, count;
  	
-	len = strlen(in_utf8_str)+1;  
+	len = strlen(src_utf8)+1;  
 	buff = (wchar_t *)calloc(sizeof(wchar_t), len); 
+	if( !buff ) {
+		return -1;
+	}
 	
 	for(count=0,i=0,j=0; i<len; ++i) {
-		t = in_utf8_str[i];
+		t = src_utf8[i];
 		/* 结束符的判断 */
 		if(t == 0) {
 			break;
@@ -155,28 +123,22 @@ utf8_to_unicode(char *in_utf8_str, wchar_t **out_unicode)
 		if((t>>7) == 0) {// 0xxxxxxx
 			buff[j] = t; 
 			++j;
-		}
-		else if((t>>5) == 6) {// 110xxxxx 
+		} else if((t>>5) == 6) {// 110xxxxx 
 			count = 2; 
-		}
-		else if((t>>4) == 14) {// 1110xxxx 
+		} else if((t>>4) == 14) {// 1110xxxx 
 			count = 3; 
-		}
-		else if((t>>3) == 30) {// 11110xxx 
+		} else if((t>>3) == 30) {// 11110xxx 
 			count = 4; 
-		}
-		else if((t>>2) == 62) {// 111110xx 
+		} else if((t>>2) == 62) {// 111110xx 
 			count = 5; 
-		}
-		else if((t>>1) == 126) {// 1111110x 
+		} else if((t>>1) == 126) {// 1111110x 
 			count = 6; 
 		}
 		if(count > 0) {
-			p = (unsigned char*)&in_utf8_str[i];
+			p = (unsigned char*)&src_utf8[i];
 			for(n=0; n<count; ++n) {
 				save[n] = *p++;
 			}
-				
 			count = 0; 
 			buff[j] = covernt_code(save);
 			memset(save, 0, sizeof(save));
@@ -189,49 +151,49 @@ utf8_to_unicode(char *in_utf8_str, wchar_t **out_unicode)
 		printf("%02x ", buff[i]);
 	printf("\n");
 	******/
-	*out_unicode = buff;
+	*des_unicode = buff;
 	return j;
 }
 
-#ifdef LCUI_BUILD_IN_LINUX
-static int 
-gb2312_to_unicode(char *in_gb2312_str, wchar_t **out_unicode)
-/* 功能：将GB2312编码的字符串转换成Unicode编码字符串 */
+/* ASCII转Unicode */
+LCUI_EXPORT(int)
+LCUICharset_ASCIIToUnicode( const char *src_ascii, wchar_t **des_unicode )
+{
+	wchar_t *buff;
+	unsigned int len, i;
+ 	
+	len = strlen(src_ascii);
+	buff = (wchar_t *)malloc( sizeof(wchar_t)*(len+1) );
+	for(i=0; i<len; ++i) {
+		buff[i] = src_ascii[i];
+	}
+	buff[i] = 0;
+	*des_unicode = buff;
+	return len;
+}
+
+/* GB2312转Unicode */
+LCUI_EXPORT(int)
+LCUICharset_GB2312ToUnicode( const char *src_gb2312, wchar_t **des_unicode )
 {
 	char *buff;
 	unsigned char *p;
 	unsigned int len, new_len;
  
-	len = strlen(in_gb2312_str);
+#ifdef LCUI_BUILD_IN_LINUX
+	len = strlen( src_gb2312 );
 	new_len = len*3;
 	buff = (char *) calloc ( sizeof(char), new_len );
 	p = (unsigned char*) buff;
-	if(code_convert("gb2312", "utf8", in_gb2312_str, len, p, new_len)) {
-		printf("gb2312_to_unicode(): error: "ERROR_CONVERT_ERROR);
+	if(code_convert("gb2312", "utf8", src_gb2312, len, p, new_len)) {
+		printf("%s (): error: %s", __FUNCTION__, ERROR_CONVERT_ERROR);
 		return -1;
 	}
-	len = utf8_to_unicode(buff, out_unicode);
+	len = LCUICharset_UTF8ToUnicode( buff, des_unicode );
 	free(buff);
 	return len;
-}
+#else
+	return -1;
 #endif
+}
 
-LCUI_EXPORT(int) Char_To_Wchar_T(char *in_text, wchar_t **unicode_text)
-/*
- * 功能：将char型字符串转换成wchar_t字符串
- * 参数说明：
- * in_text      ：传入的char型字符串
- * unicode_text ：输出的wchar_t型字符串
- * 返回值：正常则wchar_t型字符串的长度，否则返回-1
- * */
-{
-	switch(Get_EncodingType()) {
-	    case ENCODEING_TYPE_GB2312:
-#ifdef LCUI_BUILD_IN_LINUX
-		return gb2312_to_unicode(in_text, unicode_text); 
-#endif
-	    case ENCODEING_TYPE_UTF8:
-	    default: 
-		return utf8_to_unicode(in_text, unicode_text); 
-	}
-}

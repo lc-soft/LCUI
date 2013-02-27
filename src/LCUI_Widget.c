@@ -106,10 +106,13 @@ WidgetFunc_Add(	const char *type_name,
 	//printf("WidgetFunc_Add(): widget type: %s, func type: %d\n", type, func_type); 
 	
 	total = Queue_Get_Total(&app->widget_lib); 
-		/* 遍历数据，找到对应的位置 */
+	/* 遍历数据，找到对应的位置 */
 	for(i = 0; i < total; ++i) {
 		temp = Queue_Get(&app->widget_lib, i);
-		if(strcmp( temp->type_name.string, type_name) != 0) { 
+		if( temp == NULL ) {
+			continue;
+		}
+		if(_LCUIString_Cmp( &temp->type_name, type_name) != 0) { 
 			continue;
 		}
 		total = Queue_Get_Total(&temp->func); 

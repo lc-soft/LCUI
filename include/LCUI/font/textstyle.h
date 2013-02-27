@@ -107,7 +107,8 @@ LCUI_EXPORT(LCUI_TextStyle*) StyleTag_GetCurrentStyle ( LCUI_Queue *tags );
 LCUI_EXPORT(wchar_t*) StyleTag_ProcessTag( LCUI_Queue *tags, wchar_t *str );
 
 /* 处理样式结束标签 */
-LCUI_EXPORT(wchar_t*) StyleTag_ProcessEndingTag( LCUI_Queue *tags, wchar_t *str );
+LCUI_EXPORT(wchar_t*)
+StyleTag_ProcessEndingTag( LCUI_Queue *tags, wchar_t *str );
 
 /*------------------------- End StyleTag -----------------------------*/
 

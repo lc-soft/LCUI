@@ -270,7 +270,7 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	layer->max_text_len = 512000;
 	TextStyle_Init ( &layer->default_data );
 	
-	LCUIString_Init( &layer->text_buff );
+	LCUIWString_Init( &layer->text_buff );
 	//TextLayer_Text_Add_NewRow ( layer );/* 添加新行 */
 }
 
@@ -283,18 +283,18 @@ Destroy_TextLayer( LCUI_TextLayer *layer )
 	Destroy_Queue( &layer->tag_buff );
 	Destroy_Queue( &layer->style_data );
 	Destroy_Queue( &layer->clear_area );
-	LCUIString_Free( &layer->text_buff );
+	LCUIWString_Free( &layer->text_buff );
 }
 
+/* 设定整个文本图层中需显示的文本，原有选中文本被删除 */
 static int
 __TextLayer_Text( LCUI_TextLayer *layer )
-/* 设定整个文本图层中需显示的文本，原有选中文本被删除 */
 {
 	if( !layer ) {
 		return -1;
 	}
 	TextLayer_Text_Clear( layer );
-	TextLayer_Text_Add( layer, layer->text_buff.string );
+	TextLayer_WText_Add( layer, layer->text_buff.string );
 	return 0;
 }
 
@@ -757,7 +757,7 @@ TextLayer_Text_Set_MaxLength( LCUI_TextLayer *layer, int max )
 }
 
 LCUI_EXPORT(void)
-TextLayer_Text_Set_PasswordChar( LCUI_TextLayer *layer, wchar_t ch )
+TextLayer_Text_SetPasswordChar( LCUI_TextLayer *layer, wchar_t ch )
 /* 
  * 设置屏蔽字符，设置后，文本框内的文本都会显示成该字符
  * 如果ch的值为0，则不对文本框里的文本进行屏蔽 
@@ -768,14 +768,16 @@ TextLayer_Text_Set_PasswordChar( LCUI_TextLayer *layer, wchar_t ch )
 	//暂时不进行其它处理
 }
 
-LCUI_EXPORT(void)
-TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text )
 /* 对文本进行预处理，处理后的数据保存至layer里 */ 
+LCUI_EXPORT(void)
+TextLayer_WText_Process(	LCUI_TextLayer *layer,
+				int pos_type,
+				wchar_t *new_text )
 {
 	LCUI_BOOL refresh = TRUE;
 	LCUI_Pos cur_pos, des_pos;
 	int total, cur_len, row, src_pos, total_row, n_ignore = 0;
-	wchar_t *finish, *buff, *p, *q;
+	wchar_t *finish, *p, *q;
 	
 	LCUI_Pos tmp_pos;
 	LCUI_CharData *char_ptr, char_data; 
@@ -813,8 +815,7 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text )
 		DEBUG_MSG1( "des_pos: %d,%d\n", des_pos.x, des_pos.y );
 	}
 	row = cur_pos.y;
-	
-	total = Char_To_Wchar_T( new_text, &buff ); 
+	total = wcslen( new_text );
 	total_row = TextLayer_GetRows( layer );
 	/* 判断当前要添加的字符的总数是否超出最大限制 */
 	cur_len = Queue_Get_Total( &layer->text_source_data );
@@ -832,7 +833,7 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text )
 	char_data.bitmap = NULL;
 	/* 先记录这一行需要刷新的区域，起点为光标所在位置 */
 	TextLayer_CharLater_Refresh( layer, cur_pos );
-	for(p=buff, finish=buff+total; p<finish; ++p) { 
+	for(p=new_text, finish=new_text+total; p<finish; ++p) { 
 		DEBUG_MSG2( "1, char: %c\n", *p );
 		if( layer->using_style_tags ) {
 			/* 处理样式的结束标签 */ 
@@ -921,8 +922,6 @@ TextLayer_Text_Process( LCUI_TextLayer *layer, int pos_type, char *new_text )
 		Queue_Insert_Pointer( &cur_row_ptr->string, des_pos.x, char_ptr );
 		++src_pos; ++des_pos.x; 
 	}
-	/* 释放用于临时储存Wchar_T字符的空间 */
-	free( buff );
 	
 	if( pos_type == AT_CURSOR_POS ) {
 		layer->current_des_pos = des_pos;
@@ -1005,34 +1004,92 @@ TextLayer_Print_Info( LCUI_TextLayer *layer )
 	printf("\n\n");
 }
 
-LCUI_EXPORT(void)
-TextLayer_Text( LCUI_TextLayer *layer, char *new_text )
 /* 
- * 功能：设定整个文本图层中需显示的文本
+ * 功能：设定指定的宽字符串作为文本图层中显示的文本
  * 说明：文本将被储存至缓冲区，等待绘制文本位图时再处理缓冲区内的文本
  *  */
+LCUI_EXPORT(void)
+TextLayer_WText( LCUI_TextLayer *layer, const wchar_t *wchar_text )
 {
 	/* 将文本存储至缓冲区 */
-	_LCUIString_Copy( &layer->text_buff, new_text );
+	_LCUIWString_Copy( &layer->text_buff, wchar_text ); 
 	/* 标记，需要处理缓冲区 */
 	layer->need_proc_buff = TRUE;
 }
 
-LCUI_EXPORT(int)
-TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text )
-/* 在文本末尾追加文本，不移动光标，不删除原有选中文本 */
+LCUI_EXPORT(void)
+TextLayer_Text( LCUI_TextLayer *layer, const char *utf8_text )
 {
-	TextLayer_Text_Process( layer, AT_TEXT_LAST, new_text );
+	wchar_t *unicode_text;
+	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
+	TextLayer_WText( layer, unicode_text );
+	free( unicode_text );
+}
+
+LCUI_EXPORT(void)
+TextLayer_AText( LCUI_TextLayer *layer, const char *ascii_text )
+{
+	wchar_t *unicode_text;
+	LCUICharset_ASCIIToUnicode( ascii_text, &unicode_text );
+	TextLayer_WText( layer, unicode_text );
+	free( unicode_text );
+}
+
+/* 在文本末尾追加文本，不移动光标，不删除原有选中文本 */
+LCUI_EXPORT(int)
+TextLayer_WText_Append( LCUI_TextLayer *layer, wchar_t *new_text )
+{
+	TextLayer_WText_Process( layer, AT_TEXT_LAST, new_text );
 	TextLayer_Text_GenerateBMP( layer );
 	return 0;
 }
 
 LCUI_EXPORT(int)
-TextLayer_Text_Add( LCUI_TextLayer *layer, char *new_text )
-/* 在光标处添加文本，如有选中文本，将被删除 */
+TextLayer_AText_Append( LCUI_TextLayer *layer, char *new_text )
 {
-	TextLayer_Text_Process( layer, AT_CURSOR_POS, new_text );
+	wchar_t *unicode_text;
+	LCUICharset_ASCIIToUnicode( new_text, &unicode_text );
+	TextLayer_WText_Add( layer, unicode_text );
+	free( unicode_text );
+	return 0;
+}
+
+LCUI_EXPORT(int)
+TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text )
+{
+	wchar_t *unicode_text;
+	LCUICharset_UTF8ToUnicode( new_text, &unicode_text );
+	TextLayer_WText_Add( layer, unicode_text );
+	free( unicode_text );
+	return 0;
+}
+
+/* 在光标处添加文本，如有选中文本，将被删除 */
+LCUI_EXPORT(int)
+TextLayer_WText_Add( LCUI_TextLayer *layer, wchar_t *unicode_text )
+{
+	TextLayer_WText_Process( layer, AT_CURSOR_POS, unicode_text );
 	TextLayer_Text_GenerateBMP( layer );
+	return 0;
+}
+
+LCUI_EXPORT(int)
+TextLayer_Text_Add( LCUI_TextLayer *layer, char *utf8_text )
+{
+	wchar_t *unicode_text;
+	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
+	TextLayer_WText_Add( layer, unicode_text );
+	free( unicode_text );
+	return 0;
+}
+
+LCUI_EXPORT(int)
+TextLayer_AText_Add( LCUI_TextLayer *layer, char *ascii_text )
+{
+	wchar_t *unicode_text;
+	LCUICharset_ASCIIToUnicode( ascii_text, &unicode_text );
+	TextLayer_WText_Add( layer, unicode_text );
+	free( unicode_text );
 	return 0;
 }
 
