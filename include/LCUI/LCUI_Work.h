@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * LCUI_Work.h -- LCUI's other work
  * 
- * Copyright (C) 2012 by
+ * Copyright (C) 2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Work.h -- LCUI 的其它工作
  *
- * 版权所有 (C) 2012 归属于 
+ * 版权所有 (C) 2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -64,15 +64,15 @@ typedef struct {
 } LCUI_WidgetResizeEvent;
 
 typedef struct {
-	unsigned char type;
+	uchar_t type;
 	LCUI_Pos new_pos;	/* 部件的新全局坐标 */
 	LCUI_Pos cursor_pos;	/* 鼠标游标的坐标 */
-	int first_click;	/* 标志，是否为首次点击 */ 
-	int end_click;		/* 标志，是否已经结束拖动 */
+	LCUI_BOOL first_click;	/* 标志，是否为首次点击 */ 
+	LCUI_BOOL end_click;	/* 标志，是否已经结束拖动 */
 } LCUI_WidgetDragEvent; 
 
 typedef struct {
-	unsigned char type;
+	uchar_t type;
 	LCUI_BOOL focus;
 } LCUI_WidgetFocusEvent;
 
@@ -86,14 +86,14 @@ typedef union {
 	LCUI_WidgetResizeEvent resize;
 } LCUI_WidgetEvent;
 
-/***************************** Func ***********************************/
+
 LCUI_EXPORT(void) NULL_Func();
 /* 功能：空函数，不做任何操作 */ 
 
 LCUI_EXPORT(void) FuncQueue_Init(LCUI_Queue *queue);
 /* 功能：初始化函数指针队列 */ 
 
-/********************* 处理部件拖动/点击事件 ******************************/
+/*----------------------------- 部件事件 -------------------------------------*/
 /* 将回调函数与部件的指定事件进行关联 */
 LCUI_EXPORT(int)
 Widget_Event_Connect(	LCUI_Widget *widget, WidgetEventType event_id, 
@@ -110,6 +110,7 @@ LCUIModule_Widget_Init( void );
 /* 停用部件模块 */
 LCUI_EXPORT(void)
 LCUIModule_Widget_End( void );
+/*-------------------------------- END ---------------------------------------*/
 
 /*--------------------------- Focus Proc ------------------------------*/
 LCUI_EXPORT(LCUI_BOOL)
@@ -140,8 +141,6 @@ Reset_Focus( LCUI_Widget* widget );
 /* 复位指定部件内的子部件的焦点 */ 
 
 /*------------------------- End Focus Proc ----------------------------*/
-
-/*************************** Event End *********************************/
 
 LCUI_END_HEADER
 

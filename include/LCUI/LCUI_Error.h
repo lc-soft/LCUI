@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * LCUI_Error.c -- LCUI‘s errors handling, at present, only macro definition
  * 
- * Copyright (C) 2012 by
+ * Copyright (C) 2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Error.h -- LCUI 的错误处理，目前只有宏定义
  *
- * 版权所有 (C) 2012 归属于 
+ * 版权所有 (C) 2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。

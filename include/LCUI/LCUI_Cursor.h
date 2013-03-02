@@ -1,7 +1,7 @@
 /* ***************************************************************************
- * LCUI_Cursor.h -- control mouse cursor
+ * LCUI_Cursor.h -- mouse cursor operation set.
  * 
- * Copyright (C) 2012 by
+ * Copyright (C) 2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -21,9 +21,9 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * LCUI_Cursor.h -- 控制鼠标光标
+ * LCUI_Cursor.h -- 鼠标游标的操作集
  *
- * 版权所有 (C) 2012 归属于 
+ * 版权所有 (C) 2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。

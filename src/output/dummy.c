@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * dummy.c --  if not found graphical output support, use this sourcefile
  * 
- * Copyright (C) 2012 by
+ * Copyright (C) 2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * dummy.c -- 通常在找不到合适的图形输出支持的情况下，使用该源文件，用虚设函数凑数
  *
- * 版权所有 (C) 2012 归属于 
+ * 版权所有 (C) 2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
