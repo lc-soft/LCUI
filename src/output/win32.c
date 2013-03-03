@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * win32.c -- win32ƽ̨�ϵ�ͼ�����֧��
+ * win32.c -- win32平台上的图形输出支持
  *
- * ��Ȩ���� (C) 2013 ������
- * ����
+ * 版权所有 (C) 2013 归属于
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -87,14 +87,14 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 	case WM_PAINT: 
 		Graph_Init( &graph );
 		BeginPaint( hwnd, &ps );
-		/* ��ȡ�������꼰�ߴ� */
+		/* 获取区域坐标及尺寸 */
 		area.x = ps.rcPaint.left;
 		area.y = ps.rcPaint.top;
 		area.width = ps.rcPaint.right - area.x;
 		area.height = ps.rcPaint.bottom - area.y;
 		LCUIScreen_GetRealGraph( area, &graph );
 		LCUIScreen_PutGraph( &graph, Pos(area.x, area.y) );
-		/* ��֡�����ڵ�λͼ���ݸ������ͻ�����ָ������area�� */
+		/* 将帧缓冲内的位图数据更新至客户区内指定区域（area） */
 		BitBlt( hdc_client, area.x, area.y, area.width, area.height, 
 			hdc_framebuffer, area.x, area.y, SRCCOPY );
 		
@@ -172,7 +172,7 @@ LCUIScreen_Init( void )
 	LCUI_Sys.screen.size.w = client_rect.right;
 	LCUI_Sys.screen.size.h = client_rect.bottom; 
 	LCUI_Sys.screen.smem_len = LCUI_Sys.screen.size.w * LCUI_Sys.screen.size.h * 4;
-	/* �����ڴ棬������������ */ 
+	/* 分配内存，储存像素数据 */ 
 	pixel_mem = malloc ( LCUI_Sys.screen.smem_len );
 	LCUI_Sys.screen.fb_mem = pixel_mem;
 	LCUI_Sys.root_glayer = GraphLayer_New();
@@ -180,13 +180,13 @@ LCUIScreen_Init( void )
 	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
 	Graph_FillColor( graph, RGB(255,255,255) );
 
-	/* ��ȡ�ͻ�����DC */
+	/* 获取客户区的DC */
 	hdc_client = GetDC( current_hwnd );
-	/* Ϊ֡���崴��һ��DC */
+	/* 为帧缓冲创建一个DC */
 	hdc_framebuffer = CreateCompatibleDC( hdc_client );
-	/* Ϊ�ͻ�������һ��Bitmap */ 
+	/* 为客户区创建一个Bitmap */ 
 	client_bitmap = CreateCompatibleBitmap( hdc_client, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h );
-	/* Ϊ֡�����DCѡ��client_bitmap��Ϊ���� */
+	/* 为帧缓冲的DC选择client_bitmap作为对象 */
 	SelectObject( hdc_framebuffer, client_bitmap );
 	
 	GraphLayer_Show( LCUI_Sys.root_glayer );
@@ -220,16 +220,16 @@ LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	if (!Graph_IsValid (src)) {
 		return -1;
 	}
-	/* ָ��֡���� */
+	/* 指向帧缓冲 */
 	dest = LCUI_Sys.screen.fb_mem;		
 	pic = src; 
 	Graph_Init (&temp);
 	
-	if ( Get_Cut_Area ( LCUIScreen_GetSize(), 
+	if ( LCUIRect_GetCutArea ( LCUIScreen_GetSize(), 
 			Rect ( pos.x, pos.y, src->width, src->height ), 
 			&cut_rect
-		) ) {/* �����Ҫ�ü�ͼ�� */
-		if(!Rect_Valid(cut_rect)) {
+		) ) {/* 如果需要裁剪图形 */
+		if(!LCUIRect_IsValid(cut_rect)) {
 			return -2;
 		}
 		pos.x += cut_rect.x;
@@ -242,7 +242,7 @@ LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	k = pos.y * LCUI_Sys.screen.size.w + pos.x;
 	for (n=0,y = 0; y < pic->height; ++y) {
 		for (x = 0; x < pic->width; ++x, ++n) {
-			count = k + x;//count = 4 * (k + x);/* �������������ص������ */
+			count = k + x;//count = 4 * (k + x);/* 计算需填充的像素点的坐标 */
 			count = count << 2; 
 			dest[count++] = pic->rgba[2][n]; 
 			dest[count++] = pic->rgba[1][n]; 
