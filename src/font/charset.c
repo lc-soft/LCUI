@@ -176,11 +176,11 @@ LCUICharset_ASCIIToUnicode( const char *src_ascii, wchar_t **des_unicode )
 LCUI_EXPORT(int)
 LCUICharset_GB2312ToUnicode( const char *src_gb2312, wchar_t **des_unicode )
 {
+#ifdef LCUI_BUILD_IN_LINUX
 	char *buff;
 	unsigned char *p;
 	unsigned int len, new_len;
  
-#ifdef LCUI_BUILD_IN_LINUX
 	len = strlen( src_gb2312 );
 	new_len = len*3;
 	buff = (char *) calloc ( sizeof(char), new_len );
