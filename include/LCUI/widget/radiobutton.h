@@ -112,7 +112,7 @@ LCUI_EXPORT(void)
 RadioButton_Text( LCUI_Widget *widget, const char *text );
 
 LCUI_EXPORT(void)
-RadioButton_WText( LCUI_Widget *widget, const wchar_t *text );
+RadioButton_TextW( LCUI_Widget *widget, const wchar_t *text );
 
 /* 创建一个带文本内容的单选框 */
 LCUI_EXPORT(LCUI_Widget*)

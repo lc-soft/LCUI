@@ -358,12 +358,11 @@ Window_SetTitleText(LCUI_Widget *win_p, const char *text)
 }
 
 LCUI_EXPORT(void)
-Window_SetTitleWText(LCUI_Widget *win_p, const wchar_t *text)
-/* 功能：为窗口设置标题文字 */
+Window_SetTitleTextW(LCUI_Widget *win_p, const wchar_t *text)
 { 
 	LCUI_Widget *titlebar = Window_GetTitleBar(win_p); 
 	LCUI_TitleBar *title = Widget_GetPrivData(titlebar); 
-	Label_WText(title->label, text);
+	Label_TextW(title->label, text);
 }
 
 LCUI_EXPORT(void)

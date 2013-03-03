@@ -194,14 +194,14 @@ Button_Text( LCUI_Widget *widget, const char *text )
 }
 
 LCUI_EXPORT(void)
-Button_WText( LCUI_Widget *widget, const wchar_t *text )
+Button_TextW( LCUI_Widget *widget, const wchar_t *text )
 {
 	LCUI_Button *button;
 	LCUI_Widget *label;
 	
 	button = (LCUI_Button*)Widget_GetPrivData(widget);
 	label = button->label;
-	Label_WText( label, text );
+	Label_TextW( label, text );
 }
 
 /* 创建一个带文本内容的按钮 */

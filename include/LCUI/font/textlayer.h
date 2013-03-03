@@ -171,7 +171,7 @@ TextLayer_Text_SetPasswordChar( LCUI_TextLayer *layer, wchar_t ch );
 
 /* 对文本进行预处理，处理后的数据保存至layer里 */ 
 LCUI_EXPORT(void)
-TextLayer_WText_Process(	LCUI_TextLayer *layer,
+TextLayer_Text_Process(	LCUI_TextLayer *layer,
 				int pos_type,
 				wchar_t *new_text );
 
@@ -180,7 +180,7 @@ TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer );
 /* 为文本图层中的文本生成位图，已存在位图的文字将不重新生成 */
 
 LCUI_EXPORT(void)
-TextLayer_Print_Info( LCUI_TextLayer *layer );
+TextLayer_PrintInfo( LCUI_TextLayer *layer );
 /* 打印文本图层信息 */
 
 /* 
@@ -188,29 +188,29 @@ TextLayer_Print_Info( LCUI_TextLayer *layer );
  * 说明：文本将被储存至缓冲区，等待绘制文本位图时再处理缓冲区内的文本
  *  */
 LCUI_EXPORT(void)
-TextLayer_WText( LCUI_TextLayer *layer, const wchar_t *wchar_text );
+TextLayer_TextW( LCUI_TextLayer *layer, const wchar_t *wchar_text );
 
 LCUI_EXPORT(void)
 TextLayer_Text( LCUI_TextLayer *layer, const char *utf8_text );
 
 LCUI_EXPORT(void)
-TextLayer_AText( LCUI_TextLayer *layer, const char *ascii_text );
+TextLayer_TextA( LCUI_TextLayer *layer, const char *ascii_text );
 
 /* 在文本末尾追加文本，不移动光标，不删除原有选中文本 */
 LCUI_EXPORT(int)
-TextLayer_WText_Append( LCUI_TextLayer *layer, wchar_t *new_text );
+TextLayer_Text_AppendW( LCUI_TextLayer *layer, wchar_t *new_text );
 
 LCUI_EXPORT(int)
-TextLayer_AText_Append( LCUI_TextLayer *layer, char *new_text );
+TextLayer_Text_AppendA( LCUI_TextLayer *layer, char *new_text );
 
 LCUI_EXPORT(int)
 TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text );
 
 LCUI_EXPORT(int)
-TextLayer_WText_Add( LCUI_TextLayer *layer, wchar_t *unicode_text );
+TextLayer_Text_AddW( LCUI_TextLayer *layer, wchar_t *unicode_text );
 
 LCUI_EXPORT(int)
-TextLayer_AText_Add( LCUI_TextLayer *layer, char *ascii_text );
+TextLayer_Text_AddA( LCUI_TextLayer *layer, char *ascii_text );
 
 /* 在光标处添加文本，如有选中文本，将被删除 */
 LCUI_EXPORT(int)

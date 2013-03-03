@@ -109,7 +109,7 @@ LCUI_EXPORT(void)
 CheckBox_Text( LCUI_Widget *widget, const char *text );
 
 LCUI_EXPORT(void)
-CheckBox_WText( LCUI_Widget *widget, const wchar_t *text );
+CheckBox_TextW( LCUI_Widget *widget, const wchar_t *text );
 
 /* 创建一个带文本内容的复选框 */
 LCUI_EXPORT(LCUI_Widget*)

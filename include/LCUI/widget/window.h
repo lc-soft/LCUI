@@ -100,7 +100,7 @@ Window_SetTitleText(LCUI_Widget *win_p, const char *text);
 /* 功能：为窗口设置标题文字 */ 
 
 LCUI_EXPORT(void)
-Window_SetTitleWText(LCUI_Widget *win_p, const wchar_t *text);
+Window_SetTitleTextW(LCUI_Widget *win_p, const wchar_t *text);
 /* 功能：为窗口设置标题文字 */
 
 LCUI_EXPORT(void)

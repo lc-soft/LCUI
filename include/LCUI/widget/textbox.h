@@ -72,7 +72,7 @@ TextBox_Text_GetTotalLength( LCUI_Widget *widget );
 
 /* 设定文本框显示的文本 */
 LCUI_EXPORT(void)
-TextBox_WText( LCUI_Widget *widget, wchar_t *unicode_text );
+TextBox_TextW( LCUI_Widget *widget, wchar_t *unicode_text );
 
 LCUI_EXPORT(void)
 TextBox_Text( LCUI_Widget *widget, char *utf8_text );
@@ -83,17 +83,17 @@ TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos );
 
 /* 在光标处添加文本 */
 LCUI_EXPORT(void)
-TextBox_WText_Add( LCUI_Widget *widget, wchar_t *unicode_text );
+TextBox_Text_AddW( LCUI_Widget *widget, wchar_t *unicode_text );
 
 LCUI_EXPORT(void)
-TextBox_AText_Add( LCUI_Widget *widget, char *ascii_text );
+TextBox_Text_AddA( LCUI_Widget *widget, char *ascii_text );
 
 LCUI_EXPORT(void)
 TextBox_Text_Add( LCUI_Widget *widget, char *utf8_text );
 
 /* 在文本末尾追加文本 */
 LCUI_EXPORT(void)
-TextBox_WText_Append( LCUI_Widget *widget, wchar_t *unicode_text );
+TextBox_Text_AppendW( LCUI_Widget *widget, wchar_t *unicode_text );
 
 /* 在文本末尾追加文本 */
 LCUI_EXPORT(void)

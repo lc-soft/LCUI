@@ -80,7 +80,7 @@ LCUI_EXPORT(void)
 Button_Text( LCUI_Widget *widget, const char *text );
 
 LCUI_EXPORT(void)
-Button_WText( LCUI_Widget *widget, const wchar_t *text );
+Button_TextW( LCUI_Widget *widget, const wchar_t *text );
 
 /* 创建一个带文本内容的按钮 */
 LCUI_EXPORT(LCUI_Widget*)

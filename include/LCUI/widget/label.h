@@ -56,13 +56,13 @@ LCUI_Label;
 
 /* 设定与标签关联的文本内容 */
 LCUI_EXPORT(int)
-Label_WText( LCUI_Widget *widget, const wchar_t *unicode_text );
+Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text );
 
 LCUI_EXPORT(void)
 Label_Text( LCUI_Widget *widget, const char *utf8_text );
 
 LCUI_EXPORT(void)
-Label_AText( LCUI_Widget *widget, const char *ascii_text );
+Label_TextA( LCUI_Widget *widget, const char *ascii_text );
 
 /* 为Label部件内显示的文本设定文本样式 */
 LCUI_EXPORT(int)
