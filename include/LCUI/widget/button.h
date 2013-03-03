@@ -79,6 +79,9 @@ Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal,
 LCUI_EXPORT(void)
 Button_Text( LCUI_Widget *widget, const char *text );
 
+LCUI_EXPORT(void)
+Button_WText( LCUI_Widget *widget, const wchar_t *text );
+
 /* 创建一个带文本内容的按钮 */
 LCUI_EXPORT(LCUI_Widget*)
 Button_New( const char *text );
