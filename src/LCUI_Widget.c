@@ -1269,7 +1269,7 @@ Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 		 *  */ 
 		tmp_pos = Pos_Sub( pos, ctnr->pos ); 
 		graph = Widget_GetSelfGraph( ctnr );
-		if( Get_Graph_Pixel( graph, tmp_pos, &pixel )) {
+		if( Graph_GetPixel( graph, tmp_pos, &pixel )) {
 			//printf("mode: %d, pixel alpha: %d, alpha: %d\n",
 			//widget->clickable_mode, pixel.alpha, widget->clickable_area_alpha );
 			if( (ctnr->clickable_mode == 0 
@@ -1729,7 +1729,7 @@ Widget_SetBackgroundImage( LCUI_Widget *widget, LCUI_Graph *img )
 	if(!widget) {
 		return;
 	}
-	if( !Graph_Valid(img) ) {
+	if( !Graph_IsValid(img) ) {
 		Graph_Init( &widget->background.image );
 		return;
 	}
@@ -2059,7 +2059,7 @@ Widget_ExecDrawBackground( LCUI_Widget *widget )
 		fill_mode = GRAPH_MIX_FLAG_OVERLAY;
 	}
 	fill_mode |= bg->layout;
-	Graph_Fill_Image( graph, &bg->image, fill_mode, bg->color );
+	Graph_FillImage( graph, &bg->image, fill_mode, bg->color );
 }
 
 LCUI_EXPORT(void)
@@ -2079,7 +2079,7 @@ Widget_ExecDraw(LCUI_Widget *widget)
 	graph = Widget_GetSelfGraph( widget );
 	/* 绘制边框线 */
 	Graph_Draw_Border( graph, widget->border );
-	Graph_Update_Attr( graph );
+	Graph_UpdateAttr( graph );
 }
 
 /* 获取指向部件自身图形数据的指针 */

@@ -293,7 +293,7 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	LCUI_Rect cut_rect;
 	LCUI_Graph temp, *pic;
 
-	if (!Graph_Valid (src)) {
+	if (!Graph_IsValid (src)) {
 		return -1;
 	}
 	/* 指向帧缓冲 */

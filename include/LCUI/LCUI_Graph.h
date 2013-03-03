@@ -72,172 +72,170 @@ ALPHA_BLENDING( uchar_t fore, uchar_t back, uchar_t alpha )
 #undef RGB
 #endif
 
-LCUI_EXPORT(LCUI_RGB)
-RGB ( uchar_t red, uchar_t green, uchar_t blue ) ;
 /* 将三个颜色值转换成LCUI_RGB型数据 */
+LCUI_EXPORT(LCUI_RGB)
+RGB ( uchar_t red, uchar_t green, uchar_t blue );
 
 /* 为图形数据设定互斥锁 */
 LCUI_EXPORT(void)
 Graph_Lock( LCUI_Graph *graph );
 
-LCUI_EXPORT(void)
-Graph_Update_Attr( LCUI_Graph *buff );
 /* 更新图层的属性 */
-
 LCUI_EXPORT(void)
-Graph_Unlock(LCUI_Graph *pic);
-/* 功能：结束图像数据的使用 */
+Graph_UpdateAttr( LCUI_Graph *buff );
 
-LCUI_EXPORT(LCUI_RGBA)
-RGBA_Mix(LCUI_RGBA back, LCUI_RGBA fore);
-/* 功能：混合两个像素点的颜色 */ 
+/* 解除互斥锁，以结束图像数据的使用 */
+LCUI_EXPORT(void)
+Graph_Unlock( LCUI_Graph *graph );
 
+/* 混合两个像素点的颜色 */
+LCUI_EXPORT(void)
+RGBA_Mix( LCUI_RGBA *back, LCUI_RGBA *fore );
+
+/* 获取图像中指定坐标的像素点的颜色 */
 LCUI_EXPORT(LCUI_BOOL)
-Get_Graph_Pixel(LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel);
-/* 功能：获取图像中指定坐标的像素点的颜色 */
+Graph_GetPixel( LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel );
 
+/* 返回图形的类型 */
 LCUI_EXPORT(int)
-Get_Graph_Type(LCUI_Graph *pic);
-/* 返回图形的类型 */ 
+Graph_GetType( LCUI_Graph *pic );
 
+/* 获取图形的尺寸 */
 LCUI_EXPORT(LCUI_Size)
-Get_Graph_Size(LCUI_Graph *pic);
-/* 功能：获取图形的尺寸 */ 
+Graph_GetSize( LCUI_Graph *pic );
 
-LCUI_EXPORT(LCUI_BOOL)
-Graph_Is_PNG(LCUI_Graph *pic);
 /* 
  * 功能：判断图像是否为png
- * 返回值：是则返回1，否则返回0
- * */ 
-
+ * 返回值：是则返回TRUE，否则返回FALSE
+ * */
 LCUI_EXPORT(LCUI_BOOL)
-Graph_Is_BMP(LCUI_Graph *pic);
+Graph_IsPNG( LCUI_Graph *pic );
+
 /* 
  * 功能：判断图像是否为bmp
- * 返回值：是则返回1，否则返回0
- * */ 
-
+ * 返回值：是则返回TRUE，否则返回FALSE
+ * */
 LCUI_EXPORT(LCUI_BOOL)
-Graph_Is_JPG(LCUI_Graph *pic);
+Graph_IsBMP( LCUI_Graph *pic );
+
 /* 
  * 功能：判断图像是否为jpg 
  * 返回值：是则返回1，否则返回0
- * */ 
-
+ * */
 LCUI_EXPORT(LCUI_BOOL)
-Graph_Have_Alpha(LCUI_Graph *pic);
+Graph_IsJPG( LCUI_Graph *pic );
+
 /* 
  * 功能：判断图像是否带有带alpha通道 
  * 返回值：是则返回1，否则返回0
- * */ 
-
+ * */
 LCUI_EXPORT(LCUI_BOOL)
-Graph_Valid(LCUI_Graph *pic);
+Graph_HaveAlpha( LCUI_Graph *pic );
+
 /*
  * 功能：检测图形数据是否有效
  * 返回值：有效返回1，无效返回0
- */ 
+ */
+LCUI_EXPORT(LCUI_BOOL)
+Graph_IsValid( LCUI_Graph *pic );
 
-LCUI_EXPORT(int)
-Graph_Is_Opaque(LCUI_Graph *graph);
 /* 
  * 功能：检测图形是否为不透明 
  * 说明：完全透明则返回-1，不透明则返回1，有透明效果则返回0
- * */ 
-
-LCUI_EXPORT(void)
-Print_Graph_Info(LCUI_Graph *pic);
-/* 功能：打印图像的信息 */ 
-
-LCUI_EXPORT(void)
-Graph_Init(LCUI_Graph *pic);
-/* 初始化图片数据结构体 */ 
-
+ * */
 LCUI_EXPORT(int)
-Graph_Create(LCUI_Graph *graph, int width, int height);
-/* 功能：创建一个Graph对象 */ 
+Graph_IsOpaque( LCUI_Graph *graph );
 
+/* 打印图像的信息 */
 LCUI_EXPORT(void)
-Graph_Copy(LCUI_Graph *des, LCUI_Graph *src);
+Graph_PrintInfo( LCUI_Graph *pic );
+
+/* 初始化图片数据结构体 */
+LCUI_EXPORT(void)
+Graph_Init( LCUI_Graph *pic );
+
+/* 为图像数据分配内存资源 */
+LCUI_EXPORT(int)
+Graph_Create( LCUI_Graph *graph, int width, int height );
+
 /* 
  * 功能：拷贝图像数据
  * 说明：将src的数据拷贝至des 
- * */ 
-
+ * */
 LCUI_EXPORT(void)
-Graph_Free(LCUI_Graph *pic);
-/* 功能：释放LCUI_Graph内的图像数据占用的内存资源 */ 
+Graph_Copy( LCUI_Graph *des, LCUI_Graph *src );
+
+/* 释放LCUI_Graph内的图像数据占用的内存资源 */
+LCUI_EXPORT(void)
+Graph_Free( LCUI_Graph *pic );
 
 /************************ Graph Quote *********************************/
 LCUI_EXPORT(int)
-Quote_Graph(LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area);
-/* 
- * 功能：引用另一个图层中指定区域里的图形 
- * 说明：src是被引用的对象，des是引用者，area是引用的src中的图形所在的区域
- * */ 
+Graph_Quote( LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area );
 
+/* 获取被引用的图形所在的有效区域 */
 LCUI_EXPORT(LCUI_Rect)
-Get_Graph_Valid_Rect(LCUI_Graph *graph);
-/* 功能：获取被引用的图形所在的有效区域 */ 
+Graph_GetValidRect( LCUI_Graph *graph );
 
-LCUI_EXPORT(LCUI_Graph*)
-Get_Quote_Graph(LCUI_Graph *graph);
 /* 
  * 功能：获取指向被引用的图形的指针 
  * 说明：如果当前图形引用了另一个图形，并且，该图形处于一条引用链中，那么，本函数会返
  * 回指向被引用的最终图形的指针。
- * */ 
+ * */
+LCUI_EXPORT(LCUI_Graph*)
+Graph_GetQuote( LCUI_Graph *graph );
 
 /************************ End Graph Quote *****************************/
-LCUI_EXPORT(void)
-Graph_Zoom(LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size);
-/* 功能：根据指定模式，对图像进行缩放 */ 
 
-LCUI_EXPORT(int)
-Graph_Cut(LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out);
+/* 根据指定模式，对图像进行缩放 */
+LCUI_EXPORT(void)
+Graph_Zoom( LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size );
+
 /* 
  * 功能：从源图形中截取出指定区域的图形 
  * 说明：裁剪出的图像数据，全局透明度和源图像一致
- * */ 
-
+ * */
 LCUI_EXPORT(int)
-Graph_Flip_Horizontal(LCUI_Graph *src, LCUI_Graph *out);
-/* 功能：将图像进行水平翻转 */
+Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out );
 
+/* 将图像进行水平翻转 */  
 LCUI_EXPORT(int)
-Graph_Fill_Color(LCUI_Graph *pic, LCUI_RGB color);
-/* 功能：为传入的图形填充颜色 */ 
+Graph_HorizFlip( LCUI_Graph *src, LCUI_Graph *out );
+
+/* 为传入的图形填充颜色 */
+LCUI_EXPORT(int)
+Graph_FillColor( LCUI_Graph *graph, LCUI_RGB color );
 
 /* 平铺图形 */
 LCUI_EXPORT(int)
 Graph_Tile( LCUI_Graph *src, LCUI_Graph *des_buff, LCUI_BOOL replace );
 
-LCUI_EXPORT(int)
-Graph_Mix(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos);
 /* 
  * 功能：将前景图与背景图混合叠加
  * 说明：back_graph是背景图像，fore_graph前景图像，混合后的数据保存在背景图中
- */ 
- 
+ */
 LCUI_EXPORT(int)
-Graph_Replace(LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos);
+Graph_Mix( LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos );
+
 /* 
  * 功能：替换原图中对应位置的区域中的图形
  * 说明：与Overlay_Graph函数不同，back_graph中的图形数据会被fore_graph中的图形数据覆盖
- */ 
-
+ */
 LCUI_EXPORT(int)
-Graph_Put_Image(LCUI_Graph *graph, LCUI_Graph *image, int flag);
-/* 功能：将图片以指定对齐方式粘贴至背景图上 */ 
+Graph_Replace( LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos );
 
+/* 将图片以指定对齐方式粘贴至背景图上 */
 LCUI_EXPORT(int)
-Graph_Fill_Image(LCUI_Graph *graph, LCUI_Graph *bg, int flag, LCUI_RGB color);
-/* 功能：为指定图形填充背景图像 */ 
+Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int flag );
 
+/* 为指定图形填充背景图像 */
 LCUI_EXPORT(int)
-Graph_Fill_Alpha(LCUI_Graph *src, uchar_t alpha);
-/* 功能：填充图形的alpha通道的所有值 */ 
+Graph_FillImage(	LCUI_Graph *graph,	LCUI_Graph *bg, 
+			int mode,		LCUI_RGB color );
+
+/* 填充图形的alpha通道的所有值 */
+LCUI_EXPORT(int)
+Graph_FillAlpha( LCUI_Graph *src, uchar_t alpha );
  
 LCUI_END_HEADER
 

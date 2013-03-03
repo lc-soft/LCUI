@@ -121,7 +121,7 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 	png_infop info_ptr; 
 	png_bytep * row_pointers;
 	
-	if(!Graph_Valid(graph)) {
+	if(!Graph_IsValid(graph)) {
 		printf("write_png(): graph is not valid\n");
 		return -1;
 	}
@@ -157,7 +157,7 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 		return -1;
 	}
 	Graph_Lock(graph);
-	if(Graph_Have_Alpha(graph)) {
+	if(Graph_HaveAlpha(graph)) {
 		color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 	} else {
 		color_type = PNG_COLOR_TYPE_RGB;
@@ -176,7 +176,7 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 		Graph_Unlock(graph);
 		return -1;
 	}
-	if(Graph_Have_Alpha(graph)) {
+	if(Graph_HaveAlpha(graph)) {
 		temp = (4 * graph->width);
 	} else {
 		temp = (3 * graph->width);
@@ -189,7 +189,7 @@ int write_png(const char *file_name, LCUI_Graph *graph)
 			row_pointers[i][j++] = graph->rgba[0][pos]; // red
 			row_pointers[i][j++] = graph->rgba[1][pos]; // green
 			row_pointers[i][j++] = graph->rgba[2][pos];   // blue
-			if(Graph_Have_Alpha(graph)) {
+			if(Graph_HaveAlpha(graph)) {
 				row_pointers[i][j++] = graph->rgba[3][pos]; // alpha 
 			}
 		}

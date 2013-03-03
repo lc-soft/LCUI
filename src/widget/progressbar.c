@@ -131,24 +131,24 @@ ProgressBar_ExecDraw(LCUI_Widget *widget)
 		/* 绘制空槽 */
 		Draw_Empty_Slot(widget_graph, widget->size.w, widget->size.h);
 		/* 载入两个图形 */
-		if(!Graph_Valid(&pb->fore_graph)) {
+		if(!Graph_IsValid(&pb->fore_graph)) {
 			Load_Graph_ProgressBar_Fore(&pb->fore_graph);  
 		}
-		if(!Graph_Valid(&pb->flash_image)) {
+		if(!Graph_IsValid(&pb->flash_image)) {
 			Load_Graph_ProgressBar_Img(&pb->flash_image);
 		}
 		
-		Widget_Resize(pb->img_pic_box, Get_Graph_Size(&pb->flash_image));
+		Widget_Resize(pb->img_pic_box, Graph_GetSize(&pb->flash_image));
 		/* 让图片盒子显示这个图形 */
 		PictureBox_SetImage(pb->img_pic_box, &pb->flash_image);
 		Widget_SetPadding( widget, Padding(1,1,1,1) );
 	} else {
 		_LCUIString_Copy(&widget->style_name, "classic");
-		if(!Graph_Valid(&pb->fore_graph)) {
+		if(!Graph_IsValid(&pb->fore_graph)) {
 			Graph_Create(&pb->fore_graph, 10, widget->size.h); 
 		}
-		Graph_Fill_Color(&pb->fore_graph, RGB(80,80,200));
-		Graph_Fill_Alpha(&pb->fore_graph, 255);
+		Graph_FillColor(&pb->fore_graph, RGB(80,80,200));
+		Graph_FillAlpha(&pb->fore_graph, 255);
 		Widget_SetBackgroundColor( widget, RGB(255,255,255) );
 		Widget_SetBackgroundTransparent( widget, FALSE );
 		Widget_SetBorder( widget,

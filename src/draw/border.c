@@ -102,9 +102,9 @@ Graph_Draw_RoundBorder_LeftTop(
 		return 1;
 	}
 	
-	real_rect = Get_Graph_Valid_Rect( des );
-	des = Get_Quote_Graph( des );
-	if( !Graph_Valid( des ) ) {
+	real_rect = Graph_GetValidRect( des );
+	des = Graph_GetQuote( des );
+	if( !Graph_IsValid( des ) ) {
 		return -1;
 	}
 	/* 预先计算xy轴坐标的有效范围 */
@@ -210,9 +210,9 @@ Graph_Draw_RoundBorder_TopLeft(
 		return 1;
 	}
 	
-	real_rect = Get_Graph_Valid_Rect( des );
-	des = Get_Quote_Graph( des );
-	if( !Graph_Valid( des ) ) {
+	real_rect = Graph_GetValidRect( des );
+	des = Graph_GetQuote( des );
+	if( !Graph_IsValid( des ) ) {
 		return -1;
 	}
 	/* 预先计算xy轴坐标的有效范围 */
@@ -321,9 +321,9 @@ Graph_Draw_RoundBorder_RightTop(
 		return 1;
 	}
 	
-	real_rect = Get_Graph_Valid_Rect( des );
-	des = Get_Quote_Graph( des );
-	if( !Graph_Valid( des ) ) {
+	real_rect = Graph_GetValidRect( des );
+	des = Graph_GetQuote( des );
+	if( !Graph_IsValid( des ) ) {
 		return -1;
 	}
 	
@@ -413,9 +413,9 @@ Graph_Draw_RoundBorder_TopRight(
 		return 1;
 	}
 	
-	real_rect = Get_Graph_Valid_Rect( des );
-	des = Get_Quote_Graph( des );
-	if( !Graph_Valid( des ) ) {
+	real_rect = Graph_GetValidRect( des );
+	des = Graph_GetQuote( des );
+	if( !Graph_IsValid( des ) ) {
 		return -1;
 	}
 	
@@ -513,9 +513,9 @@ Graph_Draw_RoundBorder_LeftBottom(
 		return 1;
 	}
 	
-	real_rect = Get_Graph_Valid_Rect( des );
-	des = Get_Quote_Graph( des );
-	if( !Graph_Valid( des ) ) {
+	real_rect = Graph_GetValidRect( des );
+	des = Graph_GetQuote( des );
+	if( !Graph_IsValid( des ) ) {
 		return -1;
 	}
 	
@@ -608,9 +608,9 @@ Graph_Draw_RoundBorder_BottomLeft(
 		return 1;
 	}
 	
-	real_rect = Get_Graph_Valid_Rect( des );
-	des = Get_Quote_Graph( des );
-	if( !Graph_Valid( des ) ) {
+	real_rect = Graph_GetValidRect( des );
+	des = Graph_GetQuote( des );
+	if( !Graph_IsValid( des ) ) {
 		return -1;
 	}
 	
@@ -711,9 +711,9 @@ Graph_Draw_RoundBorder_RightBottom(
 		return 1;
 	}
 	
-	real_rect = Get_Graph_Valid_Rect( des );
-	des = Get_Quote_Graph( des );
-	if( !Graph_Valid( des ) ) {
+	real_rect = Graph_GetValidRect( des );
+	des = Graph_GetQuote( des );
+	if( !Graph_IsValid( des ) ) {
 		return -1;
 	}
 	
@@ -801,9 +801,9 @@ Graph_Draw_RoundBorder_BottomRight(
 		return 1;
 	}
 	
-	real_rect = Get_Graph_Valid_Rect( des );
-	des = Get_Quote_Graph( des );
-	if( !Graph_Valid( des ) ) {
+	real_rect = Graph_GetValidRect( des );
+	des = Graph_GetQuote( des );
+	if( !Graph_IsValid( des ) ) {
 		return -1;
 	}
 	
@@ -893,7 +893,7 @@ LCUI_EXPORT(int) Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	LCUI_Rect rect;
 	int  radius, x, y,count, k, w[2], h[2], start_x, start_y;
 	
-	if( !Graph_Valid(des) ) {
+	if( !Graph_IsValid(des) ) {
 		return -1;
 	}
 	w[0] = des->width - border.top_right_radius;
@@ -904,7 +904,7 @@ LCUI_EXPORT(int) Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	/* 绘制左上角的圆角，先引用左上角区域，再将圆绘制到这个区域里 */
 	radius = border.top_left_radius;
 	rect = Rect( 0, 0, radius, radius );
-	Quote_Graph( &des_area, des, rect );
+	Graph_Quote( &des_area, des, rect );
 	Graph_Draw_RoundBorder_LeftTop( 
 		&des_area		, Pos( radius, radius ), 
 		radius			, border.left_width, 
@@ -919,7 +919,7 @@ LCUI_EXPORT(int) Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	/* 右上角 */
 	radius = border.top_right_radius;
 	rect = Rect( des->width-radius-1, 0, radius, radius );
-	Quote_Graph( &des_area, des, rect );
+	Graph_Quote( &des_area, des, rect );
 	Graph_Draw_RoundBorder_RightTop( 
 		&des_area		, Pos( 0, radius ), 
 		radius			, border.right_width, 
@@ -934,7 +934,7 @@ LCUI_EXPORT(int) Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	/* 左下角 */
 	radius = border.bottom_left_radius;
 	rect = Rect( 0, des->height-radius-1, radius, radius );
-	Quote_Graph( &des_area, des, rect );
+	Graph_Quote( &des_area, des, rect );
 	Graph_Draw_RoundBorder_LeftBottom( 
 		&des_area		, Pos( radius, 0 ), 
 		radius			, border.left_width, 
@@ -950,7 +950,7 @@ LCUI_EXPORT(int) Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
 	radius = border.bottom_left_radius;
 	rect = Rect(	des->width-radius-1, 
 			des->height-radius-1, radius, radius );
-	Quote_Graph( &des_area, des, rect );
+	Graph_Quote( &des_area, des, rect );
 	Graph_Draw_RoundBorder_RightBottom( 
 		&des_area		, Pos( 0, 0 ), 
 		radius			, border.right_width, 

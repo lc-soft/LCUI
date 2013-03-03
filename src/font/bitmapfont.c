@@ -200,11 +200,11 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 	uint_t total, m, n, y;
 	uint_t src_start_pos, des_start_pos;
 	/* 获取背景图形的有效区域 */
-	des_rect = Get_Graph_Valid_Rect( graph );
+	des_rect = Graph_GetValidRect( graph );
 	/* 获取背景图引用的源图形 */
-	des = Get_Quote_Graph( graph ); 
+	des = Graph_GetQuote( graph ); 
 	/* 数据有效性检测 */
-	if( !FontBMP_Valid( bitmap ) || !Graph_Valid( graph ) ) {
+	if( !FontBMP_Valid( bitmap ) || !Graph_IsValid( graph ) ) {
 		return -1;
 	}
 	/* 起点位置的有效性检测 */

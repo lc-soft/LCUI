@@ -87,7 +87,7 @@ LCUI_EXPORT(int) Load_Graph_Default_Cursor(LCUI_Graph *pic)
 		244,55,0,0,55,215,255,255,209,0,0,0,0,0,0,0,0,180,255,255,204,0,0,0,0,0,0,0,0,26,215,158,
 		49,0,0};
 	int value;
-	if(Graph_Valid(pic)) {
+	if(Graph_IsValid(pic)) {
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);

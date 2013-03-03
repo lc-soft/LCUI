@@ -427,7 +427,7 @@ __GraphLayer_GetLayers(
 		pos = GraphLayer_GetGlobalPos( root_glayer, child );
 		//_DEBUG_MSG( "child: %p, pos: %d,%d, valid rect: %d,%d, %d, %d\n", 
 		//	child, pos.x, pos.y, tmp.x, tmp.y, tmp.width, tmp.height);
-		//Print_Graph_Info( &child->graph );
+		//Graph_PrintInfo( &child->graph );
 		tmp.x += pos.x;
 		tmp.y += pos.y;
 		if( !LCUIRect_IsValid(tmp) ) {
@@ -516,7 +516,7 @@ GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 		glayer_pos = GraphLayer_GetGlobalPos( ctnr, glayer );
 		valid_area.x += glayer_pos.x;
 		valid_area.y += glayer_pos.y;
-		switch( Graph_Is_Opaque( &glayer->graph ) ) {
+		switch( Graph_IsOpaque( &glayer->graph ) ) {
 		    case -1:
 			Queue_Delete_Pointer( &glayerQ, i );
 			break;
@@ -544,7 +544,7 @@ skip_loop:
 		Graph_Lock( &glayer->graph );
 		pos = GraphLayer_GetGlobalPos( ctnr, glayer );
 		valid_area = GraphLayer_GetValidRect( ctnr, glayer );
-		Quote_Graph( &tmp_graph, &glayer->graph, valid_area ); 
+		Graph_Quote( &tmp_graph, &glayer->graph, valid_area ); 
 		//_DEBUG_MSG("valid area: %d,%d,%d,%d, pos: %d,%d, size: %d,%d\n", 
 		//	valid_area.x, valid_area.y, valid_area.width, valid_area.height,
 		//	pos.x, pos.y, glayer->graph.width, glayer->graph.height

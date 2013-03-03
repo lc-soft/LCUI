@@ -163,7 +163,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_Normal(LCUI_Graph *pic)
 		1,1,1,1,1,1,1,1,1,1,2};
 
 	int value;
-	if(Graph_Valid(pic))
+	if(Graph_IsValid(pic))
 	{
 		Graph_Free(pic);
 	}
@@ -297,7 +297,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_HighLight(LCUI_Graph *pic)
 		7,7,7,7,7,7,7,7,7,7,2};
 
 	int value;
-	if(Graph_Valid(pic))
+	if(Graph_IsValid(pic))
 	{
 		Graph_Free(pic);
 	}
@@ -432,7 +432,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_Down(LCUI_Graph *pic)
 		7,7,7,7,7,7,7,7,7,7,2};
 
 	int value;
-	if(Graph_Valid(pic))
+	if(Graph_IsValid(pic))
 	{
 		Graph_Free(pic);
 	}
@@ -458,7 +458,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_BG(LCUI_Graph *pic)
 	unsigned char green[]={248,209,208,205,201,196,192,193,193,193,193,193,193,193,192,191,191,191,190,190,189,189,185,243,182};
 	unsigned char blue[]={255,249,248,245,243,240,238,238,238,238,238,238,238,238,238,238,238,238,238,238,238,238,237,254,226};
 	int value;
-	if(Graph_Valid(pic))
+	if(Graph_IsValid(pic))
 	{
 		Graph_Free(pic);
 	}

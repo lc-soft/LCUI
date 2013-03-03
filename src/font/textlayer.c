@@ -413,9 +413,9 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 		area.x += layer->offset_pos.x;
 		area.y += layer->offset_pos.y;
 		Queue_Delete( &layer->clear_area, 0 );
-		Quote_Graph( &slot, graph, area );
+		Graph_Quote( &slot, graph, area );
 		/* 将该区域的alpha通道填充为0 */
-		Graph_Fill_Alpha( &slot, 0 );
+		Graph_FillAlpha( &slot, 0 );
 		Widget_InvalidArea( widget, area ); 
 		//printf("refresh area: %d,%d,%d,%d\n",
 		//area.x, area.y, area.width, area.height);

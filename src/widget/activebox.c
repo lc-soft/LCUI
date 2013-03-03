@@ -91,10 +91,10 @@ Frames_UpdateGraphSlot( LCUI_Frames *frames, int num )
 	if( !frame ) {
 		return -1;
 	}
-	if(!Graph_Valid(&frames->slot)){
+	if(!Graph_IsValid(&frames->slot)){
 		return -2;
 	}
-	Graph_Fill_Alpha(&frames->slot, 0);
+	Graph_FillAlpha(&frames->slot, 0);
 	if(0 < Queue_Get_Total(&frames->pic)) {
 		pos = Frames_GetFrameMixPos(frames, frame);
 		Graph_Replace(&frames->slot, frame->pic, pos); 
@@ -135,7 +135,7 @@ Frames_GetFrameMixPos(LCUI_Frames *stream, LCUI_Frame *frame)
 {
 	LCUI_Pos pos;
 	pos = Align_Get_Pos(	stream->size, 
-				Get_Graph_Size(frame->pic), 
+				Graph_GetSize(frame->pic), 
 				ALIGN_MIDDLE_CENTER );
 	return Pos_Add(pos, frame->offset);
 }
@@ -162,7 +162,7 @@ Resize_Frames(LCUI_Frames *p, LCUI_Size new_size)
 	for(i=0; i<total; ++i){
 		frame = Queue_Get(&p->pic, i);
 		graph = frame->pic->src;
-		size = Get_Graph_Size(graph);
+		size = Graph_GetSize(graph);
 		pos = Frames_GetFrameMixPos(p, frame);
 		if(pos.x+size.w > new_size.w){
 			size.w = new_size.w - pos.x;
@@ -172,7 +172,7 @@ Resize_Frames(LCUI_Frames *p, LCUI_Size new_size)
 			size.h = new_size.h - pos.y;
 			size.h<0 ? size.h=0 :1;
 		}
-		Quote_Graph(frame->pic, graph, Rect(0,0,size.w, size.h));
+		Graph_Quote(frame->pic, graph, Rect(0,0,size.w, size.h));
 	}
 	Graph_Create(&p->slot, new_size.w, new_size.h);
 	Frames_UpdateGraphSlot( p, p->current );
@@ -195,7 +195,7 @@ Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic,
 	if( !des ) {
 		return -1;
 	}
-	if(!Graph_Valid(pic)) {
+	if(!Graph_IsValid(pic)) {
 		return -2;
 	}
 	

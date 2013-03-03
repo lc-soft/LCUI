@@ -103,7 +103,7 @@ static int Update_BuffGraph(LCUI_Widget *widget)
 	LCUI_PictureBox *pic_box;
 	
 	pic_box = Widget_GetPrivData(widget);
-	if(!Graph_Valid(pic_box->image)) {
+	if(!Graph_IsValid(pic_box->image)) {
 		return -1;
 	}
 	width = pic_box->scale * pic_box->image->width;
@@ -127,7 +127,7 @@ static int Update_ReadBox(LCUI_Widget *widget)
 	LCUI_PictureBox *pic_box;
 	
 	pic_box = Widget_GetPrivData(widget);
-	if(!Graph_Valid(pic_box->image)) {
+	if(!Graph_IsValid(pic_box->image)) {
 		return -1;
 	}
 	/* 缩放后的图像尺寸 */
@@ -212,10 +212,10 @@ PictureBox_ExecUpdate(LCUI_Widget *widget)
 	pic_box  = (LCUI_PictureBox*)Widget_GetPrivData(widget);
 	widget_graph = Widget_GetSelfGraph( widget );
 	//print_widget_info(widget);
-	//Print_Graph_Info(widget_graph);
-	//Print_Graph_Info(pic_box->image);
+	//Graph_PrintInfo(widget_graph);
+	//Graph_PrintInfo(pic_box->image);
 	//printf("PictureBox_ExecUpdate(): 1\n");
-	if(! Graph_Valid(pic_box->image)) {
+	if(! Graph_IsValid(pic_box->image)) {
 		return;
 	}
 	
@@ -229,19 +229,19 @@ PictureBox_ExecUpdate(LCUI_Widget *widget)
 	/* 裁剪图像 */ 
 		if(pic_box->scale == 1.00) p = pic_box->image; 
 		else p = &pic_box->buff_graph; 
-		if(! Graph_Valid(p)) {
-			//printf("! Graph_Valid(p)\n");
+		if(! Graph_IsValid(p)) {
+			//printf("! Graph_IsValid(p)\n");
 			return;
 		}
 		
 		pos.x = (widget->size.w - pic_box->read_box.width)/2.0;
 		pos.y = (widget->size.h - pic_box->read_box.height)/2.0;
 		/* 引用图像中指定区域的图形 */
-		Quote_Graph(&graph, p, pic_box->read_box);
+		Graph_Quote(&graph, p, pic_box->read_box);
 		break;
 		 
 	case SIZE_MODE_NORMAL:/* 正常模式 */
-		Quote_Graph(&graph, pic_box->image, pic_box->read_box); 
+		Graph_Quote(&graph, pic_box->image, pic_box->read_box); 
 		break;
 		
 	case SIZE_MODE_STRETCH:/* 拉伸模式 */ 
@@ -271,7 +271,7 @@ PictureBox_ExecUpdate(LCUI_Widget *widget)
 		if(pic_box->read_box.x + pic_box->read_box.width >= pic_box->image->width) 
 			pic_box->read_box.x = pic_box->image->width - pic_box->read_box.width;
 			
-		Quote_Graph(&graph, pic_box->image, pic_box->read_box); 
+		Graph_Quote(&graph, pic_box->image, pic_box->read_box); 
 		break;
 	default : break;
 	}
@@ -281,7 +281,7 @@ PictureBox_ExecUpdate(LCUI_Widget *widget)
 	//pic_box->read_box.width, pic_box->read_box.height, 
 	//pic_box->read_box.x + pic_box->read_box.width, pic_box->buff_graph.width, 
 	//pic_box->read_box.y + pic_box->read_box.height, pic_box->buff_graph.height);
-	if(!Graph_Valid(&widget->background.image)) {
+	if(!Graph_IsValid(&widget->background.image)) {
 		Graph_Replace( widget_graph, &graph, pos );
 	} else {
 		Graph_Mix( widget_graph, &graph, pos );
@@ -351,7 +351,7 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 	pic_box = Widget_GetPrivData(widget);
 	for(i = 0;i < 2; ++i) {
 		/* 如果image有效 */ 
-		if(Graph_Valid(graph)) {
+		if(Graph_IsValid(graph)) {
 			/* 图片更换了，就释放缓存图形 */
 			Graph_Free(&pic_box->buff_graph);
 			pic_box->image = graph;
@@ -408,14 +408,14 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 			break;
 		} else if(pic_box->image_state == IMAGE_STATE_LOADING) {
 			/* 使用对应的图片 */ 
-			if(Graph_Valid(&pic_box->initial_image)) { 
+			if(Graph_IsValid(&pic_box->initial_image)) { 
 				graph = &pic_box->initial_image; 
 			} else {
 				return;
 			}
 		}
 		else { /* 使用对应的图片 */ 
-			if(Graph_Valid(&pic_box->error_image)) {
+			if(Graph_IsValid(&pic_box->error_image)) {
 				graph = &pic_box->error_image; 
 				pic_box->image_state = IMAGE_STATE_FAIL;
 			} else {
@@ -484,7 +484,7 @@ PictureBox_SetErrorImage( LCUI_Widget *widget, LCUI_Graph *pic )
 	
 	pic_box = Widget_GetPrivData(widget);
 	
-	if(Graph_Valid(pic)) {
+	if(Graph_IsValid(pic)) {
 		Graph_Copy(&pic_box->error_image, pic);
 		return 0;
 	}
@@ -499,7 +499,7 @@ PictureBox_SetInitImage( LCUI_Widget *widget, LCUI_Graph *pic )
 	
 	pic_box = Widget_GetPrivData(widget);
 	
-	if(Graph_Valid(pic)) {
+	if(Graph_IsValid(pic)) {
 		Graph_Copy(&pic_box->initial_image, pic);
 		return 0;
 	}
@@ -558,7 +558,7 @@ PictureBox_ResizeViewArea( LCUI_Widget *widget, int width, int height )
 	if(width <= 0 || height <= 0) {
 		return;
 	}
-	if(!Graph_Valid(pic_box->image)) {
+	if(!Graph_IsValid(pic_box->image)) {
 		return;
 	}
 	/* 将中心点位置转换成坐标 */
@@ -610,10 +610,10 @@ PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos )
 	
 	pic_box = Widget_GetPrivData(widget);
 	
-	if(!Graph_Valid(pic_box->image)) {
+	if(!Graph_IsValid(pic_box->image)) {
 		return -1;
 	}
-	if(pic_box->scale == 1.00 || !Graph_Valid(&pic_box->buff_graph)) {
+	if(pic_box->scale == 1.00 || !Graph_IsValid(&pic_box->buff_graph)) {
 		p = pic_box->image;
 	} else {
 		p = &pic_box->buff_graph;
@@ -663,7 +663,7 @@ PictureBox_ZoomViewArea( LCUI_Widget *widget, double scale )
 	LCUI_PictureBox *pic_box;
 	
 	pic_box = Widget_GetPrivData(widget);
-	if(!Graph_Valid(pic_box->image)) {
+	if(!Graph_IsValid(pic_box->image)) {
 		return -1;
 	}
 	Graph_Init(&buff);

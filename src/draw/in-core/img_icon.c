@@ -351,7 +351,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Error(LCUI_Graph *pic)
 		1,2,4,7,9,10,12,12,12,10,9,7,4,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	int value;
-	if(Graph_Valid(pic))
+	if(Graph_IsValid(pic))
 	{
 		Graph_Free(pic);
 	}
@@ -674,7 +674,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Help(LCUI_Graph *pic)
 		1,2,4,7,9,10,12,12,12,10,9,7,4,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	int value;
-	if(Graph_Valid(pic))
+	if(Graph_IsValid(pic))
 	{
 		Graph_Free(pic);
 	}
@@ -996,7 +996,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Info(LCUI_Graph *pic)
 		1,2,4,7,9,10,12,12,12,10,9,7,4,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	int value;
-	if(Graph_Valid(pic))
+	if(Graph_IsValid(pic))
 	{
 		Graph_Free(pic);
 	}
@@ -1318,7 +1318,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Warning(LCUI_Graph *pic)
 		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	int value;
-	if(Graph_Valid(pic))
+	if(Graph_IsValid(pic))
 	{
 		Graph_Free(pic);
 	}
@@ -1804,7 +1804,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_LCUI(LCUI_Graph *pic)
 		255,255,255,255,255,255,255,255,255,255,255,255,247,0,0};
 
 	int value;
-	if(Graph_Valid(pic))
+	if(Graph_IsValid(pic))
 	{
 		Graph_Free(pic);
 	}

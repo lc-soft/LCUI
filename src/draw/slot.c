@@ -15,8 +15,8 @@ LCUI_EXPORT(int) Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 	}
 	graph->have_alpha = IS_TRUE;
 	Graph_Create(graph, width, height); /* 申请内存 */
-	Graph_Fill_Color(graph, RGB(250,250,250));/* 填充白色 */
-	Graph_Fill_Alpha(graph, 255);
+	Graph_FillColor(graph, RGB(250,250,250));/* 填充白色 */
+	Graph_FillAlpha(graph, 255);
 	
 	/* 四个角上的一个像素点完全透明 */
 	graph->rgba[3][0] = 0;

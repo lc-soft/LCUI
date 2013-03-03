@@ -69,7 +69,7 @@ LCUI_EXPORT(int) Load_Graph_Mosaics(LCUI_Graph *pic)
 		121,121,121,121,121,121,121,121,78,78,78,78,78,78,78,78,
 	};
 	int value;
-	if(Graph_Valid(pic))
+	if(Graph_IsValid(pic))
 	{
 		Graph_Free(pic);
 	}

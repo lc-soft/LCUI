@@ -87,7 +87,7 @@ static void Button_ExecCustomUpdate( LCUI_Widget *widget )
 	default : img = NULL; break;
 	}
 	/* 如果图像不可用，则使用默认样式 */
-	if( !Graph_Valid(img) ) {
+	if( !Graph_IsValid(img) ) {
 		Button_ExecDefalutUpdate( widget );
 	} else {
 		Widget_SetBackgroundImage( widget, img );
@@ -150,27 +150,27 @@ Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal,
 {
 	LCUI_Button *btn_data;
 	btn_data = Widget_GetPrivData(widget);
-	if( Graph_Valid(normal) ) {
+	if( Graph_IsValid(normal) ) {
 		btn_data->btn_normal = *normal;
 	} else {
 		Graph_Init( &btn_data->btn_normal );
 	}
-	if( Graph_Valid(over) ) {
+	if( Graph_IsValid(over) ) {
 		btn_data->btn_over = *over;
 	} else {
 		Graph_Init( &btn_data->btn_over );
 	}
-	if( Graph_Valid(down) ) {
+	if( Graph_IsValid(down) ) {
 		btn_data->btn_down = *down;
 	} else {
 		Graph_Init( &btn_data->btn_down );
 	}
-	if( Graph_Valid(focus) ) {
+	if( Graph_IsValid(focus) ) {
 		btn_data->btn_focus = *focus;
 	} else {
 		Graph_Init( &btn_data->btn_focus );
 	}
-	if( Graph_Valid(disable) ) {
+	if( Graph_IsValid(disable) ) {
 		btn_data->btn_disable = *disable;
 	} else {
 		Graph_Init( &btn_data->btn_disable );

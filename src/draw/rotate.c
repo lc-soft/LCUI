@@ -32,7 +32,7 @@ LCUI_EXPORT(int) Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des
 	double   fDstX1,fDstY1,fDstX2,fDstY2,fDstX3,fDstY3,fDstX4,fDstY4;
 	double   f1,f2; 
 
-	if(!Graph_Valid(src)) {
+	if(!Graph_IsValid(src)) {
 		return -1;
 	}
 	// 获取图像的"宽度"（4的倍数）   
@@ -76,7 +76,7 @@ LCUI_EXPORT(int) Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des
 	f1 = (double) (-0.5*(new_width-1)*fCosa-0.5*(new_height-1)*fSina+0.5*(width-1)); 
 	f2 = (double) (0.5*(new_width-1)*fSina-0.5*(new_height-1)*fCosa+0.5*(height-1));   
 	   
-	if(Graph_Valid(des)) {
+	if(Graph_IsValid(des)) {
 		Graph_Free(des);/* 先将这个内存释放 */
 	}
 	des->have_alpha = src->have_alpha;
@@ -103,7 +103,7 @@ LCUI_EXPORT(int) Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des
 				des->rgba[0][n] = src->rgba[0][z];
 				des->rgba[1][n] = src->rgba[1][z];
 				des->rgba[2][n] = src->rgba[2][z];
-				if(Graph_Have_Alpha(des)) {
+				if(Graph_HaveAlpha(des)) {
 					des->rgba[3][n] = src->rgba[3][z];
 				}
 			} else {
@@ -111,7 +111,7 @@ LCUI_EXPORT(int) Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des
 				des->rgba[0][n] = 255;
 				des->rgba[1][n] = 255;
 				des->rgba[2][n] = 255;
-				if(Graph_Have_Alpha(des)) {
+				if(Graph_HaveAlpha(des)) {
 					des->rgba[3][n] = 0;
 				}
 			}

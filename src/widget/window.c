@@ -251,7 +251,7 @@ union_draw_method:;
 		Widget_SetBorder( client_area, border);
 		Widget_SetBorder( win_p, border);
 		Widget_SetBackgroundColor( win_p, back_color );
-		Graph_Fill_Color( graph, back_color );
+		Graph_FillColor( graph, back_color );
 		Widget_SetBackgroundColor( client_area, RGB(255,255,255) );
 		Widget_SetBackgroundImage( titlebar, NULL );
 		Widget_SetBackgroundLayout( titlebar, 0 );

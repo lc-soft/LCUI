@@ -110,7 +110,7 @@ LCUICursor_SetPos( LCUI_Pos pos )
 LCUI_EXPORT(int)
 LCUICursor_SetGraph( LCUI_Graph *graph )
 {
-	if (Graph_Valid (graph)) {
+	if (Graph_IsValid (graph)) {
 		Graph_Copy (&LCUI_Sys.cursor.graph, graph);
 		LCUICursor_Refresh();
 		return 0;
