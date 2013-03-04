@@ -43,6 +43,108 @@
 #define __LCUI_WIDGET_HPP__
 
 #ifdef __cplusplus
+class LCUIWidget
+{
+public: 
+	LCUIWidget( const char* widget_type );
+	~LCUIWidget(void);
+
+	LCUI_Widget *getWidget( void );
+	LCUI_Size getSize( void );
+	int getHeight( void );
+	int getWidth( void );
+	LCUI_Rect getRect( void );
+	LCUI_Pos getPos( void );
+	void *getPrivateData( void );
+	int InvalidateArea( LCUI_Rect );
+	void show( LCUI_BOOL );
+	void enable( LCUI_BOOL );
+	void modal( LCUI_BOOL );
+	void move( LCUI_Pos );
+	void resize( LCUI_Size );
+	void dock( DOCK_TYPE );
+protected:
+	LCUI_Widget *widget;
+};
+
+LCUIWidget::LCUIWidget( const char *widget_type )
+{
+	widget = Widget_New( widget_type );
+}
+
+LCUIWidget::~LCUIWidget(void)
+{
+	Widget_Destroy( widget );
+}
+
+LCUI_Widget *LCUIWidget::getWidget( void )
+{
+	return widget;
+}
+
+LCUI_Size LCUIWidget::getSize( void )
+{
+	return Widget_GetSize( widget );
+}
+
+int LCUIWidget::getHeight( void )
+{
+	return Widget_GetHeight( widget );
+}
+
+int LCUIWidget::getWidth( void )
+{
+	return Widget_GetWidth( widget );
+}
+
+LCUI_Rect LCUIWidget::getRect( void )
+{
+	return Widget_GetRect( widget );
+}
+
+LCUI_Pos LCUIWidget::getPos( void )
+{
+	return Widget_GetPos( widget );
+}
+
+void *LCUIWidget::getPrivateData( void )
+{
+	return Widget_GetPrivData( widget );
+}
+
+int LCUIWidget::InvalidateArea( LCUI_Rect area )
+{
+	return Widget_InvalidArea( widget, area );
+}
+
+void LCUIWidget::show( LCUI_BOOL need_show )
+{
+	if(need_show) {
+		Widget_Show( widget );
+	} else {
+		Widget_Hide( widget );
+	}
+}
+
+void LCUIWidget::modal( LCUI_BOOL is_modal )
+{
+	Widget_SetModal( widget, is_modal );
+}
+
+void LCUIWidget::dock( DOCK_TYPE dock_type )
+{
+	Widget_SetDock( widget, dock_type );
+}
+
+void LCUIWidget::move( LCUI_Pos new_pos )
+{
+	Widget_Move( widget, new_pos );
+}
+
+void LCUIWidget::resize( LCUI_Size new_size )
+{
+	Widget_Resize( widget, new_size );
+}
 
 #endif
 

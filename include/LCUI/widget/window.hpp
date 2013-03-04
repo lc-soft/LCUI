@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * window.h -- C++ class and function for window widget
  * 
  * Copyright (C) 2013 by
@@ -21,29 +21,52 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * window.h -- ���ڲ�����C++��ͺ���
+ * window.h -- 窗口部件的C++类和函数
  *
- * ��Ȩ���� (C) 2013 ������
- * ����
+ * 版权所有 (C) 2013 归属于
+ * 刘超
  * 
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  * 
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  * 
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>. 
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 #ifndef __LCUI_WINDOW_HPP_
 #define __LCUI_WINDOW_HPP_ 
 
+/* LCUIWindow类继承自LCUIWidget类 */
+class LCUIWindow:public LCUIWidget
+{
+public:
+	LCUIWindow(void):LCUIWidget("window"){;};
+	void setTitleIcon( LCUI_Graph* );
+	//void setTitleIcon( LCUIGraph & );
+	void setTitleText( const char* );
+	void setTitleTextW( const wchar_t *);
+	void addToTitleBar( LCUIWidget& );
+	void addToClientArea( LCUIWidget& );
+};
+
+void LCUIWindow::setTitleIcon( LCUI_Graph *icon )
+{
+	Window_SetTitleIcon( widget, icon );
+}
+
+void LCUIWindow::setTitleText( const char *text )
+{
+	Window_SetTitleText( widget, text );
+}
+
+void LCUIWindow::setTitleTextW( const wchar_t *text )
+{
+	Window_SetTitleTextW( widget, text );
+}
 #endif
-
-
-
-
 
