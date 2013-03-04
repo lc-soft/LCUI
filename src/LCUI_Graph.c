@@ -166,8 +166,6 @@ RGBA_Mix( LCUI_RGBA *back, LCUI_RGBA *fore )
 		back->green = ALPHA_BLENDING(fore->red, back->green, fore->alpha); 
 		back->red = ALPHA_BLENDING(fore->red, back->blue, fore->alpha); 
 	}
-	
-	return back;
 }
 
 /* 获取图像中指定坐标的像素点的颜色 */

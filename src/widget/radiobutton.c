@@ -266,7 +266,7 @@ static void RadioButton_ExecUpdate( LCUI_Widget *widget )
 	/* 如果为自定义风格，那就使用用户指定的图形 */ 	
 	if(_LCUIString_Cmp(&widget->style_name, "custom") == 0) {
 		//printf("custom\n"); 
-		if(widget->enabled == IS_FALSE) 
+		if(widget->enabled == FALSE) 
 			widget->state = WIDGET_STATE_DISABLE;
 			
 		switch(widget->state)

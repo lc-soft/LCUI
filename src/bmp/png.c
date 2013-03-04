@@ -57,7 +57,7 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 	/*如果是RGB+alpha通道，或者RGB+其它字节*/
 	if(channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
 		/* 开始分配内存 */
-		out->have_alpha = IS_TRUE; 
+		out->have_alpha = TRUE; 
 		temp = Graph_Create( out, 
 				png_get_image_width(png_ptr, info_ptr), 
 				png_get_image_height(png_ptr, info_ptr)
@@ -80,7 +80,7 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 	}
 	else if(channels == 3 || color_type == PNG_COLOR_TYPE_RGB) {
 	/*如果是RGB通道*/
-		out->have_alpha = IS_FALSE;
+		out->have_alpha = FALSE;
 		temp = Graph_Create( out, 
 				png_get_image_width(png_ptr, info_ptr), 
 				png_get_image_height(png_ptr, info_ptr)

@@ -356,7 +356,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Error(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_TRUE;
+	pic->have_alpha = TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Graph_Create(pic,48,48);
@@ -679,7 +679,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Help(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_TRUE;
+	pic->have_alpha = TRUE;
 	pic->alpha = 255;
 	value = Graph_Create(pic,48,48);
 	if(value == 0)
@@ -1001,7 +1001,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Info(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_TRUE;
+	pic->have_alpha = TRUE;
 	pic->alpha = 255;
 	value = Graph_Create(pic,48,48);
 	if(value == 0)
@@ -1323,7 +1323,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Warning(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_TRUE;
+	pic->have_alpha = TRUE;
 	pic->alpha = 255;
 	value = Graph_Create(pic,48,48);
 	if(value == 0)
@@ -1809,7 +1809,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_LCUI(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_TRUE;
+	pic->have_alpha = TRUE;
 	pic->alpha = 255;
 	value = Graph_Create(pic,60,60);
 	if(value == 0)
@@ -1879,7 +1879,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out)
 	int value;
 	Graph_Free(out);
 	Graph_Init(out);
-	out->have_alpha	= IS_TRUE;
+	out->have_alpha	= TRUE;
 	out->type	= TYPE_PNG;
 	out->alpha	= 255;
 	value = Graph_Create(out,18,18);

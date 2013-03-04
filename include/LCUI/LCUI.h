@@ -165,12 +165,7 @@
 
 LCUI_BEGIN_HEADER
 
-typedef enum _LCUI_BOOL
-{
-	IS_FALSE = 0,
-	IS_TRUE = 1
-}
-LCUI_BOOL;
+typedef unsigned char LCUI_BOOL;
 
 /****************** 图像的布局 *****************/
 typedef enum _LAYOUT_TYPE

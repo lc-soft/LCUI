@@ -56,7 +56,7 @@ LCUI_EXPORT(int) load_jpeg(const char *filepath, LCUI_Graph *out)
 	
 	jpeg_create_decompress(&cinfo);
 	jpeg_stdio_src(&cinfo,fp);
-	(void) jpeg_read_header(&cinfo,IS_TRUE);
+	(void) jpeg_read_header(&cinfo,TRUE);
 	(void) jpeg_start_decompress(&cinfo);    
 	
 	jaka = cinfo.num_components;

@@ -74,7 +74,7 @@ LCUI_EXPORT(int) Load_Graph_Mosaics(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_FALSE;
+	pic->have_alpha = FALSE;
 	pic->type = TYPE_PNG;
 	pic->alpha = 255;
 	value = Graph_Create(pic,16,16);

@@ -66,7 +66,7 @@ LCUI_EXPORT(int) Load_Graph_ProgressBar_Fore(LCUI_Graph *out)
 	int value;
 	Graph_Free(out);
 	Graph_Init(out);
-	out->have_alpha = IS_FALSE;
+	out->have_alpha = FALSE;
 	out->type    = TYPE_BMP;
 	out->alpha   = 255;
 	value = Graph_Create(out,1,43);
@@ -183,7 +183,7 @@ LCUI_EXPORT(int) Load_Graph_ProgressBar_Img(LCUI_Graph *out)
 	int value;
 	Graph_Free(out);
 	Graph_Init(out);
-	out->have_alpha	= IS_TRUE;
+	out->have_alpha	= TRUE;
 	out->type	= TYPE_PNG;
 	out->alpha	= 255;
 	value = Graph_Create(out,70,43);

@@ -121,7 +121,7 @@ Create_Frames(LCUI_Size size)
 	frames.size = size; 
 	if( !database_init ) {
 		Queue_Init(&frames_database, sizeof(LCUI_Frames), NULL); 
-		database_init = IS_TRUE;
+		database_init = TRUE;
 	}
 	/* 记录该动画至库中 */ 
 	pos = Queue_Add(&frames_database, &frames); 

@@ -13,7 +13,7 @@ LCUI_EXPORT(int) Draw_Empty_Slot(LCUI_Graph *graph, int width, int height)
 	if(width < 4 || height < 4) {
 		return -1;
 	}
-	graph->have_alpha = IS_TRUE;
+	graph->have_alpha = TRUE;
 	Graph_Create(graph, width, height); /* 申请内存 */
 	Graph_FillColor(graph, RGB(250,250,250));/* 填充白色 */
 	Graph_FillAlpha(graph, 255);

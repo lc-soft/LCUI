@@ -168,7 +168,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_Normal(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_TRUE;
+	pic->have_alpha = TRUE;
 	pic->alpha = 255; 
 	value = Graph_Create(pic, 39, 20); 
 	if(value == 0)
@@ -302,7 +302,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_HighLight(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_TRUE;
+	pic->have_alpha = TRUE;
 	pic->type = TYPE_PNG;
 	pic->alpha = 255;
 	value = Graph_Create(pic, 39, 20); 
@@ -437,7 +437,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_Down(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_TRUE;
+	pic->have_alpha = TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Graph_Create(pic, 39, 20); 
@@ -463,7 +463,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_BG(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_TRUE;
+	pic->have_alpha = TRUE;
 	pic->alpha = 255;
 	pic->type = TYPE_PNG;
 	value = Graph_Create(pic, 1, 25); 

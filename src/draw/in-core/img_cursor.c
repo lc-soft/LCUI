@@ -91,7 +91,7 @@ LCUI_EXPORT(int) Load_Graph_Default_Cursor(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = IS_TRUE;
+	pic->have_alpha = TRUE;
 	pic->type = TYPE_PNG;
 	pic->alpha = 255;
 	value = Graph_Create(pic,12,19);
