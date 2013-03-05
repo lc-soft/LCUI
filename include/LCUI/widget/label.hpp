@@ -42,22 +42,48 @@
 #ifndef __LCUI_LABEL_HPP__
 #define __LCUI_LABEL_HPP__
 
-class LCUILabel:public LCUIWidget
-{
+class LCUILabel:public LCUIWidget {
 public:
 	LCUILabel():LCUIWidget( "label" ){};
 	void setText( const char* );
+	void setTextW( const wchar_t* );
 	void setTextStyle( LCUI_TextStyle );
+	void setTextStyle( int, LCUI_RGB );
+	void setTextStyle( int );
 };
 
 void LCUILabel::setText( const char *text )
 {
-	Label_Text( getWidget(), text );
+	Label_Text( widget, text );
+}
+
+void LCUILabel::setTextW( const wchar_t *text )
+{
+	Label_TextW( widget, text );
 }
 
 void LCUILabel::setTextStyle( LCUI_TextStyle style )
 {
-	Label_TextStyle( getWidget(), style );
+	Label_TextStyle( widget, style );
+}
+
+void LCUILabel::setTextStyle( int pixel_size, LCUI_RGB color )
+{
+	LCUI_TextStyle style;
+	
+	style = Label_GetTextStyle( widget );
+	style.pixel_size = pixel_size;
+	style.fore_color = color;
+	Label_TextStyle( widget, style );
+}
+
+void LCUILabel::setTextStyle( int pixel_size )
+{
+	LCUI_TextStyle style;
+	
+	style = Label_GetTextStyle( widget );
+	style.pixel_size = pixel_size;
+	Label_TextStyle( widget, style );
 }
 
 #endif

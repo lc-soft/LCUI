@@ -68,6 +68,10 @@ Label_TextA( LCUI_Widget *widget, const char *ascii_text );
 LCUI_EXPORT(int)
 Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
 
+/* 获取Label部件的文本样式 */
+LCUI_EXPORT(LCUI_TextStyle)
+Label_GetTextStyle( LCUI_Widget *widget );
+
 /* 获取label部件内的文本图层的指针 */
 LCUI_EXPORT(LCUI_TextLayer*)
 Label_GetTextLayer( LCUI_Widget *widget );

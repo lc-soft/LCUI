@@ -68,5 +68,15 @@ void LCUIWindow::setTitleTextW( const wchar_t *text )
 {
 	Window_SetTitleTextW( widget, text );
 }
+
+void LCUIWindow::addToTitleBar( LCUIWidget &child_widget )
+{
+	Window_TitleBar_Add( widget, child_widget.getWidget() );
+}
+
+void LCUIWindow::addToClientArea( LCUIWidget &child_widget )
+{
+	Window_ClientArea_Add( widget, child_widget.getWidget() );
+}
 #endif
 

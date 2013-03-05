@@ -245,7 +245,7 @@ void LCUIWidget::setBorderRadius( unsigned int radius )
 	Widget_SetBorderRadius( widget, radius );
 }
 
-void LCUIWidget::setAlign( ALIGN_TYPE align, LCUI_Pos offset )
+void LCUIWidget::setAlign( ALIGN_TYPE align, LCUI_Pos offset = Pos(0,0) )
 {
 	Widget_SetAlign( widget, align, offset );
 }
