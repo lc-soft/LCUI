@@ -676,7 +676,7 @@ TextBox_ExecUpdate( LCUI_Widget *widget )
 		/* 更新滚动条的位置 */
 		TextBox_ScrollBar_UpdatePos( widget );
 		/* 标记下次继续更新 */
-		__Update_Widget( widget );
+		__Widget_Update( widget );
 	}
 	/* 如果文本框内没有文本，且还未显示占位符，则设置占位符并显示 */
 	if( TextBox_Text_GetTotalLength( widget ) == 0

@@ -25,7 +25,7 @@ LCUI_EXPORT(void) Border_Init( LCUI_Border *border )
 	border->bottom_right_radius = 0;
 }
 
-LCUI_EXPORT(LCUI_Border) Border( int width_px, BORDER_STYLE style, LCUI_RGB color )
+LCUI_EXPORT(LCUI_Border) Border( unsigned int width_px, BORDER_STYLE style, LCUI_RGB color )
 /* 简单的设置边框样式，并获取该样式数据 */
 {
 	LCUI_Border border;
@@ -48,7 +48,7 @@ LCUI_EXPORT(LCUI_Border) Border( int width_px, BORDER_STYLE style, LCUI_RGB colo
 	return border; 
 }
 
-LCUI_EXPORT(void) Border_Radius( LCUI_Border *border, int radius )
+LCUI_EXPORT(void) Border_Radius( LCUI_Border *border, unsigned int radius )
 /* 设置边框的圆角半径 */
 {
 	border->top_left_radius = radius;
@@ -886,7 +886,7 @@ Graph_Draw_RoundBorder_BottomRight(
 	return 0;
 }
 
-LCUI_EXPORT(int) Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border )
+LCUI_EXPORT(int) Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 /* 简单的为图形边缘绘制边框 */
 {
 	LCUI_Graph des_area;
