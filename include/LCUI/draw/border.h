@@ -59,10 +59,10 @@ BORDER_STYLE;
 /* 完整的边框信息 */
 typedef struct _LCUI_Border
 {
-	int top_width;
-	int bottom_width;
-	int left_width;
-	int right_width;
+	unsigned int top_width;
+	unsigned int bottom_width;
+	unsigned int left_width;
+	unsigned int right_width;
 	BORDER_STYLE top_style;
 	BORDER_STYLE bottom_style;
 	BORDER_STYLE left_style;
@@ -71,23 +71,23 @@ typedef struct _LCUI_Border
 	LCUI_RGB bottom_color;
 	LCUI_RGB left_color;
 	LCUI_RGB right_color;
-	int top_left_radius;
-	int top_right_radius;
-	int bottom_left_radius;
-	int bottom_right_radius;
+	unsigned int top_left_radius;
+	unsigned int top_right_radius;
+	unsigned int bottom_left_radius;
+	unsigned int bottom_right_radius;
 }
 LCUI_Border;
 
 LCUI_EXPORT(void) Border_Init( LCUI_Border *border );
 /* 初始化边框数据 */
 
-LCUI_EXPORT(LCUI_Border) Border( int width_px, BORDER_STYLE style, LCUI_RGB color );
+LCUI_EXPORT(LCUI_Border) Border( unsigned int width_px, BORDER_STYLE style, LCUI_RGB color );
 /* 简单的设置边框样式，并获取该样式数据 */
 
-LCUI_EXPORT(void) Border_Radius( LCUI_Border *border, int radius );
+LCUI_EXPORT(void) Border_Radius( LCUI_Border *border, unsigned int radius );
 /* 设置边框的圆角半径 */
 
-LCUI_EXPORT(int) Graph_Draw_Border( LCUI_Graph *des, LCUI_Border border );
+LCUI_EXPORT(int) Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border );
 /* 简单的为图形边缘绘制边框 */
 
 LCUI_END_HEADER

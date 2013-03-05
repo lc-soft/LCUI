@@ -422,7 +422,7 @@ Widget_SetBorder( LCUI_Widget *widget, LCUI_Border border );
 
 /* 设定部件边框的四个角的圆角半径 */
 LCUI_EXPORT(void)
-Widget_SetBorderRadius( LCUI_Widget *widget, int radius );
+Widget_SetBorderRadius( LCUI_Widget *widget, unsigned int radius );
 
 /* 设定部件的背景图像 */
 LCUI_EXPORT(void)
@@ -584,7 +584,7 @@ Widget_Update(LCUI_Widget *widget);
  * */
 
 LCUI_EXPORT(void)
-__Update_Widget(LCUI_Widget *widget);
+__Widget_Update(LCUI_Widget *widget);
 /* 
  * 功能：让部件根据已设定的属性，进行相应数据的更新
  * 说明：与上个函数功能一样，但是，可以允许队列中有两条相同记录。

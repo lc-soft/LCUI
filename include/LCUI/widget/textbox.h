@@ -139,6 +139,11 @@ LCUI_EXPORT(void)
 TextBox_Text_SetPasswordChar( LCUI_Widget *widget, wchar_t ch );
 /* 为文本框设置屏蔽字符 */
 
+LCUI_EXPORT(void)
+TextBox_Text_SetPlaceHolderW(	LCUI_Widget *widget, 
+				LCUI_TextStyle *style,
+				const wchar_t *str );
+
 /* 为文本框设置占位符 */
 LCUI_EXPORT(void)
 TextBox_Text_SetPlaceHolder(	LCUI_Widget *widget, 
