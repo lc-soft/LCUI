@@ -2,30 +2,41 @@
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
+#include LC_GRAPH_H
 #include LC_WIDGET_H 
 #include LC_WINDOW_H
 #include LC_LABEL_H 
-#include LC_GRAPH_H
 #include LC_RES_H
 
+#ifdef __cplusplus
 #ifdef LCUI_BUILD_IN_WIN32
-#include <io.h>
-#include <fcntl.h>
-#include <windows.h>
-/* 在运行程序时会打开控制台，以查看打印的调试信息 */
-void InitConsoleWindow(void)
+int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
-	int hCrt;
-	FILE *hf;
-	AllocConsole();
-	hCrt=_open_osfhandle((long)GetStdHandle(STD_OUTPUT_HANDLE),_O_TEXT );
-	hf=_fdopen( hCrt, "w" );
-	*stdout=*hf;
-	setvbuf (stdout, NULL, _IONBF, 0);
-	// test code
-	printf ("InitConsoleWindow OK!\n");
+	Win32_LCUI_Init( hInstance );
+#else
+int main(int argc, char*argv[]) 
+{
+#endif
+	LCUIApp app;
+	LCUIWindow wind;
+	LCUILabel text;
+	LCUIGraph icon;
+
+	Load_Graph_Icon_LCUI_18x18( icon.getGraph() );
+	wind.setTitleText( "测试窗口" );
+	wind.setTitleIcon( icon );
+	wind.resize( 320,240 );
+	text.setText( "Hello, World!\n你好，世界！" );
+	text.setTextStyle( 24 );
+	text.setAlign( ALIGN_MIDDLE_CENTER );
+	wind.addToClientArea( text );
+	text.show();
+	wind.show();
+	app.main();
 }
 
+#else
+#ifdef LCUI_BUILD_IN_WIN32
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 #else
 int main(int argc, char*argv[]) 
@@ -36,10 +47,9 @@ int main(int argc, char*argv[])
 	LCUI_Graph pic;
 	
 #ifdef LCUI_BUILD_IN_WIN32
-	//InitConsoleWindow();
 	Win32_LCUI_Init( hInstance );
 #endif
-	LCUI_Init( 0, NULL );
+	LCUI_Init();
 	
 	/* 初始化结构体 */
 	Graph_Init( &pic );
@@ -78,3 +88,5 @@ int main(int argc, char*argv[])
 	window->show(window); 
 	return LCUI_Main(); /* 进入主循环 */
 }
+
+#endif
