@@ -429,13 +429,12 @@ LCUI_Active()
 	return FALSE;
 }
 
-//extern int debug_mark;
-LCUI_EXPORT(int)
-LCUI_Init(int argc, char *argv[])
 /* 
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */
+LCUI_EXPORT(int)
+LCUI_Init( void )
 {
 	int temp;
 	/* 如果LCUI没有初始化过 */
@@ -478,7 +477,6 @@ LCUI_Init(int argc, char *argv[])
 	Register_Default_Widget_Type();
 	return 0;
 }
-
 
 /* 
  * 功能：LCUI程序的主循环
