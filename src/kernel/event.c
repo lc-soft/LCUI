@@ -71,12 +71,12 @@ LCUI_PollEvent( LCUI_Event *event )
 	Queue_Lock( &events );
 	tmp = Queue_Get( &events, 0 );
 	if( !tmp ) {
-		Queue_UnLock( &events );
+		Queue_Unlock( &events );
 		return FALSE;
 	}
 	*event = *tmp;
 	Queue_Delete( &events, 0 );
-	Queue_UnLock( &events );
+	Queue_Unlock( &events );
 	return TRUE;
 }
 
@@ -224,10 +224,10 @@ LCUI_PushEvent( LCUI_Event *event )
 	}
 	Queue_Lock( &events );
 	if(Queue_Add( &events, event ) < 0) {
-		Queue_UnLock( &events );
+		Queue_Unlock( &events );
 		return FALSE;
 	}
-	Queue_UnLock( &events );
+	Queue_Unlock( &events );
 	return TRUE;
 }
 

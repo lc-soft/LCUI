@@ -148,7 +148,7 @@ Graph_Unlock( LCUI_Graph *graph )
 {
 	LCUI_Graph *src;
 	src = Graph_GetQuote(graph);
-	LCUIMutex_UnLock( &src->mutex );
+	LCUIMutex_Unlock( &src->mutex );
 }
 
 /* 混合两个像素点的颜色 */

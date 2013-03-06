@@ -95,7 +95,7 @@ Queue_Lock( LCUI_Queue *queue );
 
 /* 解开队列的互斥锁 */
 LCUI_EXPORT(int)
-Queue_UnLock( LCUI_Queue *queue );
+Queue_Unlock( LCUI_Queue *queue );
 
 /* 初始化队列 */
 LCUI_EXPORT(void)

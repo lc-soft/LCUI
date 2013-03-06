@@ -82,7 +82,7 @@ LCUIMutex_Lock( LCUI_Mutex *mutex );
 
 /* Unlock the mutex */
 LCUI_EXPORT(int)
-LCUIMutex_UnLock( LCUI_Mutex *mutex );
+LCUIMutex_Unlock( LCUI_Mutex *mutex );
 
 
 LCUI_EXPORT(int)

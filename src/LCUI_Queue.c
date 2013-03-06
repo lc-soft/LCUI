@@ -75,9 +75,9 @@ Queue_Lock( LCUI_Queue *queue )
 
 /* 解开队列的互斥锁 */
 LCUI_EXPORT(int)
-Queue_UnLock( LCUI_Queue *queue )
+Queue_Unlock( LCUI_Queue *queue )
 {
-	return LCUIMutex_UnLock( &queue->mutex );
+	return LCUIMutex_Unlock( &queue->mutex );
 }
 
 /* 初始化队列 */

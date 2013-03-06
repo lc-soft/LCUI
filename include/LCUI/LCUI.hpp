@@ -41,12 +41,11 @@
 #ifndef __LCUI_HPP__
 #define __LCUI_HPP__
 
-class LCUIApp
-{
+class LCUIApp {
 	public:
-	LCUIApp( int argc, char *argv[] )
+	LCUIApp( void )
 	{
-		LCUI_Init(argc, argv);
+		LCUI_Init();
 	}
 	int main( void )
 	{

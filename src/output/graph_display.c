@@ -97,7 +97,7 @@ LCUIScreen_InvalidArea( LCUI_Rect rect )
 	rect = LCUIRect_ValidArea(LCUIScreen_GetSize(), rect);
 	Queue_Lock( &screen_invalid_area );
 	ret = RectQueue_Add ( &screen_invalid_area, rect );
-	Queue_UnLock( &screen_invalid_area );
+	Queue_Unlock( &screen_invalid_area );
 	return ret;
 }
 
@@ -180,7 +180,7 @@ LCUIScreen_UpdateInvalidArea(void)
 		Queue_Delete( &screen_invalid_area, 0 );
 	}
 	/* 解锁队列 */
-	Queue_UnLock( &screen_invalid_area );
+	Queue_Unlock( &screen_invalid_area );
 	//_DEBUG_MSG("quit\n");
 	Graph_Free(&graph);
 #else
@@ -194,7 +194,7 @@ LCUIScreen_UpdateInvalidArea(void)
 		Queue_Delete( &screen_invalid_area, 0 );
 	}
 	/* 解锁队列 */
-	Queue_UnLock( &screen_invalid_area );
+	Queue_Unlock( &screen_invalid_area );
 #endif
 }
 

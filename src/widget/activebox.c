@@ -280,7 +280,7 @@ FramesStream_Sort()
 			}
 		}
 	}
-	Queue_UnLock(&frames_stream);
+	Queue_Unlock(&frames_stream);
 }
 
 static void 
@@ -313,7 +313,7 @@ FramesStream_TimeSub(int time)
 			frames, pos, frame->current_time, time);
 	}
 	DEBUG_MSG("end\n");
-	Queue_UnLock(&frames_stream);
+	Queue_Unlock(&frames_stream);
 }
 
 LCUI_EXPORT(LCUI_Frame*)
@@ -448,7 +448,7 @@ Frames_Play(LCUI_Frames *frames)
 			break;
 		}
 	}
-	Queue_UnLock( &frames_stream );
+	Queue_Unlock( &frames_stream );
 	/* 添加至动画更新队列中 */ 
 	if( i>=total ) {
 		return Queue_Add_Pointer(&frames_stream, frames); 

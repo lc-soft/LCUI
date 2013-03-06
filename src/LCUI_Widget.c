@@ -1069,10 +1069,10 @@ Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 	Queue_Lock( &widget->invalid_area );
 	/* 保存至队列中 */
 	if(0 != Queue_Add( &widget->invalid_area, &rect ) ) {
-		Queue_UnLock( &widget->invalid_area );
+		Queue_Unlock( &widget->invalid_area );
 		return -1;
 	}
-	Queue_UnLock( &widget->invalid_area );
+	Queue_Unlock( &widget->invalid_area );
 	return 0;
 }
 
@@ -1547,7 +1547,7 @@ static void Widget_ExecDestroy( LCUI_Widget *widget )
 			break;
 		}
 	}
-	Queue_UnLock( child_list );
+	Queue_Unlock( child_list );
 }
 
 /* 累计部件的位置坐标 */
@@ -2503,7 +2503,7 @@ Widget_Front( LCUI_Widget *widget )
 	Queue_Move( widget_list, des_pos, src_pos );
 	/* 对容器图层中的子图层列表进行排序 */
 	GraphLayer_Sort( container_glayer );
-	Queue_UnLock( widget_list );
+	Queue_Unlock( widget_list );
 	return 0;
 }
 
@@ -2748,7 +2748,7 @@ Handle_WidgetUpdate(LCUI_Widget *widget)
 			/* 添加刷新区域 */
 			Widget_ExecRefresh(widget);
 			/* 解锁队列 */
-			Queue_UnLock( &widget->data_buff );
+			Queue_Unlock( &widget->data_buff );
 			/* 开始销毁部件数据 */
 			Widget_ExecDestroy(widget);
 			return 0;
@@ -2758,7 +2758,7 @@ Handle_WidgetUpdate(LCUI_Widget *widget)
 	}
 	total = Queue_Get_Total( &widget->data_buff );
 	//_DEBUG_MSG(" 2, total: %d\n", total);
-	Queue_UnLock( &widget->data_buff );
+	Queue_Unlock( &widget->data_buff );
 	/* 处理子部件更新 */
 	total = Queue_Get_Total( &widget->child );
 	/* 从尾到首,递归处理子部件的更新 */

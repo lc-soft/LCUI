@@ -136,7 +136,7 @@ LCUI_EXPORT(int) LCUI_MainLoop_Quit( LCUI_MainLoop *loop );
 LCUI_EXPORT(LCUI_BOOL) LCUI_Active();
 /* 功能：检测LCUI是否活动 */ 
 
-LCUI_EXPORT(int) LCUI_Init(int argc, char *argv[]);
+LCUI_EXPORT(int) LCUI_Init( void );
 /* 
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化

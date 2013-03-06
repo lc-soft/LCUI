@@ -258,7 +258,7 @@ GraphLayer_Sort( LCUI_GraphLayer *glayer )
 			}
 		}
 	}
-	Queue_UnLock( &glayer->child );
+	Queue_Unlock( &glayer->child );
 	return 0;
 }
 

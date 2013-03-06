@@ -84,7 +84,7 @@ timer_list_sort( LCUI_Queue *timer_list )
 			}
 		}
 	}
-	Queue_UnLock( timer_list );
+	Queue_Unlock( timer_list );
 }
 
 /* 功能：将各个定时器的等待时间与指定时间相减 */
@@ -105,7 +105,7 @@ timer_list_sub( LCUI_Queue *timer_list, int time )
 		}
 		timer->cur_ms -= time;
 	}
-	Queue_UnLock( timer_list );
+	Queue_Unlock( timer_list );
 }
 
 static timer_data *
@@ -187,7 +187,7 @@ find_timer( int timer_id )
 			break;
 		}
 	}
-	Queue_UnLock( &LCUI_Sys.timer_list ); 
+	Queue_Unlock( &LCUI_Sys.timer_list ); 
 	return timer;
 }
 /*--------------------------- End Private ----------------------------*/
@@ -237,7 +237,7 @@ free_timer( int timer_id )
 			break;
 		}
 	}
-	Queue_UnLock( &LCUI_Sys.timer_list );
+	Queue_Unlock( &LCUI_Sys.timer_list );
 	if( i < total ) {
 		return 0;
 	}
