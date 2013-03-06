@@ -73,6 +73,9 @@
     <Filter Include="源文件\bmp">
       <UniqueIdentifier>{dd6d7c8f-2626-480f-b8ca-002f4a4ce989}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\LCUI\misc">
+      <UniqueIdentifier>{8549c555-60ca-47c5-a4d6-b4e0bff7bcb9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\LCUI_Build.h">
@@ -221,6 +224,15 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\misc\delay.h">
+      <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\misc\rect.h">
+      <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\misc\string.h">
+      <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
