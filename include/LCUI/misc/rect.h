@@ -118,6 +118,18 @@ LCUIRect_Equal( LCUI_Rect a, LCUI_Rect b );
 LCUI_EXPORT(int)
 LCUIRect_IsValid( LCUI_Rect r );
 
+/* 初始化储存矩形数据的队列 */
+LCUI_EXPORT(void)
+RectQueue_Init( LCUI_Queue *queue );
+
+/* 从队列指定位置中获取一个矩形数据 */
+LCUI_EXPORT(int)
+RectQueue_Get( LCUI_Rect * rect, int pos, LCUI_Queue * queue );
+ 
+/* 将矩形数据追加至队列 */
+LCUI_EXPORT(int)
+RectQueue_Add( LCUI_Queue * queue, LCUI_Rect rect );
+
 LCUI_END_HEADER
 
 #endif

@@ -478,3 +478,89 @@ LCUIRect_IsValid( LCUI_Rect r )
 	return 1;
 }
 
+
+/************************* RectQueue **********************************/
+/* 初始化储存矩形数据的队列 */
+LCUI_EXPORT(void)
+RectQueue_Init( LCUI_Queue *queue )
+{
+	/* 由于LCUI_Rect结构体中的成员没有指针，因此，不需要释放指针指向的内存，也就不需要析构函数 */
+	Queue_Init(queue, sizeof(LCUI_Rect), NULL);
+}
+
+/* 从队列指定位置中获取一个矩形数据 */
+LCUI_EXPORT(int)
+RectQueue_Get( LCUI_Rect * rect, int pos, LCUI_Queue * queue )
+{
+	void *temp;
+	temp = Queue_Get(queue, pos);
+	if(NULL == temp) {
+		return 0;
+	}
+	*rect = *((LCUI_Rect*)temp);
+	return 1;
+}
+
+/* 将源队列里的全部成员拷贝追加至目标队列里 */
+static void RectQueue_Copy( LCUI_Queue *des, LCUI_Queue *src )
+{
+	LCUI_Rect *rect;
+	int i, total;
+	total = Queue_Get_Total(src);
+	for(i=0; i<total; ++i) {
+		rect = (LCUI_Rect *)Queue_Get(src, i);/* 获取源队列里的成员 */
+		//printf("[%d] rect: %d,%d, %d,%d\n", i, rect->x, rect->y, rect->width, rect->height);
+		RectQueue_Add(des, *rect); /* 添加至目标队列里 */
+	}
+}
+ 
+/* 将矩形数据追加至队列 */
+LCUI_EXPORT(int)
+RectQueue_Add( LCUI_Queue * queue, LCUI_Rect rect )
+{ 
+	int i, flag = 0;
+	LCUI_Rect t_rect; 
+	LCUI_Queue rect_buff;
+	
+	if(!LCUIRect_IsValid(rect)) {
+		return -1;
+	}
+	
+	RectQueue_Init(&rect_buff);
+	
+	for (i = 0; i < queue->total_num; ++i) {
+		if( !RectQueue_Get(&t_rect, i, queue) ) {
+			break;
+		}
+		if (!LCUIRect_IsValid(t_rect)) {
+		/* 删除这个矩形数据，因为它是无效的 */
+			Queue_Delete (queue, i); 
+		} else if (LCUIRect_IncludeRect (rect, t_rect)) {
+		/* 删除这个矩形数据，因为它已经被新增的矩形区域包含 */
+			Queue_Delete (queue, i); 
+		} else if (LCUIRect_IncludeRect (t_rect, rect)) {
+		/* 如果新增的矩形数据与已存在的矩形数据属于包含关系 */
+			flag = 1;
+			break;
+		} else if(LCUIRect_Equal(rect, t_rect)) {
+		/* 相等的就不需要了 */
+			flag = 1;
+			break;
+		} else if(LCUIRect_Overlay(rect, t_rect)) {
+			/* 如果新增的矩形与队列中的矩形重叠 */ 
+			/* 将矩形分离成若干个不重叠的矩形，之后将它们添加进去 */
+			LCUIRect_Cut(t_rect, rect, &rect_buff);
+			RectQueue_Copy(queue, &rect_buff);
+			flag = 1;
+			break;
+		}
+	}
+	
+	/* 销毁队列 */
+	Destroy_Queue(&rect_buff);
+	if (flag == 0) { /* 没有的话，就需要添加至队列 */ 
+		return Queue_Add(queue, &rect);
+	}
+	return -1;
+}
+/************************* RectQueue end *******************************/

@@ -88,7 +88,6 @@ struct _LCUI_Queue
 };
 /**********************************************************************/
 
-/************************ LCUI_Queue **********************************/
 /* 为队列设定互斥锁，使之只能被一个线程使用 */
 LCUI_EXPORT(int)
 Queue_Lock( LCUI_Queue *queue );
@@ -199,25 +198,6 @@ Queue_Empty(LCUI_Queue *queue);
 /* 查找指定成员指针所在队列中的位置 */
 LCUI_EXPORT(int)
 Queue_Find( LCUI_Queue *queue, const void *p );
-/************************ LCUI_Queue End ******************************/
-
-/************************* RectQueue **********************************/
-LCUI_EXPORT(void)
-RectQueue_Init(LCUI_Queue *queue);
-/* 功能：初始化储存矩形数据的队列 */ 
-
-LCUI_EXPORT(int)
-RectQueue_Get( LCUI_Rect * rect, int pos, LCUI_Queue * queue);
-/* 功能：从队列指定位置中获取一个矩形数据 */ 
-
-LCUI_EXPORT(void)
-Queue_Copy(LCUI_Queue *des, LCUI_Queue *src);
-/* 功能：将源队列里的全部成员拷贝追加至目标队列里 */ 
- 
-LCUI_EXPORT(int)
-RectQueue_Add (LCUI_Queue * queue, LCUI_Rect rect) ;
-/* 功能：将矩形数据追加至队列 */ 
-/************************* RectQueue end *******************************/
 
 LCUI_END_HEADER
 
