@@ -71,7 +71,7 @@ WidgetQueue_Get_Pos(LCUI_Queue *queue, LCUI_Widget *widget)
 	LCUI_Widget *temp;
 	int i, result = -1, total; 
 	
-	total = Queue_Get_Total(queue); 
+	total = Queue_GetTotal(queue); 
 	for(i = 0; i < total; ++i) {
 		temp = Queue_Get(queue, i);
 		if(temp == widget) { 
@@ -116,7 +116,7 @@ int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	if( !slot ) {
 		return -2;
 	}
-	n = Queue_Get_Total( &slot->func_data );
+	n = Queue_GetTotal( &slot->func_data );
 	for(i=0; i<n; ++i) {
 		task = Queue_Get( &slot->func_data, i );
 		p_buff = malloc( sizeof(LCUI_WidgetEvent) );
@@ -226,7 +226,7 @@ widget_list_reset( void )
 {
 	int i, n;
 	widget_item *item;
-	n = Queue_Get_Total( &widget_list );
+	n = Queue_GetTotal( &widget_list );
 	for(i=0; i<n; ++i) {
 		item = Queue_Get( &widget_list, i );
 		item->need_delete = TRUE;
@@ -239,7 +239,7 @@ widget_list_clear( void )
 {
 	int i, n;
 	widget_item *item;
-	n = Queue_Get_Total( &widget_list );
+	n = Queue_GetTotal( &widget_list );
 	for(i=0; i<n; ++i) {
 		item = Queue_Get( &widget_list, i );
 		if( !item->need_delete ) {
@@ -247,7 +247,7 @@ widget_list_clear( void )
 		}
 		Widget_SetState( item->widget, WIDGET_STATE_NORMAL );
 		Queue_Delete( &widget_list, i );
-		n = Queue_Get_Total( &widget_list );
+		n = Queue_GetTotal( &widget_list );
 		--i;
 	}
 }
@@ -258,7 +258,7 @@ widget_list_add( LCUI_Widget *widget )
 {
 	int i, n;
 	widget_item new_item, *item;
-	n = Queue_Get_Total( &widget_list );
+	n = Queue_GetTotal( &widget_list );
 	for(i=0; i<n; ++i) {
 		item = Queue_Get( &widget_list, i );
 		if( item->widget == widget ) {
@@ -289,7 +289,7 @@ static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
 		} else {
 			child_list = &up_widget->child;
 		}
-		n = Queue_Get_Total( child_list );
+		n = Queue_GetTotal( child_list );
 		for(i=0; i<n; ++i) {
 			child = Queue_Get( child_list, i );
 			if( !child || !child->visible ) {
@@ -446,7 +446,7 @@ Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 	if( !slot ) {
 		return -2;
 	}
-	n = Queue_Get_Total( &slot->func_data );
+	n = Queue_GetTotal( &slot->func_data );
 	for(i=0; i<n; ++i) {
 		task = Queue_Get( &slot->func_data, i );
 		p_buff = malloc( sizeof(LCUI_KeyboardEvent) );
@@ -482,8 +482,8 @@ LCUIModule_Widget_Init( void )
 LCUI_EXPORT(void)
 LCUIModule_Widget_End( void )
 {
-	Destroy_Queue( &LCUI_Sys.widget_list );
-	Destroy_Queue( &widget_list );
+	Queue_Destroy( &LCUI_Sys.widget_list );
+	Queue_Destroy( &widget_list );
 }
 /*************************** Event End *********************************/
 
@@ -570,7 +570,7 @@ Get_FocusWidget( LCUI_Widget *widget )
 		return NULL;
 	}
 	
-	total = Queue_Get_Total( queue_ptr );
+	total = Queue_GetTotal( queue_ptr );
 	if( total <= 0 ) {
 		return NULL;
 	}
@@ -624,7 +624,7 @@ Cancel_Focus( LCUI_Widget *widget )
 	event.type = EVENT_FOCUSOUT;
 	Widget_DispatchEvent( widget, &event );
 	/* 寻找可获得焦点的其它部件 */
-	total = Queue_Get_Total( queue_ptr );
+	total = Queue_GetTotal( queue_ptr );
 	focus_pos = WidgetQueue_Get_Pos( queue_ptr, *focus_widget );
 	for( i=0; i<focus_pos; ++i ) {
 		other_widget = Queue_Get( queue_ptr, i);

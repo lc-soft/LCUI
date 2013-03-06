@@ -87,7 +87,7 @@ Tasks_CustomAdd( LCUI_Queue *tasks, int mode, LCUI_Task *task )
 	int total, i;
 	LCUI_Task *tmp_task;
 	
-	total = Queue_Get_Total(tasks);
+	total = Queue_GetTotal(tasks);
 	/* 如果模式是“添加新的”模式 */
 	if( mode == ADD_MODE_ADD_NEW ) {
 		Queue_Add(tasks, task); 

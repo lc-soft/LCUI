@@ -83,7 +83,7 @@ _LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 		*thread = 0;
 		return -1;
 	}
-	Queue_Add_Pointer( &thread_database, thread_ptr );
+	Queue_AddPointer( &thread_database, thread_ptr );
 	*thread = thread_ptr->tid;
 	return 0;
 }
@@ -95,7 +95,7 @@ static LCUI_ThreadData *_LCUIThread_Self( void )
 	LCUI_ThreadData *thread_data;
 	
 	tid = GetCurrentThreadId();
-	n = Queue_Get_Total( &thread_database );
+	n = Queue_GetTotal( &thread_database );
 	for(i=0; i<n; ++i) {
 		thread_data = Queue_Get( &thread_database, i );
 		if( !thread_data || thread_data->tid != tid ) {
@@ -114,7 +114,7 @@ static int _LCUIThread_Destroy( LCUI_Thread thread )
 	if(!thread){
 		return -1;
 	}
-	n = Queue_Get_Total( &thread_database );
+	n = Queue_GetTotal( &thread_database );
 	for(i=0; i<n; ++i) {
 		thread_data = Queue_Get( &thread_database, i );
 		if( !thread_data || thread != thread_data->tid ) {

@@ -96,7 +96,7 @@ msgbox_mainloop_new( LCUI_Widget *msgbox )
 	
 	data->msgbox = msgbox;
 	data->mainloop = LCUI_MainLoop_New();
-	Queue_Insert_Pointer( &msgbox_list, 0, data );
+	Queue_InsertPointer( &msgbox_list, 0, data );
 	return data->mainloop;
 }
 
@@ -105,7 +105,7 @@ msgbox_data_find( LCUI_Widget *msgbox )
 {
 	int i, n;
 	MB_data *data;
-	n = Queue_Get_Total( &msgbox_list );
+	n = Queue_GetTotal( &msgbox_list );
 	for(i=0; i<n; ++i) {
 		data = Queue_Get( &msgbox_list, i );
 		if( !data ) {
@@ -123,7 +123,7 @@ msgbox_data_delete( LCUI_Widget *msgbox )
 {
 	int i, n;
 	MB_data *data;
-	n = Queue_Get_Total( &msgbox_list );
+	n = Queue_GetTotal( &msgbox_list );
 	for(i=0; i<n; ++i) {
 		data = Queue_Get( &msgbox_list, i );
 		if( !data ) {

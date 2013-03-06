@@ -49,13 +49,13 @@ timer_list_init( LCUI_Queue *timer_list )
 {
 	Queue_Init( timer_list, sizeof(timer_data), NULL );
 	/* 使用链表 */
-	Queue_Set_DataMode( timer_list, QUEUE_DATA_MODE_LINKED_LIST );
+	Queue_SetDataMode( timer_list, QUEUE_DATA_MODE_LINKED_LIST );
 }
 /* 功能：销毁定时器列表 */
 static void 
 timer_list_destroy( LCUI_Queue *timer_list )
 {
-	Destroy_Queue( timer_list );
+	Queue_Destroy( timer_list );
 }
 
 /* 功能：对定时器列表进行排序 */
@@ -66,7 +66,7 @@ timer_list_sort( LCUI_Queue *timer_list )
 	timer_data *a_timer, *b_timer;
 	
 	Queue_Lock( timer_list );
-	total = Queue_Get_Total( timer_list );
+	total = Queue_GetTotal( timer_list );
 	/* 使用的是选择排序,按剩余等待时间从少到多排序 */
 	for(i=0; i<total; ++i) {
 		a_timer = Queue_Get( timer_list, i );
@@ -95,7 +95,7 @@ timer_list_sub( LCUI_Queue *timer_list, int time )
 	int i, total;
 	
 	Queue_Lock( timer_list );
-	total = Queue_Get_Total( timer_list );
+	total = Queue_GetTotal( timer_list );
 	
 	for(i=0; i<total; ++i) {
 		timer = Queue_Get( timer_list , i);
@@ -115,7 +115,7 @@ timer_list_update( LCUI_Queue *timer_list )
 	int i, total;
 	timer_data *timer = NULL;
 	
-	total = Queue_Get_Total( timer_list ); 
+	total = Queue_GetTotal( timer_list ); 
 	for(i=0; i<total; ++i){
 		timer = Queue_Get( timer_list , i);
 		if(timer->state == 1) {
@@ -177,7 +177,7 @@ find_timer( int timer_id )
 	int i, total;
 	timer_data *timer = NULL;
 	Queue_Lock( &LCUI_Sys.timer_list );
-	total = Queue_Get_Total( &LCUI_Sys.timer_list );
+	total = Queue_GetTotal( &LCUI_Sys.timer_list );
 	for(i=0; i<total; ++i) {
 		timer = Queue_Get( &LCUI_Sys.timer_list, i );
 		if( !timer ) {
@@ -226,7 +226,7 @@ free_timer( int timer_id )
 	timer_data *timer;
 	
 	Queue_Lock( &LCUI_Sys.timer_list );
-	total = Queue_Get_Total( &LCUI_Sys.timer_list );
+	total = Queue_GetTotal( &LCUI_Sys.timer_list );
 	for(i=0; i<total; ++i) {
 		timer = Queue_Get( &LCUI_Sys.timer_list, i );
 		if( !timer ) {

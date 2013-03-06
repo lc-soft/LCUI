@@ -55,6 +55,7 @@
  * 数据的位置需要向后移动，后面的数据元素越多，耗时越多。
  * 后者适合频繁的进行数据插入和删除，因为只需要找到目标位置的结点，然后插入新结点即可。
  * LCUI的文本位图层的处理就用到了后者，因为编辑文本主要是添加和删除文字。
+ * 此模块代码可以改进，比如可以选择相应算法，以提高队列的 查找和插入 效率。
  * */
 
 //#define DEBUG
@@ -65,7 +66,6 @@
 #include LC_WIDGET_H 
 #include LC_ERROR_H
 
-/************************ LCUI_Queue **********************************/
 /* 为队列设定互斥锁，使之只能被一个线程使用 */
 LCUI_EXPORT(int)
 Queue_Lock( LCUI_Queue *queue )
@@ -97,30 +97,30 @@ Queue_Init (LCUI_Queue * queue, size_t element_size, void (*func) (void*))
 	queue->destroy_func	= func; 
 }
 
-LCUI_EXPORT(void)
-Queue_Using_Pointer(LCUI_Queue * queue)
 /* 
  * 功能：设定队列成员类型为指针 
  * 说明：如果队列只是用于存放指针，并且不希望队列销毁后，指针指向的内存空间也被释放，可
  * 使用该函数设置。
  * */
+LCUI_EXPORT(void)
+Queue_UsingPointer( LCUI_Queue * queue )
 {
 	queue->member_type = 1;
 }
 
+/* 获取队列当前总成员数量 */
 LCUI_EXPORT(int)
-Queue_Get_Total(LCUI_Queue * queue)
-/* 说明：获取队列当前总成员数量 */
+Queue_GetTotal( LCUI_Queue * queue )
 {
 	return queue->total_num;
 }
 
-LCUI_EXPORT(int)
-Queue_Set_DataMode(LCUI_Queue * queue, Queue_DataMode mode)
 /* 
  * 功能：设定队列使用的数据储存模式
  * 说明：只能在初始化后且未加入成员时使用该函数
  * */
+LCUI_EXPORT(int)
+Queue_SetDataMode( LCUI_Queue * queue, Queue_DataMode mode )
 {
 	if(queue->total_num > 0 || queue->max_num > 0) {
 		return -1;
@@ -129,9 +129,9 @@ Queue_Set_DataMode(LCUI_Queue * queue, Queue_DataMode mode)
 	return 0;
 }
 
+/* 交换队列中指定位置两个成员的位置 */
 LCUI_EXPORT(int)
-Queue_Swap(LCUI_Queue * queue, int pos_a, int pos_b)
-/* 功能：交换队列中指定位置两个成员的位置 */
+Queue_Swap( LCUI_Queue * queue, int pos_a, int pos_b )
 {
 	void *temp;
 	
@@ -164,15 +164,15 @@ Queue_Swap(LCUI_Queue * queue, int pos_a, int pos_b)
 	return 0;
 }
 
+/* 释放队列占用的内存资源 */
 LCUI_EXPORT(void)
-Destroy_Queue(LCUI_Queue * queue) 
-/* 功能：释放队列占用的内存资源 */
+Queue_Destroy( LCUI_Queue * queue )
 {
 	if(queue->member_type == 0) {
 	/* 如果成员是普通类型，释放队列成员占用的内存空间 */ 
 		while( Queue_Delete(queue, 0) );/* 清空队列成员 */
 	} else {
-		while( Queue_Delete_Pointer(queue, 0) );
+		while( Queue_DeletePointer(queue, 0) );
 	}
 	if(queue->data_mode == QUEUE_DATA_MODE_ARRAY) {
 		/* 释放二维指针占用的的内存空间 */ 
@@ -194,13 +194,13 @@ Destroy_Queue(LCUI_Queue * queue)
 	LCUIMutex_Destroy( &queue->mutex );
 }
 
-LCUI_EXPORT(void*)
-Queue_Get (LCUI_Queue * queue, int pos)
 /* 
  * 功能：从队列中获取指定位置的成员 
  * 说明：成功返回指向该成员的指针，失败返回NULL
  * 注意：请勿对返回的指针进行free操作
  * */
+LCUI_EXPORT(void*)
+Queue_Get( LCUI_Queue * queue, int pos )
 {
 	void  *data = NULL;
 	
@@ -223,32 +223,32 @@ Queue_Get (LCUI_Queue * queue, int pos)
 	return data;
 }
 
+/* 向队列中指定位置插入成员 */
 LCUI_EXPORT(int)
-Queue_Insert( LCUI_Queue * queue, int pos, const void *data)
-/* 功能：向队列中指定位置插入成员 */
+Queue_Insert( LCUI_Queue * queue, int pos, const void *data )
 {
 	int src_pos;
 	src_pos = Queue_Add(queue, data);
 	return Queue_Move(queue, pos, src_pos); 
 }
 
+/* 向队列中指定位置插入成员的指针 */
 LCUI_EXPORT(int)
-Queue_Insert_Pointer( LCUI_Queue * queue, int pos, const void *data)
-/* 功能：向队列中指定位置插入成员的指针 */
+Queue_InsertPointer( LCUI_Queue * queue, int pos, const void *data )
 {
 	int src_pos;
-	src_pos = Queue_Add_Pointer(queue, data);
+	src_pos = Queue_AddPointer(queue, data);
 	return Queue_Move(queue, pos, src_pos); 
 }
 
+/* 将队列中指定位置的成员移动至目的位置 */
 LCUI_EXPORT(int)
-Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos)
-/* 功能：将队列中指定位置的成员移动至目的位置 */
+Queue_Move( LCUI_Queue *queue, int des_pos, int src_pos )
 {
 	void *temp;
 	int i, total;
 	
-	total = Queue_Get_Total(queue);
+	total = Queue_GetTotal(queue);
 	if(des_pos < 0 || des_pos > total 
 	|| src_pos < 0 || src_pos > total ) {
 		return -1;
@@ -317,9 +317,9 @@ Queue_Move(LCUI_Queue *queue, int des_pos, int src_pos)
 	return 0;
 }
 
+/* 引用队列 */
 LCUI_EXPORT(int)
 Queue_Quote( LCUI_Queue *des, LCUI_Queue *src )
-/* 引用队列 */
 {
 	*des = *src;
 	if( des->data_mode == QUEUE_DATA_MODE_ARRAY 
@@ -337,12 +337,12 @@ Queue_Quote( LCUI_Queue *des, LCUI_Queue *src )
 	return -1;
 }
 
-LCUI_EXPORT(int)
-Queue_Replace_By_Flag(LCUI_Queue * queue, int pos, const void *data, int flag)
-/* 功能：覆盖队列中指定位置的成员 */
+/* 根据给定的标志，覆盖队列中指定位置的成员 */
+static int
+__Queue_Replace( LCUI_Queue * queue, int pos, const void *data, int flag )
 {
 	int i, total;
-	total = Queue_Get_Total(queue);
+	total = Queue_GetTotal(queue);
 	if(pos >= total) {	/* 如果超出队列范围 */
 		return -1;
 	}
@@ -381,26 +381,26 @@ Queue_Replace_By_Flag(LCUI_Queue * queue, int pos, const void *data, int flag)
 	return 0;
 }
 
+/* 覆盖队列中指定位置的成员内存空间里的数据 */
 LCUI_EXPORT(int)
-Queue_Replace(LCUI_Queue * queue, int pos, const void *data)
-/* 功能：覆盖队列中指定位置的成员内存空间里的数据 */
+Queue_Replace( LCUI_Queue * queue, int pos, const void *data )
 {
-	return Queue_Replace_By_Flag(queue, pos, data, 1);
+	return __Queue_Replace(queue, pos, data, 1);
 }
 
+/* 覆盖队列中指定位置的成员指针 */
 LCUI_EXPORT(int)
-Queue_Replace_Pointer(LCUI_Queue * queue, int pos, const void *data)
-/* 功能：覆盖队列中指定位置的成员指针 */
+Queue_ReplacePointer( LCUI_Queue * queue, int pos, const void *data )
 {
-	return Queue_Replace_By_Flag(queue, pos, data, 0);
+	return __Queue_Replace(queue, pos, data, 0);
 }
 
-static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 /* 
  * 功能：将新的成员添加至队列 
  * 说明：是否为新成员重新分配内存空间，由参数flag的值决定
  * 返回值：正常则返回在队列中的位置，错误则返回非0值
  * */
+static int __Queue_Add( LCUI_Queue * queue, const void *data, int flag )
 {
 	int i, pos;
 	size_t size; 
@@ -423,7 +423,7 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 			}
 			
 			if( !queue->data_array ) {
-				printf("Queue_Add_By_Flag(): "ERROR_MALLOC_ERROR);
+				printf("__Queue_Add(): "ERROR_MALLOC_ERROR);
 				exit(-1);
 			}
 			if (flag == 1) {
@@ -473,7 +473,7 @@ static int Queue_Add_By_Flag(LCUI_Queue * queue, const void *data, int flag)
 
 /* 打印队列信息，一般用于调试 */
 LCUI_EXPORT(void)
-Print_Queue_Info( LCUI_Queue *queue )
+Queue_PrintInfo( LCUI_Queue *queue )
 {
 	printf(
 		"queue: %p, total: %d, max: %d, data_mode: %d\n"
@@ -483,31 +483,31 @@ Print_Queue_Info( LCUI_Queue *queue )
 	);
 }
 
-LCUI_EXPORT(int)
-Queue_Add(LCUI_Queue * queue, const void *data) 
 /* 
  * 功能：将新的成员添加至队列 
  * 说明：这个函数只是单纯的添加成员，如果想有更多的功能，需要自己实现
  * */
+LCUI_EXPORT(int)
+Queue_Add( LCUI_Queue * queue, const void *data )
 {
-	return Queue_Add_By_Flag(queue, data, 1); 
+	return __Queue_Add(queue, data, 1); 
 }
 
-LCUI_EXPORT(int)
-Queue_Add_Pointer(LCUI_Queue * queue, const void *data)
 /* 
  * 功能：将新的成员添加至队列 
  * 说明：与Queue_Add函数不同，该函数只是修改指定位置的成员指针指向的地址，主要用
  * 与部件队列的处理上，有的部件需要从一个队列转移到另一个队列上，不重新分配内存空间，
  * 直接使用原来的内存地址，这是为了避免部件转移所在队列后，部件指针无效的问题。
  * */
+LCUI_EXPORT(int)
+Queue_AddPointer( LCUI_Queue * queue, const void *data )
 {
-	return Queue_Add_By_Flag(queue, data, 0); 
+	return __Queue_Add(queue, data, 0); 
 }
 
+/* 将一个队列拼接至另一个队列的末尾 */
 LCUI_EXPORT(int)
 Queue_Cat( LCUI_Queue *des, LCUI_Queue *src )
-/* 功能：将一个队列拼接至另一个队列的末尾 */
 {
 	int i,total;
 	
@@ -515,22 +515,22 @@ Queue_Cat( LCUI_Queue *des, LCUI_Queue *src )
 		return -1;
 	}
 	
-	total = Queue_Get_Total( src );
+	total = Queue_GetTotal( src );
 	for( i=0; i<total; ++i ) {
-		Queue_Add_Pointer( des, Queue_Get( src, i ) );
+		Queue_AddPointer( des, Queue_Get( src, i ) );
 	}
 	return 0;
 }
 
-LCUI_EXPORT(int)
-Queue_Empty(LCUI_Queue *queue)
-/* 功能：检测队列是否为空 */
+/* 检测队列是否为空 */
+LCUI_EXPORT(LCUI_BOOL)
+Queue_Empty( LCUI_Queue *queue )
 {
 	if(queue->total_num > 0) {
-		return 0;
+		return FALSE;
 	}
 	
-	return 1;
+	return TRUE;
 }
 
 /* 查找指定成员指针所在队列中的位置 */
@@ -540,7 +540,7 @@ Queue_Find( LCUI_Queue *queue, const void *p )
 	void *tmp;
 	int i, total; 
 	
-	total = Queue_Get_Total( queue );
+	total = Queue_GetTotal( queue );
 	for(i=0; i<total; ++i) {
 		tmp = Queue_Get( queue, i );
 		if( tmp == p ) { 
@@ -550,13 +550,13 @@ Queue_Find( LCUI_Queue *queue, const void *p )
 	return -1;
 }
 
-static LCUI_BOOL 
-Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag) 
 /* 
  * 功能：从队列中删除一个成员，并重新排列队列
  * 说明：处理方式因flag的值而不同 
  * 返回值：正常返回真（1），出错返回假（0）
  * */
+static LCUI_BOOL 
+__Queue_Delete( LCUI_Queue * queue, int pos, int flag )
 {
 	int i;
 	void *save = NULL;
@@ -623,24 +623,24 @@ Queue_Delete_By_Flag(LCUI_Queue * queue, int pos, int flag)
 		}
 		/* 置零该内存空间 */
 		memset(save, 0, queue->element_size);
-		/* 不需要释放内存，只有在调用Destroy_Queue函数时才全部释放 */
+		/* 不需要释放内存，只有在调用Queue_Destroy函数时才全部释放 */
 		//free(save); 
 	}
 	return TRUE;
 }
 
+/* 从队列中删除一个成员，并释放该成员占用的内存资源 */
 LCUI_EXPORT(int)
-Queue_Delete (LCUI_Queue * queue, int pos)
-/* 功能：从队列中删除一个成员，并释放该成员占用的内存资源 */
+Queue_Delete( LCUI_Queue * queue, int pos )
 {
-	return Queue_Delete_By_Flag(queue, pos, 1);
+	return __Queue_Delete(queue, pos, 1);
 }
 
+/* 从队列中删除一个成员指针，不对该指针指向的内存进行释放 */
 LCUI_EXPORT(int)
-Queue_Delete_Pointer (LCUI_Queue * queue, int pos) 
-/* 功能：从队列中删除一个成员指针，不对该指针指向的内存进行释放 */
+Queue_DeletePointer( LCUI_Queue * queue, int pos )
 {
-	return Queue_Delete_By_Flag(queue, pos, 0);
+	return __Queue_Delete(queue, pos, 0);
 }
 
 //#define _NEED_TEST_QUEUE_
@@ -660,15 +660,15 @@ int main()
 	/* 初始化 */
 	Queue_Init(&q1, sizeof(char), NULL);
 	Queue_Init(&q2, sizeof(char), NULL);
-	Queue_Set_DataMode(&q1, QUEUE_DATA_MODE_LINKED_LIST);
-	Queue_Set_DataMode(&q2, QUEUE_DATA_MODE_LINKED_LIST);
+	Queue_SetDataMode(&q1, QUEUE_DATA_MODE_LINKED_LIST);
+	Queue_SetDataMode(&q2, QUEUE_DATA_MODE_LINKED_LIST);
 	/* 添加0至9的字符至队列 */
 	for(i=0; i<10; i++) {
 		ch = '0' + i; 
 		Queue_Add(&q1, &ch);
 		Queue_Add(&q2, &ch);
 	}
-	total = Queue_Get_Total( &q1 );
+	total = Queue_GetTotal( &q1 );
 	for(i=0; i<total; i++) {
 		str[i] = *( (char*)Queue_Get(&q1, i) );  
 	}
@@ -676,15 +676,15 @@ int main()
 	
 	printf("before, string:%s\n", str);
 	Queue_Cat( &q1, &q2 ); /* 拼接队列 */
-	total = Queue_Get_Total( &q1 );
+	total = Queue_GetTotal( &q1 );
 	for(i=0; i<total; i++) {
 		str[i] = *( (char*)Queue_Get(&q1, i) );  
 	}
 	str[i] = 0;
 	printf("after, string:%s\n\n", str);
 	
-	Destroy_Queue(&q1);
-	Destroy_Queue(&q2);
+	Queue_Destroy(&q1);
+	Queue_Destroy(&q2);
 	return 0;
 }
 #endif
@@ -702,7 +702,7 @@ int main()
 	/* 初始化 */
 	Queue_Init(&q1, sizeof(char), NULL);
 	Queue_Init(&q2, sizeof(char), NULL);
-	Queue_Set_DataMode(&q1, QUEUE_DATA_MODE_LINKED_LIST);
+	Queue_SetDataMode(&q1, QUEUE_DATA_MODE_LINKED_LIST);
 	/* 添加0至9的字符至队列 */
 	for(i=0; i<10; i++) {
 		ch = '0' + i; 
@@ -717,17 +717,17 @@ int main()
 	printf("befor, string:%s\n", str);
 	p = (char*)Queue_Get(&q1, 5);
 	printf("delete char: %c\n", *p);
-	Queue_Delete_Pointer(&q1, 5); 
+	Queue_DeletePointer(&q1, 5); 
 	for(i=0; i<9; i++) {
 		str[i] = *( (char*)Queue_Get(&q1, i) );
 	}
 	str[i] = 0;
 	printf("after, string:%s\n\n", str);
 	
-	//Queue_Add_Pointer(&q2, p);
-	Queue_Insert_Pointer( &q2, 0, p );
+	//Queue_AddPointer(&q2, p);
+	Queue_InsertPointer( &q2, 0, p );
 	printf("add char: %c\n", *p);
-	for(i=0; i<Queue_Get_Total(&q2); i++) {
+	for(i=0; i<Queue_GetTotal(&q2); i++) {
 		str[i] = *( (char*)Queue_Get(&q2, i) );
 	}
 	str[i] = 0;
@@ -741,15 +741,15 @@ int main()
 		printf("move char: %c, src pos: %d, des pos: %d\n", *p, src_pos, des_pos);
 		Queue_Move(&q1, des_pos, src_pos);
 	}
-	for(i=0; i<Queue_Get_Total(&q1); i++) {
+	for(i=0; i<Queue_GetTotal(&q1); i++) {
 		str[i] = *( (char*)Queue_Get(&q1, i) );
 	}
 	str[i] = 0;
 	printf("after, string:%s\n\n", str);
 	
 	
-	Destroy_Queue(&q1);
-	Destroy_Queue(&q2);
+	Queue_Destroy(&q1);
+	Queue_Destroy(&q2);
 	return 0;
 }
 #endif
@@ -778,7 +778,7 @@ int main()
 	
 	printf("string:%s\n", str);
 	
-	Destroy_Queue(&bq);
+	Queue_Destroy(&bq);
 	return 0;
 }
 #endif
@@ -790,7 +790,7 @@ int main()
 	LCUI_Queue q1;
 	/* 初始化 */
 	Queue_Init(&q1, sizeof(int), NULL);
-	//Queue_Set_DataMode(&q1, QUEUE_DATA_MODE_LINKED_LIST);
+	//Queue_SetDataMode(&q1, QUEUE_DATA_MODE_LINKED_LIST);
 	nobuff_printf( "queue add......" );
 	start = clock();
 	/* 添加0至9的字符至队列 */
@@ -798,18 +798,15 @@ int main()
 		Queue_Add(&q1, &i);
 	}
 	nobuff_printf( "%ld us\n", clock()-start );
-	total = Queue_Get_Total( &q1 );
+	total = Queue_GetTotal( &q1 );
 	nobuff_printf( "queue get......" );
 	start = clock();
 	for(i=0; i<total; i++) {
 		Queue_Get(&q1, i);  
 	}
 	nobuff_printf( "%ld us\n", clock()-start );
-	Destroy_Queue(&q1);
+	Queue_Destroy(&q1);
 	return 0;
 }
 #endif
 #endif
-
-
-/************************ LCUI_Queue End ******************************/

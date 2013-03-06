@@ -80,7 +80,7 @@ Destroy_Text_RowData( void *arg )
 {
 	Text_RowData *data;
 	data = (Text_RowData *)arg;
-	Destroy_Queue ( &data->string );
+	Queue_Destroy ( &data->string );
 }
 
 static void
@@ -131,9 +131,9 @@ TextLayer_Text_Add_NewRow ( LCUI_TextLayer *layer )
 	data.last_char = NULL;
 	Queue_Init( &data.string, sizeof(LCUI_CharData), NULL );
 	/* 使用链表模式，方便数据的插入 */
-	Queue_Set_DataMode( &data.string, QUEUE_DATA_MODE_LINKED_LIST );
+	Queue_SetDataMode( &data.string, QUEUE_DATA_MODE_LINKED_LIST );
 	/* 队列成员使用指针，主要是引用text_source_data里面的数据 */
-	Queue_Using_Pointer( &data.string );
+	Queue_UsingPointer( &data.string );
 	return Queue_Add( &layer->rows_data, &data );
 }
 
@@ -146,12 +146,12 @@ TextLayer_Text_RowBreak (
 	static int i, total;
 	static LCUI_CharData *char_ptr;
 	
-	total = Queue_Get_Total( &src->string );
+	total = Queue_GetTotal( &src->string );
 	for(i=break_point; i<total; ++i ) {
 		char_ptr = Queue_Get( &src->string, break_point );
-		Queue_Add_Pointer( &des->string, char_ptr );
+		Queue_AddPointer( &des->string, char_ptr );
 		char_ptr->need_update = TRUE;
-		Queue_Delete_Pointer( &src->string, break_point );
+		Queue_DeletePointer( &src->string, break_point );
 	}
 }
 
@@ -165,8 +165,8 @@ TextLayer_Text_Insert_NewRow ( LCUI_TextLayer *layer, int row )
 	data.max_size = Size(0,0);
 	data.last_char = NULL;
 	Queue_Init( &data.string, sizeof(LCUI_CharData), NULL ); 
-	Queue_Set_DataMode( &data.string, QUEUE_DATA_MODE_LINKED_LIST ); 
-	Queue_Using_Pointer( &data.string );
+	Queue_SetDataMode( &data.string, QUEUE_DATA_MODE_LINKED_LIST ); 
+	Queue_UsingPointer( &data.string );
 	return Queue_Insert( &layer->rows_data, row, &data );
 }
 
@@ -189,7 +189,7 @@ TextLayer_Update_RowSize (LCUI_TextLayer *layer, int row )
 	LCUI_TextStyle *style;
 	
 	row_data = Queue_Get( &layer->rows_data, row );
-	total = Queue_Get_Total( &row_data->string ); 
+	total = Queue_GetTotal( &row_data->string ); 
 	style = StyleTag_GetCurrentStyle( &layer->tag_buff ); 
 	size = Size(0,14);
 	if( !style ) {
@@ -252,7 +252,7 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	Queue_Init( &layer->color_keyword, sizeof(Special_KeyWord), Destroy_Special_KeyWord );
 	/* 队列中使用链表储存这些数据 */
 	Queue_Init( &layer->text_source_data, sizeof(LCUI_CharData), Destroy_CharData );
-	Queue_Set_DataMode( &layer->text_source_data, QUEUE_DATA_MODE_LINKED_LIST ); 
+	Queue_SetDataMode( &layer->text_source_data, QUEUE_DATA_MODE_LINKED_LIST ); 
 	Queue_Init( &layer->rows_data, sizeof(Text_RowData), Destroy_Text_RowData ); 
 	StyleTag_Init( &layer->tag_buff );
 	Queue_Init( &layer->style_data, sizeof(LCUI_TextStyle), NULL );
@@ -278,11 +278,11 @@ LCUI_EXPORT(void)
 Destroy_TextLayer( LCUI_TextLayer *layer )
 /* 销毁文本图层占用的资源 */
 {
-	Destroy_Queue( &layer->text_source_data );
-	Destroy_Queue( &layer->rows_data );
-	Destroy_Queue( &layer->tag_buff );
-	Destroy_Queue( &layer->style_data );
-	Destroy_Queue( &layer->clear_area );
+	Queue_Destroy( &layer->text_source_data );
+	Queue_Destroy( &layer->rows_data );
+	Queue_Destroy( &layer->tag_buff );
+	Queue_Destroy( &layer->style_data );
+	Queue_Destroy( &layer->clear_area );
 	LCUIWString_Free( &layer->text_buff );
 }
 
@@ -310,7 +310,7 @@ __TextLayer_OldArea_Erase( LCUI_TextLayer *layer, LCUI_Graph *graph )
 	static LCUI_CharData *char_ptr;
 	static LCUI_Rect area;
 	
-	rows = Queue_Get_Total( &layer->rows_data );
+	rows = Queue_GetTotal( &layer->rows_data );
 	/* 除去y轴偏移量，计算处于显示区域内的起始行的y轴坐标 */
 	for(y=layer->old_offset_pos.y,i=0; y<0 && i<rows; ++i) {
 		row_ptr = Queue_Get( &layer->rows_data, i );
@@ -327,7 +327,7 @@ __TextLayer_OldArea_Erase( LCUI_TextLayer *layer, LCUI_Graph *graph )
 		if( !row_ptr ) {
 			continue;
 		}
-		len = Queue_Get_Total( &row_ptr->string );
+		len = Queue_GetTotal( &row_ptr->string );
 		/* 除去x轴偏移量，计算处于显示区域内的起始列的x轴坐标 */
 		for(x=layer->old_offset_pos.x,j=0; x<0 && j<len; ++j) {
 			char_ptr = Queue_Get( &row_ptr->string, j );
@@ -407,7 +407,7 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	
 	Graph_Init( &slot );
 	/* 先处理需要清空的区域 */
-	n = Queue_Get_Total( &layer->clear_area ); 
+	n = Queue_GetTotal( &layer->clear_area ); 
 	for(i=0; i<n; ++i) { 
 		RectQueue_Get( &area, 0 , &layer->clear_area ); 
 		area.x += layer->offset_pos.x;
@@ -423,14 +423,14 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	//_DEBUG_MSG("2, use time: %ld\n", clock() - start );
 	//start = clock();
 	/* 开始绘制文本位图至目标图层上 */
-	rows = Queue_Get_Total( &layer->rows_data ); 
+	rows = Queue_GetTotal( &layer->rows_data ); 
 	for(pos.y=layer->offset_pos.y,i=0; i<rows; ++i) {
 		redraw_row = FALSE;
 		p_row = Queue_Get( &layer->rows_data, i );
 		if( !p_row ) {
 			continue;
 		}
-		n = Queue_Get_Total( &p_row->string );
+		n = Queue_GetTotal( &p_row->string );
 		/* 如果当前字的位图的Y轴跨距不在有效绘制区域内 */
 		if( pos.y + p_row->max_size.h <= 0 ) {
 			pos.y += p_row->max_size.h;
@@ -507,10 +507,10 @@ TextLayer_Refresh( LCUI_TextLayer *layer )
 	LCUI_CharData *char_ptr;
 	LCUI_Rect area;
 	
-	rows = Queue_Get_Total( &layer->rows_data );
+	rows = Queue_GetTotal( &layer->rows_data );
 	for(area.y=0,area.x=0,i=0; i<rows; ++i) {
 		row_ptr = Queue_Get( &layer->rows_data, i );
-		len = Queue_Get_Total( &row_ptr->string );
+		len = Queue_GetTotal( &row_ptr->string );
 		for(j=0; j<len; ++j) {
 			char_ptr = Queue_Get( &row_ptr->string, j );
 			if( !char_ptr ) {
@@ -556,7 +556,7 @@ TextLayer_GetSize ( LCUI_TextLayer *layer )
 	LCUI_Size size;
 	Text_RowData *p_row; 
 	
-	rows = Queue_Get_Total( &layer->rows_data );
+	rows = Queue_GetTotal( &layer->rows_data );
 	for(size.w=0,size.h=0,i=0; i<rows; ++i) {
 		p_row = Queue_Get( &layer->rows_data, i );
 		if( !p_row ) {
@@ -580,7 +580,7 @@ TextLayer_Get_Text( LCUI_TextLayer *layer )
 	int i, buff_size;
 	wchar_t *text_buff;
 	LCUI_CharData *char_p;
-	buff_size = Queue_Get_Total( &layer->text_source_data );
+	buff_size = Queue_GetTotal( &layer->text_source_data );
 	if( buff_size <= 0 ) {
 		return NULL;
 	}
@@ -614,7 +614,7 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 		pos.y += row_ptr->max_size.h;
 	}
 	row_ptr = Queue_Get( &layer->rows_data, char_pos.y );
-	len = Queue_Get_Total( &row_ptr->string );
+	len = Queue_GetTotal( &row_ptr->string );
 	/* 获取该字的起点X轴坐标 */
 	for( pos.x=0,i=0; i<char_pos.x; ++i ) {
 		char_ptr = Queue_Get( &row_ptr->string, i ); 
@@ -648,10 +648,10 @@ TextLayer_Text_SetDefaultStyle( LCUI_TextLayer *layer, LCUI_TextStyle style )
 	int rows, len, i, j;
 	
 	layer->default_data = style; 
-	rows = Queue_Get_Total( &layer->rows_data );
+	rows = Queue_GetTotal( &layer->rows_data );
 	for(pos.y=0,i=0; i<rows; ++i) {
 		row_ptr = Queue_Get( &layer->rows_data, i ); 
-		len = Queue_Get_Total( &row_ptr->string );
+		len = Queue_GetTotal( &row_ptr->string );
 		for(pos.x=0,j=0; j<len; ++j) {
 			char_ptr = Queue_Get( &row_ptr->string, j );
 			if( !char_ptr ) {
@@ -717,9 +717,9 @@ TextLayer_Text_Clear( LCUI_TextLayer *layer )
 /* 清空文本内容 */
 {
 	TextLayer_Refresh( layer );
-	Destroy_Queue( &layer->text_source_data );
-	Destroy_Queue( &layer->rows_data );
-	Destroy_Queue( &layer->style_data );
+	Queue_Destroy( &layer->text_source_data );
+	Queue_Destroy( &layer->rows_data );
+	Queue_Destroy( &layer->style_data );
 	layer->current_src_pos = 0;
 	layer->current_des_pos = Pos(0,0);
 }
@@ -732,7 +732,7 @@ TextLayer_Row_Set_End( LCUI_TextLayer *layer, uint_t row, uint_t start_cols )
 	Text_RowData *row_data; 
 	
 	row_data = Queue_Get( &layer->rows_data, row );
-	total = Queue_Get_Total( &row_data->string );
+	total = Queue_GetTotal( &row_data->string );
 	/* 移除多余的数据 */
 	for(i=start_cols; i<total; ++i) {
 		Queue_Delete( &row_data->string, start_cols ); 
@@ -743,7 +743,7 @@ LCUI_EXPORT(int)
 TextLayer_Text_GetTotalLength( LCUI_TextLayer *layer )
 /* 获取文本位图中的文本长度 */
 {
-	return Queue_Get_Total( &layer->text_source_data );
+	return Queue_GetTotal( &layer->text_source_data );
 }
 
 LCUI_EXPORT(void)
@@ -788,7 +788,7 @@ TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	DEBUG_MSG1("enter\n");
 	/* 如果是将文本追加至文本末尾 */
 	if( pos_type == AT_TEXT_LAST ) {
-		cur_pos.y = Queue_Get_Total( &layer->rows_data );
+		cur_pos.y = Queue_GetTotal( &layer->rows_data );
 		if( cur_pos.y > 0 ) {
 			--cur_pos.y;
 		}
@@ -797,8 +797,8 @@ TextLayer_Text_Process(	LCUI_TextLayer *layer,
 			TextLayer_Text_Add_NewRow( layer );
 			cur_row_ptr = Queue_Get( &layer->rows_data, cur_pos.y );
 		}
-		cur_pos.x = Queue_Get_Total( &cur_row_ptr->string );
-		src_pos = Queue_Get_Total( &layer->text_source_data );
+		cur_pos.x = Queue_GetTotal( &cur_row_ptr->string );
+		src_pos = Queue_GetTotal( &layer->text_source_data );
 		des_pos = cur_pos;
 	} else {/* 否则，是将文本插入至光标所在位置 */
 		cur_pos = TextLayer_Cursor_GetPos( layer );
@@ -818,7 +818,7 @@ TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	total = wcslen( new_text );
 	total_row = TextLayer_GetRows( layer );
 	/* 判断当前要添加的字符的总数是否超出最大限制 */
-	cur_len = Queue_Get_Total( &layer->text_source_data );
+	cur_len = Queue_GetTotal( &layer->text_source_data );
 	if( total + cur_len > layer->max_text_len ) {
 		total = layer->max_text_len - cur_len;
 	}
@@ -919,7 +919,7 @@ TextLayer_Text_Process(	LCUI_TextLayer *layer,
 		char_ptr = Queue_Get( &layer->text_source_data, src_pos );
 		/* 将该指针添加至行数据队列中 */
 		cur_row_ptr = Queue_Get( &layer->rows_data, des_pos.y );
-		Queue_Insert_Pointer( &cur_row_ptr->string, des_pos.x, char_ptr );
+		Queue_InsertPointer( &cur_row_ptr->string, des_pos.x, char_ptr );
 		++src_pos; ++des_pos.x; 
 	}
 	
@@ -942,10 +942,10 @@ TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
 	
 	DEBUG_MSG1("enter\n");
 	DEBUG_MSG1("thread: %lu\n", thread_self());
-	rows = Queue_Get_Total( &layer->rows_data );
+	rows = Queue_GetTotal( &layer->rows_data );
 	for( pos.y=0,j=0; j<rows; ++j ) {
 		row_ptr = Queue_Get( &layer->rows_data, j );
-		len = Queue_Get_Total( &row_ptr->string );
+		len = Queue_GetTotal( &row_ptr->string );
 		DEBUG_MSG1("row %d, len: %d\n", j, len);
 		for( pos.x=0,i=0; i<len; ++i) {
 			char_ptr = Queue_Get( &row_ptr->string, i );
@@ -989,10 +989,10 @@ TextLayer_PrintInfo( LCUI_TextLayer *layer )
 	LCUI_CharData *char_ptr;
 	
 	printf( "layer: %p\n", layer );
-	rows = Queue_Get_Total( &layer->rows_data );
+	rows = Queue_GetTotal( &layer->rows_data );
 	for(j=0; j<rows; ++j) {
 		row_ptr = Queue_Get( &layer->rows_data, j );
-		len = Queue_Get_Total( &row_ptr->string );
+		len = Queue_GetTotal( &row_ptr->string );
 		printf( "row[%d/%d], len: %d\n", j, rows, len );
 		for(i=0; i<len; ++i) {
 			char_ptr = Queue_Get( &row_ptr->string, i );
@@ -1114,7 +1114,7 @@ TextLayer_Get_CharPos(
 		return -1;
 	}
 	src_pos = layer->current_src_pos;
-	total = Queue_Get_Total( &layer->text_source_data );
+	total = Queue_GetTotal( &layer->text_source_data );
 	//printf( "source text len: %d\n", total );
 	/* 确保起点位置有效 */
 	if( src_pos >= total ) {
@@ -1193,7 +1193,7 @@ TextLayer_Get_CurChar( LCUI_TextLayer *layer )
 		return NULL;
 	}
 	char_ptr = Queue_Get( &row_ptr->string, pos.x );
-	total = Queue_Get_Total( &row_ptr->string );
+	total = Queue_GetTotal( &row_ptr->string );
 	if( !char_ptr ) {
 		/* 如果当前光标在这行行尾 */
 		if( pos.x == total ) {
@@ -1222,7 +1222,7 @@ TextLayer_Update_CurSrcPos( LCUI_TextLayer *layer, int left_or_right )
 {
 	int pos, max;
 	pos = TextLayer_Get_Cursor_CharPos( layer, left_or_right );
-	max = Queue_Get_Total( &layer->text_source_data );
+	max = Queue_GetTotal( &layer->text_source_data );
 	//printf("pos: %d, max: %d\n", pos, max );
 	if( pos == -1 || pos > max ) {
 		pos = max;
@@ -1250,7 +1250,7 @@ TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 	int i, n, rows, cols, tmp;
 	
 	pos.x = pos.y = 0;
-	rows = Queue_Get_Total( &layer->rows_data );
+	rows = Queue_GetTotal( &layer->rows_data );
 	/* 减去偏移坐标 */
 	pixel_pos = Pos_Sub( pixel_pos, layer->offset_pos );
 	for( new_pos.y=0,i=0; i<rows; ++i ) {
@@ -1269,7 +1269,7 @@ TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 	if( !row_ptr ) {
 		cols = 0;
 	} else {
-		cols = Queue_Get_Total( &row_ptr->string );
+		cols = Queue_GetTotal( &row_ptr->string );
 	}
 	for( new_pos.x=0,n=0; n<cols; ++n ) {
 		char_ptr = Queue_Get( &row_ptr->string, n );
@@ -1317,7 +1317,7 @@ TextLayer_Cursor_SetPos( LCUI_TextLayer *layer, LCUI_Pos pos )
 	int rows, cols, total;
 	
 	pixel_pos.x = pixel_pos.y = 0;
-	total = Queue_Get_Total( &layer->rows_data );
+	total = Queue_GetTotal( &layer->rows_data );
 	if( pos.y >= total ) {
 		pos.y = total-1;
 	}
@@ -1338,7 +1338,7 @@ TextLayer_Cursor_SetPos( LCUI_TextLayer *layer, LCUI_Pos pos )
 		return pixel_pos;
 	}
 	/* 获取当前行的文字数 */
-	total = Queue_Get_Total( &row_ptr->string ); 
+	total = Queue_GetTotal( &row_ptr->string ); 
 	if( pos.x > total ) {
 		pos.x = total;
 	}
@@ -1428,12 +1428,12 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 	/* 确定起点位置的XY轴坐标 */
 	pixel_pos = TextLayer_Char_GetPixelPos( layer, start_pos );
 	
-	rows = Queue_Get_Total( &layer->rows_data );
+	rows = Queue_GetTotal( &layer->rows_data );
 	row_ptr = Queue_Get( &layer->rows_data, start_pos.y );
 	if( !row_ptr ) {
 		return -1;
 	}
-	cols = Queue_Get_Total( &row_ptr->string );
+	cols = Queue_GetTotal( &row_ptr->string );
 	
 	/* 根据光标所在位置，确定遍历方向 */
 	if( layer->current_des_pos.y > start_pos.y 
@@ -1476,12 +1476,12 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 			/* 将下一行的行尾字符数据转移至当前行 */
 			row_ptr->last_char = tmp_row->last_char;
 			/* 销毁下一行的文本 */
-			Destroy_Queue( &tmp_row->string ); 
+			Queue_Destroy( &tmp_row->string ); 
 			Queue_Delete( &layer->rows_data, start_pos.y+1 );
 			/* 更新当前行的总字符数 */
-			cols = Queue_Get_Total( &row_ptr->string );
+			cols = Queue_GetTotal( &row_ptr->string );
 			/* 更新总行数 */
-			rows = Queue_Get_Total( &layer->rows_data );
+			rows = Queue_GetTotal( &layer->rows_data );
 			/* 更新当前行的尺寸 */
 			TextLayer_Update_RowSize( layer, start_pos.y );
 			continue;
@@ -1495,11 +1495,11 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 		/* 将该字从源文本中移除 */
 		TextLayer_Text_DeleteChar( layer, char_ptr, left_or_right );
 		/* 该字在这行的字体位图也需要删除 */
-		cols = Queue_Get_Total( &row_ptr->string );
-		Queue_Delete_Pointer( &row_ptr->string, start_pos.x );
-		cols = Queue_Get_Total( &row_ptr->string );
+		cols = Queue_GetTotal( &row_ptr->string );
+		Queue_DeletePointer( &row_ptr->string, start_pos.x );
+		cols = Queue_GetTotal( &row_ptr->string );
 		char_ptr = Queue_Get( &row_ptr->string, start_pos.x );
-		cols = Queue_Get_Total( &row_ptr->string );
+		cols = Queue_GetTotal( &row_ptr->string );
 	}
 	/* 更新当前行的尺寸 */
 	TextLayer_Update_RowSize( layer, start_pos.y );
@@ -1526,7 +1526,7 @@ TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 	DEBUG_MSG2( "before: %d,%d\n", char_pos.x, char_pos.y );
 	for( i=n; char_pos.y>=0; --char_pos.y ) {
 		row_ptr = Queue_Get( &layer->rows_data, char_pos.y );
-		row_len = Queue_Get_Total( &row_ptr->string );
+		row_len = Queue_GetTotal( &row_ptr->string );
 		
 		if( char_pos.x == -1 ) {
 			char_pos.x = row_len;
@@ -1561,7 +1561,7 @@ TextLayer_Char_GetPixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 	
 	pixel_pos.x = pixel_pos.y = 0;
 	char_pos = TextLayer_Cursor_GetPos( layer );
-	total = Queue_Get_Total( &layer->rows_data );
+	total = Queue_GetTotal( &layer->rows_data );
 	if( char_pos.y >= total ) {
 		char_pos.y = total-1;
 	}
@@ -1583,7 +1583,7 @@ TextLayer_Char_GetPixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 		return pixel_pos;
 	}
 	/* 获取当前行的文字数 */
-	total = Queue_Get_Total( &row_ptr->string ); 
+	total = Queue_GetTotal( &row_ptr->string ); 
 	if( char_pos.x > total ) {
 		char_pos.x = total;
 	}
@@ -1643,7 +1643,7 @@ TextLayer_Get_RowLen( LCUI_TextLayer *layer, int row )
 	int total;
 	Text_RowData *row_ptr;
 	
-	total = Queue_Get_Total( &layer->rows_data );
+	total = Queue_GetTotal( &layer->rows_data );
 	if( row > total ) {
 		row = total;
 	}
@@ -1652,7 +1652,7 @@ TextLayer_Get_RowLen( LCUI_TextLayer *layer, int row )
 	if( !row_ptr ) {
 		return 0;
 	}
-	return Queue_Get_Total( &row_ptr->string ); 
+	return Queue_GetTotal( &row_ptr->string ); 
 }
 
 LCUI_EXPORT(int)
@@ -1671,7 +1671,7 @@ LCUI_EXPORT(int)
 TextLayer_GetRows( LCUI_TextLayer *layer )
 /* 获取文本行数 */
 {
-	return Queue_Get_Total( &layer->rows_data );
+	return Queue_GetTotal( &layer->rows_data );
 }
 
 LCUI_EXPORT(int)

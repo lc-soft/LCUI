@@ -327,7 +327,7 @@ find_widget_data(LCUI_Widget *widget)
 	graph_data *temp;
 	int total, i;
 	/* 检查该部件是否用过本函数分配的内存，用过的话，清理它 */
-	total = Queue_Get_Total(&picbox_graph_mem); 
+	total = Queue_GetTotal(&picbox_graph_mem); 
 	for(i=0; i<total; ++i) {
 		temp = (graph_data *)Queue_Get(&picbox_graph_mem, i);
 		if(temp->widget == widget) {

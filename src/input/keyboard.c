@@ -66,7 +66,7 @@ LCUIKey_IsHit( int key_code )
 	int *t;
 	int i, total;
 	
-	total = Queue_Get_Total(&LCUI_Sys.press_key);
+	total = Queue_GetTotal(&LCUI_Sys.press_key);
 	for(i=0; i<total; ++i) {
 		t = Queue_Get(&LCUI_Sys.press_key, i);
 		if( t && *t == key_code ) {
@@ -90,7 +90,7 @@ LCUIKey_Free( int key_code )
 	int *t;
 	int i, total;
 	
-	total = Queue_Get_Total(&LCUI_Sys.press_key);
+	total = Queue_GetTotal(&LCUI_Sys.press_key);
 	for(i=0; i<total; ++i) {
 		t = Queue_Get(&LCUI_Sys.press_key, i);
 		if( t && *t == key_code ) {
@@ -181,7 +181,7 @@ LCUIKeyboard_IsHit( void )
 	} 
 	return FALSE;
 #endif
-	if( Queue_Get_Total( &LCUI_Sys.press_key ) > 0) {
+	if( Queue_GetTotal( &LCUI_Sys.press_key ) > 0) {
 		return TRUE;
 	}
 	return FALSE;
@@ -214,7 +214,7 @@ LCUIKeyboard_Get( void )
 	return c; 
 #else 
 	int *key_ptr;
-	while( Queue_Get_Total(&LCUI_Sys.press_key) == 0 ) {
+	while( Queue_GetTotal(&LCUI_Sys.press_key) == 0 ) {
 		LCUI_MSleep(100);
 	}
 	key_ptr = Queue_Get( &LCUI_Sys.press_key, 0 );
@@ -300,5 +300,5 @@ LCUIModule_Keyboard_Init( void )
 LCUI_EXPORT(void)
 LCUIModule_Keyboard_End( void )
 {
-	Destroy_Queue( &LCUI_Sys.press_key );
+	Queue_Destroy( &LCUI_Sys.press_key );
 }

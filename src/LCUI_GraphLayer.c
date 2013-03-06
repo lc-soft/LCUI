@@ -62,11 +62,11 @@ GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 	}
 	
 	queue = &child_glayer->parent->child;
-	total = Queue_Get_Total( queue );
+	total = Queue_GetTotal( queue );
 	for( i=0; i<total; ++i ) {
 		tmp_glayer = Queue_Get( queue, i );
 		if( tmp_glayer == child_glayer ) {
-			Queue_Delete_Pointer( queue, i );
+			Queue_DeletePointer( queue, i );
 			child_glayer->parent = NULL;
 			return 0;
 		}
@@ -84,7 +84,7 @@ GraphLayer_Free( LCUI_GraphLayer *glayer )
 	}
 	GraphLayer_DeleteChild( glayer );
 	Graph_Free( &glayer->graph );
-	Destroy_Queue( &glayer->child );
+	Queue_Destroy( &glayer->child );
 	free( glayer );
 }
 
@@ -105,7 +105,7 @@ GraphLayer_New( void )
 	glayer->parent = NULL;
 	Graph_Init( &glayer->graph );
 	Queue_Init( &glayer->child, 0, NULL );
-	Queue_Using_Pointer( &glayer->child ); /* 队列用于存储指针 */ 
+	Queue_UsingPointer( &glayer->child ); /* 队列用于存储指针 */ 
 	return glayer;
 }
 
@@ -127,7 +127,7 @@ GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 		return -2;
 	}
 	/* 根据队列中的z值，将子图层存放在队列中适当的位置 */
-	total = Queue_Get_Total( &des_ctnr->child );
+	total = Queue_GetTotal( &des_ctnr->child );
 	for( i=0; i<total; ++i ) {
 		tmp_child = Queue_Get( &des_ctnr->child, i );
 		/* 如果比当前位置的图层的z值小，那就对比下一个位置的图层 */
@@ -135,12 +135,12 @@ GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 			continue;
 		}
 		/* 将新图层插入至该位置 */
-		Queue_Insert_Pointer( &des_ctnr->child, i, glayer );
+		Queue_InsertPointer( &des_ctnr->child, i, glayer );
 		break;
 	}
 	/* 如果没找到位置，则直接添加至末尾 */
 	if( i >= total ) {
-		Queue_Add_Pointer( &des_ctnr->child, glayer );
+		Queue_AddPointer( &des_ctnr->child, glayer );
 	}
 	glayer->parent = des_ctnr;
 	return 0;
@@ -241,7 +241,7 @@ GraphLayer_Sort( LCUI_GraphLayer *glayer )
 		return -1;
 	}
 	Queue_Lock( &glayer->child );
-	total = Queue_Get_Total( &glayer->child );
+	total = Queue_GetTotal( &glayer->child );
 	for(i=0; i<total; ++i) {
 		child_a = Queue_Get( &glayer->child, i );
 		if( !child_a ) {
@@ -413,7 +413,7 @@ __GraphLayer_GetLayers(
 	}
 	child_list = &glayer->child;
 	/* 从底到顶遍历子部件 */
-	total = Queue_Get_Total( child_list );
+	total = Queue_GetTotal( child_list );
 	//_DEBUG_MSG( "root: %p, cur: %p, child total: %d\n",
 	//		root_glayer, glayer, total );
 	/* 从尾到首，从底到顶，遍历图层 */
@@ -434,7 +434,7 @@ __GraphLayer_GetLayers(
 			continue;
 		}
 		if( LCUIRect_Overlay(tmp, rect) ) {
-			Queue_Add_Pointer( queue, child );
+			Queue_AddPointer( queue, child );
 			__GraphLayer_GetLayers(	root_glayer, 
 						child, rect, queue );
 		}
@@ -496,17 +496,17 @@ GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 	
 	Graph_Init( &tmp_graph );
 	Queue_Init( &glayerQ, 0, NULL);
-	Queue_Using_Pointer( &glayerQ );
+	Queue_UsingPointer( &glayerQ );
 	
 	graph_buff->have_alpha = FALSE;
 	tmp_graph.have_alpha = TRUE;
 	Graph_Create( graph_buff, rect.width, rect.height );
 	GraphLayer_GetLayers( ctnr, rect, &glayerQ ); 
-	total = Queue_Get_Total( &glayerQ ); 
+	total = Queue_GetTotal( &glayerQ ); 
 	//_DEBUG_MSG( "total: %d\n", total );
 	if( total <= 0 ) {
 		Graph_Cut ( &ctnr->graph, rect, graph_buff );
-		Destroy_Queue( &glayerQ );
+		Queue_Destroy( &glayerQ );
 		return 1;
 	}
 	
@@ -518,7 +518,7 @@ GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 		valid_area.y += glayer_pos.y;
 		switch( Graph_IsOpaque( &glayer->graph ) ) {
 		    case -1:
-			Queue_Delete_Pointer( &glayerQ, i );
+			Queue_DeletePointer( &glayerQ, i );
 			break;
 		    case 0: break;
 		    case 1:
@@ -530,7 +530,7 @@ GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 		} 
 	}
 skip_loop:
-	total = Queue_Get_Total( &glayerQ );
+	total = Queue_GetTotal( &glayerQ );
 	//_DEBUG_MSG( "total: %d\n", total );
 	if(i <= 0){
 		Graph_Cut (&ctnr->graph, rect, graph_buff );
@@ -567,7 +567,7 @@ skip_loop:
 		}
 		Graph_Unlock( &glayer->graph );
 	}
-	Destroy_Queue( &glayerQ );
+	Queue_Destroy( &glayerQ );
 	return 0;
 }
 
@@ -583,7 +583,7 @@ GraphLayer_Front( LCUI_GraphLayer *glayer )
 		return -1;
 	}
 	queue = &glayer->parent->child;
-	total = Queue_Get_Total( queue );
+	total = Queue_GetTotal( queue );
 	for( i=0; i<total; ++i ) {
 		tmp_child = Queue_Get( queue, i );
 		if( glayer == tmp_child ) {

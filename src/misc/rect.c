@@ -506,7 +506,7 @@ static void RectQueue_Copy( LCUI_Queue *des, LCUI_Queue *src )
 {
 	LCUI_Rect *rect;
 	int i, total;
-	total = Queue_Get_Total(src);
+	total = Queue_GetTotal(src);
 	for(i=0; i<total; ++i) {
 		rect = (LCUI_Rect *)Queue_Get(src, i);/* 获取源队列里的成员 */
 		//printf("[%d] rect: %d,%d, %d,%d\n", i, rect->x, rect->y, rect->width, rect->height);
@@ -557,7 +557,7 @@ RectQueue_Add( LCUI_Queue * queue, LCUI_Rect rect )
 	}
 	
 	/* 销毁队列 */
-	Destroy_Queue(&rect_buff);
+	Queue_Destroy(&rect_buff);
 	if (flag == 0) { /* 没有的话，就需要添加至队列 */ 
 		return Queue_Add(queue, &rect);
 	}

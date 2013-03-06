@@ -653,7 +653,7 @@ TextBox_ExecUpdate( LCUI_Widget *widget )
 	
 	textbox = Widget_GetPrivData( widget );
 	/* 如果缓冲区内有文本块 */
-	if( Queue_Get_Total( &textbox->text_block_buff ) > 0 ) {
+	if( Queue_GetTotal( &textbox->text_block_buff ) > 0 ) {
 		/* 获取文本块 */
 		text_ptr = Queue_Get( &textbox->text_block_buff, 0 );
 		if( text_ptr ) {

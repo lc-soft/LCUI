@@ -165,7 +165,7 @@ LCUIScreen_UpdateInvalidArea(void)
 	Queue_Lock( &screen_invalid_area );
 	while(LCUI_Active()) {
 		//_DEBUG_MSG("total area: %d\n", 
-		//	Queue_Get_Total( &screen_invalid_area ));
+		//	Queue_GetTotal( &screen_invalid_area ));
 		/* 如果从队列中获取数据成功 */
 		if ( !RectQueue_Get(&rect, 0, &screen_invalid_area) ) {
 			break;
@@ -284,6 +284,6 @@ LCUIModule_Video_End( void )
 	}
 	LCUIScreen_Destroy();
 	i_am_init = FALSE;
-	Destroy_Queue( &screen_invalid_area );
+	Queue_Destroy( &screen_invalid_area );
 	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
 }

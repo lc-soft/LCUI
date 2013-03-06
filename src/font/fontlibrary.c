@@ -89,14 +89,14 @@ static void FontLIB_DestroyData( void *arg )
 {
 	LCUI_FontDataItem *data;
 	data = (LCUI_FontDataItem *)arg;
-	Destroy_Queue( &data->font_bmp );
+	Queue_Destroy( &data->font_bmp );
 }
 
 static void FontLIB_Destroy( void *arg )
 {
 	LCUI_FontCharItem *font;
 	font = (LCUI_FontCharItem *)arg;
-	Destroy_Queue( &font->data );
+	Queue_Destroy( &font->data );
 }
 
 static void FontLIB_DestroyFontInfo( void *arg )
@@ -110,8 +110,8 @@ LCUI_EXPORT(void) FontLIB_DestroyAll( void )
 		return;
 	}
 	database_init = FALSE;
-	Destroy_Queue( &font_database );
-	Destroy_Queue( &fontbitmap_database );
+	Queue_Destroy( &font_database );
+	Queue_Destroy( &fontbitmap_database );
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 	FT_Done_FreeType( library );
 #endif
@@ -167,7 +167,7 @@ FontLIB_FindInfoByFilePath( const char *filepath )
 	if( !database_init ) {
 		return -1;
 	}
-	n = Queue_Get_Total( &font_database );
+	n = Queue_GetTotal( &font_database );
 	for(i=0; i<n; ++i) {
 		item = Queue_Get( &font_database, i );
 		if( !item ) {
@@ -190,7 +190,7 @@ FontLIB_GetFont( int font_id )
 	if( !database_init ) {
 		return NULL;
 	}
-	n = Queue_Get_Total( &font_database );
+	n = Queue_GetTotal( &font_database );
 	for(i=0; i<n; ++i) {
 		item = Queue_Get( &font_database, i );
 		if( !item ) {
@@ -213,7 +213,7 @@ FontLIB_GetFontIDByFamilyName( const char *family_name )
 	if( !database_init ) {
 		return -1;
 	}
-	n = Queue_Get_Total( &font_database );
+	n = Queue_GetTotal( &font_database );
 	for(i=0; i<n; ++i) {
 		item = Queue_Get( &font_database, i );
 		if( !item ) {
@@ -272,7 +272,7 @@ FontLIB_AddFontInfo(	const char *family_name, const char *style_name,
 	strncpy( info->style_name, style_name, NAME_MAX_LEN );
 	strncpy( info->filepath, style_name,PATH_MAX_LEN );
 	info->face = face;
-	Queue_Add_Pointer( &font_database, info );
+	Queue_AddPointer( &font_database, info );
 	return info->id;
 }
 
@@ -282,7 +282,7 @@ FontLIB_GetBMPItem( LCUI_FontDataItem *data_item, int pixel_size )
 	int i, n;
 	LCUI_FontBMPItem *item;
 	
-	n = Queue_Get_Total( &data_item->font_bmp );
+	n = Queue_GetTotal( &data_item->font_bmp );
 	for( i=0; i<n; ++i ) {
 		item = Queue_Get( &data_item->font_bmp, i );
 		if( !item ) {
@@ -301,7 +301,7 @@ FontLIB_GetDataItem( LCUI_FontCharItem *char_item, int id )
 	int i, n;
 	LCUI_FontDataItem *item;
 	
-	n = Queue_Get_Total( &char_item->data );
+	n = Queue_GetTotal( &char_item->data );
 	for( i=0; i<n; ++i ) {
 		item = Queue_Get( &char_item->data, i );
 		if( !item ) {
@@ -320,7 +320,7 @@ FontLIB_GetCharItem( wchar_t char_code )
 	int i, n;
 	LCUI_FontCharItem *item;
 	
-	n = Queue_Get_Total( &fontbitmap_database );
+	n = Queue_GetTotal( &fontbitmap_database );
 	for( i=0; i<n; ++i ) {
 		item = Queue_Get( &fontbitmap_database, i );
 		if( !item ) {
@@ -358,7 +358,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 		}
 		FontLIB_CharInit( font );
 		font->char_code = char_code; /* 记录字符的编码 */
-		Queue_Add_Pointer( &fontbitmap_database, font );
+		Queue_AddPointer( &fontbitmap_database, font );
 	}
 	/* 但字体ID不大于0时，使用内置字体 */
 	if( font_id <= 0 ) {
@@ -373,7 +373,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 		}
 		FontLIB_DataInit( data );
 		data->font_id = font_id; /* 记录该字符使用的字体ID */
-		Queue_Add_Pointer( &font->data, data );
+		Queue_AddPointer( &font->data, data );
 	}
 	
 	/* 获取字体位图句柄，如果获取失败，则新增 */
@@ -385,7 +385,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 		}
 		bmp->pixel_size = pixel_size; /* 记录该字符的像素尺寸 */
 		bmp->bitmap = NULL;
-		Queue_Add_Pointer( &data->font_bmp, bmp );
+		Queue_AddPointer( &data->font_bmp, bmp );
 	}
 	
 	/* 如果该指针为NULL，那么就申请一块空间 */

@@ -105,7 +105,7 @@ WidgetFunc_Add(	const char *type_name,
 	
 	//printf("WidgetFunc_Add(): widget type: %s, func type: %d\n", type, func_type); 
 	
-	total = Queue_Get_Total(&app->widget_lib); 
+	total = Queue_GetTotal(&app->widget_lib); 
 	/* 遍历数据，找到对应的位置 */
 	for(i = 0; i < total; ++i) {
 		temp = Queue_Get(&app->widget_lib, i);
@@ -115,7 +115,7 @@ WidgetFunc_Add(	const char *type_name,
 		if(_LCUIString_Cmp( &temp->type_name, type_name) != 0) { 
 			continue;
 		}
-		total = Queue_Get_Total(&temp->func); 
+		total = Queue_GetTotal(&temp->func); 
 		for(i=0; i<total; i++) {
 			temp_func = Queue_Get(&temp->func, i);
 			if(temp_func->id == func_type) {
@@ -156,7 +156,7 @@ WidgetType_Add( const char *type_name )
 	}
 	
 	//printf("WidgetType_Add(): add widget type: %s\n", type);
-	total = Queue_Get_Total(&app->widget_lib);
+	total = Queue_GetTotal(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
 		if(_LCUIString_Cmp(&wd->type_name, type_name) == 0) {
@@ -179,7 +179,7 @@ static void WidgetType_Destroy(void *arg)
 /* 功能：移除部件类型数据 */
 {
 	WidgetTypeData *wd = (WidgetTypeData*)arg;
-	Destroy_Queue(&wd->func);
+	Queue_Destroy(&wd->func);
 }
 
 LCUI_EXPORT(void)
@@ -202,7 +202,7 @@ WidgetType_Delete(const char *type)
 		return -2;
 	}
 	
-	total = Queue_Get_Total(&app->widget_lib);
+	total = Queue_GetTotal(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
 		if(_LCUIString_Cmp(&wd->type_name, type) == 0) {/* 如果类型一致 */
@@ -236,7 +236,7 @@ WidgetType_Get_ID(const char *widget_type)
 		return -2;
 	}
 	
-	total = Queue_Get_Total(&app->widget_lib);
+	total = Queue_GetTotal(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
 		if(_LCUIString_Cmp(&wd->type_name, widget_type) == 0) {
@@ -260,7 +260,7 @@ WidgetType_GetByID(LCUI_ID id, char *widget_type)
 		return -2;
 	}
 	
-	total = Queue_Get_Total(&app->widget_lib);
+	total = Queue_GetTotal(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
 		if(wd->type_id == id) { /* 如果类型一致 */
@@ -287,11 +287,11 @@ WidgetFunc_GetByID(LCUI_ID id, FuncType func_type)
 	}
 	
 	//printf("WidgetFunc_GetByID(): widget type id: %lu, func type: %d\n", id, func_type);
-	total = Queue_Get_Total(&app->widget_lib); 
+	total = Queue_GetTotal(&app->widget_lib); 
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
 		if(wd->type_id == id) { /* 如果类型一致 */  
-			total = Queue_Get_Total(&wd->func); 
+			total = Queue_GetTotal(&wd->func); 
 			for(i=0; i<total; i++) {
 				f = Queue_Get(&wd->func, i); 
 				if(f->id == func_type) {
@@ -326,12 +326,12 @@ WidgetFunc_Get(const char *widget_type, FuncType func_type )
 		return NULL_Widget_Func;
 	}
 	
-	total = Queue_Get_Total(&app->widget_lib);
+	total = Queue_GetTotal(&app->widget_lib);
 	//printf("WidgetFunc_Get(): widget type: %s, func type: %d\n", widget_type, func_type);
 	for(i = 0; i < total; ++i) {
 		wd = (WidgetTypeData*)Queue_Get(&app->widget_lib, i);
 		if(_LCUIString_Cmp(&wd->type_name, widget_type) == 0) { /* 如果类型一致 */ 
-			total = Queue_Get_Total(&wd->func);
+			total = Queue_GetTotal(&wd->func);
 			for(i=0; i<total; i++) {
 				f = Queue_Get(&wd->func, i);
 				if(f->id == func_type) {
@@ -365,7 +365,7 @@ WidgetType_Valid(const char *widget_type)
 		return 0;
 	}
 	
-	total = Queue_Get_Total(&app->widget_lib);
+	total = Queue_GetTotal(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = Queue_Get(&app->widget_lib, i);
 		if(_LCUIString_Cmp(&wd->type_name, widget_type) == 0) {/* 如果类型一致 */ 
@@ -453,11 +453,11 @@ Widget_Container_Add( LCUI_Widget *ctnr, LCUI_Widget *widget )
 	/* 改变该部件的容器，需要将它从之前的容器中移除 */
 	pos = Queue_Find( old_queue, widget );
 	if(pos >= 0) {
-		Queue_Delete_Pointer(old_queue, pos);
+		Queue_DeletePointer(old_queue, pos);
 	}
 	
 	widget->parent = ctnr; /* 保存父部件指针 */ 
-	Queue_Add_Pointer( new_queue, widget ); /* 添加至部件队列 */
+	Queue_AddPointer( new_queue, widget ); /* 添加至部件队列 */
 	/* 将部件图层移动至新的父图层内 */
 	GraphLayer_MoveChild( ctnr_glayer, widget->main_glayer );
 	Update_Widget_Pos( widget );
@@ -570,16 +570,16 @@ _get_x_overlay_widget( LCUI_Queue *list, LCUI_Rect area, LCUI_Queue *out_data )
 	int i, n, len;
 	LCUI_Widget *wptr;
 	
-	if( Queue_Get_Total( out_data ) > 0 ) {
-		Destroy_Queue( out_data );
+	if( Queue_GetTotal( out_data ) > 0 ) {
+		Queue_Destroy( out_data );
 	}
-	len = Queue_Get_Total( list );
+	len = Queue_GetTotal( list );
 	for(i=0,n=0; i<len; ++i) {
 		wptr = Queue_Get( list, i );
 		/* 如果当前部件区域与area 在x轴上重叠，就添加至队列 */
 		if( wptr->pos.x < area.x+area.width
 		 && wptr->pos.x >= area.x ) {
-			Queue_Add_Pointer( out_data, wptr );
+			Queue_AddPointer( out_data, wptr );
 			++n;
 		}
 	} 
@@ -593,7 +593,7 @@ _get_max_y_widget( LCUI_Queue *widget_list )
 	int total, i, y, max_y;
 	LCUI_Widget *widget, *tmp;
 	
-	total = Queue_Get_Total( widget_list );
+	total = Queue_GetTotal( widget_list );
 	widget = Queue_Get( widget_list, 0 );
 	
 	for(max_y=0,i=0; i<total; ++i) {
@@ -639,9 +639,9 @@ Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 	Queue_Init( old_row, sizeof(LCUI_Widget*), NULL );
 	Queue_Init( cur_row, sizeof(LCUI_Widget*), NULL );
 	Queue_Init( &widget_list, sizeof(LCUI_Widget*), NULL );
-	Queue_Using_Pointer( &widget_list );
-	Queue_Using_Pointer( old_row );
-	Queue_Using_Pointer( cur_row );
+	Queue_UsingPointer( &widget_list );
+	Queue_UsingPointer( old_row );
+	Queue_UsingPointer( cur_row );
 	
 	if( !widget ) { 
 		queue = &LCUI_Sys.widget_list;
@@ -650,7 +650,7 @@ Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 	}
 	container_size = Widget_GetContainerSize( widget );
 	//printf("container size: %d,%d\n", container_size.w, container_size.h);
-	total = Queue_Get_Total( queue );
+	total = Queue_GetTotal( queue );
 	//printf("queue total: %d\n", total);
 	for(i=total-1,y=0,x=0; i>=0; --i) {
 		wptr = Queue_Get( queue, i );
@@ -661,7 +661,7 @@ Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 		}
 		if( new_pos.x == 0 && wptr->size.w > container_size.w ) {
 			new_pos.x = x = 0; 
-			Queue_Add_Pointer( cur_row, wptr ); 
+			Queue_AddPointer( cur_row, wptr ); 
 			//printf("width > container width, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
 			_move_widget( wptr, new_pos );
 			/* 更新y轴坐标 */
@@ -674,7 +674,7 @@ Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 			if(new_pos.x + wptr->size.w > container_size.w) {
 				/* 如果超出容器范围，就开始下一行记录 */
 				new_pos.x = x = 0; 
-				Destroy_Queue( old_row );
+				Queue_Destroy( old_row );
 				tmp_row = old_row;
 				old_row = cur_row;
 				cur_row = tmp_row;
@@ -688,7 +688,7 @@ Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 				continue;
 			}
 
-			Queue_Add_Pointer( cur_row, wptr ); 
+			Queue_AddPointer( cur_row, wptr ); 
 			//printf("1.2, [%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
 			_move_widget( wptr, new_pos );
 			/* 更新x轴坐标 */
@@ -699,7 +699,7 @@ Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 		/* 如果当前部件区块超出容器范围，y++，开始在下一行记录部件指针。*/
 		if(new_pos.x + wptr->size.w > container_size.w) {
 			new_pos.x = x = 0; 
-			Destroy_Queue( old_row );
+			Queue_Destroy( old_row );
 			tmp_row = old_row;
 			old_row = cur_row;
 			cur_row = tmp_row;
@@ -716,7 +716,7 @@ Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 		n = _get_x_overlay_widget( cur_row, area, &widget_list );
 		//printf("n: %d\n", n); 
 		if( n <= 0 ) { /* 如果上一行没有与之重叠的部件 */
-			Queue_Add_Pointer( cur_row, wptr ); 
+			Queue_AddPointer( cur_row, wptr ); 
 			//printf("3,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
 			_move_widget( wptr, new_pos );
 			new_pos.x = wptr->x.px + wptr->size.w;
@@ -729,7 +729,7 @@ Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 			/* 将该部件左边的部件也一同记录到当前行 */
 			for(j=0; j<n; ++j) {
 				tmp2 = Queue_Get( &widget_list, j );
-				Queue_Add_Pointer( cur_row, tmp2 );
+				Queue_AddPointer( cur_row, tmp2 );
 				if(tmp2 == tmp) {
 					break;
 				}
@@ -738,7 +738,7 @@ Update_StaticPosType_ChildWidget( LCUI_Widget *widget )
 			continue;
 		}
 		new_pos.y = tmp->y.px+tmp->size.h;
-		Queue_Add_Pointer( cur_row, wptr ); 
+		Queue_AddPointer( cur_row, wptr ); 
 		//printf("4,[%d], pos: %d,%d\n", i, new_pos.x, new_pos.y);
 		_move_widget( wptr, new_pos );
 		new_pos.x = tmp->x.px + wptr->size.w;
@@ -1090,7 +1090,7 @@ Widget_SyncInvalidArea( LCUI_Widget *widget )
 	} else {
 		widget_list = &widget->child;
 	}
-	total = Queue_Get_Total( widget_list );
+	total = Queue_GetTotal( widget_list );
 	for(i=total-1; i>=0; --i) {
 		child = Queue_Get( widget_list, i );
 		if( !child || !child->visible ) {
@@ -1163,7 +1163,7 @@ Widget_GetChildByID( LCUI_Widget *widget, LCUI_ID id )
 	} else {
 		child_list = &LCUI_Sys.widget_list;
 	}
-	n = Queue_Get_Total( child_list );
+	n = Queue_GetTotal( child_list );
 	for(i=0; i<n; ++i) {
 		child = Queue_Get( child_list, i );
 		if( !child ) {
@@ -1183,7 +1183,7 @@ LCUIApp_DestroyAllWidgets( LCUI_ID app_id )
 	int i, total;
 	LCUI_Widget *temp;
 	
-	total = Queue_Get_Total(&LCUI_Sys.widget_list);
+	total = Queue_GetTotal(&LCUI_Sys.widget_list);
 	for(i=0; i<total; i++) {
 		temp = Queue_Get(&LCUI_Sys.widget_list,i);
 		if(temp->app_id != app_id) {
@@ -1195,7 +1195,7 @@ LCUIApp_DestroyAllWidgets( LCUI_ID app_id )
 		 * */
 		Queue_Delete(&LCUI_Sys.widget_list, i);
 		/* 重新获取部件总数 */
-		total = Queue_Get_Total(&LCUI_Sys.widget_list);
+		total = Queue_GetTotal(&LCUI_Sys.widget_list);
 		--i;/* 当前位置的部件已经移除，空位已由后面部件填补，所以，--i */
 	}
 }
@@ -1290,7 +1290,7 @@ Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 	}
 	
 	widget = ctnr; 
-	total = Queue_Get_Total( widget_list );
+	total = Queue_GetTotal( widget_list );
 	for(i=0; i<total; ++i) {/* 从顶到底遍历子部件 */
 		child = Queue_Get( widget_list, i ); 
 		if( !child || !child->visible ) { 
@@ -1332,7 +1332,7 @@ Empty_Widget()
  *   0  程序的部件列表不为空
  * */
 {
-	if(Queue_Get_Total(&LCUI_Sys.widget_list) <= 0) {
+	if(Queue_GetTotal(&LCUI_Sys.widget_list) <= 0) {
 		return 1;
 	}
 	return 0;
@@ -1377,10 +1377,10 @@ Destroy_Widget( void *arg )
 	Graph_Free(&widget->background.image);
 	
 	/* 销毁部件的队列 */
-	Destroy_Queue(&widget->child);
-	Destroy_Queue(&widget->event);
-	Destroy_Queue(&widget->data_buff);
-	Destroy_Queue(&widget->invalid_area);
+	Queue_Destroy(&widget->child);
+	Queue_Destroy(&widget->event);
+	Queue_Destroy(&widget->data_buff);
+	Queue_Destroy(&widget->invalid_area);
 	
 	widget->visible = FALSE;
 	widget->enabled = TRUE;
@@ -1506,7 +1506,7 @@ Widget_New( const char *widget_type )
 	LCUIString_Init( &widget->style_name );
 	
 	/* 最后，将该部件数据添加至部件队列中 */
-	Queue_Add_Pointer( &LCUI_Sys.widget_list, widget );
+	Queue_AddPointer( &LCUI_Sys.widget_list, widget );
 	if( !widget_type ) {
 		return widget;
 	}
@@ -1539,7 +1539,7 @@ static void Widget_ExecDestroy( LCUI_Widget *widget )
 		child_list = &widget->parent->child; 
 	}
 	Queue_Lock( child_list );
-	total = Queue_Get_Total(child_list);
+	total = Queue_GetTotal(child_list);
 	for(i=0; i<total; ++i) {
 		tmp = Queue_Get(child_list, i);
 		if(tmp == widget) {
@@ -1942,7 +1942,7 @@ Widget_AutoResize(LCUI_Widget *widget)
 	size.w = 0;
 	size.h = 0;
 	Queue_Init(&point, sizeof (LCUI_Pos), NULL);
-	total = Queue_Get_Total(&widget->child);
+	total = Queue_GetTotal(&widget->child);
 	for(i=0; i<total; ++i) {/* 遍历每个子部件 */
 		child = Queue_Get(&widget->child, i);
 		if( !child ) {
@@ -2179,7 +2179,7 @@ Update_Child_Widget_Size(LCUI_Widget *widget)
 	if( !widget ) {
 		return;
 	}
-	total = Queue_Get_Total(&widget->child); 
+	total = Queue_GetTotal(&widget->child); 
 	for(i=0; i<total; ++i) {
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
 		if( !child ) {
@@ -2208,7 +2208,7 @@ Update_Child_Widget_Pos(LCUI_Widget *widget)
 {
 	LCUI_Widget *child;
 	int i, total;
-	total = Queue_Get_Total(&widget->child);
+	total = Queue_GetTotal(&widget->child);
 	for(i=0; i<total; ++i) {
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
 		Update_Widget_Pos( child ); 
@@ -2456,7 +2456,7 @@ Widget_Front( LCUI_Widget *widget )
 	}
 	
 	Queue_Lock( widget_list );
-	n = Queue_Get_Total( widget_list );
+	n = Queue_GetTotal( widget_list );
 	zindex = n;
 	if( widget->modal ) {
 		/* 先设置自己的z-index值为当前容器中最大的 */
@@ -2618,7 +2618,7 @@ Record_WidgetUpdate(LCUI_Widget *widget, void *data, DATATYPE type, int flag)
 		break;
 	    default: return -1;
 	}
-	total = Queue_Get_Total( &widget->data_buff );
+	total = Queue_GetTotal( &widget->data_buff );
 	for(n_found=0,i=0; i<total; ++i) {
 		tmp_ptr = Queue_Get( &widget->data_buff, i );
 		if( !tmp_ptr ) { 
@@ -2687,7 +2687,7 @@ Handle_WidgetUpdate(LCUI_Widget *widget)
 	/* 处理部件中需要更新的数据 */
 	//_DEBUG_MSG("enter\n");
 	Queue_Lock( &widget->data_buff );/* 锁定队列，其它线程暂时不能访问 */
-	total = Queue_Get_Total( &widget->data_buff );
+	total = Queue_GetTotal( &widget->data_buff );
 	//_DEBUG_MSG("1, total: %d\n", total);
 	for(i=0; i<total; ++i) {
 		temp = Queue_Get( &widget->data_buff, 0 );
@@ -2756,11 +2756,11 @@ Handle_WidgetUpdate(LCUI_Widget *widget)
 		} 
 		Queue_Delete( &widget->data_buff, 0 );
 	}
-	total = Queue_Get_Total( &widget->data_buff );
+	total = Queue_GetTotal( &widget->data_buff );
 	//_DEBUG_MSG(" 2, total: %d\n", total);
 	Queue_Unlock( &widget->data_buff );
 	/* 处理子部件更新 */
-	total = Queue_Get_Total( &widget->child );
+	total = Queue_GetTotal( &widget->child );
 	/* 从尾到首,递归处理子部件的更新 */
 	for(i=total-1; i>=0; --i) {
 		child = Queue_Get(&widget->child, i);  
@@ -2779,7 +2779,7 @@ Handle_AllWidgetUpdate()
 {
 	LCUI_Widget *child;
 	int i, total;
-	total = Queue_Get_Total(&LCUI_Sys.widget_list); 
+	total = Queue_GetTotal(&LCUI_Sys.widget_list); 
 	//_DEBUG_MSG("start\n");
 	for(i=total-1; i>=0; --i) {
 		/* 从尾到首获取部件指针 */

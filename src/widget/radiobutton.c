@@ -56,7 +56,7 @@ static void __Destroy_MutexData( void *arg )
 {
 	LCUI_Queue *queue;
 	queue = (LCUI_Queue*)arg;
-	Destroy_Queue( queue );
+	Queue_Destroy( queue );
 }
 
 /* 将单选框从互斥关系链中移除 */
@@ -68,11 +68,11 @@ RadioButton_DeleteMutex( LCUI_Widget *widget )
 	LCUI_RadioButton *rb;
 	
 	rb = (LCUI_RadioButton *)Widget_GetPrivData(widget);
-	total = Queue_Get_Total(rb->mutex);
+	total = Queue_GetTotal(rb->mutex);
 	for(i=0; i<total; ++i) {
 		tmp = (LCUI_Widget*)Queue_Get(rb->mutex, i);
 		if(tmp == widget) {
-			Queue_Delete_Pointer(rb->mutex, i);
+			Queue_DeletePointer(rb->mutex, i);
 			break;
 		}
 	}
@@ -101,18 +101,18 @@ RadioButton_CreateMutex( LCUI_Widget *a, LCUI_Widget *b )
 			/* 从队列中获取指向子队列的指针 */
 			p = (LCUI_Queue*)Queue_Get(&mutex_lib, pos);
 			/* 添加指针至队列 */
-			Queue_Add_Pointer(p, a);
-			Queue_Add_Pointer(p, b);
+			Queue_AddPointer(p, a);
+			Queue_AddPointer(p, b);
 			/* 保存指向关系队列的指针 */
 			rb_a->mutex = p;
 			rb_b->mutex = p;
 		} else {
-			Queue_Add_Pointer(rb_b->mutex, a);
+			Queue_AddPointer(rb_b->mutex, a);
 			rb_a->mutex = rb_b->mutex;
 		}
 	} else {
 		if( !rb_b->mutex ) {
-			Queue_Add_Pointer(rb_a->mutex, b);
+			Queue_AddPointer(rb_a->mutex, b);
 			rb_b->mutex = rb_a->mutex;
 		} else {/* 否则，两个都和其它部件有互斥关系，需要将它们拆开，并重新建立互斥关系 */
 			RadioButton_DeleteMutex(a);
@@ -133,7 +133,7 @@ RadioButton_SetOn( LCUI_Widget *widget )
 	radio_button = Widget_GetPrivData(widget); 
 	/* 如果与其它部件有互斥关系，就将其它单选框部件的状态改为“未选中”状态 */
 	if( radio_button->mutex ) {
-		total = Queue_Get_Total(radio_button->mutex);
+		total = Queue_GetTotal(radio_button->mutex);
 		for(i=0; i<total; ++i) {
 			other = (LCUI_Widget*)Queue_Get(radio_button->mutex, i);
 			RadioButton_SetOff(other);

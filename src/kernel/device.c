@@ -83,7 +83,7 @@ proc_dev_list ( void *arg )
 	dev_list = (LCUI_Queue *)arg;
 	while( LCUI_Active() ) {
 		result = 0;
-		total = Queue_Get_Total( dev_list );
+		total = Queue_GetTotal( dev_list );
 		for(i=0; i<total; ++i) {
 			data_ptr = Queue_Get( dev_list, i );
 			if( !data_ptr || !data_ptr->proc_func ) {
@@ -121,7 +121,7 @@ LCUIModule_Device_End(void)
 	LCUI_Queue *dev_list;
 	
 	dev_list = &LCUI_Sys.dev_list; 
-	total = Queue_Get_Total( dev_list );
+	total = Queue_GetTotal( dev_list );
 	for(i=0; i<total; ++i) {
 		data_ptr = Queue_Get( dev_list, i );
 		if( !data_ptr || !data_ptr->destroy_func ) {

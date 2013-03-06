@@ -39,7 +39,7 @@ StyleLib_GetStyleClass(	LCUI_StyleLibrary *lib,
 	int i, total;
 	LCUI_StyleClass *p;
 	
-	total = Queue_Get_Total( &lib->style_classes );
+	total = Queue_GetTotal( &lib->style_classes );
 	for(i=0; i<total; ++i) {
 		p = Queue_Get( &lib->style_classes, i );
 		if( !p ) {
@@ -71,7 +71,7 @@ StyleLib_AddStyleClass(	LCUI_StyleLibrary *lib,
 	StyleClass_Init( style_class );
 	/* 保存类名 */
 	_LCUIString_Copy( &style_class->class_name, class_name );
-	Queue_Add_Pointer( &lib->style_classes, style_class );
+	Queue_AddPointer( &lib->style_classes, style_class );
 	return style_class;
 }
 
@@ -87,7 +87,7 @@ StyleLib_GetStyleAttr(	LCUI_StyleClass *style_class,
 		return NULL;
 	}
 	/* 先在记录中查找是否有已存在的同名属性 */
-	total = Queue_Get_Total( &style_class->style_attr );
+	total = Queue_GetTotal( &style_class->style_attr );
 	for( i=0; i<total; ++i ) {
 		p = Queue_Get( &style_class->style_attr, i );
 		if( !p ) {
@@ -158,7 +158,7 @@ StyleClass_SetStyleAttr(	LCUI_StyleClass *style_class,
 	/* 保存属性名和属性值 */
 	_LCUIString_Copy( &style_attr->attr_name, attr_name );
 	_LCUIString_Copy( &style_attr->attr_value, attr_value );
-	Queue_Add_Pointer( &style_class->style_attr, style_attr );
+	Queue_AddPointer( &style_class->style_attr, style_attr );
 	return 0;
 }
 

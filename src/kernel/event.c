@@ -55,7 +55,7 @@ static void LCUI_EventsInit( void )
 /* 销毁事件队列 */
 static void LCUI_DestroyEvents( void )
 {
-	Destroy_Queue( &events );
+	Queue_Destroy( &events );
 }
 
 /* 从事件队列中获取事件 */
@@ -93,7 +93,7 @@ LCUI_DispatchSystemEvent( LCUI_Event *event )
 	if( !slot ) {
 		return;
 	}
-	n = Queue_Get_Total( &slot->func_data );
+	n = Queue_GetTotal( &slot->func_data );
 	for(i=0; i<n; ++i) {
 		task = Queue_Get( &slot->func_data, i );
 		if( !task || !task->func ) {
@@ -135,7 +135,7 @@ LCUI_DispatchUserEvent( LCUI_Event *event )
 	if( !slot ) {
 		return;
 	}
-	n = Queue_Get_Total( &slot->func_data );
+	n = Queue_GetTotal( &slot->func_data );
 	for(i=0; i<n; ++i) {
 		task = Queue_Get( &slot->func_data, i );
 		if( !task || !task->func ) {
@@ -211,8 +211,8 @@ LCUIModule_Event_End( void )
 {
 	LCUI_StopEventThread();
 	LCUI_DestroyEvents();
-	Destroy_Queue( &LCUI_Sys.sys_event_slots );
-	Destroy_Queue( &LCUI_Sys.user_event_slots );
+	Queue_Destroy( &LCUI_Sys.sys_event_slots );
+	Queue_Destroy( &LCUI_Sys.user_event_slots );
 }
 
 /* 添加事件至事件队列中 */
@@ -237,7 +237,7 @@ static void Destroy_EventSlot( void *arg )
 	LCUI_EventSlot *slot;
 	slot = (LCUI_EventSlot*)arg;
 	if( slot ) {
-		Destroy_Queue( &slot->func_data );
+		Queue_Destroy( &slot->func_data );
 	}
 }
 
@@ -282,7 +282,7 @@ EventSlots_Find( LCUI_Queue *slots, int event_id )
 	int i, total;  
 	LCUI_EventSlot *slot;
 	
-	total = Queue_Get_Total( slots );
+	total = Queue_GetTotal( slots );
 	if (total <= 0) {
 		return NULL;
 	}

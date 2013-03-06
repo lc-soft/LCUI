@@ -152,7 +152,7 @@ StyleTag_GetCurrentStyle ( LCUI_Queue *tags )
 	TextStyle_Init( style_data );
 	memset( flags, 0, sizeof(flags) );
 	
-	total = Queue_Get_Total( tags );
+	total = Queue_GetTotal( tags );
 	if(total <= 0) {
 		free( style_data );
 		return NULL;
@@ -204,8 +204,8 @@ StyleTag_Delete( LCUI_Queue *tags, StyleTag_ID tag )
 	int i, total;
 	StyleTag_Data *p; 
 	 
-	total = Queue_Get_Total( tags );
-	DEBUG_MSG("delete start, total tag: %d\n", Queue_Get_Total( tags ));
+	total = Queue_GetTotal( tags );
+	DEBUG_MSG("delete start, total tag: %d\n", Queue_GetTotal( tags ));
 	if(total <= 0) {
 		return;
 	}
@@ -216,7 +216,7 @@ StyleTag_Delete( LCUI_Queue *tags, StyleTag_ID tag )
 			break;
 		}
 	} 
-	DEBUG_MSG("delete end, total tag: %d\n", Queue_Get_Total( tags ));
+	DEBUG_MSG("delete end, total tag: %d\n", Queue_GetTotal( tags ));
 }
 
 LCUI_EXPORT(void)

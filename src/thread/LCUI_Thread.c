@@ -56,7 +56,7 @@ static void Destroy_TreeNode( void *arg )
 {
 	Thread_TreeNode *ttn;
 	ttn = (Thread_TreeNode *)arg;
-	Destroy_Queue( &ttn->child );
+	Queue_Destroy( &ttn->child );
 }
 
 /* 初始化线程树结点 */
@@ -81,7 +81,7 @@ ThreadTree_Find( Thread_TreeNode *ttn, LCUI_Thread tid )
 		return ttn;
 	}
 	
-	n = Queue_Get_Total( &ttn->child );
+	n = Queue_GetTotal( &ttn->child );
 	for(i=0; i<n; ++i) {
 		new_ttn = Queue_Get( &ttn->child, i );
 		if( !new_ttn ) {
@@ -130,7 +130,7 @@ ThreadTreeNode_AddNew( Thread_TreeNode *ttn, LCUI_Thread tid )
 	Thread_TreeNode_Init( new_ttn );
 	new_ttn->tid = tid;
 	new_ttn->parent = ttn;
-	Queue_Add_Pointer(& ttn->child, new_ttn );
+	Queue_AddPointer(& ttn->child, new_ttn );
 	return new_ttn;
 }
 
@@ -150,7 +150,7 @@ ThreadTreeNode_Delete( Thread_TreeNode *ttn, LCUI_Thread tid )
 	if(tt == NULL) {
 		return -2;
 	}
-	n = Queue_Get_Total( &tt->child );
+	n = Queue_GetTotal( &tt->child );
 	if(n <= 0) {
 		return -3;
 	}
@@ -224,7 +224,7 @@ static void LCUIThreadTree_Cancel( Thread_TreeNode *ttn )
 	if(ttn == NULL) {
 		return;
 	}
-	n = Queue_Get_Total( &ttn->child );
+	n = Queue_GetTotal( &ttn->child );
 	for(i=0; i<n; ++i) {
 		child = Queue_Get( &ttn->child, i );
 		if( !child ) {
@@ -247,7 +247,7 @@ LCUIApp_CancelAllThreads( LCUI_ID app_id )
 		return -1;
 	}
 	
-	n = Queue_Get_Total( &ttn->child );
+	n = Queue_GetTotal( &ttn->child );
 	for(i=0; i<n; ++i) {
 		child = Queue_Get( &ttn->child, i );
 		if( !child ) {
@@ -272,5 +272,5 @@ LCUIModule_Thread_Init( void )
 LCUI_EXPORT(void)
 LCUIModule_Thread_End( void )
 {
-	Destroy_Queue( &thread_tree.child );
+	Queue_Destroy( &thread_tree.child );
 }

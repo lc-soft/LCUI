@@ -72,7 +72,7 @@ Frames_CallFunc( LCUI_Frames *frames )
 	LCUI_Func *func;
 	LCUI_Graph *slot;
 	
-	total = Queue_Get_Total( &frames->func_data );
+	total = Queue_GetTotal( &frames->func_data );
 	slot = Frames_GetGraphSlot( frames ); 
 	for(i=0; i<total; ++i){
 		func = Queue_Get( &frames->func_data, i );
@@ -95,7 +95,7 @@ Frames_UpdateGraphSlot( LCUI_Frames *frames, int num )
 		return -2;
 	}
 	Graph_FillAlpha(&frames->slot, 0);
-	if(0 < Queue_Get_Total(&frames->pic)) {
+	if(0 < Queue_GetTotal(&frames->pic)) {
 		pos = Frames_GetFrameMixPos(frames, frame);
 		Graph_Replace(&frames->slot, frame->pic, pos); 
 	}
@@ -158,7 +158,7 @@ Resize_Frames(LCUI_Frames *p, LCUI_Size new_size)
 	}
 	
 	p->size = new_size;
-	total = Queue_Get_Total(&p->pic);
+	total = Queue_GetTotal(&p->pic);
 	for(i=0; i<total; ++i){
 		frame = Queue_Get(&p->pic, i);
 		graph = frame->pic->src;
@@ -241,7 +241,7 @@ FramesStream_Sort()
 	LCUI_Frame *p, *q;
 	
 	Queue_Lock(&frames_stream);
-	total = Queue_Get_Total(&frames_stream);
+	total = Queue_GetTotal(&frames_stream);
 	/* 使用的是选择排序 */
 	for(i=0; i<total; ++i) {
 		temp = Queue_Get(&frames_stream, i);
@@ -292,7 +292,7 @@ FramesStream_TimeSub(int time)
 	int i, total, pos;
 	
 	Queue_Lock(&frames_stream);
-	total = Queue_Get_Total(&frames_stream);
+	total = Queue_GetTotal(&frames_stream);
 	DEBUG_MSG("start\n");
 	for(i=0; i<total; ++i) {
 		frames = Queue_Get(&frames_stream, i);  
@@ -347,7 +347,7 @@ FramesStream_Update( int *sleep_time )
 	clock_t used_time; 
 	
 	DEBUG_MSG("start\n");
-	total = Queue_Get_Total(&frames_stream); 
+	total = Queue_GetTotal(&frames_stream); 
 	for(i=0; i<total; ++i){
 		frames = Queue_Get(&frames_stream, i);
 		if(frames->state == 1) {
@@ -381,7 +381,7 @@ FramesStream_Update( int *sleep_time )
 		
 		frame->current_time = frame->sleep_time; 
 		++frames->current;
-		total = Queue_Get_Total(&frames->pic);
+		total = Queue_GetTotal(&frames->pic);
 		if(frames->current > total) {
 			frames->current = 1;
 		}
@@ -436,12 +436,12 @@ Frames_Play(LCUI_Frames *frames)
 	frames->state = 1;
 	if(__timer_id == -1){
 		Queue_Init( &frames_stream, sizeof(LCUI_Frames), NULL );
-		Queue_Using_Pointer( &frames_stream );
+		Queue_UsingPointer( &frames_stream );
 		__timer_id = set_timer( 50, Process_Frames, TRUE );
 	}
 	/* 检查该动画是否已存在 */
 	Queue_Lock( &frames_stream );
-	total = Queue_Get_Total( &frames_stream );
+	total = Queue_GetTotal( &frames_stream );
 	for( i=0; i<total; ++i ) {
 		tmp_ptr = Queue_Get( &frames_stream, i );
 		if( tmp_ptr == frames ) {
@@ -451,7 +451,7 @@ Frames_Play(LCUI_Frames *frames)
 	Queue_Unlock( &frames_stream );
 	/* 添加至动画更新队列中 */ 
 	if( i>=total ) {
-		return Queue_Add_Pointer(&frames_stream, frames); 
+		return Queue_AddPointer(&frames_stream, frames); 
 	}
 	return 1;
 }

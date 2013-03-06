@@ -61,7 +61,7 @@ LCUIApp_Find( LCUI_ID id )
 	LCUI_App *app; 
 	int i, total;
 	
-	total = Queue_Get_Total(&LCUI_Sys.app_list);
+	total = Queue_GetTotal(&LCUI_Sys.app_list);
 	if (total > 0) { /* 如果程序总数大于0 */
 		for (i = 0; i < total; ++i) {
 			app = Queue_Get(&LCUI_Sys.app_list, i);
@@ -142,7 +142,7 @@ static int LCUIAppList_Delete( LCUI_ID app_id )
 	LCUI_App *app; 
 	int i, total;  
 	
-	total = Queue_Get_Total(&LCUI_Sys.app_list);
+	total = Queue_GetTotal(&LCUI_Sys.app_list);
 	/* 如果程序总数大于0，查找程序信息所在队列的位置 */
 	if (total > 0) { 
 		for (i = 0; i < total; ++i) {
@@ -234,7 +234,7 @@ LCUI_MainLoopQueue_Find( void )
 	int i, total;
 	LCUI_MainLoop *loop;
 	
-	total = Queue_Get_Total( &mainloop_queue );
+	total = Queue_GetTotal( &mainloop_queue );
 	for(i=0; i<total; ++i) {
 		loop = Queue_Get( &mainloop_queue, i );
 		if( loop->running ) {
@@ -250,7 +250,7 @@ LCUI_MainLoopQueue_Sort( void )
 	int i, j, total;
 	LCUI_MainLoop *cur_loop, *next_loop;
 	
-	total = Queue_Get_Total( &mainloop_queue );
+	total = Queue_GetTotal( &mainloop_queue );
 	for(i=0; i<total; ++i) {
 		cur_loop = Queue_Get( &mainloop_queue, i );
 		if( !cur_loop ) {
@@ -284,9 +284,9 @@ LCUI_MainLoop_New( void )
 		return NULL;
 	}
 	loop->quit = FALSE;
-	loop->level = Queue_Get_Total( &mainloop_queue );
+	loop->level = Queue_GetTotal( &mainloop_queue );
 	loop->running = FALSE;
-	Queue_Add_Pointer( &mainloop_queue, loop );
+	Queue_AddPointer( &mainloop_queue, loop );
 	/* 重新对主循环队列进行排序 */
 	LCUI_MainLoopQueue_Sort();
 	return loop;
@@ -311,7 +311,7 @@ LCUIApp_HaveTask( LCUI_App *app )
 	if( !app ) {
 		return FALSE; 
 	}
-	if(Queue_Get_Total(&app->tasks) > 0) {
+	if(Queue_GetTotal(&app->tasks) > 0) {
 		return TRUE; 
 	}
 	return FALSE;
@@ -325,7 +325,7 @@ LCUIApp_RunTask( LCUI_App *app )
 	if( task == NULL ) {
 		return -1;
 	}
-	Queue_Delete_Pointer( &app->tasks, 0 );
+	Queue_DeletePointer( &app->tasks, 0 );
 	if( task->func == NULL ) {
 		return -2;
 	}
