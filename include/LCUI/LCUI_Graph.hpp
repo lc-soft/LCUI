@@ -44,7 +44,38 @@
 #include LC_RES_H
 
 #ifdef __cplusplus
+class LCUIGraph {
+public:
+	LCUIGraph( void );
+	LCUIGraph( int, int, LCUI_BOOL );
+	int create( int, int, LCUI_BOOL );
+	LCUI_Graph *getGraph( void );
+private:
+	LCUI_Graph graph;
+};
 
+LCUIGraph::LCUIGraph( void )
+{
+	Graph_Init( &graph );
+}
+
+LCUIGraph::LCUIGraph( int w, int h, LCUI_BOOL have_alpha = TRUE )
+{
+	Graph_Init( &graph );
+	graph.have_alpha = have_alpha;
+	Graph_Create( &graph, w, h );
+}
+
+int LCUIGraph::create( int w, int h, LCUI_BOOL have_alpha = TRUE )
+{
+	graph.have_alpha = have_alpha;
+	return Graph_Create( &graph, w, h );
+}
+
+LCUI_Graph* LCUIGraph::getGraph( void )
+{
+	return &graph;
+}
 #endif
 
 #endif

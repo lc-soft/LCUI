@@ -41,13 +41,15 @@
 #ifndef __LCUI_WINDOW_HPP_
 #define __LCUI_WINDOW_HPP_ 
 
+#include LC_GRAPH_H
+
 /* LCUIWindow类继承自LCUIWidget类 */
 class LCUIWindow:public LCUIWidget
 {
 public:
 	LCUIWindow(void):LCUIWidget("window"){;};
 	void setTitleIcon( LCUI_Graph* );
-	//void setTitleIcon( LCUIGraph & );
+	void setTitleIcon( LCUIGraph & );
 	void setTitleText( const char* );
 	void setTitleTextW( const wchar_t *);
 	void addToTitleBar( LCUIWidget& );
@@ -57,6 +59,11 @@ public:
 void LCUIWindow::setTitleIcon( LCUI_Graph *icon )
 {
 	Window_SetTitleIcon( widget, icon );
+}
+
+void LCUIWindow::setTitleIcon( LCUIGraph &icon )
+{
+	Window_SetTitleIcon( widget, icon.getGraph() );
 }
 
 void LCUIWindow::setTitleText( const char *text )
