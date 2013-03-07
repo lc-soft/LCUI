@@ -163,7 +163,7 @@ struct _LCUI_Widget {
 	LCUI_Widget *parent;		/* 父部件 */
 	LCUI_Queue child;		/* 子部件集 */
 	LCUI_Queue event;		/* 保存部件的事件关联的数据 */
-	LCUI_Queue data_buff;		/* 记录需要进行更新的数据 */ 
+	LCUI_Queue update_buff;		/* 记录子部件需要进行更新的数据 */ 
 	LCUI_Queue invalid_area;	/* 记录无效区域 */
 	
 	WIDGET_STATE state;	/* 部件当前状态 */
@@ -610,13 +610,12 @@ Widget_SetState( LCUI_Widget *widget, int state );
 
 
 /**************************** Widget Update ***************************/
-LCUI_EXPORT(int)
-Handle_WidgetUpdate(LCUI_Widget *widget);
-/* 功能：处理部件的更新 */ 
+/* 初始化记录部件数据更新的队列 */
+LCUI_EXPORT(void)
+WidgetUpdateBuff_Init( LCUI_Queue *queue );
 
 LCUI_EXPORT(void)
-Handle_AllWidgetUpdate();
-/* 功能：处理所有部件的更新 */ 
+Widget_ProcessUpdate( LCUI_Widget *widget );
 /************************ Widget Update End ***************************/
 
 

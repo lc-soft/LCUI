@@ -472,6 +472,7 @@ LCUI_EXPORT(void)
 LCUIModule_Widget_Init( void )
 {
 	WidgetQueue_Init( &LCUI_Sys.widget_list );
+	WidgetUpdateBuff_Init( &LCUI_Sys.update_buff );
 	Queue_Init( &widget_list, sizeof(widget_item), NULL );
 	LCUI_MouseButtonEvent_Connect( LCUI_HandleMouseButton, NULL );
 	LCUI_MouseMotionEvent_Connect( LCUI_HandleMouseMotion, NULL );
@@ -483,6 +484,7 @@ LCUI_EXPORT(void)
 LCUIModule_Widget_End( void )
 {
 	Queue_Destroy( &LCUI_Sys.widget_list );
+	Queue_Destroy( &LCUI_Sys.update_buff );
 	Queue_Destroy( &widget_list );
 }
 /*************************** Event End *********************************/
