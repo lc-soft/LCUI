@@ -12,24 +12,19 @@ LCUI_Widget *label, *window, *scrollbar;
 
 void callback_func( ScrollBar_Data data, void *arg )
 {
-	Label_Text( label, "%d", data.current_num );
+	char str[25];
+	sprintf( str, "%d", data.current_num );
+	Label_Text( label, str );
 }
 
-static void *test_thread()
+static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
-	int y;
-	sleep(1);
-	for(y=0; y<100; ++y) {
-		Widget_Move( ScrollBar_GetWidget(scrollbar), Pos(0,y) );
-		LCUI_MSleep(10);
-	}
-	LCUIThread_Exit(NULL);
+	LCUI_MainLoop_Quit(NULL);
 }
 
 int main(int argc, char*argv[]) 
 {
-	thread_t t;
-	LCUI_Init(argc, argv);
+	LCUI_Init();
 	
 	window = Widget_New("window");
 	scrollbar = Widget_New("scrollbar");
@@ -51,11 +46,11 @@ int main(int argc, char*argv[])
 	Window_ClientArea_Add(window, scrollbar); 
 	/* 将回调函数与滚动条部件连接 */
 	ScrollBar_Connect( scrollbar, callback_func, NULL );
+	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 显示部件 */
-	scrollbar->show(scrollbar);
-	window->show(window); 
-	label->show(label);
-	LCUIThread_Create( &t, NULL, test_thread, NULL );
+	Widget_Show(scrollbar);
+	Widget_Show(window); 
+	Widget_Show(label);
 	return LCUI_Main(); /* 进入主循环 */
 }
 
