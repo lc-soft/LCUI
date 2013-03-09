@@ -114,7 +114,7 @@ Label_ExecUpdate( LCUI_Widget *widget )
 	 && Size_Cmp( max, widget->size ) != 0 ) {
 		/* 如果开启了自动调整大小,并且尺寸有改变 */ 
 		Widget_Resize(widget, max );
-		Refresh_Widget(widget);
+		Widget_Refresh(widget);
 	}
 }
 

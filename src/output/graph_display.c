@@ -232,7 +232,7 @@ LCUIScreen_Update( void* unused )
 	/* 添加个定时器，每隔1秒刷新FPS计数 */
 	timer_id = set_timer( 1000, refresh_fps_count, TRUE );
 	while(LCUI_Active()) {
-		Handle_AllWidgetUpdate(); /* 处理所有部件更新 */ 
+		Widget_ProcessUpdate(NULL); /* 处理所有部件更新 */ 
 		LCUI_MSleep(5);
 		LCUIScreen_SyncInvalidArea();
 		LCUIScreen_UpdateInvalidArea();

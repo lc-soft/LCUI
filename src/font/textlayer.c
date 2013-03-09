@@ -101,7 +101,7 @@ TextLayer_Clear(	LCUI_TextLayer *layer, LCUI_Pos pos,
 }
 
 static void 
-TextLayer_Char_GetBMP ( LCUI_TextStyle *default_style, LCUI_CharData *data )
+TextLayer_GetCharBMP ( LCUI_TextStyle *default_style, LCUI_CharData *data )
 /* 获取字体位图，字体的样式由文本图层中记录的字体样式决定 */
 {
 	int pixel_size;
@@ -171,7 +171,7 @@ TextLayer_Text_Insert_NewRow ( LCUI_TextLayer *layer, int row )
 }
 
 static Text_RowData *
-TextLayer_Get_CurRowData ( LCUI_TextLayer *layer )
+TextLayer_GetCurRowData ( LCUI_TextLayer *layer )
 /* 获取指向当前行的指针 */
 {
 	return Queue_Get( &layer->rows_data, layer->current_des_pos.y );
@@ -574,7 +574,7 @@ TextLayer_GetSize ( LCUI_TextLayer *layer )
 }
 
 LCUI_EXPORT(wchar_t*)
-TextLayer_Get_Text( LCUI_TextLayer *layer )
+TextLayer_GetText( LCUI_TextLayer *layer )
 /* 获取文本图层中的文本内容 */
 {
 	int i, buff_size;
@@ -695,7 +695,7 @@ skip_style_cmp:;
 			if(char_ptr->need_update) {
 				TextLayer_Clear( layer, pos, row_ptr->max_size.h, char_ptr );
 				pos.x += char_ptr->bitmap->advance.x;
-				TextLayer_Char_GetBMP ( &layer->default_data, char_ptr );
+				TextLayer_GetCharBMP ( &layer->default_data, char_ptr );
 			} else {
 				pos.x += char_ptr->bitmap->advance.x;
 			}
@@ -725,7 +725,7 @@ TextLayer_Text_Clear( LCUI_TextLayer *layer )
 }
 
 LCUI_EXPORT(void)
-TextLayer_Row_Set_End( LCUI_TextLayer *layer, uint_t row, uint_t start_cols )
+TextLayer_SetRowEnd( LCUI_TextLayer *layer, uint_t row, uint_t start_cols )
 /* 为指定行设定结束点，结束点及后面的数据将被删除，但不记录残余文本位图区域 */
 {
 	uint_t total, i;
@@ -764,7 +764,7 @@ TextLayer_Text_SetPasswordChar( LCUI_TextLayer *layer, wchar_t ch )
  * */
 {
 	layer->password_char.char_code = ch;
-	TextLayer_Char_GetBMP( &layer->default_data, &layer->password_char );
+	TextLayer_GetCharBMP( &layer->default_data, &layer->password_char );
 	//暂时不进行其它处理
 }
 
@@ -964,7 +964,7 @@ TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
 			} else {
 				refresh = TRUE;
 				DEBUG_MSG1( "generate FontBMP, char code: %d\n", char_ptr->char_code );
-				TextLayer_Char_GetBMP ( &layer->default_data, char_ptr );
+				TextLayer_GetCharBMP ( &layer->default_data, char_ptr );
 			}
 			DEBUG_MSG1( "char_data->bitmap->advance.x: %d\n", char_ptr->bitmap->advance.x );
 			TextLayer_Clear( layer, pos, row_ptr->max_size.h, char_ptr );
@@ -1101,7 +1101,7 @@ TextLayer_Text_Paste( LCUI_TextLayer *layer )
 }
 
 static int
-TextLayer_Get_CharPos( 
+TextLayer_GetCharPos( 
 	LCUI_TextLayer *layer, 
 	LCUI_CharData *char_ptr, 
 	int left_or_right )
@@ -1179,7 +1179,7 @@ end_search:
 
 
 static LCUI_CharData *
-TextLayer_Get_CurChar( LCUI_TextLayer *layer )
+TextLayer_GetCurChar( LCUI_TextLayer *layer )
 /* 获取光标附近的字符数据的指针 */
 {
 	int total;
@@ -1207,13 +1207,13 @@ TextLayer_Get_CurChar( LCUI_TextLayer *layer )
 
 
 static int
-TextLayer_Get_Cursor_CharPos( LCUI_TextLayer *layer, int left_or_right )
+TextLayer_GetCharPosUnderCursor( LCUI_TextLayer *layer, int left_or_right )
 /* 根据光标当前所在位置，获取对于源字符串中的位置 */
 {
 	LCUI_CharData *char_ptr;
 	
-	char_ptr = TextLayer_Get_CurChar( layer );
-	return TextLayer_Get_CharPos( layer, char_ptr, left_or_right );
+	char_ptr = TextLayer_GetCurChar( layer );
+	return TextLayer_GetCharPos( layer, char_ptr, left_or_right );
 }
 
 static int
@@ -1221,7 +1221,7 @@ TextLayer_Update_CurSrcPos( LCUI_TextLayer *layer, int left_or_right )
 /* 更新当前光标所在的字符 对应于源文本中的位置 */
 {
 	int pos, max;
-	pos = TextLayer_Get_Cursor_CharPos( layer, left_or_right );
+	pos = TextLayer_GetCharPosUnderCursor( layer, left_or_right );
 	max = Queue_GetTotal( &layer->text_source_data );
 	//printf("pos: %d, max: %d\n", pos, max );
 	if( pos == -1 || pos > max ) {
@@ -1235,7 +1235,7 @@ TextLayer_Update_CurSrcPos( LCUI_TextLayer *layer, int left_or_right )
 }
 
 LCUI_EXPORT(LCUI_Pos)
-TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
+TextLayer_Cursor_SetPixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 /* 
  * 功能：根据传入的二维坐标，设定光标在的文本图层中的位置
  * 说明：该位置会根据当前位置中的字体位图来调整，确保光标显示在字体位图边上，而不
@@ -1398,7 +1398,7 @@ TextLayer_Text_DeleteChar(
  *  */
 {
 	int n;
-	n = TextLayer_Get_CharPos( layer, char_ptr, left_or_right );
+	n = TextLayer_GetCharPos( layer, char_ptr, left_or_right );
 	/* 将该字从源文本中移除 */
 	Queue_Delete( &layer->text_source_data, n );
 	return 0;
@@ -1637,7 +1637,7 @@ TextLayer_Cursor_GetPixelPos( LCUI_TextLayer *layer )
 }
 
 LCUI_EXPORT(int)
-TextLayer_Get_RowLen( LCUI_TextLayer *layer, int row )
+TextLayer_GetRowLen( LCUI_TextLayer *layer, int row )
 /* 获取指定行显式文字数 */
 {
 	int total;
@@ -1660,7 +1660,7 @@ TextLayer_CurRow_GetMaxHeight( LCUI_TextLayer *layer )
 /* 获取当前行的最大高度 */
 {
 	Text_RowData *row_ptr;
-	row_ptr = TextLayer_Get_CurRowData( layer );
+	row_ptr = TextLayer_GetCurRowData( layer );
 	if( !row_ptr ) {
 		return layer->default_data.pixel_size + 2;
 	}
@@ -1675,7 +1675,7 @@ TextLayer_GetRows( LCUI_TextLayer *layer )
 }
 
 LCUI_EXPORT(int)
-TextLayer_Get_Select_Text( LCUI_TextLayer *layer, char *out_text )
+TextLayer_GetSelectedText( LCUI_TextLayer *layer, char *out_text )
 /* 获取文本图层内被选中的文本 */
 { 
 	/* 如果选择了文本 */
@@ -1688,7 +1688,7 @@ TextLayer_Get_Select_Text( LCUI_TextLayer *layer, char *out_text )
 }
 
 LCUI_EXPORT(int)
-TextLayer_Copy_Select_Text( LCUI_TextLayer *layer )
+TextLayer_CopySelectedText( LCUI_TextLayer *layer )
 /* 复制文本图层内被选中的文本 */
 {
 	/* 如果选择了文本 */
@@ -1701,7 +1701,7 @@ TextLayer_Copy_Select_Text( LCUI_TextLayer *layer )
 }
 
 LCUI_EXPORT(int)
-TextLayer_Cut_Select_Text( LCUI_TextLayer *layer )
+TextLayer_CutSelectedText( LCUI_TextLayer *layer )
 /* 剪切文本图层内被选中的文本 */
 {
 	/* 如果选择了文本 */
