@@ -1,5 +1,6 @@
+// 测试图像显示
+
 #include <LCUI_Build.h>
-#include <unistd.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H 
 #include LC_WINDOW_H
@@ -9,50 +10,51 @@
 #include LC_GRAPH_H
 #include LC_RES_H
 
-int main(int argc,char*argv[])
-/* 主函数，程序的入口 */
+static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+{
+	LCUI_MainLoop_Quit(NULL);
+}
+
+int main( int argc, char*argv[] )
 { 
-	LCUI_Widget	*window, *label, *pic_box, *fore_box;
-	int width, height; 
-	/* 自定义默认字体文件位置 */
-	//Set_Default_Font("msyh.ttf");
-	/* 初始化LCUI */ 
-	LCUI_Init(argc, argv);
-	/* 创建一个LCUI程序窗口 */
-	width  = 320; /* 窗口的宽度 */
-	height = 240; /* 窗口的高度 */
-	/* 创建部件 */
-	window		= Create_Widget("window");
-	label		= Create_Widget("label");
-	pic_box		= Create_Widget("picture_box");
-	fore_box	= Create_Widget("picture_box");
-	 
-	Resize_Widget(fore_box, Size(190, 190));
-	Resize_Widget(pic_box, Size(135,135));
-	Resize_Widget(window, Size(width, height));
-	 
-	Set_Window_Title_Text(window, "头像");
-	
 	LCUI_Graph pic;
+	int width = 320, height = 240;
+	LCUI_Widget *window, *label, *pic_box, *fore_box;
+	
+	LCUI_Init();
 	Graph_Init(&pic); 
-	Set_PictureBox_Size_Mode(pic_box, SIZE_MODE_STRETCH); 
-	Set_PictureBox_Image_From_File(pic_box, "image.jpg");
-	Set_PictureBox_Image_From_File(fore_box, "border.png");
+	
+	window	 = Widget_New("window");
+	label	 = Widget_New("label");
+	pic_box	 = Widget_New("picture_box");
+	fore_box = Widget_New("picture_box");
+	 
+	Widget_Resize(fore_box, Size(190, 190));
+	Widget_Resize(pic_box, Size(135,135));
+	Widget_Resize(window, Size(width, height));
+	 
+	Window_SetTitleText(window, "头像");
+	
+	PictureBox_SetSizeMode(pic_box, SIZE_MODE_STRETCH); 
+	PictureBox_SetImageFile(pic_box, "image.jpg");
+	PictureBox_SetImageFile(fore_box, "border.png");
 	 
 	Label_Text(label, "蛋疼的头像");
 	
-	Set_Widget_Align(pic_box, ALIGN_MIDDLE_CENTER, Pos(0, -20));
-	Set_Widget_Align(fore_box, ALIGN_MIDDLE_CENTER, Pos(0, -20));
-	Set_Widget_Align(label, ALIGN_MIDDLE_CENTER, Pos(0, +75));
+	Widget_SetAlign(pic_box, ALIGN_MIDDLE_CENTER, Pos(0, -20));
+	Widget_SetAlign(fore_box, ALIGN_MIDDLE_CENTER, Pos(0, -20));
+	Widget_SetAlign(label, ALIGN_MIDDLE_CENTER, Pos(0, +75));
 	
-	Window_Client_Area_Add(window, label);
-	Window_Client_Area_Add(window, pic_box); 
-	Window_Client_Area_Add(window, fore_box);
+	Window_ClientArea_Add(window, label);
+	Window_ClientArea_Add(window, pic_box); 
+	Window_ClientArea_Add(window, fore_box);
 	
-	Show_Widget(label);
-	Show_Widget(pic_box);
-	Show_Widget(fore_box);
-	Show_Widget(window); 
+	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	
+	Widget_Show(label);
+	Widget_Show(pic_box);
+	Widget_Show(fore_box);
+	Widget_Show(window); 
 	return LCUI_Main(); 
 }
 
