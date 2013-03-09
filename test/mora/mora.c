@@ -42,11 +42,13 @@ left_stone, left_knife, left_cloth;
 static int 
 win = 0, lose = 0, standoff = 0; 
 
+/* 更新文本 */
 static void 
-update_text()
-/* 功能：更新文本 */
+update_text( void )
 {
-	Label_Text(label, TEXT_SCROE, win, lose, standoff); 
+	char str[256];
+	sprintf( str, TEXT_SCROE, win, lose, standoff );
+	Label_Text( label, str ); 
 }
 
 static void 
@@ -57,12 +59,12 @@ run_game(int select)
 	cpu_select = rand() % 3;  /* 产生3以内的随机数 */ 
 	/* 根据随机数的取值，让PictureBox部件显示不同的图像 */
 	if(cpu_select == 0) { /* 石头 */
-		Set_PictureBox_Image_From_Graph(cpu_pic_box, &stone); 
+		PictureBox_SetImage(cpu_pic_box, &stone); 
 	}
 	else if(cpu_select == 1) { /* 剪刀 */
-		Set_PictureBox_Image_From_Graph(cpu_pic_box, &knife); 
+		PictureBox_SetImage(cpu_pic_box, &knife); 
 	} else {/* 布 */
-		Set_PictureBox_Image_From_Graph(cpu_pic_box, &cloth); 
+		PictureBox_SetImage(cpu_pic_box, &cloth); 
 	}
 	if(cpu_select == select) {/* 如果出一样的,平局次数+1 */
 		standoff += 1; 
@@ -82,54 +84,55 @@ static void
 clear_game()
 /* 功能：清理游戏，恢复PictureBox部件显示的图像 */
 {
-	Set_PictureBox_Image_From_Graph( me_pic_box, &think ); 
-	Set_PictureBox_Image_From_Graph( cpu_pic_box, &think );
-	Disable_Widget(btn_next);
+	PictureBox_SetImage( me_pic_box, &think ); 
+	PictureBox_SetImage( cpu_pic_box, &think );
+	Widget_Disable(btn_next);
 }
 
-void select_stone(LCUI_Widget *widget, void *junk)
-/* 功能：玩家选择石头 */
+/* 玩家选择石头 */
+static void
+select_stone( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	/* 如果没有存储已水平翻转的图像，就进行水平翻转 */
-	if(!Graph_Valid(&left_stone)) {
-		Graph_Flip_Horizontal(&stone, &left_stone);
+	if(!Graph_IsValid(&left_stone)) {
+		Graph_HorizFlip(&stone, &left_stone);
 	}
 	/* 设定显示的图像为石头 */
-	Set_PictureBox_Image_From_Graph(me_pic_box, &left_stone);
-	Disable_Widget(btn_j);
-	Disable_Widget(btn_s);
-	Disable_Widget(btn_b);
-	Enable_Widget(btn_next);
+	PictureBox_SetImage(me_pic_box, &left_stone);
+	Widget_Disable(btn_j);
+	Widget_Disable(btn_s);
+	Widget_Disable(btn_b);
+	Widget_Enable(btn_next);
 	run_game(0);/* 进入游戏 */
 }
 
+/* 玩家选择剪刀 */
 static void 
-select_knife(LCUI_Widget *widget, void *junk)
-/* 功能：玩家选择剪刀 */
+select_knife( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
-	if(!Graph_Valid(&left_knife)) {
-		Graph_Flip_Horizontal(&knife, &left_knife);
+	if(!Graph_IsValid(&left_knife)) {
+		Graph_HorizFlip(&knife, &left_knife);
 	}
-	Set_PictureBox_Image_From_Graph(me_pic_box, &left_knife); 
-	Disable_Widget(btn_j);
-	Disable_Widget(btn_s);
-	Disable_Widget(btn_b);
-	Enable_Widget(btn_next);
+	PictureBox_SetImage(me_pic_box, &left_knife); 
+	Widget_Disable(btn_j);
+	Widget_Disable(btn_s);
+	Widget_Disable(btn_b);
+	Widget_Enable(btn_next);
 	run_game(1);
 }
 
+/* 玩家选择布 */
 static void 
-select_cloth(LCUI_Widget *widget, void *junk)
-/* 功能：玩家选择布 */
+select_cloth( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
-	if(!Graph_Valid(&left_cloth)) {
-		Graph_Flip_Horizontal( &cloth, &left_cloth );
+	if(!Graph_IsValid(&left_cloth)) {
+		Graph_HorizFlip( &cloth, &left_cloth );
 	}
-	Set_PictureBox_Image_From_Graph( me_pic_box, &left_cloth ); 
-	Disable_Widget( btn_j );
-	Disable_Widget( btn_s );
-	Disable_Widget( btn_b );
-	Enable_Widget( btn_next );
+	PictureBox_SetImage( me_pic_box, &left_cloth ); 
+	Widget_Disable( btn_j );
+	Widget_Disable( btn_s );
+	Widget_Disable( btn_b );
+	Widget_Enable( btn_next );
 	run_game(2);
 }
 
@@ -137,10 +140,10 @@ static void
 next()
 /* 功能：进行下一局 */
 {
-	Enable_Widget( btn_j );
-	Enable_Widget( btn_s );
-	Enable_Widget( btn_b );
-	Disable_Widget( btn_next );
+	Widget_Enable( btn_j );
+	Widget_Enable( btn_s );
+	Widget_Enable( btn_b );
+	Widget_Disable( btn_next );
 	clear_game();
 }
 
@@ -175,39 +178,44 @@ static void
 widgets_structure( void )
 {
 	/* 创建一个窗口 */
-	window = Create_Widget("window"); 
+	window = Widget_New("window"); 
 	
 	/* 创建label部件，用于显示文字 */ 
-	label = Create_Widget("label");
-	l_vs = Create_Widget("label");
+	label = Widget_New("label");
+	l_vs = Widget_New("label");
 	/* 创建几个按钮 */
-	btn_b = Create_Button_With_Text( TEXT_CLOTH ); 
-	btn_s = Create_Button_With_Text( TEXT_STONE );
-	btn_j = Create_Button_With_Text( TEXT_KNIFE );
-	btn_next = Create_Button_With_Text( NEXT_ONE );
-	btn_area = Create_Widget( NULL );
-	cpu_pic_box = Create_Widget("picture_box");
-	me_pic_box = Create_Widget("picture_box");
+	btn_b = Button_New( TEXT_CLOTH ); 
+	btn_s = Button_New( TEXT_STONE );
+	btn_j = Button_New( TEXT_KNIFE );
+	btn_next = Button_New( NEXT_ONE );
+	btn_area = Widget_New( NULL );
+	cpu_pic_box = Widget_New("picture_box");
+	me_pic_box = Widget_New("picture_box");
 	
+}
+
+static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *event )
+{
+	LCUI_MainLoop_Quit(NULL);
 }
 
 static void
 widgets_configure( void )
 {
 	/* 设定标题栏显示的文本 */
-	Set_Window_Title_Text( window, TEXT_WND_TITLE );
-	Set_Window_Title_Icon( window, &icon );
-	Resize_Widget( window, WND_SIZE );
+	Window_SetTitleText( window, TEXT_WND_TITLE );
+	Window_SetTitleIcon( window, &icon );
+	Widget_Resize( window, WND_SIZE );
 	/* 将部件加入至相应的容器 */
 	Widget_Container_Add( btn_area, btn_s );
 	Widget_Container_Add( btn_area, btn_j );
 	Widget_Container_Add( btn_area, btn_b );
 	Widget_Container_Add( btn_area, btn_next );
-	Window_Client_Area_Add( window, label );
-	Window_Client_Area_Add( window, l_vs );
-	Window_Client_Area_Add( window, me_pic_box );
-	Window_Client_Area_Add( window, cpu_pic_box );
-	Window_Client_Area_Add( window, btn_area );
+	Window_ClientArea_Add( window, label );
+	Window_ClientArea_Add( window, l_vs );
+	Window_ClientArea_Add( window, me_pic_box );
+	Window_ClientArea_Add( window, cpu_pic_box );
+	Window_ClientArea_Add( window, btn_area );
 
 	/* 设定label部件显示的文本内容 */
 	Label_Text( label,  TEXT_TIP );
@@ -215,61 +223,62 @@ widgets_configure( void )
 	/* 设定label部件中的字体大小为55像素，颜色为红色 */
 	Label_Text( l_vs, TEXT_VS );
 	/* 禁用按钮的自动尺寸调整 */
-	Widget_AutoSize( btn_b, FALSE, 0 );
-	Widget_AutoSize( btn_s, FALSE, 0 );
-	Widget_AutoSize( btn_j, FALSE, 0 );
-	Widget_AutoSize( btn_next, FALSE, 0 );
+	Widget_SetAutoSize( btn_b, FALSE, 0 );
+	Widget_SetAutoSize( btn_s, FALSE, 0 );
+	Widget_SetAutoSize( btn_j, FALSE, 0 );
+	Widget_SetAutoSize( btn_next, FALSE, 0 );
 	/* 调整这些部件的大小 */
-	Set_Widget_Size( btn_b, "78px", "30px" );
-	Set_Widget_Size( btn_s, "77px", "30px" );
-	Set_Widget_Size( btn_j, "77px", "30px" );
-	Set_Widget_Size( btn_next, "78px", "30px" );
-	Set_Widget_Size( btn_area, NULL, "30px" );
-	Set_Widget_Dock( btn_area, DOCK_TYPE_BOTTOM );
-	Resize_Widget(me_pic_box, Size(110, 140));
-	Resize_Widget(cpu_pic_box, Size(110, 140));
+	Widget_SetSize( btn_b, "78px", "30px" );
+	Widget_SetSize( btn_s, "77px", "30px" );
+	Widget_SetSize( btn_j, "77px", "30px" );
+	Widget_SetSize( btn_next, "78px", "30px" );
+	Widget_SetSize( btn_area, NULL, "30px" );
+	Widget_SetDock( btn_area, DOCK_TYPE_BOTTOM );
+	Widget_Resize( me_pic_box, Size(110, 140) );
+	Widget_Resize( cpu_pic_box, Size(110, 140) );
 	/* 自定义这四个按钮的风格 */
-	Custom_Button_Style(btn_b,    &btn_normal, 
-		&btn_over, &btn_down, &btn_focus, NULL); 
-	Custom_Button_Style(btn_s,    &btn_normal, 
-		&btn_over, &btn_down, &btn_focus, NULL); 
-	Custom_Button_Style(btn_j,    &btn_normal, 
-		&btn_over, &btn_down, &btn_focus, NULL); 
-	Custom_Button_Style(btn_next, &btn_normal, 
-		&btn_over, &btn_down, &btn_focus, NULL); 
+	Button_CustomStyle(	btn_b, &btn_normal, &btn_over, 
+				&btn_down, &btn_focus, NULL); 
+	Button_CustomStyle(	btn_s, &btn_normal, &btn_over,
+				&btn_down, &btn_focus, NULL); 
+	Button_CustomStyle(	btn_j, &btn_normal, &btn_over, 
+				&btn_down, &btn_focus, NULL); 
+	Button_CustomStyle(	btn_next, &btn_normal, &btn_over, 
+				&btn_down, &btn_focus, NULL); 
 	/* 设定部件的定位类型 */
-	Set_Widget_PosType( btn_s, POS_TYPE_STATIC );
-	Set_Widget_PosType( btn_j, POS_TYPE_STATIC );
-	Set_Widget_PosType( btn_b, POS_TYPE_STATIC );
-	Set_Widget_PosType( btn_next, POS_TYPE_STATIC );
+	Widget_SetPosType( btn_s, POS_TYPE_STATIC );
+	Widget_SetPosType( btn_j, POS_TYPE_STATIC );
+	Widget_SetPosType( btn_b, POS_TYPE_STATIC );
+	Widget_SetPosType( btn_next, POS_TYPE_STATIC );
 	/* 设定布局 */
-	Set_Widget_Align(me_pic_box, ALIGN_MIDDLE_LEFT, Pos(5, -5));
-	Set_Widget_Align(cpu_pic_box, ALIGN_MIDDLE_RIGHT, Pos(-5, -5));
-	Set_Widget_Align(label, ALIGN_TOP_CENTER, Pos(0, 3));
-	Set_Widget_Align(l_vs, ALIGN_MIDDLE_CENTER, Pos(0, 0));
+	Widget_SetAlign(me_pic_box, ALIGN_MIDDLE_LEFT, Pos(5, -5));
+	Widget_SetAlign(cpu_pic_box, ALIGN_MIDDLE_RIGHT, Pos(-5, -5));
+	Widget_SetAlign(label, ALIGN_TOP_CENTER, Pos(0, 3));
+	Widget_SetAlign(l_vs, ALIGN_MIDDLE_CENTER, Pos(0, 0));
 	/* 设定部件的边框及颜色 */
-	Set_Widget_Border(me_pic_box, RGB(0,0,0), Border(1, 1, 1, 1));
-	Set_Widget_Border(cpu_pic_box, RGB(0,0,0), Border(1, 1, 1, 1));
+	Widget_SetBorder(me_pic_box, Border(1, BORDER_STYLE_SOLID, RGB(0,0,0)));
+	Widget_SetBorder(cpu_pic_box, Border(1, BORDER_STYLE_SOLID, RGB(0,0,0)));
 	/* 关联这些按钮的单击事件 */ 
-	Widget_Clicked_Event_Connect(btn_s, select_stone, NULL);
-	Widget_Clicked_Event_Connect(btn_j, select_knife, NULL);
-	Widget_Clicked_Event_Connect(btn_b, select_cloth, NULL);
-	Widget_Clicked_Event_Connect(btn_next, next, NULL);
+	Widget_Event_Connect(btn_s, EVENT_CLICKED, select_stone );
+	Widget_Event_Connect(btn_j, EVENT_CLICKED, select_knife );
+	Widget_Event_Connect(btn_b, EVENT_CLICKED, select_cloth );
+	Widget_Event_Connect(btn_next, EVENT_CLICKED, next );
+	Widget_Event_Connect(Window_GetCloseButton(window), EVENT_CLICKED, destroy);
 }
 
 static void
 Show_GUI( void )
 {
-	Show_Widget( btn_s );
-	Show_Widget( btn_j );
-	Show_Widget( btn_b );
-	Show_Widget( label );
-	Show_Widget( btn_area );
-	Show_Widget( l_vs );
-	Show_Widget( me_pic_box );
-	Show_Widget( cpu_pic_box );
-	Show_Widget( btn_next );
-	Show_Widget( window );
+	Widget_Show( btn_s );
+	Widget_Show( btn_j );
+	Widget_Show( btn_b );
+	Widget_Show( label );
+	Widget_Show( btn_area );
+	Widget_Show( l_vs );
+	Widget_Show( me_pic_box );
+	Widget_Show( cpu_pic_box );
+	Widget_Show( btn_next );
+	Widget_Show( window );
 }
 
 static void 
@@ -283,7 +292,7 @@ Create_GUI( void )
 int main(int argc, char*argv[]) 
 {
 	setenv( "LCUI_FONTFILE", "../../fonts/msyh.ttf", FALSE );
-	LCUI_Init(argc, argv); /* 初始化LCUI */
+	LCUI_Init(); /* 初始化LCUI */
 	Create_GUI(); /* 创建图形界面 */
 	clear_game(); /* 清理游戏 */
 	Show_GUI(); /* 显示图形界面 */
