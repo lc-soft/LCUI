@@ -20,22 +20,13 @@ static void callback( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 
 #define TEST_1
 #ifdef TEST_1
-#ifdef LCUI_BUILD_IN_WIN32
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
-#else
 int main(int argc, char*argv[]) 
-#endif
 {
 	int mode;
 	LCUI_Widget *window, *text[2], *tb_username, *tb_password;
 	LCUI_Widget *area, *login_btn;
 	LCUI_Widget *fore_pb, *back_pb;
-	
-#ifdef LCUI_BUILD_IN_WIN32
-	//InitConsoleWindow();
-	Win32_LCUI_Init( hInstance );
-#endif
-	LCUI_Init(argc, argv);
+	LCUI_Init();
 	/* 创建所需的部件 */
 	window = Widget_New("window");
 	area = Widget_New(NULL);
@@ -119,7 +110,7 @@ int main(int argc, char*argv[])
 	char buff[256];
 	LCUI_Widget *window, *textbox;
 	
-	LCUI_Init(argc, argv);
+	LCUI_Init();
 	
 	window  = Widget_New("window");
 	textbox = Widget_New("text_box");
