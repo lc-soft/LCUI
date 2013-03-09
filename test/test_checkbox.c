@@ -14,6 +14,12 @@
 
 LCUI_Widget *checkbox[5], *button, *window, *label; 
 
+static void
+destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+{
+	LCUI_MainLoop_Quit(NULL);
+}
+
 static void 
 view_result( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
@@ -43,14 +49,14 @@ view_result( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 #ifdef LCUI_BUILD_IN_WIN32
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 #else
-int main(int argc, char*argv[]) 
+int main(void) 
 #endif
 {
 	int i;
 #ifdef LCUI_BUILD_IN_WIN32
 	Win32_LCUI_Init( hInstance );
 #endif
-	LCUI_Init( 0, NULL );
+	LCUI_Init();
 	/* 创建部件 */
 	window  = Widget_New("window");
 	label   = Widget_New("label");
@@ -91,6 +97,7 @@ int main(int argc, char*argv[])
 	Widget_Show(window); 
 	/* 为按钮部件关联点击事件，被关联的函数是view_result，它会在点击按钮后被调用 */
 	Widget_Event_Connect( button, EVENT_CLICKED, view_result );
+	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	return LCUI_Main();
 }
 
