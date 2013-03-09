@@ -44,7 +44,7 @@
 
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 
-#define __NEED_CATCHSCREEN__
+//#define __NEED_CATCHSCREEN__
 #ifdef __NEED_CATCHSCREEN__
 #include LC_GRAPH_H
 #include LC_DRAW_H
