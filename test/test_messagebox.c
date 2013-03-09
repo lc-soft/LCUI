@@ -1,3 +1,5 @@
+// 测试MessageBox
+
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
@@ -56,11 +58,11 @@ program_quit( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 	LCUI_MainLoop_Quit( NULL );
 }
 
-int main(int argc, char*argv[]) 
+int main(void)
 {
 	int  i, x, y = 3;
 	
-	LCUI_Init( 0, NULL );
+	LCUI_Init();
 	
 	window = Window_New( "测试MessageBox", NULL, Size(320,240) );
 	label_btn = Widget_New( "label" );
