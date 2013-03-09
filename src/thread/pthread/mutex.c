@@ -63,7 +63,7 @@ int LCUIMutex_Lock( LCUI_Mutex *mutex )
 }
 
 /* Unlock the mutex */
-int LCUIMutex_UnLock( LCUI_Mutex *mutex )
+int LCUIMutex_Unlock( LCUI_Mutex *mutex )
 {
 	return pthread_mutex_unlock( mutex );
 }

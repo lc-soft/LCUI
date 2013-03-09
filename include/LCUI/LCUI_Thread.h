@@ -105,6 +105,10 @@ _LCUIThread_Join( LCUI_Thread thread, void **retval );
 LCUI_EXPORT(LCUI_Thread)
 LCUIThread_GetRootThreadID( LCUI_Thread tid );
 
+/* 打印各个线程的信息 */
+LCUI_EXPORT(void)
+LCUIThread_PrintInfo( void );
+
 /* 创建并运行一个线程 */
 LCUI_EXPORT(int)
 LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg );
@@ -124,6 +128,10 @@ LCUIThread_Exit( void* retval );
 /* 撤销指定ID的程序的全部子线程 */
 LCUI_EXPORT(int)
 LCUIApp_CancelAllThreads( LCUI_ID app_id );
+
+/* 注册程序主线程 */
+LCUI_EXPORT(void)
+LCUIApp_RegisterMainThread( LCUI_ID app_id );
 
 /* 初始化线程模块 */
 LCUI_EXPORT(void)
