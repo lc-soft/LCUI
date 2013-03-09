@@ -114,6 +114,9 @@ test/test_gaussian_blur.c \
 test/test_widget_1.c \
 test/test_widget_2.c \
 test/test_widget_3.c \
+test/test_widget_4.c \
+test/test_widget_5.c \
+test/test_widget_6.c \
 test/test_timer.c \
 test/test_textbox.c \
 test/faceback.png \
@@ -203,19 +206,3 @@ test/clock/new_night_bg.png  \
 test/clock/night_min.png \
 test/clock/Makefile.am \
 test/clock/Makefile.in
-
-
-#
-#src/freetype/freetype-2.4.9.tar.bz2  \
-#src/freetype/freetype-doc-2.4.8.tar.bz2  \
-#src/freetype/ft2demos-2.4.8.tar.bz2 \
-#src/freetype/README \
-#src/jpeg/jpegsrc.v8d.tar.gz \
-#src/jpeg/README \
-#src/png/libpng-1.2.49.tar.gz \
-#src/png/libpng-1.5.10.tar.gz \
-#src/png/README \
-#src/tslib/tslib-1.0.tar.gz \
-#src/tslib/README \
-#src/zlib/zlib-1.2.6.tar.bz2 \
-#src/zlib/README 
