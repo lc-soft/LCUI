@@ -153,11 +153,11 @@ timer_list_process( void *arg )
 	while( !LCUI_Active() ) {
 		LCUI_MSleep(10);
 	}
-	while( LCUI_Active() || timer_thread_active ) { 
+	while( LCUI_Active() && timer_thread_active ) { 
 		timer = timer_list_update( timer_list );
 		if( !timer ) {
 			LCUI_MSleep( sleep_time );
-			if(sleep_time < 500) {
+			if(sleep_time < 100) {
 				sleep_time += 1;
 			}
 			continue;
@@ -294,7 +294,7 @@ timer_thread_start( LCUI_Thread *tid, LCUI_Queue *list )
 	timer_list_init( list );
 	timer_thread_active = TRUE;
 	/* 创建用于处理定时器列表的线程 */
-	return LCUIThread_Create( tid, timer_list_process, list );
+	return _LCUIThread_Create( tid, timer_list_process, list );
 }
 
 /* 停止定时器的处理线程，并销毁定时器列表 */
@@ -303,7 +303,7 @@ timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
 {
 	timer_thread_active = FALSE;
 	/* 等待定时器处理线程的退出 */
-	LCUIThread_Join( tid, NULL ); 
+	_LCUIThread_Join( tid, NULL ); 
 	/* 销毁定时器列表 */
 	timer_list_destroy( list ); 
 }
