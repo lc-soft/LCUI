@@ -111,7 +111,7 @@ void *change_fonttype()
 	char info[256];
 	for(;;) {
 		sprintf(info, "(%d/%d) %s", current+1, total_files, filename[current]);
-		Set_Window_Title_Text(window, info);
+		Window_SetTitleText(window, info);
 		Label_Refresh(text);
 		sleep(1);
 		++current;
@@ -119,19 +119,19 @@ void *change_fonttype()
 			current = 0;
 		}
 	}
-	LCUI_Thread_Exit(NULL);
+	LCUIThread_Exit(NULL);
 }
 
 int main(int argc, char *argv[])
 {
 	//thread_t t; 
-	setenv( "LCUI_FONTFILE", "../fonts/simsun.ttc", TRUE );
-	LCUI_Init(argc, argv);
-	window = Create_Widget("window");
-	text = Create_Widget("label"); 
+	setenv( "LCUI_FONTFILE", "../fonts/consola/consola.ttf", TRUE );
+	LCUI_Init();
+	window = Widget_New("window");
+	text = Widget_New("label"); 
 	//filename = scan_fontfile("../fonts/", &total_files); 
-	Resize_Widget(window, Size(320, 240));
-	Set_Window_Title_Text( window, "测试simsun.ttc" );
+	Widget_Resize(window, Size(320, 240));
+	Window_SetTitleText( window, "测试字体" );
 	Label_Text( text, 
 		"<size=10px>10px: 汉字，abcdefghijklmn,opqrstuvwxyz</size>\n"
 		"<size=11px>11px: 汉字，abcdefghijklmn,opqrstuvwxyz</size>\n" 
@@ -139,10 +139,10 @@ int main(int argc, char *argv[])
 		"<size=14px>14px: 汉字，ABCDEFGHIJKLMN,OPQRSTUVWXYZ</size>\n"
 		"<size=16px>16px: 汉字，1234567890.:,;(*!?)</size>\n"
 		"<size=18px>18px: 中国创造，慧及全球！</size>");
-	Set_Widget_Align(text, ALIGN_MIDDLE_CENTER, Pos(0,0));
-	Window_Client_Area_Add(window, text);
-	Show_Widget(text);
-	Show_Widget(window); 
-	//LCUI_Thread_Create(&t, NULL, change_fonttype, NULL);
+	Widget_SetAlign(text, ALIGN_MIDDLE_CENTER, Pos(0,0));
+	Window_ClientArea_Add(window, text);
+	Widget_Show(text);
+	Widget_Show(window); 
+	//LCUIThread_Create(&t, NULL, change_fonttype, NULL);
 	return LCUI_Main();
 }
