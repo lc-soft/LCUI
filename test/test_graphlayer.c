@@ -26,10 +26,10 @@ int main()
 	GraphLayer_Resize( b_glayer, 100, 100 );
 	GraphLayer_Resize( c_glayer, 80, 80 );
 	/* 填充颜色 */
-	Graph_Fill_Color( &root_glayer->graph, RGB(255,255,255) );
-	Graph_Fill_Color( &a_glayer->graph, RGB(255,50,50) );
-	Graph_Fill_Color( &b_glayer->graph, RGB(50,255,50) );
-	Graph_Fill_Color( &c_glayer->graph, RGB(50,50,255) );
+	Graph_FillColor( &root_glayer->graph, RGB(255,255,255) );
+	Graph_FillColor( &a_glayer->graph, RGB(255,50,50) );
+	Graph_FillColor( &b_glayer->graph, RGB(50,255,50) );
+	Graph_FillColor( &c_glayer->graph, RGB(50,50,255) );
 	/* 建立父子图层关系 */
 	GraphLayer_AddChild( b_glayer, c_glayer );
 	GraphLayer_AddChild( root_glayer, a_glayer );
@@ -49,4 +49,5 @@ int main()
 	write_png( OUTPUT_GRAPHFILE, &graph_buff );
 	printf( "please see file: %s \n", OUTPUT_GRAPHFILE );
 	GraphLayer_Free( root_glayer );
+	return 0;
 }
