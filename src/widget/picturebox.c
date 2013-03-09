@@ -289,7 +289,7 @@ PictureBox_ExecUpdate(LCUI_Widget *widget)
 	Graph_Free(&graph);
 	//printf("scale: %.4f\n", pic_box->scale);
 	//printf("PictureBox_ExecUpdate(): end\n");
-	Refresh_Widget(widget); 
+	Widget_Refresh(widget); 
 }
 
 /* 获取缩放比例 */
@@ -587,7 +587,7 @@ PictureBox_ResizeViewArea( LCUI_Widget *widget, int width, int height )
 	pic_box->read_box.height = height;
 	/* 更新图片盒子内的图像 */
 	Widget_Draw(widget);
-	Refresh_Widget(widget); 
+	Widget_Refresh(widget); 
 }
 
 /* 获取PictureBox部件内的图像 */
@@ -683,7 +683,7 @@ PictureBox_ZoomViewArea( LCUI_Widget *widget, double scale )
 	Update_BuffGraph(widget); 
 	Update_ReadBox(widget);
 	Widget_Draw(widget);
-	Refresh_Widget(widget);
+	Widget_Refresh(widget);
 	return 0;
 }
 
@@ -696,7 +696,7 @@ PictureBox_ExecResize(LCUI_Widget *widget)
 	
 	pic_box = Widget_GetPrivData(widget);
 	if( widget->size.w <= 0 || widget->size.h <= 0 ) {
-		Refresh_Widget(widget); 
+		Widget_Refresh(widget); 
 		return;
 	}
 	
@@ -734,7 +734,7 @@ PictureBox_ExecResize(LCUI_Widget *widget)
 		default : break;
 	}
 	
-	Refresh_Widget(widget); 
+	Widget_Refresh(widget); 
 }
 
 LCUI_EXPORT(void)
