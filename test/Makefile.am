@@ -6,6 +6,7 @@ INCLUDES = -I$(top_builddir)/include
 noinst_PROGRAMS = helloworld test_font test_radiobtn test_checkbox test_progressbar \
 test_button test_label test_loading ts_calibrate test_viewimage test_lcui_graph_mix \
 test_window test_rect_cut test_gaussian_blur test_widget_1 test_widget_2 test_widget_3 \
+test_widget_4 test_widget_5 test_widget_6 \
 test_timer test_textbox test_scrollbar graph2array test_graphlayer test_stylelib \
 test_messagebox
 
@@ -62,6 +63,15 @@ test_widget_2_LDADD	= $(top_builddir)/src/libLCUI.la
 
 test_widget_3_SOURCES	= test_widget_3.c
 test_widget_3_LDADD	= $(top_builddir)/src/libLCUI.la
+
+test_widget_4_SOURCES	= test_widget_4.c
+test_widget_4_LDADD	= $(top_builddir)/src/libLCUI.la
+
+test_widget_5_SOURCES	= test_widget_5.c
+test_widget_5_LDADD	= $(top_builddir)/src/libLCUI.la
+
+test_widget_6_SOURCES	= test_widget_6.c
+test_widget_6_LDADD	= $(top_builddir)/src/libLCUI.la
 
 test_timer_SOURCES	= test_timer.c
 test_timer_LDADD	= $(top_builddir)/src/libLCUI.la
