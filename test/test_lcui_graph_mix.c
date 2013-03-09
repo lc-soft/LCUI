@@ -13,8 +13,8 @@ int main()
 	
 	Graph_Init(&bg);
 	Graph_Init(&fg);
-	bg.have_alpha = IS_FALSE;
-	fg.have_alpha = IS_TRUE; 
+	bg.have_alpha = FALSE;
+	fg.have_alpha = TRUE; 
 	w = 1640;
 	h = 1480;
 	//为前景图和背景图分配内存
@@ -25,7 +25,7 @@ int main()
 	for(i=0; i<=255; i+=5){
 		t = clock(); 
 		nobuff_printf("[%2d] mix graph, alpha = %3d, use time: ", i, i);
-		Graph_Fill_Alpha(&fg, i);
+		Graph_FillAlpha(&fg, i);
 		Graph_Mix(&bg, &fg, Pos(0,0));
 		printf("%ldms\n", clock()-t);//结束计时，输出结果
 	} 
