@@ -199,9 +199,13 @@ ProgressBar_ProcMoveingLight(void *arg)
 /* 功能：移动进度条中闪光的位置 */
 {
 	int x=0;
-	LCUI_Widget *widget = (LCUI_Widget*)arg;
-	LCUI_Widget *flash = ProgressBar_GetMoveingLight(widget);
-	LCUI_ProgressBar *pb = Widget_GetPrivData(widget);
+	LCUI_Widget *widget;
+	LCUI_Widget *flash;
+	LCUI_ProgressBar *pb;
+	
+	widget = (LCUI_Widget*)arg;
+	flash = ProgressBar_GetMoveingLight(widget);
+	pb = Widget_GetPrivData(widget);
 	while(1) {
 		for(x=(0-flash->size.w); 
 			x<=flash->parent->size.w; 
@@ -224,7 +228,8 @@ ProgressBar_ExecShow(LCUI_Widget *widget)
 	if(_LCUIString_Cmp(&widget->style_name, "dynamic") == 0) {
 		if(pb->thread == 0) {
 			Widget_Show(pb->img_pic_box);
-			LCUIThread_Create(&pb->thread, ProgressBar_ProcMoveingLight, (void*)widget);
+			LCUIThread_Create(&pb->thread, 
+			ProgressBar_ProcMoveingLight, (void*)widget);
 		}
 	} else {
 		Widget_Hide(pb->img_pic_box);
