@@ -5,10 +5,14 @@
 ## 效果图
 ![screenshort 1](http://lcui.org/files/images/helloworld-01.png)
 ![screenshort 2](http://lcui.org/files/images/label-01.png)
-![screenshort 3](http://lcui.org/files/images/devlog/test_textbox-05.gif)
+![screenshort 3](http://lcui.org/files/images/devlog/test_textbox-07.gif)
 ![screenshort 4](http://lcui.org/files/images/devlog/2012-12-03-17-24-03.png)
-![screenshort 5](http://lcui.org/files/images/mora-01.gif)
+![screenshort 5](http://lcui.org/files/images/test_progressbar.gif)
 ![screenshort 6](http://lcui.org/files/images/test_LCPV-3.gif)
+![screenshort 7](http://lcui.org/files/images/devlog/test_windows-05.gif)
+![screenshort 8](http://lcui.org/files/images/devlog/messagebox-02.gif)
+![screenshort 9](http://lcui.org/files/images/devlog/test_scrollbar-02.gif)
+![screenshort 9](http://lcui.org/files/images/devlog/test_checkbox.gif)
 
 ## 说明
 
