@@ -38,8 +38,8 @@ test_move_widget(
 	LCUI_Queue rq;
 	LCUI_Rect bg_rect, rt, fg_rect;
 	
-	x = Get_Widget_Pos(widget).x;
-	y = Get_Widget_Pos(widget).y;
+	x = Widget_GetPos(widget).x;
+	y = Widget_GetPos(widget).y;
 	/* 求两点之间的距离 */
 	w = des_pos.x-x;
 	h = des_pos.y-y;
@@ -55,33 +55,33 @@ test_move_widget(
 	RectQueue_Init(&rq); 
 	
 	for(i=0; i<j; i++) {
-		bg_rect = Get_Widget_Rect(bg);
+		bg_rect = Widget_GetRect(bg);
 		x += w; y += h;
 		pos = Pos(x, y);
-		Move_Widget(widget, pos);
-		fg_rect = Get_Widget_Rect(widget);
+		Widget_Move(widget, pos);
+		fg_rect = Widget_GetRect(widget);
 		/* 分割前景和背景矩形的重叠区域，得到分割后的矩形 */
-		Cut_Overlay_Rect(bg_rect, fg_rect, &rq); 
+		LCUIRect_Cut(bg_rect, fg_rect, &rq); 
 		/* 根据分割后的矩形，设置子区域的尺寸和位置 */
 		for(z=0; RectQueue_Get(&rt, 0, &rq); ++z) {
-			Move_Widget(child_area[z], Pos_Sub(Pos(rt.x, rt.y), widget->pos)); 
-			Resize_Widget(child_area[z], Size(rt.width, rt.height));
+			Widget_Move(child_area[z], Pos_Sub(Pos(rt.x, rt.y), widget->pos)); 
+			Widget_Resize(child_area[z], Size(rt.width, rt.height));
 			Queue_Delete(&rq, 0);
 		} 
 		/* 如果两个矩形未重叠，就会重置这些区域的尺寸 */
 		for(; z<5; z++) {
-			Resize_Widget(child_area[z], Size(0, 0));
+			Widget_Resize(child_area[z], Size(0, 0));
 		}
-		sprintf( str, "测试矩形裁剪功能(FPS:%d)", LCUI_GetFPS() );
-		Set_Window_Title_Text( window, str );
-		usleep(10000);/* 停顿0.01秒 */
+		sprintf( str, "测试矩形裁剪功能(FPS:%d)", LCUIScreen_GetFPS() );
+		Window_SetTitleText( window, str );
+		LCUI_MSleep(10);/* 停顿0.01秒 */
 	} 
 }
 
-static void *
-test()
+static void test( void *unused )
 {
 	int i; 
+	char str[25];
 	/* 6个位置的坐标 */
 	LCUI_Pos pos[6]={
 		{0, 0},{220, 0},{220, 55},{0, 55},{0, 110},{220, 110}
@@ -94,65 +94,72 @@ test()
 	LCUI_Widget *bg, *label[5], *fg, *area[5];
 	
 	/* 创建前景和背景区域 */
-	bg = Create_Widget(NULL);
-	fg = Create_Widget(NULL);
+	bg = Widget_New(NULL);
+	fg = Widget_New(NULL);
 	/* 创建5个区域 */
 	for(i=0; i<5; i++) {
-		area[i]	= Create_Widget(NULL);  
-		label[i] = Create_Widget("label");
+		area[i]	= Widget_New(NULL);  
+		label[i] = Widget_New("label");
 	} 
 	/* 设置背景 */
-	Set_Widget_Backcolor(bg, RGB(50, 50, 255));
-	Set_Widget_Backcolor(fg, RGB(255, 50, 50));
-	Set_Widget_BG_Mode(bg, BG_MODE_FILL_BACKCOLOR);
-	Set_Widget_BG_Mode(fg, BG_MODE_FILL_BACKCOLOR);
+	Widget_SetBackgroundColor(bg, RGB(50, 50, 255));
+	Widget_SetBackgroundColor(fg, RGB(255, 50, 50));
+	Widget_SetBackgroundTransparent( bg, FALSE );
+	Widget_SetBackgroundTransparent( fg, FALSE );
 	/* 设置背景区域的布局 */
-	Set_Widget_Align(bg, ALIGN_MIDDLE_CENTER, Pos(0,0));
+	Widget_SetAlign(bg, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	/* 调整背景区域的尺寸 */
-	Resize_Widget(bg, Size(110, 110)); 
-	Resize_Widget(fg, Size(100, 100));
+	Widget_Resize(bg, Size(110, 110)); 
+	Widget_Resize(fg, Size(100, 100));
 	/* 将前景和背景区域加入至窗口客户区 */
-	Window_Client_Area_Add(window, bg);  
-	Window_Client_Area_Add(window, fg);  
+	Window_ClientArea_Add(window, bg);  
+	Window_ClientArea_Add(window, fg);  
 	/* 循环设置5个区域 */
 	for(i=0; i<5; i++) {
-		Set_Widget_BG_Mode(area[i], BG_MODE_FILL_BACKCOLOR);
-		Set_Widget_Backcolor(area[i], color[i]); 
-		Label_Text(label[i], "%d", i+1);
-		Set_Widget_Align(label[i], ALIGN_MIDDLE_CENTER, Pos(0,0));
+		Widget_SetBackgroundTransparent(area[i], FALSE);
+		Widget_SetBackgroundColor(area[i], color[i]); 
+		sprintf(str, "%d", i+1);
+		Label_Text(label[i], str);
+		Widget_SetAlign(label[i], ALIGN_MIDDLE_CENTER, Pos(0,0));
 		Widget_Container_Add(area[i], label[i]);
 		Widget_Container_Add(fg, area[i]);
-		Show_Widget(label[i]); 
-		Show_Widget(area[i]); 
+		Widget_Show(label[i]); 
+		Widget_Show(area[i]); 
 	}
 	/* 设置前景区域的初始位置 */
-	Set_Widget_Pos(fg, pos[0]);
+	Widget_SetPos(fg, pos[0]);
 	/* 显示部件 */
-	Show_Widget(bg);
-	Show_Widget(fg);
-	Show_Widget(window);
+	Widget_Show(bg);
+	Widget_Show(fg);
+	Widget_Show(window);
 	/* 开始移动前景区域 */
 	while(1) { 
 		for(i=0; i<6; ++i) {
 			test_move_widget(fg, area, pos[i], 100, bg);
 		}
-		Resize_Widget(fg, Size(140, 100));
+		Widget_Resize(fg, Size(140, 100));
 		for(i=4; i>=0; --i) {
 			test_move_widget(fg, area, pos[i], 100, bg); 
 		}
-		Resize_Widget(fg, Size(100, 100));
+		Widget_Resize(fg, Size(100, 100));
 	}
-	LCUI_Thread_Exit(NULL);
+	LCUIThread_Exit(NULL);
 }
 
-int main(int argc, char*argv[]) 
+static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
-	thread_t t;
-	LCUI_Init( argc, argv ); 
-	window = Create_Widget("window"); 
-	Resize_Widget( window, Size(320, 240) );
-	Set_Window_Title_Text( window, "测试矩形裁剪功能" );
+	LCUI_MainLoop_Quit(NULL);
+}
+
+int main(void)
+{
+	LCUI_Thread t;
+	LCUI_Init(); 
+	window = Widget_New("window"); 
+	Widget_Resize( window, Size(320, 240) );
+	Window_SetTitleText( window, "测试矩形裁剪功能" );
+	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 创建一个线程，以让区域移动 */
-	LCUI_Thread_Create(&t, NULL, test, NULL);
+	LCUIThread_Create(&t, test, NULL);
 	return LCUI_Main();
 }
