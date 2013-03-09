@@ -245,7 +245,7 @@ union_draw_method:;
 		/* 若窗口未获得焦点 */
 		if( !Widget_GetFocus( win_p ) ) {
 			back_color = RGB(255,255,255);
-			border_color = RGB(50,50,50); 
+			border_color = RGB(150,150,150); 
 		}
 		border = Border(1, BORDER_STYLE_SOLID, border_color);
 		Widget_SetBorder( client_area, border);
