@@ -164,7 +164,7 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	}
 	//printf("pos: %d,%d\n", pos.x, pos.y);
 	/* 根据像素坐标，设定文本光标的位置 */
-	TextLayer_Set_Cursor_PixelPos( layer, pos );
+	TextLayer_Cursor_SetPixelPos( layer, pos );
 	/* 获取光标的当前位置 */
 	pos = TextLayer_Cursor_GetPos( layer );
 	/* 主要是调用该函数更新当前文本浏览区域，以使光标处于显示区域内 */
@@ -184,7 +184,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	layer = TextBox_GetTextLayer( widget );
 	textbox = Widget_GetPrivData( widget );
 	cur_pos = TextLayer_Cursor_GetPos( layer );
-	cols = TextLayer_Get_RowLen( layer, cur_pos.y );
+	cols = TextLayer_GetRowLen( layer, cur_pos.y );
 	rows = TextLayer_GetRows( layer ); 
 	switch( event->key.key_code ) {
 	    case LCUIKEY_HOMEPAGE: //home键移动光标至行首
@@ -200,7 +200,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 			cur_pos.x--;
 		} else if( cur_pos.y > 0 ) {
 			cur_pos.y--;
-			cur_pos.x = TextLayer_Get_RowLen( layer, cur_pos.y );
+			cur_pos.x = TextLayer_GetRowLen( layer, cur_pos.y );
 		}
 		goto mv_cur_pos;
 		
@@ -1119,29 +1119,13 @@ TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
 	return pixel_pos;
 }
 
-LCUI_EXPORT(LCUI_Pos)
-TextBox_Get_Pixel_Pos(LCUI_Widget *widget, uint32_t char_pos)
-/* 根据源文本中的位置，获取该位置的字符相对于文本框的坐标 */
-{
-	LCUI_Pos pos;
-	pos.x = pos.y = 0;
-	return pos;
-}
-
-LCUI_EXPORT(uint32_t)
-TextBox_Get_Char_Pos( LCUI_Widget *widget, LCUI_Pos pixel_pos )
-/* 根据文本框的相对坐标，获取该坐标对应于源文本中的字符 */
-{
-	return 0;
-}
-
 LCUI_EXPORT(int)
 TextBox_GetSelectedText( LCUI_Widget *widget, char *out_text )
 /* 获取文本框内被选中的文本 */
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
-	return TextLayer_Get_Select_Text( layer, out_text );
+	return TextLayer_GetSelectedText( layer, out_text );
 }
 
 LCUI_EXPORT(int)
@@ -1150,7 +1134,7 @@ TextBox_CopySelectedText(LCUI_Widget *widget)
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
-	return TextLayer_Copy_Select_Text( layer );
+	return TextLayer_CopySelectedText( layer );
 }
 
 LCUI_EXPORT(int)
@@ -1159,7 +1143,7 @@ TextBox_CutSelectedText(LCUI_Widget *widget)
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
-	return TextLayer_Cut_Select_Text( layer );
+	return TextLayer_CutSelectedText( layer );
 }
 
 LCUI_EXPORT(void)
