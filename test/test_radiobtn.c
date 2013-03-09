@@ -12,7 +12,7 @@
 
 LCUI_Widget *age_rb[6], *button, *window, *age_label; 
 
-void view_result(LCUI_Widget *widget, LCUI_WidgetEvent *unused)
+static void view_result(LCUI_Widget *widget, LCUI_WidgetEvent *unused)
 {
 	char str[256]; 
 	strcpy(str, "你的年龄段是： ");
@@ -40,15 +40,19 @@ void view_result(LCUI_Widget *widget, LCUI_WidgetEvent *unused)
 	Widget_Disable(button);
 }
 
-int main(int argc, char*argv[])
-/* 主函数，程序的入口 */
+static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+{
+	LCUI_MainLoop_Quit(NULL);
+}
+
+int main(void)
 {
 	int i;
-	LCUI_Init(argc, argv);
+	LCUI_Init();
 	/* 创建部件 */
-	window  = Widget_New("window");
+	window = Widget_New("window");
 	age_label = Widget_New("label"); 
-	button	= Button_New("提交"); 
+	button = Button_New("提交"); 
 	age_rb[0] = RadioButton_New("A. 15岁以下");
 	age_rb[1] = RadioButton_New("B. 15-20岁");
 	age_rb[2] = RadioButton_New("C. 21-25岁");
@@ -93,6 +97,7 @@ int main(int argc, char*argv[])
 	}
 	Widget_Show(window); 
 	Widget_Event_Connect(button, EVENT_CLICKED, view_result );
+	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	LCUI_Main();
 	return 0;
 }
