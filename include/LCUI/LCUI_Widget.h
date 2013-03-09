@@ -327,11 +327,11 @@ LCUI_EXPORT(LCUI_Widget*)
 Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos );
 
 LCUI_EXPORT(int)
-Widget_Is_Active(LCUI_Widget *widget);
+Widget_IsActive(LCUI_Widget *widget);
 /* 功能：判断部件是否为活动状态 */ 
 
 LCUI_EXPORT(int)
-Empty_Widget();
+Empty_Widget(void);
 /* 
  * 功能：用于检测程序的部件列表是否为空 
  * 返回值：
@@ -531,11 +531,11 @@ Widget_Move(LCUI_Widget *widget, LCUI_Pos new_pos);
  * */ 
 
 LCUI_EXPORT(void)
-Update_Widget_Pos(LCUI_Widget *widget);
+Widget_UpdatePos(LCUI_Widget *widget);
 /* 功能：更新部件的位置 */ 
 
 LCUI_EXPORT(void)
-Update_Child_Widget_Pos(LCUI_Widget *widget);
+Widget_UpdateChildPos(LCUI_Widget *widget);
 /* 
  * 功能：更新指定部件的子部件的位置
  * 说明：当作为子部件的容器部件的尺寸改变后，有的部件的布局不为ALIGN_NONE，就需要重新
@@ -547,25 +547,25 @@ Widget_UpdateSize( LCUI_Widget *widget );
 /* 部件尺寸更新 */ 
 
 LCUI_EXPORT(void)
-Update_Child_Widget_Size(LCUI_Widget *widget);
+Widget_UpdateChildSize(LCUI_Widget *widget);
 /* 
  * 功能：更新指定部件的子部件的尺寸
  * 说明：当部件尺寸改变后，有的部件的尺寸以及位置是按百分比算的，需要重新计算。
  * */
  
 LCUI_EXPORT(void)
-Offset_Widget_Pos(LCUI_Widget *widget, LCUI_Pos offset);
+Widget_OffsetPos(LCUI_Widget *widget, LCUI_Pos offset);
 /* 功能：以部件原有的位置为基础，根据指定的偏移坐标偏移位置 */ 
 
 LCUI_EXPORT(void)
-Move_Widget_To_Pos(LCUI_Widget *widget, LCUI_Pos des_pos, int speed);
+Widget_MoveToPos(LCUI_Widget *widget, LCUI_Pos des_pos, int speed);
 /* 
  * 功能：将部件以指定的速度向指定位置移动 
  * 说明：des_pos是目标位置，speed是该部件的移动速度，单位为：像素/秒
  * */ 
 
 LCUI_EXPORT(void)
-Refresh_Widget(LCUI_Widget *widget);
+Widget_Refresh(LCUI_Widget *widget);
 /* 功能：刷新显示指定部件的整个区域图形 */ 
 
 /* 调整部件的尺寸 */

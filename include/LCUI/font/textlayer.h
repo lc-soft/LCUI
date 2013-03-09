@@ -131,7 +131,7 @@ TextLayer_GetSize ( LCUI_TextLayer *layer );
 /* 获取文本图层的实际尺寸 */
 
 LCUI_EXPORT(wchar_t *)
-TextLayer_Get_Text( LCUI_TextLayer *layer );
+TextLayer_GetText( LCUI_TextLayer *layer );
 /* 获取文本图层中的文本内容 */
 
 LCUI_EXPORT(void)
@@ -151,7 +151,7 @@ TextLayer_Text_Clear( LCUI_TextLayer *layer );
 /* 清空文本内容 */
 
 LCUI_EXPORT(void)
-TextLayer_Row_Set_End( LCUI_TextLayer *layer, uint_t row, uint_t start_cols );
+TextLayer_SetRowEnd( LCUI_TextLayer *layer, uint_t row, uint_t start_cols );
 /* 为指定行设定结束点，结束点及后面的数据将被删除，但不记录残余文本位图区域 */
 
 LCUI_EXPORT(int)
@@ -217,7 +217,7 @@ LCUI_EXPORT(int)
 TextLayer_Text_Add( LCUI_TextLayer *layer, char *utf8_text );
 
 LCUI_EXPORT(LCUI_Pos)
-TextLayer_Set_Cursor_PixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos );
+TextLayer_Cursor_SetPixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos );
 /* 
  * 功能：根据传入的二维坐标，设定光标在的文本图层中的位置
  * 说明：该位置会根据当前位置中的字体位图来调整，确保光标显示在字体位图边上，而不
@@ -251,7 +251,7 @@ TextLayer_Cursor_GetPixelPos( LCUI_TextLayer *layer );
 /* 获取文本图层的光标相对于容器位置，单位为像素 */
 
 LCUI_EXPORT(int)
-TextLayer_Get_RowLen( LCUI_TextLayer *layer, int row );
+TextLayer_GetRowLen( LCUI_TextLayer *layer, int row );
 /* 获取指定行显式文字数 */
 
 LCUI_EXPORT(int)
@@ -263,15 +263,15 @@ TextLayer_GetRows( LCUI_TextLayer *layer );
 /* 获取文本行数 */
 
 LCUI_EXPORT(int)
-TextLayer_Get_Select_Text( LCUI_TextLayer *layer, char *out_text );
+TextLayer_GetSelectedText( LCUI_TextLayer *layer, char *out_text );
 /* 获取文本图层内被选中的文本 */ 
 
 LCUI_EXPORT(int)
-TextLayer_Copy_Select_Text( LCUI_TextLayer *layer );
+TextLayer_CopySelectedText( LCUI_TextLayer *layer );
 /* 复制文本图层内被选中的文本 */
 
 LCUI_EXPORT(int)
-TextLayer_Cut_Select_Text( LCUI_TextLayer *layer );
+TextLayer_CutSelectedText( LCUI_TextLayer *layer );
 /* 剪切文本图层内被选中的文本 */
 
 LCUI_EXPORT(void)
