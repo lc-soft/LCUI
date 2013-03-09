@@ -195,9 +195,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Widget.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Widget.hpp" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Work.h" />
-    <ClInclude Include="..\..\..\include\LCUI\misc\delay.h" />
-    <ClInclude Include="..\..\..\include\LCUI\misc\rect.h" />
-    <ClInclude Include="..\..\..\include\LCUI\misc\string.h" />
     <ClInclude Include="..\..\..\include\LCUI\widget\activebox.h" />
     <ClInclude Include="..\..\..\include\LCUI\widget\button.h" />
     <ClInclude Include="..\..\..\include\LCUI\widget\checkbox.h" />
