@@ -52,7 +52,7 @@ static void Button_ExecDefalutUpdate( LCUI_Widget *widget )
 	LCUI_Border border;
 	
 	border = Border(1, BORDER_STYLE_SOLID, RGB(170,170,170));
-	Border_Radius( &border, 2 );
+	Border_Radius( &border, 1 );
 	Widget_SetBorder( widget, border );
 	Widget_SetBackgroundTransparent( widget, FALSE );
 	
@@ -86,11 +86,11 @@ static void Button_ExecCustomUpdate( LCUI_Widget *widget )
 	case WIDGET_STATE_DISABLE: img = &btn->btn_disable; break;
 	default : img = NULL; break;
 	}
+	Widget_SetBackgroundImage( widget, img );
 	/* 如果图像不可用，则使用默认样式 */
 	if( !Graph_IsValid(img) ) {
 		Button_ExecDefalutUpdate( widget );
 	} else {
-		Widget_SetBackgroundImage( widget, img );
 		Widget_SetBackgroundTransparent( widget, TRUE );
 		Widget_SetBackgroundLayout( widget, LAYOUT_STRETCH );
 	}
@@ -103,7 +103,7 @@ static void Button_ExecUpdate( LCUI_Widget *widget )
 	} else {
 		Button_ExecDefalutUpdate( widget );
 	}
-	Refresh_Widget( widget );
+	Widget_Refresh( widget );
 }
 
 /* 初始化按钮部件的数据 */
