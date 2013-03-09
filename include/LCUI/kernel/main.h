@@ -47,7 +47,7 @@ LCUI_BEGIN_HEADER
 typedef struct _LCUI_App 
 {
 	LCUI_ID id; /* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
-	
+	void (*func)(void);	/* 在LCUI退出时调用的函数 */
 	LCUI_Queue tasks;	/* 程序的任务队列 */
 	LCUI_Queue events;	/* 事件队列 */
 	LCUI_Queue widget_lib;	/* 部件类型库 */
@@ -117,6 +117,9 @@ LCUI_EXPORT(LCUI_App*) LCUIApp_GetSelf( void );
 
 /* 获取程序ID */
 LCUI_EXPORT(LCUI_ID) LCUIApp_GetSelfID( void );
+
+/* 注册终止函数，以在LCUI程序退出时调用 */
+LCUI_EXPORT(int) LCUIApp_AtQuit( void (*callback_func)(void) );
 /*--------------------------- End LCUIApp ----------------------------*/
 
 /*--------------------------- Main Loop ------------------------------*/

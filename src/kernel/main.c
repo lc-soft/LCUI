@@ -99,13 +99,12 @@ LCUIApp_GetSelfID( void )
 	return (LCUI_ID)LCUIThread_SelfID();
 }
 
-LCUI_EXPORT(void)
-LCUIApp_Init( LCUI_App *app )
-/* 功能：初始化程序数据结构体 */
+/* 初始化程序数据结构体 */
+static void LCUIApp_Init( LCUI_App *app )
 {
 	app->id = 0;
+	app->func = NULL;
 	AppTasks_Init( &app->tasks );
-	//EventSlots_Init(&app->key_event);
 	WidgetLib_Init(&app->widget_lib);
 }
 
@@ -175,6 +174,9 @@ static void LCUIApp_Destroy( void *arg )
 	if( !app ) {
 		return;
 	}
+	if( app->func ) {
+		app->func();
+	}
 	LCUIApp_CancelAllThreads( app->id ); /* 撤销这个程序的所有线程 */
 	LCUIApp_DestroyAllWidgets( app->id ); /* 销毁这个程序的所有部件 */
 }
@@ -194,10 +196,23 @@ static int LCUIAppList_Add( void )
 {
 	LCUI_App app;
 	
-	/* 初始化程序数据结构体 */
-	LCUIApp_Init (&app);
+	LCUIApp_Init (&app); /* 初始化程序数据结构体 */
 	app.id	= LCUIThread_SelfID(); /* 保存ID */ 
-	Queue_Add(&LCUI_Sys.app_list, &app);/* 添加至队列 */
+	Queue_Add(&LCUI_Sys.app_list, &app); /* 添加至队列 */
+	LCUIApp_RegisterMainThread( app.id ); /* 注册程序主线程 */
+	return 0;
+}
+
+/* 注册终止函数，以在LCUI程序退出时调用 */
+LCUI_EXPORT(int)
+LCUIApp_AtQuit( void (*callback_func)(void) )
+{
+	LCUI_App *app;
+	app = LCUIApp_GetSelf();
+	if( app == NULL || callback_func == NULL ) {
+		return -1;
+	}
+	app->func = callback_func;
 	return 0;
 }
 
@@ -210,7 +225,6 @@ static int LCUIApp_Quit(void)
 		printf("%s (): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
 		return -1;
 	} 
-	
 	return LCUIAppList_Delete(app->id); 
 }
 
