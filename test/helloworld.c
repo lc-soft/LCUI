@@ -8,13 +8,18 @@
 #include LC_LABEL_H 
 #include LC_RES_H
 
+static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+{
+	LCUI_MainLoop_Quit(NULL);
+}
+
 #ifdef __cplusplus
 #ifdef LCUI_BUILD_IN_WIN32
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
 	Win32_LCUI_Init( hInstance );
 #else
-int main(int argc, char*argv[]) 
+int main(void) 
 {
 #endif
 	LCUIApp app;
@@ -63,7 +68,7 @@ int main(int argc, char*argv[])
 	/* 将窗口客户区作为label部件的容器添加进去 */
 	Window_ClientArea_Add(window, label);
 	/* 居中显示 */
-	label->set_align(label, ALIGN_MIDDLE_CENTER, Pos(0,0));
+	Widget_SetAlign(label, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	/* 
 	 * 设定label部件显示的文本
 	 * <color=R,G,B>文字</color> 表示的是：“文字”将使用自定义颜色
@@ -83,9 +88,10 @@ int main(int argc, char*argv[])
 		"<size=24px>Hello,World!\n"
 		"世界,你好!\n</size>");
 #endif
+	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 显示部件 */
-	label->show(label); 
-	window->show(window); 
+	Widget_Show(label); 
+	Widget_Show(window); 
 	return LCUI_Main(); /* 进入主循环 */
 }
 
