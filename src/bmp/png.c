@@ -110,7 +110,7 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 	return 0;
 }
 
-int write_png(const char *file_name, LCUI_Graph *graph)
+LCUI_EXPORT(int) write_png(const char *file_name, LCUI_Graph *graph)
 /* 将图像数据写入至png文件 */
 {
 #ifdef USE_LIBPNG
