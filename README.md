@@ -12,7 +12,7 @@
 ![screenshort 7](http://lcui.org/files/images/devlog/test_windows-05.gif)
 ![screenshort 8](http://lcui.org/files/images/devlog/messagebox-02.gif)
 ![screenshort 9](http://lcui.org/files/images/devlog/test_scrollbar-02.gif)
-![screenshort 9](http://lcui.org/files/images/devlog/test_checkbox.gif)
+![screenshort 10](http://lcui.org/files/images/devlog/test_rect_cut-01.gif)
 
 ## Description
 
