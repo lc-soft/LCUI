@@ -67,7 +67,7 @@
 #  ifdef LCUI_EXPORTS
 #    define LCUI_EXPORT(type) extern __declspec(dllexport) type 
 #  else
-#    define LCUI_EXPORT(type) extern __declspec(dllimport) type 
+#    define LCUI_EXPORT(type) /*extern __declspec(dllimport)*/ type 
 #  endif
 #endif /* compiler */
 
