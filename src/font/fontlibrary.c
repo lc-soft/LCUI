@@ -445,7 +445,7 @@ FontLIB_LoadFontFile( const char *filepath )
 	/* 如果有同一文件路径的字族信息 */
 	id = FontLIB_FindInfoByFilePath( filepath );
 	if( id >= 0 ) {
-		return -1;
+		return id;
 	}
 	
 #ifdef LCUI_FONT_ENGINE_FREETYPE
