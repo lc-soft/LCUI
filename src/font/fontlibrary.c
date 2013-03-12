@@ -451,7 +451,6 @@ FontLIB_LoadFontFile( const char *filepath )
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 	error_code = FT_New_Face( library, filepath , 0 , &face );
 	if( error_code != 0 ) {
-		FT_Done_FreeType( library );
 		printf("%s: ", __FUNCTION__);
 		if ( error_code == FT_Err_Unknown_File_Format ) {
 			printf( "%s", FT_UNKNOWN_FILE_FORMAT );
