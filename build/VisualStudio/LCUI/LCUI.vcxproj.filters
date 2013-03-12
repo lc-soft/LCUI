@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="头文件">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
@@ -31,6 +27,13 @@
     <Filter Include="头文件\LCUI\font">
       <UniqueIdentifier>{e82633f2-1d26-4ccb-9d8b-acf3bca828a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="docs">
+      <UniqueIdentifier>{55f58a5e-9a60-4e9d-b65e-7377c4486a7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
     <Filter Include="源文件\widget">
       <UniqueIdentifier>{bb54efed-7e15-4cdf-a4ad-77a5c5ada8a1}</UniqueIdentifier>
     </Filter>
@@ -42,6 +45,9 @@
     </Filter>
     <Filter Include="源文件\thread">
       <UniqueIdentifier>{19d018c7-169c-4dcb-a52f-fe7bfd3750b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\thread\win32">
+      <UniqueIdentifier>{4238cadf-f552-49a7-9899-8400100a3536}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\input">
       <UniqueIdentifier>{3f77af46-2c50-47d7-88b8-ce1c02cd320b}</UniqueIdentifier>
@@ -57,12 +63,6 @@
     </Filter>
     <Filter Include="源文件\draw\in-core">
       <UniqueIdentifier>{4d1a3851-c7a0-4655-a805-5d407d3f2b19}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\thread\win32">
-      <UniqueIdentifier>{4238cadf-f552-49a7-9899-8400100a3536}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="docs">
-      <UniqueIdentifier>{55f58a5e-9a60-4e9d-b65e-7377c4486a7f}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\font">
       <UniqueIdentifier>{185bc9d3-84a5-49b4-9a7c-dc59c8f0b08e}</UniqueIdentifier>
