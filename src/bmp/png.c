@@ -9,18 +9,17 @@
 #include <png.h>
 #endif
 
-#include <stdlib.h>
-
 #define PNG_BYTES_TO_CHECK 4
+
+/* 载入png图片文件 */
 LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
-/* 载入PNG图片中的图形数据 */
 {
 #ifdef USE_LIBPNG
 	FILE *pic_fp;
 	png_structp png_ptr;
 	png_infop   info_ptr;
 	char buf[PNG_BYTES_TO_CHECK];
-	int   i, j, temp, pos, color_type, channels;
+	int i, j, temp, pos, color_type, channels;
 	png_bytep* row_pointers;
 
 	pic_fp = fopen(filepath, "rb");
@@ -45,13 +44,12 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 	png_init_io(png_ptr, pic_fp); 
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0);
 
-	/*获取宽度，高度，位深，颜色类型*/
 	channels       = png_get_channels(png_ptr, info_ptr);/*获取通道数*/
-	out->bit_depth = png_get_bit_depth(png_ptr, info_ptr);
 	color_type     = png_get_color_type(png_ptr, info_ptr);/*颜色类型*/
-	
+	out->bit_depth = png_get_bit_depth(png_ptr, info_ptr);/*获取位深*/
 	/* row_pointers里边就是rgba数据 */
 	row_pointers = png_get_rows(png_ptr, info_ptr);
+	//printf("channels: %d, colortype: %d\n", channels, color_type);
 	
 	out->type = TYPE_PNG;  /* 图片类型为png */
 	/*如果是RGB+alpha通道，或者RGB+其它字节*/
@@ -64,7 +62,7 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 			);
 		if(temp != 0) {
 			fclose(pic_fp);
-			printf("load_png(): error: "MALLOC_ERROR);
+			printf("%s (): error: "__FUNCTION__, MALLOC_ERROR);
 			return 1;
 		}
 		
@@ -87,7 +85,7 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 			);
 		if(temp != 0) {
 			fclose(pic_fp);
-			printf("load_png(): error: "MALLOC_ERROR);
+			printf("%s (): error: "__FUNCTION__, MALLOC_ERROR);
 			return 1;
 		}
 		
@@ -102,7 +100,6 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 	} else {
 		return FILE_ERROR_UNKNOWN_FORMAT;
 	}
-	/* 撤销数据占用的内存 */
 	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 #else
 	printf("warning: not PNG support!"); 
@@ -209,7 +206,7 @@ LCUI_EXPORT(int) write_png(const char *file_name, LCUI_Graph *graph)
 		free(row_pointers[j]);
 	}
 	free(row_pointers);
-
+	
 	fclose(fp);
 	Graph_Unlock(graph);
 #else
