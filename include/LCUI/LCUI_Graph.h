@@ -202,7 +202,11 @@ Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out );
 LCUI_EXPORT(int)
 Graph_HorizFlip( LCUI_Graph *src, LCUI_Graph *out );
 
-/* 为传入的图形填充颜色 */
+/* 填充矩形 */
+LCUI_EXPORT(int)
+Graph_FillRect( LCUI_Graph *graph, LCUI_RGB color, LCUI_Rect rect );
+
+/* 填充颜色 */
 LCUI_EXPORT(int)
 Graph_FillColor( LCUI_Graph *graph, LCUI_RGB color );
 

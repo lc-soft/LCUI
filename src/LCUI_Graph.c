@@ -759,9 +759,58 @@ Graph_HorizFlip( LCUI_Graph *src, LCUI_Graph *out )
 	return 0;  
 }
 
-/* 为传入的图形填充颜色 */
+/* 填充矩形 */
+LCUI_EXPORT(int)
+Graph_FillRect( LCUI_Graph *graph, LCUI_RGB color, LCUI_Rect rect )
+{
+	int pos, i, size;
+	LCUI_Rect src_rect;
+	uchar_t *r_ptr, *g_ptr, *b_ptr;
+	
+	src_rect = Graph_GetValidRect( graph ); 
+	graph = Graph_GetQuote( graph );
+	
+	if(! Graph_IsValid(graph) ) {
+		return -1;
+	}
+	rect.x = rect.x + src_rect.x;
+	rect.y = rect.y + src_rect.y;
+
+	if( rect.x < src_rect.x ) {
+		rect.width -= (src_rect.x-rect.x);
+		rect.x = src_rect.x;
+	}
+	if( rect.x + rect.width > src_rect.x + src_rect.width ) {
+		rect.width = src_rect.x + src_rect.width - rect.x;
+	}
+	
+	if( rect.y < src_rect.y ) {
+		rect.height -= (src_rect.y-rect.y);
+		rect.y = src_rect.y;
+	}
+	if( rect.y + rect.height > src_rect.x + src_rect.height ) {
+		rect.height = src_rect.y + src_rect.height - rect.y;
+	}
+	
+	size = sizeof(uchar_t) * rect.width;
+	pos = rect.x + rect.y * graph->width;
+	r_ptr = graph->rgba[0] + pos;
+	g_ptr = graph->rgba[1] + pos;
+	b_ptr = graph->rgba[2] + pos;
+	for(i=0; i<rect.height; ++i) { 
+		memset(r_ptr, color.red, size);
+		memset(g_ptr, color.green, size);
+		memset(b_ptr, color.blue, size);
+		r_ptr += graph->width;
+		g_ptr += graph->width;
+		b_ptr += graph->width;
+	}
+	return 0; 
+}
+
 LCUI_EXPORT(int)
 Graph_FillColor( LCUI_Graph *graph, LCUI_RGB color )
+/* 填充颜色 */
 {
 	int i, pos;
 	size_t size;
