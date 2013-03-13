@@ -383,11 +383,9 @@ LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 			}
 		}
 #ifdef LCUI_BUILD_IN_WIN32
-		if( GetMessage (&msg, NULL, 0, 0) ) {
+		if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE) ) {
 			TranslateMessage (&msg) ;
 			DispatchMessage (&msg) ;
-		} else {
-			loop->quit = TRUE;
 		}
 #endif
 	}
