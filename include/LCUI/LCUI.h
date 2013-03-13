@@ -170,12 +170,12 @@ typedef unsigned char LCUI_BOOL;
 /****************** 图像的布局 *****************/
 typedef enum _LAYOUT_TYPE
 {
-	LAYOUT_ZOOM	= 1,	  /* 缩放 */
-	LAYOUT_STRETCH	= 2,	  /* 拉伸 */
-	LAYOUT_CENTER	= 3,	  /* 居中 */
-	LAYOUT_TILE	= 4,	  /* 平铺 */
 	LAYOUT_NONE	= 0,	  /* 无 */
-	LAYOUT_NORMAL	= 0 
+	LAYOUT_NORMAL	= 0,
+	LAYOUT_ZOOM	= 1,	  /* 缩放 */
+	LAYOUT_STRETCH	= 1<<1,	  /* 拉伸 */
+	LAYOUT_CENTER	= 1<<2,	  /* 居中 */
+	LAYOUT_TILE	= 1<<3	  /* 平铺 */
 }LAYOUT_TYPE;
 /**********************************************/
 
