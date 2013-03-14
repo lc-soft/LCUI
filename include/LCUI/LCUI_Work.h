@@ -52,6 +52,7 @@ typedef enum {
 	EVENT_CLICKED,	/* 部件的点击事件 */
 	EVENT_MOVE,	/* 部件的移动事件 */
 	EVENT_RESIZE,	/* 部件尺寸改变 */
+	EVENT_REDRAW,	/* 部件重绘 */
 	EVENT_KEYBOARD,	/* 按键事件 */
 	EVENT_FOCUSIN,	/* 得到焦点 */
 	EVENT_FOCUSOUT	/* 失去焦点 */

@@ -2057,11 +2057,13 @@ Widget_ExecDrawBackground( LCUI_Widget *widget )
 	Graph_FillImage( graph, &bg->image, fill_mode, bg->color );
 }
 
+/* 执行部件图形更新操作 */
 LCUI_EXPORT(void)
 Widget_ExecDraw(LCUI_Widget *widget)
-/* 功能：执行部件图形更新操作 */
 { 
 	LCUI_Graph *graph;
+	LCUI_WidgetEvent event;
+
 	if( !widget ) {
 		return;
 	}
@@ -2069,12 +2071,16 @@ Widget_ExecDraw(LCUI_Widget *widget)
 	WidgetFunc_Call( widget, FUNC_TYPE_UPDATE );
 	/* 然后根据部件样式，绘制背景图形 */
 	Widget_ExecDrawBackground( widget );
-	/* 再调用函数进行绘制 */
+	/* 调用该类型部件默认的函数进行处理 */
 	WidgetFunc_Call( widget, FUNC_TYPE_DRAW );
 	graph = Widget_GetSelfGraph( widget );
 	/* 绘制边框线 */
 	Graph_DrawBorder( graph, widget->border );
 	Graph_UpdateAttr( graph );
+
+	event.type = EVENT_REDRAW;
+	/* 处理部件的RESIZE事件 */
+	Widget_DispatchEvent( widget, &event );
 }
 
 /* 获取指向部件自身图形数据的指针 */
@@ -2628,7 +2634,8 @@ Record_WidgetUpdate( LCUI_Widget *widget, void *data, DATATYPE type, int flag )
 		if( !tmp_ptr || tmp_ptr->widget != widget ) { 
 			continue;
 		}
-		if(tmp_ptr->type != temp.type) {
+		if(tmp_ptr->valid != temp.valid
+		|| tmp_ptr->type != temp.type) {
 			continue;
 		}
 		++n_found;
