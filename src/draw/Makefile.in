@@ -47,7 +47,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libdraw_la_LIBADD =
-am_libdraw_la_OBJECTS = border.lo rotate.lo slot.lo smooth.lo
+am_libdraw_la_OBJECTS = border.lo rotate.lo slot.lo smooth.lo line.lo
 libdraw_la_OBJECTS = $(am_libdraw_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -249,7 +249,7 @@ SUBDIRS = in-core
 AUTOMAKE_OPTIONS = foreign 
 INCLUDES = -I$(abs_top_srcdir)/include 
 noinst_LTLIBRARIES = libdraw.la
-libdraw_la_SOURCES = border.c rotate.c slot.c smooth.c
+libdraw_la_SOURCES = border.c rotate.c slot.c smooth.c line.c
 all: all-recursive
 
 .SUFFIXES:
@@ -303,6 +303,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/border.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/line.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rotate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slot.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/smooth.Plo@am__quote@
