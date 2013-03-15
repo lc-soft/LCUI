@@ -88,13 +88,11 @@ _LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 	return 0;
 }
 
-static LCUI_ThreadData *_LCUIThread_Self( void )
+static LCUI_ThreadData *_LCUIThread_Find( LCUI_Thread tid )
 {
 	int i, n;
-	unsigned int tid;
 	LCUI_ThreadData *thread_data;
 	
-	tid = GetCurrentThreadId();
 	n = Queue_GetTotal( &thread_database );
 	for(i=0; i<n; ++i) {
 		thread_data = Queue_Get( &thread_database, i );
@@ -136,7 +134,10 @@ LCUI_EXPORT(void)
 _LCUIThread_Exit( void *retval )
 {
 	LCUI_ThreadData *thread;
-	thread = _LCUIThread_Self();
+	LCUI_Thread tid;
+
+	tid = LCUIThread_SelfID();
+	thread = _LCUIThread_Find( tid );
 	if( !thread ) {
 		return;
 	}
@@ -147,7 +148,7 @@ LCUI_EXPORT(void)
 _LCUIThread_Cancel( LCUI_Thread thread )
 {
 	LCUI_ThreadData *data_ptr;
-	data_ptr = _LCUIThread_Self();
+	data_ptr = _LCUIThread_Find(thread);
 	TerminateThread( data_ptr->handle, FALSE );
 	_LCUIThread_Destroy( data_ptr->tid );
 }
@@ -156,7 +157,11 @@ LCUI_EXPORT(int)
 _LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
 	LCUI_ThreadData *data_ptr;
-	data_ptr = _LCUIThread_Self();
+
+	data_ptr = _LCUIThread_Find( thread );
+	if( data_ptr == NULL ) {
+		return -1;
+	}
 	WaitForSingleObject( data_ptr->handle, INFINITE );
 	CloseHandle( data_ptr->handle );
 	if( retval ) {
