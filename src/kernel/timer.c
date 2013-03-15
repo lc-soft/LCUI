@@ -183,7 +183,7 @@ find_timer( int timer_id )
 		if( !timer ) {
 			continue;
 		}
-		if( timer->id == timer_id ) { 
+		if( timer->id == timer_id ) {
 			break;
 		}
 	}
@@ -207,7 +207,7 @@ set_timer( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse )
 	timer.callback_func = callback_func;
 	timer.reuse = reuse;
 	timer.id = rand();
-	timer.app_id = LCUIApp_GetSelf()->id;
+	timer.app_id = LCUIApp_GetSelfID();
 	if( 0 > Queue_Add( &LCUI_Sys.timer_list, &timer ) ) {
 		return -1;
 	}
