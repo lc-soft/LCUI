@@ -102,7 +102,8 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 		Graph_Free( &graph );
 		return 0;
 	case WM_DESTROY:
-		PostQuitMessage (0) ;
+		PostQuitMessage(0);
+		LCUI_MainLoop_Quit(NULL);
 		return 0;
 	}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;

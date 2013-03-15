@@ -335,12 +335,16 @@ static int
 LCUIApp_RunTask( LCUI_App *app )
 { 
 	LCUI_Task *task;
+
+	Queue_Lock( &app->tasks );
 	task = Queue_Get( &app->tasks, 0 );
 	if( task == NULL ) {
+		Queue_Unlock( &app->tasks );
 		return -1;
 	}
 	Queue_DeletePointer( &app->tasks, 0 );
 	if( task->func == NULL ) {
+		Queue_Unlock( &app->tasks );
 		return -2;
 	}
 	/* 调用函数指针指向的函数，并传递参数 */
@@ -353,6 +357,7 @@ LCUIApp_RunTask( LCUI_App *app )
 		free( task->arg[1] );
 	}
 	free( task );
+	Queue_Unlock( &app->tasks );
 	return 0;
 }
 
@@ -383,7 +388,10 @@ LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 			}
 		}
 #ifdef LCUI_BUILD_IN_WIN32
-		if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE) ) {
+		if( PeekMessage( &msg, Win32_GetSelfHWND(), 0, 0, PM_REMOVE) ) {
+			if (msg.message == WM_QUIT) {
+				break;
+			}
 			TranslateMessage (&msg) ;
 			DispatchMessage (&msg) ;
 		}
