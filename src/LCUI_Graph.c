@@ -316,11 +316,12 @@ Graph_PrintInfo( LCUI_Graph *pic )
 		return;
 	}
 	
-	printf("width:%d, height:%d, alpha:%u, %s, %s, %s\n", 
-	pic->width, pic->height, pic->alpha, 
-	pic->have_alpha ? "have alpha channel":"no alpha channel",
-	pic->not_visible ? "not visible":"visible",
-	pic->is_opaque ? "is opaque":"not opaque");
+	printf("width:%d, ", pic->width);
+	printf("height:%d, ", pic->height);
+	printf("alpha:%u", pic->alpha);
+	printf("%s, ", pic->have_alpha ? "have alpha channel":"no alpha channel");
+	printf("%s, ", pic->not_visible ? "not visible":"visible");
+	printf("%s\n", pic->is_opaque ? "is opaque":"not opaque");
 	if( pic->quote ) {
 		printf("graph src:");
 		Graph_PrintInfo(Graph_GetQuote(pic));
@@ -714,46 +715,54 @@ Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out )
 
 /* 将图像进行水平翻转 */  
 LCUI_EXPORT(int)
-Graph_HorizFlip( LCUI_Graph *src, LCUI_Graph *out )
+Graph_HorizFlip( LCUI_Graph *img, LCUI_Graph *out )
 {
-	int x, y, pos, left, temp, count;  
-	int width = src->width, height = src->height;  
+	int x, y, temp; 
+	int src_left_pos, src_right_pos;
+	int des_left_pos, des_right_pos;
+	int width, height;  
 	uchar_t buff;  
+	LCUI_Graph *src;
+	LCUI_Rect rect;
 	
-	if(!Graph_IsValid(src)) {
+	if(!Graph_IsValid(img)) {
 		return -1;
 	}
-	
-	if(Graph_HaveAlpha(src)) {
-		out->have_alpha = TRUE;
-	}
+	src = Graph_GetQuote( img );
+	rect = Graph_GetValidRect( img );
+	width = img->width;
+	height = img->height;
+	out->have_alpha = src->have_alpha;
 	Graph_Create(out, width, height);
 	/* 水平翻转其实也就是交换两边的数据 */  
-	temp = width / 2.0;
-	for (y = 0; y < height; ++y) {   
-		pos = y * width;
-		left = pos;
+	temp = (int)(width / 2.0);
+	for (y = 0; y < height; ++y) {
+		des_left_pos = y * width;
+		des_right_pos = des_left_pos + width -1;
+		src_left_pos = (y + rect.y) * src->width + rect.x;
+		src_right_pos = src_left_pos + width -1;
 		for (x = 0; x <= temp; ++x)  {
-			count = left + width - x - 1;
-			
-			buff = src->rgba[0][pos]; 
-			out->rgba[0][pos] = src->rgba[0][count];  
-			out->rgba[0][count] = buff;
+			buff = src->rgba[0][src_left_pos]; 
+			out->rgba[0][des_left_pos] = src->rgba[0][src_right_pos];  
+			out->rgba[0][des_right_pos] = buff;
 			 
-			buff = src->rgba[1][pos]; 
-			out->rgba[1][pos] = src->rgba[1][count];  
-			out->rgba[1][count] = buff;
-			
-			buff = src->rgba[2][pos]; 
-			out->rgba[2][pos] = src->rgba[2][count];  
-			out->rgba[2][count] = buff;
-			
-			if(Graph_HaveAlpha(src)) {
-				buff = src->rgba[3][pos]; 
-				out->rgba[3][pos] = src->rgba[3][count];  
-				out->rgba[3][count] = buff;
+			buff = src->rgba[1][src_left_pos]; 
+			out->rgba[1][des_left_pos] = src->rgba[1][src_right_pos];  
+			out->rgba[1][des_right_pos] = buff;
+			 
+			buff = src->rgba[2][src_left_pos]; 
+			out->rgba[2][des_left_pos] = src->rgba[2][src_right_pos];  
+			out->rgba[2][des_right_pos] = buff;
+			 
+			if(src->have_alpha) {
+				buff = src->rgba[3][src_left_pos]; 
+				out->rgba[3][des_left_pos] = src->rgba[3][src_right_pos];  
+				out->rgba[3][des_right_pos] = buff;
 			}
-			++pos;
+			++src_left_pos;
+			++des_left_pos;
+			--src_right_pos;
+			--des_right_pos;
 		}
 	} 
 	return 0;  
@@ -876,7 +885,14 @@ Graph_Mix( LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos )
 	int total, y = 0, m, n, tmp_m, tmp_n;
 	LCUI_Graph *src, *des;
 	LCUI_Rect cut, src_rect, des_rect;
-	
+
+	if(!Graph_IsValid(back_graph) || !Graph_IsValid(fore_graph)) {
+		return -1;
+	}
+	if(fore_graph->width < 0 || fore_graph->height < 0 
+	|| back_graph->width < 0 || back_graph->height < 0 ) {
+		return -1;
+	}
 	src_rect = Graph_GetValidRect(fore_graph);
 	des_rect = Graph_GetValidRect(back_graph);
 	src = Graph_GetQuote(fore_graph);
@@ -889,10 +905,6 @@ Graph_Mix( LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos )
 		return -1;
 	}
 	
-	if(fore_graph->width < 0 || fore_graph->height < 0 
-	|| back_graph->width < 0 || back_graph->height < 0 ) {
-		return -1;
-	}
 	/* 如果前景图尺寸超出背景图的范围，需要更改前景图的像素读取范围 */ 
 	if( LCUIRect_GetCutArea(
 		Size( des_rect.width, des_rect.height),
@@ -1149,7 +1161,6 @@ Graph_FillImage(	LCUI_Graph *graph,	LCUI_Graph *bg,
 		Graph_FillAlpha( graph, 255 );
 		replace_mix = FALSE;
 	}
-	/* 填充背景色 */
 	if(!Graph_IsValid(bg) || !Graph_IsValid(graph)) {
 		return -1; 
 	}
