@@ -202,6 +202,10 @@ Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out );
 LCUI_EXPORT(int)
 Graph_HorizFlip( LCUI_Graph *src, LCUI_Graph *out );
 
+/* 将图像进行垂直翻转 */  
+LCUI_EXPORT(int)
+Graph_VertiFlip( LCUI_Graph *img, LCUI_Graph *out );
+
 /* 填充矩形 */
 LCUI_EXPORT(int)
 Graph_FillRect( LCUI_Graph *graph, LCUI_RGB color, LCUI_Rect rect );

@@ -768,6 +768,70 @@ Graph_HorizFlip( LCUI_Graph *img, LCUI_Graph *out )
 	return 0;  
 }
 
+/* 将图像进行垂直翻转 */  
+LCUI_EXPORT(int)
+Graph_VertiFlip( LCUI_Graph *img, LCUI_Graph *out )
+{
+	int x, y, temp; 
+	int src_top_pos, src_bottom_pos;
+	int des_top_pos, des_bottom_pos;
+	int src_start_top_pos, src_start_bottom_pos;
+	int des_start_top_pos, des_start_bottom_pos;
+	int width, height;  
+	uchar_t buff;  
+	LCUI_Graph *src;
+	LCUI_Rect rect;
+	
+	if(!Graph_IsValid(img)) {
+		return -1;
+	}
+	src = Graph_GetQuote( img );
+	rect = Graph_GetValidRect( img );
+	width = img->width;
+	height = img->height;
+	out->have_alpha = src->have_alpha;
+	Graph_Create(out, width, height); 
+
+	temp = (int)(height / 2.0);
+	/* 记录基坐标 */
+	des_start_top_pos = 0;
+	des_start_bottom_pos = (height-1)*width;
+	src_start_top_pos = rect.y * src->width + rect.x;
+	src_start_bottom_pos = (rect.y + height-1)*src->width + rect.x;
+	
+	for (x=0; x < width; ++x) {
+		/* 当前坐标=基坐标+x */
+		des_top_pos = des_start_top_pos + x;
+		des_bottom_pos = des_start_bottom_pos + x;
+		src_top_pos = src_start_top_pos + x;
+		src_bottom_pos = src_start_bottom_pos + x;
+		for (y = 0; y <= temp; ++y) {
+			buff = src->rgba[0][src_top_pos]; 
+			out->rgba[0][des_top_pos] = src->rgba[0][src_bottom_pos];  
+			out->rgba[0][des_bottom_pos] = buff;
+			
+			buff = src->rgba[1][src_top_pos]; 
+			out->rgba[1][des_top_pos] = src->rgba[1][src_bottom_pos];  
+			out->rgba[1][des_bottom_pos] = buff;
+			
+			buff = src->rgba[2][src_top_pos]; 
+			out->rgba[2][des_top_pos] = src->rgba[2][src_bottom_pos];  
+			out->rgba[2][des_bottom_pos] = buff;
+			
+			if(src->have_alpha) {
+				buff = src->rgba[3][src_top_pos]; 
+				out->rgba[3][des_top_pos] = src->rgba[3][src_bottom_pos];  
+				out->rgba[3][des_bottom_pos] = buff;
+			}
+			src_top_pos += src->width;
+			des_top_pos += width;
+			src_bottom_pos -= src->width;
+			des_bottom_pos -= width;
+		}
+	}
+	return 0;  
+}
+
 /* 填充矩形 */
 LCUI_EXPORT(int)
 Graph_FillRect( LCUI_Graph *graph, LCUI_RGB color, LCUI_Rect rect )
