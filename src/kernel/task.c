@@ -75,9 +75,12 @@ AppTasks_Add( LCUI_Task *task )
 	if( !app ) {
 		return -1;
 	}
+	Queue_Lock( &app->tasks );
 	if(Queue_Add( &app->tasks, task ) < 0 ) {
+		Queue_Unlock( &app->tasks );
 		return -2;
 	}
+	Queue_Unlock( &app->tasks );
 	return 0;
 }
 
@@ -87,10 +90,12 @@ Tasks_CustomAdd( LCUI_Queue *tasks, int mode, LCUI_Task *task )
 	int total, i;
 	LCUI_Task *tmp_task;
 	
+	Queue_Lock( tasks );
 	total = Queue_GetTotal(tasks);
 	/* 如果模式是“添加新的”模式 */
 	if( mode == ADD_MODE_ADD_NEW ) {
 		Queue_Add(tasks, task); 
+		Queue_Unlock( tasks );
 		return 0;
 	}
 	for (i=0; i < total; ++i) { 
@@ -109,11 +114,13 @@ Tasks_CustomAdd( LCUI_Queue *tasks, int mode, LCUI_Task *task )
 					if(tmp_task->arg[0] == task->arg[0] 
 					&& tmp_task->arg[1] == task->arg[1]) {
 						Destroy_Task( task );
+						Queue_Unlock( tasks );
 						return -1; 
 					}
 				} else {/* 否则，只是要求函数以及第1个参数不能全部重复 */
 					if(tmp_task->arg[0] == task->arg[0]) { 
 						Destroy_Task( task );
+						Queue_Unlock( tasks );
 						return -1; 
 					}
 				}
@@ -121,10 +128,12 @@ Tasks_CustomAdd( LCUI_Queue *tasks, int mode, LCUI_Task *task )
 			else if(Check_Option(mode, AND_ARG_S)) {
 				if(tmp_task->arg[1] == task->arg[1] ) {
 					Destroy_Task( task );
+					Queue_Unlock( tasks );
 					return -1; 
 				}
 			} else {/* 否则，只是要求函数不同 */ 
 				Destroy_Task( task );
+				Queue_Unlock( tasks );
 				return -1; 
 			}
 		}/* 如果要求的是替换模式 */
@@ -159,6 +168,7 @@ Tasks_CustomAdd( LCUI_Queue *tasks, int mode, LCUI_Task *task )
 	} else {
 		Queue_Replace( tasks, i, task ); 
 	}
+	Queue_Unlock( tasks );
 	return 0;
 }
 
