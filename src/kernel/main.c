@@ -347,6 +347,7 @@ LCUIApp_RunTask( LCUI_App *app )
 		Queue_Unlock( &app->tasks );
 		return -2;
 	}
+	Queue_Unlock( &app->tasks );
 	/* 调用函数指针指向的函数，并传递参数 */
 	task->func( task->arg[0], task->arg[1] );
 	/* 若需要在调用回调函数后销毁参数 */
@@ -357,7 +358,6 @@ LCUIApp_RunTask( LCUI_App *app )
 		free( task->arg[1] );
 	}
 	free( task );
-	Queue_Unlock( &app->tasks );
 	return 0;
 }
 
