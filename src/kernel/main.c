@@ -454,7 +454,7 @@ LCUI_Active()
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */
 LCUI_EXPORT(int)
-LCUI_Init( void )
+LCUI_Init( int mode, void *arg )
 {
 	int temp;
 	/* 如果LCUI没有初始化过 */
@@ -464,6 +464,10 @@ LCUI_Init( void )
 		srand(time(NULL));
 		LCUI_ShowCopyrightText();
 		
+		LCUI_Sys.mode = mode;
+#ifdef LCUI_BUILD_IN_WIN32
+		Win32_LCUI_Init((HINSTANCE)arg );
+#endif
 		LCUIAppList_Init();
 		/* 注册程序 */
 		temp = LCUIAppList_Add();
