@@ -52,23 +52,6 @@
 #include <string.h>
 #include <stdarg.h>
 
-#if defined(WIN32) || defined(_WIN32)
-#define LCUI_BUILD_IN_WIN32
-#define LCUI_THREAD_WIN32
-#define LCUI_VIDEO_DRIVER_WIN32
-#define LCUI_FONT_ENGINE_FREETYPE
-#define USE_LIBPNG
-#define USE_LIBJPEG
-#undef USE_TSLIB
-#undef LCUI_THREAD_PTHREAD
-#undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
-#else
-#include LC_CONFIG_H
-#define LCUI_BUILD_IN_LINUX
-#define LCUI_KEYBOARD_DRIVER_LINUX
-#define LCUI_MOUSE_DRIVER_LINUX
-#endif
-
 /* 打开文件时的错误 */
 #define FILE_ERROR_OPEN_ERROR		-1
 #define FILE_ERROR_SHORT_FILE		-2

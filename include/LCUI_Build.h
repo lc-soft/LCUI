@@ -39,8 +39,24 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
+#if defined(WIN32) || defined(_WIN32)
+#define LCUI_BUILD_IN_WIN32
+#define LCUI_THREAD_WIN32
+#define LCUI_VIDEO_DRIVER_WIN32
+#define LCUI_FONT_ENGINE_FREETYPE
+#define USE_LIBPNG
+#define USE_LIBJPEG
+#undef USE_TSLIB
+#undef LCUI_THREAD_PTHREAD
+#undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+#else
+#include LC_CONFIG_H
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
+#define LCUI_BUILD_IN_LINUX
+#define LCUI_KEYBOARD_DRIVER_LINUX
+#define LCUI_MOUSE_DRIVER_LINUX
 #endif
 
 #ifdef __cplusplus
@@ -70,6 +86,31 @@
 #    define LCUI_EXPORT(type) /*extern __declspec(dllimport)*/ type 
 #  endif
 #endif /* compiler */
+
+/* 自动模式，LCUI初始化时会自动选择一个模式 */
+#define LCUI_INIT_MODE_AUTO		0
+
+/* 全屏模式，使用整个屏幕进行图形显示 */
+#define LCUI_INIT_MODE_FULLSCREEN	1
+
+/* 窗口模式，LCUI的图形将输出至系统创建的窗口内 */
+#define LCUI_INIT_MODE_WINDOW		2
+
+/* LCUI模式，结合操作系统现有GUI系统，实现图形界面 */
+#define LCUI_INIT_MODE_LCUI		3
+
+/* 用宏包装了WIN32和linux平台下的main函数 */
+#ifdef LCUI_BUILD_IN_WIN32
+#define LCUI_ARGLIST		HINSTANCE hInstance,HINSTANCE hPrevInstance,PSTR szCmdLine,int iCmdShow
+#define LCUIMainFunc(x)		WINAPI WinMain(x)
+#define LCUI_DEFAULT_ARG	hInstance
+#define LCUI_DEFAULT_CONFIG	LCUI_INIT_MODE_AUTO,LCUI_DEFAULT_ARG
+#else
+#define LCUI_ARGLIST	 	int argc, char *argv
+#define	LCUIMainFunc(x)		main(x)
+#define LCUI_DEFAULT_ARG	NULL
+#define LCUI_DEFAULT_CONFIG	LCUI_INIT_MODE_AUTO,LCUI_DEFAULT_ARG
+#endif
 
 
 #define LC_STYLE_LIBRARY_H	<LCUI/LCUI_StyleLibrary.h>
@@ -117,7 +158,7 @@
 #define LC_TEXTSTYLE_H	<LCUI/font/textstyle.h>
 #define LC_TEXTLAYER_H	<LCUI/font/textlayer.h>
 
-/* 一些部件的头文件路径 */
+/* 一些GUI部件的头文件路径 */
 #define LC_WINDOW_H	<LCUI/widget/window.h>
 #define LC_WINDOW_HPP	<LCUI/widget/window.hpp>
 #define LC_LABEL_H	<LCUI/widget/label.h>
@@ -139,25 +180,25 @@
 #define _DEBUG_MSG(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
 
 #ifdef DEBUG
-#define DEBUG_MSG(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
+#define DEBUG_MSG(format, ...) _DEBUG_MSG(format, ...)
 #else
 #define DEBUG_MSG(format, ...) 
 #endif
 
 #ifdef DEBUG1
-#define DEBUG_MSG1(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
+#define DEBUG_MSG1(format, ...) _DEBUG_MSG(format, ...)
 #else
 #define DEBUG_MSG1(format, ...) 
 #endif
 
 #ifdef DEBUG2
-#define DEBUG_MSG2(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
+#define DEBUG_MSG2(format, ...) _DEBUG_MSG(format, ...)
 #else
 #define DEBUG_MSG2(format, ...) 
 #endif
 
 #ifdef DEBUG3
-#define DEBUG_MSG3(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
+#define DEBUG_MSG3(format, ...) _DEBUG_MSG(format, ...)
 #else
 #define DEBUG_MSG3(format, ...) 
 #endif
