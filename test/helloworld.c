@@ -14,14 +14,8 @@ static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 }
 
 #ifdef __cplusplus
-#ifdef LCUI_BUILD_IN_WIN32
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
+int LCUIMainFunc( LCUI_ARGLIST )
 {
-	Win32_LCUI_Init( hInstance );
-#else
-int main(void) 
-{
-#endif
 	LCUIApp app;
 	LCUIWindow wind;
 	LCUILabel text;
@@ -37,24 +31,18 @@ int main(void)
 	wind.addToClientArea( text );
 	text.show();
 	wind.show();
-	app.main();
+	return app.main();
 }
 
 #else
-#ifdef LCUI_BUILD_IN_WIN32
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
-#else
-int main(int argc, char*argv[]) 
-#endif
+
+int LCUIMainFunc( LCUI_ARGLIST )
 {
 	LCUI_Widget *window, *label;
 	LCUI_TextStyle style;
 	LCUI_Graph pic;
 	
-#ifdef LCUI_BUILD_IN_WIN32
-	Win32_LCUI_Init( hInstance );
-#endif
-	LCUI_Init();
+	LCUI_Init( LCUI_DEFAULT_CONFIG );
 	
 	/* 初始化结构体 */
 	Graph_Init( &pic );
