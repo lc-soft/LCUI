@@ -47,24 +47,25 @@
 
 LCUI_BEGIN_HEADER
 
-typedef enum {
+typedef enum WidgetEventType_ {
 	EVENT_DRAG,	/* 部件的拖动事件 */
 	EVENT_CLICKED,	/* 部件的点击事件 */
 	EVENT_MOVE,	/* 部件的移动事件 */
 	EVENT_RESIZE,	/* 部件尺寸改变 */
 	EVENT_REDRAW,	/* 部件重绘 */
 	EVENT_KEYBOARD,	/* 按键事件 */
+	EVENT_INPUT,	/* 输入事件 */
 	EVENT_FOCUSIN,	/* 得到焦点 */
 	EVENT_FOCUSOUT	/* 失去焦点 */
 } WidgetEventType; 
 
-typedef struct {
+typedef struct LCUI_WidgetResizeEvent_ {
 	uchar_t type;
 	LCUI_Size old_size;
 	LCUI_Size new_size;
 } LCUI_WidgetResizeEvent;
 
-typedef struct {
+typedef struct LCUI_WidgetDragEvent_ {
 	uchar_t type;
 	LCUI_Pos new_pos;	/* 部件的新全局坐标 */
 	LCUI_Pos cursor_pos;	/* 鼠标游标的坐标 */
@@ -72,19 +73,25 @@ typedef struct {
 	LCUI_BOOL end_click;	/* 标志，是否已经结束拖动 */
 } LCUI_WidgetDragEvent; 
 
-typedef struct {
+typedef struct LCUI_WidgetFocusEvent_ {
 	uchar_t type;
 	LCUI_BOOL focus;
 } LCUI_WidgetFocusEvent;
 
 typedef LCUI_KeyboardEvent LCUI_WidgetKeyboardEvent;
 
-typedef union {
-	unsigned char type;
+typedef struct LCUI_WidgetInputEvent_ {
+	uchar_t type;
+	wchar_t text[256];
+} LCUI_WidgetInputEvent;
+
+typedef union LCUI_WidgetEvent_ {
+	uchar_t type;
 	LCUI_WidgetDragEvent drag;
 	LCUI_WidgetKeyboardEvent key;
 	LCUI_WidgetFocusEvent focus;
 	LCUI_WidgetResizeEvent resize;
+	LCUI_WidgetInputEvent input;
 } LCUI_WidgetEvent;
 
 
