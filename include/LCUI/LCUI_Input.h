@@ -42,15 +42,6 @@
 #ifndef __LCUI_INPUT_H__
 #define __LCUI_INPUT_H__
 
-#ifdef LCUI_KEYBOARD_DRIVER_LINUX
-
-#define LCUIKEY_ESC		27
-#define LCUIKEY_ENTER		10
-#define LCUIKEY_BACKSPACE	127
-#define LCUIKEY_DELETE		295
-#define LCUIKEY_HOMEPAGE	293
-#define LCUIKEY_END		296
-
 #define LCUIKEY_SPACE	' '
 #define LCUIKEY_0	'0'
 #define LCUIKEY_1	'1'
@@ -90,32 +81,14 @@
 #define LCUIKEY_Y	'Y'
 #define LCUIKEY_Z	'Z'
 
-#define LCUIKEY_a	'a'
-#define LCUIKEY_b	'b'
-#define LCUIKEY_c	'c'
-#define LCUIKEY_d	'd'
-#define LCUIKEY_e	'e'
-#define LCUIKEY_f	'f'
-#define LCUIKEY_g	'g'
-#define LCUIKEY_h	'h'
-#define LCUIKEY_i	'i'
-#define LCUIKEY_j	'j'
-#define LCUIKEY_k	'k'
-#define LCUIKEY_l	'l'
-#define LCUIKEY_m	'm'
-#define LCUIKEY_n	'n'
-#define LCUIKEY_o	'o'
-#define LCUIKEY_p	'p'
-#define LCUIKEY_q	'q'
-#define LCUIKEY_r	'r'
-#define LCUIKEY_s	's'
-#define LCUIKEY_t	'i'
-#define LCUIKEY_u	'u'
-#define LCUIKEY_v	'v'
-#define LCUIKEY_w	'w'
-#define LCUIKEY_x	'x'
-#define LCUIKEY_y	'y'
-#define LCUIKEY_z	'z'
+#ifdef LCUI_KEYBOARD_DRIVER_LINUX
+
+#define LCUIKEY_ESC		27
+#define LCUIKEY_ENTER		10
+#define LCUIKEY_BACKSPACE	127
+#define LCUIKEY_DELETE		295
+#define LCUIKEY_HOMEPAGE	293
+#define LCUIKEY_END		296
 
 
 /* 这个是诺亚舟NP1500学习机的游戏键A和B键的键值 */
@@ -144,13 +117,16 @@
 #define LCUIKEY_DELETE		VK_DELETE
 #define LCUIKEY_HOMEPAGE	VK_HOME
 #define LCUIKEY_END		VK_END
-#define LCUIKEY_SPACE		VK_SPACE
 #define LCUIKEY_TAB		VK_TAB
 
-#define LCUIKEY_DOWN    VK_DOWN
-#define LCUIKEY_UP      VK_UP
-#define LCUIKEY_LEFT    VK_LEFT
-#define LCUIKEY_RIGHT   VK_RIGHT
+#define LCUIKEY_DOWN		VK_DOWN
+#define LCUIKEY_UP		VK_UP
+#define LCUIKEY_LEFT		VK_LEFT
+#define LCUIKEY_RIGHT		VK_RIGHT
+
+#define LCUIKEY_CAPITAL		VK_CAPITAL
+#define LCUIKEY_SHIFT		VK_SHIFT
+#define LCUIKEY_CONTROL		VK_CONTROL
 
 #endif
 
