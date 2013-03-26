@@ -102,12 +102,12 @@
 /* 用宏包装了WIN32和linux平台下的main函数 */
 #ifdef LCUI_BUILD_IN_WIN32
 #define LCUI_ARGLIST		HINSTANCE hInstance,HINSTANCE hPrevInstance,PSTR szCmdLine,int iCmdShow
-#define LCUIMainFunc(x)		WINAPI WinMain(x)
+#define LCUIMainFunc		WINAPI WinMain
 #define LCUI_DEFAULT_ARG	hInstance
 #define LCUI_DEFAULT_CONFIG	LCUI_INIT_MODE_AUTO,LCUI_DEFAULT_ARG
 #else
 #define LCUI_ARGLIST	 	int argc, char *argv
-#define	LCUIMainFunc(x)		main(x)
+#define	LCUIMainFunc		main
 #define LCUI_DEFAULT_ARG	NULL
 #define LCUI_DEFAULT_CONFIG	LCUI_INIT_MODE_AUTO,LCUI_DEFAULT_ARG
 #endif
