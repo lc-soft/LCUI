@@ -19,22 +19,22 @@ typedef struct LCUIIME_Info_ {
 	LCUIIME_Func func;
 } LCUIIME_Info;
 
-// Ö¸Ê¾ÊäÈë·¨ÁĞ±íÊÇ·ñ³õÊ¼»¯
+// æŒ‡ç¤ºè¾“å…¥æ³•åˆ—è¡¨æ˜¯å¦åˆå§‹åŒ–
 LCUI_BOOL imelist_init = FALSE;
 
-// ÊäÈë·¨ÁĞ±í
+// è¾“å…¥æ³•åˆ—è¡¨
 LCUI_Queue imelist;
 
-// ÊäÈë»º³åÇø£¬ÓÃÓÚ±£´æÊäÈë·¨ÊäÈëµÄÎÄ±¾
+// è¾“å…¥ç¼“å†²åŒºï¼Œç”¨äºä¿å­˜è¾“å…¥æ³•è¾“å…¥çš„æ–‡æœ¬
 static wchar_t text_input_buff[256];
 
-// µ±Ç°Ñ¡ÔñµÄÊäÈë·¨
+// å½“å‰é€‰æ‹©çš„è¾“å…¥æ³•
 static LCUIIME_Info* current_ime = NULL;
 
-// Ö¸Ê¾ÊÇ·ñ¿ªÆôÁË´óĞ´Ëø¶¨
+// æŒ‡ç¤ºæ˜¯å¦å¼€å¯äº†å¤§å†™é”å®š
 static LCUI_BOOL enable_capitals_lock = FALSE;
 
-/* Í¨¹ıID²éÕÒÊäÈë·¨ĞÅÏ¢ */
+/* é€šè¿‡IDæŸ¥æ‰¾è¾“å…¥æ³•ä¿¡æ¯ */
 static LCUIIME_Info* LCUIIME_Find( int ime_id )
 {
 	int n, i;
@@ -51,7 +51,7 @@ static LCUIIME_Info* LCUIIME_Find( int ime_id )
 	return NULL;
 }
 
-/* Í¨¹ıÃû×Ö²éÕÒÊäÈë·¨ĞÅÏ¢ */
+/* é€šè¿‡åå­—æŸ¥æ‰¾è¾“å…¥æ³•ä¿¡æ¯ */
 static LCUIIME_Info* LCUIIME_FindByName( const char *name )
 {
 	int n, i;
@@ -70,11 +70,11 @@ static LCUIIME_Info* LCUIIME_FindByName( const char *name )
 	return NULL;
 }
 
-/* ×¢²áÒ»¸öÊäÈë·¨ */
+/* æ³¨å†Œä¸€ä¸ªè¾“å…¥æ³• */
 LCUI_EXPORT(int)
 LCUIIME_Register( const char *ime_name, LCUIIME_Func *ime_func )
 {
-	static int ime_id = 0; // ÊäÈë·¨µÄID
+	static int ime_id = 0; // è¾“å…¥æ³•çš„ID
 	LCUIIME_Info *ptr_data;
 
 	if( !imelist_init ) {
@@ -93,7 +93,7 @@ LCUIIME_Register( const char *ime_name, LCUIIME_Func *ime_func )
 	return ime_id;
 }
 
-/* Ñ¡¶¨ÊäÈë·¨ */
+/* é€‰å®šè¾“å…¥æ³• */
 LCUI_EXPORT(LCUI_BOOL)
 LCUIIME_Select( int ime_id )
 {
@@ -118,19 +118,19 @@ LCUIIME_SelectByName( const char *name )
 	return TRUE;
 }
 
-/* ´ò¿ªÊäÈë·¨ */
+/* æ‰“å¼€è¾“å…¥æ³• */
 LCUIIME_Open(void)
 {
 
 }
 
-/* ¹Ø±ÕÊäÈë·¨ */
+/* å…³é—­è¾“å…¥æ³• */
 LCUIIME_Close(void)
 {
 
 }
 
-/* ÇĞ»»ÖÁÏÂÒ»¸öÊäÈë·¨ */
+/* åˆ‡æ¢è‡³ä¸‹ä¸€ä¸ªè¾“å…¥æ³• */
 LCUI_EXPORT(void)
 LCUIIME_Switch(void)
 {
@@ -149,14 +149,14 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 	char ch;
 	
 	if( event->key_code >= 'A' && event->key_code <= 'Z' ) {
-		/* Èç¹û¿ªÆôÁË´óĞ´Ëø¶¨ */
+		/* å¦‚æœå¼€å¯äº†å¤§å†™é”å®š */
 		if( enable_capitals_lock ) {
 			ch = event->key_code;
 		} else {
 			ch = event->key_code + 32;
 		}
 	}
-	/* Èç¹ûshift¼ü´¦ÓÚ°´ÏÂ×´Ì¬ */
+	/* å¦‚æœshifté”®å¤„äºæŒ‰ä¸‹çŠ¶æ€ */
 	if( LCUIKey_IsHit(LCUIKEY_SHIFT) ) {
 		if(ch >='a' && ch <= 'z') {
 			ch = ch - 32;
@@ -191,16 +191,16 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 	current_ime->func.totext( ch );
 }
 
-/* ¼ì²âÊäÈë·¨ÊÇ·ñÒª´¦Àí°´¼üÊÂ¼ş */
+/* æ£€æµ‹è¾“å…¥æ³•æ˜¯å¦è¦å¤„ç†æŒ‰é”®äº‹ä»¶ */
 LCUI_EXPORT(LCUI_BOOL)
 LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
 {
-	/* Èç¹û°´ÏÂÏÂµÄÊÇshift¼ü£¬µ«Ã»ÊÍ·Å£¬ÔòÖ±½ÓÍË³ö */
+	/* å¦‚æœæŒ‰ä¸‹ä¸‹çš„æ˜¯shifté”®ï¼Œä½†æ²¡é‡Šæ”¾ï¼Œåˆ™ç›´æ¥é€€å‡º */
 	if( event->key_code == LCUIKEY_SHIFT
 	 && event->type == LCUI_KEYDOWN ) {
 		return FALSE;
 	}
-	/* Èç¹ûÊÇcaps lock°´¼ü±»ÊÍ·Å */
+	/* å¦‚æœæ˜¯caps lockæŒ‰é”®è¢«é‡Šæ”¾ */
 	if( event->key_code == LCUIKEY_CAPITAL
 	&& event->type == LCUI_KEYUP ) {
 		enable_capitals_lock = !enable_capitals_lock;
@@ -212,7 +212,7 @@ LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
 	if( current_ime->func.prockey == NULL ) {
 		return FALSE;
 	}
-	/* Èç¹ûÊäÈë·¨Òª´¦Àí¸Ã¼ü£¬Ôòµ÷ÓÃLCUIIME_ToTextº¯Êı */
+	/* å¦‚æœè¾“å…¥æ³•è¦å¤„ç†è¯¥é”®ï¼Œåˆ™è°ƒç”¨LCUIIME_ToTextå‡½æ•° */
 	if( current_ime->func.prockey( event->key_code ) ) {
 		LCUIIME_ToText( event );
 		return TRUE;
@@ -220,7 +220,7 @@ LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
 	return FALSE;
 }
 
-/* Ìá½»ÊäÈë·¨ÊäÈëµÄÄÚÈİÖÁÄ¿±ê */
+/* æäº¤è¾“å…¥æ³•è¾“å…¥çš„å†…å®¹è‡³ç›®æ ‡ */
 LCUI_EXPORT(int)
 LCUIIME_Commit( const wchar_t *str )
 {
@@ -237,14 +237,14 @@ LCUIIME_Commit( const wchar_t *str )
 	if(! widget ) {
 		return -3;
 	}
-	/* ÉèÖÃÊÂ¼ş */
+	/* è®¾ç½®äº‹ä»¶ */
 	event.type = EVENT_INPUT;
 	wcscpy( event.input.text, str );
-	/* ÅÉ·¢ÊÂ¼ş */
+	/* æ´¾å‘äº‹ä»¶ */
 	return Widget_DispatchEvent( widget, &event );
 }
 
-/* ÉèÖÃÊäÈë·¨µÄÄ¿±ê */
+/* è®¾ç½®è¾“å…¥æ³•çš„ç›®æ ‡ */
 LCUI_EXPORT(int)
 LCUIIME_SetTarget( LCUI_Widget *widget )
 {
@@ -274,16 +274,16 @@ LCUIModule_IME_End(void)
 }
 
 
-/*-------------------------- Ä¬ÈÏµÄÊäÈë·¨ ------------------------------*/
+/*-------------------------- é»˜è®¤çš„è¾“å…¥æ³• ------------------------------*/
 
-// Ä¿±ê²¿¼ş
+// ç›®æ ‡éƒ¨ä»¶
 static LCUI_Widget *target_widget = NULL;
 
 /**
-ÅĞ¶Ï°´¼üÊÇ·ñĞèÒª´¦Àí£¬Ò²¿ÉÒÔÓÃÓÚÉèÖÃµ±Ç°µÄÊäÈë·¨£¬±ÈÈç£º
-°´shift¼ü£¬ÇĞ»»ÊäÈë·¨µÄÖĞÓ¢ÎÄÊäÈë£¬°´PageUPºÍPageDownÇĞ»»´Ê×éÒ³
-°´backspace¼ü£¬Èç¹ûÊäÈëµÄÄÚÈİÎª¿Õ£¬Ôòreturn FALSE;ÈÃLCUI½«¸Ã°´¼üÊÂ¼ş·¢¸ø²¿¼ş
-µÄÏàÓ¦»Øµ÷º¯Êı´¦Àí£»·ñÔò£¬return TRUE;²¢´ÓÊäÈëµÄÄÚÈİÖĞÉ¾³ıÒ»¸ö×Ö·û
+åˆ¤æ–­æŒ‰é”®æ˜¯å¦éœ€è¦å¤„ç†ï¼Œä¹Ÿå¯ä»¥ç”¨äºè®¾ç½®å½“å‰çš„è¾“å…¥æ³•ï¼Œæ¯”å¦‚ï¼š
+æŒ‰shifté”®ï¼Œåˆ‡æ¢è¾“å…¥æ³•çš„ä¸­è‹±æ–‡è¾“å…¥ï¼ŒæŒ‰PageUPå’ŒPageDownåˆ‡æ¢è¯ç»„é¡µ
+æŒ‰backspaceé”®ï¼Œå¦‚æœè¾“å…¥çš„å†…å®¹ä¸ºç©ºï¼Œåˆ™return FALSE;è®©LCUIå°†è¯¥æŒ‰é”®äº‹ä»¶å‘ç»™éƒ¨ä»¶
+çš„ç›¸åº”å›è°ƒå‡½æ•°å¤„ç†ï¼›å¦åˆ™ï¼Œreturn TRUE;å¹¶ä»è¾“å…¥çš„å†…å®¹ä¸­åˆ é™¤ä¸€ä¸ªå­—ç¬¦
 **/
 static LCUI_BOOL
 IME_ProcessKey( int key )
@@ -314,7 +314,7 @@ IME_ToText( char ch )
 	
 	text[0] = ch;
 	text[1] = '\0';
-	LCUIIME_Commit( text ); // Ö±½ÓÌá½»¸Ã×Ö·û
+	LCUIIME_Commit( text ); // ç›´æ¥æäº¤è¯¥å­—ç¬¦
 }
 /*------------------------------ END ----------------------------------*/
 
