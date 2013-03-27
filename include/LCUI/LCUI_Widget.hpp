@@ -58,6 +58,7 @@ public:
 	int addInvalidArea( LCUI_Rect );
 	int addInvalidArea( int, int, int, int );
 	void show( LCUI_BOOL );
+	int connect( WidgetEventType, void (*)(LCUI_Widget*, LCUI_WidgetEvent*) );
 	void enable( LCUI_BOOL );
 	void modal( LCUI_BOOL );
 	void move( LCUI_Pos );
@@ -268,6 +269,11 @@ void LCUIWidget::setBackgroundColor( LCUI_RGB color )
 void LCUIWidget::setBackgroundTransparent( LCUI_BOOL flag = TRUE )
 {
 	Widget_SetBackgroundTransparent( widget, flag );
+}
+
+int LCUIWidget::connect( WidgetEventType event_id, void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) )
+{
+	return Widget_Event_Connect( widget, event_id, func );
 }
 
 void LCUIWidget::destroy( void )
