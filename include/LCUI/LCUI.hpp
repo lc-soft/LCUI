@@ -43,9 +43,9 @@
 
 class LCUIApp {
 	public:
-	LCUIApp( void )
+	LCUIApp( int mode, void *arg )
 	{
-		LCUI_Init(LCUI_DEFAULT_CONFIG);
+		LCUI_Init( mode, arg );
 	}
 	int main( void )
 	{
