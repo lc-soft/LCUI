@@ -5,13 +5,7 @@
 #include LC_LCUI_H
 #include LC_INPUT_H
 #include LC_WIDGET_H
-
-typedef struct LCUIIME_Func_ {
-	LCUI_BOOL (*prockey)(int);
-	void (*settarget)(LCUI_Widget*);
-	LCUI_Widget *(*gettarget)(void);
-	void (*totext)(char);
-} LCUIIME_Func;
+#include LC_INPUT_METHOD_H
 
 typedef struct LCUIIME_Info_ {
 	int id;
@@ -85,11 +79,14 @@ LCUIIME_Register( const char *ime_name, LCUIIME_Func *ime_func )
 	}
 
 	ptr_data = (LCUIIME_Info*)malloc( sizeof(LCUIIME_Info) );
+	if( !ptr_data ) {
+		return -3;
+	}
 	_LCUIString_Copy( &ptr_data->name, ime_name );
 	ime_id = ime_id + 1;
 	ptr_data->id = ime_id;
 	memcpy( &ptr_data->func, ime_func, sizeof(LCUIIME_Func) );
-	Queue_Add( &imelist, ptr_data );
+	Queue_AddPointer( &imelist, ptr_data );
 	return ime_id;
 }
 
@@ -119,24 +116,55 @@ LCUIIME_SelectByName( const char *name )
 }
 
 /* 打开输入法 */
-LCUIIME_Open(void)
+static LCUI_BOOL
+LCUIIME_Open( LCUIIME_Info *ime )
 {
-
+	if( ime == NULL ) {
+		return FALSE;
+	}
+	if( ime->func.open == NULL ) {
+		return FALSE;
+	}
+	return ime->func.open();
 }
 
 /* 关闭输入法 */
-LCUIIME_Close(void)
+static LCUI_BOOL
+LCUIIME_Close( LCUIIME_Info *ime )
 {
-
+	if( ime == NULL ) {
+		return FALSE;
+	}
+	if( ime->func.close == NULL ) {
+		return FALSE;
+	}
+	return ime->func.close();
 }
 
 /* 切换至下一个输入法 */
 LCUI_EXPORT(void)
 LCUIIME_Switch(void)
 {
+	int i=0, n;
+	LCUIIME_Info *ime_ptr;
 
+	n = Queue_GetTotal( &imelist );
+	if( i>=n ) {
+		i = 0;
+	}
+	ime_ptr = Queue_Get( &imelist, i );
+	if( ime_ptr == NULL ) {
+		return;
+	}
+	if(ime_ptr != current_ime) {
+		LCUIIME_Close( current_ime );
+		current_ime = ime_ptr;
+		LCUIIME_Open( current_ime );
+	}
+	++i;
 }
 
+/* 销毁输入法信息 */
 static void LCUIIME_DestroyInfo( void *arg )
 {
 	LCUIIME_Info *p;
@@ -148,11 +176,10 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 {
 	char ch;
 	
-	if( event->key_code >= 'A' && event->key_code <= 'Z' ) {
-		/* 如果开启了大写锁定 */
-		if( enable_capitals_lock ) {
-			ch = event->key_code;
-		} else {
+	ch = event->key_code;
+	/* 如果没开启大写锁定，则将字母转换成小写 */
+	if( !enable_capitals_lock ) {
+		if( ch >= 'A' && ch <= 'Z' ) {
 			ch = event->key_code + 32;
 		}
 	}
@@ -188,6 +215,7 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 			}
 		}
 	}
+	_DEBUG_MSG("ch = %c\n", ch);
 	current_ime->func.totext( ch );
 }
 
@@ -195,7 +223,7 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 LCUI_EXPORT(LCUI_BOOL)
 LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
 {
-	/* 如果按下下的是shift键，但没释放，则直接退出 */
+	/* 如果按下的是shift键，但没释放，则直接退出 */
 	if( event->key_code == LCUIKEY_SHIFT
 	 && event->type == LCUI_KEYDOWN ) {
 		return FALSE;
@@ -258,15 +286,20 @@ LCUIIME_SetTarget( LCUI_Widget *widget )
 	return 0;
 }
 
+static int LCUI_DefaultIMERegister(void);
 
+/* 初始化LCUI输入法模块 */
 LCUI_EXPORT(void)
 LCUIModule_IME_Init(void)
 {
+	int ime_id;
 	Queue_Init( &imelist, sizeof(LCUIIME_Info), LCUIIME_DestroyInfo );
-	
 	imelist_init = TRUE;
+	ime_id = LCUI_DefaultIMERegister();
+	LCUIIME_Select( ime_id );
 }
 
+/* 停用LCUI输入法模块 */
 LCUI_EXPORT(void)
 LCUIModule_IME_End(void)
 {
@@ -289,8 +322,45 @@ static LCUI_BOOL
 IME_ProcessKey( int key )
 {
 	switch(key) {
-	case LCUIKEY_SHIFT:break;
+	case LCUIKEY_A:
+	case LCUIKEY_B:
+	case LCUIKEY_C:
+	case LCUIKEY_D:
+	case LCUIKEY_E:
+	case LCUIKEY_F:
+	case LCUIKEY_G:
+	case LCUIKEY_H:
+	case LCUIKEY_I:
+	case LCUIKEY_J:
+	case LCUIKEY_K:
+	case LCUIKEY_L:
+	case LCUIKEY_M:
+	case LCUIKEY_N:
+	case LCUIKEY_O:
+	case LCUIKEY_P:
+	case LCUIKEY_Q:
+	case LCUIKEY_R:
+	case LCUIKEY_S:
+	case LCUIKEY_T:
+	case LCUIKEY_U:
+	case LCUIKEY_V:
+	case LCUIKEY_W:
+	case LCUIKEY_X:
+	case LCUIKEY_Y:
+	case LCUIKEY_Z:
+	case LCUIKEY_0:
+	case LCUIKEY_1:
+	case LCUIKEY_2:
+	case LCUIKEY_3:
+	case LCUIKEY_4:
+	case LCUIKEY_5:
+	case LCUIKEY_6:
+	case LCUIKEY_7:
+	case LCUIKEY_8:
+	case LCUIKEY_9:
+	case LCUIKEY_SPACE:
 	return TRUE;
+	default:break;
 	}
 	return FALSE;
 }
@@ -314,7 +384,39 @@ IME_ToText( char ch )
 	
 	text[0] = ch;
 	text[1] = '\0';
+	_DEBUG_MSG("%S\n", text);
 	LCUIIME_Commit( text ); // 直接提交该字符
+}
+
+/**
+ 输入法被打开时的处理
+ 可以在输入法被打开时，初始化相关数据，链接至词库什么的
+ **/
+static LCUI_BOOL
+IME_Open(void)
+{
+	return TRUE;
+}
+
+
+/* 输入法被关闭时的处理 */
+static LCUI_BOOL
+IME_Close(void)
+{
+	return TRUE;
+}
+
+/* 注册LCUI默认的输入法 */
+static int LCUI_DefaultIMERegister(void)
+{
+	LCUIIME_Func ime_func;
+	ime_func.gettarget = IME_GetTarget;
+	ime_func.settarget = IME_SetTarget;
+	ime_func.prockey = IME_ProcessKey;
+	ime_func.totext = IME_ToText;
+	ime_func.close = IME_Close;
+	ime_func.open = IME_Open;
+	return LCUIIME_Register( "LCUI Input Method", &ime_func );
 }
 /*------------------------------ END ----------------------------------*/
 
