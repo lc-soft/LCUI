@@ -45,6 +45,7 @@
 #include LC_DISPLAY_H
 #include LC_CURSOR_H 
 #include LC_INPUT_H
+#include LC_INPUT_METHOD_H
 #include LC_ERROR_H
 #include LC_FONT_H 
 #include LC_WIDGET_H
@@ -121,6 +122,7 @@ static void LCUI_Quit( void )
 {
 	LCUI_Sys.state = KILLED;	/* 状态标志置为KILLED */
 	LCUIModule_Thread_End();
+	LCUIModule_IME_End();
 	LCUIModule_Event_End();
 	LCUIModule_Cursor_End();
 	LCUIModule_Widget_End();
@@ -478,6 +480,7 @@ LCUI_Init( int mode, void *arg )
 		/* 初始化各个模块 */
 		LCUIModule_Thread_Init();
 		LCUIModule_Event_Init();
+		LCUIModule_IME_Init();
 		LCUIModule_Font_Init();
 		LCUIModule_Timer_Init();
 		LCUIModule_Device_Init();
