@@ -51,6 +51,7 @@
 #include LC_LABEL_H
 #include LC_SCROLLBAR_H
 #include LC_INPUT_H
+#include LC_INPUT_METHOD_H
 #include LC_ERROR_H 
 
 typedef struct _LCUI_TextBox
@@ -84,6 +85,8 @@ static void
 _putin_textbox_cursor( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	active_textbox = widget;
+	/* 设定输入法的目标 */
+	LCUIIME_SetTarget( widget );
 	Widget_Draw( widget );
 }
 
@@ -171,8 +174,9 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	TextBox_Cursor_Move( widget, pos );
 }
 
+/* 处理按键事件 */
 static void
-TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
+TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
 	static char buff[5];
 	static int cols, flag, rows;
@@ -240,52 +244,15 @@ mv_cur_pos:;
 		
 		break;
 		
-	    default:;
-		if( textbox->limit_mode == 0 ) {
-			flag = 1;
-		} else {
-			flag = 0;
-		}
-		/* 处理文本框的字符输入限制 */
-		if( Check_Option( textbox->limit_mode, ONLY_0_TO_9 ) ) {
-			if( event->key.key_code >= '0'
-			 && event->key.key_code <= '9' ) {
-				++flag;
-			}
-		}
-		if( Check_Option( textbox->limit_mode, ONLY_a_TO_z ) ) {
-			if( event->key.key_code >= 'a' 
-			 && event->key.key_code <= 'z' ) {
-				++flag;
-			}
-		}
-		if( Check_Option( textbox->limit_mode, ONLY_A_TO_Z ) ) {
-			if( event->key.key_code >= 'A'
-			 && event->key.key_code <= 'Z' ) {
-				++flag;
-			}
-		}
-		if( Check_Option( textbox->limit_mode, ONLY_UNDERLINE ) ) {
-			if( event->key.key_code == '_' ) {
-				++flag;
-			}
-		}
-		//_DEBUG_MSG("input char: %c, %d\n", event->key.key_code, flag);
-		/* 如果该ASCII码代表的字符是可见的 */
-		if( flag == 1 && (event->key.key_code == 10 || 
-		 (event->key.key_code > 31
-		  && event->key.key_code < 126)) ) {
-			//wchar_t *text;
-			buff[0] = event->key.key_code;
-			buff[1] = 0;
-			TextBox_Text_Add( widget, buff);
-			//text = TextLayer_Get_Text( layer );
-			//free( text );
-		}
-		
-	    //向文本框中添加字符
-		break;
+	    default:break;
 	}
+}
+
+/* 处理输入法对文本框输入的内容 */
+static void
+TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
+{
+	// 待添加
 }
 
 static void 
@@ -397,7 +364,8 @@ TextBox_Init( LCUI_Widget *widget )
 	Widget_Event_Connect( widget, EVENT_FOCUSOUT, _putout_textbox_cursor );
 	Widget_Event_Connect( widget, EVENT_FOCUSIN, _putin_textbox_cursor );
 	/* 关联按键输入事件 */
-	Widget_Event_Connect( widget, EVENT_KEYBOARD, TextBox_Input );
+	Widget_Event_Connect( widget, EVENT_KEYBOARD, TextBox_ProcessKey );
+	Widget_Event_Connect( widget, EVENT_INPUT, TextBox_Input );
 	/* 默认不启用多行文本模式 */
 	TextBox_Multiline( widget, FALSE );
 }
