@@ -72,9 +72,12 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 
 	switch (message) {
 	case WM_KEYDOWN:
-		printf("WM_KEYDOWN: %ld\n",lParam);
+		printf("WM_KEYDOWN: %ld\n",wParam);
+		LCUIKeyboard_HitKey( wParam );
 		break;
 	case WM_KEYUP:
+		printf("WM_KEYUP: %ld\n",wParam);
+		LCUIKeyboard_FreeKey( wParam );
 		break;
 	case WM_LBUTTONDOWN:
 		Win32_LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
