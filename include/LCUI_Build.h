@@ -114,6 +114,7 @@
 
 
 #define LC_STYLE_LIBRARY_H	<LCUI/LCUI_StyleLibrary.h>
+#define LC_INPUT_METHOD_H	<LCUI/LCUI_InputMethod.h>
 
 #define LC_KERNEL_TIMER_H	<LCUI/kernel/timer.h>
 #define LC_KERNEL_DEV_H		<LCUI/kernel/device.h>
