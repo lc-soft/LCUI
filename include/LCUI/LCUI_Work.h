@@ -42,8 +42,9 @@
 #ifndef __LCUI_WORK_H__
 #define __LCUI_WORK_H__
 
-#define RELATIVE_POS	1 /* 相对坐标 */
-#define NORMAL_POS	0 /*普通坐标 */
+#define RELATIVE_POS		1	/* 相对坐标 */
+#define NORMAL_POS		0	/* 普通坐标 */
+#define MAX_INPUT_TEXT_LEN	256	/* 输入法输入的文本的最大长度 */
 
 LCUI_BEGIN_HEADER
 
@@ -82,7 +83,7 @@ typedef LCUI_KeyboardEvent LCUI_WidgetKeyboardEvent;
 
 typedef struct LCUI_WidgetInputEvent_ {
 	uchar_t type;
-	wchar_t text[256];
+	wchar_t text[MAX_INPUT_TEXT_LEN];
 } LCUI_WidgetInputEvent;
 
 typedef union LCUI_WidgetEvent_ {
