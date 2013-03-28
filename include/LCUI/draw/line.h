@@ -1,15 +1,15 @@
 
 #ifndef __LCUI_DRAW_LINE_H__
 #define __LCUI_DRAW_LINE_H__
-/* ªÊ÷∆ÀÆ∆Ωœﬂ */
+/* ÁªòÂà∂Ê∞¥Âπ≥Á∫ø */
 LCUI_EXPORT(void)
 Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start, int end_x );
 
-/* ªÊ÷∆¥π÷±œﬂ */
+/* ÁªòÂà∂ÂûÇÁõ¥Á∫ø */
 LCUI_EXPORT(void)
-Graph_DrawVertLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start, int end_y );
+Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start, int end_y );
 
-/* ªÊ÷∆œﬂÃıøÚ */
+/* ÁªòÂà∂Á∫øÊù°Ê°Ü */
 LCUI_EXPORT(void)
 Graph_DrawBoxLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Rect rect );
 #endif

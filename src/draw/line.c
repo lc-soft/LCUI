@@ -2,7 +2,7 @@
 #include LC_LCUI_H
 #include LC_GRAPH_H
 
-/* ªÊ÷∆ÀÆ∆Ωœﬂ */
+/* ÁªòÂà∂Ê∞¥Âπ≥Á∫ø */
 LCUI_EXPORT(void)
 Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start, int end_x )
 {
@@ -46,9 +46,9 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start
 	}
 }
 
-/* ªÊ÷∆¥π÷±œﬂ */
+/* ÁªòÂà∂ÂûÇÁõ¥Á∫ø */
 LCUI_EXPORT(void)
-Graph_DrawVertLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start, int end_y )
+Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start, int end_y )
 {
 	int k, pos, y, x, end_x;
 	LCUI_Rect area;
@@ -90,7 +90,7 @@ Graph_DrawVertLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start,
 	}
 }
 
-/* ªÊ÷∆œﬂÃıøÚ */
+/* ÁªòÂà∂Á∫øÊù°Ê°Ü */
 LCUI_EXPORT(void)
 Graph_DrawBoxLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Rect rect )
 {
@@ -105,7 +105,7 @@ Graph_DrawBoxLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Rect rect )
 
 	start.y = rect.y;
 	end = rect.y+rect.height;
-	Graph_DrawVertLine( graph, color, size, start, end );
+	Graph_DrawVertiLine( graph, color, size, start, end );
 	start.x = rect.x+rect.width-size;
-	Graph_DrawVertLine( graph, color, size, start, end );
+	Graph_DrawVertiLine( graph, color, size, start, end );
 }
