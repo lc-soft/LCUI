@@ -2,6 +2,7 @@
 #include LC_LCUI_H
 #include LC_GRAPH_H
 #include LC_DRAW_BORDER_H
+#include LC_DRAW_LINE_H
 #include <math.h>
 
 LCUI_EXPORT(void) Border_Init( LCUI_Border *border )
@@ -889,17 +890,14 @@ Graph_Draw_RoundBorder_BottomRight(
 LCUI_EXPORT(int) Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 /* 简单的为图形边缘绘制边框 */
 {
-	LCUI_Graph des_area;
+	int  radius;
 	LCUI_Rect rect;
-	int  radius, x, y,count, k, w[2], h[2], start_x, start_y;
+	LCUI_Pos start, end;
+	LCUI_Graph des_area;
 	
 	if( !Graph_IsValid(des) ) {
 		return -1;
 	}
-	w[0] = des->width - border.top_right_radius;
-	h[0] = des->height - border.bottom_left_radius;
-	w[1] = des->width - border.bottom_right_radius;
-	h[1] = des->height - border.bottom_right_radius;
 	
 	/* 绘制左上角的圆角，先引用左上角区域，再将圆绘制到这个区域里 */
 	radius = border.top_left_radius;
@@ -962,61 +960,24 @@ LCUI_EXPORT(int) Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 		border.bottom_color	, TRUE 
 	);
 	
+	start.x = border.top_left_radius;
+	start.y = 0;
+	end.x = des->width - border.top_right_radius;
 	/* 绘制上边框 */
-	k = des->width;
-	for(y=0;y<border.top_width;++y) {
-		k = y * des->width;
-		for(x = border.top_left_radius; x < w[0]; ++x) {
-			count = k + x;
-			des->rgba[0][count] = border.top_color.red;
-			des->rgba[1][count] = border.top_color.green;
-			des->rgba[2][count] = border.top_color.blue;
-			if( des->have_alpha ) {
-				des->rgba[3][count] = 255;
-			}
-		}
-	}
-	start_y = des->height - border.bottom_width;
+	Graph_DrawHorizLine( des, border.top_color, border.top_width, start, end.x );
 	/* 绘制下边的线 */
-	for(y=0;y<border.bottom_width;++y) {
-		k = (start_y+y) * des->width;
-		for(x = border.bottom_left_radius; x < w[1]; ++x) {
-			count = k + x;
-			des->rgba[0][count] = border.bottom_color.red;
-			des->rgba[1][count] = border.bottom_color.green;
-			des->rgba[2][count] = border.bottom_color.blue;
-			if( des->have_alpha ) {
-				des->rgba[3][count] = 255;
-			}
-		}
-	}
+	start.y = des->height - border.bottom_width;
+	end.x = des->width - border.bottom_right_radius;
+	Graph_DrawHorizLine( des, border.top_color, border.bottom_width, start, end.x );
 	/* 绘制左边的线 */
-	for(y=border.top_left_radius; y<h[0]; ++y) {
-		k = y * des->width;
-		for(x=0;x<border.left_width;++x) {
-			count = k + x;
-			des->rgba[0][count] = border.left_color.red;
-			des->rgba[1][count] = border.left_color.green;
-			des->rgba[2][count] = border.left_color.blue;
-			if( des->have_alpha ) {
-				des->rgba[3][count] = 255;
-			}
-		}
-	}
+	start.y = 0;
+	end.y = des->height - border.bottom_left_radius;
+	Graph_DrawVertiLine( des, border.left_color, border.left_width, start, end.y );
 	/* 绘制右边的线 */
-	start_x = des->width - border.right_width;
-	for(y=border.top_right_radius; y<h[1]; ++y) {
-		k = y * des->width + start_x;
-		for(x=0;x<border.right_width;++x) {
-			count = k + x;
-			des->rgba[0][count] = border.right_color.red;
-			des->rgba[1][count] = border.right_color.green;
-			des->rgba[2][count] = border.right_color.blue;
-			if( des->have_alpha ) {
-				des->rgba[3][count] = 255;
-			}
-		}
-	}
+	start.x = des->width - border.right_width;
+	start.y = border.top_right_radius;
+	end.y = des->height - border.bottom_right_radius;
+	Graph_DrawVertiLine( des, border.right_color, border.right_width, start, end.y );
 	/* 边框线绘制完成 */
 	return 0;
 }
