@@ -42,11 +42,6 @@
 #ifndef __LCUI_TEXTBOX_H__
 #define __LCUI_TEXTBOX_H__
 
-#define ONLY_0_TO_9	1
-#define ONLY_a_TO_z	1<<1
-#define ONLY_A_TO_Z	1<<2
-#define ONLY_UNDERLINE	1<<3
-
 LCUI_BEGIN_HEADER
 
 
@@ -150,19 +145,13 @@ TextBox_Text_SetPlaceHolder(	LCUI_Widget *widget,
 				LCUI_TextStyle *style,
 				const char *str );
 
-LCUI_EXPORT(void)
-TextBox_Text_Limit( LCUI_Widget *widget, int mode );
+
 /* 
- * 功能：限制能对文本框输入的字符 
- * 说明：参数mode的取值可为：
- *      ONLY_0_9       //只能输入0至9范围内的字符
- *      ONLY_a_z       //只能输入a至z范围内的字符
- *      ONLY_A_Z       //只能输入A至Z范围内的字符
- *      ONLY_UNDERLINE //只能输入下划线
- * 上述值可同时使用，可以这样：
- * ONLY_0_TO_9 | ONLY_a_TO_z | ONLY_A_TO_Z
- * 设置文本框，只能输入数字和字母
+ * 功能：限制能对文本框输入的字符
+ * 说明：str中存放限制范围内的字符，设置后，文本框只接受输入该字符串内的字符
  * */
+LCUI_EXPORT(void)
+TextBox_LimitInput( LCUI_Widget *widget, wchar_t *str );
 
 LCUI_END_HEADER
 

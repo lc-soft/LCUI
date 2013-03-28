@@ -59,11 +59,11 @@ typedef struct _LCUI_TextBox
 	LCUI_Widget *text;		/* 文本显示层 */
 	LCUI_Widget *cursor;		/* 光标 */
 	LCUI_Widget *scrollbar[2];	/* 两个滚动条 */
-	int limit_mode;			/* 限制模式 */
 	int block_size;			/* 块大小 */
 	LCUI_Queue text_block_buff;	/* 文本块缓冲区 */
 	LCUI_BOOL show_placeholder;	/* 表示占位符是否已经显示 */
 	LCUI_WString placeholder;	/* 文本框的占位符 */
+	LCUI_WString allow_input_char;	/* 允许输入的字符 */
 	wchar_t password_char_bak;	/* 屏蔽符的副本 */
 	LCUI_TextStyle placeholder_style;	/* 占位符的文本样式 */
 	LCUI_TextStyle textstyle_bak;		/* 文本框内文本样式的副本 */
@@ -252,7 +252,33 @@ mv_cur_pos:;
 static void
 TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
-	// 待添加
+	unsigned int i;
+	wchar_t *ptr, *tmp_ptr, *ptr_last;
+	LCUI_TextBox *textbox;
+
+	ptr = event->input.text;
+	ptr_last = ptr + MAX_INPUT_TEXT_LEN;
+	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	if( textbox->allow_input_char.length > 0 ) {
+		for( ; ptr<ptr_last && *ptr!='\0'; ++ptr ) {
+			/* 判断当前字符是否为限制范围内的字符 */
+			for( i=0; i<textbox->allow_input_char.length; ++i ) {
+				if( textbox->allow_input_char.string[i] == *ptr ) {
+					break;
+				}
+			}
+			/* 如果已提前结束循环，则表明当前字符是允许的 */
+			if( i < textbox->allow_input_char.length ) {
+				continue;
+			}
+			/* 否则不是允许的字符，需移除该字符 */
+			for( tmp_ptr=ptr; tmp_ptr<ptr_last
+			 && *tmp_ptr!='\0'; ++tmp_ptr ) {
+				*tmp_ptr = *(tmp_ptr+1);
+			}
+		}
+	}
+	TextBox_Text_AddW( widget, event->input.text );
 }
 
 static void 
@@ -316,10 +342,10 @@ TextBox_Init( LCUI_Widget *widget )
 	textbox->cursor->focus = FALSE;
 	textbox->scrollbar[0]->focus = FALSE;
 	textbox->scrollbar[1]->focus = FALSE;
-	textbox->limit_mode = 0;
 	textbox->block_size = 256;
 	textbox->show_placeholder = FALSE;
 	LCUIWString_Init( &textbox->placeholder );
+	LCUIWString_Init( &textbox->allow_input_char );
 	TextStyle_Init( &textbox->placeholder_style );
 	TextStyle_FontColor( &textbox->placeholder_style, RGB(100,100,100) );
 	Label_AutoSize( textbox->text, FALSE, 0 );
@@ -1177,23 +1203,16 @@ TextBox_Text_SetPlaceHolder(	LCUI_Widget *widget,
 	free( unicode_str );
 }
 
-LCUI_EXPORT(void)
-TextBox_Text_Limit( LCUI_Widget *widget, int mode )
 /* 
- * 功能：限制能对文本框输入的字符 
- * 说明：参数mode的取值可为：
- *      ONLY_0_9       //只能输入0至9范围内的字符
- *      ONLY_a_z       //只能输入a至z范围内的字符
- *      ONLY_A_Z       //只能输入A至Z范围内的字符
- *      ONLY_UNDERLINE //只能输入下划线
- * 上述值可同时使用，可以这样：
- * ONLY_0_TO_9 | ONLY_a_TO_z | ONLY_A_TO_Z
- * 设置文本框，只能输入数字和字母
+ * 功能：限制能对文本框输入的字符
+ * 说明：str中存放限制范围内的字符，设置后，文本框只接受输入该字符串内的字符
  * */
+LCUI_EXPORT(void)
+TextBox_LimitInput( LCUI_Widget *widget, wchar_t *str )
 {
 	LCUI_TextBox *textbox;
 	
 	textbox = Widget_GetPrivData( widget );
-	textbox->limit_mode = mode;
+	_LCUIWString_Copy( &textbox->allow_input_char, str );
 }
 /*--------------------------- End Public -----------------------------*/
