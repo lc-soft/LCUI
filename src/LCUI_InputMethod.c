@@ -215,7 +215,7 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 			}
 		}
 	}
-	_DEBUG_MSG("ch = %c\n", ch);
+	DEBUG_MSG("ch = %c\n", ch);
 	current_ime->func.totext( ch );
 }
 
@@ -384,7 +384,7 @@ IME_ToText( char ch )
 	
 	text[0] = ch;
 	text[1] = '\0';
-	_DEBUG_MSG("%S\n", text);
+	DEBUG_MSG("%S\n", text);
 	LCUIIME_Commit( text ); // 直接提交该字符
 }
 

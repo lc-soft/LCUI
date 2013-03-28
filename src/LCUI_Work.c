@@ -705,10 +705,8 @@ WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
 	LCUI_Widget *widget = NULL, *tmp = NULL, *focus_widget;
 	/* 如果输入法需要处理这个键，则退出本函数 */
 	if( LCUIIME_ProcessKey( event ) ) {
-		_DEBUG_MSG("LCUIIME_ProcessKey = TRUE\n");
 		return;
 	}
-	_DEBUG_MSG("LCUIIME_ProcessKey = FALSE\n");
 	/* 否则，将这个键盘消息发送给当前获得焦点的部件 */
 	while( 1 ) {
 		/* 获取当前容器中已获得焦点的部件 */
