@@ -110,10 +110,6 @@ LCUIScreen_GetCenter( void );
 LCUI_EXPORT(void)
 LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph );
 
-/* 获取当前FPS */
-LCUI_EXPORT(int)
-LCUIScreen_GetFPS( void );
-
 /* 初始化图形输出模块 */
 LCUI_EXPORT(int)
 LCUIModule_Video_Init( void );

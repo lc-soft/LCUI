@@ -47,6 +47,7 @@
 #include LC_DISPLAY_H
 #include LC_WIDGET_H
 #include LC_CURSOR_H
+
 #ifdef LCUI_BUILD_IN_WIN32
 #include <Windows.h>
 #endif
@@ -213,50 +214,18 @@ LCUIScreen_SyncInvalidArea( void )
 	} 
 }
 
-static int fps = 0, fps_count = 0;
-
-/* 刷新FPS计数 */
-static void 
-refresh_fps_count( void )
-{
-	fps = fps_count;
-	fps_count = 0;
-	//printf("FPS: %d\n", fps);
-}
-
 /* 更新屏幕内的图形显示 */
 static void
 LCUIScreen_Update( void* unused )
 {
-	int timer_id;
-	/* 添加个定时器，每隔1秒刷新FPS计数 */
-	timer_id = set_timer( 1000, refresh_fps_count, TRUE );
-	while(LCUI_Active()) {
+	while(LCUI_Sys.state == ACTIVE) {
 		Widget_ProcessUpdate(NULL); /* 处理所有部件更新 */ 
 		LCUI_MSleep(5);
 		LCUIScreen_SyncInvalidArea();
 		LCUIScreen_UpdateInvalidArea();
-		++fps_count; /* 累计当前更新的帧数 */
 	}
-	/* 释放定时器 */
-	free_timer( timer_id );
 	LCUIThread_Exit(NULL);
 }
-
-/* 获取当前FPS */
-LCUI_EXPORT(int)
-LCUIScreen_GetFPS( void )
-{
-#ifdef LCUI_BUILD_IN_LINUX
-	return fps;
-#else
-	return 0;
-#endif
-}
-
-
-#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
-#endif
 
 extern int LCUIScreen_Init(void);
 extern int LCUIScreen_Destroy(void);
