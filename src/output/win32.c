@@ -87,7 +87,7 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 		break;
 	case WM_MOUSEMOVE:
 		break;
-	case WM_PAINT: 
+	case WM_PAINT:
 		Graph_Init( &graph );
 		BeginPaint( hwnd, &ps );
 		/* 获取区域坐标及尺寸 */
@@ -106,7 +106,7 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
-		LCUI_MainLoop_Quit(NULL);
+		LCUI_Quit();
 		return 0;
 	}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
