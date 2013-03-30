@@ -46,7 +46,7 @@ LCUI_BEGIN_HEADER
 /************************ LCUI程序的数据 *******************************/
 typedef struct _LCUI_App 
 {
-	LCUI_ID id; /* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
+	LCUI_ID id;		/* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
 	void (*func)(void);	/* 在LCUI退出时调用的函数 */
 	LCUI_Queue tasks;	/* 程序的任务队列 */
 	LCUI_Queue events;	/* 事件队列 */
@@ -99,6 +99,7 @@ typedef struct _LCUI_System
 /***********************************************************************/
 
 typedef struct {
+	LCUI_ID app_id;
 	LCUI_BOOL quit;
 	LCUI_BOOL running;
 	int level;
@@ -156,6 +157,9 @@ LCUI_EXPORT(int) LCUI_Main( void );
 
 /* 获取LCUI的版本 */
 LCUI_EXPORT(int) LCUI_GetSelfVersion( char *out );
+
+/* 用于退出LCUI，释放LCUI占用的资源 */
+LCUI_EXPORT(void) LCUI_Quit( void );
 
 LCUI_END_HEADER
 
