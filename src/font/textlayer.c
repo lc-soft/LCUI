@@ -386,8 +386,13 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	//clock_t start;
 	//start = clock();
 	//_DEBUG_MSG("enter\n");
-	
+	if( widget == NULL || layer == NULL ) {
+		return;
+	}
 	graph = Widget_GetSelfGraph( widget );
+	if( graph == NULL ) {
+		return;
+	}
 	/* 如果文本缓存区内有数据 */
 	if( layer->need_proc_buff ) {
 		__TextLayer_Text( layer );
@@ -716,6 +721,9 @@ LCUI_EXPORT(void)
 TextLayer_Text_Clear( LCUI_TextLayer *layer )
 /* 清空文本内容 */
 {
+	if( layer == NULL ) {
+		return;
+	}
 	TextLayer_Refresh( layer );
 	Queue_Destroy( &layer->text_source_data );
 	Queue_Destroy( &layer->rows_data );
@@ -783,6 +791,9 @@ TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	LCUI_CharData *char_ptr, char_data; 
 	Text_RowData *cur_row_ptr, *tmp_row_ptr;
 	
+	if( new_text == NULL ) {
+		return;
+	}
 	/* 如果有选中的文本，那就删除 */
 	//......  
 	DEBUG_MSG1("enter\n");
@@ -1526,6 +1537,9 @@ TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 	DEBUG_MSG2( "before: %d,%d\n", char_pos.x, char_pos.y );
 	for( i=n; char_pos.y>=0; --char_pos.y ) {
 		row_ptr = Queue_Get( &layer->rows_data, char_pos.y );
+		if(row_ptr == NULL) {
+			continue;
+		}
 		row_len = Queue_GetTotal( &row_ptr->string );
 		
 		if( char_pos.x == -1 ) {
