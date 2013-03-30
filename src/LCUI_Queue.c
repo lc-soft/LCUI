@@ -168,6 +168,9 @@ Queue_Swap( LCUI_Queue * queue, int pos_a, int pos_b )
 LCUI_EXPORT(void)
 Queue_Destroy( LCUI_Queue * queue )
 {
+	if( queue == NULL ) {
+		return;
+	}
 	if(queue->member_type == 0) {
 	/* 如果成员是普通类型，释放队列成员占用的内存空间 */ 
 		while( Queue_Delete(queue, 0) );/* 清空队列成员 */
