@@ -148,7 +148,7 @@ LCUI_MainLoop_New( void )
 	loop->quit = FALSE;
 	loop->level = Queue_GetTotal( &mainloop_queue );
 	loop->running = FALSE;
-	Queue_Add( &mainloop_queue, loop );
+	Queue_AddPointer( &mainloop_queue, loop );
 	/* 重新对主循环队列进行排序 */
 	LCUI_MainLoopQueue_Sort();
 	return loop;
@@ -253,6 +253,7 @@ LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
 {
 	if( loop == NULL ) {
 		loop = LCUI_MainLoopQueue_Find();
+		DEBUG_MSG("quit loop: %p\n", loop);
 		if( loop == NULL ) {
 			return -1;
 		}
