@@ -418,7 +418,7 @@ Process_Frames( void )
 		LCUI_MSleep(10);
 	}
 	frames = FramesStream_Update( &sleep_time ); 
-	reset_timer( __timer_id, sleep_time );
+	LCUITimer_Reset( __timer_id, sleep_time );
 	if( frames ) {
 		Frames_CallFunc( frames );
 	}
@@ -437,7 +437,7 @@ Frames_Play(LCUI_Frames *frames)
 	if(__timer_id == -1){
 		Queue_Init( &frames_stream, sizeof(LCUI_Frames), NULL );
 		Queue_UsingPointer( &frames_stream );
-		__timer_id = set_timer( 50, Process_Frames, TRUE );
+		__timer_id = LCUITimer_Set( 50, Process_Frames, TRUE );
 	}
 	/* 检查该动画是否已存在 */
 	Queue_Lock( &frames_stream );

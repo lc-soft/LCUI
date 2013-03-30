@@ -377,7 +377,7 @@ Enable_Mouse_Input(void)
 	printf("open %s successfuly.\n", msdev);
 #else
 	/* 创建一个定时器，用于在windows下，每隔20ms更新一次鼠标游标的位置 */
-	timer_id = set_timer( 20, start_update_cursor_pos, TRUE );
+	timer_id = LCUITimer_Set( 20, start_update_cursor_pos, TRUE );
 	/* 隐藏windows的鼠标游标 */
 	ShowCursor( FALSE );
 #endif
@@ -396,7 +396,7 @@ Disable_Mouse_Input(void)
 	close (mouse_data.fd); 
 	mouse_data.state = REMOVE;
 #else
-	free_timer( timer_id );
+	LCUITimer_Free( timer_id );
 #endif
 	return TRUE;
 }

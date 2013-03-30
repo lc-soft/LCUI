@@ -42,6 +42,19 @@
 #include LC_LCUI_H
 
 /*----------------------------- Timer --------------------------------*/
+
+typedef struct _timer_data
+{
+	int state;		/* 状态 */
+	LCUI_BOOL reuse;		/* 是否重复使用该定时器 */
+	LCUI_ID app_id;	/* 所属程序ID */
+	long int id;		/* 定时器ID */
+	long int total_ms;	/* 定时总时间（单位：毫秒） */
+	long int cur_ms;	/* 当前剩下的等待时间 */
+	void (*callback_func)(); /* 回调函数 */ 
+}
+timer_data;
+
 /*----------------------------- Private ------------------------------*/
 /* 功能：初始化定时器列表 */
 static void 
@@ -199,7 +212,7 @@ find_timer( int timer_id )
  * 如果要用于循环定时处理某些任务，可将 reuse 置为 1，否则置于 0。
  * */
 LCUI_EXPORT(int) 
-set_timer( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse )
+LCUITimer_Set( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse )
 {
 	timer_data timer;
 	timer.state = 1;
@@ -220,7 +233,7 @@ set_timer( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse )
  * 返回值：正常返回0，指定ID的定时器不存在则返回-1.
  * */
 LCUI_EXPORT(int)
-free_timer( int timer_id )
+LCUITimer_Free( int timer_id )
 {
 	int i, total;
 	timer_data *timer;
@@ -249,7 +262,7 @@ free_timer( int timer_id )
  * 说明：一般用于往复定时的定时器
  * */
 LCUI_EXPORT(int)
-pause_timer( int timer_id )
+LCUITimer_Pause( int timer_id )
 {
 	timer_data *timer;
 	timer = find_timer( timer_id );
@@ -260,9 +273,9 @@ pause_timer( int timer_id )
 	return -1;
 }
 
-LCUI_EXPORT(int)
-continue_timer( int timer_id )
 /* 继续使用定时器 */
+LCUI_EXPORT(int)
+LCUITimer_Continue( int timer_id )
 {
 	timer_data *timer;
 	timer = find_timer( timer_id );
@@ -275,7 +288,7 @@ continue_timer( int timer_id )
 
 /* 重设定时器的时间 */
 LCUI_EXPORT(int)
-reset_timer( int timer_id, long int n_ms ) 
+LCUITimer_Reset( int timer_id, long int n_ms ) 
 {
 	timer_data *timer;
 	timer = find_timer( timer_id );
@@ -287,7 +300,7 @@ reset_timer( int timer_id, long int n_ms )
 }
 
 /* 创建一个线程以处理定时器 */
-LCUI_EXPORT(int)
+static int
 timer_thread_start( LCUI_Thread *tid, LCUI_Queue *list )
 {
 	/* 初始化列表 */
@@ -298,7 +311,7 @@ timer_thread_start( LCUI_Thread *tid, LCUI_Queue *list )
 }
 
 /* 停止定时器的处理线程，并销毁定时器列表 */
-LCUI_EXPORT(void)
+static void
 timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
 {
 	timer_thread_active = FALSE;

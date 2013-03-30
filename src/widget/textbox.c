@@ -383,7 +383,7 @@ TextBox_Init( LCUI_Widget *widget )
 	
 	/* 设定定时器，每1秒闪烁一次 */
 	if( __timer_id == -1 ) {
-		__timer_id = set_timer( 500, blink_cursor, TRUE );
+		__timer_id = LCUITimer_Set( 500, blink_cursor, TRUE );
 	}
 	Widget_Event_Connect( widget, EVENT_DRAG, TextBox_TextLayer_Click );
 	/* 关联 FOCUS_OUT 和 FOCUS_IN 事件 */
