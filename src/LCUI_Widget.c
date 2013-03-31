@@ -1033,11 +1033,26 @@ print_widget_info(LCUI_Widget *widget)
  * 说明：在调试时需要用到它，用于确定widget是否有问题
  *  */
 {
+	int i, n;
+	LCUI_Widget *child;
+	LCUI_Queue *child_list;
 	if( widget ) {
-		printf("widget: %p, type: %s, visible: %d, pos: (%d,%d), size: (%d, %d)\n",
+		if( widget->parent ) {
+			child_list = &widget->child;
+		} else {
+			child_list = &LCUI_Sys.widget_list;
+		}
+		n = Queue_GetTotal( child_list );
+		for(i=0; i<n; ++i) {
+			child = Queue_Get( child_list, i );
+			if( child == widget ) {
+				break;
+			}
+		}
+		printf("widget: %p, type: %s, visible: %d, show pos: %d, pos: (%d,%d), size: (%d, %d)\n",
 			widget, widget->type_name.string, widget->visible,
-			widget->pos.x, widget->pos.y,
-			widget->size.w, widget->size.h);  
+			i, widget->pos.x, widget->pos.y,
+			widget->size.w, widget->size.h);
 	} else {
 		printf("NULL widget\n");
 	}
@@ -2706,7 +2721,7 @@ Widget_ProcessUpdate( LCUI_Widget *widget )
 	n = Queue_GetTotal( update_buff );
 	while(n--) {
 		tmp_ptr = Queue_Get( update_buff, 0 );
-		if( !tmp_ptr ) {
+		if( tmp_ptr == NULL || tmp_ptr->widget == NULL ) {
 			continue;
 		}
 		/* 根据不同的类型来进行处理 */
