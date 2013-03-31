@@ -370,6 +370,7 @@ msgbox_add_BTN_YESNOCANCEL( LCUI_Widget *btn_area )
 	Widget_Show( btn[2] );
 }
 
+
 /* LCUI的消息框
  * 参数：
  * icon_type	: 指定消息框中显示的图标，可取以下值：
@@ -401,8 +402,8 @@ msgbox_add_BTN_YESNOCANCEL( LCUI_Widget *btn_area )
  * 	MB_BTN_IS_QUIT	: 窗口右上角的关闭按钮
  *  */
 LCUI_EXPORT(int)
-LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text, 
-			const char *title, MB_BTN_TYPE button )
+LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text, 
+			const wchar_t *title, MB_BTN_TYPE button )
 {
 	int ret, icon_flag;
 	LCUI_Graph icon;
@@ -484,7 +485,10 @@ LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text,
 	default: return -1;
 	}
 	/* 创建消息框，并设置ID */
-	msgbox = Window_New( title, NULL, min_size );
+	msgbox = Widget_New( "window" );
+	Window_SetTitleTextW( msgbox, title );
+	Widget_Resize( msgbox, min_size );
+
 	msgbox->self_id = WIDGET_ID_MESSAGEBOX | button | icon_flag;
 	/* 获取窗口右上角的按钮指针，并设定按钮的ID */
 	btn_close = Window_GetCloseButton( msgbox );
@@ -512,7 +516,7 @@ LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text,
 	btn_area_border.top_color = MB_BTN_AREA_LINECOLOR;
 	Widget_SetBorder( btn_area, btn_area_border );
 	
-	Label_Text( textbox, text );
+	Label_TextW( textbox, text );
 	Widget_Show( textbox );
 	if( icon_type != MB_ICON_NONE ) {
 		Widget_Show( iconbox );
@@ -536,4 +540,23 @@ LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text,
 		return ret;
 	}
 	return -2;
+}
+
+LCUI_EXPORT(int)
+LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text, 
+			const char *title, MB_BTN_TYPE button )
+{
+	int ret;
+	wchar_t *unicode_text, *unicode_title;
+	
+	LCUICharset_GB2312ToUnicode( text, &unicode_text );
+	LCUICharset_GB2312ToUnicode( title, &unicode_title );
+	ret = LCUI_MessageBoxW( icon_type, unicode_text, unicode_title, button );
+	if( unicode_text != NULL ) {
+		free( unicode_text );
+	}
+	if( unicode_title != NULL ) {
+		free( unicode_title );
+	}
+	return ret;
 }
