@@ -283,6 +283,7 @@ static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
 	if( widget == NULL ) {
 		return TRUE;
 	}
+	/* 开始判断该部件的上级部件 */
 	up_widget = widget->parent;
 	while( widget ) {
 		if( up_widget == NULL ) {
@@ -293,15 +294,19 @@ static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
 		n = Queue_GetTotal( child_list );
 		for(i=0; i<n; ++i) {
 			child = Queue_Get( child_list, i );
-			if( !child || !child->visible ) {
+			if( !child || !child->visible || !child->modal ) {
 				continue;
 			}
-			if( child->modal && child != widget ) {
+			if( child == widget ) {
+				break;
+			} else {
 				return FALSE;
 			}
 		}
+		/* 记录这一级部件 */
 		widget = up_widget;
 		if( widget ) {
+			/* 切换至上级部件 */
 			up_widget = widget->parent;
 		}
 	}
@@ -315,12 +320,10 @@ static void
 widget_list_set_state( LCUI_Widget *widget, WIDGET_STATE state )
 {
 	widget_list_reset();
-	if( widget ) {
-		while( widget ) {
-			widget_list_add( widget );
-			Widget_SetState( widget, state );
-			widget = widget->parent;
-		}
+	while( widget ) {
+		widget_list_add( widget );
+		Widget_SetState( widget, state );
+		widget = widget->parent;
 	}
 	widget_list_clear();
 }
