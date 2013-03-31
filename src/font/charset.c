@@ -106,7 +106,11 @@ LCUICharset_UTF8ToUnicode( const char *src_utf8, wchar_t **des_unicode )
 	wchar_t *buff;
 	unsigned char *p, t, save[MAX_SAVE_NUM];
 	unsigned int len, i, j, n, count;
- 	
+
+ 	if( src_utf8 == NULL ) {
+		*des_unicode = NULL;
+		return 0;
+	}
 	len = strlen(src_utf8)+1;  
 	buff = (wchar_t *)calloc(sizeof(wchar_t), len); 
 	if( !buff ) {
