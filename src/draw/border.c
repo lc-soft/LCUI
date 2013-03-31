@@ -970,7 +970,7 @@ LCUI_EXPORT(int) Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	end.x = des->width - border.bottom_right_radius;
 	Graph_DrawHorizLine( des, border.top_color, border.bottom_width, start, end.x );
 	/* 绘制左边的线 */
-	start.y = 0;
+	start.x = start.y = 0;
 	end.y = des->height - border.bottom_left_radius;
 	Graph_DrawVertiLine( des, border.left_color, border.left_width, start, end.y );
 	/* 绘制右边的线 */
