@@ -855,6 +855,21 @@ TextBox_GetCursor( LCUI_Widget *widget )
 	return tb->cursor;
 }
 
+/* 获取文本框内文本 */
+LCUI_EXPORT(size_t)
+TextBox_GetText( LCUI_Widget *widget, wchar_t *buff, size_t max_len )
+{
+	LCUI_TextLayer *layer;
+	if( widget == NULL ) {
+		return 0;
+	}
+	layer = TextBox_GetTextLayer( widget );
+	if( layer == NULL ) {
+		return 0;
+	}
+	return TextLayer_GetText( layer, buff, max_len );
+}
+
 /* 获取文本框内的文本总长度 */
 LCUI_EXPORT(int)
 TextBox_Text_GetTotalLength( LCUI_Widget *widget )

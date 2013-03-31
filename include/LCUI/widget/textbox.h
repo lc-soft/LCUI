@@ -61,6 +61,10 @@ TextBox_GetLabel( LCUI_Widget *widget );
 LCUI_EXPORT(LCUI_Widget*)
 TextBox_GetCursor( LCUI_Widget *widget );
 
+/* 获取文本框内文本 */
+LCUI_EXPORT(size_t)
+TextBox_GetText( LCUI_Widget *widget, wchar_t *buff, size_t max_len );
+
 /* 获取文本框内的文本总长度 */
 LCUI_EXPORT(int)
 TextBox_Text_GetTotalLength( LCUI_Widget *widget );
