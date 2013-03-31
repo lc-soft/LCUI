@@ -96,7 +96,13 @@ Label_ExecUpdate( LCUI_Widget *widget )
 	LCUI_Size max;
 	LCUI_Label *label;
 	
+	if( widget == NULL ) {
+		return;
+	}
 	label = Widget_GetPrivData( widget );
+	if( label == NULL ) {
+		return;
+	}
 	if(!Graph_IsValid(&widget->background.image)) {
 		mode = GRAPH_MIX_FLAG_REPLACE; /* 替换模式 */
 	} else {
@@ -136,8 +142,18 @@ Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 	int len;
 	LCUI_Label *label;
 	
-	len = wcslen(unicode_text);
+	if( widget == NULL ) {
+		return -1;
+	}
+	if( unicode_text == NULL ) {
+		len = 0;
+	} else {
+		len = wcslen(unicode_text);
+	}
 	label = Widget_GetPrivData( widget );
+	if( label == NULL ) {
+		return -2;
+	}
 	if( label->text_buff != NULL ) {
 		label->text_buff = realloc( label->text_buff, 
 				sizeof(wchar_t)*(len+1) );
@@ -147,7 +163,11 @@ Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 	if( label->text_buff == NULL ) {
 		return -1;
 	}
-	wcscpy( label->text_buff, unicode_text );
+	if( unicode_text == NULL ) {
+		label->text_buff[0] = '\0';
+	} else {
+		wcscpy( label->text_buff, unicode_text );
+	}
 	Widget_Update( widget );
 	return 0;
 }
@@ -158,7 +178,9 @@ Label_Text( LCUI_Widget *widget, const char *utf8_text )
 	wchar_t *unicode_text;
 	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
 	Label_TextW( widget, unicode_text );
-	free( unicode_text );
+	if( unicode_text != NULL ) {
+		free( unicode_text );
+	}
 }
 
 LCUI_EXPORT(void)
@@ -167,7 +189,9 @@ Label_TextA( LCUI_Widget *widget, const char *ascii_text )
 	wchar_t *unicode_text;
 	LCUICharset_ASCIIToUnicode( ascii_text, &unicode_text );
 	Label_TextW( widget, unicode_text );
-	free( unicode_text );
+	if( unicode_text != NULL ) {
+		free( unicode_text );
+	}
 }
 
 /* 为Label部件内显示的文本设定文本样式 */
