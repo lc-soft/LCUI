@@ -140,7 +140,7 @@ TextLayer_Text_Add_NewRow ( LCUI_TextLayer *layer )
 /* 对目标行进行断行处理，也就是将目标行指定位置后面的全部文字转移到另一行 */
 static void 
 TextLayer_Text_RowBreak ( 
-	LCUI_TextLayer *layer,	Text_RowData *src, 
+	LCUI_TextLayer *layer,		Text_RowData *src, 
 	int break_point,		Text_RowData *des )
 {
 	static int i, total;
@@ -578,27 +578,30 @@ TextLayer_GetSize ( LCUI_TextLayer *layer )
 	return size;
 }
 
-LCUI_EXPORT(wchar_t*)
-TextLayer_GetText( LCUI_TextLayer *layer )
 /* 获取文本图层中的文本内容 */
+LCUI_EXPORT(size_t)
+TextLayer_GetText( LCUI_TextLayer *layer, wchar_t *buff, size_t max_len )
 {
-	int i, buff_size;
-	wchar_t *text_buff;
+	unsigned int i, text_len;
 	LCUI_CharData *char_p;
-	buff_size = Queue_GetTotal( &layer->text_source_data );
-	if( buff_size <= 0 ) {
-		return NULL;
+
+	if( max_len == 0 ) {
+		return 0;
 	}
-	text_buff = (wchar_t*) malloc( sizeof(wchar_t)*(buff_size+1) );
-	printf("print text:\n");
-	for( i=0; i<buff_size; ++i ) {
-		char_p = Queue_Get( &layer->text_source_data, i );
-		printf("%c", char_p->char_code);
-		text_buff[i] = char_p->char_code;
+	text_len = Queue_GetTotal( &layer->text_source_data );
+	if( text_len <= 0 ) {
+		return 0;
 	}
-	printf("\nend\n");
-	text_buff[i] = 0;
-	return text_buff;
+	max_len -= 1; /* 留一个位置保存结束符 */
+	if( max_len > text_len ) {
+		max_len = text_len;
+	}
+	for( i=0; i<max_len; ++i ) {
+		char_p = (LCUI_CharData *)Queue_Get( &layer->text_source_data, i );
+		buff[i] = char_p->char_code;
+	}
+	buff[i] = '\0';
+	return i;
 }
 
 LCUI_EXPORT(void)
