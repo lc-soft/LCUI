@@ -131,7 +131,7 @@ LCUI_MainLoop_GetAvailable(void)
 LCUI_EXPORT(LCUI_MainLoop*)
 LCUI_MainLoop_New( void )
 {
-	LCUI_MainLoop *loop, buff_loop;
+	LCUI_MainLoop *loop;
 	
 	if( !init_mainloop_queue ) {
 		LCUI_MainLoopQueue_Init();
