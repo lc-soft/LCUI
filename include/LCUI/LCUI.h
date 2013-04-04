@@ -89,12 +89,6 @@
 /* 触屏校准后的文件 */
 #define LCUI_CALIBFILE "/mnt/Data/LC-SOFT/pointercal"
 
-#ifdef LCUI_BUILD_IN_LINUX
-/* 默认的字体文件路径 */
-#define LCUI_DEFAULT_FONTFILE	"../fonts/msyh.ttf"
-#else
-#define LCUI_DEFAULT_FONTFILE	"C:/Windows/Fonts/msyh.ttf"
-#endif
 /* 鼠标事件 */
 #define MOUSE_EVENT_MOVE	1
 #define MOUSE_EVENT_CLICK	2

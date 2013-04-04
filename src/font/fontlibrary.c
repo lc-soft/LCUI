@@ -494,21 +494,48 @@ static int FontLIB_AddInCoreFontInfo( void )
 	return font_id;
 }
 
+#ifdef LCUI_BUILD_IN_WIN32
+#define MAX_FONTFILE_NUM	4
+#else
+#define MAX_FONTFILE_NUM	1
+#endif
 /* 初始化字体处理模块 */
 void LCUIModule_Font_Init( void )
 {
 	char *p;
-	int font_id;
+	int font_id = -1, i;
+	char *fontfilelist[MAX_FONTFILE_NUM]={
+#ifdef LCUI_BUILD_IN_WIN32
+		"C:/Windows/Fonts/msyh.ttf",
+		"C:/Windows/Fonts/msyh.ttc",
+		"C:/Windows/Fonts/simsun.ttc",
+		"C:/Windows/Fonts/consola.ttf"
+#else
+		"../fonts/msyh.ttf"
+#endif
+	};
+
 	printf("loading fontfile...\n");
-	/* 如果在环境变量中定义了字体文件路径，那就使用它 */
-	p = getenv("LCUI_FONTFILE");
-	if( !p ) {
-		p = LCUI_DEFAULT_FONTFILE;
-	}
 	FontLIB_Init(); /* 初始化字体数据库 */
 	FontLIB_AddInCoreFontInfo(); /* 添加内置的字体信息 */
-	font_id = FontLIB_LoadFontFile( p ); /* 载入默认的字体至库中 */
-	FontLIB_SetDefaultFont( font_id ); /* 设定该字体为默认字体 */
+	/* 如果在环境变量中定义了字体文件路径，那就使用它 */
+	p = getenv("LCUI_FONTFILE");
+	if( p != NULL ) {
+		font_id = FontLIB_LoadFontFile( p );
+	}
+	/* 如果载入成功，则设定该字体为默认字体 */
+	if(font_id != -1) {
+		FontLIB_SetDefaultFont( font_id );
+		return;
+	}
+	/* 否则载入失败就载入其它字体文件 */
+	for(i=0; i<MAX_FONTFILE_NUM; ++i) {
+		font_id = FontLIB_LoadFontFile( fontfilelist[i] ); 
+		if(font_id != -1) {
+			FontLIB_SetDefaultFont( font_id );
+			break;
+		}
+	}
 }
 
 /* 停用字体处理模块 */
