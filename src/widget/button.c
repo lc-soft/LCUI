@@ -50,27 +50,35 @@
 static void Button_ExecDefalutUpdate( LCUI_Widget *widget )
 {
 	LCUI_Border border;
-	
-	border = Border(1, BORDER_STYLE_SOLID, RGB(170,170,170));
-	Border_Radius( &border, 1 );
-	Widget_SetBorder( widget, border );
-	Widget_SetBackgroundTransparent( widget, FALSE );
-	
+	LCUI_RGB border_color;
+
 	switch( widget->state ) {
 	case WIDGET_STATE_NORMAL:
-		Widget_SetBackgroundColor( widget, RGB(225,225,225) );
+		Widget_SetBackgroundColor( widget, RGB(230,230,230) );
+		/* 获得焦点的按钮，使用另一种颜色的边框 */
+		if( Widget_GetFocus(widget) ) {
+			border_color = RGB(50,150,255);
+		} else {
+			border_color = RGB(172,172,172);
+		}
 		break;
 	case WIDGET_STATE_OVERLAY :
-		Widget_SetBackgroundColor( widget, RGB(170,215,230) );
+		Widget_SetBackgroundColor( widget, RGB(232,242,252) );
+		border_color = RGB(126,180,234);
 		break;
 	case WIDGET_STATE_ACTIVE :
-		Widget_SetBackgroundColor( widget, RGB(255,180,45) );
+		Widget_SetBackgroundColor( widget, RGB(207,230,252) );
+		border_color = RGB(86,157,229);
 		break;
 	case WIDGET_STATE_DISABLE :
 		Widget_SetBackgroundColor( widget, RGB(200,200,200) );
+		border_color = RGB(172,172,172);
 		break;
 		default : break;
 	}
+	border = Border(1, BORDER_STYLE_SOLID, border_color );
+	Widget_SetBorder( widget, border );
+	Widget_SetBackgroundTransparent( widget, FALSE );
 }
 
 static void Button_ExecCustomUpdate( LCUI_Widget *widget )
@@ -106,8 +114,16 @@ static void Button_ExecUpdate( LCUI_Widget *widget )
 	Widget_Refresh( widget );
 }
 
+static void 
+Button_ProcFocusOut( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+{
+	Widget_Update( widget );
+}
+
+
 /* 初始化按钮部件的数据 */
-static void Button_Init( LCUI_Widget *widget )
+static void
+Button_Init( LCUI_Widget *widget )
 {
 	int valid_state;
 	LCUI_Button *button;
@@ -132,6 +148,8 @@ static void Button_Init( LCUI_Widget *widget )
 	/* 启用自动尺寸调整，以适应内容 */
 	Widget_SetAutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK);
 	Widget_SetStyleID( widget, BUTTON_STYLE_DEFAULT );
+	/* 关联EVENT_FOCUSOUT事件，以在按钮失去焦点时重绘按钮 */
+	Widget_Event_Connect( widget, EVENT_FOCUSOUT, Button_ProcFocusOut );
 }
 
 /* 获取嵌套在按钮部件里的label部件 */
