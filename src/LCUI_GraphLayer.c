@@ -585,7 +585,7 @@ GraphLayer_Front( LCUI_GraphLayer *glayer )
 	queue = &glayer->parent->child;
 	total = Queue_GetTotal( queue );
 	for( i=0; i<total; ++i ) {
-		tmp_child = Queue_Get( queue, i );
+		tmp_child = (LCUI_GraphLayer *)Queue_Get( queue, i );
 		if( glayer == tmp_child ) {
 			src_pos = i;
 			continue;

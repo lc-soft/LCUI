@@ -334,7 +334,7 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 {
 	LCUI_Widget *widget;
 	LCUI_Pos pos;
-	
+
 	if( !event || Mouse_LeftButton(event) < 0 ) {
 		return;
 	}
