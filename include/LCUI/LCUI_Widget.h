@@ -182,7 +182,7 @@ struct _LCUI_Widget {
 	LCUI_GraphLayer* client_glayer;	/* 客户区图层 */
 	
 	void *private_data;   /* 指针，指向部件私有数据，供预先注册的回调函数利用 */
-	
+
 	/* 以下是函数指针，闲函数名太长的话，可以直接用下面的 */
 	void (*resize)(LCUI_Widget*, LCUI_Size);
 	void (*move)(LCUI_Widget*, LCUI_Pos); 
@@ -201,6 +201,14 @@ struct _LCUI_Widget {
 #include LC_GUI_MSGBOX_H
 
 /***************************** Widget *********************************/
+/* 获取部件的主图层指针 */
+LCUI_EXPORT(LCUI_GraphLayer *)
+Widget_GetMainGraphLayer( LCUI_Widget *widget );
+
+/* 获取部件的子部件队列 */
+LCUI_EXPORT(LCUI_Queue*)
+Widget_GetChildList( LCUI_Widget *widget );
+
 LCUI_EXPORT(LCUI_Size)
 Widget_GetSize(LCUI_Widget *widget);
 /* 功能：获取部件的尺寸 */ 
@@ -254,6 +262,9 @@ Widget_GetPrivData(LCUI_Widget *widget);
 LCUI_EXPORT(LCUI_Widget*)
 Get_Widget_Parent(LCUI_Widget *widget);
 /* 功能：获取部件的父部件 */ 
+
+LCUI_EXPORT(int)
+Widget_PrintChildList( LCUI_Widget *widget );
 
 LCUI_EXPORT(void)
 print_widget_info(LCUI_Widget *widget);
@@ -467,6 +478,10 @@ LCUI_EXPORT(void)
 Widget_SetPosType( LCUI_Widget *widget, POS_TYPE pos_type );
 /* 设定部件的定位类型 */
 
+/* 设置部件的堆叠顺序 */
+LCUI_EXPORT(int)
+Widget_SetZIndex( LCUI_Widget *widget, int z_index );
+
 LCUI_EXPORT(void)
 Widget_SetAlpha(LCUI_Widget *widget, unsigned char alpha);
 /* 功能：设定部件的透明度 */ 
@@ -481,6 +496,10 @@ Widget_ExecMove(LCUI_Widget *widget, LCUI_Pos pos);
 LCUI_EXPORT(void)
 Widget_ExecHide(LCUI_Widget *widget);
 /* 功能：执行隐藏部件的操作 */ 
+
+/* 将部件显示在同等z-index值的部件的前端 */
+LCUI_EXPORT(int)
+Widget_Front( LCUI_Widget *widget );
 
 LCUI_EXPORT(void)
 Widget_ExecShow(LCUI_Widget *widget);
@@ -589,14 +608,10 @@ __Widget_Update(LCUI_Widget *widget);
  * 功能：让部件根据已设定的属性，进行相应数据的更新
  * 说明：与上个函数功能一样，但是，可以允许队列中有两条相同记录。
  * */
-
-/* 将指定部件显示在同等z-index值的部件的前端 */
-LCUI_EXPORT(int)
-Widget_Front( LCUI_Widget *widget );
-
+ 
+/* 显示部件 */ 
 LCUI_EXPORT(void)
 Widget_Show(LCUI_Widget *widget);
-/* 功能：显示部件 */ 
 
 LCUI_EXPORT(void)
 Widget_Hide(LCUI_Widget *widget);
@@ -644,32 +659,21 @@ LCUI_EXPORT(int)
 WidgetType_Delete(const char *type);
 /* 功能：删除指定部件类型的相关数据 */ 
 
-LCUI_EXPORT(void)
-NULL_Widget_Func(LCUI_Widget *widget);
-/*
- * 功能：空函数，不做任何操作
- * 说明：如果获取指定部件类型的函数指针失败，将返回这个函数的函数指针
- **/ 
-
+/* 获取指定类型部件的类型ID */
 LCUI_EXPORT(LCUI_ID)
-WidgetType_Get_ID(const char *widget_type);
-/* 功能：获取指定类型部件的类型ID */ 
+WidgetType_GetID( const char *widget_type );
 
-LCUI_EXPORT(int)
-WidgetType_GetByID(LCUI_ID id, char *widget_type);
-/* 功能：获取指定类型ID的类型名称 */ 
-
+/* 获取指定部件类型ID的函数的函数指针 */
 LCUI_EXPORT(WidgetCallBackFunc)
-Get_WidgetFunc_By_ID(LCUI_ID id, FuncType func_type);
-/* 功能：获取指定部件类型ID的函数的函数指针 */ 
+WidgetFunc_GetByID(LCUI_ID id, FuncType func_type);
 
+/* 获取指定类型名的部件的函数指针 */
 LCUI_EXPORT(WidgetCallBackFunc)
-Get_WidgetFunc(const char *widget_type, FuncType func_type);
-/* 功能：获取指定类型部件的函数的函数指针 */ 
+WidgetFunc_Get(const char *widget_type, FuncType func_type );
 
+/* 检测指定部件类型是否有效 */
 LCUI_EXPORT(int)
-WidgetType_Valid(const char *widget_type);
-/* 功能：检测指定部件类型是否有效 */ 
+WidgetType_Valid( const char *widget_type );
 
 /* 调用指定类型的部件函数 */
 LCUI_EXPORT(void)
