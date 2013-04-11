@@ -350,6 +350,7 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 	/* 焦点转移给该部件 */
 	Set_Focus( widget );
 	if( Widget_Have_Event( widget, EVENT_DRAG ) ) {
+		DEBUG_MSG("start drag\n");
 		/* 开始处理部件的拖动 */
 		_Start_DragEvent( widget, event );
 	}
@@ -417,7 +418,7 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 {
 	LCUI_Pos pos;
 	LCUI_Widget *widget;
-	
+
 	pos.x = event->x;
 	pos.y = event->y;
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
@@ -429,6 +430,7 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */ 
 	if( click_widget && event->state == LCUIKEYSTATE_PRESSED 
 	 && Widget_Have_Event( click_widget, EVENT_DRAG ) ) {
+		DEBUG_MSG("doing drag\n");
 		_Doing_DragEvent( click_widget, event );
 	}
 }

@@ -277,6 +277,7 @@ Win32_LCUIMouse_ButtonDown( int key_code )
 {
 	LCUI_Pos pos;
 	pos = LCUICursor_GetPos();
+	DEBUG_MSG("pos: %d,%d\n", pos.x, pos.y);
 	return LCUIMouse_ButtonDown( pos, key_code );
 }
 
@@ -285,6 +286,7 @@ Win32_LCUIMouse_ButtonUp( int key_code )
 {
 	LCUI_Pos pos;
 	pos = LCUICursor_GetPos();
+	DEBUG_MSG("pos: %d,%d\n", pos.x, pos.y);
 	return LCUIMouse_ButtonUp( pos, key_code );
 }
 

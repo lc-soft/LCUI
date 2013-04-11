@@ -80,9 +80,11 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 		LCUIKeyboard_FreeKey( wParam );
 		break;
 	case WM_LBUTTONDOWN:
+		//_DEBUG_MSG("left button down\n");
 		Win32_LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
 		break;
 	case WM_LBUTTONUP:
+		//_DEBUG_MSG("left button up\n");
 		Win32_LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
 		break;
 	case WM_MOUSEMOVE:
