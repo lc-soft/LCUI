@@ -49,6 +49,31 @@
  * 
  * */
 
+ 
+LCUI_EXPORT(int)
+GraphLayer_PrintChildList( LCUI_GraphLayer *glayer )
+{
+	int i, n;
+	LCUI_Queue *child_list;
+	LCUI_GraphLayer *child;
+
+	child_list = &glayer->child;
+	if(child_list == NULL) {
+		return -1;
+	}
+	n = Queue_GetTotal( child_list );
+	for(i=0; i<n; ++i) {
+		child = (LCUI_GraphLayer*)Queue_Get( child_list, i );
+		if( child == NULL ) {
+			continue;
+		}
+		printf("[%d] glayer: %p, z-index: %d, pos: (%d,%d), size: (%d, %d)\n",
+			i, child, child->z_index, child->pos.x, child->pos.y,
+			child->graph.width, child->graph.height );
+	}
+	return 0;
+}
+
 /* 将子图层从父图层中的子图层队列中移除 */
 LCUI_EXPORT(int)
 GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
@@ -243,12 +268,12 @@ GraphLayer_Sort( LCUI_GraphLayer *glayer )
 	Queue_Lock( &glayer->child );
 	total = Queue_GetTotal( &glayer->child );
 	for(i=0; i<total; ++i) {
-		child_a = Queue_Get( &glayer->child, i );
+		child_a = (LCUI_GraphLayer*)Queue_Get( &glayer->child, i );
 		if( !child_a ) {
 			continue;
 		}
 		for(j=i+1; j<total; ++j) {
-			child_b = Queue_Get( &glayer->child, j );
+			child_b = (LCUI_GraphLayer*)Queue_Get( &glayer->child, j );
 			if( !child_b ) {
 				continue;
 			}
@@ -270,7 +295,8 @@ GraphLayer_Resize( LCUI_GraphLayer *glayer, int w, int h )
 		return -1;
 	}
 	/* 尺寸没有变化的话就返回 */
-	if( glayer->graph.width == w && glayer->graph.height == h) {
+	if( glayer->graph.width == w
+	 && glayer->graph.height == h) {
 		return 1;
 	}
 	
@@ -577,33 +603,43 @@ GraphLayer_Front( LCUI_GraphLayer *glayer )
 {
 	int i, total, src_pos = -1, des_pos = -1;
 	LCUI_GraphLayer *tmp_child;
-	LCUI_Queue *queue;
+	LCUI_Queue *child_list;
 	
 	if( !glayer || !glayer->parent ) {
 		return -1;
 	}
-	queue = &glayer->parent->child;
-	total = Queue_GetTotal( queue );
-	for( i=0; i<total; ++i ) {
-		tmp_child = (LCUI_GraphLayer *)Queue_Get( queue, i );
-		if( glayer == tmp_child ) {
+	child_list = &glayer->parent->child;
+	total = Queue_GetTotal( child_list );
+	/* 先在队列中找到自己，以及z-index值小于或等于它的第一个图层 */
+	for(i=0,src_pos=des_pos=-1; i<total; ++i) {
+		tmp_child = (LCUI_GraphLayer*)Queue_Get( child_list, i );
+		if( !tmp_child ) {
+			continue;
+		}
+		if( tmp_child == glayer ) {
 			src_pos = i;
 			continue;
-		} else if( glayer->z_index < tmp_child->z_index ) {
-			continue;
 		}
-		des_pos = i;
-		if( src_pos != -1 ) {
-			break;
+		if( des_pos == -1 ) {
+			if( tmp_child->z_index
+			  <= glayer->z_index ) {
+				des_pos = i;
+			}
+		} else {
+			if( src_pos != -1 ) {
+				break;
+			}
 		}
 	}
-	if( -1 == src_pos || -1 == des_pos ) {
-		return 1;
+	/* 没有找到就退出 */
+	if( des_pos == -1 || src_pos == -1 ) {
+		return -1;
 	}
 	if( src_pos+1 == des_pos ) {
-		return 2;
+		return 1;
 	}
-	Queue_Move( queue, des_pos, src_pos );
+	/* 找到的话就移动位置 */
+	Queue_Move( child_list, des_pos, src_pos );
 	return 0;
 }
 
