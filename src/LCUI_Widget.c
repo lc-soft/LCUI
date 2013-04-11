@@ -1065,8 +1065,8 @@ Widget_PrintChildList( LCUI_Widget *widget )
 		if( child == NULL ) {
 			continue;
 		}
-		printf("[%d] widget: %p, type: %s, pos: (%d,%d), size: (%d, %d)\n",
-			i, child, child->type_name.string, 
+		printf("[%d] widget: %p, type: %s, z-index: %d, pos: (%d,%d), size: (%d, %d)\n",
+			i, child, child->type_name.string, child->main_glayer->z_index, 
 			child->pos.x, child->pos.y,
 			child->size.w, child->size.h);
 	}
@@ -1464,7 +1464,10 @@ Widget_New( const char *widget_type )
 	LCUI_Widget *widget;
 	LCUI_App *app;
 	
-	widget = malloc( sizeof(LCUI_Widget) );
+	if( !LCUI_Active() ) {
+		return NULL;
+	}
+	widget = (LCUI_Widget *)malloc( sizeof(LCUI_Widget) );
 	if( !widget ) {
 		char str[256];
 		sprintf( str, "%s ()", __FUNCTION__ );
@@ -1914,6 +1917,7 @@ Widget_SetZIndex( LCUI_Widget *widget, int z_index )
 		}
 	}
 	GraphLayer_SetZIndex( glayer, z_index );
+	Record_WidgetUpdate( widget->parent, NULL, DATATYPE_SORT, 0 );
 	return 0;
 }
 
@@ -2000,11 +2004,7 @@ Widget_ExecSortChild( LCUI_Widget *widget )
 	LCUI_Widget *child_a, *child_b;
 	LCUI_Queue *child_list;
 	
-	if( !widget ) {
-		child_list = &LCUI_Sys.widget_list;
-	} else {
-		child_list = &widget->child;
-	}
+	child_list = Widget_GetChildList( widget );
 	Queue_Lock( child_list );
 	total = Queue_GetTotal( child_list );
 	/* 先将模态部件移动到队列前端 */
@@ -2013,6 +2013,8 @@ Widget_ExecSortChild( LCUI_Widget *widget )
 		if( !child_a || !child_a->modal ) {
 			continue;
 		}
+		/* 更新模态部件的z-index值 */
+		Widget_SetZIndex( child_a, 0 );
 		Queue_Move( child_list, 0, i );
 		++j; /* j用于统计模态部件的数量 */
 	}
@@ -2028,13 +2030,13 @@ Widget_ExecSortChild( LCUI_Widget *widget )
 				continue;
 			}
 			if( child_b->main_glayer->z_index
-			 < child_a->main_glayer->z_index ) {
+			 > child_a->main_glayer->z_index ) {
 				Queue_Swap( child_list, j, i );
-				child_a = child_b;
 			}
 		}
 	}
 	Queue_Unlock( child_list );
+	GraphLayer_Sort( Widget_GetMainGraphLayer(widget) );
 }
 
 /* 将部件显示在同等z-index值的部件的前端 */
@@ -2061,13 +2063,15 @@ Widget_Front( LCUI_Widget *widget )
 			src_pos = i;
 			continue;
 		}
-		if( child->main_glayer->z_index
-		  > widget->main_glayer->z_index ) {
-			continue;
-		}
-		des_pos = i;
-		if( src_pos != -1 ) {
-			break;
+		if( des_pos == -1 ) {
+			if( child->main_glayer->z_index
+			  <= widget->main_glayer->z_index ) {
+				des_pos = i;
+			}
+		} else {
+			if( src_pos != -1 ) {
+				break;
+			}
 		}
 	}
 	/* 没有找到就退出 */
@@ -2448,6 +2452,7 @@ Widget_SetModal( LCUI_Widget *widget, LCUI_BOOL is_modal )
 		return;
 	}
 	widget->modal = is_modal;
+	Widget_SetZIndex( widget, 0 );
 }
 
 LCUI_EXPORT(void)
@@ -2619,7 +2624,7 @@ Widget_Show(LCUI_Widget *widget)
 		return; 
 	}
 	Record_WidgetUpdate( widget, NULL, DATATYPE_SHOW, 0 );
-	Record_WidgetUpdate( widget->parent, NULL, DATATYPE_SORT, 0 );
+	Record_WidgetUpdate( widget, NULL, DATATYPE_SORT, 0 );
 }
 
 LCUI_EXPORT(void)
@@ -2859,7 +2864,7 @@ Widget_ProcessUpdate( LCUI_Widget *widget )
 			Widget_ExecHide(tmp_ptr->widget);
 			break;
 		    case DATATYPE_SORT:
-			Widget_ExecSortChild(tmp_ptr->widget);
+			Widget_ExecSortChild(widget);
 			break;
 		    case DATATYPE_SHOW: 
 			Widget_ExecShow(tmp_ptr->widget);
