@@ -71,6 +71,9 @@ Window_GetClientArea(LCUI_Widget *window)
 /* 功能：获取窗口客户区的指针 */
 {
 	LCUI_Window *win_p;
+	if( !window ) {
+		return;
+	}
 	win_p = (LCUI_Window *)Widget_GetPrivData(window); 
 	return win_p->client_area;	
 }
@@ -80,7 +83,10 @@ LCUI_EXPORT(LCUI_Widget*)
 Window_GetCloseButton( LCUI_Widget *window )
 {
 	LCUI_Window *win_p;
-	win_p = Widget_GetPrivData( window );
+	if( !window ) {
+		return;
+	}
+	win_p = (LCUI_Window *)Widget_GetPrivData( window );
 	return win_p->btn_close;
 }
 
@@ -125,6 +131,9 @@ Window_SetTitleIcon(LCUI_Widget *window, LCUI_Graph *icon)
 	LCUI_Widget *title_widget;
 	LCUI_TitleBar *title_data;
 	
+	if( window == NULL ) {
+		return;
+	}
 	title_widget = Window_GetTitleBar(window);
 	title_data = (LCUI_TitleBar *)Widget_GetPrivData(title_widget);
 	
@@ -348,20 +357,30 @@ Window_Init( LCUI_Widget *win_p )
 	Widget_SetAlign( win_p, ALIGN_MIDDLE_CENTER, Pos(0,0) );
 }
 
+/* 为窗口设置标题文字 */
 LCUI_EXPORT(void)
-Window_SetTitleText(LCUI_Widget *win_p, const char *text)
-/* 功能：为窗口设置标题文字 */
+Window_SetTitleText( LCUI_Widget *win_p, const char *text )
 { 
-	LCUI_Widget *titlebar = Window_GetTitleBar(win_p); 
-	LCUI_TitleBar *title = Widget_GetPrivData(titlebar); 
+	LCUI_Widget *titlebar; 
+	LCUI_TitleBar *title; 
+	if( win_p == NULL ) {
+		return;
+	}
+	titlebar = Window_GetTitleBar(win_p); 
+	title = (LCUI_TitleBar *)Widget_GetPrivData(titlebar); 
 	Label_Text(title->label, text);
 }
 
 LCUI_EXPORT(void)
-Window_SetTitleTextW(LCUI_Widget *win_p, const wchar_t *text)
-{ 
-	LCUI_Widget *titlebar = Window_GetTitleBar(win_p); 
-	LCUI_TitleBar *title = Widget_GetPrivData(titlebar); 
+Window_SetTitleTextW( LCUI_Widget *win_p, const wchar_t *text )
+{
+	LCUI_Widget *titlebar; 
+	LCUI_TitleBar *title; 
+	if( win_p == NULL ) {
+		return;
+	}
+	titlebar = Window_GetTitleBar(win_p); 
+	title = (LCUI_TitleBar *)Widget_GetPrivData(titlebar); 
 	Label_TextW(title->label, text);
 }
 
