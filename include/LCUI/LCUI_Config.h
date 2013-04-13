@@ -144,7 +144,7 @@
 #define USE_LIBPNG 1
 
 /* Define to 1 if you have the tslib */
-#define USE_TSLIB 1
+/* #undef USE_TSLIB */
 
 /* Version number of package */
 #define VERSION "0.13.0"
