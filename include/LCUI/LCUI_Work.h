@@ -49,15 +49,17 @@
 LCUI_BEGIN_HEADER
 
 typedef enum WidgetEventType_ {
-	EVENT_DRAG,	/* 部件的拖动事件 */
-	EVENT_CLICKED,	/* 部件的点击事件 */
-	EVENT_MOVE,	/* 部件的移动事件 */
-	EVENT_RESIZE,	/* 部件尺寸改变 */
-	EVENT_REDRAW,	/* 部件重绘 */
-	EVENT_KEYBOARD,	/* 按键事件 */
-	EVENT_INPUT,	/* 输入事件 */
-	EVENT_FOCUSIN,	/* 得到焦点 */
-	EVENT_FOCUSOUT	/* 失去焦点 */
+	EVENT_DRAG,		/* 部件的拖动事件 */
+	EVENT_CLICKED,		/* 部件的点击事件 */
+	EVENT_MOVE,		/* 部件的移动事件 */
+	EVENT_RESIZE,		/* 部件尺寸改变 */
+	EVENT_REDRAW,		/* 部件重绘 */
+	EVENT_KEYBOARD,		/* 按键事件 */
+	EVENT_INPUT,		/* 输入事件 */
+	EVENT_MOUSEBUTTON,	/* 鼠标按钮事件 */
+	EVENT_MOUSEMOTION,	/* 鼠标移动事件 */
+	EVENT_FOCUSIN,		/* 得到焦点 */
+	EVENT_FOCUSOUT		/* 失去焦点 */
 } WidgetEventType; 
 
 typedef struct LCUI_WidgetResizeEvent_ {
@@ -79,12 +81,19 @@ typedef struct LCUI_WidgetFocusEvent_ {
 	LCUI_BOOL focus;
 } LCUI_WidgetFocusEvent;
 
-typedef LCUI_KeyboardEvent LCUI_WidgetKeyboardEvent;
+typedef LCUI_KeyboardEvent	LCUI_WidgetKeyboardEvent;
+typedef LCUI_MouseButtonEvent	LCUI_WidgetMouseButtonEvent;
+typedef LCUI_MouseMotionEvent	LCUI_WidgetMouseMotionEvent;
 
 typedef struct LCUI_WidgetInputEvent_ {
 	uchar_t type;
 	wchar_t text[MAX_INPUT_TEXT_LEN];
 } LCUI_WidgetInputEvent;
+
+typedef struct LCUI_WidgetClickedEvent_ {
+	uchar_t type;
+	LCUI_Pos rel_pos;	/* 鼠标点击处的相对坐标 */
+} LCUI_WidgetClickedEvent;
 
 typedef union LCUI_WidgetEvent_ {
 	uchar_t type;
@@ -93,6 +102,9 @@ typedef union LCUI_WidgetEvent_ {
 	LCUI_WidgetFocusEvent focus;
 	LCUI_WidgetResizeEvent resize;
 	LCUI_WidgetInputEvent input;
+	LCUI_WidgetClickedEvent clicked;
+	LCUI_WidgetMouseButtonEvent mouse_button;
+	LCUI_WidgetMouseMotionEvent mouse_motion;
 } LCUI_WidgetEvent;
 
 
