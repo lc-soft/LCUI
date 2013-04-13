@@ -4,6 +4,15 @@
 #include LC_ERROR_H 
 
 #ifdef USE_LIBJPEG
+/* *********************************************************************
+ * jmorecfg.h 里面的boolean是这样定义的：
+ * typedef enum { FALSE = 0, TRUE = 1 } boolean;
+ * 为了不使LCUI的FALSE和TRUE这两个宏与boolean枚举中的FALSE和TRUE产生冲突，在此用
+ * #undef取消这两个宏。
+ * ********************************************************************/
+#undef TRUE
+#undef FALSE
+
 #include <jpeglib.h>
 #include <jerror.h>
 #include <setjmp.h>
