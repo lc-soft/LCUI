@@ -130,9 +130,9 @@ LCUI_EXPORT(LCUI_Size)
 TextLayer_GetSize ( LCUI_TextLayer *layer );
 /* 获取文本图层的实际尺寸 */
 
-LCUI_EXPORT(wchar_t *)
-TextLayer_GetText( LCUI_TextLayer *layer );
 /* 获取文本图层中的文本内容 */
+LCUI_EXPORT(size_t)
+TextLayer_GetText( LCUI_TextLayer *layer, wchar_t *buff, size_t max_len );
 
 LCUI_EXPORT(void)
 TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos );
