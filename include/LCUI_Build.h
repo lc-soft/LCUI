@@ -39,34 +39,6 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#if defined(WIN32) || defined(_WIN32)
-#define LCUI_BUILD_IN_WIN32
-#define LCUI_THREAD_WIN32
-#define LCUI_VIDEO_DRIVER_WIN32
-#define LCUI_FONT_ENGINE_FREETYPE
-#define USE_LIBPNG
-#define USE_LIBJPEG
-#undef USE_TSLIB
-#undef LCUI_THREAD_PTHREAD
-#undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
-#else
-#include LC_CONFIG_H
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#define LCUI_BUILD_IN_LINUX
-#define LCUI_KEYBOARD_DRIVER_LINUX
-#define LCUI_MOUSE_DRIVER_LINUX
-#endif
-
-#ifdef __cplusplus
-#define LCUI_BEGIN_HEADER  extern "C"{
-#define LCUI_END_HEADER  }
-#else
-#define LCUI_BEGIN_HEADER  /* nothing */
-#define LCUI_END_HEADER
-#endif
-
 #ifndef __LCUI_BUILD_H__
 #define __LCUI_BUILD_H__
 
@@ -202,4 +174,34 @@
 #define DEBUG_MSG3(format, ...) _DEBUG_MSG(format, ...)
 #else
 #define DEBUG_MSG3(format, ...) 
+
+
+#if defined(WIN32) || defined(_WIN32)
+#define LCUI_BUILD_IN_WIN32
+#define LCUI_THREAD_WIN32
+#define LCUI_VIDEO_DRIVER_WIN32
+#define LCUI_FONT_ENGINE_FREETYPE
+#define USE_LIBPNG
+#define USE_LIBJPEG
+#undef USE_TSLIB
+#undef LCUI_THREAD_PTHREAD
+#undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+#else
+#include LC_CONFIG_H
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#define LCUI_BUILD_IN_LINUX
+#define LCUI_KEYBOARD_DRIVER_LINUX
+#define LCUI_MOUSE_DRIVER_LINUX
+#endif
+
+#ifdef __cplusplus
+#define LCUI_BEGIN_HEADER  extern "C"{
+#define LCUI_END_HEADER  }
+#else
+#define LCUI_BEGIN_HEADER  /* nothing */
+#define LCUI_END_HEADER
+#endif
+
 #endif
