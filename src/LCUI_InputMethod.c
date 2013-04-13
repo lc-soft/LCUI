@@ -19,9 +19,6 @@ LCUI_BOOL imelist_init = FALSE;
 // 输入法列表
 LCUI_Queue imelist;
 
-// 输入缓冲区，用于保存输入法输入的文本
-static wchar_t text_input_buff[256];
-
 // 当前选择的输入法
 static LCUIIME_Info* current_ime = NULL;
 
