@@ -251,7 +251,7 @@ EventSlots_Init( LCUI_Queue *slots )
 /* 将函数指针以及两个参数，转换成LCUI_Func类型，保存至p_buff指向的缓冲区中 */
 LCUI_EXPORT(LCUI_BOOL)
 Get_FuncData(	LCUI_Func *p_buff, 
-		void (*func) (),
+		void (*func) (void*,void*),
 		void *arg1, void *arg2 )
 {
 	LCUI_App *app;

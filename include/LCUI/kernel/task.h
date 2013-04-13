@@ -49,7 +49,7 @@ typedef struct {
 	 * 任务也需要该ID来标识目标程序ID 
 	 * */
 	LCUI_ID id;
-	void (*func)();  /* 函数指针 */
+	void (*func)(void*,void*);  /* 函数指针 */
 	
 	/* 以下参数该怎么传给回调函数，具体要看是如何处理事件的 */  
 	void *arg[2];		/* 传给函数的两个参数 */
