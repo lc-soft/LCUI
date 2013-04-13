@@ -79,6 +79,12 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 		printf("WM_KEYUP: %ld\n",wParam);
 		LCUIKeyboard_FreeKey( wParam );
 		break;
+	case WM_RBUTTONDOWN:
+		Win32_LCUIMouse_ButtonDown( LCUIKEY_RIGHTBUTTON );
+		break;
+	case WM_RBUTTONUP:
+		Win32_LCUIMouse_ButtonUp( LCUIKEY_RIGHTBUTTON );
+		break;
 	case WM_LBUTTONDOWN:
 		//_DEBUG_MSG("left button down\n");
 		Win32_LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
