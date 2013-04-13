@@ -821,7 +821,7 @@ Get_Widget_RelativePos(LCUI_Widget *widget)
 }
 
 LCUI_EXPORT(LCUI_Pos)
-GlobalPos_ConvTo_RelativePos(LCUI_Widget *widget, LCUI_Pos global_pos)
+Widget_ToRelPos(LCUI_Widget *widget, LCUI_Pos global_pos)
 /* 
  * 功能：全局坐标转换成相对坐标
  * 说明：传入的全局坐标，将根据传入的部件指针，转换成相对于该部件所在容器区域的坐标
