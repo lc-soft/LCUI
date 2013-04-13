@@ -72,7 +72,7 @@ Window_GetClientArea(LCUI_Widget *window)
 {
 	LCUI_Window *win_p;
 	if( !window ) {
-		return;
+		return NULL;
 	}
 	win_p = (LCUI_Window *)Widget_GetPrivData(window); 
 	return win_p->client_area;	
@@ -84,7 +84,7 @@ Window_GetCloseButton( LCUI_Widget *window )
 {
 	LCUI_Window *win_p;
 	if( !window ) {
-		return;
+		return NULL;
 	}
 	win_p = (LCUI_Window *)Widget_GetPrivData( window );
 	return win_p->btn_close;
