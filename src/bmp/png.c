@@ -62,7 +62,7 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 			);
 		if(temp != 0) {
 			fclose(pic_fp);
-			printf("%s (): error: "__FUNCTION__, MALLOC_ERROR);
+			_DEBUG_MSG("error: %s", MALLOC_ERROR);
 			return 1;
 		}
 		
@@ -85,7 +85,7 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 			);
 		if(temp != 0) {
 			fclose(pic_fp);
-			printf("%s (): error: "__FUNCTION__, MALLOC_ERROR);
+			_DEBUG_MSG("error: %s", MALLOC_ERROR);
 			return 1;
 		}
 		
@@ -102,7 +102,7 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 	}
 	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
 #else
-	printf("warning: not PNG support!"); 
+	_DEBUG_MSG("warning: not PNG support!"); 
 #endif
 	return 0;
 }
