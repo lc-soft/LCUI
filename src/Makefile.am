@@ -22,6 +22,7 @@ LCUI_SOURCES = \
 	LCUI_GraphLayer.c	\
 	LCUI_StyleLibrary.c	\
 	LCUI_Work.c		\
+	LCUI_InputMethod.c	\
 	LCUI_Cursor.c		\
 	LCUI_Widget.c		\
 	LCUI_Error.c
