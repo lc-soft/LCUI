@@ -79,6 +79,7 @@ LCUIIME_Register( const char *ime_name, LCUIIME_Func *ime_func )
 	if( !ptr_data ) {
 		return -3;
 	}
+	LCUIString_Init( &ptr_data->name );
 	_LCUIString_Copy( &ptr_data->name, ime_name );
 	ime_id = ime_id + 1;
 	ptr_data->id = ime_id;
