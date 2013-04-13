@@ -12,6 +12,7 @@ LCUI_Graph.h LCUI_Graph.hpp \
 LCUI_StyleLibrary.h \
 LCUI_GraphLayer.h \
 LCUI_Input.h \
+LCUI_InputMethod.h \
 LCUI_Queue.h \
 LCUI_Thread.h LCUI_Thread.hpp \
 LCUI_Widget.h LCUI_Widget.hpp\
