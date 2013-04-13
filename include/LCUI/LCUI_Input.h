@@ -90,6 +90,8 @@
 #define LCUIKEY_HOMEPAGE	293
 #define LCUIKEY_END		296
 
+#define LCUIKEY_CAPITAL		-1
+#define LCUIKEY_SHIFT		-1
 
 /* 这个是诺亚舟NP1500学习机的游戏键A和B键的键值 */
 #define KEY_AA      342
