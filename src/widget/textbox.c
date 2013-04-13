@@ -178,8 +178,7 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 static void
 TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
-	static char buff[5];
-	static int cols, flag, rows;
+	static int cols, rows;
 	static LCUI_Pos cur_pos;
 	static LCUI_TextLayer *layer;
 	static LCUI_TextBox *textbox;
