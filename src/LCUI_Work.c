@@ -334,8 +334,9 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 {
 	LCUI_Widget *widget;
 	LCUI_Pos pos;
+	LCUI_WidgetEvent wdg_event;
 
-	if( !event || Mouse_LeftButton(event) < 0 ) {
+	if( !event || event->state != LCUIKEYSTATE_PRESSED ) {
 		return;
 	}
 	
@@ -344,6 +345,19 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 	widget = Widget_At( NULL, pos );
 	
 	if( !widget_allow_response(widget) ) {
+		return;
+	}
+	/* 开始准备事件数据 */
+	pos = Widget_ToRelPos( widget, pos );
+	wdg_event.type = EVENT_MOUSEBUTTON;
+	wdg_event.mouse_button.x = pos.x;
+	wdg_event.mouse_button.y = pos.y;
+	wdg_event.mouse_button.button = event->button;
+	wdg_event.mouse_button.state = event->state;
+	/* 派发事件 */
+	Widget_DispatchEvent( widget, &wdg_event );
+
+	if( event->button != LCUIKEY_LEFTBUTTON ) {
 		return;
 	}
 	click_widget = widget;
@@ -365,10 +379,9 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 	LCUI_WidgetEvent tmp_event;
 	LCUI_Pos pos;
 	
-	if( !event || Mouse_LeftButton(event) < 0 ) {
+	if( !event || event->state != LCUIKEYSTATE_RELEASE ) {
 		return;
 	}
-	tmp_event.type = EVENT_CLICKED;
 	pos.x = event->x;
 	pos.y = event->y;
 	widget = Widget_At( NULL, pos );
@@ -377,6 +390,17 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 		return;
 	}
 	
+	pos = Widget_ToRelPos( widget, pos );
+	tmp_event.type = EVENT_MOUSEBUTTON;
+	tmp_event.mouse_button.x = pos.x;
+	tmp_event.mouse_button.y = pos.y;
+	tmp_event.mouse_button.button = event->button;
+	tmp_event.mouse_button.state = event->state;
+	Widget_DispatchEvent( widget, &tmp_event );
+
+	if( event->button != LCUIKEY_LEFTBUTTON ) {
+		return;
+	}
 	DEBUG_MSG("mouse left button free\n");
 	if( !click_widget ) {
 		/* 如果是点击屏幕空白处，则复位焦点 */
@@ -387,7 +411,7 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 		DEBUG_MSG("end drag\n");
 		_End_DragEvent( click_widget, event );
 	}
-	if(click_widget == widget) {
+	if( click_widget == widget ) {
 		/* 
 		 * 如果点击时和点击后都在同一个按钮部件内进行的,
 		 * 触发CLICKED事件，将部件中关联该事件的回调函数发送至
@@ -395,7 +419,9 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 		 * */
 		tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_CLICKED );
 		if( tmp_widget && tmp_widget->enabled ) {
-			Widget_DispatchEvent( tmp_widget, &tmp_event);
+			tmp_event.type = EVENT_CLICKED;
+			tmp_event.clicked.rel_pos = Widget_ToRelPos( widget, pos );
+			Widget_DispatchEvent( tmp_widget, &tmp_event );
 		}
 		widget_list_set_state (widget, WIDGET_STATE_ACTIVE);
 	}
