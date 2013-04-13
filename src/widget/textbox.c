@@ -163,7 +163,7 @@ TextBox_TextLayer_Click( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 		pos.x = pos.y = 0;
 	} else {
 		/* 全局坐标转换成相对坐标 */
-		pos = GlobalPos_ConvTo_RelativePos( tb->text, event->drag.cursor_pos );
+		pos = Widget_ToRelPos( tb->text, event->drag.cursor_pos );
 	}
 	//printf("pos: %d,%d\n", pos.x, pos.y);
 	/* 根据像素坐标，设定文本光标的位置 */

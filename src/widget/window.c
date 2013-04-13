@@ -116,7 +116,7 @@ Window_ExecMove(LCUI_Widget *titlebar, LCUI_WidgetEvent *event)
 	/* 将偏移坐标加在窗口全局坐标上，得出窗口的新全局坐标 */
 	pos = Pos_Add( pos, offset );
 	/* 转换成在容器区域内的相对坐标 */
-	pos = GlobalPos_ConvTo_RelativePos( window, pos );
+	pos = Widget_ToRelPos( window, pos );
 	/* 解除之前设定的align */
 	Widget_SetAlign( window, ALIGN_NONE, Pos(0,0) );
 	/* 移动窗口的位置 */
