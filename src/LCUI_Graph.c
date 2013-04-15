@@ -337,13 +337,15 @@ Graph_Init( LCUI_Graph *pic )
 	}
 	
 	pic->quote	= FALSE; 
+	pic->src	= NULL;
 	pic->have_alpha	= FALSE;
 	pic->is_opaque	= FALSE;
 	pic->not_visible = FALSE;
 	pic->rgba	= NULL;
 	pic->alpha	= 255;
 	pic->mem_size	= 0;
-	pic->pos	= Pos(0, 0);
+	pic->pos.x	= 0;
+	pic->pos.y	= 0;
 	pic->width	= 0;
 	pic->height	= 0;
 	pic->type	= DEFAULT;
@@ -443,7 +445,6 @@ Graph_Create( LCUI_Graph *graph, int width, int height )
 LCUI_EXPORT(void)
 Graph_Copy( LCUI_Graph *des, LCUI_Graph *src )
 {
-	int size;
 	if( !des ) {
 		return;
 	}
@@ -456,14 +457,7 @@ Graph_Copy( LCUI_Graph *des, LCUI_Graph *src )
 		}
 		/* 创建合适尺寸的Graph */
 		Graph_Create(des, src->width, src->height);
-		/* 开始拷贝图像数组 */
-		size = sizeof(uchar_t)*src->width*src->height;
-		memcpy(des->rgba[0], src->rgba[0], size);
-		memcpy(des->rgba[1], src->rgba[1], size);
-		memcpy(des->rgba[2], src->rgba[2], size);
-		if(Graph_HaveAlpha(src)) {
-			memcpy(des->rgba[3], src->rgba[3], size);
-		}
+		Graph_Replace( des, src, Pos(0,0) );
 		des->type = src->type;       /* 存储图片类型 */
 		des->bit_depth = src->bit_depth;  /* 位深 */
 		des->alpha = src->alpha;      /* 全局透明度 */
