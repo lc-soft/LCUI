@@ -83,7 +83,10 @@ typedef struct LCUI_WidgetFocusEvent_ {
 
 typedef LCUI_KeyboardEvent	LCUI_WidgetKeyboardEvent;
 typedef LCUI_MouseButtonEvent	LCUI_WidgetMouseButtonEvent;
-typedef LCUI_MouseMotionEvent	LCUI_WidgetMouseMotionEvent;
+typedef struct LCUI_WidgetMouseMotionEvent_ {
+	uchar_t type;
+	LCUI_Pos rel_pos;
+} LCUI_WidgetMouseMotionEvent;
 
 typedef struct LCUI_WidgetInputEvent_ {
 	uchar_t type;

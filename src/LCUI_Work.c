@@ -443,12 +443,28 @@ static void
 LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 {
 	LCUI_Pos pos;
-	LCUI_Widget *widget;
+	LCUI_Widget *tmp_widget, *widget;
+	LCUI_WidgetEvent wdg_event;
 
 	pos.x = event->x;
 	pos.y = event->y;
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
 	widget = Widget_At (NULL, pos);
+	if( widget ) {
+		tmp_widget = widget;
+		while( !Widget_Have_Event( tmp_widget, EVENT_MOUSEMOTION ) ) {
+			tmp_widget = tmp_widget->parent;
+			if( tmp_widget == NULL ) {
+				break;
+			}
+		}
+		if( tmp_widget ) {
+			wdg_event.type = EVENT_MOUSEMOTION;
+			pos = Widget_ToRelPos( tmp_widget, pos );
+			wdg_event.mouse_motion.rel_pos = pos;
+			Widget_DispatchEvent( tmp_widget, &wdg_event );
+		}
+	}
 	/* 如果没有部件处于按住状态 */
 	if( widget_allow_response(widget) && !click_widget ) {
 		widget_list_set_state (widget, WIDGET_STATE_OVERLAY);
