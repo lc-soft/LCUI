@@ -109,7 +109,7 @@ ScrollBar_Drag( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	pos = Widget_GetGlobalPos( widget );
 	offset = Pos_Sub( event->drag.new_pos, pos ); 
 	pos = Pos_Add( pos, offset ); 
-	pos = Widget_ToRelPos( widget, pos );
+	pos = Widget_ToRelPos( widget->parent, pos );
 	
 	Move_ScrollBar( widget, pos );
 	/* 若函数指针有效，则调用回调函数 */

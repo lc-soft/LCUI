@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * LCUI_Widget.c -- processing GUI widget 
  * 
  * Copyright (C) 2013 by
@@ -824,13 +824,13 @@ LCUI_EXPORT(LCUI_Pos)
 Widget_ToRelPos(LCUI_Widget *widget, LCUI_Pos global_pos)
 /* 
  * 功能：全局坐标转换成相对坐标
- * 说明：传入的全局坐标，将根据传入的部件指针，转换成相对于该部件所在容器区域的坐标
+ * 说明：传入的全局坐标，将根据传入的部件指针，转换成相对于该部件的坐标
  *  */
 {
 	if( widget == NULL || widget->parent == NULL) {
 		return global_pos;
 	}
-	widget = widget->parent;
+	//widget = widget->parent;
 	while( widget ) {
 		global_pos.x -= widget->padding.left;
 		global_pos.y -= widget->padding.top; 
@@ -1154,7 +1154,7 @@ Widget_SyncInvalidArea( LCUI_Widget *widget )
 	}
 	total = Queue_GetTotal( widget_list );
 	for(i=total-1; i>=0; --i) {
-		child = Queue_Get( widget_list, i );
+		child = (LCUI_Widget*)Queue_Get( widget_list, i );
 		if( !child || !child->visible ) {
 			continue;
 		}
@@ -2542,7 +2542,8 @@ LCUI_EXPORT(void)
 Widget_Resize( LCUI_Widget *widget, LCUI_Size new_size )
 {
 	LCUI_Size max_size, min_size;
-	if( !widget || new_size.w < 0 || new_size.h < 0) {
+
+	if( widget == NULL || new_size.w < 0 || new_size.h < 0) {
 		return;
 	}
 	max_size = Widget_GetMaxSize( widget );
@@ -2562,6 +2563,7 @@ Widget_Resize( LCUI_Widget *widget, LCUI_Size new_size )
 	}
 	widget->w.px = new_size.w;
 	widget->h.px = new_size.h;
+
 	Record_WidgetUpdate( widget, &new_size, DATATYPE_SIZE, 0 );
 	if( widget->pos_type == POS_TYPE_STATIC
 	 || widget->pos_type == POS_TYPE_RELATIVE ) {
