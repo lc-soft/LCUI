@@ -110,7 +110,11 @@ hide_textbox_cursor( LCUI_Widget *widget  )
 	if( widget == NULL ) {
 		return;
 	}
-	tb = Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	if( tb == NULL ) {
+		active_textbox = NULL;
+		return;
+	}
 	Widget_Hide( tb->cursor );
 }
 
@@ -121,7 +125,11 @@ show_textbox_cursor( LCUI_Widget *widget )
 	if( widget == NULL ) {
 		return;
 	}
-	tb = Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	if( tb == NULL ) {
+		active_textbox = NULL;
+		return;
+	}
 	Widget_Show( tb->cursor );
 }
 
