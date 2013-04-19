@@ -1,0 +1,39 @@
+[file_prefs]
+final_new_line=true
+ensure_convert_new_lines=false
+strip_trailing_spaces=true
+replace_tabs=false
+
+[indentation]
+indent_width=8
+indent_type=1
+indent_hard_tab_width=8
+detect_indent=false
+detect_indent_width=false
+indent_mode=2
+
+[project]
+name=LCUI
+base_path=/home/liuchao/桌面/project/LCUI/
+description=
+file_patterns=
+
+[long line marker]
+long_line_behaviour=1
+long_line_column=72
+
+[files]
+current_page=3
+FILE_NAME_0=1964;C;0;16;1;1;0;%2Fhome%2Fliuchao%2F桌面%2Fproject%2FLCUI%2Fsrc%2Fkernel%2Fevent.c;0;8
+FILE_NAME_1=5593;C;0;16;1;1;0;%2Fhome%2Fliuchao%2F桌面%2Fproject%2FLCUI%2Fsrc%2FLCUI_Widget.c;0;8
+FILE_NAME_2=2034;C;0;16;1;1;0;%2Fhome%2Fliuchao%2F桌面%2Fproject%2FLCUI%2Finclude%2FLCUI%2FLCUI_Widget.h;0;8
+FILE_NAME_3=2209;C;0;16;1;1;0;%2Fhome%2Fliuchao%2F桌面%2Fproject%2FLCUI%2Fsrc%2Fwidget%2Factivebox.c;0;8
+
+[build-menu]
+CFT_00_LB=编译(_C)
+CFT_00_CM=gcc -Wall -O2 -c "%f"
+CFT_00_WD=
+CFT_01_LB=生成(_B)
+CFT_01_CM=gcc -o "%e" "%f"
+CFT_01_WD=
+filetypes=C;
