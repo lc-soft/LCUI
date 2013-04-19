@@ -2,40 +2,40 @@
  * LCUI_Work.c -- LCUI's other work
  * Copyright (C) 2013 by
  * Liu Chao
- * 
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
- 
+
 /* ****************************************************************************
  * LCUI_Work.c -- LCUI 的其它工作
  *
  * 版权所有 (C) 2013 归属于
  * 刘超
- * 
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 //#define DEBUG
 #include <LCUI_Build.h>
@@ -63,28 +63,28 @@ FuncQueue_Init(LCUI_Queue *queue)
 
 /****************** 处理部件拖动/点击事件的相关代码 ************************/
 static LCUI_Widget *click_widget = NULL;
-static LCUI_Pos __offset_pos = {0, 0};  /* 点击部件时保存的偏移坐标 */ 
+static LCUI_Pos __offset_pos = {0, 0};  /* 点击部件时保存的偏移坐标 */
 
-static int 
+static int
 WidgetQueue_Get_Pos(LCUI_Queue *queue, LCUI_Widget *widget)
 /* 功能：从部件队列中获取指定部件的排列位置 */
 {
 	LCUI_Widget *temp;
-	int i, result = -1, total; 
-	
-	total = Queue_GetTotal(queue); 
+	int i, result = -1, total;
+
+	total = Queue_GetTotal(queue);
 	for(i = 0; i < total; ++i) {
 		temp = Queue_Get(queue, i);
-		if(temp == widget) { 
-			result = i; 
+		if(temp == widget) {
+			result = i;
 			break;
 		}
-	} 
+	}
 	return result;
 }
 /* 将回调函数与部件的指定事件进行关联 */
 LCUI_EXPORT(int)
-Widget_Event_Connect(	LCUI_Widget *widget, WidgetEventType event_id, 
+Widget_Event_Connect(	LCUI_Widget *widget, WidgetEventType event_id,
 			void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) )
 {
 	LCUI_Func func_data;
@@ -94,7 +94,7 @@ Widget_Event_Connect(	LCUI_Widget *widget, WidgetEventType event_id,
 	if( !Get_FuncData(&func_data, func, widget, NULL) ) {
 		return -2;
 	}
-	//_DEBUG_MSG("widget: %p, event id: %d, callback func: %p\n", 
+	//_DEBUG_MSG("widget: %p, event id: %d, callback func: %p\n",
 	//		widget, event_id, func_data->func);
 	EventSlots_Add( &widget->event, event_id, &func_data );
 	return 0;
@@ -108,11 +108,11 @@ int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	LCUI_EventSlot *slot;
 	LCUI_Task *task;
 	LCUI_WidgetEvent *p_buff;
-	
+
 	if( !widget ) {
 		return -1;
 	}
-	
+
 	slot = EventSlots_Find( &widget->event, event->type );
 	if( !slot ) {
 		return -2;
@@ -137,9 +137,9 @@ int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 static LCUI_BOOL
 Widget_Have_Event(LCUI_Widget *widget, int event_id)
 /* 检测部件是否关联了指定事件 */
-{ 
+{
 	LCUI_EventSlot *event;
-	
+
 	if( !widget ) {
 		return FALSE;
 	}
@@ -152,8 +152,8 @@ Widget_Have_Event(LCUI_Widget *widget, int event_id)
 
 static LCUI_Widget *
 Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
-/* 
- * 功能：查找能响应事件的部件 
+/*
+ * 功能：查找能响应事件的部件
  * 说明：此函数用于检查部件以及它的上级所有父部件，第一个有响应指定事件的部件，它的指针
  * 将会作为本函数的返回值
  * */
@@ -161,24 +161,24 @@ Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
 	if( !widget ) {
 		return NULL;
 	}
-	if( Widget_Have_Event(widget, event_id) ) { 
-		return widget; 
+	if( Widget_Have_Event(widget, event_id) ) {
+		return widget;
 	}
-	if( !widget->parent ) { 
+	if( !widget->parent ) {
 		return NULL;
 	} else {
-		return Get_ResponseEvent_Widget(widget->parent, event_id); 
+		return Get_ResponseEvent_Widget(widget->parent, event_id);
 	}
 }
 
-static void 
+static void
 _DragEvent_Start( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 {
 	LCUI_WidgetEvent widget_event;
 	widget_event.type = EVENT_DRAG;
 	widget_event.drag.cursor_pos.x = event->x;
 	widget_event.drag.cursor_pos.y = event->y;
-	/* 用全局坐标减去部件的全局坐标，得到偏移坐标 */ 
+	/* 用全局坐标减去部件的全局坐标，得到偏移坐标 */
 	__offset_pos = Widget_GetGlobalPos( widget );
 	__offset_pos = Pos_Sub( widget_event.drag.cursor_pos, __offset_pos );
 	/* 得出部件的新全局坐标 */
@@ -189,7 +189,7 @@ _DragEvent_Start( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 	Widget_DispatchEvent( widget, &widget_event );
 }
 
-static void 
+static void
 _DragEvent_Do( LCUI_Widget *widget, LCUI_MouseMotionEvent *event )
 {
 	LCUI_WidgetEvent widget_event;
@@ -202,7 +202,7 @@ _DragEvent_Do( LCUI_Widget *widget, LCUI_MouseMotionEvent *event )
 	Widget_DispatchEvent( widget, &widget_event );
 }
 
-static void 
+static void
 _DragEvent_End( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 {
 	LCUI_WidgetEvent widget_event;
@@ -222,7 +222,7 @@ typedef struct {
 
 static LCUI_Queue widget_list;
 
-static void 
+static void
 widget_list_reset( void )
 {
 	int i, n;
@@ -279,7 +279,7 @@ static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
 	int i, n;
 	LCUI_Queue *child_list;
 	LCUI_Widget *child, *up_widget;
-	
+
 	if( widget == NULL ) {
 		return TRUE;
 	}
@@ -329,7 +329,7 @@ widget_list_set_state( LCUI_Widget *widget, WIDGET_STATE state )
 }
 
 /* 响应鼠标按键按下事件 */
-static void 
+static void
 LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 {
 	LCUI_Widget *widget, *tmp_widget;
@@ -339,11 +339,11 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 	if( !event || event->state != LCUIKEYSTATE_PRESSED ) {
 		return;
 	}
-	
+
 	pos.x = event->x;
 	pos.y = event->y;
 	widget = Widget_At( NULL, pos );
-	
+
 	if( !widget_allow_response(widget) ) {
 		return;
 	}
@@ -366,7 +366,7 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 	click_widget = widget;
 	tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_DRAG );
 	/* 焦点转移给该部件 */
-	Set_Focus( tmp_widget );
+	Set_Focus( click_widget );
 	if( tmp_widget != NULL ) {
 		DEBUG_MSG("start drag\n");
 		/* 开始处理部件的拖动 */
@@ -376,24 +376,24 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 }
 
 /* 响应鼠标按键释放事件 */
-static void 
+static void
 LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 {
 	LCUI_Widget *tmp_widget, *widget;
 	LCUI_WidgetEvent tmp_event;
 	LCUI_Pos pos;
-	
+
 	if( !event || event->state != LCUIKEYSTATE_RELEASE ) {
 		return;
 	}
 	pos.x = event->x;
 	pos.y = event->y;
 	widget = Widget_At( NULL, pos );
-	
+
 	if( !widget_allow_response(widget) ) {
 		return;
 	}
-	
+
 	pos = Widget_ToRelPos( widget, pos );
 	tmp_event.type = EVENT_MOUSEBUTTON;
 	tmp_event.mouse_button.x = pos.x;
@@ -417,10 +417,10 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 		_DragEvent_End( tmp_widget, event );
 	}
 	if( click_widget == widget ) {
-		/* 
+		/*
 		 * 如果点击时和点击后都在同一个按钮部件内进行的,
 		 * 触发CLICKED事件，将部件中关联该事件的回调函数发送至
-		 * 任务队列，使之在主循环中执行 
+		 * 任务队列，使之在主循环中执行
 		 * */
 		tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_CLICKED );
 		if( tmp_widget && tmp_widget->enabled ) {
@@ -434,7 +434,7 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 	click_widget = NULL;
 }
 
-static void 
+static void
 LCUI_HandleMouseButton( LCUI_MouseButtonEvent *event, void *unused )
 {
 	if( event->state == LCUIKEYSTATE_PRESSED ) {
@@ -444,7 +444,7 @@ LCUI_HandleMouseButton( LCUI_MouseButtonEvent *event, void *unused )
 	}
 }
 
-static void 
+static void
 LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 {
 	LCUI_Pos pos;
@@ -468,7 +468,7 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	if( widget_allow_response(widget) && !click_widget ) {
 		widget_list_set_state (widget, WIDGET_STATE_OVERLAY);
 	}
-	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */ 
+	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */
 	tmp_widget = Get_ResponseEvent_Widget( click_widget, EVENT_DRAG );
 	if( tmp_widget != NULL && event->state == LCUIKEYSTATE_PRESSED ) {
 		DEBUG_MSG("doing drag\n");
@@ -476,8 +476,8 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	}
 }
 
-static int 
-Widget_DispatchKeyboardEvent(	LCUI_Widget *widget, 
+static int
+Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 				LCUI_KeyboardEvent *event )
 {
 	int i,n;
@@ -488,7 +488,7 @@ Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 	if( !widget ) {
 		return -1;
 	}
-	
+
 	slot = EventSlots_Find( &widget->event, EVENT_KEYBOARD );
 	if( !slot ) {
 		return -2;
@@ -511,7 +511,7 @@ Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 	return 0;
 }
 
-static void 
+static void
 WidgetFocusProc( LCUI_KeyboardEvent *event, void *arg );
 
 /* 初始化部件模块 */
@@ -542,7 +542,7 @@ static LCUI_Widget *root_focus_widget = NULL;
 
 LCUI_EXPORT(LCUI_BOOL)
 Set_Focus( LCUI_Widget *widget )
-/* 
+/*
  * 功能：为部件设置焦点
  * 说明：上个获得焦点的部件会得到EVENT_FOCUSOUT事件，而当前获得焦点的部件会得到
  * EVENT_FOCUSIN事件。
@@ -550,7 +550,7 @@ Set_Focus( LCUI_Widget *widget )
 {
 	LCUI_Widget **focus_widget;
 	LCUI_WidgetEvent event;
-	
+
 	if( widget ) {
 		/* 先处理上级部件的焦点 */
 		if( widget->parent ) {
@@ -562,11 +562,11 @@ Set_Focus( LCUI_Widget *widget )
 	} else {
 		return FALSE;
 	}
-	
+
 	if( widget->parent ) {
 		focus_widget = &widget->parent->focus_widget;
 	} else {
-		focus_widget = &root_focus_widget; 
+		focus_widget = &root_focus_widget;
 	}
 	if( *focus_widget ) {
 		/* 如果上次和这次的部件不一样 */
@@ -600,7 +600,7 @@ Get_FocusWidget( LCUI_Widget *widget )
 	int i, focus_pos, total;
 	LCUI_Widget **focus_widget;
 	LCUI_Queue *queue_ptr;
-	
+
 	//printf( "Get_FocusWidget(）： widget: %p\n", widget );
 	//print_widget_info( widget );
 	if( !widget ) {
@@ -614,38 +614,38 @@ Get_FocusWidget( LCUI_Widget *widget )
 		queue_ptr = &widget->child;
 		focus_widget = &widget->focus_widget;
 	}
-	
-	if( !focus_widget ) { 
+
+	if( !focus_widget ) {
 		return NULL;
 	}
-	
+
 	total = Queue_GetTotal( queue_ptr );
 	if( total <= 0 ) {
 		return NULL;
 	}
 	focus_pos = WidgetQueue_Get_Pos( queue_ptr, *focus_widget );
 	if( focus_pos < 0 ) {
-		*focus_widget = NULL; 
+		*focus_widget = NULL;
 		return NULL;
 	}
 	/* 查找可获取焦点的有效部件 */
 	for( i=focus_pos; i<total; ++i ) {
-		widget = Queue_Get( queue_ptr, i ); 
+		widget = Queue_Get( queue_ptr, i );
 		if( widget && widget->focus ) {
 			break;
 		}
 	}
 	if( i>=total ) {
-		*focus_widget = NULL; 
+		*focus_widget = NULL;
 		widget = NULL;
 	}
-	
+
 	return widget;
 }
 
 LCUI_EXPORT(LCUI_BOOL)
 Cancel_Focus( LCUI_Widget *widget )
-/* 
+/*
  * 功能：取消指定部件的焦点
  * 说明：该部件会得到EVENT_FOCUSOUT事件，并且，会将焦点转移至其它部件
  * */
@@ -654,11 +654,11 @@ Cancel_Focus( LCUI_Widget *widget )
 	LCUI_Widget *other_widget, **focus_widget;
 	LCUI_Queue *queue_ptr;
 	LCUI_WidgetEvent event;
-	
+
 	if( !widget || !widget->focus ) {
 		return FALSE;
 	}
-	
+
 	if( widget->parent ) {
 		focus_widget = &widget->parent->focus_widget;
 		queue_ptr = &widget->parent->child;
@@ -709,20 +709,20 @@ Cancel_Focus( LCUI_Widget *widget )
 LCUI_EXPORT(LCUI_BOOL)
 Reset_Focus( LCUI_Widget* widget )
 /* 复位指定部件内的子部件的焦点 */
-{	
+{
 	LCUI_Widget** focus_widget;
 	LCUI_WidgetEvent event;
-	
+
 	if( widget ) {
-		focus_widget = &widget->focus_widget; 
+		focus_widget = &widget->focus_widget;
 	} else {
-		focus_widget = &root_focus_widget; 
+		focus_widget = &root_focus_widget;
 	}
 	if( *focus_widget ) {
 		event.type = EVENT_FOCUSOUT;
 		Widget_DispatchEvent( *focus_widget, &event );
 	}
-	
+
 	*focus_widget = NULL;
 	return TRUE;
 }
@@ -745,7 +745,7 @@ Return_FocusToParent()
 	return 0;
 }
 
-static void 
+static void
 WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
 {
 	LCUI_Widget *widget = NULL, *tmp = NULL, *focus_widget;
