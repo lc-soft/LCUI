@@ -107,8 +107,8 @@ Window_ExecMove(LCUI_Widget *titlebar, LCUI_WidgetEvent *event)
 		return;
 	}
 	//_DEBUG_MSG( "new:%d,%d, cursor:%d,%d\n", 
-	//event->new_pos.x, event->new_pos.y, 
-	//event->cursor_pos.x, event->cursor_pos.y );
+	//event->drag.new_pos.x, event->drag.new_pos.y, 
+	//event->drag.cursor_pos.x, event->drag.cursor_pos.y );
 	/* 将新全局坐标减去标题栏的全局坐标，得到偏移坐标 */
 	pos = Widget_GetGlobalPos( titlebar );
 	offset = Pos_Sub( event->drag.new_pos, pos );
@@ -253,8 +253,8 @@ Window_ExecUpdate( LCUI_Widget *win_p )
 union_draw_method:;
 		/* 若窗口未获得焦点 */
 		if( !Widget_GetFocus( win_p ) ) {
-			back_color = RGB(217,217,217);
-			border_color = RGB(150,150,150); 
+			back_color = RGB(235,235,235);
+			border_color = RGB(211,211,211); 
 		}
 		border = Border(1, BORDER_STYLE_SOLID, border_color);
 		Widget_SetBorder( client_area, border);
@@ -309,7 +309,7 @@ Window_Init( LCUI_Widget *win_p )
 	LCUI_Window *win;
 	static LCUI_Graph btn_highlight, btn_normal, btn_down; 
 	
-	win = WidgetPrivData_New(win_p, sizeof(LCUI_Window));
+	win = (LCUI_Window*)WidgetPrivData_New(win_p, sizeof(LCUI_Window));
 	
 	titlebar = Widget_New("titlebar"); 
 	client_area = Widget_New(NULL); 
