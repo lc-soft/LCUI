@@ -1312,9 +1312,8 @@ Widget_SetStyleID( LCUI_Widget *widget, int style_id )
 	Widget_Draw( widget );
 }
 
-/* 获取与指定坐标层叠的部件 */
-LCUI_EXPORT(LCUI_Widget*)
-Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
+static LCUI_Widget *
+__Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 {
 	int i, total, temp;
 	LCUI_Widget *child, *widget;
@@ -1322,7 +1321,7 @@ Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 	LCUI_Pos tmp_pos;
 	LCUI_RGBA pixel;
 	LCUI_Graph *graph;
-	
+
 	if( ctnr ) {
 		widget_list = &ctnr->child;
 		/* 判断 鼠标坐标对应部件图层中的像素点的透明度 是否符合要求，
@@ -1349,8 +1348,7 @@ Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 	} else {
 		widget_list = &LCUI_Sys.widget_list;
 	}
-	
-	widget = ctnr; 
+	widget = ctnr;
 	total = Queue_GetTotal( widget_list );
 	for(i=0; i<total; ++i) {/* 从顶到底遍历子部件 */
 		child = Queue_Get( widget_list, i ); 
@@ -1358,20 +1356,33 @@ Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 			continue;
 		}
 		temp = LCUIRect_IncludePoint( pos, Widget_GetRect(child) );
-		/* 如果这个点被包含在部件区域内 */
-		if(temp != 1) {
+		/* 如果这个点没被包含在部件区域内 */
+		if( !temp ) {
 			continue;
 		}
 		/* 改变相对坐标 */
 		tmp_pos.x = pos.x - child->pos.x;
 		tmp_pos.y = pos.y - child->pos.y;
-		widget = Widget_At( child, tmp_pos );
-		if( !widget ) {
+		widget = __Widget_At( child, tmp_pos );
+		if( widget == NULL ) {
 			widget = ctnr;
 		}
 		break;
 	}
 	return widget; 
+}
+
+/* 获取指定坐标上的子部件，有则返回子部件指针，否则返回NULL */
+LCUI_EXPORT(LCUI_Widget*)
+Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
+{
+	LCUI_Widget *widget;
+	widget = __Widget_At( ctnr, pos );
+	if( widget == ctnr ) {
+		return NULL;
+	}
+	return widget;
+
 }
 
 LCUI_EXPORT(int)
