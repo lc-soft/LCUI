@@ -220,7 +220,9 @@ Queue_Get( LCUI_Queue * queue, int pos )
 			for(i=0; i< pos && p->next; ++i) {
 				p = p->next;
 			}
-			data = p->data;
+			if( p != NULL ) {
+				data = p->data;
+			}
 		}
 	}
 	return data;
