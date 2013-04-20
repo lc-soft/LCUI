@@ -413,8 +413,7 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 		return;
 	}
 	tmp_widget = Get_ResponseEvent_Widget( click_widget, EVENT_DRAG );
-	if( tmp_widget != NULL
-	 && !Widget_Have_Event(click_widget, EVENT_CLICKED) ) {
+	if( tmp_widget != NULL ) {
 		DEBUG_MSG("end drag\n");
 		_DragEvent_End( tmp_widget, event );
 	}
@@ -472,10 +471,9 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	if( widget && widget_allow_response(widget) && !click_widget ) {
 		widget_list_set_state (widget, WIDGET_STATE_OVERLAY);
 	}
-	tmp_widget = Get_ResponseEvent_Widget( click_widget, EVENT_DRAG );
 	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */
-	if( tmp_widget != NULL && event->state == LCUIKEYSTATE_PRESSED
-	 && !Widget_Have_Event( click_widget, EVENT_CLICKED ) ) {
+	tmp_widget = Get_ResponseEvent_Widget( click_widget, EVENT_DRAG );
+	if( tmp_widget != NULL && event->state == LCUIKEYSTATE_PRESSED ) {
 		DEBUG_MSG("doing drag\n");
 		_DragEvent_Do( tmp_widget, event );
 	}
