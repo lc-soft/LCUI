@@ -151,23 +151,6 @@ Graph_Unlock( LCUI_Graph *graph )
 	LCUIMutex_Unlock( &src->mutex );
 }
 
-/* 混合两个像素点的颜色 */
-LCUI_EXPORT(void)
-RGBA_Mix( LCUI_RGBA *back, LCUI_RGBA *fore )
-{
-	if(fore->alpha == 255) {
-		back->red	= fore->red;
-		back->blue	= fore->blue;
-		back->green	= fore->green;
-	}
-	else if(fore->alpha == 0);
-	else {
-		back->red = ALPHA_BLENDING(fore->red, back->red, fore->alpha); 
-		back->green = ALPHA_BLENDING(fore->red, back->green, fore->alpha); 
-		back->red = ALPHA_BLENDING(fore->red, back->blue, fore->alpha); 
-	}
-}
-
 /* 获取图像中指定坐标的像素点的颜色 */
 LCUI_EXPORT(LCUI_BOOL)
 Graph_GetPixel( LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel )
@@ -514,6 +497,7 @@ Graph_Quote( LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area )
 		des->pos.y = 0;
 		des->width = 0;
 		des->height= 0;
+		des->alpha = 255;
 		des->quote = FALSE;
 		return -1;
 	} 
@@ -522,6 +506,7 @@ Graph_Quote( LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area )
 	des->pos.y = area.y;
 	des->width = area.width;
 	des->height= area.height;
+	des->alpha = 255;
 	des->quote = TRUE;
 	return 0;
 }
@@ -936,7 +921,7 @@ Graph_Tile( LCUI_Graph *src, LCUI_Graph *des_buff, LCUI_BOOL replace )
 LCUI_EXPORT(int)
 Graph_Mix( LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos )
 {
-	uchar_t j;//, alpha; 
+	uchar_t j;
 	uchar_t *r1, *g1, *a1, *b1, *r2, *g2, *b2; 
 
 	float k;
@@ -974,61 +959,46 @@ Graph_Mix( LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos )
 		des_pos.y += cut.y;
 	}
 	
+	/* 根据左上角点的二维坐标，计算出一维坐标 */
+	m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
+	n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
 	/* 如果前景图形有alpha通道 */
 	if(Graph_HaveAlpha(src)) {
 		k = src->alpha / 255.0;
-		if(src->alpha == 255){
-			/* 根据左上角点的二维坐标，计算出一维坐标 */
-			m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
-			n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
-			for (y = 0; y < cut.height; ++y) { 
-				/* 保存这一行开头的像素点的位置 */
-				tmp_n = n; tmp_m = m;
-				total = tmp_n + cut.width;
-				/* 根据alpha通道来混合像素点 */
-				for (; tmp_n < total; ++tmp_n,++tmp_m) { 
-					des->rgba[0][tmp_n] = ALPHA_BLENDING(src->rgba[0][tmp_m], des->rgba[0][tmp_n], src->rgba[3][tmp_m]); 
-					des->rgba[1][tmp_n] = ALPHA_BLENDING(src->rgba[1][tmp_m], des->rgba[1][tmp_n], src->rgba[3][tmp_m]);
-					des->rgba[2][tmp_n] = ALPHA_BLENDING(src->rgba[2][tmp_m], des->rgba[2][tmp_n], src->rgba[3][tmp_m]); 
-				}
-				/* 切换到下一行像素点 */
-				m += src->width;
-				n += des->width; 
-			}
-		} else {
-			m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
-			n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+		if( src->alpha < 255 ) {
 			for (y = 0; y < cut.height; ++y) {
 				tmp_n = n; tmp_m = m;
 				total = tmp_n + cut.width; 
 				for (; tmp_n < total; ++tmp_n,++tmp_m) { 
 					j = src->rgba[3][tmp_m] * k;
-					des->rgba[0][tmp_n] = ALPHA_BLENDING(src->rgba[0][tmp_m], des->rgba[0][tmp_n], j); 
-					des->rgba[1][tmp_n] = ALPHA_BLENDING(src->rgba[1][tmp_m], des->rgba[1][tmp_n], j);
-					des->rgba[2][tmp_n] = ALPHA_BLENDING(src->rgba[2][tmp_m], des->rgba[2][tmp_n], j);  
+					ALPHA_BLEND( src->rgba[0][tmp_m], des->rgba[0][tmp_n], j );
+					ALPHA_BLEND( src->rgba[1][tmp_m], des->rgba[1][tmp_n], j );
+					ALPHA_BLEND( src->rgba[2][tmp_m], des->rgba[2][tmp_n], j );
 				} 
 				m += src->width;
 				n += des->width; 
 			}
-		} 
-	} else if(fore_graph->alpha < 255) { 
-		m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
-		n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
-		for (y = 0; y < cut.height; ++y) {
+			return 0;
+		}
+		for (y = 0; y < cut.height; ++y) { 
+			/* 保存这一行开头的像素点的位置 */
 			tmp_n = n; tmp_m = m;
-			total = tmp_n + cut.width; 
+			total = tmp_n + cut.width;
+			/* 根据alpha通道来混合像素点 */
 			for (; tmp_n < total; ++tmp_n,++tmp_m) { 
-				des->rgba[0][tmp_n] = ALPHA_BLENDING(src->rgba[0][tmp_m], des->rgba[0][tmp_n], fore_graph->alpha); 
-				des->rgba[1][tmp_n] = ALPHA_BLENDING(src->rgba[1][tmp_m], des->rgba[1][tmp_n], fore_graph->alpha);
-				des->rgba[2][tmp_n] = ALPHA_BLENDING(src->rgba[2][tmp_m], des->rgba[2][tmp_n], fore_graph->alpha); 
+				ALPHA_BLEND( src->rgba[0][tmp_m], des->rgba[0][tmp_n], src->rgba[3][tmp_m] );
+				ALPHA_BLEND( src->rgba[1][tmp_m], des->rgba[1][tmp_n], src->rgba[3][tmp_m] );
+				ALPHA_BLEND( src->rgba[2][tmp_m], des->rgba[2][tmp_n], src->rgba[3][tmp_m] );
 			}
+			/* 切换到下一行像素点 */
 			m += src->width;
 			n += des->width; 
 		}
-	} else {/* 如果前景图形没有透明效果 */
-		m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
-		n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
-		for (y = 0; y < cut.height; ++y) {
+		return 0;
+	}
+	/* 如果全局透明度为255，说明前景图形没有透明效果 */
+	if( fore_graph->alpha == 255 ) { 
+		for (y=0; y < cut.height; ++y) {
 			/* 使用指针来引用 */
 			r1 = des->rgba[0] + n;
 			g1 = des->rgba[1] + n;
@@ -1043,13 +1013,26 @@ Graph_Mix( LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos )
 			memcpy(g1, g2, cut.width);
 			memcpy(b1, b2, cut.width);
 			/* 透明度取决于前景图的透明度 */
-			if(Graph_HaveAlpha(des)) {
+			if( des->have_alpha ) {
 				memset(a1, src->alpha, sizeof(uchar_t)*cut.width);
 			}
 			m += src->width;
 			n += des->width; 
 		}
-	} 
+		return 0;
+	}
+	/* 全局透明度低于255，那么就用全局透明度进行混合 */
+	for (y = 0; y < cut.height; ++y) {
+		tmp_n = n; tmp_m = m;
+		total = tmp_n + cut.width; 
+		for (; tmp_n < total; ++tmp_n,++tmp_m) { 
+			ALPHA_BLEND( src->rgba[0][tmp_m], des->rgba[0][tmp_n], fore_graph->alpha );
+			ALPHA_BLEND( src->rgba[1][tmp_m], des->rgba[1][tmp_n], fore_graph->alpha );
+			ALPHA_BLEND( src->rgba[2][tmp_m], des->rgba[2][tmp_n], fore_graph->alpha );
+		}
+		m += src->width;
+		n += des->width; 
+	}
 	return 0; 
 }
 
@@ -1095,51 +1078,49 @@ Graph_Replace( LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos 
 	}
 	
 	k = src->alpha / 255.0;
+	m = (cut.y + src_rect.y) *src->width + cut.x + src_rect.x;
+	n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+	/* 如果前景图像有透明度，且背景图没有透明度 */
 	if(Graph_HaveAlpha(src) && !Graph_HaveAlpha(des)) { 
-		m = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
-		n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
 		for (y = 0; y < cut.height; ++y) {
 			tmp_n = n; tmp_m = m;
 			total = tmp_n + cut.width; 
 			for (; tmp_n < total; ++tmp_n,++tmp_m) { 
 				j = src->rgba[3][tmp_m] * k;
-				des->rgba[0][tmp_n] = ALPHA_BLENDING(src->rgba[0][tmp_m], 255, j); 
-				des->rgba[1][tmp_n] = ALPHA_BLENDING(src->rgba[1][tmp_m], 255, j);
-				des->rgba[2][tmp_n] = ALPHA_BLENDING(src->rgba[2][tmp_m], 255, j);  
+				ALPHA_BLEND( 255, src->rgba[0][tmp_m], j );
+				ALPHA_BLEND( 255, src->rgba[1][tmp_m], j );
+				ALPHA_BLEND( 255, src->rgba[2][tmp_m], j );
 			} 
 			m += src->width;
 			n += des->width; 
 		}
-	} else {
-		m = (cut.y + src_rect.y) *src->width + cut.x + src_rect.x;
-		n = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
-		for (y = 0; y < cut.height; ++y) {
-			/* 使用指针来引用 */
-			r1 = des->rgba[0] + n;
-			g1 = des->rgba[1] + n;
-			b1 = des->rgba[2] + n;
-			
-			r2 = src->rgba[0] + m;
-			g2 = src->rgba[1] + m;
-			b2 = src->rgba[2] + m; 
-			/* 拷贝 */
-			memcpy(r1, r2, cut.width);
-			memcpy(g1, g2, cut.width);
-			memcpy(b1, b2, cut.width);
-			if(Graph_HaveAlpha(des)) {
-				a1 = des->rgba[3] + n;
-				if(!Graph_HaveAlpha(src)) {
-					memset(a1, src->alpha, cut.width);
-				} else {
-					a2 = src->rgba[3] + m; 
-					memcpy(a1, a2, cut.width);  
-				}
-			}
-			m += src->width;
-			n += des->width; 
-		}
+		return 0;
 	}
-	
+	for (y = 0; y < cut.height; ++y) {
+		/* 使用指针来引用 */
+		r1 = des->rgba[0] + n;
+		g1 = des->rgba[1] + n;
+		b1 = des->rgba[2] + n;
+			
+		r2 = src->rgba[0] + m;
+		g2 = src->rgba[1] + m;
+		b2 = src->rgba[2] + m; 
+		/* 拷贝 */
+		memcpy(r1, r2, cut.width);
+		memcpy(g1, g2, cut.width);
+		memcpy(b1, b2, cut.width);
+		if(des->have_alpha) {
+			a1 = des->rgba[3] + n;
+			if(!src->have_alpha) {
+				memset(a1, src->alpha, cut.width);
+			} else {
+				a2 = src->rgba[3] + m; 
+				memcpy(a1, a2, cut.width);  
+			}
+		}
+		m += src->width;
+		n += des->width; 
+	}
 	return 0; 
 } 
 
