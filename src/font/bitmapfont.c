@@ -231,9 +231,9 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 			total = n + cut.width;
 			for (; n < total; ++n,++m) { 
 				/* 获取通过ALPHA混合后的像素点的数据 */
-				des->rgba[0][n] = ALPHA_BLENDING(color.red, des->rgba[0][n], bitmap->buffer[m]);
-				des->rgba[1][n] = ALPHA_BLENDING(color.green, des->rgba[1][n], bitmap->buffer[m]);
-				des->rgba[2][n] = ALPHA_BLENDING(color.blue, des->rgba[2][n], bitmap->buffer[m]);
+				ALPHA_BLEND( color.red, des->rgba[0][n], bitmap->buffer[m] );
+				ALPHA_BLEND( color.green, des->rgba[1][n], bitmap->buffer[m] );
+				ALPHA_BLEND( color.blue, des->rgba[2][n], bitmap->buffer[m] );
 			}
 			/* 切换至下一行像素点 */
 			des_start_pos += des->width;
