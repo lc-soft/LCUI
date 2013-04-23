@@ -43,29 +43,49 @@
 
 LCUI_BEGIN_HEADER
 
-#ifdef LCUI_BUILD_IN_WIN32
-#define NEED_MACRO_ALPHA_BLENDING
-#endif
-
-/* 如果需要宏定义版的ALPHA_BLENDING */
-#ifdef NEED_MACRO_ALPHA_BLENDING
-
-#define ALPHA_BLENDING(__fore__ , __back__, __alpha__) \
-	((__fore__*__alpha__+__back__*(255-__alpha__))/255)
-
-#else /* 否则，用内联函数版的ALPHA_BLENDING */
-
-extern inline uchar_t 
-ALPHA_BLENDING( uchar_t fore, uchar_t back, uchar_t alpha )
-__attribute__((always_inline));
-
-extern inline uchar_t 
-ALPHA_BLENDING( uchar_t fore, uchar_t back, uchar_t alpha )
-{
-	return (fore * alpha + back*(255-alpha))/255;
+/* 将两个像素点的颜色值进行alpha混合 */
+#define ALPHA_BLEND(__src__ , __des__, __alpha__)		\
+{								\
+    __des__ = (((__src__-__des__)*(__alpha__))>>8)+__des__;	\
 }
 
-#endif
+/* 获取像素的RGB值 */
+#define RGB_FROM_RGB565(pixel, r, g, b)	\
+{\
+	r = (((pixel&0xF800)>>11)<<3);	\
+	g = (((pixel&0x07E0)>>5)<<2);	\
+	b = ((pixel&0x001F)<<3);	\
+}
+
+#define RGB_FROM_RGB555(pixel, r, g, b)	\
+{\
+	r = (((pixel&0x7C00)>>10)<<3);	\
+	g = (((pixel&0x03E0)>>5)<<3);	\
+	b = ((pixel&0x001F)<<3);	\
+}
+
+#define RGB_FROM_RGB888(pixel, r, g, b)	\
+{\
+	r = ((pixel&0xFF0000)>>16);	\
+	g = ((pixel&0xFF00)>>8);	\
+	b = (pixel&0xFF);		\
+}
+
+/* 混合像素的RGB值 */
+#define RGB565_FROM_RGB(pixel, r, g, b)			\
+{							\
+    pixel = ((r>>3)<<11)|((g>>2)<<5)|(b>>3);		\
+}
+
+#define RGB555_FROM_RGB(pixel, r, g, b)			\
+{							\
+	pixel = ((r>>3)<<10)|((g>>3)<<5)|(b>>3);	\
+}
+
+#define RGB888_FROM_RGB(pixel, r, g, b)			\
+{							\
+	pixel = (r<<16)|(g<<8)|b;			\
+}
 
 /* 解除RGB宏 */
 #ifdef RGB
@@ -87,10 +107,6 @@ Graph_UpdateAttr( LCUI_Graph *buff );
 /* 解除互斥锁，以结束图像数据的使用 */
 LCUI_EXPORT(void)
 Graph_Unlock( LCUI_Graph *graph );
-
-/* 混合两个像素点的颜色 */
-LCUI_EXPORT(void)
-RGBA_Mix( LCUI_RGBA *back, LCUI_RGBA *fore );
 
 /* 获取图像中指定坐标的像素点的颜色 */
 LCUI_EXPORT(LCUI_BOOL)
