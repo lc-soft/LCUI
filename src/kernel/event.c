@@ -42,8 +42,6 @@
 #include LC_LCUI_H
 #include LC_ERROR_H
 
-typedef void (*CallBackFunc)(void*,void*);
-
 static LCUI_Queue events;
 static LCUI_BOOL active = FALSE;
 static LCUI_Thread eventloop_thread = -1;
