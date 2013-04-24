@@ -42,6 +42,8 @@
 #ifndef __LCUI_TEXTBOX_H__
 #define __LCUI_TEXTBOX_H__
 
+#include LC_FONT_H
+
 LCUI_BEGIN_HEADER
 
 
@@ -129,6 +131,10 @@ TextBox_Using_StyleTags(LCUI_Widget *widget, LCUI_BOOL flag);
 LCUI_EXPORT(void)
 TextBox_Multiline( LCUI_Widget *widget, LCUI_BOOL flag );
 /* 指定文本框是否启用多行文本显示 */
+
+LCUI_EXPORT(void)
+TextBox_Text_SetDefaultStyle( LCUI_Widget *widget, LCUI_TextStyle style );
+/* 设定文本框内的文本的缺省样式 */
 
 LCUI_EXPORT(void)
 TextBox_Text_SetMaxLength( LCUI_Widget *widget, int max );

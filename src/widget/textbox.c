@@ -690,6 +690,8 @@ TextBox_ExecUpdate( LCUI_Widget *widget )
 		TextLayer_Text_SetPasswordChar( layer, 0 );
 		/* 文本框内显示占位符 */
 		TextLayer_TextW( layer, textbox->placeholder.string );
+		/* 占位符的字体大小取缺省大小 */
+		textbox->placeholder_style.pixel_size = layer->default_data.pixel_size;
 		/* 设置占位符的样式 */
 		TextLayer_Text_SetDefaultStyle( layer, textbox->placeholder_style );
 		textbox->show_placeholder = TRUE;
@@ -1179,6 +1181,16 @@ TextBox_Multiline( LCUI_Widget *widget, LCUI_BOOL flag )
 	layer = TextBox_GetTextLayer( widget );
 	TextLayer_Multiline( layer, flag );
 }
+
+LCUI_EXPORT(void)
+TextBox_Text_SetDefaultStyle( LCUI_Widget *widget, LCUI_TextStyle style )
+/* 设定文本框内的文本的缺省样式 */
+{
+	LCUI_TextLayer *layer;
+	layer = TextBox_GetTextLayer( widget );
+	TextLayer_Text_SetDefaultStyle( layer, style );
+}
+
 
 LCUI_EXPORT(void)
 TextBox_Text_SetMaxLength( LCUI_Widget *widget, int max )
