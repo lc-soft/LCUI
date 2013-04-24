@@ -51,7 +51,7 @@ typedef struct _timer_data
 	long int id;		/* 定时器ID */
 	long int total_ms;	/* 定时总时间（单位：毫秒） */
 	long int cur_ms;	/* 当前剩下的等待时间 */
-	void (*callback_func)(); /* 回调函数 */ 
+	void (*callback_func)(void); /* 回调函数 */ 
 }
 timer_data;
 
@@ -177,7 +177,7 @@ timer_list_process( void *arg )
 		}
 		sleep_time = 1;
 		func_data.id = timer->app_id;
-		func_data.func = timer->callback_func;
+		func_data.func = (CallBackFunc)timer->callback_func;
 		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */
 		AppTasks_CustomAdd( ADD_MODE_REPLACE, &func_data );
 	}
