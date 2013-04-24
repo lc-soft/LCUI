@@ -125,7 +125,7 @@ WidgetFunc_Add(	const char *type_name,
 			}
 		}
 		
-		Get_FuncData(&func_data, widget_func, NULL, NULL);
+		Get_FuncData(&func_data, (CallBackFunc)widget_func, NULL, NULL);
 		func_data.id = func_type; /* 保存类型ID */
 		if(found == 1) {/* 如果已经存在，就覆盖 */
 			//printf("WidgetFunc_Add(): the function is already registered. repalce\n");
@@ -554,6 +554,16 @@ Widget_GetMainGraphLayer( LCUI_Widget *widget )
 		return LCUI_Sys.root_glayer;
 	}
 	return widget->main_glayer;
+}
+
+/* 获取部件的客户区图层指针 */
+LCUI_EXPORT(LCUI_GraphLayer *)
+Widget_GetClientGraphLayer( LCUI_Widget *widget )
+{
+	if( widget == NULL ) {
+		return LCUI_Sys.root_glayer;
+	}
+	return widget->client_glayer;
 }
 
 /* 获取部件的子部件队列 */
@@ -1927,6 +1937,7 @@ Widget_SetZIndex( LCUI_Widget *widget, int z_index )
 			z_index = 10000;
 		}
 	}
+	_DEBUG_MSG("%p: %d\n", widget, z_index);
 	GraphLayer_SetZIndex( glayer, z_index );
 	Record_WidgetUpdate( widget->parent, NULL, DATATYPE_SORT, 0 );
 	return 0;
@@ -2047,7 +2058,7 @@ Widget_ExecSortChild( LCUI_Widget *widget )
 		}
 	}
 	Queue_Unlock( child_list );
-	GraphLayer_Sort( Widget_GetMainGraphLayer(widget) );
+	GraphLayer_Sort( Widget_GetClientGraphLayer(widget) );
 }
 
 /* 将部件显示在同等z-index值的部件的前端 */
@@ -2236,11 +2247,11 @@ Widget_ExecDrawBackground( LCUI_Widget *widget )
 	int fill_mode;
 	LCUI_Graph *graph;
 	LCUI_Background *bg;
-	
+
 	graph = Widget_GetSelfGraph( widget );
 	bg = &widget->background;
 	/* 如果背景透明，则使用覆盖模式将背景图绘制到部件上 */
-	if(widget->background.transparent) {
+	if( bg->transparent ) {
 		fill_mode = GRAPH_MIX_FLAG_REPLACE;
 	} else { /* 否则，使用叠加模式 */
 		fill_mode = GRAPH_MIX_FLAG_OVERLAY;
