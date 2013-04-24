@@ -83,9 +83,9 @@ fill_pixel( uchar_t **buff, int pos, LCUI_RGB color )
 extern inline void
 mix_pixel( uchar_t **buff, int pos, LCUI_RGB color, uchar_t alpha ) 
 {
-	ALPHA_BLENDING( color.red, buff[0][pos], alpha );
-	ALPHA_BLENDING( color.blue, buff[1][pos], alpha );
-	ALPHA_BLENDING( color.green, buff[2][pos], alpha );
+	ALPHA_BLEND( color.red, buff[0][pos], alpha );
+	ALPHA_BLEND( color.blue, buff[1][pos], alpha );
+	ALPHA_BLEND( color.green, buff[2][pos], alpha );
 }
 
 static int
