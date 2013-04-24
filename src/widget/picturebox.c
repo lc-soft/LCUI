@@ -113,7 +113,7 @@ static int Update_BuffGraph(LCUI_Widget *widget)
 		Graph_Free(&pic_box->buff_graph); 
 	} else {
 		Graph_Zoom(pic_box->image, &pic_box->buff_graph,
-				DEFAULT, Size(width, height)); 
+				TRUE, Size(width, height)); 
 	}
 	return 0;
 }
@@ -246,7 +246,7 @@ PictureBox_ExecUpdate(LCUI_Widget *widget)
 		
 	case SIZE_MODE_STRETCH:/* 拉伸模式 */ 
 		/* 开始缩放图片 */
-		Graph_Zoom( pic_box->image, &graph, CUSTOM, widget->size ); 
+		Graph_Zoom( pic_box->image, &graph, FALSE, widget->size ); 
 		break;
 		
 	case SIZE_MODE_TILE:/* 平铺模式 */ 
@@ -347,6 +347,9 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 	LCUI_PictureBox *pic_box;
 	graph_data *data;
 
+	if( widget == NULL ) {
+		return;
+	}
 	graph = image;
 	pic_box = Widget_GetPrivData(widget);
 	for(i = 0;i < 2; ++i) {

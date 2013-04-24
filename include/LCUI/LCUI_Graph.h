@@ -205,7 +205,8 @@ Graph_GetQuote( LCUI_Graph *graph );
 
 /* 根据指定模式，对图像进行缩放 */
 LCUI_EXPORT(void)
-Graph_Zoom( LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size );
+Graph_Zoom(	LCUI_Graph *in,		LCUI_Graph *out, 
+		LCUI_BOOL keep_scale,	LCUI_Size size );
 
 /* 
  * 功能：从源图形中截取出指定区域的图形 

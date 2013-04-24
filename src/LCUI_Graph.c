@@ -331,7 +331,7 @@ Graph_Init( LCUI_Graph *pic )
 	pic->pos.y	= 0;
 	pic->width	= 0;
 	pic->height	= 0;
-	pic->type	= DEFAULT;
+	pic->type	= 0;
 	pic->bit_depth	= 8;	/* 位深 */
 	LCUIMutex_Init( &pic->mutex );
 }
@@ -604,7 +604,8 @@ Graph_GetQuote( LCUI_Graph *graph )
 
 /* 根据指定模式，对图像进行缩放 */
 LCUI_EXPORT(void)
-Graph_Zoom( LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size )
+Graph_Zoom(	LCUI_Graph *in,		LCUI_Graph *out, 
+		LCUI_BOOL keep_scale,	LCUI_Size size )
 {
 	LCUI_Graph *src;
 	LCUI_Rect rect;
@@ -626,9 +627,12 @@ Graph_Zoom( LCUI_Graph *in, LCUI_Graph *out, int flag, LCUI_Size size )
 	scale_x = (double)rect.width / size.w;
 	scale_y = (double)rect.height / size.h;
 	/* 如果缩放方式为缺省，图像的宽和高的缩放比例将会一样 */
-	if(flag == DEFAULT) {
-		if (scale_x<scale_y) scale_y = scale_x; 
-		else scale_x = scale_y;
+	if( keep_scale ) {
+		if (scale_x<scale_y) {
+			scale_y = scale_x; 
+		} else {
+			scale_x = scale_y;
+		}
 	}
 	out->have_alpha = in->have_alpha;
 	if( Graph_Create(out, size.w, size.h) < 0) {
@@ -1213,21 +1217,21 @@ Graph_FillImage(	LCUI_Graph *graph,	LCUI_Graph *bg,
 	}
 	/* 缩放 */
 	if( Check_Option( mode, LAYOUT_ZOOM ) ) {
-		Graph_Zoom( bg, &temp_bg, DEFAULT, size );
+		Graph_Zoom( bg, &temp_bg, TRUE, size );
 		pos.x = (size.w - temp_bg.width) / 2.0;
 		pos.y = (size.h - temp_bg.height) / 2.0;
 		bg = &temp_bg;
 	}
 	/* 拉伸 */
 	else if( Check_Option( mode, LAYOUT_STRETCH ) ) {
-		Graph_Zoom( bg, &temp_bg, CUSTOM, size );
+		Graph_Zoom( bg, &temp_bg, FALSE, size );
 		bg = &temp_bg;
 	}
 	/* 居中 */
 	else if( Check_Option( mode, LAYOUT_CENTER ) ) {
 		pos.x = (size.w - bg->width) / 2.0;
 		pos.y = (size.h - bg->height) / 2.0;
-	} 
+	}
 	if( replace_mix ) {
 		Graph_Replace( graph, bg, pos );
 	} else {
