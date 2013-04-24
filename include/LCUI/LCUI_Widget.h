@@ -62,29 +62,16 @@ typedef enum _FuncType
 /****************************************************/
 
 /***************************** 定位类型 ********************************/
-typedef enum _POS_TYPE
-{
+typedef enum POS_TYPE_ {
 	POS_TYPE_STATIC,
 	POS_TYPE_RELATIVE,
 	POS_TYPE_ABSOLUTE,
 	POS_TYPE_FIXED,
-}
-POS_TYPE;
-/*
- * absolute:
- * 	绝对定位，相对于 static 定位以外的第一个父元素进行定位。
- * 	元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。
- * fixed：
- * 	绝对定位，相对于屏幕进行定位。
- * 	元素的位置通过 "left", "top", "right" 以及 "bottom" 属性进行规定。 
- * static：
- * 	默认值。没有定位，忽略 top, bottom, left, right 或者 z-index。 
- */
+} POS_TYPE;
 /**********************************************************************/
 
 /*------------ 部件停靠类型 --------------*/
-typedef enum _DOCK_TYPE
-{
+typedef enum DOCK_TYPE_ {
 	DOCK_TYPE_NONE,
 	DOCK_TYPE_TOP,
 	DOCK_TYPE_LEFT,
@@ -95,26 +82,27 @@ typedef enum _DOCK_TYPE
 DOCK_TYPE;
 /*---------------- END -----------------*/
 
-/*----------------- 部件的几种状态 ------------------*/
-typedef enum {
+/* --------------------- 部件状态 -----------------------*/
+typedef enum WIDGET_STATE_ {
 	WIDGET_STATE_NORMAL = 1,	/* 普通状态 */
 	WIDGET_STATE_DISABLE = 1<<1,	/* 禁用状态 */
 	WIDGET_STATE_OVERLAY = 1<<2,	/* 被鼠标游标覆盖 */
 	WIDGET_STATE_ACTIVE = 1<<3,	/* 被鼠标点击 */
 } WIDGET_STATE;
-/*-------------------------------------------------*/
+/* ------------------------------------------------------*/
 
-/******************************* 部件 **********************************/
-typedef struct {
-	LCUI_BOOL transparent; /* 是否透明 */
-	LCUI_Graph image; /* 背景图 */
-	LCUI_RGB color; /* 背景色 */
-	ALIGN_TYPE layout; /* 背景图的布局 */
+/*--------------------- 背景属性 --------------------------*/
+typedef struct LCUI_Background_ {
+	LCUI_BOOL transparent;	/* 是否透明 */
+	LCUI_Graph image;	/* 背景图 */
+	LCUI_RGB color;		/* 背景色 */
+	LAYOUT_TYPE layout;	/* 背景图的布局 */
 } LCUI_Background;
+/*--------------------------------------------------------*/
 
 
-struct _LCUI_Widget {
-	LCUI_ID app_id;	/* 所属程序的ID */
+struct LCUI_Widget_ {
+	LCUI_ID app_id;		/* 所属程序的ID */
 	LCUI_ID self_id;	/* 自身ID */
 	LCUI_ID type_id;	/* 类型编号 */
 	LCUI_ID style_id;	/* 风格编号 */
@@ -178,7 +166,7 @@ struct _LCUI_Widget {
 	int clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“不小于”才使条件成立 */
 	uchar_t clickable_area_alpha;	/* 指定部件图层中的区域的alpha值小于/不小于多少时可被鼠标点击，默认为0，最大为255 */
 	
-	LCUI_GraphLayer* main_glayer;		/* 部件的主图层 */
+	LCUI_GraphLayer* main_glayer;	/* 部件的主图层 */
 	LCUI_GraphLayer* client_glayer;	/* 客户区图层 */
 	
 	void *private_data;   /* 指针，指向部件私有数据，供预先注册的回调函数利用 */
@@ -204,6 +192,10 @@ struct _LCUI_Widget {
 /* 获取部件的主图层指针 */
 LCUI_EXPORT(LCUI_GraphLayer *)
 Widget_GetMainGraphLayer( LCUI_Widget *widget );
+
+/* 获取部件的客户区图层指针 */
+LCUI_EXPORT(LCUI_GraphLayer *)
+Widget_GetClientGraphLayer( LCUI_Widget *widget );
 
 /* 获取部件的子部件队列 */
 LCUI_EXPORT(LCUI_Queue*)

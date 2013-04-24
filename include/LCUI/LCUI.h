@@ -69,9 +69,6 @@
 #define REMOVE	-1
 #define INSIDE	1
 
-#define DEFAULT	0 /* 缺省 */
-#define CUSTOM	1 /* 自定义 */
-
 /***************** 一些输入输出设备 *********************/
 #define FB_DEV	"/dev/fb0"		/* 图形输出设备 */
 #define TS_DEV	"/dev/jz_ts"		/* 触屏输入设备 */
@@ -145,7 +142,7 @@ LCUI_BEGIN_HEADER
 typedef unsigned char LCUI_BOOL;
 
 /****************** 图像的布局 *****************/
-typedef enum _LAYOUT_TYPE
+typedef enum LAYOUT_TYPE_
 {
 	LAYOUT_NONE	= 0,	  /* 无 */
 	LAYOUT_NORMAL	= 0,
@@ -157,15 +154,18 @@ typedef enum _LAYOUT_TYPE
 /**********************************************/
 
 typedef unsigned long int LCUI_ID; 
+
+typedef void (*CallBackFunc)(void*,void*);
+
 /* 先使用typedef为结构体创建同义字，之后再定义结构体 */
-typedef struct	_LCUI_Widget		LCUI_Widget;
-typedef struct	_LCUI_Key		LCUI_Key;
+typedef struct	LCUI_Widget_		LCUI_Widget;
+typedef struct	LCUI_Key_		LCUI_Key;
 
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
 
 /********** 按键信息 ************/
-struct _LCUI_Key
+struct LCUI_Key_
 {
 	int code;
 	int state;
@@ -173,7 +173,7 @@ struct _LCUI_Key
 /******************************/
 
 /*--------- RGB配色数据 ---------*/
-typedef struct {
+typedef struct LCUI_RGB_ {
 	uchar_t red;
 	uchar_t green;
 	uchar_t blue;
@@ -181,7 +181,7 @@ typedef struct {
 /*----------- END -------------*/
 
 /*--------- RGBA配色数据 --------*/
-typedef struct {
+typedef struct LCUI_RGBA_ {
 	uchar_t red;
 	uchar_t green;
 	uchar_t blue;
@@ -190,33 +190,33 @@ typedef struct {
 /*----------- END -------------*/
 
 /*------- 二维坐标 --------*/
-typedef struct {
+typedef struct LCUI_Pos_ {
 	int x, y;
 } LCUI_Pos;
 /*--------- END ----------*/
 
 /*------- 尺寸 --------*/
-typedef struct {
+typedef struct LCUI_Size_ {
 	int w, h;
 } LCUI_Size;
 /*------- END --------*/
 
 /*------------- 像素点信息 ------------*/
-typedef struct {
+typedef struct Pixel_ {
 	LCUI_Pos pos;	/* 位置 */ 
 	LCUI_RGB rgb;	/* RGBA值 */
 } Pixel;
 /*--------------- END ---------------*/
 
 /*---------------- 字符串 ----------------*/
-typedef struct {
+typedef struct LCUI_String_ {
 	char   *string; /* 字符串内容 */
 	uint_t length;	/* 长度 */
 } LCUI_String;
 /*----------------- END -----------------*/
 
 /*------------------- 区域数据 ---------------------*/
-typedef struct {
+typedef struct LCUI_Rect_ {
 	int x,y;
 	int width,height;
 	double center_x,center_y; /* 中心点的坐标 */
@@ -224,7 +224,7 @@ typedef struct {
 /*--------------------- END ----------------------*/
 
 /*---------------- 字体位图数据 ------------------*/
-typedef struct {
+typedef struct LCUI_FontBMP_ {
 	int top;		/* 与顶边框的距离 */
 	int left;		/* 与左边框的距离 */
 	int width;		/* 位图宽度 */
@@ -237,22 +237,22 @@ typedef struct {
 } LCUI_FontBMP;
 /*------------------- END ---------------------*/
 
-/*------------------------ 宽字符位图及相关数据 --------------------------*/
-typedef struct {
+/*------------------------ 宽字符位图及相关数据 -----------------------*/
+typedef struct LCUI_WChar_ {
 	wchar_t		char_code;	/* 字符码 */
 	LCUI_FontBMP	*bitmap;	/* 字符的位图数据 */
 	LCUI_RGB	color;		/* 该文字的配色 */
 	LCUI_BOOL	update;		/* 标明这个字符是否需要刷新 */ 
 	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */		   
 } LCUI_WChar;
-/*----------------------------- END ----------------------------------*/
+/*-----------------------------END ----------------------------------*/
 
-/*------- 宽字符串 -------*/
-typedef struct {
+/*---------- 宽字符串 ----------*/
+typedef struct LCUI_WString_ {
 	wchar_t *string;
 	uint_t length;
 } LCUI_WString;
-/*-------- END ---------*/
+/*------------ END ------------*/
 
 LCUI_END_HEADER
 
@@ -262,52 +262,52 @@ LCUI_END_HEADER
 LCUI_BEGIN_HEADER
 
 /*---------------------------- 图形数据 -------------------------------*/
-typedef struct _LCUI_Graph LCUI_Graph;
-struct _LCUI_Graph {
+typedef struct LCUI_Graph_ LCUI_Graph;
+struct LCUI_Graph_ {
 	int	type;		/* 图片类型 */
 	int	bit_depth;	/* 位深 */
 	
 	LCUI_Mutex mutex;	/* 锁，用于数据保护 */
 	
-	LCUI_BOOL quote;		/* 指示是否引用其它图层中的图形 */
+	LCUI_BOOL quote;	/* 指示是否引用其它图层中的图形 */
 	LCUI_Graph *src;	/* 所引用的对象 */
 	LCUI_Pos pos;		/* 在引用另一个图层中的图形时，会保存区域的起点位置 */
 	int width, height;	/* 尺寸 */
 	
 	uchar_t	alpha;	/* 全局透明度，表示整张图片的透明度，默认为255 */
-	uchar_t**	rgba;	/* 像素数据缓冲区 */
-	size_t		mem_size; /* 像素数据缓冲区大小 */
+	uchar_t** rgba;	/* 像素数据缓冲区 */
+	size_t mem_size; /* 像素数据缓冲区大小 */
 	
 	LCUI_BOOL have_alpha;	/* 标志，指定是否需要透明度，分配内存时会根据它分配 */
-	LCUI_BOOL is_opaque;		/* 标志，指定该图形是否为不透明 */
+	LCUI_BOOL is_opaque;	/* 标志，指定该图形是否为不透明 */
 	LCUI_BOOL not_visible;	/* 标志，指定该图形是否不可见，也就是全透明 */
 };
 /*------------------------------ END ---------------------------------*/
 
 /*---------------- 用于表示像素或百分比 -----------------*/
-typedef struct {
-	LCUI_BOOL which_one;		/* 指定用哪个类型的变量 */
+typedef struct PX_P_t_ {
+	LCUI_BOOL which_one;	/* 指定用哪个类型的变量 */
 	int px;			/* 数值，单位为像素 */
 	double scale;		/* 比例 */
 } PX_P_t;
 /*---------------------- END -------------------------*/
 
 /*----------------- 用于表示字体大小 --------------------*/
-typedef struct {
-	LCUI_BOOL which_one;		/* 指定用哪个类型的变量 */
+typedef struct PX_PT_t_ {
+	LCUI_BOOL which_one;	/* 指定用哪个类型的变量 */
 	int px;			/* pixel, 字体大小（像素） */
 	int pt;			/* point，字体大小（点数） */
 } PX_PT_t;
 /*---------------------- END -------------------------*/
 
 /*------------------- 内边距和外边距 --------------------*/
-typedef struct {
+typedef struct common_box_ {
 	int top, bottom, left, right;
 } LCUI_Margin, LCUI_Padding;
 /*---------------------- END -------------------------*/
 
 /*----------------- 自动尺寸调整模式 --------------------*/
-typedef enum {
+typedef enum AUTOSIZE_MODE_ {
 	AUTOSIZE_MODE_GROW_AND_SHRINK,	/* 增大和缩小 */
 	AUTOSIZE_MODE_GROW_ONLY		/* 只增大 */
 }
@@ -315,7 +315,7 @@ AUTOSIZE_MODE;
 /*---------------------- END --------------------------*/
 
 /*---------------- 鼠标游标数据 -------------------*/
-typedef struct {
+typedef struct LCUI_Cursor_ {
 	LCUI_Pos	pos;	/* 坐标 */
 	int		visible;/* 是否可见 */
 	LCUI_Graph	graph;	/* 游标的图形 */
@@ -323,7 +323,7 @@ typedef struct {
 /*------------------- END -----------------------*/
 
 /*----------------- 对齐方式 -------------------*/
-typedef enum {
+typedef enum ALIGN_TYPE_ {
 	ALIGN_NONE,		/* 无 */
 	ALIGN_TOP_LEFT,	  	/* 向左上角对齐 */
 	ALIGN_TOP_CENTER,	/* 向上中间对齐 */

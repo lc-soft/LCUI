@@ -57,6 +57,10 @@ struct _LCUI_GraphLayer
 	LCUI_Graph graph;		/* 图层像素数据 */
 };
 
+/* 打印子图层信息列表 */
+LCUI_EXPORT(int)
+GraphLayer_PrintChildList( LCUI_GraphLayer *glayer );
+
 /* 将子图层从父图层中的子图层队列中移除 */
 LCUI_EXPORT(int)
 GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer );

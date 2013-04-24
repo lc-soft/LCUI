@@ -49,7 +49,7 @@
  * 
  * */
 
- 
+/* 打印子图层信息列表 */
 LCUI_EXPORT(int)
 GraphLayer_PrintChildList( LCUI_GraphLayer *glayer )
 {
