@@ -576,6 +576,16 @@ Widget_GetChildList( LCUI_Widget *widget )
 	return &widget->child;
 }
 
+/* 获取部件的矩形区域队列 */
+LCUI_EXPORT(LCUI_RectQueue*)
+Widget_GetInvalidAreaQueue( LCUI_Widget *widget )
+{
+	if( widget == NULL ) {
+		return LCUIScreen_GetInvalidAreaQueue();
+	}
+	return &widget->invalid_area;
+}
+
 /*-------------------------- Widget Pos ------------------------------*/
 LCUI_EXPORT(int)
 _Get_Widget_X( LCUI_Widget *widget )
@@ -1138,13 +1148,8 @@ Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 	//		rect.x, rect.y, rect.width, rect.height );
 	//}
 	
-	Queue_Lock( &widget->invalid_area );
 	/* 保存至队列中 */
-	if(0 != Queue_Add( &widget->invalid_area, &rect ) ) {
-		Queue_Unlock( &widget->invalid_area );
-		return -1;
-	}
-	Queue_Unlock( &widget->invalid_area );
+	RectQueue_AddToValid( &widget->invalid_area, rect );
 	return 0;
 }
 
@@ -1156,12 +1161,11 @@ Widget_SyncInvalidArea( LCUI_Widget *widget )
 	LCUI_Widget *child;
 	LCUI_Rect rect;
 	LCUI_Queue *widget_list;
+	LCUI_RectQueue *rect_queue;
 	
-	if( !widget ) {
-		widget_list = &LCUI_Sys.widget_list;
-	} else {
-		widget_list = &widget->child;
-	}
+	widget_list = Widget_GetChildList( widget );
+	rect_queue = Widget_GetInvalidAreaQueue( widget );
+
 	total = Queue_GetTotal( widget_list );
 	for(i=total-1; i>=0; --i) {
 		child = (LCUI_Widget*)Queue_Get( widget_list, i );
@@ -1170,13 +1174,11 @@ Widget_SyncInvalidArea( LCUI_Widget *widget )
 		}
 		/* 递归调用，同步下一级图层的无效区域至这一级图层 */
 		Widget_SyncInvalidArea( child );
-		while( RectQueue_Get(&rect, 0, &child->invalid_area) ) {
+		while( RectQueue_GetFromCurrent( &child->invalid_area, &rect ) ) {
 			rect.x += child->pos.x;
 			rect.y += child->pos.y;
 			/* 将子图层的rect队列成员复制到自己这里 */
 			Widget_InvalidArea( widget, rect );
-			/* 删除该区域记录 */
-			Queue_Delete( &child->invalid_area, 0 );
 		}
 	}
 	return 0;
@@ -1458,7 +1460,7 @@ Destroy_Widget( void *arg )
 	Queue_Destroy(&widget->child);
 	Queue_Destroy(&widget->event);
 	Queue_Destroy(&widget->update_buff);
-	Queue_Destroy(&widget->invalid_area);
+	RectQueue_Destroy(&widget->invalid_area);
 	
 	widget->visible = FALSE;
 	widget->enabled = TRUE;
@@ -1937,7 +1939,6 @@ Widget_SetZIndex( LCUI_Widget *widget, int z_index )
 			z_index = 10000;
 		}
 	}
-	_DEBUG_MSG("%p: %d\n", widget, z_index);
 	GraphLayer_SetZIndex( glayer, z_index );
 	Record_WidgetUpdate( widget->parent, NULL, DATATYPE_SORT, 0 );
 	return 0;
@@ -1960,7 +1961,7 @@ Widget_ExecMove( LCUI_Widget *widget, LCUI_Pos pos )
  * 说明：更改部件位置，并添加局部刷新区域
  **/
 {
-	LCUI_Rect rect;
+	LCUI_Rect old_rect, new_rect;
 	LCUI_Pos max_pos, min_pos;
 	
 	if( !widget ) {
@@ -1982,21 +1983,24 @@ Widget_ExecMove( LCUI_Widget *widget, LCUI_Pos pos )
 	if(pos.y < min_pos.y) {
 		pos.y = min_pos.y;
 	}
-	if( pos.x == widget->pos.x && pos.y == widget->pos.y ) {
+	if( pos.x == widget->pos.x
+	 && pos.y == widget->pos.y ) {
 		return;
 	}
 	/* 如果图层是显示的，并且位置变动，那就需要添加无效区域 */
 	if( widget->visible ) {
-		rect = Widget_GetRect( widget );
+		old_rect = Widget_GetRect( widget );
 		//_DEBUG_MSG("old:%d,%d,%d,%d\n", 
 		// rect.x, rect.y, rect.width, rect.height);
-		Widget_InvalidArea( widget->parent, rect );
 		widget->pos = pos;
-		rect.x = pos.x;
-		rect.y = pos.y;
+		new_rect.x = pos.x;
+		new_rect.y = pos.y;
+		new_rect.width = old_rect.width;
+		new_rect.height = old_rect.height;
 		//_DEBUG_MSG("new:%d,%d,%d,%d\n",
 		// rect.x, rect.y, rect.width, rect.height);
-		Widget_InvalidArea( widget->parent, rect );
+		Widget_InvalidArea( widget->parent, new_rect );
+		Widget_InvalidArea( widget->parent, old_rect );
 	} else {
 		/* 否则，直接改坐标 */
 		widget->pos = pos;
