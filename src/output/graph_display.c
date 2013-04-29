@@ -51,8 +51,10 @@
 #ifdef LCUI_BUILD_IN_WIN32
 #include <Windows.h>
 #endif
+/* 标记是否初始化 */
 static LCUI_BOOL i_am_init = FALSE;
-static LCUI_Queue screen_invalid_area;
+/* 用于记录屏幕无效区域 */
+static LCUI_RectQueue screen_invalid_area;
 
 /*
  * 功能：获取屏幕宽度
@@ -87,19 +89,28 @@ LCUIScreen_GetSize( void )
 	return LCUI_Sys.screen.size; 
 }
 
+/* 获取屏幕无效区域队列的指针 */
+LCUI_EXPORT(LCUI_RectQueue*)
+LCUIScreen_GetInvalidAreaQueue( void )
+{
+	if( !i_am_init ) {
+		return NULL;
+	}
+	return &screen_invalid_area;
+}
+
 /* 设置屏幕内的指定区域为无效区域，以便刷新该区域内的图形显示 */
 LCUI_EXPORT(int)
 LCUIScreen_InvalidArea( LCUI_Rect rect )
 {
-	int ret;
-	if (rect.width <= 0 || rect.height <= 0) {
+	if( !i_am_init ) {
 		return -1;
 	}
+	if (rect.width <= 0 || rect.height <= 0) {
+		return -2;
+	}
 	rect = LCUIRect_ValidArea(LCUIScreen_GetSize(), rect);
-	Queue_Lock( &screen_invalid_area );
-	ret = RectQueue_Add ( &screen_invalid_area, rect );
-	Queue_Unlock( &screen_invalid_area );
-	return ret;
+	return RectQueue_AddToValid ( &screen_invalid_area, rect );;
 }
 
 /* 功能：获取屏幕中的每个像素的表示所用的位数 */
@@ -147,7 +158,6 @@ static void Win32_Clinet_InvalidArea( LCUI_Rect rect )
 	win32_rect.right = rect.x + rect.width;
 	win32_rect.bottom = rect.y + rect.height;
 	InvalidateRect( hWnd, &win32_rect, FALSE );
-	PostMessage( hWnd, WM_PAINT, 0,0 );
 }
 #endif
 
@@ -186,16 +196,16 @@ LCUIScreen_UpdateInvalidArea(void)
 	Graph_Free(&graph);
 #else
 	LCUI_Rect rect;
-	Queue_Lock( &screen_invalid_area );
-	while(LCUI_Active()) {
-		if ( !RectQueue_Get(&rect, 0, &screen_invalid_area) ) {
+	/* 切换可用队列为当前使用的队列 */
+	RectQueue_Switch( &screen_invalid_area );
+	while( i_am_init ) {
+		/* 从当前使用的队列中获取矩形区域 */
+		if ( !RectQueue_GetFromCurrent( &screen_invalid_area, &rect ) ) {
 			break;
 		}
+		_DEBUG_MSG("rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
 		Win32_Clinet_InvalidArea( rect );
-		Queue_Delete( &screen_invalid_area, 0 );
 	}
-	/* 解锁队列 */
-	Queue_Unlock( &screen_invalid_area );
 #endif
 }
 
@@ -253,6 +263,6 @@ LCUIModule_Video_End( void )
 	}
 	LCUIScreen_Destroy();
 	i_am_init = FALSE;
-	Queue_Destroy( &screen_invalid_area );
+	RectQueue_Destroy( &screen_invalid_area );
 	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
 }
