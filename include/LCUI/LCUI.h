@@ -1,48 +1,48 @@
 /* ***************************************************************************
- * LCUI.h -- Records with common data type definitions, macro definitions and 
+ * LCUI.h -- Records with common data type definitions, macro definitions and
  * function declarations
- * 
+ *
  * Copyright (C) 2013 by
  * Liu Chao
- * 
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
- 
+
 /* ****************************************************************************
  * LCUI.h -- 记录着常用的数据类型定义，宏定义，以及函数声明
  *
  * 版权所有 (C) 2013 归属于
  * 刘超
- * 
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
 /* 为了解决结构体被重复定义，用宏进行头文件保护(其它地方出现类似的内容，将不再注释) */
 #ifndef __LCUI_H__  /* 如果没有定义 __LCUI_H__ 宏 */
-#define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */ 
+#define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */
 
 #define LCUI_VERSION "0.13.0"
 
@@ -63,7 +63,7 @@
 #define TYPE_JPG	2
 #define TYPE_BMP	3
 
-/* 状态 */ 
+/* 状态 */
 #define ACTIVE	1
 #define KILLED	-1
 #define REMOVE	-1
@@ -102,7 +102,7 @@
 #define ADD_MODE_REPLACE	2 /* 覆盖 */
 
 #define AND_ARG_F	1<<3	/* 第一个参数 */
-#define AND_ARG_S 	1<<4	/* 第二个参数 */ 
+#define AND_ARG_S 	1<<4	/* 第二个参数 */
 /*****************************************/
 
 /****************** 图像的处理方式 *****************/
@@ -111,12 +111,12 @@
 #define FILL_MODE_CENTER	LAYOUT_CENTER	/* 居中 */
 #define FILL_MODE_TILE		LAYOUT_TILE	/* 平铺 */
 #define FILL_MODE_NONE		LAYOUT_NONE	/* 无 */
-#define FILL_MODE_NORMAL	LAYOUT_NORMAL 
+#define FILL_MODE_NORMAL	LAYOUT_NORMAL
 /*************************************************/
 
 /****************** 图像的处理方式 *****************/
 /* 缩放，缩放比例随着PictureBox部件的尺寸的改变而改变 */
-#define SIZE_MODE_ZOOM		LAYOUT_ZOOM	
+#define SIZE_MODE_ZOOM		LAYOUT_ZOOM
 
 /* 固定缩放，用于照片查看器，PictureBox部件的尺寸的改变不影响缩放比列 */
 #define SIZE_MODE_BLOCK_ZOOM	5
@@ -125,7 +125,7 @@
 #define SIZE_MODE_CENTER	LAYOUT_CENTER	/* 居中 */
 #define SIZE_MODE_TILE		LAYOUT_TILE	/* 平铺 */
 #define SIZE_MODE_NONE		LAYOUT_NONE	/* 无 */
-#define SIZE_MODE_NORMAL	LAYOUT_NORMAL 
+#define SIZE_MODE_NORMAL	LAYOUT_NORMAL
 /*************************************************/
 
 
@@ -153,7 +153,7 @@ typedef enum LAYOUT_TYPE_
 }LAYOUT_TYPE;
 /**********************************************/
 
-typedef unsigned long int LCUI_ID; 
+typedef unsigned long int LCUI_ID;
 
 typedef void (*CallBackFunc)(void*,void*);
 
@@ -203,7 +203,7 @@ typedef struct LCUI_Size_ {
 
 /*------------- 像素点信息 ------------*/
 typedef struct Pixel_ {
-	LCUI_Pos pos;	/* 位置 */ 
+	LCUI_Pos pos;	/* 位置 */
 	LCUI_RGB rgb;	/* RGBA值 */
 } Pixel;
 /*--------------- END ---------------*/
@@ -242,8 +242,8 @@ typedef struct LCUI_WChar_ {
 	wchar_t		char_code;	/* 字符码 */
 	LCUI_FontBMP	*bitmap;	/* 字符的位图数据 */
 	LCUI_RGB	color;		/* 该文字的配色 */
-	LCUI_BOOL	update;		/* 标明这个字符是否需要刷新 */ 
-	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */		   
+	LCUI_BOOL	update;		/* 标明这个字符是否需要刷新 */
+	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */
 } LCUI_WChar;
 /*-----------------------------END ----------------------------------*/
 
@@ -266,18 +266,18 @@ typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
 	int	type;		/* 图片类型 */
 	int	bit_depth;	/* 位深 */
-	
+
 	LCUI_Mutex mutex;	/* 锁，用于数据保护 */
-	
+
 	LCUI_BOOL quote;	/* 指示是否引用其它图层中的图形 */
 	LCUI_Graph *src;	/* 所引用的对象 */
 	LCUI_Pos pos;		/* 在引用另一个图层中的图形时，会保存区域的起点位置 */
 	int width, height;	/* 尺寸 */
-	
+
 	uchar_t	alpha;	/* 全局透明度，表示整张图片的透明度，默认为255 */
 	uchar_t** rgba;	/* 像素数据缓冲区 */
 	size_t mem_size; /* 像素数据缓冲区大小 */
-	
+
 	LCUI_BOOL have_alpha;	/* 标志，指定是否需要透明度，分配内存时会根据它分配 */
 	LCUI_BOOL is_opaque;	/* 标志，指定该图形是否为不透明 */
 	LCUI_BOOL not_visible;	/* 标志，指定该图形是否不可见，也就是全透明 */
@@ -316,9 +316,10 @@ AUTOSIZE_MODE;
 
 /*---------------- 鼠标游标数据 -------------------*/
 typedef struct LCUI_Cursor_ {
-	LCUI_Pos	pos;	/* 坐标 */
-	int		visible;/* 是否可见 */
-	LCUI_Graph	graph;	/* 游标的图形 */
+	LCUI_Pos	current_pos;	/* 当前的坐标 */
+	LCUI_Pos	new_pos;	/* 将要更新的坐标 */
+	int		visible;	/* 是否可见 */
+	LCUI_Graph	graph;		/* 游标的图形 */
 } LCUI_Cursor;
 /*------------------- END -----------------------*/
 
