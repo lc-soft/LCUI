@@ -152,7 +152,7 @@ struct LCUI_Widget_ {
 	LCUI_Queue child;		/* 子部件集 */
 	LCUI_Queue event;		/* 保存部件的事件关联的数据 */
 	LCUI_Queue update_buff;		/* 记录子部件需要进行更新的数据 */ 
-	LCUI_Queue invalid_area;	/* 记录无效区域 */
+	LCUI_RectQueue invalid_area;	/* 记录无效区域 */
 	
 	WIDGET_STATE state;	/* 部件当前状态 */
 	int valid_state;	/* 对部件有效的状态 */
@@ -200,6 +200,10 @@ Widget_GetClientGraphLayer( LCUI_Widget *widget );
 /* 获取部件的子部件队列 */
 LCUI_EXPORT(LCUI_Queue*)
 Widget_GetChildList( LCUI_Widget *widget );
+
+/* 获取部件的矩形区域队列 */
+LCUI_EXPORT(LCUI_RectQueue*)
+Widget_GetInvalidAreaQueue( LCUI_Widget *widget );
 
 LCUI_EXPORT(LCUI_Size)
 Widget_GetSize(LCUI_Widget *widget);
