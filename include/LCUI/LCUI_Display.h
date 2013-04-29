@@ -86,6 +86,10 @@ LCUIScreen_GetHeight( void );
 LCUI_EXPORT(LCUI_Size)
 LCUIScreen_GetSize( void );
 
+/* 获取屏幕无效区域队列的指针 */
+LCUI_EXPORT(LCUI_RectQueue*)
+LCUIScreen_GetInvalidAreaQueue( void );
+
 /* 填充指定位置的像素点的颜色 */
 LCUI_EXPORT(void)
 LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color );
