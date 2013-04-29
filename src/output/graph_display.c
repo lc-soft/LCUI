@@ -1,42 +1,42 @@
 /* ***************************************************************************
  * graph_display.c -- graphical display processing
- * 
+ *
  * Copyright (C) 2013 by
  * Liu Chao
- * 
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
- 
+
 /* ****************************************************************************
  * graph_display.c -- 图形显示处理
  *
  * 版权所有 (C) 2013 归属于
  * 刘超
- * 
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
 
@@ -64,9 +64,9 @@ LCUI_EXPORT(int)
 LCUIScreen_GetWidth( void )
 {
 	if ( !LCUI_Sys.init ) {
-		return 0; 
+		return 0;
 	}
-	return LCUI_Sys.screen.size.w; 
+	return LCUI_Sys.screen.size.w;
 }
 
 /*
@@ -77,16 +77,16 @@ LCUI_EXPORT(int)
 LCUIScreen_GetHeight( void )
 {
 	if ( !LCUI_Sys.init ) {
-		return 0; 
+		return 0;
 	}
-	return LCUI_Sys.screen.size.h; 
+	return LCUI_Sys.screen.size.h;
 }
 
 /* 获取屏幕尺寸 */
 LCUI_EXPORT(LCUI_Size)
 LCUIScreen_GetSize( void )
 {
-	return LCUI_Sys.screen.size; 
+	return LCUI_Sys.screen.size;
 }
 
 /* 获取屏幕无效区域队列的指针 */
@@ -110,7 +110,7 @@ LCUIScreen_InvalidArea( LCUI_Rect rect )
 		return -2;
 	}
 	rect = LCUIRect_ValidArea(LCUIScreen_GetSize(), rect);
-	return RectQueue_AddToValid ( &screen_invalid_area, rect );;
+	return RectQueue_AddToValid ( &screen_invalid_area, rect );
 }
 
 /* 功能：获取屏幕中的每个像素的表示所用的位数 */
@@ -131,16 +131,17 @@ LCUIScreen_GetCenter( void )
 LCUI_EXPORT(void)
 LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 {
-	LCUI_Pos pos;
+	LCUI_Pos pos, cursor_pos;
 	GraphLayer_GetGraph( LCUI_Sys.root_glayer, graph, rect );
 	if ( !LCUI_Sys.cursor.visible ) { /* 如果游标可见 */
 		return;
 	}
-	/* 如果该区域与游标的图形区域重叠 */ 
+	/* 如果该区域与游标的图形区域重叠 */
 	if ( LCUIRect_Overlay( rect, LCUICursor_GetRect()) ) {
-		pos.x = LCUI_Sys.cursor.pos.x - rect.x;
-		pos.y = LCUI_Sys.cursor.pos.y - rect.y;
-		/* 将图形合成 */ 
+		cursor_pos = LCUICursor_GetPos();
+		pos.x = cursor_pos.x - rect.x;
+		pos.y = cursor_pos.y - rect.y;
+		/* 将图形合成 */
 		Graph_Mix( graph, &LCUI_Sys.cursor.graph, pos );
 	}
 }
@@ -161,52 +162,35 @@ static void Win32_Clinet_InvalidArea( LCUI_Rect rect )
 }
 #endif
 
-static void 
+static void
 LCUIScreen_UpdateInvalidArea(void)
 /* 功能：进行屏幕内容更新 */
-{ 
-#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+{
 	LCUI_Rect rect;
-	LCUI_Graph fill_area, graph;
-	
-	Graph_Init(&graph);
-	Graph_Init(&fill_area);
-	/* 锁住队列，其它线程不能访问 */
+	LCUI_Graph graph;
+
 	//_DEBUG_MSG("enter\n");
-	Queue_Lock( &screen_invalid_area );
-	while(LCUI_Active()) {
-		//_DEBUG_MSG("total area: %d\n", 
-		//	Queue_GetTotal( &screen_invalid_area ));
-		/* 如果从队列中获取数据成功 */
-		if ( !RectQueue_Get(&rect, 0, &screen_invalid_area) ) {
-			break;
-		}
-		/* 获取内存中对应区域的图形数据 */ 
-		LCUIScreen_GetRealGraph ( rect, &graph );
-		//_DEBUG_MSG("get screen area: %d,%d,%d,%d\n", 
-		//rect.x, rect.y, rect.width, rect.height);
-		/* 写入至帧缓冲，让屏幕显示图形 */
-		LCUIScreen_PutGraph( &graph, Pos(rect.x, rect.y) );
-		/* 移除队列中的成员 */ 
-		Queue_Delete( &screen_invalid_area, 0 );
-	}
-	/* 解锁队列 */
-	Queue_Unlock( &screen_invalid_area );
-	//_DEBUG_MSG("quit\n");
-	Graph_Free(&graph);
-#else
-	LCUI_Rect rect;
+	Graph_Init( &graph );
 	/* 切换可用队列为当前使用的队列 */
 	RectQueue_Switch( &screen_invalid_area );
 	while( i_am_init ) {
-		/* 从当前使用的队列中获取矩形区域 */
-		if ( !RectQueue_GetFromCurrent( &screen_invalid_area, &rect ) ) {
+		/* 如果从队列中获取数据成功 */
+		if ( !RectQueue_GetFromCurrent(&screen_invalid_area, &rect) ) {
 			break;
 		}
-		_DEBUG_MSG("rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
+#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
+		/* 获取内存中对应区域的图形数据 */
+		LCUIScreen_GetRealGraph ( rect, &graph );
+		/* 写入至帧缓冲，让屏幕显示图形 */
+		LCUIScreen_PutGraph( &graph, Pos(rect.x, rect.y) );
+#else
 		Win32_Clinet_InvalidArea( rect );
-	}
 #endif
+		_DEBUG_MSG("rect: %d,%d,%d,%d\n",
+		 rect.x, rect.y, rect.width, rect.height);
+	}
+	//_DEBUG_MSG("quit\n");
+	Graph_Free(&graph);
 }
 
 /*
@@ -214,14 +198,14 @@ LCUIScreen_UpdateInvalidArea(void)
  * 说明：此函数会将各个部件的rect队列中的处理掉，并将最终的无效区域添加至屏幕无效区域
  * 队列中，等待LCUI来处理。
  **/
-static void 
+static void
 LCUIScreen_SyncInvalidArea( void )
 {
 	if ( LCUI_Sys.need_sync_area ) {
-		/* 同步部件内记录的区域至主记录中 */ 
-		Widget_SyncInvalidArea( NULL );
-		LCUI_Sys.need_sync_area = FALSE; 
-	} 
+		/* 同步部件内记录的区域至主记录中 */
+		Widget_SyncInvalidArea();
+		LCUI_Sys.need_sync_area = FALSE;
+	}
 }
 
 /* 更新屏幕内的图形显示 */
@@ -229,7 +213,8 @@ static void
 LCUIScreen_Update( void* unused )
 {
 	while(LCUI_Sys.state == ACTIVE) {
-		Widget_ProcessUpdate(NULL); /* 处理所有部件更新 */ 
+		LCUICursor_UpdatePos();
+		Widget_ProcessUpdate(NULL); /* 处理所有部件更新 */
 		LCUI_MSleep(5);
 		LCUIScreen_SyncInvalidArea();
 		LCUIScreen_UpdateInvalidArea();
@@ -250,7 +235,7 @@ LCUIModule_Video_Init( void )
 	LCUIScreen_Init();
 	i_am_init = TRUE;
 	RectQueue_Init( &screen_invalid_area );
-	return _LCUIThread_Create( &LCUI_Sys.display_thread, 
+	return _LCUIThread_Create( &LCUI_Sys.display_thread,
 			LCUIScreen_Update, NULL );
 }
 
