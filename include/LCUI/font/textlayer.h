@@ -88,7 +88,7 @@ typedef struct _LCUI_TextLayer
 	LCUI_Queue rows_data;		/* 储存每一行文本的数据 */
 	LCUI_Queue tag_buff;		/* 保存样式标签中表达的属性数据 */
 	LCUI_Queue style_data;		/* 保存样式数据 */
-	LCUI_Queue clear_area;		/* 记录需刷新的区域 */
+	LCUI_RectQueue clear_area;	/* 记录需刷新的区域 */
 	
 	LCUI_Pos offset_pos;		/* 偏移位置 */
 	LCUI_Pos old_offset_pos;	/* 未滚动前的偏移位置 */
