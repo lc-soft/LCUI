@@ -96,7 +96,7 @@ TextLayer_Clear(	LCUI_TextLayer *layer, LCUI_Pos pos,
 	area.width = char_ptr->bitmap->width;
 	area.height = char_ptr->bitmap->rows;
 	/* 记录需刷新的区域 */
-	RectQueue_Add( &layer->clear_area, area );
+	RectQueue_AddToValid( &layer->clear_area, area );
 	//printf("record area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
 }
 
@@ -282,7 +282,7 @@ Destroy_TextLayer( LCUI_TextLayer *layer )
 	Queue_Destroy( &layer->rows_data );
 	Queue_Destroy( &layer->tag_buff );
 	Queue_Destroy( &layer->style_data );
-	Queue_Destroy( &layer->clear_area );
+	RectQueue_Destroy( &layer->clear_area );
 	LCUIWString_Free( &layer->text_buff );
 }
 
@@ -361,7 +361,7 @@ __TextLayer_OldArea_Erase( LCUI_TextLayer *layer, LCUI_Graph *graph )
 		area.x = 0-layer->offset_pos.x;
 		area.y = y-layer->offset_pos.y;
 		area.width = x;
-		RectQueue_Add( &layer->clear_area, area );
+		RectQueue_AddToValid( &layer->clear_area, area );
 		//_DEBUG_MSG("area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
 		y += row_ptr->max_size.h;
 		if( y > graph->height ) {
@@ -411,13 +411,12 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	//start = clock();
 	
 	Graph_Init( &slot );
+	/* 切换可用队列为当前占用的队列 */
+	RectQueue_Switch( &layer->clear_area );
 	/* 先处理需要清空的区域 */
-	n = Queue_GetTotal( &layer->clear_area ); 
-	for(i=0; i<n; ++i) { 
-		RectQueue_Get( &area, 0 , &layer->clear_area ); 
+	while( RectQueue_GetFromCurrent(&layer->clear_area, &area) ) { 
 		area.x += layer->offset_pos.x;
 		area.y += layer->offset_pos.y;
-		Queue_Delete( &layer->clear_area, 0 );
 		Graph_Quote( &slot, graph, area );
 		/* 将该区域的alpha通道填充为0 */
 		Graph_FillAlpha( &slot, 0 );
@@ -525,7 +524,7 @@ TextLayer_Refresh( LCUI_TextLayer *layer )
 		}
 		area.height = row_ptr->max_size.h;
 		area.width = row_ptr->max_size.w;
-		RectQueue_Add( &layer->clear_area, area );
+		RectQueue_AddToValid( &layer->clear_area, area );
 		area.y += row_ptr->max_size.h;
 	}
 }
