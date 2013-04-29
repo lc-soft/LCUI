@@ -1,42 +1,42 @@
 /* ***************************************************************************
  * mouse.c -- mouse support
- * 
+ *
  * Copyright (C) 2013 by
  * Liu Chao
- * 
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
- 
+
 /* ****************************************************************************
  * mouse.c -- 鼠标支持
  *
  * 版权所有 (C) 2013 归属于
  * 刘超
- * 
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -44,12 +44,12 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 #include LC_DISPLAY_H
-#include LC_INPUT_H 
- 
+#include LC_INPUT_H
+
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 #include <errno.h>
-#include <unistd.h> 
-#include <fcntl.h> 
+#include <unistd.h>
+#include <fcntl.h>
 #endif
 
 /********************** 鼠标相关信息 ***************************/
@@ -103,7 +103,7 @@ Mouse_RightButton( LCUI_MouseButtonEvent *event )
 		return -2;
 	}
 	else if(event->button == LCUIKEY_RIGHTBUTTON) {
-		return event->state; 
+		return event->state;
 	}
 	return -1;
 }
@@ -126,7 +126,7 @@ LCUIMouse_ButtonDown( LCUI_Pos pos, int key_code )
 {
 	int temp;
 	LCUI_Event event;
-	
+
 	/* 若该键已经按下，就不需要再添加至队列了 */
 	if( LCUIKey_IsHit( key_code ) ) {
 		return -1;
@@ -149,9 +149,9 @@ LCUI_EXPORT(int)
 LCUIMouse_ButtonUp( LCUI_Pos pos, int key_code )
 {
 	LCUI_Event event;
-	
+
 	if( !LCUIKey_IsHit( key_code ) ) {
-		return -1; 
+		return -1;
 	}
 	LCUIKey_Free( key_code );
 	event.type = LCUI_MOUSEBUTTONUP;
@@ -198,8 +198,8 @@ LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type )
 		key_state = LCUIKEYSTATE_RELEASE;
 		break;
 	    case 3:		/* 鼠标左右键被按下 */
-		LCUIMouse_ButtonDown( new_pos, LCUIKEY_RIGHTBUTTON ); 
-		LCUIMouse_ButtonDown( new_pos, LCUIKEY_LEFTBUTTON ); 
+		LCUIMouse_ButtonDown( new_pos, LCUIKEY_RIGHTBUTTON );
+		LCUIMouse_ButtonDown( new_pos, LCUIKEY_LEFTBUTTON );
 		key_state = LCUIKEYSTATE_PRESSED;
 		break;
 	    default:		/* 默认是释放的 */
@@ -214,12 +214,12 @@ LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type )
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 static LCUI_BOOL proc_mouse( void )
 {
-	static int  tmp; 
-	static char buf[6]; 
-	static fd_set readfds; 
+	static int  tmp;
+	static char buf[6];
+	static fd_set readfds;
 	static struct timeval tv;
 	static LCUI_Pos pos;
-	
+
 	if (mouse_data.state == REMOVE || mouse_data.fd < 0) {
 		return FALSE;
 	}
@@ -245,9 +245,9 @@ static LCUI_BOOL proc_mouse( void )
 		}
 		return FALSE;
 	}
-	
-	pos = LCUICursor_GetPos();
-	pos.x += (buf[1] * mouse_data.move_speed); 
+
+	pos = LCUICursor_GetNewPos();
+	pos.x += (buf[1] * mouse_data.move_speed);
 	pos.y -= (buf[2] * mouse_data.move_speed);
 
 	if (pos.x > LCUIScreen_GetWidth ()) {
@@ -256,7 +256,7 @@ static LCUI_BOOL proc_mouse( void )
 	if (pos.y > LCUIScreen_GetHeight ()) {
 		pos.y = LCUIScreen_GetHeight ();
 	}
-	pos.x = pos.x<0 ? 0:pos.x; 
+	pos.x = pos.x<0 ? 0:pos.x;
 	pos.y = pos.y<0 ? 0:pos.y;
 	/* 应用鼠标游标的位置变更 */
 	LCUICursor_SetPos( pos );
@@ -265,12 +265,6 @@ static LCUI_BOOL proc_mouse( void )
 	return TRUE;
 }
 #else
-
-static LCUI_BOOL need_wait = TRUE;
-static LCUI_BOOL need_read_data = FALSE;
-static LCUI_Pos new_cursor_pos = {0,0};
-static int button_type = 0;
-static int timer_id = -1;
 
 LCUI_EXPORT(int)
 Win32_LCUIMouse_ButtonDown( int key_code )
@@ -290,28 +284,6 @@ Win32_LCUIMouse_ButtonUp( int key_code )
 	return LCUIMouse_ButtonUp( pos, key_code );
 }
 
-static void start_update_cursor_pos( void )
-{
-	/* 标记，表示不需要等待 */
-	need_wait = FALSE;
-}
-
-/* 更新鼠标位置 */
-LCUI_EXPORT(void)
-Win32_LCUIMouse_UpdatePos( void )
-{
-	POINT new_pos;
-	
-	/* 获取鼠标坐标 */
-	GetCursorPos( &new_pos );
-	/* 转换成相对于窗口客户区的坐标 */
-	ScreenToClient( Win32_GetSelfHWND(), &new_pos );
-	new_cursor_pos.x = new_pos.x;
-	new_cursor_pos.y = new_pos.y;
-	/* 标记需要读取数据 */
-	need_read_data = TRUE;
-}
-
 static void Win32_LCUIMouse_PushMotionEvent( LCUI_Pos pos )
 {
 	int key_state;
@@ -326,27 +298,26 @@ static void Win32_LCUIMouse_PushMotionEvent( LCUI_Pos pos )
 
 static LCUI_BOOL proc_mouse( void )
 {
-	static int  tmp; 
-	static char buf[6]; 
-	static fd_set readfds; 
-	static struct timeval tv;
-	static LCUI_Pos pos;
-	/* 如果不需要读取数据，或者需要等待，则退出函数 */
-	if( !need_read_data || need_wait ) {
+	LCUI_Pos pos;
+	POINT new_pos;
+
+	/* 获取鼠标坐标 */
+	GetCursorPos( &new_pos );
+	/* 转换成相对于窗口客户区的坐标 */
+	ScreenToClient( Win32_GetSelfHWND(), &new_pos );
+	pos = LCUICursor_GetNewPos();
+	if( pos.x == new_pos.x && pos.y == new_pos.y ) {
 		return FALSE;
 	}
-	/* 标记下次需要等待 */
-	need_wait = TRUE;
-	/* 标记不需要再读数据 */
-	need_read_data = FALSE;
-	pos = new_cursor_pos;
+	pos.x = new_pos.x;
+	pos.y = new_pos.y;
 	if (pos.x > LCUIScreen_GetWidth ()) {
 		pos.x = LCUIScreen_GetWidth ();
 	}
 	if (pos.y > LCUIScreen_GetHeight ()) {
 		pos.y = LCUIScreen_GetHeight ();
 	}
-	pos.x = pos.x<0 ? 0:pos.x; 
+	pos.x = pos.x<0 ? 0:pos.x;
 	pos.y = pos.y<0 ? 0:pos.y;
 	/* 更新鼠标位置 */
 	LCUICursor_SetPos( pos );
@@ -361,7 +332,7 @@ Enable_Mouse_Input(void)
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 	char *msdev;
-	
+
 	if(mouse_data.state != REMOVE) {
 		return FALSE;
 	}
@@ -372,18 +343,16 @@ Enable_Mouse_Input(void)
 	if ((mouse_data.fd = open (MS_DEV, O_RDONLY)) < 0) {
 		printf("failed to open %s.\n", msdev );
 		perror(NULL);
-		mouse_data.state = REMOVE; 
+		mouse_data.state = REMOVE;
 		return FALSE;
 	}
 	mouse_data.state = INSIDE;
 	printf("open %s successfuly.\n", msdev);
 #else
-	/* 创建一个定时器，用于在windows下，每隔20ms更新一次鼠标游标的位置 */
-	timer_id = LCUITimer_Set( 20, start_update_cursor_pos, TRUE );
 	/* 隐藏windows的鼠标游标 */
 	ShowCursor( FALSE );
 #endif
-	return TRUE; 
+	return TRUE;
 }
 
 LCUI_EXPORT(LCUI_BOOL)
@@ -395,10 +364,8 @@ Disable_Mouse_Input(void)
 		return FALSE;
 	}
 	LCUICursor_Hide();
-	close (mouse_data.fd); 
+	close (mouse_data.fd);
 	mouse_data.state = REMOVE;
-#else
-	LCUITimer_Free( timer_id );
 #endif
 	return TRUE;
 }
@@ -409,13 +376,13 @@ LCUIModule_Mouse_Init( void )
 {
 	mouse_data.move_speed = 1;	/* 移动数度为1 */
 #ifdef LCUI_MOUSE_DRIVER_LINUX
-	mouse_data.fd = -1;  
+	mouse_data.fd = -1;
 	mouse_data.state = REMOVE;	/* 鼠标为移除状态 */
 	/* 启用鼠标输入处理 */
 	nobuff_printf("enable mouse input: ");
 #endif
 	/* 注册鼠标设备 */
-	return LCUIDevice_Add( Enable_Mouse_Input, 
+	return LCUIDevice_Add( Enable_Mouse_Input,
 			proc_mouse, Disable_Mouse_Input );
 }
 /**************************** Mouse End *******************************/
