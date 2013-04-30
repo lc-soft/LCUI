@@ -110,6 +110,7 @@ LCUIScreen_InvalidArea( LCUI_Rect rect )
 		return -2;
 	}
 	rect = LCUIRect_ValidArea(LCUIScreen_GetSize(), rect);
+	DEBUG_MSG("%d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
 	return RectQueue_AddToValid ( &screen_invalid_area, rect );
 }
 
@@ -178,20 +179,15 @@ LCUIScreen_UpdateInvalidArea(void)
 		if ( !RectQueue_GetFromCurrent(&screen_invalid_area, &rect) ) {
 			break;
 		}
-#ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 		/* 获取内存中对应区域的图形数据 */
 		LCUIScreen_GetRealGraph ( rect, &graph );
 		/* 写入至帧缓冲，让屏幕显示图形 */
 		LCUIScreen_PutGraph( &graph, Pos(rect.x, rect.y) );
-#else
-		Win32_Clinet_InvalidArea( rect );
-#endif
-		_DEBUG_MSG("rect: %d,%d,%d,%d\n",
-		 rect.x, rect.y, rect.width, rect.height);
 	}
 	//_DEBUG_MSG("quit\n");
 	Graph_Free(&graph);
 }
+
 
 /*
  * 功能：处理已记录的无效区域
@@ -212,12 +208,21 @@ LCUIScreen_SyncInvalidArea( void )
 static void
 LCUIScreen_Update( void* unused )
 {
+	LCUI_Rect screen_area;
+
+	/* 先标记刷新整个屏幕区域 */
+	screen_area.x = screen_area.y = 0;
+	screen_area.width = LCUI_Sys.screen.size.w;
+	screen_area.height = LCUI_Sys.screen.size.h;
+	LCUIScreen_InvalidArea( screen_area );
+
 	while(LCUI_Sys.state == ACTIVE) {
 		LCUICursor_UpdatePos();
 		Widget_ProcessUpdate(NULL); /* 处理所有部件更新 */
 		LCUI_MSleep(5);
 		LCUIScreen_SyncInvalidArea();
 		LCUIScreen_UpdateInvalidArea();
+		LCUIScreen_SyncFrameBuffer();
 	}
 	LCUIThread_Exit(NULL);
 }

@@ -459,4 +459,10 @@ LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out )
 	Graph_Unlock (out);
 }
 
+/* 将帧缓冲的图像同步显示至屏幕 */
+LCUI_EXPORT(void)
+LCUIScreen_SyncFrameBuffer( void )
+{
+	;
+}
 #endif

@@ -72,4 +72,10 @@ LCUIScreen_PutGraph (LCUI_Graph * src, LCUI_Pos pos)
 {
 	return -1;
 }
+
+LCUI_EXPORT(void)
+LCUIScreen_SyncFrameBuffer( void )
+{
+	;
+}
 #endif

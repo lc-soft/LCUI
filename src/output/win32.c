@@ -60,62 +60,52 @@ Win32_LCUI_Init( HINSTANCE hInstance )
 {
 	win32_hInstance = hInstance;
 }
-
+#include <time.h>
 static LRESULT CALLBACK 
 Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	LCUI_Rect area;
 	PAINTSTRUCT ps;
-	LCUI_Graph graph;
-	
-	Win32_LCUIMouse_UpdatePos();
+	LCUI_Rect area;
 
 	switch (message) {
 	case WM_KEYDOWN:
 		printf("WM_KEYDOWN: %ld\n",wParam);
 		LCUIKeyboard_HitKey( wParam );
-		break;
+		return 0;
 	case WM_KEYUP:
 		printf("WM_KEYUP: %ld\n",wParam);
 		LCUIKeyboard_FreeKey( wParam );
-		break;
+		return 0;
 	case WM_RBUTTONDOWN:
 		Win32_LCUIMouse_ButtonDown( LCUIKEY_RIGHTBUTTON );
-		break;
+		return 0;
 	case WM_RBUTTONUP:
 		Win32_LCUIMouse_ButtonUp( LCUIKEY_RIGHTBUTTON );
-		break;
+		return 0;
 	case WM_LBUTTONDOWN:
 		//_DEBUG_MSG("left button down\n");
 		Win32_LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
-		break;
+		return 0;
 	case WM_LBUTTONUP:
 		//_DEBUG_MSG("left button up\n");
 		Win32_LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
-		break;
-	case WM_MOUSEMOVE:
-		break;
+		return 0;
 	case WM_PAINT:
-		Graph_Init( &graph );
+		DEBUG_MSG("WM_PAINT\n");
 		BeginPaint( hwnd, &ps );
 		/* 获取区域坐标及尺寸 */
 		area.x = ps.rcPaint.left;
 		area.y = ps.rcPaint.top;
 		area.width = ps.rcPaint.right - area.x;
 		area.height = ps.rcPaint.bottom - area.y;
-		LCUIScreen_GetRealGraph( area, &graph );
-		LCUIScreen_PutGraph( &graph, Pos(area.x, area.y) );
-		/* 将帧缓冲内的位图数据更新至客户区内指定区域（area） */
-		BitBlt( hdc_client, area.x, area.y, area.width, area.height, 
-			hdc_framebuffer, area.x, area.y, SRCCOPY );
-		
+		LCUIScreen_InvalidArea( area );
 		EndPaint( hwnd, &ps );
-		Graph_Free( &graph );
 		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		LCUI_Quit();
 		return 0;
+	default:break;
 	}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
@@ -221,6 +211,16 @@ LCUIScreen_Destroy( void )
 	return 0;
 }
 
+LCUI_EXPORT(void)
+LCUIScreen_SyncFrameBuffer( void )
+{
+	SetBitmapBits( client_bitmap, LCUI_Sys.screen.smem_len, LCUI_Sys.screen.fb_mem );
+	/* 将帧缓冲内的位图数据更新至客户区内指定区域（area） */
+	BitBlt( hdc_client, 0, 0, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h, 
+		hdc_framebuffer, 0, 0, SRCCOPY );
+	ValidateRect( current_hwnd, NULL );
+}
+
 LCUI_EXPORT(int)
 LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 {
@@ -265,7 +265,6 @@ LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	}
 	Graph_Unlock( pic );
 	Graph_Free( &temp );
-	SetBitmapBits( client_bitmap, LCUI_Sys.screen.smem_len, LCUI_Sys.screen.fb_mem );
 	return 0;
 }
 
