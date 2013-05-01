@@ -68,6 +68,10 @@ LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos );
 LCUI_EXPORT(void)
 LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out );
 
+/* 将帧缓冲的图像同步显示至屏幕 */
+LCUI_EXPORT(void)
+LCUIScreen_SyncFrameBuffer( void );
+
 /*
  * 功能：获取屏幕宽度
  * 返回值：屏幕的宽度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
