@@ -229,10 +229,7 @@ typedef struct LCUI_FontBMP_ {
 	int left;		/* 与左边框的距离 */
 	int width;		/* 位图宽度 */
 	int rows;		/* 位图行数 */
-	int pitch;
 	uchar_t *buffer;	/* 字体位图数据 */
-	short num_grays;
-	char pixel_mode;
 	LCUI_Pos advance;	/* XY轴的跨距 */
 } LCUI_FontBMP;
 /*------------------- END ---------------------*/
