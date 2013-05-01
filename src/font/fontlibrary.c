@@ -157,6 +157,13 @@ FontLIB_Init( void )
 	database_init = TRUE;
 }
 
+#ifdef LCUI_FONT_ENGINE_FREETYPE
+/* 获取FT库句柄 */
+LCUI_EXPORT(FT_Library) FontLIB_GetLibrary(void) {
+	return library;
+}
+#endif
+
 /* 通过字体文件路径来查找字体信息，并获取字体ID */
 LCUI_EXPORT(int)
 FontLIB_FindInfoByFilePath( const char *filepath )
