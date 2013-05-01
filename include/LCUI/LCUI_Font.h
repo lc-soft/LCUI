@@ -48,8 +48,7 @@
 	#include FT_FREETYPE_H
 	#include FT_GLYPH_H
 	#include FT_OUTLINE_H
-	#define LCUI_FONT_RENDER_MODE	FT_RENDER_MODE_MONO
-	#define LCUI_FONT_LOAD_FALGS	(FT_LOAD_RENDER | FT_LOAD_NO_AUTOHINT | FT_LOAD_NO_BITMAP)
+	#include FT_BITMAP_H
 #else
 	typedef void* FT_Library;
 	typedef void* FT_Face;

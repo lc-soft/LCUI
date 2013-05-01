@@ -43,11 +43,14 @@
 //#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include LC_MISC_H
 #include LC_FONT_H
-#include LC_MEM_H
 #include LC_ERROR_H
 #include LC_GRAPH_H
+
+#ifdef LCUI_FONT_ENGINE_FREETYPE
+#define LCUI_FONT_RENDER_MODE	FT_RENDER_MODE_NORMAL
+#define LCUI_FONT_LOAD_FALGS	(FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT)
+#endif
 
 LCUI_EXPORT(LCUI_BOOL) FontBMP_Valid(LCUI_FontBMP *bitmap)
 /*
@@ -79,8 +82,6 @@ LCUI_EXPORT(void) FontBMP_Init(LCUI_FontBMP *bitmap)
 	bitmap->width = 0;
 	bitmap->top = 0;
 	bitmap->left = 0; 
-	bitmap->num_grays = 0;
-	bitmap->pixel_mode = 0;
 	bitmap->buffer = NULL; 
 }
 
@@ -160,8 +161,6 @@ LCUI_EXPORT(void) Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bit
 	out_bitmap->left = 0;
 	out_bitmap->rows = 8;
 	out_bitmap->width = 8;
-	out_bitmap->pixel_mode = 0;
-	out_bitmap->num_grays = 1;
 	out_bitmap->advance.x = 8;
 	out_bitmap->advance.y = 8;
 }
@@ -187,26 +186,42 @@ LCUI_EXPORT(int) Show_FontBMP(LCUI_FontBMP *fontbmp)
 	return 0;
 }
 
+/* 混合字体的1位单色位图 */
+static int
+FontBMP_MixMONO(
+	LCUI_Graph	*graph,
+	LCUI_Pos	des_pos,
+	LCUI_FontBMP	*bitmap,
+	LCUI_RGB	color,
+	int flag )
+{
+	
+	return 0;
+}
+
+/* 功能：将字体位图绘制到背景图形上 */
 LCUI_EXPORT(int)
 FontBMP_Mix(	LCUI_Graph	*graph,
 		LCUI_Pos	des_pos,
 		LCUI_FontBMP	*bitmap,
 		LCUI_RGB	color,
 		int flag )
-/* 功能：将字体位图绘制到背景图形上 */
 {
+
 	LCUI_Graph *des;
 	LCUI_Rect des_rect, cut;
-	uint_t total, m, n, y;
-	uint_t src_start_pos, des_start_pos;
+	int total, m, n, y;
+	int src_start_pos, des_start_pos;
+
+	/* 数据有效性检测 */
+	if( !FontBMP_Valid( bitmap )
+	 || !Graph_IsValid( graph ) ) {
+		return -1;
+	}
 	/* 获取背景图形的有效区域 */
 	des_rect = Graph_GetValidRect( graph );
 	/* 获取背景图引用的源图形 */
 	des = Graph_GetQuote( graph ); 
-	/* 数据有效性检测 */
-	if( !FontBMP_Valid( bitmap ) || !Graph_IsValid( graph ) ) {
-		return -1;
-	}
 	/* 起点位置的有效性检测 */
 	if(des_pos.x > des->width || des_pos.y > des->height) {
 		return -2;
@@ -304,19 +319,48 @@ Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 	des->left = slot->metrics.horiBearingX>>6;
 	des->rows = bitmap_glyph->bitmap.rows;
 	des->width = bitmap_glyph->bitmap.width;
-	des->pixel_mode = bitmap_glyph->bitmap.pixel_mode;
-	des->num_grays = bitmap_glyph->bitmap.num_grays;
 	des->advance.x = slot->metrics.horiAdvance>>6;	/* 水平跨距 */
 	des->advance.y = slot->metrics.vertAdvance>>6;	/* 垂直跨距 */
 	/* 分配内存，用于保存字体位图 */
 	size = des->rows * des->width * sizeof(uchar_t);
-	des->buffer = malloc( size );
+	des->buffer = (uchar_t*)malloc( size );
 	if( !des->buffer ) {
 		FT_Done_Glyph(glyph);
 		return -1;
 	}
-	/* 拷贝至该内存空间内 */
-	memcpy( des->buffer, bitmap_glyph->bitmap.buffer, size ); 
+
+	switch( bitmap_glyph->bitmap.pixel_mode ) {
+	    /* 8位灰度位图，直接拷贝 */
+	    case FT_PIXEL_MODE_GRAY:
+		memcpy( des->buffer, bitmap_glyph->bitmap.buffer, size ); 
+		break;
+	    /* 单色点阵图，需要转换 */
+	    case FT_PIXEL_MODE_MONO: {
+		FT_Bitmap bitmap;
+		FT_Library lib;
+		FT_Int x, y;
+		uchar_t *t, *s;
+
+		lib = FontLIB_GetLibrary();
+		FT_Bitmap_New( &bitmap );
+		/* 转换位图bitmap_glyph->bitmap至bitmap，1个像素占1个字节 */
+		FT_Bitmap_Convert( lib, &bitmap_glyph->bitmap, &bitmap, 1);
+		s = bitmap.buffer;
+		t = des->buffer;
+		for( y=0; y<des->rows; ++y ) {
+			for( x=0; x<des->width; ++x ) {
+				*t = *s?255:0;
+				++t,++s;
+			}
+		}
+		FT_Bitmap_Done( lib, &bitmap );
+		break;
+	    }
+	    /* 其它像素模式的位图，暂时先直接填充255，等需要时再完善 */
+	    default: 
+		memset( des->buffer, 255, size ); 
+		break;
+	}
 	FT_Done_Glyph(glyph);
 	return size;
 }
