@@ -1,7 +1,7 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * timer.h -- The timer module for LCUI
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -48,7 +48,7 @@ LCUI_BEGIN_HEADER
  * 说明：时间单位为毫秒，调用后会返回该定时器的标识符; 
  * 如果要用于循环定时处理某些任务，可将 reuse 置为 1，否则置于 0。
  * */
-LCUI_EXPORT(int) 
+LCUI_API int 
 LCUITimer_Set( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse );
 
 /*
@@ -56,30 +56,30 @@ LCUITimer_Set( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse );
  * 说明：当不需要定时器时，可以使用该函数释放定时器占用的资源
  * 返回值：正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUITimer_Free( int timer_id );
 
 /*
  * 功能：暂停定时器的使用 
  * 说明：一般用于往复定时的定时器
  * */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUITimer_Pause( int timer_id );
 
 /* 继续使用定时器 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUITimer_Continue( int timer_id );
 
 /* 重设定时器的时间 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUITimer_Reset( int timer_id, long int n_ms );
 
 /* 初始化定时器模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Timer_Init( void );
 
 /* 停用定时器模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Timer_End( void );
 
 LCUI_END_HEADER

@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * font_8x8.c -- in-core font bitmap
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -2607,7 +2607,7 @@ static unsigned char const fontdata_8x8[FONTDATAMAX] = {
 
 };
 
-LCUI_EXPORT(uchar_t const*) in_core_font_8x8( void )
+LCUI_API uchar_t const* in_core_font_8x8( void )
 { 
 	return fontdata_8x8;
 }

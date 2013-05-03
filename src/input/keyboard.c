@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * keyboard.c -- keyboard support
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -60,7 +60,7 @@ static int fd = STDIN_FILENO;
 #endif
 
 /* 检测指定键值的按键是否处于按下状态 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 LCUIKey_IsHit( int key_code )
 {
 	int *t;
@@ -77,14 +77,14 @@ LCUIKey_IsHit( int key_code )
 }
 
 /* 添加已被按下的按键 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIKey_Hit( int key_code )
 {
 	Queue_Add( &LCUI_Sys.press_key, &key_code );
 }
 
 /* 标记指定键值的按键已释放 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIKey_Free( int key_code )
 {
 	int *t;
@@ -100,7 +100,7 @@ LCUIKey_Free( int key_code )
 }
 
 /* 初始化键盘输入 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIKeyboard_Init( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
@@ -120,7 +120,7 @@ LCUIKeyboard_Init( void )
 }
 
 /* 停用键盘输入 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIKeyboard_End( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
@@ -137,7 +137,7 @@ LCUIKeyboard_End( void )
 }
 
 /* 添加键盘的按键按下事件 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIKeyboard_HitKey( int key_code )
 {
 	LCUI_Event event;
@@ -148,7 +148,7 @@ LCUIKeyboard_HitKey( int key_code )
 }
 
 /* 添加键盘的按键释放事件 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIKeyboard_FreeKey( int key_code )
 {
 	LCUI_Event event;
@@ -159,7 +159,7 @@ LCUIKeyboard_FreeKey( int key_code )
 }
 
 /* 检测是否有按键按下 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 LCUIKeyboard_IsHit( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
@@ -188,7 +188,7 @@ LCUIKeyboard_IsHit( void )
 }
 
 /* 获取被按下的按键的键值 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIKeyboard_Get( void )
 { 
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
@@ -287,7 +287,7 @@ static LCUI_BOOL Disable_Keyboard_Input( void )
 #endif
 
 /* 初始化键盘输入模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Keyboard_Init( void )
 {
 	Queue_Init( &LCUI_Sys.press_key, sizeof(int), NULL );
@@ -297,7 +297,7 @@ LCUIModule_Keyboard_Init( void )
 }
 
 /* 停用键盘输入模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Keyboard_End( void )
 {
 	Queue_Destroy( &LCUI_Sys.press_key );

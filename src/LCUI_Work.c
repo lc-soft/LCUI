@@ -1,6 +1,6 @@
 /* ***************************************************************************
  * LCUI_Work.c -- LCUI's other work
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -47,14 +47,14 @@
 #include LC_CURSOR_H
 
 /***************************** Func ***********************************/
-LCUI_EXPORT(void)
+LCUI_API void
 NULL_Func()
 /* 功能：空函数，不做任何操作 */
 {
 	return;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 FuncQueue_Init(LCUI_Queue *queue)
 /* 功能：初始化函数指针队列 */
 {
@@ -83,7 +83,7 @@ WidgetQueue_Get_Pos(LCUI_Queue *queue, LCUI_Widget *widget)
 	return result;
 }
 /* 将回调函数与部件的指定事件进行关联 */
-LCUI_EXPORT(int)
+LCUI_API int
 Widget_Event_Connect(	LCUI_Widget *widget, WidgetEventType event_id,
 			void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) )
 {
@@ -518,7 +518,7 @@ static void
 WidgetFocusProc( LCUI_KeyboardEvent *event, void *arg );
 
 /* 初始化部件模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Widget_Init( void )
 {
 	WidgetQueue_Init( &LCUI_Sys.widget_list );
@@ -530,7 +530,7 @@ LCUIModule_Widget_Init( void )
 }
 
 /* 停用部件模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Widget_End( void )
 {
 	Queue_Destroy( &LCUI_Sys.widget_list );
@@ -543,7 +543,7 @@ LCUIModule_Widget_End( void )
 /*--------------------------- Focus Proc ------------------------------*/
 static LCUI_Widget *root_focus_widget = NULL;
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Set_Focus( LCUI_Widget *widget )
 /*
  * 功能：为部件设置焦点
@@ -586,7 +586,7 @@ Set_Focus( LCUI_Widget *widget )
 }
 
 /* 设定部件是否能够获取焦点 */
-LCUI_EXPORT(void)
+LCUI_API void
 Widget_SetFocus( LCUI_Widget *widget, LCUI_BOOL flag )
 {
 	/* 如果该部件已经获得焦点，并且要设置它不能获取焦点，则取消当前焦点 */
@@ -597,7 +597,7 @@ Widget_SetFocus( LCUI_Widget *widget, LCUI_BOOL flag )
 }
 
 /* 获取指定部件内的已获得焦点的子部件 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 Get_FocusWidget( LCUI_Widget *widget )
 {
 	int i, focus_pos, total;
@@ -646,7 +646,7 @@ Get_FocusWidget( LCUI_Widget *widget )
 	return widget;
 }
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Cancel_Focus( LCUI_Widget *widget )
 /*
  * 功能：取消指定部件的焦点
@@ -709,7 +709,7 @@ Cancel_Focus( LCUI_Widget *widget )
 	return TRUE;
 }
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Reset_Focus( LCUI_Widget* widget )
 /* 复位指定部件内的子部件的焦点 */
 {
@@ -730,19 +730,19 @@ Reset_Focus( LCUI_Widget* widget )
 	return TRUE;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 Next_FocusWidget()
 {
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 Prev_FocusWidget()
 {
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 Return_FocusToParent()
 {
 	return 0;

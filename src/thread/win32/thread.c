@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * thread.c -- the win32 edition thread opreation set.
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -65,7 +65,7 @@ static unsigned __stdcall run_thread(void *arg)
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 _LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 {
 	LCUI_ThreadData *thread_ptr;
@@ -124,13 +124,13 @@ static int _LCUIThread_Destroy( LCUI_Thread thread )
 	return -2;
 }
 
-LCUI_EXPORT(LCUI_Thread)
+LCUI_API LCUI_Thread
 LCUIThread_SelfID( void )
 {
 	return GetCurrentThreadId();
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 _LCUIThread_Exit( void *retval )
 {
 	LCUI_ThreadData *thread;
@@ -144,7 +144,7 @@ _LCUIThread_Exit( void *retval )
 	thread->retval = retval;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 _LCUIThread_Cancel( LCUI_Thread thread )
 {
 	LCUI_ThreadData *data_ptr;
@@ -153,7 +153,7 @@ _LCUIThread_Cancel( LCUI_Thread thread )
 	_LCUIThread_Destroy( data_ptr->tid );
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 _LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
 	LCUI_ThreadData *data_ptr;

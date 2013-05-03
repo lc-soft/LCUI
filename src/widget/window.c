@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * window.c -- LCUI's window widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -54,7 +54,7 @@
 #include LC_FONT_H
 #include LC_ERROR_H
 
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 Window_GetTitleBar(LCUI_Widget *window)
 /* 功能：获取窗口标题栏的指针 */
 { 
@@ -66,7 +66,7 @@ Window_GetTitleBar(LCUI_Widget *window)
 	return win_p->titlebar;
 }
 
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 Window_GetClientArea(LCUI_Widget *window)
 /* 功能：获取窗口客户区的指针 */
 {
@@ -79,7 +79,7 @@ Window_GetClientArea(LCUI_Widget *window)
 }
 
 /* 获取窗口右上角关闭按钮 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 Window_GetCloseButton( LCUI_Widget *window )
 {
 	LCUI_Window *win_p;
@@ -123,7 +123,7 @@ Window_ExecMove(LCUI_Widget *titlebar, LCUI_WidgetEvent *event)
 	Widget_Move( window, pos );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Window_SetTitleIcon(LCUI_Widget *window, LCUI_Graph *icon)
 /* 功能：自定义指定窗口的标题栏图标 */
 {
@@ -358,7 +358,7 @@ Window_Init( LCUI_Widget *win_p )
 }
 
 /* 为窗口设置标题文字 */
-LCUI_EXPORT(void)
+LCUI_API void
 Window_SetTitleText( LCUI_Widget *win_p, const char *text )
 { 
 	LCUI_Widget *titlebar; 
@@ -371,7 +371,7 @@ Window_SetTitleText( LCUI_Widget *win_p, const char *text )
 	Label_Text(title->label, text);
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Window_SetTitleTextW( LCUI_Widget *win_p, const wchar_t *text )
 {
 	LCUI_Widget *titlebar; 
@@ -384,7 +384,7 @@ Window_SetTitleTextW( LCUI_Widget *win_p, const wchar_t *text )
 	Label_TextW(title->label, text);
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Window_ClientArea_Add(LCUI_Widget *window, LCUI_Widget *widget)
 /* 功能：将部件添加至窗口客户区 */
 {
@@ -392,7 +392,7 @@ Window_ClientArea_Add(LCUI_Widget *window, LCUI_Widget *widget)
 	Widget_Container_Add(w, widget);
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget)
 /* 功能：将部件添加至窗口标题栏 */
 {
@@ -402,7 +402,7 @@ Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget)
 
 
 /* 新建一个窗口 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 Window_New( const char *title, LCUI_Graph *icon, LCUI_Size size )
 {
 	LCUI_Widget *wnd;
@@ -416,7 +416,7 @@ Window_New( const char *title, LCUI_Graph *icon, LCUI_Size size )
 	return wnd;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Register_Window()
 /* 注册窗口部件类型 */
 {

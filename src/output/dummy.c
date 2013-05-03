@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * dummy.c --  if not found graphical output support, use this sourcefile
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -43,37 +43,37 @@
 #include LC_LCUI_H
 
 #ifdef LCUI_VIDEO_DRIVER_NONE
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
 {
 	return;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_GetGraph( LCUI_Graph *out )
 {
 	return -1;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_Init( void )
 {
 	return -1;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_Destroy( void )
 {
 	return -1;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_PutGraph (LCUI_Graph * src, LCUI_Pos pos)
 {
 	return -1;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIScreen_SyncFrameBuffer( void )
 {
 	;

@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * button.c -- LCUI‘s Button widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -153,7 +153,7 @@ Button_Init( LCUI_Widget *widget )
 }
 
 /* 获取嵌套在按钮部件里的label部件 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 Button_GetLabel( LCUI_Widget *widget )
 {
 	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivData(widget);
@@ -161,7 +161,7 @@ Button_GetLabel( LCUI_Widget *widget )
 }
 
 /* 自定义按钮在各种状态下显示的位图 */
-LCUI_EXPORT(void)
+LCUI_API void
 Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal, 
 			LCUI_Graph *over, LCUI_Graph *down, 
 			LCUI_Graph *focus, LCUI_Graph *disable)
@@ -199,7 +199,7 @@ Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal,
 }
 
 /* 设定按钮部件显示的文本内容 */
-LCUI_EXPORT(void)
+LCUI_API void
 Button_Text( LCUI_Widget *widget, const char *text )
 {
 	LCUI_Button *button;
@@ -211,7 +211,7 @@ Button_Text( LCUI_Widget *widget, const char *text )
 	Label_Text( label, text );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Button_TextW( LCUI_Widget *widget, const wchar_t *text )
 {
 	LCUI_Button *button;
@@ -223,7 +223,7 @@ Button_TextW( LCUI_Widget *widget, const wchar_t *text )
 }
 
 /* 创建一个带文本内容的按钮 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 Button_New( const char *text )
 {
 	LCUI_Widget *widget;
@@ -233,7 +233,7 @@ Button_New( const char *text )
 }
 
 /* 将按钮部件类型注册至部件库 */
-LCUI_EXPORT(void)
+LCUI_API void
 Register_Button(void)
 {
 	/* 添加部件类型 */

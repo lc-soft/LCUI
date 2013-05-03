@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * picturebox.c -- LCUI's PictureBox widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -77,7 +77,7 @@ PictureBox_Init(LCUI_Widget *widget)
 }
 
 /* 获取图片盒子的图片显示的区域 */
-LCUI_EXPORT(LCUI_Rect)
+LCUI_API LCUI_Rect
 PictureBox_GetViewArea( LCUI_Widget *widget )
 {
 	LCUI_PictureBox *pic_box;
@@ -87,7 +87,7 @@ PictureBox_GetViewArea( LCUI_Widget *widget )
 }
 
 /* 获取获取图片盒子的图片显示的区域的坐标 */
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 PictureBox_GetViewAreaPos( LCUI_Widget *widget )
 {
 	LCUI_Rect rect;
@@ -293,7 +293,7 @@ PictureBox_ExecUpdate(LCUI_Widget *widget)
 }
 
 /* 获取缩放比例 */
-LCUI_EXPORT(float)
+LCUI_API float
 PictureBox_GetScale( LCUI_Widget *widget )
 {
 	LCUI_PictureBox *pic_box;
@@ -338,7 +338,7 @@ find_widget_data(LCUI_Widget *widget)
 }
 
 /* 设定PictureBox部件显示的图像 */
-LCUI_EXPORT(void)
+LCUI_API void
 PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 { 
 	int i;
@@ -439,7 +439,7 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 
 
 /* 设定图片文件中的图像为PictureBox部件显示的图像 */
-LCUI_EXPORT(int)
+LCUI_API int
 PictureBox_SetImageFile( LCUI_Widget *widget, char *image_file )
 {
 	int ret;
@@ -480,7 +480,7 @@ PictureBox_SetImageFile( LCUI_Widget *widget, char *image_file )
 }
 
 /* 设定当加载图像失败时显示的图像 */
-LCUI_EXPORT(int)
+LCUI_API int
 PictureBox_SetErrorImage( LCUI_Widget *widget, LCUI_Graph *pic )
 {
 	LCUI_PictureBox *pic_box;
@@ -495,7 +495,7 @@ PictureBox_SetErrorImage( LCUI_Widget *widget, LCUI_Graph *pic )
 }
 
 /* 设定正在加载另一图像时显示的图像 */
-LCUI_EXPORT(int)
+LCUI_API int
 PictureBox_SetInitImage( LCUI_Widget *widget, LCUI_Graph *pic )
 {
 	LCUI_PictureBox *pic_box;
@@ -510,7 +510,7 @@ PictureBox_SetInitImage( LCUI_Widget *widget, LCUI_Graph *pic )
 }
 
 /* 设定图像显示模式 */
-LCUI_EXPORT(void)
+LCUI_API void
 PictureBox_SetSizeMode( LCUI_Widget *widget, int mode )
 {
 	LCUI_Size my_size;
@@ -550,7 +550,7 @@ PictureBox_SetSizeMode( LCUI_Widget *widget, int mode )
 
 
 /* 设定PictureBox部件的图片显示区域的大小 */
-LCUI_EXPORT(void)
+LCUI_API void
 PictureBox_ResizeViewArea( LCUI_Widget *widget, int width, int height )
 {
 	LCUI_Pos start, center_pos;
@@ -594,7 +594,7 @@ PictureBox_ResizeViewArea( LCUI_Widget *widget, int width, int height )
 }
 
 /* 获取PictureBox部件内的图像 */
-LCUI_EXPORT(LCUI_Graph*)
+LCUI_API LCUI_Graph*
 PictureBox_GetImage( LCUI_Widget *widget )
 {
 	LCUI_PictureBox *pic_box;
@@ -604,7 +604,7 @@ PictureBox_GetImage( LCUI_Widget *widget )
 }
 
 /* 移动PictureBox部件内的图片的显示区域的位置 */
-LCUI_EXPORT(int)
+LCUI_API int
 PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos )
 {
 	LCUI_Size size;
@@ -659,7 +659,7 @@ PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos )
 }
 
 /* 缩放PictureBox部件的图片浏览区域 */
-LCUI_EXPORT(int)
+LCUI_API int
 PictureBox_ZoomViewArea( LCUI_Widget *widget, double scale )
 {
 	LCUI_Graph buff, temp;
@@ -740,7 +740,7 @@ PictureBox_ExecResize(LCUI_Widget *widget)
 	Widget_Refresh(widget); 
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Register_PictureBox()
 /* 注册图片部件类型 */
 {

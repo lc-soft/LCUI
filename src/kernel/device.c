@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * device.c -- The input device processing module
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -53,7 +53,7 @@ dev_list_init( LCUI_Queue *dev_list )
  * 功能：注册设备
  * 说明：为指定设备添加处理函数
  * */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIDevice_Add(	LCUI_BOOL (*init_func)(void), 
 		LCUI_BOOL (*proc_func)(void), 
 		LCUI_BOOL (*destroy_func)(void) )
@@ -78,33 +78,35 @@ proc_dev_list ( void *arg )
 {
 	LCUI_Queue *dev_list;
 	dev_func_data *data_ptr;
-	int total, i, result, sleep_time = 1;
+	int total, i, need_sleep, sleep_time = 1;
 	
 	dev_list = (LCUI_Queue *)arg;
 	while( LCUI_Active() ) {
-		result = 0;
+		need_sleep = TRUE;
 		total = Queue_GetTotal( dev_list );
 		for(i=0; i<total; ++i) {
-			data_ptr = Queue_Get( dev_list, i );
+			data_ptr = (dev_func_data*)Queue_Get( dev_list, i );
 			if( !data_ptr || !data_ptr->proc_func ) {
 				continue;
 			}
-			result += data_ptr->proc_func();
+			if( data_ptr->proc_func() ) {
+				need_sleep = FALSE;
+			}
 		}
-		if( result > 0 ) {
-			sleep_time = 1;
-		} else {
+		if( need_sleep ) {
 			LCUI_MSleep( sleep_time );
 			if( sleep_time < 100 ) {
 				sleep_time += 1;
 			}
+		} else {
+			sleep_time = 1;
 		}
 	}
 	LCUIThread_Exit(NULL);
 }
 
 /* 初始化设备处理模块 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIModule_Device_Init(void)
 {
 	dev_list_init( &LCUI_Sys.dev_list );
@@ -113,7 +115,7 @@ LCUIModule_Device_Init(void)
 }
 
 /* 停用设备处理模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Device_End(void)
 {
 	int total, i;

@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * titlebar.c -- window titlebar graphic resources
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 
-LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_Normal(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Default_TitleBar_CloseBox_Normal(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为正常状态 */
 {
 	unsigned char red[]={
@@ -181,7 +181,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_Normal(LCUI_Graph *pic)
 	return value;
 }
 
-LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_HighLight(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Default_TitleBar_CloseBox_HighLight(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为高亮状态 */
 {
 	unsigned char red[]={
@@ -316,7 +316,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_HighLight(LCUI_Graph *pic)
 	return value;
 }
 
-LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_Down(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Default_TitleBar_CloseBox_Down(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为按下状态 */
 {
 	unsigned char red[]={
@@ -451,7 +451,7 @@ LCUI_EXPORT(int) Load_Graph_Default_TitleBar_CloseBox_Down(LCUI_Graph *pic)
 	return value;
 }
 
-LCUI_EXPORT(int) Load_Graph_Default_TitleBar_BG(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Default_TitleBar_BG(LCUI_Graph *pic)
 /* 功能：载入默认的标题栏背景图 */
 {
 	unsigned char red[]={153,81,77,69,62,56,54,54,54,54,54,54,54,54,53,53,53,53,53,53,52,52,46,148,13};

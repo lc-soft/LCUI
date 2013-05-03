@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * textlayer.c -- text bitmap layer processing module.
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -232,7 +232,7 @@ TextLayer_Update_RowSize (LCUI_TextLayer *layer, int row )
 	row_data->max_size = size;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Init( LCUI_TextLayer *layer )
 /* 初始化文本图层相关数据 */
 {
@@ -274,7 +274,7 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	//TextLayer_Text_Add_NewRow ( layer );/* 添加新行 */
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Destroy_TextLayer( LCUI_TextLayer *layer )
 /* 销毁文本图层占用的资源 */
 {
@@ -370,7 +370,7 @@ __TextLayer_OldArea_Erase( LCUI_TextLayer *layer, LCUI_Graph *graph )
 	}
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 /* 将文本图层绘制到目标部件的图层上 */
 {
@@ -501,7 +501,7 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	//_DEBUG_MSG("quit\n");
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Refresh( LCUI_TextLayer *layer )
 /* 标记文本图层中每个字的位图，等待绘制文本图层时进行更新 */
 {
@@ -533,7 +533,7 @@ TextLayer_Refresh( LCUI_TextLayer *layer )
  * 功能：设定文本图层的偏移位置
  * 返回值：需要对图层进行重绘时返回0，否则返回1
  *  */
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_SetOffset( LCUI_TextLayer *layer, LCUI_Pos offset_pos )
 {
 	/* 如果之前已经标记不需要滚动，那么就记录当前的偏移位置 */
@@ -552,7 +552,7 @@ TextLayer_SetOffset( LCUI_TextLayer *layer, LCUI_Pos offset_pos )
 /* 剪切板 */
 //static LCUI_String clip_board;
 
-LCUI_EXPORT(LCUI_Size)
+LCUI_API LCUI_Size
 TextLayer_GetSize ( LCUI_TextLayer *layer )
 /* 获取文本图层的实际尺寸 */
 {
@@ -578,7 +578,7 @@ TextLayer_GetSize ( LCUI_TextLayer *layer )
 }
 
 /* 获取文本图层中的文本内容 */
-LCUI_EXPORT(size_t)
+LCUI_API size_t
 TextLayer_GetText( LCUI_TextLayer *layer, wchar_t *buff, size_t max_len )
 {
 	unsigned int i, text_len;
@@ -603,7 +603,7 @@ TextLayer_GetText( LCUI_TextLayer *layer, wchar_t *buff, size_t max_len )
 	return i;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 /* 刷新指定行中指定字以及后面的字的区域 */
 {
@@ -644,7 +644,7 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 	}
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Text_SetDefaultStyle( LCUI_TextLayer *layer, LCUI_TextStyle style )
 /* 设定默认的文本样式，需要调用TextLayer_Draw函数进行文本位图更新 */
 {
@@ -712,14 +712,14 @@ skip_style_cmp:;
 	}
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_ReadOnly( LCUI_TextLayer *layer, LCUI_BOOL flag )
 /* 指定文本图层中的文本是否为只读 */
 {
 	layer->read_only = flag;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Text_Clear( LCUI_TextLayer *layer )
 /* 清空文本内容 */
 {
@@ -734,7 +734,7 @@ TextLayer_Text_Clear( LCUI_TextLayer *layer )
 	layer->current_des_pos = Pos(0,0);
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_SetRowEnd( LCUI_TextLayer *layer, uint_t row, uint_t start_cols )
 /* 为指定行设定结束点，结束点及后面的数据将被删除，但不记录残余文本位图区域 */
 {
@@ -749,14 +749,14 @@ TextLayer_SetRowEnd( LCUI_TextLayer *layer, uint_t row, uint_t start_cols )
 	}
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_Text_GetTotalLength( LCUI_TextLayer *layer )
 /* 获取文本位图中的文本长度 */
 {
 	return Queue_GetTotal( &layer->text_source_data );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Text_Set_MaxLength( LCUI_TextLayer *layer, int max )
 /* 设定文本位图中的文本长度 */
 {
@@ -766,7 +766,7 @@ TextLayer_Text_Set_MaxLength( LCUI_TextLayer *layer, int max )
 	// 对现有文本进行截断处理，暂不添加添加
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Text_SetPasswordChar( LCUI_TextLayer *layer, wchar_t ch )
 /* 
  * 设置屏蔽字符，设置后，文本框内的文本都会显示成该字符
@@ -779,7 +779,7 @@ TextLayer_Text_SetPasswordChar( LCUI_TextLayer *layer, wchar_t ch )
 }
 
 /* 对文本进行预处理，处理后的数据保存至layer里 */ 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Text_Process(	LCUI_TextLayer *layer,
 				int pos_type,
 				wchar_t *new_text )
@@ -943,7 +943,7 @@ TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	DEBUG_MSG1("quit\n");
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
 /* 为文本图层中的文本生成位图，已存在位图的文字将不重新生成 */
 {
@@ -993,7 +993,7 @@ TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
 	DEBUG_MSG1("quit\n");
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_PrintInfo( LCUI_TextLayer *layer )
 /* 打印文本图层信息 */
 {
@@ -1021,7 +1021,7 @@ TextLayer_PrintInfo( LCUI_TextLayer *layer )
  * 功能：设定指定的宽字符串作为文本图层中显示的文本
  * 说明：文本将被储存至缓冲区，等待绘制文本位图时再处理缓冲区内的文本
  *  */
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_TextW( LCUI_TextLayer *layer, const wchar_t *wchar_text )
 {
 	/* 将文本存储至缓冲区 */
@@ -1030,7 +1030,7 @@ TextLayer_TextW( LCUI_TextLayer *layer, const wchar_t *wchar_text )
 	layer->need_proc_buff = TRUE;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Text( LCUI_TextLayer *layer, const char *utf8_text )
 {
 	wchar_t *unicode_text;
@@ -1039,7 +1039,7 @@ TextLayer_Text( LCUI_TextLayer *layer, const char *utf8_text )
 	free( unicode_text );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_TextA( LCUI_TextLayer *layer, const char *ascii_text )
 {
 	wchar_t *unicode_text;
@@ -1049,7 +1049,7 @@ TextLayer_TextA( LCUI_TextLayer *layer, const char *ascii_text )
 }
 
 /* 在文本末尾追加文本，不移动光标，不删除原有选中文本 */
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_Text_AppendW( LCUI_TextLayer *layer, wchar_t *new_text )
 {
 	TextLayer_Text_Process( layer, AT_TEXT_LAST, new_text );
@@ -1057,7 +1057,7 @@ TextLayer_Text_AppendW( LCUI_TextLayer *layer, wchar_t *new_text )
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_Text_AppendA( LCUI_TextLayer *layer, char *new_text )
 {
 	wchar_t *unicode_text;
@@ -1067,7 +1067,7 @@ TextLayer_Text_AppendA( LCUI_TextLayer *layer, char *new_text )
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text )
 {
 	wchar_t *unicode_text;
@@ -1078,7 +1078,7 @@ TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text )
 }
 
 /* 在光标处添加文本，如有选中文本，将被删除 */
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_Text_AddW( LCUI_TextLayer *layer, wchar_t *unicode_text )
 {
 	TextLayer_Text_Process( layer, AT_CURSOR_POS, unicode_text );
@@ -1086,7 +1086,7 @@ TextLayer_Text_AddW( LCUI_TextLayer *layer, wchar_t *unicode_text )
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_Text_Add( LCUI_TextLayer *layer, char *utf8_text )
 {
 	wchar_t *unicode_text;
@@ -1096,7 +1096,7 @@ TextLayer_Text_Add( LCUI_TextLayer *layer, char *utf8_text )
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_Text_AddA( LCUI_TextLayer *layer, char *ascii_text )
 {
 	wchar_t *unicode_text;
@@ -1106,7 +1106,7 @@ TextLayer_Text_AddA( LCUI_TextLayer *layer, char *ascii_text )
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_Text_Paste( LCUI_TextLayer *layer )
 /* 将剪切板的内容粘贴至文本图层 */
 {
@@ -1247,7 +1247,7 @@ TextLayer_Update_CurSrcPos( LCUI_TextLayer *layer, int left_or_right )
 	return layer->current_src_pos;
 }
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 TextLayer_Cursor_SetPixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 /* 
  * 功能：根据传入的二维坐标，设定光标在的文本图层中的位置
@@ -1320,7 +1320,7 @@ TextLayer_Cursor_SetPixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 	return new_pos;
 }
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 TextLayer_Cursor_SetPos( LCUI_TextLayer *layer, LCUI_Pos pos )
 /* 设定光标在文本框中的位置，并返回该光标的坐标，单位为像素 */
 {
@@ -1390,7 +1390,7 @@ TextLayer_Cursor_SetPos( LCUI_TextLayer *layer, LCUI_Pos pos )
 	return pixel_pos;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_Text_Delete( LCUI_TextLayer *layer, int n )
 /* 删除光标右边处n个字符 */
 {
@@ -1519,7 +1519,7 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 /* 删除光标左边处n个字符 */
 {
@@ -1566,7 +1566,7 @@ TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 }
 
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 TextLayer_Char_GetPixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 /* 获取显示出来的文字相对于文本图层的坐标，单位为像素 */
 {
@@ -1624,14 +1624,14 @@ TextLayer_Char_GetPixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 	return pixel_pos;
 }
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 TextLayer_Cursor_GetPos( LCUI_TextLayer *layer )
 /* 获取光标在文本框中的位置，也就是光标在哪一行的哪个字后面 */
 {
 	return layer->current_des_pos;
 }
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 TextLayer_Cursor_GetFixedPixelPos( LCUI_TextLayer *layer )
 /* 获取文本图层的光标位置，单位为像素 */
 {
@@ -1641,7 +1641,7 @@ TextLayer_Cursor_GetFixedPixelPos( LCUI_TextLayer *layer )
 	return pos;
 }
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 TextLayer_Cursor_GetPixelPos( LCUI_TextLayer *layer )
 /* 获取文本图层的光标相对于容器位置，单位为像素 */
 {
@@ -1652,7 +1652,7 @@ TextLayer_Cursor_GetPixelPos( LCUI_TextLayer *layer )
 	return pos;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_GetRowLen( LCUI_TextLayer *layer, int row )
 /* 获取指定行显式文字数 */
 {
@@ -1671,7 +1671,7 @@ TextLayer_GetRowLen( LCUI_TextLayer *layer, int row )
 	return Queue_GetTotal( &row_ptr->string ); 
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_CurRow_GetMaxHeight( LCUI_TextLayer *layer )
 /* 获取当前行的最大高度 */
 {
@@ -1683,14 +1683,14 @@ TextLayer_CurRow_GetMaxHeight( LCUI_TextLayer *layer )
 	return row_ptr->max_size.h;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_GetRows( LCUI_TextLayer *layer )
 /* 获取文本行数 */
 {
 	return Queue_GetTotal( &layer->rows_data );
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_GetSelectedText( LCUI_TextLayer *layer, char *out_text )
 /* 获取文本图层内被选中的文本 */
 { 
@@ -1703,7 +1703,7 @@ TextLayer_GetSelectedText( LCUI_TextLayer *layer, char *out_text )
 	return -1;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_CopySelectedText( LCUI_TextLayer *layer )
 /* 复制文本图层内被选中的文本 */
 {
@@ -1716,7 +1716,7 @@ TextLayer_CopySelectedText( LCUI_TextLayer *layer )
 	return -1;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextLayer_CutSelectedText( LCUI_TextLayer *layer )
 /* 剪切文本图层内被选中的文本 */
 {
@@ -1729,14 +1729,14 @@ TextLayer_CutSelectedText( LCUI_TextLayer *layer )
 	return -1;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_UsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL flag )
 /* 指定文本图层是否处理样式标签 */
 {
 	layer->using_style_tags = flag;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextLayer_Multiline( LCUI_TextLayer *layer, LCUI_BOOL flag )
 /* 指定文本图层是否启用多行文本显示 */
 {

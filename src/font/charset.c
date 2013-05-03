@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * charset.c -- The charset operation set.
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -100,7 +100,7 @@ covernt_code(unsigned char in[MAX_SAVE_NUM])
 }
 
 /* UTF-8转Unicode */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUICharset_UTF8ToUnicode( const char *src_utf8, wchar_t **des_unicode )
 {
 	wchar_t *buff;
@@ -160,7 +160,7 @@ LCUICharset_UTF8ToUnicode( const char *src_utf8, wchar_t **des_unicode )
 }
 
 /* ASCII转Unicode */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUICharset_ASCIIToUnicode( const char *src_ascii, wchar_t **des_unicode )
 {
 	wchar_t *buff;
@@ -177,7 +177,7 @@ LCUICharset_ASCIIToUnicode( const char *src_ascii, wchar_t **des_unicode )
 }
 
 /* GB2312转Unicode */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUICharset_GB2312ToUnicode( const char *src_gb2312, wchar_t **des_unicode )
 {
 #ifdef LCUI_BUILD_IN_LINUX

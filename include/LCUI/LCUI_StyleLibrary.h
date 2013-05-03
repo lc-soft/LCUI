@@ -1,4 +1,4 @@
-#ifndef __LCUI_STYLE_LIBRARY_H__
+﻿#ifndef __LCUI_STYLE_LIBRARY_H__
 #define __LCUI_STYLE_LIBRARY_H__
 
 LCUI_BEGIN_HEADER
@@ -19,26 +19,26 @@ typedef struct {
 } LCUI_StyleAttr;
 
 /* 初始化样式库 */
-LCUI_EXPORT(void)
+LCUI_API void
 StyleLib_Init( LCUI_StyleLibrary *lib );
 
-LCUI_EXPORT(void)
+LCUI_API void
 StyleAttr_Init( LCUI_StyleAttr *attr );
 
-LCUI_EXPORT(void)
+LCUI_API void
 StyleClass_Init( LCUI_StyleClass *style_class );
 
 /* 获取样式类的句柄 */
-LCUI_EXPORT(LCUI_StyleClass*)
+LCUI_API LCUI_StyleClass*
 StyleLib_GetStyleClass(	LCUI_StyleLibrary *lib, 
 			const char *class_name );
 
 /* 添加指定名称的样式类到样式库中 */
-LCUI_EXPORT(LCUI_StyleClass*)
+LCUI_API LCUI_StyleClass*
 StyleLib_AddStyleClass(	LCUI_StyleLibrary *lib, 
 			const char *class_name );
 
-LCUI_EXPORT(LCUI_StyleAttr*)
+LCUI_API LCUI_StyleAttr*
 StyleLib_GetStyleAttr(	LCUI_StyleClass *style_class,
 			const char *pseudo_class_name,
 			const char *attr_name );
@@ -51,26 +51,26 @@ StyleLib_GetStyleAttr(	LCUI_StyleClass *style_class,
  * attr_name		属性名
  * attr_buff		储存属性值的缓冲区
  * */
-LCUI_EXPORT(int)
+LCUI_API int
 StyleClass_GetStyleAttrValue(	LCUI_StyleClass *style_class,
 				const char *pseudo_class_name,
 				const char *attr_name,
 				char *attr_buff );
 
 /* 为样式类添加样式属性 */
-LCUI_EXPORT(int)
+LCUI_API int
 StyleClass_SetStyleAttr(	LCUI_StyleClass *style_class,
 				const char *pseudo_class_name,
 				const char *attr_name,
 				const char *attr_value );
 
 /* 根据字符串的内容，往样式库里添加相应样式 */
-LCUI_EXPORT(int)
+LCUI_API int
 StyleLib_AddStyleFromString(	LCUI_StyleLibrary *lib,
 				const char *style_string );
 
 /* 根据指定文件内的数据，往样式库里添加相应样式 */
-LCUI_EXPORT(int)
+LCUI_API int
 StyleLib_AddStyleFromFile(	LCUI_StyleLibrary *lib,
 				const char *filepath );
 

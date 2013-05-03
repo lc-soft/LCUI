@@ -1,7 +1,7 @@
-/* ****************************************************************************
+﻿/* ****************************************************************************
  * LCUI_Build.h -- macro definition defines the location of some header files
  *
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -43,19 +43,19 @@
 #define __LCUI_BUILD_H__
 
 #if defined(__GNUC__)
-#  define LCUI_EXPORT(type) extern type
+#  define LCUI_API 
 #elif (defined(_MSC_VER) && _MSC_VER < 800) ||\
     (defined(__BORLANDC__) && __BORLANDC__ < 0x500)
   /* older Borland and MSC
    * compilers used '__export' and required this to be after
    * the type.
    */
-#  define LCUI_EXPORT(type) type __export
+#  define LCUI_API __export
 #else /* newer compiler */
 #  ifdef LCUI_EXPORTS
-#    define LCUI_EXPORT(type) extern __declspec(dllexport) type
+#    define LCUI_API __declspec(dllexport)
 #  else
-#    define LCUI_EXPORT(type) /*extern __declspec(dllimport)*/ type
+#    define LCUI_API 
 #  endif
 #endif /* compiler */
 

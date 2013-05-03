@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * radiobutton.c -- LCUI‘s RadioButton widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -60,7 +60,7 @@ static void __Destroy_MutexData( void *arg )
 }
 
 /* 将单选框从互斥关系链中移除 */
-LCUI_EXPORT(void)
+LCUI_API void
 RadioButton_DeleteMutex( LCUI_Widget *widget )
 {
 	int i, total;
@@ -79,7 +79,7 @@ RadioButton_DeleteMutex( LCUI_Widget *widget )
 }
 
 /* 为两个单选框建立互斥关系 */
-LCUI_EXPORT(void)
+LCUI_API void
 RadioButton_CreateMutex( LCUI_Widget *a, LCUI_Widget *b )
 {
 	int pos;
@@ -123,7 +123,7 @@ RadioButton_CreateMutex( LCUI_Widget *a, LCUI_Widget *b )
 }
 
 /* 设定单选框为选中状态 */
-LCUI_EXPORT(void)
+LCUI_API void
 RadioButton_SetOn( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
@@ -144,7 +144,7 @@ RadioButton_SetOn( LCUI_Widget *widget )
 }
 
 /* 设定单选框为未选中状态 */
-LCUI_EXPORT(void)
+LCUI_API void
 RadioButton_SetOff( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
@@ -154,7 +154,7 @@ RadioButton_SetOff( LCUI_Widget *widget )
 }
 
 /* 检测单选框是否被选中 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 RadioButton_IsOn( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
@@ -163,7 +163,7 @@ RadioButton_IsOn( LCUI_Widget *widget )
 }
 
 /* 检测单选框是否未选中 */
-LCUI_EXPORT(int)
+LCUI_API int
 RadioButton_IsOff( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
@@ -180,7 +180,7 @@ RadioButton_Click( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 }
 
 /* 设定单选框中的图像框的尺寸 */
-LCUI_EXPORT(void)
+LCUI_API void
 RadioButton_ImgBox_SetSize(LCUI_Widget *widget, LCUI_Size size)
 {
 	LCUI_Widget *imgbox;
@@ -353,7 +353,7 @@ static void RadioButton_ExecUpdate( LCUI_Widget *widget )
 }
 
 /* 获取单选框部件中的label部件的指针 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 RadioButton_GetLabel( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
@@ -366,7 +366,7 @@ RadioButton_GetLabel( LCUI_Widget *widget )
 }
 
 /* 获取单选框部件中的PictureBox部件的指针 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 RadioButton_GetImgBox( LCUI_Widget *widget )
 {
 	LCUI_RadioButton *radio_button;
@@ -379,7 +379,7 @@ RadioButton_GetImgBox( LCUI_Widget *widget )
 }
 
 /* 设定与单选框部件关联的文本内容 */
-LCUI_EXPORT(void)
+LCUI_API void
 RadioButton_Text( LCUI_Widget *widget, const char *text )
 {
 	LCUI_Widget *label;
@@ -387,7 +387,7 @@ RadioButton_Text( LCUI_Widget *widget, const char *text )
 	Label_Text(label, text); 
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 RadioButton_TextW( LCUI_Widget *widget, const wchar_t *text )
 {
 	LCUI_Widget *label;
@@ -396,7 +396,7 @@ RadioButton_TextW( LCUI_Widget *widget, const wchar_t *text )
 }
 
 /* 创建一个带文本内容的单选框 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 RadioButton_New( const char *text )
 {
 	LCUI_Widget *widget;
@@ -406,7 +406,7 @@ RadioButton_New( const char *text )
 }
 
 /* 注册单选框部件类型 */
-LCUI_EXPORT(void)
+LCUI_API void
 Register_RadioButton(void)
 {
 	/* 添加几个部件类型 */

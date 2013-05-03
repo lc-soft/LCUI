@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * textbox.c -- LCUI's TextBox widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -702,14 +702,14 @@ TextBox_ExecUpdate( LCUI_Widget *widget )
 	TextBox_Cursor_Update( widget ); /* 更新文本框内的光标 */
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Process_TextBox_Drag(LCUI_Widget *widget, LCUI_WidgetDragEvent *event)
 /* 处理鼠标对文本框的拖动事件 */
 {
 	
 }
 
-LCUI_EXPORT(void )
+LCUI_API void 
 Process_TextBox_Clicked(LCUI_Widget *widget, LCUI_EventSlot *event)
 /* 处理鼠标对文本框的点击事件 */
 {
@@ -721,7 +721,7 @@ Process_TextBox_Clicked(LCUI_Widget *widget, LCUI_EventSlot *event)
 /*----------------------------- Public -------------------------------*/
 /* 剪切板 */
 //static LCUI_String clip_board;
-LCUI_EXPORT(void)
+LCUI_API void
 Register_TextBox(void)
 /* 注册文本框部件 */
 {
@@ -731,7 +731,7 @@ Register_TextBox(void)
 	WidgetFunc_Add ( "text_box", Destroy_TextBox, FUNC_TYPE_DESTROY );
 }
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 TextBox_ViewArea_GetPos( LCUI_Widget *widget )
 /* 获取文本显示区域的位置 */
 {
@@ -745,7 +745,7 @@ TextBox_ViewArea_GetPos( LCUI_Widget *widget )
 	return pos;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextBox_ViewArea_Update( LCUI_Widget *widget )
 /* 更新文本框的文本显示区域 */
 {
@@ -847,7 +847,7 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 }
 
 /* 获取文本框部件内的label部件指针 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 TextBox_GetLabel( LCUI_Widget *widget )
 {
 	LCUI_TextBox *textbox;
@@ -856,7 +856,7 @@ TextBox_GetLabel( LCUI_Widget *widget )
 }
 
 /* 获取文本框部件内的光标 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 TextBox_GetCursor( LCUI_Widget *widget )
 {
 	LCUI_TextBox *tb;
@@ -865,7 +865,7 @@ TextBox_GetCursor( LCUI_Widget *widget )
 }
 
 /* 获取文本框内文本 */
-LCUI_EXPORT(size_t)
+LCUI_API size_t
 TextBox_GetText( LCUI_Widget *widget, wchar_t *buff, size_t max_len )
 {
 	LCUI_TextLayer *layer;
@@ -880,7 +880,7 @@ TextBox_GetText( LCUI_Widget *widget, wchar_t *buff, size_t max_len )
 }
 
 /* 获取文本框内的文本总长度 */
-LCUI_EXPORT(int)
+LCUI_API int
 TextBox_Text_GetTotalLength( LCUI_Widget *widget )
 {
 	LCUI_TextLayer *layer;
@@ -945,7 +945,7 @@ TextBox_Text_Clear( LCUI_Widget *widget )
 
 
 /* 设定文本框显示的文本 */
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_TextW( LCUI_Widget *widget, wchar_t *unicode_text )
 {
 	LCUI_TextBox *tb;
@@ -965,7 +965,7 @@ TextBox_TextW( LCUI_Widget *widget, wchar_t *unicode_text )
 	Widget_Update( widget );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text( LCUI_Widget *widget, char *utf8_text )
 {
 	wchar_t *unicode_text;
@@ -974,7 +974,7 @@ TextBox_Text( LCUI_Widget *widget, char *utf8_text )
 	free( unicode_text );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos )
 /* 为文本框内的文本图层设置偏移 */
 {
@@ -988,7 +988,7 @@ TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos )
 }
 
 /* 在光标处添加文本 */
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text_AddW( LCUI_Widget *widget, wchar_t *unicode_text )
 {
 	LCUI_TextBox *tb;
@@ -1007,7 +1007,7 @@ TextBox_Text_AddW( LCUI_Widget *widget, wchar_t *unicode_text )
 	Widget_Update( widget );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text_AddA( LCUI_Widget *widget, char *ascii_text )
 {
 	wchar_t *unicode_text;
@@ -1016,7 +1016,7 @@ TextBox_Text_AddA( LCUI_Widget *widget, char *ascii_text )
 	free( unicode_text );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text_Add( LCUI_Widget *widget, char *utf8_text )
 {
 	wchar_t *unicode_text;
@@ -1027,7 +1027,7 @@ TextBox_Text_Add( LCUI_Widget *widget, char *utf8_text )
 
 
 /* 在文本末尾追加文本 */
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text_AppendW( LCUI_Widget *widget, wchar_t *unicode_text )
 {
 	LCUI_TextBox *tb;
@@ -1046,7 +1046,7 @@ TextBox_Text_AppendW( LCUI_Widget *widget, wchar_t *unicode_text )
 }
 
 /* 在文本末尾追加文本 */
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text_Append( LCUI_Widget *widget, char *utf8_text )
 {
 	wchar_t *unicode_text;
@@ -1055,14 +1055,14 @@ TextBox_Text_Append( LCUI_Widget *widget, char *utf8_text )
 	free( unicode_text );
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextBox_Text_Paste(LCUI_Widget *widget)
 /* 将剪切板的内容粘贴至文本框 */
 {
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextBox_Text_Backspace(LCUI_Widget *widget, int n)
 /* 删除光标左边处n个字符 */
 {
@@ -1077,14 +1077,14 @@ TextBox_Text_Backspace(LCUI_Widget *widget, int n)
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextBox_Text_Delete(LCUI_Widget *widget, int n)
 /* 删除光标右边处n个字符 */
 {
 	return 0;
 }
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 TextBox_Cursor_Update( LCUI_Widget *widget )
 /* 更新文本框的光标，返回该光标的像素坐标 */
 {
@@ -1113,7 +1113,7 @@ TextBox_Cursor_Update( LCUI_Widget *widget )
 	return pixel_pos;
 }
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
 /* 移动文本框内的光标 */
 {
@@ -1137,7 +1137,7 @@ TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
 	return pixel_pos;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextBox_GetSelectedText( LCUI_Widget *widget, char *out_text )
 /* 获取文本框内被选中的文本 */
 {
@@ -1146,7 +1146,7 @@ TextBox_GetSelectedText( LCUI_Widget *widget, char *out_text )
 	return TextLayer_GetSelectedText( layer, out_text );
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextBox_CopySelectedText(LCUI_Widget *widget)
 /* 复制文本框内被选中的文本 */
 {
@@ -1155,7 +1155,7 @@ TextBox_CopySelectedText(LCUI_Widget *widget)
 	return TextLayer_CopySelectedText( layer );
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 TextBox_CutSelectedText(LCUI_Widget *widget)
 /* 剪切文本框内被选中的文本 */
 {
@@ -1164,7 +1164,7 @@ TextBox_CutSelectedText(LCUI_Widget *widget)
 	return TextLayer_CutSelectedText( layer );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Using_StyleTags(LCUI_Widget *widget, LCUI_BOOL flag)
 /* 指定文本框是否处理控制符 */
 {
@@ -1173,7 +1173,7 @@ TextBox_Using_StyleTags(LCUI_Widget *widget, LCUI_BOOL flag)
 	TextLayer_UsingStyleTags( layer, flag );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Multiline( LCUI_Widget *widget, LCUI_BOOL flag )
 /* 指定文本框是否启用多行文本显示 */
 {
@@ -1182,7 +1182,7 @@ TextBox_Multiline( LCUI_Widget *widget, LCUI_BOOL flag )
 	TextLayer_Multiline( layer, flag );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text_SetDefaultStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 /* 设定文本框内的文本的缺省样式 */
 {
@@ -1192,7 +1192,7 @@ TextBox_Text_SetDefaultStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 }
 
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text_SetMaxLength( LCUI_Widget *widget, int max )
 /* 设置文本框中能够输入的最大字符数 */
 {
@@ -1201,7 +1201,7 @@ TextBox_Text_SetMaxLength( LCUI_Widget *widget, int max )
 	TextLayer_Text_Set_MaxLength( layer, max );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text_SetPasswordChar( LCUI_Widget *widget, wchar_t ch )
 /* 为文本框设置屏蔽字符 */
 {
@@ -1212,7 +1212,7 @@ TextBox_Text_SetPasswordChar( LCUI_Widget *widget, wchar_t ch )
 	Widget_Update( widget );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text_SetPlaceHolderW(	LCUI_Widget *widget, 
 				LCUI_TextStyle *style,
 				const wchar_t *str )
@@ -1226,7 +1226,7 @@ TextBox_Text_SetPlaceHolderW(	LCUI_Widget *widget,
 	}
 }
 /* 为文本框设置占位符 */
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_Text_SetPlaceHolder(	LCUI_Widget *widget, 
 				LCUI_TextStyle *style,
 				const char *str )
@@ -1241,7 +1241,7 @@ TextBox_Text_SetPlaceHolder(	LCUI_Widget *widget,
  * 功能：限制能对文本框输入的字符
  * 说明：str中存放限制范围内的字符，设置后，文本框只接受输入该字符串内的字符
  * */
-LCUI_EXPORT(void)
+LCUI_API void
 TextBox_LimitInput( LCUI_Widget *widget, wchar_t *str )
 {
 	LCUI_TextBox *textbox;

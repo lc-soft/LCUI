@@ -1,7 +1,7 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * border.h -- Graph border drawing operation set.
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -78,16 +78,16 @@ typedef struct _LCUI_Border
 }
 LCUI_Border;
 
-LCUI_EXPORT(void) Border_Init( LCUI_Border *border );
+LCUI_API void Border_Init( LCUI_Border *border );
 /* 初始化边框数据 */
 
-LCUI_EXPORT(LCUI_Border) Border( unsigned int width_px, BORDER_STYLE style, LCUI_RGB color );
+LCUI_API LCUI_Border Border( unsigned int width_px, BORDER_STYLE style, LCUI_RGB color );
 /* 简单的设置边框样式，并获取该样式数据 */
 
-LCUI_EXPORT(void) Border_Radius( LCUI_Border *border, unsigned int radius );
+LCUI_API void Border_Radius( LCUI_Border *border, unsigned int radius );
 /* 设置边框的圆角半径 */
 
-LCUI_EXPORT(int) Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border );
+LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border );
 /* 简单的为图形边缘绘制边框 */
 
 LCUI_END_HEADER

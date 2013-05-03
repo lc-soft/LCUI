@@ -1,7 +1,7 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * label.h -- LCUI's Label widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -55,33 +55,33 @@ typedef struct _LCUI_Label
 LCUI_Label;
 
 /* 设定与标签关联的文本内容 */
-LCUI_EXPORT(int)
+LCUI_API int
 Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text );
 
-LCUI_EXPORT(void)
+LCUI_API void
 Label_Text( LCUI_Widget *widget, const char *utf8_text );
 
-LCUI_EXPORT(void)
+LCUI_API void
 Label_TextA( LCUI_Widget *widget, const char *ascii_text );
 
 /* 为Label部件内显示的文本设定文本样式 */
-LCUI_EXPORT(int)
+LCUI_API int
 Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
 
 /* 获取Label部件的文本样式 */
-LCUI_EXPORT(LCUI_TextStyle)
+LCUI_API LCUI_TextStyle
 Label_GetTextStyle( LCUI_Widget *widget );
 
 /* 获取label部件内的文本图层的指针 */
-LCUI_EXPORT(LCUI_TextLayer*)
+LCUI_API LCUI_TextLayer*
 Label_GetTextLayer( LCUI_Widget *widget );
 
 /* 刷新label部件显示的文本 */
-LCUI_EXPORT(void)
+LCUI_API void
 Label_Refresh( LCUI_Widget *widget );
 
 /* 启用或禁用Label部件的自动尺寸调整功能 */
-LCUI_EXPORT(void)
+LCUI_API void
 Label_AutoSize( LCUI_Widget *widget, LCUI_BOOL flag, AUTOSIZE_MODE mode );
 LCUI_END_HEADER
 

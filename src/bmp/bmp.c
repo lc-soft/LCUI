@@ -16,7 +16,7 @@ typedef struct bmp_head {
 	short int nic4[11];
 } bmp_head;
 
-LCUI_EXPORT(int) load_bmp(const char *filepath, LCUI_Graph *out)
+LCUI_API int load_bmp(const char *filepath, LCUI_Graph *out)
 /* 打开并载入BMP图片文件内的图形数据 */
 {
 	FILE *fp;

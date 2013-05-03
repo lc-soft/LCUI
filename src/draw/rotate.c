@@ -14,7 +14,7 @@ static double radian(int angle)
 	return angle*3.1415926/180;
 }
 
-LCUI_EXPORT(int) Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
+LCUI_API int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 /* 
  * 功能：旋转图形
  * 说明：指定旋转中心点坐标以及旋转角度，即可得到旋转后的图形

@@ -1,7 +1,7 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * activebox.h -- ActiveBox widget, play simple dynamic picture
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -75,22 +75,22 @@ struct _LCUI_Frames
 /*************************************************************/
 
 /*********************** Frames Process *******************************/
-LCUI_EXPORT(LCUI_Frames*)
+LCUI_API LCUI_Frames*
 Create_Frames(LCUI_Size size);
 /* 
  * 功能：创建一个能存放动画数据的容器
  * 说明：该容器用于记录动画的每一帧的信息，需要指定该容器的尺寸。
  *  */ 
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 Frames_GetFrameMixPos( LCUI_Frames *stream, LCUI_Frame *frame );
 /* 功能：获取指定帧在整个动画容器中的位置 */ 
 
-LCUI_EXPORT(int)
+LCUI_API int
 Resize_Frames( LCUI_Frames *p, LCUI_Size new_size );
 /* 功能：调整动画的容器尺寸 */ 
 
-LCUI_EXPORT(int)
+LCUI_API int
 Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic, 
 			LCUI_Pos offset, int sleep_time );
 /* 
@@ -101,7 +101,7 @@ Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic,
  * sleep_time表示该帧的显示时长，单位为：10毫秒
  * */ 
 
-LCUI_EXPORT(int)
+LCUI_API int
 Frames_AddFunc(	LCUI_Frames *des, 
 		void (*func)(LCUI_Graph*, void*), 
 		void *arg );
@@ -110,40 +110,40 @@ Frames_AddFunc(	LCUI_Frames *des,
  * 说明：关联回调函数后，动画每更新一帧都会调用这个函数
  * */ 
 
-LCUI_EXPORT(LCUI_Frame*)
+LCUI_API LCUI_Frame*
 Frames_GetFrame(LCUI_Frames *src);
 /* 功能：获取当前帧 */ 
 
-LCUI_EXPORT(LCUI_Graph*)
+LCUI_API LCUI_Graph*
 Frames_GetGraphSlot(LCUI_Frames *src);
 /* 功能：获取当前帧的图像 */ 
 
-LCUI_EXPORT(int)
+LCUI_API int
 Frames_Play(LCUI_Frames *frames);
 /* 功能：播放动画 */ 
 
-LCUI_EXPORT(int)
+LCUI_API int
 Frames_Pause(LCUI_Frames *frames);
 /* 功能：暂停动画 */ 
 /*********************** End Frames Process ***************************/
 
 /************************** ActiveBox *********************************/
-LCUI_EXPORT(LCUI_Frames*)
+LCUI_API LCUI_Frames*
 ActiveBox_GetFrames(LCUI_Widget *widget);
 
-LCUI_EXPORT(int)
+LCUI_API int
 ActiveBox_SetFramesSize(LCUI_Widget *widget, LCUI_Size new_size);
 /* 功能：设定动画尺寸 */ 
 
-LCUI_EXPORT(int)
+LCUI_API int
 ActiveBox_Play(LCUI_Widget *widget);
 /* 功能：播放动画 */ 
 
-LCUI_EXPORT(int)
+LCUI_API int
 ActiveBox_Pause(LCUI_Widget *widget);
 /* 功能：暂停动画 */ 
 
-LCUI_EXPORT(int)
+LCUI_API int
 ActiveBox_AddFrame(	LCUI_Widget *widget, LCUI_Graph *pic, 
 			LCUI_Pos offset, int sleep_time );
 /* 功能：为ActiveBox部件内的动画添加一帧图像 */ 

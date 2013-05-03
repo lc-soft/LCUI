@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * window.h -- C++ class and function for window widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and

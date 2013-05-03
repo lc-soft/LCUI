@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * menu.c -- LCUI's Menu widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -59,7 +59,7 @@
 #include LC_MENU_H
 #include LC_RES_H
 
-LCUI_EXPORT(void)
+LCUI_API void
 Register_Menu()
 {
 	

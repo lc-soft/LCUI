@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * progressbar.c -- LCUI's ProgressBar widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -160,7 +160,7 @@ ProgressBar_ExecDraw(LCUI_Widget *widget)
 	PictureBox_SetImage(pb->fore_pic_box, &pb->fore_graph);
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value)
 /* 功能：设定进度条最大值 */
 {
@@ -169,7 +169,7 @@ ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value)
 	Widget_Update(widget); 
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 ProgressBar_GetMaxValue(LCUI_Widget *widget)
 /* 功能：获取进度条最大值 */
 {
@@ -177,7 +177,7 @@ ProgressBar_GetMaxValue(LCUI_Widget *widget)
 	return pb->max_value;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 ProgressBar_SetValue(LCUI_Widget *widget, int value)
 /* 功能：设定进度条当前值 */
 {
@@ -186,7 +186,7 @@ ProgressBar_SetValue(LCUI_Widget *widget, int value)
 	Widget_Update(widget);
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 ProgressBar_GetValue(LCUI_Widget *widget)
 /* 功能：获取进度条当前值 */
 {
@@ -240,7 +240,7 @@ ProgressBar_ExecShow(LCUI_Widget *widget)
 	}
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Register_ProgressBar()
 /* 注册进度条部件类型 */
 {

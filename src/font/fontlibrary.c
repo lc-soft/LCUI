@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * fontlibrary.c -- The font database management module
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -104,7 +104,7 @@ static void FontLIB_DestroyFontInfo( void *arg )
 	
 }
 
-LCUI_EXPORT(void) FontLIB_DestroyAll( void )
+LCUI_API void FontLIB_DestroyAll( void )
 {
 	if( !database_init ) {
 		return;
@@ -133,7 +133,7 @@ static void FontLIB_CharInit( LCUI_FontCharItem *item )
 }
 
 /* 初始化字体数据库 */
-LCUI_EXPORT(void)
+LCUI_API void
 FontLIB_Init( void )
 {
 	if( database_init ) {
@@ -159,13 +159,14 @@ FontLIB_Init( void )
 
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 /* 获取FT库句柄 */
-LCUI_EXPORT(FT_Library) FontLIB_GetLibrary(void) {
+LCUI_API FT_Library FontLIB_GetLibrary(void)
+{
 	return library;
 }
 #endif
 
 /* 通过字体文件路径来查找字体信息，并获取字体ID */
-LCUI_EXPORT(int)
+LCUI_API int
 FontLIB_FindInfoByFilePath( const char *filepath )
 {
 	int i, n;
@@ -188,7 +189,7 @@ FontLIB_FindInfoByFilePath( const char *filepath )
 }
 
 /* 获取指定字体ID的字体face对象句柄 */
-LCUI_EXPORT(LCUI_FontInfo*)
+LCUI_API LCUI_FontInfo*
 FontLIB_GetFont( int font_id )
 {
 	int i, n;
@@ -211,7 +212,7 @@ FontLIB_GetFont( int font_id )
 }
 
 /* 获取指定字族名的字体ID */
-LCUI_EXPORT(int)
+LCUI_API int
 FontLIB_GetFontIDByFamilyName( const char *family_name )
 {
 	int i, n;
@@ -235,7 +236,7 @@ FontLIB_GetFontIDByFamilyName( const char *family_name )
 }
 
 /* 获取指定字体ID的字体face对象句柄 */
-LCUI_EXPORT(FT_Face)
+LCUI_API FT_Face
 FontLIB_GetFontFace( int font_id )
 {
 	LCUI_FontInfo *info;
@@ -247,7 +248,7 @@ FontLIB_GetFontFace( int font_id )
 }
 
 /* 获取默认的字体ID */
-LCUI_EXPORT(int)
+LCUI_API int
 FontLIB_GetDefaultFontID( void )
 {
 	if( !default_font ) {
@@ -257,7 +258,7 @@ FontLIB_GetDefaultFontID( void )
 }
 
 /* 设定默认的字体 */
-LCUI_EXPORT(void)
+LCUI_API void
 FontLIB_SetDefaultFont( int id )
 {
 	LCUI_FontInfo *p;
@@ -268,7 +269,7 @@ FontLIB_SetDefaultFont( int id )
 }
 
 /* 添加字体族，并返回该字族的ID */
-LCUI_EXPORT(int)
+LCUI_API int
 FontLIB_AddFontInfo(	const char *family_name, const char *style_name, 
 			const char *filepath, FT_Face face )
 {
@@ -345,7 +346,7 @@ FontLIB_GetCharItem( wchar_t char_code )
  * 注意：调用此函数后，作为参数fontbmp_buff的变量，不能被free掉，否则，数据库中记录
  * 的此数据会无效 
  * */
-LCUI_EXPORT(LCUI_FontBMP*)
+LCUI_API LCUI_FontBMP*
 FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 			int pixel_size,	 LCUI_FontBMP *fontbmp_buff )
 {
@@ -408,7 +409,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 }
 
 /* 获取字体位图数据 */
-LCUI_EXPORT(LCUI_FontBMP*)
+LCUI_API LCUI_FontBMP*
 FontLIB_GetFontBMP( wchar_t char_code, int font_id, int pixel_size )
 {
 	LCUI_FontCharItem *font;
@@ -438,7 +439,7 @@ FontLIB_GetFontBMP( wchar_t char_code, int font_id, int pixel_size )
 }
 
 /* 载入字体值数据库中 */
-LCUI_EXPORT(int)
+LCUI_API int
 FontLIB_LoadFontFile( const char *filepath )
 {
 	int id;

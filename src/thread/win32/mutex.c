@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * mutex.c -- the win32 edition mutex lock
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -45,7 +45,7 @@
 
 #ifdef LCUI_THREAD_WIN32
 
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIMutex_Init( LCUI_Mutex *mutex )
 {
 	*mutex = CreateMutex(NULL, FALSE, NULL);
@@ -53,14 +53,14 @@ LCUIMutex_Init( LCUI_Mutex *mutex )
 }
 
 /* Free the mutex */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIMutex_Destroy( LCUI_Mutex *mutex )
 {
 	CloseHandle( *mutex );
 }
 
 /* Lock the mutex */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIMutex_Lock( LCUI_Mutex *mutex )
 {
 	if ( WaitForSingleObject( *mutex, INFINITE ) == WAIT_FAILED ) {
@@ -71,7 +71,7 @@ LCUIMutex_Lock( LCUI_Mutex *mutex )
 }
 
 /* Unlock the mutex */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIMutex_Unlock( LCUI_Mutex *mutex )
 {
 	if ( ReleaseMutex( *mutex ) == FALSE ) {

@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * main.c -- The main functions for the LCUI normal work
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -128,7 +128,7 @@ LCUI_MainLoop_GetAvailable(void)
 }
 
 /* 新建一个主循环 */
-LCUI_EXPORT(LCUI_MainLoop*)
+LCUI_API LCUI_MainLoop*
 LCUI_MainLoop_New( void )
 {
 	LCUI_MainLoop *loop;
@@ -155,7 +155,7 @@ LCUI_MainLoop_New( void )
 }
 
 /* 设定主循环等级，level值越高，处理主循环退出时，也越早处理该循环 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
 {
 	if( loop == NULL ) {
@@ -210,7 +210,7 @@ LCUIApp_RunTask( LCUI_App *app )
 }
 
 /* 运行目标循环 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 {
 	LCUI_App *app;
@@ -248,7 +248,7 @@ LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 }
 
 /* 标记目标主循环需要退出 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
 {
 	if( loop == NULL ) {
@@ -291,7 +291,7 @@ LCUI_DestroyMainLoopQueue(void)
 
 /************************* App Management *****************************/
 /* 根据程序的ID，获取指向程序数据结构的指针 */
-LCUI_EXPORT(LCUI_App*)
+LCUI_API LCUI_App*
 LCUIApp_Find( LCUI_ID id )
 {
 	LCUI_App *app; 
@@ -311,7 +311,7 @@ LCUIApp_Find( LCUI_ID id )
 }
 
 /* 获取指向程序数据的指针 */
-LCUI_EXPORT(LCUI_App*) 
+LCUI_API LCUI_App* 
 LCUIApp_GetSelf( void )
 {
 	LCUI_Thread id;
@@ -329,7 +329,7 @@ LCUIApp_GetSelf( void )
 }
 
 /* 获取程序ID */
-LCUI_EXPORT(LCUI_ID)
+LCUI_API LCUI_ID
 LCUIApp_GetSelfID( void )
 {
 	LCUI_App *app;
@@ -373,8 +373,9 @@ static void LCUI_DestroyAllApps(void)
 }
 
 /* 用于退出LCUI，释放LCUI占用的资源 */
-LCUI_EXPORT(void) LCUI_Quit( void )
+LCUI_API void LCUI_Quit( void )
 {
+	_DEBUG_MSG("start quit\n");
 	LCUI_Sys.state = KILLED;	/* 状态标志置为KILLED */
 	LCUI_DestroyAllApps();
 	LCUI_DestroyMainLoopQueue();
@@ -390,7 +391,9 @@ LCUI_EXPORT(void) LCUI_Quit( void )
 	//LCUIModule_Mouse_End();
 	//LCUIModule_TouchScreen_End();
 	LCUIModule_Device_End();
+	_DEBUG_MSG("end video ....\n");
 	LCUIModule_Video_End();
+	_DEBUG_MSG("end video .... OK!\n");
 }
 
 
@@ -461,7 +464,7 @@ static int LCUIAppList_Add( void )
 }
 
 /* 注册终止函数，以在LCUI程序退出时调用 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIApp_AtQuit( void (*callback_func)(void) )
 {
 	LCUI_App *app;
@@ -514,7 +517,7 @@ static void LCUIModule_Cursor_Init( void )
 	LCUICursor_SetGraph( &pic );
 }
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 LCUI_Active()
 /* 功能：检测LCUI是否活动 */
 {
@@ -528,7 +531,7 @@ LCUI_Active()
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUI_Init( int mode, void *arg )
 {
 	int temp;
@@ -582,7 +585,7 @@ LCUI_Init( int mode, void *arg )
  * 功能：LCUI程序的主循环
  * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
  *  */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUI_Main( void )
 {
 	LCUI_MainLoop *loop;
@@ -592,7 +595,7 @@ LCUI_Main( void )
 }
 
 /* 获取LCUI的版本 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUI_GetSelfVersion( char *out )
 {
 	return sprintf(out, "%s", LCUI_VERSION);

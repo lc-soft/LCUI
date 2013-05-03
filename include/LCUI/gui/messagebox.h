@@ -1,7 +1,7 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * messagebox.h -- MessageBox for LCUI
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -101,11 +101,11 @@ typedef enum {
  * 	MB_BTN_IS_NO	: "否"按钮
  * 	MB_BTN_IS_QUIT	: 窗口右上角的关闭按钮
  *  */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUI_MessageBoxW(	MB_ICON_TYPE icon_type,	const wchar_t *text, 
 			const wchar_t *title,	MB_BTN_TYPE button );
 
-LCUI_EXPORT(int)
+LCUI_API int
 LCUI_MessageBox(	MB_ICON_TYPE icon_type,	const char *text, 
 			const char *title,	MB_BTN_TYPE button );
 LCUI_END_HEADER

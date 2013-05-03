@@ -1,7 +1,7 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * LCUI_Input.h -- The input devices handling module of LCUI
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -149,7 +149,7 @@ LCUI_BEGIN_HEADER
  *   0   鼠标左键已经释放
  *   1   鼠标左键处于按下状态
  **/ 
-LCUI_EXPORT(int)
+LCUI_API int
 Mouse_LeftButton( LCUI_MouseButtonEvent *event );
 
 /*
@@ -161,122 +161,122 @@ Mouse_LeftButton( LCUI_MouseButtonEvent *event );
  *   0   鼠标右键已经释放
  *   1   鼠标右键处于按下状态
  **/
-LCUI_EXPORT(int)
+LCUI_API int
 Mouse_RightButton( LCUI_MouseButtonEvent *event );
 
-LCUI_EXPORT(int)
+LCUI_API int
 Click_LeftButton (LCUI_MouseButtonEvent *event);
 /*
  * 功能：检测是否是按鼠标左键
  **/ 
 
 /* 记录被按下的指定键的键值，并添加LCUI_MOUSEBUTTONDOWN事件 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIMouse_ButtonDown( LCUI_Pos pos, int key_code );
 
 /* 记录被释放的指定键的键值，并添加LCUI_MOUSEBUTTONUP事件 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIMouse_ButtonUp( LCUI_Pos pos, int key_code );
 
-LCUI_EXPORT(int)
+LCUI_API int
 Win32_LCUIMouse_ButtonDown( int key_code );
 
-LCUI_EXPORT(int)
+LCUI_API int
 Win32_LCUIMouse_ButtonUp( int key_code );
 
 #ifdef LCUI_BUILD_IN_WIN32
 /* 更新鼠标位置 */
-LCUI_EXPORT(void) Win32_LCUIMouse_UpdatePos( void );
+LCUI_API void Win32_LCUIMouse_UpdatePos( void );
 #endif
 
 /* 功能：处理鼠标产生的事件 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type );
 
-LCUI_EXPORT(int)
+LCUI_API int
 Check_Mouse_Support();
 /* 功能：检测鼠标的支持 */ 
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Enable_Mouse_Input();
 /* 功能：启用鼠标输入处理 */ 
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Disable_Mouse_Input();
 /* 功能：禁用鼠标输入处理 */ 
 
 /* 初始化鼠标输入模块 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIModule_Mouse_Init( void );
 /**************************** Mouse End *******************************/
 
 
 /***************************** Key *************************************/ 
 /* 初始化键盘输入 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIKeyboard_Init( void );
 
 /* 停用键盘输入 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIKeyboard_End( void );
 
 /* 添加键盘的按键按下事件 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIKeyboard_HitKey( int key_code );
 
 /* 添加键盘的按键释放事件 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIKeyboard_FreeKey( int key_code );
 
 /* 检测是否有按键按下 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 LCUIKeyboard_IsHit( void );
 
 /* 功能：获取被按下的按键的键值 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIKeyboard_Get( void );
 
 /* 检测指定键值的按键是否处于按下状态 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 LCUIKey_IsHit( int key_code );
 
 /* 添加已被按下的按键 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIKey_Hit( int key_code );
 
 /* 标记指定键值的按键已释放 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIKey_Free( int key_code );
 
 /* 初始化键盘输入模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Keyboard_Init( void );
 
 /* 停用键盘输入模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Keyboard_End( void );
 /*************************** Key End **********************************/
 
 
 /************************* TouchScreen *********************************/ 
-LCUI_EXPORT(int)
+LCUI_API int
 Check_TouchScreen_Support();
 /* 功能：检测是否支持触瓶 */ 
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Enable_TouchScreen_Input();
 /* 功能：启用鼠标输入处理 */ 
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Disable_TouchScreen_Input();
 /* 功能：撤销鼠标输入处理 */ 
 
-LCUI_EXPORT(void*)
+LCUI_API void*
 Get_TouchScreen();
 /* 获取触屏设备文件句柄 */
 
 /* 初始化触屏输入模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_TouchScreen_Init( void );
 /*********************** TouchScreen End *******************************/
 

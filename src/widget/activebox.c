@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * activebox.c -- ActiveBox widget, play simple dynamic picture
  *
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -104,7 +104,7 @@ Frames_UpdateGraphSlot( LCUI_Frames *frames, int num )
 	return 0;
 }
 
-LCUI_EXPORT(LCUI_Frames*)
+LCUI_API LCUI_Frames*
 Create_Frames(LCUI_Size size)
 /*
  * 功能：创建一个能存放动画数据的容器
@@ -131,7 +131,7 @@ Create_Frames(LCUI_Size size)
 	return p;
 }
 
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 Frames_GetFrameMixPos(LCUI_Frames *stream, LCUI_Frame *frame)
 /* 功能：获取指定帧在整个动画容器中的位置 */
 {
@@ -142,7 +142,7 @@ Frames_GetFrameMixPos(LCUI_Frames *stream, LCUI_Frame *frame)
 	return Pos_Add(pos, frame->offset);
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 Resize_Frames(LCUI_Frames *p, LCUI_Size new_size)
 /* 功能：调整动画的容器尺寸 */
 {
@@ -182,7 +182,7 @@ Resize_Frames(LCUI_Frames *p, LCUI_Size new_size)
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic,
 			LCUI_Pos offset, int sleep_time )
 /*
@@ -209,7 +209,7 @@ Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic,
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 Frames_AddFunc(	LCUI_Frames *des,
 		void (*func)(LCUI_Graph*, void*),
 		void *arg )
@@ -318,7 +318,7 @@ FramesStream_TimeSub(int time)
 	Queue_Unlock(&frames_stream);
 }
 
-LCUI_EXPORT(LCUI_Frame*)
+LCUI_API LCUI_Frame*
 Frames_GetFrame(LCUI_Frames *src)
 /* 功能：获取当前帧 */
 {
@@ -327,7 +327,7 @@ Frames_GetFrame(LCUI_Frames *src)
 	return p;
 }
 
-LCUI_EXPORT(LCUI_Graph*)
+LCUI_API LCUI_Graph*
 Frames_GetGraphSlot(LCUI_Frames *src)
 /* 功能：获取当前帧的图像 */
 {
@@ -426,7 +426,7 @@ Process_Frames( void )
 	}
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 Frames_Play(LCUI_Frames *frames)
 /* 功能：播放动画 */
 {
@@ -458,7 +458,7 @@ Frames_Play(LCUI_Frames *frames)
 	return 1;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 Frames_Pause(LCUI_Frames *frames)
 /* 功能：暂停动画 */
 {
@@ -471,7 +471,7 @@ Frames_Pause(LCUI_Frames *frames)
 /*********************** End Frames Process ***************************/
 
 /************************** ActiveBox *********************************/
-LCUI_EXPORT(LCUI_Frames*)
+LCUI_API LCUI_Frames*
 ActiveBox_GetFrames(LCUI_Widget *widget)
 {
 	LCUI_ActiveBox *actbox;
@@ -487,7 +487,7 @@ ActiveBox_RefreshFrame(LCUI_Graph *frame, void *arg)
 	Widget_Draw(widget);
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 ActiveBox_SetFramesSize(LCUI_Widget *widget, LCUI_Size new_size)
 /* 功能：设定动画尺寸 */
 {
@@ -495,7 +495,7 @@ ActiveBox_SetFramesSize(LCUI_Widget *widget, LCUI_Size new_size)
 	return Resize_Frames(frames, new_size);
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 ActiveBox_Play(LCUI_Widget *widget)
 /* 功能：播放动画 */
 {
@@ -503,7 +503,7 @@ ActiveBox_Play(LCUI_Widget *widget)
 	return Frames_Play(frames);
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 ActiveBox_Pause(LCUI_Widget *widget)
 /* 功能：暂停动画 */
 {
@@ -511,7 +511,7 @@ ActiveBox_Pause(LCUI_Widget *widget)
 	return Frames_Pause(frames);
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 ActiveBox_AddFrame(	LCUI_Widget *widget, LCUI_Graph *pic,
 			LCUI_Pos offset, int sleep_time )
 /* 功能：为ActiveBox部件内的动画添加一帧图像 */
@@ -561,7 +561,7 @@ Destroy_ActiveBox(LCUI_Widget *widget)
 
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Register_ActiveBox()
 {
 	WidgetType_Add("active_box");

@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * scrollbar.c -- LCUI's ScrollBar widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -198,7 +198,7 @@ ScrollBar_Update( LCUI_Widget *widget )
 	}
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Register_ScrollBar(void)
 {
 	WidgetType_Add( "scrollbar" );
@@ -211,7 +211,7 @@ Register_ScrollBar(void)
 /**************************** 公共函数 **********************************/
 
 /* 获取滚动条部件 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 Get_ScrollBar( LCUI_Widget *widget )
 {
 	LCUI_ScrollBar *scrollbar;
@@ -221,7 +221,7 @@ Get_ScrollBar( LCUI_Widget *widget )
 }
 
 /* 获取滚动条的数据 */
-LCUI_EXPORT(ScrollBar_Data)
+LCUI_API ScrollBar_Data
 ScrollBar_GetData ( LCUI_Widget *widget )
 {
 	LCUI_ScrollBar *scrollbar;
@@ -231,7 +231,7 @@ ScrollBar_GetData ( LCUI_Widget *widget )
 }
 
 /* 获取滚动条部件的滑块 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 ScrollBar_GetWidget( LCUI_Widget *widget )
 {
 	LCUI_ScrollBar *scrollbar;
@@ -240,7 +240,7 @@ ScrollBar_GetWidget( LCUI_Widget *widget )
 	return scrollbar->widget;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 ScrollBar_SetMaxNum( LCUI_Widget *widget, int max_num )
 {
 	LCUI_ScrollBar *scrollbar;
@@ -250,7 +250,7 @@ ScrollBar_SetMaxNum( LCUI_Widget *widget, int max_num )
 	Widget_Update( widget );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 ScrollBar_SetMaxSize( LCUI_Widget *widget, int max_size )
 {
 	LCUI_ScrollBar *scrollbar;
@@ -260,7 +260,7 @@ ScrollBar_SetMaxSize( LCUI_Widget *widget, int max_size )
 	Widget_Update( widget );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 ScrollBar_SetCurrentValue( LCUI_Widget *widget, int current_num )
 {
 	LCUI_ScrollBar *scrollbar;
@@ -270,7 +270,7 @@ ScrollBar_SetCurrentValue( LCUI_Widget *widget, int current_num )
 	Widget_Update( widget );
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 ScrollBar_SetCurrentSize( LCUI_Widget *widget, int current_size )
 {
 	LCUI_ScrollBar *scrollbar;
@@ -281,7 +281,7 @@ ScrollBar_SetCurrentSize( LCUI_Widget *widget, int current_size )
 }
 
 /* 将回调函数与滚动条部件连接 */
-LCUI_EXPORT(void)
+LCUI_API void
 ScrollBar_Connect(
 	LCUI_Widget *widget,
 	void (*callback_func)( ScrollBar_Data, void* ),
@@ -295,7 +295,7 @@ ScrollBar_Connect(
 }
 
 /* 设置滚动条是横向移动还是纵向移动 */
-LCUI_EXPORT(void)
+LCUI_API void
 ScrollBar_SetDirection( LCUI_Widget *widget, int direction )
 {
 	LCUI_ScrollBar *scrollbar;

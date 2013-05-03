@@ -1,7 +1,7 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * device.h -- The input device processing module
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -55,16 +55,16 @@ dev_func_data;
  * 功能：注册设备
  * 说明：为指定设备添加处理函数
  * */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIDevice_Add(	LCUI_BOOL (*init_func)(void), 
 		LCUI_BOOL (*proc_func)(void), 
 		LCUI_BOOL (*destroy_func)(void) );
 
 /* 初始化设备处理模块 */
-LCUI_EXPORT(int) LCUIModule_Device_Init(void);
+LCUI_API int LCUIModule_Device_Init(void);
 
 /* 停用设备处理模块 */
-LCUI_EXPORT(void) LCUIModule_Device_End(void);
+LCUI_API void LCUIModule_Device_End(void);
 
 LCUI_END_HEADER
 

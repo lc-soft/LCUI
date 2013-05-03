@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * LCUI_Thread.c -- base thread management
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -127,14 +127,14 @@ __LCUIThread_PrintInfo( Thread_TreeNode *ttn )
 }
 
 /* 打印各个线程的信息 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIThread_PrintInfo( void )
 {
 	__LCUIThread_PrintInfo(NULL);
 }
 
 /* 获取指定线程的根线程ID */
-LCUI_EXPORT(LCUI_Thread)
+LCUI_API LCUI_Thread
 LCUIThread_GetRootThreadID( LCUI_Thread tid )
 {
 	Thread_TreeNode *ttn;
@@ -203,7 +203,7 @@ ThreadTreeNode_Delete( LCUI_Thread tid )
 }
 
 /* 创建并运行一个线程 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg )
 {
 	Thread_TreeNode *tt;
@@ -227,7 +227,7 @@ LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg )
 }
 
 /* 等待一个线程的结束，并释放该线程的资源 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
 	int ret;
@@ -240,7 +240,7 @@ LCUIThread_Join( LCUI_Thread thread, void **retval )
 }
 
 /* 撤销一个线程 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIThread_Cancel( LCUI_Thread thread )
 {
 	_LCUIThread_Cancel( thread );
@@ -249,7 +249,7 @@ LCUIThread_Cancel( LCUI_Thread thread )
 }
 
 /* 记录指针作为返回值，并退出线程 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIThread_Exit( void* retval )
 {
 	_LCUIThread_Exit( retval );
@@ -277,7 +277,7 @@ static void LCUIThreadTree_Cancel( Thread_TreeNode *ttn )
 }
 
 /* 撤销指定ID的程序的全部子线程 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIApp_CancelAllThreads( LCUI_ID app_id )
 {
 	int i, n;
@@ -300,14 +300,14 @@ LCUIApp_CancelAllThreads( LCUI_ID app_id )
 }
 
 /* 注册程序主线程 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIApp_RegisterMainThread( LCUI_ID app_id )
 {
 	ThreadTreeNode_AddNew( &thread_tree, app_id );
 }
 
 /* 初始化线程模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Thread_Init( void )
 {
 	Thread_TreeNode_Init( &thread_tree ); /* 初始化根线程结点 */
@@ -316,7 +316,7 @@ LCUIModule_Thread_Init( void )
 }
 
 /* 停用线程模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_Thread_End( void )
 {
 	Queue_Destroy( &thread_tree.child );

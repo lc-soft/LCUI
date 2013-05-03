@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * cursor.c -- The graphic resources of mouse cursor
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 
-LCUI_EXPORT(int) Load_Graph_Default_Cursor(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Default_Cursor(LCUI_Graph *pic)
 /* 功能：载入默认的鼠标指针的图形 */
 {
 	unsigned char red[]={

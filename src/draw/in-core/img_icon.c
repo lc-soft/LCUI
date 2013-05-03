@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * icon.c -- icon graphic resources
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 
-LCUI_EXPORT(int) Load_Graph_Icon_Error(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Icon_Error(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为“错误”图标 */
 {
 	unsigned char red[]={
@@ -370,7 +370,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Error(LCUI_Graph *pic)
 	return value;
 }
 
-LCUI_EXPORT(int) Load_Graph_Icon_Help(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Icon_Help(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为“帮助”图标 */
 {
 	unsigned char red[]={
@@ -692,7 +692,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Help(LCUI_Graph *pic)
 	return value;
 }
 
-LCUI_EXPORT(int) Load_Graph_Icon_Info(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Icon_Info(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为“信息”图标 */
 {
 	unsigned char red[]={
@@ -1014,7 +1014,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Info(LCUI_Graph *pic)
 	return value;
 }
 
-LCUI_EXPORT(int) Load_Graph_Icon_Warning(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Icon_Warning(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为“警告”图标 */
 {
 	unsigned char red[]={
@@ -1336,7 +1336,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_Warning(LCUI_Graph *pic)
 	return value;
 }
 
-LCUI_EXPORT(int) Load_Graph_Icon_LCUI(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Icon_LCUI(LCUI_Graph *pic)
 /* 功能：载入图形，该图形为LCUI的LOGO */
 {
 	unsigned char red[]={
@@ -1822,7 +1822,7 @@ LCUI_EXPORT(int) Load_Graph_Icon_LCUI(LCUI_Graph *pic)
 	return value;
 }
 
-LCUI_EXPORT(int) Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out)
+LCUI_API int Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out)
 {
 	unsigned char red[]={
 		237,

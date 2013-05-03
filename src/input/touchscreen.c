@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * touchscreen.c -- touchscreen support
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -102,7 +102,7 @@ static LCUI_BOOL proc_touchscreen(void)
 #endif
 }
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Enable_TouchScreen_Input(void)
 /* 功能：启用触屏输入处理 */
 { 
@@ -137,7 +137,7 @@ Enable_TouchScreen_Input(void)
 #endif
 }
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Disable_TouchScreen_Input(void)
 /* 功能：撤销触屏输入处理 */
 {
@@ -153,7 +153,7 @@ Disable_TouchScreen_Input(void)
 #endif
 }
 
-LCUI_EXPORT(void*)
+LCUI_API void*
 Get_TouchScreen(void)
 /* 获取触屏设备文件句柄 */
 {
@@ -161,7 +161,7 @@ Get_TouchScreen(void)
 }
 
 /* 初始化触屏输入模块 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIModule_TouchScreen_Init( void )
 {
 	ts_data.td = NULL;

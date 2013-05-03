@@ -1,7 +1,7 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * task.h -- The app task queue operation set.
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -56,13 +56,13 @@ typedef struct {
 	LCUI_BOOL destroy_arg[2];	/* 指定是否在调用完回调函数后，销毁参数 */
 } LCUI_Func, LCUI_Task;
 
-LCUI_EXPORT(void) AppTasks_Init( LCUI_Queue *tasks );
+LCUI_API void AppTasks_Init( LCUI_Queue *tasks );
 
 /*
  * 功能：发送任务给程序，使这个程序进行指定任务
  * 说明：LCUI_Task结构体中的成员变量 id，保存的是目标程序的id
  */
-LCUI_EXPORT(int) AppTasks_Add( LCUI_Task *task );
+LCUI_API int AppTasks_Add( LCUI_Task *task );
 
 /*
  * 功能：使用自定义方式添加程序任务
@@ -78,7 +78,7 @@ LCUI_EXPORT(int) AppTasks_Add( LCUI_Task *task );
  * 有相同函数则覆盖，没有则新增
  * AppTasks_CustomAdd(ADD_MODE_REPLACE, task);
  * */
-LCUI_EXPORT(int) AppTasks_CustomAdd( int mode, LCUI_Task *task );
+LCUI_API int AppTasks_CustomAdd( int mode, LCUI_Task *task );
 
 LCUI_END_HEADER
 

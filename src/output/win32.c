@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * win32.c -- win32 platform support for graphical output
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -55,7 +55,7 @@ static HDC hdc_client, hdc_framebuffer;
 static HBITMAP client_bitmap;
 static HINSTANCE win32_hInstance = NULL;
 
-LCUI_EXPORT(void)
+LCUI_API void
 Win32_LCUI_Init( HINSTANCE hInstance )
 {
 	win32_hInstance = hInstance;
@@ -110,31 +110,31 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
 
-LCUI_EXPORT(HWND)
+LCUI_API HWND
 Win32_GetSelfHWND( void )
 {
 	return current_hwnd;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 Win32_SetSelfHWND( HWND hwnd )
 {
 	current_hwnd = hwnd;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
 {
 	return;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_GetGraph( LCUI_Graph *out )
 {
 	return -1;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_Init( void )
 {
 	RECT client_rect;
@@ -197,7 +197,7 @@ LCUIScreen_Init( void )
 	return 0;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_Destroy( void )
 {
 	LCUI_Graph *graph;
@@ -211,7 +211,7 @@ LCUIScreen_Destroy( void )
 	return 0;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIScreen_SyncFrameBuffer( void )
 {
 	SetBitmapBits( client_bitmap, LCUI_Sys.screen.smem_len, LCUI_Sys.screen.fb_mem );
@@ -221,7 +221,7 @@ LCUIScreen_SyncFrameBuffer( void )
 	ValidateRect( current_hwnd, NULL );
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 {
 	uchar_t *dest;
@@ -268,7 +268,7 @@ LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	return 0;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out )
 {
 	return;

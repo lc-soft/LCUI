@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * graph_display.c -- graphical display processing
  *
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -60,7 +60,7 @@ static LCUI_RectQueue screen_invalid_area;
  * 功能：获取屏幕宽度
  * 返回值：屏幕的宽度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
  * */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_GetWidth( void )
 {
 	if ( !LCUI_Sys.init ) {
@@ -73,7 +73,7 @@ LCUIScreen_GetWidth( void )
  * 功能：获取屏幕高度
  * 返回值：屏幕的高度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
  * */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_GetHeight( void )
 {
 	if ( !LCUI_Sys.init ) {
@@ -83,14 +83,14 @@ LCUIScreen_GetHeight( void )
 }
 
 /* 获取屏幕尺寸 */
-LCUI_EXPORT(LCUI_Size)
+LCUI_API LCUI_Size
 LCUIScreen_GetSize( void )
 {
 	return LCUI_Sys.screen.size;
 }
 
 /* 获取屏幕无效区域队列的指针 */
-LCUI_EXPORT(LCUI_RectQueue*)
+LCUI_API LCUI_RectQueue*
 LCUIScreen_GetInvalidAreaQueue( void )
 {
 	if( !i_am_init ) {
@@ -100,7 +100,7 @@ LCUIScreen_GetInvalidAreaQueue( void )
 }
 
 /* 设置屏幕内的指定区域为无效区域，以便刷新该区域内的图形显示 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_InvalidArea( LCUI_Rect rect )
 {
 	if( !i_am_init ) {
@@ -115,21 +115,21 @@ LCUIScreen_InvalidArea( LCUI_Rect rect )
 }
 
 /* 功能：获取屏幕中的每个像素的表示所用的位数 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_GetBits( void )
 {
 	return LCUI_Sys.screen.bits;
 }
 
 /* 获取屏幕中心点的坐标 */
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 LCUIScreen_GetCenter( void )
 {
 	return Pos(LCUI_Sys.screen.size.w/2.0, LCUI_Sys.screen.size.h/2.0);
 }
 
 /* 获取屏幕中指定区域内实际要显示的图形 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 {
 	LCUI_Pos pos, cursor_pos;
@@ -231,7 +231,7 @@ extern int LCUIScreen_Init(void);
 extern int LCUIScreen_Destroy(void);
 
 /* 初始化图形输出模块 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIModule_Video_Init( void )
 {
 	if( i_am_init ) {
@@ -245,7 +245,7 @@ LCUIModule_Video_Init( void )
 }
 
 /* 停用图形输出模块 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIModule_Video_End( void )
 {
 	if( !i_am_init ) {

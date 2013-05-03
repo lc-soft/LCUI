@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * checkbox.c -- LCUI's CheckBox widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -49,7 +49,7 @@
 #include LC_RES_H
 
 /* 设定复选框为选中状态 */
-LCUI_EXPORT(void)
+LCUI_API void
 CheckBox_SetOn( LCUI_Widget *widget )
 {
 	LCUI_CheckBox *check_box;
@@ -59,7 +59,7 @@ CheckBox_SetOn( LCUI_Widget *widget )
 }
 
 /* 设定复选框为未选中状态 */
-LCUI_EXPORT(void)
+LCUI_API void
 CheckBox_SetOff( LCUI_Widget *widget )
 {
 	LCUI_CheckBox *check_box;
@@ -69,7 +69,7 @@ CheckBox_SetOff( LCUI_Widget *widget )
 }
 
 /* 检测复选框是否被选中 */
-LCUI_EXPORT(int)
+LCUI_API int
 CheckBox_IsOn( LCUI_Widget *widget )
 {
 	LCUI_CheckBox *check_box;
@@ -81,7 +81,7 @@ CheckBox_IsOn( LCUI_Widget *widget )
 }
 
 /* 检测复选框是否未选中 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 CheckBox_IsOff( LCUI_Widget *widget )
 {
 	LCUI_CheckBox *check_box;
@@ -96,7 +96,7 @@ CheckBox_IsOff( LCUI_Widget *widget )
  * 功能：切换复选框的状态
  * 说明：这个状态指的是打勾与没打勾的两种状态
  *  */
-LCUI_EXPORT(void)
+LCUI_API void
 CheckBox_SwitchState( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 { 
 	if(CheckBox_IsOn(widget)) {
@@ -107,7 +107,7 @@ CheckBox_SwitchState( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 }
 
 /* 设定复选框中的图像框的尺寸 */
-LCUI_EXPORT(void)
+LCUI_API void
 CheckBox_ImgBox_SetSize( LCUI_Widget *widget, LCUI_Size size )
 {
 	LCUI_Widget *imgbox;
@@ -305,7 +305,7 @@ CheckBox_ExecDraw(LCUI_Widget *widget)
 }
 
 /* 获取复选框部件中的label部件的指针 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 CheckBox_GetLabel( LCUI_Widget *widget )
 {
 	LCUI_CheckBox *check_box;
@@ -317,7 +317,7 @@ CheckBox_GetLabel( LCUI_Widget *widget )
 }
 
 /* 获取复选框部件中的PictureBox部件的指针 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 CheckBox_GetImgBox( LCUI_Widget *widget )
 {
 	LCUI_CheckBox *check_box;
@@ -329,7 +329,7 @@ CheckBox_GetImgBox( LCUI_Widget *widget )
 }
 
 /* 设定与复选框部件关联的文本内容 */
-LCUI_EXPORT(void)
+LCUI_API void
 CheckBox_Text( LCUI_Widget *widget, const char *text )
 {
 	LCUI_Widget *label;
@@ -337,7 +337,7 @@ CheckBox_Text( LCUI_Widget *widget, const char *text )
 	Label_Text(label, text); 
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 CheckBox_TextW( LCUI_Widget *widget, const wchar_t *text )
 {
 	LCUI_Widget *label;
@@ -346,7 +346,7 @@ CheckBox_TextW( LCUI_Widget *widget, const wchar_t *text )
 }
 
 /* 创建一个带文本内容的复选框 */
-LCUI_EXPORT(LCUI_Widget*)
+LCUI_API LCUI_Widget*
 CheckBox_New( const char *text )
 {
 	LCUI_Widget *widget;
@@ -356,7 +356,7 @@ CheckBox_New( const char *text )
 }
 
 /* 注册复选框部件类型 */
-LCUI_EXPORT(void)
+LCUI_API void
 Register_CheckBox(void)
 {
 	/* 添加几个部件类型 */

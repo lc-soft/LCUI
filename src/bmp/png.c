@@ -12,7 +12,7 @@
 #define PNG_BYTES_TO_CHECK 4
 
 /* 载入png图片文件 */
-LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
+LCUI_API int load_png(const char *filepath, LCUI_Graph *out)
 {
 #ifdef USE_LIBPNG
 	FILE *pic_fp;
@@ -107,7 +107,7 @@ LCUI_EXPORT(int) load_png(const char *filepath, LCUI_Graph *out)
 	return 0;
 }
 
-LCUI_EXPORT(int) write_png(const char *file_name, LCUI_Graph *graph)
+LCUI_API int write_png(const char *file_name, LCUI_Graph *graph)
 /* 将图像数据写入至png文件 */
 {
 #ifdef USE_LIBPNG

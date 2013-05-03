@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * delay.c -- time delay function.
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -47,7 +47,7 @@
 #include <unistd.h>
 #endif
 /* 秒级延时 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUI_Sleep( unsigned int s )
 {
 #ifdef LCUI_BUILD_IN_WIN32
@@ -58,7 +58,7 @@ LCUI_Sleep( unsigned int s )
 }
 
 /* 毫秒级延时 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUI_MSleep( unsigned int ms )
 {
 #ifdef LCUI_BUILD_IN_WIN32

@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * mouse.c -- mouse support
  *
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -75,7 +75,7 @@ static LCUI_Mouse mouse_data;
  *   0   鼠标左键已经释放
  *   1   鼠标左键处于按下状态
  **/
-LCUI_EXPORT(int)
+LCUI_API int
 Mouse_LeftButton( LCUI_MouseButtonEvent *event )
 {
 	if( !event ) {
@@ -96,7 +96,7 @@ Mouse_LeftButton( LCUI_MouseButtonEvent *event )
  *   0   鼠标右键已经释放
  *   1   鼠标右键处于按下状态
  **/
-LCUI_EXPORT(int)
+LCUI_API int
 Mouse_RightButton( LCUI_MouseButtonEvent *event )
 {
 	if(NULL == event) {
@@ -108,7 +108,7 @@ Mouse_RightButton( LCUI_MouseButtonEvent *event )
 	return -1;
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 Click_LeftButton (LCUI_MouseButtonEvent *event)
 /* 功能：检测是否是按鼠标左键 */
 {
@@ -121,7 +121,7 @@ Click_LeftButton (LCUI_MouseButtonEvent *event)
 }
 
 /* 记录被按下的指定键的键值，并添加LCUI_MOUSEBUTTONDOWN事件 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIMouse_ButtonDown( LCUI_Pos pos, int key_code )
 {
 	int temp;
@@ -145,7 +145,7 @@ LCUIMouse_ButtonDown( LCUI_Pos pos, int key_code )
 }
 
 /* 记录被释放的指定键的键值，并添加LCUI_MOUSEBUTTONUP事件 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIMouse_ButtonUp( LCUI_Pos pos, int key_code )
 {
 	LCUI_Event event;
@@ -163,7 +163,7 @@ LCUIMouse_ButtonUp( LCUI_Pos pos, int key_code )
 	return 0;
 }
 
-LCUI_EXPORT(void)
+LCUI_API void
 LCUI_PushMouseMotionEvent( LCUI_Pos new_pos, int key_state )
 {
 	static LCUI_Pos old_pos = {0,0};
@@ -182,7 +182,7 @@ LCUI_PushMouseMotionEvent( LCUI_Pos new_pos, int key_state )
 }
 
 /* 处理鼠标产生的事件 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type )
 {
 	int key_state = LCUIKEYSTATE_RELEASE;
@@ -266,7 +266,7 @@ static LCUI_BOOL proc_mouse( void )
 }
 #else
 
-LCUI_EXPORT(int)
+LCUI_API int
 Win32_LCUIMouse_ButtonDown( int key_code )
 {
 	LCUI_Pos pos;
@@ -275,7 +275,7 @@ Win32_LCUIMouse_ButtonDown( int key_code )
 	return LCUIMouse_ButtonDown( pos, key_code );
 }
 
-LCUI_EXPORT(int)
+LCUI_API int
 Win32_LCUIMouse_ButtonUp( int key_code )
 {
 	LCUI_Pos pos;
@@ -305,7 +305,7 @@ static LCUI_BOOL proc_mouse( void )
 	GetCursorPos( &new_pos );
 	/* 转换成相对于窗口客户区的坐标 */
 	ScreenToClient( Win32_GetSelfHWND(), &new_pos );
-	pos = LCUICursor_GetNewPos();
+	pos = LCUICursor_GetPos();
 	if( pos.x == new_pos.x && pos.y == new_pos.y ) {
 		return FALSE;
 	}
@@ -322,11 +322,12 @@ static LCUI_BOOL proc_mouse( void )
 	/* 更新鼠标位置 */
 	LCUICursor_SetPos( pos );
 	Win32_LCUIMouse_PushMotionEvent( pos );
+	DEBUG_MSG("new pos: %d,%d\n", pos.x, pos.y);
 	return TRUE;
 }
 #endif
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Enable_Mouse_Input(void)
 /* 功能：启用鼠标输入处理 */
 {
@@ -355,7 +356,7 @@ Enable_Mouse_Input(void)
 	return TRUE;
 }
 
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 Disable_Mouse_Input(void)
 /* 功能：禁用鼠标输入处理 */
 {
@@ -371,7 +372,7 @@ Disable_Mouse_Input(void)
 }
 
 /* 初始化鼠标输入模块 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIModule_Mouse_Init( void )
 {
 	mouse_data.move_speed = 1;	/* 移动数度为1 */

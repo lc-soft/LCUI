@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * catch_screen.c -- screenshot support
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -85,7 +85,7 @@ static void catch_screen( void *unused )
 }
 
 /* 录制屏幕指定区域的内容 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_StartRecord( LCUI_Rect area )
 {
 	if( t != 0 ) {
@@ -97,7 +97,7 @@ LCUIScreen_StartRecord( LCUI_Rect area )
 }
 
 /* 结束录制 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIScreen_EndRecord( void )
 {
 	if( t == 0 ) {

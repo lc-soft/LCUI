@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * radiobutton.c -- The graphic resources for RadioButton widget 
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 
-LCUI_EXPORT(int) Load_Graph_Default_RadioButton_Off_Normal ( LCUI_Graph *buff )
+LCUI_API int Load_Graph_Default_RadioButton_Off_Normal ( LCUI_Graph *buff )
 {
 	int ret;
 	unsigned char red[] = {
@@ -161,7 +161,7 @@ LCUI_EXPORT(int) Load_Graph_Default_RadioButton_Off_Normal ( LCUI_Graph *buff )
 	return ret;
 }	
 
-LCUI_EXPORT(int) Load_Graph_Default_RadioButton_Off_Selected ( LCUI_Graph *buff )
+LCUI_API int Load_Graph_Default_RadioButton_Off_Selected ( LCUI_Graph *buff )
 {
 	int ret;
 	unsigned char red[] = {
@@ -275,12 +275,12 @@ LCUI_EXPORT(int) Load_Graph_Default_RadioButton_Off_Selected ( LCUI_Graph *buff 
 	return ret;
 }
 	
-LCUI_EXPORT(int) Load_Graph_Default_RadioButton_Off_Pressed(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Default_RadioButton_Off_Pressed(LCUI_Graph *pic)
 {
 	return -1;
 }
 
-LCUI_EXPORT(int) Load_Graph_Default_RadioButton_On_Normal ( LCUI_Graph *buff )
+LCUI_API int Load_Graph_Default_RadioButton_On_Normal ( LCUI_Graph *buff )
 {
 	int ret;
 	unsigned char red[] = {
@@ -394,7 +394,7 @@ LCUI_EXPORT(int) Load_Graph_Default_RadioButton_On_Normal ( LCUI_Graph *buff )
 	return ret;
 }
 	
-LCUI_EXPORT(int) Load_Graph_Default_RadioButton_On_Selected ( LCUI_Graph *buff )
+LCUI_API int Load_Graph_Default_RadioButton_On_Selected ( LCUI_Graph *buff )
 {
 	int ret;
 	unsigned char red[] = {
@@ -508,7 +508,7 @@ LCUI_EXPORT(int) Load_Graph_Default_RadioButton_On_Selected ( LCUI_Graph *buff )
 	return ret;
 }
 	
-LCUI_EXPORT(int) Load_Graph_Default_RadioButton_On_Pressed(LCUI_Graph *pic)
+LCUI_API int Load_Graph_Default_RadioButton_On_Pressed(LCUI_Graph *pic)
 {
 	return -1;
 }

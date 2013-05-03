@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * rect.c -- Rectangle area handling
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -44,7 +44,7 @@
 #include LC_MISC_H
 
 /* 初始化矩形区域的数据 */
-LCUI_EXPORT(void)
+LCUI_API void
 Rect_Init( LCUI_Rect *rect )
 {
 	rect->x      = 0;
@@ -62,7 +62,7 @@ Rect_Init( LCUI_Rect *rect )
  * -1 a衡，b竖
  *  0 不叠加
  **/
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIRect_IsCrossOverlay( LCUI_Rect a, LCUI_Rect b )
 {
 	if(a.x < b.x && a.y > b.y 
@@ -82,7 +82,7 @@ LCUIRect_IsCrossOverlay( LCUI_Rect a, LCUI_Rect b )
  * 功能：获取需裁剪的区域
  * 说明：指定容器尺寸和容器中的区域位置及尺寸，即可得到该区域中需要进行裁剪区域
  *  */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIRect_GetCutArea( LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut )
 {
 	int result = 0;
@@ -125,7 +125,7 @@ LCUIRect_GetCutArea( LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut )
  * 说明：指定容器的区域大小，再指定容器中的区域位置及大小，就能得到该容器实际能显示
  * 出的该区域范围。
  * */
-LCUI_EXPORT(LCUI_Rect)
+LCUI_API LCUI_Rect
 LCUIRect_ValidArea( LCUI_Size container, LCUI_Rect rect )
 {
 	if (rect.x < 0) {
@@ -158,7 +158,7 @@ LCUIRect_ValidArea( LCUI_Size container, LCUI_Rect rect )
  * 功能：检测两个矩形中，A矩形是否包含B矩形
  * 返回值：两不矩形属于包含关系返回1，否则返回0。
  * */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 LCUIRect_IncludeRect( LCUI_Rect a, LCUI_Rect b )
 {
 	int count = 0, m, n = 0, x[4], y[4];
@@ -204,7 +204,7 @@ LCUIRect_IncludeRect( LCUI_Rect a, LCUI_Rect b )
  * rq  ： 指向矩形的队列的指针
  * 注意！传递参数时，请勿颠倒old和new位置。
  **/
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIRect_Cut(	LCUI_Rect	old_rect,
 		LCUI_Rect	new_rect, 
 		LCUI_Queue	*rects_buff )
@@ -310,7 +310,7 @@ LCUIRect_Cut(	LCUI_Rect	old_rect,
 }
 
 /* 获取两矩形重叠部分的矩形 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIRect_GetOverlay( LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out )
 {
 	int x = 0,y = 0,w = 0,h = 0;
@@ -351,7 +351,7 @@ LCUIRect_GetOverlay( LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out )
 }
 
 /* 将数值转换成LCUI_Rect型结构体 */
-LCUI_EXPORT(LCUI_Rect)
+LCUI_API LCUI_Rect
 Rect( int x, int y, int width, int height )
 {
 	LCUI_Rect s;
@@ -365,7 +365,7 @@ Rect( int x, int y, int width, int height )
 }
 
 /* 检测一个点是否被矩形包含 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 LCUIRect_IncludePoint( LCUI_Pos pos, LCUI_Rect rect )
 {
 	if (pos.x >= rect.x && pos.x < rect.x + rect.width-1 
@@ -450,7 +450,7 @@ _LCUIRect_Overlay (	int ax, int ay, int aw, int ah,
 }
 
 /* 检测两个矩形是否重叠 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 LCUIRect_Overlay( LCUI_Rect a, LCUI_Rect b )
 {
 	return _LCUIRect_Overlay(	a.x, a.y, a.width, a.height, 
@@ -458,7 +458,7 @@ LCUIRect_Overlay( LCUI_Rect a, LCUI_Rect b )
 }
 
 /* 判断两个矩形是否相等 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 LCUIRect_Equal( LCUI_Rect a, LCUI_Rect b )
 {
 	if(a.x == b.x && a.y == b.y 
@@ -469,7 +469,7 @@ LCUIRect_Equal( LCUI_Rect a, LCUI_Rect b )
 }
 
 /* 判断矩形是否有效 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUIRect_IsValid( LCUI_Rect r )
 {
 	if(r.width <= 0 || r.height <= 0) {
@@ -482,7 +482,7 @@ LCUIRect_IsValid( LCUI_Rect r )
 /*----------------------------- RectQueue ------------------------------*/
 
 /* 切换队列 */
-LCUI_EXPORT(void)
+LCUI_API void
 RectQueue_Switch( LCUI_RectQueue *queue )
 {
 	if( queue->number == 0 ) {
@@ -493,7 +493,7 @@ RectQueue_Switch( LCUI_RectQueue *queue )
 }
 
 /* 初始化储存矩形数据的队列 */
-LCUI_EXPORT(void)
+LCUI_API void
 RectQueue_Init( LCUI_RectQueue *queue )
 {
 	queue->number = 0;
@@ -505,7 +505,7 @@ RectQueue_Init( LCUI_RectQueue *queue )
 }
 
 /* 销毁储存矩形数据的队列 */
-LCUI_EXPORT(void)
+LCUI_API void
 RectQueue_Destroy( LCUI_RectQueue *queue )
 {
 	Queue_Destroy( &queue->queue[0] );
@@ -581,7 +581,7 @@ RectQueue_Add( LCUI_Queue* queue, LCUI_Rect rect )
 }
 
 /* 添加矩形区域至可用的队列 */
-LCUI_EXPORT(int)
+LCUI_API int
 RectQueue_AddToValid( LCUI_RectQueue *queue, LCUI_Rect rect )
 {
 	if( queue->number == 0 ) {
@@ -592,7 +592,7 @@ RectQueue_AddToValid( LCUI_RectQueue *queue, LCUI_Rect rect )
 }
 
 /* 添加矩形区域至当前占用的队列 */
-LCUI_EXPORT(int)
+LCUI_API int
 RectQueue_AddToCurrent( LCUI_RectQueue *queue, LCUI_Rect rect )
 {
 	if( queue->number == 0 ) {
@@ -604,7 +604,7 @@ RectQueue_AddToCurrent( LCUI_RectQueue *queue, LCUI_Rect rect )
 
 
 /* 从可用的队列中取出一个矩形区域 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 RectQueue_GetFromValid( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
 {
 	LCUI_Rect *rect_ptr;
@@ -624,7 +624,7 @@ RectQueue_GetFromValid( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
 }
 
 /* 从当前占用的队列中取出一个矩形区域 */
-LCUI_EXPORT(LCUI_BOOL)
+LCUI_API LCUI_BOOL
 RectQueue_GetFromCurrent( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
 {
 	LCUI_Rect *rect_ptr;

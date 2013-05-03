@@ -1,7 +1,7 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * progressbar.h -- LCUI's ProgressBar widget
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -63,19 +63,19 @@ struct _LCUI_ProgressBar
 	int value;	/* 当前进度的值 */
 };
 
-LCUI_EXPORT(void)
+LCUI_API void
 ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value);
 /* 功能：设定进度条最大值 */ 
 
-LCUI_EXPORT(int)
+LCUI_API int
 ProgressBar_GetMaxValue(LCUI_Widget *widget);
 /* 功能：获取进度条最大值 */ 
 
-LCUI_EXPORT(void)
+LCUI_API void
 ProgressBar_SetValue(LCUI_Widget *widget, int value);
 /* 功能：设定进度条当前值 */ 
 
-LCUI_EXPORT(int)
+LCUI_API int
 ProgressBar_GetValue(LCUI_Widget *widget);
 /* 功能：获取进度条当前值 */ 
 

@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * bitmapfont.c -- The Bitmap Font operation set.
  * 
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -52,7 +52,7 @@
 #define LCUI_FONT_LOAD_FALGS	(FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT)
 #endif
 
-LCUI_EXPORT(LCUI_BOOL) FontBMP_Valid(LCUI_FontBMP *bitmap)
+LCUI_API LCUI_BOOL FontBMP_Valid(LCUI_FontBMP *bitmap)
 /*
  * 功能：检测位图数据是否有效
  * 返回值：有效返回帧，无效返回假
@@ -64,7 +64,7 @@ LCUI_EXPORT(LCUI_BOOL) FontBMP_Valid(LCUI_FontBMP *bitmap)
 	return FALSE;
 }
 
-LCUI_EXPORT(void) Print_FontBMP_Info(LCUI_FontBMP *bitmap)
+LCUI_API void Print_FontBMP_Info(LCUI_FontBMP *bitmap)
 /* 功能：打印位图的信息 */
 {
 	printf("address:%p\n",bitmap);
@@ -75,7 +75,7 @@ LCUI_EXPORT(void) Print_FontBMP_Info(LCUI_FontBMP *bitmap)
 	bitmap->top, bitmap->left, bitmap->width, bitmap->rows);
 }
 
-LCUI_EXPORT(void) FontBMP_Init(LCUI_FontBMP *bitmap)
+LCUI_API void FontBMP_Init(LCUI_FontBMP *bitmap)
 /* 初始化字体位图 */
 {
 	bitmap->rows = 0;
@@ -85,7 +85,7 @@ LCUI_EXPORT(void) FontBMP_Init(LCUI_FontBMP *bitmap)
 	bitmap->buffer = NULL; 
 }
 
-LCUI_EXPORT(void) FontBMP_Free(LCUI_FontBMP *bitmap)
+LCUI_API void FontBMP_Free(LCUI_FontBMP *bitmap)
 /* 释放字体位图占用的资源 */
 {
 	if(FontBMP_Valid(bitmap)) {
@@ -94,7 +94,7 @@ LCUI_EXPORT(void) FontBMP_Free(LCUI_FontBMP *bitmap)
 	}
 }
 
-LCUI_EXPORT(int) FontBMP_Create(LCUI_FontBMP *bitmap, int width, int rows)
+LCUI_API int FontBMP_Create(LCUI_FontBMP *bitmap, int width, int rows)
 /* 功能：创建字体位图 */
 { 
 	size_t size;
@@ -115,7 +115,7 @@ LCUI_EXPORT(int) FontBMP_Create(LCUI_FontBMP *bitmap, int width, int rows)
 	return 0;
 }
 
-LCUI_EXPORT(void) Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
+LCUI_API void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 /* 功能：根据字符编码，获取已内置的字体位图 */
 {
 	int i,j, start, m;
@@ -165,7 +165,7 @@ LCUI_EXPORT(void) Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bit
 	out_bitmap->advance.y = 8;
 }
 
-LCUI_EXPORT(int) Show_FontBMP(LCUI_FontBMP *fontbmp)
+LCUI_API int Show_FontBMP(LCUI_FontBMP *fontbmp)
 /* 功能：在屏幕打印以0和1表示字体位图 */
 {
 	int x,y,m;
@@ -200,7 +200,7 @@ FontBMP_MixMONO(
 }
 
 /* 功能：将字体位图绘制到背景图形上 */
-LCUI_EXPORT(int)
+LCUI_API int
 FontBMP_Mix(	LCUI_Graph	*graph,
 		LCUI_Pos	des_pos,
 		LCUI_FontBMP	*bitmap,
@@ -368,7 +368,7 @@ Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 #endif
 
 /* 获取新的字体位图，并记录至字体位图库中 */
-LCUI_EXPORT(int) 
+LCUI_API int 
 Get_NewFontBMP(	int font_id, wchar_t ch, int pixel_size, 
 		LCUI_FontBMP *out_bitmap )
 {
@@ -415,7 +415,7 @@ Get_NewFontBMP(	int font_id, wchar_t ch, int pixel_size,
 }
 
 /* 获取现有的字体位图数据 */
-LCUI_EXPORT(LCUI_FontBMP*)
+LCUI_API LCUI_FontBMP*
 Get_ExistFontBMP( int font_id, wchar_t ch, int pixel_size )
 {
 	LCUI_FontBMP *font_bmp, bmp_buff;

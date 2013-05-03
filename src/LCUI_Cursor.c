@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * LCUI_Cursor.c -- control mouse cursor
  *
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -49,14 +49,14 @@
 #include LC_MEM_H
 
 /* 刷新鼠标游标在屏幕上显示的图形 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUICursor_Refresh( void )
 {
 	LCUIScreen_InvalidArea ( LCUICursor_GetRect() );
 }
 
 /* 显示鼠标游标 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUICursor_Show( void )
 {
 	LCUI_Sys.cursor.visible = TRUE;	/* 标识游标为可见 */
@@ -64,7 +64,7 @@ LCUICursor_Show( void )
 }
 
 /* 隐藏鼠标游标 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUICursor_Hide( void )
 {
 	LCUI_Sys.cursor.visible = FALSE;
@@ -72,7 +72,7 @@ LCUICursor_Hide( void )
 }
 
 /* 获取鼠标游标的区域范围 */
-LCUI_EXPORT(LCUI_Rect)
+LCUI_API LCUI_Rect
 LCUICursor_GetRect( void )
 {
 	LCUI_Rect rect;
@@ -84,11 +84,10 @@ LCUICursor_GetRect( void )
 }
 
 /* 更新鼠标指针的位置 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUICursor_UpdatePos( void )
 {
 	LCUI_Rect old;
-
 	if( LCUI_Sys.cursor.current_pos.x == LCUI_Sys.cursor.new_pos.x
 	 && LCUI_Sys.cursor.current_pos.y == LCUI_Sys.cursor.new_pos.y ) {
 		return;
@@ -102,17 +101,18 @@ LCUICursor_UpdatePos( void )
 }
 
 /* 设定游标的位置 */
-LCUI_EXPORT(void)
+LCUI_API void
 LCUICursor_SetPos( LCUI_Pos pos )
 {
 	LCUI_Sys.cursor.new_pos = pos;
+	DEBUG_MSG("new pos: %d,%d\n", pos.x, pos.y);
 }
 
 /*
  * 功能：设定游标的图形
  * 返回值：设定成功返回0，失败则返回-1
 */
-LCUI_EXPORT(int)
+LCUI_API int
 LCUICursor_SetGraph( LCUI_Graph *graph )
 {
 	if (Graph_IsValid (graph)) {
@@ -124,14 +124,14 @@ LCUICursor_SetGraph( LCUI_Graph *graph )
 }
 
 /* 获取鼠标指针当前的坐标 */
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 LCUICursor_GetPos( void )
 {
 	return LCUI_Sys.cursor.current_pos;
 }
 
 /* 获取鼠标指针将要更新的坐标 */
-LCUI_EXPORT(LCUI_Pos)
+LCUI_API LCUI_Pos
 LCUICursor_GetNewPos( void )
 {
 	return LCUI_Sys.cursor.new_pos;
