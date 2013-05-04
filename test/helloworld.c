@@ -1,4 +1,4 @@
-// 用LCUI实现hello,world程序
+﻿// 用LCUI实现hello,world程序
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
@@ -12,29 +12,6 @@ static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	LCUI_MainLoop_Quit(NULL);
 }
-
-#ifdef __cplusplus
-int LCUIMainFunc( LCUI_ARGLIST )
-{
-	LCUIApp app;
-	LCUIWindow wind;
-	LCUILabel text;
-	LCUIGraph icon;
-
-	Load_Graph_Icon_LCUI_18x18( icon.getGraph() );
-	wind.setTitleText( "测试窗口" );
-	wind.setTitleIcon( icon );
-	wind.resize( 320,240 );
-	text.setText( "Hello, World!\n你好，世界！" );
-	text.setTextStyle( 24 );
-	text.setAlign( ALIGN_MIDDLE_CENTER );
-	wind.addToClientArea( text );
-	text.show();
-	wind.show();
-	return app.main();
-}
-
-#else
 
 int LCUIMainFunc( LCUI_ARGLIST )
 {
@@ -50,9 +27,12 @@ int LCUIMainFunc( LCUI_ARGLIST )
 	/* 载入库中自带的图形数据，这个图形是18x18尺寸的LCUI的图标 */
 	Load_Graph_Icon_LCUI_18x18(&pic);
 	/* 创建部件 */
-	window  = Window_New("测试窗口", &pic, Size(320, 240));
+	window  = Widget_New("window");
 	label   = Widget_New("label");
 	
+	Window_SetTitleTextW( window, L"测试窗口" );
+	Window_SetTitleIcon( window, &pic );
+	Widget_Resize( window, Size(320, 240) );
 	/* 将窗口客户区作为label部件的容器添加进去 */
 	Window_ClientArea_Add(window, label);
 	/* 居中显示 */
@@ -62,25 +42,17 @@ int LCUIMainFunc( LCUI_ARGLIST )
 	 * <color=R,G,B>文字</color> 表示的是：“文字”将使用自定义颜色
 	 * <size=24px>文字</size> 表示的是：显示的“文字”，大小为24像素
 	 **/
-#ifdef test_this_code
-	Label_Text(label, 
-		"<size=24px>Hello,World!\n"
-		"<color=255,0,0>世</color>"
-		"<color=100,155,0>界</color>"
-		"<color=0,0,0>,</color>"
-		"<color=0,255,0>你</color>"
-		"<color=0,100,155>好</color>"
-		"<color=0,0,255>！</color>\n</size>");
-#else
-	Label_Text(label, 
-		"<size=24px>Hello,World!\n"
-		"世界,你好!\n</size>");
-#endif
+	Label_TextW(label, 
+		L"<size=24px>Hello,World!\n"
+		L"<color=255,0,0>世</color>"
+		L"<color=100,155,0>界</color>"
+		L"<color=0,0,0>,</color>"
+		L"<color=0,255,0>你</color>"
+		L"<color=0,100,155>好</color>"
+		L"<color=0,0,255>！</color>\n</size>");
 	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 显示部件 */
 	Widget_Show(label); 
 	Widget_Show(window); 
 	return LCUI_Main(); /* 进入主循环 */
 }
-
-#endif
