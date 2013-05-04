@@ -163,15 +163,17 @@ static void Win32_Clinet_InvalidArea( LCUI_Rect rect )
 }
 #endif
 
-static void
+/* 更新无效区域内的图像 */
+static int
 LCUIScreen_UpdateInvalidArea(void)
-/* 功能：进行屏幕内容更新 */
 {
+	int ret;
 	LCUI_Rect rect;
 	LCUI_Graph graph;
 
 	//_DEBUG_MSG("enter\n");
 	Graph_Init( &graph );
+	ret = 0;
 	/* 切换可用队列为当前使用的队列 */
 	RectQueue_Switch( &screen_invalid_area );
 	while( i_am_init ) {
@@ -179,6 +181,7 @@ LCUIScreen_UpdateInvalidArea(void)
 		if ( !RectQueue_GetFromCurrent(&screen_invalid_area, &rect) ) {
 			break;
 		}
+		ret = 1;
 		/* 获取内存中对应区域的图形数据 */
 		LCUIScreen_GetRealGraph ( rect, &graph );
 		/* 写入至帧缓冲，让屏幕显示图形 */
@@ -186,6 +189,7 @@ LCUIScreen_UpdateInvalidArea(void)
 	}
 	//_DEBUG_MSG("quit\n");
 	Graph_Free(&graph);
+	return ret;
 }
 
 
@@ -194,20 +198,24 @@ LCUIScreen_UpdateInvalidArea(void)
  * 说明：此函数会将各个部件的rect队列中的处理掉，并将最终的无效区域添加至屏幕无效区域
  * 队列中，等待LCUI来处理。
  **/
-static void
+static int
 LCUIScreen_SyncInvalidArea( void )
 {
+	int ret = 0;
 	if ( LCUI_Sys.need_sync_area ) {
 		/* 同步部件内记录的区域至主记录中 */
 		Widget_SyncInvalidArea();
 		LCUI_Sys.need_sync_area = FALSE;
+		ret = 1;
 	}
+	return ret;
 }
 
 /* 更新屏幕内的图形显示 */
 static void
 LCUIScreen_Update( void* unused )
 {
+	int retval;
 	LCUI_Rect screen_area;
 
 	/* 先标记刷新整个屏幕区域 */
@@ -220,9 +228,13 @@ LCUIScreen_Update( void* unused )
 		LCUICursor_UpdatePos();
 		Widget_ProcessUpdate(NULL); /* 处理所有部件更新 */
 		LCUI_MSleep(5);
-		LCUIScreen_SyncInvalidArea();
-		LCUIScreen_UpdateInvalidArea();
-		LCUIScreen_SyncFrameBuffer();
+		retval = LCUIScreen_SyncInvalidArea();
+		retval += LCUIScreen_UpdateInvalidArea();
+		if(retval > 0) {
+			LCUIScreen_SyncFrameBuffer();
+		} else {
+			LCUI_MSleep(10);
+		}
 	}
 	LCUIThread_Exit(NULL);
 }
