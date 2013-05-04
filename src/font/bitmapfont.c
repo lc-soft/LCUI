@@ -1,42 +1,42 @@
 /* ***************************************************************************
  * bitmapfont.c -- The Bitmap Font operation set.
- * 
+ *
  * Copyright (C) 2012-2013 by
  * Liu Chao
- * 
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
- 
+
 /* ****************************************************************************
  * bitmapfont.c -- 位图字体的操作集
  *
  * 版权所有 (C) 2013 归属于
  * 刘超
- * 
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
 //#define LCUI_FONT_ENGINE_FREETYPE
@@ -59,7 +59,7 @@ LCUI_API LCUI_BOOL FontBMP_Valid(LCUI_FontBMP *bitmap)
  */
 {
 	if( bitmap && bitmap->width > 0 && bitmap->rows > 0) {
-		return TRUE; 
+		return TRUE;
 	}
 	return FALSE;
 }
@@ -71,7 +71,7 @@ LCUI_API void Print_FontBMP_Info(LCUI_FontBMP *bitmap)
 	if( !bitmap ) {
 		return;
 	}
-	printf("top: %d, left: %d, width:%d, rows:%d\n", 
+	printf("top: %d, left: %d, width:%d, rows:%d\n",
 	bitmap->top, bitmap->left, bitmap->width, bitmap->rows);
 }
 
@@ -81,8 +81,8 @@ LCUI_API void FontBMP_Init(LCUI_FontBMP *bitmap)
 	bitmap->rows = 0;
 	bitmap->width = 0;
 	bitmap->top = 0;
-	bitmap->left = 0; 
-	bitmap->buffer = NULL; 
+	bitmap->left = 0;
+	bitmap->buffer = NULL;
 }
 
 LCUI_API void FontBMP_Free(LCUI_FontBMP *bitmap)
@@ -96,7 +96,7 @@ LCUI_API void FontBMP_Free(LCUI_FontBMP *bitmap)
 
 LCUI_API int FontBMP_Create(LCUI_FontBMP *bitmap, int width, int rows)
 /* 功能：创建字体位图 */
-{ 
+{
 	size_t size;
 	if(width < 0 || rows < 0) {
 		FontBMP_Free(bitmap);
@@ -120,22 +120,22 @@ LCUI_API void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 {
 	int i,j, start, m;
 	uchar_t const *p;
-	
+
 	p = in_core_font_8x8(); /* 获取指向内置字体位图数组的指针 */
 	FontBMP_Create(out_bitmap, 8, 8); /* 为位图分配内存，8x8的尺寸 */
 	out_bitmap->left = 0;
 	out_bitmap->top = 0;
 	if(code < 256) { /* 如果在ASCII编码范围内 */
 		if(code == ' ') { /* 空格就直接置0 */
-			memset(out_bitmap->buffer, 0, sizeof(uchar_t)*64); 
+			memset(out_bitmap->buffer, 0, sizeof(uchar_t)*64);
 		} else {
 			start = code * 8;
 			for (i=start;i<start+8;++i) {
 				m = (i-start) * 8 + 7;
 				/* 将数值转换成一行位图 */
 				for (j=0;j<8;++j,--m) {
-					out_bitmap->buffer[m] 
-					 = (p[i]&(1<<j))?255:0;  
+					out_bitmap->buffer[m]
+					 = (p[i]&(1<<j))?255:0;
 				}
 			}
 		}
@@ -152,7 +152,7 @@ LCUI_API void Get_Default_FontBMP(unsigned short code, LCUI_FontBMP *out_bitmap)
 		for (i=0;i<8;i++) {
 			m = i*8;
 			for (j=0;j<8;j++,++m) {
-				out_bitmap->buffer[m] = (null_bmp[m]>0)?255:0; 
+				out_bitmap->buffer[m] = (null_bmp[m]>0)?255:0;
 			}
 		}
 	}
@@ -171,7 +171,7 @@ LCUI_API int Show_FontBMP(LCUI_FontBMP *fontbmp)
 	int x,y,m;
 	for(y = 0;y < fontbmp->rows; ++y){
 		m = y*fontbmp->width;
-		for(x = 0; x < fontbmp->width; ++x,++m){ 
+		for(x = 0; x < fontbmp->width; ++x,++m){
 			if(fontbmp->buffer[m] > 128) {
 				printf("#");
 			} else if(fontbmp->buffer[m] > 64) {
@@ -186,18 +186,6 @@ LCUI_API int Show_FontBMP(LCUI_FontBMP *fontbmp)
 	return 0;
 }
 
-/* 混合字体的1位单色位图 */
-static int
-FontBMP_MixMONO(
-	LCUI_Graph	*graph,
-	LCUI_Pos	des_pos,
-	LCUI_FontBMP	*bitmap,
-	LCUI_RGB	color,
-	int flag )
-{
-	
-	return 0;
-}
 
 /* 功能：将字体位图绘制到背景图形上 */
 LCUI_API int
@@ -221,7 +209,7 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 	/* 获取背景图形的有效区域 */
 	des_rect = Graph_GetValidRect( graph );
 	/* 获取背景图引用的源图形 */
-	des = Graph_GetQuote( graph ); 
+	des = Graph_GetQuote( graph );
 	/* 起点位置的有效性检测 */
 	if(des_pos.x > des->width || des_pos.y > des->height) {
 		return -2;
@@ -234,7 +222,7 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 		des_pos.x += cut.x;
 		des_pos.y += cut.y;
 	}
-	
+
 	/* 如果是以叠加模式绘制字体位图 */
 	if( flag == GRAPH_MIX_FLAG_OVERLAY ) {
 		/* 预先计算起点位置 */
@@ -244,7 +232,7 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 			m = src_start_pos;
 			n = des_start_pos;
 			total = n + cut.width;
-			for (; n < total; ++n,++m) { 
+			for (; n < total; ++n,++m) {
 				/* 获取通过ALPHA混合后的像素点的数据 */
 				ALPHA_BLEND( color.red, des->rgba[0][n], bitmap->buffer[m] );
 				ALPHA_BLEND( color.green, des->rgba[1][n], bitmap->buffer[m] );
@@ -265,8 +253,8 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 				des->rgba[0][n] = color.red;
 				des->rgba[1][n] = color.green;
 				des->rgba[2][n] = color.blue;
-				des->rgba[3][n] = bitmap->buffer[m]; 
-			} 
+				des->rgba[3][n] = bitmap->buffer[m];
+			}
 			des_start_pos += des->width;
 			src_start_pos += bitmap->width;
 		}
@@ -277,7 +265,7 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 /* 如果定义了LCUI_FONT_ENGINE_FREETYPE宏定义，则使用FreeType字体引擎处理字体数据 */
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 
-static int 
+static int
 Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 /* 转换FT_GlyphSlot类型数据为LCUI_FontBMP */
 {
@@ -285,21 +273,21 @@ Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 	size_t size;
 	FT_BitmapGlyph bitmap_glyph;
 	FT_Glyph  glyph;
-	
-	/* 从字形槽中提取一个字形图像 
+
+	/* 从字形槽中提取一个字形图像
 	 * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
 	error = FT_Get_Glyph( slot, &glyph );
 	if(error) {
-		return -1; 
+		return -1;
 	}
 	/*---------------------- 打印字体信息 --------------------------
 	printf(" width= %ld,  met->height= %ld\n"
 	"horiBearingX = %ld, horiBearingY = %ld, horiAdvance = %ld\n"
-	"vertBearingX = %ld, vertBearingY = %ld,  vertAdvance = %ld\n", 
+	"vertBearingX = %ld, vertBearingY = %ld,  vertAdvance = %ld\n",
 	slot->metrics.width>>6, slot->metrics.height>>6,
-	slot->metrics.horiBearingX>>6, slot->metrics.horiBearingY>>6, 
-	slot->metrics.horiAdvance>>6, slot->metrics.vertBearingX>>6, 
-	slot->metrics.vertBearingY>>6, slot->metrics.vertAdvance>>6 ); 
+	slot->metrics.horiBearingX>>6, slot->metrics.horiBearingY>>6,
+	slot->metrics.horiAdvance>>6, slot->metrics.vertBearingX>>6,
+	slot->metrics.vertBearingY>>6, slot->metrics.vertAdvance>>6 );
 	------------------------------------------------------------*/
 	if ( glyph->format != FT_GLYPH_FORMAT_BITMAP ) {
 		error = FT_Glyph_To_Bitmap(&glyph, render_mode, 0 ,1);
@@ -332,7 +320,7 @@ Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 	switch( bitmap_glyph->bitmap.pixel_mode ) {
 	    /* 8位灰度位图，直接拷贝 */
 	    case FT_PIXEL_MODE_GRAY:
-		memcpy( des->buffer, bitmap_glyph->bitmap.buffer, size ); 
+		memcpy( des->buffer, bitmap_glyph->bitmap.buffer, size );
 		break;
 	    /* 单色点阵图，需要转换 */
 	    case FT_PIXEL_MODE_MONO: {
@@ -357,8 +345,8 @@ Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 		break;
 	    }
 	    /* 其它像素模式的位图，暂时先直接填充255，等需要时再完善 */
-	    default: 
-		memset( des->buffer, 255, size ); 
+	    default:
+		memset( des->buffer, 255, size );
 		break;
 	}
 	FT_Done_Glyph(glyph);
@@ -368,17 +356,17 @@ Convert_FTGlyph( LCUI_FontBMP *des, FT_GlyphSlot slot, int render_mode )
 #endif
 
 /* 获取新的字体位图，并记录至字体位图库中 */
-LCUI_API int 
-Get_NewFontBMP(	int font_id, wchar_t ch, int pixel_size, 
+LCUI_API int
+Get_NewFontBMP(	int font_id, wchar_t ch, int pixel_size,
 		LCUI_FontBMP *out_bitmap )
 {
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 	size_t size;
 	LCUI_BOOL have_space = FALSE;
-	
+
 	FT_Face face;
 	int error;
-	
+
 	if( font_id > 0 ) {
 		face = FontLIB_GetFontFace( font_id );
 		if( !face ) {
@@ -389,7 +377,7 @@ Get_NewFontBMP(	int font_id, wchar_t ch, int pixel_size,
 		Get_Default_FontBMP( ch, out_bitmap );
 		return -1;
 	}
-	
+
 	/* 设定字体尺寸 */
 	FT_Set_Pixel_Sizes( face, 0, pixel_size );
 	/* 如果是空格 */
@@ -400,7 +388,7 @@ Get_NewFontBMP(	int font_id, wchar_t ch, int pixel_size,
 	/* 这个函数只是简单地调用FT_Get_Char_Index和FT_Load_Glyph */
 	error = FT_Load_Char( face, ch, LCUI_FONT_LOAD_FALGS );
 	if(error) {
-		return error; 
+		return error;
 	}
 	size = Convert_FTGlyph( out_bitmap, face->glyph, LCUI_FONT_RENDER_MODE );
 	/* 如果是空格则将位图内容清空 */
@@ -419,7 +407,7 @@ LCUI_API LCUI_FontBMP*
 Get_ExistFontBMP( int font_id, wchar_t ch, int pixel_size )
 {
 	LCUI_FontBMP *font_bmp, bmp_buff;
-	
+
 	font_bmp = FontLIB_GetFontBMP( ch, font_id, pixel_size );
 	if( font_bmp ) {
 		return font_bmp;
