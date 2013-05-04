@@ -141,8 +141,7 @@ LCUIScreen_Init( void )
 	LCUI_Graph *graph;
 	WNDCLASS wndclass;
 	TCHAR szAppName[] = TEXT ("Typer");
-	BITMAPINFOHEADER bmih;
-
+	
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
 	wndclass.lpfnWndProc   = Win32_LCUI_WndProc;
 	wndclass.cbClsExtra    = 0 ;
@@ -176,31 +175,19 @@ LCUIScreen_Init( void )
 	LCUI_Sys.screen.size.h = client_rect.bottom; 
 	LCUI_Sys.screen.smem_len = LCUI_Sys.screen.size.w * LCUI_Sys.screen.size.h * 4;
 	/* 分配内存，储存像素数据 */ 
+	pixel_mem = malloc ( LCUI_Sys.screen.smem_len );
 	LCUI_Sys.screen.fb_mem = pixel_mem;
 	LCUI_Sys.root_glayer = GraphLayer_New();
 	GraphLayer_Resize( LCUI_Sys.root_glayer, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h );
 	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
 	Graph_FillColor( graph, RGB(255,255,255) );
-	
-	/* 初始化BITMAPINFOHEADER结构体 */
-	bmih.biSize		= sizeof (BITMAPINFOHEADER);
-	bmih.biWidth		= LCUI_Sys.screen.size.w;
-	bmih.biHeight		= LCUI_Sys.screen.size.h;
-	bmih.biPlanes		= 1;
-	bmih.biBitCount		= 24;
-	bmih.biCompression	= BI_RGB;
-	bmih.biSizeImage	= 0;
-	bmih.biXPelsPerMeter	= 0;
-	bmih.biYPelsPerMeter	= 0;
-	bmih.biClrUsed		= 0;
-	bmih.biClrImportant	= 0;
 
 	/* 获取客户区的DC */
 	hdc_client = GetDC( current_hwnd );
 	/* 为帧缓冲创建一个DC */
 	hdc_framebuffer = CreateCompatibleDC( hdc_client );
 	/* 为客户区创建一个Bitmap */ 
-	client_bitmap = CreateDIBSection( hdc_client, (BITMAPINFO *)&bmih, 0, (void**)&pixel_mem, NULL, 0 );
+	client_bitmap = CreateCompatibleBitmap( hdc_client, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h );
 	/* 为帧缓冲的DC选择client_bitmap作为对象 */
 	SelectObject( hdc_framebuffer, client_bitmap );
 	
@@ -220,12 +207,14 @@ LCUIScreen_Destroy( void )
 	GraphLayer_Free( LCUI_Sys.root_glayer );
 	DeleteDC( hdc_framebuffer );
 	ReleaseDC( Win32_GetSelfHWND(), hdc_client );
+	free( pixel_mem );
 	return 0;
 }
 
 LCUI_API void
 LCUIScreen_SyncFrameBuffer( void )
 {
+	SetBitmapBits( client_bitmap, LCUI_Sys.screen.smem_len, LCUI_Sys.screen.fb_mem );
 	/* 将帧缓冲内的位图数据更新至客户区内指定区域（area） */
 	BitBlt( hdc_client, 0, 0, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h, 
 		hdc_framebuffer, 0, 0, SRCCOPY );
@@ -264,21 +253,21 @@ LCUIScreen_PutGraph (LCUI_Graph *graph, LCUI_Pos des_pos )
 	/* 根据二维坐标和图像尺寸，计算源图像的起始读取点的一维坐标 */
 	src_row_x = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
 	/* 根据二维坐标和屏幕尺寸，计算帧缓冲的起始写入点的一维坐标 */
-	des_row_x = (screen_size.h-1-des_pos.y) * screen_size.w + des_pos.x;
+	des_row_x = des_pos.y * screen_size.w + des_pos.x;
 
 	for(y=0; y<cut.height; ++y) {
 		src_x = src_row_x;
 		des_x = des_row_x;
 		total = src_x + cut.width;
 		for (; src_x < total; ++des_x,++src_x) {
-			n = des_x * 3;
+			n = des_x << 2;
 			des_ptr[n++] = src->rgba[2][src_x];
 			des_ptr[n++] = src->rgba[1][src_x];
 			des_ptr[n++] = src->rgba[0][src_x];
 		}
 		src_row_x += src->width;
 		/* DIB扫描行是上下颠倒的，因此是从行尾到行首递减 */
-		des_row_x -= screen_size.w;
+		des_row_x += screen_size.w;
 	}
 	Graph_Unlock( src );
 	return 0;
