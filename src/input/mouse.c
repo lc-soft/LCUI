@@ -305,20 +305,20 @@ static LCUI_BOOL proc_mouse( void )
 	GetCursorPos( &new_pos );
 	/* 转换成相对于窗口客户区的坐标 */
 	ScreenToClient( Win32_GetSelfHWND(), &new_pos );
+	if (new_pos.x > LCUIScreen_GetWidth ()) {
+		new_pos.x = LCUIScreen_GetWidth ();
+	}
+	if (new_pos.y > LCUIScreen_GetHeight ()) {
+		new_pos.y = LCUIScreen_GetHeight ();
+	}
+	new_pos.x = new_pos.x<0 ? 0:new_pos.x;
+	new_pos.y = new_pos.y<0 ? 0:new_pos.y;
 	pos = LCUICursor_GetPos();
 	if( pos.x == new_pos.x && pos.y == new_pos.y ) {
 		return FALSE;
 	}
 	pos.x = new_pos.x;
 	pos.y = new_pos.y;
-	if (pos.x > LCUIScreen_GetWidth ()) {
-		pos.x = LCUIScreen_GetWidth ();
-	}
-	if (pos.y > LCUIScreen_GetHeight ()) {
-		pos.y = LCUIScreen_GetHeight ();
-	}
-	pos.x = pos.x<0 ? 0:pos.x;
-	pos.y = pos.y<0 ? 0:pos.y;
 	/* 更新鼠标位置 */
 	LCUICursor_SetPos( pos );
 	Win32_LCUIMouse_PushMotionEvent( pos );
