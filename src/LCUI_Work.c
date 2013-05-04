@@ -91,7 +91,7 @@ Widget_Event_Connect(	LCUI_Widget *widget, WidgetEventType event_id,
 	if( !widget ) {
 		return -1;
 	}
-	if( !Get_FuncData(&func_data, func, widget, NULL) ) {
+	if( !Get_FuncData(&func_data, (CallBackFunc)func, widget, NULL) ) {
 		return -2;
 	}
 	//_DEBUG_MSG("widget: %p, event id: %d, callback func: %p\n",
