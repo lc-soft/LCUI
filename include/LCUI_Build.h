@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Build.h -- 定义了一些头文件的位置的宏定义
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -83,11 +83,17 @@
 #define LC_LCUI_H	<LCUI/LCUI.h>
 #define LC_LCUI_HPP	<LCUI/LCUI.hpp>
 #define LC_CONFIG_H	<LCUI/LCUI_Config.h>
-#define LC_MISC_H	<LCUI/LCUI_Misc.h>
 
 #define LC_MISC_STRING_H	<LCUI/misc/string.h>
 #define LC_MISC_RECT_H		<LCUI/misc/rect.h>
 #define LC_MISC_DELAY_H		<LCUI/misc/delay.h>
+#define LC_MISC_H		<LCUI/LCUI_Misc.h>
+
+#define LC_WIDGET_BASE_H	<LCUI/gui/widget_base.h>
+#define LC_WIDGET_EVENT_H	<LCUI/gui/widget_event.h>
+#define LC_WIDGET_LIBRARY_H	<LCUI/gui/widget_library.h>
+#define LC_WIDGET_H		<LCUI/LCUI_Widget.h>
+#define LC_WIDGET_HPP		<LCUI/LCUI_Widget.hpp>
 
 #define LC_FONT_H	<LCUI/LCUI_Font.h>
 #define LC_FONTLIB_H	<LCUI/font/fontlibrary.h>
@@ -95,13 +101,9 @@
 #define LC_GRAPH_HPP	<LCUI/LCUI_Graph.hpp>
 #define LC_DRAW_H	<LCUI/LCUI_Draw.h>
 #define LC_DISPLAY_H	<LCUI/LCUI_Display.h>
-#define LC_WIDGET_H	<LCUI/LCUI_Widget.h>
-#define LC_WIDGET_HPP	<LCUI/LCUI_Widget.hpp>
 #define LC_QUEUE_H	<LCUI/LCUI_Queue.h>
 #define LC_CURSOR_H	<LCUI/LCUI_Cursor.h>
-#define LC_WORK_H	<LCUI/LCUI_Work.h>
 #define LC_INPUT_H	<LCUI/LCUI_Input.h>
-#define LC_MEM_H	<LCUI/LCUI_Memory.h>
 #define LC_ERROR_H	<LCUI/LCUI_Error.h>
 #define LC_THREAD_H	<LCUI/LCUI_Thread.h>
 #define LC_THREAD_HPP	<LCUI/LCUI_Thread.hpp>
@@ -118,19 +120,19 @@
 #define LC_TEXTLAYER_H	<LCUI/font/textlayer.h>
 
 /* 一些GUI部件的头文件路径 */
-#define LC_WINDOW_H	<LCUI/widget/window.h>
-#define LC_WINDOW_HPP	<LCUI/widget/window.hpp>
-#define LC_LABEL_H	<LCUI/widget/label.h>
-#define LC_LABEL_HPP	<LCUI/widget/label.hpp>
-#define LC_BUTTON_H	<LCUI/widget/button.h>
-#define LC_PICBOX_H	<LCUI/widget/picturebox.h>
-#define LC_PROGBAR_H	<LCUI/widget/progressbar.h>
-#define LC_MENU_H	<LCUI/widget/menu.h>
-#define LC_CHECKBOX_H	<LCUI/widget/checkbox.h>
-#define LC_RADIOBTN_H	<LCUI/widget/radiobutton.h>
-#define LC_ACTIVEBOX_H	<LCUI/widget/activebox.h>
-#define LC_TEXTBOX_H	<LCUI/widget/textbox.h>
-#define LC_SCROLLBAR_H	<LCUI/widget/scrollbar.h>
+#define LC_WINDOW_H	<LCUI/gui/widget/window.h>
+#define LC_WINDOW_HPP	<LCUI/gui/widget/window.hpp>
+#define LC_LABEL_H	<LCUI/gui/widget/label.h>
+#define LC_LABEL_HPP	<LCUI/gui/widget/label.hpp>
+#define LC_BUTTON_H	<LCUI/gui/widget/button.h>
+#define LC_PICBOX_H	<LCUI/gui/widget/picturebox.h>
+#define LC_PROGBAR_H	<LCUI/gui/widget/progressbar.h>
+#define LC_MENU_H	<LCUI/gui/widget/menu.h>
+#define LC_CHECKBOX_H	<LCUI/gui/widget/checkbox.h>
+#define LC_RADIOBTN_H	<LCUI/gui/widget/radiobutton.h>
+#define LC_ACTIVEBOX_H	<LCUI/gui/widget/activebox.h>
+#define LC_TEXTBOX_H	<LCUI/gui/widget/textbox.h>
+#define LC_SCROLLBAR_H	<LCUI/gui/widget/scrollbar.h>
 
 #define LC_GUI_MSGBOX_H	<LCUI/gui/messagebox.h>
 
