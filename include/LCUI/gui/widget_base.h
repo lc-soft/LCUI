@@ -21,27 +21,27 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * widget_base.h -- �����Ļ�����������
+ * widget_base.h -- 部件的基本操作集。
  *
- * ��Ȩ���� (C) 2012-2013 ������
- * ����
+ * 版权所有 (C) 2012-2013 归属于
+ * 刘超
  *
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  *
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  *
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>.
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
 #ifndef __LCUI_WIDGET_BASE_H__
 #define __LCUI_WIDGET_BASE_H__
-/* �����������ͱ�ʶ */
+/* 定义数据类型标识 */
 typedef enum DATATYPE_{
 	DATATYPE_POS,
 	DATATYPE_POS_TYPE,
@@ -57,81 +57,81 @@ typedef enum DATATYPE_{
 } DATATYPE;
 
 /*************************** Container ********************************/
-/* ��������������Ϊ�����Ĳ����� */
+/* 将部件添加至作为容器的部件内 */
 LCUI_API int
 Widget_Container_Add( LCUI_Widget *ctnr, LCUI_Widget *widget );
 
-/* ͨ������ó�ָ�������������Ŀ��ȣ���λΪ���� */
+/* 通过计算得出指定部件的容器的宽度，单位为像素 */
 LCUI_API int
 _Widget_GetContainerWidth(LCUI_Widget *widget);
 
-/* ͨ������ó�ָ�������������ĸ߶ȣ���λΪ���� */
+/* 通过计算得出指定部件的容器的高度，单位为像素 */
 LCUI_API int
 _Widget_GetContainerHeight(LCUI_Widget *widget);
 
-/* ��ȡ�����Ŀ��� */
+/* 获取容器的宽度 */
 LCUI_API int
 Widget_GetContainerWidth( LCUI_Widget *widget );
 
-/* ��ȡ�����ĸ߶� */
+/* 获取容器的高度 */
 LCUI_API int
 Widget_GetContainerHeight( LCUI_Widget *widget );
 
-/* ��ȡ�����ĳߴ� */
+/* 获取容器的尺寸 */
 LCUI_API LCUI_Size
 Widget_GetContainerSize( LCUI_Widget *widget );
 /************************* Container End ******************************/
 
 /***************************** Widget *********************************/
 
-/* ��ȡ��������ͼ��ָ�� */
+/* 获取部件的主图层指针 */
 LCUI_API LCUI_GraphLayer *
 Widget_GetMainGraphLayer( LCUI_Widget *widget );
 
-/* ��ȡ�����Ŀͻ���ͼ��ָ�� */
+/* 获取部件的客户区图层指针 */
 LCUI_API LCUI_GraphLayer *
 Widget_GetClientGraphLayer( LCUI_Widget *widget );
 
-/* ��ȡ�������Ӳ������� */
+/* 获取部件的子部件队列 */
 LCUI_API LCUI_Queue*
 Widget_GetChildList( LCUI_Widget *widget );
 
-/* ��ȡ�����ľ���������� */
+/* 获取部件的矩形区域队列 */
 LCUI_API LCUI_RectQueue*
 Widget_GetInvalidAreaQueue( LCUI_Widget *widget );
 
 /*-------------------------- Widget Pos ------------------------------*/
-/* ͨ������ó�������x������ */
+/* 通过计算得出部件的x轴坐标 */
 LCUI_API int
 _Widget_GetX( LCUI_Widget *widget );
 
-/* ͨ������ó�������y������ */
+/* 通过计算得出部件的y轴坐标 */
 LCUI_API int
 _Widget_GetY( LCUI_Widget *widget );
 
 
-/* ���ܣ�ͨ������ó�������λ�ã���λΪ���� */
+/* 功能：通过计算得出部件的位置，单位为像素 */
 LCUI_API LCUI_Pos
 _Widget_GetPos(LCUI_Widget *widget);
 
 /*
- * ���ܣ���ȡ�������������������λ��
- * ˵������λ��������������������Ͻǵ㣬���������������ڱ߾ࡣ
+ * 功能：获取部件相对于容器部件的位置
+ * 说明：该位置相对于容器部件的左上角点，忽略容器部件的内边距。
  *  */
 LCUI_API LCUI_Pos
 Widget_GetPos(LCUI_Widget *widget);
 
 /*
- * ���ܣ���ȡ������������������������λ��
- * ˵�������������������򲢲�һ����������������������Ϊ���������С�ܵ�
- * �����������ڱ߾��Ӱ�졣
+ * 功能：获取部件的相对于所在容器区域的位置
+ * 说明：部件所在容器区域并不一定等于容器部件的区域，因为容器区域大小受到
+ * 容器部件的内边距的影响。
  *  */
 LCUI_API LCUI_Pos
 Widget_GetRelPos(LCUI_Widget *widget);
 
 /*
- * ���ܣ�ȫ������ת�����������
- * ˵���������ȫ�����꣬�����ݴ���Ĳ���ָ�룬ת��������ڸò���������
+ * 功能：全局坐标转换成相对坐标
+ * 说明：传入的全局坐标，将根据传入的部件指针，转换成相对于该部件的坐标
  *  */
 LCUI_API LCUI_Pos
 Widget_ToRelPos(LCUI_Widget *widget, LCUI_Pos global_pos);
@@ -192,22 +192,22 @@ Widget_GetHeight(LCUI_Widget *widget);
 LCUI_API int
 Widget_GetWidth(LCUI_Widget *widget);
 
-/* ��ȡ�����ĳߴ� */
+/* 获取部件的尺寸 */
 LCUI_API LCUI_Size
 Widget_GetSize(LCUI_Widget *widget);
 
-/* ͨ�������ȡ�����ĳߴ� */
+/* 通过计算获取部件的尺寸 */
 LCUI_API LCUI_Size
 _Widget_GetSize(LCUI_Widget *widget);
 
 /*------------------------ END Widget Size ----------------------------*/
 
 
-/* ��ȡ���������� */
+/* 获取部件的区域 */
 LCUI_API LCUI_Rect
 Widget_GetRect(LCUI_Widget *widget);
 
-/* ��ȡ������˽�����ݽṹ���ָ�� */
+/* 获取部件的私有数据结构体的指针 */
 LCUI_API void*
 Widget_GetPrivData(LCUI_Widget *widget);
 
@@ -215,25 +215,25 @@ LCUI_API int
 Widget_PrintChildList( LCUI_Widget *widget );
 
 /*
- * ���ܣ���ӡwidget����Ϣ
- * ˵�����ڵ���ʱ��Ҫ�õ���������ȷ��widget�Ƿ�������
+ * 功能：打印widget的信息
+ * 说明：在调试时需要用到它，用于确定widget是否有问题
  *  */
 LCUI_API void
 print_widget_info(LCUI_Widget *widget);
 
-/* ��ָ���������ڲ��������趨��Ҫˢ�µ����� */
+/* 在指定部件的内部区域内设定需要刷新的区域 */
 LCUI_API int
 Widget_InvalidArea( LCUI_Widget *widget, LCUI_Rect rect );
 
-/* �����пɼ���������Ч���� ͬ���� ��Ļ��Ч��������� */
+/* 将所有可见部件的无效区域 同步至 屏幕无效区域队列中 */
 LCUI_API void Widget_SyncInvalidArea( void );
 
 /*
- * ���ܣ���ָ��������Ӧ����״̬�ĸı�
- * ˵������������ʱ��Ĭ���ǲ���Ӧ״̬�ı�ģ���Ϊÿ��״̬�ı�󣬶�Ҫ���ú����ػ沿����
- * �����һЩ�����Ƕ���ģ�û��Ҫ�ػ棬Ӱ��Ч�ʡ�������ò�������ť����������ƶ�����
- * ����ʱ�Լ��������ʱ������ı䰴ť��ͼ����ʽ���Ǿ���Ҫ�������������һ�¡�
- * �÷���
+ * 功能：让指定部件响应部件状态的改变
+ * 说明：部件创建时，默认是不响应状态改变的，因为每次状态改变后，都要调用函数重绘部件，
+ * 这对于一些部件是多余的，没必要重绘，影响效率。如果想让部件能像按钮那样，鼠标移动到它
+ * 上面时以及鼠标点击它时，都会改变按钮的图形样式，那就需要用这个函数设置一下。
+ * 用法：
  * Widget_SetValidState( widget, WIDGET_STATE_NORMAL );
  * Widget_SetValidState( widget, WIDGET_STATE_OVERLAY | WIDGET_STATE_ACTIVE );
  * */
@@ -241,50 +241,50 @@ LCUI_API void
 Widget_SetValidState( LCUI_Widget *widget, int state );
 
 /*
- * ���ܣ���ȡ������ָ�����͵ĸ�������ָ��
- * ˵�������������ڲ�����ϵ������ͷ�����Ҹ�����ָ�룬���ж�����������Ƿ�Ϊ�ƶ�����
- * ����ֵ��û�з���Ҫ��ĸ��������ͷ���NULL�����򷵻ز���ָ��
+ * 功能：获取部件的指定类型的父部件的指针
+ * 说明：本函数会在部件关系链中往头部查找父部件指针，并判断这个父部件是否为制定类型
+ * 返回值：没有符合要求的父级部件就返回NULL，否则返回部件指针
  **/
 LCUI_API LCUI_Widget*
 Widget_GetParent(LCUI_Widget *widget, char *widget_type);
 
-/* ��ȡָ��ID���Ӳ��� */
+/* 获取指定ID的子部件 */
 LCUI_API LCUI_Widget*
 Widget_GetChildByID( LCUI_Widget *widget, LCUI_ID id );
 
-/* ����ָ��ID�ĳ�������в��� */
+/* 销毁指定ID的程序的所有部件 */
 LCUI_API void
 LCUIApp_DestroyAllWidgets( LCUI_ID app_id );
 
-/* ���ָ�������Ƿ��ڽ���״̬ */
+/* 检测指定部件是否处于焦点状态 */
 LCUI_API LCUI_BOOL
 Widget_GetFocus( LCUI_Widget *widget );
 
-/* ���ָ�������Ƿ���ȫ�ֽ��㣬Ҳ���Ǹò����Լ��ϼ����и������Ƿ񶼵õ��˽��� */
+/* 检测指定部件是否获得全局焦点，也就是该部件以及上级所有父部件是否都得到了焦点 */
 LCUI_API LCUI_BOOL
 Widget_GetGlobalFocus( LCUI_Widget *widget );
 
-/* ��ȡ�����ķ������ */
+/* 获取部件的风格名称 */
 LCUI_API LCUI_String
 Widget_GetStyleName( LCUI_Widget *widget );
 
-/* �趨�����ķ������ */
+/* 设定部件的风格名称 */
 LCUI_API void
 Widget_SetStyleName( LCUI_Widget *widget, const char *style_name );
 
-/* �趨�����ķ��ID */
+/* 设定部件的风格ID */
 LCUI_API void
 Widget_SetStyleID( LCUI_Widget *widget, int style_id );
 
-/* ��ȡָ�������ϵ��Ӳ��������򷵻��Ӳ���ָ�룬���򷵻�NULL */
+/* 获取指定坐标上的子部件，有则返回子部件指针，否则返回NULL */
 LCUI_API LCUI_Widget*
 Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos );
 
-/* ���ܣ�Ϊ����˽�нṹ��ָ������ڴ� */
+/* 功能：为部件私有结构体指针分配内存 */
 LCUI_API void*
 WidgetPrivData_New( LCUI_Widget *widget, size_t size );
 
-/* ��ʼ���������� */
+/* 初始化部件队列 */
 LCUI_API void
 WidgetQueue_Init(LCUI_Queue *queue);
 
@@ -293,190 +293,190 @@ WidgetQueue_Init(LCUI_Queue *queue);
 	Widget_New
 
 <Description>
-	����ָ�����͵Ĳ���
+	创建指定类型的部件
 
 <Input>
-	widget_type :: ������������
+	widget_type :: 部件的类型名
 
 <Return>
-	�ɹ��򷵻�ָ��ò�����ָ�룬ʧ���򷵻�NULL
+	成功则返回指向该部件的指针，失败则返回NULL
 ************************************************************/
 LCUI_API LCUI_Widget* Widget_New( const char *widget_type );
 
-/* ��ȡ������ȫ������ */
+/* 获取部件的全局坐标 */
 LCUI_API LCUI_Pos
 Widget_GetGlobalPos(LCUI_Widget *widget);
 
-/* �趨�����ɱ�����������͸���� */
+/* 设定部件可被点击的区域的透明度 */
 LCUI_API void
 Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode );
 
-/* �趨�����Ķ��뷽ʽ�Լ�ƫ�ƾ��� */
+/* 设定部件的对齐方式以及偏移距离 */
 LCUI_API void
 Widget_SetAlign(LCUI_Widget *widget, ALIGN_TYPE align, LCUI_Pos offset);
 
 /*
- * ���ܣ��趨���������ߴ�
- * ˵������ֵΪ0ʱ�������ĳߴ粻�����ƣ��÷�ʾ���ɲο�Set_Widget_Size()����
+ * 功能：设定部件的最大尺寸
+ * 说明：当值为0时，部件的尺寸不受限制，用法示例可参考Set_Widget_Size()函数
  * */
 LCUI_API int
 Widget_SetMaxSize( LCUI_Widget *widget, char *width, char *height );
 
-/* �趨��������С�ߴ� */
+/* 设定部件的最小尺寸 */
 LCUI_API int
 Widget_SetMinSize( LCUI_Widget *widget, char *width, char *height );
 
-/* ���Ʋ����ĳߴ�䶯��Χ */
+/* 限制部件的尺寸变动范围 */
 LCUI_API void
 Widget_LimitSize(LCUI_Widget *widget, LCUI_Size min_size, LCUI_Size max_size);
 
-/* ���Ʋ������ƶ���Χ */
+/* 限制部件的移动范围 */
 LCUI_API void
 Widget_LimitPos(LCUI_Widget *widget, LCUI_Pos min_pos, LCUI_Pos max_pos);
 
-/* �趨�����ı߿� */
+/* 设定部件的边框 */
 LCUI_API void
 Widget_SetBorder( LCUI_Widget *widget, LCUI_Border border );
 
-/* �趨�����߿���ĸ��ǵ�Բ�ǰ뾶 */
+/* 设定部件边框的四个角的圆角半径 */
 LCUI_API void
 Widget_SetBorderRadius( LCUI_Widget *widget, unsigned int radius );
 
-/* �趨�����ı���ͼ�� */
+/* 设定部件的背景图像 */
 LCUI_API void
 Widget_SetBackgroundImage( LCUI_Widget *widget, LCUI_Graph *img );
 
-/* �趨����ͼ�Ĳ��� */
+/* 设定背景图的布局 */
 LCUI_API void
 Widget_SetBackgroundLayout( LCUI_Widget *widget, LAYOUT_TYPE layout );
 
-/* �趨�����ı�����ɫ */
+/* 设定部件的背景颜色 */
 LCUI_API void
 Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color );
 
-/* �趨���������Ƿ�͸�� */
+/* 设定部件背景是否透明 */
 LCUI_API void
 Widget_SetBackgroundTransparent( LCUI_Widget *widget, LCUI_BOOL flag );
 
-/* ���ò��� */
+/* 启用部件 */
 LCUI_API void
 Widget_Enable(LCUI_Widget *widget);
 
-/* ���ò��� */
+/* 禁用部件 */
 LCUI_API void
 Widget_Disable(LCUI_Widget *widget);
 
-/* ָ�������Ƿ�ɼ� */
+/* 指定部件是否可见 */
 LCUI_API void
 Widget_Visible( LCUI_Widget *widget, LCUI_BOOL flag );
 
 /*
- * ���ܣ��趨������λ��
- * ˵����ֻ�޸����꣬�����оֲ�ˢ��
+ * 功能：设定部件的位置
+ * 说明：只修改坐标，不进行局部刷新
  * */
 LCUI_API void
 Widget_SetPos(LCUI_Widget *widget, LCUI_Pos pos);
 
-/* ���ò������ڱ߾� */
+/* 设置部件的内边距 */
 LCUI_API void
 Widget_SetPadding( LCUI_Widget *widget, LCUI_Padding padding );
 
-/* ���ò�������߾� */
+/* 设置部件的外边距 */
 LCUI_API void
 Widget_SetMargin( LCUI_Widget *widget, LCUI_Margin margin );
 
-/* �趨�����Ķ�λ���� */
+/* 设定部件的定位类型 */
 LCUI_API void
 Widget_SetPosType( LCUI_Widget *widget, POS_TYPE pos_type );
 
-/* ���ò����Ķѵ�˳�� */
+/* 设置部件的堆叠顺序 */
 LCUI_API int
 Widget_SetZIndex( LCUI_Widget *widget, int z_index );
 
-/* �趨������͸���� */
+/* 设定部件的透明度 */
 LCUI_API void
 Widget_SetAlpha(LCUI_Widget *widget, unsigned char alpha);
 
 /*
- * ���ܣ�ִ���ƶ�����λ�õĲ���
- * ˵�������Ĳ���λ�ã������Ӿֲ�ˢ������
+ * 功能：执行移动部件位置的操作
+ * 说明：更改部件位置，并添加局部刷新区域
  **/
 LCUI_API void
 Widget_ExecMove( LCUI_Widget *widget, LCUI_Pos pos );
 
-/* ִ�����ز����Ĳ��� */
+/* 执行隐藏部件的操作 */
 LCUI_API void
 Widget_ExecHide(LCUI_Widget *widget);
 
-/* ��������ʾ��ͬ��z-indexֵ�Ĳ�����ǰ�� */
+/* 将部件显示在同等z-index值的部件的前端 */
 LCUI_API int
 Widget_Front( LCUI_Widget *widget );
 
 LCUI_API void
 Widget_ExecShow(LCUI_Widget *widget);
 
-/* �Զ�����������С������Ӧ�����ݴ�С */
+/* 自动调整部件大小，以适应其内容大小 */
 LCUI_API void
 Widget_AutoResize(LCUI_Widget *widget);
 
-/* ִ�иı䲿���ߴ�Ĳ��� */
+/* 执行改变部件尺寸的操作 */
 LCUI_API void
 Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size);
 
-/* ���û���ò������Զ��ߴ�������� */
+/* 启用或禁用部件的自动尺寸调整功能 */
 LCUI_API void
 Widget_SetAutoSize(	LCUI_Widget *widget,
 			LCUI_BOOL flag, AUTOSIZE_MODE mode );
 
-/* ִ��ˢ����ʾָ����������������ͼ�εĲ��� */
+/* 执行刷新显示指定部件的整个区域图形的操作 */
 LCUI_API void
 Widget_ExecRefresh(LCUI_Widget *widget);
 
-/* ִ�в����ĸ��²��� */
+/* 执行部件的更新操作 */
 LCUI_API void
 Widget_ExecUpdate(LCUI_Widget *widget);
 
-/* ִ�в���ͼ�θ��²��� */
+/* 执行部件图形更新操作 */
 LCUI_API void
 Widget_ExecDraw(LCUI_Widget *widget);
 
-/* ��ȡָ�򲿼�����ͼ�����ݵ�ָ�� */
+/* 获取指向部件自身图形数据的指针 */
 LCUI_API LCUI_Graph*
 Widget_GetSelfGraph( LCUI_Widget *widget );
 
-/* ��ȡ����ʵ����ʾ��ͼ�� */
+/* 获取部件实际显示的图形 */
 LCUI_API int
 Widget_GetGraph(
 	LCUI_Widget *widget,
 	LCUI_Graph *graph_buff,
 	LCUI_Rect rect );
 
-/* ��ȡ��Ч������������ݣ���ʵ���ǽ������Ʒ�Χ������괦���������Ʒ�Χ�ڵ� */
+/* 获取有效化后的坐标数据，其实就是将在限制范围外的坐标处理成在限制范围内的 */
 LCUI_API LCUI_Pos
 Widget_GetValidPos( LCUI_Widget *widget, LCUI_Pos pos );
 
 /*
- * ���ܣ��ƶ�����λ��
- * ˵������������Ĳ���ΪALIGN_NONE����ô���Ϳ����ƶ�����λ�ã������޷��ƶ�λ��
+ * 功能：移动部件位置
+ * 说明：如果部件的布局为ALIGN_NONE，那么，就可以移动它的位置，否则，无法移动位置
  * */
 LCUI_API void
 Widget_Move(LCUI_Widget *widget, LCUI_Pos new_pos);
 
-/* ���²�����λ�� */
+/* 更新部件的位置 */
 LCUI_API void
 Widget_UpdatePos(LCUI_Widget *widget);
 
-/* ���²�����λ�ã��Լ�λ�ñ䶯��Χ */
+/* 更新部件的位置，以及位置变动范围 */
 LCUI_API void
 Widget_ExecUpdatePos( LCUI_Widget *widget );
 
-/* �����ߴ���� */
+/* 部件尺寸更新 */
 LCUI_API void
 Widget_UpdateSize( LCUI_Widget *widget );
 
 /*
- * ���ܣ�����ָ���������Ӳ����ĳߴ�
- * ˵�����������ߴ�ı���еĲ����ĳߴ��Լ�λ���ǰ��ٷֱ���ģ���Ҫ���¼��㡣
+ * 功能：更新指定部件的子部件的尺寸
+ * 说明：当部件尺寸改变后，有的部件的尺寸以及位置是按百分比算的，需要重新计算。
  * */
 LCUI_API void
 Widget_UpdateChildSize(LCUI_Widget *widget);
@@ -485,77 +485,77 @@ LCUI_API void
 Widget_ExecUpdateSize( LCUI_Widget *widget );
 
 /*
- * ���ܣ�����ָ���������Ӳ�����λ��
- * ˵��������Ϊ�Ӳ��������������ĳߴ�ı���еĲ����Ĳ��ֲ�ΪALIGN_NONE������Ҫ����
- * ����λ�á�
+ * 功能：更新指定部件的子部件的位置
+ * 说明：当作为子部件的容器部件的尺寸改变后，有的部件的布局不为ALIGN_NONE，就需要重新
+ * 调整位置。
  * */
 LCUI_API void
 Widget_UpdateChildPos(LCUI_Widget *widget);
 
-/* �趨�����ĸ߶ȣ���λΪ���� */
+/* 设定部件的高度，单位为像素 */
 LCUI_API void
 Widget_SetHeight( LCUI_Widget *widget, int height );
 
 /*
- * ���ܣ��趨�����ĳߴ��С
- * ˵��������趨�˲�����ͣ��λ�ã����Ҹ�ͣ������Ĭ�������˿�/�ߣ���ô�����Ŀ�/�߾Ͳ��ܱ��ı䡣
- * �÷�ʾ����
- * Widget_SetSize( widget, "100px", "50px" ); �����ߴ����Ϊ100x50����
- * Widget_SetSize( widget, "100%", "50px" ); �������ȵ����������ȣ��߶�Ϊ50����
- * Widget_SetSize( widget, "50", "50" ); �����ߴ����Ϊ50x50���أ�px����ʡ��
- * Widget_SetSize( widget, NULL, "50%" ); �������ȱ���ԭ�����߶�Ϊ�����߶ȵ�һ��
+ * 功能：设定部件的尺寸大小
+ * 说明：如果设定了部件的停靠位置，并且该停靠类型默认限制了宽/高，那么部件的宽/高就不能被改变。
+ * 用法示例：
+ * Widget_SetSize( widget, "100px", "50px" ); 部件尺寸最大为100x50像素
+ * Widget_SetSize( widget, "100%", "50px" ); 部件宽度等于容器宽度，高度为50像素
+ * Widget_SetSize( widget, "50", "50" ); 部件尺寸最大为50x50像素，px可以省略
+ * Widget_SetSize( widget, NULL, "50%" ); 部件宽度保持原样，高度为容器高度的一半
  * */
 LCUI_API void
 Widget_SetSize( LCUI_Widget *widget, char *width, char *height );
 
-/* �趨�����Ƿ�Ϊģ̬���� */
+/* 设定部件是否为模态部件 */
 LCUI_API void
 Widget_SetModal( LCUI_Widget *widget, LCUI_BOOL is_modal );
 
-/* �趨������ͣ������ */
+/* 设定部件的停靠类型 */
 LCUI_API void
 Widget_SetDock( LCUI_Widget *widget, DOCK_TYPE dock );
 
-/* ���ܣ�ˢ����ʾָ����������������ͼ�� */
+/* 功能：刷新显示指定部件的整个区域图形 */
 LCUI_API void
 Widget_Refresh(LCUI_Widget *widget);
 
-/* ���������ĳߴ� */
-LCUI_API void 
+/* 调整部件的尺寸 */
+LCUI_API void
 Widget_Resize( LCUI_Widget *widget, LCUI_Size new_size );
 
-/* ���»��Ʋ��� */
+/* 重新绘制部件 */
 LCUI_API void
 Widget_Draw(LCUI_Widget *widget);
 
-/* ���ٲ��� */
+/* 销毁部件 */
 LCUI_API void
 Widget_Destroy( LCUI_Widget *widget );
 
 /*
- * ���ܣ��ò����������趨�����ԣ�������Ӧ���ݵĸ���
- * ˵�����˼�¼�����������У������������һ����ͬ��¼���򸲸�������¼��
+ * 功能：让部件根据已设定的属性，进行相应数据的更新
+ * 说明：此记录会添加至队列，如果队列中有一条相同记录，则覆盖上条记录。
  * */
 LCUI_API void
 Widget_Update(LCUI_Widget *widget);
 
 /*
- * ���ܣ��ò����������趨�����ԣ�������Ӧ���ݵĸ���
- * ˵�������ϸ���������һ�������ǣ�����������������������ͬ��¼��
+ * 功能：让部件根据已设定的属性，进行相应数据的更新
+ * 说明：与上个函数功能一样，但是，可以允许队列中有两条相同记录。
  * */
 LCUI_API void
 __Widget_Update(LCUI_Widget *widget);
 
 
-/* ��ʾ���� */
+/* 显示部件 */
 LCUI_API void
 Widget_Show(LCUI_Widget *widget);
 
-/* ���ز��� */
+/* 隐藏部件 */
 LCUI_API void
 Widget_Hide(LCUI_Widget *widget);
 
-/* �ı䲿����״̬ */
+/* 改变部件的状态 */
 LCUI_API int
 Widget_SetState( LCUI_Widget *widget, int state );
 /************************* Widget End *********************************/
@@ -564,14 +564,14 @@ Widget_SetState( LCUI_Widget *widget, int state );
 
 /**************************** Widget Update ***************************/
 
-/* ��ʼ����¼�������ݸ��µĶ��� */
+/* 初始化记录部件数据更新的队列 */
 LCUI_API void
 WidgetUpdateBuff_Init( LCUI_Queue *queue );
 
 /*
- * ���ܣ���¼��Ҫ�������ݸ��µĲ���
- * ˵����������ָ���Լ�����µ��������������У����ݲ�������ʾ˳�������ж���
- * ����ֵ���������ز�С��0��ֵ
+ * 功能：记录需要进行数据更新的部件
+ * 说明：将部件指针以及需更新的数据添加至队列，根据部件的显示顺序来排列队列
+ * 返回值：正常返回不小于0的值
  *  */
 LCUI_API int
 Record_WidgetUpdate( LCUI_Widget *widget, void *data, DATATYPE type, int flag );

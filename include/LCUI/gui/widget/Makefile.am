@@ -13,5 +13,5 @@ scrollbar.h
 
 # Headers to install
 pkginclude_HEADERS = $(INSTINCLUDES)
-pkgincludedir=$(prefix)/include/LCUI/widget
+pkgincludedir=$(prefix)/include/LCUI/gui/widget
 

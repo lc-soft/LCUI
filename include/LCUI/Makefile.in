@@ -271,14 +271,13 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = widget font kernel draw gui misc
+SUBDIRS = font kernel draw gui misc
 # Headers which are installed to support the library
 INSTINCLUDES = LCUI.h LCUI.hpp\
 LCUI_Config.h \
 LCUI_Display.h \
 LCUI_Font.h \
 LCUI_Misc.h \
-LCUI_Work.h \
 LCUI_Graph.h LCUI_Graph.hpp \
 LCUI_StyleLibrary.h \
 LCUI_GraphLayer.h \

@@ -1,4 +1,4 @@
-﻿/* include/LCUI/LCUI_Config.h.  Generated from LCUI_Config.h.in by configure.  */
+/* include/LCUI/LCUI_Config.h.  Generated from LCUI_Config.h.in by configure.  */
 /* include/LCUI/LCUI_Config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */

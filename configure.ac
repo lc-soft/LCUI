@@ -61,12 +61,12 @@ fi
 ##检测是否有freetype库
 want_font_engine="yes"
 font_engine_name="freetype"
-AC_ARG_ENABLE(font-engine, AC_HELP_STRING([--enable-font-engine], 
+AC_ARG_ENABLE(font-engine, AC_HELP_STRING([--enable-font-engine],
 [turn on font-engine [[default=yes]]]), want_font_engine=$enableval)
 if test "$want_font_engine" = "yes"; then
 	AC_CHECK_LIB([freetype], [FT_Init_FreeType], want_font_engine="yes", want_font_engine="no")
 	if test "$want_font_engine" = "yes"; then
-		AC_CHECK_HEADERS([ft2build.h], 
+		AC_CHECK_HEADERS([ft2build.h],
 		[want_font_engine="yes"], [want_font_engine="no"])
 	fi
 	if test "$want_font_engine" = "yes"; then
@@ -76,20 +76,20 @@ if test "$want_font_engine" = "yes"; then
 		want_font_engine="no"
 		font_engine_name="none"
 	fi
-else 
+else
 	want_font_engine="no"
 	font_engine_name="none"
 fi
 
 ## 检测图形输出设备
 want_video_output=yes
-video_driver_name="framebuffer" 
-AC_ARG_ENABLE(video-output, AC_HELP_STRING([--enable-video-output], 
+video_driver_name="framebuffer"
+AC_ARG_ENABLE(video-output, AC_HELP_STRING([--enable-video-output],
 [turn on video-output [[default=yes]]]), want_video_output=$enableval)
 if test "$want_video_output" = "yes"; then
 	AC_CHECK_HEADERS([linux/fb.h],
 	[video_driver_name="framebuffer"], [video_driver_name="none"])
-else 
+else
 	want_video_output=no
 	video_driver_name=none
 fi
@@ -127,11 +127,11 @@ if test "x$with_jpeg" != "xno"; then
 fi
 
 
-# DEBUG option 
+# DEBUG option
 # 调试选项，如果需要对项目进行调试，可启用调试选项
 want_debug=no
 AC_MSG_CHECKING(whether to enable debugging)
-AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug], 
+AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug],
 [turn on debugging [[default=no]]]), want_debug=$enableval)
 if test "$want_debug" = "yes"; then
 	CFLAGS="-O2 -g -Wall -D _GNU_SOURCE"
@@ -172,7 +172,7 @@ font_engine_name="none"
 if test "$want_font_engine" = "yes"; then
     font_engine_name="freetype"
     AC_DEFINE_UNQUOTED(LCUI_FONT_ENGINE_FREETYPE, 1,  Define to 1 if you have the FreeType font engine)
-    
+
 fi
 
 if test "$want_iconv" = "yes"; then
@@ -182,17 +182,17 @@ fi
 if test "$want_thread" = "yes"; then
     if test "$thread_name" = "pthread"; then
         AC_DEFINE_UNQUOTED(LCUI_THREAD_PTHREAD, 1, Define to 1 if you using pthread support)
-    else 
+    else
         AC_DEFINE_UNQUOTED(LCUI_THREAD_NONE, 1, Define to 1 if not have thread support)
     fi
-else 
+else
     AC_DEFINE_UNQUOTED(LCUI_THREAD_NONE, 1, Define to 1 if not have thread support)
 fi
 
 if test "$want_video_output" = "yes"; then
     if test "$video_driver_name" = "framebuffer"; then
-        AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_FRAMEBUFFER, 1, Define to 1 if you select FrameBuffer for video support) 
-    else 
+        AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_FRAMEBUFFER, 1, Define to 1 if you select FrameBuffer for video support)
+    else
         AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_NONE, 1, Define to 1 if not have video output support)
     fi
 else
@@ -206,7 +206,7 @@ AC_OUTPUT([Makefile
                  include/LCUI/Makefile
                  include/LCUI/font/Makefile
                  include/LCUI/draw/Makefile
-                 include/LCUI/widget/Makefile
+                 include/LCUI/gui/widget/Makefile
                  include/LCUI/kernel/Makefile
                  include/LCUI/gui/Makefile
                  include/LCUI/misc/Makefile
@@ -223,7 +223,6 @@ AC_OUTPUT([Makefile
                  src/kernel/Makefile
                  src/input/Makefile
                  src/output/Makefile
-                 src/widget/Makefile
                  src/gui/Makefile
                  test/Makefile
                  test/mora/Makefile
@@ -239,5 +238,5 @@ echo -e "Build with libiconv support ........ : $want_iconv"
 echo -e "Build with font-engine support ..... : $font_engine_name"
 echo -e "Build with thread support .......... : $thread_name"
 echo -e "Build with video support ........... : $video_driver_name"
-echo 
+echo
 

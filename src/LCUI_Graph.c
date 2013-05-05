@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Graph.c -- 图形处理
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -41,7 +41,6 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
-#include LC_MEM_H
 #include LC_MISC_H 
 #include LC_WIDGET_H
 #include LC_CURSOR_H

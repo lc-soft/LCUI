@@ -1,8 +1,8 @@
-﻿/* ***************************************************************************
+/* ***************************************************************************
  * LCUI.h -- Records with common data type definitions, macro definitions and
  * function declarations
  *
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2013 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -24,7 +24,7 @@
 /* ****************************************************************************
  * LCUI.h -- 记录着常用的数据类型定义，宏定义，以及函数声明
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -229,7 +229,10 @@ typedef struct LCUI_FontBMP_ {
 	int left;		/* 与左边框的距离 */
 	int width;		/* 位图宽度 */
 	int rows;		/* 位图行数 */
+	int pitch;
 	uchar_t *buffer;	/* 字体位图数据 */
+	short num_grays;
+	char pixel_mode;
 	LCUI_Pos advance;	/* XY轴的跨距 */
 } LCUI_FontBMP;
 /*------------------- END ---------------------*/

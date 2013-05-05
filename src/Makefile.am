@@ -21,10 +21,8 @@ LCUI_SOURCES = \
 	LCUI_Graph.c		\
 	LCUI_GraphLayer.c	\
 	LCUI_StyleLibrary.c	\
-	LCUI_Work.c		\
 	LCUI_InputMethod.c	\
 	LCUI_Cursor.c		\
-	LCUI_Widget.c		\
 	LCUI_Error.c
 
 LCUI_LIBADD = \
@@ -40,7 +38,6 @@ LCUI_LIBADD = \
 	thread/libthread.la \
 	thread/win32/libthread.la \
 	thread/pthread/libthread.la \
-	widget/libwidget.la \
 	gui/libgui.la \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
@@ -49,7 +46,7 @@ LCUI_LIBADD = \
 	$(ICONV_LIBS) \
 	$(TS_LIBS)
 
-SUBDIRS = bmp misc draw kernel font input output thread widget gui
+SUBDIRS = bmp misc draw kernel font input output thread gui
 
 ##库的编译需要这样
 lib_LTLIBRARIES = libLCUI.la
@@ -60,4 +57,4 @@ libLCUI_la_LIBADD = $(LCUI_LIBADD)
 ##库的源文件
 libLCUI_la_SOURCES = $(LCUI_SOURCES)
 ##编译的附加选项
-libLCUI_la_LDFLAGS = $(LCUI_LDFLAGS) 
+libLCUI_la_LDFLAGS = $(LCUI_LDFLAGS)
