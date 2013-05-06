@@ -174,13 +174,30 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 {
 	char ch;
 	
-	ch = event->key_code;
+	switch(event->key_code) {
+#ifdef LCUI_BUILD_IN_WIN32
+	case 189: ch = '-'; break;
+	case 187: ch = '='; break;
+	case 188: ch = ','; break;
+	case 190: ch = '.'; break;
+	case 191: ch = '/'; break;
+	case 222: ch = '\''; break;
+	case 186: ch = ';'; break;
+	case 220: ch = '\\'; break;
+	case 221: ch = ']'; break;
+	case 219: ch = '['; break;
+#endif
+	default:ch = event->key_code;break;
+	}
+	
+	DEBUG_MSG("key code: %d\n", event->key_code);
 	/* 如果没开启大写锁定，则将字母转换成小写 */
 	if( !enable_capitals_lock ) {
 		if( ch >= 'A' && ch <= 'Z' ) {
 			ch = event->key_code + 32;
 		}
 	}
+
 	/* 如果shift键处于按下状态 */
 	if( LCUIKey_IsHit(LCUIKEY_SHIFT) ) {
 		if(ch >='a' && ch <= 'z') {
@@ -357,6 +374,18 @@ IME_ProcessKey( int key )
 	case LCUIKEY_8:
 	case LCUIKEY_9:
 	case LCUIKEY_SPACE:
+#ifdef LCUI_BUILD_IN_WIN32
+	case 189:
+	case 187:
+	case 188:
+	case 190:
+	case 191:
+	case 222:
+	case 186:
+	case 220:
+	case 221:
+	case 219:
+#endif
 	return TRUE;
 	default:break;
 	}
