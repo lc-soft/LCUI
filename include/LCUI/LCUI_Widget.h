@@ -191,6 +191,7 @@ LCUI_END_HEADER
 #include LC_WIDGET_BASE_H
 #include LC_WIDGET_EVENT_H
 #include LC_WIDGET_LIBRARY_H
+#include LC_WIDGET_STYLE_H
 #include LC_GUI_MSGBOX_H
 
 #ifdef __cplusplus

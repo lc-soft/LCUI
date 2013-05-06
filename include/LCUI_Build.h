@@ -92,6 +92,7 @@
 #define LC_WIDGET_BASE_H	<LCUI/gui/widget_base.h>
 #define LC_WIDGET_EVENT_H	<LCUI/gui/widget_event.h>
 #define LC_WIDGET_LIBRARY_H	<LCUI/gui/widget_library.h>
+#define LC_WIDGET_STYLE_H	<LCUI/gui/widget_style.h>
 #define LC_WIDGET_H		<LCUI/LCUI_Widget.h>
 #define LC_WIDGET_HPP		<LCUI/LCUI_Widget.hpp>
 
@@ -136,33 +137,26 @@
 
 #define LC_GUI_MSGBOX_H	<LCUI/gui/messagebox.h>
 
-#endif
-
-#define _DEBUG_MSG(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
 
 #ifdef DEBUG
-#define DEBUG_MSG(format, ...) _DEBUG_MSG(format, ...)
+#define DEBUG_MSG _DEBUG_MSG
 #else
 #define DEBUG_MSG(format, ...)
 #endif
 
 #ifdef DEBUG1
-#define DEBUG_MSG1(format, ...) _DEBUG_MSG(format, ...)
+#define DEBUG_MSG1 _DEBUG_MSG
 #else
 #define DEBUG_MSG1(format, ...)
 #endif
 
 #ifdef DEBUG2
-#define DEBUG_MSG2(format, ...) _DEBUG_MSG(format, ...)
+#define DEBUG_MSG2 _DEBUG_MSG
 #else
 #define DEBUG_MSG2(format, ...)
 #endif
 
-#ifdef DEBUG3
-#define DEBUG_MSG3(format, ...) _DEBUG_MSG(format, ...)
-#else
-#define DEBUG_MSG3(format, ...)
-
+#define _DEBUG_MSG(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
 
 #if defined(WIN32) || defined(_WIN32)
 #define LCUI_BUILD_IN_WIN32
