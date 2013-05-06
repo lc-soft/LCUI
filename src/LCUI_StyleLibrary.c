@@ -41,7 +41,7 @@ StyleLib_GetStyleClass(	LCUI_StyleLibrary *lib,
 	
 	total = Queue_GetTotal( &lib->style_classes );
 	for(i=0; i<total; ++i) {
-		p = Queue_Get( &lib->style_classes, i );
+		p = (LCUI_StyleClass*)Queue_Get( &lib->style_classes, i );
 		if( !p ) {
 			continue;
 		}
@@ -64,7 +64,7 @@ StyleLib_AddStyleClass(	LCUI_StyleLibrary *lib,
 		return NULL;
 	}
 
-	style_class = malloc( sizeof(LCUI_StyleClass) );
+	style_class = (LCUI_StyleClass*)malloc( sizeof(LCUI_StyleClass) );
 	if( !style_class ) {
 		return NULL;
 	}
@@ -82,14 +82,14 @@ StyleLib_GetStyleAttr(	LCUI_StyleClass *style_class,
 {
 	int i, total;
 	LCUI_StyleAttr *p;
-	
+
 	if( !style_class ) {
 		return NULL;
 	}
 	/* 先在记录中查找是否有已存在的同名属性 */
 	total = Queue_GetTotal( &style_class->style_attr );
 	for( i=0; i<total; ++i ) {
-		p = Queue_Get( &style_class->style_attr, i );
+		p = (LCUI_StyleAttr*)Queue_Get( &style_class->style_attr, i );
 		if( !p ) {
 			continue;
 		}
@@ -175,65 +175,72 @@ StyleLib_AddStyleFromString(	LCUI_StyleLibrary *lib,
 			save_attr_value = FALSE;
 	
 	LCUI_StyleClass *cur_style = NULL;
-	
+
 	cur = style_string;
 	max = cur + strlen( style_string );
+	DEBUG_MSG1("len: %d\n", strlen(style_string));
 	for( i=0; cur < max; ++cur ) {
-		DEBUG_MSG1("*cur: %c\n", *cur);
-		DEBUG_MSG1("%d,%d\n", save_class_name, save_attr_name);
-		switch( *cur ) {
-		case '\n':
-		case '\t':break;
-		case '}':
-		case ' ':
-			if( save_attr_name ) {
-				i = 0; break;
-			} else if( save_attr_value && i == 0 ) {
+		if( save_attr_name ) {
+			switch(*cur) {
+			case ' ': break;
+			case ':':
+				name_buff[i] = 0;
+				i = 0;
+				save_attr_name = FALSE;
+				save_attr_value = TRUE;
+				DEBUG_MSG1("end save, attr name: %s\n", name_buff);
 				break;
-			} else {
-				break;
+			default:
+				DEBUG_MSG1("name_buff[%d]: %c\n", i, *cur);
+				name_buff[i] = *cur;
+				++i;
 			}
-		case ';':
-			if( save_attr_value ) {
+			continue;
+		} else if( save_attr_value ) {
+			switch(*cur) {
+			case '}':
+			case ';':
+				DEBUG_MSG1("i==%d\n", i);
 				value_buff[i] = 0; i = 0;
 				StyleClass_SetStyleAttr( cur_style, NULL, name_buff, value_buff );
 				save_attr_name = TRUE;
 				save_attr_value = FALSE;
 				DEBUG_MSG1("add attr: %s = %s\n", name_buff, value_buff);
 				break;
+			case ' ':
+				if(i == 0) {
+					break;
+				}
+			default:
+				DEBUG_MSG1("name_buff[%d]: %c\n", i, *cur);
+				value_buff[i] = *cur;
+				++i;
 			}
-		case ':':
-			if( save_attr_name ) {
-				name_buff[i] = 0; i = 0;
-				save_attr_name = FALSE;
-				save_attr_value = TRUE;
-				DEBUG_MSG1("end save, attr name: %s\n", name_buff);
+			continue;
+		} else if( save_class_name ) {
+			switch(*cur) {
+			case ' ':
 				break;
-			}
-		case '{': 
-			if( save_class_name ) {
+			case '{':
 				name_buff[i] = 0; i = 0;
 				save_class_name = FALSE;
 				save_attr_name = TRUE;
 				cur_style = StyleLib_AddStyleClass( lib, name_buff );
 				DEBUG_MSG1("add class: %s\n", name_buff);
 				break;
-			}
-		case '.':
-			if( !save_class_name ) {
-				save_class_name = TRUE; i = 0; break;
-			}
-		default:
-			if( save_class_name || save_attr_name ) {
+			default:
 				DEBUG_MSG1("name_buff[%d]: %c\n", i, *cur);
-				name_buff[i] = *cur; ++i;
-			} else if( save_attr_value ) {
-				DEBUG_MSG1("value_buff[%d]: %c\n", i, *cur);
-				value_buff[i] = *cur; ++i;
+				name_buff[i] = *cur;
+				++i;
 			}
-			break;
+			continue;
+		}
+		if( *cur == '.' ) {
+			save_class_name = TRUE;
+			i = 0;
 		}
 	}
+	_DEBUG_MSG("quit\n");
 	return 0;
 }
 
