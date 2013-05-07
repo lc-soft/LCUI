@@ -1,4 +1,4 @@
-// ´Ë³ÌĞòÓÃÓÚ²âÊÔ²¿¼şµÄÑùÊ½×Ô¶¨Òå¹¦ÄÜ
+ï»¿// æ­¤ç¨‹åºç”¨äºæµ‹è¯•éƒ¨ä»¶çš„æ ·å¼è‡ªå®šä¹‰åŠŸèƒ½
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -11,7 +11,7 @@
 #include <io.h>
 #include <fcntl.h>
 
-/* ÔÚÔËĞĞ³ÌĞòÊ±»á´ò¿ª¿ØÖÆÌ¨£¬ÒÔ²é¿´´òÓ¡µÄµ÷ÊÔĞÅÏ¢ */
+/* åœ¨è¿è¡Œç¨‹åºæ—¶ä¼šæ‰“å¼€æ§åˆ¶å°ï¼Œä»¥æŸ¥çœ‹æ‰“å°çš„è°ƒè¯•ä¿¡æ¯ */
 static void InitConsoleWindow(void)
 {
 	int hCrt;
@@ -26,6 +26,7 @@ static void InitConsoleWindow(void)
 }
 #endif
 
+/* ç”¨äºè®°å½•éƒ¨ä»¶æ ·å¼çš„å­—ç¬¦ä¸² */
 char style_buff[256]={
 	".void-widget {"
 	"background-color:#B5E61D;"
@@ -43,13 +44,13 @@ int LCUIMainFunc( LCUI_ARGLIST )
 	InitConsoleWindow();
 #endif
 	LCUI_Init( LCUI_DEFAULT_CONFIG );
+	/* ä»å­—ç¬¦ä¸²ä¸­è½½å…¥æ ·å¼æ•°æ® */
 	WidgetStyle_LoadFromString( style_buff );
 	
-	/* ´´½¨²¿¼ş */
 	widget  = Widget_New(NULL);
 	Widget_SetBorder(widget, Border(1,BORDER_STYLE_SOLID, RGB(0,0,0)));
 	Widget_Resize( widget, Size(320, 240) );
 	Widget_Draw( widget );
 	Widget_Show( widget ); 
-	return LCUI_Main(); /* ½øÈëÖ÷Ñ­»· */
+	return LCUI_Main(); 
 }
