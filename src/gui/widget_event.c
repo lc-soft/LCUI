@@ -527,6 +527,7 @@ LCUIModule_Widget_Init( void )
 	LCUI_MouseButtonEvent_Connect( LCUI_HandleMouseButton, NULL );
 	LCUI_MouseMotionEvent_Connect( LCUI_HandleMouseMotion, NULL );
 	LCUI_KeyboardEvent_Connect( WidgetFocusProc, NULL );
+	WidgetStyle_LibraryInit();
 }
 
 /* 停用部件模块 */
@@ -536,6 +537,7 @@ LCUIModule_Widget_End( void )
 	Queue_Destroy( &LCUI_Sys.widget_list );
 	Queue_Destroy( &LCUI_Sys.update_buff );
 	Queue_Destroy( &widget_list );
+	WidgetStyle_LibraryDestroy();
 }
 /*************************** Event End *********************************/
 
