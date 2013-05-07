@@ -18,6 +18,9 @@ typedef struct {
 	LCUI_String attr_value;
 } LCUI_StyleAttr;
 
+LCUI_API void
+StyleLib_Free( LCUI_StyleLibrary *lib );
+
 /* 初始化样式库 */
 LCUI_API void
 StyleLib_Init( LCUI_StyleLibrary *lib );

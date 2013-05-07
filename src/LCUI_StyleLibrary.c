@@ -3,6 +3,13 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_STYLE_LIBRARY_H
+
+LCUI_API void
+StyleLib_Free( LCUI_StyleLibrary *lib )
+{
+	Queue_Destroy( &lib->style_classes );
+}
+
 /* 初始化样式库 */
 LCUI_API void
 StyleLib_Init( LCUI_StyleLibrary *lib )
@@ -240,7 +247,7 @@ StyleLib_AddStyleFromString(	LCUI_StyleLibrary *lib,
 			i = 0;
 		}
 	}
-	_DEBUG_MSG("quit\n");
+	DEBUG_MSG("quit\n");
 	return 0;
 }
 
