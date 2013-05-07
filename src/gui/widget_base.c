@@ -1936,10 +1936,13 @@ Widget_ExecRefresh(LCUI_Widget *widget)
 	Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
 }
 
+/* 执行部件的更新操作 */
 LCUI_API void
 Widget_ExecUpdate(LCUI_Widget *widget)
-/* 功能：执行部件的更新操作 */
 {
+	/* 将样式库中的属性同步至该部件 */
+	WidgetStyle_Sync( widget );
+	/* 调用回调函数进更新 */
 	WidgetFunc_Call( widget, FUNC_TYPE_UPDATE );
 }
 
@@ -1973,7 +1976,7 @@ Widget_ExecDraw(LCUI_Widget *widget)
 		return;
 	}
 	/* 先更新一次部件 */
-	WidgetFunc_Call( widget, FUNC_TYPE_UPDATE );
+	Widget_ExecUpdate( widget );
 	/* 然后根据部件样式，绘制背景图形 */
 	Widget_ExecDrawBackground( widget );
 	/* 调用该类型部件默认的函数进行处理 */
