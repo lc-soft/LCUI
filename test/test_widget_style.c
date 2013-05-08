@@ -26,16 +26,6 @@ static void InitConsoleWindow(void)
 }
 #endif
 
-/* 用于记录部件样式的字符串 */
-char style_buff[256]={
-	".void-widget {"
-	"background-color:#B5E61D;"
-	"background-image:logo_128x128.png;"
-	"background-transparent:0;"
-	"background-layout:center;"
-	"}"
-};
-
 int LCUIMainFunc( LCUI_ARGLIST )
 {
 	LCUI_Widget *widget;
@@ -44,8 +34,8 @@ int LCUIMainFunc( LCUI_ARGLIST )
 	InitConsoleWindow();
 #endif
 	LCUI_Init( LCUI_DEFAULT_CONFIG );
-	/* 从字符串中载入样式数据 */
-	WidgetStyle_LoadFromString( style_buff );
+	/* 从文件中载入样式数据 */
+	WidgetStyle_LoadFromFile( "style.css" );
 	
 	widget  = Widget_New(NULL);
 	Widget_SetBorder(widget, Border(1,BORDER_STYLE_SOLID, RGB(0,0,0)));
