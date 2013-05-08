@@ -169,92 +169,153 @@ StyleClass_SetStyleAttr(	LCUI_StyleClass *style_class,
 	return 0;
 }
 
+/* 记录样式扫描状态 */
+typedef struct style_scan_status {
+	int ch_pos;
+	char name_buff[256];
+	char value_buff[256];
+	LCUI_BOOL save_class_name;
+	LCUI_BOOL save_attr_name; 
+	LCUI_BOOL save_attr_value;
+	LCUI_StyleClass *cur_style;
+} style_scan_status;
+
+static void style_scan_status_init( style_scan_status *status )
+{
+	status->save_attr_name = FALSE;
+	status->save_attr_value = FALSE;
+	status->save_class_name = FALSE;
+	status->cur_style = NULL;
+	memset( status->name_buff, 0, sizeof(status->name_buff) );
+	memset( status->value_buff, 0, sizeof(status->value_buff) );
+}
+
+static void StyleLib_ScanStyle(
+		LCUI_StyleLibrary *lib,
+		style_scan_status *status,
+		const char *style_string,
+		int max_len )
+{
+	const char *cur, *max;
+
+	cur = style_string;
+	max = cur + max_len;
+	DEBUG_MSG1("len: %d\n", strlen(style_string));
+	for( status->ch_pos=0; cur<max && *cur!='\0'; ++cur ) {
+		if( status->save_attr_name ) {
+			switch(*cur) {
+			case '\r':
+			case '\t':
+			case '\n':
+			case ' ': break;
+			case ':':
+				status->name_buff[status->ch_pos] = 0;
+				status->ch_pos = 0;
+				status->save_attr_name = FALSE;
+				status->save_attr_value = TRUE;
+				DEBUG_MSG1("end save, attr name: %s\n", status->name_buff);
+				break;
+			default:
+				DEBUG_MSG1("name_buff[%d]: %c\n", status->ch_pos, *cur);
+				status->name_buff[status->ch_pos] = *cur;
+				++status->ch_pos;
+			}
+			continue;
+		} else if( status->save_attr_value ) {
+			switch(*cur) {
+			case '\r':
+			case '\t':
+			case '\n':
+				break;
+			case '}':
+			case ';':
+				DEBUG_MSG1("i==%d\n", status->ch_pos);
+				status->value_buff[status->ch_pos] = 0;
+				status->ch_pos = 0;
+				StyleClass_SetStyleAttr( status->cur_style, NULL, status->name_buff, status->value_buff );
+				status->save_attr_name = TRUE;
+				status->save_attr_value = FALSE;
+				DEBUG_MSG1("add attr: %s = %s\n\n", status->name_buff, status->value_buff);
+				break;
+			case ' ':
+				if(status->ch_pos == 0) {
+					break;
+				}
+			default:
+				DEBUG_MSG1("value_buff[%d]: %c\n", status->ch_pos, *cur);
+				status->value_buff[status->ch_pos] = *cur;
+				++status->ch_pos;
+			}
+			continue;
+		} else if( status->save_class_name ) {
+			switch(*cur) {
+			case '\r':
+			case '\t':
+			case '\n':
+			case ' ':
+				break;
+			case '{':
+				status->name_buff[status->ch_pos] = 0;
+				status->ch_pos = 0;
+				status->save_class_name = FALSE;
+				status->save_attr_name = TRUE;
+				status->cur_style = StyleLib_AddStyleClass( lib, status->name_buff );
+				DEBUG_MSG1("add class: %s\n", status->name_buff);
+				break;
+			default:
+				DEBUG_MSG1("name_buff[%d]: %c\n", status->ch_pos, *cur);
+				status->name_buff[status->ch_pos] = *cur;
+				++status->ch_pos;
+			}
+			continue;
+		}
+		if( *cur == '.' ) {
+			status->save_class_name = TRUE;
+			status->ch_pos = 0;
+		}
+	}
+	DEBUG_MSG1("quit\n");
+}
+
 /* 根据字符串的内容，往样式库里添加相应样式 */
 LCUI_API int
 StyleLib_AddStyleFromString(	LCUI_StyleLibrary *lib,
 				const char *style_string )
 {
-	int		i;
-	const char	*cur, *max;
-	char		name_buff[256], value_buff[256];
-	LCUI_BOOL	save_class_name = FALSE, 
-			save_attr_name = FALSE, 
-			save_attr_value = FALSE;
-	
-	LCUI_StyleClass *cur_style = NULL;
-
-	cur = style_string;
-	max = cur + strlen( style_string );
-	DEBUG_MSG1("len: %d\n", strlen(style_string));
-	for( i=0; cur < max; ++cur ) {
-		if( save_attr_name ) {
-			switch(*cur) {
-			case ' ': break;
-			case ':':
-				name_buff[i] = 0;
-				i = 0;
-				save_attr_name = FALSE;
-				save_attr_value = TRUE;
-				DEBUG_MSG1("end save, attr name: %s\n", name_buff);
-				break;
-			default:
-				DEBUG_MSG1("name_buff[%d]: %c\n", i, *cur);
-				name_buff[i] = *cur;
-				++i;
-			}
-			continue;
-		} else if( save_attr_value ) {
-			switch(*cur) {
-			case '}':
-			case ';':
-				DEBUG_MSG1("i==%d\n", i);
-				value_buff[i] = 0; i = 0;
-				StyleClass_SetStyleAttr( cur_style, NULL, name_buff, value_buff );
-				save_attr_name = TRUE;
-				save_attr_value = FALSE;
-				DEBUG_MSG1("add attr: %s = %s\n", name_buff, value_buff);
-				break;
-			case ' ':
-				if(i == 0) {
-					break;
-				}
-			default:
-				DEBUG_MSG1("name_buff[%d]: %c\n", i, *cur);
-				value_buff[i] = *cur;
-				++i;
-			}
-			continue;
-		} else if( save_class_name ) {
-			switch(*cur) {
-			case ' ':
-				break;
-			case '{':
-				name_buff[i] = 0; i = 0;
-				save_class_name = FALSE;
-				save_attr_name = TRUE;
-				cur_style = StyleLib_AddStyleClass( lib, name_buff );
-				DEBUG_MSG1("add class: %s\n", name_buff);
-				break;
-			default:
-				DEBUG_MSG1("name_buff[%d]: %c\n", i, *cur);
-				name_buff[i] = *cur;
-				++i;
-			}
-			continue;
-		}
-		if( *cur == '.' ) {
-			save_class_name = TRUE;
-			i = 0;
-		}
-	}
-	DEBUG_MSG("quit\n");
+	style_scan_status status;
+	style_scan_status_init( &status );
+	StyleLib_ScanStyle( lib, &status, style_string, strlen(style_string) );
 	return 0;
 }
+
+#define BUFFER_SIZE 512
 
 /* 根据指定文件内的数据，往样式库里添加相应样式 */
 LCUI_API int
 StyleLib_AddStyleFromFile(	LCUI_StyleLibrary *lib,
 				const char *filepath )
 {
+	char *buff;
+	FILE *fp;
+	style_scan_status status;
+	buff = (char*)malloc(sizeof(char)*BUFFER_SIZE);
+	if( buff == NULL ) {
+		return -1;
+	}
+	DEBUG_MSG1("open file: %s\n", filepath);
+	/* 先初始化样式扫描状态 */
+	style_scan_status_init( &status );
+	/* 打开文件 */
+	fp = fopen( filepath, "rb" );
+	if(fp == NULL) {
+		DEBUG_MSG1("open file fail\n");
+		return -2;
+	}
+	DEBUG_MSG1("open file success\n");
+	/* 分段读取文件内容，并解析样式数据 */
+	while( fread(buff, sizeof(char), BUFFER_SIZE, fp) ) {
+		StyleLib_ScanStyle( lib, &status, buff, BUFFER_SIZE );
+	}
+	fclose( fp );
 	return 0;
 }

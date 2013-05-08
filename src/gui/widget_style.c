@@ -72,6 +72,11 @@ LCUI_API int WidgetStyle_LoadFromString( const char *style_str )
 	return StyleLib_AddStyleFromString( &style_library, style_str );
 }
 
+LCUI_API int WidgetStyle_LoadFromFile( const char *filepath )
+{
+	return StyleLib_AddStyleFromFile( &style_library, filepath );
+}
+
 /* 从字符串中指定段内获取出16进制的数 */
 static int str_scan_hex_number( const char *str, int start, int end )
 {
