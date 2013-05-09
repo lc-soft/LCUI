@@ -218,11 +218,38 @@ static int WidgetStyle_SyncBorder(
 	return 0;
 }
 
+/* 根据部件样式，同步部件的尺寸 */
 static int WidgetStyle_SyncSize(
 		LCUI_Widget *widget,
 		LCUI_StyleClass *style_class,
 		const char *pseudo_class_name )
 {
+	int ret;
+	char *attr_value;
+	IntOrFloat_t num;
+	LCUI_StyleAttr *widget_attr;
+	
+	widget_attr = StyleLib_GetStyleAttr( style_class, 
+			pseudo_class_name, "width");
+	if( widget_attr != NULL ) {
+		attr_value = widget_attr->attr_value.string;
+		ret = GetIntOrFloat( attr_value, &num );
+		if( ret == 0 ) {
+			widget->w = num;
+			Widget_UpdateSize( widget );
+		}
+	}
+
+	widget_attr = StyleLib_GetStyleAttr( style_class, 
+			pseudo_class_name, "height");
+	if( widget_attr != NULL ) {
+		attr_value = widget_attr->attr_value.string;
+		ret = GetIntOrFloat( attr_value, &num );
+		if( ret == 0 ) {
+			widget->h = num;
+			Widget_UpdateSize( widget );
+		}
+	}
 	return 0;
 }
 
