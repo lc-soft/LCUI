@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * misc.c -- 没有具体分类的杂项功能
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -194,9 +194,9 @@ Pos_Sub( LCUI_Pos a, LCUI_Pos b )
 	return a;
 }
 
-/* 初始化PX_P_t */
+/* 初始化IntOrFloat_t */
 LCUI_API void
-PX_P_t_init( PX_P_t *combo_num )
+IntOrFloat_Init( IntOrFloat_t *combo_num )
 {
 	combo_num->which_one = 0;
 	combo_num->px = 0;
@@ -214,7 +214,7 @@ PX_PT_t_init( PX_PT_t *combo_num )
 
 /* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是百分比 */
 LCUI_API int
-get_PX_P_t( char *str, PX_P_t *combo_num )
+GetIntOrFloat( char *str, IntOrFloat_t *combo_num )
 {
 	char buff[256];
 	int j, i, len; 

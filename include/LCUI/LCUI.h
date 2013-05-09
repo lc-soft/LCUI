@@ -1,8 +1,8 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * LCUI.h -- Records with common data type definitions, macro definitions and
  * function declarations
  *
- * Copyright (C) 2013 by
+ * Copyright (C) 2012-2013 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -289,7 +289,7 @@ typedef struct PX_P_t_ {
 	LCUI_BOOL which_one;	/* 指定用哪个类型的变量 */
 	int px;			/* 数值，单位为像素 */
 	double scale;		/* 比例 */
-} PX_P_t;
+} IntOrFloat_t;
 /*---------------------- END -------------------------*/
 
 /*----------------- 用于表示字体大小 --------------------*/

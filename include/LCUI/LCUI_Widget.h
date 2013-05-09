@@ -118,9 +118,9 @@ struct LCUI_Widget_ {
 	LCUI_Pos max_pos;
 	LCUI_Pos min_pos;
 	/*------------ 位置（描述） ---------------*/
-	PX_P_t x, y;
-	PX_P_t max_x, min_x;
-	PX_P_t max_y, min_y;
+	IntOrFloat_t x, y;
+	IntOrFloat_t max_x, min_x;
+	IntOrFloat_t max_y, min_y;
 	/*-------------- END -------------------*/
 
 	LCUI_Size size; /* 已计算出的实际尺寸，单位为像素 */
@@ -128,9 +128,9 @@ struct LCUI_Widget_ {
 	LCUI_Size min_size;
 
 	/*------------ 尺寸（描述） ---------------*/
-	PX_P_t w, h;
-	PX_P_t max_w, min_w;
-	PX_P_t max_h, min_h;
+	IntOrFloat_t w, h;
+	IntOrFloat_t max_w, min_w;
+	IntOrFloat_t max_h, min_h;
 	/*--------------- END -------------------*/
 
 	/*----------------- 部件布局相关 ----------------*/
