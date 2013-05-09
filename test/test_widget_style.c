@@ -36,11 +36,9 @@ int LCUIMainFunc( LCUI_ARGLIST )
 	LCUI_Init( LCUI_DEFAULT_CONFIG );
 	/* 从文件中载入样式数据 */
 	WidgetStyle_LoadFromFile( "style.css" );
-	
-	widget  = Widget_New(NULL);
+	widget = Widget_New(NULL);
 	Widget_SetBorder(widget, Border(1,BORDER_STYLE_SOLID, RGB(0,0,0)));
-	Widget_Resize( widget, Size(320, 240) );
 	Widget_Draw( widget );
-	Widget_Show( widget ); 
-	return LCUI_Main(); 
+	Widget_Show( widget );
+	return LCUI_Main();
 }
