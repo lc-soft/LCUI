@@ -1,4 +1,6 @@
 .void-widget {
+	width:100%;
+	height:100%;
 	background-color:#B5E61D;
 	background-image:logo_128x128.png;
 	background-transparent:0;
