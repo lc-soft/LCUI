@@ -1225,22 +1225,22 @@ Widget_New( const char *widget_type )
 	/*------------------------- END --------------------------*/
 
 	/*--------------- 初始化部件的附加属性 ------------------*/
-	PX_P_t_init( &widget->x );
-	PX_P_t_init( &widget->y );
-	PX_P_t_init( &widget->max_x );
-	PX_P_t_init( &widget->max_y );
-	PX_P_t_init( &widget->min_x );
-	PX_P_t_init( &widget->min_y );
+	IntOrFloat_Init( &widget->x );
+	IntOrFloat_Init( &widget->y );
+	IntOrFloat_Init( &widget->max_x );
+	IntOrFloat_Init( &widget->max_y );
+	IntOrFloat_Init( &widget->min_x );
+	IntOrFloat_Init( &widget->min_y );
 	widget->max_x.px = INT_MAX;
 	widget->max_y.px = INT_MAX;
 	widget->min_x.px = INT_MIN;
 	widget->min_y.px = INT_MIN;
-	PX_P_t_init( &widget->w );
-	PX_P_t_init( &widget->h );
-	PX_P_t_init( &widget->max_w );
-	PX_P_t_init( &widget->max_h );
-	PX_P_t_init( &widget->min_w );
-	PX_P_t_init( &widget->min_h );
+	IntOrFloat_Init( &widget->w );
+	IntOrFloat_Init( &widget->h );
+	IntOrFloat_Init( &widget->max_w );
+	IntOrFloat_Init( &widget->max_h );
+	IntOrFloat_Init( &widget->min_w );
+	IntOrFloat_Init( &widget->min_h );
 	/*---------------------- END -----------------------*/
 
 	/*------------- 函数指针初始化 ------------------*/
@@ -1386,8 +1386,8 @@ Widget_SetMaxSize( LCUI_Widget *widget, char *width, char *height )
  * */
 {
 	int n;
-	n = get_PX_P_t( width, &widget->max_w );
-	n += get_PX_P_t( width, &widget->max_h );
+	n = GetIntOrFloat( width, &widget->max_w );
+	n += GetIntOrFloat( width, &widget->max_h );
 	return n;
 }
 
@@ -1399,8 +1399,8 @@ Widget_SetMinSize( LCUI_Widget *widget, char *width, char *height )
  * */
 {
 	int n;
-	n = get_PX_P_t( width, &widget->min_w );
-	n += get_PX_P_t( width, &widget->min_h );
+	n = GetIntOrFloat( width, &widget->min_w );
+	n += GetIntOrFloat( width, &widget->min_h );
 	return n;
 }
 
@@ -2156,16 +2156,16 @@ Widget_SetSize( LCUI_Widget *widget, char *width, char *height )
 	switch( widget->dock ) {
 	    case DOCK_TYPE_TOP:
 	    case DOCK_TYPE_BOTTOM: /* 只能改变高 */
-		get_PX_P_t( height, &widget->h );
+		GetIntOrFloat( height, &widget->h );
 		break;
 	    case DOCK_TYPE_LEFT:
 	    case DOCK_TYPE_RIGHT:/* 只能改变宽 */
-		get_PX_P_t( width, &widget->w );
+		GetIntOrFloat( width, &widget->w );
 		break;
 	    case DOCK_TYPE_FILL:break;
 	    case DOCK_TYPE_NONE: /* 可改变宽和高 */
-		get_PX_P_t( width, &widget->w );
-		get_PX_P_t( height, &widget->h );
+		GetIntOrFloat( width, &widget->w );
+		GetIntOrFloat( height, &widget->h );
 		break;
 	}
 	Widget_UpdateSize( widget );
