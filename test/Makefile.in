@@ -62,10 +62,10 @@ noinst_PROGRAMS = helloworld$(EXEEXT) test_font$(EXEEXT) \
 	test_widget_1$(EXEEXT) test_widget_2$(EXEEXT) \
 	test_widget_3$(EXEEXT) test_widget_4$(EXEEXT) \
 	test_widget_5$(EXEEXT) test_widget_6$(EXEEXT) \
-	test_timer$(EXEEXT) test_textbox$(EXEEXT) \
-	test_scrollbar$(EXEEXT) graph2array$(EXEEXT) \
-	test_graphlayer$(EXEEXT) test_stylelib$(EXEEXT) \
-	test_messagebox$(EXEEXT)
+	test_widget_style$(EXEEXT) test_timer$(EXEEXT) \
+	test_textbox$(EXEEXT) test_scrollbar$(EXEEXT) \
+	graph2array$(EXEEXT) test_graphlayer$(EXEEXT) \
+	test_stylelib$(EXEEXT) test_messagebox$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -155,6 +155,9 @@ test_widget_5_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_widget_6_OBJECTS = test_widget_6.$(OBJEXT)
 test_widget_6_OBJECTS = $(am_test_widget_6_OBJECTS)
 test_widget_6_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
+am_test_widget_style_OBJECTS = test_widget_style.$(OBJEXT)
+test_widget_style_OBJECTS = $(am_test_widget_style_OBJECTS)
+test_widget_style_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 am_test_window_OBJECTS = test_window.$(OBJEXT)
 test_window_OBJECTS = $(am_test_window_OBJECTS)
 test_window_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
@@ -199,8 +202,8 @@ SOURCES = $(graph2array_SOURCES) $(helloworld_SOURCES) \
 	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
 	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
 	$(test_widget_4_SOURCES) $(test_widget_5_SOURCES) \
-	$(test_widget_6_SOURCES) $(test_window_SOURCES) \
-	$(ts_calibrate_SOURCES)
+	$(test_widget_6_SOURCES) $(test_widget_style_SOURCES) \
+	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 DIST_SOURCES = $(graph2array_SOURCES) $(helloworld_SOURCES) \
 	$(test_button_SOURCES) $(test_checkbox_SOURCES) \
 	$(test_font_SOURCES) $(test_gaussian_blur_SOURCES) \
@@ -213,8 +216,8 @@ DIST_SOURCES = $(graph2array_SOURCES) $(helloworld_SOURCES) \
 	$(test_viewimage_SOURCES) $(test_widget_1_SOURCES) \
 	$(test_widget_2_SOURCES) $(test_widget_3_SOURCES) \
 	$(test_widget_4_SOURCES) $(test_widget_5_SOURCES) \
-	$(test_widget_6_SOURCES) $(test_window_SOURCES) \
-	$(ts_calibrate_SOURCES)
+	$(test_widget_6_SOURCES) $(test_widget_style_SOURCES) \
+	$(test_window_SOURCES) $(ts_calibrate_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -386,7 +389,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = mora photoviewer screenlock clock 
+SUBDIRS = mora photoviewer screenlock clock
 INCLUDES = -I$(top_builddir)/include
 helloworld_SOURCES = helloworld.c
 helloworld_LDADD = $(top_builddir)/src/libLCUI.la
@@ -442,6 +445,8 @@ test_graphlayer_SOURCES = test_graphlayer.c
 test_graphlayer_LDADD = $(top_builddir)/src/libLCUI.la
 test_messagebox_SOURCES = test_messagebox.c
 test_messagebox_LDADD = $(top_builddir)/src/libLCUI.la
+test_widget_style_SOURCES = test_widget_style.c
+test_widget_style_LDADD = $(top_builddir)/src/libLCUI.la
 all: all-recursive
 
 .SUFFIXES:
@@ -560,6 +565,9 @@ test_widget_5$(EXEEXT): $(test_widget_5_OBJECTS) $(test_widget_5_DEPENDENCIES) $
 test_widget_6$(EXEEXT): $(test_widget_6_OBJECTS) $(test_widget_6_DEPENDENCIES) $(EXTRA_test_widget_6_DEPENDENCIES) 
 	@rm -f test_widget_6$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_widget_6_OBJECTS) $(test_widget_6_LDADD) $(LIBS)
+test_widget_style$(EXEEXT): $(test_widget_style_OBJECTS) $(test_widget_style_DEPENDENCIES) $(EXTRA_test_widget_style_DEPENDENCIES) 
+	@rm -f test_widget_style$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_widget_style_OBJECTS) $(test_widget_style_LDADD) $(LIBS)
 test_window$(EXEEXT): $(test_window_OBJECTS) $(test_window_DEPENDENCIES) $(EXTRA_test_window_DEPENDENCIES) 
 	@rm -f test_window$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_window_OBJECTS) $(test_window_LDADD) $(LIBS)
@@ -598,6 +606,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_widget_4.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_widget_5.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_widget_6.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_widget_style.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_window.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ts_calibrate.Po@am__quote@
 

@@ -1,12 +1,12 @@
 AUTOMAKE_OPTIONS=foreign
-SUBDIRS=mora photoviewer screenlock clock 
+SUBDIRS=mora photoviewer screenlock clock
 ##设定在编译时头文件的查找位置
 INCLUDES = -I$(top_builddir)/include
 ##需要编译的测试程序, noinst指的是不安装
 noinst_PROGRAMS = helloworld test_font test_radiobtn test_checkbox test_progressbar \
 test_button test_label test_loading ts_calibrate test_viewimage test_lcui_graph_mix \
 test_window test_rect_cut test_gaussian_blur test_widget_1 test_widget_2 test_widget_3 \
-test_widget_4 test_widget_5 test_widget_6 \
+test_widget_4 test_widget_5 test_widget_6 test_widget_style\
 test_timer test_textbox test_scrollbar graph2array test_graphlayer test_stylelib \
 test_messagebox
 
@@ -93,3 +93,6 @@ test_graphlayer_LDADD	= $(top_builddir)/src/libLCUI.la
 
 test_messagebox_SOURCES	= test_messagebox.c
 test_messagebox_LDADD	= $(top_builddir)/src/libLCUI.la
+
+test_widget_style_SOURCES = test_widget_style.c
+test_widget_style_LDADD = $(top_builddir)/src/libLCUI.la

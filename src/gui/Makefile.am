@@ -5,6 +5,7 @@ libgui_la_SOURCES =\
 widget_base.c		\
 widget_event.c		\
 widget_library.c	\
+widget_style.c		\
 messagebox.c		\
 widget/activebox.c	\
 widget/button.c		\
