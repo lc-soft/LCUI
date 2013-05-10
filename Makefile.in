@@ -294,18 +294,12 @@ pkgconfigdir = $(prefix)/lib/pkgconfig
 pkgconfig_DATA = $(PACKAGE).pc
 EXTRA_DIST = README README.zh-cn.md README.md fonts/README.zh-cn \
 build/VisualStudio/LCUI.sln \
-build/VisualStudio/graph2array/graph2array.vcxproj \
-build/VisualStudio/graph2array/graph2array.vcxproj.filters \
 build/VisualStudio/LCUI/LCUI.vcxproj \
 build/VisualStudio/LCUI/LCUI.vcxproj.filters \
 build/VisualStudio/LCUI/LCUI.rc \
 build/VisualStudio/LCUI/resource.h \
-build/VisualStudio/test_gaussian_blur/test_gaussian_blur.vcxproj \
-build/VisualStudio/test_gaussian_blur/test_gaussian_blur.vcxproj.filters \
 build/VisualStudio/helloworld/helloworld.vcxproj \
 build/VisualStudio/helloworld/helloworld.vcxproj.filters \
-build/VisualStudio/test_checkbox/test_checkbox.vcxproj \
-build/VisualStudio/test_checkbox/test_checkbox.vcxproj.filters \
 build/VisualStudio/include/ft2build.h \
 build/VisualStudio/include/jconfig.h \
 build/VisualStudio/include/jerror.h \
@@ -404,6 +398,7 @@ test/test_widget_3.c \
 test/test_widget_4.c \
 test/test_widget_5.c \
 test/test_widget_6.c \
+test/test_widget_style.c \
 test/test_timer.c \
 test/test_textbox.c \
 test/faceback.png \
