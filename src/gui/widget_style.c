@@ -105,7 +105,7 @@ static int style_color_convert( const char *style_str, LCUI_RGB *rgb )
 	len = strlen(style_str);
 	if(style_str[0] == '#') {
 		switch(len) {
-		case 4: 
+		case 4:
 			r = str_scan_hex_number( style_str, 1, 2 );
 			g = str_scan_hex_number( style_str, 2, 3 );
 			b = str_scan_hex_number( style_str, 3, 4 );
@@ -154,7 +154,7 @@ static int WidgetStyle_SyncBackground(
 		}
 	}
 
-	widget_attr = StyleLib_GetStyleAttr( style_class, 
+	widget_attr = StyleLib_GetStyleAttr( style_class,
 			pseudo_class_name, "background-image");
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->attr_value.string;
@@ -166,7 +166,7 @@ static int WidgetStyle_SyncBackground(
 		}
 	}
 
-	widget_attr = StyleLib_GetStyleAttr( style_class, 
+	widget_attr = StyleLib_GetStyleAttr( style_class,
 			pseudo_class_name, "background-transparent");
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->attr_value.string;
@@ -174,14 +174,14 @@ static int WidgetStyle_SyncBackground(
 		if( strcmp("1", attr_value) == 0
 		 || lcui_strcasecmp("true",attr_value) == 0) {
 			Widget_SetBackgroundTransparent( widget, TRUE );
-		 } 
+		 }
 		else if( strcmp("0", attr_value) == 0
 		 || lcui_strcasecmp("false",attr_value) == 0 ) {
 			Widget_SetBackgroundTransparent( widget, FALSE );
 		 }
 	}
-	
-	widget_attr = StyleLib_GetStyleAttr( style_class, 
+
+	widget_attr = StyleLib_GetStyleAttr( style_class,
 			pseudo_class_name, "background-layout");
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->attr_value.string;
@@ -217,6 +217,7 @@ static int WidgetStyle_SyncPostion(
 	LCUI_StyleAttr *widget_attr;
 
 	offset.x = offset.y = 0;
+	align = widget->align;
 	IntOrFloat_Init( &num );
 	/* 获取align属性的值 */
 	widget_attr = StyleLib_GetStyleAttr( style_class,
@@ -243,8 +244,6 @@ static int WidgetStyle_SyncPostion(
 			align = ALIGN_BOTTOM_CENTER;
 		} else if( lcui_strcasecmp("bottom-right",attr_value) == 0 ) {
 			align = ALIGN_BOTTOM_RIGHT;
-		} else {
-			align = widget->align;
 		}
 	}
 	/* 获取left属性的值 */
@@ -403,8 +402,8 @@ static int WidgetStyle_SyncSize(
 	char *attr_value;
 	IntOrFloat_t num;
 	LCUI_StyleAttr *widget_attr;
-	
-	widget_attr = StyleLib_GetStyleAttr( style_class, 
+
+	widget_attr = StyleLib_GetStyleAttr( style_class,
 			pseudo_class_name, "width");
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->attr_value.string;
@@ -415,7 +414,7 @@ static int WidgetStyle_SyncSize(
 		}
 	}
 
-	widget_attr = StyleLib_GetStyleAttr( style_class, 
+	widget_attr = StyleLib_GetStyleAttr( style_class,
 			pseudo_class_name, "height");
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->attr_value.string;
