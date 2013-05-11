@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * widget_base.c -- the widget base operation set.
  *
  * Copyright (C) 2012-2013 by
@@ -1490,8 +1490,8 @@ LCUI_API void
 Widget_SetBorder( LCUI_Widget *widget, LCUI_Border border )
 {
 	widget->border = border;
-	Widget_Draw( widget );
-	Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
+	//Widget_Draw( widget );
+	//Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
 }
 
 /* 设定部件边框的四个角的圆角半径 */
@@ -1909,7 +1909,10 @@ Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 	WidgetFunc_Call( widget, FUNC_TYPE_RESIZE );
 	//Widget_Refresh( widget );
 
-	Widget_UpdateChildSize( widget ); /* 更新子部件的位置及尺寸 */
+	/* 更新子部件的位置及尺寸 */
+	Widget_UpdateChildSize( widget );
+	Widget_UpdateChildPos( widget );
+
 	if( widget->parent && widget->parent->auto_size ) {
 		/* 如果需要让它的容器能够自动调整大小 */
 		Widget_AutoResize( widget->parent );
@@ -2094,8 +2097,11 @@ Widget_UpdateChildSize(LCUI_Widget *widget)
 		if( !child ) {
 			continue;
 		}
-		Widget_UpdateSize( child );
-		Widget_UpdatePos( child );
+		/* 如果该子部件的尺寸是使用百分比的 */
+		if( child->w.which_one == 1
+		 || child->h.which_one == 1 ) {
+			Widget_UpdateSize( child );
+		}
 	}
 }
 
@@ -2120,6 +2126,9 @@ Widget_UpdateChildPos(LCUI_Widget *widget)
 	total = Queue_GetTotal(&widget->child);
 	for(i=0; i<total; ++i) {
 		child = (LCUI_Widget*)Queue_Get(&widget->child, i);
+		if( child == NULL ) {
+			continue;
+		}
 		Widget_UpdatePos( child );
 	}
 	/* 更新该部件内定位类型为static的子部件的位置 */
