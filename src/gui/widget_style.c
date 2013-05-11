@@ -97,7 +97,7 @@ static int str_scan_hex_number( const char *str, int start, int end )
 }
 
 /* 从字符串中获取RGB值，获取失败则返回0 */
-static int style_color_covernt( const char *style_str, LCUI_RGB *rgb )
+static int style_color_convert( const char *style_str, LCUI_RGB *rgb )
 {
 	int len;
 	uchar_t r, g, b;
@@ -117,16 +117,16 @@ static int style_color_covernt( const char *style_str, LCUI_RGB *rgb )
 			b = str_scan_hex_number( style_str, 5, 7 );
 			break;
 		default:
-			return 0;
+			return -1;
 		}
 	} else {
-		return 0;
+		return -1;
 	}
 	rgb->red = r;
 	rgb->green = g;
 	rgb->blue = b;
 	DEBUG_MSG("%d,%d,%d\n", r,g,b);
-	return 3;
+	return 0;
 }
 
 /* 根据部件的样式，同步设置部件的背景 */
@@ -148,8 +148,8 @@ static int WidgetStyle_SyncBackground(
 		/* 引用属性值 */
 		attr_value = widget_attr->attr_value.string;
 		/* 将属性值转换成颜色数据 */
-		ret = style_color_covernt( attr_value, &back_color );
-		if( ret > 0 ) { /* 如果转换成功，则设置部件背景色 */
+		ret = style_color_convert( attr_value, &back_color );
+		if( ret != -1 ) { /* 如果转换成功，则设置部件背景色 */
 			Widget_SetBackgroundColor( widget, back_color );
 		}
 	}
@@ -283,11 +283,113 @@ static int WidgetStyle_SyncPostion(
 	return 0;
 }
 
+
+/* 从字符串中获取边框数据，获取失败则返回-1 */
+static int style_border_convert( const char *style_str, LCUI_Border *border )
+{
+	int i;
+	char buff[64];
+	const char *str_ptr;
+	LCUI_RGB color;
+	IntOrFloat_t num;
+	BORDER_STYLE style_type;
+	LCUI_BOOL have_color=FALSE, have_size=FALSE, have_type=FALSE;
+
+	IntOrFloat_Init( &num );
+	str_ptr = style_str;
+	while(1) {
+		for(i=0; i<64; ++i) {
+			if( *str_ptr == ' ' ) {
+				++str_ptr;
+				break;
+			}
+			if( *str_ptr == 0 ) {
+				break;
+			}
+			buff[i] = *str_ptr;
+			++str_ptr;
+		}
+		buff[i] = 0;
+		if( style_color_convert(buff,&color) != -1 ) {
+			/* 如果已经有了边框颜色 */
+			if( have_color ) {
+				return -1;
+			}
+			have_color = TRUE;
+		} else if( GetIntOrFloat(buff, &num) != -1 ) {
+			/* 如果已经有了边框大小 */
+			if( have_size ) {
+				return -1;
+			}
+			/* 不支持百分比 */
+			if( num.which_one == 1 ) {
+				return -1;
+			}
+			have_size = TRUE;
+		} else if( lcui_strcasecmp(buff,"solid") == 0 ) {
+			if( have_type ) {
+				return -1;
+			}
+			style_type = BORDER_STYLE_SOLID;
+			have_type = TRUE;
+		} else if( lcui_strcasecmp(buff,"none") == 0 ) {
+			if( have_type ) {
+				return -1;
+			}
+			style_type = BORDER_STYLE_NONE;
+			have_type = TRUE;
+		} else if( lcui_strcasecmp(buff,"dotted") == 0 ) {
+			if( have_type ) {
+				return -1;
+			}
+			style_type = BORDER_STYLE_DOTTED;
+			have_type = TRUE;
+		} else if( lcui_strcasecmp(buff,"double") == 0 ) {
+			if( have_type ) {
+				return -1;
+			}
+			style_type = BORDER_STYLE_DOUBLE;
+			have_type = TRUE;
+		} else if( lcui_strcasecmp(buff,"dashed") == 0 ) {
+			if( have_type ) {
+				return -1;
+			}
+			style_type = BORDER_STYLE_DASHED;
+			have_type = TRUE;
+		}
+		if( *str_ptr == 0 ) {
+			break;
+		}
+	}
+	if( have_color && have_size && have_type ) {
+		*border = Border( num.px, style_type, color );
+		return 0;
+	}
+	return -1;
+}
+
 static int WidgetStyle_SyncBorder(
 		LCUI_Widget *widget,
 		LCUI_StyleClass *style_class,
 		const char *pseudo_class_name )
 {
+	int ret;
+	LCUI_Border border;
+	char *attr_value;
+	IntOrFloat_t num;
+	LCUI_StyleAttr *widget_attr;
+
+	IntOrFloat_Init( &num );
+	/* 获取border属性的值 */
+	widget_attr = StyleLib_GetStyleAttr( style_class,
+			pseudo_class_name, "border");
+	if( widget_attr != NULL ) {
+		attr_value = widget_attr->attr_value.string;
+		ret = style_border_convert( attr_value, &border );
+		if( ret != -1 ) {
+			Widget_SetBorder( widget, border );
+		}
+	}
 	return 0;
 }
 
