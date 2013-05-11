@@ -43,6 +43,7 @@
 #define __LCUI_WIDGET_BASE_H__
 /* 定义数据类型标识 */
 typedef enum DATATYPE_{
+	DATATYPE_NONE,
 	DATATYPE_POS,
 	DATATYPE_POS_TYPE,
 	DATATYPE_SIZE,
@@ -420,7 +421,7 @@ LCUI_API void
 Widget_AutoResize(LCUI_Widget *widget);
 
 /* 执行改变部件尺寸的操作 */
-LCUI_API void
+LCUI_API int
 Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size);
 
 /* 启用或禁用部件的自动尺寸调整功能 */
@@ -481,7 +482,7 @@ Widget_UpdateSize( LCUI_Widget *widget );
 LCUI_API void
 Widget_UpdateChildSize(LCUI_Widget *widget);
 
-LCUI_API void
+LCUI_API int
 Widget_ExecUpdateSize( LCUI_Widget *widget );
 
 /*
@@ -574,7 +575,7 @@ WidgetUpdateBuff_Init( LCUI_Queue *queue );
  * 返回值：正常返回不小于0的值
  *  */
 LCUI_API int
-Record_WidgetUpdate( LCUI_Widget *widget, void *data, DATATYPE type, int flag );
+Widget_RecordUpdate( LCUI_Widget *widget, void *data, DATATYPE type, int flag );
 
 LCUI_API void
 Widget_ProcessUpdate( LCUI_Widget *widget );
