@@ -129,6 +129,7 @@ static int style_color_covernt( const char *style_str, LCUI_RGB *rgb )
 	return 3;
 }
 
+/* 根据部件的样式，同步设置部件的背景 */
 static int WidgetStyle_SyncBackground(
 		LCUI_Widget *widget,
 		LCUI_StyleClass *style_class,
@@ -202,11 +203,83 @@ static int WidgetStyle_SyncBackground(
 	return 0;
 }
 
+/* 根据样式，同步部件的定位 */
 static int WidgetStyle_SyncPostion(
 		LCUI_Widget *widget,
 		LCUI_StyleClass *style_class,
 		const char *pseudo_class_name )
 {
+	int ret;
+	LCUI_Pos offset;
+	char *attr_value;
+	IntOrFloat_t num;
+	ALIGN_TYPE align;
+	LCUI_StyleAttr *widget_attr;
+
+	offset.x = offset.y = 0;
+	IntOrFloat_Init( &num );
+	/* 获取align属性的值 */
+	widget_attr = StyleLib_GetStyleAttr( style_class,
+			pseudo_class_name, "align");
+	if( widget_attr != NULL ) {
+		attr_value = widget_attr->attr_value.string;
+		if( lcui_strcasecmp("none",attr_value) == 0 ) {
+			align = ALIGN_NONE;
+		} else if( lcui_strcasecmp("top-left",attr_value) == 0 ) {
+			align = ALIGN_TOP_LEFT;
+		} else if( lcui_strcasecmp("top-center",attr_value) == 0 ) {
+			align = ALIGN_TOP_CENTER;
+		} else if( lcui_strcasecmp("top-right",attr_value) == 0 ) {
+			align = ALIGN_TOP_RIGHT;
+		} else if( lcui_strcasecmp("middle-left",attr_value) == 0 ) {
+			align = ALIGN_MIDDLE_LEFT;
+		} else if( lcui_strcasecmp("middle-center",attr_value) == 0 ) {
+			align = ALIGN_MIDDLE_CENTER;
+		} else if( lcui_strcasecmp("middle-right",attr_value) == 0 ) {
+			align = ALIGN_MIDDLE_RIGHT;
+		} else if( lcui_strcasecmp("bottom-left",attr_value) == 0 ) {
+			align = ALIGN_BOTTOM_LEFT;
+		} else if( lcui_strcasecmp("bottom-center",attr_value) == 0 ) {
+			align = ALIGN_BOTTOM_CENTER;
+		} else if( lcui_strcasecmp("bottom-right",attr_value) == 0 ) {
+			align = ALIGN_BOTTOM_RIGHT;
+		} else {
+			align = widget->align;
+		}
+	}
+	/* 获取left属性的值 */
+	widget_attr = StyleLib_GetStyleAttr( style_class,
+			pseudo_class_name, "left");
+	if( widget_attr != NULL ) {
+		attr_value = widget_attr->attr_value.string;
+		ret = GetIntOrFloat( attr_value, &num );
+		if( ret == 0 ) {
+			if( num.which_one == 1 ) {
+				offset.x = Widget_GetContainerWidth( widget->parent );
+				offset.x = (int)(offset.x * num.scale);
+			} else {
+				offset.x = num.px;
+			}
+		}
+	}
+	/* 获取top属性的值 */
+	widget_attr = StyleLib_GetStyleAttr( style_class,
+			pseudo_class_name, "top");
+	if( widget_attr != NULL ) {
+		attr_value = widget_attr->attr_value.string;
+		GetIntOrFloat( attr_value, &num );
+		ret = GetIntOrFloat( attr_value, &num );
+		if( ret == 0 ) {
+			if( num.which_one == 1 ) {
+				offset.y = Widget_GetContainerHeight( widget->parent );
+				offset.y = (int)(offset.y * num.scale);
+			} else {
+				offset.y = num.px;
+			}
+		}
+	}
+
+	Widget_SetAlign( widget, align, offset );
 	return 0;
 }
 
