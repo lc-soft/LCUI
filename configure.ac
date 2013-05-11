@@ -7,7 +7,7 @@
 # http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/html_node/index.html
 
 AC_PREREQ([2.68])
-AC_INIT(LCUI, 0.13.0, lc-soft@live.cn)
+AC_INIT(LCUI, 0.14.0, lc-soft@live.cn)
 
 # Check system type
 AC_CANONICAL_TARGET
@@ -15,6 +15,7 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([include/LCUI_Build.h])
 AC_CONFIG_HEADERS([include/LCUI/LCUI_Config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 # Make --enable-silent-rules the default.
 # To get verbose build output you may configure
@@ -29,7 +30,18 @@ AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
+
+# Checks for header files.
+AC_CHECK_HEADERS([fcntl.h limits.h malloc.h memory.h stddef.h stdlib.h string.h strings.h sys/ioctl.h termio.h unistd.h wchar.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_SIZE_T
+AC_HEADER_STDBOOL
+AC_C_RESTRICT
+AC_TYPE_UINT32_T
+
+# Checks for library functions.
+AC_CHECK_FUNCS([memset munmap select strcasecmp sysinfo])
 
 # Checks for libraries.
 # 检测LCUI所依赖的库是否存在并且能正常使用
@@ -142,18 +154,6 @@ else
 	CXXFLAGS="-O2 -Wall -D _GNU_SOURCE"
 	AC_MSG_RESULT(no)
 fi
-
-# Checks for header files.
-AC_CHECK_HEADERS([fcntl.h limits.h malloc.h memory.h stddef.h stdlib.h string.h strings.h sys/ioctl.h termio.h unistd.h wchar.h])
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_SIZE_T
-AC_HEADER_STDBOOL
-AC_C_RESTRICT
-AC_TYPE_UINT32_T
-
-# Checks for library functions.
-AC_CHECK_FUNCS([memset munmap select strcasecmp sysinfo])
 
 #根据之前的检测结果，定义相应宏
 if test "$want_png" = "yes"; then
