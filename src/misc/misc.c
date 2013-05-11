@@ -217,7 +217,7 @@ LCUI_API int
 GetIntOrFloat( char *str, IntOrFloat_t *combo_num )
 {
 	char buff[256];
-	int j, i, len; 
+	int j, i, len;
 	
 	DEBUG_MSG( "enter\n" );
 	if( !str ) {
@@ -234,6 +234,16 @@ GetIntOrFloat( char *str, IntOrFloat_t *combo_num )
 		if(str[i] == ' ') {
 			--j;
 			continue;
+		}
+		/* 判断正负符号 */
+		if( str[i] == '-' || str[i] == '+' ) {
+			/* 正负符号必须在首位 */
+			if( j == 0 ) {
+				buff[j] = str[i];
+				continue;
+			} else {
+				return -1;
+			}
 		}
 		if((str[i] >= '0' && str[i] <= '9') || str[i] == '.' ) {
 			buff[j] = str[i];
