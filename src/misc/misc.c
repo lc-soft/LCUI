@@ -217,7 +217,7 @@ LCUI_API int
 GetIntOrFloat( char *str, IntOrFloat_t *combo_num )
 {
 	char buff[256];
-	int j, i, len;
+	int bits, j, i, len;
 	
 	DEBUG_MSG( "enter\n" );
 	if( !str ) {
@@ -230,7 +230,7 @@ GetIntOrFloat( char *str, IntOrFloat_t *combo_num )
 		DEBUG_MSG( "len == 0, quit\n" );
 		return -1;
 	}
-	for(j=0,i=0; i<len; ++i, ++j) {
+	for(bits=0,j=0,i=0; i<len; ++i, ++j) {
 		if(str[i] == ' ') {
 			--j;
 			continue;
@@ -247,6 +247,7 @@ GetIntOrFloat( char *str, IntOrFloat_t *combo_num )
 		}
 		if((str[i] >= '0' && str[i] <= '9') || str[i] == '.' ) {
 			buff[j] = str[i];
+			++bits;
 			continue;
 		}
 		else if(str[i] == '%') {/* 如果有%，取浮点数 */ 
@@ -274,6 +275,10 @@ GetIntOrFloat( char *str, IntOrFloat_t *combo_num )
 			DEBUG_MSG( "2, quit\n" );
 			break;
 		}
+	}
+	/* 如果数字位数不大于0，也就是没有数字，则退出 */
+	if( bits <= 0 ) {
+		return -1;
 	}
 	/* 不包含px和%，那单位就默认为px，取整数 */
 	sscanf( buff, "%d", &combo_num->px ); 
