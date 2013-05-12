@@ -2102,6 +2102,7 @@ Widget_UpdateChildSize(LCUI_Widget *widget)
 		/* 如果该子部件的尺寸是使用百分比的 */
 		if( child->w.which_one == 1
 		 || child->h.which_one == 1 ) {
+			Widget_UpdatePos( child );
 			Widget_UpdateSize( child );
 		}
 	}
@@ -2320,14 +2321,9 @@ Widget_Resize( LCUI_Widget *widget, LCUI_Size new_size )
 LCUI_API void
 Widget_Draw(LCUI_Widget *widget)
 {
-	static int count = 0;
 	if( !widget ) {
 		return;
 	}
-	if(count >= 30 ) {
-		abort();
-	}
-	++count;
 	Widget_RecordUpdate( widget, NULL, DATATYPE_GRAPH, 0 );
 }
 
@@ -2428,19 +2424,11 @@ typedef struct _WidgetData
 	LCUI_Widget *widget;
 } WidgetData;
 
-static void reset_widget_record( void *arg )
-{
-	WidgetData *p = (WidgetData*)arg;
-	p->valid = FALSE;
-	p->type = DATATYPE_NONE;
-	p->widget = NULL;
-}
-
 /* 初始化记录部件数据更新的队列 */
 LCUI_API void
 WidgetUpdateBuff_Init( LCUI_Queue *queue )
 {
-	Queue_Init( queue, sizeof(WidgetData), reset_widget_record );
+	Queue_Init( queue, sizeof(WidgetData), NULL );
 }
 
 /*
@@ -2561,11 +2549,86 @@ Widget_RecordUpdate( LCUI_Widget *widget, void *data, DATATYPE type, int flag )
 	return result;
 }
 
+static void Widget_ApplyUpdate( WidgetData *data_ptr )
+{
+	int ret;
+
+	if( data_ptr == NULL
+	 || data_ptr->widget == NULL ) {
+		return;
+	}
+	/* 根据不同的类型来进行处理 */
+	switch(data_ptr->type) {
+	case DATATYPE_SIZE:
+		/* 部件尺寸更新，将更新部件的位置 */
+		if( !data_ptr->valid ) {
+			ret = Widget_ExecUpdateSize( data_ptr->widget );
+		} else {
+			ret = Widget_ExecResize( data_ptr->widget,
+						 data_ptr->data.size);
+		}
+		if( ret == 0 ) {
+			Widget_ExecDraw(data_ptr->widget);
+		}
+	/* 需要更新位置，所以不用break */
+	case DATATYPE_POS:
+		/*
+		 * 由于更新位置可能会是更新部件尺寸的附加操作，需要判断一下更新类型
+		 * 是否为DATATYPE_POS
+		 * */
+		if( data_ptr->type == DATATYPE_POS
+			&& data_ptr->widget->align == ALIGN_NONE
+			&& data_ptr->valid ) {
+			Widget_ExecMove(data_ptr->widget, data_ptr->data.pos);
+		} else {
+			Widget_ExecUpdatePos( data_ptr->widget );
+		}
+		break;
+	case DATATYPE_POS_TYPE:
+		Widget_UpdateChildStaticPos( data_ptr->widget->parent );
+		break;
+	case DATATYPE_UPDATE:
+		Widget_ExecUpdate( data_ptr->widget );
+		break;
+	case DATATYPE_STATUS:
+		/* 只有状态不一样才重绘部件 */
+		if( data_ptr->widget->state == data_ptr->data.state ) {
+			break;
+		}
+		data_ptr->widget->state = data_ptr->data.state;
+		/* 改变部件状态后需要进行重绘，所以不用break */
+	case DATATYPE_GRAPH:
+		Widget_ExecDraw(data_ptr->widget);
+		break;
+	case DATATYPE_HIDE:
+		Widget_ExecHide(data_ptr->widget);
+		break;
+	case DATATYPE_SORT:
+		Widget_ExecSortChild(data_ptr->widget->parent);
+		break;
+	case DATATYPE_SHOW:
+		Widget_ExecShow(data_ptr->widget);
+		/* 更新父部件中的STATIC定位类型的子部件的位置 */
+		Widget_UpdateChildStaticPos( data_ptr->widget->parent );
+		break;
+	case DATATYPE_AREA:
+		Widget_ExecRefresh(data_ptr->widget);
+		break;
+	case DATATYPE_DESTROY:
+		/* 添加刷新区域 */
+		Widget_ExecRefresh(data_ptr->widget);
+		/* 开始销毁部件数据 */
+		Widget_ExecDestroy(data_ptr->widget);
+		break;
+	default: break;
+	}
+}
+
 LCUI_API void
 Widget_ProcessUpdate( LCUI_Widget *widget )
 {
-	int n, ret;
-	WidgetData *tmp_ptr;
+	int n;
+	WidgetData *data_ptr;
 	LCUI_Widget *child;
 	LCUI_Queue *update_buff, *child_list;
 	if( widget ) {
@@ -2578,82 +2641,15 @@ Widget_ProcessUpdate( LCUI_Widget *widget )
 	Queue_Lock( update_buff );
 	n = Queue_GetTotal( update_buff );
 	while(n--) {
-		tmp_ptr = Queue_Get( update_buff, 0 );
-		if( tmp_ptr == NULL || tmp_ptr->widget == NULL ) {
-			continue;
-		}
-		/* 根据不同的类型来进行处理 */
-		switch(tmp_ptr->type) {
-		    case DATATYPE_SIZE	:
-			/* 部件尺寸更新，将更新部件的位置 */
-			if( !tmp_ptr->valid ) {
-				ret = Widget_ExecUpdateSize( tmp_ptr->widget );
-			} else {
-				ret = Widget_ExecResize(tmp_ptr->widget, tmp_ptr->data.size);
-			}
-			if( ret == 0 ) {
-				Widget_ExecDraw(tmp_ptr->widget);
-			}
-			break;
-			/* 需要更新位置，所以不用break */
-		    case DATATYPE_POS	:
-			/*
-			 * 由于更新位置可能会是更新部件尺寸的附加操作，需要判断一下更新类型
-			 * 是否为DATATYPE_POS
-			 * */
-			if( tmp_ptr->type == DATATYPE_POS
-			 && tmp_ptr->widget->align == ALIGN_NONE
-			 && tmp_ptr->valid ) {
-				Widget_ExecMove(tmp_ptr->widget, tmp_ptr->data.pos);
-			} else {
-				Widget_ExecUpdatePos( tmp_ptr->widget );
-			}
-			break;
-		    case DATATYPE_POS_TYPE:
-			Widget_UpdateChildStaticPos( tmp_ptr->widget->parent );
-			break;
-		    case DATATYPE_UPDATE:
-			Widget_ExecUpdate( tmp_ptr->widget );
-			break;
-		    case DATATYPE_STATUS:
-			/* 只有状态不一样才重绘部件 */
-			if( tmp_ptr->widget->state == tmp_ptr->data.state ) {
-				break;
-			}
-			tmp_ptr->widget->state = tmp_ptr->data.state;
-			/* 改变部件状态后需要进行重绘，所以不用break */
-		    case DATATYPE_GRAPH	:
-			Widget_ExecDraw(tmp_ptr->widget);
-			break;
-		    case DATATYPE_HIDE:
-			Widget_ExecHide(tmp_ptr->widget);
-			break;
-		    case DATATYPE_SORT:
-			Widget_ExecSortChild(widget);
-			break;
-		    case DATATYPE_SHOW:
-			Widget_ExecShow(tmp_ptr->widget);
-			/* 更新父部件中的STATIC定位类型的子部件的位置 */
-			Widget_UpdateChildStaticPos( tmp_ptr->widget->parent );
-			break;
-		    case DATATYPE_AREA:
-			Widget_ExecRefresh(tmp_ptr->widget);
-			break;
-		    case DATATYPE_DESTROY:
-			/* 添加刷新区域 */
-			Widget_ExecRefresh(tmp_ptr->widget);
-			/* 开始销毁部件数据 */
-			Widget_ExecDestroy(tmp_ptr->widget);
-			break;
-		    default: break;
-		}
+		data_ptr = (WidgetData*)Queue_Get( update_buff, 0 );
+		Widget_ApplyUpdate( data_ptr );
 		Queue_Delete( update_buff, 0 );
 	}
 	Queue_Unlock( update_buff );
 	n = Queue_GetTotal( child_list );
 	/* 从尾到首,递归处理子部件的更新 */
 	while(n--) {
-		child = Queue_Get( child_list, n );
+		child = (LCUI_Widget*)Queue_Get( child_list, n );
 		if( child ) {
 			Widget_ProcessUpdate( child );
 		}
