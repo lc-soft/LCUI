@@ -278,7 +278,7 @@ FontLIB_AddFontInfo(	const char *family_name, const char *style_name,
 	info->id = ++font_count;
 	strncpy( info->family_name, family_name, NAME_MAX_LEN );
 	strncpy( info->style_name, style_name, NAME_MAX_LEN );
-	strncpy( info->filepath, style_name,PATH_MAX_LEN );
+	strncpy( info->filepath, filepath, PATH_MAX_LEN );
 	info->face = face;
 	Queue_AddPointer( &font_database, info );
 	return info->id;
