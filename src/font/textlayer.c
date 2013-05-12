@@ -520,8 +520,11 @@ TextLayer_Refresh( LCUI_TextLayer *layer )
 			if( !char_ptr ) {
 				continue;
 			}
+			/* 重新获取字体位图 */
+			TextLayer_GetCharBMP( &layer->default_data, char_ptr );
 			char_ptr->need_update = TRUE; 
 		}
+		TextLayer_Update_RowSize( layer, i );
 		area.height = row_ptr->max_size.h;
 		area.width = row_ptr->max_size.w;
 		RectQueue_AddToValid( &layer->clear_area, area );
@@ -648,68 +651,8 @@ LCUI_API void
 TextLayer_Text_SetDefaultStyle( LCUI_TextLayer *layer, LCUI_TextStyle style )
 /* 设定默认的文本样式，需要调用TextLayer_Draw函数进行文本位图更新 */
 {
-	LCUI_Pos pos;
-	LCUI_CharData *char_ptr;
-	LCUI_TextStyle *old_style;
-	Text_RowData *row_ptr;
-	int rows, len, i, j;
-	
 	layer->default_data = style; 
-	rows = Queue_GetTotal( &layer->rows_data );
-	for(pos.y=0,i=0; i<rows; ++i) {
-		row_ptr = Queue_Get( &layer->rows_data, i ); 
-		len = Queue_GetTotal( &row_ptr->string );
-		for(pos.x=0,j=0; j<len; ++j) {
-			char_ptr = Queue_Get( &row_ptr->string, j );
-			if( !char_ptr ) {
-				continue;
-			}
-			old_style = char_ptr->data;
-			if( !old_style ) {
-				char_ptr->need_update = TRUE; 
-				goto skip_style_cmp;
-			}
-			/* 若有属性是缺省的 */
-			if(!old_style->_pixel_size) {
-				old_style->pixel_size = style.pixel_size;
-				char_ptr->need_update = TRUE; 
-			}
-			if(!old_style->_style) {
-				old_style->style = style.style;
-				char_ptr->need_update = TRUE; 
-			}
-			if(!old_style->_family) {
-				old_style->font_id = style.font_id;
-				char_ptr->need_update = TRUE; 
-			}
-			if(!old_style->_weight) {
-				old_style->weight = style.weight;
-				char_ptr->need_update = TRUE; 
-			}
-			if(!old_style->_back_color) {
-				old_style->back_color = style.back_color;
-				char_ptr->need_update = TRUE; 
-			}
-			if(!old_style->_fore_color) {
-				old_style->fore_color = style.fore_color;
-				char_ptr->need_update = TRUE; 
-			}
-			if(!old_style->_decoration) {
-				old_style->decoration = style.decoration;
-				char_ptr->need_update = TRUE; 
-			} 
-skip_style_cmp:;
-			if(char_ptr->need_update) {
-				TextLayer_Clear( layer, pos, row_ptr->max_size.h, char_ptr );
-				pos.x += char_ptr->bitmap->advance.x;
-				TextLayer_GetCharBMP ( &layer->default_data, char_ptr );
-			} else {
-				pos.x += char_ptr->bitmap->advance.x;
-			}
-		}
-		pos.y += row_ptr->max_size.h; 
-		TextLayer_Update_RowSize( layer, i );
-	}
+	TextLayer_Refresh( layer );
 }
 
 LCUI_API void
