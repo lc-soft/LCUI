@@ -405,7 +405,8 @@ Graph_Create( LCUI_Graph *graph, int width, int height )
 			graph->height = height;
 			return 0;
 		}
-		Graph_Free( graph ); 
+		Graph_Free( graph );
+		Graph_Init( graph );
 	}
 	graph->mem_size = (size_t)width*height;
 	graph->rgba = New_Graph( width, height, graph->have_alpha ); 
