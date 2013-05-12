@@ -72,6 +72,9 @@ LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );
 /* 设置字体族 */
 LCUI_API void TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily );
 
+/* 设置字体族ID */
+LCUI_API void TextStyle_FontFamilyID( LCUI_TextStyle *style, int id );
+
 /* 设置字体大小 */
 LCUI_API void TextStyle_FontSize( LCUI_TextStyle *style, int fontsize );
 

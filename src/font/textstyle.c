@@ -69,6 +69,13 @@ TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily )
 	style->font_id = FontLIB_GetFontIDByFamilyName( fontfamily );
 }
 
+/* 设置字体族ID */
+LCUI_API void
+TextStyle_FontFamilyID( LCUI_TextStyle *style, int id )
+{
+	style->font_id = id;
+}
+
 /* 设置字体大小 */
 LCUI_API void
 TextStyle_FontSize( LCUI_TextStyle *style, int fontsize )
