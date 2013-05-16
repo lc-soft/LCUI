@@ -111,7 +111,7 @@ Size_Cmp(LCUI_Size a, LCUI_Size b)
 
 /* 根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */
 LCUI_API LCUI_Pos
-Align_Get_Pos( LCUI_Size container, LCUI_Size child, int align )
+GetPosByAlign( LCUI_Size container, LCUI_Size child, int align )
 {
 	LCUI_Pos pos;
 	pos.x = pos.y = 0; 
