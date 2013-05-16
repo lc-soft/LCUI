@@ -226,7 +226,7 @@ LCUIScreen_Update( void* unused )
 
 	while(LCUI_Sys.state == ACTIVE) {
 		LCUICursor_UpdatePos();
-		Widget_ProcessUpdate(NULL); /* 处理所有部件更新 */
+		WidgetMsg_Proc(NULL); /* 处理所有消息 */
 		LCUI_MSleep(5);
 		retval = LCUIScreen_SyncInvalidArea();
 		retval += LCUIScreen_UpdateInvalidArea();
