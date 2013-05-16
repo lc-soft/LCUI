@@ -89,12 +89,11 @@ typedef struct _LCUI_System
 	LCUI_Queue user_event_slots;	/* 事件槽记录 */
 	LCUI_Queue press_key;		/* 保存已被按下的按键的键值 */
 	LCUI_Queue dev_list;		/* 设备列表 */
-	LCUI_Queue widget_list;		/* 部件队列，对应它的显示顺序 */
-	LCUI_Queue update_buff;		/* 部件更新缓冲队列 */
 	LCUI_Queue timer_list;		/* 定时器列表 */
 	LCUI_Queue app_list;		/* LCUI程序列表 */
-
-	LCUI_GraphLayer *root_glayer;		/* 根图层 */
+	LCUI_Queue widget_list;		/* 部件队列，对应它的显示顺序 */
+	LCUI_Queue widget_msg;		/* 部件消息 */
+	LCUI_GraphLayer *root_glayer;	/* 根图层 */
 } LCUI_System;
 /***********************************************************************/
 
