@@ -26,7 +26,7 @@ LCUI_API int WidgetMsg_AddToTask( LCUI_Widget *widget, WidgetMsgData *data_ptr )
 	int i,n;
 	LCUI_Queue *msg_func;
 	LCUI_Task *task_ptr, task;
-
+	
 	/* LCUI系统消息不能作为任务让程序在主循环里处理 */
 	if( data_ptr->msg_id < WIDGET_USER ) {
 		return -1;
@@ -227,6 +227,7 @@ LCUI_API int WidgetMsg_Connect(	LCUI_Widget *widget,
 		task_ptr->func = (CallBackFunc)func;
 		return 0;
 	}
+	task.id = msg_id;
 	task.func = (CallBackFunc)func;
 	return Queue_Add( msg_func, &task );
 }
