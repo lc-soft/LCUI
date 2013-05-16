@@ -47,7 +47,23 @@
 #include LC_GRAPH_H
 #include LC_LABEL_H
 
+enum label_msg_id {
+	LABEL_TEXT = WIDGET_USER+1
+};
+
 /*---------------------------- Private -------------------------------*/
+static void Label_SetTextW( LCUI_Widget *widget, void *arg )
+{
+	wchar_t *unicode_text;
+	LCUI_Label *label;
+	
+	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	unicode_text = (wchar_t*)arg;
+	TextLayer_TextW( &label->layer, unicode_text );
+	Widget_Draw( widget );
+	DEBUG_MSG("recv msg\n");
+}
+
 /* 初始化label部件数据 */
 static void 
 Label_ExecInit( LCUI_Widget *widget )
@@ -57,8 +73,6 @@ Label_ExecInit( LCUI_Widget *widget )
 	widget->focus = FALSE;
 	label = WidgetPrivData_New( widget, sizeof(LCUI_Label) );
 	label->auto_size = TRUE;
-	/* 初始化文本块缓冲队列 */
-	label->text_buff = NULL;
 	/* 初始化文本图层 */
 	TextLayer_Init( &label->layer ); 
 	/* 启用多行文本显示 */
@@ -66,6 +80,8 @@ Label_ExecInit( LCUI_Widget *widget )
 	Widget_SetAutoSize( widget, FALSE, 0 );
 	/* 启用样式标签的支持 */
 	TextLayer_UsingStyleTags( &label->layer, TRUE );
+	/* 将回调函数与自定义消息关联 */
+	WidgetMsg_Connect( widget, LABEL_TEXT, Label_SetTextW );
 }
 
 /* 释放label部件占用的资源 */
@@ -78,19 +94,9 @@ Destroy_Label( LCUI_Widget *widget )
 	Destroy_TextLayer( &label->layer );
 }
 
-/* 刷新label部件内的字体位图 */
-static void 
-Refresh_Label_FontBitmap( LCUI_Widget *widget )
-{
-	LCUI_Label *label;
-	
-	label = Widget_GetPrivData( widget );
-	TextLayer_Refresh( &label->layer ); 
-}
-
 /* 更新label部件 */
 static void 
-Label_ExecUpdate( LCUI_Widget *widget )
+Label_ExecDraw( LCUI_Widget *widget )
 {
 	int mode; 
 	LCUI_Size max;
@@ -108,11 +114,7 @@ Label_ExecUpdate( LCUI_Widget *widget )
 	} else {
 		mode = GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */ 
 	}
-	if( label->text_buff != NULL ) {
-		TextLayer_TextW( &label->layer, label->text_buff );
-		free( label->text_buff );
-		label->text_buff = NULL;
-	}
+	Label_Refresh( widget );
 	/* 先绘制文本位图，在绘制前它会更新位图尺寸 */
 	TextLayer_Draw( widget, &label->layer, mode );
 	max = TextLayer_GetSize( &label->layer ); /* 获取尺寸 */
@@ -124,14 +126,6 @@ Label_ExecUpdate( LCUI_Widget *widget )
 	}
 }
 
-/* 重绘Label部件 */
-static void 
-Label_ExecDraw( LCUI_Widget *widget )
-{
-	Refresh_Label_FontBitmap( widget );
-	Label_ExecUpdate( widget );
-}
-
 /*-------------------------- End Private -----------------------------*/
 
 /*---------------------------- Public --------------------------------*/
@@ -140,8 +134,8 @@ LCUI_API int
 Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 {
 	int len;
-	LCUI_Label *label;
-	
+	wchar_t *text_ptr;
+
 	if( widget == NULL ) {
 		return -1;
 	}
@@ -150,25 +144,17 @@ Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 	} else {
 		len = wcslen(unicode_text);
 	}
-	label = Widget_GetPrivData( widget );
-	if( label == NULL ) {
-		return -2;
-	}
-	if( label->text_buff != NULL ) {
-		label->text_buff = realloc( label->text_buff, 
-				sizeof(wchar_t)*(len+1) );
-	} else {
-		label->text_buff = malloc( sizeof(wchar_t)*(len+1) );
-	}
-	if( label->text_buff == NULL ) {
+	text_ptr = (wchar_t*)malloc( sizeof(wchar_t)*(len+1) );
+	if( text_ptr == NULL ) {
 		return -1;
 	}
 	if( unicode_text == NULL ) {
-		label->text_buff[0] = '\0';
+		text_ptr[0] = '\0';
 	} else {
-		wcscpy( label->text_buff, unicode_text );
+		wcscpy( text_ptr, unicode_text );
 	}
-	Widget_Update( widget );
+	_DEBUG_MSG("post msg\n");
+	WidgetMsg_Post( widget, LABEL_TEXT, text_ptr, TRUE, TRUE );
 	return 0;
 }
 
@@ -255,6 +241,5 @@ Register_Label(void)
 	WidgetType_Add("label");
 	WidgetFunc_Add("label",	Label_ExecInit,	FUNC_TYPE_INIT);
 	WidgetFunc_Add("label",	Label_ExecDraw,	FUNC_TYPE_DRAW); 
-	WidgetFunc_Add("label",	Label_ExecUpdate, FUNC_TYPE_UPDATE); 
 	WidgetFunc_Add("label", Destroy_Label,	FUNC_TYPE_DESTROY);
 }
