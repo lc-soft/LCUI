@@ -65,14 +65,16 @@ LCUIKey_IsHit( int key_code )
 {
 	int *t;
 	int i, total;
-	
+	Queue_Lock( &LCUI_Sys.press_key );
 	total = Queue_GetTotal(&LCUI_Sys.press_key);
 	for(i=0; i<total; ++i) {
 		t = Queue_Get(&LCUI_Sys.press_key, i);
 		if( t && *t == key_code ) {
+			Queue_Unlock( &LCUI_Sys.press_key );
 			return TRUE;
 		}
 	}
+	Queue_Unlock( &LCUI_Sys.press_key );
 	return FALSE;
 }
 
@@ -80,7 +82,9 @@ LCUIKey_IsHit( int key_code )
 LCUI_API void
 LCUIKey_Hit( int key_code )
 {
+	Queue_Lock( &LCUI_Sys.press_key );
 	Queue_Add( &LCUI_Sys.press_key, &key_code );
+	Queue_Unlock( &LCUI_Sys.press_key );
 }
 
 /* 标记指定键值的按键已释放 */
@@ -90,6 +94,7 @@ LCUIKey_Free( int key_code )
 	int *t;
 	int i, total;
 	
+	Queue_Lock( &LCUI_Sys.press_key );
 	total = Queue_GetTotal(&LCUI_Sys.press_key);
 	for(i=0; i<total; ++i) {
 		t = Queue_Get(&LCUI_Sys.press_key, i);
@@ -97,6 +102,7 @@ LCUIKey_Free( int key_code )
 			Queue_Delete( &LCUI_Sys.press_key, i );
 		}
 	}
+	Queue_Unlock( &LCUI_Sys.press_key );
 }
 
 /* 初始化键盘输入 */
