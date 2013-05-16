@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * widget_base.h -- the widget base operation set.
  *
  * Copyright (C) 2012-2013 by
@@ -41,21 +41,6 @@
 
 #ifndef __LCUI_WIDGET_BASE_H__
 #define __LCUI_WIDGET_BASE_H__
-/* 定义数据类型标识 */
-typedef enum DATATYPE_{
-	DATATYPE_NONE,
-	DATATYPE_POS,
-	DATATYPE_POS_TYPE,
-	DATATYPE_SIZE,
-	DATATYPE_GRAPH,
-	DATATYPE_UPDATE,
-	DATATYPE_STATUS,
-	DATATYPE_SHOW,
-	DATATYPE_SORT,
-	DATATYPE_HIDE,
-	DATATYPE_AREA,
-	DATATYPE_DESTROY
-} DATATYPE;
 
 /*************************** Container ********************************/
 /* 将部件添加至作为容器的部件内 */
@@ -286,8 +271,11 @@ LCUI_API void*
 WidgetPrivData_New( LCUI_Widget *widget, size_t size );
 
 /* 初始化部件队列 */
-LCUI_API void
-WidgetQueue_Init(LCUI_Queue *queue);
+LCUI_API void WidgetQueue_Init(LCUI_Queue *queue);
+
+LCUI_API LCUI_Queue *Widget_GetMsgFunc( LCUI_Widget *widget );
+
+LCUI_API LCUI_Queue *Widget_GetMsgBuff( LCUI_Widget *widget );
 
 /***********************************************************
 <Function>
@@ -561,25 +549,6 @@ LCUI_API int
 Widget_SetState( LCUI_Widget *widget, int state );
 /************************* Widget End *********************************/
 
-
-
-/**************************** Widget Update ***************************/
-
-/* 初始化记录部件数据更新的队列 */
-LCUI_API void
-WidgetUpdateBuff_Init( LCUI_Queue *queue );
-
-/*
- * 功能：记录需要进行数据更新的部件
- * 说明：将部件指针以及需更新的数据添加至队列，根据部件的显示顺序来排列队列
- * 返回值：正常返回不小于0的值
- *  */
-LCUI_API int
-Widget_RecordUpdate( LCUI_Widget *widget, void *data, DATATYPE type, int flag );
-
-LCUI_API void
-Widget_ProcessUpdate( LCUI_Widget *widget );
-
-/************************ Widget Update End ***************************/
+LCUI_API void WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr );
 
 #endif
