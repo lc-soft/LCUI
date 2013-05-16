@@ -104,7 +104,6 @@ Widget_Event_Connect(	LCUI_Widget *widget, WidgetEventType event_id,
 int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
 	int i,n;
-	char str[256];
 	LCUI_EventSlot *slot;
 	LCUI_Task *task;
 	LCUI_WidgetEvent *p_buff;
@@ -122,8 +121,7 @@ int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 		task = Queue_Get( &slot->func_data, i );
 		p_buff = malloc( sizeof(LCUI_WidgetEvent) );
 		if( !p_buff ) {
-			sprintf( str,"%s()", __FUNCTION__ );
-			perror( str );
+			perror( __FUNCTION__ );
 			abort();
 		}
 		*p_buff = *event;
@@ -501,9 +499,7 @@ Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 		task = Queue_Get( &slot->func_data, i );
 		p_buff = malloc( sizeof(LCUI_KeyboardEvent) );
 		if( !p_buff ) {
-			char str[256];
-			sprintf( str,"%s()", __FUNCTION__ );
-			perror( str );
+			perror( __FUNCTION__ );
 			abort();
 		}
 		*p_buff = *event;
@@ -522,7 +518,7 @@ LCUI_API void
 LCUIModule_Widget_Init( void )
 {
 	WidgetQueue_Init( &LCUI_Sys.widget_list );
-	WidgetUpdateBuff_Init( &LCUI_Sys.update_buff );
+	WidgetMsgBuff_Init( NULL );
 	Queue_Init( &widget_list, sizeof(widget_item), NULL );
 	LCUI_MouseButtonEvent_Connect( LCUI_HandleMouseButton, NULL );
 	LCUI_MouseMotionEvent_Connect( LCUI_HandleMouseMotion, NULL );
@@ -535,7 +531,7 @@ LCUI_API void
 LCUIModule_Widget_End( void )
 {
 	Queue_Destroy( &LCUI_Sys.widget_list );
-	Queue_Destroy( &LCUI_Sys.update_buff );
+	Queue_Destroy( &LCUI_Sys.widget_msg );
 	Queue_Destroy( &widget_list );
 	WidgetStyle_LibraryDestroy();
 }
