@@ -1,0 +1,232 @@
+﻿#include <LCUI_Build.h>
+#include LC_LCUI_H
+#include LC_WIDGET_H
+
+static void WidgetMsg_Destroy( void *arg )
+{
+
+}
+
+LCUI_API void WidgetMsgBuff_Init( LCUI_Widget *widget )
+{
+	LCUI_Queue *msg_buff;
+	msg_buff = Widget_GetMsgBuff( widget );
+	Queue_Init( msg_buff, sizeof(WidgetMsgData), WidgetMsg_Destroy );
+}
+
+LCUI_API void WidgetMsgFunc_Init( LCUI_Widget *widget )
+{
+	LCUI_Queue *msg_func;
+	msg_func = Widget_GetMsgFunc( widget );
+	Queue_Init( msg_func, sizeof(LCUI_Func), NULL );
+}
+
+LCUI_API int WidgetMsg_AddToTask( LCUI_Widget *widget, WidgetMsgData *data_ptr )
+{
+	int i,n;
+	LCUI_Queue *msg_func;
+	LCUI_Task *task_ptr, task;
+
+	/* LCUI系统消息不能作为任务让程序在主循环里处理 */
+	if( data_ptr->msg_id < WIDGET_USER ) {
+		return -1;
+	}
+	msg_func = Widget_GetMsgFunc( widget );
+	if( msg_func == NULL ) {
+		return -2;
+	}
+	n = Queue_GetTotal( msg_func );
+	for(i=0; i<n; ++i) {
+		task_ptr = (LCUI_Task*)Queue_Get( msg_func, i );
+		if( task_ptr == NULL ) {
+			continue;
+		}
+		if( task_ptr->id != data_ptr->msg_id ) {
+			continue;
+		}
+		task.id = widget->app_id;
+		task.func = task_ptr->func;
+		task.arg[0] = widget;
+		task.arg[1] = data_ptr->data.ptr;
+		task.destroy_arg[0] = FALSE;
+		task.destroy_arg[1] = data_ptr->need_free;
+		AppTasks_Add( &task );
+	}
+	return 0;
+}
+
+LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget )
+{
+	int n;
+	WidgetMsgData *data_ptr;
+	LCUI_Widget *child;
+	LCUI_Queue *msg_buff, *child_list;
+
+	msg_buff = Widget_GetMsgBuff( widget );
+	child_list = Widget_GetChildList( widget );
+	
+	Queue_Lock( msg_buff );
+	n = Queue_GetTotal( msg_buff );
+	while(n--) {
+		DEBUG_MSG("get msg\n");
+		data_ptr = (WidgetMsgData*)Queue_Get( msg_buff, 0 );
+		DEBUG_MSG("dispatch msg\n");
+		WidgetMsg_Dispatch( widget, data_ptr );
+		DEBUG_MSG("delete msg\n");
+		Queue_Delete( msg_buff, 0 );
+	}
+	Queue_Unlock( msg_buff );
+	n = Queue_GetTotal( child_list );
+	/* 从尾到首,递归处理子部件的更新 */
+	while(n--) {
+		child = (LCUI_Widget*)Queue_Get( child_list, n );
+		if( child ) {
+			DEBUG_MSG("proc child msg\n");
+			WidgetMsg_Proc( child );
+		}
+	}
+}
+
+LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
+				uint_t msg_id,
+				void *data,
+				LCUI_BOOL only_one,
+				LCUI_BOOL need_free )
+{
+	int i, total, n_found, ret = 0;
+	WidgetMsgData tmp_msg, *tmp_msg_ptr;
+	LCUI_Queue *des_queue;
+
+	if( !widget ) {
+		return -1;
+	}
+	tmp_msg.msg_id = msg_id;
+	tmp_msg.need_free = need_free;
+	if( data ) {
+		tmp_msg.valid = TRUE;
+	} else {
+		tmp_msg.valid = FALSE;
+	}
+	switch(tmp_msg.msg_id) {
+	    case WIDGET_MOVE:
+		if(tmp_msg.valid) {
+			tmp_msg.data.pos = *((LCUI_Pos*)data);
+		}
+		break;
+	    case WIDGET_RESIZE:
+		if(tmp_msg.valid) {
+			tmp_msg.data.size = *((LCUI_Size*)data);
+		}
+		break;
+	    case WIDGET_CHGSTATE:
+		if(tmp_msg.valid) {
+			tmp_msg.data.state = *((int*)data);
+		}
+		break;
+	    case WIDGET_PAINT:
+	    case WIDGET_REFRESH:
+	    case WIDGET_HIDE:
+	    case WIDGET_UPDATE:
+	    case WIDGET_SHOW:
+	    case WIDGET_SORT:
+	    case WIDGET_DESTROY:
+		tmp_msg.valid = FALSE;
+		break;
+	    default:
+		tmp_msg.data.ptr = data;
+		break;
+	}
+	/* 消息记录至父部件 */
+	des_queue = Widget_GetMsgBuff( widget );
+	total = Queue_GetTotal( des_queue );
+	for(n_found=0,i=0; i<total; ++i) {
+		tmp_msg_ptr = (WidgetMsgData*)Queue_Get( des_queue, i );
+		if( !tmp_msg_ptr ) {
+			continue;
+		}
+		if(tmp_msg_ptr->valid != tmp_msg.valid
+		|| tmp_msg_ptr->msg_id != tmp_msg.msg_id) {
+			continue;
+		}
+		++n_found;
+		/* 如果已存在的数量少于2 */
+		if( !only_one && n_found < 2 ) {
+			continue;
+		}
+		/* 否则，需要进行替换 */
+		switch(tmp_msg.msg_id) {
+		    case WIDGET_MOVE:
+			if(tmp_msg.valid) {
+				tmp_msg_ptr->data.pos = tmp_msg.data.pos;
+				tmp_msg_ptr->valid = TRUE;
+			} else {
+				tmp_msg_ptr->valid = FALSE;
+			}
+			break;
+		    case WIDGET_RESIZE:
+			if(tmp_msg.valid) {
+				tmp_msg_ptr->data.size = tmp_msg.data.size;
+				tmp_msg_ptr->valid = TRUE;
+			} else {
+				tmp_msg_ptr->valid = FALSE;
+			}
+			break;
+		    case WIDGET_CHGSTATE:
+			if(tmp_msg.valid) {
+				tmp_msg_ptr->data.state = tmp_msg.data.state;
+			} else {
+				tmp_msg_ptr->valid = FALSE;
+			}
+			break;
+		    case WIDGET_PAINT:
+		    case WIDGET_REFRESH:
+		    case WIDGET_HIDE:
+		    case WIDGET_UPDATE:
+		    case WIDGET_SHOW:
+		    case WIDGET_SORT:
+			tmp_msg.valid = FALSE;
+			break;
+		    default:
+			if( tmp_msg_ptr->need_free ) {
+				free( tmp_msg_ptr->data.ptr );
+			}
+			tmp_msg_ptr->need_free = tmp_msg.need_free;
+			tmp_msg_ptr->data.ptr = tmp_msg.data.ptr;
+			break;
+		}
+		break;
+	}
+	/* 未找到，则添加新的 */
+	if( i>= total ) {
+		ret = Queue_Add( des_queue, &tmp_msg );
+	}
+	return ret;
+}
+
+LCUI_API int WidgetMsg_Connect(	LCUI_Widget *widget,
+				uint_t msg_id,
+				WidgetProcFunc func )
+{
+	int i,n;
+	LCUI_Queue *msg_func;
+	LCUI_Task *task_ptr, task;
+
+	msg_func = Widget_GetMsgFunc( widget );
+	if( msg_func == NULL ) {
+		return -1;
+	}
+	n = Queue_GetTotal( msg_func );
+	for(i=0; i<n; ++i) {
+		task_ptr = (LCUI_Task*)Queue_Get( msg_func, i );
+		if( task_ptr == NULL ) {
+			continue;
+		}
+		if( task_ptr->id != msg_id ) {
+			continue;
+		}
+		task_ptr->func = (CallBackFunc)func;
+		return 0;
+	}
+	task.func = (CallBackFunc)func;
+	return Queue_Add( msg_func, &task );
+}

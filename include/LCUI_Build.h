@@ -90,6 +90,7 @@
 #define LC_MISC_H		<LCUI/LCUI_Misc.h>
 
 #define LC_WIDGET_BASE_H	<LCUI/gui/widget_base.h>
+#define LC_WIDGET_MSG_H		<LCUI/gui/widget_msg.h>
 #define LC_WIDGET_EVENT_H	<LCUI/gui/widget_event.h>
 #define LC_WIDGET_LIBRARY_H	<LCUI/gui/widget_library.h>
 #define LC_WIDGET_STYLE_H	<LCUI/gui/widget_style.h>
