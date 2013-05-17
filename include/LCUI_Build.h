@@ -188,12 +188,14 @@
 #endif
 
 /* 用宏包装了WIN32和linux平台下的main函数 */
-#ifdef LCUI_BUILD_IN_WIN32
+/* 如果在win32环境下，且是win32窗口程序 */
+#if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS)
 #define LCUI_ARGLIST		HINSTANCE hInstance,HINSTANCE hPrevInstance,PSTR szCmdLine,int iCmdShow
 #define LCUIMainFunc		WINAPI WinMain
 #define LCUI_DEFAULT_ARG	hInstance
 #define LCUI_DEFAULT_CONFIG	LCUI_INIT_MODE_AUTO,LCUI_DEFAULT_ARG
 #else
+/* 否则，是在linux环境下，或者是win32的控制台程序 */
 #define LCUI_ARGLIST	 	int argc, char *argv[]
 #define	LCUIMainFunc		main
 #define LCUI_DEFAULT_ARG	NULL
