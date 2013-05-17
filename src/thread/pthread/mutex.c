@@ -56,6 +56,12 @@ void LCUIMutex_Destroy( LCUI_Mutex *mutex )
 	pthread_mutex_destroy( mutex );
 }
 
+/* Try lock the mutex */
+int LCUIMutex_TryLock( LCUI_Mutex *mutex )
+{
+	return pthread_mutex_trylock( mutex );
+}
+
 /* Lock the mutex */
 int LCUIMutex_Lock( LCUI_Mutex *mutex )
 {

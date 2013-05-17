@@ -59,6 +59,22 @@ LCUIMutex_Destroy( LCUI_Mutex *mutex )
 	CloseHandle( *mutex );
 }
 
+/* Try lock the mutex */
+LCUI_API int
+LCUIMutex_TryLock( LCUI_Mutex *mutex )
+{
+	switch ( WaitForSingleObject( *mutex, 0 ) ) {
+	case WAIT_FAILED:
+		printf("Couldn't wait on mutex\n");
+		return -1;
+	case WAIT_OBJECT_0:
+		return 1;
+	default:
+		return -2;
+	}
+	return 0;
+}
+
 /* Lock the mutex */
 LCUI_API int
 LCUIMutex_Lock( LCUI_Mutex *mutex )

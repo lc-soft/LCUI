@@ -76,6 +76,10 @@ LCUIMutex_Init( LCUI_Mutex *mutex );
 LCUI_API void
 LCUIMutex_Destroy( LCUI_Mutex *mutex );
 
+/* Try lock the mutex */
+LCUI_API int
+LCUIMutex_TryLock( LCUI_Mutex *mutex );
+
 /* Lock the mutex */
 LCUI_API int
 LCUIMutex_Lock( LCUI_Mutex *mutex );
