@@ -255,7 +255,6 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	Queue_SetDataMode( &layer->text_source_data, QUEUE_DATA_MODE_LINKED_LIST ); 
 	Queue_Init( &layer->rows_data, sizeof(Text_RowData), Destroy_Text_RowData ); 
 	StyleTag_Init( &layer->tag_buff );
-	Queue_Init( &layer->style_data, sizeof(LCUI_TextStyle), NULL );
 	RectQueue_Init( &layer->clear_area );
 	/* 初始化屏蔽符的数据 */
 	layer->password_char.display = TRUE;
@@ -281,7 +280,6 @@ Destroy_TextLayer( LCUI_TextLayer *layer )
 	Queue_Destroy( &layer->text_source_data );
 	Queue_Destroy( &layer->rows_data );
 	Queue_Destroy( &layer->tag_buff );
-	Queue_Destroy( &layer->style_data );
 	RectQueue_Destroy( &layer->clear_area );
 	LCUIWString_Free( &layer->text_buff );
 }
@@ -510,7 +508,7 @@ TextLayer_Refresh( LCUI_TextLayer *layer )
 	Text_RowData *row_ptr;
 	LCUI_CharData *char_ptr;
 	LCUI_Rect area;
-	
+
 	rows = Queue_GetTotal( &layer->rows_data );
 	for(area.y=0,area.x=0,i=0; i<rows; ++i) {
 		row_ptr = Queue_Get( &layer->rows_data, i );
@@ -669,12 +667,21 @@ TextLayer_Text_Clear( LCUI_TextLayer *layer )
 	if( layer == NULL ) {
 		return;
 	}
-	TextLayer_Refresh( layer );
+	
 	Queue_Destroy( &layer->text_source_data );
 	Queue_Destroy( &layer->rows_data );
-	Queue_Destroy( &layer->style_data );
+	Queue_Destroy( &layer->tag_buff );
+
+	Queue_Init( &layer->text_source_data, sizeof(LCUI_CharData), Destroy_CharData );
+	Queue_SetDataMode( &layer->text_source_data, QUEUE_DATA_MODE_LINKED_LIST ); 
+	Queue_Init( &layer->rows_data, sizeof(Text_RowData), Destroy_Text_RowData ); 
+	StyleTag_Init( &layer->tag_buff );
+	
+	layer->offset_pos.x = 0;
+	layer->offset_pos.y = 0;
 	layer->current_src_pos = 0;
-	layer->current_des_pos = Pos(0,0);
+	layer->current_des_pos.x = 0;
+	layer->current_des_pos.y = 0;
 }
 
 LCUI_API void
@@ -897,7 +904,6 @@ TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
 	LCUI_CharData *char_ptr;
 	
 	DEBUG_MSG1("enter\n");
-	DEBUG_MSG1("thread: %lu\n", thread_self());
 	rows = Queue_GetTotal( &layer->rows_data );
 	for( pos.y=0,j=0; j<rows; ++j ) {
 		row_ptr = Queue_Get( &layer->rows_data, j );
@@ -1005,7 +1011,7 @@ TextLayer_Text_AppendA( LCUI_TextLayer *layer, char *new_text )
 {
 	wchar_t *unicode_text;
 	LCUICharset_ASCIIToUnicode( new_text, &unicode_text );
-	TextLayer_Text_AddW( layer, unicode_text );
+	TextLayer_Text_AppendW( layer, unicode_text );
 	free( unicode_text );
 	return 0;
 }
@@ -1015,7 +1021,7 @@ TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text )
 {
 	wchar_t *unicode_text;
 	LCUICharset_UTF8ToUnicode( new_text, &unicode_text );
-	TextLayer_Text_AddW( layer, unicode_text );
+	TextLayer_Text_AppendW( layer, unicode_text );
 	free( unicode_text );
 	return 0;
 }
