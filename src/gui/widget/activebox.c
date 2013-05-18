@@ -135,7 +135,7 @@ Frames_GetFrameMixPos(LCUI_Frames *stream, LCUI_Frame *frame)
 /* 功能：获取指定帧在整个动画容器中的位置 */
 {
 	LCUI_Pos pos;
-	pos = Align_Get_Pos(	stream->size,
+	pos = GetPosByAlign(	stream->size,
 				Graph_GetSize(frame->pic),
 				ALIGN_MIDDLE_CENTER );
 	return Pos_Add(pos, frame->offset);
@@ -541,7 +541,7 @@ ActiveBox_ExecUpdate(LCUI_Widget *widget)
 
 	frames = ActiveBox_GetFrames( widget );
 	frame_graph = Frames_GetGraphSlot( frames );
-	pos = Align_Get_Pos( Widget_GetSize(widget),
+	pos = GetPosByAlign( Widget_GetSize(widget),
 				frames->size, ALIGN_MIDDLE_CENTER);
 
 	Widget_SetBackgroundTransparent( widget, TRUE );
