@@ -277,6 +277,12 @@ LCUI_API LCUI_Queue *Widget_GetMsgFunc( LCUI_Widget *widget );
 
 LCUI_API LCUI_Queue *Widget_GetMsgBuff( LCUI_Widget *widget );
 
+LCUI_API int Widget_Lock( LCUI_Widget *widget );
+
+LCUI_API int Widget_TryLock( LCUI_Widget *widget );
+
+LCUI_API int Widget_Unlock( LCUI_Widget *widget );
+
 /***********************************************************
 <Function>
 	Widget_New
@@ -549,6 +555,6 @@ LCUI_API int
 Widget_SetState( LCUI_Widget *widget, int state );
 /************************* Widget End *********************************/
 
-LCUI_API void WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr );
+LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr );
 
 #endif
