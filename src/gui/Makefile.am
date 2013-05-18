@@ -2,6 +2,7 @@ AUTOMAKE_OPTIONS=foreign
 INCLUDES = -I$(abs_top_srcdir)/include
 noinst_LTLIBRARIES = libgui.la
 libgui_la_SOURCES =\
+widget_msg.c		\
 widget_base.c		\
 widget_event.c		\
 widget_library.c	\

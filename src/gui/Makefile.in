@@ -64,7 +64,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgui_la_LIBADD =
-am_libgui_la_OBJECTS = widget_base.lo widget_event.lo \
+am_libgui_la_OBJECTS = widget_msg.lo widget_base.lo widget_event.lo \
 	widget_library.lo widget_style.lo messagebox.lo activebox.lo \
 	button.lo checkbox.lo label.lo menu.lo picturebox.lo \
 	progressbar.lo radiobutton.lo textbox.lo window.lo \
@@ -237,6 +237,7 @@ AUTOMAKE_OPTIONS = foreign
 INCLUDES = -I$(abs_top_srcdir)/include
 noinst_LTLIBRARIES = libgui.la
 libgui_la_SOURCES = \
+widget_msg.c		\
 widget_base.c		\
 widget_event.c		\
 widget_library.c	\
@@ -320,6 +321,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget_event.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget_library.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget_msg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget_style.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/window.Plo@am__quote@
 
