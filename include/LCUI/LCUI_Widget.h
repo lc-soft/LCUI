@@ -152,7 +152,8 @@ struct LCUI_Widget_ {
 	LCUI_Widget *parent;		/* 父部件 */
 	LCUI_Queue child;		/* 子部件集 */
 	LCUI_Queue event;		/* 保存部件的事件关联的数据 */
-	LCUI_Queue update_buff;		/* 记录子部件需要进行更新的数据 */
+	LCUI_Queue msg_buff;		/* 记录子部件的消息 */
+	LCUI_Queue msg_func;		/* 记录与自定义消息关联的函数 */
 	LCUI_RectQueue invalid_area;	/* 记录无效区域 */
 
 	WIDGET_STATE state;	/* 部件当前状态 */
@@ -170,7 +171,8 @@ struct LCUI_Widget_ {
 	LCUI_GraphLayer* main_glayer;	/* 部件的主图层 */
 	LCUI_GraphLayer* client_glayer;	/* 客户区图层 */
 
-	void *private_data;   /* 指针，指向部件私有数据，供预先注册的回调函数利用 */
+	LCUI_Mutex mutex;	/* 互斥锁 */
+	void *private_data;	/* 指针，指向部件私有数据，供预先注册的回调函数利用 */
 
 	/* 以下是函数指针，闲函数名太长的话，可以直接用下面的 */
 	void (*resize)(LCUI_Widget*, LCUI_Size);
@@ -188,6 +190,7 @@ struct LCUI_Widget_ {
 
 LCUI_END_HEADER
 
+#include LC_WIDGET_MSG_H
 #include LC_WIDGET_BASE_H
 #include LC_WIDGET_EVENT_H
 #include LC_WIDGET_LIBRARY_H

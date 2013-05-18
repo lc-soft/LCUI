@@ -57,7 +57,7 @@ LCUI_API int WidgetMsg_AddToTask( LCUI_Widget *widget, WidgetMsgData *data_ptr )
 
 LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget )
 {
-	int n;
+	int i,n;
 	WidgetMsgData *data_ptr;
 	LCUI_Widget *child;
 	LCUI_Queue *msg_buff, *child_list;
@@ -67,13 +67,17 @@ LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget )
 	
 	Queue_Lock( msg_buff );
 	n = Queue_GetTotal( msg_buff );
-	while(n--) {
-		DEBUG_MSG("get msg\n");
-		data_ptr = (WidgetMsgData*)Queue_Get( msg_buff, 0 );
-		DEBUG_MSG("dispatch msg\n");
-		WidgetMsg_Dispatch( widget, data_ptr );
-		DEBUG_MSG("delete msg\n");
-		Queue_Delete( msg_buff, 0 );
+	for(i=0; i<n; ++i) {
+		DEBUG_MSG("[%d/%d]get msg\n", i, n);
+		data_ptr = (WidgetMsgData*)Queue_Get( msg_buff, i );
+		DEBUG_MSG("[%d/%d]dispatch msg\n", i, n);
+		if( WidgetMsg_Dispatch( widget, data_ptr ) ) {
+			DEBUG_MSG("[%d/%d]delete msg\n", i, n);
+			Queue_Delete( msg_buff, i );
+			--i, --n;
+			continue;
+		}
+		DEBUG_MSG("[%d/%d]skip msg\n", i, n);
 	}
 	Queue_Unlock( msg_buff );
 	n = Queue_GetTotal( child_list );

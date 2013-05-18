@@ -1185,6 +1185,21 @@ LCUI_API LCUI_Queue *Widget_GetMsgBuff( LCUI_Widget *widget )
 	return &LCUI_Sys.widget_msg;
 }
 
+LCUI_API int Widget_Lock( LCUI_Widget *widget )
+{
+	return LCUIMutex_Lock( &widget->mutex );
+}
+
+LCUI_API int Widget_TryLock( LCUI_Widget *widget )
+{
+	return LCUIMutex_TryLock( &widget->mutex );
+}
+
+LCUI_API int Widget_Unlock( LCUI_Widget *widget )
+{
+	return LCUIMutex_Unlock( &widget->mutex );
+}
+
 /*
  * 功能：创建指定类型的部件
  * 返回值：成功则部件的指针，失败则返回NULL
@@ -1296,7 +1311,7 @@ Widget_New( const char *widget_type )
 	WidgetMsgFunc_Init( widget );
 	LCUIString_Init( &widget->type_name );
 	LCUIString_Init( &widget->style_name );
-
+	LCUIMutex_Init( &widget->mutex );	/* 初始化互斥锁 */
 	/* 最后，将该部件数据添加至部件队列中 */
 	Queue_AddPointer( &LCUI_Sys.widget_list, widget );
 	if( !widget_type ) {
@@ -2423,12 +2438,12 @@ Widget_SetState( LCUI_Widget *widget, int state )
 /************************* Widget End *********************************/
 
 
-LCUI_API void WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr )
+LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr )
 {
 	int ret;
 
 	if( data_ptr == NULL ) {
-		return;
+		return TRUE;
 	}
 	if( widget == NULL ) {
 		switch(data_ptr->msg_id) {
@@ -2437,7 +2452,7 @@ LCUI_API void WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr )
 		default:
 			break;
 		}
-		return;
+		return TRUE;
 	}
 	DEBUG_MSG("widget: %p, msg id: %d\n", widget, data_ptr->msg_id);
 	/* 根据不同的类型来进行处理 */
@@ -2463,7 +2478,11 @@ LCUI_API void WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr )
 		}
 		break;
 	case WIDGET_UPDATE:
+		if( Widget_TryLock( widget ) != 0 ) {
+			return FALSE;
+		}
 		Widget_ExecUpdate( widget );
+		Widget_Unlock( widget );
 		break;
 	case WIDGET_CHGSTATE:
 		/* 只有状态不一样才重绘部件 */
@@ -2474,7 +2493,11 @@ LCUI_API void WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr )
 		Widget_Draw( widget );
 		break;
 	case WIDGET_PAINT:
+		if( Widget_TryLock( widget ) != 0 ) {
+			return FALSE;
+		}
 		Widget_ExecDraw( widget );
+		Widget_Unlock( widget );
 		break;
 	case WIDGET_HIDE:
 		Widget_ExecHide( widget );
@@ -2491,13 +2514,18 @@ LCUI_API void WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr )
 		Widget_ExecRefresh( widget );
 		break;
 	case WIDGET_DESTROY:
+		if( Widget_TryLock( widget ) != 0 ) {
+			return FALSE;
+		}
 		/* 添加刷新区域 */
 		Widget_ExecRefresh( widget );
 		/* 开始销毁部件数据 */
 		Widget_ExecDestroy( widget );
+		Widget_Unlock( widget );
 		break;
 	default:
 		WidgetMsg_AddToTask( widget, data_ptr );
 		break;
 	}
+	return TRUE;
 }
