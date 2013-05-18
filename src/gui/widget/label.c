@@ -48,20 +48,40 @@
 #include LC_LABEL_H
 
 enum label_msg_id {
-	LABEL_TEXT = WIDGET_USER+1
+	LABEL_TEXT = WIDGET_USER+1,
+	LABEL_STYLE
 };
 
 /*---------------------------- Private -------------------------------*/
+
+static void Label_SetTextStyle( LCUI_Widget *widget, void *arg )
+{
+	LCUI_TextStyle *style;
+	LCUI_Label *label;
+	
+	DEBUG_MSG("recv LABEL_STYLE msg, lock widget\n");
+	Widget_Lock( widget );
+	style = (LCUI_TextStyle*)arg;
+	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	TextLayer_Text_SetDefaultStyle( &label->layer, *style );
+	Widget_Draw( widget ); 
+	DEBUG_MSG("unlock widget\n");
+	Widget_Unlock( widget );
+}
+
 static void Label_SetTextW( LCUI_Widget *widget, void *arg )
 {
 	wchar_t *unicode_text;
 	LCUI_Label *label;
 	
+	DEBUG_MSG("recv LABEL_TEXT msg, lock widget\n");
+	Widget_Lock( widget );
 	label = (LCUI_Label*)Widget_GetPrivData( widget );
 	unicode_text = (wchar_t*)arg;
 	TextLayer_TextW( &label->layer, unicode_text );
 	Widget_Draw( widget );
-	DEBUG_MSG("recv msg\n");
+	DEBUG_MSG("unlock widget\n");
+	Widget_Unlock( widget );
 }
 
 /* 初始化label部件数据 */
@@ -69,9 +89,11 @@ static void
 Label_ExecInit( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
+	
 	/* label部件不需要焦点 */
 	widget->focus = FALSE;
-	label = WidgetPrivData_New( widget, sizeof(LCUI_Label) );
+
+	label = (LCUI_Label*)WidgetPrivData_New( widget, sizeof(LCUI_Label) );
 	label->auto_size = TRUE;
 	/* 初始化文本图层 */
 	TextLayer_Init( &label->layer ); 
@@ -82,6 +104,7 @@ Label_ExecInit( LCUI_Widget *widget )
 	TextLayer_UsingStyleTags( &label->layer, TRUE );
 	/* 将回调函数与自定义消息关联 */
 	WidgetMsg_Connect( widget, LABEL_TEXT, Label_SetTextW );
+	WidgetMsg_Connect( widget, LABEL_STYLE, Label_SetTextStyle );
 }
 
 /* 释放label部件占用的资源 */
@@ -122,7 +145,6 @@ Label_ExecDraw( LCUI_Widget *widget )
 	 && Size_Cmp( max, widget->size ) != 0 ) {
 		/* 如果开启了自动调整大小,并且尺寸有改变 */ 
 		Widget_Resize(widget, max );
-		Widget_Refresh(widget);
 	}
 }
 
@@ -153,7 +175,7 @@ Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 	} else {
 		wcscpy( text_ptr, unicode_text );
 	}
-	_DEBUG_MSG("post msg\n");
+	DEBUG_MSG("post LABEL_TEXT msg\n");
 	WidgetMsg_Post( widget, LABEL_TEXT, text_ptr, TRUE, TRUE );
 	return 0;
 }
@@ -180,15 +202,23 @@ Label_TextA( LCUI_Widget *widget, const char *ascii_text )
 	}
 }
 
+
 /* 为Label部件内显示的文本设定文本样式 */
 LCUI_API int
 Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 {
-	LCUI_Label *label;
+	LCUI_TextStyle *style_ptr;
 	
-	label = Widget_GetPrivData( widget );
-	TextLayer_Text_SetDefaultStyle( &label->layer, style );
-	Widget_Draw( widget ); 
+	if( widget == NULL ) {
+		return -1;
+	}
+	style_ptr = (LCUI_TextStyle*)malloc( sizeof(LCUI_TextStyle) );
+	if(style_ptr == NULL) {
+		return -2;
+	}
+	*style_ptr = style;
+	DEBUG_MSG("post LABEL_STYLE msg\n");
+	WidgetMsg_Post( widget, LABEL_STYLE, style_ptr, TRUE, TRUE );
 	return 0;
 }
 
