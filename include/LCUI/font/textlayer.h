@@ -41,8 +41,10 @@
 #ifndef __LCUI_TEXTLAYER_H__
 #define __LCUI_TEXTLAYER_H__
 
-#define	AT_TEXT_LAST	0
-#define	AT_CURSOR_POS	1
+enum text_add_position {
+	AT_TEXT_LAST,
+	AT_CURSOR_POS
+};
 
 LCUI_BEGIN_HEADER
 
@@ -87,7 +89,6 @@ typedef struct _LCUI_TextLayer
 	LCUI_Queue text_source_data;	/* 储存文本相关数据 */
 	LCUI_Queue rows_data;		/* 储存每一行文本的数据 */
 	LCUI_Queue tag_buff;		/* 保存样式标签中表达的属性数据 */
-	LCUI_Queue style_data;		/* 保存样式数据 */
 	LCUI_RectQueue clear_area;	/* 记录需刷新的区域 */
 	
 	LCUI_Pos offset_pos;		/* 偏移位置 */
