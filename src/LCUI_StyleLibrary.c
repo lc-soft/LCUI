@@ -4,6 +4,223 @@
 #include LC_LCUI_H
 #include LC_STYLE_LIBRARY_H
 
+#ifdef need_new_code
+typedef struct StyleLIB_Property_ {
+	LCUI_String name;	/* 属性名 */
+	LCUI_String value;	/* 属性值 */
+} StyleLIB_Property;
+
+typedef struct StyleLIB_PseudoClass_ {
+	LCUI_String name;	/* 伪类的名称 */
+	LCUI_Queue property;	/* 伪类的属性集 */
+} StyleLIB_PseudoClass;
+
+typedef struct StyleLIB_Element_ {
+	LCUI_String name;		/* 名称 */
+	LCUI_Queue property;		/* 属性集 */
+	LCUI_Queue pseudo_class;	/* 拥有的伪类 */
+} StyleLIB_Element, StyleLIB_Selector, StyleLIB_Class;
+
+typedef struct StyleLIB_Library_ {
+	LCUI_Queue selectors;	/* 选择器 */
+	LCUI_Queue classes;	/* 类 */
+} StyleLIB_Library;
+
+static void StyleLIB_DestroyElement( void *arg )
+{
+	StyleLIB_Element *element;
+	element = (StyleLIB_Element*)arg;
+	LCUIString_Free( &element->name );
+	Queue_Destroy( &element->property );
+	Queue_Destroy( &element->pseudo_class );
+}
+
+static void StyleLIB_DestroyProperty( void *arg )
+{
+	StyleLIB_Property *prop;
+	prop = (StyleLIB_Property*)arg;
+	LCUIString_Free( &prop->name );
+	LCUIString_Free( &prop->value );
+}
+
+static void StyleLIB_DestroyPseudoClass( void *arg )
+{
+	StyleLIB_PseudoClass *pclass;
+	pclass = (StyleLIB_PseudoClass*)arg;
+	Queue_Destroy( &pclass->property );
+	LCUIString_Free( &pclass->name );
+}
+
+/* 初始化样式库 */
+void StyleLIB_Init( StyleLIB_Library *lib_ptr )
+{
+	Queue_Init( &lib_ptr->selectors, sizeof(StyleLIB_Element),
+					StyleLIB_DestroyElement );
+	Queue_Init( &lib_ptr->classes, sizeof(StyleLIB_Element),
+					StyleLIB_DestroyElement );
+}
+
+static StyleLIB_Element *StyleLIB_GetElement(	StyleLIB_Library *lib_ptr,
+						const char *name,
+						int type )
+{
+	int i, total;
+	LCUI_Queue *list;
+	StyleLIB_Element *p;
+	
+	if( type == 0 ) {
+		list = &lib_ptr->selectors;
+	} else {
+		list = &lib_ptr->classes;
+	}
+	total = Queue_GetTotal( list );
+	for(i=0; i<total; ++i) {
+		p = (StyleLIB_Element*)Queue_Get( list, i );
+		if( !p ) {
+			continue;
+		}
+		if( _LCUIString_Cmp(&p->name, name) == 0 ) {
+			return p;
+		}
+	}
+	return NULL;
+}
+
+static StyleLIB_Element *StyleLIB_AddElement(	StyleLIB_Library *lib_ptr,
+						const char *name,
+						int type )
+{
+	LCUI_Queue *list;
+	StyleLIB_Element *element;
+	element = StyleLIB_GetElement( lib_ptr, name, type );
+	if( element != NULL ) {
+		return element;
+	}
+	element = (StyleLIB_Element*)malloc( sizeof(StyleLIB_Element) );
+	if( element == NULL ) {
+		return NULL;
+	}
+	LCUIString_Init( &element->name );
+	_LCUIString_Copy( &element->name, name );
+	Queue_Init( &element->property, sizeof(StyleLIB_Property),
+					StyleLIB_DestroyProperty );
+	Queue_Init( &element->pseudo_class, sizeof(StyleLIB_PseudoClass),
+					StyleLIB_DestroyPseudoClass );
+	if( type == 0 ) {
+		list = &lib_ptr->selectors;
+	} else {
+		list = &lib_ptr->classes;
+	}
+	Queue_AddPointer( list, element );
+	return element;
+}
+
+/* 添加一个选择器 */
+StyleLIB_Element *StyleLIB_AddSelector(	StyleLIB_Library *lib_ptr,
+					const char *selector_name )
+{
+	return StyleLIB_AddElement( lib_ptr, selector_name, 0 );
+}
+
+/* 添加一个类 */
+StyleLIB_Element *StyleLIB_AddClass(	StyleLIB_Library *lib_ptr,
+					const char *class_name )
+{
+	return StyleLIB_AddElement( lib_ptr, class_name, 1 );
+}
+
+/* 为 选择器/类 添加属性 */
+int StyleLIB_AddProperty(	StyleLIB_Element *element_ptr,
+				const char *pseudo_class_name,
+				const char *property_name,
+				const char *property_value )
+{
+	int i, n;
+	LCUI_Queue *target_queue;
+	StyleLIB_PseudoClass *pclass;
+	StyleLIB_Property *property_ptr;
+
+	if( pseudo_class_name == NULL ) {
+		target_queue = element_ptr->property;
+	} else {
+		n = Queue_GetTotal( &element_ptr->pseudo_class );
+		for(i=0; i<n; ++) {
+			pclass = Queue_Get( &element_ptr->pseudo_class, i );
+			if( pclass == NULL ) {
+				continue;
+			}
+			if( !_LCUIString_Cmp( &pclass->name, pseudo_class_name ) ) {
+				break;
+			}
+		}
+		if( i>=n ) {
+			pclass = (StyleLIB_PseudoClass*)malloc(sizeof(StyleLIB_PseudoClass));
+			if( pclass == NULL ) {
+				return -1;
+			}
+			LCUIString_Init( &pclass->name );
+			LCUIString_Copy( &pclass->name, pseudo_class_name );
+			Queue_Init( &pclass->property, sizeof(StyleLIB_Property),
+							StyleLIB_DestroyProperty );
+			Queue_AddPointer( &element_ptr->pseudo_class, pclass );
+		}
+		target_queue = &pclass->property;
+	}
+	n = Queue_GetTotal( target_queue );
+	for(i=0; i<n; ++i) {
+		property_ptr = Queue_Get( target_queue, i );
+		if( property_ptr == NULL ) {
+			continue;
+		}
+		if( !_LCUIString_Cmp(&property_ptr->name, property_name) ) {
+			break;
+		}
+	}
+	if( i>= n ) {
+		property_ptr = (StyleLIB_Property*)malloc(sizeof(StyleLIB_Property));
+		if( property_ptr == NULL ) {
+			return -1;
+		}
+		LCUIString_Init( &property_ptr->name );
+		LCUIString_Init( &property_ptr->value );
+		Queue_AddPointer( target_queue, property_ptr );
+	}
+	_LCUIString_Copy( &property_ptr->name, property_name );
+	_LCUIString_Copy( &property_ptr->value, property_value );
+}
+						
+/* 获取选择器的句柄 */
+StyleLIB_Element *StyleLIB_GetSelector(	StyleLIB_Library *lib_ptr,
+					const char *selector_name )
+{
+	return StyleLIB_GetElement( lib_ptr, selector_name, 0 );
+}
+
+/* 获取类的句柄 */
+StyleLIB_Element *StyleLIB_GetClass(	StyleLIB_Library *lib_ptr,
+					const char *class_name )
+{
+	return StyleLIB_GetElement( lib_ptr, class_name, 1 );
+}
+					
+/* 获取属性的句柄 */
+StyleLIB_Property *StyleLIB_GetProperty(	StyleLIB_Selector *selector_ptr,
+						StyleLIB_Class *class_ptr,
+						const char *pseudo_class_name,
+						const char *property_name )
+{
+
+}
+						
+/* 设置属性的值 */
+int StyleLIB_SetPropertyValue(	StyleLIB_Property *property_ptr,
+				const char *property_value )
+{
+	_LCUIString_Copy( &property_ptr->value, property_value );
+}
+
+#else
+
 LCUI_API void
 StyleLib_Free( LCUI_StyleLibrary *lib )
 {
@@ -319,3 +536,4 @@ StyleLib_AddStyleFromFile(	LCUI_StyleLibrary *lib,
 	fclose( fp );
 	return 0;
 }
+#endif
