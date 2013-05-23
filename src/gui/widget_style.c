@@ -12,7 +12,7 @@ typedef struct image_data_ {
 	LCUI_Graph img;		/* 图片文件的图像数据 */
 } image_data;
 
-static LCUI_StyleLibrary style_library;
+static StyleLIB_Library style_library;
 static LCUI_Queue imagefile_library;
 
 static void destroy_imagefile_library( void *arg )
@@ -57,13 +57,13 @@ static int add_imagefile( const char *filepath, LCUI_Graph *buff )
 
 LCUI_API void WidgetStyle_LibraryInit( void )
 {
-	StyleLib_Init( &style_library );
+	StyleLIB_Init( &style_library );
 	Queue_Init( &imagefile_library, sizeof(image_data), destroy_imagefile_library );
 }
 
 LCUI_API void WidgetStyle_LibraryDestroy( void )
 {
-	StyleLib_Free( &style_library );
+	StyleLIB_Destroy( &style_library );
 	Queue_Destroy( &imagefile_library );
 }
 
@@ -132,21 +132,22 @@ static int style_color_convert( const char *style_str, LCUI_RGB *rgb )
 /* 根据部件的样式，同步设置部件的背景 */
 static int WidgetStyle_SyncBackground(
 		LCUI_Widget *widget,
-		LCUI_StyleClass *style_class,
+		StyleLIB_Selector *selector,
+		StyleLIB_Class *style_class,
 		const char *pseudo_class_name )
 {
 	int ret;
 	char *attr_value;
 	LCUI_RGB back_color;
 	LCUI_Graph img_bg;
-	LCUI_StyleAttr *widget_attr;
+	StyleLIB_Property *widget_attr;
 
 	/* 根据样式类句柄，获取样式属性句柄 */
-	widget_attr = StyleLib_GetStyleAttr( style_class,
-			pseudo_class_name, "background-color");
+	widget_attr = StyleLIB_GetProperty( selector, style_class,
+			pseudo_class_name, "background-color" );
 	if( widget_attr != NULL ) {
 		/* 引用属性值 */
-		attr_value = widget_attr->attr_value.string;
+		attr_value = widget_attr->value.string;
 		/* 将属性值转换成颜色数据 */
 		ret = style_color_convert( attr_value, &back_color );
 		if( ret != -1 ) { /* 如果转换成功，则设置部件背景色 */
@@ -154,10 +155,10 @@ static int WidgetStyle_SyncBackground(
 		}
 	}
 
-	widget_attr = StyleLib_GetStyleAttr( style_class,
-			pseudo_class_name, "background-image");
+	widget_attr = StyleLIB_GetProperty( selector, style_class,
+			pseudo_class_name, "background-image" );
 	if( widget_attr != NULL ) {
-		attr_value = widget_attr->attr_value.string;
+		attr_value = widget_attr->value.string;
 		Graph_Init( &img_bg );
 		/* 添加该路径的图片文件，并载入它 */
 		ret = add_imagefile( attr_value, &img_bg );
@@ -165,11 +166,11 @@ static int WidgetStyle_SyncBackground(
 			Widget_SetBackgroundImage( widget, &img_bg );
 		}
 	}
-
-	widget_attr = StyleLib_GetStyleAttr( style_class,
-			pseudo_class_name, "background-transparent");
+	
+	widget_attr = StyleLIB_GetProperty( selector, style_class,
+			pseudo_class_name, "background-transparent" );
 	if( widget_attr != NULL ) {
-		attr_value = widget_attr->attr_value.string;
+		attr_value = widget_attr->value.string;
 		/* 判断属性值是"true"还是"false" */
 		if( strcmp("1", attr_value) == 0
 		 || lcui_strcasecmp("true",attr_value) == 0) {
@@ -180,11 +181,11 @@ static int WidgetStyle_SyncBackground(
 			Widget_SetBackgroundTransparent( widget, FALSE );
 		 }
 	}
-
-	widget_attr = StyleLib_GetStyleAttr( style_class,
-			pseudo_class_name, "background-layout");
+	
+	widget_attr = StyleLIB_GetProperty( selector, style_class,
+			pseudo_class_name, "background-layout" );
 	if( widget_attr != NULL ) {
-		attr_value = widget_attr->attr_value.string;
+		attr_value = widget_attr->value.string;
 		/* 判断背景图的布局方式 */
 		if( lcui_strcasecmp("center",attr_value) == 0 ) {
 			Widget_SetBackgroundLayout( widget, LAYOUT_CENTER );
@@ -206,7 +207,8 @@ static int WidgetStyle_SyncBackground(
 /* 根据样式，同步部件的定位 */
 static int WidgetStyle_SyncPostion(
 		LCUI_Widget *widget,
-		LCUI_StyleClass *style_class,
+		StyleLIB_Selector *selector,
+		StyleLIB_Class *style_class,
 		const char *pseudo_class_name )
 {
 	int ret;
@@ -214,16 +216,16 @@ static int WidgetStyle_SyncPostion(
 	char *attr_value;
 	IntOrFloat_t num;
 	ALIGN_TYPE align;
-	LCUI_StyleAttr *widget_attr;
+	StyleLIB_Property *widget_attr;
 
 	offset.x = offset.y = 0;
 	align = widget->align;
 	IntOrFloat_Init( &num );
 	/* 获取align属性的值 */
-	widget_attr = StyleLib_GetStyleAttr( style_class,
-			pseudo_class_name, "align");
+	widget_attr = StyleLIB_GetProperty( selector, style_class,
+					pseudo_class_name, "align" );
 	if( widget_attr != NULL ) {
-		attr_value = widget_attr->attr_value.string;
+		attr_value = widget_attr->value.string;
 		if( lcui_strcasecmp("none",attr_value) == 0 ) {
 			align = ALIGN_NONE;
 		} else if( lcui_strcasecmp("top-left",attr_value) == 0 ) {
@@ -247,10 +249,10 @@ static int WidgetStyle_SyncPostion(
 		}
 	}
 	/* 获取left属性的值 */
-	widget_attr = StyleLib_GetStyleAttr( style_class,
-			pseudo_class_name, "left");
+	widget_attr = StyleLIB_GetProperty( selector, style_class,
+					pseudo_class_name, "left" );
 	if( widget_attr != NULL ) {
-		attr_value = widget_attr->attr_value.string;
+		attr_value = widget_attr->value.string;
 		ret = GetIntOrFloat( attr_value, &num );
 		if( ret == 0 ) {
 			if( num.which_one == 1 ) {
@@ -262,10 +264,10 @@ static int WidgetStyle_SyncPostion(
 		}
 	}
 	/* 获取top属性的值 */
-	widget_attr = StyleLib_GetStyleAttr( style_class,
-			pseudo_class_name, "top");
+	widget_attr = StyleLIB_GetProperty( selector, style_class,
+					pseudo_class_name, "top" );
 	if( widget_attr != NULL ) {
-		attr_value = widget_attr->attr_value.string;
+		attr_value = widget_attr->value.string;
 		GetIntOrFloat( attr_value, &num );
 		ret = GetIntOrFloat( attr_value, &num );
 		if( ret == 0 ) {
@@ -369,21 +371,22 @@ static int style_border_convert( const char *style_str, LCUI_Border *border )
 
 static int WidgetStyle_SyncBorder(
 		LCUI_Widget *widget,
-		LCUI_StyleClass *style_class,
+		StyleLIB_Selector *selector,
+		StyleLIB_Class *style_class,
 		const char *pseudo_class_name )
 {
 	int ret;
 	LCUI_Border border;
 	char *attr_value;
 	IntOrFloat_t num;
-	LCUI_StyleAttr *widget_attr;
+	StyleLIB_Property *widget_attr;
 
 	IntOrFloat_Init( &num );
 	/* 获取border属性的值 */
-	widget_attr = StyleLib_GetStyleAttr( style_class,
-			pseudo_class_name, "border");
+	widget_attr = StyleLIB_GetProperty( selector, style_class,
+					pseudo_class_name, "border" );
 	if( widget_attr != NULL ) {
-		attr_value = widget_attr->attr_value.string;
+		attr_value = widget_attr->value.string;
 		ret = style_border_convert( attr_value, &border );
 		if( ret != -1 ) {
 			Widget_SetBorder( widget, border );
@@ -395,29 +398,30 @@ static int WidgetStyle_SyncBorder(
 /* 根据部件样式，同步部件的尺寸 */
 static int WidgetStyle_SyncSize(
 		LCUI_Widget *widget,
-		LCUI_StyleClass *style_class,
+		StyleLIB_Selector *selector,
+		StyleLIB_Class *style_class,
 		const char *pseudo_class_name )
 {
 	int ret;
 	char *attr_value;
 	IntOrFloat_t num;
-	LCUI_StyleAttr *widget_attr;
+	StyleLIB_Property *widget_attr;
 
-	widget_attr = StyleLib_GetStyleAttr( style_class,
-			pseudo_class_name, "width");
+	widget_attr = StyleLIB_GetProperty( selector, style_class,
+					pseudo_class_name, "width" );
 	if( widget_attr != NULL ) {
-		attr_value = widget_attr->attr_value.string;
+		attr_value = widget_attr->value.string;
 		ret = GetIntOrFloat( attr_value, &num );
 		if( ret == 0 ) {
 			widget->w = num;
 			Widget_UpdateSize( widget );
 		}
 	}
-
-	widget_attr = StyleLib_GetStyleAttr( style_class,
-			pseudo_class_name, "height");
+	
+	widget_attr = StyleLIB_GetProperty( selector, style_class,
+					pseudo_class_name, "height" );
 	if( widget_attr != NULL ) {
-		attr_value = widget_attr->attr_value.string;
+		attr_value = widget_attr->value.string;
 		ret = GetIntOrFloat( attr_value, &num );
 		if( ret == 0 ) {
 			widget->h = num;
@@ -429,24 +433,37 @@ static int WidgetStyle_SyncSize(
 
 LCUI_API int WidgetStyle_Sync( LCUI_Widget *widget )
 {
-	char type_name[256], *pseudo_class_name;
-	LCUI_StyleClass *style_class;
+	StyleLIB_Class *style_class;
+	StyleLIB_Selector *style_selector;
+	char type_name[256], *class_name_ptr, class_name[256], *pseudo_class_name;
 
 	if( widget == NULL ) {
 		return -1;
 	}
-	/* 如果部件指定了类型名，则直接用该类型名作为样式类名 */
+	/* 如果部件指定了类型名，则直接用该类型名作为样式选择器名 */
 	if( widget->type_name.string != NULL
 	 && widget->type_name.length > 0 ) {
 		strcpy( type_name, widget->type_name.string );
 	} else {/* 否则，用void-widget作为缺省样式名 */
 		strcpy( type_name, "void-widget" );
 	}
-	/* 从样式库中获取指定名字的样式类句柄 */
-	style_class = StyleLib_GetStyleClass( &style_library, type_name );
-	if( style_class == NULL ) {
+	/* 从样式库中获取指定名称的 选择器 的句柄 */
+	style_selector = StyleLIB_GetSelector( &style_library, type_name );
+	if( style_selector == NULL ) {
 		return 1;
 	}
+
+	/* 如果部件指定了样式类名，则直接用该名称作为样式类名 */
+	if( widget->style_name.string != NULL
+	 && widget->style_name.length > 0 ) {
+		strcpy( class_name, widget->style_name.string );
+		class_name_ptr = class_name;
+	} else {
+		class_name_ptr = NULL;
+	}
+	/* 从样式库中获取指定名称的 样式类 的句柄 */
+	style_class = StyleLIB_GetClass( &style_library, class_name_ptr );
+
 	/* 根据当前部件状态，选定伪类名 */
 	switch(widget->state) {
 	case WIDGET_STATE_ACTIVE:pseudo_class_name="active"; break;
@@ -455,10 +472,11 @@ LCUI_API int WidgetStyle_Sync( LCUI_Widget *widget )
 	case WIDGET_STATE_NORMAL:
 	default: pseudo_class_name=NULL; break;
 	}
+
 	/* 从样式库中同步部件属性 */
-	WidgetStyle_SyncPostion( widget, style_class, pseudo_class_name );
-	WidgetStyle_SyncSize( widget, style_class, pseudo_class_name );
-	WidgetStyle_SyncBackground( widget, style_class, pseudo_class_name );
-	WidgetStyle_SyncBorder( widget, style_class, pseudo_class_name );
+	WidgetStyle_SyncPostion( widget, style_selector, style_class, pseudo_class_name );
+	WidgetStyle_SyncSize( widget, style_selector, style_class, pseudo_class_name );
+	WidgetStyle_SyncBackground( widget, style_selector, style_class, pseudo_class_name );
+	WidgetStyle_SyncBorder( widget, style_selector, style_class, pseudo_class_name );
 	return 0;
 }
