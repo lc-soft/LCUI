@@ -2,80 +2,93 @@
 #define __LCUI_STYLE_LIBRARY_H__
 
 LCUI_BEGIN_HEADER
+	
+typedef struct StyleLIB_Property_ {
+	LCUI_String name;	/* 属性名 */
+	LCUI_String value;	/* 属性值 */
+} StyleLIB_Property;
 
-typedef struct {
-	LCUI_Queue style_classes;
-} LCUI_StyleLibrary;
+typedef struct StyleLIB_PseudoClass_ {
+	LCUI_String name;	/* 伪类的名称 */
+	LCUI_Queue property;	/* 伪类的属性集 */
+} StyleLIB_PseudoClass;
 
-typedef struct {
-	LCUI_String class_name;		/* 类名 */
-	LCUI_Queue style_attr;		/* 该类的样式属性 */
-	LCUI_Queue pseudo_classes;	/* 伪类 */
-} LCUI_StyleClass;
+typedef struct StyleLIB_Element_ {
+	LCUI_String name;		/* 名称 */
+	LCUI_Queue property;		/* 属性集 */
+	LCUI_Queue pseudo_class;	/* 拥有的伪类 */
+} StyleLIB_Element, StyleLIB_Selector, StyleLIB_Class;
 
-typedef struct {
-	LCUI_String attr_name;
-	LCUI_String attr_value;
-} LCUI_StyleAttr;
+typedef struct StyleLIB_Library_ {
+	LCUI_Queue selectors;	/* 选择器 */
+	LCUI_Queue classes;	/* 类 */
+} StyleLIB_Library;
 
-LCUI_API void
-StyleLib_Free( LCUI_StyleLibrary *lib );
+
+/* 销毁样式库 */
+LCUI_API void StyleLIB_Destroy( StyleLIB_Library *lib_ptr );
 
 /* 初始化样式库 */
-LCUI_API void
-StyleLib_Init( LCUI_StyleLibrary *lib );
+LCUI_API void StyleLIB_Init( StyleLIB_Library *lib_ptr );
 
-LCUI_API void
-StyleAttr_Init( LCUI_StyleAttr *attr );
+/* 添加一个选择器 */
+LCUI_API StyleLIB_Element *
+StyleLIB_AddSelector(	StyleLIB_Library *lib_ptr,
+			const char *selector_name );
 
-LCUI_API void
-StyleClass_Init( LCUI_StyleClass *style_class );
-
-/* 获取样式类的句柄 */
-LCUI_API LCUI_StyleClass*
-StyleLib_GetStyleClass(	LCUI_StyleLibrary *lib, 
+/* 添加一个类 */
+LCUI_API StyleLIB_Element *
+StyleLIB_AddClass(	StyleLIB_Library *lib_ptr,
 			const char *class_name );
 
-/* 添加指定名称的样式类到样式库中 */
-LCUI_API LCUI_StyleClass*
-StyleLib_AddStyleClass(	LCUI_StyleLibrary *lib, 
-			const char *class_name );
-
-LCUI_API LCUI_StyleAttr*
-StyleLib_GetStyleAttr(	LCUI_StyleClass *style_class,
+/* 为 选择器/类 添加属性 */
+LCUI_API int 
+StyleLIB_AddProperty(	StyleLIB_Element *element_ptr,
 			const char *pseudo_class_name,
-			const char *attr_name );
+			const char *property_name,
+			const char *property_value );
+						
+/* 获取选择器的句柄 */
+LCUI_API StyleLIB_Element *
+StyleLIB_GetSelector(	StyleLIB_Library *lib_ptr,
+			const char *selector_name );
 
-/* 
- * 功能：获取指定样式类中的属性的值 
- * 说明：
- * class		是类句柄
- * pseudo_class_name	伪类名，为NULL时只用主类里的样式属性。
- * attr_name		属性名
- * attr_buff		储存属性值的缓冲区
- * */
-LCUI_API int
-StyleClass_GetStyleAttrValue(	LCUI_StyleClass *style_class,
-				const char *pseudo_class_name,
-				const char *attr_name,
-				char *attr_buff );
+/* 获取类的句柄 */
+LCUI_API StyleLIB_Element *
+StyleLIB_GetClass(	StyleLIB_Library *lib_ptr,
+			const char *class_name );
+					
+/* 获取属性的句柄 */
+LCUI_API StyleLIB_Property *
+StyleLIB_GetProperty(	StyleLIB_Selector *selector_ptr,
+			StyleLIB_Class *class_ptr,
+			const char *pseudo_class_name,
+			const char *property_name );
 
-/* 为样式类添加样式属性 */
-LCUI_API int
-StyleClass_SetStyleAttr(	LCUI_StyleClass *style_class,
+/* 获取属性值 */
+LCUI_API LCUI_BOOL
+StyleLIB_GetPropertyValue(	StyleLIB_Selector *selector_ptr,
+				StyleLIB_Class *class_ptr,
 				const char *pseudo_class_name,
-				const char *attr_name,
-				const char *attr_value );
+				const char *property_name,
+				char *value_buff );
+
+/* 设置属性的值 */
+LCUI_API void
+StyleLIB_SetPropertyValue(	StyleLIB_Property *property_ptr,
+				const char *property_value );
 
 /* 根据字符串的内容，往样式库里添加相应样式 */
 LCUI_API int
-StyleLib_AddStyleFromString(	LCUI_StyleLibrary *lib,
+StyleLib_AddStyleFromString(	StyleLIB_Library *lib,
 				const char *style_string );
+
 
 /* 根据指定文件内的数据，往样式库里添加相应样式 */
 LCUI_API int
-StyleLib_AddStyleFromFile(	LCUI_StyleLibrary *lib,
+StyleLib_AddStyleFromFile(	StyleLIB_Library *lib,
 				const char *filepath );
+
 
 LCUI_END_HEADER
 
