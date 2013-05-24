@@ -270,6 +270,7 @@ Register_Label(void)
 {
 	WidgetType_Add("label");
 	WidgetFunc_Add("label",	Label_ExecInit,	FUNC_TYPE_INIT);
-	WidgetFunc_Add("label",	Label_ExecDraw,	FUNC_TYPE_DRAW); 
+	WidgetFunc_Add("label",	Label_ExecDraw,	FUNC_TYPE_DRAW);
+	WidgetFunc_Add("label",	Label_ExecDraw,	FUNC_TYPE_UPDATE);
 	WidgetFunc_Add("label", Destroy_Label,	FUNC_TYPE_DESTROY);
 }
