@@ -449,9 +449,6 @@ LCUI_API int WidgetStyle_Sync( LCUI_Widget *widget )
 	}
 	/* 从样式库中获取指定名称的 选择器 的句柄 */
 	style_selector = StyleLIB_GetSelector( &style_library, type_name );
-	if( style_selector == NULL ) {
-		return 1;
-	}
 
 	/* 如果部件指定了样式类名，则直接用该名称作为样式类名 */
 	if( widget->style_name.string != NULL
@@ -472,7 +469,7 @@ LCUI_API int WidgetStyle_Sync( LCUI_Widget *widget )
 	case WIDGET_STATE_NORMAL:
 	default: pseudo_class_name=NULL; break;
 	}
-
+	DEBUG_MSG1("selector: %p, class: %p\n", style_selector, style_class);
 	/* 从样式库中同步部件属性 */
 	WidgetStyle_SyncPostion( widget, style_selector, style_class, pseudo_class_name );
 	WidgetStyle_SyncSize( widget, style_selector, style_class, pseudo_class_name );
