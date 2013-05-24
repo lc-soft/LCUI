@@ -251,7 +251,9 @@ StyleLIB_AddProperty(	StyleLIB_Element *element_ptr,
 	LCUI_Queue *target_queue;
 	StyleLIB_PseudoClass *pclass;
 	StyleLIB_Property *property_ptr;
-	
+	if( element_ptr == NULL ) {
+		return -1;
+	}
 	pclass = StyleLIB_GetExistPseudoClass(
 			element_ptr, pseudo_class_name );
 	if( pclass == NULL ) {
@@ -262,7 +264,7 @@ StyleLIB_AddProperty(	StyleLIB_Element *element_ptr,
 	property_ptr = StyleLIB_GetExistProperty(
 			target_queue, property_name );
 	if( property_ptr == NULL ) {
-		return -1;
+		return -2;
 	}
 	_LCUIString_Copy( &property_ptr->name, property_name );
 	_LCUIString_Copy( &property_ptr->value, property_value );
@@ -295,23 +297,31 @@ StyleLIB_GetProperty(	StyleLIB_Selector *selector_ptr,
 	StyleLIB_PseudoClass *pclass;
 	LCUI_Queue *property_list;
 	StyleLIB_Property *first_prop, *second_prop;
-	/* 先从 选择器 查找第一个属性 */
-	pclass = StyleLIB_FindPseudoClass( selector_ptr, pseudo_class_name );
-	if( pclass == NULL ) {
-		property_list = &selector_ptr->property;
+	
+	if( selector_ptr != NULL ) {
+		/* 先从 选择器 查找第一个属性 */
+		pclass = StyleLIB_FindPseudoClass( selector_ptr, pseudo_class_name );
+		if( pclass == NULL ) {
+			property_list = &selector_ptr->property;
+		} else {
+			property_list = &pclass->property;
+		}
+		first_prop = StyleLIB_FindProperty( property_list, property_name );
 	} else {
-		property_list = &pclass->property;
+		first_prop = NULL;
 	}
-	first_prop = StyleLIB_FindProperty( property_list, property_name );
-
-	/* 再从 类 中查找第二个属性 */
-	pclass = StyleLIB_FindPseudoClass( class_ptr, pseudo_class_name );
-	if( pclass == NULL ) {
-		property_list = &class_ptr->property;
+	if( class_ptr != NULL ) {
+		/* 再从 类 中查找第二个属性 */
+		pclass = StyleLIB_FindPseudoClass( class_ptr, pseudo_class_name );
+		if( pclass == NULL ) {
+			property_list = &class_ptr->property;
+		} else {
+			property_list = &pclass->property;
+		}
+		second_prop = StyleLIB_FindProperty( property_list, property_name );
 	} else {
-		property_list = &pclass->property;
+		second_prop = NULL;
 	}
-	second_prop = StyleLIB_FindProperty( property_list, property_name );
 	/* 如果没找到一个属性，则返回NULL */
 	if( first_prop == NULL
 	 && second_prop == NULL ) {
