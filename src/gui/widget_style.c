@@ -217,8 +217,9 @@ static int WidgetStyle_SyncPostion(
 	IntOrFloat_t num;
 	ALIGN_TYPE align;
 	StyleLIB_Property *widget_attr;
-
-	offset.x = offset.y = 0;
+	
+	offset.x = widget->offset.x;
+	offset.y = widget->offset.y;
 	align = widget->align;
 	IntOrFloat_Init( &num );
 	/* 获取align属性的值 */
@@ -436,7 +437,7 @@ LCUI_API int WidgetStyle_Sync( LCUI_Widget *widget )
 	StyleLIB_Class *style_class;
 	StyleLIB_Selector *style_selector;
 	char type_name[256], *class_name_ptr, class_name[256], *pseudo_class_name;
-
+	
 	if( widget == NULL ) {
 		return -1;
 	}
@@ -444,7 +445,7 @@ LCUI_API int WidgetStyle_Sync( LCUI_Widget *widget )
 	if( widget->type_name.string != NULL
 	 && widget->type_name.length > 0 ) {
 		strcpy( type_name, widget->type_name.string );
-	} else {/* 否则，用void-widget作为缺省样式名 */
+	} else {/* 否则，用void-widget作为缺省选择器名 */
 		strcpy( type_name, "void-widget" );
 	}
 	/* 从样式库中获取指定名称的 选择器 的句柄 */
