@@ -667,16 +667,18 @@ TextLayer_Text_Clear( LCUI_TextLayer *layer )
 	if( layer == NULL ) {
 		return;
 	}
-	
+	/* 刷新文本图层，记录当前文字的区域，以在绘制时抹去残余文字位图 */
+	TextLayer_Refresh( layer );
+	/* 销毁现有数据 */
 	Queue_Destroy( &layer->text_source_data );
 	Queue_Destroy( &layer->rows_data );
 	Queue_Destroy( &layer->tag_buff );
-
+	/* 再初始化 */
 	Queue_Init( &layer->text_source_data, sizeof(LCUI_CharData), Destroy_CharData );
 	Queue_SetDataMode( &layer->text_source_data, QUEUE_DATA_MODE_LINKED_LIST ); 
 	Queue_Init( &layer->rows_data, sizeof(Text_RowData), Destroy_Text_RowData ); 
 	StyleTag_Init( &layer->tag_buff );
-	
+	/* 重置相关变量 */
 	layer->offset_pos.x = 0;
 	layer->offset_pos.y = 0;
 	layer->current_src_pos = 0;
