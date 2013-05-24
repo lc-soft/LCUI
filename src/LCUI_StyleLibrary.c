@@ -369,6 +369,7 @@ typedef struct style_scan_status {
 	LCUI_BOOL save_class_name;
 	LCUI_BOOL save_attr_name; 
 	LCUI_BOOL save_attr_value;
+	LCUI_BOOL is_selector;
 	StyleLIB_Element *cur_style;
 } style_scan_status;
 
@@ -377,6 +378,7 @@ static void style_scan_status_init( style_scan_status *status )
 	status->save_attr_name = FALSE;
 	status->save_attr_value = FALSE;
 	status->save_class_name = FALSE;
+	status->is_selector = TRUE;
 	status->cur_style = NULL;
 	memset( status->name_buff, 0, sizeof(status->name_buff) );
 	memset( status->value_buff, 0, sizeof(status->value_buff) );
@@ -453,7 +455,11 @@ static void StyleLIB_ScanStyle(
 				status->ch_pos = 0;
 				status->save_class_name = FALSE;
 				status->save_attr_name = TRUE;
-				status->cur_style = StyleLIB_AddClass( lib, status->name_buff );
+				if( status->is_selector ) {
+					status->cur_style = StyleLIB_AddSelector( lib, status->name_buff );
+				} else {
+					status->cur_style = StyleLIB_AddClass( lib, status->name_buff );
+				}
 				DEBUG_MSG1("add class: %s\n", status->name_buff);
 				break;
 			default:
@@ -463,7 +469,16 @@ static void StyleLIB_ScanStyle(
 			}
 			continue;
 		}
-		if( *cur == '.' ) {
+		/* 如果是以字母下划线开头 */
+		if( *cur >= 'a' && *cur <= 'z'
+		 || *cur >= 'A' && *cur <= 'Z'
+		 || *cur == '_' ) {
+			status->is_selector = TRUE;
+			status->save_class_name = TRUE;
+			status->ch_pos = 0;
+			--cur; /* 下个循环中需要将当前字符记录进去 */
+		} else if( *cur == '.' ) {
+			status->is_selector = FALSE;
 			status->save_class_name = TRUE;
 			status->ch_pos = 0;
 		}
