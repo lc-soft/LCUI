@@ -743,9 +743,9 @@ print_widget_info(LCUI_Widget *widget)
 				break;
 			}
 		}
-		printf("widget: %p, type: %s, visible: %d, show pos: %d, pos: (%d,%d), size: (%d, %d)\n",
+		printf("widget: %p, type: %s, visible: %d, show pos: %d, z-index: %d, pos: (%d,%d), size: (%d, %d)\n",
 			widget, widget->type_name.string, widget->visible,
-			i, widget->pos.x, widget->pos.y,
+			i, widget->main_glayer->z_index, widget->pos.x, widget->pos.y,
 			widget->size.w, widget->size.h);
 	} else {
 		printf("NULL widget\n");
@@ -1540,6 +1540,7 @@ Widget_SetBackgroundImage( LCUI_Widget *widget, LCUI_Graph *img )
 	if(!widget) {
 		return;
 	}
+	Widget_Draw( widget );
 	if( !Graph_IsValid(img) ) {
 		Graph_Init( &widget->background.image );
 		return;
