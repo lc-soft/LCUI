@@ -111,7 +111,7 @@ LCUI_API LCUI_GraphLayer* GraphLayer_New( void )
 {
 	LCUI_GraphLayer * glayer;
 	
-	glayer = malloc( sizeof( LCUI_GraphLayer ) );
+	glayer = (LCUI_GraphLayer*)malloc( sizeof( LCUI_GraphLayer ) );
 	if( glayer == NULL ) {
 		return NULL;
 	}
@@ -119,6 +119,10 @@ LCUI_API LCUI_GraphLayer* GraphLayer_New( void )
 	glayer->visible = FALSE;
 	glayer->inherit_alpha = TRUE;
 	glayer->pos.x = glayer->pos.y = glayer->z_index = 0;
+	glayer->padding.left = 0;
+	glayer->padding.top = 0;
+	glayer->padding.bottom = 0;
+	glayer->padding.right = 0;
 	glayer->parent = NULL;
 	Graph_Init( &glayer->graph );
 	Queue_Init( &glayer->child, 0, NULL );
@@ -183,6 +187,10 @@ LCUI_API LCUI_Rect GraphLayer_GetRect( LCUI_GraphLayer *glayer )
 	LCUI_Rect rect;
 	rect.x = glayer->pos.x;
 	rect.y = glayer->pos.y;
+	if( glayer->parent ) {
+		rect.x += glayer->parent->padding.left;
+		rect.y += glayer->parent->padding.top;
+	}
 	rect.width = glayer->graph.width;
 	rect.height = glayer->graph.height;
 	return rect;
@@ -216,6 +224,10 @@ LCUI_API int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y )
 	return 0;
 }
 
+LCUI_API void GraphLayer_SetPadding( LCUI_GraphLayer *glayer, LCUI_Padding padding )
+{
+	glayer->padding = padding;
+}
 
 LCUI_API void GraphLayer_SetAlpha( LCUI_GraphLayer *glayer, uchar_t alpha )
 {
@@ -292,8 +304,9 @@ LCUI_API LCUI_Graph* GraphLayer_GetSelfGraph( LCUI_GraphLayer *glayer )
 	return &glayer->graph;
 }
 
-LCUI_API LCUI_Rect GraphLayer_GetValidRect(	LCUI_GraphLayer *root_glayer,
-						LCUI_GraphLayer *glayer )
+LCUI_API LCUI_Rect 
+GraphLayer_GetValidRect(	LCUI_GraphLayer *root_glayer,
+				LCUI_GraphLayer *glayer )
 {
 	int temp; 
 	LCUI_Pos pos;
@@ -307,18 +320,21 @@ LCUI_API LCUI_Rect GraphLayer_GetValidRect(	LCUI_GraphLayer *root_glayer,
 	cut_rect.width = glayer->graph.width;
 	cut_rect.height = glayer->graph.height;
 	pos = glayer->pos;
-	area.x = area.y = 0;
 	if( !root_glayer || !glayer->parent ) {
 		return cut_rect;
-	} 
-	else if( glayer->parent == root_glayer ) { 
-		area.width = root_glayer->graph.width;
-		area.height = root_glayer->graph.height;
-	} else {
-		area.width = glayer->parent->graph.width;
-		area.height = glayer->parent->graph.height;
 	}
-	
+	pos.x += glayer->parent->padding.left;
+	pos.y += glayer->parent->padding.top;
+	/* 计算当前有效显示区域 */
+	area.x = glayer->parent->padding.left;
+	area.y = glayer->parent->padding.top;
+	area.width = glayer->parent->graph.width;
+	area.width -= glayer->parent->padding.left;
+	area.width -= glayer->parent->padding.right;
+	area.height = glayer->parent->graph.height;
+	area.height -= glayer->parent->padding.top;
+	area.height -= glayer->parent->padding.bottom;
+	/* 根据图层的坐标及尺寸，计算图层裁剪后的区域 */
 	if(pos.x < area.x) {
 		cut_rect.x = area.x - pos.x; 
 		cut_rect.width -= cut_rect.x;
@@ -382,7 +398,12 @@ GraphLayer_GetGlobalPos(	LCUI_GraphLayer *root_glayer,
 		return Pos(0,0);
 	}
 	pos = GraphLayer_GetGlobalPos( root_glayer, glayer->parent );
-	pos = Pos_Add( pos, glayer->pos );
+	pos.x += glayer->pos.x;
+	pos.y += glayer->pos.y;
+	if( glayer->parent ) {
+		pos.x += glayer->parent->padding.left;
+		pos.y += glayer->parent->padding.top;
+	}
 	return pos;
 }
 
@@ -414,7 +435,7 @@ __GraphLayer_GetLayers(
 	//		root_glayer, glayer, total );
 	/* 从尾到首，从底到顶，遍历图层 */
 	for( i=total-1; i>=0; --i ) {
-		child = Queue_Get( child_list, i );
+		child = (LCUI_GraphLayer*)Queue_Get( child_list, i );
 		if( !child || !child->visible ) {
 			continue;
 		}
@@ -502,7 +523,7 @@ LCUI_API int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 	}
 	
 	for(i=total-1; i>=0; --i) {
-		glayer = Queue_Get( &glayerQ, i );
+		glayer = (LCUI_GraphLayer*)Queue_Get( &glayerQ, i );
 		valid_area = GraphLayer_GetValidRect( ctnr, glayer );
 		glayer_pos = GraphLayer_GetGlobalPos( ctnr, glayer );
 		valid_area.x += glayer_pos.x;
