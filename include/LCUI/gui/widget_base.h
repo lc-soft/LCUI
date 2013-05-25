@@ -70,13 +70,10 @@ Widget_GetContainerSize( LCUI_Widget *widget );
 
 /***************************** Widget *********************************/
 
-/* 获取部件的主图层指针 */
-LCUI_API LCUI_GraphLayer *
-Widget_GetMainGraphLayer( LCUI_Widget *widget );
 
-/* 获取部件的客户区图层指针 */
+/* 获取部件的图层指针 */
 LCUI_API LCUI_GraphLayer *
-Widget_GetClientGraphLayer( LCUI_Widget *widget );
+Widget_GetGraphLayer( LCUI_Widget *widget );
 
 /* 获取部件的子部件队列 */
 LCUI_API LCUI_Queue*
