@@ -68,7 +68,7 @@ Widget_Container_Add( LCUI_Widget *ctnr, LCUI_Widget *widget )
 		return -1;
 	}
 	new_queue = Widget_GetChildList( ctnr );
-	ctnr_glayer = Widget_GetClientGraphLayer( ctnr );
+	ctnr_glayer = Widget_GetGraphLayer( ctnr );
 	/* 如果部件有父部件，那就在父部件的子部件队列中 */
 	if( widget->parent ) {
 		old_queue = &widget->parent->child;
@@ -89,7 +89,7 @@ Widget_Container_Add( LCUI_Widget *ctnr, LCUI_Widget *widget )
 	widget->parent = ctnr; /* 保存父部件指针 */
 	Queue_AddPointer( new_queue, widget ); /* 添加至部件队列 */
 	/* 将部件图层移动至新的父图层内 */
-	GraphLayer_MoveChild( ctnr_glayer, widget->main_glayer );
+	GraphLayer_MoveChild( ctnr_glayer, widget->glayer );
 	Widget_UpdatePos( widget );
 	return 0;
 }
@@ -109,8 +109,8 @@ _Widget_GetContainerWidth(LCUI_Widget *widget)
 		width = _Widget_GetContainerWidth( widget );
 		width *= widget->w.scale;
 	}
-	width -= widget->padding.left;
-	width -= widget->padding.right;
+	width -= widget->glayer->padding.left;
+	width -= widget->glayer->padding.right;
 	return width;
 }
 
@@ -129,8 +129,8 @@ _Widget_GetContainerHeight(LCUI_Widget *widget)
 		height = _Widget_GetContainerHeight( widget );
 		height *= widget->h.scale;
 	}
-	height -= widget->padding.top;
-	height -= widget->padding.bottom;
+	height -= widget->glayer->padding.top;
+	height -= widget->glayer->padding.bottom;
 	return height;
 }
 
@@ -143,7 +143,7 @@ Widget_GetContainerWidth( LCUI_Widget *widget )
 		return LCUIScreen_GetWidth();
 	}
 	width = _Widget_GetWidth( widget );
-	width -= (widget->padding.left + widget->padding.right);
+	width -= (widget->glayer->padding.left + widget->glayer->padding.right);
 	return width;
 }
 
@@ -156,7 +156,7 @@ Widget_GetContainerHeight( LCUI_Widget *widget )
 		return LCUIScreen_GetHeight();
 	}
 	height = _Widget_GetHeight( widget );
-	height -= (widget->padding.top + widget->padding.bottom);
+	height -= (widget->glayer->padding.top + widget->glayer->padding.bottom);
 	return height;
 }
 
@@ -173,24 +173,14 @@ Widget_GetContainerSize( LCUI_Widget *widget )
 
 /***************************** Widget *********************************/
 
-/* 获取部件的主图层指针 */
+/* 获取部件图层指针 */
 LCUI_API LCUI_GraphLayer *
-Widget_GetMainGraphLayer( LCUI_Widget *widget )
+Widget_GetGraphLayer( LCUI_Widget *widget )
 {
 	if( widget == NULL ) {
 		return LCUI_Sys.root_glayer;
 	}
-	return widget->main_glayer;
-}
-
-/* 获取部件的客户区图层指针 */
-LCUI_API LCUI_GraphLayer *
-Widget_GetClientGraphLayer( LCUI_Widget *widget )
-{
-	if( widget == NULL ) {
-		return LCUI_Sys.root_glayer;
-	}
-	return widget->client_glayer;
+	return widget->glayer;
 }
 
 /* 获取部件的子部件队列 */
@@ -479,8 +469,8 @@ Widget_ToRelPos(LCUI_Widget *widget, LCUI_Pos global_pos)
 	}
 	//widget = widget->parent;
 	while( widget ) {
-		global_pos.x -= widget->padding.left;
-		global_pos.y -= widget->padding.top;
+		global_pos.x -= widget->glayer->padding.left;
+		global_pos.y -= widget->glayer->padding.top;
 		global_pos.x -= widget->pos.x;
 		global_pos.y -= widget->pos.y;
 		widget = widget->parent;
@@ -713,7 +703,7 @@ Widget_PrintChildList( LCUI_Widget *widget )
 			continue;
 		}
 		printf("[%d] widget: %p, type: %s, z-index: %d, pos: (%d,%d), size: (%d, %d)\n",
-			i, child, child->type_name.string, child->main_glayer->z_index,
+			i, child, child->type_name.string, child->glayer->z_index,
 			child->pos.x, child->pos.y,
 			child->size.w, child->size.h);
 	}
@@ -745,7 +735,7 @@ print_widget_info(LCUI_Widget *widget)
 		}
 		printf("widget: %p, type: %s, visible: %d, show pos: %d, z-index: %d, pos: (%d,%d), size: (%d, %d)\n",
 			widget, widget->type_name.string, widget->visible,
-			i, widget->main_glayer->z_index, widget->pos.x, widget->pos.y,
+			i, widget->glayer->z_index, widget->pos.x, widget->pos.y,
 			widget->size.w, widget->size.h);
 	} else {
 		printf("NULL widget\n");
@@ -763,8 +753,8 @@ Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 		return -1;
 	}
 	/* 加上内边距 */
-	rect.x += widget->padding.left;
-	rect.y += widget->padding.top;
+	rect.x += widget->glayer->padding.left;
+	rect.y += widget->glayer->padding.top;
 	/* 根据部件所在容器的尺寸，调整矩形位置及尺寸 */
 	rect = LCUIRect_ValidArea( Widget_GetSize(widget), rect );
 	if( widget->visible ) {
@@ -846,8 +836,8 @@ __Widget_SyncInvalidArea(	LCUI_Widget *widget,
 		}
 		point.x = global_pos.x + child->pos.x;
 		point.y = global_pos.y + child->pos.y;
-		point.x += widget->padding.left;
-		point.y += widget->padding.top;
+		point.x += widget->glayer->padding.left;
+		point.y += widget->glayer->padding.top;
 		__Widget_SyncInvalidArea( child, point, valid_area );
 	}
 }
@@ -1046,8 +1036,8 @@ __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 			printf("get graph pixel error\n");
 		} */
 		/* 减去内边距 */
-		pos.x -= ctnr->padding.left;
-		pos.y -= ctnr->padding.top;
+		pos.x -= ctnr->glayer->padding.left;
+		pos.y -= ctnr->glayer->padding.top;
 	} else {
 		widget_list = &LCUI_Sys.widget_list;
 	}
@@ -1144,8 +1134,7 @@ Destroy_Widget( void *arg )
 	/* 释放字符串 */
 	LCUIString_Free(&widget->type_name);
 	LCUIString_Free(&widget->style_name);
-	GraphLayer_Free( widget->main_glayer );
-	GraphLayer_Free( widget->client_glayer );
+	GraphLayer_Free( widget->glayer );
 
 	/* 销毁部件的队列 */
 	Queue_Destroy(&widget->child);
@@ -1282,27 +1271,21 @@ Widget_New( const char *widget_type )
 
 	/* 初始化边框数据 */
 	Border_Init( &widget->border );
-	Padding_Init( &widget->padding );
-	Margin_Init( &widget->margin );
 
 	Widget_BackgroundInit( widget );
 
 	/* 创建两个图层 */
-	widget->main_glayer = GraphLayer_New();
-	widget->client_glayer = GraphLayer_New();
-	/* 客户区图层作为主图层的子图层 */
-	GraphLayer_AddChild( widget->main_glayer, widget->client_glayer );
+	widget->glayer = GraphLayer_New();
 	/* 主图层作为根图层的子图层 */
-	GraphLayer_AddChild( LCUI_Sys.root_glayer, widget->main_glayer );
+	GraphLayer_AddChild( LCUI_Sys.root_glayer, widget->glayer );
 	/* 继承主图层的透明度 */
-	GraphLayer_InerntAlpha( widget->client_glayer, TRUE );
+	GraphLayer_InerntAlpha( widget->glayer, TRUE );
 	/* 设定图层属性 */
-	widget->main_glayer->graph.have_alpha = TRUE;
-	widget->client_glayer->graph.have_alpha = TRUE;
-	//widget->client_glayer->graph.is_opaque = FALSE;
-	//widget->client_glayer->graph.not_visible = TRUE;
+	widget->glayer->graph.have_alpha = TRUE;
+	//widget->glayer->graph.is_opaque = FALSE;
+	//widget->glayer->graph.not_visible = TRUE;
 	/* 显示图层 */
-	GraphLayer_Show( widget->client_glayer );
+	GraphLayer_Show( widget->glayer );
 
 	RectQueue_Init( &widget->invalid_area ); /* 初始化无效区域记录 */
 	EventSlots_Init( &widget->event );	/* 初始化部件的事件数据队列 */
@@ -1366,8 +1349,8 @@ static LCUI_Pos Widget_CountPos( LCUI_Widget *widget )
 		return widget->pos;
 	}
 	pos = Widget_CountPos(widget->parent);
-	pos.x += widget->parent->padding.left;
-	pos.y += widget->parent->padding.top;
+	pos.x += widget->parent->glayer->padding.left;
+	pos.y += widget->parent->glayer->padding.top;
 	pos = Pos_Add(pos, widget->pos);
 	return pos;
 }
@@ -1600,9 +1583,9 @@ Widget_Visible( LCUI_Widget *widget, LCUI_BOOL flag )
 {
 	widget->visible = flag;
 	if( flag ) {
-		GraphLayer_Show( widget->main_glayer );
+		GraphLayer_Show( widget->glayer );
 	} else {
-		GraphLayer_Hide( widget->main_glayer );
+		GraphLayer_Hide( widget->glayer );
 	}
 }
 
@@ -1616,29 +1599,13 @@ Widget_SetPos(LCUI_Widget *widget, LCUI_Pos pos)
 	widget->pos = pos;
 }
 
+/* 设置部件的内边距 */
 LCUI_API void
 Widget_SetPadding( LCUI_Widget *widget, LCUI_Padding padding )
-/* 设置部件的内边距 */
 {
-	LCUI_Size size;
-	widget->padding = padding;
-	/* 根据设定的内边距，设置client图层的尺寸及位置 */
-	GraphLayer_SetPos( widget->client_glayer,
-			widget->padding.left, widget->padding.top );
-	size = widget->size;
-	size.w -= (widget->padding.left + widget->padding.right);
-	size.h -= (widget->padding.top + widget->padding.bottom);
-	GraphLayer_Resize( widget->client_glayer, size.w, size.h );
+	GraphLayer_SetPadding( widget->glayer, padding );
 	/* 更新子部件的位置 */
 	Widget_UpdateChildPos( widget );
-}
-
-LCUI_API void
-Widget_SetMargin( LCUI_Widget *widget, LCUI_Margin margin )
-/* 设置部件的外边距 */
-{
-	widget->margin = margin;
-	Widget_UpdateChildPos( widget->parent );
 }
 
 LCUI_API void
@@ -1654,7 +1621,7 @@ LCUI_API int
 Widget_SetZIndex( LCUI_Widget *widget, int z_index )
 {
 	LCUI_GraphLayer *glayer;
-	glayer = Widget_GetMainGraphLayer(widget);
+	glayer = Widget_GetGraphLayer(widget);
 	if( glayer == NULL ) {
 		return -1;
 	}
@@ -1678,8 +1645,8 @@ LCUI_API void
 Widget_SetAlpha(LCUI_Widget *widget, unsigned char alpha)
 /* 功能：设定部件的透明度 */
 {
-	if( GraphLayer_GetAlpha( widget->main_glayer ) != alpha) {
-		GraphLayer_SetAlpha( widget->main_glayer, alpha );
+	if( GraphLayer_GetAlpha( widget->glayer ) != alpha) {
+		GraphLayer_SetAlpha( widget->glayer, alpha );
 		Widget_Refresh( widget );
 	}
 }
@@ -1735,7 +1702,7 @@ Widget_ExecMove( LCUI_Widget *widget, LCUI_Pos pos )
 		/* 否则，直接改坐标 */
 		widget->pos = pos;
 	}
-	GraphLayer_SetPos( widget->main_glayer, pos.x, pos.y );
+	GraphLayer_SetPos( widget->glayer, pos.x, pos.y );
 }
 
 LCUI_API void
@@ -1785,14 +1752,14 @@ Widget_ExecSortChild( LCUI_Widget *widget )
 			if( !child_b ) {
 				continue;
 			}
-			if( child_b->main_glayer->z_index
-			 > child_a->main_glayer->z_index ) {
+			if( child_b->glayer->z_index
+			 > child_a->glayer->z_index ) {
 				Queue_Swap( child_list, j, i );
 			}
 		}
 	}
 	Queue_Unlock( child_list );
-	GraphLayer_Sort( Widget_GetClientGraphLayer(widget) );
+	GraphLayer_Sort( Widget_GetGraphLayer(widget) );
 }
 
 /* 将部件显示在同等z-index值的部件的前端 */
@@ -1820,8 +1787,8 @@ Widget_Front( LCUI_Widget *widget )
 			continue;
 		}
 		if( des_pos == -1 ) {
-			if( child->main_glayer->z_index
-			  <= widget->main_glayer->z_index ) {
+			if( child->glayer->z_index
+			  <= widget->glayer->z_index ) {
 				des_pos = i;
 			}
 		} else {
@@ -1842,7 +1809,7 @@ Widget_Front( LCUI_Widget *widget )
 	/* 找到的话就移动位置 */
 	Queue_Move( child_list, des_pos, src_pos );
 	Queue_Unlock( child_list );
-	return GraphLayer_Front( Widget_GetMainGraphLayer(widget) );
+	return GraphLayer_Front( Widget_GetGraphLayer(widget) );
 }
 
 LCUI_API void
@@ -1932,12 +1899,7 @@ Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 		widget->size = size;
 	}
 	//_DEBUG_MSG("size: %d, %d\n", size.w, size.h);
-	GraphLayer_Resize( widget->main_glayer, size.w, size.h );
-	/* 调整客户区图层尺寸 */
-	size.w -= (widget->padding.left + widget->padding.right);
-	size.h -= (widget->padding.top + widget->padding.bottom);
-	//_DEBUG_MSG("size: %d, %d\n", size.w, size.h);
-	GraphLayer_Resize( widget->client_glayer, size.w, size.h );
+	GraphLayer_Resize( widget->glayer, size.w, size.h );
 
 	WidgetFunc_Call( widget, FUNC_TYPE_RESIZE );
 	//Widget_Refresh( widget );
@@ -2033,7 +1995,7 @@ Widget_ExecDraw(LCUI_Widget *widget)
 LCUI_API LCUI_Graph*
 Widget_GetSelfGraph( LCUI_Widget *widget )
 {
-	return GraphLayer_GetSelfGraph( widget->main_glayer );
+	return GraphLayer_GetSelfGraph( widget->glayer );
 }
 
 /* 获取部件实际显示的图形 */
@@ -2043,8 +2005,7 @@ Widget_GetGraph(
 	LCUI_Graph *graph_buff,
 	LCUI_Rect rect )
 {
-	return GraphLayer_GetGraph( widget->main_glayer,
-		graph_buff, rect );
+	return GraphLayer_GetGraph( widget->glayer, graph_buff, rect );
 }
 
 LCUI_API LCUI_Pos
