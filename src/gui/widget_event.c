@@ -20,7 +20,7 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * LCUI_Work.c -- LCUI部件的事件模块
+ * widget_event.c -- LCUI部件的事件模块
  *
  * 版权所有 (C) 2012-2013 归属于
  * 刘超
@@ -46,17 +46,10 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
-/***************************** Func ***********************************/
-LCUI_API void
-NULL_Func()
-/* 功能：空函数，不做任何操作 */
-{
-	return;
-}
 
+/* 初始化函数指针队列 */
 LCUI_API void
 FuncQueue_Init(LCUI_Queue *queue)
-/* 功能：初始化函数指针队列 */
 {
 	Queue_Init(queue, sizeof(LCUI_Func), NULL);
 }
@@ -65,9 +58,9 @@ FuncQueue_Init(LCUI_Queue *queue)
 static LCUI_Widget *click_widget = NULL;
 static LCUI_Pos __offset_pos = {0, 0};  /* 点击部件时保存的偏移坐标 */
 
+/* 从部件队列中获取指定部件的排列位置 */
 static int
-WidgetQueue_Get_Pos(LCUI_Queue *queue, LCUI_Widget *widget)
-/* 功能：从部件队列中获取指定部件的排列位置 */
+WidgetQueue_FindPos(LCUI_Queue *queue, LCUI_Widget *widget)
 {
 	LCUI_Widget *temp;
 	int i, result = -1, total;
@@ -132,9 +125,9 @@ int Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	return 0;
 }
 
-static LCUI_BOOL
-Widget_Have_Event(LCUI_Widget *widget, int event_id)
 /* 检测部件是否关联了指定事件 */
+static LCUI_BOOL
+Widget_HaveEvent(LCUI_Widget *widget, int event_id)
 {
 	LCUI_EventSlot *event;
 
@@ -159,7 +152,7 @@ Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
 	if( !widget ) {
 		return NULL;
 	}
-	if( Widget_Have_Event(widget, event_id) ) {
+	if( Widget_HaveEvent(widget, event_id) ) {
 		return widget;
 	}
 	if( !widget->parent ) {
@@ -563,13 +556,16 @@ Set_Focus( LCUI_Widget *widget )
 	} else {
 		return FALSE;
 	}
-
 	if( widget->parent ) {
 		focus_widget = &widget->parent->focus_widget;
 	} else {
 		focus_widget = &root_focus_widget;
 	}
 	if( *focus_widget ) {
+		/* 若之前获得焦点的是模态部件，则不能移动焦点 */
+		if( (*focus_widget)->modal ) {
+			return FALSE;
+		}
 		/* 如果上次和这次的部件不一样 */
 		if( *focus_widget != widget ) {
 			event.type = EVENT_FOCUSOUT;
@@ -624,7 +620,7 @@ Get_FocusWidget( LCUI_Widget *widget )
 	if( total <= 0 ) {
 		return NULL;
 	}
-	focus_pos = WidgetQueue_Get_Pos( queue_ptr, *focus_widget );
+	focus_pos = WidgetQueue_FindPos( queue_ptr, *focus_widget );
 	if( focus_pos < 0 ) {
 		*focus_widget = NULL;
 		return NULL;
@@ -675,7 +671,7 @@ Cancel_Focus( LCUI_Widget *widget )
 	Widget_DispatchEvent( widget, &event );
 	/* 寻找可获得焦点的其它部件 */
 	total = Queue_GetTotal( queue_ptr );
-	focus_pos = WidgetQueue_Get_Pos( queue_ptr, *focus_widget );
+	focus_pos = WidgetQueue_FindPos( queue_ptr, *focus_widget );
 	for( i=0; i<focus_pos; ++i ) {
 		other_widget = Queue_Get( queue_ptr, i);
 		if( other_widget && other_widget->visible
