@@ -49,16 +49,17 @@ LCUI_BEGIN_HEADER
 
 typedef struct LCUI_GraphLayer_ LCUI_GraphLayer;
 
-/// 图层(GraphLayer)的结构体
+/** 图层(GraphLayer)的结构体 */
 struct LCUI_GraphLayer_
 {
-	LCUI_BOOL visible;		///< 图层是否可见
-	LCUI_BOOL inherit_alpha;	///< 是否继承父图层的透明度
-	int z_index;			///< 图层的堆叠顺序，值越大，图层显示位置越靠前
-	LCUI_Pos pos;			///< 图层的xy轴坐标
-	LCUI_GraphLayer *parent;	///< 该图层的容器图层
-	LCUI_Queue child;		///< 该图层中内的子图层记录
-	LCUI_Graph graph;		///< 图层像素数据
+	LCUI_BOOL visible;		/**< 图层是否可见 */
+	LCUI_BOOL inherit_alpha;	/**< 是否继承父图层的透明度 */
+	LCUI_Padding padding;		/**< 内边距，决定子图层所在显示区域的范围 */
+	int z_index;			/**< 图层的堆叠顺序，值越大，图层显示位置越靠前 */
+	LCUI_Pos pos;			/**< 图层的xy轴坐标 */
+	LCUI_GraphLayer *parent;	/**< 该图层的容器图层 */
+	LCUI_Queue child;		/**< 该图层中内的子图层记录 */
+	LCUI_Graph graph;		/**< 图层像素数据 */
 };
 
 /**
@@ -154,6 +155,15 @@ LCUI_API void GraphLayer_InerntAlpha( LCUI_GraphLayer *glayer, LCUI_BOOL flag );
  * 	@return		正常返回0，图层无效则返回-1
  */
 LCUI_API int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y );
+
+
+/**
+ * 设定图层的内边距
+ * 该内边距决定图层内的有效显示区域的范围，子图层在该区域范围内以外的图像将不可见
+ *	@param glayer	图层
+ *	@param padding	内边距
+ */
+LCUI_API void GraphLayer_SetPadding( LCUI_GraphLayer *glayer, LCUI_Padding padding );
 
 /**
  * 设定图层的全局透明度
