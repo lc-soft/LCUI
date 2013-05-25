@@ -109,10 +109,6 @@ typedef union LCUI_WidgetEvent_ {
 	LCUI_WidgetMouseMotionEvent mouse_motion;
 } LCUI_WidgetEvent;
 
-
-LCUI_API void FuncQueue_Init(LCUI_Queue *queue);
-/* 功能：初始化函数指针队列 */ 
-
 /*----------------------------- 部件事件 -------------------------------------*/
 /* 将回调函数与部件的指定事件进行关联 */
 LCUI_API int

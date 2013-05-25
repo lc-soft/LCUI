@@ -46,14 +46,6 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
-
-/* 初始化函数指针队列 */
-LCUI_API void
-FuncQueue_Init(LCUI_Queue *queue)
-{
-	Queue_Init(queue, sizeof(LCUI_Func), NULL);
-}
-
 /****************** 处理部件拖动/点击事件的相关代码 ************************/
 static LCUI_Widget *click_widget = NULL;
 static LCUI_Pos __offset_pos = {0, 0};  /* 点击部件时保存的偏移坐标 */
