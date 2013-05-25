@@ -521,9 +521,9 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 	if( icon_type != MB_ICON_NONE ) {
 		Widget_Show( iconbox );
 	}
-	Widget_Show( msgbox );
 	Widget_Show( btn_area );
 	Widget_Show( msg_area );
+	Widget_Show( msgbox );
 	
 	loop = msgbox_mainloop_new( msgbox );
 	/* 关联消息框右上角关闭按钮的CLICKED事件 */
