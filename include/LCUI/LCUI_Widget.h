@@ -140,12 +140,7 @@ struct LCUI_Widget_ {
 	DOCK_TYPE	dock;		/* 停靠位置 */
 	/*------------------ END ----------------------*/
 
-	/*------------ 外边距和内边距 ---------------*/
-	LCUI_Margin	margin;
-	LCUI_Padding	padding;
-	/*---------------- END -------------------*/
-
-	LCUI_RGB color;		/* 前景颜色 */
+	LCUI_RGB color;			/* 前景颜色 */
 	LCUI_Border border;		/* 边框 */
 	LCUI_Background background;	/* 背景 */
 
@@ -168,8 +163,7 @@ struct LCUI_Widget_ {
 	int clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“不小于”才使条件成立 */
 	uchar_t clickable_area_alpha;	/* 指定部件图层中的区域的alpha值小于/不小于多少时可被鼠标点击，默认为0，最大为255 */
 
-	LCUI_GraphLayer* main_glayer;	/* 部件的主图层 */
-	LCUI_GraphLayer* client_glayer;	/* 客户区图层 */
+	LCUI_GraphLayer* glayer;	/* 部件的图层 */
 
 	LCUI_Mutex mutex;	/* 互斥锁 */
 	void *private_data;	/* 指针，指向部件私有数据，供预先注册的回调函数利用 */
