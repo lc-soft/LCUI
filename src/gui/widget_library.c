@@ -90,9 +90,10 @@ WidgetType_Add( const char *type_name )
 		}
 	}
 
-	/* 以下需要初始化 */
-	FuncQueue_Init(&new_wd.func);
-	new_wd.type_id = rand(); /* 用随机数作为类型ID */
+	/* 初始化部件函数列表 */
+	Queue_Init( &new_wd.func, sizeof(LCUI_Func), NULL );
+	/* 用随机数作为类型ID */
+	new_wd.type_id = rand();
 	//printf("WidgetType_Add(): widget type id: %ld\n", new_wd.type_id);
 	LCUIString_Init( &new_wd.type_name );
 	_LCUIString_Copy( &new_wd.type_name, type_name );
