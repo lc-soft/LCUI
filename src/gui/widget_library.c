@@ -1,4 +1,4 @@
-#include <LCUI_Build.h>
+ï»¿#include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
 #include LC_ERROR_H
@@ -12,8 +12,8 @@ typedef struct _WidgetTypeData
 WidgetTypeData;
 
 /*
- * ¹¦ÄÜ£ºÎªÖ¸¶¨ÀàĞÍµÄ²¿¼şÌí¼ÓÏà¹ØÀàĞÍµÄº¯Êı
- * ·µ»ØÖµ£º²¿¼şÀàĞÍ²»´æÔÚ£¬·µ»Ø-1£¬ÆäËü´íÎó·µ»Ø-2
+ * åŠŸèƒ½ï¼šä¸ºæŒ‡å®šç±»å‹çš„éƒ¨ä»¶æ·»åŠ ç›¸å…³ç±»å‹çš„å‡½æ•°
+ * è¿”å›å€¼ï¼šéƒ¨ä»¶ç±»å‹ä¸å­˜åœ¨ï¼Œè¿”å›-1ï¼Œå…¶å®ƒé”™è¯¯è¿”å›-2
  **/
 LCUI_API int 
 WidgetFunc_Add(
@@ -33,7 +33,7 @@ WidgetFunc_Add(
 	}
 
 	total = Queue_GetTotal(&app->widget_lib);
-	/* ±éÀúÊı¾İ£¬ÕÒµ½¶ÔÓ¦µÄÎ»ÖÃ */
+	/* éå†æ•°æ®ï¼Œæ‰¾åˆ°å¯¹åº”çš„ä½ç½® */
 	for(i = 0; i < total; ++i) {
 		temp = (WidgetTypeData *)Queue_Get(&app->widget_lib, i);
 		if( temp == NULL ) {
@@ -52,8 +52,8 @@ WidgetFunc_Add(
 		}
 
 		Get_FuncData(&func_data, (CallBackFunc)widget_func, NULL, NULL);
-		func_data.id = func_type; /* ±£´æÀàĞÍID */
-		if(found == 1) {/* Èç¹ûÒÑ¾­´æÔÚ£¬¾Í¸²¸Ç */
+		func_data.id = func_type; /* ä¿å­˜ç±»å‹ID */
+		if(found == 1) {/* å¦‚æœå·²ç»å­˜åœ¨ï¼Œå°±è¦†ç›– */
 			Queue_Replace(&temp->func, i, &func_data);
 		} else {
 			Queue_Add(&temp->func, &func_data);
@@ -64,8 +64,8 @@ WidgetFunc_Add(
 }
 
 /*
- * ¹¦ÄÜ£ºÌí¼ÓÒ»¸öĞÂµÄ²¿¼şÀàĞÍÖÁ²¿¼ş¿â
- * ·µ»ØÖµ£ºÈç¹ûÌí¼ÓµÄĞÂ²¿¼şÀàĞÍÒÑ´æÔÚ£¬·µ»Ø-1£¬³É¹¦Ôò·µ»Ø0
+ * åŠŸèƒ½ï¼šæ·»åŠ ä¸€ä¸ªæ–°çš„éƒ¨ä»¶ç±»å‹è‡³éƒ¨ä»¶åº“
+ * è¿”å›å€¼ï¼šå¦‚æœæ·»åŠ çš„æ–°éƒ¨ä»¶ç±»å‹å·²å­˜åœ¨ï¼Œè¿”å›-1ï¼ŒæˆåŠŸåˆ™è¿”å›0
  **/
 LCUI_API int
 WidgetType_Add( const char *type_name )
@@ -90,9 +90,9 @@ WidgetType_Add( const char *type_name )
 		}
 	}
 
-	/* ÒÔÏÂĞèÒª³õÊ¼»¯ */
+	/* ä»¥ä¸‹éœ€è¦åˆå§‹åŒ– */
 	FuncQueue_Init(&new_wd.func);
-	new_wd.type_id = rand(); /* ÓÃËæ»úÊı×÷ÎªÀàĞÍID */
+	new_wd.type_id = rand(); /* ç”¨éšæœºæ•°ä½œä¸ºç±»å‹ID */
 	//printf("WidgetType_Add(): widget type id: %ld\n", new_wd.type_id);
 	LCUIString_Init( &new_wd.type_name );
 	_LCUIString_Copy( &new_wd.type_name, type_name );
@@ -101,20 +101,20 @@ WidgetType_Add( const char *type_name )
 }
 
 static void WidgetType_Destroy(void *arg)
-/* ¹¦ÄÜ£ºÒÆ³ı²¿¼şÀàĞÍÊı¾İ */
+/* åŠŸèƒ½ï¼šç§»é™¤éƒ¨ä»¶ç±»å‹æ•°æ® */
 {
 	WidgetTypeData *wd = (WidgetTypeData*)arg;
 	Queue_Destroy(&wd->func);
 }
 
-/* ¹¦ÄÜ£º³õÊ¼»¯²¿¼ş¿â */
+/* åŠŸèƒ½ï¼šåˆå§‹åŒ–éƒ¨ä»¶åº“ */
 LCUI_API void
 WidgetLib_Init(LCUI_Queue *w_lib)
 {
 	Queue_Init(w_lib, sizeof(WidgetTypeData), WidgetType_Destroy);
 }
 
-/* ¹¦ÄÜ£ºÉ¾³ıÖ¸¶¨²¿¼şÀàĞÍµÄÏà¹ØÊı¾İ */
+/* åŠŸèƒ½ï¼šåˆ é™¤æŒ‡å®šéƒ¨ä»¶ç±»å‹çš„ç›¸å…³æ•°æ® */
 LCUI_API int
 WidgetType_Delete(const char *type)
 {
@@ -130,7 +130,7 @@ WidgetType_Delete(const char *type)
 	total = Queue_GetTotal(&app->widget_lib);
 	for(i = 0; i < total; ++i) {
 		wd = (WidgetTypeData *)Queue_Get(&app->widget_lib, i);
-		/* Èç¹ûÀàĞÍÒ»ÖÂ */
+		/* å¦‚æœç±»å‹ä¸€è‡´ */
 		if(_LCUIString_Cmp(&wd->type_name, type) == 0) {
 			return Queue_Delete(&app->widget_lib, i);
 		}
@@ -139,17 +139,7 @@ WidgetType_Delete(const char *type)
 	return -1;
 }
 
-/*
- * ¹¦ÄÜ£º¿Õº¯Êı£¬²»×öÈÎºÎ²Ù×÷
- * ËµÃ÷£ºÈç¹û»ñÈ¡Ö¸¶¨²¿¼şÀàĞÍµÄº¯ÊıÖ¸ÕëÊ§°Ü£¬½«·µ»ØÕâ¸öº¯ÊıµÄº¯ÊıÖ¸Õë
- **/
-LCUI_API void
-NULL_Widget_Func(LCUI_Widget *widget)
-{
-	;
-}
-
-/* »ñÈ¡Ö¸¶¨ÀàĞÍ²¿¼şµÄÀàĞÍID */
+/* è·å–æŒ‡å®šç±»å‹éƒ¨ä»¶çš„ç±»å‹ID */
 LCUI_API LCUI_ID
 WidgetType_GetID( const char *widget_type )
 {
@@ -175,7 +165,7 @@ WidgetType_GetID( const char *widget_type )
 
 LCUI_API int
 WidgetType_GetByID(LCUI_ID id, char *widget_type)
-/* ¹¦ÄÜ£º»ñÈ¡Ö¸¶¨ÀàĞÍIDµÄÀàĞÍÃû³Æ */
+/* åŠŸèƒ½ï¼šè·å–æŒ‡å®šç±»å‹IDçš„ç±»å‹åç§° */
 {
 	int total, i;
 	LCUI_App *app;
@@ -198,7 +188,7 @@ WidgetType_GetByID(LCUI_ID id, char *widget_type)
 	return -1;
 }
 
-/* »ñÈ¡Ö¸¶¨²¿¼şÀàĞÍIDµÄº¯ÊıµÄº¯ÊıÖ¸Õë */
+/* è·å–æŒ‡å®šéƒ¨ä»¶ç±»å‹IDçš„å‡½æ•°çš„å‡½æ•°æŒ‡é’ˆ */
 LCUI_API WidgetCallBackFunc
 WidgetFunc_GetByID(LCUI_ID id, FuncType func_type)
 {
@@ -209,7 +199,7 @@ WidgetFunc_GetByID(LCUI_ID id, FuncType func_type)
 
 	app = LCUIApp_GetSelf();
 	if( !app ) {
-		return NULL_Widget_Func;
+		return NULL;
 	}
 
 	total = Queue_GetTotal(&app->widget_lib);
@@ -229,14 +219,14 @@ WidgetFunc_GetByID(LCUI_ID id, FuncType func_type)
 		break;
 	}
 
-	/* Èç¹ûÒÑ¾­´æÔÚ */
+	/* å¦‚æœå·²ç»å­˜åœ¨ */
 	if(found == 1) {
-		return (void(*)(LCUI_Widget*))f->func;
+		return (WidgetCallBackFunc)f->func;
 	}
-	return NULL_Widget_Func;
+	return NULL;
 }
 
-/* »ñÈ¡Ö¸¶¨ÀàĞÍÃûµÄ²¿¼şµÄº¯ÊıÖ¸Õë */
+/* è·å–æŒ‡å®šç±»å‹åçš„éƒ¨ä»¶çš„å‡½æ•°æŒ‡é’ˆ */
 LCUI_API WidgetCallBackFunc
 WidgetFunc_Get(const char *widget_type, FuncType func_type )
 {
@@ -247,7 +237,7 @@ WidgetFunc_Get(const char *widget_type, FuncType func_type )
 
 	app = LCUIApp_GetSelf();
 	if( !app ) {
-		return NULL_Widget_Func;
+		return NULL;
 	}
 
 	total = Queue_GetTotal(&app->widget_lib);
@@ -271,12 +261,12 @@ WidgetFunc_Get(const char *widget_type, FuncType func_type )
 	}
 
 	if(found == 1) {
-		return (void(*)(LCUI_Widget*))f->func;
+		return (WidgetCallBackFunc)f->func;
 	}
-	return NULL_Widget_Func;
+	return NULL;
 }
 
-/* ¼ì²âÖ¸¶¨²¿¼şÀàĞÍÊÇ·ñÓĞĞ§ */
+/* æ£€æµ‹æŒ‡å®šéƒ¨ä»¶ç±»å‹æ˜¯å¦æœ‰æ•ˆ */
 LCUI_API int
 WidgetType_Valid( const char *widget_type )
 {
@@ -303,14 +293,16 @@ WidgetType_Valid( const char *widget_type )
 	return 0;
 }
 
-/* µ÷ÓÃÖ¸¶¨ÀàĞÍµÄ²¿¼şº¯Êı */
+/* è°ƒç”¨æŒ‡å®šç±»å‹çš„éƒ¨ä»¶å‡½æ•° */
 LCUI_API void
 WidgetFunc_Call( LCUI_Widget *widget, FuncType type )
 {
 	void (*func)(LCUI_Widget*);
 
 	func = WidgetFunc_GetByID( widget->type_id, type );
-	func( widget );
+	if( func != NULL ) {
+		func( widget );
+	}
 }
 
 extern void Register_Window(void);
@@ -327,13 +319,13 @@ extern void Register_ScrollBar(void);
 
 LCUI_API void
 Register_DefaultWidgetType()
-/* ¹¦ÄÜ£ºÎª³ÌĞòµÄ²¿¼ş¿âÌí¼ÓÄ¬ÈÏµÄ²¿¼şÀàĞÍ */
+/* åŠŸèƒ½ï¼šä¸ºç¨‹åºçš„éƒ¨ä»¶åº“æ·»åŠ é»˜è®¤çš„éƒ¨ä»¶ç±»å‹ */
 {
-	WidgetType_Add(NULL);	/* Ìí¼ÓÒ»¸öNULLÀàĞÍµÄ²¿¼ş */
-	Register_Window();	/* ×¢²á´°¿Ú²¿¼ş */
-	Register_Label();	/* ×¢²áÎÄ±¾±êÇ©²¿¼ş */
-	Register_Button();	/* ×¢²á°´Å¥²¿¼ş */
-	Register_PictureBox();	/* ×¢²áÍ¼Æ¬ºĞ×Ó²¿¼ş */
+	WidgetType_Add(NULL);	/* æ·»åŠ ä¸€ä¸ªNULLç±»å‹çš„éƒ¨ä»¶ */
+	Register_Window();	/* æ³¨å†Œçª—å£éƒ¨ä»¶ */
+	Register_Label();	/* æ³¨å†Œæ–‡æœ¬æ ‡ç­¾éƒ¨ä»¶ */
+	Register_Button();	/* æ³¨å†ŒæŒ‰é’®éƒ¨ä»¶ */
+	Register_PictureBox();	/* æ³¨å†Œå›¾ç‰‡ç›’å­éƒ¨ä»¶ */
 	Register_ProgressBar();
 	Register_Menu();
 	Register_CheckBox();

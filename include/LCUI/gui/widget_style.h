@@ -1,4 +1,4 @@
-#ifndef __LCUI_WIDGET_STYLE_H__
+﻿#ifndef __LCUI_WIDGET_STYLE_H__
 #define __LCUI_WIDGET_STYLE_H__
 
 LCUI_API void WidgetStyle_LibraryInit( void );
