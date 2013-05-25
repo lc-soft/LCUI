@@ -110,9 +110,6 @@ typedef union LCUI_WidgetEvent_ {
 } LCUI_WidgetEvent;
 
 
-LCUI_API void NULL_Func();
-/* 功能：空函数，不做任何操作 */ 
-
 LCUI_API void FuncQueue_Init(LCUI_Queue *queue);
 /* 功能：初始化函数指针队列 */ 
 
