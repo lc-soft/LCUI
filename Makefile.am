@@ -196,8 +196,9 @@ test/clock/new_daytime_background.png \
 test/clock/new_daytime_minute.png  \
 test/clock/night_hour.png \
 test/clock/clock.c \
-test/clock/new_daytime_cup.png  \
-test/clock/new_night_bg.png  \
-test/clock/night_min.png \
+test/clock/hand_hour.png \
+test/clock/hand_second.png \
+test/clock/dial.png \
+test/clock/hand_minute.png \
 test/clock/Makefile.am \
 test/clock/Makefile.in
