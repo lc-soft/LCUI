@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign
-SUBDIRS=mora photoviewer screenlock clock
+SUBDIRS=mora screenlock clock
 ##设定在编译时头文件的查找位置
 INCLUDES = -I$(top_builddir)/include
 ##需要编译的测试程序, noinst指的是不安装

@@ -226,7 +226,6 @@ AC_OUTPUT([Makefile
                  src/gui/Makefile
                  test/Makefile
                  test/mora/Makefile
-                 test/photoviewer/Makefile
                  test/clock/Makefile
                  test/screenlock/Makefile])
 echo
