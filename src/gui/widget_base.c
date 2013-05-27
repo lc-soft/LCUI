@@ -1271,10 +1271,8 @@ Widget_New( const char *widget_type )
 
 	/* 初始化边框数据 */
 	Border_Init( &widget->border );
-
 	Widget_BackgroundInit( widget );
-
-	/* 创建两个图层 */
+	/* 为部件创建一个图层 */
 	widget->glayer = GraphLayer_New();
 	/* 主图层作为根图层的子图层 */
 	GraphLayer_AddChild( LCUI_Sys.root_glayer, widget->glayer );
@@ -1284,9 +1282,6 @@ Widget_New( const char *widget_type )
 	widget->glayer->graph.have_alpha = TRUE;
 	//widget->glayer->graph.is_opaque = FALSE;
 	//widget->glayer->graph.not_visible = TRUE;
-	/* 显示图层 */
-	GraphLayer_Show( widget->glayer );
-
 	RectQueue_Init( &widget->invalid_area ); /* 初始化无效区域记录 */
 	EventSlots_Init( &widget->event );	/* 初始化部件的事件数据队列 */
 	WidgetQueue_Init( &widget->child );	/* 初始化子部件集 */
