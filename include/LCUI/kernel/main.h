@@ -55,19 +55,6 @@ typedef struct _LCUI_App
 LCUI_App;
 /**********************************************************************/
 
-/****************************** 屏幕信息 ********************************/
-typedef struct _LCUI_Screen
-{
-	LCUI_Size	size;		/* 屏幕尺寸 */
-	char		*fb_dev_name;	/* 图形输出设备的名称 */
-	uchar_t		*fb_mem;	/* 指向图像输出设备映射到的内存的指针 */
-	int		fb_dev_fd;	/* 图形显示设备的句柄 */
-	size_t		smem_len;	/* 内存空间的大小 */
-	int		bits;		/* 每个像素的用多少位表示 */
-}
-LCUI_Screen;
-/***********************************************************************/
-
 /***************************整个LCUI的数据 *****************************/
 typedef struct _LCUI_System
 {
@@ -81,8 +68,6 @@ typedef struct _LCUI_System
 	LCUI_Thread display_thread;	/* 保存核心处理的线程的ID */
 	LCUI_Thread timer_thread;	/* 定时器列表处理线程的ID */
 	LCUI_Thread dev_thread;		/* 设备输入数据处理线程的ID */
-	
-	LCUI_Screen screen; /* 屏幕信息 */
 
 	LCUI_Queue sys_event_slots;	/* 事件槽记录 */
 	LCUI_Queue user_event_slots;	/* 事件槽记录 */
