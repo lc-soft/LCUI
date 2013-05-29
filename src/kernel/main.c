@@ -349,11 +349,6 @@ static void LCUIApp_Init( LCUI_App *app )
 	WidgetLib_Init(&app->widget_lib);
 }
 
-static void LCUIModule_Cursor_End( void )
-{
-	Graph_Free( &LCUI_Sys.cursor.graph );
-}
-
 static void LCUI_DestroyAllApps(void)
 {
 	LCUI_App *app; 
@@ -500,21 +495,12 @@ static void LCUI_ShowCopyrightText()
 /* 功能：打印LCUI的信息 */
 {
 	printf(
-	"============| LCUI v0.13.0 |============\n"
-	"Copyright (C) 2012 Liu Chao.\n"
+	"============| LCUI v0.14.0 |============\n"
+	"Copyright (C) 2012-2013 Liu Chao.\n"
 	"Licensed under GPLv2.\n"
 	"Report bugs to <lc-soft@live.cn>.\n"
 	"Project Homepage: www.lcui.org.\n"
 	"========================================\n" );
-}
-
-/* 初始化游标数据 */
-static void LCUIModule_Cursor_Init( void )
-{
-	LCUI_Graph pic;
-	Graph_Init( &pic );
-	Load_Graph_Default_Cursor( &pic );/* 载入自带的游标的图形数据 */ 
-	LCUICursor_SetGraph( &pic );
 }
 
 LCUI_API LCUI_BOOL
