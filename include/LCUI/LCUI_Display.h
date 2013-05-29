@@ -43,6 +43,18 @@
 #define __LCUI_DISPLAY_H__
 
 LCUI_BEGIN_HEADER
+	
+/****************************** 屏幕信息 ********************************/
+typedef struct LCUI_Screen_
+{
+	LCUI_Size	size;		/* 屏幕尺寸 */
+	char		*fb_dev_name;	/* 图形输出设备的名称 */
+	uchar_t		*fb_mem;	/* 指向图像输出设备映射到的内存的指针 */
+	int		fb_dev_fd;	/* 图形显示设备的句柄 */
+	size_t		smem_len;	/* 内存空间的大小 */
+	int		bits;		/* 每个像素的用多少位表示 */
+} LCUI_Screen;
+/***********************************************************************/
 
 #ifdef LCUI_BUILD_IN_WIN32
 #define WIN32_WINDOW_WIDTH 800
