@@ -50,6 +50,7 @@
 #include <Windows.h>
 
 static HWND current_hwnd = NULL;
+static int pixel_mem_len = 0;
 static unsigned char *pixel_mem = NULL;
 static HDC hdc_client, hdc_framebuffer;
 static HBITMAP client_bitmap;
@@ -60,7 +61,7 @@ Win32_LCUI_Init( HINSTANCE hInstance )
 {
 	win32_hInstance = hInstance;
 }
-#include <time.h>
+
 static LRESULT CALLBACK 
 Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
@@ -135,7 +136,7 @@ LCUIScreen_GetGraph( LCUI_Graph *out )
 }
 
 LCUI_API int
-LCUIScreen_Init( void )
+LCUIScreen_Init( LCUI_Screen *screen_info )
 {
 	RECT client_rect;
 	LCUI_Graph *graph;
@@ -168,17 +169,18 @@ LCUIScreen_Init( void )
 	
 	GetClientRect( current_hwnd, &client_rect );
 
-	LCUI_Sys.screen.fb_dev_fd = -1;
-	LCUI_Sys.screen.fb_dev_name = "win32";
-	LCUI_Sys.screen.bits = 32;
-	LCUI_Sys.screen.size.w = client_rect.right;
-	LCUI_Sys.screen.size.h = client_rect.bottom; 
-	LCUI_Sys.screen.smem_len = LCUI_Sys.screen.size.w * LCUI_Sys.screen.size.h * 4;
+	screen_info->fb_dev_fd = -1;
+	screen_info->fb_dev_name = "win32";
+	screen_info->bits = 32;
+	screen_info->size.w = client_rect.right;
+	screen_info->size.h = client_rect.bottom; 
+	pixel_mem_len = screen_info->size.w * screen_info->size.h * 4;
+	screen_info->smem_len = pixel_mem_len;
 	/* 分配内存，储存像素数据 */ 
-	pixel_mem = malloc ( LCUI_Sys.screen.smem_len );
-	LCUI_Sys.screen.fb_mem = pixel_mem;
+	pixel_mem = (uchar_t*)malloc( screen_info->smem_len );
+	screen_info->fb_mem = pixel_mem;
 	LCUI_Sys.root_glayer = GraphLayer_New();
-	GraphLayer_Resize( LCUI_Sys.root_glayer, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h );
+	GraphLayer_Resize( LCUI_Sys.root_glayer, screen_info->size.w, screen_info->size.h );
 	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
 	Graph_FillColor( graph, RGB(255,255,255) );
 
@@ -187,7 +189,7 @@ LCUIScreen_Init( void )
 	/* 为帧缓冲创建一个DC */
 	hdc_framebuffer = CreateCompatibleDC( hdc_client );
 	/* 为客户区创建一个Bitmap */ 
-	client_bitmap = CreateCompatibleBitmap( hdc_client, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h );
+	client_bitmap = CreateCompatibleBitmap( hdc_client, screen_info->size.w, screen_info->size.h );
 	/* 为帧缓冲的DC选择client_bitmap作为对象 */
 	SelectObject( hdc_framebuffer, client_bitmap );
 	
@@ -198,7 +200,7 @@ LCUIScreen_Init( void )
 }
 
 LCUI_API int
-LCUIScreen_Destroy( void )
+LCUIScreen_Destroy( LCUI_Screen *screen_info )
 {
 	LCUI_Graph *graph;
 	
@@ -214,9 +216,9 @@ LCUIScreen_Destroy( void )
 LCUI_API void
 LCUIScreen_SyncFrameBuffer( void )
 {
-	SetBitmapBits( client_bitmap, LCUI_Sys.screen.smem_len, LCUI_Sys.screen.fb_mem );
+	SetBitmapBits( client_bitmap, pixel_mem_len, pixel_mem );
 	/* 将帧缓冲内的位图数据更新至客户区内指定区域（area） */
-	BitBlt( hdc_client, 0, 0, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h, 
+	BitBlt( hdc_client, 0, 0, LCUIScreen_GetWidth(), LCUIScreen_GetHeight(),
 		hdc_framebuffer, 0, 0, SRCCOPY );
 	ValidateRect( current_hwnd, NULL );
 }
@@ -278,4 +280,5 @@ LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out )
 {
 	return;
 }
+
 #endif

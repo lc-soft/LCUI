@@ -48,6 +48,7 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
+
 #ifdef LCUI_BUILD_IN_WIN32
 #include <Windows.h>
 #endif
@@ -55,6 +56,7 @@
 static LCUI_BOOL i_am_init = FALSE;
 /* 用于记录屏幕无效区域 */
 static LCUI_RectQueue screen_invalid_area;
+static LCUI_Screen screen;
 
 /*
  * 功能：获取屏幕宽度
@@ -63,10 +65,10 @@ static LCUI_RectQueue screen_invalid_area;
 LCUI_API int
 LCUIScreen_GetWidth( void )
 {
-	if ( !LCUI_Sys.init ) {
+	if ( !i_am_init ) {
 		return 0;
 	}
-	return LCUI_Sys.screen.size.w;
+	return screen.size.w;
 }
 
 /*
@@ -76,17 +78,17 @@ LCUIScreen_GetWidth( void )
 LCUI_API int
 LCUIScreen_GetHeight( void )
 {
-	if ( !LCUI_Sys.init ) {
+	if ( !i_am_init ) {
 		return 0;
 	}
-	return LCUI_Sys.screen.size.h;
+	return screen.size.h;
 }
 
 /* 获取屏幕尺寸 */
 LCUI_API LCUI_Size
 LCUIScreen_GetSize( void )
 {
-	return LCUI_Sys.screen.size;
+	return screen.size;
 }
 
 /* 获取屏幕无效区域队列的指针 */
@@ -118,14 +120,14 @@ LCUIScreen_InvalidArea( LCUI_Rect rect )
 LCUI_API int
 LCUIScreen_GetBits( void )
 {
-	return LCUI_Sys.screen.bits;
+	return screen.bits;
 }
 
 /* 获取屏幕中心点的坐标 */
 LCUI_API LCUI_Pos
 LCUIScreen_GetCenter( void )
 {
-	return Pos(LCUI_Sys.screen.size.w/2.0, LCUI_Sys.screen.size.h/2.0);
+	return Pos(screen.size.w/2.0, screen.size.h/2.0);
 }
 
 /* 获取屏幕中指定区域内实际要显示的图形 */
@@ -221,8 +223,8 @@ LCUIScreen_Update( void* unused )
 
 	/* 先标记刷新整个屏幕区域 */
 	screen_area.x = screen_area.y = 0;
-	screen_area.width = LCUI_Sys.screen.size.w;
-	screen_area.height = LCUI_Sys.screen.size.h;
+	screen_area.width = screen.size.w;
+	screen_area.height = screen.size.h;
 	LCUIScreen_InvalidArea( screen_area );
 
 	while(LCUI_Sys.state == ACTIVE) {
@@ -239,8 +241,8 @@ LCUIScreen_Update( void* unused )
 	LCUIThread_Exit(NULL);
 }
 
-extern int LCUIScreen_Init(void);
-extern int LCUIScreen_Destroy(void);
+extern int LCUIScreen_Init( LCUI_Screen *screen_info );
+extern int LCUIScreen_Destroy( LCUI_Screen *screen_info );
 
 /* 初始化图形输出模块 */
 LCUI_API int
@@ -249,7 +251,7 @@ LCUIModule_Video_Init( void )
 	if( i_am_init ) {
 		return -1;
 	}
-	LCUIScreen_Init();
+	LCUIScreen_Init( &screen );
 	i_am_init = TRUE;
 	RectQueue_Init( &screen_invalid_area );
 	return _LCUIThread_Create( &LCUI_Sys.display_thread,
@@ -263,7 +265,7 @@ LCUIModule_Video_End( void )
 	if( !i_am_init ) {
 		return -1;
 	}
-	LCUIScreen_Destroy();
+	LCUIScreen_Destroy( &screen );
 	i_am_init = FALSE;
 	RectQueue_Destroy( &screen_invalid_area );
 	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );

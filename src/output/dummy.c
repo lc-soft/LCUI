@@ -56,13 +56,13 @@ LCUIScreen_GetGraph( LCUI_Graph *out )
 }
 
 LCUI_API int
-LCUIScreen_Init( void )
+LCUIScreen_Init( LCUI_Screen *screen_info )
 {
 	return -1;
 }
 
 LCUI_API int
-LCUIScreen_Destroy( void )
+LCUIScreen_Destroy( LCUI_Screen *screen_info )
 {
 	return -1;
 }
