@@ -46,6 +46,29 @@
 #include LC_CURSOR_H
 #include LC_DISPLAY_H
 #include LC_MISC_H
+#include LC_RES_H
+
+struct LCUI_Cursor {
+	LCUI_Pos current_pos;	/* 当前的坐标 */
+	LCUI_Pos new_pos;	/* 将要更新的坐标 */
+	int visible;		/* 是否可见 */
+	LCUI_Graph graph;	/* 游标的图形 */
+} cursor;
+
+/* 初始化游标数据 */
+void LCUIModule_Cursor_Init( void )
+{
+	LCUI_Graph pic;
+	Graph_Init( &pic );
+	/* 载入自带的游标的图形数据 */ 
+	Load_Graph_Default_Cursor( &pic );
+	LCUICursor_SetGraph( &pic );
+}
+
+void LCUIModule_Cursor_End( void )
+{
+	Graph_Free( &cursor.graph );
+}
 
 /* 刷新鼠标游标在屏幕上显示的图形 */
 LCUI_API void
@@ -54,11 +77,18 @@ LCUICursor_Refresh( void )
 	LCUIScreen_InvalidArea ( LCUICursor_GetRect() );
 }
 
+/* 检测鼠标游标是否可见 */
+LCUI_API LCUI_BOOL
+LCUICursor_Visible( void )
+{
+	return cursor.visible;
+}
+
 /* 显示鼠标游标 */
 LCUI_API void
 LCUICursor_Show( void )
 {
-	LCUI_Sys.cursor.visible = TRUE;	/* 标识游标为可见 */
+	cursor.visible = TRUE;	/* 标识游标为可见 */
 	LCUICursor_Refresh();
 }
 
@@ -66,7 +96,7 @@ LCUICursor_Show( void )
 LCUI_API void
 LCUICursor_Hide( void )
 {
-	LCUI_Sys.cursor.visible = FALSE;
+	cursor.visible = FALSE;
 	LCUICursor_Refresh();
 }
 
@@ -75,10 +105,10 @@ LCUI_API LCUI_Rect
 LCUICursor_GetRect( void )
 {
 	LCUI_Rect rect;
-	rect.x = LCUI_Sys.cursor.current_pos.x;
-	rect.y = LCUI_Sys.cursor.current_pos.y;
-	rect.width = LCUI_Sys.cursor.graph.width;
-	rect.height = LCUI_Sys.cursor.graph.height;
+	rect.x = cursor.current_pos.x;
+	rect.y = cursor.current_pos.y;
+	rect.width = cursor.graph.width;
+	rect.height = cursor.graph.height;
 	return rect;
 }
 
@@ -87,12 +117,12 @@ LCUI_API void
 LCUICursor_UpdatePos( void )
 {
 	LCUI_Rect old;
-	if( LCUI_Sys.cursor.current_pos.x == LCUI_Sys.cursor.new_pos.x
-	 && LCUI_Sys.cursor.current_pos.y == LCUI_Sys.cursor.new_pos.y ) {
+	if( cursor.current_pos.x == cursor.new_pos.x
+	 && cursor.current_pos.y == cursor.new_pos.y ) {
 		return;
 	}
 	old = LCUICursor_GetRect();
- 	LCUI_Sys.cursor.current_pos = LCUI_Sys.cursor.new_pos;
+ 	cursor.current_pos = cursor.new_pos;
  	/* 刷新游标的显示 */
 	LCUICursor_Refresh();
 	/* 刷新游标原来的区域中的图形 */
@@ -103,7 +133,7 @@ LCUICursor_UpdatePos( void )
 LCUI_API void
 LCUICursor_SetPos( LCUI_Pos pos )
 {
-	LCUI_Sys.cursor.new_pos = pos;
+	cursor.new_pos = pos;
 	DEBUG_MSG("new pos: %d,%d\n", pos.x, pos.y);
 }
 
@@ -115,7 +145,7 @@ LCUI_API int
 LCUICursor_SetGraph( LCUI_Graph *graph )
 {
 	if (Graph_IsValid (graph)) {
-		Graph_Copy (&LCUI_Sys.cursor.graph, graph);
+		Graph_Copy( &cursor.graph, graph );
 		LCUICursor_Refresh();
 		return 0;
 	}
@@ -126,12 +156,26 @@ LCUICursor_SetGraph( LCUI_Graph *graph )
 LCUI_API LCUI_Pos
 LCUICursor_GetPos( void )
 {
-	return LCUI_Sys.cursor.current_pos;
+	return cursor.current_pos;
 }
 
 /* 获取鼠标指针将要更新的坐标 */
 LCUI_API LCUI_Pos
 LCUICursor_GetNewPos( void )
 {
-	return LCUI_Sys.cursor.new_pos;
+	return cursor.new_pos;
+}
+
+/* 检测鼠标游标是否覆盖在矩形区域上 */
+LCUI_API LCUI_BOOL 
+LCUICursor_CoverRect( LCUI_Rect rect )
+{
+	return LCUIRect_Overlay( rect, LCUICursor_GetRect() );
+}
+
+/* 将当前鼠标游标的图像叠加至目标图像指定位置 */
+LCUI_API int
+LCUICursor_MixGraph( LCUI_Graph *buff, LCUI_Pos pos )
+{
+	return Graph_Mix( buff, &cursor.graph, pos );
 }

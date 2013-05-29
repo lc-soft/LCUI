@@ -43,9 +43,17 @@
 #define __LCUI_CURSOR_H__
 
 LCUI_BEGIN_HEADER
+	
+/* 初始化游标数据 */
+void LCUIModule_Cursor_Init( void );
+
+void LCUIModule_Cursor_End( void );
 
 /* 刷新鼠标游标在屏幕上显示的图形 */
 LCUI_API void LCUICursor_Refresh( void );
+
+/* 检测鼠标游标是否可见 */
+LCUI_API LCUI_BOOL LCUICursor_Visible( void );
 
 /* 显示鼠标游标 */
 LCUI_API void LCUICursor_Show( void );
@@ -76,6 +84,14 @@ LCUICursor_GetPos( void );
 /* 获取鼠标指针将要更新的坐标 */
 LCUI_API LCUI_Pos
 LCUICursor_GetNewPos( void );
+
+/* 检测鼠标游标是否覆盖在矩形区域上 */
+LCUI_API LCUI_BOOL 
+LCUICursor_CoverRect( LCUI_Rect rect );
+
+/* 将当前鼠标游标的图像叠加至目标图像指定位置 */
+LCUI_API int
+LCUICursor_MixGraph( LCUI_Graph *buff, LCUI_Pos pos );
 
 LCUI_END_HEADER
 
