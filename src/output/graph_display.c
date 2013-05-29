@@ -134,16 +134,17 @@ LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 {
 	LCUI_Pos pos, cursor_pos;
 	GraphLayer_GetGraph( LCUI_Sys.root_glayer, graph, rect );
-	if ( !LCUI_Sys.cursor.visible ) { /* 如果游标可见 */
+	/* 如果游标可见 */
+	if ( !LCUICursor_Visible() ) {
 		return;
 	}
 	/* 如果该区域与游标的图形区域重叠 */
-	if ( LCUIRect_Overlay( rect, LCUICursor_GetRect()) ) {
+	if ( LCUICursor_CoverRect( rect ) ) {
 		cursor_pos = LCUICursor_GetPos();
 		pos.x = cursor_pos.x - rect.x;
 		pos.y = cursor_pos.y - rect.y;
-		/* 将图形合成 */
-		Graph_Mix( graph, &LCUI_Sys.cursor.graph, pos );
+		/* 将鼠标游标的图形混合至当前图形里 */
+		LCUICursor_MixGraph( graph, pos );
 	}
 }
 
@@ -227,7 +228,6 @@ LCUIScreen_Update( void* unused )
 	while(LCUI_Sys.state == ACTIVE) {
 		LCUICursor_UpdatePos();
 		WidgetMsg_Proc(NULL); /* 处理所有消息 */
-		LCUI_MSleep(5);
 		retval = LCUIScreen_SyncInvalidArea();
 		retval += LCUIScreen_UpdateInvalidArea();
 		if(retval > 0) {
