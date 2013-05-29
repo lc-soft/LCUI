@@ -44,7 +44,7 @@
 #ifndef __LCUI_H__  /* 如果没有定义 __LCUI_H__ 宏 */
 #define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */
 
-#define LCUI_VERSION "0.14.0"
+#define LCUI_VERSION "0.13.0"
 
 #include <wchar.h>
 #include <stdio.h>
@@ -86,10 +86,6 @@
 /* 触屏校准后的文件 */
 #define LCUI_CALIBFILE "/mnt/Data/LC-SOFT/pointercal"
 
-/* 鼠标事件 */
-#define MOUSE_EVENT_MOVE	1
-#define MOUSE_EVENT_CLICK	2
-
 #define LABEL_TEXT_MAX_SIZE	2048
 
 /* 定义图形的混合方式 */
@@ -127,15 +123,6 @@
 #define SIZE_MODE_NONE		LAYOUT_NONE	/* 无 */
 #define SIZE_MODE_NORMAL	LAYOUT_NORMAL
 /*************************************************/
-
-
-/*********** 图像与文本的几种相对位置 *******************/
-#define Overlay		10   /* 文字覆盖在图片上面 */
-#define ImageAboveText	11   /* 图片在上，文字在下 */
-#define TextAboveImage	12   /* 图片在下，文字在上 */
-#define ImageBeforeText	13   /* 图片在左，文字在右 */
-#define TextBeforeImage	14   /* 图片在右，文字在左 */
-/***************************************************/
 
 LCUI_BEGIN_HEADER
 
@@ -313,30 +300,6 @@ typedef enum AUTOSIZE_MODE_ {
 }
 AUTOSIZE_MODE;
 /*---------------------- END --------------------------*/
-
-/*---------------- 鼠标游标数据 -------------------*/
-typedef struct LCUI_Cursor_ {
-	LCUI_Pos	current_pos;	/* 当前的坐标 */
-	LCUI_Pos	new_pos;	/* 将要更新的坐标 */
-	int		visible;	/* 是否可见 */
-	LCUI_Graph	graph;		/* 游标的图形 */
-} LCUI_Cursor;
-/*------------------- END -----------------------*/
-
-/*----------------- 对齐方式 -------------------*/
-typedef enum ALIGN_TYPE_ {
-	ALIGN_NONE,		/* 无 */
-	ALIGN_TOP_LEFT,	  	/* 向左上角对齐 */
-	ALIGN_TOP_CENTER,	/* 向上中间对齐 */
-	ALIGN_TOP_RIGHT,	/* 向右上角对齐 */
-	ALIGN_MIDDLE_LEFT,	/* 向中央偏左对齐 */
-	ALIGN_MIDDLE_CENTER,	/* 向正中央对齐 */
-	ALIGN_MIDDLE_RIGHT,	/* 向中央偏由对齐 */
-	ALIGN_BOTTOM_LEFT,	/* 向底部偏左对齐 */
-	ALIGN_BOTTOM_CENTER,	/* 向底部居中对齐 */
-	ALIGN_BOTTOM_RIGHT	/* 向底部偏右对齐 */
-} ALIGN_TYPE;
-/*---------------------------------------------*/
 
 LCUI_END_HEADER
 
