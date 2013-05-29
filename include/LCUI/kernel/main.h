@@ -82,7 +82,6 @@ typedef struct _LCUI_System
 	LCUI_Thread timer_thread;	/* 定时器列表处理线程的ID */
 	LCUI_Thread dev_thread;		/* 设备输入数据处理线程的ID */
 	
-	LCUI_Cursor cursor; /* 游标 */
 	LCUI_Screen screen; /* 屏幕信息 */
 
 	LCUI_Queue sys_event_slots;	/* 事件槽记录 */
