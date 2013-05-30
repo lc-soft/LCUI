@@ -68,16 +68,6 @@ typedef struct _LCUI_System
 	LCUI_Thread display_thread;	/* 保存核心处理的线程的ID */
 	LCUI_Thread timer_thread;	/* 定时器列表处理线程的ID */
 	LCUI_Thread dev_thread;		/* 设备输入数据处理线程的ID */
-
-	LCUI_Queue sys_event_slots;	/* 事件槽记录 */
-	LCUI_Queue user_event_slots;	/* 事件槽记录 */
-	LCUI_Queue press_key;		/* 保存已被按下的按键的键值 */
-	LCUI_Queue dev_list;		/* 设备列表 */
-	LCUI_Queue timer_list;		/* 定时器列表 */
-	LCUI_Queue app_list;		/* LCUI程序列表 */
-	LCUI_Queue widget_list;		/* 部件队列，对应它的显示顺序 */
-	LCUI_Queue widget_msg;		/* 部件消息 */
-	LCUI_GraphLayer *root_glayer;	/* 根图层 */
 } LCUI_System;
 /***********************************************************************/
 
@@ -123,8 +113,8 @@ LCUI_API int LCUI_MainLoop_Quit( LCUI_MainLoop *loop );
 
 /*----------------------- End MainLoop -------------------------------*/
 
-LCUI_API LCUI_BOOL LCUI_Active();
-/* 功能：检测LCUI是否活动 */ 
+/* 检测LCUI是否活动 */ 
+LCUI_API LCUI_BOOL LCUI_Active(void);
 
 /* 
  * 功能：用于对LCUI进行初始化操作 
