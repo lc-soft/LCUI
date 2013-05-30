@@ -124,17 +124,13 @@ Click_LeftButton (LCUI_MouseButtonEvent *event)
 LCUI_API int
 LCUIMouse_ButtonDown( LCUI_Pos pos, int key_code )
 {
-	int temp;
 	LCUI_Event event;
 
 	/* 若该键已经按下，就不需要再添加至队列了 */
 	if( LCUIKey_IsHit( key_code ) ) {
 		return -1;
 	}
-	temp = Queue_Add(&LCUI_Sys.press_key, &key_code);
-	if( temp < 0 ) {
-		return -2;
-	}
+	LCUIKey_Hit( key_code );
 	event.type = LCUI_MOUSEBUTTONDOWN;
 	event.button.x = pos.x;
 	event.button.y = pos.y;
