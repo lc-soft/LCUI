@@ -47,6 +47,7 @@
 #include LC_INPUT_H
 #include LC_CURSOR_H
 #include LC_DISPLAY_H
+#include LC_WIDGET_H
 #include <Windows.h>
 
 static HWND current_hwnd = NULL;
@@ -139,8 +140,8 @@ LCUI_API int
 LCUIScreen_Init( LCUI_Screen *screen_info )
 {
 	RECT client_rect;
-	LCUI_Graph *graph;
 	WNDCLASS wndclass;
+	LCUI_Widget *root_widget;
 	TCHAR szAppName[] = TEXT ("Typer");
 	
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
@@ -179,11 +180,6 @@ LCUIScreen_Init( LCUI_Screen *screen_info )
 	/* 分配内存，储存像素数据 */ 
 	pixel_mem = (uchar_t*)malloc( screen_info->smem_len );
 	screen_info->fb_mem = pixel_mem;
-	LCUI_Sys.root_glayer = GraphLayer_New();
-	GraphLayer_Resize( LCUI_Sys.root_glayer, screen_info->size.w, screen_info->size.h );
-	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
-	Graph_FillColor( graph, RGB(255,255,255) );
-
 	/* 获取客户区的DC */
 	hdc_client = GetDC( current_hwnd );
 	/* 为帧缓冲创建一个DC */
@@ -193,7 +189,11 @@ LCUIScreen_Init( LCUI_Screen *screen_info )
 	/* 为帧缓冲的DC选择client_bitmap作为对象 */
 	SelectObject( hdc_framebuffer, client_bitmap );
 	
-	GraphLayer_Show( LCUI_Sys.root_glayer );
+	root_widget = RootWidget_GetSelf();
+	Widget_Resize( root_widget, screen_info->size );
+	Widget_SetBackgroundColor( root_widget, RGB(255,255,255) );
+	Widget_Show( root_widget );
+
 	ShowWindow( current_hwnd, SW_SHOWNORMAL );
 	UpdateWindow( current_hwnd );
 	return 0;
@@ -202,11 +202,7 @@ LCUIScreen_Init( LCUI_Screen *screen_info )
 LCUI_API int
 LCUIScreen_Destroy( LCUI_Screen *screen_info )
 {
-	LCUI_Graph *graph;
-	
 	LCUI_Sys.state = KILLED;
-	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
-	GraphLayer_Free( LCUI_Sys.root_glayer );
 	DeleteDC( hdc_framebuffer );
 	ReleaseDC( Win32_GetSelfHWND(), hdc_client );
 	free( pixel_mem );
