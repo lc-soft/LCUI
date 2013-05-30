@@ -43,6 +43,31 @@
 #define __LCUI_BITMAPFONT_H__
 
 LCUI_BEGIN_HEADER
+	
+/*---------------- 字体位图数据 ------------------*/
+typedef struct LCUI_FontBMP_ {
+	int top;		/* 与顶边框的距离 */
+	int left;		/* 与左边框的距离 */
+	int width;		/* 位图宽度 */
+	int rows;		/* 位图行数 */
+	int pitch;
+	uchar_t *buffer;	/* 字体位图数据 */
+	short num_grays;
+	char pixel_mode;
+	LCUI_Pos advance;	/* XY轴的跨距 */
+} LCUI_FontBMP;
+/*------------------- END ---------------------*/
+
+/*------------------------ 宽字符位图及相关数据 -----------------------*/
+typedef struct LCUI_WChar_ {
+	wchar_t		char_code;	/* 字符码 */
+	LCUI_FontBMP	*bitmap;	/* 字符的位图数据 */
+	LCUI_RGB	color;		/* 该文字的配色 */
+	LCUI_BOOL	update;		/* 标明这个字符是否需要刷新 */
+	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */
+} LCUI_WChar;
+/*-----------------------------END ----------------------------------*/
+
 
 LCUI_API uchar_t const * in_core_font_8x8( void );
 
