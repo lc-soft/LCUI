@@ -60,6 +60,7 @@ LCUI_API int GraphLayer_PrintChildList( LCUI_GraphLayer *glayer )
 		return -1;
 	}
 	n = Queue_GetTotal( child_list );
+	_DEBUG_MSG("total glayer: %d\n", n);
 	for(i=0; i<n; ++i) {
 		child = (LCUI_GraphLayer*)Queue_Get( child_list, i );
 		if( child == NULL ) {
@@ -78,10 +79,12 @@ LCUI_API int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 	LCUI_Queue *queue;
 	LCUI_GraphLayer *tmp_glayer;
 	
-	if( !child_glayer || !child_glayer->parent ) {
+	if( !child_glayer ) {
 		return -1;
 	}
-	
+	if(  !child_glayer->parent ) {
+		return 0;
+	}
 	queue = &child_glayer->parent->child;
 	total = Queue_GetTotal( queue );
 	for( i=0; i<total; ++i ) {
@@ -93,7 +96,7 @@ LCUI_API int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 		}
 	}
 	child_glayer->parent = NULL;
-	return 1;
+	return 0;
 }
 
 LCUI_API void GraphLayer_Free( LCUI_GraphLayer *glayer )
@@ -517,7 +520,11 @@ LCUI_API int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 	total = Queue_GetTotal( &glayerQ ); 
 	//_DEBUG_MSG( "total: %d\n", total );
 	if( total <= 0 ) {
-		Graph_Cut ( &ctnr->graph, rect, graph_buff );
+		if( ctnr == NULL ) {
+			Graph_FillColor( graph_buff, RGB(255,255,255) );
+		} else {
+			Graph_Cut( &ctnr->graph, rect, graph_buff );
+		}
 		Queue_Destroy( &glayerQ );
 		return 0;
 	}
@@ -544,8 +551,12 @@ LCUI_API int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 skip_loop:
 	total = Queue_GetTotal( &glayerQ );
 	//_DEBUG_MSG( "total: %d\n", total );
-	if(i <= 0){
-		Graph_Cut (&ctnr->graph, rect, graph_buff );
+	if(i <= 0) {
+		if( ctnr == NULL ) {
+			Graph_FillColor( graph_buff, RGB(255,255,255) );
+		} else {
+			Graph_Cut ( &ctnr->graph, rect, graph_buff );
+		}
 	}
 	for(i=0; i<total; ++i) {
 		glayer = Queue_Get( &glayerQ, i );
