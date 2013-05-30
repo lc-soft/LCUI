@@ -42,6 +42,12 @@
 #define __LCUI_KERNEL_DEVICE_H__
 
 LCUI_BEGIN_HEADER
+	
+/***************** 一些输入输出设备 *********************/
+#define FB_DEV	"/dev/fb0"		/* 图形输出设备 */
+#define TS_DEV	"/dev/jz_ts"		/* 触屏输入设备 */
+#define MS_DEV	"/dev/input/mice"	/* 鼠标设备 */
+/*******************************************************/
 
 typedef struct _dev_func_data
 {
