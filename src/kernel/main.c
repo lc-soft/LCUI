@@ -54,7 +54,7 @@
 
 LCUI_System LCUI_Sys; 
 
-
+static LCUI_Queue global_app_list;	/* LCUI程序列表 */
 
 /*--------------------------- Main Loop -------------------------------*/
 static LCUI_BOOL init_mainloop_queue = FALSE;
@@ -297,10 +297,10 @@ LCUIApp_Find( LCUI_ID id )
 	LCUI_App *app; 
 	int i, total;
 	
-	total = Queue_GetTotal(&LCUI_Sys.app_list);
+	total = Queue_GetTotal(&global_app_list);
 	if (total > 0) { /* 如果程序总数大于0 */
 		for (i = 0; i < total; ++i) {
-			app = Queue_Get(&LCUI_Sys.app_list, i);
+			app = Queue_Get(&global_app_list, i);
 			if(app->id == id) {
 				return app;
 			}
@@ -354,17 +354,17 @@ static void LCUI_DestroyAllApps(void)
 	LCUI_App *app; 
 	int i, total;
 
-	Queue_Lock( &LCUI_Sys.app_list );
-	total = Queue_GetTotal(&LCUI_Sys.app_list);
+	Queue_Lock( &global_app_list );
+	total = Queue_GetTotal(&global_app_list);
 	for (i = 0; i < total; ++i) {
-		app = Queue_Get(&LCUI_Sys.app_list, 0);
+		app = Queue_Get(&global_app_list, 0);
 		if(app == NULL) {
 			continue;
 		}
-		Queue_Delete (&LCUI_Sys.app_list, 0); 
+		Queue_Delete (&global_app_list, 0); 
 	}
-	Queue_Unlock( &LCUI_Sys.app_list );
-	Queue_Destroy( &LCUI_Sys.app_list );
+	Queue_Unlock( &global_app_list );
+	Queue_Destroy( &global_app_list );
 }
 
 /* 用于退出LCUI，释放LCUI占用的资源 */
@@ -399,11 +399,11 @@ static int LCUIAppList_Delete( LCUI_ID app_id )
 	LCUI_App *app; 
 	int i, total;  
 	
-	total = Queue_GetTotal(&LCUI_Sys.app_list);
+	total = Queue_GetTotal(&global_app_list);
 	/* 如果程序总数大于0，查找程序信息所在队列的位置 */
 	if (total > 0) { 
 		for (i = 0; i < total; ++i) {
-			app = Queue_Get(&LCUI_Sys.app_list, i);
+			app = Queue_Get(&global_app_list, i);
 			if(app->id == app_id) {
 				pos = i;
 				break;
@@ -416,7 +416,7 @@ static int LCUIAppList_Delete( LCUI_ID app_id )
 		return -1;
 	}
 	/* 从程序显示顺序队列中删除这个程序ID */ 
-	Queue_Delete (&LCUI_Sys.app_list, pos); 
+	Queue_Delete (&global_app_list, pos); 
 	return 0;
 }
 
@@ -439,7 +439,7 @@ static void LCUIApp_Destroy( void *arg )
 /* 初始化程序数据表 */
 static void LCUIAppList_Init(void)
 {
-	Queue_Init(&LCUI_Sys.app_list, sizeof(LCUI_App), LCUIApp_Destroy);
+	Queue_Init(&global_app_list, sizeof(LCUI_App), LCUIApp_Destroy);
 }
 
 /* 
@@ -453,7 +453,7 @@ static int LCUIAppList_Add( void )
 	
 	LCUIApp_Init (&app); /* 初始化程序数据结构体 */
 	app.id	= LCUIThread_SelfID(); /* 保存ID */ 
-	Queue_Add(&LCUI_Sys.app_list, &app); /* 添加至队列 */
+	Queue_Add(&global_app_list, &app); /* 添加至队列 */
 	LCUIApp_RegisterMainThread( app.id ); /* 注册程序主线程 */
 	return 0;
 }
@@ -482,7 +482,7 @@ static int LCUIApp_Quit(void)
 	} 
 	LCUIAppList_Delete(app->id); 
 	/* 如果程序列表为空,就退出LCUI */  
-	if (Queue_Empty(&LCUI_Sys.app_list)) {
+	if (Queue_Empty(&global_app_list)) {
 		LCUI_Quit();
 	}
 	return 0;
@@ -491,21 +491,20 @@ static int LCUIApp_Quit(void)
 /*********************** App Management End ***************************/
 
 
-static void LCUI_ShowCopyrightText()
-/* 功能：打印LCUI的信息 */
+/* 打印LCUI的信息 */
+static void LCUI_ShowCopyrightText(void)
 {
 	printf(
-	"============| LCUI v0.14.0 |============\n"
+	"============| LCUI v%s |============\n"
 	"Copyright (C) 2012-2013 Liu Chao.\n"
 	"Licensed under GPLv2.\n"
 	"Report bugs to <lc-soft@live.cn>.\n"
 	"Project Homepage: www.lcui.org.\n"
-	"========================================\n" );
+	"========================================\n", LCUI_VERSION );
 }
 
-LCUI_API LCUI_BOOL
-LCUI_Active()
-/* 功能：检测LCUI是否活动 */
+/* 检测LCUI是否活动 */
+LCUI_API LCUI_BOOL LCUI_Active(void)
 {
 	if(LCUI_Sys.state == ACTIVE) {
 		return TRUE;
@@ -549,9 +548,9 @@ LCUI_Init( int mode, void *arg )
 		LCUIModule_Keyboard_Init();
 		LCUIModule_Mouse_Init();
 		LCUIModule_TouchScreen_Init();
-		LCUIModule_Video_Init();
 		LCUIModule_Cursor_Init();
 		LCUIModule_Widget_Init();
+		LCUIModule_Video_Init();
 		/* 让鼠标游标居中显示 */
 		LCUICursor_SetPos( LCUIScreen_GetCenter() );  
 		LCUICursor_Show();
