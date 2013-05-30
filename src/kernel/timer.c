@@ -43,20 +43,21 @@
 
 /*----------------------------- Timer --------------------------------*/
 
-typedef struct _timer_data
-{
-	int state;		/* 状态 */
+typedef struct _timer_data {
+	int state;			/* 状态 */
 	LCUI_BOOL reuse;		/* 是否重复使用该定时器 */
-	LCUI_ID app_id;	/* 所属程序ID */
-	long int id;		/* 定时器ID */
-	long int total_ms;	/* 定时总时间（单位：毫秒） */
-	long int cur_ms;	/* 当前剩下的等待时间 */
-	void (*callback_func)(void); /* 回调函数 */ 
-}
-timer_data;
+	LCUI_ID app_id;			/* 所属程序ID */
+	long int id;			/* 定时器ID */
+	long int total_ms;		/* 定时总时间（单位：毫秒） */
+	long int cur_ms;		/* 当前剩下的等待时间 */
+	void (*callback_func)(void);	/* 回调函数 */ 
+} timer_data;
+
+static LCUI_Queue global_timer_list;	/* 定时器列表 */
+static LCUI_BOOL timer_thread_active = TRUE;
 
 /*----------------------------- Private ------------------------------*/
-/* 功能：初始化定时器列表 */
+/* 初始化定时器列表 */
 static void 
 timer_list_init( LCUI_Queue *timer_list )
 {
@@ -64,14 +65,15 @@ timer_list_init( LCUI_Queue *timer_list )
 	/* 使用链表 */
 	Queue_SetDataMode( timer_list, QUEUE_DATA_MODE_LINKED_LIST );
 }
-/* 功能：销毁定时器列表 */
+
+/* 销毁定时器列表 */
 static void 
 timer_list_destroy( LCUI_Queue *timer_list )
 {
 	Queue_Destroy( timer_list );
 }
 
-/* 功能：对定时器列表进行排序 */
+/* 对定时器列表进行排序 */
 static void 
 timer_list_sort( LCUI_Queue *timer_list )
 {
@@ -100,7 +102,7 @@ timer_list_sort( LCUI_Queue *timer_list )
 	Queue_Unlock( timer_list );
 }
 
-/* 功能：将各个定时器的等待时间与指定时间相减 */
+/* 将各个定时器的等待时间与指定时间相减 */
 static void 
 timer_list_sub( LCUI_Queue *timer_list, int time )
 {
@@ -121,9 +123,9 @@ timer_list_sub( LCUI_Queue *timer_list, int time )
 	Queue_Unlock( timer_list );
 }
 
+/* 更新定时器列表中的定时器 */
 static timer_data *
 timer_list_update( LCUI_Queue *timer_list )
-/* 功能：更新定时器列表中的定时器 */
 {
 	int i, total;
 	timer_data *timer = NULL;
@@ -147,8 +149,6 @@ timer_list_update( LCUI_Queue *timer_list )
 	timer_list_sort( timer_list ); /* 重新排序 */
 	return timer;
 }
-
-static LCUI_BOOL timer_thread_active = TRUE;
 
 /* 一个线程，用于处理定时器 */
 static void 
@@ -189,10 +189,10 @@ find_timer( int timer_id )
 {
 	int i, total;
 	timer_data *timer = NULL;
-	Queue_Lock( &LCUI_Sys.timer_list );
-	total = Queue_GetTotal( &LCUI_Sys.timer_list );
+	Queue_Lock( &global_timer_list );
+	total = Queue_GetTotal( &global_timer_list );
 	for(i=0; i<total; ++i) {
-		timer = Queue_Get( &LCUI_Sys.timer_list, i );
+		timer = Queue_Get( &global_timer_list, i );
 		if( !timer ) {
 			continue;
 		}
@@ -200,7 +200,7 @@ find_timer( int timer_id )
 			break;
 		}
 	}
-	Queue_Unlock( &LCUI_Sys.timer_list ); 
+	Queue_Unlock( &global_timer_list ); 
 	return timer;
 }
 /*--------------------------- End Private ----------------------------*/
@@ -221,7 +221,7 @@ LCUITimer_Set( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse )
 	timer.reuse = reuse;
 	timer.id = rand();
 	timer.app_id = LCUIApp_GetSelfID();
-	if( 0 > Queue_Add( &LCUI_Sys.timer_list, &timer ) ) {
+	if( 0 > Queue_Add( &global_timer_list, &timer ) ) {
 		return -1;
 	}
 	return timer.id;
@@ -238,19 +238,19 @@ LCUITimer_Free( int timer_id )
 	int i, total;
 	timer_data *timer;
 	
-	Queue_Lock( &LCUI_Sys.timer_list );
-	total = Queue_GetTotal( &LCUI_Sys.timer_list );
+	Queue_Lock( &global_timer_list );
+	total = Queue_GetTotal( &global_timer_list );
 	for(i=0; i<total; ++i) {
-		timer = Queue_Get( &LCUI_Sys.timer_list, i );
+		timer = Queue_Get( &global_timer_list, i );
 		if( !timer ) {
 			continue;
 		}
 		if( timer->id == timer_id ) {
-			Queue_Delete( &LCUI_Sys.timer_list, i );
+			Queue_Delete( &global_timer_list, i );
 			break;
 		}
 	}
-	Queue_Unlock( &LCUI_Sys.timer_list );
+	Queue_Unlock( &global_timer_list );
 	if( i < total ) {
 		return 0;
 	}
@@ -325,14 +325,14 @@ timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
 LCUI_API void
 LCUIModule_Timer_Init( void )
 {
-	timer_thread_start( &LCUI_Sys.timer_thread, &LCUI_Sys.timer_list );
+	timer_thread_start( &LCUI_Sys.timer_thread, &global_timer_list );
 }
 
 /* 停用定时器模块 */
 LCUI_API void
 LCUIModule_Timer_End( void )
 {
-	timer_thread_destroy( LCUI_Sys.timer_thread, &LCUI_Sys.timer_list );
+	timer_thread_destroy( LCUI_Sys.timer_thread, &global_timer_list );
 }
 /*---------------------------- End Public -----------------------------*/
 
