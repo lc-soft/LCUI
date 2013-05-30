@@ -32,8 +32,8 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 }
 #endif
 
-LCUI_API int load_jpeg(const char *filepath, LCUI_Graph *out)
-/* 功能：载入并解码jpg图片 */
+/* 载入jpeg图片文件 */
+LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *out )
 {
 #ifdef USE_LIBJPEG
 	FILE *fp;

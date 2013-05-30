@@ -43,6 +43,12 @@
 #define __LCUI_DRAW_H__
 
 LCUI_BEGIN_HEADER
+	
+/* 打开文件时的错误 */
+#define FILE_ERROR_OPEN_ERROR		-1
+#define FILE_ERROR_SHORT_FILE		-2
+#define FILE_ERROR_BIG_FILE		-3
+#define FILE_ERROR_UNKNOWN_FORMAT	-4
 
 #include LC_DRAW_BORDER_H
 #include LC_DRAW_LINE_H
@@ -56,28 +62,20 @@ Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des);
  * 算法有待优化完善。
  */
 
-LCUI_API int
-load_bmp(const char *filepath, LCUI_Graph *out);
-/* 打开并载入BMP图片文件内的图形数据 */
+/* 载入BMP图片文件 */
+LCUI_API int Graph_LoadBMP( const char *filepath, LCUI_Graph *out );
 
-LCUI_API int
-load_jpeg(const char *filepath, LCUI_Graph *out);
-/* 功能：载入并解码jpg图片 */
+/* 载入jpeg图片文件 */
+LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *out );
 
-LCUI_API int
-load_png(const char *filepath, LCUI_Graph *out);
-/* 载入PNG图片中的图形数据 */
+/* 载入png图片文件 */
+LCUI_API int Graph_LoadPNG( const char *filepath, LCUI_Graph *out );
 
-LCUI_API int
-write_png(const char *file_name, LCUI_Graph *graph);
 /* 将图像数据写入至png文件 */
+LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph );
 
-LCUI_API int
-Load_Image(const char *filepath, LCUI_Graph *out);
-/* 
- * 功能：载入指定图片文件的图形数据
- * 说明：打开图片文件，并解码至内存，打开的图片文件越大，占用的内存也就越大 
- * */
+/* 载入指定图片文件的图像数据 */
+LCUI_API int Graph_LoadImage( const char *filepath, LCUI_Graph *out );
 
 LCUI_API int
 GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );

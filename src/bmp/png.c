@@ -12,7 +12,7 @@
 #define PNG_BYTES_TO_CHECK 4
 
 /* 载入png图片文件 */
-LCUI_API int load_png(const char *filepath, LCUI_Graph *out)
+LCUI_API int Graph_LoadPNG( const char *filepath, LCUI_Graph *out )
 {
 #ifdef USE_LIBPNG
 	FILE *pic_fp;
@@ -107,8 +107,8 @@ LCUI_API int load_png(const char *filepath, LCUI_Graph *out)
 	return 0;
 }
 
-LCUI_API int write_png(const char *file_name, LCUI_Graph *graph)
 /* 将图像数据写入至png文件 */
+LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
 {
 #ifdef USE_LIBPNG
 	FILE *fp;
@@ -119,30 +119,30 @@ LCUI_API int write_png(const char *file_name, LCUI_Graph *graph)
 	png_bytep * row_pointers;
 	
 	if(!Graph_IsValid(graph)) {
-		printf("write_png(): graph is not valid\n");
+		_DEBUG_MSG("graph is not valid\n");
 		return -1;
 	}
 	
 	/* create file */
 	fp = fopen(file_name, "wb");
 	if (!fp) {
-		printf("write_png(): File %s could not be opened for writing\n", file_name);
+		_DEBUG_MSG("file %s could not be opened for writing\n", file_name);
 		return -1;
 	}
 	/* initialize stuff */
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
 	if (!png_ptr) {
-		printf("write_png(): png_create_write_struct failed\n");
+		_DEBUG_MSG("png_create_write_struct failed\n");
 		return -1;
 	}
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr) {
-		printf("write_png(): png_create_info_struct failed\n");
+		_DEBUG_MSG("png_create_info_struct failed\n");
 		return -1;
 	}
 	if (setjmp(png_jmpbuf(png_ptr))) {
-		printf("write_png(): Error during init_io\n");
+		_DEBUG_MSG("error during init_io\n");
 		return -1;
 	}
 	png_init_io(png_ptr, fp);
@@ -150,7 +150,7 @@ LCUI_API int write_png(const char *file_name, LCUI_Graph *graph)
 
 	/* write header */
 	if (setjmp(png_jmpbuf(png_ptr))) {
-		printf("write_png(): Error during writing header\n");
+		_DEBUG_MSG("error during writing header\n");
 		return -1;
 	}
 	Graph_Lock(graph);
@@ -169,7 +169,7 @@ LCUI_API int write_png(const char *file_name, LCUI_Graph *graph)
 	/* write bytes */
 	if (setjmp(png_jmpbuf(png_ptr)))
 	{
-		printf("write_png(): Error during writing bytes\n");
+		_DEBUG_MSG("error during writing bytes\n");
 		Graph_Unlock(graph);
 		return -1;
 	}
@@ -195,7 +195,7 @@ LCUI_API int write_png(const char *file_name, LCUI_Graph *graph)
 
 	/* end write */
 	if (setjmp(png_jmpbuf(png_ptr))) {
-		printf("write_png(): Error during end of write\n");
+		_DEBUG_MSG("error during end of write\n");
 		Graph_Unlock(graph);
 		return -1;
 	}
