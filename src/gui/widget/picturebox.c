@@ -43,7 +43,6 @@
 #include LC_LCUI_H
 #include LC_MISC_H
 #include LC_GRAPH_H
-#include LC_DRAW_H
 #include LC_WIDGET_H
 #include LC_PICBOX_H
 
@@ -466,7 +465,7 @@ PictureBox_SetImageFile( LCUI_Widget *widget, char *image_file )
 	
 	pic_box->image_state = IMAGE_STATE_LOADING; /* 图片状态为正在载入 */
 	PictureBox_SetImage(widget, NULL);
-	ret = Load_Image( image_file, graph );/* 载入图片文件 */
+	ret = Graph_LoadImage( image_file, graph );/* 载入图片文件 */
 	if( ret == 0 ) {
 		/* 载入成功 */
 		pic_box->image_state = IMAGE_STATE_SUCCESS; 

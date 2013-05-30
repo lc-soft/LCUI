@@ -48,7 +48,6 @@
 #include LC_PICBOX_H
 #include LC_WINDOW_H 
 #include LC_GRAPH_H
-#include LC_DRAW_H
 #include LC_RES_H
 #include LC_INPUT_H
 #include LC_FONT_H

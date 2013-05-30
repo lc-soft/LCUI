@@ -55,7 +55,6 @@
 #include LC_WIDGET_H
 #include LC_BUTTON_H 
 #include LC_DISPLAY_H
-#include LC_DRAW_H
 #include LC_MENU_H
 #include LC_RES_H
 

@@ -43,7 +43,6 @@
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include LC_DRAW_H
 #include LC_WIDGET_H
 #include LC_GRAPH_H
 #include LC_FONT_H

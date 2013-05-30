@@ -45,7 +45,6 @@
 #include LC_LABEL_H
 #include LC_BUTTON_H
 #include LC_GRAPH_H
-#include LC_DRAW_H
 
 static void Button_ExecDefalutUpdate( LCUI_Widget *widget )
 {
