@@ -47,6 +47,33 @@
 #include LC_MISC_STRING_H
 
 LCUI_BEGIN_HEADER
+	
+/****************** 布局 ******************/
+typedef enum LAYOUT_TYPE_
+{
+	LAYOUT_NONE	= 0,	  /* 无 */
+	LAYOUT_NORMAL	= 0,
+	LAYOUT_ZOOM	= 1,	  /* 缩放 */
+	LAYOUT_STRETCH	= 1<<1,	  /* 拉伸 */
+	LAYOUT_CENTER	= 1<<2,	  /* 居中 */
+	LAYOUT_TILE	= 1<<3	  /* 平铺 */
+}LAYOUT_TYPE;
+/******************************************/
+
+/*----------------- 对齐方式 -------------------*/
+typedef enum ALIGN_TYPE_ {
+	ALIGN_NONE,		/* 无 */
+	ALIGN_TOP_LEFT,	  	/* 向左上角对齐 */
+	ALIGN_TOP_CENTER,	/* 向上中间对齐 */
+	ALIGN_TOP_RIGHT,	/* 向右上角对齐 */
+	ALIGN_MIDDLE_LEFT,	/* 向中央偏左对齐 */
+	ALIGN_MIDDLE_CENTER,	/* 向正中央对齐 */
+	ALIGN_MIDDLE_RIGHT,	/* 向中央偏由对齐 */
+	ALIGN_BOTTOM_LEFT,	/* 向底部偏左对齐 */
+	ALIGN_BOTTOM_CENTER,	/* 向底部居中对齐 */
+	ALIGN_BOTTOM_RIGHT	/* 向底部偏右对齐 */
+} ALIGN_TYPE;
+/*---------------------------------------------*/
 
 /* 检测result是否包含option */
 LCUI_API int
