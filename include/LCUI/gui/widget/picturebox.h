@@ -43,6 +43,20 @@
 #define __LCUI_PICTURE_BOX_H_
 
 LCUI_BEGIN_HEADER
+	
+/****************** 图像的处理方式 *****************/
+/* 缩放，缩放比例随着PictureBox部件的尺寸的改变而改变 */
+#define SIZE_MODE_ZOOM		LAYOUT_ZOOM
+
+/* 固定缩放，用于照片查看器，PictureBox部件的尺寸的改变不影响缩放比列 */
+#define SIZE_MODE_BLOCK_ZOOM	5
+
+#define SIZE_MODE_STRETCH	LAYOUT_STRETCH	/* 拉伸 */
+#define SIZE_MODE_CENTER	LAYOUT_CENTER	/* 居中 */
+#define SIZE_MODE_TILE		LAYOUT_TILE	/* 平铺 */
+#define SIZE_MODE_NONE		LAYOUT_NONE	/* 无 */
+#define SIZE_MODE_NORMAL	LAYOUT_NORMAL
+/*************************************************/
 
 typedef struct _LCUI_PictureBox	LCUI_PictureBox;
 /******************* 图像状态 *******************/
