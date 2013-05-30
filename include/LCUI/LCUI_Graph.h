@@ -42,6 +42,15 @@
 #define __LCUI_GRAPH_H__
 
 LCUI_BEGIN_HEADER
+	
+/* 图像类型 */
+#define TYPE_PNG	1
+#define TYPE_JPG	2
+#define TYPE_BMP	3
+
+/* 图像的混合方式 */
+#define GRAPH_MIX_FLAG_OVERLAY	 1<<7
+#define GRAPH_MIX_FLAG_REPLACE	 1<<8
 
 /* 将两个像素点的颜色值进行alpha混合 */
 #define ALPHA_BLEND(__src__ , __des__, __alpha__)		\
@@ -263,10 +272,13 @@ LCUI_API int
 Graph_FillAlpha( LCUI_Graph *src, uchar_t alpha );
  
 LCUI_END_HEADER
+	
+#include LC_DRAW_H
 
 #ifdef __cplusplus
 #include LC_GRAPH_HPP
 #endif
 
-#endif /* __LCUI_GRAPHICS_H__ */
+
+#endif /* __LCUI_GRAPH_H__ */
 
