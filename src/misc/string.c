@@ -1,4 +1,4 @@
-/* ***************************************************************************
+ï»¿/* ***************************************************************************
  * string.c -- The string operation set.
  * 
  * Copyright (C) 2012-2013 by
@@ -21,29 +21,29 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * string.c -- ×Ö·û´®²Ù×÷¼¯
+ * string.c -- å­—ç¬¦ä¸²æ“ä½œé›†
  *
- * °æÈ¨ËùÓÐ (C) 2013 ¹éÊôÓÚ
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2013 å½’å±žäºŽ
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼þÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾ÝGPLv2Ðí¿ÉÐ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ðí¿ÉÖ¤µÚ¶þ°æ µÄÓ¢ÎÄËõÐ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌÐøÊ¹ÓÃ¡¢ÐÞ¸Ä»ò·¢²¼±¾ÎÄ¼þ£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öÐí¿ÉÐ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜Žæ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’ŒæŽ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔðÈÎ£¬ÉõÖÁÃ»ÓÐÊÊÏúÐÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒþº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ðí¿ÉÐ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºŽä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼þµÄGPLv2Ðí¿ÉÐ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼þÖÐ£¬Èç¹û
- * Ã»ÓÐ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºŽæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æžœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
  
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
 #include LC_FONT_H
 
-/* ½«×ÖÄ¸×ª»»³É´óÐ´ */
+/* å°†å­—æ¯è½¬æ¢æˆå¤§å†™ */
 static char uppercase( char ch )
 {
 	if( 'a' <= ch && ch <= 'z' ) {
@@ -52,7 +52,7 @@ static char uppercase( char ch )
 	return ch;
 }
 
-/* ²»Çø·Ö´óÐ¡Ð´£¬¶Ô±ÈÁ½¸ö×Ö·û´® */
+/* ä¸åŒºåˆ†å¤§å°å†™ï¼Œå¯¹æ¯”ä¸¤ä¸ªå­—ç¬¦ä¸² */
 LCUI_API int
 lcui_strcasecmp( const char *str1, const char *str2 )
 {
@@ -71,7 +71,7 @@ lcui_strcasecmp( const char *str1, const char *str2 )
 	return 0;
 }
 
-/* ³õÊ¼»¯×Ö·û´® */
+/* åˆå§‹åŒ–å­—ç¬¦ä¸² */
 LCUI_API void
 LCUIString_Init( LCUI_String *in )
 {
@@ -79,7 +79,7 @@ LCUIString_Init( LCUI_String *in )
 	in->string = NULL;
 }
 
-/* ³õÊ¼»¯¿í×Ö·û´® */
+/* åˆå§‹åŒ–å®½å­—ç¬¦ä¸² */
 LCUI_API void
 LCUIWString_Init( LCUI_WString *in )
 {
@@ -87,7 +87,7 @@ LCUIWString_Init( LCUI_WString *in )
 	in->string = NULL;
 }
 
-/* ¿½±´Ô´×Ö·û´®ÖÁÄ¿±ê×Ö·û´®ÖÐ */
+/* æ‹·è´æºå­—ç¬¦ä¸²è‡³ç›®æ ‡å­—ç¬¦ä¸²ä¸­ */
 LCUI_API void
 _LCUIString_Copy( LCUI_String * des, const char *src )
 {
@@ -102,7 +102,7 @@ _LCUIString_Copy( LCUI_String * des, const char *src )
 	strcpy (des->string, src);
 }
 
-/* ¿í×Ö·û´®¿½±´ */
+/* å®½å­—ç¬¦ä¸²æ‹·è´ */
 LCUI_API void
 _LCUIWString_Copy( LCUI_WString *des, const wchar_t *src )
 {
@@ -123,7 +123,7 @@ LCUIWString_Copy( LCUI_WString *des_str, LCUI_WString *src_str )
 	_LCUIWString_Copy( des_str, src_str->string );
 }
 
-/* ×Ö·û´®¶Ô±È */
+/* å­—ç¬¦ä¸²å¯¹æ¯” */
 LCUI_API int
 _LCUIString_Cmp( LCUI_String *str1, const char *str2 )
 {
@@ -142,7 +142,7 @@ LCUIString_Cmp( LCUI_String *str1, LCUI_String *str2 )
 	return _LCUIString_Cmp( str1, str2->string );
 }
 
-/* ¿í×Ö·û´®¶Ô±È */
+/* å®½å­—ç¬¦ä¸²å¯¹æ¯” */
 LCUI_API int
 _LCUIWString_Cmp( LCUI_WString *str1, const wchar_t *str2 )
 {
@@ -161,7 +161,7 @@ LCUIWString_Cmp( LCUI_WString *str1, LCUI_WString *str2 )
 	return _LCUIWString_Cmp( str1, str2->string );
 }
 
-/* ×Ö·û´®¿½±´ */
+/* å­—ç¬¦ä¸²æ‹·è´ */
 LCUI_API int
 LCUIString_Copy( LCUI_String *str1, LCUI_String *str2 )
 {
@@ -186,14 +186,7 @@ LCUIString_Free( LCUI_String *in )
 	in->string = NULL;
 }
 
-/* ÊÍ·Å¿í×Ö·ûÕ¼ÓÃµÄ×ÊÔ´ */
-LCUI_API void
-LCUIWchar_Free( LCUI_WChar *ch )
-{
-	ch->bitmap = NULL;
-}
-
-/* ÊÍ·Å¿í×Ö·û´®Õ¼ÓÃµÄ×ÊÔ´ */
+/* é‡Šæ”¾å®½å­—ç¬¦ä¸²å ç”¨çš„èµ„æº */
 LCUI_API void
 LCUIWString_Free( LCUI_WString *str )
 {

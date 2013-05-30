@@ -92,10 +92,6 @@ LCUIString_Copy( LCUI_String *str1, LCUI_String *str2 );
 LCUI_API void
 LCUIString_Free( LCUI_String *in );
 
-/* 释放宽字符占用的资源 */
-LCUI_API void
-LCUIWchar_Free( LCUI_WChar *ch );
-
 /* 释放宽字符串占用的资源 */
 LCUI_API void
 LCUIWString_Free( LCUI_WString *str );
