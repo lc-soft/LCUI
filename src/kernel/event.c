@@ -42,20 +42,23 @@
 #include LC_LCUI_H
 #include LC_ERROR_H
 
-static LCUI_Queue events;
+static LCUI_Queue global_events;
+static LCUI_Queue sys_event_slots;
+static LCUI_Queue user_event_slots;
 static LCUI_BOOL active = FALSE;
 static LCUI_Thread eventloop_thread = -1;
+
 
 /* 事件队列初始化 */
 static void LCUI_EventsInit( void )
 {
-	Queue_Init( &events, sizeof(LCUI_Event), NULL );
+	Queue_Init( &global_events, sizeof(LCUI_Event), NULL );
 }
 
 /* 销毁事件队列 */
 static void LCUI_DestroyEvents( void )
 {
-	Queue_Destroy( &events );
+	Queue_Destroy( &global_events );
 }
 
 /* 从事件队列中获取事件 */
@@ -68,15 +71,15 @@ LCUI_PollEvent( LCUI_Event *event )
 		return FALSE;
 	}
 
-	Queue_Lock( &events );
-	tmp = Queue_Get( &events, 0 );
+	Queue_Lock( &global_events );
+	tmp = Queue_Get( &global_events, 0 );
 	if( !tmp ) {
-		Queue_Unlock( &events );
+		Queue_Unlock( &global_events );
 		return FALSE;
 	}
 	*event = *tmp;
-	Queue_Delete( &events, 0 );
-	Queue_Unlock( &events );
+	Queue_Delete( &global_events, 0 );
+	Queue_Unlock( &global_events );
 	return TRUE;
 }
 
@@ -89,7 +92,7 @@ LCUI_DispatchSystemEvent( LCUI_Event *event )
 	LCUI_Task *task;
 	LCUI_Event event_buff;
 
-	slot = EventSlots_Find( &LCUI_Sys.sys_event_slots, event->type);
+	slot = EventSlots_Find( &sys_event_slots, event->type);
 	if( !slot ) {
 		return;
 	}
@@ -130,7 +133,7 @@ LCUI_DispatchUserEvent( LCUI_Event *event )
 	LCUI_Task *task;
 	LCUI_UserEvent user_event;
 
-	slot = EventSlots_Find(	&LCUI_Sys.user_event_slots,
+	slot = EventSlots_Find(	&user_event_slots,
 				event->user.code );
 	if( !slot ) {
 		return;
@@ -199,8 +202,8 @@ static int LCUI_StartEventThread( void )
 LCUI_API void
 LCUIModule_Event_Init( void )
 {
-	EventSlots_Init( &LCUI_Sys.sys_event_slots );
-	EventSlots_Init( &LCUI_Sys.user_event_slots );
+	EventSlots_Init( &sys_event_slots );
+	EventSlots_Init( &user_event_slots );
 	LCUI_EventsInit();
 	LCUI_StartEventThread();
 }
@@ -211,8 +214,8 @@ LCUIModule_Event_End( void )
 {
 	LCUI_StopEventThread();
 	LCUI_DestroyEvents();
-	Queue_Destroy( &LCUI_Sys.sys_event_slots );
-	Queue_Destroy( &LCUI_Sys.user_event_slots );
+	Queue_Destroy( &sys_event_slots );
+	Queue_Destroy( &user_event_slots );
 }
 
 /* 添加事件至事件队列中 */
@@ -223,12 +226,12 @@ LCUI_PushEvent( LCUI_Event *event )
 		return FALSE;
 	}
 
-	Queue_Lock( &events );
-	if(Queue_Add( &events, event ) < 0) {
-		Queue_Unlock( &events );
+	Queue_Lock( &global_events );
+	if(Queue_Add( &global_events, event ) < 0) {
+		Queue_Unlock( &global_events );
 		return FALSE;
 	}
-	Queue_Unlock( &events );
+	Queue_Unlock( &global_events );
 	return TRUE;
 }
 
@@ -330,7 +333,7 @@ LCUI_KeyboardEvent_Connect(
 	if( !Get_FuncData( &func_data, (CallBackFunc)func, NULL, arg ) ) {
 		return -1;
 	}
-	return EventSlots_Add(	&LCUI_Sys.sys_event_slots,
+	return EventSlots_Add(	&sys_event_slots,
 				LCUI_KEYDOWN, &func_data );
 }
 
@@ -344,7 +347,7 @@ LCUI_MouseMotionEvent_Connect(
 	if( !Get_FuncData( &func_data, (CallBackFunc)func, NULL, arg ) ) {
 		return -1;
 	}
-	return EventSlots_Add(	&LCUI_Sys.sys_event_slots,
+	return EventSlots_Add(	&sys_event_slots,
 				LCUI_MOUSEMOTION, &func_data );
 }
 
@@ -360,9 +363,9 @@ LCUI_MouseButtonEvent_Connect(
 	if( !Get_FuncData( &func_data, (CallBackFunc)func, NULL, arg ) ) {
 		return -1;
 	}
-	ret += EventSlots_Add(	&LCUI_Sys.sys_event_slots,
+	ret += EventSlots_Add(	&sys_event_slots,
 				LCUI_MOUSEBUTTONDOWN, &func_data );
-	ret += EventSlots_Add(	&LCUI_Sys.sys_event_slots,
+	ret += EventSlots_Add(	&sys_event_slots,
 				LCUI_MOUSEBUTTONUP, &func_data );
 	return ret>=0?0:-1;
 }
@@ -375,6 +378,6 @@ LCUI_UserEvent_Connect( int event_id, void (*func)(void*, void*) )
 	if( !Get_FuncData( &func_data, func, NULL, NULL ) ) {
 		return -1;
 	}
-	return EventSlots_Add(	&LCUI_Sys.user_event_slots,
+	return EventSlots_Add(	&user_event_slots,
 				LCUI_USEREVENT, &func_data );
 }
