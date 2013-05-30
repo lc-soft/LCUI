@@ -44,7 +44,7 @@
 #ifndef __LCUI_H__  /* 如果没有定义 __LCUI_H__ 宏 */
 #define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */
 
-#define LCUI_VERSION "0.13.0"
+#define LCUI_VERSION "0.14.0"
 
 #include <wchar.h>
 #include <stdio.h>
@@ -52,28 +52,11 @@
 #include <string.h>
 #include <stdarg.h>
 
-/* 打开文件时的错误 */
-#define FILE_ERROR_OPEN_ERROR		-1
-#define FILE_ERROR_SHORT_FILE		-2
-#define FILE_ERROR_BIG_FILE		-3
-#define FILE_ERROR_UNKNOWN_FORMAT	-4
-
-/* 图像类型 */
-#define TYPE_PNG	1
-#define TYPE_JPG	2
-#define TYPE_BMP	3
-
 /* 状态 */
 #define ACTIVE	1
 #define KILLED	-1
 #define REMOVE	-1
 #define INSIDE	1
-
-/***************** 一些输入输出设备 *********************/
-#define FB_DEV	"/dev/fb0"		/* 图形输出设备 */
-#define TS_DEV	"/dev/jz_ts"		/* 触屏输入设备 */
-#define MS_DEV	"/dev/input/mice"	/* 鼠标设备 */
-/*****************************************************/
 
 #ifndef FALSE
 #define FALSE 0
@@ -86,12 +69,6 @@
 /* 触屏校准后的文件 */
 #define LCUI_CALIBFILE "/mnt/Data/LC-SOFT/pointercal"
 
-#define LABEL_TEXT_MAX_SIZE	2048
-
-/* 定义图形的混合方式 */
-#define GRAPH_MIX_FLAG_OVERLAY	 1<<7
-#define GRAPH_MIX_FLAG_REPLACE	 1<<8
-
 /************ 任务的添加模式 ***************/
 #define ADD_MODE_ADD_NEW	0 /* 新增 */
 #define ADD_MODE_NOT_REPEAT	1 /* 不能重复 */
@@ -101,62 +78,24 @@
 #define AND_ARG_S 	1<<4	/* 第二个参数 */
 /*****************************************/
 
-/****************** 图像的处理方式 *****************/
-#define FILL_MODE_ZOOM		LAYOUT_ZOOM	/* 缩放 */
-#define FILL_MODE_STRETCH  	LAYOUT_STRETCH	/* 拉伸 */
-#define FILL_MODE_CENTER	LAYOUT_CENTER	/* 居中 */
-#define FILL_MODE_TILE		LAYOUT_TILE	/* 平铺 */
-#define FILL_MODE_NONE		LAYOUT_NONE	/* 无 */
-#define FILL_MODE_NORMAL	LAYOUT_NORMAL
-/*************************************************/
-
-/****************** 图像的处理方式 *****************/
-/* 缩放，缩放比例随着PictureBox部件的尺寸的改变而改变 */
-#define SIZE_MODE_ZOOM		LAYOUT_ZOOM
-
-/* 固定缩放，用于照片查看器，PictureBox部件的尺寸的改变不影响缩放比列 */
-#define SIZE_MODE_BLOCK_ZOOM	5
-
-#define SIZE_MODE_STRETCH	LAYOUT_STRETCH	/* 拉伸 */
-#define SIZE_MODE_CENTER	LAYOUT_CENTER	/* 居中 */
-#define SIZE_MODE_TILE		LAYOUT_TILE	/* 平铺 */
-#define SIZE_MODE_NONE		LAYOUT_NONE	/* 无 */
-#define SIZE_MODE_NORMAL	LAYOUT_NORMAL
-/*************************************************/
-
 LCUI_BEGIN_HEADER
 
 typedef unsigned char LCUI_BOOL;
-
-/****************** 图像的布局 *****************/
-typedef enum LAYOUT_TYPE_
-{
-	LAYOUT_NONE	= 0,	  /* 无 */
-	LAYOUT_NORMAL	= 0,
-	LAYOUT_ZOOM	= 1,	  /* 缩放 */
-	LAYOUT_STRETCH	= 1<<1,	  /* 拉伸 */
-	LAYOUT_CENTER	= 1<<2,	  /* 居中 */
-	LAYOUT_TILE	= 1<<3	  /* 平铺 */
-}LAYOUT_TYPE;
-/**********************************************/
 
 typedef unsigned long int LCUI_ID;
 
 typedef void (*CallBackFunc)(void*,void*);
 
-/* 先使用typedef为结构体创建同义字，之后再定义结构体 */
-typedef struct	LCUI_Widget_		LCUI_Widget;
-typedef struct	LCUI_Key_		LCUI_Key;
+typedef struct	LCUI_Widget_	LCUI_Widget;
 
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
 
 /********** 按键信息 ************/
-struct LCUI_Key_
-{
+typedef struct LCUI_Key_ {
 	int code;
 	int state;
-};
+} LCUI_Key;
 /******************************/
 
 /*--------- RGB配色数据 ---------*/
@@ -209,30 +148,6 @@ typedef struct LCUI_Rect_ {
 	double center_x,center_y; /* 中心点的坐标 */
 } LCUI_Rect;
 /*--------------------- END ----------------------*/
-
-/*---------------- 字体位图数据 ------------------*/
-typedef struct LCUI_FontBMP_ {
-	int top;		/* 与顶边框的距离 */
-	int left;		/* 与左边框的距离 */
-	int width;		/* 位图宽度 */
-	int rows;		/* 位图行数 */
-	int pitch;
-	uchar_t *buffer;	/* 字体位图数据 */
-	short num_grays;
-	char pixel_mode;
-	LCUI_Pos advance;	/* XY轴的跨距 */
-} LCUI_FontBMP;
-/*------------------- END ---------------------*/
-
-/*------------------------ 宽字符位图及相关数据 -----------------------*/
-typedef struct LCUI_WChar_ {
-	wchar_t		char_code;	/* 字符码 */
-	LCUI_FontBMP	*bitmap;	/* 字符的位图数据 */
-	LCUI_RGB	color;		/* 该文字的配色 */
-	LCUI_BOOL	update;		/* 标明这个字符是否需要刷新 */
-	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */
-} LCUI_WChar;
-/*-----------------------------END ----------------------------------*/
 
 /*---------- 宽字符串 ----------*/
 typedef struct LCUI_WString_ {
