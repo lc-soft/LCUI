@@ -42,12 +42,13 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 
+static LCUI_Queue presskey_record;
+
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 
 //#define __NEED_CATCHSCREEN__
 #ifdef __NEED_CATCHSCREEN__
 #include LC_GRAPH_H
-#include LC_DRAW_H
 #include LC_DISPLAY_H
 #endif
 
@@ -65,16 +66,16 @@ LCUIKey_IsHit( int key_code )
 {
 	int *t;
 	int i, total;
-	Queue_Lock( &LCUI_Sys.press_key );
-	total = Queue_GetTotal(&LCUI_Sys.press_key);
+	Queue_Lock( &presskey_record );
+	total = Queue_GetTotal(&presskey_record);
 	for(i=0; i<total; ++i) {
-		t = Queue_Get(&LCUI_Sys.press_key, i);
+		t = Queue_Get(&presskey_record, i);
 		if( t && *t == key_code ) {
-			Queue_Unlock( &LCUI_Sys.press_key );
+			Queue_Unlock( &presskey_record );
 			return TRUE;
 		}
 	}
-	Queue_Unlock( &LCUI_Sys.press_key );
+	Queue_Unlock( &presskey_record );
 	return FALSE;
 }
 
@@ -82,9 +83,9 @@ LCUIKey_IsHit( int key_code )
 LCUI_API void
 LCUIKey_Hit( int key_code )
 {
-	Queue_Lock( &LCUI_Sys.press_key );
-	Queue_Add( &LCUI_Sys.press_key, &key_code );
-	Queue_Unlock( &LCUI_Sys.press_key );
+	Queue_Lock( &presskey_record );
+	Queue_Add( &presskey_record, &key_code );
+	Queue_Unlock( &presskey_record );
 }
 
 /* 标记指定键值的按键已释放 */
@@ -94,15 +95,15 @@ LCUIKey_Free( int key_code )
 	int *t;
 	int i, total;
 	
-	Queue_Lock( &LCUI_Sys.press_key );
-	total = Queue_GetTotal(&LCUI_Sys.press_key);
+	Queue_Lock( &presskey_record );
+	total = Queue_GetTotal(&presskey_record);
 	for(i=0; i<total; ++i) {
-		t = Queue_Get(&LCUI_Sys.press_key, i);
+		t = Queue_Get(&presskey_record, i);
 		if( t && *t == key_code ) {
-			Queue_Delete( &LCUI_Sys.press_key, i );
+			Queue_Delete( &presskey_record, i );
 		}
 	}
-	Queue_Unlock( &LCUI_Sys.press_key );
+	Queue_Unlock( &presskey_record );
 }
 
 /* 初始化键盘输入 */
@@ -187,7 +188,7 @@ LCUIKeyboard_IsHit( void )
 	} 
 	return FALSE;
 #endif
-	if( Queue_GetTotal( &LCUI_Sys.press_key ) > 0) {
+	if( Queue_GetTotal( &presskey_record ) > 0) {
 		return TRUE;
 	}
 	return FALSE;
@@ -220,10 +221,10 @@ LCUIKeyboard_Get( void )
 	return c; 
 #else 
 	int *key_ptr;
-	while( Queue_GetTotal(&LCUI_Sys.press_key) == 0 ) {
+	while( Queue_GetTotal(&presskey_record) == 0 ) {
 		LCUI_MSleep(100);
 	}
-	key_ptr = Queue_Get( &LCUI_Sys.press_key, 0 );
+	key_ptr = Queue_Get( &presskey_record, 0 );
 	if( key_ptr ) {
 		return *key_ptr;
 	}
@@ -265,7 +266,7 @@ static LCUI_BOOL proc_keyboard(void)
 			timeinfo->tm_min, timeinfo->tm_sec
 		);
 		LCUIScreen_CatchGraph( area, &graph );
-		write_png(filename, &graph);
+		Graph_WritePNG(filename, &graph);
 		Graph_Free(&graph);
 	}
 	else if(event.key.key_code == 'r') {
@@ -296,7 +297,7 @@ static LCUI_BOOL Disable_Keyboard_Input( void )
 LCUI_API void
 LCUIModule_Keyboard_Init( void )
 {
-	Queue_Init( &LCUI_Sys.press_key, sizeof(int), NULL );
+	Queue_Init( &presskey_record, sizeof(int), NULL );
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	LCUIDevice_Add( Enable_Keyboard_Input, proc_keyboard, Disable_Keyboard_Input );
 #endif
@@ -306,5 +307,5 @@ LCUIModule_Keyboard_Init( void )
 LCUI_API void
 LCUIModule_Keyboard_End( void )
 {
-	Queue_Destroy( &LCUI_Sys.press_key );
+	Queue_Destroy( &presskey_record );
 }
