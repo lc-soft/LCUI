@@ -61,7 +61,10 @@ LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget )
 	WidgetMsgData *data_ptr;
 	LCUI_Widget *child;
 	LCUI_Queue *msg_buff, *child_list;
-
+	
+	if( widget == NULL ) {
+		widget = RootWidget_GetSelf();
+	}
 	msg_buff = Widget_GetMsgBuff( widget );
 	child_list = Widget_GetChildList( widget );
 	
@@ -140,7 +143,6 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 		tmp_msg.data.ptr = data;
 		break;
 	}
-	/* 消息记录至父部件 */
 	des_queue = Widget_GetMsgBuff( widget );
 	total = Queue_GetTotal( des_queue );
 	for(n_found=0,i=0; i<total; ++i) {

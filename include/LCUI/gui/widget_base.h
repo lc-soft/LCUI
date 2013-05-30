@@ -280,6 +280,18 @@ LCUI_API int Widget_TryLock( LCUI_Widget *widget );
 
 LCUI_API int Widget_Unlock( LCUI_Widget *widget );
 
+/* 初始化根部件 */
+LCUI_API void RootWidget_Init(void);
+
+/* 销毁根部件 */
+LCUI_API void RootWidget_Destroy(void);
+
+/* 获取根部件图层指针 */
+LCUI_API LCUI_GraphLayer *RootWidget_GetGraphLayer(void);
+
+/* 获取根部件指针 */
+LCUI_API LCUI_Widget *RootWidget_GetSelf(void);
+
 /***********************************************************
 <Function>
 	Widget_New

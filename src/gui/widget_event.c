@@ -269,14 +269,10 @@ static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
 	/* 开始判断该部件的上级部件 */
 	up_widget = widget->parent;
 	while( widget ) {
-		if( up_widget == NULL ) {
-			child_list = &LCUI_Sys.widget_list;
-		} else {
-			child_list = &up_widget->child;
-		}
+		child_list = Widget_GetChildList( up_widget );
 		n = Queue_GetTotal( child_list );
 		for(i=0; i<n; ++i) {
-			child = Queue_Get( child_list, i );
+			child = (LCUI_Widget*)Queue_Get( child_list, i );
 			if( !child || !child->visible || !child->modal ) {
 				continue;
 			}
@@ -502,8 +498,7 @@ WidgetFocusProc( LCUI_KeyboardEvent *event, void *arg );
 LCUI_API void
 LCUIModule_Widget_Init( void )
 {
-	WidgetQueue_Init( &LCUI_Sys.widget_list );
-	WidgetMsgBuff_Init( NULL );
+	RootWidget_Init();
 	Queue_Init( &widget_list, sizeof(widget_item), NULL );
 	LCUI_MouseButtonEvent_Connect( LCUI_HandleMouseButton, NULL );
 	LCUI_MouseMotionEvent_Connect( LCUI_HandleMouseMotion, NULL );
@@ -515,8 +510,7 @@ LCUIModule_Widget_Init( void )
 LCUI_API void
 LCUIModule_Widget_End( void )
 {
-	Queue_Destroy( &LCUI_Sys.widget_list );
-	Queue_Destroy( &LCUI_Sys.widget_msg );
+	RootWidget_Destroy();
 	Queue_Destroy( &widget_list );
 	WidgetStyle_LibraryDestroy();
 }
@@ -524,7 +518,6 @@ LCUIModule_Widget_End( void )
 
 
 /*--------------------------- Focus Proc ------------------------------*/
-static LCUI_Widget *root_focus_widget = NULL;
 
 LCUI_API LCUI_BOOL
 Set_Focus( LCUI_Widget *widget )
@@ -551,7 +544,7 @@ Set_Focus( LCUI_Widget *widget )
 	if( widget->parent ) {
 		focus_widget = &widget->parent->focus_widget;
 	} else {
-		focus_widget = &root_focus_widget;
+		focus_widget = &RootWidget_GetSelf()->focus_widget;
 	}
 	if( *focus_widget ) {
 		/* 若之前获得焦点的是模态部件，则不能移动焦点 */
@@ -592,17 +585,17 @@ Get_FocusWidget( LCUI_Widget *widget )
 
 	//printf( "Get_FocusWidget(）： widget: %p\n", widget );
 	//print_widget_info( widget );
+	queue_ptr = Widget_GetChildList( widget );
 	if( !widget ) {
-		queue_ptr = &LCUI_Sys.widget_list;
-		focus_widget = &root_focus_widget;
+		widget = RootWidget_GetSelf();
 	} else {
 		/* 如果部件不需要焦点，则返回NULL */
 		if( !widget->focus ) {
 			return NULL;
 		}
-		queue_ptr = &widget->child;
-		focus_widget = &widget->focus_widget;
 	}
+	queue_ptr = &widget->child;
+	focus_widget = &widget->focus_widget;
 
 	if( !focus_widget ) {
 		return NULL;
@@ -648,13 +641,8 @@ Cancel_Focus( LCUI_Widget *widget )
 		return FALSE;
 	}
 
-	if( widget->parent ) {
-		focus_widget = &widget->parent->focus_widget;
-		queue_ptr = &widget->parent->child;
-	} else {
-		focus_widget = &root_focus_widget;
-		queue_ptr = &LCUI_Sys.widget_list;
-	}
+	focus_widget = &RootWidget_GetSelf()->focus_widget;
+	queue_ptr = Widget_GetChildList( widget->parent );
 	/* 如果该部件并没获得焦点 */
 	if( *focus_widget != widget ) {
 		return FALSE;
@@ -702,11 +690,10 @@ Reset_Focus( LCUI_Widget* widget )
 	LCUI_Widget** focus_widget;
 	LCUI_WidgetEvent event;
 
-	if( widget ) {
-		focus_widget = &widget->focus_widget;
-	} else {
-		focus_widget = &root_focus_widget;
+	if( !widget ) {
+		widget = RootWidget_GetSelf();
 	}
+	focus_widget = &widget->focus_widget;
 	if( *focus_widget ) {
 		event.type = EVENT_FOCUSOUT;
 		Widget_DispatchEvent( *focus_widget, &event );
