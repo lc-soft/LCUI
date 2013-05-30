@@ -135,7 +135,7 @@ LCUI_API void
 LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 {
 	LCUI_Pos pos, cursor_pos;
-	GraphLayer_GetGraph( LCUI_Sys.root_glayer, graph, rect );
+	GraphLayer_GetGraph( RootWidget_GetGraphLayer(), graph, rect );
 	/* 如果游标可见 */
 	if ( !LCUICursor_Visible() ) {
 		return;
@@ -149,7 +149,6 @@ LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 		LCUICursor_MixGraph( graph, pos );
 	}
 }
-
 
 #ifdef LCUI_BUILD_IN_WIN32
 static void Win32_Clinet_InvalidArea( LCUI_Rect rect )
