@@ -43,7 +43,6 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
-#include LC_DRAW_H
 #include LC_DISPLAY_H
 #include <time.h>
 
@@ -78,7 +77,7 @@ static void catch_screen( void *unused )
 		tsec = timeinfo->tm_sec;
 		
 		LCUIScreen_CatchGraph( area, &graph );
-		write_png( filename, &graph );
+		Graph_WritePNG( filename, &graph );
 		LCUI_MSleep(35);
 	}
 	LCUIThread_Exit(NULL);

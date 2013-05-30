@@ -2,7 +2,6 @@
 #include LC_LCUI_H
 #include LC_WIDGET_H
 #include LC_GRAPH_H
-#include LC_DRAW_H
 #include LC_STYLE_LIBRARY_H
 
 #include <math.h>
@@ -44,7 +43,7 @@ static int add_imagefile( const char *filepath, LCUI_Graph *buff )
 		}
 	}
 	/* 该图片文件记录不存在，则从图片文件中载入图像数据 */
-	if( Load_Image( filepath, &imgdata.img ) != 0 ) {
+	if( Graph_LoadImage( filepath, &imgdata.img ) != 0 ) {
 		return -1;
 	}
 	/* 载入成功后，就添加该图片文件记录 */
