@@ -666,7 +666,6 @@ Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out )
 	int x, y;
 	int temp,count = 0, k; 
 	
-	out->have_alpha = src->have_alpha;
 	out->alpha = src->alpha;
 	rect = LCUIRect_ValidArea(Size(src->width, src->height), rect); 
 	
@@ -674,7 +673,6 @@ Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out )
 	else {
 		return -1;
 	}
-	
 	temp = Graph_Create(out, rect.width, rect.height);
 	if(temp != 0) {
 		return -1; 
@@ -688,8 +686,13 @@ Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out )
 			out->rgba[0][count] = src->rgba[0][temp];
 			out->rgba[1][count] = src->rgba[1][temp];
 			out->rgba[2][count] = src->rgba[2][temp];
-			if(Graph_HaveAlpha(src))
-				out->rgba[3][count] = src->rgba[3][temp];
+			if(out->have_alpha) {
+				if(src->have_alpha) {
+					out->rgba[3][count] = src->rgba[3][temp];
+				} else {
+					out->rgba[3][count] = 255;
+				}
+			}
 			++count;
 		}
 	}
