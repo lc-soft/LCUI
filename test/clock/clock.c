@@ -68,10 +68,10 @@ static void CreateClockWidget( LCUI_Widget *mian_window )
 	PictureBox_SetSizeMode(wdg_min_ptr, SIZE_MODE_CENTER);
 	PictureBox_SetSizeMode(wdg_sec_ptr, SIZE_MODE_CENTER);
 	/* 载入图片，保存图形数据 */
-	Load_Image(IMG_DIAL, &clock_bg);
-	Load_Image(IMG_HOUR_PONTER, &hour_ptr);
-	Load_Image(IMG_MINUTE_POINTER, &min_ptr);
-	Load_Image(IMG_SECOND_POINTER, &sec_ptr);
+	Graph_LoadImage(IMG_DIAL, &clock_bg);
+	Graph_LoadImage(IMG_HOUR_PONTER, &hour_ptr);
+	Graph_LoadImage(IMG_MINUTE_POINTER, &min_ptr);
+	Graph_LoadImage(IMG_SECOND_POINTER, &sec_ptr);
 	/* 设定PictureBox部件显示的图形 */
 	PictureBox_SetImage(wdg_dial, &clock_bg);
 	PictureBox_SetImage(wdg_hour_ptr, &hour_ptr);
@@ -111,11 +111,16 @@ static void Quit( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	LCUI_MainLoop_Quit( NULL );
 }
 
-int LCUIMainFunc(LCUI_ARGLIST)
+int main( int argc, char **argv )
 {
 	LCUI_Widget *window;
 	/* 初始化LCUI */
-	LCUI_Init(LCUI_DEFAULT_CONFIG);
+	// 缺省模式，默认是全屏
+	LCUI_Init(0,0,0);
+	// 全屏模式，分辨率为800x600
+	//LCUI_Init(800,600,LCUI_INIT_MODE_FULLSCREEN);
+	// 窗口模式，窗口尺寸为800x600
+	//LCUI_Init(800,600,LCUI_INIT_MODE_WINDOW);
 	/* 创建一个窗口 */
 	window = Widget_New("window");
 	/* 调整窗口尺寸 */
@@ -132,5 +137,3 @@ int LCUIMainFunc(LCUI_ARGLIST)
 	Widget_Show( window );
 	return LCUI_Main();
 }
-
-
