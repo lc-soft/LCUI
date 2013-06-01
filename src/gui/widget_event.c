@@ -261,14 +261,15 @@ static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
 {
 	int i, n;
 	LCUI_Queue *child_list;
-	LCUI_Widget *child, *up_widget;
+	LCUI_Widget *child, *root_widget, *up_widget;
 
-	if( widget == NULL ) {
+	root_widget = RootWidget_GetSelf();
+	if( widget == NULL || widget == root_widget ) {
 		return TRUE;
 	}
 	/* 开始判断该部件的上级部件 */
 	up_widget = widget->parent;
-	while( widget ) {
+	while( widget && widget != root_widget ) {
 		child_list = Widget_GetChildList( up_widget );
 		n = Queue_GetTotal( child_list );
 		for(i=0; i<n; ++i) {
@@ -436,7 +437,7 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	pos.x = event->x;
 	pos.y = event->y;
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
-	widget = Widget_At (NULL, pos);
+	widget = Widget_At( NULL, pos );
 	if( widget ) {
 		tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_MOUSEMOTION );
 		if( tmp_widget ) {
