@@ -44,7 +44,7 @@
 LCUI_BEGIN_HEADER
 
 /************************ LCUI程序的数据 *******************************/
-typedef struct _LCUI_App 
+typedef struct LCUI_App_
 {
 	LCUI_ID id;		/* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
 	void (*func)(void);	/* 在LCUI退出时调用的函数 */
@@ -56,13 +56,11 @@ LCUI_App;
 /**********************************************************************/
 
 /***************************整个LCUI的数据 *****************************/
-typedef struct _LCUI_System
+typedef struct LCUI_System_
 {
 	int state;		/* 状态 */ 
 	int mode;		/* LCUI的运行模式 */
-
 	LCUI_BOOL init;		/* 指示LCUI是否初始化过 */
-	LCUI_BOOL need_sync_area;	/* 指示是否需要转移部件中记录的区域数据 */ 
 	
 	LCUI_Thread self_id;		/* 保存LCUI主程序的线程的ID */
 	LCUI_Thread display_thread;	/* 保存核心处理的线程的ID */
@@ -71,7 +69,7 @@ typedef struct _LCUI_System
 } LCUI_System;
 /***********************************************************************/
 
-typedef struct {
+typedef struct LCUI_MainLoop_ {
 	LCUI_ID app_id;
 	LCUI_BOOL quit;
 	LCUI_BOOL running;
@@ -120,7 +118,7 @@ LCUI_API LCUI_BOOL LCUI_Active(void);
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */ 
-LCUI_API int LCUI_Init( int mode, void *arg );
+LCUI_API int LCUI_Init( int w, int h, int mode );
 
 /* 
  * 功能：LCUI程序的主循环
