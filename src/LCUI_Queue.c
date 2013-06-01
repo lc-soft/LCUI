@@ -613,9 +613,7 @@ __Queue_Delete( LCUI_Queue * queue, int pos, int flag )
 				p_src->next = NULL;
 			}
 		}
-		if(flag == 1) { 
-			memset(p_src->data, 0, queue->element_size);
-		} else {
+		if(flag == 0) {
 			p_src->data = NULL;
 		}
 	} 
@@ -626,10 +624,8 @@ __Queue_Delete( LCUI_Queue * queue, int pos, int flag )
 		if( queue->destroy_func ) {
 			queue->destroy_func(save);
 		}
-		/* 置零该内存空间 */
-		memset(save, 0, queue->element_size);
 		/* 不需要释放内存，只有在调用Queue_Destroy函数时才全部释放 */
-		//free(save); 
+		//free(save);
 	}
 	return TRUE;
 }
