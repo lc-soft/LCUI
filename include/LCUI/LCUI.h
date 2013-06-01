@@ -240,6 +240,66 @@ LCUI_END_HEADER
 #include LC_LCUI_HPP
 #endif
 
+#if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS)
+extern int main(int,char**);
+
+int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow )
+{
+	char *pCmdLine, *cmdline_buff;
+	char *token = NULL, *next_token = NULL;
+	char **argv = NULL;
+	int ret, len, i = 0, argc = 0;
+
+	Win32_LCUI_Init( hInstance );
+	/* 获取命令行 */
+	pCmdLine = GetCommandLine();	
+	/* 计算命令行的长度 */
+	len = strlen( pCmdLine ) + 1;	
+	/* 分配一段相应长度的内存空间 */
+	cmdline_buff = (char*)malloc(sizeof(char)*len); 
+	if( cmdline_buff == NULL ) {
+		return -1;
+	}
+	/* 拷贝该命令行 */
+	strcpy_s( cmdline_buff, len, pCmdLine );	
+	/* 计算命令行中参数的个数 */
+	token = strtok_s( cmdline_buff, " \r\t\n", &next_token );
+	while( token != NULL ) {
+		argc++;
+		token = strtok_s( NULL, " \r\t\n", &next_token );
+	}
+	/* 根据参数个数来分配内存空间 */
+	if( argc > 0 ) {
+		argv = (char**)malloc(sizeof(char*)*argc);
+		if( argv == NULL ) {
+			return -1;
+		}
+	}
+	/* 由于strtok_s函数会修改cmdline_buff里的内容，因此，需要重新拷贝一次 */
+	strcpy_s( cmdline_buff, len, pCmdLine );
+	token = strtok_s( cmdline_buff, " \r\t\n", &next_token );
+	while( token != NULL ) {
+		len = strlen( token ) + 1;
+		argv[i] = (char*)malloc(sizeof(char)*len);
+		if( argv[i] == NULL ) {
+			return -1;
+		}
+		strcpy_s( argv[i], len, token );
+		token = strtok_s( NULL, " \r\t\n", &next_token );
+		++i;
+	}
+	/* 调用main函数 */
+	ret = main( argc, argv );
+	/* 释放之前申请的内存空间 */
+	for(i=0; i<argc; ++i) {
+		free( argv[i] );
+	}
+	free( argv );
+	free( cmdline_buff );
+	return ret;
+}
+#endif
+
 #endif /* __LCUI_H__ */
 
 

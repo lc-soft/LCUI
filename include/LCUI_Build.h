@@ -192,7 +192,7 @@
 #if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS)
 #define LCUI_ARGLIST		HINSTANCE hInstance,HINSTANCE hPrevInstance,PSTR szCmdLine,int iCmdShow
 #define LCUIMainFunc		WINAPI WinMain
-#define LCUI_DEFAULT_ARG	hInstance
+#define LCUI_DEFAULT_ARG	NULL
 #define LCUI_DEFAULT_CONFIG	LCUI_INIT_MODE_AUTO,LCUI_DEFAULT_ARG
 #else
 /* 否则，是在linux环境下，或者是win32的控制台程序 */
