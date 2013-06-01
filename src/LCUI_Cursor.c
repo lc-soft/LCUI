@@ -48,7 +48,7 @@
 #include LC_MISC_H
 #include LC_RES_H
 
-struct LCUI_Cursor {
+static struct LCUI_Cursor {
 	LCUI_Pos current_pos;	/* 当前的坐标 */
 	LCUI_Pos new_pos;	/* 将要更新的坐标 */
 	int visible;		/* 是否可见 */
@@ -60,6 +60,7 @@ void LCUIModule_Cursor_Init( void )
 {
 	LCUI_Graph pic;
 	Graph_Init( &pic );
+	Graph_Init( &cursor.graph );
 	/* 载入自带的游标的图形数据 */ 
 	Load_Graph_Default_Cursor( &pic );
 	LCUICursor_SetGraph( &pic );
@@ -145,6 +146,9 @@ LCUI_API int
 LCUICursor_SetGraph( LCUI_Graph *graph )
 {
 	if (Graph_IsValid (graph)) {
+		if( Graph_IsValid(&cursor.graph) ) {
+			Graph_Free( &cursor.graph );
+		}
 		Graph_Copy( &cursor.graph, graph );
 		LCUICursor_Refresh();
 		return 0;
