@@ -56,6 +56,7 @@ static unsigned char *pixel_mem = NULL;
 static HDC hdc_client, hdc_framebuffer;
 static HBITMAP client_bitmap;
 static HINSTANCE win32_hInstance = NULL;
+static LCUI_Mutex screen_mutex;
 
 LCUI_API void
 Win32_LCUI_Init( HINSTANCE hInstance )
@@ -137,11 +138,13 @@ LCUIScreen_GetGraph( LCUI_Graph *out )
 }
 
 LCUI_API int
-LCUIScreen_Init( LCUI_Screen *screen_info )
+LCUIScreen_Init( int w, int h, int mode )
 {
 	RECT client_rect;
 	WNDCLASS wndclass;
 	LCUI_Widget *root_widget;
+	LCUI_Screen screen_info;
+	LCUI_Size window_size;
 	TCHAR szAppName[] = TEXT ("Typer");
 	
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
@@ -160,37 +163,64 @@ LCUIScreen_Init( LCUI_Screen *screen_info )
 		szAppName, MB_ICONERROR) ;
 		return 0;
 	}
-	
-	current_hwnd = CreateWindow (
-			szAppName, TEXT ("LCUI"),
-			WS_OVERLAPPEDWINDOW &~WS_THICKFRAME,
-			CW_USEDEFAULT, CW_USEDEFAULT,
-			WIN32_WINDOW_WIDTH, WIN32_WINDOW_HEIGHT,
-			NULL, NULL, win32_hInstance, NULL);
-	
-	GetClientRect( current_hwnd, &client_rect );
+	/* 初始化屏幕互斥锁 */
+	LCUIMutex_Init( &screen_mutex );
+	if( mode == LCUI_INIT_MODE_AUTO ) {
+		if( w == 0 && h == 0 ) {
+			mode = LCUI_INIT_MODE_FULLSCREEN;
+		} else {
+			mode = LCUI_INIT_MODE_WINDOW;
+		}
+	}
+	if( mode == LCUI_INIT_MODE_FULLSCREEN ) {
+		window_size.w = GetSystemMetrics(SM_CXSCREEN);
+		window_size.h = GetSystemMetrics(SM_CYSCREEN);
+		if( w == 0 ) {
+			w = window_size.w;
+		}
+		if( h == 0 ) {
+			h = window_size.h;
+		}
+		current_hwnd = CreateWindow (
+				szAppName, TEXT ("LCUI"),
+				WS_POPUP,
+				CW_USEDEFAULT, CW_USEDEFAULT,
+				window_size.w, window_size.h,
+				NULL, NULL, win32_hInstance, NULL);
+		screen_info.size.w = w;
+		screen_info.size.h = h;
+	} else {
+		window_size.w = w;
+		window_size.h = h;
+		current_hwnd = CreateWindow (
+				szAppName, TEXT ("LCUI"),
+				WS_OVERLAPPEDWINDOW &~WS_THICKFRAME,
+				CW_USEDEFAULT, CW_USEDEFAULT,
+				window_size.w, window_size.h,
+				NULL, NULL, win32_hInstance, NULL);
+		GetClientRect( current_hwnd, &client_rect );
+		screen_info.size.w = client_rect.right;
+		screen_info.size.h = client_rect.bottom;
+	}
+	screen_info.bits = 32;
+	screen_info.mode = mode;
+	strcpy( screen_info.dev_name, "win32 GDI" );
+	LCUIScreen_SetInfo( &screen_info );
 
-	screen_info->fb_dev_fd = -1;
-	screen_info->fb_dev_name = "win32";
-	screen_info->bits = 32;
-	screen_info->size.w = client_rect.right;
-	screen_info->size.h = client_rect.bottom; 
-	pixel_mem_len = screen_info->size.w * screen_info->size.h * 4;
-	screen_info->smem_len = pixel_mem_len;
+	pixel_mem_len = screen_info.size.w * screen_info.size.h * 4;
 	/* 分配内存，储存像素数据 */ 
-	pixel_mem = (uchar_t*)malloc( screen_info->smem_len );
-	screen_info->fb_mem = pixel_mem;
+	pixel_mem = (uchar_t*)malloc( pixel_mem_len );
 	/* 获取客户区的DC */
 	hdc_client = GetDC( current_hwnd );
 	/* 为帧缓冲创建一个DC */
 	hdc_framebuffer = CreateCompatibleDC( hdc_client );
 	/* 为客户区创建一个Bitmap */ 
-	client_bitmap = CreateCompatibleBitmap( hdc_client, screen_info->size.w, screen_info->size.h );
+	client_bitmap = CreateCompatibleBitmap( hdc_client, screen_info.size.w, screen_info.size.h );
 	/* 为帧缓冲的DC选择client_bitmap作为对象 */
 	SelectObject( hdc_framebuffer, client_bitmap );
 	
 	root_widget = RootWidget_GetSelf();
-	Widget_Resize( root_widget, screen_info->size );
+	Widget_Resize( root_widget, screen_info.size );
 	Widget_SetBackgroundColor( root_widget, RGB(255,255,255) );
 	Widget_SetBackgroundTransparent( root_widget, FALSE );
 	Widget_Show( root_widget );
@@ -201,23 +231,51 @@ LCUIScreen_Init( LCUI_Screen *screen_info )
 }
 
 LCUI_API int
-LCUIScreen_Destroy( LCUI_Screen *screen_info )
+LCUIScreen_SetMode( int w, int h, int mode )
+{
+	LCUIMutex_Lock( &screen_mutex );
+
+	LCUIMutex_Unlock( &screen_mutex );
+	return 0;
+}
+
+LCUI_API int
+LCUIScreen_Destroy( void )
 {
 	LCUI_Sys.state = KILLED;
 	DeleteDC( hdc_framebuffer );
 	ReleaseDC( Win32_GetSelfHWND(), hdc_client );
 	free( pixel_mem );
+	LCUIMutex_Destroy( &screen_mutex );
 	return 0;
 }
 
 LCUI_API void
 LCUIScreen_SyncFrameBuffer( void )
 {
+	RECT client_rect;
+	LCUIMutex_Lock( &screen_mutex );
 	SetBitmapBits( client_bitmap, pixel_mem_len, pixel_mem );
-	/* 将帧缓冲内的位图数据更新至客户区内指定区域（area） */
-	BitBlt( hdc_client, 0, 0, LCUIScreen_GetWidth(), LCUIScreen_GetHeight(),
-		hdc_framebuffer, 0, 0, SRCCOPY );
+	switch(LCUIScreen_GetMode()) {
+	case LCUI_INIT_MODE_FULLSCREEN:
+		/* 全屏模式下，则使用拉伸模式，将帧拉伸至全屏 */
+		GetClientRect( current_hwnd, &client_rect );
+		StretchBlt( hdc_client, 0, 0, 
+			client_rect.right, client_rect.bottom,
+			hdc_framebuffer, 0, 0, 
+			LCUIScreen_GetWidth(), LCUIScreen_GetHeight(),
+			SRCCOPY );
+		break;
+	case LCUI_INIT_MODE_WINDOW:
+		/* 将帧缓冲内的位图数据更新至客户区内指定区域（area） */
+		BitBlt( hdc_client, 0, 0, 
+			LCUIScreen_GetWidth(), LCUIScreen_GetHeight(),
+			hdc_framebuffer, 0, 0,
+			SRCCOPY );
+		break;
+	}
 	ValidateRect( current_hwnd, NULL );
+	LCUIMutex_Unlock( &screen_mutex );
 }
 
 LCUI_API int
