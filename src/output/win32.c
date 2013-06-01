@@ -192,6 +192,7 @@ LCUIScreen_Init( LCUI_Screen *screen_info )
 	root_widget = RootWidget_GetSelf();
 	Widget_Resize( root_widget, screen_info->size );
 	Widget_SetBackgroundColor( root_widget, RGB(255,255,255) );
+	Widget_SetBackgroundTransparent( root_widget, FALSE );
 	Widget_Show( root_widget );
 
 	ShowWindow( current_hwnd, SW_SHOWNORMAL );
