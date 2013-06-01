@@ -745,7 +745,7 @@ print_widget_info(LCUI_Widget *widget)
 
 /* 在指定部件的内部区域内设定需要刷新的区域 */
 LCUI_API int
-Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
+Widget_InvalidArea( LCUI_Widget *widget, LCUI_Rect rect )
 {
 	if( !widget ) {
 		return LCUIScreen_InvalidArea( rect );
@@ -759,13 +759,8 @@ Widget_InvalidArea ( LCUI_Widget *widget, LCUI_Rect rect )
 	/* 根据部件所在容器的尺寸，调整矩形位置及尺寸 */
 	rect = LCUIRect_ValidArea( Widget_GetSize(widget), rect );
 	if( widget->visible ) {
-		LCUI_Sys.need_sync_area = TRUE;
+		LCUIScreen_MarkSync();
 	}
-	//if( widget->type_name.string && strcmp(widget->type_name.string, "text_box") == 0 ) {
-	//	_DEBUG_MSG("add rect: %d,%d,%d,%d\n",
-	//		rect.x, rect.y, rect.width, rect.height );
-	//}
-
 	/* 保存至队列中 */
 	RectQueue_AddToValid( &widget->invalid_area, rect );
 	return 0;

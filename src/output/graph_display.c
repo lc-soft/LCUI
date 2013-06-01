@@ -54,6 +54,7 @@
 #endif
 /* 标记是否初始化 */
 static LCUI_BOOL i_am_init = FALSE;
+static LCUI_BOOL need_sync_area = FALSE;
 /* 用于记录屏幕无效区域 */
 static LCUI_RectQueue screen_invalid_area;
 static LCUI_Screen screen;
@@ -194,6 +195,11 @@ LCUIScreen_UpdateInvalidArea(void)
 	return ret;
 }
 
+/* 标记需要同步无效区域 */
+LCUI_API void LCUIScreen_MarkSync(void)
+{
+	need_sync_area = TRUE;
+}
 
 /*
  * 功能：处理已记录的无效区域
@@ -204,10 +210,10 @@ static int
 LCUIScreen_SyncInvalidArea( void )
 {
 	int ret = 0;
-	if ( LCUI_Sys.need_sync_area ) {
+	if ( need_sync_area ) {
 		/* 同步部件内记录的区域至主记录中 */
 		Widget_SyncInvalidArea();
-		LCUI_Sys.need_sync_area = FALSE;
+		need_sync_area = FALSE;
 		ret = 1;
 	}
 	return ret;
