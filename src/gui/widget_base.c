@@ -1003,32 +1003,32 @@ __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 	LCUI_RGBA pixel;
 	LCUI_Graph *graph;
 
-	if( ctnr ) {
-		widget_list = &ctnr->child;
-		/* 判断 鼠标坐标对应部件图层中的像素点的透明度 是否符合要求，
-		 * 如果透明度小于/不小于clickable_area_alpha的值，那么，无视
-		 * 该部件。
-		 *  */
-		graph = Widget_GetSelfGraph( ctnr );
-		if( Graph_GetPixel( graph, pos, &pixel )) {
-			//printf("mode: %d, pixel alpha: %d, alpha: %d\n",
-			//widget->clickable_mode, pixel.alpha, widget->clickable_area_alpha );
-			if( (ctnr->clickable_mode == 0
-			 && pixel.alpha < ctnr->clickable_area_alpha )
-			 || (ctnr->clickable_mode == 1
-			 && pixel.alpha >= ctnr->clickable_area_alpha ) ) {
-				//printf("Ignore widget\n");
-				return NULL;
-			}
-		}/* else {
-			printf("get graph pixel error\n");
-		} */
-		/* 减去内边距 */
-		pos.x -= ctnr->glayer->padding.left;
-		pos.y -= ctnr->glayer->padding.top;
-	} else {
-		widget_list = &root_widget.child;
+	if( !ctnr ) {
+		return NULL;
 	}
+	widget_list = &ctnr->child;
+	/* 判断 鼠标坐标对应部件图层中的像素点的透明度 是否符合要求，
+		* 如果透明度小于/不小于clickable_area_alpha的值，那么，无视
+		* 该部件。
+		*  */
+	graph = Widget_GetSelfGraph( ctnr );
+	if( Graph_GetPixel( graph, pos, &pixel )) {
+		//printf("mode: %d, pixel alpha: %d, alpha: %d\n",
+		//widget->clickable_mode, pixel.alpha, widget->clickable_area_alpha );
+		if( (ctnr->clickable_mode == 0
+			&& pixel.alpha < ctnr->clickable_area_alpha )
+			|| (ctnr->clickable_mode == 1
+			&& pixel.alpha >= ctnr->clickable_area_alpha ) ) {
+			//printf("Ignore widget\n");
+			return NULL;
+		}
+	}/* else {
+		printf("get graph pixel error\n");
+	} */
+	/* 减去内边距 */
+	pos.x -= ctnr->glayer->padding.left;
+	pos.y -= ctnr->glayer->padding.top;
+
 	widget = ctnr;
 	total = Queue_GetTotal( widget_list );
 	for(i=0; i<total; ++i) {/* 从顶到底遍历子部件 */
@@ -1058,6 +1058,9 @@ LCUI_API LCUI_Widget*
 Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 {
 	LCUI_Widget *widget;
+	if( ctnr == NULL ) {
+		ctnr = &root_widget;
+	}
 	widget = __Widget_At( ctnr, pos );
 	if( widget == ctnr ) {
 		return NULL;
@@ -1136,6 +1139,7 @@ Destroy_Widget( void *arg )
 	/* 调用回调函数销毁部件私有数据 */
 	WidgetFunc_Call( widget, FUNC_TYPE_DESTROY );
 	free( widget->private_data );
+	widget->private_data = NULL;
 }
 
 /* 初始化部件队列 */
@@ -2487,14 +2491,14 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 		Widget_ExecRefresh( widget );
 		break;
 	case WIDGET_DESTROY:
-		if( Widget_TryLock( widget ) != 0 ) {
+		if( Widget_TryLock( data_ptr->target ) != 0 ) {
 			return FALSE;
 		}
 		/* 添加刷新区域 */
-		Widget_ExecRefresh( widget );
+		Widget_ExecRefresh( data_ptr->target );
 		/* 开始销毁部件数据 */
-		Widget_ExecDestroy( widget );
-		Widget_Unlock( widget );
+		Widget_ExecDestroy( data_ptr->target );
+		Widget_Unlock( data_ptr->target );
 		break;
 	default:
 		WidgetMsg_AddToTask( widget, data_ptr );

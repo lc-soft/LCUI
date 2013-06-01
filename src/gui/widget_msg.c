@@ -109,6 +109,7 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 	}
 	tmp_msg.msg_id = msg_id;
 	tmp_msg.need_free = need_free;
+	tmp_msg.target = widget;
 	if( data ) {
 		tmp_msg.valid = TRUE;
 	} else {
@@ -136,7 +137,11 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 	    case WIDGET_UPDATE:
 	    case WIDGET_SHOW:
 	    case WIDGET_SORT:
+		tmp_msg.valid = FALSE;
+		break;
 	    case WIDGET_DESTROY:
+		/* 部件的销毁消息需要发送到父部件 */
+		widget = widget->parent;
 		tmp_msg.valid = FALSE;
 		break;
 	    default:
