@@ -59,29 +59,17 @@ static LCUI_BOOL need_sync_area = FALSE;
 static LCUI_RectQueue screen_invalid_area;
 static LCUI_Screen screen;
 
-/*
- * 功能：获取屏幕宽度
- * 返回值：屏幕的宽度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
- * */
+/* 获取屏幕宽度 */
 LCUI_API int
 LCUIScreen_GetWidth( void )
 {
-	if ( !i_am_init ) {
-		return 0;
-	}
 	return screen.size.w;
 }
 
-/*
- * 功能：获取屏幕高度
- * 返回值：屏幕的高度，单位为像素，必须在使用LCUI_Init()函数后使用，否则无效
- * */
+/* 获取屏幕高度 */
 LCUI_API int
 LCUIScreen_GetHeight( void )
 {
-	if ( !i_am_init ) {
-		return 0;
-	}
 	return screen.size.h;
 }
 
@@ -117,11 +105,24 @@ LCUIScreen_InvalidArea( LCUI_Rect rect )
 	return RectQueue_AddToValid ( &screen_invalid_area, rect );
 }
 
-/* 功能：获取屏幕中的每个像素的表示所用的位数 */
+/* 获取屏幕每个像素点的色彩值所占的位数 */
 LCUI_API int
 LCUIScreen_GetBits( void )
 {
 	return screen.bits;
+}
+
+/* 获取屏幕显示模式 */
+LCUI_API int
+LCUIScreen_GetMode( void )
+{
+	return screen.mode;
+}
+
+/* 设置屏幕信息 */
+LCUI_API void LCUIScreen_SetInfo( LCUI_Screen *info )
+{
+	memcpy( &screen, info, sizeof(LCUI_Screen) );
 }
 
 /* 获取屏幕中心点的坐标 */
@@ -246,17 +247,14 @@ LCUIScreen_Update( void* unused )
 	LCUIThread_Exit(NULL);
 }
 
-extern int LCUIScreen_Init( LCUI_Screen *screen_info );
-extern int LCUIScreen_Destroy( LCUI_Screen *screen_info );
-
 /* 初始化图形输出模块 */
 LCUI_API int
-LCUIModule_Video_Init( void )
+LCUIModule_Video_Init( int w, int h, int mode )
 {
 	if( i_am_init ) {
 		return -1;
 	}
-	LCUIScreen_Init( &screen );
+	LCUIScreen_Init( w, h, mode );
 	i_am_init = TRUE;
 	RectQueue_Init( &screen_invalid_area );
 	return _LCUIThread_Create( &LCUI_Sys.display_thread,
@@ -270,7 +268,7 @@ LCUIModule_Video_End( void )
 	if( !i_am_init ) {
 		return -1;
 	}
-	LCUIScreen_Destroy( &screen );
+	LCUIScreen_Destroy();
 	i_am_init = FALSE;
 	RectQueue_Destroy( &screen_invalid_area );
 	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
