@@ -131,7 +131,7 @@ int main( int argc, char **argv )
 	CreateClockWidget( window );
 	/* 设置定时器，每隔1秒更新一次时指针 */
 	LCUITimer_Set( 1000, UpdateClockPointer, TRUE );
-	/* 关联窗口关闭按钮的CLOCKED事件 */
+	/* 关联窗口关闭按钮的CLICKED事件 */
 	Widget_Event_Connect(Window_GetCloseButton(window), EVENT_CLICKED, Quit);
 	/* 显示窗口 */
 	Widget_Show( window );
