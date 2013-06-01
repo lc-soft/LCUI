@@ -458,7 +458,7 @@ Graph_Free( LCUI_Graph *pic )
 			pic->src = NULL; 
 			pic->quote = FALSE;
 		} else {
-			Graph_Lock( p );
+			LCUIMutex_Lock( &p->mutex );
 			free(p->rgba[0]);
 			free(p->rgba[1]);
 			free(p->rgba[2]);
@@ -469,7 +469,7 @@ Graph_Free( LCUI_Graph *pic )
 			p->rgba = NULL;
 			p->width = 0;
 			p->height = 0;
-			Graph_Unlock( p );
+			LCUIMutex_Unlock( &p->mutex );
 		}
 		LCUIMutex_Destroy( &pic->mutex );
 	}
