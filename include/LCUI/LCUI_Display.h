@@ -43,15 +43,13 @@
 #define __LCUI_DISPLAY_H__
 
 LCUI_BEGIN_HEADER
-	
+
 /****************************** 屏幕信息 ********************************/
 typedef struct LCUI_Screen_
 {
+	int		mode;		/* 屏幕显示模式 */
+	char		dev_name[256];	/* 图形输出设备的名称 */
 	LCUI_Size	size;		/* 屏幕尺寸 */
-	char		*fb_dev_name;	/* 图形输出设备的名称 */
-	uchar_t		*fb_mem;	/* 指向图像输出设备映射到的内存的指针 */
-	int		fb_dev_fd;	/* 图形显示设备的句柄 */
-	size_t		smem_len;	/* 内存空间的大小 */
 	int		bits;		/* 每个像素的用多少位表示 */
 } LCUI_Screen;
 /***********************************************************************/
@@ -102,10 +100,6 @@ LCUIScreen_GetHeight( void );
 LCUI_API LCUI_Size
 LCUIScreen_GetSize( void );
 
-/* 获取屏幕无效区域队列的指针 */
-LCUI_API LCUI_RectQueue*
-LCUIScreen_GetInvalidAreaQueue( void );
-
 /* 填充指定位置的像素点的颜色 */
 LCUI_API void
 LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color );
@@ -122,6 +116,13 @@ LCUIScreen_InvalidArea( LCUI_Rect rect );
 LCUI_API int
 LCUIScreen_GetBits( void );
 
+/* 获取屏幕显示模式 */
+LCUI_API int
+LCUIScreen_GetMode( void );
+
+/* 设置屏幕信息 */
+LCUI_API void LCUIScreen_SetInfo( LCUI_Screen *info );
+
 /* 获取屏幕中心点的坐标 */
 LCUI_API LCUI_Pos
 LCUIScreen_GetCenter( void );
@@ -130,9 +131,21 @@ LCUIScreen_GetCenter( void );
 LCUI_API void
 LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph );
 
+/* 标记需要同步无效区域 */
+LCUI_API void LCUIScreen_MarkSync(void);
+
+/* 设置模式 */
+LCUI_API int LCUIScreen_SetMode( int w, int h, int mode );
+
+/* 初始化屏幕 */
+LCUI_API int LCUIScreen_Init( int w, int h, int mode );
+
+/* 销毁屏幕 */
+LCUI_API int LCUIScreen_Destroy( void );
+
 /* 初始化图形输出模块 */
 LCUI_API int
-LCUIModule_Video_Init( void );
+LCUIModule_Video_Init( int w, int h, int mode );
 
 /* 停用图形输出模块 */
 LCUI_API int
