@@ -7,23 +7,47 @@
 #include LC_WINDOW_H
 #include LC_LABEL_H 
 #include LC_RES_H
+#ifdef LCUI_BUILD_IN_WIN32
+#include <io.h>
+#include <fcntl.h>
+
+/* 在运行程序时会打开控制台，以查看打印的调试信息 */
+static void InitConsoleWindow(void)
+{
+	int hCrt;
+	FILE *hf;
+	AllocConsole();
+	hCrt=_open_osfhandle((long)GetStdHandle(STD_OUTPUT_HANDLE),_O_TEXT );
+	hf=_fdopen( hCrt, "w" );
+	*stdout=*hf;
+	setvbuf (stdout, NULL, _IONBF, 0);
+	// test code
+	printf ("InitConsoleWindow OK!\n");
+}
+#endif
 
 static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	LCUI_MainLoop_Quit(NULL);
 }
 
-int LCUIMainFunc( LCUI_ARGLIST )
+int main( int argc, char **argv )
 {
 	LCUI_Widget *window, *label;
-	LCUI_TextStyle style;
 	LCUI_Graph pic;
 	
-	LCUI_Init( LCUI_DEFAULT_CONFIG );
-	
+#ifdef LCUI_BUILD_IN_WIN32
+	//InitConsoleWindow();
+#endif
+	// 缺省模式，默认是全屏
+	LCUI_Init(0,0,0);
+	// 全屏模式，分辨率为800x600
+	//LCUI_Init(800,600,LCUI_INIT_MODE_FULLSCREEN);
+	// 窗口模式，窗口尺寸为800x600
+	//LCUI_Init(800,600,LCUI_INIT_MODE_WINDOW);
+
 	/* 初始化结构体 */
 	Graph_Init( &pic );
-	TextStyle_Init( &style );
 	/* 载入库中自带的图形数据，这个图形是18x18尺寸的LCUI的图标 */
 	Load_Graph_Icon_LCUI_18x18(&pic);
 	/* 创建部件 */
