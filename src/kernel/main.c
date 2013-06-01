@@ -516,8 +516,7 @@ LCUI_API LCUI_BOOL LCUI_Active(void)
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */
-LCUI_API int
-LCUI_Init( int mode, void *arg )
+LCUI_API int LCUI_Init( int w, int h, int mode )
 {
 	int temp;
 	/* 如果LCUI没有初始化过 */
@@ -526,11 +525,6 @@ LCUI_Init( int mode, void *arg )
 		LCUI_Sys.state = ACTIVE;
 		srand(time(NULL));
 		LCUI_ShowCopyrightText();
-		
-		LCUI_Sys.mode = mode;
-#ifdef LCUI_BUILD_IN_WIN32
-		Win32_LCUI_Init((HINSTANCE)arg );
-#endif
 		LCUIAppList_Init();
 		/* 注册程序 */
 		temp = LCUIAppList_Add();
@@ -550,7 +544,7 @@ LCUI_Init( int mode, void *arg )
 		LCUIModule_TouchScreen_Init();
 		LCUIModule_Cursor_Init();
 		LCUIModule_Widget_Init();
-		LCUIModule_Video_Init();
+		LCUIModule_Video_Init(w, h, mode);
 		/* 让鼠标游标居中显示 */
 		LCUICursor_SetPos( LCUIScreen_GetCenter() );  
 		LCUICursor_Show();
