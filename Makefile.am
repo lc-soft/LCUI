@@ -162,11 +162,6 @@ test/screenlock/screenlock.c \
 test/screenlock/Makefile.am \
 test/screenlock/Makefile.in \
 test/clock/README.zh-cn \
-test/clock/new_daytime_hour.png \
-test/clock/new_night_cup.png \
-test/clock/new_daytime_background.png \
-test/clock/new_daytime_minute.png  \
-test/clock/night_hour.png \
 test/clock/clock.c \
 test/clock/hand_hour.png \
 test/clock/hand_second.png \
