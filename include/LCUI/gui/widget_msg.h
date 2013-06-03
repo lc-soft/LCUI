@@ -25,6 +25,7 @@ typedef union union_widget_data {
 } u_wdata;
 
 typedef struct WidgetMsgData_ {
+	LCUI_Widget *target;	/* 针对的部件 */
 	LCUI_BOOL need_proc;	/* 是否需要处理 */
 	uint_t msg_id;		/* 消息的类型 */
 	LCUI_BOOL valid;	/* 数据是否有效 */
