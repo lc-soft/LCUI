@@ -120,6 +120,9 @@ LCUIScreen_GetBits( void );
 LCUI_API int
 LCUIScreen_GetMode( void );
 
+/* 获取屏幕信息 */
+LCUI_API void LCUIScreen_GetInfo( LCUI_Screen *info );
+
 /* 设置屏幕信息 */
 LCUI_API void LCUIScreen_SetInfo( LCUI_Screen *info );
 
