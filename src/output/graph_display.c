@@ -119,6 +119,12 @@ LCUIScreen_GetMode( void )
 	return screen.mode;
 }
 
+/* 获取屏幕信息 */
+LCUI_API void LCUIScreen_GetInfo( LCUI_Screen *info )
+{
+	memcpy( info, &screen, sizeof(LCUI_Screen) );
+}
+
 /* 设置屏幕信息 */
 LCUI_API void LCUIScreen_SetInfo( LCUI_Screen *info )
 {
