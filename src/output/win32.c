@@ -207,7 +207,10 @@ LCUIScreen_Init( int w, int h, int mode )
 	strcpy( screen_info.dev_name, "win32 GDI" );
 	LCUIScreen_SetInfo( &screen_info );
 
-	pixel_mem_len = screen_info.size.w * screen_info.size.h * 4;
+	w = GetSystemMetrics(SM_CXSCREEN);
+	h = GetSystemMetrics(SM_CYSCREEN);
+	pixel_mem_len = w*h*4;
+
 	/* 分配内存，储存像素数据 */ 
 	pixel_mem = (uchar_t*)malloc( pixel_mem_len );
 	/* 获取客户区的DC */
@@ -215,7 +218,7 @@ LCUIScreen_Init( int w, int h, int mode )
 	/* 为帧缓冲创建一个DC */
 	hdc_framebuffer = CreateCompatibleDC( hdc_client );
 	/* 为客户区创建一个Bitmap */ 
-	client_bitmap = CreateCompatibleBitmap( hdc_client, screen_info.size.w, screen_info.size.h );
+	client_bitmap = CreateCompatibleBitmap( hdc_client, w, h );
 	/* 为帧缓冲的DC选择client_bitmap作为对象 */
 	SelectObject( hdc_framebuffer, client_bitmap );
 	
@@ -230,10 +233,52 @@ LCUIScreen_Init( int w, int h, int mode )
 	return 0;
 }
 
+/* 设置视频输出模式 */
 LCUI_API int
 LCUIScreen_SetMode( int w, int h, int mode )
 {
+	LCUI_Pos pos;
+	RECT client_rect;
+	LCUI_Size real_size;
+	LCUI_Screen screen_info;
+	LCUI_Widget *root_widget;
+	
 	LCUIMutex_Lock( &screen_mutex );
+	LCUIScreen_GetInfo( &screen_info );
+	real_size.w = GetSystemMetrics(SM_CXSCREEN);
+	real_size.h = GetSystemMetrics(SM_CYSCREEN);
+	if( mode == LCUI_INIT_MODE_AUTO ) {
+		if( w == 0 && h == 0 ) {
+			mode = LCUI_INIT_MODE_FULLSCREEN;
+		} else {
+			mode = LCUI_INIT_MODE_WINDOW;
+		}
+	}
+	if( mode == LCUI_INIT_MODE_FULLSCREEN ) {
+		if( w == 0 ) {
+			w = real_size.w;
+		}
+		if( h == 0 ) {
+			h = real_size.h;
+		}
+		SetWindowLong( current_hwnd, GWL_STYLE, WS_POPUP );
+		SetWindowPos( current_hwnd, HWND_NOTOPMOST, 0, 0, real_size.w, real_size.h, SWP_SHOWWINDOW );
+	} else {
+		pos.x = (real_size.w - w)/2;
+		pos.y = (real_size.h - h)/2;
+		SetWindowLong( current_hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW &~WS_THICKFRAME );
+		SetWindowPos( current_hwnd, HWND_NOTOPMOST, pos.x, pos.y, w, h, SWP_SHOWWINDOW );
+		GetClientRect( current_hwnd, &client_rect );
+		w = client_rect.right;
+		h = client_rect.bottom;
+	}
+
+	screen_info.size.w = w;
+	screen_info.size.h = h;
+	screen_info.mode = mode;
+	LCUIScreen_SetInfo( &screen_info );
+	root_widget = RootWidget_GetSelf();
+	Widget_Resize( root_widget, screen_info.size );
 
 	LCUIMutex_Unlock( &screen_mutex );
 	return 0;
@@ -289,8 +334,8 @@ LCUIScreen_PutGraph (LCUI_Graph *graph, LCUI_Pos des_pos )
 	
 	src = Graph_GetQuote( graph );
 	src_rect = Graph_GetValidRect( graph );
-	screen_size = LCUIScreen_GetSize();
-	
+	screen_size.w = GetSystemMetrics(SM_CXSCREEN);
+	screen_size.h = GetSystemMetrics(SM_CYSCREEN);
 	if(!Graph_IsValid(src)) {
 		return -1;
 	}
