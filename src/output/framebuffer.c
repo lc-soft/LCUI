@@ -45,6 +45,7 @@
 #ifdef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 #include LC_GRAPH_H
 #include LC_DISPLAY_H
+#include LC_WIDGET_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,15 +56,46 @@
 #include <errno.h>
 #include <unistd.h>
 
+#define FB_BACKUP_FILE "/tmp/framebuffer.bak"
+
+static int fb_dev_fd = -1;
+static uchar_t *fb_mem = NULL;
+static int fb_mem_len = 0;
+static LCUI_Size screen_size = {0,0};
+
+/* 备份帧缓冲内容 */
+static int FrameBuffer_Backup(void)
+{
+	char cmd[256], *fb_dev;
+	fb_dev = getenv("LCUI_FB_DEVICE");
+	if(fb_dev == NULL) {
+		fb_dev = FB_DEV;
+	}
+	sprintf( cmd, "cat %s > %s", fb_dev, FB_BACKUP_FILE );
+	return system( cmd );
+}
+
+/* 恢复帧缓冲内容 */
+static int FrameBuffer_Restore(void)
+{
+	char cmd[256], *fb_dev;
+	fb_dev = getenv("LCUI_FB_DEVICE");
+	if(fb_dev == NULL) {
+		fb_dev = FB_DEV;
+	}
+	sprintf( cmd, "cat %s > %s", FB_BACKUP_FILE, fb_dev );
+	return system( cmd );
+}
+
 /* 填充指定位置的像素点的颜色 */
 void LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
 {
 	int k;
 	uchar_t *dest;
 
-	k = (pos.y * LCUI_Sys.screen.size.w + pos.x) << 2;
+	k = (pos.y * screen_size.w + pos.x) << 2;
 	//这里需要根据不同位的显示器来进行相应处理
-	dest = LCUI_Sys.screen.fb_mem;	/* 指向帧缓冲 */
+	dest = fb_mem;	/* 指向帧缓冲 */
 	dest[k] = color.blue;
 	dest[k + 1] = color.green;
 	dest[k + 2] = color.red;
@@ -73,6 +105,7 @@ void LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
 int LCUIScreen_GetGraph( LCUI_Graph *out )
 {
 	uchar_t  *dest;
+
 	int i, temp, h, w;
 	if( !LCUI_Sys.init ) {/* 如果没有初始化过 */
 		return -1;
@@ -80,16 +113,16 @@ int LCUIScreen_GetGraph( LCUI_Graph *out )
 
 	out->have_alpha = FALSE;/* 无alpha通道 */
 	out->type = TYPE_BMP;
-	temp = Graph_Create(out, LCUI_Sys.screen.size.w, LCUI_Sys.screen.size.h);
+	temp = Graph_Create(out, screen_size.w, screen_size.h);
 	if(temp != 0) {
 		return -2;
 	}
 	/* 指针指向帧缓冲的内存 */
-	dest = LCUI_Sys.screen.fb_mem;
+	dest = fb_mem;
 	switch( LCUIScreen_GetBits() ) {
 	    case 32:
-		for (i=0,h=0; h < LCUI_Sys.screen.size.h; ++h) {
-			for (w = 0; w < LCUI_Sys.screen.size.w; ++w) {
+		for (i=0,h=0; h < screen_size.h; ++h) {
+			for (w = 0; w < screen_size.w; ++w) {
 				out->rgba[2][i] = *(dest++);
 				out->rgba[1][i] = *(dest++);
 				out->rgba[0][i] = *(dest++);
@@ -99,8 +132,8 @@ int LCUIScreen_GetGraph( LCUI_Graph *out )
 		}
 		break;
 	    case 24:
-		for (i=0,h=0; h < LCUI_Sys.screen.size.h; ++h) {
-			for (w = 0; w < LCUI_Sys.screen.size.w; ++w) {
+		for (i=0,h=0; h < screen_size.h; ++h) {
+			for (w = 0; w < screen_size.w; ++w) {
 				/* 读取帧缓冲的内容 */
 				out->rgba[2][i] = *(dest++);
 				out->rgba[1][i] = *(dest++);
@@ -110,8 +143,8 @@ int LCUIScreen_GetGraph( LCUI_Graph *out )
 		}
 		break;
 	    case 16:
-		for (i=0,h=0; h < LCUI_Sys.screen.size.h; ++h) {
-			for (w = 0; w < LCUI_Sys.screen.size.w; ++w) {
+		for (i=0,h=0; h < screen_size.h; ++h) {
+			for (w = 0; w < screen_size.w; ++w) {
 				out->rgba[0][i] = *(dest+1) & 0xf8;
 				out->rgba[1][i] = (*(dest+1) << 5) | ((*dest & 0xe0) >> 3);
 				out->rgba[2][i] = *dest << 3;
@@ -192,14 +225,16 @@ static void print_screeninfo(
 }
 
 /* 初始化屏幕 */
-int LCUIScreen_Init( void )
+int LCUIScreen_Init( int w, int h, int mode )
 {
+	char *fb_dev;
+	LCUI_Screen screen_info;
+	LCUI_Widget *root_widget;
 	__u16 rr[256],gg[256],bb[256];
 	struct fb_var_screeninfo fb_vinfo;
 	struct fb_fix_screeninfo fb_fix;
-	struct fb_cmap oldcmap = {0,256,rr,gg,bb} ;
-	char *fb_dev;
-	LCUI_Graph *graph;
+	struct fb_cmap oldcmap = {0,256,rr,gg,bb};
+
 	/* 获取环境变量中指定的帧缓冲设备的位置 */
 	fb_dev = getenv("LCUI_FB_DEVICE");
 	if(fb_dev == NULL) {
@@ -207,53 +242,53 @@ int LCUIScreen_Init( void )
 	}
 
 	nobuff_printf("open video output device...");
-	LCUI_Sys.screen.fb_dev_fd = open(fb_dev, O_RDWR);
-	if (LCUI_Sys.screen.fb_dev_fd== -1) {
+	fb_dev_fd = open(fb_dev, O_RDWR);
+	if( fb_dev_fd == -1 ) {
 		printf("fail\n");
 		perror("error");
 		exit(-1);
 	} else {
 		printf("success\n");
 	}
-	LCUI_Sys.screen.fb_dev_name = fb_dev;
 	/* 获取屏幕相关信息 */
-	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_VSCREENINFO, &fb_vinfo);
-	ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGET_FSCREENINFO, &fb_fix);
+	ioctl( fb_dev_fd, FBIOGET_VSCREENINFO, &fb_vinfo );
+	ioctl( fb_dev_fd, FBIOGET_FSCREENINFO, &fb_fix );
 	/* 打印屏幕信息 */
 	print_screeninfo(fb_vinfo, fb_fix);
 
-	LCUI_Sys.screen.bits = fb_vinfo.bits_per_pixel;
-	if (fb_vinfo.bits_per_pixel==8) {
-		ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOGETCMAP, &oldcmap);
+	if( fb_vinfo.bits_per_pixel == 8 ) {
+		ioctl( fb_dev_fd, FBIOGETCMAP, &oldcmap );
 	}
 	nobuff_printf("mapping framebuffer...");
-	LCUI_Sys.screen.smem_len = fb_fix.smem_len;/* 保存内存空间大小 */
+	fb_mem_len = fb_fix.smem_len;
 	/* 映射帧缓存至内存空间 */
-	LCUI_Sys.screen.fb_mem = mmap(NULL,fb_fix.smem_len,
-					PROT_READ|PROT_WRITE,MAP_SHARED,
-					LCUI_Sys.screen.fb_dev_fd, 0);
+	fb_mem = mmap( NULL, fb_fix.smem_len,
+			PROT_READ|PROT_WRITE, MAP_SHARED,
+			fb_dev_fd, 0);
 
-	if((void *)-1 == LCUI_Sys.screen.fb_mem) {
+	if( (void *)-1 == fb_mem ) {
 		printf("fail\n");
 		perror(strerror(errno));
 		exit(-1);
 	} else {
 		printf("success\n");
 	}
+	LCUIScreen_GetInfo( &screen_info );
+	strcpy( screen_info.dev_name, "FrameBuffer" );
+	screen_info.bits = fb_vinfo.bits_per_pixel;
+	screen_info.size.w = fb_vinfo.xres;
+	screen_info.size.h = fb_vinfo.yres;
+	screen_size = screen_info.size;
+	/* 保存屏幕信息 */
+	LCUIScreen_SetInfo( &screen_info );
 
-	LCUI_Sys.screen.size.w = fb_vinfo.xres; /* 保存屏幕尺寸 */
-	LCUI_Sys.screen.size.h = fb_vinfo.yres;
-	/* 初始化根图层 */
-	LCUI_Sys.root_glayer = GraphLayer_New();
-	/* 调整根图层的尺寸 */
-	GraphLayer_Resize( LCUI_Sys.root_glayer,
-		fb_vinfo.xres, fb_vinfo.yres );
-	/* 获取指向根图层图形数据的指针 */
-	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
-	/* 保存当前屏幕内容，以便退出LCUI后还原 */
-	LCUIScreen_GetGraph( graph );
-	/* 显示根图层 */
-	GraphLayer_Show( LCUI_Sys.root_glayer );
+	root_widget = RootWidget_GetSelf();
+	Widget_Resize( root_widget, screen_info.size );
+	Widget_SetBackgroundColor( root_widget, RGB(255,255,255) );
+	Widget_SetBackgroundTransparent( root_widget, FALSE );
+	Widget_Show( root_widget );
+
+	FrameBuffer_Backup();
 	return 0;
 }
 
@@ -261,20 +296,15 @@ int LCUIScreen_Init( void )
 int LCUIScreen_Destroy( void )
 {
 	int err;
-	LCUI_Graph *graph;
-
 	LCUI_Sys.state = KILLED;
-	graph = GraphLayer_GetSelfGraph( LCUI_Sys.root_glayer );
-	/* 恢复屏幕初始内容 */
-	LCUIScreen_PutGraph( graph, Pos(0, 0) );
 	/* 解除帧缓冲在内存中的映射 */
-	err = munmap( LCUI_Sys.screen.fb_mem, LCUI_Sys.screen.smem_len );
+	err = munmap( fb_mem, fb_mem_len );
 	if (err != 0) {
 		perror ("munmap()");
 		return err;
 	}
-	close (LCUI_Sys.screen.fb_dev_fd);
-	GraphLayer_Free( LCUI_Sys.root_glayer );
+	close( fb_dev_fd );
+	FrameBuffer_Restore();
 	return 0;
 }
 
@@ -297,7 +327,7 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 		return -1;
 	}
 	/* 指向帧缓冲 */
-	dest = LCUI_Sys.screen.fb_mem;
+	dest = fb_mem;
 	pic = src;
 	Graph_Init (&temp);
 
@@ -319,7 +349,7 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	bits = LCUIScreen_GetBits();
 	switch(bits) {
 	    case 32:/* 32位，其中RGB各占8位，剩下的8位用于alpha，共4个字节 */
-		k = pos.y * LCUI_Sys.screen.size.w + pos.x;
+		k = pos.y * screen_size.w + pos.x;
 		for (n=0,y = 0; y < pic->height; ++y) {
 			for (x = 0; x < pic->width; ++x, ++n) {
 				count = k + x;//count = 4 * (k + x);/* 计算需填充的像素点的坐标 */
@@ -329,11 +359,11 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 				dest[count + 1] = pic->rgba[1][n];
 				dest[count + 2] = pic->rgba[0][n];
 			}
-			k += LCUI_Sys.screen.size.w;
+			k += screen_size.w;
 		}
 		break;
 	    case 24:/* 24位，RGB各占8位，也就是共3个字节 */
-		k = pos.y * LCUI_Sys.screen.size.w + pos.x;
+		k = pos.y * screen_size.w + pos.x;
 		for (n=0, y = 0; y < pic->height; ++y) {
 			for (x = 0; x < pic->width; ++x, ++n) {
 				count = k + x;//count = 3 * (k + x);
@@ -342,7 +372,7 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 				dest[count + 1] = pic->rgba[1][n];
 				dest[count + 2] = pic->rgba[0][n];
 			}
-			k += LCUI_Sys.screen.size.w;
+			k += screen_size.w;
 		}
 		break;
 	    case 16:/* 16位，rgb分别占5位，6位，5位，也就是RGB565 */
@@ -352,7 +382,7 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 		 * 低字节的后三位+高字节的前三位用来表示G(Green)
 		 * 高字节的后5位用来表示R(RED)
 		 * */
-		k = pos.y * LCUI_Sys.screen.size.w + pos.x;
+		k = pos.y * screen_size.w + pos.x;
 		for (n=0, y = 0; y < pic->height; ++y) {
 			for (x = 0; x < pic->width; ++x, ++n) {
 				count = (k + x) << 1;//count = 2 * (k + x);
@@ -362,7 +392,7 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 				dest[count] = ((temp3 & 0x1c)<<3)+((temp2 & 0xf8)>>3);
 				dest[count+1] = ((temp1 & 0xf8))+((temp3 & 0xe0)>>5);
 			}
-			k += LCUI_Sys.screen.size.w;
+			k += screen_size.w;
 		}
 		break;
 	    case 8: /* 8位，占1个字节 */
@@ -379,7 +409,7 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 			kolor.blue[i]=0;
 		}
 
-		k = pos.y * LCUI_Sys.screen.size.w + pos.x;
+		k = pos.y * screen_size.w + pos.x;
 		for (n=0, y = 0; y < pic->height; ++y) {
 			for (x = 0; x < pic->width; ++x, ++n) {
 				count = k + x;
@@ -399,10 +429,10 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 						+((temp2 & 0xf0)>>2)
 						+((temp3 & 0xc0)>>6));
 			}
-			k += LCUI_Sys.screen.size.w;
+			k += screen_size.w;
 		}
 
-		ioctl(LCUI_Sys.screen.fb_dev_fd, FBIOPUTCMAP, &kolor);
+		ioctl(fb_dev_fd, FBIOPUTCMAP, &kolor);
 		free(kolor.red);
 		free(kolor.green);
 		free(kolor.blue);
@@ -425,7 +455,7 @@ void LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out )
 	unsigned char *dest;
 	int x, y, n, k, count;
 
-	dest = LCUI_Sys.screen.fb_mem;	/* 指向帧缓冲 */
+	dest = fb_mem;
 
 	if( !LCUI_Active() ) {
 		return;
@@ -445,7 +475,7 @@ void LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out )
 	Graph_Lock (out);
 	/* 只能正常捕获32位显示器中显示的图形，有待完善 */
 	for (n=0,y=0; y < area.height; ++y) {
-		k = (area.y + y) * LCUI_Sys.screen.size.w + area.x;
+		k = (area.y + y) * screen_size.w + area.x;
 		for (x = 0; x < area.width; ++x) {
 			count = k + x;
 			count = count << 2;
