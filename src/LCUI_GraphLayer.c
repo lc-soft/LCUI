@@ -76,7 +76,7 @@ LCUI_API int GraphLayer_PrintChildList( LCUI_GraphLayer *glayer )
 LCUI_API int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 {
 	int i, total;
-	LCUI_Queue *queue;
+	LCUI_Queue *child_list;
 	LCUI_GraphLayer *tmp_glayer;
 	
 	if( !child_glayer ) {
@@ -85,12 +85,15 @@ LCUI_API int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 	if(  !child_glayer->parent ) {
 		return 0;
 	}
-	queue = &child_glayer->parent->child;
-	total = Queue_GetTotal( queue );
+	/* 引用父图层的子图层列表 */
+	child_list = &child_glayer->parent->child;
+	total = Queue_GetTotal( child_list );
+	/* 查找子图层记录 */
 	for( i=0; i<total; ++i ) {
-		tmp_glayer = Queue_Get( queue, i );
+		tmp_glayer = (LCUI_GraphLayer*)Queue_Get( child_list, i );
+		/* 若找到则删除该子图层记录 */
 		if( tmp_glayer == child_glayer ) {
-			Queue_DeletePointer( queue, i );
+			Queue_DeletePointer( child_list, i );
 			child_glayer->parent = NULL;
 			return 0;
 		}
@@ -104,8 +107,11 @@ LCUI_API void GraphLayer_Free( LCUI_GraphLayer *glayer )
 	if( glayer == NULL ) {
 		return;
 	}
+	/* 移除该图层在父图层中的记录 */
 	GraphLayer_DeleteChild( glayer );
+	/* 释放图层的图像数据 */
 	Graph_Free( &glayer->graph );
+	/* 销毁子图层列表 */
 	Queue_Destroy( &glayer->child );
 	free( glayer );
 }
@@ -118,7 +124,7 @@ LCUI_API LCUI_GraphLayer* GraphLayer_New( void )
 	if( glayer == NULL ) {
 		return NULL;
 	}
-	
+	/* 赋初始值 */
 	glayer->visible = FALSE;
 	glayer->inherit_alpha = TRUE;
 	glayer->pos.x = glayer->pos.y = glayer->z_index = 0;
@@ -127,9 +133,12 @@ LCUI_API LCUI_GraphLayer* GraphLayer_New( void )
 	glayer->padding.bottom = 0;
 	glayer->padding.right = 0;
 	glayer->parent = NULL;
+	/* 初始化图像数据 */
 	Graph_Init( &glayer->graph );
+	/* 初始化子图层列表 */
 	Queue_Init( &glayer->child, 0, NULL );
-	Queue_UsingPointer( &glayer->child ); /* 队列用于存储指针 */ 
+	/* 标记该队列用于存储指针，即使销毁队列后，也不自动释放指针指向的内存空间 */ 
+	Queue_UsingPointer( &glayer->child ); 
 	return glayer;
 }
 
@@ -152,7 +161,7 @@ LCUI_API int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 	/* 根据队列中的z值，将子图层存放在队列中适当的位置 */
 	total = Queue_GetTotal( &des_ctnr->child );
 	for( i=0; i<total; ++i ) {
-		tmp_child = Queue_Get( &des_ctnr->child, i );
+		tmp_child = (LCUI_GraphLayer*)Queue_Get( &des_ctnr->child, i );
 		/* 如果比当前位置的图层的z值小，那就对比下一个位置的图层 */
 		if( glayer->z_index < tmp_child->z_index ) {
 			continue;
@@ -174,10 +183,12 @@ LCUI_API int GraphLayer_MoveChild(	LCUI_GraphLayer *new_ctnr,
 {
 	int ret;
 	//_DEBUG_MSG( "new_ctnr: %p, glayer: %p\n", new_ctnr, glayer );
+	/* 先删除子图层记录，以解除与之前父图层的父子关系 */
 	ret = GraphLayer_DeleteChild( glayer );
 	if( ret != 0 ) {
 		return -1;
 	}
+	/* 再添加至新的父图层内 */
 	ret = GraphLayer_AddChild( new_ctnr, glayer );
 	if( ret != 0 ) {
 		return -2;
@@ -255,8 +266,10 @@ LCUI_API int GraphLayer_Sort( LCUI_GraphLayer *glayer )
 	if( !glayer ) {
 		return -1;
 	}
+	/* 排序前先锁上队列互斥锁 */
 	Queue_Lock( &glayer->child );
 	total = Queue_GetTotal( &glayer->child );
+	/* 使用的是选择排序法 */
 	for(i=0; i<total; ++i) {
 		child_a = (LCUI_GraphLayer*)Queue_Get( &glayer->child, i );
 		if( !child_a ) {
@@ -273,6 +286,7 @@ LCUI_API int GraphLayer_Sort( LCUI_GraphLayer *glayer )
 			}
 		}
 	}
+	/* 解开互斥锁 */
 	Queue_Unlock( &glayer->child );
 	return 0;
 }
@@ -323,14 +337,17 @@ GraphLayer_GetValidRect(	LCUI_GraphLayer *root_glayer,
 	cut_rect.width = glayer->graph.width;
 	cut_rect.height = glayer->graph.height;
 	pos = glayer->pos;
+	/* 如果根图层无效，或者没有父图层 */
 	if( !root_glayer || !glayer->parent ) {
 		return cut_rect;
 	}
+	/* 加上父图层的内边距 */
 	pos.x += glayer->parent->padding.left;
 	pos.y += glayer->parent->padding.top;
 	/* 计算当前有效显示区域 */
 	area.x = glayer->parent->padding.left;
 	area.y = glayer->parent->padding.top;
+	/* 区域尺寸则减去内边距 */
 	area.width = glayer->parent->graph.width;
 	area.width -= glayer->parent->padding.left;
 	area.width -= glayer->parent->padding.right;
@@ -358,8 +375,9 @@ GraphLayer_GetValidRect(	LCUI_GraphLayer *root_glayer,
 		cut_rect.height -= glayer->graph.height;
 		cut_rect.height += area.height;
 	}
-	
+	/* 递归调用 */
 	rect = GraphLayer_GetValidRect( root_glayer, glayer->parent );
+	/* 根据父图层的有效区域，调整当前图层的裁剪区域 */
 	if(rect.x > area.x) {
 		temp = pos.x + cut_rect.x;
 		if(temp < rect.x) {
@@ -400,10 +418,12 @@ GraphLayer_GetGlobalPos(	LCUI_GraphLayer *root_glayer,
 	if( !glayer || !root_glayer || glayer == root_glayer ) {
 		return Pos(0,0);
 	}
+	/* 递归获取父图层的全局坐标 */
 	pos = GraphLayer_GetGlobalPos( root_glayer, glayer->parent );
 	pos.x += glayer->pos.x;
 	pos.y += glayer->pos.y;
 	if( glayer->parent ) {
+		/* 加上内边距 */
 		pos.x += glayer->parent->padding.left;
 		pos.y += glayer->parent->padding.top;
 	}
@@ -439,20 +459,24 @@ __GraphLayer_GetLayers(
 	/* 从尾到首，从底到顶，遍历图层 */
 	for( i=total-1; i>=0; --i ) {
 		child = (LCUI_GraphLayer*)Queue_Get( child_list, i );
+		/* 忽略无效或不可见的图层 */
 		if( !child || !child->visible ) {
 			continue;
 		}
-		
+		/* 获取子图层的有效区域及全局坐标 */
 		tmp = GraphLayer_GetValidRect( root_glayer, child );
 		pos = GraphLayer_GetGlobalPos( root_glayer, child );
 		//_DEBUG_MSG( "child: %p, pos: %d,%d, valid rect: %d,%d, %d, %d\n", 
 		//	child, pos.x, pos.y, tmp.x, tmp.y, tmp.width, tmp.height);
 		//Graph_PrintInfo( &child->graph );
+		/* 有效区域加上子部件的全局坐标 */
 		tmp.x += pos.x;
 		tmp.y += pos.y;
+		/* 判断区域是否有效 */
 		if( !LCUIRect_IsValid(tmp) ) {
 			continue;
 		}
+		/* 若该有效区域与目标区域重叠，则记录子部件，并进行递归 */
 		if( LCUIRect_Overlay(tmp, rect) ) {
 			Queue_AddPointer( queue, child );
 			__GraphLayer_GetLayers(	root_glayer, 
@@ -515,20 +539,25 @@ LCUI_API int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 	
 	graph_buff->have_alpha = FALSE;
 	tmp_graph.have_alpha = TRUE;
+	/* 为graph_buff分配合适尺寸的内存空间 */
 	Graph_Create( graph_buff, rect.width, rect.height );
+	/* 获取rect区域内的图层列表 */
 	GraphLayer_GetLayers( ctnr, rect, &glayerQ ); 
 	total = Queue_GetTotal( &glayerQ ); 
 	//_DEBUG_MSG( "total: %d\n", total );
+	/* 若记录数为零，则表明该区域没有图层 */
 	if( total <= 0 ) {
+		/* 若没有父图层，则填充白色 */
 		if( ctnr == NULL ) {
 			Graph_FillColor( graph_buff, RGB(255,255,255) );
-		} else {
+		} else { /* 否则使用父图层的图形 */
 			Graph_Cut( &ctnr->graph, rect, graph_buff );
 		}
+		/* 销毁记录 */
 		Queue_Destroy( &glayerQ );
 		return 0;
 	}
-	
+	/* 从顶层到底层遍历图层，排除被其它图层完全遮挡或者自身完全透明的图层 */
 	for(i=total-1; i>=0; --i) {
 		glayer = (LCUI_GraphLayer*)Queue_Get( &glayerQ, i );
 		valid_area = GraphLayer_GetValidRect( ctnr, glayer );
@@ -536,12 +565,16 @@ LCUI_API int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 		valid_area.x += glayer_pos.x;
 		valid_area.y += glayer_pos.y;
 		switch( Graph_IsOpaque( &glayer->graph ) ) {
-		    case -1:
+		    case -1: /* 若完全透明 */
 			Queue_DeletePointer( &glayerQ, i );
 			break;
 		    case 0: break;
-		    case 1:
+		    case 1: /* 若完全不透明，且该图层的有效区域包含目标区域 */
 			if( LCUIRect_IncludeRect(valid_area, rect) ) { 
+				/* 移除底层的图层，因为已经被完全遮挡 */
+				for(total=i-1;total>=0; --total) {
+					Queue_DeletePointer( &glayerQ, 0 );
+				}
 				goto skip_loop;
 			}
 			break;
@@ -558,15 +591,19 @@ skip_loop:
 			Graph_Cut ( &ctnr->graph, rect, graph_buff );
 		}
 	}
+	/* 获取图层列表中的图层 */
 	for(i=0; i<total; ++i) {
-		glayer = Queue_Get( &glayerQ, i );
+		glayer = (LCUI_GraphLayer*)Queue_Get( &glayerQ, i );
 		//_DEBUG_MSG("%p = Queue_Get( %p, %d )\n", glayer, &glayerQ, i);
 		if( !glayer ) {
 			continue;
 		}
+		/* 锁上该图层的互斥锁 */
 		Graph_Lock( &glayer->graph );
+		/* 获取该图层的有效区域及全局坐标 */
 		pos = GraphLayer_GetGlobalPos( ctnr, glayer );
 		valid_area = GraphLayer_GetValidRect( ctnr, glayer );
+		/* 引用该图层的有效区域内的图像 */
 		Graph_Quote( &tmp_graph, &glayer->graph, valid_area ); 
 		//_DEBUG_MSG("valid area: %d,%d,%d,%d, pos: %d,%d, size: %d,%d\n", 
 		//	valid_area.x, valid_area.y, valid_area.width, valid_area.height,
@@ -579,15 +616,20 @@ skip_loop:
 		//_DEBUG_MSG("mix pos: %d,%d\n", pos.x, pos.y);
 		/* 如果该图层没有继承父图层的透明度 */
 		if( !glayer->inherit_alpha ) {
+			/* 直接叠加至graph_buff */
 			Graph_Mix( graph_buff, &tmp_graph, pos );
 		} else {
 			/* 否则，计算该图层应有的透明度 */
 			alpha = GraphLayer_GetRealAlpha( glayer );
+			/* 备份该图层的全局透明度 */
 			tmp_alpha = glayer->graph.alpha;
+			/* 将实际透明度作为全局透明度，参与图像叠加 */
 			glayer->graph.alpha = alpha;
 			Graph_Mix( graph_buff, &tmp_graph, pos );
+			/* 还原全局透明度 */
 			glayer->graph.alpha = tmp_alpha;
 		}
+		/* 解锁图层 */
 		Graph_Unlock( &glayer->graph );
 	}
 	Queue_Destroy( &glayerQ );
