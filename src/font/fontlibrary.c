@@ -1,80 +1,86 @@
-/* ***************************************************************************
- * fontlibrary.c -- The font database management module
- * 
- * Copyright (C) 2012-2013 by
- * Liu Chao
- * 
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
- * 
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+/** ******************************************************************************
+ * @file	fontlibrary.c
+ * @brief	The font database management module.
+ * @author	Liu Chao <lc-soft@live.cn>
+ * @warning
+ * Copyright (C) 2012-2013 by							\n
+ * Liu Chao									\n
+ * 										\n
+ * This file is part of the LCUI project, and may only be used, modified, and	\n
+ * distributed under the terms of the GPLv2.					\n
+ * 										\n
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)		\n
+ * 										\n
+ * By continuing to use, modify, or distribute this file you indicate that you	\n
+ * have read the license and understand and accept it fully.			\n
+ *  										\n
+ * The LCUI project is distributed in the hope that it will be useful, but 	\n
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 	\n
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.	\n
+ * 										\n
+ * You should have received a copy of the GPLv2 along with this file. It is 	\n
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.	\n
+ * ******************************************************************************/
  
-/* ****************************************************************************
- * fontlibrary.c -- 字体数据库管理模块
- *
- * 版权所有 (C) 2013 归属于
- * 刘超
- * 
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
- *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
- *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
- * ****************************************************************************/
+/** ******************************************************************************
+ * @file	fontlibrary.c
+ * @brief	字体数据库管理模块。
+ * @author	刘超 <lc-soft@live.cn>
+ * @warning
+ * 版权所有 (C) 2012-2013 归属于							\n
+ * 刘超										\n
+ * 										\n
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。	\n
+ * 										\n
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)					\n
+ * 										\n
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。		\n
+ * 										\n
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特定用途	\n
+ * 的隐含担保，详情请参照GPLv2许可协议。						\n
+ * 										\n
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果	\n
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 				\n
+ * ******************************************************************************/
  
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_ERROR_H
 #include LC_FONT_H
 
-#define NAME_MAX_LEN	256
-#define PATH_MAX_LEN	1024
+#define NAME_MAX_LEN	256	/** 最大名字长度 */
+#define PATH_MAX_LEN	1024	/** 最大路径长度 */
 
-typedef struct {
-	int pixel_size;			/* 位图像素大小 */
-	LCUI_FontBMP *bitmap;		/* 位图数据 */
+typedef struct LCUI_FontBMPItem_ {
+	int pixel_size;			/** 位图像素大小 */
+	LCUI_FontBMP *bitmap;		/** 位图数据 */
 } LCUI_FontBMPItem;
 
-typedef struct {
-	int font_id;			/* 字体信息ID */
-	LCUI_Queue font_bmp;		/* 位图库 */
+typedef struct LCUI_FontDataItem_ {
+	int font_id;			/** 字体信息ID */
+	LCUI_Queue font_bmp;		/** 位图库 */
 } LCUI_FontDataItem;
 
-typedef struct {
-	wchar_t char_code;		/* 字符码 */
-	LCUI_Queue data;		/* 与该字符关联的数据 */
+typedef struct LCUI_FontCharItem_ {
+	wchar_t char_code;		/** 字符码 */
+	LCUI_Queue data;		/** 与该字符关联的数据 */
 } LCUI_FontCharItem;
 
-typedef struct {
-	int id;
-	char style_name[NAME_MAX_LEN];	/* 风格名 */
-	char family_name[NAME_MAX_LEN];	/* 字族名 */
-	char filepath[PATH_MAX_LEN];	/* 字体文件路径 */
+typedef struct LCUI_FontInfo_ {
+	int id;				/** 字体信息ID */
+	char style_name[NAME_MAX_LEN];	/** 风格名 */
+	char family_name[NAME_MAX_LEN];	/** 字族名 */
+	char filepath[PATH_MAX_LEN];	/** 字体文件路径 */
 	FT_Face face;
 } LCUI_FontInfo;
 
 static int font_count = 0;
-static FT_Library library = NULL;
-static LCUI_BOOL database_init = FALSE;
-static LCUI_Queue font_database, fontbitmap_database;
-static LCUI_FontInfo *default_font = NULL, *in_core_font = NULL;
+static FT_Library library = NULL;		/** FreeType 库句柄 */
+static LCUI_BOOL database_init = FALSE;		/** 标记，指示数据库是否初始化 */
+static LCUI_Queue font_database;		/** 字体信息数据库 */
+static LCUI_Queue fontbitmap_database;		/** 字体位图数据库 */
+static LCUI_FontInfo *default_font = NULL;	/** 指向默认字体信息的指针 */
+static LCUI_FontInfo *in_core_font = NULL;	/** 指向内置字体的信息的指针 */
 
 static void FontLIB_DestroyBMP( void *arg )
 {
@@ -117,7 +123,6 @@ LCUI_API void FontLIB_DestroyAll( void )
 #endif
 }
 
-
 static void FontLIB_DataInit( LCUI_FontDataItem *item )
 {
 	Queue_Init(	&item->font_bmp, 
@@ -133,8 +138,7 @@ static void FontLIB_CharInit( LCUI_FontCharItem *item )
 }
 
 /* 初始化字体数据库 */
-LCUI_API void
-FontLIB_Init( void )
+LCUI_API void FontLIB_Init( void )
 {
 	if( database_init ) {
 		return;
@@ -232,7 +236,7 @@ FontLIB_GetFontIDByFamilyName( const char *family_name )
 			return item->id;
 		}
 	}
-	return -1;
+	return -2;
 }
 
 /* 获取指定字体ID的字体face对象句柄 */
@@ -466,7 +470,7 @@ FontLIB_LoadFontFile( const char *filepath )
 			printf("%s", FT_OPEN_FILE_ERROR);
 		}
 		perror( filepath );
-		return -1;
+		return -2;
 	}
 	/* 打印字体信息 */
 	printf(	"=============== font info ==============\n" 
