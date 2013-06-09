@@ -79,8 +79,7 @@ typedef struct _LCUI_TextLayer
 	LCUI_BOOL using_code_mode	:1;	/* 指示是否开启代码模式 */
 	LCUI_BOOL using_style_tags	:1;	/* 指示是否处理样式标签 */
 	LCUI_BOOL enable_word_wrap	:1;	/* 指示是否自动换行 */
-	LCUI_BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */ 
-	LCUI_BOOL need_proc_buff	:1;	/* 指示是否处理缓冲区内的文本 */
+	LCUI_BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */
 	LCUI_BOOL need_scroll_layer	:1;	/* 指示是否需要滚动图层 */
 	LCUI_BOOL have_select		:1;	/* 标记，指示是否在文本图层中选择了文本 */
 	uint32_t start, end;	/* 被选中的文本的范围 */ 
@@ -189,7 +188,7 @@ TextLayer_PrintInfo( LCUI_TextLayer *layer );
  * 说明：文本将被储存至缓冲区，等待绘制文本位图时再处理缓冲区内的文本
  *  */
 LCUI_API void
-TextLayer_TextW( LCUI_TextLayer *layer, const wchar_t *wchar_text );
+TextLayer_TextW( LCUI_TextLayer *layer, wchar_t *wchar_text );
 
 LCUI_API void
 TextLayer_Text( LCUI_TextLayer *layer, const char *utf8_text );

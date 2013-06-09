@@ -267,8 +267,6 @@ TextLayer_Init( LCUI_TextLayer *layer )
 	layer->current_des_pos = Pos(0,0);
 	layer->max_text_len = 512000;
 	TextStyle_Init ( &layer->default_data );
-	
-	LCUIWString_Init( &layer->text_buff );
 	//TextLayer_Text_Add_NewRow ( layer );/* 添加新行 */
 }
 
@@ -280,7 +278,6 @@ Destroy_TextLayer( LCUI_TextLayer *layer )
 	Queue_Destroy( &layer->rows_data );
 	Queue_Destroy( &layer->tag_buff );
 	RectQueue_Destroy( &layer->clear_area );
-	LCUIWString_Free( &layer->text_buff );
 }
 
 static void
