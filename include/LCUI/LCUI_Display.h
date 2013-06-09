@@ -130,6 +130,14 @@ LCUI_API void LCUIScreen_SetInfo( LCUI_Screen *info );
 LCUI_API LCUI_Pos
 LCUIScreen_GetCenter( void );
 
+/* 为图层树锁上互斥锁 */
+LCUI_API void 
+LCUIScreen_LockGraphLayerTree( void );
+
+/* 解除图层树互斥锁 */
+LCUI_API void 
+LCUIScreen_UnlockGraphLayerTree( void );
+
 /* 获取屏幕中指定区域内实际要显示的图形 */
 LCUI_API void
 LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph );

@@ -57,6 +57,7 @@ static LCUI_BOOL i_am_init = FALSE;
 static LCUI_BOOL need_sync_area = FALSE;
 /* 用于记录屏幕无效区域 */
 static LCUI_RectQueue screen_invalid_area;
+static LCUI_Mutex glayer_list_mutex;
 static LCUI_Screen screen;
 
 /* 获取屏幕宽度 */
@@ -138,13 +139,30 @@ LCUIScreen_GetCenter( void )
 	return Pos(screen.size.w/2.0, screen.size.h/2.0);
 }
 
+/* 为图层树锁上互斥锁 */
+LCUI_API void 
+LCUIScreen_LockGraphLayerTree( void )
+{
+	LCUIMutex_Lock( &glayer_list_mutex );
+}
+
+/* 解除图层树互斥锁 */
+LCUI_API void 
+LCUIScreen_UnlockGraphLayerTree( void )
+{
+	LCUIMutex_Unlock( &glayer_list_mutex );
+}
+
 /* 获取屏幕中指定区域内实际要显示的图形 */
 LCUI_API void
 LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 {
 	LCUI_Pos pos, cursor_pos;
+	/* 设置互斥锁，避免在统计图层时，图层记录被其它线程修改 */
+	LCUIScreen_LockGraphLayerTree();
 	GraphLayer_GetGraph( RootWidget_GetGraphLayer(), graph, rect );
-	/* 如果游标可见 */
+	LCUIScreen_UnlockGraphLayerTree();
+	/* 如果游标不可见 */
 	if ( !LCUICursor_Visible() ) {
 		return;
 	}
@@ -260,6 +278,7 @@ LCUIModule_Video_Init( int w, int h, int mode )
 	if( i_am_init ) {
 		return -1;
 	}
+	LCUIMutex_Init( &glayer_list_mutex );
 	LCUIScreen_Init( w, h, mode );
 	i_am_init = TRUE;
 	RectQueue_Init( &screen_invalid_area );
