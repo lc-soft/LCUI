@@ -53,6 +53,23 @@
 #include LC_FONT_H
 #include LC_ERROR_H
 
+static void Window_GetCloseButtonBG( LCUI_Graph *graph )
+{
+	unsigned char alpha[]={
+		0xff,0xff,0x00,0x00,0x00,0x00,0xff,0xff,
+		0x00,0xff,0xff,0x00,0x00,0xff,0xff,0x00,
+		0x00,0x00,0xff,0xff,0xff,0xff,0x00,0x00,
+		0x00,0x00,0x00,0xff,0xff,0x00,0x00,0x00,
+		0x00,0x00,0xff,0xff,0xff,0xff,0x00,0x00,
+		0x00,0xff,0xff,0x00,0x00,0xff,0xff,0x00,
+		0xff,0xff,0x00,0x00,0x00,0x00,0xff,0xff,
+	};
+	graph->have_alpha = TRUE;
+	Graph_Create( graph, 8, 7 );
+	Graph_FillColor( graph, RGB(255,255,255) );
+	memcpy( graph->rgba[3], alpha, sizeof(alpha) );
+}
+
 LCUI_API LCUI_Widget*
 Window_GetTitleBar(LCUI_Widget *window)
 /* 功能：获取窗口标题栏的指针 */
@@ -176,9 +193,6 @@ Window_TitleBar_Init(LCUI_Widget *titlebar)
 	
 	Widget_SetAlign(t->icon_box, ALIGN_MIDDLE_LEFT, Pos(0,0));
 	Widget_SetAlign(t->label, ALIGN_MIDDLE_LEFT, Pos(2,-2));
-	Load_Graph_Default_TitleBar_BG(&img);
-	Widget_SetBackgroundImage( titlebar, &img );
-	Widget_SetBackgroundLayout( titlebar, LAYOUT_STRETCH );
 }
 
 static void
@@ -186,11 +200,11 @@ Window_ExecUpdate( LCUI_Widget *win_p )
 {
 	LCUI_Size size;
 	LCUI_Graph *graph;
-	LCUI_Widget *titlebar;
-	LCUI_Widget *client_area;
 	LCUI_Border border;
+	LCUI_Widget *titlebar, *btn, *client_area;
 	LCUI_RGB border_color, back_color;
 	
+	btn = Window_GetCloseButton(win_p);
 	titlebar = Window_GetTitleBar(win_p);
 	client_area = Window_GetClientArea(win_p);
 	graph = Widget_GetSelfGraph( win_p );
@@ -211,25 +225,7 @@ Window_ExecUpdate( LCUI_Widget *win_p )
 		Widget_Hide( titlebar );
 		Widget_Show( client_area );
 		break;
-		
-	    case WINDOW_STYLE_STANDARD: /* 标准边框 */ 
-		Widget_SetBorder(win_p,
-		 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)));
-		Widget_SetPadding(win_p, Padding(1,1,1,1)); 
-		
-		size = Widget_GetContainerSize( win_p );
-		
-		Widget_Resize(titlebar, Size(size.w, 25));
-		Widget_Resize(client_area, Size(size.w, size.h - 25));
-		/* 标题栏向顶部停靠 */
-		Widget_SetDock( titlebar, DOCK_TYPE_TOP );
-		/* 客户区向底部停靠 */
-		Widget_SetDock( client_area, DOCK_TYPE_BOTTOM );
-		/* 标题栏和客户区都需要显示 */
-		Widget_Show( titlebar ); 
-		Widget_Show( client_area ); 
-		break;
-			
+
 	    case WINDOW_STYLE_PURE_BLUE: 
 		back_color = RGB(30,160,225); 
 		border_color = RGB(0,130,195);
@@ -253,8 +249,10 @@ union_draw_method:;
 		/* 若窗口未获得焦点 */
 		if( !Widget_GetFocus( win_p ) ) {
 			back_color = RGB(235,235,235);
-			border_color = RGB(211,211,211); 
+			border_color = RGB(211,211,211);
 		}
+		/* 更新窗口标题栏上的关闭按钮 */
+		Widget_Update( btn );
 		border = Border(1, BORDER_STYLE_SOLID, border_color);
 		Widget_SetBorder( client_area, border);
 		Widget_SetBorder( win_p, border);
@@ -306,7 +304,7 @@ Window_Init( LCUI_Widget *win_p )
 	LCUI_Widget *client_area;
 	LCUI_Widget *btn_close;
 	LCUI_Window *win;
-	static LCUI_Graph btn_highlight, btn_normal, btn_down; 
+	static LCUI_Graph btn_bg; 
 	
 	win = (LCUI_Window*)WidgetPrivData_New(win_p, sizeof(LCUI_Window));
 	
@@ -315,28 +313,26 @@ Window_Init( LCUI_Widget *win_p )
 	btn_close = Widget_New("button"); 
 	titlebar->focus = FALSE;
 	Set_Focus( client_area );
-	Graph_Init(&btn_down);
-	Graph_Init(&btn_highlight);
-	Graph_Init(&btn_normal);
-	/* 载入默认图形 */
-	Load_Graph_Default_TitleBar_CloseBox_Normal(&btn_normal);
-	Load_Graph_Default_TitleBar_CloseBox_Down(&btn_down);
-	Load_Graph_Default_TitleBar_CloseBox_HighLight(&btn_highlight);
+
+	Graph_Init( &btn_bg );
+	/* 载入按钮背景 */
+	Window_GetCloseButtonBG( &btn_bg );
 	/* 显示在左上角 */
-	Widget_SetAlign(btn_close, ALIGN_TOP_RIGHT, Pos(0, -2)); 
+	Widget_SetAlign(btn_close, ALIGN_TOP_RIGHT, Pos(0, 0)); 
 	/* 将尺寸改成和图片一样 */
 	Widget_SetAutoSize( btn_close, FALSE, 0 );
-	Widget_Resize(btn_close, Size(btn_normal.width, btn_normal.height));
-	Button_CustomStyle(btn_close, &btn_normal, &btn_highlight, &btn_down, NULL, NULL);
+	Widget_Resize(btn_close, Size(44, 20));
+	Widget_SetBackgroundImage( btn_close, &btn_bg );
+	Widget_SetBackgroundLayout( btn_close, LAYOUT_CENTER );
+	/* 没有背景图就填充背景色 */
+	Widget_SetBackgroundTransparent( win_p, FALSE );
+	/* 部件的风格ID */
+	Widget_SetStyleID( win_p, WINDOW_STYLE_PURE_BLUE );
+	Widget_SetStyleID( btn_close, BUTTON_STYLE_FLAT );
 	/* 保存部件指针 */
 	win->client_area = client_area;
 	win->titlebar = titlebar;
 	win->btn_close = btn_close;
-	/* 没有背景图就填充背景色 */
-	Widget_SetBackgroundTransparent( win_p, FALSE );
-	/* 部件的风格ID */
-	win_p->style_id = WINDOW_STYLE_PURE_BLUE;
-	
 	/* 放入至容器 */
 	Widget_Container_Add(titlebar, btn_close);
 	Widget_Container_Add(win_p, titlebar);
