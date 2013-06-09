@@ -103,12 +103,52 @@ static void Button_ExecCustomUpdate( LCUI_Widget *widget )
 	}
 }
 
+static void Button_ExecFlatStyleUpdate( LCUI_Widget *widget )
+{
+	LCUI_Widget *window;
+	LCUI_RGB color;
+	LCUI_Border border;
+
+	switch( widget->state ) {
+	case WIDGET_STATE_NORMAL:
+		/* 获取类型为window的父部件 */
+		window = Widget_GetParent( widget, "window" );
+		/* 若父部件有效，且已获得焦点 */
+		if( window && Widget_GetFocus(window) ) {
+			color = RGB(199,80,80);
+		} else {
+			color = RGB(188,188,188);
+		}
+		break;
+	case WIDGET_STATE_OVERLAY :
+		color = RGB(224,67,67);
+		break;
+	case WIDGET_STATE_ACTIVE :
+		color = RGB(153,61,61);
+		break;
+	case WIDGET_STATE_DISABLE :
+		color = color = RGB(199,80,80);
+		break;
+		default : break;
+	}
+	Widget_SetBackgroundColor( widget, color );
+	border = Border(0, BORDER_STYLE_SOLID, color );
+	Widget_SetBorder( widget, border );
+	Widget_SetBackgroundTransparent( widget, FALSE );
+}
+
 static void Button_ExecUpdate( LCUI_Widget *widget )
 {
-	if(widget->style_id == BUTTON_STYLE_CUSTOM) {
+	switch(widget->style_id) {
+	case BUTTON_STYLE_CUSTOM:
 		Button_ExecCustomUpdate( widget );
-	} else {
+		break;
+	case BUTTON_STYLE_FLAT:
+		Button_ExecFlatStyleUpdate( widget );
+		break;
+	default:
 		Button_ExecDefalutUpdate( widget );
+		break;
 	}
 	Widget_Refresh( widget );
 }
