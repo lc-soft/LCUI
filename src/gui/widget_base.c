@@ -920,10 +920,14 @@ LCUIApp_DestroyAllWidgets( LCUI_ID app_id )
 {
 	int i, total;
 	LCUI_Widget *temp;
-
+	
+	Queue_Lock( &root_widget.child );
 	total = Queue_GetTotal(&root_widget.child);
 	for(i=0; i<total; i++) {
-		temp = Queue_Get(&root_widget.child,i);
+		temp = (LCUI_Widget*)Queue_Get(&root_widget.child,i);
+		if( temp == NULL ) {
+			continue;
+		}
 		if(temp->app_id != app_id) {
 			continue;
 		}
@@ -931,11 +935,12 @@ LCUIApp_DestroyAllWidgets( LCUI_ID app_id )
 		 * 在Queue_Delete()函数将队列中的部件移除时，会调用初始化部件队列时指
 		 * 定的Destroy_Widget()函数进行部件数据相关的清理。
 		 * */
-		Queue_Delete(&root_widget.child, i);
+		Queue_Delete( &root_widget.child, i );
 		/* 重新获取部件总数 */
 		total = Queue_GetTotal(&root_widget.child);
 		--i;/* 当前位置的部件已经移除，空位已由后面部件填补，所以，--i */
 	}
+	Queue_Unlock( &root_widget.child );
 }
 
 
@@ -1114,14 +1119,19 @@ Destroy_Widget( void *arg )
  * */
 {
 	LCUI_Widget *widget;
+	LCUI_Queue *glayer_list;
 	widget = (LCUI_Widget *)arg;
 	widget->parent = NULL;
 
 	/* 释放字符串 */
 	LCUIString_Free(&widget->type_name);
 	LCUIString_Free(&widget->style_name);
+	/* 在移除图层前，先锁上图层树的互斥锁 */
+	LCUIScreen_LockGraphLayerTree();
+	/* 开始移除该部件的图层记录，并释放内存资源 */
 	GraphLayer_Free( widget->glayer );
-
+	/* 移除后，解除互斥锁 */
+	LCUIScreen_UnlockGraphLayerTree();
 	/* 销毁部件的队列 */
 	Queue_Destroy(&widget->child);
 	Queue_Destroy(&widget->event);
