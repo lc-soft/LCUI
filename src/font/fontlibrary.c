@@ -536,14 +536,14 @@ void LCUIModule_Font_Init( void )
 		font_id = FontLIB_LoadFontFile( p );
 	}
 	/* 如果载入成功，则设定该字体为默认字体 */
-	if(font_id != -1) {
+	if(font_id > 0) {
 		FontLIB_SetDefaultFont( font_id );
 		return;
 	}
 	/* 否则载入失败就载入其它字体文件 */
 	for(i=0; i<MAX_FONTFILE_NUM; ++i) {
 		font_id = FontLIB_LoadFontFile( fontfilelist[i] ); 
-		if(font_id != -1) {
+		if(font_id > 0) {
 			FontLIB_SetDefaultFont( font_id );
 			break;
 		}
