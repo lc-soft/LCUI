@@ -484,9 +484,9 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 			wdg_event.mouse_motion.rel_pos = pos;
 			Widget_DispatchEvent( tmp_widget, &wdg_event );
 		}
-	}
+	} 
 	/* 如果没有部件处于按住状态 */
-	if( widget && widget_allow_response(widget) && !click_widget ) {
+	if( widget_allow_response(widget) && !click_widget ) {
 		widget_list_set_state (widget, WIDGET_STATE_OVERLAY);
 	}
 	tmp_widget = Get_ResponseEvent_Widget( click_widget, EVENT_CLICKED );
