@@ -179,8 +179,8 @@ Window_TitleBar_Init(LCUI_Widget *titlebar)
 	/* 窗口图标和标题文字不可获得焦点，并忽略鼠标点击 */
 	t->label->focus = FALSE;
 	t->icon_box->focus = FALSE;
-	Set_Widget_ClickableAlpha( t->label, 0, 1 );
-	Set_Widget_ClickableAlpha( t->icon_box, 0, 1 );
+	Widget_SetClickableAlpha( t->label, 0, 1 );
+	Widget_SetClickableAlpha( t->icon_box, 0, 1 );
 	
 	Widget_Container_Add(titlebar, t->icon_box);
 	Widget_Container_Add(titlebar, t->label);

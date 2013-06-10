@@ -384,8 +384,8 @@ TextBox_Init( LCUI_Widget *widget )
 	
 	Widget_Resize( textbox->cursor, Size(1, 14) );
 	/* 设置可点击区域的alpha值要满足的条件 */
-	Set_Widget_ClickableAlpha( textbox->cursor, 0, 1 );
-	Set_Widget_ClickableAlpha( textbox->text, 0, 1 );
+	Widget_SetClickableAlpha( textbox->cursor, 0, 1 );
+	Widget_SetClickableAlpha( textbox->text, 0, 1 );
 	
 	/* 设定定时器，每1秒闪烁一次 */
 	if( __timer_id == -1 ) {
