@@ -49,13 +49,13 @@
 #include LC_DISPLAY_H
 #include LC_WIDGET_H
 #include <Windows.h>
-
+#include "resource.h"
 static HWND current_hwnd = NULL;
 static int pixel_mem_len = 0;
 static unsigned char *pixel_mem = NULL;
 static HDC hdc_client, hdc_framebuffer;
 static HBITMAP client_bitmap;
-static HINSTANCE win32_hInstance = NULL;
+static HINSTANCE win32_hInstance = NULL, dll_hInstance = NULL;
 static LCUI_Mutex screen_mutex;
 
 LCUI_API void
@@ -137,6 +137,24 @@ LCUIScreen_GetGraph( LCUI_Graph *out )
 	return -1;
 }
 
+/* win32的动态库的入口函数 */
+BOOL APIENTRY DllMain( HMODULE hModule,
+                       DWORD  ul_reason_for_call,
+                       LPVOID lpReserved
+					 )
+{
+	switch (ul_reason_for_call)
+	{
+	case DLL_PROCESS_ATTACH:
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+	}
+	dll_hInstance = hModule;
+	return TRUE;
+}
+
 LCUI_API int
 LCUIScreen_Init( int w, int h, int mode )
 {
@@ -145,18 +163,19 @@ LCUIScreen_Init( int w, int h, int mode )
 	LCUI_Widget *root_widget;
 	LCUI_Screen screen_info;
 	LCUI_Size window_size;
-	TCHAR szAppName[] = TEXT ("Typer");
-	
-	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
+	TCHAR szAppName[] = TEXT ("LCUI OutPut");
+
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW;
 	wndclass.lpfnWndProc   = Win32_LCUI_WndProc;
-	wndclass.cbClsExtra    = 0 ;
-	wndclass.cbWndExtra    = 0 ;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = 0;
 	wndclass.hInstance     = win32_hInstance;
-	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
-	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
-	wndclass.lpszMenuName  = NULL ;
-	wndclass.lpszClassName = szAppName ;
+	/* 载入动态库里的图标 */
+	wndclass.hIcon         = LoadIcon( dll_hInstance, MAKEINTRESOURCE(IDI_MAIN_ICON) );
+	wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
+	wndclass.hbrBackground = (HBRUSH) GetStockObject( WHITE_BRUSH );
+	wndclass.lpszMenuName  = NULL;
+	wndclass.lpszClassName = szAppName;
 
 	if (!RegisterClass (&wndclass)) {
 		MessageBox (NULL, TEXT ("This program requires Windows NT!"), 
