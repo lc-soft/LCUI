@@ -240,6 +240,15 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_base.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_style.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\LCUI_Widget.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_msg.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -368,9 +377,6 @@
     <ClCompile Include="..\..\..\src\draw\in-core\img_radiobutton.c">
       <Filter>源文件\draw\in-core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\draw\in-core\img_titlebar.c">
-      <Filter>源文件\draw\in-core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\bmp\bmp.c">
       <Filter>源文件\bmp</Filter>
     </ClCompile>
@@ -431,6 +437,12 @@
     <ClCompile Include="..\..\..\src\gui\widget_library.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_style.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_msg.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\README" />
@@ -453,7 +465,6 @@
     <None Include="..\..\..\docs\FAQ.zh-cn">
       <Filter>docs</Filter>
     </None>
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\docs\LICENSE.TXT">
@@ -464,5 +475,10 @@
     <ResourceCompile Include="LCUI.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="lcui.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>
