@@ -213,7 +213,7 @@ LCUIScreen_Init( int w, int h, int mode )
 		window_size.h = h;
 		current_hwnd = CreateWindow (
 				szAppName, TEXT ("LCUI"),
-				WS_OVERLAPPEDWINDOW &~WS_THICKFRAME,
+				WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
 				CW_USEDEFAULT, CW_USEDEFAULT,
 				window_size.w, window_size.h,
 				NULL, NULL, win32_hInstance, NULL);
