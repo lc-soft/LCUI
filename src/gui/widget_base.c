@@ -965,6 +965,10 @@ LCUI_API LCUI_BOOL
 Widget_GetGlobalFocus( LCUI_Widget *widget )
 {
 	if( Widget_GetFocus(widget) ) {
+		if( widget->parent == NULL
+		 || widget->parent == &root_widget ) {
+			return TRUE;
+		}
 		return Widget_GetFocus( widget->parent );
 	}
 	return FALSE;
@@ -1013,8 +1017,8 @@ __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 		*  */
 	graph = Widget_GetSelfGraph( ctnr );
 	if( Graph_GetPixel( graph, pos, &pixel )) {
-		//printf("mode: %d, pixel alpha: %d, alpha: %d\n",
-		//widget->clickable_mode, pixel.alpha, widget->clickable_area_alpha );
+		DEBUG_MSG("%p, mode: %d, pixel alpha: %d, alpha: %d\n", ctnr, 
+		ctnr->clickable_mode, pixel.alpha, ctnr->clickable_area_alpha );
 		if( (ctnr->clickable_mode == 0
 			&& pixel.alpha < ctnr->clickable_area_alpha )
 			|| (ctnr->clickable_mode == 1
@@ -1119,7 +1123,6 @@ Destroy_Widget( void *arg )
  * */
 {
 	LCUI_Widget *widget;
-	LCUI_Queue *glayer_list;
 	widget = (LCUI_Widget *)arg;
 	widget->parent = NULL;
 
@@ -1383,7 +1386,7 @@ Widget_GetGlobalPos(LCUI_Widget *widget)
 }
 
 LCUI_API void
-Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode )
+Widget_SetClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode )
 /* 设定部件可被点击的区域的透明度 */
 {
 	if( mode == 0 ) {
@@ -1391,7 +1394,7 @@ Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode )
 	} else {
 		widget->clickable_mode = 1;
 	}
-	//printf("set, mode: %d, alpha: %d\n", widget->clickable_mode, alpha);
+	//printf("%p, set, mode: %d, alpha: %d\n", widget, widget->clickable_mode, alpha);
 	widget->clickable_area_alpha = alpha;
 }
 
