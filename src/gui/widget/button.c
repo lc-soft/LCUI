@@ -114,10 +114,10 @@ static void Button_ExecFlatStyleUpdate( LCUI_Widget *widget )
 		/* 获取类型为window的父部件 */
 		window = Widget_GetParent( widget, "window" );
 		/* 若父部件有效，且已获得焦点 */
-		if( window && Widget_GetFocus(window) ) {
-			color = RGB(199,80,80);
-		} else {
+		if( window && !Widget_GetFocus(window) ) {
 			color = RGB(188,188,188);
+		} else {
+			color = RGB(199,80,80);
 		}
 		break;
 	case WIDGET_STATE_OVERLAY :
