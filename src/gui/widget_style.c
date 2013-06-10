@@ -68,12 +68,12 @@ LCUI_API void WidgetStyle_LibraryDestroy( void )
 
 LCUI_API int WidgetStyle_LoadFromString( const char *style_str )
 {
-	return StyleLib_AddStyleFromString( &style_library, style_str );
+	return StyleLIB_AddStyleFromString( &style_library, style_str );
 }
 
 LCUI_API int WidgetStyle_LoadFromFile( const char *filepath )
 {
-	return StyleLib_AddStyleFromFile( &style_library, filepath );
+	return StyleLIB_AddStyleFromFile( &style_library, filepath );
 }
 
 /* 从字符串中指定段内获取出16进制的数 */
@@ -84,11 +84,14 @@ static int str_scan_hex_number( const char *str, int start, int end )
 	k = end - start - 1;
 	for(i=start; i<end; ++i) {
 		if(str[i] >= '0' && str[i] <= '9') {
-			n += (str[i]-'0')*pow(16,k);
+			n += ((str[i]-'0')*pow(16,k));
 			--k;
-		} else if((str[i] >= 'a' && str[i] <= 'f')
-		|| (str[i] >= 'A' && str[i] <= 'F')) {
-			n += (str[i]-'a'+10)*k*pow(16,k);
+		} else if(str[i] >= 'a' && str[i] <= 'f') {
+			n += ((str[i]-'a'+10)*pow(16,k));
+			--k;
+		}
+		else if(str[i] >= 'A' && str[i] <= 'F') {
+			n += ((str[i]-'A'+10)*pow(16,k));
 			--k;
 		}
 	}
@@ -108,7 +111,7 @@ static int style_color_convert( const char *style_str, LCUI_RGB *rgb )
 			r = str_scan_hex_number( style_str, 1, 2 );
 			g = str_scan_hex_number( style_str, 2, 3 );
 			b = str_scan_hex_number( style_str, 3, 4 );
-			r<<=4; g<<=4; b<<=4;
+			r*=17; g*=17; b*=17;
 			break;
 		case 7:
 			r = str_scan_hex_number( style_str, 1, 3 );
@@ -124,7 +127,7 @@ static int style_color_convert( const char *style_str, LCUI_RGB *rgb )
 	rgb->red = r;
 	rgb->green = g;
 	rgb->blue = b;
-	DEBUG_MSG("%d,%d,%d\n", r,g,b);
+	DEBUG_MSG("%s: %d,%d,%d\n", style_str, r,g,b);
 	return 0;
 }
 
