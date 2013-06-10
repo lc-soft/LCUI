@@ -564,12 +564,17 @@ LCUI_API int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 		glayer_pos = GraphLayer_GetGlobalPos( ctnr, glayer );
 		valid_area.x += glayer_pos.x;
 		valid_area.y += glayer_pos.y;
+		alpha = GraphLayer_GetRealAlpha( glayer );
+		/* 当前图层的透明度小于255的话，就跳过 */
+		if( alpha < 255 ) {
+			continue;
+		}
 		switch( Graph_IsOpaque( &glayer->graph ) ) {
 		    case -1: /* 若完全透明 */
 			Queue_DeletePointer( &glayerQ, i );
 			break;
 		    case 0: break;
-		    case 1: /* 若完全不透明，且该图层的有效区域包含目标区域 */
+		    case 1:/* 若完全不透明，且该图层的有效区域包含目标区域 */
 			if( LCUIRect_IncludeRect(valid_area, rect) ) { 
 				/* 移除底层的图层，因为已经被完全遮挡 */
 				for(total=i-1;total>=0; --total) {
