@@ -53,7 +53,7 @@ StyleLIB_GetElement(	StyleLIB_Library *lib_ptr,
 	int i, total;
 	LCUI_Queue *list;
 	StyleLIB_Element *p;
-
+	
 	if( lib_ptr == NULL || name == NULL ) {
 		return NULL;
 	}
@@ -122,7 +122,7 @@ StyleLIB_AddClass(	StyleLIB_Library *lib_ptr,
 }
 
 static StyleLIB_Property *
-StyleLIB_FindProperty(	LCUI_Queue *property_list,
+StyleLIB_FindProperty(	LCUI_Queue *property_list, 
 			const char *property_name )
 {
 	int i, n;
@@ -141,7 +141,7 @@ StyleLIB_FindProperty(	LCUI_Queue *property_list,
 		}
 		if( !lcui_strcasecmp(
 			property_ptr->name.string,
-			property_name)
+			property_name) 
 		) {
 			return property_ptr;
 		}
@@ -150,7 +150,7 @@ StyleLIB_FindProperty(	LCUI_Queue *property_list,
 }
 
 static StyleLIB_Property *
-StyleLIB_GetExistProperty(	LCUI_Queue *property_list,
+StyleLIB_GetExistProperty(	LCUI_Queue *property_list, 
 				const char *property_name )
 {
 	StyleLIB_Property *property_ptr;
@@ -194,7 +194,7 @@ StyleLIB_FindPseudoClass(	StyleLIB_Element *element_ptr,
 			continue;
 		}
 		if( !lcui_strcasecmp(
-			pclass->name.string,
+			pclass->name.string, 
 			pseudo_class_name)
 		) {
 			return pclass;
@@ -222,7 +222,7 @@ StyleLIB_GetExistPseudoClass(	StyleLIB_Element *element_ptr,
 			continue;
 		}
 		if( !lcui_strcasecmp(
-			pclass->name.string,
+			pclass->name.string, 
 			pseudo_class_name)
 		) {
 			return pclass;
@@ -242,7 +242,7 @@ StyleLIB_GetExistPseudoClass(	StyleLIB_Element *element_ptr,
 }
 
 /* 为 选择器/类 添加属性 */
-LCUI_API int
+LCUI_API int 
 StyleLIB_AddProperty(	StyleLIB_Element *element_ptr,
 			const char *pseudo_class_name,
 			const char *property_name,
@@ -270,7 +270,7 @@ StyleLIB_AddProperty(	StyleLIB_Element *element_ptr,
 	_LCUIString_Copy( &property_ptr->value, property_value );
 	return 0;
 }
-
+						
 /* 获取选择器的句柄 */
 LCUI_API StyleLIB_Element *
 StyleLIB_GetSelector(	StyleLIB_Library *lib_ptr,
@@ -286,7 +286,7 @@ StyleLIB_GetClass(	StyleLIB_Library *lib_ptr,
 {
 	return StyleLIB_GetElement( lib_ptr, class_name, 1 );
 }
-
+					
 /* 获取属性的句柄 */
 LCUI_API StyleLIB_Property *
 StyleLIB_GetProperty(	StyleLIB_Selector *selector_ptr,
@@ -297,7 +297,7 @@ StyleLIB_GetProperty(	StyleLIB_Selector *selector_ptr,
 	StyleLIB_PseudoClass *pclass;
 	LCUI_Queue *property_list;
 	StyleLIB_Property *first_prop, *second_prop;
-
+	
 	if( selector_ptr != NULL ) {
 		/* 先从 选择器 查找第一个属性 */
 		pclass = StyleLIB_FindPseudoClass( selector_ptr, pseudo_class_name );
@@ -367,7 +367,7 @@ typedef struct style_scan_status {
 	char name_buff[256];
 	char value_buff[256];
 	LCUI_BOOL save_class_name;
-	LCUI_BOOL save_attr_name;
+	LCUI_BOOL save_attr_name; 
 	LCUI_BOOL save_attr_value;
 	LCUI_BOOL is_selector;
 	StyleLIB_Element *cur_style;
@@ -398,6 +398,14 @@ static void StyleLIB_ScanStyle(
 	for( status->ch_pos=0; cur<max && *cur!='\0'; ++cur ) {
 		if( status->save_attr_name ) {
 			switch(*cur) {
+			case '}':
+				status->save_class_name = FALSE;
+				status->save_attr_name = FALSE;
+				status->save_attr_value = FALSE;
+				status->cur_style = NULL;
+				status->name_buff[status->ch_pos] = 0;
+				status->ch_pos = 0;
+				goto proc_class_name;
 			case '\r':
 			case '\t':
 			case '\n':
@@ -413,6 +421,7 @@ static void StyleLIB_ScanStyle(
 				DEBUG_MSG1("name_buff[%d]: %c\n", status->ch_pos, *cur);
 				status->name_buff[status->ch_pos] = *cur;
 				++status->ch_pos;
+				break;
 			}
 			continue;
 		} else if( status->save_attr_value ) {
@@ -432,6 +441,9 @@ static void StyleLIB_ScanStyle(
 				status->save_attr_value = FALSE;
 				DEBUG_MSG1("add attr: %s = %s\n\n",
 					status->name_buff, status->value_buff);
+				if( *cur == '}' ) {
+					goto proc_class_name;
+				}
 				break;
 			case ' ':
 				if(status->ch_pos == 0) {
@@ -466,13 +478,16 @@ static void StyleLIB_ScanStyle(
 				DEBUG_MSG1("name_buff[%d]: %c\n", status->ch_pos, *cur);
 				status->name_buff[status->ch_pos] = *cur;
 				++status->ch_pos;
+				break;
 			}
 			continue;
 		}
+proc_class_name:
+		DEBUG_MSG1("check: %c, %d\n", *cur, *cur);
 		/* 如果是以字母下划线开头 */
-		if( (*cur >= 'a' && *cur <= 'z')
-		 || (*cur >= 'A' && *cur <= 'Z')
-		 || (*cur == '_') ) {
+		if( *cur >= 'a' && *cur <= 'z'
+		 || *cur >= 'A' && *cur <= 'Z'
+		 || *cur == '_' ) {
 			status->is_selector = TRUE;
 			status->save_class_name = TRUE;
 			status->ch_pos = 0;
@@ -488,7 +503,7 @@ static void StyleLIB_ScanStyle(
 
 /* 根据字符串的内容，往样式库里添加相应样式 */
 LCUI_API int
-StyleLib_AddStyleFromString(	StyleLIB_Library *lib,
+StyleLIB_AddStyleFromString(	StyleLIB_Library *lib,
 				const char *style_string )
 {
 	style_scan_status status;
@@ -501,7 +516,7 @@ StyleLib_AddStyleFromString(	StyleLIB_Library *lib,
 
 /* 根据指定文件内的数据，往样式库里添加相应样式 */
 LCUI_API int
-StyleLib_AddStyleFromFile(	StyleLIB_Library *lib,
+StyleLIB_AddStyleFromFile(	StyleLIB_Library *lib,
 				const char *filepath )
 {
 	char *buff;
