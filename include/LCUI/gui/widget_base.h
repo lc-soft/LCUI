@@ -313,7 +313,7 @@ Widget_GetGlobalPos(LCUI_Widget *widget);
 
 /* 设定部件可被点击的区域的透明度 */
 LCUI_API void
-Set_Widget_ClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode );
+Widget_SetClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode );
 
 /* 设定部件的对齐方式以及偏移距离 */
 LCUI_API void

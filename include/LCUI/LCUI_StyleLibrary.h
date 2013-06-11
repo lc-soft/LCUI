@@ -80,13 +80,13 @@ StyleLIB_SetPropertyValue(	StyleLIB_Property *property_ptr,
 
 /* 根据字符串的内容，往样式库里添加相应样式 */
 LCUI_API int
-StyleLib_AddStyleFromString(	StyleLIB_Library *lib,
+StyleLIB_AddStyleFromString(	StyleLIB_Library *lib,
 				const char *style_string );
 
 
 /* 根据指定文件内的数据，往样式库里添加相应样式 */
 LCUI_API int
-StyleLib_AddStyleFromFile(	StyleLIB_Library *lib,
+StyleLIB_AddStyleFromFile(	StyleLIB_Library *lib,
 				const char *filepath );
 
 
