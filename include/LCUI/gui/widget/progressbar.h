@@ -44,40 +44,38 @@
 #define __LCUI_PROGBAR_H__
 
 LCUI_BEGIN_HEADER
-
-typedef struct _LCUI_ProgressBar LCUI_ProgressBar;
-
-/*************** 进度条 ********************/
-struct _LCUI_ProgressBar
-{
-	LCUI_Thread thread;	/* 线程 */
-	LCUI_Graph fore_graph;		/* 前景图形 */ 
-	LCUI_Graph flash_image;	/* 附加的图形，实现进度条上移动的的闪光 */
 	
-	LCUI_Widget *fore_pic_box;	/* 前景图片的图片盒子 */ 
-	LCUI_Widget *img_pic_box;	/* 闪光图片的图片盒子 */
-	
-	int img_move_speed; /* 表示进度条上的闪光的移动速度，单位为：像素/秒 */
-	int sleep_time;	/* 指定在闪光移动至进度条尾部后，等待多久进行下一次移动，单位为：毫秒 */
-	int max_value;	/* 总进度的值 */
-	int value;	/* 当前进度的值 */
+enum ProgressBarStyle {
+	PROGBAR_STYLE_BLUE,
+	PROGBAR_STYLE_GREEN,
+	PROGBAR_STYLE_RED
 };
 
-LCUI_API void
-ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value);
-/* 功能：设定进度条最大值 */ 
+typedef struct LCUI_ProgressBar_
+{
+	LCUI_Widget *fore_wdg;		/* 进度条 */ 
+	LCUI_Widget *glisten_wdg;	/* 闪光 */
+	
+	int move_speed;		/* 闪光的移动速度，单位为：像素/秒 */
+	int sleep_time;		/* 闪光每趟移动的间隔时间，单位为：毫秒 */
+	int max_value;		/* 总进度的值 */
+	int value;		/* 当前进度的值 */
+} LCUI_ProgressBar;
 
-LCUI_API int
-ProgressBar_GetMaxValue(LCUI_Widget *widget);
-/* 功能：获取进度条最大值 */ 
+/* 设定进度条最大值 */
+LCUI_API void ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value);
 
-LCUI_API void
-ProgressBar_SetValue(LCUI_Widget *widget, int value);
-/* 功能：设定进度条当前值 */ 
+/* 获取进度条最大值 */
+LCUI_API int ProgressBar_GetMaxValue( LCUI_Widget *widget );
 
-LCUI_API int
-ProgressBar_GetValue(LCUI_Widget *widget);
-/* 功能：获取进度条当前值 */ 
+/* 设定进度条当前值 */
+LCUI_API void ProgressBar_SetValue( LCUI_Widget *widget, int value );
+
+/* 获取进度条当前值 */
+LCUI_API int ProgressBar_GetValue( LCUI_Widget *widget );
+
+/* 注册进度条部件类型 */
+LCUI_API void Register_ProgressBar(void);
 
 LCUI_END_HEADER
 
