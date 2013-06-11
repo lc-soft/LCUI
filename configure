@@ -12296,7 +12296,7 @@ _ACEOF
 fi
 
 ##输出文件
-ac_config_files="$ac_config_files Makefile lcui.pc include/Makefile include/LCUI/Makefile include/LCUI/font/Makefile include/LCUI/draw/Makefile include/LCUI/gui/widget/Makefile include/LCUI/kernel/Makefile include/LCUI/gui/Makefile include/LCUI/misc/Makefile src/Makefile src/font/Makefile src/font/in-core/Makefile src/draw/Makefile src/draw/in-core/Makefile src/thread/Makefile src/thread/win32/Makefile src/thread/pthread/Makefile src/bmp/Makefile src/misc/Makefile src/kernel/Makefile src/input/Makefile src/output/Makefile src/gui/Makefile test/Makefile test/mora/Makefile test/clock/Makefile test/screenlock/Makefile"
+ac_config_files="$ac_config_files Makefile lcui.pc include/Makefile include/LCUI/Makefile include/LCUI/font/Makefile include/LCUI/draw/Makefile include/LCUI/gui/widget/Makefile include/LCUI/kernel/Makefile include/LCUI/gui/Makefile include/LCUI/misc/Makefile src/Makefile src/font/Makefile src/font/in-core/Makefile src/draw/Makefile src/draw/in-core/Makefile src/thread/Makefile src/thread/win32/Makefile src/thread/pthread/Makefile src/bmp/Makefile src/misc/Makefile src/kernel/Makefile src/input/Makefile src/output/Makefile src/gui/Makefile test/Makefile test/mora/Makefile test/clock/Makefile test/login/Makefile test/screenlock/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13322,6 +13322,7 @@ do
     "test/Makefile") CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
     "test/mora/Makefile") CONFIG_FILES="$CONFIG_FILES test/mora/Makefile" ;;
     "test/clock/Makefile") CONFIG_FILES="$CONFIG_FILES test/clock/Makefile" ;;
+    "test/login/Makefile") CONFIG_FILES="$CONFIG_FILES test/login/Makefile" ;;
     "test/screenlock/Makefile") CONFIG_FILES="$CONFIG_FILES test/screenlock/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

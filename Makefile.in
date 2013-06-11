@@ -367,8 +367,6 @@ build/VisualStudio/lib/libpng15.lib \
 build/VisualStudio/lib/zlib.lib \
 docs/LICENSE.TXT docs/CHANGES docs/CHANGES.zh-cn docs/FAQ docs/FAQ.zh-cn\
 docs/CodingStyle.zh-cn.md \
-docs/html/zh-cn/design/index.html \
-docs/html/us-en/design/index.html \
 test/README.zh-cn \
 test/Makefile.in \
 test/Makefile.am \
@@ -455,7 +453,20 @@ test/clock/hand_second.png \
 test/clock/dial.png \
 test/clock/hand_minute.png \
 test/clock/Makefile.am \
-test/clock/Makefile.in
+test/clock/Makefile.in \
+test/login/boot.c \
+test/login/data/avatar/avatar.png \
+test/login/data/avatar/default.png \
+test/login/data/bg.png \
+test/login/data/btn_login.png \
+test/login/data/cloud.png \
+test/login/data/main.css \
+test/login/desktop.c \
+test/login/desktop.h \
+test/login/login.c \
+test/login/login.h \
+test/login/Makefile.in \
+test/login/Makefile.am
 
 all: all-recursive
 
