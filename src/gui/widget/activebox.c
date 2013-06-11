@@ -42,8 +42,6 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
-#include LC_MISC_H
-#include LC_GRAPH_H
 #include LC_ACTIVEBOX_H
 #include LC_RES_H
 
