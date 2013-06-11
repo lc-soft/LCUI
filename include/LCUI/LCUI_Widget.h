@@ -41,9 +41,7 @@
 
 #ifndef __LCUI_WIDGET_H__
 #define __LCUI_WIDGET_H__
-#include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_DRAW_BORDER_H
+#include LC_GRAPH_H
 
 LCUI_BEGIN_HEADER
 
@@ -101,7 +99,7 @@ typedef struct LCUI_Background_ {
 } LCUI_Background;
 /*--------------------------------------------------------*/
 
-
+typedef struct	LCUI_Widget_	LCUI_Widget;
 struct LCUI_Widget_ {
 	LCUI_ID app_id;		/* 所属程序的ID */
 	LCUI_ID self_id;	/* 自身ID */

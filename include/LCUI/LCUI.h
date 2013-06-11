@@ -166,39 +166,39 @@ LCUI_BEGIN_HEADER
 /*---------------------------- 图形数据 -------------------------------*/
 typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
-	int	type;		/* 图片类型 */
-	int	bit_depth;	/* 位深 */
+	int	type;		/** 图片类型 */
+	int	bit_depth;	/** 位深 */
 
-	LCUI_Mutex mutex;	/* 锁，用于数据保护 */
+	LCUI_Mutex mutex;	/** 锁，用于数据保护 */
 
-	LCUI_BOOL quote;	/* 指示是否引用其它图层中的图形 */
-	LCUI_Graph *src;	/* 所引用的对象 */
-	LCUI_Pos pos;		/* 在引用另一个图层中的图形时，会保存区域的起点位置 */
-	int width, height;	/* 尺寸 */
+	LCUI_BOOL quote;	/** 指示是否引用其它图层中的图形 */
+	LCUI_Graph *src;	/** 所引用的对象 */
+	LCUI_Pos pos;		/** 在引用另一个图层中的图形时，会保存区域的起点位置 */
+	int width, height;	/** 尺寸 */
 
-	uchar_t	alpha;	/* 全局透明度，表示整张图片的透明度，默认为255 */
-	uchar_t** rgba;	/* 像素数据缓冲区 */
-	size_t mem_size; /* 像素数据缓冲区大小 */
+	uchar_t	alpha;		/** 全局透明度，表示整张图片的透明度，默认为255 */
+	uchar_t** rgba;		/** 像素数据缓冲区 */
+	size_t mem_size;	/** 像素数据缓冲区大小 */
 
-	LCUI_BOOL have_alpha;	/* 标志，指定是否需要透明度，分配内存时会根据它分配 */
-	LCUI_BOOL is_opaque;	/* 标志，指定该图形是否为不透明 */
-	LCUI_BOOL not_visible;	/* 标志，指定该图形是否不可见，也就是全透明 */
+	LCUI_BOOL have_alpha;	/** 标志，指定是否需要透明度，分配内存时会根据它分配 */
+	LCUI_BOOL is_opaque;	/** 标志，指定该图形是否为不透明 */
+	LCUI_BOOL not_visible;	/** 标志，指定该图形是否不可见，也就是全透明 */
 };
 /*------------------------------ END ---------------------------------*/
 
 /*---------------- 用于表示像素或百分比 -----------------*/
 typedef struct PX_P_t_ {
-	LCUI_BOOL which_one;	/* 指定用哪个类型的变量 */
-	int px;			/* 数值，单位为像素 */
-	double scale;		/* 比例 */
+	LCUI_BOOL which_one;	/** 指定用哪个类型的变量 */
+	int px;			/** 数值，单位为像素 */
+	double scale;		/** 比例 */
 } IntOrFloat_t;
 /*---------------------- END -------------------------*/
 
 /*----------------- 用于表示字体大小 --------------------*/
 typedef struct PX_PT_t_ {
-	LCUI_BOOL which_one;	/* 指定用哪个类型的变量 */
-	int px;			/* pixel, 字体大小（像素） */
-	int pt;			/* point，字体大小（点数） */
+	LCUI_BOOL which_one;	/** 指定用哪个类型的变量 */
+	int px;			/** pixel, 字体大小（像素） */
+	int pt;			/** point，字体大小（点数） */
 } PX_PT_t;
 /*---------------------- END -------------------------*/
 
@@ -210,8 +210,8 @@ typedef struct common_box_ {
 
 /*----------------- 自动尺寸调整模式 --------------------*/
 typedef enum AUTOSIZE_MODE_ {
-	AUTOSIZE_MODE_GROW_AND_SHRINK,	/* 增大和缩小 */
-	AUTOSIZE_MODE_GROW_ONLY		/* 只增大 */
+	AUTOSIZE_MODE_GROW_AND_SHRINK,	/** 增大和缩小 */
+	AUTOSIZE_MODE_GROW_ONLY		/** 只增大 */
 }
 AUTOSIZE_MODE;
 /*---------------------- END --------------------------*/
@@ -228,7 +228,6 @@ LCUI_END_HEADER
 	}
 
 #include LC_MISC_H
-#include LC_GRAPHLAYER_H
 #include LC_KERNEL_MAIN_H
 #include LC_KERNEL_DEV_H
 #include LC_KERNEL_TIMER_H
@@ -240,21 +239,20 @@ LCUI_END_HEADER
 #include LC_LCUI_HPP
 #endif
 
-#if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS)
+#if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS) &&defined(I_NEED_WINMAIN)
 extern int main(int,char**);
-
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow )
 {
 	char *pCmdLine, *cmdline_buff;
 	char *token = NULL, *next_token = NULL;
 	char **argv = NULL;
 	int ret, len, i = 0, argc = 0;
-
+	
 	Win32_LCUI_Init( hInstance );
 	/* 获取命令行 */
-	pCmdLine = GetCommandLine();	
+	pCmdLine = GetCommandLine();
 	/* 计算命令行的长度 */
-	len = strlen( pCmdLine ) + 1;	
+	len = strlen( pCmdLine ) + 1;
 	/* 分配一段相应长度的内存空间 */
 	cmdline_buff = (char*)malloc(sizeof(char)*len); 
 	if( cmdline_buff == NULL ) {
