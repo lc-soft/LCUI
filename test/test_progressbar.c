@@ -1,4 +1,5 @@
-//测试进度条部件的示例程序
+﻿//测试进度条部件的示例程序
+#define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
@@ -9,55 +10,38 @@
 #include LC_PROGBAR_H
 #include LC_PICBOX_H
 
-/* 动态改变进度条部件的数据 */
-static void change_progress_1( void *arg )
+/* 动态改变进度条的数据 */
+static void change_progress( void *arg )
 {
 	char str[15];
 	int i, max = 100;
 	LCUI_Widget *label;
 	LCUI_Widget *widget;
 	
-	widget = (LCUI_Widget *)arg; /* 转换类型 */
+	/* 创建一个label部件 */
+	widget = (LCUI_Widget *)arg;
 	label = Widget_New("label");
-	Widget_Container_Add(widget, label);
-	Widget_SetAlign(label, ALIGN_MIDDLE_CENTER, Pos(0,0)); 
-	Widget_Show(label);
-	ProgressBar_SetMaxValue(widget, max); /* 最大值 */
-	srand(time(NULL));
-	for(i=0; i<max; i+=rand()%5) {
-		ProgressBar_SetValue(widget, i);/* 当前值 */
-		sprintf( str, "%d%%", (int)(i*100.0/max) );
-		Label_Text( label, str );
-		LCUI_MSleep(100);/* 暂停0.1秒 */
-	}
-	ProgressBar_SetValue(widget, max);
-	Label_Text(label, "100%");
-	LCUIThread_Exit(NULL);
-}
+	/* 放到进度条里 */
+	Widget_Container_Add( widget, label );
+	/* 并且居中 */
+	Widget_SetAlign( label, ALIGN_MIDDLE_CENTER, Pos(0,0) ); 
+	/* 显示它 */
+	Widget_Show( label );
 
-static void change_progress_2( void *arg )
-{
-	char str[15];
-	int i, max = 100;
-	LCUI_Widget *label;
-	LCUI_Widget *widget;
-	
-	widget = (LCUI_Widget *)arg; 
-	label = Widget_New("label");
-	Widget_Container_Add(widget, label);
-	label->set_align(label, ALIGN_MIDDLE_CENTER, Pos(0,0)); 
-	label->show(label);
+	/* 设置最大值 */
 	ProgressBar_SetMaxValue(widget, max); 
-	srand(time(NULL));
-	for(i=0; i<max; i+=rand()%5) {
+	for( i=0; i<max; i+=rand()%5 ) {
+		/* 设置当前值 */
 		ProgressBar_SetValue(widget, i); 
-		sprintf( str, "%d/%d", i, max );
+		/* 转换成字符串 */
+		sprintf( str, "%d%%", (int)(i*100.0/max) );
+		/* 设置显示的文本 */
 		Label_Text( label, str );
+		/* 暂停0.1秒 */
 		LCUI_MSleep(100);
 	}
-	ProgressBar_SetValue(widget, max);
-	sprintf( str, "%d/%d", max, max );
-	Label_Text( label, str );
+	ProgressBar_SetValue( widget, max );
+	Label_Text( label, "100%" );
 	LCUIThread_Exit(NULL);
 }
 
@@ -66,47 +50,27 @@ static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 	LCUI_MainLoop_Quit(NULL);
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
-	LCUI_Thread t[2];
-	LCUI_Widget *window, *pb_a, *pb_b;
+	LCUI_Thread thread;
+	LCUI_Widget *window, *progbar;
 	
-	LCUI_Init();
-	/* 创建部件 */
-	printf("main(): create widget\n");
+	LCUI_Init(800,600,0);
+	
 	window = Widget_New("window");
-	pb_a = Widget_New("progress_bar");
-	pb_b = Widget_New("progress_bar");
-	printf("main(): create widget done\n");
-	/* 设定窗口标题的文本 */
-	printf("main(): setting widget\n");
-	Window_SetTitleText(window, "测试进度条部件"); 
-	/* 改变窗口的尺寸 */
+	progbar = Widget_New("progress_bar");
+
+	Window_SetTitleTextW(window, L"测试进度条部件");
 	Widget_Resize(window, Size(320, 240));
-	/* 将窗口客户区作为部件的容器添加进去 */
-	Window_ClientArea_Add(window, pb_a);
-	Window_ClientArea_Add(window, pb_b);
-	/* 居中显示 */
-	Widget_SetAlign(pb_a, ALIGN_MIDDLE_CENTER, Pos(0, -25)); 
-	Widget_SetAlign(pb_b, ALIGN_MIDDLE_CENTER, Pos(0, 25));
-	/* 设定部件的风格 */
-	Widget_SetStyleName(pb_a, "dynamic");
-	Widget_SetStyleName(pb_b, "classic");
-	/* 改变部件尺寸 */
-	Widget_Resize(pb_a, Size(300, 25));
-	Widget_Resize(pb_b, Size(300, 25));
-	printf("main(): create thread 1\n");
-	/* 创建线程，此函数和pthread_create函数用法一样 */
-	LCUIThread_Create(&t[0], change_progress_1, (void*)pb_a);
-	printf("main(): create thread 2\n");
-	LCUIThread_Create(&t[1], change_progress_2, (void*)pb_b); 
-	printf("main(): create thread done\n");
+	Window_ClientArea_Add(window, progbar);
+	Widget_SetAlign(progbar, ALIGN_MIDDLE_CENTER, Pos(0,0)); 
+	Widget_Resize(progbar, Size(300, 25));
+
+	LCUIThread_Create(&thread, change_progress, (void*)progbar);
 	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
-	/* 显示部件 */
-	Widget_Show(pb_a);
-	Widget_Show(pb_b);
+
+	Widget_Show(progbar);
 	Widget_Show(window);
-	printf("main(): enter LCUI_Main()\n");
-	return LCUI_Main(); /* 进入主循环 */  
+	return LCUI_Main();
 }
 
