@@ -43,7 +43,6 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
-#include LC_GRAPH_H
 #include LC_DISPLAY_H
 #include LC_FONT_H
 #include LC_ERROR_H
@@ -1923,7 +1922,6 @@ Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 	}
 	//_DEBUG_MSG("size: %d, %d\n", size.w, size.h);
 	GraphLayer_Resize( widget->glayer, size.w, size.h );
-
 	WidgetFunc_Call( widget, FUNC_TYPE_RESIZE );
 	//Widget_Refresh( widget );
 
@@ -2450,7 +2448,7 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 			ret = Widget_ExecResize( widget, data_ptr->data.size );
 		}
 		if( ret == 0 ) {
-			Widget_Draw( widget );
+			Widget_ExecDraw( widget );
 			Widget_UpdatePos( widget );
 		}
 		break;
