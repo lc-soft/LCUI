@@ -140,14 +140,14 @@ static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 	LCUI_MainLoop_Quit(NULL);
 }
 
-int LCUIMainFunc(LCUI_ARGLIST)
+int main(int argc, char **argv)
 {
 	LCUI_Thread t;
 
 #ifdef LCUI_BUILD_IN_WIN32
 	InitConsoleWindow();
 #endif
-	LCUI_Init(LCUI_DEFAULT_CONFIG);
+	LCUI_Init(0,0,0);
 	filename = scan_fontfile("../../fonts/", &total_files);
 	window = Widget_New("window");
 	text = Widget_New("label");

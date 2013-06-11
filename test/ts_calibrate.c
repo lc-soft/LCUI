@@ -5,7 +5,7 @@
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include LC_WIDGET_H 
+#include LC_WIDGET_H
 #include LC_WINDOW_H
 #include LC_PICBOX_H
 #include LC_DISPLAY_H
@@ -13,7 +13,7 @@
 #include LC_GRAPH_H
 #include LC_DRAW_H
 #include LC_RES_H
-#include LC_INPUT_H 
+#include LC_INPUT_H
 
 #ifdef USE_TSLIB
 
@@ -48,7 +48,7 @@ static void getxy(struct tsdev *ts, int *x, int *y)
 			perror("ts_read");
 			exit(1);
 		}
-		
+
 	} while (samp[0].pressure == 0);
 
 	/* Now collect up to MAX_SAMPLES touches into the samp array. */
@@ -57,7 +57,7 @@ static void getxy(struct tsdev *ts, int *x, int *y)
 		if (index < MAX_SAMPLES-1)
 			index++;
 		if (ts_read_raw(ts, &samp[index], 1) < 0) {
-			perror("ts_read"); 
+			perror("ts_read");
 			exit(1);
 		}
 	} while (samp[index].pressure > 0);
@@ -108,7 +108,7 @@ static int perform_calibration(calibration *cal)
 
 	// Get sums for matrix
 	n = x = y = x2 = y2 = xy = 0;
-	for(j=0;j<5;j++) 
+	for(j=0;j<5;j++)
 	{
 		n += 1.0;
 		x += (float)cal->x[j];
@@ -170,7 +170,7 @@ static int perform_calibration(calibration *cal)
 	// If we got here, we're OK, so assign scaling to a[6] and return
 	cal->a[6] = (int)scaling;
 	return 1;
-	/*	
+	/*
 // This code was here originally to just insert default values
 	for(j=0;j<7;j++) {
 		c->a[j]=0;
@@ -193,14 +193,14 @@ static void get_sample (	struct tsdev *ts, calibration *cal,
 {
 	static int last_x = -1, last_y;
 
-	if (last_x != -1) 
+	if (last_x != -1)
 	{
 		int dx = ((x - last_x) << 16) / NR_STEPS;
 		int dy = ((y - last_y) << 16) / NR_STEPS;
 		int i;
 		last_x <<= 16;
 		last_y <<= 16;
-		for (i = 0; i < NR_STEPS; i++) 
+		for (i = 0; i < NR_STEPS; i++)
 		{
 			put_cross (last_x >> 16, last_y >> 16, cross);
 			LCUI_MSleep (1);
@@ -261,16 +261,16 @@ static void calibrate_func(void *widget)
 	char *calfile = NULL;
 	unsigned int i, len;
 	LCUI_Widget *cross;
-	
+
 	ts = Get_TouchScreen();
 	if( !ts ) {
 		printf("error: your device can not support touch screen!\n");
 		LCUI_MainLoop_Quit(NULL);
 		LCUIThread_Exit(NULL);
 	}
-	
+
 	cross = (LCUI_Widget*)widget;
-	
+
 	width = LCUIScreen_GetWidth();
 	height = LCUIScreen_GetHeight();
 	// Clear the buffer
@@ -304,9 +304,9 @@ static void calibrate_func(void *widget)
 		cal.a[4], cal.a[5], cal.a[3], cal.a[6],
 		width, height);
 		i = write (cal_fd, cal_buffer, len);
-		close (cal_fd); 
+		close (cal_fd);
 	} else {
-		printf("Calibration failed.\n"); 
+		printf("Calibration failed.\n");
 	}
 	/* 退出主循环 */
 	LCUI_MainLoop_Quit(NULL);
@@ -316,7 +316,7 @@ static void calibrate_func(void *widget)
 /* 用于获取程序所在的文件目录 */
 static void get_path(char *filepath, char *out_path)
 {
-	int num; 
+	int num;
 	strcpy(out_path, filepath);
 	for(num = strlen(filepath) - 1; num >= 0; --num) {
 		if(filepath[num] == '/') {
@@ -346,21 +346,21 @@ int main(int argc,char*argv[])
 	LCUI_Size wnd_size;
 	LCUI_Widget *window, *label, *click_pic;
 	char my_path[1024], file_path[1024];
-	
+
 	LCUI_Init();
-	Graph_Init(&pic_cross); 
-	Graph_Init(&bg); 
-	
+	Graph_Init(&pic_cross);
+	Graph_Init(&bg);
+
 	/* 获取文件的路径，之后打开并载入图片 */
 	get_path(argv[0], my_path);
 	sprintf(file_path, "%scross.png", my_path);
 	Load_Image(file_path, &pic_cross);
 	sprintf(file_path, "%sbg.png", my_path);
 	Load_Image(file_path, &bg);
-	
+
 	wnd_size = LCUIScreen_GetSize();
 	/* 创建一个窗口部件 */
-	window = Widget_New("window"); 
+	window = Widget_New("window");
 	/* 窗口部件边框风格为无(NONE) */
 	Widget_SetStyleID( window, WINDOW_STYLE_NONE );
 	/* 部件背景图为bg，填充模式为拉伸 */
@@ -369,10 +369,10 @@ int main(int argc,char*argv[])
 	/* 改变部件尺寸 */
 	Widget_Resize( window, wnd_size );
 	Widget_SetStyleID( window, WINDOW_STYLE_LINE );
-	
-	label  = Widget_New("label"); /* 该部件用于显示文字 */ 
+
+	label  = Widget_New("label"); /* 该部件用于显示文字 */
 	click_pic = Widget_New("picture_box"); /* 该部件用于显示图像 */
-	
+
 	/* 设定label部件显示的文本内容 */
 	Label_Text(label, "点击圆圈中心，笔点校正");
 	/* 调整部件的大小 */
@@ -380,7 +380,7 @@ int main(int argc,char*argv[])
 	/* 设定部件中显示的图形 */
 	PictureBox_SetImage(click_pic, &pic_cross);
 	/* 设定部件对齐方式以及偏移距离 */
-	Widget_SetAlign(label, ALIGN_MIDDLE_CENTER, Pos(0, 18)); 
+	Widget_SetAlign(label, ALIGN_MIDDLE_CENTER, Pos(0, 18));
 	/* 响应窗口关闭按钮的点击事件 */
 	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 响应按键输入 */
@@ -388,14 +388,19 @@ int main(int argc,char*argv[])
 	/* 将这两个部件放入窗口客户区内 */
 	Window_ClientArea_Add(window, label);
 	Window_ClientArea_Add(window, click_pic);
-	
+
 	/* 显示部件以及窗口 */
-	Widget_Show(label); 
+	Widget_Show(label);
 	Widget_Show(click_pic);
 	Widget_Show(window);
 	/* 创建线程 */
 	LCUIThread_Create(&thread, calibrate_func, (void*)click_pic);
 	return LCUI_Main();
 }
-
+#else
+int main( int argc, char **argv )
+{
+	printf("not have tslib support!\n");
+	return -1;
+}
 #endif

@@ -5,9 +5,8 @@ INCLUDES = -I$(top_builddir)/include
 ##需要编译的测试程序, noinst指的是不安装
 noinst_PROGRAMS = helloworld test_font test_radiobtn test_checkbox test_progressbar \
 test_button test_label test_loading ts_calibrate test_viewimage test_lcui_graph_mix \
-test_window test_rect_cut test_gaussian_blur test_widget_1 test_widget_2 test_widget_3 \
-test_widget_4 test_widget_5 test_widget_6 test_widget_style\
-test_timer test_textbox test_scrollbar graph2array test_graphlayer test_stylelib \
+test_window test_rect_cut test_gaussian_blur test_widget_dock  test_widget_style\
+test_timer test_textbox test_scrollbar graph2array test_graphlayer \
 test_messagebox
 
 ##指定测试程序的源码文件
@@ -55,23 +54,8 @@ test_rect_cut_LDADD	= $(top_builddir)/src/libLCUI.la
 test_gaussian_blur_SOURCES	= test_gaussian_blur.c
 test_gaussian_blur_LDADD	= $(top_builddir)/src/libLCUI.la
 
-test_widget_1_SOURCES	= test_widget_1.c
-test_widget_1_LDADD	= $(top_builddir)/src/libLCUI.la
-
-test_widget_2_SOURCES	= test_widget_2.c
-test_widget_2_LDADD	= $(top_builddir)/src/libLCUI.la
-
-test_widget_3_SOURCES	= test_widget_3.c
-test_widget_3_LDADD	= $(top_builddir)/src/libLCUI.la
-
-test_widget_4_SOURCES	= test_widget_4.c
-test_widget_4_LDADD	= $(top_builddir)/src/libLCUI.la
-
-test_widget_5_SOURCES	= test_widget_5.c
-test_widget_5_LDADD	= $(top_builddir)/src/libLCUI.la
-
-test_widget_6_SOURCES	= test_widget_6.c
-test_widget_6_LDADD	= $(top_builddir)/src/libLCUI.la
+test_widget_dock_SOURCES	= test_widget_dock.c
+test_widget_dock_LDADD		= $(top_builddir)/src/libLCUI.la
 
 test_timer_SOURCES	= test_timer.c
 test_timer_LDADD	= $(top_builddir)/src/libLCUI.la
@@ -84,9 +68,6 @@ test_scrollbar_LDADD	= $(top_builddir)/src/libLCUI.la
 
 graph2array_SOURCES	= graph2array.c
 graph2array_LDADD	= $(top_builddir)/src/libLCUI.la
-
-test_stylelib_SOURCES	= test_stylelib.c
-test_stylelib_LDADD	= $(top_builddir)/src/libLCUI.la
 
 test_graphlayer_SOURCES	= test_graphlayer.c
 test_graphlayer_LDADD	= $(top_builddir)/src/libLCUI.la

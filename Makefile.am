@@ -75,7 +75,7 @@ build/VisualStudio/include/libpng15/pngconf.h \
 build/VisualStudio/include/libpng15/png.h \
 build/VisualStudio/include/libpng15/pnglibconf.h \
 build/VisualStudio/lib/jpeg.lib \
-build/VisualStudio/lib/libfreetype2411MT.lib \
+build/VisualStudio/lib/freetype2412.lib \
 build/VisualStudio/lib/libpng15.lib \
 build/VisualStudio/lib/zlib.lib \
 docs/LICENSE.TXT docs/CHANGES docs/CHANGES.zh-cn docs/FAQ docs/FAQ.zh-cn\
@@ -84,6 +84,7 @@ test/README.zh-cn \
 test/Makefile.in \
 test/Makefile.am \
 test/image.jpg \
+test/style.css \
 test/logo_128x128.png \
 test/border.png \
 test/cross.png \
@@ -103,12 +104,7 @@ test/test_rect_cut.c \
 test/test_viewimage.c \
 test/test_window.c \
 test/test_gaussian_blur.c \
-test/test_widget_1.c \
-test/test_widget_2.c \
-test/test_widget_3.c \
-test/test_widget_4.c \
-test/test_widget_5.c \
-test/test_widget_6.c \
+test/test_widget_dock.c \
 test/test_widget_style.c \
 test/test_timer.c \
 test/test_textbox.c \
@@ -116,7 +112,6 @@ test/faceback.png \
 test/test_scrollbar.c \
 test/graph2array.c \
 test/test_graphlayer.c \
-test/test_stylelib.c \
 test/test_messagebox.c \
 test/mora/mora.c \
 test/mora/README.zh-cn \

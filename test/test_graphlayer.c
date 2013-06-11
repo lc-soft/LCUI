@@ -13,7 +13,7 @@ int main()
 	LCUI_Graph graph_buff;
 	LCUI_GraphLayer *root_glayer;
 	LCUI_GraphLayer *a_glayer, *b_glayer, *c_glayer;
-	
+
 	Graph_Init( &graph_buff );
 	/* 新建图层 */
 	root_glayer = GraphLayer_New();
@@ -46,7 +46,7 @@ int main()
 	/* 获取根图层指定区域内实际显示的图形 */
 	GraphLayer_GetGraph( root_glayer, &graph_buff, Rect(0,0,320,240) );
 	/* 写入至文件 */
-	write_png( OUTPUT_GRAPHFILE, &graph_buff );
+	Graph_WritePNG( OUTPUT_GRAPHFILE, &graph_buff );
 	printf( "please see file: %s \n", OUTPUT_GRAPHFILE );
 	GraphLayer_Free( root_glayer );
 	return 0;

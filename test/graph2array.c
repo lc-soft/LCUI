@@ -15,31 +15,31 @@ char help_text[]={
 	"%s image_file_path\n"
 };
 
-static void 
+static void
 get_filename(char *filepath, char *out_name)
 /* 根据文件路径，获取文件名 */
 {
 	int m,n = 0;
 	char *p;
 	for(m=0; m<strlen(filepath); ++m) {
-		if(filepath[m]=='/')  
-			n = m+1; 
+		if(filepath[m]=='/')
+			n = m+1;
 	}
 	p = filepath + n;
 	strcpy(out_name, p);
 }
 
-static int 
+static int
 graph_conv( LCUI_Graph *buff, char *out_filename )
 {
 	int i;
 	FILE *fp;
 	char file[1024], name[1024];
-	
+
 	get_filename( out_filename, name );
 	sprintf( file, "%s.c", name );
 	printf("output file: %s\n", file);
-	
+
 	fp = fopen( file, "w+" );
 	if( !fp ) {
 		return -1;
@@ -60,7 +60,7 @@ graph_conv( LCUI_Graph *buff, char *out_filename )
 		fprintf( fp, "0x%02x,", buff->rgba[0][i] );
 	}
 	fprintf( fp, "\n	};\n" );
-	
+
 	/* green channel */
 	fprintf( fp, "	unsigned char green[] = {" );
 	for( i=0; i<buff->width*buff->height; ++i ) {
@@ -70,7 +70,7 @@ graph_conv( LCUI_Graph *buff, char *out_filename )
 		fprintf( fp, "0x%02x,", buff->rgba[1][i] );
 	}
 	fprintf( fp, "\n	};\n" );
-	
+
 	/* blue channel */
 	fprintf( fp, "	unsigned char blue[] = {" );
 	for( i=0; i<buff->width*buff->height; ++i ) {
@@ -80,7 +80,7 @@ graph_conv( LCUI_Graph *buff, char *out_filename )
 		fprintf( fp, "0x%02x,", buff->rgba[2][i] );
 	}
 	fprintf( fp, "\n	};\n" );
-	
+
 	/* alpha channel */
 	if( buff->have_alpha ) {
 		fprintf( fp, "	unsigned char alpha[] = {" );
@@ -92,7 +92,7 @@ graph_conv( LCUI_Graph *buff, char *out_filename )
 		}
 		fprintf( fp, "\n	};\n" );
 	}
-	
+
 	fprintf( fp,
 		"	if( Graph_Valid( buff ) ) {\n"
 		"		Graph_Free( buff );\n"
@@ -112,7 +112,7 @@ graph_conv( LCUI_Graph *buff, char *out_filename )
 		"	}\n"
 		"	return ret;\n"
 		"}\n",
-		buff->have_alpha?"TRUE":"FALSE", 
+		buff->have_alpha?"TRUE":"FALSE",
 		buff->type, buff->width, buff->height
 	);
 	fclose( fp );
@@ -122,11 +122,11 @@ graph_conv( LCUI_Graph *buff, char *out_filename )
 int main( int argc, char *argv[] )
 {
 	LCUI_Graph graph;
-	
+
 	Graph_Init( &graph );
-	
+
 	if( argc == 2 ) {
-		Load_Image( argv[1], &graph );
+		Graph_LoadImage( argv[1], &graph );
 		graph_conv( &graph, argv[1] );
 	} else {
 		printf(help_text, argv[0]);

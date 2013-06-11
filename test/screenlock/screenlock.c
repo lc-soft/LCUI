@@ -1,4 +1,5 @@
 // 一个屏幕滑动解锁的程序
+#define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
@@ -168,12 +169,12 @@ void update_time(void *arg)
 	LCUIThread_Exit(NULL);
 }
 
-int LCUIMainFunc(LCUI_ARGLIST)
+int main( int argc, char **argv )
 {
 	LCUI_Thread t;
 	LCUI_Widget *window;
 
-	LCUI_Init(LCUI_DEFAULT_CONFIG);
+	LCUI_Init(320,240,0);
 	window = Widget_New("window");
 	Widget_SetBackgroundColor(window, RGB(255,255,255));
 	Widget_Resize(window, Size(320, 240));

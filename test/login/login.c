@@ -204,8 +204,6 @@ static void create_loginbtn( LCUI_Widget **btn )
 /* 显示登录界面 */
 void ShowLoginPanel(void)
 {
-	LCUI_MainLoop *loop;
-
 	load_resource();
 	WidgetStyle_LoadFromFile("data/main.css");
 	BackgroundImage_Init();
