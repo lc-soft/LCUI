@@ -1,4 +1,4 @@
-#define I_NEED_WINMAIN
+ï»¿#define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_FONT_H
@@ -10,7 +10,7 @@
 #include <io.h>
 #include <fcntl.h>
 
-/* ÔÚÔËĞĞ³ÌĞòÊ±»á´ò¿ª¿ØÖÆÌ¨£¬ÒÔ²é¿´´òÓ¡µÄµ÷ÊÔĞÅÏ¢ */
+/* åœ¨è¿è¡Œç¨‹åºæ—¶ä¼šæ‰“å¼€æ§åˆ¶å°ï¼Œä»¥æŸ¥çœ‹æ‰“å°çš„è°ƒè¯•ä¿¡æ¯ */
 static void InitConsoleWindow(void)
 {
 	int hCrt;

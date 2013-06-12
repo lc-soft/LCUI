@@ -1,4 +1,4 @@
-#include <LCUI_Build.h>
+﻿#include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
 #include LC_GRAPH_H
