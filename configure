@@ -12196,13 +12196,13 @@ if test "${enable_debug+set}" = set; then :
 fi
 
 if test "$want_debug" = "yes"; then
-	CFLAGS="-O2 -g -Wall -D _GNU_SOURCE"
-	CXXFLAG="-O2 -g -Wall -D _GNU_SOURCE"
+	CFLAGS="-O2 -g -Wall -D _GNU_SOURCE -finput-charset=UTF-8"
+	CXXFLAG="-O2 -g -Wall -D _GNU_SOURCE -finput-charset=UTF-8"
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
-	CFLAGS="-O2 -Wall -D _GNU_SOURCE"
-	CXXFLAGS="-O2 -Wall -D _GNU_SOURCE"
+	CFLAGS="-O2 -Wall -D _GNU_SOURCE -finput-charset=UTF-8"
+	CXXFLAGS="-O2 -Wall -D _GNU_SOURCE -finput-charset=UTF-8"
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi

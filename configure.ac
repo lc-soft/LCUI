@@ -146,12 +146,12 @@ AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug],
 [turn on debugging [[default=no]]]), want_debug=$enableval)
 if test "$want_debug" = "yes"; then
-	CFLAGS="-O2 -g -Wall -D _GNU_SOURCE"
-	CXXFLAG="-O2 -g -Wall -D _GNU_SOURCE"
+	CFLAGS="-O2 -g -Wall -D _GNU_SOURCE -finput-charset=UTF-8"
+	CXXFLAG="-O2 -g -Wall -D _GNU_SOURCE -finput-charset=UTF-8"
 	AC_MSG_RESULT(yes)
 else
-	CFLAGS="-O2 -Wall -D _GNU_SOURCE"
-	CXXFLAGS="-O2 -Wall -D _GNU_SOURCE"
+	CFLAGS="-O2 -Wall -D _GNU_SOURCE -finput-charset=UTF-8"
+	CXXFLAGS="-O2 -Wall -D _GNU_SOURCE -finput-charset=UTF-8"
 	AC_MSG_RESULT(no)
 fi
 
