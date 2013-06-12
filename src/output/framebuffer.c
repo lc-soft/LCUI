@@ -493,4 +493,9 @@ void LCUIScreen_SyncFrameBuffer( void )
 {
 	return;
 }
+
+int LCUIScreen_SetMode( int w, int h, int mode )
+{
+	return 0;
+}
 #endif
