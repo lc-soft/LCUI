@@ -1,4 +1,4 @@
-// 测试复选框部件的程序例子
+﻿// 测试复选框部件的程序例子
 #define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -48,9 +48,7 @@ view_result( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 int main( int argc, char **argv )
 {
 	int i;
-#ifdef LCUI_BUILD_IN_WIN32
-	Win32_LCUI_Init( hInstance );
-#endif
+
 	LCUI_Init(0,0,0);
 	/* 创建部件 */
 	window  = Widget_New("window");

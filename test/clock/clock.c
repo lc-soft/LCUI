@@ -1,5 +1,5 @@
 // 时钟的例子程序
-
+#define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H

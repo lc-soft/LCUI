@@ -1,4 +1,4 @@
-// 测试矩形裁剪的示例程序
+﻿// 测试矩形裁剪的示例程序
 #define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -24,16 +24,16 @@ test_move_widget(
  * 此函数修改自Move_Widget_To_Pos函数
  * */
 {
-	if(speed <= 0) {
-		return;
-	}
-
 	int i, j, z;
 	double w, h, l, n, x, y;
 
 	LCUI_Pos pos;
 	LCUI_Queue rq;
 	LCUI_Rect bg_rect, rt, fg_rect;
+	
+	if(speed <= 0) {
+		return;
+	}
 
 	x = Widget_GetPos(widget).x;
 	y = Widget_GetPos(widget).y;

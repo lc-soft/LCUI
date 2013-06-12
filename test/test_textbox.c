@@ -10,14 +10,8 @@
 #include LC_PICBOX_H
 #include LC_GRAPH_H
 
-#ifdef LCUI_BUILD_IN_WIN32
 #define IMG_PATH_FACE	"image.png"
 #define IMG_PATH_BORDER	"faceback.png"
-
-#else
-#define IMG_PATH_FACE	"image.jpg"
-#define IMG_PATH_BORDER	"faceback.png"
-#endif
 
 
 #ifdef LCUI_BUILD_IN_WIN32
@@ -183,7 +177,7 @@ int main(int argc, char*argv[])
 	InitConsoleWindow();
 #endif
 	LCUI_Init(800,600,LCUI_INIT_MODE_AUTO);
-	BackgroundImage_Init();
+
 	window  = Widget_New("window");
 	textbox = Widget_New("text_box");
 
