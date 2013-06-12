@@ -65,8 +65,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libdraw_incore_la_LIBADD =
 am_libdraw_incore_la_OBJECTS = img_checkbox.lo img_cursor.lo \
-	img_icon.lo img_mosaics.lo img_progressbar.lo \
-	img_radiobutton.lo
+	img_icon.lo img_mosaics.lo img_radiobutton.lo
 libdraw_incore_la_OBJECTS = $(am_libdraw_incore_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -231,15 +230,14 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = foreign 
-INCLUDES = -I$(abs_top_srcdir)/include 
+AUTOMAKE_OPTIONS = foreign
+INCLUDES = -I$(abs_top_srcdir)/include
 noinst_LTLIBRARIES = libdraw_incore.la
 libdraw_incore_la_SOURCES = \
 	img_checkbox.c		\
 	img_cursor.c		\
 	img_icon.c		\
 	img_mosaics.c		\
-	img_progressbar.c	\
 	img_radiobutton.c
 
 all: all-am
@@ -298,7 +296,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_cursor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_icon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_mosaics.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_progressbar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/img_radiobutton.Plo@am__quote@
 
 .c.o:

@@ -370,7 +370,7 @@ docs/CodingStyle.zh-cn.md \
 test/README.zh-cn \
 test/Makefile.in \
 test/Makefile.am \
-test/image.jpg \
+test/image.png \
 test/style.css \
 test/logo_128x128.png \
 test/border.png \
