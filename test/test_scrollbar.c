@@ -30,7 +30,7 @@ int main(int argc, char*argv[])
 	scrollbar = Widget_New("scrollbar");
 	label = Widget_New("label");
 	/* 设定窗口标题的文本 */
-	Window_SetTitleText(window, "测试滚动条");
+	Window_SetTitleTextW(window, L"测试滚动条");
 	/* 改变窗口的尺寸 */
 	window->resize(window, Size(320, 240));
 	Widget_Resize( scrollbar, Size(10, 100) );
@@ -40,6 +40,7 @@ int main(int argc, char*argv[])
 	Widget_SetAlign( scrollbar, ALIGN_MIDDLE_CENTER, Pos(0,0) );
 
 	Label_Text( label, "0" );
+	ScrollBar_SetCurrentValue( scrollbar, 0 );
 
 	/* 将窗口客户区作为部件的容器添加进去 */
 	Window_ClientArea_Add(window, label);
