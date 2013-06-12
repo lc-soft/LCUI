@@ -393,6 +393,7 @@ test/test_window.c \
 test/test_gaussian_blur.c \
 test/test_widget_dock.c \
 test/test_widget_style.c \
+test/test_videomode.c \
 test/test_timer.c \
 test/test_textbox.c \
 test/faceback.png \

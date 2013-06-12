@@ -5,8 +5,8 @@ INCLUDES = -I$(top_builddir)/include
 ##需要编译的测试程序, noinst指的是不安装
 noinst_PROGRAMS = helloworld test_font test_radiobtn test_checkbox test_progressbar \
 test_button test_label test_loading ts_calibrate test_viewimage test_lcui_graph_mix \
-test_window test_rect_cut test_gaussian_blur test_widget_dock  test_widget_style\
-test_timer test_textbox test_scrollbar graph2array test_graphlayer \
+test_window test_rect_cut test_gaussian_blur test_widget_dock  test_widget_style \
+test_timer test_textbox test_scrollbar graph2array test_graphlayer test_videomode \
 test_messagebox
 
 ##指定测试程序的源码文件
@@ -77,3 +77,6 @@ test_messagebox_LDADD	= $(top_builddir)/src/libLCUI.la
 
 test_widget_style_SOURCES = test_widget_style.c
 test_widget_style_LDADD = $(top_builddir)/src/libLCUI.la
+
+test_videomode_SOURCES = test_videomode.c
+test_videomode_LDADD = $(top_builddir)/src/libLCUI.la
