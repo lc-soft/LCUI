@@ -1,4 +1,5 @@
-// 测试LCUI的窗口
+﻿// 测试LCUI的窗口
+#define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
@@ -12,7 +13,7 @@ static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 	LCUI_MainLoop_Quit(NULL);
 }
 
-//#define TEST_THIS
+#define TEST_THIS
 #ifdef TEST_THIS
 
 static LCUI_Widget *main_window, *label, *btn_ok, *rdbtn[5];
@@ -41,23 +42,23 @@ void switch_style(LCUI_Widget *widget, LCUI_WidgetEvent *event)
 int main( int argc, char **argv )
 {
 	int i;
-	char text[5][10] = { "蓝色","绿色", "红色", "橙色", "紫色" };
+	wchar_t text[5][10] = { L"蓝色", L"绿色", L"红色", L"橙色", L"紫色" };
 	LCUI_Pos offset_pos[5]={{-120,0},{-60,0},{0,0},{60,0},{120,0}};
 
-	LCUI_Init();
+	LCUI_Init(0,0,0);
 
 	main_window = Widget_New( "window" );
 	btn_ok = Widget_New( "button" );
 	label = Widget_New( "label" );
 	/* 设置窗口的尺寸以及标题栏文本 */
 	Widget_Resize( main_window, Size(320, 240) );
-	Window_SetTitleText( main_window, "测试窗口的风格切换" );
+	Window_SetTitleTextW( main_window, L"测试窗口的风格切换" );
 	/* 创建5个单选框部件 */
 	for(i=0; i<5; ++i) {
 		rdbtn[i] = Widget_New( "radio_button" );
 		Window_ClientArea_Add( main_window, rdbtn[i] );
 		Widget_SetAlign( rdbtn[i], ALIGN_MIDDLE_CENTER, offset_pos[i] );
-		RadioButton_Text( rdbtn[i], text[i] );
+		RadioButton_TextW( rdbtn[i], text[i] );
 		Widget_Show( rdbtn[i] );
 	}
 	/* 为单选框建立互斥关系 */
@@ -76,8 +77,8 @@ int main( int argc, char **argv )
 	Widget_SetAlign( btn_ok, ALIGN_MIDDLE_CENTER, Pos(0,50) );
 	Widget_SetAlign( label, ALIGN_MIDDLE_CENTER, Pos(0,-50) );
 	/* 设置部件的文本 */
-	Button_Text( btn_ok, "应用" );
-	Label_Text( label, "选择窗口配色：" );
+	Button_TextW( btn_ok, L"应用" );
+	Label_TextW( label, L"选择窗口配色：" );
 	/* 为按钮的点击事件关联回调函数 */
 	Widget_Event_Connect( btn_ok, EVENT_CLICKED, switch_style );
 	Widget_Event_Connect( Window_GetCloseButton(main_window), EVENT_CLICKED, destroy );
@@ -92,15 +93,14 @@ int main( int argc, char **argv )
 #else
 
 int main(int argc, char*argv[])
-/* 主函数，程序的入口 */
 {
-	LCUI_Init(0,0,0);
 	LCUI_Widget *windows[4];
+	LCUI_Init(800,600,0);
 	/* 创建窗口部件 */
-	windows[0] = Window_New("主窗口", NULL, Size(320, 240));
-	windows[1] = Window_New("子窗口 A", NULL, Size(240, 200));
-	windows[2] = Window_New("子窗口 B", NULL, Size(180, 150));
-	windows[3] = Window_New("子窗口 C", NULL, Size(150, 100));
+	windows[0] = Window_New("main", NULL, Size(320, 240));
+	windows[1] = Window_New("child A", NULL, Size(240, 200));
+	windows[2] = Window_New("child B", NULL, Size(180, 150));
+	windows[3] = Window_New("child C", NULL, Size(150, 100));
 	/* 改变风格 */
 	Widget_SetStyleID( windows[1], WINDOW_STYLE_PURE_ORANGE );
 	Widget_SetStyleID( windows[2], WINDOW_STYLE_PURE_GREEN );
@@ -115,7 +115,7 @@ int main(int argc, char*argv[])
 	Widget_Show(windows[2]);
 	Widget_Show(windows[3]);
 	Widget_Event_Connect( Window_GetCloseButton(windows[0]), EVENT_CLICKED, destroy);
-	LCUI_Main(); /* 进入主循环 */
+	LCUI_Main();
 	return 0;
 }
 #endif
