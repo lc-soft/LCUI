@@ -32,13 +32,13 @@ int main( int argc, char*argv[] )
 	Widget_Resize(pic_box, Size(135,135));
 	Widget_Resize(window, Size(width, height));
 
-	Window_SetTitleText(window, "头像");
+	Window_SetTitleTextW(window, L"头像");
 
 	PictureBox_SetSizeMode(pic_box, SIZE_MODE_STRETCH);
-	PictureBox_SetImageFile(pic_box, "image.jpg");
+	PictureBox_SetImageFile(pic_box, "image.png");
 	PictureBox_SetImageFile(fore_box, "border.png");
 
-	Label_Text(label, "蛋疼的头像");
+	Label_TextW(label, L"<size=16px>这是一段文本</size>");
 
 	Widget_SetAlign(pic_box, ALIGN_MIDDLE_CENTER, Pos(0, -20));
 	Widget_SetAlign(fore_box, ALIGN_MIDDLE_CENTER, Pos(0, -20));
