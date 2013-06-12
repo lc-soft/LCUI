@@ -142,15 +142,18 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 		break;
 	    case WIDGET_PAINT:
 	    case WIDGET_REFRESH:
-	    case WIDGET_HIDE:
 	    case WIDGET_UPDATE:
-	    case WIDGET_SHOW:
 	    case WIDGET_SORT:
 		tmp_msg.valid = FALSE;
 		break;
+		/* 部件的显示、隐藏和销毁消息，需要发送到父部件 */
+	    case WIDGET_SHOW:
+	    case WIDGET_HIDE:
 	    case WIDGET_DESTROY:
-		/* 部件的销毁消息需要发送到父部件 */
-		widget = widget->parent;
+		/* 如果不是根部件 */
+		if( widget != RootWidget_GetSelf() ) {
+			widget = widget->parent;
+		} 
 		tmp_msg.valid = FALSE;
 		break;
 	    default:
@@ -165,7 +168,8 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 			continue;
 		}
 		if(tmp_msg_ptr->valid != tmp_msg.valid
-		|| tmp_msg_ptr->msg_id != tmp_msg.msg_id) {
+		|| tmp_msg_ptr->msg_id != tmp_msg.msg_id
+		|| tmp_msg_ptr->target != tmp_msg.target ) {
 			continue;
 		}
 		++n_found;

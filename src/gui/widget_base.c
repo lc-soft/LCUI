@@ -702,9 +702,9 @@ Widget_PrintChildList( LCUI_Widget *widget )
 		if( child == NULL ) {
 			continue;
 		}
-		printf("[%d] widget: %p, type: %s, z-index: %d, pos: (%d,%d), size: (%d, %d)\n",
-			i, child, child->type_name.string, child->glayer->z_index,
-			child->pos.x, child->pos.y,
+		printf("[%d] widget: %p, type: %s, visible: %s, z-index: %d, pos: (%d,%d), size: (%d, %d)\n",
+			i, child, child->type_name.string, child->visible?"TRUE":"FALSE",
+			child->glayer->z_index, child->pos.x, child->pos.y,
 			child->size.w, child->size.h);
 	}
 	return 0;
@@ -722,7 +722,7 @@ print_widget_info(LCUI_Widget *widget)
 	LCUI_Queue *child_list;
 	if( widget ) {
 		if( widget->parent ) {
-			child_list = &widget->child;
+			child_list = &widget->parent->child;
 		} else {
 			child_list = &root_widget.child;
 		}
@@ -1792,7 +1792,7 @@ Widget_Front( LCUI_Widget *widget )
 	LCUI_Widget *child;
 	LCUI_Queue *child_list;
 
-	if( widget == NULL ) {
+	if( widget == NULL || widget == &root_widget ) {
 		return -1;
 	}
 	child_list = Widget_GetChildList( widget->parent );
@@ -2386,8 +2386,8 @@ Widget_Show(LCUI_Widget *widget)
 	if( !widget ) {
 		return;
 	}
-	WidgetMsg_Post( widget, WIDGET_SHOW, NULL, TRUE, FALSE );
 	WidgetMsg_Post( widget->parent, WIDGET_SORT, NULL, TRUE, FALSE );
+	WidgetMsg_Post( widget, WIDGET_SHOW, NULL, TRUE, FALSE );
 }
 
 LCUI_API void
@@ -2429,15 +2429,8 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 		return TRUE;
 	}
 	if( widget == NULL ) {
-		switch(data_ptr->msg_id) {
-		case WIDGET_SORT:
-			Widget_ExecSortChild( widget );
-		default:
-			break;
-		}
-		return TRUE;
+		widget = &root_widget;
 	}
-	DEBUG_MSG("widget: %p, msg id: %d\n", widget, data_ptr->msg_id);
 	/* 根据不同的类型来进行处理 */
 	switch(data_ptr->msg_id) {
 	case WIDGET_RESIZE:
@@ -2483,13 +2476,13 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 		Widget_Unlock( widget );
 		break;
 	case WIDGET_HIDE:
-		Widget_ExecHide( widget );
+		Widget_ExecHide( data_ptr->target );
 		break;
 	case WIDGET_SORT:
 		Widget_ExecSortChild( widget );
 		break;
 	case WIDGET_SHOW:
-		Widget_ExecShow( widget );
+		Widget_ExecShow( data_ptr->target );
 		/* 更新父部件中的STATIC定位类型的子部件的位置 */
 		//Widget_UpdateChildStaticPos( widget->parent );
 		break;
