@@ -172,6 +172,7 @@ static void create_error_tip( LCUI_Widget **tip )
 	TextStyle_FontSize( &style, 15 );
 	Widget_SetAlign( widget, ALIGN_MIDDLE_CENTER, Pos(0,85) );
 	Label_TextStyle( widget, style );
+	Label_TextW( widget, TEXT_PASSWD_ERROR );
 	*tip = widget;
 }
 
@@ -183,7 +184,6 @@ static void verify_passwd( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 	if( wcscmp( buff, L"123456" ) == 0 ) {
 		LCUI_MainLoop_Quit(NULL);
 	} else {
-		Label_TextW( error_tip, TEXT_PASSWD_ERROR );
 		Widget_Show( error_tip );
 	}
 }
