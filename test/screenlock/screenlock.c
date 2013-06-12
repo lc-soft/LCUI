@@ -10,6 +10,13 @@
 #include LC_PICBOX_H
 #include <time.h>
 
+static LCUI_Widget	*pic_bg, *time_box, *pic_btn_line,
+			*pic_btn, *pic_l1, *pic_l2,
+			*pic_c, *pic_r1, *pic_r2;
+
+static LCUI_Widget *wday_label, *date_label;
+static LCUI_Graph img_digital[9], img_dot, img_bg, img_btn, img_btn_bg;
+
 /* 移动滑块 */
 void move_pic_btn(LCUI_Widget *widget, LCUI_WidgetEvent *event)
 {
@@ -21,7 +28,6 @@ void move_pic_btn(LCUI_Widget *widget, LCUI_WidgetEvent *event)
 	pos = Pos_Sub(event->drag.new_pos, parent);
 	Widget_Move(widget, pos);
 	if(event->drag.end_click) {/* 如果拖动已经结束 */
-		//usleep(10000);
 		rect = Widget_GetRect(widget);
 		size = Widget_GetSize(widget->parent);
 		des = Rect(size.w-10, 0, 30, 30);/* 目标区域 */
@@ -33,13 +39,6 @@ void move_pic_btn(LCUI_Widget *widget, LCUI_WidgetEvent *event)
 		}
 	}
 }
-
-static LCUI_Widget	*pic_bg, *time_box, *pic_btn_line, *pic_btn,
-			*win, *pic_l1, *pic_l2,
-			*pic_c, *pic_r1, *pic_r2;
-
-static LCUI_Widget *wday_label, *date_label;
-static LCUI_Graph img_digital[9], img_dot, img_bg, img_btn, img_btn_bg;
 
 static void LoadIMG(void)
 {
@@ -79,12 +78,12 @@ static void update_time(void)
 	struct tm *timeinfo;
 	wchar_t date_text[64];
 	wchar_t day[][20] = {
-		L"星期天", L"星期一", L"星期二", 
+		L"星期天", L"星期一", L"星期二",
 		L"星期三", L"星期四", L"星期五", L"星期六"};
 
 	time ( &rawtime );
 	/* 获取系统当前时间 */
-	timeinfo = localtime ( &rawtime ); 
+	timeinfo = localtime ( &rawtime );
 	swprintf( date_text, 64,
 		L"<color=40,165,45>%4d年%02d月%02d日</color>",
 		timeinfo->tm_year+1900, timeinfo->tm_mon+1,
@@ -183,7 +182,6 @@ static void CreateGUI( LCUI_Widget *win )
 
 int main( int argc, char **argv )
 {
-	LCUI_Thread t;
 	LCUI_Widget *window;
 	/* 载入图像资源 */
 	LoadIMG();

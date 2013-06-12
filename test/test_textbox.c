@@ -13,26 +13,6 @@
 #define IMG_PATH_FACE	"image.png"
 #define IMG_PATH_BORDER	"faceback.png"
 
-
-#ifdef LCUI_BUILD_IN_WIN32
-#include <io.h>
-#include <fcntl.h>
-
-/* 在运行程序时会打开控制台，以查看打印的调试信息 */
-static void InitConsoleWindow(void)
-{
-	int hCrt;
-	FILE *hf;
-	AllocConsole();
-	hCrt=_open_osfhandle((long)GetStdHandle(STD_OUTPUT_HANDLE),_O_TEXT );
-	hf=_fdopen( hCrt, "w" );
-	*stdout=*hf;
-	setvbuf (stdout, NULL, _IONBF, 0);
-	// test code
-	printf ("InitConsoleWindow OK!\n");
-}
-#endif
-
 static void callback( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	LCUI_MainLoop_Quit(NULL);
@@ -73,10 +53,6 @@ int main(int argc, char**argv)
 	LCUI_Widget *window, *text[2];
 	LCUI_Widget *area, *login_btn;
 	LCUI_Widget *fore_pb, *back_pb;
-
-#ifdef LCUI_BUILD_IN_WIN32
-	//InitConsoleWindow();
-#endif
 
 	LCUI_Init(800,600,LCUI_INIT_MODE_WINDOW);
 	/* 创建所需的部件 */
@@ -173,9 +149,6 @@ int main(int argc, char*argv[])
 	char buff[256];
 	LCUI_Widget *window, *textbox;
 
-#ifdef LCUI_BUILD_IN_WIN32
-	InitConsoleWindow();
-#endif
 	LCUI_Init(800,600,LCUI_INIT_MODE_AUTO);
 
 	window  = Widget_New("window");
@@ -188,7 +161,7 @@ int main(int argc, char*argv[])
 	TextBox_Multiline( textbox, TRUE );
 	textbox->set_align( textbox, ALIGN_MIDDLE_CENTER, Pos(0,0) );
 	/* 打开README.md文件，并将内容读取至文本框上显示 */
-	fp = fopen("style.css", "r");
+	fp = fopen("../README.md", "r");
 	if( fp ) {
 		while(fgets( buff, sizeof(buff), fp )) {
 			TextBox_Text_Append( textbox, buff );
