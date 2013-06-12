@@ -173,7 +173,7 @@ static void LCUIIME_DestroyInfo( void *arg )
 static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 {
 	char ch;
-	
+
 	switch(event->key_code) {
 #ifdef LCUI_BUILD_IN_WIN32
 	case 189: ch = '-'; break;
@@ -189,7 +189,7 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 #endif
 	default:ch = event->key_code;break;
 	}
-	
+
 	DEBUG_MSG("key code: %d\n", event->key_code);
 	/* 如果没开启大写锁定，则将字母转换成小写 */
 	if( !enable_capitals_lock ) {
@@ -336,7 +336,29 @@ static LCUI_Widget *target_widget = NULL;
 static LCUI_BOOL
 IME_ProcessKey( int key )
 {
+#ifdef LCUI_BUILD_IN_LINUX
+	/* *
+	 * LCUI的linux键盘驱动获取的是输入的字符的ASCII码，而不是实际键值，
+	 * 因此，直接判断是否为可显字符即可
+	 * */
+	if( key >= '!' && key <= '~') {
+		return TRUE;
+	}
+#endif
 	switch(key) {
+	case LCUIKEY_ENTER:
+	case LCUIKEY_SPACE:
+#ifdef LCUI_BUILD_IN_WIN32
+	case LCUIKEY_0:
+	case LCUIKEY_1:
+	case LCUIKEY_2:
+	case LCUIKEY_3:
+	case LCUIKEY_4:
+	case LCUIKEY_5:
+	case LCUIKEY_6:
+	case LCUIKEY_7:
+	case LCUIKEY_8:
+	case LCUIKEY_9:
 	case LCUIKEY_A:
 	case LCUIKEY_B:
 	case LCUIKEY_C:
@@ -363,18 +385,6 @@ IME_ProcessKey( int key )
 	case LCUIKEY_X:
 	case LCUIKEY_Y:
 	case LCUIKEY_Z:
-	case LCUIKEY_0:
-	case LCUIKEY_1:
-	case LCUIKEY_2:
-	case LCUIKEY_3:
-	case LCUIKEY_4:
-	case LCUIKEY_5:
-	case LCUIKEY_6:
-	case LCUIKEY_7:
-	case LCUIKEY_8:
-	case LCUIKEY_9:
-	case LCUIKEY_SPACE:
-#ifdef LCUI_BUILD_IN_WIN32
 	case 189:
 	case 187:
 	case 188:
@@ -408,7 +418,7 @@ static void
 IME_ToText( char ch )
 {
 	wchar_t text[2];
-	
+
 	text[0] = ch;
 	text[1] = '\0';
 	DEBUG_MSG("%S\n", text);
