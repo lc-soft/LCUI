@@ -2448,7 +2448,7 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 			ret = Widget_ExecResize( widget, data_ptr->data.size );
 		}
 		if( ret == 0 ) {
-			Widget_ExecDraw( widget );
+			Widget_Draw( widget );
 			Widget_UpdatePos( widget );
 		}
 		break;
