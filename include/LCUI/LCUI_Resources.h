@@ -50,10 +50,6 @@ LCUI_API int Load_Graph_Default_Cursor(LCUI_Graph *pic);
 LCUI_API int Load_Graph_Mosaics(LCUI_Graph *pic);
 /* 功能：载入马赛克图形 */ 
 
-LCUI_API int Load_Graph_ProgressBar_Img(LCUI_Graph *out);
-
-LCUI_API int Load_Graph_ProgressBar_Fore(LCUI_Graph *out);
-
 LCUI_API int Load_Graph_Icon_Error(LCUI_Graph *pic);
 /* 功能：载入图形，该图形为“错误”图标 */ 
 
@@ -70,20 +66,6 @@ LCUI_API int Load_Graph_Icon_LCUI(LCUI_Graph *pic);
 /* 功能：载入图形，该图形为LCUI的LOGO */
 
 LCUI_API int Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out);
-
-LCUI_API int Load_Graph_Default_TitleBar_CloseBox_Normal(LCUI_Graph *pic);
-/* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为正常状态 */ 
-
-LCUI_API int Load_Graph_Default_TitleBar_CloseBox_HighLight(LCUI_Graph *pic);
-/* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为高亮状态 */ 
-
-LCUI_API int Load_Graph_Default_TitleBar_CloseBox_Down(LCUI_Graph *pic);
-/* 功能：载入图形，该图形为标题栏上的关闭按钮，按钮为按下状态 */ 
-
-LCUI_API int Load_Graph_Default_TitleBar_BG(LCUI_Graph *pic);
-/*
- * 功能：载入默认的标题栏背景图
- */
 
 LCUI_API int Load_Graph_Default_CheckBox_Off_Normal(LCUI_Graph *pic);
 

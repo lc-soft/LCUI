@@ -85,10 +85,6 @@ LCUI_API int
 Graph_Smooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
 /* 对图像进行模糊处理 */
 
-LCUI_API int
-Draw_Empty_Slot(LCUI_Graph *graph, int width, int height);
-/* 功能：绘制进度条的空槽 */ 
-
 LCUI_END_HEADER
 
 #endif
