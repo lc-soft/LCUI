@@ -4,8 +4,9 @@
 #include LC_LCUI_H
 #include LC_MISC_H
 #include LC_GRAPH_H
+#include <time.h>
 
-int main()
+int main(int argc, char **argv)
 {
 	clock_t time, t;
 	int i, w, h;

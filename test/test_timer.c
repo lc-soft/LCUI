@@ -1,4 +1,4 @@
-// 测试LCUI的定时器
+﻿// 测试LCUI的定时器
 #define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
