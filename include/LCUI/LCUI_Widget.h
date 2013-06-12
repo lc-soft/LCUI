@@ -99,7 +99,6 @@ typedef struct LCUI_Background_ {
 } LCUI_Background;
 /*--------------------------------------------------------*/
 
-typedef struct	LCUI_Widget_	LCUI_Widget;
 struct LCUI_Widget_ {
 	LCUI_ID app_id;		/* 所属程序的ID */
 	LCUI_ID self_id;	/* 自身ID */
