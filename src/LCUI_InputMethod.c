@@ -418,7 +418,13 @@ static void
 IME_ToText( char ch )
 {
 	wchar_t text[2];
-
+	
+#ifdef LCUI_BUILD_IN_WIN32
+	/* 回车符转换行符 */
+	if( ch == '\r' ) {
+		ch = '\n';
+	}
+#endif
 	text[0] = ch;
 	text[1] = '\0';
 	DEBUG_MSG("%S\n", text);
