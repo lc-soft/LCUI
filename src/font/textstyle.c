@@ -40,8 +40,8 @@
  * ****************************************************************************/
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include LC_FONT_H
 #include LC_GRAPH_H
+#include LC_FONT_H
 
 /* 初始化字体样式数据 */
 LCUI_API void

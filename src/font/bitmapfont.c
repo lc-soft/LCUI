@@ -43,9 +43,9 @@
 //#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H
+#include LC_GRAPH_H
 #include LC_FONT_H
 #include LC_ERROR_H
-#include LC_GRAPH_H
 
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 #define LCUI_FONT_RENDER_MODE	FT_RENDER_MODE_NORMAL
