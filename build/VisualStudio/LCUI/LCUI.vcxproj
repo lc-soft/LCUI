@@ -236,11 +236,9 @@
     <ClCompile Include="..\..\..\src\draw\in-core\img_cursor.c" />
     <ClCompile Include="..\..\..\src\draw\in-core\img_icon.c" />
     <ClCompile Include="..\..\..\src\draw\in-core\img_mosaics.c" />
-    <ClCompile Include="..\..\..\src\draw\in-core\img_progressbar.c" />
     <ClCompile Include="..\..\..\src\draw\in-core\img_radiobutton.c" />
     <ClCompile Include="..\..\..\src\draw\line.c" />
     <ClCompile Include="..\..\..\src\draw\rotate.c" />
-    <ClCompile Include="..\..\..\src\draw\slot.c" />
     <ClCompile Include="..\..\..\src\draw\smooth.c" />
     <ClCompile Include="..\..\..\src\font\bitmapfont.c" />
     <ClCompile Include="..\..\..\src\font\charset.c" />
