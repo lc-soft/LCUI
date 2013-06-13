@@ -1,42 +1,42 @@
 /* ***************************************************************************
  * button.c -- LCUI‘s Button widget
- *
+ * 
  * Copyright (C) 2012-2013 by
  * Liu Chao
- *
+ * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- *
+ * 
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- *
+ * 
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *
- * The LCUI project is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- *
- * You should have received a copy of the GPLv2 along with this file. It is
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
-
+ 
 /* ****************************************************************************
  * button.c -- LCUI 的按钮部件
  *
  * 版权所有 (C) 2012-2013 归属于
  * 刘超
- *
+ * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- *
+ * 
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- *
+ * 
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>.
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 //#define DEBUG
 #include <LCUI_Build.h>
@@ -84,7 +84,7 @@ static void Button_ExecCustomUpdate( LCUI_Widget *widget )
 {
 	LCUI_Button *btn;
 	LCUI_Graph *img;
-
+	
 	btn = Widget_GetPrivData( widget );
 	switch(widget->state) {
 	case WIDGET_STATE_NORMAL: img = &btn->btn_normal; break;
@@ -153,7 +153,7 @@ static void Button_ExecUpdate( LCUI_Widget *widget )
 	Widget_Refresh( widget );
 }
 
-static void
+static void 
 Button_ProcFocusOut( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	Widget_Update( widget );
@@ -166,19 +166,19 @@ Button_Init( LCUI_Widget *widget )
 {
 	int valid_state;
 	LCUI_Button *button;
-
+	
 	button = WidgetPrivData_New(widget, sizeof(LCUI_Button));
-	/* 初始化图像数据 */
+	/* 初始化图像数据 */ 
 	Graph_Init(&button->btn_disable);
 	Graph_Init(&button->btn_normal);
 	Graph_Init(&button->btn_focus);
 	Graph_Init(&button->btn_down);
 	Graph_Init(&button->btn_over);
-
+	
 	valid_state = (WIDGET_STATE_NORMAL | WIDGET_STATE_ACTIVE);
 	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);
 	Widget_SetValidState( widget, valid_state );
-	button->label = Widget_New("label");/* 创建label部件 */
+	button->label = Widget_New("label");/* 创建label部件 */ 
 	/* 将按钮部件作为label部件的容器 */
 	Widget_Container_Add(widget, button->label);
 	/* label部件居中显示 */
@@ -201,8 +201,8 @@ Button_GetLabel( LCUI_Widget *widget )
 
 /* 自定义按钮在各种状态下显示的位图 */
 LCUI_API void
-Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal,
-			LCUI_Graph *over, LCUI_Graph *down,
+Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal, 
+			LCUI_Graph *over, LCUI_Graph *down, 
 			LCUI_Graph *focus, LCUI_Graph *disable)
 {
 	LCUI_Button *btn_data;
@@ -243,7 +243,7 @@ Button_Text( LCUI_Widget *widget, const char *text )
 {
 	LCUI_Button *button;
 	LCUI_Widget *label;
-
+	
 	button = (LCUI_Button*)Widget_GetPrivData(widget);
 	label = button->label;
 	/* 设定部件显示的文本 */
@@ -255,7 +255,7 @@ Button_TextW( LCUI_Widget *widget, const wchar_t *text )
 {
 	LCUI_Button *button;
 	LCUI_Widget *label;
-
+	
 	button = (LCUI_Button*)Widget_GetPrivData(widget);
 	label = button->label;
 	Label_TextW( label, text );
@@ -277,7 +277,7 @@ Register_Button(void)
 {
 	/* 添加部件类型 */
 	WidgetType_Add("button");
-
+	
 	/* 为部件类型关联相关函数 */
 	WidgetFunc_Add("button", Button_Init,		FUNC_TYPE_INIT);
 	WidgetFunc_Add("button", Button_ExecUpdate,	FUNC_TYPE_UPDATE);
