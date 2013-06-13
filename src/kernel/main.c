@@ -1,58 +1,58 @@
 /* ***************************************************************************
  * main.c -- The main functions for the LCUI normal work
- *
+ * 
  * Copyright (C) 2012-2013 by
  * Liu Chao
- *
+ * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- *
+ * 
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- *
+ * 
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *
- * The LCUI project is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- *
- * You should have received a copy of the GPLv2 along with this file. It is
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
-
+ 
 /* ****************************************************************************
  * main.c -- 使LCUI能够正常工作的相关主要函数
  *
  * 版权所有 (C) 2012-2013 归属于
  * 刘超
- *
+ * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- *
+ * 
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- *
+ * 
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>.
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
 #include LC_RES_H
 #include LC_DISPLAY_H
-#include LC_CURSOR_H
+#include LC_CURSOR_H 
 #include LC_INPUT_H
 #include LC_INPUT_METHOD_H
 #include LC_ERROR_H
-#include LC_FONT_H
+#include LC_FONT_H 
 #include LC_WIDGET_H
 
 #include <time.h>
 
-LCUI_System LCUI_Sys;
+LCUI_System LCUI_Sys; 
 
 static LCUI_Queue global_app_list;	/* LCUI程序列表 */
 
@@ -71,7 +71,7 @@ LCUI_MainLoopQueue_Find( void )
 {
 	int i, total;
 	LCUI_MainLoop *loop;
-
+	
 	total = Queue_GetTotal( &mainloop_queue );
 	for(i=0; i<total; ++i) {
 		loop = Queue_Get( &mainloop_queue, i );
@@ -87,7 +87,7 @@ LCUI_MainLoopQueue_Sort( void )
 {
 	int i, j, total;
 	LCUI_MainLoop *cur_loop, *next_loop;
-
+	
 	total = Queue_GetTotal( &mainloop_queue );
 	for(i=0; i<total; ++i) {
 		cur_loop = Queue_Get( &mainloop_queue, i );
@@ -97,7 +97,7 @@ LCUI_MainLoopQueue_Sort( void )
 		for(j=i+1; j<total; ++j) {
 			next_loop = Queue_Get( &mainloop_queue, j );
 			if( !next_loop ) {
-				continue;
+				continue; 
 			}
 			if( next_loop->level > cur_loop->level ) {
 				Queue_Swap( &mainloop_queue, j, i);
@@ -112,7 +112,7 @@ LCUI_MainLoop_GetAvailable(void)
 {
 	int i, total;
 	LCUI_MainLoop *loop;
-
+	
 	total = Queue_GetTotal( &mainloop_queue );
 	for(i=0; i<total; ++i) {
 		loop = Queue_Get( &mainloop_queue, i );
@@ -132,7 +132,7 @@ LCUI_API LCUI_MainLoop*
 LCUI_MainLoop_New( void )
 {
 	LCUI_MainLoop *loop;
-
+	
 	if( !init_mainloop_queue ) {
 		LCUI_MainLoopQueue_Init();
 		init_mainloop_queue = TRUE;
@@ -171,17 +171,17 @@ static LCUI_BOOL
 LCUIApp_HaveTask( LCUI_App *app )
 {
 	if( !app ) {
-		return FALSE;
+		return FALSE; 
 	}
 	if(Queue_GetTotal(&app->tasks) > 0) {
-		return TRUE;
+		return TRUE; 
 	}
 	return FALSE;
 }
 
-static int
+static int 
 LCUIApp_RunTask( LCUI_App *app )
-{
+{ 
 	LCUI_Task *task;
 
 	Queue_Lock( &app->tasks );
@@ -228,7 +228,7 @@ LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 	while( !loop->quit && LCUI_Sys.state == ACTIVE ) {
 		if( LCUIApp_HaveTask(app) ) {
 			idle_time = 1;
-			LCUIApp_RunTask( app );
+			LCUIApp_RunTask( app ); 
 		} else {
 			LCUI_MSleep (idle_time);
 			if (idle_time < MAX_APP_IDLE_TIME) {
@@ -294,9 +294,9 @@ LCUI_DestroyMainLoopQueue(void)
 LCUI_API LCUI_App*
 LCUIApp_Find( LCUI_ID id )
 {
-	LCUI_App *app;
+	LCUI_App *app; 
 	int i, total;
-
+	
 	total = Queue_GetTotal(&global_app_list);
 	if (total > 0) { /* 如果程序总数大于0 */
 		for (i = 0; i < total; ++i) {
@@ -306,18 +306,18 @@ LCUIApp_Find( LCUI_ID id )
 			}
 		}
 	}
-
+	
 	return NULL;
 }
 
 /* 获取指向程序数据的指针 */
-LCUI_API LCUI_App*
+LCUI_API LCUI_App* 
 LCUIApp_GetSelf( void )
 {
 	LCUI_Thread id;
-
-	id = LCUIThread_SelfID(); /* 获取本线程ID */
-	if(id == LCUI_Sys.display_thread
+	
+	id = LCUIThread_SelfID(); /* 获取本线程ID */  
+	if(id == LCUI_Sys.display_thread 
 	|| id == LCUI_Sys.dev_thread
 	|| id == LCUI_Sys.self_id
 	|| id == LCUI_Sys.timer_thread )
@@ -351,7 +351,7 @@ static void LCUIApp_Init( LCUI_App *app )
 
 static void LCUI_DestroyAllApps(void)
 {
-	LCUI_App *app;
+	LCUI_App *app; 
 	int i, total;
 
 	Queue_Lock( &global_app_list );
@@ -361,7 +361,7 @@ static void LCUI_DestroyAllApps(void)
 		if(app == NULL) {
 			continue;
 		}
-		Queue_Delete (&global_app_list, 0);
+		Queue_Delete (&global_app_list, 0); 
 	}
 	Queue_Unlock( &global_app_list );
 	Queue_Destroy( &global_app_list );
@@ -393,27 +393,26 @@ LCUI_API void LCUI_Quit( void )
 static int LCUIAppList_Delete( LCUI_ID app_id )
 {
 	int pos = -1;
-	LCUI_App *app;
-	int i, total;
-
+	LCUI_App *app; 
+	int i, total;  
+	
 	total = Queue_GetTotal(&global_app_list);
-	/* 如果程序总数大于0，查找程序信息所在队列的位置 */
-	if (total > 0) {
-		for (i = 0; i < total; ++i) {
-			app = Queue_Get(&global_app_list, i);
-			if(app->id == app_id) {
-				pos = i;
-				break;
-			}
-		}
-		if(pos < 0) {
-			return -1;
-		}
-	} else {
+	if( total <= 0 ) {
 		return -1;
 	}
-	/* 从程序显示顺序队列中删除这个程序ID */
-	Queue_Delete (&global_app_list, pos);
+	/* 查找程序信息所在队列的位置 */
+	for (i = 0; i < total; ++i) {
+		app = Queue_Get(&global_app_list, i);
+		if(app->id == app_id) {
+			pos = i;
+			break;
+		}
+	}
+	if(pos < 0) {
+		return -1;
+	}
+	/* 从程序显示顺序队列中删除这个程序ID */ 
+	Queue_Delete( &global_app_list, pos );
 	return 0;
 }
 
@@ -439,7 +438,7 @@ static void LCUIAppList_Init(void)
 	Queue_Init(&global_app_list, sizeof(LCUI_App), LCUIApp_Destroy);
 }
 
-/*
+/* 
  * 功能：创建一个LCUI程序
  * 说明：此函数会将程序信息添加至程序列表
  * 返回值：成功则返回程序的ID，失败则返回-1
@@ -447,9 +446,9 @@ static void LCUIAppList_Init(void)
 static int LCUIAppList_Add( void )
 {
 	LCUI_App app;
-
+	
 	LCUIApp_Init (&app); /* 初始化程序数据结构体 */
-	app.id	= LCUIThread_SelfID(); /* 保存ID */
+	app.id	= LCUIThread_SelfID(); /* 保存ID */ 
 	Queue_Add(&global_app_list, &app); /* 添加至队列 */
 	LCUIApp_RegisterMainThread( app.id ); /* 注册程序主线程 */
 	return 0;
@@ -476,9 +475,9 @@ static int LCUIApp_Quit(void)
 	if( !app ) {
 		printf("%s (): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
 		return -1;
-	}
-	LCUIAppList_Delete(app->id);
-	/* 如果程序列表为空,就退出LCUI */
+	} 
+	LCUIAppList_Delete(app->id); 
+	/* 如果程序列表为空,就退出LCUI */  
 	if (Queue_Empty(&global_app_list)) {
 		LCUI_Quit();
 	}
@@ -509,8 +508,8 @@ LCUI_API LCUI_BOOL LCUI_Active(void)
 	return FALSE;
 }
 
-/*
- * 功能：用于对LCUI进行初始化操作
+/* 
+ * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */
 LCUI_API int LCUI_Init( int w, int h, int mode )
@@ -543,7 +542,7 @@ LCUI_API int LCUI_Init( int w, int h, int mode )
 		LCUIModule_Widget_Init();
 		LCUIModule_Video_Init(w, h, mode);
 		/* 让鼠标游标居中显示 */
-		LCUICursor_SetPos( LCUIScreen_GetCenter() );
+		LCUICursor_SetPos( LCUIScreen_GetCenter() );  
 		LCUICursor_Show();
 	} else {
 		temp = LCUIAppList_Add();
@@ -557,7 +556,7 @@ LCUI_API int LCUI_Init( int w, int h, int mode )
 	return 0;
 }
 
-/*
+/* 
  * 功能：LCUI程序的主循环
  * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
  *  */
