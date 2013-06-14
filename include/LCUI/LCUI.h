@@ -240,54 +240,67 @@ LCUI_END_HEADER
 #endif
 
 #if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS) &&defined(I_NEED_WINMAIN)
-extern int main(int,char**);
+
+#include <tchar.h>
+
+#ifdef _UNICODE
+#define _tcstok_s wcstok_s
+#define _tcscpy_s wcscpy_s
+#else
+#define _tcstok_s strtok_s
+#define _tcscpy_s strcpy_s
+#endif
+
+/* 若是UNICODE字符，请手动将参数argv转换由char为wchar_t类型 */
+extern int main( int argc, char *argv[] );
+
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow )
 {
-	char *pCmdLine, *cmdline_buff;
-	char *token = NULL, *next_token = NULL;
-	char **argv = NULL;
 	int ret, len, i = 0, argc = 0;
+	TCHAR *pCmdLine, *cmdline_buff;
+	TCHAR *token = NULL, *next_token = NULL;
+	TCHAR **argv = NULL;
 	
 	Win32_LCUI_Init( hInstance );
 	/* 获取命令行 */
 	pCmdLine = GetCommandLine();
 	/* 计算命令行的长度 */
-	len = strlen( pCmdLine ) + 1;
+	len = _tclen( pCmdLine ) + 1;
 	/* 分配一段相应长度的内存空间 */
-	cmdline_buff = (char*)malloc(sizeof(char)*len); 
+	cmdline_buff = (TCHAR*)malloc(sizeof(TCHAR)*len); 
 	if( cmdline_buff == NULL ) {
 		return -1;
 	}
 	/* 拷贝该命令行 */
-	strcpy_s( cmdline_buff, len, pCmdLine );	
+	_tcscpy_s( cmdline_buff, len, pCmdLine );
 	/* 计算命令行中参数的个数 */
-	token = strtok_s( cmdline_buff, " \r\t\n", &next_token );
+	token = _tcstok_s( cmdline_buff, _T(" \r\t\n"), &next_token );
 	while( token != NULL ) {
 		argc++;
-		token = strtok_s( NULL, " \r\t\n", &next_token );
+		token = _tcstok_s( NULL, _T(" \r\t\n"), &next_token );
 	}
 	/* 根据参数个数来分配内存空间 */
 	if( argc > 0 ) {
-		argv = (char**)malloc(sizeof(char*)*argc);
+		argv = (TCHAR**)malloc(sizeof(TCHAR*)*argc);
 		if( argv == NULL ) {
 			return -1;
 		}
 	}
 	/* 由于strtok_s函数会修改cmdline_buff里的内容，因此，需要重新拷贝一次 */
-	strcpy_s( cmdline_buff, len, pCmdLine );
-	token = strtok_s( cmdline_buff, " \r\t\n", &next_token );
+	_tcscpy_s( cmdline_buff, len, pCmdLine );
+	token = _tcstok_s( cmdline_buff, _T(" \r\t\n"), &next_token );
 	while( token != NULL ) {
-		len = strlen( token ) + 1;
-		argv[i] = (char*)malloc(sizeof(char)*len);
+		len = _tclen( token ) + 1;
+		argv[i] = (TCHAR*)malloc(sizeof(TCHAR)*len);
 		if( argv[i] == NULL ) {
 			return -1;
 		}
-		strcpy_s( argv[i], len, token );
-		token = strtok_s( NULL, " \r\t\n", &next_token );
+		_tcscpy_s( argv[i], len, token );
+		token = _tcstok_s( NULL, _T(" \r\t\n"), &next_token );
 		++i;
 	}
 	/* 调用main函数 */
-	ret = main( argc, argv );
+	ret = main( argc, (char**)argv );
 	/* 释放之前申请的内存空间 */
 	for(i=0; i<argc; ++i) {
 		free( argv[i] );
