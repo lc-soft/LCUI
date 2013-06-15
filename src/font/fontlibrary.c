@@ -232,7 +232,7 @@ FontLIB_GetFontIDByFamilyName( const char *family_name )
 			continue;
 		}
 		/* 不区分大小写，进行对比 */
-		if( strcasecmp( item->family_name, family_name) == 0 ) {
+		if( LCUI_strcasecmpA( item->family_name, family_name) == 0 ) {
 			return item->id;
 		}
 	}

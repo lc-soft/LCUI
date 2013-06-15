@@ -426,11 +426,11 @@ StyleTag_ProcessEndingTag( LCUI_Queue *tags, wchar_t *str )
 	if( p == NULL ) {
 		return NULL;
 	}
-	if( strcasecmp(tag_name, "color") == 0 ) {
+	if( LCUI_strcasecmpA(tag_name, "color") == 0 ) {
 		/* 消除该标签添加的字体样式 */
 		StyleTag_Delete ( tags, TAG_ID_COLOR );
 	} 
-	else if( strcasecmp(tag_name, "size") == 0 ) {
+	else if( LCUI_strcasecmpA(tag_name, "size") == 0 ) {
 		/* 消除该标签添加的字体样式 */
 		StyleTag_Delete ( tags, TAG_ID_SIZE );
 	} else {

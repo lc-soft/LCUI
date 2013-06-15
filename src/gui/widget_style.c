@@ -175,11 +175,11 @@ static int WidgetStyle_SyncBackground(
 		attr_value = widget_attr->value.string;
 		/* 判断属性值是"true"还是"false" */
 		if( strcmp("1", attr_value) == 0
-		 || lcui_strcasecmp("true",attr_value) == 0) {
+		 || LCUI_strcasecmpA("true",attr_value) == 0) {
 			Widget_SetBackgroundTransparent( widget, TRUE );
 		 }
 		else if( strcmp("0", attr_value) == 0
-		 || lcui_strcasecmp("false",attr_value) == 0 ) {
+		 || LCUI_strcasecmpA("false",attr_value) == 0 ) {
 			Widget_SetBackgroundTransparent( widget, FALSE );
 		 }
 	}
@@ -189,17 +189,17 @@ static int WidgetStyle_SyncBackground(
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->value.string;
 		/* 判断背景图的布局方式 */
-		if( lcui_strcasecmp("center",attr_value) == 0 ) {
+		if( LCUI_strcasecmpA("center",attr_value) == 0 ) {
 			Widget_SetBackgroundLayout( widget, LAYOUT_CENTER );
-		} else if( lcui_strcasecmp("tile",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("tile",attr_value) == 0 ) {
 			Widget_SetBackgroundLayout( widget, LAYOUT_TILE );
-		} else if( lcui_strcasecmp("stretch",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("stretch",attr_value) == 0 ) {
 			Widget_SetBackgroundLayout( widget, LAYOUT_STRETCH );
-		} else if( lcui_strcasecmp("zoom",attr_value) == 0  ) {
+		} else if( LCUI_strcasecmpA("zoom",attr_value) == 0  ) {
 			Widget_SetBackgroundLayout( widget, LAYOUT_ZOOM );
-		} else if( lcui_strcasecmp("none",attr_value) == 0  ) {
+		} else if( LCUI_strcasecmpA("none",attr_value) == 0  ) {
 			Widget_SetBackgroundLayout( widget, LAYOUT_NONE );
-		} else if( lcui_strcasecmp("normal",attr_value) == 0  ) {
+		} else if( LCUI_strcasecmpA("normal",attr_value) == 0  ) {
 			Widget_SetBackgroundLayout( widget, LAYOUT_NORMAL );
 		}
 	}
@@ -229,25 +229,25 @@ static int WidgetStyle_SyncPostion(
 					pseudo_class_name, "align" );
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->value.string;
-		if( lcui_strcasecmp("none",attr_value) == 0 ) {
+		if( LCUI_strcasecmpA("none",attr_value) == 0 ) {
 			align = ALIGN_NONE;
-		} else if( lcui_strcasecmp("top-left",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("top-left",attr_value) == 0 ) {
 			align = ALIGN_TOP_LEFT;
-		} else if( lcui_strcasecmp("top-center",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("top-center",attr_value) == 0 ) {
 			align = ALIGN_TOP_CENTER;
-		} else if( lcui_strcasecmp("top-right",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("top-right",attr_value) == 0 ) {
 			align = ALIGN_TOP_RIGHT;
-		} else if( lcui_strcasecmp("middle-left",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("middle-left",attr_value) == 0 ) {
 			align = ALIGN_MIDDLE_LEFT;
-		} else if( lcui_strcasecmp("middle-center",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("middle-center",attr_value) == 0 ) {
 			align = ALIGN_MIDDLE_CENTER;
-		} else if( lcui_strcasecmp("middle-right",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("middle-right",attr_value) == 0 ) {
 			align = ALIGN_MIDDLE_RIGHT;
-		} else if( lcui_strcasecmp("bottom-left",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("bottom-left",attr_value) == 0 ) {
 			align = ALIGN_BOTTOM_LEFT;
-		} else if( lcui_strcasecmp("bottom-center",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("bottom-center",attr_value) == 0 ) {
 			align = ALIGN_BOTTOM_CENTER;
-		} else if( lcui_strcasecmp("bottom-right",attr_value) == 0 ) {
+		} else if( LCUI_strcasecmpA("bottom-right",attr_value) == 0 ) {
 			align = ALIGN_BOTTOM_RIGHT;
 		}
 	}
@@ -330,31 +330,31 @@ static int style_border_convert( const char *style_str, LCUI_Border *border )
 				return -1;
 			}
 			have_size = TRUE;
-		} else if( lcui_strcasecmp(buff,"solid") == 0 ) {
+		} else if( LCUI_strcasecmpA(buff,"solid") == 0 ) {
 			if( have_type ) {
 				return -1;
 			}
 			style_type = BORDER_STYLE_SOLID;
 			have_type = TRUE;
-		} else if( lcui_strcasecmp(buff,"none") == 0 ) {
+		} else if( LCUI_strcasecmpA(buff,"none") == 0 ) {
 			if( have_type ) {
 				return -1;
 			}
 			style_type = BORDER_STYLE_NONE;
 			have_type = TRUE;
-		} else if( lcui_strcasecmp(buff,"dotted") == 0 ) {
+		} else if( LCUI_strcasecmpA(buff,"dotted") == 0 ) {
 			if( have_type ) {
 				return -1;
 			}
 			style_type = BORDER_STYLE_DOTTED;
 			have_type = TRUE;
-		} else if( lcui_strcasecmp(buff,"double") == 0 ) {
+		} else if( LCUI_strcasecmpA(buff,"double") == 0 ) {
 			if( have_type ) {
 				return -1;
 			}
 			style_type = BORDER_STYLE_DOUBLE;
 			have_type = TRUE;
-		} else if( lcui_strcasecmp(buff,"dashed") == 0 ) {
+		} else if( LCUI_strcasecmpA(buff,"dashed") == 0 ) {
 			if( have_type ) {
 				return -1;
 			}

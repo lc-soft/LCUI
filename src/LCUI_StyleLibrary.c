@@ -68,7 +68,7 @@ StyleLIB_GetElement(	StyleLIB_Library *lib_ptr,
 		if( !p ) {
 			continue;
 		}
-		if( lcui_strcasecmp(p->name.string, name) == 0 ) {
+		if( LCUI_strcasecmpA(p->name.string, name) == 0 ) {
 			return p;
 		}
 	}
@@ -139,7 +139,7 @@ StyleLIB_FindProperty(	LCUI_Queue *property_list,
 		if( property_ptr == NULL ) {
 			continue;
 		}
-		if( !lcui_strcasecmp(
+		if( !LCUI_strcasecmpA(
 			property_ptr->name.string,
 			property_name)
 		) {
@@ -193,7 +193,7 @@ StyleLIB_FindPseudoClass(	StyleLIB_Element *element_ptr,
 		if( pclass == NULL ) {
 			continue;
 		}
-		if( !lcui_strcasecmp(
+		if( !LCUI_strcasecmpA(
 			pclass->name.string,
 			pseudo_class_name)
 		) {
@@ -221,7 +221,7 @@ StyleLIB_GetExistPseudoClass(	StyleLIB_Element *element_ptr,
 		if( pclass == NULL ) {
 			continue;
 		}
-		if( !lcui_strcasecmp(
+		if( !LCUI_strcasecmpA(
 			pclass->name.string,
 			pseudo_class_name)
 		) {
