@@ -47,6 +47,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #ifdef LCUI_BUILD_IN_LINUX
 #include <iconv.h>
@@ -197,7 +198,15 @@ LCUICharset_GB2312ToUnicode( const char *src_gb2312, wchar_t **des_unicode )
 	free(buff);
 	return len;
 #else
-	return -1;
+	wchar_t *buff;
+	unsigned int len;
+ 
+	len = strlen( src_gb2312 );
+	buff = (wchar_t *)calloc( sizeof(wchar_t), len );
+	setlocale( LC_ALL, ".936" );
+	len = mbstowcs( buff, src_gb2312, len );
+	*des_unicode = buff;
+	return len;
 #endif
 }
 
