@@ -40,6 +40,7 @@
  * ****************************************************************************/
 #include <LCUI_Build.h>
 #include LC_LCUI_H
+#include LC_CHARSET_H
 #include LC_GRAPH_H
 #include LC_RES_H
 #include LC_DISPLAY_H
@@ -542,8 +543,29 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 	return -2;
 }
 
+/* UTF-8版的LCUI_MessageBox */
 LCUI_API int
 LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text, 
+			const char *title, MB_BTN_TYPE button )
+{
+	int ret;
+	wchar_t *unicode_text, *unicode_title;
+	
+	LCUICharset_UTF8ToUnicode( text, &unicode_text );
+	LCUICharset_UTF8ToUnicode( title, &unicode_title );
+	ret = LCUI_MessageBoxW( icon_type, unicode_text, unicode_title, button );
+	if( unicode_text != NULL ) {
+		free( unicode_text );
+	}
+	if( unicode_title != NULL ) {
+		free( unicode_title );
+	}
+	return ret;
+}
+
+/* ASCII版的LCUI_MessageBox */
+LCUI_API int
+LCUI_MessageBoxA(	MB_ICON_TYPE icon_type, const char *text, 
 			const char *title, MB_BTN_TYPE button )
 {
 	int ret;

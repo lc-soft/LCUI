@@ -105,9 +105,16 @@ LCUI_API int
 LCUI_MessageBoxW(	MB_ICON_TYPE icon_type,	const wchar_t *text, 
 			const wchar_t *title,	MB_BTN_TYPE button );
 
+/* UTF-8版的LCUI_MessageBox */
 LCUI_API int
-LCUI_MessageBox(	MB_ICON_TYPE icon_type,	const char *text, 
-			const char *title,	MB_BTN_TYPE button );
+LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text, 
+			const char *title, MB_BTN_TYPE button );
+
+/* ASCII版的LCUI_MessageBox */
+LCUI_API int
+LCUI_MessageBoxA(	MB_ICON_TYPE icon_type, const char *text, 
+			const char *title, MB_BTN_TYPE button );
+
 LCUI_END_HEADER
 
 #endif
