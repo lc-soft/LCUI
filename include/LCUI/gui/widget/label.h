@@ -41,18 +41,9 @@
 #ifndef __LCUI_LABEL_H__
 #define __LCUI_LABEL_H__
 
-#include LC_FONT_H
+#include LC_TEXTSTYLE_H
 
 LCUI_BEGIN_HEADER
-
-typedef struct _LCUI_Label 
-{
-	LCUI_BOOL auto_size;	/* 指定是否根据文本图层的尺寸来调整部件尺寸 */
-	AUTOSIZE_MODE mode;	/* 自动尺寸调整的模式 */
-	wchar_t *text_buff;	/* 文本块缓冲 */
-	LCUI_TextLayer layer;	/* 文本图层 */
-}
-LCUI_Label;
 
 /* 设定与标签关联的文本内容 */
 LCUI_API int
@@ -72,9 +63,11 @@ Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
 LCUI_API LCUI_TextStyle
 Label_GetTextStyle( LCUI_Widget *widget );
 
+#ifdef I_NEED_LABEL_TEXTLAYER
 /* 获取label部件内的文本图层的指针 */
 LCUI_API LCUI_TextLayer*
 Label_GetTextLayer( LCUI_Widget *widget );
+#endif
 
 /* 刷新label部件显示的文本 */
 LCUI_API void
@@ -83,6 +76,7 @@ Label_Refresh( LCUI_Widget *widget );
 /* 启用或禁用Label部件的自动尺寸调整功能 */
 LCUI_API void
 Label_AutoSize( LCUI_Widget *widget, LCUI_BOOL flag, AUTOSIZE_MODE mode );
+
 LCUI_END_HEADER
 
 #ifdef __cplusplus
