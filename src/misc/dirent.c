@@ -116,7 +116,7 @@ int LCUI_FileIsDirectory( LCUI_DirEntry *entry )
 	return entry->dataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
 }
 
-int LCUI_FileIsNormal( LCUI_DirEntry *entry )
+int LCUI_FileIsArchive( LCUI_DirEntry *entry )
 {
-	return entry->dataA.dwFileAttributes & FILE_ATTRIBUTE_NORMAL;
+	return entry->dataA.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE;
 }
