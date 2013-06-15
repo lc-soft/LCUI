@@ -182,7 +182,7 @@ _DragEvent_Do( LCUI_Widget *widget, LCUI_MouseMotionEvent *event )
 	widget_event.drag.cursor_pos.x = event->x;
 	widget_event.drag.cursor_pos.y = event->y;
 	widget_event.drag.new_pos = Pos_Sub( widget_event.drag.cursor_pos, __offset_pos );
-	widget_event.drag.first_click = TRUE;
+	widget_event.drag.first_click = FALSE;
 	widget_event.drag.end_click = FALSE;
 	Widget_DispatchEvent( widget, &widget_event );
 }
