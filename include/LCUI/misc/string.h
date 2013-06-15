@@ -41,16 +41,49 @@
 #ifndef __LCUI_MISC_STRING_H__
 #define __LCUI_MISC_STRING_H__
 
+#ifdef LCUI_BUILD_IN_WIN32
+#include <tchar.h>
+#else
+#ifdef _UNICODE
+#define __T(x) L ## x
+#define _T(x) __T(x)
+#else
+#define __T(x) x
+#define _T(x) __T(x)
+#endif
+#endif
+
+#ifndef _TCHAR_DEFINED
+#if     !__STDC__
+typedef char TCHAR;
+#endif
+#define _TCHAR_DEFINED
+#endif
+
 LCUI_BEGIN_HEADER
 
-/* windows系统里并没有strcasecmp函数，因此，使用自定义函数的代替 */
+#ifdef _UNICODE
+#define LCUI_tcscasecmp LCUI_strcasecmpW
+#define LCUI_tcscmp wcscmp
+#define LCUI_tcscpy wcscpy
+#define LCUI_tcscat wcscat
+#define LCUI_tcsnprintf swprintf
+#else
+#define LCUI_tcscasecmp LCUI_strcasecmpA
+#define LCUI_tcscmp strcmp
+#define LCUI_tcscpy strcpy
+#define LCUI_tcscat strcat
 #ifdef LCUI_BUILD_IN_WIN32
-#define strcasecmp(str1, str2)	lcui_strcasecmp(str1, str2)
+#define LCUI_tcsnprintf _snprintf
+#else
+#define LCUI_tcsnprintf snprintf
+#endif
 #endif
 
 /* 不区分大小写，对比两个字符串 */
-LCUI_API int
-lcui_strcasecmp( const char *str1, const char *str2 );
+LCUI_API int LCUI_strcasecmpA( const char *str1, const char *str2 );
+
+LCUI_API int LCUI_strcasecmpW( const wchar_t *str1, const wchar_t *str2 );
 
 /* 初始化字符串 */
 LCUI_API void
