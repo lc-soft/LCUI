@@ -42,6 +42,8 @@
 #ifndef __LCUI_BUILD_H__
 #define __LCUI_BUILD_H__
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #if defined(__GNUC__)
 #  define LCUI_API 
 #elif (defined(_MSC_VER) && _MSC_VER < 800) ||\
@@ -87,6 +89,7 @@
 #define LC_MISC_STRING_H	<LCUI/misc/string.h>
 #define LC_MISC_RECT_H		<LCUI/misc/rect.h>
 #define LC_MISC_DELAY_H		<LCUI/misc/delay.h>
+#define LC_MISC_DIRENT_H	<LCUI/misc/dirent.h>
 #define LC_MISC_H		<LCUI/LCUI_Misc.h>
 
 #define LC_WIDGET_BASE_H	<LCUI/gui/widget_base.h>
