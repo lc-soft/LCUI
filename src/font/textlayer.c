@@ -971,7 +971,7 @@ LCUI_API void
 TextLayer_TextA( LCUI_TextLayer *layer, const char *ascii_text )
 {
 	wchar_t *unicode_text;
-	LCUICharset_ASCIIToUnicode( ascii_text, &unicode_text );
+	LCUICharset_GB2312ToUnicode( ascii_text, &unicode_text );
 	TextLayer_TextW( layer, unicode_text );
 	free( unicode_text );
 }
@@ -989,7 +989,7 @@ LCUI_API int
 TextLayer_Text_AppendA( LCUI_TextLayer *layer, char *new_text )
 {
 	wchar_t *unicode_text;
-	LCUICharset_ASCIIToUnicode( new_text, &unicode_text );
+	LCUICharset_GB2312ToUnicode( new_text, &unicode_text );
 	TextLayer_Text_AppendW( layer, unicode_text );
 	free( unicode_text );
 	return 0;
@@ -1028,7 +1028,7 @@ LCUI_API int
 TextLayer_Text_AddA( LCUI_TextLayer *layer, char *ascii_text )
 {
 	wchar_t *unicode_text;
-	LCUICharset_ASCIIToUnicode( ascii_text, &unicode_text );
+	LCUICharset_GB2312ToUnicode( ascii_text, &unicode_text );
 	TextLayer_Text_AddW( layer, unicode_text );
 	free( unicode_text );
 	return 0;

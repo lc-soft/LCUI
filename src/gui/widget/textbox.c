@@ -40,7 +40,7 @@
  * ****************************************************************************/
 
 //#define DEBUG
-
+#define I_NEED_LABEL_TEXTLAYER
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
@@ -1010,7 +1010,7 @@ LCUI_API void
 TextBox_Text_AddA( LCUI_Widget *widget, char *ascii_text )
 {
 	wchar_t *unicode_text;
-	LCUICharset_ASCIIToUnicode( ascii_text, &unicode_text );
+	LCUICharset_GB2312ToUnicode( ascii_text, &unicode_text );
 	TextBox_Text_AddW( widget, unicode_text );
 	free( unicode_text );
 }

@@ -40,17 +40,26 @@
  * ****************************************************************************/
 
 //#define DEBUG
+
+#define I_NEED_LABEL_TEXTLAYER
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include LC_WIDGET_H 
-#include LC_MISC_H 
-#include LC_GRAPH_H
+#include LC_FONT_H
+#include LC_WIDGET_H
 #include LC_LABEL_H
+
 
 enum label_msg_id {
 	LABEL_TEXT = WIDGET_USER+1,
 	LABEL_STYLE
 };
+
+typedef struct LCUI_Label_ {
+	LCUI_BOOL auto_size;	/* 指定是否根据文本图层的尺寸来调整部件尺寸 */
+	AUTOSIZE_MODE mode;	/* 自动尺寸调整的模式 */
+	LCUI_TextLayer layer;	/* 文本图层 */
+}
+LCUI_Label;
 
 /*---------------------------- Private -------------------------------*/
 
@@ -195,7 +204,7 @@ LCUI_API void
 Label_TextA( LCUI_Widget *widget, const char *ascii_text )
 {
 	wchar_t *unicode_text;
-	LCUICharset_ASCIIToUnicode( ascii_text, &unicode_text );
+	LCUICharset_GB2312ToUnicode( ascii_text, &unicode_text );
 	Label_TextW( widget, unicode_text );
 	if( unicode_text != NULL ) {
 		free( unicode_text );
