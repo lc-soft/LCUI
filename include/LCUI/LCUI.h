@@ -241,14 +241,12 @@ LCUI_END_HEADER
 
 #if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS) &&defined(I_NEED_WINMAIN)
 
-#include <tchar.h>
-
 #ifdef _UNICODE
-#define _tcstok_s wcstok_s
-#define _tcscpy_s wcscpy_s
+	#define _tcstok_s wcstok_s
+	#define _tcscpy_s wcscpy_s
 #else
-#define _tcstok_s strtok_s
-#define _tcscpy_s strcpy_s
+	#define _tcstok_s strtok_s
+	#define _tcscpy_s strcpy_s
 #endif
 
 /* 若是UNICODE字符，请手动将参数argv转换由char为wchar_t类型 */
@@ -265,9 +263,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine
 	/* 获取命令行 */
 	pCmdLine = GetCommandLine();
 	/* 计算命令行的长度 */
-	len = _tclen( pCmdLine ) + 1;
+	len = _tcslen( pCmdLine ) + 1;
 	/* 分配一段相应长度的内存空间 */
-	cmdline_buff = (TCHAR*)malloc(sizeof(TCHAR)*len); 
+	cmdline_buff = (TCHAR*)malloc( sizeof(TCHAR)*len );
 	if( cmdline_buff == NULL ) {
 		return -1;
 	}
@@ -290,7 +288,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine
 	_tcscpy_s( cmdline_buff, len, pCmdLine );
 	token = _tcstok_s( cmdline_buff, _T(" \r\t\n"), &next_token );
 	while( token != NULL ) {
-		len = _tclen( token ) + 1;
+		len = _tcslen( token ) + 1;
 		argv[i] = (TCHAR*)malloc(sizeof(TCHAR)*len);
 		if( argv[i] == NULL ) {
 			return -1;
