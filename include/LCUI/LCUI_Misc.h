@@ -45,6 +45,7 @@
 #include LC_MISC_DELAY_H
 #include LC_MISC_RECT_H
 #include LC_MISC_STRING_H
+#include LC_MISC_DIRENT_H
 
 LCUI_BEGIN_HEADER
 	
