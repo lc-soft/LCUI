@@ -249,6 +249,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_msg.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\misc\dirent.h">
+      <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -436,6 +439,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_msg.c">
       <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\misc\dirent.c">
+      <Filter>源文件\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\LCUI_Memory.c">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
