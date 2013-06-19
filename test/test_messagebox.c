@@ -1,4 +1,4 @@
-// 测试MessageBox
+﻿// 测试MessageBox
 #define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
