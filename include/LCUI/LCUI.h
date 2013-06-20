@@ -157,32 +157,31 @@ typedef struct LCUI_WString_ {
 /*------------ END ------------*/
 
 LCUI_END_HEADER
-
+	
 #include LC_THREAD_H
 #include LC_QUEUE_H
 
 LCUI_BEGIN_HEADER
 
+enum GraphColorTyle {
+	COLOR_TYPE_RGB,
+	COLOR_TYPE_RGBA
+};
+
 /*---------------------------- 图形数据 -------------------------------*/
 typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
-	int	type;		/** 图片类型 */
-	int	bit_depth;	/** 位深 */
+	int x, y;		/**< 源图形中的引用区域所在的坐标 */
+	int w, h;		/**< 图形的尺寸 */
+	
+	int color_type;		/**< 色彩类型 */
+	LCUI_BOOL quote;	/**< 标志，指示是否引用了另一图形 */
+	LCUI_Graph *src;	/**< 所引用的源图形 */
+	uchar_t	alpha;		/**< 全局透明度 */
+	uchar_t* rgba;		/**< 像素数据缓冲区 */
+	size_t mem_size;	/**< 像素数据缓冲区大小 */
 
-	LCUI_Mutex mutex;	/** 锁，用于数据保护 */
-
-	LCUI_BOOL quote;	/** 指示是否引用其它图层中的图形 */
-	LCUI_Graph *src;	/** 所引用的对象 */
-	LCUI_Pos pos;		/** 在引用另一个图层中的图形时，会保存区域的起点位置 */
-	int width, height;	/** 尺寸 */
-
-	uchar_t	alpha;		/** 全局透明度，表示整张图片的透明度，默认为255 */
-	uchar_t** rgba;		/** 像素数据缓冲区 */
-	size_t mem_size;	/** 像素数据缓冲区大小 */
-
-	LCUI_BOOL have_alpha;	/** 标志，指定是否需要透明度，分配内存时会根据它分配 */
-	LCUI_BOOL is_opaque;	/** 标志，指定该图形是否为不透明 */
-	LCUI_BOOL not_visible;	/** 标志，指定该图形是否不可见，也就是全透明 */
+	LCUI_Mutex mutex;	/**< 互斥锁，用于数据保护 */
 };
 /*------------------------------ END ---------------------------------*/
 
