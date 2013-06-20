@@ -53,9 +53,12 @@ LCUI_BEGIN_HEADER
 #define GRAPH_MIX_FLAG_REPLACE	 1<<8
 
 /* 将两个像素点的颜色值进行alpha混合 */
-#define ALPHA_BLEND(__src__ , __des__, __alpha__)		\
-{								\
-    __des__ = (((__src__-__des__)*(__alpha__))>>8)+__des__;	\
+#define _ALPHA_BLEND(__src__ , __des__, __alpha__)	\
+    ((((__src__-__des__)*(__alpha__))>>8)+__des__)
+
+#define ALPHA_BLEND(__src__ , __des__, __alpha__)	\
+{							\
+    __des__ =_ALPHA_BLEND(__src__,__des__,__alpha__);	\
 }
 
 /* 获取像素的RGB值 */
@@ -101,175 +104,68 @@ LCUI_BEGIN_HEADER
 #undef RGB
 #endif
 
-/* 将三个颜色值转换成LCUI_RGB型数据 */
-LCUI_API LCUI_RGB
-RGB ( uchar_t red, uchar_t green, uchar_t blue );
+LCUI_API LCUI_RGB RGB ( uchar_t red, uchar_t green, uchar_t blue );
 
-/* 为图形数据设定互斥锁 */
-LCUI_API void
-Graph_Lock( LCUI_Graph *graph );
+LCUI_API void Graph_Lock( LCUI_Graph *graph );
 
-/* 更新图层的属性 */
-LCUI_API void
-Graph_UpdateAttr( LCUI_Graph *buff );
+LCUI_API void Graph_Unlock( LCUI_Graph *graph );
 
-/* 解除互斥锁，以结束图像数据的使用 */
-LCUI_API void
-Graph_Unlock( LCUI_Graph *graph );
+LCUI_API LCUI_BOOL Graph_GetPixel(	LCUI_Graph *graph,
+					LCUI_Pos pos,
+					LCUI_RGBA *pixel );
 
-/* 获取图像中指定坐标的像素点的颜色 */
-LCUI_API LCUI_BOOL
-Graph_GetPixel( LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel );
+LCUI_API LCUI_Size Graph_GetSize( LCUI_Graph *graph );
 
-/* 返回图形的类型 */
-LCUI_API int
-Graph_GetType( LCUI_Graph *pic );
+LCUI_API LCUI_BOOL Graph_HaveAlpha( LCUI_Graph *graph );
 
-/* 获取图形的尺寸 */
-LCUI_API LCUI_Size
-Graph_GetSize( LCUI_Graph *pic );
+LCUI_API LCUI_BOOL Graph_IsValid( LCUI_Graph *graph );
 
-/* 
- * 功能：判断图像是否为png
- * 返回值：是则返回TRUE，否则返回FALSE
- * */
-LCUI_API LCUI_BOOL
-Graph_IsPNG( LCUI_Graph *pic );
+LCUI_API void Graph_PrintInfo( LCUI_Graph *graph );
 
-/* 
- * 功能：判断图像是否为bmp
- * 返回值：是则返回TRUE，否则返回FALSE
- * */
-LCUI_API LCUI_BOOL
-Graph_IsBMP( LCUI_Graph *pic );
+LCUI_API void Graph_Init( LCUI_Graph *graph );
 
-/* 
- * 功能：判断图像是否为jpg 
- * 返回值：是则返回1，否则返回0
- * */
-LCUI_API LCUI_BOOL
-Graph_IsJPG( LCUI_Graph *pic );
+LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h );
 
-/* 
- * 功能：判断图像是否带有带alpha通道 
- * 返回值：是则返回1，否则返回0
- * */
-LCUI_API LCUI_BOOL
-Graph_HaveAlpha( LCUI_Graph *pic );
+LCUI_API void Graph_Copy( LCUI_Graph *des, LCUI_Graph *src );
 
-/*
- * 功能：检测图形数据是否有效
- * 返回值：有效返回1，无效返回0
- */
-LCUI_API LCUI_BOOL
-Graph_IsValid( LCUI_Graph *pic );
+LCUI_API void Graph_Free( LCUI_Graph *pic );
 
-/* 
- * 功能：检测图形是否为不透明 
- * 说明：完全透明则返回-1，不透明则返回1，有透明效果则返回0
- * */
-LCUI_API int
-Graph_IsOpaque( LCUI_Graph *graph );
+LCUI_API int Graph_Quote( LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area );
 
-/* 打印图像的信息 */
-LCUI_API void
-Graph_PrintInfo( LCUI_Graph *pic );
+LCUI_API LCUI_Rect Graph_GetValidRect( LCUI_Graph *graph );
 
-/* 初始化图片数据结构体 */
-LCUI_API void
-Graph_Init( LCUI_Graph *pic );
+LCUI_API LCUI_Graph* Graph_GetQuote( LCUI_Graph *graph );
 
-/* 为图像数据分配内存资源 */
-LCUI_API int
-Graph_Create( LCUI_Graph *graph, int width, int height );
+LCUI_API void Graph_Zoom(	LCUI_Graph *in,
+				LCUI_Graph *out, 
+				LCUI_BOOL keep_scale,
+				LCUI_Size size );
 
-/* 
- * 功能：拷贝图像数据
- * 说明：将src的数据拷贝至des 
- * */
-LCUI_API void
-Graph_Copy( LCUI_Graph *des, LCUI_Graph *src );
+LCUI_API int Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out );
 
-/* 释放LCUI_Graph内的图像数据占用的内存资源 */
-LCUI_API void
-Graph_Free( LCUI_Graph *pic );
+LCUI_API int Graph_HorizFlip( LCUI_Graph *src, LCUI_Graph *out );
 
-/************************ Graph Quote *********************************/
-LCUI_API int
-Graph_Quote( LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area );
+LCUI_API int Graph_VertiFlip( LCUI_Graph *src, LCUI_Graph *out );
 
-/* 获取被引用的图形所在的有效区域 */
-LCUI_API LCUI_Rect
-Graph_GetValidRect( LCUI_Graph *graph );
+LCUI_API int Graph_FillRect( LCUI_Graph *graph, LCUI_RGB color, LCUI_Rect rect );
 
-/* 
- * 功能：获取指向被引用的图形的指针 
- * 说明：如果当前图形引用了另一个图形，并且，该图形处于一条引用链中，那么，本函数会返
- * 回指向被引用的最终图形的指针。
- * */
-LCUI_API LCUI_Graph*
-Graph_GetQuote( LCUI_Graph *graph );
+LCUI_API int Graph_FillColor( LCUI_Graph *graph, LCUI_RGB color );
 
-/************************ End Graph Quote *****************************/
+LCUI_API int Graph_Tile( LCUI_Graph *src, LCUI_Graph *des, LCUI_BOOL replace );
 
-/* 根据指定模式，对图像进行缩放 */
-LCUI_API void
-Graph_Zoom(	LCUI_Graph *in,		LCUI_Graph *out, 
-		LCUI_BOOL keep_scale,	LCUI_Size size );
+LCUI_API int Graph_Mix( LCUI_Graph *back, LCUI_Graph *fore, LCUI_Pos pos );
 
-/* 
- * 功能：从源图形中截取出指定区域的图形 
- * 说明：裁剪出的图像数据，全局透明度和源图像一致
- * */
-LCUI_API int
-Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out );
+LCUI_API int Graph_Replace( LCUI_Graph *back, LCUI_Graph *fore, LCUI_Pos pos );
 
-/* 将图像进行水平翻转 */  
-LCUI_API int
-Graph_HorizFlip( LCUI_Graph *src, LCUI_Graph *out );
+LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int flag );
 
-/* 将图像进行垂直翻转 */  
-LCUI_API int
-Graph_VertiFlip( LCUI_Graph *img, LCUI_Graph *out );
 
-/* 填充矩形 */
-LCUI_API int
-Graph_FillRect( LCUI_Graph *graph, LCUI_RGB color, LCUI_Rect rect );
+LCUI_API int Graph_FillImage(	LCUI_Graph *graph,
+				LCUI_Graph *bg, 
+				int mode,
+				LCUI_RGB color );
 
-/* 填充颜色 */
-LCUI_API int
-Graph_FillColor( LCUI_Graph *graph, LCUI_RGB color );
-
-/* 平铺图形 */
-LCUI_API int
-Graph_Tile( LCUI_Graph *src, LCUI_Graph *des_buff, LCUI_BOOL replace );
-
-/* 
- * 功能：将前景图与背景图混合叠加
- * 说明：back_graph是背景图像，fore_graph前景图像，混合后的数据保存在背景图中
- */
-LCUI_API int
-Graph_Mix( LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos );
-
-/* 
- * 功能：替换原图中对应位置的区域中的图形
- * 说明：与Overlay_Graph函数不同，back_graph中的图形数据会被fore_graph中的图形数据覆盖
- */
-LCUI_API int
-Graph_Replace( LCUI_Graph *back_graph, LCUI_Graph *fore_graph, LCUI_Pos des_pos );
-
-/* 将图片以指定对齐方式粘贴至背景图上 */
-LCUI_API int
-Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int flag );
-
-/* 为指定图形填充背景图像 */
-LCUI_API int
-Graph_FillImage(	LCUI_Graph *graph,	LCUI_Graph *bg, 
-			int mode,		LCUI_RGB color );
-
-/* 填充图形的alpha通道的所有值 */
-LCUI_API int
-Graph_FillAlpha( LCUI_Graph *src, uchar_t alpha );
+LCUI_API int Graph_FillAlpha( LCUI_Graph *src, uchar_t alpha );
  
 LCUI_END_HEADER
 	
