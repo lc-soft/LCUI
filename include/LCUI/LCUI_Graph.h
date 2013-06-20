@@ -136,7 +136,7 @@ LCUI_API LCUI_Rect Graph_GetValidRect( LCUI_Graph *graph );
 
 LCUI_API LCUI_Graph* Graph_GetQuote( LCUI_Graph *graph );
 
-LCUI_API void Graph_Zoom(	LCUI_Graph *in,
+LCUI_API int Graph_Zoom(	LCUI_Graph *in,
 				LCUI_Graph *out, 
 				LCUI_BOOL keep_scale,
 				LCUI_Size size );
