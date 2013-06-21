@@ -50,8 +50,7 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
-LCUI_API LCUI_RGB
-RGB ( uchar_t red, uchar_t green, uchar_t blue )
+LCUI_API LCUI_RGB RGB ( uchar_t red, uchar_t green, uchar_t blue )
 {
 	LCUI_RGB color;
 
@@ -61,24 +60,21 @@ RGB ( uchar_t red, uchar_t green, uchar_t blue )
 	return color;
 }
 
-LCUI_API void
-Graph_Lock( LCUI_Graph *graph )
+LCUI_API void Graph_Lock( LCUI_Graph *graph )
 {
 	LCUI_Graph *src;
 	src = Graph_GetQuote(graph);
 	LCUIMutex_Lock( &src->mutex );
 }
 
-LCUI_API void
-Graph_Unlock( LCUI_Graph *graph )
+LCUI_API void Graph_Unlock( LCUI_Graph *graph )
 {
 	LCUI_Graph *src;
 	src = Graph_GetQuote(graph);
 	LCUIMutex_Unlock( &src->mutex );
 }
 
-LCUI_API LCUI_BOOL
-Graph_GetPixel( LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel )
+LCUI_API LCUI_BOOL Graph_GetPixel( LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel )
 {
 	int i;
 	LCUI_Rect rect;
@@ -92,12 +88,12 @@ Graph_GetPixel( LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *pixel )
 		return FALSE;
 	}
 	i = graph->w*(pos.y+rect.y) + pos.x + rect.x;
-	pixel->red = graph->bgra[i++];
-	pixel->green = graph->bgra[i++];
-	pixel->blue = graph->bgra[i++];
+	pixel->red = graph->rgba[0][i];
+	pixel->green = graph->rgba[1][i];
+	pixel->blue = graph->rgba[2][i];
 	
 	if(graph->color_type == COLOR_TYPE_RGBA) {
-		pixel->alpha = graph->bgra[i];
+		pixel->alpha = graph->rgba[3][i];
 	} else {
 		pixel->alpha = 255;
 	}
@@ -141,7 +137,7 @@ LCUI_API LCUI_BOOL Graph_IsValid( LCUI_Graph *graph )
 {
 	LCUI_Graph *p;
 	p = Graph_GetQuote(graph);
-	if(p != NULL && p->bgra != NULL
+	if(p != NULL && p->rgba != NULL
 	  && p->h > 0 && p->w > 0 ) {
 		return TRUE;
 	}
@@ -157,7 +153,7 @@ LCUI_API void Graph_PrintInfo( LCUI_Graph *graph )
 	
 	printf("width:%d, ", graph->w);
 	printf("height:%d, ", graph->h);
-	printf("alpha:%u", graph->alpha);
+	printf("alpha:%u, ", graph->alpha);
 	printf("%s\n", graph->color_type == COLOR_TYPE_RGBA ? "RGBA":"RGB");
 	if( graph->quote ) {
 		printf("graph src:");
@@ -174,7 +170,7 @@ LCUI_API void Graph_Init( LCUI_Graph *graph )
 	graph->quote		= FALSE; 
 	graph->src		= NULL;
 	graph->color_type	= COLOR_TYPE_RGB;
-	graph->bgra		= NULL;
+	graph->rgba		= NULL;
 	graph->alpha		= 255;
 	graph->mem_size		= 0;
 	graph->x		= 0;
@@ -192,21 +188,12 @@ LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h )
 		printf("error: can not allocate too much memory!\n");
 		abort();
 	}
-	if(h < 0 || w < 0) {
+	if(h <= 0 || w <= 0) {
 		Graph_Free( graph );
 		return -1; 
 	}
 	
-	switch( graph->color_type ) {
-	case COLOR_TYPE_RGBA:
-		size = sizeof(uchar_t)*w*h*4;
-		break;
-	case COLOR_TYPE_RGB:
-	default:
-		size = sizeof(uchar_t)*w*h*3;
-		break;
-	}
-
+	size = sizeof(uchar_t)*w*h;
 	if( Graph_IsValid(graph) ) {
 		/* 如果现有图形尺寸大于要创建的图形的尺寸，直接改尺寸即可 */
 		if( graph->mem_size >= size ) {
@@ -218,17 +205,46 @@ LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h )
 		LCUIMutex_Init( &graph->mutex );
 	}
 	graph->mem_size = size;
-	graph->bgra = (uchar_t*)malloc( size ); 
-
-	if( NULL == graph->bgra ) {
-		graph->w = 0;
-		graph->h = 0;
-		return -1;
+	if( graph->color_type == COLOR_TYPE_RGBA ) {
+		graph->rgba = (uchar_t**)malloc(sizeof(uchar_t*)*4);
+	} else {
+		graph->rgba = (uchar_t**)malloc(sizeof(uchar_t*)*3);
 	}
-	
+	if( graph->rgba == NULL ) {
+		goto error_exit;
+	}
+	graph->rgba[0] = (uchar_t*)malloc( graph->mem_size );
+	if( graph->rgba[0] == NULL ) {
+		free( graph->rgba );
+		goto error_exit;
+	}
+	graph->rgba[1] = (uchar_t*)malloc( graph->mem_size );
+	if( graph->rgba[1] == NULL ) {
+		goto error_exit;
+	}
+	graph->rgba[2] = (uchar_t*)malloc( graph->mem_size );
+	if( graph->rgba[2] == NULL ) {
+		free( graph->rgba[0] );
+		free( graph->rgba[1] );
+		goto error_exit;
+	}
+	if( graph->color_type == COLOR_TYPE_RGBA ) {
+		graph->rgba[3] = (uchar_t*)malloc( graph->mem_size );
+		if( graph->rgba[3] == NULL ) {
+			free( graph->rgba[0] );
+			free( graph->rgba[1] );
+			free( graph->rgba[2] );
+			goto error_exit;
+		}
+	}
 	graph->w = w;
 	graph->h = h;
 	return 0;
+error_exit:
+	free( graph->rgba );
+	graph->w = 0;
+	graph->h = 0;
+	return -1;
 }
 
 LCUI_API void Graph_Copy( LCUI_Graph *des, LCUI_Graph *src )
@@ -247,21 +263,28 @@ LCUI_API void Graph_Copy( LCUI_Graph *des, LCUI_Graph *src )
 LCUI_API void Graph_Free( LCUI_Graph *pic )
 {
 	LCUI_Graph *p;
-	p = Graph_GetQuote(pic);
+
+	if( pic && pic->quote ) {
+		pic->src = NULL; 
+		pic->quote = FALSE;
+		return;
+	}
+	p = Graph_GetQuote( pic );
 	if( !Graph_IsValid(p)) {
 		return;
 	}
-	if( pic->quote ) {
-		pic->src = NULL; 
-		pic->quote = FALSE;
-	} else {
-		LCUIMutex_Lock( &p->mutex );
-		free(p->bgra);
-		p->bgra = NULL;
-		p->w = 0;
-		p->h = 0;
-		LCUIMutex_Unlock( &p->mutex );
+	LCUIMutex_Lock( &p->mutex );
+	free( p->rgba[0] );
+	free( p->rgba[1] );
+	free( p->rgba[2] );
+	if( p->color_type == COLOR_TYPE_RGBA ) {
+		free( p->rgba[3] );
 	}
+	free( p->rgba );
+	p->rgba = NULL;
+	p->w = 0;
+	p->h = 0;
+	LCUIMutex_Unlock( &p->mutex );
 	LCUIMutex_Destroy( &pic->mutex );
 }
 
@@ -379,27 +402,28 @@ LCUI_API LCUI_Graph* Graph_GetQuote( LCUI_Graph *graph )
 	return Graph_GetQuote(graph->src);
 }
 
-LCUI_API int Graph_Zoom(	LCUI_Graph *in,
-				LCUI_Graph *out, 
+LCUI_API int Graph_Zoom(	LCUI_Graph *in_graph,
+				LCUI_Graph *out_graph, 
 				LCUI_BOOL keep_scale,
 				LCUI_Size size )
 {
 	LCUI_Graph *src;
 	LCUI_Rect rect;
-	int src_n, des_n, x, y;
+	LCUI_Pos pos; 
+	int des_n, src_n, x, y, k, m;
 	double scale_x,scale_y;
-	
-	if(!Graph_IsValid(in)) {
+
+	if(!Graph_IsValid(in_graph)) {
 		return -1;
 	}
 	if(size.w <=0 || size.h <= 0) { 
-		Graph_Free(out);
-		return -2;
+		Graph_Free(out_graph);
+		return -1;
 	}
 	/* 获取引用的有效区域，以及指向引用的对象的指针 */
-	rect = Graph_GetValidRect(in);
-	src = Graph_GetQuote(in);
-	
+	rect = Graph_GetValidRect(in_graph);
+	src = Graph_GetQuote(in_graph);
+
 	scale_x = (double)rect.width / size.w;
 	scale_y = (double)rect.height / size.h;
 	/* 如果缩放方式为缺省，图像的宽和高的缩放比例将会一样 */
@@ -410,284 +434,184 @@ LCUI_API int Graph_Zoom(	LCUI_Graph *in,
 			scale_x = scale_y;
 		}
 	}
-	out->color_type = in->color_type;
-	if( Graph_Create(out, size.w, size.h) < 0) {
-		return -3;
+	out_graph->color_type = in_graph->color_type;
+	if( Graph_Create(out_graph, size.w, size.h) < 0) {
+		return -2;
 	}
-	switch( in->color_type ) {
-	case COLOR_TYPE_RGBA:
-		des_n = 0;
-		for (y=0; y < size.h; ++y)  {
-			src_n = (y*scale_y+rect.y) * src->w + rect.x;
-			src_n *= 4;
-			for (x = 0; x < size.w; ++x) {
-				out->bgra[des_n++] = src->bgra[src_n];
-				out->bgra[des_n++] = src->bgra[src_n+1];
-				out->bgra[des_n++] = src->bgra[src_n+2];
-				out->bgra[des_n++] = src->bgra[src_n+3];
-				src_n += (x*scale_x*4);
+	for (y=0; y < size.h; ++y)  {
+		pos.y = y*scale_y;
+		k = y*size.w;
+		m = (pos.y+rect.y)*src->w + rect.x;
+		for (x = 0; x < size.w; ++x) {
+			pos.x = x*scale_x; 
+			src_n  = k + x;
+			des_n = m + pos.x;
+			out_graph->rgba[0][src_n] = src->rgba[0][des_n];
+			out_graph->rgba[1][src_n] = src->rgba[1][des_n];
+			out_graph->rgba[2][src_n] = src->rgba[2][des_n];
+			if( in_graph->color_type == COLOR_TYPE_RGBA) {
+				out_graph->rgba[3][src_n] = src->rgba[3][des_n];
 			}
 		}
-		break;
-	case COLOR_TYPE_RGB:
-	default:
-		des_n = 0;
-		for (y=0; y < size.h; ++y)  {
-			src_n = (y*scale_y+rect.y) * src->w + rect.x;
-			src_n *= 3;
-			for (x = 0; x < size.w; ++x) {
-				out->bgra[des_n++] = src->bgra[src_n];
-				out->bgra[des_n++] = src->bgra[src_n+1];
-				out->bgra[des_n++] = src->bgra[src_n+2];
-				src_n += (x*scale_x*3);
-			}
-		}
-		break;
-	}
+	} 
 	return 0;
 }
 
-LCUI_API int Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out )
+LCUI_API int Graph_Cut( LCUI_Graph *src_graph, LCUI_Rect rect, LCUI_Graph *out_graph )
 {
-	int x, y;
-	int count = 0; 
-	int src_n, src_start_n, des_n;
-	out->alpha = src->alpha;
-	rect = LCUIRect_ValidArea(Size(src->w, src->h), rect); 
+	int k, x, y, des_n, src_n;
 	
-	if( !Graph_IsValid(src) || rect.width <= 0 || rect.height <= 0) {
+	out_graph->alpha = src_graph->alpha;
+	rect = LCUIRect_ValidArea(Size(src_graph->w, src_graph->h), rect); 
+	
+	if( !Graph_IsValid(src_graph) || rect.width <= 0 || rect.height <= 0) {
 		return -1;
 	}
-	if( Graph_Create( out, rect.width, rect.height ) != 0 ) {
-		return -2;
-	}
 	
-	switch( src->color_type ) {
-	case COLOR_TYPE_RGBA:
-		des_n = 0;
-		src_start_n = rect.y * src->w + rect.x;
-		for (y=0; y < rect.height; ++y)  {
-			src_n = src_start_n * 4;
-			for (x = 0; x < rect.width; ++x) {
-				out->bgra[des_n++] = src->bgra[src_n++];
-				out->bgra[des_n++] = src->bgra[src_n++];
-				out->bgra[des_n++] = src->bgra[src_n++];
-				out->bgra[des_n++] = src->bgra[src_n++];
-			}
-			src_start_n += src->w;
-		}
-		break;
-	case COLOR_TYPE_RGB:
-	default:
-		des_n = 0;
-		src_start_n = rect.y * src->w + rect.x;
-		for (y=0; y < rect.height; ++y)  {
-			src_n = src_start_n * 3;
-			for (x = 0; x < rect.width; ++x) {
-				out->bgra[des_n++] = src->bgra[src_n++];
-				out->bgra[des_n++] = src->bgra[src_n++];
-				out->bgra[des_n++] = src->bgra[src_n++];
-			}
-			src_start_n += src->w;
-		}
-		break;
+	if( 0 != Graph_Create(out_graph, rect.width, rect.height) ) {
+		return -1; 
 	}
 
+	des_n = 0;
+	/* 开始读取图片中的图形数组并写入窗口 */ 
+	for (y=0;y< rect.height; ++y) {
+		k = (rect.y+y)*src_graph->w + rect.x;
+		for (x=0;x<rect.width; ++x) {
+			src_n = k + x; /* 计算图片内需要读取的区域的各点坐标 */
+			out_graph->rgba[0][des_n] = src_graph->rgba[0][src_n];
+			out_graph->rgba[1][des_n] = src_graph->rgba[1][src_n];
+			out_graph->rgba[2][des_n] = src_graph->rgba[2][src_n];
+			if(out_graph->color_type == COLOR_TYPE_RGBA) {
+				if(src_graph->color_type == COLOR_TYPE_RGBA) {
+					out_graph->rgba[3][des_n] = src_graph->rgba[3][src_n];
+				} else {
+					out_graph->rgba[3][des_n] = 255;
+				}
+			}
+			++des_n;
+		}
+	}
 	return 0; 
 }
 
-LCUI_API int Graph_HorizFlip( LCUI_Graph *src, LCUI_Graph *out )
+LCUI_API int Graph_HorizFlip( LCUI_Graph *src_graph, LCUI_Graph *out_graph )
 {
-	uchar_t buff;
-	LCUI_Rect rect;
 	int x, y, center;
 	int src_left_pos, src_right_pos;
-	int des_left_pos, des_right_pos;  
-	
-	if(!Graph_IsValid(src)) {
+	int des_left_pos, des_right_pos;
+	uchar_t buff;
+	LCUI_Graph *src;
+	LCUI_Rect rect;
+
+	if(!Graph_IsValid(src_graph)) {
 		return -1;
 	}
-	rect = Graph_GetValidRect( src );
-	src = Graph_GetQuote( src );
-	out->color_type = src->color_type;
-	if( Graph_Create( out, rect.width, rect.height ) != 0 ) {
+	rect = Graph_GetValidRect( src_graph );
+	src = Graph_GetQuote( src_graph );
+	out_graph->color_type = src->color_type;
+	if( 0 != Graph_Create( out_graph, rect.width, rect.height ) ) {
 		return -2;	
 	}
 	/* 水平翻转其实也就是交换两边的数据 */  
 	center = (int)(rect.width / 2.0);
-	switch( src->color_type ) {
-	case COLOR_TYPE_RGBA:
-		for (y = 0; y < rect.height; ++y) {
-			des_left_pos = y * rect.width;
-			des_right_pos = des_left_pos + rect.width -1;
-			src_left_pos = (y + rect.y) * src->w + rect.x;
-			src_right_pos = src_left_pos + rect.width -1;
-			des_left_pos *= 4;
-			des_right_pos *= 4;
-			src_left_pos *= 4;
-			src_right_pos *= 4;
-			for (x = 0; x <= center; ++x)  {
-				buff = src->bgra[src_left_pos++];
-				out->bgra[des_left_pos++] = src->bgra[src_right_pos];
-				out->bgra[des_right_pos] = buff;
-				
-				buff = src->bgra[src_left_pos++];
-				out->bgra[des_left_pos++] = src->bgra[src_right_pos+1];
-				out->bgra[des_right_pos+1] = buff;
-				
-				buff = src->bgra[src_left_pos++];
-				out->bgra[des_left_pos++] = src->bgra[src_right_pos+2];
-				out->bgra[des_right_pos+2] = buff;
-				
-				buff = src->bgra[src_left_pos++];
-				out->bgra[des_left_pos++] = src->bgra[src_right_pos+3];
-				out->bgra[des_right_pos+3] = buff;
+	for (y = 0; y < rect.height; ++y) {
+		des_left_pos = y * rect.width;
+		des_right_pos = des_left_pos + rect.width -1;
+		src_left_pos = (y + rect.y) * src->w + rect.x;
+		src_right_pos = src_left_pos + rect.width -1;
+		for (x = 0; x <= center; ++x)  {
+			buff = src->rgba[0][src_left_pos]; 
+			out_graph->rgba[0][des_left_pos] = src->rgba[0][src_right_pos];  
+			out_graph->rgba[0][des_right_pos] = buff;
 
-				des_right_pos -= 4;
-				src_right_pos -= 4;
+			buff = src->rgba[1][src_left_pos]; 
+			out_graph->rgba[1][des_left_pos] = src->rgba[1][src_right_pos];  
+			out_graph->rgba[1][des_right_pos] = buff;
+
+			buff = src->rgba[2][src_left_pos]; 
+			out_graph->rgba[2][des_left_pos] = src->rgba[2][src_right_pos];  
+			out_graph->rgba[2][des_right_pos] = buff;
+
+			if(src->color_type == COLOR_TYPE_RGBA) {
+				buff = src->rgba[3][src_left_pos]; 
+				out_graph->rgba[3][des_left_pos] = src->rgba[3][src_right_pos];  
+				out_graph->rgba[3][des_right_pos] = buff;
 			}
+			++src_left_pos;
+			++des_left_pos;
+			--src_right_pos;
+			--des_right_pos;
 		}
-		break;
-	case COLOR_TYPE_RGB:
-		for (y = 0; y < rect.height; ++y) {
-			des_left_pos = y * rect.width;
-			des_right_pos = des_left_pos + rect.width -1;
-			src_left_pos = (y + rect.y) * src->w + rect.x;
-			src_right_pos = src_left_pos + rect.width -1;
-			des_left_pos *= 3;
-			des_right_pos *= 3;
-			src_left_pos *= 3;
-			src_right_pos *= 3;
-			for (x = 0; x <= center; ++x)  {
-				buff = src->bgra[src_left_pos++];
-				out->bgra[des_left_pos++] = src->bgra[src_right_pos];
-				out->bgra[des_right_pos] = buff;
-				
-				buff = src->bgra[src_left_pos++];
-				out->bgra[des_left_pos++] = src->bgra[src_right_pos+1];
-				out->bgra[des_right_pos+1] = buff;
-				
-				buff = src->bgra[src_left_pos++];
-				out->bgra[des_left_pos++] = src->bgra[src_right_pos+2];
-				out->bgra[des_right_pos+2] = buff;
-				
-				des_right_pos -= 3;
-				src_right_pos -= 3;
-			}
-		}
-	default:
-		break;
-	}
+	} 
 	return 0;
 }
 
-LCUI_API int Graph_VertiFlip( LCUI_Graph *src, LCUI_Graph *out )
+LCUI_API int Graph_VertiFlip( LCUI_Graph *src_graph, LCUI_Graph *out_graph )
 {
 	uchar_t buff;
 	LCUI_Rect rect;
-	int x, y, center;
-	int src_row_size, des_row_size;
+	int x, y, center; 
 	int src_top_pos, src_bottom_pos;
 	int des_top_pos, des_bottom_pos;
 	int src_start_top_pos, src_start_bottom_pos;
 	int des_start_top_pos, des_start_bottom_pos;
-	
-	if(!Graph_IsValid(src)) {
+
+	if(!Graph_IsValid(src_graph)) {
 		return -1;
 	}
-	rect = Graph_GetValidRect( src );
-	src = Graph_GetQuote( src );
-	out->color_type = src->color_type;
-	if( Graph_Create(out, rect.width, rect.height ) != 0 ) {
+	src_graph = Graph_GetQuote(src_graph );
+	rect = Graph_GetValidRect( src_graph );
+	out_graph->color_type = src_graph->color_type;
+	if( 0 != Graph_Create(out_graph, rect.width, rect.height ) ) {
 		return -2;
 	}
 
 	center = (int)(rect.height / 2.0);
-	/* 计算基坐标 */
+	/* 记录基坐标 */
 	des_start_top_pos = 0;
 	des_start_bottom_pos = (rect.height-1)*rect.width;
-	src_start_top_pos = rect.y * src->w + rect.x;
-	src_start_bottom_pos = (rect.y + rect.height-1)*src->w + rect.x;
-	switch( src->color_type ) {
-	case COLOR_TYPE_RGBA:
-		src_row_size = src->w * 4;
-		des_row_size = rect.width * 4;
-		for (x=0; x < rect.width; ++x) {
-			/* 当前坐标=基坐标+x */
-			des_top_pos = des_start_top_pos + x;
-			des_bottom_pos = des_start_bottom_pos + x;
-			src_top_pos = src_start_top_pos + x;
-			src_bottom_pos = src_start_bottom_pos + x;
-			des_top_pos *= 4;
-			des_bottom_pos *= 4;
-			src_top_pos *= 4;
-			src_bottom_pos *= 4;
-			for (y = 0; y <= center; ++y) {
-				buff = src->bgra[src_top_pos];
-				out->bgra[des_top_pos] = src->bgra[src_bottom_pos];  
-				out->bgra[des_bottom_pos] = buff;
-			
-				buff = src->bgra[src_top_pos+1];
-				out->bgra[des_top_pos+1] = src->bgra[src_bottom_pos+1];
-				out->bgra[des_bottom_pos+1] = buff;
-			
-				buff = src->bgra[src_top_pos+2];
-				out->bgra[des_top_pos+2] = src->bgra[src_bottom_pos+2];
-				out->bgra[des_bottom_pos+2] = buff;
-			
-				buff = src->bgra[src_top_pos+3];
-				out->bgra[des_top_pos+3] = src->bgra[src_bottom_pos+3];
-				out->bgra[des_bottom_pos+3] = buff;
-			
-				src_top_pos += src_row_size;
-				des_top_pos += des_row_size;
-				src_bottom_pos -= src_row_size;
-				des_bottom_pos -= des_row_size;
+	src_start_top_pos = rect.y * src_graph->w + rect.x;
+	src_start_bottom_pos = (rect.y + rect.height-1)*src_graph->w + rect.x;
+
+	for (x=0; x < rect.width; ++x) {
+		/* 当前坐标=基坐标+x */
+		des_top_pos = des_start_top_pos + x;
+		des_bottom_pos = des_start_bottom_pos + x;
+		src_top_pos = src_start_top_pos + x;
+		src_bottom_pos = src_start_bottom_pos + x;
+		for (y = 0; y <= center; ++y) {
+			buff = src_graph->rgba[0][src_top_pos]; 
+			out_graph->rgba[0][des_top_pos] = src_graph->rgba[0][src_bottom_pos];  
+			out_graph->rgba[0][des_bottom_pos] = buff;
+
+			buff = src_graph->rgba[1][src_top_pos]; 
+			out_graph->rgba[1][des_top_pos] = src_graph->rgba[1][src_bottom_pos];  
+			out_graph->rgba[1][des_bottom_pos] = buff;
+
+			buff = src_graph->rgba[2][src_top_pos]; 
+			out_graph->rgba[2][des_top_pos] = src_graph->rgba[2][src_bottom_pos];  
+			out_graph->rgba[2][des_bottom_pos] = buff;
+
+			if(src_graph->color_type == COLOR_TYPE_RGBA) {
+				buff = src_graph->rgba[3][src_top_pos]; 
+				out_graph->rgba[3][des_top_pos] = src_graph->rgba[3][src_bottom_pos];  
+				out_graph->rgba[3][des_bottom_pos] = buff;
 			}
+			src_top_pos += src_graph->w;
+			des_top_pos += rect.width;
+			src_bottom_pos -= src_graph->w;
+			des_bottom_pos -= rect.width;
 		}
-		break;
-	case COLOR_TYPE_RGB:
-	default:
-		src_row_size = src->w * 3;
-		des_row_size = rect.width * 3;
-		for (x=0; x < rect.width; ++x) {
-			/* 当前坐标=基坐标+x */
-			des_top_pos = des_start_top_pos + x;
-			des_bottom_pos = des_start_bottom_pos + x;
-			src_top_pos = src_start_top_pos + x;
-			src_bottom_pos = src_start_bottom_pos + x;
-			des_top_pos *= 3;
-			des_bottom_pos *= 3;
-			src_top_pos *= 3;
-			src_bottom_pos *= 3;
-			for (y = 0; y <= center; ++y) {
-				buff = src->bgra[src_top_pos];
-				out->bgra[des_top_pos] = src->bgra[src_bottom_pos];  
-				out->bgra[des_bottom_pos] = buff;
-			
-				buff = src->bgra[src_top_pos+1];
-				out->bgra[des_top_pos+1] = src->bgra[src_bottom_pos+1];
-				out->bgra[des_bottom_pos+1] = buff;
-			
-				buff = src->bgra[src_top_pos+2];
-				out->bgra[des_top_pos+2] = src->bgra[src_bottom_pos+2];
-				out->bgra[des_bottom_pos+2] = buff;
-				
-				src_top_pos += src_row_size;
-				des_top_pos += des_row_size;
-				src_bottom_pos -= src_row_size;
-				des_bottom_pos -= des_row_size;
-			}
-		}
-		break;
 	}
-	return 0;  
+	return 0;
 }
 
 LCUI_API int Graph_FillRect( LCUI_Graph *graph, LCUI_RGB color, LCUI_Rect rect )
 {
-	int pos, y, x;
+	size_t size;
+	int pos, y;
 	LCUI_Rect src_rect;
+	uchar_t *r_ptr, *g_ptr, *b_ptr;
 	
 	src_rect = Graph_GetValidRect( graph ); 
 	graph = Graph_GetQuote( graph );
@@ -713,32 +637,18 @@ LCUI_API int Graph_FillRect( LCUI_Graph *graph, LCUI_RGB color, LCUI_Rect rect )
 	if( rect.y + rect.height > src_rect.x + src_rect.height ) {
 		rect.height = src_rect.y + src_rect.height - rect.y;
 	}
-	/* 根据不同的色彩类型，进行像素颜色填充 */
-	switch( graph->color_type ) {
-	case COLOR_TYPE_RGBA:
-		for(y=0; y<rect.height; ++y) {
-			pos = (rect.y+y)*graph->w+rect.x;
-			pos *= 4;
-			for(x=0; x<rect.width; ++x) {
-				graph->bgra[pos++] = color.blue;
-				graph->bgra[pos++] = color.green;
-				graph->bgra[pos++] = color.red;
-				pos++;
-			}
-		}
-		break;
-	case COLOR_TYPE_RGB:
-	default:
-		for(y=0; y<rect.height; ++y) {
-			pos = (rect.y+y)*graph->w+rect.x;
-			pos *= 3;
-			for(x=0; x<rect.width; ++x) {
-				graph->bgra[pos++] = color.blue;
-				graph->bgra[pos++] = color.green;
-				graph->bgra[pos++] = color.red;
-			}
-		}
-		break;
+	size = sizeof(uchar_t) * rect.width;
+	pos = rect.x + rect.y * graph->w;
+	r_ptr = graph->rgba[0] + pos;
+	g_ptr = graph->rgba[1] + pos;
+	b_ptr = graph->rgba[2] + pos;
+	for(y=0; y<rect.height; ++y) {
+		memset( r_ptr, color.red, size );
+		memset( g_ptr, color.green, size );
+		memset( b_ptr, color.blue, size );
+		r_ptr += graph->w;
+		g_ptr += graph->w;
+		b_ptr += graph->w;
 	}
 	return 0; 
 }
@@ -782,57 +692,33 @@ LCUI_API int Graph_Tile( LCUI_Graph *src, LCUI_Graph *des, LCUI_BOOL replace )
  *	此函数不会对传入的参数进行有效性判断，因为此函数主要被Graph_Mix函
  *	数调用，Graph_Mix函数会预先进行参数有效性判断
  */
-static int Graph_RGBAMix(	LCUI_Graph *back,
+static int Graph_RGBAMix(	LCUI_Graph *des,
 				LCUI_Rect des_rect,
-				LCUI_Graph *fore,
+				LCUI_Graph *src,
 				LCUI_Pos src_pos )
 {
 	int x, y;
-	int des_pixel_bytes;
-	int n, des_row_size, src_row_size;
-	uchar_t *src_alpha_ptr, *src_ptr, *des_ptr;
-	uchar_t *des_row_start, *src_row_start;
-	LCUI_Graph *src, *des;
+	int src_n, des_n;
+	int des_row_start, src_row_start;
 
-	src = Graph_GetQuote(fore);
-	des = Graph_GetQuote(back);
-	
-	/* 根据左上角点的二维坐标，计算出一维坐标 */
-	n = (src_pos.y * src->w + src_pos.x)*4;
-	src_row_start = src->bgra + n;
-	/* 计算出源图像每行像素占的字节数 */
-	src_row_size = 4 * src->w;
-	/* 根据目标图像的色彩类型，计算出每个像素和每行像素占的字节数 */
-	if( des->color_type == COLOR_TYPE_RGBA ) {
-		des_pixel_bytes = 4;
-		des_row_size = 4 * des->w;
-	} else {
-		des_pixel_bytes = 3;
-		des_row_size = 3 * des->w;
-	}
 	/* 计算并保存第一行的首个像素的位置 */
-	n = des_rect.y * des->w + des_rect.x;
-	n = n * des_pixel_bytes;
-	des_row_start = des->bgra + n;
-
+	src_row_start = src_pos.y * src->w + src_pos.x;
+	des_row_start = des_rect.y * des->w + des_rect.x;
 	for(y=0; y<des_rect.height; ++y) { 
-		des_ptr = des_row_start;
-		src_ptr = src_row_start;
-		src_alpha_ptr = src_row_start + 3;
+		des_n = des_row_start;
+		src_n = src_row_start;
 		for(x=0; x<des_rect.width; ++x) {
 			/* 将R、G、B三个色彩值进行alpha混合 */
-			ALPHA_BLEND( *src_ptr++, *des_ptr, *src_alpha_ptr );
-			ALPHA_BLEND( *src_ptr++, *(des_ptr+1), *src_alpha_ptr );
-			ALPHA_BLEND( *src_ptr++, *(des_ptr+2), *src_alpha_ptr );
+			ALPHA_BLEND( src->rgba[0][src_n], des->rgba[0][des_n], src->rgba[3][src_n] );
+			ALPHA_BLEND( src->rgba[1][src_n], des->rgba[1][des_n], src->rgba[3][src_n] );
+			ALPHA_BLEND( src->rgba[2][src_n], des->rgba[2][des_n], src->rgba[3][src_n] );
 			/* 切换到下个像素的数据 */
-			src_ptr++;
-			des_ptr += des_pixel_bytes;
-			/* 切换到下一个像素的alpha值 */
-			src_alpha_ptr += 4;
+			++src_n;
+			++des_n;
 		}
 		/* 切换到下一行像素 */
-		des_row_start += des_row_size;
-		src_row_start += src_row_size;
+		des_row_start += des->w;
+		src_row_start += src->w;
 	}
 	return 0;
 }
@@ -852,55 +738,35 @@ static int Graph_RGBAMix(	LCUI_Graph *back,
  *	此函数不会对传入的参数进行有效性判断，因为此函数主要被Graph_Mix函
  *	数调用，Graph_Mix函数会预先进行参数有效性判断
  */
-static int Graph_RGBAMixWithGlobalAlpha(	LCUI_Graph *back,
+static int Graph_RGBAMixWithGlobalAlpha(	LCUI_Graph *des,
 						LCUI_Rect des_rect,
-						LCUI_Graph *fore,
+						LCUI_Graph *src,
 						LCUI_Pos src_pos )
 {
 	double k;
 	int x, y;
 	uchar_t alpha;
-	int des_pixel_bytes;
-	int n, des_row_size, src_row_size;
-	uchar_t *src_alpha_ptr, *src_ptr, *des_ptr;
-	uchar_t *des_row_start, *src_row_start;
-	LCUI_Graph *src, *des;
+	int src_n, des_n;
+	int des_row_start, src_row_start;
 
-	src = Graph_GetQuote(fore);
-	des = Graph_GetQuote(back);
-	
-	n = (src_pos.y * src->w + src_pos.x)*4;
-	src_row_start = src->bgra + n;
-	src_row_size = 4 * src->w;
-	if( des->color_type == COLOR_TYPE_RGBA ) {
-		des_pixel_bytes = 4;
-		des_row_size = 4 * des->w;
-	} else {
-		des_pixel_bytes = 3;
-		des_row_size = 3 * des->w;
-	}
-
-	n = des_rect.y * src->w + des_rect.x;
-	n = n * des_pixel_bytes;
-	des_row_start = des->bgra + n;
+	src_row_start = src_pos.y * src->w + src_pos.x;
+	des_row_start = des_rect.y * src->w + des_rect.x;
 	/* 先得出透明度比例，避免在循环中进行除法运算 */
 	k = src->alpha / 255.0;
 
 	for(y=0; y<des_rect.height; ++y) {
-		des_ptr = des_row_start;
-		src_ptr = src_row_start;
-		src_alpha_ptr = src_row_start + 3;
+		des_n = des_row_start;
+		src_n = src_row_start;
 		for(x=0; x<des_rect.width; ++x) {
-			alpha = *src_alpha_ptr * k;
-			ALPHA_BLEND( *src_ptr++, *des_ptr, alpha );
-			ALPHA_BLEND( *src_ptr++, *(des_ptr+1), alpha );
-			ALPHA_BLEND( *src_ptr++, *(des_ptr+2), alpha );
-			src_ptr++;
-			des_ptr += des_pixel_bytes;
-			src_alpha_ptr += 4;
+			alpha = src->rgba[3][src_n] * k;
+			ALPHA_BLEND( src->rgba[0][src_n], des->rgba[0][des_n], alpha );
+			ALPHA_BLEND( src->rgba[1][src_n], des->rgba[1][des_n], alpha );
+			ALPHA_BLEND( src->rgba[2][src_n], des->rgba[2][des_n], alpha );
+			++src_n;
+			++des_n;
 		}
-		des_row_start += des_row_size;
-		src_row_start += src_row_size;
+		des_row_start += des->w;
+		src_row_start += src->w;
 	}
 	return 0;
 }
@@ -919,39 +785,24 @@ static int Graph_RGBAMixWithGlobalAlpha(	LCUI_Graph *back,
  *	此函数不会对传入的参数进行有效性判断，因为此函数主要被Graph_Mix函
  *	数调用，Graph_Mix函数会预先进行参数有效性判断
  */
-static int Graph_RGBMix(	LCUI_Graph *back,
+static int Graph_RGBMix(	LCUI_Graph *des,
 				LCUI_Rect des_rect,
-				LCUI_Graph *fore,
+				LCUI_Graph *src,
 				LCUI_Pos src_pos )
 {
-	int y, des_pixel_bytes;
-	int n, des_row_size, src_row_size;
-	uchar_t *des_row_start, *src_row_start;
-	LCUI_Graph *src, *des;
+	int y;
+	int des_n, src_n;
 
-	src = Graph_GetQuote(fore);
-	des = Graph_GetQuote(back);
-	
-	n = (src_pos.y * src->w + src_pos.x)*3;
-	src_row_start = src->bgra + n;
-	src_row_size = 3 * src->w;
-	if( des->color_type == COLOR_TYPE_RGBA ) {
-		des_pixel_bytes = 4;
-		des_row_size = 4 * des->w;
-	} else {
-		des_pixel_bytes = 3;
-		des_row_size = 3 * des->w;
-	}
-	
-	n = des_rect.y * src->w + des_rect.x;
-	n = n * des_pixel_bytes;
-	des_row_start = des->bgra + n;
+	src_n = src_pos.y * src->w + src_pos.x;
+	des_n = des_rect.y * des->w + des_rect.x;
 
 	for(y=0; y<des_rect.height; ++y) { 
 		/* 直接拷贝覆盖每一行像素数据 */
-		memcpy( des_row_start, src_row_start, des_rect.width*des_pixel_bytes );
-		des_row_start += des_row_size;
-		src_row_start += src_row_size;
+		memcpy( &des->rgba[0][des_n], &src->rgba[0][src_n], des_rect.width );
+		memcpy( &des->rgba[1][des_n], &src->rgba[1][src_n], des_rect.width );
+		memcpy( &des->rgba[2][des_n], &src->rgba[2][src_n], des_rect.width );
+		des_n += des->w;
+		src_n += src->w;
 	}
 
 	return 0;
@@ -972,104 +823,95 @@ static int Graph_RGBMix(	LCUI_Graph *back,
  *	此函数不会对传入的参数进行有效性判断，因为此函数主要被Graph_Mix函
  *	数调用，Graph_Mix函数会预先进行参数有效性判断
  */
-static int Graph_RGBMixWithGlobalAlpha(	LCUI_Graph *back,
+static int Graph_RGBMixWithGlobalAlpha(	LCUI_Graph *des,
 					LCUI_Rect des_rect,
-					LCUI_Graph *fore,
+					LCUI_Graph *src,
 					LCUI_Pos src_pos )
 {
 	int x, y;
-	int des_pixel_bytes;
-	int n, des_row_size, src_row_size;
-	uchar_t *src_ptr, *des_ptr;
-	uchar_t *des_row_start, *src_row_start;
-	LCUI_Graph *src, *des;
-
-	src = Graph_GetQuote(fore);
-	des = Graph_GetQuote(back);
+	int src_n, des_n;
+	int des_row_start, src_row_start;
 	
-	n = (src_pos.y * src->w + src_pos.x)*4;
-	src_row_start = src->bgra + n;
-	src_row_size = 3 * src->w;
-	if( des->color_type == COLOR_TYPE_RGBA ) {
-		des_pixel_bytes = 4;
-		des_row_size = 4 * des->w;
-	} else {
-		des_pixel_bytes = 3;
-		des_row_size = 3 * des->w;
-	}
-	n = des_rect.y * src->w + des_rect.x;
-	n = n * des_pixel_bytes;
-	des_row_start = des->bgra + n;
+	src_row_start = src_pos.y * src->w + src_pos.x;
+	des_row_start = des_rect.y * src->w + des_rect.x;
 	for(y=0; y<des_rect.height; ++y) { 
-		des_ptr = des_row_start;
-		src_ptr = src_row_start;
+		des_n = des_row_start;
+		src_n = src_row_start;
 		for(x=0; x<des_rect.width; ++x) {
-			ALPHA_BLEND( *src_ptr++, *des_ptr, src->alpha );
-			ALPHA_BLEND( *src_ptr++, *(des_ptr+1), src->alpha );
-			ALPHA_BLEND( *src_ptr++, *(des_ptr+2), src->alpha );
-			des_ptr += des_pixel_bytes;
+			ALPHA_BLEND( src->rgba[0][src_n], des->rgba[0][des_n], src->alpha );
+			ALPHA_BLEND( src->rgba[1][src_n], des->rgba[1][des_n], src->alpha );
+			ALPHA_BLEND( src->rgba[2][src_n], des->rgba[2][des_n], src->alpha );
+			++src_n;
+			++des_n;
 		}
-		des_row_start += des_row_size;
-		src_row_start += src_row_size;
+		des_row_start += des->w;
+		src_row_start += src->w;
 	}
 	return 0;
 }
 
-LCUI_API int Graph_Mix( LCUI_Graph *back, LCUI_Graph *fore, LCUI_Pos pos )
+
+LCUI_API int Graph_Mix(	LCUI_Graph *back_graph, 
+			LCUI_Graph *fore_graph,
+			LCUI_Pos des_pos )
 {
 	LCUI_Graph *src, *des;
-	LCUI_Rect src_rect, des_rect, cut;
-
+	LCUI_Rect cut, src_rect, des_rect;
+	LCUI_Pos src_pos;
+	
 	/* 预先进行有效性判断 */
-	if(!Graph_IsValid(back) || !Graph_IsValid(fore)) {
+	if(!Graph_IsValid(back_graph)
+	 || !Graph_IsValid(fore_graph)) {
 		return -1;
 	}
+	
 	/* 获取引用的源图像的最终区域 */
-	src_rect = Graph_GetValidRect(fore);
-	des_rect = Graph_GetValidRect(back);
+	src_rect = Graph_GetValidRect(fore_graph);
+	des_rect = Graph_GetValidRect(back_graph);
 	/* 获取引用的源图像 */
-	src = Graph_GetQuote(fore);
-	des = Graph_GetQuote(back);
+	src = Graph_GetQuote(fore_graph);
+	des = Graph_GetQuote(back_graph);  
 	/* 判断引用的源图像的有效性 */
 	if(!Graph_IsValid(des) || !Graph_IsValid(src)) {
 		return -1;
-	}
-	
+	} 
 	/* 判断坐标是否在背景图的范围内 */
-	if(pos.x >= des_rect.width || pos.y >= des_rect.height) {
+	if(des_pos.x > des->w || des_pos.y > des->h) {
 		return -1;
 	}
-	
+
 	/* 如果前景图尺寸超出背景图的范围，需要更改前景图的像素读取范围 */ 
 	if( LCUIRect_GetCutArea(
 		Size( des_rect.width, des_rect.height),
-		Rect( pos.x, pos.y, src_rect.width, src_rect.height ),
+		Rect( des_pos.x, des_pos.y, 
+			src_rect.width, src_rect.height ),
 		&cut
 	)) {
-		pos.x += cut.x;
-		pos.y += cut.y;
+		des_pos.x += cut.x;
+		des_pos.y += cut.y;
 	}
-	/* 计算出背景图像的目标写入区域 */
-	des_rect.x = pos.x;
-	des_rect.y = pos.y;
+	/* 得出源图像的读取区域的坐标 */
+	src_pos.x = cut.x + src_rect.x;
+	src_pos.y = cut.y + src_rect.y;
+	/* 得出目标图像的写入区域 */
+	des_rect.x = des_pos.x + des_rect.x;
+	des_rect.y = des_pos.y + des_rect.y;
 	des_rect.width = cut.width;
 	des_rect.height = cut.height;
-
 	/* 如果前景图像有alpha通道 */
 	if( src->color_type == COLOR_TYPE_RGBA ) {
 		/* 如果全局透明度为255，则说明混合时不需要考虑全局透明度 */
 		if( src->alpha == 255 ) {
-			return Graph_RGBAMix( back, des_rect, fore, pos );
+			return Graph_RGBAMix( des, des_rect, src, src_pos );
 		}
-		/* 否则，在进行alpha混合时，需要将全局透明度计算在内 */
-		return Graph_RGBAMixWithGlobalAlpha( back, des_rect, fore, pos );
+		return Graph_RGBAMixWithGlobalAlpha( des, des_rect, src, src_pos );
+	} /* 否则，前景图像没有Alpha通道 */
+	/* 如果全局透明度为255，说明前景图形没有透明效果 */
+	if( src->alpha == 255 ) { 
+		return Graph_RGBMix( des, des_rect, des, src_pos );
 	}
-	/* 否则，前景图像没有Alpha通道 */
-
-	if( src->alpha == 255 ) {
-		return Graph_RGBMix( back, des_rect, fore, pos );
-	}
-	return Graph_RGBMixWithGlobalAlpha( back, des_rect, fore, pos );
+	/* 否则，将全局透明度计算在内，进行alpha混合 */
+	return Graph_RGBAMixWithGlobalAlpha( des, des_rect, des, src_pos );
 }
 
 /**
@@ -1092,34 +934,28 @@ static int Graph_RGBAReplaceRGB(	LCUI_Graph *back,
 					LCUI_Pos src_pos )
 {
 	int x, y;
-	int n, des_row_size, src_row_size;
-	uchar_t *src_alpha_ptr, *src_ptr, *des_ptr;
-	uchar_t *des_row_start, *src_row_start;
+	int src_n, des_n;
+	int des_row_start, src_row_start;
 	LCUI_Graph *src, *des;
 
 	src = Graph_GetQuote(fore);
 	des = Graph_GetQuote(back);
 	
-	n = (src_pos.y * src->w + src_pos.x)*4;
-	src_row_start = src->bgra + n;
-	src_row_size = 4 * src->w;
-	des_row_size = 3 * des->w;
-	n = (des_rect.y * des->w +  des_rect.x)*3;
-	des_row_start = des->bgra + n;
+	src_row_start = src_pos.y * src->w + src_pos.x;
+	des_row_start = des_rect.y * des->w +  des_rect.x;
 	
 	for(y=0; y<des_rect.height; ++y) { 
-		des_ptr = des_row_start;
-		src_ptr = src_row_start;
-		src_alpha_ptr = src_row_start + 3;
+		des_n = des_row_start;
+		src_n = src_row_start;
 		for(x=0; x<des_rect.width; ++x) {
-			*des_ptr++ = _ALPHA_BLEND( *src_ptr++, 255, *src_alpha_ptr );
-			*des_ptr++ = _ALPHA_BLEND( *src_ptr++, 255, *src_alpha_ptr );
-			*des_ptr++ = _ALPHA_BLEND( *src_ptr++, 255, *src_alpha_ptr );
-			src_ptr++;
-			src_alpha_ptr += 4;
+			des->rgba[0][des_n] = _ALPHA_BLEND( src->rgba[0][src_n], 255, src->rgba[3][src_n] );
+			des->rgba[1][des_n] = _ALPHA_BLEND( src->rgba[1][src_n], 255, src->rgba[3][src_n] );
+			des->rgba[2][des_n] = _ALPHA_BLEND( src->rgba[2][src_n], 255, src->rgba[3][src_n] );
+			++src->w;
+			++des->w;
 		}
-		des_row_start += des_row_size;
-		src_row_start += src_row_size;
+		des_row_start += des->w;
+		src_row_start += src->w;
 	}
 	return 0;
 }
@@ -1148,9 +984,9 @@ static int Graph_RGBAReplaceRGBWithGlobalAlpha(	LCUI_Graph *back,
 {
 	int x, y;
 	double k;
-	int n, des_row_size, src_row_size;
-	uchar_t alpha, *src_alpha_ptr, *src_ptr, *des_ptr;
-	uchar_t *des_row_start, *src_row_start;
+	uchar_t alpha;
+	int src_n, des_n;
+	int des_row_start, src_row_start;
 	LCUI_Graph *src, *des;
 	
 	src = Graph_GetQuote(fore);
@@ -1158,27 +994,22 @@ static int Graph_RGBAReplaceRGBWithGlobalAlpha(	LCUI_Graph *back,
 
 	k = 1.0 / src->alpha;
 
-	n = (src_pos.y * src->w + src_pos.x)*4;
-	src_row_start = src->bgra + n;
-	src_row_size = 4 * src->w;
-	des_row_size = 3 * des->w;
-	n = (des_rect.y * des->w + des_rect.x)*3;
-	des_row_start = des->bgra + n;
+	src_row_start = src_pos.y * src->w + src_pos.x;
+	des_row_start = des_rect.y * des->w + des_rect.x;
 	
 	for(y=0; y<des_rect.height; ++y) { 
-		des_ptr = des_row_start;
-		src_ptr = src_row_start;
-		src_alpha_ptr = src_row_start + 3;
+		des_n = des_row_start;
+		src_n = src_row_start;
 		for(x=0; x<des_rect.width; ++x) {
 			alpha = src->alpha * k;
-			*des_ptr++ = _ALPHA_BLEND( *src_ptr++, 255, alpha );
-			*des_ptr++ = _ALPHA_BLEND( *src_ptr++, 255, alpha );
-			*des_ptr++ = _ALPHA_BLEND( *src_ptr++, 255, alpha );
-			src_ptr++;
-			src_alpha_ptr += 4;
+			des->rgba[0][des_n] = _ALPHA_BLEND( src->rgba[0][src_n], 255, alpha );
+			des->rgba[1][des_n] = _ALPHA_BLEND( src->rgba[1][src_n], 255, alpha );
+			des->rgba[2][des_n] = _ALPHA_BLEND( src->rgba[2][src_n], 255, alpha );
+			++src->w;
+			++des->w;
 		}
-		des_row_start += des_row_size;
-		src_row_start += src_row_size;
+		des_row_start += des->w;
+		src_row_start += src->w;
 	}
 	return 0;
 }
@@ -1202,33 +1033,26 @@ static int Graph_DirectReplace(	LCUI_Graph *back,
 				LCUI_Graph *fore,
 				LCUI_Pos src_pos )
 {
-	int y, pixel_bytes;
-	int n, des_row_size, src_row_size;
-	uchar_t *des_row_start, *src_row_start;
+	int y;
+	int des_n, src_n;
 	LCUI_Graph *src, *des;
 
 	src = Graph_GetQuote(fore);
 	des = Graph_GetQuote(back);
 
-	if( Graph_HaveAlpha(src) && Graph_HaveAlpha(des) ) {
-		pixel_bytes = 4;
-	} else {
-		pixel_bytes = 3;
-	}
-
-	n = (src_pos.y * src->w + src_pos.x);
-	n = n * pixel_bytes;
-	src_row_start = src->bgra + n;
-	src_row_size = pixel_bytes * src->w;
-	n = des_rect.y * des->w + des_rect.x;
-	n = n * pixel_bytes;
-	des_row_start = des->bgra + n;
-	des_row_size = pixel_bytes * des->w;
+	src_n = src_pos.y * src->w + src_pos.x;
+	des_n = des_rect.y * des->w + des_rect.x;
 
 	for(y=0; y<des_rect.height; ++y) {
-		memcpy( des_row_start, src_row_start, des_rect.width*pixel_bytes );
-		des_row_start += des_row_size;
-		src_row_start += src_row_size;
+		memcpy( &des->rgba[0][des_n], &src->rgba[0][src_n], des_rect.width );
+		memcpy( &des->rgba[1][des_n], &src->rgba[1][src_n], des_rect.width );
+		memcpy( &des->rgba[2][des_n], &src->rgba[2][src_n], des_rect.width );
+		if( des->color_type == src->color_type
+		 && des->color_type == COLOR_TYPE_RGBA ) {
+			memcpy( &des->rgba[3][des_n], &src->rgba[3][src_n], des_rect.width );
+		}
+		des_n += des->w;
+		src_n += src->w;
 	}
 
 	return 0;
@@ -1252,41 +1076,32 @@ static int Graph_DirectReplace(	LCUI_Graph *back,
 					LCUI_Graph *fore,
 					LCUI_Pos src_pos )
  {
-	int x, y;
-	int n, des_row_size, src_row_size;
-	uchar_t *src_ptr, *des_ptr;
-	uchar_t *des_row_start, *src_row_start;
+	int y;
+	int des_n, src_n;
 	LCUI_Graph *src, *des;
 
 	src = Graph_GetQuote(fore);
 	des = Graph_GetQuote(back);
-	
-	n = (src_pos.y * src->w + src_pos.x)*3;
-	src_row_start = src->bgra + n;
-	src_row_size = 3 * src->w;
-	des_row_size = 4 * des->w;
-	n = (des_rect.y * des->w + des_rect.x)*4;
-	des_row_start = des->bgra + n;
-	
-	for(y=0; y<des_rect.height; ++y) { 
-		des_ptr = des_row_start;
-		src_ptr = src_row_start;
-		for(x=0; x<des_rect.width; ++x) {
-			*des_ptr++ = *src_ptr++;
-			*des_ptr++ = *src_ptr++;
-			*des_ptr++ = *src_ptr++;
-			*des_ptr++ = src->alpha;
-		}
-		des_row_start += des_row_size;
-		src_row_start += src_row_size;
+
+	src_n = src_pos.y * src->w + src_pos.x;
+	des_n = des_rect.y * des->w + des_rect.x;
+
+	for(y=0; y<des_rect.height; ++y) {
+		memcpy( &des->rgba[0][des_n], &src->rgba[0][src_n], des_rect.width );
+		memcpy( &des->rgba[1][des_n], &src->rgba[1][src_n], des_rect.width );
+		memcpy( &des->rgba[2][des_n], &src->rgba[2][src_n], des_rect.width );
+		memset( &des->rgba[3][des_n], src->alpha, des_rect.width );
+		des_n += des->w;
+		src_n += src->w;
 	}
 	return 0;
 }
 
 LCUI_API int Graph_Replace( LCUI_Graph *back, LCUI_Graph *fore, LCUI_Pos pos )
 {
+	LCUI_Size box_size;
 	LCUI_Graph *src, *des;
-	LCUI_Rect src_rect, des_rect, cut;
+	LCUI_Rect src_rect, area, des_rect, cut;
 
 	if(!Graph_IsValid(back) || !Graph_IsValid(fore)) {
 		return -1;
@@ -1298,26 +1113,23 @@ LCUI_API int Graph_Replace( LCUI_Graph *back, LCUI_Graph *fore, LCUI_Pos pos )
 	if(!Graph_IsValid(des) || !Graph_IsValid(src)) {
 		return -1;
 	}
-	/* 判断坐标是否在背景图的范围内 */
+	
 	if(pos.x >= des_rect.width || pos.y >= des_rect.height) {
 		return -1;
 	}
-	
-	/* 如果前景图尺寸超出背景图的范围，需要更改前景图的像素读取范围 */ 
-	if( LCUIRect_GetCutArea(
-		Size( des_rect.width, des_rect.height),
-		Rect( pos.x, pos.y, src_rect.width, src_rect.height ),
-		&cut
-	)) {
-		pos.x += cut.x;
-		pos.y += cut.y;
-	}
-	/* 计算出背景图像的目标写入区域 */
-	des_rect.x = pos.x;
-	des_rect.y = pos.y;
+	des_rect.x += pos.x;
+	des_rect.y += pos.y;
+	box_size.w = des_rect.width;
+	box_size.h = des_rect.height;
+	area.x = pos.x;
+	area.y = pos.y;
+	area.width = src_rect.width;
+	area.height = src_rect.height;
+	LCUIRect_GetCutArea( box_size, area, &cut );
+	pos.x = cut.x;
+	pos.y = cut.y;
 	des_rect.width = cut.width;
 	des_rect.height = cut.height;
-
 	/* 如果前景图像有透明度 */
 	if(Graph_HaveAlpha(src)) {
 		 /* 弱背景图有透明度 */
@@ -1448,8 +1260,7 @@ LCUI_API int Graph_FillImage(	LCUI_Graph *graph,
 
 LCUI_API int Graph_FillAlpha( LCUI_Graph *src, uchar_t alpha )
 {
-	int x, y, n, row_size;
-	uchar_t *ptr, *row_start_ptr;
+	int y, row_start;
 	LCUI_Rect src_rect;
 	
 	/* 获取引用的区域在源图形中的有效区域 */
@@ -1464,15 +1275,11 @@ LCUI_API int Graph_FillAlpha( LCUI_Graph *src, uchar_t alpha )
 		return -2;
 	}
 	
-	row_size = 4 * src_rect.width;
-	n = (src_rect.x + src_rect.y * src->w) + 4;
-	row_start_ptr = src->bgra + n;
+	row_start = src_rect.x + src_rect.y * src->w;
 	for(y=0; y<src_rect.height; ++y) {
-		ptr = row_start_ptr + 3;
-		for(x=0; x<src_rect.width; ++x) {
-			*ptr = alpha;
-			ptr += 4;
-		}
+		memset( &src->rgba[3][row_start], 
+			alpha, src_rect.width*sizeof(uchar_t) );
+		row_start += src->w;
 	}
 	return 0; 
 }
