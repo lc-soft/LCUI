@@ -72,19 +72,18 @@ struct _LCUI_Node
 /*******************************************/
 
 /****************************** 队列 ***********************************/
-struct _LCUI_Queue
-{ 
-	LCUI_Mutex mutex;
-	int member_type:2;	/* 成员类型 */ 
-	int data_mode:2;	/* 数据储存方式（数组/链表） */
+struct _LCUI_Queue {
+	LCUI_Mutex mutex;	/**< 队列互斥锁 */
+	int member_type:2;	/**< 成员类型 */ 
+	int data_mode:2;	/**< 数据储存方式（数组/链表） */
 	
-	void **data_array;		/* 记录队列成员(数组模式) */
-	LCUI_Node data_head_node;	/* 记录队列成员(链表模式) */
+	void **data_array;		/**< 记录队列成员(数组模式) */
+	LCUI_Node data_head_node;	/**< 记录队列成员(链表模式) */
 	
-	size_t element_size;	/* 成员的占用的内存空间大小，单位为字节 */
-	int total_num;		/* 记录队列成员数量 */
-	int max_num;		/* 最大的数量 */
-	void (*destroy_func) (void*); /* 析构函数，当销毁队列成员时，会调用它进行销毁 */
+	size_t element_size;	/**< 成员的占用的内存空间大小，单位为字节 */
+	int total_num;		/**< 记录队列成员数量 */
+	int max_num;		/**< 最大的数量 */
+	void (*destroy_func) (void*); /**< 析构函数，当销毁队列成员时，会调用它进行销毁 */
 };
 /**********************************************************************/
 
