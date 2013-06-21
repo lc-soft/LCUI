@@ -1112,54 +1112,70 @@ static int Graph_DirectReplace(	LCUI_Graph *back,
 	return 0;
 }
 
-LCUI_API int Graph_Replace( LCUI_Graph *back, LCUI_Graph *fore, LCUI_Pos pos )
+LCUI_API int Graph_Replace(	LCUI_Graph *back_graph,
+				LCUI_Graph *fore_graph,
+				LCUI_Pos des_pos )
 {
-	LCUI_Size box_size;
 	LCUI_Graph *src, *des;
-	LCUI_Rect src_rect, area, des_rect, cut;
-
-	if(!Graph_IsValid(back) || !Graph_IsValid(fore)) {
+	LCUI_Rect cut, src_rect, area, des_rect;
+	LCUI_Size box_size;
+	LCUI_Pos src_pos;
+	
+	/* 预先进行有效性判断 */
+	if( !Graph_IsValid(back_graph)
+	 || !Graph_IsValid(fore_graph) ) {
 		return -1;
 	}
-	src_rect = Graph_GetValidRect(fore);
-	des_rect = Graph_GetValidRect(back);
-	src = Graph_GetQuote(fore);
-	des = Graph_GetQuote(back);
+	/* 获取引用的源图像的最终区域 */
+	src_rect = Graph_GetValidRect(fore_graph);
+	des_rect = Graph_GetValidRect(back_graph);
+	/* 获取引用的源图像 */
+	src = Graph_GetQuote(fore_graph);
+	des = Graph_GetQuote(back_graph);  
+	/* 判断引用的源图像的有效性 */
 	if(!Graph_IsValid(des) || !Graph_IsValid(src)) {
 		return -1;
-	}
-	
-	if(pos.x >= des_rect.width || pos.y >= des_rect.height) {
+	} 
+	/* 判断坐标是否在背景图的范围内 */
+	if(des_pos.x > des->w || des_pos.y > des->h) {
 		return -1;
 	}
-	des_rect.x += pos.x;
-	des_rect.y += pos.y;
+	/* 记录容器尺寸 */
 	box_size.w = des_rect.width;
 	box_size.h = des_rect.height;
-	area.x = pos.x;
-	area.y = pos.y;
+	/* 记录前景图像在容器中的区域 */
+	area.x = des_pos.x;
+	area.y = des_pos.y;
 	area.width = src_rect.width;
 	area.height = src_rect.height;
+	/* 获取前景图像区域中的需要裁减的区域 */ 
 	LCUIRect_GetCutArea( box_size, area, &cut );
-	pos.x = cut.x;
-	pos.y = cut.y;
+	/* 移动前景图像区域的坐标 */
+	des_pos.x += cut.x;
+	des_pos.y += cut.y;
+	/* 得出源图像的读取区域的坐标 */
+	src_pos.x = cut.x + src_rect.x;
+	src_pos.y = cut.y + src_rect.y;
+	/* 得出目标图像的写入区域 */
+	des_rect.x = des_pos.x + des_rect.x;
+	des_rect.y = des_pos.y + des_rect.y;
 	des_rect.width = cut.width;
 	des_rect.height = cut.height;
 	/* 如果前景图像有透明度 */
-	if(Graph_HaveAlpha(src)) {
+	if( src->color_type == COLOR_TYPE_RGBA ) {
 		 /* 弱背景图有透明度 */
-		if( Graph_HaveAlpha(des)) {
-			return Graph_DirectReplace( back, des_rect, fore, pos );
+		if( des->color_type == COLOR_TYPE_RGBA ) {
+			return Graph_DirectReplace( des, des_rect, src, src_pos );
 		}
 		if( src->alpha == 255 ) {
-			return Graph_RGBAReplaceRGB( back, des_rect, fore, pos );
+			return Graph_RGBAReplaceRGB( des, des_rect, src, src_pos );
 		}
-		return Graph_RGBAReplaceRGBWithGlobalAlpha( back, des_rect, fore, pos );
+		return Graph_RGBAReplaceRGBWithGlobalAlpha( des, des_rect, src, src_pos );
 	}
-	if( Graph_HaveAlpha(des) ) {
-		return Graph_RGBReplaceRGBA( back, des_rect, fore, pos );
+	if( des->color_type == COLOR_TYPE_RGBA ) {
+		return Graph_RGBReplaceRGBA( des, des_rect, src, src_pos );
 	}
-	return Graph_DirectReplace( back, des_rect, fore, pos );
+	return Graph_DirectReplace( des, des_rect, src, src_pos );
 }
 
 LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int flag )
