@@ -75,10 +75,7 @@ LCUI_API int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 	// 两个常数，这样不用以后每次都计算了   
 	f1 = (double) (-0.5*(new_width-1)*fCosa-0.5*(new_height-1)*fSina+0.5*(width-1)); 
 	f2 = (double) (0.5*(new_width-1)*fSina-0.5*(new_height-1)*fCosa+0.5*(height-1));   
-	   
-	if(Graph_IsValid(des)) {
-		Graph_Free(des);/* 先将这个内存释放 */
-	}
+	
 	des->color_type = src->color_type;
 	// 分配内存，储存新的图形
 	if(Graph_Create(des, new_width, new_height) != 0) {
@@ -103,7 +100,7 @@ LCUI_API int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 				des->rgba[0][n] = src->rgba[0][z];
 				des->rgba[1][n] = src->rgba[1][z];
 				des->rgba[2][n] = src->rgba[2][z];
-				if(Graph_HaveAlpha(des)) {
+				if(src->color_type == COLOR_TYPE_RGBA) {
 					des->rgba[3][n] = src->rgba[3][z];
 				}
 			} else {
@@ -111,7 +108,7 @@ LCUI_API int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 				des->rgba[0][n] = 255;
 				des->rgba[1][n] = 255;
 				des->rgba[2][n] = 255;
-				if(Graph_HaveAlpha(des)) {
+				if(src->color_type == COLOR_TYPE_RGBA) {
 					des->rgba[3][n] = 0;
 				}
 			}
