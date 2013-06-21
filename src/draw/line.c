@@ -33,13 +33,13 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start
 	}
 
 	for(y=start.y; y<end_y; ++y) {
-		k = y * des->width;
+		k = y * des->w;
 		for(x=start.x; x < end_x; ++x) {
 			pos = k + x;
 			des->rgba[0][pos] = color.red;
 			des->rgba[1][pos] = color.green;
 			des->rgba[2][pos] = color.blue;
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
@@ -77,13 +77,13 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start
 	}
 
 	for(y=start.y; y<end_y; ++y) {
-		k = y * des->width;
+		k = y * des->w;
 		for(x=start.x; x < end_x; ++x) {
 			pos = k + x;
 			des->rgba[0][pos] = color.red;
 			des->rgba[1][pos] = color.green;
 			des->rgba[2][pos] = color.blue;
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}

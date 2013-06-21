@@ -130,11 +130,11 @@ Graph_Draw_RoundBorder_LeftTop(
 	}
 	
 	/* 预先计算圆心的线性坐标 */
-	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = (real_rect.y + center.y) * des->w;
 	center_pos = center_pos + center.x + real_rect.x;
 
 	/* 根据y轴计算各点的x轴坐标并填充点 */
-	for( y=0; y<=radius; ++y, center_pos -= des->width ) {
+	for( y=0; y<=radius; ++y, center_pos -= des->w ) {
 		if( radius-y >= max_y || radius-y < min_y ) {
 			continue;
 		}
@@ -145,12 +145,12 @@ Graph_Draw_RoundBorder_LeftTop(
 		 && radius-x <= max_x ) {
 			pos = center_pos - x;
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
 		
-		if( hide_outarea && des->have_alpha ) {
+		if( hide_outarea && des->color_type == COLOR_TYPE_RGBA ) {
 			/* 计算起点坐标 */
 			pos = center_pos - center.x;
 			if( radius-x > max_x ) {
@@ -185,7 +185,7 @@ Graph_Draw_RoundBorder_LeftTop(
 		/* 开始填充当前点右边的n-1个像素点 */
 		for(i=0; i<n-1; ++i,++pos) {
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
@@ -237,7 +237,7 @@ Graph_Draw_RoundBorder_TopLeft(
 		min_y = 0;
 	}
 	
-	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = (real_rect.y + center.y) * des->w;
 	center_pos = center_pos + center.x + real_rect.x;
 
 	for( x=0; x<=radius; ++x ) {
@@ -251,20 +251,20 @@ Graph_Draw_RoundBorder_TopLeft(
 		
 		if( line_width > 0 && radius-y >= min_y 
 		 && radius-y <= max_y ) {
-			pos = center_pos - y * des->width - x;
+			pos = center_pos - y * des->w - x;
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
 
-		if( hide_outarea && des->have_alpha ) {
+		if( hide_outarea && des->color_type == COLOR_TYPE_RGBA ) {
 			/* 计算起点坐标 */
 			if( radius-y < min_y ) {
 				pos = center_pos;
-				pos -= ((radius+min_y-1)*des->width);
+				pos -= ((radius+min_y-1)*des->w);
 			} else {
-				pos = center_pos - y * des->width - x;
+				pos = center_pos - y * des->w - x;
 			}
 			if( radius-y > max_y ) {
 				n = max_y - min_y;
@@ -273,8 +273,8 @@ Graph_Draw_RoundBorder_TopLeft(
 			}
 			/* 加上圆与背景图的上边距 */
 			n += (center.y-radius);
-			pos-=des->width;
-			for(i=0; i<n; ++i,pos-=des->width) {
+			pos-=des->w;
+			for(i=0; i<n; ++i,pos-=des->w) {
 				des->rgba[3][pos]=0;
 			}
 		}
@@ -284,22 +284,22 @@ Graph_Draw_RoundBorder_TopLeft(
 		n = n>radius ? y:line_width;
 		if( radius-y < min_y ) {
 			/* 重新确定起点坐标pos和填充的像素点的个数n */
-			pos = center_pos - (radius+min_y-1)*des->width;
+			pos = center_pos - (radius+min_y-1)*des->w;
 			n -= (min_y-radius+y);
 		} else {
-			pos = center_pos - y * des->width - x;
+			pos = center_pos - y * des->w - x;
 		}
 		/* 从下一行像素点开始 */
-		pos += des->width;
+		pos += des->w;
 		/* 如果填充的像素点超出了最大y轴范围 */
 		if( radius-y + n > max_y ) {
 			/* 重新确定需要填充的像素点的个数n */
 			n = max_y - radius + y;
 		}
 		/* 开始填充当前点下边的n-2个像素点 */
-		for(i=0; i<n-1; ++i,pos+=des->width) {
+		for(i=0; i<n-1; ++i,pos+=des->w) {
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
@@ -348,10 +348,10 @@ Graph_Draw_RoundBorder_RightTop(
 		min_y = 0;
 	}
 	
-	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = (real_rect.y + center.y) * des->w;
 	center_pos = center_pos + center.x + real_rect.x;
 	
-	for( y=0; y<=radius; ++y, center_pos -= des->width ) {
+	for( y=0; y<=radius; ++y, center_pos -= des->w ) {
 		if( radius-y >= max_y || radius-y < min_y ) {
 			continue;
 		}
@@ -361,12 +361,12 @@ Graph_Draw_RoundBorder_RightTop(
 		 && radius+x <= max_x ) {
 			pos = center_pos + x;
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
 		
-		if( hide_outarea && des->have_alpha ) {
+		if( hide_outarea && des->color_type == COLOR_TYPE_RGBA ) {
 			n = center_pos + max_x - radius;
 			if( radius+x < min_x ) {
 				pos = center_pos + min_x - radius;
@@ -390,7 +390,7 @@ Graph_Draw_RoundBorder_RightTop(
 		}
 		for(i=0; i<n; ++i,--pos) {
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
@@ -440,7 +440,7 @@ Graph_Draw_RoundBorder_TopRight(
 		min_y = 0;
 	}
 	
-	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = (real_rect.y + center.y) * des->w;
 	center_pos = center_pos + center.x + real_rect.x;
 
 	for( x=0; x<=radius; ++x ) {
@@ -452,18 +452,18 @@ Graph_Draw_RoundBorder_TopRight(
 		
 		if( line_width > 0 && radius-y >= min_y 
 		 && radius-y <= max_y ) {
-			pos = center_pos - y * des->width + x;
+			pos = center_pos - y * des->w + x;
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
-		if( hide_outarea && des->have_alpha ) {
+		if( hide_outarea && des->color_type == COLOR_TYPE_RGBA ) {
 			if( radius-y < min_y ) {
 				pos = center_pos;
-				pos -= ((radius+min_y-1)*des->width);
+				pos -= ((radius+min_y-1)*des->w);
 			} else {
-				pos = center_pos - y * des->width + x;
+				pos = center_pos - y * des->w + x;
 			}
 			if( radius-y > max_y ) {
 				n = max_y - min_y;
@@ -471,8 +471,8 @@ Graph_Draw_RoundBorder_TopRight(
 				n = radius-y-min_y;
 			}
 			n += (center.y-radius);
-			pos-=des->width;
-			for(i=0; i<n; ++i,pos-=des->width) {
+			pos-=des->w;
+			for(i=0; i<n; ++i,pos-=des->w) {
 				des->rgba[3][pos]=0;
 			}
 		}
@@ -480,18 +480,18 @@ Graph_Draw_RoundBorder_TopRight(
 		n = radius-y+line_width;
 		n = n>radius ? y:line_width;
 		if( radius-y < min_y ) {
-			pos = center_pos - (radius+min_y-1)*des->width;
+			pos = center_pos - (radius+min_y-1)*des->w;
 			n -= (min_y-radius+y);
 		} else {
-			pos = center_pos - y * des->width + x;
+			pos = center_pos - y * des->w + x;
 		}
-		pos += des->width;
+		pos += des->w;
 		if( radius-y + n > max_y ) {
 			n = max_y - radius + y;
 		}
-		for(i=0; i<n-1; ++i,pos+=des->width) {
+		for(i=0; i<n-1; ++i,pos+=des->w) {
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
@@ -540,13 +540,13 @@ Graph_Draw_RoundBorder_LeftBottom(
 		min_y = 0;
 	}
 	
-	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = (real_rect.y + center.y) * des->w;
 	center_pos = center_pos + center.x + real_rect.x;
 
-	if( hide_outarea && des->have_alpha ) {
+	if( hide_outarea && des->color_type == COLOR_TYPE_RGBA ) {
 		
 	}
-	for( y=0; y<=radius; ++y, center_pos += des->width ) {
+	for( y=0; y<=radius; ++y, center_pos += des->w ) {
 		if( radius+y >= max_y || radius+y < min_y ) {
 			continue;
 		}
@@ -556,11 +556,11 @@ Graph_Draw_RoundBorder_LeftBottom(
 		 && radius-x <= max_x ) {
 			pos = center_pos - x;
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
-		if( hide_outarea && des->have_alpha ) {
+		if( hide_outarea && des->color_type == COLOR_TYPE_RGBA ) {
 			pos = center_pos - center.x;
 			if( radius-x > max_x ) {
 				n = max_x - min_x;
@@ -586,7 +586,7 @@ Graph_Draw_RoundBorder_LeftBottom(
 		}
 		for(i=0; i<n-1; ++i,++pos) {
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
@@ -635,7 +635,7 @@ Graph_Draw_RoundBorder_BottomLeft(
 		min_y = 0;
 	}
 	
-	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = (real_rect.y + center.y) * des->w;
 	center_pos = center_pos + center.x + real_rect.x;
 
 	for( x=0; x<=radius; ++x ) {
@@ -647,20 +647,20 @@ Graph_Draw_RoundBorder_BottomLeft(
 		
 		if( radius+y > max_y ) {
 			pos = center_pos;
-			pos += (max_y-radius)*des->width;
+			pos += (max_y-radius)*des->w;
 		} else {
-			pos = center_pos + y * des->width - x;
+			pos = center_pos + y * des->w - x;
 		}
 		
 		if( line_width > 0 && radius+y >= min_y 
 		 && radius+y <= max_y ) {
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
 		
-		if( hide_outarea && des->have_alpha ) {
+		if( hide_outarea && des->color_type == COLOR_TYPE_RGBA ) {
 			tmp_pos = pos;
 			if( radius+y < min_y ) {
 				n = max_y - min_y;
@@ -669,8 +669,8 @@ Graph_Draw_RoundBorder_BottomLeft(
 			}
 			/* 加上圆与背景图的下边距 */
 			n += (real_rect.height-center.y-radius);
-			tmp_pos+=des->width;
-			for(i=0; i<n; ++i,tmp_pos+=des->width) {
+			tmp_pos+=des->w;
+			for(i=0; i<n; ++i,tmp_pos+=des->w) {
 				des->rgba[3][tmp_pos]=0;
 			}
 		}
@@ -682,14 +682,14 @@ Graph_Draw_RoundBorder_BottomLeft(
 			n -= (radius+y-max_y);
 		}
 		/* 从上一行像素点开始 */
-		pos -= des->width;
+		pos -= des->w;
 		if( radius+y - n < min_y ) {
 			n = min_y - radius - y;
 		}
 		/* 开始填充当前点下边的n-1个像素点 */
-		for(i=0; i<n-1; ++i,pos-=des->width) {
+		for(i=0; i<n-1; ++i,pos-=des->w) {
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
@@ -738,10 +738,10 @@ Graph_Draw_RoundBorder_RightBottom(
 		min_y = 0;
 	}
 	
-	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = (real_rect.y + center.y) * des->w;
 	center_pos = center_pos + center.x + real_rect.x;
 	
-	for( y=0; y<=radius; ++y, center_pos += des->width ) {
+	for( y=0; y<=radius; ++y, center_pos += des->w ) {
 		if( radius+y >= max_y || radius+y < min_y ) {
 			continue;
 		}
@@ -751,12 +751,12 @@ Graph_Draw_RoundBorder_RightBottom(
 		 && radius+x < max_x ) {
 			pos = center_pos + x;
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
 		
-		if( hide_outarea && des->have_alpha ) {
+		if( hide_outarea && des->color_type == COLOR_TYPE_RGBA ) {
 			n = center_pos + max_x - radius;
 			if( radius+x < min_x ) {
 				pos = center_pos + min_x - radius;
@@ -779,7 +779,7 @@ Graph_Draw_RoundBorder_RightBottom(
 		}
 		for(i=0; i<n; ++i,--pos) {
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
@@ -828,7 +828,7 @@ Graph_Draw_RoundBorder_BottomRight(
 		min_y = 0;
 	}
 	
-	center_pos = (real_rect.y + center.y) * des->width;
+	center_pos = (real_rect.y + center.y) * des->w;
 	center_pos = center_pos + center.x + real_rect.x;
 
 	for( x=0; x<=radius; ++x ) {
@@ -840,18 +840,18 @@ Graph_Draw_RoundBorder_BottomRight(
 		
 		if( line_width > 0 && radius+y >= min_y 
 		 && radius+y < max_y ) {
-			pos = center_pos + y * des->width + x;
+			pos = center_pos + y * des->w + x;
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
-		if( hide_outarea && des->have_alpha ) {
+		if( hide_outarea && des->color_type == COLOR_TYPE_RGBA ) {
 			if( radius+y > max_y ) {
 				pos = center_pos;
-				pos += (max_y-radius)*des->width;
+				pos += (max_y-radius)*des->w;
 			} else {
-				pos = center_pos + y * des->width + x;
+				pos = center_pos + y * des->w + x;
 			}
 			if( radius+y < min_y ) {
 				n = max_y - min_y;
@@ -859,8 +859,8 @@ Graph_Draw_RoundBorder_BottomRight(
 				n = max_y-radius-y;
 			}
 			n += (real_rect.height-center.y-radius);
-			pos+=des->width;
-			for(i=0; i<n; ++i,pos+=des->width) {
+			pos+=des->w;
+			for(i=0; i<n; ++i,pos+=des->w) {
 				des->rgba[3][pos]=0;
 			}
 		}
@@ -868,18 +868,18 @@ Graph_Draw_RoundBorder_BottomRight(
 		n = radius+y-line_width;
 		n = n<radius ? y:line_width;
 		if( radius+y > max_y ) {
-			pos = center_pos + (max_y-radius)*des->width;
+			pos = center_pos + (max_y-radius)*des->w;
 			n -= (radius+y-max_y);
 		} else {
-			pos = center_pos + y * des->width + x;
+			pos = center_pos + y * des->w + x;
 		}
 		if( radius+y - n < min_y ) {
 			n = min_y - radius - y;
 		}
-		pos -= des->width;
-		for(i=0; i<n-1; ++i,pos-=des->width) {
+		pos -= des->w;
+		for(i=0; i<n-1; ++i,pos-=des->w) {
 			fill_pixel( des->rgba, pos, line_color );
-			if( des->have_alpha ) {
+			if( des->color_type == COLOR_TYPE_RGBA ) {
 				des->rgba[3][pos] = 255;
 			}
 		}
@@ -916,7 +916,7 @@ LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	
 	/* 右上角 */
 	radius = border.top_right_radius;
-	rect = Rect( des->width-radius-1, 0, radius, radius );
+	rect = Rect( des->w-radius-1, 0, radius, radius );
 	Graph_Quote( &des_area, des, rect );
 	Graph_Draw_RoundBorder_RightTop( 
 		&des_area		, Pos( 0, radius ), 
@@ -931,7 +931,7 @@ LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	
 	/* 左下角 */
 	radius = border.bottom_left_radius;
-	rect = Rect( 0, des->height-radius-1, radius, radius );
+	rect = Rect( 0, des->h-radius-1, radius, radius );
 	Graph_Quote( &des_area, des, rect );
 	Graph_Draw_RoundBorder_LeftBottom( 
 		&des_area		, Pos( radius, 0 ), 
@@ -946,8 +946,8 @@ LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	
 	/* 右下角 */
 	radius = border.bottom_left_radius;
-	rect = Rect(	des->width-radius-1, 
-			des->height-radius-1, radius, radius );
+	rect = Rect(	des->w-radius-1, 
+			des->h-radius-1, radius, radius );
 	Graph_Quote( &des_area, des, rect );
 	Graph_Draw_RoundBorder_RightBottom( 
 		&des_area		, Pos( 0, 0 ), 
@@ -962,21 +962,21 @@ LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	
 	start.x = border.top_left_radius;
 	start.y = 0;
-	end.x = des->width - border.top_right_radius;
+	end.x = des->w - border.top_right_radius;
 	/* 绘制上边框 */
 	Graph_DrawHorizLine( des, border.top_color, border.top_width, start, end.x );
 	/* 绘制下边的线 */
-	start.y = des->height - border.bottom_width;
-	end.x = des->width - border.bottom_right_radius;
+	start.y = des->h - border.bottom_width;
+	end.x = des->w - border.bottom_right_radius;
 	Graph_DrawHorizLine( des, border.top_color, border.bottom_width, start, end.x );
 	/* 绘制左边的线 */
 	start.x = start.y = 0;
-	end.y = des->height - border.bottom_left_radius;
+	end.y = des->h - border.bottom_left_radius;
 	Graph_DrawVertiLine( des, border.left_color, border.left_width, start, end.y );
 	/* 绘制右边的线 */
-	start.x = des->width - border.right_width;
+	start.x = des->w - border.right_width;
 	start.y = border.top_right_radius;
-	end.y = des->height - border.bottom_right_radius;
+	end.y = des->h - border.bottom_right_radius;
 	Graph_DrawVertiLine( des, border.right_color, border.right_width, start, end.y );
 	/* 边框线绘制完成 */
 	return 0;

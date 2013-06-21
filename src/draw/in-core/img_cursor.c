@@ -90,8 +90,7 @@ LCUI_API int Load_Graph_Default_Cursor(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = TRUE;
-	pic->type = TYPE_PNG;
+	pic->color_type = COLOR_TYPE_RGBA;;
 	pic->alpha = 255;
 	value = Graph_Create(pic,12,19);
 	if(value == 0) {

@@ -108,8 +108,8 @@ LCUICursor_GetRect( void )
 	LCUI_Rect rect;
 	rect.x = cursor.current_pos.x;
 	rect.y = cursor.current_pos.y;
-	rect.width = cursor.graph.width;
-	rect.height = cursor.graph.height;
+	rect.width = cursor.graph.w;
+	rect.height = cursor.graph.h;
 	return rect;
 }
 

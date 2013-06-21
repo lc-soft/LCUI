@@ -372,7 +372,7 @@ LCUIScreen_PutGraph (LCUI_Graph *graph, LCUI_Pos des_pos )
 		des_pos.y += cut.y;
 	}
 	/* 根据二维坐标和图像尺寸，计算源图像的起始读取点的一维坐标 */
-	src_row_x = (cut.y + src_rect.y) * src->width + cut.x + src_rect.x;
+	src_row_x = (cut.y + src_rect.y) * src->w + cut.x + src_rect.x;
 	/* 根据二维坐标和屏幕尺寸，计算帧缓冲的起始写入点的一维坐标 */
 	des_row_x = des_pos.y * screen_size.w + des_pos.x;
 
@@ -386,8 +386,7 @@ LCUIScreen_PutGraph (LCUI_Graph *graph, LCUI_Pos des_pos )
 			des_ptr[n++] = src->rgba[1][src_x];
 			des_ptr[n++] = src->rgba[0][src_x];
 		}
-		src_row_x += src->width;
-		/* DIB扫描行是上下颠倒的，因此是从行尾到行首递减 */
+		src_row_x += src->w;
 		des_row_x += screen_size.w;
 	}
 	Graph_Unlock( src );

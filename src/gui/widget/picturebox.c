@@ -105,8 +105,8 @@ static int Update_BuffGraph(LCUI_Widget *widget)
 	if(!Graph_IsValid(pic_box->image)) {
 		return -1;
 	}
-	width = pic_box->scale * pic_box->image->width;
-	height = pic_box->scale * pic_box->image->height;
+	width = pic_box->scale * pic_box->image->w;
+	height = pic_box->scale * pic_box->image->h;
 	
 	if(pic_box->scale == 1.00) {
 		Graph_Free(&pic_box->buff_graph); 
@@ -130,8 +130,8 @@ static int Update_ReadBox(LCUI_Widget *widget)
 		return -1;
 	}
 	/* 缩放后的图像尺寸 */
-	width = pic_box->scale * pic_box->image->width;
-	height = pic_box->scale * pic_box->image->height;
+	width = pic_box->scale * pic_box->image->w;
+	height = pic_box->scale * pic_box->image->h;
 	//printf("Update_ReadBox(): scale: %.4f, size: %.2f, %.2f\n", pic_box->scale, width, height);
 	
 	if(pic_box->scale == 1.00) {
@@ -144,8 +144,8 @@ static int Update_ReadBox(LCUI_Widget *widget)
 	if( widget->size.w <= 0 || widget->size.h <= 0 ) { 
 		pic_box->read_box.x = 0;
 		pic_box->read_box.y = 0;
-		pic_box->read_box.width = p->width;
-		pic_box->read_box.height = p->height;
+		pic_box->read_box.width = p->w;
+		pic_box->read_box.height = p->h;
 		pic_box->read_box.center_x = 0.5;
 		pic_box->read_box.center_y = 0.5;
 		return 0;
@@ -167,9 +167,9 @@ static int Update_ReadBox(LCUI_Widget *widget)
 			pic_box->read_box.x = 0;
 		}
 		if(pic_box->read_box.x + pic_box->read_box.width
-		 > p->width) {
-			pic_box->read_box.x = pic_box->buff_graph.width - pic_box->read_box.width; 
-			center_pos.x = p->width/2.0 + pic_box->read_box.x;
+		 > p->w) {
+			pic_box->read_box.x = pic_box->buff_graph.w - pic_box->read_box.width; 
+			center_pos.x = p->w/2.0 + pic_box->read_box.x;
 			pic_box->read_box.center_x = center_pos.x / width; 
 		} 
 	} 
@@ -184,13 +184,13 @@ static int Update_ReadBox(LCUI_Widget *widget)
 		pic_box->read_box.y = center_pos.y - pic_box->read_box.height/2.0;
 		/* 如果小于0，就需要调整中心点位置 */
 		if(pic_box->read_box.y < 0) {
-			center_pos.y = p->height/2.0 + pic_box->read_box.y;
+			center_pos.y = p->h/2.0 + pic_box->read_box.y;
 			pic_box->read_box.center_y = center_pos.y / height;
 			pic_box->read_box.y = 0;
 		}
 		if(pic_box->read_box.y + pic_box->read_box.height
-		 > p->height) {
-			pic_box->read_box.y = p->height - pic_box->read_box.height; 
+		 > p->h) {
+			pic_box->read_box.y = p->h - pic_box->read_box.height; 
 			center_pos.y = pic_box->read_box.height/2.0 + pic_box->read_box.y;
 			pic_box->read_box.center_y = center_pos.y / height; 
 		}
@@ -254,21 +254,21 @@ PictureBox_ExecUpdate(LCUI_Widget *widget)
 		
 	case SIZE_MODE_CENTER:
 		/* 判断图像的尺寸是否小于图片盒子的尺寸，并计算坐标位置 */
-		if(pic_box->image->width < widget->size.w) {
+		if(pic_box->image->w < widget->size.w) {
 			pic_box->read_box.x = 0;
-			pic_box->read_box.width = pic_box->image->width;
-			pos.x = (widget->size.w - pic_box->image->width)/2 + 0.5;
+			pic_box->read_box.width = pic_box->image->w;
+			pos.x = (widget->size.w - pic_box->image->w)/2 + 0.5;
 		}
-		if(pic_box->image->height < widget->size.h) {
-			pos.y = (widget->size.h - pic_box->image->height)/2 + 0.5;
+		if(pic_box->image->h < widget->size.h) {
+			pos.y = (widget->size.h - pic_box->image->h)/2 + 0.5;
 			pic_box->read_box.y = 0;
-			pic_box->read_box.height = pic_box->image->height;
+			pic_box->read_box.height = pic_box->image->h;
 		}
-		if(pic_box->read_box.y + pic_box->read_box.height >= pic_box->image->height) 
+		if(pic_box->read_box.y + pic_box->read_box.height >= pic_box->image->h) 
 		/* 如果读取区域的尺寸大于图片尺寸 */
-			pic_box->read_box.y = pic_box->image->height - pic_box->read_box.height;
-		if(pic_box->read_box.x + pic_box->read_box.width >= pic_box->image->width) 
-			pic_box->read_box.x = pic_box->image->width - pic_box->read_box.width;
+			pic_box->read_box.y = pic_box->image->h - pic_box->read_box.height;
+		if(pic_box->read_box.x + pic_box->read_box.width >= pic_box->image->w) 
+			pic_box->read_box.x = pic_box->image->w - pic_box->read_box.width;
 			
 		Graph_Quote(&graph, pic_box->image, pic_box->read_box); 
 		break;
@@ -278,8 +278,8 @@ PictureBox_ExecUpdate(LCUI_Widget *widget)
 	//printf("PictureBox_ExecUpdate(): read box: %d,%d,%d,%d; %d/%d, %d/%d\n", 
 	//pic_box->read_box.x, pic_box->read_box.y, 
 	//pic_box->read_box.width, pic_box->read_box.height, 
-	//pic_box->read_box.x + pic_box->read_box.width, pic_box->buff_graph.width, 
-	//pic_box->read_box.y + pic_box->read_box.height, pic_box->buff_graph.height);
+	//pic_box->read_box.x + pic_box->read_box.width, pic_box->buff_graph.w, 
+	//pic_box->read_box.y + pic_box->read_box.height, pic_box->buff_graph.h);
 	if(!Graph_IsValid(&widget->background.image)) {
 		Graph_Replace( widget_graph, &graph, pos );
 	} else {
@@ -360,13 +360,13 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 			/* 读取的范区域为整个图片区域 */
 			pic_box->read_box.x = 0;
 			pic_box->read_box.y = 0;
-			pic_box->read_box.width = graph->width;
-			pic_box->read_box.height = graph->height;
+			pic_box->read_box.width = graph->w;
+			pic_box->read_box.height = graph->h;
 			pic_box->read_box.center_x = 0.5;
 			pic_box->read_box.center_y = 0.5;
 			pic_box->scale = 1.0; 
 			
-			//printf("PictureBox_SetImage(): img, w: %d, h: %d\n", graph->width, graph->height);
+			//printf("PictureBox_SetImage(): img, w: %d, h: %d\n", graph->w, graph->h);
 			//printf("PictureBox_SetImage(): pb: w: %d, h: %d\n", widget->size.w, widget->size.h);
 			//printf("PictureBox_SetImage(): size mode: %d\n", pic_box->size_mode);
 			switch(pic_box->size_mode) {
@@ -377,8 +377,8 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 					//printf("PictureBox_SetImage(): break\n");
 					break;
 				}
-				scale_x = (float)widget->size.w / pic_box->image->width;
-				scale_y = (float)widget->size.h / pic_box->image->height;
+				scale_x = (float)widget->size.w / pic_box->image->w;
+				scale_y = (float)widget->size.h / pic_box->image->h;
 				if(scale_x < scale_y) pic_box->scale = scale_x;
 				else pic_box->scale = scale_y;
 				//printf("PictureBox_SetImage(): scale: %.4f, x: %.4f, y: %.4f\n", 
@@ -396,12 +396,12 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 			    case SIZE_MODE_TILE: break;
 			    case SIZE_MODE_CENTER: 
 				/* 判断图像的尺寸是否超出图片盒子的尺寸 */
-				if(pic_box->image->width >= widget->size.w) {
-					pic_box->read_box.x = (pic_box->image->width - widget->size.w)/2.0;
+				if(pic_box->image->w >= widget->size.w) {
+					pic_box->read_box.x = (pic_box->image->w - widget->size.w)/2.0;
 					pic_box->read_box.width = widget->size.w;
 				}
-				if(pic_box->image->height >= widget->size.h) {
-					pic_box->read_box.y = (pic_box->image->height - widget->size.h)/2.0;
+				if(pic_box->image->h >= widget->size.h) {
+					pic_box->read_box.y = (pic_box->image->h - widget->size.h)/2.0;
 					pic_box->read_box.height = widget->size.h;
 				}
 				break;
@@ -532,8 +532,8 @@ PictureBox_SetSizeMode( LCUI_Widget *widget, int mode )
 		if( my_size.w <= 0 || my_size.h <= 0) {
 			pic_box->scale = 1.0; 
 		} else {
-			scale_x = (float)my_size.w / pic_box->image->width;
-			scale_y = (float)my_size.h / pic_box->image->height;
+			scale_x = (float)my_size.w / pic_box->image->w;
+			scale_y = (float)my_size.h / pic_box->image->h;
 			if(scale_x < scale_y) {
 				pic_box->scale = scale_x;
 			} else {
@@ -564,24 +564,24 @@ PictureBox_ResizeViewArea( LCUI_Widget *widget, int width, int height )
 		return;
 	}
 	/* 将中心点位置转换成坐标 */
-	center_pos.x = pic_box->read_box.center_x * pic_box->scale * pic_box->image->width;
-	center_pos.y = pic_box->read_box.center_y * pic_box->scale * pic_box->image->height;
+	center_pos.x = pic_box->read_box.center_x * pic_box->scale * pic_box->image->w;
+	center_pos.y = pic_box->read_box.center_y * pic_box->scale * pic_box->image->h;
 	/* 处理区域数据，使之为有效区域 */
 	start.x = center_pos.x - width/2.0;
 	start.y = center_pos.y - height/2.0;
 	if(start.x < 0) start.x = 0;
 	if(start.y < 0) start.y = 0;
-	if(start.x + width > pic_box->image->width)
-	start.x = pic_box->image->width - width;
-	if(start.y + height > pic_box->image->height)
-	start.y = pic_box->image->height - height;
+	if(start.x + width > pic_box->image->w)
+	start.x = pic_box->image->w - width;
+	if(start.y + height > pic_box->image->h)
+	start.y = pic_box->image->h - height;
 	if(start.x < 0) {
 		start.x = 0;
-		width = pic_box->image->width;
+		width = pic_box->image->w;
 	}
 	if(start.y < 0) {
 		start.y = 0;
-		height = pic_box->image->height;
+		height = pic_box->image->h;
 	}
 	pic_box->read_box.x = start.x;
 	pic_box->read_box.y = start.y;
@@ -629,11 +629,11 @@ PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos )
 	if(des_pos.y < 0) {
 		des_pos.y = 0;
 	}
-	if(des_pos.x + size.w > p->width) {
-		des_pos.x = p->width - size.w;
+	if(des_pos.x + size.w > p->w) {
+		des_pos.x = p->w - size.w;
 	}
-	if(des_pos.y + size.h > p->height) {
-		des_pos.y = p->height - size.h;
+	if(des_pos.y + size.h > p->h) {
+		des_pos.y = p->h - size.h;
 	}
 	if(des_pos.x == pic_box->read_box.x 
 	&& des_pos.y == pic_box->read_box.y) {
@@ -643,8 +643,8 @@ PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos )
 	pic_box->read_box.x = des_pos.x;
 	pic_box->read_box.y = des_pos.y;
 	/* 重新计算中心点的位置 */ 
-	pic_box->read_box.center_x = (des_pos.x + size.w/2.0)/p->width;
-	pic_box->read_box.center_y = (des_pos.y + size.h/2.0)/p->height;
+	pic_box->read_box.center_x = (des_pos.x + size.w/2.0)/p->w;
+	pic_box->read_box.center_y = (des_pos.y + size.h/2.0)/p->h;
 	
 	Widget_Draw(widget);
 	//用于调试
@@ -653,7 +653,7 @@ PictureBox_MoveViewArea( LCUI_Widget *widget, LCUI_Pos des_pos )
 	//pic_box->read_box.width, pic_box->read_box.height, 
 	//pic_box->read_box.x + pic_box->read_box.width,
 	//pic_box->read_box.y + pic_box->read_box.height,
-	//pic_box->buff_graph.width, pic_box->buff_graph.height);
+	//pic_box->buff_graph.w, pic_box->buff_graph.h);
 	return 0;
 }
 
@@ -716,8 +716,8 @@ PictureBox_ExecResize(LCUI_Widget *widget)
 		if(widget->size.w <= 0 || widget->size.h <= 0) {
 			break; 
 		}
-		scale_x = (float)widget->size.w / pic_box->image->width;
-		scale_y = (float)widget->size.h / pic_box->image->height;
+		scale_x = (float)widget->size.w / pic_box->image->w;
+		scale_y = (float)widget->size.h / pic_box->image->h;
 		if(scale_x < scale_y) pic_box->scale = scale_x;
 		else pic_box->scale = scale_y; 
 		//printf("PictureBox_ExecResize(): scale: %.4f, x: %.4f, y: %.4f\n", pic_box->scale, scale_x, scale_y);

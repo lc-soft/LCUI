@@ -106,7 +106,7 @@ Create_Frames(LCUI_Size size)
 	Queue_Init(&frames.pic, sizeof(LCUI_Frame), NULL);
 	Queue_Init(&frames.func_data, sizeof(LCUI_Func), NULL);
 	Graph_Init(&frames.slot);
-	frames.slot.have_alpha = TRUE;
+	frames.slot.color_type = COLOR_TYPE_RGBA;
 	frames.current = 0;
 	frames.state = 0;
 	frames.size = size;
@@ -539,8 +539,8 @@ ActiveBox_ExecUpdate(LCUI_Widget *widget)
 	Widget_SetBackgroundLayout( widget, LAYOUT_NONE );
 	rect.x = pos.x;
 	rect.y = pos.y;
-	rect.width = frame_graph->width;
-	rect.height = frame_graph->height;
+	rect.width = frame_graph->w;
+	rect.height = frame_graph->h;
 	Widget_InvalidArea( widget, rect );
 }
 

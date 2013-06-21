@@ -211,7 +211,7 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 	/* 获取背景图引用的源图形 */
 	des = Graph_GetQuote( graph );
 	/* 起点位置的有效性检测 */
-	if(des_pos.x > des->width || des_pos.y > des->height) {
+	if(des_pos.x > des->w || des_pos.y > des->h) {
 		return -2;
 	}
 	/* 获取需要裁剪的区域 */
@@ -227,7 +227,7 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 	if( flag == GRAPH_MIX_FLAG_OVERLAY ) {
 		/* 预先计算起点位置 */
 		src_start_pos = cut.y * bitmap->width + cut.x;
-		des_start_pos = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+		des_start_pos = (des_pos.y + des_rect.y) * des->w + des_pos.x + des_rect.x;
 		for (y = 0; y < cut.height; ++y) {
 			m = src_start_pos;
 			n = des_start_pos;
@@ -239,12 +239,12 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 				ALPHA_BLEND( color.blue, des->rgba[2][n], bitmap->buffer[m] );
 			}
 			/* 切换至下一行像素点 */
-			des_start_pos += des->width;
+			des_start_pos += des->w;
 			src_start_pos += bitmap->width;
 		}
 	} else { /* 否则是以覆盖模式 */
 		src_start_pos = cut.y * bitmap->width + cut.x;
-		des_start_pos = (des_pos.y + des_rect.y) * des->width + des_pos.x + des_rect.x;
+		des_start_pos = (des_pos.y + des_rect.y) * des->w + des_pos.x + des_rect.x;
 		for (y = 0; y < cut.height; ++y) {
 			m = src_start_pos;
 			n = des_start_pos;
@@ -255,7 +255,7 @@ FontBMP_Mix(	LCUI_Graph	*graph,
 				des->rgba[2][n] = color.blue;
 				des->rgba[3][n] = bitmap->buffer[m];
 			}
-			des_start_pos += des->width;
+			des_start_pos += des->w;
 			src_start_pos += bitmap->width;
 		}
 	}

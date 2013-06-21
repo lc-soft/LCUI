@@ -73,8 +73,7 @@ LCUI_API int Load_Graph_Mosaics(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = FALSE;
-	pic->type = TYPE_PNG;
+	pic->color_type = COLOR_TYPE_RGB;
 	pic->alpha = 255;
 	value = Graph_Create(pic,16,16);
 	if(value == 0){

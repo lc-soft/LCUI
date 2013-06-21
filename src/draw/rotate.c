@@ -36,9 +36,9 @@ LCUI_API int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 		return -1;
 	}
 	// 获取图像的"宽度"（4的倍数）   
-	width = src->width; 
+	width = src->w; 
 	// 获取图像的高度   
-	height = src->height;   
+	height = src->h;   
 	   
 	// 将旋转角度从度转换到弧度   
 	fRotateAngle = (double) radian(rotate_angle); 
@@ -79,7 +79,7 @@ LCUI_API int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 	if(Graph_IsValid(des)) {
 		Graph_Free(des);/* 先将这个内存释放 */
 	}
-	des->have_alpha = src->have_alpha;
+	des->color_type = src->color_type;
 	// 分配内存，储存新的图形
 	if(Graph_Create(des, new_width, new_height) != 0) {
 		return -1;

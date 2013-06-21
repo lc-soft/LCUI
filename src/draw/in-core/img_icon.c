@@ -355,9 +355,8 @@ LCUI_API int Load_Graph_Icon_Error(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = TRUE;
+	pic->color_type = COLOR_TYPE_RGBA;
 	pic->alpha = 255;
-	pic->type = TYPE_PNG;
 	value = Graph_Create(pic,48,48);
 	if(value == 0)
 	{
@@ -678,7 +677,7 @@ LCUI_API int Load_Graph_Icon_Help(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = TRUE;
+	pic->color_type = COLOR_TYPE_RGBA;
 	pic->alpha = 255;
 	value = Graph_Create(pic,48,48);
 	if(value == 0)
@@ -1000,7 +999,7 @@ LCUI_API int Load_Graph_Icon_Info(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = TRUE;
+	pic->color_type = COLOR_TYPE_RGBA;
 	pic->alpha = 255;
 	value = Graph_Create(pic,48,48);
 	if(value == 0)
@@ -1322,7 +1321,7 @@ LCUI_API int Load_Graph_Icon_Warning(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = TRUE;
+	pic->color_type = COLOR_TYPE_RGBA;
 	pic->alpha = 255;
 	value = Graph_Create(pic,48,48);
 	if(value == 0)
@@ -1808,7 +1807,7 @@ LCUI_API int Load_Graph_Icon_LCUI(LCUI_Graph *pic)
 		Graph_Free(pic);
 	}
 	Graph_Init(pic);
-	pic->have_alpha = TRUE;
+	pic->color_type = COLOR_TYPE_RGBA;
 	pic->alpha = 255;
 	value = Graph_Create(pic,60,60);
 	if(value == 0)
@@ -1878,12 +1877,10 @@ LCUI_API int Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out)
 	int value;
 	Graph_Free(out);
 	Graph_Init(out);
-	out->have_alpha	= TRUE;
-	out->type	= TYPE_PNG;
+	out->color_type	= COLOR_TYPE_RGBA;
 	out->alpha	= 255;
-	value = Graph_Create(out,18,18);
-	/* 拷贝 */
-	if(value == 0){
+	value = Graph_Create(out,18,18); 
+	if(value == 0) {
 		memcpy(out->rgba[0],red,sizeof(red));
 		memcpy(out->rgba[1],green,sizeof(green));
 		memcpy(out->rgba[2],blue,sizeof(blue));

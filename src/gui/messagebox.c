@@ -455,7 +455,7 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 		icon_flag = 0;
 		Widget_SetAlign( iconbox, ALIGN_MIDDLE_LEFT, Pos(5,0) );
 		Widget_SetAlign( textbox, ALIGN_MIDDLE_LEFT, 
-				Pos(icon.width + 10,0) );
+				Pos(icon.w + 10,0) );
 	}
 	/* 根据按钮数量，得出相应的最小尺寸 */
 	switch( button ) {

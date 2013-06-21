@@ -335,7 +335,7 @@ __TextLayer_OldArea_Erase( LCUI_TextLayer *layer, LCUI_Graph *graph )
 			}
 			/* 累加当前行的宽度（已减去x轴偏移量） */
 			x += char_ptr->bitmap->advance.x;
-			if( x > graph->width ) {
+			if( x > graph->w ) {
 				break;
 			}
 		}
@@ -346,7 +346,7 @@ __TextLayer_OldArea_Erase( LCUI_TextLayer *layer, LCUI_Graph *graph )
 		RectQueue_AddToValid( &layer->clear_area, area );
 		//_DEBUG_MSG("area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
 		y += row_ptr->max_size.h;
-		if( y > graph->height ) {
+		if( y > graph->h ) {
 			break;
 		}
 	}

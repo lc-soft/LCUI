@@ -64,7 +64,7 @@ static void Window_GetCloseButtonBG( LCUI_Graph *graph )
 		0x00,0xff,0xff,0x00,0x00,0xff,0xff,0x00,
 		0xff,0xff,0x00,0x00,0x00,0x00,0xff,0xff,
 	};
-	graph->have_alpha = TRUE;
+	graph->color_type = COLOR_TYPE_RGBA;
 	Graph_Create( graph, 8, 7 );
 	Graph_FillColor( graph, RGB(255,255,255) );
 	memcpy( graph->rgba[3], alpha, sizeof(alpha) );

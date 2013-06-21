@@ -1260,7 +1260,7 @@ static void Widget_AttrInit( LCUI_Widget *widget )
 	/* 继承主图层的透明度 */
 	GraphLayer_InerntAlpha( widget->glayer, TRUE );
 	/* 设定图层属性 */
-	widget->glayer->graph.have_alpha = TRUE;
+	widget->glayer->graph.color_type = COLOR_TYPE_RGBA;
 	//widget->glayer->graph.is_opaque = FALSE;
 	//widget->glayer->graph.not_visible = TRUE;
 	RectQueue_Init( &widget->invalid_area ); /* 初始化无效区域记录 */
@@ -2004,7 +2004,6 @@ Widget_ExecDraw(LCUI_Widget *widget)
 	graph = Widget_GetSelfGraph( widget );
 	/* 绘制边框线 */
 	Graph_DrawBorder( graph, widget->border );
-	Graph_UpdateAttr( graph );
 
 	event.type = EVENT_REDRAW;
 	/* 处理部件的RESIZE事件 */

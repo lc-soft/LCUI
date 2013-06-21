@@ -145,17 +145,14 @@ LCUI_API int Load_Graph_Default_CheckBox_Off_Normal ( LCUI_Graph *buff )
 		Graph_Free( buff );
 	}
 	Graph_Init( buff );
-	buff->have_alpha = TRUE;
+	buff->color_type = COLOR_TYPE_RGBA;;
 	buff->alpha = 255;
-	buff->type = 1;
 	ret = Graph_Create( buff, 15, 15 );
 	if( ret == 0 ) {
 		memcpy( buff->rgba[0], red, sizeof(red) );
 		memcpy( buff->rgba[1], green, sizeof(green) );
 		memcpy( buff->rgba[2], blue, sizeof(blue) );
-		if( buff->have_alpha ) {
-			memcpy( buff->rgba[3], alpha, sizeof(alpha) );
-		}
+		memcpy( buff->rgba[3], alpha, sizeof(alpha) );
 	}
 	return ret;
 }
@@ -259,17 +256,14 @@ LCUI_API int Load_Graph_Default_CheckBox_Off_Selected ( LCUI_Graph *buff )
 		Graph_Free( buff );
 	}
 	Graph_Init( buff );
-	buff->have_alpha = TRUE;
+	buff->color_type = COLOR_TYPE_RGBA;;
 	buff->alpha = 255;
-	buff->type = 1;
 	ret = Graph_Create( buff, 15, 15 );
 	if( ret == 0 ) {
 		memcpy( buff->rgba[0], red, sizeof(red) );
 		memcpy( buff->rgba[1], green, sizeof(green) );
 		memcpy( buff->rgba[2], blue, sizeof(blue) );
-		if( buff->have_alpha ) {
-			memcpy( buff->rgba[3], alpha, sizeof(alpha) );
-		}
+		memcpy( buff->rgba[3], alpha, sizeof(alpha) );
 	}
 	return ret;
 }
@@ -378,17 +372,14 @@ LCUI_API int Load_Graph_Default_CheckBox_On_Normal ( LCUI_Graph *buff )
 		Graph_Free( buff );
 	}
 	Graph_Init( buff );
-	buff->have_alpha = TRUE;
+	buff->color_type = COLOR_TYPE_RGBA;;
 	buff->alpha = 255;
-	buff->type = 1;
 	ret = Graph_Create( buff, 15, 15 );
 	if( ret == 0 ) {
 		memcpy( buff->rgba[0], red, sizeof(red) );
 		memcpy( buff->rgba[1], green, sizeof(green) );
 		memcpy( buff->rgba[2], blue, sizeof(blue) );
-		if( buff->have_alpha ) {
-			memcpy( buff->rgba[3], alpha, sizeof(alpha) );
-		}
+		memcpy( buff->rgba[3], alpha, sizeof(alpha) );
 	}
 	return ret;
 }
@@ -492,17 +483,14 @@ LCUI_API int Load_Graph_Default_CheckBox_On_Selected ( LCUI_Graph *buff )
 		Graph_Free( buff );
 	}
 	Graph_Init( buff );
-	buff->have_alpha = TRUE;
+	buff->color_type = COLOR_TYPE_RGBA;;
 	buff->alpha = 255;
-	buff->type = 1;
 	ret = Graph_Create( buff, 15, 15 );
 	if( ret == 0 ) {
 		memcpy( buff->rgba[0], red, sizeof(red) );
 		memcpy( buff->rgba[1], green, sizeof(green) );
 		memcpy( buff->rgba[2], blue, sizeof(blue) );
-		if( buff->have_alpha ) {
-			memcpy( buff->rgba[3], alpha, sizeof(alpha) );
-		}
+		memcpy( buff->rgba[3], alpha, sizeof(alpha) );
 	}
 	return ret;
 }
