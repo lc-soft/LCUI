@@ -71,7 +71,7 @@ LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *out )
 	jaka = cinfo.num_components;
 	
 	//if (jaka==3) printf("color\n"); else printf("grayscale\n");
-	out->have_alpha = FALSE; /* 设置为无透明度 */
+	out->color_type = COLOR_TYPE_RGB;
 	n = Graph_Create(out, cinfo.output_width, cinfo.output_height);
 	if( n != 0 ){
 		printf("%s (): error: %s",__FUNCTION__, MALLOC_ERROR);
@@ -84,9 +84,9 @@ LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *out )
 	
 	for(y=0; cinfo.output_scanline <cinfo.output_height; ++y) {
 		(void) jpeg_read_scanlines(&cinfo, buffer, 1);
-		m = y*out->width;
+		m = y*out->w;
 		if ( jaka == 3 ) {
-			for (x=0;x<out->width;x++) {
+			for (x=0;x<out->w;x++) {
 				n = x+m;
 				k=x*3;
 				out->rgba[0][n]=buffer[0][k++];
@@ -94,7 +94,7 @@ LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *out )
 				out->rgba[2][n]=buffer[0][k++];
 			}
 		} else {
-			for (x=0;x<out->width;x++) {
+			for (x=0;x<out->w;x++) {
 				n = x+m;
 				out->rgba[0][n]=buffer[0][x];
 				out->rgba[1][n]=buffer[0][x];
@@ -102,7 +102,6 @@ LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *out )
 			}
 		} 
 	}
-	out->type = TYPE_JPG;//图片类型为jpg
 	(void) jpeg_finish_decompress(&cinfo);
 	jpeg_destroy_decompress(&cinfo);
 	fclose(fp);
