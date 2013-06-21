@@ -153,9 +153,13 @@ LCUI_API int Graph_FillColor( LCUI_Graph *graph, LCUI_RGB color );
 
 LCUI_API int Graph_Tile( LCUI_Graph *src, LCUI_Graph *des, LCUI_BOOL replace );
 
-LCUI_API int Graph_Mix( LCUI_Graph *back, LCUI_Graph *fore, LCUI_Pos pos );
+LCUI_API int Graph_Mix(	LCUI_Graph *back_graph, 
+			LCUI_Graph *fore_graph,
+			LCUI_Pos des_pos );
 
-LCUI_API int Graph_Replace( LCUI_Graph *back, LCUI_Graph *fore, LCUI_Pos pos );
+LCUI_API int Graph_Replace(	LCUI_Graph *back_graph,
+				LCUI_Graph *fore_graph,
+				LCUI_Pos des_pos );
 
 LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int flag );
 
