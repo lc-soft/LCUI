@@ -608,7 +608,6 @@ skip_loop:
 		//	valid_area.x, valid_area.y, valid_area.width, valid_area.height,
 		//	pos.x, pos.y, glayer->graph.w, glayer->graph.h
 		//	);
-		Graph_PrintInfo( &glayer->graph );
 		/* 获取相对坐标 */
 		pos.x = pos.x - rect.x + valid_area.x;
 		pos.y = pos.y - rect.y + valid_area.y;
