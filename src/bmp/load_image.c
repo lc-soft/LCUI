@@ -30,9 +30,9 @@ LCUI_API int Graph_LoadImage( const char *filepath, LCUI_Graph *out )
 	int result = 0;
 	
 	Graph_Init(out); 
-	out->have_alpha = FALSE;
-	fp = fopen(filepath,"r");
-	if ( fp== NULL ) {
+	out->color_type = COLOR_TYPE_RGB;
+	fp = fopen(filepath,"rb");
+	if ( fp == NULL ) {
 		result = FILE_ERROR_OPEN_ERROR; 
 	} else {
 		fgetc(fp);
