@@ -178,7 +178,7 @@ struct LCUI_Graph_ {
 	LCUI_BOOL quote;	/**< 标志，指示是否引用了另一图形 */
 	LCUI_Graph *src;	/**< 所引用的源图形 */
 	uchar_t	alpha;		/**< 全局透明度 */
-	uchar_t* rgba;		/**< 像素数据缓冲区 */
+	uchar_t** rgba;		/**< 像素数据缓冲区 */
 	size_t mem_size;	/**< 像素数据缓冲区大小 */
 
 	LCUI_Mutex mutex;	/**< 互斥锁，用于数据保护 */
