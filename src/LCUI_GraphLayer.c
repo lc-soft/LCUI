@@ -68,7 +68,7 @@ LCUI_API int GraphLayer_PrintChildList( LCUI_GraphLayer *glayer )
 		}
 		printf("[%d] glayer: %p, z-index: %d, pos: (%d,%d), size: (%d, %d)\n",
 			i, child, child->z_index, child->pos.x, child->pos.y,
-			child->graph.width, child->graph.height );
+			child->graph.w, child->graph.h );
 	}
 	return 0;
 }
@@ -205,16 +205,16 @@ LCUI_API LCUI_Rect GraphLayer_GetRect( LCUI_GraphLayer *glayer )
 		rect.x += glayer->parent->padding.left;
 		rect.y += glayer->parent->padding.top;
 	}
-	rect.width = glayer->graph.width;
-	rect.height = glayer->graph.height;
+	rect.width = glayer->graph.w;
+	rect.height = glayer->graph.h;
 	return rect;
 }
 
 LCUI_API LCUI_Size GraphLayer_GetSize( LCUI_GraphLayer *glayer )
 {
 	LCUI_Size size;
-	size.w = glayer->graph.width;
-	size.h = glayer->graph.height;
+	size.w = glayer->graph.w;
+	size.h = glayer->graph.h;
 	return size;
 }
 
@@ -298,8 +298,8 @@ LCUI_API int GraphLayer_Resize( LCUI_GraphLayer *glayer, int w, int h )
 		return -1;
 	}
 	/* 尺寸没有变化的话就返回 */
-	if( glayer->graph.width == w
-	 && glayer->graph.height == h) {
+	if( glayer->graph.w == w
+	 && glayer->graph.h == h) {
 		return 1;
 	}
 	
@@ -334,8 +334,8 @@ GraphLayer_GetValidRect(	LCUI_GraphLayer *root_glayer,
 	}
 	cut_rect.x = 0;
 	cut_rect.y = 0;
-	cut_rect.width = glayer->graph.width;
-	cut_rect.height = glayer->graph.height;
+	cut_rect.width = glayer->graph.w;
+	cut_rect.height = glayer->graph.h;
 	pos = glayer->pos;
 	/* 如果根图层无效，或者没有父图层 */
 	if( !root_glayer || !glayer->parent ) {
@@ -348,10 +348,10 @@ GraphLayer_GetValidRect(	LCUI_GraphLayer *root_glayer,
 	area.x = glayer->parent->padding.left;
 	area.y = glayer->parent->padding.top;
 	/* 区域尺寸则减去内边距 */
-	area.width = glayer->parent->graph.width;
+	area.width = glayer->parent->graph.w;
 	area.width -= glayer->parent->padding.left;
 	area.width -= glayer->parent->padding.right;
-	area.height = glayer->parent->graph.height;
+	area.height = glayer->parent->graph.h;
 	area.height -= glayer->parent->padding.top;
 	area.height -= glayer->parent->padding.bottom;
 	/* 根据图层的坐标及尺寸，计算图层裁剪后的区域 */
@@ -359,20 +359,20 @@ GraphLayer_GetValidRect(	LCUI_GraphLayer *root_glayer,
 		cut_rect.x = area.x - pos.x; 
 		cut_rect.width -= cut_rect.x;
 	}
-	if(pos.x + glayer->graph.width - area.x > area.width) {
+	if(pos.x + glayer->graph.w - area.x > area.width) {
 		cut_rect.width -= pos.x;
 		cut_rect.width += area.x;
-		cut_rect.width -= glayer->graph.width;
+		cut_rect.width -= glayer->graph.w;
 		cut_rect.width += area.width;
 	}
 	if(pos.y < area.y) {
 		cut_rect.y = area.y - pos.y; 
 		cut_rect.height -= cut_rect.y;
 	}
-	if(pos.y + glayer->graph.height - area.y > area.height) {
+	if(pos.y + glayer->graph.h - area.y > area.height) {
 		cut_rect.height -= pos.y;
 		cut_rect.height += area.y;
-		cut_rect.height -= glayer->graph.height;
+		cut_rect.height -= glayer->graph.h;
 		cut_rect.height += area.height;
 	}
 	/* 递归调用 */
@@ -513,20 +513,20 @@ LCUI_API int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 					LCUI_Graph *graph_buff,
 					LCUI_Rect rect )
 {
-	static int i, total; 
-	static uchar_t tmp_alpha, alpha;
-	static LCUI_Pos pos, glayer_pos;
-	static LCUI_GraphLayer *glayer;
-	static LCUI_Queue glayerQ;
-	static LCUI_Rect valid_area;
-	static LCUI_Graph tmp_graph;
+	int i, total; 
+	uchar_t tmp_alpha, alpha;
+	LCUI_Pos pos, glayer_pos;
+	LCUI_GraphLayer *glayer;
+	LCUI_Queue glayerQ;
+	LCUI_Rect valid_area;
+	LCUI_Graph tmp_graph;
 	
 	/* 检测这个区域是否有效 */
 	if (rect.x < 0 || rect.y < 0) {
 		return -1; 
 	}
-	if (rect.x + rect.width > ctnr->graph.width
-	 || rect.y + rect.height > ctnr->graph.height ) {
+	if (rect.x + rect.width > ctnr->graph.w
+	 || rect.y + rect.height > ctnr->graph.h ) {
 		 return -1;
 	}
 	if (rect.width <= 0 || rect.height <= 0) {
@@ -537,8 +537,7 @@ LCUI_API int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 	Queue_Init( &glayerQ, 0, NULL);
 	Queue_UsingPointer( &glayerQ );
 	
-	graph_buff->have_alpha = FALSE;
-	tmp_graph.have_alpha = TRUE;
+	graph_buff->color_type = COLOR_TYPE_RGB;
 	/* 为graph_buff分配合适尺寸的内存空间 */
 	Graph_Create( graph_buff, rect.width, rect.height );
 	/* 获取rect区域内的图层列表 */
@@ -569,12 +568,9 @@ LCUI_API int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 		if( alpha < 255 ) {
 			continue;
 		}
-		switch( Graph_IsOpaque( &glayer->graph ) ) {
-		    case -1: /* 若完全透明 */
-			Queue_DeletePointer( &glayerQ, i );
-			break;
-		    case 0: break;
-		    case 1:/* 若完全不透明，且该图层的有效区域包含目标区域 */
+		/* 如果色彩类型为RGB，没有alpha通道 */
+		if( glayer->graph.color_type == COLOR_TYPE_RGB ) {
+			/* 如果该图层的有效区域包含目标区域 */
 			if( LCUIRect_IncludeRect(valid_area, rect) ) { 
 				/* 移除底层的图层，因为已经被完全遮挡 */
 				for(total=i-1;total>=0; --total) {
@@ -582,9 +578,7 @@ LCUI_API int GraphLayer_GetGraph(	LCUI_GraphLayer *ctnr,
 				}
 				goto skip_loop;
 			}
-			break;
-		    default:break;
-		} 
+		}
 	}
 skip_loop:
 	total = Queue_GetTotal( &glayerQ );
@@ -612,9 +606,9 @@ skip_loop:
 		Graph_Quote( &tmp_graph, &glayer->graph, valid_area ); 
 		//_DEBUG_MSG("valid area: %d,%d,%d,%d, pos: %d,%d, size: %d,%d\n", 
 		//	valid_area.x, valid_area.y, valid_area.width, valid_area.height,
-		//	pos.x, pos.y, glayer->graph.width, glayer->graph.height
+		//	pos.x, pos.y, glayer->graph.w, glayer->graph.h
 		//	);
-			
+		Graph_PrintInfo( &glayer->graph );
 		/* 获取相对坐标 */
 		pos.x = pos.x - rect.x + valid_area.x;
 		pos.y = pos.y - rect.y + valid_area.y;
