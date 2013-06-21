@@ -220,12 +220,15 @@ LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h )
 	}
 	graph->rgba[1] = (uchar_t*)malloc( graph->mem_size );
 	if( graph->rgba[1] == NULL ) {
+		free( graph->rgba[0] );
+		free( graph->rgba );
 		goto error_exit;
 	}
 	graph->rgba[2] = (uchar_t*)malloc( graph->mem_size );
 	if( graph->rgba[2] == NULL ) {
 		free( graph->rgba[0] );
 		free( graph->rgba[1] );
+		free( graph->rgba );
 		goto error_exit;
 	}
 	if( graph->color_type == COLOR_TYPE_RGBA ) {
@@ -234,6 +237,7 @@ LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h )
 			free( graph->rgba[0] );
 			free( graph->rgba[1] );
 			free( graph->rgba[2] );
+			free( graph->rgba );
 			goto error_exit;
 		}
 	}
@@ -241,7 +245,6 @@ LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h )
 	graph->h = h;
 	return 0;
 error_exit:
-	free( graph->rgba );
 	graph->w = 0;
 	graph->h = 0;
 	return -1;
@@ -692,7 +695,7 @@ LCUI_API int Graph_Tile( LCUI_Graph *src, LCUI_Graph *des, LCUI_BOOL replace )
  *	此函数不会对传入的参数进行有效性判断，因为此函数主要被Graph_Mix函
  *	数调用，Graph_Mix函数会预先进行参数有效性判断
  */
-static int Graph_RGBAMix(	LCUI_Graph *des,
+static void Graph_RGBAMix(	LCUI_Graph *des,
 				LCUI_Rect des_rect,
 				LCUI_Graph *src,
 				LCUI_Pos src_pos )
@@ -720,7 +723,6 @@ static int Graph_RGBAMix(	LCUI_Graph *des,
 		des_row_start += des->w;
 		src_row_start += src->w;
 	}
-	return 0;
 }
 
 /**
@@ -738,7 +740,7 @@ static int Graph_RGBAMix(	LCUI_Graph *des,
  *	此函数不会对传入的参数进行有效性判断，因为此函数主要被Graph_Mix函
  *	数调用，Graph_Mix函数会预先进行参数有效性判断
  */
-static int Graph_RGBAMixWithGlobalAlpha(	LCUI_Graph *des,
+static void Graph_RGBAMixWithGlobalAlpha(	LCUI_Graph *des,
 						LCUI_Rect des_rect,
 						LCUI_Graph *src,
 						LCUI_Pos src_pos )
@@ -750,25 +752,30 @@ static int Graph_RGBAMixWithGlobalAlpha(	LCUI_Graph *des,
 	int des_row_start, src_row_start;
 
 	src_row_start = src_pos.y * src->w + src_pos.x;
-	des_row_start = des_rect.y * src->w + des_rect.x;
+	des_row_start = des_rect.y * des->w + des_rect.x;
 	/* 先得出透明度比例，避免在循环中进行除法运算 */
 	k = src->alpha / 255.0;
 
-	for(y=0; y<des_rect.height; ++y) {
+	for (y=0; y < des_rect.height; ++y) {
 		des_n = des_row_start;
 		src_n = src_row_start;
-		for(x=0; x<des_rect.width; ++x) {
+		for(x=0; x<des_rect.width; ++x) { 
 			alpha = src->rgba[3][src_n] * k;
-			ALPHA_BLEND( src->rgba[0][src_n], des->rgba[0][des_n], alpha );
-			ALPHA_BLEND( src->rgba[1][src_n], des->rgba[1][des_n], alpha );
-			ALPHA_BLEND( src->rgba[2][src_n], des->rgba[2][des_n], alpha );
-			++src_n;
+			ALPHA_BLEND(	src->rgba[0][src_n],
+					des->rgba[0][des_n],
+					alpha );
+			ALPHA_BLEND(	src->rgba[1][src_n],
+					des->rgba[1][des_n],
+					alpha );
+			ALPHA_BLEND(	src->rgba[2][src_n],
+					des->rgba[2][des_n],
+					alpha );
 			++des_n;
-		}
-		des_row_start += des->w;
+			++src_n;
+		} 
 		src_row_start += src->w;
+		des_row_start += des->w; 
 	}
-	return 0;
 }
 
 /**
@@ -785,7 +792,7 @@ static int Graph_RGBAMixWithGlobalAlpha(	LCUI_Graph *des,
  *	此函数不会对传入的参数进行有效性判断，因为此函数主要被Graph_Mix函
  *	数调用，Graph_Mix函数会预先进行参数有效性判断
  */
-static int Graph_RGBMix(	LCUI_Graph *des,
+static void Graph_RGBMix(	LCUI_Graph *des,
 				LCUI_Rect des_rect,
 				LCUI_Graph *src,
 				LCUI_Pos src_pos )
@@ -804,8 +811,6 @@ static int Graph_RGBMix(	LCUI_Graph *des,
 		des_n += des->w;
 		src_n += src->w;
 	}
-
-	return 0;
 }
 
 /**
@@ -823,10 +828,10 @@ static int Graph_RGBMix(	LCUI_Graph *des,
  *	此函数不会对传入的参数进行有效性判断，因为此函数主要被Graph_Mix函
  *	数调用，Graph_Mix函数会预先进行参数有效性判断
  */
-static int Graph_RGBMixWithGlobalAlpha(	LCUI_Graph *des,
-					LCUI_Rect des_rect,
-					LCUI_Graph *src,
-					LCUI_Pos src_pos )
+static void Graph_RGBMixWithGlobalAlpha(	LCUI_Graph *des,
+						LCUI_Rect des_rect,
+						LCUI_Graph *src,
+						LCUI_Pos src_pos )
 {
 	int x, y;
 	int src_n, des_n;
@@ -838,33 +843,35 @@ static int Graph_RGBMixWithGlobalAlpha(	LCUI_Graph *des,
 		des_n = des_row_start;
 		src_n = src_row_start;
 		for(x=0; x<des_rect.width; ++x) {
-			ALPHA_BLEND( src->rgba[0][src_n], des->rgba[0][des_n], src->alpha );
-			ALPHA_BLEND( src->rgba[1][src_n], des->rgba[1][des_n], src->alpha );
-			ALPHA_BLEND( src->rgba[2][src_n], des->rgba[2][des_n], src->alpha );
-			++src_n;
+			ALPHA_BLEND(	src->rgba[0][src_n],
+					des->rgba[0][des_n],
+					src->alpha );
+			ALPHA_BLEND(	src->rgba[1][src_n],
+					des->rgba[1][des_n],
+					src->alpha );
+			ALPHA_BLEND(	src->rgba[2][src_n],
+					des->rgba[2][des_n],
+					src->alpha );
 			++des_n;
+			++src_n;
 		}
-		des_row_start += des->w;
-		src_row_start += src->w;
 	}
-	return 0;
 }
-
 
 LCUI_API int Graph_Mix(	LCUI_Graph *back_graph, 
 			LCUI_Graph *fore_graph,
 			LCUI_Pos des_pos )
 {
 	LCUI_Graph *src, *des;
-	LCUI_Rect cut, src_rect, des_rect;
+	LCUI_Rect cut, src_rect, area, des_rect;
+	LCUI_Size box_size;
 	LCUI_Pos src_pos;
 	
 	/* 预先进行有效性判断 */
-	if(!Graph_IsValid(back_graph)
-	 || !Graph_IsValid(fore_graph)) {
+	if( !Graph_IsValid(back_graph)
+	 || !Graph_IsValid(fore_graph) ) {
 		return -1;
 	}
-	
 	/* 获取引用的源图像的最终区域 */
 	src_rect = Graph_GetValidRect(fore_graph);
 	des_rect = Graph_GetValidRect(back_graph);
@@ -879,17 +886,19 @@ LCUI_API int Graph_Mix(	LCUI_Graph *back_graph,
 	if(des_pos.x > des->w || des_pos.y > des->h) {
 		return -1;
 	}
-
-	/* 如果前景图尺寸超出背景图的范围，需要更改前景图的像素读取范围 */ 
-	if( LCUIRect_GetCutArea(
-		Size( des_rect.width, des_rect.height),
-		Rect( des_pos.x, des_pos.y, 
-			src_rect.width, src_rect.height ),
-		&cut
-	)) {
-		des_pos.x += cut.x;
-		des_pos.y += cut.y;
-	}
+	/* 记录容器尺寸 */
+	box_size.w = des_rect.width;
+	box_size.h = des_rect.height;
+	/* 记录前景图像在容器中的区域 */
+	area.x = des_pos.x;
+	area.y = des_pos.y;
+	area.width = src_rect.width;
+	area.height = src_rect.height;
+	/* 获取前景图像区域中的需要裁减的区域 */ 
+	LCUIRect_GetCutArea( box_size, area, &cut );
+	/* 移动前景图像区域的坐标 */
+	des_pos.x += cut.x;
+	des_pos.y += cut.y;
 	/* 得出源图像的读取区域的坐标 */
 	src_pos.x = cut.x + src_rect.x;
 	src_pos.y = cut.y + src_rect.y;
@@ -902,16 +911,22 @@ LCUI_API int Graph_Mix(	LCUI_Graph *back_graph,
 	if( src->color_type == COLOR_TYPE_RGBA ) {
 		/* 如果全局透明度为255，则说明混合时不需要考虑全局透明度 */
 		if( src->alpha == 255 ) {
-			return Graph_RGBAMix( des, des_rect, src, src_pos );
+			Graph_RGBAMix( des, des_rect, src, src_pos );
+			return 0;
 		}
-		return Graph_RGBAMixWithGlobalAlpha( des, des_rect, src, src_pos );
-	} /* 否则，前景图像没有Alpha通道 */
+		Graph_RGBAMixWithGlobalAlpha( des, des_rect, src, src_pos );
+		return 0;
+	}
+	/* 否则，前景图像没有Alpha通道 */
+	
 	/* 如果全局透明度为255，说明前景图形没有透明效果 */
 	if( src->alpha == 255 ) { 
-		return Graph_RGBMix( des, des_rect, des, src_pos );
+		Graph_RGBMix( des, des_rect, des, src_pos );
+		return 0;
 	}
 	/* 否则，将全局透明度计算在内，进行alpha混合 */
-	return Graph_RGBAMixWithGlobalAlpha( des, des_rect, des, src_pos );
+	Graph_RGBMixWithGlobalAlpha( des, des_rect, des, src_pos );
+	return 0;
 }
 
 /**
