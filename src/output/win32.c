@@ -158,7 +158,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 LCUI_API int
 LCUIScreen_Init( int w, int h, int mode )
 {
-	RECT client_rect;
+	RECT rect;
 	WNDCLASS wndclass;
 	LCUI_Widget *root_widget;
 	LCUI_Screen screen_info;
@@ -209,17 +209,23 @@ LCUIScreen_Init( int w, int h, int mode )
 		screen_info.size.w = w;
 		screen_info.size.h = h;
 	} else {
-		window_size.w = w;
-		window_size.h = h;
+		int boader_w, boader_h;
+		/* 计算边框的尺寸 */
+		boader_w = GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
+		boader_h = GetSystemMetrics(SM_CYFIXEDFRAME) * 2;
+		boader_h += GetSystemMetrics(SM_CYCAPTION);
+		/* 计算窗口尺寸 */
+		window_size.w = w + boader_w;
+		window_size.h = h + boader_h;
 		current_hwnd = CreateWindow (
 				szAppName, TEXT ("LCUI"),
 				WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
 				CW_USEDEFAULT, CW_USEDEFAULT,
 				window_size.w, window_size.h,
 				NULL, NULL, win32_hInstance, NULL);
-		GetClientRect( current_hwnd, &client_rect );
-		screen_info.size.w = client_rect.right;
-		screen_info.size.h = client_rect.bottom;
+		GetClientRect( current_hwnd, &rect );
+		screen_info.size.w = rect.right;
+		screen_info.size.h = rect.bottom;
 	}
 	screen_info.bits = 32;
 	screen_info.mode = mode;
@@ -257,7 +263,6 @@ LCUI_API int
 LCUIScreen_SetMode( int w, int h, int mode )
 {
 	LCUI_Pos pos;
-	RECT client_rect;
 	LCUI_Size real_size;
 	LCUI_Screen screen_info;
 	LCUI_Widget *root_widget;
@@ -283,13 +288,26 @@ LCUIScreen_SetMode( int w, int h, int mode )
 		SetWindowLong( current_hwnd, GWL_STYLE, WS_POPUP );
 		SetWindowPos( current_hwnd, HWND_NOTOPMOST, 0, 0, real_size.w, real_size.h, SWP_SHOWWINDOW );
 	} else {
+		RECT rect;
+		int boader_w, boader_h;
+		/* 计算边框的尺寸 */
+		boader_w = GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
+		boader_h = GetSystemMetrics(SM_CYFIXEDFRAME) * 2;
+		boader_h += GetSystemMetrics(SM_CYCAPTION);
+		/* 计算窗口尺寸 */
+		w = w + boader_w;
+		h = h + boader_h;
 		pos.x = (real_size.w - w)/2;
 		pos.y = (real_size.h - h)/2;
-		SetWindowLong( current_hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW &~WS_THICKFRAME );
-		SetWindowPos( current_hwnd, HWND_NOTOPMOST, pos.x, pos.y, w, h, SWP_SHOWWINDOW );
-		GetClientRect( current_hwnd, &client_rect );
-		w = client_rect.right;
-		h = client_rect.bottom;
+		SetWindowLong( current_hwnd, GWL_STYLE,
+			WS_OVERLAPPEDWINDOW &~WS_THICKFRAME );
+		/* 调整窗口尺寸 */
+		SetWindowPos( current_hwnd, HWND_NOTOPMOST, 
+			pos.x, pos.y, w, h, SWP_SHOWWINDOW );
+		/* 获取客户区的尺寸 */
+		GetClientRect( current_hwnd, &rect );
+		w = rect.right;
+		h = rect.bottom;
 	}
 
 	screen_info.size.w = w;
