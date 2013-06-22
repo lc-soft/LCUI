@@ -907,6 +907,7 @@ LCUI_API int Graph_Mix(	LCUI_Graph *back_graph,
 	des_rect.y = des_pos.y + des_rect.y;
 	des_rect.width = cut.width;
 	des_rect.height = cut.height;
+	
 	/* 如果前景图像有alpha通道 */
 	if( src->color_type == COLOR_TYPE_RGBA ) {
 		/* 如果全局透明度为255，则说明混合时不需要考虑全局透明度 */
@@ -918,10 +919,10 @@ LCUI_API int Graph_Mix(	LCUI_Graph *back_graph,
 		return 0;
 	}
 	/* 否则，前景图像没有Alpha通道 */
-	
+
 	/* 如果全局透明度为255，说明前景图形没有透明效果 */
 	if( src->alpha == 255 ) { 
-		Graph_RGBMix( des, des_rect, des, src_pos );
+		Graph_RGBMix( des, des_rect, src, src_pos );
 		return 0;
 	}
 	/* 否则，将全局透明度计算在内，进行alpha混合 */
