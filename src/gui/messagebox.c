@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * messagebox.c -- MessageBox for LCUI
  * 
  * Copyright (C) 2012-2013 by
@@ -55,8 +55,8 @@
 #define TEXT_MB_BTN_ABORT	L"终止"
 #define TEXT_MB_BTN_IGNORE	L"忽略"
 #define TEXT_MB_BTN_RETRY	L"重试"
-#define TEXT_MB_BTN_YES		L" 是 "
-#define TEXT_MB_BTN_NO		L" 否 "
+#define TEXT_MB_BTN_YES		L"是"
+#define TEXT_MB_BTN_NO		L"否"
 
 #define WIDGET_ID_MB_MSG_AREA	30
 
@@ -450,7 +450,7 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 	/* 判断是否有图标，并调整文本位置 */
 	if( icon_type == MB_ICON_NONE ) {
 		icon_flag = MSGBOX_NONE_ICON;
-		Widget_SetAlign( textbox, ALIGN_MIDDLE_LEFT, Pos(5,0) );
+		Widget_SetAlign( textbox, ALIGN_MIDDLE_CENTER, Pos(0,0) );
 	} else {
 		icon_flag = 0;
 		Widget_SetAlign( iconbox, ALIGN_MIDDLE_LEFT, Pos(5,0) );
