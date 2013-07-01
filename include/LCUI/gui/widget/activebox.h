@@ -44,110 +44,135 @@
 
 LCUI_BEGIN_HEADER
 
-typedef struct _LCUI_Frames		LCUI_Frames;
-typedef struct _LCUI_Frame		LCUI_Frame;
-typedef struct _LCUI_ActiveBox	LCUI_ActiveBox;
+/** 动画每一帧的信息 */
+typedef struct AnimationFrameData_ {
+	LCUI_Pos offset;	/**< 该帧的偏移位置 */
+	LCUI_Graph graph;	/**< 当前帧的图形 */
+	long int sleep_time;	/**< 该帧显示的时长（单位：毫秒） */
+	long int current_time;	/**< 当前剩下的等待时间 */
+} AnimationFrameData;
 
-struct _LCUI_ActiveBox{
-	LCUI_Frames *frames;
-}; 
+/** 动画的信息 */
+typedef struct AnimationData_ {
+	int state;		/**< 状态，指示播放还是暂停 */
+	LCUI_Queue frame;	/**< 用于记录该动画的所有帧 */
+	int current;		/**< 记录当前显示的帧序号 */
+	LCUI_Size size;		/**< 动画的尺寸 */
+	LCUI_Graph slot;	/**< 动画槽，记录当前帧显示的图像 */
+	LCUI_Func func;		/**< 被关联的回调函数 */
+} AnimationData;
 
-/************************** 保存动画每一帧的信息 **********************/
-struct _LCUI_Frame
-{
-	LCUI_Pos offset;	/* 该帧的偏移位置 */
-	LCUI_Graph *pic;	/* 当前帧的图形 */
-	long int sleep_time;	/* 该帧显示的时长（单位：毫秒） */
-	long int current_time;	/* 当前剩下的等待时间 */
-};
-/******************************************************************/
 
-/************************** 保存动画的信息 **********************/
-struct _LCUI_Frames
-{
-	int state;		/* 状态，播放还是暂停 */
-	LCUI_Queue pic;	/* 用于记录该动画的所有帧 */
-	int current;		/* 记录当前显示的帧序号 */
-	LCUI_Size size;	/* 动画的尺寸 */
-	LCUI_Graph slot;	/* 动画槽，记录当前帧显示的图像 */
-	LCUI_Queue func_data;	/* 记录被关联的函数及它的参数 */
-};
-/*************************************************************/
+typedef struct LCUI_ActiveBox_ {
+	AnimationData *current;		/**< 当前使用的动画 */
+	LCUI_Queue animation_list;	/**< 动画列表 */
+} LCUI_ActiveBox;
 
-/*********************** Frames Process *******************************/
-LCUI_API LCUI_Frames*
-Create_Frames(LCUI_Size size);
-/* 
- * 功能：创建一个能存放动画数据的容器
- * 说明：该容器用于记录动画的每一帧的信息，需要指定该容器的尺寸。
- *  */ 
+/** 获取当前帧 */
+LCUI_API AnimationFrameData* Animation_GetFrame( AnimationData *src );
 
-LCUI_API LCUI_Pos
-Frames_GetFrameMixPos( LCUI_Frames *stream, LCUI_Frame *frame );
-/* 功能：获取指定帧在整个动画容器中的位置 */ 
+/** 获取当前帧的图像 */
+LCUI_API LCUI_Graph* Animation_GetGraphSlot( AnimationData *src );
 
-LCUI_API int
-Resize_Frames( LCUI_Frames *p, LCUI_Size new_size );
-/* 功能：调整动画的容器尺寸 */ 
+/* 获取指定帧在整个动画容器中的位置 */
+LCUI_API LCUI_Pos Animation_GetFrameMixPos(	AnimationData *animation,
+						AnimationFrameData *frame );
 
-LCUI_API int
-Frames_AddFrame(	LCUI_Frames *des, LCUI_Graph *pic, 
-			LCUI_Pos offset, int sleep_time );
-/* 
- * 功能：为动画添加帧 
- * 说明：
- * pic指的是该帧的图像；
- * pos代表该帧图像在整个动画画面中的位置；
- * sleep_time表示该帧的显示时长，单位为：10毫秒
- * */ 
+/**
+ * 创建一个动画
+ * 创建的动画将记录至动画库中
+ * @param size
+ *	动画的尺寸
+ * @returns
+ *	正常则返回指向动画库中的该动画的指针，失败则返回NULL
+ */
+LCUI_API AnimationData* Animation_Create( LCUI_Size size );
 
-LCUI_API int
-Frames_AddFunc(	LCUI_Frames *des, 
-		void (*func)(LCUI_Graph*, void*), 
-		void *arg );
-/* 
- * 功能：为动画关联回调函数 
- * 说明：关联回调函数后，动画每更新一帧都会调用这个函数
- * */ 
+/**
+ * 删除一个动画
+ * 从动画库中删除指定的动画
+ * @param animation
+ *	需删除的动画
+ * @returns
+ *	正常则返回0，失败则返回-1
+ */
+LCUI_API int Animation_Delete( AnimationData* animation );
 
-LCUI_API LCUI_Frame*
-Frames_GetFrame(LCUI_Frames *src);
-/* 功能：获取当前帧 */ 
+/* 功能：调整动画的容器尺寸 */
+LCUI_API int Animation_Resize( AnimationData *p, LCUI_Size new_size );
 
-LCUI_API LCUI_Graph*
-Frames_GetGraphSlot(LCUI_Frames *src);
-/* 功能：获取当前帧的图像 */ 
+/**
+ * 为动画添加一帧图像
+ * @param des
+ *	目标动画
+ * @param pic
+ *	新增帧的图像
+ * @param offset
+ *	该帧图像的坐标偏移量，用于条该帧图像的显示位置
+ * @param sleep_time
+ *	该帧的显示时长（单位：毫秒）
+ * */
+LCUI_API int Animation_AddFrame(	AnimationData *des,
+					LCUI_Graph *pic,
+					LCUI_Pos offset,
+					int sleep_time );
 
-LCUI_API int
-Frames_Play(LCUI_Frames *frames);
-/* 功能：播放动画 */ 
+/**
+ * 为动画关联回调函数
+ * 关联回调函数后，动画每更新一帧都会调用该函数
+ * @param des
+ *	目标动画
+ * @param func
+ *	指向回调函数的函数指针
+ * @param arg
+ *	需传递给回调函数的第二个参数
+ * */
+LCUI_API int Animation_Connect(	AnimationData *des,
+				void (*func)(AnimationData*, void*),
+				void *arg );
 
-LCUI_API int
-Frames_Pause(LCUI_Frames *frames);
-/* 功能：暂停动画 */ 
-/*********************** End Frames Process ***************************/
+/* 播放动画 */
+LCUI_API int Animation_Play(AnimationData *animation);
 
-/************************** ActiveBox *********************************/
-LCUI_API LCUI_Frames*
-ActiveBox_GetFrames(LCUI_Widget *widget);
+/* 暂停动画 */
+LCUI_API int Animation_Pause(AnimationData *animation);
 
-LCUI_API int
-ActiveBox_SetFramesSize(LCUI_Widget *widget, LCUI_Size new_size);
-/* 功能：设定动画尺寸 */ 
+LCUI_API AnimationData* ActiveBox_GetCurrentAnimation( LCUI_Widget *widget );
 
-LCUI_API int
-ActiveBox_Play(LCUI_Widget *widget);
-/* 功能：播放动画 */ 
+/**
+ * 向ActiveBox部件添加一个动画
+ * @param widget
+ *	目标ActiveBox部件
+ * @param animation
+ *	要添加的动画
+ * @param id
+ *	该动画的标识号，用于区分各个动画
+ * @return
+ *	正常返回0，失败返回-1
+ * @note
+ *	添加的动画需要手动释放，ActiveBox部件只负责记录、引用动画
+ */
+LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget *widget,
+					AnimationData *animation,
+					int id );
 
-LCUI_API int
-ActiveBox_Pause(LCUI_Widget *widget);
-/* 功能：暂停动画 */ 
+/**
+ * 切换ActiveBox部件播放的动画
+ * @param widget
+ *	目标ActiveBox部件
+ * @param id
+ *	切换至的新动画的标识号
+ * @return
+ *	切换成功则返回0，未找到指定ID的动画记录，则返回-1
+ */
+LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget *widget,
+					int id );
 
-LCUI_API int
-ActiveBox_AddFrame(	LCUI_Widget *widget, LCUI_Graph *pic, 
-			LCUI_Pos offset, int sleep_time );
-/* 功能：为ActiveBox部件内的动画添加一帧图像 */ 
-/************************** End ActiveBox *****************************/
+/* 播放动画 */
+LCUI_API int ActiveBox_Play( LCUI_Widget *widget );
+
+/* 暂停动画 */
+LCUI_API int ActiveBox_Pause( LCUI_Widget *widget );
 
 LCUI_END_HEADER
 
