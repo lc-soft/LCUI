@@ -83,6 +83,10 @@ LCUI_API LCUI_BOOL Graph_GetPixel( LCUI_Graph *graph, LCUI_Pos pos, LCUI_RGBA *p
 		return FALSE;
 	}
 	rect = Graph_GetValidRect( graph );
+	/* 若坐标超出范围 */
+	if( pos.x >= rect.width || pos.y >= rect.height ) {
+		return FALSE;
+	}
 	graph = Graph_GetQuote( graph );
 	if( !Graph_IsValid(graph) ) {
 		return FALSE;
@@ -240,6 +244,8 @@ LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h )
 			free( graph->rgba );
 			goto error_exit;
 		}
+		/* 默认将alpha通道用0填充 */
+		memset( graph->rgba[3], 0, graph->mem_size );
 	}
 	graph->w = w;
 	graph->h = h;
@@ -1164,7 +1170,7 @@ LCUI_API int Graph_Replace(	LCUI_Graph *back_graph,
 	des_rect.height = cut.height;
 	/* 如果前景图像有透明度 */
 	if( src->color_type == COLOR_TYPE_RGBA ) {
-		 /* 弱背景图有透明度 */
+		 /* 若背景图有透明度 */
 		if( des->color_type == COLOR_TYPE_RGBA ) {
 			return Graph_DirectReplace( des, des_rect, src, src_pos );
 		}
