@@ -80,6 +80,24 @@ static LCUI_Queue animation_stream;
 static int database_init = FALSE;
 static int __timer_id = -1;
 
+static void AnimationStatus_Destroy( void *arg )
+{
+	AnimationStatus *p_status;
+	p_status = (AnimationStatus*)arg;
+	Graph_Free( &p_status->framebuffer );
+}
+
+static void AnimationStatus_Init( AnimationStatus *p_status )
+{
+	p_status->play_id = 0;
+	p_status->animation = NULL;
+	p_status->current = 0;
+	p_status->state = PAUSE;
+	p_status->func.func = NULL;
+	Graph_Init( &p_status->framebuffer );
+	p_status->framebuffer.color_type = COLOR_TYPE_RGBA;
+}
+
 static AnimationStatus* AnimationStatus_Get( AnimationData *animation, int play_id )
 {
 	int i, total;
@@ -96,6 +114,7 @@ static AnimationStatus* AnimationStatus_Get( AnimationData *animation, int play_
 			continue;
 		}
 		if( play_id == p_status->play_id ) {
+			Queue_Unlock( &animation_stream );
 			return p_status;
 		}
 	}
@@ -119,7 +138,6 @@ LCUI_API LCUI_Graph* Animation_GetGraphSlot( AnimationData *animation, int play_
 
 static void Animation_CallFunc( AnimationStatus *p_status )
 {
-	p_status->func.arg[0] = p_status;
 	AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_S, &p_status->func );
 }
 
@@ -150,11 +168,10 @@ static int Animation_UpdateGraphSlot( AnimationData *animation, int play_id, int
 	if( p_status == NULL ) {
 		return -2;
 	}
-	
 	Graph_Create(	&p_status->framebuffer,
 			p_status->animation->size.w,
 			p_status->animation->size.h );
-
+	
 	Graph_FillAlpha( &p_status->framebuffer, 0 );
 	if(0 < Queue_GetTotal( &animation->frame )) {
 		pos = Animation_GetFrameMixPos( animation, frame );
@@ -348,7 +365,7 @@ LCUI_API int Animation_AddFrame(	AnimationData *des,
  * */
 LCUI_API int Animation_Connect(	AnimationData *animation,
 				int play_id,
-				void (*func)(AnimationData*, void*),
+				void (*func)(void*),
 				void *arg )
 {
 	AnimationStatus *p_status;
@@ -362,8 +379,8 @@ LCUI_API int Animation_Connect(	AnimationData *animation,
 	}
 	p_status->func.func = (CallBackFunc)func;
 	p_status->func.id = LCUIApp_GetSelfID();
-	p_status->func.arg[0] = NULL;
-	p_status->func.arg[1] = arg;
+	p_status->func.arg[0] = arg;
+	p_status->func.arg[1] = NULL;
 	p_status->func.destroy_arg[0] = FALSE;
 	p_status->func.destroy_arg[1] = FALSE;
 	return 0;
@@ -432,7 +449,7 @@ static void AnimationStream_TimeSub( int time )
 	AnimationStatus *p_status;
 	int i, total, pos;
 
-	Queue_Lock(&animation_stream);
+	Queue_Lock( &animation_stream );
 	total = Queue_GetTotal(&animation_stream);
 	DEBUG_MSG("start\n");
 	for(i=0; i<total; ++i) {
@@ -451,8 +468,8 @@ static void AnimationStream_TimeSub( int time )
 			continue;
 		}
 		frame->current_time -= time;
-		DEBUG_MSG("fames: %p, current: %d, time:%ld, sub:%d\n",
-			animation, pos, frame->current_time, time);
+		DEBUG_MSG("animation: %p, current: %d, time:%ld, sub:%d\n",
+			p_status->animation, pos, frame->current_time, time);
 	}
 	DEBUG_MSG("end\n");
 	Queue_Unlock( &animation_stream );
@@ -471,7 +488,7 @@ static AnimationStatus* AnimationStream_Update( int *sleep_time )
 	for(i=0; i<total; ++i){
 		ani_status = (AnimationStatus*)
 				Queue_Get( &animation_stream, i );
-		if(ani_status->state == 1) {
+		if(ani_status->state == PLAY) {
 			break;
 		}
 	}
@@ -526,13 +543,13 @@ static AnimationStatus* AnimationStream_Update( int *sleep_time )
 		ani_status->animation,
 		ani_status->play_id,
 		ani_status->current-1 );
-
+	
 	used_time = clock()-used_time;
 	if(used_time > 0) {
 		AnimationStream_TimeSub( used_time );
 	}
 	AnimationStream_Sort(); /* 重新排序 */
-	DEBUG_MSG("current frame: %d\n", animation->current);
+	DEBUG_MSG("current frame: %d\n", ani_status->current);
 	DEBUG_MSG("end\n");
 	return ani_status;
 }
@@ -571,17 +588,19 @@ LCUI_API int Animation_Play( AnimationData *animation, int play_id )
 		return -1;
 	}
 	if( __timer_id == -1 ) {
-		Queue_Init( &animation_stream, sizeof(AnimationStatus), NULL );
-		Queue_UsingPointer( &animation_stream );
+		Queue_Init(
+			&animation_stream,
+			sizeof(AnimationStatus),
+			AnimationStatus_Destroy
+		);
 		__timer_id = LCUITimer_Set( 50, Process_Frames, TRUE );
 	}
 	/* 若播放标识号不大于0，则创建新播放实例 */
 	if( play_id <= 0 ) {
+		AnimationStatus_Init( &new_status );
 		new_status.play_id = new_play_id++;
 		new_status.animation = animation;
-		new_status.current = 0;
 		new_status.state = PLAY;
-		new_status.func.func = NULL;
 		/* 添加新实例至队列中 */
 		Queue_Add( &animation_stream, &new_status );
 		return new_status.play_id;
@@ -635,11 +654,11 @@ static AnimationRec* ActiveBox_GetCurrentAnimation( LCUI_Widget *widget )
 }
 
 /* 刷新动画当前帧的显示 */
-static void ActiveBox_RefreshFrame( AnimationStatus *unused, void *arg )
+static void ActiveBox_RefreshFrame( void *arg )
 {
 	LCUI_Widget *widget = (LCUI_Widget*)arg;
 	DEBUG_MSG("refresh\n");
-	Widget_Draw(widget);
+	Widget_Draw( widget );
 }
 
 
@@ -684,6 +703,7 @@ LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget *widget,
 	int i, n;
 	AnimationRec *p_rec;
 	LCUI_ActiveBox *actbox;
+
 	actbox = (LCUI_ActiveBox*)Widget_GetPrivData( widget );
 	n = Queue_GetTotal( &actbox->animation_list );
 	for(i=0; i<n; ++i) {
@@ -737,6 +757,13 @@ LCUI_API int ActiveBox_Play( LCUI_Widget *widget )
 	if( ret > 0 ) {
 		/* 保存播放标识号 */
 		actbox->current->play_id = ret;
+		/* 关联回调函数 */
+		Animation_Connect(
+			actbox->current->animation,
+			actbox->current->play_id,
+			ActiveBox_RefreshFrame,
+			(void*)widget
+		);
 		return 0;
 	}
 	return -1;
@@ -764,7 +791,10 @@ LCUI_API int ActiveBox_Pause( LCUI_Widget *widget )
 static void ActiveBox_ExecInit(LCUI_Widget *widget)
 {
 	LCUI_ActiveBox *actbox;
-	actbox = (LCUI_ActiveBox*)WidgetPrivData_New(widget, sizeof(LCUI_ActiveBox));
+	
+	actbox = (LCUI_ActiveBox*)WidgetPrivData_New(
+			widget, sizeof(LCUI_ActiveBox));
+
 	actbox->current = NULL;
 	Queue_Init( &actbox->animation_list, sizeof(AnimationRec), NULL );
 	Widget_SetBackgroundLayout( widget, LAYOUT_CENTER );
@@ -778,8 +808,10 @@ static void ActiveBox_ExecUpdate(LCUI_Widget *widget)
 	LCUI_Graph *frame_graph;
 	LCUI_Pos pos;
 
-	DEBUG_MSG("update\n");
 	p_rec = ActiveBox_GetCurrentAnimation( widget );
+	if( p_rec == NULL ) {
+		return;
+	}
 	frame_graph = Animation_GetGraphSlot( p_rec->animation, p_rec->play_id );
 	pos = GetPosByAlign(
 			Widget_GetSize(widget),

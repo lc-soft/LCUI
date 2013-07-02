@@ -121,7 +121,7 @@ LCUI_API int Animation_AddFrame(	AnimationData *des,
  * */
 LCUI_API int Animation_Connect(	AnimationData *animation,
 				int play_id,
-				void (*func)(AnimationData*, void*),
+				void (*func)(void*),
 				void *arg );
 
 /**
