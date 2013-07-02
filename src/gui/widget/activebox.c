@@ -47,12 +47,31 @@
 
 #include <time.h>
 
+#define PAUSE	0
+#define PLAY	1
+
+/** 动画记录 */
 typedef struct AnimationRec_ {
-	int id;
-	AnimationData *animation;
+	int play_id;			/**< 动画的播放标识号 */
+	AnimationData *animation;	/**< 对应的动画 */
 } AnimationRec;
 
-/*********************** Frames Process *******************************/
+/** 动画状态 */
+typedef struct AnimationStatus_ {
+	int play_id;			/**< 标识号 */
+	int state;			/**< 状态，指示播放还是暂停 */
+	int current;			/**< 记录当前帧的序号 */
+	AnimationData *animation;	/**< 对应的动画 */
+	LCUI_Graph framebuffer;		/**< 当前帧图像的缓冲 */
+	LCUI_Func func;			/**< 被关联的回调函数 */
+} AnimationStatus;
+
+typedef struct LCUI_ActiveBox_ {
+	int state;			/**< 当前动画状态 */
+	AnimationRec *current;		/**< 当前使用的动画 */
+	LCUI_Queue animation_list;	/**< 动画列表 */
+} LCUI_ActiveBox;
+
 /* 动画库，用于记录所有动画的信息 */
 static LCUI_Queue animation_database;
 /* 动画流，以流水线的形式处理每个动画的每帧图像的更新 */
@@ -61,24 +80,47 @@ static LCUI_Queue animation_stream;
 static int database_init = FALSE;
 static int __timer_id = -1;
 
-/** 获取当前帧 */
-LCUI_API AnimationFrameData* Animation_GetFrame( AnimationData *src )
+static AnimationStatus* AnimationStatus_Get( AnimationData *animation, int play_id )
 {
-	return (AnimationFrameData*)Queue_Get(&src->frame, src->current-1);
+	int i, total;
+	AnimationStatus *p_status;
+
+	if( animation == NULL ) {
+		return NULL;
+	}
+	Queue_Lock( &animation_stream );
+	total = Queue_GetTotal( &animation_stream );
+	for( i=0; i<total; ++i ) {
+		p_status = (AnimationStatus*)Queue_Get( &animation_stream, i );
+		if( !p_status || p_status->animation != animation ) {
+			continue;
+		}
+		if( play_id == p_status->play_id ) {
+			return p_status;
+		}
+	}
+	Queue_Unlock( &animation_stream );
+	return NULL;
 }
 
 /** 获取当前帧的图像 */
-LCUI_API LCUI_Graph* Animation_GetGraphSlot( AnimationData *src )
+LCUI_API LCUI_Graph* Animation_GetGraphSlot( AnimationData *animation, int play_id )
 {
-	if( !src ) {
+	AnimationStatus *p_status;
+	if( !animation ) {
 		return NULL;
 	}
-	return &src->slot;
+	p_status = AnimationStatus_Get( animation, play_id );
+	if( p_status == NULL ) {
+		return NULL;
+	}
+	return &p_status->framebuffer;
 }
 
-static void Animation_CallFunc( AnimationData *animation )
+static void Animation_CallFunc( AnimationStatus *p_status )
 {
-	AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_S, &animation->func );
+	p_status->func.arg[0] = p_status;
+	AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_S, &p_status->func );
 }
 
 /* 获取指定帧在整个动画容器中的位置 */
@@ -93,23 +135,30 @@ LCUI_API LCUI_Pos Animation_GetFrameMixPos(	AnimationData *animation,
 }
 
 /* 将动画当前帧的图像写入至槽中 */
-static int Animation_UpdateGraphSlot( AnimationData *animation, int num )
+static int Animation_UpdateGraphSlot( AnimationData *animation, int play_id, int frame_num )
 {
 	LCUI_Pos pos;
+	AnimationStatus *p_status;
 	AnimationFrameData *frame;
 
-	frame = (AnimationFrameData*)Queue_Get( &animation->frame, num );
+	frame = (AnimationFrameData*)Queue_Get( &animation->frame, frame_num );
 	DEBUG_MSG("animation: %p, frame: %p\n", animation, frame);
 	if( !frame ) {
 		return -1;
 	}
-	if(!Graph_IsValid( &animation->slot) ) {
+	p_status = AnimationStatus_Get( animation, play_id );
+	if( p_status == NULL ) {
 		return -2;
 	}
-	Graph_FillAlpha( &animation->slot, 0 );
+	
+	Graph_Create(	&p_status->framebuffer,
+			p_status->animation->size.w,
+			p_status->animation->size.h );
+
+	Graph_FillAlpha( &p_status->framebuffer, 0 );
 	if(0 < Queue_GetTotal( &animation->frame )) {
 		pos = Animation_GetFrameMixPos( animation, frame );
-		Graph_Replace( &animation->slot, &frame->graph, pos );
+		Graph_Replace( &p_status->framebuffer, &frame->graph, pos );
 	}
 	return 0;
 }
@@ -120,7 +169,43 @@ static void AnimationData_Destroy( void *arg )
 	AnimationData *animation;
 	animation = (AnimationData*)arg;
 	Queue_Destroy( &animation->frame );
-	Graph_Free( &animation->slot );
+}
+
+/** 调整动画的容器尺寸 */
+LCUI_API int Animation_Resize( AnimationData *p, LCUI_Size new_size )
+{
+	int i, total;
+	LCUI_Pos pos;
+	AnimationFrameData *frame;
+	LCUI_Graph *graph;
+	LCUI_Size size;
+
+	if(new_size.w <= 0 || new_size.h <= 0)	{
+		return -1;
+	}
+	if( !p ) {
+		return -2;
+	}
+
+	p->size = new_size;
+	total = Queue_GetTotal(&p->frame);
+	for(i=0; i<total; ++i){
+		frame = (AnimationFrameData *)Queue_Get(&p->frame, i);
+		graph = Graph_GetQuote( &frame->graph );
+		size = Graph_GetSize( graph );
+		pos = Animation_GetFrameMixPos( p, frame );
+		/* 判断当前帧图像是否超出动画尺寸 */
+		if(pos.x+size.w > new_size.w){
+			size.w = new_size.w - pos.x;
+			size.w<0 ? size.w=0 :1;
+		}
+		if(pos.y+size.h > new_size.h){
+			size.h = new_size.h - pos.y;
+			size.h<0 ? size.h=0 :1;
+		}
+		Graph_Quote( &frame->graph, graph, Rect(0,0,size.w, size.h) );
+	}
+	return 0;
 }
 
 
@@ -138,12 +223,6 @@ LCUI_API AnimationData* Animation_Create( LCUI_Size size )
 	AnimationData *p, animation;
 
 	Queue_Init( &animation.frame, sizeof(AnimationFrameData), NULL );
-	animation.func.func = NULL;
-	animation.func.id = 0;
-	Graph_Init( &animation.slot );
-	animation.slot.color_type = COLOR_TYPE_RGBA;
-	animation.current = 0;
-	animation.state = 0;
 	animation.size = size;
 	
 	if( !database_init ) {
@@ -220,48 +299,6 @@ LCUI_API int Animation_Delete( AnimationData* animation )
 }
 
 
-/* 功能：调整动画的容器尺寸 */
-LCUI_API int Animation_Resize( AnimationData *p, LCUI_Size new_size )
-{
-	int i, total;
-	LCUI_Pos pos;
-	AnimationFrameData *frame;
-	LCUI_Graph *graph;
-	LCUI_Size size;
-
-	if(new_size.w <= 0 || new_size.h <= 0)	{
-		return -1;
-	}
-	if( !p ) {
-		return -2;
-	}
-
-	p->size = new_size;
-	total = Queue_GetTotal(&p->frame);
-	for(i=0; i<total; ++i){
-		frame = (AnimationFrameData *)Queue_Get(&p->frame, i);
-		graph = Graph_GetQuote( &frame->graph );
-		size = Graph_GetSize( graph );
-		pos = Animation_GetFrameMixPos( p, frame );
-		/* 判断当前帧图像是否超出动画尺寸 */
-		if(pos.x+size.w > new_size.w){
-			size.w = new_size.w - pos.x;
-			size.w<0 ? size.w=0 :1;
-		}
-		if(pos.y+size.h > new_size.h){
-			size.h = new_size.h - pos.y;
-			size.h<0 ? size.h=0 :1;
-		}
-		Graph_Quote( &frame->graph, graph, Rect(0,0,size.w, size.h) );
-	}
-	/* 调整动画槽的尺寸 */
-	Graph_Create( &p->slot, new_size.w, new_size.h );
-	/* 更新动画槽中的图像 */
-	Animation_UpdateGraphSlot( p, p->current );
-	Animation_CallFunc( p );
-	return 0;
-}
-
 /**
  * 为动画添加一帧图像
  * @param des
@@ -298,73 +335,82 @@ LCUI_API int Animation_AddFrame(	AnimationData *des,
 /**
  * 为动画关联回调函数
  * 关联回调函数后，动画每更新一帧都会调用该函数
- * @param des
+ * @param animation
  *	目标动画
  * @param func
  *	指向回调函数的函数指针
  * @param arg
  *	需传递给回调函数的第二个参数
+ * @returns
+ *	正常则返回0，失败则返回-1
+ * @warning
+ *	必须在动画被第一次播放后调用此函数，否则将因找不到该动画的播放实例而导致关联失败
  * */
-LCUI_API int Animation_Connect(	AnimationData *des,
+LCUI_API int Animation_Connect(	AnimationData *animation,
+				int play_id,
 				void (*func)(AnimationData*, void*),
 				void *arg )
 {
-	if( !des ) {
+	AnimationStatus *p_status;
+
+	if( !animation ) {
 		return -1;
 	}
-
-	des->func.func = (CallBackFunc)func;
-	des->func.id = LCUIApp_GetSelfID();
-	des->func.arg[0] = NULL;
-	des->func.arg[1] = arg;
-	/* 如果不将该标志置为FALSE，会是确定的值，导致在执行任务后的销毁参数时出现段错误 */
-	des->func.destroy_arg[0] = FALSE;
-	des->func.destroy_arg[1] = FALSE;
+	p_status = AnimationStatus_Get( animation, play_id );
+	if( p_status == NULL ) {
+		return -1;
+	}
+	p_status->func.func = (CallBackFunc)func;
+	p_status->func.id = LCUIApp_GetSelfID();
+	p_status->func.arg[0] = NULL;
+	p_status->func.arg[1] = arg;
+	p_status->func.destroy_arg[0] = FALSE;
+	p_status->func.destroy_arg[1] = FALSE;
 	return 0;
 }
-
 
 /* 对动画流进行排序 */
 static void AnimationStream_Sort(void)
 {
 	int i, j, pos, total;
-	AnimationData *temp;
+	AnimationStatus *p_status;
 	AnimationFrameData *p, *q;
+
 	/* 为动画流锁上互斥锁 */
 	Queue_Lock( &animation_stream );
 	total = Queue_GetTotal( &animation_stream );
 	/* 使用选择排序法进行排序 */
 	for(i=0; i<total; ++i) {
-		/* 获取一个动画 */
-		temp = (AnimationData*)Queue_Get( &animation_stream, i );
-		if( !temp ) {
+		/* 获取一个动画状态信息 */
+		p_status = (AnimationStatus*)Queue_Get( &animation_stream, i );
+		if( !p_status ) {
 			continue;
 		}
 		/* 若该动画当前帧序号大于0 */
-		if(temp->current > 0) {
-			pos = temp->current-1;
+		if(p_status->current > 0) {
+			pos = p_status->current-1;
 		} else {
 			pos = 0;
 		}
 		/* 获取当前帧 */
-		p = (AnimationFrameData*)Queue_Get( &temp->frame, pos );
+		p = (AnimationFrameData*)Queue_Get( &p_status->animation->frame, pos );
 		if( !p ) {
 			continue;
 		}
 
 		for(j=i+1; j<total; ++j) {
-		/* 获取下一个动画 */
-		temp = (AnimationData*)Queue_Get( &animation_stream, j );
-			if( !temp ) {
+			/* 获取下一个动画 */
+			p_status = (AnimationStatus*)Queue_Get( &animation_stream, j );
+			if( !p_status ) {
 				continue;
 			}
-			if(temp->current > 0) {
-				pos = temp->current-1;
+			if(p_status->current > 0) {
+				pos = p_status->current-1;
 			} else {
 				pos = 0;
 			}
 			/* 获取该动画的当前帧 */
-			q =(AnimationFrameData*) Queue_Get(&temp->frame, pos);
+			q = (AnimationFrameData*)Queue_Get( &p_status->animation->frame, pos );
 			if( !q ) {
 				continue;
 			}
@@ -376,30 +422,31 @@ static void AnimationStream_Sort(void)
 		}
 	}
 	/* 解锁动画流 */
-	Queue_Unlock(&animation_stream);
+	Queue_Unlock( &animation_stream );
 }
 
 /* 将各个动画的当前帧的等待时间与指定时间相减 */
 static void AnimationStream_TimeSub( int time )
 {
 	AnimationFrameData *frame;
-	AnimationData *animation;
+	AnimationStatus *p_status;
 	int i, total, pos;
 
 	Queue_Lock(&animation_stream);
 	total = Queue_GetTotal(&animation_stream);
 	DEBUG_MSG("start\n");
 	for(i=0; i<total; ++i) {
-		animation = (AnimationData*)Queue_Get(&animation_stream, i);
-		if( !animation || animation->state == 0 ) {
+		p_status = (AnimationStatus*)Queue_Get( &animation_stream, i );
+		if( !p_status || p_status->state == PAUSE ) {
 			continue;
 		}
-		if(animation->current > 0) {
-			pos = animation->current-1;
+		if( p_status->current > 0 ) {
+			pos = p_status->current-1;
 		} else {
 			pos = 0;
 		}
-		frame = (AnimationFrameData*)Queue_Get(&animation->frame, pos);
+		frame = (AnimationFrameData*)
+			Queue_Get( &p_status->animation->frame, pos );
 		if( !frame ) {
 			continue;
 		}
@@ -408,26 +455,27 @@ static void AnimationStream_TimeSub( int time )
 			animation, pos, frame->current_time, time);
 	}
 	DEBUG_MSG("end\n");
-	Queue_Unlock(&animation_stream);
+	Queue_Unlock( &animation_stream );
 }
 
 /** 更新流中的动画至下一帧，并获取当前动画和当前帧的等待时间 */
-static AnimationData * AnimationStream_Update( int *sleep_time )
+static AnimationStatus* AnimationStream_Update( int *sleep_time )
 {
 	int i, total;
+	AnimationStatus *ani_status, *temp = NULL;
 	AnimationFrameData *frame = NULL;
-	AnimationData *animation = NULL, *temp = NULL;
 	clock_t used_time;
 
 	DEBUG_MSG("start\n");
 	total = Queue_GetTotal(&animation_stream);
 	for(i=0; i<total; ++i){
-		animation = (AnimationData*)Queue_Get(&animation_stream, i);
-		if(animation->state == 1) {
+		ani_status = (AnimationStatus*)
+				Queue_Get( &animation_stream, i );
+		if(ani_status->state == 1) {
 			break;
 		}
 	}
-	if(i >= total || !animation ) {
+	if(i >= total || !ani_status ) {
 		return NULL;
 	}
 	/*
@@ -435,15 +483,16 @@ static AnimationData * AnimationStream_Update( int *sleep_time )
 	 * 需要优先处理帧序号为0的动画。
 	 * */
 	for(i=0; i<total; ++i){
-		temp = (AnimationData*)Queue_Get( &animation_stream, i );
-		if( animation->state == 1 && temp->current == 0 ) {
-			animation = temp;
+		temp = (AnimationStatus*)Queue_Get( &animation_stream, i );
+		if( ani_status->state == PLAY && temp->current == 0 ) {
+			ani_status = temp;
 			break;
 		}
 	}
-	if( animation && animation->current > 0 ) {
-		frame = (AnimationFrameData*)Queue_Get( &animation->frame,
-							animation->current-1 );
+	if( ani_status && ani_status->current > 0 ) {
+		frame = (AnimationFrameData*)
+			Queue_Get(	&ani_status->animation->frame,
+					ani_status->current-1 );
 		if( !frame ) {
 			return NULL;
 		}
@@ -454,93 +503,131 @@ static AnimationData * AnimationStream_Update( int *sleep_time )
 		}
 
 		frame->current_time = frame->sleep_time;
-		++animation->current;
-		total = Queue_GetTotal(&animation->frame);
-		if(animation->current > total) {
-			animation->current = 1;
+		++ani_status->current;
+		total = Queue_GetTotal( &ani_status->animation->frame );
+		if( ani_status->current > total ) {
+			ani_status->current = 1;
 		}
-		frame = (AnimationFrameData*)Queue_Get(	&animation->frame,
-							animation->current-1);
+		frame = (AnimationFrameData*)
+			Queue_Get(	&ani_status->animation->frame,
+					ani_status->current-1 );
 		if( !frame ) {
 			return NULL;
 		}
 	} else {
-		animation->current = 1;
-		frame = (AnimationFrameData*)Queue_Get(&animation->frame, 0);
+		ani_status->current = 1;
+		frame = (AnimationFrameData*)
+			Queue_Get( &ani_status->animation->frame, 0 );
 	}
-
-	used_time = clock();/* 开始计时 */
+	/* 开始计时 */
+	used_time = clock();
 	/* 将该动画当前帧的图像写入至槽中 */
-	Animation_UpdateGraphSlot( animation, animation->current-1 );
+	Animation_UpdateGraphSlot(
+		ani_status->animation,
+		ani_status->play_id,
+		ani_status->current-1 );
+
 	used_time = clock()-used_time;
 	if(used_time > 0) {
-		AnimationStream_TimeSub(used_time);
+		AnimationStream_TimeSub( used_time );
 	}
 	AnimationStream_Sort(); /* 重新排序 */
 	DEBUG_MSG("current frame: %d\n", animation->current);
 	DEBUG_MSG("end\n");
-	return animation;
+	return ani_status;
 }
 
 /* 响应定时器，处理动画的每一帧的更新 */
 static void Process_Frames( void )
 {
 	int sleep_time = 10;
-	AnimationData *animation;
+	AnimationStatus *ani_status;
 
 	while(!LCUI_Active()) {
 		LCUI_MSleep(10);
 	}
-	animation = AnimationStream_Update( &sleep_time );
+	ani_status = AnimationStream_Update( &sleep_time );
 	LCUITimer_Reset( __timer_id, sleep_time );
-	if( animation ) {
-		Animation_CallFunc( animation );
+	if( ani_status ) {
+		Animation_CallFunc( ani_status );
 	}
 }
 
-/* 播放动画 */
-LCUI_API int Animation_Play(AnimationData *animation)
+/**
+/* 播放指定播放实例中的动画
+ * @param animation
+ *	要播放的动画
+ * @param play_id
+ *	与该动画的播放实例对应的标识号，若不大于0，则会为该动画创建一个新的播放实例
+ * @returns
+ *	正常则返回该动画的播放标识号，失败则返回-1
+ */
+LCUI_API int Animation_Play( AnimationData *animation, int play_id )
 {
-	int i, total;
-	AnimationData *tmp_ptr;
+	static int new_play_id = 1;
+	AnimationStatus new_status, *p_status;
+
 	if( !animation ) {
 		return -1;
 	}
-	animation->state = 1;
-	if(__timer_id == -1){
-		Queue_Init( &animation_stream, sizeof(AnimationData), NULL );
+	if( __timer_id == -1 ) {
+		Queue_Init( &animation_stream, sizeof(AnimationStatus), NULL );
 		Queue_UsingPointer( &animation_stream );
 		__timer_id = LCUITimer_Set( 50, Process_Frames, TRUE );
 	}
-	/* 检查该动画是否已存在 */
-	Queue_Lock( &animation_stream );
-	total = Queue_GetTotal( &animation_stream );
-	for( i=0; i<total; ++i ) {
-		tmp_ptr = Queue_Get( &animation_stream, i );
-		if( tmp_ptr == animation ) {
-			break;
-		}
+	/* 若播放标识号不大于0，则创建新播放实例 */
+	if( play_id <= 0 ) {
+		new_status.play_id = new_play_id++;
+		new_status.animation = animation;
+		new_status.current = 0;
+		new_status.state = PLAY;
+		new_status.func.func = NULL;
+		/* 添加新实例至队列中 */
+		Queue_Add( &animation_stream, &new_status );
+		return new_status.play_id;
 	}
-	Queue_Unlock( &animation_stream );
-	/* 添加至动画更新队列中 */
-	if( i>=total ) {
-		return Queue_AddPointer(&animation_stream, animation);
+	/* 获取该动画的状态信息 */
+	p_status = AnimationStatus_Get( animation, play_id );
+	if( p_status == NULL ) {
+		return -1;
 	}
-	return 1;
+	p_status->state = PLAY;
+	return play_id;
 }
 
-/* 暂停动画 */
-LCUI_API int Animation_Pause(AnimationData *animation)
+/**
+ * 暂停指定播放实例中的动画
+ * @param animation
+ *	要暂停的动画
+ * @param play_id
+ *	与该动画的播放实例对应的标识号
+ * @returns
+ *	正常则返回该动画的播放标识号，失败则返回-1
+ */
+LCUI_API int Animation_Pause( AnimationData *animation, int play_id )
 {
+	static int new_play_id = 1;
+	AnimationStatus *p_status;
+
 	if( !animation ) {
 		return -1;
 	}
-	animation->state = 0;
+	if( __timer_id == -1 ) {
+		return -1;
+	}
+	/* 播放标识号必须大于0 */
+	if( play_id <= 0 ) {
+		return -1;
+	}
+	p_status = AnimationStatus_Get( animation, play_id );
+	if( p_status == NULL ) {
+		return -1;
+	}
+	p_status->state = PAUSE;
 	return 0;
 }
 
-
-LCUI_API AnimationData* ActiveBox_GetCurrentAnimation( LCUI_Widget *widget )
+static AnimationRec* ActiveBox_GetCurrentAnimation( LCUI_Widget *widget )
 {
 	LCUI_ActiveBox *actbox;
 	actbox = (LCUI_ActiveBox *)Widget_GetPrivData(widget);
@@ -548,7 +635,7 @@ LCUI_API AnimationData* ActiveBox_GetCurrentAnimation( LCUI_Widget *widget )
 }
 
 /* 刷新动画当前帧的显示 */
-static void ActiveBox_RefreshFrame( AnimationData *unused, void *arg )
+static void ActiveBox_RefreshFrame( AnimationStatus *unused, void *arg )
 {
 	LCUI_Widget *widget = (LCUI_Widget*)arg;
 	DEBUG_MSG("refresh\n");
@@ -562,23 +649,19 @@ static void ActiveBox_RefreshFrame( AnimationData *unused, void *arg )
  *	目标ActiveBox部件
  * @param animation
  *	要添加的动画
- * @param id
- *	该动画的标识号，用于区分各个动画
  * @return
  *	正常返回0，失败返回-1
  * @note
  *	添加的动画需要手动释放，ActiveBox部件只负责记录、引用动画
  */
 LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget *widget,
-					AnimationData *animation,
-					int id )
+					AnimationData *animation )
 {
 	AnimationRec rec;
 	LCUI_ActiveBox *actbox;
 
 	rec.animation = animation;
-	rec.id = id;
-	Animation_Connect( animation, ActiveBox_RefreshFrame, widget );
+	rec.play_id = 0;
 	actbox = (LCUI_ActiveBox*)Widget_GetPrivData( widget );
 	if( 0 <= Queue_Add( &actbox->animation_list, &rec ) ) {
 		return 0;
@@ -590,13 +673,13 @@ LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget *widget,
  * 切换ActiveBox部件播放的动画
  * @param widget
  *	目标ActiveBox部件
- * @param id
- *	切换至的新动画的标识号
+ * @param animation
+ *	切换至的新动画
  * @return
  *	切换成功则返回0，未找到指定ID的动画记录，则返回-1
  */
 LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget *widget,
-					int id )
+					AnimationData *animation )
 {
 	int i, n;
 	AnimationRec *p_rec;
@@ -604,25 +687,32 @@ LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget *widget,
 	actbox = (LCUI_ActiveBox*)Widget_GetPrivData( widget );
 	n = Queue_GetTotal( &actbox->animation_list );
 	for(i=0; i<n; ++i) {
-		p_rec = (AnimationRec*)Queue_Get( &actbox->animation_list, i );
-		if( !p_rec ) {
+		p_rec = (AnimationRec*)
+			Queue_Get( &actbox->animation_list, i );
+
+		if( !p_rec || p_rec->animation != animation ) {
 			continue;
 		}
-		if( p_rec->id == id ) {
-			if( actbox->current ) {
-				Animation_Pause( actbox->current );
-				/* 若当前动画处于播放状态，则暂停它
-				 * 并使切换的新动画处于播放状态 */
-				if( actbox->current->state == 1 ) {
-					Animation_Pause( actbox->current );
-					Animation_Play( p_rec->animation );
-				} else {
-					Animation_Pause( p_rec->animation );
-				}
-			}
-			actbox->current = p_rec->animation;
-			return 0;
+		if( actbox->current ) {
+			Animation_Pause(
+				actbox->current->animation,
+				actbox->current->play_id
+			);
 		}
+		/* 若当前动画处于播放状态，则设置切换的新动画的状态 */
+		if( actbox->state == PLAY ) {
+			Animation_Play(
+				p_rec->animation,
+				p_rec->play_id
+			);
+		} else {
+			Animation_Pause(
+				p_rec->animation,
+				p_rec->play_id
+			);
+		}
+		actbox->current = p_rec;
+		return 0;
 	}
 	return -1;
 }
@@ -630,15 +720,44 @@ LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget *widget,
 /* 播放动画 */
 LCUI_API int ActiveBox_Play( LCUI_Widget *widget )
 {
-	AnimationData *animation = ActiveBox_GetCurrentAnimation(widget);
-	return Animation_Play(animation);
+	int ret;
+	LCUI_ActiveBox *actbox;
+
+	actbox = (LCUI_ActiveBox*)Widget_GetPrivData(widget);
+	actbox->state = PLAY;
+	if( actbox->current == NULL ) {
+		actbox->current = (AnimationRec*)Queue_Get(
+					&actbox->animation_list, 0 );
+		if( actbox->current == NULL ) {
+			return -1;
+		}
+	}
+	ret = Animation_Play(	actbox->current->animation,
+				actbox->current->play_id );
+	if( ret > 0 ) {
+		/* 保存播放标识号 */
+		actbox->current->play_id = ret;
+		return 0;
+	}
+	return -1;
 }
 
 /* 暂停动画 */
 LCUI_API int ActiveBox_Pause( LCUI_Widget *widget )
 {
-	AnimationData *animation = ActiveBox_GetCurrentAnimation(widget);
-	return Animation_Pause(animation);
+	LCUI_ActiveBox *actbox;
+
+	actbox = (LCUI_ActiveBox*)Widget_GetPrivData(widget);
+	actbox->state = PAUSE;
+	if( actbox->current == NULL ) {
+		actbox->current = (AnimationRec*)Queue_Get(
+					&actbox->animation_list, 0 );
+		if( actbox->current == NULL ) {
+			return -1;
+		}
+	}
+	return Animation_Pause(	actbox->current->animation,
+				actbox->current->play_id );
 }
 
 /* 初始化ActiveBox部件 */
@@ -655,14 +774,18 @@ static void ActiveBox_ExecInit(LCUI_Widget *widget)
 static void ActiveBox_ExecUpdate(LCUI_Widget *widget)
 {
 	LCUI_Rect rect;
-	AnimationData *animation;
+	AnimationRec *p_rec;
 	LCUI_Graph *frame_graph;
 	LCUI_Pos pos;
+
 	DEBUG_MSG("update\n");
-	animation = ActiveBox_GetCurrentAnimation( widget );
-	frame_graph = Animation_GetGraphSlot( animation );
-	pos = GetPosByAlign( Widget_GetSize(widget),
-				animation->size, ALIGN_MIDDLE_CENTER);
+	p_rec = ActiveBox_GetCurrentAnimation( widget );
+	frame_graph = Animation_GetGraphSlot( p_rec->animation, p_rec->play_id );
+	pos = GetPosByAlign(
+			Widget_GetSize(widget),
+			p_rec->animation->size,
+			ALIGN_MIDDLE_CENTER
+	);
 
 	Widget_SetBackgroundTransparent( widget, TRUE );
 	Widget_SetBackgroundImage( widget, frame_graph );
@@ -675,7 +798,12 @@ static void ActiveBox_ExecUpdate(LCUI_Widget *widget)
 
 static void ActiveBox_ExecDestroy(LCUI_Widget *widget)
 {
+	LCUI_ActiveBox *actbox;
 
+	actbox = (LCUI_ActiveBox*)Widget_GetPrivData(widget);
+	actbox->current = NULL;
+	actbox->state = PAUSE;
+	Queue_Destroy( &actbox->animation_list );
 }
 
 LCUI_API void Register_ActiveBox(void)
@@ -685,5 +813,3 @@ LCUI_API void Register_ActiveBox(void)
 	WidgetFunc_Add("active_box", ActiveBox_ExecUpdate, FUNC_TYPE_UPDATE);
 	WidgetFunc_Add("active_box", ActiveBox_ExecDestroy, FUNC_TYPE_DESTROY);
 }
-
-/************************** End ActiveBox *****************************/

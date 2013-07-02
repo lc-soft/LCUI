@@ -54,29 +54,20 @@ typedef struct AnimationFrameData_ {
 
 /** 动画的信息 */
 typedef struct AnimationData_ {
-	int state;		/**< 状态，指示播放还是暂停 */
 	LCUI_Queue frame;	/**< 用于记录该动画的所有帧 */
-	int current;		/**< 记录当前显示的帧序号 */
 	LCUI_Size size;		/**< 动画的尺寸 */
-	LCUI_Graph slot;	/**< 动画槽，记录当前帧显示的图像 */
-	LCUI_Func func;		/**< 被关联的回调函数 */
 } AnimationData;
 
 
-typedef struct LCUI_ActiveBox_ {
-	AnimationData *current;		/**< 当前使用的动画 */
-	LCUI_Queue animation_list;	/**< 动画列表 */
-} LCUI_ActiveBox;
-
-/** 获取当前帧 */
-LCUI_API AnimationFrameData* Animation_GetFrame( AnimationData *src );
-
 /** 获取当前帧的图像 */
-LCUI_API LCUI_Graph* Animation_GetGraphSlot( AnimationData *src );
+LCUI_API LCUI_Graph* Animation_GetGraphSlot( AnimationData *animation, int play_id );
 
 /* 获取指定帧在整个动画容器中的位置 */
 LCUI_API LCUI_Pos Animation_GetFrameMixPos(	AnimationData *animation,
 						AnimationFrameData *frame );
+
+/** 调整动画的容器尺寸 */
+LCUI_API int Animation_Resize( AnimationData *p, LCUI_Size new_size );
 
 /**
  * 创建一个动画
@@ -98,9 +89,6 @@ LCUI_API AnimationData* Animation_Create( LCUI_Size size );
  */
 LCUI_API int Animation_Delete( AnimationData* animation );
 
-/* 功能：调整动画的容器尺寸 */
-LCUI_API int Animation_Resize( AnimationData *p, LCUI_Size new_size );
-
 /**
  * 为动画添加一帧图像
  * @param des
@@ -120,24 +108,43 @@ LCUI_API int Animation_AddFrame(	AnimationData *des,
 /**
  * 为动画关联回调函数
  * 关联回调函数后，动画每更新一帧都会调用该函数
- * @param des
+ * @param animation
  *	目标动画
  * @param func
  *	指向回调函数的函数指针
  * @param arg
  *	需传递给回调函数的第二个参数
+ * @returns
+ *	正常则返回0，失败则返回-1
+ * @warning
+ *	必须在动画被第一次播放后调用此函数，否则将因找不到该动画的播放实例而导致关联失败
  * */
-LCUI_API int Animation_Connect(	AnimationData *des,
+LCUI_API int Animation_Connect(	AnimationData *animation,
+				int play_id,
 				void (*func)(AnimationData*, void*),
 				void *arg );
 
-/* 播放动画 */
-LCUI_API int Animation_Play(AnimationData *animation);
+/**
+/* 播放指定播放实例中的动画
+ * @param animation
+ *	要播放的动画
+ * @param play_id
+ *	与该动画的播放实例对应的标识号，若不大于0，则会为该动画创建一个新的播放实例
+ * @returns
+ *	正常则返回该动画的播放标识号，失败则返回-1
+ */
+LCUI_API int Animation_Play( AnimationData *animation, int play_id );
 
-/* 暂停动画 */
-LCUI_API int Animation_Pause(AnimationData *animation);
-
-LCUI_API AnimationData* ActiveBox_GetCurrentAnimation( LCUI_Widget *widget );
+/**
+ * 暂停指定播放实例中的动画
+ * @param animation
+ *	要暂停的动画
+ * @param play_id
+ *	与该动画的播放实例对应的标识号
+ * @returns
+ *	正常则返回该动画的播放标识号，失败则返回-1
+ */
+LCUI_API int Animation_Pause( AnimationData *animation, int play_id );
 
 /**
  * 向ActiveBox部件添加一个动画
@@ -145,28 +152,25 @@ LCUI_API AnimationData* ActiveBox_GetCurrentAnimation( LCUI_Widget *widget );
  *	目标ActiveBox部件
  * @param animation
  *	要添加的动画
- * @param id
- *	该动画的标识号，用于区分各个动画
  * @return
  *	正常返回0，失败返回-1
  * @note
  *	添加的动画需要手动释放，ActiveBox部件只负责记录、引用动画
  */
 LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget *widget,
-					AnimationData *animation,
-					int id );
+					AnimationData *animation );
 
 /**
  * 切换ActiveBox部件播放的动画
  * @param widget
  *	目标ActiveBox部件
- * @param id
- *	切换至的新动画的标识号
+ * @param animation
+ *	切换至的新动画
  * @return
  *	切换成功则返回0，未找到指定ID的动画记录，则返回-1
  */
 LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget *widget,
-					int id );
+					AnimationData *animation );
 
 /* 播放动画 */
 LCUI_API int ActiveBox_Play( LCUI_Widget *widget );
