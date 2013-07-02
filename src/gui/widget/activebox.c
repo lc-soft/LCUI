@@ -1,43 +1,48 @@
-/* ***************************************************************************
- * activebox.c -- ActiveBox widget, play simple dynamic picture
- *
- * Copyright (C) 2012-2013 by
- * Liu Chao
- *
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
- *
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- *
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *
- * The LCUI project is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- *
- * You should have received a copy of the GPLv2 along with this file. It is
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+/** ******************************************************************************
+ * @file	activebox.c
+ * @brief	ActiveBox widget, play simple dynamic picture
+ * @author	Liu Chao <lc-soft@live.cn>
+ * @warning
+ * Copyright (C) 2012-2013 by							\n
+ * Liu Chao									\n
+ * 										\n
+ * This file is part of the LCUI project, and may only be used, modified, and	\n
+ * distributed under the terms of the GPLv2.					\n
+ * 										\n
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)		\n
+ * 										\n
+ * By continuing to use, modify, or distribute this file you indicate that you	\n
+ * have read the license and understand and accept it fully.			\n
+ *  										\n
+ * The LCUI project is distributed in the hope that it will be useful, but 	\n
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 	\n
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.	\n
+ * 										\n
+ * You should have received a copy of the GPLv2 along with this file. It is 	\n
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.	\n
+ * ******************************************************************************/
+ 
+/** ******************************************************************************
+ * @file	activebox.c
+ * @brief	ActiveBox部件, 可实现播放简单的动态图像
+ * @author	刘超 <lc-soft@live.cn>
+ * @warning
+ * 版权所有 (C) 2012-2013 归属于						\n
+ * 刘超										\n
+ * 										\n
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。	\n
+ * 										\n
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)				\n
+ * 										\n
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。	\n
+ * 										\n
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特定\n
+ * 用途的隐含担保，详情请参照GPLv2许可协议。					\n
+ * 										\n
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果	\n
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 				\n
+ * ******************************************************************************/
 
-/* ****************************************************************************
- * activebox.c -- ActiveBox部件, 播放简单的动态图像
- *
- * 版权所有 (C) 2012-2013 归属于
- * 刘超
- *
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
- *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- *
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- *
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
- *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>.
- * ****************************************************************************/
 //#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -78,7 +83,7 @@ static LCUI_Queue animation_database;
 static LCUI_Queue animation_stream;
 
 static int database_init = FALSE;
-static int __timer_id = -1;
+static int frame_proc_timer = -1;
 
 static void AnimationStatus_Destroy( void *arg )
 {
@@ -564,7 +569,7 @@ static void Process_Frames( void )
 		LCUI_MSleep(10);
 	}
 	ani_status = AnimationStream_Update( &sleep_time );
-	LCUITimer_Reset( __timer_id, sleep_time );
+	LCUITimer_Reset( frame_proc_timer, sleep_time );
 	if( ani_status ) {
 		Animation_CallFunc( ani_status );
 	}
@@ -587,13 +592,13 @@ LCUI_API int Animation_Play( AnimationData *animation, int play_id )
 	if( !animation ) {
 		return -1;
 	}
-	if( __timer_id == -1 ) {
+	if( frame_proc_timer == -1 ) {
 		Queue_Init(
 			&animation_stream,
 			sizeof(AnimationStatus),
 			AnimationStatus_Destroy
 		);
-		__timer_id = LCUITimer_Set( 50, Process_Frames, TRUE );
+		frame_proc_timer = LCUITimer_Set( 50, Process_Frames, TRUE );
 	}
 	/* 若播放标识号不大于0，则创建新播放实例 */
 	if( play_id <= 0 ) {
@@ -631,7 +636,7 @@ LCUI_API int Animation_Pause( AnimationData *animation, int play_id )
 	if( !animation ) {
 		return -1;
 	}
-	if( __timer_id == -1 ) {
+	if( frame_proc_timer == -1 ) {
 		return -1;
 	}
 	/* 播放标识号必须大于0 */
