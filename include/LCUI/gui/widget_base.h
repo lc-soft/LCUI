@@ -265,7 +265,7 @@ Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos );
 
 /* 功能：为部件私有结构体指针分配内存 */
 LCUI_API void*
-WidgetPrivData_New( LCUI_Widget *widget, size_t size );
+Widget_NewPrivData( LCUI_Widget *widget, size_t size );
 
 /* 初始化部件队列 */
 LCUI_API void WidgetQueue_Init(LCUI_Queue *queue);
