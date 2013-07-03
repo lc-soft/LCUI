@@ -62,7 +62,7 @@ ProgressBar_ExecInit( LCUI_Widget *widget )
 	LCUIProgBar *pb;
 	LCUI_Widget *fore_wdg, *glisten_wdg;
 	
-	pb = (LCUIProgBar*)WidgetPrivData_New(widget, sizeof(LCUIProgBar));
+	pb = (LCUIProgBar*)Widget_NewPrivData(widget, sizeof(LCUIProgBar));
 	pb->move_speed = 200;
 	pb->sleep_time = 100;
 	pb->max_value = 1;

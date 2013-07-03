@@ -338,7 +338,7 @@ TextBox_Init( LCUI_Widget *widget )
 	
 	widget->valid_state = WIDGET_STATE_ACTIVE | WIDGET_STATE_OVERLAY;
 	widget->valid_state |= (WIDGET_STATE_NORMAL | WIDGET_STATE_DISABLE);
-	textbox = WidgetPrivData_New(widget, sizeof(LCUI_TextBox));
+	textbox = Widget_NewPrivData(widget, sizeof(LCUI_TextBox));
 	textbox->text = Widget_New( "label" );
 	textbox->cursor = Widget_New( NULL );
 	textbox->scrollbar[0] = Widget_New( "scrollbar" );

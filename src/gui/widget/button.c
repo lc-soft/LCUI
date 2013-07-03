@@ -167,7 +167,7 @@ Button_Init( LCUI_Widget *widget )
 	int valid_state;
 	LCUI_Button *button;
 	
-	button = WidgetPrivData_New(widget, sizeof(LCUI_Button));
+	button = Widget_NewPrivData(widget, sizeof(LCUI_Button));
 	/* 初始化图像数据 */ 
 	Graph_Init(&button->btn_disable);
 	Graph_Init(&button->btn_normal);

@@ -129,7 +129,7 @@ ScrollBar_Init( LCUI_Widget *widget )
 {
 	LCUI_ScrollBar *scrollbar;
 	
-	scrollbar = WidgetPrivData_New(widget, sizeof(LCUI_ScrollBar));
+	scrollbar = Widget_NewPrivData(widget, sizeof(LCUI_ScrollBar));
 	scrollbar->data.max_num = 100;
 	scrollbar->data.current_num = 100;
 	scrollbar->data.max_size = 100;

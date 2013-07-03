@@ -797,7 +797,7 @@ static void ActiveBox_ExecInit(LCUI_Widget *widget)
 {
 	LCUI_ActiveBox *actbox;
 	
-	actbox = (LCUI_ActiveBox*)WidgetPrivData_New(
+	actbox = (LCUI_ActiveBox*)Widget_NewPrivData(
 			widget, sizeof(LCUI_ActiveBox));
 
 	actbox->current = NULL;

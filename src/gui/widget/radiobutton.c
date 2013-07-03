@@ -201,7 +201,7 @@ RadioButton_Init( LCUI_Widget *widget )
 	LCUI_Widget *container[2];
 	LCUI_RadioButton *radio_button;
 	
-	radio_button = WidgetPrivData_New(widget, sizeof(LCUI_RadioButton));
+	radio_button = Widget_NewPrivData(widget, sizeof(LCUI_RadioButton));
 	radio_button->on = FALSE;
 	/* 初始化图片数据 */ 
 	Graph_Init(&radio_button->img_off_disable);

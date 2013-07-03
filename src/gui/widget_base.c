@@ -1099,7 +1099,7 @@ Empty_Widget(void)
 
 /* 功能：为部件私有结构体指针分配内存 */
 LCUI_API void*
-WidgetPrivData_New( LCUI_Widget *widget, size_t size )
+Widget_NewPrivData( LCUI_Widget *widget, size_t size )
 {
 	widget->private_data = malloc(size);
 	return widget->private_data;

@@ -173,7 +173,7 @@ Window_TitleBar_Init(LCUI_Widget *titlebar)
 	LCUI_TitleBar *t;
 	
 	Graph_Init(&img);
-	t = WidgetPrivData_New(titlebar, sizeof(LCUI_TitleBar));
+	t = Widget_NewPrivData(titlebar, sizeof(LCUI_TitleBar));
 	t->icon_box = Widget_New("picture_box");
 	t->label = Widget_New("label");
 	/* 窗口图标和标题文字不可获得焦点，并忽略鼠标点击 */
@@ -306,7 +306,7 @@ Window_Init( LCUI_Widget *win_p )
 	LCUI_Window *win;
 	static LCUI_Graph btn_bg; 
 	
-	win = (LCUI_Window*)WidgetPrivData_New(win_p, sizeof(LCUI_Window));
+	win = (LCUI_Window*)Widget_NewPrivData(win_p, sizeof(LCUI_Window));
 	
 	titlebar = Widget_New("titlebar"); 
 	client_area = Widget_New(NULL); 

@@ -129,7 +129,7 @@ CheckBox_Init(LCUI_Widget *widget)
 	LCUI_Widget *container[2];
 	LCUI_CheckBox *check_box;
 	
-	check_box = WidgetPrivData_New(widget, sizeof(LCUI_CheckBox));
+	check_box = Widget_NewPrivData(widget, sizeof(LCUI_CheckBox));
 	
 	check_box->on = FALSE;
 	/* 初始化图像数据 */ 

@@ -63,7 +63,7 @@ PictureBox_Init(LCUI_Widget *widget)
 {
 	LCUI_PictureBox *pic_box;
 	
-	pic_box = WidgetPrivData_New(widget, sizeof(LCUI_PictureBox));;
+	pic_box = Widget_NewPrivData(widget, sizeof(LCUI_PictureBox));;
 	
 	Rect_Init(&pic_box->read_box);
 	pic_box->image		= NULL; 

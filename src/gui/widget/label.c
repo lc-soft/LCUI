@@ -102,7 +102,7 @@ Label_ExecInit( LCUI_Widget *widget )
 	/* label部件不需要焦点 */
 	widget->focus = FALSE;
 
-	label = (LCUI_Label*)WidgetPrivData_New( widget, sizeof(LCUI_Label) );
+	label = (LCUI_Label*)Widget_NewPrivData( widget, sizeof(LCUI_Label) );
 	label->auto_size = TRUE;
 	/* 初始化文本图层 */
 	TextLayer_Init( &label->layer ); 
