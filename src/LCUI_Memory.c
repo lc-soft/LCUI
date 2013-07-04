@@ -27,17 +27,17 @@
  * @brief	内存管理.
  * @author	刘超 <lc-soft@live.cn>
  * @warning
- * 版权所有 (C) 2012-2013 归属于							\n
+ * 版权所有 (C) 2012-2013 归属于						\n
  * 刘超										\n
  * 										\n
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。	\n
  * 										\n
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)					\n
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)				\n
  * 										\n
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。		\n
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。	\n
  * 										\n
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特定用途	\n
- * 的隐含担保，详情请参照GPLv2许可协议。						\n
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特定\n
+ * 用途的隐含担保，详情请参照GPLv2许可协议。					\n
  * 										\n
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果	\n
  * 没有，请查看：<http://www.gnu.org/licenses/>. 				\n
@@ -90,21 +90,6 @@ typedef struct rb_tree_t_ {
 
 rb_tree_t global_mem_data;
 rb_tree_t global_mem_class_info;
-
-static unsigned int BKDRHash(char *str)
-{
-    unsigned int seed = 131;
-    unsigned int hash = 0;
-
-    if( str == NULL ) {
-	    return 0;
-    }
-    while (*str) {
-        hash = hash * seed + (*str++);
-    }
-
-    return (hash & 0x7FFFFFFF);
-}
 
 static void rb_tree_init( rb_tree_t *rbt )
 {

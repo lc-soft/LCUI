@@ -136,6 +136,9 @@ GetIntOrFloat( char *str, IntOrFloat_t *combo_num );
 LCUI_API int
 get_PX_PT_t( char *str, PX_PT_t *combo_num );
 
+/** 根据给定的字符串，生成一个ID */
+unsigned int BKDRHash( const char *str );
+
 /* 录制屏幕指定区域的内容 */
 LCUI_API int
 LCUIScreen_StartRecord( LCUI_Rect area );

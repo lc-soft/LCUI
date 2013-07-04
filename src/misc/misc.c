@@ -338,3 +338,18 @@ get_PX_PT_t( char *str, PX_PT_t *combo_num )
 	return 0;
 }
 
+/** 根据给定的字符串，生成一个ID */
+unsigned int BKDRHash( const char *str )
+{
+    unsigned int seed = 131;
+    unsigned int hash = 0;
+
+    if( str == NULL ) {
+	    return 0;
+    }
+    while (*str) {
+        hash = hash * seed + (*str++);
+    }
+
+    return (hash & 0x7FFFFFFF);
+}
