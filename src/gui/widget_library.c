@@ -20,7 +20,7 @@ static WidgetTypeData *WidgetType_FindByID(	LCUI_Queue *type_lib,
 	n = Queue_GetTotal( type_lib );
 	for(i=0; i<n; ++i) {
 		data = (WidgetTypeData *)Queue_Get( type_lib, i );
-		if( !data || type_id == data->type_id ) {
+		if( !data || type_id != data->type_id ) {
 			continue;
 		}
 		return data;
@@ -164,7 +164,7 @@ LCUI_API WidgetCallBackFunc WidgetFunc_GetByID( LCUI_ID id,
 						FuncType func_type )
 {
 	LCUI_App *app;
-	LCUI_Func *f = NULL;
+	LCUI_Func *f;
 	WidgetTypeData *data;
 	int total, i;
 	LCUI_BOOL found = FALSE;
