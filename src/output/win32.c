@@ -72,11 +72,9 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 
 	switch (message) {
 	case WM_KEYDOWN:
-		printf("WM_KEYDOWN: %ld\n",wParam);
 		LCUIKeyboard_HitKey( wParam );
 		return 0;
 	case WM_KEYUP:
-		printf("WM_KEYUP: %ld\n",wParam);
 		LCUIKeyboard_FreeKey( wParam );
 		return 0;
 	case WM_RBUTTONDOWN:
@@ -86,15 +84,12 @@ Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 		Win32_LCUIMouse_ButtonUp( LCUIKEY_RIGHTBUTTON );
 		return 0;
 	case WM_LBUTTONDOWN:
-		//_DEBUG_MSG("left button down\n");
 		Win32_LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
 		return 0;
 	case WM_LBUTTONUP:
-		//_DEBUG_MSG("left button up\n");
 		Win32_LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
 		return 0;
 	case WM_PAINT:
-		DEBUG_MSG("WM_PAINT\n");
 		BeginPaint( hwnd, &ps );
 		/* 获取区域坐标及尺寸 */
 		area.x = ps.rcPaint.left;
