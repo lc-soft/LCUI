@@ -69,7 +69,7 @@ LCUIKey_IsHit( int key_code )
 	Queue_Lock( &presskey_record );
 	total = Queue_GetTotal(&presskey_record);
 	for(i=0; i<total; ++i) {
-		t = Queue_Get(&presskey_record, i);
+		t = (int*)Queue_Get(&presskey_record, i);
 		if( t && *t == key_code ) {
 			Queue_Unlock( &presskey_record );
 			return TRUE;
@@ -98,9 +98,13 @@ LCUIKey_Free( int key_code )
 	Queue_Lock( &presskey_record );
 	total = Queue_GetTotal(&presskey_record);
 	for(i=0; i<total; ++i) {
-		t = Queue_Get(&presskey_record, i);
+		t = (int*)Queue_Get(&presskey_record, i);
 		if( t && *t == key_code ) {
 			Queue_Delete( &presskey_record, i );
+			/* 更新总数 */
+			total = Queue_GetTotal(&presskey_record);
+			/* i在本次循环后保持原值 */
+			--i;
 		}
 	}
 	Queue_Unlock( &presskey_record );
