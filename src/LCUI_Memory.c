@@ -43,6 +43,9 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 				\n
  * ******************************************************************************/
 
+#include <LCUI_Build.h>
+#include LC_LCUI_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
