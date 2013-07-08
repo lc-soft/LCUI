@@ -57,7 +57,7 @@ LCUI_API int WidgetMsg_AddToTask( LCUI_Widget *widget, WidgetMsgData *data_ptr )
 
 LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget )
 {
-	int i,n, new_n, old_n;
+	int i,n;
 	WidgetMsgData *data_ptr;
 	LCUI_Widget *child;
 	LCUI_Queue *msg_buff, *child_list;
@@ -70,8 +70,6 @@ LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget )
 	
 	Queue_Lock( msg_buff );
 	n = Queue_GetTotal( msg_buff );
-	/* 保存当前消息总数 */
-	old_n = n;
 	for(i=0; i<n; ++i) {
 		DEBUG_MSG("[%d/%d]get msg\n", i, n);
 		data_ptr = (WidgetMsgData*)Queue_Get( msg_buff, i );
@@ -79,15 +77,8 @@ LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget )
 		if( WidgetMsg_Dispatch( widget, data_ptr ) ) {
 			DEBUG_MSG("[%d/%d]delete msg\n", i, n);
 			Queue_Delete( msg_buff, i );
-			--i, --n;
-			/* 获取当前消息总数 */
-			new_n = Queue_GetTotal( msg_buff );
-			/* 如果队列中的消息总数量有增加，则增加循环次数 */
-			if( new_n > old_n ) {
-				n += (new_n - old_n);
-				old_n = new_n;
-			}
-			continue;
+			n = Queue_GetTotal( msg_buff );
+			--i;
 		}
 		DEBUG_MSG("[%d/%d]skip msg\n", i, n);
 	}
