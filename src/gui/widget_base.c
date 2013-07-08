@@ -2057,6 +2057,10 @@ Widget_Move(LCUI_Widget *widget, LCUI_Pos new_pos)
 	if( !widget ) {
 		return;
 	}
+	if( widget->x.px == new_pos.x
+	 && widget->y.px == new_pos.y ) {
+		 return;
+	}
 	widget->x.px = new_pos.x;
 	widget->y.px = new_pos.y;
 	WidgetMsg_Post( widget, WIDGET_MOVE, &new_pos, TRUE, FALSE );
