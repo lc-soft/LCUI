@@ -211,73 +211,64 @@ LCUIModule_Mouse_Init( void );
 /**************************** Mouse End *******************************/
 
 
-/***************************** Key *************************************/ 
-/* 初始化键盘输入 */
-LCUI_API int
-LCUIKeyboard_Init( void );
+/***************************** Keyboard **********************************/ 
 
-/* 停用键盘输入 */
-LCUI_API int
-LCUIKeyboard_End( void );
+/** 检测指定键值的按键是否处于按下状态 */
+LCUI_API LCUI_BOOL LCUIKey_IsHit( int key_code );
 
-/* 添加键盘的按键按下事件 */
-LCUI_API void
-LCUIKeyboard_HitKey( int key_code );
-
-/* 添加键盘的按键释放事件 */
-LCUI_API void
-LCUIKeyboard_FreeKey( int key_code );
-
-/* 检测是否有按键按下 */
-LCUI_API LCUI_BOOL
-LCUIKeyboard_IsHit( void );
-
-/* 功能：获取被按下的按键的键值 */
-LCUI_API int
-LCUIKeyboard_Get( void );
-
-/* 检测指定键值的按键是否处于按下状态 */
-LCUI_API LCUI_BOOL
-LCUIKey_IsHit( int key_code );
+/**
+检测指定键值的按键是否按了两次
+@param key_code
+	要检测的按键的键值
+@param interval_time
+	该按键倒数第二次按下时的时间与当前时间的最大间隔
+*/
+LCUI_API LCUI_BOOL LCUIKey_IsDoubleHit( int key_code, int interval_time );
 
 /* 添加已被按下的按键 */
-LCUI_API void
-LCUIKey_Hit( int key_code );
+LCUI_API void LCUIKey_Hit( int key_code );
 
 /* 标记指定键值的按键已释放 */
-LCUI_API void
-LCUIKey_Free( int key_code );
+LCUI_API void LCUIKey_Free( int key_code );
 
-/* 初始化键盘输入模块 */
-LCUI_API void
-LCUIModule_Keyboard_Init( void );
+/** 初始化键盘输入 */
+LCUI_API int LCUIKeyboard_Init( void );
 
-/* 停用键盘输入模块 */
-LCUI_API void
-LCUIModule_Keyboard_End( void );
+/** 停用键盘输入 */
+LCUI_API int LCUIKeyboard_End( void );
+
+/** 添加键盘的按键按下事件 */
+LCUI_API void LCUIKeyboard_HitKey( int key_code );
+
+/** 添加键盘的按键释放事件 */
+LCUI_API void LCUIKeyboard_FreeKey( int key_code );
+
+/** 检测键盘是否有按键按下（类似于kbhit函数） */
+LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( void );
+
+/** 获取被按下的按键的键值（类似于getch函数） */
+LCUI_API int LCUIKeyboard_Get( void );
+
+/** 初始化键盘输入模块 */
+LCUI_API void LCUIModule_Keyboard_Init( void );
+
+/** 停用键盘输入模块 */
+LCUI_API void LCUIModule_Keyboard_End( void );
 /*************************** Key End **********************************/
 
 
 /************************* TouchScreen *********************************/ 
-LCUI_API int
-Check_TouchScreen_Support();
-/* 功能：检测是否支持触瓶 */ 
+/** 启用触屏输入处理 */
+LCUI_API LCUI_BOOL EnableTouchScreenInput(void);
 
-LCUI_API LCUI_BOOL
-Enable_TouchScreen_Input();
-/* 功能：启用鼠标输入处理 */ 
+/** 禁用触屏输入处理 */
+LCUI_API LCUI_BOOL DisableTouchScreenInput(void);
 
-LCUI_API LCUI_BOOL
-Disable_TouchScreen_Input();
-/* 功能：撤销鼠标输入处理 */ 
+/** 获取触屏的私有数据 */
+LCUI_API void* Get_TouchScreen(void);
 
-LCUI_API void*
-Get_TouchScreen();
-/* 获取触屏设备文件句柄 */
-
-/* 初始化触屏输入模块 */
-LCUI_API void
-LCUIModule_TouchScreen_Init( void );
+/** 初始化触屏输入模块 */
+LCUI_API void LCUIModule_TouchScreen_Init( void );
 /*********************** TouchScreen End *******************************/
 
 LCUI_END_HEADER
