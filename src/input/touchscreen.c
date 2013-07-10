@@ -1,4 +1,4 @@
-/* ***************************************************************************
+ï»¿/* ***************************************************************************
  * touchscreen.c -- touchscreen support
  * 
  * Copyright (C) 2012-2013 by
@@ -21,22 +21,22 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * touchscreen.c -- ´¥ÆÁÖ§³Ö
+ * touchscreen.c -- è§¦å±æ”¯æŒ
  *
- * °æÈ¨ËùÓÐ (C) 2013 ¹éÊôÓÚ
- * Áõ³¬
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2013 å½’å±žäºŽ
+ * åˆ˜è¶…
  * 
- * Õâ¸öÎÄ¼þÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾ÝGPLv2Ðí¿ÉÐ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ðí¿ÉÖ¤µÚ¶þ°æ µÄÓ¢ÎÄËõÐ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  * 
- * ¼ÌÐøÊ¹ÓÃ¡¢ÐÞ¸Ä»ò·¢²¼±¾ÎÄ¼þ£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öÐí¿ÉÐ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜Žæ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’ŒæŽ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  * 
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔðÈÎ£¬ÉõÖÁÃ»ÓÐÊÊÏúÐÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒþº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ðí¿ÉÐ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºŽä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼þµÄGPLv2Ðí¿ÉÐ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼þÖÐ£¬Èç¹û
- * Ã»ÓÐ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºŽæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æžœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -50,14 +50,10 @@
 #include <tslib.h> 
 #endif
 
-/*********** ´¥ÆÁÏà¹Ø **************/
-typedef struct _LCUI_TS
-{
+typedef struct _LCUI_TS {
 	void *td;
 	int state;
-}
-LCUI_TS;
-/**********************************/
+} LCUI_TS;
 
 static LCUI_TS ts_data;
 
@@ -72,7 +68,7 @@ static LCUI_BOOL proc_touchscreen(void)
 		return FALSE;
 	}
 
-	/* ¿ªÊ¼»ñÈ¡´¥ÆÁµã»÷´¦µÄ×ø±ê */ 
+	/* å¼€å§‹èŽ·å–è§¦å±ç‚¹å‡»å¤„çš„åæ ‡ */ 
 	ret = ts_read (ts_data.td, &samp, 1); 
 	if (ret < 0) {
 		perror ("ts_read");
@@ -102,9 +98,8 @@ static LCUI_BOOL proc_touchscreen(void)
 #endif
 }
 
-LCUI_API LCUI_BOOL
-Enable_TouchScreen_Input(void)
-/* ¹¦ÄÜ£ºÆôÓÃ´¥ÆÁÊäÈë´¦Àí */
+/** å¯ç”¨è§¦å±è¾“å…¥å¤„ç† */
+LCUI_API LCUI_BOOL EnableTouchScreenInput(void)
 { 
 #ifdef USE_TSLIB
 	char *tsdevice;
@@ -137,9 +132,8 @@ Enable_TouchScreen_Input(void)
 #endif
 }
 
-LCUI_API LCUI_BOOL
-Disable_TouchScreen_Input(void)
-/* ¹¦ÄÜ£º³·Ïú´¥ÆÁÊäÈë´¦Àí */
+/** ç¦ç”¨è§¦å±è¾“å…¥å¤„ç† */
+LCUI_API LCUI_BOOL DisableTouchScreenInput(void)
 {
 #ifdef USE_TSLIB
 	if(ts_data.state == INSIDE) {
@@ -153,19 +147,17 @@ Disable_TouchScreen_Input(void)
 #endif
 }
 
-LCUI_API void*
-Get_TouchScreen(void)
-/* »ñÈ¡´¥ÆÁÉè±¸ÎÄ¼þ¾ä±ú */
+/* èŽ·å–è§¦å±çš„ç§æœ‰æ•°æ® */
+LCUI_API void* Get_TouchScreen(void)
 {
 	return ts_data.td;
 }
 
-/* ³õÊ¼»¯´¥ÆÁÊäÈëÄ£¿é */
-LCUI_API void
-LCUIModule_TouchScreen_Init( void )
+/* åˆå§‹åŒ–è§¦å±è¾“å…¥æ¨¡å— */
+LCUI_API void LCUIModule_TouchScreen_Init( void )
 {
 	ts_data.td = NULL;
 	ts_data.state = REMOVE;
-	LCUIDevice_Add( Enable_TouchScreen_Input, proc_touchscreen,
-			Disable_TouchScreen_Input );
+	LCUIDevice_Add( EnableTouchScreenInput, proc_touchscreen,
+			DisableTouchScreenInput );
 }
