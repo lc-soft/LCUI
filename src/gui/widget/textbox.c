@@ -80,8 +80,8 @@ LCUI_TextBlock;
 static LCUI_Widget *active_textbox = NULL; 
 static int __timer_id = -1;
 
-static void
-_putin_textbox_cursor( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+static void _putin_textbox_cursor(	LCUI_Widget *widget,
+					LCUI_WidgetEvent *unused )
 {
 	active_textbox = widget;
 	/* 设定输入法的目标 */
@@ -89,8 +89,8 @@ _putin_textbox_cursor( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 	Widget_Draw( widget );
 }
 
-static void
-_putout_textbox_cursor( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+static void _putout_textbox_cursor(	LCUI_Widget *widget,
+					LCUI_WidgetEvent *unused )
 {
 	LCUI_TextBox *tb;
 	
@@ -102,8 +102,7 @@ _putout_textbox_cursor( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 	Widget_Draw( widget );
 }
 
-static void 
-hide_textbox_cursor( LCUI_Widget *widget  )
+static void hide_textbox_cursor( LCUI_Widget *widget  )
 {
 	LCUI_TextBox *tb;
 	if( widget == NULL ) {
@@ -117,8 +116,7 @@ hide_textbox_cursor( LCUI_Widget *widget  )
 	Widget_Hide( tb->cursor );
 }
 
-static void 
-show_textbox_cursor( LCUI_Widget *widget )
+static void show_textbox_cursor( LCUI_Widget *widget )
 {
 	LCUI_TextBox *tb;
 	if( widget == NULL ) {
@@ -132,18 +130,16 @@ show_textbox_cursor( LCUI_Widget *widget )
 	Widget_Show( tb->cursor );
 }
 
-static LCUI_TextLayer *
-TextBox_GetTextLayer( LCUI_Widget *widget )
 /* 获取文本框部件内的文本图层指针 */
+static LCUI_TextLayer *TextBox_GetTextLayer( LCUI_Widget *widget )
 {
 	LCUI_Widget *label;
 	label = TextBox_GetLabel( widget );
 	return Label_GetTextLayer( label );
 }
 
-static void 
-blink_cursor( void )
 /* 闪烁文本框中的光标 */
+static void blink_cursor( void* arg )
 {
 	static int cur_state = 0;
 	if(cur_state == 0) {
@@ -389,7 +385,7 @@ TextBox_Init( LCUI_Widget *widget )
 	
 	/* 设定定时器，每1秒闪烁一次 */
 	if( __timer_id == -1 ) {
-		__timer_id = LCUITimer_Set( 500, blink_cursor, TRUE );
+		__timer_id = LCUITimer_Set( 500, blink_cursor, NULL, TRUE );
 	}
 	Widget_Event_Connect( widget, EVENT_DRAG, TextBox_TextLayer_Click );
 	/* 关联 FOCUS_OUT 和 FOCUS_IN 事件 */
