@@ -44,13 +44,14 @@
 /*----------------------------- Timer --------------------------------*/
 
 typedef struct _timer_data {
-	int state;			/* 状态 */
-	LCUI_BOOL reuse;		/* 是否重复使用该定时器 */
-	LCUI_ID app_id;			/* 所属程序ID */
-	long int id;			/* 定时器ID */
-	long int total_ms;		/* 定时总时间（单位：毫秒） */
-	long int cur_ms;		/* 当前剩下的等待时间 */
-	void (*callback_func)(void);	/* 回调函数 */ 
+	int state;			/**< 状态 */
+	LCUI_BOOL reuse;		/**< 是否重复使用该定时器 */
+	LCUI_ID app_id;			/**< 所属程序ID */
+	long int id;			/**< 定时器ID */
+	long int total_ms;		/**< 定时总时间（单位：毫秒） */
+	long int cur_ms;		/**< 当前剩下的等待时间 */
+	void (*callback_func)(void*);	/**< 回调函数 */ 
+	void *arg;			/**< 函数的参数 */
 } timer_data;
 
 static LCUI_Queue global_timer_list;	/* 定时器列表 */
@@ -58,8 +59,7 @@ static LCUI_BOOL timer_thread_active = TRUE;
 
 /*----------------------------- Private ------------------------------*/
 /* 初始化定时器列表 */
-static void 
-timer_list_init( LCUI_Queue *timer_list )
+static void timer_list_init( LCUI_Queue *timer_list )
 {
 	Queue_Init( timer_list, sizeof(timer_data), NULL );
 	/* 使用链表 */
@@ -67,15 +67,13 @@ timer_list_init( LCUI_Queue *timer_list )
 }
 
 /* 销毁定时器列表 */
-static void 
-timer_list_destroy( LCUI_Queue *timer_list )
+static void timer_list_destroy( LCUI_Queue *timer_list )
 {
 	Queue_Destroy( timer_list );
 }
 
 /* 对定时器列表进行排序 */
-static void 
-timer_list_sort( LCUI_Queue *timer_list )
+static void timer_list_sort( LCUI_Queue *timer_list )
 {
 	int i, j, total;
 	timer_data *a_timer, *b_timer;
@@ -84,12 +82,12 @@ timer_list_sort( LCUI_Queue *timer_list )
 	total = Queue_GetTotal( timer_list );
 	/* 使用的是选择排序,按剩余等待时间从少到多排序 */
 	for(i=0; i<total; ++i) {
-		a_timer = Queue_Get( timer_list, i );
+		a_timer = (timer_data*)Queue_Get( timer_list, i );
 		if( !a_timer ) {
 			continue;
 		}
 		for(j=i+1; j<total; ++j) {
-			b_timer = Queue_Get( timer_list, j );
+			b_timer = (timer_data*)Queue_Get( timer_list, j );
 			if( !b_timer ) {
 				continue; 
 			}
@@ -103,8 +101,7 @@ timer_list_sort( LCUI_Queue *timer_list )
 }
 
 /* 将各个定时器的等待时间与指定时间相减 */
-static void 
-timer_list_sub( LCUI_Queue *timer_list, int time )
+static void timer_list_sub( LCUI_Queue *timer_list, int time )
 {
 	timer_data *timer;
 	int i, total;
@@ -113,7 +110,7 @@ timer_list_sub( LCUI_Queue *timer_list, int time )
 	total = Queue_GetTotal( timer_list );
 	
 	for(i=0; i<total; ++i) {
-		timer = Queue_Get( timer_list , i);
+		timer = (timer_data*)Queue_Get( timer_list , i);
 		/* 忽略无效的定时器，或者状态为暂停的定时器 */
 		if( !timer || timer->state == 0) {
 			continue;
@@ -124,15 +121,14 @@ timer_list_sub( LCUI_Queue *timer_list, int time )
 }
 
 /* 更新定时器列表中的定时器 */
-static timer_data *
-timer_list_update( LCUI_Queue *timer_list )
+static timer_data* timer_list_update( LCUI_Queue *timer_list )
 {
 	int i, total;
 	timer_data *timer = NULL;
 	
 	total = Queue_GetTotal( timer_list ); 
 	for(i=0; i<total; ++i){
-		timer = Queue_Get( timer_list , i);
+		timer = (timer_data*)Queue_Get( timer_list , i);
 		if(timer->state == 1) {
 			break;
 		}
@@ -150,9 +146,8 @@ timer_list_update( LCUI_Queue *timer_list )
 	return timer;
 }
 
-/* 一个线程，用于处理定时器 */
-static void 
-timer_list_process( void *arg )
+/** 处理列表中各个定时器 */
+static void timer_list_process( void *arg )
 {
 	int sleep_time = 1;
 	LCUI_Func func_data;
@@ -178,14 +173,15 @@ timer_list_process( void *arg )
 		sleep_time = 1;
 		func_data.id = timer->app_id;
 		func_data.func = (CallBackFunc)timer->callback_func;
+		func_data.arg[0] = timer->arg;
+		func_data.destroy_arg[0] = FALSE;
 		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */
 		AppTasks_CustomAdd( ADD_MODE_REPLACE, &func_data );
 	}
 	LCUIThread_Exit(NULL);
 }
 
-static timer_data *
-find_timer( int timer_id )
+static timer_data *find_timer( int timer_id )
 {
 	int i, total;
 	timer_data *timer = NULL;
@@ -206,13 +202,24 @@ find_timer( int timer_id )
 /*--------------------------- End Private ----------------------------*/
 
 /*----------------------------- Public -------------------------------*/
-/* 
- * 功能：设置定时器，在指定的时间后调用指定回调函数 
- * 说明：时间单位为毫秒，调用后会返回该定时器的标识符; 
- * 如果要用于循环定时处理某些任务，可将 reuse 置为 1，否则置于 0。
+
+/** 
+ * 设置定时器
+ * 定时器的作用是让一个任务在经过指定时间后才执行
+ * @param n_ms
+ *	等待的时间，单位为毫秒
+ * @param callback_func
+ *	用于响应定时器的回调函数
+ * @param reuse 
+ *	指示该定时器是否重复使用，如果要用于循环定时处理某些
+ *	任务，可将它置为 TRUE，否则置于 FALSE。
+ * @return 
+ *	该定时器的标识符
  * */
-LCUI_API int 
-LCUITimer_Set( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse )
+LCUI_API int LCUITimer_Set(	long int n_ms,
+				void (*callback_func)(void*),
+				void *arg,
+				LCUI_BOOL reuse )
 {
 	timer_data timer;
 	timer.state = 1;
@@ -227,13 +234,15 @@ LCUITimer_Set( long int n_ms, void (*callback_func)(void), LCUI_BOOL reuse )
 	return timer.id;
 }
 
-/*
- * 功能：释放定时器
- * 说明：当不需要定时器时，可以使用该函数释放定时器占用的资源
- * 返回值：正常返回0，指定ID的定时器不存在则返回-1.
+/**
+ * 释放定时器
+ * 当不需要定时器时，可以使用该函数释放定时器占用的资源
+ * @param timer_id
+ *	需要释放的定时器的标识符
+ * @return
+ *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int
-LCUITimer_Free( int timer_id )
+LCUI_API int LCUITimer_Free( int timer_id )
 {
 	int i, total;
 	timer_data *timer;
@@ -241,7 +250,7 @@ LCUITimer_Free( int timer_id )
 	Queue_Lock( &global_timer_list );
 	total = Queue_GetTotal( &global_timer_list );
 	for(i=0; i<total; ++i) {
-		timer = Queue_Get( &global_timer_list, i );
+		timer = (timer_data*)Queue_Get( &global_timer_list, i );
 		if( !timer ) {
 			continue;
 		}
@@ -257,12 +266,15 @@ LCUITimer_Free( int timer_id )
 	return -1;
 }
 
-/*
- * 功能：暂停定时器的使用 
- * 说明：一般用于往复定时的定时器
+/**
+ * 暂停定时器的倒计时
+ * 一般用于往复定时的定时器
+ * @param timer_id
+ *	目标定时器的标识符
+ * @return
+ *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int
-LCUITimer_Pause( int timer_id )
+LCUI_API int LCUITimer_Pause( int timer_id )
 {
 	timer_data *timer;
 	timer = find_timer( timer_id );
@@ -273,9 +285,14 @@ LCUITimer_Pause( int timer_id )
 	return -1;
 }
 
-/* 继续使用定时器 */
-LCUI_API int
-LCUITimer_Continue( int timer_id )
+/**
+ * 继续定时器的倒计时
+ * @param timer_id
+ *	目标定时器的标识符
+ * @return
+ *	正常返回0，指定ID的定时器不存在则返回-1.
+ * */
+LCUI_API int LCUITimer_Continue( int timer_id )
 {
 	timer_data *timer;
 	timer = find_timer( timer_id );
@@ -286,9 +303,16 @@ LCUITimer_Continue( int timer_id )
 	return -1;
 }
 
-/* 重设定时器的时间 */
-LCUI_API int
-LCUITimer_Reset( int timer_id, long int n_ms ) 
+/**
+ * 重设定时器的等待时间
+ * @param timer_id
+ *	需要释放的定时器的标识符
+ * @param n_ms
+ *	等待的时间，单位为毫秒
+ * @return
+ *	正常返回0，指定ID的定时器不存在则返回-1.
+ * */
+LCUI_API int LCUITimer_Reset( int timer_id, long int n_ms ) 
 {
 	timer_data *timer;
 	timer = find_timer( timer_id );
@@ -300,8 +324,7 @@ LCUITimer_Reset( int timer_id, long int n_ms )
 }
 
 /* 创建一个线程以处理定时器 */
-static int
-timer_thread_start( LCUI_Thread *tid, LCUI_Queue *list )
+static int timer_thread_start( LCUI_Thread *tid, LCUI_Queue *list )
 {
 	/* 初始化列表 */
 	timer_list_init( list );
@@ -311,8 +334,7 @@ timer_thread_start( LCUI_Thread *tid, LCUI_Queue *list )
 }
 
 /* 停止定时器的处理线程，并销毁定时器列表 */
-static void
-timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
+static void timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
 {
 	timer_thread_active = FALSE;
 	/* 等待定时器处理线程的退出 */
@@ -322,15 +344,13 @@ timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
 }
 
 /* 初始化定时器模块 */
-LCUI_API void
-LCUIModule_Timer_Init( void )
+LCUI_API void LCUIModule_Timer_Init( void )
 {
 	timer_thread_start( &LCUI_Sys.timer_thread, &global_timer_list );
 }
 
 /* 停用定时器模块 */
-LCUI_API void
-LCUIModule_Timer_End( void )
+LCUI_API void LCUIModule_Timer_End( void )
 {
 	timer_thread_destroy( LCUI_Sys.timer_thread, &global_timer_list );
 }
