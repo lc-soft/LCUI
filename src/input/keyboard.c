@@ -41,8 +41,18 @@
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
+#include LC_INPUT_H
 
-static LCUI_Queue presskey_record;
+#include <time.h>
+
+typedef struct key_state_ {
+	int key_code;		/**< 按键键值 */
+	int state;		/**< 当前状态 */
+	clock_t hit_time;	/**< 按下此键时的时间 */
+	clock_t interval_time;	/**< 近两次按下此键的时间间隔 */
+} key_state;
+
+static LCUI_Queue key_state_record;
 
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 
@@ -60,59 +70,108 @@ static struct termios tm;//, tm_old;
 static int fd = STDIN_FILENO;
 #endif
 
-/* 检测指定键值的按键是否处于按下状态 */
-LCUI_API LCUI_BOOL
-LCUIKey_IsHit( int key_code )
+/** 获取指定按键的状态数据 */
+static key_state* LCUIKey_FindData( int key_code )
 {
-	int *t;
-	int i, total;
-	Queue_Lock( &presskey_record );
-	total = Queue_GetTotal(&presskey_record);
-	for(i=0; i<total; ++i) {
-		t = (int*)Queue_Get(&presskey_record, i);
-		if( t && *t == key_code ) {
-			Queue_Unlock( &presskey_record );
-			return TRUE;
+	key_state* p;
+	int i, n;
+	n = Queue_GetTotal( &key_state_record );
+	for(i=0; i<n; ++i) {
+		p = (key_state*)Queue_Get(&key_state_record, i);
+		if( p && p->key_code == key_code ) {
+			return p;
 		}
 	}
-	Queue_Unlock( &presskey_record );
+	return NULL;
+}
+
+/** 检测指定键值的按键是否处于按下状态 */
+LCUI_API LCUI_BOOL LCUIKey_IsHit( int key_code )
+{
+	key_state* p;
+	Queue_Lock( &key_state_record );
+	p = LCUIKey_FindData( key_code );
+	Queue_Unlock( &key_state_record );
+	if( p && p->state == LCUIKEYSTATE_PRESSED ) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+/**
+检测指定键值的按键是否按了两次
+@param key_code
+	要检测的按键的键值
+@param interval_time
+	该按键倒数第二次按下时的时间与当前时间的最大间隔
+ */
+LCUI_API LCUI_BOOL LCUIKey_IsDoubleHit( int key_code, int interval_time )
+{
+	clock_t ct;
+	key_state* p;
+	/* 计算当前时间（单位：毫秒） */
+	ct = clock()*1000 / CLOCKS_PER_SEC;
+	Queue_Lock( &key_state_record );
+	p = LCUIKey_FindData( key_code );
+	Queue_Unlock( &key_state_record );
+	/* 若当前时间与上次按下该键时的时间间隔不大于interval_time */
+	if( !p ) {
+		return FALSE;	
+	}
+	/* 间隔时间为-1，说明该键是新记录的 */
+	if( p->interval_time == -1 ) {
+		return FALSE;
+	}
+	/* 判断按键被按下两次时是否在距当前interval_time毫秒的时间内发生 */
+	if( ct - (p->hit_time - p->interval_time) <= interval_time ) {
+		return TRUE;
+	}
 	return FALSE;
 }
 
 /* 添加已被按下的按键 */
-LCUI_API void
-LCUIKey_Hit( int key_code )
+LCUI_API void LCUIKey_Hit( int key_code )
 {
-	Queue_Lock( &presskey_record );
-	Queue_Add( &presskey_record, &key_code );
-	Queue_Unlock( &presskey_record );
+	clock_t ct;
+	key_state data, *p;
+
+	Queue_Lock( &key_state_record );
+	ct = clock()*1000 / CLOCKS_PER_SEC;
+	p = LCUIKey_FindData( key_code );
+	if( !p ) {
+		data.key_code = key_code;
+		data.interval_time = -1;
+		data.hit_time = ct;
+		data.state = LCUIKEYSTATE_PRESSED;
+		Queue_Add( &key_state_record, &data );
+		Queue_Unlock( &key_state_record );
+		return;
+	}
+	if( p->state == LCUIKEYSTATE_RELEASE ) {
+		p->state = LCUIKEYSTATE_PRESSED;
+		/* 记录与上次此键被按下时的时间间隔 */
+		p->interval_time = ct - p->hit_time;
+		/* 记录本次此键被按下时的时间 */
+		p->hit_time = ct;
+	}
+	Queue_Unlock( &key_state_record );
 }
 
 /* 标记指定键值的按键已释放 */
-LCUI_API void
-LCUIKey_Free( int key_code )
+LCUI_API void LCUIKey_Free( int key_code )
 {
-	int *t;
-	int i, total;
+	key_state *p;
 	
-	Queue_Lock( &presskey_record );
-	total = Queue_GetTotal(&presskey_record);
-	for(i=0; i<total; ++i) {
-		t = (int*)Queue_Get(&presskey_record, i);
-		if( t && *t == key_code ) {
-			Queue_Delete( &presskey_record, i );
-			/* 更新总数 */
-			total = Queue_GetTotal(&presskey_record);
-			/* i在本次循环后保持原值 */
-			--i;
-		}
+	Queue_Lock( &key_state_record );
+	p = LCUIKey_FindData( key_code );
+	if( p ) {
+		p->state = LCUIKEYSTATE_RELEASE;
 	}
-	Queue_Unlock( &presskey_record );
+	Queue_Unlock( &key_state_record );
 }
 
 /* 初始化键盘输入 */
-LCUI_API int
-LCUIKeyboard_Init( void )
+LCUI_API int LCUIKeyboard_Init( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	if(tcgetattr(fd, &tm) < 0) {
@@ -131,8 +190,7 @@ LCUIKeyboard_Init( void )
 }
 
 /* 停用键盘输入 */
-LCUI_API int
-LCUIKeyboard_End( void )
+LCUI_API int LCUIKeyboard_End( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	tm.c_lflag |= ICANON;
@@ -148,8 +206,7 @@ LCUIKeyboard_End( void )
 }
 
 /* 添加键盘的按键按下事件 */
-LCUI_API void
-LCUIKeyboard_HitKey( int key_code )
+LCUI_API void LCUIKeyboard_HitKey( int key_code )
 {
 	LCUI_Event event;
 	event.type = LCUI_KEYDOWN;
@@ -159,8 +216,7 @@ LCUIKeyboard_HitKey( int key_code )
 }
 
 /* 添加键盘的按键释放事件 */
-LCUI_API void
-LCUIKeyboard_FreeKey( int key_code )
+LCUI_API void LCUIKeyboard_FreeKey( int key_code )
 {
 	LCUI_Event event;
 	event.type = LCUI_KEYUP;
@@ -169,9 +225,8 @@ LCUIKeyboard_FreeKey( int key_code )
 	LCUI_PushEvent( &event );
 }
 
-/* 检测是否有按键按下 */
-LCUI_API LCUI_BOOL
-LCUIKeyboard_IsHit( void )
+/** 检测键盘是否有按键按下（类似于kbhit函数） */
+LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	struct termios oldt;//, newt;  
@@ -192,15 +247,14 @@ LCUIKeyboard_IsHit( void )
 	} 
 	return FALSE;
 #endif
-	if( Queue_GetTotal( &presskey_record ) > 0) {
+	if( Queue_GetTotal( &key_state_record ) > 0) {
 		return TRUE;
 	}
 	return FALSE;
 }
 
-/* 获取被按下的按键的键值 */
-LCUI_API int
-LCUIKeyboard_Get( void )
+/** 获取被按下的按键的键值（类似于getch函数） */
+LCUI_API int LCUIKeyboard_Get( void )
 { 
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	int k,c;
@@ -225,10 +279,10 @@ LCUIKeyboard_Get( void )
 	return c; 
 #else 
 	int *key_ptr;
-	while( Queue_GetTotal(&presskey_record) == 0 ) {
+	while( Queue_GetTotal(&key_state_record) == 0 ) {
 		LCUI_MSleep(100);
 	}
-	key_ptr = Queue_Get( &presskey_record, 0 );
+	key_ptr = Queue_Get( &key_state_record, 0 );
 	if( key_ptr ) {
 		return *key_ptr;
 	}
@@ -297,19 +351,17 @@ static LCUI_BOOL Disable_Keyboard_Input( void )
 }
 #endif
 
-/* 初始化键盘输入模块 */
-LCUI_API void
-LCUIModule_Keyboard_Init( void )
+/** 初始化键盘输入模块 */
+LCUI_API void LCUIModule_Keyboard_Init( void )
 {
-	Queue_Init( &presskey_record, sizeof(int), NULL );
+	Queue_Init( &key_state_record, sizeof(key_state), NULL );
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	LCUIDevice_Add( Enable_Keyboard_Input, proc_keyboard, Disable_Keyboard_Input );
 #endif
 }
 
-/* 停用键盘输入模块 */
-LCUI_API void
-LCUIModule_Keyboard_End( void )
+/** 停用键盘输入模块 */
+LCUI_API void LCUIModule_Keyboard_End( void )
 {
-	Queue_Destroy( &presskey_record );
+	Queue_Destroy( &key_state_record );
 }
