@@ -208,7 +208,16 @@ LCUI_API int LCUIKeyboard_End( void )
 /* 添加键盘的按键按下事件 */
 LCUI_API void LCUIKeyboard_HitKey( int key_code )
 {
+	key_state *p;
 	LCUI_Event event;
+	
+	Queue_Lock( &key_state_record );
+	p = LCUIKey_FindData( key_code );
+	Queue_Unlock( &key_state_record );
+	/* 已经按下过的按键就不用再触发KEYDOWN事件了 */
+	if( p && p->state == LCUIKEYSTATE_PRESSED ) {
+		return;
+	}
 	event.type = LCUI_KEYDOWN;
 	event.key.key_code = key_code;
 	LCUIKey_Hit( key_code );
