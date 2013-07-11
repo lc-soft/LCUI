@@ -48,6 +48,9 @@
 #include LC_WIDGET_H
 #include LC_CURSOR_H
 
+#include <time.h>
+#define SYNC_TIME 10
+
 
 #ifdef LCUI_BUILD_IN_WIN32
 #include <Windows.h>
@@ -216,7 +219,7 @@ LCUIScreen_UpdateInvalidArea(void)
 		LCUIScreen_PutGraph( &graph, Pos(rect.x, rect.y) );
 	}
 	//_DEBUG_MSG("quit\n");
-	Graph_Free(&graph);
+	Graph_Free( &graph );
 	return ret;
 }
 
@@ -245,10 +248,10 @@ LCUIScreen_SyncInvalidArea( void )
 }
 
 /* 更新屏幕内的图形显示 */
-static void
-LCUIScreen_Update( void* unused )
+static void LCUIScreen_Update( void* unused )
 {
 	int retval;
+	clock_t lost_time;
 	LCUI_Rect screen_area;
 
 	/* 先标记刷新整个屏幕区域 */
@@ -258,14 +261,17 @@ LCUIScreen_Update( void* unused )
 	LCUIScreen_InvalidArea( screen_area );
 
 	while(LCUI_Sys.state == ACTIVE) {
+		lost_time = clock();
 		LCUICursor_UpdatePos();
 		WidgetMsg_Proc(NULL); /* 处理所有消息 */
 		retval = LCUIScreen_SyncInvalidArea();
 		retval += LCUIScreen_UpdateInvalidArea();
-		if(retval > 0) {
+		if( retval > 0 ) {
 			LCUIScreen_SyncFrameBuffer();
-		} else {
-			LCUI_MSleep(10);
+		}
+		lost_time = clock() - lost_time;
+		if( lost_time < SYNC_TIME ) {
+			LCUI_MSleep(SYNC_TIME-lost_time);
 		}
 	}
 	LCUIThread_Exit(NULL);
