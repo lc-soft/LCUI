@@ -120,12 +120,15 @@ static void timer_list_sub( LCUI_Queue *timer_list, int time )
 	Queue_Unlock( timer_list );
 }
 
+#include <time.h>
+
 /* 更新定时器列表中的定时器 */
 static timer_data* timer_list_update( LCUI_Queue *timer_list )
 {
 	int i, total;
 	timer_data *timer = NULL;
-	
+	clock_t c, lost_time = 0;
+
 	total = Queue_GetTotal( timer_list ); 
 	for(i=0; i<total; ++i){
 		timer = (timer_data*)Queue_Get( timer_list , i);
@@ -137,10 +140,12 @@ static timer_data* timer_list_update( LCUI_Queue *timer_list )
 		return NULL; 
 	}
 	if(timer->cur_ms > 0) {
+		c = clock();
 		LCUI_MSleep( timer->cur_ms ); 
+		lost_time = clock() - c;
 	}
 	/* 减少列表中所有定时器的剩余等待时间 */
-	timer_list_sub( timer_list, timer->cur_ms );
+	timer_list_sub( timer_list, lost_time );
 	timer->cur_ms = timer->total_ms;
 	timer_list_sort( timer_list ); /* 重新排序 */
 	return timer;
@@ -153,7 +158,7 @@ static void timer_list_process( void *arg )
 	LCUI_Func func_data;
 	LCUI_Queue *timer_list;
 	timer_data *timer;
-	
+
 	timer_list = (LCUI_Queue*)arg;
 	func_data.arg[0] = NULL;
 	func_data.arg[1] = NULL;
