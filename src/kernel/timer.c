@@ -41,6 +41,8 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 
+#include <time.h>
+
 /*----------------------------- Timer --------------------------------*/
 
 typedef struct _timer_data {
@@ -56,8 +58,24 @@ typedef struct _timer_data {
 
 static LCUI_Queue global_timer_list;	/* 定时器列表 */
 static LCUI_BOOL timer_thread_active = TRUE;
+static LCUI_BOOL break_sleep = FALSE;	/* 是否需要打断睡眠 */
 
 /*----------------------------- Private ------------------------------*/
+static int timer_msleep( int n_ms )
+{
+	clock_t start_ms, lost_ms=0;
+	start_ms = clock()*1000 / CLOCKS_PER_SEC;
+	while(!break_sleep) {
+		lost_ms = clock()*1000 / CLOCKS_PER_SEC - start_ms;
+		if( lost_ms >= n_ms ) {
+			break;
+		}
+		LCUI_MSleep(1);
+	}
+	break_sleep = FALSE;
+	return lost_ms;
+}
+
 /* 初始化定时器列表 */
 static void timer_list_init( LCUI_Queue *timer_list )
 {
@@ -120,14 +138,12 @@ static void timer_list_sub( LCUI_Queue *timer_list, int time )
 	Queue_Unlock( timer_list );
 }
 
-#include <time.h>
-
 /* 更新定时器列表中的定时器 */
 static timer_data* timer_list_update( LCUI_Queue *timer_list )
 {
 	int i, total;
 	timer_data *timer = NULL;
-	clock_t c, lost_time = 0;
+	clock_t lost_time;
 
 	total = Queue_GetTotal( timer_list ); 
 	for(i=0; i<total; ++i){
@@ -140,13 +156,13 @@ static timer_data* timer_list_update( LCUI_Queue *timer_list )
 		return NULL; 
 	}
 	if(timer->cur_ms > 0) {
-		c = clock();
-		LCUI_MSleep( timer->cur_ms ); 
-		lost_time = clock() - c;
+		lost_time = timer_msleep( timer->cur_ms ); 
+		DEBUG_MSG("lost_time: %d, timer->cur_ms: %d\n", lost_time, timer->cur_ms);
+		/* 减少列表中所有定时器的剩余等待时间 */
+		timer_list_sub( timer_list, lost_time );
+	} else {
+		timer->cur_ms = timer->total_ms;
 	}
-	/* 减少列表中所有定时器的剩余等待时间 */
-	timer_list_sub( timer_list, lost_time );
-	timer->cur_ms = timer->total_ms;
 	timer_list_sort( timer_list ); /* 重新排序 */
 	return timer;
 }
@@ -238,6 +254,8 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 	if( 0 > Queue_Add( &global_timer_list, &timer ) ) {
 		return -1;
 	}
+	break_sleep = TRUE;
+	timer_list_sort( &global_timer_list );
 	return timer.id;
 }
 
@@ -268,6 +286,7 @@ LCUI_API int LCUITimer_Free( int timer_id )
 	}
 	Queue_Unlock( &global_timer_list );
 	if( i < total ) {
+		break_sleep = TRUE;
 		return 0;
 	}
 	return -1;
@@ -287,6 +306,7 @@ LCUI_API int LCUITimer_Pause( int timer_id )
 	timer = find_timer( timer_id );
 	if( timer ) {
 		timer->state = 0;
+		break_sleep = TRUE;
 		return 0;
 	}
 	return -1;
@@ -305,6 +325,7 @@ LCUI_API int LCUITimer_Continue( int timer_id )
 	timer = find_timer( timer_id );
 	if( timer ) {
 		timer->state = 1;
+		break_sleep = TRUE;
 		return 0;
 	}
 	return -1;
@@ -324,7 +345,12 @@ LCUI_API int LCUITimer_Reset( int timer_id, long int n_ms )
 	timer_data *timer;
 	timer = find_timer( timer_id );
 	if( timer ) {
-		timer->total_ms = timer->cur_ms = n_ms;
+		break_sleep = TRUE;
+		/* 更新当前剩余等待时间 */
+		timer->cur_ms = timer->total_ms;
+		/* 保存新的总剩余等待时间 */
+		timer->total_ms = n_ms;
+		timer_list_sort( &global_timer_list );
 		return 0;
 	}
 	return -1;
