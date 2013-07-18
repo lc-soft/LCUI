@@ -233,6 +233,8 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 	timer.reuse = reuse;
 	timer.id = rand();
 	timer.app_id = LCUIApp_GetSelfID();
+	timer.arg = arg;
+
 	if( 0 > Queue_Add( &global_timer_list, &timer ) ) {
 		return -1;
 	}
