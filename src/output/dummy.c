@@ -43,6 +43,7 @@
 #include LC_LCUI_H
 
 #ifdef LCUI_VIDEO_DRIVER_NONE
+
 LCUI_API void
 LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
 {
@@ -55,27 +56,46 @@ LCUIScreen_GetGraph( LCUI_Graph *out )
 	return -1;
 }
 
+
 LCUI_API int
-LCUIScreen_Init( LCUI_Screen *screen_info )
+LCUIScreen_Init( int w, int h, int mode )
 {
 	return -1;
 }
 
+
+/* 设置视频输出模式 */
 LCUI_API int
-LCUIScreen_Destroy( LCUI_Screen *screen_info )
+LCUIScreen_SetMode( int w, int h, int mode )
 {
 	return -1;
 }
 
+
 LCUI_API int
-LCUIScreen_PutGraph (LCUI_Graph * src, LCUI_Pos pos)
+LCUIScreen_Destroy( void )
+{
+	return -1;
+}
+
+
+LCUI_API void
+LCUIScreen_SyncFrameBuffer( void )
+{
+	return;
+}
+
+
+LCUI_API int
+LCUIScreen_PutGraph (LCUI_Graph *graph, LCUI_Pos des_pos )
 {
 	return -1;
 }
 
 LCUI_API void
-LCUIScreen_SyncFrameBuffer( void )
+LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out )
 {
-	;
+	return;
 }
+
 #endif
