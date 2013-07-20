@@ -163,7 +163,6 @@ static timer_data* timer_list_update( LCUI_Queue *timer_list )
 		/* 减少列表中所有定时器的剩余等待时间 */
 		timer_list_sub( timer_list, lost_time );
 	}
-	timer_list_sort( timer_list ); /* 重新排序 */
 	return timer;
 }
 
@@ -192,15 +191,16 @@ static void timer_list_process( void *arg )
 		func_data.arg[0] = timer->arg;
 		func_data.destroy_arg[0] = FALSE;
 		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */
-		AppTasks_CustomAdd( ADD_MODE_REPLACE, &func_data );
+		AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_F, &func_data );
 		/* 若需要重复使用，则重置剩余等待时间 */
 		if( timer->reuse ) {
 			timer->cur_ms = timer->total_ms;
-			timer_list_sort( timer_list );
 		} else { /* 否则，释放该定时器 */
 			LCUITimer_Free( timer->id );
 			DEBUG_MSG("delete timer: %d\n", timer->id);
 		}
+		/* 重新排序 */
+		timer_list_sort( timer_list );
 	}
 	LCUIThread_Exit(NULL);
 }
