@@ -63,30 +63,26 @@ static LCUI_RectQueue screen_invalid_area;
 static LCUI_Mutex glayer_list_mutex;
 static LCUI_Screen screen;
 
-/* 获取屏幕宽度 */
-LCUI_API int
-LCUIScreen_GetWidth( void )
+/** 获取屏幕宽度 */
+LCUI_API int LCUIScreen_GetWidth( void )
 {
 	return screen.size.w;
 }
 
-/* 获取屏幕高度 */
-LCUI_API int
-LCUIScreen_GetHeight( void )
+/** 获取屏幕高度 */
+LCUI_API int LCUIScreen_GetHeight( void )
 {
 	return screen.size.h;
 }
 
-/* 获取屏幕尺寸 */
-LCUI_API LCUI_Size
-LCUIScreen_GetSize( void )
+/** 获取屏幕尺寸 */
+LCUI_API LCUI_Size LCUIScreen_GetSize( void )
 {
 	return screen.size;
 }
 
-/* 获取屏幕无效区域队列的指针 */
-LCUI_API LCUI_RectQueue*
-LCUIScreen_GetInvalidAreaQueue( void )
+/** 获取屏幕无效区域队列的指针 */
+LCUI_API LCUI_RectQueue* LCUIScreen_GetInvalidAreaQueue( void )
 {
 	if( !i_am_init ) {
 		return NULL;
@@ -94,9 +90,8 @@ LCUIScreen_GetInvalidAreaQueue( void )
 	return &screen_invalid_area;
 }
 
-/* 设置屏幕内的指定区域为无效区域，以便刷新该区域内的图形显示 */
-LCUI_API int
-LCUIScreen_InvalidArea( LCUI_Rect rect )
+/** 设置屏幕内的指定区域为无效区域 */
+LCUI_API int LCUIScreen_InvalidArea( LCUI_Rect rect )
 {
 	if( !i_am_init ) {
 		return -1;
@@ -109,56 +104,50 @@ LCUIScreen_InvalidArea( LCUI_Rect rect )
 	return RectQueue_AddToValid ( &screen_invalid_area, rect );
 }
 
-/* 获取屏幕每个像素点的色彩值所占的位数 */
-LCUI_API int
-LCUIScreen_GetBits( void )
+/** 获取屏幕每个像素点的色彩值所占的位数 */
+LCUI_API int LCUIScreen_GetBits( void )
 {
 	return screen.bits;
 }
 
-/* 获取屏幕显示模式 */
-LCUI_API int
-LCUIScreen_GetMode( void )
+/** 获取屏幕显示模式 */
+LCUI_API int LCUIScreen_GetMode( void )
 {
 	return screen.mode;
 }
 
-/* 获取屏幕信息 */
+/** 获取屏幕信息 */
 LCUI_API void LCUIScreen_GetInfo( LCUI_Screen *info )
 {
 	memcpy( info, &screen, sizeof(LCUI_Screen) );
 }
 
-/* 设置屏幕信息 */
+/** 设置屏幕信息 */
 LCUI_API void LCUIScreen_SetInfo( LCUI_Screen *info )
 {
 	memcpy( &screen, info, sizeof(LCUI_Screen) );
 }
 
-/* 获取屏幕中心点的坐标 */
-LCUI_API LCUI_Pos
-LCUIScreen_GetCenter( void )
+/** 获取屏幕中心点的坐标 */
+LCUI_API LCUI_Pos LCUIScreen_GetCenter( void )
 {
 	return Pos(screen.size.w/2.0, screen.size.h/2.0);
 }
 
-/* 为图层树锁上互斥锁 */
-LCUI_API void 
-LCUIScreen_LockGraphLayerTree( void )
+/** 为图层树锁上互斥锁 */
+LCUI_API void LCUIScreen_LockGraphLayerTree( void )
 {
 	LCUIMutex_Lock( &glayer_list_mutex );
 }
 
-/* 解除图层树互斥锁 */
-LCUI_API void 
-LCUIScreen_UnlockGraphLayerTree( void )
+/** 解除图层树互斥锁 */
+LCUI_API void LCUIScreen_UnlockGraphLayerTree( void )
 {
 	LCUIMutex_Unlock( &glayer_list_mutex );
 }
 
-/* 获取屏幕中指定区域内实际要显示的图形 */
-LCUI_API void
-LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
+/** 获取屏幕中指定区域内实际要显示的图形 */
+LCUI_API void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 {
 	LCUI_Pos pos, cursor_pos;
 	/* 设置互斥锁，避免在统计图层时，图层记录被其它线程修改 */
@@ -194,9 +183,8 @@ static void Win32_Clinet_InvalidArea( LCUI_Rect rect )
 }
 #endif
 
-/* 更新无效区域内的图像 */
-static int
-LCUIScreen_UpdateInvalidArea(void)
+/** 更新无效区域内的图像 */
+static int LCUIScreen_UpdateInvalidArea(void)
 {
 	int ret;
 	LCUI_Rect rect;
@@ -223,19 +211,26 @@ LCUIScreen_UpdateInvalidArea(void)
 	return ret;
 }
 
-/* 标记需要同步无效区域 */
+/** 标记需要同步无效区域 */
 LCUI_API void LCUIScreen_MarkSync(void)
 {
 	need_sync_area = TRUE;
 }
 
-/*
+static int current_screen_fps = 0;
+
+/** 获取当前的屏幕内容每秒更新的帧数 */
+LCUI_API int LCUIScreen_GetFPS(void)
+{
+	return current_screen_fps;
+}
+
+/**
  * 功能：处理已记录的无效区域
  * 说明：此函数会将各个部件的rect队列中的处理掉，并将最终的无效区域添加至屏幕无效区域
  * 队列中，等待LCUI来处理。
  **/
-static int
-LCUIScreen_SyncInvalidArea( void )
+static int LCUIScreen_SyncInvalidArea( void )
 {
 	int ret = 0;
 	if ( need_sync_area ) {
@@ -247,11 +242,11 @@ LCUIScreen_SyncInvalidArea( void )
 	return ret;
 }
 
-/* 更新屏幕内的图形显示 */
+/** 更新屏幕内的图形显示 */
 static void LCUIScreen_Update( void* unused )
 {
-	int retval;
-	clock_t lost_time;
+	int val, n_frame;
+	clock_t cur_sec, lost_time;
 	LCUI_Rect screen_area;
 
 	/* 先标记刷新整个屏幕区域 */
@@ -259,27 +254,40 @@ static void LCUIScreen_Update( void* unused )
 	screen_area.width = screen.size.w;
 	screen_area.height = screen.size.h;
 	LCUIScreen_InvalidArea( screen_area );
-
+	
+	cur_sec = clock() / CLOCKS_PER_SEC;
+	n_frame = 0;
 	while(LCUI_Sys.state == ACTIVE) {
 		lost_time = clock();
-		LCUICursor_UpdatePos();
-		WidgetMsg_Proc(NULL); /* 处理所有消息 */
-		retval = LCUIScreen_SyncInvalidArea();
-		retval += LCUIScreen_UpdateInvalidArea();
-		if( retval > 0 ) {
+		/* 更新鼠标位置 */
+		LCUICursor_UpdatePos();	
+		/* 处理所有部件消息 */
+		WidgetMsg_Proc(NULL);
+		/* 同步部件中的无效区域至屏幕的无效区域记录中 */
+		val = LCUIScreen_SyncInvalidArea();
+		/* 更新屏幕上各无效区域内的图像内容 */
+		val += LCUIScreen_UpdateInvalidArea();
+		/* 若有无效区域，则同步帧缓冲内保存的屏幕内容 */
+		if( val > 0 ) {
 			LCUIScreen_SyncFrameBuffer();
 		}
 		lost_time = clock() - lost_time;
+		/* 限制每帧屏幕内容刷新所耗的时间至少为SYNC_TIME */
 		if( lost_time < SYNC_TIME ) {
 			LCUI_MSleep(SYNC_TIME-lost_time);
+		}
+		++n_frame;
+		val = (clock() / CLOCKS_PER_SEC) - cur_sec;
+		if( val >= 1 ) {
+			current_screen_fps = n_frame / val;
+			n_frame = 0;
 		}
 	}
 	LCUIThread_Exit(NULL);
 }
 
-/* 初始化图形输出模块 */
-LCUI_API int
-LCUIModule_Video_Init( int w, int h, int mode )
+/** 初始化图形输出模块 */
+LCUI_API int LCUIModule_Video_Init( int w, int h, int mode )
 {
 	if( i_am_init ) {
 		return -1;
@@ -292,9 +300,8 @@ LCUIModule_Video_Init( int w, int h, int mode )
 			LCUIScreen_Update, NULL );
 }
 
-/* 停用图形输出模块 */
-LCUI_API int
-LCUIModule_Video_End( void )
+/** 停用图形输出模块 */
+LCUI_API int LCUIModule_Video_End( void )
 {
 	if( !i_am_init ) {
 		return -1;
