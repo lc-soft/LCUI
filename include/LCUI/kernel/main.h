@@ -78,10 +78,6 @@ typedef struct LCUI_MainLoop_ {
 
 extern LCUI_System  LCUI_Sys;
 
-#ifdef LCUI_BUILD_IN_WIN32
-LCUI_API void Win32_LCUI_Init( HINSTANCE hInstance );
-#endif
-
 /*------------------------------ LCUIApp -----------------------------*/
 /* 根据程序的ID，获取指向程序数据结构的指针 */
 LCUI_API LCUI_App* LCUIApp_Find( LCUI_ID id );
