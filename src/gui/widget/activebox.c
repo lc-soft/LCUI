@@ -560,7 +560,7 @@ static AnimationStatus* AnimationStream_Update( int *sleep_time )
 }
 
 /* 响应定时器，处理动画的每一帧的更新 */
-static void Process_Frames( void )
+static void Process_Frames( void* arg )
 {
 	int sleep_time = 10;
 	AnimationStatus *ani_status;
@@ -598,7 +598,7 @@ LCUI_API int Animation_Play( AnimationData *animation, int play_id )
 			sizeof(AnimationStatus),
 			AnimationStatus_Destroy
 		);
-		frame_proc_timer = LCUITimer_Set( 50, Process_Frames, TRUE );
+		frame_proc_timer = LCUITimer_Set( 50, Process_Frames, NULL, TRUE );
 	}
 	/* 若播放标识号不大于0，则创建新播放实例 */
 	if( play_id <= 0 ) {
