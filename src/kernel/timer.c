@@ -157,11 +157,11 @@ static timer_data* timer_list_update( LCUI_Queue *timer_list )
 	}
 	if(timer->cur_ms > 0) {
 		lost_time = timer_msleep( timer->cur_ms ); 
-		DEBUG_MSG("lost_time: %d, timer->cur_ms: %d\n", lost_time, timer->cur_ms);
+		DEBUG_MSG("timer id: %d, lost_time: %d, timer->cur_ms: %d,"
+			" timer->total_ms: %d\n",
+			timer->id, lost_time, timer->cur_ms, timer->total_ms );
 		/* 减少列表中所有定时器的剩余等待时间 */
 		timer_list_sub( timer_list, lost_time );
-	} else {
-		timer->cur_ms = timer->total_ms;
 	}
 	timer_list_sort( timer_list ); /* 重新排序 */
 	return timer;
@@ -170,7 +170,6 @@ static timer_data* timer_list_update( LCUI_Queue *timer_list )
 /** 处理列表中各个定时器 */
 static void timer_list_process( void *arg )
 {
-	int sleep_time = 1;
 	LCUI_Func func_data;
 	LCUI_Queue *timer_list;
 	timer_data *timer;
@@ -185,19 +184,23 @@ static void timer_list_process( void *arg )
 	while( LCUI_Active() && timer_thread_active ) { 
 		timer = timer_list_update( timer_list );
 		if( !timer ) {
-			LCUI_MSleep( sleep_time );
-			if(sleep_time < 100) {
-				sleep_time += 1;
-			}
+			LCUI_MSleep( 5 );
 			continue;
 		}
-		sleep_time = 1;
 		func_data.id = timer->app_id;
 		func_data.func = (CallBackFunc)timer->callback_func;
 		func_data.arg[0] = timer->arg;
 		func_data.destroy_arg[0] = FALSE;
 		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */
 		AppTasks_CustomAdd( ADD_MODE_REPLACE, &func_data );
+		/* 若需要重复使用，则重置剩余等待时间 */
+		if( timer->reuse ) {
+			timer->cur_ms = timer->total_ms;
+			timer_list_sort( timer_list );
+		} else { /* 否则，释放该定时器 */
+			LCUITimer_Free( timer->id );
+			DEBUG_MSG("delete timer: %d\n", timer->id);
+		}
 	}
 	LCUIThread_Exit(NULL);
 }
@@ -255,6 +258,7 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 		return -1;
 	}
 	break_sleep = TRUE;
+	DEBUG_MSG("set timer, id: %d, total_ms: %d\n", timer.id, timer.total_ms);
 	timer_list_sort( &global_timer_list );
 	return timer.id;
 }
