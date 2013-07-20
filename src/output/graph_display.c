@@ -246,7 +246,7 @@ static int LCUIScreen_SyncInvalidArea( void )
 static void LCUIScreen_Update( void* unused )
 {
 	int val, n_frame;
-	clock_t cur_sec, lost_time;
+	clock_t cur_time, lost_time;
 	LCUI_Rect screen_area;
 
 	/* 先标记刷新整个屏幕区域 */
@@ -255,7 +255,7 @@ static void LCUIScreen_Update( void* unused )
 	screen_area.height = screen.size.h;
 	LCUIScreen_InvalidArea( screen_area );
 	
-	cur_sec = clock() / CLOCKS_PER_SEC;
+	cur_time = clock();
 	n_frame = 0;
 	while(LCUI_Sys.state == ACTIVE) {
 		lost_time = clock();
@@ -277,9 +277,10 @@ static void LCUIScreen_Update( void* unused )
 			LCUI_MSleep(SYNC_TIME-lost_time);
 		}
 		++n_frame;
-		val = (clock() / CLOCKS_PER_SEC) - cur_sec;
-		if( val >= 1 ) {
-			current_screen_fps = n_frame / val;
+		val = clock() - cur_time;
+		if( val >= CLOCKS_PER_SEC ) {
+			current_screen_fps = n_frame * CLOCKS_PER_SEC / val;
+			cur_time = clock();
 			n_frame = 0;
 		}
 	}
