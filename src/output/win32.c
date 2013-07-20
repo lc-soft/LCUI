@@ -43,6 +43,7 @@
 #include LC_LCUI_H
 
 #ifdef LCUI_VIDEO_DRIVER_WIN32
+
 #include LC_GRAPH_H
 #include LC_INPUT_H
 #include LC_CURSOR_H
@@ -50,6 +51,7 @@
 #include LC_WIDGET_H
 #include <Windows.h>
 #include "resource.h"
+
 static HWND current_hwnd = NULL;
 static int pixel_mem_len = 0;
 static unsigned char *pixel_mem = NULL;
@@ -58,13 +60,7 @@ static HBITMAP client_bitmap;
 static HINSTANCE win32_hInstance = NULL, dll_hInstance = NULL;
 static LCUI_Mutex screen_mutex;
 
-LCUI_API void
-Win32_LCUI_Init( HINSTANCE hInstance )
-{
-	win32_hInstance = hInstance;
-}
-
-static LRESULT CALLBACK 
+static LRESULT CALLBACK
 Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	PAINTSTRUCT ps;
@@ -132,7 +128,7 @@ LCUIScreen_GetGraph( LCUI_Graph *out )
 	return -1;
 }
 
-/* win32的动态库的入口函数 */
+/** win32的动态库的入口函数 */
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
