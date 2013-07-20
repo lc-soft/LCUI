@@ -60,6 +60,12 @@ static HBITMAP client_bitmap;
 static HINSTANCE win32_hInstance = NULL, dll_hInstance = NULL;
 static LCUI_Mutex screen_mutex;
 
+LCUI_API void
+Win32_LCUI_Init( HINSTANCE hInstance )
+{
+	win32_hInstance = hInstance;
+}
+
 static LRESULT CALLBACK
 Win32_LCUI_WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
