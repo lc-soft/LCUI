@@ -54,6 +54,9 @@ typedef struct LCUI_Screen_
 } LCUI_Screen;
 /***********************************************************************/
 
+/** 一秒内的最大画面帧数 */
+#define MAX_FRAMES_PER_SEC	100
+
 #ifdef LCUI_BUILD_IN_WIN32
 #define WIN32_WINDOW_WIDTH 800
 #define WIN32_WINDOW_HEIGHT 600
