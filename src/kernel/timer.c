@@ -43,6 +43,9 @@
 
 #include <time.h>
 
+#define STATE_RUN	1
+#define STATE_PAUSE	0
+
 /*----------------------------- Timer --------------------------------*/
 
 typedef struct _timer_data {
@@ -76,8 +79,8 @@ static int timer_msleep( int n_ms )
 	return lost_ms;
 }
 
-/* 初始化定时器列表 */
-static void timer_list_init( LCUI_Queue *timer_list )
+/** 初始化定时器列表 */
+static void TimerList_Init( LCUI_Queue *timer_list )
 {
 	Queue_Init( timer_list, sizeof(timer_data), NULL );
 	/* 使用链表 */
@@ -85,18 +88,17 @@ static void timer_list_init( LCUI_Queue *timer_list )
 }
 
 /* 销毁定时器列表 */
-static void timer_list_destroy( LCUI_Queue *timer_list )
+static void TimerList_Destroy( LCUI_Queue *timer_list )
 {
 	Queue_Destroy( timer_list );
 }
 
-/* 对定时器列表进行排序 */
-static void timer_list_sort( LCUI_Queue *timer_list )
+/** 对定时器列表进行排序,不使用互斥锁 */
+static void TimerList_NoLockSort( LCUI_Queue *timer_list )
 {
 	int i, j, total;
 	timer_data *a_timer, *b_timer;
 	
-	Queue_Lock( timer_list );
 	total = Queue_GetTotal( timer_list );
 	/* 使用的是选择排序,按剩余等待时间从少到多排序 */
 	for(i=0; i<total; ++i) {
@@ -115,31 +117,43 @@ static void timer_list_sort( LCUI_Queue *timer_list )
 			}
 		}
 	}
+}
+
+/** 对定时器列表进行排序 */
+static void TimerList_Sort( LCUI_Queue *timer_list )
+{
+	Queue_Lock( timer_list );
+	TimerList_NoLockSort( timer_list );
 	Queue_Unlock( timer_list );
 }
 
-/* 将各个定时器的等待时间与指定时间相减 */
-static void timer_list_sub( LCUI_Queue *timer_list, int time )
+/** 缩短定时器列表中的各个定时器的等待时间，不使用互斥锁 */
+static void TimerList_NoLockShortenTime( LCUI_Queue *timer_list, int n_ms )
 {
-	timer_data *timer;
 	int i, total;
-	
-	Queue_Lock( timer_list );
+	timer_data *timer;
+
 	total = Queue_GetTotal( timer_list );
-	
 	for(i=0; i<total; ++i) {
 		timer = (timer_data*)Queue_Get( timer_list , i);
 		/* 忽略无效的定时器，或者状态为暂停的定时器 */
-		if( !timer || timer->state == 0) {
+		if( !timer || timer->state == STATE_PAUSE ) {
 			continue;
 		}
-		timer->cur_ms -= time;
+		timer->cur_ms -= n_ms;
 	}
+}
+
+/** 缩短定时器列表中的各个定时器的等待时间 */
+static void TimerList_ShortenTime( LCUI_Queue *timer_list, int n_ms )
+{
+	Queue_Lock( timer_list );
+	TimerList_NoLockShortenTime( timer_list, n_ms );
 	Queue_Unlock( timer_list );
 }
 
 /** 更新定时器列表中的定时器 */
-static timer_data* timer_list_update( LCUI_Queue *timer_list )
+static timer_data* TimerList_Update( LCUI_Queue *timer_list )
 {
 	int i, total;
 	timer_data *timer = NULL;
@@ -148,7 +162,7 @@ static timer_data* timer_list_update( LCUI_Queue *timer_list )
 	total = Queue_GetTotal( timer_list ); 
 	for(i=0; i<total; ++i){
 		timer = (timer_data*)Queue_Get( timer_list , i);
-		if(timer->state == 1) {
+		if( timer->state == STATE_RUN ) {
 			break;
 		}
 	}
@@ -157,12 +171,14 @@ static timer_data* timer_list_update( LCUI_Queue *timer_list )
 		return (timer_data*)-1; 
 	}
 	if(timer->cur_ms > 0) {
+		Queue_Lock( timer_list );
 		lost_time = timer_msleep( timer->cur_ms ); 
+		/* 减少列表中所有定时器的剩余等待时间 */
+		TimerList_NoLockShortenTime( timer_list, lost_time );
+		Queue_Unlock( timer_list );
 		DEBUG_MSG("timer id: %d, lost_time: %d, timer->cur_ms: %d,"
 			" timer->total_ms: %d\n",
 			timer->id, lost_time, timer->cur_ms, timer->total_ms );
-		/* 减少列表中所有定时器的剩余等待时间 */
-		timer_list_sub( timer_list, lost_time );
 	}
 	/* 若定时器已经到了响应时间，则返回该定时器 */
 	if( timer->cur_ms <= 0 ) {
@@ -172,8 +188,8 @@ static timer_data* timer_list_update( LCUI_Queue *timer_list )
 	return NULL;
 }
 
-/** 处理列表中各个定时器 */
-static void timer_list_process( void *arg )
+/** 定时器线程，用于处理列表中各个定时器 */
+static void TimerThread( void *arg )
 {
 	LCUI_Func func_data;
 	LCUI_Queue *timer_list;
@@ -187,7 +203,7 @@ static void timer_list_process( void *arg )
 		LCUI_MSleep(10);
 	}
 	while( LCUI_Active() && timer_thread_active ) { 
-		timer = timer_list_update( timer_list );
+		timer = TimerList_Update( timer_list );
 		if( timer == (timer_data*)-1 ) {
 			LCUI_MSleep( 5 );
 			continue;
@@ -209,19 +225,19 @@ static void timer_list_process( void *arg )
 			DEBUG_MSG("delete timer: %d\n", timer->id);
 		}
 		/* 重新排序 */
-		timer_list_sort( timer_list );
+		TimerList_Sort( timer_list );
 	}
 	LCUIThread_Exit(NULL);
 }
 
-static timer_data *find_timer( int timer_id )
+static timer_data *TimerList_Find( int timer_id )
 {
 	int i, total;
 	timer_data *timer = NULL;
-	Queue_Lock( &global_timer_list );
+
 	total = Queue_GetTotal( &global_timer_list );
 	for(i=0; i<total; ++i) {
-		timer = Queue_Get( &global_timer_list, i );
+		timer = (timer_data*)Queue_Get( &global_timer_list, i );
 		if( !timer ) {
 			continue;
 		}
@@ -229,7 +245,6 @@ static timer_data *find_timer( int timer_id )
 			break;
 		}
 	}
-	Queue_Unlock( &global_timer_list ); 
 	return timer;
 }
 /*--------------------------- End Private ----------------------------*/
@@ -255,20 +270,23 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 				LCUI_BOOL reuse )
 {
 	timer_data timer;
-	timer.state = 1;
+	timer.state = STATE_RUN;
 	timer.total_ms = timer.cur_ms = n_ms;
 	timer.callback_func = callback_func;
 	timer.reuse = reuse;
 	timer.id = rand();
 	timer.app_id = LCUIApp_GetSelfID();
 	timer.arg = arg;
-
+	
+	break_sleep = TRUE;
+	Queue_Lock( &global_timer_list );
 	if( 0 > Queue_Add( &global_timer_list, &timer ) ) {
+		Queue_Unlock( &global_timer_list );
 		return -1;
 	}
-	break_sleep = TRUE;
 	DEBUG_MSG("set timer, id: %d, total_ms: %d\n", timer.id, timer.total_ms);
-	timer_list_sort( &global_timer_list );
+	TimerList_NoLockSort( &global_timer_list );
+	Queue_Unlock( &global_timer_list );
 	return timer.id;
 }
 
@@ -285,6 +303,7 @@ LCUI_API int LCUITimer_Free( int timer_id )
 	int i, total;
 	timer_data *timer;
 	
+	break_sleep = TRUE;
 	Queue_Lock( &global_timer_list );
 	total = Queue_GetTotal( &global_timer_list );
 	for(i=0; i<total; ++i) {
@@ -316,12 +335,16 @@ LCUI_API int LCUITimer_Free( int timer_id )
 LCUI_API int LCUITimer_Pause( int timer_id )
 {
 	timer_data *timer;
-	timer = find_timer( timer_id );
+	
+	break_sleep = TRUE;
+	Queue_Lock( &global_timer_list );
+	timer = TimerList_Find( timer_id );
 	if( timer ) {
-		timer->state = 0;
-		break_sleep = TRUE;
+		timer->state = STATE_PAUSE;
+		Queue_Unlock( &global_timer_list );
 		return 0;
 	}
+	Queue_Unlock( &global_timer_list );
 	return -1;
 }
 
@@ -335,12 +358,16 @@ LCUI_API int LCUITimer_Pause( int timer_id )
 LCUI_API int LCUITimer_Continue( int timer_id )
 {
 	timer_data *timer;
-	timer = find_timer( timer_id );
+
+	break_sleep = TRUE;
+	Queue_Lock( &global_timer_list );
+	timer = TimerList_Find( timer_id );
 	if( timer ) {
-		timer->state = 1;
-		break_sleep = TRUE;
+		timer->state = STATE_RUN;
+		Queue_Unlock( &global_timer_list );
 		return 0;
 	}
+	Queue_Unlock( &global_timer_list );
 	return -1;
 }
 
@@ -356,16 +383,20 @@ LCUI_API int LCUITimer_Continue( int timer_id )
 LCUI_API int LCUITimer_Reset( int timer_id, long int n_ms ) 
 {
 	timer_data *timer;
-	timer = find_timer( timer_id );
+
+	break_sleep = TRUE;
+	Queue_Lock( &global_timer_list );
+	timer = TimerList_Find( timer_id );
 	if( timer ) {
-		break_sleep = TRUE;
 		/* 更新当前剩余等待时间 */
 		timer->cur_ms = timer->total_ms;
 		/* 保存新的总剩余等待时间 */
 		timer->total_ms = n_ms;
-		timer_list_sort( &global_timer_list );
+		TimerList_Sort( &global_timer_list );
+		Queue_Unlock( &global_timer_list );
 		return 0;
 	}
+	Queue_Unlock( &global_timer_list );
 	return -1;
 }
 
@@ -373,10 +404,10 @@ LCUI_API int LCUITimer_Reset( int timer_id, long int n_ms )
 static int timer_thread_start( LCUI_Thread *tid, LCUI_Queue *list )
 {
 	/* 初始化列表 */
-	timer_list_init( list );
+	TimerList_Init( list );
 	timer_thread_active = TRUE;
 	/* 创建用于处理定时器列表的线程 */
-	return _LCUIThread_Create( tid, timer_list_process, list );
+	return _LCUIThread_Create( tid, TimerThread, list );
 }
 
 /* 停止定时器的处理线程，并销毁定时器列表 */
@@ -386,7 +417,7 @@ static void timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
 	/* 等待定时器处理线程的退出 */
 	_LCUIThread_Join( tid, NULL ); 
 	/* 销毁定时器列表 */
-	timer_list_destroy( list ); 
+	TimerList_Destroy( list ); 
 }
 
 /* 初始化定时器模块 */
