@@ -275,10 +275,9 @@ static void LCUIScreen_Update( void* unused )
 		/* 将单位转换为毫秒 */
 		one_frame_lost_time *= 1000;
 		one_frame_lost_time /= CLOCKS_PER_SEC;
-		/* 将上次多睡的时间缩小一倍 */
-		diff_val /= 2;
 		/* 计算剩余睡眠时间 */
 		n_ms = frame_per_ms - one_frame_lost_time;
+		/* 减去上次多睡的时间 */
 		n_ms = n_ms - diff_val;
 		if( n_ms > 0 ) {
 			lost_time = clock();
@@ -288,6 +287,9 @@ static void LCUIScreen_Update( void* unused )
 			diff_val = lost_time * 1000 / CLOCKS_PER_SEC;
 			/* 减去理论上的睡眠时间，得出本次多睡的时间 */
 			diff_val -= n_ms;
+		} else {
+			/* 本次剩余的多睡的时间留到下帧再处理 */
+			diff_val = 0 - n_ms;
 		}
 		++n_frame;
 		val = clock() - cur_time;
