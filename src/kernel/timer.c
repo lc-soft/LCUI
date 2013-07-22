@@ -138,7 +138,7 @@ static void timer_list_sub( LCUI_Queue *timer_list, int time )
 	Queue_Unlock( timer_list );
 }
 
-/* 更新定时器列表中的定时器 */
+/** 更新定时器列表中的定时器 */
 static timer_data* timer_list_update( LCUI_Queue *timer_list )
 {
 	int i, total;
@@ -152,8 +152,9 @@ static timer_data* timer_list_update( LCUI_Queue *timer_list )
 			break;
 		}
 	}
+	/* 没有要处理的定时器，则返回-1 */
 	if(i >= total || !timer ) {
-		return NULL; 
+		return (timer_data*)-1; 
 	}
 	if(timer->cur_ms > 0) {
 		lost_time = timer_msleep( timer->cur_ms ); 
@@ -163,7 +164,12 @@ static timer_data* timer_list_update( LCUI_Queue *timer_list )
 		/* 减少列表中所有定时器的剩余等待时间 */
 		timer_list_sub( timer_list, lost_time );
 	}
-	return timer;
+	/* 若定时器已经到了响应时间，则返回该定时器 */
+	if( timer->cur_ms <= 0 ) {
+		return timer;
+	}
+	/* 否则返回NULL，表示还没有要处理的定时器 */
+	return NULL;
 }
 
 /** 处理列表中各个定时器 */
@@ -182,8 +188,11 @@ static void timer_list_process( void *arg )
 	}
 	while( LCUI_Active() && timer_thread_active ) { 
 		timer = timer_list_update( timer_list );
-		if( !timer ) {
+		if( timer == (timer_data*)-1 ) {
 			LCUI_MSleep( 5 );
+			continue;
+		}
+		if( timer == NULL ) {
 			continue;
 		}
 		func_data.id = timer->app_id;
