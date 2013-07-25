@@ -1,30 +1,14 @@
 # The LCUI Project
 
-![LCUI Logo](https://raw.github.com/lc-soft/LCUI/gh-pages/files/images/lc-soft-logo.png)
-
-## 效果图
-![screenshort 1](http://lcui.org/files/images/helloworld-01.png)
-![screenshort 2](http://lcui.org/files/images/label-01.png)
-![screenshort 3](http://lcui.org/files/images/devlog/test_textbox-07.gif)
-![screenshort 4](http://lcui.org/files/images/devlog/2012-12-03-17-24-03.png)
-![screenshort 5](http://lcui.org/files/images/devlog/test_progressbar.gif)
-![screenshort 6](http://lcui.org/files/images/test_LCPV-3.gif)
-![screenshort 7](http://lcui.org/files/images/devlog/test_windows-05.gif)
-![screenshort 8](http://lcui.org/files/images/devlog/messagebox-02.gif)
-![screenshort 9](http://lcui.org/files/images/devlog/test_scrollbar-02.gif)
-![screenshort 10](http://lcui.org/files/images/devlog/test_rect_cut-01.gif)
+![LCUI Logo](https://raw.github.com/lc-soft/LCUI-HomePage/gh-pages/files/images/lc-soft-logo.png)
 
 ## 说明
 
-LCUI 是作者利用业余时间开发的 GUI 函数库, 支持windows和linux平台，你可以利用它开
-发简单的图形界面程序。
+LCUI 是 GNU/Linux 平台上的一款自由软件，主要面向嵌入式，注重易用性和性能。
 
-源代码使用C语言编写，主要供技术交流之用，可应用于嵌入式。
+源代码基于 GNU通用公共许可协议 发布，任何人都有运行、研究、复制、发布、修改和改进LCUI的自由。
 
-它是一款自由软件，源代码基于 GNU通用公共许可协议 发布，任何人都有运行、研究、复
-制、发布、修改和改进 LCUI 的自由。
-
-我们正努力使它成为一款成熟、稳定的GUI函数库。
+我们正努力使它成为一款成熟、稳定、高效的GUI开发工具。
 
 请阅读 `docs/CHANGES.zh-cn` 文件了解新版本的更新内容。
 
@@ -42,7 +26,7 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 
 如果遇到问题、发现BUG或者有好的建议和想法，可以在项目主页上留言或发送邮件告诉我们。
 
-我们已经使用 GitHub 托管 LCUI 项目，网址在上面，欢迎你参与 LCUI 项目的优化和改进。
+我们已经使用 GitHub 托管 LCUI 项目，网址在上面，欢迎您参与 LCUI 项目的优化和改进。
 
 
 ## 文档
@@ -67,7 +51,7 @@ LCUI 的相关信息与资料可以在项目主页中找到。
 2. 进入解压后得到的新文件夹。
 3. 运行源码根目录中的configure脚本，以对系统环境进行检测。
 4. 使用make命令编译 LCUI 的源代码。
-5. 等待编译成功完成，如果在编译过程中遇到错误，请检查你的系统中是否有完整的编译环境。
+5. 等待编译成功完成，如果在编译过程中遇到错误，请检查您的系统中是否有完整的编译环境。
 6. 使用make install命令安装 LCUI 的函数库和头文件。
 
 windows系统上构建本项目方法，有两种：
@@ -86,14 +70,10 @@ windows系统上构建本项目方法，有两种：
 * 线程支持： pthread
 * 图片处理： libpng 和 libjpeg
 
-为了你能正常使用LCUI，请先确保你的计算机已经安装了上述的函数库，并保持较新的版本。
+为了你能正常使用LCUI，请先确保您的计算机已经安装了上述的函数库，并保持较新的版本。
 理论上，LCUI 能在 GNU/Linux 系统环境中正常工作，LCUI 的图形输出，需要内核支持 FrameBuffer。
 
 ## 贡献
-
-LCUI 在 GNU/Linux 系统环境下只能通过FrameBuffer来输出图形，并且需要切换至控制台模式，
-在系统桌面环境下无法显示图形，若你熟悉该系统环境下其它的图形输出方法（例如：Xwindow），
-欢迎你提供技术支持。
 
 你可以通过GitHub向本项目提交合并请求，补丁应符合以下要求：
 
