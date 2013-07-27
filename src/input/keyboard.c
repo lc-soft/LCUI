@@ -256,9 +256,6 @@ LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( void )
 	} 
 	return FALSE;
 #endif
-	if( Queue_GetTotal( &key_state_record ) > 0) {
-		return TRUE;
-	}
 	return FALSE;
 }
 
@@ -287,14 +284,6 @@ LCUI_API int LCUIKeyboard_Get( void )
 	}
 	return c; 
 #else 
-	int *key_ptr;
-	while( Queue_GetTotal(&key_state_record) == 0 ) {
-		LCUI_MSleep(100);
-	}
-	key_ptr = Queue_Get( &key_state_record, 0 );
-	if( key_ptr ) {
-		return *key_ptr;
-	}
 	return -1;
 #endif
 }
