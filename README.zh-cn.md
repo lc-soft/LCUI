@@ -1,6 +1,6 @@
 # The LCUI Project
 
-![LCUI Logo](https://raw.github.com/lc-soft/LCUI-HomePage/gh-pages/files/images/lc-soft-logo.png)
+![LCUI Logo](https://raw.github.com/lc-soft/LCUI-HomePage/gh-pages/files/images/lcui-project-logo.png)
 
 ## 说明
 
