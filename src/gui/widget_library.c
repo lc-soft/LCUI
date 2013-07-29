@@ -38,7 +38,7 @@ LCUI_API int WidgetFunc_Add(	const char *type_name,
 	LCUI_App *app;
 	WidgetTypeData *data;
 	LCUI_Func *temp_func, func_data;
-	int total, i, found = 0;
+	int total, i;
 
 	app = LCUIApp_GetSelf();
 	if( !app ) {
@@ -86,7 +86,7 @@ LCUI_API int WidgetType_Add( const char *type_name )
 		_DEBUG_MSG(APP_ERROR_UNRECORDED_APP);
 		return -1;
 	}
-	
+
 	/* 生成类型ID */
 	new_data.type_id = WidgetType_GetID( type_name );
 	data = WidgetType_FindByID( &app->widget_lib, new_data.type_id );
@@ -167,7 +167,6 @@ LCUI_API WidgetCallBackFunc WidgetFunc_GetByID( LCUI_ID id,
 	LCUI_Func *f;
 	WidgetTypeData *data;
 	int total, i;
-	LCUI_BOOL found = FALSE;
 
 	app = LCUIApp_GetSelf();
 	if( !app ) {
