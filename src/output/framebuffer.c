@@ -111,8 +111,7 @@ int LCUIScreen_GetGraph( LCUI_Graph *out )
 		return -1;
 	}
 
-	out->have_alpha = FALSE;/* 无alpha通道 */
-	out->type = TYPE_BMP;
+	out->color_type = COLOR_TYPE_RGB;/* 无alpha通道 */
 	temp = Graph_Create(out, screen_size.w, screen_size.h);
 	if(temp != 0) {
 		return -2;
@@ -332,7 +331,7 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	Graph_Init (&temp);
 
 	if ( LCUIRect_GetCutArea ( LCUIScreen_GetSize(),
-			Rect ( pos.x, pos.y, src->width, src->height ),
+			Rect ( pos.x, pos.y, src->w, src->h ),
 			&cut_rect
 		) ) {/* 如果需要裁剪图形 */
 		if(!LCUIRect_IsValid(cut_rect)) {
@@ -350,8 +349,8 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 	switch(bits) {
 	    case 32:/* 32位，其中RGB各占8位，剩下的8位用于alpha，共4个字节 */
 		k = pos.y * screen_size.w + pos.x;
-		for (n=0,y = 0; y < pic->height; ++y) {
-			for (x = 0; x < pic->width; ++x, ++n) {
+		for (n=0,y = 0; y < pic->h; ++y) {
+			for (x = 0; x < pic->w; ++x, ++n) {
 				count = k + x;//count = 4 * (k + x);/* 计算需填充的像素点的坐标 */
 				count = count << 2;
 				/* 由于帧缓冲(FrameBuffer)的颜色排列是BGR，图片数组是RGB，需要改变一下写入顺序 */
@@ -364,8 +363,8 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 		break;
 	    case 24:/* 24位，RGB各占8位，也就是共3个字节 */
 		k = pos.y * screen_size.w + pos.x;
-		for (n=0, y = 0; y < pic->height; ++y) {
-			for (x = 0; x < pic->width; ++x, ++n) {
+		for (n=0, y = 0; y < pic->h; ++y) {
+			for (x = 0; x < pic->w; ++x, ++n) {
 				count = k + x;//count = 3 * (k + x);
 				count = (count << 1) + count;
 				dest[count] = pic->rgba[2][n];
@@ -383,8 +382,8 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 		 * 高字节的后5位用来表示R(RED)
 		 * */
 		k = pos.y * screen_size.w + pos.x;
-		for (n=0, y = 0; y < pic->height; ++y) {
-			for (x = 0; x < pic->width; ++x, ++n) {
+		for (n=0, y = 0; y < pic->h; ++y) {
+			for (x = 0; x < pic->w; ++x, ++n) {
 				count = (k + x) << 1;//count = 2 * (k + x);
 				temp1 = pic->rgba[0][n];
 				temp2 = pic->rgba[2][n];
@@ -410,8 +409,8 @@ int LCUIScreen_PutGraph (LCUI_Graph *src, LCUI_Pos pos )
 		}
 
 		k = pos.y * screen_size.w + pos.x;
-		for (n=0, y = 0; y < pic->height; ++y) {
-			for (x = 0; x < pic->width; ++x, ++n) {
+		for (n=0, y = 0; y < pic->h; ++y) {
+			for (x = 0; x < pic->w; ++x, ++n) {
 				count = k + x;
 
 				temp1 = pic->rgba[0][n]*0.92;
