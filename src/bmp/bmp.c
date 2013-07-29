@@ -1,7 +1,7 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
-#include LC_ERROR_H 
+#include LC_ERROR_H
 
 /* 这个结构体用于存储bmp文件的文件头的信息 */
 typedef struct bmp_head {
@@ -22,21 +22,20 @@ LCUI_API int Graph_LoadBMP( const char *filepath, LCUI_Graph *out )
 	FILE *fp;
 	bmp_head bmp;
 	int  m, n, x, y, tempi, pocz, omin;
-	unsigned char rozp;
-	
+
 	fp = fopen(filepath,"rb");
 	if(fp == NULL) {
 		return FILE_ERROR_OPEN_ERROR;
 	}
-	
-	/* 检测是否为bmp图片 */ 
+
+	/* 检测是否为bmp图片 */
 	tempi = fread(&bmp, 1, sizeof(bmp_head),fp);
 	if (tempi < sizeof(bmp_head) || bmp.BMPsyg != 19778) {
-		return FILE_ERROR_UNKNOWN_FORMAT; 
+		return FILE_ERROR_UNKNOWN_FORMAT;
 	}
-	
+
 	pocz = bmp.nic[4];
-	if ((bmp.depth != 32) && (bmp.depth != 24) ) { 
+	if ((bmp.depth != 32) && (bmp.depth != 24) ) {
 		_DEBUG_MSG("can not support  %i bit-depth !\n", bmp.depth);
 		return  FILE_ERROR_UNKNOWN_FORMAT;
 	}
@@ -46,15 +45,14 @@ LCUI_API int Graph_LoadBMP( const char *filepath, LCUI_Graph *out )
 		_DEBUG_MSG("can not alloc memory\n");
 		return 1;
 	}
-	
-	rozp = ftell(fp);
+
 	fseek(fp,0,SEEK_END);
 	omin = ftell(fp);
 	omin = omin-pocz;
 	omin = omin-((out->w*out->h)*(bmp.depth/8));
 	omin = omin/(out->h);
 	fseek(fp,pocz,SEEK_SET);
-	switch(bmp.depth){ 
+	switch(bmp.depth){
 	case 32:
 		for (y=0; y<out->h; ++y) {
 			m = (out->h-y-1)*out->w;
@@ -67,7 +65,7 @@ LCUI_API int Graph_LoadBMP( const char *filepath, LCUI_Graph *out )
 			}
 			if (omin>0) {
 				for (tempi=0;tempi<omin;tempi++) {
-					fgetc(fp); 
+					fgetc(fp);
 				}
 			}
 		}
@@ -83,7 +81,7 @@ LCUI_API int Graph_LoadBMP( const char *filepath, LCUI_Graph *out )
 			}
 			if (omin>0) {
 				for (tempi=0;tempi<omin;tempi++) {
-					fgetc(fp); 
+					fgetc(fp);
 				}
 			}
 		}
