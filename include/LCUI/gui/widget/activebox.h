@@ -21,7 +21,7 @@
  * You should have received a copy of the GPLv2 along with this file. It is 	\n
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.	\n
  * ******************************************************************************/
- 
+
 /** ******************************************************************************
  * @file	activebox.h
  * @brief	ActiveBox部件, 可实现播放简单的动态图像
@@ -129,7 +129,7 @@ LCUI_API int Animation_Connect(	AnimationData *animation,
 				void *arg );
 
 /**
-/* 播放指定播放实例中的动画
+ * 播放指定播放实例中的动画
  * @param animation
  *	要播放的动画
  * @param play_id
