@@ -21,7 +21,7 @@
  * You should have received a copy of the GPLv2 along with this file. It is 	\n
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.	\n
  * ******************************************************************************/
- 
+
 /** ******************************************************************************
  * @file	activebox.c
  * @brief	ActiveBox部件, 可实现播放简单的动态图像
@@ -176,7 +176,7 @@ static int Animation_UpdateGraphSlot( AnimationData *animation, int play_id, int
 	Graph_Create(	&p_status->framebuffer,
 			p_status->animation->size.w,
 			p_status->animation->size.h );
-	
+
 	Graph_FillAlpha( &p_status->framebuffer, 0 );
 	if(0 < Queue_GetTotal( &animation->frame )) {
 		pos = Animation_GetFrameMixPos( animation, frame );
@@ -246,7 +246,7 @@ LCUI_API AnimationData* Animation_Create( LCUI_Size size )
 
 	Queue_Init( &animation.frame, sizeof(AnimationFrameData), NULL );
 	animation.size = size;
-	
+
 	if( !database_init ) {
 		Queue_Init(	&animation_database,
 				sizeof(AnimationData),
@@ -271,7 +271,7 @@ static int AnimationStream_Delete( AnimationData *animation )
 	Queue_Lock( &animation_stream );
 	n = Queue_GetTotal( &animation_stream );
 	/* 查询该动画是否在动画流中存在 */
-	for(n; n>=0; --n) {
+	for(; n>=0; --n) {
 		tmp = (AnimationData*)Queue_Get( &animation_stream, n );
 		/* 如果存在则删除它 */
 		if( tmp == animation ) {
@@ -305,7 +305,7 @@ LCUI_API int Animation_Delete( AnimationData* animation )
 	Queue_Lock( &animation_database );
 	n = Queue_GetTotal( &animation_database );
 	/* 查询该动画是否在动画库中存在 */
-	for(n; n>=0; --n) {
+	for(; n>=0; --n) {
 		tmp = (AnimationData*)Queue_Get( &animation_database, n );
 		/* 如果存在则删除它 */
 		if( tmp == animation ) {
@@ -337,7 +337,7 @@ LCUI_API int Animation_AddFrame(	AnimationData *des,
 					LCUI_Pos offset,
 					int sleep_time )
 {
-	AnimationFrameData *p, frame;
+	AnimationFrameData frame;
 	if( !des ) {
 		return -1;
 	}
@@ -349,8 +349,7 @@ LCUI_API int Animation_AddFrame(	AnimationData *des,
 	frame.sleep_time = sleep_time;
 	frame.graph = *pic;
 	frame.current_time = frame.sleep_time;
-	p = Queue_Get( &des->frame, Queue_Add( &des->frame, &frame ) );
-	DEBUG_MSG("animation: %p, frame: %p\n", des, p);
+	Queue_Get( &des->frame, Queue_Add( &des->frame, &frame ) );
 	return 0;
 }
 
@@ -548,7 +547,7 @@ static AnimationStatus* AnimationStream_Update( int *sleep_time )
 		ani_status->animation,
 		ani_status->play_id,
 		ani_status->current-1 );
-	
+
 	used_time = clock()-used_time;
 	if(used_time > 0) {
 		AnimationStream_TimeSub( used_time );
@@ -576,7 +575,7 @@ static void Process_Frames( void* arg )
 }
 
 /**
-/* 播放指定播放实例中的动画
+ * 播放指定播放实例中的动画
  * @param animation
  *	要播放的动画
  * @param play_id
@@ -630,7 +629,6 @@ LCUI_API int Animation_Play( AnimationData *animation, int play_id )
  */
 LCUI_API int Animation_Pause( AnimationData *animation, int play_id )
 {
-	static int new_play_id = 1;
 	AnimationStatus *p_status;
 
 	if( !animation ) {
@@ -796,7 +794,7 @@ LCUI_API int ActiveBox_Pause( LCUI_Widget *widget )
 static void ActiveBox_ExecInit(LCUI_Widget *widget)
 {
 	LCUI_ActiveBox *actbox;
-	
+
 	actbox = (LCUI_ActiveBox*)Widget_NewPrivData(
 			widget, sizeof(LCUI_ActiveBox));
 
