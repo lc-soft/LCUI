@@ -15,6 +15,7 @@ typedef union LCUI_DirEntry_ {
 #define PATH_DELIMITER '\\'
 
 #elif defined(LCUI_BUILD_IN_LINUX)
+#include <dirent.h>
 typedef DIR* LCUI_DirHandle;
 typedef struct dirent LCUI_DirEntry;
 
@@ -30,7 +31,7 @@ typedef struct LCUI_Dir_ {
 	int cached;
 } LCUI_Dir;
 
-#ifdef _UNICODE 
+#ifdef _UNICODE
 #define LCUI_OpenDir LCUI_OpenDirW
 #define LCUI_ReadDir LCUI_ReadDirW
 #define LCUI_GetFileName LCUI_GetFileNameW
