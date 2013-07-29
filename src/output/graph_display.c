@@ -252,7 +252,7 @@ static void LCUIScreen_Update( void* unused )
 	screen_area.width = screen.size.w;
 	screen_area.height = screen.size.h;
 	LCUIScreen_InvalidArea( screen_area );
-	
+
 	cur_time = clock();
 	n_frame = 0;
 	diff_val = 0;
@@ -260,7 +260,7 @@ static void LCUIScreen_Update( void* unused )
 	while(LCUI_Sys.state == ACTIVE) {
 		one_frame_lost_time = clock();
 		/* 更新鼠标位置 */
-		LCUICursor_UpdatePos();	
+		LCUICursor_UpdatePos();
 		/* 处理所有部件消息 */
 		WidgetMsg_Proc(NULL);
 		/* 同步部件中的无效区域至屏幕的无效区域记录中 */
@@ -286,7 +286,11 @@ static void LCUIScreen_Update( void* unused )
 			/* 保存本次睡眠实际耗时(单位为毫秒) */
 			diff_val = lost_time * 1000 / CLOCKS_PER_SEC;
 			/* 减去理论上的睡眠时间，得出本次多睡的时间 */
-			diff_val -= n_ms;
+			if( lost_time > n_ms ) {
+				diff_val -= n_ms;
+			} else {
+				diff_val = 0;
+			}
 		} else {
 			/* 本次剩余的多睡的时间留到下帧再处理 */
 			diff_val = 0 - n_ms;
