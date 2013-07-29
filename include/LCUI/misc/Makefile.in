@@ -235,7 +235,7 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 
 # Headers to install
-pkginclude_HEADERS = string.h rect.h delay.h
+pkginclude_HEADERS = string.h dirent.h rect.h delay.h
 all: all-am
 
 .SUFFIXES:
