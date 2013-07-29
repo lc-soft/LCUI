@@ -37,7 +37,7 @@ static void LeftMoveCloud( LCUI_Widget *widget )
 	Widget_Move( widget, Pos(x-1,0) );
 }
 
-static void LeftMoveAllCloud(void)
+static void LeftMoveAllCloud(void* arg)
 {
 	int i;
 	for(i=0; i<total_cloud; ++i) {
@@ -70,7 +70,7 @@ static void CreateCloud(void)
 		Widget_Show( wdg_cloud[i] );
 		x += avg_w;
 	}
-	LCUITimer_Set( 50, LeftMoveAllCloud, TRUE );
+	LCUITimer_Set( 50, LeftMoveAllCloud, NULL, TRUE );
 }
 
 
