@@ -339,7 +339,7 @@ get_PX_PT_t( char *str, PX_PT_t *combo_num )
 }
 
 /** 根据给定的字符串，生成一个ID */
-unsigned int BKDRHash( const char *str )
+LCUI_API unsigned int BKDRHash( const char *str )
 {
     unsigned int seed = 131;
     unsigned int hash = 0;
