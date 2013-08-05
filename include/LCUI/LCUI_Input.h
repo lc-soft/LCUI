@@ -1,43 +1,47 @@
-﻿/* ***************************************************************************
- * LCUI_Input.h -- The input devices handling module of LCUI
- * 
- * Copyright (C) 2012-2013 by
- * Liu Chao
- * 
- * This file is part of the LCUI project, and may only be used, modified, and
- * distributed under the terms of the GPLv2.
- * 
- * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
- * By continuing to use, modify, or distribute this file you indicate that you
- * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+﻿/** ******************************************************************************
+ * @file	LCUI_Input.h
+ * @brief	The input devices handling module of LCUI.
+ * @author	Liu Chao <lc-soft@live.cn>
+ * @warning
+ * Copyright (C) 2012-2013 by							\n
+ * Liu Chao									\n
+ * 										\n
+ * This file is part of the LCUI project, and may only be used, modified, and	\n
+ * distributed under the terms of the GPLv2.					\n
+ * 										\n
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)		\n
+ * 										\n
+ * By continuing to use, modify, or distribute this file you indicate that you	\n
+ * have read the license and understand and accept it fully.			\n
+ *  										\n
+ * The LCUI project is distributed in the hope that it will be useful, but 	\n
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 	\n
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.	\n
+ * 										\n
+ * You should have received a copy of the GPLv2 along with this file. It is 	\n
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.	\n
+ * ******************************************************************************/
  
-/* ****************************************************************************
- * LCUI_Input.h -- LCUI的输入设备处理模块
- *
- * 版权所有 (C) 2013 归属于
- * 刘超
- * 
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
- *
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
- * 定用途的隐含担保，详情请参照GPLv2许可协议。
- *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
- * ****************************************************************************/
+/** ******************************************************************************
+ * @file	LCUI_Input.h
+ * @brief	LCUI的输入设备处理模块。
+ * @author	刘超 <lc-soft@live.cn>
+ * @warning
+ * 版权所有 (C) 2012-2013 归属于						\n
+ * 刘超										\n
+ * 										\n
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。	\n
+ * 										\n
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)				\n
+ * 										\n
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。	\n
+ * 										\n
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特定\n
+ 用途的隐含担保，详情请参照GPLv2许可协议。					\n
+ * 										\n
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果	\n
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 				\n
+ * ******************************************************************************/
 
 #ifndef __LCUI_INPUT_H__
 #define __LCUI_INPUT_H__
@@ -139,90 +143,40 @@
 
 LCUI_BEGIN_HEADER
 
-/****************************** Mouse *********************************/
-/*
- * 功能：检测鼠标事件中鼠标左键的状态
- * 说明：该函数只适用于响应鼠标按键状态发生改变时，判断按键状态。
- * 返回值：
- *   -2  事件指针为NULL
- *   -1  键值不是鼠标左键的键值
- *   0   鼠标左键已经释放
- *   1   鼠标左键处于按下状态
- **/ 
-LCUI_API int
-Mouse_LeftButton( LCUI_MouseButtonEvent *event );
+/*---------------------------------- Mouse ---------------------------------*/
+/** 按下指定鼠标按键 */
+LCUI_API int LCUIMouse_ButtonDown( int key_code );
 
-/*
- * 功能：检测鼠标事件中鼠标右键的状态
- * 说明：该函数只适用于响应鼠标按键状态发生改变时，判断按键状态。
- * 返回值：
- *   -2  事件指针为NULL
- *   -1  键值不是鼠标右键的键值
- *   0   鼠标右键已经释放
- *   1   鼠标右键处于按下状态
- **/
-LCUI_API int
-Mouse_RightButton( LCUI_MouseButtonEvent *event );
+/** 释放指定鼠标按键 */
+LCUI_API int LCUIMouse_ButtonUp( int key_code );
 
-LCUI_API int
-Click_LeftButton (LCUI_MouseButtonEvent *event);
-/*
- * 功能：检测是否是按鼠标左键
- **/ 
+/** 添加鼠标移动事件 */
+LCUI_API void LCUI_PushMouseMotionEvent( LCUI_Pos new_pos );
 
-/* 记录被按下的指定键的键值，并添加LCUI_MOUSEBUTTONDOWN事件 */
-LCUI_API int
-LCUIMouse_ButtonDown( LCUI_Pos pos, int key_code );
+/** 启用鼠标输入处理 */
+LCUI_API LCUI_BOOL Enable_Mouse_Input(void);
 
-/* 记录被释放的指定键的键值，并添加LCUI_MOUSEBUTTONUP事件 */
-LCUI_API int
-LCUIMouse_ButtonUp( LCUI_Pos pos, int key_code );
+/** 禁用鼠标输入处理 */
+LCUI_API LCUI_BOOL Disable_Mouse_Input(void);
 
-LCUI_API int
-Win32_LCUIMouse_ButtonDown( int key_code );
+/** 初始化鼠标输入模块 */
+LCUI_API int LCUIModule_Mouse_Init( void );
 
-LCUI_API int
-Win32_LCUIMouse_ButtonUp( int key_code );
-
-#ifdef LCUI_BUILD_IN_WIN32
-/* 更新鼠标位置 */
-LCUI_API void Win32_LCUIMouse_UpdatePos( void );
-#endif
-
-/* 功能：处理鼠标产生的事件 */
-LCUI_API void
-LCUI_PushMouseEvent( LCUI_Pos new_pos, int button_type );
-
-LCUI_API int
-Check_Mouse_Support();
-/* 功能：检测鼠标的支持 */ 
-
-LCUI_API LCUI_BOOL
-Enable_Mouse_Input();
-/* 功能：启用鼠标输入处理 */ 
-
-LCUI_API LCUI_BOOL
-Disable_Mouse_Input();
-/* 功能：禁用鼠标输入处理 */ 
-
-/* 初始化鼠标输入模块 */
-LCUI_API int
-LCUIModule_Mouse_Init( void );
-/**************************** Mouse End *******************************/
+/*-------------------------------- Mouse End -------------------------------*/
 
 
-/***************************** Keyboard **********************************/ 
+/*-------------------------------- Keyboard --------------------------------*/
 
 /** 检测指定键值的按键是否处于按下状态 */
 LCUI_API LCUI_BOOL LCUIKey_IsHit( int key_code );
 
 /**
-检测指定键值的按键是否按了两次
-@param key_code
-	要检测的按键的键值
-@param interval_time
-	该按键倒数第二次按下时的时间与当前时间的最大间隔
-*/
+ * 检测指定键值的按键是否按了两次
+ * @param key_code
+ *	要检测的按键的键值
+ * @param interval_time
+ *	该按键倒数第二次按下时的时间与当前时间的最大间隔
+ */
 LCUI_API LCUI_BOOL LCUIKey_IsDoubleHit( int key_code, int interval_time );
 
 /* 添加已被按下的按键 */
@@ -254,10 +208,10 @@ LCUI_API void LCUIModule_Keyboard_Init( void );
 
 /** 停用键盘输入模块 */
 LCUI_API void LCUIModule_Keyboard_End( void );
-/*************************** Key End **********************************/
+/*------------------------------ Keyboard End ------------------------------*/
 
 
-/************************* TouchScreen *********************************/ 
+/*------------------------------ TouchScreen -------------------------------*/ 
 /** 启用触屏输入处理 */
 LCUI_API LCUI_BOOL EnableTouchScreenInput(void);
 
@@ -269,7 +223,7 @@ LCUI_API void* Get_TouchScreen(void);
 
 /** 初始化触屏输入模块 */
 LCUI_API void LCUIModule_TouchScreen_Init( void );
-/*********************** TouchScreen End *******************************/
+/*---------------------------- TouchScreen End -----------------------------*/ 
 
 LCUI_END_HEADER
 
