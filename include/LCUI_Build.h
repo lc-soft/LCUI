@@ -83,7 +83,6 @@
 #define LC_KERNEL_TASK_H	<LCUI/kernel/task.h>
 
 #define LC_LCUI_H	<LCUI/LCUI.h>
-#define LC_LCUI_HPP	<LCUI/LCUI.hpp>
 #define LC_CONFIG_H	<LCUI/LCUI_Config.h>
 
 #define LC_MISC_STRING_H	<LCUI/misc/string.h>
@@ -98,12 +97,10 @@
 #define LC_WIDGET_LIBRARY_H	<LCUI/gui/widget_library.h>
 #define LC_WIDGET_STYLE_H	<LCUI/gui/widget_style.h>
 #define LC_WIDGET_H		<LCUI/LCUI_Widget.h>
-#define LC_WIDGET_HPP		<LCUI/LCUI_Widget.hpp>
 
 #define LC_FONT_H	<LCUI/LCUI_Font.h>
 #define LC_FONTLIB_H	<LCUI/font/fontlibrary.h>
 #define LC_GRAPH_H	<LCUI/LCUI_Graph.h>
-#define LC_GRAPH_HPP	<LCUI/LCUI_Graph.hpp>
 #define LC_DRAW_H	<LCUI/LCUI_Draw.h>
 #define LC_DISPLAY_H	<LCUI/LCUI_Display.h>
 #define LC_QUEUE_H	<LCUI/LCUI_Queue.h>
@@ -111,7 +108,6 @@
 #define LC_INPUT_H	<LCUI/LCUI_Input.h>
 #define LC_ERROR_H	<LCUI/LCUI_Error.h>
 #define LC_THREAD_H	<LCUI/LCUI_Thread.h>
-#define LC_THREAD_HPP	<LCUI/LCUI_Thread.hpp>
 #define LC_RES_H	<LCUI/LCUI_Resources.h>
 
 #define LC_GRAPHLAYER_H		<LCUI/LCUI_GraphLayer.h>
@@ -126,9 +122,7 @@
 
 /* 一些GUI部件的头文件路径 */
 #define LC_WINDOW_H	<LCUI/gui/widget/window.h>
-#define LC_WINDOW_HPP	<LCUI/gui/widget/window.hpp>
 #define LC_LABEL_H	<LCUI/gui/widget/label.h>
-#define LC_LABEL_HPP	<LCUI/gui/widget/label.hpp>
 #define LC_BUTTON_H	<LCUI/gui/widget/button.h>
 #define LC_PICBOX_H	<LCUI/gui/widget/picturebox.h>
 #define LC_PROGBAR_H	<LCUI/gui/widget/progressbar.h>
