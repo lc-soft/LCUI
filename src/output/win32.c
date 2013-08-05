@@ -81,16 +81,16 @@ static LRESULT CALLBACK Win32_LCUI_WndProc(	HWND hwnd,
 		LCUIKeyboard_FreeKey( wParam );
 		return 0;
 	case WM_RBUTTONDOWN:
-		Win32_LCUIMouse_ButtonDown( LCUIKEY_RIGHTBUTTON );
+		LCUIMouse_ButtonDown( LCUIKEY_RIGHTBUTTON );
 		return 0;
 	case WM_RBUTTONUP:
-		Win32_LCUIMouse_ButtonUp( LCUIKEY_RIGHTBUTTON );
+		LCUIMouse_ButtonUp( LCUIKEY_RIGHTBUTTON );
 		return 0;
 	case WM_LBUTTONDOWN:
-		Win32_LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
+		LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
 		return 0;
 	case WM_LBUTTONUP:
-		Win32_LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
+		LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
 		return 0;
 	case WM_PAINT:
 		BeginPaint( hwnd, &ps );
