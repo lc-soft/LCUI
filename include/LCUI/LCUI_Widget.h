@@ -188,7 +188,4 @@ LCUI_END_HEADER
 #include LC_WIDGET_STYLE_H
 #include LC_GUI_MSGBOX_H
 
-#ifdef __cplusplus
-#include LC_WIDGET_HPP
-#endif
 #endif

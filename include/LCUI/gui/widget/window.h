@@ -49,7 +49,6 @@ LCUI_BEGIN_HEADER
 typedef enum WINDOW_STYLE
 {
 	WINDOW_STYLE_NONE,
-	WINDOW_STYLE_STANDARD,
 	WINDOW_STYLE_LINE,
 	WINDOW_STYLE_PURE_BLUE,
 	WINDOW_STYLE_PURE_GREEN,
@@ -116,9 +115,5 @@ LCUI_API LCUI_Widget*
 Window_New( const char *title, LCUI_Graph *icon, LCUI_Size size );
 
 LCUI_END_HEADER
-
-#ifdef __cplusplus
-#include LC_WINDOW_HPP
-#endif
 
 #endif /* __LCUI_WINDOW_H__ */

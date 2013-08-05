@@ -176,10 +176,5 @@ LCUI_END_HEADER
 #include LC_DRAW_H
 #include LC_GRAPHLAYER_H
 
-#ifdef __cplusplus
-#include LC_GRAPH_HPP
-#endif
-
-
 #endif /* __LCUI_GRAPH_H__ */
 

@@ -147,10 +147,5 @@ LCUIModule_Thread_End( void );
 
 LCUI_END_HEADER
 
-
-#ifdef __cplusplus
-#include LC_THREAD_HPP
-#endif
-
 #endif
 

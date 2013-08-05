@@ -79,8 +79,4 @@ Label_AutoSize( LCUI_Widget *widget, LCUI_BOOL flag, AUTOSIZE_MODE mode );
 
 LCUI_END_HEADER
 
-#ifdef __cplusplus
-#include LC_LABEL_HPP
-#endif
-
 #endif

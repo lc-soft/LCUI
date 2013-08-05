@@ -233,11 +233,6 @@ LCUI_END_HEADER
 #include LC_KERNEL_TASK_H
 #include LC_KERNEL_EVENT_H
 
-/* 如果是使用C++语言，那么就包含LCUI的C++版头文件 */
-#ifdef __cplusplus
-#include LC_LCUI_HPP
-#endif
-
 #if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS) &&defined(I_NEED_WINMAIN)
 
 #ifdef _UNICODE
