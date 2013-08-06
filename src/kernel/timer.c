@@ -59,18 +59,44 @@ typedef struct _timer_data {
 	void *arg;			/**< 函数的参数 */
 } timer_data;
 
-static LCUI_Queue global_timer_list;	/* 定时器列表 */
-static LCUI_BOOL timer_thread_active = TRUE;
-static LCUI_BOOL break_sleep = FALSE;	/* 是否需要打断睡眠 */
+static LCUI_Queue global_timer_list;		/**< 定时器列表 */
+static LCUI_BOOL timer_thread_active = FALSE;	/**< 定时器线程是否活动 */
+static LCUI_BOOL break_sleep = FALSE;		/**< 是否需要打断睡眠 */
+
+#ifdef LCUI_BUILD_IN_WIN32
+
+#define TIME_WRAP_VALUE	(~(DWORD)0)
+
+static DWORD start_ticks;
+
+void LCUI_StartTicks( void )
+{
+	start_ticks = GetTickCount();
+}
+
+uint_t LCUI_GetTicks( void )
+{
+	DWORD now_ticks;
+
+	now_ticks = GetTickCount();
+	if ( now_ticks < start_ticks ) {
+		return (TIME_WRAP_VALUE-start_ticks) + now_ticks;
+	}
+	return now_ticks - start_ticks;
+}
+
+#elif defined LCUI_BUILD_IN_LINUX
+
+#endif
 
 /*----------------------------- Private ------------------------------*/
-static int timer_msleep( int n_ms )
+static uint_t timer_msleep( int n_ms )
 {
-	clock_t start_ms, lost_ms=0;
-	start_ms = clock()*1000 / CLOCKS_PER_SEC;
+	uint_t lost_ms;
+	LCUI_StartTicks();
 	while(!break_sleep) {
-		lost_ms = clock()*1000 / CLOCKS_PER_SEC - start_ms;
-		if( lost_ms >= n_ms ) {
+		lost_ms = LCUI_GetTicks();
+		if( lost_ms >= (uint_t)n_ms ) {
 			break;
 		}
 		LCUI_MSleep(1);
@@ -128,7 +154,7 @@ static void TimerList_Sort( LCUI_Queue *timer_list )
 }
 
 /** 缩短定时器列表中的各个定时器的等待时间，不使用互斥锁 */
-static void TimerList_NoLockShortenTime( LCUI_Queue *timer_list, int n_ms )
+static void TimerList_NoLockShortenTime( LCUI_Queue *timer_list, uint_t n_ms )
 {
 	int i, total;
 	timer_data *timer;
@@ -149,7 +175,7 @@ static timer_data* TimerList_Update( LCUI_Queue *timer_list )
 {
 	int i, total;
 	timer_data *timer = NULL;
-	clock_t lost_time;
+	uint_t lost_ms;
 
 	total = Queue_GetTotal( timer_list );
 	for(i=0; i<total; ++i){
@@ -164,9 +190,9 @@ static timer_data* TimerList_Update( LCUI_Queue *timer_list )
 	}
 	if(timer->cur_ms > 0) {
 		Queue_Lock( timer_list );
-		lost_time = timer_msleep( timer->cur_ms );
+		lost_ms = timer_msleep( timer->cur_ms );
 		/* 减少列表中所有定时器的剩余等待时间 */
-		TimerList_NoLockShortenTime( timer_list, lost_time );
+		TimerList_NoLockShortenTime( timer_list, lost_ms );
 		Queue_Unlock( timer_list );
 		DEBUG_MSG("timer id: %d, lost_time: %d, timer->cur_ms: %d,"
 			" timer->total_ms: %d\n",
