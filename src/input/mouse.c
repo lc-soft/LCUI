@@ -93,10 +93,10 @@ LCUI_API int LCUIMouse_ButtonUp( int key_code )
 	LCUI_Event event;
 	LCUI_Pos pos;
 	
-	if( button_state[key_code] == LCUIKEYSTATE_PRESSED ) {
+	if( button_state[key_code] == LCUIKEYSTATE_RELEASE ) {
 		return -1;
 	}
-	LCUIKey_Free( key_code );
+	button_state[key_code] = LCUIKEYSTATE_RELEASE;
 	event.type = LCUI_MOUSEBUTTONUP;
 	pos = LCUICursor_GetPos();
 	event.button.x = pos.x;
