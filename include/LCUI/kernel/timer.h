@@ -43,6 +43,10 @@
 
 LCUI_BEGIN_HEADER
 
+void LCUI_StartTicks( void );
+
+uint_t LCUI_GetTicks( void );
+
 /** 
  * 设置定时器
  * 定时器的作用是让一个任务在经过指定时间后才执行
