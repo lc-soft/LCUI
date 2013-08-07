@@ -27,60 +27,60 @@
  * @brief	字体数据库管理模块。
  * @author	刘超 <lc-soft@live.cn>
  * @warning
- * 版权所有 (C) 2012-2013 归属于							\n
+ * 版权所有 (C) 2012-2013 归属于						\n
  * 刘超										\n
  * 										\n
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。	\n
  * 										\n
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)					\n
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)				\n
  * 										\n
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。		\n
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。	\n
  * 										\n
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特定用途	\n
- * 的隐含担保，详情请参照GPLv2许可协议。						\n
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特定\n
+ * 用途的隐含担保，详情请参照GPLv2许可协议。					\n
  * 										\n
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果	\n
  * 没有，请查看：<http://www.gnu.org/licenses/>. 				\n
  * ******************************************************************************/
- 
+
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_ERROR_H
 #include LC_FONT_H
 
-#define NAME_MAX_LEN	256	/** 最大名字长度 */
-#define PATH_MAX_LEN	1024	/** 最大路径长度 */
+#define NAME_MAX_LEN	256	/**< 最大名字长度 */
+#define PATH_MAX_LEN	1024	/**< 最大路径长度 */
 
 typedef struct LCUI_FontBMPItem_ {
-	int pixel_size;			/** 位图像素大小 */
-	LCUI_FontBMP *bitmap;		/** 位图数据 */
+	int pixel_size;			/**< 位图像素大小 */
+	LCUI_FontBMP *bitmap;		/**< 位图数据 */
 } LCUI_FontBMPItem;
 
 typedef struct LCUI_FontDataItem_ {
-	int font_id;			/** 字体信息ID */
-	LCUI_Queue font_bmp;		/** 位图库 */
+	int font_id;			/**< 字体信息ID */
+	LCUI_Queue font_bmp;		/**< 位图库 */
 } LCUI_FontDataItem;
 
 typedef struct LCUI_FontCharItem_ {
-	wchar_t char_code;		/** 字符码 */
-	LCUI_Queue data;		/** 与该字符关联的数据 */
+	wchar_t char_code;		/**< 字符码 */
+	LCUI_Queue data;		/**< 与该字符关联的数据 */
 } LCUI_FontCharItem;
 
 typedef struct LCUI_FontInfo_ {
-	int id;				/** 字体信息ID */
-	char style_name[NAME_MAX_LEN];	/** 风格名 */
-	char family_name[NAME_MAX_LEN];	/** 字族名 */
-	char filepath[PATH_MAX_LEN];	/** 字体文件路径 */
+	int id;				/**< 字体信息ID */
+	char style_name[NAME_MAX_LEN];	/**< 风格名 */
+	char family_name[NAME_MAX_LEN];	/**< 字族名 */
+	char filepath[PATH_MAX_LEN];	/**< 字体文件路径 */
 	FT_Face face;
 } LCUI_FontInfo;
 
 static int font_count = 0;
-static FT_Library library = NULL;		/** FreeType 库句柄 */
-static LCUI_BOOL database_init = FALSE;		/** 标记，指示数据库是否初始化 */
-static LCUI_Queue font_database;		/** 字体信息数据库 */
-static LCUI_Queue fontbitmap_database;		/** 字体位图数据库 */
-static LCUI_FontInfo *default_font = NULL;	/** 指向默认字体信息的指针 */
-static LCUI_FontInfo *in_core_font = NULL;	/** 指向内置字体的信息的指针 */
+static FT_Library library = NULL;		/**< FreeType 库句柄 */
+static LCUI_BOOL database_init = FALSE;		/**< 标记，指示数据库是否初始化 */
+static LCUI_Queue font_database;		/**< 字体信息数据库 */
+static LCUI_Queue fontbitmap_database;		/**< 字体位图数据库 */
+static LCUI_FontInfo *default_font = NULL;	/**< 指向默认字体信息的指针 */
+static LCUI_FontInfo *in_core_font = NULL;	/**< 指向内置字体的信息的指针 */
 
 static void FontLIB_DestroyBMP( void *arg )
 {
@@ -137,7 +137,7 @@ static void FontLIB_CharInit( LCUI_FontCharItem *item )
 			FontLIB_DestroyData );
 }
 
-/* 初始化字体数据库 */
+/** 初始化字体数据库 */
 LCUI_API void FontLIB_Init( void )
 {
 	if( database_init ) {
@@ -169,9 +169,8 @@ LCUI_API FT_Library FontLIB_GetLibrary(void)
 }
 #endif
 
-/* 通过字体文件路径来查找字体信息，并获取字体ID */
-LCUI_API int
-FontLIB_FindInfoByFilePath( const char *filepath )
+/** 通过字体文件路径来查找字体信息，并获取字体ID */
+LCUI_API int FontLIB_FindInfoByFilePath( const char *filepath )
 {
 	int i, n;
 	LCUI_FontInfo *item;
@@ -192,9 +191,8 @@ FontLIB_FindInfoByFilePath( const char *filepath )
 	return -2;
 }
 
-/* 获取指定字体ID的字体face对象句柄 */
-LCUI_API LCUI_FontInfo*
-FontLIB_GetFont( int font_id )
+/** 获取指定字体ID的字体信息 */
+static LCUI_FontInfo* FontLIB_GetFont( int font_id )
 {
 	int i, n;
 	LCUI_FontInfo *item;
@@ -204,7 +202,7 @@ FontLIB_GetFont( int font_id )
 	}
 	n = Queue_GetTotal( &font_database );
 	for(i=0; i<n; ++i) {
-		item = Queue_Get( &font_database, i );
+		item = (LCUI_FontInfo*)Queue_Get( &font_database, i );
 		if( !item ) {
 			continue;
 		}
@@ -215,9 +213,8 @@ FontLIB_GetFont( int font_id )
 	return NULL;
 }
 
-/* 获取指定字族名的字体ID */
-LCUI_API int
-FontLIB_GetFontIDByFamilyName( const char *family_name )
+/** 获取指定字族名的字体ID */
+LCUI_API int FontLIB_GetFontIDByFamilyName( const char *family_name )
 {
 	int i, n;
 	LCUI_FontInfo *item;
@@ -227,7 +224,7 @@ FontLIB_GetFontIDByFamilyName( const char *family_name )
 	}
 	n = Queue_GetTotal( &font_database );
 	for(i=0; i<n; ++i) {
-		item = Queue_Get( &font_database, i );
+		item = (LCUI_FontInfo*)Queue_Get( &font_database, i );
 		if( !item ) {
 			continue;
 		}
@@ -239,9 +236,8 @@ FontLIB_GetFontIDByFamilyName( const char *family_name )
 	return -2;
 }
 
-/* 获取指定字体ID的字体face对象句柄 */
-LCUI_API FT_Face
-FontLIB_GetFontFace( int font_id )
+/** 获取指定字体ID的字体face对象句柄 */
+LCUI_API FT_Face FontLIB_GetFontFace( int font_id )
 {
 	LCUI_FontInfo *info;
 	info = FontLIB_GetFont( font_id );
@@ -251,9 +247,8 @@ FontLIB_GetFontFace( int font_id )
 	return info->face;
 }
 
-/* 获取默认的字体ID */
-LCUI_API int
-FontLIB_GetDefaultFontID( void )
+/** 获取默认的字体ID */
+LCUI_API int FontLIB_GetDefaultFontID( void )
 {
 	if( !default_font ) {
 		return -1;
@@ -261,9 +256,8 @@ FontLIB_GetDefaultFontID( void )
 	return default_font->id;
 }
 
-/* 设定默认的字体 */
-LCUI_API void
-FontLIB_SetDefaultFont( int id )
+/** 设定默认的字体 */
+LCUI_API void FontLIB_SetDefaultFont( int id )
 {
 	LCUI_FontInfo *p;
 	p = FontLIB_GetFont( id );
@@ -272,13 +266,14 @@ FontLIB_SetDefaultFont( int id )
 	}
 }
 
-/* 添加字体族，并返回该字族的ID */
-LCUI_API int
-FontLIB_AddFontInfo(	const char *family_name, const char *style_name, 
-			const char *filepath, FT_Face face )
+/** 添加字体族，并返回该字族的ID */
+static int FontLIB_AddFontInfo(	const char *family_name,
+				const char *style_name, 
+				const char *filepath,
+				FT_Face face )
 {
 	LCUI_FontInfo *info;
-	info = malloc( sizeof(LCUI_FontInfo) );
+	info = (LCUI_FontInfo*)malloc( sizeof(LCUI_FontInfo) );
 	info->id = ++font_count;
 	strncpy( info->family_name, family_name, NAME_MAX_LEN );
 	strncpy( info->style_name, style_name, NAME_MAX_LEN );
@@ -288,15 +283,15 @@ FontLIB_AddFontInfo(	const char *family_name, const char *style_name,
 	return info->id;
 }
 
-static LCUI_FontBMPItem *
-FontLIB_GetBMPItem( LCUI_FontDataItem *data_item, int pixel_size )
+static LCUI_FontBMPItem *FontLIB_GetBMPItem(	LCUI_FontDataItem *data_item,
+						int pixel_size )
 {
 	int i, n;
 	LCUI_FontBMPItem *item;
 	
 	n = Queue_GetTotal( &data_item->font_bmp );
 	for( i=0; i<n; ++i ) {
-		item = Queue_Get( &data_item->font_bmp, i );
+		item = (LCUI_FontBMPItem*)Queue_Get( &data_item->font_bmp, i );
 		if( !item ) {
 			continue;
 		}
@@ -307,8 +302,8 @@ FontLIB_GetBMPItem( LCUI_FontDataItem *data_item, int pixel_size )
 	return NULL;
 }
 
-static LCUI_FontDataItem *
-FontLIB_GetDataItem( LCUI_FontCharItem *char_item, int id )
+static LCUI_FontDataItem *FontLIB_GetDataItem(	LCUI_FontCharItem *char_item,
+						int id )
 {
 	int i, n;
 	LCUI_FontDataItem *item;
@@ -326,15 +321,14 @@ FontLIB_GetDataItem( LCUI_FontCharItem *char_item, int id )
 	return NULL;
 }
 
-static LCUI_FontCharItem *
-FontLIB_GetCharItem( wchar_t char_code )
+static LCUI_FontCharItem *FontLIB_GetCharItem( wchar_t char_code )
 {
 	int i, n;
 	LCUI_FontCharItem *item;
 	
 	n = Queue_GetTotal( &fontbitmap_database );
 	for( i=0; i<n; ++i ) {
-		item = Queue_Get( &fontbitmap_database, i );
+		item = (LCUI_FontCharItem*)Queue_Get( &fontbitmap_database, i );
 		if( !item ) {
 			continue;
 		}
@@ -345,14 +339,16 @@ FontLIB_GetCharItem( wchar_t char_code )
 	return NULL;
 }
 
-/* 
+/**
  * 添加一个字体位图数据至数据库中
- * 注意：调用此函数后，作为参数fontbmp_buff的变量，不能被free掉，否则，数据库中记录
+ * @warning
+ * 调用此函数后，作为参数fontbmp_buff的变量，不能被free掉，否则，数据库中记录
  * 的此数据会无效 
  * */
-LCUI_API LCUI_FontBMP*
-FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
-			int pixel_size,	 LCUI_FontBMP *fontbmp_buff )
+LCUI_API LCUI_FontBMP* FontLIB_AddFontBMP(	wchar_t char_code,
+						int font_id,
+						int pixel_size,
+						LCUI_FontBMP *fontbmp_buff )
 {
 	LCUI_FontCharItem *font;
 	LCUI_FontDataItem *data;
@@ -364,7 +360,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 	/* 获取字体数据句柄，如果获取失败，则新增 */
 	font = FontLIB_GetCharItem( char_code );
 	if( !font ) {
-		font = malloc( sizeof(LCUI_FontCharItem) );
+		font = (LCUI_FontCharItem*)malloc( sizeof(LCUI_FontCharItem) );
 		if( !font ) {
 			return NULL;
 		}
@@ -379,7 +375,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 	/* 获取字体字族句柄，如果获取失败，则新增 */
 	data = FontLIB_GetDataItem( font, font_id );
 	if( !data ) {
-		data = malloc( sizeof(LCUI_FontDataItem) );
+		data = (LCUI_FontDataItem*)malloc( sizeof(LCUI_FontDataItem) );
 		if( !data ) {
 			return NULL;
 		}
@@ -391,7 +387,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 	/* 获取字体位图句柄，如果获取失败，则新增 */
 	bmp = FontLIB_GetBMPItem( data, pixel_size );
 	if( !bmp ) {
-		bmp = malloc( sizeof(LCUI_FontBMPItem) );
+		bmp = (LCUI_FontBMPItem*)malloc( sizeof(LCUI_FontBMPItem) );
 		if( !bmp ) {
 			return NULL;
 		}
@@ -402,7 +398,7 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 	
 	/* 如果该指针为NULL，那么就申请一块空间 */
 	if( NULL == bmp->bitmap ) {
-		bmp->bitmap = malloc( sizeof(LCUI_FontBMP) );
+		bmp->bitmap = (LCUI_FontBMP*)malloc( sizeof(LCUI_FontBMP) );
 		if( !bmp->bitmap ) {
 			return NULL;
 		}
@@ -412,9 +408,20 @@ FontLIB_AddFontBMP(	wchar_t char_code, int font_id,
 	return bmp->bitmap;
 }
 
-/* 获取字体位图数据 */
-LCUI_API LCUI_FontBMP*
-FontLIB_GetFontBMP( wchar_t char_code, int font_id, int pixel_size )
+/** 
+ * 获取库中的字体位图
+ * @param[in] char_code
+ *	字符的Unicode码
+ * @param[in] font_id
+ *	字体信息的编号
+ * @param[in] pixel_size
+ *	字体位图的像素尺寸
+ * @return
+ *	获取失败返回NULL，正常则返回指向字体位图的指针
+ */
+LCUI_API LCUI_FontBMP* FontLIB_GetFontBMP(	wchar_t char_code,
+						int font_id,
+						int pixel_size )
 {
 	LCUI_FontCharItem *font;
 	LCUI_FontDataItem *data;
@@ -442,9 +449,35 @@ FontLIB_GetFontBMP( wchar_t char_code, int font_id, int pixel_size )
 	return bmp->bitmap;
 }
 
-/* 载入字体值数据库中 */
-LCUI_API int
-FontLIB_LoadFontFile( const char *filepath )
+/** 
+ * 获取库中现有的字体位图，若没有则载入新的
+ * @param[in] font_id
+ *	字体信息的编号
+ * @param[in] ch
+ *	字符的Unicode码
+ * @param[in] pixel_size
+ *	字体位图的像素尺寸
+ * @return
+ *	获取失败返回NULL，正常则返回指向字体位图的指针
+ */
+LCUI_API LCUI_FontBMP* FontLIB_GetExistFontBMP(	int font_id,
+						wchar_t ch,
+						int pixel_size )
+{
+	LCUI_FontBMP *font_bmp, bmp_buff;
+
+	font_bmp = FontLIB_GetFontBMP( ch, font_id, pixel_size );
+	if( font_bmp ) {
+		return font_bmp;
+	}
+	FontBMP_Init( &bmp_buff );
+	FontBMP_Load( &bmp_buff, font_id, ch, pixel_size );
+	font_bmp = FontLIB_AddFontBMP( ch, font_id, pixel_size, &bmp_buff );
+	return font_bmp;
+}
+
+/** 载入字体值数据库中 */
+LCUI_API int FontLIB_LoadFontFile( const char *filepath )
 {
 	int id;
 #ifdef LCUI_FONT_ENGINE_FREETYPE
@@ -511,7 +544,8 @@ static int FontLIB_AddInCoreFontInfo( void )
 #else
 #define MAX_FONTFILE_NUM	1
 #endif
-/* 初始化字体处理模块 */
+
+/** 初始化字体处理模块 */
 void LCUIModule_Font_Init( void )
 {
 	char *p;
@@ -550,7 +584,7 @@ void LCUIModule_Font_Init( void )
 	}
 }
 
-/* 停用字体处理模块 */
+/** 停用字体处理模块 */
 void LCUIModule_Font_End( void )
 {
 	FontLIB_DestroyAll();
