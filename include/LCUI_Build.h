@@ -156,6 +156,10 @@
 
 #define _DEBUG_MSG(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
 
+#if defined(WIN32) && !defined(__cplusplus)
+#define inline __inline
+#endif
+
 #if defined(WIN32) || defined(_WIN32)
 #define LCUI_BUILD_IN_WIN32
 #define LCUI_THREAD_WIN32
