@@ -119,7 +119,7 @@ TextLayer_GetCharBMP ( LCUI_TextStyle *default_style, LCUI_CharData *data )
 			pixel_size = default_style->pixel_size;
 		}
 	}
-	data->bitmap = Get_ExistFontBMP( default_style->font_id, 
+	data->bitmap = FontLIB_GetExistFontBMP( default_style->font_id, 
 			data->char_code, pixel_size );
 }
 
@@ -938,7 +938,7 @@ TextLayer_PrintInfo( LCUI_TextLayer *layer )
 			char_ptr = Queue_Get( &row_ptr->string, i );
 			printf( "char code: %d, display: %d\n", 
 			char_ptr->char_code, char_ptr->display );
-			Print_FontBMP_Info( char_ptr->bitmap );
+			FontBMP_PrintInfo( char_ptr->bitmap );
 		}
 	}
 	printf("\n\n");
