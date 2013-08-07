@@ -71,12 +71,6 @@ LCUI_API int FontLIB_GetDefaultFontID( void );
 /** 设定默认的字体 */
 LCUI_API void FontLIB_SetDefaultFont( int id );
 
-/** 添加字体族，并返回该字族的ID */
-LCUI_API int FontLIB_AddFontInfo(	const char *family_name,
-					const char *style_name, 
-					const char *filepath,
-					FT_Face face );
-
 /**
  * 添加一个字体位图数据至数据库中
  * @warning
