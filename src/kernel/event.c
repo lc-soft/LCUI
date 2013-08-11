@@ -153,11 +153,11 @@ LCUI_DispatchUserEvent( LCUI_Event *event )
 static void LCUI_EventLoop( void *unused )
 {
 	LCUI_Event event;
-	int delay_time = 1;
+	int timeout_count = 0;
 
 	while( active ) {
 		if( LCUI_PollEvent( &event ) ) {
-			delay_time = 1;
+			timeout_count = 0;
 			switch( event.type ) {
 			case LCUI_KEYDOWN:
 			case LCUI_KEYUP:
@@ -171,10 +171,12 @@ static void LCUI_EventLoop( void *unused )
 				break;
 			}
 		} else {
-			if( delay_time <= 15 ) {
-				delay_time += 1;
+			++timeout_count;
+			if( timeout_count <= 15 ) {
+				continue;
 			}
-			LCUI_MSleep( delay_time );
+			LCUI_MSleep( 5 );
+			timeout_count = 0;
 		}
 	}
 	_LCUIThread_Exit( NULL );
@@ -329,12 +331,15 @@ LCUI_KeyboardEvent_Connect(
 		void (*func)(LCUI_KeyboardEvent*, void*),
 		void *arg )
 {
+	int ret;
 	LCUI_Func func_data;
+
 	if( !Get_FuncData( &func_data, (CallBackFunc)func, NULL, arg ) ) {
 		return -1;
 	}
-	return EventSlots_Add(	&sys_event_slots,
-				LCUI_KEYDOWN, &func_data );
+	ret = EventSlots_Add( &sys_event_slots, LCUI_KEYDOWN, &func_data );
+	ret |= EventSlots_Add( &sys_event_slots, LCUI_KEYUP, &func_data );
+	return ret;
 }
 
 /* 将回调函数与鼠标移动事件进行连接 */
