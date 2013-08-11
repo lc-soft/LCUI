@@ -80,11 +80,10 @@ proc_dev_list ( void *arg )
 {
 	LCUI_Queue *dev_list;
 	dev_func_data *data_ptr;
-	int total, i, need_sleep, sleep_time = 1;
+	int total, i, timeout_count = 0;
 	
 	dev_list = (LCUI_Queue *)arg;
 	while( LCUI_Active() ) {
-		need_sleep = TRUE;
 		total = Queue_GetTotal( dev_list );
 		for(i=0; i<total; ++i) {
 			data_ptr = (dev_func_data*)Queue_Get( dev_list, i );
@@ -92,17 +91,14 @@ proc_dev_list ( void *arg )
 				continue;
 			}
 			if( data_ptr->proc_func() ) {
-				need_sleep = FALSE;
+				++timeout_count;
 			}
 		}
-		if( need_sleep ) {
-			LCUI_MSleep( sleep_time );
-			if( sleep_time < 100 ) {
-				sleep_time += 1;
-			}
-		} else {
-			sleep_time = 1;
+		if( timeout_count > 20 ) {
+			LCUI_MSleep( 10 );
+			timeout_count = 0;
 		}
+		LCUI_MSleep( 5 );
 	}
 	LCUIThread_Exit(NULL);
 }
