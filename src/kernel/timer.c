@@ -92,7 +92,7 @@ uint_t LCUI_GetTicks( void )
 /*----------------------------- Private ------------------------------*/
 static uint_t timer_msleep( int n_ms )
 {
-	uint_t lost_ms;
+	uint_t lost_ms = 0;
 	LCUI_StartTicks();
 	while(!break_sleep) {
 		lost_ms = LCUI_GetTicks();
@@ -180,6 +180,9 @@ static timer_data* TimerList_Update( LCUI_Queue *timer_list )
 	total = Queue_GetTotal( timer_list );
 	for(i=0; i<total; ++i){
 		timer = (timer_data*)Queue_Get( timer_list , i);
+		if( timer == NULL ) {
+			continue;
+		}
 		if( timer->state == STATE_RUN ) {
 			break;
 		}
