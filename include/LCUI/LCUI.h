@@ -91,6 +91,13 @@ typedef struct	LCUI_Widget_	LCUI_Widget;
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
 
+#ifdef LCUI_BUILD_IN_WIN32
+typedef __int64 int64_t;
+#else
+typedef long long int64_t;
+#endif
+
+
 /********** 按键信息 ************/
 typedef struct LCUI_Key_ {
 	int code;
@@ -229,6 +236,7 @@ LCUI_END_HEADER
 #include LC_MISC_H
 #include LC_KERNEL_MAIN_H
 #include LC_KERNEL_DEV_H
+#include LC_KERNEL_SLEEPER_H
 #include LC_KERNEL_TIMER_H
 #include LC_KERNEL_TASK_H
 #include LC_KERNEL_EVENT_H
