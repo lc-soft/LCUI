@@ -973,8 +973,8 @@ static int Graph_RGBAReplaceRGB(	LCUI_Graph *back,
 			des->rgba[0][des_n] = _ALPHA_BLEND( src->rgba[0][src_n], 255, src->rgba[3][src_n] );
 			des->rgba[1][des_n] = _ALPHA_BLEND( src->rgba[1][src_n], 255, src->rgba[3][src_n] );
 			des->rgba[2][des_n] = _ALPHA_BLEND( src->rgba[2][src_n], 255, src->rgba[3][src_n] );
-			++src->w;
-			++des->w;
+			++src_n;
+			++des_n;
 		}
 		des_row_start += des->w;
 		src_row_start += src->w;
