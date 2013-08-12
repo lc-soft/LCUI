@@ -54,12 +54,13 @@
 #include <Windows.h>
 #endif
 
+#define MS_PER_FRAME 1000/MAX_FRAMES_PER_SEC;		/**< 每帧画面的最少耗时(ms) */
+
 static LCUI_BOOL i_am_init = FALSE;			/**< 标志，指示本模块是否初始化 */
 static LCUI_BOOL need_sync_area = FALSE;		/**< 标志，指示是否需要同步无效区域 */
 static LCUI_RectQueue screen_invalid_area;		/**< 屏幕无效区域记录 */
 static LCUI_Mutex glayer_list_mutex;			/**< 图层列表的互斥锁 */
 static LCUI_Screen screen;				/**< 屏幕信息 */
-static int frame_per_ms = 1000/MAX_FRAMES_PER_SEC;	/**< 每帧画面的最少耗时(ms) */
 
 /** 获取屏幕宽度 */
 LCUI_API int LCUIScreen_GetWidth( void )
@@ -243,7 +244,7 @@ static int LCUIScreen_SyncInvalidArea( void )
 /** 更新屏幕内的图形显示 */
 static void LCUIScreen_Update( void* unused )
 {
-	int val, n_frame;
+	int val, n_frame, ms_per_frame;
 	clock_t lost_time, diff_val, n_ms, cur_time, one_frame_lost_time;
 	LCUI_Rect screen_area;
 
@@ -253,12 +254,12 @@ static void LCUIScreen_Update( void* unused )
 	screen_area.height = screen.size.h;
 	LCUIScreen_InvalidArea( screen_area );
 
-	cur_time = clock();
+	cur_time = LCUI_GetTickCount();
 	n_frame = 0;
 	diff_val = 0;
-
+	ms_per_frame = MS_PER_FRAME;
 	while(LCUI_Sys.state == ACTIVE) {
-		one_frame_lost_time = clock();
+		one_frame_lost_time = LCUI_GetTickCount();
 		/* 更新鼠标位置 */
 		LCUICursor_UpdatePos();
 		/* 处理所有部件消息 */
@@ -271,20 +272,17 @@ static void LCUIScreen_Update( void* unused )
 		if( val > 0 ) {
 			LCUIScreen_SyncFrameBuffer();
 		}
-		one_frame_lost_time = clock() - one_frame_lost_time;
-		/* 将单位转换为毫秒 */
-		one_frame_lost_time *= 1000;
-		one_frame_lost_time /= CLOCKS_PER_SEC;
+		one_frame_lost_time = LCUI_GetTicks( one_frame_lost_time );
 		/* 计算剩余睡眠时间 */
-		n_ms = frame_per_ms - one_frame_lost_time;
+		n_ms = ms_per_frame - one_frame_lost_time;
 		/* 减去上次多睡的时间 */
 		n_ms = n_ms - diff_val;
 		if( n_ms > 0 ) {
-			lost_time = clock();
+			lost_time = LCUI_GetTickCount();
 			LCUI_MSleep( n_ms );
-			lost_time = clock() - lost_time;
-			/* 保存本次睡眠实际耗时(单位为毫秒) */
-			diff_val = lost_time * 1000 / CLOCKS_PER_SEC;
+			lost_time = LCUI_GetTicks( lost_time );
+			/* 保存本次睡眠实际耗时) */
+			diff_val = lost_time;
 			/* 减去理论上的睡眠时间，得出本次多睡的时间 */
 			if( lost_time > n_ms ) {
 				diff_val -= n_ms;
@@ -296,12 +294,25 @@ static void LCUIScreen_Update( void* unused )
 			diff_val = 0 - n_ms;
 		}
 		++n_frame;
-		val = clock() - cur_time;
-		/* 若与上次FPS值的更新至少相差1秒，则更新FPS值 */
-		if( val >= CLOCKS_PER_SEC ) {
-			current_screen_fps = n_frame * CLOCKS_PER_SEC / val;
-			cur_time = clock();
+		val = LCUI_GetTicks( cur_time );
+		/* 若与上次FPS值的更新相差大约1秒，则更新FPS值 */
+		if( val >= 985 ) {
+			/* fps = 1000 / (losttime / frames) */
+			current_screen_fps = 1000*n_frame/val;
+			/* 记录本次更新FPS值的时间 */
+			cur_time = LCUI_GetTickCount();
+			/* 重置这些变量 */
 			n_frame = 0;
+			diff_val = 0;
+			ms_per_frame = MS_PER_FRAME;
+		} else {
+			/* 若当前帧数小于最大帧数，则更新剩余帧的停留时间 */
+			if( n_frame < MAX_FRAMES_PER_SEC ) {
+				ms_per_frame = 1000-val;
+				ms_per_frame /= (MAX_FRAMES_PER_SEC-n_frame);
+			} else {
+				ms_per_frame = MS_PER_FRAME;
+			}
 		}
 	}
 
