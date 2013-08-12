@@ -42,10 +42,12 @@
 #define __LCUI_KERNEL_TIMER_H__
 
 LCUI_BEGIN_HEADER
+	
+LCUI_API void LCUI_StartTicks( void );
 
-void LCUI_StartTicks( void );
+LCUI_API int64_t LCUI_GetTickCount( void );
 
-uint_t LCUI_GetTicks( void );
+LCUI_API int64_t LCUI_GetTicks( int64_t start_ticks );
 
 /** 
  * 设置定时器
