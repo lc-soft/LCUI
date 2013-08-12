@@ -84,9 +84,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI.hpp">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Config.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
@@ -106,9 +103,6 @@
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Graph.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Graph.hpp">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\LCUI_GraphLayer.h">
@@ -133,9 +127,6 @@
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Thread.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Thread.hpp">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\font\bitmapfont.h">
@@ -251,6 +242,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\misc\dirent.h">
       <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\kernel\sleeper.h">
+      <Filter>头文件\LCUI\kernel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -445,6 +439,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\LCUI_Memory.c">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\listview.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kernel\sleeper.c">
+      <Filter>源文件\kernel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

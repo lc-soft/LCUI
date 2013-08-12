@@ -61,6 +61,8 @@
     <CodeAnalysisRuleAssemblies />
     <EmbedManifest>false</EmbedManifest>
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\..\bin\</OutDir>
+    <IntDir>$(SolutionDir)..\..\bin\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Library|Win32'">
     <TargetName>$(ProjectName)</TargetName>
@@ -72,6 +74,9 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
+    <TargetName>$(ProjectName)_D</TargetName>
+    <OutDir>$(SolutionDir)..\..\bin\</OutDir>
+    <IntDir>$(SolutionDir)..\..\bin\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -79,15 +84,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>LCUI_EXPORTS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)LCUI\;$(SolutionDir)include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4819;4244;4996</DisableSpecificWarnings>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libpng15.lib;jpeg.lib;freetype2412.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>libpng15.lib;jpeg.lib;freetype2412_D.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -199,8 +205,8 @@
     <ClInclude Include="..\..\..\include\LCUI\kernel\main.h" />
     <ClInclude Include="..\..\..\include\LCUI\kernel\task.h" />
     <ClInclude Include="..\..\..\include\LCUI\kernel\timer.h" />
+    <ClInclude Include="..\..\..\include\LCUI\kernel\sleeper.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI.h" />
-    <ClInclude Include="..\..\..\include\LCUI\LCUI.hpp" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Config.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Cursor.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Display.h" />
@@ -208,7 +214,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Error.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Font.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Graph.h" />
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Graph.hpp" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_GraphLayer.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Input.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_InputMethod.h" />
@@ -218,7 +223,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Resources.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_StyleLibrary.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Thread.h" />
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Thread.hpp" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Widget.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\delay.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\dirent.h" />
@@ -252,6 +256,7 @@
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\checkbox.c" />
     <ClCompile Include="..\..\..\src\gui\widget\label.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\listview.c" />
     <ClCompile Include="..\..\..\src\gui\widget\menu.c" />
     <ClCompile Include="..\..\..\src\gui\widget\picturebox.c" />
     <ClCompile Include="..\..\..\src\gui\widget\progressbar.c" />
@@ -272,6 +277,7 @@
     <ClCompile Include="..\..\..\src\kernel\main.c" />
     <ClCompile Include="..\..\..\src\kernel\task.c" />
     <ClCompile Include="..\..\..\src\kernel\timer.c" />
+    <ClCompile Include="..\..\..\src\kernel\sleeper.c" />
     <ClCompile Include="..\..\..\src\LCUI_Cursor.c" />
     <ClCompile Include="..\..\..\src\LCUI_Error.c" />
     <ClCompile Include="..\..\..\src\LCUI_Graph.c">
