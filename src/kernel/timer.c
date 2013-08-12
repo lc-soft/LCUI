@@ -61,24 +61,49 @@ typedef struct _timer_data {
 
 static LCUI_Queue global_timer_list;		/**< 定时器列表 */
 static LCUI_BOOL timer_thread_active = FALSE;	/**< 定时器线程是否活动 */
-static LCUI_BOOL break_sleep = FALSE;		/**< 是否需要打断睡眠 */
+static LCUI_Sleeper global_timer_waiter;	/**< 用于实现定时器睡眠的等待者 */
 
 #ifdef LCUI_BUILD_IN_WIN32
 
-#define TIME_WRAP_VALUE	(~(DWORD)0)
+#include <Mmsystem.h>
+#pragma comment(lib, "Winmm.lib")
 
-static DWORD start_ticks;
+#define TIME_WRAP_VALUE	(~(int64_t)0)
 
-void LCUI_StartTicks( void )
+static BOOL hires_timer_available;	/**< 标志，指示高精度计数器是否可用 */
+static double hires_ticks_per_second;	/**< 高精度计数器每秒的滴答数 */
+
+LCUI_API void LCUI_StartTicks( void )
 {
-	start_ticks = GetTickCount();
+	LARGE_INTEGER hires;
+
+	if( QueryPerformanceFrequency(&hires) ) {
+		hires_timer_available = TRUE;
+		hires_ticks_per_second = hires.QuadPart;
+	} else {
+		hires_timer_available = FALSE;
+		timeBeginPeriod(1);
+	}
 }
 
-uint_t LCUI_GetTicks( void )
+LCUI_API int64_t LCUI_GetTickCount( void )
 {
-	DWORD now_ticks;
+	LARGE_INTEGER hires_now;
+	
+	if (hires_timer_available) {
+		QueryPerformanceCounter(&hires_now);
+		hires_now.QuadPart *= 1000;
+		hires_now.QuadPart /= hires_ticks_per_second;
+		return (int64_t)hires_now.QuadPart;
+	}
+	return (int64_t)timeGetTime();
+}
 
-	now_ticks = GetTickCount();
+LCUI_API int64_t LCUI_GetTicks( int64_t start_ticks )
+{
+	int64_t now_ticks;
+
+	now_ticks = LCUI_GetTickCount();
 	if ( now_ticks < start_ticks ) {
 		return (TIME_WRAP_VALUE-start_ticks) + now_ticks;
 	}
@@ -90,20 +115,6 @@ uint_t LCUI_GetTicks( void )
 #endif
 
 /*----------------------------- Private ------------------------------*/
-static uint_t timer_msleep( int n_ms )
-{
-	uint_t lost_ms = 0;
-	LCUI_StartTicks();
-	while(!break_sleep) {
-		lost_ms = LCUI_GetTicks();
-		if( lost_ms >= (uint_t)n_ms ) {
-			break;
-		}
-		LCUI_MSleep(1);
-	}
-	break_sleep = FALSE;
-	return lost_ms;
-}
 
 /** 初始化定时器列表 */
 static void TimerList_Init( LCUI_Queue *timer_list )
@@ -193,7 +204,7 @@ static timer_data* TimerList_Update( LCUI_Queue *timer_list )
 	}
 	if(timer->cur_ms > 0) {
 		Queue_Lock( timer_list );
-		lost_ms = timer_msleep( timer->cur_ms );
+		lost_ms = LCUISleeper_StartSleep( global_timer_waiter, timer->cur_ms );
 		/* 减少列表中所有定时器的剩余等待时间 */
 		TimerList_NoLockShortenTime( timer_list, lost_ms );
 		Queue_Unlock( timer_list );
@@ -291,6 +302,7 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 				LCUI_BOOL reuse )
 {
 	timer_data timer;
+	
 	timer.state = STATE_RUN;
 	timer.total_ms = timer.cur_ms = n_ms;
 	timer.callback_func = callback_func;
@@ -298,8 +310,10 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 	timer.id = rand();
 	timer.app_id = LCUIApp_GetSelfID();
 	timer.arg = arg;
+	
+	/* 打断定时器睡眠者的睡眠 */
+	LCUISleeper_BreakSleep( global_timer_waiter );
 
-	break_sleep = TRUE;
 	Queue_Lock( &global_timer_list );
 	if( 0 > Queue_Add( &global_timer_list, &timer ) ) {
 		Queue_Unlock( &global_timer_list );
@@ -323,8 +337,8 @@ LCUI_API int LCUITimer_Free( int timer_id )
 {
 	int i, total;
 	timer_data *timer;
-
-	break_sleep = TRUE;
+	
+	LCUISleeper_BreakSleep( global_timer_waiter );
 	Queue_Lock( &global_timer_list );
 	total = Queue_GetTotal( &global_timer_list );
 	for(i=0; i<total; ++i) {
@@ -339,7 +353,7 @@ LCUI_API int LCUITimer_Free( int timer_id )
 	}
 	Queue_Unlock( &global_timer_list );
 	if( i < total ) {
-		break_sleep = TRUE;
+		LCUISleeper_BreakSleep( global_timer_waiter );
 		return 0;
 	}
 	return -1;
@@ -356,8 +370,8 @@ LCUI_API int LCUITimer_Free( int timer_id )
 LCUI_API int LCUITimer_Pause( int timer_id )
 {
 	timer_data *timer;
-
-	break_sleep = TRUE;
+	
+	LCUISleeper_BreakSleep( global_timer_waiter );
 	Queue_Lock( &global_timer_list );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
@@ -379,8 +393,8 @@ LCUI_API int LCUITimer_Pause( int timer_id )
 LCUI_API int LCUITimer_Continue( int timer_id )
 {
 	timer_data *timer;
-
-	break_sleep = TRUE;
+	
+	LCUISleeper_BreakSleep( global_timer_waiter );
 	Queue_Lock( &global_timer_list );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
@@ -404,8 +418,8 @@ LCUI_API int LCUITimer_Continue( int timer_id )
 LCUI_API int LCUITimer_Reset( int timer_id, long int n_ms )
 {
 	timer_data *timer;
-
-	break_sleep = TRUE;
+	
+	LCUISleeper_BreakSleep( global_timer_waiter );
 	Queue_Lock( &global_timer_list );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
@@ -444,6 +458,8 @@ static void timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
 /* 初始化定时器模块 */
 LCUI_API void LCUIModule_Timer_Init( void )
 {
+	LCUI_StartTicks();
+	global_timer_waiter = LCUISleeper_New();
 	timer_thread_start( &LCUI_Sys.timer_thread, &global_timer_list );
 }
 
