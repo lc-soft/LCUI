@@ -2,8 +2,8 @@ AUTOMAKE_OPTIONS=foreign
 INSTINCLUDES=button.h \
 picturebox.h \
 progressbar.h \
-label.h label.hpp\
-window.h window.hpp\
+label.h \
+window.h\
 menu.h \
 checkbox.h \
 radiobutton.h \
