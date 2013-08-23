@@ -314,6 +314,9 @@ Widget_UpdateChildStaticPos( LCUI_Widget *widget )
 	//_DEBUG_MSG("queue total: %d\n", total);
 	for(i=total-1,y=0,x=0; i>=0; --i) {
 		wptr = Queue_Get( queue, i );
+		if( wptr == NULL ) {
+			continue;
+		}
 		/* 过滤掉定位类型不是static和relative的部件 */
 		if(wptr->pos_type != POS_TYPE_STATIC
 		&& wptr->pos_type != POS_TYPE_RELATIVE ) {
@@ -1638,6 +1641,18 @@ Widget_SetPosType( LCUI_Widget *widget, POS_TYPE pos_type )
 	Widget_UpdatePos( widget );
 }
 
+
+/* 获取部件的堆叠顺序 */
+LCUI_API int Widget_GetZIndex( LCUI_Widget *widget )
+{
+	LCUI_GraphLayer *glayer;
+	glayer = Widget_GetGraphLayer(widget);
+	if( glayer == NULL ) {
+		return -1;
+	}
+	return glayer->z_index;
+}
+
 /* 设置部件的堆叠顺序 */
 LCUI_API int
 Widget_SetZIndex( LCUI_Widget *widget, int z_index )
@@ -1663,11 +1678,16 @@ Widget_SetZIndex( LCUI_Widget *widget, int z_index )
 	return 0;
 }
 
-LCUI_API void
-Widget_SetAlpha(LCUI_Widget *widget, unsigned char alpha)
-/* 功能：设定部件的透明度 */
+/** 获取部件的透明度 */
+LCUI_API unsigned char Widget_GetAlpha( LCUI_Widget *widget )
 {
-	if( GraphLayer_GetAlpha( widget->glayer ) != alpha) {
+	return GraphLayer_GetAlpha( widget->glayer );
+}
+
+/** 设定部件的透明度 */
+LCUI_API void Widget_SetAlpha( LCUI_Widget *widget, unsigned char alpha )
+{
+	if( Widget_GetAlpha( widget ) != alpha) {
 		GraphLayer_SetAlpha( widget->glayer, alpha );
 		Widget_Refresh( widget );
 	}
