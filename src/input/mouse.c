@@ -142,7 +142,7 @@ static LCUI_BOOL proc_mouse( void )
 	static struct timeval tv;
 	static LCUI_Pos pos;
 
-	if (mouse_data.state == REMOVE || mouse_data.fd < 0) {
+	if (mouse_state == REMOVE || mouse_fd < 0) {
 		return FALSE;
 	}
 	/* 设定select等待I/o的最长时间 */
@@ -150,20 +150,20 @@ static LCUI_BOOL proc_mouse( void )
 	tv.tv_usec = 0;
 
 	FD_ZERO (&readfds);
-	FD_SET (mouse_data.fd, &readfds);
+	FD_SET (mouse_fd, &readfds);
 
-	tmp = select (mouse_data.fd+1, &readfds, NULL, NULL, &tv);
+	tmp = select (mouse_fd+1, &readfds, NULL, NULL, &tv);
 	if (tmp == 0) {
 		//printf("Time out!\n");
 		return FALSE;
 	}
-	if ( !FD_ISSET (mouse_data.fd, &readfds) ) {
+	if ( !FD_ISSET (mouse_fd, &readfds) ) {
 		return FALSE;
 	}
-	tmp = read (mouse_data.fd, buf, 6);
+	tmp = read (mouse_fd, buf, 6);
 	if (tmp <= 0){
 		if (tmp < 0) {
-			mouse_data.state = REMOVE;
+			mouse_state = REMOVE;
 		}
 		return FALSE;
 	}
@@ -181,25 +181,25 @@ static LCUI_BOOL proc_mouse( void )
 	pos.y = pos.y<0 ? 0:pos.y;
 	/* 应用鼠标游标的位置变更 */
 	LCUICursor_SetPos( pos );
+	LCUI_PushMouseMotionEvent( pos );
 	switch ( buf[0]&0x07 ) {
 	    case 1:		/* 鼠标左键被按下 */
-		LCUIMouse_ButtonDown( new_pos, LCUIKEY_LEFTBUTTON );
-		LCUIMouse_ButtonUp( new_pos, LCUIKEY_RIGHTBUTTON );
+		LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
+		LCUIMouse_ButtonUp( LCUIKEY_RIGHTBUTTON );
 		break;
 	    case 2:		/* 鼠标右键被按下 */
-		LCUIMouse_ButtonDown( new_pos, LCUIKEY_RIGHTBUTTON );
-		LCUIMouse_ButtonUp( new_pos, LCUIKEY_LEFTBUTTON );
+		LCUIMouse_ButtonDown( LCUIKEY_RIGHTBUTTON );
+		LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
 		break;
 	    case 3:		/* 鼠标左右键被按下 */
-		LCUIMouse_ButtonDown( new_pos, LCUIKEY_RIGHTBUTTON );
-		LCUIMouse_ButtonDown( new_pos, LCUIKEY_LEFTBUTTON );
+		LCUIMouse_ButtonDown( LCUIKEY_RIGHTBUTTON );
+		LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
 		break;
 	    default:		/* 默认是释放的 */
-		LCUIMouse_ButtonUp( new_pos, LCUIKEY_RIGHTBUTTON );
-		LCUIMouse_ButtonUp( new_pos, LCUIKEY_LEFTBUTTON );
+		LCUIMouse_ButtonUp( LCUIKEY_RIGHTBUTTON );
+		LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
 		break;
 	}
-	LCUI_PushMouseMotionEvent( new_pos );
 	return TRUE;
 }
 #else
@@ -241,20 +241,20 @@ LCUI_API LCUI_BOOL Enable_Mouse_Input(void)
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 	char *msdev;
 
-	if(mouse_data.state != REMOVE) {
+	if(mouse_state != REMOVE) {
 		return FALSE;
 	}
 	msdev = getenv("LCUI_MOUSE_DEVICE");
 	if( msdev == NULL ) {
 		msdev = MS_DEV;
 	}
-	if ((mouse_data.fd = open (MS_DEV, O_RDONLY)) < 0) {
+	if ((mouse_fd = open (MS_DEV, O_RDONLY)) < 0) {
 		printf("failed to open %s.\n", msdev );
 		perror(NULL);
-		mouse_data.state = REMOVE;
+		mouse_state = REMOVE;
 		return FALSE;
 	}
-	mouse_data.state = INSIDE;
+	mouse_state = INSIDE;
 	printf("open %s successfuly.\n", msdev);
 #else
 	/* 隐藏windows的鼠标游标 */
@@ -267,12 +267,12 @@ LCUI_API LCUI_BOOL Enable_Mouse_Input(void)
 LCUI_API LCUI_BOOL Disable_Mouse_Input(void)
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
-	if(mouse_data.state != INSIDE) {
+	if(mouse_state != INSIDE) {
 		return FALSE;
 	}
 	LCUICursor_Hide();
-	close (mouse_data.fd);
-	mouse_data.state = REMOVE;
+	close( mouse_fd );
+	mouse_state = REMOVE;
 #endif
 	return TRUE;
 }
@@ -281,8 +281,8 @@ LCUI_API LCUI_BOOL Disable_Mouse_Input(void)
 LCUI_API int LCUIModule_Mouse_Init( void )
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
-	mouse_data.fd = -1;
-	mouse_data.state = REMOVE;	/* 鼠标为移除状态 */
+	mouse_fd = -1;
+	mouse_state = REMOVE;	/* 鼠标为移除状态 */
 	/* 启用鼠标输入处理 */
 	nobuff_printf("enable mouse input: ");
 #endif
