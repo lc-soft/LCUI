@@ -344,6 +344,7 @@ static int Convert_FTGlyph(	LCUI_FontBMP *des,
 	FT_Done_Glyph(glyph);
 	return size;
 }
+#endif
 
 /** 载入字体位图 */
 LCUI_API int FontBMP_Load(	LCUI_FontBMP *buff,
@@ -393,4 +394,3 @@ LCUI_API int FontBMP_Load(	LCUI_FontBMP *buff,
 #endif
 }
 
-#endif
