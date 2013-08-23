@@ -79,7 +79,7 @@ LCUI_API uchar_t const * in_core_font_8x8( void );
  * 检测位图数据是否有效
  * @return 有效返回真，无效返回假
  */
-inline LCUI_BOOL FontBMP_Valid( LCUI_FontBMP *bitmap )
+extern inline LCUI_BOOL FontBMP_Valid( LCUI_FontBMP *bitmap )
 {
 	if( bitmap && bitmap->width > 0 && bitmap->rows > 0) {
 		return TRUE;
