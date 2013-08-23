@@ -132,10 +132,8 @@ docs/CodingStyle.zh-cn.md \
 test/README.zh-cn \
 test/Makefile.in \
 test/Makefile.am \
-test/image.png \
 test/style.css \
 test/logo_128x128.png \
-test/border.png \
 test/cross.png \
 test/ring.png \
 test/bg.png \
@@ -150,7 +148,6 @@ test/test_checkbox.c \
 test/ts_calibrate.c \
 test/test_radiobtn.c \
 test/test_rect_cut.c \
-test/test_viewimage.c \
 test/test_window.c \
 test/test_gaussian_blur.c \
 test/test_widget_dock.c \
