@@ -45,26 +45,37 @@
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-
+#ifdef LCUI_BUILD_IN_LINUX
+#include <errno.h>
+#endif
 /** 新建一个睡眠者 */
-LCUI_Sleeper LCUISleeper_New(void)
+int LCUISleeper_Create( LCUI_Sleeper *p_sleeper )
 {
+#ifdef LCUI_BUILD_IN_WIN32
 	/* 创建一个事件对象：
 	 * 使用默认安全符
 	 * 在事件被释放后，自动复原为无信号状态
 	 * 初始状态为无信号状态
 	 * 不指定名字，无名
 	 */
-	return CreateEvent( NULL, FALSE, FALSE, NULL );
+	*p_sleeper = CreateEvent( NULL, FALSE, FALSE, NULL );
+	if( *p_sleeper == 0 ) {
+		return -1;
+	}
+	return 0;
+#else
+	return sem_init( p_sleeper, 0, 0 );
+#endif
 }
 
 /** 让指定睡眠者睡一段时间 */
-unsigned int LCUISleeper_StartSleep( LCUI_Sleeper waiter, unsigned int ms )
+unsigned int LCUISleeper_StartSleep( LCUI_Sleeper* sleeper, unsigned int ms )
 {
+#ifdef LCUI_BUILD_IN_WIN32
 	int ret;
 	int64_t lost_time;
 	lost_time = LCUI_GetTickCount();
-	ret = WaitForSingleObject( waiter, ms );
+	ret = WaitForSingleObject( *sleeper, ms );
 	lost_time = LCUI_GetTicks( lost_time );
 	switch( ret ) {
 	case WAIT_OBJECT_0: return (unsigned int)lost_time;
@@ -72,14 +83,36 @@ unsigned int LCUISleeper_StartSleep( LCUI_Sleeper waiter, unsigned int ms )
 	case WAIT_FAILED: 
 	default: break;
 	}
-	return 0;
+	return ret;
+#else
+	int ret;
+	int64_t lost_time;
+	struct timespec ts;
+
+	clock_gettime(CLOCK_REALTIME, &ts );
+	ts.tv_sec += ms/1000;
+	ts.tv_nsec += ms%1000*1000*1000;
+	lost_time = LCUI_GetTickCount();
+	ret = sem_timedwait( sleeper, &ts );
+	lost_time = LCUI_GetTicks( lost_time );
+	switch( ret ) {
+	case 0: return (unsigned int)lost_time;
+	case ETIMEDOUT: return ms;
+	default: break;
+	}
+	return ret;
+#endif
 }
 
 /** 打断目标睡眠者的睡眠 */
-int LCUISleeper_BreakSleep( LCUI_Sleeper waiter )
+int LCUISleeper_BreakSleep( LCUI_Sleeper* sleeper )
 {
-	if( SetEvent( waiter ) ) {
+#ifdef LCUI_BUILD_IN_WIN32
+	if( SetEvent( *sleeper ) ) {
 		return 0;
 	}
 	return -1;
+#else
+	return sem_post( sleeper );
+#endif
 }

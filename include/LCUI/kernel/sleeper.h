@@ -51,16 +51,19 @@ LCUI_BEGIN_HEADER
 #ifdef LCUI_BUILD_IN_WIN32
 #include <windows.h>
 typedef HANDLE LCUI_Sleeper;
+#else
+#include <semaphore.h>
+typedef sem_t LCUI_Sleeper;
 #endif
 
 /** 新建一个睡眠者 */
-LCUI_Sleeper LCUISleeper_New(void);
+int LCUISleeper_Create( LCUI_Sleeper *p_sleeper );
 
 /** 让指定睡眠者睡一段时间 */
-unsigned int LCUISleeper_StartSleep( LCUI_Sleeper waiter, unsigned int ms );
+unsigned int LCUISleeper_StartSleep( LCUI_Sleeper *sleeper, unsigned int ms );
 
 /** 打断目标睡眠者的睡眠 */
-int LCUISleeper_BreakSleep( LCUI_Sleeper waiter );
+int LCUISleeper_BreakSleep( LCUI_Sleeper *sleeper );
 
 LCUI_END_HEADER
 
