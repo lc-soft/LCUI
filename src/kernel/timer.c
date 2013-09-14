@@ -206,6 +206,7 @@ static void TimerList_Print( LCUI_Queue *timer_list )
 static void TimerThread( void *arg )
 {
 	int i, n;
+	long int n_ms;
 	LCUI_Func func_data;
 	LCUI_Queue *timer_list;
 	timer_data *timer = NULL;
@@ -238,7 +239,15 @@ static void TimerThread( void *arg )
 		/* 减去处于暂停状态的时长 */
 		lost_ms -= timer->pause_ms;
 		if( lost_ms < timer->total_ms ) {
-			continue;
+			Queue_Lock( timer_list );
+			n_ms = timer->total_ms - lost_ms;
+			LCUISleeper_StartSleep( &timer_sleeper, n_ms );
+			Queue_Unlock( timer_list );
+			lost_ms = LCUI_GetTicks( timer->start_time );
+			lost_ms -= timer->pause_ms;
+			if( lost_ms < timer->total_ms ) {
+				continue;
+			}
 		}
 		DEBUG_MSG("timer: %d, start_time: %I64dms, cur_time: %I64dms, lost_ms: %I64d, total_ms: %ld\n", 
 			timer->id, timer->start_time, LCUI_GetTickCount(), lost_ms, timer->total_ms);
