@@ -49,7 +49,7 @@
 #include <errno.h>
 #endif
 /** 新建一个睡眠者 */
-int LCUISleeper_Create( LCUI_Sleeper *p_sleeper )
+LCUI_API int LCUISleeper_Create( LCUI_Sleeper *p_sleeper )
 {
 #ifdef LCUI_BUILD_IN_WIN32
 	/* 创建一个事件对象：
@@ -69,7 +69,8 @@ int LCUISleeper_Create( LCUI_Sleeper *p_sleeper )
 }
 
 /** 让指定睡眠者睡一段时间 */
-unsigned int LCUISleeper_StartSleep( LCUI_Sleeper* sleeper, unsigned int ms )
+LCUI_API unsigned int LCUISleeper_StartSleep(	LCUI_Sleeper* sleeper,
+						unsigned int ms )
 {
 #ifdef LCUI_BUILD_IN_WIN32
 	int ret;
@@ -105,7 +106,7 @@ unsigned int LCUISleeper_StartSleep( LCUI_Sleeper* sleeper, unsigned int ms )
 }
 
 /** 打断目标睡眠者的睡眠 */
-int LCUISleeper_BreakSleep( LCUI_Sleeper* sleeper )
+LCUI_API int LCUISleeper_BreakSleep( LCUI_Sleeper* sleeper )
 {
 #ifdef LCUI_BUILD_IN_WIN32
 	if( SetEvent( *sleeper ) ) {
