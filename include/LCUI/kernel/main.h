@@ -44,20 +44,19 @@
 LCUI_BEGIN_HEADER
 
 /************************ LCUI程序的数据 *******************************/
-typedef struct LCUI_App_
-{
+typedef struct LCUI_App_ {
 	LCUI_ID id;		/* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
 	void (*func)(void);	/* 在LCUI退出时调用的函数 */
 	LCUI_Queue tasks;	/* 程序的任务队列 */
 	LCUI_Queue events;	/* 事件队列 */
 	LCUI_Queue widget_lib;	/* 部件类型库 */
+	LCUI_Sleeper mainloop_sleeper;
 }
 LCUI_App;
 /**********************************************************************/
 
 /***************************整个LCUI的数据 *****************************/
-typedef struct LCUI_System_
-{
+typedef struct LCUI_System_ {
 	int state;		/* 状态 */ 
 	int mode;		/* LCUI的运行模式 */
 	LCUI_BOOL init;		/* 指示LCUI是否初始化过 */
