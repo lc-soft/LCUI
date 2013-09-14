@@ -66,8 +66,7 @@ static void LCUI_MainLoopQueue_Init( void )
 }
 
 /* 查找处于运行状态的主循环 */
-static LCUI_MainLoop *
-LCUI_MainLoopQueue_Find( void )
+static LCUI_MainLoop *LCUI_MainLoopQueue_Find( void )
 {
 	int i, total;
 	LCUI_MainLoop *loop;
@@ -82,8 +81,7 @@ LCUI_MainLoopQueue_Find( void )
 	return NULL;
 }
 
-static void
-LCUI_MainLoopQueue_Sort( void )
+static void LCUI_MainLoopQueue_Sort( void )
 {
 	int i, j, total;
 	LCUI_MainLoop *cur_loop, *next_loop;
@@ -107,8 +105,7 @@ LCUI_MainLoopQueue_Sort( void )
 	}
 }
 
-static LCUI_MainLoop*
-LCUI_MainLoop_GetAvailable(void)
+static LCUI_MainLoop* LCUI_MainLoop_GetAvailable(void)
 {
 	int i, total;
 	LCUI_MainLoop *loop;
@@ -128,8 +125,7 @@ LCUI_MainLoop_GetAvailable(void)
 }
 
 /* 新建一个主循环 */
-LCUI_API LCUI_MainLoop*
-LCUI_MainLoop_New( void )
+LCUI_API LCUI_MainLoop* LCUI_MainLoop_New( void )
 {
 	LCUI_MainLoop *loop;
 	
@@ -155,8 +151,7 @@ LCUI_MainLoop_New( void )
 }
 
 /* 设定主循环等级，level值越高，处理主循环退出时，也越早处理该循环 */
-LCUI_API int
-LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
+LCUI_API int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
 {
 	if( loop == NULL ) {
 		return -1;
@@ -166,26 +161,12 @@ LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
 	return 0;
 }
 
-
-static LCUI_BOOL
-LCUIApp_HaveTask( LCUI_App *app )
-{
-	if( !app ) {
-		return FALSE; 
-	}
-	if(Queue_GetTotal(&app->tasks) > 0) {
-		return TRUE; 
-	}
-	return FALSE;
-}
-
-static int 
-LCUIApp_RunTask( LCUI_App *app )
+static int LCUIApp_RunTask( LCUI_App *app )
 { 
 	LCUI_Task *task;
 
 	Queue_Lock( &app->tasks );
-	task = Queue_Get( &app->tasks, 0 );
+	task = (LCUI_Task*)Queue_Get( &app->tasks, 0 );
 	if( task == NULL ) {
 		Queue_Unlock( &app->tasks );
 		return -1;
@@ -209,47 +190,86 @@ LCUIApp_RunTask( LCUI_App *app )
 	return 0;
 }
 
-/* 运行目标循环 */
-LCUI_API int
-LCUI_MainLoop_Run( LCUI_MainLoop *loop )
+static LCUI_BOOL LCUIApp_ReceiveTask( LCUI_App *app )
+{
+	if( app == NULL ) {
+		return FALSE;
+	}
+	while( Queue_GetTotal(&app->tasks) == 0 ) {
+		LCUISleeper_StartSleep( &app->mainloop_sleeper, 1000 );
+	}
+	return TRUE;
+}
+
+#ifdef LCUI_BUILD_IN_WIN32
+static void MainLoop_Thread( void *arg )
 {
 	LCUI_App *app;
-	int idle_time = 1;
-#ifdef LCUI_BUILD_IN_WIN32
-	MSG msg;
-#endif
+	LCUI_MainLoop *loop;
+	
+	loop = (LCUI_MainLoop*)arg;
 	app = LCUIApp_GetSelf();
 	if( !app ) {
 		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
-		return -1;
+		LCUIThread_Exit((void*)-1);
+		return;
 	}
+	while( !loop->quit && LCUI_Sys.state == ACTIVE ) {
+		LCUIApp_ReceiveTask( app );
+		LCUIApp_RunTask( app );
+	}
+	LCUIThread_Exit(NULL);
+}
+#endif
+
+/** 运行目标主循环 */
+LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
+#ifdef LCUI_BUILD_IN_WIN32
+{
+	MSG msg;
+	int ret;
+	LCUI_Thread t;
 	DEBUG_MSG("loop: %p, enter\n", loop);
 	loop->running = TRUE;
+	LCUIThread_Create( &t, MainLoop_Thread, (void*)loop );
 	while( !loop->quit && LCUI_Sys.state == ACTIVE ) {
-		if( LCUIApp_HaveTask(app) ) {
-			idle_time = 1;
-			LCUIApp_RunTask( app ); 
-		} else {
-			LCUI_MSleep (idle_time);
-			if (idle_time < MAX_APP_IDLE_TIME) {
-				idle_time += 1;
-			}
+		ret = GetMessage( &msg, Win32_GetSelfHWND(), 0, 0 );
+		if( ret == -1 || ret == 0) {
+			loop->quit = TRUE;
+			break;
 		}
-#ifdef LCUI_BUILD_IN_WIN32
-		if( PeekMessage( &msg, Win32_GetSelfHWND(), 0, 0, PM_REMOVE) ) {
-			TranslateMessage (&msg) ;
-			DispatchMessage (&msg) ;
-		}
-#endif
+		TranslateMessage( &msg );
+		DispatchMessage( &msg );
+	}
+	LCUIThread_Join( t, NULL );
+	loop->running = FALSE;
+	DEBUG_MSG("loop: %p, exit\n", loop);
+	return 0;
+#else
+	LCUI_App *app;
+	LCUI_MainLoop *loop;
+	
+	DEBUG_MSG("loop: %p, enter\n", loop);
+	loop = (LCUI_MainLoop*)arg;
+	app = LCUIApp_GetSelf();
+	if( !app ) {
+		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
+		LCUIThread_Exit((void*)-1);
+		return;
+	}
+	loop->running = TRUE;
+	while( !loop->quit && LCUI_Sys.state == ACTIVE ) {
+		LCUIApp_ReceiveTask( app );
+		LCUIApp_RunTask( app );
 	}
 	loop->running = FALSE;
 	DEBUG_MSG("loop: %p, exit\n", loop);
 	return 0;
+#endif
 }
 
-/* 标记目标主循环需要退出 */
-LCUI_API int
-LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
+/** 标记目标主循环需要退出 */
+LCUI_API int LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
 {
 	if( loop == NULL ) {
 		loop = LCUI_MainLoopQueue_Find();
@@ -262,8 +282,8 @@ LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
 	return 0;
 }
 
-static void
-LCUIApp_QuitAllMainLoops( LCUI_ID app_id )
+/** 退出所有主循环 */
+static void LCUIApp_QuitAllMainLoops( LCUI_ID app_id )
 {
 	int i, total;
 	LCUI_MainLoop *loop;
@@ -282,17 +302,16 @@ LCUIApp_QuitAllMainLoops( LCUI_ID app_id )
 	Queue_Unlock( &mainloop_queue );
 }
 
-static void
-LCUI_DestroyMainLoopQueue(void)
+/** 销毁主循环队列 */
+static void LCUI_DestroyMainLoopQueue(void)
 {
 	Queue_Destroy( &mainloop_queue );
 }
 /*----------------------- End MainLoop -------------------------------*/
 
 /************************* App Management *****************************/
-/* 根据程序的ID，获取指向程序数据结构的指针 */
-LCUI_API LCUI_App*
-LCUIApp_Find( LCUI_ID id )
+/** 根据程序的ID，获取指向程序数据结构的指针 */
+LCUI_API LCUI_App* LCUIApp_Find( LCUI_ID id )
 {
 	LCUI_App *app; 
 	int i, total;
@@ -310,9 +329,8 @@ LCUIApp_Find( LCUI_ID id )
 	return NULL;
 }
 
-/* 获取指向程序数据的指针 */
-LCUI_API LCUI_App* 
-LCUIApp_GetSelf( void )
+/** 获取指向程序数据的指针 */
+LCUI_API LCUI_App* LCUIApp_GetSelf( void )
 {
 	LCUI_Thread id;
 	
@@ -328,9 +346,8 @@ LCUIApp_GetSelf( void )
 	return LCUIApp_Find( (LCUI_ID)id );
 }
 
-/* 获取程序ID */
-LCUI_API LCUI_ID
-LCUIApp_GetSelfID( void )
+/** 获取程序ID */
+LCUI_API LCUI_ID LCUIApp_GetSelfID( void )
 {
 	LCUI_App *app;
 	app = LCUIApp_GetSelf();
@@ -340,15 +357,17 @@ LCUIApp_GetSelfID( void )
 	return (LCUI_ID)app->id;
 }
 
-/* 初始化程序数据结构体 */
+/** 初始化程序数据结构体 */
 static void LCUIApp_Init( LCUI_App *app )
 {
 	app->id = 0;
 	app->func = NULL;
 	AppTasks_Init( &app->tasks );
 	WidgetLib_Init(&app->widget_lib);
+	LCUISleeper_Create( &app->mainloop_sleeper );
 }
 
+/** 销毁全部程序数据 */
 static void LCUI_DestroyAllApps(void)
 {
 	LCUI_App *app; 
@@ -357,7 +376,7 @@ static void LCUI_DestroyAllApps(void)
 	Queue_Lock( &global_app_list );
 	total = Queue_GetTotal(&global_app_list);
 	for (i = 0; i < total; ++i) {
-		app = Queue_Get(&global_app_list, 0);
+		app = (LCUI_App*)Queue_Get(&global_app_list, 0);
 		if(app == NULL) {
 			continue;
 		}
@@ -367,7 +386,7 @@ static void LCUI_DestroyAllApps(void)
 	Queue_Destroy( &global_app_list );
 }
 
-/* 用于退出LCUI，释放LCUI占用的资源 */
+/** 退出 LCUI 并释放LCUI占用的资源 */
 LCUI_API void LCUI_Quit( void )
 {
 	LCUI_Sys.state = KILLED;	/* 状态标志置为KILLED */
@@ -389,7 +408,7 @@ LCUI_API void LCUI_Quit( void )
 }
 
 
-/* 从程序列表中删除一个LCUI程序信息 */
+/** 从程序列表中删除一个LCUI程序信息 */
 static int LCUIAppList_Delete( LCUI_ID app_id )
 {
 	int pos = -1;
@@ -402,7 +421,7 @@ static int LCUIAppList_Delete( LCUI_ID app_id )
 	}
 	/* 查找程序信息所在队列的位置 */
 	for (i = 0; i < total; ++i) {
-		app = Queue_Get(&global_app_list, i);
+		app = (LCUI_App*)Queue_Get(&global_app_list, i);
 		if(app->id == app_id) {
 			pos = i;
 			break;
@@ -427,9 +446,9 @@ static void LCUIApp_Destroy( void *arg )
 	if( app->func ) {
 		app->func();
 	}
-	LCUIApp_CancelAllThreads( app->id ); /* 撤销这个程序的所有线程 */
-	LCUIApp_DestroyAllWidgets( app->id ); /* 销毁这个程序的所有部件 */
-	LCUIApp_QuitAllMainLoops( app->id ); /* 退出所有的主循环 */
+	LCUIApp_CancelAllThreads( app->id );	/* 撤销这个程序的所有线程 */
+	LCUIApp_DestroyAllWidgets( app->id );	/* 销毁这个程序的所有部件 */
+	LCUIApp_QuitAllMainLoops( app->id );	/* 退出所有的主循环 */
 }
 
 /* 初始化程序数据表 */
@@ -447,16 +466,15 @@ static int LCUIAppList_Add( void )
 {
 	LCUI_App app;
 	
-	LCUIApp_Init (&app); /* 初始化程序数据结构体 */
-	app.id	= LCUIThread_SelfID(); /* 保存ID */ 
-	Queue_Add(&global_app_list, &app); /* 添加至队列 */
-	LCUIApp_RegisterMainThread( app.id ); /* 注册程序主线程 */
+	LCUIApp_Init( &app );			/* 初始化程序数据结构体 */
+	app.id = LCUIThread_SelfID();		/* 保存ID */ 
+	Queue_Add(&global_app_list, &app);	/* 添加至队列 */
+	LCUIApp_RegisterMainThread( app.id );	/* 注册程序主线程 */
 	return 0;
 }
 
-/* 注册终止函数，以在LCUI程序退出时调用 */
-LCUI_API int
-LCUIApp_AtQuit( void (*callback_func)(void) )
+/** 注册一个函数，以在LCUI程序退出时调用 */
+LCUI_API int LCUIApp_AtQuit( void (*callback_func)(void) )
 {
 	LCUI_App *app;
 	app = LCUIApp_GetSelf();
@@ -467,13 +485,12 @@ LCUIApp_AtQuit( void (*callback_func)(void) )
 	return 0;
 }
 
-/* 退出程序 */
+/** 退出程序 */
 static int LCUIApp_Quit(void)
 {
 	LCUI_App *app;
 	app = LCUIApp_GetSelf();
 	if( !app ) {
-		printf("%s (): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
 		return -1;
 	} 
 	LCUIAppList_Delete(app->id); 
@@ -487,7 +504,7 @@ static int LCUIApp_Quit(void)
 /*********************** App Management End ***************************/
 
 
-/* 打印LCUI的信息 */
+/** 打印LCUI的信息 */
 static void LCUI_ShowCopyrightText(void)
 {
 	printf(
@@ -499,7 +516,7 @@ static void LCUI_ShowCopyrightText(void)
 	"========================================\n", LCUI_VERSION );
 }
 
-/* 检测LCUI是否活动 */
+/** 检测LCUI是否活动 */
 LCUI_API LCUI_BOOL LCUI_Active(void)
 {
 	if(LCUI_Sys.state == ACTIVE) {
@@ -519,7 +536,6 @@ LCUI_API int LCUI_Init( int w, int h, int mode )
 	if( !LCUI_Sys.init ) {
 		LCUI_Sys.init = TRUE;
 		LCUI_Sys.state = ACTIVE;
-		srand(time(NULL));
 		LCUI_ShowCopyrightText();
 		LCUIAppList_Init();
 		/* 注册程序 */
@@ -560,18 +576,16 @@ LCUI_API int LCUI_Init( int w, int h, int mode )
  * 功能：LCUI程序的主循环
  * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
  *  */
-LCUI_API int
-LCUI_Main( void )
+LCUI_API int LCUI_Main( void )
 {
 	LCUI_MainLoop *loop;
 	loop = LCUI_MainLoop_New();
 	LCUI_MainLoop_Run( loop );
-	return LCUIApp_Quit ();
+	return LCUIApp_Quit();
 }
 
 /* 获取LCUI的版本 */
-LCUI_API int
-LCUI_GetSelfVersion( char *out )
+LCUI_API int LCUI_GetSelfVersion( char *out )
 {
 	return sprintf(out, "%s", LCUI_VERSION);
 }
