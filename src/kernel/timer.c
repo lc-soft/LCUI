@@ -164,7 +164,10 @@ static void TimerList_UpdateTimerPos(	LCUI_Queue *timer_list,
 		tmp_time_left -= p_tmp_timer->pause_ms;
 		tmp_time_left = p_tmp_timer->total_ms - tmp_time_left;
 		/* 若该定时器的剩余定时时长不大于当前定时器，则记录 */
-		if( des_i != -1 && time_left >= tmp_time_left ) {
+		if( des_i == -1 && time_left >= tmp_time_left ) {
+			DEBUG_MSG("src timer: %d, pos: %d, , cur_ms: %I64dms, des timer: %d, pos: %d, cur_ms: %I64dms\n",
+				p_timer->id, src_i, LCUI_GetTicks(p_timer->start_time), 
+				p_tmp_timer->id, des_i, LCUI_GetTicks(p_tmp_timer->start_time) );
 			des_i = n;
 			/* 如果已经找到源位置，则退出循环 */
 			if( src_i != -1 ) {
@@ -174,10 +177,12 @@ static void TimerList_UpdateTimerPos(	LCUI_Queue *timer_list,
 	}
 	/* 若目标位置无效，则将末尾作为目标位置 */
 	if( des_i == -1 ) {
-		des_i = Queue_GetTotal( &global_timer_list );
+		DEBUG_MSG("tip\n");
+		des_i = Queue_GetTotal( &global_timer_list )-1;
 	}
 	/* 若源位置和目标位置有效，则开始移动 */
 	if( src_i != -1 ) {
+		DEBUG_MSG("src: %d, des: %d\n", src_i, des_i );
 		Queue_Move( &global_timer_list, des_i, src_i );
 	}
 	Queue_Unlock( &global_timer_list );
@@ -190,16 +195,16 @@ static void TimerList_Print( LCUI_Queue *timer_list )
 	timer_data *timer;
 
 	total = Queue_GetTotal( timer_list );
-	DEBUG_MSG("timer list(%d) start:\n", total);
+	_DEBUG_MSG("timer list(%d) start:\n", total);
 	for(i=0; i<total; ++i) {
 		timer = (timer_data*)Queue_Get( timer_list , i);
 		if( !timer ) {
 			continue;
 		}
-		DEBUG_MSG("[%02d] %d, lost_ms: %I64dms, total_ms: %dms\n",
-			i, timer->id, LCUI_GetTicks(timer->start_time), timer->total_ms );
+		_DEBUG_MSG("[%02d] %d, cur_ms: %dms, total_ms: %dms\n",
+			i, timer->id, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
 	}
-	DEBUG_MSG("timer list end\n\n");
+	_DEBUG_MSG("timer list end\n\n");
 }
 
 /** 定时器线程，用于处理列表中各个定时器 */
@@ -220,6 +225,7 @@ static void TimerThread( void *arg )
 		LCUI_MSleep(10);
 	}
 	while( timer_thread_active ) {
+		Queue_Lock( timer_list );
 		n = Queue_GetTotal( timer_list );
 		for(i=0; i<n; ++i) {
 			timer = (timer_data*)Queue_Get( timer_list , i);
@@ -230,6 +236,7 @@ static void TimerThread( void *arg )
 				break;
 			}
 		}
+		Queue_Unlock( timer_list );
 		/* 没有要处理的定时器，停留一段时间再进行下次循环 */
 		if(i >= n || !timer ) {
 			LCUI_MSleep(10);
@@ -238,9 +245,11 @@ static void TimerThread( void *arg )
 		lost_ms = LCUI_GetTicks( timer->start_time );
 		/* 减去处于暂停状态的时长 */
 		lost_ms -= timer->pause_ms;
+		/* 若流失的时间未达到总定时时长 */
 		if( lost_ms < timer->total_ms ) {
 			Queue_Lock( timer_list );
 			n_ms = timer->total_ms - lost_ms;
+			/* 开始睡眠 */
 			LCUISleeper_StartSleep( &timer_sleeper, n_ms );
 			Queue_Unlock( timer_list );
 			lost_ms = LCUI_GetTicks( timer->start_time );
@@ -249,24 +258,25 @@ static void TimerThread( void *arg )
 				continue;
 			}
 		}
-		DEBUG_MSG("timer: %d, start_time: %I64dms, cur_time: %I64dms, lost_ms: %I64d, total_ms: %ld\n", 
-			timer->id, timer->start_time, LCUI_GetTickCount(), lost_ms, timer->total_ms);
-		/* 否则就准备数据 */
+		DEBUG_MSG("timer: %d, start_time: %I64dms, cur_time: %I64dms, cur_ms: %I64d, total_ms: %ld\n", 
+			timer->id, timer->start_time, LCUI_GetTickCount(), timer->total_ms-lost_ms, timer->total_ms);
+		/* 准备任务数据 */
 		func_data.id = timer->app_id;
 		func_data.func = (CallBackFunc)timer->callback_func;
 		func_data.arg[0] = timer->arg;
 		func_data.destroy_arg[0] = FALSE;
 		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */
 		AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_F, &func_data );
+		Queue_Lock( timer_list );
 		/* 若需要重复使用，则重置剩余等待时间 */
 		if( timer->reuse ) {
 			timer->start_time = LCUI_GetTickCount();
 			timer->pause_ms = 0;
 			TimerList_UpdateTimerPos( timer_list, timer );
-			TimerList_Print( timer_list );
 		} else { /* 否则，释放该定时器 */
 			LCUITimer_Free( timer->id );
 		}
+		Queue_Unlock( timer_list );
 	}
 	LCUIThread_Exit(NULL);
 }
@@ -311,9 +321,26 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 				LCUI_BOOL reuse )
 {
 	int n;
-	int64_t t, time_left;
+	int64_t time_left;
 	timer_data timer, *p_timer;
 	static int id = 100;
+
+	/* 打断定时器睡眠者的睡眠 */
+	LCUISleeper_BreakSleep( &timer_sleeper );
+	Queue_Lock( &global_timer_list );
+	n = Queue_GetTotal( &global_timer_list );
+	while(n--) {
+		p_timer = (timer_data*)Queue_Get( &global_timer_list, n );
+		if( !p_timer ) {
+			continue;
+		}
+		time_left = LCUI_GetTicks( p_timer->start_time );
+		time_left -= p_timer->pause_ms;
+		time_left = p_timer->total_ms - time_left;
+		if( time_left <= n_ms ) {
+			break;
+		}
+	}
 
 	timer.id = ++id;
 	timer.app_id = LCUIApp_GetSelfID();
@@ -325,23 +352,6 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 	timer.callback_func = callback_func;
 	timer.arg = arg;
 
-	/* 打断定时器睡眠者的睡眠 */
-	LCUISleeper_BreakSleep( &timer_sleeper );
-	t = LCUI_GetTickCount();
-	Queue_Lock( &global_timer_list );
-	n = Queue_GetTotal( &global_timer_list );
-	while(n--) {
-		p_timer = (timer_data*)Queue_Get( &global_timer_list, n );
-		if( !p_timer ) {
-			continue;
-		}
-		time_left = LCUI_GetTicks( p_timer->start_time );
-		time_left -= p_timer->pause_ms;
-		time_left = p_timer->total_ms - time_left;
-		if( time_left <= p_timer->total_ms ) {
-			break;
-		}
-	}
 	Queue_Insert( &global_timer_list, n+1, &timer );
 	Queue_Unlock( &global_timer_list );
 	DEBUG_MSG("set timer, id: %d, total_ms: %d,app_id: %lu\n", timer.id, timer.total_ms, timer.app_id);
