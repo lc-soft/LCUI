@@ -192,11 +192,14 @@ static int LCUIApp_RunTask( LCUI_App *app )
 
 static LCUI_BOOL LCUIApp_ReceiveTask( LCUI_App *app )
 {
+	unsigned int lost_time = 0;
 	if( app == NULL ) {
 		return FALSE;
 	}
-	while( Queue_GetTotal(&app->tasks) == 0 ) {
-		LCUISleeper_StartSleep( &app->mainloop_sleeper, 1000 );
+	while( Queue_GetTotal(&app->tasks) <= 0 ) {
+		DEBUG_MSG("wait task...\n");
+		lost_time = LCUISleeper_StartSleep( &app->mainloop_sleeper, 1000 );
+		DEBUG_MSG("task are receive, lost time: %ums\n", lost_time);
 	}
 	return TRUE;
 }
@@ -224,8 +227,8 @@ static void MainLoop_Thread( void *arg )
 
 /** 运行目标主循环 */
 LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
-#ifdef LCUI_BUILD_IN_WIN32
 {
+#ifdef LCUI_BUILD_IN_WIN32
 	MSG msg;
 	int ret;
 	LCUI_Thread t;
@@ -247,15 +250,12 @@ LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 	return 0;
 #else
 	LCUI_App *app;
-	LCUI_MainLoop *loop;
-	
 	DEBUG_MSG("loop: %p, enter\n", loop);
-	loop = (LCUI_MainLoop*)arg;
 	app = LCUIApp_GetSelf();
 	if( !app ) {
 		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
 		LCUIThread_Exit((void*)-1);
-		return;
+		return -1;
 	}
 	loop->running = TRUE;
 	while( !loop->quit && LCUI_Sys.state == ACTIVE ) {
