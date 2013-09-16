@@ -241,11 +241,51 @@ static int LCUIScreen_SyncInvalidArea( void )
 	return ret;
 }
 
+static int one_sec_total_frame;		/**< 一秒内的总帧数 */
+static int64_t one_sec_start_time;	/**< 该秒的起始时间 */
+static int one_sec_cur_frames;		/**< 该秒内当前已更新的帧数 */
+
+/** 初始化帧数控制 */
+static void FrameControl_Init( int frames_per_sec )
+{
+	one_sec_total_frame = frames_per_sec;
+	one_sec_start_time = LCUI_GetTickCount();
+	one_sec_cur_frames = 0;
+}
+
+/** 让当前帧停留一段时间 */
+static void FrameControl_RemainFrame(void)
+{
+	int n_ms;
+	int64_t one_sec_lost_ms;
+
+	one_sec_lost_ms = LCUI_GetTicks( one_sec_start_time );
+	/* 如果本秒内流逝的毫秒小于1000毫秒 */
+	if( one_sec_lost_ms >= 1000 ) {
+		one_sec_start_time = LCUI_GetTickCount();
+		current_screen_fps = one_sec_cur_frames;
+		one_sec_lost_ms = 0;
+		one_sec_cur_frames = 0;
+	}
+	/* 计算本秒内剩余的时间(毫秒) */
+	n_ms = 1000 - (int)one_sec_lost_ms;
+	/* 计算剩余帧的平均停留时间 */
+	n_ms /= (one_sec_total_frame - one_sec_cur_frames);
+	/* 小于1毫秒就不睡眠了 */
+	if( n_ms < 1 ) {
+		return;
+	}
+	/* 开始睡眠 */
+	LCUI_MSleep( n_ms );
+	/* 增加已经更新的帧数 */
+	++one_sec_cur_frames;
+}
+
+
 /** 更新屏幕内的图形显示 */
 static void LCUIScreen_Update( void* unused )
 {
-	int val, n_frame, ms_per_frame;
-	clock_t lost_time, diff_val, n_ms, cur_time, one_frame_lost_time;
+	int val;
 	LCUI_Rect screen_area;
 
 	/* 先标记刷新整个屏幕区域 */
@@ -253,13 +293,9 @@ static void LCUIScreen_Update( void* unused )
 	screen_area.width = screen.size.w;
 	screen_area.height = screen.size.h;
 	LCUIScreen_InvalidArea( screen_area );
-
-	cur_time = LCUI_GetTickCount();
-	n_frame = 0;
-	diff_val = 0;
-	ms_per_frame = MS_PER_FRAME;
-	while(LCUI_Sys.state == ACTIVE) {
-		one_frame_lost_time = LCUI_GetTickCount();
+	/* 初始化帧数控制 */
+	FrameControl_Init( MAX_FRAMES_PER_SEC );
+	while( LCUI_Sys.state == ACTIVE ) {
 		/* 更新鼠标位置 */
 		LCUICursor_UpdatePos();
 		/* 处理所有部件消息 */
@@ -272,48 +308,8 @@ static void LCUIScreen_Update( void* unused )
 		if( val > 0 ) {
 			LCUIScreen_SyncFrameBuffer();
 		}
-		one_frame_lost_time = LCUI_GetTicks( one_frame_lost_time );
-		/* 计算剩余睡眠时间 */
-		n_ms = ms_per_frame - one_frame_lost_time;
-		/* 减去上次多睡的时间 */
-		n_ms = n_ms - diff_val;
-		if( n_ms > 0 ) {
-			lost_time = LCUI_GetTickCount();
-			LCUI_MSleep( n_ms );
-			lost_time = LCUI_GetTicks( lost_time );
-			/* 保存本次睡眠实际耗时) */
-			diff_val = lost_time;
-			/* 减去理论上的睡眠时间，得出本次多睡的时间 */
-			if( lost_time > n_ms ) {
-				diff_val -= n_ms;
-			} else {
-				diff_val = 0;
-			}
-		} else {
-			/* 本次剩余的多睡的时间留到下帧再处理 */
-			diff_val = 0 - n_ms;
-		}
-		++n_frame;
-		val = LCUI_GetTicks( cur_time );
-		/* 若与上次FPS值的更新相差大约1秒，则更新FPS值 */
-		if( val >= 985 ) {
-			/* fps = 1000 / (losttime / frames) */
-			current_screen_fps = 1000*n_frame/val;
-			/* 记录本次更新FPS值的时间 */
-			cur_time = LCUI_GetTickCount();
-			/* 重置这些变量 */
-			n_frame = 0;
-			diff_val = 0;
-			ms_per_frame = MS_PER_FRAME;
-		} else {
-			/* 若当前帧数小于最大帧数，则更新剩余帧的停留时间 */
-			if( n_frame < MAX_FRAMES_PER_SEC ) {
-				ms_per_frame = 1000-val;
-				ms_per_frame /= (MAX_FRAMES_PER_SEC-n_frame);
-			} else {
-				ms_per_frame = MS_PER_FRAME;
-			}
-		}
+		/* 让本帧停留一段时间 */
+		FrameControl_RemainFrame();
 	}
 
 	LCUIThread_Exit(NULL);
