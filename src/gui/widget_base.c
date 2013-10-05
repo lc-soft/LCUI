@@ -2449,7 +2449,7 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 	int ret;
 
 	if( data_ptr == NULL ) {
-		return TRUE;
+		return FALSE;
 	}
 	if( widget == NULL ) {
 		widget = &root_widget;
