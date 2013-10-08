@@ -209,7 +209,7 @@ LCUIRect_Cut(	LCUI_Rect	old_rect,
 		LCUI_Rect	new_rect, 
 		LCUI_Queue	*rects_buff )
 {
-	int i; 
+	int i;
 	LCUI_Rect r[5];
 	
 	for(i=0; i<5; ++i) {
@@ -300,11 +300,10 @@ LCUIRect_Cut(	LCUI_Rect	old_rect,
 	//r[3].width -= 1;
 	//r[4].y += 1;
 	//r[4].height -= 1;
-	  
 	for(i=0; i<5; i++) { 
 		//if(debug_mark)
 		//	printf("slip rect[%d]: %d,%d, %d,%d\n", i, r[i].x, r[i].y, r[i].width, r[i].height);
-		Queue_Add(rects_buff, &r[i]); 
+		Queue_Add( rects_buff, &r[i] ); 
 	}
 	return 0;
 }
@@ -539,7 +538,7 @@ RectQueue_Add( LCUI_Queue* queue, LCUI_Rect rect )
 		/* 如果矩形无效，或者被新增的矩形区域包含，则删除 */
 		if ( cur_rect_ptr->width <= 0 || cur_rect_ptr->height <= 0
 		 || LCUIRect_IncludeRect( rect, *cur_rect_ptr) ) {
-			Queue_Delete ( queue, i );
+			Queue_Delete( queue, i );
 			continue;
 		}
 
@@ -554,7 +553,6 @@ RectQueue_Add( LCUI_Queue* queue, LCUI_Rect rect )
 		if( !LCUIRect_Overlay(rect, *cur_rect_ptr) ) {
 			continue;
 		}
-		continue; // 暂时不对相交的矩形进行分割
 		DEBUG_MSG("[%d] rect overlay, start cut\n", i);
 		/* 根据当前区域，分割新区域 */
 		LCUIRect_Cut( *cur_rect_ptr, rect, &rect_buff );
@@ -601,7 +599,6 @@ RectQueue_AddToCurrent( LCUI_RectQueue *queue, LCUI_Rect rect )
 		return RectQueue_Add( &queue->queue[1], rect );
 	}
 }
-
 
 /* 从可用的队列中取出一个矩形区域 */
 LCUI_API LCUI_BOOL
