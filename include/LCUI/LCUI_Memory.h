@@ -54,23 +54,25 @@ void LCUIMM_Init(void);
 /**
  * 添加新的类别记录
  *
- * class_name[in]
+ * @class_name[in]
  *	类别名
- * return
+ * @return
  *	与该类别名对应的ID
- * warning
+ * @warning
  *	class_name指向的最好是全局常量字符串，不能是生存周期短的局部变量
  */
 unsigned int LCUIMM_NewClass( char *class_name );
 
+LCUI_API void LCUIMM_PrintAllClassInfo( void );
+
 /**
  * 分配指定大小的内存空间
  *
- * param[in] 
+ * @param[in] 
  *	size 要分配的内存空间的大小(字节)
- * param[in]
+ * @param[in]
  *	class_id 该内存的分类ID，用于统计不同用途的内存空间大小
- * return
+ * @return
  *	正常返回分配的内存空间的首地址，失败返回NULL
  */
 void *LCUIMM_Alloc( size_t size, unsigned int class_id );
@@ -78,9 +80,9 @@ void *LCUIMM_Alloc( size_t size, unsigned int class_id );
 /** 
  * 释放已动态分配的内存空间
  *
- * param[in]
+ * @param[in]
  *	mem_ptr	指向要释放的内存空间的指针
- * return
+ * @return
  *	正常返回0，内存不能被释放则返回-1
  */
 int LCUIMM_Free( void *mem_ptr );
