@@ -55,7 +55,7 @@
 /* 内存的分类信息 */
 typedef struct mem_info_t_ {
 	unsigned int class_id;	/** 所属分类ID */
-	char *class_name;	/** 指向分类名的指针 */
+	char class_name[32];	/** 分类名 */
 	size_t total_size;	/** 该分类的内存块的总大小 */
 } mem_info_t;
 
@@ -253,7 +253,7 @@ rb_search_auxiliary(	rb_node_t *root, mem_data_t *data,
 	if( save ) { 
 		*save = parent;  
 	}
-	return NULL;  
+	return NULL;
 }
 
 static rb_node_t*
@@ -485,7 +485,7 @@ void LCUIMM_Init(void)
 
 	/* 初始化默认类别的数据 */
 	first_data.mem_info.class_id = 0;
-	first_data.mem_info.class_name = NULL;
+	first_data.mem_info.class_name[0] = 0;
 	first_data.mem_info.total_size = 0;
 
 	rb_tree_init( &global_mem_class_info );
@@ -501,7 +501,8 @@ unsigned int LCUIMM_NewClass( char *class_name )
 	mem_data_t mem_data;
 
 	mem_data.mem_info.class_id = BKDRHash(class_name);
-	mem_data.mem_info.class_name = class_name;
+	strncpy( mem_data.mem_info.class_name, class_name, 32 );
+	mem_data.mem_info.class_name[31] = 0;
 	mem_data.mem_info.total_size = 0;
 	node = rb_search( global_mem_class_info.root, 
 			&mem_data, RB_DATA_TYLE_INFO );
@@ -510,9 +511,27 @@ unsigned int LCUIMM_NewClass( char *class_name )
 				&mem_data, RB_DATA_TYLE_INFO );
 		global_mem_class_info.total_node += 1;
 	} else {
-		printf( "%s class is exist !", class_name );
+		DEBUG_MSG( "%s class is exist !", class_name );
 	}
 	return mem_data.mem_info.class_id;
+}
+
+static void LCUIMM_PrintClassInfo( rb_node_t *node )
+{
+	if( !node ) {
+		return;
+	}
+	printf( "%-32s: %d bytes\n", node->mem_data.mem_info.class_name, node->mem_data.mem_info.total_size );
+	LCUIMM_PrintClassInfo( node->left );
+	LCUIMM_PrintClassInfo( node->right );
+}
+
+LCUI_API void LCUIMM_PrintAllClassInfo( void )
+{
+	rb_node_t *node, *parent = NULL;
+	node = global_mem_class_info.root;
+	LCUIMM_PrintClassInfo( node->left );
+	LCUIMM_PrintClassInfo( node->right );
 }
 
 void *LCUIMM_Alloc( size_t size, unsigned int class_id )
@@ -570,7 +589,7 @@ int LCUIMM_Free( void *mem_ptr )
 			node->mem_data.mem_info.total_size -= size;
 		}
 	} else {
-		printf("%p can not be released !\n");
+		DEBUG_MSG("%p can not be released !\n");
 		return -1;
 	}
 	mem_data.mem_blk.mem_addr = mem_ptr;
