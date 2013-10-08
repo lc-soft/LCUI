@@ -146,10 +146,6 @@ Queue_InsertPointer( LCUI_Queue * queue, int pos, const void *data );
 LCUI_API int
 Queue_Move( LCUI_Queue *queue, int des_pos, int src_pos );
 
-/* 引用队列 */
-LCUI_API int
-Queue_Quote( LCUI_Queue *des, LCUI_Queue *src );
-
 /* 覆盖队列中指定位置的成员内存空间里的数据 */
 LCUI_API int
 Queue_Replace( LCUI_Queue * queue, int pos, const void *data );
