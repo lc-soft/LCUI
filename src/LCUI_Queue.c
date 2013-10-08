@@ -207,7 +207,12 @@ LCUI_API void Queue_Destroy( LCUI_Queue *queue )
 		}
 		/* 如果有未使用的队列成员，则把它们占用的内存空间也释放掉 */
 		if( queue->max_num > queue->total_num ) {
-			for (i=queue->total_num-1; i<queue->max_num; ++i) {
+			if( queue->total_num > 0 ) {
+				i = queue->total_num - 1;
+			} else {
+				i = 0;
+			}
+			for(; i<queue->max_num; ++i) {
 				free( queue->data_array[i] );
 			}
 		}
@@ -430,7 +435,7 @@ static int __Queue_Add(	LCUI_Queue *queue,
 	int i, pos;
 	size_t size; 
 	LCUI_Node *p, *q;
-	
+
 	pos = queue->total_num;
 	++queue->total_num;
 	/* 如果数据是以数组形式储存 */
@@ -448,14 +453,19 @@ static int __Queue_Add(	LCUI_Queue *queue,
 			p->next = q;
 			p = q;
 			queue->max_num = queue->total_num;
-		} else {
-			p = queue->data_head_node.next; 
-			for(i=0; p->next && i<pos; ++i ) {
-				p = p->next;
-			} 
+			if( !is_pointer ) { 
+				p->data = malloc( queue->element_size );
+				memcpy( p->data, data, queue->element_size );
+			} else {
+				memcpy( &p->data, &data, sizeof(void*) );
+			}
+			return pos;
 		}
-		if( !is_pointer ) { 
-			p->data = malloc ( queue->element_size );
+		p = queue->data_head_node.next; 
+		for(i=0; p->next && i<pos; ++i ) {
+			p = p->next;
+		} 
+		if( !is_pointer ) {
 			memcpy( p->data, data, queue->element_size );
 		} else {
 			memcpy( &p->data, &data, sizeof(void*) );
@@ -467,8 +477,8 @@ static int __Queue_Add(	LCUI_Queue *queue,
 		/* 如果不保存指针 */
 		if( !is_pointer ) {
 			/* 如果当前位置的成员空间的指针无效 */
-			if( !queue->data_array[pos] ) { 
-				queue->data_array[pos] = malloc(queue->element_size);
+			if( !queue->data_array[pos] ) {
+				queue->data_array[pos] = malloc( queue->element_size );
 			}
 			/* 复制数据至当前位置的成员空间里 */
 			memcpy(queue->data_array[pos], data, queue->element_size);
@@ -482,8 +492,8 @@ static int __Queue_Add(	LCUI_Queue *queue,
 	queue->max_num = queue->total_num;
 	size = sizeof(void*) * queue->total_num;
 	/* 如果总数大于1，说明之前已经malloc过，直接realloc扩增内存 */
-	if (queue->total_num > 1 && queue->data_array ) { 
-		queue->data_array = (void **)realloc( queue->data_array, size ); 
+	if (queue->total_num > 1 && queue->data_array ) {
+		queue->data_array = (void **)realloc( queue->data_array, size );
 	} else {
 		queue->data_array = (void **)malloc( sizeof(void*) ); 
 	}
@@ -492,7 +502,7 @@ static int __Queue_Add(	LCUI_Queue *queue,
 		exit(-1);
 	}
 	if( !is_pointer ) {
-		queue->data_array[pos] = malloc(queue->element_size);
+		queue->data_array[pos] = malloc( queue->element_size );
 		memcpy(queue->data_array[pos], data, queue->element_size);
 	} else {
 		memcpy(&queue->data_array[pos], &data, sizeof(void*));
