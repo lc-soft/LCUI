@@ -59,16 +59,48 @@ static HDC hdc_client, hdc_framebuffer;
 static HBITMAP client_bitmap;
 static HINSTANCE win32_hInstance = NULL, dll_hInstance = NULL;
 static LCUI_Mutex screen_mutex;
+static LCUI_Thread th_win32;
+static LCUI_Sleeper win32_init_sleeper;
+static LCUI_BOOL win32_init_error = TRUE;
 
 LCUI_API void Win32_LCUI_Init( HINSTANCE hInstance )
 {
 	win32_hInstance = hInstance;
 }
 
-static LRESULT CALLBACK Win32_LCUI_WndProc(	HWND hwnd,
-						UINT message,
-						WPARAM wParam,
-						LPARAM lParam )
+LCUI_API HWND Win32_GetSelfHWND( void )
+{
+	return current_hwnd;
+}
+
+LCUI_API void Win32_SetSelfHWND( HWND hwnd )
+{
+	current_hwnd = hwnd;
+}
+
+/** win32的动态库的入口函数 */
+BOOL APIENTRY DllMain( HMODULE hModule,
+                       DWORD  ul_reason_for_call,
+                       LPVOID lpReserved
+					 )
+{
+	switch (ul_reason_for_call)
+	{
+	case DLL_PROCESS_ATTACH:
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+	}
+	dll_hInstance = hModule;
+	return TRUE;
+}
+
+static LRESULT CALLBACK Win32_LCUI_WndProc(
+				HWND hwnd,
+				UINT message,
+				WPARAM wParam,
+				LPARAM lParam )
 {
 	PAINTSTRUCT ps;
 	LCUI_Rect area;
@@ -99,6 +131,7 @@ static LRESULT CALLBACK Win32_LCUI_WndProc(	HWND hwnd,
 		area.y = ps.rcPaint.top;
 		area.width = ps.rcPaint.right - area.x;
 		area.height = ps.rcPaint.bottom - area.y;
+		/* 记录该无效区域 */
 		LCUIScreen_InvalidArea( area );
 		EndPaint( hwnd, &ps );
 		return 0;
@@ -111,51 +144,9 @@ static LRESULT CALLBACK Win32_LCUI_WndProc(	HWND hwnd,
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
 
-LCUI_API HWND Win32_GetSelfHWND( void )
+static int Win32_ScreenInit(void)
 {
-	return current_hwnd;
-}
-
-LCUI_API void Win32_SetSelfHWND( HWND hwnd )
-{
-	current_hwnd = hwnd;
-}
-
-LCUI_API void LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
-{
-	return;
-}
-
-LCUI_API int LCUIScreen_GetGraph( LCUI_Graph *out )
-{
-	return -1;
-}
-
-/** win32的动态库的入口函数 */
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-					 )
-{
-	switch (ul_reason_for_call)
-	{
-	case DLL_PROCESS_ATTACH:
-	case DLL_THREAD_ATTACH:
-	case DLL_THREAD_DETACH:
-	case DLL_PROCESS_DETACH:
-		break;
-	}
-	dll_hInstance = hModule;
-	return TRUE;
-}
-
-LCUI_API int LCUIScreen_Init( int w, int h, int mode )
-{
-	RECT rect;
 	WNDCLASS wndclass;
-	LCUI_Widget *root_widget;
-	LCUI_Screen screen_info;
-	LCUI_Size window_size;
 	TCHAR szAppName[] = TEXT ("LCUI OutPut");
 
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW;
@@ -169,61 +160,74 @@ LCUI_API int LCUIScreen_Init( int w, int h, int mode )
 	wndclass.hbrBackground = (HBRUSH) GetStockObject( WHITE_BRUSH );
 	wndclass.lpszMenuName  = NULL;
 	wndclass.lpszClassName = szAppName;
-
+	
 	if (!RegisterClass (&wndclass)) {
 		MessageBox (NULL, TEXT ("This program requires Windows NT!"), 
 		szAppName, MB_ICONERROR) ;
-		return 0;
+		return -1;
 	}
+	/* 创建窗口 */
+	current_hwnd = CreateWindow (
+			szAppName, TEXT ("LCUI"),
+			WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
+			CW_USEDEFAULT, CW_USEDEFAULT,
+			0, 0,
+			NULL, NULL, win32_hInstance, NULL);
+	return 0;
+}
+
+/** Win32的消息循环线程 */
+static void LCUI_Win32_Thread( void *arg )
+{
+	MSG msg;
+	if( Win32_ScreenInit() == -1 ) {
+		/* 设置标志为TRUE，表示初始化失败 */
+		win32_init_error = TRUE;
+		/* 打断处于睡眠状态的线程的睡眠 */
+		LCUISleeper_BreakSleep( &win32_init_sleeper );
+		LCUIThread_Exit(NULL);
+		return;
+	}
+	/* 设置标志为FALSE，表示初始化成功 */
+	win32_init_error = FALSE;
+	/* 隐藏windows的鼠标游标 */
+	ShowCursor( FALSE );
+	LCUISleeper_BreakSleep( &win32_init_sleeper );
+	while( LCUI_Sys.state == ACTIVE ) {
+		/* 获取消息 */
+		if( GetMessage( &msg, Win32_GetSelfHWND(), 0, 0 ) ) {
+			TranslateMessage( &msg );
+			DispatchMessage( &msg );
+		}
+	}
+	LCUIThread_Exit(NULL);
+}
+
+/** 初始化屏幕 */
+LCUI_API int LCUIScreen_Init( int w, int h, int mode )
+{
+	LCUI_Widget *root_widget;
+	LCUI_Screen screen_info;
+
 	/* 初始化屏幕互斥锁 */
 	LCUIMutex_Init( &screen_mutex );
-	if( mode == LCUI_INIT_MODE_AUTO ) {
-		if( w == 0 && h == 0 ) {
-			mode = LCUI_INIT_MODE_FULLSCREEN;
-		} else {
-			mode = LCUI_INIT_MODE_WINDOW;
-		}
+	LCUISleeper_Create( &win32_init_sleeper );
+	/* 创建线程 */
+	LCUIThread_Create( &th_win32, LCUI_Win32_Thread, NULL );
+	/* 进行睡眠，最长时间为5秒 */
+	LCUISleeper_StartSleep( &win32_init_sleeper, 5000 );
+	/* 若初始化出现错误 */
+	if( win32_init_error ) {
+		return -1;
 	}
-	if( mode == LCUI_INIT_MODE_FULLSCREEN ) {
-		window_size.w = GetSystemMetrics(SM_CXSCREEN);
-		window_size.h = GetSystemMetrics(SM_CYSCREEN);
-		if( w == 0 ) {
-			w = window_size.w;
-		}
-		if( h == 0 ) {
-			h = window_size.h;
-		}
-		current_hwnd = CreateWindow (
-				szAppName, TEXT ("LCUI"),
-				WS_POPUP,
-				CW_USEDEFAULT, CW_USEDEFAULT,
-				window_size.w, window_size.h,
-				NULL, NULL, win32_hInstance, NULL);
-		screen_info.size.w = w;
-		screen_info.size.h = h;
-	} else {
-		int boader_w, boader_h;
-		/* 计算边框的尺寸 */
-		boader_w = GetSystemMetrics(SM_CXFIXEDFRAME) * 2;
-		boader_h = GetSystemMetrics(SM_CYFIXEDFRAME) * 2;
-		boader_h += GetSystemMetrics(SM_CYCAPTION);
-		/* 计算窗口尺寸 */
-		window_size.w = w + boader_w;
-		window_size.h = h + boader_h;
-		current_hwnd = CreateWindow (
-				szAppName, TEXT ("LCUI"),
-				WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
-				CW_USEDEFAULT, CW_USEDEFAULT,
-				window_size.w, window_size.h,
-				NULL, NULL, win32_hInstance, NULL);
-		GetClientRect( current_hwnd, &rect );
-		screen_info.size.w = rect.right;
-		screen_info.size.h = rect.bottom;
-	}
+	/* 准备屏幕相关信息 */
 	screen_info.bits = 32;
 	screen_info.mode = mode;
 	strcpy( screen_info.dev_name, "win32 GDI" );
+	/* 设置屏幕信息 */
 	LCUIScreen_SetInfo( &screen_info );
+	/* 设置图形输出模式 */
+	LCUIScreen_SetMode( w, h, mode );
 
 	w = GetSystemMetrics(SM_CXSCREEN);
 	h = GetSystemMetrics(SM_CYSCREEN);
@@ -245,10 +249,20 @@ LCUI_API int LCUIScreen_Init( int w, int h, int mode )
 	Widget_SetBackgroundColor( root_widget, RGB(255,255,255) );
 	Widget_SetBackgroundTransparent( root_widget, FALSE );
 	Widget_Show( root_widget );
-
+	/* 显示窗口 */
 	ShowWindow( current_hwnd, SW_SHOWNORMAL );
 	UpdateWindow( current_hwnd );
 	return 0;
+}
+
+LCUI_API void LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
+{
+	return;
+}
+
+LCUI_API int LCUIScreen_GetGraph( LCUI_Graph *out )
+{
+	return -1;
 }
 
 /* 设置视频输出模式 */
