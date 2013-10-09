@@ -44,22 +44,21 @@
 static LCUI_Queue dev_list; /* 设备列表 */
 
 /*----------------------------- Device -------------------------------*/
-/* 设备列表初始化 */
-static void 
-dev_list_init( LCUI_Queue *dev_list )
+/** 设备列表初始化 */
+static void dev_list_init( LCUI_Queue *dev_list )
 {
 	Queue_Init( dev_list, sizeof(dev_func_data), NULL );
 }
 
-/* 
+/** 
  * 功能：注册设备
  * 说明：为指定设备添加处理函数
  * */
-LCUI_API int
-LCUIDevice_Add(	LCUI_BOOL (*init_func)(void), 
-		LCUI_BOOL (*proc_func)(void), 
-		LCUI_BOOL (*destroy_func)(void) )
+LCUI_API int LCUIDevice_Add(	LCUI_BOOL (*init_func)(void), 
+				LCUI_BOOL (*proc_func)(void), 
+				LCUI_BOOL (*destroy_func)(void) )
 {
+	int ret;
 	dev_func_data data;
 	
 	if( init_func ) {
@@ -68,15 +67,17 @@ LCUIDevice_Add(	LCUI_BOOL (*init_func)(void),
 	data.init_func = init_func;
 	data.proc_func = proc_func;
 	data.destroy_func = destroy_func;
-	if( 0 <= Queue_Add( &dev_list, &data ) ) {
+	Queue_Lock( &dev_list );
+	ret = Queue_Add( &dev_list, &data );
+	Queue_Unlock( &dev_list );
+	if( ret >= 0 ) {
 		return 0;
 	}
 	return -1;
 }
 
-/* 处理列表中的设备的数据 */
-static void
-proc_dev_list ( void *arg )
+/** 处理列表中的设备的数据 */
+static void proc_dev_list( void *arg )
 {
 	LCUI_Queue *dev_list;
 	dev_func_data *data_ptr;
@@ -84,6 +85,7 @@ proc_dev_list ( void *arg )
 	
 	dev_list = (LCUI_Queue *)arg;
 	while( LCUI_Active() ) {
+		Queue_Lock( dev_list );
 		total = Queue_GetTotal( dev_list );
 		for(i=0; i<total; ++i) {
 			data_ptr = (dev_func_data*)Queue_Get( dev_list, i );
@@ -94,6 +96,7 @@ proc_dev_list ( void *arg )
 				++timeout_count;
 			}
 		}
+		Queue_Unlock( dev_list );
 		if( timeout_count > 20 ) {
 			LCUI_MSleep( 10 );
 			timeout_count = 0;
@@ -103,22 +106,21 @@ proc_dev_list ( void *arg )
 	LCUIThread_Exit(NULL);
 }
 
-/* 初始化设备处理模块 */
-LCUI_API int
-LCUIModule_Device_Init(void)
+/** 初始化设备处理模块 */
+LCUI_API int LCUIModule_Device_Init(void)
 {
 	dev_list_init( &dev_list );
-	return _LCUIThread_Create( &LCUI_Sys.dev_thread,
-			proc_dev_list, &dev_list );
+	return _LCUIThread_Create(	&LCUI_Sys.dev_thread,
+					proc_dev_list, &dev_list );
 }
 
-/* 停用设备处理模块 */
-LCUI_API void
-LCUIModule_Device_End(void)
+/** 停用设备处理模块 */
+LCUI_API void LCUIModule_Device_End(void)
 {
 	int total, i;
 	dev_func_data *data_ptr;
 	
+	Queue_Lock( &dev_list );
 	total = Queue_GetTotal( &dev_list );
 	for(i=0; i<total; ++i) {
 		data_ptr = (dev_func_data*)Queue_Get( &dev_list, i );
@@ -127,5 +129,6 @@ LCUIModule_Device_End(void)
 		}
 		data_ptr->destroy_func();
 	}
+	Queue_Unlock( &dev_list );
 }
 /*--------------------------- End Device -----------------------------*/
