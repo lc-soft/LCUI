@@ -190,82 +190,29 @@ static int LCUIApp_RunTask( LCUI_App *app )
 	return 0;
 }
 
-static LCUI_BOOL LCUIApp_ReceiveTask( LCUI_App *app )
-{
-	unsigned int lost_time = 0;
-	if( app == NULL ) {
-		return FALSE;
-	}
-	while( Queue_GetTotal(&app->tasks) <= 0 ) {
-		DEBUG_MSG("wait task...\n");
-		lost_time = LCUISleeper_StartSleep( &app->mainloop_sleeper, 1000 );
-		DEBUG_MSG("task are receive, lost time: %ums\n", lost_time);
-	}
-	return TRUE;
-}
-
-#ifdef LCUI_BUILD_IN_WIN32
-static void MainLoop_Thread( void *arg )
-{
-	LCUI_App *app;
-	LCUI_MainLoop *loop;
-	
-	loop = (LCUI_MainLoop*)arg;
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
-		LCUIThread_Exit((void*)-1);
-		return;
-	}
-	while( !loop->quit && LCUI_Sys.state == ACTIVE ) {
-		LCUIApp_ReceiveTask( app );
-		LCUIApp_RunTask( app );
-	}
-	LCUIThread_Exit(NULL);
-}
-#endif
-
 /** 运行目标主循环 */
 LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 {
-#ifdef LCUI_BUILD_IN_WIN32
-	MSG msg;
-	int ret;
-	LCUI_Thread t;
-	DEBUG_MSG("loop: %p, enter\n", loop);
-	loop->running = TRUE;
-	LCUIThread_Create( &t, MainLoop_Thread, (void*)loop );
-	while( !loop->quit && LCUI_Sys.state == ACTIVE ) {
-		ret = GetMessage( &msg, Win32_GetSelfHWND(), 0, 0 );
-		if( ret == -1 || ret == 0) {
-			loop->quit = TRUE;
-			break;
-		}
-		TranslateMessage( &msg );
-		DispatchMessage( &msg );
-	}
-	LCUIThread_Join( t, NULL );
-	loop->running = FALSE;
-	DEBUG_MSG("loop: %p, exit\n", loop);
-	return 0;
-#else
 	LCUI_App *app;
-	DEBUG_MSG("loop: %p, enter\n", loop);
+	
 	app = LCUIApp_GetSelf();
 	if( !app ) {
 		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
 		LCUIThread_Exit((void*)-1);
 		return -1;
 	}
+	DEBUG_MSG("loop: %p, enter\n", loop);
 	loop->running = TRUE;
 	while( !loop->quit && LCUI_Sys.state == ACTIVE ) {
-		LCUIApp_ReceiveTask( app );
+		if( Queue_GetTotal(&app->tasks) <= 0 ) {
+			LCUISleeper_StartSleep( &app->mainloop_sleeper, 1000 );
+			continue;
+		}
 		LCUIApp_RunTask( app );
 	}
 	loop->running = FALSE;
 	DEBUG_MSG("loop: %p, exit\n", loop);
 	return 0;
-#endif
 }
 
 /** 标记目标主循环需要退出 */
