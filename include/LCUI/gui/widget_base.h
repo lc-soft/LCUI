@@ -393,13 +393,18 @@ Widget_SetMargin( LCUI_Widget *widget, LCUI_Margin margin );
 LCUI_API void
 Widget_SetPosType( LCUI_Widget *widget, POS_TYPE pos_type );
 
+/* 获取部件的堆叠顺序 */
+LCUI_API int Widget_GetZIndex( LCUI_Widget *widget );
+
 /* 设置部件的堆叠顺序 */
 LCUI_API int
 Widget_SetZIndex( LCUI_Widget *widget, int z_index );
 
-/* 设定部件的透明度 */
-LCUI_API void
-Widget_SetAlpha(LCUI_Widget *widget, unsigned char alpha);
+/** 获取部件的透明度 */
+LCUI_API unsigned char Widget_GetAlpha( LCUI_Widget *widget );
+
+/** 设定部件的透明度 */
+LCUI_API void Widget_SetAlpha( LCUI_Widget *widget, unsigned char alpha );
 
 /*
  * 功能：执行移动部件位置的操作
