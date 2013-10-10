@@ -92,8 +92,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmisc_la_LIBADD =
-am_libmisc_la_OBJECTS = catch_screen.lo rect.lo dirent.lo string.lo \
-	misc.lo delay.lo
+am_libmisc_la_OBJECTS = catch_screen.lo rect.lo string.lo misc.lo \
+	delay.lo
 libmisc_la_OBJECTS = $(am_libmisc_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -284,10 +284,10 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = foreign
-INCLUDES = -I$(abs_top_srcdir)/include
+AUTOMAKE_OPTIONS = foreign 
+AM_CFLAGS = -I$(abs_top_srcdir)/include 
 noinst_LTLIBRARIES = libmisc.la
-libmisc_la_SOURCES = catch_screen.c rect.c dirent.c string.c misc.c delay.c
+libmisc_la_SOURCES = catch_screen.c rect.c string.c misc.c delay.c
 all: all-am
 
 .SUFFIXES:
@@ -345,7 +345,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/catch_screen.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/delay.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dirent.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/misc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rect.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@

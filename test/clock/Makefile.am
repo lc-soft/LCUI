@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign 
-INCLUDES = -I$(top_builddir)/include 
+AM_CFLAGS = -I$(top_builddir)/include 
 noinst_PROGRAMS = clock
 
 clock_SOURCES = clock.c 

@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS=foreign
 SUBDIRS=mora screenlock clock login
 ##设定在编译时头文件的查找位置
-INCLUDES = -I$(top_builddir)/include
+AM_CFLAGS = -I$(top_builddir)/include
 ##需要编译的测试程序, noinst指的是不安装
 noinst_PROGRAMS = helloworld test_font test_radiobtn test_checkbox test_progressbar \
 test_button test_label test_loading ts_calibrate test_viewimage test_lcui_graph_mix \

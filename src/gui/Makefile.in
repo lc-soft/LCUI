@@ -92,11 +92,11 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgui_la_LIBADD =
-am_libgui_la_OBJECTS = widget_msg.lo widget_base.lo widget_event.lo \
-	widget_library.lo widget_style.lo messagebox.lo activebox.lo \
-	button.lo checkbox.lo label.lo menu.lo picturebox.lo \
-	progressbar.lo radiobutton.lo textbox.lo window.lo \
-	scrollbar.lo
+am_libgui_la_OBJECTS = widget_base.lo widget_event.lo \
+	widget_library.lo widget_style.lo widget_msg.lo messagebox.lo \
+	activebox.lo button.lo checkbox.lo label.lo menu.lo \
+	picturebox.lo progressbar.lo radiobutton.lo textbox.lo \
+	window.lo scrollbar.lo
 libgui_la_OBJECTS = $(am_libgui_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -288,14 +288,14 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
-INCLUDES = -I$(abs_top_srcdir)/include
+AM_CFLAGS = -I$(abs_top_srcdir)/include
 noinst_LTLIBRARIES = libgui.la
 libgui_la_SOURCES = \
-widget_msg.c		\
 widget_base.c		\
 widget_event.c		\
 widget_library.c	\
 widget_style.c		\
+widget_msg.c		\
 messagebox.c		\
 widget/activebox.c	\
 widget/button.c		\

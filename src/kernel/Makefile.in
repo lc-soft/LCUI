@@ -92,7 +92,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libkernel_la_LIBADD =
-am_libkernel_la_OBJECTS = sleeper.lo device.lo main.lo timer.lo \
+am_libkernel_la_OBJECTS = device.lo main.lo sleeper.lo timer.lo \
 	event.lo task.lo
 libkernel_la_OBJECTS = $(am_libkernel_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -285,9 +285,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign 
-INCLUDES = -I$(abs_top_srcdir)/include 
+AM_CFLAGS = -I$(abs_top_srcdir)/include 
 noinst_LTLIBRARIES = libkernel.la
-libkernel_la_SOURCES = sleeper.c device.c main.c timer.c event.c task.c
+libkernel_la_SOURCES = device.c main.c sleeper.c timer.c event.c task.c
 all: all-am
 
 .SUFFIXES:

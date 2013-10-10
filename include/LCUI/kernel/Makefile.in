@@ -283,7 +283,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
-pkginclude_HEADERS = sleeper.h device.h timer.h main.h event.h task.h
+pkginclude_HEADERS = device.h timer.h main.h event.h sleeper.h task.h
 all: all-am
 
 .SUFFIXES:
