@@ -66,12 +66,12 @@ static LCUI_Queue global_timer_list;		/**< 定时器列表 */
 static LCUI_BOOL timer_thread_active = FALSE;	/**< 定时器线程是否活动 */
 static LCUI_Sleeper timer_sleeper;		/**< 用于实现定时器睡眠的等待者 */
 
+#define TIME_WRAP_VALUE (~(int64_t)0)
+
 #ifdef LCUI_BUILD_IN_WIN32
 
 #include <Mmsystem.h>
 #pragma comment(lib, "Winmm.lib")
-
-#define TIME_WRAP_VALUE	(~(int64_t)0)
 
 static BOOL hires_timer_available;	/**< 标志，指示高精度计数器是否可用 */
 static double hires_ticks_per_second;	/**< 高精度计数器每秒的滴答数 */
@@ -102,6 +102,26 @@ LCUI_API int64_t LCUI_GetTickCount( void )
 	return (int64_t)timeGetTime();
 }
 
+#elif defined LCUI_BUILD_IN_LINUX
+#include <sys/time.h>
+
+LCUI_API void LCUI_StartTicks( void )
+{
+	return;
+}
+
+LCUI_API int64_t LCUI_GetTickCount( void )
+{
+	int64_t t;
+	struct timeval tv;
+
+	gettimeofday( &tv, NULL );
+	t = tv.tv_sec*1000 + tv.tv_usec/1000;
+	return t;
+}
+
+#endif
+
 LCUI_API int64_t LCUI_GetTicks( int64_t start_ticks )
 {
 	int64_t now_ticks;
@@ -113,9 +133,6 @@ LCUI_API int64_t LCUI_GetTicks( int64_t start_ticks )
 	return now_ticks - start_ticks;
 }
 
-#elif defined LCUI_BUILD_IN_LINUX
-
-#endif
 
 /*----------------------------- Private ------------------------------*/
 
@@ -132,6 +149,7 @@ static void TimerList_Destroy( LCUI_Queue *timer_list )
 {
 	Queue_Destroy( timer_list );
 }
+
 /** 更新定时器在定时器列表中的位置 */
 static void TimerList_UpdateTimerPos(	LCUI_Queue *timer_list,
 					timer_data *p_timer )
@@ -188,6 +206,7 @@ static void TimerList_UpdateTimerPos(	LCUI_Queue *timer_list,
 	Queue_Unlock( &global_timer_list );
 }
 
+#ifdef DEBUG
 /** 打印列表中的定时器信息 */
 static void TimerList_Print( LCUI_Queue *timer_list )
 {
@@ -201,11 +220,12 @@ static void TimerList_Print( LCUI_Queue *timer_list )
 		if( !timer ) {
 			continue;
 		}
-		_DEBUG_MSG("[%02d] %d, cur_ms: %dms, total_ms: %dms\n",
+		_DEBUG_MSG("[%02d] %ld, cur_ms: %dms, total_ms: %dms\n",
 			i, timer->id, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
 	}
 	_DEBUG_MSG("timer list end\n\n");
 }
+#endif
 
 /** 定时器线程，用于处理列表中各个定时器 */
 static void TimerThread( void *arg )
