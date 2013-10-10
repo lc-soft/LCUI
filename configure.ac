@@ -7,7 +7,7 @@
 # http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/html_node/index.html
 
 AC_PREREQ([2.68])
-AC_INIT(LCUI, 0.14.0, lc-soft@live.cn)
+AC_INIT(LCUI, 0.14.1, lc-soft@live.cn)
 
 # Check system type
 AC_CANONICAL_TARGET
@@ -15,7 +15,6 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([include/LCUI_Build.h])
 AC_CONFIG_HEADERS([include/LCUI/LCUI_Config.h])
-AC_CONFIG_MACRO_DIR([m4])
 
 # Make --enable-silent-rules the default.
 # To get verbose build output you may configure
@@ -181,7 +180,7 @@ fi
 
 if test "$want_thread" = "yes"; then
     if test "$thread_name" = "pthread"; then
-        AC_DEFINE_UNQUOTED(LCUI_THREAD_PTHREAD, 1, Define to 1 if you using pthread support)
+	AC_DEFINE_UNQUOTED(LCUI_THREAD_PTHREAD, 1, Define to 1 if you using pthread support)
     else
         AC_DEFINE_UNQUOTED(LCUI_THREAD_NONE, 1, Define to 1 if not have thread support)
     fi
