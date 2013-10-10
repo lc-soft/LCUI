@@ -41,8 +41,6 @@
  
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
-#include LC_FONT_H
-
 
 /* 将字母转换成大写 */
 #define uppercase(ch) ((ch>='a'&&ch<='z')?ch-32:ch)
