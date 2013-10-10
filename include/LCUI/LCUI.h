@@ -44,7 +44,7 @@
 #ifndef __LCUI_H__  /* 如果没有定义 __LCUI_H__ 宏 */
 #define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */
 
-#define LCUI_VERSION "0.14.0"
+#define LCUI_VERSION "0.14.1"
 
 #include <wchar.h>
 #include <stdio.h>
@@ -254,7 +254,22 @@ LCUI_END_HEADER
 /* 若是UNICODE字符，请手动将参数argv转换由char为wchar_t类型 */
 extern int main( int argc, char *argv[] );
 
-int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow )
+int
+#if !defined(_MAC)
+#if defined(_M_CEE_PURE)
+__clrcall
+#else
+WINAPI
+#endif
+#else
+CALLBACK
+#endif
+WinMain (
+    _In_ HINSTANCE hInstance,
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPSTR lpCmdLine,
+    _In_ int nShowCmd
+    )
 {
 	int ret, len, i = 0, argc = 0;
 	TCHAR *pCmdLine, *cmdline_buff;
@@ -282,14 +297,14 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine
 	/* 根据参数个数来分配内存空间 */
 	if( argc > 0 ) {
 		argv = (TCHAR**)malloc(sizeof(TCHAR*)*argc);
-		if( argv == NULL ) {
-			return -1;
-		}
+	}
+	if( argv == NULL ) {
+		return -1;
 	}
 	/* 由于strtok_s函数会修改cmdline_buff里的内容，因此，需要重新拷贝一次 */
 	_tcscpy_s( cmdline_buff, len, pCmdLine );
 	token = _tcstok_s( cmdline_buff, _T(" \r\t\n"), &next_token );
-	while( token != NULL ) {
+	while( token && i<argc ) {
 		len = _tcslen( token ) + 1;
 		argv[i] = (TCHAR*)malloc(sizeof(TCHAR)*len);
 		if( argv[i] == NULL ) {
