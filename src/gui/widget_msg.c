@@ -61,14 +61,13 @@ LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget )
 	WidgetMsgData *data_ptr;
 	LCUI_Widget *child;
 	LCUI_Queue *msg_buff, *child_list;
-	
+
 	if( widget == NULL ) {
 		widget = RootWidget_GetSelf();
 	}
 	msg_buff = Widget_GetMsgBuff( widget );
 	child_list = Widget_GetChildList( widget );
-	
-	Queue_Lock( msg_buff );
+	//Queue_Lock( msg_buff );
 	n = Queue_GetTotal( msg_buff );
 	for(i=0; i<n; ++i) {
 		DEBUG_MSG("[%d/%d]get msg\n", i, n);
@@ -82,7 +81,8 @@ LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget )
 		}
 		DEBUG_MSG("[%d/%d]skip msg\n", i, n);
 	}
-	Queue_Unlock( msg_buff );
+	//Queue_Unlock( msg_buff );
+	Queue_Lock( child_list );
 	n = Queue_GetTotal( child_list );
 	/* 从尾到首,递归处理子部件的更新 */
 	while(n--) {
@@ -92,6 +92,7 @@ LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget )
 			WidgetMsg_Proc( child );
 		}
 	}
+	Queue_Unlock( child_list );
 }
 
 LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
@@ -152,6 +153,7 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 		break;
 	}
 	des_queue = Widget_GetMsgBuff( widget );
+	Queue_Lock( des_queue );
 	total = Queue_GetTotal( des_queue );
 	for(n_found=0,i=0; i<total; ++i) {
 		tmp_msg_ptr = (WidgetMsgData*)Queue_Get( des_queue, i );
@@ -215,6 +217,7 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 	if( i>= total ) {
 		ret = Queue_Add( des_queue, &tmp_msg );
 	}
+	Queue_Unlock( des_queue );
 	return ret;
 }
 
