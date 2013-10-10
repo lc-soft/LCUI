@@ -99,7 +99,6 @@ typedef struct _LCUI_TextLayer
 	
 	LCUI_BOOL show_cursor;	/* 指定是否需要显示文本光标 */
 	
-	LCUI_WString text_buff;
 	LCUI_TextStyle default_data;	/* 缺省状态下使用的文本样式数据 */
 }
 LCUI_TextLayer;
