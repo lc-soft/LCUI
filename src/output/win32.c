@@ -52,6 +52,8 @@
 #include <Windows.h>
 #include "resource.h"
 
+#define WIN32_WINDOW_STYLE (WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
+
 static HWND current_hwnd = NULL;
 static int pixel_mem_len = 0;
 static unsigned char *pixel_mem = NULL;
@@ -161,15 +163,15 @@ static int Win32_ScreenInit(void)
 	wndclass.lpszMenuName  = NULL;
 	wndclass.lpszClassName = szAppName;
 	
-	if (!RegisterClass (&wndclass)) {
-		MessageBox (NULL, TEXT ("This program requires Windows NT!"), 
-		szAppName, MB_ICONERROR) ;
+	if( !RegisterClass(&wndclass) ) {
+		MessageBox( NULL, TEXT("This program requires Windows NT!" ),
+		szAppName, MB_ICONERROR );
 		return -1;
 	}
 	/* 创建窗口 */
-	current_hwnd = CreateWindow (
-			szAppName, TEXT ("LCUI"),
-			WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
+	current_hwnd = CreateWindow(
+			szAppName, TEXT ("LCUI Windowed Graphics Output"),
+			WIN32_WINDOW_STYLE,
 			CW_USEDEFAULT, CW_USEDEFAULT,
 			0, 0,
 			NULL, NULL, win32_hInstance, NULL);
@@ -228,6 +230,8 @@ LCUI_API int LCUIScreen_Init( int w, int h, int mode )
 	LCUIScreen_SetInfo( &screen_info );
 	/* 设置图形输出模式 */
 	LCUIScreen_SetMode( w, h, mode );
+	/* 获取屏幕信息 */
+	LCUIScreen_GetInfo( &screen_info );
 
 	w = GetSystemMetrics(SM_CXSCREEN);
 	h = GetSystemMetrics(SM_CYSCREEN);
@@ -249,9 +253,12 @@ LCUI_API int LCUIScreen_Init( int w, int h, int mode )
 	Widget_SetBackgroundColor( root_widget, RGB(255,255,255) );
 	Widget_SetBackgroundTransparent( root_widget, FALSE );
 	Widget_Show( root_widget );
+
+	UpdateWindow( current_hwnd );
 	/* 显示窗口 */
 	ShowWindow( current_hwnd, SW_SHOWNORMAL );
-	UpdateWindow( current_hwnd );
+	/* 前置并激活窗口 */
+	SetForegroundWindow( current_hwnd );
 	return 0;
 }
 
@@ -292,7 +299,8 @@ LCUI_API int LCUIScreen_SetMode( int w, int h, int mode )
 			h = real_size.h;
 		}
 		SetWindowLong( current_hwnd, GWL_STYLE, WS_POPUP );
-		SetWindowPos( current_hwnd, HWND_NOTOPMOST, 0, 0, real_size.w, real_size.h, SWP_SHOWWINDOW );
+		SetWindowPos(	current_hwnd, HWND_NOTOPMOST, 0, 0, 
+				real_size.w, real_size.h, SWP_SHOWWINDOW );
 	} else {
 		RECT rect;
 		int boader_w, boader_h;
@@ -305,17 +313,16 @@ LCUI_API int LCUIScreen_SetMode( int w, int h, int mode )
 		h = h + boader_h;
 		pos.x = (real_size.w - w)/2;
 		pos.y = (real_size.h - h)/2;
-		SetWindowLong( current_hwnd, GWL_STYLE,
-			WS_OVERLAPPEDWINDOW &~WS_THICKFRAME );
+		
+		SetWindowLong(	current_hwnd, GWL_STYLE, WIN32_WINDOW_STYLE );
 		/* 调整窗口尺寸 */
-		SetWindowPos( current_hwnd, HWND_NOTOPMOST, 
-			pos.x, pos.y, w, h, SWP_SHOWWINDOW );
+		SetWindowPos(	current_hwnd, HWND_NOTOPMOST, 
+				pos.x, pos.y, w, h, SWP_SHOWWINDOW );
 		/* 获取客户区的尺寸 */
 		GetClientRect( current_hwnd, &rect );
 		w = rect.right;
 		h = rect.bottom;
 	}
-
 	screen_info.size.w = w;
 	screen_info.size.h = h;
 	screen_info.mode = mode;
