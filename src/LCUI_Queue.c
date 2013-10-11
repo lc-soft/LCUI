@@ -208,7 +208,7 @@ LCUI_API void Queue_Destroy( LCUI_Queue *queue )
 		/* 如果有未使用的队列成员，则把它们占用的内存空间也释放掉 */
 		if( queue->max_num > queue->total_num ) {
 			if( queue->total_num > 0 ) {
-				i = queue->total_num - 1;
+				i = queue->total_num;
 			} else {
 				i = 0;
 			}
