@@ -196,7 +196,7 @@ static void TimerList_UpdateTimerPos(	LCUI_Queue *timer_list,
 	/* 若目标位置无效，则将末尾作为目标位置 */
 	if( des_i == -1 ) {
 		DEBUG_MSG("tip\n");
-		des_i = Queue_GetTotal( &global_timer_list )-1;
+		des_i = 0;
 	}
 	/* 若源位置和目标位置有效，则开始移动 */
 	if( src_i != -1 ) {
@@ -206,7 +206,8 @@ static void TimerList_UpdateTimerPos(	LCUI_Queue *timer_list,
 	Queue_Unlock( &global_timer_list );
 }
 
-#ifdef DEBUG
+//#define DEBUG_TIMER
+#ifdef DEBUG_TIMER
 /** 打印列表中的定时器信息 */
 static void TimerList_Print( LCUI_Queue *timer_list )
 {
@@ -287,7 +288,6 @@ static void TimerThread( void *arg )
 		func_data.destroy_arg[0] = FALSE;
 		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */
 		AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_F, &func_data );
-		Queue_Lock( timer_list );
 		/* 若需要重复使用，则重置剩余等待时间 */
 		if( timer->reuse ) {
 			timer->start_time = LCUI_GetTickCount();
@@ -296,7 +296,6 @@ static void TimerThread( void *arg )
 		} else { /* 否则，释放该定时器 */
 			LCUITimer_Free( timer->id );
 		}
-		Queue_Unlock( timer_list );
 	}
 	LCUIThread_Exit(NULL);
 }
