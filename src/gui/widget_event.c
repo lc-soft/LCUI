@@ -136,7 +136,7 @@ Widget_HaveEvent(LCUI_Widget *widget, int event_id)
 }
 
 static LCUI_Widget *
-Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
+GetWidgetOfResponseEvent(LCUI_Widget *widget, int event_id)
 /*
  * 功能：查找能响应事件的部件
  * 说明：此函数用于检查部件以及它的上级所有父部件，第一个有响应指定事件的部件，它的指针
@@ -152,7 +152,7 @@ Get_ResponseEvent_Widget(LCUI_Widget *widget, int event_id)
 	if( !widget->parent ) {
 		return NULL;
 	} else {
-		return Get_ResponseEvent_Widget(widget->parent, event_id);
+		return GetWidgetOfResponseEvent(widget->parent, event_id);
 	}
 }
 
@@ -209,59 +209,87 @@ _DragEvent_End( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 typedef struct {
 	LCUI_BOOL need_delete;
 	LCUI_Widget *widget;
-} widget_item;
+} WidgetRecordItem;
 
-static LCUI_Queue widget_list;
+static LCUI_Queue widget_proc_record;
 
 static void
-widget_list_reset( void )
+WidgetRecord_Reset( void )
 {
 	int i, n;
-	widget_item *item;
-	n = Queue_GetTotal( &widget_list );
+	WidgetRecordItem *item;
+
+	Queue_Lock( &widget_proc_record );
+	n = Queue_GetTotal( &widget_proc_record );
 	for(i=0; i<n; ++i) {
-		item = Queue_Get( &widget_list, i );
+		item = (WidgetRecordItem*)Queue_Get( &widget_proc_record, i );
 		item->need_delete = TRUE;
 	}
+	Queue_Unlock( &widget_proc_record );
 }
 
 /* 清理部件列表中需要移除的部件，并将部件状态设置为NORMAL */
 static void
-widget_list_clear( void )
+WidgetRecord_Clear( void )
 {
 	int i, n;
-	widget_item *item;
-	n = Queue_GetTotal( &widget_list );
+	WidgetRecordItem *item;
+
+	Queue_Lock( &widget_proc_record );
+	n = Queue_GetTotal( &widget_proc_record );
 	for(i=0; i<n; ++i) {
-		item = Queue_Get( &widget_list, i );
+		item = (WidgetRecordItem*)Queue_Get( &widget_proc_record, i );
 		if( !item->need_delete ) {
 			continue;
 		}
 		Widget_SetState( item->widget, WIDGET_STATE_NORMAL );
-		Queue_Delete( &widget_list, i );
-		n = Queue_GetTotal( &widget_list );
+		Queue_Delete( &widget_proc_record, i );
+		n = Queue_GetTotal( &widget_proc_record );
 		--i;
 	}
+	Queue_Unlock( &widget_proc_record );
 }
 
 /* 添加部件至列表里，如果已存在，则标记该部件不需要删除 */
 static int
-widget_list_add( LCUI_Widget *widget )
+WidgetRecord_Add( LCUI_Widget *widget )
 {
 	int i, n;
-	widget_item new_item, *item;
-	n = Queue_GetTotal( &widget_list );
+	WidgetRecordItem new_item, *item;
+
+	Queue_Lock( &widget_proc_record );
+	n = Queue_GetTotal( &widget_proc_record );
 	for(i=0; i<n; ++i) {
-		item = Queue_Get( &widget_list, i );
+		item = (WidgetRecordItem*)Queue_Get( &widget_proc_record, i );
 		if( item->widget == widget ) {
+			Queue_Unlock( &widget_proc_record );
 			item->need_delete = FALSE;
 			return 1;
 		}
 	}
 	new_item.need_delete = FALSE;
 	new_item.widget = widget;
-	Queue_Add( &widget_list, &new_item );
+	Queue_Add( &widget_proc_record, &new_item );
+	Queue_Unlock( &widget_proc_record );
 	return 0;
+}
+
+/** 移除指定部件的记录，使之不再响应状态变化 */
+LCUI_API void WidgetRecord_Delete( LCUI_Widget *widget )
+{
+	int n;
+	WidgetRecordItem *item;
+
+	Queue_Lock( &widget_proc_record );
+	n = Queue_GetTotal( &widget_proc_record );
+	for(; n>=0; --n) {
+		item = (WidgetRecordItem*)Queue_Get( &widget_proc_record, n );
+		if( item && item->widget == widget ) {
+			Queue_Delete( &widget_proc_record, n );
+			break;
+		}
+	}
+	Queue_Unlock( &widget_proc_record );
 }
 
 /* 判断指定部件是否被允许响应事件 */
@@ -305,15 +333,15 @@ static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
  * 列表中的部件记录，若部件在更新前后都在列表中有记录，则该部件及上级所有父部件都会应用
  * 此状态，否则，移除多余的部件，并恢复部件的状态为NORMAL */
 static void
-widget_list_set_state( LCUI_Widget *widget, WIDGET_STATE state )
+WidgetRecord_SetWidgetState( LCUI_Widget *widget, WIDGET_STATE state )
 {
-	widget_list_reset();
+	WidgetRecord_Reset();
 	while( widget ) {
-		widget_list_add( widget );
+		WidgetRecord_Add( widget );
 		Widget_SetState( widget, state );
 		widget = widget->parent;
 	}
-	widget_list_clear();
+	WidgetRecord_Clear();
 }
 
 /* 响应鼠标按键按下事件 */
@@ -339,7 +367,7 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 	}
 	DEBUG_MSG("widget: %p\n", widget);
 	/* 获取能够响应此事件的部件 */
-	tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_MOUSEBUTTON );
+	tmp_widget = GetWidgetOfResponseEvent( widget, EVENT_MOUSEBUTTON );
 	if( widget != NULL && tmp_widget != NULL ) {
 		/* 开始准备事件数据 */
 		pos = Widget_ToRelPos( tmp_widget, pos );
@@ -354,10 +382,10 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 	if( event->button != LCUIKEY_LEFTBUTTON ) {
 		return;
 	}
-	tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_CLICKED );
+	tmp_widget = GetWidgetOfResponseEvent( widget, EVENT_CLICKED );
 	if( tmp_widget != NULL ) {
 		click_widget = tmp_widget;
-		tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_DRAG );
+		tmp_widget = GetWidgetOfResponseEvent( widget, EVENT_DRAG );
 		if( click_widget == tmp_widget ) {
 			DEBUG_MSG("start drag\n");
 			/* 开始处理部件的拖动 */
@@ -370,7 +398,7 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 		}
 	} else {
 		click_widget = widget;
-		tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_DRAG );
+		tmp_widget = GetWidgetOfResponseEvent( widget, EVENT_DRAG );
 		if( widget != NULL && tmp_widget != NULL ) {
 			DEBUG_MSG("start drag\n");
 			/* 开始处理部件的拖动 */
@@ -380,7 +408,7 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 	}
 	/* 焦点转移给该部件 */
 	Set_Focus( click_widget );
-	widget_list_set_state( widget, WIDGET_STATE_ACTIVE );
+	WidgetRecord_SetWidgetState( widget, WIDGET_STATE_ACTIVE );
 }
 
 /* 响应鼠标按键释放事件 */
@@ -424,7 +452,7 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 	}
 	/* 如果能拖动部件 */
 	if( can_drag_widget ) {
-		tmp_widget = Get_ResponseEvent_Widget( click_widget, EVENT_DRAG );
+		tmp_widget = GetWidgetOfResponseEvent( click_widget, EVENT_DRAG );
 		if( tmp_widget != NULL ) {
 			DEBUG_MSG("end drag\n");
 			/* 结束部件的拖动 */
@@ -437,7 +465,7 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 	if( !can_click ) {
 		goto exit_point;
 	}
-	tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_CLICKED );
+	tmp_widget = GetWidgetOfResponseEvent( widget, EVENT_CLICKED );
 	/* 如果之前点击的部件和当前点击的部件一样 */
 	if( click_widget == tmp_widget ) {
 		/* 如果部件有效且已经启用 */
@@ -448,10 +476,10 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 			tmp_event.clicked.rel_pos = Widget_ToRelPos( tmp_widget, pos );
 			Widget_DispatchEvent( tmp_widget, &tmp_event );
 		}
-		widget_list_set_state (widget, WIDGET_STATE_ACTIVE);
+		WidgetRecord_SetWidgetState (widget, WIDGET_STATE_ACTIVE);
 	}
 exit_point:;
-	widget_list_set_state (widget, WIDGET_STATE_OVERLAY);
+	WidgetRecord_SetWidgetState (widget, WIDGET_STATE_OVERLAY);
 	click_widget = NULL;
 }
 
@@ -477,7 +505,7 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
 	widget = Widget_At( NULL, pos );
 	if( widget ) {
-		tmp_widget = Get_ResponseEvent_Widget( widget, EVENT_MOUSEMOTION );
+		tmp_widget = GetWidgetOfResponseEvent( widget, EVENT_MOUSEMOTION );
 		if( tmp_widget ) {
 			wdg_event.type = EVENT_MOUSEMOTION;
 			pos = Widget_ToRelPos( tmp_widget, pos );
@@ -487,17 +515,25 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	} 
 	/* 如果没有部件处于按住状态 */
 	if( widget_allow_response(widget) && !click_widget ) {
-		widget_list_set_state (widget, WIDGET_STATE_OVERLAY);
+		WidgetRecord_SetWidgetState( widget, WIDGET_STATE_OVERLAY );
 	}
-	tmp_widget = Get_ResponseEvent_Widget( click_widget, EVENT_CLICKED );
+	tmp_widget = GetWidgetOfResponseEvent( click_widget, EVENT_CLICKED );
 	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */
-	tmp_widget = Get_ResponseEvent_Widget( click_widget, EVENT_DRAG );
+	tmp_widget = GetWidgetOfResponseEvent( click_widget, EVENT_DRAG );
 	if( tmp_widget != click_widget ) {
 		return;
 	}
 	if( tmp_widget != NULL && event->state == LCUIKEYSTATE_PRESSED ) {
 		DEBUG_MSG("doing drag\n");
 		_DragEvent_Do( tmp_widget, event );
+	}
+}
+
+/** 清除部件点击记录 */
+void Widget_ClearClickRecord( LCUI_Widget *widget )
+{
+	if( click_widget && click_widget == widget ) {
+		click_widget = NULL;
 	}
 }
 
@@ -542,7 +578,7 @@ LCUI_API void
 LCUIModule_Widget_Init( void )
 {
 	RootWidget_Init();
-	Queue_Init( &widget_list, sizeof(widget_item), NULL );
+	Queue_Init( &widget_proc_record, sizeof(WidgetRecordItem), NULL );
 	LCUI_MouseButtonEvent_Connect( LCUI_HandleMouseButton, NULL );
 	LCUI_MouseMotionEvent_Connect( LCUI_HandleMouseMotion, NULL );
 	LCUI_KeyboardEvent_Connect( WidgetFocusProc, NULL );
@@ -554,7 +590,7 @@ LCUI_API void
 LCUIModule_Widget_End( void )
 {
 	RootWidget_Destroy();
-	Queue_Destroy( &widget_list );
+	Queue_Destroy( &widget_proc_record );
 	WidgetStyle_LibraryDestroy();
 }
 /*************************** Event End *********************************/
