@@ -119,6 +119,9 @@ Widget_Event_Connect(	LCUI_Widget *widget, WidgetEventType event_id,
 LCUI_API int
 Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event );
 
+/** 移除指定部件的记录，使之不再响应状态变化 */
+LCUI_API void WidgetRecord_Delete( LCUI_Widget *widget );
+
 /* 初始化部件模块 */
 LCUI_API void
 LCUIModule_Widget_Init( void );

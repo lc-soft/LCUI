@@ -259,13 +259,11 @@ Widget_SetStyleName( LCUI_Widget *widget, const char *style_name );
 LCUI_API void
 Widget_SetStyleID( LCUI_Widget *widget, int style_id );
 
-/* 获取指定坐标上的子部件，有则返回子部件指针，否则返回NULL */
-LCUI_API LCUI_Widget*
-Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos );
+/** 获取指定坐标上的子部件，有则返回子部件指针，否则返回NULL */
+LCUI_API LCUI_Widget* Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos );
 
-/* 功能：为部件私有结构体指针分配内存 */
-LCUI_API void*
-Widget_NewPrivData( LCUI_Widget *widget, size_t size );
+/** 为部件分配一个用于存放私有数据的内存空间 */
+LCUI_API void* Widget_NewPrivData( LCUI_Widget *widget, size_t size );
 
 /* 初始化部件队列 */
 LCUI_API void WidgetQueue_Init(LCUI_Queue *queue);
