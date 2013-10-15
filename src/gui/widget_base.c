@@ -935,7 +935,7 @@ LCUIApp_DestroyAllWidgets( LCUI_ID app_id )
 		}
 		/*
 		 * 在Queue_Delete()函数将队列中的部件移除时，会调用初始化部件队列时指
-		 * 定的Destroy_Widget()函数进行部件数据相关的清理。
+		 * 定的WidgetList_DestroyWidget()函数进行部件数据相关的清理。
 		 * */
 		Queue_Delete( &root_widget.child, i );
 		/* 重新获取部件总数 */
@@ -999,10 +999,9 @@ Widget_SetStyleID( LCUI_Widget *widget, int style_id )
 	Widget_Draw( widget );
 }
 
-static LCUI_Widget *
-__Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
+static LCUI_Widget* __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 {
-	int i, total, temp;
+	int i, total;
 	LCUI_Widget *child, *widget;
 	LCUI_Queue *widget_list;
 	LCUI_Pos tmp_pos;
@@ -1014,9 +1013,9 @@ __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 	}
 	widget_list = &ctnr->child;
 	/* 判断 鼠标坐标对应部件图层中的像素点的透明度 是否符合要求，
-		* 如果透明度小于/不小于clickable_area_alpha的值，那么，无视
-		* 该部件。
-		*  */
+	 * 如果透明度小于/不小于clickable_area_alpha的值，那么，无视
+	 * 该部件。
+	 * */
 	graph = Widget_GetSelfGraph( ctnr );
 	if( Graph_GetPixel( graph, pos, &pixel )) {
 		DEBUG_MSG("%p, mode: %d, pixel alpha: %d, alpha: %d\n", ctnr, 
@@ -1037,14 +1036,14 @@ __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 
 	widget = ctnr;
 	total = Queue_GetTotal( widget_list );
-	for(i=0; i<total; ++i) {/* 从顶到底遍历子部件 */
-		child = Queue_Get( widget_list, i );
+	/* 从顶到底遍历子部件 */
+	for(i=0; i<total; ++i) {
+		child = (LCUI_Widget*)Queue_Get( widget_list, i );
 		if( !child || !child->visible ) {
 			continue;
 		}
-		temp = LCUIRect_IncludePoint( pos, Widget_GetRect(child) );
 		/* 如果这个点没被包含在部件区域内 */
-		if( !temp ) {
+		if( !LCUIRect_IncludePoint( pos, Widget_GetRect(child) ) ) {
 			continue;
 		}
 		/* 改变相对坐标 */
@@ -1059,9 +1058,8 @@ __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 	return widget;
 }
 
-/* 获取指定坐标上的子部件，有则返回子部件指针，否则返回NULL */
-LCUI_API LCUI_Widget*
-Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
+/** 获取指定坐标上的子部件，有则返回子部件指针，否则返回NULL */
+LCUI_API LCUI_Widget* Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 {
 	LCUI_Widget *widget;
 	if( ctnr == NULL ) {
@@ -1075,34 +1073,8 @@ Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 
 }
 
-LCUI_API int
-Widget_IsActive(LCUI_Widget *widget)
-/* 功能：判断部件是否为活动状态 */
-{
-	if(widget->state != KILLED) {
-		return 1;
-	}
-	return 0;
-}
-
-LCUI_API int
-Empty_Widget(void)
-/*
- * 功能：用于检测程序的部件列表是否为空
- * 返回值：
- *   1  程序的部件列表为空
- *   0  程序的部件列表不为空
- * */
-{
-	if(Queue_GetTotal(&root_widget.child) <= 0) {
-		return 1;
-	}
-	return 0;
-}
-
-/* 功能：为部件私有结构体指针分配内存 */
-LCUI_API void*
-Widget_NewPrivData( LCUI_Widget *widget, size_t size )
+/** 为部件分配一个用于存放私有数据的内存空间 */
+LCUI_API void* Widget_NewPrivData( LCUI_Widget *widget, size_t size )
 {
 	widget->private_data = malloc(size);
 	return widget->private_data;
@@ -1116,21 +1088,23 @@ static void Widget_BackgroundInit( LCUI_Widget *widget )
 	widget->background.layout = LAYOUT_NONE;
 }
 
-
-static void
-Destroy_Widget( void *arg )
-/*
- * 功能：销毁一个部件
- * 说明：如果这个部件有子部件，将对它进行销毁
- * */
+/**
+ * 部件列表的析构函数，用于在移除部件记录时对部件进行析构处理，
+ * 如果这个部件有子部件，将对它进行销毁 
+ */
+static void WidgetList_DestroyWidget( void *arg )
 {
 	LCUI_Widget *widget;
+
 	widget = (LCUI_Widget *)arg;
+	widget->visible = FALSE;
+	widget->enabled = FALSE;
+	WidgetRecord_Delete( widget );
 	widget->parent = NULL;
 
 	/* 释放字符串 */
-	LCUIString_Free(&widget->type_name);
-	LCUIString_Free(&widget->style_name);
+	LCUIString_Free( &widget->type_name );
+	LCUIString_Free( &widget->style_name );
 	/* 在移除图层前，先锁上图层树的互斥锁 */
 	LCUIScreen_LockGraphLayerTree();
 	/* 开始移除该部件的图层记录，并释放内存资源 */
@@ -1138,14 +1112,11 @@ Destroy_Widget( void *arg )
 	/* 移除后，解除互斥锁 */
 	LCUIScreen_UnlockGraphLayerTree();
 	/* 销毁部件的队列 */
-	Queue_Destroy(&widget->child);
-	Queue_Destroy(&widget->event);
-	Queue_Destroy(&widget->msg_buff);
-	Queue_Destroy(&widget->msg_func);
-	RectQueue_Destroy(&widget->invalid_area);
-
-	widget->visible = FALSE;
-	widget->enabled = TRUE;
+	Queue_Destroy( &widget->child );
+	Queue_Destroy( &widget->event );
+	Queue_Destroy( &widget->msg_buff );
+	Queue_Destroy( &widget->msg_func );
+	RectQueue_Destroy( &widget->invalid_area );
 	/* 调用回调函数销毁部件私有数据 */
 	WidgetFunc_Call( widget, FUNC_TYPE_DESTROY );
 	free( widget->private_data );
@@ -1156,7 +1127,7 @@ Destroy_Widget( void *arg )
 LCUI_API void
 WidgetQueue_Init(LCUI_Queue *queue)
 {
-	Queue_Init(queue, sizeof(LCUI_Widget), Destroy_Widget);
+	Queue_Init(queue, sizeof(LCUI_Widget), WidgetList_DestroyWidget);
 }
 
 
@@ -1290,7 +1261,7 @@ static void Widget_ExecDestroy( LCUI_Widget *widget )
 	Queue_Lock( child_list );
 	total = Queue_GetTotal(child_list);
 	for(i=0; i<total; ++i) {
-		tmp = Queue_Get(child_list, i);
+		tmp = (LCUI_Widget*)Queue_Get(child_list, i);
 		if(tmp == widget) {
 			Queue_Delete(child_list, i);
 			break;
