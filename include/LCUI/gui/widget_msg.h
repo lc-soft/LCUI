@@ -8,6 +8,7 @@ typedef enum WidgetMsgID_ {
 	WIDGET_PAINT,		// 重绘
 	WIDGET_MOVE,		// 移动
 	WIDGET_CHGSTATE,	// 状态改变（Change State）
+	WIDGET_CHGALPHA,	// 更新透明度（Change Alpha）
 	WIDGET_RESIZE,		// 调整尺寸
 	WIDGET_SORT,		// 排序子部件
 	WIDGET_SHOW,		// 显示
@@ -21,6 +22,7 @@ typedef union union_widget_data {
 	LCUI_Pos pos;
 	LCUI_Size size;
 	int state;
+	uchar_t alpha;
 	void *ptr;
 } u_wdata;
 

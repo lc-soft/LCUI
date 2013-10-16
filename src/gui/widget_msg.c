@@ -132,6 +132,11 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 			tmp_msg.data.state = *((int*)data);
 		}
 		break;
+	    case WIDGET_CHGALPHA:
+		if(tmp_msg.valid) {
+			tmp_msg.data.alpha = *((int*)data);
+		}
+		break;
 	    case WIDGET_PAINT:
 	    case WIDGET_REFRESH:
 	    case WIDGET_UPDATE:
@@ -191,6 +196,13 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 		    case WIDGET_CHGSTATE:
 			if(tmp_msg.valid) {
 				tmp_msg_ptr->data.state = tmp_msg.data.state;
+			} else {
+				tmp_msg_ptr->valid = FALSE;
+			}
+			break;
+		    case WIDGET_CHGALPHA:
+			if(tmp_msg.valid) {
+				tmp_msg_ptr->data.alpha = tmp_msg.data.alpha;
 			} else {
 				tmp_msg_ptr->valid = FALSE;
 			}
