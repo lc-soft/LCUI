@@ -399,7 +399,7 @@ LCUI_API int
 Widget_SetZIndex( LCUI_Widget *widget, int z_index );
 
 /** 获取部件的透明度 */
-LCUI_API unsigned char Widget_GetAlpha( LCUI_Widget *widget );
+LCUI_API uchar_t Widget_GetAlpha( LCUI_Widget *widget );
 
 /** 设定部件的透明度 */
 LCUI_API void Widget_SetAlpha( LCUI_Widget *widget, unsigned char alpha );
@@ -503,7 +503,7 @@ Widget_UpdateChildPos(LCUI_Widget *widget);
 LCUI_API void
 Widget_SetHeight( LCUI_Widget *widget, int height );
 
-/*
+/**
  * 功能：设定部件的尺寸大小
  * 说明：如果设定了部件的停靠位置，并且该停靠类型默认限制了宽/高，那么部件的宽/高就不能被改变。
  * 用法示例：
@@ -512,59 +512,50 @@ Widget_SetHeight( LCUI_Widget *widget, int height );
  * Widget_SetSize( widget, "50", "50" ); 部件尺寸最大为50x50像素，px可以省略
  * Widget_SetSize( widget, NULL, "50%" ); 部件宽度保持原样，高度为容器高度的一半
  * */
-LCUI_API void
-Widget_SetSize( LCUI_Widget *widget, char *width, char *height );
+LCUI_API void Widget_SetSize( LCUI_Widget *widget, char *width, char *height );
 
-/* 设定部件是否为模态部件 */
-LCUI_API void
-Widget_SetModal( LCUI_Widget *widget, LCUI_BOOL is_modal );
+/** 指定部件是否为模态部件 */
+LCUI_API void Widget_SetModal( LCUI_Widget *widget, LCUI_BOOL is_modal );
 
-/* 设定部件的停靠类型 */
-LCUI_API void
-Widget_SetDock( LCUI_Widget *widget, DOCK_TYPE dock );
+/** 设定部件的停靠类型 */
+LCUI_API void Widget_SetDock( LCUI_Widget *widget, DOCK_TYPE dock );
 
-/* 功能：刷新显示指定部件的整个区域图形 */
-LCUI_API void
-Widget_Refresh(LCUI_Widget *widget);
+/** 刷新显示指定部件的整个区域图形 */
+LCUI_API void Widget_Refresh(LCUI_Widget *widget);
 
-/* 调整部件的尺寸 */
-LCUI_API void
-Widget_Resize( LCUI_Widget *widget, LCUI_Size new_size );
+/** 调整部件的尺寸 */
+LCUI_API void Widget_Resize( LCUI_Widget *widget, LCUI_Size new_size );
 
-/* 重新绘制部件 */
-LCUI_API void
-Widget_Draw(LCUI_Widget *widget);
+/** 重新绘制部件 */
+LCUI_API void Widget_Draw( LCUI_Widget *widget );
 
-/* 销毁部件 */
-LCUI_API void
-Widget_Destroy( LCUI_Widget *widget );
+/** 销毁部件 */
+LCUI_API void Widget_Destroy( LCUI_Widget *widget );
 
-/*
+/**
  * 功能：让部件根据已设定的属性，进行相应数据的更新
  * 说明：此记录会添加至队列，如果队列中有一条相同记录，则覆盖上条记录。
  * */
-LCUI_API void
-Widget_Update(LCUI_Widget *widget);
+LCUI_API void Widget_Update( LCUI_Widget *widget );
 
 /*
  * 功能：让部件根据已设定的属性，进行相应数据的更新
  * 说明：与上个函数功能一样，但是，可以允许队列中有两条相同记录。
  * */
-LCUI_API void
-__Widget_Update(LCUI_Widget *widget);
+LCUI_API void __Widget_Update( LCUI_Widget *widget );
 
+/** 显示部件 */
+LCUI_API void Widget_Show( LCUI_Widget *widget );
 
-/* 显示部件 */
-LCUI_API void
-Widget_Show(LCUI_Widget *widget);
+/** 隐藏部件 */
+LCUI_API void Widget_Hide( LCUI_Widget *widget );
 
-/* 隐藏部件 */
-LCUI_API void
-Widget_Hide(LCUI_Widget *widget);
+/** 改变部件的状态 */
+LCUI_API int Widget_SetState( LCUI_Widget *widget, int state );
 
-/* 改变部件的状态 */
-LCUI_API int
-Widget_SetState( LCUI_Widget *widget, int state );
+/** 设置部件的alpha透明度 */
+LCUI_API void Widget_SetAlpha( LCUI_Widget *widget, uchar_t alpha );
+
 /************************* Widget End *********************************/
 
 LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr );
