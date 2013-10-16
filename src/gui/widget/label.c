@@ -86,6 +86,9 @@ static void Label_SetTextW( LCUI_Widget *widget, void *arg )
 	DEBUG_MSG("recv LABEL_TEXT msg, lock widget\n");
 	Widget_Lock( widget );
 	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	if( !label ) {
+		return;
+	}
 	unicode_text = (wchar_t*)arg;
 	TextLayer_TextW( &label->layer, unicode_text );
 	Widget_Update( widget );
