@@ -540,7 +540,7 @@ static int FontLIB_AddInCoreFontInfo( void )
 }
 
 #ifdef LCUI_BUILD_IN_WIN32
-#define MAX_FONTFILE_NUM	5
+#define MAX_FONTFILE_NUM	4
 #else
 #define MAX_FONTFILE_NUM	1
 #endif
@@ -554,7 +554,6 @@ void LCUIModule_Font_Init( void )
 #ifdef LCUI_BUILD_IN_WIN32
 		"C:/Windows/Fonts/msyh.ttf",
 		"C:/Windows/Fonts/msyh.ttc",
-		"C:/Windows/Fonts/simhei.ttc",
 		"C:/Windows/Fonts/simsun.ttc",
 		"C:/Windows/Fonts/consola.ttf"
 #else
