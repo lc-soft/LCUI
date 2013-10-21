@@ -67,6 +67,7 @@ LCUI_API void
 TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily )
 {
 	style->font_id = FontLIB_GetFontIDByFamilyName( fontfamily );
+	style->_family = TRUE;
 }
 
 /* 设置字体族ID */
@@ -74,6 +75,7 @@ LCUI_API void
 TextStyle_FontFamilyID( LCUI_TextStyle *style, int id )
 {
 	style->font_id = id;
+	style->_family = TRUE;
 }
 
 /* 设置字体大小 */
@@ -81,6 +83,7 @@ LCUI_API void
 TextStyle_FontSize( LCUI_TextStyle *style, int fontsize )
 {
 	style->pixel_size = fontsize;
+	style->_pixel_size = TRUE;
 }
 
 /* 设置字体颜色 */
@@ -88,6 +91,7 @@ LCUI_API void
 TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color )
 {
 	style->fore_color = color;
+	style->_fore_color = TRUE;
 }
 
 /* 设置字体背景颜色 */
@@ -95,6 +99,7 @@ LCUI_API void
 TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color )
 {
 	style->back_color = color;
+	style->_back_color = TRUE;
 }
 
 /* 设置字体样式 */
@@ -102,12 +107,14 @@ LCUI_API void
 TextStyle_FontStyle( LCUI_TextStyle *style, enum_font_style fontstyle )
 {
 	style->style = fontstyle;
+	style->_style = TRUE;
 }
 
 LCUI_API void
 TextStyle_FontWeight( LCUI_TextStyle *style, enum_font_weight fontweight ) 
 {
 	style->weight = fontweight;
+	style->_weight = TRUE;
 }
 
 LCUI_API void
