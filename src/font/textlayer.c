@@ -407,7 +407,7 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 	rows = Queue_GetTotal( &layer->rows_data ); 
 	for(pos.y=layer->offset_pos.y,i=0; i<rows; ++i) {
 		redraw_row = FALSE;
-		p_row = Queue_Get( &layer->rows_data, i );
+		p_row = (Text_RowData*)Queue_Get( &layer->rows_data, i );
 		if( !p_row ) {
 			continue;
 		}
@@ -417,9 +417,9 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 			pos.y += p_row->max_size.h;
 			continue;
 		}
-		for(pos.x=layer->offset_pos.x,j=0; j<n; ++j) {
+		for( pos.x=layer->offset_pos.x,j=0; j<n; ++j ) {
 			/* 如果设置了屏蔽符 */
-			p_data = Queue_Get( &p_row->string, j ); 
+			p_data = (LCUI_CharData*)Queue_Get( &p_row->string, j ); 
 			if( !p_data ) {
 				continue;
 			}
@@ -433,13 +433,15 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 				pos.x += p_data->bitmap->advance.x;
 				continue;
 			}
-			/* 获取该字体位图的大致尺寸 */
-			if( p_data->data ) {
-				size = p_data->data->pixel_size;
-				size += 2;
-				color = p_data->data->fore_color;
+			/* 获取该字体位图的大致尺寸以及颜色 */
+			if( p_data->data && p_data->data->_pixel_size ) {
+				size = p_data->data->pixel_size + 2;
 			} else {
 				size = layer->default_data.pixel_size + 2; 
+			}
+			if( p_data->data && p_data->data->_fore_color ) {
+				color = p_data->data->fore_color;
+			} else {
 				color = layer->default_data.fore_color;
 			}
 			/* 如果字体位图已标记更新，则绘制它 */
