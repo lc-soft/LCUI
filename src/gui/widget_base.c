@@ -77,7 +77,7 @@ Widget_Container_Add( LCUI_Widget *ctnr, LCUI_Widget *widget )
 	}
 	/* 若部件已获得过焦点，则复位之前容器中的焦点 */
 	if( Widget_GetFocus( widget ) ) {
-		Reset_Focus( widget->parent );
+		Widget_ResetFocus( widget->parent );
 	}
 
 	/* 改变该部件的容器，需要将它从之前的容器中移除 */
