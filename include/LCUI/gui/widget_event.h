@@ -155,9 +155,8 @@ Cancel_Focus( LCUI_Widget *widget );
  * 说明：该部件会得到EVENT_FOCUSOUT事件，并且，会将焦点转移至其它部件
  * */ 
 
-LCUI_API LCUI_BOOL
-Reset_Focus( LCUI_Widget* widget );
-/* 复位指定部件内的子部件的焦点 */ 
+/** 复位指定部件内的子部件的焦点 */
+LCUI_API LCUI_BOOL Widget_ResetFocus( LCUI_Widget* widget );
 
 /*------------------------- End Focus Proc ----------------------------*/
 
