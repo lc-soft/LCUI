@@ -310,13 +310,14 @@ static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
 		n = Queue_GetTotal( child_list );
 		for(i=0; i<n; ++i) {
 			child = (LCUI_Widget*)Queue_Get( child_list, i );
-			if( !child || !child->visible || !child->modal ) {
+			if( !child || !child->visible ) {
 				continue;
+			}
+			if( !widget->modal && child->modal ) {
+				return FALSE;
 			}
 			if( child == widget ) {
 				break;
-			} else {
-				return FALSE;
 			}
 		}
 		/* 记录这一级部件 */
@@ -447,7 +448,7 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 	DEBUG_MSG("mouse left button free, click_widget: %p\n", click_widget );
 	if( !click_widget ) {
 		/* 如果是点击屏幕空白处，则复位焦点 */
-		Reset_Focus( NULL );
+		Widget_ResetFocus( NULL );
 		return;
 	}
 	/* 如果能拖动部件 */
@@ -513,11 +514,11 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 			Widget_DispatchEvent( tmp_widget, &wdg_event );
 		}
 	} 
+	
 	/* 如果没有部件处于按住状态 */
-	if( widget_allow_response(widget) && !click_widget ) {
+	if( !click_widget ) {
 		WidgetRecord_SetWidgetState( widget, WIDGET_STATE_OVERLAY );
 	}
-	tmp_widget = GetWidgetOfResponseEvent( click_widget, EVENT_CLICKED );
 	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */
 	tmp_widget = GetWidgetOfResponseEvent( click_widget, EVENT_DRAG );
 	if( tmp_widget != click_widget ) {
@@ -762,9 +763,8 @@ Cancel_Focus( LCUI_Widget *widget )
 	return TRUE;
 }
 
-LCUI_API LCUI_BOOL
-Reset_Focus( LCUI_Widget* widget )
-/* 复位指定部件内的子部件的焦点 */
+/** 复位指定部件内的子部件的焦点 */
+LCUI_API LCUI_BOOL Widget_ResetFocus( LCUI_Widget* widget )
 {
 	LCUI_Widget** focus_widget;
 	LCUI_WidgetEvent event;
