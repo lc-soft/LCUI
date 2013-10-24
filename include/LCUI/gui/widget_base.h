@@ -211,7 +211,7 @@ Widget_InvalidArea( LCUI_Widget *widget, LCUI_Rect rect );
 /* 将所有可见部件的无效区域 同步至 屏幕无效区域队列中 */
 LCUI_API void Widget_SyncInvalidArea( void );
 
-/*
+/**
  * 功能：让指定部件响应部件状态的改变
  * 说明：部件创建时，默认是不响应状态改变的，因为每次状态改变后，都要调用函数重绘部件，
  * 这对于一些部件是多余的，没必要重绘，影响效率。如果想让部件能像按钮那样，鼠标移动到它
@@ -220,20 +220,17 @@ LCUI_API void Widget_SyncInvalidArea( void );
  * Widget_SetValidState( widget, WIDGET_STATE_NORMAL );
  * Widget_SetValidState( widget, WIDGET_STATE_OVERLAY | WIDGET_STATE_ACTIVE );
  * */
-LCUI_API void
-Widget_SetValidState( LCUI_Widget *widget, int state );
+LCUI_API void Widget_SetValidState( LCUI_Widget *widget, int state );
 
-/*
+/**
  * 功能：获取部件的指定类型的父部件的指针
  * 说明：本函数会在部件关系链中往头部查找父部件指针，并判断这个父部件是否为制定类型
  * 返回值：没有符合要求的父级部件就返回NULL，否则返回部件指针
  **/
-LCUI_API LCUI_Widget*
-Widget_GetParent(LCUI_Widget *widget, char *widget_type);
+LCUI_API LCUI_Widget* Widget_GetParent(LCUI_Widget *widget, char *widget_type);
 
 /* 获取指定ID的子部件 */
-LCUI_API LCUI_Widget*
-Widget_GetChildByID( LCUI_Widget *widget, LCUI_ID id );
+LCUI_API LCUI_Widget* Widget_GetChildByID( LCUI_Widget *widget, LCUI_ID id );
 
 /* 销毁指定ID的程序的所有部件 */
 LCUI_API void
