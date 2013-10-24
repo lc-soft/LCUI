@@ -408,7 +408,7 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 		}
 	}
 	/* 焦点转移给该部件 */
-	Set_Focus( click_widget );
+	Widget_SetFocus( click_widget );
 	WidgetRecord_SetWidgetState( widget, WIDGET_STATE_ACTIVE );
 }
 
@@ -517,7 +517,12 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	
 	/* 如果没有部件处于按住状态 */
 	if( !click_widget ) {
-		WidgetRecord_SetWidgetState( widget, WIDGET_STATE_OVERLAY );
+		/* 如果允许响应状态，就设置为OVERLAY状态，否则重置为NORMAL状态 */
+		if( widget_allow_response(widget) ) {
+			WidgetRecord_SetWidgetState( widget, WIDGET_STATE_OVERLAY );
+		} else {
+			WidgetRecord_SetWidgetState( widget, WIDGET_STATE_NORMAL );
+		}
 	}
 	/* 如果之前点击过部件，并且现在鼠标左键还处于按下状态，那就处理部件拖动 */
 	tmp_widget = GetWidgetOfResponseEvent( click_widget, EVENT_DRAG );
@@ -599,13 +604,12 @@ LCUIModule_Widget_End( void )
 
 /*--------------------------- Focus Proc ------------------------------*/
 
-LCUI_API LCUI_BOOL
-Set_Focus( LCUI_Widget *widget )
-/*
+/**
  * 功能：为部件设置焦点
  * 说明：上个获得焦点的部件会得到EVENT_FOCUSOUT事件，而当前获得焦点的部件会得到
  * EVENT_FOCUSIN事件。
  * */
+LCUI_API LCUI_BOOL Widget_SetFocus( LCUI_Widget *widget )
 {
 	LCUI_Widget **focus_widget;
 	LCUI_WidgetEvent event;
@@ -613,7 +617,7 @@ Set_Focus( LCUI_Widget *widget )
 	if( widget ) {
 		/* 先处理上级部件的焦点 */
 		if( widget->parent ) {
-			Set_Focus( widget->parent );
+			Widget_SetFocus( widget->parent );
 		}
 		if( !widget->focus ) {
 			return FALSE;
@@ -644,13 +648,12 @@ Set_Focus( LCUI_Widget *widget )
 	return TRUE;
 }
 
-/* 设定部件是否能够获取焦点 */
-LCUI_API void
-Widget_SetFocus( LCUI_Widget *widget, LCUI_BOOL flag )
+/** 设定部件是否能够获取焦点 */
+LCUI_API void Widget_SetCanGetFocus( LCUI_Widget *widget, LCUI_BOOL flag )
 {
 	/* 如果该部件已经获得焦点，并且要设置它不能获取焦点，则取消当前焦点 */
 	if( Widget_GetFocus(widget) && !flag ) {
-		Cancel_Focus( widget );
+		Widget_CancelFocus( widget );
 	}
 	widget->focus = flag;
 }
@@ -705,12 +708,11 @@ Get_FocusWidget( LCUI_Widget *widget )
 	return widget;
 }
 
-LCUI_API LCUI_BOOL
-Cancel_Focus( LCUI_Widget *widget )
-/*
+/**
  * 功能：取消指定部件的焦点
  * 说明：该部件会得到EVENT_FOCUSOUT事件，并且，会将焦点转移至其它部件
  * */
+LCUI_API LCUI_BOOL Widget_CancelFocus( LCUI_Widget *widget )
 {
 	int i, total, focus_pos;
 	LCUI_Widget *other_widget, **focus_widget;
