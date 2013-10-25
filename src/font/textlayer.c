@@ -45,7 +45,6 @@
 
 #include LC_LCUI_H 
 #include LC_GRAPH_H
-#include LC_WIDGET_H
 #include LC_FONT_H
 
 #include <wchar.h>
@@ -280,12 +279,8 @@ Destroy_TextLayer( LCUI_TextLayer *layer )
 	RectQueue_Destroy( &layer->clear_area );
 }
 
-static void
-__TextLayer_OldArea_Erase( LCUI_TextLayer *layer, LCUI_Graph *graph )
-/* 
- * 功能：擦除文本图层的老区域
- * 说明：根据记录的旧偏移坐标，刷新部件区域内的文字所在区域。
- *  */
+/** 记录文本图层中的需擦除的区域 */
+static void TextLayer_EraseOldArea( LCUI_TextLayer *layer, LCUI_Graph *graph )
 {
 	static int i, j, x, y, rows, len;
 	static Text_RowData *row_ptr;
@@ -352,40 +347,30 @@ __TextLayer_OldArea_Erase( LCUI_TextLayer *layer, LCUI_Graph *graph )
 	}
 }
 
-LCUI_API void
-TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
-/* 将文本图层绘制到目标部件的图层上 */
+/** 将文本图层绘制到目标图层上 */
+LCUI_API void TextLayer_Draw(	LCUI_Graph *graph, 
+				LCUI_Queue *dirty_rect_list,
+				LCUI_TextLayer *layer,
+				int mode )
 {
 	LCUI_Rect area;
 	LCUI_Pos pos, mix_pos;
 	LCUI_BOOL draw_all = FALSE, redraw_row;
 	int i, j, n, rows, size;
 	LCUI_RGB color;
-	LCUI_Graph slot, *graph;
+	LCUI_Graph slot;
 	LCUI_CharData *p_data;
 	Text_RowData *p_row;
 	
-	//clock_t start;
-	//start = clock();
-	//_DEBUG_MSG("enter\n");
-	if( widget == NULL || layer == NULL ) {
-		return;
-	}
-	graph = Widget_GetSelfGraph( widget );
-	if( graph == NULL ) {
+	if( !graph || !layer ) {
 		return;
 	}
 	/* 如果需要滚动图层 */
 	if( layer->need_scroll_layer ) {
 		layer->need_scroll_layer = FALSE;
-		//_DEBUG_MSG("layer->need_scroll_layer\n");
-		/* 根据之前记录的偏移坐标，刷新文本图层 */
-		__TextLayer_OldArea_Erase( layer, Widget_GetSelfGraph( widget ) );
+		TextLayer_EraseOldArea( layer, graph );
 		draw_all = TRUE;
 	}
-	
-	//_DEBUG_MSG("1, use time: %ld\n", clock() - start );
-	//start = clock();
 	
 	Graph_Init( &slot );
 	/* 切换可用队列为当前占用的队列 */
@@ -397,33 +382,30 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 		Graph_Quote( &slot, graph, area );
 		/* 将该区域的alpha通道填充为0 */
 		Graph_FillAlpha( &slot, 0 );
-		Widget_InvalidArea( widget, area ); 
-		//printf("refresh area: %d,%d,%d,%d\n",
-		//area.x, area.y, area.width, area.height);
+		if( dirty_rect_list ) {
+			Queue_Add( dirty_rect_list, &area ); 
+		}
 	}
-	//_DEBUG_MSG("2, use time: %ld\n", clock() - start );
-	//start = clock();
 	/* 开始绘制文本位图至目标图层上 */
-	rows = Queue_GetTotal( &layer->rows_data ); 
+	rows = Queue_GetTotal( &layer->rows_data );
 	for(pos.y=layer->offset_pos.y,i=0; i<rows; ++i) {
 		redraw_row = FALSE;
 		p_row = (Text_RowData*)Queue_Get( &layer->rows_data, i );
 		if( !p_row ) {
 			continue;
 		}
-		n = Queue_GetTotal( &p_row->string );
 		/* 如果当前字的位图的Y轴跨距不在有效绘制区域内 */
 		if( pos.y + p_row->max_size.h <= 0 ) {
 			pos.y += p_row->max_size.h;
 			continue;
 		}
-		for( pos.x=layer->offset_pos.x,j=0; j<n; ++j ) {
-			/* 如果设置了屏蔽符 */
+		n = Queue_GetTotal( &p_row->string );
+		for(pos.x=layer->offset_pos.x,j=0; j<n; ++j) {
 			p_data = (LCUI_CharData*)Queue_Get( &p_row->string, j ); 
 			if( !p_data ) {
 				continue;
 			}
-			
+			/* 如果设置了屏蔽符 */
 			if( layer->password_char.char_code > 0 ) {
 				layer->password_char.need_update = p_data->need_update;
 				p_data = &layer->password_char;
@@ -460,7 +442,7 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 					p_data->bitmap, color, mode );
 			}
 			pos.x += p_data->bitmap->advance.x;
-			if( pos.x > widget->size.w ) {
+			if( pos.x > graph->w ) {
 				break;
 			}
 		}
@@ -469,15 +451,13 @@ TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode )
 			area.width = pos.x - area.x;
 			//_DEBUG_MSG("area:%d,%d,%d,%d\n", 
 			//area.x, area.y, area.width, area.height);
-			Widget_InvalidArea( widget, area );
+			Queue_Add( dirty_rect_list, &area );
 		}
 		pos.y += p_row->max_size.h;
-		if( pos.y > widget->size.h ) {
+		if( pos.y > graph->h ) {
 			break;
 		}
 	}
-	//_DEBUG_MSG("3, use time: %ld\n", clock() - start );
-	//_DEBUG_MSG("quit\n");
 }
 
 LCUI_API void
@@ -714,11 +694,10 @@ TextLayer_Text_SetPasswordChar( LCUI_TextLayer *layer, wchar_t ch )
 	//暂时不进行其它处理
 }
 
-/* 对文本进行预处理，处理后的数据保存至layer里 */ 
-LCUI_API void
-TextLayer_Text_Process(	LCUI_TextLayer *layer,
-				int pos_type,
-				wchar_t *new_text )
+/** 对文本进行预处理，处理后的数据保存至layer里 */ 
+LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
+					int pos_type,
+					wchar_t *new_text )
 {
 	LCUI_BOOL refresh = TRUE;
 	LCUI_Pos cur_pos, des_pos;
@@ -768,7 +747,7 @@ TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	total_row = TextLayer_GetRows( layer );
 	/* 判断当前要添加的字符的总数是否超出最大限制 */
 	cur_len = Queue_GetTotal( &layer->text_source_data );
-	if( total + cur_len > layer->max_text_len ) {
+	if( (uint32_t)(total+cur_len) > layer->max_text_len ) {
 		total = layer->max_text_len - cur_len;
 	}
 	if( total < 0 ) {
