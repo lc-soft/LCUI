@@ -245,7 +245,10 @@ LCUI_API int FontBMP_Mix(	LCUI_Graph	*graph,
 			des->rgba[0][n] = color.red;
 			des->rgba[1][n] = color.green;
 			des->rgba[2][n] = color.blue;
-			des->rgba[3][n] = bitmap->buffer[m];
+			/* 仅在有透明度时才覆盖 */
+			if( bitmap->buffer[m] > 0 ) {
+				des->rgba[3][n] = bitmap->buffer[m];
+			}
 		}
 		des_start_pos += des->w;
 		src_start_pos += bitmap->width;
@@ -344,6 +347,7 @@ static int Convert_FTGlyph(	LCUI_FontBMP *des,
 	FT_Done_Glyph(glyph);
 	return size;
 }
+
 #endif
 
 /** 载入字体位图 */
