@@ -71,12 +71,10 @@ TextBox_GetText( LCUI_Widget *widget, wchar_t *buff, size_t max_len );
 LCUI_API int
 TextBox_Text_GetTotalLength( LCUI_Widget *widget );
 
-/* 设定文本框显示的文本 */
-LCUI_API void
-TextBox_TextW( LCUI_Widget *widget, wchar_t *unicode_text );
+/** 设定文本框显示的文本 */
+LCUI_API void TextBox_TextW( LCUI_Widget *widget, const wchar_t *unicode_text );
 
-LCUI_API void
-TextBox_Text( LCUI_Widget *widget, char *utf8_text );
+LCUI_API void TextBox_Text( LCUI_Widget *widget, const char *utf8_text );
 
 LCUI_API void
 TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos );
@@ -128,9 +126,11 @@ LCUI_API void
 TextBox_Using_StyleTags(LCUI_Widget *widget, LCUI_BOOL flag);
 /* 指定文本框是否处理控制符 */
 
-LCUI_API void
-TextBox_Multiline( LCUI_Widget *widget, LCUI_BOOL flag );
-/* 指定文本框是否启用多行文本显示 */
+/** 指定文本框是否启用多行文本显示 */
+LCUI_API void TextBox_SetMultiline( LCUI_Widget *widget, LCUI_BOOL flag );
+
+/** 设置文本框的内容是否为只读 */
+LCUI_API void TextBox_SetReadOnly( LCUI_Widget *widget, LCUI_BOOL flag );
 
 LCUI_API void
 TextBox_Text_SetDefaultStyle( LCUI_Widget *widget, LCUI_TextStyle style );
