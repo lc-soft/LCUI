@@ -238,6 +238,13 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 LCUI_API LCUI_BOOL
 LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
 {
+	int key_state;
+	/* 根据事件类型判定按键状态 */
+	if( event->type == LCUI_KEYUP ) {
+		key_state = LCUIKEYSTATE_RELEASE;
+	} else {
+		key_state = LCUIKEYSTATE_PRESSED;
+	}
 	/* 如果按下的是shift键，但没释放，则直接退出 */
 	if( event->key_code == LCUIKEY_SHIFT
 	 && event->type == LCUI_KEYDOWN ) {
@@ -256,7 +263,7 @@ LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
 		return FALSE;
 	}
 	/* 如果输入法要处理该键，则调用LCUIIME_ToText函数 */
-	if( current_ime->func.prockey( event->key_code ) ) {
+	if( current_ime->func.prockey( event->key_code, key_state ) ) {
 		LCUIIME_ToText( event );
 		return TRUE;
 	}
@@ -334,7 +341,7 @@ static LCUI_Widget *target_widget = NULL;
 的相应回调函数处理；否则，return TRUE;并从输入的内容中删除一个字符
 **/
 static LCUI_BOOL
-IME_ProcessKey( int key )
+IME_ProcessKey( int key, int key_state )
 {
 #ifdef LCUI_BUILD_IN_LINUX
 	/* *
@@ -343,6 +350,10 @@ IME_ProcessKey( int key )
 	 * */
 	if( key >= '!' && key <= '~') {
 		return TRUE;
+	}
+#elif defined LCUI_BUILD_IN_WIN32
+	if( key_state != LCUIKEYSTATE_PRESSED ) {
+		return FALSE;
 	}
 #endif
 	switch(key) {
@@ -427,7 +438,7 @@ IME_ToText( char ch )
 #endif
 	text[0] = ch;
 	text[1] = '\0';
-	DEBUG_MSG("%S\n", text);
+	DEBUG_MSG("%S, %d\n", text, ch);
 	LCUIIME_Commit( text ); // 直接提交该字符
 }
 
