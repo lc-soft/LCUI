@@ -292,8 +292,8 @@ LCUI_API void WidgetRecord_Delete( LCUI_Widget *widget )
 	Queue_Unlock( &widget_proc_record );
 }
 
-/* 判断指定部件是否被允许响应事件 */
-static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
+/** 判断指定部件是否被允许响应事件 */
+LCUI_API LCUI_BOOL Widget_IsAllowResponseEvent( LCUI_Widget *widget )
 {
 	int i, n;
 	LCUI_Queue *child_list;
@@ -330,11 +330,13 @@ static LCUI_BOOL widget_allow_response( LCUI_Widget *widget )
 	return TRUE;
 }
 
-/* 设定部件状态，该函数会将该部件及上级所有父部件添加至列表里，每次调用该函数时，会更新
+/**
+ * 设定部件状态，该函数会将该部件及上级所有父部件添加至列表里，每次调用该函数时，会更新
  * 列表中的部件记录，若部件在更新前后都在列表中有记录，则该部件及上级所有父部件都会应用
- * 此状态，否则，移除多余的部件，并恢复部件的状态为NORMAL */
-static void
-WidgetRecord_SetWidgetState( LCUI_Widget *widget, WIDGET_STATE state )
+ * 此状态，否则，移除多余的部件，并恢复部件的状态为NORMAL 
+ */
+static void WidgetRecord_SetWidgetState(	LCUI_Widget *widget, 
+						WIDGET_STATE state )
 {
 	WidgetRecord_Reset();
 	while( widget ) {
@@ -363,7 +365,7 @@ LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 
 	widget = Widget_At( NULL, pos );
 
-	if( !widget_allow_response(widget) ) {
+	if( !Widget_IsAllowResponseEvent(widget) ) {
 		return;
 	}
 	DEBUG_MSG("widget: %p\n", widget);
@@ -428,7 +430,7 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 	pos.y = event->y;
 	widget = Widget_At( NULL, pos );
 
-	if( !widget_allow_response(widget) ) {
+	if( !Widget_IsAllowResponseEvent(widget) ) {
 		return;
 	}
 	DEBUG_MSG("widget: %p\n", widget);
@@ -477,10 +479,10 @@ LCUI_HandleMouseButtonUp( LCUI_MouseButtonEvent *event )
 			tmp_event.clicked.rel_pos = Widget_ToRelPos( tmp_widget, pos );
 			Widget_DispatchEvent( tmp_widget, &tmp_event );
 		}
-		WidgetRecord_SetWidgetState (widget, WIDGET_STATE_ACTIVE);
+		WidgetRecord_SetWidgetState( widget, WIDGET_STATE_ACTIVE );
 	}
 exit_point:;
-	WidgetRecord_SetWidgetState (widget, WIDGET_STATE_OVERLAY);
+	WidgetRecord_SetWidgetState( widget, WIDGET_STATE_OVERLAY );
 	click_widget = NULL;
 }
 
@@ -518,7 +520,7 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	/* 如果没有部件处于按住状态 */
 	if( !click_widget ) {
 		/* 如果允许响应状态，就设置为OVERLAY状态，否则重置为NORMAL状态 */
-		if( widget_allow_response(widget) ) {
+		if( Widget_IsAllowResponseEvent(widget) ) {
 			WidgetRecord_SetWidgetState( widget, WIDGET_STATE_OVERLAY );
 		} else {
 			WidgetRecord_SetWidgetState( widget, WIDGET_STATE_NORMAL );
@@ -543,14 +545,14 @@ void Widget_ClearClickRecord( LCUI_Widget *widget )
 	}
 }
 
-static int
-Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
-				LCUI_KeyboardEvent *event )
+/** 根据键盘事件，将部件事件的响应任务派发出去 */
+static int Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
+						LCUI_KeyboardEvent *event )
 {
 	int i,n;
 	LCUI_EventSlot *slot;
 	LCUI_Task *task;
-	LCUI_KeyboardEvent *p_buff;
+	LCUI_WidgetEvent *p_buff;
 
 	if( !widget ) {
 		return -1;
@@ -562,13 +564,19 @@ Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 	}
 	n = Queue_GetTotal( &slot->func_data );
 	for(i=0; i<n; ++i) {
-		task = Queue_Get( &slot->func_data, i );
-		p_buff = malloc( sizeof(LCUI_KeyboardEvent) );
+		task = (LCUI_Task*)Queue_Get( &slot->func_data, i );
+		p_buff = (LCUI_WidgetEvent*)malloc( sizeof(LCUI_WidgetEvent) );
 		if( !p_buff ) {
 			perror( __FUNCTION__ );
 			abort();
 		}
-		*p_buff = *event;
+		p_buff->type = EVENT_KEYBOARD;
+		p_buff->key.key_code = event->key_code;
+		if( event->type == LCUI_KEYUP ) {
+			p_buff->key.key_state = LCUIKEYSTATE_RELEASE;
+		} else {
+			p_buff->key.key_state = LCUIKEYSTATE_PRESSED;
+		}
 		task->arg[1] = p_buff;
 		task->destroy_arg[1] = TRUE;
 		AppTasks_Add( task );
@@ -784,26 +792,7 @@ LCUI_API LCUI_BOOL Widget_ResetFocus( LCUI_Widget* widget )
 	return TRUE;
 }
 
-LCUI_API int
-Next_FocusWidget()
-{
-	return 0;
-}
-
-LCUI_API int
-Prev_FocusWidget()
-{
-	return 0;
-}
-
-LCUI_API int
-Return_FocusToParent()
-{
-	return 0;
-}
-
-static void
-WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
+static void WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
 {
 	LCUI_Widget *widget = NULL, *tmp = NULL, *focus_widget;
 	/* 如果输入法需要处理这个键，则退出本函数 */

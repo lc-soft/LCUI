@@ -80,8 +80,14 @@ typedef struct LCUI_WidgetFocusEvent_ {
 	LCUI_BOOL focus;
 } LCUI_WidgetFocusEvent;
 
-typedef LCUI_KeyboardEvent	LCUI_WidgetKeyboardEvent;
+typedef struct {
+	unsigned char type;
+	int key_code;
+	int key_state;
+}LCUI_WidgetKeyboardEvent;
+
 typedef LCUI_MouseButtonEvent	LCUI_WidgetMouseButtonEvent;
+
 typedef struct LCUI_WidgetMouseMotionEvent_ {
 	uchar_t type;
 	LCUI_Pos rel_pos;
@@ -122,6 +128,9 @@ Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event );
 /** 移除指定部件的记录，使之不再响应状态变化 */
 LCUI_API void WidgetRecord_Delete( LCUI_Widget *widget );
 
+/** 判断指定部件是否被允许响应事件 */
+LCUI_API LCUI_BOOL Widget_IsAllowResponseEvent( LCUI_Widget *widget );
+
 /* 初始化部件模块 */
 LCUI_API void
 LCUIModule_Widget_Init( void );
@@ -132,28 +141,26 @@ LCUIModule_Widget_End( void );
 /*-------------------------------- END ---------------------------------------*/
 
 /*--------------------------- Focus Proc ------------------------------*/
-LCUI_API LCUI_BOOL
-Set_Focus( LCUI_Widget *widget );
-/* 
+
+/**
  * 功能：为部件设置焦点
  * 说明：上个获得焦点的部件会得到EVENT_FOCUSOUT事件，而当前获得焦点的部件会得到
  * EVENT_FOCUSIN事件。
- * */ 
+ * */
+LCUI_API LCUI_BOOL Widget_SetFocus( LCUI_Widget *widget );
 
-/* 设定部件是否能够获取焦点 */
-LCUI_API void
-Widget_SetFocus( LCUI_Widget *widget, LCUI_BOOL flag );
+/** 设定部件是否能够获取焦点 */
+LCUI_API void Widget_SetCanGetFocus( LCUI_Widget *widget, LCUI_BOOL flag );
 
 /* 获取指定部件内的已获得焦点的子部件 */
 LCUI_API LCUI_Widget*
 Get_FocusWidget( LCUI_Widget *widget );
 
-LCUI_API LCUI_BOOL
-Cancel_Focus( LCUI_Widget *widget );
-/* 
+/**
  * 功能：取消指定部件的焦点
  * 说明：该部件会得到EVENT_FOCUSOUT事件，并且，会将焦点转移至其它部件
- * */ 
+ * */
+LCUI_API LCUI_BOOL Widget_CancelFocus( LCUI_Widget *widget );
 
 /** 复位指定部件内的子部件的焦点 */
 LCUI_API LCUI_BOOL Widget_ResetFocus( LCUI_Widget* widget );
