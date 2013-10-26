@@ -4,7 +4,7 @@
 LCUI_BEGIN_HEADER
 
 typedef struct LCUIIME_Func_ {
-	LCUI_BOOL (*prockey)(int);
+	LCUI_BOOL (*prockey)(int,int);
 	void (*settarget)(LCUI_Widget*);
 	LCUI_Widget *(*gettarget)(void);
 	void (*totext)(char);
