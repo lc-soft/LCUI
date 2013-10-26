@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * textlayer.h -- 文本图层处理模块
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -82,7 +82,7 @@ typedef struct _LCUI_TextLayer
 	LCUI_BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */
 	LCUI_BOOL need_scroll_layer	:1;	/* 指示是否需要滚动图层 */
 	LCUI_BOOL have_select		:1;	/* 标记，指示是否在文本图层中选择了文本 */
-	uint32_t start, end;	/* 被选中的文本的范围 */ 
+	uint32_t start, end;			/* 被选中的文本的范围 */ 
 	
 	LCUI_Queue color_keyword;	/* 记录需要使用指定风格的关键字 */
 	LCUI_Queue text_source_data;	/* 储存文本相关数据 */
@@ -100,6 +100,7 @@ typedef struct _LCUI_TextLayer
 	LCUI_BOOL show_cursor;	/* 指定是否需要显示文本光标 */
 	
 	LCUI_TextStyle default_data;	/* 缺省状态下使用的文本样式数据 */
+	LCUI_Graph graph;		/* 图层数据 */
 }
 LCUI_TextLayer;
 
@@ -111,9 +112,9 @@ LCUI_API void
 Destroy_TextLayer( LCUI_TextLayer *layer );
 /* 销毁文本图层占用的资源 */
 
-LCUI_API void
-TextLayer_Draw( LCUI_Widget *widget, LCUI_TextLayer *layer, int mode );
-/* 将文本图层绘制到目标部件的图层上 */
+/** 更新文本图层中的内容 */
+LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
+				LCUI_Queue *dirty_rect_list );
 
 LCUI_API void
 TextLayer_Refresh( LCUI_TextLayer *layer );
@@ -125,9 +126,15 @@ TextLayer_Refresh( LCUI_TextLayer *layer );
  *  */
 LCUI_API int TextLayer_SetOffset( LCUI_TextLayer *layer, LCUI_Pos offset_pos );
 
-LCUI_API LCUI_Size
-TextLayer_GetSize ( LCUI_TextLayer *layer );
-/* 获取文本图层的实际尺寸 */
+/** 设置文本图层的图像尺寸 */
+LCUI_API int TextLayer_SetGraphSize(	LCUI_TextLayer *layer, 
+					LCUI_Size new_size );
+
+/** 计算文本图层的尺寸 */
+LCUI_API int TextLayer_GetSize( LCUI_TextLayer *layer, LCUI_Size *layer_size );
+
+/** 获取文本图层的图像数据 */
+LCUI_API LCUI_Graph *TextLayer_GetGraph( LCUI_TextLayer *layer );
 
 /* 获取文本图层中的文本内容 */
 LCUI_API size_t
@@ -278,7 +285,7 @@ TextLayer_UsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL flag );
 /* 指定文本图层是否处理样式标签 */
 
 LCUI_API void
-TextLayer_Multiline( LCUI_TextLayer *layer, LCUI_BOOL flag );
+TextLayer_SetMultiline( LCUI_TextLayer *layer, LCUI_BOOL flag );
 /* 指定文本图层是否启用多行文本显示 */
 
 LCUI_END_HEADER
