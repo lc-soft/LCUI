@@ -55,17 +55,18 @@
 
 typedef struct _LCUI_TextBox
 {
-	LCUI_Widget *text;		/* 文本显示层 */
-	LCUI_Widget *cursor;		/* 光标 */
-	LCUI_Widget *scrollbar[2];	/* 两个滚动条 */
-	int block_size;			/* 块大小 */
-	LCUI_Queue text_block_buff;	/* 文本块缓冲区 */
-	LCUI_BOOL show_placeholder;	/* 表示占位符是否已经显示 */
-	LCUI_WString placeholder;	/* 文本框的占位符 */
-	LCUI_WString allow_input_char;	/* 允许输入的字符 */
-	wchar_t password_char_bak;	/* 屏蔽符的副本 */
-	LCUI_TextStyle placeholder_style;	/* 占位符的文本样式 */
-	LCUI_TextStyle textstyle_bak;		/* 文本框内文本样式的副本 */
+	LCUI_Widget *text;			/**< 文本显示层 */
+	LCUI_Widget *cursor;			/**< 光标 */
+	LCUI_Widget *scrollbar[2];		/**< 两个滚动条 */
+	int block_size;				/**< 块大小 */
+	LCUI_BOOL read_only;			/**< 是否只读 */
+	LCUI_Queue text_block_buff;		/**< 文本块缓冲区 */
+	LCUI_BOOL show_placeholder;		/**< 表示占位符是否已经显示 */
+	LCUI_WString placeholder;		/**< 文本框的占位符 */
+	LCUI_WString allow_input_char;		/**< 允许输入的字符 */
+	wchar_t password_char_bak;		/**< 屏蔽符的副本 */
+	LCUI_TextStyle placeholder_style;	/**< 占位符的文本样式 */
+	LCUI_TextStyle textstyle_bak;		/**< 文本框内文本样式的副本 */
 }
 LCUI_TextBox;
 
@@ -192,6 +193,11 @@ TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	cur_pos = TextLayer_Cursor_GetPos( layer );
 	cols = TextLayer_GetRowLen( layer, cur_pos.y );
 	rows = TextLayer_GetRows( layer ); 
+
+	if( event->key.key_state == LCUIKEYSTATE_RELEASE ) {
+		return;
+	}
+
 	switch( event->key.key_code ) {
 	    case LCUIKEY_HOMEPAGE: //home键移动光标至行首
 		cur_pos.x = 0;
@@ -261,6 +267,10 @@ TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	ptr = event->input.text;
 	ptr_last = ptr + MAX_INPUT_TEXT_LEN;
 	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	/* 如果文本框是只读的 */
+	if( textbox->read_only ) {
+		return;
+	}
 	if( textbox->allow_input_char.length > 0 ) {
 		for( ; ptr<ptr_last && *ptr!='\0'; ++ptr ) {
 			/* 判断当前字符是否为限制范围内的字符 */
@@ -280,6 +290,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 			}
 		}
 	}
+	_DEBUG_MSG("add text: --%s--\n",event->input.text);
 	TextBox_Text_AddW( widget, event->input.text );
 }
 
@@ -344,6 +355,7 @@ TextBox_Init( LCUI_Widget *widget )
 	textbox->cursor->focus = FALSE;
 	textbox->scrollbar[0]->focus = FALSE;
 	textbox->scrollbar[1]->focus = FALSE;
+	textbox->read_only = FALSE;
 	textbox->block_size = 256;
 	textbox->show_placeholder = FALSE;
 	LCUIWString_Init( &textbox->placeholder );
@@ -395,7 +407,7 @@ TextBox_Init( LCUI_Widget *widget )
 	Widget_Event_Connect( widget, EVENT_KEYBOARD, TextBox_ProcessKey );
 	Widget_Event_Connect( widget, EVENT_INPUT, TextBox_Input );
 	/* 默认不启用多行文本模式 */
-	TextBox_Multiline( widget, FALSE );
+	TextBox_SetMultiline( widget, FALSE );
 }
 
 static void 
@@ -431,7 +443,7 @@ TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 	layer = TextBox_GetTextLayer( widget );
 	
 	/* 获取文本图层和文本框区域的尺寸 */
-	layer_size = TextLayer_GetSize( layer );
+	TextLayer_GetSize( layer, &layer_size );
 	area_size = Widget_GetContainerSize( widget );
 	/* 获取纵向和横向滚动条 */
 	scrollbar[0] = TextBox_GetScrollbar( widget, 0 );
@@ -530,7 +542,7 @@ TextBox_ScrollBar_UpdatePos( LCUI_Widget *widget )
 	if( !layer->enable_multiline ) {
 		return 1;
 	}
-	layer_size = TextLayer_GetSize( layer );
+	TextLayer_GetSize( layer, &layer_size );
 	//_DEBUG_MSG("layer_size: (%d,%d)\n", layer_size.w, layer_size.h);
 	if( layer_size.h <= 0 || layer_size.w <= 0 ) {
 		return -2;
@@ -667,6 +679,7 @@ TextBox_ExecUpdate( LCUI_Widget *widget )
 			    default: break;
 			}
 		}
+		_DEBUG_MSG("text: %S\n", text_ptr->text );
 		/* 删除该文本块 */
 		Queue_Delete( &textbox->text_block_buff, 0 );
 		/* 更新滚动条的位置 */
@@ -769,7 +782,7 @@ TextBox_ViewArea_Update( LCUI_Widget *widget )
 	}
 	
 	layer = TextBox_GetTextLayer( widget );
-	layer_size = TextLayer_GetSize( layer );
+	TextLayer_GetSize( layer, &layer_size );
 	if( layer_size.h <= 0 || layer_size.w <= 0 ) {
 		return -2;
 	}
@@ -885,7 +898,7 @@ TextBox_Text_GetTotalLength( LCUI_Widget *widget )
 
 /* 将文本添加至缓冲区内 */
 static int
-TextBox_TextBuff_Add( LCUI_Widget *widget, wchar_t *text, int pos_type )
+TextBox_TextBuff_Add( LCUI_Widget *widget, const wchar_t *text, int pos_type )
 {
 	LCUI_TextBox *textbox;
 	int i, j, len, size;
@@ -915,7 +928,7 @@ TextBox_TextBuff_Add( LCUI_Widget *widget, wchar_t *text, int pos_type )
 		for( j=0; j<len; ++j,++i ) {
 			/* 如果大于当前块大小 */
 			if( j >= textbox->block_size ) {
-					break;
+				break;
 			}
 			text_buff[j] = text[i];
 			//_DEBUG_MSG("char: %d, count: %d\n", new_text[i], count);
@@ -939,9 +952,8 @@ TextBox_Text_Clear( LCUI_Widget *widget )
 }
 
 
-/* 设定文本框显示的文本 */
-LCUI_API void
-TextBox_TextW( LCUI_Widget *widget, wchar_t *unicode_text )
+/** 设定文本框显示的文本 */
+LCUI_API void TextBox_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 {
 	LCUI_TextBox *tb;
 	LCUI_TextLayer *layer;
@@ -960,8 +972,7 @@ TextBox_TextW( LCUI_Widget *widget, wchar_t *unicode_text )
 	Widget_Update( widget );
 }
 
-LCUI_API void
-TextBox_Text( LCUI_Widget *widget, char *utf8_text )
+LCUI_API void TextBox_Text( LCUI_Widget *widget, const char *utf8_text )
 {
 	wchar_t *unicode_text;
 	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
@@ -1168,13 +1179,20 @@ TextBox_Using_StyleTags(LCUI_Widget *widget, LCUI_BOOL flag)
 	TextLayer_UsingStyleTags( layer, flag );
 }
 
-LCUI_API void
-TextBox_Multiline( LCUI_Widget *widget, LCUI_BOOL flag )
-/* 指定文本框是否启用多行文本显示 */
+/** 指定文本框是否启用多行文本显示 */
+LCUI_API void TextBox_SetMultiline( LCUI_Widget *widget, LCUI_BOOL flag )
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
-	TextLayer_Multiline( layer, flag );
+	TextLayer_SetMultiline( layer, flag );
+}
+
+/** 设置文本框的内容是否为只读 */
+LCUI_API void TextBox_SetReadOnly( LCUI_Widget *widget, LCUI_BOOL flag )
+{
+	LCUI_TextBox *textbox;
+	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	textbox->read_only = flag;
 }
 
 LCUI_API void
