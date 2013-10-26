@@ -110,7 +110,7 @@ Label_ExecInit( LCUI_Widget *widget )
 	/* 初始化文本图层 */
 	TextLayer_Init( &label->layer ); 
 	/* 启用多行文本显示 */
-	TextLayer_Multiline( &label->layer, TRUE );
+	TextLayer_SetMultiline( &label->layer, TRUE );
 	Widget_SetAutoSize( widget, FALSE, 0 );
 	/* 启用样式标签的支持 */
 	TextLayer_UsingStyleTags( &label->layer, TRUE );
@@ -133,30 +133,51 @@ Destroy_Label( LCUI_Widget *widget )
 static void 
 Label_ExecDraw( LCUI_Widget *widget )
 {
-	int mode; 
+	int n; 
 	LCUI_Size max;
 	LCUI_Label *label;
-	
-	if( widget == NULL ) {
+	LCUI_Graph *widget_graph, *tlayer_graph;
+	LCUI_Rect *p_rect;
+	LCUI_Queue rect_list;
+
+	if( !widget ) {
 		return;
 	}
-	label = Widget_GetPrivData( widget );
-	if( label == NULL ) {
+	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	if( !label ) {
 		return;
 	}
-	if(!Graph_IsValid(&widget->background.image)) {
-		mode = GRAPH_MIX_FLAG_REPLACE; /* 替换模式 */
-	} else {
-		mode = GRAPH_MIX_FLAG_OVERLAY; /* 叠加模式 */ 
-	}
+
 	Label_Refresh( widget );
-	/* 先绘制文本位图，在绘制前它会更新位图尺寸 */
-	TextLayer_Draw( widget, &label->layer, mode );
-	max = TextLayer_GetSize( &label->layer ); /* 获取尺寸 */
+	Queue_Init( &rect_list, sizeof(LCUI_Rect), NULL );
+	/* 先更新文本图层的数据 */
+	TextLayer_Update( &label->layer, &rect_list );
+	n = Queue_GetTotal( &rect_list );
+	/* 将得到的无效区域导入至部件的无效区域列表 */
+	while(n--) {
+		p_rect = (LCUI_Rect*)Queue_Get( &rect_list, n );
+		if( !p_rect ) {
+			continue;
+		}
+		Widget_InvalidArea( widget, *p_rect );
+	}
+	Queue_Destroy( &rect_list );
+	TextLayer_GetSize( &label->layer, &max ); /* 获取尺寸 */
 	if( widget->dock == DOCK_TYPE_NONE && label->auto_size
 	 && Size_Cmp( max, widget->size ) != 0 ) {
-		/* 如果开启了自动调整大小,并且尺寸有改变 */ 
-		Widget_Resize(widget, max );
+		/* 如果开启了自动调整大小,并且尺寸有改变 */
+		TextLayer_SetGraphSize( &label->layer, max );
+		Widget_Resize( widget, max );
+		return;
+	}
+	widget_graph = Widget_GetSelfGraph( widget );
+	tlayer_graph = TextLayer_GetGraph( &label->layer );
+	TextLayer_SetGraphSize( &label->layer, Widget_GetSize(widget) );
+	/* 如果部件使用透明背景 */
+	if( widget->background.transparent ) {
+		Graph_Replace( widget_graph, tlayer_graph, Pos(0,0) );
+	} else {
+		Graph_Mix( widget_graph, tlayer_graph, Pos(0,0) );
 	}
 }
 
