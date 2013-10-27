@@ -399,6 +399,7 @@ static void TextBox_UpdateFontBitmap( LCUI_Widget *widget, void *arg )
 	/* 下次继续更新 */
 	WidgetMsg_Post( widget, WIDGET_MSG_UPDATE_FONTBMP, NULL, TRUE, FALSE );
 	Widget_Draw( textbox->text );
+	Widget_Update( widget );
 	Widget_Unlock( widget );
 }
 
