@@ -129,26 +129,18 @@ Destroy_Label( LCUI_Widget *widget )
 	Destroy_TextLayer( &label->layer );
 }
 
-/* 更新label部件 */
-static void 
-Label_ExecDraw( LCUI_Widget *widget )
+static void Label_UpdateTextLayer( LCUI_Widget *widget )
 {
 	int n; 
-	LCUI_Size max;
 	LCUI_Label *label;
-	LCUI_Graph *widget_graph, *tlayer_graph;
 	LCUI_Rect *p_rect;
 	LCUI_Queue rect_list;
 
-	if( !widget ) {
-		return;
-	}
 	label = (LCUI_Label*)Widget_GetPrivData( widget );
 	if( !label ) {
 		return;
 	}
 
-	Label_Refresh( widget );
 	Queue_Init( &rect_list, sizeof(LCUI_Rect), NULL );
 	/* 先更新文本图层的数据 */
 	TextLayer_Update( &label->layer, &rect_list );
@@ -162,17 +154,40 @@ Label_ExecDraw( LCUI_Widget *widget )
 		Widget_InvalidArea( widget, *p_rect );
 	}
 	Queue_Destroy( &rect_list );
-	TextLayer_GetSize( &label->layer, &max ); /* 获取尺寸 */
-	if( widget->dock == DOCK_TYPE_NONE && label->auto_size
-	 && Size_Cmp( max, widget->size ) != 0 ) {
-		/* 如果开启了自动调整大小,并且尺寸有改变 */
-		TextLayer_SetGraphSize( &label->layer, max );
-		Widget_Resize( widget, max );
+}
+
+/** 更新label部件 */
+static void Label_ExecDraw( LCUI_Widget *widget )
+{
+	LCUI_Size new_size;
+	LCUI_Label *label;
+	LCUI_Graph *widget_graph, *tlayer_graph;
+
+	if( !widget ) {
 		return;
 	}
+	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	if( !label ) {
+		return;
+	}
+
+	Label_Refresh( widget );
+	Label_UpdateTextLayer( widget );
+	TextLayer_GetSize( &label->layer, &new_size );
+	/* 如果开启了自动调整大小,并且尺寸有改变 */
+	if( widget->dock == DOCK_TYPE_NONE && label->auto_size
+	 && Size_Cmp( new_size, widget->size ) != 0 ) {
+		TextLayer_SetGraphSize( &label->layer, new_size );
+		Widget_Resize( widget, new_size );
+		return;
+	}
+
+	new_size = Widget_GetSize(widget);
+	TextLayer_SetGraphSize( &label->layer, new_size );
+	Label_UpdateTextLayer( widget );
 	widget_graph = Widget_GetSelfGraph( widget );
 	tlayer_graph = TextLayer_GetGraph( &label->layer );
-	TextLayer_SetGraphSize( &label->layer, Widget_GetSize(widget) );
+
 	/* 如果部件使用透明背景 */
 	if( widget->background.transparent ) {
 		Graph_Replace( widget_graph, tlayer_graph, Pos(0,0) );
