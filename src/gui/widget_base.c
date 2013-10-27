@@ -1833,7 +1833,7 @@ LCUI_API void Widget_ExecShow( LCUI_Widget *widget )
 	WidgetFunc_Call(widget, FUNC_TYPE_SHOW);
 	Widget_Visible( widget, TRUE ); /* 部件可见 */
 	if( widget->focus ) {
-		//Set_Focus( widget );	/* 将焦点给该部件 */
+		//Widget_SetFocus( widget );	/* 将焦点给该部件 */
 	}
 	Widget_Front(widget); /* 改变部件的排列位置 */
 	Widget_Refresh( widget ); /* 刷新部件所在区域的图形显示 */
@@ -1988,7 +1988,6 @@ LCUI_API void Widget_ExecDraw(LCUI_Widget *widget)
 	Graph_DrawBorder( graph, widget->border );
 
 	event.type = EVENT_REDRAW;
-	/* 处理部件的RESIZE事件 */
 	Widget_DispatchEvent( widget, &event );
 	Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
 }
@@ -2317,7 +2316,7 @@ LCUI_API void Widget_Destroy( LCUI_Widget *widget )
 	if( !widget ) {
 		return;
 	}
-	Cancel_Focus( widget ); /* 取消焦点 */
+	Widget_CancelFocus( widget ); /* 取消焦点 */
 	WidgetMsg_Post( widget, WIDGET_DESTROY, NULL, TRUE, FALSE );
 }
 
@@ -2361,7 +2360,7 @@ LCUI_API void Widget_Hide( LCUI_Widget *widget )
 	if( !widget ) {
 		return;
 	}
-	Cancel_Focus( widget ); /* 取消焦点 */
+	Widget_CancelFocus( widget ); /* 取消焦点 */
 	WidgetMsg_Post( widget, WIDGET_HIDE, NULL, TRUE, FALSE );
 }
 
