@@ -124,7 +124,7 @@ static void TextLayer_GetCharBMP( LCUI_TextStyle *default_style, LCUI_CharData *
 }
 
 /** 向文本图层中的文本中添加新行 */
-static int TextLayer_Text_Add_NewRow( LCUI_TextLayer *layer )
+static int TextLayer_Text_AddNewRow( LCUI_TextLayer *layer )
 {
 	Text_RowData data; 
 	/* 单整行最大尺寸改变时，需要移动整行，目前还未支持此功能 */
@@ -205,9 +205,9 @@ static void TextLayer_Update_RowSize( LCUI_TextLayer *layer, int row )
 		} else {
 			char_data = (LCUI_CharData*)
 			Queue_Get( &row_data->string, i );
-			if( !char_data ) {
-				continue;
-			}
+		}
+		if( !char_data || !char_data->bitmap ) {
+			continue;
 		}
 		size.w += char_data->bitmap->advance.x;
 		if( !char_data->data ) {
@@ -265,7 +265,7 @@ LCUI_API void TextLayer_Init( LCUI_TextLayer *layer )
 	layer->current_des_pos = Pos(0,0);
 	layer->max_text_len = 512000;
 	TextStyle_Init( &layer->default_data );
-	//TextLayer_Text_Add_NewRow ( layer );/* 添加新行 */
+	//TextLayer_Text_AddNewRow ( layer );/* 添加新行 */
 }
 
 /** 销毁文本图层占用的资源 */
@@ -399,7 +399,7 @@ LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
 		n = Queue_GetTotal( &p_row->string );
 		for(pos.x=layer->offset_pos.x,j=0; j<n; ++j) {
 			p_data = (LCUI_CharData*)Queue_Get( &p_row->string, j ); 
-			if( !p_data ) {
+			if( !p_data || !p_data->bitmap ) {
 				continue;
 			}
 			/* 如果设置了屏蔽符 */
@@ -735,7 +735,7 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 		}
 		cur_row_ptr = Queue_Get( &layer->rows_data, cur_pos.y );
 		if( !cur_row_ptr ) {
-			TextLayer_Text_Add_NewRow( layer );
+			TextLayer_Text_AddNewRow( layer );
 			cur_row_ptr = Queue_Get( &layer->rows_data, cur_pos.y );
 		}
 		cur_pos.x = Queue_GetTotal( &cur_row_ptr->string );
@@ -747,7 +747,7 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 		cur_row_ptr = Queue_Get( &layer->rows_data, cur_pos.y );
 		DEBUG_MSG1( "cur_row_ptr: %p\n", cur_row_ptr );
 		if( !cur_row_ptr ) {
-			TextLayer_Text_Add_NewRow( layer );
+			TextLayer_Text_AddNewRow( layer );
 			cur_row_ptr = Queue_Get( &layer->rows_data, cur_pos.y );
 		}
 		src_pos = layer->current_src_pos;
@@ -871,16 +871,15 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	DEBUG_MSG1("quit\n");
 }
 
-LCUI_API void
-TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
-/* 为文本图层中的文本生成位图，已存在位图的文字将不重新生成 */
+/** 为文本图层中的文本生成位图，已存在位图的文字将不重新生成 */
+LCUI_API void TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer )
 {
 	LCUI_BOOL refresh = FALSE;
 	int x, y, len, rows;
 	Text_RowData *row_ptr;
 	LCUI_CharData *char_ptr;
 	
-	DEBUG_MSG1("enter\n");
+	DEBUG_MSG("enter\n");
 	rows = Queue_GetTotal( &layer->rows_data );
 	for( y=0; y<rows; ++y ) {
 		row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, y );
