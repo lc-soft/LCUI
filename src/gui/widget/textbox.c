@@ -55,6 +55,8 @@
 
 #define WIDGET_MSG_UPDATE_FONTBMP	(WIDGET_USER+1)
 
+#define TEXTBOX_DEFAULT_TEXT_BLOCK_SIZE	512
+
 typedef struct LCUI_TextBox_ {
 	LCUI_Widget *text;			/**< 文本显示层 */
 	LCUI_Widget *cursor;			/**< 光标 */
@@ -418,7 +420,7 @@ static void TextBox_Init( LCUI_Widget *widget )
 	textbox->scrollbar[0]->focus = FALSE;
 	textbox->scrollbar[1]->focus = FALSE;
 	textbox->read_only = FALSE;
-	textbox->block_size = 256;
+	textbox->block_size = TEXTBOX_DEFAULT_TEXT_BLOCK_SIZE;
 	textbox->show_placeholder = FALSE;
 	textbox->show_cursor = TRUE;
 	LCUIWString_Init( &textbox->placeholder );
@@ -1203,6 +1205,20 @@ LCUI_API void TextBox_SetReadOnly( LCUI_Widget *widget, LCUI_BOOL flag )
 	LCUI_TextBox *textbox;
 	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
 	textbox->read_only = flag;
+}
+
+/** 设置每次处理并显示的文本块的大小 */
+LCUI_API int TextBox_SetTextBlockSize( LCUI_Widget *widget, int size )
+{
+	LCUI_TextBox *textbox;
+	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	if( size < 1 ) {
+		size = TEXTBOX_DEFAULT_TEXT_BLOCK_SIZE;
+		textbox->block_size = size;
+		return -1;
+	}
+	textbox->block_size = size;
+	return 0;
 }
 
 LCUI_API void
