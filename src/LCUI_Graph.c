@@ -201,6 +201,10 @@ LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h )
 	if( Graph_IsValid(graph) ) {
 		/* 如果现有图形尺寸大于要创建的图形的尺寸，直接改尺寸即可 */
 		if( graph->mem_size >= size ) {
+			if( (w != graph->w || h != graph->h)
+			 && graph->color_type == COLOR_TYPE_RGBA ) {
+				memset( graph->rgba[3], 0, graph->mem_size );
+			}
 			graph->w = w;
 			graph->h = h;
 			return 0;
