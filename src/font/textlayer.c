@@ -516,6 +516,10 @@ TextLayer_SetOffset( LCUI_TextLayer *layer, LCUI_Pos offset_pos )
 LCUI_API int TextLayer_SetGraphSize(	LCUI_TextLayer *layer, 
 					LCUI_Size new_size )
 {
+	/* 如果尺寸有变化，则标记需要重绘文本位图 */
+	if( layer->graph.h != new_size.h || layer->graph.h != new_size.h ) {
+		TextLayer_Refresh( layer );
+	}
 	return Graph_Create( &layer->graph, new_size.w, new_size.h );
 }
 
