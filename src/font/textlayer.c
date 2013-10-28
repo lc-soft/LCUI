@@ -517,7 +517,7 @@ LCUI_API int TextLayer_SetGraphSize(	LCUI_TextLayer *layer,
 					LCUI_Size new_size )
 {
 	/* 如果尺寸有变化，则标记需要重绘文本位图 */
-	if( layer->graph.h != new_size.h || layer->graph.h != new_size.h ) {
+	if( layer->graph.w != new_size.w || layer->graph.h != new_size.h ) {
 		TextLayer_Refresh( layer );
 	}
 	return Graph_Create( &layer->graph, new_size.w, new_size.h );
@@ -1665,4 +1665,10 @@ TextLayer_UsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL flag )
 LCUI_API void TextLayer_SetMultiline( LCUI_TextLayer *layer, LCUI_BOOL flag )
 {
 	layer->enable_multiline = flag;
+}
+
+/** 设置文本图层中的文本是否自动换行 */
+LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer *layer, LCUI_BOOL flag )
+{
+
 }
