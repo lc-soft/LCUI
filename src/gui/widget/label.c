@@ -51,6 +51,8 @@
 
 enum label_msg_id {
 	LABEL_TEXT = WIDGET_USER+1,
+	LABEL_REFRESH,
+	LABEL_UPDATE_SIZE,
 	LABEL_STYLE
 };
 
@@ -62,72 +64,6 @@ typedef struct LCUI_Label_ {
 LCUI_Label;
 
 /*---------------------------- Private -------------------------------*/
-
-static void Label_SetTextStyle( LCUI_Widget *widget, void *arg )
-{
-	LCUI_TextStyle *style;
-	LCUI_Label *label;
-	
-	DEBUG_MSG("recv LABEL_STYLE msg, lock widget\n");
-	Widget_Lock( widget );
-	style = (LCUI_TextStyle*)arg;
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
-	TextLayer_Text_SetDefaultStyle( &label->layer, *style );
-	Widget_Draw( widget ); 
-	DEBUG_MSG("unlock widget\n");
-	Widget_Unlock( widget );
-}
-
-static void Label_SetTextW( LCUI_Widget *widget, void *arg )
-{
-	wchar_t *unicode_text;
-	LCUI_Label *label;
-	
-	DEBUG_MSG("recv LABEL_TEXT msg, lock widget\n");
-	Widget_Lock( widget );
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
-	if( !label ) {
-		return;
-	}
-	unicode_text = (wchar_t*)arg;
-	TextLayer_TextW( &label->layer, unicode_text );
-	Widget_Update( widget );
-	DEBUG_MSG("unlock widget\n");
-	Widget_Unlock( widget );
-}
-
-/* 初始化label部件数据 */
-static void 
-Label_ExecInit( LCUI_Widget *widget )
-{
-	LCUI_Label *label;
-	
-	/* label部件不需要焦点 */
-	widget->focus = FALSE;
-
-	label = (LCUI_Label*)Widget_NewPrivData( widget, sizeof(LCUI_Label) );
-	label->auto_size = TRUE;
-	/* 初始化文本图层 */
-	TextLayer_Init( &label->layer ); 
-	/* 启用多行文本显示 */
-	TextLayer_SetMultiline( &label->layer, TRUE );
-	Widget_SetAutoSize( widget, FALSE, 0 );
-	/* 启用样式标签的支持 */
-	TextLayer_UsingStyleTags( &label->layer, TRUE );
-	/* 将回调函数与自定义消息关联 */
-	WidgetMsg_Connect( widget, LABEL_TEXT, Label_SetTextW );
-	WidgetMsg_Connect( widget, LABEL_STYLE, Label_SetTextStyle );
-}
-
-/* 释放label部件占用的资源 */
-static void 
-Destroy_Label( LCUI_Widget *widget )
-{
-	LCUI_Label *label;
-	
-	label = Widget_GetPrivData( widget );
-	Destroy_TextLayer( &label->layer );
-}
 
 static void Label_UpdateTextLayer( LCUI_Widget *widget )
 {
@@ -156,10 +92,136 @@ static void Label_UpdateTextLayer( LCUI_Widget *widget )
 	Queue_Destroy( &rect_list );
 }
 
-/** 更新label部件 */
-static void Label_ExecDraw( LCUI_Widget *widget )
+/** 更新TextLayer的尺寸 */
+static void Label_UpdateTextLayerSize( LCUI_Widget *widget, void *arg )
 {
 	LCUI_Size new_size;
+	LCUI_Label *label;
+
+	if( !widget ) {
+		return;
+	}
+	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	if( !label ) {
+		return;
+	}
+
+	Widget_Lock( widget );
+	TextLayer_GetSize( &label->layer, &new_size );
+	/* 如果开启了自动调整大小,并且尺寸有改变 */
+	if( widget->dock == DOCK_TYPE_NONE && label->auto_size ) {
+		if( Size_Cmp( new_size, widget->size ) != 0 ) {
+			TextLayer_SetGraphSize( &label->layer, new_size );
+			Widget_Resize( widget, new_size );
+		}
+	} else {
+		new_size = Widget_GetSize(widget);
+		if( label->layer.graph.w != new_size.w
+		 || label->layer.graph.h != new_size.h ) {
+			Widget_Draw( widget ); 
+		}
+		TextLayer_SetGraphSize( &label->layer, new_size );
+	}
+	Widget_Unlock( widget );
+}
+
+/** 刷新Label部件的文本图层 */
+static void Label_RefreshTextLayer( LCUI_Widget *widget, void *arg )
+{
+	LCUI_Label *label;
+
+	if( !widget ) {
+		return;
+	}
+	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	if( !label ) {
+		return;
+	}
+
+	Widget_Lock( widget );
+	TextLayer_Refresh( &label->layer );
+	Label_UpdateTextLayer( widget );
+	Widget_Update( widget );
+	Widget_Unlock( widget );
+}
+
+static void Label_SetTextStyle( LCUI_Widget *widget, void *arg )
+{
+	LCUI_TextStyle *style;
+	LCUI_Label *label;
+	
+	DEBUG_MSG("recv LABEL_STYLE msg, lock widget\n");
+	Widget_Lock( widget );
+	style = (LCUI_TextStyle*)arg;
+	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	TextLayer_Text_SetDefaultStyle( &label->layer, *style );
+	WidgetMsg_Post( widget, LABEL_REFRESH, NULL, TRUE, FALSE );
+	Widget_Update( widget );
+	DEBUG_MSG("unlock widget\n");
+	Widget_Unlock( widget );
+}
+
+static void Label_SetTextW( LCUI_Widget *widget, void *arg )
+{
+	wchar_t *unicode_text;
+	LCUI_Label *label;
+	
+	DEBUG_MSG("recv LABEL_TEXT msg, lock widget\n");
+	Widget_Lock( widget );
+	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	if( !label ) {
+		return;
+	}
+	unicode_text = (wchar_t*)arg;
+	TextLayer_TextW( &label->layer, unicode_text );
+	WidgetMsg_Post( widget, LABEL_REFRESH, NULL, TRUE, FALSE );
+	Widget_Update( widget );
+	DEBUG_MSG("unlock widget\n");
+	Widget_Unlock( widget );
+}
+
+/** 初始化label部件数据 */
+static void Label_ExecInit( LCUI_Widget *widget )
+{
+	LCUI_Label *label;
+	
+	/* label部件不需要焦点 */
+	widget->focus = FALSE;
+
+	label = (LCUI_Label*)Widget_NewPrivData( widget, sizeof(LCUI_Label) );
+	label->auto_size = TRUE;
+	/* 初始化文本图层 */
+	TextLayer_Init( &label->layer ); 
+	/* 启用多行文本显示 */
+	TextLayer_SetMultiline( &label->layer, TRUE );
+	Widget_SetAutoSize( widget, FALSE, 0 );
+	/* 启用样式标签的支持 */
+	TextLayer_UsingStyleTags( &label->layer, TRUE );
+	/* 将回调函数与自定义消息关联 */
+	WidgetMsg_Connect( widget, LABEL_TEXT, Label_SetTextW );
+	WidgetMsg_Connect( widget, LABEL_STYLE, Label_SetTextStyle );
+	WidgetMsg_Connect( widget, LABEL_UPDATE_SIZE, Label_UpdateTextLayerSize );
+	WidgetMsg_Connect( widget, LABEL_REFRESH, Label_RefreshTextLayer );
+}
+
+/** 释放label部件占用的资源 */
+static void Destroy_Label( LCUI_Widget *widget )
+{
+	LCUI_Label *label;
+	
+	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	Destroy_TextLayer( &label->layer );
+}
+
+/** 更新Label部件的数据 */
+static void Label_ExecUpdate( LCUI_Widget *widget )
+{
+	WidgetMsg_Post( widget, LABEL_UPDATE_SIZE, NULL, TRUE, FALSE );
+}
+
+/** 绘制label部件 */
+static void Label_ExecDraw( LCUI_Widget *widget )
+{
 	LCUI_Label *label;
 	LCUI_Graph *widget_graph, *tlayer_graph;
 
@@ -170,24 +232,9 @@ static void Label_ExecDraw( LCUI_Widget *widget )
 	if( !label ) {
 		return;
 	}
-
-	Label_Refresh( widget );
-	Label_UpdateTextLayer( widget );
-	TextLayer_GetSize( &label->layer, &new_size );
-	/* 如果开启了自动调整大小,并且尺寸有改变 */
-	if( widget->dock == DOCK_TYPE_NONE && label->auto_size
-	 && Size_Cmp( new_size, widget->size ) != 0 ) {
-		TextLayer_SetGraphSize( &label->layer, new_size );
-		Widget_Resize( widget, new_size );
-		return;
-	}
-
-	new_size = Widget_GetSize(widget);
-	TextLayer_SetGraphSize( &label->layer, new_size );
 	Label_UpdateTextLayer( widget );
 	widget_graph = Widget_GetSelfGraph( widget );
 	tlayer_graph = TextLayer_GetGraph( &label->layer );
-
 	/* 如果部件使用透明背景 */
 	if( widget->background.transparent ) {
 		Graph_Replace( widget_graph, tlayer_graph, Pos(0,0) );
@@ -199,9 +246,8 @@ static void Label_ExecDraw( LCUI_Widget *widget )
 /*-------------------------- End Private -----------------------------*/
 
 /*---------------------------- Public --------------------------------*/
-/* 设定与标签关联的文本内容 */
-LCUI_API int
-Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
+/** 设定与标签关联的文本内容 */
+LCUI_API int Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 {
 	int len;
 	wchar_t *text_ptr;
@@ -228,8 +274,7 @@ Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 	return 0;
 }
 
-LCUI_API void
-Label_Text( LCUI_Widget *widget, const char *utf8_text )
+LCUI_API void Label_Text( LCUI_Widget *widget, const char *utf8_text )
 {
 	wchar_t *unicode_text;
 	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
@@ -239,8 +284,7 @@ Label_Text( LCUI_Widget *widget, const char *utf8_text )
 	}
 }
 
-LCUI_API void
-Label_TextA( LCUI_Widget *widget, const char *ascii_text )
+LCUI_API void Label_TextA( LCUI_Widget *widget, const char *ascii_text )
 {
 	wchar_t *unicode_text;
 	LCUICharset_GB2312ToUnicode( ascii_text, &unicode_text );
@@ -251,9 +295,8 @@ Label_TextA( LCUI_Widget *widget, const char *ascii_text )
 }
 
 
-/* 为Label部件内显示的文本设定文本样式 */
-LCUI_API int
-Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
+/** 为Label部件内显示的文本设定文本样式 */
+LCUI_API int Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 {
 	LCUI_TextStyle *style_ptr;
 	
@@ -289,13 +332,10 @@ Label_GetTextLayer( LCUI_Widget *widget )
 	return &label->layer;
 }
 
-/* 刷新label部件显示的文本 */
-LCUI_API void
-Label_Refresh( LCUI_Widget *widget )
+/** 刷新label部件显示的文本 */
+LCUI_API void Label_Refresh( LCUI_Widget *widget )
 {
-	LCUI_TextLayer *layer;
-	layer = Label_GetTextLayer( widget );
-	TextLayer_Refresh( layer );
+	WidgetMsg_Post( widget, LABEL_REFRESH, NULL, TRUE, FALSE );
 }
 
 /* 启用或禁用Label部件的自动尺寸调整功能 */
@@ -317,8 +357,8 @@ LCUI_API void
 Register_Label(void)
 {
 	WidgetType_Add("label");
-	WidgetFunc_Add("label",	Label_ExecInit,	FUNC_TYPE_INIT);
-	WidgetFunc_Add("label",	Label_ExecDraw,	FUNC_TYPE_DRAW);
-	WidgetFunc_Add("label",	Label_ExecDraw,	FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("label", Destroy_Label,	FUNC_TYPE_DESTROY);
+	WidgetFunc_Add("label",	Label_ExecInit, FUNC_TYPE_INIT);
+	WidgetFunc_Add("label",	Label_ExecDraw, FUNC_TYPE_DRAW);
+	WidgetFunc_Add("label",	Label_ExecUpdate, FUNC_TYPE_UPDATE);
+	WidgetFunc_Add("label", Destroy_Label, FUNC_TYPE_DESTROY);
 }
