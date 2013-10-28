@@ -46,22 +46,21 @@
 
 LCUI_BEGIN_HEADER
 
-
 LCUI_API LCUI_Pos
 TextBox_ViewArea_GetPos( LCUI_Widget *widget );
 /* 获取文本显示区域的位置 */
 
-LCUI_API int
-TextBox_ViewArea_Update( LCUI_Widget *widget );
-/* 更新文本框的文本显示区域 */
+/** 更新文本框的文本显示区域 */
+LCUI_API int TextBox_UpdateViewArea( LCUI_Widget *widget );
 
-/* 获取文本框部件内的label部件指针 */
-LCUI_API LCUI_Widget*
-TextBox_GetLabel( LCUI_Widget *widget );
+/** 获取文本框部件内的label部件指针 */
+LCUI_API LCUI_Widget* TextBox_GetLabel( LCUI_Widget *widget );
 
-/* 获取文本框部件内的光标 */
-LCUI_API LCUI_Widget*
-TextBox_GetCursor( LCUI_Widget *widget );
+/** 获取文本框部件内的光标 */
+LCUI_API LCUI_Widget* TextBox_GetCursor( LCUI_Widget *widget );
+
+/** 设置文本框是否显示光标 */
+LCUI_API void TextBox_ShowCursor( LCUI_Widget *widget, LCUI_BOOL is_show );
 
 /* 获取文本框内文本 */
 LCUI_API size_t
@@ -122,15 +121,20 @@ LCUI_API int
 TextBox_CutSelectedText(LCUI_Widget *widget);
 /* 剪切文本框内被选中的文本 */
 
-LCUI_API void
-TextBox_Using_StyleTags(LCUI_Widget *widget, LCUI_BOOL flag);
-/* 指定文本框是否处理控制符 */
+/** 指定文本框是否处理控制符 */
+LCUI_API void TextBox_SetUsingStyleTags( LCUI_Widget *widget, LCUI_BOOL flag );
 
 /** 指定文本框是否启用多行文本显示 */
 LCUI_API void TextBox_SetMultiline( LCUI_Widget *widget, LCUI_BOOL flag );
 
 /** 设置文本框的内容是否为只读 */
 LCUI_API void TextBox_SetReadOnly( LCUI_Widget *widget, LCUI_BOOL flag );
+
+/** 设置每次处理并显示的文本块的大小 */
+LCUI_API int TextBox_SetTextBlockSize( LCUI_Widget *widget, int size );
+
+/** 设置文本框内的文本是否自动换行 */
+LCUI_API void TextBox_SetAutoWrap( LCUI_Widget *widget, LCUI_BOOL is_true );
 
 LCUI_API void
 TextBox_Text_SetDefaultStyle( LCUI_Widget *widget, LCUI_TextStyle style );
