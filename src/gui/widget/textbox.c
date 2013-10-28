@@ -937,13 +937,10 @@ TextBox_TextBuff_Add( LCUI_Widget *widget, const wchar_t *text, int pos_type )
 			return -2;
 		}
 		for( j=0; j<len&&j<size-1; ++j,++i ) {
-			/* 如果大于当前块大小 */
-			if( j >= textbox->block_size ) {
-				break;
-			}
 			text_buff[j] = text[i];
 			//_DEBUG_MSG("char: %d, count: %d\n", new_text[i], count);
 		}
+		--i;
 		text_buff[j] = 0;
 		text_block.text = text_buff;
 		/* 添加文本块至缓冲区 */
@@ -1220,6 +1217,14 @@ LCUI_API int TextBox_SetTextBlockSize( LCUI_Widget *widget, int size )
 	}
 	textbox->block_size = size;
 	return 0;
+}
+
+/** 设置文本框内的文本是否自动换行 */
+LCUI_API void TextBox_SetAutoWrap( LCUI_Widget *widget, LCUI_BOOL is_true )
+{
+	LCUI_TextBox *textbox;
+	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	Label_SetAutoWrap( textbox->text, is_true );
 }
 
 LCUI_API void
