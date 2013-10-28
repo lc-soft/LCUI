@@ -398,7 +398,6 @@ static void TextBox_UpdateFontBitmap( LCUI_Widget *widget, void *arg )
 	TextBox_ScrollBar_UpdatePos( widget );
 	/* 下次继续更新 */
 	WidgetMsg_Post( widget, WIDGET_MSG_UPDATE_FONTBMP, NULL, TRUE, FALSE );
-	Widget_Draw( textbox->text );
 	Widget_Update( widget );
 	Widget_Unlock( widget );
 }
@@ -721,8 +720,9 @@ static void TextBox_ExecUpdate( LCUI_Widget *widget )
 		TextLayer_Text_SetDefaultStyle( layer, textbox->placeholder_style );
 		textbox->show_placeholder = TRUE;
 	}
+	Widget_Update( TextBox_GetLabel(widget) );
+	Widget_Draw( TextBox_GetLabel(widget) );
 	TextBox_ExecUpdateStyle( widget ); /* 更新文本框的样式 */
-	Widget_ExecUpdate( TextBox_GetLabel( widget ) ); /* 更新文本图层的内容 */
 	TextBox_ScrollBar_UpdateSize( widget ); /* 更新滚动条的长度 */
 	TextBox_Cursor_Update( widget ); /* 更新文本框内的光标 */
 }
