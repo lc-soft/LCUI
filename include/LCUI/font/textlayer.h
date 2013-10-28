@@ -81,6 +81,7 @@ typedef struct _LCUI_TextLayer
 	LCUI_BOOL enable_word_wrap	:1;	/* 指示是否自动换行 */
 	LCUI_BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */
 	LCUI_BOOL need_scroll_layer	:1;	/* 指示是否需要滚动图层 */
+	LCUI_BOOL auto_wrap		:1;	/* 指示是否自动换行 */
 	LCUI_BOOL have_select		:1;	/* 标记，指示是否在文本图层中选择了文本 */
 	uint32_t start, end;			/* 被选中的文本的范围 */ 
 	
@@ -180,10 +181,6 @@ LCUI_API void
 TextLayer_Text_Process(	LCUI_TextLayer *layer,
 				int pos_type,
 				wchar_t *new_text );
-
-LCUI_API void
-TextLayer_Text_GenerateBMP( LCUI_TextLayer *layer );
-/* 为文本图层中的文本生成位图，已存在位图的文字将不重新生成 */
 
 LCUI_API void
 TextLayer_PrintInfo( LCUI_TextLayer *layer );
@@ -287,6 +284,9 @@ TextLayer_UsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL flag );
 LCUI_API void
 TextLayer_SetMultiline( LCUI_TextLayer *layer, LCUI_BOOL flag );
 /* 指定文本图层是否启用多行文本显示 */
+
+/** 设置文本图层中的文本是否自动换行 */
+LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer *layer, LCUI_BOOL flag );
 
 LCUI_END_HEADER
 
