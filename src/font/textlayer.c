@@ -347,76 +347,87 @@ static void TextLayer_EraseOldArea( LCUI_TextLayer *layer, LCUI_Graph *graph )
 	}
 }
 
-/** 对文本图层中的文本进行自动换行处理 */
-static void TextLayer_Text_ExecAutoWarp( LCUI_TextLayer *layer, int start_row )
+/** 对指定文本行进行自动换行处理 */
+static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
 {
-	LCUI_Size row_size;
+	LCUI_Size row_size={0,0};
 	Text_RowData *p_row, *p_next_row;
 	LCUI_CharData *p_char;
-	int i_row, i_col, n_rows, n_cols, char_h;
+	int i_col, n_cols, char_h;
 
-	n_rows = Queue_GetTotal( &layer->rows_data );
-	for(i_row=start_row; i_row<n_rows; ++i_row) {
-		p_row = (Text_RowData*)
-		Queue_Get( &layer->rows_data, i_row );
-		n_cols = Queue_GetTotal( &p_row->string );
-		row_size.w = 0;
-		row_size.h = 0;
-		for(i_col=0; i_col<n_cols; ++i_col) {
-			p_char = (LCUI_CharData*)
-			Queue_Get( &p_row->string, i_col );
-			if( !p_char || !p_char->bitmap || !p_char->display ) {
-				continue;
+	p_row = (Text_RowData*)Queue_Get( &layer->rows_data, i_row );
+	n_cols = Queue_GetTotal( &p_row->string );
+	/* 遍历当前行的各个文字 */
+	for(i_col=0; i_col<n_cols; ++i_col) {
+		p_char = (LCUI_CharData*)
+		Queue_Get( &p_row->string, i_col );
+		/* 忽略无效、无字体位图、不可显的文字 */
+		if( !p_char || !p_char->bitmap || !p_char->display ) {
+			continue;
+		}
+		/* 获取该字的高度 */
+		if( p_char->data && p_char->data->_pixel_size ) {
+			char_h = p_char->data->pixel_size+2;
+		} else {
+			char_h = layer->default_data.pixel_size+2;
+		}
+		row_size.w += p_char->bitmap->advance.x;
+		/* 如果没有超过宽度限制 */
+		if( row_size.w < layer->graph.w ) {
+			if( row_size.h < char_h ) {
+				row_size.h = char_h;
 			}
-			/* 获取该字的高度 */
-			if( p_char->data && p_char->data->_pixel_size ) {
-				char_h = p_char->data->pixel_size+2;
-			} else {
-				char_h = layer->default_data.pixel_size+2;
-			}
-			row_size.w += p_char->bitmap->advance.x;
-			/* 如果没有超过宽度限制 */
-			if( row_size.w < layer->graph.w ) {
-				if( row_size.h < char_h ) {
-					row_size.h = char_h;
-				}
-				continue;
-			}
-			/* 至少每行要显示一个字符 */
-			if( i_col<1 ) {
-				continue;
-			}
-			/* 如果是换行符 */
-			if( p_row->last_char == p_char ) {
-				continue;
-			}
-			row_size.w -= p_char->bitmap->advance.x;
-			/* 更新本行的尺寸 */
-			p_row->max_size.w = row_size.w;
-			p_row->max_size.h = row_size.h;
-			/* 获取下一行的指针 */
+			continue;
+		}
+		/* 至少每行要显示一个字符 */
+		if( i_col<1 ) {
+			continue;
+		}
+		row_size.w -= p_char->bitmap->advance.x;
+		/* 更新本行的尺寸 */
+		p_row->max_size.w = row_size.w;
+		p_row->max_size.h = row_size.h;
+		/* 如果本行末尾有换行符，则插入新行 */
+		if( p_row->last_char ) {
+			TextLayer_Text_InsertNewRow( layer, i_row+1 );
 			p_next_row = (Text_RowData*)
 			Queue_Get( &layer->rows_data, i_row+1 );
-			/* 若没有下一行，则插入新行 */
-			if( !p_next_row ) {
-				TextLayer_Text_InsertNewRow( layer, i_row+1 );
-				p_next_row = (Text_RowData*)
-				Queue_Get( &layer->rows_data, i_row+1 );
-			}
-			_DEBUG_MSG("i_row: %d, n_rows: %d,n_cols: %d\n", i_row, n_rows, n_cols);
-			/* 将本行剩余文字转移至下一行 */
-			for(n_cols-=1; n_cols>=i_col; --n_cols) {
-				p_char = (LCUI_CharData*)
-				Queue_Get( &p_row->string, n_cols );
-				/* 标记本字需要刷新 */
-				p_char->need_update = TRUE;
-				_DEBUG_MSG("[%d] char code: %d, char: %C\n", n_cols, p_char->char_code, p_char->char_code);
-				Queue_InsertPointer( &p_next_row->string, 0, p_char );
-				Queue_DeletePointer( &p_row->string, n_cols );
-			}
-			n_rows = Queue_GetTotal( &layer->rows_data );
-			break;
+			/* 将本行的换行符转移至新行 */
+			p_next_row ->last_char = p_row->last_char;
+			p_row->last_char = NULL;
 		}
+		/* 获取下一行的指针 */
+		p_next_row = (Text_RowData*)
+		Queue_Get( &layer->rows_data, i_row+1 );
+		/* 若没有下一行，则插入新行 */
+		if( !p_next_row ) {
+			TextLayer_Text_InsertNewRow( layer, i_row+1 );
+			p_next_row = (Text_RowData*)
+			Queue_Get( &layer->rows_data, i_row+1 );
+		}
+		/* 将本行剩余文字转移至下一行 */
+		for(n_cols-=1; n_cols>=i_col; --n_cols) {
+			p_char = (LCUI_CharData*)
+			Queue_Get( &p_row->string, n_cols );
+			/* 标记本字需要刷新 */
+			p_char->need_update = TRUE;
+			Queue_InsertPointer( &p_next_row->string, 0, p_char );
+			Queue_DeletePointer( &p_row->string, n_cols );
+		}
+		break;
+	}
+}
+
+/** 对文本图层中的文本进行自动换行处理 */
+static void TextLayer_Text_ExecAutoWRap( LCUI_TextLayer *layer, int start_row )
+{
+	int i_row, n_rows;
+	n_rows = Queue_GetTotal( &layer->rows_data );
+	/* 从第start_row 行开始，对后面所有行进行自动换行处理 */
+	for(i_row=start_row; i_row<n_rows; ++i_row) {
+		TextLayer_TextRow_ExecAutoWRap( layer, i_row );
+		/* 更新总行数 */
+		n_rows = Queue_GetTotal( &layer->rows_data );
 	}
 }
 
@@ -424,7 +435,7 @@ static void TextLayer_Text_ExecAutoWarp( LCUI_TextLayer *layer, int start_row )
 LCUI_API void TextLayer_Text_UpdateLayout( LCUI_TextLayer *layer )
 {
 	if( layer->auto_wrap ) {
-		TextLayer_Text_ExecAutoWarp( layer, 0 );
+		TextLayer_Text_ExecAutoWRap( layer, 0 );
 	} else {
 
 	}
@@ -605,7 +616,7 @@ LCUI_API int TextLayer_SetGraphSize(	LCUI_TextLayer *layer,
 		TextLayer_Refresh( layer );
 		/* 如果启用了自动换行功能 */
 		if( layer->auto_wrap ) {
-			TextLayer_Text_ExecAutoWarp( layer, 0 );
+			TextLayer_Text_ExecAutoWRap( layer, 0 );
 		}
 	}
 	return Graph_Create( &layer->graph, new_size.w, new_size.h );
@@ -992,7 +1003,7 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	_DEBUG_MSG("tip1\n");
 	/* 若启用了自动换行 */
 	if( layer->auto_wrap ) {
-		TextLayer_Text_ExecAutoWarp( layer, cur_pos.y );
+		TextLayer_Text_ExecAutoWRap( layer, cur_pos.y );
 	}
 	_DEBUG_MSG("tip2\n");
 	DEBUG_MSG1("quit\n");
