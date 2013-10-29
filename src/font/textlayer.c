@@ -282,74 +282,6 @@ LCUI_API void Destroy_TextLayer( LCUI_TextLayer *layer )
 	RectQueue_Destroy( &layer->clear_area );
 }
 
-/** 记录文本图层中的需擦除的区域 */
-static void TextLayer_EraseOldArea( LCUI_TextLayer *layer, LCUI_Graph *graph )
-{
-	static int i, j, x, y, rows, len;
-	static Text_RowData *row_ptr;
-	static LCUI_CharData *char_ptr;
-	static LCUI_Rect area;
-	
-	rows = Queue_GetTotal( &layer->rows_data );
-	/* 除去y轴偏移量，计算处于显示区域内的起始行的y轴坐标 */
-	for(y=layer->old_offset_pos.y,i=0; y<0 && i<rows; ++i) {
-		row_ptr = Queue_Get( &layer->rows_data, i );
-		if( !row_ptr ) {
-			continue;
-		}
-		if( y + row_ptr->max_size.h >= 0 ) {
-			break;
-		}
-		y += row_ptr->max_size.h;
-	}
-	for(; i<rows; ++i) {
-		row_ptr = Queue_Get( &layer->rows_data, i );
-		if( !row_ptr ) {
-			continue;
-		}
-		len = Queue_GetTotal( &row_ptr->string );
-		/* 除去x轴偏移量，计算处于显示区域内的起始列的x轴坐标 */
-		for(x=layer->old_offset_pos.x,j=0; x<0 && j<len; ++j) {
-			char_ptr = Queue_Get( &row_ptr->string, j );
-			if( !char_ptr || !char_ptr->bitmap || !char_ptr->display ) {
-				continue;
-			}
-			if( x+char_ptr->bitmap->advance.x >= 0 ) {
-				break;
-			}
-			x += char_ptr->bitmap->advance.x;
-		}
-		/* 计算当前行的区域高度 */
-		area.height = layer->default_data.pixel_size+2;
-		for( ; j<len; ++j ) {
-			char_ptr = Queue_Get( &row_ptr->string, j );
-			if( !char_ptr || !char_ptr->bitmap || !char_ptr->display ) {
-				continue;
-			}
-			area.y = row_ptr->max_size.h-1;
-			area.y -= char_ptr->bitmap->top;
-			if( area.y + char_ptr->bitmap->rows > area.height ) {
-				area.height = area.y + char_ptr->bitmap->rows;
-			}
-			/* 累加当前行的宽度（已减去x轴偏移量） */
-			x += char_ptr->bitmap->advance.x;
-			if( x > graph->w ) {
-				break;
-			}
-		}
-		/* 计算相对于图层内的区域 */
-		area.x = 0-layer->offset_pos.x;
-		area.y = y-layer->offset_pos.y;
-		area.width = x;
-		RectQueue_AddToValid( &layer->clear_area, area );
-		//_DEBUG_MSG("area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
-		y += row_ptr->max_size.h;
-		if( y > graph->h ) {
-			break;
-		}
-	}
-}
-
 /** 对指定文本行进行自动换行处理 */
 static void TextLayer_TextRowTypeset( LCUI_TextLayer *layer, int i_row )
 {
@@ -535,9 +467,14 @@ LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
 	}
 	/* 如果需要滚动图层 */
 	if( layer->need_scroll_layer ) {
-		layer->need_scroll_layer = FALSE;
-		TextLayer_EraseOldArea( layer, &layer->graph );
+		/* 直接刷新整个文本图层 */
+		area.x = 0 - layer->offset_pos.x;
+		area.y = 0 - layer->offset_pos.y;
+		area.width = layer->graph.w;
+		area.height = layer->graph.h;
+		RectQueue_AddToValid( &layer->clear_area, area );
 		draw_all = TRUE;
+		layer->need_scroll_layer = FALSE;
 	}
 	
 	Graph_Init( &slot );
