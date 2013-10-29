@@ -115,6 +115,12 @@ static void Label_UpdateTextLayerSize( LCUI_Widget *widget, void *arg )
 		 || label->layer.graph.h != new_size.h ) {
 			Widget_Draw( widget ); 
 		}
+		if( new_size.w < 20 ) {
+			new_size.w = 20;
+		}
+		if( new_size.h < 20 ) {
+			new_size.h = 20;
+		}
 		TextLayer_SetGraphSize( &label->layer, new_size );
 		Widget_Unlock( widget );
 		return;
@@ -271,8 +277,6 @@ static void Label_ExecDraw( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
 	LCUI_Graph *widget_graph, *tlayer_graph;
-	char filename[256];
-	static int count = 0;
 
 	if( !widget ) {
 		return;
@@ -289,10 +293,6 @@ static void Label_ExecDraw( LCUI_Widget *widget )
 		Graph_Replace( widget_graph, tlayer_graph, Pos(0,0) );
 	} else {
 		Graph_Mix( widget_graph, tlayer_graph, Pos(0,0) );
-	}
-	if( label->layer.auto_wrap ) {
-	sprintf(filename, "tlayer-graph-%02d.png", count++);
-	Graph_WritePNG(filename, tlayer_graph );
 	}
 }
 
