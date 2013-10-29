@@ -181,7 +181,7 @@ static int TextLayer_Text_InsertNewRow( LCUI_TextLayer *layer, int row )
 }
 
 /** 获取指向当前行的指针 */
-static Text_RowData *TextLayer_GetCurRowData ( LCUI_TextLayer *layer )
+static Text_RowData *TextLayer_GetCurRowData( LCUI_TextLayer *layer )
 {
 	return (Text_RowData*)Queue_Get( &layer->rows_data, 
 				layer->current_des_pos.y );
@@ -219,19 +219,13 @@ static void TextLayer_Update_RowSize( LCUI_TextLayer *layer, int row )
 			continue;
 		}
 		size.w += char_data->bitmap->advance.x;
-		if( !char_data->data ) {
-			if( size.h < 14) {
-				size.h = 14;
+		if( !char_data->data || !char_data->data->_pixel_size ) {
+			if( size.h < layer->default_data.pixel_size+2 ) {
+				size.h = layer->default_data.pixel_size+2;
 			}
 			continue;
 		}
-		if( !char_data->data->_pixel_size ) {
-			if( size.h < 14) {
-				size.h = 14;
-			}
-			continue;
-		}
-		if( size.h < char_data->data->pixel_size + 2) {
+		if( size.h < char_data->data->pixel_size + 2 ) {
 			size.h = char_data->data->pixel_size + 2;
 		}
 	}
@@ -357,7 +351,7 @@ static void TextLayer_EraseOldArea( LCUI_TextLayer *layer, LCUI_Graph *graph )
 }
 
 /** 对指定文本行进行自动换行处理 */
-static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
+static void TextLayer_TextRowTypeset( LCUI_TextLayer *layer, int i_row )
 {
 	LCUI_Size row_size={0,0};
 	Text_RowData *p_row, *p_next_row;
@@ -384,7 +378,8 @@ static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
 		}
 		row_size.w += p_char->bitmap->advance.x;
 		/* 如果是当前行的第一个字符，或者行宽度没有超过宽度限制 */
-		if( i_col<1 || row_size.w <= layer->graph.w ) {
+		if( i_col < 1 || !layer->auto_wrap
+		 || row_size.w <= layer->graph.w ) {
 			if( row_size.h < char_h ) {
 				row_size.h = char_h;
 			}
@@ -480,7 +475,7 @@ static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
 			}
 			row_size.w += p_char->bitmap->advance.x;
 			/* 如果没有超过宽度限制 */
-			if( row_size.w < layer->graph.w ) {
+			if( !layer->auto_wrap || row_size.w < layer->graph.w ) {
 				if( row_size.h < char_h ) {
 					row_size.h = char_h;
 				}
@@ -509,26 +504,16 @@ static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
 	}
 }
 
-/** 对文本图层中的文本进行自动换行处理 */
-static void TextLayer_Text_ExecAutoWRap( LCUI_TextLayer *layer, int start_row )
+/** 对文本图层中的文本进行排版 */
+static void TextLayer_TextTypeset( LCUI_TextLayer *layer, int start_row )
 {
 	int i_row, n_rows;
 	n_rows = Queue_GetTotal( &layer->rows_data );
 	/* 从第start_row 行开始，对后面所有行进行自动换行处理 */
 	for(i_row=start_row; i_row<n_rows; ++i_row) {
-		TextLayer_TextRow_ExecAutoWRap( layer, i_row );
+		TextLayer_TextRowTypeset( layer, i_row );
 		/* 更新总行数 */
 		n_rows = Queue_GetTotal( &layer->rows_data );
-	}
-}
-
-/** 更新文本图层中的文本排版 */
-LCUI_API void TextLayer_Text_UpdateLayout( LCUI_TextLayer *layer )
-{
-	if( layer->auto_wrap ) {
-		TextLayer_Text_ExecAutoWRap( layer, 0 );
-	} else {
-
 	}
 }
 
@@ -743,7 +728,7 @@ LCUI_API int TextLayer_SetGraphSize(	LCUI_TextLayer *layer,
 	ret = Graph_Create( &layer->graph, new_size.w, new_size.h );
 	/* 如果宽度有变化，并启用了自动换行功能 */
 	if( old_w != new_size.w && layer->auto_wrap ) {
-		TextLayer_Text_ExecAutoWRap( layer, 0 );
+		TextLayer_TextTypeset( layer, 0 );
 	}
 	return ret;
 }
@@ -1128,7 +1113,7 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	}
 	/* 若启用了自动换行 */
 	if( layer->auto_wrap ) {
-		TextLayer_Text_ExecAutoWRap( layer, cur_pos.y );
+		TextLayer_TextTypeset( layer, cur_pos.y );
 	}
 	DEBUG_MSG1("quit\n");
 }
@@ -1889,5 +1874,5 @@ LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer *layer, LCUI_BOOL flag )
 	}
 	layer->auto_wrap = flag;
 	/* 更新文本图层中的文本排版 */
-	TextLayer_Text_UpdateLayout( layer );
+	TextLayer_TextTypeset( layer, 0 );
 }
