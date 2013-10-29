@@ -551,7 +551,7 @@ static void TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 		Widget_SetSize( label, "100%", NULL );
 	}
 	/* 和上面的处理基本一样，这个是处理横向滚动条 */
-	if( layer->enable_multiline &&
+	if( layer->enable_multiline && !layer->auto_wrap &&
 	 area_size.w > 0 && layer_size.w > area_size.w ) {
 		tmp = area_size.h - Widget_GetHeight( scrollbar[1] );
 #ifdef LCUI_BUILD_IN_LINUX
