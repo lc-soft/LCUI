@@ -108,20 +108,47 @@ static void Label_UpdateTextLayerSize( LCUI_Widget *widget, void *arg )
 
 	Widget_Lock( widget );
 	TextLayer_GetSize( &label->layer, &new_size );
-	/* 如果开启了自动调整大小,并且尺寸有改变 */
-	if( widget->dock == DOCK_TYPE_NONE && label->auto_size ) {
-		if( Size_Cmp( new_size, widget->size ) != 0 ) {
-			TextLayer_SetGraphSize( &label->layer, new_size );
-			Widget_Resize( widget, new_size );
-		}
-	} else {
+	/* 如果部件尺寸不是由LCUI自动调整的 */
+	if( widget->dock != DOCK_TYPE_NONE || !label->auto_size ) {
 		new_size = Widget_GetSize(widget);
 		if( label->layer.graph.w != new_size.w
 		 || label->layer.graph.h != new_size.h ) {
 			Widget_Draw( widget ); 
 		}
 		TextLayer_SetGraphSize( &label->layer, new_size );
+		Widget_Unlock( widget );
+		return;
 	}
+	/* 如果未启用自动换行 */
+	if( !label->layer.auto_wrap ) {
+		if( Size_Cmp( new_size, widget->size ) != 0 ) {
+			TextLayer_SetGraphSize( &label->layer, new_size );
+			Widget_Resize( widget, new_size );
+		}
+		Widget_Unlock( widget );
+		return;
+	}
+	
+	new_size = Widget_GetSize(widget);
+	/* 将部件所在容器的宽度作为图像宽度 */
+	new_size.w = Widget_GetContainerWidth( widget->parent );
+	/* 高度必须有效，最小高度为20 */
+	if( new_size.h < 20 ) {
+		new_size.h = 20;
+	}
+	/* 如果部件尺寸等于TextLayer的图像尺寸 */
+	if( label->layer.graph.w == new_size.w
+	 && label->layer.graph.h == new_size.h ) {
+		Widget_Unlock( widget );
+		return;
+	}
+	/* 重新调整图像尺寸 */
+	TextLayer_SetGraphSize( &label->layer, new_size );
+	/* 重新计算文本图层的尺寸 */
+	TextLayer_GetSize( &label->layer, &new_size );
+	Widget_Resize( widget, new_size );
+	/* 确保此部件会重绘 */
+	Widget_Draw( widget );
 	Widget_Unlock( widget );
 }
 
@@ -244,6 +271,8 @@ static void Label_ExecDraw( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
 	LCUI_Graph *widget_graph, *tlayer_graph;
+	char filename[256];
+	static int count = 0;
 
 	if( !widget ) {
 		return;
@@ -260,6 +289,10 @@ static void Label_ExecDraw( LCUI_Widget *widget )
 		Graph_Replace( widget_graph, tlayer_graph, Pos(0,0) );
 	} else {
 		Graph_Mix( widget_graph, tlayer_graph, Pos(0,0) );
+	}
+	if( label->layer.auto_wrap ) {
+	sprintf(filename, "tlayer-graph-%02d.png", count++);
+	Graph_WritePNG(filename, tlayer_graph );
 	}
 }
 
