@@ -363,6 +363,7 @@ static void __TextBox_Text_Add( LCUI_Widget *widget, wchar_t *new_text )
 
 /* 在这里提前声明要用到的函数 */
 static int TextBox_ScrollBar_UpdatePos( LCUI_Widget *widget );
+static void TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget );
 
 /** 更新文本框内的字体位图 */
 static void TextBox_UpdateFontBitmap( LCUI_Widget *widget, void *arg )
@@ -396,6 +397,7 @@ static void TextBox_UpdateFontBitmap( LCUI_Widget *widget, void *arg )
 	Queue_Delete( &textbox->text_block_buff, 0 );
 	/* 更新滚动条的位置 */
 	TextBox_ScrollBar_UpdatePos( widget );
+	TextBox_ScrollBar_UpdateSize( widget );
 	/* 下次继续更新 */
 	WidgetMsg_Post( widget, WIDGET_MSG_UPDATE_FONTBMP, NULL, TRUE, FALSE );
 	Widget_Update( widget );
@@ -496,9 +498,8 @@ static LCUI_Widget *TextBox_GetScrollbar( LCUI_Widget *widget, int which )
 	return tb->scrollbar[1];
 }
 
-static void 
-TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 /* 更新滚动条的长度 */
+static void TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 {
 	int tmp;
 	char size_str[15];
@@ -584,11 +585,11 @@ TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 /** 更新滚动条的位置 */
 static int TextBox_ScrollBar_UpdatePos( LCUI_Widget *widget )
 {
-	static ScrollBar_Data scrollbar_data;
-	static LCUI_Pos area_pos;
-	static LCUI_Size layer_size, area_size;
-	static LCUI_Widget *scrollbar[2];
-	static LCUI_TextLayer *layer;
+	ScrollBar_Data scrollbar_data;
+	LCUI_Pos area_pos;
+	LCUI_Size layer_size, area_size;
+	LCUI_Widget *scrollbar[2];
+	LCUI_TextLayer *layer;
 	
 	area_size = Widget_GetContainerSize( widget ); 
 	//_DEBUG_MSG("area_size: (%d,%d)\n", area_size.w, area_size.h);
@@ -723,7 +724,9 @@ static void TextBox_ExecUpdate( LCUI_Widget *widget )
 	Widget_Update( TextBox_GetLabel(widget) );
 	Widget_Draw( TextBox_GetLabel(widget) );
 	TextBox_ExecUpdateStyle( widget ); /* 更新文本框的样式 */
-	TextBox_ScrollBar_UpdateSize( widget ); /* 更新滚动条的长度 */
+	/* 更新滚动条的位置 */
+	TextBox_ScrollBar_UpdatePos( widget );
+	TextBox_ScrollBar_UpdateSize( widget );
 	TextBox_Cursor_Update( widget ); /* 更新文本框内的光标 */
 }
 
