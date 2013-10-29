@@ -354,8 +354,9 @@ static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
 	Text_RowData *p_row, *p_next_row;
 	LCUI_CharData *p_char;
 	int i_col, n_cols, char_h;
-
+	/* 获取本行的指针 */
 	p_row = (Text_RowData*)Queue_Get( &layer->rows_data, i_row );
+	/* 获取本行文本的字符列数 */
 	n_cols = Queue_GetTotal( &p_row->string );
 	/* 遍历当前行的各个文字 */
 	for(i_col=0; i_col<n_cols; ++i_col) {
@@ -411,10 +412,71 @@ static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
 			Queue_Get( &p_row->string, n_cols );
 			/* 标记本字需要刷新 */
 			p_char->need_update = TRUE;
+			/* 插入至新行 */
 			Queue_InsertPointer( &p_next_row->string, 0, p_char );
+			/* 移除该字在本行的记录 */
 			Queue_DeletePointer( &p_row->string, n_cols );
 		}
-		break;
+		return;
+	}
+	/* 如果本行有结束符（换行符） */
+	if( p_row->last_char ) {
+		return;
+	}
+	/* 本行内容的宽度未达到限制宽度，需要将下行的文本转移至本行 */
+	while(1) {
+		p_next_row = (Text_RowData*)
+		Queue_Get( &layer->rows_data, i_row+1 );
+		/* 若没有下行 */
+		if( !p_next_row ) {
+			return;
+		}
+		while(1) {
+			p_char = (LCUI_CharData*)
+			Queue_Get( &p_next_row->string, 0 );
+			if( !p_char ) {
+				break;
+			}
+			/* 忽略无字体位图、不可显的文字 */
+			if( !p_char->bitmap || !p_char->display ) {
+				Queue_AddPointer( &p_row->string, p_char );
+				Queue_DeletePointer( &p_next_row->string, 0 );
+				continue;
+			}
+			/* 获取该字的高度 */
+			if( p_char->data && p_char->data->_pixel_size ) {
+				char_h = p_char->data->pixel_size+2;
+			} else {
+				char_h = layer->default_data.pixel_size+2;
+			}
+			row_size.w += p_char->bitmap->advance.x;
+			/* 如果没有超过宽度限制 */
+			if( row_size.w < layer->graph.w ) {
+				if( row_size.h < char_h ) {
+					row_size.h = char_h;
+				}
+				/* 标记本字需要刷新 */
+				p_char->need_update = TRUE;
+				Queue_AddPointer( &p_row->string, p_char );
+				Queue_DeletePointer( &p_next_row->string, 0 );
+				continue;
+			}
+			/* 超过了就更新本行的尺寸，然后退出 */
+			row_size.w -= p_char->bitmap->advance.x;
+			p_row->max_size = row_size;
+			return;
+		}
+		/* 如果这一行有结束符 */
+		if( p_next_row->last_char ) {
+			/* 将结束符转移至当前行 */
+			p_row->last_char = p_next_row->last_char;
+			p_next_row->last_char = NULL;
+			/* 然后删除这一行 */
+			Queue_DeletePointer( &layer->rows_data, i_row+1 );
+			return;
+		}
+		/* 删除这一行，因为这一行的内容已经转移至当前行 */
+		Queue_DeletePointer( &layer->rows_data, i_row+1 );
 	}
 }
 
@@ -611,15 +673,18 @@ TextLayer_SetOffset( LCUI_TextLayer *layer, LCUI_Pos offset_pos )
 LCUI_API int TextLayer_SetGraphSize(	LCUI_TextLayer *layer, 
 					LCUI_Size new_size )
 {
+	int ret, old_w;
 	/* 如果尺寸有变化，则标记需要重绘文本位图 */
 	if( layer->graph.w != new_size.w || layer->graph.h != new_size.h ) {
 		TextLayer_Refresh( layer );
-		/* 如果启用了自动换行功能 */
-		if( layer->auto_wrap ) {
-			TextLayer_Text_ExecAutoWRap( layer, 0 );
-		}
 	}
-	return Graph_Create( &layer->graph, new_size.w, new_size.h );
+	old_w = layer->graph.w;
+	ret = Graph_Create( &layer->graph, new_size.w, new_size.h );
+	/* 如果宽度有变化，并启用了自动换行功能 */
+	if( old_w != new_size.w && layer->auto_wrap ) {
+		TextLayer_Text_ExecAutoWRap( layer, 0 );
+	}
+	return ret;
 }
 
 /** 计算文本图层的尺寸 */
@@ -1000,12 +1065,10 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 		layer->current_des_pos = des_pos;
 		layer->current_src_pos = src_pos;
 	}
-	_DEBUG_MSG("tip1\n");
 	/* 若启用了自动换行 */
 	if( layer->auto_wrap ) {
 		TextLayer_Text_ExecAutoWRap( layer, cur_pos.y );
 	}
-	_DEBUG_MSG("tip2\n");
 	DEBUG_MSG1("quit\n");
 }
 
