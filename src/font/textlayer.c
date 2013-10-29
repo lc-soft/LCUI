@@ -160,14 +160,23 @@ static void  TextLayer_Text_RowBreak(	LCUI_TextLayer *layer,
 /* 将插入新行至文本图层的文本中的指定位置 */
 static int TextLayer_Text_InsertNewRow( LCUI_TextLayer *layer, int row )
 {
+	LCUI_TextStyle *style;
 	Text_RowData data;
 	
 	data.pos = Pos(0,0); 
-	data.max_size = Size(0,0);
 	data.last_char = NULL;
 	Queue_Init( &data.string, sizeof(LCUI_CharData), NULL ); 
 	Queue_SetDataMode( &data.string, QUEUE_DATA_MODE_LINKED_LIST ); 
 	Queue_UsingPointer( &data.string );
+	/* 根据当前样式，判定当前行的尺寸 */
+	style = StyleTag_GetCurrentStyle( &layer->tag_buff );
+	if( style && style->_pixel_size ) {
+		data.max_size.h = style->pixel_size+2;
+		free(style);
+	} else {
+		data.max_size.h = layer->default_data.pixel_size+2;
+	}
+	data.max_size.w = 0;
 	return Queue_Insert( &layer->rows_data, row, &data );
 }
 
@@ -354,6 +363,7 @@ static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
 	Text_RowData *p_row, *p_next_row;
 	LCUI_CharData *p_char;
 	int i_col, n_cols, char_h;
+
 	/* 获取本行的指针 */
 	p_row = (Text_RowData*)Queue_Get( &layer->rows_data, i_row );
 	/* 获取本行文本的字符列数 */
@@ -373,15 +383,11 @@ static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
 			char_h = layer->default_data.pixel_size+2;
 		}
 		row_size.w += p_char->bitmap->advance.x;
-		/* 如果没有超过宽度限制 */
-		if( row_size.w < layer->graph.w ) {
+		/* 如果是当前行的第一个字符，或者行宽度没有超过宽度限制 */
+		if( i_col<1 || row_size.w <= layer->graph.w ) {
 			if( row_size.h < char_h ) {
 				row_size.h = char_h;
 			}
-			continue;
-		}
-		/* 至少每行要显示一个字符 */
-		if( i_col<1 ) {
 			continue;
 		}
 		row_size.w -= p_char->bitmap->advance.x;
@@ -406,6 +412,8 @@ static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
 			p_next_row = (Text_RowData*)
 			Queue_Get( &layer->rows_data, i_row+1 );
 		}
+		row_size.w = 0;
+		row_size.h = 0;
 		/* 将本行剩余文字转移至下一行 */
 		for(n_cols-=1; n_cols>=i_col; --n_cols) {
 			p_char = (LCUI_CharData*)
@@ -414,27 +422,48 @@ static void TextLayer_TextRow_ExecAutoWRap( LCUI_TextLayer *layer, int i_row )
 			p_char->need_update = TRUE;
 			/* 插入至新行 */
 			Queue_InsertPointer( &p_next_row->string, 0, p_char );
+			if( p_char->data && p_char->data->_pixel_size ) {
+				char_h = p_char->data->pixel_size+2;
+			} else {
+				char_h = layer->default_data.pixel_size+2;
+			}
+			if( row_size.h < char_h ) {
+				row_size.h = char_h;
+			}
+			row_size.w += p_char->bitmap->advance.x;
 			/* 移除该字在本行的记录 */
 			Queue_DeletePointer( &p_row->string, n_cols );
 		}
+		/* 更新本行的尺寸 */
+		p_next_row->max_size = row_size;
 		return;
+	}
+	if( n_cols <= 0 ) {
+		TextLayer_Update_RowSize( layer, i_row );
+	}
+	else if( i_col >= n_cols ) {
+		p_row->max_size = row_size;
 	}
 	/* 如果本行有结束符（换行符） */
 	if( p_row->last_char ) {
 		return;
 	}
+	/* 获取本行尺寸，以便下面继续累计本行的尺寸 */
+	row_size = p_row->max_size;
 	/* 本行内容的宽度未达到限制宽度，需要将下行的文本转移至本行 */
 	while(1) {
 		p_next_row = (Text_RowData*)
 		Queue_Get( &layer->rows_data, i_row+1 );
 		/* 若没有下行 */
 		if( !p_next_row ) {
+			p_row->max_size = row_size;
 			return;
 		}
 		while(1) {
 			p_char = (LCUI_CharData*)
 			Queue_Get( &p_next_row->string, 0 );
 			if( !p_char ) {
+				p_row->max_size = row_size;
 				break;
 			}
 			/* 忽略无字体位图、不可显的文字 */
@@ -617,6 +646,38 @@ LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
 	}
 }
 
+/* 标记需要重绘整个文本图层 */
+LCUI_API void TextLayer_Redraw( LCUI_TextLayer *layer )
+{
+	int i, j;
+	int rows, len;
+	Text_RowData *row_ptr;
+	LCUI_CharData *char_ptr;
+	LCUI_Rect area;
+
+	area.x = 0;
+	area.y = 0;
+	area.width = layer->graph.w;
+	area.height = layer->graph.h;
+	/* 直接清除整个图层内容 */
+	RectQueue_AddToValid( &layer->clear_area, area );
+
+	rows = Queue_GetTotal( &layer->rows_data );
+	for(i=0; i<rows; ++i) {
+		row_ptr = (Text_RowData*)
+		Queue_Get( &layer->rows_data, i );
+		len = Queue_GetTotal( &row_ptr->string );
+		for(j=0; j<len; ++j) {
+			char_ptr = (LCUI_CharData*)
+			Queue_Get( &row_ptr->string, j );
+			if( !char_ptr ) {
+				continue;
+			}
+			char_ptr->need_update = TRUE; 
+		}
+	}
+}
+
 LCUI_API void
 TextLayer_Refresh( LCUI_TextLayer *layer )
 /* 标记文本图层中每个字的位图，等待绘制文本图层时进行更新 */
@@ -676,7 +737,7 @@ LCUI_API int TextLayer_SetGraphSize(	LCUI_TextLayer *layer,
 	int ret, old_w;
 	/* 如果尺寸有变化，则标记需要重绘文本位图 */
 	if( layer->graph.w != new_size.w || layer->graph.h != new_size.h ) {
-		TextLayer_Refresh( layer );
+		TextLayer_Redraw( layer );
 	}
 	old_w = layer->graph.w;
 	ret = Graph_Create( &layer->graph, new_size.w, new_size.h );
