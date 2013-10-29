@@ -403,13 +403,16 @@ static void TextLayer_Text_ExecAutoWarp( LCUI_TextLayer *layer, int start_row )
 				p_next_row = (Text_RowData*)
 				Queue_Get( &layer->rows_data, i_row+1 );
 			}
+			_DEBUG_MSG("i_row: %d, n_rows: %d,n_cols: %d\n", i_row, n_rows, n_cols);
 			/* 将本行剩余文字转移至下一行 */
 			for(n_cols-=1; n_cols>=i_col; --n_cols) {
 				p_char = (LCUI_CharData*)
 				Queue_Get( &p_row->string, n_cols );
 				/* 标记本字需要刷新 */
 				p_char->need_update = TRUE;
+				_DEBUG_MSG("[%d] char code: %d, char: %C\n", n_cols, p_char->char_code, p_char->char_code);
 				Queue_InsertPointer( &p_next_row->string, 0, p_char );
+				Queue_DeletePointer( &p_row->string, n_cols );
 			}
 			n_rows = Queue_GetTotal( &layer->rows_data );
 			break;
@@ -965,8 +968,7 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 		/* 将该指针添加至行数据队列中 */
 		cur_row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, des_pos.y );
 		Queue_InsertPointer( &cur_row_ptr->string, des_pos.x, char_ptr );
-		++src_pos; 
-		++des_pos.x;
+		
 		/* 累计当前行的宽度 */
 		row_size.w += char_ptr->bitmap->advance.x;
 		/* 获取该字的高度 */
@@ -978,37 +980,21 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 		if( row_size.h < char_h ) {
 			row_size.h = char_h;
 		}
-		/* 如果未启用自动换行功能，或者未超出限制宽度 */
-		if( !layer->auto_wrap || row_size.w < layer->graph.w ) {
-			/* 累计当前字符的X轴坐标 */
-			char_pos_x += char_ptr->bitmap->advance.x;
-			continue;
-		}
-		row_size.w -= char_ptr->bitmap->advance.x;
-		cur_row_ptr->max_size = row_size;
-		/* 对当前行后面的所有行文本进行自动换行处理 */
-		_DEBUG_MSG("tip1\n");
-		TextLayer_Text_ExecAutoWarp( layer, des_pos.y );
-		_DEBUG_MSG("tip2\n");
-		/* 如果当前插入的字符坐标已经超出宽度范围，则移动光标至下一行 */
-		if( char_pos_x > row_size.h ) {
-			des_pos.y = ++row;
-			des_pos.x = 0;
-			char_pos_x = 0;
-			/* 切换至下一行 */
-			cur_row_ptr = (Text_RowData*)
-			Queue_Get( &layer->rows_data, row );
-		} else {
-			char_pos_x += char_ptr->bitmap->advance.x;
-		}
-		/* 更新总行数 */
-		total_row = TextLayer_GetRows( layer );
+
+		++src_pos; 
+		++des_pos.x;
 	}
 	
 	if( pos_type == AT_CURSOR_POS ) {
 		layer->current_des_pos = des_pos;
 		layer->current_src_pos = src_pos;
 	}
+	_DEBUG_MSG("tip1\n");
+	/* 若启用了自动换行 */
+	if( layer->auto_wrap ) {
+		TextLayer_Text_ExecAutoWarp( layer, cur_pos.y );
+	}
+	_DEBUG_MSG("tip2\n");
 	DEBUG_MSG1("quit\n");
 }
 
