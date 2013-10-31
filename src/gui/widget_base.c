@@ -1735,7 +1735,7 @@ LCUI_API void Widget_ExecHide( LCUI_Widget *widget )
 /** 为部件的子部件进行排序 */
 static void Widget_ExecSortChild( LCUI_Widget *widget )
 {
-	int i, j, total;
+	int i, j, k, total;
 	LCUI_Widget *child_a, *child_b;
 	LCUI_Queue *child_list;
 
@@ -1753,21 +1753,19 @@ static void Widget_ExecSortChild( LCUI_Widget *widget )
 		Queue_Move( child_list, 0, i );
 		++j; /* j用于统计模态部件的数量 */
 	}
-	/* 忽略前面j个模态部件，从第j个部件开始 */
-	for(i=j; i<total; ++i) {
+	/* 使用冒泡排序法对部件列表进行排序 */
+	for(k=0; k<total; ++k)
+	for(i=total-1; i>=j; --i) {
 		child_a = (LCUI_Widget*)Queue_Get( child_list, i );
 		if( !child_a ) {
 			continue;
 		}
-		for(j=i+1; j<total; ++j) {
-			child_b = (LCUI_Widget*)Queue_Get( child_list, j );
-			if( !child_b ) {
-				continue;
-			}
-			if( child_b->glayer->z_index
-			 > child_a->glayer->z_index ) {
-				Queue_Swap( child_list, j, i );
-			}
+		child_b = (LCUI_Widget*)Queue_Get( child_list, i-1 );
+		if( !child_b ) {
+			continue;
+		}
+		if( child_a->glayer->z_index > child_b->glayer->z_index ) {
+			Queue_Swap( child_list, i-1, i );
 		}
 	}
 	Queue_Unlock( child_list );
