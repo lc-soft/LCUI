@@ -44,7 +44,6 @@
 #define I_NEED_LABEL_TEXTLAYER
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include LC_FONT_H
 #include LC_WIDGET_H
 #include LC_LABEL_H
 
@@ -175,6 +174,7 @@ static void Label_RefreshTextLayer( LCUI_Widget *widget, void *arg )
 	TextLayer_Refresh( &label->layer );
 	Label_UpdateTextLayer( widget );
 	Widget_Update( widget );
+	Widget_Draw( widget );
 	Widget_Unlock( widget );
 }
 
