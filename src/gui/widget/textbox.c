@@ -45,7 +45,6 @@
 #include LC_LCUI_H
 #include LC_WIDGET_H
 #include LC_GRAPH_H
-#include LC_FONT_H
 #include LC_TEXTBOX_H
 #include LC_LABEL_H
 #include LC_SCROLLBAR_H
@@ -534,7 +533,7 @@ static void TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 		ScrollBar_SetCurrentSize( scrollbar[0], area_size.h );
 		Widget_Show( scrollbar[0] );
 		/* 如果横向滚动条可见 */
-		if( scrollbar[1]->visible ) {
+		if( scrollbar[1]->visible || !layer->auto_wrap ) {
 			tmp = area_size.h - Widget_GetHeight( scrollbar[1] );
 #ifdef LCUI_BUILD_IN_LINUX
 			snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
