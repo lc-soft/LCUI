@@ -41,7 +41,7 @@
 #ifndef __LCUI_LABEL_H__
 #define __LCUI_LABEL_H__
 
-#include LC_TEXTSTYLE_H
+#include LC_FONT_H
 
 LCUI_BEGIN_HEADER
 
@@ -61,10 +61,8 @@ LCUI_API int Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
 /** 获取Label部件的文本样式 */
 LCUI_API LCUI_TextStyle Label_GetTextStyle( LCUI_Widget *widget );
 
-#ifdef I_NEED_LABEL_TEXTLAYER
 /** 获取label部件内的文本图层的指针 */
 LCUI_API LCUI_TextLayer* Label_GetTextLayer( LCUI_Widget *widget );
-#endif
 
 /** 刷新label部件显示的文本 */
 LCUI_API void Label_Refresh( LCUI_Widget *widget );
