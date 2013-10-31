@@ -600,18 +600,17 @@ LCUI_API void TextLayer_Redraw( LCUI_TextLayer *layer )
 	}
 }
 
-LCUI_API void
-TextLayer_Refresh( LCUI_TextLayer *layer )
-/* 标记文本图层中每个字的位图，等待绘制文本图层时进行更新 */
+/* 刷新整个文本图层，让各个字体位图得到更新 */
+LCUI_API void TextLayer_Refresh( LCUI_TextLayer *layer )
 {
 	int i, j;
 	int rows, len;
 	Text_RowData *row_ptr;
 	LCUI_CharData *char_ptr;
-	LCUI_Rect area;
-
+	LCUI_Rect area={0,0,0,0};
+	
 	rows = Queue_GetTotal( &layer->rows_data );
-	for(area.y=0,area.x=0,i=0; i<rows; ++i) {
+	for(i=0; i<rows; ++i) {
 		row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, i );
 		len = Queue_GetTotal( &row_ptr->string );
 		for(j=0; j<len; ++j) {
@@ -624,12 +623,15 @@ TextLayer_Refresh( LCUI_TextLayer *layer )
 			char_ptr->need_update = TRUE; 
 		}
 		TextLayer_Update_RowSize( layer, i );
+		area.height += row_ptr->max_size.h;
 		/* 稍微扩大一点区域，区域高度再+2 */
-		area.height = row_ptr->max_size.h+2;
-		area.width = row_ptr->max_size.w;
-		RectQueue_AddToValid( &layer->clear_area, area );
-		area.y += row_ptr->max_size.h;
+		area.height += 2;
+		if( area.width < row_ptr->max_size.w ) {
+			area.width = row_ptr->max_size.w;
+		}
 	}
+	/* 记录整个文本图层的内容需要清除 */
+	RectQueue_AddToValid( &layer->clear_area, area );
 }
 
 /* 
