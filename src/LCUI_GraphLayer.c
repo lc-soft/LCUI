@@ -257,7 +257,6 @@ LCUI_API int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index )
 	return 0;
 }
 
-
 LCUI_API int GraphLayer_Sort( LCUI_GraphLayer *glayer )
 {
 	LCUI_GraphLayer *child_a, *child_b;
@@ -269,21 +268,19 @@ LCUI_API int GraphLayer_Sort( LCUI_GraphLayer *glayer )
 	/* 排序前先锁上队列互斥锁 */
 	Queue_Lock( &glayer->child );
 	total = Queue_GetTotal( &glayer->child );
-	/* 使用的是选择排序法 */
-	for(i=0; i<total; ++i) {
+	/* 使用的是冒泡排序法 */
+	for(j=0; j<total; ++j)
+	for(i=total-1; i>=1; --i) {
 		child_a = (LCUI_GraphLayer*)Queue_Get( &glayer->child, i );
 		if( !child_a ) {
 			continue;
 		}
-		for(j=i+1; j<total; ++j) {
-			child_b = (LCUI_GraphLayer*)Queue_Get( &glayer->child, j );
-			if( !child_b ) {
-				continue;
-			}
-			if( child_b->z_index > child_a->z_index ) {
-				Queue_Swap( &glayer->child, j, i);
-				child_a = child_b;
-			}
+		child_b = (LCUI_GraphLayer*)Queue_Get( &glayer->child, i-1 );
+		if( !child_b ) {
+			continue;
+		}
+		if( child_a->z_index > child_b->z_index ) {
+			Queue_Move( &glayer->child, i-1, i);
 		}
 	}
 	/* 解开互斥锁 */
