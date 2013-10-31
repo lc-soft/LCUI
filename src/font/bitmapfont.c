@@ -259,6 +259,9 @@ LCUI_API int FontBMP_Mix(	LCUI_Graph	*graph,
 /* 如果定义了LCUI_FONT_ENGINE_FREETYPE宏定义，则使用FreeType字体引擎处理字体数据 */
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 
+/** 获取FT库句柄 */
+FT_Library FontLIB_GetLibrary(void);
+
 /** 转换FT_GlyphSlot类型数据为LCUI_FontBMP */
 static int Convert_FTGlyph(	LCUI_FontBMP *des,
 				FT_GlyphSlot slot,

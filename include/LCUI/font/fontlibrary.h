@@ -51,11 +51,6 @@ LCUI_BEGIN_HEADER
 /** 初始化字体数据库 */
 LCUI_API void FontLIB_Init( void );
 
-#ifdef LCUI_FONT_ENGINE_FREETYPE
-/** 获取FT库句柄 */
-LCUI_API FT_Library FontLIB_GetLibrary(void);
-#endif
-
 /** 通过字体文件路径来查找字体信息，并获取字体ID */
 LCUI_API int FontLIB_FindInfoByFilePath( const char *filepath );
 

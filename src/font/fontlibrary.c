@@ -163,7 +163,7 @@ LCUI_API void FontLIB_Init( void )
 
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 /* 获取FT库句柄 */
-LCUI_API FT_Library FontLIB_GetLibrary(void)
+FT_Library FontLIB_GetLibrary(void)
 {
 	return library;
 }
