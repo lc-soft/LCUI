@@ -48,6 +48,21 @@
 #include LC_ERROR_H
 #include LC_FONT_H
 
+#ifdef LCUI_FONT_ENGINE_FREETYPE
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
+#include FT_OUTLINE_H
+#include FT_BITMAP_H
+
+#else
+
+typedef void* FT_Library;
+typedef void* FT_Face;
+
+#endif
+
 #define NAME_MAX_LEN	256	/**< 最大名字长度 */
 #define PATH_MAX_LEN	1024	/**< 最大路径长度 */
 
@@ -237,7 +252,7 @@ LCUI_API int FontLIB_GetFontIDByFamilyName( const char *family_name )
 }
 
 /** 获取指定字体ID的字体face对象句柄 */
-LCUI_API FT_Face FontLIB_GetFontFace( int font_id )
+FT_Face FontLIB_GetFontFace( int font_id )
 {
 	LCUI_FontInfo *info;
 	info = FontLIB_GetFont( font_id );

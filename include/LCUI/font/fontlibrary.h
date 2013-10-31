@@ -57,9 +57,6 @@ LCUI_API int FontLIB_FindInfoByFilePath( const char *filepath );
 /** 获取指定字族名的字体ID */
 LCUI_API int FontLIB_GetFontIDByFamilyName( const char *family_name );
 
-/** 获取指定字体ID的字体face对象句柄 */
-LCUI_API FT_Face FontLIB_GetFontFace( int font_id );
-
 /** 获取默认的字体ID */
 LCUI_API int FontLIB_GetDefaultFontID( void );
 

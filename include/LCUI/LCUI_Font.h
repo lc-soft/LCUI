@@ -46,19 +46,6 @@
 #ifndef __LCUI_FONT_H__
 #define __LCUI_FONT_H__
 
-#include <stdint.h>
-
-#ifdef LCUI_FONT_ENGINE_FREETYPE
-	#include <ft2build.h>
-	#include FT_FREETYPE_H
-	#include FT_GLYPH_H
-	#include FT_OUTLINE_H
-	#include FT_BITMAP_H
-#else
-	typedef void* FT_Library;
-	typedef void* FT_Face;
-#endif
-
 LCUI_BEGIN_HEADER
 
 #include LC_CHARSET_H
@@ -74,6 +61,5 @@ LCUI_API void LCUIModule_Font_Init( void );
 LCUI_API void LCUIModule_Font_End( void );
 
 LCUI_END_HEADER
-
 
 #endif /* __LCUI_FONTS_H__ */

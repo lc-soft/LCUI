@@ -52,8 +52,21 @@
 #include LC_ERROR_H
 
 #ifdef LCUI_FONT_ENGINE_FREETYPE
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
+#include FT_OUTLINE_H
+#include FT_BITMAP_H
+
 #define LCUI_FONT_RENDER_MODE	FT_RENDER_MODE_NORMAL
 #define LCUI_FONT_LOAD_FALGS	(FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT)
+
+/** 获取FT库句柄 */
+FT_Library FontLIB_GetLibrary(void);
+
+/** 获取指定字体ID的字体face对象句柄 */
+FT_Face FontLIB_GetFontFace( int font_id );
+
 #endif
 
 /** 打印字体位图的信息 */
@@ -258,9 +271,6 @@ LCUI_API int FontBMP_Mix(	LCUI_Graph	*graph,
 
 /* 如果定义了LCUI_FONT_ENGINE_FREETYPE宏定义，则使用FreeType字体引擎处理字体数据 */
 #ifdef LCUI_FONT_ENGINE_FREETYPE
-
-/** 获取FT库句柄 */
-FT_Library FontLIB_GetLibrary(void);
 
 /** 转换FT_GlyphSlot类型数据为LCUI_FontBMP */
 static int Convert_FTGlyph(	LCUI_FontBMP *des,
