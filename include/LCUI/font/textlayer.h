@@ -117,6 +117,9 @@ Destroy_TextLayer( LCUI_TextLayer *layer );
 LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
 				LCUI_Queue *dirty_rect_list );
 
+/* 标记需要重绘整个文本图层 */
+LCUI_API void TextLayer_Redraw( LCUI_TextLayer *layer );
+
 LCUI_API void
 TextLayer_Refresh( LCUI_TextLayer *layer );
 /* 标记文本图层中每个字的位图，等待绘制文本图层时进行更新 */
