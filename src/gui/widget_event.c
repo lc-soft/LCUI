@@ -486,25 +486,24 @@ exit_point:;
 	click_widget = NULL;
 }
 
-static void
-LCUI_HandleMouseButton( LCUI_MouseButtonEvent *event, void *unused )
+static void LCUI_HandleMouseButton( LCUI_Event *event, void *unused )
 {
-	if( event->state == LCUIKEYSTATE_PRESSED ) {
-		LCUI_HandleMouseButtonDown( event );
+	if( event->button.state == LCUIKEYSTATE_PRESSED ) {
+		LCUI_HandleMouseButtonDown( &event->button );
 	} else {
-		LCUI_HandleMouseButtonUp( event );
+		LCUI_HandleMouseButtonUp( &event->button );
 	}
 }
 
 static void
-LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
+LCUI_HandleMouseMotion( LCUI_Event *event, void *unused )
 {
 	LCUI_Pos pos;
 	LCUI_Widget *tmp_widget, *widget;
 	LCUI_WidgetEvent wdg_event;
 
-	pos.x = event->x;
-	pos.y = event->y;
+	pos.x = event->motion.x;
+	pos.y = event->motion.y;
 	/* 获取当前鼠标游标覆盖到的部件的指针 */
 	widget = Widget_At( NULL, pos );
 	if( widget ) {
@@ -531,9 +530,9 @@ LCUI_HandleMouseMotion( LCUI_MouseMotionEvent *event, void *unused )
 	if( tmp_widget != click_widget ) {
 		return;
 	}
-	if( tmp_widget != NULL && event->state == LCUIKEYSTATE_PRESSED ) {
+	if( tmp_widget && event->motion.state == LCUIKEYSTATE_PRESSED ) {
 		DEBUG_MSG("doing drag\n");
-		_DragEvent_Do( tmp_widget, event );
+		_DragEvent_Do( tmp_widget, &event->motion );
 	}
 }
 
@@ -585,7 +584,7 @@ static int Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 }
 
 static void
-WidgetFocusProc( LCUI_KeyboardEvent *event, void *arg );
+WidgetFocusProc( LCUI_Event *event, void *arg );
 
 /* 初始化部件模块 */
 LCUI_API void
@@ -593,9 +592,11 @@ LCUIModule_Widget_Init( void )
 {
 	RootWidget_Init();
 	Queue_Init( &widget_proc_record, sizeof(WidgetRecordItem), NULL );
-	LCUI_MouseButtonEvent_Connect( LCUI_HandleMouseButton, NULL );
-	LCUI_MouseMotionEvent_Connect( LCUI_HandleMouseMotion, NULL );
-	LCUI_KeyboardEvent_Connect( WidgetFocusProc, NULL );
+	LCUISysEvent_Connect( LCUI_MOUSEBUTTONDOWN, LCUI_HandleMouseButton, NULL );
+	LCUISysEvent_Connect( LCUI_MOUSEBUTTONUP, LCUI_HandleMouseButton, NULL );
+	LCUISysEvent_Connect( LCUI_MOUSEMOTION, LCUI_HandleMouseMotion, NULL );
+	LCUISysEvent_Connect( LCUI_KEYDOWN, WidgetFocusProc, NULL );
+	LCUISysEvent_Connect( LCUI_KEYUP, WidgetFocusProc, NULL );
 	WidgetStyle_LibraryInit();
 }
 
@@ -792,11 +793,11 @@ LCUI_API LCUI_BOOL Widget_ResetFocus( LCUI_Widget* widget )
 	return TRUE;
 }
 
-static void WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
+static void WidgetFocusProc( LCUI_Event *event, void *unused )
 {
 	LCUI_Widget *widget = NULL, *tmp = NULL, *focus_widget;
 	/* 如果输入法需要处理这个键，则退出本函数 */
-	if( LCUIIME_ProcessKey( event ) ) {
+	if( LCUIIME_ProcessKey( &event->key ) ) {
 		return;
 	}
 	/* 否则，将这个键盘消息发送给当前获得焦点的部件 */
@@ -809,7 +810,7 @@ static void WidgetFocusProc( LCUI_KeyboardEvent *event, void *unused )
 			if( !tmp ) {
 				break;
 			}
-			Widget_DispatchKeyboardEvent( tmp, event );
+			Widget_DispatchKeyboardEvent( tmp, &event->key );
 			break;
 		}
 		/* 切换到子部件 */
