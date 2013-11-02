@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * rect.c -- 矩形区域处理
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -572,8 +572,8 @@ RectQueue_Add( LCUI_Queue* queue, LCUI_Rect rect )
 	
 	/* 销毁队列 */
 	Queue_Destroy( &rect_buff );
-	if ( flag == 0 ) {
-		return Queue_Add( queue, &rect );
+	if ( flag == 0 && Queue_Add( queue, &rect ) ) {
+		return 0;
 	}
 	return -1;
 }

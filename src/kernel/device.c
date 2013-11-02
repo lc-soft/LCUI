@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * device.c -- 输入设备的处理模块
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -58,7 +58,6 @@ LCUI_API int LCUIDevice_Add(	LCUI_BOOL (*init_func)(void),
 				LCUI_BOOL (*proc_func)(void), 
 				LCUI_BOOL (*destroy_func)(void) )
 {
-	int ret;
 	dev_func_data data;
 	
 	if( init_func ) {
@@ -68,11 +67,11 @@ LCUI_API int LCUIDevice_Add(	LCUI_BOOL (*init_func)(void),
 	data.proc_func = proc_func;
 	data.destroy_func = destroy_func;
 	Queue_Lock( &dev_list );
-	ret = Queue_Add( &dev_list, &data );
-	Queue_Unlock( &dev_list );
-	if( ret >= 0 ) {
+	if( Queue_Add( &dev_list, &data ) ) {
+		Queue_Unlock( &dev_list );
 		return 0;
 	}
+	Queue_Unlock( &dev_list );
 	return -1;
 }
 

@@ -136,7 +136,10 @@ static int TextLayer_Text_AddNewRow( LCUI_TextLayer *layer )
 	Queue_SetDataMode( &data.string, QUEUE_DATA_MODE_LINKED_LIST );
 	/* 队列成员使用指针，主要是引用text_source_data里面的数据 */
 	Queue_UsingPointer( &data.string );
-	return Queue_Add( &layer->rows_data, &data );
+	if( Queue_Add( &layer->rows_data, &data ) ) {
+		return 0;
+	}
+	return -1;
 }
 
 /** 对目标行进行断行处理，也就是将目标行指定位置后面的全部文字转移到另一行 */

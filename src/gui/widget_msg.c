@@ -227,10 +227,14 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 	}
 	/* 未找到，则添加新的 */
 	if( i>= total ) {
-		ret = Queue_Add( des_queue, &tmp_msg );
+		if( Queue_Add( des_queue, &tmp_msg ) ) {
+			Queue_Unlock( des_queue );
+			return 0;
+		}
+		return -2;
 	}
 	Queue_Unlock( des_queue );
-	return ret;
+	return 0;
 }
 
 LCUI_API int WidgetMsg_Connect(	LCUI_Widget *widget,
@@ -259,5 +263,8 @@ LCUI_API int WidgetMsg_Connect(	LCUI_Widget *widget,
 	}
 	task.id = msg_id;
 	task.func = (CallBackFunc)func;
-	return Queue_Add( msg_func, &task );
+	if( Queue_Add( msg_func, &task ) ) {
+		return 0;
+	}
+	return -2;
 }

@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * task.c -- 程序任务队列操作集
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -73,7 +73,7 @@ LCUI_API int AppTasks_Add( LCUI_Task *task )
 		return -1;
 	}
 	Queue_Lock( &app->tasks );
-	if(Queue_Add( &app->tasks, task ) < 0 ) {
+	if( !Queue_Add( &app->tasks, task ) ) {
 		Queue_Unlock( &app->tasks );
 		return -2;
 	}

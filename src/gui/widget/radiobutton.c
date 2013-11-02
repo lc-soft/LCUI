@@ -82,7 +82,6 @@ RadioButton_DeleteMutex( LCUI_Widget *widget )
 LCUI_API void
 RadioButton_CreateMutex( LCUI_Widget *a, LCUI_Widget *b )
 {
-	int pos;
 	LCUI_Queue *p, queue;
 	LCUI_RadioButton *rb_a, *rb_b;
 	if(mutex_lib_init == 0) {
@@ -96,10 +95,8 @@ RadioButton_CreateMutex( LCUI_Widget *a, LCUI_Widget *b )
 	if( !rb_a->mutex ) {
 		if( !rb_b->mutex ) {
 			Queue_Init(&queue, sizeof(LCUI_Widget*), NULL);
-			/* 将子队列添加至父队列，并获取位置 */
-			pos = Queue_Add(&mutex_lib, &queue);
-			/* 从队列中获取指向子队列的指针 */
-			p = (LCUI_Queue*)Queue_Get(&mutex_lib, pos);
+			/* 将子队列添加至父队列 */
+			p = (LCUI_Queue*)Queue_Add(&mutex_lib, &queue);
 			/* 添加指针至队列 */
 			Queue_AddPointer(p, a);
 			Queue_AddPointer(p, b);

@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * textstyle.c -- 文本样式处理模块
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -150,7 +150,10 @@ StyleTag_Init( LCUI_Queue *tags )
 LCUI_API int
 StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data )
 {
-	return Queue_Add( tags, data );
+	if( Queue_Add( tags, data ) ) {
+		return 0;
+	}
+	return 0;
 }
 
 /* 获取当前的样式数据 */

@@ -241,7 +241,6 @@ LCUI_API int Animation_Resize( AnimationData *p, LCUI_Size new_size )
  */
 LCUI_API AnimationData* Animation_Create( LCUI_Size size )
 {
-	int pos;
 	AnimationData *p, animation;
 
 	Queue_Init( &animation.frame, sizeof(AnimationFrameData), NULL );
@@ -255,8 +254,7 @@ LCUI_API AnimationData* Animation_Create( LCUI_Size size )
 	}
 	Queue_Lock( &animation_database );
 	/* 记录该动画至库中 */
-	pos = Queue_Add( &animation_database, &animation );
-	p = (AnimationData*)Queue_Get( &animation_database, pos );
+	p = (AnimationData*)Queue_Add( &animation_database, &animation );
 	Queue_Unlock( &animation_database );
 	DEBUG_MSG("create animation: %p\n", p);
 	Animation_Resize( p, size );
@@ -349,8 +347,10 @@ LCUI_API int Animation_AddFrame(	AnimationData *des,
 	frame.sleep_time = sleep_time;
 	frame.graph = *pic;
 	frame.current_time = frame.sleep_time;
-	Queue_Get( &des->frame, Queue_Add( &des->frame, &frame ) );
-	return 0;
+	if( Queue_Add( &des->frame, &frame ) ) {
+		return 0;
+	}
+	return -3;
 }
 
 /**
@@ -685,7 +685,7 @@ LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget *widget,
 	rec.animation = animation;
 	rec.play_id = 0;
 	actbox = (LCUI_ActiveBox*)Widget_GetPrivData( widget );
-	if( 0 <= Queue_Add( &actbox->animation_list, &rec ) ) {
+	if( Queue_Add( &actbox->animation_list, &rec ) ) {
 		return 0;
 	}
 	return -1;
