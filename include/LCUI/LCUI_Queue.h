@@ -162,8 +162,7 @@ Queue_PrintInfo( LCUI_Queue *queue );
  * 功能：将新的成员添加至队列 
  * 说明：这个函数只是单纯的添加成员，如果想有更多的功能，需要自己实现
  * */
-LCUI_API int
-Queue_Add( LCUI_Queue * queue, const void *data );
+LCUI_API void* Queue_Add( LCUI_Queue *queue, const void *data );
 
 /* 
  * 功能：将新的成员添加至队列 
@@ -171,8 +170,7 @@ Queue_Add( LCUI_Queue * queue, const void *data );
  * 与部件队列的处理上，有的部件需要从一个队列转移到另一个队列上，不重新分配内存空间，
  * 直接使用原来的内存地址，这是为了避免部件转移所在队列后，部件指针无效的问题。
  * */
-LCUI_API int
-Queue_AddPointer( LCUI_Queue * queue, const void *data );
+LCUI_API void* Queue_AddPointer( LCUI_Queue *queue, const void *data );
 
 /* 将一个队列拼接至另一个队列的末尾 */
 LCUI_API int

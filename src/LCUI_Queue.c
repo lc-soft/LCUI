@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Queue.c -- 基本的队列处理
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -265,8 +265,11 @@ LCUI_API int Queue_Insert(	LCUI_Queue *queue,
 				const void *data )
 {
 	int src_pos;
-	src_pos = Queue_Add(queue, data);
-	return Queue_Move(queue, pos, src_pos); 
+	src_pos = queue->total_num;
+	if( Queue_Add(queue, data) ) {
+		return Queue_Move(queue, pos, src_pos); 
+	}
+	return -1;
 }
 
 /** 向队列中指定位置插入成员的指针 */
@@ -275,8 +278,11 @@ LCUI_API int Queue_InsertPointer(	LCUI_Queue *queue,
 					const void *data )
 {
 	int src_pos;
-	src_pos = Queue_AddPointer(queue, data);
-	return Queue_Move(queue, pos, src_pos); 
+	src_pos = queue->total_num;
+	if( Queue_AddPointer(queue, data) ) {
+		return Queue_Move(queue, pos, src_pos); 
+	}
+	return -1;
 }
 
 /** 将队列中指定位置的成员移动至目的位置 */
@@ -428,9 +434,9 @@ LCUI_API int Queue_ReplacePointer(	LCUI_Queue *queue,
  * 说明：是否为新成员重新分配内存空间，由参数flag的值决定
  * 返回值：正常则返回在队列中的位置，错误则返回非0值
  * */
-static int __Queue_Add(	LCUI_Queue *queue, 
-			const void *data,
-			LCUI_BOOL is_pointer )
+static void* __Queue_Add(	LCUI_Queue *queue, 
+				const void *data,
+				LCUI_BOOL is_pointer )
 {
 	int i, pos;
 	size_t size; 
@@ -459,7 +465,7 @@ static int __Queue_Add(	LCUI_Queue *queue,
 			} else {
 				memcpy( &p->data, &data, sizeof(void*) );
 			}
-			return pos;
+			return p->data;
 		}
 		p = queue->data_head_node.next; 
 		for(i=0; p->next && i<pos; ++i ) {
@@ -470,7 +476,7 @@ static int __Queue_Add(	LCUI_Queue *queue,
 		} else {
 			memcpy( &p->data, &data, sizeof(void*) );
 		}
-		return pos;
+		return p->data;
 	}
 	/* 如果当前成员使用量不大于最大成员数量，则说明有未使用的队列成员空间 */
 	if( queue->total_num <= queue->max_num ) {
@@ -486,7 +492,7 @@ static int __Queue_Add(	LCUI_Queue *queue,
 			/* 指针间的赋值 */
 			memcpy(&queue->data_array[pos], &data, sizeof(void*));
 		}
-		return pos;
+		return queue->data_array[pos];
 	}
 	
 	queue->max_num = queue->total_num;
@@ -507,7 +513,7 @@ static int __Queue_Add(	LCUI_Queue *queue,
 	} else {
 		memcpy(&queue->data_array[pos], &data, sizeof(void*));
 	}
-	return pos;
+	return queue->data_array[pos];
 }
 
 /** 打印队列信息，一般用于调试 */
@@ -525,7 +531,7 @@ LCUI_API void Queue_PrintInfo( LCUI_Queue *queue )
  * 功能：将新的成员添加至队列 
  * 说明：这个函数只是单纯的添加成员，如果想有更多的功能，需要自己实现
  * */
-LCUI_API int Queue_Add( LCUI_Queue *queue, const void *data )
+LCUI_API void* Queue_Add( LCUI_Queue *queue, const void *data )
 {
 	return __Queue_Add( queue, data, FALSE ); 
 }
@@ -536,7 +542,7 @@ LCUI_API int Queue_Add( LCUI_Queue *queue, const void *data )
  * 与部件队列的处理上，有的部件需要从一个队列转移到另一个队列上，不重新分配内存空间，
  * 直接使用原来的内存地址，这是为了避免部件转移所在队列后，部件指针无效的问题。
  * */
-LCUI_API int Queue_AddPointer( LCUI_Queue *queue, const void *data )
+LCUI_API void* Queue_AddPointer( LCUI_Queue *queue, const void *data )
 {
 	return __Queue_Add( queue, data, TRUE ); 
 }
