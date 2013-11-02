@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * event.h -- 事件处理模块
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -88,60 +88,52 @@ typedef union {
 } LCUI_Event;
 
 typedef struct {
-	int id;			/* 记录事件ID */
-	LCUI_Queue func_data;	/* 记录被关联的回调函数数据 */
+	int id;			/**< 事件ID */
+	LCUI_Queue func_data;	/**< 记录被关联的回调函数数据 */
 } LCUI_EventSlot;
 
-/* 初始化事件模块 */
-LCUI_API void LCUIModule_Event_Init( void );
-
-/* 停用事件模块 */
-LCUI_API void LCUIModule_Event_End( void );
-
-/* 从事件队列中获取事件 */
+/** 从事件队列中取出一个事件 */
 LCUI_API LCUI_BOOL LCUI_PollEvent( LCUI_Event *event );
 
-/* 添加事件至事件队列中 */
+/** 初始化事件模块 */
+LCUI_API void LCUIModule_Event_Init( void );
+
+/** 停用事件模块 */
+LCUI_API void LCUIModule_Event_End( void );
+
+/** 添加事件至事件队列中 */
 LCUI_API LCUI_BOOL LCUI_PushEvent( LCUI_Event *event );
 
-/* 初始化事件槽记录 */
+/** 初始化事件槽记录 */
 LCUI_API void EventSlots_Init( LCUI_Queue *slots );
 
-/* 将函数指针以及两个参数，转换成LCUI_Func类型，保存至p_buff指向的缓冲区中 */
-LCUI_API LCUI_BOOL
-Get_FuncData(	LCUI_Func *p_buff, 
-		void (*func) (void*,void*),
-		void *arg1, void *arg2 );
+/** 将函数指针以及两个参数，转换成LCUI_Func类型，保存至p_buff指向的缓冲区中 */
+LCUI_API LCUI_BOOL Get_FuncData(	LCUI_Func *p_buff,
+					void (*func) (void*,void*),
+					void *arg1, void *arg2 );
 
-/* 根据事件的ID，获取与该事件关联的事件槽 */
-LCUI_API LCUI_EventSlot*
-EventSlots_Find( LCUI_Queue *slots, int event_id );
+/** 根据事件的ID，获取与该事件关联的事件槽 */
+LCUI_API LCUI_EventSlot* EventSlots_Find( LCUI_Queue *slots, int event_id );
 
-/* 添加事件槽与事件的关联记录 */
-LCUI_API int
-EventSlots_Add( LCUI_Queue *slots, int event_id, LCUI_Func *func );
+/** 添加事件槽与事件的关联记录 */
+LCUI_API int EventSlots_Add( LCUI_Queue *slots, int event_id, LCUI_Func *func );
 
-/* 将回调函数与键盘按键事件进行连接 */
-LCUI_API int
-LCUI_KeyboardEvent_Connect( 
-		void (*func)(LCUI_KeyboardEvent*, void*), 
-		void *arg );
+/** 从事件槽中移除指定记录 */
+LCUI_API int EventSlots_Delete( LCUI_Queue *slots, int event_id, int func_id );
 
-/* 将回调函数与鼠标移动事件进行连接 */
-LCUI_API int
-LCUI_MouseMotionEvent_Connect( 
-		void (*func)(LCUI_MouseMotionEvent*, void*), 
-		void *arg );
+/** 与指定系统事件建立连接，以进行响应 */
+LCUI_API int LCUISysEvent_Connect(	int event_type,
+					void (*func)(LCUI_Event*,void*), 
+					void *arg );
 
-/* 将回调函数与鼠标按键事件进行连接 */
-LCUI_API int
-LCUI_MouseButtonEvent_Connect( 
-		void (*func)(LCUI_MouseButtonEvent*, void*), 
-		void *arg );
+/** 移除与系统事件的连接 */
+LCUI_API int LCUISysEvent_Disconnect( int event_type, int connect_id );
 
 /* 将回调函数与用户自定义的事件进行连接 */
-LCUI_API int
-LCUI_UserEvent_Connect( int event_id, void (*func)(void*, void*) );
+LCUI_API int LCUIUserEvent_Connect( int event_id, void (*func)(void*, void*) );
+
+/** 移除与用户事件的连接 */
+LCUI_API int LCUIUserEvent_Disconnect( int event_type, int connect_id );
 
 LCUI_END_HEADER
 
