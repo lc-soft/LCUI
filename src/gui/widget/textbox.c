@@ -526,14 +526,14 @@ static void TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget )
 #else
 		sprintf_s( size_str, sizeof(size_str)-1, "%dpx", tmp );
 #endif
+		/* 调整文本区域宽度 */
 		Widget_SetSize( label, size_str, NULL );
-		
 		/* 修改滚动条中记录的最大值和当前值，让滚动条在更新后有相应的长度 */
 		ScrollBar_SetMaxSize( scrollbar[0], layer_size.h );
 		ScrollBar_SetCurrentSize( scrollbar[0], area_size.h );
 		Widget_Show( scrollbar[0] );
 		/* 如果横向滚动条可见 */
-		if( scrollbar[1]->visible || !layer->auto_wrap ) {
+		if( scrollbar[1]->visible ) {
 			tmp = area_size.h - Widget_GetHeight( scrollbar[1] );
 #ifdef LCUI_BUILD_IN_LINUX
 			snprintf( size_str, sizeof(size_str)-1, "%dpx", tmp );
