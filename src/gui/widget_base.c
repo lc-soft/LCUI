@@ -1530,12 +1530,16 @@ LCUI_API void Widget_SetBackgroundImage(	LCUI_Widget *widget,
 	if(!widget) {
 		return;
 	}
-	Widget_Draw( widget );
 	if( !Graph_IsValid(img) ) {
-		Graph_Init( &widget->background.image );
-		return;
+		if( Graph_IsValid(&widget->background.image) ) {
+			Graph_Init( &widget->background.image );
+		} else {
+			return;
+		}
+	} else {
+		widget->background.image = *img;
 	}
-	widget->background.image = *img;
+	Widget_Draw( widget );
 }
 
 /** 设定背景图的布局 */
@@ -1775,16 +1779,31 @@ static void Widget_ExecSortChild( LCUI_Widget *widget )
 /* 将部件显示在同等z-index值的部件的前端 */
 LCUI_API int Widget_Front( LCUI_Widget *widget )
 {
-	int i, src_pos, des_pos, total;
+	int i, src_pos, des_pos, z_index, total;
 	LCUI_Widget *child;
 	LCUI_Queue *child_list;
 
-	if( widget == NULL || widget == &root_widget ) {
+	if( !widget || widget == &root_widget ) {
 		return -1;
 	}
 	child_list = Widget_GetChildList( widget->parent );
 	Queue_Lock( child_list );
 	total = Queue_GetTotal( child_list );
+	/* 如果是模态部件，则计算它的z-index值 */
+	if( widget->modal ) {
+		z_index = 10000;
+		for(i=0,src_pos=des_pos=-1; i<total; ++i) {
+			child = (LCUI_Widget*)Queue_Get( child_list, i );
+			if( !child || !child->visible || child == widget ) {
+				continue;
+			}
+			if( !child->modal ) {
+				break;
+			}
+			++z_index;
+		}
+		GraphLayer_SetZIndex( widget->glayer, z_index );
+	}
 	/* 先在队列中找到自己，以及z-index值小于或等于它的第一个部件 */
 	for(i=0,src_pos=des_pos=-1; i<total; ++i) {
 		child = (LCUI_Widget*)Queue_Get( child_list, i );
@@ -1796,9 +1815,16 @@ LCUI_API int Widget_Front( LCUI_Widget *widget )
 			continue;
 		}
 		if( des_pos == -1 ) {
+			/* 如果该位置的部件z-index值不大于自己 */
 			if( child->glayer->z_index
-			  <= widget->glayer->z_index ) {
-				des_pos = i;
+			 <= widget->glayer->z_index ) {
+				/* 如果未找到源位置 */
+				if( src_pos == -1 ) {
+					des_pos = i;
+					continue;
+				}
+				/* 否则，退出循环，因为已经在前排了 */
+				break;
 			}
 		} else {
 			if( src_pos != -1 ) {
@@ -1807,16 +1833,10 @@ LCUI_API int Widget_Front( LCUI_Widget *widget )
 		}
 	}
 	/* 没有找到就退出 */
-	if( des_pos == -1 || src_pos == -1 ) {
-		Queue_Unlock( child_list );
-		return -1;
+	if( des_pos != -1 && src_pos != -1 ) {
+		/* 找到的话就移动位置 */
+		Queue_Move( child_list, des_pos, src_pos );
 	}
-	if( src_pos+1 == des_pos ) {
-		Queue_Unlock( child_list );
-		return 1;
-	}
-	/* 找到的话就移动位置 */
-	Queue_Move( child_list, des_pos, src_pos );
 	Queue_Unlock( child_list );
 	return GraphLayer_Front( Widget_GetGraphLayer(widget) );
 }
