@@ -313,11 +313,11 @@ LCUI_API LCUI_BOOL Widget_IsAllowResponseEvent( LCUI_Widget *widget )
 			if( !child || !child->visible ) {
 				continue;
 			}
-			if( !widget->modal && child->modal ) {
-				return FALSE;
-			}
 			if( child == widget ) {
 				break;
+			}
+			if( child->modal ) {
+				return FALSE;
 			}
 		}
 		/* 记录这一级部件 */
