@@ -636,10 +636,11 @@ LCUI_API int GraphLayer_Front( LCUI_GraphLayer *glayer )
 	int i, total, src_pos = -1, des_pos = -1;
 	LCUI_GraphLayer *tmp_child;
 	LCUI_Queue *child_list;
-	
+
 	if( !glayer || !glayer->parent ) {
 		return -1;
 	}
+
 	child_list = &glayer->parent->child;
 	total = Queue_GetTotal( child_list );
 	/* 先在队列中找到自己，以及z-index值小于或等于它的第一个图层 */
@@ -653,9 +654,15 @@ LCUI_API int GraphLayer_Front( LCUI_GraphLayer *glayer )
 			continue;
 		}
 		if( des_pos == -1 ) {
-			if( tmp_child->z_index
-			  <= glayer->z_index ) {
-				des_pos = i;
+			/* 如果该位置的图层的z-index值不大于自己 */
+			if( tmp_child->z_index <= glayer->z_index ) {
+				/* 如果未找到自己的源位置 */
+				if( src_pos == -1 ) {
+					des_pos = i;
+					continue;
+				}
+				/* 否则，退出循环，因为已经在前排了 */
+				break;
 			}
 		} else {
 			if( src_pos != -1 ) {
@@ -666,9 +673,6 @@ LCUI_API int GraphLayer_Front( LCUI_GraphLayer *glayer )
 	/* 没有找到就退出 */
 	if( des_pos == -1 || src_pos == -1 ) {
 		return -2;
-	}
-	if( src_pos+1 == des_pos ) {
-		return 1;
 	}
 	/* 找到的话就移动位置 */
 	Queue_Move( child_list, des_pos, src_pos );
