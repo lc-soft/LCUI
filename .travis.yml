@@ -4,4 +4,6 @@ compiler:
   - clang
   - gcc
 
-script: ./configure && make
+script: ./configure
+
+after_success: make
