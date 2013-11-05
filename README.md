@@ -112,11 +112,21 @@ You can use `-i` with `rebase` for an “interactive” rebase. This allows
 
 	git rebase -i upstream/master
 
+## Current Build Status
+
+LCUI is built under Travis CI service. Every commit pushed to this repository 
+will queue a build into the continuous integration service and will run sime 
+tests to ensure that everything is going well and the project is stable. 
+
+The current build status is:
+
+[![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
+
 ## Legal
 
-The LCUI Project is released under the GNU General Public License as 
-published by the Free Software Foundation, either version 2 of the 
-License, or (at your option) any later version.
+The LCUI Project is released under the GNU General Public License as published
+ by the Free Software Foundation, either version 2 of the License, or (at your 
+option) any later version.
 
 ## Thanks to 
   Liu Chao <lc-soft@live.cn>
