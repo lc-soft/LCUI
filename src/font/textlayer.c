@@ -459,7 +459,7 @@ LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
 	LCUI_Rect area;
 	LCUI_Pos pos, mix_pos;
 	LCUI_BOOL draw_all = FALSE, redraw_row;
-	int i, j, n, rows, size;
+	int i, j, n, rows;
 	LCUI_RGB color;
 	LCUI_Graph slot;
 	LCUI_CharData *p_data;
@@ -523,12 +523,7 @@ LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
 				pos.x += p_data->bitmap->advance.x;
 				continue;
 			}
-			/* 获取该字体位图的大致尺寸以及颜色 */
-			if( p_data->data && p_data->data->_pixel_size ) {
-				size = p_data->data->pixel_size + 2;
-			} else {
-				size = layer->default_data.pixel_size + 2; 
-			}
+			/* 获取该字体位图的颜色 */
 			if( p_data->data && p_data->data->_fore_color ) {
 				color = p_data->data->fore_color;
 			} else {
@@ -1076,7 +1071,7 @@ TextLayer_PrintInfo( LCUI_TextLayer *layer )
 		printf( "row[%d/%d], len: %d\n", j, rows, len );
 		for(i=0; i<len; ++i) {
 			char_ptr = Queue_Get( &row_ptr->string, i );
-			printf( "char code: %d, display: %d\n", 
+			printf( "char code: %lu, display: %d\n", 
 			char_ptr->char_code, char_ptr->display );
 			FontBMP_PrintInfo( char_ptr->bitmap );
 		}

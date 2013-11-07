@@ -221,7 +221,7 @@ static void Label_ExecSetAutoWrap( LCUI_Widget *widget, void *arg )
 	LCUI_BOOL flag;
 	LCUI_Label *label;
 
-	flag = (LCUI_BOOL)arg;
+	flag = arg?TRUE:FALSE;
 	label = (LCUI_Label*)Widget_GetPrivData( widget );
 	if( !label ) {
 		return;
@@ -350,7 +350,7 @@ LCUI_API void Label_TextA( LCUI_Widget *widget, const char *ascii_text )
 /** 设置Label部件显示的文本是否自动换行 */
 LCUI_API void Label_SetAutoWrap( LCUI_Widget *widget, LCUI_BOOL flag )
 {
-	WidgetMsg_Post( widget, LABEL_AUTO_WRAP, (void*)flag, TRUE, FALSE );
+	WidgetMsg_Post( widget, LABEL_AUTO_WRAP, flag?((void*)(1)):NULL, TRUE, FALSE );
 }
 
 /** 为Label部件内显示的文本设定文本样式 */

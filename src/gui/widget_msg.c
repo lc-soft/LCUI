@@ -101,7 +101,7 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 				LCUI_BOOL only_one,
 				LCUI_BOOL need_free )
 {
-	int i, total, n_found, ret = 0;
+	int i, total, n_found;
 	WidgetMsgData tmp_msg, *tmp_msg_ptr;
 	LCUI_Queue *des_queue;
 

@@ -108,7 +108,7 @@ Window_GetCloseButton( LCUI_Widget *window )
 
 static void Window_ExecShow( LCUI_Widget *widget )
 {
-	Set_Focus( widget );
+	Widget_SetFocus( widget );
 }
 
 /* 处理鼠标移动事件 */
@@ -312,7 +312,7 @@ Window_Init( LCUI_Widget *win_p )
 	client_area = Widget_New(NULL); 
 	btn_close = Widget_New("button"); 
 	titlebar->focus = FALSE;
-	Set_Focus( client_area );
+	Widget_SetFocus( client_area );
 
 	Graph_Init( &btn_bg );
 	/* 载入按钮背景 */

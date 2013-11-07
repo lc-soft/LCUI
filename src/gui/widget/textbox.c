@@ -293,7 +293,7 @@ TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 			}
 		}
 	}
-	_DEBUG_MSG("add text: --%s--\n",event->input.text);
+	DEBUG_MSG("add text: --%S--\n",event->input.text);
 	TextBox_Text_AddW( widget, event->input.text );
 }
 
