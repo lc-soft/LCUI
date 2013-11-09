@@ -53,6 +53,8 @@
 #include LC_ERROR_H 
 
 #define WIDGET_MSG_UPDATE_FONTBMP	(WIDGET_USER+1)
+#define WIDGET_MSG_HIDE_PLACEHOLDER	(WIDGET_USER+2)
+#define WIDGET_MSG_SHOW_PLACEHOLDER	(WIDGET_USER+3)
 
 #define TEXTBOX_DEFAULT_TEXT_BLOCK_SIZE	512
 
@@ -181,9 +183,8 @@ static void TextBox_OnClicked( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	TextBox_Cursor_Move( widget, pos );
 }
 
-/* 处理按键事件 */
-static void
-TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
+/** 处理按键事件 */
+static void TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
 	static int cols, rows;
 	static LCUI_Pos cur_pos;
@@ -259,9 +260,8 @@ mv_cur_pos:;
 	}
 }
 
-/* 处理输入法对文本框输入的内容 */
-static void
-TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
+/** 处理输入法对文本框输入的内容 */
+static void TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
 	unsigned int i;
 	wchar_t *ptr, *tmp_ptr, *ptr_last;
@@ -297,9 +297,8 @@ TextBox_Input( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	TextBox_Text_AddW( widget, event->input.text );
 }
 
-static void 
-TextBox_HoriScroll_TextLayer( ScrollBar_Data data, void *arg )
-/* 水平滚动文本框内的文本图层 */
+/** 水平滚动文本框内的文本图层 */
+static void TextBox_HoriScroll_TextLayer( ScrollBar_Data data, void *arg )
 {
 	LCUI_Pos pos;
 	LCUI_Widget *widget;
@@ -315,9 +314,8 @@ TextBox_HoriScroll_TextLayer( ScrollBar_Data data, void *arg )
 	TextBox_TextLayer_SetOffset( widget, pos );
 }
 
-static void 
-TextBox_TextLayer_VertScroll( ScrollBar_Data data, void *arg )
-/* 垂直滚动文本框内的文本图层 */
+/** 垂直滚动文本框内的文本图层 */
+static void TextBox_TextLayer_VertScroll( ScrollBar_Data data, void *arg )
 {
 	LCUI_Pos pos;
 	LCUI_Widget *widget;
@@ -332,15 +330,14 @@ TextBox_TextLayer_VertScroll( ScrollBar_Data data, void *arg )
 	TextBox_TextLayer_SetOffset( widget, pos );
 }
 
-static void
-destroy_textblock( void *arg )
+static void destroy_textblock( void *arg )
 {
 	LCUI_TextBlock *ptr;
 	ptr = (LCUI_TextBlock *)arg;
 	free( ptr->text );
 }
 
-/* 在文本末尾追加文本 */
+/** 在文本末尾追加文本 */
 static void __TextBox_Text_AppendW( LCUI_Widget *widget, wchar_t *new_text )
 {
 	LCUI_TextLayer *layer;
@@ -348,14 +345,15 @@ static void __TextBox_Text_AppendW( LCUI_Widget *widget, wchar_t *new_text )
 	TextLayer_Text_AppendW( layer, new_text );
 }
 
-/* 在光标处添加文本 */
+/** 在光标处添加文本 */
 static void __TextBox_Text_Add( LCUI_Widget *widget, wchar_t *new_text )
 {
 	LCUI_Pos cur_pos;
 	LCUI_TextLayer *layer;
-	
+	DEBUG_MSG("add text: %S\n", new_text);
 	layer = TextBox_GetTextLayer( widget );
 	TextLayer_Text_AddW( layer, new_text );
+	DEBUG_MSG("new len: %d\n", TextLayer_Text_GetTotalLength(layer));
 	cur_pos = TextLayer_Cursor_GetPos( layer );
 	TextBox_Cursor_Move( widget, cur_pos );
 }
@@ -403,8 +401,51 @@ static void TextBox_UpdateFontBitmap( LCUI_Widget *widget, void *arg )
 	Widget_Unlock( widget );
 }
 
+/** 隐藏文本框内显示的占位符 */
+static void TextBox_HidePlaceHolder(LCUI_Widget *widget, void *arg )
+{
+	LCUI_TextBox *textbox;
+	LCUI_TextLayer *layer;
+	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	if( !textbox->show_placeholder ) {
+		return;
+	}
+	layer = TextBox_GetTextLayer( widget );
+	TextLayer_Text_Clear( layer );
+	TextLayer_Text_SetPasswordChar( layer, textbox->password_char_bak );
+	TextLayer_Text_SetDefaultStyle( layer, textbox->textstyle_bak );
+	textbox->show_placeholder = FALSE;
+	Widget_Update( widget );
+}
+
+/** 在文本框内显示占位符 */
+static void TextBox_ShowPlaceHolder(LCUI_Widget *widget, void *arg )
+{
+	LCUI_TextBox *textbox;
+	LCUI_TextLayer *layer;
+
+	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	if( textbox->show_placeholder ) {
+		return;
+	}
+	layer = TextBox_GetTextLayer(widget);
+	/* 备份文本框内的文本样式以及屏蔽符 */
+	textbox->textstyle_bak = layer->default_data;
+	textbox->password_char_bak = layer->password_char.char_code;
+	/* 占位符不能被屏蔽，所以设置屏蔽符为0 */
+	TextLayer_Text_SetPasswordChar( layer, 0 );
+	/* 文本框内显示占位符 */
+	TextLayer_TextW( layer, textbox->placeholder.string );
+	/* 占位符的字体大小取缺省大小 */
+	textbox->placeholder_style.pixel_size = layer->default_data.pixel_size;
+	/* 设置占位符的样式 */
+	TextLayer_Text_SetDefaultStyle( layer, textbox->placeholder_style );
+	textbox->show_placeholder = TRUE;
+	Widget_Update( widget );
+}
+
 /** 初始化文本框相关数据 */
-static void TextBox_Init( LCUI_Widget *widget )
+static void TextBox_ExecInit( LCUI_Widget *widget )
 {
 	LCUI_TextBox *textbox;
 	
@@ -467,6 +508,8 @@ static void TextBox_Init( LCUI_Widget *widget )
 	}
 	/* 连接自定义消息 */
 	WidgetMsg_Connect( widget, WIDGET_MSG_UPDATE_FONTBMP, TextBox_UpdateFontBitmap );
+	WidgetMsg_Connect( widget, WIDGET_MSG_HIDE_PLACEHOLDER, TextBox_HidePlaceHolder );
+	WidgetMsg_Connect( widget, WIDGET_MSG_SHOW_PLACEHOLDER, TextBox_ShowPlaceHolder );
 
 	Widget_Event_Connect( widget, EVENT_DRAG, TextBox_OnClicked );
 	/* 关联 FOCUS_OUT 和 FOCUS_IN 事件 */
@@ -698,27 +741,15 @@ static void TextBox_ExecUpdateStyle( LCUI_Widget *widget )
 /** 更新文本框的样式以及文本图层相关的数据 */
 static void TextBox_ExecUpdate( LCUI_Widget *widget )
 {
-	LCUI_TextLayer *layer;
 	LCUI_TextBox *textbox;
 	
 	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
-	/* 如果文本框内没有文本，且还未显示占位符，则设置占位符并显示 */
-	if( Queue_GetTotal( &textbox->text_block_buff ) <= 0
+	if( Queue_GetTotal( &textbox->text_block_buff ) == 0
 	 && TextBox_Text_GetTotalLength( widget ) == 0
 	 && !textbox->show_placeholder ) {
-		layer = TextBox_GetTextLayer(widget);
-		/* 备份文本框内的文本样式以及屏蔽符 */
-		textbox->textstyle_bak = layer->default_data;
-		textbox->password_char_bak = layer->password_char.char_code;
-		/* 占位符不能被屏蔽，所以设置屏蔽符为0 */
-		TextLayer_Text_SetPasswordChar( layer, 0 );
-		/* 文本框内显示占位符 */
-		TextLayer_TextW( layer, textbox->placeholder.string );
-		/* 占位符的字体大小取缺省大小 */
-		textbox->placeholder_style.pixel_size = layer->default_data.pixel_size;
-		/* 设置占位符的样式 */
-		TextLayer_Text_SetDefaultStyle( layer, textbox->placeholder_style );
-		textbox->show_placeholder = TRUE;
+		/* 投递消息，以在条件满足时显示占位符 */
+		WidgetMsg_Post( widget, WIDGET_MSG_SHOW_PLACEHOLDER, NULL, FALSE, FALSE );
+		return;
 	}
 	Widget_Update( TextBox_GetLabel(widget) );
 	Widget_Draw( TextBox_GetLabel(widget) );
@@ -731,14 +762,13 @@ static void TextBox_ExecUpdate( LCUI_Widget *widget )
 
 /*--------------------------- End Private ----------------------------*/
 
-
 /*----------------------------- Public -------------------------------*/
 
 /** 注册文本框部件 */
 LCUI_API void Register_TextBox(void)
 {
 	WidgetType_Add( "text_box" );
-	WidgetFunc_Add( "text_box", TextBox_Init, FUNC_TYPE_INIT );
+	WidgetFunc_Add( "text_box", TextBox_ExecInit, FUNC_TYPE_INIT );
 	WidgetFunc_Add( "text_box", TextBox_ExecUpdate, FUNC_TYPE_UPDATE );
 	WidgetFunc_Add( "text_box", Destroy_TextBox, FUNC_TYPE_DESTROY );
 }
@@ -1004,28 +1034,21 @@ TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos )
 	TextBox_Cursor_Update( widget );
 }
 
-/* 在光标处添加文本 */
-LCUI_API void
-TextBox_Text_AddW( LCUI_Widget *widget, wchar_t *unicode_text )
+/** 在光标处添加文本 */
+LCUI_API void TextBox_Text_AddW( LCUI_Widget *widget, wchar_t *unicode_text )
 {
 	LCUI_TextBox *tb;
-	LCUI_TextLayer *layer;
-	
-	tb = Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	/* 如果已经显示了占位符，则先隐藏占位符 */
+	if( tb->show_placeholder ) {
+		WidgetMsg_Post( widget, WIDGET_MSG_HIDE_PLACEHOLDER, NULL, FALSE, FALSE );
+	}
 	/* 把文本分割成若干块，加入至缓冲队列，让文本框分段处理显示 */ 
 	TextBox_TextBuff_Add( widget, unicode_text, AT_CURSOR_POS );
-	if( tb->show_placeholder ) {
-		layer = TextBox_GetTextLayer( widget );
-		TextLayer_Text_Clear( layer );
-		TextLayer_Text_SetPasswordChar( layer, tb->password_char_bak );
-		TextLayer_Text_SetDefaultStyle( layer, tb->textstyle_bak );
-		tb->show_placeholder = FALSE;
-	}
 	Widget_Update( widget );
 }
 
-LCUI_API void
-TextBox_Text_AddA( LCUI_Widget *widget, char *ascii_text )
+LCUI_API void TextBox_Text_AddA( LCUI_Widget *widget, char *ascii_text )
 {
 	wchar_t *unicode_text;
 	LCUICharset_GB2312ToUnicode( ascii_text, &unicode_text );
@@ -1033,8 +1056,7 @@ TextBox_Text_AddA( LCUI_Widget *widget, char *ascii_text )
 	free( unicode_text );
 }
 
-LCUI_API void
-TextBox_Text_Add( LCUI_Widget *widget, char *utf8_text )
+LCUI_API void TextBox_Text_Add( LCUI_Widget *widget, char *utf8_text )
 {
 	wchar_t *unicode_text;
 	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
@@ -1042,29 +1064,20 @@ TextBox_Text_Add( LCUI_Widget *widget, char *utf8_text )
 	free( unicode_text );
 }
 
-
-/* 在文本末尾追加文本 */
-LCUI_API void
-TextBox_Text_AppendW( LCUI_Widget *widget, wchar_t *unicode_text )
+/** 在文本末尾追加文本 */
+LCUI_API void TextBox_Text_AppendW( LCUI_Widget *widget, wchar_t *unicode_text )
 {
 	LCUI_TextBox *tb;
-	LCUI_TextLayer *layer;
-	
-	tb = Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
 	TextBox_TextBuff_Add( widget, unicode_text, AT_TEXT_LAST );
 	if( tb->show_placeholder ) {
-		layer = TextBox_GetTextLayer( widget );
-		TextLayer_Text_Clear( layer );
-		TextLayer_Text_SetPasswordChar( layer, tb->password_char_bak );
-		TextLayer_Text_SetDefaultStyle( layer, tb->textstyle_bak );
-		tb->show_placeholder = FALSE;
+		WidgetMsg_Post( widget, WIDGET_MSG_HIDE_PLACEHOLDER, NULL, FALSE, FALSE );
 	}
 	Widget_Update( widget );
 }
 
-/* 在文本末尾追加文本 */
-LCUI_API void
-TextBox_Text_Append( LCUI_Widget *widget, char *utf8_text )
+/** 在文本末尾追加文本 */
+LCUI_API void TextBox_Text_Append( LCUI_Widget *widget, char *utf8_text )
 {
 	wchar_t *unicode_text;
 	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
@@ -1101,9 +1114,8 @@ TextBox_Text_Delete(LCUI_Widget *widget, int n)
 	return 0;
 }
 
-LCUI_API LCUI_Pos
-TextBox_Cursor_Update( LCUI_Widget *widget )
-/* 更新文本框的光标，返回该光标的像素坐标 */
+/** 更新文本框的光标，返回该光标的像素坐标 */
+LCUI_API LCUI_Pos TextBox_Cursor_Update( LCUI_Widget *widget )
 {
 	LCUI_Pos pixel_pos;
 	LCUI_Widget *cursor;
@@ -1111,7 +1123,7 @@ TextBox_Cursor_Update( LCUI_Widget *widget )
 	LCUI_TextBox *textbox;
 	LCUI_Size size;
 	
-	textbox = Widget_GetPrivData( widget );
+	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
 	layer = TextBox_GetTextLayer( widget );
 	/* 如果显示了占位符，那么就复位光标的位置 */
 	if( textbox->show_placeholder ) {
@@ -1130,9 +1142,8 @@ TextBox_Cursor_Update( LCUI_Widget *widget )
 	return pixel_pos;
 }
 
-LCUI_API LCUI_Pos
-TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
-/* 移动文本框内的光标 */
+/** 移动文本框内的光标 */
+LCUI_API LCUI_Pos TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
 {
 	LCUI_Pos pixel_pos;
 	LCUI_Widget *cursor;
@@ -1156,27 +1167,24 @@ TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
 	return pixel_pos;
 }
 
-LCUI_API int
-TextBox_GetSelectedText( LCUI_Widget *widget, char *out_text )
-/* 获取文本框内被选中的文本 */
+/** 获取文本框内被选中的文本 */
+LCUI_API int TextBox_GetSelectedText( LCUI_Widget *widget, char *out_text )
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
 	return TextLayer_GetSelectedText( layer, out_text );
 }
 
-LCUI_API int
-TextBox_CopySelectedText(LCUI_Widget *widget)
-/* 复制文本框内被选中的文本 */
+/** 复制文本框内被选中的文本 */
+LCUI_API int TextBox_CopySelectedText(LCUI_Widget *widget)
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
 	return TextLayer_CopySelectedText( layer );
 }
 
-LCUI_API int
-TextBox_CutSelectedText(LCUI_Widget *widget)
-/* 剪切文本框内被选中的文本 */
+/** 剪切文本框内被选中的文本 */
+LCUI_API int TextBox_CutSelectedText(LCUI_Widget *widget)
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
