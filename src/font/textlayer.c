@@ -496,18 +496,22 @@ LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
 	}
 	/* 开始绘制文本位图至目标图层上 */
 	rows = Queue_GetTotal( &layer->rows_data );
+	DEBUG_MSG("tip1, rows: %d\n", rows);
 	for(pos.y=layer->offset_pos.y,i=0; i<rows; ++i) {
 		redraw_row = FALSE;
 		p_row = (Text_RowData*)Queue_Get( &layer->rows_data, i );
 		if( !p_row ) {
+			DEBUG_MSG("tip1.1\n");
 			continue;
 		}
 		/* 如果当前字的位图的Y轴跨距不在有效绘制区域内 */
 		if( pos.y + p_row->max_size.h <= 0 ) {
 			pos.y += p_row->max_size.h;
+			DEBUG_MSG("tip1.2, pos.y: %d, p_row->max_size.h: %d\n", pos.y, p_row->max_size.h);
 			continue;
 		}
 		n = Queue_GetTotal( &p_row->string );
+		DEBUG_MSG("tip2, row %d, len: %d\n", i, n);
 		for(pos.x=layer->offset_pos.x,j=0; j<n; ++j) {
 			p_data = (LCUI_CharData*)Queue_Get( &p_row->string, j ); 
 			if( !p_data || !p_data->bitmap ) {
@@ -529,6 +533,8 @@ LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
 			} else {
 				color = layer->default_data.fore_color;
 			}
+			DEBUG_MSG("char: %d, pos: %d,%d, redraw: %d\n", 
+				j, pos.x, pos.y, p_data->need_update || draw_all);
 			/* 如果字体位图已标记更新，则绘制它 */
 			if( p_data->need_update || draw_all ) {
 				p_data->need_update = FALSE;
@@ -564,6 +570,7 @@ LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
 			break;
 		}
 	}
+	DEBUG_MSG("tip3\n");
 }
 
 /* 标记需要重绘整个文本图层 */
@@ -730,38 +737,52 @@ TextLayer_GetText( LCUI_TextLayer *layer, wchar_t *buff, size_t max_len )
 	return i;
 }
 
-LCUI_API void
-TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
-/* 刷新指定行中指定字以及后面的字的区域 */
+/** 刷新指定行中指定字以及后面的字的区域 */
+LCUI_API void TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 {
 	int i, len;
 	LCUI_Rect area;
 	Text_RowData *row_ptr;
 	LCUI_CharData *char_ptr;
-	
-	/* 获取该行文字的起点Y轴坐标 */
-	for( area.y=0,i=0; i<char_pos.y; ++i ) {
-		row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, i );
-		if( !row_ptr ) {
-			continue;
-		}
-		area.y += row_ptr->max_size.h;
-	}
+
 	row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, char_pos.y );
 	len = Queue_GetTotal( &row_ptr->string );
-	/* 获取该字的起点X轴坐标 */
-	for( area.x=0,i=0; i<char_pos.x; ++i ) {
-		char_ptr = (LCUI_CharData*)Queue_Get( &row_ptr->string, i ); 
-		if( !char_ptr ) {
-			continue;
+	/* 如果设置了屏蔽符，则直接计算出坐标 */
+	if( layer->password_char.char_code > 0
+	 && layer->password_char.bitmap ) {
+		area.y = layer->password_char.bitmap->advance.y + 2;
+		area.y *= char_pos.y;
+		area.x = layer->password_char.bitmap->advance.x;
+		area.x *= char_pos.x;
+		area.width = layer->password_char.bitmap->advance.x;
+		area.width *= len;
+		area.width -= area.x;
+		area.height = layer->password_char.bitmap->advance.y;
+	} else {
+		/* 获取该行文字的起点Y轴坐标 */
+		for( area.y=0,i=0; i<char_pos.y; ++i ) {
+			row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, i );
+			if( !row_ptr ) {
+				continue;
+			}
+			area.y += row_ptr->max_size.h;
 		}
-		area.x += char_ptr->bitmap->advance.x;
+		/* 遍历各个文字，累计该字的X轴坐标 */
+		for( area.x=0,i=0; i<char_pos.x; ++i ) {
+			char_ptr = (LCUI_CharData*)
+			Queue_Get( &row_ptr->string, i ); 
+			if( !char_ptr || !char_ptr->bitmap ) {
+				continue;
+			}
+			area.x += char_ptr->bitmap->advance.x;
+		}
+		area.width = row_ptr->max_size.w - area.x;
+		area.height = row_ptr->max_size.h;
 	}
-
-	area.width = row_ptr->max_size.w - area.x;
-	area.height = row_ptr->max_size.h;
+	/* 该字后面的字都需要重绘 */
 	for( i=char_pos.x; i<len; ++i ) {
-		char_ptr = (LCUI_CharData*)Queue_Get( &row_ptr->string, i );
+		char_ptr = (LCUI_CharData*)
+		Queue_Get( &row_ptr->string, i );
 		if( !char_ptr ) {
 			continue;
 		}
@@ -770,7 +791,7 @@ TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 	}
 	/* 记录需刷新的区域 */
 	RectQueue_AddToValid( &layer->clear_area, area );
-	//printf("record area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
+	DEBUG_MSG("record area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
 }
 
 LCUI_API void
@@ -1043,7 +1064,26 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 		++src_pos; 
 		++des_pos.x;
 	}
-	
+	/** 如果还在同一行内 */
+	if( des_pos.y == cur_pos.y ) {
+		total = Queue_GetTotal( &cur_row_ptr->string );
+		/* 继续累计当前行剩余字符的尺寸 */
+		for(i=des_pos.x; i<total; ++i) {
+			char_ptr = (LCUI_CharData*)
+			Queue_Get( &cur_row_ptr->string, i );
+			row_size.w += char_ptr->bitmap->advance.x;
+			if( char_ptr->data && char_ptr->data->_pixel_size ) {
+				char_h = char_ptr->data->pixel_size+2;
+			} else {
+				char_h = layer->default_data.pixel_size+2;
+			}
+			if( row_size.h < char_h ) {
+				row_size.h = char_h;
+			}
+		}
+		/* 更新该行的尺寸 */
+		cur_row_ptr->max_size = row_size;
+	}
 	if( pos_type == AT_CURSOR_POS ) {
 		layer->current_des_pos = des_pos;
 		layer->current_src_pos = src_pos;
