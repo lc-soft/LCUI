@@ -92,13 +92,6 @@ typedef struct	LCUI_Widget_	LCUI_Widget;
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
 
-#ifdef LCUI_BUILD_IN_WIN32
-typedef __int64 int64_t;
-#else
-typedef long long int64_t;
-#endif
-
-
 /********** 按键信息 ************/
 typedef struct LCUI_Key_ {
 	int code;
