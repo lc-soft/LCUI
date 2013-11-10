@@ -4,11 +4,10 @@
 
 ## 说明
 
-LCUI 是 GNU/Linux 平台上的一款自由软件，主要面向嵌入式，注重易用性和性能。
+LCUI 是一个 GUI 函数库，用于创建图形用户界面，其诞生目的主要是为作者开发的程序提
+供一个良好的GUI解决方案。
 
-源代码基于 GNU通用公共许可协议 发布，任何人都有运行、研究、复制、发布、修改和改进LCUI的自由。
-
-我们正努力使它成为一款成熟、稳定、高效的GUI开发工具。
+LCUI 是一个自由软件项目，基于 GNU通用公共许可协议 发布，该许可协议要求 LCUI 及 LCUI 衍生软件无论以何种形式发布，都必须确保收受者能收到或得到源码。
 
 请阅读 `docs/CHANGES.zh-cn` 文件了解新版本的更新内容。
 
@@ -62,6 +61,10 @@ windows系统上构建本项目方法，有两种：
 目录下的LCUI_Config.h文件，定义LCUI_BUILD_IN_WIN32宏，若有LCUI_BUILD_IN_LINUX宏，
 请删除它。
 
+###当前的构建状态
+LCUI基于 Travis CI 服务进行构建，每向该代码库推送一次代码提交，会将构建任务添加
+至持续集成服务的队列中，并且会运行一些测试以确保该项目的稳定。当前的构建状态是：
+[![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
 
 ### 系统需求
 
