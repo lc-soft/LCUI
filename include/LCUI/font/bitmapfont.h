@@ -73,19 +73,7 @@ typedef struct LCUI_WChar_ {
 /*-----------------------------END ----------------------------------*/
 
 
-LCUI_API uchar_t const * in_core_font_8x8( void );
-
-/**
- * 检测位图数据是否有效
- * @return 有效返回真，无效返回假
- */
-extern inline LCUI_BOOL FontBMP_Valid( LCUI_FontBMP *bitmap )
-{
-	if( bitmap && bitmap->width > 0 && bitmap->rows > 0) {
-		return TRUE;
-	}
-	return FALSE;
-}
+LCUI_API uchar_t const* in_core_font_8x8( void );
 
 /** 打印字体位图的信息 */
 LCUI_API void FontBMP_PrintInfo( LCUI_FontBMP *bitmap );
