@@ -683,7 +683,7 @@ LCUI_API int TextLayer_SetGraphSize(	LCUI_TextLayer *layer,
 /** 计算文本图层的尺寸 */
 LCUI_API int TextLayer_GetSize( LCUI_TextLayer *layer, LCUI_Size *layer_size )
 {
-	int i, rows;
+	int i, cols, max_cols, rows;
 	LCUI_Size size={0,0};
 	Text_RowData *p_row; 
 	
@@ -691,15 +691,32 @@ LCUI_API int TextLayer_GetSize( LCUI_TextLayer *layer, LCUI_Size *layer_size )
 		return -1;
 	}
 	rows = Queue_GetTotal( &layer->rows_data );
-	for(size.w=0,size.h=0,i=0; i<rows; ++i) {
-		p_row = (Text_RowData*)Queue_Get( &layer->rows_data, i );
-		if( !p_row ) {
-			continue;
+	if( layer->password_char.char_code > 0 ) {
+		max_cols = 0;
+		for(i=0; i<rows; ++i) {
+			p_row = (Text_RowData*)
+			Queue_Get( &layer->rows_data, i );
+			cols = Queue_GetTotal( &p_row->string );
+			if( max_cols < cols ) {
+				max_cols = cols;
+			}
 		}
-		if( size.w < p_row->max_size.w ) {
-			size.w = p_row->max_size.w;
+		size.w = layer->password_char.bitmap->advance.x;
+		size.w *= max_cols;
+		size.h = layer->default_data.pixel_size + 4;
+		size.h *= rows;
+	} else {
+		for(size.w=0,size.h=0,i=0; i<rows; ++i) {
+			p_row = (Text_RowData*)
+			Queue_Get( &layer->rows_data, i );
+			if( !p_row ) {
+				continue;
+			}
+			if( size.w < p_row->max_size.w ) {
+				size.w = p_row->max_size.w;
+			}
+			size.h += p_row->max_size.h;
 		}
-		size.h += p_row->max_size.h;
 	}
 	/* 尺寸稍微搞大一点，因为显示文本光标需要一定空间 */
 	size.w += 2;
@@ -1371,7 +1388,7 @@ LCUI_API LCUI_Pos TextLayer_Cursor_SetPixelPos(	LCUI_TextLayer *layer,
 	LCUI_Pos new_pos, pos;
 	Text_RowData *row_ptr;
 	LCUI_CharData *char_ptr;
-	int i, n, rows, cols, tmp;
+	int i, n, rows, cols, adv_x;
 	
 	pos.x = pos.y = 0;
 	rows = Queue_GetTotal( &layer->rows_data );
@@ -1388,21 +1405,28 @@ LCUI_API LCUI_Pos TextLayer_Cursor_SetPixelPos(	LCUI_TextLayer *layer,
 		}
 	}
 	pos.y = i;
-	row_ptr = Queue_Get( &layer->rows_data, i );
+	row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, i );
 	if( !row_ptr ) {
 		cols = 0;
 	} else {
 		cols = Queue_GetTotal( &row_ptr->string );
 	}
 	for( new_pos.x=0,n=0; n<cols; ++n ) {
-		char_ptr = Queue_Get( &row_ptr->string, n );
+		char_ptr = (LCUI_CharData*)Queue_Get( &row_ptr->string, n );
 		if( !char_ptr || !char_ptr->bitmap || !char_ptr->display ) {
 			continue;
 		}
-		tmp = char_ptr->bitmap->advance.x;
-		if( pixel_pos.x >= tmp/2 ) {
-			pixel_pos.x -= tmp;
-			new_pos.x += tmp;
+		/* 若启用了屏蔽符 */
+		if( layer->password_char.char_code > 0 
+		 && layer->password_char.bitmap ) {
+			adv_x = layer->password_char.bitmap->advance.x;
+		} else {
+			adv_x = char_ptr->bitmap->advance.x;
+		}
+		/* 若坐标在当前字符的右边 */
+		if( pixel_pos.x >= adv_x/2 ) {
+			pixel_pos.x -= adv_x;
+			new_pos.x += adv_x;
 			if(n < cols-1 || (n == cols-1 && pixel_pos.x >= 0)) {
 				continue;
 			}
@@ -1675,10 +1699,9 @@ TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
 	return 0;
 }
 
-
-LCUI_API LCUI_Pos
-TextLayer_Char_GetPixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos )
-/* 获取显示出来的文字相对于文本图层的坐标，单位为像素 */
+/** 获取显示出来的文字相对于文本图层的坐标，单位为像素 */
+LCUI_API LCUI_Pos TextLayer_Char_GetPixelPos(	LCUI_TextLayer *layer,
+						LCUI_Pos char_pos )
 {
 	LCUI_Pos pixel_pos;
 	Text_RowData *row_ptr;
