@@ -4,8 +4,7 @@ compiler:
   - clang
   - gcc
 
- before_script:
-  - aclocal
+before_script: aclocal
 
 script:
   - ./configure
