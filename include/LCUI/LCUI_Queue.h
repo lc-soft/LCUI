@@ -134,13 +134,15 @@ Queue_Destroy( LCUI_Queue * queue );
 LCUI_API void*
 Queue_Get( LCUI_Queue * queue, int pos );
 
-/* 向队列中指定位置插入成员 */
-LCUI_API int
-Queue_Insert( LCUI_Queue * queue, int pos, const void *data );
+/** 向队列中指定位置插入成员 */
+LCUI_API void* Queue_Insert(	LCUI_Queue *queue,
+				int pos,
+				const void *data );
 
-/* 向队列中指定位置插入成员的指针 */
-LCUI_API int
-Queue_InsertPointer( LCUI_Queue * queue, int pos, const void *data );
+/** 向队列中指定位置插入成员的指针 */
+LCUI_API void* Queue_InsertPointer(	LCUI_Queue *queue,
+					int pos,
+					const void *data );
 
 /* 将队列中指定位置的成员移动至目的位置 */
 LCUI_API int

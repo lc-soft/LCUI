@@ -260,29 +260,35 @@ LCUI_API void* Queue_Get( LCUI_Queue *queue, int pos )
 }
 
 /** 向队列中指定位置插入成员 */
-LCUI_API int Queue_Insert(	LCUI_Queue *queue,
+LCUI_API void* Queue_Insert(	LCUI_Queue *queue,
 				int pos,
 				const void *data )
 {
 	int src_pos;
+	void *p_data;
+
 	src_pos = queue->total_num;
-	if( Queue_Add(queue, data) ) {
-		return Queue_Move(queue, pos, src_pos); 
+	p_data = Queue_Add( queue, data );
+	if( p_data && Queue_Move(queue, pos, src_pos) == 0 ) {
+		return p_data;
 	}
-	return -1;
+	return NULL;
 }
 
 /** 向队列中指定位置插入成员的指针 */
-LCUI_API int Queue_InsertPointer(	LCUI_Queue *queue,
+LCUI_API void* Queue_InsertPointer(	LCUI_Queue *queue,
 					int pos,
 					const void *data )
 {
 	int src_pos;
+	void *p_data;
+
 	src_pos = queue->total_num;
-	if( Queue_AddPointer(queue, data) ) {
-		return Queue_Move(queue, pos, src_pos); 
+	p_data = Queue_AddPointer( queue, data );
+	if( p_data && Queue_Move(queue, pos, src_pos) == 0 ) {
+		return p_data;
 	}
-	return -1;
+	return NULL;
 }
 
 /** 将队列中指定位置的成员移动至目的位置 */
