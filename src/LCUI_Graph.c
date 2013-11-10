@@ -262,11 +262,12 @@ error_exit:
 
 LCUI_API void Graph_Copy( LCUI_Graph *des, LCUI_Graph *src )
 {
+	LCUI_Graph *graph;
 	if( !des || !Graph_IsValid(src) ) {
 		return;
 	}
-	
-	des->color_type = src->color_type;
+	graph = Graph_GetQuote( src );
+	des->color_type = graph->color_type;
 	/* 创建合适尺寸的Graph */
 	Graph_Create( des, src->w, src->h );
 	Graph_Replace( des, src, Pos(0,0) );
@@ -525,12 +526,17 @@ LCUI_API int Graph_HorizFlip( LCUI_Graph *src_graph, LCUI_Graph *out_graph )
 	if( 0 != Graph_Create( out_graph, rect.width, rect.height ) ) {
 		return -2;	
 	}
-	/* 水平翻转其实也就是交换两边的数据 */  
-	center = (int)(rect.width / 2.0);
+	/* 水平翻转其实也就是交换两边的数据，需要计算中点像素的位置 */
+	if( rect.width > 1 ) {
+		center = rect.width-1;
+		center = center/2;
+	} else {
+		center = 0;
+	}
 	for (y = 0; y < rect.height; ++y) {
 		des_left_pos = y * rect.width;
 		des_right_pos = des_left_pos + rect.width -1;
-		src_left_pos = (y + rect.y) * src->w + rect.x;
+		src_left_pos = (y + rect.y)*src->w + rect.x;
 		src_right_pos = src_left_pos + rect.width -1;
 		for (x = 0; x <= center; ++x)  {
 			buff = src->rgba[0][src_left_pos]; 
@@ -1252,7 +1258,7 @@ LCUI_API int Graph_FillImage(	LCUI_Graph *graph,
 	LCUI_Pos pos;
 	LCUI_Graph temp_bg;
 	LCUI_BOOL replace_mix;
-	
+
 	if( Check_Option( mode, GRAPH_MIX_FLAG_REPLACE ) ) {
 		/* 将alpha通道置为0 */
 		Graph_FillAlpha( graph, 0 );
