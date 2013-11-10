@@ -69,6 +69,9 @@ FT_Face FontLIB_GetFontFace( int font_id );
 
 #endif
 
+/** 检测位图数据是否有效 */
+#define FontBMP_IsValid(fbmp) (fbmp && fbmp->width>0 && fbmp->rows>0)
+
 /** 打印字体位图的信息 */
 LCUI_API void FontBMP_PrintInfo( LCUI_FontBMP *bitmap )
 {
@@ -93,7 +96,7 @@ LCUI_API void FontBMP_Init( LCUI_FontBMP *bitmap )
 /** 释放字体位图占用的资源 */
 LCUI_API void FontBMP_Free( LCUI_FontBMP *bitmap )
 {
-	if( FontBMP_Valid(bitmap) ) {
+	if( FontBMP_IsValid(bitmap) ) {
 		free( bitmap->buffer );
 		FontBMP_Init( bitmap );
 	}
@@ -107,7 +110,7 @@ LCUI_API int FontBMP_Create( LCUI_FontBMP *bitmap, int width, int rows )
 		FontBMP_Free(bitmap);
 		return -1;
 	}
-	if(FontBMP_Valid(bitmap)) {
+	if(FontBMP_IsValid(bitmap)) {
 		FontBMP_Free(bitmap);
 	}
 	bitmap->width = width;
@@ -205,7 +208,7 @@ LCUI_API int FontBMP_Mix(	LCUI_Graph	*graph,
 	int src_start_pos, des_start_pos;
 
 	/* 数据有效性检测 */
-	if( !FontBMP_Valid( bitmap )
+	if( !FontBMP_IsValid( bitmap )
 	 || !Graph_IsValid( graph ) ) {
 		return -1;
 	}
