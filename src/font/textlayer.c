@@ -160,7 +160,7 @@ static void  TextLayer_Text_RowBreak(	LCUI_TextLayer *layer,
 	}
 }
 
-/* 将插入新行至文本图层的文本中的指定位置 */
+/** 将插入新行至文本图层的文本中的指定位置 */
 static int TextLayer_Text_InsertNewRow( LCUI_TextLayer *layer, int row )
 {
 	LCUI_TextStyle *style;
@@ -180,7 +180,10 @@ static int TextLayer_Text_InsertNewRow( LCUI_TextLayer *layer, int row )
 		data.max_size.h = layer->default_data.pixel_size+2;
 	}
 	data.max_size.w = 0;
-	return Queue_Insert( &layer->rows_data, row, &data );
+	if( Queue_Insert( &layer->rows_data, row, &data ) ) {
+		return 0;
+	}
+	return -1;
 }
 
 /** 获取指向当前行的指针 */
@@ -738,7 +741,7 @@ TextLayer_GetText( LCUI_TextLayer *layer, wchar_t *buff, size_t max_len )
 }
 
 /** 刷新指定行中指定字以及后面的字的区域 */
-LCUI_API void TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos )
+LCUI_API void TextLayer_RefreshCharBehind( LCUI_TextLayer *layer, LCUI_Pos char_pos )
 {
 	int i, len;
 	LCUI_Rect area;
@@ -884,7 +887,7 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 					int pos_type,
 					wchar_t *new_text )
 {
-	LCUI_BOOL refresh = TRUE;
+	LCUI_BOOL need_refresh_row = FALSE;
 	LCUI_Pos cur_pos, des_pos;
 	int total, cur_len, row, src_pos, total_row, n_ignore = 0;
 	wchar_t *finish, *p, *q;
@@ -908,10 +911,12 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 		if( cur_pos.y > 0 ) {
 			--cur_pos.y;
 		}
-		cur_row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, cur_pos.y );
+		cur_row_ptr = (Text_RowData*)
+		Queue_Get( &layer->rows_data, cur_pos.y );
 		if( !cur_row_ptr ) {
 			TextLayer_Text_AddNewRow( layer );
-			cur_row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, cur_pos.y );
+			cur_row_ptr = (Text_RowData*)
+			Queue_Get( &layer->rows_data, cur_pos.y );
 		}
 		cur_pos.x = Queue_GetTotal( &cur_row_ptr->string );
 		src_pos = Queue_GetTotal( &layer->text_source_data );
@@ -919,11 +924,13 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	} else {/* 否则，是将文本插入至光标所在位置 */
 		cur_pos = TextLayer_Cursor_GetPos( layer );
 		DEBUG_MSG1( "cur_pos: %d,%d\n", cur_pos.x, cur_pos.y );
-		cur_row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, cur_pos.y );
+		cur_row_ptr = (Text_RowData*)
+		Queue_Get( &layer->rows_data, cur_pos.y );
 		DEBUG_MSG1( "cur_row_ptr: %p\n", cur_row_ptr );
 		if( !cur_row_ptr ) {
 			TextLayer_Text_AddNewRow( layer );
-			cur_row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, cur_pos.y );
+			cur_row_ptr = (Text_RowData*)
+			Queue_Get( &layer->rows_data, cur_pos.y );
 		}
 		src_pos = layer->current_src_pos;
 		des_pos = layer->current_des_pos;
@@ -956,8 +963,9 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	DEBUG_MSG1( "total char: %d\n", total );
 	DEBUG_MSG1( "total row: %d\n", total_row );
 	/* 先记录这一行需要刷新的区域，起点为光标所在位置 */
-	TextLayer_CharLater_Refresh( layer, cur_pos );
+	TextLayer_RefreshCharBehind( layer, cur_pos );
 	for(p=new_text, finish=new_text+total; p<finish; ++p) {
+		n_ignore = -1;
 		DEBUG_MSG2( "1, char: %c\n", *p );
 		if( layer->using_style_tags ) {
 			/* 处理样式的结束标签 */ 
@@ -974,77 +982,72 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 			}
 		}
 		/* 针对换行符模式为Win(CR/LF)的文本，进行处理 */
-		if(*p == '\n' || *p == '\r') { 
+		if( *p == '\n' || *p == '\r' ) { 
 			/* 计算需要忽略的换行符的数量 */
 			for( n_ignore=0,q=p; *q=='\n' || *q=='\r'; ++q,++n_ignore);
 		} 
-		if(n_ignore > 0) {
+		if( n_ignore > 0 ) {
 			/* 被忽略的字符的属性都一样，所以只需赋一次值 */
 			char_data.data = NULL;
 			char_data.display = FALSE; 
 			char_data.need_update = FALSE;
 			char_data.bitmap = NULL;
+			tmp_pos.x = des_pos.x;
+			tmp_pos.y = des_pos.y;
 		}
-		while(n_ignore > 0) {
-			DEBUG_MSG2( "ignore = %d\n", n_ignore );
+		for( ;n_ignore>0; --n_ignore,++src_pos ) {
 			char_data.char_code = *p++;
-			Queue_Insert( &layer->text_source_data, src_pos, &char_data ); 
-			char_ptr = (LCUI_CharData*)Queue_Get( &layer->text_source_data, src_pos );
-			/* 如果启用多行显示，并遇到换行符，那就增加新行 */
-			if( layer->enable_multiline && char_data.char_code == '\n' ) {
-				++row;
-				if( refresh ) {
-					tmp_pos.x = 0;
-					tmp_pos.y = row;
-					/* 刷新该行后面所有行的字符 */
-					for( ; tmp_pos.y<total_row; ++tmp_pos.y ) {
-						TextLayer_CharLater_Refresh( layer, tmp_pos );
-					}
-					refresh = FALSE;
-				}
-				/* 换行符的数据单独保存 */
-				cur_row_ptr->last_char = char_ptr;
-				/* 在该行插入新行 */
-				TextLayer_Text_InsertNewRow( layer, row );
-				/* 获取新行的行指针 */
-				tmp_row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, row );
-				/* 更新当前行尺寸 */
-				cur_row_ptr->max_size = row_size;
-				/* 记录新行的尺寸 */
-				row_size = tmp_row_ptr->max_size;
-				/* 当前位置后面的字符转移到新行里 */
-				TextLayer_Text_RowBreak( layer, cur_row_ptr, des_pos.x, tmp_row_ptr );
-				/* 行指针切换到下一行 */
-				cur_row_ptr = tmp_row_ptr;
-				/* 更新当前字符坐标 */
-				des_pos.x = 0;
-				des_pos.y = row;
-				/* 更新总行数 */
-				total_row = TextLayer_GetRows( layer );
+			char_ptr = (LCUI_CharData*)Queue_Insert( 
+			&layer->text_source_data, src_pos, &char_data ); 
+			/* 如果未启用多行文本，或未遇到换行符 */
+			if( !layer->enable_multiline
+			 || char_data.char_code != '\n' ) {
+				continue;
 			}
-			++src_pos; 
-			--n_ignore;
-			if(n_ignore == 0) {
-				n_ignore = -1;
-				break;
+			++row;
+			if( !need_refresh_row ) {
+				/* 记录当前行的起点位置 */
+				tmp_pos.x = 0;
+				tmp_pos.y = row;
+				/* 标记需要刷新该行后面所有行 */
+				need_refresh_row = TRUE;
 			}
+			/* 换行符的数据单独保存 */
+			cur_row_ptr->last_char = char_ptr;
+			/* 在该行插入新行 */
+			TextLayer_Text_InsertNewRow( layer, row );
+			/* 获取新行的行指针 */
+			tmp_row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, row );
+			/* 更新当前行尺寸 */
+			cur_row_ptr->max_size = row_size;
+			/* 记录新行的尺寸 */
+			row_size = tmp_row_ptr->max_size;
+			/* 当前位置后面的字符转移到新行里 */
+			TextLayer_Text_RowBreak( layer, cur_row_ptr, des_pos.x, tmp_row_ptr );
+			/* 行指针切换到下一行 */
+			cur_row_ptr = tmp_row_ptr;
+			/* 更新当前字符坐标 */
+			des_pos.x = 0;
+			des_pos.y = row;
 		}
-		if(n_ignore == -1) {
-			--p; 
-			n_ignore = 0;
+		if( n_ignore == 0 ) {
+			/* 更新总行数 */
+			total_row = TextLayer_GetRows( layer );
+			n_ignore = -1;
+			--p;
 			continue;
 		}
 		DEBUG_MSG2( "2, char: %c\n", *p );
 		char_data.char_code = *p;
 		char_data.display = TRUE; 
 		char_data.need_update = TRUE; 
+		/* 获取当前文本样式数据 */
 		char_data.data = StyleTag_GetCurrentStyle( &layer->tag_buff );
 		/* 获取本字的字体位图 */
 		TextLayer_GetCharBMP( &layer->default_data, &char_data );
 		/* 插入至源文本中 */
+		char_ptr = (LCUI_CharData*)
 		Queue_Insert( &layer->text_source_data, src_pos, &char_data );
-		/* 获取源文本中的字符数据的指针 */
-		char_ptr = (LCUI_CharData*)Queue_Get( &layer->text_source_data, src_pos );
 		/* 将该指针添加至行数据队列中 */
 		cur_row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, des_pos.y );
 		Queue_InsertPointer( &cur_row_ptr->string, des_pos.x, char_ptr );
@@ -1063,6 +1066,13 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 
 		++src_pos; 
 		++des_pos.x;
+	}
+	/** 如果需要刷新后面所有行的文本 */
+	if( need_refresh_row ) {
+		/* 刷新该行后面所有行的字符 */
+		for( ; tmp_pos.y<total_row; ++tmp_pos.y ) {
+			TextLayer_RefreshCharBehind( layer, tmp_pos );
+		}
 	}
 	/** 如果还在同一行内 */
 	if( des_pos.y == cur_pos.y ) {
@@ -1348,8 +1358,6 @@ TextLayer_Update_CurSrcPos( LCUI_TextLayer *layer, int left_or_right )
 	return layer->current_src_pos;
 }
 
-LCUI_API LCUI_Pos
-TextLayer_Cursor_SetPixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 /* 
  * 功能：根据传入的二维坐标，设定光标在的文本图层中的位置
  * 说明：该位置会根据当前位置中的字体位图来调整，确保光标显示在字体位图边上，而不
@@ -1357,6 +1365,8 @@ TextLayer_Cursor_SetPixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
  * 因为文本的添加，删减，都需要以光标当前所在位置对应的字符为基础。
  * 返回值：文本图层中对应字体位图的坐标，单位为像素
  *  */
+LCUI_API LCUI_Pos TextLayer_Cursor_SetPixelPos(	LCUI_TextLayer *layer, 
+						LCUI_Pos pixel_pos )
 {
 	LCUI_Pos new_pos, pos;
 	Text_RowData *row_ptr;
@@ -1368,15 +1378,14 @@ TextLayer_Cursor_SetPixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos )
 	/* 减去偏移坐标 */
 	pixel_pos = Pos_Sub( pixel_pos, layer->offset_pos );
 	for( new_pos.y=0,i=0; i<rows; ++i ) {
-		row_ptr = Queue_Get( &layer->rows_data, i );
-		if( pixel_pos.y >= row_ptr->max_size.h ) {
-			pixel_pos.y -= row_ptr->max_size.h; 
-			if(i < rows-1 ) {
-				new_pos.y += row_ptr->max_size.h; 
-				continue;
-			}
+		row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, i );
+		if( pixel_pos.y < row_ptr->max_size.h ) {
+			break;
 		}
-		break;
+		pixel_pos.y -= row_ptr->max_size.h;
+		if(i < rows-1 ) {
+			new_pos.y += row_ptr->max_size.h;
+		}
 	}
 	pos.y = i;
 	row_ptr = Queue_Get( &layer->rows_data, i );
@@ -1562,7 +1571,7 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 	/* 如果需删除的字符只在当前行 */
 	if( start_pos.x + len <= cols ) {
 		/* 标记后面的文字位图需要刷新 */
-		TextLayer_CharLater_Refresh( layer, start_pos );
+		TextLayer_RefreshCharBehind( layer, start_pos );
 	}
 	for( ; start_pos.x<=cols && len>0; --len ) {
 		/* 如果到了行尾 */
@@ -1576,7 +1585,7 @@ _TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
 				tmp_pos.y=start_pos.y+1;
 				/* 刷新该行后面所有行的字符 */
 				for( ; tmp_pos.y<rows; ++tmp_pos.y ) {
-					TextLayer_CharLater_Refresh( layer, tmp_pos );
+					TextLayer_RefreshCharBehind( layer, tmp_pos );
 				}
 				refresh = FALSE;
 			}
