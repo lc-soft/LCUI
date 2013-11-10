@@ -4,6 +4,9 @@ compiler:
   - clang
   - gcc
 
+ before_script:
+  - aclocal
+
 script:
   - ./configure
   - make
