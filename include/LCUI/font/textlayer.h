@@ -145,7 +145,7 @@ LCUI_API size_t
 TextLayer_GetText( LCUI_TextLayer *layer, wchar_t *buff, size_t max_len );
 
 LCUI_API void
-TextLayer_CharLater_Refresh( LCUI_TextLayer *layer, LCUI_Pos char_pos );
+TextLayer_RefreshCharBehind( LCUI_TextLayer *layer, LCUI_Pos char_pos );
 /* 刷新指定行中指定字以及后面的字的区域 */
 
 LCUI_API void
