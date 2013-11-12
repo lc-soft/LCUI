@@ -133,22 +133,19 @@ TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b )
 /*-------------------------- StyleTag --------------------------------*/
 #define MAX_TAG_NUM 2
 
-static void 
-Destroy_StyleTag_Data( void *arg )
+static void Destroy_StyleTag_Data( void *arg )
 { 
 	//free( data->style );
 }
 
-/* 初始化样式标签库 */
-LCUI_API void
-StyleTag_Init( LCUI_Queue *tags )
+/** 初始化样式标签库 */
+LCUI_API void StyleTag_Init( LCUI_Queue *tags )
 {
 	Queue_Init( tags, sizeof(StyleTag_Data), Destroy_StyleTag_Data );
 }
 
-/* 添加样式标签 */
-LCUI_API int
-StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data )
+/** 添加样式标签 */
+LCUI_API int StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data )
 {
 	if( Queue_Add( tags, data ) ) {
 		return 0;
@@ -156,9 +153,8 @@ StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data )
 	return 0;
 }
 
-/* 获取当前的样式数据 */
-LCUI_API LCUI_TextStyle*
-StyleTag_GetCurrentStyle ( LCUI_Queue *tags )
+/** 获取当前的样式数据 */
+LCUI_API LCUI_TextStyle* StyleTag_GetCurrentStyle( LCUI_Queue *tags )
 {
 	PX_PT_t pxpt;
 	StyleTag_Data *tag_data;
@@ -214,9 +210,8 @@ StyleTag_GetCurrentStyle ( LCUI_Queue *tags )
 	return style_data;
 }
 
-static void 
-StyleTag_Delete( LCUI_Queue *tags, StyleTag_ID tag )
-/* 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
+/** 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
+static void StyleTag_Delete( LCUI_Queue *tags, StyleTag_ID tag )
 {
 	int i, total;
 	StyleTag_Data *p; 
@@ -236,9 +231,8 @@ StyleTag_Delete( LCUI_Queue *tags, StyleTag_ID tag )
 	DEBUG_MSG("delete end, total tag: %d\n", Queue_GetTotal( tags ));
 }
 
-LCUI_API void
-clear_space(char *in, char *out)
-/* 清除字符串中的空格 */
+/** 清除字符串中的空格 */
+LCUI_API void clear_space( char *in, char *out )
 {
 	int j, i, len = strlen(in);
 	for(j=i=0; i<len; ++i) {
@@ -251,74 +245,151 @@ clear_space(char *in, char *out)
 	out[j] = 0;
 }
 
-static wchar_t *
-get_style_endtag ( wchar_t *str, char *out_tag_name )
-/* 在字符串中获取样式的结束标签，输出的是标签名 */
+/** 在字符串中获取样式的结束标签，输出的是标签名 */
+LCUI_API const wchar_t* 
+StyleTag_GetEndingTag(	const wchar_t *str, char *out_tag_name )
 {
-	int i, j, len, tag_found = 0;
+	int i, j, len;
 	
 	len = wcslen ( str );
 	//printf("string: %S\n", str);
-	if(str[0] != '<' || str[1] != '/') { 
+	if( str[0] != '<' || str[1] != '/' ) { 
 		return NULL;
 	} 
 	/* 匹配标签,获取标签名 */
 	for(j=0,i=2; i<len; ++i) {
-		switch(str[i]) {
-		    case ' ': 
-			if(  tag_found == 0 ) {
-				break;
-			} 
-			return NULL;
-		    case '>': goto end_tag_search;
-		    default: out_tag_name[j] = str[i]; ++j; break;
+		switch( str[i] ) {
+		case ' ': break;
+		case '>': ++i; goto end_tag_search;
+		default:
+			if( out_tag_name ) {
+				out_tag_name[j] = str[i];
+			}
+			++j; 
+			break;
 		}
 	}
 	
 end_tag_search:;
-
-	out_tag_name[j] = 0;
+	if( out_tag_name ) {
+		out_tag_name[j] = 0;
+	}
 	if( j < 1 ) { 
 		return NULL;
 	}
 	return str+i;
 }
 
-static wchar_t *
-get_style_tag( wchar_t *str, const char *tag, char *out_tag_data )
-/* 在字符串中获取指定样式标签中的数据 */
+/** 从字符串中获取样式标签的名字及样式属性 */
+LCUI_API const wchar_t* StyleTag_GetTagData(	const wchar_t *w_str,
+						char *out_tag_name,
+						int max_name_size,
+						char *out_tag_data )
 {
-	wchar_t *p;
+	int i, j, len; 
+	LCUI_BOOL end_name = FALSE;
+
+	len = wcslen( w_str );
+	DEBUG_MSG2("len = %d\n", len);
+	if( w_str[0] != '<' ) {
+		DEBUG_MSG2("str[0] != '<'\n");
+		return NULL;
+	}
+	/* 匹配标签前半部分 */
+	for( j=0,i=1; i<len; ++i ) {
+		if( w_str[i] == ' ' ) {
+			/* 如果上个字符不是空格，说明标签名已经结束 */
+			if( i > 0 && w_str[i-1] != ' ' ) {
+				end_name = TRUE;
+			}
+			/* 标签名首部和尾部可包含空格 */
+			if( j == 0 || max_name_size == 0
+			 || (max_name_size > 0 && end_name) ) { 
+				continue;
+			}
+			/* 标签名中间不能包含空格 */
+			return NULL;
+		}
+		/* 如果标签名部分已经匹配完 */
+		if( w_str[i] == '=' ) {
+			++i;
+			break;
+		}
+		/* 如果标签名已经结束了 */
+		if( end_name ) {
+			return NULL;
+		}
+		if( max_name_size > 0 && out_tag_data ) {
+			out_tag_name[j] = w_str[i];
+		}
+		++j;
+	}
+	
+	if( out_tag_data ) {
+		out_tag_name[j] = 0;
+	}
+	DEBUG_MSG2("tag is: %s\n", tag);
+	/* 获取标签后半部分 */
+	for(j=0; i<len; ++i) {
+		DEBUG_MSG2("str[%d]: %c\n", i, str[i]);
+		if( w_str[i] == ' ' ) {
+			continue; 
+		}
+		/* 标签结束，退出 */
+		if( w_str[i] == '>' ) {
+			++i;
+			break;
+		}
+		if( out_tag_data ) {
+			/* 保存标签内的数据 */
+			out_tag_data[j] = w_str[i];
+		}
+		++j;
+	}
+	if( out_tag_data ) {
+		out_tag_data[j] = 0;
+	}
+	DEBUG_MSG2("out_tag_data: %s\n", out_tag_data);
+	if( i >= len ) {
+		return NULL;
+	}
+	return w_str+i;
+}
+
+/** 在字符串中获取指定样式标签中的数据 */
+static const wchar_t* 
+StyleTag_GetTagDataByTagName(	const wchar_t *str,
+				const char *in_tag_name,
+				char *out_tag_data )
+{
 	int i, j, len, tag_len; 
 	
-	len = wcslen ( str );
+	len = wcslen( str );
 	DEBUG_MSG2("len = %d\n", len);
-	tag_len = strlen ( tag );
-	if(str[0] != '<') {
+	tag_len = strlen( in_tag_name );
+	if( str[0] != '<' ) {
 		DEBUG_MSG2("str[0] != '<'\n");
 		return NULL;
 	} 
 	/* 匹配标签前半部分 */
-	for(j=0,i=1; i<len; ++i) {
+	for( j=0,i=1; i<len; ++i ) {
 		if( str[i] == ' ' ) { 
 			if( j == 0 || j >= tag_len ) { 
 				continue;
 			}
 			return NULL;
 		}
-		else if( str[i] == tag[j] ) { 
+		else if( str[i] == in_tag_name[j] ) { 
 			++j;
-		} else { 
-			/* 如果标签名部分已经匹配完 */
-			if( j>= tag_len ) { 
-				if( str[i] == '=' ) {
-					++i; 
-					break;
-				}
-			}
-			/* 否则，有误 */
-			return NULL;
+			continue;
 		}
+		/* 如果标签名部分已经匹配完 */
+		if( j>= tag_len && str[i] == '=' ) {
+			++i; 
+			break;
+		}
+		/* 否则，有误 */
+		return NULL;
 	}
 	DEBUG_MSG2("tag is: %s\n", tag);
 	/* 获取标签后半部分 */
@@ -329,6 +400,7 @@ get_style_tag( wchar_t *str, const char *tag, char *out_tag_data )
 		} else {
 			/* 标签结束，退出 */
 			if( str[i] == '>' ) {
+				++i;
 				break;
 			}
 			/* 保存标签内的数据 */
@@ -341,20 +413,19 @@ get_style_tag( wchar_t *str, const char *tag, char *out_tag_data )
 	if(i >= len ) {
 		return NULL;
 	}
-	p = &str[i];
-	return p;
+	return &str[i];
 }
 
-/* 根据字符串中的标签得到相应的样式数据，并返回指向标签后面字符的指针 */
-static wchar_t *
-covernt_tag_to_style_data (wchar_t *str, StyleTag_Data *out_data)
+/** 根据字符串中的标签得到相应的样式数据，并返回指向标签后面字符的指针 */
+static const wchar_t* 
+StyleTag_ConvertTagToStyleData(	const wchar_t *str, StyleTag_Data *out_data )
 {
-	wchar_t *p, *q; 
+	const wchar_t *p, *q; 
 	char tag_data[256];
 	
 	p = str; 
-	DEBUG_MSG("covernt_tag_to_style_data(): enter\n");
-	if( (q = get_style_tag ( p, "color", tag_data)) ) {
+	DEBUG_MSG("StyleTag_ConvertTagToStyleData(): enter\n");
+	if( (q = StyleTag_GetTagDataByTagName( p, "color", tag_data)) ) {
 		int r,g,b, len, i, j;
 		LCUI_RGB rgb;
 		
@@ -391,7 +462,7 @@ covernt_tag_to_style_data (wchar_t *str, StyleTag_Data *out_data)
 		out_data->style = malloc( sizeof(LCUI_RGB) );
 		memcpy( out_data->style, &rgb, sizeof(LCUI_RGB) );
 	}
-	else if( (q = get_style_tag ( p, "size", tag_data)) ) {
+	else if( (q = StyleTag_GetTagDataByTagName( p, "size", tag_data)) ) {
 		PX_PT_t pxpt;
 		p = q;
 		if( get_PX_PT_t( tag_data, &pxpt ) != 0) {
@@ -403,19 +474,19 @@ covernt_tag_to_style_data (wchar_t *str, StyleTag_Data *out_data)
 	} else {
 		p = NULL;
 	}
-	DEBUG_MSG("covernt_tag_to_style_data(): quit\n");
+	DEBUG_MSG("StyleTag_ConvertTagToStyleData(): quit\n");
 	return p;
 }
 
-/* 处理样式标签 */
-LCUI_API wchar_t*
-StyleTag_ProcessTag( LCUI_Queue *tags, wchar_t *str )
+/** 处理样式标签 */
+LCUI_API const wchar_t*
+StyleTag_ProcessTag( LCUI_Queue *tags, const wchar_t *str )
 {
-	wchar_t *q;
+	const wchar_t *q;
 	StyleTag_Data data;
 	
 	/* 开始处理样式标签 */
-	q = covernt_tag_to_style_data ( str, &data );
+	q = StyleTag_ConvertTagToStyleData( str, &data );
 	DEBUG_MSG2("handle_style_tag():%p\n", q);
 	if( q ) {
 		DEBUG_MSG2("add style data\n");
@@ -425,15 +496,15 @@ StyleTag_ProcessTag( LCUI_Queue *tags, wchar_t *str )
 	return q;
 }
 
-/* 处理样式结束标签 */
-LCUI_API wchar_t*
-StyleTag_ProcessEndingTag( LCUI_Queue *tags, wchar_t *str )
+/** 处理样式结束标签 */
+LCUI_API const wchar_t* 
+StyleTag_ProcessEndingTag( LCUI_Queue *tags, const wchar_t *str )
 {
-	wchar_t *p;
+	const wchar_t *p;
 	char tag_name[256];
 	/* 获取标签名 */
-	p = get_style_endtag( str, tag_name );
-	if( p == NULL ) {
+	p = StyleTag_GetEndingTag( str, tag_name );
+	if( !p ) {
 		return NULL;
 	}
 	if( LCUI_strcasecmpA(tag_name, "color") == 0 ) {
