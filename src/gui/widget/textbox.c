@@ -939,15 +939,19 @@ TextBox_Text_GetTotalLength( LCUI_Widget *widget )
 }
 
 /* 将文本添加至缓冲区内 */
-static int
-TextBox_TextBuff_Add( LCUI_Widget *widget, const wchar_t *text, int pos_type )
+static int TextBox_TextBuff_Add(	LCUI_Widget *widget,
+					const wchar_t *text, 
+					int pos_type )
 {
 	LCUI_TextBox *textbox;
-	int i, j, len, size;
+	LCUI_TextLayer *layer;
+	int i, j, len, tag_len, size;
 	wchar_t *text_buff;
+	const wchar_t *p;
 	LCUI_TextBlock text_block;
 	
 	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	layer = Label_GetTextLayer( textbox->text );
 	len = wcslen( text );
 	DEBUG_MSG("len = %d\n", len);
 	switch( pos_type ) {
@@ -968,9 +972,40 @@ TextBox_TextBuff_Add( LCUI_Widget *widget, const wchar_t *text, int pos_type )
 		if( !text_buff ) {
 			return -2;
 		}
-		for( j=0; j<len&&j<size-1; ++j,++i ) {
+		
+		/* 如果未启用样式标签功能 */
+		if( !layer->using_style_tags ) {
+			for( j=0; i<len&&j<size-1; ++j,++i ) {
+				text_buff[j] = text[i];
+			}
+			--i;
+			text_buff[j] = 0;
+			text_block.text = text_buff;
+			/* 添加文本块至缓冲区 */
+			Queue_Add( &textbox->text_block_buff, &text_block );
+			continue;
+		}
+		for( j=0; i<len&&j<size-1; ++j,++i ) {
 			text_buff[j] = text[i];
-			//_DEBUG_MSG("char: %d, count: %d\n", new_text[i], count);
+			/* 检测是否有样式标签 */
+			p = StyleTag_GetTagData( text+i, NULL, 0, NULL );
+			if( !p ) {
+				p = StyleTag_GetEndingTag( text+i, NULL );
+				if( !p ) {
+					continue;
+				}
+			}
+			/* 计算标签的长度 */
+			tag_len = p-text-i;
+			DEBUG_MSG("pos: %d, tag len: %d, start: %C, end: %C\n", i, tag_len, text[i], *p);
+			/* 若当前块大小能够容纳这个标签 */
+			if( j+tag_len <= size-1 ) {
+				continue;
+			}
+			/* 重新计算该文本块的大小，并重新分配内存空间 */
+			size = j+tag_len+1;
+			text_buff = (wchar_t*)realloc(
+			text_buff, sizeof(wchar_t)*size );
 		}
 		--i;
 		text_buff[j] = 0;
@@ -978,6 +1013,7 @@ TextBox_TextBuff_Add( LCUI_Widget *widget, const wchar_t *text, int pos_type )
 		/* 添加文本块至缓冲区 */
 		Queue_Add( &textbox->text_block_buff, &text_block );
 	}
+	_DEBUG_MSG("end\n");
 	/* 投递消息，以在添加新文本后更新文本位图 */
 	WidgetMsg_Post( widget, WIDGET_MSG_UPDATE_FONTBMP, NULL, TRUE, FALSE );
 	return 0;
