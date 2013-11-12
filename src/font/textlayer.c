@@ -907,7 +907,7 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 	LCUI_BOOL need_refresh_row = FALSE;
 	LCUI_Pos cur_pos, des_pos;
 	int total, cur_len, row, src_pos, total_row, n_ignore = 0;
-	wchar_t *finish, *p, *q;
+	const wchar_t *finish, *p, *q;
 	
 	LCUI_Pos tmp_pos;
 	LCUI_CharData *char_ptr, char_data; 
@@ -989,12 +989,12 @@ LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
 			q = StyleTag_ProcessEndingTag( &layer->tag_buff, p );
 			if( q ) {
 				/* 计算需忽略的字符数 */
-				n_ignore = q-p+1;
+				n_ignore = q-p;
 			} else {
 				/* 处理样式标签 */
 				q = StyleTag_ProcessTag( &layer->tag_buff, p );
 				if( q ) {
-					n_ignore = q-p+1;
+					n_ignore = q-p;
 				}
 			}
 		}
