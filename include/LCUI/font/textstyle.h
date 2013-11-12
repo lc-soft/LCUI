@@ -97,21 +97,32 @@ LCUI_API int TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b );
 /*-------------------------- StyleTag --------------------------------*/
 #define MAX_TAG_NUM 2
 
-/* 初始化样式标签库 */
+/** 初始化样式标签库 */
 LCUI_API void StyleTag_Init( LCUI_Queue *tags );
 
-/* 添加样式标签 */
+/** 添加样式标签 */
 LCUI_API int StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data );
 
-/* 获取当前的样式数据 */
-LCUI_API LCUI_TextStyle* StyleTag_GetCurrentStyle ( LCUI_Queue *tags );
+/** 获取当前的样式数据 */
+LCUI_API LCUI_TextStyle* StyleTag_GetCurrentStyle( LCUI_Queue *tags );
 
-/* 处理样式标签 */
-LCUI_API wchar_t* StyleTag_ProcessTag( LCUI_Queue *tags, wchar_t *str );
+/** 在字符串中获取样式的结束标签，输出的是标签名 */
+LCUI_API const wchar_t* StyleTag_GetEndingTag(	const wchar_t *str,
+						char *out_tag_name );
 
-/* 处理样式结束标签 */
-LCUI_API wchar_t*
-StyleTag_ProcessEndingTag( LCUI_Queue *tags, wchar_t *str );
+/** 从字符串中获取样式标签的名字及样式属性 */
+LCUI_API const wchar_t* StyleTag_GetTagData(	const wchar_t *w_str,
+						char *out_tag_name,
+						int max_name_size,
+						char *out_tag_data );
+
+/** 处理样式标签 */
+LCUI_API const wchar_t* StyleTag_ProcessTag(	LCUI_Queue *tags,
+						const wchar_t *str );
+
+/** 处理样式结束标签 */
+LCUI_API const wchar_t* StyleTag_ProcessEndingTag(	LCUI_Queue *tags,
+							const wchar_t *str );
 
 /*------------------------- End StyleTag -----------------------------*/
 
