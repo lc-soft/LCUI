@@ -9,7 +9,7 @@
 - Add text auto-wrap function, if edit text in TextBox, may be problems when enabled auto-wrap function.
 - Fixed: multi-threaded rendering text causes text bitmap abnormal, program crash and other problems, now the text rendering tasks has been transferred to the main thread performed separately.
 - Fixed: known BUG in GUI widgets stacking order processing function.
-- fixed: all messages are not all processed when each processing GUI Widget messages. 
+- Fixed: all messages are not all processed when each processing GUI Widget messages. 
 
 This updates mainly aimed author's LCUI 2D Fighting Game, since the LCUI 2D Fighting Game is mainly on the windows platform for development and testing, therefore, although some function modules on the windows platform support is good, but is not guaranteed can be normal support  GNU / Linux platform.
 
