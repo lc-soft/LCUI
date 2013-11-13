@@ -1013,7 +1013,7 @@ static int TextBox_TextBuff_Add(	LCUI_Widget *widget,
 		/* 添加文本块至缓冲区 */
 		Queue_Add( &textbox->text_block_buff, &text_block );
 	}
-	_DEBUG_MSG("end\n");
+	DEBUG_MSG("end\n");
 	/* 投递消息，以在添加新文本后更新文本位图 */
 	WidgetMsg_Post( widget, WIDGET_MSG_UPDATE_FONTBMP, NULL, TRUE, FALSE );
 	return 0;
