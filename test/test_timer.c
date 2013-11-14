@@ -15,7 +15,7 @@ static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 	LCUI_MainLoop_Quit(NULL);
 }
 
-static void display_text(void)
+static void display_text(void *arg)
 {
 	if( state == 0 ) {
 		Widget_Show( label );
@@ -46,7 +46,7 @@ int main( int argc, char **argv )
 	Label_TextStyle( label, style );
 	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 设置定时器，每隔500毫秒调用display_text函数，重复调用 */
-	LCUITimer_Set( 500, display_text, TRUE );
+	LCUITimer_Set( 500, display_text, NULL, TRUE );
 	Widget_Show( window );
 	return LCUI_Main();
 }
