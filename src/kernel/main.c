@@ -485,14 +485,8 @@ LCUI_API int LCUI_Init( int w, int h, int mode )
 		LCUI_Sys.state = ACTIVE;
 		LCUI_ShowCopyrightText();
 		LCUIAppList_Init();
-		/* 注册程序 */
-		temp = LCUIAppList_Add();
-		if(temp != 0) {
-			printf(APP_ERROR_REGISTER_ERROR);
-			abort();
-		}
-		/* 初始化各个模块 */
 		LCUIModule_Thread_Init();
+		/* 初始化各个模块 */
 		LCUIModule_Event_Init();
 		LCUIModule_IME_Init();
 		LCUIModule_Font_Init();
@@ -507,12 +501,12 @@ LCUI_API int LCUI_Init( int w, int h, int mode )
 		/* 让鼠标游标居中显示 */
 		LCUICursor_SetPos( LCUIScreen_GetCenter() );  
 		LCUICursor_Show();
-	} else {
-		temp = LCUIAppList_Add();
-		if(temp != 0) {
-			printf(APP_ERROR_REGISTER_ERROR);
-			abort();
-		}
+	}
+
+	temp = LCUIAppList_Add();
+	if(temp != 0) {
+		printf(APP_ERROR_REGISTER_ERROR);
+		abort();
 	}
 	/* 注册默认部件类型 */
 	Register_DefaultWidgetType();
