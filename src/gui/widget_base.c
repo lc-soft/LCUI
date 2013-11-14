@@ -1102,6 +1102,11 @@ static void WidgetList_DestroyWidget( void *arg )
 	WidgetRecord_Delete( widget );
 	widget->parent = NULL;
 
+	/* 销毁部件的队列 */
+	Queue_Destroy( &widget->child );
+	Queue_Destroy( &widget->event );
+	Queue_Destroy( &widget->msg_buff );
+	Queue_Destroy( &widget->msg_func );
 	/* 释放字符串 */
 	LCUIString_Free( &widget->type_name );
 	LCUIString_Free( &widget->style_name );
@@ -1111,11 +1116,6 @@ static void WidgetList_DestroyWidget( void *arg )
 	GraphLayer_Free( widget->glayer );
 	/* 移除后，解除互斥锁 */
 	LCUIScreen_UnlockGraphLayerTree();
-	/* 销毁部件的队列 */
-	Queue_Destroy( &widget->child );
-	Queue_Destroy( &widget->event );
-	Queue_Destroy( &widget->msg_buff );
-	Queue_Destroy( &widget->msg_func );
 	RectQueue_Destroy( &widget->invalid_area );
 	/* 调用回调函数销毁部件私有数据 */
 	WidgetFunc_Call( widget, FUNC_TYPE_DESTROY );
