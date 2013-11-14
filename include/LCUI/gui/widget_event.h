@@ -115,32 +115,31 @@ typedef union LCUI_WidgetEvent_ {
 	LCUI_WidgetMouseMotionEvent mouse_motion;
 } LCUI_WidgetEvent;
 
-/*----------------------------- 部件事件 -------------------------------------*/
-/* 将回调函数与部件的指定事件进行关联 */
-LCUI_API int
-Widget_Event_Connect(	LCUI_Widget *widget, WidgetEventType event_id, 
+/*----------------------------- 部件事件 ------------------------------------*/
+
+/** 将回调函数与部件的指定事件进行关联 */
+LCUI_API int Widget_Event_Connect(
+			LCUI_Widget *widget, 
+			WidgetEventType event_id,
 			void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) );
 
-/* 处理与部件事件关联的回调函数 */
-LCUI_API int
-Widget_DispatchEvent( LCUI_Widget *widget, LCUI_WidgetEvent *event );
+/** 处理与部件事件关联的回调函数 */
+LCUI_API int Widget_DispatchEvent(	LCUI_Widget *widget, 
+					LCUI_WidgetEvent *event );
 
 /** 移除指定部件的记录，使之不再响应状态变化 */
 LCUI_API void WidgetRecord_Delete( LCUI_Widget *widget );
 
 /** 判断指定部件是否被允许响应事件 */
 LCUI_API LCUI_BOOL Widget_IsAllowResponseEvent( LCUI_Widget *widget );
+/** 初始化部件模块 */
+LCUI_API void LCUIModule_Widget_Init( void );
 
-/* 初始化部件模块 */
-LCUI_API void
-LCUIModule_Widget_Init( void );
+/** 停用部件模块 */
+LCUI_API void LCUIModule_Widget_End( void );
+/*--------------------------------- END -------------------------------------*/
 
-/* 停用部件模块 */
-LCUI_API void
-LCUIModule_Widget_End( void );
-/*-------------------------------- END ---------------------------------------*/
-
-/*--------------------------- Focus Proc ------------------------------*/
+/*------------------------------- 部件焦点 ----------------------------------*/
 
 /**
  * 功能：为部件设置焦点
@@ -152,9 +151,8 @@ LCUI_API LCUI_BOOL Widget_SetFocus( LCUI_Widget *widget );
 /** 设定部件是否能够获取焦点 */
 LCUI_API void Widget_SetCanGetFocus( LCUI_Widget *widget, LCUI_BOOL flag );
 
-/* 获取指定部件内的已获得焦点的子部件 */
-LCUI_API LCUI_Widget*
-Get_FocusWidget( LCUI_Widget *widget );
+/** 获取指定部件内的已获得焦点的子部件 */
+LCUI_API LCUI_Widget* Get_FocusWidget( LCUI_Widget *widget );
 
 /**
  * 功能：取消指定部件的焦点
@@ -165,7 +163,7 @@ LCUI_API LCUI_BOOL Widget_CancelFocus( LCUI_Widget *widget );
 /** 复位指定部件内的子部件的焦点 */
 LCUI_API LCUI_BOOL Widget_ResetFocus( LCUI_Widget* widget );
 
-/*------------------------- End Focus Proc ----------------------------*/
+/*--------------------------------- END -------------------------------------*/
 
 LCUI_END_HEADER
 
