@@ -121,7 +121,7 @@ static void LCUI_DispatchUserEvent( LCUI_Event *event )
 	}
 	n = Queue_GetTotal( &slot->func_data );
 	for(i=0; i<n; ++i) {
-		task = Queue_Get( &slot->func_data, i );
+		task = (LCUI_Task*)Queue_Get( &slot->func_data, i );
 		if( !task || !task->func ) {
 			continue;
 		}
@@ -231,32 +231,6 @@ LCUI_API void EventSlots_Init( LCUI_Queue *slots )
 	Queue_Init( slots, sizeof(LCUI_EventSlot), Destroy_EventSlot);
 }
 
-/** 将函数指针以及两个参数，转换成LCUI_Func类型，保存至p_buff指向的缓冲区中 */
-LCUI_API LCUI_BOOL Get_FuncData(	LCUI_Func *p_buff,
-					void (*func) (void*,void*),
-					void *arg1, void *arg2 )
-{
-	LCUI_App *app;
-	app = LCUIApp_GetSelf();
-
-	if( !app ) {
-		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
-		return FALSE;
-	}
-
-	p_buff->id = app->id;
-	p_buff->func = func;
-	/*
-	 * 只是保存了指向参数的指针，如果该参数是局部变量，在声明它的函数退出后，该变量
-	 * 的空间可能会无法访问。
-	 *  */
-	p_buff->arg[0] = arg1;
-	p_buff->arg[1] = arg2;
-	p_buff->destroy_arg[0] = FALSE;
-	p_buff->destroy_arg[1] = FALSE;
-	return TRUE;
-}
-
 /** 根据事件的ID，获取与该事件关联的事件槽 */
 LCUI_API LCUI_EventSlot* EventSlots_Find( LCUI_Queue *slots, int event_id )
 {
@@ -268,7 +242,7 @@ LCUI_API LCUI_EventSlot* EventSlots_Find( LCUI_Queue *slots, int event_id )
 		return NULL;
 	}
 	for (i = 0; i < total; ++i) {
-		slot = Queue_Get( slots, i );
+		slot = (LCUI_EventSlot*)Queue_Get( slots, i );
 		if( slot->id == event_id ) {
 			return slot;
 		}
@@ -322,9 +296,11 @@ LCUI_API int LCUISysEvent_Connect(	int event_type,
 					void *arg )
 {
 	LCUI_Func func_data;
-	if( !Get_FuncData( &func_data, (CallBackFunc)func, NULL, arg ) ) {
-		return -1;
-	}
+	func_data.func = (CallBackFunc)func;
+	func_data.destroy_arg[0] = FALSE;
+	func_data.destroy_arg[1] = FALSE;
+	func_data.arg[0] = NULL;
+	func_data.arg[1] = arg;
 	return EventSlots_Add( &sys_event_slots, event_type, &func_data );
 }
 
@@ -338,9 +314,11 @@ LCUI_API int LCUISysEvent_Disconnect( int event_type, int connect_id )
 LCUI_API int LCUIUserEvent_Connect( int event_id, void (*func)(void*, void*) )
 {
 	LCUI_Func func_data;
-	if( !Get_FuncData( &func_data, func, NULL, NULL ) ) {
-		return -1;
-	}
+	func_data.func = (CallBackFunc)func;
+	func_data.destroy_arg[0] = FALSE;
+	func_data.destroy_arg[1] = FALSE;
+	func_data.arg[0] = NULL;
+	func_data.arg[1] = NULL;
 	return EventSlots_Add(	&user_event_slots,
 				LCUI_USEREVENT, &func_data );
 }
