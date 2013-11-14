@@ -1,4 +1,4 @@
-//²âÊÔLCUIµÄÍ¼Ïñ»ìºÏËÙ¶È
+ï»¿//æµ‹è¯•LCUIçš„å›¾åƒæ··åˆé€Ÿåº¦
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -14,21 +14,21 @@ int main(int argc, char **argv)
 	
 	Graph_Init(&bg);
 	Graph_Init(&fg);
-	bg.have_alpha = FALSE;
-	fg.have_alpha = TRUE; 
+	bg.color_type = COLOR_TYPE_RGB;
+	fg.color_type = COLOR_TYPE_RGBA;
 	w = 1640;
 	h = 1480;
-	//ÎªÇ°¾°Í¼ºÍ±³¾°Í¼·ÖÅäÄÚ´æ
+	//ä¸ºå‰æ™¯å›¾å’ŒèƒŒæ™¯å›¾åˆ†é…å†…å­˜
 	Graph_Create(&bg, w, h);
 	Graph_Create(&fg, w, h);
 	printf("graph size: %dx%d\n", w, h);
-	time = clock(); //¿ªÊ¼¼ÆÊ±
+	time = clock(); //å¼€å§‹è®¡æ—¶
 	for(i=0; i<=255; i+=5){
 		t = clock(); 
 		nobuff_printf("[%2d] mix graph, alpha = %3d, use time: ", i, i);
 		Graph_FillAlpha(&fg, i);
 		Graph_Mix(&bg, &fg, Pos(0,0));
-		printf("%ldms\n", clock()-t);//½áÊø¼ÆÊ±£¬Êä³ö½á¹û
+		printf("%ldms\n", clock()-t);//ç»“æŸè®¡æ—¶ï¼Œè¾“å‡ºç»“æœ
 	} 
 	printf("total time: %ldms\n", clock()-time);
 	return 0;
