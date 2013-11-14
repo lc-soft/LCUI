@@ -10,6 +10,8 @@
 #include LC_PROGBAR_H
 #include LC_PICBOX_H
 
+#include <time.h>
+
 /* 动态改变进度条的数据 */
 static void change_progress( void *arg )
 {
@@ -18,6 +20,7 @@ static void change_progress( void *arg )
 	LCUI_Widget *label;
 	LCUI_Widget *widget;
 	
+	srand((unsigned int)time(NULL));
 	/* 创建一个label部件 */
 	widget = (LCUI_Widget *)arg;
 	label = Widget_New("label");
@@ -30,15 +33,15 @@ static void change_progress( void *arg )
 
 	/* 设置最大值 */
 	ProgressBar_SetMaxValue(widget, max); 
-	for( i=0; i<max; i+=rand()%5 ) {
+	for( i=0; i<max; i+=(rand()%3+1) ) {
 		/* 设置当前值 */
 		ProgressBar_SetValue(widget, i); 
 		/* 转换成字符串 */
 		sprintf( str, "%d%%", (int)(i*100.0/max) );
 		/* 设置显示的文本 */
 		Label_Text( label, str );
-		/* 暂停0.1秒 */
-		LCUI_MSleep(100);
+		/* 随机暂停一段时间 */
+		LCUI_MSleep(20+(rand()%80));
 	}
 	ProgressBar_SetValue( widget, max );
 	Label_Text( label, "100%" );
@@ -60,17 +63,17 @@ int main(int argc, char **argv)
 	window = Widget_New("window");
 	progbar = Widget_New("progress_bar");
 
-	Window_SetTitleTextW(window, L"测试进度条部件");
-	Widget_Resize(window, Size(320, 240));
-	Window_ClientArea_Add(window, progbar);
-	Widget_SetAlign(progbar, ALIGN_MIDDLE_CENTER, Pos(0,0)); 
-	Widget_Resize(progbar, Size(300, 25));
+	Window_SetTitleTextW( window, L"测试进度条部件" );
+	Widget_Resize( window, Size(320, 240) );
+	Window_ClientArea_Add( window, progbar );
+	Widget_SetAlign( progbar, ALIGN_MIDDLE_CENTER, Pos(0,0) );
+	Widget_Resize( progbar, Size(300, 25) );
 
-	LCUIThread_Create(&thread, change_progress, (void*)progbar);
+	LCUIThread_Create( &thread, change_progress, (void*)progbar );
 	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 
-	Widget_Show(progbar);
-	Widget_Show(window);
+	Widget_Show( progbar );
+	Widget_Show( window );
 	return LCUI_Main();
 }
 
