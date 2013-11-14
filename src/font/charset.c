@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * charset.c -- 字符集的操作。
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -55,8 +55,8 @@
 /* 编码转换，从一种编码转为另一种编码，主要是调用iconv的API实现字符编码转换 */
 static int 
 code_convert(	char *src_charset,	char *des_charset, 
-		const char *inbuf,	unsigned int inlen,
-		unsigned char *outbuf,	unsigned int outlen )
+		const char *inbuf,	size_t inlen,
+		unsigned char *outbuf,	size_t outlen )
 {
 	iconv_t cd;
 	const char **pin = &inbuf;
@@ -184,7 +184,7 @@ LCUICharset_GB2312ToUnicode( const char *src_gb2312, wchar_t **des_unicode )
 #ifdef LCUI_BUILD_IN_LINUX
 	char *buff;
 	unsigned char *p;
-	unsigned int len, new_len;
+	size_t len, new_len;
  
 	len = strlen( src_gb2312 );
 	new_len = len*3;
