@@ -7,6 +7,7 @@
 #include LC_WINDOW_H
 #include LC_LABEL_H 
 #include LC_RES_H
+
 static void destroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	LCUI_MainLoop_Quit(NULL);
