@@ -341,13 +341,13 @@ Window_Init( LCUI_Widget *win_p )
 	Widget_Resize(win_p, Size(100, 50));
 	Widget_Show(btn_close);
 	/* 关联拖动事件，让鼠标能够拖动标题栏并使窗口移动 */
-	Widget_Event_Connect(titlebar, EVENT_DRAG, Window_ExecMove );
+	Widget_ConnectEvent(titlebar, EVENT_DRAG, Window_ExecMove );
 	/* 
 	 * 由于需要在窗口获得/失去焦点时进行相关处理，因此需要将回调函数 与部件
 	 * 的FOCUS_IN和FOCUS_OUT事件 进行关联
 	 * */
-	Widget_Event_Connect( win_p, EVENT_FOCUSOUT, Window_FocusOut );
-	Widget_Event_Connect( win_p, EVENT_FOCUSIN, Window_FocusIn );
+	Widget_ConnectEvent( win_p, EVENT_FOCUSOUT, Window_FocusOut );
+	Widget_ConnectEvent( win_p, EVENT_FOCUSIN, Window_FocusIn );
 	/* 设置窗口部件的初始位置 */
 	Widget_SetAlign( win_p, ALIGN_MIDDLE_CENTER, Pos(0,0) );
 }

@@ -59,9 +59,9 @@ static int WidgetQueue_FindPos( LCUI_Queue *queue, LCUI_Widget *widget )
 	int i, result = -1, total;
 
 	total = Queue_GetTotal(queue);
-	for(i = 0; i < total; ++i) {
-		temp = Queue_Get(queue, i);
-		if(temp == widget) {
+	for(i=0; i<total; ++i) {
+		temp = (LCUI_Widget*)Queue_Get(queue, i);
+		if( temp == widget ) {
 			result = i;
 			break;
 		}
@@ -70,21 +70,16 @@ static int WidgetQueue_FindPos( LCUI_Queue *queue, LCUI_Widget *widget )
 }
 
 /** 将回调函数与部件的指定事件进行关联 */
-LCUI_API int Widget_Event_Connect(
+LCUI_API int Widget_ConnectEvent(
 			LCUI_Widget *widget, 
 			WidgetEventType event_id,
 			void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) )
 {
-	LCUI_App *app;
 	LCUI_Func func_data;
+
 	if( !widget ) {
 		return -1;
 	}
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		return -2;
-	}
-	func_data.id = app->id;
 	func_data.func = (CallBackFunc)func;
 	func_data.destroy_arg[0] = FALSE;
 	func_data.destroy_arg[1] = FALSE;
@@ -92,8 +87,15 @@ LCUI_API int Widget_Event_Connect(
 	func_data.arg[1] = NULL;
 	//_DEBUG_MSG("widget: %p, event id: %d, callback func: %p\n",
 	//		widget, event_id, func_data->func);
-	EventSlots_Add( &widget->event, event_id, &func_data );
-	return 0;
+	return EventSlots_Add( &widget->event, event_id, &func_data );
+}
+
+/** 解除部件事件的连接 */
+LCUI_API int Widget_DisconnectEvent(	LCUI_Widget *widget, 
+					WidgetEventType event_id, 
+					int connect_id )
+{
+	return EventSlots_Delete( &widget->event, event_id, connect_id );
 }
 
 /** 处理与部件事件关联的回调函数 */
@@ -102,7 +104,7 @@ LCUI_API int Widget_DispatchEvent(	LCUI_Widget *widget,
 {
 	int i,n;
 	LCUI_EventSlot *slot;
-	LCUI_Task *task;
+	LCUI_Task *p_task, task_buff;
 	LCUI_WidgetEvent *p_buff;
 
 	if( !widget ) {
@@ -115,7 +117,7 @@ LCUI_API int Widget_DispatchEvent(	LCUI_Widget *widget,
 	}
 	n = Queue_GetTotal( &slot->func_data );
 	for(i=0; i<n; ++i) {
-		task = (LCUI_Task*)Queue_Get( &slot->func_data, i );
+		p_task = (LCUI_Task*)Queue_Get( &slot->func_data, i );
 		p_buff = (LCUI_WidgetEvent*)
 		malloc( sizeof(LCUI_WidgetEvent) );
 		if( !p_buff ) {
@@ -123,9 +125,12 @@ LCUI_API int Widget_DispatchEvent(	LCUI_Widget *widget,
 			abort();
 		}
 		*p_buff = *event;
-		task->arg[1] = p_buff;
-		task->destroy_arg[1] = TRUE;
-		AppTasks_Add( task );
+		task_buff.id = widget->app_id;
+		task_buff.arg[0] = p_task->arg[0];
+		task_buff.arg[1] = p_buff;
+		task_buff.destroy_arg[0] = p_task->destroy_arg[0];
+		task_buff.destroy_arg[1] = TRUE;
+		AppTasks_Add( &task_buff );
 	}
 	return 0;
 }

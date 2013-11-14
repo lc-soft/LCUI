@@ -246,7 +246,7 @@ RadioButton_Init( LCUI_Widget *widget )
 	Widget_Show(container[0]);
 	Widget_Show(container[1]);
 	
-	Widget_Event_Connect( widget, EVENT_CLICKED, RadioButton_Click );
+	Widget_ConnectEvent( widget, EVENT_CLICKED, RadioButton_Click );
 	
 	valid_state = (WIDGET_STATE_NORMAL | WIDGET_STATE_ACTIVE);
 	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);

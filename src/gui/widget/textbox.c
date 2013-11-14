@@ -511,13 +511,13 @@ static void TextBox_ExecInit( LCUI_Widget *widget )
 	WidgetMsg_Connect( widget, WIDGET_MSG_HIDE_PLACEHOLDER, TextBox_HidePlaceHolder );
 	WidgetMsg_Connect( widget, WIDGET_MSG_SHOW_PLACEHOLDER, TextBox_ShowPlaceHolder );
 
-	Widget_Event_Connect( widget, EVENT_DRAG, TextBox_OnClicked );
+	Widget_ConnectEvent( widget, EVENT_DRAG, TextBox_OnClicked );
 	/* 关联 FOCUS_OUT 和 FOCUS_IN 事件 */
-	Widget_Event_Connect( widget, EVENT_FOCUSOUT, _putout_textbox_cursor );
-	Widget_Event_Connect( widget, EVENT_FOCUSIN, _putin_textbox_cursor );
+	Widget_ConnectEvent( widget, EVENT_FOCUSOUT, _putout_textbox_cursor );
+	Widget_ConnectEvent( widget, EVENT_FOCUSIN, _putin_textbox_cursor );
 	/* 关联按键输入事件 */
-	Widget_Event_Connect( widget, EVENT_KEYBOARD, TextBox_ProcessKey );
-	Widget_Event_Connect( widget, EVENT_INPUT, TextBox_Input );
+	Widget_ConnectEvent( widget, EVENT_KEYBOARD, TextBox_ProcessKey );
+	Widget_ConnectEvent( widget, EVENT_INPUT, TextBox_Input );
 	/* 默认不启用多行文本模式 */
 	TextBox_SetMultiline( widget, FALSE );
 }
