@@ -1,4 +1,5 @@
 ﻿// 此程序用于测试部件的样式自定义功能
+// 运行程序前，请将 test 目录下的style.css文件复制到程序所在目录
 #define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
