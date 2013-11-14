@@ -118,10 +118,15 @@ typedef union LCUI_WidgetEvent_ {
 /*----------------------------- 部件事件 ------------------------------------*/
 
 /** 将回调函数与部件的指定事件进行关联 */
-LCUI_API int Widget_Event_Connect(
+LCUI_API int Widget_ConnectEvent(
 			LCUI_Widget *widget, 
 			WidgetEventType event_id,
 			void (*func)(LCUI_Widget*, LCUI_WidgetEvent*) );
+
+/** 解除部件事件的连接 */
+LCUI_API int Widget_DisconnectEvent(	LCUI_Widget *widget, 
+					WidgetEventType event_id, 
+					int connect_id );
 
 /** 处理与部件事件关联的回调函数 */
 LCUI_API int Widget_DispatchEvent(	LCUI_Widget *widget, 
