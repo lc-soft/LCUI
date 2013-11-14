@@ -1,4 +1,5 @@
-﻿#include <LCUI_Build.h>
+﻿// 登录界面
+#include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
 #include LC_GRAPH_H
@@ -45,6 +46,7 @@ static void LeftMoveAllCloud(void* arg)
 	}
 }
 
+/** 创建“云” */
 static void CreateCloud(void)
 {
 	int i, screen_w, img_w, x, avg_w;
@@ -73,7 +75,7 @@ static void CreateCloud(void)
 	LCUITimer_Set( 50, LeftMoveAllCloud, NULL, TRUE );
 }
 
-
+/** 初始化登录界面的背景 */
 static void BackgroundImage_Init(void)
 {
 	LCUI_Widget *widget;
@@ -85,7 +87,7 @@ static void BackgroundImage_Init(void)
 	CreateCloud();
 }
 
-/* 释放程序的资源 */
+/** 释放程序的资源 */
 static void free_resource(void)
 {
 	Graph_Free( &user_avatar );
@@ -93,7 +95,7 @@ static void free_resource(void)
 	Graph_Free( &cloud_img );
 }
 
-/* 载入程序所需资源 */
+/** 载入程序所需资源 */
 static void load_resource(void)
 {
 	int ret;
@@ -122,6 +124,7 @@ static void load_resource(void)
 	LCUIApp_AtQuit( free_resource );
 }
 
+/** 创建一个部件，用于显示用户头像 */
 void create_imgbox( LCUI_Widget **imgbox )
 {
 	LCUI_Widget *widget;
@@ -132,6 +135,7 @@ void create_imgbox( LCUI_Widget **imgbox )
 	*imgbox = widget;
 }
 
+/** 创建一个label部件，用于显示用户名 */
 static void create_usernamelabel( LCUI_Widget **usernamelabel )
 {
 	LCUI_Widget *widget;
@@ -146,6 +150,7 @@ static void create_usernamelabel( LCUI_Widget **usernamelabel )
 	*usernamelabel = widget;
 }
 
+/** 创建密码输入框 */
 static void create_passwdbox( LCUI_Widget **passwdbox )
 {
 	LCUI_Widget *widget;
@@ -162,6 +167,7 @@ static void create_passwdbox( LCUI_Widget **passwdbox )
 	*passwdbox = widget;
 }
 
+/* 创建错误提示 */
 static void create_error_tip( LCUI_Widget **tip )
 {
 	LCUI_Widget *widget;
@@ -176,6 +182,7 @@ static void create_error_tip( LCUI_Widget **tip )
 	*tip = widget;
 }
 
+/** 验证密码 */
 static void verify_passwd( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	wchar_t buff[32];
