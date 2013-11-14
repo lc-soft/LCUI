@@ -1,4 +1,7 @@
 // 时钟的例子程序
+// 运行程序前，请将所需的资源文件放在程序文件所在的目录下，以确保能够载入它们
+// 所需的图像资源文件一般在test目录下
+
 #define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -10,7 +13,7 @@
 #include LC_PICBOX_H
 #include <time.h>
 
-/* 图片文件 */
+/* 图片资源文件 */
 #define IMG_DIAL		"dial.png"
 #define IMG_HOUR_PONTER		"hand_hour.png"
 #define IMG_MINUTE_POINTER	"hand_minute.png"
@@ -23,7 +26,8 @@ static LCUI_Graph clock_bg, hour_ptr, min_ptr, sec_ptr;
 /* 旋转后的时钟指针图像 */
 static LCUI_Graph tmp_hour_ptr, tmp_min_ptr, tmp_sec_ptr;
 
-static void UpdateClockPointer(void)
+/** 响应定时器，更新时钟的指针 */
+static void UpdateClockPointer( void *arg )
 {
 	time_t rawtime;
 	struct tm * timeinfo;
@@ -85,9 +89,9 @@ static void CreateClockWidget( LCUI_Widget *mian_window )
 	Window_ClientArea_Add(mian_window, wdg_dial);
 	/* 改变部件尺寸，使用固定的尺寸 */
 	Widget_Resize(wdg_dial, Graph_GetSize(&clock_bg));
-	Widget_Resize(wdg_hour_ptr, Size(hour_ptr.height, hour_ptr.height));
-	Widget_Resize(wdg_min_ptr, Size(min_ptr.height, min_ptr.height));
-	Widget_Resize(wdg_sec_ptr, Size(sec_ptr.height, sec_ptr.height));
+	Widget_Resize(wdg_hour_ptr, Size(hour_ptr.h, hour_ptr.h));
+	Widget_Resize(wdg_min_ptr, Size(min_ptr.h, min_ptr.h));
+	Widget_Resize(wdg_sec_ptr, Size(sec_ptr.h, sec_ptr.h));
 	/* 改变部件的布局方式，都是居中显示 */
 	Widget_SetAlign(wdg_dial, ALIGN_MIDDLE_CENTER, Pos(0, 0));
 	Widget_SetAlign(wdg_hour_ptr, ALIGN_MIDDLE_CENTER, Pos(0, 0));
@@ -98,7 +102,7 @@ static void CreateClockWidget( LCUI_Widget *mian_window )
 	Widget_SetZIndex( wdg_min_ptr, 1 );
 	Widget_SetZIndex( wdg_sec_ptr, 2 );
 	/* 先更新一次时钟上的指针 */
-	UpdateClockPointer();
+	UpdateClockPointer(NULL);
 	/* 显示时钟 */
 	Widget_Show(wdg_hour_ptr);
 	Widget_Show(wdg_min_ptr);
@@ -130,7 +134,7 @@ int main( int argc, char **argv )
 	/* 创建时钟部件 */
 	CreateClockWidget( window );
 	/* 设置定时器，每隔1秒更新一次时指针 */
-	LCUITimer_Set( 1000, UpdateClockPointer, TRUE );
+	LCUITimer_Set( 1000, UpdateClockPointer, NULL, TRUE );
 	/* 关联窗口关闭按钮的CLICKED事件 */
 	Widget_Event_Connect(Window_GetCloseButton(window), EVENT_CLICKED, Quit);
 	/* 显示窗口 */
