@@ -9,14 +9,14 @@
 
 #define MAX_ROW_PIXEL_NUM 11
 
-char help_text[]={
+static char help_text[]={
 	"picture file to C code."
 	"usage:\n"
 	"%s image_file_path\n"
 };
 
-static int
-graph_conv( LCUI_Graph *buff, char *out_filepath )
+/** Converte image data to C code, and write to the source code file */
+static int GraphConvertToCode( LCUI_Graph *buff, char *out_filepath )
 {
 	int i;
 	FILE *fp;
@@ -24,7 +24,7 @@ graph_conv( LCUI_Graph *buff, char *out_filepath )
 
 	sprintf( file, "%s.c", out_filepath );
 	printf("output file: %s\n", file);
-
+	/* open output file */
 	fp = fopen( file, "w+" );
 	if( !fp ) {
 		return -1;
@@ -37,7 +37,7 @@ graph_conv( LCUI_Graph *buff, char *out_filepath )
 	);
 	/* red channel */
 	fprintf( fp, "static unsigned char graph_red[] = {" );
-	for( i=0; i<buff->width*buff->height; ++i ) {
+	for( i=0; i<buff->w*buff->h; ++i ) {
 		if( i%MAX_ROW_PIXEL_NUM == 0 ) {
 			fprintf( fp, "\n\t" );
 		}
@@ -47,7 +47,7 @@ graph_conv( LCUI_Graph *buff, char *out_filepath )
 
 	/* green channel */
 	fprintf( fp, "static unsigned char graph_green[] = {" );
-	for( i=0; i<buff->width*buff->height; ++i ) {
+	for( i=0; i<buff->w*buff->h; ++i ) {
 		if( i%MAX_ROW_PIXEL_NUM == 0 ) {
 			fprintf( fp, "\n\t" );
 		}
@@ -57,7 +57,7 @@ graph_conv( LCUI_Graph *buff, char *out_filepath )
 
 	/* blue channel */
 	fprintf( fp, "static unsigned char graph_blue[] = {" );
-	for( i=0; i<buff->width*buff->height; ++i ) {
+	for( i=0; i<buff->w*buff->h; ++i ) {
 		if( i%MAX_ROW_PIXEL_NUM == 0 ) {
 			fprintf( fp, "\n\t" );
 		}
@@ -66,9 +66,9 @@ graph_conv( LCUI_Graph *buff, char *out_filepath )
 	fprintf( fp, "\n};\n\n" );
 
 	/* alpha channel */
-	if( buff->have_alpha ) {
+	if( buff->color_type == COLOR_TYPE_RGBA ) {
 		fprintf( fp, "static unsigned char graph_alpha[] = {" );
-		for( i=0; i<buff->width*buff->height; ++i ) {
+		for( i=0; i<buff->w*buff->h; ++i ) {
 			if( i%MAX_ROW_PIXEL_NUM == 0 ) {
 				fprintf( fp, "\n\t" );
 			}
@@ -78,29 +78,26 @@ graph_conv( LCUI_Graph *buff, char *out_filepath )
 	}
 
 	fprintf( fp,
-		"int InCoreIMG_LoadMyIIMG ( LCUI_Graph *buff )\n"
+		"int InCoreIMG_LoadMyIIMG( LCUI_Graph *buff )\n"
 		"{\n"
 		"	int ret;\n"
 		"	if( Graph_IsValid( buff ) ) {\n"
 		"		Graph_Free( buff );\n"
 		"	}\n"
 		"	Graph_Init( buff );\n"
-		"	buff->have_alpha = %s;\n"
+		"	buff->color_type = %s;\n"
 		"	buff->alpha = 255;\n"
-		"	buff->type = %d;\n"
 		"	ret = Graph_Create( buff, %d, %d );\n"
 		"	if( ret == 0 ) {\n"
 		"		memcpy( buff->rgba[0], red, sizeof(red) );\n"
 		"		memcpy( buff->rgba[1], green, sizeof(green) );\n"
 		"		memcpy( buff->rgba[2], blue, sizeof(blue) );\n",
-		buff->have_alpha?"TRUE":"FALSE",
-		buff->type, buff->width, buff->height
+		buff->color_type == COLOR_TYPE_RGBA? "COLOR_TYPE_RGBA":"COLOR_TYPE_RGB",
+		buff->w, buff->h
 	);
-	if( buff->have_alpha ) {
+	if( buff->color_type == COLOR_TYPE_RGBA ) {
 		fprintf( fp,
-			"		if( buff->have_alpha ) {\n"
-			"			memcpy( buff->rgba[3], alpha, sizeof(alpha) );\n"
-			"		}\n" 
+			"		memcpy( buff->rgba[3], alpha, sizeof(alpha) );\n"
 		);
 	}
 	fprintf( fp,
@@ -114,15 +111,21 @@ graph_conv( LCUI_Graph *buff, char *out_filepath )
 
 int main( int argc, char *argv[] )
 {
-	LCUI_Graph graph;
-
-	Graph_Init( &graph );
-
+	int ret;
 	if( argc == 2 ) {
-		Graph_LoadImage( argv[1], &graph );
-		graph_conv( &graph, argv[1] );
+		LCUI_Graph graph;
+		Graph_Init( &graph );
+		ret = Graph_LoadImage( argv[1], &graph );
+		if( ret != 0 ) {
+			return -1;
+		}
+		ret = GraphConvertToCode( &graph, argv[1] );
+		if( ret != 0 ) {
+			return -2;
+		}
+		Graph_Free( &graph );
 	} else {
-		printf(help_text, argv[0]);
+		printf( help_text, argv[0] );
 	}
 	return 0;
 }
