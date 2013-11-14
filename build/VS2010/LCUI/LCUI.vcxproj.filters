@@ -216,6 +216,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\window.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\window.hpp">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_library.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>

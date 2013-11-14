@@ -8,9 +8,6 @@ Global
 		Debug|ARM = Debug|ARM
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
-		Release Library|ARM = Release Library|ARM
-		Release Library|Win32 = Release Library|Win32
-		Release Library|x64 = Release Library|x64
 		Release|ARM = Release|ARM
 		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
@@ -20,10 +17,6 @@ Global
 		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}.Debug|Win32.ActiveCfg = Debug|Win32
 		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}.Debug|Win32.Build.0 = Debug|Win32
 		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}.Debug|x64.ActiveCfg = Debug|Win32
-		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}.Release Library|ARM.ActiveCfg = Release Library|Win32
-		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}.Release Library|Win32.ActiveCfg = Release Library|Win32
-		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}.Release Library|Win32.Build.0 = Release Library|Win32
-		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}.Release Library|x64.ActiveCfg = Release Library|Win32
 		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}.Release|ARM.ActiveCfg = Release|Win32
 		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}.Release|Win32.ActiveCfg = Release|Win32
 		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}.Release|Win32.Build.0 = Release|Win32
