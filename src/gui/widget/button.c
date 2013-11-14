@@ -188,7 +188,7 @@ Button_Init( LCUI_Widget *widget )
 	Widget_SetAutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK);
 	Widget_SetStyleID( widget, BUTTON_STYLE_DEFAULT );
 	/* 关联EVENT_FOCUSOUT事件，以在按钮失去焦点时重绘按钮 */
-	Widget_Event_Connect( widget, EVENT_FOCUSOUT, Button_ProcFocusOut );
+	Widget_ConnectEvent( widget, EVENT_FOCUSOUT, Button_ProcFocusOut );
 }
 
 /* 获取嵌套在按钮部件里的label部件 */

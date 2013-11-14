@@ -150,7 +150,7 @@ ScrollBar_Init( LCUI_Widget *widget )
 	Widget_SetBackgroundColor( widget, RGB(200,200,200) );
 	Widget_SetBackgroundTransparent( widget, FALSE );
 	Widget_Show( scrollbar->widget );
-	Widget_Event_Connect( scrollbar->widget, EVENT_DRAG, ScrollBar_Drag );
+	Widget_ConnectEvent( scrollbar->widget, EVENT_DRAG, ScrollBar_Drag );
 }
 
 static void 

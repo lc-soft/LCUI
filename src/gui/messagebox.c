@@ -219,7 +219,7 @@ msgbox_add_BTN_OK( LCUI_Widget *btn_area )
 	Button_TextW( btn, TEXT_MB_BTN_OK );
 	Widget_Container_Add( btn_area, btn );
 	Widget_SetAlign( btn, ALIGN_MIDDLE_CENTER, Pos(0,0) );
-	Widget_Event_Connect( btn, EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn, EVENT_CLICKED, msgbox_mainloop_quit );
 	Widget_Show( btn );
 }
 
@@ -243,8 +243,8 @@ msgbox_add_BTN_OKCANCEL( LCUI_Widget *btn_area )
 	btn_size = MB_BTN_SIZE;
 	Widget_SetAlign( btn[0], ALIGN_MIDDLE_CENTER, Pos(0-(btn_size.w/2.0+3),0) );
 	Widget_SetAlign( btn[1], ALIGN_MIDDLE_CENTER, Pos((btn_size.w/2.0+3),0) );
-	Widget_Event_Connect( btn[0], EVENT_CLICKED, msgbox_mainloop_quit );
-	Widget_Event_Connect( btn[1], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[0], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[1], EVENT_CLICKED, msgbox_mainloop_quit );
 	Widget_Show( btn[0] );
 	Widget_Show( btn[1] );
 }
@@ -276,9 +276,9 @@ msgbox_add_BTN_ABORTRETRYIGNORE( LCUI_Widget *btn_area )
 	Widget_SetAlign( btn[0], ALIGN_MIDDLE_CENTER, Pos(0-(btn_size.w+3),0) );
 	Widget_SetAlign( btn[1], ALIGN_MIDDLE_CENTER, Pos(0,0) );
 	Widget_SetAlign( btn[2], ALIGN_MIDDLE_CENTER, Pos((btn_size.w+3),0) );
-	Widget_Event_Connect( btn[0], EVENT_CLICKED, msgbox_mainloop_quit );
-	Widget_Event_Connect( btn[1], EVENT_CLICKED, msgbox_mainloop_quit );
-	Widget_Event_Connect( btn[2], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[0], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[1], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[2], EVENT_CLICKED, msgbox_mainloop_quit );
 	Widget_Show( btn[0] );
 	Widget_Show( btn[1] );
 	Widget_Show( btn[2] );
@@ -304,8 +304,8 @@ msgbox_add_BTN_RETRYCANCEL( LCUI_Widget *btn_area )
 	btn_size = MB_BTN_SIZE;
 	Widget_SetAlign( btn[0], ALIGN_MIDDLE_CENTER, Pos(0-(btn_size.w/2.0+3),0) );
 	Widget_SetAlign( btn[1], ALIGN_MIDDLE_CENTER, Pos((btn_size.w/2.0+3),0) );
-	Widget_Event_Connect( btn[0], EVENT_CLICKED, msgbox_mainloop_quit );
-	Widget_Event_Connect( btn[1], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[0], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[1], EVENT_CLICKED, msgbox_mainloop_quit );
 	Widget_Show( btn[0] );
 	Widget_Show( btn[1] );
 }
@@ -330,8 +330,8 @@ msgbox_add_BTN_YESNO( LCUI_Widget *btn_area )
 	btn_size = MB_BTN_SIZE;
 	Widget_SetAlign( btn[0], ALIGN_MIDDLE_CENTER, Pos(0-(btn_size.w/2.0+3),0) );
 	Widget_SetAlign( btn[1], ALIGN_MIDDLE_CENTER, Pos((btn_size.w/2.0+3),0) );
-	Widget_Event_Connect( btn[0], EVENT_CLICKED, msgbox_mainloop_quit );
-	Widget_Event_Connect( btn[1], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[0], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[1], EVENT_CLICKED, msgbox_mainloop_quit );
 	Widget_Show( btn[0] );
 	Widget_Show( btn[1] );
 }
@@ -363,9 +363,9 @@ msgbox_add_BTN_YESNOCANCEL( LCUI_Widget *btn_area )
 	Widget_SetAlign( btn[0], ALIGN_MIDDLE_CENTER, Pos(0-(btn_size.w+3),0) );
 	Widget_SetAlign( btn[1], ALIGN_MIDDLE_CENTER, Pos(0,0) );
 	Widget_SetAlign( btn[2], ALIGN_MIDDLE_CENTER, Pos((btn_size.w+3),0) );
-	Widget_Event_Connect( btn[0], EVENT_CLICKED, msgbox_mainloop_quit );
-	Widget_Event_Connect( btn[1], EVENT_CLICKED, msgbox_mainloop_quit );
-	Widget_Event_Connect( btn[2], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[0], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[1], EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn[2], EVENT_CLICKED, msgbox_mainloop_quit );
 	Widget_Show( btn[0] );
 	Widget_Show( btn[1] );
 	Widget_Show( btn[2] );
@@ -528,9 +528,9 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 	
 	loop = msgbox_mainloop_new( msgbox );
 	/* 关联消息框右上角关闭按钮的CLICKED事件 */
-	Widget_Event_Connect( btn_close, EVENT_CLICKED, msgbox_mainloop_quit );
+	Widget_ConnectEvent( btn_close, EVENT_CLICKED, msgbox_mainloop_quit );
 	/* 关联用于显示文本的label部件的RESIZE事件 */
-	Widget_Event_Connect( textbox, EVENT_RESIZE, auto_resize_msgbox );
+	Widget_ConnectEvent( textbox, EVENT_RESIZE, auto_resize_msgbox );
 	/* 进入主循环 */
 	LCUI_MainLoop_Run( loop );
 	msgbox_data = msgbox_data_find( msgbox );

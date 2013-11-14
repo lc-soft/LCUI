@@ -491,12 +491,12 @@ static AnimationStatus* AnimationStream_Update( int *sleep_time )
 	total = Queue_GetTotal(&animation_stream);
 	for(i=0; i<total; ++i){
 		ani_status = (AnimationStatus*)
-				Queue_Get( &animation_stream, i );
+		Queue_Get( &animation_stream, i );
 		if(ani_status->state == PLAY) {
 			break;
 		}
 	}
-	if(i >= total || !ani_status ) {
+	if(i >= total ) {
 		return NULL;
 	}
 	/*
