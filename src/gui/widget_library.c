@@ -51,8 +51,14 @@ LCUI_API int WidgetFunc_Add(	const char *type_name,
 	if( !data ) {
 		return -2;
 	}
-	Get_FuncData(&func_data, (CallBackFunc)widget_func, NULL, NULL);
+	
 	func_data.id = func_type;
+	func_data.func = (CallBackFunc)widget_func;
+	func_data.destroy_arg[0] = FALSE;
+	func_data.destroy_arg[1] = FALSE;
+	func_data.arg[0] = NULL;
+	func_data.arg[1] = NULL;
+
 	total = Queue_GetTotal( &data->func );
 	for(i=0; i<total; i++) {
 		temp_func = (LCUI_Func*)Queue_Get( &data->func, i );
@@ -203,9 +209,10 @@ LCUI_API LCUI_BOOL WidgetType_Valid( const char *widget_type )
 
 	app = LCUIApp_GetSelf();
 	if( !app ) {
+		_DEBUG_MSG("thread id: %ld\n", LCUIThread_SelfID());
 		return FALSE;
 	}
-
+	
 	n = Queue_GetTotal( &app->widget_lib );
 	for(i=0; i<n; ++i) {
 		wd = (WidgetTypeData *)Queue_Get(&app->widget_lib, i);
