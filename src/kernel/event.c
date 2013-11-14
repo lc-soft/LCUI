@@ -253,22 +253,29 @@ LCUI_API LCUI_EventSlot* EventSlots_Find( LCUI_Queue *slots, int event_id )
 /** 添加事件槽与事件的关联记录 */
 LCUI_API int EventSlots_Add( LCUI_Queue *slots, int event_id, LCUI_Func *func )
 {
-	int id;
 	LCUI_EventSlot *slot;
 	LCUI_EventSlot new_slot;
 
 	slot = EventSlots_Find( slots, event_id );
 	if ( slot ) {
-		return (int)Queue_Add( &slot->func_data, func );
+		func->id = ++slot->temp_connect_id;
+		if( !Queue_Add( &slot->func_data, func ) ) {
+			return -1;
+		}
+		return func->id;
 	}
 
 	new_slot.id = event_id;
+	new_slot.temp_connect_id = 100;
+	func->id = 100;
 	Queue_Init( &new_slot.func_data, sizeof(LCUI_Func), NULL );
-	id = (int)Queue_Add( &new_slot.func_data, func );
-	if( Queue_Add( slots, &new_slot ) ) {
-		return -1;
+	if( !Queue_Add( &new_slot.func_data, func ) ) {
+		return -2;
 	}
-	return id==0?-2:id;
+	if( !Queue_Add( slots, &new_slot ) ) {
+		return -3;
+	}
+	return new_slot.temp_connect_id;
 }
 
 /** 从事件槽中移除指定记录 */
@@ -276,13 +283,16 @@ LCUI_API int EventSlots_Delete( LCUI_Queue *slots, int event_id, int func_id )
 {
 	int n;
 	LCUI_EventSlot *slot;
+	LCUI_Func *p_func;
+
 	slot = EventSlots_Find( slots, event_id );
 	if( !slot ) {
 		return -1;
 	}
 	n = Queue_GetTotal( &slot->func_data );
 	while(n--) {
-		if( func_id == (int)Queue_Get(&slot->func_data, n) ) {
+		p_func = (LCUI_Func*)Queue_Get( &slot->func_data, n );
+		if( p_func->id == func_id ) {
 			Queue_Delete( &slot->func_data, n );
 			return 0;
 		}
