@@ -1,0 +1,15 @@
+﻿生成启动时间为 2013/11/14 15:26:59。
+     1>项目“D:\重要数据\我的文件\LCUI项目\LCUI\build\VS2012\test_lcui_graph_mix\test_lcui_graph_mix.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         D:\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"D:\重要数据\我的文件\LCUI项目\LCUI\build\VS2012\\include" /I"D:\重要数据\我的文件\LCUI项目\LCUI\build\VS2012\\..\..\include" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _USING_V110_SDK71_ /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TC /wd4819 /analyze- /errorReport:prompt ..\..\..\test\test_lcui_graph_mix.c
+         test_lcui_graph_mix.c
+       Link:
+         D:\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\重要数据\我的文件\LCUI项目\LCUI\build\VS2012\Release\test_lcui_graph_mix.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"D:\重要数据\我的文件\LCUI项目\LCUI\build\VS2012\Release\\" LCUI.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\重要数据\我的文件\LCUI项目\LCUI\build\VS2012\Release\test_lcui_graph_mix.pdb" /SUBSYSTEM:CONSOLE,"5.01" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\重要数据\我的文件\LCUI项目\LCUI\build\VS2012\Release\test_lcui_graph_mix.lib" /MACHINE:X86 /SAFESEH Release\test_lcui_graph_mix.obj
+         正在生成代码
+         已完成代码的生成
+         test_lcui_graph_mix.vcxproj -> D:\重要数据\我的文件\LCUI项目\LCUI\build\VS2012\Release\test_lcui_graph_mix.exe
+     1>已完成生成项目“D:\重要数据\我的文件\LCUI项目\LCUI\build\VS2012\test_lcui_graph_mix\test_lcui_graph_mix.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.24
