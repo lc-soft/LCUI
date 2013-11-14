@@ -34,6 +34,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "login", "login\login.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "screenlock", "screenlock\screenlock.vcxproj", "{66A6251F-6A73-47AC-B955-25ECE1ABE26E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_messagebox", "test_messagebox\test_messagebox.vcxproj", "{FB3181C4-D459-4190-8E80-92CDD3A5594B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -150,6 +152,14 @@ Global
 		{66A6251F-6A73-47AC-B955-25ECE1ABE26E}.Release|Win32.ActiveCfg = Release|Win32
 		{66A6251F-6A73-47AC-B955-25ECE1ABE26E}.Release|Win32.Build.0 = Release|Win32
 		{66A6251F-6A73-47AC-B955-25ECE1ABE26E}.Release|x64.ActiveCfg = Release|Win32
+		{FB3181C4-D459-4190-8E80-92CDD3A5594B}.Debug|ARM.ActiveCfg = Debug|Win32
+		{FB3181C4-D459-4190-8E80-92CDD3A5594B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FB3181C4-D459-4190-8E80-92CDD3A5594B}.Debug|Win32.Build.0 = Debug|Win32
+		{FB3181C4-D459-4190-8E80-92CDD3A5594B}.Debug|x64.ActiveCfg = Debug|Win32
+		{FB3181C4-D459-4190-8E80-92CDD3A5594B}.Release|ARM.ActiveCfg = Release|Win32
+		{FB3181C4-D459-4190-8E80-92CDD3A5594B}.Release|Win32.ActiveCfg = Release|Win32
+		{FB3181C4-D459-4190-8E80-92CDD3A5594B}.Release|Win32.Build.0 = Release|Win32
+		{FB3181C4-D459-4190-8E80-92CDD3A5594B}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
