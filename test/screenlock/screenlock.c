@@ -17,6 +17,29 @@ static LCUI_Widget	*pic_bg, *time_box, *pic_btn_line,
 static LCUI_Widget *wday_label, *date_label;
 static LCUI_Graph img_digital[9], img_dot, img_bg, img_btn, img_btn_bg;
 
+static LCUI_BOOL need_move_pic_btn = FALSE;
+
+static void PicBtn_UpdatePos( void *arg )
+{
+	static int n = 2;
+	LCUI_Pos pos;
+	if( !need_move_pic_btn ) {
+		n = 4;
+		return;
+	}
+	pos = _Widget_GetPos( pic_btn );
+	if( pos.x == 0 ) {
+		return;
+	}
+	pos.x -= n;
+	if( pos.x < 0 ) {
+		pos.x = 0;
+	}
+	pos.y = 0;
+	n+=2;
+	Widget_Move( pic_btn, pos );
+}
+
 /* 移动滑块 */
 void move_pic_btn(LCUI_Widget *widget, LCUI_WidgetEvent *event)
 {
@@ -24,6 +47,7 @@ void move_pic_btn(LCUI_Widget *widget, LCUI_WidgetEvent *event)
 	LCUI_Rect des, rect;
 	LCUI_Pos pos, parent;
 
+	need_move_pic_btn = FALSE;
 	parent = Widget_GetGlobalPos(widget->parent);
 	pos = Pos_Sub(event->drag.new_pos, parent);
 	Widget_Move(widget, pos);
@@ -35,7 +59,7 @@ void move_pic_btn(LCUI_Widget *widget, LCUI_WidgetEvent *event)
 		if(LCUIRect_Overlay(rect, des)) {
 			LCUI_MainLoop_Quit(NULL);
 		} else {/* 否则，让部件回到起始位置，这个使用的是匀速移动 */
-			Widget_MoveToPos(widget, Pos(0,0), 500);
+			need_move_pic_btn = TRUE;
 		}
 	}
 }
@@ -72,7 +96,7 @@ static void FreeIMG(void)
 }
 
 /* 动态改变label部件的文本内容 */
-static void update_time(void)
+static void UpdateTimeView(void *arg)
 {
 	time_t rawtime;
 	struct tm *timeinfo;
@@ -121,6 +145,7 @@ static void CreateGUI( LCUI_Widget *win )
 	/* 设置这些部件的初始背景图 */
 	Widget_SetBackgroundImage( pic_bg, &img_bg );
 	Widget_SetBackgroundImage( pic_btn_line, &img_btn_bg );
+	Widget_SetBackgroundLayout( pic_btn_line, LAYOUT_CENTER );
 	Widget_SetBackgroundImage( pic_btn, &img_btn );
 	Widget_SetBackgroundImage( pic_l1, &img_digital[0] );
 	Widget_SetBackgroundImage( pic_l2, &img_digital[0] );
@@ -177,7 +202,7 @@ static void CreateGUI( LCUI_Widget *win )
 	Widget_Show(pic_btn);
 	Widget_Show(pic_btn_line);
 
-	update_time();
+	UpdateTimeView(NULL);
 }
 
 int main( int argc, char **argv )
@@ -198,7 +223,9 @@ int main( int argc, char **argv )
 	/* 将界面创建至窗口内 */
 	CreateGUI( window );
 	/* 设置定时器，用于定时更新时间显示 */
-	LCUITimer_Set( 1000, update_time, TRUE );
+	LCUITimer_Set( 1000, UpdateTimeView, NULL, TRUE );
+	/* 设置定时器，用于更新滑块的位置 */
+	LCUITimer_Set( 20, PicBtn_UpdatePos, NULL, TRUE );
 	/* 显示窗口 */
 	Widget_Show( window );
 	/* 在LCUI退出时释放图像资源 */
