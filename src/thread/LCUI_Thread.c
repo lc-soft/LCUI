@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Thread.c -- 基本的线程管理
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -43,11 +43,10 @@
 #include LC_LCUI_H 
 
 typedef struct _Thread_TreeNode Thread_TreeNode;
-struct _Thread_TreeNode
-{
+struct _Thread_TreeNode {
 	Thread_TreeNode *parent;	/* 父线程结点指针 */
 	LCUI_Thread tid;		/* 父线程ID */
-	LCUI_Queue child;		/* 子线程结点队列 */
+	LCUI_Queue child;		/* 子线程列表 */
 };
 
 static Thread_TreeNode thread_tree;
@@ -59,7 +58,7 @@ static void Destroy_TreeNode( void *arg )
 	Queue_Destroy( &ttn->child );
 }
 
-/* 初始化线程树结点 */
+/** 初始化线程树结点 */
 static void Thread_TreeNode_Init( Thread_TreeNode *ttn )
 {
 	ttn->tid = 0;
@@ -67,14 +66,14 @@ static void Thread_TreeNode_Init( Thread_TreeNode *ttn )
 	Queue_Init( &ttn->child, sizeof(Thread_TreeNode), Destroy_TreeNode );
 }
 
-/* 从指定线程树的结点中搜索匹配的线程ID，并返回线程树结点的指针 */
-static Thread_TreeNode *
-ThreadTree_Find( Thread_TreeNode *ttn, LCUI_Thread tid )
-{ 
+/** 从指定线程树的结点中搜索匹配的线程ID，并返回线程树结点的指针 */
+static Thread_TreeNode * ThreadTree_Find(	Thread_TreeNode *ttn, 
+						LCUI_Thread tid )
+{
 	int i, n;
-	Thread_TreeNode *new_ttn;\
+	Thread_TreeNode *new_ttn;
 
-	if(NULL == ttn) {
+	if( !ttn ) {
 		return NULL;
 	}
 	/* 如果是LCUI的一个线程的ID */
@@ -87,23 +86,26 @@ ThreadTree_Find( Thread_TreeNode *ttn, LCUI_Thread tid )
 		return ttn;
 	}
 	
+	Queue_Lock( &ttn->child );
 	n = Queue_GetTotal( &ttn->child );
 	for(i=0; i<n; ++i) {
-		new_ttn = Queue_Get( &ttn->child, i );
+		new_ttn = (Thread_TreeNode*)Queue_Get( &ttn->child, i );
 		if( !new_ttn ) {
 			continue;
 		}
 		/* 如果该线程树结点指针有效，就继续递归查找 */
-		new_ttn = ThreadTree_Find(new_ttn, tid);
+		new_ttn = ThreadTree_Find( new_ttn, tid );
 		if( new_ttn ) {
+			Queue_Unlock( &ttn->child );
 			return new_ttn;
 		}
 	}
-	return NULL;/* 没有在for循环里返回正常的指针，那么就在这里返回NULL */
+	Queue_Unlock( &ttn->child );
+	/* 没有在for循环里返回正常的指针，那么就在这里返回NULL */
+	return NULL;
 }
 
-static void 
-__LCUIThread_PrintInfo( Thread_TreeNode *ttn )
+static void __LCUIThread_PrintInfo( Thread_TreeNode *ttn )
 {
 	static int level=0;
 	int i, n;
@@ -126,16 +128,14 @@ __LCUIThread_PrintInfo( Thread_TreeNode *ttn )
 	}
 }
 
-/* 打印各个线程的信息 */
-LCUI_API void
-LCUIThread_PrintInfo( void )
+/** 打印各个线程的信息 */
+LCUI_API void LCUIThread_PrintInfo( void )
 {
 	__LCUIThread_PrintInfo(NULL);
 }
 
-/* 获取指定线程的根线程ID */
-LCUI_API LCUI_Thread
-LCUIThread_GetRootThreadID( LCUI_Thread tid )
+/** 获取指定线程的根线程ID */
+LCUI_API LCUI_Thread LCUIThread_GetRootThreadID( LCUI_Thread tid )
 {
 	Thread_TreeNode *ttn;
 	ttn = ThreadTree_Find(&thread_tree, tid);
@@ -157,54 +157,70 @@ LCUIThread_GetRootThreadID( LCUI_Thread tid )
 	
 }
 
+/** 在线程树中添加新的结点 */
 static Thread_TreeNode *
 ThreadTreeNode_AddNew( Thread_TreeNode *ttn, LCUI_Thread tid )
-/* 功能：在线程树中添加新的结点 */
 {
-	Thread_TreeNode *new_ttn;
+	Thread_TreeNode *p_ttn, new_ttn;
 	
-	new_ttn = malloc(sizeof(Thread_TreeNode));
-	Thread_TreeNode_Init( new_ttn );
-	new_ttn->tid = tid;
-	new_ttn->parent = ttn;
-	Queue_AddPointer(& ttn->child, new_ttn );
-	return new_ttn;
+	Queue_Lock( &ttn->child );
+	p_ttn = (Thread_TreeNode*)Queue_Add(& ttn->child, &new_ttn );
+	Thread_TreeNode_Init( p_ttn );
+	p_ttn->tid = tid;
+	p_ttn->parent = ttn;
+	Queue_Unlock( &ttn->child );
+	return p_ttn;
 }
 
-
-/* 在线程树中删除一个结点 */
-static int 
-ThreadTreeNode_Delete( LCUI_Thread tid )
+/** 在线程树中删除一个结点 */
+static int ThreadTreeNode_Delete( LCUI_Thread tid )
 {
-	int i, n;
-	Thread_TreeNode *tt, *child;
+	int i, n, m;
+	Thread_TreeNode *tt, *child, *tmp_child;
 	
 	tt = ThreadTree_Find(&thread_tree, tid);
-	if(tt == NULL) {
+	if( !tt ) {
 		return -1;
 	}
-	tt = tt->parent; /* 得到父线程的结点指针 */
-	if(tt == NULL) {
+	 /* 得到父线程的结点指针 */
+	tt = tt->parent;
+	if( !tt ) {
 		return -2;
 	}
+	Queue_Lock( &tt->child );
 	n = Queue_GetTotal( &tt->child );
-	if(n <= 0) {
+	if( n <= 0 ) {
+		Queue_Unlock( &tt->child );
 		return -3;
 	}
 	for(i=0; i<n; ++i) { 
-		child = Queue_Get( &tt->child, i );
+		child = (Thread_TreeNode*)Queue_Get( &tt->child, i );
 		if( !child || child->tid != tid ) {
 			continue;
 		}
+		Queue_Lock( &child->child );
+		m = Queue_GetTotal( &child->child );
+		/** 先把此节点里的子节点列表转移至本列表里 */
+		while( m-- ) {
+			tmp_child = (Thread_TreeNode*)
+			Queue_Get( &child->child, 0 );
+			Queue_AddPointer( &tt->child, tmp_child );
+			Queue_DeletePointer( &child->child, 0 );
+		}
+		Queue_Unlock( &child->child );
+		/* 然后移除本节点 */
 		Queue_Delete( &tt->child, i );
+		Queue_Unlock( &tt->child );
 		return 0;
 	}
-	return -3;
+	Queue_Unlock( &tt->child );
+	return -4;
 }
 
-/* 创建并运行一个线程 */
-LCUI_API int
-LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg )
+/** 创建并运行一个线程 */
+LCUI_API int LCUIThread_Create(	LCUI_Thread *tidp,
+				void (*start_rtn)(void*),
+				void *arg )
 {
 	Thread_TreeNode *tt;
 	LCUI_Thread cur_tid;
@@ -214,9 +230,9 @@ LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg )
 	/* 在线程树中查找匹配的线程ID，并得到该结点的指针 */
 	tt = ThreadTree_Find( &thread_tree, cur_tid );
 	/* 如果没有搜索到，那就新增，并获得该结点指针 */
-	if(tt == NULL) {
+	if( !tt ) {
 		tt = ThreadTreeNode_AddNew( &thread_tree, cur_tid );
-		if(tt == NULL) {
+		if( !tt ) {
 			return -1; 
 		}
 	}
@@ -226,9 +242,8 @@ LCUIThread_Create( LCUI_Thread *tidp, void (*start_rtn)(void*), void * arg )
 	return 0;
 }
 
-/* 等待一个线程的结束，并释放该线程的资源 */
-LCUI_API int
-LCUIThread_Join( LCUI_Thread thread, void **retval )
+/** 等待一个线程的结束，并释放该线程的资源 */
+LCUI_API int LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
 	int ret;
 	ret = _LCUIThread_Join( thread, retval );
@@ -239,34 +254,32 @@ LCUIThread_Join( LCUI_Thread thread, void **retval )
 	return ret;
 }
 
-/* 撤销一个线程 */
-LCUI_API void
-LCUIThread_Cancel( LCUI_Thread thread )
+/** 撤销一个线程 */
+LCUI_API void LCUIThread_Cancel( LCUI_Thread thread )
 {
 	_LCUIThread_Cancel( thread );
 	/* 移除记录该线程的结点 */
 	ThreadTreeNode_Delete( thread );
 }
 
-/* 记录指针作为返回值，并退出线程 */
-LCUI_API void
-LCUIThread_Exit( void* retval )
+/** 记录指针作为返回值，并退出线程 */
+LCUI_API void LCUIThread_Exit( void* retval )
 {
 	_LCUIThread_Exit( retval );
 }
 
-/* 撤销线程关系树的结点中的线程以及它的所有子线程 */
+/** 撤销线程关系树的结点中的线程以及它的所有子线程 */
 static void LCUIThreadTree_Cancel( Thread_TreeNode *ttn )
 {
 	int i, n;
 	Thread_TreeNode *child;
 
-	if(ttn == NULL) {
+	if( !ttn ) {
 		return;
 	}
 	n = Queue_GetTotal( &ttn->child );
 	for(i=0; i<n; ++i) {
-		child = Queue_Get( &ttn->child, 0 );
+		child = (Thread_TreeNode*)Queue_Get( &ttn->child, 0 );
 		if( !child ) {
 			continue;
 		}
@@ -276,20 +289,19 @@ static void LCUIThreadTree_Cancel( Thread_TreeNode *ttn )
 	LCUIThread_Cancel( ttn->tid );
 }
 
-/* 撤销指定ID的程序的全部子线程 */
-LCUI_API int
-LCUIApp_CancelAllThreads( LCUI_ID app_id )
+/** 撤销指定ID的程序的全部子线程 */
+LCUI_API int LCUIApp_CancelAllThreads( LCUI_ID app_id )
 {
 	int i, n;
 	Thread_TreeNode *ttn, *child;
 	
 	ttn = ThreadTree_Find(&thread_tree, (LCUI_Thread)app_id);
-	if(ttn == NULL) {
+	if( !ttn ) {
 		return -1;
 	}
 	n = Queue_GetTotal( &ttn->child );
 	for(i=0; i<n; ++i) {
-		child = Queue_Get( &ttn->child, 0 );
+		child = (Thread_TreeNode*)Queue_Get( &ttn->child, 0 );
 		if( !child ) {
 			continue;
 		}
@@ -299,25 +311,22 @@ LCUIApp_CancelAllThreads( LCUI_ID app_id )
 	return 0;
 }
 
-/* 注册程序主线程 */
-LCUI_API void
-LCUIApp_RegisterMainThread( LCUI_ID app_id )
+/** 注册程序主线程 */
+LCUI_API void LCUIApp_RegisterMainThread( LCUI_ID app_id )
 {
 	ThreadTreeNode_AddNew( &thread_tree, app_id );
 }
 
-/* 初始化线程模块 */
-LCUI_API void
-LCUIModule_Thread_Init( void )
+/** 初始化线程模块 */
+LCUI_API void LCUIModule_Thread_Init( void )
 {
 	Thread_TreeNode_Init( &thread_tree ); /* 初始化根线程结点 */
 	thread_tree.tid = LCUIThread_SelfID(); /* 当前线程ID作为根结点 */
 	LCUI_Sys.self_id = thread_tree.tid; /* 保存线程ID */
 }
 
-/* 停用线程模块 */
-LCUI_API void
-LCUIModule_Thread_End( void )
+/** 停用线程模块 */
+LCUI_API void LCUIModule_Thread_End( void )
 {
 	Queue_Destroy( &thread_tree.child );
 }
