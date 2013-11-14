@@ -53,7 +53,8 @@ test_move_widget(
 
 	for(i=0; i<j; i++) {
 		bg_rect = Widget_GetRect(bg);
-		x += w; y += h;
+		x += w;
+		y += h;
 		pos = Pos(x, y);
 		Widget_Move(widget, pos);
 		fg_rect = Widget_GetRect(widget);
