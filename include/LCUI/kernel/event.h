@@ -89,6 +89,7 @@ typedef union {
 
 typedef struct {
 	int id;			/**< 事件ID */
+	int temp_connect_id;	/**< 临时记录新建的事件连接的ID */
 	LCUI_Queue func_data;	/**< 记录被关联的回调函数数据 */
 } LCUI_EventSlot;
 
