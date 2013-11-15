@@ -126,6 +126,7 @@ LCUI_API int Widget_DispatchEvent(	LCUI_Widget *widget,
 		}
 		*p_buff = *event;
 		task_buff.id = widget->app_id;
+		task_buff.func = p_task->func;
 		task_buff.arg[0] = p_task->arg[0];
 		task_buff.arg[1] = p_buff;
 		task_buff.destroy_arg[0] = p_task->destroy_arg[0];
