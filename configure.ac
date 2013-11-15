@@ -7,7 +7,7 @@
 # http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/html_node/index.html
 
 AC_PREREQ([2.68])
-AC_INIT(LCUI, 0.14.1, lc-soft@live.cn)
+AC_INIT(LCUI, 0.15.0, lc-soft@live.cn)
 
 # Check system type
 AC_CANONICAL_TARGET
@@ -201,6 +201,7 @@ fi
 ##输出文件
 AC_OUTPUT([Makefile
                  lcui.pc
+                 build/Makefile
                  include/Makefile
                  include/LCUI/Makefile
                  include/LCUI/font/Makefile
