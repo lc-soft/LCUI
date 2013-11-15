@@ -3,6 +3,7 @@
 .deps
 .libs
 *.la
+*.*~
 Makefile
 autom4te.cache
 lcui.pc
