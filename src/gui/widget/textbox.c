@@ -186,14 +186,14 @@ static void TextBox_OnClicked( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 /** 处理按键事件 */
 static void TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
-	static int cols, rows;
-	static LCUI_Pos cur_pos;
-	static LCUI_TextLayer *layer;
-	static LCUI_TextBox *textbox;
+	int cols, rows;
+	LCUI_Pos cur_pos;
+	LCUI_TextLayer *layer;
+	LCUI_TextBox *textbox;
 	
 	//_DEBUG_MSG("you input: %d\n", event->key.key_code);
 	layer = TextBox_GetTextLayer( widget );
-	textbox = Widget_GetPrivData( widget );
+	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
 	cur_pos = TextLayer_Cursor_GetPos( layer );
 	cols = TextLayer_GetRowLen( layer, cur_pos.y );
 	rows = TextLayer_GetRows( layer ); 
