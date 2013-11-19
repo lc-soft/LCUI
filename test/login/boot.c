@@ -4,7 +4,6 @@
 #include LC_FONT_H
 
 #include "login.h"
-#include "desktop.h"
 
 #ifdef LCUI_BUILD_IN_WIN32
 #include <io.h>
@@ -25,10 +24,11 @@ static void InitConsoleWindow(void)
 }
 #endif
 
+//#define DEBUG
 int main(int argc, char **argv)
 {
-#ifdef LCUI_BUILD_IN_WIN32
-	//InitConsoleWindow();
+#if defined (LCUI_BUILD_IN_WIN32) && defined (DEBUG)
+	InitConsoleWindow();
 #endif
 	LCUI_Init(800,600,LCUI_INIT_MODE_WINDOW);
 	//LCUI_Init(0,0,0);
