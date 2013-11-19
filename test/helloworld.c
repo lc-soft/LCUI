@@ -53,7 +53,7 @@ int main( int argc, char **argv )
 		L"<color=0,255,0>你</color>"
 		L"<color=0,100,155>好</color>"
 		L"<color=0,0,255>！</color>\n</size>");
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 显示部件 */
 	Widget_Show(label); 
 	Widget_Show(window); 

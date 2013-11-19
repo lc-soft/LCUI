@@ -117,8 +117,8 @@ int main(int argc, char **argv)
 	Window_ClientArea_Add( window, btn );
 	Widget_Show( btn );
 
-	Widget_Event_Connect( btn, EVENT_CLICKED, show_msgbox );
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, program_quit );
+	Widget_ConnectEvent( btn, EVENT_CLICKED, show_msgbox );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, program_quit );
 	Widget_Show( window );
 	return LCUI_Main();
 }

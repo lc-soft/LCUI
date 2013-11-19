@@ -157,7 +157,7 @@ int main(int argc, char **argv)
 	window = Widget_New("window");
 	Widget_Resize( window, Size(320, 240) );
 	Window_SetTitleTextW( window, L"测试矩形裁剪功能" );
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 创建一个线程，以让区域移动 */
 	LCUIThread_Create(&t, test, NULL);
 	return LCUI_Main();
