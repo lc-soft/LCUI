@@ -15,7 +15,7 @@ static LCUI_Widget	*pic_bg, *time_box, *pic_btn_line,
 			*pic_c, *pic_r1, *pic_r2;
 
 static LCUI_Widget *wday_label, *date_label;
-static LCUI_Graph img_digital[9], img_dot, img_bg, img_btn, img_btn_bg;
+static LCUI_Graph img_digital[10], img_dot, img_bg, img_btn, img_btn_bg;
 
 static LCUI_BOOL need_move_pic_btn = FALSE;
 
@@ -104,23 +104,23 @@ static void UpdateTimeView(void *arg)
 	wchar_t day[][20] = {
 		L"星期天", L"星期一", L"星期二",
 		L"星期三", L"星期四", L"星期五", L"星期六"};
-
-	time ( &rawtime );
+	
+	time( &rawtime );
 	/* 获取系统当前时间 */
-	timeinfo = localtime ( &rawtime );
+	timeinfo = localtime( &rawtime );
 	swprintf( date_text, 64,
 		L"<color=40,165,45>%4d年%02d月%02d日</color>",
 		timeinfo->tm_year+1900, timeinfo->tm_mon+1,
 		timeinfo->tm_mday );
-
+	
 	Label_TextW( date_label, date_text );
-
+	
 	swprintf( date_text, 64,
 		L"<color=40,165,45>%s</color>",
 		day[(int) (timeinfo->tm_wday)] );
-
+	
 	Label_TextW( wday_label, date_text );
-
+	
 	Widget_SetBackgroundImage( pic_l1, &img_digital[timeinfo->tm_hour/10] );
 	Widget_SetBackgroundImage( pic_l2, &img_digital[timeinfo->tm_hour%10] );
 	Widget_SetBackgroundImage( pic_r1, &img_digital[timeinfo->tm_min/10] );
@@ -188,7 +188,7 @@ static void CreateGUI( LCUI_Widget *win )
 	Window_ClientArea_Add (win, pic_btn_line );
 	/* 限制移动范围 */
 	Widget_LimitPos(pic_btn, Pos(0,0), Pos(195,0));
-	Widget_Event_Connect(pic_btn, EVENT_DRAG, move_pic_btn);
+	Widget_ConnectEvent(pic_btn, EVENT_DRAG, move_pic_btn);
 
 	Widget_Show(pic_bg);
 	Widget_Show(pic_l1);
@@ -205,7 +205,7 @@ static void CreateGUI( LCUI_Widget *win )
 	UpdateTimeView(NULL);
 }
 
-int main( int argc, char **argv )
+int main(int argc, char **argv)
 {
 	LCUI_Widget *window;
 	/* 载入图像资源 */
