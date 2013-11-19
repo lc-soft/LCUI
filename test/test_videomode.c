@@ -70,8 +70,8 @@ int main(int argc, char **argv)
 	Button_TextW( btn_ok, L"应用" ); 
 	Label_TextW( label, L"选择视频模式：" );
 	/* 为按钮的点击事件关联回调函数 */
-	Widget_Event_Connect( btn_ok, EVENT_CLICKED, switch_style );
-	Widget_Event_Connect( Window_GetCloseButton(main_window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( btn_ok, EVENT_CLICKED, switch_style );
+	Widget_ConnectEvent( Window_GetCloseButton(main_window), EVENT_CLICKED, destroy );
 	/* 显示部件 */
 	Widget_Show( btn_ok );
 	Widget_Show( label );

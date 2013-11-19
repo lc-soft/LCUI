@@ -93,8 +93,8 @@ int main( int argc, char **argv )
 	}
 	Widget_Show(window);
 	/* 为按钮部件关联点击事件，被关联的函数是view_result，它会在点击按钮后被调用 */
-	Widget_Event_Connect( button, EVENT_CLICKED, view_result );
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( button, EVENT_CLICKED, view_result );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	return LCUI_Main();
 }
 
