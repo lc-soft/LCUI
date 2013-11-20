@@ -14,10 +14,10 @@
 #include <time.h>
 
 /* 图片资源文件 */
-#define IMG_DIAL		"dial.png"
-#define IMG_HOUR_PONTER		"hand_hour.png"
-#define IMG_MINUTE_POINTER	"hand_minute.png"
-#define IMG_SECOND_POINTER	"hand_second.png"
+#define IMG_DIAL		"drawable/dial.png"
+#define IMG_HOUR_PONTER		"drawable/hand_hour.png"
+#define IMG_MINUTE_POINTER	"drawable/hand_minute.png"
+#define IMG_SECOND_POINTER	"drawable/hand_second.png"
 
 /* 时钟及各个指针部件 */
 static LCUI_Widget *wdg_dial, *wdg_sec_ptr, *wdg_hour_ptr, *wdg_min_ptr; 
@@ -115,7 +115,7 @@ static void Quit( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	LCUI_MainLoop_Quit( NULL );
 }
 
-int main( int argc, char **argv )
+int main(void)
 {
 	LCUI_Widget *window;
 	/* 初始化LCUI */
@@ -136,7 +136,7 @@ int main( int argc, char **argv )
 	/* 设置定时器，每隔1秒更新一次时指针 */
 	LCUITimer_Set( 1000, UpdateClockPointer, NULL, TRUE );
 	/* 关联窗口关闭按钮的CLICKED事件 */
-	Widget_Event_Connect(Window_GetCloseButton(window), EVENT_CLICKED, Quit);
+	Widget_ConnectEvent(Window_GetCloseButton(window), EVENT_CLICKED, Quit);
 	/* 显示窗口 */
 	Widget_Show( window );
 	return LCUI_Main();
