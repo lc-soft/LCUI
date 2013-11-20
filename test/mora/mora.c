@@ -227,10 +227,10 @@ widgets_configure( void )
 	Widget_SetAutoSize( btn_j, FALSE, 0 );
 	Widget_SetAutoSize( btn_next, FALSE, 0 );
 	/* 调整这些部件的大小 */
-	Widget_SetSize( btn_b, "78px", "30px" );
-	Widget_SetSize( btn_s, "77px", "30px" );
-	Widget_SetSize( btn_j, "77px", "30px" );
-	Widget_SetSize( btn_next, "78px", "30px" );
+	Widget_Resize( btn_s, Size(78,30) );
+	Widget_Resize( btn_b, Size(77,30) );
+	Widget_Resize( btn_j, Size(77,30) );
+	Widget_Resize( btn_next, Size(78,30) );
 	Widget_SetSize( btn_area, NULL, "30px" );
 	Widget_SetDock( btn_area, DOCK_TYPE_BOTTOM );
 	Widget_Resize( me_pic_box, Size(110, 140) );
@@ -244,11 +244,11 @@ widgets_configure( void )
 				&btn_down, &btn_focus, NULL);
 	Button_CustomStyle(	btn_next, &btn_normal, &btn_over,
 				&btn_down, &btn_focus, NULL);
-	/* 设定部件的定位类型 */
-	Widget_SetPosType( btn_s, POS_TYPE_STATIC );
-	Widget_SetPosType( btn_j, POS_TYPE_STATIC );
-	Widget_SetPosType( btn_b, POS_TYPE_STATIC );
-	Widget_SetPosType( btn_next, POS_TYPE_STATIC );
+	/* 设定按鈕的位置 */
+	Widget_SetAlign( btn_s, ALIGN_MIDDLE_LEFT, Pos(0,0) );
+	Widget_SetAlign( btn_j, ALIGN_MIDDLE_LEFT, Pos(78,0) );
+	Widget_SetAlign( btn_b, ALIGN_MIDDLE_RIGHT, Pos(-78,0) );
+	Widget_SetAlign( btn_next, ALIGN_MIDDLE_RIGHT, Pos(0,0) );
 	/* 设定布局 */
 	Widget_SetAlign(me_pic_box, ALIGN_MIDDLE_LEFT, Pos(5, -5));
 	Widget_SetAlign(cpu_pic_box, ALIGN_MIDDLE_RIGHT, Pos(-5, -5));
@@ -258,11 +258,11 @@ widgets_configure( void )
 	Widget_SetBorder(me_pic_box, Border(1, BORDER_STYLE_SOLID, RGB(0,0,0)));
 	Widget_SetBorder(cpu_pic_box, Border(1, BORDER_STYLE_SOLID, RGB(0,0,0)));
 	/* 关联这些按钮的单击事件 */
-	Widget_Event_Connect(btn_s, EVENT_CLICKED, select_stone );
-	Widget_Event_Connect(btn_j, EVENT_CLICKED, select_knife );
-	Widget_Event_Connect(btn_b, EVENT_CLICKED, select_cloth );
-	Widget_Event_Connect(btn_next, EVENT_CLICKED, next );
-	Widget_Event_Connect(Window_GetCloseButton(window), EVENT_CLICKED, destroy);
+	Widget_ConnectEvent(btn_s, EVENT_CLICKED, select_stone );
+	Widget_ConnectEvent(btn_j, EVENT_CLICKED, select_knife );
+	Widget_ConnectEvent(btn_b, EVENT_CLICKED, select_cloth );
+	Widget_ConnectEvent(btn_next, EVENT_CLICKED, next );
+	Widget_ConnectEvent(Window_GetCloseButton(window), EVENT_CLICKED, destroy);
 }
 
 static void
