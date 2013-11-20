@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 	Widget_Resize( progbar, Size(300, 25) );
 
 	LCUIThread_Create( &thread, change_progress, (void*)progbar );
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 
 	Widget_Show( progbar );
 	Widget_Show( window );

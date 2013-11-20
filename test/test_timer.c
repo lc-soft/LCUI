@@ -44,7 +44,7 @@ int main( int argc, char **argv )
 	Label_TextW( label, L"利用定时器实现的文本闪烁" );
 	TextStyle_FontSize( &style, 20 );
 	Label_TextStyle( label, style );
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 设置定时器，每隔500毫秒调用display_text函数，重复调用 */
 	LCUITimer_Set( 500, display_text, NULL, TRUE );
 	Widget_Show( window );

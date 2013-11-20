@@ -204,7 +204,7 @@ static void create_loginbtn( LCUI_Widget **btn )
 	Widget_SetAutoSize( widget, FALSE, 0 );
 	Widget_Resize( widget, Size(30,30) );
 	Widget_SetAlign( widget, ALIGN_MIDDLE_CENTER, Pos(93,50) );
-	Widget_Event_Connect( widget, EVENT_CLICKED, verify_passwd );
+	Widget_ConnectEvent( widget, EVENT_CLICKED, verify_passwd );
 	*btn = widget;
 }
 

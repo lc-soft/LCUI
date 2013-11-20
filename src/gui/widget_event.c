@@ -555,7 +555,7 @@ static int Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 {
 	int i,n;
 	LCUI_EventSlot *slot;
-	LCUI_Task *task;
+	LCUI_Task *task, task_buff;
 	LCUI_WidgetEvent *p_buff;
 
 	if( !widget ) {
@@ -569,11 +569,13 @@ static int Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 	n = Queue_GetTotal( &slot->func_data );
 	for(i=0; i<n; ++i) {
 		task = (LCUI_Task*)Queue_Get( &slot->func_data, i );
+		/* 为事件数据申请内存空间 */
 		p_buff = (LCUI_WidgetEvent*)malloc( sizeof(LCUI_WidgetEvent) );
 		if( !p_buff ) {
 			perror( __FUNCTION__ );
 			abort();
 		}
+		/* 准备事件数据 */
 		p_buff->type = EVENT_KEYBOARD;
 		p_buff->key.key_code = event->key_code;
 		if( event->type == LCUI_KEYUP ) {
@@ -581,9 +583,15 @@ static int Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 		} else {
 			p_buff->key.key_state = LCUIKEYSTATE_PRESSED;
 		}
-		task->arg[1] = p_buff;
-		task->destroy_arg[1] = TRUE;
-		AppTasks_Add( task );
+		/* 准备任务 */
+		task_buff.id = widget->app_id;
+		task_buff.func = task->func;
+		task_buff.arg[0] = task->arg[0];
+		task_buff.arg[1] = p_buff;
+		task_buff.destroy_arg[0] = task->destroy_arg[0];
+		task_buff.destroy_arg[1] = TRUE;
+		/* 添加至程序的任务队列 */
+		AppTasks_Add( &task_buff );
 	}
 	return 0;
 }
@@ -796,11 +804,12 @@ LCUI_API LCUI_BOOL Widget_ResetFocus( LCUI_Widget* widget )
 
 static void WidgetFocusProc( LCUI_Event *event, void *unused )
 {
-	LCUI_Widget *widget = NULL, *tmp = NULL, *focus_widget;
+	LCUI_Widget *widget = NULL, *valid_widget = NULL, *focus_widget;
 	/* 如果输入法需要处理这个键，则退出本函数 */
 	if( LCUIIME_ProcessKey( &event->key ) ) {
 		return;
 	}
+	//_DEBUG_MSG("key code: %d\n", event->key.key_code );
 	/* 否则，将这个键盘消息发送给当前获得焦点的部件 */
 	while( 1 ) {
 		/* 获取当前容器中已获得焦点的部件 */
@@ -808,17 +817,17 @@ static void WidgetFocusProc( LCUI_Event *event, void *unused )
 		//_DEBUG_MSG("focus_widget: %p\n", focus_widget);
 		//print_widget_info( focus_widget );
 		if( !focus_widget ) {
-			if( !tmp ) {
+			if( !valid_widget ) {
 				break;
 			}
-			Widget_DispatchKeyboardEvent( tmp, &event->key );
+			Widget_DispatchKeyboardEvent( valid_widget, &event->key );
 			break;
 		}
 		/* 切换到子部件 */
 		widget = focus_widget;
 		/* 保存已关联按键事件的部件指针 */
 		if( EventSlots_Find( &widget->event, EVENT_KEYBOARD ) ) {
-			tmp = widget;
+			valid_widget = widget;
 		}
 	}
 }
