@@ -92,7 +92,7 @@ CONFIG_HEADER = $(top_builddir)/include/LCUI/LCUI_Config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_login_OBJECTS = login.$(OBJEXT) desktop.$(OBJEXT) boot.$(OBJEXT)
+am_login_OBJECTS = login.$(OBJEXT) boot.$(OBJEXT)
 login_OBJECTS = $(am_login_OBJECTS)
 login_DEPENDENCIES = $(top_builddir)/src/libLCUI.la
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -286,7 +286,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 AM_CFLAGS = -I$(top_builddir)/include
-login_SOURCES = login.c desktop.c boot.c
+login_SOURCES = login.c boot.c
 login_LDADD = $(top_builddir)/src/libLCUI.la
 all: all-am
 
@@ -343,7 +343,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boot.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/desktop.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/login.Po@am__quote@
 
 .c.o:
