@@ -47,7 +47,7 @@ int main(int argc, char*argv[])
 	Window_ClientArea_Add(window, scrollbar);
 	/* 将回调函数与滚动条部件连接 */
 	ScrollBar_Connect( scrollbar, callback_func, NULL );
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 显示部件 */
 	Widget_Show(scrollbar);
 	Widget_Show(window);

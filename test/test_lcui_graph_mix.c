@@ -6,31 +6,32 @@
 #include LC_GRAPH_H
 #include <time.h>
 
-int main(int argc, char **argv)
+#define IMG_W	1920
+#define IMG_H	1080
+#define MIX_COUNT	255
+
+int main(void)
 {
-	clock_t time, t;
-	int i, w, h;
+	int i;
+	clock_t ct;
 	LCUI_Graph bg, fg;
 	
-	Graph_Init(&bg);
-	Graph_Init(&fg);
+	Graph_Init( &bg );
+	Graph_Init( &fg );
 	bg.color_type = COLOR_TYPE_RGB;
 	fg.color_type = COLOR_TYPE_RGBA;
-	w = 1640;
-	h = 1480;
 	//为前景图和背景图分配内存
-	Graph_Create(&bg, w, h);
-	Graph_Create(&fg, w, h);
-	printf("graph size: %dx%d\n", w, h);
-	time = clock(); //开始计时
-	for(i=0; i<=255; i+=5){
-		t = clock(); 
-		nobuff_printf("[%2d] mix graph, alpha = %3d, use time: ", i, i);
-		Graph_FillAlpha(&fg, i);
+	Graph_Create( &bg, IMG_W, IMG_H );
+	Graph_Create( &fg, IMG_W, IMG_H );
+	ct = clock(); //开始计时
+	printf("start test, please wait......\n");
+	for(i=0; i<255; i+=5){
+		Graph_FillAlpha( &fg, i );
 		Graph_Mix(&bg, &fg, Pos(0,0));
-		printf("%ldms\n", clock()-t);//结束计时，输出结果
 	} 
-	printf("total time: %ldms\n", clock()-time);
+	i = (clock()-ct)*1000/CLOCKS_PER_SEC;
+	printf("graph size: %dx%d, total mix count: %d, total time: %dms,  mix count per sec: %.2lf\n",
+	IMG_W, IMG_H, MIX_COUNT, i, (double)(1.0*i/MIX_COUNT));
 	return 0;
 }
 

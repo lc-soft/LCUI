@@ -71,7 +71,7 @@ int main( int argc, char **argv )
 
 	Widget_Show( widget );
 	Widget_Show( window );
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	LCUIThread_Create( &t, thread, widget );
 
 	return LCUI_Main();

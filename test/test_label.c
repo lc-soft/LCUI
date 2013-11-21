@@ -70,7 +70,7 @@ int main( int argc, char **argv )
 	);
 	/* 创建线程，此函数和pthread_create函数用法一样 */
 	LCUIThread_Create(&t, change_label_text, (void*)time_text);
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	Widget_Show(label);
 	Widget_Show(time_text);
 	Widget_Show(window);

@@ -97,8 +97,8 @@ int main(int argc, char **argv)
 		Widget_Show(age_rb[i]);
 	}
 	Widget_Show(window);
-	Widget_Event_Connect(button, EVENT_CLICKED, view_result );
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( button, EVENT_CLICKED, view_result );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	LCUI_Main();
 	return 0;
 }
