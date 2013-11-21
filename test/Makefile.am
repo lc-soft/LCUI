@@ -4,7 +4,7 @@ SUBDIRS=mora screenlock clock login
 AM_CFLAGS = -I$(top_builddir)/include
 ##需要编译的测试程序, noinst指的是不安装
 noinst_PROGRAMS = helloworld test_font test_radiobtn test_checkbox test_progressbar \
-test_button test_label test_loading ts_calibrate test_viewimage test_lcui_graph_mix \
+test_button test_label test_loading ts_calibrate test_lcui_graph_mix \
 test_window test_rect_cut test_gaussian_blur test_widget_dock  test_widget_style \
 test_timer test_textbox test_scrollbar graph2array test_graphlayer test_videomode \
 test_messagebox
@@ -39,9 +39,6 @@ ts_calibrate_LDADD   = $(top_builddir)/src/libLCUI.la
 test_font_SOURCES = test_font.c
 test_font_LDADD   = $(top_builddir)/src/libLCUI.la
 
-test_viewimage_SOURCES = test_viewimage.c
-test_viewimage_LDADD   = $(top_builddir)/src/libLCUI.la
-
 test_lcui_graph_mix_SOURCES = test_lcui_graph_mix.c
 test_lcui_graph_mix_LDADD   = $(top_builddir)/src/libLCUI.la
 
@@ -49,7 +46,7 @@ test_window_SOURCES	= test_window.c
 test_window_LDADD	= $(top_builddir)/src/libLCUI.la
 
 test_rect_cut_SOURCES	= test_rect_cut.c
-test_rect_cut_LDADD	= $(top_builddir)/src/libLCUI.la
+test_rect_cut_LDADD	= -lm $(top_builddir)/src/libLCUI.la
 
 test_gaussian_blur_SOURCES	= test_gaussian_blur.c
 test_gaussian_blur_LDADD	= $(top_builddir)/src/libLCUI.la
