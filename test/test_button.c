@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	/* 显示部件 */
 	Widget_Show( button );
 	Widget_Show( window );
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	return LCUI_Main(); /* 进入主循环 */
 }
 

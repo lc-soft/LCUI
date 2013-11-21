@@ -164,7 +164,7 @@ int main(int argc, char **argv)
 		L"<size=20px>20px: 中国创造，慧及全球！</size>");
 	Widget_SetAlign(text, ALIGN_MIDDLE_CENTER, Pos(0,0));
 	Window_ClientArea_Add(window, text);
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy);
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy);
 	Widget_Show(text);
 	Widget_Show(window);
 	LCUIThread_Create( &t, change_font, NULL );

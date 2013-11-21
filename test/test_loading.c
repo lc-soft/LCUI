@@ -76,7 +76,7 @@ int main(void)
 	Window_ClientArea_Add(window, logo);
 
 	LCUIThread_Create(&t, change_graph, (void*)img);
-	Widget_Event_Connect( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
+	Widget_ConnectEvent( Window_GetCloseButton(window), EVENT_CLICKED, destroy );
 	/* 显示部件以及窗口 */
 	Widget_Show(label);
 	Widget_Show(logo);
