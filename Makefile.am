@@ -80,7 +80,7 @@ test/screenlock/screenlock.c \
 test/screenlock/Makefile.am \
 test/screenlock/Makefile.in \
 test/clock/README.zh-cn \
-test/clock/drawable/clock.c \
+test/clock/clock.c \
 test/clock/drawable/hand_hour.png \
 test/clock/drawable/hand_second.png \
 test/clock/drawable/dial.png \
