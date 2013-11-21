@@ -80,23 +80,22 @@ test/screenlock/screenlock.c \
 test/screenlock/Makefile.am \
 test/screenlock/Makefile.in \
 test/clock/README.zh-cn \
-test/clock/clock.c \
-test/clock/hand_hour.png \
-test/clock/hand_second.png \
-test/clock/dial.png \
-test/clock/hand_minute.png \
+test/clock/drawable/clock.c \
+test/clock/drawable/hand_hour.png \
+test/clock/drawable/hand_second.png \
+test/clock/drawable/dial.png \
+test/clock/drawable/hand_minute.png \
 test/clock/Makefile.am \
 test/clock/Makefile.in \
-test/login/boot.c \
 test/login/data/avatar/avatar.png \
 test/login/data/avatar/default.png \
 test/login/data/bg.png \
 test/login/data/btn_login.png \
 test/login/data/cloud.png \
 test/login/data/main.css \
-test/login/desktop.c \
-test/login/desktop.h \
+test/login/boot.c \
 test/login/login.c \
 test/login/login.h \
 test/login/Makefile.in \
 test/login/Makefile.am
+
