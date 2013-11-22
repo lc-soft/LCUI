@@ -8,7 +8,7 @@
   not very good, so, some files will appear chinese character, 
   please understand. thanks.
 
-  Please read the file `docs/CHANGES`, it contains IMPORTANT INFORMATION.
+  Please read the file `docs/CHANGES.md`, it contains IMPORTANT INFORMATION.
 
   Read the file `INSTALL` for installation instructions.
 

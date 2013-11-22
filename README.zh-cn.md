@@ -9,9 +9,9 @@ LCUI 是一个 GUI 函数库，用于创建图形用户界面，其诞生目的�
 
 LCUI 是一个自由软件项目，基于 GNU通用公共许可协议 发布，该许可协议要求 LCUI 及 LCUI 衍生软件无论以何种形式发布，都必须确保收受者能收到或得到源码。
 
-请阅读 `docs/CHANGES.zh-cn` 文件了解新版本的更新内容。
+请阅读 `docs/CHANGES.zh-cn.md` 文件了解新版本的更新内容。
 
-阅读 `docs/FAQ.zh-cn` 文件可以找到常见问题的解决方法。
+阅读 `docs/FAQ.zh-cn.md` 文件可以找到常见问题的解决方法。
 
 阅读 `docs/LICENSE.TXT`  文件了解 GPLv2 许可协议的具体内容。
 
