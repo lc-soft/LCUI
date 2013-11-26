@@ -42,7 +42,7 @@
 #include LC_LCUI_H
 
 /** 销毁程序任务 */
-static void Destroy_Task( void *arg )
+static void DestroyTask( void *arg )
 {
 	LCUI_Task *task;
 	task = (LCUI_Task *)arg;
@@ -58,12 +58,27 @@ static void Destroy_Task( void *arg )
 
 LCUI_API void AppTasks_Init( LCUI_Queue *tasks )
 {
-	Queue_Init( tasks, sizeof(LCUI_Task), Destroy_Task );
+	Queue_Init( tasks, sizeof(LCUI_Task), DestroyTask );
 }
 
+/** 无锁模式添加任务 */
+LCUI_API int AppTasks_NoLockAdd( LCUI_Task *task )
+{
+	LCUI_App *app;
+	app = LCUIApp_Find( task->id );
+	if( !app ) {
+		return -1;
+	}
+	if( !Queue_Add( &app->tasks, task ) ) {
+		Queue_Unlock( &app->tasks );
+		return -2;
+	}
+	LCUISleeper_BreakSleep( &app->mainloop_sleeper );
+	return 0;
+}
 /*
  * 功能：发送任务给程序，使这个程序进行指定任务
- * 说明：LCUI_Task结构体中的成员变量 id，保存的是目标程序的id
+ * 说明：LCUI_Task结构体中的成员变量 id 保存的是目标程序的id
  */
 LCUI_API int AppTasks_Add( LCUI_Task *task )
 {
@@ -77,96 +92,102 @@ LCUI_API int AppTasks_Add( LCUI_Task *task )
 		Queue_Unlock( &app->tasks );
 		return -2;
 	}
-	LCUISleeper_BreakSleep( &app->mainloop_sleeper );
 	Queue_Unlock( &app->tasks );
+	LCUISleeper_BreakSleep( &app->mainloop_sleeper );
 	return 0;
+}
+
+static LCUI_BOOL TaskEqual( LCUI_Task* t1, LCUI_Task* t2, int mode )
+{
+	if( t1->func != t2->func ) {
+		return FALSE;
+	}
+	/* 如果要求是第1个参数不能重复 */
+	if( HaveOption(mode, AND_ARG_F) ) {
+		/* 如果要求是第2个参数也不能重复 */
+		if( HaveOption(mode, AND_ARG_S) ) {
+			/* 如果函数以及参数1和2都一样 */ 
+			if(t1->arg[0] == t2->arg[0] 
+			&& t1->arg[1] == t2->arg[1]) {
+				return TRUE;
+			}
+			return FALSE;
+		}
+		/* 否则，只是要求函数以及第1个参数不能全部重复 */
+		if( t1->arg[0] == t2->arg[0] ) { 
+			return TRUE;
+		}
+		return FALSE;
+	}
+	/* 如果只是要求是第2个参数不能重复 */
+	if( HaveOption(mode, AND_ARG_S) ) {
+		if( t1->arg[1] == t2->arg[1] ) { 
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+/** 从程序任务队列中删除有指定回调函数的任务 */
+LCUI_API int AppTasks_Delete(	LCUI_Queue *tasks,
+				CallBackFunc task_func, 
+				LCUI_BOOL need_lock )
+{
+	int n, i;
+	LCUI_Task *exist_task;
+
+	if( need_lock ) {
+		Queue_Lock( tasks );
+	}
+	n = Queue_GetTotal( tasks );
+	for (i=0; i<n; ++i) { 
+		exist_task = (LCUI_Task*)Queue_Get( tasks, i );
+		if( exist_task && exist_task->func == task_func ) {
+			Queue_Delete( tasks, i );
+			--n;
+			--i;
+		}
+	}
+	if( need_lock ) {
+		Queue_Unlock( tasks );
+	}
+	return n;
 }
 
 static int Tasks_CustomAdd( LCUI_Queue *tasks, int mode, LCUI_Task *task )
 {
-	int total, i;
-	LCUI_Task *tmp_task;
+	int n, i;
+	LCUI_Task *exist_task = NULL;
 	
-	Queue_Lock( tasks );
-	total = Queue_GetTotal(tasks);
+	n = Queue_GetTotal(tasks);
 	/* 如果模式是“添加新的”模式 */
 	if( mode == ADD_MODE_ADD_NEW ) {
-		Queue_Add(tasks, task); 
-		Queue_Unlock( tasks );
+		Queue_Add( tasks, task );
 		return 0;
 	}
-	for (i=0; i < total; ++i) { 
-		tmp_task = Queue_Get(tasks, i);
-		/* 如果指针无效，或者函数指针已有记录 */
-		if( !tmp_task || tmp_task->func != task->func ) {
-			continue;
-		}
-		/* 如果要求的是不重复模式 */ 
-		if(Check_Option(mode, ADD_MODE_NOT_REPEAT)) {
-			/* 如果要求是第1个参数不能重复 */
-			if(Check_Option(mode, AND_ARG_F)) {
-				/* 如果要求是第2个参数也不能重复 */
-				if(Check_Option(mode, AND_ARG_S)) {
-					/* 如果函数以及参数1和2都一样 */ 
-					if(tmp_task->arg[0] == task->arg[0] 
-					&& tmp_task->arg[1] == task->arg[1]) {
-						Destroy_Task( task );
-						Queue_Unlock( tasks );
-						return -1; 
-					}
-				} else {/* 否则，只是要求函数以及第1个参数不能全部重复 */
-					if(tmp_task->arg[0] == task->arg[0]) { 
-						Destroy_Task( task );
-						Queue_Unlock( tasks );
-						return -1; 
-					}
-				}
-			}/* 否则，如果只是要求是第2个参数不能重复 */
-			else if(Check_Option(mode, AND_ARG_S)) {
-				if(tmp_task->arg[1] == task->arg[1] ) {
-					Destroy_Task( task );
-					Queue_Unlock( tasks );
-					return -1; 
-				}
-			} else {/* 否则，只是要求函数不同 */ 
-				Destroy_Task( task );
-				Queue_Unlock( tasks );
-				return -1; 
-			}
-		}/* 如果要求的是替换模式 */
-		else if(Check_Option(mode, ADD_MODE_REPLACE)) {
-			/* 如果要求是第1个参数相同 */
-			if( Check_Option(mode, AND_ARG_F) ) {
-				/* 如果要求是第2个参数也相同 */
-				if( Check_Option(mode, AND_ARG_S) ) {
-					if(tmp_task->arg[0] == task->arg[0] 
-					&& tmp_task->arg[1] == task->arg[1]
-					) {
-						break; 
-					}
-				} else {/* 否则，只是要求函数以及第1个参数全部相同 */
-					if(tmp_task->arg[0] == task->arg[0]) {
-						break; 
-					}
-				}
-			}/* 否则，如果只是要求第2个参数不能相同 */
-			else if(Check_Option(mode, AND_ARG_S)) {
-				if(tmp_task->arg[1] == task->arg[1]) {
-					break; 
-				}
-			} else { 
-				break; 
-			}
+	for (i=0; i < n; ++i) { 
+		exist_task = (LCUI_Task*)Queue_Get( tasks, i );
+		/* 如果已存在的任务与当前任务匹配 */
+		if( exist_task && TaskEqual( exist_task, task, mode ) ) {
+			break;
 		}
 	}
-	
-	if(i == total) {
-		Queue_Add(tasks, task); 
-	} else {
-		Queue_Replace( tasks, i, task ); 
+	/* 如果没有已存在的任务与当前任务匹配 */
+	if( i >= n || !exist_task ) {
+		Queue_Add( tasks, task );
+		return 0;
 	}
-	Queue_Unlock( tasks );
-	return 0;
+	/* 如果任务不能重复 */
+	if( HaveOption(mode, ADD_MODE_NOT_REPEAT) ) {
+		n = -1;
+	}
+	/* 如果需要覆盖任务 */
+	if( HaveOption(mode, ADD_MODE_REPLACE) )  {
+		DestroyTask( exist_task );		/* 先销毁已存在的任务 */
+		Queue_Replace( tasks, i, task );	/* 然后再覆盖 */
+		n = 0;
+	}
+	return n;
 }
 
 /*
@@ -196,10 +217,14 @@ LCUI_API int AppTasks_CustomAdd( int mode, LCUI_Task *task )
 	if( !app ) {
 		return -1;
 	}
+	Queue_Lock( &app->tasks );
 	ret = Tasks_CustomAdd( &app->tasks, mode, task );
 	if( ret == 0 ) {
 		LCUISleeper_BreakSleep( &app->mainloop_sleeper );
+	} else if( ret == -1 ) {
+		DestroyTask( task );
 	}
+	Queue_Unlock( &app->tasks );
 	return ret;
 }
 /**************************** Task End ********************************/

@@ -64,6 +64,11 @@ LCUI_API void AppTasks_Init( LCUI_Queue *tasks );
  */
 LCUI_API int AppTasks_Add( LCUI_Task *task );
 
+/** 从程序任务队列中删除有指定回调函数的任务 */
+LCUI_API int AppTasks_Delete(	LCUI_Queue *tasks,
+				CallBackFunc task_func, 
+				LCUI_BOOL need_lock );
+
 /*
  * 功能：使用自定义方式添加程序任务
  * 用法示例：
@@ -79,7 +84,7 @@ LCUI_API int AppTasks_Add( LCUI_Task *task );
  * AppTasks_CustomAdd(ADD_MODE_REPLACE, task);
  * */
 LCUI_API int AppTasks_CustomAdd( int mode, LCUI_Task *task );
-
+LCUI_API void DebugTimer( int );
 LCUI_END_HEADER
 
 #endif
