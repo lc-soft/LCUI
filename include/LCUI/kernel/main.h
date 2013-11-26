@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * main.h -- 使LCUI能够正常工作的相关主要函数
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -45,12 +45,13 @@ LCUI_BEGIN_HEADER
 
 /************************ LCUI程序的数据 *******************************/
 typedef struct LCUI_App_ {
-	LCUI_ID id;		/* LCUI程序的ID，如果是以线程方式运行的话，这个就是线程ID */ 
-	void (*func)(void);	/* 在LCUI退出时调用的函数 */
-	LCUI_Queue tasks;	/* 程序的任务队列 */
-	LCUI_Queue events;	/* 事件队列 */
-	LCUI_Queue widget_lib;	/* 部件类型库 */
-	LCUI_Sleeper mainloop_sleeper;
+	LCUI_ID id;			/**< LCUI程序的ID */ 
+	void (*func)(void);		/**< 在LCUI退出时调用的函数 */
+	LCUI_Queue tasks;		/**< 程序的任务队列 */
+	LCUI_Queue events;		/**< 事件队列 */
+	LCUI_Queue widget_lib;		/**< 部件类型库 */
+	LCUI_Sleeper mainloop_sleeper;	/**< 用于决定主循环是否睡眠 */
+	LCUI_Mutex task_mutex;		/**< 任务互斥锁，当运行程序任务时会锁上 */
 }
 LCUI_App;
 /**********************************************************************/
