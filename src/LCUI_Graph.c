@@ -1234,11 +1234,11 @@ LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int flag )
 		pos.y = graph->h - image->h;
 	}
 	
-	if( Check_Option(flag, GRAPH_MIX_FLAG_OVERLAY) ) {
+	if( HaveOption(flag, GRAPH_MIX_FLAG_OVERLAY) ) {
 	/* 如果包含GRAPH_MIX_FLAG_OVERLAY选项 */
 		Graph_Mix(graph, image, pos); 
 	}
-	else if( Check_Option(flag, GRAPH_MIX_FLAG_REPLACE) ) {
+	else if( HaveOption(flag, GRAPH_MIX_FLAG_REPLACE) ) {
 	/* 如果包含GRAPH_MIX_FLAG_REPLACE选项 */
 		Graph_Replace(graph, image, pos); 
 	} else {
@@ -1259,7 +1259,7 @@ LCUI_API int Graph_FillImage(	LCUI_Graph *graph,
 	LCUI_Graph temp_bg;
 	LCUI_BOOL replace_mix;
 
-	if( Check_Option( mode, GRAPH_MIX_FLAG_REPLACE ) ) {
+	if( HaveOption( mode, GRAPH_MIX_FLAG_REPLACE ) ) {
 		/* 将alpha通道置为0 */
 		Graph_FillAlpha( graph, 0 );
 		replace_mix = TRUE;
@@ -1277,23 +1277,23 @@ LCUI_API int Graph_FillImage(	LCUI_Graph *graph,
 	Graph_Init(&temp_bg);
 	pos.x = pos.y = 0;
 	/* 平铺 */
-	if( Check_Option( mode, LAYOUT_TILE ) ) {
+	if( HaveOption( mode, LAYOUT_TILE ) ) {
 		return Graph_Tile( bg, graph, replace_mix );
 	}
 	/* 缩放 */
-	if( Check_Option( mode, LAYOUT_ZOOM ) ) {
+	if( HaveOption( mode, LAYOUT_ZOOM ) ) {
 		Graph_Zoom( bg, &temp_bg, TRUE, size );
 		pos.x = (size.w - temp_bg.w) / 2.0;
 		pos.y = (size.h - temp_bg.h) / 2.0;
 		bg = &temp_bg;
 	}
 	/* 拉伸 */
-	else if( Check_Option( mode, LAYOUT_STRETCH ) ) {
+	else if( HaveOption( mode, LAYOUT_STRETCH ) ) {
 		Graph_Zoom( bg, &temp_bg, FALSE, size );
 		bg = &temp_bg;
 	}
 	/* 居中 */
-	else if( Check_Option( mode, LAYOUT_CENTER ) ) {
+	else if( HaveOption( mode, LAYOUT_CENTER ) ) {
 		pos.x = (size.w - bg->w) / 2.0;
 		pos.y = (size.h - bg->h) / 2.0;
 	}
