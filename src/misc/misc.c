@@ -44,16 +44,6 @@
 #include LC_LCUI_H 
 #include LC_GRAPH_H
 
-/* 检测result是否包含option */
-LCUI_API int
-Check_Option(int result, int option)
-{
-	if((result & option) == option) {
-		return 1; 
-	}
-	return 0;
-}
-
 LCUI_API void
 Padding_Init( LCUI_Padding *padding )
 {

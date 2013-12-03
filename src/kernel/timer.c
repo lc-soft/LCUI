@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * timer.c -- LCUI 的定时器模块
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2013 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -206,7 +206,7 @@ static void TimerList_UpdateTimerPos(	LCUI_Queue *timer_list,
 	Queue_Unlock( &global_timer_list );
 }
 
-//#define DEBUG_TIMER
+#define DEBUG_TIMER
 #ifdef DEBUG_TIMER
 /** 打印列表中的定时器信息 */
 static void TimerList_Print( LCUI_Queue *timer_list )
@@ -221,8 +221,8 @@ static void TimerList_Print( LCUI_Queue *timer_list )
 		if( !timer ) {
 			continue;
 		}
-		_DEBUG_MSG("[%02d] %ld, cur_ms: %dms, total_ms: %dms\n",
-			i, timer->id, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
+		_DEBUG_MSG("[%02d] %ld, func: %p, cur_ms: %dms, total_ms: %dms\n",
+			i, timer->id, timer->callback_func, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
 	}
 	_DEBUG_MSG("timer list end\n\n");
 }
@@ -299,21 +299,15 @@ static void TimerThread( void *arg )
 			LCUISleeper_StartSleep( &timer_sleeper, n_ms );
 			Queue_Unlock( timer_list );
 			TimerList_WaitOtherThreadGetLock();
-			lost_ms = LCUI_GetTicks( timer->start_time );
-			lost_ms -= timer->pause_ms;
-			if( lost_ms < timer->total_ms ) {
-				continue;
-			}
+			continue;
 		}
-		DEBUG_MSG("timer: %d, start_time: %I64dms, cur_time: %I64dms, cur_ms: %I64d, total_ms: %ld\n", 
-			timer->id, timer->start_time, LCUI_GetTickCount(), timer->total_ms-lost_ms, timer->total_ms);
 		/* 准备任务数据 */
 		func_data.id = timer->app_id;
 		func_data.func = (CallBackFunc)timer->callback_func;
 		func_data.arg[0] = timer->arg;
 		func_data.destroy_arg[0] = FALSE;
-		/* 添加该任务至指定程序的任务队列，添加模式是覆盖 */
-		AppTasks_CustomAdd( ADD_MODE_REPLACE | AND_ARG_F, &func_data );
+		DEBUG_MSG("timer: %d, start_time: %I64dms, cur_time: %I64dms, cur_ms: %I64d, total_ms: %ld\n", 
+			timer->id, timer->start_time, LCUI_GetTickCount(), timer->total_ms-lost_ms, timer->total_ms);
 		/* 若需要重复使用，则重置剩余等待时间 */
 		if( timer->reuse ) {
 			timer->start_time = LCUI_GetTickCount();
@@ -322,6 +316,9 @@ static void TimerThread( void *arg )
 		} else { /* 否则，释放该定时器 */
 			LCUITimer_Free( timer->id );
 		}
+		DEBUG_MSG("add task: %p, timer id: %d\n", func_data.func, timer->id);
+		/* 添加该任务至指定程序的任务队列 */
+		AppTasks_Add( &func_data );
 	}
 	LCUIThread_Exit(NULL);
 }
@@ -403,7 +400,8 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 
 /**
  * 释放定时器
- * 当不需要定时器时，可以使用该函数释放定时器占用的资源
+ * 当不需要定时器时，可以使用该函数释放定时器占用的资源，并移除程序任务队列
+ * 中还未处理的定时器任务
  * @param timer_id
  *	需要释放的定时器的标识符
  * @return
@@ -413,23 +411,39 @@ LCUI_API int LCUITimer_Free( int timer_id )
 {
 	int i, total;
 	timer_data *timer;
+	LCUI_App *app;
+	LCUI_ID self_id;
 	
+	app = LCUIApp_GetSelf();
+	self_id = LCUIThread_SelfID();
+	/* 如果当前为非主线程，则锁上程序任务锁 */
+	if( app && app->id != self_id ) {
+		LCUIMutex_Lock( &app->task_mutex );
+	}
 	TimerList_GetLock();
 	total = Queue_GetTotal( &global_timer_list );
 	for(i=0; i<total; ++i) {
 		timer = (timer_data*)Queue_Get( &global_timer_list, i );
-		if( !timer ) {
+		/* 忽略无效或ID不一致的定时器 */
+		if( !timer || timer->id != timer_id ) {
 			continue;
 		}
-		if( timer->id == timer_id ) {
-			DEBUG_MSG("delete timer: %d, n_ms: %d\n", timer->id, timer->total_ms);
-			Queue_Delete( &global_timer_list, i );
-			break;
+		/* 移除定时器任务，并且只在非主线程上时使用互斥锁 */
+		if( app ) {
+			AppTasks_Delete(
+				&app->tasks, 
+				(CallBackFunc)timer->callback_func, 
+				app->id != self_id
+			);
 		}
+		Queue_Delete( &global_timer_list, i );
+		break;
 	}
 	TimerList_FreeLock();
+	if( app && app->id != self_id ) {
+		LCUIMutex_Unlock( &app->task_mutex );
+	}
 	if( i < total ) {
-		LCUISleeper_BreakSleep( &timer_sleeper );
 		return 0;
 	}
 	return -1;

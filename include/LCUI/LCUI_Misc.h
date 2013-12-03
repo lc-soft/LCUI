@@ -77,8 +77,7 @@ typedef enum ALIGN_TYPE_ {
 /*---------------------------------------------*/
 
 /* 检测result是否包含option */
-LCUI_API int
-Check_Option(int result, int option);
+#define HaveOption(result,option) ((result & option) == option)
 
 LCUI_API void
 Padding_Init( LCUI_Padding *padding );

@@ -164,18 +164,22 @@ LCUI_API int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
 static int LCUIApp_RunTask( LCUI_App *app )
 { 
 	LCUI_Task *task;
-
+	
+	LCUIMutex_Lock( &app->task_mutex );
 	Queue_Lock( &app->tasks );
 	task = (LCUI_Task*)Queue_Get( &app->tasks, 0 );
-	if( task == NULL ) {
+	if( !task ) {
 		Queue_Unlock( &app->tasks );
+		LCUIMutex_Unlock( &app->task_mutex );
 		return -1;
 	}
-	Queue_DeletePointer( &app->tasks, 0 );
-	if( task->func == NULL ) {
+	if( !task->func ) {
+		Queue_Delete( &app->tasks, 0 );
 		Queue_Unlock( &app->tasks );
+		LCUIMutex_Unlock( &app->task_mutex );
 		return -2;
 	}
+	Queue_DeletePointer( &app->tasks, 0 );
 	Queue_Unlock( &app->tasks );
 	/* 调用函数指针指向的函数，并传递参数 */
 	task->func( task->arg[0], task->arg[1] );
@@ -187,6 +191,7 @@ static int LCUIApp_RunTask( LCUI_App *app )
 		free( task->arg[1] );
 	}
 	free( task );
+	LCUIMutex_Unlock( &app->task_mutex );
 	return 0;
 }
 
@@ -310,7 +315,8 @@ static void LCUIApp_Init( LCUI_App *app )
 	app->id = 0;
 	app->func = NULL;
 	AppTasks_Init( &app->tasks );
-	WidgetLib_Init(&app->widget_lib);
+	WidgetLib_Init( &app->widget_lib );
+	LCUIMutex_Init( &app->task_mutex );
 	LCUISleeper_Create( &app->mainloop_sleeper );
 }
 
@@ -354,7 +360,6 @@ LCUI_API void LCUI_Quit( void )
 	LCUIModule_Video_End();
 }
 
-
 /** 从程序列表中删除一个LCUI程序信息 */
 static int LCUIAppList_Delete( LCUI_ID app_id )
 {
@@ -396,6 +401,7 @@ static void LCUIApp_Destroy( void *arg )
 	LCUIApp_CancelAllThreads( app->id );	/* 撤销这个程序的所有线程 */
 	LCUIApp_DestroyAllWidgets( app->id );	/* 销毁这个程序的所有部件 */
 	LCUIApp_QuitAllMainLoops( app->id );	/* 退出所有的主循环 */
+	LCUIMutex_Unlock( &app->task_mutex );
 }
 
 /* 初始化程序数据表 */
@@ -425,7 +431,7 @@ LCUI_API int LCUIApp_AtQuit( void (*callback_func)(void) )
 {
 	LCUI_App *app;
 	app = LCUIApp_GetSelf();
-	if( app == NULL || callback_func == NULL ) {
+	if( !app || !callback_func ) {
 		return -1;
 	}
 	app->func = callback_func;
