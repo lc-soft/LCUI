@@ -42,8 +42,6 @@
 #ifndef __LCUI_BUILD_H__
 #define __LCUI_BUILD_H__
 
-#define _CRT_SECURE_NO_WARNINGS
-
 #if defined(__GNUC__)
 #  define LCUI_API 
 #elif (defined(_MSC_VER) && _MSC_VER < 800) ||\
