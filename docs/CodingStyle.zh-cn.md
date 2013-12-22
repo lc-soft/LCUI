@@ -1,13 +1,13 @@
 #LCUI 代码风格
 
-本文档只是描述一些附加的代码风格，主要代码风格可以参考Linux内核的CodingStyle文档：
-https://github.com/torvalds/linux/blob/master/Documentation/zh_CN/CodingStyle
+本文档只是描述一些附加的代码风格，主要代码风格可以参考Linux内核的CodingStyle文档
+：https://github.com/torvalds/linux/blob/master/Documentation/zh_CN/CodingStyle
 
 ##缩进 & 每行字符数限制
 
-代码缩进宽度应设置为8个字符，每一行的代码长度应该限制在80列以内，8个字符的缩进可
+代码缩进宽度应设置为8个字符，每一行的代码长度也应限制在80列以内，8个字符的缩进可
 以让代码更容易阅读，再加上每行字符数的限制，当你的代码缩进层次太深的时候可以给你
-警告，留心这个警告。
+警告，以提醒你去考虑是否需要调整代码。
 
 建议缩进使用空格填充，这样就能使代码格式在其它默认缩进宽度不同的编辑器中不会有太
 大变化。
@@ -44,7 +44,7 @@ https://github.com/torvalds/linux/blob/master/Documentation/zh_CN/CodingStyle
 - 无条件语句容易理解和跟踪
 - 嵌套程度减小
 - 可以避免由于修改时忘记更新某个单独的退出点而导致的错误
-- 减轻了编译器的工作，无需删除冗余代码;)
+- 减轻了编译器的工作，无需删除冗余代码
 
 ```c
 int fun(int a)
@@ -96,13 +96,13 @@ error_out:
 被操作的对象属性是位置（Pos），也就是设定图层的位置。
 
 ```c
-        Queue_Add();
+    Queue_Add();
 ```
 
 该函数的操作对象是队列（Queue），实现的操作是添加（Add），也就是往队列里添加数据。
 
 ```c
-        TextLayer_Text_SetDefaultStyle();
+    TextLayer_Text_SetDefaultStyle();
 ```
         
 该函数操作的主对象是文本图层(TextLayer)中的文本(Text)，实现的操作是设定(Set)，被
@@ -115,26 +115,26 @@ error_out:
 如果函数名较长，应该考虑进行分行，例如：
 
 ```c
-        static MyType* ObjectName_OperateAttribute( XXXX *object, XXXX arg1, XXXX arg2, XXXX arg3 )
+    static MyType* ObjectName_OperateAttribute( XXXX *object, XXXX arg1, XXXX arg2, XXXX arg3 )
 ```
 
 应该改成：
 
 ```c
-        static MyType* ObjectName_OperateAttribute(     XXXX *object,
-                                                        XXXX arg1,
-                                                        XXXX arg2,
-                                                        XXXX arg3 )
+    static MyType* ObjectName_OperateAttribute(     XXXX *object,
+                                                    XXXX arg1,
+                                                    XXXX arg2,
+                                                    XXXX arg3 )
 ```
 
 如果函数名前的修饰符较多，可以将它们放到单独行里，例如：
 
 ```c
-        static struct MyObjectStruct* 
-        ObjectName_OperateAttribute(    XXXX *object,
-                                        XXXX arg1,
-                                        XXXX arg2,
-                                        XXXX arg3 )
+    static struct MyObjectStruct* 
+    ObjectName_OperateAttribute(    XXXX *object,
+                                    XXXX arg1,
+                                    XXXX arg2,
+                                    XXXX arg3 )
 ```
 
 使用制表符缩进，调整参数列表中的参数的位置，保持对齐。
@@ -143,12 +143,12 @@ error_out:
 的单词，像这样：
 
 ```c
-        static struct MyObjectStruct* 
-        ObjName_OptAttr( XXXX *object, XXXX arg1, XXXX arg2, XXXX arg3 )
+    static struct MyObjectStruct* 
+    ObjName_OptAttr( XXXX *object, XXXX arg1, XXXX arg2, XXXX arg3 )
 ```
 
 调用函数时，每个参数的逗号后面需要加个空格。
 
 ```c
-        func( arg1, arg2, arg3, arg4 );
+    func( arg1, arg2, arg3, arg4 );
 ```
