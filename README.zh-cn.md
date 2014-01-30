@@ -69,7 +69,7 @@ windows系统上构建本项目方法，有两种：
 ###当前的构建状态
 LCUI基于 Travis CI 服务进行构建，每向该代码库推送一次代码提交，会将构建任务添加
 至持续集成服务的队列中，并且会运行一些测试以确保该项目的稳定。当前的构建状态是：
-[![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
+[![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
 
 ### 系统需求
 
