@@ -197,6 +197,8 @@ static LinkedListNode* LinkedList_GetNode( LinkedList *list, int pos )
         else if( pos - list->current_node_pos > list->used_node_num - pos ) {
                 i = list->used_node_num-1;
                 node = list->boundary;
+        } else {
+                i = list->current_node_pos;
         }
 
         while( i < pos ) {
