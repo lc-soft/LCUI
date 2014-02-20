@@ -50,7 +50,7 @@
 #include LC_GRAPH_H
 #include LC_FONT_H
 #include LC_ERROR_H
-
+//#undef LCUI_FONT_ENGINE_FREETYPE
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -66,6 +66,20 @@ FT_Library FontLIB_GetLibrary(void);
 
 /** 获取指定字体ID的字体face对象句柄 */
 FT_Face FontLIB_GetFontFace( int font_id );
+
+#elif defined LCUI_BUILD_IN_WIN32
+
+#include <wingdi.h>
+
+test()
+{
+        MAT2 glyph_mat = {{0,1},{0,0},{0,0},{0,1}};
+        int buff_len;
+        GLYPHMETRICS glyph_metrics;
+        unsigned char *buff;
+        buff_len = GetGlyphOutline( NULL, L'a', GGO_BITMAP, &glyph_metrics, 0, NULL, &glyph_mat );
+        GetGlyphOutline( NULL, L'a', GGO_BITMAP, &glyph_metrics, buff_len, buff, &glyph_mat);
+}
 
 #endif
 
@@ -195,13 +209,9 @@ LCUI_API int FontBMP_Print( LCUI_FontBMP *fontbmp )
 }
 
 /** 将字体位图绘制到目标图像上 */
-LCUI_API int FontBMP_Mix(	LCUI_Graph	*graph,
-				LCUI_Pos	des_pos,
-				LCUI_FontBMP	*bitmap,
-				LCUI_RGB	color,
-				int		flag )
+LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos des_pos, 
+			LCUI_FontBMP *bitmap, LCUI_RGB color, int flag )
 {
-
 	LCUI_Graph *des;
 	LCUI_Rect des_rect, cut;
 	int total, m, n, y;
