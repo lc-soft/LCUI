@@ -507,12 +507,11 @@ StyleTag_ProcessEndingTag( LCUI_Queue *tags, const wchar_t *str )
 	if( !p ) {
 		return NULL;
 	}
+	/* 删除相应的样式标签 */
 	if( LCUI_strcasecmpA(tag_name, "color") == 0 ) {
-		/* 消除该标签添加的字体样式 */
 		StyleTag_Delete ( tags, TAG_ID_COLOR );
 	} 
 	else if( LCUI_strcasecmpA(tag_name, "size") == 0 ) {
-		/* 消除该标签添加的字体样式 */
 		StyleTag_Delete ( tags, TAG_ID_SIZE );
 	} else {
 		return NULL;
