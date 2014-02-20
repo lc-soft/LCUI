@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * textlayer.h -- text bitmap layer processing module.
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * textlayer.h -- 文本图层处理模块
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -41,255 +41,215 @@
 #ifndef __LCUI_TEXTLAYER_H__
 #define __LCUI_TEXTLAYER_H__
 
-enum text_add_position {
-	AT_TEXT_LAST,
-	AT_CURSOR_POS
-};
-
 LCUI_BEGIN_HEADER
 
-/********* 保存字体相关数据以及位图 ********/
-typedef struct _LCUI_CharData
+/* 文本对齐方式 */
+typedef enum TextAlignType_ {
+	TEXT_ALIGN_LEFT,	/* 向左对齐 */
+	TEXT_ALIGN_CENTER,	/* 居中对齐 */
+	TEXT_ALIGN_RIGHT	/* 向右对齐 */
+} TextAlignType;
+
+/* 文本添加类型 */
+typedef enum TextAddType_ {
+        TEXT_ADD_TYPE_INSERT,		/* 插入至插入点处 */
+        TEXT_ADD_TYPE_APPEND		/* 追加至文本末尾 */
+} TextAddType;
+
+typedef struct TextCharDataRec_ {
+        LCUI_BOOL need_display;		/* 是否需要显示该字 */
+        LCUI_BOOL need_update;		/* 表示是否需要刷新该字的字体位图数据 */
+        wchar_t char_code;		/* 字符码 */
+        LCUI_TextStyle *style;		/* 该字符使用的样式数据 */
+	LCUI_FontBMP *bitmap;		/* 字体位图数据 */
+} TextCharData;
+
+/* 文本行 */
+typedef struct TextRowDataRec_ {
+        int max_width;			/* 文本行的最大像素宽度 */
+        int max_height;			/* 文本行的最大像素高度 */
+        int top_spacing;		/* 与上一行文本的间距 */
+        int bottom_spacing;		/* 与下一行文本的间距 */
+        int string_len;			/* 该行文本长度 */
+        int string_max_len;		/* 该行文本最大长度 */
+        TextCharData **string;		/* 该行文本的数据 */
+} TextRowData;
+
+/* 文本行列表 */
+typedef struct TextRowListRec_ {
+        int rows;			/* 当前总行数 */
+        int max_rows;			/* 最大行数 */
+        TextRowData **rowdata;		/* 每一行文本的数据 */
+} TextRowList;
+
+/* 任务数据 */
+typedef struct TaskDataRec_ {
+        LCUI_BOOL update_bitmap;	/* 更新文本的字体位图 */
+        LCUI_BOOL update_typeset;	/* 重新对文本进行排版 */
+        int typeset_start_row;		/* 排版处理的起始行 */	
+        int redraw_all;			/* 重绘所有字体位图 */
+} TaskData;
+
+typedef struct TextLayerRec_  {
+        int offset_x;			/* X轴坐标偏移量 */
+        int offset_y;			/* Y轴坐标偏移量 */
+	int new_offset_x;		/* 新的X轴坐标偏移量 */
+	int new_offset_y;		/* 新的Y轴坐标偏移量 */
+        int insert_x;			/* 光标所在列数 */
+        int insert_y;			/* 光标所在行数 */
+        int max_width;			/* 最大文本宽度 */
+        int max_height;			/* 最大文本高度 */
+        
+	LCUI_BOOL is_mulitiline_mode;	/* 是否启用多行文本模式 */
+        LCUI_BOOL is_wordwrap_mode;	/* 是否启用自动换行模式 */
+	LCUI_BOOL is_using_style_tags;	/* 是否使用文本样式标签 */
+        LCUI_BOOL is_using_buffer;	/* 是否使用缓存空间来存储文本位图 */
+	LCUI_RectQueue clear_area;
+
+        TextAlignType text_align;	/* 文本的对齐方式 */
+        TextRowList row_list;		/* 文本行列表 */
+        LCUI_TextStyle text_style;	/* 文本全局样式 */
+        TaskData task;			/* 任务 */
+        LCUI_Graph graph;		/* 文本位图缓存 */
+} LCUI_TextLayer;
+
+/** 获取指定文本行的高度 */
+static inline int TextLayer_GetRowHeight( LCUI_TextLayer* layer, int row )
 {
-	LCUI_BOOL display:1;		/* 标志，是否需要显示该字 */
-	LCUI_BOOL need_update:1;	/* 标志，表示是否需要刷新该字的字体位图数据 */
-	//LCUI_BOOL using_quote:2;	/* 标志，表示是否引用了现成的文本样式 */
-	
-	wchar_t char_code;	/* 字符码 */
-	LCUI_FontBMP *bitmap;	/* 字体位图数据 */
-	LCUI_TextStyle *data;	/* 文本样式数据 */
+        if( row >= layer->row_list.rows ) {
+                return 0;
+        }
+        return layer->row_list.rowdata[row]->max_height;
 }
-LCUI_CharData;
-/***************************************/
 
-/********* 保存一行的文本数据 *************/
-typedef struct _Text_RowData
+/** 获取指定文本行的文本长度 */
+static inline int TextLayer_GetRowTextLength( LCUI_TextLayer* layer, int row )
 {
-	LCUI_Size max_size;	/* 记录最大尺寸 */
-	LCUI_Pos pos;		/* 当前行所在的位置 */
-	LCUI_Queue string;	/* 这个队列中的成员用于引用源文本的字体数据 */
-	LCUI_CharData *last_char;	/* 保存最后一个字符数据的地址，通常是换行符 */
+        if( row >= layer->row_list.rows ) {
+                return -1;
+        }
+        return layer->row_list.rowdata[row]->string_len;
 }
-Text_RowData;
-/***************************************/
 
-typedef struct _LCUI_TextLayer
+/** 设置文本颜色 */
+static inline void TextLayer_SetFontColor( LCUI_TextLayer* layer, LCUI_RGB color )
 {
-	LCUI_BOOL read_only		:1;	/* 指示文本内容是否为只读 */
-	LCUI_BOOL using_code_mode	:1;	/* 指示是否开启代码模式 */
-	LCUI_BOOL using_style_tags	:1;	/* 指示是否处理样式标签 */
-	LCUI_BOOL enable_word_wrap	:1;	/* 指示是否自动换行 */
-	LCUI_BOOL enable_multiline	:1;	/* 指示是否为多行文本图层部件 */
-	LCUI_BOOL need_scroll_layer	:1;	/* 指示是否需要滚动图层 */
-	LCUI_BOOL auto_wrap		:1;	/* 指示是否自动换行 */
-	LCUI_BOOL have_select		:1;	/* 标记，指示是否在文本图层中选择了文本 */
-	uint32_t start, end;			/* 被选中的文本的范围 */ 
-	
-	LCUI_Queue color_keyword;	/* 记录需要使用指定风格的关键字 */
-	LCUI_Queue text_source_data;	/* 储存文本相关数据 */
-	LCUI_Queue rows_data;		/* 储存每一行文本的数据 */
-	LCUI_Queue tag_buff;		/* 保存样式标签中表达的属性数据 */
-	LCUI_RectQueue clear_area;	/* 记录需刷新的区域 */
-	
-	LCUI_Pos offset_pos;		/* 偏移位置 */
-	LCUI_Pos old_offset_pos;	/* 未滚动前的偏移位置 */
-	uint32_t current_src_pos;	/* 当前光标在源文本中位置 */
-	LCUI_Pos current_des_pos;	/* 当前光标在分段后的文本中的位置 */
-	uint32_t max_text_len;		/* 最大文本长度 */
-	LCUI_CharData password_char;	/* 该字符用于屏蔽单行，为0时则不屏蔽 */
-	
-	LCUI_BOOL show_cursor;	/* 指定是否需要显示文本光标 */
-	
-	LCUI_TextStyle default_data;	/* 缺省状态下使用的文本样式数据 */
-	LCUI_Graph graph;		/* 图层数据 */
+	TextStyle_FontColor( &layer->text_style, color );
+	layer->task.redraw_all = TRUE;
 }
-LCUI_TextLayer;
 
-LCUI_API void
-TextLayer_Init( LCUI_TextLayer *layer );
-/* 初始化文本图层相关数据 */
+/** 设置文本所使用的字体字族 */
+static inline void TextLayer_SetFontFamily( LCUI_TextLayer* layer, const char *family_name )
+{
+	TextStyle_FontFamily( &layer->text_style, family_name );
+        layer->task.update_bitmap = TRUE;
+}
 
-LCUI_API void
-Destroy_TextLayer( LCUI_TextLayer *layer );
-/* 销毁文本图层占用的资源 */
+/** 设置文本的字体像素大小 */
+static inline void TextLayer_SetFontPixelSize( LCUI_TextLayer* layer, int pixel_size )
+{
+	TextStyle_FontSize( &layer->text_style, pixel_size );
+        layer->task.update_bitmap = TRUE;
+}
 
-/** 更新文本图层中的内容 */
-LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
-				LCUI_Queue *dirty_rect_list );
+/** 设置文本对齐方式 */
+static inline void TextLayer_SetTextAlign( LCUI_TextLayer* layer, TextAlignType align )
+{
+        layer->text_align = align;
+        layer->task.redraw_all = TRUE;
+}
 
-/* 标记需要重绘整个文本图层 */
-LCUI_API void TextLayer_Redraw( LCUI_TextLayer *layer );
+/** 设置坐标偏移量 */
+static inline void TextLayer_SetOffset( LCUI_TextLayer* layer, int offset_x, int offset_y )
+{
+        layer->new_offset_x = offset_x;
+        layer->new_offset_y = offset_y;
+}
 
-LCUI_API void
-TextLayer_Refresh( LCUI_TextLayer *layer );
-/* 标记文本图层中每个字的位图，等待绘制文本图层时进行更新 */
+LCUI_API void TextLayer_Init( LCUI_TextLayer *layer );
 
-/* 
- * 功能：设定文本图层的偏移位置
- * 返回值：需要对图层进行重绘时返回0，否则返回1
- *  */
-LCUI_API int TextLayer_SetOffset( LCUI_TextLayer *layer, LCUI_Pos offset_pos );
+/** 设置插入点的行列坐标 */
+LCUI_API void TextLayer_SetCaretPos( LCUI_TextLayer* layer, int row, int col );
 
-/** 设置文本图层的图像尺寸 */
-LCUI_API int TextLayer_SetGraphSize(	LCUI_TextLayer *layer, 
-					LCUI_Size new_size );
+/** 根据像素坐标设置文本光标的行列坐标 */
+LCUI_API int TextLayer_SetCaretPosByPixelPos( LCUI_TextLayer* layer, int x, int y );
 
-/** 计算文本图层的尺寸 */
-LCUI_API int TextLayer_GetSize( LCUI_TextLayer *layer, LCUI_Size *layer_size );
+/** 获取指定行列的文字的像素坐标 */
+LCUI_API int TextLayer_GetCharPixelPos( LCUI_TextLayer* layer, int row,
+						int col, LCUI_Pos *pixel_pos );
 
-/** 获取文本图层的图像数据 */
-LCUI_API LCUI_Graph *TextLayer_GetGraph( LCUI_TextLayer *layer );
+/** 获取文本光标的像素坐标 */
+LCUI_API int TextLayer_GetCaretPixelPos( LCUI_TextLayer *layer, LCUI_Pos *pixel_pos );
 
-/* 获取文本图层中的文本内容 */
-LCUI_API size_t
-TextLayer_GetText( LCUI_TextLayer *layer, wchar_t *buff, size_t max_len );
+/** 清空文本 */
+LCUI_API void TextLayer_Clear( LCUI_TextLayer* layer );
 
-LCUI_API void
-TextLayer_RefreshCharBehind( LCUI_TextLayer *layer, LCUI_Pos char_pos );
-/* 刷新指定行中指定字以及后面的字的区域 */
+/** 插入文本内容（宽字符版） */
+LCUI_API int TextLayer_InsertTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text );
 
-LCUI_API void
-TextLayer_Text_SetDefaultStyle( LCUI_TextLayer *layer, LCUI_TextStyle style );
-/* 设定默认的文本样式，需要调用TextLayer_Draw函数进行文本位图更新 */
+/** 插入文本内容 */
+LCUI_API int TextLayer_InsertTextA( LCUI_TextLayer* layer, const char *ascii_text );
 
-LCUI_API void
-TextLayer_ReadOnly( LCUI_TextLayer *layer, LCUI_BOOL flag );
-/* 指定文本图层中的文本是否为只读 */
+/** 插入文本内容（UTF-8版） */
+LCUI_API int TextLayer_InsertText( LCUI_TextLayer* layer, const char *utf8_text );
 
-LCUI_API void
-TextLayer_Text_Clear( LCUI_TextLayer *layer );
-/* 清空文本内容 */
+/** 追加文本内容（宽字符版） */
+LCUI_API int TextLayer_AppendTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text );
 
-LCUI_API void
-TextLayer_SetRowEnd( LCUI_TextLayer *layer, uint_t row, uint_t start_cols );
-/* 为指定行设定结束点，结束点及后面的数据将被删除，但不记录残余文本位图区域 */
+/** 追加文本内容 */
+LCUI_API int TextLayer_AppendTextA( LCUI_TextLayer* layer, const char *ascii_text );
 
-LCUI_API int
-TextLayer_Text_GetTotalLength( LCUI_TextLayer *layer );
-/* 获取文本位图中的文本长度 */
+/** 追加文本内容（UTF-8版） */
+LCUI_API int TextLayer_AppendText( LCUI_TextLayer* layer, const char *utf8_text );
 
-LCUI_API void
-TextLayer_Text_Set_MaxLength( LCUI_TextLayer *layer, int max );
-/* 设定文本位图中的文本长度 */
+/** 设置文本内容（宽字符版） */
+LCUI_API int TextLayer_SetTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text );
 
-LCUI_API void
-TextLayer_Text_SetPasswordChar( LCUI_TextLayer *layer, wchar_t ch );
-/* 
- * 设置屏蔽字符，设置后，文本框内的文本都会显示成该字符
- * 如果ch的值为0，则不对文本框里的文本进行屏蔽 
- * */
+/** 设置文本内容 */
+LCUI_API int TextLayer_SetTextA( LCUI_TextLayer* layer, const char *ascii_text );
 
-/* 对文本进行预处理，处理后的数据保存至layer里 */ 
-LCUI_API void
-TextLayer_Text_Process(	LCUI_TextLayer *layer,
-				int pos_type,
-				wchar_t *new_text );
+/** 设置文本内容（UTF-8版） */
+LCUI_API int TextLayer_SetText( LCUI_TextLayer* layer, const char *utf8_text );
 
-LCUI_API void
-TextLayer_PrintInfo( LCUI_TextLayer *layer );
-/* 打印文本图层信息 */
+/** 获取TextWidget中的文本（宽字符版） */
+LCUI_API int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
+					int max_len, wchar_t *wstr_buff );
 
-/* 
- * 功能：设定指定的宽字符串作为文本图层中显示的文本
- * 说明：文本将被储存至缓冲区，等待绘制文本位图时再处理缓冲区内的文本
- *  */
-LCUI_API void
-TextLayer_TextW( LCUI_TextLayer *layer, wchar_t *wchar_text );
+/** 设置最大文本宽度 */
+LCUI_API int TextLayer_SetMaxWidth( LCUI_TextLayer* layer, int max_width );
 
-LCUI_API void
-TextLayer_Text( LCUI_TextLayer *layer, const char *utf8_text );
+/** 设置最大文本高度 */
+LCUI_API int TextLayer_SetMaxHeight( LCUI_TextLayer* layer, int max_height );
 
-LCUI_API void
-TextLayer_TextA( LCUI_TextLayer *layer, const char *ascii_text );
+/** 设置是否启用多行文本模式 */
+LCUI_API void TextLayer_SetMultiline( LCUI_TextLayer* layer, int is_true );
 
-/* 在文本末尾追加文本，不移动光标，不删除原有选中文本 */
-LCUI_API int
-TextLayer_Text_AppendW( LCUI_TextLayer *layer, wchar_t *new_text );
+/** 删除文本光标的当前坐标右边的文本 */
+LCUI_API int TextLayer_Delete( LCUI_TextLayer *layer, int n_char );
 
-LCUI_API int
-TextLayer_Text_AppendA( LCUI_TextLayer *layer, char *new_text );
+/** 退格删除文本，即删除文本光标的当前坐标左边的文本 */
+LCUI_API int TextLayer_Backspace( LCUI_TextLayer* layer, int n_char );
 
-LCUI_API int
-TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text );
+/** 设置是否启用自动换行模式 */
+LCUI_API void TextLayer_SetWordWrap( LCUI_TextLayer* layer, int is_true );
 
-LCUI_API int
-TextLayer_Text_AddW( LCUI_TextLayer *layer, wchar_t *unicode_text );
+/** 计算并获取文本的宽度 */
+LCUI_API int TextLayer_GetWidth( LCUI_TextLayer* layer );
 
-LCUI_API int
-TextLayer_Text_AddA( LCUI_TextLayer *layer, char *ascii_text );
+/** 计算并获取文本的高度 */
+LCUI_API int TextLayer_GetHeight( LCUI_TextLayer* layer );
 
-/* 在光标处添加文本，如有选中文本，将被删除 */
-LCUI_API int
-TextLayer_Text_Add( LCUI_TextLayer *layer, char *utf8_text );
+/** 重新载入各个文字的字体位图 */
+LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer );
 
-LCUI_API LCUI_Pos
-TextLayer_Cursor_SetPixelPos( LCUI_TextLayer *layer, LCUI_Pos pixel_pos );
-/* 
- * 功能：根据传入的二维坐标，设定光标在的文本图层中的位置
- * 说明：该位置会根据当前位置中的字体位图来调整，确保光标显示在字体位图边上，而不
- * 会遮挡字体位图；光标在文本图层中的位置改变后，在字符串中的位置也要做相应改变，
- * 因为文本的添加，删减，都需要以光标当前所在位置对应的字符为基础。
- * 返回值：文本图层中对应字体位图的坐标，单位为像素
- *  */
+/** 更新数据 */
+LCUI_API void TextLayer_Update( LCUI_TextLayer* layer );
 
-LCUI_API LCUI_Pos
-TextLayer_Cursor_SetPos( LCUI_TextLayer *layer, LCUI_Pos pos );
-/* 设定光标在文本框中的位置，并返回该光标的坐标，单位为像素 */
+LCUI_API int TextLayer_PaintToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph, 
+					LCUI_Rect area, LCUI_Pos paint_pos );
 
-LCUI_API int
-TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n );
-/* 删除光标左边处n个字符 */
-
-LCUI_API LCUI_Pos
-TextLayer_Char_GetPixelPos( LCUI_TextLayer *layer, LCUI_Pos char_pos );
-/* 获取显示出来的文字相对于文本图层的坐标，单位为像素 */
-
-LCUI_API LCUI_Pos
-TextLayer_Cursor_GetPos( LCUI_TextLayer *layer );
-/* 获取光标在文本框中的位置，也就是光标在哪一行的哪个字后面 */
-
-LCUI_API LCUI_Pos
-TextLayer_Cursor_GetFixedPixelPos( LCUI_TextLayer *layer );
-/* 获取文本图层的光标位置，单位为像素 */
-
-LCUI_API LCUI_Pos
-TextLayer_Cursor_GetPixelPos( LCUI_TextLayer *layer );
-/* 获取文本图层的光标相对于容器位置，单位为像素 */
-
-LCUI_API int
-TextLayer_GetRowLen( LCUI_TextLayer *layer, int row );
-/* 获取指定行显式文字数 */
-
-LCUI_API int
-TextLayer_CurRow_GetMaxHeight( LCUI_TextLayer *layer );
-/* 获取当前行的最大高度 */
-
-LCUI_API int
-TextLayer_GetRows( LCUI_TextLayer *layer );
-/* 获取文本行数 */
-
-LCUI_API int
-TextLayer_GetSelectedText( LCUI_TextLayer *layer, char *out_text );
-/* 获取文本图层内被选中的文本 */ 
-
-LCUI_API int
-TextLayer_CopySelectedText( LCUI_TextLayer *layer );
-/* 复制文本图层内被选中的文本 */
-
-LCUI_API int
-TextLayer_CutSelectedText( LCUI_TextLayer *layer );
-/* 剪切文本图层内被选中的文本 */
-
-LCUI_API void
-TextLayer_UsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL flag );
-/* 指定文本图层是否处理样式标签 */
-
-LCUI_API void
-TextLayer_SetMultiline( LCUI_TextLayer *layer, LCUI_BOOL flag );
-/* 指定文本图层是否启用多行文本显示 */
-
-/** 设置文本图层中的文本是否自动换行 */
-LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer *layer, LCUI_BOOL flag );
+/** 绘制文本 */
+LCUI_API int TextLayer_Paint( LCUI_TextLayer* layer );
 
 LCUI_END_HEADER
 

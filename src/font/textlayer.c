@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * textlayer.c -- text bitmap layer processing module.
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -21,1867 +21,1195 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * textlayer.c -- æ–‡æœ¬å›¾å±‚å¤„ç†æ¨¡å—
+ * textlayer.c -- ÎÄ±¾Í¼²ã´¦ÀíÄ£¿é
  *
- * ç‰ˆæƒæ‰€æœ‰ (C) 2012-2013 å½’å±äº
- * åˆ˜è¶…
+ * °æÈ¨ËùÓĞ (C) 2012-2014 ¹éÊôÓÚ
+ * Áõ³¬
  * 
- * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
+ * Õâ¸öÎÄ¼şÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾İGPLv2Ğí¿ÉĞ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
  *
- * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
+ * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ğí¿ÉÖ¤µÚ¶ş°æ µÄÓ¢ÎÄËõĞ´)
  * 
- * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜æ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’Œæ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
+ * ¼ÌĞøÊ¹ÓÃ¡¢ĞŞ¸Ä»ò·¢²¼±¾ÎÄ¼ş£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öĞí¿ÉĞ­Òé¡£
  * 
- * LCUI é¡¹ç›®æ˜¯åŸºäºä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
- * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
+ * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔğÈÎ£¬ÉõÖÁÃ»ÓĞÊÊÏúĞÔ»òÌØ
+ * ¶¨ÓÃÍ¾µÄÒşº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ğí¿ÉĞ­Òé¡£
  *
- * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æœ
- * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>. 
+ * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼şµÄGPLv2Ğí¿ÉĞ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼şÖĞ£¬Èç¹û
+ * Ã»ÓĞ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-//#define DEBUG
-//#define DEBUG1
-//#define DEBUG2
 #include <LCUI_Build.h>
-
-#include LC_LCUI_H 
+#include LC_LCUI_H
 #include LC_GRAPH_H
 #include LC_FONT_H
 
-#include <wchar.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-typedef struct _Special_KeyWord	Special_KeyWord;
-/*************************** ç‰¹æ®Šå…³é”®è¯ *****************************/
-struct _Special_KeyWord
+static void TaskData_Init( TaskData *task )
 {
-	LCUI_String keyword;		/* å…³é”®è¯ */
-	LCUI_TextStyle *data;		/* è¯¥å…³é”®è¯ä½¿ç”¨çš„å­—ä½“æ•°æ® */
-	LCUI_Queue *text_source_data;	/* å…³é”®è¯æ‰€å±çš„æºæ–‡æœ¬ */
-};
-/******************************************************************/
-
-static void 
-Destroy_Special_KeyWord( void *arg )
-{
-	/* åœ¨è¯¥å…³é”®è¯æ‰€å±çš„åŸæ–‡æœ¬ä¸­æŸ¥æ‰¾ç»„æˆè¯¥å…³é”®è¯çš„å­—ï¼Œå¹¶ä¿®æ”¹å­—æ‰€ä½¿ç”¨çš„å­—ä½“æ•°æ® */
+        task->redraw_all = 0;
+        task->update_bitmap = 0;
+        task->update_typeset = 0;
+        task->typeset_start_row = 0;
 }
 
-static void 
-Destroy_CharData( void *arg )
+/** Ìí¼Ó ¸üĞÂÎÄ±¾ÅÅ°æ µÄÈÎÎñ */
+static inline void TaskData_AddUpdateTypeset( TaskData *task, int start_row )
 {
-	
+        if( start_row < task->typeset_start_row ) {
+                task->typeset_start_row = start_row;
+        }
+        task->update_typeset = TRUE;
 }
 
-static void 
-Destroy_Text_RowData( void *arg )
-{
-	Text_RowData *data;
-	data = (Text_RowData *)arg;
-	Queue_Destroy ( &data->string );
-}
-
-static void TextLayer_Clear(	LCUI_TextLayer *layer, 
-				LCUI_Pos pos, 
-				int max_h, 
-				LCUI_CharData *char_ptr )
-{
-	LCUI_Rect area;
-	DEBUG_MSG("pos: %d,%d, max_h: %d\n", pos.x, pos.y, max_h);
-	if( layer->password_char.char_code != 0 ) {
-		char_ptr = &layer->password_char;
-	}
-	/* è®¡ç®—åŒºåŸŸèŒƒå›´ */
-	area.x = pos.x + char_ptr->bitmap->left;
-	area.y = pos.y + max_h-1;
-	area.y -= char_ptr->bitmap->top;
-	area.width = char_ptr->bitmap->width;
-	area.height = char_ptr->bitmap->rows;
-	/* è®°å½•éœ€åˆ·æ–°çš„åŒºåŸŸ */
-	RectQueue_AddToValid( &layer->clear_area, area );
-	DEBUG_MSG("record area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
-}
-
-
-/** è·å–å­—ä½“ä½å›¾ï¼Œå­—ä½“çš„æ ·å¼ç”±æ–‡æœ¬å›¾å±‚ä¸­è®°å½•çš„å­—ä½“æ ·å¼å†³å®š */
-static void TextLayer_GetCharBMP( LCUI_TextStyle *default_style, LCUI_CharData *data )
-{
-	int pixel_size;
-	/* è·å–å­—ä½“å°ºå¯¸ */
-	if( !data->data ) {
-		pixel_size = default_style->pixel_size;
-	} else {
-		/* å¦‚æœå·²ç»è‡ªå®šä¹‰å­—ä½“å°ºå¯¸ */
-		if( data->data->_pixel_size ) {
-			pixel_size = data->data->pixel_size; 
-		} else {
-			pixel_size = default_style->pixel_size;
-		}
-	}
-	data->bitmap = FontLIB_GetExistFontBMP( default_style->font_id, 
-			data->char_code, pixel_size );
-}
-
-/** å‘æ–‡æœ¬å›¾å±‚ä¸­çš„æ–‡æœ¬ä¸­æ·»åŠ æ–°è¡Œ */
-static int TextLayer_Text_AddNewRow( LCUI_TextLayer *layer )
-{
-	Text_RowData data; 
-	/* å•æ•´è¡Œæœ€å¤§å°ºå¯¸æ”¹å˜æ—¶ï¼Œéœ€è¦ç§»åŠ¨æ•´è¡Œï¼Œç›®å‰è¿˜æœªæ”¯æŒæ­¤åŠŸèƒ½ */
-	data.pos = Pos(0,0); 
-	data.max_size = Size(0,0);
-	data.last_char = NULL;
-	Queue_Init( &data.string, sizeof(LCUI_CharData), NULL );
-	/* ä½¿ç”¨é“¾è¡¨æ¨¡å¼ï¼Œæ–¹ä¾¿æ•°æ®çš„æ’å…¥ */
-	Queue_SetDataMode( &data.string, QUEUE_DATA_MODE_LINKED_LIST );
-	/* é˜Ÿåˆ—æˆå‘˜ä½¿ç”¨æŒ‡é’ˆï¼Œä¸»è¦æ˜¯å¼•ç”¨text_source_dataé‡Œé¢çš„æ•°æ® */
-	Queue_UsingPointer( &data.string );
-	if( Queue_Add( &layer->rows_data, &data ) ) {
-		return 0;
-	}
-	return -1;
-}
-
-/** å¯¹ç›®æ ‡è¡Œè¿›è¡Œæ–­è¡Œå¤„ç†ï¼Œä¹Ÿå°±æ˜¯å°†ç›®æ ‡è¡ŒæŒ‡å®šä½ç½®åé¢çš„å…¨éƒ¨æ–‡å­—è½¬ç§»åˆ°å¦ä¸€è¡Œ */
-static void  TextLayer_Text_RowBreak(	LCUI_TextLayer *layer,		
-					Text_RowData *src, 
-					int break_point,
-					Text_RowData *des )
-{
-	int i, total;
-	LCUI_CharData *char_ptr;
-	
-	total = Queue_GetTotal( &src->string );
-	for(i=break_point; i<total; ++i ) {
-		char_ptr = (LCUI_CharData*)Queue_Get( &src->string, break_point );
-		Queue_AddPointer( &des->string, char_ptr );
-		char_ptr->need_update = TRUE;
-		Queue_DeletePointer( &src->string, break_point );
-	}
-}
-
-/** å°†æ’å…¥æ–°è¡Œè‡³æ–‡æœ¬å›¾å±‚çš„æ–‡æœ¬ä¸­çš„æŒ‡å®šä½ç½® */
-static int TextLayer_Text_InsertNewRow( LCUI_TextLayer *layer, int row )
-{
-	LCUI_TextStyle *style;
-	Text_RowData data;
-	
-	data.pos = Pos(0,0); 
-	data.last_char = NULL;
-	Queue_Init( &data.string, sizeof(LCUI_CharData), NULL ); 
-	Queue_SetDataMode( &data.string, QUEUE_DATA_MODE_LINKED_LIST ); 
-	Queue_UsingPointer( &data.string );
-	/* æ ¹æ®å½“å‰æ ·å¼ï¼Œåˆ¤å®šå½“å‰è¡Œçš„å°ºå¯¸ */
-	style = StyleTag_GetCurrentStyle( &layer->tag_buff );
-	if( style && style->_pixel_size ) {
-		data.max_size.h = style->pixel_size+2;
-		free(style);
-	} else {
-		data.max_size.h = layer->default_data.pixel_size+2;
-	}
-	data.max_size.w = 0;
-	if( Queue_Insert( &layer->rows_data, row, &data ) ) {
-		return 0;
-	}
-	return -1;
-}
-
-/** è·å–æŒ‡å‘å½“å‰è¡Œçš„æŒ‡é’ˆ */
-static Text_RowData *TextLayer_GetCurRowData( LCUI_TextLayer *layer )
-{
-	return (Text_RowData*)Queue_Get( &layer->rows_data, 
-				layer->current_des_pos.y );
-}
-
-/** æ›´æ–°æŒ‡å®šè¡Œæ–‡æœ¬ä½å›¾çš„å°ºå¯¸ */
-static void TextLayer_Update_RowSize( LCUI_TextLayer *layer, int row )
-{
-	int total, i;
-	LCUI_Size size;
-	LCUI_CharData *char_data;
-	Text_RowData *row_data;
-	LCUI_TextStyle *style;
-	
-	row_data = (Text_RowData*)Queue_Get( &layer->rows_data, row );
-	total = Queue_GetTotal( &row_data->string ); 
-	style = StyleTag_GetCurrentStyle( &layer->tag_buff ); 
-	size.w = 0;
-	size.h = layer->default_data.pixel_size+2;
-	if( style ) {
-		if(style->pixel_size > 0) {
-			size.h = style->pixel_size+2;
-		} 
-		free( style );
-	}
-	for( i=0; i<total; ++i ) {
-		/* å¦‚æœå±è”½å­—ç¬¦æœ‰æ•ˆï¼Œåˆ™ä½¿ç”¨è¯¥å­—ç¬¦çš„æ•°æ® */
-		if( layer->password_char.char_code > 0 ) {
-			char_data = &layer->password_char;
-		} else {
-			char_data = (LCUI_CharData*)
-			Queue_Get( &row_data->string, i );
-		}
-		if( !char_data || !char_data->bitmap || !char_data->display ) {
-			continue;
-		}
-		size.w += char_data->bitmap->advance.x;
-		if( !char_data->data || !char_data->data->_pixel_size ) {
-			if( size.h < layer->default_data.pixel_size+2 ) {
-				size.h = layer->default_data.pixel_size+2;
-			}
-			continue;
-		}
-		if( size.h < char_data->data->pixel_size + 2 ) {
-			size.h = char_data->data->pixel_size + 2;
-		}
-	}
-	row_data->max_size = size;
-}
-
-/** åˆå§‹åŒ–æ–‡æœ¬å›¾å±‚ç›¸å…³æ•°æ® */
 LCUI_API void TextLayer_Init( LCUI_TextLayer *layer )
 {
-	layer->read_only = FALSE;
-	layer->using_code_mode = FALSE; 
-	layer->using_style_tags = FALSE; 
-	layer->enable_word_wrap = FALSE; 
-	layer->enable_multiline = FALSE;
-	layer->need_scroll_layer = FALSE;
-	layer->have_select = FALSE;
-	layer->auto_wrap = FALSE;
-	layer->start = 0;
-	layer->end = 0;
-	layer->offset_pos = Pos(0,0);
-	layer->old_offset_pos = Pos(0,0);
-	
-	Queue_Init( &layer->color_keyword, sizeof(Special_KeyWord), Destroy_Special_KeyWord );
-	/* é˜Ÿåˆ—ä¸­ä½¿ç”¨é“¾è¡¨å‚¨å­˜è¿™äº›æ•°æ® */
-	Queue_Init( &layer->text_source_data, sizeof(LCUI_CharData), Destroy_CharData );
-	Queue_SetDataMode( &layer->text_source_data, QUEUE_DATA_MODE_LINKED_LIST ); 
-	Queue_Init( &layer->rows_data, sizeof(Text_RowData), Destroy_Text_RowData ); 
-	StyleTag_Init( &layer->tag_buff );
-	RectQueue_Init( &layer->clear_area );
+        layer->max_width = 0;
+        layer->max_height = 0;
+        layer->offset_x = 0;
+        layer->offset_y = 0;
+	layer->new_offset_x = 0;
+	layer->new_offset_y = 0;
+        layer->insert_x = 0;
+        layer->insert_y = 0;
+        layer->is_mulitiline_mode = FALSE;
+        layer->is_wordwrap_mode = FALSE;
+	layer->is_using_style_tags = FALSE;
+        layer->text_align = TEXT_ALIGN_LEFT;
+
+        layer->row_list.max_rows = 0;
+        layer->row_list.rows = 0;
+        layer->row_list.rowdata = 0;
+        
+        TextStyle_Init( &layer->text_style );
+        TaskData_Init( &layer->task );
+
+        layer->is_using_buffer = TRUE;
 	Graph_Init( &layer->graph );
-	layer->graph.color_type = COLOR_TYPE_RGBA;
-	/* åˆå§‹åŒ–å±è”½ç¬¦çš„æ•°æ® */
-	layer->password_char.display = TRUE;
-	layer->password_char.need_update = FALSE;
-	layer->password_char.data = NULL;
-	layer->password_char.char_code = 0;
-	layer->password_char.bitmap = NULL;
-	
-	layer->default_data.pixel_size = 12;
-	layer->current_src_pos = 0;
-	layer->current_des_pos = Pos(0,0);
-	layer->max_text_len = 512000;
-	TextStyle_Init( &layer->default_data );
-	//TextLayer_Text_AddNewRow ( layer );/* æ·»åŠ æ–°è¡Œ */
 }
 
-/** é”€æ¯æ–‡æœ¬å›¾å±‚å ç”¨çš„èµ„æº */
-LCUI_API void Destroy_TextLayer( LCUI_TextLayer *layer )
+static void TextRow_Init( TextRowData* p_row )
 {
-	Queue_Destroy( &layer->text_source_data );
-	Queue_Destroy( &layer->rows_data );
-	Queue_Destroy( &layer->tag_buff );
-	Graph_Free( &layer->graph );
-	RectQueue_Destroy( &layer->clear_area );
+        p_row->bottom_spacing = 1;
+        p_row->top_spacing = 1;
+        p_row->max_height = 0;
+        p_row->max_width = 0;
+        p_row->string = NULL;
+        p_row->string_len = 0;
+        p_row->string_max_len = 0;
 }
 
-/** å¯¹æŒ‡å®šæ–‡æœ¬è¡Œè¿›è¡Œè‡ªåŠ¨æ¢è¡Œå¤„ç† */
-static void TextLayer_TextRowTypeset( LCUI_TextLayer *layer, int i_row )
+static inline TextRowData* 
+TextRowList_GetRow( TextRowList *p_row_list, int n_row )
 {
-	LCUI_Size row_size={0,0};
-	Text_RowData *p_row, *p_next_row;
-	LCUI_CharData *p_char;
-	int i_col, n_cols, char_h;
-
-	/* è·å–æœ¬è¡Œçš„æŒ‡é’ˆ */
-	p_row = (Text_RowData*)Queue_Get( &layer->rows_data, i_row );
-	/* è·å–æœ¬è¡Œæ–‡æœ¬çš„å­—ç¬¦åˆ—æ•° */
-	n_cols = Queue_GetTotal( &p_row->string );
-	/* éå†å½“å‰è¡Œçš„å„ä¸ªæ–‡å­— */
-	for(i_col=0; i_col<n_cols; ++i_col) {
-		p_char = (LCUI_CharData*)
-		Queue_Get( &p_row->string, i_col );
-		/* å¿½ç•¥æ— æ•ˆã€æ— å­—ä½“ä½å›¾ã€ä¸å¯æ˜¾çš„æ–‡å­— */
-		if( !p_char || !p_char->bitmap || !p_char->display ) {
-			continue;
-		}
-		/* è·å–è¯¥å­—çš„é«˜åº¦ */
-		if( p_char->data && p_char->data->_pixel_size ) {
-			char_h = p_char->data->pixel_size+2;
-		} else {
-			char_h = layer->default_data.pixel_size+2;
-		}
-		row_size.w += p_char->bitmap->advance.x;
-		/* å¦‚æœæ˜¯å½“å‰è¡Œçš„ç¬¬ä¸€ä¸ªå­—ç¬¦ï¼Œæˆ–è€…è¡Œå®½åº¦æ²¡æœ‰è¶…è¿‡å®½åº¦é™åˆ¶ */
-		if( i_col < 1 || !layer->auto_wrap
-		 || row_size.w <= layer->graph.w ) {
-			if( row_size.h < char_h ) {
-				row_size.h = char_h;
-			}
-			continue;
-		}
-		row_size.w -= p_char->bitmap->advance.x;
-		/* æ›´æ–°æœ¬è¡Œçš„å°ºå¯¸ */
-		p_row->max_size.w = row_size.w;
-		p_row->max_size.h = row_size.h;
-		/* å¦‚æœæœ¬è¡Œæœ«å°¾æœ‰æ¢è¡Œç¬¦ï¼Œåˆ™æ’å…¥æ–°è¡Œ */
-		if( p_row->last_char ) {
-			TextLayer_Text_InsertNewRow( layer, i_row+1 );
-			p_next_row = (Text_RowData*)
-			Queue_Get( &layer->rows_data, i_row+1 );
-			/* å°†æœ¬è¡Œçš„æ¢è¡Œç¬¦è½¬ç§»è‡³æ–°è¡Œ */
-			p_next_row ->last_char = p_row->last_char;
-			p_row->last_char = NULL;
-		}
-		/* è·å–ä¸‹ä¸€è¡Œçš„æŒ‡é’ˆ */
-		p_next_row = (Text_RowData*)
-		Queue_Get( &layer->rows_data, i_row+1 );
-		/* è‹¥æ²¡æœ‰ä¸‹ä¸€è¡Œï¼Œåˆ™æ’å…¥æ–°è¡Œ */
-		if( !p_next_row ) {
-			TextLayer_Text_InsertNewRow( layer, i_row+1 );
-			p_next_row = (Text_RowData*)
-			Queue_Get( &layer->rows_data, i_row+1 );
-		}
-		row_size.w = 0;
-		row_size.h = 0;
-		/* å°†æœ¬è¡Œå‰©ä½™æ–‡å­—è½¬ç§»è‡³ä¸‹ä¸€è¡Œ */
-		for(n_cols-=1; n_cols>=i_col; --n_cols) {
-			p_char = (LCUI_CharData*)
-			Queue_Get( &p_row->string, n_cols );
-			/* æ ‡è®°æœ¬å­—éœ€è¦åˆ·æ–° */
-			p_char->need_update = TRUE;
-			/* æ’å…¥è‡³æ–°è¡Œ */
-			Queue_InsertPointer( &p_next_row->string, 0, p_char );
-			if( p_char->data && p_char->data->_pixel_size ) {
-				char_h = p_char->data->pixel_size+2;
-			} else {
-				char_h = layer->default_data.pixel_size+2;
-			}
-			if( row_size.h < char_h ) {
-				row_size.h = char_h;
-			}
-			row_size.w += p_char->bitmap->advance.x;
-			/* ç§»é™¤è¯¥å­—åœ¨æœ¬è¡Œçš„è®°å½• */
-			Queue_DeletePointer( &p_row->string, n_cols );
-		}
-		/* æ›´æ–°æœ¬è¡Œçš„å°ºå¯¸ */
-		p_next_row->max_size = row_size;
-		return;
-	}
-	if( n_cols <= 0 ) {
-		TextLayer_Update_RowSize( layer, i_row );
-	}
-	else if( i_col >= n_cols ) {
-		p_row->max_size = row_size;
-	}
-	/* å¦‚æœæœ¬è¡Œæœ‰ç»“æŸç¬¦ï¼ˆæ¢è¡Œç¬¦ï¼‰ */
-	if( p_row->last_char ) {
-		return;
-	}
-	/* è·å–æœ¬è¡Œå°ºå¯¸ï¼Œä»¥ä¾¿ä¸‹é¢ç»§ç»­ç´¯è®¡æœ¬è¡Œçš„å°ºå¯¸ */
-	row_size = p_row->max_size;
-	/* æœ¬è¡Œå†…å®¹çš„å®½åº¦æœªè¾¾åˆ°é™åˆ¶å®½åº¦ï¼Œéœ€è¦å°†ä¸‹è¡Œçš„æ–‡æœ¬è½¬ç§»è‡³æœ¬è¡Œ */
-	while(1) {
-		p_next_row = (Text_RowData*)
-		Queue_Get( &layer->rows_data, i_row+1 );
-		/* è‹¥æ²¡æœ‰ä¸‹è¡Œ */
-		if( !p_next_row ) {
-			p_row->max_size = row_size;
-			return;
-		}
-		while(1) {
-			p_char = (LCUI_CharData*)
-			Queue_Get( &p_next_row->string, 0 );
-			if( !p_char ) {
-				p_row->max_size = row_size;
-				break;
-			}
-			/* å¿½ç•¥æ— å­—ä½“ä½å›¾ã€ä¸å¯æ˜¾çš„æ–‡å­— */
-			if( !p_char->bitmap || !p_char->display ) {
-				Queue_AddPointer( &p_row->string, p_char );
-				Queue_DeletePointer( &p_next_row->string, 0 );
-				continue;
-			}
-			/* è·å–è¯¥å­—çš„é«˜åº¦ */
-			if( p_char->data && p_char->data->_pixel_size ) {
-				char_h = p_char->data->pixel_size+2;
-			} else {
-				char_h = layer->default_data.pixel_size+2;
-			}
-			row_size.w += p_char->bitmap->advance.x;
-			/* å¦‚æœæ²¡æœ‰è¶…è¿‡å®½åº¦é™åˆ¶ */
-			if( !layer->auto_wrap || row_size.w < layer->graph.w ) {
-				if( row_size.h < char_h ) {
-					row_size.h = char_h;
-				}
-				/* æ ‡è®°æœ¬å­—éœ€è¦åˆ·æ–° */
-				p_char->need_update = TRUE;
-				Queue_AddPointer( &p_row->string, p_char );
-				Queue_DeletePointer( &p_next_row->string, 0 );
-				continue;
-			}
-			/* è¶…è¿‡äº†å°±æ›´æ–°æœ¬è¡Œçš„å°ºå¯¸ï¼Œç„¶åé€€å‡º */
-			row_size.w -= p_char->bitmap->advance.x;
-			p_row->max_size = row_size;
-			return;
-		}
-		/* å¦‚æœè¿™ä¸€è¡Œæœ‰ç»“æŸç¬¦ */
-		if( p_next_row->last_char ) {
-			/* å°†ç»“æŸç¬¦è½¬ç§»è‡³å½“å‰è¡Œ */
-			p_row->last_char = p_next_row->last_char;
-			p_next_row->last_char = NULL;
-			/* ç„¶ååˆ é™¤è¿™ä¸€è¡Œ */
-			Queue_DeletePointer( &layer->rows_data, i_row+1 );
-			return;
-		}
-		/* åˆ é™¤è¿™ä¸€è¡Œï¼Œå› ä¸ºè¿™ä¸€è¡Œçš„å†…å®¹å·²ç»è½¬ç§»è‡³å½“å‰è¡Œ */
-		Queue_DeletePointer( &layer->rows_data, i_row+1 );
-	}
+        if( n_row >= p_row_list->rows ) {
+                return NULL;
+        }
+        return p_row_list->rowdata[n_row];
 }
 
-/** å¯¹æ–‡æœ¬å›¾å±‚ä¸­çš„æ–‡æœ¬è¿›è¡Œæ’ç‰ˆ */
-static void TextLayer_TextTypeset( LCUI_TextLayer *layer, int start_row )
+static inline TextRowData* 
+TextRowList_AddNewRow( TextRowList *rowlist )
 {
-	int i_row, n_rows;
-	n_rows = Queue_GetTotal( &layer->rows_data );
-	/* ä»ç¬¬start_row è¡Œå¼€å§‹ï¼Œå¯¹åé¢æ‰€æœ‰è¡Œè¿›è¡Œè‡ªåŠ¨æ¢è¡Œå¤„ç† */
-	for(i_row=start_row; i_row<n_rows; ++i_row) {
-		TextLayer_TextRowTypeset( layer, i_row );
-		/* æ›´æ–°æ€»è¡Œæ•° */
-		n_rows = Queue_GetTotal( &layer->rows_data );
-	}
+        TextRowData *row_ptr, **new_rowlist;
+        
+        ++rowlist->rows;
+        if( rowlist->max_rows <= rowlist->rows ) {
+                new_rowlist = (TextRowData**)realloc( rowlist->rowdata, 
+			sizeof(TextRowData*)*(rowlist->rows+1) );
+		if( !new_rowlist ) {
+                        --rowlist->rows;
+                        return NULL;
+                }
+                rowlist->rowdata = new_rowlist;
+                rowlist->max_rows = rowlist->rows;
+        }
+        
+        row_ptr = (TextRowData*)malloc( sizeof(TextRowData) );
+        if( !row_ptr ) {
+                return NULL;
+        }
+        TextRow_Init( row_ptr );
+        rowlist->rowdata[rowlist->rows-1] = row_ptr;
+        return row_ptr;
 }
 
-/** æ›´æ–°æ–‡æœ¬å›¾å±‚ä¸­çš„å†…å®¹ */
-LCUI_API void TextLayer_Update(	LCUI_TextLayer *layer,
-				LCUI_Queue *dirty_rect_list )
+static TextRowData* 
+TextRowList_InsertNewRow( TextRowList *rowlist, int n_row )
 {
-	LCUI_Rect area;
-	LCUI_Pos pos, mix_pos;
-	LCUI_BOOL draw_all = FALSE, redraw_row;
-	int i, j, n, rows;
-	LCUI_RGB color;
-	LCUI_Graph slot;
-	LCUI_CharData *p_data;
-	Text_RowData *p_row;
-	
-	if( !layer ) {
-		return;
-	}
-	/* å¦‚æœéœ€è¦æ»šåŠ¨å›¾å±‚ */
-	if( layer->need_scroll_layer ) {
-		/* ç›´æ¥åˆ·æ–°æ•´ä¸ªæ–‡æœ¬å›¾å±‚ */
-		area.x = 0 - layer->offset_pos.x;
-		area.y = 0 - layer->offset_pos.y;
-		area.width = layer->graph.w;
-		area.height = layer->graph.h;
-		RectQueue_AddToValid( &layer->clear_area, area );
-		draw_all = TRUE;
-		layer->need_scroll_layer = FALSE;
-	}
-	
-	Graph_Init( &slot );
-	/* åˆ‡æ¢å¯ç”¨é˜Ÿåˆ—ä¸ºå½“å‰å ç”¨çš„é˜Ÿåˆ— */
-	RectQueue_Switch( &layer->clear_area );
-	/* å…ˆå¤„ç†éœ€è¦æ¸…ç©ºçš„åŒºåŸŸ */
-	while( RectQueue_GetFromCurrent(&layer->clear_area, &area) ) { 
-		area.x += layer->offset_pos.x;
-		area.y += layer->offset_pos.y;
-		Graph_Quote( &slot, &layer->graph, area );
-		/* å°†è¯¥åŒºåŸŸçš„alphaé€šé“å¡«å……ä¸º0 */
-		Graph_FillAlpha( &slot, 0 );
-		if( dirty_rect_list ) {
-			Queue_Add( dirty_rect_list, &area ); 
-		}
-	}
-	/* å¼€å§‹ç»˜åˆ¶æ–‡æœ¬ä½å›¾è‡³ç›®æ ‡å›¾å±‚ä¸Š */
-	rows = Queue_GetTotal( &layer->rows_data );
-	DEBUG_MSG("tip1, rows: %d\n", rows);
-	for(pos.y=layer->offset_pos.y,i=0; i<rows; ++i) {
-		redraw_row = FALSE;
-		p_row = (Text_RowData*)Queue_Get( &layer->rows_data, i );
-		if( !p_row ) {
-			DEBUG_MSG("tip1.1\n");
-			continue;
-		}
-		/* å¦‚æœå½“å‰å­—çš„ä½å›¾çš„Yè½´è·¨è·ä¸åœ¨æœ‰æ•ˆç»˜åˆ¶åŒºåŸŸå†… */
-		if( pos.y + p_row->max_size.h <= 0 ) {
-			pos.y += p_row->max_size.h;
-			DEBUG_MSG("tip1.2, pos.y: %d, p_row->max_size.h: %d\n", pos.y, p_row->max_size.h);
-			continue;
-		}
-		n = Queue_GetTotal( &p_row->string );
-		DEBUG_MSG("tip2, row %d, len: %d\n", i, n);
-		for(pos.x=layer->offset_pos.x,j=0; j<n; ++j) {
-			p_data = (LCUI_CharData*)Queue_Get( &p_row->string, j ); 
-			if( !p_data || !p_data->bitmap ) {
-				continue;
-			}
-			/* å¦‚æœè®¾ç½®äº†å±è”½ç¬¦ */
-			if( layer->password_char.char_code > 0 ) {
-				layer->password_char.need_update = p_data->need_update;
-				p_data = &layer->password_char;
-			}
-			/* å¦‚æœå½“å‰å­—çš„ä½å›¾çš„Xè½´è·¨è·ä¸åœ¨æœ‰æ•ˆç»˜åˆ¶åŒºåŸŸå†… */
-			if( pos.x + p_data->bitmap->advance.x <= 0) {
-				pos.x += p_data->bitmap->advance.x;
-				continue;
-			}
-			/* è·å–è¯¥å­—ä½“ä½å›¾çš„é¢œè‰² */
-			if( p_data->data && p_data->data->_fore_color ) {
-				color = p_data->data->fore_color;
-			} else {
-				color = layer->default_data.fore_color;
-			}
-			DEBUG_MSG("char: %d, pos: %d,%d, redraw: %d\n", 
-				j, pos.x, pos.y, p_data->need_update || draw_all);
-			/* å¦‚æœå­—ä½“ä½å›¾å·²æ ‡è®°æ›´æ–°ï¼Œåˆ™ç»˜åˆ¶å®ƒ */
-			if( p_data->need_update || draw_all ) {
-				p_data->need_update = FALSE;
-				if( !redraw_row ) {
-					area.x = pos.x;
-					area.height = p_row->max_size.h;
-					redraw_row = TRUE;
-				}
-				mix_pos.x = pos.x + p_data->bitmap->left;
-				mix_pos.y = pos.y + p_row->max_size.h-1;
-				mix_pos.y -= p_data->bitmap->top;
-				/* è´´ä¸Šå­—ä½“ä½å›¾ */
-				FontBMP_Mix(	&layer->graph, 
-						mix_pos, 
-						p_data->bitmap,
-						color, 
-						GRAPH_MIX_FLAG_REPLACE );
-			}
-			pos.x += p_data->bitmap->advance.x;
-			if( pos.x > layer->graph.w ) {
-				break;
-			}
-		}
-		if(redraw_row) {
-			area.y = pos.y;
-			area.width = pos.x - area.x;
-			//_DEBUG_MSG("area:%d,%d,%d,%d\n", 
-			//area.x, area.y, area.width, area.height);
-			Queue_Add( dirty_rect_list, &area );
-		}
-		pos.y += p_row->max_size.h;
-		if( pos.y > layer->graph.h ) {
-			break;
-		}
-	}
-	DEBUG_MSG("tip3\n");
+        int i;
+        TextRowData *row_ptr, **new_rowlist;
+        
+        if( n_row > rowlist->rows ) {
+                return NULL;
+        }
+        ++rowlist->rows;
+        if( rowlist->max_rows <= rowlist->rows ) {
+                new_rowlist = (TextRowData**)realloc( rowlist->rowdata, 
+			sizeof(TextRowData*)*(rowlist->rows+1) );
+                if( !new_rowlist ) {
+                        --rowlist->rows;
+                        return NULL;
+                }
+                rowlist->rowdata = new_rowlist;
+                rowlist->max_rows = rowlist->rows;
+        }
+
+        row_ptr = (TextRowData*)malloc( sizeof(TextRowData) );
+        if( !row_ptr ) {
+                return NULL;
+        }
+        TextRow_Init( row_ptr );
+        for( i=rowlist->rows-1; i>n_row; --i ) {
+                rowlist->rowdata[i] = rowlist->rowdata[i-1];
+        }
+        rowlist->rowdata[n_row] = row_ptr;
+        return row_ptr;
 }
 
-/* æ ‡è®°éœ€è¦é‡ç»˜æ•´ä¸ªæ–‡æœ¬å›¾å±‚ */
-LCUI_API void TextLayer_Redraw( LCUI_TextLayer *layer )
+/** ´ÓÎÄ±¾ĞĞÁĞ±íÖĞÉ¾³ıÖ¸¶¨ÎÄ±¾ĞĞ */
+static int TextRowList_RemoveRow( TextRowList *p_rowlist, int row )
 {
-	int i, j;
-	int rows, len;
-	Text_RowData *row_ptr;
-	LCUI_CharData *char_ptr;
-	LCUI_Rect area;
-
-	area.x = 0;
-	area.y = 0;
-	area.width = layer->graph.w;
-	area.height = layer->graph.h;
-	/* ç›´æ¥æ¸…é™¤æ•´ä¸ªå›¾å±‚å†…å®¹ */
-	RectQueue_AddToValid( &layer->clear_area, area );
-
-	rows = Queue_GetTotal( &layer->rows_data );
-	for(i=0; i<rows; ++i) {
-		row_ptr = (Text_RowData*)
-		Queue_Get( &layer->rows_data, i );
-		len = Queue_GetTotal( &row_ptr->string );
-		for(j=0; j<len; ++j) {
-			char_ptr = (LCUI_CharData*)
-			Queue_Get( &row_ptr->string, j );
-			if( !char_ptr ) {
-				continue;
-			}
-			char_ptr->need_update = TRUE; 
-		}
-	}
+        if( row < 0 || row >= p_rowlist->rows ) {
+                return -1;
+        }
+        for( ; row < p_rowlist->rows; ++row ) {
+                p_rowlist->rowdata[row] = p_rowlist->rowdata[row+1];
+        }
+        p_rowlist->rowdata[row] = NULL;
+        --p_rowlist->rows;
+        return 0;
 }
 
-/* åˆ·æ–°æ•´ä¸ªæ–‡æœ¬å›¾å±‚ï¼Œè®©å„ä¸ªå­—ä½“ä½å›¾å¾—åˆ°æ›´æ–° */
-LCUI_API void TextLayer_Refresh( LCUI_TextLayer *layer )
+/** ¸üĞÂÎÄ±¾ĞĞµÄ³ß´ç */
+static void TextRow_UpdateSize( TextRowData *p_row, int default_height )
 {
-	int i, j;
-	int rows, len;
-	Text_RowData *row_ptr;
-	LCUI_CharData *char_ptr;
-	LCUI_Rect area={0,0,0,0};
-	
-	rows = Queue_GetTotal( &layer->rows_data );
-	for(i=0; i<rows; ++i) {
-		row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, i );
-		len = Queue_GetTotal( &row_ptr->string );
-		for(j=0; j<len; ++j) {
-			char_ptr = (LCUI_CharData*)Queue_Get( &row_ptr->string, j );
-			if( !char_ptr ) {
-				continue;
-			}
-			/* é‡æ–°è·å–å­—ä½“ä½å›¾ */
-			TextLayer_GetCharBMP( &layer->default_data, char_ptr );
-			char_ptr->need_update = TRUE; 
-		}
-		TextLayer_Update_RowSize( layer, i );
-		area.height += row_ptr->max_size.h;
-		/* ç¨å¾®æ‰©å¤§ä¸€ç‚¹åŒºåŸŸï¼ŒåŒºåŸŸé«˜åº¦å†+2 */
-		area.height += 2;
-		if( area.width < row_ptr->max_size.w ) {
-			area.width = row_ptr->max_size.w;
-		}
-	}
-	/* è®°å½•æ•´ä¸ªæ–‡æœ¬å›¾å±‚çš„å†…å®¹éœ€è¦æ¸…é™¤ */
-	RectQueue_AddToValid( &layer->clear_area, area );
+        int char_h, i;
+        TextCharData* p_char;
+
+        p_row->max_width = 0;
+        p_row->max_height = default_height;
+        for( i=0; i<p_row->string_len; ++i ) {
+                p_char = p_row->string[i];
+		if( !p_char->bitmap || !p_char->need_display ) {
+                        continue;
+                }
+		p_row->max_width += p_char->bitmap->advance.x;
+                if( p_char->style && p_char->style->_pixel_size ) {
+                        char_h = p_char->style->pixel_size+2;
+                } else {
+                        char_h = default_height;
+                }
+
+                if( p_row->max_width < char_h ) {
+                        p_row->max_width = char_h;
+                }
+        }
 }
 
-/* 
- * åŠŸèƒ½ï¼šè®¾å®šæ–‡æœ¬å›¾å±‚çš„åç§»ä½ç½®
- * è¿”å›å€¼ï¼šéœ€è¦å¯¹å›¾å±‚è¿›è¡Œé‡ç»˜æ—¶è¿”å›0ï¼Œå¦åˆ™è¿”å›1
- *  */
-LCUI_API int
-TextLayer_SetOffset( LCUI_TextLayer *layer, LCUI_Pos offset_pos )
+/** ÉèÖÃÎÄ±¾ĞĞµÄ×Ö·û´®³¤¶È */
+static int TextRow_SetLength( TextRowData *p_row, int new_len )
 {
-	/* å¦‚æœä¹‹å‰å·²ç»æ ‡è®°ä¸éœ€è¦æ»šåŠ¨ï¼Œé‚£ä¹ˆå°±è®°å½•å½“å‰çš„åç§»ä½ç½® */
-	if( !layer->need_scroll_layer ) {
-		layer->old_offset_pos = layer->offset_pos;
-	}
-	if( layer->offset_pos.x == offset_pos.x
-	&& layer->offset_pos.y == offset_pos.y ) {
-		return 1;
-	}
-	layer->offset_pos = offset_pos;
-	layer->need_scroll_layer = TRUE;
-	return 0;
-}
+        TextCharData **p_new_str;
 
-/** è®¾ç½®æ–‡æœ¬å›¾å±‚çš„å›¾åƒå°ºå¯¸ */
-LCUI_API int TextLayer_SetGraphSize(	LCUI_TextLayer *layer, 
-					LCUI_Size new_size )
-{
-	int ret, old_w;
-	/* å¦‚æœå°ºå¯¸æœ‰å˜åŒ–ï¼Œåˆ™æ ‡è®°éœ€è¦é‡ç»˜æ–‡æœ¬ä½å›¾ */
-	if( layer->graph.w != new_size.w || layer->graph.h != new_size.h ) {
-		TextLayer_Redraw( layer );
-	}
-	old_w = layer->graph.w;
-	ret = Graph_Create( &layer->graph, new_size.w, new_size.h );
-	/* å¦‚æœå®½åº¦æœ‰å˜åŒ–ï¼Œå¹¶å¯ç”¨äº†è‡ªåŠ¨æ¢è¡ŒåŠŸèƒ½ */
-	if( old_w != new_size.w && layer->auto_wrap ) {
-		TextLayer_TextTypeset( layer, 0 );
-	}
-	return ret;
-}
-
-/** è®¡ç®—æ–‡æœ¬å›¾å±‚çš„å°ºå¯¸ */
-LCUI_API int TextLayer_GetSize( LCUI_TextLayer *layer, LCUI_Size *layer_size )
-{
-	int i, cols, max_cols, rows;
-	LCUI_Size size={0,0};
-	Text_RowData *p_row; 
-	
-	if( !layer ) {
-		return -1;
-	}
-	rows = Queue_GetTotal( &layer->rows_data );
-	if( layer->password_char.char_code > 0 ) {
-		max_cols = 0;
-		for(i=0; i<rows; ++i) {
-			p_row = (Text_RowData*)
-			Queue_Get( &layer->rows_data, i );
-			cols = Queue_GetTotal( &p_row->string );
-			if( max_cols < cols ) {
-				max_cols = cols;
-			}
-		}
-		size.w = layer->password_char.bitmap->advance.x;
-		size.w *= max_cols;
-		size.h = layer->default_data.pixel_size + 4;
-		size.h *= rows;
-	} else {
-		for(size.w=0,size.h=0,i=0; i<rows; ++i) {
-			p_row = (Text_RowData*)
-			Queue_Get( &layer->rows_data, i );
-			if( !p_row ) {
-				continue;
-			}
-			if( size.w < p_row->max_size.w ) {
-				size.w = p_row->max_size.w;
-			}
-			size.h += p_row->max_size.h;
-		}
-	}
-	/* å°ºå¯¸ç¨å¾®æå¤§ä¸€ç‚¹ï¼Œå› ä¸ºæ˜¾ç¤ºæ–‡æœ¬å…‰æ ‡éœ€è¦ä¸€å®šç©ºé—´ */
-	size.w += 2;
-	size.h += 2;
-	*layer_size = size;
-	return 0;
-}
-
-/** è·å–æ–‡æœ¬å›¾å±‚çš„å›¾åƒæ•°æ® */
-LCUI_API LCUI_Graph *TextLayer_GetGraph( LCUI_TextLayer *layer )
-{
-	return &layer->graph;
-}
-
-/* è·å–æ–‡æœ¬å›¾å±‚ä¸­çš„æ–‡æœ¬å†…å®¹ */
-LCUI_API size_t
-TextLayer_GetText( LCUI_TextLayer *layer, wchar_t *buff, size_t max_len )
-{
-	unsigned int i, text_len;
-	LCUI_CharData *char_p;
-
-	if( max_len == 0 ) {
+        if( new_len < 0 ) {
+                new_len = 0;
+        }
+        p_row->string_len = new_len;
+        if( new_len <= p_row->string_max_len ) {
 		return 0;
 	}
-	text_len = Queue_GetTotal( &layer->text_source_data );
-	if( text_len <= 0 ) {
-		return 0;
-	}
-	max_len -= 1; /* ç•™ä¸€ä¸ªä½ç½®ä¿å­˜ç»“æŸç¬¦ */
-	if( max_len > text_len ) {
-		max_len = text_len;
-	}
-	for( i=0; i<max_len; ++i ) {
-		char_p = (LCUI_CharData *)Queue_Get( &layer->text_source_data, i );
-		buff[i] = char_p->char_code;
-	}
-	buff[i] = '\0';
-	return i;
+
+        p_new_str = (TextCharData**)
+	realloc( p_row->string, sizeof(TextCharData*)*new_len );
+        if( !p_new_str ) {
+                --p_row->string_len;
+                return -1;
+        }
+        p_row->string = p_new_str;
+        p_row->string_max_len = p_row->string_len;
+        return 0;
 }
 
-/** åˆ·æ–°æŒ‡å®šè¡Œä¸­æŒ‡å®šå­—ä»¥åŠåé¢çš„å­—çš„åŒºåŸŸ */
-LCUI_API void TextLayer_RefreshCharBehind( LCUI_TextLayer *layer, LCUI_Pos char_pos )
-{
-	int i, len;
-	LCUI_Rect area;
-	Text_RowData *row_ptr;
-	LCUI_CharData *char_ptr;
-
-	row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, char_pos.y );
-	len = Queue_GetTotal( &row_ptr->string );
-	/* å¦‚æœè®¾ç½®äº†å±è”½ç¬¦ï¼Œåˆ™ç›´æ¥è®¡ç®—å‡ºåæ ‡ */
-	if( layer->password_char.char_code > 0
-	 && layer->password_char.bitmap ) {
-		area.y = layer->password_char.bitmap->advance.y + 2;
-		area.y *= char_pos.y;
-		area.x = layer->password_char.bitmap->advance.x;
-		area.x *= char_pos.x;
-		area.width = layer->password_char.bitmap->advance.x;
-		area.width *= len;
-		area.width -= area.x;
-		area.height = layer->password_char.bitmap->advance.y;
-	} else {
-		/* è·å–è¯¥è¡Œæ–‡å­—çš„èµ·ç‚¹Yè½´åæ ‡ */
-		for( area.y=0,i=0; i<char_pos.y; ++i ) {
-			row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, i );
-			if( !row_ptr ) {
-				continue;
-			}
-			area.y += row_ptr->max_size.h;
-		}
-		/* éå†å„ä¸ªæ–‡å­—ï¼Œç´¯è®¡è¯¥å­—çš„Xè½´åæ ‡ */
-		for( area.x=0,i=0; i<char_pos.x; ++i ) {
-			char_ptr = (LCUI_CharData*)
-			Queue_Get( &row_ptr->string, i ); 
-			if( !char_ptr || !char_ptr->bitmap ) {
-				continue;
-			}
-			area.x += char_ptr->bitmap->advance.x;
-		}
-		area.width = row_ptr->max_size.w - area.x;
-		area.height = row_ptr->max_size.h;
-	}
-	/* è¯¥å­—åé¢çš„å­—éƒ½éœ€è¦é‡ç»˜ */
-	for( i=char_pos.x; i<len; ++i ) {
-		char_ptr = (LCUI_CharData*)
-		Queue_Get( &row_ptr->string, i );
-		if( !char_ptr ) {
-			continue;
-		}
-		/* æ ‡è®°è¯¥å­—çš„ä½å›¾éœ€è¦é‡ç»˜ */
-		char_ptr->need_update = TRUE;
-	}
-	/* è®°å½•éœ€åˆ·æ–°çš„åŒºåŸŸ */
-	RectQueue_AddToValid( &layer->clear_area, area );
-	DEBUG_MSG("record area: %d,%d,%d,%d\n", area.x, area.y, area.width, area.height);
-}
-
-LCUI_API void
-TextLayer_Text_SetDefaultStyle( LCUI_TextLayer *layer, LCUI_TextStyle style )
-/* è®¾å®šé»˜è®¤çš„æ–‡æœ¬æ ·å¼ï¼Œéœ€è¦è°ƒç”¨TextLayer_Drawå‡½æ•°è¿›è¡Œæ–‡æœ¬ä½å›¾æ›´æ–° */
-{
-	layer->default_data = style; 
-	TextLayer_Refresh( layer );
-}
-
-LCUI_API void
-TextLayer_ReadOnly( LCUI_TextLayer *layer, LCUI_BOOL flag )
-/* æŒ‡å®šæ–‡æœ¬å›¾å±‚ä¸­çš„æ–‡æœ¬æ˜¯å¦ä¸ºåªè¯» */
-{
-	layer->read_only = flag;
-}
-
-LCUI_API void
-TextLayer_Text_Clear( LCUI_TextLayer *layer )
-/* æ¸…ç©ºæ–‡æœ¬å†…å®¹ */
-{
-	if( layer == NULL ) {
-		return;
-	}
-	/* åˆ·æ–°æ–‡æœ¬å›¾å±‚ï¼Œè®°å½•å½“å‰æ–‡å­—çš„åŒºåŸŸï¼Œä»¥åœ¨ç»˜åˆ¶æ—¶æŠ¹å»æ®‹ä½™æ–‡å­—ä½å›¾ */
-	TextLayer_Refresh( layer );
-	/* é”€æ¯ç°æœ‰æ•°æ® */
-	Queue_Destroy( &layer->text_source_data );
-	Queue_Destroy( &layer->rows_data );
-	Queue_Destroy( &layer->tag_buff );
-	/* å†åˆå§‹åŒ– */
-	Queue_Init( &layer->text_source_data, sizeof(LCUI_CharData), Destroy_CharData );
-	Queue_SetDataMode( &layer->text_source_data, QUEUE_DATA_MODE_LINKED_LIST ); 
-	Queue_Init( &layer->rows_data, sizeof(Text_RowData), Destroy_Text_RowData ); 
-	StyleTag_Init( &layer->tag_buff );
-	/* é‡ç½®ç›¸å…³å˜é‡ */
-	layer->offset_pos.x = 0;
-	layer->offset_pos.y = 0;
-	layer->current_src_pos = 0;
-	layer->current_des_pos.x = 0;
-	layer->current_des_pos.y = 0;
-}
-
-LCUI_API void
-TextLayer_SetRowEnd( LCUI_TextLayer *layer, uint_t row, uint_t start_cols )
-/* ä¸ºæŒ‡å®šè¡Œè®¾å®šç»“æŸç‚¹ï¼Œç»“æŸç‚¹åŠåé¢çš„æ•°æ®å°†è¢«åˆ é™¤ï¼Œä½†ä¸è®°å½•æ®‹ä½™æ–‡æœ¬ä½å›¾åŒºåŸŸ */
-{
-	uint_t total, i;
-	Text_RowData *row_data; 
-	
-	row_data = Queue_Get( &layer->rows_data, row );
-	total = Queue_GetTotal( &row_data->string );
-	/* ç§»é™¤å¤šä½™çš„æ•°æ® */
-	for(i=start_cols; i<total; ++i) {
-		Queue_Delete( &row_data->string, start_cols ); 
-	}
-}
-
-LCUI_API int
-TextLayer_Text_GetTotalLength( LCUI_TextLayer *layer )
-/* è·å–æ–‡æœ¬ä½å›¾ä¸­çš„æ–‡æœ¬é•¿åº¦ */
-{
-	return Queue_GetTotal( &layer->text_source_data );
-}
-
-LCUI_API void
-TextLayer_Text_Set_MaxLength( LCUI_TextLayer *layer, int max )
-/* è®¾å®šæ–‡æœ¬ä½å›¾ä¸­çš„æ–‡æœ¬é•¿åº¦ */
-{
-	if( max > 0 ) {
-		layer->max_text_len = max;
-	}
-	// å¯¹ç°æœ‰æ–‡æœ¬è¿›è¡Œæˆªæ–­å¤„ç†ï¼Œæš‚ä¸æ·»åŠ æ·»åŠ 
-}
-
-LCUI_API void
-TextLayer_Text_SetPasswordChar( LCUI_TextLayer *layer, wchar_t ch )
-/* 
- * è®¾ç½®å±è”½å­—ç¬¦ï¼Œè®¾ç½®åï¼Œæ–‡æœ¬æ¡†å†…çš„æ–‡æœ¬éƒ½ä¼šæ˜¾ç¤ºæˆè¯¥å­—ç¬¦
- * å¦‚æœchçš„å€¼ä¸º0ï¼Œåˆ™ä¸å¯¹æ–‡æœ¬æ¡†é‡Œçš„æ–‡æœ¬è¿›è¡Œå±è”½ 
- * */
-{
-	layer->password_char.char_code = ch;
-	TextLayer_GetCharBMP( &layer->default_data, &layer->password_char );
-	//æš‚æ—¶ä¸è¿›è¡Œå…¶å®ƒå¤„ç†
-}
-
-/** å¯¹æ–‡æœ¬è¿›è¡Œé¢„å¤„ç†ï¼Œå¤„ç†åçš„æ•°æ®ä¿å­˜è‡³layeré‡Œ */ 
-LCUI_API void TextLayer_Text_Process(	LCUI_TextLayer *layer,
-					int pos_type,
-					wchar_t *new_text )
-{
-	LCUI_BOOL need_refresh_row = FALSE;
-	LCUI_Pos cur_pos, des_pos;
-	int total, cur_len, row, src_pos, total_row, n_ignore = 0;
-	const wchar_t *finish, *p, *q;
-	
-	LCUI_Pos tmp_pos;
-	LCUI_CharData *char_ptr, char_data; 
-	Text_RowData *cur_row_ptr, *tmp_row_ptr;
-
-	int char_h, char_pos_x, i;
-	LCUI_Size row_size;
-	
-	if( new_text == NULL ) {
-		return;
-	}
-	/* å¦‚æœæœ‰é€‰ä¸­çš„æ–‡æœ¬ï¼Œé‚£å°±åˆ é™¤ */
-	//......  
-	DEBUG_MSG1("enter\n");
-	/* å¦‚æœæ˜¯å°†æ–‡æœ¬è¿½åŠ è‡³æ–‡æœ¬æœ«å°¾ */
-	if( pos_type == AT_TEXT_LAST ) {
-		cur_pos.y = Queue_GetTotal( &layer->rows_data );
-		if( cur_pos.y > 0 ) {
-			--cur_pos.y;
-		}
-		cur_row_ptr = (Text_RowData*)
-		Queue_Get( &layer->rows_data, cur_pos.y );
-		if( !cur_row_ptr ) {
-			TextLayer_Text_AddNewRow( layer );
-			cur_row_ptr = (Text_RowData*)
-			Queue_Get( &layer->rows_data, cur_pos.y );
-		}
-		cur_pos.x = Queue_GetTotal( &cur_row_ptr->string );
-		src_pos = Queue_GetTotal( &layer->text_source_data );
-		des_pos = cur_pos;
-	} else {/* å¦åˆ™ï¼Œæ˜¯å°†æ–‡æœ¬æ’å…¥è‡³å…‰æ ‡æ‰€åœ¨ä½ç½® */
-		cur_pos = TextLayer_Cursor_GetPos( layer );
-		DEBUG_MSG1( "cur_pos: %d,%d\n", cur_pos.x, cur_pos.y );
-		cur_row_ptr = (Text_RowData*)
-		Queue_Get( &layer->rows_data, cur_pos.y );
-		DEBUG_MSG1( "cur_row_ptr: %p\n", cur_row_ptr );
-		if( !cur_row_ptr ) {
-			TextLayer_Text_AddNewRow( layer );
-			cur_row_ptr = (Text_RowData*)
-			Queue_Get( &layer->rows_data, cur_pos.y );
-		}
-		src_pos = layer->current_src_pos;
-		des_pos = layer->current_des_pos;
-		DEBUG_MSG1( "src_pos: %d\n", src_pos );
-		DEBUG_MSG1( "des_pos: %d,%d\n", des_pos.x, des_pos.y );
-	}
-	row = cur_pos.y;
-	total = wcslen( new_text );
-	total_row = TextLayer_GetRows( layer );
-	/* è®°å½•å½“å‰è¡Œçš„å°ºå¯¸ */
-	row_size = cur_row_ptr->max_size;
-	/* åˆ¤æ–­å½“å‰è¦æ·»åŠ çš„å­—ç¬¦çš„æ€»æ•°æ˜¯å¦è¶…å‡ºæœ€å¤§é™åˆ¶ */
-	cur_len = Queue_GetTotal( &layer->text_source_data );
-	if( (uint32_t)(total+cur_len) > layer->max_text_len ) {
-		total = layer->max_text_len - cur_len;
-	}
-	if( total < 0 ) {
-		total = 0;
-	}
-	/* å…ˆè®¡ç®—å½“å‰æ’å…¥ç‚¹çš„Xè½´åæ ‡ */
-	for(char_pos_x=0,i=0; i<des_pos.x; ++i) {
-		char_ptr = (LCUI_CharData*)
-		Queue_Get( &cur_row_ptr->string, i );
-		if( char_ptr && char_ptr->bitmap && char_ptr->display ) {
-			char_pos_x += char_ptr->bitmap->advance.x;
-		}
-	}
-	//_DEBUG_MSG( "layer: %p, cur total: %d, max_len: %d\n", 
-	// layer, cur_len, layer->max_text_len );
-	DEBUG_MSG1( "total char: %d\n", total );
-	DEBUG_MSG1( "total row: %d\n", total_row );
-	/* å…ˆè®°å½•è¿™ä¸€è¡Œéœ€è¦åˆ·æ–°çš„åŒºåŸŸï¼Œèµ·ç‚¹ä¸ºå…‰æ ‡æ‰€åœ¨ä½ç½® */
-	TextLayer_RefreshCharBehind( layer, cur_pos );
-	for(p=new_text, finish=new_text+total; p<finish; ++p) {
-		n_ignore = -1;
-		DEBUG_MSG2( "1, char: %c\n", *p );
-		if( layer->using_style_tags ) {
-			/* å¤„ç†æ ·å¼çš„ç»“æŸæ ‡ç­¾ */ 
-			q = StyleTag_ProcessEndingTag( &layer->tag_buff, p );
-			if( q ) {
-				/* è®¡ç®—éœ€å¿½ç•¥çš„å­—ç¬¦æ•° */
-				n_ignore = q-p;
-			} else {
-				/* å¤„ç†æ ·å¼æ ‡ç­¾ */
-				q = StyleTag_ProcessTag( &layer->tag_buff, p );
-				if( q ) {
-					n_ignore = q-p;
-				}
-			}
-		}
-		/* é’ˆå¯¹æ¢è¡Œç¬¦æ¨¡å¼ä¸ºWin(CR/LF)çš„æ–‡æœ¬ï¼Œè¿›è¡Œå¤„ç† */
-		if( *p == '\n' || *p == '\r' ) { 
-			/* è®¡ç®—éœ€è¦å¿½ç•¥çš„æ¢è¡Œç¬¦çš„æ•°é‡ */
-			for( n_ignore=0,q=p; *q=='\n' || *q=='\r'; ++q,++n_ignore);
-		} 
-		if( n_ignore > 0 ) {
-			/* è¢«å¿½ç•¥çš„å­—ç¬¦çš„å±æ€§éƒ½ä¸€æ ·ï¼Œæ‰€ä»¥åªéœ€èµ‹ä¸€æ¬¡å€¼ */
-			char_data.data = NULL;
-			char_data.display = FALSE; 
-			char_data.need_update = FALSE;
-			char_data.bitmap = NULL;
-			tmp_pos.x = des_pos.x;
-			tmp_pos.y = des_pos.y;
-		}
-		for( ;n_ignore>0; --n_ignore,++src_pos ) {
-			char_data.char_code = *p++;
-			char_ptr = (LCUI_CharData*)Queue_Insert( 
-			&layer->text_source_data, src_pos, &char_data ); 
-			/* å¦‚æœæœªå¯ç”¨å¤šè¡Œæ–‡æœ¬ï¼Œæˆ–æœªé‡åˆ°æ¢è¡Œç¬¦ */
-			if( !layer->enable_multiline
-			 || char_data.char_code != '\n' ) {
-				continue;
-			}
-			++row;
-			if( !need_refresh_row ) {
-				/* è®°å½•å½“å‰è¡Œçš„èµ·ç‚¹ä½ç½® */
-				tmp_pos.x = 0;
-				tmp_pos.y = row;
-				/* æ ‡è®°éœ€è¦åˆ·æ–°è¯¥è¡Œåé¢æ‰€æœ‰è¡Œ */
-				need_refresh_row = TRUE;
-			}
-			/* æ¢è¡Œç¬¦çš„æ•°æ®å•ç‹¬ä¿å­˜ */
-			cur_row_ptr->last_char = char_ptr;
-			/* åœ¨è¯¥è¡Œæ’å…¥æ–°è¡Œ */
-			TextLayer_Text_InsertNewRow( layer, row );
-			/* è·å–æ–°è¡Œçš„è¡ŒæŒ‡é’ˆ */
-			tmp_row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, row );
-			/* æ›´æ–°å½“å‰è¡Œå°ºå¯¸ */
-			cur_row_ptr->max_size = row_size;
-			/* è®°å½•æ–°è¡Œçš„å°ºå¯¸ */
-			row_size = tmp_row_ptr->max_size;
-			/* å½“å‰ä½ç½®åé¢çš„å­—ç¬¦è½¬ç§»åˆ°æ–°è¡Œé‡Œ */
-			TextLayer_Text_RowBreak( layer, cur_row_ptr, des_pos.x, tmp_row_ptr );
-			/* è¡ŒæŒ‡é’ˆåˆ‡æ¢åˆ°ä¸‹ä¸€è¡Œ */
-			cur_row_ptr = tmp_row_ptr;
-			/* æ›´æ–°å½“å‰å­—ç¬¦åæ ‡ */
-			des_pos.x = 0;
-			des_pos.y = row;
-		}
-		if( n_ignore == 0 ) {
-			/* æ›´æ–°æ€»è¡Œæ•° */
-			total_row = TextLayer_GetRows( layer );
-			n_ignore = -1;
-			--p;
-			continue;
-		}
-		DEBUG_MSG2( "2, char: %c\n", *p );
-		char_data.char_code = *p;
-		char_data.display = TRUE; 
-		char_data.need_update = TRUE; 
-		/* è·å–å½“å‰æ–‡æœ¬æ ·å¼æ•°æ® */
-		char_data.data = StyleTag_GetCurrentStyle( &layer->tag_buff );
-		/* è·å–æœ¬å­—çš„å­—ä½“ä½å›¾ */
-		TextLayer_GetCharBMP( &layer->default_data, &char_data );
-		/* æ’å…¥è‡³æºæ–‡æœ¬ä¸­ */
-		char_ptr = (LCUI_CharData*)
-		Queue_Insert( &layer->text_source_data, src_pos, &char_data );
-		/* å°†è¯¥æŒ‡é’ˆæ·»åŠ è‡³è¡Œæ•°æ®é˜Ÿåˆ—ä¸­ */
-		cur_row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, des_pos.y );
-		Queue_InsertPointer( &cur_row_ptr->string, des_pos.x, char_ptr );
-		
-		/* ç´¯è®¡å½“å‰è¡Œçš„å®½åº¦ */
-		row_size.w += char_ptr->bitmap->advance.x;
-		/* è·å–è¯¥å­—çš„é«˜åº¦ */
-		if( char_ptr->data && char_ptr->data->_pixel_size ) {
-			char_h = char_ptr->data->pixel_size+2;
-		} else {
-			char_h = layer->default_data.pixel_size+2;
-		}
-		if( row_size.h < char_h ) {
-			row_size.h = char_h;
-		}
-
-		++src_pos; 
-		++des_pos.x;
-	}
-	/** å¦‚æœéœ€è¦åˆ·æ–°åé¢æ‰€æœ‰è¡Œçš„æ–‡æœ¬ */
-	if( need_refresh_row ) {
-		/* åˆ·æ–°è¯¥è¡Œåé¢æ‰€æœ‰è¡Œçš„å­—ç¬¦ */
-		for( ; tmp_pos.y<total_row; ++tmp_pos.y ) {
-			TextLayer_RefreshCharBehind( layer, tmp_pos );
-		}
-	}
-	/** å¦‚æœè¿˜åœ¨åŒä¸€è¡Œå†… */
-	if( des_pos.y == cur_pos.y ) {
-		total = Queue_GetTotal( &cur_row_ptr->string );
-		/* ç»§ç»­ç´¯è®¡å½“å‰è¡Œå‰©ä½™å­—ç¬¦çš„å°ºå¯¸ */
-		for(i=des_pos.x; i<total; ++i) {
-			char_ptr = (LCUI_CharData*)
-			Queue_Get( &cur_row_ptr->string, i );
-			row_size.w += char_ptr->bitmap->advance.x;
-			if( char_ptr->data && char_ptr->data->_pixel_size ) {
-				char_h = char_ptr->data->pixel_size+2;
-			} else {
-				char_h = layer->default_data.pixel_size+2;
-			}
-			if( row_size.h < char_h ) {
-				row_size.h = char_h;
-			}
-		}
-		/* æ›´æ–°è¯¥è¡Œçš„å°ºå¯¸ */
-		cur_row_ptr->max_size = row_size;
-	}
-	if( pos_type == AT_CURSOR_POS ) {
-		layer->current_des_pos = des_pos;
-		layer->current_src_pos = src_pos;
-	}
-	/* è‹¥å¯ç”¨äº†è‡ªåŠ¨æ¢è¡Œ */
-	if( layer->auto_wrap ) {
-		TextLayer_TextTypeset( layer, cur_pos.y );
-	}
-	DEBUG_MSG1("quit\n");
-}
-
-LCUI_API void
-TextLayer_PrintInfo( LCUI_TextLayer *layer )
-/* æ‰“å°æ–‡æœ¬å›¾å±‚ä¿¡æ¯ */
-{
-	int32_t i, j, len, rows;
-	Text_RowData *row_ptr;
-	LCUI_CharData *char_ptr;
-	
-	printf( "layer: %p\n", layer );
-	rows = Queue_GetTotal( &layer->rows_data );
-	for(j=0; j<rows; ++j) {
-		row_ptr = Queue_Get( &layer->rows_data, j );
-		len = Queue_GetTotal( &row_ptr->string );
-		printf( "row[%d/%d], len: %d\n", j, rows, len );
-		for(i=0; i<len; ++i) {
-			char_ptr = Queue_Get( &row_ptr->string, i );
-			printf( "char code: %lu, display: %d\n", 
-			char_ptr->char_code, char_ptr->display );
-			FontBMP_PrintInfo( char_ptr->bitmap );
-		}
-	}
-	printf("\n\n");
-}
-
-/* 
- * åŠŸèƒ½ï¼šè®¾å®šæŒ‡å®šçš„å®½å­—ç¬¦ä¸²ä½œä¸ºæ–‡æœ¬å›¾å±‚ä¸­æ˜¾ç¤ºçš„æ–‡æœ¬
- * è¯´æ˜ï¼šæ–‡æœ¬å°†è¢«å‚¨å­˜è‡³ç¼“å†²åŒºï¼Œç­‰å¾…ç»˜åˆ¶æ–‡æœ¬ä½å›¾æ—¶å†å¤„ç†ç¼“å†²åŒºå†…çš„æ–‡æœ¬
- *  */
-LCUI_API void
-TextLayer_TextW( LCUI_TextLayer *layer, wchar_t *wchar_text )
-{
-	if( !layer ) {
-		return;
-	}
-	TextLayer_Text_Clear( layer );
-	TextLayer_Text_AddW( layer, wchar_text );
-}
-
-LCUI_API void
-TextLayer_Text( LCUI_TextLayer *layer, const char *utf8_text )
-{
-	wchar_t *unicode_text;
-	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
-	TextLayer_TextW( layer, unicode_text );
-	free( unicode_text );
-}
-
-LCUI_API void
-TextLayer_TextA( LCUI_TextLayer *layer, const char *ascii_text )
-{
-	wchar_t *unicode_text;
-	LCUICharset_GB2312ToUnicode( ascii_text, &unicode_text );
-	TextLayer_TextW( layer, unicode_text );
-	free( unicode_text );
-}
-
-/* åœ¨æ–‡æœ¬æœ«å°¾è¿½åŠ æ–‡æœ¬ï¼Œä¸ç§»åŠ¨å…‰æ ‡ï¼Œä¸åˆ é™¤åŸæœ‰é€‰ä¸­æ–‡æœ¬ */
-LCUI_API int
-TextLayer_Text_AppendW( LCUI_TextLayer *layer, wchar_t *new_text )
-{
-	TextLayer_Text_Process( layer, AT_TEXT_LAST, new_text );
-	return 0;
-}
-
-LCUI_API int
-TextLayer_Text_AppendA( LCUI_TextLayer *layer, char *new_text )
-{
-	wchar_t *unicode_text;
-	LCUICharset_GB2312ToUnicode( new_text, &unicode_text );
-	TextLayer_Text_AppendW( layer, unicode_text );
-	free( unicode_text );
-	return 0;
-}
-
-LCUI_API int
-TextLayer_Text_Append( LCUI_TextLayer *layer, char *new_text )
-{
-	wchar_t *unicode_text;
-	LCUICharset_UTF8ToUnicode( new_text, &unicode_text );
-	TextLayer_Text_AppendW( layer, unicode_text );
-	free( unicode_text );
-	return 0;
-}
-
-/* åœ¨å…‰æ ‡å¤„æ·»åŠ æ–‡æœ¬ï¼Œå¦‚æœ‰é€‰ä¸­æ–‡æœ¬ï¼Œå°†è¢«åˆ é™¤ */
-LCUI_API int
-TextLayer_Text_AddW( LCUI_TextLayer *layer, wchar_t *unicode_text )
-{
-	TextLayer_Text_Process( layer, AT_CURSOR_POS, unicode_text );
-	return 0;
-}
-
-LCUI_API int
-TextLayer_Text_Add( LCUI_TextLayer *layer, char *utf8_text )
-{
-	wchar_t *unicode_text;
-	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
-	TextLayer_Text_AddW( layer, unicode_text );
-	free( unicode_text );
-	return 0;
-}
-
-LCUI_API int
-TextLayer_Text_AddA( LCUI_TextLayer *layer, char *ascii_text )
-{
-	wchar_t *unicode_text;
-	LCUICharset_GB2312ToUnicode( ascii_text, &unicode_text );
-	TextLayer_Text_AddW( layer, unicode_text );
-	free( unicode_text );
-	return 0;
-}
-
-LCUI_API int
-TextLayer_Text_Paste( LCUI_TextLayer *layer )
-/* å°†å‰ªåˆ‡æ¿çš„å†…å®¹ç²˜è´´è‡³æ–‡æœ¬å›¾å±‚ */
-{
-	return 0;
-}
-
-/** è·å–æŒ‡å®šå­—ç¬¦æ•°æ®åœ¨æºæ–‡æœ¬ä¸­çš„ä½ç½® */
-static int TextLayer_GetCharPos(	LCUI_TextLayer *layer, 
-					LCUI_CharData *p_cdata, 
-					LCUI_BOOL left_search )
-{
-	int n, src_pos, total;
-	LCUI_CharData *p_exist_cdata;
-	
-	if( !p_cdata ) {
-		return -1;
-	}
-	src_pos = layer->current_src_pos;
-	total = Queue_GetTotal( &layer->text_source_data );
-	//printf( "source text len: %d\n", total );
-	/* ç¡®ä¿èµ·ç‚¹ä½ç½®æœ‰æ•ˆ */
-	if( src_pos >= total ) {
-		src_pos = total-1;
-	}
-	if( src_pos < 0 ) {
-		src_pos = 0;
-	}
-	/* å¦‚æœæ˜¯è¦å‘å·¦æœç´¢ */
-	if( left_search ) {
-		goto left_search;
-	} else {
-		goto right_search;
-	}
-	/* ç¡®å®šè¯¥å­—åœ¨æºæ–‡æœ¬ä¸­çš„ä½ç½® */
-left_search:
-	//printf( "left, char_ptr: %p, char_code: %c\n", 
-	//	char_ptr, char_ptr?char_ptr->char_code:'?' );
-	for( n=src_pos; n>=0 ;--n ) {
-		p_exist_cdata = (LCUI_CharData*)
-		Queue_Get( &layer->text_source_data, n );
-		//printf( "get, char_ptr: %p, char_code: %c\n", 
-		//	tmp_ptr, tmp_ptr?tmp_ptr->char_code:'?' );
-		if( p_exist_cdata == p_cdata ) {
-			break;
-		}
-	}
-	goto end_search;
-	
-right_search:
-	//printf( "right, char_ptr: %p, char_code: %c\n", 
-	//	char_ptr, char_ptr?char_ptr->char_code:'?' );
-	for( n=src_pos; n<total; ++n ) {
-		p_exist_cdata = (LCUI_CharData*)
-		Queue_Get( &layer->text_source_data, n );
-		//printf( "get, char_ptr: %p, char_code: %c\n", 
-		//	tmp_ptr, tmp_ptr?tmp_ptr->char_code:'?' );
-		if( p_exist_cdata == p_cdata ) {
-			break;
-		}
-	}
-	goto end_search;
-	
-end_search:
-	/* æ£€æµ‹éå†ç»“æœ */
-	if( left_search ) {
-		if( n < 0 ) {
-			goto right_search;
-		}
-		/* æœªæ‰¾åˆ°åˆ™è¿”å›-1 */
-		if( n >= total ) {
-			return -1;
-		}
-	} else {
-		if( n < 0 ) {
-			return -1;
-		}
-		if( n >= total ) {
-			goto left_search;
-		}
-	}
-	return n;
-}
-
-
-static LCUI_CharData *
-TextLayer_GetCurChar( LCUI_TextLayer *layer )
-/* è·å–å…‰æ ‡é™„è¿‘çš„å­—ç¬¦æ•°æ®çš„æŒ‡é’ˆ */
-{
-	int total;
-	LCUI_Pos pos;
-	LCUI_CharData *char_ptr;
-	Text_RowData *row_ptr;
-	
-	pos = TextLayer_Cursor_GetPos( layer );
-	row_ptr = Queue_Get( &layer->rows_data, pos.y );
-	if( !row_ptr ) {
-		return NULL;
-	}
-	char_ptr = Queue_Get( &row_ptr->string, pos.x );
-	total = Queue_GetTotal( &row_ptr->string );
-	if( !char_ptr ) {
-		/* å¦‚æœå½“å‰å…‰æ ‡åœ¨è¿™è¡Œè¡Œå°¾ */
-		if( pos.x == total ) {
-			char_ptr = row_ptr->last_char;
-		} else {
-			return NULL;
-		}
-	}
-	return char_ptr;
-}
-
-
-static int
-TextLayer_GetCharPosUnderCursor( LCUI_TextLayer *layer, int left_or_right )
-/* æ ¹æ®å…‰æ ‡å½“å‰æ‰€åœ¨ä½ç½®ï¼Œè·å–å¯¹äºæºå­—ç¬¦ä¸²ä¸­çš„ä½ç½® */
-{
-	LCUI_CharData *char_ptr;
-	
-	char_ptr = TextLayer_GetCurChar( layer );
-	return TextLayer_GetCharPos( layer, char_ptr, left_or_right );
-}
-
-static int
-TextLayer_Update_CurSrcPos( LCUI_TextLayer *layer, int left_or_right )
-/* æ›´æ–°å½“å‰å…‰æ ‡æ‰€åœ¨çš„å­—ç¬¦ å¯¹åº”äºæºæ–‡æœ¬ä¸­çš„ä½ç½® */
-{
-	int pos, max;
-	pos = TextLayer_GetCharPosUnderCursor( layer, left_or_right );
-	max = Queue_GetTotal( &layer->text_source_data );
-	//printf("pos: %d, max: %d\n", pos, max );
-	if( pos == -1 || pos > max ) {
-		pos = max;
-	}
-	if( pos >= 0 ) {
-		layer->current_src_pos = pos;
-	}
-	//printf( "layer->current_src_pos: %d\n", layer->current_src_pos );
-	return layer->current_src_pos;
-}
-
-/* 
- * åŠŸèƒ½ï¼šæ ¹æ®ä¼ å…¥çš„äºŒç»´åæ ‡ï¼Œè®¾å®šå…‰æ ‡åœ¨çš„æ–‡æœ¬å›¾å±‚ä¸­çš„ä½ç½®
- * è¯´æ˜ï¼šè¯¥ä½ç½®ä¼šæ ¹æ®å½“å‰ä½ç½®ä¸­çš„å­—ä½“ä½å›¾æ¥è°ƒæ•´ï¼Œç¡®ä¿å…‰æ ‡æ˜¾ç¤ºåœ¨å­—ä½“ä½å›¾è¾¹ä¸Šï¼Œè€Œä¸
- * ä¼šé®æŒ¡å­—ä½“ä½å›¾ï¼›å…‰æ ‡åœ¨æ–‡æœ¬å›¾å±‚ä¸­çš„ä½ç½®æ”¹å˜åï¼Œåœ¨å­—ç¬¦ä¸²ä¸­çš„ä½ç½®ä¹Ÿè¦åšç›¸åº”æ”¹å˜ï¼Œ
- * å› ä¸ºæ–‡æœ¬çš„æ·»åŠ ï¼Œåˆ å‡ï¼Œéƒ½éœ€è¦ä»¥å…‰æ ‡å½“å‰æ‰€åœ¨ä½ç½®å¯¹åº”çš„å­—ç¬¦ä¸ºåŸºç¡€ã€‚
- * è¿”å›å€¼ï¼šæ–‡æœ¬å›¾å±‚ä¸­å¯¹åº”å­—ä½“ä½å›¾çš„åæ ‡ï¼Œå•ä½ä¸ºåƒç´ 
- *  */
-LCUI_API LCUI_Pos TextLayer_Cursor_SetPixelPos(	LCUI_TextLayer *layer, 
-						LCUI_Pos pixel_pos )
-{
-	LCUI_Pos new_pos, pos;
-	Text_RowData *row_ptr;
-	LCUI_CharData *char_ptr;
-	int i, n, rows, cols, adv_x;
-	
-	pos.x = pos.y = 0;
-	rows = Queue_GetTotal( &layer->rows_data );
-	/* å‡å»åç§»åæ ‡ */
-	pixel_pos = Pos_Sub( pixel_pos, layer->offset_pos );
-	for( new_pos.y=0,i=0; i<rows; ++i ) {
-		row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, i );
-		if( pixel_pos.y < row_ptr->max_size.h ) {
-			break;
-		}
-		pixel_pos.y -= row_ptr->max_size.h;
-		if(i < rows-1 ) {
-			new_pos.y += row_ptr->max_size.h;
-		}
-	}
-	pos.y = i;
-	row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, i );
-	if( !row_ptr ) {
-		cols = 0;
-	} else {
-		cols = Queue_GetTotal( &row_ptr->string );
-	}
-	for( new_pos.x=0,n=0; n<cols; ++n ) {
-		char_ptr = (LCUI_CharData*)Queue_Get( &row_ptr->string, n );
-		if( !char_ptr || !char_ptr->bitmap || !char_ptr->display ) {
-			continue;
-		}
-		/* è‹¥å¯ç”¨äº†å±è”½ç¬¦ */
-		if( layer->password_char.char_code > 0 
-		 && layer->password_char.bitmap ) {
-			adv_x = layer->password_char.bitmap->advance.x;
-		} else {
-			adv_x = char_ptr->bitmap->advance.x;
-		}
-		/* è‹¥åæ ‡åœ¨å½“å‰å­—ç¬¦çš„å³è¾¹ */
-		if( pixel_pos.x >= adv_x/2 ) {
-			pixel_pos.x -= adv_x;
-			new_pos.x += adv_x;
-			if(n < cols-1 || (n == cols-1 && pixel_pos.x >= 0)) {
-				continue;
-			}
-		}
-		break;
-	}
-	pos.x = n;
-	/* åˆ¤æ–­å…‰æ ‡ä½ç½®å˜åŒ–ï¼Œä»¥å¿«é€Ÿç¡®å®šå½“å‰å­—ç¬¦åœ¨æºæ–‡æœ¬ä¸­çš„ä½ç½®å¹¶æ›´æ–° */
-	if( layer->current_des_pos.y > pos.y 
-	 || (layer->current_des_pos.y == pos.y 
-	 && layer->current_des_pos.x > pos.x)) {
-		layer->current_des_pos = pos;
-		 /* ä¼˜å…ˆå‘å·¦è¾¹éå† */
-		TextLayer_Update_CurSrcPos( layer, 0 );
-	} 
-	else if( layer->current_des_pos.y == pos.y 
-		&& layer->current_des_pos.x == pos.x );
-	else { 
-		layer->current_des_pos = pos;
-		/* ä¼˜å…ˆå‘å³è¾¹éå† */
-		TextLayer_Update_CurSrcPos( layer, 1 );
-	}
-	/* åŠ ä¸Šåç§»åæ ‡ */
-	new_pos = Pos_Add( new_pos, layer->offset_pos );
-	return new_pos;
-}
-
-LCUI_API LCUI_Pos
-TextLayer_Cursor_SetPos( LCUI_TextLayer *layer, LCUI_Pos pos )
-/* è®¾å®šå…‰æ ‡åœ¨æ–‡æœ¬æ¡†ä¸­çš„ä½ç½®ï¼Œå¹¶è¿”å›è¯¥å…‰æ ‡çš„åæ ‡ï¼Œå•ä½ä¸ºåƒç´  */
-{
-	LCUI_Pos pixel_pos;
-	Text_RowData *row_ptr;
-	LCUI_CharData *char_ptr;
-	int rows, cols, total;
-	
-	pixel_pos.x = pixel_pos.y = 0;
-	total = Queue_GetTotal( &layer->rows_data );
-	if( pos.y >= total ) {
-		pos.y = total-1;
-	}
-	if( pos.y < 0 ) {
-		pos.y = 0;
-	}
-	/* ç´¯åŠ pos.yè¡Œä¹‹å‰å‡ è¡Œçš„é«˜åº¦ */
-	for( pixel_pos.y=0,rows=0; rows<pos.y; ++rows ) {
-		row_ptr = Queue_Get( &layer->rows_data, rows );
-		if( !row_ptr ) {
-			continue;
-		}
-		pixel_pos.y += row_ptr->max_size.h;
-	}
-	/* è·å–å½“å‰è¡Œçš„æŒ‡é’ˆ */
-	row_ptr = Queue_Get( &layer->rows_data, rows );
-	if( !row_ptr ) {
-		return pixel_pos;
-	}
-	/* è·å–å½“å‰è¡Œçš„æ–‡å­—æ•° */
-	total = Queue_GetTotal( &row_ptr->string ); 
-	if( pos.x > total ) {
-		pos.x = total;
-	}
-	if( pos.x < 0 ) {
-		pos.x = 0;
-	}
-	/* ç´¯è®¡å®½åº¦ */
-	for( pixel_pos.x=0,cols=0; cols<pos.x; ++cols ) {
-		char_ptr = Queue_Get( &row_ptr->string, cols );
-		if( !char_ptr || !char_ptr->bitmap || !char_ptr->display ) {
-			continue;
-		}
-		pixel_pos.x += char_ptr->bitmap->advance.x;
-		//printf("TextLayer_Cursor_SetPos(): pixel pos x: %d, total: %d, cols: %d, pos.x: %d\n", 
-		//pixel_pos.x, total, cols, pos.x);
-	}
-	//printf("layer->current_des_pos: %d,%d,  pos: %d,%d\n",
-	//layer->current_des_pos.x, layer->current_des_pos.y, pos.x, pos.y );
-	if( layer->current_des_pos.y > pos.y 
-	 || (layer->current_des_pos.y == pos.y 
-	 && layer->current_des_pos.x > pos.x)) {
-		layer->current_des_pos = pos;
-		TextLayer_Update_CurSrcPos( layer, 0 );
-	} 
-	else if( layer->current_des_pos.y == pos.y 
-		&& layer->current_des_pos.x == pos.x );
-	else {
-		layer->current_des_pos = pos;
-		TextLayer_Update_CurSrcPos( layer, 1 );
-	}
-	layer->current_des_pos = pos;
-	/* åŠ ä¸Šåç§»åæ ‡ */
-	pixel_pos = Pos_Add( pixel_pos, layer->offset_pos );
-	/* å¾®è°ƒä½ç½® */
-	pixel_pos.y += 2;
-	return pixel_pos;
-}
-
-LCUI_API int
-TextLayer_Text_Delete( LCUI_TextLayer *layer, int n )
-/* åˆ é™¤å…‰æ ‡å³è¾¹å¤„nä¸ªå­—ç¬¦ */
-{
-	return 0;
-}
-
-static int
-TextLayer_Text_DeleteChar( 
-		LCUI_TextLayer *layer, 
-		LCUI_CharData *char_ptr, 
-		int left_or_right )
-/* 
- * åŠŸèƒ½ï¼šå°†å­—ç¬¦æ•°æ®ä»æºæ–‡æœ¬ä¸­ç§»é™¤
- * å‚æ•°ï¼š
- * layer         æ“ä½œå¯¹è±¡
- * char_ptr      æŒ‡å‘æ‰€è¦åˆ é™¤çš„å­—ç¬¦æ•°æ®çš„æŒ‡é’ˆ
- * left_or_right æŒ‡å®šåœ¨æºæ–‡æœ¬ä¸­éå†çš„æ–¹å‘ï¼Œå€¼ä¸º0æ—¶æ˜¯å‘å·¦éå†ï¼Œå…¶å®ƒå€¼åˆ™åƒå³éå†
- *  */
-{
-	int n;
-	n = TextLayer_GetCharPos( layer, char_ptr, left_or_right );
-	/* å°†è¯¥å­—ä»æºæ–‡æœ¬ä¸­ç§»é™¤ */
-	Queue_Delete( &layer->text_source_data, n );
-	return 0;
-}
-
-
+/** ÏòÎÄ±¾ĞĞ²åÈëÒ»¸ö×Ö·û */
 static int 
-_TextLayer_Text_Delete ( LCUI_TextLayer *layer, LCUI_Pos start_pos, int len )
-/* ä»¥start_posä¸ºèµ·ç‚¹ï¼Œåˆ é™¤nä¸ªæ–‡å­— */
+TextRow_Insert( TextRowData *p_row, int insert_pos, TextCharData *p_char )
 {
-	LCUI_BOOL refresh = TRUE;
-	LCUI_CharData *char_ptr;
-	LCUI_Pos tmp_pos, pixel_pos;
-	int left_or_right, rows, cols;
-	Text_RowData *row_ptr, *tmp_row;
-	
-	if( start_pos.x < 0 ) {
-		len += start_pos.x;
-		start_pos.x = 0;
+        int i;
+        TextCharData **p_new_str;
+        
+        if( insert_pos > p_row->string_len ) {
+                insert_pos = p_row->string_len;
+        }
+        ++p_row->string_len;
+        if( p_row->string_max_len <= p_row->string_len ) {
+                p_new_str = (TextCharData**)realloc( p_row->string, 
+			sizeof(TextCharData*)*p_row->string_len );
+                if( !p_new_str ) {
+                        --p_row->string_len;
+                        return -1;
+                }
+                p_row->string = p_new_str;
+                p_row->string_max_len = p_row->string_len;
+        }
+        for( i=p_row->string_len-1; i>=insert_pos; --i ) {
+                p_row->string[i] = p_row->string[i-1];
+        }
+        p_row->string[insert_pos] = p_char;
+        return 0;
+}
+
+/* ½«ÎÄ±¾ĞĞÖĞµÄÄÚÈİÏò×óÒÆ¶¯ */
+static void TextRow_LeftMove( TextRowData *p_row, int n )
+{
+        int i, j, m;
+
+        if( n <= 0 ) {
+                return;
+        }
+        if( n > p_row->string_len ) {
+                n = p_row->string_len;
+        }
+        m = p_row->string_len - n;
+        for( i=0,j=n; i<m; ++i,++j ) {
+                p_row->string[i] = p_row->string[j];
+        }
+        p_row->string_len = m;
+}
+
+static inline LCUI_BOOL TextRow_HasEndChar( TextRowData *p_row )
+{
+	if( p_row->string_len < 1 ) {
+		return FALSE;
 	}
-	if( start_pos.y < 0 ) {
-		start_pos.y = 0;
-	}
-	if( len <= 0 ) {
-		return -1;
-	}
-	/* ç¡®å®šèµ·ç‚¹ä½ç½®çš„XYè½´åæ ‡ */
-	pixel_pos = TextLayer_Char_GetPixelPos( layer, start_pos );
-	
-	rows = Queue_GetTotal( &layer->rows_data );
-	row_ptr = (Text_RowData*)Queue_Get( &layer->rows_data, start_pos.y );
-	if( !row_ptr ) {
-		return -1;
-	}
-	cols = Queue_GetTotal( &row_ptr->string );
-	
-	/* æ ¹æ®å…‰æ ‡æ‰€åœ¨ä½ç½®ï¼Œç¡®å®šéå†æ–¹å‘ */
-	if( layer->current_des_pos.y > start_pos.y 
-	 || (layer->current_des_pos.y == start_pos.y 
-	 && layer->current_des_pos.x > start_pos.x)) {
-		left_or_right = 0;
-	}
-	else {
-		left_or_right = 1;
-	}
-	
-	/* å¦‚æœéœ€åˆ é™¤çš„å­—ç¬¦åªåœ¨å½“å‰è¡Œ */
-	if( start_pos.x + len <= cols ) {
-		/* æ ‡è®°åé¢çš„æ–‡å­—ä½å›¾éœ€è¦åˆ·æ–° */
-		TextLayer_RefreshCharBehind( layer, start_pos );
-	}
-	for( ; start_pos.x<=cols && len>0; --len ) {
-		/* å¦‚æœåˆ°äº†è¡Œå°¾ */
-		if( start_pos.x == cols ) {
-			/* å¦‚æœå½“å‰è¡Œæ˜¯æœ€åä¸€è¡Œ */
-			if( start_pos.y >= rows-1 ) {
-				break;
-			}
-			if( refresh ) {
-				tmp_pos.x = 0;
-				tmp_pos.y=start_pos.y+1;
-				/* åˆ·æ–°è¯¥è¡Œåé¢æ‰€æœ‰è¡Œçš„å­—ç¬¦ */
-				for( ; tmp_pos.y<rows; ++tmp_pos.y ) {
-					TextLayer_RefreshCharBehind( layer, tmp_pos );
-				}
-				refresh = FALSE;
-			}
-			
-			/* å°†å½“å‰è¡Œè¡Œå°¾çš„æ¢è¡Œç¬¦'\n'ä»æºæ–‡æœ¬ä¸­ç§»é™¤ */
-			TextLayer_Text_DeleteChar( layer, row_ptr->last_char, left_or_right );
-			/* è·å–æŒ‡å‘ä¸‹ä¸€è¡Œæ–‡æœ¬çš„æŒ‡é’ˆ */
-			tmp_row = (Text_RowData*)Queue_Get( &layer->rows_data, start_pos.y+1 );
-			/* å°†ä¸‹ä¸€è¡Œçš„æ–‡æœ¬æ‹¼æ¥è‡³å½“å‰è¡Œè¡Œå°¾ */
-			Queue_Cat( &row_ptr->string, &tmp_row->string );
-			/* å°†ä¸‹ä¸€è¡Œçš„è¡Œå°¾å­—ç¬¦æ•°æ®è½¬ç§»è‡³å½“å‰è¡Œ */
-			row_ptr->last_char = tmp_row->last_char;
-			/* é”€æ¯ä¸‹ä¸€è¡Œçš„æ–‡æœ¬ */
-			Queue_Destroy( &tmp_row->string ); 
-			Queue_Delete( &layer->rows_data, start_pos.y+1 );
-			/* æ›´æ–°å½“å‰è¡Œçš„æ€»å­—ç¬¦æ•° */
-			cols = Queue_GetTotal( &row_ptr->string );
-			/* æ›´æ–°æ€»è¡Œæ•° */
-			rows = Queue_GetTotal( &layer->rows_data );
-			/* æ›´æ–°å½“å‰è¡Œçš„å°ºå¯¸ */
-			TextLayer_Update_RowSize( layer, start_pos.y );
-			continue;
-		}
-		char_ptr = (LCUI_CharData*)Queue_Get( &row_ptr->string, start_pos.x );
-		if( !char_ptr ) {
-			continue;
-		}
-		TextLayer_Clear( layer, pixel_pos, row_ptr->max_size.h, char_ptr );
-		pixel_pos.x += char_ptr->bitmap->advance.x;
-		/* å°†è¯¥å­—ä»æºæ–‡æœ¬ä¸­ç§»é™¤ */
-		TextLayer_Text_DeleteChar( layer, char_ptr, left_or_right );
-		/* è¯¥å­—åœ¨è¿™è¡Œçš„å­—ä½“ä½å›¾ä¹Ÿéœ€è¦åˆ é™¤ */
-		cols = Queue_GetTotal( &row_ptr->string );
-		Queue_DeletePointer( &row_ptr->string, start_pos.x );
-		cols = Queue_GetTotal( &row_ptr->string );
-		char_ptr = (LCUI_CharData*)Queue_Get( &row_ptr->string, start_pos.x );
-		cols = Queue_GetTotal( &row_ptr->string );
-	}
-	/* æ›´æ–°å½“å‰è¡Œçš„å°ºå¯¸ */
-	TextLayer_Update_RowSize( layer, start_pos.y );
+	if( p_row->string[p_row->string_len-1]->char_code == L'\n' ) {
+                return TRUE;
+        }
+	return FALSE;
+}
+
+/** ¸üĞÂ×ÖÌåÎ»Í¼ */
+static inline void TextChar_UpdateBitmap( TextCharData* p_data, LCUI_TextStyle *default_style )
+{
+        p_data->bitmap = FontLIB_GetExistFontBMP( p_data->char_code, 
+			default_style->font_id, default_style->pixel_size );
+        //printf("char_code: %c, pixel_size: %d, font_id: %d, bitmap: %p\n", 
+        //p_data->char_code, default_style->pixel_size, default_style->font_id, p_data->bitmap);
+}
+
+/** ÉèÖÃ²åÈëµãµÄĞĞÁĞ×ø±ê */
+LCUI_API void TextLayer_SetCaretPos( LCUI_TextLayer* layer, int row, int col )
+{
+        if( row < 0 ) {
+                row = 0;
+        }
+        else if( row >= layer->row_list.rows ) {
+                if( layer->row_list.rows < 0 ) {
+                        row = 0;
+                } else  {
+                        row = layer->row_list.rows-1;
+                }
+        }
+
+        if( col < 0 ) {
+                col = 0;
+        }
+        else if( layer->row_list.rows > 0 ) {
+                if( col >= layer->row_list.rowdata[row]->string_len ) {
+                        col = layer->row_list.rowdata[row]->string_len;
+                }
+        } else {
+                col = 0;
+        }
+        layer->insert_x = col;
+        layer->insert_y = row;
+}
+
+/** ¸ù¾İÏñËØ×ø±êÉèÖÃÎÄ±¾¹â±êµÄĞĞÁĞ×ø±ê */
+LCUI_API int TextLayer_SetCaretPosByPixelPos( LCUI_TextLayer* layer, int x, int y )
+{
+        TextRowData* p_row;
+        int i, pixel_pos, ins_x, ins_y;
+
+        for( pixel_pos=0, i=0; i<layer->row_list.rows; ++i ) {
+                p_row = layer->row_list.rowdata[i];
+                pixel_pos += p_row->top_spacing;
+                pixel_pos += p_row->max_height;
+                pixel_pos += p_row->bottom_spacing;
+                if( pixel_pos >= y ) {
+                        ins_y = i;
+                        break;
+                }
+        }
+        if( i >= layer->row_list.rows ) {
+                if( layer->row_list.rows > 0 ) {
+                        ins_y = layer->row_list.rows-1;
+                } else {
+                        layer->insert_x = 0;
+                        layer->insert_y = 0;
+                        return -1;
+                }
+        }
+        p_row = layer->row_list.rowdata[ins_y];
+        ins_x = p_row->string_len;
+        /* ¸ù¾İÎÄ±¾¶ÔÆë·½Ê½£¬È·¶¨µ±Ç°ĞĞÎÄ±¾µÄÆğÊ¼×ø±ê */
+        switch( layer->text_align ) {
+        case TEXT_ALIGN_CENTER:
+                pixel_pos = (layer->max_width - p_row->max_width)/2;
+                break;
+        case TEXT_ALIGN_RIGHT:
+                pixel_pos = layer->max_width - p_row->max_width;
+                break;
+        case TEXT_ALIGN_LEFT:
+        default:
+                pixel_pos = 0;
+                break;
+        }
+        for( i=0; i<p_row->string_len; ++i ) {
+                if( !p_row->string[i]->bitmap || !p_row->string[i]->need_display ) {
+                        continue;
+                }
+                pixel_pos += p_row->string[i]->bitmap->advance.x;
+                /* Èç¹ûÔÚµ±Ç°×ÖÖĞĞÄµãµÄÇ°Ãæ */
+                if( x <= pixel_pos - p_row->string[i]->bitmap->advance.x/2 ) {
+                        ins_x = i;
+                        break;
+                }
+        }
+        TextLayer_SetCaretPos( layer, ins_y, ins_x );
 	return 0;
 }
 
-LCUI_API int
-TextLayer_Text_Backspace( LCUI_TextLayer *layer, int n )
-/* åˆ é™¤å…‰æ ‡å·¦è¾¹å¤„nä¸ªå­—ç¬¦ */
+/** »ñÈ¡Ö¸¶¨ĞĞÁĞµÄÎÄ×ÖµÄÏñËØ×ø±ê */
+LCUI_API int TextLayer_GetCharPixelPos( LCUI_TextLayer* layer, int row,
+						int col, LCUI_Pos *pixel_pos )
 {
-	int i, row_len;
-	LCUI_Pos char_pos;
-	Text_RowData *row_ptr;
-	
-	if( layer->read_only ) {
+        TextRowData* p_row;
+        int i, pixel_x = 0, pixel_y = 0;
+
+        if( row < 0 || row >= layer->row_list.rows ) {
+                return -1;
+        }
+        if( col < 0 ) {
+                return -2;
+        }
+        else if( col > layer->row_list.rowdata[row]->string_len ) {
+                return -3;
+        }
+        /* ÀÛ¼ÓÇ°¼¸ĞĞµÄ¸ß¶È */
+        for( i=0; i<row-1; ++i ) {
+                p_row = layer->row_list.rowdata[i];
+                pixel_y += p_row->top_spacing;
+                pixel_y += p_row->max_height;
+                pixel_y += p_row->bottom_spacing;
+        }
+        p_row = layer->row_list.rowdata[i];
+        pixel_y += p_row->top_spacing;
+
+        p_row = layer->row_list.rowdata[row];
+        switch( layer->text_align ) {
+        case TEXT_ALIGN_CENTER:
+                pixel_x = (layer->max_width - p_row->max_width)/2;
+                break;
+        case TEXT_ALIGN_RIGHT:
+                pixel_x = layer->max_width - p_row->max_width;
+                break;
+        case TEXT_ALIGN_LEFT:
+        default:
+                pixel_x = 0;
+                break;
+        }
+        for( i=0; i<col; ++i ) {
+                if( !p_row->string[i] ) {
+                        break;
+                }
+                if( !p_row->string[i]->bitmap
+		 || !p_row->string[i]->need_display ) {
+                        continue;
+                }
+                pixel_x += p_row->string[i]->bitmap->advance.x;
+        }
+	pixel_pos->x = pixel_x;
+        pixel_pos->y = pixel_y;
+        return 0;
+}
+
+/** »ñÈ¡ÎÄ±¾¹â±êµÄÏñËØ×ø±ê */
+LCUI_API int TextLayer_GetCaretPixelPos( LCUI_TextLayer *layer, LCUI_Pos *pixel_pos )
+{
+        return TextLayer_GetCharPixelPos( layer, layer->insert_y, 
+						layer->insert_x, pixel_pos );
+}
+
+static void DestroyTextRowList( TextRowList *p_list )
+{
+        int i;
+        for( i=0; i<p_list->rows; ++i ) {
+                free( p_list->rowdata[i] );
+                p_list->rowdata[i] = NULL;
+        }
+        p_list->max_rows = 0;
+        p_list->rows = 0;
+}
+
+/** Çå¿ÕÎÄ±¾ */
+LCUI_API void TextLayer_Clear( LCUI_TextLayer* layer )
+{
+	layer->insert_x = 0;
+	layer->insert_y = 0;
+        DestroyTextRowList( &layer->row_list );
+        layer->task.redraw_all = TRUE;
+}
+
+static int TextLayer_DoWordWrap( LCUI_TextLayer *layer, int row, int start_col )
+{
+	int n_cols, char_h;
+	TextRowData *p_row, *p_next_row;
+	TextCharData *p_char;
+
+	if( row < 0 || row >= layer->row_list.rows ) {
 		return -1;
 	}
-	
-	if( n <= 0 ) {
+	p_row = layer->row_list.rowdata[row];
+	if( p_row->string_len < 1 || start_col >= p_row->string_len-1 ) {
 		return -2;
 	}
-	/* è®¡ç®—å½“å‰å…‰æ ‡æ‰€åœ¨å­—çš„ä½ç½® */
-	char_pos = TextLayer_Cursor_GetPos( layer );
-	DEBUG_MSG2( "before: %d,%d\n", char_pos.x, char_pos.y );
-	for( i=n; char_pos.y>=0; --char_pos.y ) {
-		row_ptr = Queue_Get( &layer->rows_data, char_pos.y );
-		if(row_ptr == NULL) {
-			continue;
-		}
-		row_len = Queue_GetTotal( &row_ptr->string );
-		
-		if( char_pos.x == -1 ) {
-			char_pos.x = row_len;
-		}
-		for( ; char_pos.x>=0 && i>0; --char_pos.x,--i );
-		
-		if( i<=0 && char_pos.x >= 0 ) {
-			break;
-		}
-	}
-	DEBUG_MSG2( "after: %d,%d\n", char_pos.x, char_pos.y );
-	if( i>0 ) {
-		n -= i;
-	}
-	DEBUG_MSG2("start_pos: %d,%d, len: %d\n", char_pos.x, char_pos.y, n);
-	/* å¼€å§‹åˆ é™¤æ–‡å­— */
-	_TextLayer_Text_Delete( layer, char_pos, n );
-	/* åˆ é™¤å®Œåï¼Œéœ€è¦å°†å…‰æ ‡å‘å·¦ç§»åŠ¨ä¸€ä¸ªä½ç½® */
-	TextLayer_Cursor_SetPos( layer, char_pos );
+	/* Èç¹û±¾ĞĞÄ©Î²ÓĞ»»ĞĞ·û£¬Ôò²åÈëĞÂĞĞ */
+	if( p_row->string[p_row->string_len-1]->char_code == L'\n' ) {
+                p_next_row = TextRowList_InsertNewRow( &layer->row_list, row+1 );
+        }
+        /* »ñÈ¡ÏÂÒ»ĞĞµÄÖ¸Õë */
+        p_next_row = TextRowList_GetRow( &layer->row_list, row+1 );
+        /* ÈôÃ»ÓĞÏÂÒ»ĞĞ£¬Ôò²åÈëĞÂĞĞ */
+        if( !p_next_row ) {
+                p_next_row = TextRowList_InsertNewRow( &layer->row_list, row+1 );
+        }
+        p_next_row->max_width = 0;
+        p_next_row->max_height = layer->text_style.pixel_size + 2;
+        n_cols = p_row->string_len;
+        /* Èç¹û²åÈëµãÔÚµ±Ç°ĞĞ£¬²¢ÇÒÎ»ÖÃ³¬³öÁËµ±Ç°ĞĞ£¬ÔòÒÆ¶¯ÖÁÏÂÒ»ĞĞ */
+        if( layer->insert_y == row && layer->insert_x >= p_row->string_len ) {
+                ++layer->insert_y;
+                ++layer->insert_x;
+                layer->insert_x -= p_row->string_len;
+        }
+        /* ½«±¾ĞĞÊ£ÓàÎÄ×Ö×ªÒÆÖÁÏÂÒ»ĞĞ */
+        for( n_cols-=1; n_cols>=start_col; --n_cols ) {
+                p_char = p_row->string[n_cols];
+                /* ÒÆ³ı¸Ã×ÖÔÚ±¾ĞĞµÄ¼ÇÂ¼ */
+                p_row->string[n_cols] = NULL;
+                /* ±ê¼Ç±¾×ÖĞèÒªË¢ĞÂ */
+                p_char->need_update = TRUE;
+                /* ²åÈëÖÁĞÂĞĞ */
+                TextRow_Insert( p_next_row, 0, p_char );
+                if( p_char->style && p_char->style->_pixel_size ) {
+                        char_h = p_char->style->pixel_size+2;
+                } else {
+                        char_h = layer->text_style.pixel_size+2;
+                }
+                if( p_next_row->max_height < char_h ) {
+                        p_next_row->max_height = char_h;
+                }
+                p_next_row->max_width += p_char->bitmap->advance.x;
+        }
+        p_row->string_len = start_col;
 	return 0;
 }
 
-/** è·å–æ˜¾ç¤ºå‡ºæ¥çš„æ–‡å­—ç›¸å¯¹äºæ–‡æœ¬å›¾å±‚çš„åæ ‡ï¼Œå•ä½ä¸ºåƒç´  */
-LCUI_API LCUI_Pos TextLayer_Char_GetPixelPos(	LCUI_TextLayer *layer,
-						LCUI_Pos char_pos )
+/** ¶ÔÖ¸¶¨ĞĞµÄÎÄ±¾½øĞĞÅÅ°æ */
+static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
 {
-	LCUI_Pos pixel_pos;
-	Text_RowData *row_ptr;
-	LCUI_CharData *char_ptr;
-	int rows, cols, total;
-	
-	pixel_pos.x = pixel_pos.y = 0;
-	char_pos = TextLayer_Cursor_GetPos( layer );
-	total = Queue_GetTotal( &layer->rows_data );
-	if( char_pos.y >= total ) {
-		char_pos.y = total-1;
-	}
-	if( char_pos.y < 0 ) {
-		char_pos.y = 0;
-	}
-	/* ç´¯åŠ pos.yè¡Œä¹‹å‰å‡ è¡Œçš„é«˜åº¦ */
-	for( pixel_pos.y=0,rows=0; rows<char_pos.y; ++rows ) {
-		row_ptr = Queue_Get( &layer->rows_data, rows );
-		if( !row_ptr ) {
-			continue;
+        int col, char_h;
+        TextRowData *p_row, *p_next_row;
+        TextCharData *p_char;
+
+        p_row = layer->row_list.rowdata[row];
+        p_row->max_width = 0;
+        p_row->max_height = layer->text_style.pixel_size + 2;
+        for( col=0; col<p_row->string_len; ++col ) {
+                p_char = p_row->string[col];
+		/* Èç¹ûÓöµ½»»ĞĞ·û */
+		if( layer->is_wordwrap_mode && p_char->char_code == L'\n' ) {
+			TextLayer_DoWordWrap( layer, row, col+1 );
+			return;
 		}
-		pixel_pos.y += row_ptr->max_size.h;
-	}
-	/* è·å–å½“å‰è¡Œçš„æŒ‡é’ˆ */
-	row_ptr = Queue_Get( &layer->rows_data, rows );
-	if( !row_ptr ) {
-		pixel_pos.y += 2;
-		return pixel_pos;
-	}
-	/* è·å–å½“å‰è¡Œçš„æ–‡å­—æ•° */
-	total = Queue_GetTotal( &row_ptr->string ); 
-	if( char_pos.x > total ) {
-		char_pos.x = total;
-	}
-	if( char_pos.x < 0 ) {
-		char_pos.x = 0;
-	}
-	/* ç´¯è®¡å®½åº¦ */
-	for( pixel_pos.x=0,cols=0; cols<char_pos.x; ++cols ) {
-		char_ptr = Queue_Get( &row_ptr->string, cols );
-		if( !char_ptr || !char_ptr->bitmap || !char_ptr->display ) {
-			continue;
-		}
-		/* å¦‚æœè®¾å®šäº†å±è”½å­—ç¬¦ */
-		if( layer->password_char.char_code > 0 ) {
-			pixel_pos.x += layer->password_char.bitmap->advance.x;
-		} else {
-			pixel_pos.x += char_ptr->bitmap->advance.x;
-		}
-	}
-	/* å¾®è°ƒä½ç½® */
-	pixel_pos.y += 2;
-	return pixel_pos;
-}
-
-LCUI_API LCUI_Pos
-TextLayer_Cursor_GetPos( LCUI_TextLayer *layer )
-/* è·å–å…‰æ ‡åœ¨æ–‡æœ¬æ¡†ä¸­çš„ä½ç½®ï¼Œä¹Ÿå°±æ˜¯å…‰æ ‡åœ¨å“ªä¸€è¡Œçš„å“ªä¸ªå­—åé¢ */
-{
-	return layer->current_des_pos;
-}
-
-LCUI_API LCUI_Pos
-TextLayer_Cursor_GetFixedPixelPos( LCUI_TextLayer *layer )
-/* è·å–æ–‡æœ¬å›¾å±‚çš„å…‰æ ‡ä½ç½®ï¼Œå•ä½ä¸ºåƒç´  */
-{
-	LCUI_Pos pos;
-	pos = TextLayer_Cursor_GetPos( layer );
-	pos = TextLayer_Char_GetPixelPos( layer, pos );
-	return pos;
-}
-
-LCUI_API LCUI_Pos
-TextLayer_Cursor_GetPixelPos( LCUI_TextLayer *layer )
-/* è·å–æ–‡æœ¬å›¾å±‚çš„å…‰æ ‡ç›¸å¯¹äºå®¹å™¨ä½ç½®ï¼Œå•ä½ä¸ºåƒç´  */
-{
-	LCUI_Pos pos;
-	pos = TextLayer_Cursor_GetFixedPixelPos( layer );
-	/* åŠ ä¸Šåç§»åæ ‡ */
-	pos = Pos_Add( pos, layer->offset_pos );
-	return pos;
-}
-
-LCUI_API int
-TextLayer_GetRowLen( LCUI_TextLayer *layer, int row )
-/* è·å–æŒ‡å®šè¡Œæ˜¾å¼æ–‡å­—æ•° */
-{
-	int total;
-	Text_RowData *row_ptr;
-	
-	total = Queue_GetTotal( &layer->rows_data );
-	if( row > total ) {
-		row = total;
-	}
-	/* è·å–å½“å‰è¡Œçš„æŒ‡é’ˆ */
-	row_ptr = Queue_Get( &layer->rows_data, row );
-	if( !row_ptr ) {
-		return 0;
-	}
-	return Queue_GetTotal( &row_ptr->string ); 
-}
-
-LCUI_API int
-TextLayer_CurRow_GetMaxHeight( LCUI_TextLayer *layer )
-/* è·å–å½“å‰è¡Œçš„æœ€å¤§é«˜åº¦ */
-{
-	Text_RowData *row_ptr;
-	row_ptr = TextLayer_GetCurRowData( layer );
-	if( !row_ptr ) {
-		return layer->default_data.pixel_size + 2;
-	}
-	return row_ptr->max_size.h;
-}
-
-LCUI_API int
-TextLayer_GetRows( LCUI_TextLayer *layer )
-/* è·å–æ–‡æœ¬è¡Œæ•° */
-{
-	return Queue_GetTotal( &layer->rows_data );
-}
-
-LCUI_API int
-TextLayer_GetSelectedText( LCUI_TextLayer *layer, char *out_text )
-/* è·å–æ–‡æœ¬å›¾å±‚å†…è¢«é€‰ä¸­çš„æ–‡æœ¬ */
-{ 
-	/* å¦‚æœé€‰æ‹©äº†æ–‡æœ¬ */
-	if( layer->have_select ) {
-		/* è·å–é€‰ä¸­çš„æ–‡æœ¬å†…å®¹ */
-		//......
-		return 0;
-	}
-	return -1;
-}
-
-LCUI_API int
-TextLayer_CopySelectedText( LCUI_TextLayer *layer )
-/* å¤åˆ¶æ–‡æœ¬å›¾å±‚å†…è¢«é€‰ä¸­çš„æ–‡æœ¬ */
-{
-	/* å¦‚æœé€‰æ‹©äº†æ–‡æœ¬ */
-	if( layer->have_select ) {
-		/* å°†é€‰ä¸­çš„æ–‡æœ¬å†…å®¹æ·»åŠ è‡³å‰ªåˆ‡ç‰ˆ */
-		//......
-		return 0;
-	}
-	return -1;
-}
-
-LCUI_API int
-TextLayer_CutSelectedText( LCUI_TextLayer *layer )
-/* å‰ªåˆ‡æ–‡æœ¬å›¾å±‚å†…è¢«é€‰ä¸­çš„æ–‡æœ¬ */
-{
-	/* å¦‚æœé€‰æ‹©äº†æ–‡æœ¬ */
-	if( layer->have_select ) {
-		/* å°†é€‰ä¸­çš„æ–‡æœ¬å†…å®¹æ·»åŠ è‡³å‰ªåˆ‡ç‰ˆï¼Œå¹¶åˆ é™¤è¢«é€‰ä¸­çš„æ–‡æœ¬ */
-		//......
-		return 0;
-	}
-	return -1;
-}
-
-LCUI_API void
-TextLayer_UsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL flag )
-/* æŒ‡å®šæ–‡æœ¬å›¾å±‚æ˜¯å¦å¤„ç†æ ·å¼æ ‡ç­¾ */
-{
-	layer->using_style_tags = flag;
-}
-
-/** æŒ‡å®šæ–‡æœ¬å›¾å±‚æ˜¯å¦å¯ç”¨å¤šè¡Œæ–‡æœ¬æ˜¾ç¤º */
-LCUI_API void TextLayer_SetMultiline( LCUI_TextLayer *layer, LCUI_BOOL flag )
-{
-	layer->enable_multiline = flag;
-}
-
-/** è®¾ç½®æ–‡æœ¬å›¾å±‚ä¸­çš„æ–‡æœ¬æ˜¯å¦è‡ªåŠ¨æ¢è¡Œ */
-LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer *layer, LCUI_BOOL flag )
-{
-	if( layer->auto_wrap == flag ) {
+                if( !p_char->bitmap || !p_char->need_display ) {
+                        continue;
+                }
+                if(p_char->style && p_char->style->_pixel_size ) {
+                        char_h = p_char->style->pixel_size + 2;
+                } else {
+                        char_h = layer->text_style.pixel_size + 2;
+                }
+                /* ÀÛ¼ÓĞĞ¿í¶È */
+                p_row->max_width += p_char->bitmap->advance.x;
+                /* Èç¹ûÊÇµ±Ç°ĞĞµÄµÚÒ»¸ö×Ö·û£¬»òÕßĞĞ¿í¶ÈÃ»ÓĞ³¬¹ı¿í¶ÈÏŞÖÆ */
+                if( layer->max_width <= 0 || !layer->is_wordwrap_mode 
+		 || (layer->is_wordwrap_mode && !layer->is_mulitiline_mode)
+		 || col < 1 || p_row->max_width <= layer->max_width ) {
+                        if( p_row->max_height < char_h ) {
+                                p_row->max_height = char_h;
+                        }
+                        continue;
+                }
+                /* ½«ĞĞ¿í¶È»¹Ô­µ½±¾´ÎÀÛ¼ÓÇ°µÄÖµ */
+                p_row->max_width -= p_char->bitmap->advance.x;
+		TextLayer_DoWordWrap( layer, row, col );
 		return;
+        }
+        /* Èç¹û±¾ĞĞÓĞ»»ĞĞ·û */
+        if( TextRow_HasEndChar( p_row ) ) {
+                return;
+        }
+        /* ±¾ĞĞµÄÎÄ±¾¿í¶ÈÎ´´ïµ½ÏŞÖÆ¿í¶È£¬ĞèÒª½«ÏÂĞĞµÄÎÄ±¾×ªÒÆÖÁ±¾ĞĞ */
+        while(1) {
+                /* »ñÈ¡ÏÂÒ»ĞĞµÄÖ¸Õë */
+                p_next_row = TextRowList_GetRow( &layer->row_list, row+1 );
+                if( !p_next_row ) {
+			return;
+                }
+                for( col=0; col<p_next_row->string_len; ++col ) {
+                        p_char = p_next_row->string[col];
+			if( layer->is_wordwrap_mode
+			 && p_char->char_code == L'\n' ) {
+				TextLayer_DoWordWrap( layer, row, col+1 );
+				return;
+			}
+                        /* ºöÂÔÎŞ×ÖÌåÎ»Í¼»ò²»ĞèÒªÏÔÊ¾µÄÎÄ×Ö */
+                        if( !p_char->bitmap || !p_char->need_display ) {
+                                TextRow_Insert( p_row, p_row->string_len, p_char );
+                                p_next_row->string[col] = NULL;
+                                continue;
+                        }
+                        if( p_char->style && p_char->style->_pixel_size ) {
+                                char_h = p_char->style->pixel_size+2;
+                        } else {
+                                char_h = layer->text_style.pixel_size+2;
+                        }
+                        p_row->max_width += p_char->bitmap->advance.x;
+                        /* Èç¹ûÃ»ÓĞ³¬¹ı¿í¶ÈÏŞÖÆ */
+                        if( !layer->is_wordwrap_mode || layer->max_width <= 0
+			 || (layer->is_wordwrap_mode && !layer->is_mulitiline_mode)
+			 || p_row->max_width <= layer->max_width ) {
+                                if( p_row->max_height < char_h ) {
+                                        p_row->max_height = char_h;
+                                }
+                                /* ±ê¼Ç±¾×ÖĞèÒªË¢ĞÂ */
+                                p_char->need_update = 1;
+                                TextRow_Insert( p_row, p_row->string_len, p_char );
+                                p_next_row->string[col] = NULL;
+                                continue;
+                        }
+                        /* Èç¹û²åÈëµãÔÚÏÂÒ»ĞĞ */
+                        if( layer->insert_y == row+1 ) {
+                                /* Èç¹û²åÈëµã´¦ÓÚ±»×ªÒÆµÄ¼¸¸öÎÄ×ÖÖĞ */
+                                if( layer->insert_x < col ) {
+                                        layer->insert_y = row;
+                                        layer->insert_x += p_row->string_len;
+                                } else {
+                                        /* ·ñÔò£¬¼õÈ¥±»×ªÒÆµÄÎÄ×ÖÊı */
+                                        layer->insert_x -= col;
+                                }
+                        }
+                        /* ·ñÔò£¬³¬¹ıÁË¿í¶ÈÏŞÖÆ */
+                        p_next_row->max_width -= p_char->bitmap->advance.x;
+                        /* ½«ÕâÒ»ĞĞÊ£ÓàµÄÎÄ×ÖÏòÇ°ÒÆ */
+                        TextRow_LeftMove( p_next_row, col );
+                        return;
+                }
+                /* É¾³ıÕâÒ»ĞĞ£¬ÒòÎªÕâÒ»ĞĞµÄÄÚÈİÒÑ¾­×ªÒÆÖÁµ±Ç°ĞĞ */
+                TextRowList_RemoveRow( &layer->row_list, row+1 );
+                /* Èç¹û²åÈëµãµ±Ç°ĞĞÔÚºóÃæ */
+                if( layer->insert_y > row ) {
+                        --layer->insert_y;
+                }
+        }
+}
+
+/** ´ÓÖ¸¶¨ĞĞ¿ªÊ¼£¬¶ÔÎÄ±¾½øĞĞÅÅ°æ */
+static void TextLayer_TextTypeset( LCUI_TextLayer* layer, int start_row )
+{
+        int row;
+        for( row=start_row; row<layer->row_list.rows; ++row ) {
+                TextLayer_TextRowTypeset( layer, row );
+        }
+}
+
+/** ¶ÔÎÄ±¾½øĞĞÔ¤´¦Àí */ 
+static int TextLayer_ProcessText(	LCUI_TextLayer *layer, 
+					const wchar_t *new_text,
+					TextAddType add_type )
+{
+        TextRowData *p_cur_row;
+        TextCharData *p_char, char_data;
+        const wchar_t *p_end, *p, *pp;
+        int cur_col, cur_row, ins_x;
+	LCUI_Queue tag_buff;
+
+        if( !new_text ) {
+                return -1;
+        }
+        /* Èç¹ûÊÇ½«ÎÄ±¾×·¼ÓÖÁÎÄ±¾Ä©Î² */
+        if( add_type == TEXT_ADD_TYPE_APPEND ) {
+                if( layer->row_list.rows > 0 ) {
+                        cur_row = layer->row_list.rows - 1;
+                } else {
+                        cur_row = 0;
+                }
+                p_cur_row = TextRowList_GetRow( &layer->row_list, cur_row );
+                if( !p_cur_row ) {
+                        p_cur_row = TextRowList_AddNewRow( &layer->row_list );
+                }
+                cur_col = p_cur_row->string_len;
+        } else { /* ·ñÔò£¬ÊÇ½«ÎÄ±¾²åÈëÖÁ¹â±êËùÔÚÎ»ÖÃ */
+                cur_row = layer->insert_y;
+                cur_col = layer->insert_x;
+                p_cur_row = TextRowList_GetRow( &layer->row_list, cur_row );
+                if( !p_cur_row ) {
+                        p_cur_row = TextRowList_AddNewRow( &layer->row_list );
+                }
+        }
+        ins_x = cur_col;
+        StyleTag_Init( &tag_buff );
+        p_end = new_text + wcslen(new_text);
+        for( p=new_text; p<p_end; ++p, ++ins_x ) {
+		if( layer->is_using_style_tags ) {
+			/* ´¦ÀíÑùÊ½µÄ½áÊø±êÇ© */ 
+			pp = StyleTag_ProcessEndingTag( &tag_buff, p );
+			if( pp ) {
+				p = pp;
+			} else {
+				/* ´¦ÀíÑùÊ½±êÇ© */
+				pp = StyleTag_ProcessTag( &tag_buff, p );
+				if( pp ) {
+					p = pp;
+				}
+			}
+			/* Èç¹ûµ½ÁËÄ©Î² */
+			if( p >= p_end ) {
+				break;
+			}
+		}
+		
+                char_data.char_code = *p;
+                /* Õë¶Ô»»ĞĞ·ûÄ£Ê½ÎªWin(CR/LF)µÄÎÄ±¾£¬½øĞĞ´¦Àí */
+                if( *p == '\n' || *p == '\r' ) { 
+                        char_data.need_display = FALSE;
+			char_data.need_update = FALSE;
+			char_data.bitmap = NULL;
+			/* ²åÈëÖÁµ±Ç°ÎÄ±¾ĞĞÖĞ */
+			TextRow_Insert( p_cur_row, ins_x, p_char );
+			continue;
+                } 
+		char_data.need_display = TRUE;
+		char_data.need_update = TRUE;
+		/* »ñÈ¡µ±Ç°ÎÄ±¾ÑùÊ½Êı¾İ */
+		char_data.style = StyleTag_GetCurrentStyle( &tag_buff );
+		/* ¸üĞÂ×ÖÌåÎ»Í¼ */
+		TextChar_UpdateBitmap( &char_data, &layer->text_style );
+        }
+        /* ¸üĞÂµ±Ç°ĞĞµÄ³ß´ç */
+        TextRow_UpdateSize( p_cur_row, layer->text_style.pixel_size+2 );
+        if( add_type == TEXT_ADD_TYPE_INSERT ) {
+                layer->insert_x = ins_x;
+        }
+        /* ÈôÆôÓÃÁË×Ô¶¯»»ĞĞÄ£Ê½£¬Ôò±ê¼ÇĞèÒªÖØĞÂ¶ÔÎÄ±¾½øĞĞÅÅ°æ */
+        if( layer->is_wordwrap_mode ) {
+                TaskData_AddUpdateTypeset( &layer->task, cur_row );
+        }
+        return 0;
+}
+
+/** ²åÈëÎÄ±¾ÄÚÈİ£¨¿í×Ö·û°æ£© */
+LCUI_API int TextLayer_InsertTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text )
+{
+        if( !unicode_text ) {
+                return -1;
+        }
+        return TextLayer_ProcessText( layer, unicode_text, TEXT_ADD_TYPE_INSERT );
+}
+
+/** ²åÈëÎÄ±¾ÄÚÈİ */
+LCUI_API int TextLayer_InsertTextA( LCUI_TextLayer* layer, const char *ascii_text )
+{
+        return 0;
+}
+
+/** ²åÈëÎÄ±¾ÄÚÈİ£¨UTF-8°æ£© */
+LCUI_API int TextLayer_InsertText( LCUI_TextLayer* layer, const char *utf8_text )
+{
+        return 0;
+}
+
+/** ×·¼ÓÎÄ±¾ÄÚÈİ£¨¿í×Ö·û°æ£© */
+LCUI_API int TextLayer_AppendTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text )
+{
+        if( !unicode_text ) {
+                return -1;
+        }
+        return TextLayer_ProcessText( layer, unicode_text, TEXT_ADD_TYPE_APPEND );
+}
+
+/** ×·¼ÓÎÄ±¾ÄÚÈİ */
+LCUI_API int TextLayer_AppendTextA( LCUI_TextLayer* layer, const char *ascii_text )
+{
+        return 0;
+}
+
+/** ×·¼ÓÎÄ±¾ÄÚÈİ£¨UTF-8°æ£© */
+LCUI_API int TextLayer_AppendText( LCUI_TextLayer* layer, const char *utf8_text )
+{
+        return 0;
+}
+
+/** ÉèÖÃÎÄ±¾ÄÚÈİ£¨¿í×Ö·û°æ£© */
+LCUI_API int TextLayer_SetTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text )
+{
+        TextLayer_Clear( layer );
+        return TextLayer_AppendTextW( layer, unicode_text );
+}
+
+/** ÉèÖÃÎÄ±¾ÄÚÈİ */
+LCUI_API int TextLayer_SetTextA( LCUI_TextLayer* layer, const char *ascii_text )
+{
+        return 0;
+}
+
+/** ÉèÖÃÎÄ±¾ÄÚÈİ£¨UTF-8°æ£© */
+LCUI_API int TextLayer_SetText( LCUI_TextLayer* layer, const char *utf8_text )
+{
+        return 0;
+}
+
+/** »ñÈ¡TextWidgetÖĞµÄÎÄ±¾£¨¿í×Ö·û°æ£© */
+LCUI_API int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
+					int max_len, wchar_t *wstr_buff )
+{
+        int row, col, i;
+	TextRowData *row_ptr;
+
+        if( start_pos<0 ) {
+                return -1;
+        }
+        if( max_len <= 0 ) {
+                return 0;
+        }
+	/* ÏÈ¸ù¾İÒ»Î¬×ø±ê¼ÆËãĞĞÁĞ×ø±ê */
+	for( i=0,row=0; row<layer->row_list.max_rows; ++row ) {
+		if( i >= start_pos ) {
+			col = start_pos - i;
+			break;
+		}
+		i += layer->row_list.rowdata[row]->string_len;
 	}
-	layer->auto_wrap = flag;
-	/* æ›´æ–°æ–‡æœ¬å›¾å±‚ä¸­çš„æ–‡æœ¬æ’ç‰ˆ */
-	TextLayer_TextTypeset( layer, 0 );
+	for( i=0; row < layer->row_list.max_rows, i < max_len; ++row ) {
+		row_ptr = layer->row_list.rowdata[row];
+		for( ; col < row_ptr->string_len, i < max_len; ++col,++i ) {
+			wstr_buff[i] = row_ptr->string[col]->char_code;
+		}
+	}
+        wstr_buff[i] = L'\0';
+        return i;
+}
+
+/** ÉèÖÃ×î´óÎÄ±¾¿í¶È */
+LCUI_API int TextLayer_SetMaxWidth( LCUI_TextLayer* layer, int max_width )
+{
+        if( max_width <= 0 ) {
+                return -1;
+        }
+        if( layer->is_using_buffer && layer->max_height > 0 ) {
+		Graph_Create( &layer->graph, max_width, layer->max_height );
+        }
+        layer->max_width = max_width;
+        return 0;
+}
+
+/** ÉèÖÃ×î´óÎÄ±¾¸ß¶È */
+LCUI_API int TextLayer_SetMaxHeight( LCUI_TextLayer* layer, int max_height )
+{
+        if( max_height <= 0 ) {
+                return -1;
+        }
+        if( layer->is_using_buffer && layer->max_width > 0 ) {
+		Graph_Create( &layer->graph, layer->max_width, max_height );
+        }
+        layer->max_height = max_height;
+        return 0;
+}
+
+/** ÉèÖÃÊÇ·ñÆôÓÃ¶àĞĞÎÄ±¾Ä£Ê½ */
+LCUI_API void TextLayer_SetMultiline( LCUI_TextLayer* layer, int is_true )
+{
+        if( layer->is_mulitiline_mode && !is_true
+	 || !layer->is_mulitiline_mode && is_true ) {
+                layer->is_mulitiline_mode = is_true;
+                TaskData_AddUpdateTypeset( &layer->task, 0 );;
+        }
+}
+
+/** É¾³ıÖ¸¶¨ĞĞÁĞµÄÎÄ×Ö¼°ÆäÓÒ±ßµÄÎÄ±¾ */
+static int TextLayer_DeleteText( LCUI_TextLayer* layer, int char_y, 
+						int char_x, int n_char )
+{
+        int end_x, end_y, i, j, len;
+        TextRowData *p_row, *p_end_row;
+
+        if( char_x < 0 ) {
+                char_x = 0;
+        }
+        if( char_y < 0 ) {
+                char_y = 0;
+        }
+        if( n_char <= 0 ) {
+                return -1;
+        }
+        if( char_y >= layer->row_list.rows ) {
+                return -2;
+        }
+        p_row = layer->row_list.rowdata[char_y];
+        if( char_x > p_row->string_len ) {
+		char_x = p_row->string_len;
+        }
+
+        end_x = char_x;
+        end_y = char_y;
+        --n_char;
+        /* ¼ÆËã½áÊøµãµÄÎ»ÖÃ */
+	for( end_y=char_y; end_y<layer->row_list.rows && n_char>0; ++end_y ) {
+		p_row = layer->row_list.rowdata[end_y];
+		if( n_char < p_row->string_len ) {
+			end_x = n_char;
+			n_char = 0;
+			break;
+		}
+		n_char -= (p_row->string_len - end_x);
+	}
+        if( end_y >= layer->row_list.rows ) {
+                end_y = layer->row_list.rows-1;
+        }
+        p_end_row = layer->row_list.rowdata[end_y];
+        if( end_x > p_end_row->string_len ) {
+		end_x = p_end_row->string_len;
+        }
+        
+        /* ¼ÆËãÆğÊ¼ĞĞÓë½áÊøĞĞÆ´½ÓºóµÄ³¤¶È */
+        len = char_x + p_end_row->string_len - end_x - 1;
+        // ÆğÊ¼ĞĞ£º0 1 2 3 4 5£¬ÆğµãÎ»ÖÃ£º2
+        // ½áÊøĞĞ£º0 1 2 3 4 5£¬ÖÕµãÎ»ÖÃ£º4
+        // Æ´½ÓºóµÄ³¤¶È£º2 + 6 - 4 - 1 = 3
+        /* Èç¹ûÊÇÍ¬Ò»ĞĞ */
+        if( p_row == p_end_row && end_x < p_end_row->string_len ) {
+                for( i=char_x, j=end_x+1; j<p_row->string_len; ++i,++j ) {
+                        p_row->string[i] = p_row->string[j];
+                }
+                /* Èç¹ûµ±Ç°ĞĞÎª¿Õ£¬Ò²²»ÊÇµÚÒ»ĞĞ£¬ÔòÒÆ³ıµ±Ç°ĞĞ */
+                if( len <= 0 && end_y > 0 ) {
+                        TextRowList_RemoveRow( &layer->row_list, end_y );
+                } else {
+                        /* µ÷ÕûÆğÊ¼ĞĞµÄÈİÁ¿ */
+                        TextRow_SetLength( p_row, len );
+                        /* ¸üĞÂÎÄ±¾ĞĞµÄ³ß´ç */
+                        TextRow_UpdateSize( p_row, layer->text_style.pixel_size+2 );
+                }
+                TaskData_AddUpdateTypeset( &layer->task, char_y );
+                return 0;
+        }
+        /* Èç¹û½áÊøµãÔÚĞĞÎ²£¬²¢ÇÒ¸ÃĞĞ²»ÊÇ×îºóÒ»ĞĞ */
+        if( end_x == p_end_row->string_len && end_y < layer->row_list.rows-1 ) {
+                ++end_y;
+                p_end_row = TextRowList_GetRow( &layer->row_list, end_y );
+                end_x = -1;
+                len = char_x + p_end_row->string_len;
+        }
+        TextRow_SetLength( p_row, len );
+        /* ÒÆ³ıÆğÊ¼ĞĞÓë½áÊøĞĞÖ®¼äµÄÎÄ±¾ĞĞ */
+        for( i=char_y+1, j=i; j<end_y; ++j ) {
+                TextRowList_RemoveRow( &layer->row_list, i );
+        }
+        end_y = char_y + 1;
+        /* ½«½áÊøĞĞµÄÄÚÈİÆ´½ÓÖÁÆğÊ¼ĞĞ */
+        for( i=char_x, j=end_x+1; i<len && j<p_end_row->string_len; ++i,++j ) {
+                p_row->string[i] = p_end_row->string[j];
+        }
+        TextRow_UpdateSize( p_row, layer->text_style.pixel_size+2 );
+        /* ÒÆ³ı½áÊøĞĞ */
+        TextRowList_RemoveRow( &layer->row_list, end_y );
+        /* Èç¹ûÆğÊ¼ĞĞµÄ³¤¶ÈĞ¡ÓÚ0£¬ËµÃ÷ÆğÊ¼ĞĞÒ²ĞèÒªÉ¾³ı */
+        if( len < 0 ) {
+                TextRowList_RemoveRow( &layer->row_list, char_y );
+        }
+        TaskData_AddUpdateTypeset( &layer->task, char_y );;
+        return 0;
+}
+
+/** É¾³ıÎÄ±¾¹â±êµÄµ±Ç°×ø±êÓÒ±ßµÄÎÄ±¾ */
+LCUI_API int TextLayer_Delete( LCUI_TextLayer *layer, int n_char )
+{
+        return TextLayer_DeleteText(	layer, layer->insert_y, 
+					layer->insert_x, n_char );
+}
+
+/** ÍË¸ñÉ¾³ıÎÄ±¾£¬¼´É¾³ıÎÄ±¾¹â±êµÄµ±Ç°×ø±ê×ó±ßµÄÎÄ±¾ */
+LCUI_API int TextLayer_Backspace( LCUI_TextLayer* layer, int n_char )
+{
+        int n_del;
+        int char_x, char_y;
+        TextRowData* p_row;
+
+        /* ÏÈ»ñÈ¡µ±Ç°×ÖµÄÎ»ÖÃ */
+        char_x = layer->insert_x;
+        char_y = layer->insert_y;
+        /* ÔÙ¼ÆËãÉ¾³ı n_char ¸ö×ÖºóµÄÎ»ÖÃ */
+        for( n_del=n_char; char_y>=0; --char_y ) {
+                p_row = layer->row_list.rowdata[char_y];
+		if( char_x >= n_del-1 ) {
+			char_x = char_x - n_del;
+			n_del = 0;
+			break;
+		}
+		char_x = p_row->string_len-1;
+		n_del -= p_row->string_len;
+	}
+        if( char_y < 0 && n_del == n_char ) {
+                return -1;
+        }
+        /* ÈôÄÜ¹»±»É¾³ıµÄ×Ö²»¹» n_char ¸ö£¬Ôòµ÷ÕûĞèÉ¾³ıµÄ×ÖÊı */
+        if( n_del > 0 ) {
+                n_char -= n_del;
+        }
+        /* ¿ªÊ¼É¾³ıÎÄ±¾ */
+        TextLayer_DeleteText( layer, char_y, char_x, n_char );
+        /* Èô×îºóÒ»ĞĞ±»ÍêÈ«ÒÆ³ı£¬ÔòÒÆ¶¯ÊäÈëµãÖÁÉÏÒ»ĞĞµÄĞĞÎ²´¦ */
+        if( char_x == 0 && layer->row_list.rows > 0 
+	 && char_y >= layer->row_list.rows ) {
+                char_y = layer->row_list.rows-1;
+                char_x = layer->row_list.rowdata[char_y]->string_len;
+        }
+        /* ¸üĞÂÎÄ±¾¹â±êµÄÎ»ÖÃ */
+        TextLayer_SetCaretPos( layer, char_y, char_x );
+        return 0;
+}
+
+/** ÉèÖÃÊÇ·ñÆôÓÃ×Ô¶¯»»ĞĞÄ£Ê½ */
+LCUI_API void TextLayer_SetWordWrap( LCUI_TextLayer* layer, int is_true )
+{
+        if( !layer->is_wordwrap_mode && is_true
+	 || layer->is_wordwrap_mode && !is_true ) {
+                layer->is_wordwrap_mode = is_true;
+                TaskData_AddUpdateTypeset( &layer->task, 0 );;
+        }
+}
+
+/** ¼ÆËã²¢»ñÈ¡ÎÄ±¾µÄ¿í¶È */
+LCUI_API int TextLayer_GetWidth( LCUI_TextLayer* layer )
+{
+        int i, row, w, max_w;
+        TextRowData* p_row;
+
+        for( row=0,max_w=0; row<layer->row_list.rows; ++row ) {
+                p_row = layer->row_list.rowdata[row];
+                for( i=0, w=0; i<p_row->string_len; ++i ) {
+                        if( !p_row->string[i]->bitmap
+			 || !p_row->string[i]->need_display ) {
+                                continue;
+                        }
+                        w += p_row->string[i]->bitmap->advance.x;
+                }
+                if( w > max_w ) {
+                        max_w = w;
+                }
+        }
+        return max_w;
+}
+
+/** ¼ÆËã²¢»ñÈ¡ÎÄ±¾µÄ¸ß¶È */
+LCUI_API int TextLayer_GetHeight( LCUI_TextLayer* layer )
+{
+        int i, h;
+        TextRowData* p_row;
+
+        for( i=0,h=0; i<layer->row_list.rows; ++i ) {
+                p_row = layer->row_list.rowdata[i];
+                h += p_row->top_spacing;
+                h += p_row->max_height;
+                h += p_row->bottom_spacing;
+        }
+        return h;
+}
+
+/** ÖØĞÂÔØÈë¸÷¸öÎÄ×ÖµÄ×ÖÌåÎ»Í¼ */
+LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer )
+{
+        int row, col, char_h;
+        TextCharData* p_char;
+        TextRowData* p_row;
+
+        for( row=0; row<layer->row_list.rows; ++row ) {
+                p_row = layer->row_list.rowdata[row];
+                char_h = 0;
+                p_row->max_width = 0;
+                p_row->max_height = layer->text_style.pixel_size + 2;
+                for( col=0; col<p_row->string_len; ++col ) {
+                        p_char = p_row->string[col];
+                        TextChar_UpdateBitmap( p_char, &layer->text_style );
+                        if( !p_char->need_display || !p_char->bitmap ) {
+                                continue;
+                        }
+                        p_row->max_width += p_char->bitmap->advance.x;
+                        if( p_char->style && p_char->style->_pixel_size ) {
+                                char_h = p_char->style->pixel_size+2;
+                        } else {
+                                char_h = layer->text_style.pixel_size+2;
+                        }
+                        if( p_row->max_height < char_h ) {
+                                p_row->max_height = char_h;
+                        }
+                }
+        }
+}
+
+/** ¸üĞÂÊı¾İ */
+LCUI_API void TextLayer_Update( LCUI_TextLayer* layer )
+{
+        if( layer->task.update_bitmap ) {
+                TextLayer_ReloadCharBitmap( layer );
+                layer->task.update_bitmap = FALSE;
+        }
+        if( layer->task.update_typeset ) {
+                TextLayer_TextTypeset( layer, layer->task.typeset_start_row );
+                layer->task.update_typeset = FALSE;
+                layer->task.typeset_start_row = 0;
+        }
+}
+
+LCUI_API int TextLayer_PaintToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph, 
+					LCUI_Rect area, LCUI_Pos paint_pos )
+{
+        int x, y, row, col;
+	LCUI_Pos char_pos;
+        TextRowData *p_row;
+        TextCharData *p_char;
+
+        /* Èç¹ûTextWidgetµÄÎ»ÖÃÔÚ»æÖÆÇøÓòÄÚ£¬Ôòµ÷Õû¿É»æÖÆÇøÓò */
+        if( area.x < paint_pos.x ) {
+                area.width -= (paint_pos.x - area.x);
+                area.x = paint_pos.x;
+        }
+        if( area.y < paint_pos.y ) {
+                area.height -= (paint_pos.y - area.y);
+                area.y = paint_pos.y;
+        }
+        /* ÈôÉèÖÃÁËTextWidgetµÄ×î´ó³ß´ç£¬Ôò¸ù¾İ¸Ã³ß´çµ÷Õû¿É»æÖÆÇøÓò */
+        if( layer->max_width > 0 ) {
+                if( paint_pos.x + layer->max_width < area.x + area.width ) {
+			area.width = paint_pos.x + layer->max_width - area.x;
+                }
+        }
+        if( layer->max_height > 0 ) {
+                if( paint_pos.y + layer->max_height < area.y + area.height ) {
+                        area.height = paint_pos.y + layer->max_height - area.y;
+                }
+        }
+        /* ¼ÓÉÏYÖá×ø±êÆ«ÒÆÁ¿ */
+        y = paint_pos.y + layer->offset_y;
+        /* ÏÈÈ·¶¨´ÓÄÄÒ»ĞĞ¿ªÊ¼»æÖÆ */
+        for( row=0; row<layer->row_list.rows; ++row ) {
+                p_row = TextRowList_GetRow( &layer->row_list, row );
+                y += p_row->top_spacing;
+                y += p_row->max_height;
+                if( y > area.y && y > paint_pos.y ) {
+                        y -= p_row->top_spacing;
+                        y -= p_row->max_height;
+                        break;
+                }
+                y += p_row->bottom_spacing;
+        }
+        /* Èç¹ûÃ»ÓĞ¿É»æÖÆµÄÎÄ±¾ĞĞ */
+        if( row >= layer->row_list.rows ) {
+                return -1;
+        }
+        
+        for( ; row < layer->row_list.rows; ++row ) {
+                p_row = TextRowList_GetRow( &layer->row_list, row );
+                /* ¸ù¾İ¶ÔÆë·½Ê½£¬¼ÆËã¸ÃĞĞµÄÎ»ÖÃ */
+                switch( layer->text_align ) {
+                case TEXT_ALIGN_CENTER:
+                        x = (layer->max_width - p_row->max_width)/2;
+                        break;
+                case TEXT_ALIGN_RIGHT:
+                        x = layer->max_width - p_row->max_width;
+                        break;
+                case TEXT_ALIGN_LEFT:
+                default:
+                        x = 0;
+                        break;
+                }
+                y += p_row->top_spacing;
+                x += paint_pos.x;
+                x += layer->offset_x;
+                
+                /* È·¶¨´ÓÄÄ¸öÎÄ×Ö¿ªÊ¼»æÖÆ */
+                for( col=0; col<p_row->string_len; ++col ) {
+                        p_char = p_row->string[col];
+                        /* ºöÂÔ²»ĞèÒªÏÔÊ¾¡¢ÎŞ×ÖÌåÎ»Í¼µÄÎÄ×Ö */
+                        if( !p_char->need_display || !p_char->bitmap ) {
+                                continue;
+                        }
+                        x += p_char->bitmap->advance.x;
+                        if( x > paint_pos.x && x > area.x ) {
+                                x -= p_char->bitmap->advance.x;
+                                break;
+                        }
+                }
+                /* ÈôÒ»ÕûĞĞµÄÎÄ±¾¶¼²»ÔÚ¿É»æÖÆÇøÓòÄÚ */
+                if( col >= p_row->string_len ) {
+                        y += p_row->max_height;
+                        y += p_row->bottom_spacing;
+                        continue;
+                }
+                /* ±éÀú¸ÃĞĞµÄÎÄ×Ö */
+                for( ; col<p_row->string_len; ++col ) {
+                        p_char = p_row->string[col];
+                        /* ºöÂÔ²»ĞèÒªÏÔÊ¾¡¢ÎŞ×ÖÌåÎ»Í¼µÄÎÄ×Ö */
+                        if( !p_char->need_display || !p_char->bitmap ) {
+                                continue;
+                        }
+                        /* ¼ÆËã×ÖÌåÎ»Í¼µÄ»æÖÆ×ø±ê */
+                        char_pos.x = x + p_char->bitmap->left;
+                        char_pos.y = y + p_row->max_height-1;
+                        char_pos.y -= p_char->bitmap->top;
+                        x += p_char->bitmap->advance.x;
+                        /* ÅĞ¶ÏÎÄ×ÖÊ¹ÓÃµÄÇ°¾°ÑÕÉ«£¬ÔÙ½øĞĞ»æÖÆ */
+                        if( p_char->style && p_char->style->_fore_color ) {
+				FontBMP_Mix( graph, char_pos, p_char->bitmap,
+						p_char->style->fore_color,
+						GRAPH_MIX_FLAG_REPLACE );
+                        } else {
+				FontBMP_Mix( graph, char_pos, p_char->bitmap,
+						layer->text_style.fore_color,
+						GRAPH_MIX_FLAG_REPLACE );
+                        }
+                        /* Èç¹û³¬¹ı»æÖÆÇøÓòÔò²»¼ÌĞø»æÖÆ¸ÃĞĞÎÄ±¾ */
+                        if( x > area.x + area.width ) {
+                                break;
+                        }
+                }
+                y += p_row->max_height;
+                y += p_row->bottom_spacing;
+                /* ³¬³ö»æÖÆÇøÓò·¶Î§¾Í²»»æÖÆÁË */
+                if( y > area.y + area.height ) {
+                        break;
+                }
+        }
+        return 0;
+}
+
+/** »æÖÆÎÄ±¾ */
+LCUI_API int TextLayer_Paint( LCUI_TextLayer* layer )
+{
+        /* Èç¹ûÎÄ±¾Î»Í¼»º´æÎŞĞ§ */
+	if( !Graph_IsValid( &layer->graph ) ) {
+                return -1;
+        }
+	return TextLayer_PaintToGraph( layer, &layer->graph, 
+		Rect(0, 0, layer->max_width, layer->max_height), Pos(0,0) );
 }
