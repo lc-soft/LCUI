@@ -144,8 +144,13 @@ typedef struct LCUI_String_ {
 
 /*------------------- 区域数据 ---------------------*/
 typedef struct LCUI_Rect_ {
-	int x,y;
-	int width,height;
+	int x, y;
+	union {
+		int w, width;
+	};
+	union {
+		int h, height;
+	};
 	double center_x,center_y; /* 中心点的坐标 */
 } LCUI_Rect;
 /*--------------------- END ----------------------*/
