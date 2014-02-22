@@ -104,7 +104,7 @@ typedef struct TextLayerRec_  {
         LCUI_BOOL is_wordwrap_mode;	/* 是否启用自动换行模式 */
 	LCUI_BOOL is_using_style_tags;	/* 是否使用文本样式标签 */
         LCUI_BOOL is_using_buffer;	/* 是否使用缓存空间来存储文本位图 */
-	LCUI_RectQueue clear_area;
+	LCUI_Queue dirty_rect;		/* 脏矩形记录 */
 
         TextAlignType text_align;	/* 文本的对齐方式 */
         TextRowList row_list;		/* 文本行列表 */
@@ -243,13 +243,17 @@ LCUI_API int TextLayer_GetHeight( LCUI_TextLayer* layer );
 LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer );
 
 /** 更新数据 */
-LCUI_API void TextLayer_Update( LCUI_TextLayer* layer );
+LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LCUI_Queue *rect_list );
 
 LCUI_API int TextLayer_PaintToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph, 
 					LCUI_Rect area, LCUI_Pos paint_pos );
 
 /** 绘制文本 */
 LCUI_API int TextLayer_Paint( LCUI_TextLayer* layer );
+
+/** 设置全局文本样式 */
+LCUI_API void TextLayer_SetTextStyle( LCUI_TextLayer *layer,
+					LCUI_TextStyle *style );
 
 LCUI_END_HEADER
 
