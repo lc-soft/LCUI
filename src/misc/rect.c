@@ -482,7 +482,7 @@ LCUIRect_IsValid( LCUI_Rect r )
 
 /* 切换队列 */
 LCUI_API void
-RectQueue_Switch( LCUI_RectQueue *queue )
+DoubleRectQueue_Switch( LCUI_RectQueue *queue )
 {
 	if( queue->number == 0 ) {
 		queue->number = 1;
@@ -493,7 +493,7 @@ RectQueue_Switch( LCUI_RectQueue *queue )
 
 /* 初始化储存矩形数据的队列 */
 LCUI_API void
-RectQueue_Init( LCUI_RectQueue *queue )
+DoubleRectQueue_Init( LCUI_RectQueue *queue )
 {
 	queue->number = 0;
 	Queue_Init( &queue->queue[0], sizeof(LCUI_Rect), NULL );
@@ -505,7 +505,7 @@ RectQueue_Init( LCUI_RectQueue *queue )
 
 /* 销毁储存矩形数据的队列 */
 LCUI_API void
-RectQueue_Destroy( LCUI_RectQueue *queue )
+DoubleRectQueue_Destroy( LCUI_RectQueue *queue )
 {
 	Queue_Destroy( &queue->queue[0] );
 	Queue_Destroy( &queue->queue[1] );
@@ -513,10 +513,10 @@ RectQueue_Destroy( LCUI_RectQueue *queue )
 
 
 /* 将矩形数据追加至队列 */
-static int
-RectQueue_Add( LCUI_Queue* queue, LCUI_Rect rect )
+LCUI_API int RectQueue_Add( LCUI_Queue *queue, LCUI_Rect rect )
 { 
-	int i, flag = 0;
+	int i;
+	LCUI_BOOL need_add = TRUE;
 	LCUI_Rect *rect_ptr, *cur_rect_ptr;
 	LCUI_Queue rect_buff;
 	
@@ -545,7 +545,7 @@ RectQueue_Add( LCUI_Queue* queue, LCUI_Rect rect )
 		/* 如果与现有的矩形相同，或被现有的矩形包含 */
 		if( LCUIRect_Equal( rect, *cur_rect_ptr)
 		 || LCUIRect_IncludeRect( *cur_rect_ptr, rect ) ) {
-			flag = 1;
+			need_add = FALSE;
 			break;
 		}
 		
@@ -566,13 +566,13 @@ RectQueue_Add( LCUI_Queue* queue, LCUI_Rect rect )
 				 rect_ptr->width, rect_ptr->height);
 			RectQueue_Add( queue, *rect_ptr );
 		}
-		flag = 1;
+		need_add = FALSE;
 		break;
 	}
 	
 	/* 销毁队列 */
 	Queue_Destroy( &rect_buff );
-	if ( flag == 0 && Queue_Add( queue, &rect ) ) {
+	if ( need_add && Queue_Add( queue, &rect ) ) {
 		return 0;
 	}
 	return -1;
@@ -580,7 +580,7 @@ RectQueue_Add( LCUI_Queue* queue, LCUI_Rect rect )
 
 /* 添加矩形区域至可用的队列 */
 LCUI_API int
-RectQueue_AddToValid( LCUI_RectQueue *queue, LCUI_Rect rect )
+DoubleRectQueue_AddToValid( LCUI_RectQueue *queue, LCUI_Rect rect )
 {
 	if( queue->number == 0 ) {
 		return RectQueue_Add( &queue->queue[1], rect );
@@ -591,7 +591,7 @@ RectQueue_AddToValid( LCUI_RectQueue *queue, LCUI_Rect rect )
 
 /* 添加矩形区域至当前占用的队列 */
 LCUI_API int
-RectQueue_AddToCurrent( LCUI_RectQueue *queue, LCUI_Rect rect )
+DoubleRectQueue_AddToCurrent( LCUI_RectQueue *queue, LCUI_Rect rect )
 {
 	if( queue->number == 0 ) {
 		return RectQueue_Add( &queue->queue[0], rect );
@@ -602,7 +602,7 @@ RectQueue_AddToCurrent( LCUI_RectQueue *queue, LCUI_Rect rect )
 
 /* 从可用的队列中取出一个矩形区域 */
 LCUI_API LCUI_BOOL
-RectQueue_GetFromValid( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
+DoubleRectQueue_GetFromValid( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
 {
 	LCUI_Rect *rect_ptr;
 	LCUI_Queue *q;
@@ -622,7 +622,7 @@ RectQueue_GetFromValid( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
 
 /* 从当前占用的队列中取出一个矩形区域 */
 LCUI_API LCUI_BOOL
-RectQueue_GetFromCurrent( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
+DoubleRectQueue_GetFromCurrent( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
 {
 	LCUI_Rect *rect_ptr;
 	LCUI_Queue *q;

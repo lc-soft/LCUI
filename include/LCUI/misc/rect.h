@@ -125,33 +125,36 @@ typedef struct LCUI_RectQueueRec {
 	unsigned int	number:1;	/* 正使用的队列的下标，只有0和1 */
 } LCUI_RectQueue;
 
+/* 将矩形数据追加至队列 */
+LCUI_API int RectQueue_Add( LCUI_Queue *queue, LCUI_Rect rect );
+
 /* 切换队列 */
 LCUI_API void
-RectQueue_Switch( LCUI_RectQueue *queue );
+DoubleRectQueue_Switch( LCUI_RectQueue *queue );
 
 /* 初始化储存矩形数据的队列 */
 LCUI_API void
-RectQueue_Init( LCUI_RectQueue *queue );
+DoubleRectQueue_Init( LCUI_RectQueue *queue );
 
 /* 销毁储存矩形数据的队列 */
 LCUI_API void
-RectQueue_Destroy( LCUI_RectQueue *queue );
+DoubleRectQueue_Destroy( LCUI_RectQueue *queue );
 
 /* 添加矩形区域至可用的队列 */
 LCUI_API int
-RectQueue_AddToValid( LCUI_RectQueue *queue, LCUI_Rect rect );
+DoubleRectQueue_AddToValid( LCUI_RectQueue *queue, LCUI_Rect rect );
 
 /* 添加矩形区域至当前占用的队列 */
 LCUI_API int
-RectQueue_AddToCurrent( LCUI_RectQueue *queue, LCUI_Rect rect );
+DoubleRectQueue_AddToCurrent( LCUI_RectQueue *queue, LCUI_Rect rect );
 
 /* 从可用的队列中取出一个矩形区域 */
 LCUI_API LCUI_BOOL
-RectQueue_GetFromValid( LCUI_RectQueue *queue, LCUI_Rect *rect_buff );
+DoubleRectQueue_GetFromValid( LCUI_RectQueue *queue, LCUI_Rect *rect_buff );
 
 /* 从当前占用的队列中取出一个矩形区域 */
 LCUI_API LCUI_BOOL
-RectQueue_GetFromCurrent( LCUI_RectQueue *queue, LCUI_Rect *rect_buff );
+DoubleRectQueue_GetFromCurrent( LCUI_RectQueue *queue, LCUI_Rect *rect_buff );
 
 /*--------------------------- End RectQueue ----------------------------*/
 

@@ -100,7 +100,7 @@ LCUI_API int LCUIScreen_InvalidArea( LCUI_Rect rect )
 	}
 	rect = LCUIRect_ValidArea(LCUIScreen_GetSize(), rect);
 	DEBUG_MSG("%d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
-	return RectQueue_AddToValid ( &screen_invalid_area, rect );
+	return DoubleRectQueue_AddToValid ( &screen_invalid_area, rect );
 }
 
 /** 获取屏幕每个像素点的色彩值所占的位数 */
@@ -193,10 +193,10 @@ static int LCUIScreen_UpdateInvalidArea(void)
 	Graph_Init( &graph );
 	ret = 0;
 	/* 切换可用队列为当前使用的队列 */
-	RectQueue_Switch( &screen_invalid_area );
+	DoubleRectQueue_Switch( &screen_invalid_area );
 	while( i_am_init ) {
 		/* 如果从队列中获取数据成功 */
-		if ( !RectQueue_GetFromCurrent(&screen_invalid_area, &rect) ) {
+		if ( !DoubleRectQueue_GetFromCurrent(&screen_invalid_area, &rect) ) {
 			break;
 		}
 		ret = 1;
@@ -319,7 +319,7 @@ LCUI_API int LCUIModule_Video_Init( int w, int h, int mode )
 	LCUIMutex_Init( &glayer_list_mutex );
 	LCUIScreen_Init( w, h, mode );
 	i_am_init = TRUE;
-	RectQueue_Init( &screen_invalid_area );
+	DoubleRectQueue_Init( &screen_invalid_area );
 	return _LCUIThread_Create( &LCUI_Sys.display_thread,
 			LCUIScreen_Update, NULL );
 }
@@ -332,6 +332,6 @@ LCUI_API int LCUIModule_Video_End( void )
 	}
 	LCUIScreen_Destroy();
 	i_am_init = FALSE;
-	RectQueue_Destroy( &screen_invalid_area );
+	DoubleRectQueue_Destroy( &screen_invalid_area );
 	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
 }

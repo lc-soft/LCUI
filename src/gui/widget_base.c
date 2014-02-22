@@ -764,7 +764,7 @@ Widget_InvalidArea( LCUI_Widget *widget, LCUI_Rect rect )
 		LCUIScreen_MarkSync();
 	}
 	/* 保存至队列中 */
-	RectQueue_AddToValid( &widget->invalid_area, rect );
+	DoubleRectQueue_AddToValid( &widget->invalid_area, rect );
 	return 0;
 }
 
@@ -787,8 +787,8 @@ __Widget_SyncInvalidArea(	LCUI_Widget *widget,
 	rect_queue = Widget_GetInvalidAreaQueue( widget );
 	point.x = valid_area.x + valid_area.width;
 	point.y = valid_area.y + valid_area.height;
-	RectQueue_Switch( rect_queue );
-	while( RectQueue_GetFromCurrent( rect_queue, &rect ) ) {
+	DoubleRectQueue_Switch( rect_queue );
+	while( DoubleRectQueue_GetFromCurrent( rect_queue, &rect ) ) {
 		/* 加上当前部件的全局坐标 */
 		rect.x += global_pos.x;
 		rect.y += global_pos.y;
@@ -1116,7 +1116,7 @@ static void WidgetList_DestroyWidget( void *arg )
 	GraphLayer_Free( widget->glayer );
 	/* 移除后，解除互斥锁 */
 	LCUIScreen_UnlockGraphLayerTree();
-	RectQueue_Destroy( &widget->invalid_area );
+	DoubleRectQueue_Destroy( &widget->invalid_area );
 	/* 调用回调函数销毁部件私有数据 */
 	WidgetFunc_Call( widget, FUNC_TYPE_DESTROY );
 	free( widget->private_data );
@@ -1239,7 +1239,7 @@ static void Widget_AttrInit( LCUI_Widget *widget )
 	widget->glayer->graph.color_type = COLOR_TYPE_RGBA;
 	//widget->glayer->graph.is_opaque = FALSE;
 	//widget->glayer->graph.not_visible = TRUE;
-	RectQueue_Init( &widget->invalid_area ); /* 初始化无效区域记录 */
+	DoubleRectQueue_Init( &widget->invalid_area ); /* 初始化无效区域记录 */
 	EventSlots_Init( &widget->event );	/* 初始化部件的事件数据队列 */
 	WidgetQueue_Init( &widget->child );	/* 初始化子部件集 */
 	WidgetMsgBuff_Init( widget );
