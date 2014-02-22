@@ -1,5 +1,12 @@
 *.lo
 *.o
+bin/Debug
+bin/Release
+build/*/*.sdf
+build/*/*.suo
+*.tlog
+*.log
+*.obj
 .deps
 .libs
 *.la
