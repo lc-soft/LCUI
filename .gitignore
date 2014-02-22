@@ -3,6 +3,7 @@
 bin/Debug
 bin/Release
 build/*/*.sdf
+build/*/*.opensdf
 build/*/*.suo
 *.tlog
 *.log
