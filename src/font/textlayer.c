@@ -60,32 +60,6 @@ static inline void TaskData_AddUpdateTypeset( TaskData *task, int start_row )
         task->update_typeset = TRUE;
 }
 
-LCUI_API void TextLayer_Init( LCUI_TextLayer *layer )
-{
-        layer->max_width = 0;
-        layer->max_height = 0;
-        layer->offset_x = 0;
-        layer->offset_y = 0;
-	layer->new_offset_x = 0;
-	layer->new_offset_y = 0;
-        layer->insert_x = 0;
-        layer->insert_y = 0;
-        layer->is_mulitiline_mode = FALSE;
-        layer->is_wordwrap_mode = FALSE;
-	layer->is_using_style_tags = FALSE;
-        layer->text_align = TEXT_ALIGN_LEFT;
-
-        layer->row_list.max_rows = 0;
-        layer->row_list.rows = 0;
-        layer->row_list.rowdata = 0;
-        
-        TextStyle_Init( &layer->text_style );
-        TaskData_Init( &layer->task );
-
-        layer->is_using_buffer = TRUE;
-	Graph_Init( &layer->graph );
-}
-
 static void TextRow_Init( TextRowData* p_row )
 {
         p_row->bottom_spacing = 1;
@@ -95,6 +69,20 @@ static void TextRow_Init( TextRowData* p_row )
         p_row->string = NULL;
         p_row->string_len = 0;
         p_row->string_max_len = 0;
+}
+
+static void TextRow_Destroy( TextRowData *p_row )
+{
+	int i;
+	for( i=0; i<p_row->string_max_len; ++i ) {
+		if( p_row->string[i] ) {
+			free( p_row->string[i] );
+		}
+	}
+	p_row->string_max_len = 0;
+	p_row->string_len = 0;
+	free( p_row->string );
+	p_row->string = NULL;
 }
 
 static inline TextRowData* 
@@ -174,6 +162,7 @@ static int TextRowList_RemoveRow( TextRowList *p_rowlist, int row )
         for( ; row < p_rowlist->rows; ++row ) {
                 p_rowlist->rowdata[row] = p_rowlist->rowdata[row+1];
         }
+	TextRow_Destroy( p_rowlist->rowdata[row] );
         p_rowlist->rowdata[row] = NULL;
         --p_rowlist->rows;
         return 0;
@@ -224,6 +213,8 @@ static int TextRow_SetLength( TextRowData *p_row, int new_len )
                 --p_row->string_len;
                 return -1;
         }
+	/* 用0填充新增的空间 */
+	memset( &p_new_str[new_len], 0, new_len-p_row->string_max_len );
         p_row->string = p_new_str;
         p_row->string_max_len = p_row->string_len;
         return 0;
@@ -231,13 +222,13 @@ static int TextRow_SetLength( TextRowData *p_row, int new_len )
 
 /** 向文本行插入一个字符 */
 static int 
-TextRow_Insert( TextRowData *p_row, int insert_pos, TextCharData *p_char )
+TextRow_Insert( TextRowData *p_row, int ins_pos, TextCharData *p_char )
 {
         int i;
         TextCharData **p_new_str;
         
-        if( insert_pos > p_row->string_len ) {
-                insert_pos = p_row->string_len;
+        if( ins_pos > p_row->string_len ) {
+                ins_pos = p_row->string_len;
         }
         ++p_row->string_len;
         if( p_row->string_max_len <= p_row->string_len ) {
@@ -250,10 +241,11 @@ TextRow_Insert( TextRowData *p_row, int insert_pos, TextCharData *p_char )
                 p_row->string = p_new_str;
                 p_row->string_max_len = p_row->string_len;
         }
-        for( i=p_row->string_len-1; i>=insert_pos; --i ) {
+        for( i=p_row->string_len-1; i>=ins_pos; --i ) {
                 p_row->string[i] = p_row->string[i-1];
         }
-        p_row->string[insert_pos] = p_char;
+	p_row->string[ins_pos] = (TextCharData*)malloc( sizeof(TextCharData) );
+	memcpy( p_row->string[ins_pos], p_char, sizeof(TextCharData) );
         return 0;
 }
 
@@ -287,12 +279,63 @@ static inline LCUI_BOOL TextRow_HasEndChar( TextRowData *p_row )
 }
 
 /** 更新字体位图 */
-static inline void TextChar_UpdateBitmap( TextCharData* p_data, LCUI_TextStyle *default_style )
+static inline void 
+TextChar_UpdateBitmap( TextCharData* p_data, LCUI_TextStyle *default_style )
 {
-        p_data->bitmap = FontLIB_GetExistFontBMP( p_data->char_code, 
-			default_style->font_id, default_style->pixel_size );
+        p_data->bitmap = FontLIB_GetExistFontBMP( default_style->font_id, 
+				p_data->char_code, default_style->pixel_size );
         //printf("char_code: %c, pixel_size: %d, font_id: %d, bitmap: %p\n", 
         //p_data->char_code, default_style->pixel_size, default_style->font_id, p_data->bitmap);
+}
+
+LCUI_API void TextLayer_Init( LCUI_TextLayer *layer )
+{
+        layer->max_width = 0;
+        layer->max_height = 0;
+        layer->offset_x = 0;
+        layer->offset_y = 0;
+	layer->new_offset_x = 0;
+	layer->new_offset_y = 0;
+        layer->insert_x = 0;
+        layer->insert_y = 0;
+        layer->is_mulitiline_mode = FALSE;
+        layer->is_autowrap_mode = FALSE;
+	layer->is_using_style_tags = FALSE;
+        layer->is_using_buffer = TRUE;
+        layer->text_align = TEXT_ALIGN_LEFT;
+
+        layer->row_list.max_rows = 0;
+        layer->row_list.rows = 0;
+        layer->row_list.rowdata = NULL;
+        
+        TextStyle_Init( &layer->text_style );
+        TaskData_Init( &layer->task );
+	Queue_Init( &layer->dirty_rect, sizeof(LCUI_Rect), NULL );
+	Graph_Init( &layer->graph );
+	layer->graph.color_type = COLOR_TYPE_RGBA;
+}
+
+static void TextRowList_Destroy( TextRowList *list )
+{
+	int row;
+	for( row=0; row<list->rows; ++row ) {
+		TextRow_Destroy( list->rowdata[row] );
+		list->rowdata[row] = NULL;
+	}
+	list->max_rows = 0;
+	list->rows = 0;
+	if( list->rowdata ) {
+		free( list->rowdata );
+	}
+	list->rowdata = NULL;
+}
+
+/** 销毁TextLayer */
+LCUI_API void TextLayer_Destroy( LCUI_TextLayer *layer )
+{
+	Queue_Destroy( &layer->dirty_rect );
+	Graph_Free( &layer->graph );
+	TextRowList_Destroy( &layer->row_list );
 }
 
 /** 标记当前显示区域内的所有文本行的矩形为无效 */
@@ -506,23 +549,13 @@ LCUI_API int TextLayer_GetCaretPixelPos( LCUI_TextLayer *layer, LCUI_Pos *pixel_
 						layer->insert_x, pixel_pos );
 }
 
-static void DestroyTextRowList( TextRowList *p_list )
-{
-        int i;
-        for( i=0; i<p_list->rows; ++i ) {
-                free( p_list->rowdata[i] );
-                p_list->rowdata[i] = NULL;
-        }
-        p_list->max_rows = 0;
-        p_list->rows = 0;
-}
-
 /** 清空文本 */
-LCUI_API void TextLayer_Clear( LCUI_TextLayer* layer )
+LCUI_API void TextLayer_ClearText( LCUI_TextLayer* layer )
 {
 	layer->insert_x = 0;
 	layer->insert_y = 0;
-        DestroyTextRowList( &layer->row_list );
+	TextLayer_InvalidateAllRowRect( layer );
+        TextRowList_Destroy( &layer->row_list );
         layer->task.redraw_all = TRUE;
 }
 
@@ -594,7 +627,7 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
         for( col=0; col<p_row->string_len; ++col ) {
                 p_char = p_row->string[col];
 		/* 如果遇到换行符 */
-		if( layer->is_wordwrap_mode && p_char->char_code == L'\n' ) {
+		if( layer->is_autowrap_mode && p_char->char_code == L'\n' ) {
 			TextLayer_DoWordWrap( layer, row, col+1 );
 			return;
 		}
@@ -609,8 +642,8 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
                 /* 累加行宽度 */
                 p_row->max_width += p_char->bitmap->advance.x;
                 /* 如果是当前行的第一个字符，或者行宽度没有超过宽度限制 */
-                if( layer->max_width <= 0 || !layer->is_wordwrap_mode 
-		 || (layer->is_wordwrap_mode && !layer->is_mulitiline_mode)
+                if( layer->max_width <= 0 || !layer->is_autowrap_mode 
+		 || (layer->is_autowrap_mode && !layer->is_mulitiline_mode)
 		 || col < 1 || p_row->max_width <= layer->max_width ) {
                         if( p_row->max_height < char_h ) {
                                 p_row->max_height = char_h;
@@ -635,7 +668,7 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
                 }
                 for( col=0; col<p_next_row->string_len; ++col ) {
                         p_char = p_next_row->string[col];
-			if( layer->is_wordwrap_mode
+			if( layer->is_autowrap_mode
 			 && p_char->char_code == L'\n' ) {
 				TextLayer_DoWordWrap( layer, row, col+1 );
 				return;
@@ -653,8 +686,8 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
                         }
                         p_row->max_width += p_char->bitmap->advance.x;
                         /* 如果没有超过宽度限制 */
-                        if( !layer->is_wordwrap_mode || layer->max_width <= 0
-			 || (layer->is_wordwrap_mode && !layer->is_mulitiline_mode)
+                        if( !layer->is_autowrap_mode || layer->max_width <= 0
+			 || (layer->is_autowrap_mode && !layer->is_mulitiline_mode)
 			 || p_row->max_width <= layer->max_width ) {
                                 if( p_row->max_height < char_h ) {
                                         p_row->max_height = char_h;
@@ -714,6 +747,7 @@ static int TextLayer_ProcessText(	LCUI_TextLayer *layer,
         if( !new_text ) {
                 return -1;
         }
+
         /* 如果是将文本追加至文本末尾 */
         if( add_type == TEXT_ADD_TYPE_APPEND ) {
                 if( layer->row_list.rows > 0 ) {
@@ -762,6 +796,7 @@ static int TextLayer_ProcessText(	LCUI_TextLayer *layer,
                         char_data.need_display = FALSE;
 			char_data.need_update = FALSE;
 			char_data.bitmap = NULL;
+			char_data.style = NULL;
 			/* 插入至当前文本行中 */
 			TextRow_Insert( p_cur_row, ins_x, &char_data );
 			continue;
@@ -772,6 +807,7 @@ static int TextLayer_ProcessText(	LCUI_TextLayer *layer,
 		char_data.style = StyleTag_GetCurrentStyle( &tag_buff );
 		/* 更新字体位图 */
 		TextChar_UpdateBitmap( &char_data, &layer->text_style );
+		TextRow_Insert( p_cur_row, ins_x, &char_data );
         }
         /* 更新当前行的尺寸 */
         TextRow_UpdateSize( p_cur_row, layer->text_style.pixel_size+2 );
@@ -779,9 +815,10 @@ static int TextLayer_ProcessText(	LCUI_TextLayer *layer,
                 layer->insert_x = ins_x;
         }
         /* 若启用了自动换行模式，则标记需要重新对文本进行排版 */
-        if( layer->is_wordwrap_mode ) {
+        if( layer->is_autowrap_mode ) {
                 TaskData_AddUpdateTypeset( &layer->task, cur_row );
         }
+	Queue_Destroy( &tag_buff );
         return 0;
 }
 
@@ -830,7 +867,7 @@ LCUI_API int TextLayer_AppendText( LCUI_TextLayer* layer, const char *utf8_text 
 /** 设置文本内容（宽字符版） */
 LCUI_API int TextLayer_SetTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text )
 {
-        TextLayer_Clear( layer );
+        TextLayer_ClearText( layer );
         return TextLayer_AppendTextW( layer, unicode_text );
 }
 
@@ -877,30 +914,32 @@ LCUI_API int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
         return i;
 }
 
-/** 设置最大文本宽度 */
-LCUI_API int TextLayer_SetMaxWidth( LCUI_TextLayer* layer, int max_width )
+/** 获取文本位图缓存 */
+LCUI_API LCUI_Graph* TextLayer_GetGraphBuffer( LCUI_TextLayer *layer )
 {
-        if( max_width <= 0 ) {
-                return -1;
-        }
-        if( layer->is_using_buffer && layer->max_height > 0 ) {
-		Graph_Create( &layer->graph, max_width, layer->max_height );
-        }
-        layer->max_width = max_width;
-        return 0;
+	if( layer->is_using_buffer ) {
+		return &layer->graph;
+	}
+	return NULL;
 }
 
-/** 设置最大文本高度 */
-LCUI_API int TextLayer_SetMaxHeight( LCUI_TextLayer* layer, int max_height )
+/** 设置最大尺寸 */
+LCUI_API int TextLayer_SetMaxSize( LCUI_TextLayer *layer, LCUI_Size new_size )
 {
-        if( max_height <= 0 ) {
-                return -1;
+	if( new_size.w <= 0 || new_size.h <= 0 ) {
+		return -1;
+	}
+	layer->max_width = new_size.w;
+	layer->max_height = new_size.h;
+        if( layer->is_using_buffer ) {
+		Graph_Create( &layer->graph, new_size.w, new_size.h );
         }
-        if( layer->is_using_buffer && layer->max_width > 0 ) {
-		Graph_Create( &layer->graph, layer->max_width, max_height );
-        }
-        layer->max_height = max_height;
-        return 0;
+	layer->task.redraw_all = TRUE;
+	if( layer->is_autowrap_mode ) {
+		layer->task.typeset_start_row = 0;
+		layer->task.update_typeset = TRUE;
+	}
+	return 0;
 }
 
 /** 设置是否启用多行文本模式 */
@@ -1057,13 +1096,19 @@ LCUI_API int TextLayer_Backspace( LCUI_TextLayer* layer, int n_char )
 }
 
 /** 设置是否启用自动换行模式 */
-LCUI_API void TextLayer_SetWordWrap( LCUI_TextLayer* layer, int is_true )
+LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer* layer, int is_true )
 {
-        if( !layer->is_wordwrap_mode && is_true
-	 || layer->is_wordwrap_mode && !is_true ) {
-                layer->is_wordwrap_mode = is_true;
-                TaskData_AddUpdateTypeset( &layer->task, 0 );;
+        if( !layer->is_autowrap_mode && is_true
+	 || layer->is_autowrap_mode && !is_true ) {
+                layer->is_autowrap_mode = is_true;
+                TaskData_AddUpdateTypeset( &layer->task, 0 );
         }
+}
+
+/** 设置是否使用样式标签 */
+LCUI_API void TextLayer_SetUsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL is_true )
+{
+	layer->is_using_style_tags = is_true;
 }
 
 /** 计算并获取文本的宽度 */
@@ -1173,7 +1218,7 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LCUI_Queue *rect_list )
 	 } 
 }
 
-LCUI_API int TextLayer_PaintToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph, 
+LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph, 
 					LCUI_Rect area, LCUI_Pos paint_pos )
 {
         int x, y, row, col;
@@ -1296,14 +1341,36 @@ LCUI_API int TextLayer_PaintToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph,
 }
 
 /** 绘制文本 */
-LCUI_API int TextLayer_Paint( LCUI_TextLayer* layer )
+LCUI_API int TextLayer_Draw( LCUI_TextLayer* layer )
 {
         /* 如果文本位图缓存无效 */
-	if( !Graph_IsValid( &layer->graph ) ) {
+	if( layer->is_using_buffer && !Graph_IsValid( &layer->graph ) ) {
                 return -1;
         }
-	return TextLayer_PaintToGraph( layer, &layer->graph, 
+	return TextLayer_DrawToGraph( layer, &layer->graph, 
 		Rect(0, 0, layer->max_width, layer->max_height), Pos(0,0) );
+}
+
+/** 清除已记录的无效矩形 */
+LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer *layer )
+{
+	int i, n;
+	LCUI_Rect *rect_ptr;
+	LCUI_Graph invalid_graph;
+
+	if( layer->is_using_buffer ) {
+		n = Queue_GetTotal( &layer->dirty_rect );
+		for( i=0; i<n; ++i ) {
+			rect_ptr = (LCUI_Rect*)Queue_Get( &layer->dirty_rect, i );
+			if( rect_ptr ) {
+				break;
+			}
+			Graph_Quote( &invalid_graph, &layer->graph, *rect_ptr );
+			Graph_FillAlpha( &invalid_graph, 0 );
+		}
+	}
+	Queue_Destroy( &layer->dirty_rect );
+	Queue_Init( &layer->dirty_rect, sizeof(LCUI_Rect), NULL );
 }
 
 /** 设置全局文本样式 */

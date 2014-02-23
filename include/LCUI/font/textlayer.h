@@ -101,7 +101,7 @@ typedef struct TextLayerRec_  {
         int max_height;			/* 最大文本高度 */
         
 	LCUI_BOOL is_mulitiline_mode;	/* 是否启用多行文本模式 */
-        LCUI_BOOL is_wordwrap_mode;	/* 是否启用自动换行模式 */
+        LCUI_BOOL is_autowrap_mode;	/* 是否启用自动换行模式 */
 	LCUI_BOOL is_using_style_tags;	/* 是否使用文本样式标签 */
         LCUI_BOOL is_using_buffer;	/* 是否使用缓存空间来存储文本位图 */
 	LCUI_Queue dirty_rect;		/* 脏矩形记录 */
@@ -168,6 +168,9 @@ static inline void TextLayer_SetOffset( LCUI_TextLayer* layer, int offset_x, int
 
 LCUI_API void TextLayer_Init( LCUI_TextLayer *layer );
 
+/** 销毁TextLayer */
+LCUI_API void TextLayer_Destroy( LCUI_TextLayer *layer );
+
 /** 设置插入点的行列坐标 */
 LCUI_API void TextLayer_SetCaretPos( LCUI_TextLayer* layer, int row, int col );
 
@@ -182,7 +185,7 @@ LCUI_API int TextLayer_GetCharPixelPos( LCUI_TextLayer* layer, int row,
 LCUI_API int TextLayer_GetCaretPixelPos( LCUI_TextLayer *layer, LCUI_Pos *pixel_pos );
 
 /** 清空文本 */
-LCUI_API void TextLayer_Clear( LCUI_TextLayer* layer );
+LCUI_API void TextLayer_ClearText( LCUI_TextLayer* layer );
 
 /** 插入文本内容（宽字符版） */
 LCUI_API int TextLayer_InsertTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text );
@@ -215,11 +218,11 @@ LCUI_API int TextLayer_SetText( LCUI_TextLayer* layer, const char *utf8_text );
 LCUI_API int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
 					int max_len, wchar_t *wstr_buff );
 
-/** 设置最大文本宽度 */
-LCUI_API int TextLayer_SetMaxWidth( LCUI_TextLayer* layer, int max_width );
+/** 获取文本位图缓存 */
+LCUI_API LCUI_Graph* TextLayer_GetGraphBuffer( LCUI_TextLayer *layer );
 
-/** 设置最大文本高度 */
-LCUI_API int TextLayer_SetMaxHeight( LCUI_TextLayer* layer, int max_height );
+/** 设置最大尺寸 */
+LCUI_API int TextLayer_SetMaxSize( LCUI_TextLayer *layer, LCUI_Size new_size );
 
 /** 设置是否启用多行文本模式 */
 LCUI_API void TextLayer_SetMultiline( LCUI_TextLayer* layer, int is_true );
@@ -231,7 +234,10 @@ LCUI_API int TextLayer_Delete( LCUI_TextLayer *layer, int n_char );
 LCUI_API int TextLayer_Backspace( LCUI_TextLayer* layer, int n_char );
 
 /** 设置是否启用自动换行模式 */
-LCUI_API void TextLayer_SetWordWrap( LCUI_TextLayer* layer, int is_true );
+LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer* layer, int is_true );
+
+/** 设置是否使用样式标签 */
+LCUI_API void TextLayer_SetUsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL is_true );
 
 /** 计算并获取文本的宽度 */
 LCUI_API int TextLayer_GetWidth( LCUI_TextLayer* layer );
@@ -245,11 +251,14 @@ LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer );
 /** 更新数据 */
 LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LCUI_Queue *rect_list );
 
-LCUI_API int TextLayer_PaintToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph, 
+LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph, 
 					LCUI_Rect area, LCUI_Pos paint_pos );
 
 /** 绘制文本 */
-LCUI_API int TextLayer_Paint( LCUI_TextLayer* layer );
+LCUI_API int TextLayer_Draw( LCUI_TextLayer* layer );
+
+/** 清除已记录的无效矩形 */
+LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer *layer );
 
 /** 设置全局文本样式 */
 LCUI_API void TextLayer_SetTextStyle( LCUI_TextLayer *layer,
