@@ -150,7 +150,7 @@ LCUI_API int StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data )
 	if( Queue_Add( tags, data ) ) {
 		return 0;
 	}
-	return 0;
+	return -1;
 }
 
 /** 获取当前的样式数据 */
@@ -161,7 +161,7 @@ LCUI_API LCUI_TextStyle* StyleTag_GetCurrentStyle( LCUI_Queue *tags )
 	LCUI_TextStyle *style_data;
 	int i, total, equal = 0, flags[MAX_TAG_NUM];
 	
-	style_data = malloc (sizeof(LCUI_TextStyle));
+	style_data = (LCUI_TextStyle*)malloc( sizeof(LCUI_TextStyle) );
 	TextStyle_Init( style_data );
 	memset( flags, 0, sizeof(flags) );
 	
@@ -173,7 +173,7 @@ LCUI_API LCUI_TextStyle* StyleTag_GetCurrentStyle( LCUI_Queue *tags )
 	
 	/* 从样式数据队列中获取字体样式数据 */
 	for(equal=0,i=total-1; i>=0; --i) {
-		tag_data = Queue_Get( tags, i );
+		tag_data = (StyleTag_Data*)Queue_Get( tags, i );
 		DEBUG_MSG("tag id: %d\n", tag_data->tag);
 		switch( tag_data->tag ) {
 		    case TAG_ID_COLOR: 
