@@ -1,7 +1,6 @@
 *.lo
 *.o
-bin/Debug
-bin/Release
+bin/
 build/*/*.sdf
 build/*/*.opensdf
 build/*/*.suo
