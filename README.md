@@ -42,7 +42,7 @@ LCUI is built under Travis CI service. Every commit pushed to this repository
 will queue a build into the continuous integration service and will run sime 
 tests to ensure that everything is going well and the project is stable. The 
 current build status is:
-[![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
+[![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
 
 ## Bugs 
 

@@ -243,6 +243,12 @@
     <ClInclude Include="..\..\..\include\LCUI\kernel\sleeper.h">
       <Filter>头文件\LCUI\kernel</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\misc\rbtree.h">
+      <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\misc\linkedlist.h">
+      <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -442,6 +448,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\kernel\sleeper.c">
       <Filter>源文件\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\misc\rbtree.c">
+      <Filter>源文件\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\misc\linkedlist.c">
+      <Filter>源文件\misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -92,8 +92,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmisc_la_LIBADD =
-am_libmisc_la_OBJECTS = catch_screen.lo rect.lo string.lo misc.lo \
-	delay.lo dirent.lo
+am_libmisc_la_OBJECTS = catch_screen.lo rbtree.lo linkedlist.lo \
+	rect.lo string.lo misc.lo delay.lo dirent.lo
 libmisc_la_OBJECTS = $(am_libmisc_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -287,7 +287,7 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign 
 AM_CFLAGS = -I$(abs_top_srcdir)/include 
 noinst_LTLIBRARIES = libmisc.la
-libmisc_la_SOURCES = catch_screen.c rect.c string.c misc.c delay.c dirent.c
+libmisc_la_SOURCES = catch_screen.c rbtree.c linkedlist.c rect.c string.c misc.c delay.c dirent.c
 all: all-am
 
 .SUFFIXES:
@@ -346,7 +346,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/catch_screen.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/delay.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dirent.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/linkedlist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/misc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rbtree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rect.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string.Plo@am__quote@
 
