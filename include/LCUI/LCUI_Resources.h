@@ -44,9 +44,6 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API int Load_Graph_Default_Cursor(LCUI_Graph *pic);
-/* 功能：载入默认的鼠标指针的图形 */ 
-
 LCUI_API int Load_Graph_Mosaics(LCUI_Graph *pic);
 /* 功能：载入马赛克图形 */ 
 

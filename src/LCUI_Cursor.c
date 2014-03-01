@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * LCUI_Cursor.c -- control mouse cursor
+ * LCUI_Cursor.c -- control mouse global_cursor
  *
  * Copyright (C) 2012-2013 by
  * Liu Chao
@@ -53,22 +53,77 @@ static struct LCUI_Cursor {
 	LCUI_Pos new_pos;	/* 将要更新的坐标 */
 	int visible;		/* 是否可见 */
 	LCUI_Graph graph;	/* 游标的图形 */
-} cursor;
+} global_cursor;
+
+static unsigned char cursor_img_rgba[4][12*19] = {
+	{3,3,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,3,229,3,3,0,0,0,0,0,
+	0,0,0,3,255,229,3,3,0,0,0,0,0,0,0,3,255,255,229,3,3,0,0,0,0,0,0,3,255,255,255,229,
+	3,3,0,0,0,0,0,3,255,255,255,255,229,3,3,0,0,0,0,3,255,255,255,255,253,226,3,3,0,0,0,3,
+	255,255,255,253,251,248,220,3,3,0,0,3,255,255,253,251,248,245,241,214,3,3,0,3,255,253,251,248,245,241,238,234,
+	207,3,3,3,253,251,248,245,241,238,234,230,226,201,3,3,251,248,245,217,238,234,3,3,3,3,3,3,248,245,217,3,
+	164,230,3,3,0,0,0,3,245,217,3,3,3,226,201,3,0,0,0,3,217,3,3,0,3,176,219,3,3,0,0,3,
+	3,3,0,0,3,3,216,192,3,0,0,0,0,0,0,0,0,3,192,211,3,0,0,0,0,0,0,0,0,3,3,3,
+	3,0,0},
+	{6,6,0,0,0,0,0,0,0,0,0,0,6,6,6,0,0,0,0,0,0,0,0,0,6,230,6,6,0,0,0,0,0,
+	0,0,0,6,255,230,6,6,0,0,0,0,0,0,0,6,255,255,230,6,6,0,0,0,0,0,0,6,255,255,255,230,
+	6,6,0,0,0,0,0,6,255,255,255,255,230,6,6,0,0,0,0,6,255,255,255,255,253,226,6,6,0,0,0,6,
+	255,255,255,253,251,248,221,6,6,0,0,6,255,255,253,251,248,245,241,214,6,6,0,6,255,253,251,248,245,241,238,234,
+	207,6,6,6,253,251,248,245,241,238,234,230,226,201,6,6,251,248,245,217,238,234,6,6,6,6,6,6,248,245,217,6,
+	165,230,6,6,0,0,0,6,245,217,6,6,6,226,201,6,0,0,0,6,217,6,6,0,6,176,219,6,6,0,0,6,
+	6,6,0,0,6,6,216,192,6,0,0,0,0,0,0,0,0,6,192,211,6,0,0,0,0,0,0,0,0,6,6,6,
+	6,0,0},
+	{26,26,0,0,0,0,0,0,0,0,0,0,26,26,26,0,0,0,0,0,0,0,0,0,26,232,26,26,0,0,0,0,0,
+	0,0,0,26,255,232,26,26,0,0,0,0,0,0,0,26,255,255,232,26,26,0,0,0,0,0,0,26,255,255,255,232,
+	26,26,0,0,0,0,0,26,255,255,255,255,232,26,26,0,0,0,0,26,255,255,255,255,253,228,26,26,0,0,0,26,
+	255,255,255,253,251,248,223,26,26,0,0,26,255,255,253,251,248,245,241,216,26,26,0,26,255,253,251,248,245,241,238,234,
+	209,26,26,26,253,251,248,245,241,238,234,230,226,203,26,26,251,248,245,219,238,234,26,26,26,26,26,26,248,245,219,26,
+	171,230,26,26,0,0,0,26,245,219,26,26,26,226,203,26,0,0,0,26,219,26,26,0,26,181,219,26,26,0,0,26,
+	26,26,0,0,26,26,216,194,26,0,0,0,0,0,0,0,0,26,194,211,26,0,0,0,0,0,0,0,0,26,26,26,
+	26,0,0},
+	{231,55,0,0,0,0,0,0,0,0,0,0,231,189,55,0,0,0,0,0,0,0,0,0,231,255,189,55,0,0,0,0,0,
+	0,0,0,231,255,255,189,55,0,0,0,0,0,0,0,231,255,255,255,189,55,0,0,0,0,0,0,231,255,255,255,255,
+	189,55,0,0,0,0,0,231,255,255,255,255,255,189,55,0,0,0,0,231,255,255,255,255,255,255,189,55,0,0,0,231,
+	255,255,255,255,255,255,255,189,55,0,0,231,255,255,255,255,255,255,255,255,189,55,0,231,255,255,255,255,255,255,255,255,
+	255,189,55,231,255,255,255,255,255,255,255,255,255,255,189,231,255,255,255,255,255,255,189,189,189,189,189,231,255,255,255,244,
+	255,255,188,77,0,0,0,231,255,255,244,55,211,255,255,211,0,0,0,231,255,244,55,0,180,255,255,180,77,0,0,189,
+	244,55,0,0,55,215,255,255,209,0,0,0,0,0,0,0,0,180,255,255,204,0,0,0,0,0,0,0,0,26,215,158,
+	49,0,0}
+};
+
+static int LCUICursor_LoadDefualtGraph(LCUI_Graph *buff )
+{
+	int size;
+	if( Graph_IsValid(buff) ) {
+		Graph_Free( buff );
+	}
+	Graph_Init( buff );
+	buff->color_type = COLOR_TYPE_RGBA;;
+	buff->alpha = 255;
+	if( Graph_Create(buff,12,19) != 0 ) {
+		return -1;
+	}
+	size = sizeof(unsigned char)*12*19;
+	memcpy( buff->rgba[0], cursor_img_rgba[0], size);
+	memcpy( buff->rgba[1], cursor_img_rgba[1], size );
+	memcpy( buff->rgba[2], cursor_img_rgba[2], size );
+	memcpy( buff->rgba[3], cursor_img_rgba[3], size );
+	return 0;
+}
 
 /* 初始化游标数据 */
 void LCUIModule_Cursor_Init( void )
 {
 	LCUI_Graph pic;
 	Graph_Init( &pic );
-	Graph_Init( &cursor.graph );
+	Graph_Init( &global_cursor.graph );
 	/* 载入自带的游标的图形数据 */ 
-	Load_Graph_Default_Cursor( &pic );
+	LCUICursor_LoadDefualtGraph( &pic );
 	LCUICursor_SetGraph( &pic );
 }
 
 void LCUIModule_Cursor_End( void )
 {
-	Graph_Free( &cursor.graph );
+	Graph_Free( &global_cursor.graph );
 }
 
 /* 刷新鼠标游标在屏幕上显示的图形 */
@@ -82,14 +137,14 @@ LCUICursor_Refresh( void )
 LCUI_API LCUI_BOOL
 LCUICursor_Visible( void )
 {
-	return cursor.visible;
+	return global_cursor.visible;
 }
 
 /* 显示鼠标游标 */
 LCUI_API void
 LCUICursor_Show( void )
 {
-	cursor.visible = TRUE;	/* 标识游标为可见 */
+	global_cursor.visible = TRUE;	/* 标识游标为可见 */
 	LCUICursor_Refresh();
 }
 
@@ -97,7 +152,7 @@ LCUICursor_Show( void )
 LCUI_API void
 LCUICursor_Hide( void )
 {
-	cursor.visible = FALSE;
+	global_cursor.visible = FALSE;
 	LCUICursor_Refresh();
 }
 
@@ -106,10 +161,10 @@ LCUI_API LCUI_Rect
 LCUICursor_GetRect( void )
 {
 	LCUI_Rect rect;
-	rect.x = cursor.current_pos.x;
-	rect.y = cursor.current_pos.y;
-	rect.width = cursor.graph.w;
-	rect.height = cursor.graph.h;
+	rect.x = global_cursor.current_pos.x;
+	rect.y = global_cursor.current_pos.y;
+	rect.width = global_cursor.graph.w;
+	rect.height = global_cursor.graph.h;
 	return rect;
 }
 
@@ -118,12 +173,12 @@ LCUI_API void
 LCUICursor_UpdatePos( void )
 {
 	LCUI_Rect old;
-	if( cursor.current_pos.x == cursor.new_pos.x
-	 && cursor.current_pos.y == cursor.new_pos.y ) {
+	if( global_cursor.current_pos.x == global_cursor.new_pos.x
+	 && global_cursor.current_pos.y == global_cursor.new_pos.y ) {
 		return;
 	}
 	old = LCUICursor_GetRect();
- 	cursor.current_pos = cursor.new_pos;
+ 	global_cursor.current_pos = global_cursor.new_pos;
  	/* 刷新游标的显示 */
 	LCUICursor_Refresh();
 	/* 刷新游标原来的区域中的图形 */
@@ -134,7 +189,7 @@ LCUICursor_UpdatePos( void )
 LCUI_API void
 LCUICursor_SetPos( LCUI_Pos pos )
 {
-	cursor.new_pos = pos;
+	global_cursor.new_pos = pos;
 	DEBUG_MSG("new pos: %d,%d\n", pos.x, pos.y);
 }
 
@@ -146,10 +201,10 @@ LCUI_API int
 LCUICursor_SetGraph( LCUI_Graph *graph )
 {
 	if (Graph_IsValid (graph)) {
-		if( Graph_IsValid(&cursor.graph) ) {
-			Graph_Free( &cursor.graph );
+		if( Graph_IsValid(&global_cursor.graph) ) {
+			Graph_Free( &global_cursor.graph );
 		}
-		Graph_Copy( &cursor.graph, graph );
+		Graph_Copy( &global_cursor.graph, graph );
 		LCUICursor_Refresh();
 		return 0;
 	}
@@ -160,14 +215,14 @@ LCUICursor_SetGraph( LCUI_Graph *graph )
 LCUI_API LCUI_Pos
 LCUICursor_GetPos( void )
 {
-	return cursor.current_pos;
+	return global_cursor.current_pos;
 }
 
 /* 获取鼠标指针将要更新的坐标 */
 LCUI_API LCUI_Pos
 LCUICursor_GetNewPos( void )
 {
-	return cursor.new_pos;
+	return global_cursor.new_pos;
 }
 
 /* 检测鼠标游标是否覆盖在矩形区域上 */
@@ -181,5 +236,5 @@ LCUICursor_CoverRect( LCUI_Rect rect )
 LCUI_API int
 LCUICursor_MixGraph( LCUI_Graph *buff, LCUI_Pos pos )
 {
-	return Graph_Mix( buff, &cursor.graph, pos );
+	return Graph_Mix( buff, &global_cursor.graph, pos );
 }
