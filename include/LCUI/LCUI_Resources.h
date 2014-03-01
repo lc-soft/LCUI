@@ -64,18 +64,6 @@ LCUI_API int Load_Graph_Icon_LCUI(LCUI_Graph *pic);
 
 LCUI_API int Load_Graph_Icon_LCUI_18x18(LCUI_Graph *out);
 
-LCUI_API int Load_Graph_Default_RadioButton_Off_Normal(LCUI_Graph *pic);
-
-LCUI_API int Load_Graph_Default_RadioButton_Off_Selected(LCUI_Graph *pic);
-
-LCUI_API int Load_Graph_Default_RadioButton_Off_Pressed(LCUI_Graph *pic);
-
-LCUI_API int Load_Graph_Default_RadioButton_On_Normal(LCUI_Graph *pic);
-
-LCUI_API int Load_Graph_Default_RadioButton_On_Selected(LCUI_Graph *pic);
-
-LCUI_API int Load_Graph_Default_RadioButton_On_Pressed(LCUI_Graph *pic);
-
 LCUI_END_HEADER
 
 #endif
