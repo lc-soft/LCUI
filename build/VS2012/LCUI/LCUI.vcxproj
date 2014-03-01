@@ -187,7 +187,6 @@
     <ClCompile Include="..\..\..\src\bmp\load_image.c" />
     <ClCompile Include="..\..\..\src\bmp\png.c" />
     <ClCompile Include="..\..\..\src\draw\border.c" />
-    <ClCompile Include="..\..\..\src\draw\in-core\img_checkbox.c" />
     <ClCompile Include="..\..\..\src\draw\in-core\img_cursor.c" />
     <ClCompile Include="..\..\..\src\draw\in-core\img_icon.c" />
     <ClCompile Include="..\..\..\src\draw\in-core\img_mosaics.c" />
@@ -235,7 +234,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\LCUI_GraphLayer.c" />
     <ClCompile Include="..\..\..\src\LCUI_InputMethod.c" />
-    <ClCompile Include="..\..\..\src\LCUI_Memory.c" />
     <ClCompile Include="..\..\..\src\LCUI_Queue.c" />
     <ClCompile Include="..\..\..\src\LCUI_StyleLibrary.c" />
     <ClCompile Include="..\..\..\src\misc\catch_screen.c" />

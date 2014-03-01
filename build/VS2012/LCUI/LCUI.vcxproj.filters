@@ -356,9 +356,6 @@
     <ClCompile Include="..\..\..\src\font\in-core\font_8x8.c">
       <Filter>源文件\font\in-core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\draw\in-core\img_checkbox.c">
-      <Filter>源文件\draw\in-core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\draw\in-core\img_cursor.c">
       <Filter>源文件\draw\in-core</Filter>
     </ClCompile>
@@ -439,9 +436,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\misc\dirent.c">
       <Filter>源文件\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\LCUI_Memory.c">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget\listview.c">
       <Filter>源文件\gui\widget</Filter>
