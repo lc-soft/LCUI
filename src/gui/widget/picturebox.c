@@ -351,13 +351,13 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 	}
 	graph = image;
 	pic_box = Widget_GetPrivData(widget);
-	for(i = 0;i < 2; ++i) {
+	for( i=0; i<2; ++i ) {
 		/* 如果image有效 */ 
-		if(Graph_IsValid(graph)) {
+		if( Graph_IsValid(graph) ) {
 			/* 图片更换了，就释放缓存图形 */
 			Graph_Free(&pic_box->buff_graph);
 			pic_box->image = graph;
-			/* 读取的范区域为整个图片区域 */
+			/* 读取的区域为整个图片区域 */
 			pic_box->read_box.x = 0;
 			pic_box->read_box.y = 0;
 			pic_box->read_box.width = graph->w;
@@ -370,8 +370,8 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 			//printf("PictureBox_SetImage(): pb: w: %d, h: %d\n", widget->size.w, widget->size.h);
 			//printf("PictureBox_SetImage(): size mode: %d\n", pic_box->size_mode);
 			switch(pic_box->size_mode) {
-			    case SIZE_MODE_BLOCK_ZOOM:
-			    case SIZE_MODE_ZOOM: 
+			case SIZE_MODE_BLOCK_ZOOM:
+			case SIZE_MODE_ZOOM: 
 			//printf("PictureBox_SetImage(): widget: w: %d, h: %d\n", widget->size.w, widget->size.h);
 				if(widget->size.w <= 0 || widget->size.h <= 0) {
 					//printf("PictureBox_SetImage(): break\n");
@@ -389,12 +389,12 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 				//pic_box->read_box.width, pic_box->read_box.height);
 				break;
 			/* 正常模式 */
-			    case SIZE_MODE_NORMAL: break;
+			case SIZE_MODE_NORMAL: break;
 			/* 拉伸模式 */
-			    case SIZE_MODE_STRETCH: break;
+			case SIZE_MODE_STRETCH: break;
 			/* 平铺模式 */
-			    case SIZE_MODE_TILE: break;
-			    case SIZE_MODE_CENTER: 
+			case SIZE_MODE_TILE: break;
+			case SIZE_MODE_CENTER: 
 				/* 判断图像的尺寸是否超出图片盒子的尺寸 */
 				if(pic_box->image->w >= widget->size.w) {
 					pic_box->read_box.x = (pic_box->image->w - widget->size.w)/2.0;
@@ -405,18 +405,18 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 					pic_box->read_box.height = widget->size.h;
 				}
 				break;
-				default : break;
+			default:break;
 			}
 			break;
-		} else if(pic_box->image_state == IMAGE_STATE_LOADING) {
+		}
+		else if( pic_box->image_state == IMAGE_STATE_LOADING ) {
 			/* 使用对应的图片 */ 
 			if(Graph_IsValid(&pic_box->initial_image)) { 
 				graph = &pic_box->initial_image; 
 			} else {
 				return;
 			}
-		}
-		else { /* 使用对应的图片 */ 
+		} else { /* 使用对应的图片 */ 
 			if(Graph_IsValid(&pic_box->error_image)) {
 				graph = &pic_box->error_image; 
 				pic_box->image_state = IMAGE_STATE_FAIL;
@@ -424,7 +424,7 @@ PictureBox_SetImage( LCUI_Widget *widget, LCUI_Graph *image )
 				return;
 			} 
 		}
-	} 
+	}
 	/* 如果记录中有该部件，那判断该部件使用的图像是否为同一个，不一样就释放之前的 */
 	i = find_widget_data(widget);
 	if(i >= 0) {
