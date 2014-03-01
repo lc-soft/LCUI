@@ -104,21 +104,21 @@ TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color )
 
 /* 设置字体样式 */
 LCUI_API void
-TextStyle_FontStyle( LCUI_TextStyle *style, enum_font_style fontstyle )
+TextStyle_FontStyle( LCUI_TextStyle *style, enum font_style fontstyle )
 {
 	style->style = fontstyle;
 	style->_style = TRUE;
 }
 
 LCUI_API void
-TextStyle_FontWeight( LCUI_TextStyle *style, enum_font_weight fontweight ) 
+TextStyle_FontWeight( LCUI_TextStyle *style, enum font_weight fontweight ) 
 {
 	style->weight = fontweight;
 	style->_weight = TRUE;
 }
 
 LCUI_API void
-TextStyle_FontDecoration( LCUI_TextStyle *style, enum_font_decoration decoration )
+TextStyle_FontDecoration( LCUI_TextStyle *style, enum font_decoration decoration )
 /* 设置字体下划线 */
 {
 	style->decoration = decoration;

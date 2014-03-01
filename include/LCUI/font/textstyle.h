@@ -23,8 +23,7 @@ typedef enum font_decoration {
 }; 
 
 
-typedef struct _LCUI_TextStyle
-{
+typedef struct _LCUI_TextStyle {
 	LCUI_BOOL _family:1;
 	LCUI_BOOL _style:1;
 	LCUI_BOOL _weight:1;
