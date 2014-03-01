@@ -599,7 +599,8 @@ Destroy_CheckBox(LCUI_Widget *widget)
 /* 更新复选框的图形数据 */
 static void CheckBox_ExecDraw(LCUI_Widget *widget)
 {
-	LCUI_Graph *p;
+	int img_id;
+	LCUI_Graph *img_ptr;
 	LCUI_CheckBox *check_box;
 	
 	check_box = (LCUI_CheckBox*)Widget_GetPrivData(widget); 					
@@ -611,35 +612,35 @@ static void CheckBox_ExecDraw(LCUI_Widget *widget)
 		switch(widget->state){
 		case WIDGET_STATE_NORMAL:
 			if( check_box->on ) {
-				p = &check_box->img_on_normal;
+				img_ptr = &check_box->img_on_normal;
 			} else {
-				p = &check_box->img_off_normal;
+				img_ptr = &check_box->img_off_normal;
 			}
-			PictureBox_SetImage(check_box->imgbox, p);
+			PictureBox_SetImage(check_box->imgbox, img_ptr);
 			break;
 		case WIDGET_STATE_OVERLAY :
 			if( check_box->on ) {
-				p = &check_box->img_on_over;
+				img_ptr = &check_box->img_on_over;
 			} else {
-				p = &check_box->img_off_over;
+				img_ptr = &check_box->img_off_over;
 			}
-			PictureBox_SetImage(check_box->imgbox, p);
+			PictureBox_SetImage(check_box->imgbox, img_ptr);
 			break;
 		case WIDGET_STATE_ACTIVE : 
 			if( check_box->on ) {
-				p = &check_box->img_on_down;
+				img_ptr = &check_box->img_on_down;
 			} else {
-				p = &check_box->img_off_down;
+				img_ptr = &check_box->img_off_down;
 			}
-			PictureBox_SetImage(check_box->imgbox, p);
+			PictureBox_SetImage(check_box->imgbox, img_ptr);
 			break;
 		case WIDGET_STATE_DISABLE :
 			if( check_box->on ) {
-				p = &check_box->img_on_disable;
+				img_ptr = &check_box->img_on_disable;
 			} else {
-				p = &check_box->img_off_disable;
+				img_ptr = &check_box->img_off_disable;
 			}
-			PictureBox_SetImage(check_box->imgbox, p); 
+			PictureBox_SetImage(check_box->imgbox, img_ptr); 
 			break;
 		default: break;
 		} 
@@ -650,37 +651,38 @@ static void CheckBox_ExecDraw(LCUI_Widget *widget)
 	if( !widget->enabled ) {
 		widget->state = WIDGET_STATE_DISABLE;
 	}
-	/* 先释放PictureBox部件中保存的图形数据 */
-	p = PictureBox_GetImage( check_box->imgbox );
-	Graph_Free( p );
-	/* 由于本函数在退出后，使用局部变量保存的图形数据会无效，因此，申请内存空间来储存 */
-	p = (LCUI_Graph*)calloc( 1,sizeof(LCUI_Graph) );
 	switch(widget->state) { 
 	case WIDGET_STATE_NORMAL:
 		if( check_box->on ) {
-			CheckBox_LoadDefaultGraph( p, IMG_ON_NORMAL );
+			img_id = IMG_ON_NORMAL;
 		} else {
-			CheckBox_LoadDefaultGraph( p, IMG_OFF_NORMAL );
+			img_id = IMG_OFF_NORMAL;
 		}
 		break;
 	case WIDGET_STATE_ACTIVE : 
 	case WIDGET_STATE_OVERLAY :
 		if( check_box->on ) {
-			CheckBox_LoadDefaultGraph( p, IMG_ON_SELECTED );
+			img_id = IMG_ON_SELECTED;
 		} else {
-			CheckBox_LoadDefaultGraph( p, IMG_OFF_SELECTED );
+			img_id = IMG_OFF_SELECTED;
 		}
 		break;
 	case WIDGET_STATE_DISABLE :
 		if( check_box->on ) {
-			CheckBox_LoadDefaultGraph( p, IMG_ON_DISABLED );
+			img_id = IMG_ON_DISABLED;
 		} else {
-			CheckBox_LoadDefaultGraph( p, IMG_OFF_DISABLED );
+			img_id = IMG_OFF_DISABLED;
 		}
 		break;
-		default : return;
+	default: return;
 	}
-	PictureBox_SetImage( check_box->imgbox, p );
+	/* 先释放PictureBox部件中保存的图形数据 */
+	img_ptr = PictureBox_GetImage( check_box->imgbox );
+	Graph_Free( img_ptr );
+	/* 由于本函数在退出后，使用局部变量保存的图形数据会无效，因此，申请内存空间来储存 */
+	img_ptr = (LCUI_Graph*)calloc( 1, sizeof(LCUI_Graph) );
+	CheckBox_LoadDefaultGraph( img_ptr, img_id );
+	PictureBox_SetImage( check_box->imgbox, img_ptr );
 }
 
 /* 获取复选框部件中的label部件的指针 */
