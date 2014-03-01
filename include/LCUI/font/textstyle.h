@@ -3,30 +3,24 @@
 
 LCUI_BEGIN_HEADER
 
-typedef enum _font_style
-{ 
+typedef enum font_style { 
 	FONT_STYLE_NORMAL = 0, 
 	FONT_STYLE_ITALIC = 1, 
 	FONT_STYLE_OBIQUE = 2 
-}
-enum_font_style;
+};
 
-typedef enum _font_weight
-{
+typedef enum font_weight {
 	FONT_WEIGHT_NORMAL	= 0,
 	FONT_WEIGHT_BOLD	= 1 
-} 
-enum_font_weight;
+};
 
-typedef enum _font_decoration
-{
+typedef enum font_decoration {
 	FONT_DECORATION_NONE		= 0,	/* 无装饰 */
 	FONT_DECORATION_BLINK		= 1,	/* 闪烁 */
 	FONT_DECORATION_UNDERLINE	= 2,	/* 下划线 */
 	FONT_DECORATION_LINE_THROUGH	= 3,	/* 贯穿线 */
 	FONT_DECORATION_OVERLINE	= 4	/* 上划线 */
-}
-enum_font_decoration; 
+}; 
 
 
 typedef struct _LCUI_TextStyle
@@ -40,9 +34,9 @@ typedef struct _LCUI_TextStyle
 	LCUI_BOOL _pixel_size:1;
 	
 	int font_id;
-	enum_font_style	style		:3;
-	enum_font_weight	weight		:3;
-	enum_font_decoration	decoration	:4;
+	enum font_style	style:3;
+	enum font_weight weight:3;
+	enum font_decoration decoration:4;
 	
 	LCUI_RGB fore_color;
 	LCUI_RGB back_color;
@@ -85,12 +79,12 @@ LCUI_API void TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color );
 LCUI_API void TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color );
 
 /* 设置字体样式 */
-LCUI_API void TextStyle_FontStyle( LCUI_TextStyle *style, enum_font_style fontstyle );
+LCUI_API void TextStyle_FontStyle( LCUI_TextStyle *style, enum font_style fontstyle );
 
-LCUI_API void TextStyle_FontWeight( LCUI_TextStyle *style, enum_font_weight fontweight );
+LCUI_API void TextStyle_FontWeight( LCUI_TextStyle *style, enum font_weight fontweight );
 
 /* 设置字体下划线 */
-LCUI_API void TextStyle_FontDecoration( LCUI_TextStyle *style, enum_font_decoration decoration );
+LCUI_API void TextStyle_FontDecoration( LCUI_TextStyle *style, enum font_decoration decoration );
 
 LCUI_API int TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b );
 
