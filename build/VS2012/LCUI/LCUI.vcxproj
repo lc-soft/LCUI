@@ -142,7 +142,6 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\textbox.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\window.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\window.hpp" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_base.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_library.h" />
