@@ -734,9 +734,8 @@ static void TextLayer_TextTypeset( LCUI_TextLayer* layer, int start_row )
 }
 
 /** 对文本进行预处理 */ 
-static int TextLayer_ProcessText(	LCUI_TextLayer *layer, 
-					const wchar_t *new_text,
-					TextAddType add_type )
+static int TextLayer_ProcessText( LCUI_TextLayer *layer, 
+				const wchar_t *new_text, TextAddType add_type )
 {
         TextRowData *p_cur_row;
         TextCharData char_data;
@@ -818,7 +817,7 @@ static int TextLayer_ProcessText(	LCUI_TextLayer *layer,
         if( layer->is_autowrap_mode ) {
                 TaskData_AddUpdateTypeset( &layer->task, cur_row );
         }
-	Queue_Destroy( &tag_buff );
+	StyleTagStack_Destroy( &tag_buff );
         return 0;
 }
 
