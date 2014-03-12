@@ -41,23 +41,10 @@
 #include <stdlib.h>
 
 #include <LCUI_Build.h>
+#include LC_MISC_RB_TREE_H
 
 #define RED     0
 #define BLACK   1
-
-typedef struct LCUI_RBTreeNodeRec_ LCUI_RBTreeNode;
-
-struct LCUI_RBTreeNodeRec_ {
-        unsigned char color;
-        int key;
-        void *data;
-        LCUI_RBTreeNode *parent, *left, *right;
-};
-
-typedef struct LCUI_RBTreeRec_ {
-        unsigned int total_node;
-        LCUI_RBTreeNode *root;
-} LCUI_RBTree;
 
 LCUI_API void RBTree_Init( LCUI_RBTree *rbt )
 {

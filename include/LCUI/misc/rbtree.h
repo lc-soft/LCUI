@@ -56,9 +56,9 @@ typedef struct LCUI_RBTreeRec_ {
         LCUI_RBTreeNode *root;
 } LCUI_RBTree;
 
-void RBTree_Init( LCUI_RBTree *rbt );
+LCUI_API void RBTree_Init( LCUI_RBTree *rbt );
 
-void RBTree_Destroy( LCUI_RBTree *rbt );
+LCUI_API void RBTree_Destroy( LCUI_RBTree *rbt );
 
 /** 获取第一个结点 */
 LCUI_API LCUI_RBTreeNode *RBTree_First( const LCUI_RBTree *rbt );
@@ -71,14 +71,14 @@ __inline int RBTree_GetTotal( LCUI_RBTree *rbt )
         return rbt->total_node; 
 }
 
-LCUI_RBTreeNode* RBTree_Search( LCUI_RBTree* rbt, int key );
+LCUI_API LCUI_RBTreeNode* RBTree_Search( LCUI_RBTree* rbt, int key );
 
-void* RBTree_GetData( LCUI_RBTree* rbt, int key );
+LCUI_API void* RBTree_GetData( LCUI_RBTree* rbt, int key );
 
-int RBTree_Insert( LCUI_RBTree *rbt, int key, void *data );
+LCUI_API int RBTree_Insert( LCUI_RBTree *rbt, int key, void *data );
 
 /** 删除红黑树中的结点 */
-int RBTree_Erase( LCUI_RBTree *rbt, int key );
+LCUI_API int RBTree_Erase( LCUI_RBTree *rbt, int key );
 
 LCUI_END_HEADER
 

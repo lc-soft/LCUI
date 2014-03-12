@@ -112,7 +112,7 @@ __inline void LinkedList_ToNext( LinkedList *list )
 __inline int LinkedList_IsAtTail( LinkedList *list )
 {
         return (list->current_node_pos == list->max_node_num-1
-         || list->current == list->tail);
+		|| list->current == list->tail);
 }
 
 /** 判断当前结点是否在链表可用结点区域内 */
@@ -122,28 +122,28 @@ __inline int LinkedList_IsInUsedArea( LinkedList *list )
 }
 
 /** 初始化链表 */
-void LinkedList_Init( LinkedList *list, int node_data_size );
+LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size );
 
 /** 销毁整个链表 */
-void LinkedList_Destroy( LinkedList *list );
+LCUI_API void LinkedList_Destroy( LinkedList *list );
 
 /** 移除当前结点 */
-int LinkedList_Delete( LinkedList *list );
+LCUI_API int LinkedList_Delete( LinkedList *list );
 
 /** 将当前结点移动至指定位置 */
-int LinkedList_MoveTo( LinkedList *list, int pos );
+LCUI_API int LinkedList_MoveTo( LinkedList *list, int pos );
 
 /** 在当前结点前面插入新结点，并记录数据 */
-void LinkedList_Insert( LinkedList *list, void *data );
+LCUI_API void LinkedList_Insert( LinkedList *list, void *data );
 
 /** 将数据复制至链表的相应结点上的数据内存中 */
-void *LinkedList_AddData( LinkedList *list, void *data );
+LCUI_API void *LinkedList_AddData( LinkedList *list, void *data );
 
 /** 将数据的地址记录至链表的相应结点 */
-void *LinkedList_AddDataByAddress( LinkedList *list, void *data_ptr );
+LCUI_API void *LinkedList_AddDataByAddress( LinkedList *list, void *data_ptr );
 
 /** 跳转至指定结点 */
-int LinkedList_Goto( LinkedList *list, int pos );
+LCUI_API int LinkedList_Goto( LinkedList *list, int pos );
 
 LCUI_END_HEADER
 

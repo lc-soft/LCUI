@@ -38,10 +38,10 @@
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
-#include <LCUI/misc/linkedlist.h>
+#include LC_MISC_LINKED_LIST_H
 
 /** 初始化链表 */
-void LinkedList_Init( LinkedList *list, int node_data_size )
+LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size )
 {
         list->node_data_size = node_data_size;
         list->used_node_num = 0;
@@ -57,7 +57,7 @@ void LinkedList_Init( LinkedList *list, int node_data_size )
 }
 
 /** 销毁整个链表 */
-void LinkedList_Destroy( LinkedList *list )
+LCUI_API void LinkedList_Destroy( LinkedList *list )
 {
         list->current_node_pos = -1;
         /* 先释放未使用的结点 */
@@ -101,7 +101,7 @@ void LinkedList_Destroy( LinkedList *list )
 }
 
 /** 移除当前结点 */
-int LinkedList_Delete( LinkedList *list )
+LCUI_API int LinkedList_Delete( LinkedList *list )
 {
         if( !list->current || list->current_node_pos < 0
          || list->current_node_pos >= list->used_node_num ) {
@@ -154,7 +154,7 @@ int LinkedList_Delete( LinkedList *list )
 }
 
 /** 跳转至指定结点 */
-int LinkedList_Goto( LinkedList *list, int pos )
+LCUI_API int LinkedList_Goto( LinkedList *list, int pos )
 {
         if( pos < 0 || pos >= list->max_node_num ) {
                 return -1;
@@ -213,7 +213,7 @@ static LinkedListNode* LinkedList_GetNode( LinkedList *list, int pos )
 }
 
 /** 将当前结点移动至指定位置 */
-int LinkedList_MoveTo( LinkedList *list, int pos )
+LCUI_API int LinkedList_MoveTo( LinkedList *list, int pos )
 {
         LinkedListNode *src_node, *des_node;
 
@@ -248,7 +248,7 @@ int LinkedList_MoveTo( LinkedList *list, int pos )
 }
 
 /** 在当前结点前面插入新结点，并记录数据 */
-void LinkedList_Insert( LinkedList *list, void *data )
+LCUI_API void LinkedList_Insert( LinkedList *list, void *data )
 {
         if( !list->head ) {
                 list->head = (LinkedListNode*)malloc( sizeof(LinkedListNode) );
@@ -326,7 +326,7 @@ static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
 }
 
 /** 将数据复制至链表的相应结点上的数据内存中 */
-void *LinkedList_AddData( LinkedList *list, void *data )
+LCUI_API void *LinkedList_AddData( LinkedList *list, void *data )
 {
         LinkedListNode *node;
         node = LinkedList_AllocNode( list );
@@ -338,7 +338,7 @@ void *LinkedList_AddData( LinkedList *list, void *data )
 }
 
 /** 将数据的地址记录至链表的相应结点 */
-void *LinkedList_AddDataByAddress( LinkedList *list, void *data_ptr )
+LCUI_API void *LinkedList_AddDataByAddress( LinkedList *list, void *data_ptr )
 {
         LinkedListNode *node;
         node = LinkedList_AllocNode( list );
