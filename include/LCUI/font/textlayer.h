@@ -188,7 +188,8 @@ LCUI_API int TextLayer_GetCaretPixelPos( LCUI_TextLayer *layer, LCUI_Pos *pixel_
 LCUI_API void TextLayer_ClearText( LCUI_TextLayer* layer );
 
 /** 插入文本内容（宽字符版） */
-LCUI_API int TextLayer_InsertTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text );
+LCUI_API int TextLayer_InsertTextW( LCUI_TextLayer *layer, const wchar_t *wstr,
+						LCUI_StyleTagStack *tag_stack );
 
 /** 插入文本内容 */
 LCUI_API int TextLayer_InsertTextA( LCUI_TextLayer* layer, const char *ascii_text );
@@ -197,7 +198,8 @@ LCUI_API int TextLayer_InsertTextA( LCUI_TextLayer* layer, const char *ascii_tex
 LCUI_API int TextLayer_InsertText( LCUI_TextLayer* layer, const char *utf8_text );
 
 /** 追加文本内容（宽字符版） */
-LCUI_API int TextLayer_AppendTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text );
+LCUI_API int TextLayer_AppendTextW( LCUI_TextLayer *layer, const wchar_t *wstr, 
+						LCUI_StyleTagStack *tag_stack );
 
 /** 追加文本内容 */
 LCUI_API int TextLayer_AppendTextA( LCUI_TextLayer* layer, const char *ascii_text );
@@ -206,7 +208,8 @@ LCUI_API int TextLayer_AppendTextA( LCUI_TextLayer* layer, const char *ascii_tex
 LCUI_API int TextLayer_AppendText( LCUI_TextLayer* layer, const char *utf8_text );
 
 /** 设置文本内容（宽字符版） */
-LCUI_API int TextLayer_SetTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text );
+LCUI_API int TextLayer_SetTextW( LCUI_TextLayer *layer, const wchar_t *wstr,
+						LCUI_StyleTagStack *tag_stack );
 
 /** 设置文本内容 */
 LCUI_API int TextLayer_SetTextA( LCUI_TextLayer* layer, const char *ascii_text );
