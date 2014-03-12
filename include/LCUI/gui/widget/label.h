@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * label.h -- LCUI's Label widget
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * label.h -- LCUI 的文本标签部件
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -54,6 +54,9 @@ LCUI_API void Label_TextA( LCUI_Widget *widget, const char *ascii_text );
 
 /** 设置Label部件显示的文本是否自动换行 */
 LCUI_API void Label_SetAutoWrap( LCUI_Widget *widget, LCUI_BOOL flag );
+
+/** 设置文本对齐方式 */
+LCUI_API void Label_SetTextAlign( LCUI_Widget *widget, TextAlignType align );
 
 /** 为Label部件内显示的文本设定文本样式 */
 LCUI_API int Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
