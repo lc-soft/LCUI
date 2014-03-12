@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * label.c -- LCUI's Label widget
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * label.c -- LCUI 的文本标签部件
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -128,7 +128,8 @@ static void Label_UpdateTextLayerSize( LCUI_Widget *widget, void *arg )
 	}
 	/* 如果未启用自动换行 */
 	if( !label->layer.is_autowrap_mode ) {
-		if( new_size.w != widget->size.w || new_size.h != widget->size.h ) {
+		if( new_size.w != widget->size.w
+		 || new_size.h != widget->size.h ) {
 			TextLayer_SetMaxSize( &label->layer, new_size );
 			Widget_Resize( widget, new_size );
 		}
@@ -208,7 +209,8 @@ static void Label_SetTextW( LCUI_Widget *widget, void *arg )
 	}
 	Widget_Lock( widget );
 	TextLayer_SetTextW( &label->layer, (wchar_t*)arg, NULL );
-	Widget_Update( widget );
+	Label_UpdateTextLayer( widget );
+	Label_UpdateTextLayerSize( widget, NULL );
 	DEBUG_MSG("unlock widget\n");
 	Widget_Unlock( widget );
 }
@@ -255,7 +257,7 @@ static void Label_ExecInit( LCUI_Widget *widget )
 }
 
 /** 释放label部件占用的资源 */
-static void Destroy_Label( LCUI_Widget *widget )
+static void Label_ExecDestroy( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
 	
@@ -351,6 +353,15 @@ LCUI_API void Label_SetAutoWrap( LCUI_Widget *widget, LCUI_BOOL flag )
 	WidgetMsg_Post( widget, LABEL_AUTO_WRAP, flag?((void*)(1)):NULL, TRUE, FALSE );
 }
 
+/** 设置文本对齐方式 */
+LCUI_API void Label_SetTextAlign( LCUI_Widget *widget, TextAlignType align )
+{
+	LCUI_TextLayer *layer;
+	layer = Label_GetTextLayer( widget );
+	TextLayer_SetTextAlign( layer, align );
+	Widget_Update( widget );
+}
+
 /** 为Label部件内显示的文本设定文本样式 */
 LCUI_API int Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 {
@@ -411,5 +422,5 @@ LCUI_API void Register_Label(void)
 	WidgetFunc_Add("label",	Label_ExecInit, FUNC_TYPE_INIT);
 	WidgetFunc_Add("label",	Label_ExecDraw, FUNC_TYPE_DRAW);
 	WidgetFunc_Add("label",	Label_ExecUpdate, FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("label", Destroy_Label, FUNC_TYPE_DESTROY);
+	WidgetFunc_Add("label", Label_ExecDestroy, FUNC_TYPE_DESTROY);
 }
