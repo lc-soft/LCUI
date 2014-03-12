@@ -256,7 +256,7 @@ static int WidgetStyle_SyncPostion(
 					pseudo_class_name, "left" );
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->value.string;
-		ret = GetIntOrFloat( attr_value, &num );
+		ret = ScanIntOrFloat( attr_value, &num );
 		if( ret == 0 ) {
 			if( num.which_one == 1 ) {
 				offset.x = Widget_GetContainerWidth( widget->parent );
@@ -271,8 +271,8 @@ static int WidgetStyle_SyncPostion(
 					pseudo_class_name, "top" );
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->value.string;
-		GetIntOrFloat( attr_value, &num );
-		ret = GetIntOrFloat( attr_value, &num );
+		ScanIntOrFloat( attr_value, &num );
+		ret = ScanIntOrFloat( attr_value, &num );
 		if( ret == 0 ) {
 			if( num.which_one == 1 ) {
 				offset.y = Widget_GetContainerHeight( widget->parent );
@@ -320,7 +320,7 @@ static int style_border_convert( const char *style_str, LCUI_Border *border )
 				return -1;
 			}
 			have_color = TRUE;
-		} else if( GetIntOrFloat(buff, &num) != -1 ) {
+		} else if( ScanIntOrFloat(buff, &num) != -1 ) {
 			/* 如果已经有了边框大小 */
 			if( have_size ) {
 				return -1;
@@ -414,7 +414,7 @@ static int WidgetStyle_SyncSize(
 					pseudo_class_name, "width" );
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->value.string;
-		ret = GetIntOrFloat( attr_value, &num );
+		ret = ScanIntOrFloat( attr_value, &num );
 		if( ret == 0 ) {
 			widget->w = num;
 			Widget_UpdateSize( widget );
@@ -425,7 +425,7 @@ static int WidgetStyle_SyncSize(
 					pseudo_class_name, "height" );
 	if( widget_attr != NULL ) {
 		attr_value = widget_attr->value.string;
-		ret = GetIntOrFloat( attr_value, &num );
+		ret = ScanIntOrFloat( attr_value, &num );
 		if( ret == 0 ) {
 			widget->h = num;
 			Widget_UpdateSize( widget );

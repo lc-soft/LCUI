@@ -1405,8 +1405,8 @@ Widget_SetMaxSize( LCUI_Widget *widget, char *width, char *height )
  * */
 {
 	int n;
-	n = GetIntOrFloat( width, &widget->max_w );
-	n += GetIntOrFloat( width, &widget->max_h );
+	n = ScanIntOrFloat( width, &widget->max_w );
+	n += ScanIntOrFloat( width, &widget->max_h );
 	return n;
 }
 
@@ -1418,8 +1418,8 @@ Widget_SetMinSize( LCUI_Widget *widget, char *width, char *height )
  * */
 {
 	int n;
-	n = GetIntOrFloat( width, &widget->min_w );
-	n += GetIntOrFloat( width, &widget->min_h );
+	n = ScanIntOrFloat( width, &widget->min_w );
+	n += ScanIntOrFloat( width, &widget->min_h );
 	return n;
 }
 
@@ -2180,16 +2180,16 @@ LCUI_API void Widget_SetSize( LCUI_Widget *widget, char *width, char *height )
 	switch( widget->dock ) {
 	    case DOCK_TYPE_TOP:
 	    case DOCK_TYPE_BOTTOM: /* 只能改变高 */
-		GetIntOrFloat( height, &widget->h );
+		ScanIntOrFloat( height, &widget->h );
 		break;
 	    case DOCK_TYPE_LEFT:
 	    case DOCK_TYPE_RIGHT:/* 只能改变宽 */
-		GetIntOrFloat( width, &widget->w );
+		ScanIntOrFloat( width, &widget->w );
 		break;
 	    case DOCK_TYPE_FILL:break;
 	    case DOCK_TYPE_NONE: /* 可改变宽和高 */
-		GetIntOrFloat( width, &widget->w );
-		GetIntOrFloat( height, &widget->h );
+		ScanIntOrFloat( width, &widget->w );
+		ScanIntOrFloat( height, &widget->h );
 		break;
 	}
 	Widget_UpdateSize( widget );
