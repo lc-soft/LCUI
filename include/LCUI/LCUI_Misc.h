@@ -123,17 +123,17 @@ Pos_Sub( LCUI_Pos a, LCUI_Pos b );
 LCUI_API void
 IntOrFloat_Init( IntOrFloat_t *combo_num );
 
-/* 初始化PX_PT_t */
+/* 初始化PixelOrPoint_t */
 LCUI_API void
-PX_PT_t_init( PX_PT_t *combo_num );
+PixelOrPoint_Init( PixelOrPoint_t *combo_num );
 
 /* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是百分比 */
 LCUI_API int
-GetIntOrFloat( char *str, IntOrFloat_t *combo_num );
+ScanIntOrFloat( char *str, IntOrFloat_t *combo_num );
 
 /* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是PT */
 LCUI_API int
-get_PX_PT_t( char *str, PX_PT_t *combo_num );
+ScanPixelOrPoint( char *str, PixelOrPoint_t *combo_num );
 
 /** 根据给定的字符串，生成一个ID */
 LCUI_API unsigned int BKDRHash( const char *str );
