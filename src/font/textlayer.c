@@ -279,11 +279,28 @@ static inline LCUI_BOOL TextRow_HasEndChar( TextRowData *p_row )
 }
 
 /** 更新字体位图 */
-static inline void 
-TextChar_UpdateBitmap( TextCharData* p_data, LCUI_TextStyle *default_style )
+static void TextChar_UpdateBitmap( TextCharData* p_data, 
+				LCUI_TextStyle *default_style )
 {
-        p_data->bitmap = FontLIB_GetExistFontBMP( default_style->font_id, 
-				p_data->char_code, default_style->pixel_size );
+	int pixel_size, font_id;
+	if( p_data->style ) {
+		if( p_data->style->_family ) {
+			font_id = p_data->style->font_id;
+		} else {
+			font_id = default_style->font_id;
+		}
+		if( p_data->style->_pixel_size ) {
+			pixel_size = p_data->style->pixel_size;
+		} else {
+			pixel_size = default_style->pixel_size;
+		}
+	} else {
+		font_id = default_style->font_id;
+		pixel_size = default_style->pixel_size;
+
+	}
+        p_data->bitmap = FontLIB_GetExistFontBMP( font_id, p_data->char_code,
+								pixel_size );
         //printf("char_code: %c, pixel_size: %d, font_id: %d, bitmap: %p\n", 
         //p_data->char_code, default_style->pixel_size, default_style->font_id, p_data->bitmap);
 }
@@ -734,16 +751,17 @@ static void TextLayer_TextTypeset( LCUI_TextLayer* layer, int start_row )
 }
 
 /** 对文本进行预处理 */ 
-static int TextLayer_ProcessText( LCUI_TextLayer *layer, 
-				const wchar_t *new_text, TextAddType add_type )
+static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
+			TextAddType add_type, LCUI_StyleTagStack *tag_stack )
 {
         TextRowData *p_cur_row;
         TextCharData char_data;
         const wchar_t *p_end, *p, *pp;
         int cur_col, cur_row, ins_x;
-	LCUI_Queue tag_buff;
+	LCUI_BOOL is_tmp_tag_stack;
+	LCUI_Queue tmp_tag_stack;
 
-        if( !new_text ) {
+        if( !wstr ) {
                 return -1;
         }
 
@@ -768,24 +786,30 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer,
                 }
         }
         ins_x = cur_col;
-        StyleTagStack_Init( &tag_buff );
-        p_end = new_text + wcslen(new_text);
-        for( p=new_text; p<p_end; ++p, ++ins_x ) {
+	/* 如果没有可用的标签栈，则使用临时的标签栈 */
+	if( tag_stack ) {
+		is_tmp_tag_stack = FALSE;
+	} else {
+		is_tmp_tag_stack = TRUE;
+		StyleTagStack_Init( &tmp_tag_stack );
+		tag_stack = &tmp_tag_stack;
+	}
+        p_end = wstr + wcslen(wstr);
+        for( p=wstr; p<p_end; ++p, ++ins_x ) {
 		if( layer->is_using_style_tags ) {
 			/* 处理样式的结束标签 */ 
-			pp = StyleTagStack_ScanEndingTag( &tag_buff, p );
+			pp = StyleTagStack_ScanEndingTag( tag_stack, p );
 			if( pp ) {
 				p = pp;
-			} else {
-				/* 处理样式标签 */
-				pp = StyleTagStack_ScanBeginTag( &tag_buff, p );
-				if( pp ) {
-					p = pp;
-				}
+				/* 抵消本次循环后的++p，以在下次循环时还能够在当前位置 */
+				--p; 
+				continue;
 			}
-			/* 如果到了末尾 */
-			if( p >= p_end ) {
-				break;
+			/* 处理样式标签 */
+			pp = StyleTagStack_ScanBeginTag( tag_stack, p );
+			if( pp ) {
+				p = pp - 1;
+				continue;
 			}
 		}
 		
@@ -803,7 +827,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer,
 		char_data.need_display = TRUE;
 		char_data.need_update = TRUE;
 		/* 获取当前文本样式数据 */
-		char_data.style = StyleTagStack_GetTextStyle( &tag_buff );
+		char_data.style = StyleTagStack_GetTextStyle( tag_stack );
 		/* 更新字体位图 */
 		TextChar_UpdateBitmap( &char_data, &layer->text_style );
 		TextRow_Insert( p_cur_row, ins_x, &char_data );
@@ -817,57 +841,57 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer,
         if( layer->is_autowrap_mode ) {
                 TaskData_AddUpdateTypeset( &layer->task, cur_row );
         }
-	StyleTagStack_Destroy( &tag_buff );
+	/* 如果使用的是临时标签栈，则销毁它 */
+	if( is_tmp_tag_stack ) {
+		StyleTagStack_Destroy( tag_stack );
+	}
         return 0;
 }
 
 /** 插入文本内容（宽字符版） */
-LCUI_API int TextLayer_InsertTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text )
+LCUI_API int TextLayer_InsertTextW( LCUI_TextLayer *layer, const wchar_t *wstr,
+						LCUI_StyleTagStack *tag_stack )
 {
-        if( !unicode_text ) {
-                return -1;
-        }
-        return TextLayer_ProcessText( layer, unicode_text, TEXT_ADD_TYPE_INSERT );
+        return TextLayer_ProcessText( layer, wstr, TEXT_ADD_TYPE_INSERT, tag_stack );
 }
 
 /** 插入文本内容 */
-LCUI_API int TextLayer_InsertTextA( LCUI_TextLayer* layer, const char *ascii_text )
+LCUI_API int TextLayer_InsertTextA( LCUI_TextLayer *layer, const char *str )
 {
         return 0;
 }
 
 /** 插入文本内容（UTF-8版） */
-LCUI_API int TextLayer_InsertText( LCUI_TextLayer* layer, const char *utf8_text )
+LCUI_API int TextLayer_InsertText( LCUI_TextLayer *layer, const char *utf8_str )
 {
         return 0;
 }
 
 /** 追加文本内容（宽字符版） */
-LCUI_API int TextLayer_AppendTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text )
+LCUI_API int TextLayer_AppendTextW( LCUI_TextLayer *layer, const wchar_t *wstr, 
+						LCUI_StyleTagStack *tag_stack )
 {
-        if( !unicode_text ) {
-                return -1;
-        }
-        return TextLayer_ProcessText( layer, unicode_text, TEXT_ADD_TYPE_APPEND );
+        return TextLayer_ProcessText( layer, wstr, TEXT_ADD_TYPE_APPEND, tag_stack );
 }
 
 /** 追加文本内容 */
-LCUI_API int TextLayer_AppendTextA( LCUI_TextLayer* layer, const char *ascii_text )
+LCUI_API int TextLayer_AppendTextA( LCUI_TextLayer *layer, const char *ascii_text )
 {
         return 0;
 }
 
 /** 追加文本内容（UTF-8版） */
-LCUI_API int TextLayer_AppendText( LCUI_TextLayer* layer, const char *utf8_text )
+LCUI_API int TextLayer_AppendText( LCUI_TextLayer *layer, const char *utf8_text )
 {
         return 0;
 }
 
 /** 设置文本内容（宽字符版） */
-LCUI_API int TextLayer_SetTextW( LCUI_TextLayer* layer, const wchar_t *unicode_text )
+LCUI_API int TextLayer_SetTextW( LCUI_TextLayer *layer, const wchar_t *wstr,
+						LCUI_StyleTagStack *tag_stack )
 {
         TextLayer_ClearText( layer );
-        return TextLayer_AppendTextW( layer, unicode_text );
+        return TextLayer_AppendTextW( layer, wstr, tag_stack );
 }
 
 /** 设置文本内容 */
