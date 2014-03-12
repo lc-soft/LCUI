@@ -41,7 +41,6 @@
 
 //#define DEBUG
 
-#define I_NEED_LABEL_TEXTLAYER
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
@@ -201,17 +200,14 @@ static void Label_SetTextStyle( LCUI_Widget *widget, void *arg )
 
 static void Label_SetTextW( LCUI_Widget *widget, void *arg )
 {
-	wchar_t *unicode_text;
 	LCUI_Label *label;
-	
 	DEBUG_MSG("recv LABEL_TEXT msg, lock widget\n");
 	label = (LCUI_Label*)Widget_GetPrivData( widget );
 	if( !label ) {
 		return;
 	}
 	Widget_Lock( widget );
-	unicode_text = (wchar_t*)arg;
-	TextLayer_SetTextW( &label->layer, unicode_text );
+	TextLayer_SetTextW( &label->layer, (wchar_t*)arg, NULL );
 	Widget_Update( widget );
 	DEBUG_MSG("unlock widget\n");
 	Widget_Unlock( widget );
