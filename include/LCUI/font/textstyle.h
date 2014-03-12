@@ -61,8 +61,7 @@ typedef enum font_decoration {
 	FONT_DECORATION_UNDERLINE	= 2,	/* 下划线 */
 	FONT_DECORATION_LINE_THROUGH	= 3,	/* 贯穿线 */
 	FONT_DECORATION_OVERLINE	= 4	/* 上划线 */
-}; 
-
+};
 
 typedef struct LCUI_TextStyle_ {
 	LCUI_BOOL _family:1;
@@ -101,6 +100,7 @@ typedef struct LCUI_StyleTagData_ {
 	} style;
 } LCUI_StyleTagData;
 
+typedef LCUI_Queue LCUI_StyleTagStack;
 
 /* 初始化字体样式数据 */
 LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );
@@ -134,13 +134,13 @@ LCUI_API int TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b );
 #define MAX_TAG_NUM 2
 
 /** 初始化样式标签栈 */
-LCUI_API void StyleTagStack_Init( LCUI_Queue *tags );
+LCUI_API void StyleTagStack_Init( LCUI_StyleTagStack *tags );
 
 /** 销毁样式标签栈 */
-LCUI_API void StyleTagStack_Destroy( LCUI_Queue *tags );
+LCUI_API void StyleTagStack_Destroy( LCUI_StyleTagStack *tags );
 
 /** 获取当前的文本样式 */
-LCUI_API LCUI_TextStyle* StyleTagStack_GetTextStyle( LCUI_Queue *tags );
+LCUI_API LCUI_TextStyle* StyleTagStack_GetTextStyle( LCUI_StyleTagStack *tags );
 
 /** 在字符串中获取样式的结束标签，输出的是标签名 */
 LCUI_API const wchar_t* scan_style_ending_tag( const wchar_t *wstr, 
@@ -151,11 +151,11 @@ LCUI_API const wchar_t* scan_style_tag(	const wchar_t *wstr, char *name_buff,
 					int max_name_len, char *data_buff );
 
 /** 处理样式标签 */
-LCUI_API const wchar_t* StyleTagStack_ScanBeginTag( LCUI_Queue *tags,
+LCUI_API const wchar_t* StyleTagStack_ScanBeginTag( LCUI_StyleTagStack *tags,
 						const wchar_t *str );
 
 /** 处理样式结束标签 */
-LCUI_API const wchar_t* StyleTagStack_ScanEndingTag( LCUI_Queue *tags,
+LCUI_API const wchar_t* StyleTagStack_ScanEndingTag( LCUI_StyleTagStack *tags,
 							const wchar_t *str );
 
 /*------------------------- End StyleTag -----------------------------*/

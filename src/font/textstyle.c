@@ -134,19 +134,19 @@ TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b )
 #define MAX_TAG_NUM 2
 
 /** 初始化样式标签栈 */
-LCUI_API void StyleTagStack_Init( LCUI_Queue *tags )
+LCUI_API void StyleTagStack_Init( LCUI_StyleTagStack *tags )
 {
 	Queue_Init( tags, sizeof(LCUI_StyleTagData), NULL );
 }
 
 /** 销毁样式标签栈 */
-LCUI_API void StyleTagStack_Destroy( LCUI_Queue *tags )
+LCUI_API void StyleTagStack_Destroy( LCUI_StyleTagStack *tags )
 {
 	Queue_Destroy( tags );
 }
 
 /** 获取当前的文本样式 */
-LCUI_API LCUI_TextStyle* StyleTagStack_GetTextStyle( LCUI_Queue *tags )
+LCUI_API LCUI_TextStyle* StyleTagStack_GetTextStyle( LCUI_StyleTagStack *tags )
 {
 	LCUI_StyleTagData *tag_data;
 	LCUI_TextStyle *style_data;
@@ -200,7 +200,7 @@ LCUI_API LCUI_TextStyle* StyleTagStack_GetTextStyle( LCUI_Queue *tags )
 }
 
 /** 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
-static void StyleTagStack_Delete( LCUI_Queue *tags, LCUI_StyleTagID tag )
+static void StyleTagStack_Delete( LCUI_StyleTagStack *tags, LCUI_StyleTagID tag )
 {
 	int i, total;
 	LCUI_StyleTagData *p; 
@@ -460,7 +460,7 @@ scan_style_tag_data( const wchar_t *wstr, LCUI_StyleTagData *style_buff )
 
 /** 处理样式标签 */
 LCUI_API const wchar_t*
-StyleTagStack_ScanBeginTag( LCUI_Queue *tags, const wchar_t *str )
+StyleTagStack_ScanBeginTag( LCUI_StyleTagStack *tags, const wchar_t *str )
 {
 	const wchar_t *q;
 	LCUI_StyleTagData data;
@@ -478,7 +478,7 @@ StyleTagStack_ScanBeginTag( LCUI_Queue *tags, const wchar_t *str )
 
 /** 处理样式结束标签 */
 LCUI_API const wchar_t* 
-StyleTagStack_ScanEndingTag( LCUI_Queue *tags, const wchar_t *str )
+StyleTagStack_ScanEndingTag( LCUI_StyleTagStack *tags, const wchar_t *str )
 {
 	const wchar_t *p;
 	char tag_name[256];
