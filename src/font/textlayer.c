@@ -769,17 +769,17 @@ static int TextLayer_ProcessText(	LCUI_TextLayer *layer,
                 }
         }
         ins_x = cur_col;
-        StyleTag_Init( &tag_buff );
+        StyleTagStack_Init( &tag_buff );
         p_end = new_text + wcslen(new_text);
         for( p=new_text; p<p_end; ++p, ++ins_x ) {
 		if( layer->is_using_style_tags ) {
 			/* 处理样式的结束标签 */ 
-			pp = StyleTag_ProcessEndingTag( &tag_buff, p );
+			pp = StyleTagStack_ScanEndingTag( &tag_buff, p );
 			if( pp ) {
 				p = pp;
 			} else {
 				/* 处理样式标签 */
-				pp = StyleTag_ProcessTag( &tag_buff, p );
+				pp = StyleTagStack_ScanBeginTag( &tag_buff, p );
 				if( pp ) {
 					p = pp;
 				}
@@ -804,7 +804,7 @@ static int TextLayer_ProcessText(	LCUI_TextLayer *layer,
 		char_data.need_display = TRUE;
 		char_data.need_update = TRUE;
 		/* 获取当前文本样式数据 */
-		char_data.style = StyleTag_GetCurrentStyle( &tag_buff );
+		char_data.style = StyleTagStack_GetTextStyle( &tag_buff );
 		/* 更新字体位图 */
 		TextChar_UpdateBitmap( &char_data, &layer->text_style );
 		TextRow_Insert( p_cur_row, ins_x, &char_data );
