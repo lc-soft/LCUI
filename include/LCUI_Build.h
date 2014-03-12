@@ -1,7 +1,7 @@
 ﻿/* ****************************************************************************
  * LCUI_Build.h -- macro definition defines the location of some header files
  *
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Build.h -- 定义了一些头文件的位置的宏定义
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -88,6 +88,8 @@
 #define LC_MISC_RECT_H		<LCUI/misc/rect.h>
 #define LC_MISC_DELAY_H		<LCUI/misc/delay.h>
 #define LC_MISC_DIRENT_H	<LCUI/misc/dirent.h>
+#define LC_MISC_LINKED_LIST_H	<LCUI/misc/linkedlist.h>
+#define LC_MISC_RB_TREE_H	<LCUI/misc/rbtree.h>
 #define LC_MISC_H		<LCUI/LCUI_Misc.h>
 
 #define LC_WIDGET_BASE_H	<LCUI/gui/widget_base.h>
