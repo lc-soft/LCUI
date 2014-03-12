@@ -625,7 +625,9 @@ static int TextLayer_DoWordWrap( LCUI_TextLayer *layer, int row, int start_col )
                 if( p_next_row->max_height < char_h ) {
                         p_next_row->max_height = char_h;
                 }
-                p_next_row->max_width += p_char->bitmap->advance.x;
+		if( p_char->need_display && p_char->bitmap ) {
+			p_next_row->max_width += p_char->bitmap->advance.x;
+		}
         }
         p_row->string_len = start_col;
 	return 0;
@@ -644,7 +646,7 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
         for( col=0; col<p_row->string_len; ++col ) {
                 p_char = p_row->string[col];
 		/* 如果遇到换行符 */
-		if( layer->is_autowrap_mode && p_char->char_code == L'\n' ) {
+		if( layer->is_mulitiline_mode && p_char->char_code == L'\n' ) {
 			TextLayer_DoWordWrap( layer, row, col+1 );
 			return;
 		}
