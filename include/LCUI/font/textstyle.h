@@ -1,4 +1,45 @@
-﻿#ifndef __LCUI_TEXTSTYLE_H__
+﻿/* ***************************************************************************
+ * textstyle.h -- text style processing module.
+ * 
+ * Copyright (C) 2012-2013 by
+ * Liu Chao
+ * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ * 
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
+ 
+/* ****************************************************************************
+ * textstyle.h -- 文本样式处理模块
+ *
+ * 版权所有 (C) 2012-2014 归属于
+ * 刘超
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ****************************************************************************/
+
+#ifndef __LCUI_TEXTSTYLE_H__
 #define __LCUI_TEXTSTYLE_H__
 
 LCUI_BEGIN_HEADER
@@ -92,31 +133,29 @@ LCUI_API int TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b );
 /*-------------------------- StyleTag --------------------------------*/
 #define MAX_TAG_NUM 2
 
-/** 初始化样式标签库 */
+/** 初始化样式标签栈 */
 LCUI_API void StyleTagStack_Init( LCUI_Queue *tags );
 
-/** 添加样式标签 */
-LCUI_API int StyleTagStack_Add( LCUI_Queue *tags, LCUI_StyleTagData *data );
+/** 销毁样式标签栈 */
+LCUI_API void StyleTagStack_Destroy( LCUI_Queue *tags );
 
-/** 获取当前的样式数据 */
+/** 获取当前的文本样式 */
 LCUI_API LCUI_TextStyle* StyleTagStack_GetTextStyle( LCUI_Queue *tags );
 
 /** 在字符串中获取样式的结束标签，输出的是标签名 */
-LCUI_API const wchar_t* scan_style_ending_tag(	const wchar_t *str,
-						char *out_tag_name );
+LCUI_API const wchar_t* scan_style_ending_tag( const wchar_t *wstr, 
+						char *name_buff );
 
 /** 从字符串中获取样式标签的名字及样式属性 */
-LCUI_API const wchar_t* scan_style_tag(	const wchar_t *w_str,
-						char *out_tag_name,
-						int max_name_size,
-						char *out_tag_data );
+LCUI_API const wchar_t* scan_style_tag(	const wchar_t *wstr, char *name_buff,
+					int max_name_len, char *data_buff );
 
 /** 处理样式标签 */
-LCUI_API const wchar_t* StyleTagStack_ScanBeginTag(	LCUI_Queue *tags,
+LCUI_API const wchar_t* StyleTagStack_ScanBeginTag( LCUI_Queue *tags,
 						const wchar_t *str );
 
 /** 处理样式结束标签 */
-LCUI_API const wchar_t* StyleTagStack_ScanEndingTag(	LCUI_Queue *tags,
+LCUI_API const wchar_t* StyleTagStack_ScanEndingTag( LCUI_Queue *tags,
 							const wchar_t *str );
 
 /*------------------------- End StyleTag -----------------------------*/
