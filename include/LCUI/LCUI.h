@@ -192,19 +192,23 @@ struct LCUI_Graph_ {
 /*------------------------------ END ---------------------------------*/
 
 /*---------------- 用于表示像素或百分比 -----------------*/
-typedef struct PX_P_t_ {
-	LCUI_BOOL which_one;	/** 指定用哪个类型的变量 */
-	int px;			/** 数值，单位为像素 */
-	double scale;		/** 比例 */
+typedef struct IntOrFloat_t_ {
+	LCUI_BOOL which_one;		/** 指定用哪个类型的变量 */
+	union {
+		int px;			/** 数值，单位为像素 */
+		double scale;		/** 比例 */
+	};
 } IntOrFloat_t;
 /*---------------------- END -------------------------*/
 
 /*----------------- 用于表示字体大小 --------------------*/
-typedef struct PX_PT_t_ {
-	LCUI_BOOL which_one;	/** 指定用哪个类型的变量 */
-	int px;			/** pixel, 字体大小（像素） */
-	int pt;			/** point，字体大小（点数） */
-} PX_PT_t;
+typedef struct PixelOrPoint_t_ {
+	LCUI_BOOL which_one;		/** 指定用哪个类型的变量 */
+	union {
+		int px;			/** pixel, 字体大小（像素） */
+		int pt;			/** point，字体大小（点数） */
+	};
+} PixelOrPoint_t;
 /*---------------------- END -------------------------*/
 
 /*------------------- 内边距和外边距 --------------------*/
