@@ -42,8 +42,6 @@
 #include LC_ERROR_H
 #include LC_FONT_H
 
-#include <LCUI/misc/rbtree.h>
-
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 
 #include <ft2build.h>
