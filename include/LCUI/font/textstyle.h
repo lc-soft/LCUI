@@ -23,7 +23,7 @@ typedef enum font_decoration {
 }; 
 
 
-typedef struct _LCUI_TextStyle {
+typedef struct LCUI_TextStyle_ {
 	LCUI_BOOL _family:1;
 	LCUI_BOOL _style:1;
 	LCUI_BOOL _weight:1;
@@ -41,8 +41,7 @@ typedef struct _LCUI_TextStyle {
 	LCUI_RGB back_color;
 	
 	int pixel_size;	
-}
-LCUI_TextStyle;
+} LCUI_TextStyle;
 
 typedef enum {
 	TAG_ID_FAMILY = 0,
@@ -51,12 +50,15 @@ typedef enum {
 	TAG_ID_DECORATION = 3,
 	TAG_ID_SIZE = 4,
 	TAG_ID_COLOR = 5
-} StyleTag_ID;
+} LCUI_StyleTagID;
 
-typedef struct {
-	StyleTag_ID tag;
-	void *style;
-} StyleTag_Data;
+typedef struct LCUI_StyleTagData_ {
+	LCUI_StyleTagID tag_id;
+	union {
+		LCUI_RGB color;
+		PixelOrPoint_t size;
+	} style;
+} LCUI_StyleTagData;
 
 
 /* 初始化字体样式数据 */
@@ -91,30 +93,30 @@ LCUI_API int TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b );
 #define MAX_TAG_NUM 2
 
 /** 初始化样式标签库 */
-LCUI_API void StyleTag_Init( LCUI_Queue *tags );
+LCUI_API void StyleTagStack_Init( LCUI_Queue *tags );
 
 /** 添加样式标签 */
-LCUI_API int StyleTag_Add( LCUI_Queue *tags, StyleTag_Data *data );
+LCUI_API int StyleTagStack_Add( LCUI_Queue *tags, LCUI_StyleTagData *data );
 
 /** 获取当前的样式数据 */
-LCUI_API LCUI_TextStyle* StyleTag_GetCurrentStyle( LCUI_Queue *tags );
+LCUI_API LCUI_TextStyle* StyleTagStack_GetTextStyle( LCUI_Queue *tags );
 
 /** 在字符串中获取样式的结束标签，输出的是标签名 */
-LCUI_API const wchar_t* StyleTag_GetEndingTag(	const wchar_t *str,
+LCUI_API const wchar_t* scan_style_ending_tag(	const wchar_t *str,
 						char *out_tag_name );
 
 /** 从字符串中获取样式标签的名字及样式属性 */
-LCUI_API const wchar_t* StyleTag_GetTagData(	const wchar_t *w_str,
+LCUI_API const wchar_t* scan_style_tag(	const wchar_t *w_str,
 						char *out_tag_name,
 						int max_name_size,
 						char *out_tag_data );
 
 /** 处理样式标签 */
-LCUI_API const wchar_t* StyleTag_ProcessTag(	LCUI_Queue *tags,
+LCUI_API const wchar_t* StyleTagStack_ScanBeginTag(	LCUI_Queue *tags,
 						const wchar_t *str );
 
 /** 处理样式结束标签 */
-LCUI_API const wchar_t* StyleTag_ProcessEndingTag(	LCUI_Queue *tags,
+LCUI_API const wchar_t* StyleTagStack_ScanEndingTag(	LCUI_Queue *tags,
 							const wchar_t *str );
 
 /*------------------------- End StyleTag -----------------------------*/
