@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * misc.c -- no specific categories of miscellaneous function
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * misc.c -- 没有具体分类的杂项功能
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -44,8 +44,7 @@
 #include LC_LCUI_H 
 #include LC_GRAPH_H
 
-LCUI_API void
-Padding_Init( LCUI_Padding *padding )
+LCUI_API void Padding_Init( LCUI_Padding *padding )
 {
 	padding->left = 0;
 	padding->bottom = 0;
@@ -53,8 +52,7 @@ Padding_Init( LCUI_Padding *padding )
 	padding->top = 0; 
 }
 
-LCUI_API void
-Margin_Init( LCUI_Margin *margin )
+LCUI_API void Margin_Init( LCUI_Margin *margin )
 {
 	margin->left = 0;
 	margin->bottom = 0;
@@ -63,8 +61,7 @@ Margin_Init( LCUI_Margin *margin )
 }
 
 /* 转换成LCUI_Pos类型 */
-LCUI_API LCUI_Pos
-Pos(int x, int y)
+LCUI_API LCUI_Pos Pos(int x, int y)
 {
 	LCUI_Pos p;
 	p.x = x;
@@ -73,8 +70,7 @@ Pos(int x, int y)
 }
 
 /* 转换成LCUI_Size类型 */
-LCUI_API LCUI_Size
-Size(int w, int h)
+LCUI_API LCUI_Size Size(int w, int h)
 {
 	LCUI_Size s;
 	s.w = w;
@@ -86,8 +82,7 @@ Size(int w, int h)
  * 功能：对比两个尺寸
  * 说明：a大于b，返回1， b大于a，返回-1，相等则返回0
  * */
-LCUI_API int
-Size_Cmp(LCUI_Size a, LCUI_Size b)
+LCUI_API int Size_Cmp(LCUI_Size a, LCUI_Size b)
 {
 	if(a.w > b.w || a.h > b.h) {
 		return 1;
