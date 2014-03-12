@@ -188,8 +188,8 @@ static void TextRow_UpdateSize( TextRowData *p_row, int default_height )
                         char_h = default_height;
                 }
 
-                if( p_row->max_width < char_h ) {
-                        p_row->max_width = char_h;
+                if( p_row->max_height < char_h ) {
+                        p_row->max_height = char_h;
                 }
         }
 }
@@ -578,7 +578,7 @@ LCUI_API void TextLayer_ClearText( LCUI_TextLayer* layer )
 
 static int TextLayer_DoWordWrap( LCUI_TextLayer *layer, int row, int start_col )
 {
-	int n_cols, char_h;
+	int n_cols;
 	TextRowData *p_row, *p_next_row;
 	TextCharData *p_char;
 
@@ -599,8 +599,6 @@ static int TextLayer_DoWordWrap( LCUI_TextLayer *layer, int row, int start_col )
         if( !p_next_row ) {
                 p_next_row = TextRowList_InsertNewRow( &layer->row_list, row+1 );
         }
-        p_next_row->max_width = 0;
-        p_next_row->max_height = layer->text_style.pixel_size + 2;
         n_cols = p_row->string_len;
         /* 如果插入点在当前行，并且位置超出了当前行，则移动至下一行 */
         if( layer->insert_y == row && layer->insert_x >= p_row->string_len ) {
@@ -617,19 +615,10 @@ static int TextLayer_DoWordWrap( LCUI_TextLayer *layer, int row, int start_col )
                 p_char->need_update = TRUE;
                 /* 插入至新行 */
                 TextRow_Insert( p_next_row, 0, p_char );
-                if( p_char->style && p_char->style->_pixel_size ) {
-                        char_h = p_char->style->pixel_size+2;
-                } else {
-                        char_h = layer->text_style.pixel_size+2;
-                }
-                if( p_next_row->max_height < char_h ) {
-                        p_next_row->max_height = char_h;
-                }
-		if( p_char->need_display && p_char->bitmap ) {
-			p_next_row->max_width += p_char->bitmap->advance.x;
-		}
         }
         p_row->string_len = start_col;
+	TextRow_UpdateSize( p_row, layer->text_style.pixel_size+2 );
+	TextRow_UpdateSize( p_next_row, layer->text_style.pixel_size+2 );
 	return 0;
 }
 
@@ -747,7 +736,7 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
 static void TextLayer_TextTypeset( LCUI_TextLayer* layer, int start_row )
 {
         int row;
-        for( row=start_row; row<layer->row_list.rows; ++row ) {
+	for( row=start_row; row<layer->row_list.rows; ++row ) {
                 TextLayer_TextRowTypeset( layer, row );
         }
 }
@@ -756,12 +745,12 @@ static void TextLayer_TextTypeset( LCUI_TextLayer* layer, int start_row )
 static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 			TextAddType add_type, LCUI_StyleTagStack *tag_stack )
 {
+        int cur_col, cur_row, ins_x;
+        const wchar_t *p_end, *p, *pp;
         TextRowData *p_cur_row;
         TextCharData char_data;
-        const wchar_t *p_end, *p, *pp;
-        int cur_col, cur_row, ins_x;
-	LCUI_BOOL is_tmp_tag_stack;
 	LCUI_Queue tmp_tag_stack;
+	LCUI_BOOL is_tmp_tag_stack = FALSE, need_typeset = FALSE;
 
         if( !wstr ) {
                 return -1;
@@ -789,9 +778,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
         }
         ins_x = cur_col;
 	/* 如果没有可用的标签栈，则使用临时的标签栈 */
-	if( tag_stack ) {
-		is_tmp_tag_stack = FALSE;
-	} else {
+	if( !tag_stack ) {
 		is_tmp_tag_stack = TRUE;
 		StyleTagStack_Init( &tmp_tag_stack );
 		tag_stack = &tmp_tag_stack;
@@ -824,6 +811,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 			char_data.style = NULL;
 			/* 插入至当前文本行中 */
 			TextRow_Insert( p_cur_row, ins_x, &char_data );
+			need_typeset = TRUE;
 			continue;
                 } 
 		char_data.need_display = TRUE;
@@ -840,7 +828,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
                 layer->insert_x = ins_x;
         }
         /* 若启用了自动换行模式，则标记需要重新对文本进行排版 */
-        if( layer->is_autowrap_mode ) {
+	if( layer->is_autowrap_mode || need_typeset ) {
                 TaskData_AddUpdateTypeset( &layer->task, cur_row );
         }
 	/* 如果使用的是临时标签栈，则销毁它 */
@@ -1214,7 +1202,7 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LCUI_Queue *rect_list )
                 layer->task.update_bitmap = FALSE;
 		layer->task.redraw_all = TRUE;
         }
-        if( layer->task.update_typeset ) {
+	if( layer->task.update_typeset ) {
                 TextLayer_TextTypeset( layer, layer->task.typeset_start_row );
                 layer->task.update_typeset = FALSE;
                 layer->task.typeset_start_row = 0;
