@@ -171,7 +171,7 @@ static int TextRowList_RemoveRow( TextRowList *p_rowlist, int row )
 /** 更新文本行的尺寸 */
 static void TextRow_UpdateSize( TextRowData *p_row, int default_size )
 {
-        int char_h, i;
+        int i;
         TextCharData* p_char;
 
         p_row->max_width = 0;
@@ -215,9 +215,8 @@ static int TextRow_SetLength( TextRowData *p_row, int new_len )
         return 0;
 }
 
-/** 向文本行插入一个字符 */
-static int 
-TextRow_Insert( TextRowData *p_row, int ins_pos, TextCharData *p_char )
+/** 将字符数据直接插入至文本行 */
+static int TextRow_Insert( TextRowData *p_row, int ins_pos, TextCharData *p_char )
 {
         int i;
         TextCharData **p_new_str;
@@ -239,9 +238,17 @@ TextRow_Insert( TextRowData *p_row, int ins_pos, TextCharData *p_char )
         for( i=p_row->string_len-1; i>=ins_pos; --i ) {
                 p_row->string[i] = p_row->string[i-1];
         }
-	p_row->string[ins_pos] = (TextCharData*)malloc( sizeof(TextCharData) );
-	memcpy( p_row->string[ins_pos], p_char, sizeof(TextCharData) );
+	p_row->string[ins_pos] = p_char;
         return 0;
+}
+
+/** 向文本行插入一个字符数据副本 */
+static int TextRow_InsertCopy( TextRowData *p_row, int ins_pos, TextCharData *p_char )
+{
+	TextCharData* p_copy_char;
+	p_copy_char = (TextCharData*)malloc( sizeof(TextCharData) );
+	memcpy( p_copy_char, p_char, sizeof(TextCharData) );
+	return TextRow_Insert( p_row, ins_pos, p_copy_char );
 }
 
 /* 将文本行中的内容向左移动 */
@@ -581,7 +588,7 @@ static int TextLayer_DoWordWrap( LCUI_TextLayer *layer, int row, int start_col )
 		return -1;
 	}
 	p_row = layer->row_list.rowdata[row];
-	if( p_row->string_len < 1 || start_col >= p_row->string_len-1 ) {
+	if( p_row->string_len < 1 || start_col >= p_row->string_len ) {
 		return -2;
 	}
 	/* 如果本行末尾有换行符，则插入新行 */
@@ -620,7 +627,7 @@ static int TextLayer_DoWordWrap( LCUI_TextLayer *layer, int row, int start_col )
 /** 对指定行的文本进行排版 */
 static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
 {
-        int col, char_h;
+        int col;
         TextRowData *p_row, *p_next_row;
         TextCharData *p_char;
 
@@ -791,7 +798,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 			char_data.bitmap = NULL;
 			char_data.style = NULL;
 			/* 插入至当前文本行中 */
-			TextRow_Insert( p_cur_row, ins_x, &char_data );
+			TextRow_InsertCopy( p_cur_row, ins_x, &char_data );
 			need_typeset = TRUE;
 			continue;
                 } 
@@ -801,7 +808,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 		char_data.style = StyleTagStack_GetTextStyle( tag_stack );
 		/* 更新字体位图 */
 		TextChar_UpdateBitmap( &char_data, &layer->text_style );
-		TextRow_Insert( p_cur_row, ins_x, &char_data );
+		TextRow_InsertCopy( p_cur_row, ins_x, &char_data );
         }
         /* 更新当前行的尺寸 */
         TextRow_UpdateSize( p_cur_row, layer->text_style.pixel_size+2 );
