@@ -169,29 +169,24 @@ static int TextRowList_RemoveRow( TextRowList *p_rowlist, int row )
 }
 
 /** 更新文本行的尺寸 */
-static void TextRow_UpdateSize( TextRowData *p_row, int default_height )
+static void TextRow_UpdateSize( TextRowData *p_row, int default_size )
 {
         int char_h, i;
         TextCharData* p_char;
 
         p_row->max_width = 0;
-        p_row->max_height = default_height;
+        p_row->max_height = default_size;
         for( i=0; i<p_row->string_len; ++i ) {
                 p_char = p_row->string[i];
 		if( !p_char->bitmap || !p_char->need_display ) {
                         continue;
                 }
 		p_row->max_width += p_char->bitmap->advance.x;
-                if( p_char->style && p_char->style->_pixel_size ) {
-                        char_h = p_char->style->pixel_size+2;
-                } else {
-                        char_h = default_height;
-                }
-
-                if( p_row->max_height < char_h ) {
-                        p_row->max_height = char_h;
+                if( p_row->max_height < p_char->bitmap->advance.y ) {
+                        p_row->max_height = p_char->bitmap->advance.y;
                 }
         }
+	p_row->max_height = p_row->max_height*11/10;
 }
 
 /** 设置文本行的字符串长度 */
@@ -631,7 +626,6 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
 
         p_row = layer->row_list.rowdata[row];
         p_row->max_width = 0;
-        p_row->max_height = layer->text_style.pixel_size + 2;
         for( col=0; col<p_row->string_len; ++col ) {
                 p_char = p_row->string[col];
 		/* 如果遇到换行符 */
@@ -642,20 +636,12 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
                 if( !p_char->bitmap || !p_char->need_display ) {
                         continue;
                 }
-                if(p_char->style && p_char->style->_pixel_size ) {
-                        char_h = p_char->style->pixel_size + 2;
-                } else {
-                        char_h = layer->text_style.pixel_size + 2;
-                }
                 /* 累加行宽度 */
                 p_row->max_width += p_char->bitmap->advance.x;
                 /* 如果是当前行的第一个字符，或者行宽度没有超过宽度限制 */
                 if( layer->max_width <= 0 || !layer->is_autowrap_mode 
 		 || (layer->is_autowrap_mode && !layer->is_mulitiline_mode)
 		 || col < 1 || p_row->max_width <= layer->max_width ) {
-                        if( p_row->max_height < char_h ) {
-                                p_row->max_height = char_h;
-                        }
                         continue;
                 }
                 /* 将行宽度还原到本次累加前的值 */
@@ -663,6 +649,7 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
 		TextLayer_DoWordWrap( layer, row, col );
 		return;
         }
+	TextRow_UpdateSize( p_row, layer->text_style.pixel_size );
         /* 如果本行有换行符 */
         if( TextRow_HasEndChar( p_row ) ) {
                 return;
@@ -687,21 +674,13 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
                                 p_next_row->string[col] = NULL;
                                 continue;
                         }
-                        if( p_char->style && p_char->style->_pixel_size ) {
-                                char_h = p_char->style->pixel_size+2;
-                        } else {
-                                char_h = layer->text_style.pixel_size+2;
-                        }
                         p_row->max_width += p_char->bitmap->advance.x;
                         /* 如果没有超过宽度限制 */
                         if( !layer->is_autowrap_mode || layer->max_width <= 0
 			 || (layer->is_autowrap_mode && !layer->is_mulitiline_mode)
 			 || p_row->max_width <= layer->max_width ) {
-                                if( p_row->max_height < char_h ) {
-                                        p_row->max_height = char_h;
-                                }
                                 /* 标记本字需要刷新 */
-                                p_char->need_update = 1;
+                                p_char->need_update = TRUE;
                                 TextRow_Insert( p_row, p_row->string_len, p_char );
                                 p_next_row->string[col] = NULL;
                                 continue;
@@ -721,8 +700,10 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
                         p_next_row->max_width -= p_char->bitmap->advance.x;
                         /* 将这一行剩余的文字向前移 */
                         TextRow_LeftMove( p_next_row, col );
+			TextRow_UpdateSize( p_row, layer->text_style.pixel_size );
                         return;
                 }
+		TextRow_UpdateSize( p_row, layer->text_style.pixel_size );
                 /* 删除这一行，因为这一行的内容已经转移至当前行 */
                 TextRowList_RemoveRow( &layer->row_list, row+1 );
                 /* 如果插入点当前行在后面 */
@@ -1164,31 +1145,20 @@ LCUI_API int TextLayer_GetHeight( LCUI_TextLayer* layer )
 /** 重新载入各个文字的字体位图 */
 LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer )
 {
-        int row, col, char_h;
+        int row, col;
         TextCharData* p_char;
         TextRowData* p_row;
 
         for( row=0; row<layer->row_list.rows; ++row ) {
                 p_row = layer->row_list.rowdata[row];
-                char_h = 0;
-                p_row->max_width = 0;
-                p_row->max_height = layer->text_style.pixel_size + 2;
                 for( col=0; col<p_row->string_len; ++col ) {
                         p_char = p_row->string[col];
                         TextChar_UpdateBitmap( p_char, &layer->text_style );
                         if( !p_char->need_display || !p_char->bitmap ) {
                                 continue;
                         }
-                        p_row->max_width += p_char->bitmap->advance.x;
-                        if( p_char->style && p_char->style->_pixel_size ) {
-                                char_h = p_char->style->pixel_size+2;
-                        } else {
-                                char_h = layer->text_style.pixel_size+2;
-                        }
-                        if( p_row->max_height < char_h ) {
-                                p_row->max_height = char_h;
-                        }
                 }
+		TextRow_UpdateSize( p_row, layer->text_style.pixel_size );
         }
 }
 
@@ -1325,7 +1295,7 @@ LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph,
                         }
                         /* 计算字体位图的绘制坐标 */
                         char_pos.x = x + p_char->bitmap->left;
-                        char_pos.y = y + p_row->max_height-1;
+                        char_pos.y = y + p_row->max_height*4/5;
                         char_pos.y -= p_char->bitmap->top;
                         x += p_char->bitmap->advance.x;
                         /* 判断文字使用的前景颜色，再进行绘制 */
