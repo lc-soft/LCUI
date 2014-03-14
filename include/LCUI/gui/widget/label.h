@@ -46,11 +46,11 @@
 LCUI_BEGIN_HEADER
 
 /** 设定与标签关联的文本内容 */
-LCUI_API int Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text );
+LCUI_API int Label_TextW( LCUI_Widget *widget, const wchar_t *text );
 
-LCUI_API void Label_Text( LCUI_Widget *widget, const char *utf8_text );
+LCUI_API int Label_Text( LCUI_Widget *widget, const char *utf8_text );
 
-LCUI_API void Label_TextA( LCUI_Widget *widget, const char *ascii_text );
+LCUI_API int Label_TextA( LCUI_Widget *widget, const char *ansi_text );
 
 /** 设置Label部件显示的文本是否自动换行 */
 LCUI_API void Label_SetAutoWrap( LCUI_Widget *widget, LCUI_BOOL flag );

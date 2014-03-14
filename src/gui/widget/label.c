@@ -300,7 +300,7 @@ static void Label_ExecDraw( LCUI_Widget *widget )
 
 /*---------------------------- Public --------------------------------*/
 /** 设定与标签关联的文本内容 */
-LCUI_API int Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
+LCUI_API int Label_TextW( LCUI_Widget *widget, const wchar_t *text )
 {
 	int len;
 	wchar_t *p_text;
@@ -308,43 +308,48 @@ LCUI_API int Label_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 	if( !widget ) {
 		return -1;
 	}
-	if( !unicode_text ) {
+	if( !text ) {
 		len = 0;
 	} else {
-		len = wcslen(unicode_text);
+		len = wcslen( text );
 	}
 	p_text = (wchar_t*)malloc( sizeof(wchar_t)*(len+1) );
 	if( !p_text ) {
 		return -1;
 	}
-	if( !unicode_text ) {
+	if( !text ) {
 		p_text[0] = '\0';
 	} else {
-		wcscpy( p_text, unicode_text );
+		wcscpy( p_text, text );
 	}
 	DEBUG_MSG("post LABEL_TEXT msg\n");
 	WidgetMsg_Post( widget, LABEL_TEXT, p_text, TRUE, TRUE );
 	return 0;
 }
 
-LCUI_API void Label_Text( LCUI_Widget *widget, const char *utf8_text )
+LCUI_API int Label_Text( LCUI_Widget *widget, const char *utf8_text )
 {
-	wchar_t *unicode_text;
-	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
-	Label_TextW( widget, unicode_text );
-	if( unicode_text != NULL ) {
-		free( unicode_text );
+	int ret;
+	wchar_t *wstr;
+
+	LCUICharset_UTF8ToUnicode( utf8_text, &wstr );
+	ret = Label_TextW( widget, wstr );
+	if( wstr ) {
+		free( wstr );
 	}
+	return ret;
 }
 
-LCUI_API void Label_TextA( LCUI_Widget *widget, const char *ascii_text )
+LCUI_API int Label_TextA( LCUI_Widget *widget, const char *ansi_text )
 {
-	wchar_t *unicode_text;
-	LCUICharset_GB2312ToUnicode( ascii_text, &unicode_text );
-	Label_TextW( widget, unicode_text );
-	if( unicode_text != NULL ) {
-		free( unicode_text );
+	int ret;
+	wchar_t *wstr;
+	LCUICharset_GB2312ToUnicode( ansi_text, &wstr );
+	Label_TextW( widget, wstr );
+	if( wstr ) {
+		free( wstr );
 	}
+	return ret;
 }
 
 /** 设置Label部件显示的文本是否自动换行 */
