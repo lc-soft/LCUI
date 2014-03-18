@@ -247,7 +247,7 @@ Button_Text( LCUI_Widget *widget, const char *text )
 	button = (LCUI_Button*)Widget_GetPrivData(widget);
 	label = button->label;
 	/* 设定部件显示的文本 */
-	Label_Text( label, text );
+	Label_SetText( label, text );
 }
 
 LCUI_API void
@@ -258,7 +258,7 @@ Button_TextW( LCUI_Widget *widget, const wchar_t *text )
 	
 	button = (LCUI_Button*)Widget_GetPrivData(widget);
 	label = button->label;
-	Label_TextW( label, text );
+	Label_SetTextW( label, text );
 }
 
 /* 创建一个带文本内容的按钮 */

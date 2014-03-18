@@ -363,7 +363,7 @@ Window_SetTitleText( LCUI_Widget *win_p, const char *text )
 	}
 	titlebar = Window_GetTitleBar(win_p); 
 	title = (LCUI_TitleBar *)Widget_GetPrivData(titlebar); 
-	Label_Text(title->label, text);
+	Label_SetText(title->label, text);
 }
 
 LCUI_API void
@@ -376,7 +376,7 @@ Window_SetTitleTextW( LCUI_Widget *win_p, const wchar_t *text )
 	}
 	titlebar = Window_GetTitleBar(win_p); 
 	title = (LCUI_TitleBar *)Widget_GetPrivData(titlebar); 
-	Label_TextW(title->label, text);
+	Label_SetTextW(title->label, text);
 }
 
 LCUI_API void

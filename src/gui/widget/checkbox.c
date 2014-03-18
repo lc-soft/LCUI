@@ -715,7 +715,7 @@ CheckBox_Text( LCUI_Widget *widget, const char *text )
 {
 	LCUI_Widget *label;
 	label = CheckBox_GetLabel(widget);
-	Label_Text(label, text); 
+	Label_SetText(label, text); 
 }
 
 LCUI_API void
@@ -723,7 +723,7 @@ CheckBox_TextW( LCUI_Widget *widget, const wchar_t *text )
 {
 	LCUI_Widget *label;
 	label = CheckBox_GetLabel(widget);
-	Label_TextW(label, text); 
+	Label_SetTextW(label, text); 
 }
 
 /* 创建一个带文本内容的复选框 */

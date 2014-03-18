@@ -517,7 +517,7 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 	btn_area_border.top_color = MB_BTN_AREA_LINECOLOR;
 	Widget_SetBorder( btn_area, btn_area_border );
 	
-	Label_TextW( textbox, text );
+	Label_SetTextW( textbox, text );
 	Widget_Show( textbox );
 	if( icon_type != MB_ICON_NONE ) {
 		Widget_Show( iconbox );
