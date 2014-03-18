@@ -63,6 +63,14 @@ LCUI_Label;
 
 /*---------------------------- Private -------------------------------*/
 
+/** 获取label部件内的文本图层的指针 */
+static LCUI_TextLayer* Label_GetTextLayer( LCUI_Widget *widget )
+{
+	LCUI_Label *label;
+	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	return &label->layer;
+}
+
 static void Label_UpdateTextLayer( LCUI_Widget *widget )
 {
 	int n; 
@@ -181,7 +189,7 @@ static void Label_RefreshTextLayer( LCUI_Widget *widget, void *arg )
 	Widget_Unlock( widget );
 }
 
-static void Label_SetTextStyle( LCUI_Widget *widget, void *arg )
+static void Label_ExecSetTextStyle( LCUI_Widget *widget, void *arg )
 {
 	LCUI_TextStyle *style;
 	LCUI_Label *label;
@@ -199,7 +207,7 @@ static void Label_SetTextStyle( LCUI_Widget *widget, void *arg )
 	Widget_Unlock( widget );
 }
 
-static void Label_SetTextW( LCUI_Widget *widget, void *arg )
+static void Label_ExecSetTextW( LCUI_Widget *widget, void *arg )
 {
 	LCUI_Label *label;
 	DEBUG_MSG("recv LABEL_TEXT msg, lock widget\n");
@@ -249,8 +257,8 @@ static void Label_ExecInit( LCUI_Widget *widget )
 	/* 启用样式标签的支持 */
 	TextLayer_SetUsingStyleTags( &label->layer, TRUE );
 	/* 将回调函数与自定义消息关联 */
-	WidgetMsg_Connect( widget, LABEL_TEXT, Label_SetTextW );
-	WidgetMsg_Connect( widget, LABEL_STYLE, Label_SetTextStyle );
+	WidgetMsg_Connect( widget, LABEL_TEXT, Label_ExecSetTextW );
+	WidgetMsg_Connect( widget, LABEL_STYLE, Label_ExecSetTextStyle );
 	WidgetMsg_Connect( widget, LABEL_UPDATE_SIZE, Label_UpdateTextLayerSize );
 	WidgetMsg_Connect( widget, LABEL_REFRESH, Label_RefreshTextLayer );
 	WidgetMsg_Connect( widget, LABEL_AUTO_WRAP, Label_ExecSetAutoWrap );
@@ -300,7 +308,7 @@ static void Label_ExecDraw( LCUI_Widget *widget )
 
 /*---------------------------- Public --------------------------------*/
 /** 设定与标签关联的文本内容 */
-LCUI_API int Label_TextW( LCUI_Widget *widget, const wchar_t *text )
+LCUI_API int Label_SetTextW( LCUI_Widget *widget, const wchar_t *text )
 {
 	int len;
 	wchar_t *p_text;
@@ -327,25 +335,25 @@ LCUI_API int Label_TextW( LCUI_Widget *widget, const wchar_t *text )
 	return 0;
 }
 
-LCUI_API int Label_Text( LCUI_Widget *widget, const char *utf8_text )
+LCUI_API int Label_SetText( LCUI_Widget *widget, const char *utf8_text )
 {
 	int ret;
 	wchar_t *wstr;
 
 	LCUICharset_UTF8ToUnicode( utf8_text, &wstr );
-	ret = Label_TextW( widget, wstr );
+	ret = Label_SetTextW( widget, wstr );
 	if( wstr ) {
 		free( wstr );
 	}
 	return ret;
 }
 
-LCUI_API int Label_TextA( LCUI_Widget *widget, const char *ansi_text )
+LCUI_API int Label_SetTextA( LCUI_Widget *widget, const char *ansi_text )
 {
 	int ret;
 	wchar_t *wstr;
-	LCUICharset_GB2312ToUnicode( ansi_text, &wstr );
-	Label_TextW( widget, wstr );
+	ret = LCUICharset_GB2312ToUnicode( ansi_text, &wstr );
+	ret |= Label_SetTextW( widget, wstr );
 	if( wstr ) {
 		free( wstr );
 	}
@@ -368,7 +376,7 @@ LCUI_API void Label_SetTextAlign( LCUI_Widget *widget, TextAlignType align )
 }
 
 /** 为Label部件内显示的文本设定文本样式 */
-LCUI_API int Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
+LCUI_API int Label_SetTextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 {
 	LCUI_TextStyle *p_style;
 	
@@ -385,20 +393,12 @@ LCUI_API int Label_TextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 	return 0;
 }
 
-/** 获取Label部件的文本样式 */
-LCUI_API LCUI_TextStyle Label_GetTextStyle( LCUI_Widget *widget )
+/** 获取Label部件的全局文本样式 */
+LCUI_API void Label_GetTextStyle( LCUI_Widget *widget, LCUI_TextStyle *style )
 {
 	LCUI_TextLayer *layer;
 	layer = Label_GetTextLayer( widget );
-	return layer->text_style;
-}
-
-/** 获取label部件内的文本图层的指针 */
-LCUI_API LCUI_TextLayer* Label_GetTextLayer( LCUI_Widget *widget )
-{
-	LCUI_Label *label;
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
-	return &label->layer;
+	*style = layer->text_style;
 }
 
 /** 刷新label部件显示的文本 */
@@ -408,9 +408,8 @@ LCUI_API void Label_Refresh( LCUI_Widget *widget )
 }
 
 /** 启用或禁用Label部件的自动尺寸调整功能 */
-LCUI_API void Label_AutoSize(	LCUI_Widget *widget,
-				LCUI_BOOL flag,
-				AUTOSIZE_MODE mode )
+LCUI_API void Label_SetAutoSize( LCUI_Widget *widget, LCUI_BOOL flag,
+							AUTOSIZE_MODE mode )
 {
 	LCUI_Label *label;
 	label = (LCUI_Label*)Widget_GetPrivData( widget );
