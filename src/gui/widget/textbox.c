@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * textbox.c -- LCUI's TextBox widget
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * textbox.c -- LCUI 的文本框部件
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -40,7 +40,6 @@
  * ****************************************************************************/
 
 //#define DEBUG
-#define I_NEED_LABEL_TEXTLAYER
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_WIDGET_H
@@ -51,6 +50,9 @@
 #include LC_INPUT_H
 #include LC_INPUT_METHOD_H
 #include LC_ERROR_H 
+
+#define MALLOC_ONE(type) (type*)malloc(sizeof(type))
+#define REALLOC(obj,size,type) (type*)realloc(obj,size*sizeof(type))
 
 #define WIDGET_MSG_UPDATE_FONTBMP	(WIDGET_USER+1)
 #define WIDGET_MSG_HIDE_PLACEHOLDER	(WIDGET_USER+2)
@@ -65,7 +67,7 @@ typedef struct LCUI_TextBox_ {
 	int block_size;				/**< 块大小 */
 	LCUI_BOOL read_only;			/**< 是否只读 */
 	LCUI_BOOL show_cursor;			/**< 是否显示光标 */
-	LCUI_Queue text_block_buff;		/**< 文本块缓冲区 */
+	LCUI_Queue text_block_buffer;		/**< 文本块缓冲区 */
 	LCUI_BOOL show_placeholder;		/**< 表示占位符是否已经显示 */
 	LCUI_WString placeholder;		/**< 文本框的占位符 */
 	LCUI_WString allow_input_char;		/**< 允许输入的字符 */
@@ -74,12 +76,19 @@ typedef struct LCUI_TextBox_ {
 	LCUI_TextStyle textstyle_bak;		/**< 文本框内文本样式的副本 */
 } LCUI_TextBox;
 
-typedef struct _LCUI_TextBlock
-{
-	int pos_type;	/* 指定该文本块要添加至哪个位置 */
-	wchar_t *text;	/* 指向文本所在内存空间的指针 */
-}
-LCUI_TextBlock;
+typedef enum TextBlockType_ {
+	TEXT_BLOCK_TYPE_TEXT_BEGIN,
+	TEXT_BLOCK_TYPE_TEXT_BODY,
+	TEXT_BLOCK_TYPE_TEXT_END
+} TextBlockType;
+
+/** 文本块数据结构 */
+typedef struct LCUI_TextBlock_ {
+	TextBlockType type;			/**< 文本块类型 */
+	TextAddType add_type;			/**< 指定该文本块的添加方式 */
+	LCUI_StyleTagStack *style;		/**< 整个文本所应用的样式栈 */
+	wchar_t *text;				/**< 文本块(段) */
+} LCUI_TextBlock;
 
 /*----------------------------- Private ------------------------------*/
 static LCUI_Widget *active_textbox = NULL; 
@@ -160,7 +169,7 @@ static void blink_cursor( void* arg )
 
 static void TextBox_OnClicked( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
-	LCUI_Pos pos;
+	LCUI_Pos pixel_pos;
 	LCUI_TextBox *tb;
 	LCUI_TextLayer *layer;
 	
@@ -169,82 +178,79 @@ static void TextBox_OnClicked( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	layer = TextBox_GetTextLayer( widget );
 	tb = (LCUI_TextBox*)Widget_GetPrivData( active_textbox );
 	if( tb->show_placeholder ) {
-		pos.x = pos.y = 0;
+		pixel_pos.x = pixel_pos.y = 0;
 	} else {
 		/* 全局坐标转换成相对坐标 */
-		pos = Widget_ToRelPos( tb->text, event->drag.cursor_pos );
+		pixel_pos = Widget_ToRelPos( tb->text, event->drag.cursor_pos );
 	}
-	//printf("pos: %d,%d\n", pos.x, pos.y);
-	/* 根据像素坐标，设定文本光标的位置 */
-	TextLayer_Cursor_SetPixelPos( layer, pos );
-	/* 获取光标的当前位置 */
-	pos = TextLayer_Cursor_GetPos( layer );
-	/* 主要是调用该函数更新当前文本浏览区域，以使光标处于显示区域内 */
-	TextBox_Cursor_Move( widget, pos );
+	/* 根据像素坐标，设定文本插入符的行列坐标 */
+	TextLayer_SetCaretPosByPixelPos( layer, pixel_pos.x, pixel_pos.y );
+	/* 调用该函数更新当前文本浏览区域，以使光标处于显示区域内 */
+	TextBox_MoveCaret( widget, layer->insert_y, layer->insert_x );
 }
 
 /** 处理按键事件 */
 static void TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
-	int cols, rows;
-	LCUI_Pos cur_pos;
 	LCUI_TextLayer *layer;
 	LCUI_TextBox *textbox;
+	int cols, rows, cur_col, cur_row;
 	
-	//_DEBUG_MSG("you input: %d\n", event->key.key_code);
-	layer = TextBox_GetTextLayer( widget );
-	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
-	cur_pos = TextLayer_Cursor_GetPos( layer );
-	cols = TextLayer_GetRowLen( layer, cur_pos.y );
-	rows = TextLayer_GetRows( layer ); 
-
 	if( event->key.key_state == LCUIKEYSTATE_RELEASE ) {
 		return;
 	}
 
+	//_DEBUG_MSG("you input: %d\n", event->key.key_code);
+	layer = TextBox_GetTextLayer( widget );
+	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	cur_row = layer->insert_y;
+	cur_col = layer->insert_x;
+	cols = TextLayer_GetRowTextLength( layer, cur_row );
+	rows = TextLayer_GetRowTotal( layer ); 
+
 	switch( event->key.key_code ) {
 	    case LCUIKEY_HOMEPAGE: //home键移动光标至行首
-		cur_pos.x = 0;
+		cur_col = 0;
 		goto mv_cur_pos;
 		
 	    case LCUIKEY_END: //end键移动光标至行尾
-		cur_pos.x = cols;
+		cur_col = cols;
 		goto mv_cur_pos;
 		
 	    case LCUIKEY_LEFT:
-		if( cur_pos.x > 0 ) {
-			cur_pos.x--;
-		} else if( cur_pos.y > 0 ) {
-			cur_pos.y--;
-			cur_pos.x = TextLayer_GetRowLen( layer, cur_pos.y );
+		if( cur_col > 0 ) {
+			--cur_col;
+		} else if( cur_row > 0 ) {
+			--cur_row;
+			cur_col = TextLayer_GetRowTextLength( layer, cur_row );
 		}
 		goto mv_cur_pos;
 		
 	    case LCUIKEY_RIGHT:
-		if( cur_pos.x < cols ) {
-			cur_pos.x++;
-		} else if( cur_pos.y < rows-1 ) {
-			cur_pos.y++;
-			cur_pos.x = 0;
+		if( cur_col < cols ) {
+			++cur_col;
+		} else if( cur_row < rows-1 ) {
+			++cur_row;
+			cur_col = 0;
 		}
 		goto mv_cur_pos;
 		
 	    case LCUIKEY_UP:
-		if( cur_pos.y > 0 ) {
-			cur_pos.y--;
+		if( cur_row > 0 ) {
+			--cur_row;
 		}
 		goto mv_cur_pos;
 		
 	    case LCUIKEY_DOWN:
-		if( cur_pos.y < rows-1 ) {
-			cur_pos.y++;
+		if( cur_row < rows-1 ) {
+			++cur_row;
 		}
 mv_cur_pos:;
-		/* 移动光标位置 */
+		/* 如果占位符处于显示状态，则复位插入符的位置 */
 		if( textbox->show_placeholder ) {
-			cur_pos.x = cur_pos.y = 0;
+			cur_col = cur_row = 0;
 		}
-		TextBox_Cursor_Move( widget,cur_pos );
+		TextBox_MoveCaret( widget,cur_row, cur_col );
 		break;
 		
 	    case LCUIKEY_BACKSPACE: //删除光标左边的字符
@@ -330,32 +336,16 @@ static void TextBox_TextLayer_VertScroll( ScrollBar_Data data, void *arg )
 	TextBox_TextLayer_SetOffset( widget, pos );
 }
 
-static void destroy_textblock( void *arg )
+/** 销毁文本块 */
+static void TextBlock_Destroy( void *arg )
 {
-	LCUI_TextBlock *ptr;
-	ptr = (LCUI_TextBlock *)arg;
-	free( ptr->text );
-}
-
-/** 在文本末尾追加文本 */
-static void __TextBox_Text_AppendW( LCUI_Widget *widget, wchar_t *new_text )
-{
-	LCUI_TextLayer *layer;
-	layer = TextBox_GetTextLayer( widget );
-	TextLayer_Text_AppendW( layer, new_text );
-}
-
-/** 在光标处添加文本 */
-static void __TextBox_Text_Add( LCUI_Widget *widget, wchar_t *new_text )
-{
-	LCUI_Pos cur_pos;
-	LCUI_TextLayer *layer;
-	DEBUG_MSG("add text: %S\n", new_text);
-	layer = TextBox_GetTextLayer( widget );
-	TextLayer_Text_AddW( layer, new_text );
-	DEBUG_MSG("new len: %d\n", TextLayer_Text_GetTotalLength(layer));
-	cur_pos = TextLayer_Cursor_GetPos( layer );
-	TextBox_Cursor_Move( widget, cur_pos );
+	LCUI_TextBlock *blk;
+	blk = (LCUI_TextBlock*)arg;
+	if( blk->type == TEXT_BLOCK_TYPE_TEXT_END ) {
+		StyleTagStack_Destroy( blk->style );
+		blk->style = NULL;
+	}
+	free( blk->text );
 }
 
 /* 在这里提前声明要用到的函数 */
@@ -365,33 +355,34 @@ static void TextBox_ScrollBar_UpdateSize( LCUI_Widget *widget );
 /** 更新文本框内的字体位图 */
 static void TextBox_UpdateFontBitmap( LCUI_Widget *widget, void *arg )
 {
+	LCUI_TextLayer *layer;
 	LCUI_TextBox *textbox;
-	LCUI_TextBlock *text_ptr;
+	LCUI_TextBlock *blk;
 	
 	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
 	/* 如果缓冲区内有文本块 */
-	if( Queue_GetTotal( &textbox->text_block_buff ) <= 0 ) {
+	if( Queue_GetTotal( &textbox->text_block_buffer ) <= 0 ) {
 		return;
 	}
 	Widget_Lock( widget );
+	layer = Label_GetTextLayer( textbox->text );
 	/* 获取第一个文本块 */
-	text_ptr = (LCUI_TextBlock*)Queue_Get( &textbox->text_block_buff, 0 );
-	if( text_ptr ) {
-		//_DEBUG_MSG("text block: %p, text: %p\n", 
-		//	text_ptr, text_ptr->text);
-		switch( text_ptr->pos_type ) {
-		case AT_TEXT_LAST:
+	blk = (LCUI_TextBlock*)Queue_Get( &textbox->text_block_buffer, 0 );
+	if( blk ) {
+		switch( blk->add_type ) {
+		case TEXT_ADD_TYPE_APPEND:
 			/* 将此文本块追加至文本末尾 */
-			__TextBox_Text_AppendW( widget, text_ptr->text );
+			TextLayer_AppendTextW( layer, blk->text, blk->style );
 			break;
-		case AT_CURSOR_POS:
-			/* 将此文本块插入至光标当前处 */
-			__TextBox_Text_Add( widget, text_ptr->text );
+		case TEXT_ADD_TYPE_INSERT:
+			/* 将此文本块插入至文本插入符所在处 */
+			TextLayer_InsertTextW( layer, blk->text, blk->style );
+			TextBox_MoveCaret( widget, layer->insert_y, layer->insert_x );
 		default: break;
 		}
 	}
 	/* 删除该文本块 */
-	Queue_Delete( &textbox->text_block_buff, 0 );
+	Queue_Delete( &textbox->text_block_buffer, 0 );
 	/* 更新滚动条的位置 */
 	TextBox_ScrollBar_UpdatePos( widget );
 	TextBox_ScrollBar_UpdateSize( widget );
@@ -448,7 +439,6 @@ static void TextBox_ShowPlaceHolder(LCUI_Widget *widget, void *arg )
 static void TextBox_ExecInit( LCUI_Widget *widget )
 {
 	LCUI_TextBox *textbox;
-	
 	widget->valid_state = WIDGET_STATE_ACTIVE | WIDGET_STATE_OVERLAY;
 	widget->valid_state |= (WIDGET_STATE_NORMAL | WIDGET_STATE_DISABLE);
 	textbox = Widget_NewPrivData(widget, sizeof(LCUI_TextBox));
@@ -489,9 +479,9 @@ static void TextBox_ExecInit( LCUI_Widget *widget )
 	ScrollBar_Connect( textbox->scrollbar[1], TextBox_HoriScroll_TextLayer, widget );
 	Widget_Show( textbox->text );
 	
-	Queue_Init( &textbox->text_block_buff, sizeof(LCUI_TextBlock), destroy_textblock );
+	Queue_Init( &textbox->text_block_buffer, sizeof(LCUI_TextBlock), TextBlock_Destroy );
 	
-	TextLayer_UsingStyleTags( Label_GetTextLayer(textbox->text), FALSE );
+	TextLayer_SetUsingStyleTags( Label_GetTextLayer(textbox->text), FALSE );
 	Widget_SetPadding( widget, Padding(2,2,2,2) );
 	Widget_SetBackgroundColor( textbox->cursor, RGB(0,0,0) );
 	Widget_SetBackgroundTransparent( textbox->cursor, FALSE );
@@ -744,7 +734,7 @@ static void TextBox_ExecUpdate( LCUI_Widget *widget )
 	LCUI_TextBox *textbox;
 	
 	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
-	if( Queue_GetTotal( &textbox->text_block_buff ) == 0
+	if( Queue_GetTotal( &textbox->text_block_buffer ) == 0
 	 && TextBox_Text_GetTotalLength( widget ) == 0
 	 && !textbox->show_placeholder ) {
 		/* 投递消息，以在条件满足时显示占位符 */
@@ -939,34 +929,44 @@ TextBox_Text_GetTotalLength( LCUI_Widget *widget )
 }
 
 /* 将文本添加至缓冲区内 */
-static int TextBox_TextBuff_Add(	LCUI_Widget *widget,
-					const wchar_t *text, 
-					int pos_type )
+static int TextBox_AddTextToBuffer( LCUI_Widget *widget, const wchar_t *wtext,
+								int add_type )
 {
 	LCUI_TextBox *textbox;
 	LCUI_TextLayer *layer;
 	int i, j, len, tag_len, size;
 	wchar_t *text_buff;
 	const wchar_t *p;
-	LCUI_TextBlock text_block;
+	LCUI_TextBlock txtblk;
 	
+	switch( add_type ) {
+	case TEXT_ADD_TYPE_APPEND: 
+		txtblk.add_type = TEXT_ADD_TYPE_APPEND;
+		break;
+	case TEXT_ADD_TYPE_INSERT:
+		txtblk.add_type = TEXT_ADD_TYPE_INSERT;
+		break;
+	default: return -1;
+	}
+	txtblk.style_stack = MALLOC_ONE( LCUI_StyleTagStack );
+	StyleTagStack_Init( txtblk.style_stack );
+
 	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
 	layer = Label_GetTextLayer( textbox->text );
-	len = wcslen( text );
+	len = wcslen( wtext );
 	DEBUG_MSG("len = %d\n", len);
-	switch( pos_type ) {
-		case AT_TEXT_LAST: 
-		case AT_CURSOR_POS:
-		text_block.pos_type = pos_type;
-		break;
-		default: return -1;
-	}
-	for(i=0; i<len; ++i) {
+	for( i=0; i<len; ++i ) {
 		if( len-i > textbox->block_size ) {
 			size = textbox->block_size;
+			txtblk.type = TEXT_BLOCK_TYPE_TEXT_BODY;
 		} else {
 			size = len-i;
+			txtblk.type = TEXT_BLOCK_TYPE_TEXT_END;
 		}
+		if( i == 0 ) {
+			txtblk.type = TEXT_BLOCK_TYPE_TEXT_BEGIN;
+		}
+
 		size += 1;
 		text_buff = (wchar_t*)malloc( sizeof(wchar_t)*size );
 		if( !text_buff ) {
@@ -974,44 +974,43 @@ static int TextBox_TextBuff_Add(	LCUI_Widget *widget,
 		}
 		
 		/* 如果未启用样式标签功能 */
-		if( !layer->using_style_tags ) {
-			for( j=0; i<len&&j<size-1; ++j,++i ) {
-				text_buff[j] = text[i];
+		if( !layer->is_using_style_tags ) {
+			for( j=0; i<len && j<size-1; ++j,++i ) {
+				text_buff[j] = wtext[i];
 			}
 			--i;
 			text_buff[j] = 0;
-			text_block.text = text_buff;
+			txtblk.text = text_buff;
 			/* 添加文本块至缓冲区 */
-			Queue_Add( &textbox->text_block_buff, &text_block );
+			Queue_Add( &textbox->text_block_buffer, &txtblk );
 			continue;
 		}
 		for( j=0; i<len&&j<size-1; ++j,++i ) {
-			text_buff[j] = text[i];
+			text_buff[j] = wtext[i];
 			/* 检测是否有样式标签 */
-			p = StyleTag_GetTagData( text+i, NULL, 0, NULL );
+			p = scan_style_tag( wtext+i, NULL, 0, NULL );
 			if( !p ) {
-				p = StyleTag_GetEndingTag( text+i, NULL );
+				p = scan_style_ending_tag( wtext+i, NULL );
 				if( !p ) {
 					continue;
 				}
 			}
 			/* 计算标签的长度 */
-			tag_len = p-text-i;
-			DEBUG_MSG("pos: %d, tag len: %d, start: %C, end: %C\n", i, tag_len, text[i], *p);
+			tag_len = p-wtext-i;
+			DEBUG_MSG("pos: %d, tag len: %d, start: %C, end: %C\n", i, tag_len, wtext[i], *p);
 			/* 若当前块大小能够容纳这个标签 */
 			if( j+tag_len <= size-1 ) {
 				continue;
 			}
 			/* 重新计算该文本块的大小，并重新分配内存空间 */
 			size = j+tag_len+1;
-			text_buff = (wchar_t*)realloc(
-			text_buff, sizeof(wchar_t)*size );
+			text_buff = REALLOC( text_buff, size, wchar_t );
 		}
 		--i;
 		text_buff[j] = 0;
-		text_block.text = text_buff;
+		txtblk.text = text_buff;
 		/* 添加文本块至缓冲区 */
-		Queue_Add( &textbox->text_block_buff, &text_block );
+		Queue_Add( &textbox->text_block_buffer, &txtblk );
 	}
 	DEBUG_MSG("end\n");
 	/* 投递消息，以在添加新文本后更新文本位图 */
@@ -1019,28 +1018,18 @@ static int TextBox_TextBuff_Add(	LCUI_Widget *widget,
 	return 0;
 }
 
-static void
-TextBox_Text_Clear( LCUI_Widget *widget )
-{
-	LCUI_TextLayer *layer;
-	
-	layer = TextBox_GetTextLayer( widget );
-	TextLayer_Text_Clear( layer );
-}
-
-
 /** 设定文本框显示的文本 */
-LCUI_API void TextBox_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
+LCUI_API int TextBox_SetTextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 {
 	LCUI_TextBox *tb;
 	LCUI_TextLayer *layer;
 	
-	TextBox_Text_Clear( widget );	/* 清空显示的文本 */
-	tb = Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	layer = Label_GetTextLayer( tb->text );
+	TextLayer_ClearText( layer );
 	/* 把文本分割成块，加入至缓冲队列，让文本框分段显示 */
 	TextBox_TextBuff_Add( widget, unicode_text, AT_TEXT_LAST );
 	if( tb->show_placeholder ) {
-		layer = TextBox_GetTextLayer( widget );
 		tb->show_placeholder = FALSE;
 		/* 恢复文本框的文本样式以及屏蔽符 */
 		TextLayer_Text_SetPasswordChar( layer, tb->password_char_bak );
@@ -1049,12 +1038,17 @@ LCUI_API void TextBox_TextW( LCUI_Widget *widget, const wchar_t *unicode_text )
 	Widget_Update( widget );
 }
 
-LCUI_API void TextBox_Text( LCUI_Widget *widget, const char *utf8_text )
+LCUI_API int TextBox_SetText( LCUI_Widget *widget, const char *utf8_text )
 {
-	wchar_t *unicode_text;
-	LCUICharset_UTF8ToUnicode( utf8_text, &unicode_text );
-	TextBox_TextW( widget, unicode_text );
-	free( unicode_text );
+	int ret;
+	wchar_t *wstr;
+
+	ret = LCUICharset_UTF8ToUnicode( utf8_text, &wstr );
+	ret += TextBox_TextW( widget, wstr );
+	if( wstr ) {
+		free( wstr );
+	}
+	return ret;
 }
 
 LCUI_API void
@@ -1138,7 +1132,7 @@ TextBox_Text_Backspace(LCUI_Widget *widget, int n)
 	layer = TextBox_GetTextLayer( widget );
 	TextLayer_Text_Backspace( layer, n );
 	cur_pos = TextLayer_Cursor_GetPos( layer );
-	TextBox_Cursor_Move( widget, cur_pos );
+	TextBox_MoveCaret( widget, cur_pos );
 	Widget_Update( widget );
 	return 0;
 }
@@ -1178,8 +1172,8 @@ LCUI_API LCUI_Pos TextBox_Cursor_Update( LCUI_Widget *widget )
 	return pixel_pos;
 }
 
-/** 移动文本框内的光标 */
-LCUI_API LCUI_Pos TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
+/** 移动文本框内的文本插入符的行列坐标 */
+LCUI_API void TextBox_MoveCaret( LCUI_Widget *widget, int row, int col )
 {
 	LCUI_Pos pixel_pos;
 	LCUI_Widget *cursor;
@@ -1190,8 +1184,9 @@ LCUI_API LCUI_Pos TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
 	layer = TextBox_GetTextLayer( widget );
 	cursor = TextBox_GetCursor( widget );
 	size.w = 1;
-	size.h = TextLayer_CurRow_GetMaxHeight( layer );
-	pixel_pos = TextLayer_Cursor_SetPos( layer, new_pos );
+	size.h = TextLayer_GetRowHeight( layer, row );
+	TextLayer_SetCaretPos( layer, row, col );
+	TextLayer_GetCaretPixelPos( layer, &pixel_pos );
 	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
 	Widget_Move( cursor, pixel_pos );
 	Widget_Resize( cursor, size );
@@ -1200,31 +1195,27 @@ LCUI_API LCUI_Pos TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos )
 	}
 	/* 更新文本显示区域 */
 	TextBox_UpdateViewArea( widget );
-	return pixel_pos;
 }
 
 /** 获取文本框内被选中的文本 */
 LCUI_API int TextBox_GetSelectedText( LCUI_Widget *widget, char *out_text )
 {
-	LCUI_TextLayer *layer;
-	layer = TextBox_GetTextLayer( widget );
-	return TextLayer_GetSelectedText( layer, out_text );
+	// ...
+	return -1;
 }
 
 /** 复制文本框内被选中的文本 */
 LCUI_API int TextBox_CopySelectedText(LCUI_Widget *widget)
 {
-	LCUI_TextLayer *layer;
-	layer = TextBox_GetTextLayer( widget );
-	return TextLayer_CopySelectedText( layer );
+	// ...
+	return -1;
 }
 
 /** 剪切文本框内被选中的文本 */
 LCUI_API int TextBox_CutSelectedText(LCUI_Widget *widget)
 {
-	LCUI_TextLayer *layer;
-	layer = TextBox_GetTextLayer( widget );
-	return TextLayer_CutSelectedText( layer );
+	// ...
+	return -1;
 }
 
 /** 指定文本框是否处理控制符 */
@@ -1232,7 +1223,7 @@ LCUI_API void TextBox_SetUsingStyleTags( LCUI_Widget *widget, LCUI_BOOL flag )
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
-	TextLayer_UsingStyleTags( layer, flag );
+	TextLayer_SetUsingStyleTags( layer, flag );
 }
 
 /** 指定文本框是否启用多行文本显示 */
@@ -1291,14 +1282,12 @@ TextBox_Text_SetMaxLength( LCUI_Widget *widget, int max )
 	TextLayer_Text_Set_MaxLength( layer, max );
 }
 
-LCUI_API void
-TextBox_Text_SetPasswordChar( LCUI_Widget *widget, wchar_t ch )
 /* 为文本框设置屏蔽字符 */
+LCUI_API void TextBox_Text_SetPasswordChar( LCUI_Widget *widget, wchar_t ch )
 {
 	LCUI_TextLayer *layer;
 	layer = TextBox_GetTextLayer( widget );
 	TextLayer_Text_SetPasswordChar( layer, ch );
-	TextLayer_Refresh( layer );
 	Widget_Update( widget );
 }
 
