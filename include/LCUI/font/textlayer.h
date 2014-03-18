@@ -113,6 +113,12 @@ typedef struct TextLayerRec_  {
         LCUI_Graph graph;		/* 文本位图缓存 */
 } LCUI_TextLayer;
 
+/** 获取文本行总数 */
+static inline int TextLayer_GetRowTotal( LCUI_TextLayer* layer )
+{
+	return layer->row_list.rows;
+}
+
 /** 获取指定文本行的高度 */
 static inline int TextLayer_GetRowHeight( LCUI_TextLayer* layer, int row )
 {
