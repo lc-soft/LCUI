@@ -4,6 +4,10 @@ bin/
 build/*/*.sdf
 build/*/*.opensdf
 build/*/*.suo
+*.lastbuildstate
+*.unsuccessfulbuild
+*.pdb
+*.idb
 *.tlog
 *.log
 *.obj
