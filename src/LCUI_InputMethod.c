@@ -62,8 +62,7 @@ static LCUIIME_Info* LCUIIME_FindByName( const char *name )
 }
 
 /* 注册一个输入法 */
-LCUI_API int
-LCUIIME_Register( const char *ime_name, LCUIIME_Func *ime_func )
+LCUI_API int LCUIIME_Register( const char *ime_name, LCUIIME_Func *ime_func )
 {
 	static int ime_id = 0; // 输入法的ID
 	LCUIIME_Info *ptr_data;
@@ -89,8 +88,7 @@ LCUIIME_Register( const char *ime_name, LCUIIME_Func *ime_func )
 }
 
 /* 选定输入法 */
-LCUI_API LCUI_BOOL
-LCUIIME_Select( int ime_id )
+LCUI_API LCUI_BOOL LCUIIME_Select( int ime_id )
 {
 	LCUIIME_Info *ptr_data;
 	ptr_data = LCUIIME_Find( ime_id );
@@ -101,8 +99,7 @@ LCUIIME_Select( int ime_id )
 	return TRUE;
 }
 
-LCUI_API LCUI_BOOL
-LCUIIME_SelectByName( const char *name )
+LCUI_API LCUI_BOOL LCUIIME_SelectByName( const char *name )
 {
 	LCUIIME_Info *ptr_data;
 	ptr_data = LCUIIME_FindByName( name );
@@ -114,8 +111,7 @@ LCUIIME_SelectByName( const char *name )
 }
 
 /* 打开输入法 */
-static LCUI_BOOL
-LCUIIME_Open( LCUIIME_Info *ime )
+static LCUI_BOOL LCUIIME_Open( LCUIIME_Info *ime )
 {
 	if( ime == NULL ) {
 		return FALSE;
@@ -127,8 +123,7 @@ LCUIIME_Open( LCUIIME_Info *ime )
 }
 
 /* 关闭输入法 */
-static LCUI_BOOL
-LCUIIME_Close( LCUIIME_Info *ime )
+static LCUI_BOOL LCUIIME_Close( LCUIIME_Info *ime )
 {
 	if( ime == NULL ) {
 		return FALSE;
@@ -140,8 +135,7 @@ LCUIIME_Close( LCUIIME_Info *ime )
 }
 
 /* 切换至下一个输入法 */
-LCUI_API void
-LCUIIME_Switch(void)
+LCUI_API void LCUIIME_Switch(void)
 {
 	int i=0, n;
 	LCUIIME_Info *ime_ptr;
@@ -235,8 +229,7 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 }
 
 /* 检测输入法是否要处理按键事件 */
-LCUI_API LCUI_BOOL
-LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
+LCUI_API LCUI_BOOL LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
 {
 	int key_state;
 	/* 根据事件类型判定按键状态 */
@@ -271,8 +264,7 @@ LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
 }
 
 /* 提交输入法输入的内容至目标 */
-LCUI_API int
-LCUIIME_Commit( const wchar_t *str )
+LCUI_API int LCUIIME_Commit( const wchar_t *str )
 {
 	LCUI_Widget *widget;
 	LCUI_WidgetEvent event;
@@ -295,8 +287,7 @@ LCUIIME_Commit( const wchar_t *str )
 }
 
 /* 设置输入法的目标 */
-LCUI_API int
-LCUIIME_SetTarget( LCUI_Widget *widget )
+LCUI_API int LCUIIME_SetTarget( LCUI_Widget *widget )
 {
 	if( current_ime == NULL ) {
 		return -1;
@@ -311,8 +302,7 @@ LCUIIME_SetTarget( LCUI_Widget *widget )
 static int LCUI_DefaultIMERegister(void);
 
 /* 初始化LCUI输入法模块 */
-LCUI_API void
-LCUIModule_IME_Init(void)
+LCUI_API void LCUIModule_IME_Init(void)
 {
 	int ime_id;
 	Queue_Init( &imelist, sizeof(LCUIIME_Info), LCUIIME_DestroyInfo );
@@ -322,8 +312,7 @@ LCUIModule_IME_Init(void)
 }
 
 /* 停用LCUI输入法模块 */
-LCUI_API void
-LCUIModule_IME_End(void)
+LCUI_API void LCUIModule_IME_End(void)
 {
 	imelist_init = FALSE;
 }
@@ -340,8 +329,7 @@ static LCUI_Widget *target_widget = NULL;
 按backspace键，如果输入的内容为空，则return FALSE;让LCUI将该按键事件发给部件
 的相应回调函数处理；否则，return TRUE;并从输入的内容中删除一个字符
 **/
-static LCUI_BOOL
-IME_ProcessKey( int key, int key_state )
+static LCUI_BOOL IME_ProcessKey( int key, int key_state )
 {
 #ifdef LCUI_BUILD_IN_LINUX
 	/* *
@@ -413,20 +401,17 @@ IME_ProcessKey( int key, int key_state )
 	return FALSE;
 }
 
-static void
-IME_SetTarget( LCUI_Widget *widget )
+static void IME_SetTarget( LCUI_Widget *widget )
 {
 	target_widget = widget;
 }
 
-static LCUI_Widget*
-IME_GetTarget( void )
+static LCUI_Widget* IME_GetTarget( void )
 {
 	return target_widget;
 }
 
-static void
-IME_ToText( char ch )
+static void IME_ToText( char ch )
 {
 	wchar_t text[2];
 	
@@ -446,16 +431,14 @@ IME_ToText( char ch )
  输入法被打开时的处理
  可以在输入法被打开时，初始化相关数据，链接至词库什么的
  **/
-static LCUI_BOOL
-IME_Open(void)
+static LCUI_BOOL IME_Open(void)
 {
 	return TRUE;
 }
 
 
 /* 输入法被关闭时的处理 */
-static LCUI_BOOL
-IME_Close(void)
+static LCUI_BOOL IME_Close(void)
 {
 	return TRUE;
 }
