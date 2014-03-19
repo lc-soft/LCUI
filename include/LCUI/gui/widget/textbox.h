@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * textbox.h -- Function declaration for TextBox widget 
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * textbox.h -- 一些文本框部件的操作函数的声明
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -42,130 +42,30 @@
 #ifndef __LCUI_TEXTBOX_H__
 #define __LCUI_TEXTBOX_H__
 
-#include LC_FONT_H
-
 LCUI_BEGIN_HEADER
+	
+#define WIDGET_TEXT_BOX "LCUI::TextBox"
+#define TextBox_New() Widget_New(WIDGET_TEXT_BOX)
 
-LCUI_API LCUI_Pos
-TextBox_ViewArea_GetPos( LCUI_Widget *widget );
-/* 获取文本显示区域的位置 */
-
-/** 更新文本框的文本显示区域 */
-LCUI_API int TextBox_UpdateViewArea( LCUI_Widget *widget );
-
-/** 获取文本框部件内的label部件指针 */
-LCUI_API LCUI_Widget* TextBox_GetLabel( LCUI_Widget *widget );
-
-/** 获取文本框部件内的光标 */
-LCUI_API LCUI_Widget* TextBox_GetCursor( LCUI_Widget *widget );
-
-/** 设置文本框是否显示光标 */
-LCUI_API void TextBox_ShowCursor( LCUI_Widget *widget, LCUI_BOOL is_show );
-
-/* 获取文本框内文本 */
-LCUI_API size_t
-TextBox_GetText( LCUI_Widget *widget, wchar_t *buff, size_t max_len );
-
-/* 获取文本框内的文本总长度 */
-LCUI_API int
-TextBox_Text_GetTotalLength( LCUI_Widget *widget );
-
-/** 设定文本框显示的文本 */
-LCUI_API void TextBox_TextW( LCUI_Widget *widget, const wchar_t *unicode_text );
-
-LCUI_API void TextBox_Text( LCUI_Widget *widget, const char *utf8_text );
-
-LCUI_API void
-TextBox_TextLayer_SetOffset( LCUI_Widget *widget, LCUI_Pos offset_pos );
-/* 为文本框内的文本图层设置偏移 */
-
-/* 在光标处添加文本 */
-LCUI_API void
-TextBox_Text_AddW( LCUI_Widget *widget, wchar_t *unicode_text );
-
-LCUI_API void
-TextBox_Text_AddA( LCUI_Widget *widget, char *ascii_text );
-
-LCUI_API void
-TextBox_Text_Add( LCUI_Widget *widget, char *utf8_text );
-
-/* 在文本末尾追加文本 */
-LCUI_API void
-TextBox_Text_AppendW( LCUI_Widget *widget, wchar_t *unicode_text );
-
-/* 在文本末尾追加文本 */
-LCUI_API void
-TextBox_Text_Append( LCUI_Widget *widget, char *utf8_text );
-
-LCUI_API int
-TextBox_Text_Backspace(LCUI_Widget *widget, int n);
-/* 删除光标左边处n个字符 */
-
-LCUI_API LCUI_Pos
-TextBox_Cursor_Update( LCUI_Widget *widget );
-/* 更新文本框的光标，返回该光标的像素坐标 */
-
-LCUI_API LCUI_Pos
-TextBox_Cursor_Move( LCUI_Widget *widget, LCUI_Pos new_pos );
-/* 移动文本框内的光标 */
-
-LCUI_API int
-TextBox_GetSelectedText( LCUI_Widget *widget, char *out_text );
-/* 获取文本框内被选中的文本 */
-
-LCUI_API int
-TextBox_CopySelectedText(LCUI_Widget *widget);
-/* 复制文本框内被选中的文本 */
-
-LCUI_API int
-TextBox_CutSelectedText(LCUI_Widget *widget);
-/* 剪切文本框内被选中的文本 */
+LCUI_API void RegisterTextBox( void );
 
 /** 指定文本框是否处理控制符 */
-LCUI_API void TextBox_SetUsingStyleTags( LCUI_Widget *widget, LCUI_BOOL flag );
+LCUI_API void TextBox_SetUsingStyleTags( LCUI_Widget *widget, LCUI_BOOL is_true );
 
 /** 指定文本框是否启用多行文本显示 */
-LCUI_API void TextBox_SetMultiline( LCUI_Widget *widget, LCUI_BOOL flag );
+LCUI_API void TextBox_SetMultiline( LCUI_Widget *widget, LCUI_BOOL is_true );
 
-/** 设置文本框的内容是否为只读 */
-LCUI_API void TextBox_SetReadOnly( LCUI_Widget *widget, LCUI_BOOL flag );
+/** 清空文本内容 */
+LCUI_API void TextBox_ClearText( LCUI_Widget *widget );
 
-/** 设置每次处理并显示的文本块的大小 */
-LCUI_API int TextBox_SetTextBlockSize( LCUI_Widget *widget, int size );
+/** 为文本框设置文本（宽字符版） */
+LCUI_API int TextBox_SetTextW( LCUI_Widget *widget, const wchar_t *wstr );
 
-/** 设置文本框内的文本是否自动换行 */
-LCUI_API void TextBox_SetAutoWrap( LCUI_Widget *widget, LCUI_BOOL is_true );
+/** 为文本框追加文本（宽字符版） */
+LCUI_API int TextBox_AppendTextW( LCUI_Widget *widget, const wchar_t *wstr );
 
-LCUI_API void
-TextBox_Text_SetDefaultStyle( LCUI_Widget *widget, LCUI_TextStyle style );
-/* 设定文本框内的文本的缺省样式 */
-
-LCUI_API void
-TextBox_Text_SetMaxLength( LCUI_Widget *widget, int max );
-/* 设置文本框中能够输入的最大字符数 */
-
-LCUI_API void
-TextBox_Text_SetPasswordChar( LCUI_Widget *widget, wchar_t ch );
-/* 为文本框设置屏蔽字符 */
-
-LCUI_API void
-TextBox_Text_SetPlaceHolderW(	LCUI_Widget *widget, 
-				LCUI_TextStyle *style,
-				const wchar_t *str );
-
-/* 为文本框设置占位符 */
-LCUI_API void
-TextBox_Text_SetPlaceHolder(	LCUI_Widget *widget, 
-				LCUI_TextStyle *style,
-				const char *str );
-
-
-/* 
- * 功能：限制能对文本框输入的字符
- * 说明：str中存放限制范围内的字符，设置后，文本框只接受输入该字符串内的字符
- * */
-LCUI_API void
-TextBox_LimitInput( LCUI_Widget *widget, wchar_t *str );
+/** 为文本框插入文本（宽字符版） */
+LCUI_API int TextBox_InsertTextW( LCUI_Widget *widget, const wchar_t *wstr );
 
 LCUI_END_HEADER
 
