@@ -247,7 +247,7 @@ extern void Register_Menu(void);
 extern void Register_CheckBox(void);
 extern void Register_RadioButton(void);
 extern void Register_ActiveBox(void);
-extern void Register_TextBox(void);
+extern void RegisterTextBox(void);
 extern void Register_ScrollBar(void);
 
 /* 为程序的部件库添加默认的部件类型 */
@@ -263,6 +263,6 @@ LCUI_API void Register_DefaultWidgetType(void)
 	Register_CheckBox();
 	Register_RadioButton();
 	Register_ActiveBox();
-	Register_TextBox();
+	RegisterTextBox();
 	Register_ScrollBar();
 }
