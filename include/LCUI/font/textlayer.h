@@ -57,12 +57,19 @@ typedef enum TextAddType_ {
 } TextAddType;
 
 typedef struct TextCharDataRec_ {
-        LCUI_BOOL need_display;		/* 是否需要显示该字 */
         LCUI_BOOL need_update;		/* 表示是否需要刷新该字的字体位图数据 */
         wchar_t char_code;		/* 字符码 */
         LCUI_TextStyle *style;		/* 该字符使用的样式数据 */
 	LCUI_FontBMP *bitmap;		/* 字体位图数据 */
 } TextCharData;
+
+/** 文本行结尾符 */
+typedef enum EOLChar_ {
+	EOL_NONE,	/**< 无换行 */
+	EOL_CR,		/**< Mac OS 格式换行，CF = Carriage-Return，字符：\r */
+	EOL_LF,		/**< UNIX/Linux 格式换行，LF = Line-Feed，字符：\r */
+	EOL_CR_LF	/**< Windows 格式换行： \r\n */
+} EOLChar;
 
 /* 文本行 */
 typedef struct TextRowDataRec_ {
@@ -73,6 +80,7 @@ typedef struct TextRowDataRec_ {
         int string_len;			/* 该行文本长度 */
         int string_max_len;		/* 该行文本最大长度 */
         TextCharData **string;		/* 该行文本的数据 */
+	EOLChar eol;			/* 行尾结束类型 */
 } TextRowData;
 
 /* 文本行列表 */
