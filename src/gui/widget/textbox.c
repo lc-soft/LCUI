@@ -57,8 +57,10 @@
 #define CARET_HIDE 0
 #define CARET_SHOW 1
 
-#define WIDGET_MSG_TEXT_BLOCK	(WIDGET_USER+1)
-#define WIDGET_MSG_CLEAR_TEXT	(WIDGET_USER+2)
+#define WIDGET_MSG_TEXT_BLOCK		(WIDGET_USER+1)
+#define WIDGET_MSG_CLEAR_TEXT		(WIDGET_USER+2)
+#define WIDGET_MSG_TEXT_DELETE		(WIDGET_USER+3)
+#define WIDGET_MSG_TEXT_BACKSPACE	(WIDGET_USER+4)
 
 #define TEXTBOX_DEFAULT_TEXT_BLOCK_SIZE	512
 
@@ -103,6 +105,7 @@ typedef struct LCUI_TextBlock_ {
 } LCUI_TextBlock;
 
 /*---------------------------------- Caret ----------------------------------*/
+/** 切换成现实状态 */
 static void Caret_BlinkShow( LCUI_Caret *caret )
 {
 	if( !caret->need_show ) {
@@ -113,6 +116,7 @@ static void Caret_BlinkShow( LCUI_Caret *caret )
 	LCUITimer_Reset( caret->timer_id, caret->blink_time );
 }
 
+/** 切换成现实隐藏 */
 static void Caret_BlinkHide( LCUI_Caret *caret )
 {
 	caret->state = CARET_HIDE;
@@ -424,6 +428,34 @@ static void TextBox_OnFocusOut(	LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 	Caret_SetVisible( &tb->caret, FALSE );
 }
 
+static void TextBox_DoTextBackspace( LCUI_Widget *widget, void *arg )
+{
+	LCUI_TextBox *tb;
+	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	TextLayer_Backspace( &tb->text, (int)arg );
+	Caret_BlinkShow( &tb->caret );
+	Widget_Draw( widget );
+}
+
+static void TextBox_DoTextDelete( LCUI_Widget *widget, void *arg )
+{
+	LCUI_TextBox *tb;
+	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	TextLayer_Delete( &tb->text, (int)arg );
+	Caret_BlinkShow( &tb->caret );
+	Widget_Draw( widget );
+}
+
+static void TextBox_TextBackspace( LCUI_Widget *widget, int n_ch )
+{
+	WidgetMsg_Post( widget, WIDGET_MSG_TEXT_BACKSPACE, (void*)n_ch, FALSE, FALSE );
+}
+
+static void TextBox_TextDelete(LCUI_Widget *widget, int n_ch )
+{
+	WidgetMsg_Post( widget, WIDGET_MSG_TEXT_DELETE, (void*)n_ch, FALSE, FALSE );
+}
+
 /** 处理按键事件 */
 static void TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 {
@@ -441,13 +473,13 @@ static void TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	cols = TextLayer_GetRowTextLength( &tb->text, cur_row );
 	rows = TextLayer_GetRowTotal( &tb->text ); 
 	switch( event->key.key_code ) {
-	    case LCUIKEY_HOMEPAGE: //home键移动光标至行首
+	case LCUIKEY_HOMEPAGE: //home键移动光标至行首
 		cur_col = 0;
 		break;
-	    case LCUIKEY_END: //end键移动光标至行尾
+	case LCUIKEY_END: //end键移动光标至行尾
 		cur_col = cols;
 		break;
-	    case LCUIKEY_LEFT:
+	case LCUIKEY_LEFT:
 		if( cur_col > 0 ) {
 			--cur_col;
 		} else if( cur_row > 0 ) {
@@ -455,7 +487,7 @@ static void TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 			cur_col = TextLayer_GetRowTextLength( &tb->text, cur_row );
 		}
 		break;
-	    case LCUIKEY_RIGHT:
+	case LCUIKEY_RIGHT:
 		if( cur_col < cols ) {
 			++cur_col;
 		} else if( cur_row < rows-1 ) {
@@ -463,21 +495,23 @@ static void TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 			cur_col = 0;
 		}
 		break;
-	    case LCUIKEY_UP:
+	case LCUIKEY_UP:
 		if( cur_row > 0 ) {
 			--cur_row;
 		}
 		break;
-	    case LCUIKEY_DOWN:
+	case LCUIKEY_DOWN:
 		if( cur_row < rows-1 ) {
 			++cur_row;
 		}
 		break;
-	    case LCUIKEY_BACKSPACE: //删除光标左边的字符
+	case LCUIKEY_BACKSPACE: //删除光标左边的字符
+		   TextBox_TextBackspace( widget, 1 );
 		break;
-	    case LCUIKEY_DELETE: //删除光标右边的字符
+	case LCUIKEY_DELETE: //删除光标右边的字符
+		    TextBox_TextDelete( widget, 1 );
 		break;
-	    default:break;
+	default:break;
 	}
 	TextBox_MoveCaret( widget, cur_row, cur_col );
 }
@@ -546,7 +580,8 @@ static void TextBox_OnInit( LCUI_Widget *widget )
 	TextBox_SetMultiline( widget, FALSE );
 	WidgetMsg_Connect( widget, WIDGET_MSG_CLEAR_TEXT, TextBox_DoClearText );
 	WidgetMsg_Connect( widget, WIDGET_MSG_TEXT_BLOCK, TextBox_ProcTextBlock );
-	
+	WidgetMsg_Connect( widget, WIDGET_MSG_TEXT_BACKSPACE, TextBox_DoTextBackspace );
+	WidgetMsg_Connect( widget, WIDGET_MSG_TEXT_DELETE, TextBox_DoTextDelete );
 	/* 关联按键输入事件 */
 	Widget_ConnectEvent( widget, EVENT_KEYBOARD, TextBox_ProcessKey );
 	Widget_ConnectEvent( widget, EVENT_INPUT, TextBox_OnInput );
