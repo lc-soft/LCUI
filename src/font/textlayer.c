@@ -811,8 +811,6 @@ static void TextLayer_BreakTextRow( LCUI_TextLayer *layer, int i_row,
 	p_row->eol = eol;
 	for( n=p_row->string_len-1; n>=col; --n ) {
 		TextRow_Insert( p_next_row, 0, p_row->string[n] );
-		/* 标记本字需要刷新 */
-		p_row->string[n]->need_update = TRUE;
 		p_row->string[n] = NULL;
 	}
 	p_row->string_len = col;
@@ -863,7 +861,6 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
 			p_char = p_next_row->string[col];
 			/* 忽略无字体位图的文字 */
 			if( !p_char->bitmap ) {
-				p_char->need_update = TRUE;
 				TextRow_Insert( p_row, p_row->string_len, p_char );
 				p_next_row->string[col] = NULL;
 				continue;
@@ -873,7 +870,6 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer* layer, int row )
 			if( !layer->is_autowrap_mode || layer->max_width <= 0
 			 || (layer->is_autowrap_mode && !layer->is_mulitiline_mode)
 			 || p_row->max_width <= layer->max_width ) {
-				p_char->need_update = TRUE;
 				TextRow_Insert( p_row, p_row->string_len, p_char );
 				p_next_row->string[col] = NULL;
 				continue;
@@ -925,17 +921,19 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 			TextAddType add_type, LCUI_StyleTagStack *tag_stack )
 {
 	EOLChar eol;
-	int cur_col, cur_row, ins_x, ins_y;
+	int cur_col, cur_row, start_row, ins_x, ins_y;
 	const wchar_t *p_end, *p, *pp;
 	TextRowData *p_row;
 	TextCharData char_data;
 	LCUI_Queue tmp_tag_stack;
-	LCUI_BOOL is_tmp_tag_stack = FALSE, need_typeset = FALSE;
+	LCUI_BOOL is_tmp_tag_stack, need_typeset, rect_has_added;
 
 	if( !wstr ) {
 		return -1;
 	}
-
+	is_tmp_tag_stack = FALSE;
+	need_typeset = FALSE;
+	rect_has_added = FALSE;
 	/* 如果是将文本追加至文本末尾 */
 	if( add_type == TEXT_ADD_TYPE_APPEND ) {
 		if( layer->row_list.rows > 0 ) {
@@ -956,6 +954,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 			p_row = TextRowList_AddNewRow( &layer->row_list );
 		}
 	}
+	start_row = cur_row;
 	ins_x = cur_col;
 	ins_y = cur_row;
 	/* 如果没有可用的标签栈，则使用临时的标签栈 */
@@ -995,6 +994,12 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 			} else {
 				eol = EOL_LF;
 			}
+			/* 如果没有记录过文本行的矩形区域 */
+			if( !rect_has_added ) {
+				TextLayer_InvalidateRowsRect( layer, ins_y, -1 );
+				rect_has_added = TRUE;
+				start_row = ins_y;
+			}
 			/* 将当前行中的插入点为截点，进行断行 */
 			TextLayer_BreakTextRow( layer, ins_y, ins_x, eol );
 			need_typeset = TRUE;
@@ -1005,7 +1010,6 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 		}
 
 		char_data.char_code = *p;
-		char_data.need_update = TRUE;
 		/* 获取当前文本样式数据 */
 		char_data.style = StyleTagStack_GetTextStyle( tag_stack );
 		/* 更新字体位图 */
@@ -1017,12 +1021,18 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 	TextRow_UpdateSize( p_row, layer->text_style.pixel_size );
 	if( add_type == TEXT_ADD_TYPE_INSERT ) {
 		layer->insert_x = ins_x;
+		layer->insert_y = ins_y;
 	}
 	/* 若启用了自动换行模式，则标记需要重新对文本进行排版 */
 	if( layer->is_autowrap_mode || need_typeset ) {
 		TaskData_AddUpdateTypeset( &layer->task, cur_row );
 	} else {
 		TextLayer_InvalidateRowRect( layer, cur_row );
+	}
+	/* 如果已经记录过文本行矩形区域 */
+	if( rect_has_added ) {
+		TextLayer_InvalidateRowsRect( layer, start_row, -1 );
+		rect_has_added = TRUE;
 	}
 	/* 如果使用的是临时标签栈，则销毁它 */
 	if( is_tmp_tag_stack ) {
@@ -1089,7 +1099,7 @@ LCUI_API int TextLayer_SetText( LCUI_TextLayer* layer, const char *utf8_text )
 	return 0;
 }
 
-/** 获取TextWidget中的文本（宽字符版） */
+/** 获取文本图层中的文本（宽字符版） */
 LCUI_API int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
 					int max_len, wchar_t *wstr_buff )
 {
@@ -1448,42 +1458,44 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LCUI_Queue *rect_list )
 	 } 
 }
 
-LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph, 
-					LCUI_Rect area, LCUI_Pos paint_pos )
+/** 
+ * 将文本图层中的指定区域的内容绘制至目标图像缓存中
+ * @param layer 要使用的文本图层
+ * @param area 文本图层中需要绘制的区域
+ * @param pos 文本图层在目标图像中的位置
+ * @param need_replace 绘制时是否需要覆盖像素
+ */
+LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
+		LCUI_Pos pos, LCUI_BOOL need_replace, LCUI_Graph *graph )
 {
 	int x, y, row, col;
 	LCUI_Pos char_pos;
 	TextRowData *p_row;
 	TextCharData *p_char;
+	LCUI_Rect paint_bound;
+	LCUI_Size box_size;
+	LCUI_Graph target_graph;
 
-	/* 如果TextWidget的位置在绘制区域内，则调整可绘制区域 */
-	if( area.x < paint_pos.x ) {
-		area.width -= (paint_pos.x - area.x);
-		area.x = paint_pos.x;
-	}
-	if( area.y < paint_pos.y ) {
-		area.height -= (paint_pos.y - area.y);
-		area.y = paint_pos.y;
-	}
-	/* 若设置了TextWidget的最大尺寸，则根据该尺寸调整可绘制区域 */
-	if( layer->max_width > 0 ) {
-		if( paint_pos.x + layer->max_width < area.x + area.width ) {
-			area.width = paint_pos.x + layer->max_width - area.x;
-		}
-	}
-	if( layer->max_height > 0 ) {
-		if( paint_pos.y + layer->max_height < area.y + area.height ) {
-			area.height = paint_pos.y + layer->max_height - area.y;
-		}
-	}
+	Graph_Init( &target_graph );
+	box_size.w = layer->max_width;
+	box_size.h = layer->max_height;
+	/* 调整区域范围，使之有效 */
+	area = LCUIRect_ValidArea( box_size, area );
+	/* 计算绘制边界 */
+	paint_bound.x = pos.x;
+	paint_bound.y = pos.y;
+	paint_bound.w = area.w;
+	paint_bound.h = area.h;
+	/* 引用目标图像中的绘制区域 */
+	Graph_Quote( &target_graph, graph, paint_bound );
 	/* 加上Y轴坐标偏移量 */
-	y = paint_pos.y + layer->offset_y;
+	y = layer->offset_y;
 	/* 先确定从哪一行开始绘制 */
 	for( row=0; row<layer->row_list.rows; ++row ) {
 		p_row = TextRowList_GetRow( &layer->row_list, row );
 		y += p_row->top_spacing;
 		y += p_row->max_height;
-		if( y > area.y && y > paint_pos.y ) {
+		if( y > area.y ) {
 			y -= p_row->top_spacing;
 			y -= p_row->max_height;
 			break;
@@ -1511,18 +1523,18 @@ LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph,
 			break;
 		}
 		y += p_row->top_spacing;
-		x += paint_pos.x;
+		x += pos.x;
 		x += layer->offset_x;
 		
 		/* 确定从哪个文字开始绘制 */
 		for( col=0; col<p_row->string_len; ++col ) {
 			p_char = p_row->string[col];
-			/* 忽略不需要显示、无字体位图的文字 */
+			/* 忽略无字体位图的文字 */
 			if( !p_char->bitmap ) {
 				continue;
 			}
 			x += p_char->bitmap->advance.x;
-			if( x > paint_pos.x && x > area.x ) {
+			if( x > area.x ) {
 				x -= p_char->bitmap->advance.x;
 				break;
 			}
@@ -1536,7 +1548,6 @@ LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph,
 		/* 遍历该行的文字 */
 		for( ; col<p_row->string_len; ++col ) {
 			p_char = p_row->string[col];
-			/* 忽略不需要显示、无字体位图的文字 */
 			if( !p_char->bitmap ) {
 				continue;
 			}
@@ -1547,13 +1558,18 @@ LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph,
 			x += p_char->bitmap->advance.x;
 			/* 判断文字使用的前景颜色，再进行绘制 */
 			if( p_char->style && p_char->style->_fore_color ) {
-				FontBMP_Mix( graph, char_pos, p_char->bitmap,
-						p_char->style->fore_color,
-						GRAPH_MIX_FLAG_REPLACE );
+				FontBMP_Mix( 
+					&target_graph, char_pos,
+					p_char->bitmap,
+					p_char->style->fore_color,
+					need_replace );
 			} else {
-				FontBMP_Mix( graph, char_pos, p_char->bitmap,
-						layer->text_style.fore_color,
-						GRAPH_MIX_FLAG_REPLACE );
+				FontBMP_Mix( 
+					&target_graph, char_pos,
+					p_char->bitmap, 
+					layer->text_style.fore_color,
+					need_replace 
+				);
 			}
 			/* 如果超过绘制区域则不继续绘制该行文本 */
 			if( x > area.x + area.width ) {
@@ -1573,12 +1589,16 @@ LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph,
 /** 绘制文本 */
 LCUI_API int TextLayer_Draw( LCUI_TextLayer* layer )
 {
+	LCUI_Rect rect;
 	/* 如果文本位图缓存无效 */
 	if( layer->is_using_buffer && !Graph_IsValid( &layer->graph ) ) {
 		return -1;
 	}
-	return TextLayer_DrawToGraph( layer, &layer->graph, 
-		Rect(0, 0, layer->max_width, layer->max_height), Pos(0,0) );
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = layer->max_width;
+	rect.h = layer->max_height;
+	return TextLayer_DrawToGraph( layer, rect, Pos(0,0), TRUE, &layer->graph );
 }
 
 /** 清除已记录的无效矩形 */
