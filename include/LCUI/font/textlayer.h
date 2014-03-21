@@ -57,7 +57,6 @@ typedef enum TextAddType_ {
 } TextAddType;
 
 typedef struct TextCharDataRec_ {
-        LCUI_BOOL need_update;		/* 表示是否需要刷新该字的字体位图数据 */
         wchar_t char_code;		/* 字符码 */
         LCUI_TextStyle *style;		/* 该字符使用的样式数据 */
 	LCUI_FontBMP *bitmap;		/* 字体位图数据 */
@@ -231,7 +230,7 @@ LCUI_API int TextLayer_SetTextA( LCUI_TextLayer* layer, const char *ascii_text )
 /** 设置文本内容（UTF-8版） */
 LCUI_API int TextLayer_SetText( LCUI_TextLayer* layer, const char *utf8_text );
 
-/** 获取TextWidget中的文本（宽字符版） */
+/** 获取文本图层中的文本（宽字符版） */
 LCUI_API int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
 					int max_len, wchar_t *wstr_buff );
 
@@ -268,8 +267,15 @@ LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer );
 /** 更新数据 */
 LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LCUI_Queue *rect_list );
 
-LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer* layer, LCUI_Graph *graph, 
-					LCUI_Rect area, LCUI_Pos paint_pos );
+/** 
+ * 将文本图层中的指定区域的内容绘制至目标图像缓存中
+ * @param layer 要使用的文本图层
+ * @param area 文本图层中需要绘制的区域
+ * @param pos 文本图层在目标图像中的位置
+ * @param need_replace 绘制时是否需要覆盖像素
+ */
+LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
+		LCUI_Pos pos, LCUI_BOOL need_replace, LCUI_Graph *graph );
 
 /** 绘制文本 */
 LCUI_API int TextLayer_Draw( LCUI_TextLayer* layer );
