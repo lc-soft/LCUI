@@ -3,7 +3,7 @@
  * @brief	The Bitmap Font operation set.
  * @author	Liu Chao <lc-soft@live.cn>
  * @warning
- * Copyright (C) 2012-2013 by							\n
+ * Copyright (C) 2012-2014 by							\n
  * Liu Chao									\n
  * 										\n
  * This file is part of the LCUI project, and may only be used, modified, and	\n
@@ -27,7 +27,7 @@
  * @brief	位图字体的操作集
  * @author	刘超 <lc-soft@live.cn>
  * @warning
- * 版权所有 (C) 2012-2013 归属于						\n
+ * 版权所有 (C) 2012-2014 归属于						\n
  * 刘超										\n
  * 										\n
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。	\n
@@ -91,17 +91,12 @@ LCUI_API int FontBMP_Create( LCUI_FontBMP *bitmap, int width, int rows );
 LCUI_API int FontBMP_Print( LCUI_FontBMP *fontbmp );
 
 /** 将字体位图绘制到目标图像上 */
-LCUI_API int FontBMP_Mix(	LCUI_Graph	*graph,
-				LCUI_Pos	des_pos,
-				LCUI_FontBMP	*bitmap,
-				LCUI_RGB	color,
-				int		flag );
+LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
+				LCUI_RGB color, LCUI_BOOL need_replace );
 
 /** 载入字体位图 */
-LCUI_API int FontBMP_Load(	LCUI_FontBMP *buff,
-				int font_id,
-				wchar_t ch,
-				int pixel_size  );
+LCUI_API int FontBMP_Load( LCUI_FontBMP *buff, int font_id, 
+				wchar_t ch, int pixel_size );
 LCUI_END_HEADER
 
 #endif

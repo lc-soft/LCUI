@@ -3,7 +3,7 @@
  * @brief	The Bitmap Font operation set.
  * @author	Liu Chao <lc-soft@live.cn>
  * @warning
- * Copyright (C) 2012-2013 by							\n
+ * Copyright (C) 2012-2014 by							\n
  * Liu Chao									\n
  * 										\n
  * This file is part of the LCUI project, and may only be used, modified, and	\n
@@ -27,7 +27,7 @@
  * @brief	位图字体的操作集
  * @author	刘超 <lc-soft@live.cn>
  * @warning
- * 版权所有 (C) 2012-2013 归属于						\n
+ * 版权所有 (C) 2012-2014 归属于						\n
  * 刘超										\n
  * 										\n
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。	\n
@@ -209,8 +209,8 @@ LCUI_API int FontBMP_Print( LCUI_FontBMP *fontbmp )
 }
 
 /** 将字体位图绘制到目标图像上 */
-LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos des_pos, 
-			LCUI_FontBMP *bitmap, LCUI_RGB color, int flag )
+LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
+				LCUI_RGB color, LCUI_BOOL need_replace )
 {
 	LCUI_Graph *des;
 	LCUI_Rect des_rect, cut;
@@ -218,7 +218,7 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos des_pos,
 	int src_start_pos, des_start_pos;
 
 	/* 数据有效性检测 */
-	if( !FontBMP_IsValid( bitmap )
+	if( !FontBMP_IsValid( bmp )
 	 || !Graph_IsValid( graph ) ) {
 		return -1;
 	}
@@ -227,42 +227,42 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos des_pos,
 	/* 获取背景图引用的源图形 */
 	des = Graph_GetQuote( graph );
 	/* 起点位置的有效性检测 */
-	if(des_pos.x > des->w || des_pos.y > des->h) {
+	if(pos.x > des->w || pos.y > des->h) {
 		return -2;
 	}
 	/* 获取需要裁剪的区域 */
 	if( LCUIRect_GetCutArea( Size( des_rect.width, des_rect.height ),
-		Rect( des_pos.x, des_pos.y, bitmap->width, bitmap->rows ),
+		Rect( pos.x, pos.y, bmp->width, bmp->rows ),
 		&cut
 	)) {
-		des_pos.x += cut.x;
-		des_pos.y += cut.y;
+		pos.x += cut.x;
+		pos.y += cut.y;
 	}
 
 	/* 如果是以叠加模式绘制字体位图 */
-	if( flag == GRAPH_MIX_FLAG_OVERLAY ) {
+	if( !need_replace ) {
 		/* 预先计算起点位置 */
-		src_start_pos = cut.y * bitmap->width + cut.x;
-		des_start_pos = (des_pos.y + des_rect.y) * des->w + des_pos.x + des_rect.x;
+		src_start_pos = cut.y * bmp->width + cut.x;
+		des_start_pos = (pos.y + des_rect.y) * des->w + pos.x + des_rect.x;
 		for (y = 0; y < cut.height; ++y) {
 			m = src_start_pos;
 			n = des_start_pos;
 			total = n + cut.width;
 			for (; n < total; ++n,++m) {
 				/* 获取通过ALPHA混合后的像素点的数据 */
-				ALPHA_BLEND( color.red, des->rgba[0][n], bitmap->buffer[m] );
-				ALPHA_BLEND( color.green, des->rgba[1][n], bitmap->buffer[m] );
-				ALPHA_BLEND( color.blue, des->rgba[2][n], bitmap->buffer[m] );
+				ALPHA_BLEND( color.red, des->rgba[0][n], bmp->buffer[m] );
+				ALPHA_BLEND( color.green, des->rgba[1][n], bmp->buffer[m] );
+				ALPHA_BLEND( color.blue, des->rgba[2][n], bmp->buffer[m] );
 			}
 			/* 切换至下一行像素点 */
 			des_start_pos += des->w;
-			src_start_pos += bitmap->width;
+			src_start_pos += bmp->width;
 		}
 		return 0;
 	}
 	/* 否则是以覆盖模式 */
-	src_start_pos = cut.y * bitmap->width + cut.x;
-	des_start_pos = (des_pos.y + des_rect.y) * des->w + des_pos.x + des_rect.x;
+	src_start_pos = cut.y * bmp->width + cut.x;
+	des_start_pos = (pos.y + des_rect.y) * des->w + pos.x + des_rect.x;
 	for (y = 0; y < cut.height; ++y) {
 		m = src_start_pos;
 		n = des_start_pos;
@@ -272,12 +272,12 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos des_pos,
 			des->rgba[1][n] = color.green;
 			des->rgba[2][n] = color.blue;
 			/* 仅在有透明度时才覆盖 */
-			if( bitmap->buffer[m] > 0 ) {
-				des->rgba[3][n] = bitmap->buffer[m];
+			if( bmp->buffer[m] > 0 ) {
+				des->rgba[3][n] = bmp->buffer[m];
 			}
 		}
 		des_start_pos += des->w;
-		src_start_pos += bitmap->width;
+		src_start_pos += bmp->width;
 	}
 	return 0;
 }
@@ -377,10 +377,8 @@ static int Convert_FTGlyph(	LCUI_FontBMP *des,
 #endif
 
 /** 载入字体位图 */
-LCUI_API int FontBMP_Load(	LCUI_FontBMP *buff,
-				int font_id,
-				wchar_t ch,
-				int pixel_size  )
+LCUI_API int FontBMP_Load( LCUI_FontBMP *buff, int font_id, 
+				wchar_t ch, int pixel_size )
 {
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 	size_t size;

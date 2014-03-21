@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * rect.c -- Rectangle area handling
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * rect.c -- 矩形区域处理
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -122,11 +122,10 @@ LCUIRect_GetCutArea( LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut )
 
 /* 
  * 功能：获取指定区域在容器中的有效显示区域 
- * 说明：指定容器的区域大小，再指定容器中的区域位置及大小，就能得到该容器实际能显示
- * 出的该区域范围。
+ * 说明：指定容器的区域大小，再指定容器中的区域位置及大小，就能得到该容器实际
+ * 能显示出的该区域范围。
  * */
-LCUI_API LCUI_Rect
-LCUIRect_ValidArea( LCUI_Size container, LCUI_Rect rect )
+LCUI_API LCUI_Rect LCUIRect_ValidArea( LCUI_Size box_size, LCUI_Rect rect )
 {
 	if (rect.x < 0) {
 		rect.width += rect.x;
@@ -137,16 +136,16 @@ LCUIRect_ValidArea( LCUI_Size container, LCUI_Rect rect )
 		rect.y = 0;
 	}
 	
-	if (rect.x + rect.width > container.w) {
-		if(rect.x < container.w) {
-			rect.width = container.w - rect.x; 
+	if (rect.x + rect.width > box_size.w) {
+		if(rect.x < box_size.w) {
+			rect.width = box_size.w - rect.x; 
 		} else {
 			rect.width = 0;
 		}
 	}
-	if (rect.y + rect.height > container.h) {
-		if(rect.y < container.h) {
-			rect.height = container.h - rect.y; 
+	if (rect.y + rect.height > box_size.h) {
+		if(rect.y < box_size.h) {
+			rect.height = box_size.h - rect.y; 
 		} else {
 			rect.height = 0;
 		}
