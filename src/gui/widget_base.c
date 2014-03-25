@@ -746,8 +746,7 @@ print_widget_info(LCUI_Widget *widget)
 }
 
 /* 在指定部件的内部区域内设定需要刷新的区域 */
-LCUI_API int
-Widget_InvalidArea( LCUI_Widget *widget, LCUI_Rect rect )
+LCUI_API int Widget_InvalidateArea( LCUI_Widget *widget, LCUI_Rect rect )
 {
 	if( !widget ) {
 		return LCUIScreen_InvalidArea( rect );
@@ -766,6 +765,18 @@ Widget_InvalidArea( LCUI_Widget *widget, LCUI_Rect rect )
 	/* 保存至队列中 */
 	DoubleRectQueue_AddToValid( &widget->invalid_area, rect );
 	return 0;
+}
+
+/** 获取部件中的无效区域 */
+LCUI_API int Widget_GetInvalidArea( LCUI_Widget *widget, LCUI_Rect *area )
+{
+	return DoubleRectQueue_GetFromCurrent( &widget->invalid_area, area );
+}
+
+/** 使部件中的一块区域有效化 */
+LCUI_API void Widget_ValidateArea( LCUI_Widget *widget, LCUI_Rect area )
+{
+	
 }
 
 /*
@@ -853,15 +864,15 @@ Widget_SyncInvalidArea( void )
 
 /*
  * 功能：让指定部件响应部件状态的改变
- * 说明：部件创建时，默认是不响应状态改变的，因为每次状态改变后，都要调用函数重绘部件，
- * 这对于一些部件是多余的，没必要重绘，影响效率。如果想让部件能像按钮那样，鼠标移动到它
- * 上面时以及鼠标点击它时，都会改变按钮的图形样式，那就需要用这个函数设置一下。
+ * 说明：部件创建时，默认是不响应状态改变的，因为每次状态改变后，都要调用函数
+ * 重绘部件，这对于一些部件是多余的，没必要重绘，影响效率。如果想让部件能像按
+ * 钮那样，鼠标移动到它上面时以及鼠标点击它时，都会改变按钮的图形样式，那就需
+ * 要用这个函数设置一下。
  * 用法：
  * Widget_SetValidState( widget, WIDGET_STATE_NORMAL );
  * Widget_SetValidState( widget, WIDGET_STATE_OVERLAY | WIDGET_STATE_ACTIVE );
  * */
-LCUI_API void
-Widget_SetValidState( LCUI_Widget *widget, int state )
+LCUI_API void Widget_SetValidState( LCUI_Widget *widget, int state )
 {
 	widget->valid_state = state;
 }
@@ -1616,7 +1627,7 @@ LCUI_API void Widget_SetPadding( LCUI_Widget *widget, LCUI_Padding padding )
 }
 
 /** 设定部件的定位类型 */
-LCUI_API void Widget_SetPosType( LCUI_Widget *widget, POS_TYPE pos_type )
+LCUI_API void Widget_SetPosType( LCUI_Widget *widget, PositionType pos_type )
 {
 	widget->pos_type = pos_type;
 	Widget_UpdatePos( widget );
@@ -1968,9 +1979,8 @@ LCUI_API void Widget_ExecUpdate( LCUI_Widget *widget )
 	WidgetFunc_Call( widget, FUNC_TYPE_UPDATE );
 }
 
-LCUI_API void Widget_ExecDrawBackground( LCUI_Widget *widget )
+static int Widget_DrawBackground( LCUI_Widget *widget, LCUI_Rect area )
 {
-	int fill_mode;
 	LCUI_Graph *graph;
 	LCUI_Background *bg;
 
@@ -1978,47 +1988,41 @@ LCUI_API void Widget_ExecDrawBackground( LCUI_Widget *widget )
 	bg = &widget->background;
 	/* 如果背景透明，则使用覆盖模式将背景图绘制到部件上 */
 	if( bg->transparent ) {
-		fill_mode = GRAPH_MIX_FLAG_REPLACE;
-	} else { /* 否则，使用叠加模式 */
-		fill_mode = GRAPH_MIX_FLAG_OVERLAY;
+		return Graph_FillImage( graph, &bg->image, bg->layout, area );
 	}
-	fill_mode |= bg->layout;
-	Graph_FillImage( graph, &bg->image, fill_mode, bg->color );
+	/* 否则，使用叠加模式 */
+	return Graph_FillImageWithColor( graph, &bg->image, bg->layout,
+							bg->color, area );
 }
 
-/** 执行部件图层重绘操作 */
-LCUI_API void Widget_ExecDraw(LCUI_Widget *widget)
+/** 
+ * 执行重绘部件前的一些任务
+ * @param[in] widget 需要重绘的部件
+ * @param[out] area 需要进行重绘的区域
+ * @returns 正常返回TRUE，没有无效区域则返回FALSE
+ */
+LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget *widget, LCUI_Rect *area )
+{
+	int ret;
+	ret = Widget_GetInvalidArea( widget, area );
+	if( ret != 0 ) {
+		return FALSE;
+	}
+	Widget_DrawBackground( widget, *area );
+	return TRUE;
+}
+
+/** 执行重绘部件后的一些任务 */
+LCUI_API void Widget_EndPaint( LCUI_Widget *widget, LCUI_Rect *area )
 {
 	LCUI_Graph *graph;
-	LCUI_WidgetEvent event;
-
-	if( !widget ) {
-		return;
-	}
-	/* 先更新一次部件 */
-	//Widget_ExecUpdate( widget );
-	/* 然后根据部件样式，绘制背景图形 */
-	Widget_ExecDrawBackground( widget );
-	/* 调用该类型部件默认的函数进行处理 */
-	WidgetFunc_Call( widget, FUNC_TYPE_DRAW );
 	graph = Widget_GetSelfGraph( widget );
-	/* 绘制边框线 */
-	Graph_DrawBorder( graph, widget->border );
-
-	event.type = EVENT_REDRAW;
-	Widget_DispatchEvent( widget, &event );
-	Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
-}
-
-/** 获取指向部件自身图形数据的指针 */
-LCUI_API LCUI_Graph* Widget_GetSelfGraph( LCUI_Widget *widget )
-{
-	return GraphLayer_GetSelfGraph( widget->glayer );
+	Graph_DrawBorderEx( graph, widget->border, *area );
+	Widget_ValidateArea( widget, *area );
 }
 
 /** 获取部件实际显示的图形 */
-LCUI_API int Widget_GetGraph(	LCUI_Widget *widget,
-				LCUI_Graph *graph_buff, 
+LCUI_API int Widget_GetGraph( LCUI_Widget *widget, LCUI_Graph *graph_buff,
 				LCUI_Rect rect )
 {
 	return GraphLayer_GetGraph( widget->glayer, graph_buff, rect );
@@ -2206,7 +2210,7 @@ LCUI_API void Widget_SetModal( LCUI_Widget *widget, LCUI_BOOL is_modal )
 }
 
 /** 设定部件的停靠类型 */
-LCUI_API void Widget_SetDock( LCUI_Widget *widget, DOCK_TYPE dock )
+LCUI_API void Widget_SetDock( LCUI_Widget *widget, DockType dock )
 {
 	switch( dock ) {
 	    case DOCK_TYPE_TOP:
@@ -2451,7 +2455,7 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 		if( widget->state == data_ptr->data.state ) {
 			break;
 		}
-		widget->state = (WIDGET_STATE)data_ptr->data.state;
+		widget->state = (WidgetState)data_ptr->data.state;
 		Widget_Draw( widget );
 		break;
 	case WIDGET_CHGALPHA:
@@ -2465,7 +2469,7 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 		if( Widget_TryLock( widget ) != 0 ) {
 			return FALSE;
 		}
-		Widget_ExecDraw( widget );
+		WidgetFunc_Call( widget, FUNC_TYPE_PAINT );
 		Widget_Unlock( widget );
 		break;
 	case WIDGET_HIDE:
@@ -2497,4 +2501,10 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 		break;
 	}
 	return TRUE;
+}
+
+/** 更新各个部件的无效区域中的内容 */
+LCUI_API void LCUIWidget_UpdateInvalidArea(void)
+{
+	/* 优先重绘顶层部件中的无效区域的内容 */
 }
