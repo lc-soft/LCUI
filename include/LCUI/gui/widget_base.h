@@ -386,7 +386,7 @@ Widget_SetMargin( LCUI_Widget *widget, LCUI_Margin margin );
 
 /* 设定部件的定位类型 */
 LCUI_API void
-Widget_SetPosType( LCUI_Widget *widget, POS_TYPE pos_type );
+Widget_SetPosType( LCUI_Widget *widget, PositionType pos_type );
 
 /* 获取部件的堆叠顺序 */
 LCUI_API int Widget_GetZIndex( LCUI_Widget *widget );
@@ -440,20 +440,26 @@ Widget_ExecRefresh(LCUI_Widget *widget);
 LCUI_API void
 Widget_ExecUpdate(LCUI_Widget *widget);
 
-/* 执行部件图形更新操作 */
-LCUI_API void
-Widget_ExecDraw(LCUI_Widget *widget);
+/** 
+ * 执行重绘部件前的一些任务
+ * @param[in] widget 需要重绘的部件
+ * @param[out] area 需要进行重绘的区域
+ * @returns 正常返回TRUE，没有无效区域则返回FALSE
+ */
+LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget *widget, LCUI_Rect *area );
 
-/* 获取指向部件自身图形数据的指针 */
-LCUI_API LCUI_Graph*
-Widget_GetSelfGraph( LCUI_Widget *widget );
+/** 执行重绘部件后的一些任务 */
+LCUI_API void Widget_EndPaint( LCUI_Widget *widget, LCUI_Rect *area );
+
+/** 获取部件自身的图像 */
+static inline LCUI_Graph* Widget_GetSelfGraph( LCUI_Widget *widget )
+{
+	return GraphLayer_GetSelfGraph( widget->glayer );
+}
 
 /* 获取部件实际显示的图形 */
-LCUI_API int
-Widget_GetGraph(
-	LCUI_Widget *widget,
-	LCUI_Graph *graph_buff,
-	LCUI_Rect rect );
+LCUI_API int Widget_GetGraph( LCUI_Widget *widget, LCUI_Graph *graph_buff,
+				LCUI_Rect rect );
 
 /* 获取有效化后的坐标数据，其实就是将在限制范围外的坐标处理成在限制范围内的 */
 LCUI_API LCUI_Pos
@@ -515,7 +521,7 @@ LCUI_API void Widget_SetSize( LCUI_Widget *widget, char *width, char *height );
 LCUI_API void Widget_SetModal( LCUI_Widget *widget, LCUI_BOOL is_modal );
 
 /** 设定部件的停靠类型 */
-LCUI_API void Widget_SetDock( LCUI_Widget *widget, DOCK_TYPE dock );
+LCUI_API void Widget_SetDock( LCUI_Widget *widget, DockType dock );
 
 /** 刷新显示指定部件的整个区域图形 */
 LCUI_API void Widget_Refresh(LCUI_Widget *widget);
@@ -556,5 +562,8 @@ LCUI_API void Widget_SetAlpha( LCUI_Widget *widget, uchar_t alpha );
 /************************* Widget End *********************************/
 
 LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr );
+
+/** 更新各个部件的无效区域中的内容 */
+LCUI_API void LCUIWidget_UpdateInvalidArea(void);
 
 #endif
