@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * LCUI_Widget.h -- GUI widget operation set.
  *
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Widget.h -- GUI部件操作集
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -48,46 +48,44 @@ LCUI_BEGIN_HEADER
 typedef void (*WidgetCallBackFunc)(LCUI_Widget*);
 
 /***************** 部件相关函数的类型 *******************/
-typedef enum FuncType_
-{
+typedef enum WidgetFuncType_ {
 	FUNC_TYPE_SHOW,
 	FUNC_TYPE_HIDE,
 	FUNC_TYPE_INIT,
-	FUNC_TYPE_DRAW,
+	FUNC_TYPE_PAINT,
 	FUNC_TYPE_RESIZE,
 	FUNC_TYPE_UPDATE,
 	FUNC_TYPE_DESTROY
-}FuncType;
+} WidgetFuncType;
 /****************************************************/
 
 /***************************** 定位类型 ********************************/
-typedef enum POS_TYPE_ {
+typedef enum PositionType_ {
 	POS_TYPE_STATIC,
 	POS_TYPE_RELATIVE,
 	POS_TYPE_ABSOLUTE,
 	POS_TYPE_FIXED,
-} POS_TYPE;
+} PositionType;
 /**********************************************************************/
 
 /*------------ 部件停靠类型 --------------*/
-typedef enum DOCK_TYPE_ {
+typedef enum DockType_ {
 	DOCK_TYPE_NONE,
 	DOCK_TYPE_TOP,
 	DOCK_TYPE_LEFT,
 	DOCK_TYPE_RIGHT,
 	DOCK_TYPE_FILL,
 	DOCK_TYPE_BOTTOM
-}
-DOCK_TYPE;
+} DockType;
 /*---------------- END -----------------*/
 
 /* --------------------- 部件状态 -----------------------*/
-typedef enum WIDGET_STATE_ {
+typedef enum WidgetState_ {
 	WIDGET_STATE_NORMAL = 1,	/* 普通状态 */
 	WIDGET_STATE_DISABLE = 1<<1,	/* 禁用状态 */
 	WIDGET_STATE_OVERLAY = 1<<2,	/* 被鼠标游标覆盖 */
 	WIDGET_STATE_ACTIVE = 1<<3,	/* 被鼠标点击 */
-} WIDGET_STATE;
+} WidgetState;
 /* ------------------------------------------------------*/
 
 /*--------------------- 背景属性 --------------------------*/
@@ -131,10 +129,10 @@ struct LCUI_Widget_ {
 	/*--------------- END -------------------*/
 
 	/*----------------- 部件布局相关 ----------------*/
-	POS_TYPE	pos_type;	/* 位置类型 */
+	PositionType	pos_type;	/* 位置类型 */
 	ALIGN_TYPE	align;		/* 布局 */
 	LCUI_Pos	offset;		/* x，y轴的偏移量 */
-	DOCK_TYPE	dock;		/* 停靠位置 */
+	DockType	dock;		/* 停靠位置 */
 	/*------------------ END ----------------------*/
 
 	LCUI_RGB color;			/* 前景颜色 */
@@ -148,7 +146,7 @@ struct LCUI_Widget_ {
 	LCUI_Queue msg_func;		/* 记录与自定义消息关联的函数 */
 	LCUI_RectQueue invalid_area;	/* 记录无效区域 */
 
-	WIDGET_STATE state;	/* 部件当前状态 */
+	WidgetState state;	/* 部件当前状态 */
 	int valid_state;	/* 对部件有效的状态 */
 
 	LCUI_BOOL auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */

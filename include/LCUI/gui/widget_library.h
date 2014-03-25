@@ -9,7 +9,7 @@ LCUI_BEGIN_HEADER
  **/
 LCUI_API int WidgetFunc_Add(	const char *type_name,
 				void (*widget_func)(LCUI_Widget*),
-				FuncType func_type );
+				WidgetFuncType func_type );
 
 /* 获取指定类型部件的类型ID */
 LCUI_API LCUI_ID WidgetType_GetID( const char *widget_type );
@@ -31,17 +31,17 @@ LCUI_API int WidgetType_GetNameByID( LCUI_ID type_id, char *widget_type );
 
 /* 获取指定部件类型ID的函数的函数指针 */
 LCUI_API WidgetCallBackFunc WidgetFunc_GetByID( LCUI_ID id,
-						FuncType func_type );
+						WidgetFuncType func_type );
 
 /* 获取指定类型名的部件的函数指针 */
 LCUI_API WidgetCallBackFunc WidgetFunc_Get(	const char *widget_type,
-						FuncType func_type );
+						WidgetFuncType func_type );
 
 /* 检测指定部件类型是否有效 */
 LCUI_API LCUI_BOOL WidgetType_Valid( const char *widget_type );
 
 /* 调用指定类型的部件函数 */
-LCUI_API void WidgetFunc_Call( LCUI_Widget *widget, FuncType type );
+LCUI_API void WidgetFunc_Call( LCUI_Widget *widget, WidgetFuncType type );
 
 /* 为程序的部件库添加默认的部件类型 */
 LCUI_API void Register_DefaultWidgetType(void);
