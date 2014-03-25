@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * LCUI_Graph.h -- The base graphics handling module for LCUI
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Graph.h -- LCUI的基本图形处理模块
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -163,14 +163,33 @@ LCUI_API int Graph_Replace(	LCUI_Graph *back_graph,
 
 LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int flag );
 
-
-LCUI_API int Graph_FillImage(	LCUI_Graph *graph,
-				LCUI_Graph *bg, 
-				int mode,
-				LCUI_RGB color );
-
 LCUI_API int Graph_FillAlpha( LCUI_Graph *src, uchar_t alpha );
- 
+
+/** 填充图像
+ * @param graph		目标图像
+ * @param backimg	要填充的背景图
+ * @param layout	背景图的布局
+ * @param area		需要绘制的区域
+ */
+LCUI_API int Graph_FillImageEx( LCUI_Graph *graph, LCUI_Graph *backimg,
+					     int layout, LCUI_Rect area );
+
+/** 填充图像和背景色
+ * @param graph		目标图像
+ * @param backimg	背景图
+ * @param layout	背景图的布局
+ * @param color		背景色
+ * @param area		需要绘制的区域
+ */
+LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph, 
+	LCUI_Graph *backimg, int layout, LCUI_RGB color, LCUI_Rect area );
+
+LCUI_API int Graph_FillImage( LCUI_Graph *graph, LCUI_Graph *backimg,
+				int layout );
+
+LCUI_API int Graph_FillImageWithColr( LCUI_Graph *graph, LCUI_Graph *backimg,
+						int layout, LCUI_RGB color );
+
 LCUI_END_HEADER
 	
 #include LC_DRAW_H

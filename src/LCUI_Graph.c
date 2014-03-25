@@ -677,6 +677,32 @@ LCUI_API int Graph_FillColor( LCUI_Graph *graph, LCUI_RGB color )
 	return Graph_FillRect( graph, color, Rect(0,0,graph->w, graph->h) );
 }
 
+LCUI_API int Graph_FillAlpha( LCUI_Graph *src, uchar_t alpha )
+{
+	int y, row_start;
+	LCUI_Rect src_rect;
+	
+	/* 获取引用的区域在源图形中的有效区域 */
+	src_rect = Graph_GetValidRect( src );
+	/* 获取引用的源图指针 */
+	src = Graph_GetQuote( src );
+	
+	if(! Graph_IsValid(src) ) {
+		return -1;
+	}
+	if( !Graph_HaveAlpha(src) ) {
+		return -2;
+	}
+	
+	row_start = src_rect.x + src_rect.y * src->w;
+	for(y=0; y<src_rect.height; ++y) {
+		memset( &src->rgba[3][row_start], 
+			alpha, src_rect.width*sizeof(uchar_t) );
+		row_start += src->w;
+	}
+	return 0; 
+}
+
 LCUI_API int Graph_Tile( LCUI_Graph *src, LCUI_Graph *des, LCUI_BOOL replace )
 {
 	int ret = 0;
@@ -1248,11 +1274,110 @@ LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int flag )
 	return 0;
 }
 
+/** 填充图像
+ * @param graph		目标图像
+ * @param backimg	要填充的背景图
+ * @param layout	背景图的布局
+ * @param area		需要绘制的区域
+ */
+LCUI_API int Graph_FillImageEx( LCUI_Graph *graph, LCUI_Graph *backimg,
+					     int layout, LCUI_Rect area )
+{
+	LCUI_Pos pos;
+	LCUI_Graph box;
 
-LCUI_API int Graph_FillImage(	LCUI_Graph *graph,
-				LCUI_Graph *bg, 
-				int mode,
-				LCUI_RGB color )
+	if( Graph_Quote( &box, graph, area ) != 0 ) {
+		return -1;
+	}
+	Graph_FillAlpha( &box, 0 );
+	switch( layout ) {
+	case LAYOUT_CENTER:
+		pos.x = (graph->w - backimg->w) / 2.0;
+		pos.y = (graph->h - backimg->h) / 2.0;
+		pos.x -= area.x;
+		pos.y -= area.y;
+		Graph_Replace( &box, backimg, pos );
+		break;
+	case LAYOUT_TILE:
+		break;
+	case LAYOUT_STRETCH:
+		break;
+	case LAYOUT_ZOOM:
+		break;
+	case LAYOUT_NORMAL:
+	default:
+		pos.x = -area.x;
+		pos.y = -area.y;
+		Graph_Replace( &box, backimg, pos );
+		break;
+	}
+	return 0;
+}
+
+/** 填充图像和背景色
+ * @param graph		目标图像
+ * @param backimg	背景图
+ * @param layout	背景图的布局
+ * @param color		背景色
+ * @param area		需要绘制的区域
+ */
+LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph, 
+	LCUI_Graph *backimg, int layout, LCUI_RGB color, LCUI_Rect area )
+{
+	LCUI_Pos pos;
+	LCUI_Graph box;
+
+	if( Graph_Quote( &box, graph, area ) != 0 ) {
+		return -1;
+	}
+	Graph_FillAlpha( &box, 255 );
+	Graph_FillColor( &box, color );
+	switch( layout ) {
+	case LAYOUT_CENTER:
+		pos.x = (graph->w - backimg->w) / 2.0;
+		pos.y = (graph->h - backimg->h) / 2.0;
+		pos.x -= area.x;
+		pos.y -= area.y;
+		Graph_Mix( &box, backimg, pos );
+		break;
+	case LAYOUT_TILE:
+		break;
+	case LAYOUT_STRETCH:
+		break;
+	case LAYOUT_ZOOM:
+		break;
+	case LAYOUT_NORMAL:
+	default:
+		pos.x = -area.x;
+		pos.y = -area.y;
+		Graph_Mix( &box, backimg, pos );
+		break;
+	}
+	return 0;
+}
+
+LCUI_API int Graph_FillImage( LCUI_Graph *graph, LCUI_Graph *backimg,
+				int layout )
+{
+	LCUI_Rect area;
+	area.x = area.y = 0;
+	area.w = graph->w;
+	area.h = graph->h;
+	return Graph_FillImage( graph, backimg, layout, area );
+}
+
+LCUI_API int Graph_FillImageWithColr( LCUI_Graph *graph, LCUI_Graph *backimg,
+						int layout, LCUI_RGB color )
+{
+	LCUI_Rect area;
+	area.x = area.y = 0;
+	area.w = graph->w;
+	area.h = graph->h;
+	return Graph_FillImageWithColorEx( graph, backimg, layout,
+							color, area );
+}
+
+#ifdef abc
 {
 	LCUI_Size size;
 	LCUI_Pos pos;
@@ -1305,29 +1430,4 @@ LCUI_API int Graph_FillImage(	LCUI_Graph *graph,
 	Graph_Free( &temp_bg );
 	return 0; 
 }
-
-LCUI_API int Graph_FillAlpha( LCUI_Graph *src, uchar_t alpha )
-{
-	int y, row_start;
-	LCUI_Rect src_rect;
-	
-	/* 获取引用的区域在源图形中的有效区域 */
-	src_rect = Graph_GetValidRect( src );
-	/* 获取引用的源图指针 */
-	src = Graph_GetQuote( src );
-	
-	if(! Graph_IsValid(src) ) {
-		return -1;
-	}
-	if( !Graph_HaveAlpha(src) ) {
-		return -2;
-	}
-	
-	row_start = src_rect.x + src_rect.y * src->w;
-	for(y=0; y<src_rect.height; ++y) {
-		memset( &src->rgba[3][row_start], 
-			alpha, src_rect.width*sizeof(uchar_t) );
-		row_start += src->w;
-	}
-	return 0; 
-}
+#endif
