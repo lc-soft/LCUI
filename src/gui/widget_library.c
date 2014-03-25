@@ -1,18 +1,17 @@
 ﻿#include <LCUI_Build.h>
 #include LC_LCUI_H
-#include LC_WIDGET_H
 #include LC_ERROR_H
+#include LC_WIDGET_H
 
-typedef struct _WidgetTypeData
-{
+typedef struct _WidgetTypeData {
 	LCUI_String type_name;
 	LCUI_ID type_id;
 	LCUI_Queue func;
 }
 WidgetTypeData;
 
-static WidgetTypeData *WidgetType_FindByID(	LCUI_Queue *type_lib,
-						LCUI_ID type_id )
+static WidgetTypeData *
+WidgetType_FindByID( LCUI_Queue *type_lib, LCUI_ID type_id )
 {
 	int i, n;
 	WidgetTypeData *data;
@@ -33,7 +32,7 @@ static WidgetTypeData *WidgetType_FindByID(	LCUI_Queue *type_lib,
  **/
 LCUI_API int WidgetFunc_Add(	const char *type_name,
 				void (*widget_func)(LCUI_Widget*),
-				FuncType func_type )
+				WidgetFuncType func_type )
 {
 	LCUI_App *app;
 	WidgetTypeData *data;
@@ -166,8 +165,8 @@ LCUI_API int WidgetType_GetNameByID( LCUI_ID type_id, char *widget_type )
 }
 
 /* 获取指定部件类型ID的函数的函数指针 */
-LCUI_API WidgetCallBackFunc WidgetFunc_GetByID( LCUI_ID id,
-						FuncType func_type )
+LCUI_API WidgetCallBackFunc 
+WidgetFunc_GetByID( LCUI_ID id, WidgetFuncType func_type )
 {
 	LCUI_App *app;
 	LCUI_Func *f;
@@ -194,8 +193,8 @@ LCUI_API WidgetCallBackFunc WidgetFunc_GetByID( LCUI_ID id,
 }
 
 /* 获取指定类型名的部件的函数指针 */
-LCUI_API WidgetCallBackFunc WidgetFunc_Get(	const char *widget_type,
-						FuncType func_type )
+LCUI_API WidgetCallBackFunc 
+WidgetFunc_Get(	const char *widget_type, WidgetFuncType func_type )
 {
 	return WidgetFunc_GetByID( BKDRHash(widget_type), func_type );
 }
@@ -228,7 +227,7 @@ LCUI_API LCUI_BOOL WidgetType_Valid( const char *widget_type )
 }
 
 /* 调用指定类型的部件函数 */
-LCUI_API void WidgetFunc_Call( LCUI_Widget *widget, FuncType type )
+LCUI_API void WidgetFunc_Call( LCUI_Widget *widget, WidgetFuncType type )
 {
 	void (*func)(LCUI_Widget*);
 
