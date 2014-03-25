@@ -151,7 +151,6 @@ typedef struct LCUI_Rect_ {
 	union {
 		int h, height;
 	};
-	double center_x,center_y; /* 中心点的坐标 */
 } LCUI_Rect;
 /*--------------------- END ----------------------*/
 
