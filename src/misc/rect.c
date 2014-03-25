@@ -43,16 +43,15 @@
 #include LC_LCUI_H
 #include LC_MISC_H
 
-/* 初始化矩形区域的数据 */
-LCUI_API void
-Rect_Init( LCUI_Rect *rect )
+/* 将数值转换成LCUI_Rect型结构体 */
+LCUI_API LCUI_Rect Rect( int x, int y, int w, int h )
 {
-	rect->x      = 0;
-	rect->y      = 0;
-	rect->width  = 0;
-	rect->height = 0; 
-	rect->center_x = 0;
-	rect->center_y = 0;
+	LCUI_Rect r;
+	r.x = x;
+	r.y = y;
+	r.w = w;
+	r.h = h;
+	return r;
 }
 
 /* 
@@ -153,44 +152,22 @@ LCUI_API LCUI_Rect LCUIRect_ValidArea( LCUI_Size box_size, LCUI_Rect rect )
 	return rect;
 }
 
-/*
- * 功能：检测两个矩形中，A矩形是否包含B矩形
- * 返回值：两不矩形属于包含关系返回1，否则返回0。
- * */
-LCUI_API LCUI_BOOL
-LCUIRect_IncludeRect( LCUI_Rect a, LCUI_Rect b )
+LCUI_API LCUI_BOOL LCUIRect_IsIncludeRect( LCUI_Rect *a, LCUI_Rect *b )
 {
-	int count = 0, m, n = 0, x[4], y[4];
-	b.width -= 1;
-	b.height -= 1; 
-	/* 得出矩形b的4个点的坐标 */
-	x[0] = b.x;
-	y[0] = b.y;
-	x[1] = b.x + b.width;
-	y[1] = b.y;
-	x[2] = b.x;
-	y[2] = b.y + b.height;
-	x[3] = b.x + b.width;
-	y[3] = b.y + b.height; 
-	for (m = 0; m < 4; ++m) {
-		/*printf("[%d](%d>=%d && %d<%d+%d) && (%d>=%d && %d<%d+%d)\n", 
-			m, x[m], a.x, x[m], a.x, a.width, 
-			y[m], a.y, y[m], a.y, a.height
-		);*/
-		if ((x[m] >= a.x && x[m] < a.x + a.width)
-		 && (y[m] >= a.y && y[m] < a.y + a.height)) {
-		/* 如果点(x[m],y[m])在矩形A内 */
-			//printf("yes\n");
-			count += 1;
-		}
+	if( b->x < a->x ) {
+		return FALSE;
 	}
-
-	if (count == 4) {
-		n = 1;
-	} else {
-		n = 0;
+	if( b->x + b->w > a->x + a->w ) {
+		return FALSE;
 	}
-	return n;
+	
+	if( b->y < a->y ) {
+		return FALSE;
+	}
+	if( b->y + b->h > a->y + a->h ) {
+		return FALSE;
+	}
+	return TRUE;
 }
 
 /*
@@ -203,21 +180,11 @@ LCUIRect_IncludeRect( LCUI_Rect a, LCUI_Rect b )
  * rq  ： 指向矩形的队列的指针
  * 注意！传递参数时，请勿颠倒old和new位置。
  **/
-LCUI_API int
-LCUIRect_Cut(	LCUI_Rect	old_rect,
-		LCUI_Rect	new_rect, 
-		LCUI_Queue	*rects_buff )
+static int LCUIRect_CutRect( LCUI_Rect old_rect, LCUI_Rect new_rect, LCUI_Rect r[5] )
 {
-	int i;
-	LCUI_Rect r[5];
-	
-	for(i=0; i<5; ++i) {
-		Rect_Init(&r[i]); 
-	}
-	
 	/* 计算各个矩形的x轴坐标和宽度 */
 	r[0].x = new_rect.x;
-	r[0].y = new_rect.y; 
+	r[0].y = new_rect.y;
 	//printf("old,pos(%d,%d), size(%d,%d)\n", old_rect.x, old_rect.y, old_rect.width, old_rect.height);
 	//printf("new,pos(%d,%d), size(%d,%d)\n", new_rect.x, new_rect.y, new_rect.width, new_rect.height);
 	/* 如果前景矩形在背景矩形的左边 */  
@@ -290,7 +257,9 @@ LCUIRect_Cut(	LCUI_Rect	old_rect,
 		if(new_rect.y + new_rect.height > old_rect.y + old_rect.height) {  
 			r[2].height = old_rect.y + old_rect.height - r[2].y;
 			r[4].height = new_rect.y + new_rect.height - r[4].y;
-		} else r[2].height = new_rect.y + new_rect.height - r[2].y;
+		} else {
+			r[2].height = new_rect.y + new_rect.height - r[2].y;
+		}
 	}
 	
 	//r[0].width -= 1;
@@ -299,11 +268,6 @@ LCUIRect_Cut(	LCUI_Rect	old_rect,
 	//r[3].width -= 1;
 	//r[4].y += 1;
 	//r[4].height -= 1;
-	for(i=0; i<5; i++) { 
-		//if(debug_mark)
-		//	printf("slip rect[%d]: %d,%d, %d,%d\n", i, r[i].x, r[i].y, r[i].width, r[i].height);
-		Queue_Add( rects_buff, &r[i] ); 
-	}
 	return 0;
 }
 
@@ -348,20 +312,6 @@ LCUIRect_GetOverlay( LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out )
 	return 1;
 }
 
-/* 将数值转换成LCUI_Rect型结构体 */
-LCUI_API LCUI_Rect
-Rect( int x, int y, int width, int height )
-{
-	LCUI_Rect s;
-
-	Rect_Init (&s);
-	s.x = x;
-	s.y = y;
-	s.width = width;
-	s.height = height;
-	return s;
-}
-
 /* 检测一个点是否被矩形包含 */
 LCUI_API LCUI_BOOL
 LCUIRect_IncludePoint( LCUI_Pos pos, LCUI_Rect rect )
@@ -374,110 +324,157 @@ LCUIRect_IncludePoint( LCUI_Pos pos, LCUI_Rect rect )
 	}
 }
 
-/*
- * 功能：检测两个矩形是否重叠
- * 参数说明：
- * ax ：矩形A的左上角起点所在x轴的坐标
- * ay ：矩形A的左上角起点所在y轴的坐标
- * aw ：矩形A的宽度
- * ah ：矩形A的高度
- * bx ：矩形B的左上角起点所在x轴的坐标
- * by ：矩形B的左上角起点所在y轴的坐标
- * bw ：矩形B的宽度
- * bh ：矩形B的高度
- * 返回值：两不重叠返回0，重叠则返回1。
+/** 
+ * 获取两个矩形中的重叠矩形
+ * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
-static LCUI_BOOL
-_LCUIRect_Overlay (	int ax, int ay, int aw, int ah, 
-			int bx, int by, int bw, int bh )
+LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect( LCUI_Rect *a, LCUI_Rect *b, 
+					   LCUI_Rect *out )
 {
-	int m, n = 0, x[4], y[4];
-	/* 检测两个矩形是否成十字架式叠加 */
-	if(ax < bx && ay > by && ax + aw > bx + bw && ay + ah < by + bh) {
-		return TRUE;
+	if( a->x > b->x ) {
+		out->x = a->x;
+		out->w = b->x + b->w - a->x;
+	} else {
+		out->x = b->x;
+		out->w = a->x + a->w - b->x;
 	}
-	if(bx < ax && by > ay && bx + bw > ax + aw && by + bh < ay + ah) {
-		return TRUE;
+	if( a->y > b->y ) {
+		out->y = a->y;
+		out->h = b->y + b->h - a->y;
+	} else {
+		out->y = b->y;
+		out->h = a->y + a->h - b->y;
 	}
-	/* 
-	 * 哪怕是一丁点的误差，都有可能造成图形显示上的问题
-	 * 因为局部区域刷新就是靠这个函数得知区域是否与部件
-	 * 矩形是否重叠。 
-	 * */
-	x[0] = ax;
-	y[0] = ay;
-	x[1] = ax + aw - 1;
-	y[1] = ay;
-	x[2] = ax;
-	y[2] = ay + ah - 1;
-	x[3] = ax + aw - 1; /* 因为长和宽包括了左上角点的长宽，要-1 */
-	y[3] = ay + ah - 1;
-	/* 这只是检测四个角是否在矩形内 */
-	for (m = 0; m < 4; ++m) {
-		if ((x[m] >= bx && x[m] < bx + bw)
-		 && (y[m] >= by && y[m] < by + bh)) {
-			/*printf("[%d](%d>=%d && %d<%d+%d) && (%d>=%d && %d<%d+%d)\n", 
-			m, x[m], bx,x[m], bx,bw, y[m],by, y[m], by,bh);
-			*/
-			n++;
+	if( out->w <= 0 || out->h <= 0 ) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
+static void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b )
+{
+	if( a->x < b->x ) {
+		big->x = a->x;
+	} else {
+		big->x = b->x;
+	}
+	if( a->x + a->w < b->x + b->w ) {
+		big->w = b->x + b->w - big->x;
+	} else {
+		big->w = a->x + a->w - big->x;
+	}if( a->x < b->x ) {
+		big->x = a->x;
+	} else {
+		big->x = b->x;
+	}
+	if( a->y + a->h < b->y + b->h ) {
+		big->h = b->y + b->h - big->y;
+	} else {
+		big->h = a->y + a->h - big->y;
+	}
+}
+
+/** 添加一个脏矩形记录 */
+LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
+{
+	int ret;
+	LCUI_Rect *p_rect, o_rect, tmp_rect;
+
+	if( rect->w <= 0 || rect->h <= 0 ) {
+		return -1;
+	}
+	/* 定位至链表表头 */
+	LinkedList_Goto( list, 0 );
+	while( p_rect = (LCUI_Rect*)LinkedList_Get( list )) {
+		/* 如果被现有的矩形包含 */
+		if( LCUIRect_IsIncludeRect( p_rect, rect ) ) {
+			return -2;
 		}
-	}
-	if(n == 0) {
-		//printf("n == 0\n");
-		x[0] = bx;
-		y[0] = by;
-		x[1] = bx + bw - 1;
-		y[1] = by;
-		x[2] = bx;
-		y[2] = by + bh - 1;
-		x[3] = bx + bw - 1;
-		y[3] = by + bh - 1;
-		for (m = 0; m < 4; ++m) {
-			if ((x[m] >= ax && x[m] < ax + aw)
-			 && (y[m] >= ay && y[m] < ay + ah)) {
-				//printf("[%d](%d>=%d && %d<%d+%d) && (%d>=%d && %d<%d+%d)\n", m, x[m],bx,x[m],ax,aw,y[m],ay,y[m],ay,ah);
-				n++;
+		/* 如果包含现有的矩形 */
+		if( LCUIRect_IsIncludeRect( rect, p_rect ) ) {
+			LinkedList_Delete( list );
+			continue;
+		}
+		/* 如果与现有的矩形不重叠 */
+		if( !LCUIRect_GetOverlayRect( rect, p_rect, &o_rect ) ) {
+			LinkedList_ToNext( list );
+			continue;
+		}
+		/* 如果两个矩形相距很近，则直接合并 */
+		if( rect->w - o_rect.w < 20 && rect->h - o_rect.h < 20
+		|| p_rect->w - o_rect.w < 20 && p_rect->h - o_rect.h < 20
+		|| p_rect->x == rect->x && p_rect->w == rect->w
+		|| p_rect->y == rect->y && p_rect->h == rect->h ) {
+			LCUIRect_MergeRect( &o_rect, p_rect, rect );
+			/* 删除当前矩形 */
+			LinkedList_Delete( list );
+			/* 添加合并后的矩形 */
+			return DirtyRectList_Add( list, &o_rect );
+		}
+		/* 两个相交矩形，除去重叠区域，最多可分割出两个区域。
+		 * 根据与重叠矩形的坐标，判断新矩形在重叠矩形的哪个位置 */
+		if( rect->x == o_rect.x ) {
+			/* 右下方 */
+			if( rect->y == o_rect.y ) {
+				tmp_rect.x = rect->x + o_rect.w;
+				tmp_rect.y = o_rect.y;
+				tmp_rect.w = rect->x + rect->w - tmp_rect.x;
+				tmp_rect.h = o_rect.h;
+				ret = DirtyRectList_Add( list, &tmp_rect );
+			
+				tmp_rect.x = rect->x;
+				tmp_rect.y = o_rect.h;
+				tmp_rect.w = rect->w;
+				tmp_rect.h = rect->y + rect->h - tmp_rect.y;
+				ret |= DirtyRectList_Add( list, &tmp_rect );
+			} else { /* 右上方 */
+				tmp_rect.x = rect->x;
+				tmp_rect.y = rect->y;
+				tmp_rect.w = rect->w;
+				tmp_rect.h = rect->h - o_rect.h;
+				ret = DirtyRectList_Add( list, &tmp_rect );
+
+				tmp_rect.x = rect->x + o_rect.w;
+				tmp_rect.w = rect->w - o_rect.w;
+				tmp_rect.y = o_rect.y;
+				tmp_rect.h = o_rect.h;
+				ret |= DirtyRectList_Add( list, &tmp_rect );
+			}
+		} else {
+			/* 左下方 */
+			if( rect->y == o_rect.y ) {
+				tmp_rect.x = rect->x;
+				tmp_rect.y = rect->y;
+				tmp_rect.w = rect->w - o_rect.w;
+				tmp_rect.h = o_rect.h;
+				ret = DirtyRectList_Add( list, &tmp_rect );
+				
+				tmp_rect.x = rect->x;
+				tmp_rect.y = rect->y + o_rect.h;
+				tmp_rect.w = rect->w - o_rect.w;
+				tmp_rect.h = rect->h - o_rect.h;
+				ret |= DirtyRectList_Add( list, &tmp_rect );
+			} else {/* 左上方 */
+				tmp_rect.x = rect->x;
+				tmp_rect.y = rect->y;
+				tmp_rect.w = rect->w;
+				tmp_rect.h = rect->h - o_rect.h;
+				ret = DirtyRectList_Add( list, &tmp_rect );
+				
+				tmp_rect.x = rect->x;
+				tmp_rect.y = rect->y + o_rect.h;
+				tmp_rect.w = rect->w - o_rect.w;
+				tmp_rect.h = o_rect.h;
+				ret |= DirtyRectList_Add( list, &tmp_rect );
 			}
 		}
+		return ret;
 	}
-	if( n > 0 ) {
-		return TRUE;
-	}
-	//printf("1111\n");
-	return FALSE;
+
+	/* 验证通过，则添加进去 */
+	LinkedList_AddData( list, rect );
+	return 0;
 }
-
-/* 检测两个矩形是否重叠 */
-LCUI_API LCUI_BOOL
-LCUIRect_Overlay( LCUI_Rect a, LCUI_Rect b )
-{
-	return _LCUIRect_Overlay(	a.x, a.y, a.width, a.height, 
-					b.x, b.y, b.width, b.height);
-}
-
-/* 判断两个矩形是否相等 */
-LCUI_API LCUI_BOOL
-LCUIRect_Equal( LCUI_Rect a, LCUI_Rect b )
-{
-	if(a.x == b.x && a.y == b.y 
-	&& a.width == b.width && a.height == b.height) {
-		return TRUE;
-	}
-	return FALSE;
-}
-
-/* 判断矩形是否有效 */
-LCUI_API int
-LCUIRect_IsValid( LCUI_Rect r )
-{
-	if(r.width <= 0 || r.height <= 0) {
-		return 0;
-	}
-	return 1;
-}
-
-
-/*----------------------------- RectQueue ------------------------------*/
 
 /* 切换队列 */
 LCUI_API void
@@ -508,73 +505,6 @@ DoubleRectQueue_Destroy( LCUI_RectQueue *queue )
 {
 	Queue_Destroy( &queue->queue[0] );
 	Queue_Destroy( &queue->queue[1] );
-}
-
-
-/* 将矩形数据追加至队列 */
-LCUI_API int RectQueue_Add( LCUI_Queue *queue, LCUI_Rect rect )
-{ 
-	int i;
-	LCUI_BOOL need_add = TRUE;
-	LCUI_Rect *rect_ptr, *cur_rect_ptr;
-	LCUI_Queue rect_buff;
-	
-	if( rect.width <= 0 || rect.height <= 0 ) {
-		return -1;
-	}
-	DEBUG_MSG("add new rect: %d,%d,%d,%d, current total: %d\n",
-	 rect.x, rect.y, rect.width, rect.height, queue->total_num);
-	Queue_Init( &rect_buff, sizeof(LCUI_Rect), NULL );
-	
-	for (i=0; i<queue->total_num; ++i) {
-		cur_rect_ptr = (LCUI_Rect*)Queue_Get( queue, i );
-		if( !cur_rect_ptr ) {
-			break;
-		}
-		DEBUG_MSG("[%d] rect: %d,%d,%d,%d\n", i, 
-		 cur_rect_ptr->x, cur_rect_ptr->y,
-		 cur_rect_ptr->width, cur_rect_ptr->height);
-		/* 如果矩形无效，或者被新增的矩形区域包含，则删除 */
-		if ( cur_rect_ptr->width <= 0 || cur_rect_ptr->height <= 0
-		 || LCUIRect_IncludeRect( rect, *cur_rect_ptr) ) {
-			Queue_Delete( queue, i );
-			continue;
-		}
-
-		/* 如果与现有的矩形相同，或被现有的矩形包含 */
-		if( LCUIRect_Equal( rect, *cur_rect_ptr)
-		 || LCUIRect_IncludeRect( *cur_rect_ptr, rect ) ) {
-			need_add = FALSE;
-			break;
-		}
-		
-		/* 如果新增的矩形与队列中的矩形不重叠 */ 
-		if( !LCUIRect_Overlay(rect, *cur_rect_ptr) ) {
-			continue;
-		}
-		DEBUG_MSG("[%d] rect overlay, start cut\n", i);
-		/* 根据当前区域，分割新区域 */
-		LCUIRect_Cut( *cur_rect_ptr, rect, &rect_buff );
-		for( i=0; i<rect_buff.total_num; ++i ) {
-			rect_ptr = (LCUI_Rect*)Queue_Get( &rect_buff, i );
-			if( !rect_ptr ) {
-				break;
-			}
-			DEBUG_MSG("[%d] add child rect: %d,%d,%d,%d\n", i, 
-				 rect_ptr->x, rect_ptr->y,
-				 rect_ptr->width, rect_ptr->height);
-			RectQueue_Add( queue, *rect_ptr );
-		}
-		need_add = FALSE;
-		break;
-	}
-	
-	/* 销毁队列 */
-	Queue_Destroy( &rect_buff );
-	if ( need_add && Queue_Add( queue, &rect ) ) {
-		return 0;
-	}
-	return -1;
 }
 
 /* 添加矩形区域至可用的队列 */
@@ -639,5 +569,3 @@ DoubleRectQueue_GetFromCurrent( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
 	Queue_Delete( q, 0 );
 	return TRUE;
 }
-
-/*--------------------------- End RectQueue ----------------------------*/
