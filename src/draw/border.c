@@ -89,7 +89,7 @@ mix_pixel( uchar_t **buff, int pos, LCUI_RGB color, uchar_t alpha )
 }
 
 static int
-Graph_Draw_RoundBorder_LeftTop( 
+Graph_DrawRoundBorderLeftTop( 
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
 	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
@@ -195,7 +195,7 @@ Graph_Draw_RoundBorder_LeftTop(
 
 
 static int
-Graph_Draw_RoundBorder_TopLeft( 
+Graph_DrawRoundBorderTopLeft( 
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
 	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
@@ -308,7 +308,7 @@ Graph_Draw_RoundBorder_TopLeft(
 }
 
 static int
-Graph_Draw_RoundBorder_RightTop( 
+Graph_DrawRoundBorderRightTop( 
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
 	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
@@ -400,7 +400,7 @@ Graph_Draw_RoundBorder_RightTop(
 
 
 static int
-Graph_Draw_RoundBorder_TopRight( 
+Graph_DrawRoundBorderTopRight( 
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
 	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
@@ -500,7 +500,7 @@ Graph_Draw_RoundBorder_TopRight(
 }
 
 static int
-Graph_Draw_RoundBorder_LeftBottom(
+Graph_DrawRoundBorderLeftBottom(
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
 	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
@@ -595,7 +595,7 @@ Graph_Draw_RoundBorder_LeftBottom(
 }
 
 static int
-Graph_Draw_RoundBorder_BottomLeft(
+Graph_DrawRoundBorderBottomLeft(
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
 	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
@@ -698,7 +698,7 @@ Graph_Draw_RoundBorder_BottomLeft(
 }
 
 static int
-Graph_Draw_RoundBorder_RightBottom( 
+Graph_DrawRoundBorderRightBottom( 
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
 	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
@@ -788,7 +788,7 @@ Graph_Draw_RoundBorder_RightBottom(
 }
 
 static int
-Graph_Draw_RoundBorder_BottomRight(
+Graph_DrawRoundBorderBottomRight(
 	LCUI_Graph *des,	LCUI_Pos center,
 	int radius,		int line_width,
 	LCUI_RGB line_color,	LCUI_BOOL hide_outarea )
@@ -887,11 +887,12 @@ Graph_Draw_RoundBorder_BottomRight(
 	return 0;
 }
 
-LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
-/* 简单的为图形边缘绘制边框 */
+/* 只绘制目标区域内的边框 */
+LCUI_API int Graph_DrawBorderEx( LCUI_Graph *des, LCUI_Border border,
+							LCUI_Rect area )
 {
 	int  radius;
-	LCUI_Rect rect;
+	LCUI_Rect bound;
 	LCUI_Pos start, end;
 	LCUI_Graph des_area;
 	
@@ -901,14 +902,15 @@ LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	
 	/* 绘制左上角的圆角，先引用左上角区域，再将圆绘制到这个区域里 */
 	radius = border.top_left_radius;
-	rect = Rect( 0, 0, radius, radius );
-	Graph_Quote( &des_area, des, rect );
-	Graph_Draw_RoundBorder_LeftTop( 
+	bound.x = bound.y = 0;
+	bound.w = bound.h = radius;
+	Graph_Quote( &des_area, des, bound );
+	Graph_DrawRoundBorderLeftTop( 
 		&des_area		, Pos( radius, radius ), 
 		radius			, border.left_width, 
 		border.left_color	, TRUE
 	);
-	Graph_Draw_RoundBorder_TopLeft( 
+	Graph_DrawRoundBorderTopLeft( 
 		&des_area		, Pos( radius, radius ), 
 		radius			, border.top_width, 
 		border.top_color	, TRUE 
@@ -916,14 +918,14 @@ LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	
 	/* 右上角 */
 	radius = border.top_right_radius;
-	rect = Rect( des->w-radius-1, 0, radius, radius );
-	Graph_Quote( &des_area, des, rect );
-	Graph_Draw_RoundBorder_RightTop( 
+	bound.x = des->w-radius-1;
+	Graph_Quote( &des_area, des, bound );
+	Graph_DrawRoundBorderRightTop( 
 		&des_area		, Pos( 0, radius ), 
 		radius			, border.right_width, 
 		border.right_color	, TRUE 
 	);
-	Graph_Draw_RoundBorder_TopRight( 
+	Graph_DrawRoundBorderTopRight( 
 		&des_area		, Pos( 0, radius ), 
 		radius			, border.top_width, 
 		border.top_color	, TRUE 
@@ -931,14 +933,15 @@ LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	
 	/* 左下角 */
 	radius = border.bottom_left_radius;
-	rect = Rect( 0, des->h-radius-1, radius, radius );
-	Graph_Quote( &des_area, des, rect );
-	Graph_Draw_RoundBorder_LeftBottom( 
+	bound.x = 0;
+	bound.y = des->h-radius-1;
+	Graph_Quote( &des_area, des, bound );
+	Graph_DrawRoundBorderLeftBottom( 
 		&des_area		, Pos( radius, 0 ), 
 		radius			, border.left_width, 
 		border.left_color	, TRUE 
 	);
-	Graph_Draw_RoundBorder_BottomLeft( 
+	Graph_DrawRoundBorderBottomLeft( 
 		&des_area		, Pos( radius, 0 ), 
 		radius			, border.bottom_width, 
 		border.bottom_color	, TRUE 
@@ -946,15 +949,14 @@ LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	
 	/* 右下角 */
 	radius = border.bottom_left_radius;
-	rect = Rect(	des->w-radius-1, 
-			des->h-radius-1, radius, radius );
-	Graph_Quote( &des_area, des, rect );
-	Graph_Draw_RoundBorder_RightBottom( 
+	bound.x = des->w-radius-1,
+	Graph_Quote( &des_area, des, bound );
+	Graph_DrawRoundBorderRightBottom( 
 		&des_area		, Pos( 0, 0 ), 
 		radius			, border.right_width, 
 		border.right_color	, TRUE 
 	);
-	Graph_Draw_RoundBorder_BottomRight( 
+	Graph_DrawRoundBorderBottomRight( 
 		&des_area		, Pos( 0, 0 ), 
 		radius			, border.bottom_width, 
 		border.bottom_color	, TRUE 
@@ -963,6 +965,8 @@ LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	start.x = border.top_left_radius;
 	start.y = 0;
 	end.x = des->w - border.top_right_radius;
+	/* 引用目标区域 */
+	Graph_Quote( &des_area, des, area );
 	/* 绘制上边框 */
 	Graph_DrawHorizLine( des, border.top_color, border.top_width, start, end.x );
 	/* 绘制下边的线 */
@@ -980,4 +984,14 @@ LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 	Graph_DrawVertiLine( des, border.right_color, border.right_width, start, end.y );
 	/* 边框线绘制完成 */
 	return 0;
+}
+
+/* 简单的为图形边缘绘制边框 */
+LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
+{
+	LCUI_Rect area;
+	area.x = area.y = 0;
+	area.w = des->w;
+	area.h = des->h;
+	return Graph_DrawBorderEx( des, border, area );
 }
