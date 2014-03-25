@@ -351,7 +351,7 @@ LCUI_API LCUI_BOOL Widget_IsAllowResponseEvent( LCUI_Widget *widget )
  * 级所有父部件都会应用此状态，否则，移除多余的部件，并恢复部件的状态为NORMAL 
  */
 static void WidgetRecord_SetWidgetState(	LCUI_Widget *widget, 
-						WIDGET_STATE state )
+						WidgetState state )
 {
 	WidgetRecord_Reset();
 	while( widget ) {
