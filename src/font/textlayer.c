@@ -1227,7 +1227,6 @@ static int TextLayer_DeleteText( LCUI_TextLayer* layer, int char_y,
 	// 结束行：0 1 2 3 4 5，终点位置：4
 	// 拼接后的长度：2 + 6 - 4 - 1 = 3
 	len = char_x + p_end_row->string_len - end_x - 1;
-	_DEBUG_MSG("len=%d, start: row=%d,col=%d, end: row=%d,col=%d\n", len, char_y, char_x, end_y, end_x);
 	if( len < 0 ) {
 		return -3;
 	}
@@ -1249,7 +1248,6 @@ static int TextLayer_DeleteText( LCUI_TextLayer* layer, int char_y,
 		TextRow_SetLength( p_row, len );
 		/* 更新文本行的尺寸 */
 		TextRow_UpdateSize( p_row, layer->text_style.pixel_size );
-		_DEBUG_MSG("tip\n");
 		return 0;
 	}
 	/* 如果结束点在行尾，并且该行不是最后一行 */
@@ -1258,9 +1256,7 @@ static int TextLayer_DeleteText( LCUI_TextLayer* layer, int char_y,
 		p_end_row = TextRowList_GetRow( &layer->row_list, end_y );
 		end_x = -1;
 		len = char_x + p_end_row->string_len;
-		_DEBUG_MSG("rows=%d, end_y=%d\n", layer->row_list.rows, end_y);
 	}
-	_DEBUG_MSG("len=%d\n", len);
 	TextRow_SetLength( p_row, len );
 	/* 标记当前行后面的所有行的矩形需区域需要刷新 */
 	TextLayer_InvalidateRowsRect( layer, char_y+1, -1 );
@@ -1277,7 +1273,6 @@ static int TextLayer_DeleteText( LCUI_TextLayer* layer, int char_y,
 	TextRow_UpdateSize( p_row, layer->text_style.pixel_size );
 	TextLayer_InvalidateRowRect( layer, end_y );
 	/* 移除结束行 */
-	_DEBUG_MSG("end_y=%d\n", end_y);
 	TextRowList_RemoveRow( &layer->row_list, end_y );
 	/* 如果起始行无内容，并且上一行没有结束符（换行符），则
 	 * 说明需要删除起始行 */
@@ -1306,11 +1301,9 @@ LCUI_API int TextLayer_Backspace( LCUI_TextLayer* layer, int n_char )
 	/* 先获取当前字的位置 */
 	char_x = layer->insert_x;
 	char_y = layer->insert_y;
-	_DEBUG_MSG("insert_y=%d, insert_x=%d\n", char_y, char_x);
 	/* 再计算删除 n_char 个字后的位置 */
 	for( n_del=n_char; char_y>=0; --char_y ) {
 		p_row = layer->row_list.rowdata[char_y];
-		_DEBUG_MSG("row %d, len=%d, char_x=%d, n_del=%d\n", char_y, p_row->string_len, char_x, n_del);
 		/* 如果不是当前行，则重定位至行尾 */
 		if( char_y < layer->insert_y ) {
 			char_x = p_row->string_len;
@@ -1332,7 +1325,6 @@ LCUI_API int TextLayer_Backspace( LCUI_TextLayer* layer, int n_char )
 	if( n_del > 0 ) {
 		n_char -= n_del;
 	}
-	_DEBUG_MSG("delete, row=%d, col=%d\n", char_y, char_x);
 	/* 开始删除文本 */
 	TextLayer_DeleteText( layer, char_y, char_x, n_char );
 	/* 若最后一行被完全移除，则移动输入点至上一行的行尾处 */
@@ -1459,35 +1451,26 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LCUI_Queue *rect_list )
 }
 
 /** 
- * 将文本图层中的指定区域的内容绘制至目标图像缓存中
+ * 将文本图层中的指定区域的内容绘制至目标图像中
  * @param layer 要使用的文本图层
  * @param area 文本图层中需要绘制的区域
- * @param pos 文本图层在目标图像中的位置
+ * @param layer_pos 文本图层在目标图像中的位置
  * @param need_replace 绘制时是否需要覆盖像素
+ * @param graph 目标图像
  */
 LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
-		LCUI_Pos pos, LCUI_BOOL need_replace, LCUI_Graph *graph )
+		LCUI_Pos layer_pos, LCUI_BOOL need_replace, LCUI_Graph *graph )
 {
 	int x, y, row, col;
 	LCUI_Pos char_pos;
 	TextRowData *p_row;
 	TextCharData *p_char;
-	LCUI_Rect paint_bound;
 	LCUI_Size box_size;
-	LCUI_Graph target_graph;
 
-	Graph_Init( &target_graph );
 	box_size.w = layer->max_width;
 	box_size.h = layer->max_height;
 	/* 调整区域范围，使之有效 */
 	area = LCUIRect_ValidArea( box_size, area );
-	/* 计算绘制边界 */
-	paint_bound.x = pos.x;
-	paint_bound.y = pos.y;
-	paint_bound.w = area.w;
-	paint_bound.h = area.h;
-	/* 引用目标图像中的绘制区域 */
-	Graph_Quote( &target_graph, graph, paint_bound );
 	/* 加上Y轴坐标偏移量 */
 	y = layer->offset_y;
 	/* 先确定从哪一行开始绘制 */
@@ -1523,7 +1506,7 @@ LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
 			break;
 		}
 		y += p_row->top_spacing;
-		x += pos.x;
+		x += layer_pos.x;
 		x += layer->offset_x;
 		
 		/* 确定从哪个文字开始绘制 */
@@ -1559,13 +1542,13 @@ LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
 			/* 判断文字使用的前景颜色，再进行绘制 */
 			if( p_char->style && p_char->style->_fore_color ) {
 				FontBMP_Mix( 
-					&target_graph, char_pos,
+					graph, char_pos,
 					p_char->bitmap,
 					p_char->style->fore_color,
 					need_replace );
 			} else {
 				FontBMP_Mix( 
-					&target_graph, char_pos,
+					graph, char_pos,
 					p_char->bitmap, 
 					layer->text_style.fore_color,
 					need_replace 
