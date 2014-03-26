@@ -40,6 +40,8 @@
 #include <LCUI_Build.h>
 #include LC_MISC_LINKED_LIST_H
 
+#define MALLOC_ONE(type) (type*)malloc(sizeof(type))
+
 /** 初始化链表 */
 LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size )
 {
@@ -247,11 +249,11 @@ LCUI_API int LinkedList_MoveTo( LinkedList *list, int pos )
         return 0;
 }
 
-/** 在当前结点前面插入新结点，并记录数据 */
+/** 在当前结点前面插入新结点，并引用数据 */
 LCUI_API void LinkedList_Insert( LinkedList *list, void *data )
 {
         if( !list->head ) {
-                list->head = (LinkedListNode*)malloc( sizeof(LinkedListNode) );
+                list->head = MALLOC_ONE(LinkedListNode);
                 list->head->prev = NULL;
                 list->head->next = NULL;
                 list->head->data = data;
@@ -270,7 +272,7 @@ LCUI_API void LinkedList_Insert( LinkedList *list, void *data )
         }
         /* 若当前结点没有上个结点，则插入新结点作为头结点 */
         if( !list->current->prev ) {
-                list->head = (LinkedListNode*)malloc( sizeof(LinkedListNode) );
+                list->head = MALLOC_ONE(LinkedListNode);
                 list->head->prev = NULL;
                 list->head->next = list->current;
                 list->current->prev = list->head;
@@ -279,7 +281,7 @@ LCUI_API void LinkedList_Insert( LinkedList *list, void *data )
                 return;
         }
         /* 在当前结点的前面插入一个新结点 */
-        list->current->prev->next = (LinkedListNode*)malloc( sizeof(LinkedListNode) );
+        list->current->prev->next = MALLOC_ONE(LinkedListNode);
         /* 记录新结点的前后结点 */
         list->current->prev->next->prev = list->current->prev;
         list->current->prev->next->next = list->current;
@@ -290,11 +292,21 @@ LCUI_API void LinkedList_Insert( LinkedList *list, void *data )
         list->current->data = data;
 }
 
+/** 在当前结点前面插入新结点，并将数据的副本记录到该结点上 */
+LCUI_API void* LinkedList_InsertCopy( LinkedList *list, void *data )
+{
+	void *data_copy;
+	data_copy = malloc( list->node_data_size );
+        memcpy( data_copy, data, list->node_data_size );
+	LinkedList_Insert( list, data_copy );
+	return data_copy;
+}
+
 /** 分配一个可用的结点 */
 static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
 {
         if( !list->head ) {
-                list->head = (LinkedListNode*)malloc( sizeof(LinkedListNode) );
+                list->head = MALLOC_ONE(LinkedListNode);
                 list->head->prev = NULL;
                 list->head->next = NULL;
                 list->head->data = NULL;
@@ -310,7 +322,7 @@ static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
         ++list->used_node_num;
         if( list->used_node_num > list->max_node_num ) {
                 list->boundary = list->tail;
-                list->tail->next = (LinkedListNode*)malloc( sizeof(LinkedListNode) );
+                list->tail->next = MALLOC_ONE(LinkedListNode);
                 list->tail->next->prev = list->tail;
                 list->tail->next->next = NULL;
                 list->tail->next->data = NULL;
@@ -325,8 +337,8 @@ static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
         return list->boundary;
 }
 
-/** 将数据复制至链表的相应结点上的数据内存中 */
-LCUI_API void *LinkedList_AddData( LinkedList *list, void *data )
+/** 将数据的副本记录至链表的相应结点上 */
+LCUI_API void *LinkedList_AddDataCopy( LinkedList *list, void *data )
 {
         LinkedListNode *node;
         node = LinkedList_AllocNode( list );
@@ -337,8 +349,8 @@ LCUI_API void *LinkedList_AddData( LinkedList *list, void *data )
         return node->data;
 }
 
-/** 将数据的地址记录至链表的相应结点 */
-LCUI_API void *LinkedList_AddDataByAddress( LinkedList *list, void *data_ptr )
+/** 将数据引用至链表的相应结点 */
+LCUI_API void LinkedList_AddData( LinkedList *list, void *data_ptr )
 {
         LinkedListNode *node;
         node = LinkedList_AllocNode( list );
@@ -346,5 +358,4 @@ LCUI_API void *LinkedList_AddDataByAddress( LinkedList *list, void *data_ptr )
                 free( node->data );
         }
         node->data = data_ptr;
-        return node->data;
 }
