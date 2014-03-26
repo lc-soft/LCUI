@@ -43,6 +43,9 @@
 #include LC_LCUI_H
 #include LC_MISC_H
 
+#define LCUIRect_IsIncludeRect(a,b) 	b->x >= a->x && b->x + b->w <= a->x + a->w \
+					&& b->y >= a->y && b->y + b->h <= a->y + a->h
+
 /* 将数值转换成LCUI_Rect型结构体 */
 LCUI_API LCUI_Rect Rect( int x, int y, int w, int h )
 {
@@ -54,37 +57,10 @@ LCUI_API LCUI_Rect Rect( int x, int y, int w, int h )
 	return r;
 }
 
-/* 
- * 功能：检测两个矩形是否成十字架式叠加 
- * 返回值：
- *  1 a竖，b横
- * -1 a衡，b竖
- *  0 不叠加
- **/
-LCUI_API int
-LCUIRect_IsCrossOverlay( LCUI_Rect a, LCUI_Rect b )
+/** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
+LCUI_API void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
+							LCUI_Rect *cut )
 {
-	if(a.x < b.x && a.y > b.y 
-	&& a.x + a.width  > b.x + b.width 
-	&& a.y + a.height < b.y + b.height) {
-		return 1;
-	}
-	if(b.x < a.x && b.y > a.y 
-	&& b.x + b.width  > a.x + a.width  
-	&& b.y + b.height < a.y + a.height) {
-		return -1;
-	}
-	return 0;
-}
-
-/* 
- * 功能：获取需裁剪的区域
- * 说明：指定容器尺寸和容器中的区域位置及尺寸，即可得到该区域中需要进行裁剪区域
- *  */
-LCUI_API int
-LCUIRect_GetCutArea( LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut )
-{
-	int result = 0;
 	cut->x = 0;
 	cut->y = 0;
 	cut->width = rect.width;
@@ -93,37 +69,21 @@ LCUIRect_GetCutArea( LCUI_Size container, LCUI_Rect rect, LCUI_Rect *cut )
 	if(rect.x < 0) {
 		cut->width += rect.x;
 		cut->x = 0 - rect.x;
-		result = 1;
 	}
-	if(rect.x + rect.width > container.w) {
-		cut->width -= (rect.x + rect.width - container.w); 
-		result = 1;
+	if(rect.x + rect.width > box_size.w) {
+		cut->width -= (rect.x + rect.width - box_size.w); 
 	}
 	
 	if(rect.y < 0) {
 		cut->height += rect.y;
 		cut->y = 0 - rect.y; 
-		result = 1;
 	}
-	if(rect.y + rect.height > container.h) {
-		cut->height -= (rect.y + rect.height - container.h); 
-		result = 1;
+	if(rect.y + rect.height > box_size.h) {
+		cut->height -= (rect.y + rect.height - box_size.h); 
 	}
-	/* 有效化处理 */
-	if( cut->width < 0 ) {
-		cut->width = 0;
-	}
-	if( cut->height < 0 ) {
-		cut->height = 0;
-	}
-	return result;
 }
 
-/* 
- * 功能：获取指定区域在容器中的有效显示区域 
- * 说明：指定容器的区域大小，再指定容器中的区域位置及大小，就能得到该容器实际
- * 能显示出的该区域范围。
- * */
+/** 根据容器尺寸，获取指定区域的有效显示区域 */
 LCUI_API LCUI_Rect LCUIRect_ValidArea( LCUI_Size box_size, LCUI_Rect rect )
 {
 	if (rect.x < 0) {
@@ -152,184 +112,12 @@ LCUI_API LCUI_Rect LCUIRect_ValidArea( LCUI_Size box_size, LCUI_Rect rect )
 	return rect;
 }
 
-LCUI_API LCUI_BOOL LCUIRect_IsIncludeRect( LCUI_Rect *a, LCUI_Rect *b )
-{
-	if( b->x < a->x ) {
-		return FALSE;
-	}
-	if( b->x + b->w > a->x + a->w ) {
-		return FALSE;
-	}
-	
-	if( b->y < a->y ) {
-		return FALSE;
-	}
-	if( b->y + b->h > a->y + a->h ) {
-		return FALSE;
-	}
-	return TRUE;
-}
-
-/*
- * 功能：将有重叠部分的两个矩形，进行分割，并得到分割后的矩形
- * 说明：主要用于局部区域刷新里，添加的需刷新的区域有可能会与已添加的区域重叠，为避免
- * 重复刷新同一块区域，需要在添加时对矩形进行分割，得到完全重叠和不重叠的矩形。
- * 参数说明：
- * old ： 已存在的矩形区域
- * new ： 将要添加的矩形区域
- * rq  ： 指向矩形的队列的指针
- * 注意！传递参数时，请勿颠倒old和new位置。
- **/
-static int LCUIRect_CutRect( LCUI_Rect old_rect, LCUI_Rect new_rect, LCUI_Rect r[5] )
-{
-	/* 计算各个矩形的x轴坐标和宽度 */
-	r[0].x = new_rect.x;
-	r[0].y = new_rect.y;
-	//printf("old,pos(%d,%d), size(%d,%d)\n", old_rect.x, old_rect.y, old_rect.width, old_rect.height);
-	//printf("new,pos(%d,%d), size(%d,%d)\n", new_rect.x, new_rect.y, new_rect.width, new_rect.height);
-	/* 如果前景矩形在背景矩形的左边 */  
-	if(new_rect.x < old_rect.x) {
-		/* 如果X轴上与背景矩形不重叠 */  
-		if(new_rect.x + new_rect.width <= old_rect.x) {
-			return -1;
-		}
-		r[0].width = old_rect.x - new_rect.x;
-		r[1].x = old_rect.x;
-		r[2].x = r[1].x;
-		r[4].x = r[2].x;
-		/* 如果前景矩形在X轴上包含背景矩形 */  
-		if(new_rect.x + new_rect.width > old_rect.x + old_rect.width) {
-			r[1].width = old_rect.width;
-			
-			r[3].x = old_rect.x + old_rect.width;
-			r[3].width = new_rect.x + new_rect.width - r[3].x;
-		} else { /* 得出矩形2的宽度 */ 
-			r[1].width = new_rect.x + new_rect.width - old_rect.x;  
-		}
-		/* 得出矩形3和5的宽度 */ 
-		r[2].width = r[1].width;
-		r[4].width = r[2].width;
-	} else {  
-		if(old_rect.x + old_rect.width <= new_rect.x) { 
-			return -1;
-		}
-		r[1].x = new_rect.x;
-		r[2].x = r[1].x; 
-		r[4].x = r[2].x;
-		
-		if(new_rect.x + new_rect.width > old_rect.x + old_rect.width) {  
-			r[1].width = old_rect.x + old_rect.width - r[1].x;
-			r[3].x = old_rect.x + old_rect.width;
-			r[3].width = new_rect.x + new_rect.width - r[3].x;
-		} else {
-			r[1].width = new_rect.width; 
-		}
-			
-		r[2].width = r[1].width;
-		r[4].width = r[2].width;
-	}
-	 
-	/* 计算各个矩形的y轴坐标和高度 */
-	r[0].height = new_rect.height;
-	r[3].y = new_rect.y;
-	r[3].height = r[0].height;
-	r[4].y = old_rect.y + old_rect.height; 
-	if(new_rect.y < old_rect.y) {
-		if(new_rect.y + new_rect.height <= old_rect.y) { 
-			return -1;
-		}
-		r[1].y = new_rect.y; 
-		r[1].height = old_rect.y - new_rect.y;
-		r[2].y = old_rect.y; 
-		/* 如果前景矩形在Y轴上包含背景矩形 */ 
-		if(new_rect.y + new_rect.height > old_rect.y + old_rect.height) { 
-			r[2].height = old_rect.height;
-			r[4].height = new_rect.y + new_rect.height - r[4].y; 
-		} else { 
-			r[2].height = new_rect.y + new_rect.height - old_rect.y;  
-		}
-	} else {  
-		if(new_rect.y >= old_rect.y + old_rect.height) { 
-			return -1;
-		}
-		r[2].y = new_rect.y; 
-		
-		if(new_rect.y + new_rect.height > old_rect.y + old_rect.height) {  
-			r[2].height = old_rect.y + old_rect.height - r[2].y;
-			r[4].height = new_rect.y + new_rect.height - r[4].y;
-		} else {
-			r[2].height = new_rect.y + new_rect.height - r[2].y;
-		}
-	}
-	
-	//r[0].width -= 1;
-	//r[1].height -= 1;
-	//r[3].x += 1;
-	//r[3].width -= 1;
-	//r[4].y += 1;
-	//r[4].height -= 1;
-	return 0;
-}
-
-/* 获取两矩形重叠部分的矩形 */
-LCUI_API int
-LCUIRect_GetOverlay( LCUI_Rect a, LCUI_Rect b, LCUI_Rect *out )
-{
-	int x = 0,y = 0,w = 0,h = 0;
-	
-	if(b.x > a.x && b.x+b.width < a.x+a.width) {
-		x = a.x;
-		w = b.width;
-	} else if(b.x <= a.x && b.x+b.width >= a.x+a.width) {
-		x = a.x;
-		w = a.width;
-	} else if(b.x+b.width > a.x && b.x+b.width <= a.x+a.width) {
-		x = a.x;
-		w = b.x+b.width - a.x;
-	} else if(b.x >= a.x && b.x < a.x+a.width) {
-	   x = b.x;
-	   w = a.x+a.width - b.x;
-	}
-	
-	if(b.y > a.y && b.y+b.height < a.y+a.height) {
-		y = b.y;
-		h = b.height;
-	} else if(b.y <= a.y && b.y+b.height >= a.y+a.height) {
-	   y = a.y;
-	   h = a.height;
-	} else if(b.y+b.height > a.y && b.y+b.height <= a.y+a.height) {
-		y = a.y;
-		h = b.y+b.height - a.y;
-	} else if(b.y >= a.y && b.y < a.y+a.height) {
-		y = b.y;
-		h = a.y+a.height - b.y;
-	}
-	
-	*out = Rect(x, y, w, h);
-	if (x + w == 0 || y + h == 0) {
-		return 0;
-	}
-	return 1;
-}
-
-/* 检测一个点是否被矩形包含 */
-LCUI_API LCUI_BOOL
-LCUIRect_IncludePoint( LCUI_Pos pos, LCUI_Rect rect )
-{
-	if (pos.x >= rect.x && pos.x < rect.x + rect.width-1 
-	 && pos.y >= rect.y && pos.y < rect.y + rect.height-1) {
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-}
-
 /** 
  * 获取两个矩形中的重叠矩形
  * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
-LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect( LCUI_Rect *a, LCUI_Rect *b, 
-					   LCUI_Rect *out )
+static LCUI_BOOL 
+LCUIRect_GetOverlayRect( LCUI_Rect *a, LCUI_Rect *b, LCUI_Rect *out )
 {
 	if( a->x > b->x ) {
 		out->x = a->x;
@@ -374,11 +162,106 @@ static void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b )
 	}
 }
 
+/** 
+ * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形
+ * 分割方法如下：
+ * ┏━━┳━━━━━━┓
+ * ┃    ┃     3      ┃
+ * ┃ 0  ┣━━━┳━━┃
+ * ┃    ┃rect1 ┃    ┃
+ * ┃    ┃      ┃ 2  ┃
+ * ┣━━┻━━━┫    ┃
+ * ┃     1      ┃    ┃
+ * ┗━━━━━━┻━━┛
+ *
+ * rect2 必须被 rect1 完全包含
+ */
+static void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
+				LCUI_Rect rects[4] )
+{
+	rects[0].x = rect2->x;
+	rects[0].y = rect2->y;
+	rects[0].w = rect1->x - rect2->x;
+	rects[0].h = rect1->y + rect1->h - rect2->y;
+
+	rects[1].x = rect2->x;
+	rects[1].y = rects[0].y + rects[0].h;
+	rects[1].w = rect1->x + rect1->w - rect2->x;
+	rects[1].h = rect2->y + rect2->h - rects[1].y;
+
+	rects[2].x = rect1->x + rect1->w;
+	rects[2].y = rect1->y;
+	rects[2].w = rect2->x + rect2->w - rects[2].x;
+	rects[2].h = rect2->y + rect2->h - rects[2].y;
+
+	rects[3].x = rect1->x;
+	rects[3].y = rect2->y;
+	rects[3].w = rect2->x + rect2->w - rects[3].x;
+	rects[3].h = rect1->y - rects[3].y;
+}
+
+/** 
+ * 根据重叠矩形 rect1，将矩形 rect2 分割成两个矩形
+ * rect1必须在 rect2 内，且与rect2有一个顶点相同 
+ */
+static int LCUIRect_CutTwoRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
+				LCUI_Rect rects[2] )
+{
+	/* 两个相交矩形，除去重叠区域，最多可分割出两个区域。
+		* 根据与重叠矩形的坐标，判断新矩形在重叠矩形的哪个位置 */
+	if( rect2->x == rect1->x ) {
+		/* 右下方 */
+		if( rect2->y == rect1->y ) {
+			rects[0].x = rect2->x + rect1->w;
+			rects[0].y = rect1->y;
+			rects[0].w = rect2->x + rect2->w - rects[0].x;
+			rects[0].h = rect1->h;
+			rects[1].x = rect2->x;
+			rects[1].y = rect1->h;
+			rects[1].w = rect2->w;
+			rects[1].h = rect2->y + rect2->h - rects[0].y;
+			return 0;
+		}
+		/* 右上方 */
+		rects[0].x = rect2->x;
+		rects[0].y = rect2->y;
+		rects[0].w = rect2->w;
+		rects[0].h = rect2->h - rect1->h;
+		rects[1].x = rect2->x + rect1->w;
+		rects[1].w = rect2->w - rect1->w;
+		rects[1].y = rect1->y;
+		rects[1].h = rect1->h;
+		return 1;
+	}
+	/* 左下方 */
+	if( rect2->y == rect1->y ) {
+		rects[0].x = rect2->x;
+		rects[0].y = rect2->y;
+		rects[0].w = rect2->w - rect1->w;
+		rects[0].h = rect1->h;
+		rects[1].x = rect2->x;
+		rects[1].y = rect2->y + rect1->h;
+		rects[1].w = rect2->w - rect1->w;
+		rects[1].h = rect2->h - rect1->h;
+		return 2;
+	}
+	/* 左上方 */
+	rects[0].x = rect2->x;
+	rects[0].y = rect2->y;
+	rects[0].w = rect2->w;
+	rects[0].h = rect2->h - rect1->h;
+	rects[1].x = rect2->x;
+	rects[1].y = rect2->y + rect1->h;
+	rects[1].w = rect2->w - rect1->w;
+	rects[1].h = rect1->h;
+	return 3;
+}
+
 /** 添加一个脏矩形记录 */
 LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 {
 	int ret;
-	LCUI_Rect *p_rect, o_rect, tmp_rect;
+	LCUI_Rect *p_rect, o_rect, tmp_rect[2];
 
 	if( rect->w <= 0 || rect->h <= 0 ) {
 		return -1;
@@ -411,161 +294,61 @@ LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 			/* 添加合并后的矩形 */
 			return DirtyRectList_Add( list, &o_rect );
 		}
-		/* 两个相交矩形，除去重叠区域，最多可分割出两个区域。
-		 * 根据与重叠矩形的坐标，判断新矩形在重叠矩形的哪个位置 */
-		if( rect->x == o_rect.x ) {
-			/* 右下方 */
-			if( rect->y == o_rect.y ) {
-				tmp_rect.x = rect->x + o_rect.w;
-				tmp_rect.y = o_rect.y;
-				tmp_rect.w = rect->x + rect->w - tmp_rect.x;
-				tmp_rect.h = o_rect.h;
-				ret = DirtyRectList_Add( list, &tmp_rect );
-			
-				tmp_rect.x = rect->x;
-				tmp_rect.y = o_rect.h;
-				tmp_rect.w = rect->w;
-				tmp_rect.h = rect->y + rect->h - tmp_rect.y;
-				ret |= DirtyRectList_Add( list, &tmp_rect );
-			} else { /* 右上方 */
-				tmp_rect.x = rect->x;
-				tmp_rect.y = rect->y;
-				tmp_rect.w = rect->w;
-				tmp_rect.h = rect->h - o_rect.h;
-				ret = DirtyRectList_Add( list, &tmp_rect );
-
-				tmp_rect.x = rect->x + o_rect.w;
-				tmp_rect.w = rect->w - o_rect.w;
-				tmp_rect.y = o_rect.y;
-				tmp_rect.h = o_rect.h;
-				ret |= DirtyRectList_Add( list, &tmp_rect );
-			}
-		} else {
-			/* 左下方 */
-			if( rect->y == o_rect.y ) {
-				tmp_rect.x = rect->x;
-				tmp_rect.y = rect->y;
-				tmp_rect.w = rect->w - o_rect.w;
-				tmp_rect.h = o_rect.h;
-				ret = DirtyRectList_Add( list, &tmp_rect );
-				
-				tmp_rect.x = rect->x;
-				tmp_rect.y = rect->y + o_rect.h;
-				tmp_rect.w = rect->w - o_rect.w;
-				tmp_rect.h = rect->h - o_rect.h;
-				ret |= DirtyRectList_Add( list, &tmp_rect );
-			} else {/* 左上方 */
-				tmp_rect.x = rect->x;
-				tmp_rect.y = rect->y;
-				tmp_rect.w = rect->w;
-				tmp_rect.h = rect->h - o_rect.h;
-				ret = DirtyRectList_Add( list, &tmp_rect );
-				
-				tmp_rect.x = rect->x;
-				tmp_rect.y = rect->y + o_rect.h;
-				tmp_rect.w = rect->w - o_rect.w;
-				tmp_rect.h = o_rect.h;
-				ret |= DirtyRectList_Add( list, &tmp_rect );
-			}
-		}
+		LCUIRect_CutTwoRect( &o_rect, rect, tmp_rect );
+		ret = DirtyRectList_Add( list, &tmp_rect[0] );
+		ret |= DirtyRectList_Add( list, &tmp_rect[1] );
 		return ret;
 	}
 
 	/* 验证通过，则添加进去 */
-	LinkedList_AddData( list, rect );
+	LinkedList_AddDataCopy( list, rect );
 	return 0;
 }
 
-/* 切换队列 */
-LCUI_API void
-DoubleRectQueue_Switch( LCUI_RectQueue *queue )
+/** 删除脏矩形 */
+LCUI_API int DirtyRectList_Delete( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 {
-	if( queue->number == 0 ) {
-		queue->number = 1;
-	} else {
-		queue->number = 0;
-	}
-}
+	LCUI_Rect *p_rect, o_rect, tmp_rect[4];
 
-/* 初始化储存矩形数据的队列 */
-LCUI_API void
-DoubleRectQueue_Init( LCUI_RectQueue *queue )
-{
-	queue->number = 0;
-	Queue_Init( &queue->queue[0], sizeof(LCUI_Rect), NULL );
-	Queue_Init( &queue->queue[1], sizeof(LCUI_Rect), NULL );
-	/* 采用链表来记录数据 */
-	Queue_SetDataMode( &queue->queue[0], QUEUE_DATA_MODE_LINKED_LIST );
-	Queue_SetDataMode( &queue->queue[1], QUEUE_DATA_MODE_LINKED_LIST );
-}
+	if( rect->w <= 0 || rect->h <= 0 ) {
+		return -1;
+	}
+	/* 定位至链表表头 */
+	LinkedList_Goto( list, 0 );
+	while( p_rect = (LCUI_Rect*)LinkedList_Get( list )) {
+		/* 如果被现有的矩形包含，则分割现有矩形 */
+		if( LCUIRect_IsIncludeRect( p_rect, rect ) ) {
+			LCUIRect_CutFourRect( rect, p_rect, tmp_rect );
+			LinkedList_Delete( list );
+			LinkedList_InsertCopy( list, &tmp_rect[0] );
+			LinkedList_InsertCopy( list, &tmp_rect[1] );
+			LinkedList_InsertCopy( list, &tmp_rect[1] );
+			LinkedList_InsertCopy( list, &tmp_rect[2] );
+			/* 
+			 * 既然现有矩形包含了这个矩形，那么不用继续遍历了，
+			 * 因为不会有其它矩形会与这个矩形相交，直接退出即可。 
+			 */
+			return 0;
+		}
+		/* 如果包含现有的矩形 */
+		if( LCUIRect_IsIncludeRect( rect, p_rect ) ) {
+			LinkedList_Delete( list );
+			continue;
+		}
+		/* 如果与现有的矩形不重叠 */
+		if( !LCUIRect_GetOverlayRect( rect, p_rect, &o_rect ) ) {
+			LinkedList_ToNext( list );
+			continue;
+		}
 
-/* 销毁储存矩形数据的队列 */
-LCUI_API void
-DoubleRectQueue_Destroy( LCUI_RectQueue *queue )
-{
-	Queue_Destroy( &queue->queue[0] );
-	Queue_Destroy( &queue->queue[1] );
-}
+		LCUIRect_CutTwoRect( &o_rect, p_rect, tmp_rect );
+		LinkedList_Delete( list );
+		LinkedList_InsertCopy( list, &tmp_rect[0] );
+		LinkedList_InsertCopy( list, &tmp_rect[1] );
+		/* 跳过这两个新加入的矩形 */
+		LinkedList_ToNext( list );
+		LinkedList_ToNext( list );
+	}
 
-/* 添加矩形区域至可用的队列 */
-LCUI_API int
-DoubleRectQueue_AddToValid( LCUI_RectQueue *queue, LCUI_Rect rect )
-{
-	if( queue->number == 0 ) {
-		return RectQueue_Add( &queue->queue[1], rect );
-	} else {
-		return RectQueue_Add( &queue->queue[0], rect );
-	}
-}
-
-/* 添加矩形区域至当前占用的队列 */
-LCUI_API int
-DoubleRectQueue_AddToCurrent( LCUI_RectQueue *queue, LCUI_Rect rect )
-{
-	if( queue->number == 0 ) {
-		return RectQueue_Add( &queue->queue[0], rect );
-	} else {
-		return RectQueue_Add( &queue->queue[1], rect );
-	}
-}
-
-/* 从可用的队列中取出一个矩形区域 */
-LCUI_API LCUI_BOOL
-DoubleRectQueue_GetFromValid( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
-{
-	LCUI_Rect *rect_ptr;
-	LCUI_Queue *q;
-	if( queue->number == 0 ) {
-		q = &queue->queue[1];
-	} else {
-		q = &queue->queue[0];
-	}
-	rect_ptr = (LCUI_Rect*)Queue_Get( q, 0 );
-	Queue_Delete( q, 0 );
-	if( rect_ptr == NULL ) {
-		return FALSE;
-	}
-	*rect_buff = *rect_ptr;
-	return TRUE;
-}
-
-/* 从当前占用的队列中取出一个矩形区域 */
-LCUI_API LCUI_BOOL
-DoubleRectQueue_GetFromCurrent( LCUI_RectQueue *queue, LCUI_Rect *rect_buff )
-{
-	LCUI_Rect *rect_ptr;
-	LCUI_Queue *q;
-	if( queue->number == 0 ) {
-		q = &queue->queue[0];
-	} else {
-		q = &queue->queue[1];
-	}
-	rect_ptr = (LCUI_Rect*)Queue_Get( q, 0 );
-	if( rect_ptr == NULL ) {
-		Queue_Delete( q, 0 );
-		return FALSE;
-	}
-	*rect_buff = *rect_ptr;
-	Queue_Delete( q, 0 );
-	return TRUE;
+	return 1;
 }
