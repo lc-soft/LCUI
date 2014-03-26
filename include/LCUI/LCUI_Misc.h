@@ -43,28 +43,27 @@
 #define __LCUI_MISC_H__
 
 #include LC_MISC_DELAY_H
-#include LC_MISC_RECT_H
 #include LC_MISC_STRING_H
 #include LC_MISC_DIRENT_H
 #include LC_MISC_RB_TREE_H
 #include LC_MISC_LINKED_LIST_H
+#include LC_MISC_RECT_H
 
 LCUI_BEGIN_HEADER
 	
 /****************** 布局 ******************/
-typedef enum LAYOUT_TYPE_
-{
+typedef enum LayoutType_ {
 	LAYOUT_NONE	= 0,	  /* 无 */
 	LAYOUT_NORMAL	= 0,
 	LAYOUT_ZOOM	= 1,	  /* 缩放 */
 	LAYOUT_STRETCH	= 1<<1,	  /* 拉伸 */
 	LAYOUT_CENTER	= 1<<2,	  /* 居中 */
 	LAYOUT_TILE	= 1<<3	  /* 平铺 */
-}LAYOUT_TYPE;
+} LayoutType;
 /******************************************/
 
 /*----------------- 对齐方式 -------------------*/
-typedef enum ALIGN_TYPE_ {
+typedef enum AlignType_ {
 	ALIGN_NONE,		/* 无 */
 	ALIGN_TOP_LEFT,	  	/* 向左上角对齐 */
 	ALIGN_TOP_CENTER,	/* 向上中间对齐 */
@@ -75,7 +74,7 @@ typedef enum ALIGN_TYPE_ {
 	ALIGN_BOTTOM_LEFT,	/* 向底部偏左对齐 */
 	ALIGN_BOTTOM_CENTER,	/* 向底部居中对齐 */
 	ALIGN_BOTTOM_RIGHT	/* 向底部偏右对齐 */
-} ALIGN_TYPE;
+} AlignType;
 /*---------------------------------------------*/
 
 /* 检测result是否包含option */
