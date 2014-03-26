@@ -136,11 +136,14 @@ LCUI_API int LinkedList_MoveTo( LinkedList *list, int pos );
 /** 在当前结点前面插入新结点，并记录数据 */
 LCUI_API void LinkedList_Insert( LinkedList *list, void *data );
 
-/** 将数据复制至链表的相应结点上的数据内存中 */
-LCUI_API void *LinkedList_AddData( LinkedList *list, void *data );
+/** 在当前结点前面插入新结点，并将数据的副本记录到该结点上 */
+LCUI_API void* LinkedList_InsertCopy( LinkedList *list, void *data );
 
-/** 将数据的地址记录至链表的相应结点 */
-LCUI_API void *LinkedList_AddDataByAddress( LinkedList *list, void *data_ptr );
+/** 将数据的副本记录至链表的相应结点上 */
+LCUI_API void *LinkedList_AddDataCopy( LinkedList *list, void *data );
+
+/** 将数据引用至链表的相应结点 */
+LCUI_API void LinkedList_AddData( LinkedList *list, void *data_ptr );
 
 /** 跳转至指定结点 */
 LCUI_API int LinkedList_Goto( LinkedList *list, int pos );
