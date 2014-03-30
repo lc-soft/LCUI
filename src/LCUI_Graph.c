@@ -309,7 +309,7 @@ LCUI_API int Graph_Quote( LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area )
 	}
 	//printf("Graph_Quote(), before, area: %d,%d,%d,%d\n",
 	//	area.x, area.y, area.width, area.height);
-	area = LCUIRect_ValidArea(Size(src->w, src->h), area);
+	area = LCUIRect_ValidateArea(Size(src->w, src->h), area);
 	//printf("Graph_Quote(), after, area: %d,%d,%d,%d\n",
 	//	area.x, area.y, area.width, area.height);
 	if(!LCUIRect_IsValid( area )) { 
@@ -476,7 +476,7 @@ LCUI_API int Graph_Cut( LCUI_Graph *src_graph, LCUI_Rect rect, LCUI_Graph *out_g
 	int k, x, y, des_n, src_n;
 	
 	out_graph->alpha = src_graph->alpha;
-	rect = LCUIRect_ValidArea(Size(src_graph->w, src_graph->h), rect); 
+	rect = LCUIRect_ValidateArea(Size(src_graph->w, src_graph->h), rect); 
 	
 	if( !Graph_IsValid(src_graph) || rect.width <= 0 || rect.height <= 0) {
 		return -1;
@@ -1366,7 +1366,7 @@ LCUI_API int Graph_FillImage( LCUI_Graph *graph, LCUI_Graph *backimg,
 	return Graph_FillImage( graph, backimg, layout, area );
 }
 
-LCUI_API int Graph_FillImageWithColr( LCUI_Graph *graph, LCUI_Graph *backimg,
+LCUI_API int Graph_FillImageWithColor( LCUI_Graph *graph, LCUI_Graph *backimg,
 						int layout, LCUI_RGB color )
 {
 	LCUI_Rect area;

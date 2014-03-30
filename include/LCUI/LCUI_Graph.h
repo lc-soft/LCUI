@@ -187,7 +187,7 @@ LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph,
 LCUI_API int Graph_FillImage( LCUI_Graph *graph, LCUI_Graph *backimg,
 				int layout );
 
-LCUI_API int Graph_FillImageWithColr( LCUI_Graph *graph, LCUI_Graph *backimg,
+LCUI_API int Graph_FillImageWithColor( LCUI_Graph *graph, LCUI_Graph *backimg,
 						int layout, LCUI_RGB color );
 
 LCUI_END_HEADER
