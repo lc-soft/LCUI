@@ -200,7 +200,7 @@ WidgetFunc_Get(	const char *widget_type, WidgetFuncType func_type )
 }
 
 /* 检测指定部件类型是否有效 */
-LCUI_API LCUI_BOOL WidgetType_Valid( const char *widget_type )
+LCUI_API LCUI_BOOL WidgetType_IsValid( const char *widget_type )
 {
 	int i, n;
 	WidgetTypeData *wd;
