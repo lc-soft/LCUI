@@ -53,7 +53,7 @@ void LCUIModule_Cursor_End( void );
 LCUI_API void LCUICursor_Refresh( void );
 
 /* 检测鼠标游标是否可见 */
-LCUI_API LCUI_BOOL LCUICursor_Visible( void );
+LCUI_API LCUI_BOOL LCUICursor_IsVisible( void );
 
 /* 显示鼠标游标 */
 LCUI_API void LCUICursor_Show( void );
@@ -87,7 +87,7 @@ LCUICursor_GetNewPos( void );
 
 /* 检测鼠标游标是否覆盖在矩形区域上 */
 LCUI_API LCUI_BOOL 
-LCUICursor_CoverRect( LCUI_Rect rect );
+LCUICursor_IsCoverRect( LCUI_Rect rect );
 
 /* 将当前鼠标游标的图像叠加至目标图像指定位置 */
 LCUI_API int

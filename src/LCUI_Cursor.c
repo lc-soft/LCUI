@@ -130,12 +130,12 @@ void LCUIModule_Cursor_End( void )
 LCUI_API void
 LCUICursor_Refresh( void )
 {
-	LCUIScreen_InvalidArea ( LCUICursor_GetRect() );
+	LCUIScreen_InvalidateArea ( LCUICursor_GetRect() );
 }
 
 /* 检测鼠标游标是否可见 */
 LCUI_API LCUI_BOOL
-LCUICursor_Visible( void )
+LCUICursor_IsVisible( void )
 {
 	return global_cursor.visible;
 }
@@ -182,7 +182,7 @@ LCUICursor_UpdatePos( void )
  	/* 刷新游标的显示 */
 	LCUICursor_Refresh();
 	/* 刷新游标原来的区域中的图形 */
-	LCUIScreen_InvalidArea ( old );
+	LCUIScreen_InvalidateArea ( old );
 }
 
 /* 设定游标的位置 */
@@ -227,9 +227,9 @@ LCUICursor_GetNewPos( void )
 
 /* 检测鼠标游标是否覆盖在矩形区域上 */
 LCUI_API LCUI_BOOL 
-LCUICursor_CoverRect( LCUI_Rect rect )
+LCUICursor_IsCoverRect( LCUI_Rect rect )
 {
-	return LCUIRect_Overlay( rect, LCUICursor_GetRect() );
+	return LCUIRect_IsCoverRect( rect, LCUICursor_GetRect() );
 }
 
 /* 将当前鼠标游标的图像叠加至目标图像指定位置 */
