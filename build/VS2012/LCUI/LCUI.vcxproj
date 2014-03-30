@@ -146,6 +146,7 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_library.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_msg.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_style.h" />
     <ClInclude Include="..\..\..\include\LCUI\kernel\device.h" />
     <ClInclude Include="..\..\..\include\LCUI\kernel\event.h" />
@@ -214,6 +215,7 @@
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
     <ClCompile Include="..\..\..\src\gui\widget_library.c" />
     <ClCompile Include="..\..\..\src\gui\widget_msg.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
     <ClCompile Include="..\..\..\src\gui\widget_style.c" />
     <ClCompile Include="..\..\..\src\input\keyboard.c" />
     <ClCompile Include="..\..\..\src\input\mouse.c" />
@@ -250,6 +252,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="C:\Users\刘超\Desktop\bak.text_box.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\AUTHORS" />

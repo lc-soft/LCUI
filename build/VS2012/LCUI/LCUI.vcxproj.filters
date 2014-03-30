@@ -246,6 +246,9 @@
     <ClInclude Include="..\..\..\include\LCUI\misc\linkedlist.h">
       <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -439,6 +442,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\misc\linkedlist.c">
       <Filter>源文件\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\刘超\Desktop\bak.text_box.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_paint.c">
+      <Filter>源文件\gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
