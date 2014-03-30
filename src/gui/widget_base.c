@@ -52,6 +52,7 @@
 #include <math.h>
 #include <limits.h>
 
+/** 根部件 */
 static LCUI_Widget root_widget;
 
 /*************************** Container ********************************/
@@ -191,16 +192,6 @@ Widget_GetChildList( LCUI_Widget *widget )
 		return &root_widget.child;
 	}
 	return &widget->child;
-}
-
-/* 获取部件的矩形区域队列 */
-LCUI_API LCUI_RectQueue*
-Widget_GetInvalidAreaQueue( LCUI_Widget *widget )
-{
-	if( widget == NULL ) {
-		return &root_widget.invalid_area;
-	}
-	return &widget->invalid_area;
 }
 
 /*-------------------------- Widget Pos ------------------------------*/
@@ -672,23 +663,6 @@ Widget_GetRect(LCUI_Widget *widget)
 
 /*------------------------ END Widget Size ----------------------------*/
 
-LCUI_API void*
-Widget_GetPrivData(LCUI_Widget *widget)
-/* 功能：获取部件的私有数据结构体的指针 */
-{
-	if( !widget ) {
-		return NULL;
-	}
-	return widget->private_data;
-}
-
-LCUI_API LCUI_Widget*
-Get_Widget_Parent(LCUI_Widget *widget)
-/* 功能：获取部件的父部件 */
-{
-	return widget->parent;
-}
-
 LCUI_API int
 Widget_PrintChildList( LCUI_Widget *widget )
 {
@@ -743,123 +717,6 @@ print_widget_info(LCUI_Widget *widget)
 	} else {
 		printf("NULL widget\n");
 	}
-}
-
-/* 在指定部件的内部区域内设定需要刷新的区域 */
-LCUI_API int Widget_InvalidateArea( LCUI_Widget *widget, LCUI_Rect rect )
-{
-	if( !widget ) {
-		return LCUIScreen_InvalidArea( rect );
-	}
-	if (rect.width <= 0 || rect.height <= 0) {
-		return -1;
-	}
-	/* 加上内边距 */
-	rect.x += widget->glayer->padding.left;
-	rect.y += widget->glayer->padding.top;
-	/* 根据部件所在容器的尺寸，调整矩形位置及尺寸 */
-	rect = LCUIRect_ValidArea( Widget_GetSize(widget), rect );
-	if( widget->visible ) {
-		LCUIScreen_MarkSync();
-	}
-	/* 保存至队列中 */
-	DoubleRectQueue_AddToValid( &widget->invalid_area, rect );
-	return 0;
-}
-
-/** 获取部件中的无效区域 */
-LCUI_API int Widget_GetInvalidArea( LCUI_Widget *widget, LCUI_Rect *area )
-{
-	return DoubleRectQueue_GetFromCurrent( &widget->invalid_area, area );
-}
-
-/** 使部件中的一块区域有效化 */
-LCUI_API void Widget_ValidateArea( LCUI_Widget *widget, LCUI_Rect area )
-{
-	
-}
-
-/*
- * global_pos: 当前部件的全局坐标
- * valid_area: 当前所在容器的有效显示区域
- * */
-static void
-__Widget_SyncInvalidArea(	LCUI_Widget *widget,
-				LCUI_Pos global_pos,
-				LCUI_Rect valid_area )
-{
-	int n;
-	LCUI_Pos point;
-	LCUI_Queue *widget_list;
-	LCUI_Widget *child;
-	LCUI_Rect rect;
-	LCUI_RectQueue *rect_queue;
-
-	rect_queue = Widget_GetInvalidAreaQueue( widget );
-	point.x = valid_area.x + valid_area.width;
-	point.y = valid_area.y + valid_area.height;
-	DoubleRectQueue_Switch( rect_queue );
-	while( DoubleRectQueue_GetFromCurrent( rect_queue, &rect ) ) {
-		/* 加上当前部件的全局坐标 */
-		rect.x += global_pos.x;
-		rect.y += global_pos.y;
-		/* 根据当前有效区域，对取出的区域进行调整 */
-		if( rect.x < valid_area.x ) {
-			rect.width -= (valid_area.x - rect.x);
-			rect.x = valid_area.x;
-		}
-		if( rect.y < valid_area.y ) {
-			rect.height -= (valid_area.y - rect.y);
-			rect.y = valid_area.y;
-		}
-		if( rect.x + rect.width > point.x ) {
-			rect.width = point.x - rect.x;
-		}
-		if( rect.y + rect.height > point.y ) {
-			rect.height = point.y - rect.y;
-		}
-		/* 添加至屏幕无效区域队列 */
-		LCUIScreen_InvalidArea( rect );
-	}
-	/* 根据当前部件的区域，计算有效显示区域 */
-	if( global_pos.x > valid_area.x ) {
-		valid_area.width -= (global_pos.x - valid_area.x);
-		valid_area.x = global_pos.x;
-	}
-	if( global_pos.y > valid_area.y ) {
-		valid_area.height -= (global_pos.y - valid_area.y);
-		valid_area.y = global_pos.y;
-	}
-	if( global_pos.x + widget->size.w < point.x ) {
-		valid_area.width = global_pos.x + widget->size.w - valid_area.x;
-	}
-	if( global_pos.y + widget->size.h < point.y ) {
-		valid_area.height = global_pos.y + widget->size.h - valid_area.y;
-	}
-	widget_list = Widget_GetChildList( widget );
-	n = Queue_GetTotal( widget_list );
-	while(n--) {
-		child = (LCUI_Widget*)Queue_Get( widget_list, n );
-		if( !child || !child->visible ) {
-			continue;
-		}
-		point.x = global_pos.x + child->pos.x;
-		point.y = global_pos.y + child->pos.y;
-		point.x += widget->glayer->padding.left;
-		point.y += widget->glayer->padding.top;
-		__Widget_SyncInvalidArea( child, point, valid_area );
-	}
-}
-
-/* 将所有可见部件的无效区域 同步至 屏幕无效区域队列中 */
-LCUI_API void
-Widget_SyncInvalidArea( void )
-{
-	LCUI_Rect valid_area;
-	valid_area.x = valid_area.y = 0;
-	valid_area.width = LCUIScreen_GetWidth();
-	valid_area.height = LCUIScreen_GetHeight();
-	__Widget_SyncInvalidArea( &root_widget, Pos(0,0), valid_area );
 }
 
 /*
@@ -1053,8 +910,10 @@ static LCUI_Widget* __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 		if( !child || !child->visible ) {
 			continue;
 		}
-		/* 如果这个点没被包含在部件区域内 */
-		if( !LCUIRect_IncludePoint( pos, Widget_GetRect(child) ) ) {
+		/* 如果这个点不在部件区域内 */
+		if( pos.x < child->pos.x || pos.y < child->pos.y
+		|| pos.x >= child->pos.x + widget->size.w
+		|| pos.y >= child->pos.y + widget->size.h ) {
 			continue;
 		}
 		/* 改变相对坐标 */
@@ -1082,13 +941,6 @@ LCUI_API LCUI_Widget* Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 	}
 	return widget;
 
-}
-
-/** 为部件分配一个用于存放私有数据的内存空间 */
-LCUI_API void* Widget_NewPrivData( LCUI_Widget *widget, size_t size )
-{
-	widget->private_data = malloc(size);
-	return widget->private_data;
 }
 
 static void Widget_BackgroundInit( LCUI_Widget *widget )
@@ -1127,7 +979,7 @@ static void WidgetList_DestroyWidget( void *arg )
 	GraphLayer_Free( widget->glayer );
 	/* 移除后，解除互斥锁 */
 	LCUIScreen_UnlockGraphLayerTree();
-	DoubleRectQueue_Destroy( &widget->invalid_area );
+	DirtyRectList_Destroy( &widget->dirty_rect );
 	/* 调用回调函数销毁部件私有数据 */
 	WidgetFunc_Call( widget, FUNC_TYPE_DESTROY );
 	free( widget->private_data );
@@ -1250,7 +1102,7 @@ static void Widget_AttrInit( LCUI_Widget *widget )
 	widget->glayer->graph.color_type = COLOR_TYPE_RGBA;
 	//widget->glayer->graph.is_opaque = FALSE;
 	//widget->glayer->graph.not_visible = TRUE;
-	DoubleRectQueue_Init( &widget->invalid_area ); /* 初始化无效区域记录 */
+	DirtyRectList_Init( &widget->dirty_rect );
 	EventSlots_Init( &widget->event );	/* 初始化部件的事件数据队列 */
 	WidgetQueue_Init( &widget->child );	/* 初始化子部件集 */
 	WidgetMsgBuff_Init( widget );
@@ -1258,54 +1110,6 @@ static void Widget_AttrInit( LCUI_Widget *widget )
 	LCUIString_Init( &widget->type_name );
 	LCUIString_Init( &widget->style_name );
 	LCUIMutex_Init( &widget->mutex );	/* 初始化互斥锁 */
-}
-
-/** 销毁部件 */
-static void Widget_ExecDestroy( LCUI_Widget *widget )
-{
-	int i, total;
-	LCUI_Queue *child_list;
-	LCUI_Widget *tmp;
-
-	if( !widget ) {
-		return;
-	}
-	child_list = Widget_GetChildList( widget->parent );
-	Queue_Lock( child_list );
-	total = Queue_GetTotal(child_list);
-	for(i=0; i<total; ++i) {
-		tmp = (LCUI_Widget*)Queue_Get(child_list, i);
-		if(tmp == widget) {
-			Queue_Delete(child_list, i);
-			break;
-		}
-	}
-	Queue_Unlock( child_list );
-}
-
-/** 初始化根部件 */
-LCUI_API void RootWidget_Init(void)
-{
-	Widget_AttrInit( &root_widget );
-	Widget_SetAlign( &root_widget, ALIGN_MIDDLE_CENTER, Pos(0,0) );
-}
-
-/** 销毁根部件 */
-LCUI_API void RootWidget_Destroy(void)
-{
-	Widget_ExecDestroy( &root_widget );
-}
-
-/** 获取根部件图层指针 */
-LCUI_API LCUI_GraphLayer *RootWidget_GetGraphLayer(void)
-{
-	return root_widget.glayer;
-}
-
-/** 获取根部件指针 */
-LCUI_API LCUI_Widget *RootWidget_GetSelf(void)
-{
-	return &root_widget;
 }
 
 /***********************************************************
@@ -1343,7 +1147,7 @@ LCUI_API LCUI_Widget* Widget_New( const char *widget_type )
 		return widget;
 	}
 	/* 验证部件类型是否有效 */
-	if( !WidgetType_Valid(widget_type) ) {
+	if( !WidgetType_IsValid(widget_type) ) {
 		puts(WIDGET_ERROR_TYPE_NOT_FOUND);
 		return NULL;
 	}
@@ -1392,7 +1196,7 @@ Widget_SetClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode )
 
 /** 设定部件的对齐方式以及偏移距离 */
 LCUI_API void Widget_SetAlign(	LCUI_Widget *widget, 
-				ALIGN_TYPE align, 
+				AlignType align, 
 				LCUI_Pos offset )
 {
 	if( !widget ) {
@@ -1555,7 +1359,7 @@ LCUI_API void Widget_SetBackgroundImage(	LCUI_Widget *widget,
 
 /** 设定背景图的布局 */
 LCUI_API void Widget_SetBackgroundLayout(	LCUI_Widget *widget,
-						LAYOUT_TYPE layout )
+						LayoutType layout )
 {
 	if(!widget) {
 		return;
@@ -1852,6 +1656,29 @@ LCUI_API int Widget_Front( LCUI_Widget *widget )
 	return GraphLayer_Front( Widget_GetGraphLayer(widget) );
 }
 
+/** 销毁部件 */
+static void Widget_ExecDestroy( LCUI_Widget *widget )
+{
+	int i, total;
+	LCUI_Queue *child_list;
+	LCUI_Widget *tmp;
+
+	if( !widget ) {
+		return;
+	}
+	child_list = Widget_GetChildList( widget->parent );
+	Queue_Lock( child_list );
+	total = Queue_GetTotal(child_list);
+	for(i=0; i<total; ++i) {
+		tmp = (LCUI_Widget*)Queue_Get(child_list, i);
+		if(tmp == widget) {
+			Queue_Delete(child_list, i);
+			break;
+		}
+	}
+	Queue_Unlock( child_list );
+}
+
 /** 执行显示部件的任务 */
 LCUI_API void Widget_ExecShow( LCUI_Widget *widget )
 {
@@ -1988,10 +1815,10 @@ static int Widget_DrawBackground( LCUI_Widget *widget, LCUI_Rect area )
 	bg = &widget->background;
 	/* 如果背景透明，则使用覆盖模式将背景图绘制到部件上 */
 	if( bg->transparent ) {
-		return Graph_FillImage( graph, &bg->image, bg->layout, area );
+		return Graph_FillImageEx( graph, &bg->image, bg->layout, area );
 	}
 	/* 否则，使用叠加模式 */
-	return Graph_FillImageWithColor( graph, &bg->image, bg->layout,
+	return Graph_FillImageWithColorEx( graph, &bg->image, bg->layout,
 							bg->color, area );
 }
 
@@ -2503,8 +2330,48 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 	return TRUE;
 }
 
-/** 更新各个部件的无效区域中的内容 */
-LCUI_API void LCUIWidget_UpdateInvalidArea(void)
+/*--------------------------------- Root Widget -----------------------------*/
+/** 初始化根部件 */
+static void RootWidget_Init(void)
 {
-	/* 优先重绘顶层部件中的无效区域的内容 */
+	Widget_AttrInit( &root_widget );
+	Widget_SetAlign( &root_widget, ALIGN_MIDDLE_CENTER, Pos(0,0) );
+}
+
+/** 销毁根部件 */
+static void RootWidget_Destroy(void)
+{
+	Widget_ExecDestroy( &root_widget );
+}
+
+/** 获取根部件图层指针 */
+LCUI_API LCUI_GraphLayer *RootWidget_GetGraphLayer(void)
+{
+	return root_widget.glayer;
+}
+
+/** 获取根部件指针 */
+LCUI_API LCUI_Widget *RootWidget_GetSelf(void)
+{
+	return &root_widget;
+}
+
+/*------------------------------- End Root Widget ---------------------------*/
+
+/** 初始化部件模块 */
+void LCUIModule_Widget_Init( void )
+{
+	RootWidget_Init();
+	LCUIWidgetStyleLibrary_Init();
+	LCUIWidgetPainter_Init();
+	LCUIWidgetEvent_Init();
+}
+
+/** 停用部件模块 */
+void LCUIModule_Widget_End( void )
+{
+	RootWidget_Destroy();
+	LCUIWidgetStyleLibrary_Destroy();
+	LCUIWidgetPainter_Destroy();
+	LCUIWidgetEvent_Destroy();
 }
