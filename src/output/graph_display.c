@@ -54,13 +54,13 @@
 #include <Windows.h>
 #endif
 
-#define MS_PER_FRAME 1000/MAX_FRAMES_PER_SEC;		/**< 每帧画面的最少耗时(ms) */
+#define MS_PER_FRAME 1000/MAX_FRAMES_PER_SEC;	/**< 每帧画面的最少耗时(ms) */
 
-static LCUI_BOOL i_am_init = FALSE;			/**< 标志，指示本模块是否初始化 */
-static LCUI_BOOL need_sync_area = FALSE;		/**< 标志，指示是否需要同步无效区域 */
-static LCUI_RectQueue screen_invalid_area;		/**< 屏幕无效区域记录 */
-static LCUI_Mutex glayer_list_mutex;			/**< 图层列表的互斥锁 */
-static LCUI_Screen screen;				/**< 屏幕信息 */
+static LCUI_BOOL i_am_init = FALSE;		/**< 标志，指示本模块是否初始化 */
+static LCUI_BOOL need_sync_area = FALSE;	/**< 标志，指示是否需要同步无效区域 */
+static LinkedList screen_invalid_area;		/**< 屏幕无效区域记录 */
+static LCUI_Mutex glayer_list_mutex;		/**< 图层列表的互斥锁 */
+static LCUI_Screen screen;			/**< 屏幕信息 */
 
 /** 获取屏幕宽度 */
 LCUI_API int LCUIScreen_GetWidth( void )
@@ -80,27 +80,14 @@ LCUI_API LCUI_Size LCUIScreen_GetSize( void )
 	return screen.size;
 }
 
-/** 获取屏幕无效区域队列的指针 */
-LCUI_API LCUI_RectQueue* LCUIScreen_GetInvalidAreaQueue( void )
-{
-	if( !i_am_init ) {
-		return NULL;
-	}
-	return &screen_invalid_area;
-}
-
 /** 设置屏幕内的指定区域为无效区域 */
-LCUI_API int LCUIScreen_InvalidArea( LCUI_Rect rect )
+LCUI_API int LCUIScreen_InvalidateArea( LCUI_Rect rect )
 {
 	if( !i_am_init ) {
 		return -1;
 	}
-	if (rect.width <= 0 || rect.height <= 0) {
-		return -2;
-	}
-	rect = LCUIRect_ValidArea(LCUIScreen_GetSize(), rect);
-	DEBUG_MSG("%d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
-	return DoubleRectQueue_AddToValid ( &screen_invalid_area, rect );
+	rect = LCUIRect_ValidateArea( screen.size, rect );
+	return DirtyRectList_Add( &screen_invalid_area, &rect );
 }
 
 /** 获取屏幕每个像素点的色彩值所占的位数 */
@@ -130,7 +117,10 @@ LCUI_API void LCUIScreen_SetInfo( LCUI_Screen *info )
 /** 获取屏幕中心点的坐标 */
 LCUI_API LCUI_Pos LCUIScreen_GetCenter( void )
 {
-	return Pos(screen.size.w/2.0, screen.size.h/2.0);
+	LCUI_Pos pos;
+	pos.x = screen.size.w/2.0; 
+	pos.y = screen.size.h/2.0;
+	return pos;
 }
 
 /** 为图层树锁上互斥锁 */
@@ -154,11 +144,11 @@ LCUI_API void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 	GraphLayer_GetGraph( RootWidget_GetGraphLayer(), graph, rect );
 	LCUIScreen_UnlockGraphLayerTree();
 	/* 如果游标不可见 */
-	if ( !LCUICursor_Visible() ) {
+	if ( !LCUICursor_IsVisible() ) {
 		return;
 	}
 	/* 如果该区域与游标的图形区域重叠 */
-	if ( LCUICursor_CoverRect( rect ) ) {
+	if ( LCUICursor_IsCoverRect( rect ) ) {
 		cursor_pos = LCUICursor_GetPos();
 		pos.x = cursor_pos.x - rect.x;
 		pos.y = cursor_pos.y - rect.y;
@@ -185,25 +175,23 @@ static void Win32_Clinet_InvalidArea( LCUI_Rect rect )
 /** 更新无效区域内的图像 */
 static int LCUIScreen_UpdateInvalidArea(void)
 {
-	int ret;
-	LCUI_Rect rect;
+	int ret = 0;
+	LCUI_Rect *p_rect;
 	LCUI_Graph graph;
 
 	//_DEBUG_MSG("enter\n");
 	Graph_Init( &graph );
-	ret = 0;
-	/* 切换可用队列为当前使用的队列 */
-	DoubleRectQueue_Switch( &screen_invalid_area );
+	LinkedList_Goto( &screen_invalid_area, 0 );
 	while( i_am_init ) {
-		/* 如果从队列中获取数据成功 */
-		if ( !DoubleRectQueue_GetFromCurrent(&screen_invalid_area, &rect) ) {
+		p_rect = (LCUI_Rect*)LinkedList_Get( &screen_invalid_area );
+		if( !p_rect ) {
 			break;
 		}
 		ret = 1;
 		/* 获取内存中对应区域的图形数据 */
-		LCUIScreen_GetRealGraph( rect, &graph );
+		LCUIScreen_GetRealGraph( *p_rect, &graph );
 		/* 写入至帧缓冲，让屏幕显示图形 */
-		LCUIScreen_PutGraph( &graph, Pos(rect.x, rect.y) );
+		LCUIScreen_PutGraph( &graph, Pos(p_rect->x, p_rect->y) );
 	}
 	//_DEBUG_MSG("quit\n");
 	Graph_Free( &graph );
@@ -287,14 +275,16 @@ static void LCUIScreen_Update( void* unused )
 	screen_area.x = screen_area.y = 0;
 	screen_area.width = screen.size.w;
 	screen_area.height = screen.size.h;
-	LCUIScreen_InvalidArea( screen_area );
+	LCUIScreen_InvalidateArea( screen_area );
 	/* 初始化帧数控制 */
 	FrameControl_Init( 1000/MAX_FRAMES_PER_SEC );
 	while( LCUI_Sys.state == ACTIVE ) {
 		/* 更新鼠标位置 */
 		LCUICursor_UpdatePos();
 		/* 处理所有部件消息 */
-		WidgetMsg_Proc(NULL);
+		LCUIWidget_ProcMessage();
+		/* 更新各个部件的无效区域中的内容 */
+		LCUIWidget_ProcInvalidArea();
 		/* 同步部件中的无效区域至屏幕的无效区域记录中 */
 		val = LCUIScreen_SyncInvalidArea();
 		/* 更新屏幕上各无效区域内的图像内容 */
@@ -319,7 +309,7 @@ LCUI_API int LCUIModule_Video_Init( int w, int h, int mode )
 	LCUIMutex_Init( &glayer_list_mutex );
 	LCUIScreen_Init( w, h, mode );
 	i_am_init = TRUE;
-	DoubleRectQueue_Init( &screen_invalid_area );
+	DirtyRectList_Init( &screen_invalid_area );
 	return _LCUIThread_Create( &LCUI_Sys.display_thread,
 			LCUIScreen_Update, NULL );
 }
@@ -332,6 +322,6 @@ LCUI_API int LCUIModule_Video_End( void )
 	}
 	LCUIScreen_Destroy();
 	i_am_init = FALSE;
-	DoubleRectQueue_Destroy( &screen_invalid_area );
+	DirtyRectList_Destroy( &screen_invalid_area );
 	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
 }

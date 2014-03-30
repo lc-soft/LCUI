@@ -101,11 +101,8 @@ LCUI_API int LCUIScreen_GetHeight( void );
 /** 获取屏幕尺寸 */
 LCUI_API LCUI_Size LCUIScreen_GetSize( void );
 
-/** 获取屏幕无效区域队列的指针 */
-LCUI_API LCUI_RectQueue* LCUIScreen_GetInvalidAreaQueue( void );
-
 /** 设置屏幕内的指定区域为无效区域 */
-LCUI_API int LCUIScreen_InvalidArea( LCUI_Rect rect );
+LCUI_API int LCUIScreen_InvalidateArea( LCUI_Rect rect );
 
 /** 获取屏幕每个像素点的色彩值所占的位数 */
 LCUI_API int LCUIScreen_GetBits( void );
