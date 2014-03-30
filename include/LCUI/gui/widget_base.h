@@ -79,10 +79,6 @@ Widget_GetGraphLayer( LCUI_Widget *widget );
 LCUI_API LCUI_Queue*
 Widget_GetChildList( LCUI_Widget *widget );
 
-/* 获取部件的矩形区域队列 */
-LCUI_API LCUI_RectQueue*
-Widget_GetInvalidAreaQueue( LCUI_Widget *widget );
-
 /*-------------------------- Widget Pos ------------------------------*/
 /* 通过计算得出部件的x轴坐标 */
 LCUI_API int
@@ -190,9 +186,13 @@ _Widget_GetSize(LCUI_Widget *widget);
 LCUI_API LCUI_Rect
 Widget_GetRect(LCUI_Widget *widget);
 
-/* 获取部件的私有数据结构体的指针 */
-LCUI_API void*
-Widget_GetPrivData(LCUI_Widget *widget);
+/** 获取部件的私有数据 */
+#define Widget_GetPrivateData(widget) \
+	widget->private_data 
+
+/**  为部件分配一个用于存放私有数据的内存空间 */
+#define Widget_NewPrivateData(widget,type) \
+	(type*)(widget->private_data = malloc(sizeof(type)))
 
 LCUI_API int
 Widget_PrintChildList( LCUI_Widget *widget );
@@ -259,9 +259,6 @@ Widget_SetStyleID( LCUI_Widget *widget, int style_id );
 /** 获取指定坐标上的子部件，有则返回子部件指针，否则返回NULL */
 LCUI_API LCUI_Widget* Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos );
 
-/** 为部件分配一个用于存放私有数据的内存空间 */
-LCUI_API void* Widget_NewPrivData( LCUI_Widget *widget, size_t size );
-
 /* 初始化部件队列 */
 LCUI_API void WidgetQueue_Init(LCUI_Queue *queue);
 
@@ -274,12 +271,6 @@ LCUI_API int Widget_Lock( LCUI_Widget *widget );
 LCUI_API int Widget_TryLock( LCUI_Widget *widget );
 
 LCUI_API int Widget_Unlock( LCUI_Widget *widget );
-
-/* 初始化根部件 */
-LCUI_API void RootWidget_Init(void);
-
-/* 销毁根部件 */
-LCUI_API void RootWidget_Destroy(void);
 
 /* 获取根部件图层指针 */
 LCUI_API LCUI_GraphLayer *RootWidget_GetGraphLayer(void);
@@ -312,7 +303,7 @@ Widget_SetClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode );
 
 /* 设定部件的对齐方式以及偏移距离 */
 LCUI_API void
-Widget_SetAlign(LCUI_Widget *widget, ALIGN_TYPE align, LCUI_Pos offset);
+Widget_SetAlign(LCUI_Widget *widget, AlignType align, LCUI_Pos offset);
 
 /*
  * 功能：设定部件的最大尺寸
@@ -347,7 +338,7 @@ Widget_SetBackgroundImage( LCUI_Widget *widget, LCUI_Graph *img );
 
 /* 设定背景图的布局 */
 LCUI_API void
-Widget_SetBackgroundLayout( LCUI_Widget *widget, LAYOUT_TYPE layout );
+Widget_SetBackgroundLayout( LCUI_Widget *widget, LayoutType layout );
 
 /* 设定部件的背景颜色 */
 LCUI_API void
@@ -564,6 +555,6 @@ LCUI_API void Widget_SetAlpha( LCUI_Widget *widget, uchar_t alpha );
 LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr );
 
 /** 更新各个部件的无效区域中的内容 */
-LCUI_API void LCUIWidget_UpdateInvalidArea(void);
+LCUI_API int LCUIWidget_ProcInvalidArea(void);
 
 #endif
