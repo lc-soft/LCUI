@@ -42,48 +42,33 @@
 #define __LCUI_MISC_RECT_H__
 
 LCUI_BEGIN_HEADER
-
+	
 typedef LinkedList LCUI_DirtyRectList;
 
-/*----------------------------- RectQueue ------------------------------*/
+/* 将数值转换成LCUI_Rect型结构体 */
+LCUI_API LCUI_Rect Rect( int x, int y, int w, int h );
 
-typedef struct LCUI_RectQueueRec {
-	LCUI_Queue	queue[2];	/* 两个队列 */
-	unsigned int	number:1;	/* 正使用的队列的下标，只有0和1 */
-} LCUI_RectQueue;
+/** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
+LCUI_API void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
+							LCUI_Rect *cut );
 
-/* 将矩形数据追加至队列 */
-LCUI_API int RectQueue_Add( LCUI_Queue *queue, LCUI_Rect rect );
+/** 根据容器尺寸，获取指定区域的有效显示区域 */
+LCUI_API LCUI_Rect LCUIRect_ValidateArea( LCUI_Size box_size, LCUI_Rect rect );
 
-/* 切换队列 */
-LCUI_API void
-DoubleRectQueue_Switch( LCUI_RectQueue *queue );
+/** 检测矩形是否遮盖另一个矩形 */
+LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 );
 
-/* 初始化储存矩形数据的队列 */
-LCUI_API void
-DoubleRectQueue_Init( LCUI_RectQueue *queue );
+/** 初始化脏矩形记录 */
+LCUI_API void DirtyRectList_Init( LCUI_DirtyRectList *list );
 
-/* 销毁储存矩形数据的队列 */
-LCUI_API void
-DoubleRectQueue_Destroy( LCUI_RectQueue *queue );
+/** 销毁脏矩形记录 */
+LCUI_API void DirtyRectList_Destroy( LCUI_DirtyRectList *list );
 
-/* 添加矩形区域至可用的队列 */
-LCUI_API int
-DoubleRectQueue_AddToValid( LCUI_RectQueue *queue, LCUI_Rect rect );
+/** 添加一个脏矩形记录 */
+LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect );
 
-/* 添加矩形区域至当前占用的队列 */
-LCUI_API int
-DoubleRectQueue_AddToCurrent( LCUI_RectQueue *queue, LCUI_Rect rect );
-
-/* 从可用的队列中取出一个矩形区域 */
-LCUI_API LCUI_BOOL
-DoubleRectQueue_GetFromValid( LCUI_RectQueue *queue, LCUI_Rect *rect_buff );
-
-/* 从当前占用的队列中取出一个矩形区域 */
-LCUI_API LCUI_BOOL
-DoubleRectQueue_GetFromCurrent( LCUI_RectQueue *queue, LCUI_Rect *rect_buff );
-
-/*--------------------------- End RectQueue ----------------------------*/
+/** 删除脏矩形 */
+LCUI_API int DirtyRectList_Delete( LCUI_DirtyRectList *list, LCUI_Rect *rect );
 
 LCUI_END_HEADER
 

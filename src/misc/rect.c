@@ -84,7 +84,7 @@ LCUI_API void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
 }
 
 /** 根据容器尺寸，获取指定区域的有效显示区域 */
-LCUI_API LCUI_Rect LCUIRect_ValidArea( LCUI_Size box_size, LCUI_Rect rect )
+LCUI_API LCUI_Rect LCUIRect_ValidateArea( LCUI_Size box_size, LCUI_Rect rect )
 {
 	if (rect.x < 0) {
 		rect.width += rect.x;
@@ -110,6 +110,30 @@ LCUI_API LCUI_Rect LCUIRect_ValidArea( LCUI_Size box_size, LCUI_Rect rect )
 		}
 	}
 	return rect;
+}
+
+/** 检测矩形是否遮盖另一个矩形 */
+LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 )
+{
+	if( rect1.x > rect2.x ) {
+		if( rect2.x + rect2.w <= rect1.x ) {
+			return FALSE;
+		}
+	} else {
+		if( rect1.x + rect1.w <= rect2.x ) {
+			return FALSE;
+		}
+	}
+	if( rect1.y > rect2.y ) {
+		if( rect2.y + rect2.h <= rect1.y ) {
+			return FALSE;
+		}
+	} else {
+		if( rect1.y + rect1.h <= rect2.y ) {
+			return FALSE;
+		}
+	}
+	return TRUE;
 }
 
 /** 
@@ -255,6 +279,20 @@ static int LCUIRect_CutTwoRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 	rects[1].w = rect2->w - rect1->w;
 	rects[1].h = rect1->h;
 	return 3;
+}
+
+/** 初始化脏矩形记录 */
+LCUI_API void DirtyRectList_Init( LCUI_DirtyRectList *list )
+{
+	LinkedList_Init( list, sizeof(LCUI_Rect) );
+	LinkedList_SetDataMemReuse( list, TRUE );
+	LinkedList_SetDataNeedFree( list, TRUE );
+}
+
+/** 销毁脏矩形记录 */
+LCUI_API void DirtyRectList_Destroy( LCUI_DirtyRectList *list )
+{
+	LinkedList_Destroy( list );
 }
 
 /** 添加一个脏矩形记录 */
