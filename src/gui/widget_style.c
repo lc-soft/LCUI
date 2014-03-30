@@ -54,13 +54,13 @@ static int add_imagefile( const char *filepath, LCUI_Graph *buff )
 	return 0;
 }
 
-LCUI_API void WidgetStyle_LibraryInit( void )
+void LCUIWidgetStyleLibrary_Init( void )
 {
 	StyleLIB_Init( &style_library );
 	Queue_Init( &imagefile_library, sizeof(image_data), destroy_imagefile_library );
 }
 
-LCUI_API void WidgetStyle_LibraryDestroy( void )
+void LCUIWidgetStyleLibrary_Destroy( void )
 {
 	StyleLIB_Destroy( &style_library );
 	Queue_Destroy( &imagefile_library );
@@ -217,7 +217,7 @@ static int WidgetStyle_SyncPostion(
 	LCUI_Pos offset;
 	char *attr_value;
 	IntOrFloat_t num;
-	ALIGN_TYPE align;
+	AlignType align;
 	StyleLIB_Property *widget_attr;
 	
 	offset.x = widget->offset.x;

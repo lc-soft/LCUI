@@ -1,9 +1,9 @@
 ﻿#ifndef __LCUI_WIDGET_STYLE_H__
 #define __LCUI_WIDGET_STYLE_H__
 
-LCUI_API void WidgetStyle_LibraryInit( void );
+LCUI_API void LCUIWidgetStyleLibrary_Init( void );
 
-LCUI_API void WidgetStyle_LibraryDestroy( void );
+LCUI_API void LCUIWidgetStyleLibrary_Destroy( void );
 
 LCUI_API int WidgetStyle_LoadFromString( const char *style_str );
 
