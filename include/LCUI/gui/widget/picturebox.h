@@ -58,30 +58,6 @@ LCUI_BEGIN_HEADER
 #define SIZE_MODE_NORMAL	LAYOUT_NORMAL
 /*************************************************/
 
-typedef struct _LCUI_PictureBox	LCUI_PictureBox;
-/******************* 图像状态 *******************/
-#define IMAGE_STATE_LOADING   1
-#define IMAGE_STATE_FAIL     -1
-#define IMAGE_STATE_SUCCESS   0
-/**********************************************/
-
-
-/**************************** 图片盒子 *********************************/
-struct _LCUI_PictureBox
-{
-	LCUI_Graph	*image;		/* 在PictureBox中显示的图像 */
-	LCUI_Rect	read_box;	/* 显示图像的区域范围 */ 
-	LCUI_Graph	buff_graph;	/* 用于储存缩放后的图形 */
-	float		scale;		/* 缩放比例 */
-	int		size_mode;	/* 控制PictureBox该如何处理图像位置和部件大小 */
-	
-	LCUI_Graph	error_image;	/* 当加载图像失败时显示的图像 */
-	LCUI_Graph	initial_image;	/* 正在加载另一图像时显示的图像 */ 
-	
-	int		image_state;	/* 图片状态(LOADING / FAIL / SUCCESS) */
-};
-/****************************** END ***********************************/
-
 /* 获取图片盒子的图片显示的区域 */
 LCUI_API LCUI_Rect
 PictureBox_GetViewArea( LCUI_Widget *widget );
