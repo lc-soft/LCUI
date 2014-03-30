@@ -93,7 +93,7 @@ typedef struct LCUI_Background_ {
 	LCUI_BOOL transparent;	/* 是否透明 */
 	LCUI_Graph image;	/* 背景图 */
 	LCUI_RGB color;		/* 背景色 */
-	LAYOUT_TYPE layout;	/* 背景图的布局 */
+	LayoutType layout;	/* 背景图的布局 */
 } LCUI_Background;
 /*--------------------------------------------------------*/
 
@@ -130,7 +130,7 @@ struct LCUI_Widget_ {
 
 	/*----------------- 部件布局相关 ----------------*/
 	PositionType	pos_type;	/* 位置类型 */
-	ALIGN_TYPE	align;		/* 布局 */
+	AlignType	align;		/* 布局 */
 	LCUI_Pos	offset;		/* x，y轴的偏移量 */
 	DockType	dock;		/* 停靠位置 */
 	/*------------------ END ----------------------*/
@@ -144,7 +144,7 @@ struct LCUI_Widget_ {
 	LCUI_Queue event;		/* 保存部件的事件关联的数据 */
 	LCUI_Queue msg_buff;		/* 记录子部件的消息 */
 	LCUI_Queue msg_func;		/* 记录与自定义消息关联的函数 */
-	LCUI_RectQueue invalid_area;	/* 记录无效区域 */
+	LCUI_DirtyRectList dirty_rect;	/* 记录无效区域（脏矩形） */
 
 	WidgetState state;	/* 部件当前状态 */
 	int valid_state;	/* 对部件有效的状态 */
@@ -170,7 +170,7 @@ struct LCUI_Widget_ {
 	void (*hide)(LCUI_Widget*);
 	void (*disable)(LCUI_Widget*);
 	void (*enable)(LCUI_Widget*);
-	void (*set_align)(LCUI_Widget*, ALIGN_TYPE, LCUI_Pos);
+	void (*set_align)(LCUI_Widget*, AlignType, LCUI_Pos);
 	void (*set_alpha)(LCUI_Widget*, unsigned char);
 	void (*set_border)(LCUI_Widget*, LCUI_Border);
 };
@@ -181,6 +181,7 @@ LCUI_END_HEADER
 
 #include LC_WIDGET_MSG_H
 #include LC_WIDGET_BASE_H
+#include LC_WIDGET_PAINT_H
 #include LC_WIDGET_EVENT_H
 #include LC_WIDGET_LIBRARY_H
 #include LC_WIDGET_STYLE_H
