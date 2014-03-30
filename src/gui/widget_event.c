@@ -595,28 +595,6 @@ static int Widget_DispatchKeyboardEvent(	LCUI_Widget *widget,
 	return 0;
 }
 
-static void WidgetFocusProc( LCUI_Event *event, void *arg );
-
-/** 初始化部件模块 */
-LCUI_API void LCUIModule_Widget_Init( void )
-{
-	RootWidget_Init();
-	Queue_Init( &widget_proc_record, sizeof(WidgetRecordItem), NULL );
-	LCUISysEvent_Connect( LCUI_MOUSEBUTTONDOWN, LCUI_HandleMouseButton, NULL );
-	LCUISysEvent_Connect( LCUI_MOUSEBUTTONUP, LCUI_HandleMouseButton, NULL );
-	LCUISysEvent_Connect( LCUI_MOUSEMOTION, LCUI_HandleMouseMotion, NULL );
-	LCUISysEvent_Connect( LCUI_KEYDOWN, WidgetFocusProc, NULL );
-	LCUISysEvent_Connect( LCUI_KEYUP, WidgetFocusProc, NULL );
-	WidgetStyle_LibraryInit();
-}
-
-/** 停用部件模块 */
-LCUI_API void LCUIModule_Widget_End( void )
-{
-	RootWidget_Destroy();
-	Queue_Destroy( &widget_proc_record );
-	WidgetStyle_LibraryDestroy();
-}
 /*************************** Event End *********************************/
 
 
@@ -831,3 +809,20 @@ static void WidgetFocusProc( LCUI_Event *event, void *unused )
 	}
 }
 /*------------------------- End Focus Proc ----------------------------*/
+
+/** 初始化部件事件处理 */
+void LCUIWidgetEvent_Init(void)
+{
+	Queue_Init( &widget_proc_record, sizeof(WidgetRecordItem), NULL );
+	LCUISysEvent_Connect( LCUI_MOUSEBUTTONDOWN, LCUI_HandleMouseButton, NULL );
+	LCUISysEvent_Connect( LCUI_MOUSEBUTTONUP, LCUI_HandleMouseButton, NULL );
+	LCUISysEvent_Connect( LCUI_MOUSEMOTION, LCUI_HandleMouseMotion, NULL );
+	LCUISysEvent_Connect( LCUI_KEYDOWN, WidgetFocusProc, NULL );
+	LCUISysEvent_Connect( LCUI_KEYUP, WidgetFocusProc, NULL );
+}
+
+/** 销毁部件事件处理 */
+void LCUIWidgetEvent_Destroy(void)
+{
+	Queue_Destroy( &widget_proc_record );
+}

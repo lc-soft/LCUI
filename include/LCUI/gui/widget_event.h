@@ -170,6 +170,12 @@ LCUI_API LCUI_BOOL Widget_ResetFocus( LCUI_Widget* widget );
 
 /*--------------------------------- END -------------------------------------*/
 
+/** 初始化部件事件处理 */
+void LCUIWidgetEvent_Init(void);
+
+/** 销毁部件事件处理 */
+void LCUIWidgetEvent_Destroy(void);
+
 LCUI_END_HEADER
 
 #endif
