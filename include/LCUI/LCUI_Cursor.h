@@ -49,6 +49,9 @@ void LCUIModule_Cursor_Init( void );
 
 void LCUIModule_Cursor_End( void );
 
+/* 获取鼠标游标的区域范围 */
+LCUI_API void LCUICursor_GetRect( LCUI_Rect *rect );
+
 /* 刷新鼠标游标在屏幕上显示的图形 */
 LCUI_API void LCUICursor_Refresh( void );
 
@@ -61,37 +64,26 @@ LCUI_API void LCUICursor_Show( void );
 /* 隐藏鼠标游标 */
 LCUI_API void LCUICursor_Hide( void );
 
-/* 获取鼠标游标的区域范围 */
-LCUI_API LCUI_Rect LCUICursor_GetRect( void );
-
 /* 更新鼠标指针的位置 */
-LCUI_API void
-LCUICursor_UpdatePos( void );
+LCUI_API void LCUICursor_UpdatePos( void );
 
 /* 设定游标的位置 */
 LCUI_API void LCUICursor_SetPos( LCUI_Pos pos );
 
-/*
- * 功能：设定游标的图形
- * 返回值：设定成功返回0，失败则返回-1
-*/
+/** 设置游标的图形 */
 LCUI_API int LCUICursor_SetGraph( LCUI_Graph *graph );
 
 /* 获取鼠标指针当前的坐标 */
-LCUI_API LCUI_Pos
-LCUICursor_GetPos( void );
+LCUI_API void LCUICursor_GetPos( LCUI_Pos *pos );
 
 /* 获取鼠标指针将要更新的坐标 */
-LCUI_API LCUI_Pos
-LCUICursor_GetNewPos( void );
+LCUI_API void LCUICursor_GetNewPos( LCUI_Pos *pos );
 
 /* 检测鼠标游标是否覆盖在矩形区域上 */
-LCUI_API LCUI_BOOL 
-LCUICursor_IsCoverRect( LCUI_Rect rect );
+LCUI_BOOL LCUICursor_IsCoverRect( LCUI_Rect rect );
 
 /* 将当前鼠标游标的图像叠加至目标图像指定位置 */
-LCUI_API int
-LCUICursor_MixGraph( LCUI_Graph *buff, LCUI_Pos pos );
+int LCUICursor_MixGraph( LCUI_Graph *buff, LCUI_Pos pos );
 
 LCUI_END_HEADER
 

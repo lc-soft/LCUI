@@ -126,81 +126,71 @@ void LCUIModule_Cursor_End( void )
 	Graph_Free( &global_cursor.graph );
 }
 
-/* 刷新鼠标游标在屏幕上显示的图形 */
-LCUI_API void
-LCUICursor_Refresh( void )
+/* 获取鼠标游标的区域范围 */
+LCUI_API void LCUICursor_GetRect( LCUI_Rect *rect )
 {
-	LCUIScreen_InvalidateArea ( LCUICursor_GetRect() );
+	rect->x = global_cursor.current_pos.x;
+	rect->y = global_cursor.current_pos.y;
+	rect->width = global_cursor.graph.w;
+	rect->height = global_cursor.graph.h;
+}
+
+/* 刷新鼠标游标在屏幕上显示的图形 */
+LCUI_API void LCUICursor_Refresh( void )
+{
+	LCUI_Rect rect;
+	LCUICursor_GetRect( &rect );
+	LCUIScreen_InvalidateArea( &rect );
 }
 
 /* 检测鼠标游标是否可见 */
-LCUI_API LCUI_BOOL
-LCUICursor_IsVisible( void )
+LCUI_API LCUI_BOOL LCUICursor_IsVisible( void )
 {
 	return global_cursor.visible;
 }
 
 /* 显示鼠标游标 */
-LCUI_API void
-LCUICursor_Show( void )
+LCUI_API void LCUICursor_Show( void )
 {
 	global_cursor.visible = TRUE;	/* 标识游标为可见 */
 	LCUICursor_Refresh();
 }
 
 /* 隐藏鼠标游标 */
-LCUI_API void
-LCUICursor_Hide( void )
+LCUI_API void LCUICursor_Hide( void )
 {
 	global_cursor.visible = FALSE;
 	LCUICursor_Refresh();
 }
 
-/* 获取鼠标游标的区域范围 */
-LCUI_API LCUI_Rect
-LCUICursor_GetRect( void )
-{
-	LCUI_Rect rect;
-	rect.x = global_cursor.current_pos.x;
-	rect.y = global_cursor.current_pos.y;
-	rect.width = global_cursor.graph.w;
-	rect.height = global_cursor.graph.h;
-	return rect;
-}
-
 /* 更新鼠标指针的位置 */
-LCUI_API void
-LCUICursor_UpdatePos( void )
+LCUI_API void LCUICursor_UpdatePos( void )
 {
 	LCUI_Rect old;
 	if( global_cursor.current_pos.x == global_cursor.new_pos.x
 	 && global_cursor.current_pos.y == global_cursor.new_pos.y ) {
 		return;
 	}
-	old = LCUICursor_GetRect();
+	LCUICursor_GetRect( &old );
  	global_cursor.current_pos = global_cursor.new_pos;
  	/* 刷新游标的显示 */
 	LCUICursor_Refresh();
 	/* 刷新游标原来的区域中的图形 */
-	LCUIScreen_InvalidateArea ( old );
+	LCUIScreen_InvalidateArea ( &old );
 }
 
 /* 设定游标的位置 */
-LCUI_API void
-LCUICursor_SetPos( LCUI_Pos pos )
+LCUI_API void LCUICursor_SetPos( LCUI_Pos pos )
 {
 	global_cursor.new_pos = pos;
 	DEBUG_MSG("new pos: %d,%d\n", pos.x, pos.y);
 }
 
-/*
- * 功能：设定游标的图形
- * 返回值：设定成功返回0，失败则返回-1
-*/
-LCUI_API int
-LCUICursor_SetGraph( LCUI_Graph *graph )
+/** 设置游标的图形 */
+LCUI_API int LCUICursor_SetGraph( LCUI_Graph *graph )
 {
-	if (Graph_IsValid (graph)) {
+	if( Graph_IsValid (graph) ) {
+		LCUICursor_Refresh();
 		if( Graph_IsValid(&global_cursor.graph) ) {
 			Graph_Free( &global_cursor.graph );
 		}
@@ -212,29 +202,27 @@ LCUICursor_SetGraph( LCUI_Graph *graph )
 }
 
 /* 获取鼠标指针当前的坐标 */
-LCUI_API LCUI_Pos
-LCUICursor_GetPos( void )
+LCUI_API void LCUICursor_GetPos( LCUI_Pos *pos )
 {
-	return global_cursor.current_pos;
+	*pos = global_cursor.current_pos;
 }
 
 /* 获取鼠标指针将要更新的坐标 */
-LCUI_API LCUI_Pos
-LCUICursor_GetNewPos( void )
+LCUI_API void LCUICursor_GetNewPos( LCUI_Pos *pos )
 {
-	return global_cursor.new_pos;
+	*pos = global_cursor.new_pos;
 }
 
 /* 检测鼠标游标是否覆盖在矩形区域上 */
-LCUI_API LCUI_BOOL 
-LCUICursor_IsCoverRect( LCUI_Rect rect )
+LCUI_BOOL LCUICursor_IsCoverRect( LCUI_Rect rect )
 {
-	return LCUIRect_IsCoverRect( rect, LCUICursor_GetRect() );
+	LCUI_Rect cursor_rect;
+	LCUICursor_GetRect( &cursor_rect );
+	return LCUIRect_IsCoverRect( rect, cursor_rect );
 }
 
 /* 将当前鼠标游标的图像叠加至目标图像指定位置 */
-LCUI_API int
-LCUICursor_MixGraph( LCUI_Graph *buff, LCUI_Pos pos )
+int LCUICursor_MixGraph( LCUI_Graph *buff, LCUI_Pos pos )
 {
 	return Graph_Mix( buff, &global_cursor.graph, pos );
 }
