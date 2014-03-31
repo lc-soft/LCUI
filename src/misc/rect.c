@@ -43,8 +43,9 @@
 #include LC_LCUI_H
 #include LC_MISC_H
 
-#define LCUIRect_IsIncludeRect(a,b) 	b->x >= a->x && b->x + b->w <= a->x + a->w \
-					&& b->y >= a->y && b->y + b->h <= a->y + a->h
+#define LCUIRect_IsIncludeRect(a,b)	\
+	b->x >= a->x && b->x + b->w <= a->x + a->w \
+	&& b->y >= a->y && b->y + b->h <= a->y + a->h
 
 /* 将数值转换成LCUI_Rect型结构体 */
 LCUI_API LCUI_Rect Rect( int x, int y, int w, int h )
