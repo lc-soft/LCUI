@@ -470,11 +470,11 @@ __GraphLayer_GetLayers(
 		tmp.x += pos.x;
 		tmp.y += pos.y;
 		/* 判断区域是否有效 */
-		if( !LCUIRect_IsValid(tmp) ) {
+		if( !tmp.w <= 0 || tmp.h <= 0 ) {
 			continue;
 		}
 		/* 若该有效区域与目标区域重叠，则记录子部件，并进行递归 */
-		if( LCUIRect_Overlay(tmp, rect) ) {
+		if( LCUIRect_IsCoverRect(tmp, rect) ) {
 			Queue_AddPointer( queue, child );
 			__GraphLayer_GetLayers(	root_glayer, 
 						child, rect, queue );
@@ -564,16 +564,19 @@ LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr,
 		if( alpha < 255 ) {
 			continue;
 		}
-		/* 如果色彩类型为RGB，没有alpha通道 */
-		if( glayer->graph.color_type == COLOR_TYPE_RGB ) {
-			/* 如果该图层的有效区域包含目标区域 */
-			if( LCUIRect_IncludeRect(valid_area, rect) ) { 
-				/* 移除底层的图层，因为已经被完全遮挡 */
-				for(total=i-1;total>=0; --total) {
-					Queue_DeletePointer( &glayerQ, 0 );
-				}
-				goto skip_loop;
+		/* 跳过有alpha通道的图层 */
+		if( glayer->graph.color_type == COLOR_TYPE_RGBA ) {
+			continue;
+		}
+		/* 如果该图层的有效区域包含目标区域 */
+		if( rect.x >= valid_area.x && rect.y >= valid_area.y
+		 && rect.x + rect.w <= valid_area.x + valid_area.w
+		 && rect.y + rect.h <= valid_area.y + valid_area.h ) {
+			/* 移除底层的图层，因为已经被完全遮挡 */
+			for(total=i-1;total>=0; --total) {
+				Queue_DeletePointer( &glayerQ, 0 );
 			}
+			goto skip_loop;
 		}
 	}
 skip_loop:
