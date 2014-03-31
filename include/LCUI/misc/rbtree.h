@@ -17,7 +17,7 @@
  * 
  * You should have received a copy of the GPLv2 along with this file. It is 
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * ***************************************************************************/
  
 /* ****************************************************************************
  * rbtree.h -- 红黑树
@@ -35,7 +35,7 @@
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
- * ****************************************************************************/
+ * ***************************************************************************/
 
 #ifndef __RBTREE_H__
 #define __RBTREE_H__
@@ -56,8 +56,10 @@ typedef struct LCUI_RBTreeRec_ {
         LCUI_RBTreeNode *root;
 } LCUI_RBTree;
 
+/** 初始化红黑树 */
 LCUI_API void RBTree_Init( LCUI_RBTree *rbt );
 
+/** 销毁红黑树 */
 LCUI_API void RBTree_Destroy( LCUI_RBTree *rbt );
 
 /** 获取第一个结点 */
