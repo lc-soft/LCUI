@@ -78,7 +78,7 @@ LCUI_API int LCUIMouse_ButtonDown( int key_code )
 	}
 	button_state[key_code] = LCUIKEYSTATE_PRESSED;
 	event.type = LCUI_MOUSEBUTTONDOWN;
-	pos = LCUICursor_GetPos();
+	LCUICursor_GetPos( &pos );
 	event.button.x = pos.x;
 	event.button.y = pos.y;
 	event.button.button = key_code;
@@ -98,7 +98,7 @@ LCUI_API int LCUIMouse_ButtonUp( int key_code )
 	}
 	button_state[key_code] = LCUIKEYSTATE_RELEASE;
 	event.type = LCUI_MOUSEBUTTONUP;
-	pos = LCUICursor_GetPos();
+	LCUICursor_GetPos( &pos );
 	event.button.x = pos.x;
 	event.button.y = pos.y;
 	event.button.button = key_code;
@@ -221,7 +221,7 @@ static LCUI_BOOL proc_mouse( void )
 	}
 	new_pos.x = new_pos.x<0 ? 0:new_pos.x;
 	new_pos.y = new_pos.y<0 ? 0:new_pos.y;
-	pos = LCUICursor_GetPos();
+	LCUICursor_GetPos( &pos );
 	if( pos.x == new_pos.x && pos.y == new_pos.y ) {
 		return FALSE;
 	}
