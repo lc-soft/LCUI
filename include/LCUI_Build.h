@@ -97,6 +97,7 @@
 #define LC_WIDGET_EVENT_H	<LCUI/gui/widget_event.h>
 #define LC_WIDGET_LIBRARY_H	<LCUI/gui/widget_library.h>
 #define LC_WIDGET_STYLE_H	<LCUI/gui/widget_style.h>
+#define LC_WIDGET_PAINT_H	<LCUI/gui/widget_paint.h>
 #define LC_WIDGET_H		<LCUI/LCUI_Widget.h>
 
 #define LC_FONT_H	<LCUI/LCUI_Font.h>
