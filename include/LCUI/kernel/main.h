@@ -52,8 +52,7 @@ typedef struct LCUI_App_ {
 	LCUI_Queue widget_lib;		/**< 部件类型库 */
 	LCUI_Sleeper mainloop_sleeper;	/**< 用于决定主循环是否睡眠 */
 	LCUI_Mutex task_mutex;		/**< 任务互斥锁，当运行程序任务时会锁上 */
-}
-LCUI_App;
+} LCUI_App;
 /**********************************************************************/
 
 /***************************整个LCUI的数据 *****************************/
