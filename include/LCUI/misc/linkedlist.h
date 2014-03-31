@@ -65,6 +65,12 @@ struct LinkedListRec_ {
         void (*destroy_func)(void*);
 };
 
+/** 获取当前数据元素的总数量 */
+__inline int LinkedList_GetTotal( LinkedList *list )
+{
+	return list->used_node_num;
+}
+
 /** 设置是否需要重复使用结点的数据内存空间 */
 __inline void LinkedList_SetDataMemReuse( LinkedList *list, int is_true )
 {
@@ -72,7 +78,7 @@ __inline void LinkedList_SetDataMemReuse( LinkedList *list, int is_true )
 }
 
 /** 设置结点中的数据是否需要释放 */
-__inline void LinkedList_SetFreeData( LinkedList *list, int is_true )
+__inline void LinkedList_SetDataNeedFree( LinkedList *list, int is_true )
 {
         list->need_free_data = is_true;
 }
@@ -86,7 +92,10 @@ __inline void LinkedList_SetDestroyFunc( LinkedList *list, void (*func)(void*) )
 /** 获取当前结点中的数据 */
 __inline void* LinkedList_Get( LinkedList *list )
 {
-        return list->current->data;
+	if( list->current && list->current != list->boundary ) {
+		return list->current->data;
+	}
+	return NULL;
 }
 
 /** 获取当前结点的上个结点中的数据 */
