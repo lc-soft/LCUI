@@ -44,6 +44,9 @@
 #include LC_FONT_H
 
 LCUI_BEGIN_HEADER
+	
+#define WIDGET_LABEL "LCUI::Label"
+#define Label_New() Widget_New(WIDGET_LABEL)
 
 /** 设定与标签关联的文本内容 */
 LCUI_API int Label_SetTextW( LCUI_Widget *widget, const wchar_t *text );
