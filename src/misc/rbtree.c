@@ -17,7 +17,7 @@
  * 
  * You should have received a copy of the GPLv2 along with this file. It is 
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * ***************************************************************************/
  
 /* ****************************************************************************
 * rbtree.c -- 红黑树
@@ -35,7 +35,12 @@
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
- * ****************************************************************************/
+ * ***************************************************************************/
+
+/** 
+ * 目前红黑树只适合记录引用数据，在销毁红黑树时，只会释放结点内存，不会释放
+ * 结点中记录的数据的内存。
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,15 +51,31 @@
 #define RED     0
 #define BLACK   1
 
+/** 初始化红黑树 */
 LCUI_API void RBTree_Init( LCUI_RBTree *rbt )
 {
         rbt->root = NULL;
         rbt->total_node = 0;
 }
 
+/** 销毁红黑树 */
 LCUI_API void RBTree_Destroy( LCUI_RBTree *rbt )
 {
-
+	LCUI_RBTreeNode *node, *next_node;
+	node = RBTree_First( rbt );
+	while( next_node = RBTree_Next( node ) ) {
+		/* 移除在父节点中的记录 */
+		if( node->parent ) {
+			if( node->parent->left == node ) {
+				node->parent->left = NULL;
+			} else {
+				node->parent->right = NULL;
+			}
+		}
+		/* 释放该结点 */
+		free( node );
+		node = next_node;
+	}
 }
 
 /** 获取第一个结点 */
