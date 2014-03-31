@@ -111,7 +111,7 @@ typedef struct TextLayerRec_  {
         LCUI_BOOL is_autowrap_mode;	/* 是否启用自动换行模式 */
 	LCUI_BOOL is_using_style_tags;	/* 是否使用文本样式标签 */
         LCUI_BOOL is_using_buffer;	/* 是否使用缓存空间来存储文本位图 */
-	LCUI_Queue dirty_rect;		/* 脏矩形记录 */
+	LCUI_DirtyRectList dirty_rect;	/* 脏矩形记录 */
 
         TextAlignType text_align;	/* 文本的对齐方式 */
         TextRowList row_list;		/* 文本行列表 */
@@ -265,7 +265,7 @@ LCUI_API int TextLayer_GetHeight( LCUI_TextLayer* layer );
 LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer );
 
 /** 更新数据 */
-LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LCUI_Queue *rect_list );
+LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LinkedList *rect_list );
 
 /** 
  * 将文本图层中的指定区域的内容绘制至目标图像缓存中
