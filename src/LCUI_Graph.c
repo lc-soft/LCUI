@@ -312,7 +312,7 @@ LCUI_API int Graph_Quote( LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area )
 	area = LCUIRect_ValidateArea(Size(src->w, src->h), area);
 	//printf("Graph_Quote(), after, area: %d,%d,%d,%d\n",
 	//	area.x, area.y, area.width, area.height);
-	if(!LCUIRect_IsValid( area )) { 
+	if( area.w <= 0 || area.h <= 0 ) { 
 		des->src = NULL;
 		des->x = 0;
 		des->y = 0;
@@ -1363,7 +1363,7 @@ LCUI_API int Graph_FillImage( LCUI_Graph *graph, LCUI_Graph *backimg,
 	area.x = area.y = 0;
 	area.w = graph->w;
 	area.h = graph->h;
-	return Graph_FillImage( graph, backimg, layout, area );
+	return Graph_FillImageEx( graph, backimg, layout, area );
 }
 
 LCUI_API int Graph_FillImageWithColor( LCUI_Graph *graph, LCUI_Graph *backimg,
