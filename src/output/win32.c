@@ -98,11 +98,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	return TRUE;
 }
 
-static LRESULT CALLBACK Win32_LCUI_WndProc(
-				HWND hwnd,
-				UINT message,
-				WPARAM wParam,
-				LPARAM lParam )
+static LRESULT CALLBACK Win32_LCUI_WndProc( HWND hwnd, UINT message, 
+					   WPARAM wParam, LPARAM lParam )
 {
 	PAINTSTRUCT ps;
 	LCUI_Rect area;
@@ -134,7 +131,7 @@ static LRESULT CALLBACK Win32_LCUI_WndProc(
 		area.width = ps.rcPaint.right - area.x;
 		area.height = ps.rcPaint.bottom - area.y;
 		/* 记录该无效区域 */
-		LCUIScreen_InvalidArea( area );
+		LCUIScreen_InvalidateArea( &area );
 		EndPaint( hwnd, &ps );
 		return 0;
 	case WM_DESTROY:
@@ -143,7 +140,7 @@ static LRESULT CALLBACK Win32_LCUI_WndProc(
 		return 0;
 	default:break;
 	}
-	return DefWindowProc (hwnd, message, wParam, lParam) ;
+	return DefWindowProc( hwnd, message, wParam, lParam );
 }
 
 static int Win32_ScreenInit(void)
@@ -375,7 +372,7 @@ LCUI_API int LCUIScreen_PutGraph (LCUI_Graph *graph, LCUI_Pos des_pos )
 {
 	int total, y, n, des_row_x, src_row_x, des_x, src_x;
 	LCUI_Graph *src;
-	LCUI_Rect cut, src_rect;
+	LCUI_Rect cut, src_rect, area;
 	LCUI_Size screen_size;
 	uchar_t *des_ptr;
 	
@@ -389,21 +386,20 @@ LCUI_API int LCUIScreen_PutGraph (LCUI_Graph *graph, LCUI_Pos des_pos )
 	if(des_pos.x >= screen_size.w || des_pos.y >= screen_size.h) {
 		return -1;
 	}
-	des_ptr = pixel_mem;
 	Graph_Lock( src );
+	des_ptr = pixel_mem;
+	area.x = des_pos.x;
+	area.y = des_pos.y;
+	area.w = src_rect.w;
+	area.h = src_rect.h;
 	/* 获取图像的截取区域 */ 
-	if( LCUIRect_GetCutArea( screen_size,
-		Rect( des_pos.x, des_pos.y, src_rect.width, src_rect.height ),
-		&cut
-	)) {
-		des_pos.x += cut.x;
-		des_pos.y += cut.y;
-	}
+	LCUIRect_GetCutArea( screen_size, area, &cut );
+	des_pos.x += cut.x;
+	des_pos.y += cut.y;
 	/* 根据二维坐标和图像尺寸，计算源图像的起始读取点的一维坐标 */
 	src_row_x = (cut.y + src_rect.y) * src->w + cut.x + src_rect.x;
 	/* 根据二维坐标和屏幕尺寸，计算帧缓冲的起始写入点的一维坐标 */
 	des_row_x = des_pos.y * screen_size.w + des_pos.x;
-
 	for(y=0; y<cut.height; ++y) {
 		src_x = src_row_x;
 		des_x = des_row_x;
@@ -437,15 +433,14 @@ LCUI_API void LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out )
 	fb_size.w = GetSystemMetrics(SM_CXSCREEN);
 	fb_size.h = GetSystemMetrics(SM_CYSCREEN);
 	/* 如果需要裁剪图形 */
-	if ( LCUIRect_GetCutArea ( fb_size, area, &cut_rect ) ){
-		if(!LCUIRect_IsValid(cut_rect)) {
-			return;
-		}
-		area.x += cut_rect.x;
-		area.y += cut_rect.y;
-		area.width = cut_rect.width;
-		area.height = cut_rect.height;
+	LCUIRect_GetCutArea( fb_size, area, &cut_rect );
+	if( cut_rect.w <= 0 || cut_rect.h <= 0 ) {
+		return;
 	}
+	area.x += cut_rect.x;
+	area.y += cut_rect.y;
+	area.width = cut_rect.width;
+	area.height = cut_rect.height;
 	Graph_Create (out, area.width, area.height);
 	Graph_Lock (out);
 	/* 只能正常捕获32位显示器中显示的图形，有待完善 */
