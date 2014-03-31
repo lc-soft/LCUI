@@ -231,13 +231,10 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
 		return -2;
 	}
 	/* 获取需要裁剪的区域 */
-	if( LCUIRect_GetCutArea( Size( des_rect.width, des_rect.height ),
-		Rect( pos.x, pos.y, bmp->width, bmp->rows ),
-		&cut
-	)) {
-		pos.x += cut.x;
-		pos.y += cut.y;
-	}
+	LCUIRect_GetCutArea( Size( des_rect.width, des_rect.height ),
+			Rect( pos.x, pos.y, bmp->width, bmp->rows ), &cut );
+	pos.x += cut.x;
+	pos.y += cut.y;
 
 	/* 如果是以叠加模式绘制字体位图 */
 	if( !need_replace ) {
