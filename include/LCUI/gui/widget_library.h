@@ -38,7 +38,7 @@ LCUI_API WidgetCallBackFunc WidgetFunc_Get(	const char *widget_type,
 						WidgetFuncType func_type );
 
 /* 检测指定部件类型是否有效 */
-LCUI_API LCUI_BOOL WidgetType_Valid( const char *widget_type );
+LCUI_API LCUI_BOOL WidgetType_IsValid( const char *widget_type );
 
 /* 调用指定类型的部件函数 */
 LCUI_API void WidgetFunc_Call( LCUI_Widget *widget, WidgetFuncType type );

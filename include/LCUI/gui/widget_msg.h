@@ -45,6 +45,8 @@ LCUI_API int WidgetMsg_AddToTask( LCUI_Widget *widget, WidgetMsgData *data_ptr )
 
 LCUI_API void WidgetMsg_Proc( LCUI_Widget *widget );
 
+#define LCUIWidget_ProcMessage() WidgetMsg_Proc(NULL)
+
 LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 				uint_t msg_id,
 				void *data,

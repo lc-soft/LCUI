@@ -58,17 +58,11 @@ LCUI_BEGIN_HEADER
 #define SIZE_MODE_NORMAL	LAYOUT_NORMAL
 /*************************************************/
 
-/* 获取图片盒子的图片显示的区域 */
-LCUI_API LCUI_Rect
-PictureBox_GetViewArea( LCUI_Widget *widget );
+/* 获取图片框的图片显示的区域 */
+LCUI_API void PictureBox_GetViewArea( LCUI_Widget *widget, LCUI_Rect *rect );
 
-/* 获取获取图片盒子的图片显示的区域的坐标 */
-LCUI_API LCUI_Pos
-PictureBox_GetViewAreaPos( LCUI_Widget *widget );
-
-/* 获取缩放比例 */
-LCUI_API float
-PictureBox_GetScale( LCUI_Widget *widget );
+/** 获取缩放比例 */
+LCUI_API float PictureBox_GetScale( LCUI_Widget *widget );
 
 /* 设定PictureBox部件显示的图像 */
 LCUI_API void

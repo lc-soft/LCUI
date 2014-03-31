@@ -190,7 +190,7 @@ Widget_GetRect(LCUI_Widget *widget);
 #define Widget_GetPrivateData(widget) \
 	widget->private_data 
 
-/**  为部件分配一个用于存放私有数据的内存空间 */
+/** 为部件分配一个用于存放私有数据的内存空间 */
 #define Widget_NewPrivateData(widget,type) \
 	(type*)(widget->private_data = malloc(sizeof(type)))
 
@@ -203,13 +203,6 @@ Widget_PrintChildList( LCUI_Widget *widget );
  *  */
 LCUI_API void
 print_widget_info(LCUI_Widget *widget);
-
-/* 在指定部件的内部区域内设定需要刷新的区域 */
-LCUI_API int
-Widget_InvalidArea( LCUI_Widget *widget, LCUI_Rect rect );
-
-/* 将所有可见部件的无效区域 同步至 屏幕无效区域队列中 */
-LCUI_API void Widget_SyncInvalidArea( void );
 
 /**
  * 功能：让指定部件响应部件状态的改变
@@ -332,21 +325,20 @@ Widget_SetBorder( LCUI_Widget *widget, LCUI_Border border );
 LCUI_API void
 Widget_SetBorderRadius( LCUI_Widget *widget, unsigned int radius );
 
-/* 设定部件的背景图像 */
-LCUI_API void
-Widget_SetBackgroundImage( LCUI_Widget *widget, LCUI_Graph *img );
+/** 设定部件的背景图像 */
+LCUI_API void Widget_SetBackgroundImage( LCUI_Widget *widget, 
+					 LCUI_Graph *img );
 
-/* 设定背景图的布局 */
-LCUI_API void
-Widget_SetBackgroundLayout( LCUI_Widget *widget, LayoutType layout );
+/** 设定背景图的布局 */
+LCUI_API void Widget_SetBackgroundLayout( LCUI_Widget *widget,
+					  LayoutType layout );
 
-/* 设定部件的背景颜色 */
-LCUI_API void
-Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color );
+/** 设定部件的背景颜色 */
+LCUI_API void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color );
 
-/* 设定部件背景是否透明 */
-LCUI_API void
-Widget_SetBackgroundTransparent( LCUI_Widget *widget, LCUI_BOOL flag );
+/** 设定部件背景色是否透明 */
+LCUI_API void Widget_SetBackgroundTransparent(	LCUI_Widget *widget, 
+						LCUI_BOOL is_true );
 
 /* 启用部件 */
 LCUI_API void
@@ -431,17 +423,6 @@ Widget_ExecRefresh(LCUI_Widget *widget);
 LCUI_API void
 Widget_ExecUpdate(LCUI_Widget *widget);
 
-/** 
- * 执行重绘部件前的一些任务
- * @param[in] widget 需要重绘的部件
- * @param[out] area 需要进行重绘的区域
- * @returns 正常返回TRUE，没有无效区域则返回FALSE
- */
-LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget *widget, LCUI_Rect *area );
-
-/** 执行重绘部件后的一些任务 */
-LCUI_API void Widget_EndPaint( LCUI_Widget *widget, LCUI_Rect *area );
-
 /** 获取部件自身的图像 */
 static inline LCUI_Graph* Widget_GetSelfGraph( LCUI_Widget *widget )
 {
@@ -519,9 +500,6 @@ LCUI_API void Widget_Refresh(LCUI_Widget *widget);
 
 /** 调整部件的尺寸 */
 LCUI_API void Widget_Resize( LCUI_Widget *widget, LCUI_Size new_size );
-
-/** 重新绘制部件 */
-LCUI_API void Widget_Draw( LCUI_Widget *widget );
 
 /** 销毁部件 */
 LCUI_API void Widget_Destroy( LCUI_Widget *widget );
