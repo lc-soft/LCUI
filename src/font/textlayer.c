@@ -319,7 +319,7 @@ LCUI_API void TextLayer_Init( LCUI_TextLayer *layer )
 	
 	TextStyle_Init( &layer->text_style );
 	TaskData_Init( &layer->task );
-	Queue_Init( &layer->dirty_rect, sizeof(LCUI_Rect), NULL );
+	DirtyRectList_Init( &layer->dirty_rect );
 	Graph_Init( &layer->graph );
 	TextRowList_InsertNewRow( &layer->row_list, 0 );
 	layer->graph.color_type = COLOR_TYPE_RGBA;
@@ -343,7 +343,7 @@ static void TextRowList_Destroy( TextRowList *list )
 /** 销毁TextLayer */
 LCUI_API void TextLayer_Destroy( LCUI_TextLayer *layer )
 {
-	Queue_Destroy( &layer->dirty_rect );
+	DirtyRectList_Destroy( &layer->dirty_rect );
 	Graph_Free( &layer->graph );
 	TextRowList_Destroy( &layer->row_list );
 }
@@ -495,11 +495,14 @@ static int TextLayer_GetRowRect( LCUI_TextLayer *layer, int i_row,
 
 /** 标记指定文本行的矩形区域为无效 */
 static void TextLayer_InvalidateRowRectEx( LCUI_TextLayer *layer, int i_row,
-						int start_col, int end_col )
+						int start, int end )
 {
+	int ret;
 	LCUI_Rect rect;
-	if( TextLayer_GetRowRectEx( layer, i_row, start_col, end_col, &rect ) == 0 ) {
-		RectQueue_Add( &layer->dirty_rect, rect );
+
+	ret = TextLayer_GetRowRectEx( layer, i_row, start, end, &rect );
+	if( ret == 0 ) {
+		DirtyRectList_Add( &layer->dirty_rect, &rect );
 	}
 }
 
@@ -508,7 +511,7 @@ static void TextLayer_InvalidateRowRect( LCUI_TextLayer *layer, int i_row )
 {
 	LCUI_Rect rect;
 	if( TextLayer_GetRowRect( layer, i_row, &rect ) == 0 ) {
-		RectQueue_Add( &layer->dirty_rect, rect );
+		DirtyRectList_Add( &layer->dirty_rect, &rect );
 	}
 }
 
@@ -574,7 +577,7 @@ LCUI_API void TextLayer_InvalidateAllRowRect( LCUI_TextLayer* layer )
 			rect.height = layer->max_height - rect.y;
 		}
 
-		RectQueue_Add( &layer->dirty_rect, rect );
+		DirtyRectList_Add( &layer->dirty_rect, &rect );
 	}
 }
 
@@ -641,7 +644,7 @@ LCUI_API void TextLayer_InvalidateRowsRect( LCUI_TextLayer *layer,
 			rect.height = layer->max_height - rect.y;
 		}
 
-		RectQueue_Add( &layer->dirty_rect, rect );
+		DirtyRectList_Add( &layer->dirty_rect, &rect );
 	}
 }
 
@@ -1411,7 +1414,7 @@ LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer )
 }
 
 /** 更新数据 */
-LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LCUI_Queue *rect_list )
+LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LinkedList *rect_list )
 {
 	if( layer->task.update_bitmap ) {
 		TextLayer_InvalidateAllRowRect( layer );
@@ -1438,14 +1441,12 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LCUI_Queue *rect_list )
 	}
 	
 	if( rect_list ) {
-		int i, n;
 		void *data_ptr;
-
-		n = Queue_GetTotal( &layer->dirty_rect );
+		LinkedList_Goto( &layer->dirty_rect, 0 );
 		/* 转移脏矩形记录，供利用 */
-		for( i=0; i<n; ++i ) {
-			data_ptr = Queue_Get( &layer->dirty_rect, i );
-			Queue_Add( rect_list, data_ptr );
+		while( data_ptr = LinkedList_Get( &layer->dirty_rect ) ) {
+			LinkedList_AddDataCopy( rect_list, data_ptr );
+			LinkedList_ToNext( &layer->dirty_rect );
 		}
 	 } 
 }
@@ -1470,7 +1471,7 @@ LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
 	box_size.w = layer->max_width;
 	box_size.h = layer->max_height;
 	/* 调整区域范围，使之有效 */
-	area = LCUIRect_ValidArea( box_size, area );
+	area = LCUIRect_ValidateArea( box_size, area );
 	/* 加上Y轴坐标偏移量 */
 	y = layer->offset_y;
 	/* 先确定从哪一行开始绘制 */
@@ -1587,23 +1588,22 @@ LCUI_API int TextLayer_Draw( LCUI_TextLayer* layer )
 /** 清除已记录的无效矩形 */
 LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer *layer )
 {
-	int i, n;
 	LCUI_Rect *rect_ptr;
 	LCUI_Graph invalid_graph;
 
-	if( layer->is_using_buffer ) {
-		n = Queue_GetTotal( &layer->dirty_rect );
-		for( i=0; i<n; ++i ) {
-			rect_ptr = (LCUI_Rect*)Queue_Get( &layer->dirty_rect, i );
-			if( !rect_ptr ) {
-				break;
-			}
-			Graph_Quote( &invalid_graph, &layer->graph, *rect_ptr );
-			Graph_FillAlpha( &invalid_graph, 0 );
-		}
+	if( !layer->is_using_buffer ) {
+		DirtyRectList_Destroy( &layer->dirty_rect );
+		DirtyRectList_Init( &layer->dirty_rect );
+		return;
 	}
-	Queue_Destroy( &layer->dirty_rect );
-	Queue_Init( &layer->dirty_rect, sizeof(LCUI_Rect), NULL );
+
+	while( rect_ptr = (LCUI_Rect*)LinkedList_Get( &layer->dirty_rect ) ) {
+		Graph_Quote( &invalid_graph, &layer->graph, *rect_ptr );
+		Graph_FillAlpha( &invalid_graph, 0 );
+		LinkedList_ToNext( &layer->dirty_rect );
+	}
+	DirtyRectList_Destroy( &layer->dirty_rect );
+	DirtyRectList_Init( &layer->dirty_rect );
 }
 
 /** 设置全局文本样式 */
