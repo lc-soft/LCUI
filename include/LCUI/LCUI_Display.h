@@ -91,7 +91,6 @@ LCUIScreen_PutGraph (LCUI_Graph *graph, LCUI_Pos des_pos );
 LCUI_API void
 LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out );
 
-
 /** 获取屏幕宽度 */
 LCUI_API int LCUIScreen_GetWidth( void );
 
@@ -102,7 +101,7 @@ LCUI_API int LCUIScreen_GetHeight( void );
 LCUI_API LCUI_Size LCUIScreen_GetSize( void );
 
 /** 设置屏幕内的指定区域为无效区域 */
-LCUI_API int LCUIScreen_InvalidateArea( LCUI_Rect rect );
+LCUI_API int LCUIScreen_InvalidateArea( LCUI_Rect *rect );
 
 /** 获取屏幕每个像素点的色彩值所占的位数 */
 LCUI_API int LCUIScreen_GetBits( void );
