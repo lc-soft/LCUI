@@ -9,8 +9,8 @@
 以让代码更容易阅读，再加上每行字符数的限制，当你的代码缩进层次太深的时候可以给你
 警告，以提醒你去考虑是否需要调整代码。
 
-建议缩进使用空格填充，这样就能使代码格式在其它默认缩进宽度不同的编辑器中不会有太
-大变化。
+由于LCUI项目代码是一个函数库，处于用户代码的底层，作为底层代码，再加上是用C语言写
+的，不应该写得那么冗长和臃肿。
 
 ##标识符的定义
 
@@ -77,14 +77,11 @@ error_out:
 
 ##函数命名规范
 
-如果你的函数向外提供的公用函数，那么，函数的命名方式应该为：
+如果你的函数是向外提供的公用函数，那么，函数的命名方式应该类似于：
 
 函数类/对象/模块名_操作+对象属性
 
-函数类/对象/模块名_子函数类/子对象/子模块+操作+对象属性
-
-每个单词首字母应该大写，这样更容易区分出单词，因为个人感觉多（M）个单词缩写的混
-合体会让人误以为是几（N，N<M）个单词。
+每个单词首字母应该大写，这样更容易区分出单词。
 
 函数命名示例：
 
@@ -93,26 +90,11 @@ error_out:
 ```
 
 该函数属于GraphLayer模块，操作对象是图层（GraphLayer），实现的操作是设定（Set），
-被操作的对象属性是位置（Pos），也就是设定图层的位置。
+被操作的对象属性是位置（Position），也就是设定图层的位置。
 
-```c
-    Queue_Add();
-```
+如果你的函数仅在当前源文件中使用，那么可以不必遵循以上规则，但还是建议你的函数命名便于阅读和理解。
 
-该函数的操作对象是队列（Queue），实现的操作是添加（Add），也就是往队列里添加数据。
-
-```c
-    TextLayer_Text_SetDefaultStyle();
-```
-        
-该函数操作的主对象是文本图层(TextLayer)中的文本(Text)，实现的操作是设定(Set)，被
-操作的对象属性是默认文本样式(DefaultStyle)，即：为文本图层中的文本设定默认的文本
-样式。
-
-如果你的函数仅在当前源文件中使用，那么可以不必遵循以上规则，但必须确保你的函数命
-名便于阅读和理解。
-
-如果函数名较长，应该考虑进行分行，例如：
+如果函数名较长，超出了80列字符的限制，那么应该进行分行，将参数列表分成多行，例如：
 
 ```c
     static MyType* ObjectName_OperateAttribute( XXXX *object, XXXX arg1, XXXX arg2, XXXX arg3 )
@@ -121,23 +103,16 @@ error_out:
 应该改成：
 
 ```c
-    static MyType* ObjectName_OperateAttribute(     XXXX *object,
-                                                    XXXX arg1,
-                                                    XXXX arg2,
-                                                    XXXX arg3 )
+    static MyType* ObjectName_OperateAttribute( XXXX *object, XXXX arg1,
+                                                    XXXX arg2, XXXX arg3 )
 ```
 
 如果函数名前的修饰符较多，可以将它们放到单独行里，例如：
 
 ```c
     static struct MyObjectStruct* 
-    ObjectName_OperateAttribute(    XXXX *object,
-                                    XXXX arg1,
-                                    XXXX arg2,
-                                    XXXX arg3 )
+    ObjectName_OperateAttribute( XXXX *object, XXXX arg1, XXXX arg2, XXXX arg3 )
 ```
-
-使用制表符缩进，调整参数列表中的参数的位置，保持对齐。
 
 如果还是比较长的话，可以将函数名中的单词改成缩写，或者使用其它意思相同但比较短
 的单词，像这样：
@@ -147,8 +122,28 @@ error_out:
     ObjName_OptAttr( XXXX *object, XXXX arg1, XXXX arg2, XXXX arg3 )
 ```
 
+由于作者使用的是VisualStudio 2012，如果函数的返回值类型和修饰符不与函数名同行，编辑器的代码提示功能无法位于函数上方的注释内容，例如：
+
+```c
+	/** this is function. */
+    static struct mydata*
+	test_function(void);
+```
+
+因此，建议最好将返回值类型和修饰符与函数名写在同一行。
+
 调用函数时，每个参数的逗号后面需要加个空格。
 
 ```c
     func( arg1, arg2, arg3, arg4 );
 ```
+
+##注释
+函数注释：如果是在头文件中有声明的共用函数，那么函数注释只需要在头文件的函数声明中写上，而源文件中可以不用重复写注释，这样可以省去同时维护两个注释的麻烦。
+
+代码中的注释：注释不应该太多，注释内容简单明了即可，没必要每行代码都加注释。
+
+数据定义时的注释：在定义结构体时，应该在每行的成员声明后面加上注释。
+
+关于注释风格，之前作者想用Doxygen文档生成工具根据代码中的注释整理成API文档，但作者也很纠结是否需要用Doxygen这个工具，因此项目中只有部分注释的风格是针对Doxygen的，搞得不伦不类。
+
