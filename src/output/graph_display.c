@@ -81,13 +81,20 @@ LCUI_API LCUI_Size LCUIScreen_GetSize( void )
 }
 
 /** 设置屏幕内的指定区域为无效区域 */
-LCUI_API int LCUIScreen_InvalidateArea( LCUI_Rect rect )
+LCUI_API int LCUIScreen_InvalidateArea( LCUI_Rect *rect )
 {
+	LCUI_Rect tmp_rect;
 	if( !i_am_init ) {
 		return -1;
 	}
-	rect = LCUIRect_ValidateArea( screen.size, rect );
-	return DirtyRectList_Add( &screen_invalid_area, &rect );
+	if( !rect ) {
+		tmp_rect.x = tmp_rect.y = 0;
+		tmp_rect.w = screen.size.w;
+		tmp_rect.h = screen.size.h;
+		return DirtyRectList_Add( &screen_invalid_area, &tmp_rect );
+	}
+	tmp_rect = LCUIRect_ValidateArea( screen.size, *rect );
+	return DirtyRectList_Add( &screen_invalid_area, &tmp_rect );
 }
 
 /** 获取屏幕每个像素点的色彩值所占的位数 */
@@ -149,7 +156,7 @@ LCUI_API void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 	}
 	/* 如果该区域与游标的图形区域重叠 */
 	if ( LCUICursor_IsCoverRect( rect ) ) {
-		cursor_pos = LCUICursor_GetPos();
+		LCUICursor_GetPos( &cursor_pos );
 		pos.x = cursor_pos.x - rect.x;
 		pos.y = cursor_pos.y - rect.y;
 		/* 将鼠标游标的图形混合至当前图形里 */
@@ -212,23 +219,6 @@ LCUI_API int LCUIScreen_GetFPS(void)
 	return current_screen_fps;
 }
 
-/**
- * 功能：处理已记录的无效区域
- * 说明：此函数会将各个部件的rect队列中的处理掉，并将最终的无效区域添加至屏幕无效区域
- * 队列中，等待LCUI来处理。
- **/
-static int LCUIScreen_SyncInvalidArea( void )
-{
-	int ret = 0;
-	if ( need_sync_area ) {
-		/* 同步部件内记录的区域至主记录中 */
-		Widget_SyncInvalidArea();
-		need_sync_area = FALSE;
-		ret = 1;
-	}
-	return ret;
-}
-
 static int one_frame_remain_time;
 static int64_t prev_frame_start_time;
 static int64_t prev_fps_update_time;
@@ -269,13 +259,8 @@ static void FrameControl_RemainFrame(void)
 static void LCUIScreen_Update( void* unused )
 {
 	int val;
-	LCUI_Rect screen_area;
-
 	/* 先标记刷新整个屏幕区域 */
-	screen_area.x = screen_area.y = 0;
-	screen_area.width = screen.size.w;
-	screen_area.height = screen.size.h;
-	LCUIScreen_InvalidateArea( screen_area );
+	LCUIScreen_InvalidateArea( NULL );
 	/* 初始化帧数控制 */
 	FrameControl_Init( 1000/MAX_FRAMES_PER_SEC );
 	while( LCUI_Sys.state == ACTIVE ) {
@@ -284,9 +269,7 @@ static void LCUIScreen_Update( void* unused )
 		/* 处理所有部件消息 */
 		LCUIWidget_ProcMessage();
 		/* 更新各个部件的无效区域中的内容 */
-		LCUIWidget_ProcInvalidArea();
-		/* 同步部件中的无效区域至屏幕的无效区域记录中 */
-		val = LCUIScreen_SyncInvalidArea();
+		val = LCUIWidget_ProcInvalidArea();
 		/* 更新屏幕上各无效区域内的图像内容 */
 		val += LCUIScreen_UpdateInvalidArea();
 		/* 若有无效区域，则同步帧缓冲内保存的屏幕内容 */
