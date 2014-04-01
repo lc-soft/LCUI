@@ -48,8 +48,6 @@
 
 enum label_msg_id {
 	LABEL_TEXT = WIDGET_USER+1,
-	LABEL_REFRESH,
-	LABEL_UPDATE_SIZE,
 	LABEL_AUTO_WRAP,
 	LABEL_STYLE
 };
@@ -58,8 +56,7 @@ typedef struct LCUI_Label_ {
 	LCUI_BOOL auto_size;	/* 指定是否根据文本图层的尺寸来调整部件尺寸 */
 	AUTOSIZE_MODE mode;	/* 自动尺寸调整的模式 */
 	LCUI_TextLayer layer;	/* 文本图层 */
-}
-LCUI_Label;
+} LCUI_Label;
 
 /*---------------------------- Private -------------------------------*/
 
@@ -67,63 +64,28 @@ LCUI_Label;
 static LCUI_TextLayer* Label_GetTextLayer( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	label = (LCUI_Label*)Widget_GetPrivateData( widget );
 	return &label->layer;
 }
 
 static void Label_UpdateTextLayer( LCUI_Widget *widget )
 {
-	int n; 
 	LCUI_Label *label;
 	LCUI_Rect *p_rect;
-	LCUI_Queue rect_list;
+	LinkedList rect_list;
+	LCUI_Size new_size;
 
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
-	if( !label ) {
-		return;
-	}
-
-	Queue_Init( &rect_list, sizeof(LCUI_Rect), NULL );
+	label = (LCUI_Label*)Widget_GetPrivateData( widget );
+	DirtyRectList_Init( &rect_list );
 	/* 先更新文本图层的数据 */
 	TextLayer_Update( &label->layer, &rect_list );
-	n = Queue_GetTotal( &rect_list );
-	/* 将得到的无效区域导入至部件的无效区域列表 */
-	while(n--) {
-		p_rect = (LCUI_Rect*)Queue_Get( &rect_list, n );
-		if( !p_rect ) {
-			continue;
-		}
-		Widget_InvalidArea( widget, *p_rect );
-	}
-	Queue_Destroy( &rect_list );
-	TextLayer_ClearInvalidRect( &label->layer );
-}
 
-/** 更新TextLayer的尺寸 */
-static void Label_UpdateTextLayerSize( LCUI_Widget *widget, void *arg )
-{
-	LCUI_Size new_size;
-	LCUI_Label *label;
-
-	if( !widget ) {
-		return;
-	}
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
-	if( !label ) {
-		return;
-	}
-
-	Widget_Lock( widget );
 	new_size.w = TextLayer_GetWidth( &label->layer );
 	new_size.h = TextLayer_GetHeight( &label->layer );
 	/* 如果部件尺寸不是由LCUI自动调整的 */
 	if( widget->dock != DOCK_TYPE_NONE || !label->auto_size ) {
 		new_size = Widget_GetSize(widget);
-		/* 如果部件尺寸不合TextLayer尺寸一致 */
-		if( label->layer.graph.w != new_size.w
-		 || label->layer.graph.h != new_size.h ) {
-			Widget_Draw( widget ); 
-		}
+		/* 最小尺寸为20x20 */
 		if( new_size.w < 20 ) {
 			new_size.w = 20;
 		}
@@ -131,72 +93,55 @@ static void Label_UpdateTextLayerSize( LCUI_Widget *widget, void *arg )
 			new_size.h = 20;
 		}
 		TextLayer_SetMaxSize( &label->layer, new_size );
-		Widget_Unlock( widget );
-		return;
+		TextLayer_Update( &label->layer, &rect_list );
 	}
-	/* 如果未启用自动换行 */
-	if( !label->layer.is_autowrap_mode ) {
+	else if( !label->layer.is_autowrap_mode ) {
+		/* 既然未启用自动换行，那么自动调整部件尺寸 */
 		if( new_size.w != widget->size.w
 		 || new_size.h != widget->size.h ) {
 			TextLayer_SetMaxSize( &label->layer, new_size );
 			Widget_Resize( widget, new_size );
+			TextLayer_Update( &label->layer, &rect_list );
 		}
-		Widget_Unlock( widget );
-		return;
+	} else {
+		/* 能到这里，则说明部件启用了文本自动换行，以及自动尺寸调整 */
+		new_size = Widget_GetSize(widget);
+		/* 将部件所在容器的宽度作为图像宽度 */
+		new_size.w = Widget_GetContainerWidth( widget->parent );
+		/* 高度必须有效，最小高度为20 */
+		if( new_size.h < 20 ) {
+			new_size.h = 20;
+		}
+		if( label->layer.graph.w != new_size.w
+		 || label->layer.graph.h != new_size.h ) {
+			/* 重新设置最大尺寸 */
+			TextLayer_SetMaxSize( &label->layer, new_size );
+			TextLayer_Update( &label->layer, &rect_list );
+			/* 重新计算文本图层的尺寸 */
+			new_size.w = TextLayer_GetWidth( &label->layer );
+			new_size.h = TextLayer_GetHeight( &label->layer );
+			TextLayer_SetMaxSize( &label->layer, new_size );
+			Widget_Resize( widget, new_size );
+		}
 	}
-	
-	new_size = Widget_GetSize(widget);
-	/* 将部件所在容器的宽度作为图像宽度 */
-	new_size.w = Widget_GetContainerWidth( widget->parent );
-	/* 高度必须有效，最小高度为20 */
-	if( new_size.h < 20 ) {
-		new_size.h = 20;
+
+	LinkedList_Goto( &rect_list, 0 );
+	/* 将得到的无效区域导入至部件的无效区域列表 */
+	while( p_rect = (LCUI_Rect*)LinkedList_Get(&rect_list) ) {
+		Widget_InvalidateArea( widget, p_rect );
 	}
-	/* 如果部件尺寸等于TextLayer的图像尺寸 */
-	if( label->layer.graph.w == new_size.w
-	 && label->layer.graph.h == new_size.h ) {
-		Widget_Unlock( widget );
-		return;
-	}
-	/* 重新设置最大尺寸 */
-	TextLayer_SetMaxSize( &label->layer, new_size );
-	Label_UpdateTextLayer( widget );
-	/* 重新计算文本图层的尺寸 */
-	new_size.w = TextLayer_GetWidth( &label->layer );
-	new_size.h = TextLayer_GetHeight( &label->layer );
-	TextLayer_SetMaxSize( &label->layer, new_size );
-	Widget_Resize( widget, new_size );
-	Widget_Unlock( widget );
+	DirtyRectList_Destroy( &rect_list );
+	TextLayer_ClearInvalidRect( &label->layer );
 }
 
-/** 刷新Label部件的文本图层 */
-static void Label_RefreshTextLayer( LCUI_Widget *widget, void *arg )
-{
-	LCUI_Label *label;
-
-	if( !widget ) {
-		return;
-	}
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
-	if( !label ) {
-		return;
-	}
-
-	Widget_Lock( widget );
-	Label_UpdateTextLayer( widget );
-	Widget_Update( widget );
-	Widget_Draw( widget );
-	Widget_Unlock( widget );
-}
-
-static void Label_ExecSetTextStyle( LCUI_Widget *widget, void *arg )
+static void Label_OnSetTextStyle( LCUI_Widget *widget, void *arg )
 {
 	LCUI_TextStyle *style;
 	LCUI_Label *label;
 	
 	DEBUG_MSG("recv LABEL_STYLE msg, lock widget\n");
 	style = (LCUI_TextStyle*)arg;
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	label = (LCUI_Label*)Widget_GetPrivateData( widget );
 	if( !label ) {
 		return;
 	}
@@ -207,47 +152,44 @@ static void Label_ExecSetTextStyle( LCUI_Widget *widget, void *arg )
 	Widget_Unlock( widget );
 }
 
-static void Label_ExecSetTextW( LCUI_Widget *widget, void *arg )
+static void Label_OnSetTextW( LCUI_Widget *widget, void *arg )
 {
 	LCUI_Label *label;
 	DEBUG_MSG("recv LABEL_TEXT msg, lock widget\n");
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	label = (LCUI_Label*)Widget_GetPrivateData( widget );
 	if( !label ) {
 		return;
 	}
 	Widget_Lock( widget );
 	TextLayer_SetTextW( &label->layer, (wchar_t*)arg, NULL );
 	Label_UpdateTextLayer( widget );
-	Label_UpdateTextLayerSize( widget, NULL );
 	DEBUG_MSG("unlock widget\n");
 	Widget_Unlock( widget );
 }
 
-static void Label_ExecSetAutoWrap( LCUI_Widget *widget, void *arg )
+static void Label_OnSetAutoWrap( LCUI_Widget *widget, void *arg )
 {
 	LCUI_BOOL flag;
 	LCUI_Label *label;
 
 	flag = arg?TRUE:FALSE;
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	label = (LCUI_Label*)Widget_GetPrivateData( widget );
 	if( !label ) {
 		return;
 	}
 	Widget_Lock( widget );
 	TextLayer_SetAutoWrap( &label->layer, flag );
-	Widget_Draw( widget );
+	Widget_Update( widget );
 	Widget_Unlock( widget );
 }
 
 /** 初始化label部件数据 */
-static void Label_ExecInit( LCUI_Widget *widget )
+static void Label_OnInit( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
-	
 	/* label部件不需要焦点 */
 	widget->focus = FALSE;
-
-	label = (LCUI_Label*)Widget_NewPrivData( widget, sizeof(LCUI_Label) );
+	label = Widget_NewPrivateData( widget, LCUI_Label );
 	label->auto_size = TRUE;
 	/* 初始化文本图层 */
 	TextLayer_Init( &label->layer ); 
@@ -257,51 +199,44 @@ static void Label_ExecInit( LCUI_Widget *widget )
 	/* 启用样式标签的支持 */
 	TextLayer_SetUsingStyleTags( &label->layer, TRUE );
 	/* 将回调函数与自定义消息关联 */
-	WidgetMsg_Connect( widget, LABEL_TEXT, Label_ExecSetTextW );
-	WidgetMsg_Connect( widget, LABEL_STYLE, Label_ExecSetTextStyle );
-	WidgetMsg_Connect( widget, LABEL_UPDATE_SIZE, Label_UpdateTextLayerSize );
-	WidgetMsg_Connect( widget, LABEL_REFRESH, Label_RefreshTextLayer );
-	WidgetMsg_Connect( widget, LABEL_AUTO_WRAP, Label_ExecSetAutoWrap );
+	WidgetMsg_Connect( widget, LABEL_TEXT, Label_OnSetTextW );
+	WidgetMsg_Connect( widget, LABEL_STYLE, Label_OnSetTextStyle );
+	WidgetMsg_Connect( widget, LABEL_AUTO_WRAP, Label_OnSetAutoWrap );
 }
 
 /** 释放label部件占用的资源 */
-static void Label_ExecDestroy( LCUI_Widget *widget )
+static void Label_OnDestroy( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
-	
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	label = (LCUI_Label*)Widget_GetPrivateData( widget );
 	TextLayer_Destroy( &label->layer );
 }
 
 /** 更新Label部件的数据 */
-static void Label_ExecUpdate( LCUI_Widget *widget )
+static void Label_OnUpdate( LCUI_Widget *widget )
 {
-	WidgetMsg_Post( widget, LABEL_UPDATE_SIZE, NULL, TRUE, FALSE );
+	Label_UpdateTextLayer( widget );
 }
 
 /** 绘制label部件 */
-static void Label_ExecDraw( LCUI_Widget *widget )
+static void Label_OnPaint( LCUI_Widget *widget )
 {
 	LCUI_Label *label;
-	LCUI_Graph *widget_graph, *tlayer_graph;
+	LCUI_Rect area;
+	LCUI_Pos layer_pos;
+	LCUI_Graph *widget_graph, area_graph;
 
-	if( !widget ) {
+	label = (LCUI_Label*)Widget_GetPrivateData( widget );
+	if( !Widget_BeginPaint( widget, &area ) ) {
 		return;
 	}
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
-	if( !label ) {
-		return;
-	}
-	Label_UpdateTextLayer( widget );
-	TextLayer_Draw( &label->layer );
 	widget_graph = Widget_GetSelfGraph( widget );
-	tlayer_graph = TextLayer_GetGraphBuffer( &label->layer );
-	/* 如果部件使用透明背景 */
-	if( widget->background.transparent ) {
-		Graph_Replace( widget_graph, tlayer_graph, Pos(0,0) );
-	} else {
-		Graph_Mix( widget_graph, tlayer_graph, Pos(0,0) );
-	}
+	Graph_Init( &area_graph );
+	Graph_Quote( &area_graph, widget_graph, area );
+	layer_pos.x = widget->border.left_width + 1;
+	layer_pos.y = widget->border.top_width + 1;
+	TextLayer_DrawToGraph( &label->layer, area, layer_pos, 
+			widget->background.transparent, &area_graph );
 }
 
 /*-------------------------- End Private -----------------------------*/
@@ -401,18 +336,12 @@ LCUI_API void Label_GetTextStyle( LCUI_Widget *widget, LCUI_TextStyle *style )
 	*style = layer->text_style;
 }
 
-/** 刷新label部件显示的文本 */
-LCUI_API void Label_Refresh( LCUI_Widget *widget )
-{
-	WidgetMsg_Post( widget, LABEL_REFRESH, NULL, TRUE, FALSE );
-}
-
 /** 启用或禁用Label部件的自动尺寸调整功能 */
 LCUI_API void Label_SetAutoSize( LCUI_Widget *widget, LCUI_BOOL flag,
 							AUTOSIZE_MODE mode )
 {
 	LCUI_Label *label;
-	label = (LCUI_Label*)Widget_GetPrivData( widget );
+	label = (LCUI_Label*)Widget_GetPrivateData( widget );
 	label->auto_size = flag;
 	label->mode = mode;
 	Widget_Update( widget );
@@ -420,11 +349,11 @@ LCUI_API void Label_SetAutoSize( LCUI_Widget *widget, LCUI_BOOL flag,
 /*-------------------------- End Public ------------------------------*/
 
 /** 注册label部件类型 */
-LCUI_API void Register_Label(void)
+void RegisterLabel(void)
 {
-	WidgetType_Add("label");
-	WidgetFunc_Add("label",	Label_ExecInit, FUNC_TYPE_INIT);
-	WidgetFunc_Add("label",	Label_ExecDraw, FUNC_TYPE_DRAW);
-	WidgetFunc_Add("label",	Label_ExecUpdate, FUNC_TYPE_UPDATE);
-	WidgetFunc_Add("label", Label_ExecDestroy, FUNC_TYPE_DESTROY);
+	WidgetType_Add(WIDGET_LABEL);
+	WidgetFunc_Add(WIDGET_LABEL, Label_OnInit, FUNC_TYPE_INIT);
+	WidgetFunc_Add(WIDGET_LABEL, Label_OnPaint, FUNC_TYPE_PAINT);
+	WidgetFunc_Add(WIDGET_LABEL, Label_OnUpdate, FUNC_TYPE_UPDATE);
+	WidgetFunc_Add(WIDGET_LABEL, Label_OnDestroy, FUNC_TYPE_DESTROY);
 }

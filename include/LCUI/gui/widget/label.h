@@ -73,8 +73,6 @@ LCUI_API void Label_Refresh( LCUI_Widget *widget );
 /** 启用或禁用Label部件的自动尺寸调整功能 */
 LCUI_API void Label_SetAutoSize( LCUI_Widget *widget, LCUI_BOOL flag,
 							AUTOSIZE_MODE mode );
-/** 注册label部件类型 */
-LCUI_API void Register_Label(void);
 
 LCUI_END_HEADER
 
