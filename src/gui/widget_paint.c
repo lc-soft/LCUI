@@ -32,6 +32,7 @@ LCUI_API int Widget_InvalidateArea( LCUI_Widget *widget, LCUI_Rect *r )
 		rect.h = widget->size.h;
 		r = &rect;
 	}
+	DEBUG_MSG("widget:%p, rect: %d,%d,%d,%d\n", widget, r->x, r->y, r->w, r->h);
 	if( painter_is_active ) {
 		/* 记录该部件，需要进行绘制 */
 		RBTree_Insert( &widget_paint_tree, (int)widget, NULL );
@@ -44,11 +45,18 @@ LCUI_API int Widget_InvalidateArea( LCUI_Widget *widget, LCUI_Rect *r )
 LCUI_API int Widget_GetInvalidArea( LCUI_Widget *widget, LCUI_Rect *area )
 {
 	LCUI_Rect *p_rect;
-	LinkedList_Goto( &widget->dirty_rect, 0 );
-	p_rect = (LCUI_Rect*)LinkedList_Get( &widget->dirty_rect );
-	if( !p_rect ) {
+	if( LinkedList_GetTotal(&widget->dirty_rect) <= 0 ) {
 		return -1;
 	}
+	LinkedList_Goto( &widget->dirty_rect, 0 );
+	DEBUG_MSG("list: %p, used node num: %d, current: %p, pos: %d\n",
+		&widget->dirty_rect, widget->dirty_rect.used_node_num, 
+		widget->dirty_rect.current_node, widget->dirty_rect.current_node_pos);
+	p_rect = (LCUI_Rect*)LinkedList_Get( &widget->dirty_rect );
+	if( !p_rect ) {
+		return -2;
+	}
+	DEBUG_MSG("p_rect: %d,%d,%d,%d\n", p_rect->x, p_rect->y, p_rect->w, p_rect->h);
 	*area = *p_rect;
 	return 0;
 }
@@ -153,11 +161,14 @@ static int Widget_DrawBackground( LCUI_Widget *widget, LCUI_Rect area )
 LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget *widget, LCUI_Rect *area )
 {
 	int ret;
+	DEBUG_MSG("enter\n");
 	ret = Widget_GetInvalidArea( widget, area );
 	if( ret != 0 ) {
+		DEBUG_MSG("quit1\n");
 		return FALSE;
 	}
 	Widget_DrawBackground( widget, *area );
+	DEBUG_MSG("quit2\n");
 	return TRUE;
 }
 
@@ -169,6 +180,14 @@ LCUI_API void Widget_EndPaint( LCUI_Widget *widget, LCUI_Rect *area )
 	Graph_DrawBorderEx( graph, widget->border, *area );
 	Widget_ValidateArea( widget, area );
 	Widget_PushAreaToScreen( widget, area );
+}
+
+static void Widget_OnPaint( LCUI_Widget *widget )
+{
+	LCUI_Rect rect;
+	Widget_BeginPaint( widget, &rect );
+	DEBUG_MSG("begin paint rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
+	Widget_EndPaint( widget, &rect );
 }
 
 /** 更新各个部件的无效区域中的内容 */
@@ -185,12 +204,17 @@ LCUI_API int LCUIWidget_ProcInvalidArea(void)
 	if( !node ) {
 		return 0;
 	}
+	DEBUG_MSG("tip1\n");
 	while( node ) {
 		widget = (LCUI_Widget*)node->key;
+		DEBUG_MSG("widget, %p, dirty rect num: %d\n", widget, widget->dirty_rect.used_node_num);
 		old_num = widget->dirty_rect.used_node_num;
 		/* 有多少个脏矩形就地阿姨多少次部件的绘制函数 */
 		while( widget->dirty_rect.used_node_num > 0 ) {
-			WidgetFunc_Call( widget, FUNC_TYPE_PAINT );
+			if( WidgetFunc_Call( widget, FUNC_TYPE_PAINT ) != 0 ) {
+				DEBUG_MSG("tip\n");
+				Widget_OnPaint( widget );
+			}
 			if( widget->dirty_rect.used_node_num >= old_num ) {
 				++count;
 				if( count > 10 ) {
@@ -209,5 +233,6 @@ LCUI_API int LCUIWidget_ProcInvalidArea(void)
 		}
 		node = RBTree_Next( node );
 	}
+	DEBUG_MSG("tip2\n");
 	return 1;
 }
