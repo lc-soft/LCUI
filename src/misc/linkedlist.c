@@ -47,7 +47,7 @@ LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size )
 {
         list->node_data_size = node_data_size;
         list->used_node_num = 0;
-        list->max_node_num = 0;
+        list->usable_node_num = 0;
         list->current_node_pos = 0;
         list->need_free_data = 0;
         list->need_reuse_mem = 0;
@@ -66,7 +66,7 @@ LCUI_API void LinkedList_Destroy( LinkedList *list )
 	list->current_node = NULL;
 	list->used_tail_node = NULL;
 	list->used_node_num = 0;
-	list->max_node_num = 0;
+	list->usable_node_num = 0;
         /* 先释放未使用的结点 */
 	if( list->usable_head_node ) {
 		node = list->usable_head_node;
@@ -112,6 +112,8 @@ LCUI_API int LinkedList_Delete( LinkedList *list )
         }
 
         --list->used_node_num;
+	++list->usable_node_num;
+
         if( list->destroy_func ) {
                 list->destroy_func( list->current_node->data );
         }
@@ -154,7 +156,7 @@ LCUI_API int LinkedList_Delete( LinkedList *list )
 /** 跳转至指定结点 */
 LCUI_API int LinkedList_Goto( LinkedList *list, int pos )
 {
-        if( pos < 0 || pos >= list->max_node_num ) {
+        if( pos < 0 || pos >= list->used_node_num ) {
                 return -1;
         }
         /* 如果该结点离头结点比较近，则直接从头结点开始遍历 */
@@ -185,7 +187,7 @@ static LinkedListNode* LinkedList_GetNode( LinkedList *list, int pos )
         int i;
         LinkedListNode *node = NULL;
 
-        if( pos < 0 || pos >= list->max_node_num ) {
+        if( pos < 0 || pos >= list->used_node_num ) {
                 return NULL;
         }
         if( pos < list->current_node_pos-pos ) {
@@ -253,18 +255,23 @@ static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
 		list->usable_head_node->next = NULL;
 		list->usable_head_node->prev = NULL;
 		list->usable_head_node->data = NULL;
+		++list->usable_node_num;
         }
 
         ++list->used_node_num;
-        if( list->used_node_num > list->max_node_num ) {
-		list->used_tail_node->next = MALLOC_ONE(LinkedListNode);
-                list->used_tail_node->next->prev = list->used_tail_node;
-                list->used_tail_node->next->next = NULL;
-                list->used_tail_node->next->data = NULL;
-                list->used_tail_node = list->used_tail_node->next;
-                ++list->max_node_num;
-		return list->used_tail_node;
-        }
+	--list->usable_node_num;
+
+	if( !list->used_head_node ) {
+		list->used_head_node = list->usable_head_node;
+		list->usable_head_node = list->usable_head_node->next;
+		if( list->usable_head_node ) {
+			list->usable_head_node->prev = NULL;
+		}
+		list->used_tail_node = list->used_head_node;
+		list->current_node = list->used_head_node;
+		list->current_node_pos = 0;
+		return list->used_head_node;
+	}
 
 	list->used_tail_node->next = list->usable_head_node;
 	list->used_tail_node->next->prev = list->used_tail_node;

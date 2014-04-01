@@ -56,7 +56,7 @@ struct LinkedListNodeRec_ {
 struct LinkedListRec_ {
         int node_data_size;
         int used_node_num;
-        int max_node_num;
+        int usable_node_num;
         int current_node_pos;
         unsigned int need_free_data:1;
         unsigned int need_reuse_mem:1;
