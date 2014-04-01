@@ -186,21 +186,23 @@ static int LCUIScreen_UpdateInvalidArea(void)
 	LCUI_Rect *p_rect;
 	LCUI_Graph graph;
 
-	//_DEBUG_MSG("enter\n");
+	DEBUG_MSG("enter, rect num: %d\n", screen_invalid_area.used_node_num);
 	Graph_Init( &graph );
 	LinkedList_Goto( &screen_invalid_area, 0 );
-	while( i_am_init ) {
+	while( i_am_init && !LinkedList_IsAtEnd(&screen_invalid_area) ) {
 		p_rect = (LCUI_Rect*)LinkedList_Get( &screen_invalid_area );
 		if( !p_rect ) {
 			break;
 		}
 		ret = 1;
+		DEBUG_MSG("get rect: %d,%d,%d,%d\n", p_rect->x, p_rect->y, p_rect->w, p_rect->h);
 		/* 获取内存中对应区域的图形数据 */
 		LCUIScreen_GetRealGraph( *p_rect, &graph );
 		/* 写入至帧缓冲，让屏幕显示图形 */
 		LCUIScreen_PutGraph( &graph, Pos(p_rect->x, p_rect->y) );
+		LinkedList_Delete( &screen_invalid_area );
 	}
-	//_DEBUG_MSG("quit\n");
+	DEBUG_MSG("quit\n");
 	Graph_Free( &graph );
 	return ret;
 }
@@ -270,8 +272,10 @@ static void LCUIScreen_Update( void* unused )
 		LCUIWidget_ProcMessage();
 		/* 更新各个部件的无效区域中的内容 */
 		val = LCUIWidget_ProcInvalidArea();
+		DEBUG_MSG("tip1\n");
 		/* 更新屏幕上各无效区域内的图像内容 */
 		val += LCUIScreen_UpdateInvalidArea();
+		DEBUG_MSG("tip2\n");
 		/* 若有无效区域，则同步帧缓冲内保存的屏幕内容 */
 		if( val > 0 ) {
 			LCUIScreen_SyncFrameBuffer();
