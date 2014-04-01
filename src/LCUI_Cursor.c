@@ -166,17 +166,13 @@ LCUI_API void LCUICursor_Hide( void )
 /* 更新鼠标指针的位置 */
 LCUI_API void LCUICursor_UpdatePos( void )
 {
-	LCUI_Rect old;
 	if( global_cursor.current_pos.x == global_cursor.new_pos.x
 	 && global_cursor.current_pos.y == global_cursor.new_pos.y ) {
 		return;
 	}
-	LCUICursor_GetRect( &old );
- 	global_cursor.current_pos = global_cursor.new_pos;
- 	/* 刷新游标的显示 */
 	LCUICursor_Refresh();
-	/* 刷新游标原来的区域中的图形 */
-	LCUIScreen_InvalidateArea ( &old );
+ 	global_cursor.current_pos = global_cursor.new_pos;
+	LCUICursor_Refresh();
 }
 
 /* 设定游标的位置 */
