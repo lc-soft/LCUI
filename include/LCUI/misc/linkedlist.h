@@ -101,9 +101,10 @@ __inline void* LinkedList_Get( LinkedList *list )
 }
 
 /** 判断是否处于链表末尾 */
-__inline int LinkedList_IsAtTail( LinkedList *list )
+__inline int LinkedList_IsAtEnd( LinkedList *list )
 {
-	if( list->current_node == list->used_tail_node ) {
+	if( list->current_node_pos >= list->used_node_num
+	 || !list->current_node  ) {
 		return 1;
 	}
 	return 0;
