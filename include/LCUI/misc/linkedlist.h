@@ -58,10 +58,12 @@ struct LinkedListRec_ {
         int used_node_num;
         int max_node_num;
         int current_node_pos;
-        int need_free_data;
-        int need_reuse_mem;
-        LinkedListNode *head, *tail;
-        LinkedListNode *current, *boundary;
+        unsigned int need_free_data:1;
+        unsigned int need_reuse_mem:1;
+        LinkedListNode *used_head_node;
+        LinkedListNode *current_node;
+	LinkedListNode *used_tail_node;
+	LinkedListNode *usable_head_node;
         void (*destroy_func)(void*);
 };
 
@@ -92,42 +94,38 @@ __inline void LinkedList_SetDestroyFunc( LinkedList *list, void (*func)(void*) )
 /** 获取当前结点中的数据 */
 __inline void* LinkedList_Get( LinkedList *list )
 {
-	if( list->current && list->current != list->boundary ) {
-		return list->current->data;
+	if( list->current_node ) {
+		return list->current_node->data;
 	}
 	return NULL;
+}
+
+/** 判断是否处于链表末尾 */
+__inline int LinkedList_IsAtTail( LinkedList *list )
+{
+	if( list->current_node == list->used_tail_node ) {
+		return 1;
+	}
+	return 0;
 }
 
 /** 获取当前结点的上个结点中的数据 */
 __inline void* LinkedList_GetPrev( LinkedList *list )
 {
-        return list->current->prev->data;
+        return list->current_node->prev->data;
 }
 
 /** 获取当前结点的下个结点中的数据 */
 __inline void* LinkedList_GetNext( LinkedList *list )
 {
-        return list->current->next->data;
+        return list->current_node->next->data;
 }
 
 /** 切换至下个结点 */
 __inline void LinkedList_ToNext( LinkedList *list )
 {
         ++list->current_node_pos;
-        list->current = list->current->next;
-}
-
-/** 判断是否处于链表末尾 */
-__inline int LinkedList_IsAtTail( LinkedList *list )
-{
-        return (list->current_node_pos == list->max_node_num-1
-		|| list->current == list->tail);
-}
-
-/** 判断当前结点是否在链表可用结点区域内 */
-__inline int LinkedList_IsInUsedArea( LinkedList *list )
-{
-        return (list->current_node_pos <= list->used_node_num-1);
+        list->current_node = list->current_node->next;
 }
 
 /** 初始化链表 */
@@ -142,8 +140,8 @@ LCUI_API int LinkedList_Delete( LinkedList *list );
 /** 将当前结点移动至指定位置 */
 LCUI_API int LinkedList_MoveTo( LinkedList *list, int pos );
 
-/** 在当前结点前面插入新结点，并记录数据 */
-LCUI_API void LinkedList_Insert( LinkedList *list, void *data );
+/** 在当前结点前面插入新结点，并引用数据 */
+LCUI_API int LinkedList_Insert( LinkedList *list, void *data );
 
 /** 在当前结点前面插入新结点，并将数据的副本记录到该结点上 */
 LCUI_API void* LinkedList_InsertCopy( LinkedList *list, void *data );

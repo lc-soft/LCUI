@@ -48,110 +48,106 @@ LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size )
         list->node_data_size = node_data_size;
         list->used_node_num = 0;
         list->max_node_num = 0;
-        list->current_node_pos = -1;
+        list->current_node_pos = 0;
         list->need_free_data = 0;
         list->need_reuse_mem = 0;
-        list->head = NULL;
-        list->tail = NULL;
-        list->current = NULL;
-        list->boundary = NULL;
+	list->usable_head_node = NULL;
+	list->used_head_node = NULL;
+	list->used_tail_node = NULL;
+        list->current_node = NULL;
         list->destroy_func = NULL;
 }
 
 /** 销毁整个链表 */
 LCUI_API void LinkedList_Destroy( LinkedList *list )
 {
-        list->current_node_pos = -1;
+	LinkedListNode *node;
+        list->current_node_pos = 0;
+	list->current_node = NULL;
+	list->used_tail_node = NULL;
+	list->used_node_num = 0;
+	list->max_node_num = 0;
         /* 先释放未使用的结点 */
-        while( list->tail != list->boundary ) {
-                list->tail = list->tail->prev;
-                if( list->need_free_data && list->tail->next->data ) {
-                        free( list->tail->next->data );
-                }
-                list->tail->next->data = NULL;
-                list->tail->next->prev = NULL;
-                list->tail->next->next = NULL;
-                free( list->tail->next );
-                list->tail->next = NULL;
-        }
-        /* 然后释放已使用的结点 */
-        while( list->tail != list->head ) {
-                list->tail = list->tail->prev;
-                if( list->destroy_func ) {
-                        list->destroy_func( list->head->data );
-                }
-                if( list->need_free_data && list->tail->next->data ) {
-                        free( list->tail->next->data );
-                }
-                list->tail->next->data = NULL;
-                list->tail->next->prev = NULL;
-                list->tail->next->next = NULL;
-                free( list->tail->next );
-                list->tail->next = NULL;
-        }
-        /* 单独释放头结点 */
-        if( list->destroy_func && list->head->data ) {
-                list->destroy_func( list->head->data );
-        }
-        if( list->need_free_data ) {
-                free( list->head->data );
-        }
-        list->head->data = NULL;
-        list->head->next = NULL;
-        free( list->head );
-        list->head = NULL;
+	if( list->usable_head_node ) {
+		node = list->usable_head_node;
+		while( node ) {
+			list->usable_head_node = node->next;
+			if( list->need_free_data && node->data ) {
+				free( node->data );
+			}
+			node->data = NULL;
+			node->prev = NULL;
+			node->next = NULL;
+			free( node );
+			node = list->usable_head_node;
+		}
+	}
+        /* 释放已使用的结点 */
+	if( list->used_head_node ) {
+		node = list->used_head_node;
+		while( node ) {
+			list->used_head_node = node->next;
+			if( list->need_free_data && node->data ) {
+				free( node->data );
+			}
+			node->data = NULL;
+			node->prev = NULL;
+			node->next = NULL;
+			free( node );
+			node = list->used_head_node;
+		}
+	}
 }
 
 /** 移除当前结点 */
 LCUI_API int LinkedList_Delete( LinkedList *list )
 {
-        if( !list->current || list->current_node_pos < 0
-         || list->current_node_pos >= list->used_node_num ) {
-                return -1;
-        }
         if( list->used_node_num <= 0 ) {
                 return -2;
         }
 
+        if( !list->current_node || list->current_node_pos < 0
+         || list->current_node_pos >= list->used_node_num ) {
+                return -1;
+        }
+
         --list->used_node_num;
         if( list->destroy_func ) {
-                list->destroy_func( list->current->data );
+                list->destroy_func( list->current_node->data );
         }
         if( !list->need_reuse_mem ) {
-                free( list->current->data );
-                list->current->data = NULL;
+                free( list->current_node->data );
+                list->current_node->data = NULL;
         }
+	/* 如果在链表尾端 */
+	if( list->current_node == list->used_tail_node ) {
+		if( list->current_node->prev ) {
+			list->used_tail_node = list->current_node->prev;
+		} else {
+			list->used_tail_node = NULL;
+		}
+	}
         /* 分离当前结点 */
-        if( list->current->next ) {
-                list->current->next->prev = list->current->prev;
+        if( list->current_node->next ) {
+                list->current_node->next->prev = list->current_node->prev;
         }
-        if( list->current->prev ) {
-                list->current->prev->next = list->current->next;
+        if( list->current_node->prev ) {
+                list->current_node->prev->next = list->current_node->next;
         } else {
-                if( list->current->next ) {
-                        list->boundary = NULL;
-                        return 0;
-                }
-                list->head = list->current->next;
+                list->used_head_node = list->current_node->next;
         }
 
-        if( !list->boundary->next ) {
-                list->boundary->next = list->current;
-                /* 把当前结点的next结点作为当前结点 */
-                list->current = list->current->next;
-                list->boundary->next->next = NULL;
-                list->boundary->next->prev = list->boundary;
-                return 0;
-        }
-
-        /* 修改 当前结点 和 边界结点的下个结点 的prev结点记录 */
-        list->current->prev = list->boundary;
-        list->boundary->next->prev = list->current;
-        /* 把当前结点的next结点作为当前结点 */
-        list->current = list->current->next;
-        /* 修改结点的next结点记录，list->boundary->next->prev记录的是之前分离出来的结点 */
-        list->boundary->next->prev->next = list->boundary->next;
-        list->boundary->next = list->boundary->next->prev;
+	list->current_node->prev = NULL;
+	if( list->usable_head_node ) {
+		list->usable_head_node->prev = list->current_node;
+		list->current_node = list->current_node->next;
+		list->usable_head_node->prev->next = list->usable_head_node;
+		list->usable_head_node = list->usable_head_node->prev;
+	} else {
+		list->usable_head_node = list->current_node;
+		list->current_node = list->current_node->next;
+		list->usable_head_node->next = NULL;
+	}
         return 0;
 }
 
@@ -164,20 +160,20 @@ LCUI_API int LinkedList_Goto( LinkedList *list, int pos )
         /* 如果该结点离头结点比较近，则直接从头结点开始遍历 */
         if( pos < list->current_node_pos-pos ) {
                 list->current_node_pos = 0;
-                list->current = list->head;
+		list->current_node = list->used_head_node;
         }
         /* 如果该结点离边界结点比较近，则直接从边界结点开始遍历 */
         else if( pos - list->current_node_pos > list->used_node_num - pos ) {
                 list->current_node_pos = list->used_node_num-1;
-                list->current = list->boundary;
+		list->current_node = list->used_tail_node;
         }
 
         while( list->current_node_pos < pos ) {
-                list->current = list->current->next;
+                list->current_node = list->current_node->next;
                 ++list->current_node_pos;
         }
         while( list->current_node_pos > pos ) {
-                list->current = list->current->prev;
+                list->current_node = list->current_node->prev;
                 --list->current_node_pos;
         }
         return 0;
@@ -194,21 +190,21 @@ static LinkedListNode* LinkedList_GetNode( LinkedList *list, int pos )
         }
         if( pos < list->current_node_pos-pos ) {
                 i = 0;
-                node = list->head;
+		node = list->used_head_node;
         }
         else if( pos - list->current_node_pos > list->used_node_num - pos ) {
                 i = list->used_node_num-1;
-                node = list->boundary;
+		node = list->used_tail_node;
         } else {
                 i = list->current_node_pos;
         }
 
         while( i < pos ) {
-                node = list->current->next;
+                node = list->current_node->next;
                 ++i;
         }
         while( i > pos ) {
-                node = list->current->prev;
+                node = list->current_node->prev;
                 --i;
         }
         return node;
@@ -224,7 +220,7 @@ LCUI_API int LinkedList_MoveTo( LinkedList *list, int pos )
                 return -1;
         }
         
-        src_node = list->current;
+        src_node = list->current_node;
         src_node->prev->next = src_node->next;
         if( src_node->next ) {
                 src_node->next->prev = src_node->prev;
@@ -240,7 +236,7 @@ LCUI_API int LinkedList_MoveTo( LinkedList *list, int pos )
                 if( des_node->prev ) {
                         des_node->prev->next = src_node;
                 } else {
-                        list->head = src_node;
+			list->used_head_node = src_node;
                 }
                 src_node->prev = des_node->prev;
                 des_node->prev = src_node;
@@ -249,47 +245,66 @@ LCUI_API int LinkedList_MoveTo( LinkedList *list, int pos )
         return 0;
 }
 
-/** 在当前结点前面插入新结点，并引用数据 */
-LCUI_API void LinkedList_Insert( LinkedList *list, void *data )
+/** 分配一个可用的结点 */
+static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
 {
-        if( !list->head ) {
-                list->head = MALLOC_ONE(LinkedListNode);
-                list->head->prev = NULL;
-                list->head->next = NULL;
-                list->head->data = data;
-                list->tail = list->head;
-                list->boundary = list->head;
-                list->current = list->head;
-                list->current_node_pos = 0;
-                list->max_node_num = 1;
-                list->used_node_num = 1;
-                return;
+        if( !list->usable_head_node ) {
+		list->usable_head_node = MALLOC_ONE(LinkedListNode);
+		list->usable_head_node->next = NULL;
+		list->usable_head_node->prev = NULL;
+		list->usable_head_node->data = NULL;
         }
 
         ++list->used_node_num;
         if( list->used_node_num > list->max_node_num ) {
-                list->max_node_num = list->used_node_num;
+		list->used_tail_node->next = MALLOC_ONE(LinkedListNode);
+                list->used_tail_node->next->prev = list->used_tail_node;
+                list->used_tail_node->next->next = NULL;
+                list->used_tail_node->next->data = NULL;
+                list->used_tail_node = list->used_tail_node->next;
+                ++list->max_node_num;
+		return list->used_tail_node;
         }
-        /* 若当前结点没有上个结点，则插入新结点作为头结点 */
-        if( !list->current->prev ) {
-                list->head = MALLOC_ONE(LinkedListNode);
-                list->head->prev = NULL;
-                list->head->next = list->current;
-                list->current->prev = list->head;
-                list->current = list->head;
-                list->current->data = data;
-                return;
-        }
-        /* 在当前结点的前面插入一个新结点 */
-        list->current->prev->next = MALLOC_ONE(LinkedListNode);
-        /* 记录新结点的前后结点 */
-        list->current->prev->next->prev = list->current->prev;
-        list->current->prev->next->next = list->current;
-        /* 将新结点作为当前结点的前结点 */
-        list->current->prev = list->current->prev->next;
-        /* 更新当前结点 */
-        list->current = list->current->prev;
-        list->current->data = data;
+
+	list->used_tail_node->next = list->usable_head_node;
+	list->used_tail_node->next->prev = list->used_tail_node;
+	list->usable_head_node = list->usable_head_node->next;
+	if( list->usable_head_node ) {
+		list->usable_head_node->prev = NULL;
+	}
+	list->used_tail_node = list->used_tail_node->next;
+	list->used_tail_node->next = NULL;
+        return list->used_tail_node;
+}
+
+/** 在当前结点前面插入新结点，并引用数据 */
+LCUI_API int LinkedList_Insert( LinkedList *list, void *data )
+{
+	LinkedListNode *node;
+	
+	node = LinkedList_AllocNode( list );
+	node->data = data;
+	
+	if( !list->current_node ) {
+		return -1;
+	}
+
+	if( list->current_node == list->used_head_node ) {
+		node->next = list->used_head_node;
+		list->used_head_node = node;
+		if( node == list->used_tail_node ) {
+			list->used_tail_node = node->prev;
+			list->used_tail_node->next = NULL;
+		}
+		node->prev = NULL;
+	} else {
+		node->next = list->current_node;
+		node->prev = list->current_node->prev;
+		list->current_node->prev = node;
+		list->current_node = node;
+	}
+
+	return 0;
 }
 
 /** 在当前结点前面插入新结点，并将数据的副本记录到该结点上 */
@@ -300,41 +315,6 @@ LCUI_API void* LinkedList_InsertCopy( LinkedList *list, void *data )
         memcpy( data_copy, data, list->node_data_size );
 	LinkedList_Insert( list, data_copy );
 	return data_copy;
-}
-
-/** 分配一个可用的结点 */
-static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
-{
-        if( !list->head ) {
-                list->head = MALLOC_ONE(LinkedListNode);
-                list->head->prev = NULL;
-                list->head->next = NULL;
-                list->head->data = NULL;
-                list->tail = list->head;
-                list->boundary = list->head;
-                list->current = list->head;
-                list->current_node_pos = 0;
-                list->max_node_num = 1;
-                list->used_node_num = 1;
-                return list->head;
-        }
-
-        ++list->used_node_num;
-        if( list->used_node_num > list->max_node_num ) {
-                list->boundary = list->tail;
-                list->tail->next = MALLOC_ONE(LinkedListNode);
-                list->tail->next->prev = list->tail;
-                list->tail->next->next = NULL;
-                list->tail->next->data = NULL;
-                list->tail = list->tail->next;
-                list->max_node_num = list->used_node_num;
-        }
-        if( list->boundary ) {
-                list->boundary = list->boundary->next;
-        } else {
-                list->boundary = list->head;
-        }
-        return list->boundary;
 }
 
 /** 将数据的副本记录至链表的相应结点上 */
