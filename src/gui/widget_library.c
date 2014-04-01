@@ -227,18 +227,19 @@ LCUI_API LCUI_BOOL WidgetType_IsValid( const char *widget_type )
 }
 
 /* 调用指定类型的部件函数 */
-LCUI_API void WidgetFunc_Call( LCUI_Widget *widget, WidgetFuncType type )
+LCUI_API int WidgetFunc_Call( LCUI_Widget *widget, WidgetFuncType type )
 {
 	void (*func)(LCUI_Widget*);
-
 	func = WidgetFunc_GetByID( widget->type_id, type );
-	if( func != NULL ) {
+	if( func ) {
 		func( widget );
+		return 0;
 	}
+	return -1;
 }
 
-extern void Register_Window(void);
-extern void Register_Label(void);
+extern void RegisterWindow(void);
+extern void RegisterLabel(void);
 extern void Register_Button(void);
 extern void Register_PictureBox(void);
 extern void Register_ProgressBar(void);
@@ -253,8 +254,8 @@ extern void Register_ScrollBar(void);
 LCUI_API void Register_DefaultWidgetType(void)
 {
 	WidgetType_Add(NULL);
-	Register_Window();
-	Register_Label();
+	RegisterWindow();
+	RegisterLabel();
 	Register_Button();
 	Register_PictureBox();
 	Register_ProgressBar();
