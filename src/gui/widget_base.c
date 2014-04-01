@@ -856,7 +856,6 @@ LCUI_API void
 Widget_SetStyleName( LCUI_Widget *widget, const char *style_name )
 {
 	_LCUIString_Copy(&widget->style_name, style_name);
-	Widget_Draw( widget );
 }
 
 /* 设定部件的风格ID */
@@ -864,7 +863,6 @@ LCUI_API void
 Widget_SetStyleID( LCUI_Widget *widget, int style_id )
 {
 	widget->style_id = style_id;
-	Widget_Draw( widget );
 }
 
 static LCUI_Widget* __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
@@ -1326,7 +1324,7 @@ LCUI_API void
 Widget_SetBorder( LCUI_Widget *widget, LCUI_Border border )
 {
 	widget->border = border;
-	Widget_Draw( widget );
+	Widget_InvalidateArea( widget, NULL );
 }
 
 /* 设定部件边框的四个角的圆角半径 */
@@ -1334,57 +1332,54 @@ LCUI_API void
 Widget_SetBorderRadius( LCUI_Widget *widget, unsigned int radius )
 {
 	Border_Radius( &widget->border, radius );
-	Widget_Draw( widget );
-	Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
+	Widget_InvalidateArea( widget, NULL );
 }
 
 /** 设定部件的背景图像 */
-LCUI_API void Widget_SetBackgroundImage(	LCUI_Widget *widget, 
-						LCUI_Graph *img )
+LCUI_API void Widget_SetBackgroundImage( LCUI_Widget *widget, 
+					 LCUI_Graph *img )
 {
-	if(!widget) {
+	if( Graph_IsValid(img) ) {
+		widget->background.image = *img;
+		Widget_InvalidateArea( widget, NULL );
 		return;
 	}
-	if( !Graph_IsValid(img) ) {
-		if( Graph_IsValid(&widget->background.image) ) {
-			Graph_Init( &widget->background.image );
-		} else {
-			return;
-		}
-	} else {
-		widget->background.image = *img;
+
+	if( Graph_IsValid(&widget->background.image) ) {
+		Graph_Init( &widget->background.image );
+		Widget_InvalidateArea( widget, NULL );
 	}
-	Widget_Draw( widget );
 }
 
 /** 设定背景图的布局 */
-LCUI_API void Widget_SetBackgroundLayout(	LCUI_Widget *widget,
-						LayoutType layout )
+LCUI_API void Widget_SetBackgroundLayout( LCUI_Widget *widget,
+					  LayoutType layout )
 {
-	if(!widget) {
-		return;
+	if( widget->background.layout != layout ) {
+		widget->background.layout = layout;
+		Widget_InvalidateArea( widget, NULL );
 	}
-	widget->background.layout = layout;
 }
 
 /** 设定部件的背景颜色 */
-LCUI_API void Widget_SetBackgroundColor(	LCUI_Widget *widget, 
-						LCUI_RGB color )
+LCUI_API void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color )
 {
-	if(!widget) {
-		return;
+	if( widget->background.color.blue != color.blue
+	 || widget->background.color.green != color.green
+	 || widget->background.color.red != color.red ) {
+		widget->background.color = color;
+		Widget_InvalidateArea( widget, NULL );
 	}
-	widget->background.color = color;
 }
 
-/** 设定部件背景是否透明 */
+/** 设定部件背景色是否透明 */
 LCUI_API void Widget_SetBackgroundTransparent(	LCUI_Widget *widget, 
-						LCUI_BOOL flag )
+						LCUI_BOOL is_true )
 {
-	if(!widget) {
-		return;
+	if( widget->background.transparent != is_true ) {
+		widget->background.transparent = is_true;
+		Widget_InvalidateArea( widget, NULL );
 	}
-	widget->background.transparent = flag;
 }
 
 /** 启用部件 */
@@ -1491,7 +1486,7 @@ LCUI_API void Widget_ExecSetAlpha( LCUI_Widget *widget, uchar_t alpha )
  **/
 LCUI_API void Widget_ExecMove( LCUI_Widget *widget, LCUI_Pos pos )
 {
-	LCUI_Rect old_rect, new_rect;
+	LCUI_Rect rect;
 	LCUI_Pos max_pos, min_pos;
 
 	if( !widget ) {
@@ -1519,18 +1514,21 @@ LCUI_API void Widget_ExecMove( LCUI_Widget *widget, LCUI_Pos pos )
 	}
 	/* 如果图层是显示的，并且位置变动，那就需要添加无效区域 */
 	if( widget->visible ) {
-		old_rect = Widget_GetRect( widget );
-		//_DEBUG_MSG("old:%d,%d,%d,%d\n",
-		// rect.x, rect.y, rect.width, rect.height);
+		rect = Widget_GetRect( widget );
+		if( widget->parent ) {
+			rect.x += widget->parent->glayer->padding.left;
+			rect.y += widget->parent->glayer->padding.top;
+		}
+		Widget_PushAreaToScreen( widget->parent, &rect );
+
 		widget->pos = pos;
-		new_rect.x = pos.x;
-		new_rect.y = pos.y;
-		new_rect.width = old_rect.width;
-		new_rect.height = old_rect.height;
-		//_DEBUG_MSG("new:%d,%d,%d,%d\n",
-		// rect.x, rect.y, rect.width, rect.height);
-		Widget_InvalidArea( widget->parent, new_rect );
-		Widget_InvalidArea( widget->parent, old_rect );
+		rect.x = pos.x;
+		rect.y = pos.y;
+		if( widget->parent ) {
+			rect.x += widget->parent->glayer->padding.left;
+			rect.y += widget->parent->glayer->padding.top;
+		}
+		Widget_PushAreaToScreen( widget->parent, &rect );
 	} else {
 		/* 否则，直接改坐标 */
 		widget->pos = pos;
@@ -1548,7 +1546,7 @@ LCUI_API void Widget_ExecHide( LCUI_Widget *widget )
 	/* 获取隐藏部件需要调用的函数指针，并调用之 */
 	WidgetFunc_Call( widget, FUNC_TYPE_HIDE );
 	Widget_Visible( widget, FALSE );
-	Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
+	Widget_PushAreaToScreen( widget, NULL );
 }
 
 /** 为部件的子部件进行排序 */
@@ -1752,13 +1750,10 @@ LCUI_API int Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 	event.resize.old_size = widget->size;
 
 	if( widget->visible ) {
-		LCUI_Rect rect;
-		rect = Widget_GetRect( widget );
-		Widget_InvalidArea( widget->parent, rect );
+		Widget_PushAreaToScreen( widget, NULL );
 		widget->size = size;
-		rect.width = size.w;
-		rect.height = size.h;
-		Widget_InvalidArea( widget->parent, rect );
+		Widget_PushAreaToScreen( widget, NULL );
+		Widget_InvalidateArea( widget, NULL );
 	} else {
 		widget->size = size;
 	}
@@ -1791,10 +1786,7 @@ LCUI_API void Widget_SetAutoSize(	LCUI_Widget *widget,
 /** 执行刷新显示指定部件的整个区域图形的任务 */
 LCUI_API void Widget_ExecRefresh( LCUI_Widget *widget )
 {
-	//_DEBUG_MSG("refresh widget: %d,%d,%d,%d\n",
-	//	Widget_GetRect(widget).x, Widget_GetRect(widget).y,
-	//	Widget_GetRect(widget).width, Widget_GetRect(widget).height );
-	Widget_InvalidArea( widget->parent, Widget_GetRect(widget) );
+	Widget_InvalidateArea( widget, NULL );
 }
 
 /** 执行部件的更新操作 */
@@ -1804,48 +1796,6 @@ LCUI_API void Widget_ExecUpdate( LCUI_Widget *widget )
 	WidgetStyle_Sync( widget );
 	/* 调用回调函数进更新 */
 	WidgetFunc_Call( widget, FUNC_TYPE_UPDATE );
-}
-
-static int Widget_DrawBackground( LCUI_Widget *widget, LCUI_Rect area )
-{
-	LCUI_Graph *graph;
-	LCUI_Background *bg;
-
-	graph = Widget_GetSelfGraph( widget );
-	bg = &widget->background;
-	/* 如果背景透明，则使用覆盖模式将背景图绘制到部件上 */
-	if( bg->transparent ) {
-		return Graph_FillImageEx( graph, &bg->image, bg->layout, area );
-	}
-	/* 否则，使用叠加模式 */
-	return Graph_FillImageWithColorEx( graph, &bg->image, bg->layout,
-							bg->color, area );
-}
-
-/** 
- * 执行重绘部件前的一些任务
- * @param[in] widget 需要重绘的部件
- * @param[out] area 需要进行重绘的区域
- * @returns 正常返回TRUE，没有无效区域则返回FALSE
- */
-LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget *widget, LCUI_Rect *area )
-{
-	int ret;
-	ret = Widget_GetInvalidArea( widget, area );
-	if( ret != 0 ) {
-		return FALSE;
-	}
-	Widget_DrawBackground( widget, *area );
-	return TRUE;
-}
-
-/** 执行重绘部件后的一些任务 */
-LCUI_API void Widget_EndPaint( LCUI_Widget *widget, LCUI_Rect *area )
-{
-	LCUI_Graph *graph;
-	graph = Widget_GetSelfGraph( widget );
-	Graph_DrawBorderEx( graph, widget->border, *area );
-	Widget_ValidateArea( widget, *area );
 }
 
 /** 获取部件实际显示的图形 */
@@ -2110,9 +2060,6 @@ Widget_MoveToPos(LCUI_Widget *widget, LCUI_Pos des_pos, int speed)
 /** 刷新显示指定部件的整个区域图形 */
 LCUI_API void Widget_Refresh(LCUI_Widget *widget)
 {
-	if( !widget ) {
-		return;
-	}
 	WidgetMsg_Post( widget, WIDGET_REFRESH, NULL, TRUE, FALSE );
 }
 
@@ -2147,16 +2094,6 @@ LCUI_API void Widget_Resize( LCUI_Widget *widget, LCUI_Size new_size )
 	 || widget->pos_type == POS_TYPE_RELATIVE ) {
 		//WidgetMsg_Post( widget, NULL, DATATYPE_POS_TYPE, 0 );
 	}
-}
-
-/** 重新绘制部件 */
-LCUI_API void Widget_Draw(LCUI_Widget *widget)
-{
-	if( !widget ) {
-		return;
-	}
-	Widget_Update( widget );
-	WidgetMsg_Post( widget, WIDGET_PAINT, NULL, TRUE, FALSE );
 }
 
 /** 销毁部件 */
@@ -2258,7 +2195,6 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 			ret = Widget_ExecResize( widget, data_ptr->data.size );
 		}
 		if( ret == 0 ) {
-			Widget_Draw( widget );
 			Widget_UpdatePos( widget );
 		}
 		break;
@@ -2283,14 +2219,14 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 			break;
 		}
 		widget->state = (WidgetState)data_ptr->data.state;
-		Widget_Draw( widget );
+		Widget_Update( widget );
 		break;
 	case WIDGET_CHGALPHA:
 		if( Widget_GetAlpha(widget) == data_ptr->data.alpha ) {
 			break;
 		}
 		Widget_ExecSetAlpha( widget, data_ptr->data.alpha );
-		Widget_Refresh( widget );
+		Widget_PushAreaToScreen( widget, NULL );
 		break;
 	case WIDGET_PAINT:
 		if( Widget_TryLock( widget ) != 0 ) {
