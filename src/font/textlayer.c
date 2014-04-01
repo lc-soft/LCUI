@@ -1441,10 +1441,14 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LinkedList *rect_list )
 	}
 	
 	if( rect_list ) {
+		int n;
 		void *data_ptr;
+
+		n = LinkedList_GetTotal( &layer->dirty_rect );
 		LinkedList_Goto( &layer->dirty_rect, 0 );
 		/* 转移脏矩形记录，供利用 */
-		while( data_ptr = LinkedList_Get( &layer->dirty_rect ) ) {
+		while(n--) {
+			data_ptr = LinkedList_Get( &layer->dirty_rect );
 			LinkedList_AddDataCopy( rect_list, data_ptr );
 			LinkedList_ToNext( &layer->dirty_rect );
 		}
@@ -1588,6 +1592,7 @@ LCUI_API int TextLayer_Draw( LCUI_TextLayer* layer )
 /** 清除已记录的无效矩形 */
 LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer *layer )
 {
+	int n;
 	LCUI_Rect *rect_ptr;
 	LCUI_Graph invalid_graph;
 
@@ -1597,7 +1602,10 @@ LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer *layer )
 		return;
 	}
 
-	while( rect_ptr = (LCUI_Rect*)LinkedList_Get( &layer->dirty_rect ) ) {
+	n = LinkedList_GetTotal( &layer->dirty_rect );
+	LinkedList_Goto( &layer->dirty_rect, 0 );
+	while(n--) {
+		rect_ptr = (LCUI_Rect*)LinkedList_Get( &layer->dirty_rect );
 		Graph_Quote( &invalid_graph, &layer->graph, *rect_ptr );
 		Graph_FillAlpha( &invalid_graph, 0 );
 		LinkedList_ToNext( &layer->dirty_rect );
