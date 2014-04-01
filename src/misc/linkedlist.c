@@ -122,22 +122,38 @@ LCUI_API int LinkedList_Delete( LinkedList *list )
                 list->current_node->data = NULL;
         }
 	/* 如果在链表尾端 */
+	DEBUG_MSG("current = %p, head = %p, tail = %p, used_node_num = %d\n", list->current_node, list->used_head_node, list->used_tail_node, list->used_node_num);
 	if( list->current_node == list->used_tail_node ) {
 		if( list->current_node->prev ) {
 			list->used_tail_node = list->current_node->prev;
+			DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
 		} else {
 			list->used_tail_node = NULL;
+			DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
 		}
 	}
+	if( list->current_node == list->used_head_node ) {
+		list->used_head_node = list->used_head_node->next;
+		DEBUG_MSG("head = %p\n", list->used_head_node);
+	}
+	DEBUG_MSG("list->current_node->next = %p\n", list->current_node->next);
+	DEBUG_MSG("list->current_node->prev = %p\n", list->current_node->prev);
         /* 分离当前结点 */
         if( list->current_node->next ) {
-                list->current_node->next->prev = list->current_node->prev;
-        }
-        if( list->current_node->prev ) {
-                list->current_node->prev->next = list->current_node->next;
+		if( list->current_node->prev ) {
+			list->current_node->next->prev = list->current_node->prev;
+			list->current_node->prev->next = list->current_node->next;
+		} else {
+			list->used_head_node = list->current_node->next;
+			list->used_head_node->prev = NULL;
+		}
         } else {
-                list->used_head_node = list->current_node->next;
-        }
+		if( list->current_node->prev ) {
+			list->current_node->prev->next = list->current_node->next;
+		} else {
+			list->used_head_node = list->current_node->next;
+		}
+	}
 
 	list->current_node->prev = NULL;
 	if( list->usable_head_node ) {
@@ -267,12 +283,15 @@ static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
 		if( list->usable_head_node ) {
 			list->usable_head_node->prev = NULL;
 		}
+		list->used_head_node->next = NULL;
 		list->used_tail_node = list->used_head_node;
+		DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
 		list->current_node = list->used_head_node;
 		list->current_node_pos = 0;
 		return list->used_head_node;
 	}
-
+	
+	DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
 	list->used_tail_node->next = list->usable_head_node;
 	list->used_tail_node->next->prev = list->used_tail_node;
 	list->usable_head_node = list->usable_head_node->next;
@@ -280,6 +299,7 @@ static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
 		list->usable_head_node->prev = NULL;
 	}
 	list->used_tail_node = list->used_tail_node->next;
+	DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
 	list->used_tail_node->next = NULL;
         return list->used_tail_node;
 }
@@ -299,13 +319,15 @@ LCUI_API int LinkedList_Insert( LinkedList *list, void *data )
 	if( list->current_node == list->used_head_node ) {
 		node->next = list->used_head_node;
 		list->used_head_node = node;
-		if( node == list->used_tail_node ) {
-			list->used_tail_node = node->prev;
-			list->used_tail_node->next = NULL;
-		}
+		list->used_tail_node = node->prev;
+		DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
+		list->used_tail_node->next = NULL;
 		node->prev = NULL;
 	} else {
 		node->next = list->current_node;
+		list->used_tail_node = node->prev;
+		DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
+		list->used_tail_node->next = NULL;
 		node->prev = list->current_node->prev;
 		list->current_node->prev = node;
 		list->current_node = node;
