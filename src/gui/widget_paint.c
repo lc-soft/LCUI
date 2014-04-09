@@ -124,16 +124,11 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget *widget, LCUI_Rect *area )
 		area->x += widget->glayer->padding.left;
 		area->y += widget->glayer->padding.top;
 		/* 计算父部件的内边距框，然后再调整矩形区域 */
-		n = widget->glayer->padding.left;
-		n += widget->glayer->padding.right;
-		n = widget->size.w - n;
+		n = widget->size.w - widget->glayer->padding.right;
 		if( area->x + area->w > n ) {
 			area->w = n - area->x;
 		}
-
-		n = widget->glayer->padding.top;
-		n += widget->glayer->padding.bottom;
-		n = widget->size.h - n;
+		n = widget->size.h - widget->glayer->padding.bottom;
 		if( area->y + area->h > n ) {
 			area->h = n - area->y;
 		}
