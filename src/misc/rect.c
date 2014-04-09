@@ -246,12 +246,12 @@ static int LCUIRect_CutTwoRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 		if( rect2->y == rect1->y ) {
 			rects[0].x = rect2->x + rect1->w;
 			rects[0].y = rect1->y;
-			rects[0].w = rect2->x + rect2->w - rects[0].x;
+			rects[0].w = rect2->w - rect1->w;
 			rects[0].h = rect1->h;
 			rects[1].x = rect2->x;
-			rects[1].y = rect1->h;
+			rects[1].y = rect1->y + rect1->h;
 			rects[1].w = rect2->w;
-			rects[1].h = rect2->y + rect2->h - rects[0].y;
+			rects[1].h = rect2->h - rect1->h;
 			return 0;
 		}
 		/**
