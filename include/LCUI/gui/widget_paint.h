@@ -1,4 +1,5 @@
-﻿
+﻿#ifndef __WIDGET_PAINT_H__
+#define __WIDGET_PAINT_H__
 /** 初始化GUI部件绘制器 */
 void LCUIWidgetPainter_Init(void);
 
@@ -19,8 +20,8 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget *widget, LCUI_Rect *area );
 
 /** 
  * 执行重绘部件前的一些任务
- * @param[in] widget 需要重绘的部件
- * @param[out] area 需要进行重绘的区域
+ * @param[in] widget	需要重绘的部件
+ * @param[out] area	需要进行重绘的区域
  * @returns 正常返回TRUE，没有无效区域则返回FALSE
  */
 LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget *widget, LCUI_Rect *area );
@@ -29,4 +30,6 @@ LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget *widget, LCUI_Rect *area );
 LCUI_API void Widget_EndPaint( LCUI_Widget *widget, LCUI_Rect *area );
 
 /** 更新各个部件的无效区域中的内容 */
-LCUI_API int LCUIWidget_ProcInvalidArea(void);
+int LCUIWidget_ProcInvalidArea(void);
+
+#endif
