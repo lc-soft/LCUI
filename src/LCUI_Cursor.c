@@ -139,6 +139,9 @@ LCUI_API void LCUICursor_GetRect( LCUI_Rect *rect )
 LCUI_API void LCUICursor_Refresh( void )
 {
 	LCUI_Rect rect;
+	if( !global_cursor.visible ) {
+		return;
+	}
 	LCUICursor_GetRect( &rect );
 	LCUIScreen_InvalidateArea( &rect );
 }
@@ -159,8 +162,10 @@ LCUI_API void LCUICursor_Show( void )
 /* 隐藏鼠标游标 */
 LCUI_API void LCUICursor_Hide( void )
 {
+	LCUI_Rect rect;
 	global_cursor.visible = FALSE;
-	LCUICursor_Refresh();
+	LCUICursor_GetRect( &rect );
+	LCUIScreen_InvalidateArea( &rect );
 }
 
 /* 更新鼠标指针的位置 */
