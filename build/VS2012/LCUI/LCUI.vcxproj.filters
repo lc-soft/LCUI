@@ -55,9 +55,6 @@
     <Filter Include="源文件\draw">
       <UniqueIdentifier>{12dc9c84-35f2-4835-a19f-edfa70d611e2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\draw\in-core">
-      <UniqueIdentifier>{4d1a3851-c7a0-4655-a805-5d407d3f2b19}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\font">
       <UniqueIdentifier>{185bc9d3-84a5-49b4-9a7c-dc59c8f0b08e}</UniqueIdentifier>
     </Filter>
@@ -355,12 +352,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\font\in-core\font_8x8.c">
       <Filter>源文件\font\in-core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\draw\in-core\img_icon.c">
-      <Filter>源文件\draw\in-core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\draw\in-core\img_mosaics.c">
-      <Filter>源文件\draw\in-core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\bmp\bmp.c">
       <Filter>源文件\bmp</Filter>
