@@ -91,47 +91,56 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget *widget, LCUI_Rect *area )
 		rect.h = widget->size.h;
 		area = &rect;
 	}
-	if( area->x < 0 ) {
-		area->w += area->x;
-		area->x = 0;
-	}
-	if( area->y < 0 ) {
-		area->h += area->y;
-		area->y = 0;
-	}
-	if( area->x + area->w > widget->size.w ) {
-		area-> w = widget->size.w - area->x;
-	}
-	if( area->y + area->h > widget->size.h ) {
-		area-> h = widget->size.h - area->y;
-	}
-	if( area->w <= 0 || area->h <= 0 ) {
-		return -1;
-	}
 
 	root = RootWidget_GetSelf();
-	while( widget->parent && widget->parent != root ) {
+	while( widget && widget != root ) {
+		if( !widget->visible ) {
+			return 1;
+		}
+		if( area->x < 0 ) {
+			area->w += area->x;
+			area->x = 0;
+		}
+		if( area->y < 0 ) {
+			area->h += area->y;
+			area->y = 0;
+		}
+		if( area->x + area->w > widget->size.w ) {
+			area->w = widget->size.w - area->x;
+		}
+		if( area->y + area->h > widget->size.h ) {
+			area->h = widget->size.h - area->y;
+		}
 		/* 加上所在部件的坐标 */
 		area->x += widget->pos.x;
 		area->y += widget->pos.y;
 		/* 加上父级部件的内边距 */
-		area->x += widget->parent->glayer->padding.left;
-		area->y += widget->parent->glayer->padding.top;
-		/* 计算父部件的内边距框，然后再调整矩形区域 */
-		n = widget->parent->glayer->padding.left;
-		n += widget->parent->glayer->padding.right;
-		n = widget->size.w - n;
-		if( area->x + area->w > n  ) {
-			area->w = n - area->w;
+		if( !widget->parent ) {
+			break;
 		}
-		n = widget->parent->glayer->padding.top;
-		n += widget->parent->glayer->padding.bottom;
-		n = widget->size.h - n;
-		if( area->y + area->h > n  ) {
-			area->h = n - area->h;
-		}
+		
 		/* 切换至父级部件 */
 		widget = widget->parent;
+		area->x += widget->glayer->padding.left;
+		area->y += widget->glayer->padding.top;
+		/* 计算父部件的内边距框，然后再调整矩形区域 */
+		n = widget->glayer->padding.left;
+		n += widget->glayer->padding.right;
+		n = widget->size.w - n;
+		if( area->x + area->w > n ) {
+			area->w = n - area->x;
+		}
+
+		n = widget->glayer->padding.top;
+		n += widget->glayer->padding.bottom;
+		n = widget->size.h - n;
+		if( area->y + area->h > n ) {
+			area->h = n - area->y;
+		}
+
+		if( area->w <= 0 || area->h <= 0 ) {
+			return -1;
+		}
 	}
 	return LCUIScreen_InvalidateArea( area );
 }
@@ -191,7 +200,7 @@ static void Widget_OnPaint( LCUI_Widget *widget )
 }
 
 /** 更新各个部件的无效区域中的内容 */
-LCUI_API int LCUIWidget_ProcInvalidArea(void)
+int LCUIWidget_ProcInvalidArea(void)
 {
 	int count = 0, old_num;
 	LCUI_Widget *widget;
