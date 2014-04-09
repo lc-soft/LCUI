@@ -290,9 +290,8 @@ LCUI_API LCUI_Widget* Widget_New( const char *widget_type );
 LCUI_API LCUI_Pos
 Widget_GetGlobalPos(LCUI_Widget *widget);
 
-/* 设定部件可被点击的区域的透明度 */
-LCUI_API void
-Widget_SetClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode );
+/* 设定部件是否能被点击 */
+LCUI_API void Widget_SetClickable( LCUI_Widget *widget, LCUI_BOOL is_true );
 
 /* 设定部件的对齐方式以及偏移距离 */
 LCUI_API void
