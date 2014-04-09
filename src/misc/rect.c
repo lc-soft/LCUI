@@ -233,9 +233,16 @@ static int LCUIRect_CutTwoRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 				LCUI_Rect rects[2] )
 {
 	/* 两个相交矩形，除去重叠区域，最多可分割出两个区域。
-		* 根据与重叠矩形的坐标，判断新矩形在重叠矩形的哪个位置 */
+	 * 根据与重叠矩形的坐标，判断新矩形在重叠矩形的哪个位置 */
 	if( rect2->x == rect1->x ) {
-		/* 右下方 */
+		/** 
+		 * 右下方 
+		 * ┏━━━━┳━┓
+		 * ┃ rect1  ┃0 ┃
+		 * ┣━━━━┻━┫
+		 * ┃     1      ┃
+		 * ┗━━━━━━┛
+		 */
 		if( rect2->y == rect1->y ) {
 			rects[0].x = rect2->x + rect1->w;
 			rects[0].y = rect1->y;
@@ -247,7 +254,14 @@ static int LCUIRect_CutTwoRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 			rects[1].h = rect2->y + rect2->h - rects[0].y;
 			return 0;
 		}
-		/* 右上方 */
+		/**
+		 * 右上方
+		 * ┏━━━━━━┓
+		 * ┃     0      ┃
+		 * ┣━━━┳━━┫
+		 * ┃rect1 ┃ 1  ┃
+		 * ┗━━━┻━━┛
+		 */
 		rects[0].x = rect2->x;
 		rects[0].y = rect2->y;
 		rects[0].w = rect2->w;
@@ -258,7 +272,14 @@ static int LCUIRect_CutTwoRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 		rects[1].h = rect1->h;
 		return 1;
 	}
-	/* 左下方 */
+	/** 
+	 * 左下方 
+	 * ┏━━┳━━━━┓
+	 * ┃ 0  ┃ rect1  ┃
+	 * ┃━━┻━━━━┫
+	 * ┃      1       ┃
+	 * ┗━━━━━━━┛
+	 */
 	if( rect2->y == rect1->y ) {
 		rects[0].x = rect2->x;
 		rects[0].y = rect2->y;
@@ -266,17 +287,24 @@ static int LCUIRect_CutTwoRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 		rects[0].h = rect1->h;
 		rects[1].x = rect2->x;
 		rects[1].y = rect2->y + rect1->h;
-		rects[1].w = rect2->w - rect1->w;
+		rects[1].w = rect2->w;
 		rects[1].h = rect2->h - rect1->h;
 		return 2;
 	}
-	/* 左上方 */
+	/**
+	 * 左上方
+	 * ┏━━━━━━━┓
+	 * ┃       0      ┃
+	 * ┣━━┳━━━━┫
+	 * ┃ 1  ┃ rect1  ┃
+	 * ┗━━┻━━━━┛
+	 */
 	rects[0].x = rect2->x;
 	rects[0].y = rect2->y;
 	rects[0].w = rect2->w;
 	rects[0].h = rect2->h - rect1->h;
 	rects[1].x = rect2->x;
-	rects[1].y = rect2->y + rect1->h;
+	rects[1].y = rect1->y;
 	rects[1].w = rect2->w - rect1->w;
 	rects[1].h = rect1->h;
 	return 3;
