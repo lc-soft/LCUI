@@ -428,11 +428,8 @@ GraphLayer_GetGlobalPos(	LCUI_GraphLayer *root_glayer,
 }
 
 
-static int 
-__GraphLayer_GetLayers(
-	LCUI_GraphLayer *root_glayer,
-	LCUI_GraphLayer *glayer, 
-	LCUI_Rect rect, LCUI_Queue *queue )
+static int __GraphLayer_GetLayers( LCUI_GraphLayer *root_glayer,
+		LCUI_GraphLayer *glayer, LCUI_Rect rect, LCUI_Queue *queue )
 {
 	int i, total;
 	LCUI_Pos pos;
@@ -463,14 +460,15 @@ __GraphLayer_GetLayers(
 		/* 获取子图层的有效区域及全局坐标 */
 		tmp = GraphLayer_GetValidRect( root_glayer, child );
 		pos = GraphLayer_GetGlobalPos( root_glayer, child );
-		//_DEBUG_MSG( "child: %p, pos: %d,%d, valid rect: %d,%d, %d, %d\n", 
-		//	child, pos.x, pos.y, tmp.x, tmp.y, tmp.width, tmp.height);
+		DEBUG_MSG( "child: %p, pos: %d,%d, valid rect: %d,%d, %d, %d, rect: %d,%d,%d,%d\n", 
+			child, pos.x, pos.y, tmp.x, tmp.y, tmp.width, tmp.height,
+			rect.x, rect.y, rect.w, rect.h);
 		//Graph_PrintInfo( &child->graph );
 		/* 有效区域加上子部件的全局坐标 */
 		tmp.x += pos.x;
 		tmp.y += pos.y;
 		/* 判断区域是否有效 */
-		if( !tmp.w <= 0 || tmp.h <= 0 ) {
+		if( tmp.w <= 0 || tmp.h <= 0 ) {
 			continue;
 		}
 		/* 若该有效区域与目标区域重叠，则记录子部件，并进行递归 */
@@ -483,9 +481,8 @@ __GraphLayer_GetLayers(
 	return 0;
 }
 
-LCUI_API int GraphLayer_GetLayers(	LCUI_GraphLayer *glayer, 
-					LCUI_Rect rect,
-					LCUI_Queue *queue )
+LCUI_API int GraphLayer_GetLayers( LCUI_GraphLayer *glayer,  LCUI_Rect rect,
+							LCUI_Queue *queue )
 {
 	//_DEBUG_MSG("rect: %d,%d,%d,%d\n", 
 	//rect.x, rect.y, rect.width, rect.height);
@@ -539,7 +536,7 @@ LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr,
 	/* 获取rect区域内的图层列表 */
 	GraphLayer_GetLayers( ctnr, rect, &glayerQ ); 
 	total = Queue_GetTotal( &glayerQ ); 
-	//_DEBUG_MSG( "total: %d\n", total );
+	DEBUG_MSG( "total: %d\n", total );
 	/* 若记录数为零，则表明该区域没有图层 */
 	if( total <= 0 ) {
 		/* 若没有父图层，则填充白色 */
@@ -581,12 +578,12 @@ LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr,
 	}
 skip_loop:
 	total = Queue_GetTotal( &glayerQ );
-	//_DEBUG_MSG( "total: %d\n", total );
+	DEBUG_MSG( "total: %d\n", total );
 	if(i <= 0) {
 		if( ctnr == NULL ) {
 			Graph_FillColor( graph_buff, RGB(255,255,255) );
 		} else {
-			Graph_Cut ( &ctnr->graph, rect, graph_buff );
+			Graph_Cut( &ctnr->graph, rect, graph_buff );
 		}
 	}
 	/* 获取图层列表中的图层 */
@@ -596,6 +593,7 @@ skip_loop:
 		if( !glayer ) {
 			continue;
 		}
+		DEBUG_MSG("%d,%d,%d,%d\n", glayer->pos.x, glayer->pos.y, glayer->graph.w, glayer->graph.h);
 		/* 锁上该图层的互斥锁 */
 		Graph_Lock( &glayer->graph );
 		/* 获取该图层的有效区域及全局坐标 */
