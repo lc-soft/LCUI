@@ -871,31 +871,11 @@ static LCUI_Widget* __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 	LCUI_Widget *child, *widget;
 	LCUI_Queue *widget_list;
 	LCUI_Pos tmp_pos;
-	LCUI_RGBA pixel;
-	LCUI_Graph *graph;
 
 	if( !ctnr ) {
 		return NULL;
 	}
 	widget_list = &ctnr->child;
-	/* 判断 鼠标坐标对应部件图层中的像素点的透明度 是否符合要求，
-	 * 如果透明度小于/不小于clickable_area_alpha的值，那么，无视
-	 * 该部件。
-	 * */
-	graph = Widget_GetSelfGraph( ctnr );
-	if( Graph_GetPixel( graph, pos, &pixel )) {
-		DEBUG_MSG("%p, mode: %d, pixel alpha: %d, alpha: %d\n", ctnr, 
-		ctnr->clickable_mode, pixel.alpha, ctnr->clickable_area_alpha );
-		if( (ctnr->clickable_mode == 0
-			&& pixel.alpha < ctnr->clickable_area_alpha )
-			|| (ctnr->clickable_mode == 1
-			&& pixel.alpha >= ctnr->clickable_area_alpha ) ) {
-			//printf("Ignore widget\n");
-			return NULL;
-		}
-	}/* else {
-		printf("get graph pixel error\n");
-	} */
 	/* 减去内边距 */
 	pos.x -= ctnr->glayer->padding.left;
 	pos.y -= ctnr->glayer->padding.top;
@@ -910,8 +890,8 @@ static LCUI_Widget* __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 		}
 		/* 如果这个点不在部件区域内 */
 		if( pos.x < child->pos.x || pos.y < child->pos.y
-		|| pos.x >= child->pos.x + widget->size.w
-		|| pos.y >= child->pos.y + widget->size.h ) {
+		|| pos.x >= child->pos.x + child->size.w
+		|| pos.y >= child->pos.y + child->size.h ) {
 			continue;
 		}
 		/* 改变相对坐标 */
@@ -934,6 +914,10 @@ LCUI_API LCUI_Widget* Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 		ctnr = &root_widget;
 	}
 	widget = __Widget_At( ctnr, pos );
+	/* 往父级找被点击的部件 */
+	while( widget && !widget->clickable ) {
+		widget = widget->parent;
+	}
 	if( widget == ctnr ) {
 		return NULL;
 	}
@@ -1031,8 +1015,8 @@ static void Widget_AttrInit( LCUI_Widget *widget )
 	LCUI_App *app;
 	app = LCUIApp_GetSelf();
 	/*--------------- 初始化部件基本属性及数据 ------------------*/
-	widget->auto_size		= FALSE;
-	widget->auto_size_mode		= AUTOSIZE_MODE_GROW_AND_SHRINK;
+	widget->autosize		= FALSE;
+	widget->autosize_mode		= AUTOSIZE_MODE_GROW_AND_SHRINK;
 	widget->type_id			= 0;
 	widget->modal			= FALSE;
 	widget->state			= WIDGET_STATE_NORMAL;
@@ -1054,8 +1038,7 @@ static void Widget_AttrInit( LCUI_Widget *widget )
 	widget->color			= RGB(0,0,0);
 	widget->private_data		= NULL;
 	widget->valid_state		= 0;
-	widget->clickable_mode		= 0;
-	widget->clickable_area_alpha	= 0;
+	widget->clickable		= TRUE;
 	/*------------------------- END --------------------------*/
 
 	/*--------------- 初始化部件的附加属性 ------------------*/
@@ -1179,17 +1162,10 @@ LCUI_API LCUI_Pos Widget_GetGlobalPos( LCUI_Widget *widget )
 	return Widget_CountPos(widget);
 }
 
-LCUI_API void
-Widget_SetClickableAlpha( LCUI_Widget *widget, uchar_t alpha, int mode )
-/* 设定部件可被点击的区域的透明度 */
+/* 设定部件是否能被点击 */
+LCUI_API void Widget_SetClickable( LCUI_Widget *widget, LCUI_BOOL is_true )
 {
-	if( mode == 0 ) {
-		widget->clickable_mode = 0;
-	} else {
-		widget->clickable_mode = 1;
-	}
-	//printf("%p, set, mode: %d, alpha: %d\n", widget, widget->clickable_mode, alpha);
-	widget->clickable_area_alpha = alpha;
+	widget->clickable = is_true;
 }
 
 /** 设定部件的对齐方式以及偏移距离 */
@@ -1712,7 +1688,7 @@ LCUI_API void Widget_AutoResize(LCUI_Widget *widget)
 	//size.w += 6;
 	//size.h += 6;
 	//printf("Widget_AutoResize(): %p, autosize: %d, new size: %d,%d\n",
-	//widget, widget->auto_size, size.w, size.h);
+	//widget, widget->autosize, size.w, size.h);
 	//print_widget_info(widget);
 	/* 得出适合的尺寸，调整之 */
 	Widget_Resize(widget, size);
@@ -1753,7 +1729,7 @@ LCUI_API int Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 	Widget_UpdateChildSize( widget );
 	Widget_UpdateChildPos( widget );
 
-	if( widget->parent && widget->parent->auto_size ) {
+	if( widget->parent && widget->parent->autosize ) {
 		/* 如果需要让它的容器能够自动调整大小 */
 		Widget_AutoResize( widget->parent );
 	}
@@ -1766,8 +1742,8 @@ LCUI_API void Widget_SetAutoSize(	LCUI_Widget *widget,
 					LCUI_BOOL flag, 
 					AUTOSIZE_MODE mode )
 {
-	widget->auto_size = flag;
-	widget->auto_size_mode = mode;
+	widget->autosize = flag;
+	widget->autosize_mode = mode;
 }
 
 /** 执行刷新显示指定部件的整个区域图形的任务 */
