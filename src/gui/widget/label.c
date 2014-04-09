@@ -130,6 +130,7 @@ static void Label_OnInit( LCUI_Widget *widget )
 	/* 启用多行文本显示 */
 	TextLayer_SetMultiline( &label->layer, TRUE );
 	Widget_SetAutoSize( widget, FALSE, 0 );
+	Widget_SetClickable( widget, FALSE );
 	/* 启用样式标签的支持 */
 	TextLayer_SetUsingStyleTags( &label->layer, TRUE );
 	/* 将回调函数与自定义消息关联 */
