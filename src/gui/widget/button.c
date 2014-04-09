@@ -85,7 +85,7 @@ static void Button_ExecCustomUpdate( LCUI_Widget *widget )
 	LCUI_Button *btn;
 	LCUI_Graph *img;
 	
-	btn = Widget_GetPrivData( widget );
+	btn = Widget_GetPrivateData( widget );
 	switch(widget->state) {
 	case WIDGET_STATE_NORMAL: img = &btn->btn_normal; break;
 	case WIDGET_STATE_OVERLAY: img = &btn->btn_over; break;
@@ -103,48 +103,11 @@ static void Button_ExecCustomUpdate( LCUI_Widget *widget )
 	}
 }
 
-static void Button_ExecFlatStyleUpdate( LCUI_Widget *widget )
-{
-	LCUI_Widget *window;
-	LCUI_RGB color;
-	LCUI_Border border;
-
-	switch( widget->state ) {
-	case WIDGET_STATE_NORMAL:
-		/* 获取类型为window的父部件 */
-		window = Widget_GetParent( widget, "window" );
-		/* 若父部件有效，且已获得焦点 */
-		if( window && !Widget_GetFocus(window) ) {
-			color = RGB(188,188,188);
-		} else {
-			color = RGB(199,80,80);
-		}
-		break;
-	case WIDGET_STATE_OVERLAY :
-		color = RGB(224,67,67);
-		break;
-	case WIDGET_STATE_ACTIVE :
-		color = RGB(153,61,61);
-		break;
-	case WIDGET_STATE_DISABLE :
-		color = RGB(199,80,80);
-		break;
-		default : break;
-	}
-	Widget_SetBackgroundColor( widget, color );
-	border = Border(0, BORDER_STYLE_SOLID, color );
-	Widget_SetBorder( widget, border );
-	Widget_SetBackgroundTransparent( widget, FALSE );
-}
-
 static void Button_ExecUpdate( LCUI_Widget *widget )
 {
 	switch(widget->style_id) {
 	case BUTTON_STYLE_CUSTOM:
 		Button_ExecCustomUpdate( widget );
-		break;
-	case BUTTON_STYLE_FLAT:
-		Button_ExecFlatStyleUpdate( widget );
 		break;
 	default:
 		Button_ExecDefalutUpdate( widget );
@@ -161,13 +124,12 @@ Button_ProcFocusOut( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 
 
 /* 初始化按钮部件的数据 */
-static void
-Button_Init( LCUI_Widget *widget )
+static void Button_Init( LCUI_Widget *widget )
 {
 	int valid_state;
 	LCUI_Button *button;
 	
-	button = Widget_NewPrivData(widget, sizeof(LCUI_Button));
+	button = Widget_NewPrivateData( widget, LCUI_Button );
 	/* 初始化图像数据 */ 
 	Graph_Init(&button->btn_disable);
 	Graph_Init(&button->btn_normal);
@@ -178,7 +140,7 @@ Button_Init( LCUI_Widget *widget )
 	valid_state = (WIDGET_STATE_NORMAL | WIDGET_STATE_ACTIVE);
 	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);
 	Widget_SetValidState( widget, valid_state );
-	button->label = Widget_New("label");/* 创建label部件 */ 
+	button->label = Label_New();/* 创建label部件 */ 
 	/* 将按钮部件作为label部件的容器 */
 	Widget_Container_Add(widget, button->label);
 	/* label部件居中显示 */
@@ -195,7 +157,7 @@ Button_Init( LCUI_Widget *widget )
 LCUI_API LCUI_Widget*
 Button_GetLabel( LCUI_Widget *widget )
 {
-	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivData(widget);
+	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivateData(widget);
 	return button->label;
 }
 
@@ -206,7 +168,7 @@ Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal,
 			LCUI_Graph *focus, LCUI_Graph *disable)
 {
 	LCUI_Button *btn_data;
-	btn_data = Widget_GetPrivData(widget);
+	btn_data = (LCUI_Button*)Widget_GetPrivateData(widget);
 	if( Graph_IsValid(normal) ) {
 		btn_data->btn_normal = *normal;
 	} else {
@@ -234,7 +196,7 @@ Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal,
 	}
 	/* 设定为自定义风格 */
 	Widget_SetStyleID(widget, BUTTON_STYLE_CUSTOM);
-	Widget_Draw(widget); /* 重新绘制部件 */
+	Widget_InvalidateArea( widget, NULL );
 }
 
 /* 设定按钮部件显示的文本内容 */
@@ -244,7 +206,7 @@ Button_Text( LCUI_Widget *widget, const char *text )
 	LCUI_Button *button;
 	LCUI_Widget *label;
 	
-	button = (LCUI_Button*)Widget_GetPrivData(widget);
+	button = (LCUI_Button*)Widget_GetPrivateData(widget);
 	label = button->label;
 	/* 设定部件显示的文本 */
 	Label_SetText( label, text );
@@ -256,7 +218,7 @@ Button_TextW( LCUI_Widget *widget, const wchar_t *text )
 	LCUI_Button *button;
 	LCUI_Widget *label;
 	
-	button = (LCUI_Button*)Widget_GetPrivData(widget);
+	button = (LCUI_Button*)Widget_GetPrivateData(widget);
 	label = button->label;
 	Label_SetTextW( label, text );
 }

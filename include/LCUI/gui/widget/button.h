@@ -63,7 +63,6 @@ struct _LCUI_Button
 typedef enum BUTTON_STYLE_{
 	BUTTON_STYLE_DEFAULT,	/** 默认的普通按钮风格 */
 	BUTTON_STYLE_CUSTOM,	/** 按钮图像自定义 */
-	BUTTON_STYLE_FLAT	/** 扁平的风格 */
 } BUTTON_STYLE;
 
 /* 获取嵌套在按钮部件里的label部件 */
