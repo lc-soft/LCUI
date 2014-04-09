@@ -151,7 +151,7 @@ static void Caret_Init( LCUI_Caret *caret )
 	);
 	caret->widget = Widget_New(NULL);
 	/* 设置不可被鼠标点击 */
-	Widget_SetClickableAlpha( caret->widget, 0, 1 );
+	Widget_SetClickable( caret->widget, FALSE );
 	Widget_SetBackgroundColor( caret->widget, RGB(0,0,0) );
 	Widget_SetBackgroundTransparent( caret->widget, FALSE );
 	Widget_Resize( caret->widget, Size(caret->w,caret->h) );
@@ -220,7 +220,7 @@ static void TextBox_MoveCaret( LCUI_Widget *widget, int row, int col )
 	LCUI_TextBox *tb;
 	int h;
 	
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	TextLayer_SetCaretPos( &tb->text, row, col );
 	if( TextLayer_GetCaretPixelPos( &tb->text, &pixel_pos ) == 0 ) {
 		h = TextLayer_GetRowHeight( &tb->text, row );
@@ -255,7 +255,7 @@ static int TextBox_AddTextToBuffer( LCUI_Widget *widget, const wchar_t *wtext,
 	txtblk.style = MALLOC_ONE( LCUI_StyleTagStack );
 	StyleTagStack_Init( txtblk.style );
 
-	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	textbox = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	len = wcslen( wtext );
 	for( i=0; i<len; ++i ) {
 		if( len-i > textbox->block_size ) {
@@ -323,7 +323,7 @@ static void TextBox_ProcTextBlock( LCUI_Widget *widget, void *arg )
 	LCUI_TextBox *tb;
 	LCUI_TextBlock *blk;
 	
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	/* 如果缓冲区内没有文本块 */
 	if( Queue_GetTotal( &tb->text_block_buffer ) <= 0 ) {
 		return;
@@ -351,7 +351,6 @@ static void TextBox_ProcTextBlock( LCUI_Widget *widget, void *arg )
 	/* 下次继续更新 */
 	WidgetMsg_Post( widget, WIDGET_MSG_TEXT_BLOCK, NULL, TRUE, FALSE );
 	Widget_Update( widget );
-	Widget_Draw( widget );
 	Widget_Unlock( widget );
 }
 
@@ -361,7 +360,7 @@ static void TextBox_ProcTextBlock( LCUI_Widget *widget, void *arg )
 LCUI_API void TextBox_SetUsingStyleTags( LCUI_Widget *widget, LCUI_BOOL is_true )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	TextLayer_SetUsingStyleTags( &tb->text, is_true );
 }
 
@@ -369,16 +368,16 @@ LCUI_API void TextBox_SetUsingStyleTags( LCUI_Widget *widget, LCUI_BOOL is_true 
 LCUI_API void TextBox_SetMultiline( LCUI_Widget *widget, LCUI_BOOL is_true )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	TextLayer_SetMultiline( &tb->text, is_true );
 }
 
 static void TextBox_DoClearText( LCUI_Widget *widget, void* arg )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	TextLayer_ClearText( &tb->text );
-	Widget_Draw( widget );
+	Widget_InvalidateArea( widget, NULL );
 }
 
 /** 清空文本内容 */
@@ -391,7 +390,7 @@ LCUI_API void TextBox_ClearText( LCUI_Widget *widget )
 LCUI_API int TextBox_SetTextW( LCUI_Widget *widget, const wchar_t *wstr )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	TextBox_ClearText( widget );
 	return TextBox_AddTextToBuffer( widget, wstr, TEXT_ADD_TYPE_APPEND );
 }
@@ -400,7 +399,7 @@ LCUI_API int TextBox_SetTextW( LCUI_Widget *widget, const wchar_t *wstr )
 LCUI_API int TextBox_AppendTextW( LCUI_Widget *widget, const wchar_t *wstr )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	return TextBox_AddTextToBuffer( widget, wstr, TEXT_ADD_TYPE_APPEND );
 }
 
@@ -408,14 +407,14 @@ LCUI_API int TextBox_AppendTextW( LCUI_Widget *widget, const wchar_t *wstr )
 LCUI_API int TextBox_InsertTextW( LCUI_Widget *widget, const wchar_t *wstr )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	return TextBox_AddTextToBuffer( widget, wstr, TEXT_ADD_TYPE_INSERT );
 }
 
 static void TextBox_OnFocusIn( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	/* 设定输入法的目标 */
 	LCUIIME_SetTarget( widget );
 	Caret_SetVisible( &tb->caret, TRUE );
@@ -424,26 +423,26 @@ static void TextBox_OnFocusIn( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 static void TextBox_OnFocusOut(	LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	Caret_SetVisible( &tb->caret, FALSE );
 }
 
 static void TextBox_DoTextBackspace( LCUI_Widget *widget, void *arg )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	TextLayer_Backspace( &tb->text, (int)arg );
 	Caret_BlinkShow( &tb->caret );
-	Widget_Draw( widget );
+	Widget_Update( widget );
 }
 
 static void TextBox_DoTextDelete( LCUI_Widget *widget, void *arg )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	TextLayer_Delete( &tb->text, (int)arg );
 	Caret_BlinkShow( &tb->caret );
-	Widget_Draw( widget );
+	Widget_Update( widget );
 }
 
 static void TextBox_TextBackspace( LCUI_Widget *widget, int n_ch )
@@ -467,7 +466,7 @@ static void TextBox_ProcessKey( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 	}
 
 	//_DEBUG_MSG("you input: %d\n", event->key.key_code);
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	cur_row = tb->text.insert_y;
 	cur_col = tb->text.insert_x;
 	cols = TextLayer_GetRowTextLength( &tb->text, cur_row );
@@ -525,7 +524,7 @@ static void TextBox_OnInput( LCUI_Widget *widget, LCUI_WidgetEvent *event )
 
 	ptr = event->input.text;
 	ptr_last = ptr + MAX_INPUT_TEXT_LEN;
-	textbox = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	textbox = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	/* 如果文本框是只读的 */
 	if( textbox->read_only ) {
 		return;
@@ -564,7 +563,7 @@ static void TextBox_OnInit( LCUI_Widget *widget )
 	Widget_SetPadding( widget, Padding(3,3,3,3) );
 	Widget_SetBackgroundTransparent( widget, FALSE );
 
-	tb = (LCUI_TextBox*)Widget_NewPrivData( widget, sizeof(LCUI_TextBox) );
+	tb = Widget_NewPrivateData( widget, LCUI_TextBox );
 	
 	tb->read_only = FALSE;
 	TextLayer_Init( &tb->text );
@@ -601,7 +600,7 @@ static void TextBox_OnResize( LCUI_Widget *widget )
 	LCUI_Size size;
 	LCUI_TextBox *tb;
 
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	size = Widget_GetContainerSize( widget );
 	TextLayer_SetMaxSize( &tb->text, size );
 }
@@ -662,52 +661,47 @@ static void TextBox_ExecUpdateStyle( LCUI_Widget *widget )
 /** 更新文本框的文本图层 */
 static void TextBox_UpdateTextLayer( LCUI_Widget *widget )
 {
-	int n; 
+	int n;
 	LCUI_TextBox *tb;
 	LCUI_Rect *p_rect;
-	LCUI_Queue rect_list;
+	LCUI_TextLayer *layer;
+	LinkedList rect_list;
 
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
-	if( !tb ) {
-		return;
-	}
-
-	Queue_Init( &rect_list, sizeof(LCUI_Rect), NULL );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
+	DirtyRectList_Init( &rect_list );
 	/* 根据是否启用屏蔽符，判断需更新哪个文本图层的数据 */
-	if( tb->password_char ) {
-		TextLayer_Update( &tb->text, &rect_list );
+	if( !tb->password_char ) {
+		layer = &tb->text;
 	} else {
-		TextLayer_Update( &tb->mask_text, &rect_list );
+		layer = &tb->mask_text;
 	}
-	n = Queue_GetTotal( &rect_list );
-	/* 将得到的无效区域导入至部件的无效区域列表 */
+	n = LinkedList_GetTotal( &rect_list );
+	LinkedList_Goto( &rect_list, 0 );
 	while(n--) {
-		p_rect = (LCUI_Rect*)Queue_Get( &rect_list, n );
-		if( !p_rect ) {
-			continue;
-		}
-		Widget_InvalidArea( widget, *p_rect );
+		p_rect = (LCUI_Rect*)LinkedList_Get( &rect_list );
+		Widget_InvalidateArea( widget, p_rect );
+		LinkedList_ToNext( &rect_list );
 	}
-	Queue_Destroy( &rect_list );
-	TextLayer_ClearInvalidRect( &tb->text );
+	DirtyRectList_Destroy( &rect_list );
+	TextLayer_ClearInvalidRect( layer );
 }
 
 static void TextBox_OnUpdate( LCUI_Widget *widget )
 {
 	LCUI_TextBox *tb;
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	TextBox_ExecUpdateStyle( widget );
 	TextBox_UpdateTextLayer( widget );
 	TextBox_MoveCaret( widget, tb->text.insert_y, tb->text.insert_x );
 }
 
-static void TextBox_OnDraw( LCUI_Widget *widget )
+static void TextBox_OnPaint( LCUI_Widget *widget )
 {
 	LCUI_TextBox *tb;
 	LCUI_Pos pos;
 	LCUI_Graph *widget_graph, *tlayer_graph;
 
-	tb = (LCUI_TextBox*)Widget_GetPrivData( widget );
+	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	TextBox_UpdateTextLayer( widget );
 	TextLayer_Draw( &tb->text );
 	widget_graph = Widget_GetSelfGraph( widget );
@@ -722,12 +716,12 @@ static void TextBox_OnDraw( LCUI_Widget *widget )
 	}
 }
 
-LCUI_API void RegisterTextBox( void )
+void RegisterTextBox( void )
 {
 	WidgetType_Add( WIDGET_TEXT_BOX );
 	WidgetFunc_Add( WIDGET_TEXT_BOX, TextBox_OnInit, FUNC_TYPE_INIT );
 	WidgetFunc_Add( WIDGET_TEXT_BOX, TextBox_OnUpdate, FUNC_TYPE_UPDATE );
-	WidgetFunc_Add( WIDGET_TEXT_BOX, TextBox_OnDraw, FUNC_TYPE_DRAW );
+	WidgetFunc_Add( WIDGET_TEXT_BOX, TextBox_OnPaint, FUNC_TYPE_PAINT );
 	WidgetFunc_Add( WIDGET_TEXT_BOX, TextBox_OnResize, FUNC_TYPE_RESIZE );
 	WidgetFunc_Add( WIDGET_TEXT_BOX, TextBox_OnDestroy, FUNC_TYPE_DESTROY );
 }
