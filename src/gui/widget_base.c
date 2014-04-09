@@ -1514,21 +1514,9 @@ LCUI_API void Widget_ExecMove( LCUI_Widget *widget, LCUI_Pos pos )
 	}
 	/* 如果图层是显示的，并且位置变动，那就需要添加无效区域 */
 	if( widget->visible ) {
-		rect = Widget_GetRect( widget );
-		if( widget->parent ) {
-			rect.x += widget->parent->glayer->padding.left;
-			rect.y += widget->parent->glayer->padding.top;
-		}
-		Widget_PushAreaToScreen( widget->parent, &rect );
-
+		Widget_PushAreaToScreen( widget, NULL );
 		widget->pos = pos;
-		rect.x = pos.x;
-		rect.y = pos.y;
-		if( widget->parent ) {
-			rect.x += widget->parent->glayer->padding.left;
-			rect.y += widget->parent->glayer->padding.top;
-		}
-		Widget_PushAreaToScreen( widget->parent, &rect );
+		Widget_PushAreaToScreen( widget, NULL );
 	} else {
 		/* 否则，直接改坐标 */
 		widget->pos = pos;
@@ -1752,7 +1740,6 @@ LCUI_API int Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 	if( widget->visible ) {
 		Widget_PushAreaToScreen( widget, NULL );
 		widget->size = size;
-		Widget_PushAreaToScreen( widget, NULL );
 		Widget_InvalidateArea( widget, NULL );
 	} else {
 		widget->size = size;
