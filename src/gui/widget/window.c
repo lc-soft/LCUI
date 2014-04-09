@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * window.c -- LCUI's window widget
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * window.c -- LCUI 的窗口部件
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -53,376 +53,276 @@
 #include LC_FONT_H
 #include LC_ERROR_H
 
-static void Window_GetCloseButtonBG( LCUI_Graph *graph )
+#define TOP_COLOR		RGB(34,177,76)
+#define TOP_PANDDING		2
+#define WIDGET_CLOSE_BUTTON	"LCUI::WindowCloseButton"
+#define ALLOW_STATE_LIST	(WIDGET_STATE_ACTIVE|WIDGET_STATE_NORMAL\
+				 |WIDGET_STATE_OVERLAY|WIDGET_STATE_DISABLE)
+
+typedef struct LCUI_WindowRec_ {
+	LCUI_Widget *titlebar;		/**< 标题栏 */
+	LCUI_Widget *client_area;	/**< 客户区 */
+	LCUI_Widget *btn_close;		/**< close按钮 */
+	LCUI_Widget *icon;		/**< 图标 */
+	LCUI_Widget *text;		/**< 标题文本 */
+	LCUI_RGB top_line_color;	/**< 顶部线条颜色 */
+} LCUI_Window;
+
+static unsigned char close_btn_alpha[]={
+	0x00,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0x00,
+	0xff,0xff,0xff,0x00,0x00,0x00,0x00,0xff,0xff,0xff,
+	0x00,0xff,0xff,0xff,0x00,0x00,0xff,0xff,0xff,0x00,
+	0x00,0x00,0xff,0xff,0xff,0x00,0xff,0xff,0x00,0x00,
+	0x00,0x00,0x00,0xff,0xff,0xff,0xff,0x00,0x00,0x00,
+	0x00,0x00,0x00,0xff,0xff,0xff,0xff,0x00,0x00,0x00,
+	0x00,0x00,0xff,0xff,0xff,0xff,0xff,0xff,0x00,0x00,
+	0x00,0xff,0xff,0xff,0x00,0x00,0xff,0xff,0xff,0x00,
+	0xff,0xff,0xff,0x00,0x00,0x00,0x00,0xff,0xff,0xff,
+	0x00,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0x00
+};
+
+static void LoadCloseButtonIMG( LCUI_Graph *graph )
 {
-	unsigned char alpha[]={
-		0xff,0xff,0x00,0x00,0x00,0x00,0xff,0xff,
-		0x00,0xff,0xff,0x00,0x00,0xff,0xff,0x00,
-		0x00,0x00,0xff,0xff,0xff,0xff,0x00,0x00,
-		0x00,0x00,0x00,0xff,0xff,0x00,0x00,0x00,
-		0x00,0x00,0xff,0xff,0xff,0xff,0x00,0x00,
-		0x00,0xff,0xff,0x00,0x00,0xff,0xff,0x00,
-		0xff,0xff,0x00,0x00,0x00,0x00,0xff,0xff,
-	};
 	graph->color_type = COLOR_TYPE_RGBA;
-	Graph_Create( graph, 8, 7 );
+	Graph_Create( graph, 10, 10 );
 	Graph_FillColor( graph, RGB(255,255,255) );
-	memcpy( graph->rgba[3], alpha, sizeof(alpha) );
+	memcpy( graph->rgba[3], close_btn_alpha, sizeof(close_btn_alpha) );
 }
 
-LCUI_API LCUI_Widget*
-Window_GetTitleBar(LCUI_Widget *window)
-/* 功能：获取窗口标题栏的指针 */
-{ 
-	LCUI_Window *win_p; 
-	win_p = (LCUI_Window *)Widget_GetPrivData(window); 
-	if(win_p == NULL) {
-		return NULL;
-	}
-	return win_p->titlebar;
-}
-
-LCUI_API LCUI_Widget*
-Window_GetClientArea(LCUI_Widget *window)
-/* 功能：获取窗口客户区的指针 */
+/** 在窗口失去焦点时会调用此函数 */
+static void Window_OnFocusOut( LCUI_Widget *window, LCUI_WidgetEvent *unused )
 {
-	LCUI_Window *win_p;
-	if( !window ) {
-		return NULL;
-	}
-	win_p = (LCUI_Window *)Widget_GetPrivData(window); 
-	return win_p->client_area;	
+	Widget_Update( window );
 }
 
-/* 获取窗口右上角关闭按钮 */
-LCUI_API LCUI_Widget*
-Window_GetCloseButton( LCUI_Widget *window )
+/** 在窗口获得焦点时会调用此函数 */
+static void Window_OnFocusIn( LCUI_Widget *window, LCUI_WidgetEvent *unused )
 {
-	LCUI_Window *win_p;
-	if( !window ) {
-		return NULL;
-	}
-	win_p = (LCUI_Window *)Widget_GetPrivData( window );
-	return win_p->btn_close;
+	//_DEBUG_MSG( "%p, Window_FocusIn!\n",window );
+	Widget_Front( window );
+	Widget_Update( window );
 }
 
-static void Window_ExecShow( LCUI_Widget *widget )
+static void Window_OnShow( LCUI_Widget *widget )
 {
 	Widget_SetFocus( widget );
 }
 
 /* 处理鼠标移动事件 */
-static void 
-Window_ExecMove(LCUI_Widget *titlebar, LCUI_WidgetEvent *event)
+static void Window_ExecMove( LCUI_Widget *window, LCUI_WidgetEvent *event )
 {
-	LCUI_Pos pos, offset;
-	LCUI_Widget *window;
-	
-	window = titlebar->parent;
-	if( !window ) {
-		return;
-	}
-	//_DEBUG_MSG( "new:%d,%d, cursor:%d,%d\n", 
-	//event->drag.new_pos.x, event->drag.new_pos.y, 
-	//event->drag.cursor_pos.x, event->drag.cursor_pos.y );
-	/* 将新全局坐标减去标题栏的全局坐标，得到偏移坐标 */
-	pos = Widget_GetGlobalPos( titlebar );
-	offset = Pos_Sub( event->drag.new_pos, pos );
-	pos = Widget_GetGlobalPos( window );
-	/* 将偏移坐标加在窗口全局坐标上，得出窗口的新全局坐标 */
-	pos = Pos_Add( pos, offset );
-	/* 转换成在容器区域内的相对坐标 */
-	pos = Widget_ToRelPos( window->parent, pos );
 	/* 解除之前设定的align */
 	Widget_SetAlign( window, ALIGN_NONE, Pos(0,0) );
 	/* 移动窗口的位置 */
-	Widget_Move( window, pos );
+	Widget_Move( window, event->drag.new_pos );
 }
 
-LCUI_API void
-Window_SetTitleIcon(LCUI_Widget *window, LCUI_Graph *icon)
-/* 功能：自定义指定窗口的标题栏图标 */
+/** 初始化window部件相关数据 */
+static void Window_OnInit( LCUI_Widget *window )
 {
-	LCUI_Graph *image;
-	LCUI_Widget *title_widget;
-	LCUI_TitleBar *title_data;
+	LCUI_Window *wnd;
+	LCUI_Graph btn_bg;
+	LCUI_TextStyle style;
 	
-	if( window == NULL ) {
-		return;
-	}
-	title_widget = Window_GetTitleBar(window);
-	title_data = (LCUI_TitleBar *)Widget_GetPrivData(title_widget);
-	
-	image = PictureBox_GetImage(title_data->icon_box);
-	Graph_Free(image);/* 释放PictureBox部件内的图像占用的资源 */
-	if(icon == NULL) {
-		return;
-	}
-	/* 设置新图标 */
-	PictureBox_SetImage(title_data->icon_box, icon);
-	Widget_SetAlign(title_data->icon_box, ALIGN_MIDDLE_LEFT, Pos(3,0));
-	Widget_SetAlign(title_data->label, ALIGN_MIDDLE_LEFT, Pos(23,0));
- 
-}
+	wnd = Widget_NewPrivateData( window, LCUI_Window );
 
-static void 
-Window_TitleBar_Init(LCUI_Widget *titlebar)
-/* 功能：初始化窗口标题栏 */
-{
-	LCUI_Graph img;
-	LCUI_TitleBar *t;
-	
-	Graph_Init(&img);
-	t = Widget_NewPrivData(titlebar, sizeof(LCUI_TitleBar));
-	t->icon_box = Widget_New("picture_box");
-	t->label = Widget_New("label");
-	/* 窗口图标和标题文字不可获得焦点，并忽略鼠标点击 */
-	t->label->focus = FALSE;
-	t->icon_box->focus = FALSE;
-	Widget_SetClickableAlpha( t->label, 0, 1 );
-	Widget_SetClickableAlpha( t->icon_box, 0, 1 );
-	
-	Widget_Container_Add(titlebar, t->icon_box);
-	Widget_Container_Add(titlebar, t->label);
-	
-	Widget_Resize(t->icon_box, Size(18,18));
-	PictureBox_SetSizeMode(t->icon_box, SIZE_MODE_CENTER);
-	
-	Widget_Show(t->icon_box);
-	Widget_Show(t->label);
-	
-	Widget_SetAlign(t->icon_box, ALIGN_MIDDLE_LEFT, Pos(0,0));
-	Widget_SetAlign(t->label, ALIGN_MIDDLE_LEFT, Pos(2,-2));
-}
+	wnd->top_line_color = TOP_COLOR;
+	wnd->titlebar = Widget_New(NULL); 
+	wnd->client_area = Widget_New(NULL); 
+	wnd->btn_close = Widget_New(WIDGET_CLOSE_BUTTON); 
+	wnd->icon = Widget_New(NULL);
+	wnd->text = Label_New();
 
-static void
-Window_ExecUpdate( LCUI_Widget *win_p )
-{
-	LCUI_Size size;
-	LCUI_Graph *graph;
-	LCUI_Border border;
-	LCUI_Widget *titlebar, *btn, *client_area;
-	LCUI_RGB border_color, back_color;
-	
-	btn = Window_GetCloseButton(win_p);
-	titlebar = Window_GetTitleBar(win_p);
-	client_area = Window_GetClientArea(win_p);
-	graph = Widget_GetSelfGraph( win_p );
-	/* 按不同的风格来处理 */ 
-	switch( win_p->style_id ) {
-	    case WINDOW_STYLE_NONE:  /* 没有边框 */
-		/* 先计算坐标和尺寸 */
-		Widget_SetDock( client_area, DOCK_TYPE_FILL );
-		Widget_Hide( titlebar );/* 隐藏标题栏 */
-		Widget_Show( client_area );/* 客户区需要显示 */
-		break;
-			
-	    case WINDOW_STYLE_LINE: /* 线条边框 */
-		Widget_SetBorder(win_p,
-		 Border(1, BORDER_STYLE_SOLID, RGB(50,50,50)));
-		Widget_SetPadding( win_p, Padding(1,1,1,1) );
-		Widget_SetDock( client_area, DOCK_TYPE_FILL );
-		Widget_Hide( titlebar );
-		Widget_Show( client_area );
-		break;
-
-	    case WINDOW_STYLE_PURE_BLUE: 
-		back_color = RGB(30,160,225); 
-		border_color = RGB(0,130,195);
-		goto union_draw_method;
-	    case WINDOW_STYLE_PURE_GREEN:
-		back_color = RGB(140,190,40);
-		border_color = RGB(110,160,10);
-		goto union_draw_method;
-	    case WINDOW_STYLE_PURE_RED: 
-		back_color = RGB(230,20,0);
-		border_color = RGB(200,0,0);
-		goto union_draw_method;
-	    case WINDOW_STYLE_PURE_ORANGE: 
-		back_color = RGB(240,150,10);
-		border_color = RGB(210,120,0); 
-		goto union_draw_method;
-	    case WINDOW_STYLE_PURE_PURPLE:
-		back_color = RGB(110,20,95);
-		border_color = RGB(80,0,65); 
-union_draw_method:;
-		/* 若窗口未获得焦点 */
-		if( !Widget_GetFocus( win_p ) ) {
-			back_color = RGB(235,235,235);
-			border_color = RGB(211,211,211);
-		}
-		/* 更新窗口标题栏上的关闭按钮 */
-		Widget_Update( btn );
-		border = Border(1, BORDER_STYLE_SOLID, border_color);
-		Widget_SetBorder( client_area, border);
-		Widget_SetBorder( win_p, border);
-		Widget_SetBackgroundColor( win_p, back_color );
-		Graph_FillColor( graph, back_color );
-		Widget_SetBackgroundColor( client_area, RGB(255,255,255) );
-		Widget_SetBackgroundImage( titlebar, NULL );
-		Widget_SetBackgroundLayout( titlebar, 0 );
-		Widget_SetBackgroundTransparent( titlebar, TRUE );
-		Widget_SetBackgroundTransparent( client_area, FALSE );
-		Widget_SetPadding( win_p, Padding(1,4,4,4) );
-		Widget_SetPadding( client_area, Padding(1,1,1,1) );
-		size = Widget_GetContainerSize( win_p );
-		Widget_Resize( titlebar, Size(size.h, 25) );
-		Widget_Resize( client_area, Size(size.w, size.h - 25) );
-		Widget_SetDock( titlebar, DOCK_TYPE_TOP ); 
-		Widget_SetDock( client_area, DOCK_TYPE_BOTTOM );
-		Widget_Show( titlebar );
-		Widget_Show( client_area ); 
-		break;
-	    default:
-			//
-		break;
-	}
-}
-
-/* 在窗口失去焦点时会调用此函数 */
-static void
-Window_FocusOut( LCUI_Widget *window, LCUI_WidgetEvent *unused )
-{
-	//_DEBUG_MSG( "%p, Window_FocusOut!\n", window );
-	Widget_Update( window );
-}
-
-/* 在窗口获得焦点时会调用此函数 */
-static void
-Window_FocusIn( LCUI_Widget *window, LCUI_WidgetEvent *unused )
-{
-	//_DEBUG_MSG( "%p, Window_FocusIn!\n",window );
-	Widget_Front( window ); /* 前置窗口 */
-	Widget_Update( window ); /* 更新窗口 */
-}
-
-/* 初始化window部件相关数据 */
-static void 
-Window_Init( LCUI_Widget *win_p )
-{
-	LCUI_Widget *titlebar;
-	LCUI_Widget *client_area;
-	LCUI_Widget *btn_close;
-	LCUI_Window *win;
-	static LCUI_Graph btn_bg; 
-	
-	win = (LCUI_Window*)Widget_NewPrivData(win_p, sizeof(LCUI_Window));
-	
-	titlebar = Widget_New("titlebar"); 
-	client_area = Widget_New(NULL); 
-	btn_close = Widget_New("button"); 
-	titlebar->focus = FALSE;
-	Widget_SetFocus( client_area );
+	wnd->titlebar->focus = FALSE;
+	wnd->icon->focus = FALSE;
+	wnd->text->focus = FALSE;
+	Widget_SetFocus( wnd->client_area );
+	Widget_SetClickable( wnd->icon, FALSE );
+	Widget_SetClickable( wnd->text, FALSE );
+	Widget_SetClickable( wnd->titlebar, FALSE );
+	Widget_SetClickable( wnd->client_area, FALSE );
 
 	Graph_Init( &btn_bg );
 	/* 载入按钮背景 */
-	Window_GetCloseButtonBG( &btn_bg );
-	/* 显示在左上角 */
-	Widget_SetAlign(btn_close, ALIGN_TOP_RIGHT, Pos(0, 0)); 
-	/* 将尺寸改成和图片一样 */
-	Widget_SetAutoSize( btn_close, FALSE, 0 );
-	Widget_Resize(btn_close, Size(44, 20));
-	Widget_SetBackgroundImage( btn_close, &btn_bg );
-	Widget_SetBackgroundLayout( btn_close, LAYOUT_CENTER );
-	/* 没有背景图就填充背景色 */
-	Widget_SetBackgroundTransparent( win_p, FALSE );
-	/* 部件的风格ID */
-	Widget_SetStyleID( win_p, WINDOW_STYLE_PURE_BLUE );
-	Widget_SetStyleID( btn_close, BUTTON_STYLE_FLAT );
-	/* 保存部件指针 */
-	win->client_area = client_area;
-	win->titlebar = titlebar;
-	win->btn_close = btn_close;
+	LoadCloseButtonIMG( &btn_bg );
+	/* close按钮显示在左上角 */
+	Widget_SetAlign( wnd->btn_close, ALIGN_TOP_RIGHT, Pos(0,0) );
+	Widget_Resize( wnd->btn_close, Size(30, 30) );
+
+	Widget_SetBackgroundImage( wnd->btn_close, &btn_bg );
+	Widget_SetBackgroundLayout( wnd->btn_close, LAYOUT_CENTER );
+	Widget_SetBackgroundTransparent( wnd->icon, TRUE );
+	Widget_SetBackgroundTransparent( wnd->titlebar, TRUE );
+	Widget_SetBackgroundTransparent( wnd->client_area, FALSE );
+	Widget_SetBackgroundTransparent( window, FALSE );
+	Widget_SetBackgroundColor( window, RGB(255,255,255) );
+	Widget_SetBackgroundLayout( wnd->icon, LAYOUT_ZOOM );
+	Widget_SetDock( wnd->titlebar, DOCK_TYPE_TOP );
+	Widget_SetDock( wnd->client_area, DOCK_TYPE_BOTTOM );
+	Widget_SetPadding( window, Padding(TOP_PANDDING,1,1,1) );
+	Widget_SetPadding( wnd->client_area, Padding(1,1,1,1) );
+	Widget_SetSize( wnd->titlebar, "100%", "35px" );
+
+	TextStyle_Init( &style );
+	TextStyle_FontSize( &style, 18 );
+	Label_SetTextStyle( wnd->text, style );
+
 	/* 放入至容器 */
-	Widget_Container_Add(titlebar, btn_close);
-	Widget_Container_Add(win_p, titlebar);
-	Widget_Container_Add(win_p, client_area);
-	/* 窗口初始尺寸 */
-	Widget_Resize(win_p, Size(100, 50));
-	Widget_Show(btn_close);
+	Widget_Container_Add( wnd->titlebar, wnd->icon );
+	Widget_Container_Add( wnd->titlebar, wnd->text );
+	Widget_Container_Add( wnd->titlebar, wnd->btn_close );
+	Widget_Container_Add( window, wnd->titlebar );
+	Widget_Container_Add( window, wnd->client_area );
+
+	Widget_Resize( window, Size(100, 50) );
+	Widget_Resize( wnd->icon, Size(24,24) );
+	
+	Widget_SetAlign( window, ALIGN_MIDDLE_CENTER, Pos(0,0) );
+	Widget_SetAlign( wnd->icon, ALIGN_MIDDLE_LEFT, Pos(6,0) );
+	Widget_SetAlign( wnd->text, ALIGN_MIDDLE_LEFT, Pos(6,0) );
+
 	/* 关联拖动事件，让鼠标能够拖动标题栏并使窗口移动 */
-	Widget_ConnectEvent(titlebar, EVENT_DRAG, Window_ExecMove );
+	Widget_ConnectEvent( window, EVENT_DRAG, Window_ExecMove );
 	/* 
 	 * 由于需要在窗口获得/失去焦点时进行相关处理，因此需要将回调函数 与部件
 	 * 的FOCUS_IN和FOCUS_OUT事件 进行关联
 	 * */
-	Widget_ConnectEvent( win_p, EVENT_FOCUSOUT, Window_FocusOut );
-	Widget_ConnectEvent( win_p, EVENT_FOCUSIN, Window_FocusIn );
-	/* 设置窗口部件的初始位置 */
-	Widget_SetAlign( win_p, ALIGN_MIDDLE_CENTER, Pos(0,0) );
-}
-
-/* 为窗口设置标题文字 */
-LCUI_API void
-Window_SetTitleText( LCUI_Widget *win_p, const char *text )
-{ 
-	LCUI_Widget *titlebar; 
-	LCUI_TitleBar *title; 
-	if( win_p == NULL ) {
-		return;
-	}
-	titlebar = Window_GetTitleBar(win_p); 
-	title = (LCUI_TitleBar *)Widget_GetPrivData(titlebar); 
-	Label_SetText(title->label, text);
-}
-
-LCUI_API void
-Window_SetTitleTextW( LCUI_Widget *win_p, const wchar_t *text )
-{
-	LCUI_Widget *titlebar; 
-	LCUI_TitleBar *title; 
-	if( win_p == NULL ) {
-		return;
-	}
-	titlebar = Window_GetTitleBar(win_p); 
-	title = (LCUI_TitleBar *)Widget_GetPrivData(titlebar); 
-	Label_SetTextW(title->label, text);
-}
-
-LCUI_API void
-Window_ClientArea_Add(LCUI_Widget *window, LCUI_Widget *widget)
-/* 功能：将部件添加至窗口客户区 */
-{
-	LCUI_Widget *w = Window_GetClientArea(window);
-	Widget_Container_Add(w, widget);
-}
-
-LCUI_API void
-Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget)
-/* 功能：将部件添加至窗口标题栏 */
-{
-	LCUI_Widget *w = Window_GetTitleBar(window);
-	Widget_Container_Add(w, widget);
-}
-
-
-/* 新建一个窗口 */
-LCUI_API LCUI_Widget*
-Window_New( const char *title, LCUI_Graph *icon, LCUI_Size size )
-{
-	LCUI_Widget *wnd;
-	wnd = Widget_New("window");
-	if( wnd == NULL ) {
-		return NULL;
-	}
-	Window_SetTitleText( wnd, title );
-	Window_SetTitleIcon( wnd, icon );
-	Widget_Resize( wnd, size );
-	return wnd;
-}
-
-LCUI_API void
-Register_Window()
-/* 注册窗口部件类型 */
-{
-	/* 添加几个部件类型 */
-	WidgetType_Add("window");
-	WidgetType_Add("titlebar");
+	Widget_ConnectEvent( window, EVENT_FOCUSOUT, Window_OnFocusOut );
+	Widget_ConnectEvent( window, EVENT_FOCUSIN, Window_OnFocusIn );
 	
-	/* 为部件类型关联相关函数 */ 
-	WidgetFunc_Add("titlebar", Window_TitleBar_Init, FUNC_TYPE_INIT);
-	WidgetFunc_Add("window", Window_ExecShow, FUNC_TYPE_SHOW);
-	WidgetFunc_Add("window", Window_Init, FUNC_TYPE_INIT);
-	WidgetFunc_Add("window", Window_ExecUpdate, FUNC_TYPE_UPDATE);
+	Widget_Show( wnd->btn_close );
+	Widget_Show( wnd->icon );
+	Widget_Show( wnd->text );
+	Widget_Show( wnd->titlebar );
+	Widget_Show( wnd->client_area );
 }
 
+static void Window_OnUpdate( LCUI_Widget *window )
+{
+	LCUI_Window *wnd;
+	LCUI_Border border;
+	char h_str[20];
+
+	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
+	border = Border( 1, BORDER_STYLE_SOLID, RGB(200,200,200) );
+	border.top_width = TOP_PANDDING;
+	/* 若窗口已获得焦点 */
+	if( Widget_GetFocus( window ) ) {
+		border.top_color = wnd->top_line_color;
+	}
+	Widget_SetBorder( window, border );
+	/* 更新窗口标题栏上的关闭按钮 */
+	Widget_Update( wnd->btn_close );
+	sprintf( h_str, "%dpx", Widget_GetContainerHeight(window)-35 );
+	Widget_SetSize( wnd->client_area, "100%", h_str );
+}
+
+/** 获取窗口的客户区 */
+LCUI_API LCUI_Widget *Window_GetClientArea( LCUI_Widget *window )
+{
+	LCUI_Window *wnd;
+	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
+	return wnd->client_area;
+}
+
+/** 获取窗口的close按钮 */
+LCUI_API LCUI_Widget *Window_GetCloseButton( LCUI_Widget *window )
+{
+	LCUI_Window *wnd;
+	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
+	return wnd->btn_close;
+}
+
+/** 将部件添加至窗口客户区内 */
+LCUI_API void Window_ClientArea_Add( LCUI_Widget *window, LCUI_Widget *w )
+{
+	LCUI_Window *wnd;
+	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
+	Widget_Container_Add( wnd->client_area, w );
+}
+
+/** 设置窗口标题栏中显示的文本 */
+LCUI_API int Window_SetTextW( LCUI_Widget *window, const wchar_t *text )
+{
+	LCUI_Window *wnd;
+	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
+	return Label_SetTextW( wnd->text, text );
+}
+
+/** 设置窗口的图标 */
+LCUI_API void Window_SetIcon( LCUI_Widget *window, LCUI_Graph *icon )
+{
+	LCUI_Window *wnd;
+	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
+	Widget_SetBackgroundImage( wnd->icon, icon );
+	Widget_SetAlign( wnd->icon, ALIGN_MIDDLE_LEFT, Pos(6,0) );
+	Widget_SetAlign( wnd->text, ALIGN_MIDDLE_LEFT, Pos(34,0) );
+}
+
+static void CloseButton_OnInit( LCUI_Widget *widget )
+{
+	Widget_NewPrivateData( widget, LCUI_Button );
+	widget->valid_state = ALLOW_STATE_LIST;
+
+}
+
+static void CloseButton_OnUpdate( LCUI_Widget *widget )
+{
+	LCUI_Graph img;
+	LCUI_RGB color;
+	LCUI_Widget *wnd;
+
+	Graph_Init( &img );
+	LoadCloseButtonIMG( &img );
+	
+	wnd = Widget_GetParent( widget, WIDGET_WINDOW );
+	if( wnd ) {
+		LCUI_Window *wnd_data;
+		wnd_data = (LCUI_Window*)Widget_GetPrivateData( wnd );
+		color = wnd_data->top_line_color;
+	} else {
+		color = RGB(255,0,0);
+	}
+
+	if( Graph_IsValid( &widget->background.image ) ) {
+		Graph_Free( &widget->background.image );
+	}
+	switch(widget->state) {
+	case WIDGET_STATE_NORMAL:
+		Graph_FillColor( &img, RGB(150,150,150) );
+		Widget_SetBackgroundImage( widget, &img );
+		Widget_SetBackgroundLayout( widget, LAYOUT_CENTER );
+		Widget_SetBackgroundTransparent( widget, TRUE );
+		break;
+	case WIDGET_STATE_ACTIVE:
+		color.red = _ALPHA_BLEND( 0, color.red, 100 );
+		color.green = _ALPHA_BLEND( 0, color.green, 100 );
+		color.blue = _ALPHA_BLEND( 0, color.blue, 100 );
+		Graph_FillColor( &img, RGB(255,255,255) );
+		Widget_SetBackgroundImage( widget, &img );
+		Widget_SetBackgroundColor( widget, color );
+		Widget_SetBackgroundLayout( widget, LAYOUT_CENTER );
+		Widget_SetBackgroundTransparent( widget, FALSE );
+		break;
+	case WIDGET_STATE_OVERLAY:
+		Graph_FillColor( &img, RGB(255,255,255) );
+		Widget_SetBackgroundImage( widget, &img );
+		Widget_SetBackgroundColor( widget, color );
+		Widget_SetBackgroundLayout( widget, LAYOUT_CENTER );
+		Widget_SetBackgroundTransparent( widget, FALSE );
+	case WIDGET_STATE_DISABLE:
+	default:break;
+	}
+}
+
+void RegisterWindow(void)
+{
+	WidgetType_Add( WIDGET_WINDOW );
+	WidgetFunc_Add( WIDGET_WINDOW, Window_OnShow, FUNC_TYPE_SHOW );
+	WidgetFunc_Add( WIDGET_WINDOW, Window_OnInit, FUNC_TYPE_INIT );
+	WidgetFunc_Add( WIDGET_WINDOW, Window_OnUpdate, FUNC_TYPE_UPDATE );
+
+	WidgetType_Add( WIDGET_CLOSE_BUTTON );
+	WidgetFunc_Add( WIDGET_CLOSE_BUTTON, CloseButton_OnInit, FUNC_TYPE_INIT );
+	WidgetFunc_Add( WIDGET_CLOSE_BUTTON, CloseButton_OnUpdate, FUNC_TYPE_UPDATE );
+}
