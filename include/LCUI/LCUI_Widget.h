@@ -47,7 +47,7 @@ LCUI_BEGIN_HEADER
 
 typedef void (*WidgetCallBackFunc)(LCUI_Widget*);
 
-/***************** 部件相关函数的类型 *******************/
+/*--------- 部件相关函数的类型 ---------*/
 typedef enum WidgetFuncType_ {
 	FUNC_TYPE_SHOW,
 	FUNC_TYPE_HIDE,
@@ -57,16 +57,16 @@ typedef enum WidgetFuncType_ {
 	FUNC_TYPE_UPDATE,
 	FUNC_TYPE_DESTROY
 } WidgetFuncType;
-/****************************************************/
+/*---------------- END -----------------*/
 
-/***************************** 定位类型 ********************************/
+/*--------------- 定位类型 -------------*/
 typedef enum PositionType_ {
 	POS_TYPE_STATIC,
 	POS_TYPE_RELATIVE,
 	POS_TYPE_ABSOLUTE,
 	POS_TYPE_FIXED,
 } PositionType;
-/**********************************************************************/
+/*---------------- END -----------------*/
 
 /*------------ 部件停靠类型 --------------*/
 typedef enum DockType_ {
@@ -108,6 +108,9 @@ struct LCUI_Widget_ {
 	LCUI_BOOL enabled;	/* 是否启用 */
 	LCUI_BOOL visible;	/* 是否可见 */
 	LCUI_BOOL modal;	/* 是否为模态部件 */
+	LCUI_BOOL clickable;	/**< 是否能够被点击 */
+	LCUI_BOOL autosize;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
+	LCUI_BOOL focus;	/* 指定该部件是否需要焦点 */
 
 	LCUI_Pos pos;	/* 已计算出的实际位置 */
 	LCUI_Pos max_pos;
@@ -149,14 +152,8 @@ struct LCUI_Widget_ {
 	WidgetState state;	/* 部件当前状态 */
 	int valid_state;	/* 对部件有效的状态 */
 
-	LCUI_BOOL auto_size;	/* 指定是否自动调整自身的大小，以适应内容的大小 */
-	AUTOSIZE_MODE auto_size_mode;	/* 自动尺寸调整模式 */
-
-	LCUI_BOOL focus;		/* 指定该部件是否需要焦点 */
+	AUTOSIZE_MODE autosize_mode;	/* 自动尺寸调整模式 */
 	LCUI_Widget* focus_widget;	/* 获得焦点的子部件 */
-
-	int clickable_mode;		/* 确定在对比像素alpha值时，是要“小于”还是“不小于”才使条件成立 */
-	uchar_t clickable_area_alpha;	/* 指定部件图层中的区域的alpha值小于/不小于多少时可被鼠标点击，默认为0，最大为255 */
 
 	LCUI_GraphLayer* glayer;	/* 部件的图层 */
 
