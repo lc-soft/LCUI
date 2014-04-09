@@ -43,77 +43,26 @@
 #ifndef __LCUI_WINDOW_H_
 #define __LCUI_WINDOW_H_ 
 
+#define WIDGET_WINDOW "LCUI::Window"
+#define Window_New() Widget_New(WIDGET_WINDOW)
+
 LCUI_BEGIN_HEADER
 
-/*-------------- 窗口风格 ----------------*/
-typedef enum WINDOW_STYLE
-{
-	WINDOW_STYLE_NONE,
-	WINDOW_STYLE_LINE,
-	WINDOW_STYLE_PURE_BLUE,
-	WINDOW_STYLE_PURE_GREEN,
-	WINDOW_STYLE_PURE_RED,
-	WINDOW_STYLE_PURE_ORANGE,
-	WINDOW_STYLE_PURE_PURPLE 
-}
-WINDOW_STYLE;
-/*--------------- END --------------------*/
+/** 获取窗口的客户区 */
+LCUI_API LCUI_Widget *Window_GetClientArea( LCUI_Widget *window );
 
-/******************* 窗口标题栏 ***********************/
-typedef struct _LCUI_TitleBar
-{
-	LCUI_Widget *icon_box;		/* 图标 */
-	LCUI_Widget *label;		/* 标题栏中显示的文本 */
-}
-LCUI_TitleBar;
-/****************************************************/
+/** 获取窗口的close按钮 */
+LCUI_API LCUI_Widget *Window_GetCloseButton( LCUI_Widget *window );
 
-/************************ 窗口数据 **************************/
-typedef struct _LCUI_Window
-{
-	LCUI_Widget *titlebar;		/* 标题栏 */
-	LCUI_Widget *client_area;	/* 客户区 */
-	LCUI_Widget *btn_close;	/* 关闭按钮 */
-}
-LCUI_Window;
-/***********************************************************/
+/** 将部件添加至窗口客户区内 */
+LCUI_API void Window_ClientArea_Add( LCUI_Widget *window, LCUI_Widget *w );
 
-LCUI_API LCUI_Widget*
-Window_GetTitleBar(LCUI_Widget *window);
-/* 功能：获取窗口标题栏的指针 */ 
+/** 设置窗口标题栏中显示的文本 */
+LCUI_API int Window_SetTextW( LCUI_Widget *window, const wchar_t *text );
 
-LCUI_API LCUI_Widget*
-Window_GetClientArea(LCUI_Widget *window);
-/* 功能：获取窗口客户区的指针 */
-
-/* 获取窗口右上角关闭按钮 */
-LCUI_API LCUI_Widget*
-Window_GetCloseButton( LCUI_Widget *window );
-
-LCUI_API void
-Window_SetTitleIcon(LCUI_Widget *window, LCUI_Graph *icon);
-/* 功能：自定义指定窗口的标题栏图标 */ 
-
-LCUI_API void
-Window_SetTitleText(LCUI_Widget *win_p, const char *text);
-/* 功能：为窗口设置标题文字 */ 
-
-LCUI_API void
-Window_SetTitleTextW(LCUI_Widget *win_p, const wchar_t *text);
-/* 功能：为窗口设置标题文字 */
-
-LCUI_API void
-Window_ClientArea_Add(LCUI_Widget *window, LCUI_Widget *widget);
-/* 功能：将部件添加至窗口客户区 */ 
-
-LCUI_API void
-Window_TitleBar_Add(LCUI_Widget *window, LCUI_Widget *widget);
-/* 功能：将部件添加至窗口标题栏 */ 
-
-/* 新建一个窗口 */
-LCUI_API LCUI_Widget*
-Window_New( const char *title, LCUI_Graph *icon, LCUI_Size size );
+/** 设置窗口的图标 */
+LCUI_API void Window_SetIcon( LCUI_Widget *window, LCUI_Graph *icon );
 
 LCUI_END_HEADER
 
-#endif /* __LCUI_WINDOW_H__ */
+#endif
