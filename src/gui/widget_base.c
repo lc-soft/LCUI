@@ -1462,12 +1462,7 @@ LCUI_API void Widget_ExecSetAlpha( LCUI_Widget *widget, uchar_t alpha )
  **/
 LCUI_API void Widget_ExecMove( LCUI_Widget *widget, LCUI_Pos pos )
 {
-	LCUI_Rect rect;
 	LCUI_Pos max_pos, min_pos;
-
-	if( !widget ) {
-		return;
-	}
 	max_pos = Widget_GetMaxPos( widget );
 	min_pos = Widget_GetMinPos( widget );
 
