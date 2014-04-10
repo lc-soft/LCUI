@@ -236,6 +236,7 @@ int LCUIWidget_ProcInvalidArea(void)
 				widget->type_name.string:"unknown");
 		}
 		node = RBTree_Next( node );
+		RBTree_Erase( &widget_paint_tree, (int)widget );
 	}
 	DEBUG_MSG("tip2\n");
 	return 1;
