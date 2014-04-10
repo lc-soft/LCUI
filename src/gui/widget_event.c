@@ -174,56 +174,50 @@ GetWidgetOfResponseEvent( LCUI_Widget *widget, int event_id )
 static void 
 _DragEvent_Start( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 {
-	LCUI_WidgetEvent widget_event;
-	widget_event.type = EVENT_DRAG;
-	widget_event.drag.cursor_pos.x = event->x;
-	widget_event.drag.cursor_pos.y = event->y;
-	__offset_pos = Widget_GetGlobalPos( widget );
-	widget_event.drag.new_pos.x = __offset_pos.x;
-	widget_event.drag.new_pos.y = __offset_pos.y;
-	__offset_pos.x = widget_event.drag.cursor_pos.x - __offset_pos.x;
-	__offset_pos.y = widget_event.drag.cursor_pos.y - __offset_pos.y;
-	widget_event.drag.first_click = TRUE;
-	widget_event.drag.end_click = FALSE;
+	LCUI_WidgetEvent buff;
+	buff.type = EVENT_DRAG;
+	buff.drag.cursor_pos.x = event->x;
+	buff.drag.cursor_pos.y = event->y;
+	buff.drag.new_pos = Widget_GetGlobalPos( widget );
+	__offset_pos.x = buff.drag.cursor_pos.x - buff.drag.new_pos.x;
+	__offset_pos.y = buff.drag.cursor_pos.y - buff.drag.new_pos.y;
+	buff.drag.first_click = TRUE;
+	buff.drag.end_click = FALSE;
 	/* 处理部件的拖动事件 */
-	Widget_DispatchEvent( widget, &widget_event );
+	Widget_DispatchEvent( widget, &buff );
 }
 
 static void 
-_DragEvent_Do(	LCUI_Widget *widget, LCUI_MouseMotionEvent *event )
+_DragEvent_Do(LCUI_Widget *widget, LCUI_MouseMotionEvent *event )
 {
-	LCUI_WidgetEvent widget_event;
-	widget_event.type = EVENT_DRAG;
-	widget_event.drag.cursor_pos.x = event->x;
-	widget_event.drag.cursor_pos.y = event->y;
-	widget_event.drag.new_pos.x = widget_event.drag.cursor_pos.x;
-	widget_event.drag.new_pos.y = widget_event.drag.cursor_pos.y;
-	widget_event.drag.new_pos.x -= __offset_pos.x;
-	widget_event.drag.new_pos.y -= __offset_pos.y;
-	widget_event.drag.first_click = FALSE;
-	widget_event.drag.end_click = FALSE;
-	Widget_DispatchEvent( widget, &widget_event );
+	LCUI_WidgetEvent buff;
+	buff.type = EVENT_DRAG;
+	buff.drag.cursor_pos.x = event->x;
+	buff.drag.cursor_pos.y = event->y;
+	buff.drag.new_pos.x = buff.drag.cursor_pos.x - __offset_pos.x;
+	buff.drag.new_pos.y = buff.drag.cursor_pos.y - __offset_pos.y;
+	buff.drag.first_click = FALSE;
+	buff.drag.end_click = FALSE;
+	Widget_DispatchEvent( widget, &buff );
 }
 
 static LCUI_BOOL 
 _DragEvent_End( LCUI_Widget *widget, LCUI_MouseButtonEvent *event )
 {
-	LCUI_WidgetEvent widget_event;
-	widget_event.type = EVENT_DRAG;
-	widget_event.drag.cursor_pos.x = event->x;
-	widget_event.drag.cursor_pos.y = event->y;
+	LCUI_WidgetEvent buff;
+	buff.type = EVENT_DRAG;
+	buff.drag.cursor_pos.x = event->x;
+	buff.drag.cursor_pos.y = event->y;
 	/* 若点击前后，鼠标坐标并未发生变化，则返回TRUE */
 	if( old_cursor_pos.x == event->x
 	 && old_cursor_pos.y == event->y ) {
 		return TRUE;
 	}
-	widget_event.drag.new_pos.x = widget_event.drag.cursor_pos.x;
-	widget_event.drag.new_pos.y = widget_event.drag.cursor_pos.y;
-	widget_event.drag.new_pos.x -= __offset_pos.x;
-	widget_event.drag.new_pos.y -= __offset_pos.y;
-	widget_event.drag.first_click = FALSE;
-	widget_event.drag.end_click = TRUE;
-	Widget_DispatchEvent( widget, &widget_event );
+	buff.drag.new_pos.x = buff.drag.cursor_pos.x - __offset_pos.x;
+	buff.drag.new_pos.y = buff.drag.cursor_pos.y - __offset_pos.y;
+	buff.drag.first_click = FALSE;
+	buff.drag.end_click = TRUE;
+	Widget_DispatchEvent( widget, &buff );
 	return FALSE;
 }
 
@@ -382,7 +376,6 @@ static void LCUI_HandleMouseButtonDown( LCUI_MouseButtonEvent *event )
 	pos.y = event->y;
 	old_cursor_pos.x = pos.x;
 	old_cursor_pos.y = pos.y;
-
 	widget = Widget_At( NULL, pos );
 	if( !Widget_IsAllowResponseEvent(widget) ) {
 		return;
