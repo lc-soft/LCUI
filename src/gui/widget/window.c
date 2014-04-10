@@ -53,7 +53,7 @@
 #include LC_FONT_H
 #include LC_ERROR_H
 
-#define TOP_COLOR		RGB(34,177,76)
+#define DEFAULT_THEME_COLOR	RGB(34,177,76)
 #define TOP_PANDDING		2
 #define WIDGET_CLOSE_BUTTON	"LCUI::WindowCloseButton"
 #define ALLOW_STATE_LIST	(WIDGET_STATE_ACTIVE|WIDGET_STATE_NORMAL\
@@ -65,7 +65,7 @@ typedef struct LCUI_WindowRec_ {
 	LCUI_Widget *btn_close;		/**< close按钮 */
 	LCUI_Widget *icon;		/**< 图标 */
 	LCUI_Widget *text;		/**< 标题文本 */
-	LCUI_RGB top_line_color;	/**< 顶部线条颜色 */
+	LCUI_RGB theme_color;	/**< 顶部线条颜色 */
 } LCUI_Window;
 
 static unsigned char close_btn_alpha[]={
@@ -126,7 +126,7 @@ static void Window_OnInit( LCUI_Widget *window )
 	
 	wnd = Widget_NewPrivateData( window, LCUI_Window );
 
-	wnd->top_line_color = TOP_COLOR;
+	wnd->theme_color = DEFAULT_THEME_COLOR;
 	wnd->titlebar = Widget_New(NULL); 
 	wnd->client_area = Widget_New(NULL); 
 	wnd->btn_close = Widget_New(WIDGET_CLOSE_BUTTON); 
@@ -208,7 +208,7 @@ static void Window_OnUpdate( LCUI_Widget *window )
 	border.top_width = TOP_PANDDING;
 	/* 若窗口已获得焦点 */
 	if( Widget_GetFocus( window ) ) {
-		border.top_color = wnd->top_line_color;
+		border.top_color = wnd->theme_color;
 	}
 	Widget_SetBorder( window, border );
 	/* 更新窗口标题栏上的关闭按钮 */
@@ -277,9 +277,14 @@ static void CloseButton_OnUpdate( LCUI_Widget *widget )
 	
 	wnd = Widget_GetParent( widget, WIDGET_WINDOW );
 	if( wnd ) {
-		LCUI_Window *wnd_data;
-		wnd_data = (LCUI_Window*)Widget_GetPrivateData( wnd );
-		color = wnd_data->top_line_color;
+		/* 若所在窗口并未获得焦点 */
+		if( !Widget_GetFocus(wnd) ) {
+			color = RGB(200,200,200);
+		} else {
+			LCUI_Window *wnd_data;
+			wnd_data = (LCUI_Window*)Widget_GetPrivateData( wnd );
+			color = wnd_data->theme_color;
+		}
 	} else {
 		color = RGB(255,0,0);
 	}
