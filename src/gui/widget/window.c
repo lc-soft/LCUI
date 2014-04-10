@@ -125,6 +125,7 @@ static void Window_OnInit( LCUI_Widget *window )
 	LCUI_Window *wnd;
 	LCUI_Graph btn_bg;
 	LCUI_TextStyle style;
+	LCUI_Border border;
 	
 	wnd = Widget_NewPrivateData( window, LCUI_Window );
 
@@ -164,6 +165,15 @@ static void Window_OnInit( LCUI_Widget *window )
 	Widget_SetPadding( window, Padding(TOP_PANDDING,1,1,1) );
 	Widget_SetPadding( wnd->client_area, Padding(1,1,1,1) );
 	Widget_SetSize( wnd->titlebar, "100%", "35px" );
+	
+	border.top_width = 0;
+	border.bottom_width = 1;
+	border.left_width = 1;
+	border.right_width = 1;
+	border.bottom_color = RGB(200,200,200);
+	border.left_color = RGB(255,255,255);
+	border.right_color = RGB(255,255,255);
+	Widget_SetBorder( wnd->titlebar, border );
 
 	TextStyle_Init( &style );
 	TextStyle_FontSize( &style, 18 );
