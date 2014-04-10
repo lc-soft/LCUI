@@ -81,10 +81,8 @@ LCUI_API void Win32_SetSelfHWND( HWND hwnd )
 }
 
 /** win32的动态库的入口函数 */
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-					 )
+BOOL APIENTRY DllMain( HMODULE hModule, DWORD ul_reason_for_call,
+                       LPVOID lpReserved )
 {
 	switch (ul_reason_for_call)
 	{
@@ -167,7 +165,7 @@ static int Win32_ScreenInit(void)
 	}
 	/* 创建窗口 */
 	current_hwnd = CreateWindow(
-			szAppName, TEXT ("LCUI Windowed Graphics Output"),
+			szAppName, TEXT ("LCUI Application"),
 			WIN32_WINDOW_STYLE,
 			CW_USEDEFAULT, CW_USEDEFAULT,
 			0, 0,
