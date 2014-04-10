@@ -63,6 +63,9 @@ LCUI_API int Window_SetTextW( LCUI_Widget *window, const wchar_t *text );
 /** 设置窗口的图标 */
 LCUI_API void Window_SetIcon( LCUI_Widget *window, LCUI_Graph *icon );
 
+/** 设置窗口主题色 */
+LCUI_API void Window_SetThemeColor( LCUI_Widget *window, LCUI_RGB color );
+
 LCUI_END_HEADER
 
 #endif

@@ -259,6 +259,15 @@ LCUI_API void Window_SetIcon( LCUI_Widget *window, LCUI_Graph *icon )
 	Widget_SetAlign( wnd->text, ALIGN_MIDDLE_LEFT, Pos(34,0) );
 }
 
+/** 设置窗口主题色 */
+LCUI_API void Window_SetThemeColor( LCUI_Widget *window, LCUI_RGB color )
+{
+	LCUI_Window *wnd;
+	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
+	wnd->theme_color = color;
+	Widget_Update( window );
+}
+
 static void CloseButton_OnInit( LCUI_Widget *widget )
 {
 	Widget_NewPrivateData( widget, LCUI_Button );
