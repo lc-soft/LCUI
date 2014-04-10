@@ -111,10 +111,12 @@ static void Window_OnShow( LCUI_Widget *widget )
 /* 处理鼠标移动事件 */
 static void Window_ExecMove( LCUI_Widget *window, LCUI_WidgetEvent *event )
 {
+	LCUI_Pos pos;
 	/* 解除之前设定的align */
 	Widget_SetAlign( window, ALIGN_NONE, Pos(0,0) );
+	pos = Widget_ToRelPos( window->parent, event->drag.new_pos );
 	/* 移动窗口的位置 */
-	Widget_Move( window, event->drag.new_pos );
+	Widget_Move( window, pos );
 }
 
 /** 初始化window部件相关数据 */
