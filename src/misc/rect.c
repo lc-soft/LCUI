@@ -146,17 +146,33 @@ LCUIRect_GetOverlayRect( LCUI_Rect *a, LCUI_Rect *b, LCUI_Rect *out )
 {
 	if( a->x > b->x ) {
 		out->x = a->x;
-		out->w = b->x + b->w - a->x;
+		if( b->x + b->w > a->x + a->w ) {
+			out->w = a->w;
+		} else {
+			out->w = b->x + b->w - out->x;
+		}
 	} else {
 		out->x = b->x;
-		out->w = a->x + a->w - b->x;
+		if( a->x + a->w > b->x + b->w ) {
+			out->w = b->w;
+		} else {
+			out->w = a->x + a->w - out->x;
+		}
 	}
 	if( a->y > b->y ) {
 		out->y = a->y;
-		out->h = b->y + b->h - a->y;
+		if( b->y + b->h > a->y + a->h ) {
+			out->h = a->h;
+		} else {
+			out->h = b->y + b->h - out->y;
+		}
 	} else {
 		out->y = b->y;
-		out->h = a->y + a->h - b->y;
+		if( a->y + a->h > b->y + b->h ) {
+			out->h = b->h;
+		} else {
+			out->h = a->y + a->h - out->y;
+		}
 	}
 	if( out->w <= 0 || out->h <= 0 ) {
 		return FALSE;
@@ -210,104 +226,19 @@ static void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 	rects[0].h = rect1->y + rect1->h - rect2->y;
 
 	rects[1].x = rect2->x;
-	rects[1].y = rects[0].y + rects[0].h;
+	rects[1].y = rect1->y + rect1->h;
 	rects[1].w = rect1->x + rect1->w - rect2->x;
 	rects[1].h = rect2->y + rect2->h - rects[1].y;
 
 	rects[2].x = rect1->x + rect1->w;
 	rects[2].y = rect1->y;
-	rects[2].w = rect2->x + rect2->w - rects[2].x;
+	rects[2].w = rect2->w - rects[1].w;
 	rects[2].h = rect2->y + rect2->h - rects[2].y;
 
 	rects[3].x = rect1->x;
 	rects[3].y = rect2->y;
 	rects[3].w = rect2->x + rect2->w - rects[3].x;
-	rects[3].h = rect1->y - rects[3].y;
-}
-
-/** 
- * 根据重叠矩形 rect1，将矩形 rect2 分割成两个矩形
- * rect1必须在 rect2 内，且与rect2有一个顶点相同 
- */
-static int LCUIRect_CutTwoRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
-				LCUI_Rect rects[2] )
-{
-	/* 两个相交矩形，除去重叠区域，最多可分割出两个区域。
-	 * 根据与重叠矩形的坐标，判断新矩形在重叠矩形的哪个位置 */
-	if( rect2->x == rect1->x ) {
-		/** 
-		 * 右下方 
-		 * ┏━━━━┳━┓
-		 * ┃ rect1  ┃0 ┃
-		 * ┣━━━━┻━┫
-		 * ┃     1      ┃
-		 * ┗━━━━━━┛
-		 */
-		if( rect2->y == rect1->y ) {
-			rects[0].x = rect2->x + rect1->w;
-			rects[0].y = rect1->y;
-			rects[0].w = rect2->w - rect1->w;
-			rects[0].h = rect1->h;
-			rects[1].x = rect2->x;
-			rects[1].y = rect1->y + rect1->h;
-			rects[1].w = rect2->w;
-			rects[1].h = rect2->h - rect1->h;
-			return 0;
-		}
-		/**
-		 * 右上方
-		 * ┏━━━━━━┓
-		 * ┃     0      ┃
-		 * ┣━━━┳━━┫
-		 * ┃rect1 ┃ 1  ┃
-		 * ┗━━━┻━━┛
-		 */
-		rects[0].x = rect2->x;
-		rects[0].y = rect2->y;
-		rects[0].w = rect2->w;
-		rects[0].h = rect2->h - rect1->h;
-		rects[1].x = rect2->x + rect1->w;
-		rects[1].w = rect2->w - rect1->w;
-		rects[1].y = rect1->y;
-		rects[1].h = rect1->h;
-		return 1;
-	}
-	/** 
-	 * 左下方 
-	 * ┏━━┳━━━━┓
-	 * ┃ 0  ┃ rect1  ┃
-	 * ┃━━┻━━━━┫
-	 * ┃      1       ┃
-	 * ┗━━━━━━━┛
-	 */
-	if( rect2->y == rect1->y ) {
-		rects[0].x = rect2->x;
-		rects[0].y = rect2->y;
-		rects[0].w = rect2->w - rect1->w;
-		rects[0].h = rect1->h;
-		rects[1].x = rect2->x;
-		rects[1].y = rect2->y + rect1->h;
-		rects[1].w = rect2->w;
-		rects[1].h = rect2->h - rect1->h;
-		return 2;
-	}
-	/**
-	 * 左上方
-	 * ┏━━━━━━━┓
-	 * ┃       0      ┃
-	 * ┣━━┳━━━━┫
-	 * ┃ 1  ┃ rect1  ┃
-	 * ┗━━┻━━━━┛
-	 */
-	rects[0].x = rect2->x;
-	rects[0].y = rect2->y;
-	rects[0].w = rect2->w;
-	rects[0].h = rect2->h - rect1->h;
-	rects[1].x = rect2->x;
-	rects[1].y = rect1->y;
-	rects[1].w = rect2->w - rect1->w;
-	rects[1].h = rect1->h;
-	return 3;
+	rects[3].h = rect1->y - rect2->y;
 }
 
 /** 初始化脏矩形记录 */
@@ -327,8 +258,8 @@ LCUI_API void DirtyRectList_Destroy( LCUI_DirtyRectList *list )
 /** 添加一个脏矩形记录 */
 LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 {
-	int ret;
-	LCUI_Rect *p_rect, o_rect, tmp_rect[2];
+	int i, ret;
+	LCUI_Rect *p_rect, o_rect, tmp_rect[4];
 
 	if( rect->w <= 0 || rect->h <= 0 ) {
 		return -1;
@@ -372,15 +303,11 @@ LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 			/* 添加合并后的矩形 */
 			return DirtyRectList_Add( list, &o_rect );
 		}
-		LCUIRect_CutTwoRect( &o_rect, rect, tmp_rect );
-		DEBUG_MSG("cut rect, (%d,%d,%d,%d), (%d,%d,%d,%d), child: (%d,%d,%d,%d), (%d,%d,%d,%d)\n",
-			o_rect.x, o_rect.y, o_rect.w, o_rect.h,
-			rect->x, rect->y, rect->w, rect->h,
-			tmp_rect[0].x, tmp_rect[0].y, tmp_rect[0].w, tmp_rect[0].h,
-			tmp_rect[1].x, tmp_rect[1].y, tmp_rect[1].w, tmp_rect[1].h);
-		ret = DirtyRectList_Add( list, &tmp_rect[0] );
-		ret |= DirtyRectList_Add( list, &tmp_rect[1] );
-		return ret;
+		LCUIRect_CutFourRect( &o_rect, rect, tmp_rect );
+		for( ret=0,i=0; i<4; ++i ) {
+			DirtyRectList_Add( list, &tmp_rect[i] );
+		}
+		return 1;
 	}
 	DEBUG_MSG("add\n");
 	/* 验证通过，则添加进去 */
@@ -434,13 +361,15 @@ LCUI_API int DirtyRectList_Delete( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 			continue;
 		}
 		DEBUG_MSG("cut 2\n");
-		LCUIRect_CutTwoRect( &o_rect, p_rect, tmp_rect );
+		LCUIRect_CutFourRect( &o_rect, p_rect, tmp_rect );
 		LinkedList_Delete( list );
-		LinkedList_InsertCopy( list, &tmp_rect[0] );
-		LinkedList_InsertCopy( list, &tmp_rect[1] );
-		/* 跳过这两个新加入的矩形 */
-		LinkedList_ToNext( list );
-		LinkedList_ToNext( list );
+		for( i=0; i<4; ++i ) {
+			if( tmp_rect[i].w <= 0 || tmp_rect[i].h <= 0 ) {
+				continue;
+			}
+			LinkedList_InsertCopy( list, &tmp_rect[i] );
+			LinkedList_ToNext( list );
+		}
 	}
 	DEBUG_MSG("quit\n");
 	return 1;
