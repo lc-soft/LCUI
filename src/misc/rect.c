@@ -84,33 +84,32 @@ LCUI_API void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
 	}
 }
 
-/** 根据容器尺寸，获取指定区域的有效显示区域 */
-LCUI_API LCUI_Rect LCUIRect_ValidateArea( LCUI_Size box_size, LCUI_Rect rect )
+/** 将矩形区域范围调整在容器有效范围内 */
+LCUI_API void LCUIRect_ValidateArea( LCUI_Rect *rect, LCUI_Size box_size )
 {
-	if (rect.x < 0) {
-		rect.width += rect.x;
-		rect.x = 0;
+	if( rect->x < 0 ) {
+		rect->width += rect->x;
+		rect->x = 0;
 	}
-	if (rect.y < 0) {
-		rect.height += rect.y;
-		rect.y = 0;
+	if( rect->y < 0 ) {
+		rect->height += rect->y;
+		rect->y = 0;
 	}
 	
-	if (rect.x + rect.width > box_size.w) {
-		if(rect.x < box_size.w) {
-			rect.width = box_size.w - rect.x; 
+	if( rect->x + rect->width > box_size.w ) {
+		if( rect->x < box_size.w ) {
+			rect->width = box_size.w - rect->x; 
 		} else {
-			rect.width = 0;
+			rect->width = 0;
 		}
 	}
-	if (rect.y + rect.height > box_size.h) {
-		if(rect.y < box_size.h) {
-			rect.height = box_size.h - rect.y; 
+	if( rect->y + rect->height > box_size.h ) {
+		if( rect->y < box_size.h ) {
+			rect->height = box_size.h - rect->y; 
 		} else {
-			rect.height = 0;
+			rect->height = 0;
 		}
 	}
-	return rect;
 }
 
 /** 检测矩形是否遮盖另一个矩形 */

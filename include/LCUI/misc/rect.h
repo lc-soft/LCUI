@@ -52,8 +52,8 @@ LCUI_API LCUI_Rect Rect( int x, int y, int w, int h );
 LCUI_API void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
 							LCUI_Rect *cut );
 
-/** 根据容器尺寸，获取指定区域的有效显示区域 */
-LCUI_API LCUI_Rect LCUIRect_ValidateArea( LCUI_Size box_size, LCUI_Rect rect );
+/** 将矩形区域范围调整在容器有效范围内 */
+LCUI_API void LCUIRect_ValidateArea( LCUI_Rect *rect, LCUI_Size box_size );
 
 /** 检测矩形是否遮盖另一个矩形 */
 LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 );
