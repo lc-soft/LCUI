@@ -462,7 +462,7 @@ static void LCUI_ShowCopyrightText(void)
 {
 	printf(
 	"============| LCUI v%s |============\n"
-	"Copyright (C) 2012-2013 Liu Chao.\n"
+	"Copyright (C) 2012-2014 Liu Chao.\n"
 	"Licensed under GPLv2.\n"
 	"Report bugs to <lc-soft@live.cn>.\n"
 	"Project Homepage: www.lcui.org.\n"
