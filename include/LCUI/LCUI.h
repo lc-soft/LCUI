@@ -44,7 +44,7 @@
 #ifndef __LCUI_H__  /* 如果没有定义 __LCUI_H__ 宏 */
 #define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */
 
-#define LCUI_VERSION "0.15.0"
+#define LCUI_VERSION "1.0.0"
 
 #include <wchar.h>
 #include <stdio.h>
@@ -70,70 +70,44 @@
 /* 触屏校准后的文件 */
 #define LCUI_CALIBFILE "/mnt/Data/LC-SOFT/pointercal"
 
-/************ 任务的添加模式 ***************/
-#define ADD_MODE_ADD_NEW	0 /* 新增 */
-#define ADD_MODE_NOT_REPEAT	1 /* 不能重复 */
-#define ADD_MODE_REPLACE	2 /* 覆盖 */
-
-#define AND_ARG_F	1<<3	/* 第一个参数 */
-#define AND_ARG_S 	1<<4	/* 第二个参数 */
-/*****************************************/
-
 LCUI_BEGIN_HEADER
-
-typedef unsigned char LCUI_BOOL;
-
-typedef unsigned long int LCUI_ID;
-
-typedef void (*CallBackFunc)(void*,void*);
-
-typedef struct	LCUI_Widget_	LCUI_Widget;
-
-typedef unsigned char uchar_t;
+	
 typedef unsigned int uint_t;
+typedef unsigned long int LCUI_ID;
+typedef unsigned char LCUI_BOOL;
+typedef unsigned char uchar_t;
+typedef void (*CallBackFunc)(void*,void*);
+typedef struct LCUI_Widget_ LCUI_Widget;
 
-/********** 按键信息 ************/
-typedef struct LCUI_Key_ {
-	int code;
-	int state;
-} LCUI_Key;
-/******************************/
-
-/*--------- RGB配色数据 ---------*/
-typedef struct LCUI_RGB_ {
-	uchar_t red;
-	uchar_t green;
-	uchar_t blue;
-} LCUI_RGB;
-/*----------- END -------------*/
-
-/*--------- RGBA配色数据 --------*/
-typedef struct LCUI_RGBA_ {
-	uchar_t red;
-	uchar_t green;
-	uchar_t blue;
-	uchar_t alpha;
-} LCUI_RGBA;
-/*----------- END -------------*/
+/*--------- 色彩值 ----------*/
+typedef union LCUI_ARGB_ {
+	int32_t value;
+	struct {
+		uchar_t b;
+		uchar_t g;
+		uchar_t r;
+		uchar_t a;
+	};
+	struct {
+		uchar_t blue;
+		uchar_t green;
+		uchar_t red;
+		uchar_t alpha;
+	};
+} LCUI_ARGB, LCUI_Color;
+/*----------- END -----------*/
 
 /*------- 二维坐标 --------*/
 typedef struct LCUI_Pos_ {
 	int x, y;
 } LCUI_Pos;
-/*--------- END ----------*/
+/*--------- END -----------*/
 
-/*------- 尺寸 --------*/
+/*---------- 尺寸 -----------*/
 typedef struct LCUI_Size_ {
 	int w, h;
 } LCUI_Size;
-/*------- END --------*/
-
-/*------------- 像素点信息 ------------*/
-typedef struct Pixel_ {
-	LCUI_Pos pos;	/* 位置 */
-	LCUI_RGB rgb;	/* RGBA值 */
-} Pixel;
-/*--------------- END ---------------*/
+/*---------- END ------------*/
 
 /*---------------- 字符串 ----------------*/
 typedef struct LCUI_String_ {
@@ -142,7 +116,14 @@ typedef struct LCUI_String_ {
 } LCUI_String;
 /*----------------- END -----------------*/
 
-/*------------------- 区域数据 ---------------------*/
+/*---------- 宽字符串 ----------*/
+typedef struct LCUI_WString_ {
+	wchar_t *string;
+	uint_t length;
+} LCUI_WString;
+/*------------ END ------------*/
+
+/*------------- 区域数据 -------------*/
 typedef struct LCUI_Rect_ {
 	int x, y;
 	union {
@@ -152,14 +133,7 @@ typedef struct LCUI_Rect_ {
 		int h, height;
 	};
 } LCUI_Rect;
-/*--------------------- END ----------------------*/
-
-/*---------- 宽字符串 ----------*/
-typedef struct LCUI_WString_ {
-	wchar_t *string;
-	uint_t length;
-} LCUI_WString;
-/*------------ END ------------*/
+/*--------------- END ----------------*/
 
 LCUI_END_HEADER
 	
@@ -170,23 +144,25 @@ LCUI_BEGIN_HEADER
 
 enum GraphColorTyle {
 	COLOR_TYPE_RGB,
-	COLOR_TYPE_RGBA
+	COLOR_TYPE_ARGB
 };
 
 /*---------------------------- 图形数据 -------------------------------*/
 typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
-	int x, y;		/**< 源图形中的引用区域所在的坐标 */
-	int w, h;		/**< 图形的尺寸 */
+	int x, y;			/**< 源图形中的引用区域所在的坐标 */
+	int w, h;			/**< 图形的尺寸 */
 	
-	int color_type;		/**< 色彩类型 */
-	LCUI_BOOL quote;	/**< 标志，指示是否引用了另一图形 */
-	LCUI_Graph *src;	/**< 所引用的源图形 */
-	uchar_t	alpha;		/**< 全局透明度 */
-	uchar_t** rgba;		/**< 像素数据缓冲区 */
+	int color_type;			/**< 色彩类型 */
+	LCUI_BOOL quote;		/**< 标志，指示是否引用了另一图形 */
+	LCUI_Graph *src;		/**< 所引用的源图形 */
+	uchar_t	alpha;			/**< 全局透明度 */
+	/** 像素数据缓存区 */
+	union {
+		uchar_t *bytes;		
+		LCUI_ARGB *argb;
+	};
 	size_t mem_size;	/**< 像素数据缓冲区大小 */
-
-	LCUI_Mutex mutex;	/**< 互斥锁，用于数据保护 */
 };
 /*------------------------------ END ---------------------------------*/
 
