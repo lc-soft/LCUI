@@ -117,9 +117,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Queue.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Resources.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\LCUI_StyleLibrary.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
@@ -439,6 +436,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_paint.c">
       <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\draw\boxshadow.c">
+      <Filter>源文件\draw</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

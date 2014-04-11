@@ -168,7 +168,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Memory.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Misc.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Queue.h" />
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Resources.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_StyleLibrary.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Widget.h" />
@@ -187,6 +186,7 @@
     <ClCompile Include="..\..\..\src\bmp\load_image.c" />
     <ClCompile Include="..\..\..\src\bmp\png.c" />
     <ClCompile Include="..\..\..\src\draw\border.c" />
+    <ClCompile Include="..\..\..\src\draw\boxshadow.c" />
     <ClCompile Include="..\..\..\src\draw\line.c" />
     <ClCompile Include="..\..\..\src\draw\rotate.c" />
     <ClCompile Include="..\..\..\src\draw\smooth.c" />
