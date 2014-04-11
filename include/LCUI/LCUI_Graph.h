@@ -35,9 +35,9 @@
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果s
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
- * ****************************************************************************/
+ * ***************************************************************************/
 #ifndef __LCUI_GRAPH_H__
 #define __LCUI_GRAPH_H__
 
@@ -48,17 +48,21 @@ LCUI_BEGIN_HEADER
 #define TYPE_JPG	2
 #define TYPE_BMP	3
 
-/* 图像的混合方式 */
-#define GRAPH_MIX_FLAG_OVERLAY	 1<<7
-#define GRAPH_MIX_FLAG_REPLACE	 1<<8
+/* 解除RGB宏 */
+#ifdef RGB
+#undef RGB
+#endif
+
+#define RGB(r,g,b) (LCUI_ARGB)((uchar_t)b<<16|(uchar_t)g<<8|(uchar_t)a)
+#define ARGB(a,r,g,b) (LCUI_ARGB)((uchar_t)a<<24|(uchar_t)b<<16|(uchar_t)g<<8|(uchar_t)a)
 
 /* 将两个像素点的颜色值进行alpha混合 */
-#define _ALPHA_BLEND(__src__ , __des__, __alpha__)	\
-    ((((__src__-__des__)*(__alpha__))>>8)+__des__)
+#define _ALPHA_BLEND(__back__ , __fore__, __alpha__)	\
+    ((((__fore__-__back__)*(__alpha__))>>8)+__back__)
 
-#define ALPHA_BLEND(__src__ , __des__, __alpha__)	\
-{							\
-    __des__ =_ALPHA_BLEND(__src__,__des__,__alpha__);	\
+#define ALPHA_BLEND(__back__ , __fore__, __alpha__)		\
+{								\
+    __back__ =_ALPHA_BLEND(__back__,__back__,__alpha__);	\
 }
 
 /* 获取像素的RGB值 */
@@ -99,26 +103,9 @@ LCUI_BEGIN_HEADER
 	pixel = (r<<16)|(g<<8)|b;			\
 }
 
-/* 解除RGB宏 */
-#ifdef RGB
-#undef RGB
-#endif
+LCUI_API LCUI_BOOL Graph_HaveAlpha( const LCUI_Graph *graph );
 
-LCUI_API LCUI_RGB RGB ( uchar_t red, uchar_t green, uchar_t blue );
-
-LCUI_API void Graph_Lock( LCUI_Graph *graph );
-
-LCUI_API void Graph_Unlock( LCUI_Graph *graph );
-
-LCUI_API LCUI_BOOL Graph_GetPixel(	LCUI_Graph *graph,
-					LCUI_Pos pos,
-					LCUI_RGBA *pixel );
-
-LCUI_API LCUI_Size Graph_GetSize( LCUI_Graph *graph );
-
-LCUI_API LCUI_BOOL Graph_HaveAlpha( LCUI_Graph *graph );
-
-LCUI_API LCUI_BOOL Graph_IsValid( LCUI_Graph *graph );
+LCUI_API LCUI_BOOL Graph_IsValid( const LCUI_Graph *graph );
 
 LCUI_API void Graph_PrintInfo( LCUI_Graph *graph );
 
@@ -128,42 +115,47 @@ LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h );
 
 LCUI_API void Graph_Copy( LCUI_Graph *des, LCUI_Graph *src );
 
-LCUI_API void Graph_Free( LCUI_Graph *pic );
+LCUI_API void Graph_Free( LCUI_Graph *graph );
 
 LCUI_API int Graph_Quote( LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area );
 
-LCUI_API LCUI_Rect Graph_GetValidRect( LCUI_Graph *graph );
+LCUI_API LCUI_Rect Graph_GetValidRect( const LCUI_Graph *graph );
 
+/* 
+ * 功能：获取指向被引用的图形的指针 
+ * 说明：如果当前图形引用了另一个图形，并且，该图形处于一条引用链中，那么，本函数会返
+ * 回指向被引用的最终图形的指针。
+ * */
 LCUI_API LCUI_Graph* Graph_GetQuote( LCUI_Graph *graph );
 
-LCUI_API int Graph_Zoom(	LCUI_Graph *in,
-				LCUI_Graph *out, 
-				LCUI_BOOL keep_scale,
-				LCUI_Size size );
+LCUI_API const LCUI_Graph* Graph_GetQuoteConst( const LCUI_Graph *graph );
 
-LCUI_API int Graph_Cut( LCUI_Graph *src, LCUI_Rect rect, LCUI_Graph *out );
+LCUI_API int Graph_Zoom( const LCUI_Graph *graph, LCUI_Graph *buff, 
+			 LCUI_BOOL keep_scale, LCUI_Size size );
 
-LCUI_API int Graph_HorizFlip( LCUI_Graph *src, LCUI_Graph *out );
+LCUI_API int Graph_Cut( const LCUI_Graph *graph, LCUI_Rect rect, LCUI_Graph *buff );
 
-LCUI_API int Graph_VertiFlip( LCUI_Graph *src, LCUI_Graph *out );
+LCUI_API int Graph_HorizFlip( const LCUI_Graph *graph, LCUI_Graph *buff );
 
-LCUI_API int Graph_FillRect( LCUI_Graph *graph, LCUI_RGB color, LCUI_Rect rect );
+LCUI_API int Graph_VertiFlip( const LCUI_Graph *graph, LCUI_Graph *buff );
 
-LCUI_API int Graph_FillColor( LCUI_Graph *graph, LCUI_RGB color );
+LCUI_API int Graph_FillRect( LCUI_Graph *graph, LCUI_Color color, LCUI_Rect rect );
 
-LCUI_API int Graph_Tile( LCUI_Graph *src, LCUI_Graph *des, LCUI_BOOL replace );
+LCUI_API int Graph_FillColor( LCUI_Graph *graph, LCUI_Color color );
 
-LCUI_API int Graph_Mix(	LCUI_Graph *back_graph, 
-			LCUI_Graph *fore_graph,
+LCUI_API int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha );
+
+LCUI_API int Graph_Tile( LCUI_Graph *buff,  const LCUI_Graph *graph, 
+			 LCUI_BOOL replace );
+
+LCUI_API int Graph_Mix(	LCUI_Graph *back_graph, const LCUI_Graph *fore_graph,
 			LCUI_Pos des_pos );
 
-LCUI_API int Graph_Replace(	LCUI_Graph *back_graph,
-				LCUI_Graph *fore_graph,
-				LCUI_Pos des_pos );
+LCUI_API int Graph_Replace( LCUI_Graph *back_graph, 
+			   const LCUI_Graph *fore_graph, LCUI_Pos des_pos );
 
-LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int flag );
-
-LCUI_API int Graph_FillAlpha( LCUI_Graph *src, uchar_t alpha );
+LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, 
+				   int align, LCUI_BOOL replace );
 
 /** 填充图像
  * @param graph		目标图像
@@ -182,15 +174,14 @@ LCUI_API int Graph_FillImageEx( LCUI_Graph *graph, LCUI_Graph *backimg,
  * @param area		需要绘制的区域
  */
 LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph, 
-	LCUI_Graph *backimg, int layout, LCUI_RGB color, LCUI_Rect area );
+	LCUI_Graph *backimg, int layout, LCUI_Color color, LCUI_Rect area );
 
 LCUI_API int Graph_FillImage( LCUI_Graph *graph, LCUI_Graph *backimg,
 				int layout );
 
 LCUI_API int Graph_FillImageWithColor( LCUI_Graph *graph, LCUI_Graph *backimg,
-						int layout, LCUI_RGB color );
+						int layout, LCUI_Color color );
 
-LCUI_END_HEADER
 	
 #include LC_DRAW_H
 #include LC_GRAPHLAYER_H
