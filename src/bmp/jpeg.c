@@ -37,8 +37,9 @@ LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *out )
 {
 #ifdef USE_LIBJPEG
 	FILE *fp;
+	uchar_t *bytep;
 	int row_stride,jaka;
-	int x,y, m, n, k;
+	int x,y, n, k;
 	short int JPsyg;
 	
 	struct jpeg_decompress_struct cinfo;
@@ -81,24 +82,21 @@ LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *out )
 	row_stride = cinfo.output_width * cinfo.output_components;
 	buffer = (*cinfo.mem->alloc_sarray)(
 			(j_common_ptr) &cinfo,JPOOL_IMAGE,row_stride,1);
-	
+	bytep = out->bytes;
 	for(y=0; cinfo.output_scanline <cinfo.output_height; ++y) {
 		(void) jpeg_read_scanlines(&cinfo, buffer, 1);
-		m = y*out->w;
 		if ( jaka == 3 ) {
 			for (x=0;x<out->w;x++) {
-				n = x+m;
 				k=x*3;
-				out->rgba[0][n]=buffer[0][k++];
-				out->rgba[1][n]=buffer[0][k++];
-				out->rgba[2][n]=buffer[0][k++];
+				*bytep++ = buffer[0][k+2];
+				*bytep++ = buffer[0][k+1];
+				*bytep++ = buffer[0][k];
 			}
 		} else {
 			for (x=0;x<out->w;x++) {
-				n = x+m;
-				out->rgba[0][n]=buffer[0][x];
-				out->rgba[1][n]=buffer[0][x];
-				out->rgba[2][n]=buffer[0][x];
+				*bytep++ = buffer[0][x];
+				*bytep++ = buffer[0][x];
+				*bytep++ = buffer[0][x];
 			}
 		} 
 	}

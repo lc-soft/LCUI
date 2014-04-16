@@ -14,23 +14,23 @@ static double radian(int angle)
 	return angle*3.1415926/180;
 }
 
-LCUI_API int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 /* 
  * 功能：旋转图形
  * 说明：指定旋转中心点坐标以及旋转角度，即可得到旋转后的图形
  * 本源代码参考自互联网相关代码
  * 算法有待优化完善。
  */
+LCUI_API int Graph_Rotate( LCUI_Graph *src, int rotate_angle, LCUI_Graph *des )
 {
-	int	width, height;
-	int	new_width,new_height; 
-	int m, n, z;
+	int width, height;
+	int new_width,new_height;
 	int src_x, src_y, des_x, des_y;
-	double   fRotateAngle; 
-	double   fSina, fCosa; 
-	double   fSrcX1,fSrcY1,fSrcX2,fSrcY2,fSrcX3,fSrcY3,fSrcX4,fSrcY4;
-	double   fDstX1,fDstY1,fDstX2,fDstY2,fDstX3,fDstY3,fDstX4,fDstY4;
-	double   f1,f2; 
+	double fRotateAngle; 
+	double fSina, fCosa; 
+	double fSrcX1,fSrcY1,fSrcX2,fSrcY2,fSrcX3,fSrcY3,fSrcX4,fSrcY4;
+	double fDstX1,fDstY1,fDstX2,fDstY2,fDstX3,fDstY3,fDstX4,fDstY4;
+	double f1,f2;
+	uchar_t *pSrcRowByte, *pDesRowByte, *pSrcByte, *pDesByte;
 
 	if(!Graph_IsValid(src)) {
 		return -1;
@@ -81,13 +81,15 @@ LCUI_API int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 	if(Graph_Create(des, new_width, new_height) != 0) {
 		return -1;
 	}
-
+	
+	pDesRowByte = des->bytes;
+	pSrcRowByte = src->bytes;
 	// 针对图像每行进行操作
-	for(des_y = 0; des_y < new_height; ++des_y) {
-		m = new_width * des_y;
+	for( des_y=0; des_y<new_height; ++des_y ) {
+		pDesByte = pDesRowByte;
+		pSrcByte = pSrcRowByte;
 		// 针对图像每列进行操作   
-		for(des_x = 0; des_x < new_width; ++des_x) {
-			n = m + des_x;
+		for( des_x=0; des_x<new_width; ++des_x ) {
 			// 计算该象素在源图中的坐标   
 			src_y = (long) (-((double) des_x) * fSina + ((double) des_y) * fCosa + f2 + 0.5);   
 			src_x = (long) ( ((double) des_x) * fCosa + ((double) des_y) * fSina + f1 + 0.5);   
@@ -95,23 +97,34 @@ LCUI_API int Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des)
 			// 判断是否在源图范围内   
 			if( (src_x >= 0) && (src_x < width) 
 			&& (src_y >= 0) && (src_y < height)) {
-				// 指向源DIB第i0行，第j0个象素的指针
-				z = width * src_y + src_x;
-				des->rgba[0][n] = src->rgba[0][z];
-				des->rgba[1][n] = src->rgba[1][z];
-				des->rgba[2][n] = src->rgba[2][z];
-				if(src->color_type == COLOR_TYPE_RGBA) {
-					des->rgba[3][n] = src->rgba[3][z];
+				if( src->color_type == COLOR_TYPE_ARGB ) {
+					pSrcByte = src->bytes + (width*src_y + src_x)*4;
+					*pDesByte++ = *pSrcByte++;
+					*pDesByte++ = *pSrcByte++;
+					*pDesByte++ = *pSrcByte++;
+					*pDesByte++ = *pSrcByte++;
+				} else {
+					pSrcByte = src->bytes + (width*src_y + src_x)*3;
+					*pDesByte++ = *pSrcByte++;
+					*pDesByte++ = *pSrcByte++;
+					*pDesByte++ = *pSrcByte++;
 				}
 			} else {
-				// 对于源图中没有的象素，直接赋值为255   
-				des->rgba[0][n] = 255;
-				des->rgba[1][n] = 255;
-				des->rgba[2][n] = 255;
-				if(src->color_type == COLOR_TYPE_RGBA) {
-					des->rgba[3][n] = 0;
+				// 对于源图中没有的象素，直接赋值为255
+				*pDesByte++ = 255;
+				*pDesByte++ = 255;
+				*pDesByte++ = 255;
+				if( src->color_type == COLOR_TYPE_ARGB ) {
+					*pDesByte++ = 0;
 				}
 			}
+		}
+		if( src->color_type == COLOR_TYPE_ARGB ) {
+			pDesRowByte += des->w*4;
+			pSrcRowByte += src->w*4;
+		} else {
+			pDesRowByte += des->w*3;
+			pSrcRowByte += src->w*3;
 		}
 	}
 	return 0;

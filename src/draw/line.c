@@ -4,9 +4,9 @@
 
 /* 绘制水平线 */
 LCUI_API void
-Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start, int end_x )
+Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos start, int end_x )
 {
-	int k, pos, y, x, end_y;
+	int y, x, end_y;
 	LCUI_Rect area;
 	LCUI_Graph *des;
 
@@ -31,26 +31,40 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start
 	if( end_y > area.y + area.height ) {
 		end_y = area.y + area.height;
 	}
-
-	for(y=start.y; y<end_y; ++y) {
-		k = y * des->w;
-		for(x=start.x; x < end_x; ++x) {
-			pos = k + x;
-			des->rgba[0][pos] = color.red;
-			des->rgba[1][pos] = color.green;
-			des->rgba[2][pos] = color.blue;
-			if( des->color_type == COLOR_TYPE_RGBA ) {
-				des->rgba[3][pos] = 255;
+	if( des->color_type == COLOR_TYPE_ARGB ) {
+		LCUI_ARGB *pPixel, *pRowPixel;
+		pRowPixel = des->argb + start.y*des->w + start.x;
+		for( y=start.y; y<end_y; ++y ) {
+			pPixel = pRowPixel;
+			for( x=start.x; x < end_x; ++x ) {
+				pPixel->b = color.blue;
+				pPixel->g = color.green;
+				pPixel->r = color.red;
+				pPixel->a = 255;
+				++pPixel;
 			}
+			pRowPixel += des->w;
+		}
+	} else {
+		uchar_t *pByte, *pRowByte;
+		pRowByte = des->bytes + (start.y*des->w + start.x)*3;
+		for( y=start.y; y<end_y; ++y ) {
+			pByte = pRowByte;
+			for( x=start.x; x < end_x; ++x ) {
+				*pByte++ = color.blue;
+				*pByte++ = color.green;
+				*pByte++ = color.red;
+			}
+			pRowByte += des->w*3;
 		}
 	}
 }
 
 /* 绘制垂直线 */
 LCUI_API void
-Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start, int end_y )
+Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos start, int end_y )
 {
-	int k, pos, y, x, end_x;
+	int y, x, end_x;
 	LCUI_Rect area;
 	LCUI_Graph *des;
 
@@ -75,24 +89,39 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Pos start
 	if( end_y > area.y + area.height ) {
 		end_y = area.y + area.height;
 	}
-
-	for(y=start.y; y<end_y; ++y) {
-		k = y * des->w;
-		for(x=start.x; x < end_x; ++x) {
-			pos = k + x;
-			des->rgba[0][pos] = color.red;
-			des->rgba[1][pos] = color.green;
-			des->rgba[2][pos] = color.blue;
-			if( des->color_type == COLOR_TYPE_RGBA ) {
-				des->rgba[3][pos] = 255;
+	
+	if( des->color_type == COLOR_TYPE_ARGB ) {
+		LCUI_ARGB *pPixel, *pRowPixel;
+		pRowPixel = des->argb + start.y*des->w + start.x;
+		for( y=start.y; y<end_y; ++y ) {
+			pPixel = pRowPixel;
+			for( x=start.x; x < end_x; ++x ) {
+				pPixel->b = color.blue;
+				pPixel->g = color.green;
+				pPixel->r = color.red;
+				pPixel->a = 255;
+				++pPixel;
 			}
+			pRowPixel += des->w;
+		}
+	} else {
+		uchar_t *pByte, *pRowByte;
+		pRowByte = des->bytes + (start.y*des->w + start.x)*3;
+		for( y=start.y; y<end_y; ++y ) {
+			pByte = pRowByte;
+			for( x=start.x; x < end_x; ++x ) {
+				*pByte++ = color.blue;
+				*pByte++ = color.green;
+				*pByte++ = color.red;
+			}
+			pRowByte += des->w*3;
 		}
 	}
 }
 
 /* 绘制线条框 */
 LCUI_API void
-Graph_DrawBoxLine( LCUI_Graph *graph, LCUI_RGB color, int size, LCUI_Rect rect )
+Graph_DrawBoxLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Rect rect )
 {
 	int end;
 	LCUI_Pos start;

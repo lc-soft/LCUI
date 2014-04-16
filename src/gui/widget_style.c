@@ -99,7 +99,7 @@ static int str_scan_hex_number( const char *str, int start, int end )
 }
 
 /* 从字符串中获取RGB值，获取失败则返回0 */
-static int style_color_convert( const char *style_str, LCUI_RGB *rgb )
+static int style_color_convert( const char *style_str, LCUI_Color *rgb )
 {
 	int len;
 	uchar_t r, g, b;
@@ -140,7 +140,7 @@ static int WidgetStyle_SyncBackground(
 {
 	int ret;
 	char *attr_value;
-	LCUI_RGB back_color;
+	LCUI_Color back_color;
 	LCUI_Graph img_bg;
 	StyleLIB_Property *widget_attr;
 
@@ -294,7 +294,7 @@ static int style_border_convert( const char *style_str, LCUI_Border *border )
 	int i;
 	char buff[64];
 	const char *str_ptr;
-	LCUI_RGB color;
+	LCUI_Color color;
 	IntOrFloat_t num;
 	BORDER_STYLE style_type;
 	LCUI_BOOL have_color=FALSE, have_size=FALSE, have_type=FALSE;

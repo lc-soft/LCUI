@@ -92,7 +92,7 @@ typedef enum WidgetState_ {
 typedef struct LCUI_Background_ {
 	LCUI_BOOL transparent;	/* 是否透明 */
 	LCUI_Graph image;	/* 背景图 */
-	LCUI_RGB color;		/* 背景色 */
+	LCUI_Color color;		/* 背景色 */
 	LayoutType layout;	/* 背景图的布局 */
 } LCUI_Background;
 /*--------------------------------------------------------*/
@@ -138,7 +138,7 @@ struct LCUI_Widget_ {
 	DockType	dock;		/* 停靠位置 */
 	/*------------------ END ----------------------*/
 
-	LCUI_RGB color;			/* 前景颜色 */
+	LCUI_Color color;			/* 前景颜色 */
 	LCUI_Border border;		/* 边框 */
 	LCUI_Background background;	/* 背景 */
 

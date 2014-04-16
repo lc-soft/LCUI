@@ -18,7 +18,8 @@ LCUI_API int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
         png_infop info_ptr;
 	png_bytep* row_pointers;
         char buf[PNG_BYTES_TO_CHECK];
-        int w, h, x, y, i, temp, color_type;
+	uchar_t *pPixel;
+        int w, h, x, y, temp, color_type;
 
         fp = fopen(filepath, "rb");
         if( fp == NULL ) { 
@@ -61,20 +62,25 @@ LCUI_API int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 	/* 根据不同的色彩类型进行相应处理 */
         switch( color_type ) {
 	case PNG_COLOR_TYPE_RGB_ALPHA:
-                graph->color_type = COLOR_TYPE_RGBA; 
+                graph->color_type = COLOR_TYPE_ARGB; 
                 temp = Graph_Create( graph, w, h );
 		if( temp != 0 ) {
 			fclose(fp);
 			png_destroy_read_struct( &png_ptr, &info_ptr, 0);
 			return FILE_ERROR_MALLOC_ERROR;
 		}
-
-                for( i=0,y=0; y<h; ++y ) {
-			for( x=0; x<w*4; ++i ) {
-				graph->rgba[0][i] = row_pointers[y][x++];
-				graph->rgba[1][i] = row_pointers[y][x++];
-				graph->rgba[2][i] = row_pointers[y][x++];
-				graph->rgba[3][i] = row_pointers[y][x++];
+		
+		pPixel = graph->bytes;
+                for( y=0; y<h; ++y ) {
+			/*
+			 * Graph的像素数据存储格式是BGRA，而PNG库
+			 * 提供像素数据的是RGBA格式的，因此需要调整写入顺序
+			 */
+			for( x=0; x<w*4; x+=4 ) {
+				*pPixel++ = row_pointers[y][x+2];
+				*pPixel++ = row_pointers[y][x+1];
+				*pPixel++ = row_pointers[y][x];
+				*pPixel++ = row_pointers[y][x+3];
 			}
 		}
 		break;
@@ -88,11 +94,12 @@ LCUI_API int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 			return FILE_ERROR_MALLOC_ERROR;
 		}
 		
-                for( i=0,y=0; y<h; ++y ) {
-			for( x=0; x<w*3; ++i ) {
-				graph->rgba[0][i] = row_pointers[y][x++];
-				graph->rgba[1][i] = row_pointers[y][x++];
-				graph->rgba[2][i] = row_pointers[y][x++];
+		pPixel = graph->bytes;
+                for( y=0; y<h; ++y ) {
+			for( x=0; x<w*3; x+=3 ) {
+				*pPixel++ = row_pointers[y][x+2];
+				*pPixel++ = row_pointers[y][x+1];
+				*pPixel++ = row_pointers[y][x];
 			}
 		}
 		break;
@@ -114,12 +121,13 @@ LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
 {
 #ifdef USE_LIBPNG
         FILE *fp;
-        int j, i, row_size, pos;
+        int x, y, row_size, pos;
         png_byte color_type; 
         png_structp png_ptr;
         png_infop info_ptr; 
-        png_bytep * row_pointers;
-        
+        png_bytep *row_pointers;
+        uchar_t *pPixel;
+
         if(!Graph_IsValid(graph)) {
                 _DEBUG_MSG("graph is not valid\n");
                 return -1;
@@ -154,7 +162,7 @@ LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
                 _DEBUG_MSG("error during writing header\n");
                 goto error_exit;
         }
-        Graph_Lock(graph);
+
         if(Graph_HaveAlpha(graph)) {
                 color_type = PNG_COLOR_TYPE_RGB_ALPHA;
         } else {
@@ -170,45 +178,46 @@ LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
         /* write bytes */
         if (setjmp(png_jmpbuf(png_ptr))) {
                 _DEBUG_MSG("error during writing bytes\n");
-                Graph_Unlock(graph);
                 goto error_exit;
         }
-        if(Graph_HaveAlpha(graph)) {
+	if( graph->color_type == COLOR_TYPE_ARGB ) {
                 row_size = sizeof(uchar_t) * 4 * graph->w;
         } else {
                 row_size = sizeof(uchar_t) * 3 * graph->w;
         }
         
-        row_pointers = (png_bytep*)malloc(graph->h*sizeof(png_bytep));
-        for(i=0,pos=0; i < graph->h; i++) {
-                row_pointers[i] = (png_bytep)malloc(row_size);
-                for(j=0; j < row_size; ++pos) {
-                        row_pointers[i][j++] = graph->rgba[0][pos]; // red
-                        row_pointers[i][j++] = graph->rgba[1][pos]; // green
-                        row_pointers[i][j++] = graph->rgba[2][pos];   // blue
-                        if( graph->color_type == COLOR_TYPE_RGBA ) {
-                                row_pointers[i][j++] = graph->rgba[3][pos]; // alpha 
-                        }
+	pPixel = graph->bytes;
+        row_pointers = (png_bytep*)malloc( graph->h*sizeof(png_bytep) );
+        for(y=0,pos=0; y < graph->h; y++) {
+                row_pointers[y] = (png_bytep)malloc(row_size);
+                for(x=0; x < row_size; ) {
+                        row_pointers[y][x+2] = *pPixel++; // blue
+                        row_pointers[y][x+1] = *pPixel++; // green
+                        row_pointers[y][x] = *pPixel++;   // red
+                        if( graph->color_type == COLOR_TYPE_ARGB ) {
+                                row_pointers[y][x+3] = *pPixel++; // alpha 
+				x += 4;
+			} else {
+				x += 3;
+			}
                 }
         }
-        png_write_image(png_ptr, row_pointers);
+        png_write_image( png_ptr, row_pointers );
 
         /* end write */
         if (setjmp(png_jmpbuf(png_ptr))) {
                 _DEBUG_MSG("error during end of write\n");
-                Graph_Unlock(graph);
                 goto error_exit;
         }
         png_write_end(png_ptr, NULL);
 
         /* cleanup heap allocation */
-        for (j=0; j<graph->h; j++) {
-                free(row_pointers[j]);
+        for( y=0; y<graph->h; ++y ) {
+                free( row_pointers[y] );
         }
-        free(row_pointers);
+        free( row_pointers );
         
-        fclose(fp);
-        Graph_Unlock(graph);
+        fclose( fp );
 #else
         printf("warning: not PNG support!"); 
 #endif

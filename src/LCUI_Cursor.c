@@ -45,8 +45,6 @@
 #include LC_GRAPH_H
 #include LC_CURSOR_H
 #include LC_DISPLAY_H
-#include LC_MISC_H
-#include LC_RES_H
 
 static struct LCUI_Cursor {
 	LCUI_Pos current_pos;	/* 当前的坐标 */
@@ -55,7 +53,7 @@ static struct LCUI_Cursor {
 	LCUI_Graph graph;	/* 游标的图形 */
 } global_cursor;
 
-static unsigned char cursor_img_rgba[4][12*19] = {
+static uchar_t cursor_img_rgba[4][12*19] = {
 	{3,3,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,3,229,3,3,0,0,0,0,0,
 	0,0,0,3,255,229,3,3,0,0,0,0,0,0,0,3,255,255,229,3,3,0,0,0,0,0,0,3,255,255,255,229,
 	3,3,0,0,0,0,0,3,255,255,255,255,229,3,3,0,0,0,0,3,255,255,255,255,253,226,3,3,0,0,0,3,
@@ -92,21 +90,18 @@ static unsigned char cursor_img_rgba[4][12*19] = {
 
 static int LCUICursor_LoadDefualtGraph(LCUI_Graph *buff )
 {
-	int size;
 	if( Graph_IsValid(buff) ) {
 		Graph_Free( buff );
 	}
 	Graph_Init( buff );
-	buff->color_type = COLOR_TYPE_RGBA;;
-	buff->alpha = 255;
+	buff->color_type = COLOR_TYPE_ARGB;
 	if( Graph_Create(buff,12,19) != 0 ) {
 		return -1;
 	}
-	size = sizeof(unsigned char)*12*19;
-	memcpy( buff->rgba[0], cursor_img_rgba[0], size);
-	memcpy( buff->rgba[1], cursor_img_rgba[1], size );
-	memcpy( buff->rgba[2], cursor_img_rgba[2], size );
-	memcpy( buff->rgba[3], cursor_img_rgba[3], size );
+	Graph_SetRedBits( buff, cursor_img_rgba[0], 12*19 );
+	Graph_SetGreenBits( buff, cursor_img_rgba[1], 12*19 );
+	Graph_SetBlueBits( buff, cursor_img_rgba[2], 12*19 );
+	Graph_SetAlphaBits( buff, cursor_img_rgba[3], 12*19 );
 	return 0;
 }
 
@@ -157,6 +152,7 @@ LCUI_API void LCUICursor_Show( void )
 {
 	global_cursor.visible = TRUE;	/* 标识游标为可见 */
 	LCUICursor_Refresh();
+
 }
 
 /* 隐藏鼠标游标 */

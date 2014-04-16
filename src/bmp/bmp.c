@@ -21,7 +21,8 @@ LCUI_API int Graph_LoadBMP( const char *filepath, LCUI_Graph *out )
 {
 	FILE *fp;
 	bmp_head bmp;
-	int  m, n, x, y, tempi, pocz, omin;
+	uchar_t *bytep;
+	int  x, y, tempi, pocz, omin;
 
 	fp = fopen(filepath,"rb");
 	if(fp == NULL) {
@@ -52,17 +53,19 @@ LCUI_API int Graph_LoadBMP( const char *filepath, LCUI_Graph *out )
 	omin = omin-((out->w*out->h)*(bmp.depth/8));
 	omin = omin/(out->h);
 	fseek(fp,pocz,SEEK_SET);
-	switch(bmp.depth){
+
+	switch( bmp.depth ) {
 	case 32:
 		for (y=0; y<out->h; ++y) {
-			m = (out->h-y-1)*out->w;
+			/* 从最后一行开始写入像素数据 */
+			bytep = out->bytes + ((out->h-y-1)*out->w)*3;
 			for (x=0; x<out->w; ++x) {
-				n = x+m;
-				out->rgba[2][n]=fgetc(fp);
-				out->rgba[1][n]=fgetc(fp);
-				out->rgba[0][n]=fgetc(fp);
-				tempi=fgetc(fp);
+				*bytep++ = fgetc(fp);
+				*bytep++ = fgetc(fp);
+				*bytep++ = fgetc(fp);
+				tempi = fgetc(fp);
 			}
+			/* 略过填充字符 */
 			if (omin>0) {
 				for (tempi=0;tempi<omin;tempi++) {
 					fgetc(fp);
@@ -72,12 +75,11 @@ LCUI_API int Graph_LoadBMP( const char *filepath, LCUI_Graph *out )
 		break;
 	case 24:
 		for (y=0; y<out->h; ++y) {
-			m = (out->h-y-1)*out->w;
+			bytep = out->bytes + ((out->h-y-1)*out->w)*3;
 			for (x=0; x<out->w; ++x) {
-				n = x+m;
-				out->rgba[2][n]=fgetc(fp);
-				out->rgba[1][n]=fgetc(fp);
-				out->rgba[0][n]=fgetc(fp);
+				*bytep++ = fgetc(fp);
+				*bytep++ = fgetc(fp);
+				*bytep++ = fgetc(fp);
 			}
 			if (omin>0) {
 				for (tempi=0;tempi<omin;tempi++) {
