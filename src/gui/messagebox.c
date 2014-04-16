@@ -42,7 +42,6 @@
 #include LC_LCUI_H
 #include LC_CHARSET_H
 #include LC_GRAPH_H
-#include LC_RES_H
 #include LC_DISPLAY_H
 #include LC_WIDGET_H
 #include LC_LABEL_H
@@ -1250,7 +1249,6 @@ static LCUI_Queue msgbox_list;
 
 static int LoadMsgIcon( LCUI_Graph *buff, int img_res_id )
 {
-	int size;
 	if( img_res_id >= IMG_TOTAL_NUM ) {
 		return -1;
 	}
@@ -1258,16 +1256,15 @@ static int LoadMsgIcon( LCUI_Graph *buff, int img_res_id )
 		Graph_Free( buff );
 	}
 	Graph_Init( buff );
-	buff->color_type = COLOR_TYPE_RGBA;;
+	buff->color_type = COLOR_TYPE_ARGB;;
 	buff->alpha = 255;
-	size = 48*48*sizeof(unsigned char);
 	if( Graph_Create( buff, 48, 48 ) != 0 ) {
 		return -2;
 	}
-	memcpy( buff->rgba[0], msgbox_icon[img_res_id][0], size );
-	memcpy( buff->rgba[1], msgbox_icon[img_res_id][1], size );
-	memcpy( buff->rgba[2], msgbox_icon[img_res_id][2], size );
-	memcpy( buff->rgba[3], msgbox_icon[img_res_id][3], size );
+	Graph_SetRedBits( buff, msgbox_icon[img_res_id][0], 48*48 );
+	Graph_SetGreenBits( buff, msgbox_icon[img_res_id][1], 48*48 );
+	Graph_SetBlueBits( buff, msgbox_icon[img_res_id][2], 48*48 );
+	Graph_SetAlphaBits( buff, msgbox_icon[img_res_id][3], 48*48 );
 	return 0;
 }
 
@@ -1275,13 +1272,12 @@ static LCUI_MainLoop*
 msgbox_mainloop_new( LCUI_Widget *msgbox )
 {
 	MB_data *data;
-	
 	if( !msgbox_list_init ) {
 		Queue_Init( &msgbox_list, sizeof(MB_data), NULL );
 		msgbox_list_init = TRUE;
 	}
 	
-	data = malloc( sizeof(MB_data) );
+	data = (MB_data*)malloc( sizeof(MB_data) );
 	if( data == NULL ) {
 		return NULL;
 	}
@@ -1678,7 +1674,7 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 	default: return -1;
 	}
 	/* 创建消息框，并设置ID */
-	msgbox = Widget_New( "window" );
+	msgbox = Window_New();
 	Window_SetTextW( msgbox, title );
 	Widget_Resize( msgbox, min_size );
 
@@ -1687,7 +1683,7 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 	btn_close = Window_GetCloseButton( msgbox );
 	btn_close->self_id = MB_BTN_IS_QUIT;
 	/* 限制消息框的尺寸 */
-	max_size = LCUIScreen_GetSize();
+	LCUIScreen_GetSize( &max_size );
 	Widget_LimitSize( msgbox, min_size, max_size );
 	/* 设置为模态部件 */
 	Widget_SetModal( msgbox, TRUE );
