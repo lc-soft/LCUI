@@ -41,8 +41,17 @@
 #ifndef __LCUI_KERNEL_TASK_H__
 #define __LCUI_KERNEL_TASK_H__
 
-LCUI_BEGIN_HEADER
+/************ 任务的添加模式 ***************/
+#define ADD_MODE_ADD_NEW	0 /* 新增 */
+#define ADD_MODE_NOT_REPEAT	1 /* 不能重复 */
+#define ADD_MODE_REPLACE	2 /* 覆盖 */
 
+#define AND_ARG_F	1<<3	/* 第一个参数 */
+#define AND_ARG_S 	1<<4	/* 第二个参数 */
+/*****************************************/
+
+LCUI_BEGIN_HEADER
+	
 typedef struct {
 	/* 
 	 * 函数ID，部件库需要这ID标识函数类型，往程序的任务队列添加
