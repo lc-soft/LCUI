@@ -530,7 +530,7 @@ LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr,
 	Queue_Init( &glayerQ, 0, NULL);
 	Queue_UsingPointer( &glayerQ );
 	
-	graph_buff->color_type = COLOR_TYPE_RGB;
+	graph_buff->color_type = COLOR_TYPE_ARGB;
 	/* 为graph_buff分配合适尺寸的内存空间 */
 	Graph_Create( graph_buff, rect.width, rect.height );
 	/* 获取rect区域内的图层列表 */
@@ -562,7 +562,7 @@ LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr,
 			continue;
 		}
 		/* 跳过有alpha通道的图层 */
-		if( glayer->graph.color_type == COLOR_TYPE_RGBA ) {
+		if( glayer->graph.color_type == COLOR_TYPE_ARGB ) {
 			continue;
 		}
 		/* 如果该图层的有效区域包含目标区域 */
@@ -594,8 +594,6 @@ skip_loop:
 			continue;
 		}
 		DEBUG_MSG("%d,%d,%d,%d\n", glayer->pos.x, glayer->pos.y, glayer->graph.w, glayer->graph.h);
-		/* 锁上该图层的互斥锁 */
-		Graph_Lock( &glayer->graph );
 		/* 获取该图层的有效区域及全局坐标 */
 		pos = GraphLayer_GetGlobalPos( ctnr, glayer );
 		valid_area = GraphLayer_GetValidRect( ctnr, glayer );
@@ -624,8 +622,6 @@ skip_loop:
 			/* 还原全局透明度 */
 			glayer->graph.alpha = tmp_alpha;
 		}
-		/* 解锁图层 */
-		Graph_Unlock( &glayer->graph );
 	}
 	Queue_Destroy( &glayerQ );
 	return 0;
