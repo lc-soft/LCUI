@@ -88,7 +88,7 @@ TextStyle_FontSize( LCUI_TextStyle *style, int fontsize )
 
 /* 设置字体颜色 */
 LCUI_API void
-TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color )
+TextStyle_FontColor( LCUI_TextStyle *style, LCUI_Color color )
 {
 	style->fore_color = color;
 	style->_fore_color = TRUE;
@@ -96,7 +96,7 @@ TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color )
 
 /* 设置字体背景颜色 */
 LCUI_API void
-TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color )
+TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_Color color )
 {
 	style->back_color = color;
 	style->_back_color = TRUE;
