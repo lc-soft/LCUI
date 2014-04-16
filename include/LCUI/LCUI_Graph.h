@@ -64,7 +64,7 @@ enum GraphColorType {
 
 #define ALPHA_BLEND(__back__ , __fore__, __alpha__)		\
 {								\
-    __back__ =_ALPHA_BLEND(__back__,__back__,__alpha__);	\
+    __back__ =_ALPHA_BLEND(__back__,__fore__,__alpha__);	\
 }
 
 /* 获取像素的RGB值 */
@@ -116,6 +116,7 @@ static inline LCUI_Color RGB( uchar_t r, uchar_t g, uchar_t b)
 	color.red = r;
 	color.green = g;
 	color.blue = b;
+	color.alpha = 255;
 	return color;
 }
 
@@ -127,6 +128,21 @@ static inline LCUI_Color ARGB( uchar_t a, uchar_t r, uchar_t g, uchar_t b )
 	color.green = g;
 	color.blue = b;
 	return color;
+}
+
+static inline void Graph_SetPixel( LCUI_Graph *graph, int x, int y, LCUI_Color color )
+{
+	if( graph->color_type == COLOR_TYPE_ARGB ) {
+		graph->argb[graph->w*y+x] = color;
+	} else {
+		/* 右移8位是为了去除ARGB中的alpha值 */
+		graph->bytes[(graph->w*y+x)*3] = color.value>>8;
+	}
+}
+
+static inline void Graph_SetPixelAlpha( LCUI_Graph *graph, int x, int y, uchar_t alpha )
+{
+	graph->argb[graph->w*y+x].alpha = alpha;
 }
 
 LCUI_API void Graph_PrintInfo( LCUI_Graph *graph );
