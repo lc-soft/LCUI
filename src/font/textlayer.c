@@ -322,7 +322,7 @@ LCUI_API void TextLayer_Init( LCUI_TextLayer *layer )
 	DirtyRectList_Init( &layer->dirty_rect );
 	Graph_Init( &layer->graph );
 	TextRowList_InsertNewRow( &layer->row_list, 0 );
-	layer->graph.color_type = COLOR_TYPE_RGBA;
+	layer->graph.color_type = COLOR_TYPE_ARGB;
 }
 
 static void TextRowList_Destroy( TextRowList *list )
@@ -1475,7 +1475,7 @@ LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
 	box_size.w = layer->max_width;
 	box_size.h = layer->max_height;
 	/* 调整区域范围，使之有效 */
-	area = LCUIRect_ValidateArea( box_size, area );
+	LCUIRect_ValidateArea( &area, box_size );
 	/* 加上Y轴坐标偏移量 */
 	y = layer->offset_y;
 	/* 先确定从哪一行开始绘制 */
