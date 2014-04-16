@@ -57,27 +57,74 @@
 #define MS_PER_FRAME 1000/MAX_FRAMES_PER_SEC;	/**< 每帧画面的最少耗时(ms) */
 
 static LCUI_BOOL i_am_init = FALSE;		/**< 标志，指示本模块是否初始化 */
-static LCUI_BOOL need_sync_area = FALSE;	/**< 标志，指示是否需要同步无效区域 */
 static LinkedList screen_invalid_area;		/**< 屏幕无效区域记录 */
 static LCUI_Mutex glayer_list_mutex;		/**< 图层列表的互斥锁 */
 static LCUI_Screen screen;			/**< 屏幕信息 */
 
+static int LCUIScreen_Init( int w, int h, int mode )
+{
+	if( screen.Init ) {
+		return screen.Init( w, h, mode );
+	}
+	return -1;
+}
+
+static int LCUIScreen_Destroy( void )
+{
+	if( screen.Destroy ) {
+		return screen.Destroy();
+	}
+	return -1;
+}
+
+static int LCUIScreen_SyncFrameBuffer( void )
+{
+	if( screen.Sync ) {
+		return screen.Sync();
+	}
+	return -1;
+}
+
+LCUI_API int LCUIScreen_CatchGraph( LCUI_Graph *graph, LCUI_Rect rect )
+{
+	if( screen.CatchGraph ) {
+		return screen.CatchGraph( graph, rect );
+	}
+	return -1;
+}
+
+LCUI_API int LCUIScreen_PutGraph( LCUI_Graph *graph, LCUI_Pos pos )
+{
+	if( screen.PutGraph ) {
+		return screen.PutGraph( graph, pos );
+	}
+	return -1;
+}
+
+LCUI_API int LCUIScreen_SetMode( int w, int h, int mode )
+{
+	if( screen.PutGraph ) {
+		return screen.SetMode( w, h, mode );
+	}
+	return -1;
+}
+
 /** 获取屏幕宽度 */
 LCUI_API int LCUIScreen_GetWidth( void )
 {
-	return screen.size.w;
+	return screen.info.size.w;
 }
 
 /** 获取屏幕高度 */
 LCUI_API int LCUIScreen_GetHeight( void )
 {
-	return screen.size.h;
+	return screen.info.size.h;
 }
 
 /** 获取屏幕尺寸 */
-LCUI_API LCUI_Size LCUIScreen_GetSize( void )
+LCUI_API void LCUIScreen_GetSize( LCUI_Size *size )
 {
-	return screen.size;
+	*size = screen.info.size;
 }
 
 /** 设置屏幕内的指定区域为无效区域 */
@@ -89,44 +136,46 @@ LCUI_API int LCUIScreen_InvalidateArea( LCUI_Rect *rect )
 	}
 	if( !rect ) {
 		tmp_rect.x = tmp_rect.y = 0;
-		tmp_rect.w = screen.size.w;
-		tmp_rect.h = screen.size.h;
+		tmp_rect.w = screen.info.size.w;
+		tmp_rect.h = screen.info.size.h;
 		return DirtyRectList_Add( &screen_invalid_area, &tmp_rect );
-	}
-	tmp_rect = LCUIRect_ValidateArea( screen.size, *rect );
+	} 
+	tmp_rect = *rect;
+	DEBUG_MSG("rect: %d,%d,%d,%d\n", rect->x, rect->y, rect->w, rect->h);
+	LCUIRect_ValidateArea( &tmp_rect, screen.info.size );
 	return DirtyRectList_Add( &screen_invalid_area, &tmp_rect );
 }
 
 /** 获取屏幕每个像素点的色彩值所占的位数 */
 LCUI_API int LCUIScreen_GetBits( void )
 {
-	return screen.bits;
+	return screen.info.bits;
 }
 
 /** 获取屏幕显示模式 */
 LCUI_API int LCUIScreen_GetMode( void )
 {
-	return screen.mode;
+	return screen.info.mode;
 }
 
 /** 获取屏幕信息 */
-LCUI_API void LCUIScreen_GetInfo( LCUI_Screen *info )
+LCUI_API void LCUIScreen_GetInfo( LCUI_ScreenInfo *info )
 {
-	memcpy( info, &screen, sizeof(LCUI_Screen) );
+	*info = screen.info;
 }
 
 /** 设置屏幕信息 */
-LCUI_API void LCUIScreen_SetInfo( LCUI_Screen *info )
+LCUI_API void LCUIScreen_SetInfo( LCUI_ScreenInfo *info )
 {
-	memcpy( &screen, info, sizeof(LCUI_Screen) );
+	screen.info = *info;
 }
 
 /** 获取屏幕中心点的坐标 */
 LCUI_API LCUI_Pos LCUIScreen_GetCenter( void )
 {
 	LCUI_Pos pos;
-	pos.x = screen.size.w/2.0; 
-	pos.y = screen.size.h/2.0;
+	pos.x = screen.info.size.w/2.0; 
+	pos.y = screen.info.size.h/2.0;
 	return pos;
 }
 
@@ -198,19 +247,15 @@ static int LCUIScreen_UpdateInvalidArea(void)
 		DEBUG_MSG("get rect: %d,%d,%d,%d\n", p_rect->x, p_rect->y, p_rect->w, p_rect->h);
 		/* 获取内存中对应区域的图形数据 */
 		LCUIScreen_GetRealGraph( *p_rect, &graph );
+		//Graph_FillColor( &graph, RGB(255,0,0) );
 		/* 写入至帧缓冲，让屏幕显示图形 */
+		//Graph_DrawBorder( &graph, Border(1,BORDER_STYLE_SOLID, RGB(255,0,0)) );
 		LCUIScreen_PutGraph( &graph, Pos(p_rect->x, p_rect->y) );
 		LinkedList_Delete( &screen_invalid_area );
 	}
 	DEBUG_MSG("quit\n");
 	Graph_Free( &graph );
 	return ret;
-}
-
-/** 标记需要同步无效区域 */
-LCUI_API void LCUIScreen_MarkSync(void)
-{
-	need_sync_area = TRUE;
 }
 
 static int current_screen_fps = 0;
@@ -260,7 +305,7 @@ static void FrameControl_RemainFrame(void)
 /** 更新屏幕内的图形显示 */
 static void LCUIScreen_Update( void* unused )
 {
-	int val;
+	int ret;
 	/* 先标记刷新整个屏幕区域 */
 	LCUIScreen_InvalidateArea( NULL );
 	/* 初始化帧数控制 */
@@ -271,29 +316,28 @@ static void LCUIScreen_Update( void* unused )
 		/* 处理所有部件消息 */
 		LCUIWidget_ProcMessage();
 		/* 更新各个部件的无效区域中的内容 */
-		val = LCUIWidget_ProcInvalidArea();
-		DEBUG_MSG("tip1\n");
+		ret = LCUIWidget_ProcInvalidArea();
 		/* 更新屏幕上各无效区域内的图像内容 */
-		val += LCUIScreen_UpdateInvalidArea();
-		DEBUG_MSG("tip2\n");
-		/* 若有无效区域，则同步帧缓冲内保存的屏幕内容 */
-		if( val > 0 ) {
+		ret |= LCUIScreen_UpdateInvalidArea();
+		if( ret > 0 ) {
 			LCUIScreen_SyncFrameBuffer();
 		}
 		/* 让本帧停留一段时间 */
 		FrameControl_RemainFrame();
 	}
-
 	LCUIThread_Exit(NULL);
 }
 
 /** 初始化图形输出模块 */
-LCUI_API int LCUIModule_Video_Init( int w, int h, int mode )
+int LCUIModule_Video_Init( int w, int h, int mode )
 {
 	if( i_am_init ) {
 		return -1;
 	}
 	LCUIMutex_Init( &glayer_list_mutex );
+#ifdef LCUI_BUILD_IN_WIN32
+	LCUIScreen_UseWin32( &screen );
+#endif
 	LCUIScreen_Init( w, h, mode );
 	i_am_init = TRUE;
 	DirtyRectList_Init( &screen_invalid_area );
@@ -302,7 +346,7 @@ LCUI_API int LCUIModule_Video_Init( int w, int h, int mode )
 }
 
 /** 停用图形输出模块 */
-LCUI_API int LCUIModule_Video_End( void )
+int LCUIModule_Video_End( void )
 {
 	if( !i_am_init ) {
 		return -1;

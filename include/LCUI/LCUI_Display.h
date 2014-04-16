@@ -44,13 +44,22 @@
 
 LCUI_BEGIN_HEADER
 
-/****************************** 屏幕信息 ********************************/
-typedef struct LCUI_Screen_
-{
-	int		mode;		/* 屏幕显示模式 */
-	char		dev_name[256];	/* 图形输出设备的名称 */
-	LCUI_Size	size;		/* 屏幕尺寸 */
-	int		bits;		/* 每个像素的用多少位表示 */
+/** 屏幕信息 */
+typedef struct LCUI_ScreenInfo_ {
+	int mode;		/* 屏幕显示模式 */
+	char dev_name[256];	/* 图形输出设备的名称 */
+	LCUI_Size size;		/* 屏幕尺寸 */
+	int bits;		/* 每个像素的用多少位表示 */
+} LCUI_ScreenInfo;
+
+typedef struct LCUI_Screen_ {
+	LCUI_ScreenInfo info;
+	int (*Init)(int,int,int);
+	int (*SetMode)(int,int,int);
+	int (*Destroy)(void);
+	int (*Sync)(void);
+	int (*PutGraph)(const LCUI_Graph*,LCUI_Pos);
+	int (*CatchGraph)(LCUI_Graph*,LCUI_Rect);
 } LCUI_Screen;
 /***********************************************************************/
 
@@ -61,35 +70,17 @@ typedef struct LCUI_Screen_
 #define WIN32_WINDOW_WIDTH 800
 #define WIN32_WINDOW_HEIGHT 600
 
-LCUI_API HWND Win32_GetSelfHWND( void );
-
-LCUI_API void Win32_SetSelfHWND( HWND hwnd );
+HWND Win32_GetSelfHWND( void );
+void Win32_SetSelfHWND( HWND hwnd );
+void LCUIScreen_UseWin32( LCUI_Screen *screen );
 #endif
 
-LCUI_API void
-LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color );
-
-LCUI_API int
-LCUIScreen_GetGraph( LCUI_Graph *out );
-
-LCUI_API int
-LCUIScreen_Init( int w, int h, int mode );
-
 /* 设置视频输出模式 */
-LCUI_API int
-LCUIScreen_SetMode( int w, int h, int mode );
+LCUI_API int LCUIScreen_SetMode( int w, int h, int mode );
 
-LCUI_API int
-LCUIScreen_Destroy( void );
+LCUI_API int LCUIScreen_CatchGraph( LCUI_Graph *graph, LCUI_Rect rect );
 
-LCUI_API void
-LCUIScreen_SyncFrameBuffer( void );
-
-LCUI_API int
-LCUIScreen_PutGraph (LCUI_Graph *graph, LCUI_Pos des_pos );
-
-LCUI_API void
-LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out );
+LCUI_API int LCUIScreen_PutGraph( LCUI_Graph *graph, LCUI_Pos pos );
 
 /** 获取屏幕宽度 */
 LCUI_API int LCUIScreen_GetWidth( void );
@@ -98,7 +89,7 @@ LCUI_API int LCUIScreen_GetWidth( void );
 LCUI_API int LCUIScreen_GetHeight( void );
 
 /** 获取屏幕尺寸 */
-LCUI_API LCUI_Size LCUIScreen_GetSize( void );
+LCUI_API void LCUIScreen_GetSize( LCUI_Size *size );
 
 /** 设置屏幕内的指定区域为无效区域 */
 LCUI_API int LCUIScreen_InvalidateArea( LCUI_Rect *rect );
@@ -110,10 +101,10 @@ LCUI_API int LCUIScreen_GetBits( void );
 LCUI_API int LCUIScreen_GetMode( void );
 
 /** 获取屏幕信息 */
-LCUI_API void LCUIScreen_GetInfo( LCUI_Screen *info );
+LCUI_API void LCUIScreen_GetInfo( LCUI_ScreenInfo *info );
 
 /** 设置屏幕信息 */
-LCUI_API void LCUIScreen_SetInfo( LCUI_Screen *info );
+LCUI_API void LCUIScreen_SetInfo( LCUI_ScreenInfo *info );
 
 /** 获取屏幕中心点的坐标 */
 LCUI_API LCUI_Pos LCUIScreen_GetCenter( void );
@@ -124,20 +115,14 @@ LCUI_API void LCUIScreen_LockGraphLayerTree( void );
 /** 解除图层树互斥锁 */
 LCUI_API void LCUIScreen_UnlockGraphLayerTree( void );
 
-/** 获取屏幕中指定区域内实际要显示的图形 */
-LCUI_API void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph );
-
-/** 标记需要同步无效区域 */
-LCUI_API void LCUIScreen_MarkSync(void);
-
 /** 获取当前的屏幕内容每秒更新的帧数 */
 LCUI_API int LCUIScreen_GetFPS(void);
 
 /** 初始化图形输出模块 */
-LCUI_API int LCUIModule_Video_Init( int w, int h, int mode );
+int LCUIModule_Video_Init( int w, int h, int mode );
 
 /** 停用图形输出模块 */
-LCUI_API int LCUIModule_Video_End( void );
+int LCUIModule_Video_End( void );
 
 LCUI_END_HEADER
 

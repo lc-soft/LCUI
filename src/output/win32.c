@@ -55,27 +55,26 @@
 #define WIN32_WINDOW_STYLE (WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
 
 static HWND current_hwnd = NULL;
-static int pixel_mem_len = 0;
-static unsigned char *pixel_mem = NULL;
-static HDC hdc_client, hdc_framebuffer;
-static HBITMAP client_bitmap;
 static HINSTANCE win32_hInstance = NULL, dll_hInstance = NULL;
 static LCUI_Mutex screen_mutex;
 static LCUI_Thread th_win32;
+static LCUI_Graph framebuffer;
+static HDC hdc_framebuffer;
+static HBITMAP client_bitmap;
 static LCUI_Sleeper win32_init_sleeper;
 static LCUI_BOOL win32_init_error = TRUE;
 
-LCUI_API void Win32_LCUI_Init( HINSTANCE hInstance )
+void Win32_LCUI_Init( HINSTANCE hInstance )
 {
 	win32_hInstance = hInstance;
 }
 
-LCUI_API HWND Win32_GetSelfHWND( void )
+HWND Win32_GetSelfHWND( void )
 {
 	return current_hwnd;
 }
 
-LCUI_API void Win32_SetSelfHWND( HWND hwnd )
+void Win32_SetSelfHWND( HWND hwnd )
 {
 	current_hwnd = hwnd;
 }
@@ -201,10 +200,11 @@ static void LCUI_Win32_Thread( void *arg )
 }
 
 /** 初始化屏幕 */
-LCUI_API int LCUIScreen_Init( int w, int h, int mode )
+static int Win32Screen_Init( int w, int h, int mode )
 {
+	HDC hdc_client;
 	LCUI_Widget *root_widget;
-	LCUI_Screen screen_info;
+	LCUI_ScreenInfo screen_info;
 
 	/* 初始化屏幕互斥锁 */
 	LCUIMutex_Init( &screen_mutex );
@@ -228,12 +228,10 @@ LCUI_API int LCUIScreen_Init( int w, int h, int mode )
 	/* 获取屏幕信息 */
 	LCUIScreen_GetInfo( &screen_info );
 
-	w = GetSystemMetrics(SM_CXSCREEN);
-	h = GetSystemMetrics(SM_CYSCREEN);
-	pixel_mem_len = w*h*4;
-
-	/* 分配内存，储存像素数据 */ 
-	pixel_mem = (uchar_t*)malloc( pixel_mem_len );
+	framebuffer.color_type = COLOR_TYPE_ARGB;
+	if( Graph_Create(&framebuffer, w, h) != 0 ) {
+		return -2;
+	}
 	/* 获取客户区的DC */
 	hdc_client = GetDC( current_hwnd );
 	/* 为帧缓冲创建一个DC */
@@ -242,7 +240,7 @@ LCUI_API int LCUIScreen_Init( int w, int h, int mode )
 	client_bitmap = CreateCompatibleBitmap( hdc_client, w, h );
 	/* 为帧缓冲的DC选择client_bitmap作为对象 */
 	SelectObject( hdc_framebuffer, client_bitmap );
-	
+
 	root_widget = RootWidget_GetSelf();
 	Widget_Resize( root_widget, screen_info.size );
 	Widget_SetBackgroundColor( root_widget, RGB(255,255,255) );
@@ -257,36 +255,26 @@ LCUI_API int LCUIScreen_Init( int w, int h, int mode )
 	return 0;
 }
 
-LCUI_API void LCUIScreen_FillPixel( LCUI_Pos pos, LCUI_RGB color )
-{
-	return;
-}
-
-LCUI_API int LCUIScreen_GetGraph( LCUI_Graph *out )
-{
-	return -1;
-}
-
 /* 设置视频输出模式 */
-LCUI_API int LCUIScreen_SetMode( int w, int h, int mode )
+static int Win32Screen_SetMode( int w, int h, int mode )
 {
 	LCUI_Pos pos;
 	LCUI_Size real_size;
-	LCUI_Screen screen_info;
+	LCUI_ScreenInfo screen_info;
 	LCUI_Widget *root_widget;
 	
 	LCUIMutex_Lock( &screen_mutex );
 	LCUIScreen_GetInfo( &screen_info );
 	real_size.w = GetSystemMetrics(SM_CXSCREEN);
 	real_size.h = GetSystemMetrics(SM_CYSCREEN);
-	if( mode == LCUI_INIT_MODE_AUTO ) {
+	if( mode == LCUI_MODE_AUTO ) {
 		if( w == 0 && h == 0 ) {
-			mode = LCUI_INIT_MODE_FULLSCREEN;
+			mode = LCUI_MODE_FULLSCREEN;
 		} else {
-			mode = LCUI_INIT_MODE_WINDOW;
+			mode = LCUI_MODE_WINDOWED;
 		}
 	}
-	if( mode == LCUI_INIT_MODE_FULLSCREEN ) {
+	if( mode == LCUI_MODE_FULLSCREEN ) {
 		if( w == 0 ) {
 			w = real_size.w;
 		}
@@ -321,6 +309,10 @@ LCUI_API int LCUIScreen_SetMode( int w, int h, int mode )
 	screen_info.size.w = w;
 	screen_info.size.h = h;
 	screen_info.mode = mode;
+	/* 重新调整帧缓冲大小 */
+	if( Graph_Create(&framebuffer, w, h) != 0 ) {
+		return -2;
+	}
 	LCUIScreen_SetInfo( &screen_info );
 	root_widget = RootWidget_GetSelf();
 	Widget_Resize( root_widget, screen_info.size );
@@ -329,131 +321,80 @@ LCUI_API int LCUIScreen_SetMode( int w, int h, int mode )
 	return 0;
 }
 
-LCUI_API int LCUIScreen_Destroy( void )
+static int Win32Screen_Destroy( void )
 {
 	LCUI_Sys.state = KILLED;
-	DeleteDC( hdc_framebuffer );
-	ReleaseDC( Win32_GetSelfHWND(), hdc_client );
-	free( pixel_mem );
 	LCUIMutex_Destroy( &screen_mutex );
 	return 0;
 }
 
-LCUI_API void LCUIScreen_SyncFrameBuffer( void )
+static int Win32Screen_PutGraph( const LCUI_Graph *graph, LCUI_Pos pos )
 {
-	RECT client_rect;
-	LCUIMutex_Lock( &screen_mutex );
-	SetBitmapBits( client_bitmap, pixel_mem_len, pixel_mem );
-	switch(LCUIScreen_GetMode()) {
-	case LCUI_INIT_MODE_FULLSCREEN:
-		/* 全屏模式下，则使用拉伸模式，将帧拉伸至全屏 */
-		GetClientRect( current_hwnd, &client_rect );
-		StretchBlt( hdc_client, 0, 0, 
-			client_rect.right, client_rect.bottom,
-			hdc_framebuffer, 0, 0, 
-			LCUIScreen_GetWidth(), LCUIScreen_GetHeight(),
-			SRCCOPY );
-		break;
-	case LCUI_INIT_MODE_WINDOW:
-		/* 将帧缓冲内的位图数据更新至客户区内指定区域（area） */
-		BitBlt( hdc_client, 0, 0, 
-			LCUIScreen_GetWidth(), LCUIScreen_GetHeight(),
-			hdc_framebuffer, 0, 0,
-			SRCCOPY );
-		break;
-	}
-	ValidateRect( current_hwnd, NULL );
-	LCUIMutex_Unlock( &screen_mutex );
-}
-
-LCUI_API int LCUIScreen_PutGraph (LCUI_Graph *graph, LCUI_Pos des_pos )
-{
-	int total, y, n, des_row_x, src_row_x, des_x, src_x;
-	LCUI_Graph *src;
-	LCUI_Rect cut, src_rect, area;
-	LCUI_Size screen_size;
-	uchar_t *des_ptr;
-	
-	src = Graph_GetQuote( graph );
-	src_rect = Graph_GetValidRect( graph );
-	screen_size.w = GetSystemMetrics(SM_CXSCREEN);
-	screen_size.h = GetSystemMetrics(SM_CYSCREEN);
-	if(!Graph_IsValid(src)) {
-		return -1;
-	}
-	if(des_pos.x >= screen_size.w || des_pos.y >= screen_size.h) {
-		return -1;
-	}
-	Graph_Lock( src );
-	des_ptr = pixel_mem;
-	area.x = des_pos.x;
-	area.y = des_pos.y;
-	area.w = src_rect.w;
-	area.h = src_rect.h;
-	/* 获取图像的截取区域 */ 
-	LCUIRect_GetCutArea( screen_size, area, &cut );
-	des_pos.x += cut.x;
-	des_pos.y += cut.y;
-	/* 根据二维坐标和图像尺寸，计算源图像的起始读取点的一维坐标 */
-	src_row_x = (cut.y + src_rect.y) * src->w + cut.x + src_rect.x;
-	/* 根据二维坐标和屏幕尺寸，计算帧缓冲的起始写入点的一维坐标 */
-	des_row_x = des_pos.y * screen_size.w + des_pos.x;
-	for(y=0; y<cut.height; ++y) {
-		src_x = src_row_x;
-		des_x = des_row_x;
-		total = src_x + cut.width;
-		for (; src_x < total; ++des_x,++src_x) {
-			n = des_x << 2;
-			des_ptr[n++] = src->rgba[2][src_x];
-			des_ptr[n++] = src->rgba[1][src_x];
-			des_ptr[n++] = src->rgba[0][src_x];
-		}
-		src_row_x += src->w;
-		des_row_x += screen_size.w;
-	}
-	Graph_Unlock( src );
+	Graph_Mix( &framebuffer, graph, pos );
 	return 0;
 }
 
-LCUI_API void LCUIScreen_CatchGraph( LCUI_Rect area, LCUI_Graph *out )
+static int Win32Screen_Sync( void )
 {
+	HDC hdc_client;
+       RECT client_rect;
+
+       hdc_client = GetDC( current_hwnd );
+       LCUIMutex_Lock( &screen_mutex );
+       SetBitmapBits( client_bitmap, framebuffer.mem_size, framebuffer.bytes );
+       switch(LCUIScreen_GetMode()) {
+       case LCUI_MODE_FULLSCREEN:
+               /* 全屏模式下，则使用拉伸模式，将帧拉伸至全屏 */
+               GetClientRect( current_hwnd, &client_rect );
+               StretchBlt( hdc_client, 0, 0,
+                       client_rect.right, client_rect.bottom,
+                       hdc_framebuffer, 0, 0,
+                       LCUIScreen_GetWidth(), LCUIScreen_GetHeight(),
+                       SRCCOPY );
+               break;
+       case LCUI_MODE_WINDOWED:
+               /* 将帧缓冲内的位图数据更新至客户区内指定区域（area） */
+               BitBlt( hdc_client, 0, 0,
+                       LCUIScreen_GetWidth(), LCUIScreen_GetHeight(),
+                       hdc_framebuffer, 0, 0,
+                       SRCCOPY );
+               break;
+       }
+       ValidateRect( current_hwnd, NULL );
+       LCUIMutex_Unlock( &screen_mutex );
+       return 0;
+}
+
+static int Win32Screen_CatchGraph( LCUI_Graph *out, LCUI_Rect area )
+{
+	return -1;
+#ifdef test
 	LCUI_Rect cut_rect;
-	LCUI_Size fb_size;
-	unsigned char *src_pixel;
-	int x, y, n, k, count;
-
-	src_pixel = pixel_mem;
-
 	if( !LCUI_Active() ) {
-		return;
+		return -1;
 	}
-	/* 获取帧缓冲的尺寸 */
-	fb_size.w = GetSystemMetrics(SM_CXSCREEN);
-	fb_size.h = GetSystemMetrics(SM_CYSCREEN);
 	/* 如果需要裁剪图形 */
-	LCUIRect_GetCutArea( fb_size, area, &cut_rect );
+	LCUIRect_GetCutArea( Size(framebuffer.w, framebuffer.h), area, &cut_rect );
 	if( cut_rect.w <= 0 || cut_rect.h <= 0 ) {
-		return;
+		return -2;
 	}
 	area.x += cut_rect.x;
 	area.y += cut_rect.y;
 	area.width = cut_rect.width;
 	area.height = cut_rect.height;
-	Graph_Create (out, area.width, area.height);
-	Graph_Lock (out);
-	/* 只能正常捕获32位显示器中显示的图形，有待完善 */
-	for (n=0,y=0; y < area.height; ++y) {
-		k = (area.y + y) * fb_size.w + area.x;
-		for (x = 0; x < area.width; ++x) {
-			count = k + x;
-			count = count << 2;
-			out->rgba[2][n] = src_pixel[count];
-			out->rgba[1][n] = src_pixel[count + 1];
-			out->rgba[0][n] = src_pixel[count + 2];
-			++n;
-		}
-	}
-	Graph_Unlock (out);
+	Graph_Cut( &framebuffer, cut_rect, out );
+	return 0;
+#endif
+}
+
+void LCUIScreen_UseWin32( LCUI_Screen *screen )
+{
+	screen->Init = Win32Screen_Init;
+	screen->Sync = Win32Screen_Sync;
+	screen->Destroy = Win32Screen_Destroy;
+	screen->SetMode = Win32Screen_SetMode;
+	screen->PutGraph = Win32Screen_PutGraph;
+	screen->CatchGraph = Win32Screen_CatchGraph;
 }
 
 #endif
