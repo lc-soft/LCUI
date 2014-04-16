@@ -1080,7 +1080,7 @@ static void Widget_AttrInit( LCUI_Widget *widget )
 	/* 继承主图层的透明度 */
 	GraphLayer_InerntAlpha( widget->glayer, TRUE );
 	/* 设定图层属性 */
-	widget->glayer->graph.color_type = COLOR_TYPE_RGBA;
+	widget->glayer->graph.color_type = COLOR_TYPE_ARGB;
 	//widget->glayer->graph.is_opaque = FALSE;
 	//widget->glayer->graph.not_visible = TRUE;
 	DirtyRectList_Init( &widget->dirty_rect );
@@ -1316,13 +1316,16 @@ LCUI_API void Widget_SetBackgroundImage( LCUI_Widget *widget,
 					 LCUI_Graph *img )
 {
 	if( Graph_IsValid(img) ) {
-		widget->background.image = *img;
+		if( Graph_IsValid(&widget->background.image) ) {
+			Graph_Free( &widget->background.image );
+		}
+		Graph_Copy( &widget->background.image, img );
 		Widget_InvalidateArea( widget, NULL );
 		return;
 	}
 
 	if( Graph_IsValid(&widget->background.image) ) {
-		Graph_Init( &widget->background.image );
+		Graph_Free( &widget->background.image );
 		Widget_InvalidateArea( widget, NULL );
 	}
 }
@@ -1338,7 +1341,7 @@ LCUI_API void Widget_SetBackgroundLayout( LCUI_Widget *widget,
 }
 
 /** 设定部件的背景颜色 */
-LCUI_API void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color )
+LCUI_API void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_Color color )
 {
 	if( widget->background.color.blue != color.blue
 	 || widget->background.color.green != color.green
