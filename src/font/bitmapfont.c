@@ -210,12 +210,13 @@ LCUI_API int FontBMP_Print( LCUI_FontBMP *fontbmp )
 
 /** 将字体位图绘制到目标图像上 */
 LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
-				LCUI_RGB color, LCUI_BOOL need_replace )
+				LCUI_Color color, LCUI_BOOL need_replace )
 {
+	int k, x, y;
 	LCUI_Graph *des;
 	LCUI_Rect des_rect, cut;
-	int total, m, n, y;
-	int src_start_pos, des_start_pos;
+	LCUI_ARGB *px_des, *px_row_des;
+	uchar_t *bmp_src, *bmp_row_src, *byte_row_des, *byte_des;
 
 	/* 数据有效性检测 */
 	if( !FontBMP_IsValid( bmp )
@@ -235,46 +236,77 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
 			Rect( pos.x, pos.y, bmp->width, bmp->rows ), &cut );
 	pos.x += cut.x;
 	pos.y += cut.y;
-
-	/* 如果是以叠加模式绘制字体位图 */
-	if( !need_replace ) {
-		/* 预先计算起点位置 */
-		src_start_pos = cut.y * bmp->width + cut.x;
-		des_start_pos = (pos.y + des_rect.y) * des->w + pos.x + des_rect.x;
-		for (y = 0; y < cut.height; ++y) {
-			m = src_start_pos;
-			n = des_start_pos;
-			total = n + cut.width;
-			for (; n < total; ++n,++m) {
-				/* 获取通过ALPHA混合后的像素点的数据 */
-				ALPHA_BLEND( color.red, des->rgba[0][n], bmp->buffer[m] );
-				ALPHA_BLEND( color.green, des->rgba[1][n], bmp->buffer[m] );
-				ALPHA_BLEND( color.blue, des->rgba[2][n], bmp->buffer[m] );
+	
+	if( graph->color_type == COLOR_TYPE_ARGB ) {
+		bmp_row_src = bmp->buffer + cut.y*bmp->width + cut.x;
+		k = (pos.y + des_rect.y) * des->w + pos.x + des_rect.x;
+		px_row_des = des->argb + k;
+		if( need_replace ) {
+			for( y=0; y<cut.h; ++y ) {
+				bmp_src = bmp_row_src;
+				px_des = px_row_des;
+				for( x=0; x<cut.w; ++x ) {
+					if( *bmp_src ) {
+						px_des->r = color.r;
+						px_des->g = color.g;
+						px_des->b = color.b;
+						px_des->a = *bmp_src;
+					}
+					++bmp_src;
+					++px_des;
+				}
+				px_row_des += des->w;
+				bmp_row_src += bmp->width;
 			}
-			/* 切换至下一行像素点 */
-			des_start_pos += des->w;
-			src_start_pos += bmp->width;
+			return 0;
+		}
+		
+		for( y=0; y<cut.h; ++y ) {
+			bmp_src = bmp_row_src;
+			px_des = px_row_des;
+			for( x=0; x<cut.w; ++x ) {
+				ALPHA_BLEND( px_des->r, color.r, *bmp_src );
+				ALPHA_BLEND( px_des->g, color.g, *bmp_src );
+				ALPHA_BLEND( px_des->b, color.b, *bmp_src );
+				++bmp_src;
+				++px_des;
+			}
+			px_row_des += des->w;
+			bmp_row_src += bmp->width;
 		}
 		return 0;
 	}
-	/* 否则是以覆盖模式 */
-	src_start_pos = cut.y * bmp->width + cut.x;
-	des_start_pos = (pos.y + des_rect.y) * des->w + pos.x + des_rect.x;
-	for (y = 0; y < cut.height; ++y) {
-		m = src_start_pos;
-		n = des_start_pos;
-		total = n + cut.width;
-		for (; n < total; ++n,++m) {
-			des->rgba[0][n] = color.red;
-			des->rgba[1][n] = color.green;
-			des->rgba[2][n] = color.blue;
-			/* 仅在有透明度时才覆盖 */
-			if( bmp->buffer[m] > 0 ) {
-				des->rgba[3][n] = bmp->buffer[m];
+	
+	bmp_row_src = bmp->buffer + cut.y*bmp->width + cut.x;
+	k = (pos.y + des_rect.y) * des->w + pos.x + des_rect.x;
+	byte_row_des = des->bytes + k*3;
+	if( !need_replace ) {
+		for( y=0; y<cut.h; ++y ) { 
+			bmp_src = bmp_row_src;
+			byte_des = byte_row_des;
+			for( x=0; x<cut.w; ++x ) {
+				ALPHA_BLEND( *byte_des++, color.b, *bmp_src );
+				ALPHA_BLEND( *byte_des++, color.g, *bmp_src );
+				ALPHA_BLEND( *byte_des++, color.r, *bmp_src );
+				++bmp_src;
 			}
+			byte_row_des += des->w*3;
+			bmp_row_src += bmp->width;
 		}
-		des_start_pos += des->w;
-		src_start_pos += bmp->width;
+		return 0;
+	}
+
+	for( y=0; y<cut.h; ++y ) { 
+		bmp_src = bmp_row_src;
+		byte_des = byte_row_des;
+		for( x=0; x<cut.w; ++x ) {
+			*byte_des++ = _ALPHA_BLEND( 255, color.b, *bmp_src );
+			*byte_des++ = _ALPHA_BLEND( 255, color.g, *bmp_src );
+			*byte_des++ = _ALPHA_BLEND( 255, color.r, *bmp_src );
+			++bmp_src;
+		}
+		byte_row_des += des->w*3;
+		bmp_row_src += bmp->width;
 	}
 	return 0;
 }
@@ -283,9 +315,7 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 
 /** 转换FT_GlyphSlot类型数据为LCUI_FontBMP */
-static int Convert_FTGlyph(	LCUI_FontBMP *des,
-				FT_GlyphSlot slot,
-				int render_mode )
+static int Convert_FTGlyph( LCUI_FontBMP *bmp, FT_GlyphSlot slot, int mode )
 {
 	int error;
 	size_t size;
@@ -308,7 +338,7 @@ static int Convert_FTGlyph(	LCUI_FontBMP *des,
 	slot->metrics.vertBearingY>>6, slot->metrics.vertAdvance>>6 );
 	------------------------------------------------------------*/
 	if ( glyph->format != FT_GLYPH_FORMAT_BITMAP ) {
-		error = FT_Glyph_To_Bitmap(&glyph, render_mode, 0 ,1);
+		error = FT_Glyph_To_Bitmap(&glyph, mode, 0 ,1);
 		if(error) {
 			return -1;
 		}
@@ -321,16 +351,16 @@ static int Convert_FTGlyph(	LCUI_FontBMP *des,
 	 * vertBearingX，vertBearingY和vertAdvance的值是不可靠的，目前暂不考虑
 	 * 此情况的处理。
 	 * */
-	des->top = bitmap_glyph->top;
-	des->left = slot->metrics.horiBearingX>>6;
-	des->rows = bitmap_glyph->bitmap.rows;
-	des->width = bitmap_glyph->bitmap.width;
-	des->advance.x = slot->metrics.horiAdvance>>6;	/* 水平跨距 */
-	des->advance.y = slot->metrics.vertAdvance>>6;	/* 垂直跨距 */
+	bmp->top = bitmap_glyph->top;
+	bmp->left = slot->metrics.horiBearingX>>6;
+	bmp->rows = bitmap_glyph->bitmap.rows;
+	bmp->width = bitmap_glyph->bitmap.width;
+	bmp->advance.x = slot->metrics.horiAdvance>>6;	/* 水平跨距 */
+	bmp->advance.y = slot->metrics.vertAdvance>>6;	/* 垂直跨距 */
 	/* 分配内存，用于保存字体位图 */
-	size = des->rows * des->width * sizeof(uchar_t);
-	des->buffer = (uchar_t*)malloc( size );
-	if( !des->buffer ) {
+	size = bmp->rows * bmp->width * sizeof(uchar_t);
+	bmp->buffer = (uchar_t*)malloc( size );
+	if( !bmp->buffer ) {
 		FT_Done_Glyph(glyph);
 		return -1;
 	}
@@ -338,7 +368,7 @@ static int Convert_FTGlyph(	LCUI_FontBMP *des,
 	switch( bitmap_glyph->bitmap.pixel_mode ) {
 	    /* 8位灰度位图，直接拷贝 */
 	    case FT_PIXEL_MODE_GRAY:
-		memcpy( des->buffer, bitmap_glyph->bitmap.buffer, size );
+		memcpy( bmp->buffer, bitmap_glyph->bitmap.buffer, size );
 		break;
 	    /* 单色点阵图，需要转换 */
 	    case FT_PIXEL_MODE_MONO: {
@@ -352,9 +382,9 @@ static int Convert_FTGlyph(	LCUI_FontBMP *des,
 		/* 转换位图bitmap_glyph->bitmap至bitmap，1个像素占1个字节 */
 		FT_Bitmap_Convert( lib, &bitmap_glyph->bitmap, &bitmap, 1);
 		s = bitmap.buffer;
-		t = des->buffer;
-		for( y=0; y<des->rows; ++y ) {
-			for( x=0; x<des->width; ++x ) {
+		t = bmp->buffer;
+		for( y=0; y<bmp->rows; ++y ) {
+			for( x=0; x<bmp->width; ++x ) {
 				*t = *s?255:0;
 				++t,++s;
 			}
@@ -364,7 +394,7 @@ static int Convert_FTGlyph(	LCUI_FontBMP *des,
 	    }
 	    /* 其它像素模式的位图，暂时先直接填充255，等需要时再完善 */
 	    default:
-		memset( des->buffer, 255, size );
+		memset( bmp->buffer, 255, size );
 		break;
 	}
 	FT_Done_Glyph(glyph);
