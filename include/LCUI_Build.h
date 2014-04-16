@@ -59,17 +59,12 @@
 #  endif
 #endif /* compiler */
 
-/* 自动模式，LCUI初始化时会自动选择一个模式 */
-#define LCUI_INIT_MODE_AUTO		0
-
-/* 全屏模式，使用整个屏幕进行图形显示 */
-#define LCUI_INIT_MODE_FULLSCREEN	1
-
-/* 窗口模式，LCUI的图形将输出至系统创建的窗口内 */
-#define LCUI_INIT_MODE_WINDOW		2
-
-/* LCUI模式，结合操作系统现有GUI系统，实现图形界面 */
-#define LCUI_INIT_MODE_LCUI		3
+enum LCUIMode {
+	LCUI_MODE_AUTO,		/**< 自动模式，LCUI初始化时会自动选择一个模式 */
+	LCUI_MODE_WINDOWED,	/**< 全屏模式，使用整个屏幕进行图形显示 */
+	LCUI_MODE_FULLSCREEN,	/**< 窗口模式，LCUI的图形将输出至系统创建的窗口内 */
+	LCUI_MODE_GUI		/**< GUI模式，结合操作系统现有GUI系统，实现图形界面 */
+};
 
 #define LC_STYLE_LIBRARY_H	<LCUI/LCUI_StyleLibrary.h>
 #define LC_INPUT_METHOD_H	<LCUI/LCUI_InputMethod.h>
@@ -110,7 +105,6 @@
 #define LC_INPUT_H	<LCUI/LCUI_Input.h>
 #define LC_ERROR_H	<LCUI/LCUI_Error.h>
 #define LC_THREAD_H	<LCUI/LCUI_Thread.h>
-#define LC_RES_H	<LCUI/LCUI_Resources.h>
 
 #define LC_GRAPHLAYER_H		<LCUI/LCUI_GraphLayer.h>
 
