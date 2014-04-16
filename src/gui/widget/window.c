@@ -165,6 +165,7 @@ static void Window_OnInit( LCUI_Widget *window )
 	Widget_SetPadding( wnd->client_area, Padding(1,1,1,1) );
 	Widget_SetSize( wnd->titlebar, "100%", "35px" );
 	
+	Border_Init( &border );
 	border.top_width = 0;
 	border.bottom_width = 1;
 	border.left_width = 1;
@@ -308,7 +309,7 @@ static void CloseButton_OnUpdate( LCUI_Widget *widget )
 	} else {
 		color = RGB(255,0,0);
 	}
-
+	
 	switch(widget->state) {
 	case WIDGET_STATE_NORMAL:
 		Graph_FillColor( &img, RGB(150,150,150) );
