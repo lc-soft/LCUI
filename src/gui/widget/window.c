@@ -48,7 +48,6 @@
 #include LC_PICBOX_H
 #include LC_WINDOW_H 
 #include LC_GRAPH_H
-#include LC_RES_H
 #include LC_INPUT_H
 #include LC_FONT_H
 #include LC_ERROR_H
@@ -65,7 +64,7 @@ typedef struct LCUI_WindowRec_ {
 	LCUI_Widget *btn_close;		/**< close按钮 */
 	LCUI_Widget *icon;		/**< 图标 */
 	LCUI_Widget *text;		/**< 标题文本 */
-	LCUI_RGB theme_color;	/**< 顶部线条颜色 */
+	LCUI_Color theme_color;	/**< 顶部线条颜色 */
 } LCUI_Window;
 
 static unsigned char close_btn_alpha[]={
@@ -83,10 +82,10 @@ static unsigned char close_btn_alpha[]={
 
 static void LoadCloseButtonIMG( LCUI_Graph *graph )
 {
-	graph->color_type = COLOR_TYPE_RGBA;
+	graph->color_type = COLOR_TYPE_ARGB;
 	Graph_Create( graph, 10, 10 );
 	Graph_FillColor( graph, RGB(255,255,255) );
-	memcpy( graph->rgba[3], close_btn_alpha, sizeof(close_btn_alpha) );
+	Graph_SetAlphaBits( graph, close_btn_alpha, 10*10 );
 }
 
 /** 在窗口失去焦点时会调用此函数 */
@@ -272,7 +271,7 @@ LCUI_API void Window_SetIcon( LCUI_Widget *window, LCUI_Graph *icon )
 }
 
 /** 设置窗口主题色 */
-LCUI_API void Window_SetThemeColor( LCUI_Widget *window, LCUI_RGB color )
+LCUI_API void Window_SetThemeColor( LCUI_Widget *window, LCUI_Color color )
 {
 	LCUI_Window *wnd;
 	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
@@ -290,7 +289,7 @@ static void CloseButton_OnInit( LCUI_Widget *widget )
 static void CloseButton_OnUpdate( LCUI_Widget *widget )
 {
 	LCUI_Graph img;
-	LCUI_RGB color;
+	LCUI_Color color;
 	LCUI_Widget *wnd;
 
 	Graph_Init( &img );
@@ -310,9 +309,6 @@ static void CloseButton_OnUpdate( LCUI_Widget *widget )
 		color = RGB(255,0,0);
 	}
 
-	if( Graph_IsValid( &widget->background.image ) ) {
-		Graph_Free( &widget->background.image );
-	}
 	switch(widget->state) {
 	case WIDGET_STATE_NORMAL:
 		Graph_FillColor( &img, RGB(150,150,150) );
@@ -339,6 +335,7 @@ static void CloseButton_OnUpdate( LCUI_Widget *widget )
 	case WIDGET_STATE_DISABLE:
 	default:break;
 	}
+	Graph_Free( &img );
 }
 
 void RegisterWindow(void)
