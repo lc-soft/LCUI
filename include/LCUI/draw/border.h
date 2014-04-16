@@ -67,10 +67,10 @@ typedef struct _LCUI_Border
 	BORDER_STYLE bottom_style;
 	BORDER_STYLE left_style;
 	BORDER_STYLE right_style;
-	LCUI_RGB top_color;
-	LCUI_RGB bottom_color;
-	LCUI_RGB left_color;
-	LCUI_RGB right_color;
+	LCUI_Color top_color;
+	LCUI_Color bottom_color;
+	LCUI_Color left_color;
+	LCUI_Color right_color;
 	unsigned int top_left_radius;
 	unsigned int top_right_radius;
 	unsigned int bottom_left_radius;
@@ -81,7 +81,7 @@ LCUI_Border;
 LCUI_API void Border_Init( LCUI_Border *border );
 /* 初始化边框数据 */
 
-LCUI_API LCUI_Border Border( unsigned int width_px, BORDER_STYLE style, LCUI_RGB color );
+LCUI_API LCUI_Border Border( unsigned int width_px, BORDER_STYLE style, LCUI_Color color );
 /* 简单的设置边框样式，并获取该样式数据 */
 
 LCUI_API void Border_Radius( LCUI_Border *border, unsigned int radius );

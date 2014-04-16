@@ -333,7 +333,7 @@ LCUI_API void Widget_SetBackgroundLayout( LCUI_Widget *widget,
 					  LayoutType layout );
 
 /** 设定部件的背景颜色 */
-LCUI_API void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_RGB color );
+LCUI_API void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_Color color );
 
 /** 设定部件背景色是否透明 */
 LCUI_API void Widget_SetBackgroundTransparent(	LCUI_Widget *widget, 
@@ -530,8 +530,5 @@ LCUI_API void Widget_SetAlpha( LCUI_Widget *widget, uchar_t alpha );
 /************************* Widget End *********************************/
 
 LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr );
-
-/** 更新各个部件的无效区域中的内容 */
-LCUI_API int LCUIWidget_ProcInvalidArea(void);
 
 #endif

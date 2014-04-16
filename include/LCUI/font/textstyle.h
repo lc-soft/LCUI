@@ -77,8 +77,8 @@ typedef struct LCUI_TextStyle_ {
 	enum font_weight weight:3;
 	enum font_decoration decoration:4;
 	
-	LCUI_RGB fore_color;
-	LCUI_RGB back_color;
+	LCUI_Color fore_color;
+	LCUI_Color back_color;
 	
 	int pixel_size;	
 } LCUI_TextStyle;
@@ -95,7 +95,7 @@ typedef enum {
 typedef struct LCUI_StyleTagData_ {
 	LCUI_StyleTagID tag_id;
 	union {
-		LCUI_RGB color;
+		LCUI_Color color;
 		PixelOrPoint_t size;
 	} style;
 } LCUI_StyleTagData;
@@ -115,10 +115,10 @@ LCUI_API void TextStyle_FontFamilyID( LCUI_TextStyle *style, int id );
 LCUI_API void TextStyle_FontSize( LCUI_TextStyle *style, int fontsize );
 
 /* 设置字体颜色 */
-LCUI_API void TextStyle_FontColor( LCUI_TextStyle *style, LCUI_RGB color );
+LCUI_API void TextStyle_FontColor( LCUI_TextStyle *style, LCUI_Color color );
 
 /* 设置字体背景颜色 */
-LCUI_API void TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_RGB color );
+LCUI_API void TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_Color color );
 
 /* 设置字体样式 */
 LCUI_API void TextStyle_FontStyle( LCUI_TextStyle *style, enum font_style fontstyle );

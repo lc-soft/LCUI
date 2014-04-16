@@ -145,7 +145,7 @@ static inline int TextLayer_GetRowTextLength( LCUI_TextLayer* layer, int row )
 }
 
 /** 设置文本颜色 */
-static inline void TextLayer_SetFontColor( LCUI_TextLayer* layer, LCUI_RGB color )
+static inline void TextLayer_SetFontColor( LCUI_TextLayer* layer, LCUI_Color color )
 {
 	TextStyle_FontColor( &layer->text_style, color );
 	layer->task.redraw_all = TRUE;

@@ -66,7 +66,7 @@ typedef struct LCUI_FontBMP_ {
 typedef struct LCUI_WChar_ {
 	wchar_t		char_code;	/* 字符码 */
 	LCUI_FontBMP	*bitmap;	/* 字符的位图数据 */
-	LCUI_RGB	color;		/* 该文字的配色 */
+	LCUI_Color	color;		/* 该文字的配色 */
 	LCUI_BOOL	update;		/* 标明这个字符是否需要刷新 */
 	int		color_type;	/* 颜色类型(DEFAULT / CUSTOM) */
 } LCUI_WChar;
@@ -92,7 +92,7 @@ LCUI_API int FontBMP_Print( LCUI_FontBMP *fontbmp );
 
 /** 将字体位图绘制到目标图像上 */
 LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
-				LCUI_RGB color, LCUI_BOOL need_replace );
+				LCUI_Color color, LCUI_BOOL need_replace );
 
 /** 载入字体位图 */
 LCUI_API int FontBMP_Load( LCUI_FontBMP *buff, int font_id, 
