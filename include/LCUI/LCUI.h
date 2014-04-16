@@ -80,7 +80,21 @@ typedef void (*CallBackFunc)(void*,void*);
 typedef struct LCUI_Widget_ LCUI_Widget;
 
 /*--------- 色彩值 ----------*/
-typedef union LCUI_ARGB_ {
+typedef union LCUI_RGB565_ {
+	short unsigned int value;
+	struct {
+		uchar_t b:5;
+		uchar_t g:6;
+		uchar_t r:5;
+	};
+	struct {
+		uchar_t blue:5;
+		uchar_t green:6;
+		uchar_t red:5;
+	};
+} LCUI_RGB565;
+
+typedef union LCUI_ARGB8888_ {
 	int32_t value;
 	struct {
 		uchar_t b;
@@ -94,7 +108,7 @@ typedef union LCUI_ARGB_ {
 		uchar_t red;
 		uchar_t alpha;
 	};
-} LCUI_ARGB, LCUI_Color;
+} LCUI_ARGB, LCUI_ARGB8888, LCUI_Color;
 /*----------- END -----------*/
 
 /*------- 二维坐标 --------*/
@@ -142,27 +156,23 @@ LCUI_END_HEADER
 
 LCUI_BEGIN_HEADER
 
-enum GraphColorTyle {
-	COLOR_TYPE_RGB,
-	COLOR_TYPE_ARGB
-};
-
 /*---------------------------- 图形数据 -------------------------------*/
 typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
 	int x, y;			/**< 源图形中的引用区域所在的坐标 */
 	int w, h;			/**< 图形的尺寸 */
-	
 	int color_type;			/**< 色彩类型 */
+	uchar_t *palette;		/**< 调色板 */
+	uchar_t	alpha;			/**< 全局透明度 */
 	LCUI_BOOL quote;		/**< 标志，指示是否引用了另一图形 */
 	LCUI_Graph *src;		/**< 所引用的源图形 */
-	uchar_t	alpha;			/**< 全局透明度 */
 	/** 像素数据缓存区 */
 	union {
-		uchar_t *bytes;		
+		uchar_t *bytes;	
 		LCUI_ARGB *argb;
 	};
-	size_t mem_size;	/**< 像素数据缓冲区大小 */
+	size_t mem_size;		/**< 像素数据缓冲区大小 */
+
 };
 /*------------------------------ END ---------------------------------*/
 
