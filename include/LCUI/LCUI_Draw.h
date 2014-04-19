@@ -53,6 +53,7 @@ LCUI_BEGIN_HEADER
 
 #include LC_DRAW_BORDER_H
 #include LC_DRAW_LINE_H
+#include LC_DRAW_BOXSHADOW_H
 
 LCUI_API int
 Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des);

@@ -110,6 +110,7 @@ enum LCUIMode {
 
 #define LC_DRAW_BORDER_H	<LCUI/draw/border.h>
 #define LC_DRAW_LINE_H		<LCUI/draw/line.h>
+#define LC_DRAW_BOXSHADOW_H	<LCUI/draw/boxshadow.h>
 
 #define LC_CHARSET_H	<LCUI/font/charset.h>
 #define LC_FONTBMP_H	<LCUI/font/bitmapfont.h>
