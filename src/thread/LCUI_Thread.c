@@ -39,13 +39,23 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
+/**
+ * 本模块主要用于记录LCUI应用程序所创建的线程，在LCUI退出前，会撤销掉所有线程，
+ * 避免LCUI的资源在释放时还有其它线程在使用。
+ * 在LCUI的进程版中，Server进程可能需要为每个LCUI应用程序进程（Client进程）准备
+ * 一个线程。
+ * 以后可能会为LCUI添加线程版，据说MiniGUI的线程版可以让各个MiniGUI程序运行在线
+ * 程上。
+ * 本模块目前暂时保留。
+ */
+
 #include <LCUI_Build.h>
 #include LC_LCUI_H 
 
 typedef struct _Thread_TreeNode Thread_TreeNode;
 struct _Thread_TreeNode {
 	Thread_TreeNode *parent;	/* 父线程结点指针 */
-	LCUI_Thread tid;		/* 父线程ID */
+	LCUI_Thread tid;		/* 线程ID */
 	LCUI_Queue child;		/* 子线程列表 */
 };
 
