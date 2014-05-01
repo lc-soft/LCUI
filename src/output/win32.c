@@ -330,6 +330,12 @@ static int Win32Screen_Destroy( void )
 
 static int Win32Screen_PutGraph( const LCUI_Graph *graph, LCUI_Pos pos )
 {
+	Graph_Replace( &framebuffer, graph, pos );
+	return 0;
+}
+
+static int Win32Screen_MixGraph( const LCUI_Graph *graph, LCUI_Pos pos )
+{
 	Graph_Mix( &framebuffer, graph, pos );
 	return 0;
 }
@@ -394,6 +400,7 @@ void LCUIScreen_UseWin32( LCUI_Screen *screen )
 	screen->Destroy = Win32Screen_Destroy;
 	screen->SetMode = Win32Screen_SetMode;
 	screen->PutGraph = Win32Screen_PutGraph;
+	screen->MixGraph = Win32Screen_MixGraph;
 	screen->CatchGraph = Win32Screen_CatchGraph;
 }
 
