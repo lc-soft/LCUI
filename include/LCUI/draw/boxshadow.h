@@ -56,6 +56,7 @@ static inline LCUI_BoxShadow BoxShadow( int x, int y, int size, LCUI_Color color
 	LCUI_BoxShadow shadow;
 	shadow.offset_x = x;
 	shadow.offset_y = y;
+	shadow.size = size;
 	shadow.left_color = color;
 	shadow.right_color = color;
 	shadow.top_color = color;
@@ -63,14 +64,29 @@ static inline LCUI_BoxShadow BoxShadow( int x, int y, int size, LCUI_Color color
 	return shadow;
 }
 
+static inline int BoxShadow_GetBoxWidth( LCUI_BoxShadow *shadow, int w )
+{
+	if( shadow->offset_x > 0 ) {
+		return w - shadow->size*2 - shadow->offset_x;
+	}
+	return w - shadow->size*2 + shadow->offset_x;
+}
+
+static inline int BoxShadow_GetBoxHeight( LCUI_BoxShadow *shadow, int h )
+{
+	if( shadow->offset_y > 0 ) {
+		return h - shadow->size*2 - shadow->offset_y;
+	}
+	return h - shadow->size*2 + shadow->offset_y;
+}
+
 /** 计算Box在添加阴影后的宽度 */
 static inline int BoxShadow_GetWidth( LCUI_BoxShadow *shadow, int box_w )
 {
 	if( shadow->offset_x > 0 ) {
 		return box_w + shadow->size*2 + shadow->offset_x;
-	} else {
-		return box_w + shadow->size*2 - shadow->offset_x;
 	}
+	return box_w + shadow->size*2 - shadow->offset_x;
 }
 
 /** 计算Box在添加阴影后的高度 */
@@ -78,9 +94,8 @@ static inline int BoxShadow_GetHeight( LCUI_BoxShadow *shadow, int box_h )
 {
 	if( shadow->offset_y > 0 ) {
 		return box_h + shadow->size*2 + shadow->offset_y;
-	} else {
-		return box_h + shadow->size*2 - shadow->offset_y;
 	}
+	return box_h + shadow->size*2 - shadow->offset_y;
 }
 
 static inline int BoxShadow_GetBoxX( LCUI_BoxShadow *shadow )
@@ -119,6 +134,10 @@ static inline int BoxShadow_GetX( LCUI_BoxShadow *shadow )
 	}
 }
 
+LCUI_API void BoxShadow_Init( LCUI_BoxShadow *shadow );
+
 int Graph_DrawBoxShadowEx( LCUI_Graph *graph, LCUI_Rect area, LCUI_BoxShadow shadow );
+
+int Graph_DrawBoxShadow( LCUI_Graph *graph, LCUI_BoxShadow shadow );
 
 #endif
