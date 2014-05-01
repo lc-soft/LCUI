@@ -110,8 +110,8 @@ _Widget_GetContainerWidth(LCUI_Widget *widget)
 		width = _Widget_GetContainerWidth( widget );
 		width *= widget->w.scale;
 	}
-	width -= widget->glayer->padding.left;
-	width -= widget->glayer->padding.right;
+	width -= widget->padding.left;
+	width -= widget->padding.right;
 	return width;
 }
 
@@ -130,8 +130,8 @@ _Widget_GetContainerHeight(LCUI_Widget *widget)
 		height = _Widget_GetContainerHeight( widget );
 		height *= widget->h.scale;
 	}
-	height -= widget->glayer->padding.top;
-	height -= widget->glayer->padding.bottom;
+	height -= widget->padding.top;
+	height -= widget->padding.bottom;
 	return height;
 }
 
@@ -144,7 +144,7 @@ Widget_GetContainerWidth( LCUI_Widget *widget )
 		return LCUIScreen_GetWidth();
 	}
 	width = _Widget_GetWidth( widget );
-	width -= (widget->glayer->padding.left + widget->glayer->padding.right);
+	width -= (widget->padding.left + widget->padding.right);
 	return width;
 }
 
@@ -157,7 +157,7 @@ Widget_GetContainerHeight( LCUI_Widget *widget )
 		return LCUIScreen_GetHeight();
 	}
 	height = _Widget_GetHeight( widget );
-	height -= (widget->glayer->padding.top + widget->glayer->padding.bottom);
+	height -= (widget->padding.top + widget->padding.bottom);
 	return height;
 }
 
@@ -463,8 +463,8 @@ Widget_ToRelPos(LCUI_Widget *widget, LCUI_Pos global_pos)
 	}
 	//widget = widget->parent;
 	while( widget ) {
-		global_pos.x -= widget->glayer->padding.left;
-		global_pos.y -= widget->glayer->padding.top;
+		global_pos.x -= widget->padding.left;
+		global_pos.y -= widget->padding.top;
 		global_pos.x -= widget->pos.x;
 		global_pos.y -= widget->pos.y;
 		widget = widget->parent;
@@ -636,16 +636,14 @@ Widget_GetMinSize(LCUI_Widget *widget)
 	return widget->min_size;
 }
 
-LCUI_API LCUI_Size
-Widget_GetSize(LCUI_Widget *widget)
-/* 功能：获取部件的尺寸 */
+/** 获取部件的尺寸 */
+LCUI_API LCUI_Size Widget_GetSize(LCUI_Widget *widget)
 {
 	return widget->size;
 }
 
-LCUI_API LCUI_Size
-_Widget_GetSize(LCUI_Widget *widget)
-/* 功能：通过计算获取部件的尺寸 */
+/** 通过计算获取部件的尺寸 */
+LCUI_API LCUI_Size _Widget_GetSize(LCUI_Widget *widget)
 {
 	LCUI_Size size;
 	size.w = _Widget_GetWidth( widget );
@@ -653,9 +651,8 @@ _Widget_GetSize(LCUI_Widget *widget)
 	return size;
 }
 
-LCUI_API LCUI_Rect
-Widget_GetRect(LCUI_Widget *widget)
-/* 功能：获取部件的区域 */
+/** 获取部件的区域 */
+LCUI_API LCUI_Rect Widget_GetRect(LCUI_Widget *widget)
 {
 	return Rect(widget->pos.x, widget->pos.y,
 			widget->size.w, widget->size.h);
@@ -877,8 +874,8 @@ static LCUI_Widget* __Widget_At( LCUI_Widget *ctnr, LCUI_Pos pos )
 	}
 	widget_list = &ctnr->child;
 	/* 减去内边距 */
-	pos.x -= ctnr->glayer->padding.left;
-	pos.y -= ctnr->glayer->padding.top;
+	pos.x -= ctnr->padding.left;
+	pos.y -= ctnr->padding.top;
 
 	widget = ctnr;
 	total = Queue_GetTotal( widget_list );
@@ -1029,6 +1026,7 @@ static void Widget_AttrInit( LCUI_Widget *widget )
 	widget->focus_widget		= NULL;
 	widget->pos			= Pos(0, 0);
 	widget->size			= Size(0, 0);
+	widget->outer_size		= widget->size;
 	widget->min_size		= Size(0, 0);
 	widget->max_size		= Size(INT_MAX, INT_MAX);
 	widget->align			= ALIGN_NONE;
@@ -1074,6 +1072,8 @@ static void Widget_AttrInit( LCUI_Widget *widget )
 
 	/* 初始化边框数据 */
 	Border_Init( &widget->border );
+	BoxShadow_Init( &widget->shadow );
+	Padding_Init( &widget->padding );
 	Widget_BackgroundInit( widget );
 	/* 为部件创建一个图层 */
 	widget->glayer = GraphLayer_New();
@@ -1150,8 +1150,8 @@ static LCUI_Pos Widget_CountPos( LCUI_Widget *widget )
 		return widget->pos;
 	}
 	pos = Widget_CountPos(widget->parent);
-	pos.x += widget->parent->glayer->padding.left;
-	pos.y += widget->parent->glayer->padding.top;
+	pos.x += widget->parent->padding.left;
+	pos.y += widget->parent->padding.top;
 	pos = Pos_Add(pos, widget->pos);
 	return pos;
 }
@@ -1361,6 +1361,15 @@ LCUI_API void Widget_SetBackgroundTransparent(	LCUI_Widget *widget,
 	}
 }
 
+/** 设置阴影参数 */
+LCUI_API void Widget_SetShadow( LCUI_Widget *widget, LCUI_BoxShadow shadow )
+{
+	widget->shadow = shadow;
+	Widget_UpdateSize( widget );
+	Widget_UpdatePos( widget );
+	Widget_SetPadding( widget, widget->padding );
+}
+
 /** 启用部件 */
 LCUI_API void Widget_Enable( LCUI_Widget *widget )
 {
@@ -1399,6 +1408,14 @@ Widget_SetPos(LCUI_Widget *widget, LCUI_Pos pos)
 /** 设置部件的内边距 */
 LCUI_API void Widget_SetPadding( LCUI_Widget *widget, LCUI_Padding padding )
 {
+	int x, y;
+	widget->padding = padding;
+	x = BoxShadow_GetBoxX( &widget->shadow );
+	y = BoxShadow_GetBoxY( &widget->shadow );
+	padding.left += x;
+	padding.top += y;
+	padding.right += widget->outer_size.w - x - widget->size.w;
+	padding.bottom += widget->outer_size.h - y - widget->size.h;
 	GraphLayer_SetPadding( widget->glayer, padding );
 	/* 更新子部件的位置 */
 	Widget_UpdateChildPos( widget );
@@ -1482,19 +1499,18 @@ LCUI_API void Widget_ExecMove( LCUI_Widget *widget, LCUI_Pos pos )
 	if(pos.y < min_pos.y) {
 		pos.y = min_pos.y;
 	}
-	if( pos.x == widget->pos.x
-	 && pos.y == widget->pos.y ) {
-		return;
-	}
 	/* 如果图层是显示的，并且位置变动，那就需要添加无效区域 */
 	if( widget->visible ) {
-		Widget_PushAreaToScreen( widget, NULL );
+		Widget_Refresh( widget );
 		widget->pos = pos;
-		Widget_PushAreaToScreen( widget, NULL );
+		Widget_Refresh( widget );
 	} else {
 		/* 否则，直接改坐标 */
 		widget->pos = pos;
 	}
+	/* 根据阴影占用的空间计算位置 */
+	pos.x -= BoxShadow_GetBoxX( &widget->shadow );
+	pos.y -= BoxShadow_GetBoxY( &widget->shadow );
 	GraphLayer_SetPos( widget->glayer, pos.x, pos.y );
 }
 
@@ -1508,7 +1524,7 @@ LCUI_API void Widget_ExecHide( LCUI_Widget *widget )
 	/* 获取隐藏部件需要调用的函数指针，并调用之 */
 	WidgetFunc_Call( widget, FUNC_TYPE_HIDE );
 	Widget_Visible( widget, FALSE );
-	Widget_PushAreaToScreen( widget, NULL );
+	Widget_Refresh( widget );
 }
 
 /** 为部件的子部件进行排序 */
@@ -1693,35 +1709,37 @@ LCUI_API void Widget_AutoResize(LCUI_Widget *widget)
 }
 
 /** 执行改变部件尺寸的操作 */
-LCUI_API int Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
+LCUI_API int Widget_ExecResize( LCUI_Widget *widget, LCUI_Size size )
 {
+	int outer_w, outer_h;
 	LCUI_WidgetEvent event;
 
-	if( !widget ) {
-		return -1;
-	}
-
-	if( widget->size.w == size.w
-	 && widget->size.h == size.h ) {
+	outer_w = BoxShadow_GetWidth( &widget->shadow, size.w );
+	outer_h = BoxShadow_GetHeight( &widget->shadow, size.h );
+	if( outer_w == widget->outer_size.w
+	 && outer_h == widget->outer_size.h
+	 && widget->size.w == size.w && widget->size.h == size.h) {
 		return 1;
 	}
-
-	/* 记录事件数据 */
-	event.type = EVENT_RESIZE;
-	event.resize.new_size = size;
-	event.resize.old_size = widget->size;
-
+	
 	if( widget->visible ) {
-		Widget_PushAreaToScreen( widget, NULL );
+		Widget_Refresh( widget );
 		widget->size = size;
-		Widget_InvalidateArea( widget, NULL );
+		widget->outer_size.w = outer_w;
+		widget->outer_size.h = outer_h;
+		Widget_Refresh( widget );
 	} else {
 		widget->size = size;
+		widget->outer_size.w = outer_w;
+		widget->outer_size.h = outer_h;
 	}
+	/* 重绘整个部件位图 */
+	Widget_InvalidateArea( widget, NULL );
 	//_DEBUG_MSG("size: %d, %d\n", size.w, size.h);
-	GraphLayer_Resize( widget->glayer, size.w, size.h );
+	GraphLayer_Resize( widget->glayer, outer_w, outer_h );
 	WidgetFunc_Call( widget, FUNC_TYPE_RESIZE );
-	//Widget_Refresh( widget );
+	
+	Graph_DrawBoxShadow( &widget->glayer->graph, widget->shadow );
 
 	/* 更新子部件的位置及尺寸 */
 	Widget_UpdateChildSize( widget );
@@ -1731,6 +1749,10 @@ LCUI_API int Widget_ExecResize(LCUI_Widget *widget, LCUI_Size size)
 		/* 如果需要让它的容器能够自动调整大小 */
 		Widget_AutoResize( widget->parent );
 	}
+
+	event.type = EVENT_RESIZE;
+	event.resize.new_size = size;
+	event.resize.old_size = widget->size;
 	Widget_DispatchEvent( widget, &event ); /* 处理部件的RESIZE事件 */
 	return 0;
 }
@@ -1742,12 +1764,6 @@ LCUI_API void Widget_SetAutoSize(	LCUI_Widget *widget,
 {
 	widget->autosize = flag;
 	widget->autosize_mode = mode;
-}
-
-/** 执行刷新显示指定部件的整个区域图形的任务 */
-LCUI_API void Widget_ExecRefresh( LCUI_Widget *widget )
-{
-	Widget_InvalidateArea( widget, NULL );
 }
 
 /** 执行部件的更新操作 */
@@ -1825,7 +1841,6 @@ LCUI_API void Widget_ExecUpdatePos( LCUI_Widget *widget )
 LCUI_API void Widget_UpdateSize( LCUI_Widget *widget )
 {
 	LCUI_Size size;
-
 	size = _Widget_GetSize(widget);
 	Widget_Resize( widget, size );
 }
@@ -2021,7 +2036,12 @@ Widget_MoveToPos(LCUI_Widget *widget, LCUI_Pos des_pos, int speed)
 /** 刷新显示指定部件的整个区域图形 */
 LCUI_API void Widget_Refresh(LCUI_Widget *widget)
 {
-	WidgetMsg_Post( widget, WIDGET_REFRESH, NULL, TRUE, FALSE );
+	LCUI_Rect rect;
+	rect.w = widget->outer_size.w;
+	rect.h = widget->outer_size.h;
+	rect.x = widget->pos.x - BoxShadow_GetBoxX( &widget->shadow );
+	rect.y = widget->pos.y - BoxShadow_GetBoxY( &widget->shadow );
+	Widget_PushAreaToScreen( widget->parent, &rect );
 }
 
 /** 调整部件的尺寸 */
@@ -2207,15 +2227,13 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 		/* 更新父部件中的STATIC定位类型的子部件的位置 */
 		//Widget_UpdateChildStaticPos( widget->parent );
 		break;
-	case WIDGET_REFRESH:
-		Widget_ExecRefresh( widget );
 		break;
 	case WIDGET_DESTROY:
 		if( Widget_TryLock( data_ptr->target ) != 0 ) {
 			return FALSE;
 		}
 		/* 添加刷新区域 */
-		Widget_ExecRefresh( data_ptr->target );
+		Widget_Refresh( data_ptr->target );
 		/* 开始销毁部件数据 */
 		Widget_ExecDestroy( data_ptr->target );
 		Widget_Unlock( data_ptr->target );
