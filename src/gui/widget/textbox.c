@@ -699,21 +699,21 @@ static void TextBox_OnPaint( LCUI_Widget *widget )
 {
 	LCUI_TextBox *tb;
 	LCUI_Pos pos;
-	LCUI_Graph *widget_graph, *tlayer_graph;
+	LCUI_Rect area;
+	LCUI_Graph area_graph;
 
 	tb = (LCUI_TextBox*)Widget_GetPrivateData( widget );
 	TextBox_UpdateTextLayer( widget );
 	TextLayer_Draw( &tb->text );
-	widget_graph = Widget_GetSelfGraph( widget );
-	tlayer_graph = TextLayer_GetGraphBuffer( &tb->text );
-	pos.x = widget->glayer->padding.left;
-	pos.y = widget->glayer->padding.top;
-	/* 如果部件使用透明背景 */
-	if( widget->background.transparent ) {
-		Graph_Replace( widget_graph, tlayer_graph, pos );
-	} else {
-		Graph_Mix( widget_graph, tlayer_graph, pos );
+	if( !Widget_BeginPaint( widget, &area ) ) {
+		return;
 	}
+	Widget_QuoteInnerGraph( widget, &area_graph, &area );
+	pos.x = widget->padding.left;
+	pos.y = widget->padding.top;
+	TextLayer_DrawToGraph( &tb->text, area, pos, 
+			widget->background.transparent, &area_graph );
+	Widget_EndPaint( widget, &area );
 }
 
 void RegisterTextBox( void )

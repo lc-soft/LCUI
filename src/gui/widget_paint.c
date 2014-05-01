@@ -32,6 +32,7 @@ LCUI_API int Widget_InvalidateArea( LCUI_Widget *widget, LCUI_Rect *r )
 		rect.h = widget->size.h;
 		r = &rect;
 	}
+	LCUIRect_ValidateArea( r, widget->size );
 	DEBUG_MSG("widget:%p, rect: %d,%d,%d,%d\n", widget, r->x, r->y, r->w, r->h);
 	if( painter_is_active ) {
 		/* 记录该部件，需要进行绘制 */
@@ -87,11 +88,10 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget *widget, LCUI_Rect *area )
 
 	if( !area ) {
 		rect.x = rect.y = 0;
-		rect.w = widget->size.w;
-		rect.h = widget->size.h;
+		rect.w = widget->outer_size.w;
+		rect.h = widget->outer_size.h;
 		area = &rect;
 	}
-
 	root = RootWidget_GetSelf();
 	while( widget && widget != root ) {
 		if( !widget->visible ) {
@@ -105,11 +105,11 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget *widget, LCUI_Rect *area )
 			area->h += area->y;
 			area->y = 0;
 		}
-		if( area->x + area->w > widget->size.w ) {
-			area->w = widget->size.w - area->x;
+		if( area->x + area->w > widget->outer_size.w ) {
+			area->w = widget->outer_size.w - area->x;
 		}
-		if( area->y + area->h > widget->size.h ) {
-			area->h = widget->size.h - area->y;
+		if( area->y + area->h > widget->outer_size.h ) {
+			area->h = widget->outer_size.h - area->y;
 		}
 		/* 加上所在部件的坐标 */
 		area->x += widget->pos.x;
@@ -121,14 +121,14 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget *widget, LCUI_Rect *area )
 		
 		/* 切换至父级部件 */
 		widget = widget->parent;
-		area->x += widget->glayer->padding.left;
-		area->y += widget->glayer->padding.top;
+		area->x += widget->padding.left;
+		area->y += widget->padding.top;
 		/* 计算父部件的内边距框，然后再调整矩形区域 */
-		n = widget->size.w - widget->glayer->padding.right;
+		n = widget->size.w - widget->padding.right;
 		if( area->x + area->w > n ) {
 			area->w = n - area->x;
 		}
-		n = widget->size.h - widget->glayer->padding.bottom;
+		n = widget->size.h - widget->padding.bottom;
 		if( area->y + area->h > n ) {
 			area->h = n - area->y;
 		}
@@ -142,18 +142,41 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget *widget, LCUI_Rect *area )
 
 static int Widget_DrawBackground( LCUI_Widget *widget, LCUI_Rect area )
 {
-	LCUI_Graph *graph;
+	LCUI_Graph graph;
 	LCUI_Background *bg;
 
-	graph = Widget_GetSelfGraph( widget );
+	Widget_QuoteInnerGraph( widget, &graph, &area );
 	bg = &widget->background;
 	/* 如果背景透明，则使用覆盖模式将背景图绘制到部件上 */
 	if( bg->transparent ) {
-		return Graph_FillImageEx( graph, &bg->image, bg->layout, area );
+		return Graph_FillImageEx( &graph, &bg->image, bg->layout, area );
 	}
 	/* 否则，使用叠加模式 */
-	return Graph_FillImageWithColorEx( graph, &bg->image, bg->layout,
+	return Graph_FillImageWithColorEx( &graph, &bg->image, bg->layout,
 							bg->color, area );
+}
+
+/* 获取部件内部区域的位图 */
+LCUI_API int Widget_QuoteInnerGraph( LCUI_Widget *widget, LCUI_Graph *graph,
+								LCUI_Rect *r )
+{
+	LCUI_Rect rect;
+	if( !r ) {
+		rect.x = 0;
+		rect.y = 0;
+		rect.w = widget->size.w;
+		rect.h = widget->size.h;
+	} else {
+		rect.x = r->x;
+		rect.y = r->y;
+		rect.w = r->w;
+		rect.h = r->h;
+		LCUIRect_ValidateArea( &rect, widget->size );
+	}
+
+	rect.x += BoxShadow_GetBoxX( &widget->shadow );
+	rect.y += BoxShadow_GetBoxY( &widget->shadow );
+	return Graph_Quote( graph, &widget->glayer->graph, rect );
 }
 
 /** 
@@ -179,11 +202,17 @@ LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget *widget, LCUI_Rect *area )
 /** 执行重绘部件后的一些任务 */
 LCUI_API void Widget_EndPaint( LCUI_Widget *widget, LCUI_Rect *area )
 {
-	LCUI_Graph *graph;
-	graph = Widget_GetSelfGraph( widget );
-	Graph_DrawBorderEx( graph, widget->border, *area );
+	LCUI_Graph graph;
+	LCUI_Rect outer_area;
+
+	Widget_QuoteInnerGraph( widget, &graph, area );
+	Graph_DrawBorderEx( &graph, widget->border, *area );
 	Widget_ValidateArea( widget, area );
-	Widget_PushAreaToScreen( widget, area );
+	outer_area.x = area->x + BoxShadow_GetBoxX( &widget->shadow );
+	outer_area.y = area->y + BoxShadow_GetBoxY( &widget->shadow );
+	outer_area.w = area->w;
+	outer_area.h = area->h;
+	Widget_PushAreaToScreen( widget, &outer_area );
 }
 
 static void Widget_OnPaint( LCUI_Widget *widget )

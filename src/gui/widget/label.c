@@ -224,16 +224,14 @@ static void Label_OnPaint( LCUI_Widget *widget )
 	LCUI_Label *label;
 	LCUI_Rect area;
 	LCUI_Pos layer_pos;
-	LCUI_Graph *widget_graph, area_graph;
+	LCUI_Graph area_graph;
 
 	label = (LCUI_Label*)Widget_GetPrivateData( widget );
 	if( !Widget_BeginPaint( widget, &area ) ) {
 		return;
 	}
 	DEBUG_MSG("area: %d,%d,%d,%d\n", area.x, area.y, area.w, area.h);
-	widget_graph = Widget_GetSelfGraph( widget );
-	Graph_Init( &area_graph );
-	Graph_Quote( &area_graph, widget_graph, area );
+	Widget_QuoteInnerGraph( widget, &area_graph, &area );
 	layer_pos.x = widget->border.left_width + 1;
 	layer_pos.y = widget->border.top_width + 1;
 	TextLayer_DrawToGraph( &label->layer, area, layer_pos, 

@@ -18,6 +18,10 @@ LCUI_API void Widget_ValidateArea( LCUI_Widget *widget, LCUI_Rect *area );
 /** 将部件的区域推送至屏幕 */
 LCUI_API int Widget_PushAreaToScreen( LCUI_Widget *widget, LCUI_Rect *area );
 
+/* 获取部件内部区域的位图 */
+LCUI_API int Widget_QuoteInnerGraph( LCUI_Widget *widget, LCUI_Graph *graph,
+								LCUI_Rect *r );
+
 /** 
  * 执行重绘部件前的一些任务
  * @param[in] widget	需要重绘的部件
