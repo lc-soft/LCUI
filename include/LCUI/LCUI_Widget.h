@@ -122,9 +122,9 @@ struct LCUI_Widget_ {
 	/*-------------- END -------------------*/
 
 	LCUI_Size size; /* 已计算出的实际尺寸，单位为像素 */
+	LCUI_Size outer_size;
 	LCUI_Size max_size;
 	LCUI_Size min_size;
-
 	/*------------ 尺寸（描述） ---------------*/
 	IntOrFloat_t w, h;
 	IntOrFloat_t max_w, min_w;
@@ -138,9 +138,12 @@ struct LCUI_Widget_ {
 	DockType	dock;		/* 停靠位置 */
 	/*------------------ END ----------------------*/
 
-	LCUI_Color color;			/* 前景颜色 */
+	LCUI_Padding padding;		/* 内边距 */
+
+	LCUI_Color color;		/* 前景颜色 */
 	LCUI_Border border;		/* 边框 */
 	LCUI_Background background;	/* 背景 */
+	LCUI_BoxShadow shadow;		/* 阴影 */
 
 	LCUI_Widget *parent;		/* 父部件 */
 	LCUI_Queue child;		/* 子部件集 */
