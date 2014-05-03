@@ -81,6 +81,7 @@ static void Graph_DrawTopShadow( LCUI_Graph *graph, LCUI_Rect area,
                 }
                 /* 计算当前行阴影的透明度 */
                 color.alpha = (uchar_t)(s-(v*t-(a*t*t)/2));
+		color.alpha *= shadow.right_color.a/255.0;
                 for( x=shadow_area.x; x<bound_x; ++x ) {
                         if( x < area.x || x >= area.x + area.w ) {
                                 continue;
@@ -121,6 +122,7 @@ static void Graph_DrawBottomShadow( LCUI_Graph *graph, LCUI_Rect area,
                         continue;
                 }
                 color.alpha = (uchar_t)(s-(v*t-(a*t*t)/2));
+		color.alpha *= shadow.right_color.a/255.0;
                 for( x=shadow_area.x; x<bound_x; ++x ) {
                         if( x < area.x || x >= area.x + area.w  ) {
                                 continue;
@@ -161,6 +163,7 @@ static void Graph_DrawLeftShadow( LCUI_Graph *graph, LCUI_Rect area,
                         continue;
                 }
                 color.alpha = (uchar_t)(s-(v*t-(a*t*t)/2));
+		color.alpha *= shadow.right_color.a/255.0;
                 for( y=shadow_area.y; y<bound_y; ++y ) {
                         if( y < area.y || y >= area.y + area.h ) {
                                 continue;
@@ -205,6 +208,7 @@ static void Graph_DrawRightShadow( LCUI_Graph *graph, LCUI_Rect area,
                         continue;
                 }
                 color.alpha = (uchar_t)(s-(v*t-(a*t*t)/2));
+		color.alpha *= shadow.right_color.a/255.0;
                 for( y=shadow_area.y; y<bound_y; ++y ) {
                         if( y < area.y || y >= area.y + area.h ) {
                                 continue;
@@ -251,4 +255,3 @@ int Graph_DrawBoxShadow( LCUI_Graph *graph, LCUI_BoxShadow shadow )
 	rect.h = graph->h;
 	return Graph_DrawBoxShadowEx( graph, rect, shadow );
 }
-
