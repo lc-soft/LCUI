@@ -202,22 +202,8 @@ static void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b )
 	}
 }
 
-/** 
- * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形
- * 分割方法如下：
- * ┏━━┳━━━━━━┓
- * ┃    ┃     3      ┃
- * ┃ 0  ┣━━━┳━━┃
- * ┃    ┃rect1 ┃    ┃
- * ┃    ┃      ┃ 2  ┃
- * ┣━━┻━━━┫    ┃
- * ┃     1      ┃    ┃
- * ┗━━━━━━┻━━┛
- *
- * rect2 必须被 rect1 完全包含
- */
-static void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
-				LCUI_Rect rects[4] )
+LCUI_API void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
+					LCUI_Rect rects[4] )
 {
 	rects[0].x = rect2->x;
 	rects[0].y = rect2->y;

@@ -58,6 +58,23 @@ LCUI_API void LCUIRect_ValidateArea( LCUI_Rect *rect, LCUI_Size box_size );
 /** 检测矩形是否遮盖另一个矩形 */
 LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 );
 
+/** 
+ * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形
+ * 分割方法如下：
+ * ┏━━┳━━━━━━┓
+ * ┃    ┃     3      ┃
+ * ┃ 0  ┣━━━┳━━┃
+ * ┃    ┃rect1 ┃    ┃
+ * ┃    ┃      ┃ 2  ┃
+ * ┣━━┻━━━┫    ┃
+ * ┃     1      ┃    ┃
+ * ┗━━━━━━┻━━┛
+ *
+ * rect2 必须被 rect1 完全包含
+ */
+LCUI_API void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
+					LCUI_Rect rects[4] );
+
 /** 初始化脏矩形记录 */
 LCUI_API void DirtyRectList_Init( LCUI_DirtyRectList *list );
 
