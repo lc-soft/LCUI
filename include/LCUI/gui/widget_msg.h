@@ -6,6 +6,7 @@ LCUI_BEGIN_HEADER
 typedef enum WidgetMsgID_ {
 	WIDGET_UPDATE,		// 更新
 	WIDGET_PAINT,		// 重绘
+	WIDGET_PAINTSHADOW,	// 重绘阴影
 	WIDGET_MOVE,		// 移动
 	WIDGET_CHGSTATE,	// 状态改变（Change State）
 	WIDGET_CHGALPHA,	// 更新透明度（Change Alpha）
@@ -13,7 +14,6 @@ typedef enum WidgetMsgID_ {
 	WIDGET_SORT,		// 排序子部件
 	WIDGET_SHOW,		// 显示
 	WIDGET_HIDE,		// 隐藏
-	WIDGET_REFRESH,		// 刷新显示
 	WIDGET_DESTROY,		// 销毁
 	WIDGET_USER		// 用户自定义
 } WidgetMsgID;

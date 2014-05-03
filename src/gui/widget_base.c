@@ -52,6 +52,8 @@
 #include <math.h>
 #include <limits.h>
 
+#define Widget_DrawShadow(widget) WidgetMsg_Post( widget, WIDGET_PAINTSHADOW, NULL, TRUE, FALSE )
+
 /** 根部件 */
 static LCUI_Widget root_widget;
 
@@ -1367,6 +1369,7 @@ LCUI_API void Widget_SetShadow( LCUI_Widget *widget, LCUI_BoxShadow shadow )
 	widget->shadow = shadow;
 	Widget_UpdateSize( widget );
 	Widget_UpdatePos( widget );
+	Widget_DrawShadow( widget );
 	Widget_SetPadding( widget, widget->padding );
 }
 
@@ -2154,6 +2157,31 @@ LCUI_API void Widget_SetAlpha( LCUI_Widget *widget, uchar_t alpha )
 	WidgetMsg_Post( widget, WIDGET_CHGALPHA, &alpha, TRUE, FALSE );
 }
 
+static int Widget_ExecDrawShadow( LCUI_Widget *widget )
+{
+	int i;
+	LCUI_Graph *graph;
+	LCUI_Rect outer_rect, box, rect[4];
+
+	graph = Widget_GetSelfGraph( widget );
+	if( Graph_DrawBoxShadow( graph, widget->shadow ) != 0 ) {
+		return -1;
+	}
+	box.x = BoxShadow_GetBoxX( &widget->shadow );
+	box.y = BoxShadow_GetBoxY( &widget->shadow );
+	box.w = widget->size.w;
+	box.h = widget->size.h;
+	outer_rect.x = outer_rect.y = 0;
+	outer_rect.w = widget->outer_size.w;
+	outer_rect.h = widget->outer_size.h;
+	LCUIRect_CutFourRect( &box, &outer_rect, rect );
+	for( i=0; i<4; ++i ) {
+		rect[i].x -= box.x;
+		rect[i].y -= box.y;
+		Widget_PushAreaToScreen( widget->parent, &rect[i] );
+	}
+}
+
 /************************* Widget End *********************************/
 
 LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr )
@@ -2169,14 +2197,15 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 	/* 根据不同的类型来进行处理 */
 	switch(data_ptr->msg_id) {
 	case WIDGET_RESIZE:
-		/* 部件尺寸更新，将更新部件的位置 */
 		if( !data_ptr->valid ) {
 			ret = Widget_ExecUpdateSize( widget );
 		} else {
 			ret = Widget_ExecResize( widget, data_ptr->data.size );
 		}
+		/* 如果尺寸发生变化 */
 		if( ret == 0 ) {
 			Widget_UpdatePos( widget );
+			Widget_DrawShadow( widget );
 		}
 		break;
 	case WIDGET_MOVE:
@@ -2214,6 +2243,13 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 			return FALSE;
 		}
 		WidgetFunc_Call( widget, FUNC_TYPE_PAINT );
+		Widget_Unlock( widget );
+		break;
+	case WIDGET_PAINTSHADOW:
+		if( Widget_TryLock( widget ) != 0 ) {
+			return FALSE;
+		}
+		Widget_ExecDrawShadow( widget );
 		Widget_Unlock( widget );
 		break;
 	case WIDGET_HIDE:
