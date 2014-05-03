@@ -138,7 +138,6 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 		}
 		break;
 	    case WIDGET_PAINT:
-	    case WIDGET_REFRESH:
 	    case WIDGET_UPDATE:
 	    case WIDGET_SORT:
 		tmp_msg.valid = FALSE;
@@ -208,7 +207,6 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 			}
 			break;
 		    case WIDGET_PAINT:
-		    case WIDGET_REFRESH:
 		    case WIDGET_HIDE:
 		    case WIDGET_UPDATE:
 		    case WIDGET_SHOW:
