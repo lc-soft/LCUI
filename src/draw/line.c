@@ -4,7 +4,7 @@
 
 /* 绘制水平线 */
 LCUI_API void
-Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos start, int end_x )
+Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos start, int len )
 {
 	int y, x, end_y;
 	LCUI_Rect area;
@@ -14,29 +14,27 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 	area = Graph_GetValidRect(graph);
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
-	end_y = start.y + size;
 
 	if( start.x < area.x ) {
-		end_x -= (area.x-start.x);
+		len -= (area.x-start.x);
 		start.x = area.x;
 	}
-	if( end_x > area.x + area.width ) {
-		end_x = area.x + area.width;
+	if( len > area.x + area.width ) {
+		len = area.x + area.width;
 	}
-	
 	if( start.y < area.y ) {
-		end_y -= (area.y-start.y);
+		size -= (area.y-start.y);
 		start.y = area.y;
 	}
-	if( end_y > area.y + area.height ) {
-		end_y = area.y + area.height;
+	if( start.y + size > area.y + area.height ) {
+		size = area.y + area.height - start.y;
 	}
 	if( des->color_type == COLOR_TYPE_ARGB ) {
 		LCUI_ARGB *pPixel, *pRowPixel;
 		pRowPixel = des->argb + start.y*des->w + start.x;
-		for( y=start.y; y<end_y; ++y ) {
+		for( y=0; y<size; ++y ) {
 			pPixel = pRowPixel;
-			for( x=start.x; x < end_x; ++x ) {
+			for( x=0; x<len; ++x ) {
 				pPixel->b = color.blue;
 				pPixel->g = color.green;
 				pPixel->r = color.red;
@@ -48,9 +46,9 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 	} else {
 		uchar_t *pByte, *pRowByte;
 		pRowByte = des->bytes + (start.y*des->w + start.x)*3;
-		for( y=start.y; y<end_y; ++y ) {
+		for( y=0; y<size; ++y ) {
 			pByte = pRowByte;
-			for( x=start.x; x < end_x; ++x ) {
+			for( x=0; x<len; ++x ) {
 				*pByte++ = color.blue;
 				*pByte++ = color.green;
 				*pByte++ = color.red;
@@ -62,9 +60,9 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 
 /* 绘制垂直线 */
 LCUI_API void
-Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos start, int end_y )
+Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos start, int len )
 {
-	int y, x, end_x;
+	int y, x;
 	LCUI_Rect area;
 	LCUI_Graph *des;
 
@@ -72,30 +70,29 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 	area = Graph_GetValidRect(graph);
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
-	end_x = start.x + size;
 
 	if( start.x < area.x ) {
-		end_x -= (area.x-start.x);
+		size -= (area.x-start.x);
 		start.x = area.x;
 	}
-	if( end_x > area.x + area.width ) {
-		end_x = area.x + area.width;
+	if( start.x + size > area.x + area.width ) {
+		size = area.x + area.width - start.x;
 	}
 	
 	if( start.y < area.y ) {
-		end_y -= (area.y-start.y);
+		len -= (area.y-start.y);
 		start.y = area.y;
 	}
-	if( end_y > area.y + area.height ) {
-		end_y = area.y + area.height;
+	if( start.y + len > area.y + area.height ) {
+		len = area.y + area.height - start.y;
 	}
 	
 	if( des->color_type == COLOR_TYPE_ARGB ) {
 		LCUI_ARGB *pPixel, *pRowPixel;
 		pRowPixel = des->argb + start.y*des->w + start.x;
-		for( y=start.y; y<end_y; ++y ) {
+		for( y=0; y<len; ++y ) {
 			pPixel = pRowPixel;
-			for( x=start.x; x < end_x; ++x ) {
+			for( x=0; x<size; ++x ) {
 				pPixel->b = color.blue;
 				pPixel->g = color.green;
 				pPixel->r = color.red;
@@ -107,9 +104,9 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 	} else {
 		uchar_t *pByte, *pRowByte;
 		pRowByte = des->bytes + (start.y*des->w + start.x)*3;
-		for( y=start.y; y<end_y; ++y ) {
+		for( y=0; y<len; ++y ) {
 			pByte = pRowByte;
-			for( x=start.x; x < end_x; ++x ) {
+			for( x=0; x<size; ++x ) {
 				*pByte++ = color.blue;
 				*pByte++ = color.green;
 				*pByte++ = color.red;
