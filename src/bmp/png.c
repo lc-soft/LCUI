@@ -137,30 +137,35 @@ LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
         fp = fopen(file_name, "wb");
         if (!fp) {
                 _DEBUG_MSG("file %s could not be opened for writing\n", file_name);
-                goto error_exit;
+                fclose( fp );
+                return -1;
         }
         /* initialize stuff */
         png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
         if (!png_ptr) {
                 _DEBUG_MSG("png_create_write_struct failed\n");
-                goto error_exit;
+                fclose( fp );
+                return -1;
         }
         info_ptr = png_create_info_struct(png_ptr);
         if (!info_ptr) {
                 _DEBUG_MSG("png_create_info_struct failed\n");
-                goto error_exit;
+                fclose( fp );
+                return -1;
         }
         if (setjmp(png_jmpbuf(png_ptr))) {
                 _DEBUG_MSG("error during init_io\n");
-                goto error_exit;
+                fclose( fp );
+                return -1;
         }
         png_init_io(png_ptr, fp);
 
         /* write header */
         if (setjmp(png_jmpbuf(png_ptr))) {
                 _DEBUG_MSG("error during writing header\n");
-                goto error_exit;
+                fclose( fp );
+                return -1;
         }
 
         if(Graph_HaveAlpha(graph)) {
@@ -178,7 +183,8 @@ LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
         /* write bytes */
         if (setjmp(png_jmpbuf(png_ptr))) {
                 _DEBUG_MSG("error during writing bytes\n");
-                goto error_exit;
+                fclose( fp );
+                return -1;
         }
 	if( graph->color_type == COLOR_TYPE_ARGB ) {
                 row_size = sizeof(uchar_t) * 4 * graph->w;
@@ -218,11 +224,9 @@ LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
         free( row_pointers );
         
         fclose( fp );
+        return 0;
 #else
         printf("warning: not PNG support!"); 
-#endif
         return 0;
-error_exit:
-        fclose(fp);
-        return -1;
+#endif
 }
