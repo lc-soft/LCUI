@@ -7,6 +7,7 @@ widget_event.c		\
 widget_library.c	\
 widget_style.c		\
 widget_msg.c		\
+widget_paint.c      \
 messagebox.c		\
 widget/activebox.c	\
 widget/button.c		\

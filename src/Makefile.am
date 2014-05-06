@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS=foreign
 ##设定在编译时头文件的查找位置
 AM_CFLAGS = -I$(abs_top_srcdir)/include
 ##以下是给Libtool的参数
-LCUI_LDFLAGS = -version-info 2:1:0
+LCUI_LDFLAGS = -version-info 3:0:0
 ##以下内容摘自相关文章。
 ##Libtool 的版本号分为 3 个部分 :
 ##current: 表示当前库输出的接口的数量。
