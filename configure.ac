@@ -7,7 +7,7 @@
 # http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/html_node/index.html
 
 AC_PREREQ([2.68])
-AC_INIT(LCUI, 0.15.0, lc-soft@live.cn)
+AC_INIT(LCUI, 1.0.0, lc-soft@live.cn)
 
 # Check system type
 AC_CANONICAL_TARGET
@@ -15,6 +15,7 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([include/LCUI_Build.h])
 AC_CONFIG_HEADERS([include/LCUI/LCUI_Config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 # Make --enable-silent-rules the default.
 # To get verbose build output you may configure
@@ -214,7 +215,6 @@ AC_OUTPUT([Makefile
                  src/font/Makefile
                  src/font/in-core/Makefile
                  src/draw/Makefile
-                 src/draw/in-core/Makefile
                  src/thread/Makefile
                  src/thread/win32/Makefile
                  src/thread/pthread/Makefile
