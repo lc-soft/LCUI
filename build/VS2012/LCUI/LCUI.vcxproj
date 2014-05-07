@@ -70,6 +70,9 @@
       <DisableSpecificWarnings>4819;4244;4996;</DisableSpecificWarnings>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <IntrinsicFunctions>false</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -124,6 +127,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\LCUI\draw\border.h" />
+    <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\line.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\bitmapfont.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\charset.h" />

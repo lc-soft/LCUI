@@ -243,6 +243,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h">
+      <Filter>头文件\LCUI\draw</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
