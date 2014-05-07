@@ -213,7 +213,8 @@ LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
         /* end write */
         if (setjmp(png_jmpbuf(png_ptr))) {
                 _DEBUG_MSG("error during end of write\n");
-                goto error_exit;
+		fclose( fp );
+		return -1;
         }
         png_write_end(png_ptr, NULL);
 
