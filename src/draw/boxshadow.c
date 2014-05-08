@@ -159,7 +159,6 @@ draw_circle( LCUI_Graph *graph, LCUI_Pos center, int r, LCUI_ARGB color )
 	circle_left = center.x - r;
 	circle_bottom = center.y + r;
 	circle_top = center.y - r;
-	
 	for( pos.x=circle_left; pos.x<circle_right; ++pos.x ) {
 		pos.y = r*r - (pos.x-center.x)*(pos.x-center.x);
 		pos.y = -sqrt(pos.y) + center.y;
@@ -217,6 +216,7 @@ Graph_DrawTopLeftShadow( LCUI_Graph *graph, LCUI_Rect area,
 	bound.x = bound.y = 0;
 	bound.w = bound.h = shadow.size;
 	Graph_Quote( &box, graph, bound );
+	Graph_FillAlpha( &box, 0 );
 	draw_circle( &box, pos, shadow.size, shadow.top_color );
 }
 
@@ -228,12 +228,14 @@ Graph_DrawTopRightShadow( LCUI_Graph *graph, LCUI_Rect area,
 	LCUI_Rect bound;
 	LCUI_Pos pos;
 
-	pos.x = graph->w - shadow.size;
-	pos.y = shadow.size;
-	bound.x = pos.x - shadow.size;
+	pos.x = BoxShadow_GetX( &shadow ) + shadow.size;
+	pos.x += BoxShadow_GetBoxWidth( &shadow, graph->w );
+	pos.y = BoxShadow_GetY( &shadow ) + shadow.size;
+	bound.x = pos.x;
 	bound.y = 0;
 	bound.w = bound.h = shadow.size;
 	Graph_Quote( &box, graph, bound );
+	Graph_FillAlpha( &box, 0 );
 	draw_circle( &box, pos, shadow.size, shadow.top_color );
 }
 
@@ -245,12 +247,14 @@ Graph_DrawBottomLeftShadow( LCUI_Graph *graph, LCUI_Rect area,
 	LCUI_Rect bound;
 	LCUI_Pos pos;
 	
-	pos.x = shadow.size;
-	pos.y = graph->h - shadow.size;
-	bound.x = 0;
-	bound.y = pos.y - shadow.size;
+	pos.x = BoxShadow_GetX( &shadow ) + shadow.size;
+	pos.y = BoxShadow_GetY( &shadow ) + shadow.size;
+	pos.y += BoxShadow_GetBoxHeight( &shadow, graph->h );
+	bound.x = pos.x - shadow.size;
+	bound.y = pos.y;
 	bound.w = bound.h = shadow.size;
 	Graph_Quote( &box, graph, bound );
+	Graph_FillAlpha( &box, 0 );
 	draw_circle( &box, pos, shadow.size, shadow.bottom_color );
 }
 
@@ -262,12 +266,15 @@ Graph_DrawBottomRightShadow( LCUI_Graph *graph, LCUI_Rect area,
 	LCUI_Rect bound;
 	LCUI_Pos pos;
 	
-	pos.x = graph->w - shadow.size;
-	pos.y = graph->h - shadow.size;
-	bound.x = pos.x - shadow.size;
-	bound.y = pos.y - shadow.size;
+	pos.x = BoxShadow_GetX( &shadow ) + shadow.size;
+	pos.x += BoxShadow_GetBoxWidth( &shadow, graph->w );
+	pos.y = BoxShadow_GetY( &shadow ) + shadow.size;
+	pos.y += BoxShadow_GetBoxHeight( &shadow, graph->h );
+	bound.x = pos.x;
+	bound.y = pos.y;
 	bound.w = bound.h = shadow.size;
 	Graph_Quote( &box, graph, bound );
+	Graph_FillAlpha( &box, 0 );
 	draw_circle( &box, pos, shadow.size, shadow.bottom_color );
 }
 
