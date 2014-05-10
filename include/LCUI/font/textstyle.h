@@ -44,18 +44,20 @@
 
 LCUI_BEGIN_HEADER
 
-typedef enum font_style { 
+/** 下面三种字体样式虽然有定义，但还未添加能够实现该字体样式效果的功能 */
+
+enum font_style { 
 	FONT_STYLE_NORMAL = 0, 
 	FONT_STYLE_ITALIC = 1, 
 	FONT_STYLE_OBIQUE = 2 
 };
 
-typedef enum font_weight {
+enum font_weight {
 	FONT_WEIGHT_NORMAL	= 0,
 	FONT_WEIGHT_BOLD	= 1 
 };
 
-typedef enum font_decoration {
+enum font_decoration {
 	FONT_DECORATION_NONE		= 0,	/* 无装饰 */
 	FONT_DECORATION_BLINK		= 1,	/* 闪烁 */
 	FONT_DECORATION_UNDERLINE	= 2,	/* 下划线 */
