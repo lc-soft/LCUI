@@ -339,6 +339,9 @@ LCUI_API void Widget_SetBackgroundColor( LCUI_Widget *widget, LCUI_Color color )
 LCUI_API void Widget_SetBackgroundTransparent(	LCUI_Widget *widget, 
 						LCUI_BOOL is_true );
 
+/** 设置阴影参数 */
+LCUI_API void Widget_SetShadow( LCUI_Widget *widget, LCUI_BoxShadow shadow );
+
 /* 启用部件 */
 LCUI_API void
 Widget_Enable(LCUI_Widget *widget);
