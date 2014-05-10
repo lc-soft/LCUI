@@ -52,7 +52,6 @@
 #include LC_FONT_H
 #include LC_ERROR_H
 
-#define DEFAULT_THEME_COLOR	ARGB(128,34,177,76)
 #define TOP_PANDDING		2
 #define WIDGET_CLOSE_BUTTON	"LCUI::WindowCloseButton"
 #define ALLOW_STATE_LIST	(WIDGET_STATE_ACTIVE|WIDGET_STATE_NORMAL\
@@ -128,7 +127,8 @@ static void Window_OnInit( LCUI_Widget *window )
 	
 	wnd = Widget_NewPrivateData( window, LCUI_Window );
 
-	wnd->theme_color = DEFAULT_THEME_COLOR;
+	wnd->theme_color = COLOR_EMERALD;
+	wnd->theme_color.a = 128;
 	wnd->titlebar = Widget_New(NULL); 
 	wnd->client_area = Widget_New(NULL); 
 	wnd->btn_close = Widget_New(WIDGET_CLOSE_BUTTON); 
