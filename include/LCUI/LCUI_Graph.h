@@ -168,11 +168,11 @@ LCUI_API LCUI_Size Graph_GetSize( const LCUI_Graph *graph );
 
 LCUI_API LCUI_Rect Graph_GetValidRect( const LCUI_Graph *graph );
 
-/* 
- * 功能：获取指向被引用的图形的指针 
- * 说明：如果当前图形引用了另一个图形，并且，该图形处于一条引用链中，那么，本函数会返
- * 回指向被引用的最终图形的指针。
- * */
+/**
+ * 获取被引用的图像
+ * 如果当前图形引用了另一个图形，并且，该图形处于一条引用链中（多重引用），
+ * 那么，本函数会返回被引用的源图像
+ */
 LCUI_API LCUI_Graph* Graph_GetQuote( LCUI_Graph *graph );
 
 
