@@ -5,8 +5,8 @@ LCUI_BEGIN_HEADER
 
 typedef enum WidgetMsgID_ {
 	WIDGET_UPDATE,		// 更新
+	WIDGET_UPDATE_SHADOW,	// 更新阴影
 	WIDGET_PAINT,		// 重绘
-	WIDGET_PAINTSHADOW,	// 重绘阴影
 	WIDGET_MOVE,		// 移动
 	WIDGET_CHGSTATE,	// 状态改变（Change State）
 	WIDGET_CHGALPHA,	// 更新透明度（Change Alpha）
