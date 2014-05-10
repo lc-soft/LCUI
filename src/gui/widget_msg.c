@@ -137,6 +137,7 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 			tmp_msg.data.alpha = *((int*)data);
 		}
 		break;
+	    case WIDGET_UPDATE_SHADOW:
 	    case WIDGET_PAINT:
 	    case WIDGET_UPDATE:
 	    case WIDGET_SORT:
@@ -206,6 +207,7 @@ LCUI_API int WidgetMsg_Post(	LCUI_Widget *widget,
 				tmp_msg_ptr->valid = FALSE;
 			}
 			break;
+		    case WIDGET_UPDATE_SHADOW:
 		    case WIDGET_PAINT:
 		    case WIDGET_HIDE:
 		    case WIDGET_UPDATE:
