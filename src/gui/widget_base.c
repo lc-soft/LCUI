@@ -52,7 +52,7 @@
 #include <math.h>
 #include <limits.h>
 
-#define Widget_DrawShadow(widget) WidgetMsg_Post( widget, WIDGET_PAINTSHADOW, NULL, TRUE, FALSE )
+#define Widget_UpdateShadow(widget) WidgetMsg_Post( widget, WIDGET_UPDATE_SHADOW, NULL, TRUE, FALSE )
 
 /** 根部件 */
 static LCUI_Widget root_widget;
@@ -1366,11 +1366,18 @@ LCUI_API void Widget_SetBackgroundTransparent(	LCUI_Widget *widget,
 /** 设置阴影参数 */
 LCUI_API void Widget_SetShadow( LCUI_Widget *widget, LCUI_BoxShadow shadow )
 {
-	widget->shadow = shadow;
-	Widget_UpdateSize( widget );
-	Widget_UpdatePos( widget );
-	Widget_DrawShadow( widget );
-	Widget_SetPadding( widget, widget->padding );
+	/* 阴影尺寸和偏移坐标有变化则需要调整部件图层的尺寸 */
+	if( widget->shadow.x != shadow.x || widget->shadow.y != shadow.y
+	 || widget->shadow.blur != shadow.blur
+	 || widget->shadow.spread != shadow.spread ) {
+		Widget_Refresh( widget );
+		widget->shadow = shadow;
+		Widget_UpdateSize( widget );
+		Widget_UpdatePos( widget );
+	} else {
+		widget->shadow = shadow;
+		Widget_UpdateShadow( widget );
+	}
 }
 
 /** 启用部件 */
@@ -1724,9 +1731,12 @@ LCUI_API int Widget_ExecResize( LCUI_Widget *widget, LCUI_Size size )
 	 && widget->size.w == size.w && widget->size.h == size.h) {
 		return 1;
 	}
-	
 	if( widget->visible ) {
-		Widget_Refresh( widget );
+		/* 如果阴影参数未被改变，则刷新原来占用的区域 */
+		if( outer_w-widget->outer_size.w == size.w-widget->size.w
+		 && outer_h-widget->outer_size.h == size.h-widget->size.h ) {
+			Widget_Refresh( widget );
+		}
 		widget->size = size;
 		widget->outer_size.w = outer_w;
 		widget->outer_size.h = outer_h;
@@ -1741,7 +1751,6 @@ LCUI_API int Widget_ExecResize( LCUI_Widget *widget, LCUI_Size size )
 	//_DEBUG_MSG("size: %d, %d\n", size.w, size.h);
 	GraphLayer_Resize( widget->glayer, outer_w, outer_h );
 	WidgetFunc_Call( widget, FUNC_TYPE_RESIZE );
-	
 	Graph_DrawBoxShadow( &widget->glayer->graph, widget->shadow );
 
 	/* 更新子部件的位置及尺寸 */
@@ -2157,29 +2166,37 @@ LCUI_API void Widget_SetAlpha( LCUI_Widget *widget, uchar_t alpha )
 	WidgetMsg_Post( widget, WIDGET_CHGALPHA, &alpha, TRUE, FALSE );
 }
 
-static int Widget_ExecDrawShadow( LCUI_Widget *widget )
+static void Widget_PushShadowAreaToScreen( LCUI_Widget *widget )
 {
 	int i;
-	LCUI_Graph *graph;
 	LCUI_Rect outer_rect, box, rect[4];
 
-	graph = Widget_GetSelfGraph( widget );
-	if( Graph_DrawBoxShadow( graph, widget->shadow ) != 0 ) {
-		return -1;
-	}
-	box.x = BoxShadow_GetBoxX( &widget->shadow );
-	box.y = BoxShadow_GetBoxY( &widget->shadow );
+	box.x = widget->pos.x;
+	box.y = widget->pos.y;
 	box.w = widget->size.w;
 	box.h = widget->size.h;
-	outer_rect.x = outer_rect.y = 0;
+	outer_rect.x = box.x;
+	outer_rect.y = box.y;
+	outer_rect.x -= BoxShadow_GetBoxX( &widget->shadow );
+	outer_rect.y -= BoxShadow_GetBoxY( &widget->shadow );
 	outer_rect.w = widget->outer_size.w;
 	outer_rect.h = widget->outer_size.h;
 	LCUIRect_CutFourRect( &box, &outer_rect, rect );
 	for( i=0; i<4; ++i ) {
-		rect[i].x -= box.x;
-		rect[i].y -= box.y;
 		Widget_PushAreaToScreen( widget->parent, &rect[i] );
 	}
+}
+
+static int Widget_ExecUpdateShadow( LCUI_Widget *widget )
+{
+	LCUI_Graph *graph;
+	Widget_SetPadding( widget, widget->padding );
+	graph = Widget_GetSelfGraph( widget );
+	if( Graph_DrawBoxShadow( graph, widget->shadow ) != 0 ) {
+		return -1;
+	}
+	Widget_PushShadowAreaToScreen( widget );
+	return 0;
 }
 
 /************************* Widget End *********************************/
@@ -2205,7 +2222,7 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 		/* 如果尺寸发生变化 */
 		if( ret == 0 ) {
 			Widget_UpdatePos( widget );
-			Widget_DrawShadow( widget );
+			Widget_UpdateShadow( widget );
 		}
 		break;
 	case WIDGET_MOVE:
@@ -2245,11 +2262,11 @@ LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_
 		WidgetFunc_Call( widget, FUNC_TYPE_PAINT );
 		Widget_Unlock( widget );
 		break;
-	case WIDGET_PAINTSHADOW:
+	case WIDGET_UPDATE_SHADOW:
 		if( Widget_TryLock( widget ) != 0 ) {
 			return FALSE;
 		}
-		Widget_ExecDrawShadow( widget );
+		Widget_ExecUpdateShadow( widget );
 		Widget_Unlock( widget );
 		break;
 	case WIDGET_HIDE:
