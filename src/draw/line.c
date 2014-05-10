@@ -6,7 +6,7 @@
 LCUI_API void
 Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos start, int len )
 {
-	int y, x, end_y;
+	int y, x;
 	LCUI_Rect area;
 	LCUI_Graph *des;
 
