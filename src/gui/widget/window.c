@@ -52,7 +52,7 @@
 #include LC_FONT_H
 #include LC_ERROR_H
 
-#define DEFAULT_THEME_COLOR	ARGB(150,34,177,76)
+#define DEFAULT_THEME_COLOR	ARGB(128,34,177,76)
 #define TOP_PANDDING		2
 #define WIDGET_CLOSE_BUTTON	"LCUI::WindowCloseButton"
 #define ALLOW_STATE_LIST	(WIDGET_STATE_ACTIVE|WIDGET_STATE_NORMAL\
@@ -226,7 +226,7 @@ static void Window_OnUpdate( LCUI_Widget *window )
 		border.right_color = wnd->theme_color;
 		Widget_SetShadow( window, BoxShadow(0,0,8,wnd->theme_color) );
 	} else {
-		Widget_SetShadow( window, BoxShadow(0,0,8,ARGB(200,200,200,200)) );
+		Widget_SetShadow( window, BoxShadow(0,0,8,ARGB(120,200,200,200)) );
 	}
 	Widget_SetBorder( window, border );
 	/* 更新窗口标题栏上的关闭按钮 */
