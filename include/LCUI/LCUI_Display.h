@@ -59,6 +59,7 @@ typedef struct LCUI_Screen_ {
 	int (*Destroy)(void);
 	int (*Sync)(void);
 	int (*PutGraph)(const LCUI_Graph*,LCUI_Pos);
+	int (*MixGraph)(const LCUI_Graph*,LCUI_Pos);
 	int (*CatchGraph)(LCUI_Graph*,LCUI_Rect);
 } LCUI_Screen;
 /***********************************************************************/
@@ -81,6 +82,8 @@ LCUI_API int LCUIScreen_SetMode( int w, int h, int mode );
 LCUI_API int LCUIScreen_CatchGraph( LCUI_Graph *graph, LCUI_Rect rect );
 
 LCUI_API int LCUIScreen_PutGraph( LCUI_Graph *graph, LCUI_Pos pos );
+
+LCUI_API int LCUIScreen_MixGraph( LCUI_Graph *graph, LCUI_Pos pos );
 
 /** 获取屏幕宽度 */
 LCUI_API int LCUIScreen_GetWidth( void );
