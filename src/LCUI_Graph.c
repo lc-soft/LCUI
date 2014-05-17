@@ -662,13 +662,13 @@ LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h )
 	return 0;
 }
 
-LCUI_API void Graph_Copy( LCUI_Graph *des, LCUI_Graph *src )
+LCUI_API void Graph_Copy( LCUI_Graph *des, const LCUI_Graph *src )
 {
-	LCUI_Graph *graph;
+	const LCUI_Graph *graph;
 	if( !des || !Graph_IsValid(src) ) {
 		return;
 	}
-	graph = Graph_GetQuote( src );
+	graph = Graph_GetQuoteConst( src );
 	des->color_type = graph->color_type;
 	/* 创建合适尺寸的Graph */
 	Graph_Create( des, src->w, src->h );
@@ -1295,10 +1295,18 @@ LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph,
 					LCUI_Color color, LCUI_Rect area )
 {
 	LCUI_Pos pos;
-	LCUI_Graph box;
+	LCUI_Graph box, tmp_img;
+	int x, y;
 
 	if( Graph_Quote( &box, graph, area ) != 0 ) {
 		return -1;
+	}
+	/* 转换成相同的色彩类型 */
+	if( backimg->color_type != graph->color_type ) {
+		Graph_Init( &tmp_img );
+		Graph_Copy( &tmp_img, backimg );
+		Graph_ChangeColorType( &tmp_img, graph->color_type );
+		backimg = &tmp_img;
 	}
 	Graph_FillAlpha( &box, 255 );
 	Graph_FillColor( &box, color );
@@ -1311,6 +1319,15 @@ LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph,
 		Graph_Mix( &box, backimg, pos );
 		break;
 	case LAYOUT_TILE:
+		for( y=0; y<area.y; y+=backimg->h );
+		for( ; y<area.y+area.h; y+=backimg->h ) {
+			for( x=0; x<area.x; x+=backimg->w );
+			for( ; x<area.x+area.w; x+=backimg->w ) {
+				pos.x = x - area.x;
+				pos.y = y - area.y;
+				Graph_Mix( &box, backimg, pos );
+			}
+		}
 		break;
 	case LAYOUT_STRETCH:
 		break;
@@ -1322,6 +1339,9 @@ LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph,
 		pos.y = -area.y;
 		Graph_Mix( &box, backimg, pos );
 		break;
+	}
+	if( backimg->color_type != graph->color_type ) {
+		Graph_Free( &tmp_img );
 	}
 	return 0;
 }
