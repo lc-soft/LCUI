@@ -147,6 +147,21 @@ typedef struct LCUI_Rect_ {
 		int h, height;
 	};
 } LCUI_Rect;
+
+typedef struct LCUI_Rect2_ {
+	union {
+		int left, l;
+	};
+	union {
+		int top, t;
+	};
+	union {
+		int right, r;
+	};
+	union {
+		int bottom, b;
+	};
+} LCUI_Rect2;
 /*--------------- END ----------------*/
 
 LCUI_END_HEADER
