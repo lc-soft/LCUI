@@ -175,7 +175,7 @@ LCUI_API int Graph_ChangeColorType( LCUI_Graph *graph, int color_type );
 
 LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h );
 
-LCUI_API void Graph_Copy( LCUI_Graph *des, LCUI_Graph *src );
+LCUI_API void Graph_Copy( LCUI_Graph *des, const LCUI_Graph *src );
 
 LCUI_API void Graph_Free( LCUI_Graph *graph );
 
