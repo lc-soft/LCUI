@@ -1253,10 +1253,18 @@ LCUI_API int Graph_FillImageEx( LCUI_Graph *graph, const LCUI_Graph *backimg,
 				int layout, LCUI_Rect area )
 {
 	LCUI_Pos pos;
-	LCUI_Graph box;
+	LCUI_Graph box, tmp_img;
+	int x, y;
 
 	if( Graph_Quote( &box, graph, area ) != 0 ) {
 		return -1;
+	}
+	/* 转换成相同的色彩类型 */
+	if( backimg->color_type != graph->color_type ) {
+		Graph_Init( &tmp_img );
+		Graph_Copy( &tmp_img, backimg );
+		Graph_ChangeColorType( &tmp_img, graph->color_type );
+		backimg = &tmp_img;
 	}
 	Graph_FillAlpha( &box, 0 );
 	switch( layout ) {
@@ -1268,6 +1276,15 @@ LCUI_API int Graph_FillImageEx( LCUI_Graph *graph, const LCUI_Graph *backimg,
 		Graph_Replace( &box, backimg, pos );
 		break;
 	case LAYOUT_TILE:
+		for( y=0; y<area.y; y+=backimg->h );
+		for( ; y<area.y+area.h; y+=backimg->h ) {
+			for( x=0; x<area.x; x+=backimg->w );
+			for( ; x<area.x+area.w; x+=backimg->w ) {
+				pos.x = x - area.x;
+				pos.y = y - area.y;
+				Graph_Mix( &box, backimg, pos );
+			}
+		}
 		break;
 	case LAYOUT_STRETCH:
 		break;
@@ -1279,6 +1296,9 @@ LCUI_API int Graph_FillImageEx( LCUI_Graph *graph, const LCUI_Graph *backimg,
 		pos.y = -area.y;
 		Graph_Replace( &box, backimg, pos );
 		break;
+	}
+	if( backimg->color_type != graph->color_type ) {
+		Graph_Free( &tmp_img );
 	}
 	return 0;
 }
@@ -1301,7 +1321,6 @@ LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph,
 	if( Graph_Quote( &box, graph, area ) != 0 ) {
 		return -1;
 	}
-	/* 转换成相同的色彩类型 */
 	if( backimg->color_type != graph->color_type ) {
 		Graph_Init( &tmp_img );
 		Graph_Copy( &tmp_img, backimg );
