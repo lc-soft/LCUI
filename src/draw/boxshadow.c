@@ -39,6 +39,11 @@
 * 没有，请查看：<http://www.gnu.org/licenses/>. 
 * ***************************************************************************/
 
+/**
+ * 本模块的主要用于实现阴影绘制，但不是通用的，仅适用于矩形框，不能用于绘制文
+ * 字、多边形等不规则图形的阴影。
+ */
+
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
@@ -47,142 +52,75 @@
 #define RADIUS_N	1.5
 
 static void 
-draw_gradient_line( LCUI_Graph *graph, LCUI_Pos begin, LCUI_Pos end, 
-			LCUI_ARGB line_color, LCUI_Rect *area )
-{
-	float k, v, a;
-	int s, t, x, y, b, i;
-	LCUI_ARGB pixel_color;
-	
-	s = 255;
-	t = (end.y-begin.y)*(end.y-begin.y);
-	t += (end.x-begin.x)*(end.x-begin.x);
-	t = (int)((double)sqrt(1.0*t)+0.5);
-	v = 512.0/t;
-	a = 2*(v*t-s)/(t*t);
-	pixel_color = line_color;
-	/* 如果与X轴平行 */
-	if( end.y - begin.y == 0 ) {
-		if( begin.y < area->y || begin.y >= area->y + area->h ) {
-			return;
-		}
-		if( begin.x > end.x ) {
-			i = -1;
-		} else {
-			i = 1;
-		}
-		for( t=0,x=begin.x; x!=end.x; x+=i,++t ) {
-			if( x < area->x || x >= area->x + area->w ) {
-				continue;
-			}
-			pixel_color.alpha = (uchar_t)(s-(v*t-(a*t*t)/2));
-			pixel_color.alpha *= line_color.a/255.0;
-			Graph_SetPixel( graph, x, begin.y, pixel_color );
-		}
-		return;
-	}
-	/* 如果与Y轴平行 */
-	if( end.x - begin.x == 0 ) {
-		if( begin.x < area->x || begin.x >= area->x + area->w ) {
-			return;
-		}
-		if( begin.y > end.y ) {
-			i = -1;
-		} else {
-			i = 1;
-		}
-		for( t=0,y=begin.y; y!=end.y; y+=i,++t ) {
-			if( y < area->y || y >= area->y + area->h ) {
-				continue;
-			}
-			pixel_color.alpha = (uchar_t)(s-(v*t-(a*t*t)/2));
-			pixel_color.alpha *= line_color.a/255.0;
-			Graph_SetPixel( graph, begin.x, y, pixel_color );
-		}
-		return;
-	}
-
-	k = 1.0*(end.y-begin.y)/(end.x-begin.x);
-	b = begin.y - (int)(begin.x*k);
-	if( begin.x > end.x ) {
-		i = -1;
-	} else {
-		i = 1;
-	}
-	for( x=begin.x; x!=end.x; x+=i ) {
-		if( x < area->x || x >= area->x + area->w ) {
-			continue;
-		}
-		y = (int)(x*k)+b;
-		if( y < area->y || y >= area->y + area->h ) {
-			continue;
-		}
-		t = (y-begin.y)*(y-begin.y);
-		t += (x-begin.x)*(x-begin.x);
-		t = (int)((double)sqrt(1.0*t)+0.5);
-		pixel_color.alpha = (uchar_t)(s-(v*t-(a*t*t)/2));
-		pixel_color.alpha *= line_color.a/255.0;
-		Graph_SetPixel( graph, x, y, pixel_color );
-	}
-
-	if( begin.y > end.y ) {
-		i = -1;
-	} else {
-		i = 1;
-	}
-	for( y=begin.y; y!=end.y; y+=i ) {
-		if( y < area->y || y >= area->y + area->h ) {
-			continue;
-		}
-		x = (int)((y-b)/k);
-		if( x < area->x || x >= area->x + area->w ) {
-			continue;
-		}
-		t = (y-begin.y)*(y-begin.y);
-		t += (x-begin.x)*(x-begin.x);
-		t = (int)((double)sqrt(1.0*t)+0.5);
-		pixel_color.alpha = (uchar_t)(s-(v*t-(a*t*t)/2));
-		pixel_color.alpha *= line_color.a/255.0;
-		Graph_SetPixel( graph, x, y, pixel_color );
-	}
-}
-
-static void 
 draw_circle( LCUI_Graph *graph, LCUI_Pos center, int r, LCUI_ARGB color )
 {
-	LCUI_Graph *src;
-	LCUI_Pos pos;
-	LCUI_Rect area;
-	int circle_right, circle_left, circle_bottom, circle_top;
+	LCUI_Graph *src, box_graph;
+	LCUI_Rect area, box_rect;
+	LCUI_ARGB pixel_color;
+
+	float v, a;
+	int s, t, x, y;
+	LCUI_Rect2 circle;
 	
+	s = 255;
+	t = r;
+	v = 512.0/t;
+	a = 2*(v*t-s)/(t*t);
+	pixel_color = color;
+
 	area = Graph_GetValidRect( graph );
 	src = Graph_GetQuote( graph );
-	circle_right = center.x + r;
-	circle_left = center.x - r;
-	circle_bottom = center.y + r;
-	circle_top = center.y - r;
-	for( pos.x=circle_left; pos.x<circle_right; ++pos.x ) {
-		pos.y = r*r - (pos.x-center.x)*(pos.x-center.x);
-		pos.y = -sqrt(pos.y) + center.y;
-		draw_gradient_line( src, center, pos, color, &area );
-	}
+	center.x += area.x;
+	center.y += area.y;
+	circle.r = center.x + r;
+	circle.l = center.x - r;
+	circle.b = center.y + r;
+	circle.t = center.y - r;
 
-	for( pos.x=circle_left; pos.x<circle_right; ++pos.x ) {
-		pos.y = r*r - (pos.x-center.x)*(pos.x-center.x);
-		pos.y = sqrt(pos.y) + center.y;
-		draw_gradient_line( src, center, pos, color, &area );
-	}
+	/* 先填充 圆外切矩形 外的矩形区域 */
+	box_rect.x = area.x;
+	box_rect.y = area.y;
+	box_rect.w = area.w;
+	box_rect.h = circle.t - area.y;
+	Graph_Quote( &box_graph, src, box_rect );
+	Graph_FillAlpha( &box_graph, 0 );
 
-	for( pos.y=circle_top; pos.y<circle_bottom; ++pos.y ) {
-		pos.x = r*r - (pos.y-center.y)*(pos.y-center.y);
-		pos.x = sqrt(pos.x) + center.x;
-		draw_gradient_line( src, center, pos, color, &area );
+	box_rect.y = circle.t;
+	box_rect.w = circle.l - area.x;
+	box_rect.h = area.y + area.h - circle.t;
+	Graph_Quote( &box_graph, src, box_rect );
+	Graph_FillAlpha( &box_graph, 0 );
+
+	/* 调整圆的区域 */
+	if( circle.l < area.x ) {
+		circle.l = area.x;
 	}
-	
-	for( pos.y=circle_top; pos.y<circle_bottom; ++pos.y ) {
-		pos.x = r*r - (pos.y-center.y)*(pos.y-center.y);
-		pos.x = -sqrt(pos.x) + center.x;
-		draw_gradient_line( src, center, pos, color, &area );
+	if( circle.t < area.y ) {
+		circle.t = area.y;
+	}
+	if( circle.r > area.x + area.w ) {
+		circle.r = area.x + area.w;
+	}
+	if( circle.b > area.y + area.h ) {
+		circle.b = area.y + area.h;
+	}
+	if( area.w > 50 ) {
+		_DEBUG_MSG("circle: %d,%d,%d,%d\n", circle.l, circle.t, circle.r, circle.b);
+	}
+	/* 遍历区域内每个像素点，根据点到圆心的距离，计算其alpha透明度 */
+	for( y=circle.t; y<circle.b; ++y ) {
+		for( x=circle.l; x<circle.r; ++x ) {
+			t = (y-center.y)*(y-center.y);
+			t += (x-center.x)*(x-center.x);
+			t = (int)((double)sqrt(1.0*t)+0.5);
+			if( t <= r ) {
+				pixel_color.a = (uchar_t)(s-(v*t-(a*t*t)/2));
+				pixel_color.a *= color.a/255.0;
+			} else {
+				pixel_color.alpha = 0;
+			}
+			Graph_SetPixel( src, x, y, pixel_color );
+		}
 	}
 	
 }
@@ -195,13 +133,13 @@ Graph_DrawTopLeftShadow( LCUI_Graph *graph, LCUI_Rect area,
 	LCUI_Rect bound;
 	LCUI_Pos pos;
 	
-	pos.x = BoxShadow_GetX( &shadow ) + (shadow.blur + shadow.spread)*RADIUS_N;
-	pos.y = BoxShadow_GetY( &shadow ) + (shadow.blur + shadow.spread)*RADIUS_N;
+	bound.w = bound.h = (shadow.blur + shadow.spread)*RADIUS_N;
+	pos.x = bound.w;
+	pos.y = bound.h;
 	bound.x = BoxShadow_GetX( &shadow );
 	bound.y = BoxShadow_GetY( &shadow );
-	bound.w = bound.h = (shadow.blur + shadow.spread)*RADIUS_N;
 	Graph_Quote( &box, graph, bound );
-	draw_circle( &box, pos, (shadow.blur + shadow.spread)*RADIUS_N, shadow.color );
+	draw_circle( &box, pos, bound.w, shadow.color );
 }
 
 static void
@@ -212,15 +150,15 @@ Graph_DrawTopRightShadow( LCUI_Graph *graph, LCUI_Rect area,
 	LCUI_Rect bound;
 	LCUI_Pos pos;
 
-	pos.x = BoxShadow_GetX( &shadow );
-	pos.x += BoxShadow_GetBoxWidth( &shadow, graph->w );
-	pos.x += (shadow.blur + shadow.spread)*(RADIUS_N-1.0);
-	pos.y = BoxShadow_GetY( &shadow ) + (shadow.blur + shadow.spread)*RADIUS_N;
-	bound.x = pos.x;
-	bound.y = 0;
+	bound.x = BoxShadow_GetX( &shadow );
+	bound.x += BoxShadow_GetBoxWidth( &shadow, graph->w );
+	bound.x += (shadow.blur + shadow.spread)*(RADIUS_N-1.0);
+	bound.y = BoxShadow_GetY( &shadow );
 	bound.w = bound.h = (shadow.blur + shadow.spread)*RADIUS_N;
+	pos.x = 0;
+	pos.y = bound.h;
 	Graph_Quote( &box, graph, bound );
-	draw_circle( &box, pos, (shadow.blur + shadow.spread)*RADIUS_N, shadow.color );
+	draw_circle( &box, pos, bound.w, shadow.color );
 }
 
 static void
@@ -231,15 +169,15 @@ Graph_DrawBottomLeftShadow( LCUI_Graph *graph, LCUI_Rect area,
 	LCUI_Rect bound;
 	LCUI_Pos pos;
 	
-	pos.x = BoxShadow_GetX( &shadow ) + (shadow.blur + shadow.spread)*RADIUS_N;
-	pos.y = BoxShadow_GetY( &shadow );
-	pos.y += BoxShadow_GetBoxHeight( &shadow, graph->h );
-	pos.y += (shadow.blur + shadow.spread)*(RADIUS_N-1.0);
-	bound.x = BoxShadow_GetX( &shadow );
-	bound.y = pos.y;
 	bound.w = bound.h = (shadow.blur + shadow.spread)*RADIUS_N;
+	pos.x = bound.w;
+	pos.y = 0;
+	bound.x = BoxShadow_GetX( &shadow );
+	bound.y = BoxShadow_GetY( &shadow );
+	bound.y += BoxShadow_GetBoxHeight( &shadow, graph->h );
+	bound.y += (shadow.blur + shadow.spread)*(RADIUS_N-1.0);
 	Graph_Quote( &box, graph, bound );
-	draw_circle( &box, pos, (shadow.blur + shadow.spread)*RADIUS_N, shadow.color );
+	draw_circle( &box, pos, bound.w, shadow.color );
 }
 
 static void
@@ -249,18 +187,18 @@ Graph_DrawBottomRightShadow( LCUI_Graph *graph, LCUI_Rect area,
 	LCUI_Graph box;
 	LCUI_Rect bound;
 	LCUI_Pos pos;
-	
-	pos.x = BoxShadow_GetX( &shadow );
-	pos.x += BoxShadow_GetBoxWidth( &shadow, graph->w );
-	pos.x += (shadow.blur + shadow.spread)*(RADIUS_N-1.0);
-	pos.y = BoxShadow_GetY( &shadow );
-	pos.y += BoxShadow_GetBoxHeight( &shadow, graph->h );
-	pos.y += (shadow.blur + shadow.spread)*(RADIUS_N-1.0);
-	bound.x = pos.x;
-	bound.y = pos.y;
+
+	bound.x = BoxShadow_GetX( &shadow );
+	bound.x += BoxShadow_GetBoxWidth( &shadow, graph->w );
+	bound.x += (shadow.blur + shadow.spread)*(RADIUS_N-1.0);
+	bound.y = BoxShadow_GetY( &shadow );
+	bound.y += BoxShadow_GetBoxHeight( &shadow, graph->h );
+	bound.y += (shadow.blur + shadow.spread)*(RADIUS_N-1.0);
 	bound.w = bound.h = (shadow.blur + shadow.spread)*RADIUS_N;
+	pos.x = 0;
+	pos.y = 0;
 	Graph_Quote( &box, graph, bound );
-	draw_circle( &box, pos, (shadow.blur + shadow.spread)*RADIUS_N, shadow.color );
+	draw_circle( &box, pos, bound.w, shadow.color );
 }
 
 static void 
@@ -531,4 +469,4 @@ int Graph_DrawBoxShadow( LCUI_Graph *graph, LCUI_BoxShadow shadow )
 	rect.w = graph->w;
 	rect.h = graph->h;
 	return Graph_DrawBoxShadowEx( graph, rect, shadow );
-}
+}
