@@ -64,7 +64,7 @@ static HBITMAP client_bitmap;
 static LCUI_Sleeper win32_init_sleeper;
 static LCUI_BOOL win32_init_error = TRUE;
 
-void Win32_LCUI_Init( HINSTANCE hInstance )
+void Win32_LCUI_Init__( HINSTANCE hInstance )
 {
 	win32_hInstance = hInstance;
 }
@@ -80,7 +80,7 @@ void Win32_SetSelfHWND( HWND hwnd )
 }
 
 /** win32的动态库的入口函数 */
-BOOL APIENTRY DllMain( HMODULE hModule, DWORD ul_reason_for_call,
+BOOL APIENTRY DllMain__( HMODULE hModule, DWORD ul_reason_for_call,
                        LPVOID lpReserved )
 {
 	switch (ul_reason_for_call)
