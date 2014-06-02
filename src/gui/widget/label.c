@@ -68,19 +68,16 @@ static LCUI_TextLayer* Label_GetTextLayer( LCUI_Widget *widget )
 	return &label->layer;
 }
 
-static void Label_OnSetTextStyle( LCUI_Widget *widget, void *arg )
+static void Label_UpdateTextStyle( LCUI_Widget *widget, void *arg )
 {
-	LCUI_TextStyle *style;
 	LCUI_Label *label;
-	
 	DEBUG_MSG("recv LABEL_STYLE msg, lock widget\n");
-	style = (LCUI_TextStyle*)arg;
 	label = (LCUI_Label*)Widget_GetPrivateData( widget );
 	if( !label ) {
 		return;
 	}
 	Widget_Lock( widget );
-	TextLayer_SetTextStyle( &label->layer, style );
+	TextLayer_SetTextStyle( &label->layer, &label->layer.text_style );
 	Widget_Update( widget );
 	DEBUG_MSG("unlock widget\n");
 	Widget_Unlock( widget );
@@ -135,7 +132,7 @@ static void Label_OnInit( LCUI_Widget *widget )
 	TextLayer_SetUsingStyleTags( &label->layer, TRUE );
 	/* 将回调函数与自定义消息关联 */
 	WidgetMsg_Connect( widget, LABEL_TEXT, Label_OnSetTextW );
-	WidgetMsg_Connect( widget, LABEL_STYLE, Label_OnSetTextStyle );
+	WidgetMsg_Connect( widget, LABEL_STYLE, Label_UpdateTextStyle );
 	WidgetMsg_Connect( widget, LABEL_AUTO_WRAP, Label_OnSetAutoWrap );
 }
 
@@ -313,18 +310,11 @@ LCUI_API void Label_SetTextAlign( LCUI_Widget *widget, TextAlignType align )
 /** 为Label部件内显示的文本设定文本样式 */
 LCUI_API int Label_SetTextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 {
-	LCUI_TextStyle *p_style;
-	
-	if( !widget ) {
-		return -1;
-	}
-	p_style = (LCUI_TextStyle*)malloc( sizeof(LCUI_TextStyle) );
-	if( !p_style ) {
-		return -2;
-	}
-	*p_style = style;
+	LCUI_Label *label;
+	label = (LCUI_Label*)Widget_GetPrivateData( widget );
+	label->layer.text_style = style;
 	DEBUG_MSG("post LABEL_STYLE msg\n");
-	WidgetMsg_Post( widget, LABEL_STYLE, p_style, TRUE, TRUE );
+	WidgetMsg_Post( widget, LABEL_STYLE, NULL, TRUE, FALSE );
 	return 0;
 }
 
