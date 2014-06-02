@@ -105,6 +105,7 @@ enum LCUIMode {
 #define LC_INPUT_H	<LCUI/LCUI_Input.h>
 #define LC_ERROR_H	<LCUI/LCUI_Error.h>
 #define LC_THREAD_H	<LCUI/LCUI_Thread.h>
+#define LC_SURFACE_H	<LCUI/LCUI_Surface.h>
 
 #define LC_GRAPHLAYER_H		<LCUI/LCUI_GraphLayer.h>
 
