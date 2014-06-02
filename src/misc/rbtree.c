@@ -386,7 +386,7 @@ rb_erase_rebalance( LCUI_RBTreeNode *node, LCUI_RBTreeNode *parent,
 int RBTree_Erase( LCUI_RBTree *rbt, int key )  
 {
         unsigned char color;
-        LCUI_RBTreeNode *root, *child, *parent, *old, *left, *node; 
+        LCUI_RBTreeNode *root, *child = NULL, *parent, *old, *left, *node; 
 
         root = rbt->root;
         /* 查找要删除的结点 */
