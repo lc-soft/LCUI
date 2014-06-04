@@ -76,8 +76,13 @@ LCUI_Surface *Surface_New(void)
 {
 	LCUI_Surface *surface;
 	surface = (LCUI_Surface*)malloc(sizeof(LCUI_Surface));
-	DirtyRectList_Init( &surface->rect );
 	surface->target = NULL;
+	surface->mode = RENDER_MODE_BIT_BLT;
+	surface->fb_hdc = NULL;
+	surface->fb_bmp = NULL;
+	Graph_Init( &surface->fb );
+	surface->fb.color_type = COLOR_TYPE_ARGB;
+	DirtyRectList_Init( &surface->rect );
 	/* 创建窗口 */
 	surface->hwnd = CreateWindow(
 			TEXT("LCUI"), TEXT ("LCUI Surface"),
@@ -140,6 +145,59 @@ void Surface_MapWidget( LCUI_Surface *surface, LCUI_Widget *widget )
 void Surface_UnmapWidget( LCUI_Surface *surface )
 {
 
+}
+
+/** 设置 Surface 的渲染模式 */
+int Surface_SetRenderMode( LCUI_Surface *surface, int mode )
+{
+	switch(mode) {
+	case RENDER_MODE_BIT_BLT: 
+	case RENDER_MODE_STRETCH_BLT:
+		surface->mode = mode;
+		break;
+	default: return -1;
+	}
+	return 0;
+}
+
+/** 重绘Surface中的一块区域内的图像 */
+int Surface_Paint( LCUI_Surface *surface, LCUI_Rect rect )
+{
+	LCUI_Graph graph;
+	LCUI_GraphLayer *glayer;
+	if( !surface->target ) {
+		return -1;
+	}
+	glayer = Widget_GetGraphLayer(surface->target);
+	Graph_Init( &graph );
+	GraphLayer_GetGraph( glayer, &graph, rect );
+	Graph_Replace( &surface->fb, &graph, Pos(0,0) );
+	return 0;
+}
+
+/** 将帧缓存中的数据呈现至Surface的窗口内 */
+void Surface_Present( LCUI_Surface *surface )
+{
+	HDC hdc_client;
+	RECT client_rect;
+
+	hdc_client = GetDC( surface->hwnd );
+	SetBitmapBits( surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes );
+	switch(surface->mode) {
+	case RENDER_MODE_STRETCH_BLT:
+		GetClientRect( surface->hwnd, &client_rect );
+		StretchBlt( hdc_client, 0, 0,
+			client_rect.right, client_rect.bottom,
+			surface->fb_hdc, 0, 0,
+			surface->w, surface->h, SRCCOPY );
+		break;
+       case RENDER_MODE_BIT_BLT:
+		BitBlt( hdc_client, 0, 0, surface->w, surface->h,
+			surface->fb_hdc, 0, 0, SRCCOPY );
+		break;
+	default:break;
+	}
+	ValidateRect( surface->hwnd, NULL );
 }
 
 int LCUISurface_Init(void)
