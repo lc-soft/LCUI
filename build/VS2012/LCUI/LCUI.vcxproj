@@ -173,10 +173,12 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Misc.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Queue.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_StyleLibrary.h" />
+    <ClInclude Include="..\..\..\include\LCUI\LCUI_Surface.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Widget.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\delay.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\dirent.h" />
+    <ClInclude Include="..\..\..\include\LCUI\misc\framectrl.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\linkedlist.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\rbtree.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\rect.h" />
@@ -240,6 +242,7 @@
     <ClCompile Include="..\..\..\src\misc\catch_screen.c" />
     <ClCompile Include="..\..\..\src\misc\delay.c" />
     <ClCompile Include="..\..\..\src\misc\dirent.c" />
+    <ClCompile Include="..\..\..\src\misc\framectrl.c" />
     <ClCompile Include="..\..\..\src\misc\linkedlist.c" />
     <ClCompile Include="..\..\..\src\misc\misc.c" />
     <ClCompile Include="..\..\..\src\misc\rbtree.c" />
@@ -248,6 +251,7 @@
     <ClCompile Include="..\..\..\src\output\dummy.c" />
     <ClCompile Include="..\..\..\src\output\graph_display.c" />
     <ClCompile Include="..\..\..\src\output\win32.c" />
+    <ClCompile Include="..\..\..\src\output\win32_surface.c" />
     <ClCompile Include="..\..\..\src\thread\LCUI_Thread.c" />
     <ClCompile Include="..\..\..\src\thread\win32\mutex.c" />
     <ClCompile Include="..\..\..\src\thread\win32\thread.c">

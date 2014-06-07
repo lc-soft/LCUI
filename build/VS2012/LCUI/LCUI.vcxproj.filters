@@ -246,6 +246,12 @@
     <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h">
       <Filter>头文件\LCUI\draw</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\LCUI_Surface.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\misc\framectrl.h">
+      <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -442,6 +448,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\draw\boxshadow.c">
       <Filter>源文件\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\output\win32_surface.c">
+      <Filter>源文件\output</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\misc\framectrl.c">
+      <Filter>源文件\misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
