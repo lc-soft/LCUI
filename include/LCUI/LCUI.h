@@ -236,13 +236,14 @@ LCUI_END_HEADER
 		fflush(stdout); \
 	}
 
-#include LC_MISC_H
 #include LC_KERNEL_SLEEPER_H
 #include LC_KERNEL_MAIN_H
 #include LC_KERNEL_DEV_H
 #include LC_KERNEL_TIMER_H
 #include LC_KERNEL_TASK_H
 #include LC_KERNEL_EVENT_H
+	
+#include LC_MISC_H
 
 #if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS) &&defined(I_NEED_WINMAIN)
 
