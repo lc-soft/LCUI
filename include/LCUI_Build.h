@@ -85,6 +85,7 @@ enum LCUIMode {
 #define LC_MISC_DIRENT_H	<LCUI/misc/dirent.h>
 #define LC_MISC_LINKED_LIST_H	<LCUI/misc/linkedlist.h>
 #define LC_MISC_RB_TREE_H	<LCUI/misc/rbtree.h>
+#define LC_MISC_FRAME_CONTROL_H	<LCUI/misc/framectrl.h>
 #define LC_MISC_H		<LCUI/LCUI_Misc.h>
 
 #define LC_WIDGET_BASE_H	<LCUI/gui/widget_base.h>
