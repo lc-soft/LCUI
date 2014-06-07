@@ -101,6 +101,14 @@ LCUI_API int LCUIScreen_PutGraph( LCUI_Graph *graph, LCUI_Pos pos )
 	return -1;
 }
 
+LCUI_API int LCUIScreen_MixGraph( LCUI_Graph *graph, LCUI_Pos pos )
+{
+	if( screen.MixGraph ) {
+		return screen.MixGraph( graph, pos );
+	}
+	return -1;
+}
+
 LCUI_API int LCUIScreen_SetMode( int w, int h, int mode )
 {
 	if( screen.PutGraph ) {
@@ -248,8 +256,8 @@ static int LCUIScreen_UpdateInvalidArea(void)
 		/* 获取内存中对应区域的图形数据 */
 		LCUIScreen_GetRealGraph( *p_rect, &graph );
 		//Graph_FillColor( &graph, RGB(255,0,0) );
-		/* 写入至帧缓冲，让屏幕显示图形 */
 		//Graph_DrawBorder( &graph, Border(1,BORDER_STYLE_SOLID, RGB(255,0,0)) );
+		/* 写入至帧缓冲，让屏幕显示图形 */
 		LCUIScreen_PutGraph( &graph, Pos(p_rect->x, p_rect->y) );
 		LinkedList_Delete( &screen_invalid_area );
 	}
@@ -258,48 +266,12 @@ static int LCUIScreen_UpdateInvalidArea(void)
 	return ret;
 }
 
-static int current_screen_fps = 0;
+static FrameCtrlCtx fc_ctx;
 
 /** 获取当前的屏幕内容每秒更新的帧数 */
 LCUI_API int LCUIScreen_GetFPS(void)
 {
-	return current_screen_fps;
-}
-
-static int one_frame_remain_time;
-static int64_t prev_frame_start_time;
-static int64_t prev_fps_update_time;
-/** 初始化帧数控制 */
-static void FrameControl_Init( int ms_per_frame )
-{
-	one_frame_remain_time = ms_per_frame;
-	prev_frame_start_time = LCUI_GetTickCount();
-	prev_fps_update_time = LCUI_GetTickCount();
-}
-
-/** 让当前帧停留一段时间 */
-static void FrameControl_RemainFrame(void)
-{
-	int n_ms;
-	int64_t current_time;
-	static int fps;
-
-	current_time = LCUI_GetTickCount();
-	n_ms = (int)(current_time - prev_frame_start_time);
-	if( n_ms < one_frame_remain_time ) {
-		n_ms = one_frame_remain_time - n_ms;
-		if( n_ms > 0 ) {
-			LCUI_MSleep( n_ms );
-			current_time = LCUI_GetTickCount();
-		}
-	}
-	if( current_time - prev_fps_update_time >= 1000 ) {
-		current_screen_fps = fps;
-		prev_fps_update_time = current_time;
-		fps = 0;
-	}
-	prev_frame_start_time = current_time;
-	++fps;
+	return fc_ctx.current_fps;
 }
 
 /** 更新屏幕内的图形显示 */
@@ -309,7 +281,8 @@ static void LCUIScreen_Update( void* unused )
 	/* 先标记刷新整个屏幕区域 */
 	LCUIScreen_InvalidateArea( NULL );
 	/* 初始化帧数控制 */
-	FrameControl_Init( 1000/MAX_FRAMES_PER_SEC );
+	FrameControl_Init( &fc_ctx );
+	FrameControl_SetMaxFPS( &fc_ctx, 1000/MAX_FRAMES_PER_SEC );
 	while( LCUI_Sys.state == ACTIVE ) {
 		/* 更新鼠标位置 */
 		LCUICursor_UpdatePos();
@@ -323,7 +296,7 @@ static void LCUIScreen_Update( void* unused )
 			LCUIScreen_SyncFrameBuffer();
 		}
 		/* 让本帧停留一段时间 */
-		FrameControl_RemainFrame();
+		FrameControl_Remain( &fc_ctx );
 	}
 	LCUIThread_Exit(NULL);
 }
