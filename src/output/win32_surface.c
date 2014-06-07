@@ -16,6 +16,9 @@ static struct {
 	HINSTANCE dll_instance;		/**< 动态库中的资源句柄 */
 } win32;
 
+static FrameCtrlCtx surface_framectrl_ctx;
+static LinkedList surface_list;
+
 void Win32_LCUI_Init( HINSTANCE hInstance )
 {
 	win32.main_instance = hInstance;
@@ -90,6 +93,8 @@ LCUI_Surface *Surface_New(void)
 			CW_USEDEFAULT, CW_USEDEFAULT,
 			0, 0,
 			NULL, NULL, win32.main_instance, NULL);
+
+	LinkedList_Insert( &surface_list, surface );
 	return surface;
 }
 
@@ -172,7 +177,14 @@ int Surface_Paint( LCUI_Surface *surface, LCUI_Rect rect )
 	Graph_Init( &graph );
 	GraphLayer_GetGraph( glayer, &graph, rect );
 	Graph_Replace( &surface->fb, &graph, Pos(0,0) );
+	Graph_Free( &graph );
 	return 0;
+}
+
+/** 处理Surface的无效区域 */
+void Surface_ProcInvalidArea( LCUI_Surface *surface )
+{
+
 }
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
@@ -223,7 +235,38 @@ int LCUISurface_Init(void)
 		MessageBox( NULL, str, szAppName, MB_ICONERROR );
 		return -1;
 	}
+	/** 初始化 Surface 列表 */
+	LinkedList_Init( &surface_list, sizeof(LCUI_Surface) );
+	LinkedList_SetDataNeedFree( &surface_list, TRUE );
+	LinkedList_SetDestroyFunc( &surface_list, (void (*)(void*))Surface_Delete );
 	return 0;
+}
+
+/** Surface 处理线程 */
+static void LCUISurface_ProcThread(void *unused)
+{
+	/*
+	 * 处理列表中每个 Surface 的更新，包括映射的被部件的消息处理、无效区
+	 * 域更新、Surface 内容的更新。
+	 */
+	int i, n;
+	LCUI_Surface *surface;
+
+	FrameControl_Init( &surface_framectrl_ctx );
+	FrameControl_SetMaxFPS( &surface_framectrl_ctx, 100 );
+	
+	while(1) {
+		LCUIWidget_ProcInvalidArea();
+		LinkedList_Goto( &surface_list, 0 );
+		n = LinkedList_GetTotal( &surface_list );
+		for( i=0; i<n; ++i ) {
+			surface = (LCUI_Surface*)LinkedList_Get( &surface_list );
+			Surface_ProcInvalidArea( surface );
+			Surface_Present( surface );
+			LinkedList_ToNext( &surface_list );
+		}
+		FrameControl_Remain( &surface_framectrl_ctx );
+	}
 }
 
 void LCUISurface_Loop(void)
