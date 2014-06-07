@@ -203,16 +203,10 @@ LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget *widget, LCUI_Rect *area )
 LCUI_API void Widget_EndPaint( LCUI_Widget *widget, LCUI_Rect *area )
 {
 	LCUI_Graph graph;
-	LCUI_Rect outer_area;
-
 	Widget_QuoteInnerGraph( widget, &graph, area );
 	Graph_DrawBorderEx( &graph, widget->border, *area );
 	Widget_ValidateArea( widget, area );
-	outer_area.x = area->x + BoxShadow_GetBoxX( &widget->shadow );
-	outer_area.y = area->y + BoxShadow_GetBoxY( &widget->shadow );
-	outer_area.w = area->w;
-	outer_area.h = area->h;
-	Widget_PushAreaToScreen( widget, &outer_area );
+	Widget_PushAreaToScreen( widget, area );
 }
 
 static void Widget_OnPaint( LCUI_Widget *widget )
@@ -242,7 +236,7 @@ int LCUIWidget_ProcInvalidArea(void)
 		widget = (LCUI_Widget*)node->key;
 		DEBUG_MSG("widget, %p, dirty rect num: %d\n", widget, widget->dirty_rect.used_node_num);
 		old_num = widget->dirty_rect.used_node_num;
-		/* 有多少个脏矩形就地阿姨多少次部件的绘制函数 */
+		/* 有多少个脏矩形就调用多少次部件的绘制函数 */
 		while( widget->dirty_rect.used_node_num > 0 ) {
 			if( WidgetFunc_Call( widget, FUNC_TYPE_PAINT ) != 0 ) {
 				DEBUG_MSG("tip\n");
