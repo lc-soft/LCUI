@@ -40,7 +40,12 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD reason, LPVOID unused )
 }
 
 /** 根据 hwnd 获取 Surface */
-static LCUI_Surface *getSurfaceByHWND( HWND hwnd )
+static LCUI_Surface *GetSurfaceByHWND( HWND hwnd )
+{
+	return NULL;
+}
+
+static LCUI_Surface *GetSurfaceByWidget( LCUI_Widget *widget )
 {
 	return NULL;
 }
@@ -49,7 +54,7 @@ static LRESULT CALLBACK
 WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 {
 	LCUI_Surface *surface;
-	surface = getSurfaceByHWND( hwnd);
+	surface = GetSurfaceByHWND( hwnd);
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
@@ -85,11 +90,12 @@ void Surface_Delete( LCUI_Surface *surface )
 	Graph_Free( &surface->fb );
 	DirtyRectList_Destroy( &surface->rect );
 	n = LinkedList_GetTotal( &surface_list );
-	for( i=0; i<n; +i ) {
+	for( i=0; i<n; ++i ) {
 		if( surface == LinkedList_Get(&surface_list) ) {
 			LinkedList_Delete( &surface_list );
 			break;
 		}
+		LinkedList_ToNext( &surface_list );
 	}
 }
 
@@ -172,6 +178,11 @@ void Surface_SetCaptionW( LCUI_Surface *surface, const wchar_t *str )
 	SetWindowText( surface->hwnd, str );
 }
 
+void Surface_SetOpacity( LCUI_Surface *surface, float opacity )
+{
+
+}
+
 void Surface_UnmapWidget( LCUI_Surface *surface )
 {
 	if( !surface->target ) {
@@ -179,6 +190,61 @@ void Surface_UnmapWidget( LCUI_Surface *surface )
 	}
 	Surface_InvalidateArea( surface, NULL );
 	surface->target = NULL;
+}
+
+static void
+OnWidgetShow( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+{
+	LCUI_Surface *surface;
+	surface = GetSurfaceByWidget( widget );
+	if( !surface ) {
+		return;
+	}
+	Surface_Show( surface );
+}
+
+static void
+OnWidgetHide( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+{
+	LCUI_Surface *surface;
+	surface = GetSurfaceByWidget( widget );
+	if( !surface ) {
+		return;
+	}
+	Surface_Hide( surface );
+}
+
+static void
+OnWidgetDestroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+{
+	LCUI_Surface *surface;
+	surface = GetSurfaceByWidget( widget );
+	if( !surface ) {
+		return;
+	}
+	Surface_Delete( surface );
+}
+
+static void
+OnWidgetResize( LCUI_Widget *widget, LCUI_WidgetEvent *e )
+{
+	LCUI_Surface *surface;
+	surface = GetSurfaceByWidget( widget );
+	if( !surface ) {
+		return;
+	}
+	Surface_Resize( surface, e->resize.new_size.w, e->resize.new_size.h );
+}
+
+static void
+OnWidgetOpacityChange( LCUI_Widget *widget, LCUI_WidgetEvent *e )
+{
+	LCUI_Surface *surface;
+	surface = GetSurfaceByWidget( widget );
+	if( !surface ) {
+		return;
+	}
+	Surface_SetOpacity( surface, 1.0 );
 }
 
 /** 将指定部件映射至 Surface 上 */
