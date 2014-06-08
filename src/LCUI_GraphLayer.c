@@ -525,14 +525,15 @@ LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr,
 	if (rect.width <= 0 || rect.height <= 0) {
 		return -2;
 	}
-	
+	if( !Graph_IsValid(graph_buff) ) {
+	graph_buff->color_type = COLOR_TYPE_ARGB;
+		Graph_Create( graph_buff, rect.width, rect.height );
+	}
+
 	Graph_Init( &tmp_graph );
 	Queue_Init( &glayerQ, 0, NULL);
 	Queue_UsingPointer( &glayerQ );
 	
-	graph_buff->color_type = COLOR_TYPE_ARGB;
-	/* 为graph_buff分配合适尺寸的内存空间 */
-	Graph_Create( graph_buff, rect.width, rect.height );
 	/* 获取rect区域内的图层列表 */
 	GraphLayer_GetLayers( ctnr, rect, &glayerQ ); 
 	total = Queue_GetTotal( &glayerQ ); 
@@ -579,12 +580,8 @@ LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr,
 skip_loop:
 	total = Queue_GetTotal( &glayerQ );
 	DEBUG_MSG( "total: %d\n", total );
-	if(i <= 0) {
-		if( ctnr == NULL ) {
-			Graph_FillColor( graph_buff, RGB(255,255,255) );
-		} else {
+	if(i <= 0 && ctnr ) {
 			Graph_Cut( &ctnr->graph, rect, graph_buff );
-		}
 	}
 	/* 获取图层列表中的图层 */
 	for(i=0; i<total; ++i) {
