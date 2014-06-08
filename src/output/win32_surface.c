@@ -18,6 +18,7 @@ static struct {
 
 static FrameCtrlCtx surface_framectrl_ctx;
 static LinkedList surface_list;
+static LCUI_BOOL surface_proc_active = FALSE;
 
 void Win32_LCUI_Init( HINSTANCE hInstance )
 {
@@ -58,7 +59,7 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 	case WM_KILLFOCUS:
 		break;
 	case WM_CLOSE:
-		// 解除映射，并销毁部件和Surface
+		Surface_Delete( surface );
 		break;
 	case WM_SHOWWINDOW:
 		if( arg1 ) {
@@ -72,6 +73,24 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 	default:break;
 	}
 	return DefWindowProc( hwnd, msg, arg1, arg2 );
+}
+
+/** 删除 Surface */
+void Surface_Delete( LCUI_Surface *surface )
+{
+	int i, n;
+
+	surface->w = 0;
+	surface->h = 0;
+	Graph_Free( &surface->fb );
+	DirtyRectList_Destroy( &surface->rect );
+	n = LinkedList_GetTotal( &surface_list );
+	for( i=0; i<n; +i ) {
+		if( surface == LinkedList_Get(&surface_list) ) {
+			LinkedList_Delete( &surface_list );
+			break;
+		}
+	}
 }
 
 /** 新建一个 Surface */
@@ -98,10 +117,18 @@ LCUI_Surface *Surface_New(void)
 	return surface;
 }
 
-/** 删除 Surface */
-void Surface_Delete( LCUI_Surface *surface )
+/** 标记 Surface 中的无效区域 */
+void Surface_InvalidateArea( LCUI_Surface *surface, LCUI_Rect *p_rect )
 {
-
+	LCUI_Rect rect;
+	if( !p_rect ) {
+		rect.x = 0;
+		rect.y = 0;
+		rect.w = surface->w;
+		rect.h = surface->h;
+		p_rect = &rect;
+	}
+	DirtyRectList_Add( &surface->rect, p_rect );
 }
 
 void Surface_Move( LCUI_Surface *surface, int x, int y )
@@ -114,6 +141,12 @@ void Surface_Move( LCUI_Surface *surface, int x, int y )
 
 void Surface_Resize( LCUI_Surface *surface, int w, int h )
 {
+	/* 调整位图缓存的尺寸 */
+	Graph_Create( &surface->fb, w, h );
+	surface->w = w;
+	surface->h = h;
+	// surface->fb_bmp
+	Surface_InvalidateArea( surface, NULL );
 	/* 加上窗口边框的尺寸 */
 	w += GetSystemMetrics(SM_CXFIXEDFRAME)*2;
 	h += GetSystemMetrics(SM_CYFIXEDFRAME)*2;
@@ -139,17 +172,24 @@ void Surface_SetCaptionW( LCUI_Surface *surface, const wchar_t *str )
 	SetWindowText( surface->hwnd, str );
 }
 
+void Surface_UnmapWidget( LCUI_Surface *surface )
+{
+	if( !surface->target ) {
+		return;
+	}
+	Surface_InvalidateArea( surface, NULL );
+	surface->target = NULL;
+}
+
 /** 将指定部件映射至 Surface 上 */
 void Surface_MapWidget( LCUI_Surface *surface, LCUI_Widget *widget )
 {
 	/**
 	 * 关联部件相关事件，以在部件变化时让 surface 做相应变化
 	 */
-}
-
-void Surface_UnmapWidget( LCUI_Surface *surface )
-{
-
+	/*解除与之前映射的部件的关系 */
+	Surface_UnmapWidget( surface );
+	surface->target = widget;
 }
 
 /** 设置 Surface 的渲染模式 */
@@ -166,25 +206,43 @@ int Surface_SetRenderMode( LCUI_Surface *surface, int mode )
 }
 
 /** 重绘Surface中的一块区域内的图像 */
-int Surface_Paint( LCUI_Surface *surface, LCUI_Rect rect )
+int Surface_Paint( LCUI_Surface *surface, LCUI_Rect *p_rect )
 {
 	LCUI_Graph graph;
+	LCUI_Rect rect;
 	LCUI_GraphLayer *glayer;
+
 	if( !surface->target ) {
 		return -1;
 	}
+	if( !p_rect ) {
+		rect.x = 0;
+		rect.y = 0;
+		rect.w = surface->w;
+		rect.h = surface->h;
+		p_rect = &rect;
+	}
+
 	glayer = Widget_GetGraphLayer(surface->target);
-	Graph_Init( &graph );
-	GraphLayer_GetGraph( glayer, &graph, rect );
-	Graph_Replace( &surface->fb, &graph, Pos(0,0) );
-	Graph_Free( &graph );
+	Graph_Quote( &graph, &surface->fb, *p_rect );
+	Graph_FillColor( &graph, ARGB(255,255,255,255) );
+	GraphLayer_GetGraph( glayer, &graph, *p_rect );
 	return 0;
 }
 
 /** 处理Surface的无效区域 */
 void Surface_ProcInvalidArea( LCUI_Surface *surface )
 {
+	int i, n;
+	LCUI_Rect *p_rect;
 
+	n = LinkedList_GetTotal( &surface->rect );
+	LinkedList_Goto( &surface->rect, 0 );
+	for( i=0; i<n; ++i ) {
+		p_rect = (LCUI_Rect*)LinkedList_Get( &surface->rect );
+		Surface_Paint( surface, p_rect );
+		LinkedList_Delete( &surface->rect );
+	}
 }
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
@@ -238,7 +296,6 @@ int LCUISurface_Init(void)
 	/** 初始化 Surface 列表 */
 	LinkedList_Init( &surface_list, sizeof(LCUI_Surface) );
 	LinkedList_SetDataNeedFree( &surface_list, TRUE );
-	LinkedList_SetDestroyFunc( &surface_list, (void (*)(void*))Surface_Delete );
 	return 0;
 }
 
@@ -254,8 +311,9 @@ static void LCUISurface_ProcThread(void *unused)
 
 	FrameControl_Init( &surface_framectrl_ctx );
 	FrameControl_SetMaxFPS( &surface_framectrl_ctx, 100 );
-	
-	while(1) {
+	surface_proc_active = TRUE;
+
+	while( surface_proc_active ) {
 		LCUIWidget_ProcInvalidArea();
 		LinkedList_Goto( &surface_list, 0 );
 		n = LinkedList_GetTotal( &surface_list );
@@ -267,6 +325,8 @@ static void LCUISurface_ProcThread(void *unused)
 		}
 		FrameControl_Remain( &surface_framectrl_ctx );
 	}
+
+	LCUIThread_Exit(NULL);
 }
 
 void LCUISurface_Loop(void)
