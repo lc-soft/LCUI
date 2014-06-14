@@ -29,4 +29,5 @@ LCUI_API void FrameControl_Pause( FrameCtrlCtx *ctx, LCUI_BOOL need_pause );
 
 LCUI_END_HEADER
 
-#endif __LC_FRAME_CONTROL_H__
+#endif
+
