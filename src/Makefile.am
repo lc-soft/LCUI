@@ -28,7 +28,6 @@ LCUI_SOURCES = \
 LCUI_LIBADD = \
 	bmp/libbmp.la	\
 	draw/libdraw.la \
-	draw/in-core/libdraw_incore.la \
 	misc/libmisc.la \
 	kernel/libkernel.la \
 	font/libfont.la \
