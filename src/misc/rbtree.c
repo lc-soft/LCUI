@@ -63,7 +63,8 @@ LCUI_API void RBTree_Destroy( LCUI_RBTree *rbt )
 {
 	LCUI_RBTreeNode *node, *next_node;
 	node = RBTree_First( rbt );
-	while( next_node = RBTree_Next( node ) ) {
+	next_node = RBTree_Next( node );
+	while( next_node ) {
 		/* 移除在父节点中的记录 */
 		if( node->parent ) {
 			if( node->parent->left == node ) {
@@ -75,6 +76,7 @@ LCUI_API void RBTree_Destroy( LCUI_RBTree *rbt )
 		/* 释放该结点 */
 		free( node );
 		node = next_node;
+		next_node = RBTree_Next( node );
 	}
 }
 

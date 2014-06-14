@@ -276,10 +276,10 @@ LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 		DEBUG_MSG("overlay rect(%d,%d,%d,%d)\n",
 			o_rect.x, o_rect.y, o_rect.w, o_rect.h);
 		/* 如果两个矩形相距很近，则直接合并 */
-		if( rect->w - o_rect.w < 20 && rect->h - o_rect.h < 20
-		|| p_rect->w - o_rect.w < 20 && p_rect->h - o_rect.h < 20
-		|| p_rect->x == rect->x && p_rect->w == rect->w
-		|| p_rect->y == rect->y && p_rect->h == rect->h ) {
+		if( (rect->w - o_rect.w < 20 && rect->h - o_rect.h < 20)
+		|| (p_rect->w - o_rect.w < 20 && p_rect->h - o_rect.h < 20)
+		|| (p_rect->x == rect->x && p_rect->w == rect->w)
+		|| (p_rect->y == rect->y && p_rect->h == rect->h) ) {
 			LCUIRect_MergeRect( &o_rect, p_rect, rect );
 			DEBUG_MSG("merge rect, rect(%d,%d,%d,%d)\n",
 				o_rect.x, o_rect.y, o_rect.w, o_rect.h);
@@ -289,8 +289,11 @@ LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 			return DirtyRectList_Add( list, &o_rect );
 		}
 		LCUIRect_CutFourRect( &o_rect, rect, tmp_rect );
-		for( ret=0,i=0; i<4; ++i ) {
-			DirtyRectList_Add( list, &tmp_rect[i] );
+		for( ret=0,i=0; i<4&&ret==0; ++i ) {
+			ret = DirtyRectList_Add( list, &tmp_rect[i] );
+		}
+		if( ret != 0 ) {
+			return -3;
 		}
 		return 1;
 	}
