@@ -164,6 +164,65 @@ typedef struct LCUI_Rect2_ {
 } LCUI_Rect2;
 /*--------------- END ----------------*/
 
+/** LCUI 方法集（暂定） */
+typedef struct LCUIMethods {
+	void (*init)();
+	void (*exit)();
+	void (*main)();
+	void (*atexit)();
+	/** 事件 */
+	struct {
+		int (*send)(const char*, void*);
+		int (*post)(const char*, void*);
+		int (*bind)(const char*, void*);
+		int (*unbind)(const char*, int);
+	} event;
+	/** 任务处理 */
+	struct {
+		int (*add)(/*...*/);
+		int (*_add)(/*...*/);
+	} task;
+	/** 定时器 */
+	struct {
+		int (*set)(int);
+		int (*free)(int);
+		int (*pause)(int, int);
+		int (*reset)(int);
+	} timer;
+	/** 睡眠器 */
+	struct {
+		int (*create)(void);
+		void (*destroy)(int);
+		int (*sleep)(unsigned int);
+		int (*stop)(int);
+	} sleeper;
+	/** 设备驱动 */
+	struct {
+		int (*add)(/*...*/);
+		int (*remove)(/*...*/);
+	} device;
+	/** 错误信息 */
+	struct {
+		int (*tostr)(int);
+		int code;
+	} error;
+	/** 线程 */
+	struct {
+		int (*create)();
+		int (*exit)();
+		int (*join)();
+		int (*cancel)();
+		/** 互斥锁 */
+		struct {
+			int (*create)();
+			int (*destroy)();
+			int (*lock)();
+			int (*trylock)();
+			int (*unlock)();
+		} mutex;
+	} thread;
+} LCUIMethods;
+
 LCUI_END_HEADER
 	
 #include LC_THREAD_H
