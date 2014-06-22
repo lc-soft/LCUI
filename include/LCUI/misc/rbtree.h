@@ -52,9 +52,32 @@ struct LCUI_RBTreeNodeRec_ {
 };
 
 typedef struct LCUI_RBTreeRec_ {
-        unsigned int total_node;
+        int total_node;
+	int need_free_data;
+	int (*judge)(void*, const void*);
+	void (*destroy)(void*);
         LCUI_RBTreeNode *root;
 } LCUI_RBTree;
+
+__inline int RBTree_GetTotal( LCUI_RBTree *rbt )
+{
+        return rbt->total_node; 
+}
+
+__inline void RBTree_OnJudge( LCUI_RBTree *rbt, int (*func)(void*,const void*) )
+{
+	rbt->judge = func;
+}
+
+__inline void RBTree_OnDestroy( LCUI_RBTree *rbt, void (*func)(void*) )
+{
+	rbt->destroy = func;
+}
+
+__inline void RBTree_SetDataNeedFree( LCUI_RBTree *rbt, int is_true )
+{
+	rbt->need_free_data = is_true;
+}
 
 /** 初始化红黑树 */
 LCUI_API void RBTree_Init( LCUI_RBTree *rbt );
@@ -68,19 +91,15 @@ LCUI_API LCUI_RBTreeNode *RBTree_First( const LCUI_RBTree *rbt );
 /** 获取下一个结点 */
 LCUI_API LCUI_RBTreeNode *RBTree_Next( const LCUI_RBTreeNode *node );
 
-__inline int RBTree_GetTotal( LCUI_RBTree *rbt )
-{
-        return rbt->total_node; 
-}
-
 LCUI_API LCUI_RBTreeNode* RBTree_Search( LCUI_RBTree* rbt, int key );
-
 LCUI_API void* RBTree_GetData( LCUI_RBTree* rbt, int key );
-
-LCUI_API int RBTree_Insert( LCUI_RBTree *rbt, int key, void *data );
-
-/** 删除红黑树中的结点 */
+LCUI_API LCUI_RBTreeNode* RBTree_Insert( LCUI_RBTree *rbt, int key, const void *data );
 LCUI_API int RBTree_Erase( LCUI_RBTree *rbt, int key );
+
+LCUI_API int RBTree_CustomErase( LCUI_RBTree *rbt, void *keydata );
+LCUI_API LCUI_RBTreeNode* RBTree_CustomSearch( LCUI_RBTree* rbt, const void *keydata );
+LCUI_API void* RBTree_CustomGetData( LCUI_RBTree* rbt, const void *keydata );
+LCUI_API LCUI_RBTreeNode* RBTree_CustomInsert( LCUI_RBTree *rbt, const void *keydata, void *data );
 
 LCUI_END_HEADER
 
