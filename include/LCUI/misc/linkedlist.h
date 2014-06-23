@@ -49,22 +49,22 @@ typedef struct LinkedListNodeRec_ LinkedListNode;
 typedef struct LinkedListRec_ LinkedList;
 
 struct LinkedListNodeRec_ {
-		void *data;
-		LinkedListNode *prev, *next;
+	void *data;
+	LinkedListNode *prev, *next;
 };
 
 struct LinkedListRec_ {
-		int node_data_size;			/** 结点数据域的大小 */
-		int used_node_num;			/**< 已使用的结点数量 */
-		int usable_node_num;			/**< 可使用的结点数量 */
-		int current_node_pos;			/**< 当前结点位置 */
-		int need_free_data;			/**< 是否需要在释放结点时释放数据 */
-		int need_reuse_mem;			/**< 是否需要复用结点的内存 */
-		LinkedListNode *used_head_node;		/**< 已用的链表的头结点 */
-		LinkedListNode *current_node;		/**< 当前结点 */
-		LinkedListNode *used_tail_node;		/**< 已用的链表的尾结点 */
-		LinkedListNode *usable_head_node;	/**< 可用的链表的头结点 */
-		void (*destroy_func)(void*);		/**< 数据销毁函数 */
+	int node_data_size;			/** 结点数据域的大小 */
+	int used_node_num;			/**< 已使用的结点数量 */
+	int usable_node_num;			/**< 可使用的结点数量 */
+	int current_node_pos;			/**< 当前结点位置 */
+	int need_free_data;			/**< 是否需要在释放结点时释放数据 */
+	int need_reuse_mem;			/**< 是否需要复用结点的内存 */
+	LinkedListNode *used_head_node;		/**< 已用的链表的头结点 */
+	LinkedListNode *current_node;		/**< 当前结点 */
+	LinkedListNode *used_tail_node;		/**< 已用的链表的尾结点 */
+	LinkedListNode *usable_head_node;	/**< 可用的链表的头结点 */
+	void (*destroy_func)(void*);		/**< 数据销毁函数 */
 };
 
 /** 获取当前数据元素的总数量 */
@@ -76,19 +76,19 @@ __inline int LinkedList_GetTotal( LinkedList *list )
 /** 设置是否需要重复使用结点的数据内存空间 */
 __inline void LinkedList_SetDataMemReuse( LinkedList *list, int is_true )
 {
-		list->need_reuse_mem = is_true;
+	list->need_reuse_mem = is_true;
 }
 
 /** 设置结点中的数据是否需要释放 */
 __inline void LinkedList_SetDataNeedFree( LinkedList *list, int is_true )
 {
-		list->need_free_data = is_true;
+	list->need_free_data = is_true;
 }
 
 /** 设置结点中的数据的销毁函数 */
 __inline void LinkedList_SetDestroyFunc( LinkedList *list, void (*func)(void*) )
 {
-		list->destroy_func = func;
+	list->destroy_func = func;
 }
 
 /** 获取当前结点中的数据 */
@@ -113,20 +113,20 @@ __inline int LinkedList_IsAtEnd( LinkedList *list )
 /** 获取当前结点的上个结点中的数据 */
 __inline void* LinkedList_GetPrev( LinkedList *list )
 {
-		return list->current_node->prev->data;
+	return list->current_node->prev->data;
 }
 
 /** 获取当前结点的下个结点中的数据 */
 __inline void* LinkedList_GetNext( LinkedList *list )
 {
-		return list->current_node->next->data;
+	return list->current_node->next->data;
 }
 
 /** 切换至下个结点 */
 __inline void LinkedList_ToNext( LinkedList *list )
 {
-		++list->current_node_pos;
-		list->current_node = list->current_node->next;
+	++list->current_node_pos;
+	list->current_node = list->current_node->next;
 }
 
 /** 初始化链表 */
