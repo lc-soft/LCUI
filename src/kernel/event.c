@@ -376,7 +376,7 @@ static void LCUI_EventLoop( void *unused )
 			timeout_count = 0;
 		}
 	}
-	_LCUIThread_Exit( NULL );
+	LCUIThread_Exit( NULL );
 }
 
 /** 停用事件线程 */
@@ -386,7 +386,7 @@ static void LCUI_StopEventThread( void )
 		return;
 	}
 	active = FALSE;
-	_LCUIThread_Join( eventloop_thread, NULL );
+	LCUIThread_Join( eventloop_thread, NULL );
 }
 
 /* 启动事件线程 */
@@ -394,7 +394,7 @@ static int LCUI_StartEventThread( void )
 {
 	LCUI_StopEventThread();
 	active = TRUE;
-	return _LCUIThread_Create( &eventloop_thread, LCUI_EventLoop, NULL );
+	return LCUIThread_Create( &eventloop_thread, LCUI_EventLoop, NULL );
 }
 
 /** 初始化事件模块 */
