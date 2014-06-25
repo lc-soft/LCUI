@@ -41,7 +41,6 @@
 #include <LCUI_Build.h>
 #include LC_LCUI_H
 #include LC_GRAPH_H
-#include LC_RES_H
 #include LC_DISPLAY_H
 #include LC_CURSOR_H 
 #include LC_INPUT_H
@@ -53,8 +52,6 @@
 #include <time.h>
 
 LCUI_System LCUI_Sys; 
-
-static LCUI_Queue global_app_list;	/* LCUI程序列表 */
 
 /*--------------------------- Main Loop -------------------------------*/
 static LCUI_BOOL init_mainloop_queue = FALSE;
@@ -261,54 +258,6 @@ static void LCUI_DestroyMainLoopQueue(void)
 }
 /*----------------------- End MainLoop -------------------------------*/
 
-/************************* App Management *****************************/
-/** 根据程序的ID，获取指向程序数据结构的指针 */
-LCUI_API LCUI_App* LCUIApp_Find( LCUI_ID id )
-{
-	LCUI_App *app; 
-	int i, total;
-	
-	total = Queue_GetTotal(&global_app_list);
-	if (total > 0) { /* 如果程序总数大于0 */
-		for (i = 0; i < total; ++i) {
-			app = Queue_Get(&global_app_list, i);
-			if(app->id == id) {
-				return app;
-			}
-		}
-	}
-	
-	return NULL;
-}
-
-/** 获取指向程序数据的指针 */
-LCUI_API LCUI_App* LCUIApp_GetSelf( void )
-{
-	LCUI_Thread id;
-	
-	id = LCUIThread_SelfID(); /* 获取本线程ID */  
-	if(id == LCUI_Sys.display_thread 
-	|| id == LCUI_Sys.dev_thread
-	|| id == LCUI_Sys.self_id
-	|| id == LCUI_Sys.timer_thread )
-	{/* 由于内核及其它线程ID没有被记录，只有直接返回LCUI主程序的线程ID了 */
-		return LCUIApp_Find((LCUI_ID)LCUI_Sys.self_id);
-	}
-	id = LCUIThread_GetRootThreadID( id );
-	return LCUIApp_Find( (LCUI_ID)id );
-}
-
-/** 获取程序ID */
-LCUI_API LCUI_ID LCUIApp_GetSelfID( void )
-{
-	LCUI_App *app;
-	app = LCUIApp_GetSelf();
-	if( app == NULL ) {
-		return 0;
-	}
-	return (LCUI_ID)app->id;
-}
-
 /** 初始化程序数据结构体 */
 static void LCUIApp_Init( LCUI_App *app )
 {
@@ -318,73 +267,6 @@ static void LCUIApp_Init( LCUI_App *app )
 	WidgetLib_Init( &app->widget_lib );
 	LCUIMutex_Init( &app->task_mutex );
 	LCUISleeper_Create( &app->mainloop_sleeper );
-}
-
-/** 销毁全部程序数据 */
-static void LCUI_DestroyAllApps(void)
-{
-	LCUI_App *app; 
-	int i, total;
-
-	Queue_Lock( &global_app_list );
-	total = Queue_GetTotal(&global_app_list);
-	for (i = 0; i < total; ++i) {
-		app = (LCUI_App*)Queue_Get(&global_app_list, 0);
-		if(app == NULL) {
-			continue;
-		}
-		Queue_Delete (&global_app_list, 0); 
-	}
-	Queue_Unlock( &global_app_list );
-	Queue_Destroy( &global_app_list );
-}
-
-/** 退出 LCUI 并释放LCUI占用的资源 */
-LCUI_API void LCUI_Quit( void )
-{
-	LCUI_Sys.state = KILLED;	/* 状态标志置为KILLED */
-	LCUI_DestroyAllApps();
-	LCUI_DestroyMainLoopQueue();
-
-	LCUIModule_Thread_End();
-	LCUIModule_IME_End();
-	LCUIModule_Event_End();
-	LCUIModule_Cursor_End();
-	LCUIModule_Widget_End();
-	LCUIModule_Font_End();
-	LCUIModule_Timer_End();
-	LCUIModule_Keyboard_End();
-	//LCUIModule_Mouse_End();
-	//LCUIModule_TouchScreen_End();
-	LCUIModule_Device_End();
-	LCUIModule_Video_End();
-}
-
-/** 从程序列表中删除一个LCUI程序信息 */
-static int LCUIAppList_Delete( LCUI_ID app_id )
-{
-	int pos = -1;
-	LCUI_App *app; 
-	int i, total;  
-	
-	total = Queue_GetTotal(&global_app_list);
-	if( total <= 0 ) {
-		return -1;
-	}
-	/* 查找程序信息所在队列的位置 */
-	for (i = 0; i < total; ++i) {
-		app = (LCUI_App*)Queue_Get(&global_app_list, i);
-		if(app->id == app_id) {
-			pos = i;
-			break;
-		}
-	}
-	if(pos < 0) {
-		return -1;
-	}
-	/* 从程序显示顺序队列中删除这个程序ID */ 
-	Queue_Delete( &global_app_list, pos );
-	return 0;
 }
 
 /* 销毁程序占用的资源 */
@@ -398,32 +280,29 @@ static void LCUIApp_Destroy( void *arg )
 	if( app->func ) {
 		app->func();
 	}
-	LCUIApp_CancelAllThreads( app->id );	/* 撤销这个程序的所有线程 */
 	LCUIApp_DestroyAllWidgets( app->id );	/* 销毁这个程序的所有部件 */
 	LCUIApp_QuitAllMainLoops( app->id );	/* 退出所有的主循环 */
 	LCUIMutex_Unlock( &app->task_mutex );
 }
 
-/* 初始化程序数据表 */
-static void LCUIAppList_Init(void)
+/** 退出 LCUI 并释放LCUI占用的资源 */
+LCUI_API void LCUI_Quit( void )
 {
-	Queue_Init(&global_app_list, sizeof(LCUI_App), LCUIApp_Destroy);
-}
+	LCUI_Sys.state = KILLED;	/* 状态标志置为KILLED */
+	LCUIApp_Destroy(NULL);
+	LCUI_DestroyMainLoopQueue();
 
-/* 
- * 功能：创建一个LCUI程序
- * 说明：此函数会将程序信息添加至程序列表
- * 返回值：成功则返回程序的ID，失败则返回-1
- **/
-static int LCUIAppList_Add( void )
-{
-	LCUI_App app;
-	
-	LCUIApp_Init( &app );			/* 初始化程序数据结构体 */
-	app.id = LCUIThread_SelfID();		/* 保存ID */ 
-	Queue_Add(&global_app_list, &app);	/* 添加至队列 */
-	LCUIApp_RegisterMainThread( app.id );	/* 注册程序主线程 */
-	return 0;
+	LCUIModule_IME_End();
+	LCUIModule_Event_End();
+	LCUIModule_Cursor_End();
+	LCUIModule_Widget_End();
+	LCUIModule_Font_End();
+	LCUIModule_Timer_End();
+	LCUIModule_Keyboard_End();
+	//LCUIModule_Mouse_End();
+	//LCUIModule_TouchScreen_End();
+	LCUIModule_Device_End();
+	LCUIModule_Video_End();
 }
 
 /** 注册一个函数，以在LCUI程序退出时调用 */
@@ -441,16 +320,7 @@ LCUI_API int LCUIApp_AtQuit( void (*callback_func)(void) )
 /** 退出程序 */
 static int LCUIApp_Quit(void)
 {
-	LCUI_App *app;
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		return -1;
-	} 
-	LCUIAppList_Delete(app->id); 
-	/* 如果程序列表为空,就退出LCUI */  
-	if (Queue_Empty(&global_app_list)) {
-		LCUI_Quit();
-	}
+	// ...
 	return 0;
 }
 
@@ -484,36 +354,28 @@ LCUI_API LCUI_BOOL LCUI_Active(void)
  * */
 LCUI_API int LCUI_Init( int w, int h, int mode )
 {
-	int temp;
 	/* 如果LCUI没有初始化过 */
-	if( !LCUI_Sys.init ) {
-		LCUI_Sys.init = TRUE;
-		LCUI_Sys.state = ACTIVE;
-		LCUI_ShowCopyrightText();
-		LCUIAppList_Init();
-		LCUIModule_Thread_Init();
-		/* 初始化各个模块 */
-		LCUIModule_Event_Init();
-		LCUIModule_IME_Init();
-		LCUIModule_Font_Init();
-		LCUIModule_Timer_Init();
-		LCUIModule_Device_Init();
-		LCUIModule_Keyboard_Init();
-		LCUIModule_Mouse_Init();
-		LCUIModule_TouchScreen_Init();
-		LCUIModule_Cursor_Init();
-		LCUIModule_Widget_Init();
-		LCUIModule_Video_Init(w, h, mode);
-		/* 让鼠标游标居中显示 */
-		LCUICursor_SetPos( LCUIScreen_GetCenter() );  
-		LCUICursor_Show();
+	if( LCUI_Sys.init ) {
+		return -1;
 	}
-
-	temp = LCUIAppList_Add();
-	if(temp != 0) {
-		printf(APP_ERROR_REGISTER_ERROR);
-		abort();
-	}
+	LCUI_Sys.init = TRUE;
+	LCUI_Sys.state = ACTIVE;
+	LCUI_ShowCopyrightText();
+	/* 初始化各个模块 */
+	LCUIModule_Event_Init();
+	LCUIModule_IME_Init();
+	LCUIModule_Font_Init();
+	LCUIModule_Timer_Init();
+	LCUIModule_Device_Init();
+	LCUIModule_Keyboard_Init();
+	LCUIModule_Mouse_Init();
+	LCUIModule_TouchScreen_Init();
+	LCUIModule_Cursor_Init();
+	LCUIModule_Widget_Init();
+	LCUIModule_Video_Init(w, h, mode);
+	/* 让鼠标游标居中显示 */
+	LCUICursor_SetPos( LCUIScreen_GetCenter() );  
+	LCUICursor_Show();
 	/* 注册默认部件类型 */
 	Register_DefaultWidgetType();
 	return 0;
