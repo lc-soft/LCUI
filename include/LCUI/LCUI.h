@@ -24,7 +24,7 @@
 /* ****************************************************************************
  * LCUI.h -- 记录着常用的数据类型定义，宏定义，以及函数声明
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -163,65 +163,6 @@ typedef struct LCUI_Rect2_ {
 	};
 } LCUI_Rect2;
 /*--------------- END ----------------*/
-
-/** LCUI 方法集（暂定） */
-typedef struct LCUIMethods {
-	void (*init)();
-	void (*exit)();
-	void (*main)();
-	void (*atexit)();
-	/** 事件 */
-	struct {
-		int (*send)(const char*, void*);
-		int (*post)(const char*, void*);
-		int (*bind)(const char*, void*);
-		int (*unbind)(const char*, int);
-	} event;
-	/** 任务处理 */
-	struct {
-		int (*add)(/*...*/);
-		int (*_add)(/*...*/);
-	} task;
-	/** 定时器 */
-	struct {
-		int (*set)(int);
-		int (*free)(int);
-		int (*pause)(int, int);
-		int (*reset)(int);
-	} timer;
-	/** 睡眠器 */
-	struct {
-		int (*create)(void);
-		void (*destroy)(int);
-		int (*sleep)(unsigned int);
-		int (*stop)(int);
-	} sleeper;
-	/** 设备驱动 */
-	struct {
-		int (*add)(/*...*/);
-		int (*remove)(/*...*/);
-	} device;
-	/** 错误信息 */
-	struct {
-		int (*tostr)(int);
-		int code;
-	} error;
-	/** 线程 */
-	struct {
-		int (*create)();
-		int (*exit)();
-		int (*join)();
-		int (*cancel)();
-		/** 互斥锁 */
-		struct {
-			int (*create)();
-			int (*destroy)();
-			int (*lock)();
-			int (*trylock)();
-			int (*unlock)();
-		} mutex;
-	} thread;
-} LCUIMethods;
 
 LCUI_END_HEADER
 	

@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * event.c -- 事件处理模块
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -47,12 +47,6 @@
 #define MALLOC_ONE(type) (type*)malloc(sizeof(type))
 
 typedef void(*EventCallBack)(LCUI_Event*, void*);
-
-/** 事件连接记录 */
-typedef struct LCUI_EventConnectRec_ {
-	int event_id;	/**< 被连接的事件的标识号 */
-	int handler_id;	/**< 事件处理器的标识号 */
-} LCUI_EventConnect;
 
 /** 事件 */
 typedef struct LCUI_EventRec_ {
@@ -79,6 +73,7 @@ typedef struct EventSlotRec_ {
 typedef struct LCUI_EventBoxRec_ {
 	LCUI_RBTree event_slot;		/**< 事件槽记录 */
 	LCUI_RBTree event_name;		/**< 事件名称记录 */
+	LCUI_RBTree event_handler;	/**< 事件处理器记录 */
 	LinkedList events;		/**< 任务列表 */
 	int event_id;			/**< 事件的标识号计数器 */
 	int handler_id;			/**< 事件处理器的标识号计数器 */
@@ -103,8 +98,11 @@ void LCUIEventBox_Init( LCUI_EventBox *box )
 	box->handler_id = 100;
 	RBTree_Init( &box->event_slot );
 	RBTree_Init( &box->event_name );
+	RBTree_Init( &box->event_handler );
 	RBTree_OnJudge( &box->event_name, CompareEventName );
 	RBTree_OnDestroy( &box->event_slot, DestroyEventSlot );
+	RBTree_SetDataNeedFree( &box->event_handler, FALSE );
+	RBTree_SetDataNeedFree( &box->event_name, FALSE );
 	LinkedList_Init( &box->events, sizeof(LCUI_Event) );
 }
 
@@ -121,13 +119,12 @@ void LCUIEventBox_Dispatch( LCUI_EventBox *box )
 }
 
 /** 连接事件 */
-LCUI_EventConnect LCUIEventBox_Conncet( LCUI_EventBox *box, const char *name,
-				        EventCallBack func, void *data )
+int LCUIEventBox_Conncet( LCUI_EventBox *box, const char *name,
+				EventCallBack func, void *data )
 {
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
-	LCUI_EventConnect conn;
 
 	node = RBTree_CustomSearch( &box->event_name, (const void*)name );
 	if( !node ) {
@@ -137,7 +134,8 @@ LCUI_EventConnect LCUIEventBox_Conncet( LCUI_EventBox *box, const char *name,
 		strcpy( slot->name, name );
 		LinkedList_Init( &slot->handlers, sizeof(LCUI_EventHandler) );
 		RBTree_Insert( &box->event_slot, slot->id, slot );
-		node = RBTree_CustomInsert( &box->event_name, (const void*)name, &slot->name );
+		node = RBTree_CustomInsert( &box->event_name, 
+					(const void*)name, &slot->name );
 		node->key = slot->id;
 	} else {
 		node = RBTree_Search( &box->event_slot, node->key );
@@ -149,54 +147,43 @@ LCUI_EventConnect LCUIEventBox_Conncet( LCUI_EventBox *box, const char *name,
 	handler->func = func;
 	handler->func_data = data;
 	LinkedList_AddData( &slot->handlers, handler );
-
-	conn.event_id = slot->id;
-	conn.handler_id = handler->id;
-	return conn;
+	RBTree_Insert( &box->event_handler, handler->id, (void*)(slot->id) );
+	return handler->id;
 }
 
 /** 解除事件连接 */
-int LCUIEventBox_Disconnect( LCUI_EventBox *box, LCUI_EventConnect conn )
+int LCUIEventBox_Disconnect( LCUI_EventBox *box, int handler_id )
 {
 	int i, n;
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
 
-	node = RBTree_Search( &box->event_slot, conn.event_id );
+	node = RBTree_Search( &box->event_handler, handler_id );
 	if( !node ) {
 		return -1;
 	}
+	node = RBTree_Search( &box->event_slot, (int)(node->data) );
+	if( !node ) {
+		return -2;
+	}
+	slot = (LCUI_EventSlot*)node->data;
 	LinkedList_Goto( &slot->handlers, 0 );
 	n = LinkedList_GetTotal( &slot->handlers );
 	for( i=0; i<n; ++i ) {
 		handler = (LCUI_EventHandler*)LinkedList_Get( &slot->handlers );
-		if( handler->id == conn.handler_id ) {
+		if( handler->id == handler_id ) {
 			LinkedList_Delete( &slot->handlers );
+			RBTree_Erase( &box->event_handler, handler_id );
 			return 0;
 		}
 		LinkedList_ToNext( &slot->handlers );
 	}
-	return -2;
-}
-
-/** 获取事件处理器列表 */
-LinkedList *LCUIEventBox_GetHandlers( LCUI_EventBox *box,  const char *name )
-{
-	LCUI_RBTreeNode *node;
-	LCUI_EventSlot *slot;
-
-	node = RBTree_CustomSearch( &box->event_name, (const void*)name );
-	if( !node ) {
-		return NULL;
-	}
-	node = RBTree_Search( &box->event_slot, node->key );
-	slot = (LCUI_EventSlot*)node->data;
-	return &slot->handlers;
+	return -3;
 }
 
 /** 直接将事件发送至事件处理器进行处理 */
-int LCUIEventBox_Send( LCUI_EventBox *box,  const char *name, void *data )
+int LCUIEventBox_Send( LCUI_EventBox *box, const char *name, void *data )
 {
 	int i, n;
 	LCUI_RBTreeNode *node;
@@ -210,7 +197,7 @@ int LCUIEventBox_Send( LCUI_EventBox *box,  const char *name, void *data )
 	}
 	node = RBTree_Search( &box->event_slot, node->key );
 	if( !node ) {
-		return -1;
+		return -2;
 	}
 	slot = (LCUI_EventSlot*)node->data;
 	event.data = data;
@@ -227,9 +214,8 @@ int LCUIEventBox_Send( LCUI_EventBox *box,  const char *name, void *data )
 }
 
 /** 将事件投递给事件处理器，等待处理 */
-int LCUIEventBox_Post( LCUI_EventBox *box,  const char *name, void *data )
+int LCUIEventBox_Post( LCUI_EventBox *box, const char *name, void *data )
 {
-	int i, n;
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
@@ -241,7 +227,7 @@ int LCUIEventBox_Post( LCUI_EventBox *box,  const char *name, void *data )
 	}
 	node = RBTree_Search( &box->event_slot, node->key );
 	if( !node ) {
-		return -1;
+		return -2;
 	}
 	slot = (LCUI_EventSlot*)node->data;
 	event.data = data;
