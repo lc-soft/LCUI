@@ -65,8 +65,7 @@ static unsigned __stdcall run_thread(void *arg)
 	return 0;
 }
 
-LCUI_API int
-_LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
+int LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 {
 	LCUI_ThreadData *thread_ptr;
 	if(!db_init) {
@@ -88,7 +87,7 @@ _LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 	return 0;
 }
 
-static LCUI_ThreadData *_LCUIThread_Find( LCUI_Thread tid )
+static LCUI_ThreadData *LCUIThread_Find( LCUI_Thread tid )
 {
 	int i, n;
 	LCUI_ThreadData *thread_data;
@@ -104,7 +103,7 @@ static LCUI_ThreadData *_LCUIThread_Find( LCUI_Thread tid )
 	return NULL;
 }
 
-static int _LCUIThread_Destroy( LCUI_Thread thread )
+static int LCUIThread_Destroy( LCUI_Thread thread )
 {
 	int i, n;
 	LCUI_ThreadData *thread_data;
@@ -124,41 +123,37 @@ static int _LCUIThread_Destroy( LCUI_Thread thread )
 	return -2;
 }
 
-LCUI_API LCUI_Thread
-LCUIThread_SelfID( void )
+LCUI_Thread LCUIThread_SelfID( void )
 {
 	return GetCurrentThreadId();
 }
 
-LCUI_API void
-_LCUIThread_Exit( void *retval )
+void LCUIThread_Exit( void *retval )
 {
 	LCUI_ThreadData *thread;
 	LCUI_Thread tid;
 
 	tid = LCUIThread_SelfID();
-	thread = _LCUIThread_Find( tid );
+	thread = LCUIThread_Find( tid );
 	if( !thread ) {
 		return;
 	}
 	thread->retval = retval;
 }
 
-LCUI_API void
-_LCUIThread_Cancel( LCUI_Thread thread )
+void LCUIThread_Cancel( LCUI_Thread thread )
 {
 	LCUI_ThreadData *data_ptr;
-	data_ptr = _LCUIThread_Find(thread);
+	data_ptr = LCUIThread_Find(thread);
 	TerminateThread( data_ptr->handle, FALSE );
-	_LCUIThread_Destroy( data_ptr->tid );
+	LCUIThread_Destroy( data_ptr->tid );
 }
 
-LCUI_API int
-_LCUIThread_Join( LCUI_Thread thread, void **retval )
+int LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
 	LCUI_ThreadData *data_ptr;
 
-	data_ptr = _LCUIThread_Find( thread );
+	data_ptr = LCUIThread_Find( thread );
 	if( data_ptr == NULL ) {
 		return -1;
 	}
@@ -167,6 +162,6 @@ _LCUIThread_Join( LCUI_Thread thread, void **retval )
 	if( retval ) {
 		*retval = data_ptr->retval;
 	}
-	return _LCUIThread_Destroy( data_ptr->tid );
+	return LCUIThread_Destroy( data_ptr->tid );
 }
 #endif
