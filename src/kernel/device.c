@@ -109,7 +109,7 @@ static void proc_dev_list( void *arg )
 LCUI_API int LCUIModule_Device_Init(void)
 {
 	dev_list_init( &dev_list );
-	return _LCUIThread_Create(	&LCUI_Sys.dev_thread,
+	return LCUIThread_Create(	&LCUI_Sys.dev_thread,
 					proc_dev_list, &dev_list );
 }
 

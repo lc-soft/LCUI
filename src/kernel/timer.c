@@ -532,7 +532,7 @@ static int timer_thread_start( LCUI_Thread *tid, LCUI_Queue *list )
 	TimerList_Init( list );
 	timer_thread_active = TRUE;
 	/* 创建用于处理定时器列表的线程 */
-	return _LCUIThread_Create( tid, TimerThread, list );
+	return LCUIThread_Create( tid, TimerThread, list );
 }
 
 /* 停止定时器的处理线程，并销毁定时器列表 */
@@ -540,7 +540,7 @@ static void timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
 {
 	timer_thread_active = FALSE;
 	/* 等待定时器处理线程的退出 */
-	_LCUIThread_Join( tid, NULL );
+	LCUIThread_Join( tid, NULL );
 	/* 销毁定时器列表 */
 	TimerList_Destroy( list );
 }
