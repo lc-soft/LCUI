@@ -43,33 +43,23 @@
 
 LCUI_BEGIN_HEADER
 
-/************************ LCUI程序的数据 *******************************/
-typedef struct LCUI_App_ {
-	LCUI_ID id;			/**< LCUI程序的ID */ 
-	void (*func)(void);		/**< 在LCUI退出时调用的函数 */
-	LCUI_Queue tasks;		/**< 程序的任务队列 */
-	LCUI_Queue events;		/**< 事件队列 */
-	LCUI_Queue widget_lib;		/**< 部件类型库 */
-	LCUI_Sleeper mainloop_sleeper;	/**< 用于决定主循环是否睡眠 */
-	LCUI_Mutex task_mutex;		/**< 任务互斥锁，当运行程序任务时会锁上 */
-} LCUI_App;
-/**********************************************************************/
-
 /***************************整个LCUI的数据 *****************************/
 typedef struct LCUI_System_ {
-	int state;		/* 状态 */ 
-	int mode;		/* LCUI的运行模式 */
-	LCUI_BOOL init;		/* 指示LCUI是否初始化过 */
+	int state;			/* 状态 */ 
+	int mode;			/* LCUI的运行模式 */
+	LCUI_BOOL is_inited;		/* 指示LCUI是否初始化过 */
 	
 	LCUI_Thread self_id;		/* 保存LCUI主程序的线程的ID */
 	LCUI_Thread display_thread;	/* 保存核心处理的线程的ID */
 	LCUI_Thread timer_thread;	/* 定时器列表处理线程的ID */
 	LCUI_Thread dev_thread;		/* 设备输入数据处理线程的ID */
+
+	int exit_code;			/**< 退出码 */
+	void (*func_atexit)(void);	/**< 在LCUI退出时调用的函数 */
 } LCUI_System;
 /***********************************************************************/
 
 typedef struct LCUI_MainLoop_ {
-	LCUI_ID app_id;
 	LCUI_BOOL quit;
 	LCUI_BOOL running;
 	int level;
@@ -80,20 +70,6 @@ extern LCUI_System  LCUI_Sys;
 #ifdef LCUI_BUILD_IN_WIN32
 LCUI_API void Win32_LCUI_Init( HINSTANCE hInstance );
 #endif
-
-/*------------------------------ LCUIApp -----------------------------*/
-/* 根据程序的ID，获取指向程序数据结构的指针 */
-LCUI_API LCUI_App* LCUIApp_Find( LCUI_ID id );
-
-/* 获取指向程序数据的指针 */
-LCUI_API LCUI_App* LCUIApp_GetSelf( void );
-
-/* 获取程序ID */
-LCUI_API LCUI_ID LCUIApp_GetSelfID( void );
-
-/* 注册终止函数，以在LCUI程序退出时调用 */
-LCUI_API int LCUIApp_AtQuit( void (*callback_func)(void));
-/*--------------------------- End LCUIApp ----------------------------*/
 
 /*--------------------------- Main Loop ------------------------------*/
 /* 新建一个主循环 */
@@ -128,8 +104,13 @@ LCUI_API int LCUI_Main( void );
 /* 获取LCUI的版本 */
 LCUI_API int LCUI_GetSelfVersion( char *out );
 
-/* 用于退出LCUI，释放LCUI占用的资源 */
+/* 注册终止函数，以在LCUI程序退出时调用 */
+LCUI_API int LCUI_AtExit( void (*func)(void));
+
+/* 退出LCUI，释放LCUI占用的资源 */
 LCUI_API void LCUI_Quit( void );
+
+LCUI_API void LCUI_Exit( int exit_code );
 
 LCUI_END_HEADER
 

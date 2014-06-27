@@ -51,11 +51,20 @@
 
 #include <time.h>
 
+/** LCUI程序的数据 */
+struct LCUI_App {
+	LCUI_Queue tasks;		/**< 程序的任务队列 */
+	LCUI_Queue events;		/**< 事件队列 */
+	LCUI_Queue widget_lib;		/**< 部件类型库 */
+	LCUI_Mutex task_mutex;		/**< 任务互斥锁，当运行程序任务时会锁上 */
+} MainApp;
+
 LCUI_System LCUI_Sys; 
 
 /*--------------------------- Main Loop -------------------------------*/
 static LCUI_BOOL init_mainloop_queue = FALSE;
 static LCUI_Queue mainloop_queue;
+static LCUI_Sleeper mainloop_sleeper;	/**< 用于决定主循环是否睡眠 */
 
 static void LCUI_MainLoopQueue_Init( void )
 {
@@ -122,7 +131,7 @@ static LCUI_MainLoop* LCUI_MainLoop_GetAvailable(void)
 }
 
 /* 新建一个主循环 */
-LCUI_API LCUI_MainLoop* LCUI_MainLoop_New( void )
+LCUI_MainLoop* LCUI_MainLoop_New( void )
 {
 	LCUI_MainLoop *loop;
 	
@@ -137,7 +146,6 @@ LCUI_API LCUI_MainLoop* LCUI_MainLoop_New( void )
 			return NULL;
 		}
 	}
-	loop->app_id = LCUIApp_GetSelfID();
 	loop->quit = FALSE;
 	loop->level = Queue_GetTotal( &mainloop_queue );
 	loop->running = FALSE;
@@ -148,7 +156,7 @@ LCUI_API LCUI_MainLoop* LCUI_MainLoop_New( void )
 }
 
 /* 设定主循环等级，level值越高，处理主循环退出时，也越早处理该循环 */
-LCUI_API int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
+int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
 {
 	if( loop == NULL ) {
 		return -1;
@@ -158,26 +166,26 @@ LCUI_API int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level )
 	return 0;
 }
 
-static int LCUIApp_RunTask( LCUI_App *app )
+static int LCUIApp_RunTask(void)
 { 
 	LCUI_Task *task;
 	
-	LCUIMutex_Lock( &app->task_mutex );
-	Queue_Lock( &app->tasks );
-	task = (LCUI_Task*)Queue_Get( &app->tasks, 0 );
+	LCUIMutex_Lock( &MainApp.task_mutex );
+	Queue_Lock( &MainApp.tasks );
+	task = (LCUI_Task*)Queue_Get( &MainApp.tasks, 0 );
 	if( !task ) {
-		Queue_Unlock( &app->tasks );
-		LCUIMutex_Unlock( &app->task_mutex );
+		Queue_Unlock( &MainApp.tasks );
+		LCUIMutex_Unlock( &MainApp.task_mutex );
 		return -1;
 	}
 	if( !task->func ) {
-		Queue_Delete( &app->tasks, 0 );
-		Queue_Unlock( &app->tasks );
-		LCUIMutex_Unlock( &app->task_mutex );
+		Queue_Delete( &MainApp.tasks, 0 );
+		Queue_Unlock( &MainApp.tasks );
+		LCUIMutex_Unlock( &MainApp.task_mutex );
 		return -2;
 	}
-	Queue_DeletePointer( &app->tasks, 0 );
-	Queue_Unlock( &app->tasks );
+	Queue_DeletePointer( &MainApp.tasks, 0 );
+	Queue_Unlock( &MainApp.tasks );
 	/* 调用函数指针指向的函数，并传递参数 */
 	task->func( task->arg[0], task->arg[1] );
 	/* 若需要在调用回调函数后销毁参数 */
@@ -188,29 +196,21 @@ static int LCUIApp_RunTask( LCUI_App *app )
 		free( task->arg[1] );
 	}
 	free( task );
-	LCUIMutex_Unlock( &app->task_mutex );
+	LCUIMutex_Unlock( &MainApp.task_mutex );
 	return 0;
 }
 
 /** 运行目标主循环 */
-LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
+int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 {
-	LCUI_App *app;
-	
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		printf("%s(): %s", __FUNCTION__, APP_ERROR_UNRECORDED_APP);
-		LCUIThread_Exit((void*)-1);
-		return -1;
-	}
 	DEBUG_MSG("loop: %p, enter\n", loop);
 	loop->running = TRUE;
 	while( !loop->quit && LCUI_Sys.state == ACTIVE ) {
-		if( Queue_GetTotal(&app->tasks) <= 0 ) {
-			LCUISleeper_StartSleep( &app->mainloop_sleeper, 1000 );
+		if( Queue_GetTotal(&MainApp.tasks) <= 0 ) {
+			LCUISleeper_StartSleep( &mainloop_sleeper, 1000 );
 			continue;
 		}
-		LCUIApp_RunTask( app );
+		LCUIApp_RunTask();
 	}
 	loop->running = FALSE;
 	DEBUG_MSG("loop: %p, exit\n", loop);
@@ -218,7 +218,7 @@ LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 }
 
 /** 标记目标主循环需要退出 */
-LCUI_API int LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
+int LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
 {
 	if( loop == NULL ) {
 		loop = LCUI_MainLoopQueue_Find();
@@ -232,7 +232,7 @@ LCUI_API int LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
 }
 
 /** 退出所有主循环 */
-static void LCUIApp_QuitAllMainLoops( LCUI_ID app_id )
+static void LCUI_QuitAllMainLoops(void)
 {
 	int i, total;
 	LCUI_MainLoop *loop;
@@ -244,9 +244,7 @@ static void LCUIApp_QuitAllMainLoops( LCUI_ID app_id )
 		if( loop == NULL ) {
 			continue;
 		}
-		if( loop->app_id == app_id ) {
-			loop->quit = TRUE;
-		}
+		loop->quit = TRUE;
 	}
 	Queue_Unlock( &mainloop_queue );
 }
@@ -259,69 +257,19 @@ static void LCUI_DestroyMainLoopQueue(void)
 /*----------------------- End MainLoop -------------------------------*/
 
 /** 初始化程序数据结构体 */
-static void LCUIApp_Init( LCUI_App *app )
+static void LCUIApp_Init(void)
 {
-	app->id = 0;
-	app->func = NULL;
-	AppTasks_Init( &app->tasks );
-	WidgetLib_Init( &app->widget_lib );
-	LCUIMutex_Init( &app->task_mutex );
-	LCUISleeper_Create( &app->mainloop_sleeper );
+	AppTasks_Init( &MainApp.tasks );
+	WidgetLib_Init( &MainApp.widget_lib );
+	LCUIMutex_Init( &MainApp.task_mutex );
+	LCUISleeper_Create( &mainloop_sleeper );
 }
 
 /* 销毁程序占用的资源 */
-static void LCUIApp_Destroy( void *arg )
+static void LCUIApp_Destroy(void)
 {
-	LCUI_App *app;
-	app = (LCUI_App *)arg;
-	if( !app ) {
-		return;
-	}
-	if( app->func ) {
-		app->func();
-	}
-	LCUIApp_DestroyAllWidgets( app->id );	/* 销毁这个程序的所有部件 */
-	LCUIApp_QuitAllMainLoops( app->id );	/* 退出所有的主循环 */
-	LCUIMutex_Unlock( &app->task_mutex );
-}
-
-/** 退出 LCUI 并释放LCUI占用的资源 */
-LCUI_API void LCUI_Quit( void )
-{
-	LCUI_Sys.state = KILLED;	/* 状态标志置为KILLED */
-	LCUIApp_Destroy(NULL);
 	LCUI_DestroyMainLoopQueue();
-
-	LCUIModule_IME_End();
-	LCUIModule_Event_End();
-	LCUIModule_Cursor_End();
-	LCUIModule_Widget_End();
-	LCUIModule_Font_End();
-	LCUIModule_Timer_End();
-	LCUIModule_Keyboard_End();
-	//LCUIModule_Mouse_End();
-	//LCUIModule_TouchScreen_End();
-	LCUIModule_Device_End();
-	LCUIModule_Video_End();
-}
-
-/** 注册一个函数，以在LCUI程序退出时调用 */
-LCUI_API int LCUIApp_AtQuit( void (*callback_func)(void) )
-{
-	LCUI_App *app;
-	app = LCUIApp_GetSelf();
-	if( !app || !callback_func ) {
-		return -1;
-	}
-	app->func = callback_func;
-	return 0;
-}
-
-/** 退出程序 */
-static int LCUIApp_Quit(void)
-{
-	// ...
-	return 0;
+	LCUIMutex_Unlock( &MainApp.task_mutex );
 }
 
 /*********************** App Management End ***************************/
@@ -340,7 +288,7 @@ static void LCUI_ShowCopyrightText(void)
 }
 
 /** 检测LCUI是否活动 */
-LCUI_API LCUI_BOOL LCUI_Active(void)
+LCUI_BOOL LCUI_Active(void)
 {
 	if(LCUI_Sys.state == ACTIVE) {
 		return TRUE;
@@ -352,15 +300,18 @@ LCUI_API LCUI_BOOL LCUI_Active(void)
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */
-LCUI_API int LCUI_Init( int w, int h, int mode )
+int LCUI_Init( int w, int h, int mode )
 {
 	/* 如果LCUI没有初始化过 */
-	if( LCUI_Sys.init ) {
+	if( LCUI_Sys.is_inited ) {
 		return -1;
 	}
-	LCUI_Sys.init = TRUE;
+	LCUI_Sys.is_inited = TRUE;
+	LCUI_Sys.func_atexit = NULL;
+	LCUI_Sys.exit_code = 0;
 	LCUI_Sys.state = ACTIVE;
 	LCUI_ShowCopyrightText();
+	LCUIApp_Init();
 	/* 初始化各个模块 */
 	LCUIModule_Event_Init();
 	LCUIModule_IME_Init();
@@ -381,20 +332,60 @@ LCUI_API int LCUI_Init( int w, int h, int mode )
 	return 0;
 }
 
+/** 释放LCUI占用的资源 */
+static int LCUI_Destroy( void )
+{
+	LCUI_Sys.state = KILLED;
+	if( LCUI_Sys.func_atexit ) {
+		LCUI_Sys.func_atexit();
+	}
+	LCUIModule_IME_End();
+	LCUIModule_Event_End();
+	LCUIModule_Cursor_End();
+	LCUIModule_Widget_End();
+	LCUIModule_Font_End();
+	LCUIModule_Timer_End();
+	LCUIModule_Keyboard_End();
+	//LCUIModule_Mouse_End();
+	//LCUIModule_TouchScreen_End();
+	LCUIModule_Device_End();
+	LCUIModule_Video_End();
+	LCUIApp_Destroy();
+	return LCUI_Sys.exit_code;
+}
+
+void LCUI_Quit(void)
+{
+	LCUI_Sys.state = KILLED;
+	LCUI_QuitAllMainLoops();
+}
+
+void LCUI_Exit( int exit_code )
+{
+	LCUI_Sys.exit_code = exit_code;
+	LCUI_Quit();
+}
+
 /* 
  * 功能：LCUI程序的主循环
  * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
  *  */
-LCUI_API int LCUI_Main( void )
+int LCUI_Main( void )
 {
 	LCUI_MainLoop *loop;
 	loop = LCUI_MainLoop_New();
 	LCUI_MainLoop_Run( loop );
-	return LCUIApp_Quit();
+	return LCUI_Destroy();
+}
+
+/** 注册一个函数，以在LCUI程序退出时调用 */
+void LCUI_AtQuit( void (*callback_func)(void) )
+{
+	LCUI_Sys.func_atexit = callback_func;
 }
 
 /* 获取LCUI的版本 */
-LCUI_API int LCUI_GetSelfVersion( char *out )
+int LCUI_GetSelfVersion( char *out )
 {
 	return sprintf(out, "%s", LCUI_VERSION);
 }
