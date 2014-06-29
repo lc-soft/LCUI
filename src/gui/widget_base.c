@@ -783,36 +783,6 @@ Widget_GetChildByID( LCUI_Widget *widget, LCUI_ID id )
 	return NULL;
 }
 
-/* 销毁指定ID的程序的所有部件 */
-LCUI_API void
-LCUIApp_DestroyAllWidgets( LCUI_ID app_id )
-{
-	int i, total;
-	LCUI_Widget *temp;
-	
-	Queue_Lock( &root_widget.child );
-	total = Queue_GetTotal(&root_widget.child);
-	for(i=0; i<total; i++) {
-		temp = (LCUI_Widget*)Queue_Get(&root_widget.child,i);
-		if( temp == NULL ) {
-			continue;
-		}
-		if(temp->app_id != app_id) {
-			continue;
-		}
-		/*
-		 * 在Queue_Delete()函数将队列中的部件移除时，会调用初始化部件队列时指
-		 * 定的WidgetList_DestroyWidget()函数进行部件数据相关的清理。
-		 * */
-		Queue_Delete( &root_widget.child, i );
-		/* 重新获取部件总数 */
-		total = Queue_GetTotal(&root_widget.child);
-		--i;/* 当前位置的部件已经移除，空位已由后面部件填补，所以，--i */
-	}
-	Queue_Unlock( &root_widget.child );
-}
-
-
 /* 检测指定部件是否处于焦点状态 */
 LCUI_API LCUI_BOOL
 Widget_GetFocus( LCUI_Widget *widget )
@@ -1011,8 +981,6 @@ LCUI_API int Widget_Unlock( LCUI_Widget *widget )
 /** 初始化部件属性 */
 static void Widget_AttrInit( LCUI_Widget *widget )
 {
-	LCUI_App *app;
-	app = LCUIApp_GetSelf();
 	/*--------------- 初始化部件基本属性及数据 ------------------*/
 	widget->autosize		= FALSE;
 	widget->autosize_mode		= AUTOSIZE_MODE_GROW_AND_SHRINK;
@@ -1020,7 +988,6 @@ static void Widget_AttrInit( LCUI_Widget *widget )
 	widget->modal			= FALSE;
 	widget->state			= WIDGET_STATE_NORMAL;
 	widget->self_id			= 0;
-	widget->app_id			= app?app->id:0;
 	widget->parent			= NULL;
 	widget->enabled			= TRUE;
 	widget->visible			= FALSE;
@@ -1123,7 +1090,6 @@ LCUI_API LCUI_Widget* Widget_New( const char *widget_type )
 		return NULL;
 	}
 	Widget_AttrInit( widget );
-	//_DEBUG_MSG()
 	/* 作为根部件的子部件 */
 	Widget_Container_Add( &root_widget, widget );
 	if( !widget_type ) {
@@ -1283,18 +1249,6 @@ LCUI_API void Widget_LimitPos(	LCUI_Widget *widget,
 	widget->max_x.which_one = 0;
 	widget->max_y.which_one = 0;
 	Widget_UpdatePos( widget );
-}
-
-LCUI_API void
-_Limit_Widget_Pos( LCUI_Widget *widget, char *x_str, char*y_str )
-{
-
-}
-
-LCUI_API void
-_Limit_Widget_Size( LCUI_Widget *widget, char *w_str, char*h_str )
-{
-
 }
 
 /* 设定部件的边框 */
@@ -2330,6 +2284,7 @@ LCUI_API LCUI_Widget *RootWidget_GetSelf(void)
 void LCUIModule_Widget_Init( void )
 {
 	RootWidget_Init();
+	LCUIWidgetTypeLibrary_Init();
 	LCUIWidgetStyleLibrary_Init();
 	LCUIWidgetPainter_Init();
 	LCUIWidgetEvent_Init();
@@ -2338,8 +2293,8 @@ void LCUIModule_Widget_Init( void )
 /** 停用部件模块 */
 void LCUIModule_Widget_End( void )
 {
-	RootWidget_Destroy();
 	LCUIWidgetStyleLibrary_Destroy();
 	LCUIWidgetPainter_Destroy();
 	LCUIWidgetEvent_Destroy();
+	RootWidget_Destroy();
 }
