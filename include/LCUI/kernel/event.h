@@ -53,27 +53,27 @@ typedef struct LCUI_EventRec_ {
 typedef void(*EventCallBack)(LCUI_Event*, void*);
 typedef void* LCUI_EventBox;
 
-/** 初始化一个事件容器实例 */
-void LCUIEventBox_Init( LCUI_EventBox box );
+/** 创建一个事件容器实例 */
+LCUI_API LCUI_EventBox LCUIEventBox_Create(void);
 
 /** 销毁事件容器实例 */
-void LCUIEventBox_Destroy( LCUI_EventBox box );
+LCUI_API void LCUIEventBox_Destroy( LCUI_EventBox box );
 
 /** 连接事件 */
-int LCUIEventBox_Conncet( LCUI_EventBox box, const char *name,
+LCUI_API int LCUIEventBox_Conncet( LCUI_EventBox box, const char *name,
 				EventCallBack func, void *data );
 
 /** 解除事件连接 */
-int LCUIEventBox_Disconnect( LCUI_EventBox box, int handler_id );
+LCUI_API int LCUIEventBox_Disconnect( LCUI_EventBox box, int handler_id );
 
 /** 直接将事件发送至事件处理器进行处理 */
-int LCUIEventBox_Send( LCUI_EventBox box, const char *name, void *data );
+LCUI_API int LCUIEventBox_Send( LCUI_EventBox box, const char *name, void *data );
 
 /** 将事件投递给事件处理器，等待处理 */
-int LCUIEventBox_Post( LCUI_EventBox box, const char *name, void *data );
+LCUI_API int LCUIEventBox_Post( LCUI_EventBox box, const char *name, void *data );
 
 /** 分派所有已触发的事件至事件处理器 */
-void LCUIEventBox_Dispatch( LCUI_EventBox box );
+LCUI_API void LCUIEventBox_Dispatch( LCUI_EventBox box );
 
 LCUI_END_HEADER
 
