@@ -81,6 +81,50 @@ typedef struct LCUI_System_ {
 } LCUI_System;
 /***********************************************************************/
 
+typedef struct {
+	unsigned char type;
+	int key_code;
+} LCUI_KeyboardEvent;
+
+typedef struct {
+	unsigned char type;
+	int code;
+	void *data1;
+	void *data2;
+} LCUI_UserEvent;
+
+typedef struct{
+	unsigned char type;
+	unsigned char state;
+	unsigned int x, y;
+	unsigned int xrel, yrel;
+} LCUI_MouseMotionEvent;
+
+typedef struct {
+	unsigned char type;
+	unsigned char button;
+	unsigned char state;
+	unsigned int x, y;
+} LCUI_MouseButtonEvent;
+
+typedef enum {
+	LCUI_KEYDOWN,
+	LCUI_KEYUP,
+	LCUI_MOUSEMOTION,
+	LCUI_MOUSEBUTTONDOWN,
+	LCUI_MOUSEBUTTONUP,
+	LCUI_QUIT,
+	LCUI_EVENT_TOTAL_NUM
+} LCUI_SystemEventType;
+
+typedef union {
+	unsigned char type;
+	LCUI_KeyboardEvent key;
+	LCUI_MouseMotionEvent motion;
+	LCUI_MouseButtonEvent button;
+	LCUI_UserEvent user;
+} LCUI_SystemEvent;
+
 typedef struct LCUI_MainLoop_ {
 	LCUI_BOOL quit;
 	LCUI_BOOL running;
