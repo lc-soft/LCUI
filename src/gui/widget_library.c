@@ -10,6 +10,8 @@ typedef struct _WidgetTypeData {
 }
 WidgetTypeData;
 
+static LCUI_Queue widget_type_library;
+
 static WidgetTypeData *
 WidgetType_FindByID( LCUI_Queue *type_lib, LCUI_ID type_id )
 {
@@ -34,19 +36,11 @@ LCUI_API int WidgetFunc_Add(	const char *type_name,
 				void (*widget_func)(LCUI_Widget*),
 				WidgetFuncType func_type )
 {
-	LCUI_App *app;
 	WidgetTypeData *data;
 	LCUI_Func *temp_func, func_data;
 	int total, i;
 
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		_DEBUG_MSG(APP_ERROR_UNRECORDED_APP);
-		return -1;
-	}
-	data = WidgetType_FindByID(	&app->widget_lib,
-					WidgetType_GetID(type_name)
-	);
+	data = WidgetType_FindByID( &widget_type_library, WidgetType_GetID(type_name));
 	if( !data ) {
 		return -2;
 	}
@@ -76,25 +70,16 @@ LCUI_API LCUI_ID WidgetType_GetID( const char *widget_type )
 	return BKDRHash( widget_type );
 }
 
-
 /*
  * 功能：添加一个新的部件类型至部件库
  * 返回值：如果添加的新部件类型已存在，返回-1，成功则返回0
  **/
 LCUI_API int WidgetType_Add( const char *type_name )
 {
-	LCUI_App *app;
 	WidgetTypeData *data, new_data;
-
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		_DEBUG_MSG(APP_ERROR_UNRECORDED_APP);
-		return -1;
-	}
-
 	/* 生成类型ID */
 	new_data.type_id = WidgetType_GetID( type_name );
-	data = WidgetType_FindByID( &app->widget_lib, new_data.type_id );
+	data = WidgetType_FindByID( &widget_type_library, new_data.type_id );
 	if( data ) {
 		_DEBUG_MSG("the widget type is already registered\n");
 		return -1;
@@ -105,7 +90,7 @@ LCUI_API int WidgetType_Add( const char *type_name )
 	/* 保存类型名 */
 	LCUIString_Init( &new_data.type_name );
 	_LCUIString_Copy( &new_data.type_name, type_name );
-	Queue_Add( &app->widget_lib, &new_data );
+	Queue_Add( &widget_type_library, &new_data );
 	return 0;
 }
 
@@ -116,30 +101,51 @@ static void WidgetType_Destroy(void *arg)
 	Queue_Destroy(&wd->func);
 }
 
-/* 初始化部件库 */
-LCUI_API void WidgetLib_Init( LCUI_Queue *w_lib )
+extern void RegisterWindow(void);
+extern void RegisterLabel(void);
+extern void Register_Button(void);
+extern void Register_PictureBox(void);
+extern void Register_ProgressBar(void);
+extern void Register_Menu(void);
+extern void Register_CheckBox(void);
+extern void Register_RadioButton(void);
+extern void Register_ActiveBox(void);
+extern void RegisterTextBox(void);
+extern void Register_ScrollBar(void);
+
+/* 初始化部件类型库 */
+void LCUIWidgetTypeLibrary_Init(void)
 {
-	Queue_Init( w_lib, sizeof(WidgetTypeData), WidgetType_Destroy );
+	Queue_Init( &widget_type_library, sizeof(WidgetTypeData),
+						WidgetType_Destroy );
+	/* 为程序的部件库添加默认的部件类型 */
+	WidgetType_Add(NULL);
+	RegisterWindow();
+	RegisterLabel();
+	Register_Button();
+	Register_PictureBox();
+	Register_ProgressBar();
+	Register_Menu();
+	Register_CheckBox();
+	Register_RadioButton();
+	Register_ActiveBox();
+	RegisterTextBox();
+	Register_ScrollBar();
 }
 
 /* 删除指定部件类型的相关数据 */
 LCUI_API int WidgetType_Delete( const char *type_name )
 {
 	int i, n;
-	LCUI_App *app;
 	WidgetTypeData *wd;
 	LCUI_ID type_id;
 
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		return -2;
-	}
 	type_id = WidgetType_GetID( type_name );
-	n = Queue_GetTotal( &app->widget_lib );
+	n = Queue_GetTotal( &widget_type_library );
 	for(i=0; i<n; ++i) {
-		wd = (WidgetTypeData *)Queue_Get( &app->widget_lib, i );
+		wd = (WidgetTypeData *)Queue_Get( &widget_type_library, i );
 		if( wd && wd->type_id == type_id ) {
-			return Queue_Delete( &app->widget_lib, i );
+			return Queue_Delete( &widget_type_library, i );
 		}
 	}
 	return -1;
@@ -148,15 +154,8 @@ LCUI_API int WidgetType_Delete( const char *type_name )
 /* 获取指定类型ID的类型名称 */
 LCUI_API int WidgetType_GetNameByID( LCUI_ID type_id, char *widget_type )
 {
-	LCUI_App *app;
 	WidgetTypeData *data;
-
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		return -2;
-	}
-
-	data = WidgetType_FindByID( &app->widget_lib, type_id );
+	data = WidgetType_FindByID( &widget_type_library, type_id );
 	if( !data ) {
 		return -1;
 	}
@@ -168,17 +167,11 @@ LCUI_API int WidgetType_GetNameByID( LCUI_ID type_id, char *widget_type )
 LCUI_API WidgetCallBackFunc 
 WidgetFunc_GetByID( LCUI_ID id, WidgetFuncType func_type )
 {
-	LCUI_App *app;
 	LCUI_Func *f;
 	WidgetTypeData *data;
 	int total, i;
 
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		return NULL;
-	}
-
-	data = WidgetType_FindByID( &app->widget_lib, id );
+	data = WidgetType_FindByID( &widget_type_library, id );
 	if( data == NULL ) {
 		return NULL;
 	}
@@ -204,17 +197,10 @@ LCUI_API LCUI_BOOL WidgetType_IsValid( const char *widget_type )
 {
 	int i, n;
 	WidgetTypeData *wd;
-	LCUI_App *app;
 
-	app = LCUIApp_GetSelf();
-	if( !app ) {
-		_DEBUG_MSG("thread id: %ld\n", LCUIThread_SelfID());
-		return FALSE;
-	}
-	
-	n = Queue_GetTotal( &app->widget_lib );
+	n = Queue_GetTotal( &widget_type_library );
 	for(i=0; i<n; ++i) {
-		wd = (WidgetTypeData *)Queue_Get(&app->widget_lib, i);
+		wd = (WidgetTypeData *)Queue_Get(&widget_type_library, i);
 		if( wd == NULL ) {
 			continue;
 		}
@@ -236,33 +222,4 @@ LCUI_API int WidgetFunc_Call( LCUI_Widget *widget, WidgetFuncType type )
 		return 0;
 	}
 	return -1;
-}
-
-extern void RegisterWindow(void);
-extern void RegisterLabel(void);
-extern void Register_Button(void);
-extern void Register_PictureBox(void);
-extern void Register_ProgressBar(void);
-extern void Register_Menu(void);
-extern void Register_CheckBox(void);
-extern void Register_RadioButton(void);
-extern void Register_ActiveBox(void);
-extern void RegisterTextBox(void);
-extern void Register_ScrollBar(void);
-
-/* 为程序的部件库添加默认的部件类型 */
-LCUI_API void Register_DefaultWidgetType(void)
-{
-	WidgetType_Add(NULL);
-	RegisterWindow();
-	RegisterLabel();
-	Register_Button();
-	Register_PictureBox();
-	Register_ProgressBar();
-	Register_Menu();
-	Register_CheckBox();
-	Register_RadioButton();
-	Register_ActiveBox();
-	RegisterTextBox();
-	Register_ScrollBar();
 }
