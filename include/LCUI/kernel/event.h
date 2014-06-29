@@ -43,93 +43,37 @@
 
 LCUI_BEGIN_HEADER
 
-typedef struct {
-	unsigned char type;
-	int key_code;
-} LCUI_KeyboardEvent;
-
-typedef struct {
-	unsigned char type;
-	int code;
-	void *data1;
-	void *data2;
-} LCUI_UserEvent;
-
-typedef struct{
-	unsigned char type;
-	unsigned char state;
-	unsigned int x, y;
-	unsigned int xrel, yrel;
-} LCUI_MouseMotionEvent;
-
-typedef struct {
-	unsigned char type;
-	unsigned char button;
-	unsigned char state;
-	unsigned int x, y;
-} LCUI_MouseButtonEvent;
-
-typedef enum {
-	LCUI_KEYDOWN,
-	LCUI_KEYUP,
-	LCUI_MOUSEMOTION,
-	LCUI_MOUSEBUTTONDOWN,
-	LCUI_MOUSEBUTTONUP,
-	LCUI_QUIT,
-	LCUI_USEREVENT
-} LCUI_EVENT_TYPE;
-
-typedef union {
-	unsigned char type;
-	LCUI_KeyboardEvent key;
-	LCUI_MouseMotionEvent motion;
-	LCUI_MouseButtonEvent button;
-	LCUI_UserEvent user;
+/** 事件 */
+typedef struct LCUI_EventRec_ {
+	int id;			/**< 事件标识号 */
+	const char *name;	/**< 事件名（只读） */
+	void *data;		/**< 事件附加数据 */
 } LCUI_Event;
 
-typedef struct {
-	int id;			/**< 事件ID */
-	int temp_connect_id;	/**< 临时记录新建的事件连接的ID */
-	LCUI_Queue func_data;	/**< 记录被关联的回调函数数据 */
-} LCUI_EventSlot;
+typedef void(*EventCallBack)(LCUI_Event*, void*);
+typedef void* LCUI_EventBox;
 
-/** 从事件队列中取出一个事件 */
-LCUI_API LCUI_BOOL LCUI_PollEvent( LCUI_Event *event );
+/** 初始化一个事件容器实例 */
+void LCUIEventBox_Init( LCUI_EventBox box );
 
-/** 初始化事件模块 */
-LCUI_API void LCUIModule_Event_Init( void );
+/** 销毁事件容器实例 */
+void LCUIEventBox_Destroy( LCUI_EventBox box );
 
-/** 停用事件模块 */
-LCUI_API void LCUIModule_Event_End( void );
+/** 连接事件 */
+int LCUIEventBox_Conncet( LCUI_EventBox box, const char *name,
+				EventCallBack func, void *data );
 
-/** 添加事件至事件队列中 */
-LCUI_API LCUI_BOOL LCUI_PushEvent( LCUI_Event *event );
+/** 解除事件连接 */
+int LCUIEventBox_Disconnect( LCUI_EventBox box, int handler_id );
 
-/** 初始化事件槽记录 */
-LCUI_API void EventSlots_Init( LCUI_Queue *slots );
+/** 直接将事件发送至事件处理器进行处理 */
+int LCUIEventBox_Send( LCUI_EventBox box, const char *name, void *data );
 
-/** 根据事件的ID，获取与该事件关联的事件槽 */
-LCUI_API LCUI_EventSlot* EventSlots_Find( LCUI_Queue *slots, int event_id );
+/** 将事件投递给事件处理器，等待处理 */
+int LCUIEventBox_Post( LCUI_EventBox box, const char *name, void *data );
 
-/** 添加事件槽与事件的关联记录 */
-LCUI_API int EventSlots_Add( LCUI_Queue *slots, int event_id, LCUI_Func *func );
-
-/** 从事件槽中移除指定记录 */
-LCUI_API int EventSlots_Delete( LCUI_Queue *slots, int event_id, int func_id );
-
-/** 与指定系统事件建立连接，以进行响应 */
-LCUI_API int LCUISysEvent_Connect(	int event_type,
-					void (*func)(LCUI_Event*,void*), 
-					void *arg );
-
-/** 移除与系统事件的连接 */
-LCUI_API int LCUISysEvent_Disconnect( int event_type, int connect_id );
-
-/* 将回调函数与用户自定义的事件进行连接 */
-LCUI_API int LCUIUserEvent_Connect( int event_id, void (*func)(void*, void*) );
-
-/** 移除与用户事件的连接 */
-LCUI_API int LCUIUserEvent_Disconnect( int event_type, int connect_id );
+/** 分派所有已触发的事件至事件处理器 */
+void LCUIEventBox_Dispatch( LCUI_EventBox box );
 
 LCUI_END_HEADER
 
