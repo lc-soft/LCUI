@@ -52,13 +52,12 @@
 typedef struct _timer_data {
 	int state;			/**< 状态 */
 	LCUI_BOOL reuse;		/**< 是否重复使用该定时器 */
-	LCUI_ID app_id;			/**< 所属程序ID */
 	long int id;			/**< 定时器ID */
 	int64_t start_time;		/**< 定时器启动时的时间 */
 	int64_t pause_time;		/**< 定时器暂停时的时间 */
 	long int total_ms;		/**< 定时时间（单位：毫秒） */
 	long int pause_ms;		/**< 定时器处于暂停状态的时长（单位：毫秒） */
-	void (*callback_func)(void*);	/**< 回调函数 */
+	void (*func)(void*);	/**< 回调函数 */
 	void *arg;			/**< 函数的参数 */
 } timer_data;
 
@@ -222,7 +221,7 @@ static void TimerList_Print( LCUI_Queue *timer_list )
 			continue;
 		}
 		_DEBUG_MSG("[%02d] %ld, func: %p, cur_ms: %dms, total_ms: %dms\n",
-			i, timer->id, timer->callback_func, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
+			i, timer->id, timer->func, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
 	}
 	_DEBUG_MSG("timer list end\n\n");
 }
@@ -302,8 +301,7 @@ static void TimerThread( void *arg )
 			continue;
 		}
 		/* 准备任务数据 */
-		func_data.id = timer->app_id;
-		func_data.func = (CallBackFunc)timer->callback_func;
+		func_data.func = (CallBackFunc)timer->func;
 		func_data.arg[0] = timer->arg;
 		func_data.destroy_arg[0] = FALSE;
 		DEBUG_MSG("timer: %d, start_time: %I64dms, cur_time: %I64dms, cur_ms: %I64d, total_ms: %ld\n", 
@@ -318,7 +316,7 @@ static void TimerThread( void *arg )
 		}
 		DEBUG_MSG("add task: %p, timer id: %d\n", func_data.func, timer->id);
 		/* 添加该任务至指定程序的任务队列 */
-		AppTasks_Add( &func_data );
+		LCUI_AddTask( &func_data );
 	}
 	LCUIThread_Exit(NULL);
 }
@@ -349,7 +347,7 @@ static timer_data *TimerList_Find( int timer_id )
  * 定时器的作用是让一个任务在经过指定时间后才执行
  * @param n_ms
  *	等待的时间，单位为毫秒
- * @param callback_func
+ * @param func
  *	用于响应定时器的回调函数
  * @param reuse
  *	指示该定时器是否重复使用，如果要用于循环定时处理某些
@@ -358,7 +356,7 @@ static timer_data *TimerList_Find( int timer_id )
  *	该定时器的标识符
  * */
 LCUI_API int LCUITimer_Set(	long int n_ms,
-				void (*callback_func)(void*),
+				void (*func)(void*),
 				void *arg,
 				LCUI_BOOL reuse )
 {
@@ -383,13 +381,12 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 	}
 	
 	timer.id = ++id;
-	timer.app_id = LCUIApp_GetSelfID();
 	timer.state = STATE_RUN;
 	timer.reuse = reuse;
 	timer.total_ms = n_ms;
 	timer.pause_ms = 0;
 	timer.start_time = LCUI_GetTickCount();
-	timer.callback_func = callback_func;
+	timer.func = func;
 	timer.arg = arg;
 
 	Queue_Insert( &global_timer_list, n+1, &timer );
@@ -411,14 +408,14 @@ LCUI_API int LCUITimer_Free( int timer_id )
 {
 	int i, total;
 	timer_data *timer;
-	LCUI_App *app;
+	LCUI_BOOL need_lock;
 	LCUI_ID self_id;
 	
-	app = LCUIApp_GetSelf();
 	self_id = LCUIThread_SelfID();
+	need_lock = (LCUI_Sys.self_id != self_id);
 	/* 如果当前为非主线程，则锁上程序任务锁 */
-	if( app && app->id != self_id ) {
-		LCUIMutex_Lock( &app->task_mutex );
+	if( need_lock ) {
+		LCUI_LockRunTask();
 	}
 	TimerList_GetLock();
 	total = Queue_GetTotal( &global_timer_list );
@@ -429,19 +426,13 @@ LCUI_API int LCUITimer_Free( int timer_id )
 			continue;
 		}
 		/* 移除定时器任务，并且只在非主线程上时使用互斥锁 */
-		if( app ) {
-			AppTasks_Delete(
-				&app->tasks, 
-				(CallBackFunc)timer->callback_func, 
-				app->id != self_id
-			);
-		}
+		LCUI_RemoveTask( (CallBackFunc)timer->func, need_lock );
 		Queue_Delete( &global_timer_list, i );
 		break;
 	}
 	TimerList_FreeLock();
-	if( app && app->id != self_id ) {
-		LCUIMutex_Unlock( &app->task_mutex );
+	if( need_lock ) {
+		LCUI_UnlockRunTask();
 	}
 	if( i < total ) {
 		return 0;
