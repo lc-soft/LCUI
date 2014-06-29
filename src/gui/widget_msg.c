@@ -44,13 +44,12 @@ LCUI_API int WidgetMsg_AddToTask( LCUI_Widget *widget, WidgetMsgData *data_ptr )
 		if( task_ptr->id != data_ptr->msg_id ) {
 			continue;
 		}
-		task.id = widget->app_id;
 		task.func = task_ptr->func;
 		task.arg[0] = widget;
 		task.arg[1] = data_ptr->data.ptr;
 		task.destroy_arg[0] = FALSE;
 		task.destroy_arg[1] = data_ptr->need_free;
-		AppTasks_Add( &task );
+		LCUI_AddTask( &task );
 	}
 	return 0;
 }

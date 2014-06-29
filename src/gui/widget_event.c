@@ -124,13 +124,12 @@ LCUI_API int Widget_DispatchEvent( LCUI_Widget *widget,
 			abort();
 		}
 		*p_buff = *event;
-		task_buff.id = widget->app_id;
 		task_buff.func = p_task->func;
 		task_buff.arg[0] = p_task->arg[0];
 		task_buff.arg[1] = p_buff;
 		task_buff.destroy_arg[0] = p_task->destroy_arg[0];
 		task_buff.destroy_arg[1] = TRUE;
-		AppTasks_Add( &task_buff );
+		LCUI_AddTask( &task_buff );
 	}
 	return 0;
 }
@@ -579,14 +578,13 @@ static int Widget_DispatchKeyboardEvent( LCUI_Widget *widget,
 			p_buff->key.key_state = LCUIKEYSTATE_PRESSED;
 		}
 		/* 准备任务 */
-		task_buff.id = widget->app_id;
 		task_buff.func = task->func;
 		task_buff.arg[0] = task->arg[0];
 		task_buff.arg[1] = p_buff;
 		task_buff.destroy_arg[0] = task->destroy_arg[0];
 		task_buff.destroy_arg[1] = TRUE;
 		/* 添加至程序的任务队列 */
-		AppTasks_Add( &task_buff );
+		LCUI_AddTask( &task_buff );
 	}
 	return 0;
 }
