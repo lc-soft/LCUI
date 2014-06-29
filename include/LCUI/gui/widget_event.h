@@ -58,7 +58,9 @@ typedef enum WidgetEventType_ {
 	EVENT_MOUSEBUTTON,	/* 鼠标按钮事件 */
 	EVENT_MOUSEMOTION,	/* 鼠标移动事件 */
 	EVENT_FOCUSIN,		/* 得到焦点 */
-	EVENT_FOCUSOUT		/* 失去焦点 */
+	EVENT_FOCUSOUT,		/* 失去焦点 */
+	EVENT_MOUSEOVER,	/**< 鼠标覆盖在部件上方 */
+	EVENT_MOUSEOUT		/**< 鼠标从部件上移开 */
 } WidgetEventType; 
 
 typedef struct LCUI_WidgetResizeEvent_ {
@@ -137,11 +139,7 @@ LCUI_API void WidgetRecord_Delete( LCUI_Widget *widget );
 
 /** 判断指定部件是否被允许响应事件 */
 LCUI_API LCUI_BOOL Widget_IsAllowResponseEvent( LCUI_Widget *widget );
-/** 初始化部件模块 */
-LCUI_API void LCUIModule_Widget_Init( void );
 
-/** 停用部件模块 */
-LCUI_API void LCUIModule_Widget_End( void );
 /*--------------------------------- END -------------------------------------*/
 
 /*------------------------------- 部件焦点 ----------------------------------*/

@@ -225,10 +225,6 @@ LCUI_API LCUI_Widget* Widget_GetParent(LCUI_Widget *widget, char *widget_type);
 /* 获取指定ID的子部件 */
 LCUI_API LCUI_Widget* Widget_GetChildByID( LCUI_Widget *widget, LCUI_ID id );
 
-/* 销毁指定ID的程序的所有部件 */
-LCUI_API void
-LCUIApp_DestroyAllWidgets( LCUI_ID app_id );
-
 /* 检测指定部件是否处于焦点状态 */
 LCUI_API LCUI_BOOL
 Widget_GetFocus( LCUI_Widget *widget );
@@ -533,5 +529,11 @@ LCUI_API void Widget_SetAlpha( LCUI_Widget *widget, uchar_t alpha );
 /************************* Widget End *********************************/
 
 LCUI_API LCUI_BOOL WidgetMsg_Dispatch( LCUI_Widget *widget, WidgetMsgData *data_ptr );
+
+/** 初始化部件模块 */
+LCUI_API void LCUIModule_Widget_Init( void );
+
+/** 停用部件模块 */
+LCUI_API void LCUIModule_Widget_End( void );
 
 #endif
