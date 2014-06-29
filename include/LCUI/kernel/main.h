@@ -43,6 +43,28 @@
 
 LCUI_BEGIN_HEADER
 
+/**************** 任务的添加模式 *******************/
+#define ADD_MODE_ADD_NEW	0 /* 新增 */
+#define ADD_MODE_NOT_REPEAT	1 /* 不能重复 */
+#define ADD_MODE_REPLACE	2 /* 覆盖 */
+
+#define AND_ARG_F	1<<3	/* 第一个参数 */
+#define AND_ARG_S 	1<<4	/* 第二个参数 */
+/***************************************************/
+
+typedef struct {
+	/* 
+	 * 函数ID，部件库需要这ID标识函数类型，往程序的任务队列添加
+	 * 任务也需要该ID来标识目标程序ID 
+	 * */
+	LCUI_ID id;
+	void (*func)(void*,void*);	/* 函数指针 */
+	
+	/* 以下参数该怎么传给回调函数，具体要看是如何处理事件的 */  
+	void *arg[2];			/* 传给函数的两个参数 */
+	LCUI_BOOL destroy_arg[2];	/* 指定是否在调用完回调函数后，销毁参数 */
+} LCUI_Func, LCUI_Task;
+
 /***************************整个LCUI的数据 *****************************/
 typedef struct LCUI_System_ {
 	int state;			/* 状态 */ 
@@ -85,6 +107,17 @@ LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop *loop );
 LCUI_API int LCUI_MainLoop_Quit( LCUI_MainLoop *loop );
 
 /*----------------------- End MainLoop -------------------------------*/
+
+LCUI_API int LCUI_AddTask( LCUI_Task *task );
+
+/** 从程序任务队列中删除有指定回调函数的任务 */
+LCUI_API int LCUI_RemoveTask( CallBackFunc task_func, LCUI_BOOL need_lock );
+
+/** 锁住任务的运行 */
+void LCUI_LockRunTask(void);
+
+/** 解锁任务的运行 */
+void LCUI_UnlockRunTask(void);
 
 /* 检测LCUI是否活动 */ 
 LCUI_API LCUI_BOOL LCUI_Active(void);
