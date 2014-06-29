@@ -109,13 +109,10 @@ void LCUIEventBox_Init( LCUI_EventBox *box )
 /** 销毁事件容器实例 */
 void LCUIEventBox_Destroy( LCUI_EventBox *box )
 {
-
-}
-
-/** 分派所有已触发的事件至事件处理器 */
-void LCUIEventBox_Dispatch( LCUI_EventBox *box )
-{
-
+	RBTree_Destroy( &box->event_name );
+	RBTree_Destroy( &box->event_handler );
+	RBTree_Destroy( &box->event_slot );
+	LinkedList_Destroy( &box->events );
 }
 
 /** 连接事件 */
@@ -201,7 +198,7 @@ int LCUIEventBox_Send( LCUI_EventBox *box, const char *name, void *data )
 	}
 	slot = (LCUI_EventSlot*)node->data;
 	event.data = data;
-	event.name = name;
+	event.name = slot->name;
 	event.id = slot->id;
 	n = LinkedList_GetTotal( &slot->handlers );
 	LinkedList_Goto( &slot->handlers, 0 );
@@ -231,10 +228,24 @@ int LCUIEventBox_Post( LCUI_EventBox *box, const char *name, void *data )
 	}
 	slot = (LCUI_EventSlot*)node->data;
 	event.data = data;
-	event.name = name;
+	event.name =slot->name;
 	event.id = slot->id;
 	LinkedList_AddDataCopy( &box->events, &event );
 	return 0;
+}
+
+/** 分派所有已触发的事件至事件处理器 */
+void LCUIEventBox_Dispatch( LCUI_EventBox *box )
+{
+	int i, n;
+	LCUI_Event *event;
+	n = LinkedList_GetTotal( &box->events );
+	LinkedList_Goto( &box->events, 0 );
+	for( i=0; i<n; ++i ) {
+		event = (LCUI_Event*)LinkedList_Get( &box->events );
+		LCUIEventBox_Send( box, event->name, event->data );
+		LinkedList_Delete( &box->events );
+	}
 }
 
 /*
