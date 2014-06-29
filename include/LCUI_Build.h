@@ -74,7 +74,6 @@ enum LCUIMode {
 #define LC_KERNEL_DEV_H		<LCUI/kernel/device.h>
 #define LC_KERNEL_MAIN_H	<LCUI/kernel/main.h>
 #define LC_KERNEL_EVENT_H	<LCUI/kernel/event.h>
-#define LC_KERNEL_TASK_H	<LCUI/kernel/task.h>
 
 #define LC_LCUI_H	<LCUI/LCUI.h>
 #define LC_CONFIG_H	<LCUI/LCUI_Config.h>
