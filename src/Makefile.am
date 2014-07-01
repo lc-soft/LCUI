@@ -22,8 +22,7 @@ LCUI_SOURCES = \
 	LCUI_GraphLayer.c	\
 	LCUI_StyleLibrary.c	\
 	LCUI_InputMethod.c	\
-	LCUI_Cursor.c		\
-	LCUI_Error.c
+	LCUI_Cursor.c
 
 LCUI_LIBADD = \
 	bmp/libbmp.la	\
