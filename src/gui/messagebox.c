@@ -1751,7 +1751,7 @@ LCUI_MessageBox(	MB_ICON_TYPE icon_type, const char *text,
 	return ret;
 }
 
-/* ASCII版的LCUI_MessageBox */
+/* ANSI版的LCUI_MessageBox */
 LCUI_API int
 LCUI_MessageBoxA(	MB_ICON_TYPE icon_type, const char *text, 
 			const char *title, MB_BTN_TYPE button )
