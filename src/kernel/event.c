@@ -112,35 +112,52 @@ void LCUIEventBox_Destroy( LCUI_EventBox box )
 	LinkedList_Destroy( &boxdata->events );
 }
 
-/** 连接事件 */
-int LCUIEventBox_Conncet( LCUI_EventBox box, const char *name,
-				EventCallBack func, void *data )
+/** 获取指定名称的事件槽的id */
+int LCUIEventBox_GetSlotId( LCUI_EventBox box, const char *name )
 {
+	LCUI_RBTreeNode *node;
+	LCUI_EventSlot *slot;
+	LCUI_EventBoxRec *boxdata = (LCUI_EventBoxRec*)box;
+	
+	/* 查找事件槽记录 */
+	node = RBTree_CustomSearch( &boxdata->event_name, (const void*)name );
+	if( node ) {
+		return node->key;
+	}
+	/* 新建一个事件槽 */
+	slot = MALLOC_ONE(LCUI_EventSlot);
+	slot->name = (char*)malloc(sizeof(char)*(strlen(name)+1));
+	slot->id = ++boxdata->event_id;
+	strcpy( slot->name, name );
+	LinkedList_Init( &slot->handlers, sizeof(LCUI_EventHandler) );
+	/* 添加事件槽记录 */
+	RBTree_Insert( &boxdata->event_slot, slot->id, slot );
+	/* 添加事件名记录 */
+	node = RBTree_CustomInsert( 
+		&boxdata->event_name, (const void*)name, &slot->name
+	);
+	/* 结点的 key 就是事件槽的 id */
+	node->key = slot->id;
+	return slot->id;
+}
+
+/** 连接事件 */
+int LCUIEventBox_Conncet( LCUI_EventBox box, const char *event_name,
+				EventCallBack func, void *func_data )
+{
+	int slot_id;
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
 	LCUI_EventBoxRec *boxdata = (LCUI_EventBoxRec*)box;
-
-	node = RBTree_CustomSearch( &boxdata->event_name, (const void*)name );
-	if( !node ) {
-		slot = MALLOC_ONE(LCUI_EventSlot);
-		slot->name = (char*)malloc(sizeof(char)*(strlen(name)+1));
-		slot->id = ++boxdata->event_id;
-		strcpy( slot->name, name );
-		LinkedList_Init( &slot->handlers, sizeof(LCUI_EventHandler) );
-		RBTree_Insert( &boxdata->event_slot, slot->id, slot );
-		node = RBTree_CustomInsert( &boxdata->event_name, 
-					(const void*)name, &slot->name );
-		node->key = slot->id;
-	} else {
-		node = RBTree_Search( &boxdata->event_slot, node->key );
-		slot = (LCUI_EventSlot*)node->data;
-	}
-
+	
+	slot_id = LCUIEventBox_GetSlotId( box, event_name );
+	node = RBTree_Search( &boxdata->event_slot, slot_id );
+	slot = (LCUI_EventSlot*)node->data;
 	handler = MALLOC_ONE(LCUI_EventHandler);
 	handler->id = ++boxdata->handler_id;
 	handler->func = func;
-	handler->func_data = data;
+	handler->func_data = func_data;
 	LinkedList_AddData( &slot->handlers, handler );
 	RBTree_Insert( &boxdata->event_handler, handler->id, (void*)(slot->id) );
 	return handler->id;

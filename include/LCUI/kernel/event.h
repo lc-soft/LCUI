@@ -59,9 +59,12 @@ LCUI_API LCUI_EventBox LCUIEventBox_Create(void);
 /** 销毁事件容器实例 */
 LCUI_API void LCUIEventBox_Destroy( LCUI_EventBox box );
 
+/** 获取指定名称的事件槽的id */
+LCUI_API int LCUIEventBox_GetSlotId( LCUI_EventBox box, const char *name );
+
 /** 连接事件 */
-LCUI_API int LCUIEventBox_Conncet( LCUI_EventBox box, const char *name,
-				EventCallBack func, void *data );
+LCUI_API int LCUIEventBox_Conncet( LCUI_EventBox box, const char *event_name,
+					EventCallBack func, void *func_data );
 
 /** 解除事件连接 */
 LCUI_API int LCUIEventBox_Disconnect( LCUI_EventBox box, int handler_id );
