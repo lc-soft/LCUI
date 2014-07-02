@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * main.c -- The main functions for the LCUI normal work
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * main.c -- 使LCUI能够正常工作的相关主要函数
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -51,16 +51,74 @@
 
 #include <time.h>
 
-/** LCUI程序的数据 */
+/** LCUI 系统相关数据 */
+static struct LCUI_System {
+	int state;			/**< 状态 */ 
+	int mode;			/**< LCUI的运行模式 */
+	LCUI_BOOL is_inited;		/**< 标志，指示LCUI是否初始化过 */
+	
+	LCUI_Thread main_thread;	/**< 主线程 */
+	LCUI_Thread display_thread;	/**< GUI显示线程 */
+	LCUI_Thread timer_thread;	/**< 定时器线程 */
+	LCUI_Thread dev_thread;		/**< 设备驱动线程 */
+	
+	struct {
+		LCUI_EventBox box;	/**< 系统事件容器 */
+		LCUI_Cond cond;		/**< 条件变量 */
+	} event;
+
+	int exit_code;			/**< 退出码 */
+	void (*func_atexit)(void);	/**< 在LCUI退出时调用的函数 */
+} System;
+/***********************************************************************/
+
+/** LCUI 应用程序数据 */
 static struct LCUI_App {
 	LCUI_Queue tasks;		/**< 程序的任务队列 */
-	LCUI_Queue events;		/**< 事件队列 */
 	LCUI_Mutex task_mutex;		/**< 任务互斥锁，当运行程序任务时会锁上 */
 	LCUI_Queue mainloop_queue;
-	LCUI_Sleeper mainloop_sleeper;	/**< 用于决定主循环是否睡眠 */
+	LCUI_Cond loop_cond;		/**< 条件变量，用于决定是否继续任务循环 */
 } MainApp;
 
-LCUI_System LCUI_Sys; 
+/*-------------------------- system event <START> ---------------------------*/
+
+/** 系统事件处理线程 */
+static void SystemEventThread(void)
+{
+	while( System.state == ACTIVE ) {
+		LCUICond_Wait( &System.event.cond );
+		LCUIEventBox_Dispatch( &System.event.box );
+	}
+}
+
+static void LCUIModule_Event_Init(void)
+{
+	LCUICond_Init( &System.event.cond );
+	System.event.box = LCUIEventBox_Create();
+}
+
+static void LCUIModule_Event_Exit(void)
+{
+	LCUICond_Destroy( &System.event.cond );
+	LCUIEventBox_Destroy( System.event.box );
+	System.event.box = NULL;
+}
+
+/** 绑定事件 */
+int LCUI_BindEvent( const char *event_name,
+		    void(*func)(LCUI_SystemEvent*,void*),
+		    void *func_data )
+{
+	return 0;
+}
+
+/** 解除事件绑定 */
+int LCUI_UnbindEvent( int event_handler_id )
+{
+	return 0;
+}
+
+/*--------------------------- system event <END> ----------------------------*/
 
 /*--------------------------- Main Loop -------------------------------*/
 static LCUI_BOOL init_mainloop_queue = FALSE;
@@ -204,9 +262,9 @@ int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 {
 	DEBUG_MSG("loop: %p, enter\n", loop);
 	loop->running = TRUE;
-	while( !loop->quit && LCUI_Sys.state == ACTIVE ) {
+	while( !loop->quit && System.state == ACTIVE ) {
 		if( Queue_GetTotal(&MainApp.tasks) <= 0 ) {
-			LCUISleeper_StartSleep( &MainApp.mainloop_sleeper, 1000 );
+			LCUICond_TimedWait( &MainApp.loop_cond, 1000 );
 			continue;
 		}
 		LCUI_RunTask();
@@ -357,7 +415,7 @@ int LCUI_CustomAddTask( int mode, LCUI_Task *task )
 	Queue_Lock( &MainApp.tasks );
 	ret = Tasks_CustomAdd( &MainApp.tasks, mode, task );
 	if( ret == 0 ) {
-		LCUISleeper_BreakSleep( &MainApp.mainloop_sleeper );
+		LCUICond_Broadcast( &MainApp.loop_cond );
 	} else if( ret == -1 ) {
 		DestroyTask( task );
 	}
@@ -386,7 +444,7 @@ int LCUI_AddTask( LCUI_Task *task )
 		return -2;
 	}
 	Queue_Unlock( &MainApp.tasks );
-	LCUISleeper_BreakSleep( &MainApp.mainloop_sleeper );
+	LCUICond_Broadcast( &MainApp.loop_cond );
 	return 0;
 }
 
@@ -421,7 +479,7 @@ static void LCUIApp_Init(void)
 {
 	Queue_Init( &MainApp.tasks, sizeof(LCUI_Task), DestroyTask );
 	LCUIMutex_Init( &MainApp.task_mutex );
-	LCUISleeper_Create( &MainApp.mainloop_sleeper );
+	LCUICond_Init( &MainApp.loop_cond );
 }
 
 /* 销毁程序占用的资源 */
@@ -446,7 +504,7 @@ static void LCUI_ShowCopyrightText(void)
 /** 检测LCUI是否活动 */
 LCUI_BOOL LCUI_Active(void)
 {
-	if(LCUI_Sys.state == ACTIVE) {
+	if(System.state == ACTIVE) {
 		return TRUE;
 	}
 	return FALSE;
@@ -459,14 +517,14 @@ LCUI_BOOL LCUI_Active(void)
 int LCUI_Init( int w, int h, int mode )
 {
 	/* 如果LCUI没有初始化过 */
-	if( LCUI_Sys.is_inited ) {
+	if( System.is_inited ) {
 		return -1;
 	}
-	LCUI_Sys.is_inited = TRUE;
-	LCUI_Sys.func_atexit = NULL;
-	LCUI_Sys.exit_code = 0;
-	LCUI_Sys.state = ACTIVE;
-	LCUI_Sys.self_id = LCUIThread_SelfID();
+	System.is_inited = TRUE;
+	System.func_atexit = NULL;
+	System.exit_code = 0;
+	System.state = ACTIVE;
+	System.main_thread = LCUIThread_SelfID();
 	LCUI_ShowCopyrightText();
 	LCUIApp_Init();
 	/* 初始化各个模块 */
@@ -490,12 +548,12 @@ int LCUI_Init( int w, int h, int mode )
 /** 释放LCUI占用的资源 */
 static int LCUI_Destroy( void )
 {
-	LCUI_Sys.state = KILLED;
-	if( LCUI_Sys.func_atexit ) {
-		LCUI_Sys.func_atexit();
+	System.state = KILLED;
+	if( System.func_atexit ) {
+		System.func_atexit();
 	}
 	LCUIModule_IME_End();
-	LCUIModule_Event_End();
+	LCUIModule_Event_Exit();
 	LCUIModule_Cursor_End();
 	LCUIModule_Widget_End();
 	LCUIModule_Font_End();
@@ -506,18 +564,18 @@ static int LCUI_Destroy( void )
 	LCUIModule_Device_End();
 	LCUIModule_Video_End();
 	LCUIApp_Destroy();
-	return LCUI_Sys.exit_code;
+	return System.exit_code;
 }
 
 void LCUI_Quit(void)
 {
-	LCUI_Sys.state = KILLED;
+	System.state = KILLED;
 	LCUI_QuitAllMainLoops();
 }
 
 void LCUI_Exit( int exit_code )
 {
-	LCUI_Sys.exit_code = exit_code;
+	System.exit_code = exit_code;
 	LCUI_Quit();
 }
 
@@ -536,7 +594,7 @@ int LCUI_Main( void )
 /** 注册一个函数，以在LCUI程序退出时调用 */
 void LCUI_AtQuit( void (*callback_func)(void) )
 {
-	LCUI_Sys.func_atexit = callback_func;
+	System.func_atexit = callback_func;
 }
 
 /* 获取LCUI的版本 */

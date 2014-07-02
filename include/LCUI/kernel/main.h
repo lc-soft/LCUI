@@ -65,22 +65,6 @@ typedef struct {
 	LCUI_BOOL destroy_arg[2];	/* 指定是否在调用完回调函数后，销毁参数 */
 } LCUI_Func, LCUI_Task;
 
-/***************************整个LCUI的数据 *****************************/
-typedef struct LCUI_System_ {
-	int state;			/* 状态 */ 
-	int mode;			/* LCUI的运行模式 */
-	LCUI_BOOL is_inited;		/* 指示LCUI是否初始化过 */
-	
-	LCUI_Thread self_id;		/* 保存LCUI主程序的线程的ID */
-	LCUI_Thread display_thread;	/* 保存核心处理的线程的ID */
-	LCUI_Thread timer_thread;	/* 定时器列表处理线程的ID */
-	LCUI_Thread dev_thread;		/* 设备输入数据处理线程的ID */
-
-	int exit_code;			/**< 退出码 */
-	void (*func_atexit)(void);	/**< 在LCUI退出时调用的函数 */
-} LCUI_System;
-/***********************************************************************/
-
 typedef struct {
 	unsigned char type;
 	int key_code;
@@ -130,8 +114,6 @@ typedef struct LCUI_MainLoop_ {
 	LCUI_BOOL running;
 	int level;
 } LCUI_MainLoop;
-
-extern LCUI_System  LCUI_Sys;
 
 #ifdef LCUI_BUILD_IN_WIN32
 LCUI_API void Win32_LCUI_Init( HINSTANCE hInstance );
