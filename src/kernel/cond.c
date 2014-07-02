@@ -60,6 +60,16 @@ int LCUICond_Init( LCUI_Cond *cond )
 #endif
 }
 
+/** 销毁一个条件变量 */
+void LCUICond_Destroy( LCUI_Cond *cond )
+{
+#ifdef LCUI_BUILD_IN_WIN32
+	CloseHandle(cond);
+#else
+	// ...
+#endif
+}
+
 /** 阻塞当前线程，等待条件成立 */
 unsigned int LCUICond_Wait( LCUI_Cond *cond )
 {

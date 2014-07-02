@@ -52,6 +52,9 @@ typedef HANDLE LCUI_Cond;
 /** 新建一个条件变量 */
 LCUI_API int LCUICond_Init( LCUI_Cond *cond );
 
+/** 销毁一个条件变量 */
+LCUI_API void LCUICond_Destroy( LCUI_Cond *cond );
+
 /** 阻塞当前线程，等待条件成立 */
 LCUI_API unsigned int LCUICond_Wait( LCUI_Cond *cond );
 
