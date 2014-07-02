@@ -236,7 +236,7 @@ LCUI_END_HEADER
 		fflush(stdout); \
 	}
 
-#include LC_KERNEL_SLEEPER_H
+#include LC_KERNEL_COND_H
 #include LC_KERNEL_MAIN_H
 #include LC_KERNEL_DEV_H
 #include LC_KERNEL_TIMER_H
