@@ -51,6 +51,11 @@
 
 #include <time.h>
 
+typedef struct FuncDataRec_ {
+	void (*func)(LCUI_SystemEvent*,void*);
+	void *arg;
+} FuncData;
+
 /** LCUI 系统相关数据 */
 static struct LCUI_System {
 	int state;			/**< 状态 */ 
@@ -63,8 +68,10 @@ static struct LCUI_System {
 	LCUI_Thread dev_thread;		/**< 设备驱动线程 */
 	
 	struct {
+		LCUI_BOOL is_running;	/**< 是否处于运行状态 */
 		LCUI_EventBox box;	/**< 系统事件容器 */
 		LCUI_Cond cond;		/**< 条件变量 */
+		LCUI_Thread tid;	/**< 线程ID */
 	} event;
 
 	int exit_code;			/**< 退出码 */
@@ -83,39 +90,73 @@ static struct LCUI_App {
 /*-------------------------- system event <START> ---------------------------*/
 
 /** 系统事件处理线程 */
-static void SystemEventThread(void)
+static void SystemEventThread(void *arg)
 {
-	while( System.state == ACTIVE ) {
+	LCUI_Event event;
+	System.event.is_running = TRUE;
+	while( System.event.is_running ) {
 		LCUICond_Wait( &System.event.cond );
-		LCUIEventBox_Dispatch( &System.event.box );
+		if( LCUIEventBox_GetEvent( &System.event.box, &event ) != 0 ) {
+			continue;
+		}
+		LCUIEventBox_Send( System.event.box, event.name, event.data );
+		free( event.data );
 	}
 }
 
+/** 初始化事件模块 */
 static void LCUIModule_Event_Init(void)
 {
 	LCUICond_Init( &System.event.cond );
 	System.event.box = LCUIEventBox_Create();
+	LCUIThread_Create( &System.event.tid, SystemEventThread, NULL );
 }
 
+/** 停用事件模块并进行清理 */
 static void LCUIModule_Event_Exit(void)
 {
+	System.event.is_running = FALSE;
+	LCUICond_Broadcast( &System.event.cond );
+	LCUIThread_Join( System.event.tid, NULL );
 	LCUICond_Destroy( &System.event.cond );
 	LCUIEventBox_Destroy( System.event.box );
 	System.event.box = NULL;
 }
 
+static void OnEvent( LCUI_Event *event, void *arg )
+{
+	FuncData *data = (FuncData*)arg;
+	data->func( (LCUI_SystemEvent*)event->data, data->arg );
+}
+
 /** 绑定事件 */
 int LCUI_BindEvent( const char *event_name,
 		    void(*func)(LCUI_SystemEvent*,void*),
-		    void *func_data )
+		    void *func_arg, void (*arg_destroy)(void*) )
 {
-	return 0;
+	FuncData *data;
+	data = (FuncData*)malloc(sizeof(FuncData));
+	data->func = func;
+	data->arg = func_arg;
+	return LCUIEventBox_Bind( System.event.box, event_name, 
+					OnEvent, data, arg_destroy );
 }
 
 /** 解除事件绑定 */
 int LCUI_UnbindEvent( int event_handler_id )
 {
-	return 0;
+	return LCUIEventBox_Unbind( System.event.box, event_handler_id );
+}
+
+/** 投递事件 */
+int LCUI_PostEvent( const char *name, void *data )
+{
+	int ret;
+	ret = LCUIEventBox_Post( System.event.box, name, data, free );
+	if( ret == 0 ) {
+		LCUICond_Broadcast( &System.event.cond );
+	}
+	return ret;
 }
 
 /*--------------------------- system event <END> ----------------------------*/
