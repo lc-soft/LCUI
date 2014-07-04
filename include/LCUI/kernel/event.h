@@ -45,9 +45,10 @@ LCUI_BEGIN_HEADER
 
 /** 事件 */
 typedef struct LCUI_EventRec_ {
-	int id;			/**< 事件标识号 */
-	const char *name;	/**< 事件名（只读） */
-	void *data;		/**< 事件附加数据 */
+	int id;				/**< 事件标识号 */
+	const char *name;		/**< 事件名（只读） */
+	void *data;			/**< 事件附加数据 */
+	void (*destroy_data)(void*);	/**< 用于销毁事件附加数据的回调函数 */
 } LCUI_Event;
 
 typedef void(*EventCallBack)(LCUI_Event*, void*);
@@ -62,21 +63,23 @@ LCUI_API void LCUIEventBox_Destroy( LCUI_EventBox box );
 /** 获取指定名称的事件槽的id */
 LCUI_API int LCUIEventBox_GetSlotId( LCUI_EventBox box, const char *name );
 
-/** 连接事件 */
-LCUI_API int LCUIEventBox_Conncet( LCUI_EventBox box, const char *event_name,
-					EventCallBack func, void *func_data );
+/** 绑定事件 */
+LCUI_API int LCUIEventBox_Bind( LCUI_EventBox box, const char *event_name,
+				EventCallBack func, void *func_data, 
+				void (*destroy_data)(void*) );
 
 /** 解除事件连接 */
-LCUI_API int LCUIEventBox_Disconnect( LCUI_EventBox box, int handler_id );
+LCUI_API int LCUIEventBox_Unbind( LCUI_EventBox box, int handler_id );
 
 /** 直接将事件发送至事件处理器进行处理 */
 LCUI_API int LCUIEventBox_Send( LCUI_EventBox box, const char *name, void *data );
 
 /** 将事件投递给事件处理器，等待处理 */
-LCUI_API int LCUIEventBox_Post( LCUI_EventBox box, const char *name, void *data );
+int LCUIEventBox_Post( LCUI_EventBox box, const char *name,
+		       void *data, void (*destroy_data)(void*) );
 
-/** 分派所有已触发的事件至事件处理器 */
-LCUI_API void LCUIEventBox_Dispatch( LCUI_EventBox box );
+/** 从已触发的事件记录中取出一个事件信息 */
+LCUI_API int LCUIEventBox_GetEvent( LCUI_EventBox box, LCUI_Event *ebuff );
 
 LCUI_END_HEADER
 

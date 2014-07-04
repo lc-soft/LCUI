@@ -50,9 +50,10 @@
 
 /** 事件处理器 */
 typedef struct LCUI_EventHandlerRec_ {
-	int id;			/**< 标识号 */
-	EventCallBack func;	/**< 回调函数 */
-	void *func_data;	/**< 传给回调函数的数据 */
+	int id;				/**< 标识号 */
+	EventCallBack func;		/**< 回调函数 */
+	void *func_data;		/**< 传给回调函数的数据 */
+	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 } LCUI_EventHandler;
 
 /** 事件槽，记录与事件链接的响应函数 */
@@ -77,11 +78,28 @@ static int CompareEventName( void *data, const void *keydata )
 	return strcmp(*(char**)data, (const char*)keydata);
 }
 
-static void DestroyEventSlot( void *data ) {
+static void DestroyEventSlot( void *data )
+{
 	LCUI_EventSlot *slot = (LCUI_EventSlot*)data;
 	free( slot->name );
 	slot->name = NULL;
 	LinkedList_Destroy( &slot->handlers );
+}
+
+static void DestroyEventHandler( void *data )
+{
+	LCUI_EventHandler* handler = (LCUI_EventHandler*)data;
+	if( handler->destroy_data ) {
+		handler->destroy_data( handler->func_data );
+	}
+}
+
+static void DestroyEvent( void *data )
+{
+	LCUI_Event *event = (LCUI_Event*)data;
+	if( event->destroy_data ) {
+		event->destroy_data( event->data );
+	}
 }
 
 /** 创建一个事件容器实例 */
@@ -95,10 +113,13 @@ LCUI_EventBox LCUIEventBox_Create(void)
 	RBTree_Init( &boxdata->event_name );
 	RBTree_Init( &boxdata->event_handler );
 	RBTree_OnJudge( &boxdata->event_name, CompareEventName );
+	RBTree_OnDestroy( &boxdata->event_handler, DestroyEventHandler );
 	RBTree_OnDestroy( &boxdata->event_slot, DestroyEventSlot );
 	RBTree_SetDataNeedFree( &boxdata->event_handler, 0 );
 	RBTree_SetDataNeedFree( &boxdata->event_name, 0 );
 	LinkedList_Init( &boxdata->events, sizeof(LCUI_Event) );
+	LinkedList_SetDataNeedFree( &boxdata->events, 1 );
+	LinkedList_SetDestroyFunc( &boxdata->events, DestroyEvent );
 	return boxdata;
 }
 
@@ -141,9 +162,10 @@ int LCUIEventBox_GetSlotId( LCUI_EventBox box, const char *name )
 	return slot->id;
 }
 
-/** 连接事件 */
-int LCUIEventBox_Conncet( LCUI_EventBox box, const char *event_name,
-				EventCallBack func, void *func_data )
+/** 绑定事件 */
+int LCUIEventBox_Bind( LCUI_EventBox box, const char *event_name,
+			EventCallBack func, void *func_data, 
+			void (*destroy_data)(void*) )
 {
 	int slot_id;
 	LCUI_RBTreeNode *node;
@@ -158,13 +180,14 @@ int LCUIEventBox_Conncet( LCUI_EventBox box, const char *event_name,
 	handler->id = ++boxdata->handler_id;
 	handler->func = func;
 	handler->func_data = func_data;
+	handler->destroy_data = destroy_data;
 	LinkedList_AddData( &slot->handlers, handler );
 	RBTree_Insert( &boxdata->event_handler, handler->id, (void*)(slot->id) );
 	return handler->id;
 }
 
 /** 解除事件连接 */
-int LCUIEventBox_Disconnect( LCUI_EventBox box, int handler_id )
+int LCUIEventBox_Unbind( LCUI_EventBox box, int handler_id )
 {
 	int i, n;
 	LCUI_RBTreeNode *node;
@@ -214,9 +237,10 @@ int LCUIEventBox_Send( LCUI_EventBox box, const char *name, void *data )
 		return -2;
 	}
 	slot = (LCUI_EventSlot*)node->data;
-	event.data = data;
-	event.name = slot->name;
 	event.id = slot->id;
+	event.name = slot->name;
+	event.data = data;
+	event.destroy_data = NULL;
 	n = LinkedList_GetTotal( &slot->handlers );
 	LinkedList_Goto( &slot->handlers, 0 );
 	for( i=0; i<n; ++i ) {
@@ -228,7 +252,8 @@ int LCUIEventBox_Send( LCUI_EventBox box, const char *name, void *data )
 }
 
 /** 将事件投递给事件处理器，等待处理 */
-int LCUIEventBox_Post( LCUI_EventBox box, const char *name, void *data )
+int LCUIEventBox_Post( LCUI_EventBox box, const char *name,
+		       void *data, void (*destroy_data)(void*) )
 {
 	LCUI_Event event;
 	LCUI_RBTreeNode *node;
@@ -244,25 +269,28 @@ int LCUIEventBox_Post( LCUI_EventBox box, const char *name, void *data )
 		return -2;
 	}
 	slot = (LCUI_EventSlot*)node->data;
-	event.data = data;
-	event.name =slot->name;
 	event.id = slot->id;
+	event.name =slot->name;
+	event.data = data;
+	event.destroy_data = destroy_data;
 	LinkedList_AddDataCopy( &boxdata->events, &event );
 	return 0;
 }
 
-/** 分派所有已触发的事件至事件处理器 */
-void LCUIEventBox_Dispatch( LCUI_EventBox box )
+/** 从已触发的事件记录中取出一个事件信息 */
+int LCUIEventBox_GetEvent( LCUI_EventBox box, LCUI_Event *ebuff )
 {
-	int i, n;
+	int n;
 	LCUI_Event *event;
 	LCUI_EventBoxRec *boxdata = (LCUI_EventBoxRec*)box;
 
 	n = LinkedList_GetTotal( &boxdata->events );
-	LinkedList_Goto( &boxdata->events, 0 );
-	for( i=0; i<n; ++i ) {
-		event = (LCUI_Event*)LinkedList_Get( &boxdata->events );
-		LCUIEventBox_Send( box, event->name, event->data );
-		LinkedList_Delete( &boxdata->events );
+	if( box == NULL || n <= 0 ) {
+		return -1;
 	}
+	LinkedList_Goto( &boxdata->events, 0 );
+	event = (LCUI_Event*)LinkedList_Get( &boxdata->events );
+	*ebuff = *event;
+	LinkedList_Delete( &boxdata->events );
+	return 0;
 }
