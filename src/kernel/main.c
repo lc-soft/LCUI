@@ -100,7 +100,8 @@ static void SystemEventThread(void *arg)
 			continue;
 		}
 		LCUIEventBox_Send( System.event.box, event.name, event.data );
-		free( event.data );
+		/* 删除这个事件的记录 */
+		LCUIEventBox_DeleteEvent( System.event.box );
 	}
 }
 

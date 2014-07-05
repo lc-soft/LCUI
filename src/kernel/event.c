@@ -277,7 +277,7 @@ int LCUIEventBox_Post( LCUI_EventBox box, const char *name,
 	return 0;
 }
 
-/** 从已触发的事件记录中取出一个事件信息 */
+/** 从已触发的事件记录中取出（不会移除）一个事件信息 */
 int LCUIEventBox_GetEvent( LCUI_EventBox box, LCUI_Event *ebuff )
 {
 	int n;
@@ -291,6 +291,16 @@ int LCUIEventBox_GetEvent( LCUI_EventBox box, LCUI_Event *ebuff )
 	LinkedList_Goto( &boxdata->events, 0 );
 	event = (LCUI_Event*)LinkedList_Get( &boxdata->events );
 	*ebuff = *event;
+	return 0;
+}
+
+/** 从已触发的事件记录中删除一个事件信息 */
+int LCUIEventBox_DeleteEvent( LCUI_EventBox box )
+{
+	LCUI_EventBoxRec *boxdata = (LCUI_EventBoxRec*)box;
+	if( box == NULL || LinkedList_GetTotal( &boxdata->events ) <= 0 ) {
+		return -1;
+	}
 	LinkedList_Delete( &boxdata->events );
 	return 0;
 }

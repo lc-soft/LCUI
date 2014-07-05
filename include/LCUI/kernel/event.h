@@ -78,8 +78,11 @@ LCUI_API int LCUIEventBox_Send( LCUI_EventBox box, const char *name, void *data 
 int LCUIEventBox_Post( LCUI_EventBox box, const char *name,
 		       void *data, void (*destroy_data)(void*) );
 
-/** 从已触发的事件记录中取出一个事件信息 */
+/** 从已触发的事件记录中取出（不会移除）一个事件信息 */
 LCUI_API int LCUIEventBox_GetEvent( LCUI_EventBox box, LCUI_Event *ebuff );
+
+/** 从已触发的事件记录中删除一个事件信息 */
+int LCUIEventBox_DeleteEvent( LCUI_EventBox box );
 
 LCUI_END_HEADER
 
