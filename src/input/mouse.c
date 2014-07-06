@@ -1,51 +1,44 @@
-/** ******************************************************************************
- * @file	mouse.c
- * @brief	mouse input support.
- * @author	Liu Chao <lc-soft@live.cn>
- * @warning
- * Copyright (C) 2012-2013 by							\n
- * Liu Chao									\n
- * 										\n
- * This file is part of the LCUI project, and may only be used, modified, and	\n
- * distributed under the terms of the GPLv2.					\n
- * 										\n
- * (GPLv2 is abbreviation of GNU General Public License Version 2)		\n
- * 										\n
- * By continuing to use, modify, or distribute this file you indicate that you	\n
- * have read the license and understand and accept it fully.			\n
- *  										\n
- * The LCUI project is distributed in the hope that it will be useful, but 	\n
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 	\n
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.	\n
- * 										\n
- * You should have received a copy of the GPLv2 along with this file. It is 	\n
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.	\n
- * ******************************************************************************/
+/* ***************************************************************************
+ * mouse.c -- mouse input support.
+ * 
+ * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
+ * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ * 
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ***************************************************************************/
  
-/** ******************************************************************************
- * @file	mouse.c
- * @brief	鼠标输入支持。
- * @author	刘超 <lc-soft@live.cn>
- * @warning
- * 版权所有 (C) 2012-2013 归属于						\n
- * 刘超										\n
- * 										\n
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。	\n
- * 										\n
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)				\n
- * 										\n
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。	\n
- * 										\n
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特定\n
- 用途的隐含担保，详情请参照GPLv2许可协议。					\n
- * 										\n
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果	\n
- * 没有，请查看：<http://www.gnu.org/licenses/>. 				\n
- * ******************************************************************************/
+/* ****************************************************************************
+ * mouse.c -- 鼠标输入支持。
+ *
+ * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ***************************************************************************/
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
-#include LC_WIDGET_H
 #include LC_CURSOR_H
 #include LC_DISPLAY_H
 #include LC_INPUT_H
@@ -63,78 +56,66 @@ static int mouse_state;	/**< 鼠标设备的状态 */
 
 /** 鼠标左右键的状态 */
 static int button_state[2]={
-		LCUIKEYSTATE_RELEASE,
-		LCUIKEYSTATE_RELEASE
+	LCUIKEYSTATE_RELEASE,
+	LCUIKEYSTATE_RELEASE
 };
 
-/** 按下指定鼠标按键 */
-LCUI_API int LCUIMouse_ButtonDown( int key_code )
+/** 投递鼠标按键按下事件 */
+int LCUI_PostMouseDownEvent( int key_code )
 {
-	LCUI_Event event;
 	LCUI_Pos pos;
+	LCUI_SystemEvent event;
 
 	if( button_state[key_code] == LCUIKEYSTATE_PRESSED ) {
 		return -1;
 	}
 	button_state[key_code] = LCUIKEYSTATE_PRESSED;
-	event.type = LCUI_MOUSEBUTTONDOWN;
+	event.type = LCUI_MOUSEDOWN;
 	LCUICursor_GetPos( &pos );
-	event.button.x = pos.x;
-	event.button.y = pos.y;
-	event.button.button = key_code;
-	event.button.state = LCUIKEYSTATE_PRESSED;
-	LCUI_PushEvent( &event );
+	event.x = pos.x;
+	event.y = pos.y;
+	event.which = key_code;
+	LCUI_PostEvent( "mousedown", &event );
 	return 0;
 }
 
-/** 释放指定鼠标按键 */
-LCUI_API int LCUIMouse_ButtonUp( int key_code )
+/** 投递鼠标按键释放事件 */
+int LCUI_PostMouseUpEvent( int key_code )
 {
-	LCUI_Event event;
 	LCUI_Pos pos;
+	LCUI_SystemEvent event;
 	
 	if( button_state[key_code] == LCUIKEYSTATE_RELEASE ) {
 		return -1;
 	}
 	button_state[key_code] = LCUIKEYSTATE_RELEASE;
-	event.type = LCUI_MOUSEBUTTONUP;
+	event.type = LCUI_MOUSEUP;
 	LCUICursor_GetPos( &pos );
-	event.button.x = pos.x;
-	event.button.y = pos.y;
-	event.button.button = key_code;
-	event.button.state = LCUIKEYSTATE_RELEASE;
-	LCUI_PushEvent( &event );
+	event.x = pos.x;
+	event.y = pos.y;
+	event.which = key_code;
+	LCUI_PostEvent( "mouseup", &event );
 	return 0;
 }
 
-/** 添加鼠标移动事件 */
-LCUI_API void LCUI_PushMouseMotionEvent( LCUI_Pos new_pos )
+/** 投递鼠标移动事件 */
+void LCUI_PostMouseMoveEvent( LCUI_Pos new_pos )
 {
-	LCUI_Event event;
+	LCUI_SystemEvent event;
 	static LCUI_Pos old_pos = {0,0};
 
-	if( new_pos.x == old_pos.x
-	 && new_pos.y == old_pos.y ) {
+	if( new_pos.x == old_pos.x && new_pos.y == old_pos.y ) {
 		return;
 	}
-
-	event.type = LCUI_MOUSEMOTION;
-	event.motion.x = new_pos.x;
-	event.motion.y = new_pos.y;
-	event.motion.xrel = new_pos.x - old_pos.x;
-	event.motion.yrel = new_pos.y - old_pos.y;
-	if( button_state[0] == LCUIKEYSTATE_PRESSED
-	 || button_state[1] == LCUIKEYSTATE_PRESSED ) {
-		event.motion.state = LCUIKEYSTATE_PRESSED;
-	} else {
-		event.motion.state = LCUIKEYSTATE_RELEASE;
-	}
-	LCUI_PushEvent( &event );
+	event.type = LCUI_MOUSEMOVE;
+	event.x = new_pos.x;
+	event.y = new_pos.y;
+	LCUI_PostEvent( "mousemove", &event );
 	old_pos = new_pos;
 }
 
 #ifdef LCUI_MOUSE_DRIVER_LINUX
-static LCUI_BOOL proc_mouse( void )
+static LCUI_BOOL MouseProc( void )
 {
 	static int  tmp;
 	static char buf[6];
@@ -181,30 +162,30 @@ static LCUI_BOOL proc_mouse( void )
 	pos.y = pos.y<0 ? 0:pos.y;
 	/* 应用鼠标游标的位置变更 */
 	LCUICursor_SetPos( pos );
-	LCUI_PushMouseMotionEvent( pos );
+	LCUI_PostMouseMoveEvent( pos );
 	switch ( buf[0]&0x07 ) {
 	    case 1:		/* 鼠标左键被按下 */
-		LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
-		LCUIMouse_ButtonUp( LCUIKEY_RIGHTBUTTON );
+		LCUI_PostMouseDownEvent( LCUIKEY_LEFTBUTTON );
+		LCUI_PostMouseUpEvent( LCUIKEY_RIGHTBUTTON );
 		break;
 	    case 2:		/* 鼠标右键被按下 */
-		LCUIMouse_ButtonDown( LCUIKEY_RIGHTBUTTON );
-		LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
+		LCUI_PostMouseDownEvent( LCUIKEY_RIGHTBUTTON );
+		LCUI_PostMouseUpEvent( LCUIKEY_LEFTBUTTON );
 		break;
 	    case 3:		/* 鼠标左右键被按下 */
-		LCUIMouse_ButtonDown( LCUIKEY_RIGHTBUTTON );
-		LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
+		LCUI_PostMouseDownEvent( LCUIKEY_RIGHTBUTTON );
+		LCUI_PostMouseDownEvent( LCUIKEY_LEFTBUTTON );
 		break;
 	    default:		/* 默认是释放的 */
-		LCUIMouse_ButtonUp( LCUIKEY_RIGHTBUTTON );
-		LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
+		LCUI_PostMouseUpEvent( LCUIKEY_RIGHTBUTTON );
+		LCUI_PostMouseUpEvent( LCUIKEY_LEFTBUTTON );
 		break;
 	}
 	return TRUE;
 }
 #else
 
-static LCUI_BOOL proc_mouse( void )
+static LCUI_BOOL MouseProc( void )
 {
 	LCUI_Pos pos;
 	POINT new_pos;
@@ -229,13 +210,13 @@ static LCUI_BOOL proc_mouse( void )
 	pos.y = new_pos.y;
 	/* 更新鼠标游标的位置 */
 	LCUICursor_SetPos( pos );
-	LCUI_PushMouseMotionEvent( pos );
+	LCUI_PostMouseMoveEvent( pos );
 	return TRUE;
 }
 #endif
 
-/** 启用鼠标输入处理 */
-LCUI_API LCUI_BOOL Enable_Mouse_Input(void)
+/** 初始化鼠标输入处理 */
+static LCUI_BOOL MouseInit(void)
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 	char *msdev;
@@ -262,8 +243,8 @@ LCUI_API LCUI_BOOL Enable_Mouse_Input(void)
 	return TRUE;
 }
 
-/** 禁用鼠标输入处理 */
-LCUI_API LCUI_BOOL Disable_Mouse_Input(void)
+/** 退出鼠标输入处理 */
+static LCUI_BOOL MouseExit(void)
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 	if(mouse_state != INSIDE) {
@@ -277,7 +258,7 @@ LCUI_API LCUI_BOOL Disable_Mouse_Input(void)
 }
 
 /** 初始化鼠标输入模块 */
-LCUI_API int LCUIModule_Mouse_Init( void )
+int LCUIModule_Mouse_Init( void )
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 	mouse_fd = -1;
@@ -286,6 +267,5 @@ LCUI_API int LCUIModule_Mouse_Init( void )
 	nobuff_printf("enable mouse input: ");
 #endif
 	/* 注册鼠标设备 */
-	return LCUIDevice_Add( Enable_Mouse_Input,
-			proc_mouse, Disable_Mouse_Input );
+	return LCUIDevice_Add( MouseInit, MouseProc, MouseExit );
 }
