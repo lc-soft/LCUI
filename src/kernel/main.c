@@ -126,7 +126,9 @@ static void LCUIModule_Event_Exit(void)
 static void OnEvent( LCUI_Event *event, void *arg )
 {
 	FuncData *data = (FuncData*)arg;
-	data->func( (LCUI_SystemEvent*)event->data, data->arg );
+	LCUI_SystemEvent *sys_event = (LCUI_SystemEvent*)event->data;
+	sys_event->type_name = event->name;
+	data->func( sys_event, data->arg );
 }
 
 /** 绑定事件 */
