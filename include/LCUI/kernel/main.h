@@ -65,48 +65,23 @@ typedef struct {
 	LCUI_BOOL destroy_arg[2];	/* 指定是否在调用完回调函数后，销毁参数 */
 } LCUI_Func, LCUI_Task;
 
-typedef struct {
-	unsigned char type;
-	int key_code;
-} LCUI_KeyboardEvent;
+enum LCUI_SystemEventType{
+	LCUI_KEYDOWN,		/**< 按键输入事件，键盘上任意键均可触发 */
+	LCUI_KEYPRESS,		/**< 按键输入事件，仅字母、数字等ANSI字符键可触发 */
+	LCUI_KEYUP,		/**< 按键释放事件 */
+	LCUI_MOUSEMOVE,		/**< 鼠标移动事件 */
+	LCUI_MOUSEDOWN,		/**< 鼠标按键按下事件 */
+	LCUI_MOUSEUP,		/**< 鼠标按键释放事件 */
+	LCUI_QUIT,		/**< 退出事件，在LCUI退出时触发 */
+	LCUI_USER		/**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
+};
 
 typedef struct {
-	unsigned char type;
-	int code;
-	void *data1;
-	void *data2;
-} LCUI_UserEvent;
-
-typedef struct{
-	unsigned char type;
-	unsigned char state;
-	unsigned int x, y;
-	unsigned int xrel, yrel;
-} LCUI_MouseMotionEvent;
-
-typedef struct {
-	unsigned char type;
-	unsigned char button;
-	unsigned char state;
-	unsigned int x, y;
-} LCUI_MouseButtonEvent;
-
-typedef enum {
-	LCUI_KEYDOWN,
-	LCUI_KEYUP,
-	LCUI_MOUSEMOTION,
-	LCUI_MOUSEBUTTONDOWN,
-	LCUI_MOUSEBUTTONUP,
-	LCUI_QUIT,
-	LCUI_EVENT_TOTAL_NUM
-} LCUI_SystemEventType;
-
-typedef union {
-	unsigned char type;
-	LCUI_KeyboardEvent key;
-	LCUI_MouseMotionEvent motion;
-	LCUI_MouseButtonEvent button;
-	LCUI_UserEvent user;
+	int type;			/**< 事件类型标识号 */
+	const char *type_name;		/**< 事件类型名称 */
+	int which;			/**< 指示按了哪个键或按钮 */
+	void *data;			/**< 附加数据 */
+	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 } LCUI_SystemEvent;
 
 typedef struct LCUI_MainLoop_ {
@@ -118,6 +93,21 @@ typedef struct LCUI_MainLoop_ {
 #ifdef LCUI_BUILD_IN_WIN32
 LCUI_API void Win32_LCUI_Init( HINSTANCE hInstance );
 #endif
+
+/*-------------------------- system event <START> ---------------------------*/
+
+/** 绑定事件 */
+LCUI_API int LCUI_BindEvent( const char *event_name,
+		    void(*func)(LCUI_SystemEvent*,void*),
+		    void *func_arg, void (*arg_destroy)(void*) );
+
+/** 解除事件绑定 */
+LCUI_API int LCUI_UnbindEvent( int event_handler_id );
+
+/** 投递事件 */
+LCUI_API int LCUI_PostEvent( const char *name, void *data );
+
+/*--------------------------- system event <END> ----------------------------*/
 
 /*--------------------------- Main Loop ------------------------------*/
 /* 新建一个主循环 */
