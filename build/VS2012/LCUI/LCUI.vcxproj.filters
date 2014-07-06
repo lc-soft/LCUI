@@ -150,9 +150,6 @@
     <ClInclude Include="..\..\..\include\LCUI\kernel\main.h">
       <Filter>头文件\LCUI\kernel</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\kernel\task.h">
-      <Filter>头文件\LCUI\kernel</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\kernel\timer.h">
       <Filter>头文件\LCUI\kernel</Filter>
     </ClInclude>
@@ -231,9 +228,6 @@
     <ClInclude Include="..\..\..\include\LCUI\misc\dirent.h">
       <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\kernel\sleeper.h">
-      <Filter>头文件\LCUI\kernel</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\misc\rbtree.h">
       <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
@@ -251,6 +245,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\misc\framectrl.h">
       <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\kernel\cond.h">
+      <Filter>头文件\LCUI\kernel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -299,9 +296,6 @@
     <ClCompile Include="..\..\..\src\kernel\main.c">
       <Filter>源文件\kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\kernel\task.c">
-      <Filter>源文件\kernel</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\kernel\timer.c">
       <Filter>源文件\kernel</Filter>
     </ClCompile>
@@ -320,13 +314,7 @@
     <ClCompile Include="..\..\..\src\thread\win32\thread.c">
       <Filter>源文件\thread\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\thread\LCUI_Thread.c">
-      <Filter>源文件\thread</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\LCUI_Cursor.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\LCUI_Error.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\LCUI_Graph.c">
@@ -431,9 +419,6 @@
     <ClCompile Include="..\..\..\src\gui\widget\listview.c">
       <Filter>源文件\gui\widget</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\kernel\sleeper.c">
-      <Filter>源文件\kernel</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\misc\rbtree.c">
       <Filter>源文件\misc</Filter>
     </ClCompile>
@@ -451,6 +436,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\misc\framectrl.c">
       <Filter>源文件\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kernel\cond.c">
+      <Filter>源文件\kernel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

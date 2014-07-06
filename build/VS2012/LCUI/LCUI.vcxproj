@@ -82,6 +82,9 @@
       <IgnoreSpecificDefaultLibraries>LIBCMT;MSVCRT</IgnoreSpecificDefaultLibraries>
       <LinkStatus>false</LinkStatus>
     </Link>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -155,9 +158,8 @@
     <ClInclude Include="..\..\..\include\LCUI\kernel\device.h" />
     <ClInclude Include="..\..\..\include\LCUI\kernel\event.h" />
     <ClInclude Include="..\..\..\include\LCUI\kernel\main.h" />
-    <ClInclude Include="..\..\..\include\LCUI\kernel\task.h" />
     <ClInclude Include="..\..\..\include\LCUI\kernel\timer.h" />
-    <ClInclude Include="..\..\..\include\LCUI\kernel\sleeper.h" />
+    <ClInclude Include="..\..\..\include\LCUI\kernel\cond.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Config.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Cursor.h" />
@@ -227,11 +229,9 @@
     <ClCompile Include="..\..\..\src\kernel\device.c" />
     <ClCompile Include="..\..\..\src\kernel\event.c" />
     <ClCompile Include="..\..\..\src\kernel\main.c" />
-    <ClCompile Include="..\..\..\src\kernel\task.c" />
     <ClCompile Include="..\..\..\src\kernel\timer.c" />
-    <ClCompile Include="..\..\..\src\kernel\sleeper.c" />
+    <ClCompile Include="..\..\..\src\kernel\cond.c" />
     <ClCompile Include="..\..\..\src\LCUI_Cursor.c" />
-    <ClCompile Include="..\..\..\src\LCUI_Error.c" />
     <ClCompile Include="..\..\..\src\LCUI_Graph.c">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
@@ -252,7 +252,6 @@
     <ClCompile Include="..\..\..\src\output\graph_display.c" />
     <ClCompile Include="..\..\..\src\output\win32.c" />
     <ClCompile Include="..\..\..\src\output\win32_surface.c" />
-    <ClCompile Include="..\..\..\src\thread\LCUI_Thread.c" />
     <ClCompile Include="..\..\..\src\thread\win32\mutex.c" />
     <ClCompile Include="..\..\..\src\thread\win32\thread.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
