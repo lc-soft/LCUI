@@ -45,7 +45,6 @@
 #include LC_CURSOR_H 
 #include LC_INPUT_H
 #include LC_INPUT_METHOD_H
-#include LC_ERROR_H
 #include LC_FONT_H 
 #include LC_WIDGET_H
 
@@ -150,10 +149,14 @@ int LCUI_UnbindEvent( int event_handler_id )
 }
 
 /** 投递事件 */
-int LCUI_PostEvent( const char *name, void *data )
+int LCUI_PostEvent( const char *name, LCUI_SystemEvent *event )
 {
 	int ret;
-	ret = LCUIEventBox_Post( System.event.box, name, data, free );
+	LCUI_SystemEvent *sys_event;
+
+	sys_event = (LCUI_SystemEvent*)malloc(sizeof(LCUI_SystemEvent));
+	*sys_event = *event;
+	ret = LCUIEventBox_Post( System.event.box, name, sys_event, free );
 	if( ret == 0 ) {
 		LCUICond_Broadcast( &System.event.cond );
 	}

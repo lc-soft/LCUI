@@ -80,6 +80,7 @@ typedef struct {
 	int type;			/**< 事件类型标识号 */
 	const char *type_name;		/**< 事件类型名称 */
 	int which;			/**< 指示按了哪个键或按钮 */
+	int x, y;			/**< 鼠标的坐标 */
 	void *data;			/**< 附加数据 */
 	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 } LCUI_SystemEvent;
@@ -105,7 +106,7 @@ LCUI_API int LCUI_BindEvent( const char *event_name,
 LCUI_API int LCUI_UnbindEvent( int event_handler_id );
 
 /** 投递事件 */
-LCUI_API int LCUI_PostEvent( const char *name, void *data );
+LCUI_API int LCUI_PostEvent( const char *name, LCUI_SystemEvent *event );
 
 /*--------------------------- system event <END> ----------------------------*/
 
