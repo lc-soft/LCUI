@@ -60,13 +60,22 @@ LCUI_API LCUI_EventBox LCUIEventBox_Create(void);
 /** 销毁事件容器实例 */
 LCUI_API void LCUIEventBox_Destroy( LCUI_EventBox box );
 
-/** 获取指定名称的事件槽的id */
-LCUI_API int LCUIEventBox_GetSlotId( LCUI_EventBox box, const char *name );
+/** 注册事件，指定事件名称和ID */
+LCUI_API int LCUIEventBox_RegisterEventWithId( LCUI_EventBox box, 
+					 const char *event_name, int id );
 
-/** 绑定事件 */
-LCUI_API int LCUIEventBox_Bind( LCUI_EventBox box, const char *event_name,
+/** 注册事件，只指定事件名称，事件ID由内部自动生成 */
+LCUI_API int LCUIEventBox_RegisterEvent( LCUI_EventBox box, const char *event_name );
+
+/** 绑定指定ID的事件 */
+LCUI_API int LCUIEventBox_BindById( LCUI_EventBox box, int event_id,
 				EventCallBack func, void *func_data, 
 				void (*destroy_data)(void*) );
+
+/** 绑定指定名称的事件 */
+LCUI_API int LCUIEventBox_Bind( LCUI_EventBox box, const char *event_name,
+			EventCallBack func, void *func_data, 
+			void (*destroy_data)(void*) );
 
 /** 解除事件连接 */
 LCUI_API int LCUIEventBox_Unbind( LCUI_EventBox box, int handler_id );
@@ -75,14 +84,14 @@ LCUI_API int LCUIEventBox_Unbind( LCUI_EventBox box, int handler_id );
 LCUI_API int LCUIEventBox_Send( LCUI_EventBox box, const char *name, void *data );
 
 /** 将事件投递给事件处理器，等待处理 */
-int LCUIEventBox_Post( LCUI_EventBox box, const char *name,
+LCUI_API int LCUIEventBox_Post( LCUI_EventBox box, const char *name,
 		       void *data, void (*destroy_data)(void*) );
 
 /** 从已触发的事件记录中取出（不会移除）一个事件信息 */
 LCUI_API int LCUIEventBox_GetEvent( LCUI_EventBox box, LCUI_Event *ebuff );
 
 /** 从已触发的事件记录中删除一个事件信息 */
-int LCUIEventBox_DeleteEvent( LCUI_EventBox box );
+LCUI_API int LCUIEventBox_DeleteEvent( LCUI_EventBox box );
 
 LCUI_END_HEADER
 
