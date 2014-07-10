@@ -299,37 +299,6 @@ static LCUI_BOOL proc_keyboard(void)
 	
 	event.type = LCUI_KEYDOWN;
 	event.key.key_code = LCUIKeyboard_Get();
-	
-	#ifdef __NEED_CATCHSCREEN__
-	LCUI_Rect area;
-	area.width = 320;
-	area.height = 240;
-	area.x = (LCUIScreen_GetWidth()-area.width)/2;
-	area.y = (LCUIScreen_GetHeight()-area.height)/2;
-	//当按下c键后，可以进行截图，只截取指定区域的图形
-	if(event.key.key_code == 'c') {
-		time_t rawtime;
-		struct tm * timeinfo;
-		char filename[100];
-		LCUI_Graph graph;
-		
-		Graph_Init(&graph);
-		time ( &rawtime );
-		timeinfo = localtime ( &rawtime ); /* 获取系统当前时间 */ 
-		sprintf(filename, "%4d-%02d-%02d-%02d-%02d-%02d.png",
-			timeinfo->tm_year+1900, timeinfo->tm_mon+1, 
-			timeinfo->tm_mday, timeinfo->tm_hour, 
-			timeinfo->tm_min, timeinfo->tm_sec
-		);
-		LCUIScreen_CatchGraph( area, &graph );
-		Graph_WritePNG(filename, &graph);
-		Graph_Free(&graph);
-	}
-	else if(event.key.key_code == 'r') {
-		/* 如果按下r键，就录制指定区域的图像 */
-		LCUIScreen_StartRecord( area );
-	}
-	#endif
 	LCUI_PushEvent( &event );
 	return TRUE;
 }
