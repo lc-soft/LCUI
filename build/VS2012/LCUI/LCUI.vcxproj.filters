@@ -114,9 +114,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Misc.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Queue.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\LCUI_StyleLibrary.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
@@ -246,9 +243,6 @@
     <ClInclude Include="..\..\..\include\LCUI\misc\framectrl.h">
       <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\kernel\cond.h">
-      <Filter>头文件\LCUI\kernel</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -321,9 +315,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\LCUI_GraphLayer.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\LCUI_Queue.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\LCUI_StyleLibrary.c">
@@ -437,8 +428,8 @@
     <ClCompile Include="..\..\..\src\misc\framectrl.c">
       <Filter>源文件\misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\kernel\cond.c">
-      <Filter>源文件\kernel</Filter>
+    <ClCompile Include="..\..\..\src\thread\win32\cond.c">
+      <Filter>源文件\thread\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
