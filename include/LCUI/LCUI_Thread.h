@@ -50,6 +50,7 @@ typedef pthread_mutex_t LCUI_Mutex;
 #ifdef LCUI_THREAD_WIN32
 #include <windows.h>
 typedef HANDLE LCUI_Mutex;
+typedef HANDLE LCUI_Cond;
 typedef unsigned int LCUI_Thread;
 #else
 #error 'Need thread implementation for this platform'
@@ -57,6 +58,8 @@ typedef unsigned int LCUI_Thread;
 #endif
 
 LCUI_BEGIN_HEADER
+
+/*----------------------------- Mutex <Start> -------------------------------*/
 
 /* init the mutex */
 LCUI_API int LCUIMutex_Init( LCUI_Mutex *mutex );
@@ -73,6 +76,30 @@ LCUI_API int LCUIMutex_Lock( LCUI_Mutex *mutex );
 /* Unlock the mutex */
 LCUI_API int LCUIMutex_Unlock( LCUI_Mutex *mutex );
 
+/*------------------------------- Mutex <End> -------------------------------*/
+
+/*------------------------------ Cond <Start> -------------------------------*/
+
+/** 新建一个条件变量 */
+LCUI_API int LCUICond_Init( LCUI_Cond *cond );
+
+/** 销毁一个条件变量 */
+LCUI_API void LCUICond_Destroy( LCUI_Cond *cond );
+
+/** 阻塞当前线程，等待条件成立 */
+LCUI_API unsigned int LCUICond_Wait( LCUI_Cond *cond );
+
+/** 计时阻塞当前线程，等待条件成立 */
+LCUI_API unsigned int LCUICond_TimedWait( LCUI_Cond *cond, unsigned int ms );
+
+/** 唤醒所有阻塞等待条件成立的线程 */
+LCUI_API int LCUICond_Broadcast( LCUI_Cond *cond );
+
+/*------------------------------- Cond <End> --------------------------------*/
+
+
+/*----------------------------- Thread <Start> ------------------------------*/
+
 LCUI_API LCUI_Thread LCUIThread_SelfID( void );
 
 /* 创建并运行一个线程 */
@@ -86,6 +113,8 @@ LCUI_API void LCUIThread_Cancel( LCUI_Thread thread );
 
 /* 记录指针作为返回值，并退出线程 */
 LCUI_API void LCUIThread_Exit( void* retval );
+
+/*------------------------------ Thread <End> -------------------------------*/
 
 LCUI_END_HEADER
 
