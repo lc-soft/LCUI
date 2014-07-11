@@ -69,7 +69,6 @@ enum LCUIMode {
 #define LC_STYLE_LIBRARY_H	<LCUI/LCUI_StyleLibrary.h>
 #define LC_INPUT_METHOD_H	<LCUI/LCUI_InputMethod.h>
 
-#define LC_KERNEL_COND_H	<LCUI/kernel/cond.h>
 #define LC_KERNEL_TIMER_H	<LCUI/kernel/timer.h>
 #define LC_KERNEL_DEV_H		<LCUI/kernel/device.h>
 #define LC_KERNEL_MAIN_H	<LCUI/kernel/main.h>
@@ -100,7 +99,6 @@ enum LCUIMode {
 #define LC_GRAPH_H	<LCUI/LCUI_Graph.h>
 #define LC_DRAW_H	<LCUI/LCUI_Draw.h>
 #define LC_DISPLAY_H	<LCUI/LCUI_Display.h>
-#define LC_QUEUE_H	<LCUI/LCUI_Queue.h>
 #define LC_CURSOR_H	<LCUI/LCUI_Cursor.h>
 #define LC_INPUT_H	<LCUI/LCUI_Input.h>
 #define LC_ERROR_H	<LCUI/LCUI_Error.h>
