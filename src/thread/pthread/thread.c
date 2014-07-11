@@ -58,7 +58,7 @@ static void *run_thread(void *arg)
 	pthread_exit(NULL);
 }
 
-int _LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
+int LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 {
 	int ret;
 	arglist *list;
@@ -81,12 +81,12 @@ LCUI_Thread LCUIThread_SelfID( void )
 	return pthread_self();
 }
 
-void _LCUIThread_Exit( void *retval )
+void LCUIThread_Exit( void *retval )
 {
 	pthread_exit( retval );
 }
 
-void _LCUIThread_Cancel( LCUI_Thread thread )
+void LCUIThread_Cancel( LCUI_Thread thread )
 {
 #ifdef PTHREAD_CANCEL_ASYNCHRONOUS
 	pthread_cancel( thread );
@@ -95,7 +95,7 @@ void _LCUIThread_Cancel( LCUI_Thread thread )
 #endif
 }
 
-int _LCUIThread_Join( LCUI_Thread thread, void **retval )
+int LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
 	return pthread_join( thread, retval );
 }

@@ -14,7 +14,7 @@
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the <jpeglib.h> header file. */
-#define HAVE_JPEGLIB_H 1
+/* #undef HAVE_JPEGLIB_H */
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
@@ -35,7 +35,7 @@
 #define HAVE_MUNMAP 1
 
 /* Define to 1 if you have the <png.h> header file. */
-#define HAVE_PNG_H 1
+/* #undef HAVE_PNG_H */
 
 /* Define to 1 if you have the <pthread.h> header file. */
 #define HAVE_PTHREAD_H 1
@@ -44,7 +44,7 @@
 #define HAVE_SELECT 1
 
 /* Define to 1 if you have the <setjmp.h> header file. */
-#define HAVE_SETJMP_H 1
+/* #undef HAVE_SETJMP_H */
 
 /* Define to 1 if stdbool.h conforms to C99. */
 #define HAVE_STDBOOL_H 1
@@ -120,7 +120,7 @@
 #define PACKAGE_NAME "LCUI"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "LCUI 0.15.0"
+#define PACKAGE_STRING "LCUI 1.0.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "lcui"
@@ -129,7 +129,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.15.0"
+#define PACKAGE_VERSION "1.0.0"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -138,16 +138,16 @@
 /* #undef USE_LIBICONV */
 
 /* Define to 1 if you have the libjpeg */
-#define USE_LIBJPEG 1
+/* #undef USE_LIBJPEG */
 
 /* Define to 1 if you have the libpng */
-#define USE_LIBPNG 1
+/* #undef USE_LIBPNG */
 
 /* Define to 1 if you have the tslib */
 /* #undef USE_TSLIB */
 
 /* Version number of package */
-#define VERSION "0.15.0"
+#define VERSION "1.0.0"
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
