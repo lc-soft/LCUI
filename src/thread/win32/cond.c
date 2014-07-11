@@ -39,11 +39,11 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include LC_THREAD_H
 
 /** 初始化一个条件变量 */
 int LCUICond_Init( LCUI_Cond *cond )
 {
-#ifdef LCUI_BUILD_IN_WIN32
 	/* 创建一个事件对象：
 	 * 使用默认安全符
 	 * 在事件被释放后，自动复原为无信号状态
@@ -55,70 +55,57 @@ int LCUICond_Init( LCUI_Cond *cond )
 		return -1;
 	}
 	return 0;
-#else
-	// ...
-#endif
 }
 
 /** 销毁一个条件变量 */
 void LCUICond_Destroy( LCUI_Cond *cond )
 {
-#ifdef LCUI_BUILD_IN_WIN32
 	CloseHandle(cond);
-#else
-	// ...
-#endif
 }
 
 /** 阻塞当前线程，等待条件成立 */
 unsigned int LCUICond_Wait( LCUI_Cond *cond )
 {
-#ifdef LCUI_BUILD_IN_WIN32
 	int ret;
 	int64_t lost_time;
+
 	lost_time = LCUI_GetTickCount();
 	ret = WaitForSingleObject( *cond, INFINITE );
 	lost_time = LCUI_GetTicks( lost_time );
+	/* 暂不对返回值进行处理 */
 	switch( ret ) {
-	case WAIT_OBJECT_0: return (unsigned int)lost_time;
+	case WAIT_TIMEOUT:
+	case WAIT_OBJECT_0:
+	case WAIT_FAILED: 
 	default: break;
 	}
-	return ret;
-#else
-	// ...
-#endif
+	return (unsigned int)lost_time;
 }
 
 /** 计时阻塞当前线程，等待条件成立 */
 unsigned int LCUICond_TimedWait( LCUI_Cond *cond, unsigned int ms )
 {
-#ifdef LCUI_BUILD_IN_WIN32
 	int ret;
 	int64_t lost_time;
+
 	lost_time = LCUI_GetTickCount();
 	ret = WaitForSingleObject( *cond, ms );
 	lost_time = LCUI_GetTicks( lost_time );
+
 	switch( ret ) {
-	case WAIT_OBJECT_0: return (unsigned int)lost_time;
-	case WAIT_TIMEOUT: return ms;
+	case WAIT_TIMEOUT:
+	case WAIT_OBJECT_0:
 	case WAIT_FAILED: 
 	default: break;
 	}
-	return ret;
-#else
-	// ...
-#endif
+	return (unsigned int)lost_time;
 }
 
 /** 唤醒所有阻塞等待条件成立的线程 */
 int LCUICond_Broadcast( LCUI_Cond* cond )
 {
-#ifdef LCUI_BUILD_IN_WIN32
 	if( SetEvent( *cond ) ) {
 		return 0;
 	}
 	return -1;
-#else
-	// ...
-#endif
 }
