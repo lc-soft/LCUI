@@ -155,9 +155,6 @@ LCUI_API int LCUIModule_Mouse_Init( void );
 
 /*-------------------------------- Keyboard --------------------------------*/
 
-/** 检测指定键值的按键是否处于按下状态 */
-LCUI_API LCUI_BOOL LCUIKey_IsHit( int key_code );
-
 /**
  * 检测指定键值的按键是否按了两次
  * @param key_code
@@ -167,29 +164,23 @@ LCUI_API LCUI_BOOL LCUIKey_IsHit( int key_code );
  */
 LCUI_API LCUI_BOOL LCUIKey_IsDoubleHit( int key_code, int interval_time );
 
-/* 添加已被按下的按键 */
-LCUI_API void LCUIKey_Hit( int key_code );
+/** 添加已被按下的按键 */
+LCUI_API void LCUIKeyBoard_HitKey( int key_code );
 
-/* 标记指定键值的按键已释放 */
-LCUI_API void LCUIKey_Free( int key_code );
-
-/** 初始化键盘输入 */
-LCUI_API int LCUIKeyboard_Init( void );
-
-/** 停用键盘输入 */
-LCUI_API int LCUIKeyboard_End( void );
+/** 标记指定键值的按键已释放 */
+LCUI_API void LCUIKeyBoard_ReleaseKey( int key_code );
 
 /** 添加键盘的按键按下事件 */
-LCUI_API void LCUIKeyboard_HitKey( int key_code );
+LCUI_API void LCUI_PostKeyDownEvent( int key_code );
 
 /** 添加键盘的按键释放事件 */
-LCUI_API void LCUIKeyboard_FreeKey( int key_code );
+LCUI_API void LCUI_PostKeyUpEvent( int key_code );
 
 /** 检测键盘是否有按键按下（类似于kbhit函数） */
 LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( void );
 
 /** 获取被按下的按键的键值（类似于getch函数） */
-LCUI_API int LCUIKeyboard_Get( void );
+LCUI_API int LCUIKeyboard_GetKey( void );
 
 /** 初始化键盘输入模块 */
 LCUI_API void LCUIModule_Keyboard_Init( void );

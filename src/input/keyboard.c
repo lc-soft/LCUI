@@ -1,8 +1,7 @@
-/* ***************************************************************************
+ /* ***************************************************************************
  * keyboard.c -- keyboard support
  * 
- * Copyright (C) 2012-2013 by
- * Liu Chao
+ * Copyright (C) 2013-2014 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -18,13 +17,12 @@
  * 
  * You should have received a copy of the GPLv2 along with this file. It is 
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * ***************************************************************************/
  
 /* ****************************************************************************
  * keyboard.c -- 键盘支持
  *
- * 版权所有 (C) 2013 归属于
- * 刘超
+ * 版权所有 (C) 2013-2014 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,11 +35,14 @@
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
- * ****************************************************************************/
+ * ***************************************************************************/
 
 #include <LCUI_Build.h>
 #include LC_LCUI_H
+#include LC_THREAD_H
 #include LC_INPUT_H
+
+#include <LCUI/misc/linkedlist.h>
 
 #include <time.h>
 
@@ -52,7 +53,8 @@ typedef struct key_state_ {
 	clock_t interval_time;	/**< 近两次按下此键的时间间隔 */
 } key_state;
 
-static LCUI_Queue key_state_record;
+static LCUI_Mutex record_mutex;
+static LinkedList key_state_record;
 
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 
@@ -71,28 +73,30 @@ static int fd = STDIN_FILENO;
 #endif
 
 /** 获取指定按键的状态数据 */
-static key_state* LCUIKey_FindData( int key_code )
+static key_state* KeyStateRecord_FindData( int key_code )
 {
-	key_state* p;
 	int i, n;
-	n = Queue_GetTotal( &key_state_record );
-	for(i=0; i<n; ++i) {
-		p = (key_state*)Queue_Get(&key_state_record, i);
-		if( p && p->key_code == key_code ) {
-			return p;
+	key_state* data_ptr;
+
+	n = LinkedList_GetTotal( &key_state_record );
+	for( i=0; i<n; ++i ) {
+		data_ptr = (key_state*)LinkedList_Get( &key_state_record );
+		if( data_ptr && data_ptr->key_code == key_code ) {
+			return data_ptr;
 		}
+		LinkedList_ToNext( &key_state_record );
 	}
 	return NULL;
 }
 
 /** 检测指定键值的按键是否处于按下状态 */
-LCUI_API LCUI_BOOL LCUIKey_IsHit( int key_code )
+LCUI_BOOL LCUIKey_IsHit( int key_code )
 {
-	key_state* p;
-	Queue_Lock( &key_state_record );
-	p = LCUIKey_FindData( key_code );
-	Queue_Unlock( &key_state_record );
-	if( p && p->state == LCUIKEYSTATE_PRESSED ) {
+	key_state *data_ptr;
+	LCUIMutex_Lock( &record_mutex );
+	data_ptr = KeyStateRecord_FindData( key_code );
+	LCUIMutex_Unlock( &record_mutex );
+	if( data_ptr && data_ptr->state == LCUIKEYSTATE_PRESSED ) {
 		return TRUE;
 	}
 	return FALSE;
@@ -105,73 +109,72 @@ LCUI_API LCUI_BOOL LCUIKey_IsHit( int key_code )
 @param interval_time
 	该按键倒数第二次按下时的时间与当前时间的最大间隔
  */
-LCUI_API LCUI_BOOL LCUIKey_IsDoubleHit( int key_code, int interval_time )
+LCUI_BOOL LCUIKey_IsDoubleHit( int key_code, int interval_time )
 {
 	clock_t ct;
-	key_state* p;
+	key_state* data_ptr;
 	/* 计算当前时间（单位：毫秒） */
 	ct = clock()*1000 / CLOCKS_PER_SEC;
-	Queue_Lock( &key_state_record );
-	p = LCUIKey_FindData( key_code );
-	Queue_Unlock( &key_state_record );
-	/* 若当前时间与上次按下该键时的时间间隔不大于interval_time */
-	if( !p ) {
+	LCUIMutex_Lock( &record_mutex );
+	data_ptr = KeyStateRecord_FindData( key_code );
+	LCUIMutex_Unlock( &record_mutex );
+	if( !data_ptr ) {
 		return FALSE;	
 	}
 	/* 间隔时间为-1，说明该键是新记录的 */
-	if( p->interval_time == -1 ) {
+	if( data_ptr->interval_time == -1 ) {
 		return FALSE;
 	}
+	ct -= (data_ptr->hit_time - data_ptr->interval_time);
 	/* 判断按键被按下两次时是否在距当前interval_time毫秒的时间内发生 */
-	if( ct - (p->hit_time - p->interval_time) <= interval_time ) {
+	if( ct  <= interval_time ) {
 		return TRUE;
 	}
 	return FALSE;
 }
 
-/* 添加已被按下的按键 */
-LCUI_API void LCUIKey_Hit( int key_code )
+/** 添加已被按下的按键 */
+void LCUIKeyBoard_HitKey( int key_code )
 {
 	clock_t ct;
-	key_state data, *p;
+	key_state data, *data_ptr;
 
-	Queue_Lock( &key_state_record );
+	LCUIMutex_Lock( &record_mutex );
 	ct = clock()*1000 / CLOCKS_PER_SEC;
-	p = LCUIKey_FindData( key_code );
-	if( !p ) {
+	data_ptr = KeyStateRecord_FindData( key_code );
+	if( !data_ptr ) {
 		data.key_code = key_code;
 		data.interval_time = -1;
 		data.hit_time = ct;
 		data.state = LCUIKEYSTATE_PRESSED;
-		Queue_Add( &key_state_record, &data );
-		Queue_Unlock( &key_state_record );
+		LinkedList_AddDataCopy( &key_state_record, &data );
+		LCUIMutex_Unlock( &record_mutex );
 		return;
 	}
-	if( p->state == LCUIKEYSTATE_RELEASE ) {
-		p->state = LCUIKEYSTATE_PRESSED;
+	if( data_ptr->state == LCUIKEYSTATE_RELEASE ) {
+		data_ptr->state = LCUIKEYSTATE_PRESSED;
 		/* 记录与上次此键被按下时的时间间隔 */
-		p->interval_time = ct - p->hit_time;
+		data_ptr->interval_time = ct - data_ptr->hit_time;
 		/* 记录本次此键被按下时的时间 */
-		p->hit_time = ct;
+		data_ptr->hit_time = ct;
 	}
-	Queue_Unlock( &key_state_record );
+	LCUIMutex_Unlock( &record_mutex );
 }
 
-/* 标记指定键值的按键已释放 */
-LCUI_API void LCUIKey_Free( int key_code )
+/** 标记指定键值的按键已释放 */
+void LCUIKeyBoard_ReleaseKey( int key_code )
 {
-	key_state *p;
-	
-	Queue_Lock( &key_state_record );
-	p = LCUIKey_FindData( key_code );
-	if( p ) {
-		p->state = LCUIKEYSTATE_RELEASE;
+	key_state *data_ptr;
+	LCUIMutex_Lock( &record_mutex );
+	data_ptr = KeyStateRecord_FindData( key_code );
+	if( data_ptr ) {
+		data_ptr->state = LCUIKEYSTATE_RELEASE;
 	}
-	Queue_Unlock( &key_state_record );
+	LCUIMutex_Unlock( &record_mutex );
 }
 
 /* 初始化键盘输入 */
-LCUI_API int LCUIKeyboard_Init( void )
+static LCUI_BOOL LCUIKeyboard_Init( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	if(tcgetattr(fd, &tm) < 0) {
@@ -190,7 +193,7 @@ LCUI_API int LCUIKeyboard_Init( void )
 }
 
 /* 停用键盘输入 */
-LCUI_API int LCUIKeyboard_End( void )
+static int LCUIKeyboard_Exit( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	tm.c_lflag |= ICANON;
@@ -198,44 +201,44 @@ LCUI_API int LCUIKeyboard_End( void )
 	tm.c_cc[VMIN] = 1;
 	tm.c_cc[VTIME] = 0;
 	if(tcsetattr(fd,TCSANOW,&tm)<0) {
-		return -1;
+		return FALSE;
 	}
 	printf("\033[?25h"); /* 显示光标 */ 
 #endif
-	return 0;
+	return TRUE;
 }
 
 /* 添加键盘的按键按下事件 */
-LCUI_API void LCUIKeyboard_HitKey( int key_code )
+void LCUI_PostKeyDownEvent( int key_code )
 {
-	key_state *p;
-	LCUI_Event event;
+	key_state *data_ptr;
+	LCUI_SystemEvent event;
 	
-	Queue_Lock( &key_state_record );
-	p = LCUIKey_FindData( key_code );
-	Queue_Unlock( &key_state_record );
+	LCUIMutex_Lock( &record_mutex );
+	data_ptr = KeyStateRecord_FindData( key_code );
+	LCUIMutex_Unlock( &record_mutex );
 	/* 已经按下过的按键就不用再触发KEYDOWN事件了 */
-	if( p && p->state == LCUIKEYSTATE_PRESSED ) {
+	if( data_ptr && data_ptr->state == LCUIKEYSTATE_PRESSED ) {
 		return;
 	}
 	event.type = LCUI_KEYDOWN;
-	event.key.key_code = key_code;
-	LCUIKey_Hit( key_code );
-	LCUI_PushEvent( &event );
+	event.which = key_code;
+	LCUIKeyBoard_HitKey( key_code );
+	LCUI_PostEvent( "keydown", &event );
 }
 
 /* 添加键盘的按键释放事件 */
-LCUI_API void LCUIKeyboard_FreeKey( int key_code )
+void LCUI_PostKeyUpEvent( int key_code )
 {
-	LCUI_Event event;
+	LCUI_SystemEvent event;
 	event.type = LCUI_KEYUP;
-	event.key.key_code = key_code;
-	LCUIKey_Free( key_code );
-	LCUI_PushEvent( &event );
+	event.which = key_code;
+	LCUIKeyBoard_ReleaseKey( key_code );
+	LCUI_PostEvent( "keyup", &event );
 }
 
 /** 检测键盘是否有按键按下（类似于kbhit函数） */
-LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( void )
+LCUI_BOOL LCUIKeyboard_IsHit( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	struct termios oldt;//, newt;  
@@ -260,7 +263,7 @@ LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( void )
 }
 
 /** 获取被按下的按键的键值（类似于getch函数） */
-LCUI_API int LCUIKeyboard_Get( void )
+int LCUIKeyboard_GetKey( void )
 { 
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	int k,c;
@@ -271,7 +274,7 @@ LCUI_API int LCUIKeyboard_Get( void )
 	input += k;
 	/* 如果还有字符在缓冲中 */
 	if(LCUIKeyboard_IsHit()) {
-		LCUIKeyboard_Get();
+		LCUIKeyboard_GetKey();
 	}
 	c = input;
 	--count;
@@ -289,7 +292,7 @@ LCUI_API int LCUIKeyboard_Get( void )
 }
 
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
-static LCUI_BOOL proc_keyboard(void)
+static LCUI_BOOL LCUIKeyboard_Proc(void)
 {
 	LCUI_Event event;
 	 /* 如果没有按键输入 */ 
@@ -298,37 +301,25 @@ static LCUI_BOOL proc_keyboard(void)
 	}
 	
 	event.type = LCUI_KEYDOWN;
-	event.key.key_code = LCUIKeyboard_Get();
+	event.key.key_code = LCUIKeyboard_GetKey();
 	LCUI_PushEvent( &event );
-	return TRUE;
-}
-
-/* 键盘输入模块的初始化 */
-static LCUI_BOOL Enable_Keyboard_Input( void )
-{
-	LCUIKeyboard_Init(); /* 设置终端属性 */
-	return TRUE;
-}
-
-/* 键盘输入模块的销毁 */
-static LCUI_BOOL Disable_Keyboard_Input( void )
-{
-	LCUIKeyboard_End(); /* 恢复终端属性 */
 	return TRUE;
 }
 #endif
 
 /** 初始化键盘输入模块 */
-LCUI_API void LCUIModule_Keyboard_Init( void )
+void LCUIModule_Keyboard_Init( void )
 {
-	Queue_Init( &key_state_record, sizeof(key_state), NULL );
+	LCUIMutex_Init( &record_mutex );
+	LinkedList_Init( &key_state_record, sizeof(key_state) );
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
-	LCUIDevice_Add( Enable_Keyboard_Input, proc_keyboard, Disable_Keyboard_Input );
+	LCUIDevice_Add( LCUIKeyboard_Init, LCUIKeyboard_Proc, LCUIKeyboard_Exit );
 #endif
 }
 
 /** 停用键盘输入模块 */
-LCUI_API void LCUIModule_Keyboard_End( void )
+void LCUIModule_Keyboard_End( void )
 {
-	Queue_Destroy( &key_state_record );
+	LinkedList_Destroy( &key_state_record );
+	LCUIMutex_Destroy( &record_mutex );
 }
