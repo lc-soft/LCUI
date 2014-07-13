@@ -112,7 +112,7 @@ LCUI_API int LCUITimer_Reset( int timer_id, long int n_ms ) ;
 LCUI_API void LCUIModule_Timer_Init( void );
 
 /* 停用定时器模块 */
-LCUI_API void LCUIModule_Timer_End( void );
+LCUI_API void LCUIModule_Timer_Exit( void );
 
 LCUI_END_HEADER
 

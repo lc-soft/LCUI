@@ -1,46 +1,47 @@
 /* ***************************************************************************
- * timer.c -- The timer module for LCUI
- *
- * Copyright (C) 2012-2013 by
- * Liu Chao
- *
+ * timer.c -- timer support.
+ * 
+ * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
+ * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- *
+ * 
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- *
+ * 
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *
- * The LCUI project is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- *
- * You should have received a copy of the GPLv2 along with this file. It is
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
-
+ * ***************************************************************************/
+ 
 /* ****************************************************************************
- * timer.c -- LCUI 的定时器模块
+ * timer.c -- 定时器支持
  *
- * 版权所有 (C) 2012-2013 归属于
- * 刘超
- *
+ * 版权所有 (C) 2013-2014 归属于 刘超 <lc-soft@live.cn>
+ * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- *
+ * 
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- *
+ * 
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ***************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
+#include <LCUI/LCUI.h>
+#include <LCUI/misc/linkedlist.h>
+#include <LCUI/misc/delay.h>
+#include LC_THREAD_H
 
 #include <time.h>
 
@@ -49,7 +50,7 @@
 
 /*----------------------------- Timer --------------------------------*/
 
-typedef struct _timer_data {
+typedef struct TimerDataRec_ {
 	int state;			/**< 状态 */
 	LCUI_BOOL reuse;		/**< 是否重复使用该定时器 */
 	long int id;			/**< 定时器ID */
@@ -57,13 +58,15 @@ typedef struct _timer_data {
 	int64_t pause_time;		/**< 定时器暂停时的时间 */
 	long int total_ms;		/**< 定时时间（单位：毫秒） */
 	long int pause_ms;		/**< 定时器处于暂停状态的时长（单位：毫秒） */
-	void (*func)(void*);	/**< 回调函数 */
+	void (*func)(void*);		/**< 回调函数 */
 	void *arg;			/**< 函数的参数 */
-} timer_data;
+} TimerData;
 
-static LCUI_Queue global_timer_list;		/**< 定时器列表 */
-static LCUI_BOOL timer_thread_active = FALSE;	/**< 定时器线程是否活动 */
-static LCUI_Sleeper timer_sleeper;		/**< 用于实现定时器睡眠的等待者 */
+static LinkedList timer_list;			/**< 定时器数据记录 */
+static LCUI_BOOL is_running = FALSE;		/**< 定时器线程是否正在运行 */
+static LCUI_Cond timer_sleep_cond;		/**< 用于控制定时器睡眠的条件变量 */
+static LCUI_Mutex timer_mutex;
+static LCUI_Thread timer_thread_id;
 
 #define TIME_WRAP_VALUE (~(int64_t)0)
 
@@ -75,10 +78,9 @@ static LCUI_Sleeper timer_sleeper;		/**< 用于实现定时器睡眠的等待者
 static BOOL hires_timer_available;	/**< 标志，指示高精度计数器是否可用 */
 static double hires_ticks_per_second;	/**< 高精度计数器每秒的滴答数 */
 
-LCUI_API void LCUI_StartTicks( void )
+void LCUI_StartTicks( void )
 {
 	LARGE_INTEGER hires;
-
 	if( QueryPerformanceFrequency(&hires) ) {
 		hires_timer_available = TRUE;
 		hires_ticks_per_second = hires.QuadPart;
@@ -88,10 +90,9 @@ LCUI_API void LCUI_StartTicks( void )
 	}
 }
 
-LCUI_API int64_t LCUI_GetTickCount( void )
+int64_t LCUI_GetTickCount( void )
 {
 	LARGE_INTEGER hires_now;
-	
 	if (hires_timer_available) {
 		QueryPerformanceCounter(&hires_now);
 		hires_now.QuadPart *= 1000;
@@ -104,12 +105,12 @@ LCUI_API int64_t LCUI_GetTickCount( void )
 #elif defined LCUI_BUILD_IN_LINUX
 #include <sys/time.h>
 
-LCUI_API void LCUI_StartTicks( void )
+void LCUI_StartTicks( void )
 {
 	return;
 }
 
-LCUI_API int64_t LCUI_GetTickCount( void )
+int64_t LCUI_GetTickCount( void )
 {
 	int64_t t;
 	struct timeval tv;
@@ -121,7 +122,7 @@ LCUI_API int64_t LCUI_GetTickCount( void )
 
 #endif
 
-LCUI_API int64_t LCUI_GetTicks( int64_t start_ticks )
+int64_t LCUI_GetTicks( int64_t start_ticks )
 {
 	int64_t now_ticks;
 
@@ -135,41 +136,26 @@ LCUI_API int64_t LCUI_GetTicks( int64_t start_ticks )
 
 /*----------------------------- Private ------------------------------*/
 
-/** 初始化定时器列表 */
-static void TimerList_Init( LCUI_Queue *timer_list )
-{
-	Queue_Init( timer_list, sizeof(timer_data), NULL );
-	/* 使用链表 */
-	Queue_SetDataMode( timer_list, QUEUE_DATA_MODE_LINKED_LIST );
-}
-
-/** 销毁定时器列表 */
-static void TimerList_Destroy( LCUI_Queue *timer_list )
-{
-	Queue_Destroy( timer_list );
-}
-
 /** 更新定时器在定时器列表中的位置 */
-static void TimerList_UpdateTimerPos(	LCUI_Queue *timer_list,
-					timer_data *p_timer )
+static void TimerList_UpdateTimerPos( TimerData *timer )
 {
 	int n, src_i=-1, des_i=-1;
 	int64_t time_left, tmp_time_left;
-	timer_data *p_tmp_timer;
+	TimerData *tmp_timer;
 	/* 计算该定时器的剩余定时时长 */
-	time_left = LCUI_GetTicks( p_timer->start_time );
-	time_left -= p_timer->pause_ms;
-	time_left = p_timer->total_ms - time_left;
+	time_left = LCUI_GetTicks( timer->start_time );
+	time_left -= timer->pause_ms;
+	time_left = timer->total_ms - time_left;
 	/* 锁上定时器列表 */
-	Queue_Lock( &global_timer_list );
-	n = Queue_GetTotal( &global_timer_list );
-	while(n--) {
-		p_tmp_timer = (timer_data*)Queue_Get( &global_timer_list, n );
-		if( !p_tmp_timer ) {
+	LCUIMutex_Lock( &timer_mutex );
+	n = LinkedList_GetTotal( &timer_list );
+	for(; n-- >= 0; LinkedList_ToNext(&timer_list) ) {
+		tmp_timer = (TimerData*)LinkedList_Get( &timer_list );
+		if( !tmp_timer ) {
 			continue;
 		}
 		/* 若找到自己的位置，则记录 */
-		if( p_tmp_timer->id == p_timer->id ) {
+		if( tmp_timer->id == timer->id ) {
 			src_i = n;
 			/* 如果已经找到目标位置，则退出循环 */
 			if( des_i != -1 ) {
@@ -177,14 +163,14 @@ static void TimerList_UpdateTimerPos(	LCUI_Queue *timer_list,
 			}
 			continue;
 		}
-		tmp_time_left = LCUI_GetTicks( p_tmp_timer->start_time );
-		tmp_time_left -= p_tmp_timer->pause_ms;
-		tmp_time_left = p_tmp_timer->total_ms - tmp_time_left;
+		tmp_time_left = LCUI_GetTicks( tmp_timer->start_time );
+		tmp_time_left -= tmp_timer->pause_ms;
+		tmp_time_left = tmp_timer->total_ms - tmp_time_left;
 		/* 若该定时器的剩余定时时长不大于当前定时器，则记录 */
 		if( des_i == -1 && time_left >= tmp_time_left ) {
 			DEBUG_MSG("src timer: %d, pos: %d, , cur_ms: %I64dms, des timer: %d, pos: %d, cur_ms: %I64dms\n",
-				p_timer->id, src_i, LCUI_GetTicks(p_timer->start_time), 
-				p_tmp_timer->id, des_i, LCUI_GetTicks(p_tmp_timer->start_time) );
+				timer->id, src_i, LCUI_GetTicks(timer->start_time), 
+				tmp_timer->id, des_i, LCUI_GetTicks(tmp_timer->start_time) );
 			des_i = n;
 			/* 如果已经找到源位置，则退出循环 */
 			if( src_i != -1 ) {
@@ -200,23 +186,24 @@ static void TimerList_UpdateTimerPos(	LCUI_Queue *timer_list,
 	/* 若源位置和目标位置有效，则开始移动 */
 	if( src_i != -1 ) {
 		DEBUG_MSG("src: %d, des: %d\n", src_i, des_i );
-		Queue_Move( &global_timer_list, des_i, src_i );
+		LinkedList_Goto( &timer_list, src_i );
+		LinkedList_MoveTo( &timer_list, des_i );
 	}
-	Queue_Unlock( &global_timer_list );
+	LCUIMutex_Unlock( &timer_mutex );
 }
 
 #define DEBUG_TIMER
 #ifdef DEBUG_TIMER
 /** 打印列表中的定时器信息 */
-static void TimerList_Print( LCUI_Queue *timer_list )
+static void TimerList_Print( void )
 {
-	int i, total;
-	timer_data *timer;
+	int i, n;
+	TimerData *timer;
 
-	total = Queue_GetTotal( timer_list );
-	_DEBUG_MSG("timer list(%d) start:\n", total);
-	for(i=0; i<total; ++i) {
-		timer = (timer_data*)Queue_Get( timer_list , i);
+	n = LinkedList_GetTotal( &timer_list );
+	_DEBUG_MSG("timer list(%d) start:\n", n);
+	for( i=0; i<n; ++i, LinkedList_ToNext(&timer_list) ) {
+		timer = (TimerData*)LinkedList_Get( &timer_list );
 		if( !timer ) {
 			continue;
 		}
@@ -233,8 +220,8 @@ static int threads_of_wait_lock = 0;
 static void TimerList_GetLock(void)
 {
 	++threads_of_wait_lock;
-	LCUISleeper_BreakSleep( &timer_sleeper );
-	Queue_Lock( &global_timer_list );
+	LCUICond_Broadcast( &timer_sleep_cond );
+	LCUIMutex_Lock( &timer_mutex );
 	if( threads_of_wait_lock > 0 ) {
 		--threads_of_wait_lock;
 	}
@@ -243,7 +230,7 @@ static void TimerList_GetLock(void)
 /** 释放定时器列表的互斥锁 */
 static void TimerList_FreeLock(void)
 {
-	Queue_Unlock( &global_timer_list );
+	LCUIMutex_Unlock( &timer_mutex );
 }
 
 /** 等待其它线程获得线程锁，主要供定时器线程调用 */
@@ -258,22 +245,16 @@ static void TimerThread( void *arg )
 	int i, n;
 	long int n_ms;
 	LCUI_Func func_data;
-	LCUI_Queue *timer_list;
-	timer_data *timer = NULL;
+	TimerData *timer = NULL;
 	int64_t lost_ms;
 
-	timer_list = (LCUI_Queue*)arg;
 	func_data.arg[0] = NULL;
 	func_data.arg[1] = NULL;
-
-	while( !LCUI_Active() ) {
-		LCUI_MSleep(10);
-	}
-	while( timer_thread_active ) {
-		Queue_Lock( timer_list );
-		n = Queue_GetTotal( timer_list );
-		for(i=0; i<n; ++i) {
-			timer = (timer_data*)Queue_Get( timer_list , i);
+	while( is_running ) {
+		LCUIMutex_Lock( &timer_mutex );
+		n = LinkedList_GetTotal( &timer_list );
+		for( i=0; i<n; ++i, LinkedList_ToNext(&timer_list) ) {
+			timer = (TimerData*)LinkedList_Get( &timer_list );
 			if( !timer ) {
 				continue;
 			}
@@ -281,7 +262,7 @@ static void TimerThread( void *arg )
 				break;
 			}
 		}
-		Queue_Unlock( timer_list );
+		LCUIMutex_Unlock( &timer_mutex );
 		/* 没有要处理的定时器，停留一段时间再进行下次循环 */
 		if(i >= n || !timer ) {
 			LCUI_MSleep(10);
@@ -292,11 +273,11 @@ static void TimerThread( void *arg )
 		lost_ms -= timer->pause_ms;
 		/* 若流失的时间未达到总定时时长 */
 		if( lost_ms < timer->total_ms ) {
-			Queue_Lock( timer_list );
+			LCUIMutex_Lock( &timer_mutex );
 			n_ms = timer->total_ms - lost_ms;
 			/* 开始睡眠 */
-			LCUISleeper_StartSleep( &timer_sleeper, n_ms );
-			Queue_Unlock( timer_list );
+			LCUICond_TimedWait( &timer_sleep_cond, n_ms );
+			LCUIMutex_Unlock( &timer_mutex );
 			TimerList_WaitOtherThreadGetLock();
 			continue;
 		}
@@ -310,7 +291,7 @@ static void TimerThread( void *arg )
 		if( timer->reuse ) {
 			timer->start_time = LCUI_GetTickCount();
 			timer->pause_ms = 0;
-			TimerList_UpdateTimerPos( timer_list, timer );
+			TimerList_UpdateTimerPos( timer );
 		} else { /* 否则，释放该定时器 */
 			LCUITimer_Free( timer->id );
 		}
@@ -321,14 +302,14 @@ static void TimerThread( void *arg )
 	LCUIThread_Exit(NULL);
 }
 
-static timer_data *TimerList_Find( int timer_id )
+static TimerData *TimerList_Find( int timer_id )
 {
-	int i, total;
-	timer_data *timer = NULL;
+	int i, n;
+	TimerData *timer = NULL;
 
-	total = Queue_GetTotal( &global_timer_list );
-	for(i=0; i<total; ++i) {
-		timer = (timer_data*)Queue_Get( &global_timer_list, i );
+	n = LinkedList_GetTotal( &timer_list );
+	for( i=0; i<n; ++i ) {
+		timer = (TimerData*)LinkedList_Get( &timer_list );
 		if( !timer ) {
 			continue;
 		}
@@ -355,26 +336,24 @@ static timer_data *TimerList_Find( int timer_id )
  * @return
  *	该定时器的标识符
  * */
-LCUI_API int LCUITimer_Set(	long int n_ms,
-				void (*func)(void*),
-				void *arg,
-				LCUI_BOOL reuse )
+int LCUITimer_Set( long int n_ms, void (*func)(void*),
+			void *arg, LCUI_BOOL reuse )
 {
 	int n;
 	int64_t time_left;
-	timer_data timer, *p_timer;
+	TimerData timer, *timer_ptr;
 	static int id = 100;
 
 	TimerList_GetLock();
-	n = Queue_GetTotal( &global_timer_list );
-	while(n--) {
-		p_timer = (timer_data*)Queue_Get( &global_timer_list, n );
-		if( !p_timer ) {
+	n = LinkedList_GetTotal( &timer_list );
+	for( ; n>0; --n, LinkedList_ToNext(&timer_list) ) {
+		timer_ptr = (TimerData*)LinkedList_Get( &timer_list );
+		if( !timer_ptr ) {
 			continue;
 		}
-		time_left = LCUI_GetTicks( p_timer->start_time );
-		time_left -= p_timer->pause_ms;
-		time_left = p_timer->total_ms - time_left;
+		time_left = LCUI_GetTicks( timer_ptr->start_time );
+		time_left -= timer_ptr->pause_ms;
+		time_left = timer_ptr->total_ms - time_left;
 		if( time_left <= n_ms ) {
 			break;
 		}
@@ -389,7 +368,8 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
 	timer.func = func;
 	timer.arg = arg;
 
-	Queue_Insert( &global_timer_list, n+1, &timer );
+	LinkedList_Goto( &timer_list, n+1 );
+	LinkedList_InsertCopy( &timer_list, &timer );
 	TimerList_FreeLock();
 	DEBUG_MSG("set timer, id: %d, total_ms: %d,app_id: %lu\n", timer.id, timer.total_ms, timer.app_id);
 	return timer.id;
@@ -404,37 +384,35 @@ LCUI_API int LCUITimer_Set(	long int n_ms,
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int LCUITimer_Free( int timer_id )
+int LCUITimer_Free( int timer_id )
 {
-	int i, total;
-	timer_data *timer;
+	int i, n;
+	TimerData *timer;
 	LCUI_BOOL need_lock;
-	LCUI_ID self_id;
-	
-	self_id = LCUIThread_SelfID();
-	need_lock = (LCUI_Sys.self_id != self_id);
+
+	need_lock = LCUI_IsOnMainThread();
 	/* 如果当前为非主线程，则锁上程序任务锁 */
 	if( need_lock ) {
 		LCUI_LockRunTask();
 	}
 	TimerList_GetLock();
-	total = Queue_GetTotal( &global_timer_list );
-	for(i=0; i<total; ++i) {
-		timer = (timer_data*)Queue_Get( &global_timer_list, i );
+	n = LinkedList_GetTotal( &timer_list );
+	for( i=0; i<n; ++i ) {
+		timer = (TimerData*)LinkedList_Get( &timer_list );
 		/* 忽略无效或ID不一致的定时器 */
 		if( !timer || timer->id != timer_id ) {
 			continue;
 		}
 		/* 移除定时器任务，并且只在非主线程上时使用互斥锁 */
 		LCUI_RemoveTask( (CallBackFunc)timer->func, need_lock );
-		Queue_Delete( &global_timer_list, i );
+		LinkedList_Delete( &timer_list );
 		break;
 	}
 	TimerList_FreeLock();
 	if( need_lock ) {
 		LCUI_UnlockRunTask();
 	}
-	if( i < total ) {
+	if( i < n ) {
 		return 0;
 	}
 	return -1;
@@ -448,10 +426,9 @@ LCUI_API int LCUITimer_Free( int timer_id )
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int LCUITimer_Pause( int timer_id )
+int LCUITimer_Pause( int timer_id )
 {
-	timer_data *timer;
-	
+	TimerData *timer;
 	TimerList_GetLock();
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
@@ -472,10 +449,9 @@ LCUI_API int LCUITimer_Pause( int timer_id )
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int LCUITimer_Continue( int timer_id )
+int LCUITimer_Continue( int timer_id )
 {
-	timer_data *timer;
-	
+	TimerData *timer;
 	TimerList_GetLock();
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
@@ -498,9 +474,9 @@ LCUI_API int LCUITimer_Continue( int timer_id )
  * @return
  *	正常返回0，指定ID的定时器不存在则返回-1.
  * */
-LCUI_API int LCUITimer_Reset( int timer_id, long int n_ms )
+int LCUITimer_Reset( int timer_id, long int n_ms )
 {
-	timer_data *timer;
+	TimerData *timer;
 	
 	TimerList_GetLock();
 	timer = TimerList_Find( timer_id );
@@ -508,7 +484,7 @@ LCUI_API int LCUITimer_Reset( int timer_id, long int n_ms )
 		timer->start_time = LCUI_GetTickCount();
 		timer->pause_ms = 0;
 		timer->total_ms = n_ms;
-		TimerList_UpdateTimerPos( &global_timer_list, timer );
+		TimerList_UpdateTimerPos( timer );
 		TimerList_FreeLock();
 		return 0;
 	}
@@ -516,38 +492,27 @@ LCUI_API int LCUITimer_Reset( int timer_id, long int n_ms )
 	return -1;
 }
 
-/* 创建一个线程以处理定时器 */
-static int timer_thread_start( LCUI_Thread *tid, LCUI_Queue *list )
-{
-	/* 初始化列表 */
-	TimerList_Init( list );
-	timer_thread_active = TRUE;
-	/* 创建用于处理定时器列表的线程 */
-	return LCUIThread_Create( tid, TimerThread, list );
-}
-
-/* 停止定时器的处理线程，并销毁定时器列表 */
-static void timer_thread_destroy( LCUI_Thread tid, LCUI_Queue *list )
-{
-	timer_thread_active = FALSE;
-	/* 等待定时器处理线程的退出 */
-	LCUIThread_Join( tid, NULL );
-	/* 销毁定时器列表 */
-	TimerList_Destroy( list );
-}
-
 /* 初始化定时器模块 */
-LCUI_API void LCUIModule_Timer_Init( void )
+void LCUIModule_Timer_Init( void )
 {
 	LCUI_StartTicks();
-	LCUISleeper_Create( &timer_sleeper );
-	timer_thread_start( &LCUI_Sys.timer_thread, &global_timer_list );
+	LinkedList_Init( &timer_list, sizeof(TimerData) );
+	LinkedList_SetDataMemReuse( &timer_list, TRUE );
+	LinkedList_SetDataNeedFree( &timer_list, TRUE );
+	LCUICond_Init( &timer_sleep_cond );
+	LCUIMutex_Init( &timer_mutex );
+	LCUIThread_Create( &timer_thread_id, TimerThread, NULL );
 }
 
 /* 停用定时器模块 */
-LCUI_API void LCUIModule_Timer_End( void )
+void LCUIModule_Timer_Exit( void )
 {
-	timer_thread_destroy( LCUI_Sys.timer_thread, &global_timer_list );
+	is_running = FALSE;
+	LCUICond_Broadcast( &timer_sleep_cond );
+	LCUIThread_Join( timer_thread_id, NULL );
+	LCUICond_Destroy( &timer_sleep_cond );
+	LCUIMutex_Destroy( &timer_mutex );
+	LinkedList_Destroy( &timer_list );
 }
 /*---------------------------- End Public -----------------------------*/
 
