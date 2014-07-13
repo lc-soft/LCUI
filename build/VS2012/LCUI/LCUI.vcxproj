@@ -170,7 +170,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI_GraphLayer.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Input.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_InputMethod.h" />
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Memory.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Misc.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_StyleLibrary.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Surface.h" />

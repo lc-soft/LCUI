@@ -108,9 +108,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Input.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Memory.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\LCUI_Misc.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
