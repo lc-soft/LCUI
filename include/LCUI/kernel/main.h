@@ -65,7 +65,7 @@ typedef struct {
 	LCUI_BOOL destroy_arg[2];	/* 指定是否在调用完回调函数后，销毁参数 */
 } LCUI_Func, LCUI_Task;
 
-enum LCUI_SystemEventType{
+enum LCUI_SystemEventType {
 	LCUI_KEYDOWN,		/**< 按键输入事件，键盘上任意键均可触发 */
 	LCUI_KEYPRESS,		/**< 按键输入事件，仅字母、数字等ANSI字符键可触发 */
 	LCUI_KEYUP,		/**< 按键释放事件 */
@@ -85,13 +85,10 @@ typedef struct {
 	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 } LCUI_SystemEvent;
 
-typedef struct LCUI_MainLoop_ {
-	LCUI_BOOL quit;
-	LCUI_BOOL running;
-	int level;
-} LCUI_MainLoop;
+typedef void* LCUI_MainLoop;
 
 #ifdef LCUI_BUILD_IN_WIN32
+#include <Windows.h>
 LCUI_API void Win32_LCUI_Init( HINSTANCE hInstance );
 #endif
 
@@ -112,16 +109,13 @@ LCUI_API int LCUI_PostEvent( const char *name, LCUI_SystemEvent *event );
 
 /*--------------------------- Main Loop ------------------------------*/
 /* 新建一个主循环 */
-LCUI_API LCUI_MainLoop* LCUI_MainLoop_New( void );
-
-/* 设定主循环等级，level值越高，处理主循环退出时，也越早处理该循环 */
-LCUI_API int LCUI_MainLoop_Level( LCUI_MainLoop *loop, int level );
+LCUI_API LCUI_MainLoop LCUI_MainLoop_New( void );
 
 /* 运行目标循环 */
-LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop *loop );
+LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop loop );
 
 /* 标记目标主循环需要退出 */
-LCUI_API int LCUI_MainLoop_Quit( LCUI_MainLoop *loop );
+LCUI_API int LCUI_MainLoop_Quit( LCUI_MainLoop loop );
 
 /*----------------------- End MainLoop -------------------------------*/
 
@@ -161,6 +155,9 @@ LCUI_API int LCUI_AtExit( void (*func)(void));
 LCUI_API void LCUI_Quit( void );
 
 LCUI_API void LCUI_Exit( int exit_code );
+
+/** 检测当前是否在主线程上 */
+LCUI_API LCUI_BOOL LCUI_IsOnMainThread(void);
 
 LCUI_END_HEADER
 

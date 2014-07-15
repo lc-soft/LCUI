@@ -1,8 +1,7 @@
 /* ***************************************************************************
  * main.c -- The main functions for the LCUI normal work
  * 
- * Copyright (C) 2012-2014 by
- * Liu Chao
+ * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -18,13 +17,12 @@
  * 
  * You should have received a copy of the GPLv2 along with this file. It is 
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * ***************************************************************************/
  
 /* ****************************************************************************
  * main.c -- 使LCUI能够正常工作的相关主要函数
  *
- * 版权所有 (C) 2012-2014 归属于
- * 刘超
+ * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,7 +35,8 @@
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
- * ****************************************************************************/
+ * ***************************************************************************/
+
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/misc/linkedlist.h>
@@ -62,10 +61,7 @@ static struct LCUI_System {
 	int mode;			/**< LCUI的运行模式 */
 	LCUI_BOOL is_inited;		/**< 标志，指示LCUI是否初始化过 */
 	
-	LCUI_Thread main_thread;	/**< 主线程 */
-	LCUI_Thread display_thread;	/**< GUI显示线程 */
-	LCUI_Thread timer_thread;	/**< 定时器线程 */
-	LCUI_Thread dev_thread;		/**< 设备驱动线程 */
+	unsigned long int main_tid;	/**< 主线程ID */
 	
 	struct {
 		LCUI_BOOL is_running;	/**< 是否处于运行状态 */
@@ -84,9 +80,10 @@ static struct LCUI_App {
 	LinkedList task_list;		/**< 程序的任务队列 */
 	LCUI_Mutex task_run_mutex;	/**< 任务互斥锁，当运行程序任务时会锁上 */
 	LCUI_Mutex task_list_mutex;	/**< 任务记录互斥锁 */
-	LCUI_BOOL main_loop_running;	/**< 主循环是否正在运行 */
-	int main_loop_depth;		/**< 主循环嵌套深度 */
+	LCUI_Mutex loop_mutex;		/**< 互斥锁，确保一次只允许一个线程跑主循环 */
+	LCUI_Mutex loop_changed;	/**< 互斥锁，用于指示当前运行的主循环是否改变 */
 	LCUI_Cond loop_cond;		/**< 条件变量，用于决定是否继续任务循环 */
+	LCUI_MainLoop *loop;		/**< 当前运行的主循环 */
 } MainApp;
 
 /*-------------------------- system event <START> ---------------------------*/
@@ -172,60 +169,118 @@ int LCUI_PostEvent( const char *name, LCUI_SystemEvent *event )
 
 /*---------------------------- Main Loop <START> ----------------------------*/
 
+static LinkedList loop_list;
+
+enum MainLoopState {
+	STATE_PAUSED,
+	STATE_RUNNING,
+	STATE_EXITED
+};
+
+typedef struct LCUI_MainLoopRec_ {
+	int state;	/**< 主循环的状态 */
+} LCUI_MainLoopRec;
+
 /* 新建一个主循环 */
-LCUI_MainLoop* LCUI_MainLoop_New( void )
+LCUI_MainLoop LCUI_MainLoop_New( void )
 {
-
+	LCUI_MainLoopRec *loop;
+	loop = (LCUI_MainLoopRec*)malloc(sizeof(LCUI_MainLoopRec));
+	loop->state = STATE_PAUSED;
+	return (LCUI_MainLoop)loop;
 }
-
 
 static int LCUI_RunTask(void)
 { 
-	LCUI_Task *task;
-	
-	LCUIMutex_Lock( &MainApp.task_mutex );
-	Queue_Lock( &MainApp.task_list );
-	task = (LCUI_Task*)Queue_Get( &MainApp.task_list, 0 );
+	LCUI_Task *task, task_bak;
+	LCUIMutex_Lock( &MainApp.task_run_mutex );
+	LCUIMutex_Lock( &MainApp.task_list_mutex );
+	task = (LCUI_Task*)LinkedList_Get( &MainApp.task_list );
 	if( !task ) {
 		LCUIMutex_Unlock( &MainApp.task_list_mutex );
-		LCUIMutex_Unlock( &MainApp.task_mutex );
+		LCUIMutex_Unlock( &MainApp.task_run_mutex );
 		return -1;
 	}
 	if( !task->func ) {
-		Queue_Delete( &MainApp.task_list, 0 );
+		LinkedList_Delete( &MainApp.task_list );
 		LCUIMutex_Unlock( &MainApp.task_list_mutex );
-		LCUIMutex_Unlock( &MainApp.task_mutex );
+		LCUIMutex_Unlock( &MainApp.task_run_mutex );
 		return -2;
 	}
-	Queue_DeletePointer( &MainApp.task_list, 0 );
+	/* 备份该任务数据 */
+	task_bak = *task;
+	/* 重置数据 */
+	task->func = NULL;
+	task->arg[0] = NULL;
+	task->arg[1] = NULL;
+	task->destroy_arg[0] = FALSE;
+	task->destroy_arg[1] = FALSE;
+	/* 删除之 */
+	LinkedList_Delete( &MainApp.task_list );
+	/* 解锁，现在的任务数据已经与任务列表独立开了 */
 	LCUIMutex_Unlock( &MainApp.task_list_mutex );
 	/* 调用函数指针指向的函数，并传递参数 */
-	task->func( task->arg[0], task->arg[1] );
+	task_bak.func( task_bak.arg[0], task_bak.arg[1] );
 	/* 若需要在调用回调函数后销毁参数 */
-	if( task->destroy_arg[0] ) {
-		free( task->arg[0] );
+	if( task_bak.destroy_arg[0] ) {
+		free( task_bak.arg[0] );
 	}
-	if( task->destroy_arg[1] ) {
-		free( task->arg[1] );
+	if( task_bak.destroy_arg[1] ) {
+		free( task_bak.arg[1] );
 	}
-	free( task );
-	LCUIMutex_Unlock( &MainApp.task_mutex );
+	LCUIMutex_Unlock( &MainApp.task_run_mutex );
 	return 0;
 }
 
 /** 运行目标主循环 */
 int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 {
+	LCUI_MainLoopRec *loop_rec = (LCUI_MainLoopRec*)loop;
+	if( loop_rec->state == STATE_RUNNING ) {
+		_DEBUG_MSG("error: main-loop already running.");
+		return -1;
+	}
 	DEBUG_MSG("loop: %p, enter\n", loop);
-	loop->running = TRUE;
-	while( !loop->quit && System.state == ACTIVE ) {
-		if( Queue_GetTotal(&MainApp.task_list) <= 0 ) {
+	loop_rec->state = STATE_RUNNING;
+	/* 将主循环记录插入至列表表头 */
+	LinkedList_Goto( &loop_list, 0 );
+	LinkedList_Insert( &loop_list, loop_rec );
+	MainApp.loop = loop;
+	LCUIMutex_Lock( &MainApp.loop_changed );
+	/* 广播，让其它线程交出主循环运行权 */
+	LCUICond_Broadcast( &MainApp.loop_cond );
+	/* 获取运行权 */
+	LCUIMutex_Lock( &MainApp.loop_mutex );
+	LCUIMutex_Unlock( &MainApp.loop_changed );
+	while( loop_rec->state != STATE_EXITED ) {
+		if( LinkedList_GetTotal(&MainApp.task_list) <= 0 ) {
 			LCUICond_TimedWait( &MainApp.loop_cond, 1000 );
+			/** 如果当前运行的主循环不是自己 */
+			if( MainApp.loop != loop ) {
+				loop_rec->state = STATE_PAUSED;
+				LCUIMutex_Unlock( &MainApp.loop_mutex );
+				/* 等待其它线程获得主循环运行权 */
+				LCUIMutex_Lock( &MainApp.loop_changed );
+				LCUIMutex_Unlock( &MainApp.loop_changed );
+				/* 等待其它线程释放主循环运行权 */
+				LCUIMutex_Lock( &MainApp.loop_mutex );
+			}
 			continue;
 		}
 		LCUI_RunTask();
 	}
-	loop->running = FALSE;
+	loop_rec->state = STATE_EXITED;
+	LinkedList_Goto( &loop_list, 0 );
+	LinkedList_Delete( &loop_list );
+	/* 获取处于列表表头的主循环 */
+	loop_rec = (LCUI_MainLoopRec*)LinkedList_Get( &loop_list );
+	if( loop_rec ) {
+		/* 改变当前运行的主循环 */
+		MainApp.loop = (LCUI_MainLoop*)loop_rec;
+		LCUICond_Broadcast( &MainApp.loop_cond );
+	}
+	/* 释放运行权 */
+	LCUIMutex_Unlock( &MainApp.loop_mutex );
 	DEBUG_MSG("loop: %p, exit\n", loop);
 	return 0;
 }
@@ -444,7 +499,7 @@ LCUI_BOOL LCUI_Active(void)
 /** 检测当前是否在主线程上 */
 LCUI_BOOL LCUI_IsOnMainThread(void)
 {
-	return (System.main_thread != LCUIThread_SelfID());
+	return (System.main_tid != LCUIThread_SelfID());
 }
 
 /* 
@@ -461,7 +516,7 @@ int LCUI_Init( int w, int h, int mode )
 	System.func_atexit = NULL;
 	System.exit_code = 0;
 	System.state = ACTIVE;
-	System.main_thread = LCUIThread_SelfID();
+	System.main_tid = LCUIThread_SelfID();
 	LCUI_ShowCopyrightText();
 	LCUIApp_Init();
 	/* 初始化各个模块 */
