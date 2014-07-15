@@ -164,13 +164,6 @@ typedef struct LCUI_Rect2_ {
 } LCUI_Rect2;
 /*--------------- END ----------------*/
 
-LCUI_END_HEADER
-	
-#include LC_THREAD_H
-#include LC_QUEUE_H
-
-LCUI_BEGIN_HEADER
-
 /*---------------------------- 图形数据 -------------------------------*/
 typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
@@ -236,13 +229,10 @@ LCUI_END_HEADER
 		fflush(stdout); \
 	}
 
-#include LC_KERNEL_COND_H
 #include LC_KERNEL_MAIN_H
 #include LC_KERNEL_DEV_H
 #include LC_KERNEL_TIMER_H
 #include LC_KERNEL_EVENT_H
-	
-#include LC_MISC_H
 
 #if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS) &&defined(I_NEED_WINMAIN)
 
