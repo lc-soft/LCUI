@@ -115,7 +115,7 @@ LCUI_API LCUI_MainLoop LCUI_MainLoop_New( void );
 LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop loop );
 
 /* 标记目标主循环需要退出 */
-LCUI_API int LCUI_MainLoop_Quit( LCUI_MainLoop loop );
+LCUI_API void LCUI_MainLoop_Quit( LCUI_MainLoop loop );
 
 /*----------------------- End MainLoop -------------------------------*/
 
@@ -157,7 +157,7 @@ LCUI_API void LCUI_Quit( void );
 LCUI_API void LCUI_Exit( int exit_code );
 
 /** 检测当前是否在主线程上 */
-LCUI_API LCUI_BOOL LCUI_IsOnMainThread(void);
+LCUI_API LCUI_BOOL LCUI_IsOnMainLoop(void);
 
 LCUI_END_HEADER
 
