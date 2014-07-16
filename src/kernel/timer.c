@@ -389,9 +389,9 @@ int LCUITimer_Free( int timer_id )
 	int i, n;
 	TimerData *timer;
 	LCUI_BOOL need_lock;
-
-	need_lock = LCUI_IsOnMainThread();
-	/* 如果当前为非主线程，则锁上程序任务锁 */
+	
+	/* 如果当前与主循环不在同一线程上，则需要锁上程序任务锁 */
+	need_lock = !LCUI_IsOnMainLoop();
 	if( need_lock ) {
 		LCUI_LockRunTask();
 	}
