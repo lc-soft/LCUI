@@ -444,7 +444,7 @@ LCUI_BOOL LCUI_Active(void)
 LCUI_BOOL LCUI_IsOnMainLoop(void)
 {
 	LCUI_MainLoopRec *loop = (LCUI_MainLoopRec*)MainApp.loop;
-	return (loop->tid != LCUIThread_SelfID());
+	return (loop->tid == LCUIThread_SelfID());
 }
 
 /* 
