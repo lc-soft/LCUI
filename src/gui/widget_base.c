@@ -142,7 +142,7 @@ typedef struct LCUI_WidgetLite {
 #include <LCUI/misc/rect.h>
 
 /** 部件结构（完整版） */
-typedef union LCUI_WidgetFullRec_ {
+typedef struct LCUI_WidgetFullRec_ {
 	LCUI_WidgetLite style;		/**< 样式 */
 	LCUI_BOOL autosize;		/**< 指定是否自动调整自身的大小，以适应内容的大小 */
 	LCUI_BOOL focus;		/**< 指定该部件是否需要焦点 */
