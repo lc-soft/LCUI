@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * widget_base.c -- the widget base operation set.
  *
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * widget_base.c -- 部件的基本操作集。
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -39,6 +39,122 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+/** 边框风格 */
+enum BorderStyle {
+	BORDER_STYLE_NONE,	/**< 无边框 */
+	BORDER_STYLE_SOLID,	/**< 实线 */
+	BORDER_STYLE_DOTTED,	/**< 点状 */
+	BORDER_STYLE_DOUBLE,	/**< 双线 */
+	BORDER_STYLE_DASHED,	/**< 虚线 */
+};
+
+/** 部件停靠类型 */
+enum DockType {
+	DOCK_TYPE_NONE,
+	DOCK_TYPE_TOP,
+	DOCK_TYPE_LEFT,
+	DOCK_TYPE_RIGHT,
+	DOCK_TYPE_FILL,
+	DOCK_TYPE_BOTTOM
+};
+
+/** 背景图像布局 */
+enum LayoutType {
+	LAYOUT_NONE = 0,	  /**< 无 */
+	LAYOUT_NORMAL = 0,
+	LAYOUT_ZOOM,		 /**< 缩放 */
+	LAYOUT_STRETCH,		 /**< 拉伸 */
+	LAYOUT_CENTER,		 /**< 居中 */
+	LAYOUT_TILE		 /**< 平铺 */
+};
+
+/** 使用哪一种值 */
+enum WitchValue {
+	USE_SCALE,	/**< 使用比例 */
+	USE_FIXED_NUM	/**< 使用固定数值 */
+};
+
+/** 部件结构（仅包含样式），大部分是只读的，对其修改不会影响部件效果 */
+typedef struct LCUI_WidgetLite {
+	LCUI_BOOL visible;		/**< 是否可见 */
+	int position;			/**< 定位方式 */
+	int dock;			/**< 停靠位置 */
+	int x, y;			/**< 当前坐标 */
+	int offsetX, offsetY;		/**< 水平、垂直坐标偏移量 */
+	union {
+		int w, width;		/**< 部件区域宽度 */
+	};
+	union {
+		int h, height;		/**< 部件区域高度 */
+	};
+	int innerWidth, innerHeight;	/**< 部件内部区域大小，除去内边距占用区域 */
+	int outerWidth, outerHeight;	/**< 部件外部区域大小，包括边框和阴影占用区域 */
+
+	struct {
+		int top, right, bottom, left;
+	} margin, padding;		/**< 外边距（暂不支持）, 内边距 */
+
+	struct {
+		LCUI_Graph image;	/**< 背景图 */
+		LCUI_Color color;	/**< 背景色 */
+		struct {
+			LCUI_BOOL x, y;
+		} repeat;		/**< 背景图是否重复 */
+
+		int clip;		/**< 背景图的裁剪方式 */
+		int position;		/**< 定位方式 */
+		int origin;		/**< 相对于何种位置进行定位 */
+	} background;
+
+	struct {
+		int x, y;		/**< 位置 */
+		int blur;		/**< 模糊距离 */
+		int spread;		/**< 扩散大小 */
+		LCUI_Color color;	/**< 颜色 */
+	} shadow;			/**< 阴影 */
+
+	struct {
+		struct {
+			int width;
+			int style;
+			LCUI_Color color;
+		} top, right, bottom, left;
+		unsigned int top_left_radius;
+		unsigned int top_right_radius;
+		unsigned int bottom_left_radius;
+		unsigned int bottom_right_radius;
+	} border;			/**< 边框 */
+
+	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
+	struct {
+		struct {
+			float x, y;
+		} scale;		/**< 2D 缩放 */
+		float rotate;		/**< 2D 旋转角度 */
+	} transform;
+
+} LCUI_WidgetLite;
+
+#include <LCUI_Build.h>
+#include <LCUI/LCUI.h>
+#include <LCUI/LCUI_Widget.h>
+#include <LCUI/misc/linkedlist.h>
+#include <LCUI/misc/rect.h>
+
+/** 部件结构（完整版） */
+typedef union LCUI_WidgetFullRec_ {
+	LCUI_WidgetLite style;		/**< 样式 */
+	LCUI_BOOL autosize;		/**< 指定是否自动调整自身的大小，以适应内容的大小 */
+	LCUI_BOOL focus;		/**< 指定该部件是否需要焦点 */
+	LCUI_Widget *focusWidget;	/**< 获得焦点的子部件 */
+
+	LCUI_Widget *parent;		/**< 父部件 */
+	LinkedList children;		/**< 子部件 */
+	LCUI_EventBox event;		/**< 事件记录 */
+	LCUI_DirtyRectList dirtyRects;	/**< 记录无效区域（脏矩形） */
+} LCUI_WidgetFull;
+
+#ifdef USE_OLD_CODE
 //#define DEBUG
 #include <LCUI_Build.h>
 #include LC_LCUI_H
@@ -2298,3 +2414,4 @@ void LCUIModule_Widget_End( void )
 	LCUIWidgetEvent_Destroy();
 	RootWidget_Destroy();
 }
+#endif
