@@ -39,6 +39,20 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+/** 用于描述部件样式的变量类型 */
+typedef struct StyleVar {
+	enum StyleVarType {
+		SVT_SCALE,		/**< 比例 */
+		SVT_PX,			/**< 像素 */
+		SVT_PT			/**< 点 */
+	} type;				/** 哪一种类型 */
+	union {
+		int px;			/** pixel, 像素 */
+		int pt;			/** point，点数（一般用于字体大小单位） */
+		double scale;		/** 比例 */
+	};
+} StyleVar;
+
 /** 边框风格 */
 enum BorderStyle {
 	BORDER_STYLE_NONE,	/**< 无边框 */
@@ -58,34 +72,18 @@ enum DockType {
 	DOCK_TYPE_BOTTOM
 };
 
-/** 背景图像布局 */
-enum LayoutType {
-	LAYOUT_NONE = 0,	  /**< 无 */
-	LAYOUT_NORMAL = 0,
-	LAYOUT_ZOOM,		 /**< 缩放 */
-	LAYOUT_STRETCH,		 /**< 拉伸 */
-	LAYOUT_CENTER,		 /**< 居中 */
-	LAYOUT_TILE		 /**< 平铺 */
-};
-
-/** 使用哪一种值 */
-enum WitchValue {
-	USE_SCALE,	/**< 使用比例 */
-	USE_FIXED_NUM	/**< 使用固定数值 */
-};
-
 /** 部件结构（仅包含样式），大部分是只读的，对其修改不会影响部件效果 */
 typedef struct LCUI_WidgetLite {
 	LCUI_BOOL visible;		/**< 是否可见 */
 	int position;			/**< 定位方式 */
 	int dock;			/**< 停靠位置 */
-	int x, y;			/**< 当前坐标 */
-	int offsetX, offsetY;		/**< 水平、垂直坐标偏移量 */
+	StyleVar x, y;			/**< 当前坐标 */
+	StyleVar offsetX, offsetY;	/**< 水平、垂直坐标偏移量 */
 	union {
-		int w, width;		/**< 部件区域宽度 */
+		StyleVar w, width;	/**< 部件区域宽度 */
 	};
 	union {
-		int h, height;		/**< 部件区域高度 */
+		StyleVar h, height;	/**< 部件区域高度 */
 	};
 	int innerWidth, innerHeight;	/**< 部件内部区域大小，除去内边距占用区域 */
 	int outerWidth, outerHeight;	/**< 部件外部区域大小，包括边框和阴影占用区域 */
@@ -97,12 +95,19 @@ typedef struct LCUI_WidgetLite {
 	struct {
 		LCUI_Graph image;	/**< 背景图 */
 		LCUI_Color color;	/**< 背景色 */
+	
 		struct {
 			LCUI_BOOL x, y;
 		} repeat;		/**< 背景图是否重复 */
 
 		int clip;		/**< 背景图的裁剪方式 */
-		int position;		/**< 定位方式 */
+
+		struct {
+			StyleVar x, y;
+		} position;		/**< 定位方式 */
+		struct {
+			StyleVar w, h;
+		} size;
 		int origin;		/**< 相对于何种位置进行定位 */
 	} background;
 
