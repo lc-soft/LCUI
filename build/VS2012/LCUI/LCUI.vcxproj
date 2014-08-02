@@ -179,6 +179,7 @@
     <ClInclude Include="..\..\..\include\LCUI\misc\dirent.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\framectrl.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\linkedlist.h" />
+    <ClInclude Include="..\..\..\include\LCUI\misc\parse.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\rbtree.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\rect.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\string.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="..\..\..\src\misc\framectrl.c" />
     <ClCompile Include="..\..\..\src\misc\linkedlist.c" />
     <ClCompile Include="..\..\..\src\misc\misc.c" />
+    <ClCompile Include="..\..\..\src\misc\parse.c" />
     <ClCompile Include="..\..\..\src\misc\rbtree.c" />
     <ClCompile Include="..\..\..\src\misc\rect.c" />
     <ClCompile Include="..\..\..\src\misc\string.c" />

@@ -240,6 +240,9 @@
     <ClInclude Include="..\..\..\include\LCUI\misc\framectrl.h">
       <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\misc\parse.h">
+      <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -427,6 +430,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\thread\win32\cond.c">
       <Filter>源文件\thread\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\misc\parse.c">
+      <Filter>源文件\misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
