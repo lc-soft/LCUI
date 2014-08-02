@@ -184,40 +184,6 @@ struct LCUI_Graph_ {
 };
 /*------------------------------ END ---------------------------------*/
 
-/*---------------- 用于表示像素或百分比 -----------------*/
-typedef struct IntOrFloat_t_ {
-	LCUI_BOOL which_one;		/** 指定用哪个类型的变量 */
-	union {
-		int px;			/** 数值，单位为像素 */
-		double scale;		/** 比例 */
-	};
-} IntOrFloat_t;
-/*---------------------- END -------------------------*/
-
-/*----------------- 用于表示字体大小 --------------------*/
-typedef struct PixelOrPoint_t_ {
-	LCUI_BOOL which_one;		/** 指定用哪个类型的变量 */
-	union {
-		int px;			/** pixel, 字体大小（像素） */
-		int pt;			/** point，字体大小（点数） */
-	};
-} PixelOrPoint_t;
-/*---------------------- END -------------------------*/
-
-/*------------------- 内边距和外边距 --------------------*/
-typedef struct common_box_ {
-	int top, bottom, left, right;
-} LCUI_Margin, LCUI_Padding;
-/*---------------------- END -------------------------*/
-
-/*----------------- 自动尺寸调整模式 --------------------*/
-typedef enum AUTOSIZE_MODE_ {
-	AUTOSIZE_MODE_GROW_AND_SHRINK,	/** 增大和缩小 */
-	AUTOSIZE_MODE_GROW_ONLY		/** 只增大 */
-}
-AUTOSIZE_MODE;
-/*---------------------- END --------------------------*/
-
 LCUI_END_HEADER
 
 #define MAX_APP_IDLE_TIME	50
