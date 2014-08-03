@@ -81,42 +81,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Config.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Cursor.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Display.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Draw.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Error.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Font.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Graph.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_GraphLayer.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Input.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Misc.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_StyleLibrary.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Thread.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\font\bitmapfont.h">
       <Filter>头文件\LCUI\font</Filter>
     </ClInclude>
@@ -150,14 +114,8 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\messagebox.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\draw\line.h">
       <Filter>头文件\LCUI\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_InputMethod.h">
-      <Filter>头文件\LCUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\misc\delay.h">
       <Filter>头文件\LCUI\misc</Filter>
@@ -213,12 +171,6 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_style.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Widget.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget_msg.h">
-      <Filter>头文件\LCUI\gui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\misc\dirent.h">
       <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
@@ -234,14 +186,62 @@
     <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h">
       <Filter>头文件\LCUI\draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\LCUI_Surface.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\misc\framectrl.h">
       <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\misc\parse.h">
       <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_task.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\widget.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\thread.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\surface.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\misc.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\input.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\ime.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\graphlayer.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\graph.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\font.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\draw.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\display.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\cursor.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\config.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\widget_build.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\style_parser.h">
+      <Filter>头文件\LCUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -308,18 +308,6 @@
     <ClCompile Include="..\..\..\src\thread\win32\thread.c">
       <Filter>源文件\thread\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\LCUI_Cursor.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\LCUI_Graph.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\LCUI_GraphLayer.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\LCUI_StyleLibrary.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\font\bitmapfont.c">
       <Filter>源文件\font</Filter>
     </ClCompile>
@@ -352,9 +340,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\draw\line.c">
       <Filter>源文件\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\LCUI_InputMethod.c">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget\activebox.c">
       <Filter>源文件\gui\widget</Filter>
@@ -433,6 +418,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\misc\parse.c">
       <Filter>源文件\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ime.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\graphlayer.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\graph.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cursor.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\style_parser.c">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
