@@ -129,7 +129,7 @@ error_out:
     ObjName_OptAttr( XXXX *object, XXXX arg1, XXXX arg2, XXXX arg3 )
 ```
 
-由于作者使用的是VisualStudio 2012，如果函数的返回值类型和修饰符不与函数名同行，编辑器的代码提示功能无法位于函数上方的注释内容，例如：
+由于作者使用的是VisualStudio 2012，如果函数的返回值类型和修饰符不与函数名同行，编辑器的代码提示功能会无法显示位于函数上方的注释内容，例如：
 
 ```c
 	/** this is function. */
