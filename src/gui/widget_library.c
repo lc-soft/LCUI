@@ -39,11 +39,57 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/widget.h>
+#include <LCUI/widget_build.h>
+
+typedef struct TypeData {
+	char *name;
+	LCUI_RBTree func_records;
+} TypeData;
+
+static LCUI_RBTree widget_type_records;
+
+static int CompareName( void *data, const void *keydata )
+{
+	return strcmp(*(char**)data, (const char*)keydata);
+}
+
+static void OnDestroyWidgetType( void *arg )
+{
+	
+}
+
+void LCUIWidget_InitTypeLibrary(void)
+{
+	RBTree_Init( &widget_type_records );
+	RBTree_OnJudge( &widget_type_records, CompareName );
+	RBTree_SetDataNeedFree( &widget_type_records, FALSE );
+}
+
+void LCUIWidget_ClearTypeLibrary(void)
+{
+
+}
 
 /** 添加一个部件类型 */
 int LCUIWidget_AddType( const char *widget_type )
 {
+	int len;
+	TypeData *type_data;
+
+	type_data = (TypeData*)RBTree_CustomGetData(
+		&widget_type_records, widget_type
+	);
+	if( type_data ) {
+		return -1;
+	}
+
+	len = strlen( widget_type );
+	type_data = (TypeData*)malloc(sizeof(TypeData));
+	type_data->name = (char*)malloc(sizeof(char)*(len+1));
+	strcpy( type_data->name, widget_type );
+	RBTree_Init( &type_data->func_records );
+	RBTree_SetDataNeedFree( &type_data->func_records, FALSE );
+	RBTree_CustomInsert( &widget_type_records, widget_type, type_data );
 	return 0;
 }
 
@@ -57,11 +103,42 @@ int LCUIWidget_RemoveType( const char *widget_type )
 int LCUIWidget_SetFunc( const char *widget_type, const char *func_type,
 			void(*func)(LCUI_Widget*) )
 {
+	TypeData *type_data;
+	LCUI_RBTreeNode *node;
+
+	type_data = (TypeData*)RBTree_CustomGetData(
+		&widget_type_records, widget_type
+	);
+	if( !type_data ) {
+		return -1;
+	}
+	node = RBTree_CustomSearch( &type_data->func_records, func_type );
+	if( node ) {
+		node->data = func;
+		return 0;
+	}
+	RBTree_CustomInsert( &type_data->func_records, func_type, func );
 	return 0;
 }
 
 /** 调用指定类型部件的函数 */
-void LCUIWidget_Call( const char *widget_type, const char *func_type )
+int Widget_Call( LCUI_Widget *widget, const char *func_type )
 {
+	TypeData *type_data;
+	void (*func)(LCUI_Widget*);
 
+	type_data = (TypeData*)RBTree_CustomGetData(
+		&widget_type_records, widget->type_name
+	);
+	if( !type_data ) {
+		return -1;
+	}
+	func = (void (*)(LCUI_Widget*))RBTree_CustomGetData( 
+		&type_data->func_records, func_type
+	);
+	if( func ) {
+		func( widget );
+		return 0;
+	}
+	return -2;
 }
