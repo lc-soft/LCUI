@@ -1,9 +1,24 @@
-﻿#include <LCUI_Build.h>
-#include LC_LCUI_H
+﻿#define __IN_FRAME_CONTROL_SOURCE_FILE__
+
+#include <LCUI_Build.h>
+#include <LCUI/LCUI.h>
+#include <LCUI/thread.h>
 
 #define FRAME_CTRL_STATE_RUN	0
 #define FRAME_CTRL_STATE_PAUSE	1
 #define FRAME_CTRL_STATE_QUIT	2
+
+struct FrameControlContext {
+	int state;
+	LCUI_Cond wait_continue;
+	LCUI_Cond wait_pause;
+	unsigned int temp_fps;
+	unsigned int current_fps;
+	unsigned int one_frame_remain_time;
+	unsigned int pause_time;
+	int64_t prev_frame_start_time;
+	int64_t prev_fps_update_time;
+};
 
 /** 初始化帧数控制 */
 void FrameControl_Init( FrameCtrlCtx *ctx )
@@ -14,8 +29,8 @@ void FrameControl_Init( FrameCtrlCtx *ctx )
 	ctx->one_frame_remain_time = 10;
 	ctx->prev_frame_start_time = LCUI_GetTickCount();
 	ctx->prev_fps_update_time = LCUI_GetTickCount();
-	LCUISleeper_Create( &ctx->wait_continue );
-	LCUISleeper_Create( &ctx->wait_pause );
+	LCUICond_Init( &ctx->wait_continue );
+	LCUICond_Init( &ctx->wait_pause );
 }
 
 /** 设置最大FPS（帧数/秒） */
@@ -44,13 +59,13 @@ void FrameControl_Remain( FrameCtrlCtx *ctx )
 		goto normal_exit;
 	}
 	/** 进行睡眠，直到需要暂停为止 */
-	LCUISleeper_StartSleep( &ctx->wait_pause, n_ms );
+	LCUICond_TimedWait( &ctx->wait_pause, n_ms );
 	/** 睡眠结束后，如果当前状态不为PAUSE，则说明睡眠不是因为要暂停而终止的 */
 	if( ctx->state != FRAME_CTRL_STATE_PAUSE ) {
 		goto normal_exit;
 	}
 	/** 需要暂停，进行睡眠，直到需要继续为止 */
-	lost_ms = LCUISleeper_StartSleep( &ctx->wait_continue, INT_MAX );
+	lost_ms = LCUICond_TimedWait( &ctx->wait_continue, INT_MAX );
 	ctx->pause_time = lost_ms;
 	ctx->prev_frame_start_time += lost_ms;
 	return;
@@ -70,11 +85,11 @@ normal_exit:;
 void FrameControl_Pause( FrameCtrlCtx *ctx, LCUI_BOOL need_pause )
 {
 	if( ctx->state == FRAME_CTRL_STATE_RUN && need_pause ) {
-		LCUISleeper_BreakSleep( &ctx->wait_pause );
+		LCUICond_Broadcast( &ctx->wait_pause );
 		ctx->state = FRAME_CTRL_STATE_PAUSE;
 	}
 	else if( ctx->state == FRAME_CTRL_STATE_PAUSE && !need_pause ){
-		LCUISleeper_BreakSleep( &ctx->wait_continue );
+		LCUICond_Broadcast( &ctx->wait_continue );
 		ctx->state = FRAME_CTRL_STATE_RUN;
 	}
 }
