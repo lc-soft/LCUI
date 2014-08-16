@@ -3,17 +3,11 @@
 
 LCUI_BEGIN_HEADER
 
-typedef struct FrameControlContext {
-	int state;
-	LCUI_Sleeper wait_continue;
-	LCUI_Sleeper wait_pause;
-	unsigned int temp_fps;
-	unsigned int current_fps;
-	unsigned int one_frame_remain_time;
-	unsigned int pause_time;
-	int64_t prev_frame_start_time;
-	int64_t prev_fps_update_time;
-} FrameCtrlCtx;
+#ifdef __IN_FRAME_CONTROL_SOURCE_FILE__
+typedef struct FrameControlContext FrameCtrlCtx;
+#else
+typedef void* FrameCtrlCtx;
+#endif
 
 /** 初始化帧数控制 */
 LCUI_API void FrameControl_Init( FrameCtrlCtx *ctx );
