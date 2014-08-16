@@ -74,8 +74,8 @@ typedef struct LCUI_WidgetLite {
 	union {
 		StyleVar h, height;	/**< 部件区域高度 */
 	};
-	int innerWidth, innerHeight;	/**< 部件内部区域大小，除去内边距占用区域 */
-	int outerWidth, outerHeight;	/**< 部件外部区域大小，包括边框和阴影占用区域 */
+	int inner_width, inner_height;	/**< 部件内部区域大小，除去内边距占用区域 */
+	int outer_width, outer_height;	/**< 部件外部区域大小，包括边框和阴影占用区域 */
 
 	struct {
 		int top, right, bottom, left;

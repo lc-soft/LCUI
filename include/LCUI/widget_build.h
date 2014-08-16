@@ -1,20 +1,25 @@
 ﻿#ifndef __LCUI_WIDGET_BUILD_H__
 #define __LCUI_WIDGET_BUILD_H__
 
+#include <LCUI/gui/widget_base.h>
+
 LCUI_BEGIN_HEADER
 
+typedef struct LCUI_WidgetFull LCUI_Widget;
+
 /** 部件结构（完整版） */
-typedef struct LCUI_WidgetFullRec_ {
+struct LCUI_WidgetFull {
 	LCUI_WidgetLite style;		/**< 样式 */
+	char *type_name;		/**< 类型名称 */
 	LCUI_BOOL autosize;		/**< 指定是否自动调整自身的大小，以适应内容的大小 */
 	LCUI_BOOL focus;		/**< 指定该部件是否需要焦点 */
-	LCUI_Widget *focusWidget;	/**< 获得焦点的子部件 */
+	LCUI_Widget *focus_widget;	/**< 获得焦点的子部件 */
 
 	LCUI_Widget *parent;		/**< 父部件 */
 	LinkedList children;		/**< 子部件 */
 	LCUI_EventBox event;		/**< 事件记录 */
-	LCUI_DirtyRectList dirtyRects;	/**< 记录无效区域（脏矩形） */
-} LCUI_WidgetFull, LCUI_Widget;
+	LCUI_DirtyRectList dirty_rects;	/**< 记录无效区域（脏矩形） */
+};
 
 typedef union LCUI_WidgetTask {
 	/** 各种任务所需的数据 */
@@ -35,6 +40,8 @@ typedef union LCUI_WidgetTask {
 
 LCUI_END_HEADER
 
-#include <LCUI/gui/widget.h>
+#include <LCUI/gui/widget_task.h>
+#include <LCUI/gui/widget_event.h>
+#include <LCUI/gui/widget_paint.h>
 
 #endif
