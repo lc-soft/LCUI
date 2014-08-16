@@ -42,103 +42,12 @@
 #ifndef __LCUI_MISC_H__
 #define __LCUI_MISC_H__
 
-#include LC_MISC_DELAY_H
-#include LC_MISC_STRING_H
-#include LC_MISC_DIRENT_H
-#include LC_MISC_RB_TREE_H
-#include LC_MISC_LINKED_LIST_H
-#include LC_MISC_FRAME_CONTROL_H
-#include LC_MISC_RECT_H
-
-LCUI_BEGIN_HEADER
-	
-/****************** 布局 ******************/
-typedef enum LayoutType_ {
-	LAYOUT_NONE	= 0,	  /* 无 */
-	LAYOUT_NORMAL	= 0,
-	LAYOUT_ZOOM	= 1,	  /* 缩放 */
-	LAYOUT_STRETCH	= 1<<1,	  /* 拉伸 */
-	LAYOUT_CENTER	= 1<<2,	  /* 居中 */
-	LAYOUT_TILE	= 1<<3	  /* 平铺 */
-} LayoutType;
-/******************************************/
-
-/*----------------- 对齐方式 -------------------*/
-typedef enum AlignType_ {
-	ALIGN_NONE,		/* 无 */
-	ALIGN_TOP_LEFT,	  	/* 向左上角对齐 */
-	ALIGN_TOP_CENTER,	/* 向上中间对齐 */
-	ALIGN_TOP_RIGHT,	/* 向右上角对齐 */
-	ALIGN_MIDDLE_LEFT,	/* 向中央偏左对齐 */
-	ALIGN_MIDDLE_CENTER,	/* 向正中央对齐 */
-	ALIGN_MIDDLE_RIGHT,	/* 向中央偏由对齐 */
-	ALIGN_BOTTOM_LEFT,	/* 向底部偏左对齐 */
-	ALIGN_BOTTOM_CENTER,	/* 向底部居中对齐 */
-	ALIGN_BOTTOM_RIGHT	/* 向底部偏右对齐 */
-} AlignType;
-/*---------------------------------------------*/
-
-/* 检测result是否包含option */
-#define HaveOption(result,option) ((result & option) == option)
-
-/* 转换成LCUI_Pos类型 */
-LCUI_API LCUI_Pos Pos(int x, int y);
-
-/* 转换成LCUI_Size类型 */
-LCUI_API LCUI_Size Size(int w, int h);
-
-/* 
- * 功能：对比两个尺寸
- * 说明：a大于b，返回1， b大于a，返回-1，相等则返回0
- * */
-LCUI_API int Size_Cmp(LCUI_Size a, LCUI_Size b);
-
-/* 根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */
-LCUI_API LCUI_Pos
-GetPosByAlign( LCUI_Size container, LCUI_Size child, int align );
-
-LCUI_API LCUI_Padding
-Padding(int top, int bottom, int left, int right);
-
-/* 求两个LCUI_Pos类型变量的和 */
-LCUI_API LCUI_Pos
-Pos_Add( LCUI_Pos a, LCUI_Pos b );
-
-/* 对比两个坐标是否一致 */
-LCUI_API int
-Pos_Cmp( LCUI_Pos a, LCUI_Pos b );
-
-/* 求两个LCUI_Pos类型变量的差 */
-LCUI_API LCUI_Pos
-Pos_Sub( LCUI_Pos a, LCUI_Pos b );
-
-/* 初始化IntOrFloat_t */
-LCUI_API void
-IntOrFloat_Init( IntOrFloat_t *combo_num );
-
-/* 初始化PixelOrPoint_t */
-LCUI_API void
-PixelOrPoint_Init( PixelOrPoint_t *combo_num );
-
-/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是百分比 */
-LCUI_API int
-ScanIntOrFloat( char *str, IntOrFloat_t *combo_num );
-
-/* 根据传入的字符串，获取字符串实际表达的数值，确定数值的单位是PX还是PT */
-LCUI_API int
-ScanPixelOrPoint( char *str, PixelOrPoint_t *combo_num );
-
-/** 根据给定的字符串，生成一个ID */
-LCUI_API unsigned int BKDRHash( const char *str );
-
-/* 录制屏幕指定区域的内容 */
-LCUI_API int
-LCUIScreen_StartRecord( LCUI_Rect area );
-
-/* 结束录制 */
-LCUI_API int
-LCUIScreen_EndRecord( void );
-
-LCUI_END_HEADER
+#include <LCUI/misc/delay.h>
+#include <LCUI/misc/dirent.h>
+#include <LCUI/misc/rbtree.h>
+#include <LCUI/misc/linkedlist.h>
+#include <LCUI/misc/rect.h>
+#include <LCUI/misc/framectrl.h>
+#include <LCUI/misc/parse.h>
 
 #endif
