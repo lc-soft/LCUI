@@ -42,8 +42,6 @@
 #ifndef __LCUI_WIDGET_BASE_H__
 #define __LCUI_WIDGET_BASE_H__
 
-typedef void (*WidgetCallBackFunc)(LCUI_Widget*);
-
 /** 边框风格 */
 enum BorderStyle {
 	BORDER_STYLE_NONE,	/**< 无边框 */
