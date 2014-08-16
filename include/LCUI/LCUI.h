@@ -77,7 +77,6 @@ typedef unsigned long int LCUI_ID;
 typedef unsigned char LCUI_BOOL;
 typedef unsigned char uchar_t;
 typedef void (*CallBackFunc)(void*,void*);
-typedef struct LCUI_Widget_ LCUI_Widget;
 
 /*--------- 色彩值 ----------*/
 typedef union LCUI_RGB565_ {
@@ -195,10 +194,11 @@ LCUI_END_HEADER
 		fflush(stdout); \
 	}
 
-#include LC_KERNEL_MAIN_H
-#include LC_KERNEL_DEV_H
-#include LC_KERNEL_TIMER_H
-#include LC_KERNEL_EVENT_H
+#include <LCUI/kernel/main.h>
+#include <LCUI/kernel/event.h>
+#include <LCUI/kernel/timer.h>
+#include <LCUI/kernel/device.h>
+#include <LCUI/misc.h>
 
 #if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS) &&defined(I_NEED_WINMAIN)
 
