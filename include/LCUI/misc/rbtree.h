@@ -96,7 +96,7 @@ LCUI_API void* RBTree_GetData( LCUI_RBTree* rbt, int key );
 LCUI_API LCUI_RBTreeNode* RBTree_Insert( LCUI_RBTree *rbt, int key, void *data );
 LCUI_API int RBTree_Erase( LCUI_RBTree *rbt, int key );
 
-LCUI_API int RBTree_CustomErase( LCUI_RBTree *rbt, void *keydata );
+LCUI_API int RBTree_CustomErase( LCUI_RBTree *rbt, const void *keydata );
 LCUI_API LCUI_RBTreeNode* RBTree_CustomSearch( LCUI_RBTree* rbt, const void *keydata );
 LCUI_API void* RBTree_CustomGetData( LCUI_RBTree* rbt, const void *keydata );
 LCUI_API LCUI_RBTreeNode* RBTree_CustomInsert( LCUI_RBTree *rbt, const void *keydata, void *data );
