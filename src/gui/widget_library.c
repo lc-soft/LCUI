@@ -20,7 +20,7 @@
  * ***************************************************************************/
  
 /* ****************************************************************************
- * widget_event.c -- LCUI部件库管理模块
+ * widget_library.c -- LCUI部件库管理模块
  *
  * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
  * 
@@ -55,7 +55,9 @@ static int CompareName( void *data, const void *keydata )
 
 static void OnDestroyWidgetType( void *arg )
 {
-	
+	TypeData *type_data = (TypeData*)arg;
+	free( type_data->name );
+	RBTree_Destroy( &type_data->func_records );
 }
 
 void LCUIWidget_InitTypeLibrary(void)
@@ -63,11 +65,12 @@ void LCUIWidget_InitTypeLibrary(void)
 	RBTree_Init( &widget_type_records );
 	RBTree_OnJudge( &widget_type_records, CompareName );
 	RBTree_SetDataNeedFree( &widget_type_records, FALSE );
+	RBTree_OnDestroy( &widget_type_records, OnDestroyWidgetType );
 }
 
 void LCUIWidget_ClearTypeLibrary(void)
 {
-
+	RBTree_Destroy( &widget_type_records );
 }
 
 /** 添加一个部件类型 */
@@ -96,10 +99,10 @@ int LCUIWidget_AddType( const char *widget_type )
 /** 移除一个部件类型 */
 int LCUIWidget_RemoveType( const char *widget_type )
 {
-	return 0;
+	return RBTree_CustomErase( &widget_type_records, widget_type );
 }
 
-/** 设置指定类型部件的函数 */
+/** 为指定类型的部件设置函数 */
 int LCUIWidget_SetFunc( const char *widget_type, const char *func_type,
 			void(*func)(LCUI_Widget*) )
 {
