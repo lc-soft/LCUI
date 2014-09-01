@@ -218,9 +218,9 @@
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
     <ClCompile Include="..\..\..\src\gui\widget_library.c" />
-    <ClCompile Include="..\..\..\src\gui\widget_msg.c" />
     <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
     <ClCompile Include="..\..\..\src\gui\widget_style.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_task.c" />
     <ClCompile Include="..\..\..\src\input\keyboard.c" />
     <ClCompile Include="..\..\..\src\input\mouse.c" />
     <ClCompile Include="..\..\..\src\input\touchscreen.c" />

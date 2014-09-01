@@ -386,9 +386,6 @@
     <ClCompile Include="..\..\..\src\gui\widget_style.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget_msg.c">
-      <Filter>源文件\gui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\misc\dirent.c">
       <Filter>源文件\misc</Filter>
     </ClCompile>
@@ -433,6 +430,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\style_parser.c">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_task.c">
+      <Filter>源文件\gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
