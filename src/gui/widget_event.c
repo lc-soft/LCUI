@@ -45,13 +45,57 @@ typedef struct LCUI_WidgetEvent {
 	LCUI_Widget *target;		/**< 目标部件 */
 } LCUI_WidgetEvent;
 
+/**
+ * 为部件绑定事件
+ * 需要提供事件的名称、事件处理器（回调函数）、事件附加数据、数据销毁函数。
+ * 通常，事件处理器可能会需要更多的参数，这些参数可作为事件附加数据，每次
+ * 调用事件处理器时，都可以根据附加数据进行相应的操作。
+ * 事件附加数据会在解除事件绑定时被释放。
+ */
 int  Widget_BindEvent( LCUI_Widget *widget, const char *event_name,
-			void(*func)(LCUI_WidgetEvent*), void *func_data ) 
+			void(*func)(LCUI_WidgetEvent*), void *event_data,
+			void (*destroy_data)(void*) ) 
 {
 	return 0;
 }
 
+/** 
+ * 解除与事件的绑定
+ * 这将解除所有与该事件绑定的事件处理器，当传入事件名为NULL时，将解除所有事件
+ * 绑定。
+ */
 int Widget_UnbindEvent( LCUI_Widget *widget, const char *event_name )
+{
+	return 0;
+}
+
+/** 
+ * 解除指定的事件处理器的事件绑定
+ * 需传入事件处理器的ID，该ID可在绑定事件时得到。
+ */
+int Widget_UnbindEventById( LCUI_Widget *widget, int id )
+{
+	return 0;
+}
+
+/** 
+ * 将事件投递给事件处理器，等待处理
+ * 事件将会追加至事件队列中，由部件事件线程进行处理，由于事件附加数据是一次性
+ * 的，若该数据使用的是动态分配的内存，为了不造成内存泄露，应传入相应的数据销
+ * 销毁函数，以在每个事件处理完后释放内存资源。
+ */
+int Widget_PostEvent( LCUI_Widget *widget, const char *name, void *data,
+			 void (*destroy_data)(void*) )
+{
+	return 0;
+}
+
+/** 
+ * 直接将事件发送至处理器 
+ * 这将会直接调用与事件绑定的事件处理器（回调函数），由于是同步执行的，附加的
+ * 事件数据可在调用本函数后执行销毁操作，因此，不用参入数据销毁函数。
+ */
+int Widget_SendEvent( LCUI_Widget *widget, const char *name, void *data )
 {
 	return 0;
 }
