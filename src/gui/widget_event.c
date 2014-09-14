@@ -133,3 +133,57 @@ int Widget_SendEvent( LCUI_Widget *widget, const char *name, void *data )
 {
 	return 0;
 }
+
+/** 响应鼠标的移动 */
+static LCUI_BOOL OnMouseMove()
+{
+	return FALSE;
+}
+
+/** 响应鼠标按键的按下 */
+static LCUI_BOOL OnMouseDown()
+{
+	return FALSE;
+}
+
+/** 响应鼠标按键的释放 */
+static LCUI_BOOL OnMouseUp()
+{
+	return FALSE;
+}
+
+/** 响应按键按下 */
+static LCUI_BOOL OnKeyDown()
+{
+	return FALSE;
+}
+
+/** 响应按键的释放 */
+static LCUI_BOOL OnKeyUp()
+{
+	return FALSE;
+}
+
+/** 响应按键的输入 */
+static LCUI_BOOL OnKeyPress()
+{
+	return FALSE;
+}
+
+/** 响应输入法的输入 */
+static LCUI_BOOL OnInput()
+{
+	return FALSE;
+}
+
+/** 初始化 LCUI 部件的事件功能 */
+void LCUIWidget_EventInit(void)
+{
+
+}
+
+/** 销毁 LCUI 部件的事件功能 */
+void LCUIWidget_EventDestroy(void)
+{
+	
+}
