@@ -40,20 +40,54 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/widget_build.h>
 
+enum WidgetEventType {
+	WET_RESIZE,
+
+	WET_KEYDOWN,
+	WET_KEYUP,
+	WET_KEYPRESS,
+	
+	WET_MOUSEOVER,
+	WET_MOUSEMOVE,
+	WET_MOUSEOUT,
+	WET_MOUSEDOWN,
+	WET_MOUSEUP,
+	WET_CLICK,
+
+	WET_USER
+};
+
 typedef struct LCUI_WidgetEvent {
-	LCUI_SystemEvent event;		/**< 事件数据 */
+	int type;			/**< 事件类型标识号 */
+	const char *type_name;		/**< 事件类型名称 */
+	int which;			/**< 指示按了哪个键或按钮 */
+	int x, y;			/**< 鼠标的坐标(相对于当前部件) */
+	void *data;			/**< 附加数据 */
+	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 	LCUI_Widget *target;		/**< 目标部件 */
 } LCUI_WidgetEvent;
 
 /**
+ * 预先注册一个事件，并指定事件名和事件ID
+ * 如果需要将多个事件绑定在同一个事件处理器上，并且，不想通过进行字符串比较来
+ * 区分事件类型，则可以使用该函数，但需要注意的是，指定的事件ID最好不要与系统
+ * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WIDGET_USER 
+ * 以后的值都可以使用，例如：WET_USER + 1，WET_USER + 200。
+ */
+int Widget_RegisterEventById( LCUI_Widget *widget, const char *event_name, int id )
+{
+	return 0;
+}
+
+/**
  * 为部件绑定事件
- * 需要提供事件的名称、事件处理器（回调函数）、事件附加数据、数据销毁函数。
- * 通常，事件处理器可能会需要更多的参数，这些参数可作为事件附加数据，每次
+ * 需要提供事件的名称、事件处理器（回调函数）、附加数据、数据销毁函数。
+ * 通常，事件处理器可能会需要更多的参数，这些参数可作为附加数据，每次
  * 调用事件处理器时，都可以根据附加数据进行相应的操作。
- * 事件附加数据会在解除事件绑定时被释放。
+ * 附加数据附加数据会在解除事件绑定时被释放。
  */
 int  Widget_BindEvent( LCUI_Widget *widget, const char *event_name,
-			void(*func)(LCUI_WidgetEvent*), void *event_data,
+			void(*func)(LCUI_WidgetEvent*), void *func_data,
 			void (*destroy_data)(void*) ) 
 {
 	return 0;
@@ -93,7 +127,7 @@ int Widget_PostEvent( LCUI_Widget *widget, const char *name, void *data,
 /** 
  * 直接将事件发送至处理器 
  * 这将会直接调用与事件绑定的事件处理器（回调函数），由于是同步执行的，附加的
- * 事件数据可在调用本函数后执行销毁操作，因此，不用参入数据销毁函数。
+ * 事件数据可在调用本函数后手动执行销毁操作，因此，不用参入数据销毁函数。
  */
 int Widget_SendEvent( LCUI_Widget *widget, const char *name, void *data )
 {
