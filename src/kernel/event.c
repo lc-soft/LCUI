@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * event.c -- event processing module
  *
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
