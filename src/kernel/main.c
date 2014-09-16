@@ -53,6 +53,7 @@
 typedef struct FuncDataRec_ {
 	void (*func)(LCUI_SystemEvent*,void*);
 	void *arg;
+	void (*arg_destroy)(void*);
 } FuncData;
 
 /** LCUI 系统相关数据 */
@@ -144,6 +145,13 @@ static void OnEvent( LCUI_Event *event, void *arg )
 	data->func( sys_event, data->arg );
 }
 
+static void FuncDataDestroy( void *arg )
+{
+	FuncData *data = (FuncData*)arg;
+	data->arg_destroy( data->arg );
+	data->arg = NULL;
+}
+
 /** 绑定事件 */
 int LCUI_BindEvent( const char *event_name,
 		    void(*func)(LCUI_SystemEvent*,void*),
@@ -153,8 +161,9 @@ int LCUI_BindEvent( const char *event_name,
 	data = (FuncData*)malloc(sizeof(FuncData));
 	data->func = func;
 	data->arg = func_arg;
+	data->arg_destroy = arg_destroy;
 	return LCUIEventBox_Bind( System.event.box, event_name, 
-					OnEvent, data, arg_destroy );
+					OnEvent, data, FuncDataDestroy );
 }
 
 /** 解除事件绑定 */
