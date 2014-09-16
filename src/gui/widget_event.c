@@ -46,6 +46,7 @@ enum WidgetEventType {
 	WET_KEYDOWN,
 	WET_KEYUP,
 	WET_KEYPRESS,
+	WET_INPUT,
 	
 	WET_MOUSEOVER,
 	WET_MOUSEMOVE,
@@ -63,9 +64,30 @@ typedef struct LCUI_WidgetEvent {
 	int which;			/**< 指示按了哪个键或按钮 */
 	int x, y;			/**< 鼠标的坐标(相对于当前部件) */
 	void *data;			/**< 附加数据 */
-	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 	LCUI_Widget *target;		/**< 目标部件 */
+	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */
 } LCUI_WidgetEvent;
+
+typedef struct FuncDataRec_ {
+	void (*func)(LCUI_WidgetEvent*);
+	void *arg;
+	void (*arg_destroy)(void*);
+} FuncData;
+
+static void FuncDataDestroy( void *arg )
+{
+	FuncData *data = (FuncData*)arg;
+	data->arg_destroy( data->arg );
+	data->arg = NULL;
+}
+
+/** 部件事件转换，用于将原始事件转换成部件事件 */
+static void WidgetEventConverter( LCUI_Event *event, void *arg )
+{
+	FuncData *data = (FuncData*)arg;
+	LCUI_WidgetEvent *widget_event = (LCUI_WidgetEvent*)event->data;
+	data->func( widget_event );
+}
 
 /**
  * 预先注册一个事件，并指定事件名和事件ID
@@ -74,9 +96,9 @@ typedef struct LCUI_WidgetEvent {
  * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WIDGET_USER 
  * 以后的值都可以使用，例如：WET_USER + 1，WET_USER + 200。
  */
-int Widget_RegisterEventById( LCUI_Widget *widget, const char *event_name, int id )
+int Widget_RegisterEventWithId( LCUI_Widget *widget, const char *event_name, int id )
 {
-	return 0;
+	return LCUIEventBox_RegisterEventWithId( &widget->event, event_name, id );
 }
 
 /**
@@ -90,7 +112,13 @@ int  Widget_BindEvent( LCUI_Widget *widget, const char *event_name,
 			void(*func)(LCUI_WidgetEvent*), void *func_data,
 			void (*destroy_data)(void*) ) 
 {
-	return 0;
+	FuncData *data;
+	data = (FuncData*)malloc(sizeof(FuncData));
+	data->func = func;
+	data->arg = func_data;
+	data->arg_destroy = destroy_data;
+	return LCUIEventBox_Bind( &widget->event, event_name, 
+			WidgetEventConverter, data, FuncDataDestroy );
 }
 
 /** 
@@ -152,7 +180,7 @@ static LCUI_BOOL OnMouseUp()
 	return FALSE;
 }
 
-/** 响应按键按下 */
+/** 响应按键的按下 */
 static LCUI_BOOL OnKeyDown()
 {
 	return FALSE;
@@ -174,6 +202,11 @@ static LCUI_BOOL OnKeyPress()
 static LCUI_BOOL OnInput()
 {
 	return FALSE;
+}
+
+static void WidgetEventTrhead()
+{
+
 }
 
 /** 初始化 LCUI 部件的事件功能 */
