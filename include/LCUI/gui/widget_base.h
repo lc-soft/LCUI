@@ -42,96 +42,96 @@
 #ifndef __LCUI_WIDGET_BASE_H__
 #define __LCUI_WIDGET_BASE_H__
 
+/** 如果没有包含 widget_build.h 头文件 */
+#ifndef __LCUI_WIDGET_BUILD_H__
+
+typedef struct LCUI_WidgetBase* LCUI_Widget;
+
+#endif
+
+#ifdef $
+#undef $
+#endif
+
+/** 
+ * $ 可以看成是 self，部件操作函数的第一个参数类型都是LCUI_Widget，想用
+ * 一个字符的来代替，以减少源代码的字符量，再加上又想试试 $，于是就用它了
+ */
+#define $ LCUI_Widget
+
 /** 边框风格 */
 enum BorderStyle {
-	BORDER_STYLE_NONE,	/**< 无边框 */
-	BORDER_STYLE_SOLID,	/**< 实线 */
-	BORDER_STYLE_DOTTED,	/**< 点状 */
-	BORDER_STYLE_DOUBLE,	/**< 双线 */
-	BORDER_STYLE_DASHED,	/**< 虚线 */
+	BORDER_NONE,	/**< 无边框 */
+	BORDER_SOLID,	/**< 实线 */
+	BORDER_DOTTED,	/**< 点状 */
+	BORDER_DOUBLE,	/**< 双线 */
+	BORDER_DASHED,	/**< 虚线 */
 };
 
 /** 部件停靠类型 */
 enum DockType {
-	DOCK_TYPE_NONE,
-	DOCK_TYPE_TOP,
-	DOCK_TYPE_LEFT,
-	DOCK_TYPE_RIGHT,
-	DOCK_TYPE_FILL,
-	DOCK_TYPE_BOTTOM
+	DOCK_NONE,
+	DOCK_TOP,
+	DOCK_LEFT,
+	DOCK_RIGHT,
+	DOCK_FILL,
+	DOCK_BOTTOM
 };
 
-/** 部件结构（仅包含样式），大部分是只读的，对其修改不会影响部件效果 */
-typedef struct LCUI_WidgetLite {
-	LCUI_BOOL visible;		/**< 是否可见 */
-	int position;			/**< 定位方式 */
-	int dock;			/**< 停靠位置 */
-	StyleVar x, y;			/**< 当前坐标 */
-	StyleVar offsetX, offsetY;	/**< 水平、垂直坐标偏移量 */
-	union {
-		StyleVar w, width;	/**< 部件区域宽度 */
-	};
-	union {
-		StyleVar h, height;	/**< 部件区域高度 */
-	};
-	int inner_width, inner_height;	/**< 部件内部区域大小，除去内边距占用区域 */
-	int outer_width, outer_height;	/**< 部件外部区域大小，包括边框和阴影占用区域 */
-
-	struct {
-		int top, right, bottom, left;
-	} margin, padding;		/**< 外边距（暂不支持）, 内边距 */
-
-	struct {
-		LCUI_Graph image;	/**< 背景图 */
-		LCUI_Color color;	/**< 背景色 */
+typedef struct LCUI_WidgetBase {
+	int width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
+	int innerWidth, innerHeight;	/**< 内部区域大小，不包括内边距占用区域 */
+	int outerWidth, outerHeight;	/**< 外部区域大小，包括边框和阴影占用区域 */
 	
-		struct {
-			LCUI_BOOL x, y;
-		} repeat;		/**< 背景图是否重复 */
+	void		(*show)($, LCUI_BOOL);
+	LCUI_BOOL	(*visible)($);
+	void		(*dock)($, int);
+	void		(*css)($, const char*, const char*);
+	void		(*shadow)($, int, int, int, LCUI_Color);
+	void		(*focus)($, LCUI_BOOL);
 
-		int clip;		/**< 背景图的裁剪方式 */
+	struct {
+		void (*top)($, int);
+		void (*right)($, int);
+		void (*bottom)($, int);
+		void (*left)($, int);
+		void (*all)($, int, int, int, int);
+	} margin, padding;
 
+	struct {
+		void (*top)(int, int, LCUI_Color);
+		void (*right)(int, int, LCUI_Color);
+		void (*bottom)(int, int, LCUI_Color);
+		void (*left)(int, int, LCUI_Color);
+		void (*all)(int, int, LCUI_Color);
 		struct {
-			StyleVar x, y;
-		} position;		/**< 定位方式 */
-		struct {
-			StyleVar w, h;
-		} size;
-		int origin;		/**< 相对于何种位置进行定位 */
+			void (*topLeft)(int);
+			void (*topRight)(int);
+			void (*bottomLeft)(int);
+			void (*bottomRight)(int);
+			void (*all)(int);
+		} radius;
+	} border;
+
+	struct {
+		void (*color)($, LCUI_Color);
+		void (*image)($, LCUI_Graph);
+		void (*repeat)($, LCUI_BOOL, LCUI_BOOL);
+		void (*position)($, const char*, const char*);
+		void (*size)($, const char*, const char*);
+		void (*origin)($, int);
 	} background;
 
 	struct {
-		int x, y;		/**< 位置 */
-		int blur;		/**< 模糊距离 */
-		int spread;		/**< 扩散大小 */
-		LCUI_Color color;	/**< 颜色 */
-	} shadow;			/**< 阴影 */
-
-	struct {
-		struct {
-			int width;
-			int style;
-			LCUI_Color color;
-		} top, right, bottom, left;
-		unsigned int top_left_radius;
-		unsigned int top_right_radius;
-		unsigned int bottom_left_radius;
-		unsigned int bottom_right_radius;
-	} border;			/**< 边框 */
-
-	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
-	struct {
-		struct {
-			float x, y;
-		} scale;		/**< 2D 缩放 */
-		float rotate;		/**< 2D 旋转角度 */
+		void (*scale)($, float, float);
+		void (*rotate)($, float);
 	} transform;
 
-} LCUI_WidgetLite;
+	void		(*setName)($, const char*);
+	void		(*setOpacity)($, float);
+	void		(*setStyleClassName)($, const char*);
+} LCUI_WidgetBase;
 
-/** 如果没有包含 widget_build.h 头文件，则使用只包含样式的 LCUI_Widget */
-#ifndef __LCUI_WIDGET_BUILD_H__
-typedef LCUI_WidgetLite LCUI_Widget;
-#endif
+#undef $
 
 #endif
