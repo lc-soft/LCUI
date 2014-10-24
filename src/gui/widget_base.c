@@ -41,5 +41,4 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/widget.h>
-#include "widget_private.h"
+#include <LCUI/widget_build.h>
