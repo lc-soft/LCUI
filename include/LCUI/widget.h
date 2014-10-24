@@ -1,5 +1,5 @@
 ﻿/* ***************************************************************************
- * LCUI_Widget.h -- GUI widget operation set.
+ * widget.h -- GUI widget operation set.
  *
  * Copyright (C) 2012-2014 by
  * Liu Chao
@@ -21,7 +21,7 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * LCUI_Widget.h -- GUI部件操作集
+ * widget.h -- GUI部件的常用操作函数。
  *
  * 版权所有 (C) 2012-2014 归属于
  * 刘超
@@ -42,13 +42,7 @@
 #ifndef __LCUI_WIDGET_H__
 #define __LCUI_WIDGET_H__
 
-LCUI_BEGIN_HEADER
-
 #include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_task.h>
 #include <LCUI/gui/widget_event.h>
-#include <LCUI/gui/widget_paint.h>
-
-LCUI_END_HEADER
 
 #endif
