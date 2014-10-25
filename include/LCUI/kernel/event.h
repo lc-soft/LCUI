@@ -41,6 +41,9 @@
 #ifndef __LCUI_KERNEL_EVENT_H__
 #define __LCUI_KERNEL_EVENT_H__
 
+/** 为本文件内的函数名加上前缀 */
+#define $(FUNC_NAME) LCUIEventBox_##FUNC_NAME
+
 LCUI_BEGIN_HEADER
 
 /** 事件 */
@@ -52,47 +55,56 @@ typedef struct LCUI_EventRec_ {
 } LCUI_Event;
 
 typedef void(*EventCallBack)(LCUI_Event*, void*);
+
+#ifndef __IN_EVENT_SOURCE_FILE__
 typedef void* LCUI_EventBox;
+#else
+typedef struct LCUI_EventBoxRec_* LCUI_EventBox;
+#endif
 
 /** 创建一个事件容器实例 */
-LCUI_API LCUI_EventBox LCUIEventBox_Create(void);
+LCUI_EventBox $(Create)(void);
 
 /** 销毁事件容器实例 */
-LCUI_API void LCUIEventBox_Destroy( LCUI_EventBox box );
+LCUI_API void $(Destroy)( LCUI_EventBox box );
 
 /** 注册事件，指定事件名称和ID */
-LCUI_API int LCUIEventBox_RegisterEventWithId( LCUI_EventBox box, 
-					 const char *event_name, int id );
+LCUI_API int $(RegisterEventWithId)( LCUI_EventBox box, const char *event_name, int id );
 
 /** 注册事件，只指定事件名称，事件ID由内部自动生成 */
-LCUI_API int LCUIEventBox_RegisterEvent( LCUI_EventBox box, const char *event_name );
+LCUI_API int $(RegisterEvent)( LCUI_EventBox box, const char *event_name );
 
 /** 绑定指定ID的事件 */
-LCUI_API int LCUIEventBox_BindById( LCUI_EventBox box, int event_id,
-				EventCallBack func, void *func_data, 
-				void (*destroy_data)(void*) );
+LCUI_API int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
+			void *func_data, void (*destroy_data)(void*) );
 
 /** 绑定指定名称的事件 */
-LCUI_API int LCUIEventBox_Bind( LCUI_EventBox box, const char *event_name,
+LCUI_API int $(Bind)(	LCUI_EventBox box, const char *event_name,
 			EventCallBack func, void *func_data, 
 			void (*destroy_data)(void*) );
 
 /** 解除事件连接 */
-LCUI_API int LCUIEventBox_Unbind( LCUI_EventBox box, int handler_id );
+LCUI_API int $(Unbind)( LCUI_EventBox box, int handler_id );
 
 /** 直接将事件发送至事件处理器进行处理 */
-LCUI_API int LCUIEventBox_Send( LCUI_EventBox box, const char *name, void *data );
+LCUI_API int $(Send)( LCUI_EventBox box, const char *name, void *data );
 
 /** 将事件投递给事件处理器，等待处理 */
-LCUI_API int LCUIEventBox_Post( LCUI_EventBox box, const char *name,
-		       void *data, void (*destroy_data)(void*) );
+LCUI_API int $(Post)(	LCUI_EventBox box, const char *name, void *data,
+			void (*destroy_data)(void*) );
+
+/** 切换当前使用的事件任务列表 */
+LCUI_API int $(SwapCache)( LCUI_EventBox box );
 
 /** 从已触发的事件记录中取出（不会移除）一个事件信息 */
-LCUI_API int LCUIEventBox_GetEvent( LCUI_EventBox box, LCUI_Event *ebuff );
+LCUI_API int $(GetEvent)( LCUI_EventBox box, LCUI_Event *ebuff );
 
 /** 从已触发的事件记录中删除一个事件信息 */
-LCUI_API int LCUIEventBox_DeleteEvent( LCUI_EventBox box );
+LCUI_API int $(DeleteEvent)( LCUI_EventBox box );
+
 
 LCUI_END_HEADER
+
+#undef $
 
 #endif
