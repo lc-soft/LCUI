@@ -183,6 +183,16 @@ struct LCUI_Graph_ {
 };
 /*------------------------------ END ---------------------------------*/
 
+enum SystemEventType {
+	SYSEVENT_MOUSEUP,	/**< 鼠标触发的按钮释放事件 */
+	SYSEVENT_MOUSEDOWN,	/**< 鼠标触发的按钮按下事件 */
+	SYSEVENT_MOUSEMOVE,	/**< 鼠标触发的鼠标移动事件 */
+	SYSEVENT_KEYUP,		/**< 键盘触发的按键释放事件 */
+	SYSEVENT_KEYDOWN,	/**< 键盘触发的按键按下事件 */
+	SYSEVENT_INPUT,		/**< 输入法触发的文本输入事件 */
+	SYSEVENT_USER = 100	/**< 用户自定义事件的初始ID号 */
+};
+
 LCUI_END_HEADER
 
 #define MAX_APP_IDLE_TIME	50
