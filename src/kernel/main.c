@@ -40,13 +40,8 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/misc/linkedlist.h>
-//#include LC_DISPLAY_H
-#include LC_THREAD_H
-//#include LC_CURSOR_H 
-#include LC_INPUT_H
-//#include LC_INPUT_METHOD_H
-//#include LC_FONT_H 
-//#include LC_WIDGET_H
+#include <LCUI/thread.h>
+#include <LCUI/input.h>
 
 #include <time.h>
 
