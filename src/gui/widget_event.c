@@ -64,7 +64,7 @@ typedef struct LCUI_WidgetEvent {
 	int which;			/**< 指示按了哪个键或按钮 */
 	int x, y;			/**< 鼠标的坐标(相对于当前部件) */
 	void *data;			/**< 附加数据 */
-	LCUI_Widget *target;		/**< 目标部件 */
+	LCUI_Widget target;		/**< 目标部件 */
 	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */
 } LCUI_WidgetEvent;
 
@@ -73,6 +73,9 @@ typedef struct FuncDataRec_ {
 	void *arg;
 	void (*arg_destroy)(void*);
 } FuncData;
+
+static LCUI_RBTree widget_mark_tree;	/**< 记录当前已经标记的部件 */
+static LinkedList widget_list;		/**< 待处理部件列表（按事件触发时间先后排列） */
 
 static void FuncDataDestroy( void *arg )
 {
@@ -96,7 +99,7 @@ static void WidgetEventConverter( LCUI_Event *event, void *arg )
  * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WIDGET_USER 
  * 以后的值都可以使用，例如：WET_USER + 1，WET_USER + 200。
  */
-int Widget_RegisterEventWithId( LCUI_Widget *widget, const char *event_name, int id )
+int Widget_RegisterEventWithId( LCUI_Widget widget, const char *event_name, int id )
 {
 	return LCUIEventBox_RegisterEventWithId( &widget->event, event_name, id );
 }
@@ -108,7 +111,7 @@ int Widget_RegisterEventWithId( LCUI_Widget *widget, const char *event_name, int
  * 调用事件处理器时，都可以根据附加数据进行相应的操作。
  * 附加数据附加数据会在解除事件绑定时被释放。
  */
-int  Widget_BindEvent( LCUI_Widget *widget, const char *event_name,
+int  Widget_BindEvent( LCUI_Widget widget, const char *event_name,
 			void(*func)(LCUI_WidgetEvent*), void *func_data,
 			void (*destroy_data)(void*) ) 
 {
@@ -126,7 +129,7 @@ int  Widget_BindEvent( LCUI_Widget *widget, const char *event_name,
  * 这将解除所有与该事件绑定的事件处理器，当传入事件名为NULL时，将解除所有事件
  * 绑定。
  */
-int Widget_UnbindEvent( LCUI_Widget *widget, const char *event_name )
+int Widget_UnbindEvent( LCUI_Widget widget, const char *event_name )
 {
 	return 0;
 }
@@ -135,7 +138,7 @@ int Widget_UnbindEvent( LCUI_Widget *widget, const char *event_name )
  * 解除指定的事件处理器的事件绑定
  * 需传入事件处理器的ID，该ID可在绑定事件时得到。
  */
-int Widget_UnbindEventById( LCUI_Widget *widget, int id )
+int Widget_UnbindEventById( LCUI_Widget widget, int id )
 {
 	return 0;
 }
@@ -146,10 +149,13 @@ int Widget_UnbindEventById( LCUI_Widget *widget, int id )
  * 的，若该数据使用的是动态分配的内存，为了不造成内存泄露，应传入相应的数据销
  * 销毁函数，以在每个事件处理完后释放内存资源。
  */
-int Widget_PostEvent( LCUI_Widget *widget, const char *name, void *data,
+int Widget_PostEvent( LCUI_Widget widget, const char *name, void *data,
 			 void (*destroy_data)(void*) )
 {
-	return 0;
+	if( !RBTree_Search( &widget_mark_tree, (int)widget ) ) {
+		RBTree_Insert( &widget_mark_tree, (int)widget, NULL );
+	}
+	return LCUIEventBox_Post( widget->event, name, data, destroy_data );
 }
 
 /** 
@@ -157,9 +163,9 @@ int Widget_PostEvent( LCUI_Widget *widget, const char *name, void *data,
  * 这将会直接调用与事件绑定的事件处理器（回调函数），由于是同步执行的，附加的
  * 事件数据可在调用本函数后手动执行销毁操作，因此，不用参入数据销毁函数。
  */
-int Widget_SendEvent( LCUI_Widget *widget, const char *name, void *data )
+int Widget_SendEvent( LCUI_Widget widget, const char *name, void *data )
 {
-	return 0;
+	return LCUIEventBox_Send( widget->event, name, data );
 }
 
 /** 响应鼠标的移动 */
@@ -204,19 +210,33 @@ static LCUI_BOOL OnInput()
 	return FALSE;
 }
 
-static void WidgetEventTrhead()
+/** LCUI 部件的事件系统处理一次当前积累的部件事件 */
+void LCUIWidget_Event_Step(void)
 {
+	int i, n;
+	LCUI_Widget widget;
 
+	n = LinkedList_GetTotal( &widget_list );
+	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &widget_list, 0 );
+		widget = (LCUI_Widget)LinkedList_Get( &widget_list );
+		LinkedList_Delete( &widget_list );
+		LCUIEventBox_Dispatch( widget->event );
+		RBTree_Erase( &widget_mark_tree, (int)widget );
+	}
 }
 
-/** 初始化 LCUI 部件的事件功能 */
-void LCUIWidget_EventInit(void)
+/** 初始化 LCUI 部件的事件系统 */
+void LCUIWidget_Event_Init(void)
 {
-
+	RBTree_Init( &widget_mark_tree );
+	RBTree_SetDataNeedFree( &widget_mark_tree, FALSE );
+	LinkedList_Init( &widget_list, sizeof(LCUI_Widget) );
+	LinkedList_SetDataNeedFree( &widget_list, FALSE );
 }
 
-/** 销毁 LCUI 部件的事件功能 */
-void LCUIWidget_EventDestroy(void)
+/** 销毁（释放） LCUI 部件的事件系统的相关资源 */
+void LCUIWidget_Event_Destroy(void)
 {
 	
 }
