@@ -93,8 +93,8 @@ LCUI_API int $(Send)( LCUI_EventBox box, const char *name, void *data );
 LCUI_API int $(Post)(	LCUI_EventBox box, const char *name, void *data,
 			void (*destroy_data)(void*) );
 
-/** 切换当前使用的事件任务列表 */
-LCUI_API int $(SwapCache)( LCUI_EventBox box );
+/** 派发当前待处理的事件至对应的处理器 */
+LCUI_API int $(Dispatch)( LCUI_EventBox box );
 
 /** 从已触发的事件记录中取出（不会移除）一个事件信息 */
 LCUI_API int $(GetEvent)( LCUI_EventBox box, LCUI_Event *ebuff );

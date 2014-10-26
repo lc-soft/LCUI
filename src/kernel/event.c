@@ -334,14 +334,25 @@ int $(Post)(	LCUI_EventBox box, const char *name, void *data,
 	return 0;
 }
 
-/** 切换当前使用的事件任务列表 */
-int $(SwapCache)( LCUI_EventBox box )
+/** 派发当前待处理的事件至对应的处理器 */
+int $(Dispatch)( LCUI_EventBox box )
 {
-	if( box->current == 1 ) {
-		box->current = 0;
-	} else {
-		box->current = 1;
+	int i, n;
+	LCUI_Event *e;
+	LinkedList *elist;
+	
+	box->current = box->current ? 0:1;
+	elist = &box->events[box->current ? 0:1];
+	n = LinkedList_GetTotal( elist );
+	LinkedList_Goto( elist, 0 );
+	for( i=0; i<n; ++i ) {
+		e = (LCUI_Event*)LinkedList_Get( elist );
+		$(Send)( box, e->name, e->data );
+		e->destroy_data ? e->destroy_data( e->data ):0;
+		LinkedList_Goto( elist, 0 );
+		LinkedList_Delete( elist );
 	}
+	box->current = box->current ? 0:1;
 	return 0;
 }
 
@@ -350,10 +361,11 @@ int $(GetEvent)( LCUI_EventBox box, LCUI_Event *ebuff )
 {
 	int n;
 	LCUI_Event *event;
-	LinkedList *elist = &box->events[box->current == 1 ? 0:1];
-
+	LinkedList *elist;
+	
+	elist = &box->events[box->current == 1 ? 0:1];
 	n = LinkedList_GetTotal( elist );
-	if( box == NULL || n <= 0 ) {
+	if( n <= 0 ) {
 		return -1;
 	}
 	LinkedList_Goto( elist, 0 );
@@ -365,10 +377,10 @@ int $(GetEvent)( LCUI_EventBox box, LCUI_Event *ebuff )
 /** 从已触发的事件记录中删除一个事件信息 */
 int $(DeleteEvent)( LCUI_EventBox box )
 {
-	LinkedList *elist = &box->events[box->current == 1 ? 0:1];
-
-	if( box == NULL || LinkedList_GetTotal( elist ) <= 0 ) {
-		return -1;
+	LinkedList *elist;
+	elist = &box->events[box->current == 1 ? 0:1];
+	if( LinkedList_GetTotal( elist ) <= 0 ) {
+		return -2;
 	}
 	LinkedList_Delete( elist );
 	return 0;
