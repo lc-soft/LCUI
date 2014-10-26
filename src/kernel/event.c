@@ -201,6 +201,24 @@ int $(RegisterEvent)( LCUI_EventBox box, const char *event_name )
 	return ret;
 }
 
+/** 检测事件名是否已经存在（已注册） */
+int $(IsExistEventName)( LCUI_EventBox box, const char *event_name )
+{
+	if( RBTree_CustomSearch( &box->event_name, (const void*)event_name) ) {
+		return 1;
+	}
+	return 0;
+}
+
+/** 检测事件ID是否已经存在 */
+int $(IsExistEventId)( LCUI_EventBox box, int id )
+{
+	if( RBTree_Search( &box->event_slot, id ) ) {
+		return 1;
+	}
+	return 0;
+}
+
 /** 绑定指定ID的事件 */
 int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
 		 void *func_data, void (*destroy_data)(void*) )
