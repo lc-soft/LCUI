@@ -97,6 +97,11 @@ typedef struct LCUI_MainLoopRec_ {
 
 /*-------------------------- system event <START> ---------------------------*/
 
+#define EVENT_NAME_LIST_MAX_LEN 10
+
+static int user_event_id = SYSEVENT_USER;
+static char *sys_event_name_list[EVENT_NAME_LIST_MAX_LEN];
+
 /** 系统事件处理线程 */
 static void SystemEventThread(void *arg)
 {
@@ -141,16 +146,54 @@ static void FuncDataDestroy( void *arg )
 	data->arg = NULL;
 }
 
-/** 绑定事件 */
-int LCUI_BindEvent( const char *event_name,
-		    void(*func)(LCUI_SystemEvent*,void*),
-		    void *func_arg, void (*arg_destroy)(void*) )
+/** 绑定指定ID的事件 */
+int LCUI_BindEventById( int id, void(*func)(LCUI_SystemEvent*,void*),
+			void *func_arg, void (*arg_destroy)(void*) )
 {
 	FuncData *data;
 	data = (FuncData*)malloc(sizeof(FuncData));
 	data->func = func;
 	data->arg = func_arg;
 	data->arg_destroy = arg_destroy;
+	/** 如果该事件没有注册，则当成用户事件 */
+	if( !LCUIEventBox_IsExistEventId( System.event.box, id ) ) {
+		return LCUIEventBox_BindById( 
+			System.event.box, user_event_id++,
+			OnEvent, data, FuncDataDestroy
+		);
+	}
+	return LCUIEventBox_BindById( System.event.box, id, OnEvent,
+					data, FuncDataDestroy );
+}
+
+/** 绑定事件 */
+int LCUI_BindEvent( const char *event_name,
+		    void(*func)(LCUI_SystemEvent*,void*),
+		    void *func_arg, void (*arg_destroy)(void*) )
+{
+	int i;
+	FuncData *data;
+
+	data = (FuncData*)malloc(sizeof(FuncData));
+	data->func = func;
+	data->arg = func_arg;
+	data->arg_destroy = arg_destroy;
+	/** 如果该事件没有注册 */
+	if( !LCUIEventBox_IsExistEventName( System.event.box, event_name ) ) {
+		/** 检查是否属于系统事件 */
+		for( i=0; i<EVENT_NAME_LIST_MAX_LEN; ++i ) {
+			if( strcmp(sys_event_name_list[i], event_name) == 0 ) {
+				break;
+			}
+		}
+		/** 不是的话则事件ID号从 user_event_id 开始递增 */
+		if( i >= EVENT_NAME_LIST_MAX_LEN ) {
+			return LCUIEventBox_BindById( 
+				System.event.box, user_event_id++,
+				OnEvent, data, FuncDataDestroy
+			);
+		}
+	}
 	return LCUIEventBox_Bind( System.event.box, event_name, 
 					OnEvent, data, FuncDataDestroy );
 }
