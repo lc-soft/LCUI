@@ -100,16 +100,10 @@ typedef struct LCUI_MainLoopRec_ {
 /** 系统事件处理线程 */
 static void SystemEventThread(void *arg)
 {
-	LCUI_Event event;
 	System.event.is_running = TRUE;
 	while( System.event.is_running ) {
 		LCUICond_Wait( &System.event.cond );
-		if( LCUIEventBox_GetEvent( &System.event.box, &event ) != 0 ) {
-			continue;
-		}
-		LCUIEventBox_Send( System.event.box, event.name, event.data );
-		/* 删除这个事件的记录 */
-		LCUIEventBox_DeleteEvent( System.event.box );
+		LCUIEventBox_Dispatch( &System.event.box );
 	}
 }
 
