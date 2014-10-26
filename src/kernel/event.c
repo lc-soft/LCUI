@@ -48,7 +48,7 @@
 
 #include <string.h>
 
-#define MALLOC_ONE(type) (type*)malloc(sizeof(type))
+#define NEW_ONE(type) (type*)malloc(sizeof(type))
 
 /** 为本文件内的函数名加上前缀 */
 #define $(FUNC_NAME) LCUIEventBox_##FUNC_NAME
@@ -113,7 +113,7 @@ static void DestroyEvent( void *data )
 LCUI_EventBox $(Create)(void)
 {
 	LCUI_EventBox box;
-	box = MALLOC_ONE(struct LCUI_EventBoxRec_);
+	box = NEW_ONE(struct LCUI_EventBoxRec_);
 	box->event_id = 100;
 	box->handler_id = 100;
 	box->current = 0;
@@ -147,25 +147,22 @@ void $(Destroy)( LCUI_EventBox box )
 	LinkedList_Destroy( &box->events[1] );
 }
 
-static int _LCUIEventBox_RegisterEventWithId( LCUI_EventBox box, 
-				      const char *event_name, int id )
+static int $($RegisterEvent)( LCUI_EventBox box, const char *event_name, int id )
 {
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	
 	/* 查找事件槽记录 */
-	node = RBTree_CustomSearch( 
+	if( node = RBTree_CustomSearch( 
 		&box->event_name, (const void*)event_name
-	);
-	if( node ) {
+	) ) {
 		return -1;
 	}
-	node = RBTree_Search( &box->used_evnet_id, id );
-	if( node ) {
+	if( node = RBTree_Search( &box->used_evnet_id, id ) ) {
 		return -2;
 	}
 	/* 新建一个事件槽 */
-	slot = MALLOC_ONE(LCUI_EventSlot);
+	slot = NEW_ONE(LCUI_EventSlot);
 	slot->name = (char*)malloc(sizeof(char)*(strlen(event_name)+1));
 	slot->id = id;
 	strcpy( slot->name, event_name );
@@ -184,15 +181,12 @@ static int _LCUIEventBox_RegisterEventWithId( LCUI_EventBox box,
 /** 注册事件，指定事件名称和ID */
 int $(RegisterEventWithId)( LCUI_EventBox box, const char *event_name, int id )
 {
-	LCUI_RBTreeNode *node;
-	
-	node = RBTree_Search( &box->used_evnet_id, id );
 	/** 如果该ID已经被使用 */
-	if( node ) {
+	if( RBTree_Search( &box->used_evnet_id, id ) ) {
 		return -1;
 	}
 	RBTree_Insert( &box->used_evnet_id, id, NULL );
-	return _LCUIEventBox_RegisterEventWithId( box, event_name, id );
+	return $($RegisterEvent)( box, event_name, id );
 }
 
 /** 注册事件，只指定事件名称，事件ID由内部自动生成 */
@@ -200,7 +194,7 @@ int $(RegisterEvent)( LCUI_EventBox box, const char *event_name )
 {
 	int ret, id;
 	id = ++box->event_id;
-	ret = LCUIEventBox_RegisterEventWithId( box, event_name, id );
+	ret = $($RegisterEvent)( box, event_name, id );
 	if( ret == 0 ) {
 		return id;
 	}
@@ -220,7 +214,7 @@ int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
 		return -1;
 	}
 	slot = (LCUI_EventSlot*)node->data;
-	handler = MALLOC_ONE(LCUI_EventHandler);
+	handler = NEW_ONE(LCUI_EventHandler);
 	handler->id = ++box->handler_id;
 	handler->func = func;
 	handler->func_data = func_data;
@@ -245,14 +239,14 @@ int $(Bind)(	LCUI_EventBox box, const char *event_name, EventCallBack func,
 	);
 	/** 没有就注册一个事件槽 */
 	if( !node ) {
-		id = LCUIEventBox_RegisterEvent( box, event_name );
+		id = $(RegisterEvent)( box, event_name );
 		if( id < 0 ) {
 			return -1;
 		}
 	} else {
 		id = node->key;
 	}
-	return LCUIEventBox_BindById( 
+	return $(BindById)( 
 		box, id, func, func_data, destroy_data
 	);
 }
@@ -265,12 +259,10 @@ int $(Unbind)( LCUI_EventBox box, int handler_id )
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
 
-	node = RBTree_Search( &box->event_handler, handler_id );
-	if( !node ) {
+	if( !(node = RBTree_Search(&box->event_handler, handler_id)) ) {
 		return -1;
 	}
-	node = RBTree_Search( &box->event_slot, (int)(node->data) );
-	if( !node ) {
+	if( !(node = RBTree_Search(&box->event_slot, (int)(node->data))) ) {
 		return -2;
 	}
 	slot = (LCUI_EventSlot*)node->data;
@@ -297,12 +289,10 @@ int $(Send)( LCUI_EventBox box, const char *name, void *data )
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
 	
-	node = RBTree_CustomSearch( &box->event_name, (const void*)name );
-	if( !node ) {
+	if( !(node = RBTree_CustomSearch(&box->event_name, (const void*)name)) ) {
 		return -1;
 	}
-	node = RBTree_Search( &box->event_slot, node->key );
-	if( !node ) {
+	if( !(node = RBTree_Search(&box->event_slot, node->key)) ) {
 		return -2;
 	}
 	slot = (LCUI_EventSlot*)node->data;
@@ -329,12 +319,10 @@ int $(Post)(	LCUI_EventBox box, const char *name, void *data,
 	LCUI_EventSlot *slot;
 	LinkedList *elist = &box->events[box->current];
 	
-	node = RBTree_CustomSearch( &box->event_name, (const void*)name );
-	if( !node ) {
+	if( !(node = RBTree_CustomSearch(&box->event_name, (const void*)name)) ) {
 		return -1;
 	}
-	node = RBTree_Search( &box->event_slot, node->key );
-	if( !node ) {
+	if( !(node = RBTree_Search(&box->event_slot, node->key)) ) {
 		return -2;
 	}
 	slot = (LCUI_EventSlot*)node->data;
