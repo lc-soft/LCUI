@@ -54,7 +54,7 @@ enum WidgetEventType {
 	WET_MOUSEDOWN,
 	WET_MOUSEUP,
 	WET_CLICK,
-
+	
 	WET_USER
 };
 
@@ -64,12 +64,17 @@ typedef struct LCUI_WidgetEvent {
 	int which;			/**< 指示按了哪个键或按钮 */
 	int x, y;			/**< 鼠标的坐标(相对于当前部件) */
 	void *data;			/**< 附加数据 */
-	LCUI_Widget target;		/**< 目标部件 */
+	LCUI_Widget target;		/**< 触发事件的部件 */
 	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */
 } LCUI_WidgetEvent;
 
+typedef struct LCUI_WidgetEventPack {
+	LCUI_WidgetEvent event;	/**< 事件数据 */
+	LCUI_Widget widget;	/**< 当前处理该事件的部件 */
+} LCUI_WidgetEventPack;
+
 typedef struct FuncDataRec_ {
-	void (*func)(LCUI_WidgetEvent*);
+	void (*func)(LCUI_Widget, LCUI_WidgetEvent*);
 	void *arg;
 	void (*arg_destroy)(void*);
 } FuncData;
@@ -88,8 +93,11 @@ static void FuncDataDestroy( void *arg )
 static void WidgetEventConverter( LCUI_Event *event, void *arg )
 {
 	FuncData *data = (FuncData*)arg;
-	LCUI_WidgetEvent *widget_event = (LCUI_WidgetEvent*)event->data;
-	data->func( widget_event );
+	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)event->data;
+	pack->event.data = data->arg;
+	pack->event.type = event->id;
+	pack->event.type_name = event->name;
+	data->func( pack->widget, &pack->event );
 }
 
 /**
@@ -169,45 +177,49 @@ int Widget_SendEvent( LCUI_Widget widget, const char *name, void *data )
 }
 
 /** 响应鼠标的移动 */
-static LCUI_BOOL OnMouseMove()
+static void OnMouseMove( LCUI_SystemEvent *event, void *arg )
 {
-	return FALSE;
+	int x, y;
+	LCUI_Widget target;
+
+
+	target = Widget_At( NULL, x, y );
 }
 
 /** 响应鼠标按键的按下 */
-static LCUI_BOOL OnMouseDown()
+static void OnMouseDown( LCUI_SystemEvent *event, void *arg )
 {
-	return FALSE;
+
 }
 
 /** 响应鼠标按键的释放 */
-static LCUI_BOOL OnMouseUp()
+static void OnMouseUp( LCUI_SystemEvent *event, void *arg )
 {
-	return FALSE;
+	
 }
 
 /** 响应按键的按下 */
-static LCUI_BOOL OnKeyDown()
+static void OnKeyDown( LCUI_SystemEvent *event, void *arg )
 {
-	return FALSE;
+
 }
 
 /** 响应按键的释放 */
-static LCUI_BOOL OnKeyUp()
+static void OnKeyUp( LCUI_SystemEvent *event, void *arg )
 {
-	return FALSE;
+
 }
 
 /** 响应按键的输入 */
-static LCUI_BOOL OnKeyPress()
+static void OnKeyPress( LCUI_SystemEvent *event, void *arg )
 {
-	return FALSE;
+
 }
 
 /** 响应输入法的输入 */
-static LCUI_BOOL OnInput()
+static void OnInput( LCUI_SystemEvent *event, void *arg )
 {
-	return FALSE;
+
 }
 
 /** LCUI 部件的事件系统处理一次当前积累的部件事件 */
@@ -233,6 +245,14 @@ void LCUIWidget_Event_Init(void)
 	RBTree_SetDataNeedFree( &widget_mark_tree, FALSE );
 	LinkedList_Init( &widget_list, sizeof(LCUI_Widget) );
 	LinkedList_SetDataNeedFree( &widget_list, FALSE );
+
+	LCUI_BindEvent( "mouseup", OnMouseUp, NULL, NULL );
+	LCUI_BindEvent( "mousedown", OnMouseDown, NULL, NULL );
+	LCUI_BindEvent( "mousemove", OnMouseMove, NULL, NULL );
+	LCUI_BindEvent( "mouseup", OnMouseUp, NULL, NULL );
+	LCUI_BindEvent( "keyup", OnKeyUp, NULL, NULL );
+	LCUI_BindEvent( "keydown", OnKeyDown, NULL, NULL );
+	LCUI_BindEvent( "input", OnInput, NULL, NULL );
 }
 
 /** 销毁（释放） LCUI 部件的事件系统的相关资源 */
