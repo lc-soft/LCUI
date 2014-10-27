@@ -184,6 +184,7 @@ struct LCUI_Graph_ {
 /*------------------------------ END ---------------------------------*/
 
 enum SystemEventType {
+	SYSEVENT_MOUSE,		/**< 鼠标事件 */
 	SYSEVENT_MOUSEUP,	/**< 鼠标触发的按钮释放事件 */
 	SYSEVENT_MOUSEDOWN,	/**< 鼠标触发的按钮按下事件 */
 	SYSEVENT_MOUSEMOVE,	/**< 鼠标触发的鼠标移动事件 */
@@ -220,7 +221,6 @@ LCUI_END_HEADER
 	#define _tcscpy_s strcpy_s
 #endif
 
-/* 若是UNICODE字符，请手动将参数argv转换由char为wchar_t类型 */
 extern int main( int argc, char *argv[] );
 
 int
@@ -241,22 +241,22 @@ WinMain (
     )
 {
 	int ret, len, i = 0, argc = 0;
-	TCHAR *pCmdLine, *cmdline_buff;
+	TCHAR *p_cmd_line, *cmdline_buff;
 	TCHAR *token = NULL, *next_token = NULL;
 	TCHAR **argv = NULL;
 	
 	Win32_LCUI_Init( hInstance );
 	/* 获取命令行 */
-	pCmdLine = GetCommandLine();
+	p_cmd_line = GetCommandLine();
 	/* 计算命令行的长度 */
-	len = _tcslen( pCmdLine ) + 1;
+	len = _tcslen( p_cmd_line ) + 1;
 	/* 分配一段相应长度的内存空间 */
 	cmdline_buff = (TCHAR*)malloc( sizeof(TCHAR)*len );
 	if( cmdline_buff == NULL ) {
 		return -1;
 	}
 	/* 拷贝该命令行 */
-	_tcscpy_s( cmdline_buff, len, pCmdLine );
+	_tcscpy_s( cmdline_buff, len, p_cmd_line );
 	/* 计算命令行中参数的个数 */
 	token = _tcstok_s( cmdline_buff, _T(" \r\t\n"), &next_token );
 	while( token != NULL ) {
@@ -271,7 +271,7 @@ WinMain (
 		return -1;
 	}
 	/* 由于strtok_s函数会修改cmdline_buff里的内容，因此，需要重新拷贝一次 */
-	_tcscpy_s( cmdline_buff, len, pCmdLine );
+	_tcscpy_s( cmdline_buff, len, p_cmd_line );
 	token = _tcstok_s( cmdline_buff, _T(" \r\t\n"), &next_token );
 	while( token && i<argc ) {
 		len = _tcslen( token ) + 1;
