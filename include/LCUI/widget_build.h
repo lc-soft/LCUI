@@ -136,6 +136,7 @@ struct LCUI_WidgetFull {
 
 	LCUI_Widget		parent;		/**< 父部件 */
 	LinkedList		children;	/**< 子部件 */
+	LinkedList		children_show;	/**< 子部件的显示顺序 */
 	LCUI_EventBox		event;		/**< 事件记录 */
 	LCUI_DirtyRectList	dirty_rects;	/**< 记录无效区域（脏矩形） */
 	void			*private_data;	/**< 私有数据 */
@@ -155,7 +156,7 @@ typedef union LCUI_WidgetTask {
 		} show;				/**< 显示/隐藏 */
 		void *data;			/**< 自定义任务数据 */
 	};
-	LCUI_Widget *target;			/**< 目标部件 */
+	LCUI_Widget target;			/**< 目标部件 */
 } LCUI_WidgetTask;				/**< 部件任务 */
 
 LCUI_END_HEADER
