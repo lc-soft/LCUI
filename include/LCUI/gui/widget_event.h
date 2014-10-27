@@ -1,6 +1,6 @@
 ﻿/* ***************************************************************************
  * widget_event.h -- LCUI widget event module
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2014 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_event.h -- LCUI部件的事件模块
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2014 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
