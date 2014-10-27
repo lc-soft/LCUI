@@ -80,6 +80,7 @@ typedef struct {
 	int type;			/**< 事件类型标识号 */
 	const char *type_name;		/**< 事件类型名称 */
 	int which;			/**< 指示按了哪个键或按钮 */
+	int x, y;			/**< 当前鼠标坐标 */
 	int offset_x, offset_y;		/**< 鼠标的坐标偏移量 */
 	void *data;			/**< 附加数据 */
 	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
