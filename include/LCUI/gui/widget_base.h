@@ -83,12 +83,18 @@ typedef struct LCUI_WidgetBase {
 	int innerWidth, innerHeight;	/**< 内部区域大小，不包括内边距占用区域 */
 	int outerWidth, outerHeight;	/**< 外部区域大小，包括边框和阴影占用区域 */
 	
-	void		(*show)($, LCUI_BOOL);
-	LCUI_BOOL	(*visible)($);
-	void		(*dock)($, int);
-	void		(*css)($, const char*, const char*);
-	void		(*shadow)($, int, int, int, LCUI_Color);
-	void		(*focus)($, LCUI_BOOL);
+	void (*css)($, const char*, const char*);
+	void (*dock)($, int);
+	void (*focus)($, LCUI_BOOL);
+	void (*show)($, LCUI_BOOL);
+	void (*shadow)($, int, int, int, LCUI_Color);
+	void (*setName)($, const char*);
+	void (*setOpacity)($, float);
+	void (*setStyleClassName)($, const char*);
+
+	LCUI_BOOL (*isVisible)($);
+	
+	LCUI_Widget (*at)($, int, int);
 
 	struct {
 		void (*top)($, int);
@@ -126,11 +132,18 @@ typedef struct LCUI_WidgetBase {
 		void (*scale)($, float, float);
 		void (*rotate)($, float);
 	} transform;
-
-	void		(*setName)($, const char*);
-	void		(*setOpacity)($, float);
-	void		(*setStyleClassName)($, const char*);
 } LCUI_WidgetBase;
+
+#undef $
+
+/** 上面用完 $，接着用 $ 定义个宏，为函数加前缀名 */
+#define $(FUNC_NAME) Widget_##FUNC_NAME
+
+/** 新建一个GUI部件 */
+LCUI_API LCUI_Widget $(New)( const char *type_name );
+
+/* 获取当前点命中的最上层可见部件 */
+LCUI_API LCUI_Widget $(At)( LCUI_Widget widget, int x, int y );
 
 #undef $
 

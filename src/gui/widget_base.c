@@ -42,3 +42,49 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/widget_build.h>
+
+#define NEW_ONE(TYPE) (TYPE*)malloc(sizeof(TYPE))
+
+/**
+ * $ 可以看成是 Self，指当前模块(Widget)、函数的操作对象，这样省的手工为每个函
+ * 数名加 Widget_ 前缀了。
+ */
+#define $(FUNC_NAME) Widget_##FUNC_NAME
+
+/** 新建一个GUI部件 */
+LCUI_Widget $(New)( const char *type_name )
+{
+	LCUI_Widget widget = NEW_ONE(struct LCUI_WidgetFull);
+	widget->base.border.all = NULL;
+	widget->base.border.radius.all = NULL;
+	widget->base.background.color = NULL;
+	widget->base.background.image = NULL;
+	widget->base.background.origin = NULL;
+	widget->base.background.position = NULL;
+	widget->base.background.size = NULL;
+	return widget;
+}
+
+/* 获取当前点命中的最上层可见部件 */
+LCUI_Widget $(At)( LCUI_Widget widget, int x, int y )
+{
+	int i, n;
+	LCUI_Widget target = NULL;
+
+	do {
+		n = LinkedList_GetTotal( &widget->children_show );
+		for( i=0; i<n; ++i ) {
+			LinkedList_Goto( &widget->children_show, i );
+			target = (LCUI_Widget)
+			LinkedList_Get( &widget->children_show );
+			if( target->style.x.px <= x && target->style.y.px
+			 && target->style.x.px + x < target->style.w.px
+			 && target->style.y.px + x < target->style.h.px ) {
+				widget = target;
+				break;
+			 }
+		}
+	} while( i >= n );
+
+	return target;
+}
