@@ -100,7 +100,7 @@ LCUI_API int LCUI_BindEvent( const char *event_name,
 LCUI_API int LCUI_UnbindEvent( int event_handler_id );
 
 /** 投递事件 */
-LCUI_API int LCUI_PostEvent( const char *name, LCUI_SystemEvent *event );
+LCUI_API int LCUI_PostEvent( LCUI_SystemEvent *event );
 
 /*--------------------------- system event <END> ----------------------------*/
 

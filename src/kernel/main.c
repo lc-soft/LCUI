@@ -99,7 +99,7 @@ typedef struct LCUI_MainLoopRec_ {
 
 #define EVENT_NAME_LIST_MAX_LEN 10
 
-static int user_event_id = SYSEVENT_USER;
+static int user_event_id = LCUI_USER;
 static char *sys_event_name_list[EVENT_NAME_LIST_MAX_LEN];
 
 /** 系统事件处理线程 */
@@ -135,6 +135,7 @@ static void OnEvent( LCUI_Event *event, void *arg )
 {
 	FuncData *data = (FuncData*)arg;
 	LCUI_SystemEvent *sys_event = (LCUI_SystemEvent*)event->data;
+	sys_event->type = event->id;
 	sys_event->type_name = event->name;
 	data->func( sys_event, data->arg );
 }
@@ -155,13 +156,6 @@ int LCUI_BindEventById( int id, void(*func)(LCUI_SystemEvent*,void*),
 	data->func = func;
 	data->arg = func_arg;
 	data->arg_destroy = arg_destroy;
-	/** 如果该事件没有注册，则当成用户事件 */
-	if( !LCUIEventBox_IsExistEventId( System.event.box, id ) ) {
-		return LCUIEventBox_BindById( 
-			System.event.box, user_event_id++,
-			OnEvent, data, FuncDataDestroy
-		);
-	}
 	return LCUIEventBox_BindById( System.event.box, id, OnEvent,
 					data, FuncDataDestroy );
 }
@@ -171,29 +165,12 @@ int LCUI_BindEvent( const char *event_name,
 		    void(*func)(LCUI_SystemEvent*,void*),
 		    void *func_arg, void (*arg_destroy)(void*) )
 {
-	int i;
 	FuncData *data;
 
 	data = (FuncData*)malloc(sizeof(FuncData));
 	data->func = func;
 	data->arg = func_arg;
 	data->arg_destroy = arg_destroy;
-	/** 如果该事件没有注册 */
-	if( !LCUIEventBox_IsExistEventName( System.event.box, event_name ) ) {
-		/** 检查是否属于系统事件 */
-		for( i=0; i<EVENT_NAME_LIST_MAX_LEN; ++i ) {
-			if( strcmp(sys_event_name_list[i], event_name) == 0 ) {
-				break;
-			}
-		}
-		/** 不是的话则事件ID号从 user_event_id 开始递增 */
-		if( i >= EVENT_NAME_LIST_MAX_LEN ) {
-			return LCUIEventBox_BindById( 
-				System.event.box, user_event_id++,
-				OnEvent, data, FuncDataDestroy
-			);
-		}
-	}
 	return LCUIEventBox_Bind( System.event.box, event_name, 
 					OnEvent, data, FuncDataDestroy );
 }
@@ -205,14 +182,26 @@ int LCUI_UnbindEvent( int event_handler_id )
 }
 
 /** 投递事件 */
-int LCUI_PostEvent( const char *name, LCUI_SystemEvent *event )
+int LCUI_PostEvent( LCUI_SystemEvent *event )
 {
 	int ret;
+	const char *event_name;
 	LCUI_SystemEvent *sys_event;
 
+	event_name = event->type_name;
+	if( !event_name ) {
+		event_name = LCUIEventBox_GetEventName( 
+			System.event.box, event->type 
+		);
+		if( !event_name ) {
+			_DEBUG_MSG("error event.");
+			abort();
+			return -1;
+		}
+	}
 	sys_event = (LCUI_SystemEvent*)malloc(sizeof(LCUI_SystemEvent));
 	*sys_event = *event;
-	ret = LCUIEventBox_Post( System.event.box, name, sys_event, free );
+	ret = LCUIEventBox_Post( System.event.box, event_name, sys_event, free );
 	if( ret == 0 ) {
 		LCUICond_Broadcast( &System.event.cond );
 	}
@@ -255,8 +244,8 @@ static int LCUI_RunTask(void)
 	task->func = NULL;
 	task->arg[0] = NULL;
 	task->arg[1] = NULL;
-	task->destroy_arg[0] = FALSE;
-	task->destroy_arg[1] = FALSE;
+	task->need_free[0] = FALSE;
+	task->need_free[1] = FALSE;
 	/* 删除之 */
 	LinkedList_Delete( &MainApp.task_list );
 	/* 解锁，现在的任务数据已经与任务列表独立开了 */
@@ -264,10 +253,16 @@ static int LCUI_RunTask(void)
 	/* 调用函数指针指向的函数，并传递参数 */
 	task_bak.func( task_bak.arg[0], task_bak.arg[1] );
 	/* 若需要在调用回调函数后销毁参数 */
-	if( task_bak.destroy_arg[0] ) {
+	if( task_bak.need_free[0] ) {
+		if( task_bak.destroy_func[0] ) {
+			task_bak.destroy_func[0]( task_bak.arg[0] );
+		}
 		free( task_bak.arg[0] );
 	}
-	if( task_bak.destroy_arg[1] ) {
+	if( task_bak.need_free[1] ) {
+		if( task_bak.destroy_func[1] ) {
+			task_bak.destroy_func[1]( task_bak.arg[1] );
+		}
 		free( task_bak.arg[1] );
 	}
 	LCUIMutex_Unlock( &MainApp.task_run_mutex );
@@ -348,11 +343,11 @@ static void DestroyTask( void *arg )
 {
 	LCUI_Task *task;
 	task = (LCUI_Task *)arg;
-	if( task->destroy_arg[0] && task->arg[0] ) {
+	if( task->need_free[0] && task->arg[0] ) {
 		free( task->arg[0] );
 		task->arg[0] = NULL;
 	}
-	if( task->destroy_arg[1] && task->arg[1] ) {
+	if( task->need_free[1] && task->arg[1] ) {
 		free( task->arg[1] );
 		task->arg[1] = NULL;
 	}
