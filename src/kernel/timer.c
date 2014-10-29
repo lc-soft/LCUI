@@ -41,7 +41,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/misc/linkedlist.h>
 #include <LCUI/misc/delay.h>
-#include LC_THREAD_H
+#include <LCUI/thread.h>
 
 #include <time.h>
 
