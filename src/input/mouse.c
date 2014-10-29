@@ -38,10 +38,10 @@
  * ***************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_CURSOR_H
-#include LC_DISPLAY_H
-#include LC_INPUT_H
+#include <LCUI/LCUI.h>
+#include <LCUI/input.h>
+#include <LCUI/cursor.h>
+#include <LCUI/display.h>
 
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 #include <errno.h>
@@ -70,12 +70,13 @@ int LCUI_PostMouseDownEvent( int key_code )
 		return -1;
 	}
 	button_state[key_code] = LCUIKEYSTATE_PRESSED;
-	event.type = LCUI_MOUSEDOWN;
 	LCUICursor_GetPos( &pos );
+	event.type = LCUI_MOUSEDOWN;
+	event.type_name = NULL;
 	event.x = pos.x;
 	event.y = pos.y;
 	event.which = key_code;
-	LCUI_PostEvent( "mousedown", &event );
+	LCUI_PostEvent( &event );
 	return 0;
 }
 
@@ -89,12 +90,13 @@ int LCUI_PostMouseUpEvent( int key_code )
 		return -1;
 	}
 	button_state[key_code] = LCUIKEYSTATE_RELEASE;
-	event.type = LCUI_MOUSEUP;
 	LCUICursor_GetPos( &pos );
+	event.type = LCUI_MOUSEUP;
+	event.type_name = NULL;
 	event.x = pos.x;
 	event.y = pos.y;
 	event.which = key_code;
-	LCUI_PostEvent( "mouseup", &event );
+	LCUI_PostEvent( &event );
 	return 0;
 }
 
@@ -108,9 +110,10 @@ void LCUI_PostMouseMoveEvent( LCUI_Pos new_pos )
 		return;
 	}
 	event.type = LCUI_MOUSEMOVE;
+	event.type_name = NULL;
 	event.x = new_pos.x;
 	event.y = new_pos.y;
-	LCUI_PostEvent( "mousemove", &event );
+	LCUI_PostEvent( &event );
 	old_pos = new_pos;
 }
 
@@ -195,10 +198,10 @@ static LCUI_BOOL MouseProc( void )
 	/* 转换成相对于窗口客户区的坐标 */
 	ScreenToClient( Win32_GetSelfHWND(), &new_pos );
 	if (new_pos.x > LCUIScreen_GetWidth() ) {
-		new_pos.x = LCUIScreen_GetWidth ();
+		new_pos.x = LCUIScreen_GetWidth();
 	}
 	if (new_pos.y > LCUIScreen_GetHeight() ) {
-		new_pos.y = LCUIScreen_GetHeight ();
+		new_pos.y = LCUIScreen_GetHeight();
 	}
 	new_pos.x = new_pos.x<0 ? 0:new_pos.x;
 	new_pos.y = new_pos.y<0 ? 0:new_pos.y;
