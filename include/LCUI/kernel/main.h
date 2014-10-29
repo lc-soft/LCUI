@@ -53,27 +53,23 @@ LCUI_BEGIN_HEADER
 /***************************************************/
 
 typedef struct {
-	/* 
-	 * 函数ID，部件库需要这ID标识函数类型，往程序的任务队列添加
-	 * 任务也需要该ID来标识目标程序ID 
-	 * */
-	LCUI_ID id;
-	void (*func)(void*,void*);	/* 函数指针 */
+	LCUI_ID id;			/**< 标识号 */
+	void (*func)(void*,void*);	/**< 函数指针 */
 	
-	/* 以下参数该怎么传给回调函数，具体要看是如何处理事件的 */  
-	void *arg[2];			/* 传给函数的两个参数 */
-	LCUI_BOOL destroy_arg[2];	/* 指定是否在调用完回调函数后，销毁参数 */
+	void *arg[2];			/**< 传给函数的两个参数 */
+	LCUI_BOOL destroy_arg[2];	/**< 指定在调用完回调函数后，是否释放参数 */
 } LCUI_Func, LCUI_Task;
 
-enum LCUI_SystemEventType {
-	LCUI_KEYDOWN,		/**< 按键输入事件，键盘上任意键均可触发 */
+enum SystemEventType {
+	LCUI_KEYDOWN,		/**< 键盘触发的按键按下事件 */
 	LCUI_KEYPRESS,		/**< 按键输入事件，仅字母、数字等ANSI字符键可触发 */
-	LCUI_KEYUP,		/**< 按键释放事件 */
-	LCUI_MOUSEMOVE,		/**< 鼠标移动事件 */
-	LCUI_MOUSEDOWN,		/**< 鼠标按键按下事件 */
-	LCUI_MOUSEUP,		/**< 鼠标按键释放事件 */
-	LCUI_QUIT,		/**< 退出事件，在LCUI退出时触发 */
-	LCUI_USER		/**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
+	LCUI_KEYUP,		/**< 键盘触发的按键释放事件 */
+	LCUI_MOUSE,		/**< 鼠标事件 */
+	LCUI_MOUSEMOVE,		/**< 鼠标触发的鼠标移动事件 */
+	LCUI_MOUSEDOWN,		/**< 鼠标触发的按钮按下事件 */
+	LCUI_MOUSEUP,		/**< 鼠标触发的按钮释放事件 */
+	LCUI_INPUT,		/**< 输入法触发的文本输入事件 */
+	LCUI_USER = 100		/**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
 };
 
 typedef struct {
