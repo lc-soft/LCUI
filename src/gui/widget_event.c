@@ -39,65 +39,88 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/widget_build.h>
+#include <LCUI/thread.h>
 
-enum WidgetEventType {
-	WET_RESIZE,
-
-	WET_KEYDOWN,
-	WET_KEYUP,
-	WET_KEYPRESS,
-	WET_INPUT,
-	
-	WET_MOUSEOVER,
-	WET_MOUSEMOVE,
-	WET_MOUSEOUT,
-	WET_MOUSEDOWN,
-	WET_MOUSEUP,
-	WET_CLICK,
-	
-	WET_USER
-};
-
-typedef struct LCUI_WidgetEvent {
-	int type;			/**< 事件类型标识号 */
-	const char *type_name;		/**< 事件类型名称 */
-	int which;			/**< 指示按了哪个键或按钮 */
-	int x, y;			/**< 鼠标的坐标(相对于当前部件) */
-	void *data;			/**< 附加数据 */
-	LCUI_Widget target;		/**< 触发事件的部件 */
-	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */
-} LCUI_WidgetEvent;
+#define NEW_ONE(type) (type*)malloc(sizeof(type))
 
 typedef struct LCUI_WidgetEventPack {
-	LCUI_WidgetEvent event;	/**< 事件数据 */
-	LCUI_Widget widget;	/**< 当前处理该事件的部件 */
+	void *data;			/**< 额外数据 */
+	LCUI_Widget widget;		/**< 当前处理该事件的部件 */
+	LCUI_WidgetEvent event;		/**< 事件数据 */
+	LCUI_BOOL is_direct_run;	/**< 是否直接处理该事件 */
 } LCUI_WidgetEventPack;
 
-typedef struct FuncDataRec_ {
-	void (*func)(LCUI_Widget, LCUI_WidgetEvent*);
-	void *arg;
-	void (*arg_destroy)(void*);
-} FuncData;
+typedef struct LCUI_WidgetEventTask {
+	void (*func)(LCUI_Widget, LCUI_WidgetEvent*, void*);
+	void *data;
+	void (*data_destroy)(void*);
+} LCUI_WidgetEventTask;
 
 static LCUI_RBTree widget_mark_tree;	/**< 记录当前已经标记的部件 */
 static LinkedList widget_list;		/**< 待处理部件列表（按事件触发时间先后排列） */
 
-static void FuncDataDestroy( void *arg )
+static void DestroyWidgetEventTask( void *arg )
 {
-	FuncData *data = (FuncData*)arg;
-	data->arg_destroy( data->arg );
-	data->arg = NULL;
+	LCUI_WidgetEventTask *task = (LCUI_WidgetEventTask*)arg;
+	if( task->data ) {
+		task->data_destroy ? task->data_destroy( task->data ):FALSE;
+		free( task->data );
+		task->data = NULL;
+	}
 }
 
-/** 部件事件转换，用于将原始事件转换成部件事件 */
-static void WidgetEventConverter( LCUI_Event *event, void *arg )
+/** 将原始事件转换成部件事件 */
+static void WidgetEventHandler( LCUI_Event *event, void *arg )
 {
-	FuncData *data = (FuncData*)arg;
-	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)event->data;
-	pack->event.data = data->arg;
+	LCUI_Widget widget;
+	LCUI_WidgetEventTask *task = (LCUI_WidgetEventTask*)event->data;
+	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)arg;
+
+	pack->event.data = task->data;
 	pack->event.type = event->id;
 	pack->event.type_name = event->name;
-	data->func( pack->widget, &pack->event );
+
+	switch( event->id ) {
+	case LCUI_INPUT:
+	case LCUI_MOUSEUP:
+	case LCUI_MOUSEDOWN:
+	case LCUI_KEYUP:
+	case LCUI_KEYDOWN:
+	case LCUI_KEYPRESS:
+	default: break;
+	}
+	for( widget = pack->widget; widget; ) {
+		task->func( widget, &pack->event, pack->data );
+		if( pack->event.cancel_bubble ) {
+			break;
+		}
+		/* 向底层的部件冒泡 */
+		
+	}
+}
+
+/** 响应原始事件 */
+static void OnWidgetEvent( LCUI_Event *event, void *arg )
+{
+	LCUI_Task task;
+	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)arg;
+	/** 如果需要直接执行 */
+	if( pack->is_direct_run ) {
+		WidgetEventHandler( event, arg );
+		return;
+	}
+	/* 准备任务 */
+	task.func = (CallBackFunc)WidgetEventHandler;
+	task.arg[0] = malloc(sizeof(LCUI_Event));
+	task.arg[1] = malloc(sizeof(LCUI_WidgetEventPack));
+	/* 这两个参数都需要在任务执行完后释放 */
+	task.destroy_arg[0] = TRUE;
+	task.destroy_arg[1] = TRUE;
+	/* 复制所需数据，因为在本函数退出后，这两个参数会被销毁 */
+	*((LCUI_Event*)task.arg[0]) = *event;
+	*((LCUI_WidgetEventPack*)task.arg[1]) = *pack;
+	/* 把任务扔给当前跑主循环的线程 */
+	LCUI_AddTask( &task );
 }
 
 /**
@@ -117,19 +140,21 @@ int Widget_RegisterEventWithId( LCUI_Widget widget, const char *event_name, int 
  * 需要提供事件的名称、事件处理器（回调函数）、附加数据、数据销毁函数。
  * 通常，事件处理器可能会需要更多的参数，这些参数可作为附加数据，每次
  * 调用事件处理器时，都可以根据附加数据进行相应的操作。
- * 附加数据附加数据会在解除事件绑定时被释放。
+ * 附加数据会在解除事件绑定时被释放。
  */
-int  Widget_BindEvent( LCUI_Widget widget, const char *event_name,
-			void(*func)(LCUI_WidgetEvent*), void *func_data,
-			void (*destroy_data)(void*) ) 
+int Widget_BindEvent(	LCUI_Widget widget, const char *event_name,
+			void(*func)(LCUI_Widget,LCUI_WidgetEvent*, void*), 
+			void *func_data, void (*destroy_data)(void*) )
 {
-	FuncData *data;
-	data = (FuncData*)malloc(sizeof(FuncData));
-	data->func = func;
-	data->arg = func_data;
-	data->arg_destroy = destroy_data;
-	return LCUIEventBox_Bind( &widget->event, event_name, 
-			WidgetEventConverter, data, FuncDataDestroy );
+	LCUI_WidgetEventTask *task;
+	task = NEW_ONE(LCUI_WidgetEventTask);
+	task->func = func;
+	task->data = func_data;
+	task->data_destroy = destroy_data;
+	return LCUIEventBox_Bind( 
+		&widget->event, event_name, 
+		WidgetEventHandler, task, DestroyWidgetEventTask
+	);
 }
 
 /** 
@@ -153,76 +178,96 @@ int Widget_UnbindEventById( LCUI_Widget widget, int id )
 
 /** 
  * 将事件投递给事件处理器，等待处理
- * 事件将会追加至事件队列中，由部件事件线程进行处理，由于事件附加数据是一次性
- * 的，若该数据使用的是动态分配的内存，为了不造成内存泄露，应传入相应的数据销
- * 销毁函数，以在每个事件处理完后释放内存资源。
+ * 事件将会追加至事件队列中，等待下一轮的批处理时让对应的事件处理器进行处理
  */
-int Widget_PostEvent( LCUI_Widget widget, const char *name, void *data,
-			 void (*destroy_data)(void*) )
+int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 {
+	int ret;
+	LCUI_WidgetEventPack *pack;
+
+	pack = NEW_ONE(LCUI_WidgetEventPack);
+	pack->data = data;
+	pack->event = *e;
+	pack->widget = widget;
+	pack->is_direct_run = FALSE;
+	ret = LCUIEventBox_Post( widget->event, e->type_name, pack, NULL );
 	if( !RBTree_Search( &widget_mark_tree, (int)widget ) ) {
 		RBTree_Insert( &widget_mark_tree, (int)widget, NULL );
 	}
-	return LCUIEventBox_Post( widget->event, name, data, destroy_data );
+	return ret;
 }
 
 /** 
  * 直接将事件发送至处理器 
- * 这将会直接调用与事件绑定的事件处理器（回调函数），由于是同步执行的，附加的
- * 事件数据可在调用本函数后手动执行销毁操作，因此，不用参入数据销毁函数。
+ * 这将会直接调用与事件绑定的事件处理器（回调函数）
  */
-int Widget_SendEvent( LCUI_Widget widget, const char *name, void *data )
+int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 {
-	return LCUIEventBox_Send( widget->event, name, data );
+	LCUI_WidgetEventPack pack;
+	pack.data = data;
+	pack.event = *e;
+	pack.widget = widget;
+	pack.is_direct_run = TRUE;
+	return LCUIEventBox_Send( widget->event, e->type_name, &pack );
 }
 
-/** 响应鼠标的移动 */
-static void OnMouseMove( LCUI_SystemEvent *event, void *arg )
+/** 响应系统的鼠标移动事件，向目标部件投递 mousemove 部件事件 */
+static void OnMouseMove( LCUI_SystemEvent *e, void *arg )
 {
-	int x, y;
 	LCUI_Widget target;
+	LCUI_WidgetEvent ebuff;
 
-
-	target = Widget_At( NULL, x, y );
+	target = Widget_At( NULL, e->x, e->y );
+	if( !target ) {
+		return;
+	}
+	ebuff.type = LCUI_MOUSEMOVE;
+	ebuff.type_name = "mousemove";
+	ebuff.x = e->x;
+	ebuff.y = e->y;
+	ebuff.target = target;
+	ebuff.which = 0;
+	ebuff.cancel_bubble = FALSE;
+	Widget_PostEvent( target, &ebuff, NULL );
 }
 
 /** 响应鼠标按键的按下 */
-static void OnMouseDown( LCUI_SystemEvent *event, void *arg )
+static void OnMouseDown( LCUI_SystemEvent *e, void *arg )
 {
 
 }
 
 /** 响应鼠标按键的释放 */
-static void OnMouseUp( LCUI_SystemEvent *event, void *arg )
+static void OnMouseUp( LCUI_SystemEvent *e, void *arg )
 {
 	
 }
 
 /** 响应按键的按下 */
-static void OnKeyDown( LCUI_SystemEvent *event, void *arg )
+static void OnKeyDown( LCUI_SystemEvent *e, void *arg )
 {
 
 }
 
 /** 响应按键的释放 */
-static void OnKeyUp( LCUI_SystemEvent *event, void *arg )
+static void OnKeyUp( LCUI_SystemEvent *e, void *arg )
 {
 
 }
 
 /** 响应按键的输入 */
-static void OnKeyPress( LCUI_SystemEvent *event, void *arg )
+static void OnKeyPress( LCUI_SystemEvent *e, void *arg )
 {
 
 }
 
 /** 响应输入法的输入 */
-static void OnInput( LCUI_SystemEvent *event, void *arg )
+static void OnInput( LCUI_SystemEvent *e, void *arg )
 {
 
 }
 
-/** LCUI 部件的事件系统处理一次当前积累的部件事件 */
+/** 处理一次当前积累的部件事件 */
 void LCUIWidget_Event_Step(void)
 {
 	int i, n;
