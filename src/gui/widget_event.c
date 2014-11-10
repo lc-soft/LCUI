@@ -117,7 +117,7 @@ static void WidgetEventHandler( LCUI_Event *event, void *arg )
 		for( i=i+1; i<n; ++i ) {
 			LinkedList_Goto( children, i );
 			widget = LinkedList_Get( children );
-			if( !widget->isVisible ) {
+			if( !widget->style.visible ) {
 				continue;
 			}
 			task->func( widget, &pack->event, pack->data );
