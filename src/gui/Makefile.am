@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS=foreign
+AUTOMAKE_OPTIONS=foreign subdir-objects
 AM_CFLAGS = -I$(abs_top_srcdir)/include
 noinst_LTLIBRARIES = libgui.la
 libgui_la_SOURCES =\
@@ -20,4 +20,3 @@ widget/radiobutton.c	\
 widget/textbox.c	\
 widget/window.c		\
 widget/scrollbar.c
-
