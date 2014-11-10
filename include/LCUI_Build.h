@@ -101,7 +101,7 @@ enum LCUIMode {
 #undef LCUI_THREAD_PTHREAD
 #undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 #else
-#include LC_CONFIG_H
+#include <LCUI/config.h>
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
