@@ -265,13 +265,41 @@ static void OnMouseMove( LCUI_SystemEvent *e, void *arg )
 /** 响应鼠标按键的按下 */
 static void OnMouseDown( LCUI_SystemEvent *e, void *arg )
 {
+	LCUI_Widget target;
+	LCUI_WidgetEvent ebuff;
 
+	target = Widget_At( NULL, e->x, e->y );
+	if( !target ) {
+		return;
+	}
+	ebuff.type = LCUI_MOUSEDOWN;
+	ebuff.type_name = "mousedown";
+	ebuff.x = e->x;
+	ebuff.y = e->y;
+	ebuff.target = target;
+	ebuff.which = e->which;
+	ebuff.cancel_bubble = FALSE;
+	Widget_PostEvent( target, &ebuff, NULL );
 }
 
 /** 响应鼠标按键的释放 */
 static void OnMouseUp( LCUI_SystemEvent *e, void *arg )
 {
-	
+	LCUI_Widget target;
+	LCUI_WidgetEvent ebuff;
+
+	target = Widget_At( NULL, e->x, e->y );
+	if( !target ) {
+		return;
+	}
+	ebuff.type = LCUI_MOUSEUP;
+	ebuff.type_name = "mouseup";
+	ebuff.x = e->x;
+	ebuff.y = e->y;
+	ebuff.target = target;
+	ebuff.which = e->which;
+	ebuff.cancel_bubble = FALSE;
+	Widget_PostEvent( target, &ebuff, NULL );
 }
 
 /** 响应按键的按下 */
