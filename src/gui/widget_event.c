@@ -109,14 +109,14 @@ static void WidgetEventHandler( LCUI_Event *event, void *arg )
 		/* 确定自己的显示位置，忽略显示在它前面的部件 */
 		for( i=0; i<n; ++i ) {
 			LinkedList_Goto( children, i );
-			if( widget == LinkedList_Get(children) ) {
+			if( widget == (LCUI_Widget)LinkedList_Get(children) ) {
 				break;
 			}
 		}
 		/* 向后面的部件传播事件 */
 		for( i=i+1; i<n; ++i ) {
 			LinkedList_Goto( children, i );
-			widget = LinkedList_Get( children );
+			widget = (LCUI_Widget)LinkedList_Get( children );
 			if( !widget->style.visible ) {
 				continue;
 			}

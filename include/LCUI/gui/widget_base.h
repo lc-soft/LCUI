@@ -139,6 +139,8 @@ typedef struct LCUI_WidgetBase {
 /** 上面用完 $，接着用 $ 定义个宏，为函数加前缀名 */
 #define $(FUNC_NAME) Widget_##FUNC_NAME
 
+extern LCUI_Widget LCUIRootWidget;	/**< 根级部件 */
+
 /** 新建一个GUI部件 */
 LCUI_API LCUI_Widget $(New)( const char *type_name );
 
