@@ -46,6 +46,7 @@
 #include <pthread.h>
 typedef pthread_t LCUI_Thread;
 typedef pthread_mutex_t LCUI_Mutex;
+typedef pthread_cond_t LCUI_Cond;
 #else
 #ifdef LCUI_THREAD_WIN32
 #include <windows.h>
