@@ -16,6 +16,8 @@ build/*/*.suo
 *.la
 *.*~
 Makefile
+Makefile.in
+configure
 autom4te.cache
 lcui.pc
 libtool
