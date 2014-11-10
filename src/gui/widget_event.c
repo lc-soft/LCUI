@@ -89,13 +89,44 @@ static void WidgetEventHandler( LCUI_Event *event, void *arg )
 	case LCUI_KEYPRESS:
 	default: break;
 	}
-	for( widget = pack->widget; widget; ) {
-		task->func( widget, &pack->event, pack->data );
-		if( pack->event.cancel_bubble ) {
-			break;
-		}
-		/* 向底层的部件冒泡 */
+	
+	widget = pack->widget;
+	task->func( widget, &pack->event, pack->data );
+	if( pack->event.cancel_bubble ) {
+		return;
+	}
+	/* 开始进行事件冒泡传播 */
+	while( widget ) {
+		int i = 0, n = 0;
+		LinkedList *children;
 		
+		if( widget->parent ) {
+			children = &widget->parent->children_show;	
+		} else {
+			children = &LCUIRootWidget->children_show;
+		}
+		n = LinkedList_GetTotal( children );
+		/* 确定自己的显示位置，忽略显示在它前面的部件 */
+		for( i=0; i<n; ++i ) {
+			LinkedList_Goto( children, i );
+			if( widget == LinkedList_Get(children) ) {
+				break;
+			}
+		}
+		/* 向后面的部件传播事件 */
+		for( i=i+1; i<n; ++i ) {
+			LinkedList_Goto( children, i );
+			widget = LinkedList_Get( children );
+			if( !widget->isVisible ) {
+				continue;
+			}
+			task->func( widget, &pack->event, pack->data );
+			if( pack->event.cancel_bubble ) {
+				return;
+			}
+		}
+		/* 开始向父级部件传播事件 */
+		widget = widget->parent;
 	}
 }
 
@@ -104,7 +135,7 @@ static void OnWidgetEvent( LCUI_Event *event, void *arg )
 {
 	LCUI_Task task;
 	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)arg;
-	/** 如果需要直接执行 */
+	/* 如果需要直接执行 */
 	if( pack->is_direct_run ) {
 		WidgetEventHandler( event, arg );
 		return;
