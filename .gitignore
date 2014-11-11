@@ -5,6 +5,7 @@ build/*/*.sdf
 build/*/*.opensdf
 build/*/*.suo
 include/LCUI/config.h
+m4/
 *.lastbuildstate
 *.unsuccessfulbuild
 *.pdb
@@ -27,8 +28,10 @@ missing
 depcomp
 lcui.pc
 libtool
+ltmain.sh
 config.log
 config.status
+config.guess
 config.sub
 stamp-h1
 Thumbs.db
