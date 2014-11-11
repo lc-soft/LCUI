@@ -46,6 +46,12 @@ LCUI 的相关信息与资料可以在项目主页中找到，如果遇到问题
 	git submodule update --init
 	./configure
 
+如未找到 ./configure，请使用以下命令生成它：
+
+	aclocal
+	autoconf
+	automake --add-missing
+
 在 LCUI 的项目主页上发布的源码包，一般是比较稳定的版本，你只需要这样做：
 
 1. 解压LCUI的源码包。
