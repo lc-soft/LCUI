@@ -4,6 +4,7 @@ bin/
 build/*/*.sdf
 build/*/*.opensdf
 build/*/*.suo
+include/LCUI/config.h
 *.lastbuildstate
 *.unsuccessfulbuild
 *.pdb
