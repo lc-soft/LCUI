@@ -59,6 +59,11 @@ typedef struct LCUI_WidgetEventTask {
 static LCUI_RBTree widget_mark_tree;	/**< 记录当前已经标记的部件 */
 static LinkedList widget_list;		/**< 待处理部件列表（按事件触发时间先后排列） */
 
+static int CompareWidgetMark( void *data, const void *key )
+{
+	return data == key ? 0:(data > key ? 1:-1);
+}
+
 static void DestroyWidgetEventTask( void *arg )
 {
 	LCUI_WidgetEventTask *task = (LCUI_WidgetEventTask*)arg;
@@ -184,7 +189,7 @@ int Widget_BindEvent(	LCUI_Widget widget, const char *event_name,
 	task->data_destroy = destroy_data;
 	return LCUIEventBox_Bind( 
 		&widget->event, event_name, 
-		WidgetEventHandler, task, DestroyWidgetEventTask
+		OnWidgetEvent, task, DestroyWidgetEventTask
 	);
 }
 
@@ -222,8 +227,8 @@ int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 	pack->widget = widget;
 	pack->is_direct_run = FALSE;
 	ret = LCUIEventBox_Post( widget->event, e->type_name, pack, NULL );
-	if( !RBTree_Search( &widget_mark_tree, (int)widget ) ) {
-		RBTree_Insert( &widget_mark_tree, (int)widget, NULL );
+	if( !RBTree_CustomSearch( &widget_mark_tree, widget ) ) {
+		RBTree_CustomInsert( &widget_mark_tree, widget, widget );
 	}
 	return ret;
 }
@@ -338,7 +343,7 @@ void LCUIWidget_Event_Step(void)
 		widget = (LCUI_Widget)LinkedList_Get( &widget_list );
 		LinkedList_Delete( &widget_list );
 		LCUIEventBox_Dispatch( widget->event );
-		RBTree_Erase( &widget_mark_tree, (int)widget );
+		RBTree_CustomErase( &widget_mark_tree, widget );
 	}
 }
 
@@ -346,6 +351,7 @@ void LCUIWidget_Event_Step(void)
 void LCUIWidget_Event_Init(void)
 {
 	RBTree_Init( &widget_mark_tree );
+	RBTree_OnJudge( &widget_mark_tree, CompareWidgetMark );
 	RBTree_SetDataNeedFree( &widget_mark_tree, FALSE );
 	LinkedList_Init( &widget_list, sizeof(LCUI_Widget) );
 	LinkedList_SetDataNeedFree( &widget_list, FALSE );
@@ -356,6 +362,7 @@ void LCUIWidget_Event_Init(void)
 	LCUI_BindEvent( "mouseup", OnMouseUp, NULL, NULL );
 	LCUI_BindEvent( "keyup", OnKeyUp, NULL, NULL );
 	LCUI_BindEvent( "keydown", OnKeyDown, NULL, NULL );
+	LCUI_BindEvent( "keypress", OnKeyPress, NULL, NULL );
 	LCUI_BindEvent( "input", OnInput, NULL, NULL );
 }
 
