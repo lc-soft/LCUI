@@ -219,6 +219,16 @@ int $(IsExistEventId)( LCUI_EventBox box, int id )
 	return 0;
 }
 
+/** 获取指定事件ID的名称 */
+const char *$(GetEventName)( LCUI_EventBox box, int id )
+{
+	LCUI_RBTreeNode *node;
+	if( node = RBTree_Search( &box->event_slot, id ) ) {
+		return (const char*)node->data;
+	}
+	return NULL;
+}
+
 /** 绑定指定ID的事件 */
 int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
 		 void *func_data, void (*destroy_data)(void*) )
