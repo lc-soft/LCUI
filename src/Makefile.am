@@ -17,25 +17,22 @@ LCUI_LDFLAGS = -version-info 3:0:0
 ##如果新接口删除了前面接口的元素，那么应该将 age重置为 0。这是一个新的，但是不向后兼容的版本。
 
 LCUI_SOURCES = \
-	LCUI_Queue.c		\
-	LCUI_Graph.c		\
-	LCUI_GraphLayer.c	\
-	LCUI_StyleLibrary.c	\
-	LCUI_InputMethod.c	\
-	LCUI_Cursor.c
+	graph.c			\
+	graphlayer.c	\
+	style_parser.c	\
+	ime.c			\
+	cursor.c
 
 LCUI_LIBADD = \
-	bmp/libbmp.la	\
-	draw/libdraw.la \
 	misc/libmisc.la \
+	thread/libthread.la \
 	kernel/libkernel.la \
 	font/libfont.la \
 	font/in-core/libfont_incore.la \
 	input/libinput.la \
 	output/liboutput.la \
-	thread/libthread.la \
-	thread/win32/libthread.la \
-	thread/pthread/libthread.la \
+	bmp/libbmp.la	\
+	draw/libdraw.la \
 	gui/libgui.la \
 	$(JPEG_LIBS) \
 	$(PNG_LIBS) \
