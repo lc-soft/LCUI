@@ -74,15 +74,18 @@ LCUI_API int $(RegisterEventWithId)( LCUI_EventBox box, const char *event_name, 
 /** 注册事件，只指定事件名称，事件ID由内部自动生成 */
 LCUI_API int $(RegisterEvent)( LCUI_EventBox box, const char *event_name );
 
-/** 绑定指定ID的事件 */
-LCUI_API int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
-			void *func_data, void (*destroy_data)(void*) );
-
 /** 检测事件名是否已经存在（已注册） */
 LCUI_API int $(IsExistEventName)( LCUI_EventBox box, const char *event_name );
 
 /** 检测事件ID是否已经存在 */
 LCUI_API int $(IsExistEventId)( LCUI_EventBox box, int id );
+
+/** 获取指定事件ID的名称 */
+LCUI_API const char *$(GetEventName)( LCUI_EventBox box, int id );
+
+/** 绑定指定ID的事件 */
+LCUI_API int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
+			void *func_data, void (*destroy_data)(void*) );
 
 /** 绑定指定名称的事件 */
 LCUI_API int $(Bind)(	LCUI_EventBox box, const char *event_name,
