@@ -51,6 +51,8 @@
  */
 #define $(FUNC_NAME) Widget_##FUNC_NAME
 
+LCUI_Widget LCUIRootWidget = NULL;	/**< 根级部件 */
+
 /** 新建一个GUI部件 */
 LCUI_Widget $(New)( const char *type_name )
 {
@@ -77,6 +79,9 @@ LCUI_Widget $(At)( LCUI_Widget widget, int x, int y )
 			LinkedList_Goto( &widget->children_show, i );
 			target = (LCUI_Widget)
 			LinkedList_Get( &widget->children_show );
+			if( !target->style.visible ) {
+				continue;
+			}
 			if( target->style.x.px <= x && target->style.y.px
 			 && target->style.x.px + x < target->style.w.px
 			 && target->style.y.px + x < target->style.h.px ) {
@@ -87,4 +92,49 @@ LCUI_Widget $(At)( LCUI_Widget widget, int x, int y )
 	} while( i >= n );
 
 	return target;
+}
+
+/** 获取部件当前占用的矩形区域 */
+void $(GetRect)( LCUI_Widget widget, LCUI_Rect *rect )
+{
+	if( widget ) {
+		rect->x = widget->style.x.px;
+		rect->x = widget->style.y.px;
+		rect->w = widget->style.w.px;
+		rect->h = widget->style.h.px;
+		return;
+	}
+	rect->x = 0;
+	rect->y = 0;
+	rect->w = 0;
+	rect->h = 0;
+}
+
+/** 获取部件当前可见的矩形区域 */
+void $(GetValidRect)( LCUI_Widget widget, LCUI_Rect *rect )
+{
+	LCUI_Rect container_rect;
+	$(GetRect)( widget, rect );
+	while( widget ) {
+		$(GetRect)( widget->parent, &container_rect );
+		if( rect->x < 0 ) {
+			rect->w = rect->w + rect->x;
+			rect->x = 0;
+		}
+		if( rect->y < 0 ) {
+			rect->h = rect->h + rect->y;
+			rect->y = 0;
+		}
+		if( rect->x + rect->w > container_rect.w ) {
+			rect->w = container_rect.w - rect->x;
+		}
+		if( rect->y + rect->h > container_rect.h ) {
+			rect->h = container_rect.h - rect->y;
+		}
+		/** 参照物改变，区域的坐标需要加上父部件的坐标 */
+		rect->x += container_rect.x;
+		rect->y += container_rect.y;
+		/** 切换至上一级部件 */
+		widget = widget->parent;
+	}
 }
