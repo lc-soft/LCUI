@@ -43,15 +43,6 @@
 
 LCUI_BEGIN_HEADER
 
-/**************** 任务的添加模式 *******************/
-#define ADD_MODE_ADD_NEW	0 /* 新增 */
-#define ADD_MODE_NOT_REPEAT	1 /* 不能重复 */
-#define ADD_MODE_REPLACE	2 /* 覆盖 */
-
-#define AND_ARG_F	1<<3	/* 第一个参数 */
-#define AND_ARG_S 	1<<4	/* 第二个参数 */
-/***************************************************/
-
 typedef struct {
 	LCUI_ID id;			/**< 标识号 */
 	void (*func)(void*,void*);	/**< 函数指针 */
