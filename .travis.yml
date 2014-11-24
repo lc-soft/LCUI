@@ -4,7 +4,7 @@ compiler:
   - clang
   - gcc
 
-before_script: autoreconf
+before_script: autogen
 
 script:
   - ./configure
