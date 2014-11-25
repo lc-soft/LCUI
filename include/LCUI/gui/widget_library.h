@@ -42,18 +42,30 @@
 
 LCUI_BEGIN_HEADER
 
+typedef struct LCUI_WidgetClass {
+	char *name;				/**< 类名 */
+	struct {
+		void (*init)(LCUI_Widget);	/**< 构造函数 */
+		void (*destroy)(LCUI_Widget);	/**< 析构函数 */
+		void (*paint)(LCUI_Widget);	/**< 绘制函数 */
+	} methods;				/**< 该类部件的自定义方法集 */
+	/** 部件任务处理器 */
+	void (*task_handler)(LCUI_Widget,LCUI_WidgetTask);
+} LCUI_WidgetClass;
+
+void LCUIWidget_InitLibrary(void);
+
+void LCUIWidget_DestroyLibrary(void);
+
+/** 获取部件类数据 */
+LCUI_API LCUI_WidgetClass LCUIWidget_GetClass( const char *class_name );
+
 /** 添加一个部件类型 */
-LCUI_API int LCUIWidget_AddType( const char *widget_type );
+LCUI_API LCUI_WidgetClass LCUIWidget_AddClass( const char *class_name );
 
 /** 移除一个部件类型 */
-LCUI_API int LCUIWidget_RemoveType( const char *widget_type );
+LCUI_API int LCUIWidget_RemoveClass( const char *class_name );
 
-/** 设置指定类型部件的函数 */
-LCUI_API int LCUIWidget_SetFunc( const char *widget_type, const char *func_type,
-			void(*func)(LCUI_Widget*) );
-
-/** 调用指定类型部件的函数 */
-LCUI_API void LCUIWidget_Call( const char *widget_type, const char *func_type );
 
 LCUI_END_HEADER
 

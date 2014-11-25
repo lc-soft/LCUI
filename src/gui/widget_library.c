@@ -41,107 +41,68 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/widget_build.h>
 
-typedef struct TypeData {
-	char *name;
-	LCUI_RBTree func_records;
-} TypeData;
-
-static LCUI_RBTree widget_type_records;
+static LCUI_RBTree widget_class_library;
 
 static int CompareName( void *data, const void *keydata )
 {
 	return strcmp(*(char**)data, (const char*)keydata);
 }
 
-static void OnDestroyWidgetType( void *arg )
+static void OnDestroyWidgetClass( void *arg )
 {
-	TypeData *type_data = (TypeData*)arg;
-	free( type_data->name );
-	RBTree_Destroy( &type_data->func_records );
+	LCUI_WidgetClass *class_data = (LCUI_WidgetClass*)arg;
+	free( class_data->name );
+	RBTree_Destroy( &class_data->func_records );
 }
 
-void LCUIWidget_InitTypeLibrary(void)
+void LCUIWidget_InitLibrary(void)
 {
-	RBTree_Init( &widget_type_records );
-	RBTree_OnJudge( &widget_type_records, CompareName );
-	RBTree_SetDataNeedFree( &widget_type_records, FALSE );
-	RBTree_OnDestroy( &widget_type_records, OnDestroyWidgetType );
+	RBTree_Init( &widget_class_library );
+	RBTree_OnJudge( &widget_class_library, CompareName );
+	RBTree_SetDataNeedFree( &widget_class_library, FALSE );
+	RBTree_OnDestroy( &widget_class_library, OnDestroyWidgetClass );
 }
 
-void LCUIWidget_ClearTypeLibrary(void)
+void LCUIWidget_DestroyLibrary(void)
 {
-	RBTree_Destroy( &widget_type_records );
+	RBTree_Destroy( &widget_class_library );
+}
+
+/** 获取部件类数据 */
+LCUI_WidgetClass LCUIWidget_GetClass( const char *class_name )
+{
+	return (LCUI_WidgetClass*)RBTree_CustomGetData(
+		&widget_class_library, class_name
+	);
 }
 
 /** 添加一个部件类型 */
-int LCUIWidget_AddType( const char *widget_type )
+LCUI_WidgetClass LCUIWidget_AddClass( const char *class_name )
 {
 	int len;
-	TypeData *type_data;
+	LCUI_WidgetClass *class_data;
 
-	type_data = (TypeData*)RBTree_CustomGetData(
-		&widget_type_records, widget_type
-	);
-	if( type_data ) {
-		return -1;
+	class_data = LCUIWidget_GetClass( class_name );
+	if( class_data ) {
+		return class_data;
 	}
 
-	len = strlen( widget_type );
-	type_data = (TypeData*)malloc(sizeof(TypeData));
-	type_data->name = (char*)malloc(sizeof(char)*(len+1));
-	strcpy( type_data->name, widget_type );
-	RBTree_Init( &type_data->func_records );
-	RBTree_SetDataNeedFree( &type_data->func_records, FALSE );
-	RBTree_CustomInsert( &widget_type_records, widget_type, type_data );
-	return 0;
+	len = strlen( class_name );
+	class_data = (LCUI_WidgetClass*)malloc(sizeof(LCUI_WidgetClass));
+	class_data->methods.init = NULL;
+	class_data->methods.destroy = NULL;
+	class_data->methods.paint = NULL;
+	class_data->task_handler = NULL;
+	class_data->name = (char*)malloc(sizeof(char)*(len+1));
+	strcpy( class_data->name, class_name );
+	RBTree_Init( &class_data->func_records );
+	RBTree_SetDataNeedFree( &class_data->func_records, FALSE );
+	RBTree_CustomInsert( &widget_class_library, class_name, class_data );
+	return class_data;
 }
 
 /** 移除一个部件类型 */
-int LCUIWidget_RemoveType( const char *widget_type )
+int LCUIWidget_RemoveClass( const char *class_name )
 {
-	return RBTree_CustomErase( &widget_type_records, widget_type );
-}
-
-/** 为指定类型的部件设置函数 */
-int LCUIWidget_SetFunc( const char *widget_type, const char *func_type,
-			void(*func)(LCUI_Widget*) )
-{
-	TypeData *type_data;
-	LCUI_RBTreeNode *node;
-
-	type_data = (TypeData*)RBTree_CustomGetData(
-		&widget_type_records, widget_type
-	);
-	if( !type_data ) {
-		return -1;
-	}
-	node = RBTree_CustomSearch( &type_data->func_records, func_type );
-	if( node ) {
-		node->data = func;
-		return 0;
-	}
-	RBTree_CustomInsert( &type_data->func_records, func_type, func );
-	return 0;
-}
-
-/** 调用指定类型部件的函数 */
-int Widget_Call( LCUI_Widget *widget, const char *func_type )
-{
-	TypeData *type_data;
-	void (*func)(LCUI_Widget*);
-
-	type_data = (TypeData*)RBTree_CustomGetData(
-		&widget_type_records, widget->type_name
-	);
-	if( !type_data ) {
-		return -1;
-	}
-	func = (void (*)(LCUI_Widget*))RBTree_CustomGetData( 
-		&type_data->func_records, func_type
-	);
-	if( func ) {
-		func( widget );
-		return 0;
-	}
-	return -2;
+	return RBTree_CustomErase( &widget_class_library, class_name );
 }
