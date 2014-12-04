@@ -142,25 +142,6 @@ struct LCUI_WidgetFull {
 	void			*private_data;	/**< 私有数据 */
 };
 
-typedef union LCUI_WidgetTaskData {
-	struct {
-		int x, y; 
-	} move;				/**< 移动位置 */
-	struct {
-		int width, height;
-	} resize;			/**< 调整大小 */
-	struct {
-		LCUI_BOOL visible;
-	} show;				/**< 显示/隐藏 */
-	void *data;			/**< 自定义任务数据 */
-} LCUI_WidgetTaskData;			/**< 部件任务数据 */
-
-typedef struct LCUI_WidgetTask {
-	int type;
-	LCUI_Widget target;
-	LCUI_WidgetTaskData data;
-} LCUI_WidgetTask;
-
 LCUI_END_HEADER
 
 #include <LCUI/gui/widget_task.h>
