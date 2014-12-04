@@ -4,6 +4,10 @@ bin/
 build/*/*.sdf
 build/*/*.opensdf
 build/*/*.suo
+build/VS2010/include
+build/VS2010/lib
+build/VS2012/include
+build/VS2012/lib
 include/LCUI/config.h
 m4/
 *.lastbuildstate

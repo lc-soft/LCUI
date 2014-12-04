@@ -1,1 +1,0 @@
-#include <libpng15/pngconf.h>

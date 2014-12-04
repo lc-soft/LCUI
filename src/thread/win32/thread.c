@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * thread.c -- the win32 edition thread opreation set.
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2013-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * thread.c -- win32版的线程操作集
  *
- * 版权所有 (C) 2013 归属于
+ * 版权所有 (C) 2013-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。

@@ -45,7 +45,7 @@ static LCUI_Surface *GetSurfaceByHWND( HWND hwnd )
 	return NULL;
 }
 
-static LCUI_Surface *GetSurfaceByWidget( LCUI_Widget *widget )
+static LCUI_Surface *GetSurfaceByWidget( LCUI_Widget widget )
 {
 	return NULL;
 }
@@ -193,7 +193,7 @@ void Surface_UnmapWidget( LCUI_Surface *surface )
 }
 
 static void
-OnWidgetShow( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+OnWidgetShow( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 {
 	LCUI_Surface *surface;
 	surface = GetSurfaceByWidget( widget );
@@ -204,7 +204,7 @@ OnWidgetShow( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 }
 
 static void
-OnWidgetHide( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+OnWidgetHide( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 {
 	LCUI_Surface *surface;
 	surface = GetSurfaceByWidget( widget );
@@ -215,7 +215,7 @@ OnWidgetHide( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 }
 
 static void
-OnWidgetDestroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+OnWidgetDestroy( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 {
 	LCUI_Surface *surface;
 	surface = GetSurfaceByWidget( widget );
@@ -226,7 +226,7 @@ OnWidgetDestroy( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
 }
 
 static void
-OnWidgetResize( LCUI_Widget *widget, LCUI_WidgetEvent *e )
+OnWidgetResize( LCUI_Widget widget, LCUI_WidgetEvent *e )
 {
 	LCUI_Surface *surface;
 	surface = GetSurfaceByWidget( widget );
@@ -237,7 +237,7 @@ OnWidgetResize( LCUI_Widget *widget, LCUI_WidgetEvent *e )
 }
 
 static void
-OnWidgetOpacityChange( LCUI_Widget *widget, LCUI_WidgetEvent *e )
+OnWidgetOpacityChange( LCUI_Widget widget, LCUI_WidgetEvent *e )
 {
 	LCUI_Surface *surface;
 	surface = GetSurfaceByWidget( widget );
@@ -248,7 +248,7 @@ OnWidgetOpacityChange( LCUI_Widget *widget, LCUI_WidgetEvent *e )
 }
 
 /** 将指定部件映射至 Surface 上 */
-void Surface_MapWidget( LCUI_Surface *surface, LCUI_Widget *widget )
+void Surface_MapWidget( LCUI_Surface *surface, LCUI_Widget widget )
 {
 	/**
 	 * 关联部件相关事件，以在部件变化时让 surface 做相应变化
