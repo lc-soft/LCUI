@@ -29,6 +29,21 @@ LCUI 的相关信息与资料可以在项目主页中找到，如果遇到问题
 我们已经使用 GitHub 托管 LCUI 项目，网址在上面，欢迎您参与 LCUI 项目的优化和改进。
 
 
+## 文件目录结构
+```
+
+/                项目文件目录
+/bin/            在编译生成后库文件的存放目录
+/build/          参与项目编译、构建和生成的相关文件
+/build/VS2010/   windows平台的 VisualStudio 2010 工程文件
+/build/VS2012/   windows平台的 VisualStudio 2012 工程文件
+/docs/           相关文档
+/include/        头文件目录
+/src/            源码目录
+/test/           一些测试（示例）程序
+
+```
+
 ## 文档
 
 你可以访问LCUI的项目主页浏览开发文档，开发文档也托管在GitHub上，地址：https://github.com/lc-soft/LCUI-Documentation
