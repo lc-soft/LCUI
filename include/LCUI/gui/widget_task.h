@@ -46,6 +46,7 @@ enum WidgetTaskType {
 	WTT_SHOW,
 	WTT_MOVE,
 	WTT_RESIZE,
+	WTT_TOTAL_NUM,
 	WTT_USER = 100
 };
 
@@ -66,7 +67,7 @@ typedef union LCUI_WidgetTask {
 } LCUI_WidgetTask;	/**< 部件任务数据 */
 
 /** 添加任务 */
-LCUI_API int Widget_AddTask( LCUI_Widget widget, int type, LCUI_WidgetTask *data );
+LCUI_API int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data );
 
 /** 初始化 LCUI 部件任务处理功能 */
 void LCUIWidget_Task_Init(void);

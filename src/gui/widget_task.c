@@ -1,5 +1,5 @@
 ﻿/* ***************************************************************************
- * widget_task.c -- LCUI widget task module.
+ * widget_task.c -- LCUI widget TaskRecord module.
  * 
  * Copyright (C) 2014 by Liu Chao <lc-soft@live.cn>
  * 
@@ -42,36 +42,98 @@
 #include <LCUI/misc/rbtree.h>
 #include <LCUI/widget_build.h>
 
-typedef struct LCUI_WidgetTaskPack {
-	int type;				/**< 任务类型 */
+typedef struct TaskRecord {
 	LCUI_BOOL is_valid;			/**< 是否有任务 */
-	LCUI_Widget target;			/**< 目标部件 */
 	LCUI_WidgetTask data;			/**< 任务数据 */
-} LCUI_WidgetTaskPack;
+} TaskRecord;	/**< 任务记录 */
 
-static int using_tree_n = 0;		/**< 当前使用的记录 */
-static LCUI_RBTree widget_tree[2];	/**< 两个记录 */
+typedef struct TaskNode {
+	LCUI_Widget target;			/**< 目标部件 */
+	TaskRecord tasks[WTT_TOTAL_NUM];	/**< 任务记录 */
+} TaskNode;	/**< 任务结点 */
+
+static struct {
+	int n;				/**< 当前使用的记录 */
+	LCUI_RBTree buffer[2];		/**< 两个记录缓存 */
+} self;		/**< 模块自身所需的数据 */
+
+static int CustomKeyJudge( void *node_data, const void *key_data )
+{
+	return ((TaskNode*)node_data)->target > (const LCUI_Widget)key_data;
+}
 
 /** 添加任务 */
-int Widget_AddTask( LCUI_Widget widget, int type, LCUI_WidgetTask *data )
+int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data )
 {
+	TaskNode *task;
+	LCUI_RBTree *buffer = &self.buffer[self.n == 1 ? 0:1];
+	LCUI_RBTreeNode *node = RBTree_CustomSearch( buffer, widget );
+
+	if( node ) {
+		task = (TaskNode*)node->data;
+	} else {
+		int i;
+		task = (TaskNode*)malloc(sizeof(TaskNode));
+		task->target = widget;
+		for( i=0; i<WTT_TOTAL_NUM; ++i ) {
+			task->tasks[i].is_valid = FALSE;
+		}
+		node = RBTree_CustomInsert( buffer, widget, task );
+	}
+	task->tasks[data->type].is_valid = TRUE;
+	task->tasks[data->type].data = *data;
+
 	return 0;
 }
 
 /** 初始化 LCUI 部件任务处理功能 */
 void LCUIWidget_Task_Init(void)
 {
-
+	self.n = 0;
+	RBTree_Init( &self.buffer[0] );
+	RBTree_Init( &self.buffer[1] );
+	RBTree_SetJudgeFunc( &self.buffer[0], CustomKeyJudge );
+	RBTree_SetJudgeFunc( &self.buffer[1], CustomKeyJudge );
 }
 
 /** 销毁（释放） LCUI 部件任务处理功能的相关资源 */
 void LCUIWidget_Task_Destroy(void)
 {
+	RBTee_Destroy( &self.buffer[0] );
+	RBTee_Destroy( &self.buffer[1] );
+}
 
+static void DispacthTask( LCUI_Widget target, LCUI_WidgetTask *task )
+{
+	switch(task->type) {
+	case WTT_MOVE:
+	case WTT_RESIZE:
+	case WTT_SHOW:
+	default: break;
+	}
 }
 
 /** 处理一次当前积累的部件任务 */
 void LCUIWidget_Task_Step(void)
 {
+	int i;
+	LCUI_RBTree *buffer;
+	LCUI_RBTreeNode *node;
+	TaskNode *task;
 
+	self.n = self.n == 1 ? 0:1;
+	buffer = &self.buffer[self.n];
+	node = RBTree_First( buffer );
+	while( node ) {
+		task = (TaskNode*)node->data;
+		for( i=0; i<WTT_TOTAL_NUM; ++i ) {
+			if( !task->tasks[i].is_valid ) {
+				continue;
+			}
+			DispacthTask( task->target, &task->tasks[i].data );
+			task->tasks[i].is_valid = FALSE;
+		}
+		node = RBTree_Next( node );
+		RBTree_CustomErase( buffer, task->target );
+	}
 }
