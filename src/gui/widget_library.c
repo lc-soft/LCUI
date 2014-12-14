@@ -52,7 +52,7 @@ static void OnDestroyWidgetClass( void *arg )
 {
 	LCUI_WidgetClass *class_data = (LCUI_WidgetClass*)arg;
 	free( class_data->name );
-	RBTree_Destroy( &class_data->func_records );
+	class_data->name = NULL;
 }
 
 void LCUIWidget_InitLibrary(void)
@@ -69,7 +69,7 @@ void LCUIWidget_DestroyLibrary(void)
 }
 
 /** 获取部件类数据 */
-LCUI_WidgetClass LCUIWidget_GetClass( const char *class_name )
+LCUI_WidgetClass* LCUIWidget_GetClass( const char *class_name )
 {
 	return (LCUI_WidgetClass*)RBTree_CustomGetData(
 		&widget_class_library, class_name
@@ -77,7 +77,7 @@ LCUI_WidgetClass LCUIWidget_GetClass( const char *class_name )
 }
 
 /** 添加一个部件类型 */
-LCUI_WidgetClass LCUIWidget_AddClass( const char *class_name )
+LCUI_WidgetClass* LCUIWidget_AddClass( const char *class_name )
 {
 	int len;
 	LCUI_WidgetClass *class_data;
@@ -95,8 +95,6 @@ LCUI_WidgetClass LCUIWidget_AddClass( const char *class_name )
 	class_data->task_handler = NULL;
 	class_data->name = (char*)malloc(sizeof(char)*(len+1));
 	strcpy( class_data->name, class_name );
-	RBTree_Init( &class_data->func_records );
-	RBTree_SetDataNeedFree( &class_data->func_records, FALSE );
 	RBTree_CustomInsert( &widget_class_library, class_name, class_data );
 	return class_data;
 }
