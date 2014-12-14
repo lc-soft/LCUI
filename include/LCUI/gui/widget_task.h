@@ -42,29 +42,36 @@
 
 LCUI_BEGIN_HEADER
 
+/** 部件任务类型，主要是按所对应的部件属性或具体刷新区域进行区分 */
 enum WidgetTaskType {
-	WTT_SHOW,
-	WTT_MOVE,
 	WTT_RESIZE,
+	WTT_MOVE,
+	WTT_SHOW,
+	WTT_SHADOW,
+	WTT_OPACITY,
+	WTT_BODY,
+	WTT_REFRESH,
 	WTT_TOTAL_NUM,
 	WTT_USER = 100
 };
 
 typedef union LCUI_WidgetTask {
 	int type;
+	/** 主要用于记录更新前的属性值，在更新时通过对比新旧属性来计算脏矩形 */
 	union {
 		struct {
-			int x, y; 
+			int x, y;
 		} move;				/**< 移动位置 */
 		struct {
-			int width, height;
+			int w, h;
 		} resize;			/**< 调整大小 */
-		struct {
-			LCUI_BOOL visible;
-		} show;				/**< 显示/隐藏 */
+		LCUI_WidgetShadow shadow;	/**< 阴影 */
+		LCUI_BOOL visible;		/**< 显示/隐藏 */
+		float opacity;			/**< 不透明度 */
 		void *data;			/**< 自定义任务数据 */
 	};
 } LCUI_WidgetTask;	/**< 部件任务数据 */
+
 
 /** 添加任务 */
 LCUI_API int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data );
