@@ -139,6 +139,9 @@ typedef struct LCUI_WidgetBase {
 /** 上面用完 $，接着用 $ 定义个宏，为函数加前缀名 */
 #define $(FUNC_NAME) Widget_##FUNC_NAME
 
+/** 一般来说部件占用的矩形区域看上去是指边框盒区域 */
+#define Widget_GetRect Widget_GetBorderRect
+
 extern LCUI_Widget LCUIRootWidget;	/**< 根级部件 */
 
 /** 新建一个GUI部件 */
@@ -146,6 +149,18 @@ LCUI_API LCUI_Widget $(New)( const char *type_name );
 
 /* 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget $(At)( LCUI_Widget widget, int x, int y );
+
+/** 获取内边距框占用的矩形区域 */
+LCUI_API void $(GetPaddingRect)( LCUI_Widget widget, LCUI_Rect *rect );
+
+/** 获取内容框占用的矩形区域 */
+LCUI_API void $(GetContentRect)( LCUI_Widget widget, LCUI_Rect *rect );
+
+/** 获取边框盒占用的矩形区域 */
+LCUI_API void $(GetBorderRect)( LCUI_Widget widget, LCUI_Rect *rect );
+
+/** 获取部件当前占用的矩形区域（包括阴影区域） */
+LCUI_API void $(GetOuterRect)( LCUI_Widget widget, LCUI_Rect *rect );
 
 #undef $
 

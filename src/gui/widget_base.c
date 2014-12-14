@@ -94,16 +94,36 @@ LCUI_Widget $(At)( LCUI_Widget widget, int x, int y )
 	return target;
 }
 
-/** 获取部件当前占用的矩形区域 */
-void $(GetRect)( LCUI_Widget widget, LCUI_Rect *rect )
+/** 获取内边距框占用的矩形区域 */
+void $(GetPaddingRect)( LCUI_Widget widget, LCUI_Rect *rect )
 {
-	if( widget ) {
-		rect->x = widget->style.x.px;
-		rect->x = widget->style.y.px;
-		rect->w = widget->style.w.px;
-		rect->h = widget->style.h.px;
-		return;
-	}
+	rect->x = 0;
+	rect->y = 0;
+	rect->w = 0;
+	rect->h = 0;
+}
+
+/** 获取内容框占用的矩形区域 */
+void $(GetContentRect)( LCUI_Widget widget, LCUI_Rect *rect )
+{
+	rect->x = 0;
+	rect->y = 0;
+	rect->w = 0;
+	rect->h = 0;
+}
+
+/** 获取边框盒占用的矩形区域 */
+void $(GetBorderRect)( LCUI_Widget widget, LCUI_Rect *rect )
+{
+	rect->x = 0;
+	rect->y = 0;
+	rect->w = 0;
+	rect->h = 0;
+}
+
+/** 获取部件当前占用的矩形区域（包括阴影区域） */
+void $(GetOuterRect)( LCUI_Widget widget, LCUI_Rect *rect )
+{
 	rect->x = 0;
 	rect->y = 0;
 	rect->w = 0;
