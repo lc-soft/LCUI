@@ -50,6 +50,13 @@ typedef struct {
 	int which;
 } PixelOrScale;
 
+typedef struct LCUI_WidgetShadow {
+	int x, y;		/**< 位置 */
+	int blur;		/**< 模糊距离 */
+	int spread;		/**< 扩散大小 */
+	LCUI_Color color;	/**< 颜色 */
+} LCUI_WidgetShadow;
+
 typedef struct LCUI_WidgetFull* LCUI_Widget;
 
 #include <LCUI/gui/widget_base.h>
@@ -96,12 +103,7 @@ typedef struct LCUI_WidgetStyle {
 		int origin;		/**< 相对于何种位置进行定位 */
 	} background;
 
-	struct {
-		int x, y;		/**< 位置 */
-		int blur;		/**< 模糊距离 */
-		int spread;		/**< 扩散大小 */
-		LCUI_Color color;	/**< 颜色 */
-	} shadow;			/**< 阴影 */
+	LCUI_WidgetShadow shadow;			/**< 阴影 */
 
 	struct {
 		struct {
@@ -145,6 +147,7 @@ struct LCUI_WidgetFull {
 LCUI_END_HEADER
 
 #include <LCUI/gui/widget_task.h>
+#include <LCUI/gui/widget_library.h>
 #include <LCUI/gui/widget_event.h>
 #include <LCUI/gui/widget_paint.h>
 
