@@ -47,6 +47,7 @@ LCUI_BEGIN_HEADER
 typedef struct {
 	double px;
 	double scale;
+	LCUI_BOOL is_auto;
 	int which;
 } PixelOrScale;
 
@@ -63,22 +64,20 @@ typedef struct LCUI_WidgetFull* LCUI_Widget;
 
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
-	LCUI_BOOL visible;			/**< 是否可见 */
-	int position;				/**< 定位方式 */
-	int dock;				/**< 停靠位置 */
-	PixelOrScale x, y;			/**< 当前坐标 */
-	PixelOrScale offset_x, offset_y;	/**< 水平、垂直坐标偏移量 */
+	LCUI_BOOL visible;		/**< 是否可见 */
+	int position;			/**< 定位方式 */
+	int dock;			/**< 停靠位置 */
+	int box_sizing;			/**< 以何种方式计算宽度和高度 */
+	int left, top;			/**< 水平、垂直坐标偏移量 */
+	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
+	PixelOrScale x, y;		/**< 当前坐标 */
+
 	union {
 		PixelOrScale w, width;		/**< 部件区域宽度 */
 	};
 	union {
 		PixelOrScale h, height;		/**< 部件区域高度 */
 	};
-	enum {
-		CONTENT_BOX,
-		BORDER_BOX,
-		PADDING_BOX
-	} box_sizing;
 
 	struct {
 		PixelOrScale top, right, bottom, left;
@@ -87,23 +86,21 @@ typedef struct LCUI_WidgetStyle {
 	struct {
 		LCUI_Graph image;	/**< 背景图 */
 		LCUI_Color color;	/**< 背景色 */
+		int clip;		/**< 背景图的裁剪方式 */
+		int origin;		/**< 相对于何种位置进行定位 */
 	
 		struct {
 			LCUI_BOOL x, y;
 		} repeat;		/**< 背景图是否重复 */
-
-		int clip;		/**< 背景图的裁剪方式 */
-
 		struct {
 			StyleVar x, y;
 		} position;		/**< 定位方式 */
 		struct {
 			PixelOrScale w, h;
 		} size;
-		int origin;		/**< 相对于何种位置进行定位 */
 	} background;
 
-	LCUI_WidgetShadow shadow;			/**< 阴影 */
+	LCUI_WidgetShadow shadow;	/**< 阴影 */
 
 	struct {
 		struct {
@@ -117,7 +114,6 @@ typedef struct LCUI_WidgetStyle {
 		unsigned int bottom_right_radius;
 	} border;			/**< 边框 */
 
-	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
 	struct {
 		struct {
 			float x, y;

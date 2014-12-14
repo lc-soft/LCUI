@@ -60,7 +60,7 @@ typedef struct LCUI_WidgetBase* LCUI_Widget;
 #define $ LCUI_Widget
 
 /** 边框风格 */
-enum BorderStyle {
+enum LCUI_WidgetBorderStyle {
 	BORDER_NONE,	/**< 无边框 */
 	BORDER_SOLID,	/**< 实线 */
 	BORDER_DOTTED,	/**< 点状 */
@@ -69,13 +69,20 @@ enum BorderStyle {
 };
 
 /** 部件停靠类型 */
-enum DockType {
+enum LCUI_WidgetDockType {
 	DOCK_NONE,
 	DOCK_TOP,
 	DOCK_LEFT,
 	DOCK_RIGHT,
 	DOCK_FILL,
 	DOCK_BOTTOM
+};
+
+/** 框类型 */
+enum LCUI_WidgetBoxType {
+	CONTENT_BOX,	/**< 内容框 */
+	BORDER_BOX,	/**< 边框盒 */
+	PADDING_BOX	/**< 内边距框 */
 };
 
 typedef struct LCUI_WidgetBase {
@@ -105,17 +112,17 @@ typedef struct LCUI_WidgetBase {
 	} margin, padding;
 
 	struct {
-		void (*top)(int, int, LCUI_Color);
-		void (*right)(int, int, LCUI_Color);
-		void (*bottom)(int, int, LCUI_Color);
-		void (*left)(int, int, LCUI_Color);
-		void (*all)(int, int, LCUI_Color);
+		void (*top)($,int, int, LCUI_Color);
+		void (*right)($,int, int, LCUI_Color);
+		void (*bottom)($,int, int, LCUI_Color);
+		void (*left)($,int, int, LCUI_Color);
+		void (*all)($,int, int, LCUI_Color);
 		struct {
-			void (*topLeft)(int);
-			void (*topRight)(int);
-			void (*bottomLeft)(int);
-			void (*bottomRight)(int);
-			void (*all)(int);
+			void (*topLeft)($,int);
+			void (*topRight)($,int);
+			void (*bottomLeft)($,int);
+			void (*bottomRight)($,int);
+			void (*all)($,int);
 		} radius;
 	} border;
 
