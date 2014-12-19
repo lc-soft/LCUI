@@ -51,7 +51,8 @@
  */
 #define $(FUNC_NAME) Widget_##FUNC_NAME
 
-LCUI_Widget LCUIRootWidget = NULL;	/**< 根级部件 */
+static struct LCUI_WidgetFull LCUIRootWidgetData;	/**< 根级部件 */
+LCUI_Widget LCUIRootWidget = &LCUIRootWidgetData;	/**< 创建外部引用 */
 
 /** 新建一个GUI部件 */
 LCUI_Widget $(New)( const char *type_name )
@@ -64,6 +65,7 @@ LCUI_Widget $(New)( const char *type_name )
 	widget->base.background.origin = NULL;
 	widget->base.background.position = NULL;
 	widget->base.background.size = NULL;
+	Widget_InitTaskBox( widget );
 	return widget;
 }
 

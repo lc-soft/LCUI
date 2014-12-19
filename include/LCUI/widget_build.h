@@ -61,6 +61,7 @@ typedef struct LCUI_WidgetShadow {
 typedef struct LCUI_WidgetFull* LCUI_Widget;
 
 #include <LCUI/gui/widget_base.h>
+#include <LCUI/gui/widget_task.h>
 
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
@@ -136,13 +137,13 @@ struct LCUI_WidgetFull {
 	LinkedList		children;	/**< 子部件 */
 	LinkedList		children_show;	/**< 子部件的显示顺序 */
 	LCUI_EventBox		event;		/**< 事件记录 */
+	LCUI_WidgetTaskBox	task;		/**< 任务记录 */
 	LCUI_DirtyRectList	dirty_rects;	/**< 记录无效区域（脏矩形） */
 	void			*private_data;	/**< 私有数据 */
 };
 
 LCUI_END_HEADER
 
-#include <LCUI/gui/widget_task.h>
 #include <LCUI/gui/widget_library.h>
 #include <LCUI/gui/widget_event.h>
 #include <LCUI/gui/widget_paint.h>

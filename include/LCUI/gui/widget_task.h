@@ -44,16 +44,22 @@ LCUI_BEGIN_HEADER
 
 /** 部件任务类型，主要是按所对应的部件属性或具体刷新区域进行区分 */
 enum WidgetTaskType {
+	WTT_AUTO_SIZE,
+	WTT_AUTO_LAYOUT,
 	WTT_RESIZE,
+	WTT_PADDING,
+	WTT_MARGIN,
 	WTT_MOVE,
 	WTT_SHOW,
 	WTT_SHADOW,
 	WTT_OPACITY,
 	WTT_BODY,
 	WTT_REFRESH,
-	WTT_TOTAL_NUM,
-	WTT_USER = 100
+	WTT_USER,
+	WTT_DESTROY
 };
+
+#define WTT_TOTAL_NUM (WTT_DESTROY+1)
 
 typedef union LCUI_WidgetTask {
 	int type;
@@ -72,9 +78,17 @@ typedef union LCUI_WidgetTask {
 	};
 } LCUI_WidgetTask;	/**< 部件任务数据 */
 
+#ifndef __IN_WIDGET_TASK_SOURCE_FILE__
+typedef void* LCUI_WidgetTaskBox;
+#else
+typedef struct LCUI_WidgetTaskBoxRec_* LCUI_WidgetTaskBox;
+#endif
 
 /** 添加任务 */
-LCUI_API int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data );
+LCUI_API void Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data );
+
+/** 初始化部件的任务处理 */
+void Widget_InitTaskBox( LCUI_Widget widget );
 
 /** 初始化 LCUI 部件任务处理功能 */
 void LCUIWidget_Task_Init(void);
