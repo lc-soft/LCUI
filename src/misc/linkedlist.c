@@ -38,12 +38,45 @@
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_MISC_LINKED_LIST_H
+#include <LCUI/LCUI.h>
+
+/*
+ * 注意，此链表是线程不安全的。
+ * 此链表支持结点内存复用，可减少内存申请次数，但链表的内存占用会只增不减，一
+ * 直会保持之前最大长度时占用的内存大小。
+ * 加入了游标功能，用于记录当前所处结点的位置，主要是方便访问、删除、插入、移
+ * 动结点，不必每次操作都从头至尾遍历链表来定位目标结点。
+ * 从头至尾遍历链表，只需要这样使用：
+ *
+ * LinkedList_Goto( list, 0 );
+ * while( data = (datatype)LinkedList_Get(list) ) {
+ *	// 使用 data 的代码块
+ *	...
+ *	LinkedList_ToNext( list );
+ * }
+ *
+ * 由于部分操作的目标结点都是由游标决定的，虽然在单线程下可以这样使用，但如果
+ * 有多个线程共用同一个链表，这个游标的定位可能会不正常，例如：多个线程使用上
+ * 述代码同时遍历同一个链表，各个线程有可能不会完整的遍历全部结点，假设线程A
+ * 先遍历完了 1 2 3 结点，那么线程B就会从 4 结点开始遍历。
+ * 在不确定同一时间段内该链表仅有当前线程使用的情况下，建议使用类似于遍历数组
+ * 的方法进行遍历：
+ *
+ * int i, n = LinkedList_GetTotal( list );
+ * for( i=0; i<n; ++i ) {
+ *	LinkedList_Goto( list, i );
+ *	data = (datatype)LinkedList_Get( list );
+ * }
+ *
+ * 上述代码中调用的函数都是内联函数，如果编译器能够展开内联函数的代码的话，就不
+ * 会产生像调用普通函数那样的性能开销。上述两个特性看上去可能会带来一点效率上的
+ * 提升，但具体还是以实际效果为准。
+ */
 
 #define MALLOC_ONE(type) (type*)malloc(sizeof(type))
 
 /** 初始化链表 */
-LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size )
+void LinkedList_Init( LinkedList *list, int node_data_size )
 {
         list->node_data_size = node_data_size;
         list->used_node_num = 0;
@@ -59,7 +92,7 @@ LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size )
 }
 
 /** 销毁整个链表 */
-LCUI_API void LinkedList_Destroy( LinkedList *list )
+void LinkedList_Destroy( LinkedList *list )
 {
 	LinkedListNode *node;
         list->current_node_pos = 0;
@@ -100,7 +133,7 @@ LCUI_API void LinkedList_Destroy( LinkedList *list )
 }
 
 /** 移除当前结点 */
-LCUI_API int LinkedList_Delete( LinkedList *list )
+int LinkedList_Delete( LinkedList *list )
 {
         if( list->used_node_num <= 0 ) {
                 return -2;
@@ -170,7 +203,7 @@ LCUI_API int LinkedList_Delete( LinkedList *list )
 }
 
 /** 跳转至指定结点 */
-LCUI_API int LinkedList_Goto( LinkedList *list, int pos )
+int LinkedList_Goto( LinkedList *list, int pos )
 {
         if( pos < 0 || pos >= list->used_node_num ) {
                 return -1;
@@ -229,7 +262,7 @@ static LinkedListNode* LinkedList_GetNode( LinkedList *list, int pos )
 }
 
 /** 将当前结点移动至指定位置 */
-LCUI_API int LinkedList_MoveTo( LinkedList *list, int pos )
+int LinkedList_MoveTo( LinkedList *list, int pos )
 {
         LinkedListNode *src_node, *des_node;
 
@@ -305,7 +338,7 @@ static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
 }
 
 /** 在当前结点前面插入新结点，并引用数据 */
-LCUI_API int LinkedList_Insert( LinkedList *list, void *data )
+int LinkedList_Insert( LinkedList *list, void *data )
 {
 	LinkedListNode *node;
 	
@@ -337,7 +370,7 @@ LCUI_API int LinkedList_Insert( LinkedList *list, void *data )
 }
 
 /** 在当前结点前面插入新结点，并将数据的副本记录到该结点上 */
-LCUI_API void* LinkedList_InsertCopy( LinkedList *list, void *data )
+void* LinkedList_InsertCopy( LinkedList *list, void *data )
 {
 	void *data_copy;
 	data_copy = malloc( list->node_data_size );
@@ -347,7 +380,7 @@ LCUI_API void* LinkedList_InsertCopy( LinkedList *list, void *data )
 }
 
 /** 将数据的副本记录至链表的相应结点上 */
-LCUI_API void *LinkedList_AddDataCopy( LinkedList *list, void *data )
+void *LinkedList_AddDataCopy( LinkedList *list, void *data )
 {
         LinkedListNode *node;
         node = LinkedList_AllocNode( list );
@@ -359,7 +392,7 @@ LCUI_API void *LinkedList_AddDataCopy( LinkedList *list, void *data )
 }
 
 /** 将数据引用至链表的相应结点 */
-LCUI_API void LinkedList_AddData( LinkedList *list, void *data_ptr )
+void LinkedList_AddData( LinkedList *list, void *data_ptr )
 {
         LinkedListNode *node;
         node = LinkedList_AllocNode( list );
