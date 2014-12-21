@@ -445,7 +445,7 @@ static void LCUIApp_Destroy(void)
 	/* 开始清理 */
 	LCUICond_Destroy( &MainApp.loop_list_empty );
 	LCUICond_Destroy( &MainApp.loop_cond );
-	LCUICond_Destroy( &MainApp.loop_mutex );
+	LCUIMutex_Destroy( &MainApp.loop_mutex );
 	LCUIMutex_Destroy( &MainApp.loop_changed );
 	LCUIMutex_Destroy( &MainApp.task_run_mutex );
 	LCUIMutex_Destroy( &MainApp.task_list_mutex );
