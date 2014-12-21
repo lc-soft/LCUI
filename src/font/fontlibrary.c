@@ -83,12 +83,12 @@ static LCUI_RBTree fontbmp_buffer;              /**< 字体位图缓存 */
 static LCUI_FontInfo *default_font = NULL;      /**< 指向默认字体信息的指针 */
 static LCUI_FontInfo *in_core_font = NULL;      /**< 指向内置字体的信息的指针 */
 
-static void FontLIB_DestroyData( void *arg )
+static void FontLIB_DestroyFontBitmap( void *arg )
 {
-        RBTree_Destroy( (LCUI_RBTree*)arg );
+	FontBMP_Free( (LCUI_FontBMP*)arg );
 }
 
-static void FontLIB_Destroy( void *arg )
+static void FontLIB_DestroyTreeNode( void *arg )
 {
         RBTree_Destroy( (LCUI_RBTree*)arg );
 }
@@ -119,6 +119,9 @@ LCUI_API void FontLIB_Init( void )
         
         RBTree_Init( &fontbmp_buffer );
         RBTree_Init( &font_info_buffer );
+	RBTree_OnDestroy( &fontbmp_buffer, FontLIB_DestroyTreeNode );
+	RBTree_SetDataNeedFree( &fontbmp_buffer, TRUE );
+	RBTree_SetDataNeedFree( &font_info_buffer, TRUE );
 #ifdef LCUI_FONT_ENGINE_FREETYPE
         /* 当初始化库时发生了一个错误 */
         if ( FT_Init_FreeType( &library ) ) {
@@ -249,6 +252,8 @@ FontLIB_AddFontBMP( wchar_t char_code, int font_id, int pixel_size,
                         return NULL;
                 }
                 RBTree_Init( tree_font );
+		RBTree_SetDataNeedFree( tree_font, TRUE );
+		RBTree_OnDestroy( tree_font, FontLIB_DestroyTreeNode );
                 RBTree_Insert( &fontbmp_buffer, char_code, tree_font );
         }
         /* 当字体ID不大于0时，使用内置字体 */
@@ -264,6 +269,8 @@ FontLIB_AddFontBMP( wchar_t char_code, int font_id, int pixel_size,
                         return NULL;
                 }
                 RBTree_Init( tree_bmp );
+		RBTree_OnDestroy( tree_bmp, FontLIB_DestroyFontBitmap );
+		RBTree_SetDataNeedFree( tree_bmp, TRUE );
                 RBTree_Insert( tree_font, font_id, tree_bmp );
         }
 

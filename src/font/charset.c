@@ -190,7 +190,7 @@ LCUICharset_GB2312ToUnicode( const char *src_gb2312, wchar_t **des_unicode )
 	buff = (char *) calloc ( sizeof(char), new_len );
 	p = (unsigned char*) buff;
 	if(code_convert("gb2312", "utf8", src_gb2312, len, p, new_len)) {
-		printf("%s (): error: %s", __FUNCTION__, ERROR_CONVERT_ERROR);
+		_DEBUG_MSG("convert falied.\n");
 		return -1;
 	}
 	len = LCUICharset_UTF8ToUnicode( buff, des_unicode );

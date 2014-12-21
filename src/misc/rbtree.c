@@ -58,6 +58,7 @@ void RBTree_Init( LCUI_RBTree *rbt )
 	rbt->judge = NULL;
 	rbt->destroy = NULL;
         rbt->total_node = 0;
+	rbt->need_free_data = 0;
 }
 
 /** 销毁红黑树 */

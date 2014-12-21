@@ -192,7 +192,7 @@ static void TimerList_UpdateTimerPos( TimerData *timer )
 	LCUIMutex_Unlock( &timer_mutex );
 }
 
-#define DEBUG_TIMER
+//#define DEBUG_TIMER
 #ifdef DEBUG_TIMER
 /** 打印列表中的定时器信息 */
 static void TimerList_Print( void )
@@ -207,7 +207,7 @@ static void TimerList_Print( void )
 		if( !timer ) {
 			continue;
 		}
-		_DEBUG_MSG("[%02d] %ld, func: %p, cur_ms: %dms, total_ms: %dms\n",
+		_DEBUG_MSG("[%02d] %ld, func: %p, cur_ms: %ldms, total_ms: %ldms\n",
 			i, timer->id, timer->func, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
 	}
 	_DEBUG_MSG("timer list end\n\n");

@@ -147,7 +147,7 @@ void $(Destroy)( LCUI_EventBox box )
 	LinkedList_Destroy( &box->events[1] );
 }
 
-static int $($RegisterEvent)( LCUI_EventBox box, const char *event_name, int id )
+static int _RegisterEvent( LCUI_EventBox box, const char *event_name, int id )
 {
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
@@ -186,7 +186,7 @@ int $(RegisterEventWithId)( LCUI_EventBox box, const char *event_name, int id )
 		return -1;
 	}
 	RBTree_Insert( &box->used_evnet_id, id, NULL );
-	return $($RegisterEvent)( box, event_name, id );
+	return _RegisterEvent( box, event_name, id );
 }
 
 /** 注册事件，只指定事件名称，事件ID由内部自动生成 */
@@ -194,7 +194,7 @@ int $(RegisterEvent)( LCUI_EventBox box, const char *event_name )
 {
 	int ret, id;
 	id = ++box->event_id;
-	ret = $($RegisterEvent)( box, event_name, id );
+	ret = _RegisterEvent( box, event_name, id );
 	if( ret == 0 ) {
 		return id;
 	}
