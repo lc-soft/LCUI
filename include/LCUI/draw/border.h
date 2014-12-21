@@ -44,29 +44,16 @@
 
 LCUI_BEGIN_HEADER
 
-/*************** 边框风格 *****************/
-typedef enum _BORDER_STYLE
-{
-	BORDER_STYLE_NONE,	/* 无边框 */
-	BORDER_STYLE_SOLID,	/* 实线 */
-	BORDER_STYLE_DOTTED,	/* 点状 */
-	BORDER_STYLE_DOUBLE,	/* 双线 */
-	BORDER_STYLE_DASHED,	/* 虚线 */
-}
-BORDER_STYLE;
-/*****************************************/
-
 /* 完整的边框信息 */
-typedef struct _LCUI_Border
-{
+typedef struct LCUI_Border {
 	unsigned int top_width;
 	unsigned int bottom_width;
 	unsigned int left_width;
 	unsigned int right_width;
-	BORDER_STYLE top_style;
-	BORDER_STYLE bottom_style;
-	BORDER_STYLE left_style;
-	BORDER_STYLE right_style;
+	int top_style;
+	int bottom_style;
+	int left_style;
+	int right_style;
 	LCUI_Color top_color;
 	LCUI_Color bottom_color;
 	LCUI_Color left_color;
@@ -75,13 +62,12 @@ typedef struct _LCUI_Border
 	unsigned int top_right_radius;
 	unsigned int bottom_left_radius;
 	unsigned int bottom_right_radius;
-}
-LCUI_Border;
+} LCUI_Border;
 
 LCUI_API void Border_Init( LCUI_Border *border );
 /* 初始化边框数据 */
 
-LCUI_API LCUI_Border Border( unsigned int width_px, BORDER_STYLE style, LCUI_Color color );
+LCUI_API LCUI_Border Border( unsigned int width_px, int style, LCUI_Color color );
 /* 简单的设置边框样式，并获取该样式数据 */
 
 LCUI_API void Border_Radius( LCUI_Border *border, unsigned int radius );

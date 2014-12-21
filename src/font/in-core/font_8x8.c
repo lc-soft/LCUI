@@ -39,7 +39,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 #include <LCUI_Build.h>
-#include LC_LCUI_H
+#include <LCUI/LCUI.h>
 
 #define FONTDATAMAX 2048
 /* 以下是缺省时使用的字体位图 */

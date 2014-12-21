@@ -6,7 +6,7 @@ LCUI_BEGIN_HEADER
 typedef struct LCUIIME_Func_ {
 	LCUI_BOOL (*prockey)(int,int);
 	void (*settarget)(LCUI_Widget*);
-	LCUI_Widget *(*gettarget)(void);
+	LCUI_Widget (*gettarget)(void);
 	void (*totext)(char);
 	LCUI_BOOL (*open)(void);
 	LCUI_BOOL (*close)(void);
@@ -37,7 +37,7 @@ LCUIIME_Commit( const wchar_t *str );
 
 /* 设置输入法的目标 */
 LCUI_API int
-LCUIIME_SetTarget( LCUI_Widget *widget );
+LCUIIME_SetTarget( LCUI_Widget widget );
 
 /* 初始化LCUI输入法模块 */
 LCUI_API void

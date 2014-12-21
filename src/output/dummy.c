@@ -40,7 +40,7 @@
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
+#include <LCUI/LCUI.h>
 
 #ifdef LCUI_VIDEO_DRIVER_NONE
 

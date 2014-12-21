@@ -63,7 +63,7 @@ struct FrameControlContext {
 };
 
 /** 初始化帧数控制 */
-void FrameControl_Init( FrameCtrlCtx *ctx )
+void FrameControl_Init( FrameCtrlCtx ctx )
 {
 	ctx->temp_fps = 0;
 	ctx->current_fps = 0;
@@ -76,13 +76,19 @@ void FrameControl_Init( FrameCtrlCtx *ctx )
 }
 
 /** 设置最大FPS（帧数/秒） */
-void FrameControl_SetMaxFPS( FrameCtrlCtx *ctx, unsigned int fps )
+void FrameControl_SetMaxFPS( FrameCtrlCtx ctx, unsigned int fps )
 {
 	ctx->one_frame_remain_time = (int)(1000.0/fps);
 }
 
+/** 获取当前FPS */
+int FrameControl_GetFPS( FrameCtrlCtx ctx )
+{
+	return ctx->current_fps;
+}
+
 /** 让当前帧停留一定时间 */
-void FrameControl_Remain( FrameCtrlCtx *ctx )
+void FrameControl_Remain( FrameCtrlCtx ctx )
 {
 	unsigned int n_ms, lost_ms;
 	int64_t current_time;
@@ -124,7 +130,7 @@ normal_exit:;
 }
 
 /** 暂停数据帧的更新 */
-void FrameControl_Pause( FrameCtrlCtx *ctx, LCUI_BOOL need_pause )
+void FrameControl_Pause( FrameCtrlCtx ctx, LCUI_BOOL need_pause )
 {
 	if( ctx->state == FRAME_CTRL_STATE_RUN && need_pause ) {
 		LCUICond_Broadcast( &ctx->wait_pause );

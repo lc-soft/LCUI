@@ -38,9 +38,9 @@
  * ***************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_THREAD_H
-#include LC_INPUT_H
+#include <LCUI/LCUI.h>
+#include <LCUI/thread.h>
+#include <LCUI/input.h>
 
 #include <LCUI/misc/linkedlist.h>
 
@@ -60,8 +60,8 @@ static LinkedList key_state_record;
 
 //#define __NEED_CATCHSCREEN__
 #ifdef __NEED_CATCHSCREEN__
-#include LC_GRAPH_H
-#include LC_DISPLAY_H
+#include <LCUI/graph.h>
+#include <LCUI/display.h>
 #endif
 
 #include <termios.h>
@@ -119,7 +119,7 @@ LCUI_BOOL LCUIKey_IsDoubleHit( int key_code, int interval_time )
 	data_ptr = KeyStateRecord_FindData( key_code );
 	LCUIMutex_Unlock( &record_mutex );
 	if( !data_ptr ) {
-		return FALSE;	
+		return FALSE;
 	}
 	/* 间隔时间为-1，说明该键是新记录的 */
 	if( data_ptr->interval_time == -1 ) {
@@ -224,7 +224,7 @@ void LCUI_PostKeyDownEvent( int key_code )
 	event.type = LCUI_KEYDOWN;
 	event.which = key_code;
 	LCUIKeyBoard_HitKey( key_code );
-	LCUI_PostEvent( "keydown", &event );
+	LCUI_PostEvent( &event );
 }
 
 /* 添加键盘的按键释放事件 */
@@ -234,7 +234,7 @@ void LCUI_PostKeyUpEvent( int key_code )
 	event.type = LCUI_KEYUP;
 	event.which = key_code;
 	LCUIKeyBoard_ReleaseKey( key_code );
-	LCUI_PostEvent( "keyup", &event );
+	LCUI_PostEvent( &event );
 }
 
 /** 检测键盘是否有按键按下（类似于kbhit函数） */

@@ -41,10 +41,10 @@
 //#define DEBUG
 #include <LCUI_Build.h>
 
-#include LC_LCUI_H
-#include LC_GRAPH_H
-#include LC_CURSOR_H
-#include LC_DISPLAY_H
+#include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
+#include <LCUI/cursor.h>
+#include <LCUI/display.h>
 
 static struct LCUI_Cursor {
 	LCUI_Pos current_pos;	/* 当前的坐标 */

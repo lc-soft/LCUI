@@ -38,15 +38,16 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
+#ifdef ENABLE_THIS_MODULE
 //#define DEBUG
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_WIDGET_H
+#include <LCUI/LCUI.h>
+#include <LCUI/widget.h>
 #include LC_LABEL_H
 #include LC_BUTTON_H
-#include LC_GRAPH_H
+#include <LCUI/graph.h>
 
-static void Button_ExecDefalutUpdate( LCUI_Widget *widget )
+static void Button_ExecDefalutUpdate( LCUI_Widget widget )
 {
 	LCUI_Border border;
 	LCUI_RGB border_color;
@@ -75,12 +76,12 @@ static void Button_ExecDefalutUpdate( LCUI_Widget *widget )
 		break;
 		default : break;
 	}
-	border = Border(1, BORDER_STYLE_SOLID, border_color );
+	border = Border(1, BORDER_SOLID, border_color );
 	Widget_SetBorder( widget, border );
 	Widget_SetBackgroundTransparent( widget, FALSE );
 }
 
-static void Button_ExecCustomUpdate( LCUI_Widget *widget )
+static void Button_ExecCustomUpdate( LCUI_Widget widget )
 {
 	LCUI_Button *btn;
 	LCUI_Graph *img;
@@ -103,7 +104,7 @@ static void Button_ExecCustomUpdate( LCUI_Widget *widget )
 	}
 }
 
-static void Button_ExecUpdate( LCUI_Widget *widget )
+static void Button_ExecUpdate( LCUI_Widget widget )
 {
 	switch(widget->style_id) {
 	case BUTTON_STYLE_CUSTOM:
@@ -117,14 +118,14 @@ static void Button_ExecUpdate( LCUI_Widget *widget )
 }
 
 static void 
-Button_ProcFocusOut( LCUI_Widget *widget, LCUI_WidgetEvent *unused )
+Button_ProcFocusOut( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 {
 	Widget_Update( widget );
 }
 
 
 /* 初始化按钮部件的数据 */
-static void Button_Init( LCUI_Widget *widget )
+static void Button_Init( LCUI_Widget widget )
 {
 	int valid_state;
 	LCUI_Button *button;
@@ -155,7 +156,7 @@ static void Button_Init( LCUI_Widget *widget )
 
 /* 获取嵌套在按钮部件里的label部件 */
 LCUI_API LCUI_Widget*
-Button_GetLabel( LCUI_Widget *widget )
+Button_GetLabel( LCUI_Widget widget )
 {
 	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivateData(widget);
 	return button->label;
@@ -163,7 +164,7 @@ Button_GetLabel( LCUI_Widget *widget )
 
 /* 自定义按钮在各种状态下显示的位图 */
 LCUI_API void
-Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal, 
+Button_CustomStyle(	LCUI_Widget widget, LCUI_Graph *normal, 
 			LCUI_Graph *over, LCUI_Graph *down, 
 			LCUI_Graph *focus, LCUI_Graph *disable)
 {
@@ -201,10 +202,10 @@ Button_CustomStyle(	LCUI_Widget *widget, LCUI_Graph *normal,
 
 /* 设定按钮部件显示的文本内容 */
 LCUI_API void
-Button_Text( LCUI_Widget *widget, const char *text )
+Button_Text( LCUI_Widget widget, const char *text )
 {
 	LCUI_Button *button;
-	LCUI_Widget *label;
+	LCUI_Widget label;
 	
 	button = (LCUI_Button*)Widget_GetPrivateData(widget);
 	label = button->label;
@@ -213,10 +214,10 @@ Button_Text( LCUI_Widget *widget, const char *text )
 }
 
 LCUI_API void
-Button_TextW( LCUI_Widget *widget, const wchar_t *text )
+Button_TextW( LCUI_Widget widget, const wchar_t *text )
 {
 	LCUI_Button *button;
-	LCUI_Widget *label;
+	LCUI_Widget label;
 	
 	button = (LCUI_Button*)Widget_GetPrivateData(widget);
 	label = button->label;
@@ -227,7 +228,7 @@ Button_TextW( LCUI_Widget *widget, const wchar_t *text )
 LCUI_API LCUI_Widget*
 Button_New( const char *text )
 {
-	LCUI_Widget *widget;
+	LCUI_Widget widget;
 	widget = Widget_New("button");
 	Button_Text(widget, text);
 	return widget;
@@ -244,3 +245,4 @@ Register_Button(void)
 	WidgetFunc_Add("button", Button_Init,		FUNC_TYPE_INIT);
 	WidgetFunc_Add("button", Button_ExecUpdate,	FUNC_TYPE_UPDATE);
 }
+#endif

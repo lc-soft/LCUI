@@ -57,38 +57,38 @@ ScrollBar_Data;
 
 /* 获取滚动条部件 */
 LCUI_API LCUI_Widget*
-Get_ScrollBar( LCUI_Widget *widget );
+Get_ScrollBar( LCUI_Widget widget );
 
 /* 获取滚动条的数据 */
 LCUI_API ScrollBar_Data
-ScrollBar_GetData ( LCUI_Widget *widget );
+ScrollBar_GetData ( LCUI_Widget widget );
 
 /* 获取滚动条部件的滑块 */
 LCUI_API LCUI_Widget*
-ScrollBar_GetWidget( LCUI_Widget *widget );
+ScrollBar_GetWidget( LCUI_Widget widget );
 
 LCUI_API void
-ScrollBar_SetMaxNum( LCUI_Widget *widget, int max_num );
+ScrollBar_SetMaxNum( LCUI_Widget widget, int max_num );
 
 LCUI_API void
-ScrollBar_SetMaxSize( LCUI_Widget *widget, int max_size );
+ScrollBar_SetMaxSize( LCUI_Widget widget, int max_size );
 
 LCUI_API void
-ScrollBar_SetCurrentValue( LCUI_Widget *widget, int current_num );
+ScrollBar_SetCurrentValue( LCUI_Widget widget, int current_num );
 
 LCUI_API void
-ScrollBar_SetCurrentSize( LCUI_Widget *widget, int current_size );
+ScrollBar_SetCurrentSize( LCUI_Widget widget, int current_size );
 
 /* 将回调函数与滚动条部件连接 */
 LCUI_API void
 ScrollBar_Connect(
-	LCUI_Widget *widget,
+	LCUI_Widget widget,
 	void (*callback_func)( ScrollBar_Data, void* ),
 	void *arg );
 
 /* 设置滚动条是横向移动还是纵向移动 */
 LCUI_API void
-ScrollBar_SetDirection( LCUI_Widget *widget, int direction );
+ScrollBar_SetDirection( LCUI_Widget widget, int direction );
 LCUI_END_HEADER
 
 #endif

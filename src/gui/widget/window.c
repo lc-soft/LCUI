@@ -38,18 +38,19 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-
+ 
+#ifdef ENABLE_THIS_MODULE
 #include <LCUI_Build.h> 
-#include LC_LCUI_H 
-#include LC_DISPLAY_H
-#include LC_WIDGET_H
+#include <LCUI/LCUI.h> 
+#include <LCUI/display.h>
+#include <LCUI/widget.h>
 #include LC_BUTTON_H 
 #include LC_LABEL_H
 #include LC_PICBOX_H
 #include LC_WINDOW_H 
-#include LC_GRAPH_H
-#include LC_INPUT_H
-#include LC_FONT_H
+#include <LCUI/graph.h>
+#include <LCUI/input.h>
+#include <LCUI/font.h>
 #include LC_ERROR_H
 
 #define TOP_PANDDING		2
@@ -58,11 +59,11 @@
 				 |WIDGET_STATE_OVERLAY|WIDGET_STATE_DISABLE)
 
 typedef struct LCUI_WindowRec_ {
-	LCUI_Widget *titlebar;		/**< 标题栏 */
-	LCUI_Widget *client_area;	/**< 客户区 */
-	LCUI_Widget *btn_close;		/**< close按钮 */
-	LCUI_Widget *icon;		/**< 图标 */
-	LCUI_Widget *text;		/**< 标题文本 */
+	LCUI_Widget titlebar;		/**< 标题栏 */
+	LCUI_Widget client_area;	/**< 客户区 */
+	LCUI_Widget btn_close;		/**< close按钮 */
+	LCUI_Widget icon;		/**< 图标 */
+	LCUI_Widget text;		/**< 标题文本 */
 	LCUI_Color theme_color;	/**< 顶部线条颜色 */
 } LCUI_Window;
 
@@ -88,26 +89,26 @@ static void LoadCloseButtonIMG( LCUI_Graph *graph )
 }
 
 /** 在窗口失去焦点时会调用此函数 */
-static void Window_OnFocusOut( LCUI_Widget *window, LCUI_WidgetEvent *unused )
+static void Window_OnFocusOut( LCUI_Widget window, LCUI_WidgetEvent *unused )
 {
 	Widget_Update( window );
 }
 
 /** 在窗口获得焦点时会调用此函数 */
-static void Window_OnFocusIn( LCUI_Widget *window, LCUI_WidgetEvent *unused )
+static void Window_OnFocusIn( LCUI_Widget window, LCUI_WidgetEvent *unused )
 {
 	//_DEBUG_MSG( "%p, Window_FocusIn!\n",window );
 	Widget_Front( window );
 	Widget_Update( window );
 }
 
-static void Window_OnShow( LCUI_Widget *widget )
+static void Window_OnShow( LCUI_Widget widget )
 {
 	Widget_SetFocus( widget );
 }
 
 /* 处理鼠标移动事件 */
-static void Window_ExecMove( LCUI_Widget *window, LCUI_WidgetEvent *event )
+static void Window_ExecMove( LCUI_Widget window, LCUI_WidgetEvent *event )
 {
 	LCUI_Pos pos;
 	/* 解除之前设定的align */
@@ -118,7 +119,7 @@ static void Window_ExecMove( LCUI_Widget *window, LCUI_WidgetEvent *event )
 }
 
 /** 初始化window部件相关数据 */
-static void Window_OnInit( LCUI_Widget *window )
+static void Window_OnInit( LCUI_Widget window )
 {
 	LCUI_Window *wnd;
 	LCUI_Graph btn_bg;
@@ -159,8 +160,8 @@ static void Window_OnInit( LCUI_Widget *window )
 	Widget_SetBackgroundTransparent( window, FALSE );
 	Widget_SetBackgroundColor( window, RGB(255,255,255) );
 	Widget_SetBackgroundLayout( wnd->icon, LAYOUT_ZOOM );
-	Widget_SetDock( wnd->titlebar, DOCK_TYPE_TOP );
-	Widget_SetDock( wnd->client_area, DOCK_TYPE_BOTTOM );
+	Widget_SetDock( wnd->titlebar, DOCK_TOP );
+	Widget_SetDock( wnd->client_area, DOCK_BOTTOM );
 	Widget_SetPadding( window, Padding(TOP_PANDDING,1,1,1) );
 	Widget_SetPadding( wnd->client_area, Padding(1,1,1,1) );
 	Widget_SetSize( wnd->titlebar, "100%", "35px" );
@@ -209,14 +210,14 @@ static void Window_OnInit( LCUI_Widget *window )
 	Widget_Show( wnd->client_area );
 }
 
-static void Window_OnUpdate( LCUI_Widget *window )
+static void Window_OnUpdate( LCUI_Widget window )
 {
 	LCUI_Window *wnd;
 	LCUI_Border border;
 	char h_str[20];
 
 	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
-	border = Border( 1, BORDER_STYLE_SOLID, RGB(200,200,200) );
+	border = Border( 1, BORDER_SOLID, RGB(200,200,200) );
 	border.top_width = TOP_PANDDING;
 	/* 若窗口已获得焦点 */
 	if( Widget_GetFocus( window ) ) {
@@ -236,7 +237,7 @@ static void Window_OnUpdate( LCUI_Widget *window )
 }
 
 /** 获取窗口的客户区 */
-LCUI_API LCUI_Widget *Window_GetClientArea( LCUI_Widget *window )
+LCUI_API LCUI_Widget Window_GetClientArea( LCUI_Widget window )
 {
 	LCUI_Window *wnd;
 	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
@@ -244,7 +245,7 @@ LCUI_API LCUI_Widget *Window_GetClientArea( LCUI_Widget *window )
 }
 
 /** 获取窗口的close按钮 */
-LCUI_API LCUI_Widget *Window_GetCloseButton( LCUI_Widget *window )
+LCUI_API LCUI_Widget Window_GetCloseButton( LCUI_Widget window )
 {
 	LCUI_Window *wnd;
 	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
@@ -252,7 +253,7 @@ LCUI_API LCUI_Widget *Window_GetCloseButton( LCUI_Widget *window )
 }
 
 /** 将部件添加至窗口客户区内 */
-LCUI_API void Window_ClientArea_Add( LCUI_Widget *window, LCUI_Widget *w )
+LCUI_API void Window_ClientArea_Add( LCUI_Widget window, LCUI_Widget w )
 {
 	LCUI_Window *wnd;
 	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
@@ -260,7 +261,7 @@ LCUI_API void Window_ClientArea_Add( LCUI_Widget *window, LCUI_Widget *w )
 }
 
 /** 设置窗口标题栏中显示的文本 */
-LCUI_API int Window_SetTextW( LCUI_Widget *window, const wchar_t *text )
+LCUI_API int Window_SetTextW( LCUI_Widget window, const wchar_t *text )
 {
 	LCUI_Window *wnd;
 	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
@@ -268,7 +269,7 @@ LCUI_API int Window_SetTextW( LCUI_Widget *window, const wchar_t *text )
 }
 
 /** 设置窗口的图标 */
-LCUI_API void Window_SetIcon( LCUI_Widget *window, LCUI_Graph *icon )
+LCUI_API void Window_SetIcon( LCUI_Widget window, LCUI_Graph *icon )
 {
 	LCUI_Window *wnd;
 	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
@@ -278,7 +279,7 @@ LCUI_API void Window_SetIcon( LCUI_Widget *window, LCUI_Graph *icon )
 }
 
 /** 设置窗口主题色 */
-LCUI_API void Window_SetThemeColor( LCUI_Widget *window, LCUI_Color color )
+LCUI_API void Window_SetThemeColor( LCUI_Widget window, LCUI_Color color )
 {
 	LCUI_Window *wnd;
 	wnd = (LCUI_Window*)Widget_GetPrivateData( window );
@@ -286,18 +287,18 @@ LCUI_API void Window_SetThemeColor( LCUI_Widget *window, LCUI_Color color )
 	Widget_Update( window );
 }
 
-static void CloseButton_OnInit( LCUI_Widget *widget )
+static void CloseButton_OnInit( LCUI_Widget widget )
 {
 	Widget_NewPrivateData( widget, LCUI_Button );
 	widget->valid_state = ALLOW_STATE_LIST;
 
 }
 
-static void CloseButton_OnUpdate( LCUI_Widget *widget )
+static void CloseButton_OnUpdate( LCUI_Widget widget )
 {
 	LCUI_Graph img;
 	LCUI_Color color;
-	LCUI_Widget *wnd;
+	LCUI_Widget wnd;
 
 	Graph_Init( &img );
 	LoadCloseButtonIMG( &img );
@@ -356,3 +357,4 @@ void RegisterWindow(void)
 	WidgetFunc_Add( WIDGET_CLOSE_BUTTON, CloseButton_OnInit, FUNC_TYPE_INIT );
 	WidgetFunc_Add( WIDGET_CLOSE_BUTTON, CloseButton_OnUpdate, FUNC_TYPE_UPDATE );
 }
+#endif

@@ -65,7 +65,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>LCUI_EXPORTS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)LCUI;$(SolutionDir)include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)LCUI;$(SolutionDir)include;$(SolutionDir)include\freetype2;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4819;4244;4996;</DisableSpecificWarnings>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -77,9 +77,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libpng16.lib;jpeg.lib;freetype253_D.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>libpng16.lib;libjpeg.lib;freetype253_D.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBCMT;MSVCRT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRT</IgnoreSpecificDefaultLibraries>
       <LinkStatus>false</LinkStatus>
     </Link>
     <ResourceCompile>
@@ -94,7 +94,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>LCUI_EXPORTS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)LCUI;$(SolutionDir)include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)LCUI;$(SolutionDir)include;$(SolutionDir)include\freetype2;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4819;4244;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -106,9 +106,9 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libpng16.lib;jpeg.lib;freetype253.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>libpng16.lib;libjpeg.lib;freetype253.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD;LIBCMT</IgnoreSpecificDefaultLibraries>
     </Link>
     <Lib>
       <AdditionalDependencies>libpng15.lib;jpeg.lib;libfreetype2411MT.lib;zlib.lib;</AdditionalDependencies>

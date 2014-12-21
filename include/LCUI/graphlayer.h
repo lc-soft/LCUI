@@ -1,64 +1,58 @@
-﻿/** ******************************************************************************
- * @file	LCUI_GraphLayer.h
- * @brief	GraphLayer operation set.
- * @author	Liu Chao <lc-soft@live.cn>
- * @warning
- * Copyright (C) 2012-2013 by							\n
- * Liu Chao									\n
- * 										\n
- * This file is part of the LCUI project, and may only be used, modified, and	\n
- * distributed under the terms of the GPLv2.					\n
- * 										\n
- * (GPLv2 is abbreviation of GNU General Public License Version 2)		\n
- * 										\n
- * By continuing to use, modify, or distribute this file you indicate that you	\n
- * have read the license and understand and accept it fully.			\n
- *  										\n
- * The LCUI project is distributed in the hope that it will be useful, but 	\n
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 	\n
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.	\n
- * 										\n
- * You should have received a copy of the GPLv2 along with this file. It is 	\n
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.	\n
- * ******************************************************************************/
+﻿/* ***************************************************************************
+ * graphlayer.h -- LCUI graphics layer processing module.
+ * 
+ * Copyright (C) 2014 by Liu Chao <lc-soft@live.cn>
+ * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ * 
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ***************************************************************************/
  
-/** ******************************************************************************
- * @file	LCUI_GraphLayer.h
- * @brief	图层的操作集.
- * @author	刘超 <lc-soft@live.cn>
- * @warning
- * 版权所有 (C) 2012-2013 归属于						\n
- * 刘超										\n
- * 										\n
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。	\n
- * 										\n
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)				\n
- * 										\n
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。	\n
- * 										\n
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特定\n
- 用途的隐含担保，详情请参照GPLv2许可协议。					\n
- * 										\n
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果	\n
- * 没有，请查看：<http://www.gnu.org/licenses/>. 				\n
- * ******************************************************************************/
+/* ****************************************************************************
+ * graphlayer.h -- LCUI 的图层处理模块
+ *
+ * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ***************************************************************************/
+
 #ifndef __LCUI_GRAPHLAYER_H__
 #define __LCUI_GRAPHLAYER_H__
 
 LCUI_BEGIN_HEADER
 
-typedef struct LCUI_GraphLayer_ LCUI_GraphLayer;
+typedef struct LCUI_GraphLayer LCUI_GraphLayer;
 
 /** 图层(GraphLayer)的结构体 */
-struct LCUI_GraphLayer_
-{
+struct LCUI_GraphLayer {
 	LCUI_BOOL visible;		/**< 图层是否可见 */
 	LCUI_BOOL inherit_alpha;	/**< 是否继承父图层的透明度 */
-	LCUI_Padding padding;		/**< 内边距，决定子图层所在显示区域的范围 */
+	LCUI_Rect2 content_box;		/**< 内容框，决定子图层所在显示区域的范围 */
 	int z_index;			/**< 图层的堆叠顺序，值越大，图层显示位置越靠前 */
 	LCUI_Pos pos;			/**< 图层的xy轴坐标 */
 	LCUI_GraphLayer *parent;	/**< 该图层的容器图层 */
-	LCUI_Queue child;		/**< 该图层中内的子图层记录 */
+	LinkedList children;		/**< 该图层中内的子图层记录 */
 	LCUI_Graph graph;		/**< 图层像素数据 */
 };
 
@@ -163,7 +157,8 @@ LCUI_API int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y );
  *	@param glayer	图层
  *	@param padding	内边距
  */
-LCUI_API void GraphLayer_SetPadding( LCUI_GraphLayer *glayer, LCUI_Padding padding );
+LCUI_API void GraphLayer_SetPadding( LCUI_GraphLayer *glayer, 
+				int top, int right, int bottom, int left );
 
 /**
  * 设定图层的全局透明度
@@ -253,7 +248,7 @@ GraphLayer_GetGlobalPos(	LCUI_GraphLayer *root_glayer,
  */
 LCUI_API int GraphLayer_GetLayers(	LCUI_GraphLayer *glayer, 
 					LCUI_Rect rect,
-					LCUI_Queue *queue );
+					LinkedList *list );
 
 
 /**

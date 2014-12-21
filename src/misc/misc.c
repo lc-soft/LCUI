@@ -39,29 +39,11 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-//#define DEBUG
 #include <LCUI_Build.h>
-#include LC_LCUI_H 
-#include LC_GRAPH_H
+#include <LCUI/LCUI.h>
 
-LCUI_API void Padding_Init( LCUI_Padding *padding )
-{
-	padding->left = 0;
-	padding->bottom = 0;
-	padding->right = 0;
-	padding->top = 0; 
-}
-
-LCUI_API void Margin_Init( LCUI_Margin *margin )
-{
-	margin->left = 0;
-	margin->bottom = 0;
-	margin->right = 0;
-	margin->top = 0; 
-}
-
-/* 转换成LCUI_Pos类型 */
-LCUI_API LCUI_Pos Pos(int x, int y)
+/** 转换成LCUI_Pos类型 */
+LCUI_Pos Pos(int x, int y)
 {
 	LCUI_Pos p;
 	p.x = x;
@@ -69,8 +51,8 @@ LCUI_API LCUI_Pos Pos(int x, int y)
 	return p;
 }
 
-/* 转换成LCUI_Size类型 */
-LCUI_API LCUI_Size Size(int w, int h)
+/** 转换成LCUI_Size类型 */
+LCUI_Size Size(int w, int h)
 {
 	LCUI_Size s;
 	s.w = w;
@@ -82,7 +64,7 @@ LCUI_API LCUI_Size Size(int w, int h)
  * 功能：对比两个尺寸
  * 说明：a大于b，返回1， b大于a，返回-1，相等则返回0
  * */
-LCUI_API int Size_Cmp(LCUI_Size a, LCUI_Size b)
+int Size_Cmp( LCUI_Size a, LCUI_Size b )
 {
 	if(a.w > b.w || a.h > b.h) {
 		return 1;
@@ -94,9 +76,8 @@ LCUI_API int Size_Cmp(LCUI_Size a, LCUI_Size b)
 	}
 }
 
-/* 根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */
-LCUI_API LCUI_Pos
-GetPosByAlign( LCUI_Size container, LCUI_Size child, int align )
+/** 根据容器尺寸，区域尺寸以及对齐方式，获取该区域的位置 */
+LCUI_Pos GetPosByAlign( LCUI_Size box, LCUI_Size child, int align )
 {
 	LCUI_Pos pos;
 	pos.x = pos.y = 0; 
@@ -106,81 +87,40 @@ GetPosByAlign( LCUI_Size container, LCUI_Size child, int align )
 	    case ALIGN_TOP_LEFT : /* 向左上角对齐 */  
 		break;
 	    case ALIGN_TOP_CENTER : /* 向上中间对齐 */ 
-		pos.x = (container.w - child.w) / 2.0; 
+		pos.x = (box.w - child.w) / 2.0; 
 		break;
 	    case ALIGN_TOP_RIGHT : /* 向右上角对齐 */ 
-		pos.x = container.w - child.w; 
+		pos.x = box.w - child.w; 
 		break;
 	    case ALIGN_MIDDLE_LEFT : /* 向中央偏左对齐 */  
-		pos.y = (container.h - child.h) / 2.0;
+		pos.y = (box.h - child.h) / 2.0;
 		break;
 	    case ALIGN_MIDDLE_CENTER : /* 向正中央对齐 */ 
-		pos.x = (container.w - child.w) / 2.0;
-		pos.y = (container.h - child.h) / 2.0;
+		pos.x = (box.w - child.w) / 2.0;
+		pos.y = (box.h - child.h) / 2.0;
 		break;
 	    case ALIGN_MIDDLE_RIGHT : /* 向中央偏由对齐 */ 
-		pos.x = container.w - child.w;
-		pos.y = (container.h - child.h) / 2.0;
+		pos.x = box.w - child.w;
+		pos.y = (box.h - child.h) / 2.0;
 		break;
 	    case ALIGN_BOTTOM_LEFT : /* 向底部偏左对齐 */  
-		pos.y = container.h - child.h;
+		pos.y = box.h - child.h;
 		break;
 	    case ALIGN_BOTTOM_CENTER : /* 向底部居中对齐 */ 
-		pos.x = (container.w - child.w) / 2.0;
-		pos.y = container.h - child.h; 
+		pos.x = (box.w - child.w) / 2.0;
+		pos.y = box.h - child.h; 
 		break;
 	    case ALIGN_BOTTOM_RIGHT : /* 向底部偏右对齐 */ 
-		pos.x = container.w - child.w;
-		pos.y = container.h - child.h;
+		pos.x = box.w - child.w;
+		pos.y = box.h - child.h;
 		break; 
 	    default :  break; 
 	}
 	return pos;
 }
 
-LCUI_API LCUI_Padding
-Padding(int top, int bottom, int left, int right)
-{
-	LCUI_Padding padding;
-	
-	padding.top = top;
-	padding.bottom = bottom;
-	padding.left = left;
-	padding.right = right;
-	
-	return padding;
-}
-
-/* 求两个LCUI_Pos类型变量的和 */
-LCUI_API LCUI_Pos
-Pos_Add( LCUI_Pos a, LCUI_Pos b )
-{
-	a.x += b.x;
-	a.y += b.y;
-	return a;
-}
-
-/* 对比两个坐标是否一致 */
-LCUI_API int
-Pos_Cmp( LCUI_Pos a, LCUI_Pos b )
-{
-	if(a.x != b.x || a.y != b.y) {
-		return -1;
-	}
-	return 0;
-}
-
-/* 求两个LCUI_Pos类型变量的差 */
-LCUI_API LCUI_Pos
-Pos_Sub( LCUI_Pos a, LCUI_Pos b )
-{
-	a.x -= b.x;
-	a.y -= b.y;
-	return a;
-}
-
 /** 根据给定的字符串，生成一个ID */
-LCUI_API unsigned int BKDRHash( const char *str )
+unsigned int BKDRHash( const char *str )
 {
     unsigned int seed = 131;
     unsigned int hash = 0;

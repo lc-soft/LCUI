@@ -40,9 +40,8 @@
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_ERROR_H
-#include LC_FONT_H
+#include <LCUI/LCUI.h>
+#include <LCUI/font.h>
 
 #include <stdio.h>
 #include <stdlib.h>

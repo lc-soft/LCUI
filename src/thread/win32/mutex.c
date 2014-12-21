@@ -21,10 +21,9 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * mutex.c -- win32版互斥锁
+ * mutex.c -- 适用于 windows 平台的互斥锁实现方案
  *
- * 版权所有 (C) 2013 归属于
- * 刘超
+ * 版权所有 (C) 2013-2014 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -40,28 +39,25 @@
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_THREAD_H
+#include <LCUI/LCUI.h>
+#include <LCUI/thread.h>
 
 #ifdef LCUI_THREAD_WIN32
 
-LCUI_API int
-LCUIMutex_Init( LCUI_Mutex *mutex )
+int LCUIMutex_Init( LCUI_Mutex *mutex )
 {
 	*mutex = CreateMutex(NULL, FALSE, NULL);
 	return 0;
 }
 
 /* Free the mutex */
-LCUI_API void
-LCUIMutex_Destroy( LCUI_Mutex *mutex )
+void LCUIMutex_Destroy( LCUI_Mutex *mutex )
 {
 	CloseHandle( *mutex );
 }
 
 /* Try lock the mutex */
-LCUI_API int
-LCUIMutex_TryLock( LCUI_Mutex *mutex )
+int LCUIMutex_TryLock( LCUI_Mutex *mutex )
 {
 	switch ( WaitForSingleObject( *mutex, 0 ) ) {
 	case WAIT_FAILED:
@@ -76,8 +72,7 @@ LCUIMutex_TryLock( LCUI_Mutex *mutex )
 }
 
 /* Lock the mutex */
-LCUI_API int
-LCUIMutex_Lock( LCUI_Mutex *mutex )
+int LCUIMutex_Lock( LCUI_Mutex *mutex )
 {
 	if ( WaitForSingleObject( *mutex, INFINITE ) == WAIT_FAILED ) {
 		printf("Couldn't wait on mutex\n");
@@ -88,8 +83,7 @@ LCUIMutex_Lock( LCUI_Mutex *mutex )
 }
 
 /* Unlock the mutex */
-LCUI_API int
-LCUIMutex_Unlock( LCUI_Mutex *mutex )
+int LCUIMutex_Unlock( LCUI_Mutex *mutex )
 {
 	if ( ReleaseMutex( *mutex ) == FALSE ) {
 		printf("Couldn't release mutex\n");

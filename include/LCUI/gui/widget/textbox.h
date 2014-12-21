@@ -50,22 +50,22 @@ LCUI_BEGIN_HEADER
 LCUI_API void RegisterTextBox( void );
 
 /** 指定文本框是否处理控制符 */
-LCUI_API void TextBox_SetUsingStyleTags( LCUI_Widget *widget, LCUI_BOOL is_true );
+LCUI_API void TextBox_SetUsingStyleTags( LCUI_Widget widget, LCUI_BOOL is_true );
 
 /** 指定文本框是否启用多行文本显示 */
-LCUI_API void TextBox_SetMultiline( LCUI_Widget *widget, LCUI_BOOL is_true );
+LCUI_API void TextBox_SetMultiline( LCUI_Widget widget, LCUI_BOOL is_true );
 
 /** 清空文本内容 */
-LCUI_API void TextBox_ClearText( LCUI_Widget *widget );
+LCUI_API void TextBox_ClearText( LCUI_Widget widget );
 
 /** 为文本框设置文本（宽字符版） */
-LCUI_API int TextBox_SetTextW( LCUI_Widget *widget, const wchar_t *wstr );
+LCUI_API int TextBox_SetTextW( LCUI_Widget widget, const wchar_t *wstr );
 
 /** 为文本框追加文本（宽字符版） */
-LCUI_API int TextBox_AppendTextW( LCUI_Widget *widget, const wchar_t *wstr );
+LCUI_API int TextBox_AppendTextW( LCUI_Widget widget, const wchar_t *wstr );
 
 /** 为文本框插入文本（宽字符版） */
-LCUI_API int TextBox_InsertTextW( LCUI_Widget *widget, const wchar_t *wstr );
+LCUI_API int TextBox_InsertTextW( LCUI_Widget widget, const wchar_t *wstr );
 
 LCUI_END_HEADER
 

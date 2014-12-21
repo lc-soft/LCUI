@@ -40,8 +40,8 @@
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_THREAD_H
+#include <LCUI/LCUI.h>
+#include <LCUI/thread.h>
 
 #ifdef LCUI_THREAD_WIN32
 #include <process.h>
@@ -55,7 +55,7 @@ typedef struct _LCUI_ThreadData {
 } LCUI_ThreadData;
 
 static LCUI_BOOL db_init = FALSE;
-static LCUI_Queue thread_database;
+static LinkedList thread_database;
 
 static unsigned __stdcall run_thread(void *arg)
 {
@@ -70,9 +70,9 @@ int LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 	LCUI_ThreadData *thread_ptr;
 	if(!db_init) {
 		db_init = TRUE;
-		Queue_Init(&thread_database, sizeof(LCUI_ThreadData), NULL);
+		LinkedList_Init( &thread_database, sizeof(LCUI_ThreadData) );
 	}
-	thread_ptr = malloc(sizeof(LCUI_ThreadData));
+	thread_ptr = (LCUI_ThreadData*)malloc(sizeof(LCUI_ThreadData));
 	thread_ptr->func = func;
 	thread_ptr->arg = arg;
 	thread_ptr->retval = NULL;
@@ -82,7 +82,7 @@ int LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 		*thread = 0;
 		return -1;
 	}
-	Queue_AddPointer( &thread_database, thread_ptr );
+	LinkedList_AddData( &thread_database, thread_ptr );
 	*thread = thread_ptr->tid;
 	return 0;
 }
@@ -92,9 +92,10 @@ static LCUI_ThreadData *LCUIThread_Find( LCUI_Thread tid )
 	int i, n;
 	LCUI_ThreadData *thread_data;
 	
-	n = Queue_GetTotal( &thread_database );
+	n = LinkedList_GetTotal( &thread_database );
 	for(i=0; i<n; ++i) {
-		thread_data = Queue_Get( &thread_database, i );
+		LinkedList_Goto( &thread_database, i );
+		thread_data = (LCUI_ThreadData*)LinkedList_Get( &thread_database );
 		if( !thread_data || thread_data->tid != tid ) {
 			continue;
 		}
@@ -111,13 +112,14 @@ static int LCUIThread_Destroy( LCUI_Thread thread )
 	if(!thread){
 		return -1;
 	}
-	n = Queue_GetTotal( &thread_database );
+	n = LinkedList_GetTotal( &thread_database );
 	for(i=0; i<n; ++i) {
-		thread_data = Queue_Get( &thread_database, i );
+		LinkedList_Goto( &thread_database, i );
+		thread_data = (LCUI_ThreadData*)LinkedList_Get( &thread_database );
 		if( !thread_data || thread != thread_data->tid ) {
 			continue;
 		}
-		Queue_Delete( &thread_database, i );
+		LinkedList_Delete( &thread_database );
 		return 0;
 	}
 	return -2;

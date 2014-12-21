@@ -9,6 +9,6 @@ LCUI_API int WidgetStyle_LoadFromString( const char *style_str );
 
 LCUI_API int WidgetStyle_LoadFromFile( const char *filepath );
 
-LCUI_API int WidgetStyle_Sync( LCUI_Widget *widget );
+LCUI_API int WidgetStyle_Sync( LCUI_Widget widget );
 
 #endif

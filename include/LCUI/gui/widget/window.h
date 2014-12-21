@@ -49,22 +49,22 @@
 LCUI_BEGIN_HEADER
 
 /** 获取窗口的客户区 */
-LCUI_API LCUI_Widget *Window_GetClientArea( LCUI_Widget *window );
+LCUI_API LCUI_Widget Window_GetClientArea( LCUI_Widget window );
 
 /** 获取窗口的close按钮 */
-LCUI_API LCUI_Widget *Window_GetCloseButton( LCUI_Widget *window );
+LCUI_API LCUI_Widget Window_GetCloseButton( LCUI_Widget window );
 
 /** 将部件添加至窗口客户区内 */
-LCUI_API void Window_ClientArea_Add( LCUI_Widget *window, LCUI_Widget *w );
+LCUI_API void Window_ClientArea_Add( LCUI_Widget window, LCUI_Widget w );
 
 /** 设置窗口标题栏中显示的文本 */
-LCUI_API int Window_SetTextW( LCUI_Widget *window, const wchar_t *text );
+LCUI_API int Window_SetTextW( LCUI_Widget window, const wchar_t *text );
 
 /** 设置窗口的图标 */
-LCUI_API void Window_SetIcon( LCUI_Widget *window, LCUI_Graph *icon );
+LCUI_API void Window_SetIcon( LCUI_Widget window, LCUI_Graph *icon );
 
 /** 设置窗口主题色 */
-LCUI_API void Window_SetThemeColor( LCUI_Widget *window, LCUI_Color color );
+LCUI_API void Window_SetThemeColor( LCUI_Widget window, LCUI_Color color );
 
 LCUI_END_HEADER
 

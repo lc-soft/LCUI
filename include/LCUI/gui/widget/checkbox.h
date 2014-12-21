@@ -71,45 +71,45 @@ struct _LCUI_CheckBox
 
 /* 设定复选框为选中状态 */
 LCUI_API void
-CheckBox_SetOn( LCUI_Widget *widget );
+CheckBox_SetOn( LCUI_Widget widget );
 
 /* 设定复选框为未选中状态 */
 LCUI_API void
-CheckBox_SetOff( LCUI_Widget *widget );
+CheckBox_SetOff( LCUI_Widget widget );
 
 /* 检测复选框是否被选中 */
 LCUI_API int
-CheckBox_IsOn( LCUI_Widget *widget );
+CheckBox_IsOn( LCUI_Widget widget );
 
 /* 检测复选框是否未选中 */
 LCUI_API LCUI_BOOL
-CheckBox_IsOff( LCUI_Widget *widget );
+CheckBox_IsOff( LCUI_Widget widget );
 
 /* 
  * 功能：切换复选框的状态
  * 说明：这个状态指的是打勾与没打勾的两种状态
  *  */
 LCUI_API void
-CheckBox_SwitchState( LCUI_Widget *widget, LCUI_WidgetEvent *event );
+CheckBox_SwitchState( LCUI_Widget widget, LCUI_WidgetEvent *event );
 
 /* 设定复选框中的图像框的尺寸 */
 LCUI_API void
-CheckBox_ImgBox_SetSize( LCUI_Widget *widget, LCUI_Size size );
+CheckBox_ImgBox_SetSize( LCUI_Widget widget, LCUI_Size size );
 
 /* 获取复选框部件中的label部件的指针 */
 LCUI_API LCUI_Widget*
-CheckBox_GetLabel( LCUI_Widget *widget );
+CheckBox_GetLabel( LCUI_Widget widget );
 
 /* 获取复选框部件中的PictureBox部件的指针 */
 LCUI_API LCUI_Widget*
-CheckBox_GetImgBox( LCUI_Widget *widget );
+CheckBox_GetImgBox( LCUI_Widget widget );
 
 /* 设定与复选框部件关联的文本内容 */
 LCUI_API void
-CheckBox_Text( LCUI_Widget *widget, const char *text );
+CheckBox_Text( LCUI_Widget widget, const char *text );
 
 LCUI_API void
-CheckBox_TextW( LCUI_Widget *widget, const wchar_t *text );
+CheckBox_TextW( LCUI_Widget widget, const wchar_t *text );
 
 /* 创建一个带文本内容的复选框 */
 LCUI_API LCUI_Widget*

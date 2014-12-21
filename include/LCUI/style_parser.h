@@ -1,6 +1,8 @@
 ﻿#ifndef __LCUI_STYLE_LIBRARY_H__
 #define __LCUI_STYLE_LIBRARY_H__
 
+#ifdef ENABLE_THIS_MODULE
+
 LCUI_BEGIN_HEADER
 	
 typedef struct StyleLIB_Property_ {
@@ -91,5 +93,5 @@ StyleLIB_AddStyleFromFile(	StyleLIB_Library *lib,
 
 
 LCUI_END_HEADER
-
+#endif
 #endif

@@ -41,7 +41,7 @@
 #ifndef __LCUI_LABEL_H__
 #define __LCUI_LABEL_H__
 
-#include LC_FONT_H
+#include <LCUI/font.h>
 
 LCUI_BEGIN_HEADER
 	
@@ -49,29 +49,29 @@ LCUI_BEGIN_HEADER
 #define Label_New() Widget_New(WIDGET_LABEL)
 
 /** 设定与标签关联的文本内容 */
-LCUI_API int Label_SetTextW( LCUI_Widget *widget, const wchar_t *text );
+LCUI_API int Label_SetTextW( LCUI_Widget widget, const wchar_t *text );
 
-LCUI_API int Label_SetText( LCUI_Widget *widget, const char *utf8_text );
+LCUI_API int Label_SetText( LCUI_Widget widget, const char *utf8_text );
 
-LCUI_API int Label_SetTextA( LCUI_Widget *widget, const char *ansi_text );
+LCUI_API int Label_SetTextA( LCUI_Widget widget, const char *ansi_text );
 
 /** 设置Label部件显示的文本是否自动换行 */
-LCUI_API void Label_SetAutoWrap( LCUI_Widget *widget, LCUI_BOOL flag );
+LCUI_API void Label_SetAutoWrap( LCUI_Widget widget, LCUI_BOOL flag );
 
 /** 设置文本对齐方式 */
-LCUI_API void Label_SetTextAlign( LCUI_Widget *widget, TextAlignType align );
+LCUI_API void Label_SetTextAlign( LCUI_Widget widget, TextAlignType align );
 
 /** 为Label部件内显示的文本设定文本样式 */
-LCUI_API int Label_SetTextStyle( LCUI_Widget *widget, LCUI_TextStyle style );
+LCUI_API int Label_SetTextStyle( LCUI_Widget widget, LCUI_TextStyle style );
 
 /** 获取Label部件的全局文本样式 */
-LCUI_API void Label_GetTextStyle( LCUI_Widget *widget, LCUI_TextStyle *style );
+LCUI_API void Label_GetTextStyle( LCUI_Widget widget, LCUI_TextStyle *style );
 
 /** 刷新label部件显示的文本 */
-LCUI_API void Label_Refresh( LCUI_Widget *widget );
+LCUI_API void Label_Refresh( LCUI_Widget widget );
 
 /** 启用或禁用Label部件的自动尺寸调整功能 */
-LCUI_API void Label_SetAutoSize( LCUI_Widget *widget, LCUI_BOOL flag,
+LCUI_API void Label_SetAutoSize( LCUI_Widget widget, LCUI_BOOL flag,
 							AUTOSIZE_MODE mode );
 
 LCUI_END_HEADER

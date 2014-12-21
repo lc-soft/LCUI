@@ -38,9 +38,8 @@
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_ERROR_H
-#include LC_FONT_H
+#include <LCUI/LCUI.h>
+#include <LCUI/font.h>
 
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 
@@ -123,7 +122,7 @@ LCUI_API void FontLIB_Init( void )
 #ifdef LCUI_FONT_ENGINE_FREETYPE
         /* 当初始化库时发生了一个错误 */
         if ( FT_Init_FreeType( &library ) ) {
-                printf("%s: %s", __FUNCTION__, FT_INIT_ERROR);
+                _DEBUG_MSG("failed to initialize.");
                 return;
         }
 #else
@@ -179,7 +178,7 @@ LCUI_API int FontLIB_GetFontIDByFamilyName( const char *family_name )
         while( node ) {
                 font = (LCUI_FontInfo*)node->data;
                 /* 不区分大小写，进行对比 */
-                if( LCUI_strcasecmpA(font->family_name, family_name) == 0 ) {
+                if( strcmp(font->family_name, family_name) == 0 ) {
                         return node->key;
                 }
                 node = RBTree_Next( node );
@@ -340,13 +339,12 @@ LCUI_API int FontLIB_LoadFontFile( const char *filepath )
 #ifdef LCUI_FONT_ENGINE_FREETYPE
         error_code = FT_New_Face( library, filepath , 0 , &face );
         if( error_code != 0 ) {
-                printf( "%s: %s: ", __FUNCTION__, filepath );
+                _DEBUG_MSG( "%s: open error.", filepath );
                 if ( error_code == FT_Err_Unknown_File_Format ) {
-                        printf( "%s", FT_UNKNOWN_FILE_FORMAT );
+                        // ...
                 } else {
-                        printf( "%s", FT_OPEN_FILE_ERROR );
+                        // ...
                 }
-                perror( filepath );
                 return -2;
         }
         /* 打印字体信息 */
@@ -361,7 +359,7 @@ LCUI_API int FontLIB_LoadFontFile( const char *filepath )
         /* 记录字体信息至数据库中 */
         id = FontLIB_AddFontInfo( face->family_name, face->style_name, filepath, face );
 #else
-        printf("%s: %s\n", __FUNCTION__, "warning: not font engine support!");
+        _DEBUG_MSG("warning: not font engine support!");
 #endif
         return id;
 }

@@ -40,8 +40,7 @@
  * ****************************************************************************/
  
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_MISC_H
+#include <LCUI/LCUI.h>
 
 #define LCUIRect_IsIncludeRect(a,b)	\
 	b->x >= a->x && b->x + b->w <= a->x + a->w \

@@ -1,8 +1,7 @@
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_GRAPH_H
-#include LC_DRAW_BORDER_H
-#include LC_DRAW_LINE_H
+#include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
+#include <LCUI/draw.h>
 #include <math.h>
 
 /** 初始化边框数据 */
@@ -12,10 +11,10 @@ LCUI_API void Border_Init( LCUI_Border *border )
 	border->bottom_width = 0;
 	border->left_width = 0;
 	border->right_width = 0;
-	border->top_style = BORDER_STYLE_NONE;
-	border->bottom_style = BORDER_STYLE_NONE;
-	border->left_style = BORDER_STYLE_NONE;
-	border->right_style = BORDER_STYLE_NONE;
+	border->top_style = 0;
+	border->bottom_style = 0;
+	border->left_style = 0;
+	border->right_style = 0;
 	border->top_color = RGB(0,0,0);
 	border->bottom_color = RGB(0,0,0);
 	border->left_color = RGB(0,0,0);
@@ -27,7 +26,7 @@ LCUI_API void Border_Init( LCUI_Border *border )
 }
 
 /** 简单的设置边框样式，并获取该样式数据 */
-LCUI_API LCUI_Border Border( unsigned int width_px, BORDER_STYLE style, LCUI_Color color )
+LCUI_API LCUI_Border Border( unsigned int width_px, int style, LCUI_Color color )
 {
 	LCUI_Border border;
 	border.top_width = width_px;

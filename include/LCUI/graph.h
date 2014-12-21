@@ -232,8 +232,7 @@ LCUI_API int Graph_Mix(	LCUI_Graph *bg, const LCUI_Graph *fg, LCUI_Pos pos );
 LCUI_API int Graph_Replace( LCUI_Graph *bg,  const LCUI_Graph *fg,
 			    LCUI_Pos pos );
 
-LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, 
-				    AlignType align, LCUI_BOOL replace );
+LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int align, LCUI_BOOL replace );
 
 
 /** 填充图像
@@ -264,7 +263,7 @@ LCUI_API int Graph_FillImageWithColor( LCUI_Graph *graph,
 
 LCUI_END_HEADER
 
-#include LC_DRAW_H
-#include LC_GRAPHLAYER_H
+#include <LCUI/draw.h>
+#include <LCUI/graphlayer.h>
 
 #endif /* __LCUI_GRAPH_H__ */

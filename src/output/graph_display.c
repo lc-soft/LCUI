@@ -42,11 +42,13 @@
 
 //#define DEBUG
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_GRAPH_H
-#include LC_DISPLAY_H
-#include LC_WIDGET_H
-#include LC_CURSOR_H
+#include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
+#include <LCUI/display.h>
+#include <LCUI/cursor.h>
+#include <LCUI/thread.h>
+#include <LCUI/widget_build.h>
+#include <LCUI/surface.h>
 
 #include <time.h>
 
@@ -60,6 +62,7 @@ static LCUI_BOOL i_am_init = FALSE;		/**< 标志，指示本模块是否初始�
 static LinkedList screen_invalid_area;		/**< 屏幕无效区域记录 */
 static LCUI_Mutex glayer_list_mutex;		/**< 图层列表的互斥锁 */
 static LCUI_Screen screen;			/**< 屏幕信息 */
+static LCUI_Thread display_thread;		/**< 显示处理线程 */
 
 static int LCUIScreen_Init( int w, int h, int mode )
 {
@@ -205,7 +208,7 @@ LCUI_API void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 	LCUI_Pos pos, cursor_pos;
 	/* 设置互斥锁，避免在统计图层时，图层记录被其它线程修改 */
 	LCUIScreen_LockGraphLayerTree();
-	GraphLayer_GetGraph( RootWidget_GetGraphLayer(), graph, rect );
+	GraphLayer_GetGraph( &LCUIRootWidget->glayer, graph, rect );
 	LCUIScreen_UnlockGraphLayerTree();
 	/* 如果游标不可见 */
 	if ( !LCUICursor_IsVisible() ) {
@@ -256,7 +259,7 @@ static int LCUIScreen_UpdateInvalidArea(void)
 		/* 获取内存中对应区域的图形数据 */
 		LCUIScreen_GetRealGraph( *p_rect, &graph );
 		//Graph_FillColor( &graph, RGB(255,0,0) );
-		//Graph_DrawBorder( &graph, Border(1,BORDER_STYLE_SOLID, RGB(255,0,0)) );
+		//Graph_DrawBorder( &graph, Border(1,BORDER_SOLID, RGB(255,0,0)) );
 		/* 写入至帧缓冲，让屏幕显示图形 */
 		LCUIScreen_PutGraph( &graph, Pos(p_rect->x, p_rect->y) );
 		LinkedList_Delete( &screen_invalid_area );
@@ -271,7 +274,7 @@ static FrameCtrlCtx fc_ctx;
 /** 获取当前的屏幕内容每秒更新的帧数 */
 LCUI_API int LCUIScreen_GetFPS(void)
 {
-	return fc_ctx.current_fps;
+	return FrameControl_GetFPS(fc_ctx);
 }
 
 /** 更新屏幕内的图形显示 */
@@ -283,11 +286,13 @@ static void LCUIScreen_Update( void* unused )
 	/* 初始化帧数控制 */
 	FrameControl_Init( &fc_ctx );
 	FrameControl_SetMaxFPS( &fc_ctx, 1000/MAX_FRAMES_PER_SEC );
-	while( LCUI_Sys.state == ACTIVE ) {
+	while( LCUI_IsActive() ) {
 		/* 更新鼠标位置 */
 		LCUICursor_UpdatePos();
-		/* 处理所有部件消息 */
-		LCUIWidget_ProcMessage();
+		/* 处理所有部件任务 */
+		LCUIWidget_Task_Step();
+		/* 派发所有事件 */
+		LCUIWidget_Event_Step();
 		/* 更新各个部件的无效区域中的内容 */
 		ret = LCUIWidget_ProcInvalidArea();
 		/* 更新屏幕上各无效区域内的图像内容 */
@@ -314,8 +319,7 @@ int LCUIModule_Video_Init( int w, int h, int mode )
 	LCUIScreen_Init( w, h, mode );
 	i_am_init = TRUE;
 	DirtyRectList_Init( &screen_invalid_area );
-	return _LCUIThread_Create( &LCUI_Sys.display_thread,
-			LCUIScreen_Update, NULL );
+	return LCUIThread_Create( &display_thread, LCUIScreen_Update, NULL );
 }
 
 /** 停用图形输出模块 */
@@ -327,5 +331,5 @@ int LCUIModule_Video_End( void )
 	LCUIScreen_Destroy();
 	i_am_init = FALSE;
 	DirtyRectList_Destroy( &screen_invalid_area );
-	return _LCUIThread_Join( LCUI_Sys.display_thread, NULL );
+	return LCUIThread_Join( display_thread, NULL );
 }

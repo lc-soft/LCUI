@@ -1,6 +1,6 @@
 ﻿// dirent.c -- Directory Entry pperation set.
 #include <LCUI_Build.h>
-#include LC_LCUI_H
+#include <LCUI/LCUI.h>
 
 LCUI_API int LCUI_OpenDirA( char *filepath, LCUI_Dir *dir_data )
 {

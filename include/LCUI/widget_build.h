@@ -58,11 +58,6 @@ typedef struct LCUI_WidgetShadow {
 	LCUI_Color color;	/**< 颜色 */
 } LCUI_WidgetShadow;
 
-typedef struct LCUI_WidgetFull* LCUI_Widget;
-
-#include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_task.h>
-
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
@@ -124,6 +119,12 @@ typedef struct LCUI_WidgetStyle {
 
 } LCUI_WidgetStyle;
 
+typedef struct LCUI_WidgetFull* LCUI_Widget;
+
+#include <LCUI/graph.h>
+#include <LCUI/gui/widget_base.h>
+#include <LCUI/gui/widget_task.h>
+
 /** 部件结构（完整版） */
 struct LCUI_WidgetFull {
 	LCUI_WidgetBase		base;		/**< 基础数据及操作集 */
@@ -139,6 +140,7 @@ struct LCUI_WidgetFull {
 	LCUI_EventBox		event;		/**< 事件记录 */
 	LCUI_WidgetTaskBox	task;		/**< 任务记录 */
 	LCUI_DirtyRectList	dirty_rects;	/**< 记录无效区域（脏矩形） */
+	LCUI_GraphLayer		glayer;		/**< 图层 */
 	void			*private_data;	/**< 私有数据 */
 };
 

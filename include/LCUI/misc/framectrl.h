@@ -46,22 +46,25 @@
 LCUI_BEGIN_HEADER
 
 #ifdef __IN_FRAME_CONTROL_SOURCE_FILE__
-typedef struct FrameControlContext FrameCtrlCtx;
+typedef struct FrameControlContext* FrameCtrlCtx;
 #else
 typedef void* FrameCtrlCtx;
 #endif
 
 /** 初始化帧数控制 */
-LCUI_API void FrameControl_Init( FrameCtrlCtx *ctx );
+LCUI_API void FrameControl_Init( FrameCtrlCtx ctx );
 
 /** 设置最大FPS（帧数/秒） */
-LCUI_API void FrameControl_SetMaxFPS( FrameCtrlCtx *ctx, unsigned int fps );
+LCUI_API void FrameControl_SetMaxFPS( FrameCtrlCtx ctx, unsigned int fps );
+
+/** 获取当前FPS */
+LCUI_API int FrameControl_GetFPS( FrameCtrlCtx ctx );
 
 /** 让当前帧停留一定时间 */
-LCUI_API void FrameControl_Remain( FrameCtrlCtx *ctx );
+LCUI_API void FrameControl_Remain( FrameCtrlCtx ctx );
 
 /** 暂停数据帧的更新 */
-LCUI_API void FrameControl_Pause( FrameCtrlCtx *ctx, LCUI_BOOL need_pause );
+LCUI_API void FrameControl_Pause( FrameCtrlCtx ctx, LCUI_BOOL need_pause );
 
 LCUI_END_HEADER
 

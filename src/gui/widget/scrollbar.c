@@ -38,11 +38,12 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-
+ 
+#ifdef ENABLE_THIS_MODULE
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_WIDGET_H
-#include LC_GRAPH_H
+#include <LCUI/LCUI.h>
+#include <LCUI/widget.h>
+#include <LCUI/graph.h>
 #include LC_SCROLLBAR_H
 
 typedef struct _LCUI_ScrollBar
@@ -54,14 +55,14 @@ typedef struct _LCUI_ScrollBar
 	void (*callback_func)( ScrollBar_Data, void * );
 	void *arg;
 	
-	LCUI_Widget *widget;	/* 滑块 */
+	LCUI_Widget widget;	/* 滑块 */
 }
 LCUI_ScrollBar;
 
 
 /**************************** 私有函数 **********************************/
 static void
-Move_ScrollBar( LCUI_Widget *widget, LCUI_Pos new_pos )
+Move_ScrollBar( LCUI_Widget widget, LCUI_Pos new_pos )
 {
 	double scale;
 	int size;
@@ -96,7 +97,7 @@ Move_ScrollBar( LCUI_Widget *widget, LCUI_Pos new_pos )
 }
 
 static void 
-ScrollBar_Drag( LCUI_Widget *widget, LCUI_WidgetEvent *event )
+ScrollBar_Drag( LCUI_Widget widget, LCUI_WidgetEvent *event )
 {
 	static LCUI_Pos pos, offset;
 	static LCUI_ScrollBar *scrollbar;
@@ -125,7 +126,7 @@ ScrollBar_Drag( LCUI_Widget *widget, LCUI_WidgetEvent *event )
  * 限制滚动条的移动范围
  * */
 static void 
-ScrollBar_Init( LCUI_Widget *widget )
+ScrollBar_Init( LCUI_Widget widget )
 {
 	LCUI_ScrollBar *scrollbar;
 	
@@ -145,7 +146,7 @@ ScrollBar_Init( LCUI_Widget *widget )
 	Widget_SetSize( scrollbar->widget, "100%", "100%" );
 	Widget_LimitPos( scrollbar->widget, Pos(0,0), Pos(0,0) );
 	Widget_SetBorder( widget,
-	 Border(1, BORDER_STYLE_SOLID, RGB(100,100,100)) );
+	 Border(1, BORDER_SOLID, RGB(100,100,100)) );
 	Widget_SetPadding( widget, Padding(1,1,1,1) );
 	Widget_SetBackgroundColor( widget, RGB(200,200,200) );
 	Widget_SetBackgroundTransparent( widget, FALSE );
@@ -154,7 +155,7 @@ ScrollBar_Init( LCUI_Widget *widget )
 }
 
 static void 
-ScrollBar_Update( LCUI_Widget *widget )
+ScrollBar_Update( LCUI_Widget widget )
 {
 	static int pos, max_len;
 	static double scale;
@@ -211,7 +212,7 @@ Register_ScrollBar(void)
 
 /* 获取滚动条部件 */
 LCUI_API LCUI_Widget*
-Get_ScrollBar( LCUI_Widget *widget )
+Get_ScrollBar( LCUI_Widget widget )
 {
 	LCUI_ScrollBar *scrollbar;
 	
@@ -221,7 +222,7 @@ Get_ScrollBar( LCUI_Widget *widget )
 
 /* 获取滚动条的数据 */
 LCUI_API ScrollBar_Data
-ScrollBar_GetData ( LCUI_Widget *widget )
+ScrollBar_GetData ( LCUI_Widget widget )
 {
 	LCUI_ScrollBar *scrollbar;
 	
@@ -231,7 +232,7 @@ ScrollBar_GetData ( LCUI_Widget *widget )
 
 /* 获取滚动条部件的滑块 */
 LCUI_API LCUI_Widget*
-ScrollBar_GetWidget( LCUI_Widget *widget )
+ScrollBar_GetWidget( LCUI_Widget widget )
 {
 	LCUI_ScrollBar *scrollbar;
 	
@@ -240,7 +241,7 @@ ScrollBar_GetWidget( LCUI_Widget *widget )
 }
 
 LCUI_API void
-ScrollBar_SetMaxNum( LCUI_Widget *widget, int max_num )
+ScrollBar_SetMaxNum( LCUI_Widget widget, int max_num )
 {
 	LCUI_ScrollBar *scrollbar;
 	
@@ -250,7 +251,7 @@ ScrollBar_SetMaxNum( LCUI_Widget *widget, int max_num )
 }
 
 LCUI_API void
-ScrollBar_SetMaxSize( LCUI_Widget *widget, int max_size )
+ScrollBar_SetMaxSize( LCUI_Widget widget, int max_size )
 {
 	LCUI_ScrollBar *scrollbar;
 	
@@ -260,7 +261,7 @@ ScrollBar_SetMaxSize( LCUI_Widget *widget, int max_size )
 }
 
 LCUI_API void
-ScrollBar_SetCurrentValue( LCUI_Widget *widget, int current_num )
+ScrollBar_SetCurrentValue( LCUI_Widget widget, int current_num )
 {
 	LCUI_ScrollBar *scrollbar;
 	
@@ -270,7 +271,7 @@ ScrollBar_SetCurrentValue( LCUI_Widget *widget, int current_num )
 }
 
 LCUI_API void
-ScrollBar_SetCurrentSize( LCUI_Widget *widget, int current_size )
+ScrollBar_SetCurrentSize( LCUI_Widget widget, int current_size )
 {
 	LCUI_ScrollBar *scrollbar;
 	
@@ -282,7 +283,7 @@ ScrollBar_SetCurrentSize( LCUI_Widget *widget, int current_size )
 /* 将回调函数与滚动条部件连接 */
 LCUI_API void
 ScrollBar_Connect(
-	LCUI_Widget *widget,
+	LCUI_Widget widget,
 	void (*callback_func)( ScrollBar_Data, void* ),
 	void *arg )
 {
@@ -295,7 +296,7 @@ ScrollBar_Connect(
 
 /* 设置滚动条是横向移动还是纵向移动 */
 LCUI_API void
-ScrollBar_SetDirection( LCUI_Widget *widget, int direction )
+ScrollBar_SetDirection( LCUI_Widget widget, int direction )
 {
 	LCUI_ScrollBar *scrollbar;
 	
@@ -307,4 +308,5 @@ ScrollBar_SetDirection( LCUI_Widget *widget, int direction )
 	}
 	Widget_Update( widget );
 }
-/**********************************************************************/
+
+#endif

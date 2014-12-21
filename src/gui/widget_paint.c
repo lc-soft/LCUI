@@ -1,6 +1,7 @@
 ﻿
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include <LCUI/display.h>
 #include <LCUI/misc/rbtree.h>
 #include <LCUI/widget_build.h>
 
@@ -29,11 +30,11 @@ int Widget_InvalidateArea( LCUI_Widget widget, LCUI_Rect *r )
 	/** 如果为NULL，那将整个部件区域需要刷新 */
 	if( !r ) {
 		rect.x = rect.y = 0;
-		rect.w = widget->size.w;
-		rect.h = widget->size.h;
+		rect.w = widget->base.outerWidth;
+		rect.h = widget->base.outerHeight;
 		r = &rect;
 	}
-	LCUIRect_ValidateArea( r, widget->size );
+	LCUIRect_ValidateArea( r, Size(widget->base.outerWidth, widget->base.outerHeight) );
 	DEBUG_MSG("widget:%p, rect: %d,%d,%d,%d\n", widget, r->x, r->y, r->w, r->h);
 	if( painter_is_active ) {
 		/* 记录该部件，需要进行绘制 */
@@ -64,20 +65,20 @@ int Widget_GetInvalidArea( LCUI_Widget widget, LCUI_Rect *area )
 }
 
 /** 使部件中的一块区域有效化 */
-LCUI_API void Widget_ValidateArea( LCUI_Widget widget, LCUI_Rect *area )
+void Widget_ValidateArea( LCUI_Widget widget, LCUI_Rect *area )
 {
 	LCUI_Rect rect;
 	if( !area ) {
 		rect.x = rect.y = 0;
-		rect.w = widget->size.w;
-		rect.h = widget->size.h;
+		rect.w = widget->base.outerWidth;
+		rect.h = widget->base.outerHeight;
 		area= &rect;
 	}
 	DirtyRectList_Delete( &widget->dirty_rects, area );
 }
 
 /** 将部件的区域推送至屏幕 */
-LCUI_API int Widget_PushAreaToScreen( LCUI_Widget widget, LCUI_Rect *area )
+int Widget_PushAreaToScreen( LCUI_Widget widget, LCUI_Rect *area )
 {
 	int n;
 	LCUI_Rect rect;
@@ -89,13 +90,13 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget widget, LCUI_Rect *area )
 
 	if( !area ) {
 		rect.x = rect.y = 0;
-		rect.w = widget->outer_size.w;
-		rect.h = widget->outer_size.h;
+		rect.w = widget->base.outerWidth;
+		rect.h = widget->base.outerHeight;
 		area = &rect;
 	}
-	root = RootWidget_GetSelf();
+	root = LCUIRootWidget;
 	while( widget && widget != root ) {
-		if( !widget->visible ) {
+		if( !widget->base.isVisible ) {
 			return 1;
 		}
 		if( area->x < 0 ) {
@@ -106,15 +107,15 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget widget, LCUI_Rect *area )
 			area->h += area->y;
 			area->y = 0;
 		}
-		if( area->x + area->w > widget->outer_size.w ) {
-			area->w = widget->outer_size.w - area->x;
+		if( area->x + area->w > widget->base.outerWidth ) {
+			area->w = widget->base.outerWidth - area->x;
 		}
-		if( area->y + area->h > widget->outer_size.h ) {
-			area->h = widget->outer_size.h - area->y;
+		if( area->y + area->h > widget->base.outerHeight ) {
+			area->h = widget->base.outerHeight - area->y;
 		}
 		/* 加上所在部件的坐标 */
-		area->x += widget->pos.x;
-		area->y += widget->pos.y;
+		area->x += widget->base.x;
+		area->y += widget->base.y;
 		/* 加上父级部件的内边距 */
 		if( !widget->parent ) {
 			break;
@@ -122,14 +123,14 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget widget, LCUI_Rect *area )
 		
 		/* 切换至父级部件 */
 		widget = widget->parent;
-		area->x += widget->padding.left;
-		area->y += widget->padding.top;
+		area->x += widget->style.padding.left.px;
+		area->y += widget->style.padding.top.px;
 		/* 计算父部件的内边距框，然后再调整矩形区域 */
-		n = widget->size.w - widget->padding.right;
+		n = widget->base.outerWidth - widget->style.padding.right.px;
 		if( area->x + area->w > n ) {
 			area->w = n - area->x;
 		}
-		n = widget->size.h - widget->padding.bottom;
+		n = widget->base.outerHeight - widget->style.padding.bottom.px;
 		if( area->y + area->h > n ) {
 			area->h = n - area->y;
 		}
@@ -144,40 +145,31 @@ LCUI_API int Widget_PushAreaToScreen( LCUI_Widget widget, LCUI_Rect *area )
 static int Widget_DrawBackground( LCUI_Widget widget, LCUI_Rect area )
 {
 	LCUI_Graph graph;
-	LCUI_Background *bg;
-
 	Widget_QuoteInnerGraph( widget, &graph, &area );
-	bg = &widget->background;
-	/* 如果背景透明，则使用覆盖模式将背景图绘制到部件上 */
-	if( bg->transparent ) {
-		return Graph_FillImageEx( &graph, &bg->image, bg->layout, area );
-	}
-	/* 否则，使用叠加模式 */
-	return Graph_FillImageWithColorEx( &graph, &bg->image, bg->layout,
-							bg->color, area );
+	// ...
+	return 0;
 }
 
 /* 获取部件内部区域的位图 */
-LCUI_API int Widget_QuoteInnerGraph( LCUI_Widget widget, LCUI_Graph *graph,
-								LCUI_Rect *r )
+int Widget_QuoteInnerGraph( LCUI_Widget widget, LCUI_Graph *graph, LCUI_Rect *r )
 {
 	LCUI_Rect rect;
 	if( !r ) {
 		rect.x = 0;
 		rect.y = 0;
-		rect.w = widget->size.w;
-		rect.h = widget->size.h;
+		rect.w = widget->base.outerWidth;
+		rect.h = widget->base.outerHeight;
 	} else {
 		rect.x = r->x;
 		rect.y = r->y;
 		rect.w = r->w;
 		rect.h = r->h;
-		LCUIRect_ValidateArea( &rect, widget->size );
+		LCUIRect_ValidateArea( &rect, Size(widget->base.outerWidth, widget->base.outerHeight) );
 	}
 
-	rect.x += BoxShadow_GetBoxX( &widget->shadow );
-	rect.y += BoxShadow_GetBoxY( &widget->shadow );
-	return Graph_Quote( graph, &widget->glayer->graph, rect );
+	//rect.x += BoxShadow_GetBoxX( &widget->style.shadow );
+	//rect.y += BoxShadow_GetBoxY( &widget->style.shadow );
+	return Graph_Quote( graph, &widget->glayer.graph, rect );
 }
 
 /** 
@@ -186,7 +178,7 @@ LCUI_API int Widget_QuoteInnerGraph( LCUI_Widget widget, LCUI_Graph *graph,
  * @param[out] area 需要进行重绘的区域
  * @returns 正常返回TRUE，没有无效区域则返回FALSE
  */
-LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget widget, LCUI_Rect *area )
+LCUI_BOOL Widget_BeginPaint( LCUI_Widget widget, LCUI_Rect *area )
 {
 	int ret;
 	DEBUG_MSG("enter\n");
@@ -201,11 +193,11 @@ LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget widget, LCUI_Rect *area )
 }
 
 /** 执行重绘部件后的一些任务 */
-LCUI_API void Widget_EndPaint( LCUI_Widget widget, LCUI_Rect *area )
+void Widget_EndPaint( LCUI_Widget widget, LCUI_Rect *area )
 {
 	LCUI_Graph graph;
 	Widget_QuoteInnerGraph( widget, &graph, area );
-	Graph_DrawBorderEx( &graph, widget->border, *area );
+	//Graph_DrawBorderEx( &graph, widget->border, *area );
 	Widget_ValidateArea( widget, area );
 	Widget_PushAreaToScreen( widget, area );
 }
@@ -224,6 +216,7 @@ int LCUIWidget_ProcInvalidArea(void)
 	int count = 0, old_num;
 	LCUI_Widget widget;
 	LCUI_RBTreeNode *node;
+	LCUI_WidgetClass *wc;
 
 	if( !painter_is_active ) {
 		return -1;
@@ -234,15 +227,13 @@ int LCUIWidget_ProcInvalidArea(void)
 	}
 	DEBUG_MSG("tip1\n");
 	while( node ) {
-		widget = (LCUI_Widget*)node->key;
+		widget = (LCUI_Widget)node->key;
+		wc = LCUIWidget_GetClass( widget->type_name );
 		DEBUG_MSG("widget, %p, dirty rect num: %d\n", widget, widget->dirty_rects.used_node_num);
 		old_num = widget->dirty_rects.used_node_num;
 		/* 有多少个脏矩形就调用多少次部件的绘制函数 */
 		while( widget->dirty_rects.used_node_num > 0 ) {
-			if( WidgetFunc_Call( widget, FUNC_TYPE_PAINT ) != 0 ) {
-				DEBUG_MSG("tip\n");
-				Widget_OnPaint( widget );
-			}
+			wc->methods.paint ? wc->methods.paint(widget):FALSE;
 			if( widget->dirty_rects.used_node_num >= old_num ) {
 				++count;
 				if( count > 10 ) {
@@ -256,8 +247,7 @@ int LCUIWidget_ProcInvalidArea(void)
 		if( count > 0 ) {
 			_DEBUG_MSG("warning: widget(%s): "
 				"the dirty-rect of does not reduce.\n",
-				widget->type_name.string ? 
-				widget->type_name.string:"unknown");
+				widget->type_name);
 		}
 		node = RBTree_Next( node );
 		RBTree_Erase( &widget_paint_tree, (int)widget );

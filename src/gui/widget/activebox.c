@@ -43,10 +43,11 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 				\n
  * ******************************************************************************/
 
+#ifdef ENABLE_THIS_MODULE
 //#define DEBUG
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_WIDGET_H
+#include <LCUI/LCUI.h>
+#include <LCUI/widget.h>
 #include LC_ACTIVEBOX_H
 #include LC_RES_H
 
@@ -649,7 +650,7 @@ LCUI_API int Animation_Pause( AnimationData *animation, int play_id )
 	return 0;
 }
 
-static AnimationRec* ActiveBox_GetCurrentAnimation( LCUI_Widget *widget )
+static AnimationRec* ActiveBox_GetCurrentAnimation( LCUI_Widget widget )
 {
 	LCUI_ActiveBox *actbox;
 	actbox = (LCUI_ActiveBox *)Widget_GetPrivData(widget);
@@ -659,7 +660,7 @@ static AnimationRec* ActiveBox_GetCurrentAnimation( LCUI_Widget *widget )
 /* 刷新动画当前帧的显示 */
 static void ActiveBox_RefreshFrame( void *arg )
 {
-	LCUI_Widget *widget = (LCUI_Widget*)arg;
+	LCUI_Widget widget = (LCUI_Widget*)arg;
 	DEBUG_MSG("refresh\n");
 	Widget_Draw( widget );
 }
@@ -676,7 +677,7 @@ static void ActiveBox_RefreshFrame( void *arg )
  * @note
  *	添加的动画需要手动释放，ActiveBox部件只负责记录、引用动画
  */
-LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget *widget,
+LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget widget,
 					AnimationData *animation )
 {
 	AnimationRec rec;
@@ -700,7 +701,7 @@ LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget *widget,
  * @return
  *	切换成功则返回0，未找到指定ID的动画记录，则返回-1
  */
-LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget *widget,
+LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget widget,
 					AnimationData *animation )
 {
 	int i, n;
@@ -741,7 +742,7 @@ LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget *widget,
 }
 
 /* 播放动画 */
-LCUI_API int ActiveBox_Play( LCUI_Widget *widget )
+LCUI_API int ActiveBox_Play( LCUI_Widget widget )
 {
 	int ret;
 	LCUI_ActiveBox *actbox;
@@ -773,7 +774,7 @@ LCUI_API int ActiveBox_Play( LCUI_Widget *widget )
 }
 
 /* 暂停动画 */
-LCUI_API int ActiveBox_Pause( LCUI_Widget *widget )
+LCUI_API int ActiveBox_Pause( LCUI_Widget widget )
 {
 	LCUI_ActiveBox *actbox;
 
@@ -791,7 +792,7 @@ LCUI_API int ActiveBox_Pause( LCUI_Widget *widget )
 }
 
 /* 初始化ActiveBox部件 */
-static void ActiveBox_ExecInit(LCUI_Widget *widget)
+static void ActiveBox_ExecInit(LCUI_Widget widget)
 {
 	LCUI_ActiveBox *actbox;
 
@@ -804,7 +805,7 @@ static void ActiveBox_ExecInit(LCUI_Widget *widget)
 }
 
 /* 更新ActiveBox部件内显示的图像 */
-static void ActiveBox_ExecUpdate(LCUI_Widget *widget)
+static void ActiveBox_ExecUpdate(LCUI_Widget widget)
 {
 	LCUI_Rect rect;
 	AnimationRec *p_rec;
@@ -831,7 +832,7 @@ static void ActiveBox_ExecUpdate(LCUI_Widget *widget)
 	Widget_InvalidArea( widget, rect );
 }
 
-static void ActiveBox_ExecDestroy(LCUI_Widget *widget)
+static void ActiveBox_ExecDestroy(LCUI_Widget widget)
 {
 	LCUI_ActiveBox *actbox;
 
@@ -848,3 +849,4 @@ LCUI_API void Register_ActiveBox(void)
 	WidgetFunc_Add("active_box", ActiveBox_ExecUpdate, FUNC_TYPE_UPDATE);
 	WidgetFunc_Add("active_box", ActiveBox_ExecDestroy, FUNC_TYPE_DESTROY);
 }
+#endif

@@ -7,7 +7,7 @@ typedef struct LCUI_SurfaceRec_ {
 	HWND hwnd;
 	int mode;
 	int w, h;
-	LCUI_Widget *target;
+	LCUI_Widget target;
 	LCUI_DirtyRectList rect;
 	HDC fb_hdc;
 	HBITMAP fb_bmp;
@@ -15,6 +15,9 @@ typedef struct LCUI_SurfaceRec_ {
 } LCUI_Surface;
 
 LCUI_API int LCUISurface_Init(void);
+
+/** 删除 Surface */
+LCUI_API void Surface_Delete( LCUI_Surface *surface );
 
 /** 新建一个 Surface */
 LCUI_API LCUI_Surface *Surface_New(void);
@@ -33,4 +36,5 @@ LCUI_API void Surface_Hide( LCUI_Surface *surface );
 
 /** 设置 Surface 的渲染模式 */
 int Surface_SetRenderMode( LCUI_Surface *surface, int mode );
+
 #endif

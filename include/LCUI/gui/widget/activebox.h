@@ -161,7 +161,7 @@ LCUI_API int Animation_Pause( AnimationData *animation, int play_id );
  * @note
  *	添加的动画需要手动释放，ActiveBox部件只负责记录、引用动画
  */
-LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget *widget,
+LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget widget,
 					AnimationData *animation );
 
 /**
@@ -173,14 +173,14 @@ LCUI_API int ActiveBox_AddAnimation(	LCUI_Widget *widget,
  * @return
  *	切换成功则返回0，未找到指定ID的动画记录，则返回-1
  */
-LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget *widget,
+LCUI_API int ActiveBox_SwitchAnimation(	LCUI_Widget widget,
 					AnimationData *animation );
 
 /* 播放动画 */
-LCUI_API int ActiveBox_Play( LCUI_Widget *widget );
+LCUI_API int ActiveBox_Play( LCUI_Widget widget );
 
 /* 暂停动画 */
-LCUI_API int ActiveBox_Pause( LCUI_Widget *widget );
+LCUI_API int ActiveBox_Pause( LCUI_Widget widget );
 
 LCUI_END_HEADER
 

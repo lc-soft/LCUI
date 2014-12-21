@@ -46,10 +46,10 @@
 //#define LCUI_FONT_ENGINE_FREETYPE
 //#define DEBUG
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_GRAPH_H
-#include LC_FONT_H
-#include LC_ERROR_H
+#include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
+#include <LCUI/font.h>
+
 //#undef LCUI_FONT_ENGINE_FREETYPE
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 #include <ft2build.h>

@@ -48,8 +48,9 @@ typedef struct {
 	void (*func)(void*,void*);	/**< 函数指针 */
 	
 	void *arg[2];			/**< 传给函数的两个参数 */
+	void (*destroy_func[2])(void*);	/**< 参数的销毁函数 */
 	LCUI_BOOL destroy_arg[2];	/**< 指定在调用完回调函数后，是否释放参数 */
-} LCUI_Func, LCUI_Task;
+} LCUI_Task;
 
 enum SystemEventType {
 	LCUI_KEYDOWN,		/**< 键盘触发的按键按下事件 */
@@ -119,7 +120,7 @@ void LCUI_LockRunTask(void);
 void LCUI_UnlockRunTask(void);
 
 /* 检测LCUI是否活动 */ 
-LCUI_API LCUI_BOOL LCUI_Active(void);
+LCUI_API LCUI_BOOL LCUI_IsActive(void);
 
 /* 
  * 功能：用于对LCUI进行初始化操作 

@@ -44,44 +44,7 @@
  * ******************************************************************************/
  
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_WIDGET_H
+#include <LCUI/LCUI.h>
+#include <LCUI/widget.h>
 
-/** 每行数据中每列的数据 */
-typedef struct TableColumnData_ {
-	int column_id;		/**< 当前列对应的标识号 */
-	const wchar_t *text;	/**< 当前列的文本内容 */
-} TableColumnData;
-
-typedef struct TableColumnInfo_ {
-	int id;			/**< 列的标识号 */
-	int width;		/**< 列的宽度 */
-	const wchar_t *name;	/**< 列的名称 */
-} TableColumnInfo;
-
-typedef struct TableRowData_ {
-	LCUI_Queue column_data;	/**< 当前行的每列数据 */
-} TableRowData;
-
-typedef struct Table_ {
-	LCUI_Queue row_data;	/**< 行数据 */
-	LCUI_Queue column_info;	/**< 列信息 */
-} TableData;
-
-int ListView_SetColumn(	LCUI_Widget *widget,
-			TableRowData *target_row,
-			const char *column_name,
-			const char *item_name )
-{
-	return 0;
-}
-
-int ListView_AddColumn( LCUI_Widget *widget, const char *column_name )
-{
-	return 0;
-}
-
-TableRowData *ListView_NewRow( LCUI_Widget *widget )
-{
-	return 0;
-}
+//...

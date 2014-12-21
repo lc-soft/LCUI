@@ -38,11 +38,12 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-
+ 
+#ifdef ENABLE_THIS_MODULE
 #include <LCUI_Build.h>
-#include LC_LCUI_H 
-#include LC_GRAPH_H
-#include LC_WIDGET_H
+#include <LCUI/LCUI.h> 
+#include <LCUI/graph.h>
+#include <LCUI/widget.h>
 #include LC_PROGBAR_H
 #include LC_PICBOX_H 
 #include LC_RES_H 
@@ -50,17 +51,17 @@
 typedef LCUI_ProgressBar LCUIProgBar;
 
 /* 释放进度条部件占用的内存资源 */
-static void ProgressBar_ExecDestroy( LCUI_Widget *widget )
+static void ProgressBar_ExecDestroy( LCUI_Widget widget )
 {
 
 }
 
 /* 初始化进度条的数据结构体 */
 static void 
-ProgressBar_ExecInit( LCUI_Widget *widget )
+ProgressBar_ExecInit( LCUI_Widget widget )
 {
 	LCUIProgBar *pb;
-	LCUI_Widget *fore_wdg, *glisten_wdg;
+	LCUI_Widget fore_wdg, *glisten_wdg;
 	
 	pb = (LCUIProgBar*)Widget_NewPrivData(widget, sizeof(LCUIProgBar));
 	pb->move_speed = 200;
@@ -78,7 +79,7 @@ ProgressBar_ExecInit( LCUI_Widget *widget )
 	Widget_SetBackgroundTransparent( widget, FALSE );
 	Widget_SetBackgroundTransparent( fore_wdg, FALSE );
 	Widget_SetBackgroundColor( widget, RGB(230,230,230));
-	Widget_SetBorder( widget, Border(1,BORDER_STYLE_SOLID,RGB(188,188,188)) );
+	Widget_SetBorder( widget, Border(1,BORDER_SOLID,RGB(188,188,188)) );
 	Widget_SetPadding( widget, Padding(1,1,1,1) );
 	Widget_SetZIndex( fore_wdg, -100 );
 	Widget_Show( fore_wdg ); 
@@ -90,7 +91,7 @@ ProgressBar_ExecInit( LCUI_Widget *widget )
 
 /* 更新进度条数据 */
 static void 
-ProgressBar_ExecUpdate( LCUI_Widget *widget )
+ProgressBar_ExecUpdate( LCUI_Widget widget )
 {
 	double scale;
 	char scale_str[15];
@@ -117,7 +118,7 @@ ProgressBar_ExecUpdate( LCUI_Widget *widget )
 }
 
 /* 设定进度条最大值 */
-LCUI_API void ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value)
+LCUI_API void ProgressBar_SetMaxValue(LCUI_Widget widget, int max_value)
 {
 	LCUIProgBar *pb;
 	pb = (LCUIProgBar*)Widget_GetPrivData(widget);
@@ -126,7 +127,7 @@ LCUI_API void ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value)
 }
 
 /* 获取进度条最大值 */
-LCUI_API int ProgressBar_GetMaxValue( LCUI_Widget *widget )
+LCUI_API int ProgressBar_GetMaxValue( LCUI_Widget widget )
 {
 	LCUIProgBar *pb;
 	pb = (LCUIProgBar*)Widget_GetPrivData(widget);
@@ -134,7 +135,7 @@ LCUI_API int ProgressBar_GetMaxValue( LCUI_Widget *widget )
 }
 
 /* 设定进度条当前值 */
-LCUI_API void ProgressBar_SetValue( LCUI_Widget *widget, int value )
+LCUI_API void ProgressBar_SetValue( LCUI_Widget widget, int value )
 {
 	LCUIProgBar *pb;
 	pb = (LCUIProgBar*)Widget_GetPrivData(widget);
@@ -143,7 +144,7 @@ LCUI_API void ProgressBar_SetValue( LCUI_Widget *widget, int value )
 }
 
 /* 获取进度条当前值 */
-LCUI_API int ProgressBar_GetValue( LCUI_Widget *widget )
+LCUI_API int ProgressBar_GetValue( LCUI_Widget widget )
 {
 	LCUIProgBar *pb;
 	pb = (LCUIProgBar*)Widget_GetPrivData(widget);
@@ -162,3 +163,4 @@ LCUI_API void Register_ProgressBar(void)
 	WidgetFunc_Add("progress_bar", ProgressBar_ExecDestroy,	FUNC_TYPE_DESTROY); 
 }
 
+#endif

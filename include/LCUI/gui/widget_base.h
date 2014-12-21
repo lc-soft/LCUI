@@ -65,7 +65,7 @@ enum LCUI_WidgetBorderStyle {
 	BORDER_SOLID,	/**< 实线 */
 	BORDER_DOTTED,	/**< 点状 */
 	BORDER_DOUBLE,	/**< 双线 */
-	BORDER_DASHED,	/**< 虚线 */
+	BORDER_DASHED	/**< 虚线 */
 };
 
 /** 部件停靠类型 */
@@ -86,6 +86,7 @@ enum LCUI_WidgetBoxType {
 };
 
 typedef struct LCUI_WidgetBase {
+	int x, y;
 	int width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
 	int innerWidth, innerHeight;	/**< 内部区域大小，不包括内边距占用区域 */
 	int outerWidth, outerHeight;	/**< 外部区域大小，包括边框和阴影占用区域 */
@@ -168,6 +169,14 @@ LCUI_API void $(GetBorderRect)( LCUI_Widget widget, LCUI_Rect *rect );
 
 /** 获取部件当前占用的矩形区域（包括阴影区域） */
 LCUI_API void $(GetOuterRect)( LCUI_Widget widget, LCUI_Rect *rect );
+
+LCUI_API void $(Resize)( LCUI_Widget w, LCUI_Size new_size );
+
+LCUI_API void $(Show)( LCUI_Widget w );
+
+LCUI_API void $(Hide)( LCUI_Widget w );
+
+LCUI_API void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color );
 
 #undef $
 

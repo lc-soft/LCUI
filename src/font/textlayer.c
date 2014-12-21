@@ -39,9 +39,9 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_GRAPH_H
-#include LC_FONT_H
+#include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
+#include <LCUI/font.h>
 
 static void TaskData_Init( TaskData *task )
 {
@@ -928,7 +928,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 	const wchar_t *p_end, *p, *pp;
 	TextRowData *p_row;
 	TextCharData char_data;
-	LCUI_Queue tmp_tag_stack;
+	LCUI_StyleTagStack tmp_tag_stack;
 	LCUI_BOOL is_tmp_tag_stack, need_typeset, rect_has_added;
 
 	if( !wstr ) {

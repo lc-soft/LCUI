@@ -160,3 +160,23 @@ void $(GetValidRect)( LCUI_Widget widget, LCUI_Rect *rect )
 		widget = widget->parent;
 	}
 }
+
+void $(Resize)( LCUI_Widget w, LCUI_Size new_size )
+{
+
+}
+
+void $(Show)( LCUI_Widget w )
+{
+	
+}
+
+void $(Hide)( LCUI_Widget w )
+{
+	
+}
+
+void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color )
+{
+
+}

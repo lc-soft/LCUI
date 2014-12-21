@@ -40,11 +40,11 @@
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_CURSOR_H
-#include LC_WIDGET_H
-#include LC_DISPLAY_H
-#include LC_INPUT_H
+#include <LCUI/LCUI.h>
+#include <LCUI/cursor.h>
+#include <LCUI/widget.h>
+#include <LCUI/display.h>
+#include <LCUI/input.h>
 
 #ifdef USE_TSLIB
 #include <tslib.h> 

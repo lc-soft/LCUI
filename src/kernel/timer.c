@@ -244,12 +244,12 @@ static void TimerThread( void *arg )
 {
 	int i, n;
 	long int n_ms;
-	LCUI_Func func_data;
+	LCUI_Task task_data;
 	TimerData *timer = NULL;
 	int64_t lost_ms;
 
-	func_data.arg[0] = NULL;
-	func_data.arg[1] = NULL;
+	task_data.arg[0] = NULL;
+	task_data.arg[1] = NULL;
 	while( is_running ) {
 		LCUIMutex_Lock( &timer_mutex );
 		n = LinkedList_GetTotal( &timer_list );
@@ -282,9 +282,9 @@ static void TimerThread( void *arg )
 			continue;
 		}
 		/* 准备任务数据 */
-		func_data.func = (CallBackFunc)timer->func;
-		func_data.arg[0] = timer->arg;
-		func_data.destroy_arg[0] = FALSE;
+		task_data.func = (CallBackFunc)timer->func;
+		task_data.arg[0] = timer->arg;
+		task_data.destroy_arg[0] = FALSE;
 		DEBUG_MSG("timer: %d, start_time: %I64dms, cur_time: %I64dms, cur_ms: %I64d, total_ms: %ld\n", 
 			timer->id, timer->start_time, LCUI_GetTickCount(), timer->total_ms-lost_ms, timer->total_ms);
 		/* 若需要重复使用，则重置剩余等待时间 */
@@ -295,9 +295,9 @@ static void TimerThread( void *arg )
 		} else { /* 否则，释放该定时器 */
 			LCUITimer_Free( timer->id );
 		}
-		DEBUG_MSG("add task: %p, timer id: %d\n", func_data.func, timer->id);
+		DEBUG_MSG("add task: %p, timer id: %d\n", task_data.func, timer->id);
 		/* 添加该任务至指定程序的任务队列 */
-		LCUI_AddTask( &func_data );
+		LCUI_AddTask( &task_data );
 	}
 	LCUIThread_Exit(NULL);
 }

@@ -45,8 +45,8 @@
  */
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_GRAPH_H
+#include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
 #include <math.h>
 
 #define RADIUS_N	1.5

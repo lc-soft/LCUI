@@ -1,8 +1,7 @@
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_ERROR_H
-#include LC_GRAPH_H 
+#include <LCUI/LCUI.h>
+#include <LCUI/graph.h> 
 
 #include <stdio.h>
 #include <stdlib.h>

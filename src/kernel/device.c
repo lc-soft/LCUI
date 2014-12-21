@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * device.c -- The input device processing module
  * 
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2014 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * device.c -- 输入设备的处理模块
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2014 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -49,7 +49,7 @@
 #include <LCUI/kernel/device.h>
 #include <LCUI/misc/linkedlist.h>
 #include <LCUI/misc/delay.h>
-#include LC_THREAD_H
+#include <LCUI/thread.h>
 
 typedef struct _dev_data_rec_ {
 	LCUI_BOOL (*init)(void);

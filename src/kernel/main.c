@@ -244,8 +244,8 @@ static int LCUI_RunTask(void)
 	task->func = NULL;
 	task->arg[0] = NULL;
 	task->arg[1] = NULL;
-	task->need_free[0] = FALSE;
-	task->need_free[1] = FALSE;
+	task->destroy_arg[0] = FALSE;
+	task->destroy_arg[1] = FALSE;
 	/* 删除之 */
 	LinkedList_Delete( &MainApp.task_list );
 	/* 解锁，现在的任务数据已经与任务列表独立开了 */
@@ -253,13 +253,13 @@ static int LCUI_RunTask(void)
 	/* 调用函数指针指向的函数，并传递参数 */
 	task_bak.func( task_bak.arg[0], task_bak.arg[1] );
 	/* 若需要在调用回调函数后销毁参数 */
-	if( task_bak.need_free[0] ) {
+	if( task_bak.destroy_arg[0] ) {
 		if( task_bak.destroy_func[0] ) {
 			task_bak.destroy_func[0]( task_bak.arg[0] );
 		}
 		free( task_bak.arg[0] );
 	}
-	if( task_bak.need_free[1] ) {
+	if( task_bak.destroy_arg[1] ) {
 		if( task_bak.destroy_func[1] ) {
 			task_bak.destroy_func[1]( task_bak.arg[1] );
 		}
@@ -343,11 +343,11 @@ static void DestroyTask( void *arg )
 {
 	LCUI_Task *task;
 	task = (LCUI_Task *)arg;
-	if( task->need_free[0] && task->arg[0] ) {
+	if( task->destroy_arg[0] && task->arg[0] ) {
 		free( task->arg[0] );
 		task->arg[0] = NULL;
 	}
-	if( task->need_free[1] && task->arg[1] ) {
+	if( task->destroy_arg[1] && task->arg[1] ) {
 		free( task->arg[1] );
 		task->arg[1] = NULL;
 	}
@@ -468,7 +468,7 @@ static void LCUI_ShowCopyrightText(void)
 }
 
 /** 检测LCUI是否活动 */
-LCUI_BOOL LCUI_Active(void)
+LCUI_BOOL LCUI_IsActive(void)
 {
 	if(System.state == ACTIVE) {
 		return TRUE;

@@ -54,8 +54,8 @@ typedef struct _LCUI_Menu	LCUI_Menu;
 struct _LCUI_Menu
 {
 	int mini_width;		/* 菜单的最低宽度 */
-	LCUI_Widget *widget_link; /* 记录与该菜单链接的部件 */
-	LCUI_Widget *parent_menu;	/* 记录父级菜单部件指针 */
+	LCUI_Widget widget_link; /* 记录与该菜单链接的部件 */
+	LCUI_Widget parent_menu;	/* 记录父级菜单部件指针 */
 	LCUI_Queue child_menu;/* 记录子菜单部件 */
 };
 

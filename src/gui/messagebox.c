@@ -38,12 +38,13 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
+#ifdef ENABLE_THIS_MODULE
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_CHARSET_H
-#include LC_GRAPH_H
-#include LC_DISPLAY_H
-#include LC_WIDGET_H
+#include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
+#include <LCUI/display.h>
+#include <LCUI/widget.h>
+#include <LCUI/font/charset.h>
 #include LC_LABEL_H
 #include LC_BUTTON_H
 #include LC_PICBOX_H
@@ -80,7 +81,7 @@ enum IMG_ID {
 
 typedef struct {
 	LCUI_MainLoop *mainloop;
-	LCUI_Widget *msgbox;
+	LCUI_Widget msgbox;
 	MB_BTN clicked_button;
 } MB_data;
  
@@ -1269,7 +1270,7 @@ static int LoadMsgIcon( LCUI_Graph *buff, int img_res_id )
 }
 
 static LCUI_MainLoop*
-msgbox_mainloop_new( LCUI_Widget *msgbox )
+msgbox_mainloop_new( LCUI_Widget msgbox )
 {
 	MB_data *data;
 	if( !msgbox_list_init ) {
@@ -1289,7 +1290,7 @@ msgbox_mainloop_new( LCUI_Widget *msgbox )
 }
 
 static MB_data *
-msgbox_data_find( LCUI_Widget *msgbox )
+msgbox_data_find( LCUI_Widget msgbox )
 {
 	int i, n;
 	MB_data *data;
@@ -1307,7 +1308,7 @@ msgbox_data_find( LCUI_Widget *msgbox )
 }
 
 static int
-msgbox_data_delete( LCUI_Widget *msgbox )
+msgbox_data_delete( LCUI_Widget msgbox )
 {
 	int i, n;
 	MB_data *data;
@@ -1326,9 +1327,9 @@ msgbox_data_delete( LCUI_Widget *msgbox )
 }
 
 static void 
-msgbox_mainloop_quit( LCUI_Widget *btn, LCUI_WidgetEvent *unused )
+msgbox_mainloop_quit( LCUI_Widget btn, LCUI_WidgetEvent *unused )
 {
-	LCUI_Widget *msgbox;
+	LCUI_Widget msgbox;
 	MB_data *data;
 	
 	msgbox = Widget_GetParent( btn, "window" );
@@ -1342,10 +1343,10 @@ msgbox_mainloop_quit( LCUI_Widget *btn, LCUI_WidgetEvent *unused )
 
 /* 响应用于显示文本的label部件的尺寸变动，并自动调整消息框的尺寸 */
 static void
-auto_resize_msgbox(LCUI_Widget *textlabel, LCUI_WidgetEvent *event )
+auto_resize_msgbox(LCUI_Widget textlabel, LCUI_WidgetEvent *event )
 {
 	int area_height;
-	LCUI_Widget *msgbox, *msg_area;
+	LCUI_Widget msgbox, *msg_area;
 	LCUI_Size msgbox_size;
 	
 	msgbox = Widget_GetParent( textlabel, "window" );
@@ -1396,9 +1397,9 @@ auto_resize_msgbox(LCUI_Widget *textlabel, LCUI_WidgetEvent *event )
 }
 
 static void
-msgbox_add_BTN_OK( LCUI_Widget *btn_area )
+msgbox_add_BTN_OK( LCUI_Widget btn_area )
 {
-	LCUI_Widget *btn;
+	LCUI_Widget btn;
 	btn = Widget_New("button");
 	btn->self_id = MB_BTN_IS_OK;
 	Widget_Resize( btn, MB_BTN_SIZE );
@@ -1411,10 +1412,10 @@ msgbox_add_BTN_OK( LCUI_Widget *btn_area )
 }
 
 static void
-msgbox_add_BTN_OKCANCEL( LCUI_Widget *btn_area )
+msgbox_add_BTN_OKCANCEL( LCUI_Widget btn_area )
 {
 	LCUI_Size btn_size;
-	LCUI_Widget *btn[2];
+	LCUI_Widget btn[2];
 	btn[0] = Widget_New("button");
 	btn[1] = Widget_New("button");
 	btn[0]->self_id = MB_BTN_IS_OK;
@@ -1437,10 +1438,10 @@ msgbox_add_BTN_OKCANCEL( LCUI_Widget *btn_area )
 }
 
 static void
-msgbox_add_BTN_ABORTRETRYIGNORE( LCUI_Widget *btn_area )
+msgbox_add_BTN_ABORTRETRYIGNORE( LCUI_Widget btn_area )
 {
 	LCUI_Size btn_size;
-	LCUI_Widget *btn[3];
+	LCUI_Widget btn[3];
 	btn[0] = Widget_New("button");
 	btn[1] = Widget_New("button");
 	btn[2] = Widget_New("button");
@@ -1472,10 +1473,10 @@ msgbox_add_BTN_ABORTRETRYIGNORE( LCUI_Widget *btn_area )
 }
 
 static void
-msgbox_add_BTN_RETRYCANCEL( LCUI_Widget *btn_area )
+msgbox_add_BTN_RETRYCANCEL( LCUI_Widget btn_area )
 {
 	LCUI_Size btn_size;
-	LCUI_Widget *btn[3];
+	LCUI_Widget btn[3];
 	btn[0] = Widget_New("button");
 	btn[1] = Widget_New("button");
 	btn[0]->self_id = MB_BTN_IS_RETRY;
@@ -1498,10 +1499,10 @@ msgbox_add_BTN_RETRYCANCEL( LCUI_Widget *btn_area )
 }
 
 static void
-msgbox_add_BTN_YESNO( LCUI_Widget *btn_area )
+msgbox_add_BTN_YESNO( LCUI_Widget btn_area )
 {
 	LCUI_Size btn_size;
-	LCUI_Widget *btn[2];
+	LCUI_Widget btn[2];
 	btn[0] = Widget_New("button");
 	btn[1] = Widget_New("button");
 	btn[0]->self_id = MB_BTN_IS_YES;
@@ -1524,10 +1525,10 @@ msgbox_add_BTN_YESNO( LCUI_Widget *btn_area )
 }
 
 static void
-msgbox_add_BTN_YESNOCANCEL( LCUI_Widget *btn_area )
+msgbox_add_BTN_YESNOCANCEL( LCUI_Widget btn_area )
 {
 	LCUI_Size btn_size;
-	LCUI_Widget *btn[3];
+	LCUI_Widget btn[3];
 	btn[0] = Widget_New("button");
 	btn[1] = Widget_New("button");
 	btn[2] = Widget_New("button");
@@ -1598,9 +1599,9 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 	LCUI_MainLoop *loop;
 	MB_data *msgbox_data;
 	LCUI_Border btn_area_border;
-	LCUI_Widget *iconbox, *textbox, *msgbox;
-	LCUI_Widget *btn_close;
-	LCUI_Widget *msg_area, *btn_area;
+	LCUI_Widget iconbox, *textbox, *msgbox;
+	LCUI_Widget btn_close;
+	LCUI_Widget msg_area, *btn_area;
 	LCUI_Size min_size, max_size;
 	
 	iconbox = Widget_New("picture_box");
@@ -1691,8 +1692,8 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 	Window_ClientArea_Add( msgbox, msg_area );
 	Window_ClientArea_Add( msgbox, btn_area );
 	/* 设置区域的停靠方式及初始尺寸 */
-	Widget_SetDock( msg_area, DOCK_TYPE_TOP );
-	Widget_SetDock( btn_area, DOCK_TYPE_BOTTOM );
+	Widget_SetDock( msg_area, DOCK_TOP );
+	Widget_SetDock( btn_area, DOCK_BOTTOM );
 	Widget_SetSize( msg_area, NULL, MB_MSG_AREA_HEIGHT_TEXT );
 	Widget_SetSize( btn_area, NULL, MB_BTN_AREA_HEIGHT_TEXT );
 	
@@ -1701,7 +1702,7 @@ LCUI_MessageBoxW(	MB_ICON_TYPE icon_type, const wchar_t *text,
 	Widget_SetBackgroundColor( btn_area, MB_BTN_AREA_BGCOLOR );
 	Border_Init( &btn_area_border );
 	btn_area_border.top_width = 1;
-	btn_area_border.top_style = BORDER_STYLE_SOLID;
+	btn_area_border.top_style = BORDER_SOLID;
 	btn_area_border.top_color = MB_BTN_AREA_LINECOLOR;
 	Widget_SetBorder( btn_area, btn_area_border );
 	
@@ -1770,3 +1771,5 @@ LCUI_MessageBoxA(	MB_ICON_TYPE icon_type, const char *text,
 	}
 	return ret;
 }
+
+#endif

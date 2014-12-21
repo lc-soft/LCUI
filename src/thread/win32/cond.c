@@ -39,7 +39,7 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include LC_THREAD_H
+#include <LCUI/thread.h>
 
 /** 初始化一个条件变量 */
 int LCUICond_Init( LCUI_Cond *cond )

@@ -39,27 +39,4 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-/* 
- * 说明：
- * 此部件可能与本版本的LCUI不兼容，请等待后续版本更新中对该部件进行修改。
- * 需要改进的地方很多，如果鼠标指针离开菜单，菜单中的选项光标也会消失。等到让部件支持焦
- * 点状态的时候，菜单中处于焦点状态的部件会高亮显示，即使鼠标指针移开菜单，菜单中的焦点
- * 部件是不会变的，高亮状态还是保存着的。
- * */
- 
-#include <LCUI_Build.h>
-
-#include LC_LCUI_H 
-#include LC_MISC_H
-#include LC_GRAPH_H
-#include LC_WIDGET_H
-#include LC_BUTTON_H 
-#include LC_DISPLAY_H
-#include LC_MENU_H
-#include LC_RES_H
-
-LCUI_API void
-Register_Menu()
-{
-	
-}
+//...

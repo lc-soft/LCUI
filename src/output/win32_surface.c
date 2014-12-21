@@ -1,12 +1,11 @@
-﻿/**
- * 
- */
-#include <LCUI_Build.h>
+﻿#include <LCUI_Build.h>
 
 #ifdef LCUI_BUILD_IN_WIN32
-#include LC_LCUI_H
-#include LC_WIDGET_H
-#include LC_SURFACE_H
+#include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
+#include <LCUI/thread.h>
+#include <LCUI/widget_build.h>
+#include <LCUI/surface.h>
 #include "resource.h"
 
 #define WIN32_WINDOW_STYLE (WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
@@ -68,9 +67,9 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 		break;
 	case WM_SHOWWINDOW:
 		if( arg1 ) {
-			Widget_Show( surface->target );
+			//Widget_Show( surface->target );
 		} else {
-			Widget_Hide( surface->target );
+			//Widget_Hide( surface->target );
 		}
 		break;
 	case WM_ACTIVATE:
@@ -233,7 +232,7 @@ OnWidgetResize( LCUI_Widget widget, LCUI_WidgetEvent *e )
 	if( !surface ) {
 		return;
 	}
-	Surface_Resize( surface, e->resize.new_size.w, e->resize.new_size.h );
+	//...
 }
 
 static void
@@ -289,7 +288,7 @@ int Surface_Paint( LCUI_Surface *surface, LCUI_Rect *p_rect )
 		p_rect = &rect;
 	}
 
-	glayer = Widget_GetGraphLayer(surface->target);
+	glayer = &surface->target->glayer;
 	Graph_Quote( &graph, &surface->fb, *p_rect );
 	Graph_FillColor( &graph, ARGB(255,255,255,255) );
 	GraphLayer_GetGraph( glayer, &graph, *p_rect );

@@ -98,11 +98,11 @@ typedef struct LCUI_StyleTagData_ {
 	LCUI_StyleTagID tag_id;
 	union {
 		LCUI_Color color;
-		PixelOrPoint_t size;
+		StyleVar size;
 	} style;
 } LCUI_StyleTagData;
 
-typedef LCUI_Queue LCUI_StyleTagStack;
+typedef LinkedList LCUI_StyleTagStack;
 
 /* 初始化字体样式数据 */
 LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );

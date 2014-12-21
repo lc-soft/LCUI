@@ -40,16 +40,15 @@
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
+#include <LCUI/LCUI.h>
 
 #ifdef LCUI_VIDEO_DRIVER_WIN32
 
-#include LC_GRAPH_H
-#include LC_INPUT_H
-#include LC_CURSOR_H
-#include LC_DISPLAY_H
-#include LC_WIDGET_H
-#include <Windows.h>
+#include <LCUI/thread.h>
+#include <LCUI/graph.h>
+#include <LCUI/input.h>
+#include <LCUI/display.h>
+#include <LCUI/widget.h>
 #include "resource.h"
 
 #define WIN32_WINDOW_STYLE (WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
@@ -61,8 +60,9 @@ static LCUI_Thread th_win32;
 static LCUI_Graph framebuffer;
 static HDC hdc_framebuffer;
 static HBITMAP client_bitmap;
-static LCUI_Sleeper win32_init_sleeper;
+static LCUI_Cond win32_init_cond;
 static LCUI_BOOL win32_init_error = TRUE;
+static LCUI_BOOL is_running = FALSE;
 
 void Win32_LCUI_Init__( HINSTANCE hInstance )
 {
@@ -103,22 +103,22 @@ static LRESULT CALLBACK Win32_LCUI_WndProc( HWND hwnd, UINT message,
 
 	switch (message) {
 	case WM_KEYDOWN:
-		LCUIKeyboard_HitKey( wParam );
+		LCUI_PostKeyDownEvent( wParam );
 		return 0;
 	case WM_KEYUP:
-		LCUIKeyboard_FreeKey( wParam );
+		LCUI_PostKeyUpEvent( wParam );
 		return 0;
 	case WM_RBUTTONDOWN:
-		LCUIMouse_ButtonDown( LCUIKEY_RIGHTBUTTON );
+		LCUI_PostMouseDownEvent( LCUIKEY_RIGHTBUTTON );
 		return 0;
 	case WM_RBUTTONUP:
-		LCUIMouse_ButtonUp( LCUIKEY_RIGHTBUTTON );
+		LCUI_PostMouseUpEvent( LCUIKEY_RIGHTBUTTON );
 		return 0;
 	case WM_LBUTTONDOWN:
-		LCUIMouse_ButtonDown( LCUIKEY_LEFTBUTTON );
+		LCUI_PostMouseDownEvent( LCUIKEY_LEFTBUTTON );
 		return 0;
 	case WM_LBUTTONUP:
-		LCUIMouse_ButtonUp( LCUIKEY_LEFTBUTTON );
+		LCUI_PostMouseUpEvent( LCUIKEY_LEFTBUTTON );
 		return 0;
 	case WM_PAINT:
 		BeginPaint( hwnd, &ps );
@@ -180,7 +180,7 @@ static void LCUI_Win32_Thread( void *arg )
 		/* 设置标志为TRUE，表示初始化失败 */
 		win32_init_error = TRUE;
 		/* 打断处于睡眠状态的线程的睡眠 */
-		LCUISleeper_BreakSleep( &win32_init_sleeper );
+		LCUICond_Broadcast( &win32_init_cond );
 		LCUIThread_Exit(NULL);
 		return;
 	}
@@ -188,8 +188,8 @@ static void LCUI_Win32_Thread( void *arg )
 	win32_init_error = FALSE;
 	/* 隐藏windows的鼠标游标 */
 	ShowCursor( FALSE );
-	LCUISleeper_BreakSleep( &win32_init_sleeper );
-	while( LCUI_Sys.state == ACTIVE ) {
+	LCUICond_Broadcast( &win32_init_cond );
+	while( is_running ) {
 		/* 获取消息 */
 		if( GetMessage( &msg, Win32_GetSelfHWND(), 0, 0 ) ) {
 			TranslateMessage( &msg );
@@ -203,16 +203,16 @@ static void LCUI_Win32_Thread( void *arg )
 static int Win32Screen_Init( int w, int h, int mode )
 {
 	HDC hdc_client;
-	LCUI_Widget *root_widget;
 	LCUI_ScreenInfo screen_info;
 
+	is_running = TRUE;
 	/* 初始化屏幕互斥锁 */
 	LCUIMutex_Init( &screen_mutex );
-	LCUISleeper_Create( &win32_init_sleeper );
+	LCUICond_Init( &win32_init_cond );
 	/* 创建线程 */
 	LCUIThread_Create( &th_win32, LCUI_Win32_Thread, NULL );
 	/* 进行睡眠，最长时间为5秒 */
-	LCUISleeper_StartSleep( &win32_init_sleeper, 5000 );
+	LCUICond_TimedWait( &win32_init_cond, 5000 );
 	/* 若初始化出现错误 */
 	if( win32_init_error ) {
 		return -1;
@@ -241,11 +241,9 @@ static int Win32Screen_Init( int w, int h, int mode )
 	/* 为帧缓冲的DC选择client_bitmap作为对象 */
 	SelectObject( hdc_framebuffer, client_bitmap );
 
-	root_widget = RootWidget_GetSelf();
-	Widget_Resize( root_widget, screen_info.size );
-	Widget_SetBackgroundColor( root_widget, RGB(255,255,255) );
-	Widget_SetBackgroundTransparent( root_widget, FALSE );
-	Widget_Show( root_widget );
+	Widget_Resize( LCUIRootWidget, screen_info.size );
+	Widget_SetBackgroundColor( LCUIRootWidget, RGB(255,255,255) );
+	Widget_Show( LCUIRootWidget );
 
 	UpdateWindow( current_hwnd );
 	/* 显示窗口 */
@@ -261,7 +259,6 @@ static int Win32Screen_SetMode( int w, int h, int mode )
 	LCUI_Pos pos;
 	LCUI_Size real_size;
 	LCUI_ScreenInfo screen_info;
-	LCUI_Widget *root_widget;
 	
 	LCUIMutex_Lock( &screen_mutex );
 	LCUIScreen_GetInfo( &screen_info );
@@ -314,8 +311,7 @@ static int Win32Screen_SetMode( int w, int h, int mode )
 		return -2;
 	}
 	LCUIScreen_SetInfo( &screen_info );
-	root_widget = RootWidget_GetSelf();
-	Widget_Resize( root_widget, screen_info.size );
+	Widget_Resize( LCUIRootWidget, screen_info.size );
 
 	LCUIMutex_Unlock( &screen_mutex );
 	return 0;
@@ -323,7 +319,7 @@ static int Win32Screen_SetMode( int w, int h, int mode )
 
 static int Win32Screen_Destroy( void )
 {
-	LCUI_Sys.state = KILLED;
+	is_running = FALSE;
 	LCUIMutex_Destroy( &screen_mutex );
 	return 0;
 }

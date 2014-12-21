@@ -1,8 +1,10 @@
 //#define DEBUG1
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_STYLE_LIBRARY_H
+#include <LCUI/LCUI.h>
+#include <LCUI/style_parser.h>
+
+#ifdef ENABLE_THIS_MODULE
 
 static void StyleLIB_DestroyElement( void *arg )
 {
@@ -543,3 +545,4 @@ StyleLIB_AddStyleFromFile(	StyleLIB_Library *lib,
 	fclose( fp );
 	return 0;
 }
+#endif

@@ -1,68 +1,64 @@
-/** ******************************************************************************
- * @file	LCUI_GraphLayer.c
- * @brief	GraphLayer operation set.
- * @author	Liu Chao <lc-soft@live.cn>
- * @warning
- * Copyright (C) 2012-2013 by							\n
- * Liu Chao									\n
- * 										\n
- * This file is part of the LCUI project, and may only be used, modified, and	\n
- * distributed under the terms of the GPLv2.					\n
- * 										\n
- * (GPLv2 is abbreviation of GNU General Public License Version 2)		\n
- * 										\n
- * By continuing to use, modify, or distribute this file you indicate that you	\n
- * have read the license and understand and accept it fully.			\n
- *  										\n
- * The LCUI project is distributed in the hope that it will be useful, but 	\n
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 	\n
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.	\n
- * 										\n
- * You should have received a copy of the GPLv2 along with this file. It is 	\n
- * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.	\n
- * ******************************************************************************/
+/* ***************************************************************************
+ * graphlayer.c -- graphics layer operation set.
+ * 
+ * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
+ * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ * 
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ***************************************************************************/
  
-/** ******************************************************************************
- * @file	LCUI_GraphLayer.c
- * @brief	图层的操作集.
- * @author	刘超 <lc-soft@live.cn>
- * @warning
- * 版权所有 (C) 2012-2013 归属于						\n
- * 刘超										\n
- * 										\n
- * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。	\n
- * 										\n
- * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)				\n
- * 										\n
- * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。	\n
- * 										\n
- * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特定\n
- * 用途的隐含担保，详情请参照GPLv2许可协议。					\n
- * 										\n
- * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果	\n
- * 没有，请查看：<http://www.gnu.org/licenses/>. 				\n
- * ******************************************************************************/
-#include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_GRAPH_H
+/* ****************************************************************************
+ * graphlayer.c -- 图层的操作集.
+ *
+ * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ***************************************************************************/
 
-LCUI_API int GraphLayer_PrintChildList( LCUI_GraphLayer *glayer )
+#include <LCUI_Build.h>
+#include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
+
+int GraphLayer_PrintChildList( LCUI_GraphLayer *glayer )
 {
 	int i, n;
-	LCUI_Queue *child_list;
+	LinkedList *children;
 	LCUI_GraphLayer *child;
 
 	if( glayer == NULL ) {
 		return -1;
 	}
-	child_list = &glayer->child;
-	if(child_list == NULL) {
+	children = &glayer->children;
+	if(children == NULL) {
 		return -1;
 	}
-	n = Queue_GetTotal( child_list );
-	_DEBUG_MSG("total glayer: %d\n", n);
+	n = LinkedList_GetTotal( children );
+	_DEBUG_MSG("n glayer: %d\n", n);
 	for(i=0; i<n; ++i) {
-		child = (LCUI_GraphLayer*)Queue_Get( child_list, i );
+		LinkedList_Goto( children, i );
+		child = (LCUI_GraphLayer*)LinkedList_Get( children );
 		if( child == NULL ) {
 			continue;
 		}
@@ -73,10 +69,10 @@ LCUI_API int GraphLayer_PrintChildList( LCUI_GraphLayer *glayer )
 	return 0;
 }
 
-LCUI_API int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
+int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 {
-	int i, total;
-	LCUI_Queue *child_list;
+	int i, n;
+	LinkedList *children;
 	LCUI_GraphLayer *tmp_glayer;
 	
 	if( !child_glayer ) {
@@ -86,14 +82,15 @@ LCUI_API int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 		return 0;
 	}
 	/* 引用父图层的子图层列表 */
-	child_list = &child_glayer->parent->child;
-	total = Queue_GetTotal( child_list );
+	children = &child_glayer->parent->children;
+	n = LinkedList_GetTotal( children );
 	/* 查找子图层记录 */
-	for( i=0; i<total; ++i ) {
-		tmp_glayer = (LCUI_GraphLayer*)Queue_Get( child_list, i );
+	for(i=0; i<n; ++i) {
+		LinkedList_Goto( children, i );
+		tmp_glayer = (LCUI_GraphLayer*)LinkedList_Get( children );
 		/* 若找到则删除该子图层记录 */
 		if( tmp_glayer == child_glayer ) {
-			Queue_DeletePointer( child_list, i );
+			LinkedList_Delete( children );
 			child_glayer->parent = NULL;
 			return 0;
 		}
@@ -102,7 +99,7 @@ LCUI_API int GraphLayer_DeleteChild( LCUI_GraphLayer *child_glayer )
 	return 0;
 }
 
-LCUI_API void GraphLayer_Free( LCUI_GraphLayer *glayer )
+void GraphLayer_Free( LCUI_GraphLayer *glayer )
 {
 	if( glayer == NULL ) {
 		return;
@@ -112,11 +109,11 @@ LCUI_API void GraphLayer_Free( LCUI_GraphLayer *glayer )
 	/* 释放图层的图像数据 */
 	Graph_Free( &glayer->graph );
 	/* 销毁子图层列表 */
-	Queue_Destroy( &glayer->child );
+	LinkedList_Destroy( &glayer->children );
 	free( glayer );
 }
 
-LCUI_API LCUI_GraphLayer* GraphLayer_New( void )
+LCUI_GraphLayer* GraphLayer_New( void )
 {
 	LCUI_GraphLayer * glayer;
 	
@@ -128,25 +125,22 @@ LCUI_API LCUI_GraphLayer* GraphLayer_New( void )
 	glayer->visible = FALSE;
 	glayer->inherit_alpha = TRUE;
 	glayer->pos.x = glayer->pos.y = glayer->z_index = 0;
-	glayer->padding.left = 0;
-	glayer->padding.top = 0;
-	glayer->padding.bottom = 0;
-	glayer->padding.right = 0;
+	glayer->content_box.left = 0;
+	glayer->content_box.top = 0;
+	glayer->content_box.bottom = 0;
+	glayer->content_box.right = 0;
 	glayer->parent = NULL;
 	/* 初始化图像数据 */
 	Graph_Init( &glayer->graph );
 	/* 初始化子图层列表 */
-	Queue_Init( &glayer->child, 0, NULL );
-	/* 标记该队列用于存储指针，即使销毁队列后，也不自动释放指针指向的内存空间 */ 
-	Queue_UsingPointer( &glayer->child ); 
+	LinkedList_Init( &glayer->children, 0 );
+	LinkedList_SetDataNeedFree( &glayer->children, FALSE );
 	return glayer;
 }
 
-
-LCUI_API int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
-					LCUI_GraphLayer *glayer )
+int GraphLayer_AddChild( LCUI_GraphLayer *des_ctnr, LCUI_GraphLayer *glayer )
 {
-	int i, total;
+	int i, n;
 	LCUI_GraphLayer *tmp_child;
 	//_DEBUG_MSG( "des_ctnr: %p, glayer: %p\n", des_ctnr, glayer );
 	/* 容器图层必须有效 */
@@ -159,27 +153,27 @@ LCUI_API int GraphLayer_AddChild(	LCUI_GraphLayer *des_ctnr,
 		return -2;
 	}
 	/* 根据队列中的z值，将子图层存放在队列中适当的位置 */
-	total = Queue_GetTotal( &des_ctnr->child );
-	for( i=0; i<total; ++i ) {
-		tmp_child = (LCUI_GraphLayer*)Queue_Get( &des_ctnr->child, i );
+	n = LinkedList_GetTotal( &des_ctnr->children );
+	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &des_ctnr->children, i );
+		tmp_child = (LCUI_GraphLayer*)LinkedList_Get( &des_ctnr->children );
 		/* 如果比当前位置的图层的z值小，那就对比下一个位置的图层 */
 		if( glayer->z_index < tmp_child->z_index ) {
 			continue;
 		}
 		/* 将新图层插入至该位置 */
-		Queue_InsertPointer( &des_ctnr->child, i, glayer );
+		LinkedList_Insert( &des_ctnr->children, glayer );
 		break;
 	}
 	/* 如果没找到位置，则直接添加至末尾 */
-	if( i >= total ) {
-		Queue_AddPointer( &des_ctnr->child, glayer );
+	if( i >= n ) {
+		LinkedList_AddData( &des_ctnr->children, glayer );
 	}
 	glayer->parent = des_ctnr;
 	return 0;
 }
 
-LCUI_API int GraphLayer_MoveChild(	LCUI_GraphLayer *new_ctnr, 
-					LCUI_GraphLayer *glayer )
+int GraphLayer_MoveChild( LCUI_GraphLayer *new_ctnr, LCUI_GraphLayer *glayer )
 {
 	int ret;
 	//_DEBUG_MSG( "new_ctnr: %p, glayer: %p\n", new_ctnr, glayer );
@@ -196,21 +190,21 @@ LCUI_API int GraphLayer_MoveChild(	LCUI_GraphLayer *new_ctnr,
 	return 0;
 }
 
-LCUI_API LCUI_Rect GraphLayer_GetRect( LCUI_GraphLayer *glayer )
+LCUI_Rect GraphLayer_GetRect( LCUI_GraphLayer *glayer )
 {
 	LCUI_Rect rect;
 	rect.x = glayer->pos.x;
 	rect.y = glayer->pos.y;
 	if( glayer->parent ) {
-		rect.x += glayer->parent->padding.left;
-		rect.y += glayer->parent->padding.top;
+		rect.x += glayer->parent->content_box.left;
+		rect.y += glayer->parent->content_box.top;
 	}
 	rect.width = glayer->graph.w;
 	rect.height = glayer->graph.h;
 	return rect;
 }
 
-LCUI_API LCUI_Size GraphLayer_GetSize( LCUI_GraphLayer *glayer )
+LCUI_Size GraphLayer_GetSize( LCUI_GraphLayer *glayer )
 {
 	LCUI_Size size;
 	size.w = glayer->graph.w;
@@ -218,17 +212,17 @@ LCUI_API LCUI_Size GraphLayer_GetSize( LCUI_GraphLayer *glayer )
 	return size;
 }
 
-LCUI_API uchar_t GraphLayer_GetAlpha( LCUI_GraphLayer *glayer )
+uchar_t GraphLayer_GetAlpha( LCUI_GraphLayer *glayer )
 {
 	return glayer->graph.alpha;
 }
 
-LCUI_API void GraphLayer_InerntAlpha( LCUI_GraphLayer *glayer, LCUI_BOOL flag )
+void GraphLayer_InerntAlpha( LCUI_GraphLayer *glayer, LCUI_BOOL flag )
 {
 	glayer->inherit_alpha = flag;
 }
 
-LCUI_API int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y )
+int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y )
 {
 	if( !glayer ) {
 		return -1;
@@ -238,17 +232,20 @@ LCUI_API int GraphLayer_SetPos( LCUI_GraphLayer *glayer, int x, int y )
 	return 0;
 }
 
-LCUI_API void GraphLayer_SetPadding( LCUI_GraphLayer *glayer, LCUI_Padding padding )
+void GraphLayer_SetPadding( LCUI_GraphLayer *glayer, int top, int right, int bottom, int left )
 {
-	glayer->padding = padding;
+	glayer->content_box.t = top;
+	glayer->content_box.r = right;
+	glayer->content_box.b = bottom;
+	glayer->content_box.l = left;
 }
 
-LCUI_API void GraphLayer_SetAlpha( LCUI_GraphLayer *glayer, uchar_t alpha )
+void GraphLayer_SetAlpha( LCUI_GraphLayer *glayer, uchar_t alpha )
 {
 	glayer->graph.alpha = alpha;
 }
 
-LCUI_API int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index )
+int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index )
 {	
 	if( !glayer ) {
 		return -1;
@@ -257,39 +254,40 @@ LCUI_API int GraphLayer_SetZIndex( LCUI_GraphLayer *glayer, int z_index )
 	return 0;
 }
 
-LCUI_API int GraphLayer_Sort( LCUI_GraphLayer *glayer )
+int GraphLayer_Sort( LCUI_GraphLayer *glayer )
 {
 	LCUI_GraphLayer *child_a, *child_b;
-	int i, j, total;
+	int i, j, n;
 	
 	if( !glayer ) {
 		return -1;
 	}
 	/* 排序前先锁上队列互斥锁 */
-	Queue_Lock( &glayer->child );
-	total = Queue_GetTotal( &glayer->child );
+	//LinkedList_Lock( &glayer->children );
+	n = LinkedList_GetTotal( &glayer->children );
 	/* 使用的是冒泡排序法 */
-	for(j=0; j<total; ++j)
-	for(i=total-1; i>=1; --i) {
-		child_a = (LCUI_GraphLayer*)Queue_Get( &glayer->child, i );
+	for(j=0; j<n; ++j)
+	for(i=n-1; i>=1; --i) {
+		LinkedList_Goto( &glayer->children, i );
+		child_a = (LCUI_GraphLayer*)LinkedList_Get( &glayer->children );
 		if( !child_a ) {
 			continue;
 		}
-		child_b = (LCUI_GraphLayer*)Queue_Get( &glayer->child, i-1 );
+		child_b = (LCUI_GraphLayer*)LinkedList_GetPrev( &glayer->children );
 		if( !child_b ) {
 			continue;
 		}
 		if( child_a->z_index > child_b->z_index ) {
-			Queue_Move( &glayer->child, i-1, i);
+			LinkedList_MoveTo( &glayer->children, i-1);
 		}
 	}
 	/* 解开互斥锁 */
-	Queue_Unlock( &glayer->child );
+	//LinkedList_Unlock( &glayer->children );
 	return 0;
 }
 
 
-LCUI_API int GraphLayer_Resize( LCUI_GraphLayer *glayer, int w, int h )
+int GraphLayer_Resize( LCUI_GraphLayer *glayer, int w, int h )
 {
 	if( !glayer ) {
 		return -1;
@@ -308,17 +306,17 @@ LCUI_API int GraphLayer_Resize( LCUI_GraphLayer *glayer, int w, int h )
 }
 
 
-LCUI_API LCUI_GraphLayer* GraphLayer_ChildAt( LCUI_GraphLayer *ctnr, int x, int y )
+LCUI_GraphLayer* GraphLayer_ChildAt( LCUI_GraphLayer *ctnr, int x, int y )
 {
 	return NULL;
 }
 
-LCUI_API LCUI_Graph* GraphLayer_GetSelfGraph( LCUI_GraphLayer *glayer )
+LCUI_Graph* GraphLayer_GetSelfGraph( LCUI_GraphLayer *glayer )
 {
 	return &glayer->graph;
 }
 
-LCUI_API LCUI_Rect 
+LCUI_Rect 
 GraphLayer_GetValidRect( LCUI_GraphLayer *root_glayer, 
 			 LCUI_GraphLayer *glayer )
 {
@@ -339,18 +337,18 @@ GraphLayer_GetValidRect( LCUI_GraphLayer *root_glayer,
 		return cut_rect;
 	}
 	/* 加上父图层的内边距 */
-	pos.x += glayer->parent->padding.left;
-	pos.y += glayer->parent->padding.top;
+	pos.x += glayer->parent->content_box.left;
+	pos.y += glayer->parent->content_box.top;
 	/* 计算当前有效显示区域 */
-	area.x = glayer->parent->padding.left;
-	area.y = glayer->parent->padding.top;
+	area.x = glayer->parent->content_box.left;
+	area.y = glayer->parent->content_box.top;
 	/* 区域尺寸则减去内边距 */
 	area.width = glayer->parent->graph.w;
-	area.width -= glayer->parent->padding.left;
-	area.width -= glayer->parent->padding.right;
+	area.width -= glayer->parent->content_box.left;
+	area.width -= glayer->parent->content_box.right;
 	area.height = glayer->parent->graph.h;
-	area.height -= glayer->parent->padding.top;
-	area.height -= glayer->parent->padding.bottom;
+	area.height -= glayer->parent->content_box.top;
+	area.height -= glayer->parent->content_box.bottom;
 	/* 根据图层的坐标及尺寸，计算图层裁剪后的区域 */
 	if(pos.x < area.x) {
 		cut_rect.x = area.x - pos.x; 
@@ -407,7 +405,7 @@ GraphLayer_GetValidRect( LCUI_GraphLayer *root_glayer,
 }
 
 
-LCUI_API LCUI_Pos
+LCUI_Pos
 GraphLayer_GetGlobalPos(	LCUI_GraphLayer *root_glayer,
 				LCUI_GraphLayer *glayer )
 {
@@ -421,21 +419,21 @@ GraphLayer_GetGlobalPos(	LCUI_GraphLayer *root_glayer,
 	pos.y += glayer->pos.y;
 	if( glayer->parent ) {
 		/* 加上内边距 */
-		pos.x += glayer->parent->padding.left;
-		pos.y += glayer->parent->padding.top;
+		pos.x += glayer->parent->content_box.left;
+		pos.y += glayer->parent->content_box.top;
 	}
 	return pos;
 }
 
 
 static int __GraphLayer_GetLayers( LCUI_GraphLayer *root_glayer,
-		LCUI_GraphLayer *glayer, LCUI_Rect rect, LCUI_Queue *queue )
+		LCUI_GraphLayer *glayer, LCUI_Rect rect, LinkedList *list )
 {
-	int i, total;
+	int i, n;
 	LCUI_Pos pos;
 	LCUI_Rect tmp;
 	LCUI_GraphLayer *child; 
-	LCUI_Queue *child_list;
+	LinkedList *children;
 
 	if( !glayer ) {
 		//_DEBUG_MSG("!glayer\n");
@@ -445,14 +443,15 @@ static int __GraphLayer_GetLayers( LCUI_GraphLayer *root_glayer,
 		//_DEBUG_MSG("!glayer_visible\n");
 		return 1;
 	}
-	child_list = &glayer->child;
+	children = &glayer->children;
 	/* 从底到顶遍历子部件 */
-	total = Queue_GetTotal( child_list );
-	//_DEBUG_MSG( "root: %p, cur: %p, child total: %d\n",
-	//		root_glayer, glayer, total );
+	n = LinkedList_GetTotal( children );
+	//_DEBUG_MSG( "root: %p, cur: %p, child n: %d\n",
+	//		root_glayer, glayer, n );
 	/* 从尾到首，从底到顶，遍历图层 */
-	for( i=total-1; i>=0; --i ) {
-		child = (LCUI_GraphLayer*)Queue_Get( child_list, i );
+	for( i=n-1; i>=0; --i ) {
+		LinkedList_Goto( children, i );
+		child = (LCUI_GraphLayer*)LinkedList_Get( children );
 		/* 忽略无效或不可见的图层 */
 		if( !child || !child->visible ) {
 			continue;
@@ -473,20 +472,19 @@ static int __GraphLayer_GetLayers( LCUI_GraphLayer *root_glayer,
 		}
 		/* 若该有效区域与目标区域重叠，则记录子部件，并进行递归 */
 		if( LCUIRect_IsCoverRect(tmp, rect) ) {
-			Queue_AddPointer( queue, child );
-			__GraphLayer_GetLayers(	root_glayer, 
-						child, rect, queue );
+			LinkedList_AddData( list, child );
+			__GraphLayer_GetLayers(	root_glayer, child, rect, list );
 		}
 	}
 	return 0;
 }
 
-LCUI_API int GraphLayer_GetLayers( LCUI_GraphLayer *glayer,  LCUI_Rect rect,
-							LCUI_Queue *queue )
+int GraphLayer_GetLayers(	LCUI_GraphLayer *glayer, 
+				LCUI_Rect rect, LinkedList *list )
 {
 	//_DEBUG_MSG("rect: %d,%d,%d,%d\n", 
 	//rect.x, rect.y, rect.width, rect.height);
-	return __GraphLayer_GetLayers( glayer, glayer, rect, queue );
+	return __GraphLayer_GetLayers( glayer, glayer, rect, list );
 }
 
 /* 获取图层实际的全局透明度 */
@@ -503,14 +501,13 @@ static uchar_t GraphLayer_GetRealAlpha( LCUI_GraphLayer *glayer )
 }
 
 
-LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr, 
-				LCUI_Graph *graph_buff, LCUI_Rect rect )
+int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr, LCUI_Graph *graph_buff, LCUI_Rect rect )
 {
-	int i, total; 
+	int i, n; 
 	uchar_t tmp_alpha, alpha;
 	LCUI_Pos pos, glayer_pos;
 	LCUI_GraphLayer *glayer;
-	LCUI_Queue glayerQ;
+	LinkedList glayer_list;
 	LCUI_Rect valid_area;
 	LCUI_Graph tmp_graph;
 	
@@ -531,15 +528,15 @@ LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr,
 	}
 
 	Graph_Init( &tmp_graph );
-	Queue_Init( &glayerQ, 0, NULL);
-	Queue_UsingPointer( &glayerQ );
+	LinkedList_Init( &glayer_list, 0 );
+	LinkedList_SetDataNeedFree( &glayer_list, FALSE );
 	
 	/* 获取rect区域内的图层列表 */
-	GraphLayer_GetLayers( ctnr, rect, &glayerQ ); 
-	total = Queue_GetTotal( &glayerQ ); 
-	DEBUG_MSG( "total: %d\n", total );
+	GraphLayer_GetLayers( ctnr, rect, &glayer_list ); 
+	n = LinkedList_GetTotal( &glayer_list ); 
+	DEBUG_MSG( "n: %d\n", n );
 	/* 若记录数为零，则表明该区域没有图层 */
-	if( total <= 0 ) {
+	if( n <= 0 ) {
 		/* 若没有父图层，则填充白色 */
 		if( ctnr == NULL ) {
 			Graph_FillColor( graph_buff, RGB(255,255,255) );
@@ -547,12 +544,13 @@ LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr,
 			Graph_Cut( &ctnr->graph, rect, graph_buff );
 		}
 		/* 销毁记录 */
-		Queue_Destroy( &glayerQ );
+		LinkedList_Destroy( &glayer_list );
 		return 0;
 	}
 	/* 从顶层到底层遍历图层，排除被其它图层完全遮挡或者自身完全透明的图层 */
-	for(i=total-1; i>=0; --i) {
-		glayer = (LCUI_GraphLayer*)Queue_Get( &glayerQ, i );
+	for(i=n-1; i>=0; --i) {
+		LinkedList_Goto( &glayer_list, i );
+		glayer = (LCUI_GraphLayer*)LinkedList_Get( &glayer_list );
 		valid_area = GraphLayer_GetValidRect( ctnr, glayer );
 		glayer_pos = GraphLayer_GetGlobalPos( ctnr, glayer );
 		valid_area.x += glayer_pos.x;
@@ -571,22 +569,23 @@ LCUI_API int GraphLayer_GetGraph( LCUI_GraphLayer *ctnr,
 		 && rect.x + rect.w <= valid_area.x + valid_area.w
 		 && rect.y + rect.h <= valid_area.y + valid_area.h ) {
 			/* 移除底层的图层，因为已经被完全遮挡 */
-			for(total=i-1;total>=0; --total) {
-				Queue_DeletePointer( &glayerQ, 0 );
+			for(n=i-1;n>=0; --n) {
+				LinkedList_Delete( &glayer_list );
 			}
 			goto skip_loop;
 		}
 	}
 skip_loop:
-	total = Queue_GetTotal( &glayerQ );
-	DEBUG_MSG( "total: %d\n", total );
+	n = LinkedList_GetTotal( &glayer_list );
+	DEBUG_MSG( "n: %d\n", n );
 	if(i <= 0 && ctnr ) {
-			Graph_Cut( &ctnr->graph, rect, graph_buff );
+		Graph_Cut( &ctnr->graph, rect, graph_buff );
 	}
 	/* 获取图层列表中的图层 */
-	for(i=0; i<total; ++i) {
-		glayer = (LCUI_GraphLayer*)Queue_Get( &glayerQ, i );
-		//_DEBUG_MSG("%p = Queue_Get( %p, %d )\n", glayer, &glayerQ, i);
+	for(i=0; i<n; ++i) {
+		LinkedList_Goto( &glayer_list, i );
+		glayer = (LCUI_GraphLayer*)LinkedList_Get( &glayer_list );
+		//_DEBUG_MSG("%p = LinkedList_Get( %p, %d )\n", glayer, &glayer_list, i);
 		if( !glayer ) {
 			continue;
 		}
@@ -620,25 +619,26 @@ skip_loop:
 			glayer->graph.alpha = tmp_alpha;
 		}
 	}
-	Queue_Destroy( &glayerQ );
+	LinkedList_Destroy( &glayer_list );
 	return 0;
 }
 
-LCUI_API int GraphLayer_Front( LCUI_GraphLayer *glayer )
+int GraphLayer_Front( LCUI_GraphLayer *glayer )
 {
-	int i, total, src_pos = -1, des_pos = -1;
+	int i, n, src_pos = -1, des_pos = -1;
 	LCUI_GraphLayer *tmp_child;
-	LCUI_Queue *child_list;
+	LinkedList *children;
 
 	if( !glayer || !glayer->parent ) {
 		return -1;
 	}
 
-	child_list = &glayer->parent->child;
-	total = Queue_GetTotal( child_list );
+	children = &glayer->parent->children;
+	n = LinkedList_GetTotal( children );
 	/* 先在队列中找到自己，以及z-index值小于或等于它的第一个图层 */
-	for(i=0,src_pos=des_pos=-1; i<total; ++i) {
-		tmp_child = (LCUI_GraphLayer*)Queue_Get( child_list, i );
+	for(i=0,src_pos=des_pos=-1; i<n; ++i) {
+		LinkedList_Goto( children, i );
+		tmp_child = (LCUI_GraphLayer*)LinkedList_Get( children );
 		if( !tmp_child ) {
 			continue;
 		}
@@ -668,11 +668,12 @@ LCUI_API int GraphLayer_Front( LCUI_GraphLayer *glayer )
 		return -2;
 	}
 	/* 找到的话就移动位置 */
-	Queue_Move( child_list, des_pos, src_pos );
+	LinkedList_Goto( children, src_pos );
+	LinkedList_MoveTo( children, des_pos );
 	return 0;
 }
 
-LCUI_API int GraphLayer_Show( LCUI_GraphLayer *glayer )
+int GraphLayer_Show( LCUI_GraphLayer *glayer )
 {
 	if( !glayer ) {
 		return -1;
@@ -681,7 +682,7 @@ LCUI_API int GraphLayer_Show( LCUI_GraphLayer *glayer )
 	return 0;
 }
 
-LCUI_API int GraphLayer_Hide( LCUI_GraphLayer *glayer )
+int GraphLayer_Hide( LCUI_GraphLayer *glayer )
 {
 	if( !glayer ) {
 		return -1;

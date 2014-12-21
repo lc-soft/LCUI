@@ -1,11 +1,11 @@
 // IME: Input Method Editor/Engine
-#define NEED_IME
+//#define NEED_IME
 #ifdef NEED_IME
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_INPUT_H
-#include LC_WIDGET_H
-#include LC_INPUT_METHOD_H
+#include <LCUI/LCUI.h>
+#include <LCUI/input.h>
+#include <LCUI/widget.h>
+#include <LCUI/ime.h>
 
 typedef struct LCUIIME_Info_ {
 	int id;
@@ -266,7 +266,7 @@ LCUI_API LCUI_BOOL LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
 /* 提交输入法输入的内容至目标 */
 LCUI_API int LCUIIME_Commit( const wchar_t *str )
 {
-	LCUI_Widget *widget;
+	LCUI_Widget widget;
 	LCUI_WidgetEvent event;
 
 	if( current_ime == NULL ) {
@@ -287,7 +287,7 @@ LCUI_API int LCUIIME_Commit( const wchar_t *str )
 }
 
 /* 设置输入法的目标 */
-LCUI_API int LCUIIME_SetTarget( LCUI_Widget *widget )
+LCUI_API int LCUIIME_SetTarget( LCUI_Widget widget )
 {
 	if( current_ime == NULL ) {
 		return -1;
@@ -321,7 +321,7 @@ LCUI_API void LCUIModule_IME_End(void)
 /*-------------------------- 默认的输入法 ------------------------------*/
 
 // 目标部件
-static LCUI_Widget *target_widget = NULL;
+static LCUI_Widget target_widget = NULL;
 
 /**
 判断按键是否需要处理，也可以用于设置当前的输入法，比如：
@@ -401,7 +401,7 @@ static LCUI_BOOL IME_ProcessKey( int key, int key_state )
 	return FALSE;
 }
 
-static void IME_SetTarget( LCUI_Widget *widget )
+static void IME_SetTarget( LCUI_Widget widget )
 {
 	target_widget = widget;
 }

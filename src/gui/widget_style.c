@@ -1,7 +1,8 @@
-﻿#include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_WIDGET_H
-#include LC_GRAPH_H
+﻿#ifdef ENABLE_THIS_MODULE
+#include <LCUI_Build.h>
+#include <LCUI/LCUI.h>
+#include <LCUI/widget.h>
+#include <LCUI/graph.h>
 #include LC_STYLE_LIBRARY_H
 
 #include <math.h>
@@ -133,7 +134,7 @@ static int style_color_convert( const char *style_str, LCUI_Color *rgb )
 
 /* 根据部件的样式，同步设置部件的背景 */
 static int WidgetStyle_SyncBackground(
-		LCUI_Widget *widget,
+		LCUI_Widget widget,
 		StyleLIB_Selector *selector,
 		StyleLIB_Class *style_class,
 		const char *pseudo_class_name )
@@ -208,7 +209,7 @@ static int WidgetStyle_SyncBackground(
 
 /* 根据样式，同步部件的定位 */
 static int WidgetStyle_SyncPostion(
-		LCUI_Widget *widget,
+		LCUI_Widget widget,
 		StyleLIB_Selector *selector,
 		StyleLIB_Class *style_class,
 		const char *pseudo_class_name )
@@ -334,31 +335,31 @@ static int style_border_convert( const char *style_str, LCUI_Border *border )
 			if( have_type ) {
 				return -1;
 			}
-			style_type = BORDER_STYLE_SOLID;
+			style_type = BORDER_SOLID;
 			have_type = TRUE;
 		} else if( LCUI_strcasecmpA(buff,"none") == 0 ) {
 			if( have_type ) {
 				return -1;
 			}
-			style_type = BORDER_STYLE_NONE;
+			style_type = BORDER_NONE;
 			have_type = TRUE;
 		} else if( LCUI_strcasecmpA(buff,"dotted") == 0 ) {
 			if( have_type ) {
 				return -1;
 			}
-			style_type = BORDER_STYLE_DOTTED;
+			style_type = BORDER_DOTTED;
 			have_type = TRUE;
 		} else if( LCUI_strcasecmpA(buff,"double") == 0 ) {
 			if( have_type ) {
 				return -1;
 			}
-			style_type = BORDER_STYLE_DOUBLE;
+			style_type = BORDER_DOUBLE;
 			have_type = TRUE;
 		} else if( LCUI_strcasecmpA(buff,"dashed") == 0 ) {
 			if( have_type ) {
 				return -1;
 			}
-			style_type = BORDER_STYLE_DASHED;
+			style_type = BORDER_DASHED;
 			have_type = TRUE;
 		}
 		if( *str_ptr == 0 ) {
@@ -373,7 +374,7 @@ static int style_border_convert( const char *style_str, LCUI_Border *border )
 }
 
 static int WidgetStyle_SyncBorder(
-		LCUI_Widget *widget,
+		LCUI_Widget widget,
 		StyleLIB_Selector *selector,
 		StyleLIB_Class *style_class,
 		const char *pseudo_class_name )
@@ -400,7 +401,7 @@ static int WidgetStyle_SyncBorder(
 
 /* 根据部件样式，同步部件的尺寸 */
 static int WidgetStyle_SyncSize(
-		LCUI_Widget *widget,
+		LCUI_Widget widget,
 		StyleLIB_Selector *selector,
 		StyleLIB_Class *style_class,
 		const char *pseudo_class_name )
@@ -434,7 +435,7 @@ static int WidgetStyle_SyncSize(
 	return 0;
 }
 
-LCUI_API int WidgetStyle_Sync( LCUI_Widget *widget )
+LCUI_API int WidgetStyle_Sync( LCUI_Widget widget )
 {
 	StyleLIB_Class *style_class;
 	StyleLIB_Selector *style_selector;
@@ -480,3 +481,4 @@ LCUI_API int WidgetStyle_Sync( LCUI_Widget *widget )
 	WidgetStyle_SyncBorder( widget, style_selector, style_class, pseudo_class_name );
 	return 0;
 }
+#endif

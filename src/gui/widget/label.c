@@ -38,12 +38,13 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-
+ 
+#ifdef ENABLE_THIS_MODULE
 //#define DEBUG
 
 #include <LCUI_Build.h>
-#include LC_LCUI_H
-#include LC_WIDGET_H
+#include <LCUI/LCUI.h>
+#include <LCUI/widget.h>
 #include LC_LABEL_H
 
 enum label_msg_id {
@@ -61,14 +62,14 @@ typedef struct LCUI_Label_ {
 /*---------------------------- Private -------------------------------*/
 
 /** 获取label部件内的文本图层的指针 */
-static LCUI_TextLayer* Label_GetTextLayer( LCUI_Widget *widget )
+static LCUI_TextLayer* Label_GetTextLayer( LCUI_Widget widget )
 {
 	LCUI_Label *label;
 	label = (LCUI_Label*)Widget_GetPrivateData( widget );
 	return &label->layer;
 }
 
-static void Label_UpdateTextStyle( LCUI_Widget *widget, void *arg )
+static void Label_UpdateTextStyle( LCUI_Widget widget, void *arg )
 {
 	LCUI_Label *label;
 	DEBUG_MSG("recv LABEL_STYLE msg, lock widget\n");
@@ -83,7 +84,7 @@ static void Label_UpdateTextStyle( LCUI_Widget *widget, void *arg )
 	Widget_Unlock( widget );
 }
 
-static void Label_OnSetTextW( LCUI_Widget *widget, void *arg )
+static void Label_OnSetTextW( LCUI_Widget widget, void *arg )
 {
 	LCUI_Label *label;
 	DEBUG_MSG("recv LABEL_TEXT msg, lock widget\n");
@@ -98,7 +99,7 @@ static void Label_OnSetTextW( LCUI_Widget *widget, void *arg )
 	Widget_Unlock( widget );
 }
 
-static void Label_OnSetAutoWrap( LCUI_Widget *widget, void *arg )
+static void Label_OnSetAutoWrap( LCUI_Widget widget, void *arg )
 {
 	LCUI_BOOL flag;
 	LCUI_Label *label;
@@ -115,7 +116,7 @@ static void Label_OnSetAutoWrap( LCUI_Widget *widget, void *arg )
 }
 
 /** 初始化label部件数据 */
-static void Label_OnInit( LCUI_Widget *widget )
+static void Label_OnInit( LCUI_Widget widget )
 {
 	LCUI_Label *label;
 	/* label部件不需要焦点 */
@@ -137,7 +138,7 @@ static void Label_OnInit( LCUI_Widget *widget )
 }
 
 /** 释放label部件占用的资源 */
-static void Label_OnDestroy( LCUI_Widget *widget )
+static void Label_OnDestroy( LCUI_Widget widget )
 {
 	LCUI_Label *label;
 	label = (LCUI_Label*)Widget_GetPrivateData( widget );
@@ -145,7 +146,7 @@ static void Label_OnDestroy( LCUI_Widget *widget )
 }
 
 /** 更新Label部件的数据 */
-static void Label_OnUpdate( LCUI_Widget *widget )
+static void Label_OnUpdate( LCUI_Widget widget )
 {
 	int n;
 	LCUI_Label *label;
@@ -161,7 +162,7 @@ static void Label_OnUpdate( LCUI_Widget *widget )
 	new_size.w = TextLayer_GetWidth( &label->layer );
 	new_size.h = TextLayer_GetHeight( &label->layer );
 	/* 如果部件尺寸不是由LCUI自动调整的 */
-	if( widget->dock != DOCK_TYPE_NONE || !label->auto_size ) {
+	if( widget->dock != DOCK_NONE || !label->auto_size ) {
 		new_size = Widget_GetSize(widget);
 		/* 最小尺寸为20x20 */
 		if( new_size.w < 20 ) {
@@ -216,7 +217,7 @@ static void Label_OnUpdate( LCUI_Widget *widget )
 }
 
 /** 绘制label部件 */
-static void Label_OnPaint( LCUI_Widget *widget )
+static void Label_OnPaint( LCUI_Widget widget )
 {
 	LCUI_Label *label;
 	LCUI_Rect area;
@@ -240,7 +241,7 @@ static void Label_OnPaint( LCUI_Widget *widget )
 
 /*---------------------------- Public --------------------------------*/
 /** 设定与标签关联的文本内容 */
-LCUI_API int Label_SetTextW( LCUI_Widget *widget, const wchar_t *text )
+LCUI_API int Label_SetTextW( LCUI_Widget widget, const wchar_t *text )
 {
 	int len;
 	wchar_t *p_text;
@@ -267,7 +268,7 @@ LCUI_API int Label_SetTextW( LCUI_Widget *widget, const wchar_t *text )
 	return 0;
 }
 
-LCUI_API int Label_SetText( LCUI_Widget *widget, const char *utf8_text )
+LCUI_API int Label_SetText( LCUI_Widget widget, const char *utf8_text )
 {
 	int ret;
 	wchar_t *wstr;
@@ -280,7 +281,7 @@ LCUI_API int Label_SetText( LCUI_Widget *widget, const char *utf8_text )
 	return ret;
 }
 
-LCUI_API int Label_SetTextA( LCUI_Widget *widget, const char *ansi_text )
+LCUI_API int Label_SetTextA( LCUI_Widget widget, const char *ansi_text )
 {
 	int ret;
 	wchar_t *wstr;
@@ -293,13 +294,13 @@ LCUI_API int Label_SetTextA( LCUI_Widget *widget, const char *ansi_text )
 }
 
 /** 设置Label部件显示的文本是否自动换行 */
-LCUI_API void Label_SetAutoWrap( LCUI_Widget *widget, LCUI_BOOL flag )
+LCUI_API void Label_SetAutoWrap( LCUI_Widget widget, LCUI_BOOL flag )
 {
 	WidgetMsg_Post( widget, LABEL_AUTO_WRAP, flag?((void*)(1)):NULL, TRUE, FALSE );
 }
 
 /** 设置文本对齐方式 */
-LCUI_API void Label_SetTextAlign( LCUI_Widget *widget, TextAlignType align )
+LCUI_API void Label_SetTextAlign( LCUI_Widget widget, TextAlignType align )
 {
 	LCUI_TextLayer *layer;
 	layer = Label_GetTextLayer( widget );
@@ -308,7 +309,7 @@ LCUI_API void Label_SetTextAlign( LCUI_Widget *widget, TextAlignType align )
 }
 
 /** 为Label部件内显示的文本设定文本样式 */
-LCUI_API int Label_SetTextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
+LCUI_API int Label_SetTextStyle( LCUI_Widget widget, LCUI_TextStyle style )
 {
 	LCUI_Label *label;
 	label = (LCUI_Label*)Widget_GetPrivateData( widget );
@@ -319,7 +320,7 @@ LCUI_API int Label_SetTextStyle( LCUI_Widget *widget, LCUI_TextStyle style )
 }
 
 /** 获取Label部件的全局文本样式 */
-LCUI_API void Label_GetTextStyle( LCUI_Widget *widget, LCUI_TextStyle *style )
+LCUI_API void Label_GetTextStyle( LCUI_Widget widget, LCUI_TextStyle *style )
 {
 	LCUI_TextLayer *layer;
 	layer = Label_GetTextLayer( widget );
@@ -327,7 +328,7 @@ LCUI_API void Label_GetTextStyle( LCUI_Widget *widget, LCUI_TextStyle *style )
 }
 
 /** 启用或禁用Label部件的自动尺寸调整功能 */
-LCUI_API void Label_SetAutoSize( LCUI_Widget *widget, LCUI_BOOL flag,
+LCUI_API void Label_SetAutoSize( LCUI_Widget widget, LCUI_BOOL flag,
 							AUTOSIZE_MODE mode )
 {
 	LCUI_Label *label;
@@ -347,3 +348,5 @@ void RegisterLabel(void)
 	WidgetFunc_Add(WIDGET_LABEL, Label_OnUpdate, FUNC_TYPE_UPDATE);
 	WidgetFunc_Add(WIDGET_LABEL, Label_OnDestroy, FUNC_TYPE_DESTROY);
 }
+
+#endif

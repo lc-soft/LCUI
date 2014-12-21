@@ -53,8 +53,8 @@ enum ProgressBarStyle {
 
 typedef struct LCUI_ProgressBar_
 {
-	LCUI_Widget *fore_wdg;		/* 进度条 */ 
-	LCUI_Widget *glisten_wdg;	/* 闪光 */
+	LCUI_Widget fore_wdg;		/* 进度条 */ 
+	LCUI_Widget glisten_wdg;	/* 闪光 */
 	
 	int move_speed;		/* 闪光的移动速度，单位为：像素/秒 */
 	int sleep_time;		/* 闪光每趟移动的间隔时间，单位为：毫秒 */
@@ -63,16 +63,16 @@ typedef struct LCUI_ProgressBar_
 } LCUI_ProgressBar;
 
 /* 设定进度条最大值 */
-LCUI_API void ProgressBar_SetMaxValue(LCUI_Widget *widget, int max_value);
+LCUI_API void ProgressBar_SetMaxValue(LCUI_Widget widget, int max_value);
 
 /* 获取进度条最大值 */
-LCUI_API int ProgressBar_GetMaxValue( LCUI_Widget *widget );
+LCUI_API int ProgressBar_GetMaxValue( LCUI_Widget widget );
 
 /* 设定进度条当前值 */
-LCUI_API void ProgressBar_SetValue( LCUI_Widget *widget, int value );
+LCUI_API void ProgressBar_SetValue( LCUI_Widget widget, int value );
 
 /* 获取进度条当前值 */
-LCUI_API int ProgressBar_GetValue( LCUI_Widget *widget );
+LCUI_API int ProgressBar_GetValue( LCUI_Widget widget );
 
 /* 注册进度条部件类型 */
 LCUI_API void Register_ProgressBar(void);
