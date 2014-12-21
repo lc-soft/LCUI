@@ -1106,7 +1106,7 @@ int TextLayer_SetText( LCUI_TextLayer* layer, const char *utf8_text )
 int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
 			int max_len, wchar_t *wstr_buff )
 {
-	int row, col, i;
+	int row, col = 0, i;
 	TextRowData *row_ptr;
 
 	if( start_pos<0 ) {
@@ -1344,8 +1344,8 @@ int TextLayer_Backspace( LCUI_TextLayer* layer, int n_char )
 /** 设置是否启用自动换行模式 */
 void TextLayer_SetAutoWrap( LCUI_TextLayer* layer, int is_true )
 {
-	if( !layer->is_autowrap_mode && is_true
-	 || layer->is_autowrap_mode && !is_true ) {
+	if( (!layer->is_autowrap_mode && is_true)
+	 || (layer->is_autowrap_mode && !is_true) ) {
 		layer->is_autowrap_mode = is_true;
 		TaskData_AddUpdateTypeset( &layer->task, 0 );
 	}

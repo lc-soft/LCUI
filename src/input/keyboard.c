@@ -193,7 +193,7 @@ static LCUI_BOOL LCUIKeyboard_Init( void )
 }
 
 /* 停用键盘输入 */
-static int LCUIKeyboard_Exit( void )
+static LCUI_BOOL LCUIKeyboard_Exit( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	tm.c_lflag |= ICANON;
@@ -294,15 +294,15 @@ int LCUIKeyboard_GetKey( void )
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 static LCUI_BOOL LCUIKeyboard_Proc(void)
 {
-	LCUI_Event event;
+	LCUI_SystemEvent e;
 	 /* 如果没有按键输入 */ 
 	if ( !LCUIKeyboard_IsHit() ) {
 		return FALSE;
 	}
 	
-	event.type = LCUI_KEYDOWN;
-	event.key.key_code = LCUIKeyboard_GetKey();
-	LCUI_PushEvent( &event );
+	e.type = LCUI_KEYDOWN;
+	e.which = LCUIKeyboard_GetKey();
+	LCUI_PostEvent( &e );
 	return TRUE;
 }
 #endif
