@@ -52,7 +52,7 @@
 #define BLACK   1
 
 /** 初始化红黑树 */
-LCUI_API void RBTree_Init( LCUI_RBTree *rbt )
+void RBTree_Init( LCUI_RBTree *rbt )
 {
         rbt->root = NULL;
 	rbt->judge = NULL;
@@ -61,7 +61,7 @@ LCUI_API void RBTree_Init( LCUI_RBTree *rbt )
 }
 
 /** 销毁红黑树 */
-LCUI_API void RBTree_Destroy( LCUI_RBTree *rbt )
+void RBTree_Destroy( LCUI_RBTree *rbt )
 {
 	LCUI_RBTreeNode *node, *next_node;
 	node = RBTree_First( rbt );
@@ -89,7 +89,7 @@ LCUI_API void RBTree_Destroy( LCUI_RBTree *rbt )
 }
 
 /** 获取第一个结点 */
-LCUI_API LCUI_RBTreeNode *RBTree_First( const LCUI_RBTree *rbt )
+LCUI_RBTreeNode *RBTree_First( const LCUI_RBTree *rbt )
 {
         LCUI_RBTreeNode *node;
 
@@ -104,7 +104,7 @@ LCUI_API LCUI_RBTreeNode *RBTree_First( const LCUI_RBTree *rbt )
 }
 
 /** 获取下一个结点 */
-LCUI_API LCUI_RBTreeNode *RBTree_Next( const LCUI_RBTreeNode *node )
+LCUI_RBTreeNode *RBTree_Next( const LCUI_RBTreeNode *node )
 {
         LCUI_RBTreeNode *parent;  
 
@@ -277,7 +277,7 @@ rb_search_auxiliary( LCUI_RBTreeNode *root, int key, const void *keydata,
         return NULL;
 }
 
-LCUI_RBTreeNode* RBTree_CustomSearch( LCUI_RBTree* rbt, void *keydata )
+LCUI_RBTreeNode* RBTree_CustomSearch( LCUI_RBTree* rbt, const void *keydata )
 {
 	return rb_search_auxiliary( rbt->root, 0, keydata, rbt->judge, NULL );
 }
@@ -287,7 +287,7 @@ LCUI_RBTreeNode* RBTree_Search( LCUI_RBTree* rbt, int key )
 	return rb_search_auxiliary( rbt->root, key, NULL, rbt->judge, NULL );
 }
 
-void* RBTree_CustomGetData( LCUI_RBTree* rbt, void *keydata )
+void* RBTree_CustomGetData( LCUI_RBTree* rbt, const void *keydata )
 {
         LCUI_RBTreeNode *node;
 	node = rb_search_auxiliary( rbt->root, 0, keydata, rbt->judge, NULL );

@@ -56,7 +56,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
         png_infop info_ptr;
 	png_bytep* row_pointers;
         char buf[PNG_BYTES_TO_CHECK];
-	uchar_t *pPixel;
+	uchar_t *pixel_ptr;
         int w, h, x, y, temp, color_type;
 
         fp = fopen(filepath, "rb");
@@ -108,17 +108,17 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 			return FILE_ERROR_MALLOC_ERROR;
 		}
 		
-		pPixel = graph->bytes;
+		pixel_ptr = graph->bytes;
                 for( y=0; y<h; ++y ) {
 			/*
 			 * Graph的像素数据存储格式是BGRA，而PNG库
 			 * 提供像素数据的是RGBA格式的，因此需要调整写入顺序
 			 */
 			for( x=0; x<w*4; x+=4 ) {
-				*pPixel++ = row_pointers[y][x+2];
-				*pPixel++ = row_pointers[y][x+1];
-				*pPixel++ = row_pointers[y][x];
-				*pPixel++ = row_pointers[y][x+3];
+				*pixel_ptr++ = row_pointers[y][x+2];
+				*pixel_ptr++ = row_pointers[y][x+1];
+				*pixel_ptr++ = row_pointers[y][x];
+				*pixel_ptr++ = row_pointers[y][x+3];
 			}
 		}
 		break;
@@ -132,12 +132,12 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 			return FILE_ERROR_MALLOC_ERROR;
 		}
 		
-		pPixel = graph->bytes;
+		pixel_ptr = graph->bytes;
                 for( y=0; y<h; ++y ) {
 			for( x=0; x<w*3; x+=3 ) {
-				*pPixel++ = row_pointers[y][x+2];
-				*pPixel++ = row_pointers[y][x+1];
-				*pPixel++ = row_pointers[y][x];
+				*pixel_ptr++ = row_pointers[y][x+2];
+				*pixel_ptr++ = row_pointers[y][x+1];
+				*pixel_ptr++ = row_pointers[y][x];
 			}
 		}
 		break;
@@ -155,16 +155,16 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 }
 
 /* 将图像数据写入至png文件 */
-LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
+int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
 {
 #ifdef USE_LIBPNG
         FILE *fp;
-        int x, y, row_size, pos;
+        int x, y, row_size;
         png_byte color_type; 
         png_structp png_ptr;
         png_infop info_ptr; 
         png_bytep *row_pointers;
-        uchar_t *pPixel;
+        uchar_t *pixel_ptr;
 
         if(!Graph_IsValid(graph)) {
                 _DEBUG_MSG("graph is not valid\n");
@@ -230,16 +230,16 @@ LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
                 row_size = sizeof(uchar_t) * 3 * graph->w;
         }
         
-	pPixel = graph->bytes;
+	pixel_ptr = graph->bytes;
         row_pointers = (png_bytep*)malloc( graph->h*sizeof(png_bytep) );
-        for(y=0,pos=0; y < graph->h; y++) {
+        for(y=0; y < graph->h; y++) {
                 row_pointers[y] = (png_bytep)malloc(row_size);
                 for(x=0; x < row_size; ) {
-                        row_pointers[y][x+2] = *pPixel++; // blue
-                        row_pointers[y][x+1] = *pPixel++; // green
-                        row_pointers[y][x] = *pPixel++;   // red
+                        row_pointers[y][x+2] = *pixel_ptr++; // blue
+                        row_pointers[y][x+1] = *pixel_ptr++; // green
+                        row_pointers[y][x] = *pixel_ptr++;   // red
                         if( graph->color_type == COLOR_TYPE_ARGB ) {
-                                row_pointers[y][x+3] = *pPixel++; // alpha 
+                                row_pointers[y][x+3] = *pixel_ptr++; // alpha 
 				x += 4;
 			} else {
 				x += 3;
