@@ -99,9 +99,6 @@ typedef struct LCUI_MainLoopRec_ {
 
 #define EVENT_NAME_LIST_MAX_LEN 10
 
-static int user_event_id = LCUI_USER;
-static char *sys_event_name_list[EVENT_NAME_LIST_MAX_LEN];
-
 /** 系统事件处理线程 */
 static void SystemEventThread(void *arg)
 {
@@ -270,7 +267,7 @@ static int LCUI_RunTask(void)
 }
 
 /** 运行目标主循环 */
-int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
+int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 {
 	LCUI_MainLoopRec *loop_rec = (LCUI_MainLoopRec*)loop;
 	if( loop_rec->state == STATE_RUNNING ) {
@@ -329,7 +326,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop *loop )
 }
 
 /** 标记目标主循环需要退出 */
-void LCUI_MainLoop_Quit( LCUI_MainLoop *loop )
+void LCUI_MainLoop_Quit( LCUI_MainLoop loop )
 {
 	LCUI_MainLoopRec *loop_rec = (LCUI_MainLoopRec*)loop;
 	loop_rec->state = STATE_EXITED;
