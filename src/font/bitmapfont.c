@@ -285,9 +285,12 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
 			bmp_src = bmp_row_src;
 			byte_des = byte_row_des;
 			for( x=0; x<cut.w; ++x ) {
-				*byte_des++ = _ALPHA_BLEND( *byte_des, color.b, *bmp_src );
-				*byte_des++ = _ALPHA_BLEND( *byte_des, color.g, *bmp_src );
-				*byte_des++ = _ALPHA_BLEND( *byte_des, color.r, *bmp_src );
+				ALPHA_BLEND( *byte_des, color.b, *bmp_src );
+				byte_des++;
+				ALPHA_BLEND( *byte_des, color.g, *bmp_src );
+				byte_des++;
+				ALPHA_BLEND( *byte_des, color.r, *bmp_src );
+				byte_des++;
 				++bmp_src;
 			}
 			byte_row_des += des->w*3;

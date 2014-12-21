@@ -47,6 +47,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+#define MS_DEV	"/dev/input/mice"	/* 鼠标设备 */
 #endif
 
 #ifdef LCUI_MOUSE_DRIVER_LINUX
@@ -152,7 +154,7 @@ static LCUI_BOOL MouseProc( void )
 		return FALSE;
 	}
 
-	pos = LCUICursor_GetNewPos();
+	LCUICursor_GetNewPos( &pos );
 	pos.x += buf[1];
 	pos.y -= buf[2];
 	if( pos.x > LCUIScreen_GetWidth() ) {

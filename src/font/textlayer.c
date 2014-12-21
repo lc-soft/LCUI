@@ -297,7 +297,7 @@ static void TextChar_UpdateBitmap( TextCharData* p_data,
 	//p_data->char_code, default_style->pixel_size, default_style->font_id, p_data->bitmap);
 }
 
-LCUI_API void TextLayer_Init( LCUI_TextLayer *layer )
+void TextLayer_Init( LCUI_TextLayer *layer )
 {
 	layer->max_width = 0;
 	layer->max_height = 0;
@@ -341,7 +341,7 @@ static void TextRowList_Destroy( TextRowList *list )
 }
 
 /** 销毁TextLayer */
-LCUI_API void TextLayer_Destroy( LCUI_TextLayer *layer )
+void TextLayer_Destroy( LCUI_TextLayer *layer )
 {
 	DirtyRectList_Destroy( &layer->dirty_rect );
 	Graph_Free( &layer->graph );
@@ -516,7 +516,7 @@ static void TextLayer_InvalidateRowRect( LCUI_TextLayer *layer, int i_row )
 }
 
 /** 标记当前显示区域内的所有文本行的矩形为无效 */
-LCUI_API void TextLayer_InvalidateAllRowRect( LCUI_TextLayer* layer )
+void TextLayer_InvalidateAllRowRect( LCUI_TextLayer* layer )
 {
 	int i, x, y;
 	LCUI_Rect rect;
@@ -583,7 +583,7 @@ LCUI_API void TextLayer_InvalidateAllRowRect( LCUI_TextLayer* layer )
 
 
 /** 标记指定范围内容的文本行的矩形为无效 */
-LCUI_API void TextLayer_InvalidateRowsRect( LCUI_TextLayer *layer,
+void TextLayer_InvalidateRowsRect( LCUI_TextLayer *layer,
 					   int start_row, int end_row )
 {
 	int i, x, y;
@@ -649,7 +649,7 @@ LCUI_API void TextLayer_InvalidateRowsRect( LCUI_TextLayer *layer,
 }
 
 /** 设置插入点的行列坐标 */
-LCUI_API void TextLayer_SetCaretPos( LCUI_TextLayer* layer, int row, int col )
+void TextLayer_SetCaretPos( LCUI_TextLayer* layer, int row, int col )
 {
 	if( row < 0 ) {
 		row = 0;
@@ -677,7 +677,7 @@ LCUI_API void TextLayer_SetCaretPos( LCUI_TextLayer* layer, int row, int col )
 }
 
 /** 根据像素坐标设置文本光标的行列坐标 */
-LCUI_API int TextLayer_SetCaretPosByPixelPos( LCUI_TextLayer* layer, int x, int y )
+int TextLayer_SetCaretPosByPixelPos( LCUI_TextLayer* layer, int x, int y )
 {
 	TextRowData* p_row;
 	int i, pixel_pos, ins_x, ins_y;
@@ -732,7 +732,7 @@ LCUI_API int TextLayer_SetCaretPosByPixelPos( LCUI_TextLayer* layer, int x, int 
 }
 
 /** 获取指定行列的文字的像素坐标 */
-LCUI_API int TextLayer_GetCharPixelPos( LCUI_TextLayer* layer, int row,
+int TextLayer_GetCharPixelPos( LCUI_TextLayer* layer, int row,
 						int col, LCUI_Pos *pixel_pos )
 {
 	TextRowData* p_row;
@@ -784,14 +784,14 @@ LCUI_API int TextLayer_GetCharPixelPos( LCUI_TextLayer* layer, int row,
 }
 
 /** 获取文本光标的像素坐标 */
-LCUI_API int TextLayer_GetCaretPixelPos( LCUI_TextLayer *layer, LCUI_Pos *pixel_pos )
+int TextLayer_GetCaretPixelPos( LCUI_TextLayer *layer, LCUI_Pos *pixel_pos )
 {
 	return TextLayer_GetCharPixelPos( layer, layer->insert_y, 
 						layer->insert_x, pixel_pos );
 }
 
 /** 清空文本 */
-LCUI_API void TextLayer_ClearText( LCUI_TextLayer* layer )
+void TextLayer_ClearText( LCUI_TextLayer* layer )
 {
 	layer->insert_x = 0;
 	layer->insert_y = 0;
@@ -1045,45 +1045,45 @@ static int TextLayer_ProcessText( LCUI_TextLayer *layer, const wchar_t *wstr,
 }
 
 /** 插入文本内容（宽字符版） */
-LCUI_API int TextLayer_InsertTextW( LCUI_TextLayer *layer, const wchar_t *wstr,
+int TextLayer_InsertTextW( LCUI_TextLayer *layer, const wchar_t *wstr,
 						LCUI_StyleTagStack *tag_stack )
 {
 	return TextLayer_ProcessText( layer, wstr, TEXT_ADD_TYPE_INSERT, tag_stack );
 }
 
 /** 插入文本内容 */
-LCUI_API int TextLayer_InsertTextA( LCUI_TextLayer *layer, const char *str )
+int TextLayer_InsertTextA( LCUI_TextLayer *layer, const char *str )
 {
 	return 0;
 }
 
 /** 插入文本内容（UTF-8版） */
-LCUI_API int TextLayer_InsertText( LCUI_TextLayer *layer, const char *utf8_str )
+int TextLayer_InsertText( LCUI_TextLayer *layer, const char *utf8_str )
 {
 	return 0;
 }
 
 /** 追加文本内容（宽字符版） */
-LCUI_API int TextLayer_AppendTextW( LCUI_TextLayer *layer, const wchar_t *wstr, 
+int TextLayer_AppendTextW( LCUI_TextLayer *layer, const wchar_t *wstr, 
 						LCUI_StyleTagStack *tag_stack )
 {
 	return TextLayer_ProcessText( layer, wstr, TEXT_ADD_TYPE_APPEND, tag_stack );
 }
 
 /** 追加文本内容 */
-LCUI_API int TextLayer_AppendTextA( LCUI_TextLayer *layer, const char *ascii_text )
+int TextLayer_AppendTextA( LCUI_TextLayer *layer, const char *ascii_text )
 {
 	return 0;
 }
 
 /** 追加文本内容（UTF-8版） */
-LCUI_API int TextLayer_AppendText( LCUI_TextLayer *layer, const char *utf8_text )
+int TextLayer_AppendText( LCUI_TextLayer *layer, const char *utf8_text )
 {
 	return 0;
 }
 
 /** 设置文本内容（宽字符版） */
-LCUI_API int TextLayer_SetTextW( LCUI_TextLayer *layer, const wchar_t *wstr,
+int TextLayer_SetTextW( LCUI_TextLayer *layer, const wchar_t *wstr,
 						LCUI_StyleTagStack *tag_stack )
 {
 	TextLayer_ClearText( layer );
@@ -1091,20 +1091,20 @@ LCUI_API int TextLayer_SetTextW( LCUI_TextLayer *layer, const wchar_t *wstr,
 }
 
 /** 设置文本内容 */
-LCUI_API int TextLayer_SetTextA( LCUI_TextLayer* layer, const char *ascii_text )
+int TextLayer_SetTextA( LCUI_TextLayer* layer, const char *ascii_text )
 {
 	return 0;
 }
 
 /** 设置文本内容（UTF-8版） */
-LCUI_API int TextLayer_SetText( LCUI_TextLayer* layer, const char *utf8_text )
+int TextLayer_SetText( LCUI_TextLayer* layer, const char *utf8_text )
 {
 	return 0;
 }
 
 /** 获取文本图层中的文本（宽字符版） */
-LCUI_API int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
-					int max_len, wchar_t *wstr_buff )
+int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
+			int max_len, wchar_t *wstr_buff )
 {
 	int row, col, i;
 	TextRowData *row_ptr;
@@ -1123,9 +1123,9 @@ LCUI_API int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
 		}
 		i += layer->row_list.rowdata[row]->string_len;
 	}
-	for( i=0; row < layer->row_list.max_rows, i < max_len; ++row ) {
+	for( i=0; row < layer->row_list.max_rows && i < max_len; ++row ) {
 		row_ptr = layer->row_list.rowdata[row];
-		for( ; col < row_ptr->string_len, i < max_len; ++col,++i ) {
+		for( ; col < row_ptr->string_len && i < max_len; ++col,++i ) {
 			wstr_buff[i] = row_ptr->string[col]->char_code;
 		}
 	}
@@ -1134,7 +1134,7 @@ LCUI_API int TextLayer_GetTextW( LCUI_TextLayer *layer, int start_pos,
 }
 
 /** 获取文本位图缓存 */
-LCUI_API LCUI_Graph* TextLayer_GetGraphBuffer( LCUI_TextLayer *layer )
+LCUI_Graph* TextLayer_GetGraphBuffer( LCUI_TextLayer *layer )
 {
 	if( layer->is_using_buffer ) {
 		return &layer->graph;
@@ -1143,7 +1143,7 @@ LCUI_API LCUI_Graph* TextLayer_GetGraphBuffer( LCUI_TextLayer *layer )
 }
 
 /** 设置最大尺寸 */
-LCUI_API int TextLayer_SetMaxSize( LCUI_TextLayer *layer, LCUI_Size new_size )
+int TextLayer_SetMaxSize( LCUI_TextLayer *layer, LCUI_Size new_size )
 {
 	if( new_size.w <= 0 || new_size.h <= 0 ) {
 		return -1;
@@ -1162,10 +1162,10 @@ LCUI_API int TextLayer_SetMaxSize( LCUI_TextLayer *layer, LCUI_Size new_size )
 }
 
 /** 设置是否启用多行文本模式 */
-LCUI_API void TextLayer_SetMultiline( LCUI_TextLayer* layer, int is_true )
+void TextLayer_SetMultiline( LCUI_TextLayer* layer, int is_true )
 {
-	if( layer->is_mulitiline_mode && !is_true
-	 || !layer->is_mulitiline_mode && is_true ) {
+	if( (layer->is_mulitiline_mode && !is_true)
+	 || (!layer->is_mulitiline_mode && is_true) ) {
 		layer->is_mulitiline_mode = is_true;
 		TaskData_AddUpdateTypeset( &layer->task, 0 );;
 	}
@@ -1288,14 +1288,14 @@ static int TextLayer_DeleteText( LCUI_TextLayer* layer, int char_y,
 }
 
 /** 删除文本光标的当前坐标右边的文本 */
-LCUI_API int TextLayer_Delete( LCUI_TextLayer *layer, int n_char )
+int TextLayer_Delete( LCUI_TextLayer *layer, int n_char )
 {
 	return TextLayer_DeleteText(	layer, layer->insert_y, 
 					layer->insert_x, n_char );
 }
 
 /** 退格删除文本，即删除文本光标的当前坐标左边的文本 */
-LCUI_API int TextLayer_Backspace( LCUI_TextLayer* layer, int n_char )
+int TextLayer_Backspace( LCUI_TextLayer* layer, int n_char )
 {
 	int n_del;
 	int char_x, char_y;
@@ -1342,7 +1342,7 @@ LCUI_API int TextLayer_Backspace( LCUI_TextLayer* layer, int n_char )
 }
 
 /** 设置是否启用自动换行模式 */
-LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer* layer, int is_true )
+void TextLayer_SetAutoWrap( LCUI_TextLayer* layer, int is_true )
 {
 	if( !layer->is_autowrap_mode && is_true
 	 || layer->is_autowrap_mode && !is_true ) {
@@ -1352,13 +1352,13 @@ LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer* layer, int is_true )
 }
 
 /** 设置是否使用样式标签 */
-LCUI_API void TextLayer_SetUsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL is_true )
+void TextLayer_SetUsingStyleTags( LCUI_TextLayer *layer, LCUI_BOOL is_true )
 {
 	layer->is_using_style_tags = is_true;
 }
 
 /** 计算并获取文本的宽度 */
-LCUI_API int TextLayer_GetWidth( LCUI_TextLayer* layer )
+int TextLayer_GetWidth( LCUI_TextLayer* layer )
 {
 	int i, row, w, max_w;
 	TextRowData* p_row;
@@ -1379,7 +1379,7 @@ LCUI_API int TextLayer_GetWidth( LCUI_TextLayer* layer )
 }
 
 /** 计算并获取文本的高度 */
-LCUI_API int TextLayer_GetHeight( LCUI_TextLayer* layer )
+int TextLayer_GetHeight( LCUI_TextLayer* layer )
 {
 	int i, h;
 	TextRowData* p_row;
@@ -1394,7 +1394,7 @@ LCUI_API int TextLayer_GetHeight( LCUI_TextLayer* layer )
 }
 
 /** 重新载入各个文字的字体位图 */
-LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer )
+void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer )
 {
 	int row, col;
 	TextCharData* p_char;
@@ -1414,7 +1414,7 @@ LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer* layer )
 }
 
 /** 更新数据 */
-LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LinkedList *rect_list )
+void TextLayer_Update( LCUI_TextLayer* layer, LinkedList *rect_list )
 {
 	if( layer->task.update_bitmap ) {
 		TextLayer_InvalidateAllRowRect( layer );
@@ -1463,7 +1463,7 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LinkedList *rect_list )
  * @param need_replace 绘制时是否需要覆盖像素
  * @param graph 目标图像
  */
-LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
+int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
 		LCUI_Pos layer_pos, LCUI_BOOL need_replace, LCUI_Graph *graph )
 {
 	int x, y, row, col;
@@ -1575,7 +1575,7 @@ LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
 }
 
 /** 绘制文本 */
-LCUI_API int TextLayer_Draw( LCUI_TextLayer* layer )
+int TextLayer_Draw( LCUI_TextLayer* layer )
 {
 	LCUI_Rect rect;
 	/* 如果文本位图缓存无效 */
@@ -1590,7 +1590,7 @@ LCUI_API int TextLayer_Draw( LCUI_TextLayer* layer )
 }
 
 /** 清除已记录的无效矩形 */
-LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer *layer )
+void TextLayer_ClearInvalidRect( LCUI_TextLayer *layer )
 {
 	int n;
 	LCUI_Rect *rect_ptr;
@@ -1615,7 +1615,7 @@ LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer *layer )
 }
 
 /** 设置全局文本样式 */
-LCUI_API void TextLayer_SetTextStyle( LCUI_TextLayer *layer,
+void TextLayer_SetTextStyle( LCUI_TextLayer *layer,
 					LCUI_TextStyle *style )
 {
 	layer->text_style = *style;
