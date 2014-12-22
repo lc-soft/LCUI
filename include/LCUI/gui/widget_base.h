@@ -178,6 +178,8 @@ LCUI_API void $(Hide)( LCUI_Widget w );
 
 LCUI_API void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color );
 
+LCUI_API void LCUIModule_Widget_Init(void);
+
 #undef $
 
 #endif

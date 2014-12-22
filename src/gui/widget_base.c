@@ -54,10 +54,13 @@
 static struct LCUI_WidgetFull LCUIRootWidgetData;	/**< 根级部件 */
 LCUI_Widget LCUIRootWidget = &LCUIRootWidgetData;	/**< 创建外部引用 */
 
-/** 新建一个GUI部件 */
-LCUI_Widget $(New)( const char *type_name )
+static void $(OnDestroy)( void *arg )
 {
-	LCUI_Widget widget = NEW_ONE(struct LCUI_WidgetFull);
+
+}
+
+static void $(Init)( LCUI_Widget widget )
+{
 	widget->base.border.all = NULL;
 	widget->base.border.radius.all = NULL;
 	widget->base.background.color = NULL;
@@ -66,6 +69,20 @@ LCUI_Widget $(New)( const char *type_name )
 	widget->base.background.position = NULL;
 	widget->base.background.size = NULL;
 	Widget_InitTaskBox( widget );
+	DirtyRectList_Init( &widget->dirty_rects );
+	widget->event = LCUIEventBox_Create();
+	LinkedList_Init( &widget->children, sizeof(struct LCUI_WidgetFull) );
+	LinkedList_Init( &widget->children_show, 0 );
+	LinkedList_SetDestroyFunc( &widget->children, $(OnDestroy) );
+	LinkedList_SetDataNeedFree( &widget->children, TRUE );
+	LinkedList_SetDataNeedFree( &widget->children_show, FALSE );
+}
+
+/** 新建一个GUI部件 */
+LCUI_Widget $(New)( const char *type_name )
+{
+	LCUI_Widget widget = NEW_ONE(struct LCUI_WidgetFull);
+	$(Init)(widget);
 	return widget;
 }
 
@@ -179,4 +196,9 @@ void $(Hide)( LCUI_Widget w )
 void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color )
 {
 
+}
+
+void LCUIModule_Widget_Init(void)
+{
+	$(Init)(LCUIRootWidget);
 }
