@@ -96,6 +96,7 @@ static void DeviceThread( void *arg )
 	while( is_running ) {
 		LCUIMutex_Lock( &list_mutex );
 		n = LinkedList_GetTotal( &dev_list );
+		LinkedList_Goto( &dev_list, 0 );
 		for( i=0; i<n; ++i ) {
 			data_ptr = (DeviceData*)LinkedList_Get( &dev_list );
 			if( !data_ptr || !data_ptr->proc ) {
@@ -118,6 +119,7 @@ static void DeviceThread( void *arg )
 /** 初始化设备处理模块 */
 int LCUIModule_Device_Init(void)
 {
+	LCUIMutex_Init( &list_mutex );
 	LinkedList_Init( &dev_list, sizeof(DeviceData) );
 	LinkedList_SetDataNeedFree( &dev_list, TRUE );
 	return LCUIThread_Create( &dev_tid, DeviceThread, NULL );
@@ -131,6 +133,7 @@ void LCUIModule_Device_End(void)
 	
 	LCUIMutex_Lock( &list_mutex );
 	n = LinkedList_GetTotal( &dev_list );
+	LinkedList_Goto( &dev_list, 0 );
 	for( i=0; i<n; ++i ) {
 		data_ptr = (DeviceData*)LinkedList_Get( &dev_list );
 		if( !data_ptr ) {
@@ -142,4 +145,5 @@ void LCUIModule_Device_End(void)
 		LinkedList_ToNext( &dev_list );
 	}
 	LCUIMutex_Unlock( &list_mutex );
+	LCUIMutex_Destroy( &list_mutex );
 }
