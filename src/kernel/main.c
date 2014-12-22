@@ -36,7 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
-
+#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/misc/linkedlist.h>
@@ -289,19 +289,24 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	loop_rec->tid = LCUIThread_SelfID();
 	while( loop_rec->state != STATE_EXITED ) {
 		if( LinkedList_GetTotal(&MainApp.task_list) <= 0 ) {
+			DEBUG_MSG("loop: %p, sleeping...\n", loop);
 			LCUICond_TimedWait( &MainApp.loop_cond, 1000 );
+			DEBUG_MSG("loop: %p, wakeup\n", loop);
 			/** 如果当前运行的主循环不是自己 */
 			if( MainApp.loop != loop ) {
 				loop_rec->state = STATE_PAUSED;
+				DEBUG_MSG("loop: %p, release control.\n", loop);
 				LCUIMutex_Unlock( &MainApp.loop_mutex );
 				/* 等待其它线程获得主循环运行权 */
 				LCUIMutex_Lock( &MainApp.loop_changed );
 				LCUIMutex_Unlock( &MainApp.loop_changed );
+				DEBUG_MSG("loop: %p, waiting...\n", loop);
 				/* 等待其它线程释放主循环运行权 */
 				LCUIMutex_Lock( &MainApp.loop_mutex );
 			}
 			continue;
 		}
+		DEBUG_MSG("loop: %p, run task.\n", loop);
 		LCUI_RunTask();
 	}
 	loop_rec->state = STATE_EXITED;
@@ -406,6 +411,7 @@ static void LCUIApp_Init(void)
 {
 	LCUICond_Init( &MainApp.loop_cond );
 	LCUIMutex_Init( &MainApp.loop_changed );
+	LCUIMutex_Init( &MainApp.loop_mutex );
 	LinkedList_Init( &MainApp.loop_list, sizeof(LCUI_MainLoop));
 	LinkedList_SetDataNeedFree( &MainApp.loop_list, FALSE );
 
