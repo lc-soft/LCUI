@@ -36,7 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-
+#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 
@@ -317,6 +317,7 @@ static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
 			list->usable_head_node->prev = NULL;
 		}
 		list->used_head_node->next = NULL;
+		list->used_head_node->prev = NULL;
 		list->used_tail_node = list->used_head_node;
 		DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
 		list->current_node = list->used_head_node;
@@ -350,6 +351,11 @@ int LinkedList_Insert( LinkedList *list, void *data )
 	}
 
 	if( list->current_node == list->used_head_node ) {
+		/* 已经在这个位置就不用移动结点了 */
+		if( node == list->used_head_node ) {
+			return 0;
+		}
+		DEBUG_MSG("%p, %p\n", node, list->current_node);
 		node->next = list->used_head_node;
 		list->used_head_node = node;
 		list->used_tail_node = node->prev;
