@@ -202,12 +202,14 @@ LCUI_END_HEADER
 
 #if defined (LCUI_BUILD_IN_WIN32) && defined(_WINDOWS) &&defined(I_NEED_WINMAIN)
 
+#include <tchar.h>
+
 #ifdef _UNICODE
-	#define _tcstok_s wcstok_s
-	#define _tcscpy_s wcscpy_s
+#	define _tcstok_s wcstok_s
+#	define _tcscpy_s wcscpy_s
 #else
-	#define _tcstok_s strtok_s
-	#define _tcscpy_s strcpy_s
+#	define _tcstok_s strtok_s
+#	define _tcscpy_s strcpy_s
 #endif
 
 extern int main( int argc, char *argv[] );
