@@ -53,12 +53,6 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-/* 状态 */
-#define ACTIVE	1
-#define KILLED	-1
-#define REMOVE	-1
-#define INSIDE	1
-
 #ifndef FALSE
 #define FALSE 0
 #endif
