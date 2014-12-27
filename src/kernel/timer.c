@@ -37,6 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
+//#define DEBUG
+
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/misc/linkedlist.h>
@@ -62,11 +64,13 @@ typedef struct TimerDataRec_ {
 	void *arg;			/**< 函数的参数 */
 } TimerData;
 
-static LinkedList timer_list;			/**< 定时器数据记录 */
-static LCUI_BOOL is_running = FALSE;		/**< 定时器线程是否正在运行 */
-static LCUI_Cond timer_sleep_cond;		/**< 用于控制定时器睡眠的条件变量 */
-static LCUI_Mutex timer_mutex;
-static LCUI_Thread timer_thread_id;
+static struct TimerModule {
+	LinkedList timer_list;		/**< 定时器数据记录 */
+	LCUI_BOOL is_running;		/**< 定时器线程是否正在运行 */
+	LCUI_Cond sleep_cond;		/**< 用于控制定时器睡眠的条件变量 */
+	LCUI_Mutex mutex;		/**< 定时器记录操作互斥锁 */
+	LCUI_Thread thread_id;		/**< 定时器处理线程ID */
+} self;
 
 #define TIME_WRAP_VALUE (~(int64_t)0)
 
@@ -147,10 +151,10 @@ static void TimerList_UpdateTimerPos( TimerData *timer )
 	time_left -= timer->pause_ms;
 	time_left = timer->total_ms - time_left;
 	/* 锁上定时器列表 */
-	LCUIMutex_Lock( &timer_mutex );
-	n = LinkedList_GetTotal( &timer_list );
-	for(; n-- >= 0; LinkedList_ToNext(&timer_list) ) {
-		tmp_timer = (TimerData*)LinkedList_Get( &timer_list );
+	LCUIMutex_Lock( &self.mutex );
+	n = LinkedList_GetTotal( &self.timer_list );
+	for(; --n >= 0; LinkedList_ToNext(&self.timer_list) ) {
+		tmp_timer = (TimerData*)LinkedList_Get( &self.timer_list );
 		if( !tmp_timer ) {
 			continue;
 		}
@@ -186,10 +190,10 @@ static void TimerList_UpdateTimerPos( TimerData *timer )
 	/* 若源位置和目标位置有效，则开始移动 */
 	if( src_i != -1 ) {
 		DEBUG_MSG("src: %d, des: %d\n", src_i, des_i );
-		LinkedList_Goto( &timer_list, src_i );
-		LinkedList_MoveTo( &timer_list, des_i );
+		LinkedList_Goto( &self.timer_list, src_i );
+		LinkedList_MoveTo( &self.timer_list, des_i );
 	}
-	LCUIMutex_Unlock( &timer_mutex );
+	LCUIMutex_Unlock( &self.mutex );
 }
 
 //#define DEBUG_TIMER
@@ -200,10 +204,10 @@ static void TimerList_Print( void )
 	int i, n;
 	TimerData *timer;
 
-	n = LinkedList_GetTotal( &timer_list );
+	n = LinkedList_GetTotal( &self.timer_list );
 	_DEBUG_MSG("timer list(%d) start:\n", n);
-	for( i=0; i<n; ++i, LinkedList_ToNext(&timer_list) ) {
-		timer = (TimerData*)LinkedList_Get( &timer_list );
+	for( i=0; i<n; ++i, LinkedList_ToNext(&self.timer_list) ) {
+		timer = (TimerData*)LinkedList_Get( &self.timer_list );
 		if( !timer ) {
 			continue;
 		}
@@ -220,8 +224,8 @@ static int threads_of_wait_lock = 0;
 static void TimerList_GetLock(void)
 {
 	++threads_of_wait_lock;
-	LCUICond_Broadcast( &timer_sleep_cond );
-	LCUIMutex_Lock( &timer_mutex );
+	LCUICond_Broadcast( &self.sleep_cond );
+	LCUIMutex_Lock( &self.mutex );
 	if( threads_of_wait_lock > 0 ) {
 		--threads_of_wait_lock;
 	}
@@ -230,7 +234,7 @@ static void TimerList_GetLock(void)
 /** 释放定时器列表的互斥锁 */
 static void TimerList_FreeLock(void)
 {
-	LCUIMutex_Unlock( &timer_mutex );
+	LCUIMutex_Unlock( &self.mutex );
 }
 
 /** 等待其它线程获得线程锁，主要供定时器线程调用 */
@@ -248,13 +252,20 @@ static void TimerThread( void *arg )
 	TimerData *timer = NULL;
 	int64_t lost_ms;
 
+	self.is_running = TRUE;
 	task_data.arg[0] = NULL;
 	task_data.arg[1] = NULL;
-	while( is_running ) {
-		LCUIMutex_Lock( &timer_mutex );
-		n = LinkedList_GetTotal( &timer_list );
-		for( i=0; i<n; ++i, LinkedList_ToNext(&timer_list) ) {
-			timer = (TimerData*)LinkedList_Get( &timer_list );
+	task_data.destroy_arg[0] = FALSE;
+	task_data.destroy_arg[1] = FALSE;
+	task_data.destroy_func[0] = NULL;
+	task_data.destroy_func[1] = NULL;
+	DEBUG_MSG("start\n");
+	while( self.is_running ) {
+		DEBUG_MSG("lock mutex.\n");
+		LCUIMutex_Lock( &self.mutex );
+		n = LinkedList_GetTotal( &self.timer_list );
+		for( i=0; i<n; ++i, LinkedList_ToNext(&self.timer_list) ) {
+			timer = (TimerData*)LinkedList_Get( &self.timer_list );
 			if( !timer ) {
 				continue;
 			}
@@ -262,7 +273,8 @@ static void TimerThread( void *arg )
 				break;
 			}
 		}
-		LCUIMutex_Unlock( &timer_mutex );
+		LCUIMutex_Unlock( &self.mutex );
+		DEBUG_MSG("unlock mutex.\n");
 		/* 没有要处理的定时器，停留一段时间再进行下次循环 */
 		if(i >= n || !timer ) {
 			LCUI_MSleep(10);
@@ -273,11 +285,11 @@ static void TimerThread( void *arg )
 		lost_ms -= timer->pause_ms;
 		/* 若流失的时间未达到总定时时长 */
 		if( lost_ms < timer->total_ms ) {
-			LCUIMutex_Lock( &timer_mutex );
+			LCUIMutex_Lock( &self.mutex );
 			n_ms = timer->total_ms - lost_ms;
 			/* 开始睡眠 */
-			LCUICond_TimedWait( &timer_sleep_cond, n_ms );
-			LCUIMutex_Unlock( &timer_mutex );
+			LCUICond_TimedWait( &self.sleep_cond, n_ms );
+			LCUIMutex_Unlock( &self.mutex );
 			TimerList_WaitOtherThreadGetLock();
 			continue;
 		}
@@ -307,9 +319,9 @@ static TimerData *TimerList_Find( int timer_id )
 	int i, n;
 	TimerData *timer = NULL;
 
-	n = LinkedList_GetTotal( &timer_list );
+	n = LinkedList_GetTotal( &self.timer_list );
 	for( i=0; i<n; ++i ) {
-		timer = (TimerData*)LinkedList_Get( &timer_list );
+		timer = (TimerData*)LinkedList_Get( &self.timer_list );
 		if( !timer ) {
 			continue;
 		}
@@ -345,9 +357,9 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 	static int id = 100;
 
 	TimerList_GetLock();
-	n = LinkedList_GetTotal( &timer_list );
-	for( ; n>0; --n, LinkedList_ToNext(&timer_list) ) {
-		timer_ptr = (TimerData*)LinkedList_Get( &timer_list );
+	n = LinkedList_GetTotal( &self.timer_list );
+	for( ; n>0; --n, LinkedList_ToNext(&self.timer_list) ) {
+		timer_ptr = (TimerData*)LinkedList_Get( &self.timer_list );
 		if( !timer_ptr ) {
 			continue;
 		}
@@ -368,10 +380,10 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 	timer.func = func;
 	timer.arg = arg;
 
-	LinkedList_Goto( &timer_list, n+1 );
-	LinkedList_InsertCopy( &timer_list, &timer );
+	LinkedList_Goto( &self.timer_list, n+1 );
+	LinkedList_InsertCopy( &self.timer_list, &timer );
 	TimerList_FreeLock();
-	DEBUG_MSG("set timer, id: %d, total_ms: %d,app_id: %lu\n", timer.id, timer.total_ms, timer.app_id);
+	DEBUG_MSG("set timer, id: %d, total_ms: %d\n", timer.id, timer.total_ms);
 	return timer.id;
 }
 
@@ -396,16 +408,16 @@ int LCUITimer_Free( int timer_id )
 		LCUI_LockRunTask();
 	}
 	TimerList_GetLock();
-	n = LinkedList_GetTotal( &timer_list );
+	n = LinkedList_GetTotal( &self.timer_list );
 	for( i=0; i<n; ++i ) {
-		timer = (TimerData*)LinkedList_Get( &timer_list );
+		timer = (TimerData*)LinkedList_Get( &self.timer_list );
 		/* 忽略无效或ID不一致的定时器 */
 		if( !timer || timer->id != timer_id ) {
 			continue;
 		}
 		/* 移除定时器任务，并且只在非主线程上时使用互斥锁 */
 		LCUI_RemoveTask( (CallBackFunc)timer->func, need_lock );
-		LinkedList_Delete( &timer_list );
+		LinkedList_Delete( &self.timer_list );
 		break;
 	}
 	TimerList_FreeLock();
@@ -496,23 +508,23 @@ int LCUITimer_Reset( int timer_id, long int n_ms )
 void LCUIModule_Timer_Init( void )
 {
 	LCUI_StartTicks();
-	LinkedList_Init( &timer_list, sizeof(TimerData) );
-	LinkedList_SetDataMemReuse( &timer_list, TRUE );
-	LinkedList_SetDataNeedFree( &timer_list, TRUE );
-	LCUICond_Init( &timer_sleep_cond );
-	LCUIMutex_Init( &timer_mutex );
-	LCUIThread_Create( &timer_thread_id, TimerThread, NULL );
+	LinkedList_Init( &self.timer_list, sizeof(TimerData) );
+	LinkedList_SetDataMemReuse( &self.timer_list, TRUE );
+	LinkedList_SetDataNeedFree( &self.timer_list, TRUE );
+	LCUICond_Init( &self.sleep_cond );
+	LCUIMutex_Init( &self.mutex );
+	LCUIThread_Create( &self.thread_id, TimerThread, NULL );
 }
 
 /* 停用定时器模块 */
 void LCUIModule_Timer_Exit( void )
 {
-	is_running = FALSE;
-	LCUICond_Broadcast( &timer_sleep_cond );
-	LCUIThread_Join( timer_thread_id, NULL );
-	LCUICond_Destroy( &timer_sleep_cond );
-	LCUIMutex_Destroy( &timer_mutex );
-	LinkedList_Destroy( &timer_list );
+	self.is_running = FALSE;
+	LCUICond_Broadcast( &self.sleep_cond );
+	LCUIThread_Join( self.thread_id, NULL );
+	LCUICond_Destroy( &self.sleep_cond );
+	LCUIMutex_Destroy( &self.mutex );
+	LinkedList_Destroy( &self.timer_list );
 }
 /*---------------------------- End Public -----------------------------*/
 
