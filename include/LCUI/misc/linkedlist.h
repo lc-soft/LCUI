@@ -125,8 +125,10 @@ __inline void* LinkedList_GetNext( LinkedList *list )
 /** 切换至下个结点 */
 __inline void LinkedList_ToNext( LinkedList *list )
 {
-	++list->current_node_pos;
-	list->current_node = list->current_node->next;
+	list->current_node ? 
+		++list->current_node_pos,
+		list->current_node = list->current_node->next
+	: NULL;
 }
 
 /** 初始化链表 */
