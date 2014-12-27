@@ -46,6 +46,11 @@
 #include <LCUI/display.h>
 #include <LCUI/input.h>
 
+#define STATE_REMOVE	0
+#define STATE_INSIDE	1
+
+#define TS_DEV	"/dev/ts"
+
 #ifdef USE_TSLIB
 #include <tslib.h> 
 #endif
@@ -64,7 +69,7 @@ static LCUI_BOOL proc_touchscreen(void)
 	int button, ret;
 	static LCUI_Pos pos;
 	
-	if (ts_data.state != INSIDE) {
+	if (ts_data.state != STATE_INSIDE) {
 		return FALSE;
 	}
 
@@ -103,12 +108,12 @@ static LCUI_BOOL proc_touchscreen(void)
 }
 
 /** 启用触屏输入处理 */
-LCUI_API LCUI_BOOL EnableTouchScreenInput(void)
+LCUI_BOOL EnableTouchScreenInput(void)
 { 
 #ifdef USE_TSLIB
 	char *tsdevice;
 	char str[256];
-	if (ts_data.state != INSIDE) {
+	if (ts_data.state != STATE_INSIDE) {
 		tsdevice = getenv("TSLIB_TSDEVICE");
 		if( tsdevice ) {
 			ts_data.td = ts_open(tsdevice, 0);
@@ -119,16 +124,16 @@ LCUI_API LCUI_BOOL EnableTouchScreenInput(void)
 		if (!ts_data.td) {
 			sprintf (str, "ts_open: %s", tsdevice);
 			perror (str);
-			ts_data.state = REMOVE;
+			ts_data.state = STATE_REMOVE;
 			return FALSE;
 		}
 
 		if (ts_config (ts_data.td)) {
 			perror ("ts_config");
-			ts_data.state = REMOVE;
+			ts_data.state = STATE_REMOVE;
 			return FALSE;
 		}
-		ts_data.state = INSIDE;
+		ts_data.state = STATE_INSIDE;
 	}
 	return TRUE;
 #else
@@ -137,12 +142,12 @@ LCUI_API LCUI_BOOL EnableTouchScreenInput(void)
 }
 
 /** 禁用触屏输入处理 */
-LCUI_API LCUI_BOOL DisableTouchScreenInput(void)
+LCUI_BOOL DisableTouchScreenInput(void)
 {
 #ifdef USE_TSLIB
-	if(ts_data.state == INSIDE) {
+	if(ts_data.state == STATE_INSIDE) {
 		ts_close(ts_data.td);
-		ts_data.state = REMOVE;
+		ts_data.state = STATE_REMOVE;
 		return TRUE;
 	}
 	return FALSE;
@@ -152,16 +157,16 @@ LCUI_API LCUI_BOOL DisableTouchScreenInput(void)
 }
 
 /* 获取触屏的私有数据 */
-LCUI_API void* Get_TouchScreen(void)
+void* Get_TouchScreen(void)
 {
 	return ts_data.td;
 }
 
 /* 初始化触屏输入模块 */
-LCUI_API void LCUIModule_TouchScreen_Init( void )
+void LCUIModule_TouchScreen_Init( void )
 {
 	ts_data.td = NULL;
-	ts_data.state = REMOVE;
+	ts_data.state = STATE_REMOVE;
 	LCUIDevice_Add( EnableTouchScreenInput, proc_touchscreen,
 			DisableTouchScreenInput );
 }

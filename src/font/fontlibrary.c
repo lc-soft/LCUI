@@ -125,7 +125,7 @@ LCUI_API void FontLIB_Init( void )
 #ifdef LCUI_FONT_ENGINE_FREETYPE
         /* 当初始化库时发生了一个错误 */
         if ( FT_Init_FreeType( &library ) ) {
-                _DEBUG_MSG("failed to initialize.");
+                _DEBUG_MSG("failed to initialize.\n");
                 return;
         }
 #else
@@ -346,7 +346,7 @@ LCUI_API int FontLIB_LoadFontFile( const char *filepath )
 #ifdef LCUI_FONT_ENGINE_FREETYPE
         error_code = FT_New_Face( library, filepath , 0 , &face );
         if( error_code != 0 ) {
-                _DEBUG_MSG( "%s: open error.", filepath );
+                _DEBUG_MSG( "%s: open error\n", filepath );
                 if ( error_code == FT_Err_Unknown_File_Format ) {
                         // ...
                 } else {

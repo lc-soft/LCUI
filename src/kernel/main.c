@@ -48,6 +48,9 @@
 
 #include <time.h>
 
+#define STATE_ACTIVE 1
+#define STATE_KILLED 0
+
 typedef struct FuncDataRec_ {
 	void (*func)(LCUI_SystemEvent*,void*);
 	void *arg;
@@ -252,13 +255,13 @@ static int LCUI_RunTask(void)
 	/* 调用函数指针指向的函数，并传递参数 */
 	task_bak.func( task_bak.arg[0], task_bak.arg[1] );
 	/* 若需要在调用回调函数后销毁参数 */
-	if( task_bak.destroy_arg[0] ) {
+	if( task_bak.destroy_arg[0] && task_bak.arg[0] ) {
 		if( task_bak.destroy_func[0] ) {
 			task_bak.destroy_func[0]( task_bak.arg[0] );
 		}
 		free( task_bak.arg[0] );
 	}
-	if( task_bak.destroy_arg[1] ) {
+	if( task_bak.destroy_arg[1] && task_bak.arg[1] ) {
 		if( task_bak.destroy_func[1] ) {
 			task_bak.destroy_func[1]( task_bak.arg[1] );
 		}
@@ -475,7 +478,7 @@ static void LCUI_ShowCopyrightText(void)
 /** 检测LCUI是否活动 */
 LCUI_BOOL LCUI_IsActive(void)
 {
-	if(System.state == ACTIVE) {
+	if( System.state == STATE_ACTIVE ) {
 		return TRUE;
 	}
 	return FALSE;
@@ -501,7 +504,7 @@ int LCUI_Init( int w, int h, int mode )
 	System.is_inited = TRUE;
 	System.func_atexit = NULL;
 	System.exit_code = 0;
-	System.state = ACTIVE;
+	System.state = STATE_ACTIVE;
 	System.main_tid = LCUIThread_SelfID();
 	LCUI_ShowCopyrightText();
 	LCUIApp_Init();
@@ -526,7 +529,7 @@ int LCUI_Init( int w, int h, int mode )
 /** 释放LCUI占用的资源 */
 static int LCUI_Destroy( void )
 {
-	System.state = KILLED;
+	System.state = STATE_KILLED;
 	if( System.func_atexit ) {
 		System.func_atexit();
 	}
@@ -547,7 +550,7 @@ static int LCUI_Destroy( void )
 
 void LCUI_Quit(void)
 {
-	System.state = KILLED;
+	System.state = STATE_KILLED;
 	LCUIApp_QuitAllMainLoop();
 }
 
