@@ -1,24 +1,62 @@
+/* ***************************************************************************
+ * border.c -- graph border draw support.
+ * 
+ * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ * 
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ***************************************************************************/
+ 
+/* ****************************************************************************
+ * border.c -- 边框绘制支持
+ *
+ * 版权所有 (C) 2013-2015 归属于 刘超 <lc-soft@live.cn>
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ***************************************************************************/
+
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
-#include <LCUI/draw.h>
 #include <math.h>
 
 /** 初始化边框数据 */
-LCUI_API void Border_Init( LCUI_Border *border )
+void Border_Init( LCUI_Border *border )
 {
-	border->top_width = 0;
-	border->bottom_width = 0;
-	border->left_width = 0;
-	border->right_width = 0;
-	border->top_style = 0;
-	border->bottom_style = 0;
-	border->left_style = 0;
-	border->right_style = 0;
-	border->top_color = RGB(0,0,0);
-	border->bottom_color = RGB(0,0,0);
-	border->left_color = RGB(0,0,0);
-	border->right_color = RGB(0,0,0);
+	border->top.width = 0;
+	border->bottom.width = 0;
+	border->left.width = 0;
+	border->right.width = 0;
+	border->top.style = 0;
+	border->bottom.style = 0;
+	border->left.style = 0;
+	border->right.style = 0;
+	border->top.color = RGB(0,0,0);
+	border->bottom.color = RGB(0,0,0);
+	border->left.color = RGB(0,0,0);
+	border->right.color = RGB(0,0,0);
 	border->top_left_radius = 0;
 	border->top_right_radius = 0;
 	border->bottom_left_radius = 0;
@@ -26,21 +64,21 @@ LCUI_API void Border_Init( LCUI_Border *border )
 }
 
 /** 简单的设置边框样式，并获取该样式数据 */
-LCUI_API LCUI_Border Border( unsigned int width_px, int style, LCUI_Color color )
+LCUI_Border Border( unsigned int width_px, int style, LCUI_Color color )
 {
 	LCUI_Border border;
-	border.top_width = width_px;
-	border.bottom_width = width_px;
-	border.left_width = width_px;
-	border.right_width = width_px;
-	border.top_style = style;
-	border.bottom_style = style;
-	border.left_style = style;
-	border.right_style = style;
-	border.top_color = color;
-	border.bottom_color = color;
-	border.left_color = color;
-	border.right_color = color;
+	border.top.width = width_px;
+	border.bottom.width = width_px;
+	border.left.width = width_px;
+	border.right.width = width_px;
+	border.top.style = style;
+	border.bottom.style = style;
+	border.left.style = style;
+	border.right.style = style;
+	border.top.color = color;
+	border.bottom.color = color;
+	border.left.color = color;
+	border.right.color = color;
 	border.top_left_radius = 0;
 	border.top_right_radius = 0;
 	border.bottom_left_radius = 0;
@@ -49,7 +87,7 @@ LCUI_API LCUI_Border Border( unsigned int width_px, int style, LCUI_Color color 
 }
 
 /** 设置边框的圆角半径 */
-LCUI_API void Border_Radius( LCUI_Border *border, unsigned int radius )
+void Border_Radius( LCUI_Border *border, unsigned int radius )
 {
 	border->top_left_radius = radius;
 	border->top_right_radius = radius;
@@ -207,7 +245,7 @@ static int Graph_DrawRoundBorderBottomRight(
 }
 
 /** 只绘制目标区域内的边框 */
-LCUI_API int Graph_DrawBorderEx( LCUI_Graph *des, LCUI_Border border,
+int Graph_DrawBorderEx( LCUI_Graph *des, LCUI_Border border,
 							LCUI_Rect area )
 {
 	int  radius;
@@ -226,13 +264,13 @@ LCUI_API int Graph_DrawBorderEx( LCUI_Graph *des, LCUI_Border border,
 	Graph_Quote( &des_area, des, bound );
 	Graph_DrawRoundBorderLeftTop( 
 		&des_area		, Pos( radius, radius ), 
-		radius			, border.left_width, 
-		border.left_color	, TRUE
+		radius			, border.left.width, 
+		border.left.color	, TRUE
 	);
 	Graph_DrawRoundBorderTopLeft( 
 		&des_area		, Pos( radius, radius ), 
-		radius			, border.top_width, 
-		border.top_color	, TRUE 
+		radius			, border.top.width, 
+		border.top.color	, TRUE 
 	);
 	
 	/* 右上角 */
@@ -241,13 +279,13 @@ LCUI_API int Graph_DrawBorderEx( LCUI_Graph *des, LCUI_Border border,
 	Graph_Quote( &des_area, des, bound );
 	Graph_DrawRoundBorderRightTop( 
 		&des_area		, Pos( 0, radius ), 
-		radius			, border.right_width, 
-		border.right_color	, TRUE 
+		radius			, border.right.width, 
+		border.right.color	, TRUE 
 	);
 	Graph_DrawRoundBorderTopRight( 
 		&des_area		, Pos( 0, radius ), 
-		radius			, border.top_width, 
-		border.top_color	, TRUE 
+		radius			, border.top.width, 
+		border.top.color	, TRUE 
 	);
 	
 	/* 左下角 */
@@ -257,13 +295,13 @@ LCUI_API int Graph_DrawBorderEx( LCUI_Graph *des, LCUI_Border border,
 	Graph_Quote( &des_area, des, bound );
 	Graph_DrawRoundBorderLeftBottom( 
 		&des_area		, Pos( radius, 0 ), 
-		radius			, border.left_width, 
-		border.left_color	, TRUE 
+		radius			, border.left.width, 
+		border.left.color	, TRUE 
 	);
 	Graph_DrawRoundBorderBottomLeft( 
 		&des_area		, Pos( radius, 0 ), 
-		radius			, border.bottom_width, 
-		border.bottom_color	, TRUE 
+		radius			, border.bottom.width, 
+		border.bottom.color	, TRUE 
 	);
 	
 	/* 右下角 */
@@ -272,13 +310,13 @@ LCUI_API int Graph_DrawBorderEx( LCUI_Graph *des, LCUI_Border border,
 	Graph_Quote( &des_area, des, bound );
 	Graph_DrawRoundBorderRightBottom( 
 		&des_area		, Pos( 0, 0 ), 
-		radius			, border.right_width, 
-		border.right_color	, TRUE 
+		radius			, border.right.width, 
+		border.right.color	, TRUE 
 	);
 	Graph_DrawRoundBorderBottomRight( 
 		&des_area		, Pos( 0, 0 ), 
-		radius			, border.bottom_width, 
-		border.bottom_color	, TRUE 
+		radius			, border.bottom.width, 
+		border.bottom.color	, TRUE 
 	);
 	
 	start.x = border.top_left_radius;
@@ -287,26 +325,26 @@ LCUI_API int Graph_DrawBorderEx( LCUI_Graph *des, LCUI_Border border,
 	/* 引用目标区域 */
 	Graph_Quote( &des_area, des, area );
 	/* 绘制上边框 */
-	Graph_DrawHorizLine( des, border.top_color, border.top_width, start, end.x );
+	Graph_DrawHorizLine( des, border.top.color, border.top.width, start, end.x );
 	/* 绘制下边的线 */
-	start.y = des->h - border.bottom_width;
+	start.y = des->h - border.bottom.width;
 	end.x = des->w - border.bottom_right_radius;
-	Graph_DrawHorizLine( des, border.bottom_color, border.bottom_width, start, end.x );
+	Graph_DrawHorizLine( des, border.bottom.color, border.bottom.width, start, end.x );
 	/* 绘制左边的线 */
 	start.x = start.y = 0;
 	end.y = des->h - border.bottom_left_radius;
-	Graph_DrawVertiLine( des, border.left_color, border.left_width, start, end.y );
+	Graph_DrawVertiLine( des, border.left.color, border.left.width, start, end.y );
 	/* 绘制右边的线 */
-	start.x = des->w - border.right_width;
+	start.x = des->w - border.right.width;
 	start.y = border.top_right_radius;
 	end.y = des->h - border.bottom_right_radius;
-	Graph_DrawVertiLine( des, border.right_color, border.right_width, start, end.y );
+	Graph_DrawVertiLine( des, border.right.color, border.right.width, start, end.y );
 	/* 边框线绘制完成 */
 	return 0;
 }
 
 /** 简单的为图形边缘绘制边框 */
-LCUI_API int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
+int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
 {
 	LCUI_Rect area;
 	area.x = area.y = 0;
