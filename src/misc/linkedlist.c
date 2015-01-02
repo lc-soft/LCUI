@@ -40,6 +40,8 @@
 //#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include <stdlib.h>
+#include <memory.h>
 
 /*
  * 注意，此链表是线程不安全的。
