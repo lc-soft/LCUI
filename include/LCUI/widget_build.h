@@ -42,73 +42,34 @@
 #ifndef __LCUI_WIDGET_BUILD_H__
 #define __LCUI_WIDGET_BUILD_H__
 
+#include <LCUI/graph.h>
+
 LCUI_BEGIN_HEADER
-
-typedef struct {
-	double px;
-	double scale;
-	LCUI_BOOL is_auto;
-	int which;
-} PixelOrScale;
-
-typedef struct LCUI_WidgetShadow {
-	int x, y;		/**< 位置 */
-	int blur;		/**< 模糊距离 */
-	int spread;		/**< 扩散大小 */
-	LCUI_Color color;	/**< 颜色 */
-} LCUI_WidgetShadow;
 
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
 	int position;			/**< 定位方式 */
-	int dock;			/**< 停靠位置 */
 	int box_sizing;			/**< 以何种方式计算宽度和高度 */
 	int left, top;			/**< 水平、垂直坐标偏移量 */
+	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
 	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
-	PixelOrScale x, y;		/**< 当前坐标 */
+	LCUI_StyleVar x, y;	/**< 当前平面坐标 */
 
 	union {
-		PixelOrScale w, width;		/**< 部件区域宽度 */
+		LCUI_StyleVar w, width;	/**< 部件区域宽度 */
 	};
 	union {
-		PixelOrScale h, height;		/**< 部件区域高度 */
+		LCUI_StyleVar h, height;	/**< 部件区域高度 */
 	};
 
 	struct {
-		PixelOrScale top, right, bottom, left;
+		LCUI_StyleVar top, right, bottom, left;
 	} margin, padding;		/**< 外边距, 内边距 */
 
-	struct {
-		LCUI_Graph image;	/**< 背景图 */
-		LCUI_Color color;	/**< 背景色 */
-		int clip;		/**< 背景图的裁剪方式 */
-		int origin;		/**< 相对于何种位置进行定位 */
-	
-		struct {
-			LCUI_BOOL x, y;
-		} repeat;		/**< 背景图是否重复 */
-		struct {
-			StyleVar x, y;
-		} position;		/**< 定位方式 */
-		struct {
-			PixelOrScale w, h;
-		} size;
-	} background;
-
-	LCUI_WidgetShadow shadow;	/**< 阴影 */
-
-	struct {
-		struct {
-			int width;
-			int style;
-			LCUI_Color color;
-		} top, right, bottom, left;
-		unsigned int top_left_radius;
-		unsigned int top_right_radius;
-		unsigned int bottom_left_radius;
-		unsigned int bottom_right_radius;
-	} border;			/**< 边框 */
+	LCUI_Background background;	/**< 背景 */
+	LCUI_BoxShadow shadow;		/**< 阴影 */
+	LCUI_Border border;		/**< 边框 */
 
 	struct {
 		struct {
@@ -121,7 +82,6 @@ typedef struct LCUI_WidgetStyle {
 
 typedef struct LCUI_WidgetFull* LCUI_Widget;
 
-#include <LCUI/graph.h>
 #include <LCUI/gui/widget_base.h>
 #include <LCUI/gui/widget_task.h>
 

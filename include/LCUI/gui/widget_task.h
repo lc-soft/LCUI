@@ -71,7 +71,7 @@ typedef union LCUI_WidgetTask {
 		struct {
 			int w, h;
 		} resize;			/**< 调整大小 */
-		LCUI_WidgetShadow shadow;	/**< 阴影 */
+		LCUI_BoxShadow shadow;	/**< 阴影 */
 		LCUI_BOOL visible;		/**< 显示/隐藏 */
 		float opacity;			/**< 不透明度 */
 		void *data;			/**< 自定义任务数据 */

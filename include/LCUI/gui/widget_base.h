@@ -68,16 +68,6 @@ enum LCUI_WidgetBorderStyle {
 	BORDER_DASHED	/**< 虚线 */
 };
 
-/** 部件停靠类型 */
-enum LCUI_WidgetDockType {
-	DOCK_NONE,
-	DOCK_TOP,
-	DOCK_LEFT,
-	DOCK_RIGHT,
-	DOCK_FILL,
-	DOCK_BOTTOM
-};
-
 /** 框类型 */
 enum LCUI_WidgetBoxType {
 	CONTENT_BOX,	/**< 内容框 */
@@ -86,60 +76,14 @@ enum LCUI_WidgetBoxType {
 };
 
 typedef struct LCUI_WidgetBase {
-	int x, y;
+	int x, y;			/**< 部件当前坐标 */
 	int width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
-	int innerWidth, innerHeight;	/**< 内部区域大小，不包括内边距占用区域 */
-	int outerWidth, outerHeight;	/**< 外部区域大小，包括边框和阴影占用区域 */
-	
-	void (*css)($, const char*, const char*);
-	void (*dock)($, int);
-	void (*focus)($, LCUI_BOOL);
-	void (*show)($, LCUI_BOOL);
-	void (*shadow)($, int, int, int, LCUI_Color);
-	void (*setName)($, const char*);
-	void (*setOpacity)($, float);
-	void (*setStyleClassName)($, const char*);
-
-	LCUI_BOOL (*isVisible)($);
-	
-	LCUI_Widget (*at)($, int, int);
-
-	struct {
-		void (*top)($, int);
-		void (*right)($, int);
-		void (*bottom)($, int);
-		void (*left)($, int);
-		void (*all)($, int, int, int, int);
-	} margin, padding;
-
-	struct {
-		void (*top)($,int, int, LCUI_Color);
-		void (*right)($,int, int, LCUI_Color);
-		void (*bottom)($,int, int, LCUI_Color);
-		void (*left)($,int, int, LCUI_Color);
-		void (*all)($,int, int, LCUI_Color);
-		struct {
-			void (*topLeft)($,int);
-			void (*topRight)($,int);
-			void (*bottomLeft)($,int);
-			void (*bottomRight)($,int);
-			void (*all)($,int);
-		} radius;
-	} border;
-
-	struct {
-		void (*color)($, LCUI_Color);
-		void (*image)($, LCUI_Graph);
-		void (*repeat)($, LCUI_BOOL, LCUI_BOOL);
-		void (*position)($, const char*, const char*);
-		void (*size)($, const char*, const char*);
-		void (*origin)($, int);
-	} background;
-
-	struct {
-		void (*scale)($, float, float);
-		void (*rotate)($, float);
-	} transform;
+	struct LCUI_WidgetBoxRect {
+		LCUI_Rect content;	/**< 内容框的区域 */
+		LCUI_Rect border;	/**< 边框盒的区域，包括内边距框和内容框区域 */
+		LCUI_Rect outer;	/**< 外边框的区域，包括边框盒和外边距框区域 */
+		LCUI_Rect graph;	/**< 图层的区域，包括边框盒和阴影区域 */
+	} box;				/**< 部件的各个区域信息 */
 } LCUI_WidgetBase;
 
 #undef $
