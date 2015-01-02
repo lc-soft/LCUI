@@ -61,21 +61,40 @@ static void $(OnDestroy)( void *arg )
 
 static void $(Init)( LCUI_Widget widget )
 {
-	widget->base.border.all = NULL;
-	widget->base.border.radius.all = NULL;
-	widget->base.background.color = NULL;
-	widget->base.background.image = NULL;
-	widget->base.background.origin = NULL;
-	widget->base.background.position = NULL;
-	widget->base.background.size = NULL;
-	Widget_InitTaskBox( widget );
-	DirtyRectList_Init( &widget->dirty_rects );
+	widget->style.z_index = 0;
+	widget->style.x.type = SVT_NONE;
+	widget->style.y.type = SVT_NONE;
+	widget->style.width.type = SVT_AUTO;
+	widget->style.height.type = SVT_AUTO;
+	widget->style.box_sizing = CONTENT_BOX;
+	widget->style.opacity = 1.0;
+	widget->style.margin.top.px = 0;
+	widget->style.margin.right.px = 0;
+	widget->style.margin.bottom.px = 0;
+	widget->style.margin.left.px = 0;
+	widget->style.margin.top.type = SVT_PX;
+	widget->style.margin.right.type = SVT_PX;
+	widget->style.margin.bottom.type = SVT_PX;
+	widget->style.margin.left.type = SVT_PX;
+	widget->style.padding.top.px = 0;
+	widget->style.padding.right.px = 0;
+	widget->style.padding.bottom.px = 0;
+	widget->style.padding.left.px = 0;
+	widget->style.padding.top.type = SVT_PX;
+	widget->style.padding.right.type = SVT_PX;
+	widget->style.padding.bottom.type = SVT_PX;
+	widget->style.padding.left.type = SVT_PX;
 	widget->event = LCUIEventBox_Create();
+	Widget_InitTaskBox( widget );
+	Background_Init( &widget->style.background );
+	BoxShadow_Init( &widget->style.shadow );
+	Border_Init( &widget->style.border );
 	LinkedList_Init( &widget->children, sizeof(struct LCUI_WidgetFull) );
 	LinkedList_Init( &widget->children_show, 0 );
 	LinkedList_SetDestroyFunc( &widget->children, $(OnDestroy) );
 	LinkedList_SetDataNeedFree( &widget->children, TRUE );
 	LinkedList_SetDataNeedFree( &widget->children_show, FALSE );
+	DirtyRectList_Init( &widget->dirty_rects );
 }
 
 /** 新建一个GUI部件 */
