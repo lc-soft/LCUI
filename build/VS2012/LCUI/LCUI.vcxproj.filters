@@ -243,6 +243,9 @@
     <ClInclude Include="..\..\..\include\LCUI\style_parser.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\draw\background.h">
+      <Filter>头文件\LCUI\draw</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -433,6 +436,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_task.c">
       <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\draw\background.c">
+      <Filter>源文件\draw</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

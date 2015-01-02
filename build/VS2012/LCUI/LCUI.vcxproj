@@ -129,6 +129,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\include\LCUI\draw\background.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\border.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\line.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="..\..\..\src\bmp\jpeg.c" />
     <ClCompile Include="..\..\..\src\bmp\load_image.c" />
     <ClCompile Include="..\..\..\src\bmp\png.c" />
+    <ClCompile Include="..\..\..\src\draw\background.c" />
     <ClCompile Include="..\..\..\src\draw\border.c" />
     <ClCompile Include="..\..\..\src\draw\boxshadow.c" />
     <ClCompile Include="..\..\..\src\draw\line.c" />
