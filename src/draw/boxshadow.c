@@ -1,8 +1,7 @@
 ﻿/* ****************************************************************************
-* boxshadow.c -- draw box shadow.
+* boxshadow.c -- graph box shadow draw support.
 * 
-* Copyright (C) 2014 by
-* Liu Chao <lc-soft@live.cn>
+* Copyright (C) 2014 by Liu Chao <lc-soft@live.cn>
 * 
 * This file is part of the LCUI project, and may only be used, modified, and
 * distributed under the terms of the GPLv2.
@@ -21,10 +20,9 @@
 * ***************************************************************************/
 
 /* ****************************************************************************
-* boxshadow.c -- 矩形阴影
+* boxshadow.c -- 矩形阴影绘制支持
 *
-* 版权所有 (C) 2014 归属于
-* 刘超 <lc-soft@live.cn>
+* 版权所有 (C) 2014-2015 归属于 刘超 <lc-soft@live.cn>
 * 
 * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
 *
@@ -430,7 +428,7 @@ static void draw_center_shadow( LCUI_Graph *graph, LCUI_Rect area,
 	}
 }
 
-LCUI_API void BoxShadow_Init( LCUI_BoxShadow *shadow )
+void BoxShadow_Init( LCUI_BoxShadow *shadow )
 {
 	shadow->color.r = 0;
 	shadow->color.g = 0;
