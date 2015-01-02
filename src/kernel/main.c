@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * main.c -- The main functions for the LCUI normal work
  * 
- * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * main.c -- 使LCUI能够正常工作的相关主要函数
  *
- * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,6 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 #define DEBUG
+#define __IN_MAIN_SOURCE_FILE__
+
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
@@ -50,6 +52,18 @@
 
 #define STATE_ACTIVE 1
 #define STATE_KILLED 0
+
+/** 主循环的状态 */
+enum MainLoopState {
+	STATE_PAUSED,
+	STATE_RUNNING,
+	STATE_EXITED
+};
+
+struct LCUI_MainLoopRec_ {
+	int state;		/**< 主循环的状态 */
+	unsigned long int tid;	/**< 当前运行该主循环的线程的ID */
+};
 
 typedef struct FuncDataRec_ {
 	void (*func)(LCUI_SystemEvent*,void*);
@@ -84,22 +98,10 @@ static struct LCUI_App {
 	LCUI_Mutex loop_mutex;		/**< 互斥锁，确保一次只允许一个线程跑主循环 */
 	LCUI_Mutex loop_changed;	/**< 互斥锁，用于指示当前运行的主循环是否改变 */
 	LCUI_Cond loop_cond;		/**< 条件变量，用于决定是否继续任务循环 */
-	LCUI_MainLoop *loop;		/**< 当前运行的主循环 */
+	LCUI_MainLoop loop;		/**< 当前运行的主循环 */
 	LinkedList loop_list;		/**< 主循环列表 */
 	LCUI_Cond loop_list_empty;	/**< 条件变量，当主循环列表为空时条件成立 */
 } MainApp;
-
-/** 主循环的状态 */
-enum MainLoopState {
-	STATE_PAUSED,
-	STATE_RUNNING,
-	STATE_EXITED
-};
-
-typedef struct LCUI_MainLoopRec_ {
-	int state;		/**< 主循环的状态 */
-	unsigned long int tid;	/**< 当前运行该主循环的线程的ID */
-} LCUI_MainLoopRec;
 
 /*-------------------------- system event <START> ---------------------------*/
 
@@ -217,10 +219,10 @@ int LCUI_PostEvent( LCUI_SystemEvent *event )
 /* 新建一个主循环 */
 LCUI_MainLoop LCUI_MainLoop_New( void )
 {
-	LCUI_MainLoopRec *loop;
-	loop = (LCUI_MainLoopRec*)malloc(sizeof(LCUI_MainLoopRec));
+	LCUI_MainLoop loop;
+	loop = (LCUI_MainLoop)malloc(sizeof(struct LCUI_MainLoopRec_));
 	loop->state = STATE_PAUSED;
-	return (LCUI_MainLoop)loop;
+	return loop;
 }
 
 static int LCUI_RunTask(void)
@@ -274,16 +276,15 @@ static int LCUI_RunTask(void)
 /** 运行目标主循环 */
 int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 {
-	LCUI_MainLoopRec *loop_rec = (LCUI_MainLoopRec*)loop;
-	if( loop_rec->state == STATE_RUNNING ) {
+	if( loop->state == STATE_RUNNING ) {
 		_DEBUG_MSG("error: main-loop already running.");
 		return -1;
 	}
 	DEBUG_MSG("loop: %p, enter\n", loop);
-	loop_rec->state = STATE_RUNNING;
+	loop->state = STATE_RUNNING;
 	/* 将主循环记录插入至列表表头 */
 	LinkedList_Goto( &MainApp.loop_list, 0 );
-	LinkedList_Insert( &MainApp.loop_list, loop_rec );
+	LinkedList_Insert( &MainApp.loop_list, loop );
 	MainApp.loop = loop;
 	LCUIMutex_Lock( &MainApp.loop_changed );
 	/* 广播，让其它线程交出主循环运行权 */
@@ -291,15 +292,15 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	/* 获取运行权 */
 	LCUIMutex_Lock( &MainApp.loop_mutex );
 	LCUIMutex_Unlock( &MainApp.loop_changed );
-	loop_rec->tid = LCUIThread_SelfID();
-	while( loop_rec->state != STATE_EXITED ) {
+	loop->tid = LCUIThread_SelfID();
+	while( loop->state != STATE_EXITED ) {
 		if( LinkedList_GetTotal(&MainApp.task_list) <= 0 ) {
 			DEBUG_MSG("loop: %p, sleeping...\n", loop);
 			LCUICond_TimedWait( &MainApp.loop_cond, 1000 );
 			DEBUG_MSG("loop: %p, wakeup\n", loop);
 			/** 如果当前运行的主循环不是自己 */
 			if( MainApp.loop != loop ) {
-				loop_rec->state = STATE_PAUSED;
+				loop->state = STATE_PAUSED;
 				DEBUG_MSG("loop: %p, release control.\n", loop);
 				LCUIMutex_Unlock( &MainApp.loop_mutex );
 				/* 等待其它线程获得主循环运行权 */
@@ -314,14 +315,14 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 		DEBUG_MSG("loop: %p, run task.\n", loop);
 		LCUI_RunTask();
 	}
-	loop_rec->state = STATE_EXITED;
+	loop->state = STATE_EXITED;
 	LinkedList_Goto( &MainApp.loop_list, 0 );
 	LinkedList_Delete( &MainApp.loop_list );
 	/* 获取处于列表表头的主循环 */
-	loop_rec = (LCUI_MainLoopRec*)LinkedList_Get( &MainApp.loop_list );
-	if( loop_rec ) {
+	loop = (LCUI_MainLoop)LinkedList_Get( &MainApp.loop_list );
+	if( loop ) {
 		/* 改变当前运行的主循环 */
-		MainApp.loop = (LCUI_MainLoop*)loop_rec;
+		MainApp.loop = loop;
 		LCUICond_Broadcast( &MainApp.loop_cond );
 	}
 	/* 释放运行权 */
@@ -338,8 +339,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 /** 标记目标主循环需要退出 */
 void LCUI_MainLoop_Quit( LCUI_MainLoop loop )
 {
-	LCUI_MainLoopRec *loop_rec = (LCUI_MainLoopRec*)loop;
-	loop_rec->state = STATE_EXITED;
+	loop->state = STATE_EXITED;
 	LCUICond_Broadcast( &MainApp.loop_cond );
 }
 
@@ -408,8 +408,6 @@ int LCUI_RemoveTask( CallBackFunc task_func, LCUI_BOOL need_lock )
 	}
 	return n;
 }
-/**************************** Task End ********************************/
-
 
 /** 初始化程序数据结构体 */
 static void LCUIApp_Init(void)
@@ -429,18 +427,15 @@ static void LCUIApp_Init(void)
 /** 退出所有主循环 */
 static void LCUIApp_QuitAllMainLoop(void)
 {
-	int n;
-	LCUI_MainLoopRec *loop_rec;
-
-	n = LinkedList_GetTotal( &MainApp.loop_list );
+	LCUI_MainLoop loop;
+	int n = LinkedList_GetTotal( &MainApp.loop_list );
 	LinkedList_Goto( &MainApp.loop_list, 0 );
 	while( n-- ) {
-		loop_rec = (LCUI_MainLoopRec*)
-		LinkedList_Get( &MainApp.loop_list );
-		if( !loop_rec ) {
+		loop = (LCUI_MainLoop)LinkedList_Get( &MainApp.loop_list );
+		if( !loop ) {
 			break;
 		}
-		loop_rec->state = STATE_EXITED;
+		loop->state = STATE_EXITED;
 		LinkedList_ToNext( &MainApp.loop_list );
 	}
 	LCUICond_Broadcast( &MainApp.loop_cond );
@@ -487,8 +482,7 @@ LCUI_BOOL LCUI_IsActive(void)
 /** 检测当前是否在主线程上 */
 LCUI_BOOL LCUI_IsOnMainLoop(void)
 {
-	LCUI_MainLoopRec *loop = (LCUI_MainLoopRec*)MainApp.loop;
-	return (loop->tid == LCUIThread_SelfID());
+	return (MainApp.loop->tid == LCUIThread_SelfID());
 }
 
 /* 
@@ -497,7 +491,6 @@ LCUI_BOOL LCUI_IsOnMainLoop(void)
  * */
 int LCUI_Init( int w, int h, int mode )
 {
-	/* 如果LCUI没有初始化过 */
 	if( System.is_inited ) {
 		return -1;
 	}
