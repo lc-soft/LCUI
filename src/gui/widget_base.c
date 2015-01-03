@@ -54,11 +54,105 @@
 static struct LCUI_WidgetFull LCUIRootWidgetData;	/**< 根级部件 */
 LCUI_Widget LCUIRootWidget = &LCUIRootWidgetData;	/**< 创建外部引用 */
 
-static void $(OnDestroy)( void *arg )
+/** 追加子部件 */
+int $(Append)( LCUI_Widget container, LCUI_Widget widget )
 {
+	int i, n;
+	LCUI_Widget old_container;
 
+	if( !container || !widget || container == widget->parent ) {
+		return -1;
+	}
+	if( container == widget ) {
+		return -2;
+	}
+	if( widget->parent ) {
+		old_container = widget->parent;
+	} else {
+		old_container = LCUIRootWidget;
+	}
+
+	/* 移除在之前的容器中的记录 */
+	n = LinkedList_GetTotal( &old_container->children );
+	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &old_container->children, i );
+		if( LinkedList_Get(&old_container->children) == widget ) {
+			LinkedList_Delete( &old_container->children );
+			break;
+		}
+	}
+	n = LinkedList_GetTotal( &old_container->children_show );
+	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &old_container->children_show, i );
+		if( LinkedList_Get(&old_container->children_show) == widget ) {
+			LinkedList_Delete( &old_container->children_show );
+			break;
+		}
+	}
+	widget->parent = container;
+	LinkedList_AddData( &container->children, widget );
+	LinkedList_AddData( &container->children_show, widget );
+	// XXX
+	return 0;
 }
 
+/** 前置显示 */
+int $(Front)( LCUI_Widget widget )
+{
+	int i, n, src_pos = -1, des_pos = -1;
+	LCUI_Widget parent, child;
+
+	parent = widget->parent ? widget->parent:LCUIRootWidget;
+	n = LinkedList_GetTotal( &parent->children_show );
+	/* 先在队列中找到自己，以及z-index值小于或等于它的第一个部件 */
+	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &parent->children_show, i );
+		child = (LCUI_Widget)LinkedList_Get( &parent->children_show );
+		if( child == widget ) {
+			src_pos = i;
+			continue;
+		}
+		if( des_pos >= 0 ) {
+			if( src_pos >= 0 ) {
+				break;
+			}
+			continue;
+		}
+		/* 如果该位置的图层的z-index值不大于自己 */
+		if( child->style.z_index <= widget->style.z_index ) {
+			/* 如果未找到自己的源位置 */
+			if( src_pos == -1 ) {
+				des_pos = i;
+				continue;
+			}
+			/* 否则，退出循环，因为已经在前排了 */
+			break;
+		}
+	}
+	/* 没有找到就退出 */
+	if( des_pos == -1 || src_pos == -1 ) {
+		return -1;
+	}
+	/* 找到的话就移动位置 */
+	LinkedList_Goto( &parent->children_show, src_pos );
+	LinkedList_MoveTo( &parent->children_show, des_pos );
+	// XXX
+	return 0;
+}
+
+/** 部件析构函数 */
+static void $(OnDestroy)( void *arg )
+{
+	LCUI_Widget widget = (LCUI_Widget)arg;
+	Widget_DestroyTaskBox( widget );
+	LCUIEventBox_Destroy( widget->event );
+	widget->event = NULL;
+	LinkedList_Destroy( &widget->children );
+	LinkedList_Destroy( &widget->children_show );
+	DirtyRectList_Destroy( &widget->dirty_rects );
+}
+
+/** 构造函数 */
 static void $(Init)( LCUI_Widget widget )
 {
 	widget->style.z_index = 0;
@@ -102,6 +196,8 @@ LCUI_Widget $(New)( const char *type_name )
 {
 	LCUI_Widget widget = NEW_ONE(struct LCUI_WidgetFull);
 	$(Init)(widget);
+	LinkedList_AddData( &LCUIRootWidget->children, widget );
+	LinkedList_AddData( &LCUIRootWidget->children_show, widget );
 	return widget;
 }
 

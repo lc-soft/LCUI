@@ -96,7 +96,7 @@ struct LCUI_WidgetFull {
 
 	LCUI_Widget		parent;		/**< 父部件 */
 	LinkedList		children;	/**< 子部件 */
-	LinkedList		children_show;	/**< 子部件的显示顺序 */
+	LinkedList		children_show;	/**< 子部件的堆叠顺序记录，由顶到底 */
 	LCUI_EventBox		event;		/**< 事件记录 */
 	LCUI_WidgetTaskBox	task;		/**< 任务记录 */
 	LCUI_DirtyRectList	dirty_rects;	/**< 记录无效区域（脏矩形） */

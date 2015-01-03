@@ -90,6 +90,9 @@ LCUI_API void Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data );
 /** 初始化部件的任务处理 */
 void Widget_InitTaskBox( LCUI_Widget widget );
 
+/** 销毁（释放）部件的任务处理功能的相关资源 */
+void Widget_DestroyTaskBox( LCUI_Widget widget );
+
 /** 初始化 LCUI 部件任务处理功能 */
 void LCUIWidget_Task_Init(void);
 
