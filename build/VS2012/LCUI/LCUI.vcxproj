@@ -167,7 +167,6 @@
     <ClInclude Include="..\..\..\include\LCUI\draw.h" />
     <ClInclude Include="..\..\..\include\LCUI\font.h" />
     <ClInclude Include="..\..\..\include\LCUI\graph.h" />
-    <ClInclude Include="..\..\..\include\LCUI\graphlayer.h" />
     <ClInclude Include="..\..\..\include\LCUI\input.h" />
     <ClInclude Include="..\..\..\include\LCUI\ime.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc.h" />
@@ -234,7 +233,6 @@
     <ClCompile Include="..\..\..\src\graph.c">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\graphlayer.c" />
     <ClCompile Include="..\..\..\src\ime.c" />
     <ClCompile Include="..\..\..\src\style_parser.c" />
     <ClCompile Include="..\..\..\src\misc\catch_screen.c" />

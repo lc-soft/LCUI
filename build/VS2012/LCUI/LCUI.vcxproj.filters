@@ -216,9 +216,6 @@
     <ClInclude Include="..\..\..\include\LCUI\ime.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\graphlayer.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\graph.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
@@ -420,9 +417,6 @@
       <Filter>源文件\misc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\ime.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\graphlayer.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graph.c">
