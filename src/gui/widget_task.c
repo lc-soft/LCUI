@@ -37,6 +37,13 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
+/*
+ * 任务数据主要用于存储执行任务前的数据，例如：“移动”任务，在添加该任务时会
+ * 存储部件当前位置，供执行“移动”任务时计算脏矩形。
+ * 同一帧下，同一种任务只存在一个，当在同一帧内对同一部件添加重复的任务时，部
+ * 件数据只保留第一个，后面添加的任务数据都会被忽略，不会覆盖掉。
+ */
+
 #define __IN_WIDGET_TASK_SOURCE_FILE__
 
 #include <LCUI_Build.h>
@@ -113,10 +120,13 @@ static void HandleDestroy( LCUI_Widget w, LCUI_WidgetTask *t )
 }
 
 /** 添加任务 */
-void Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data )
+int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data )
 {
 	TaskRecord *buffer;
 	buffer = widget->task->buffer[widget->task->i == 1 ? 0:1];
+	if( buffer[data->type].is_valid ) {
+		return -1;
+	}
 	buffer[data->type].is_valid = TRUE;
 	buffer[data->type].data = *data;
 	widget->task->for_self = TRUE;
@@ -126,6 +136,7 @@ void Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data )
 		widget->task->for_children = TRUE;
 		widget = widget->parent;
 	}
+	return 0;
 }
 
 typedef void (*callback)(LCUI_Widget, LCUI_WidgetTask*);

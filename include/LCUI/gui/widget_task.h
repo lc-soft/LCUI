@@ -85,7 +85,7 @@ typedef struct LCUI_WidgetTaskBoxRec_* LCUI_WidgetTaskBox;
 #endif
 
 /** 添加任务 */
-LCUI_API void Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data );
+LCUI_API int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data );
 
 /** 初始化部件的任务处理 */
 void Widget_InitTaskBox( LCUI_Widget widget );
