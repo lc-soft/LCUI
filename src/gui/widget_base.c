@@ -293,19 +293,352 @@ void $(GetValidRect)( LCUI_Widget widget, LCUI_Rect *rect )
 	}
 }
 
-void $(Resize)( LCUI_Widget w, LCUI_Size new_size )
+/** 计算坐标 */
+void $(ComputeCoord)( LCUI_Widget w )
+{
+	double n;
+	
+	// 需要考虑到其它定位相关的属性
+	// code ...
+
+	switch( w->style.x.type ) {
+	case SVT_SCALE:
+		if( !w->parent ) {
+			break;
+		 }
+		n = w->style.x.scale / 100.0;
+		w->base.x = n * w->parent->base.box.content.width;
+		break;
+	case SVT_PX:
+		w->base.x = w->style.x.px;
+		break;
+	case SVT_NONE:
+	case SVT_AUTO:
+	default:
+		w->base.x = 0;
+		break;
+	}
+	switch( w->style.y.type ) {
+	case SVT_SCALE:
+		if( !w->parent ) {
+			break;
+		 }
+		n = w->style.y.scale / 100.0;
+		w->base.y = n * w->parent->base.box.content.width;
+		break;
+	case SVT_PX:
+		w->base.y = w->style.y.px;
+		break;
+	case SVT_NONE:
+	case SVT_AUTO:
+	default:
+		w->base.y = 0;
+		break;
+	}
+	/* 以x、y为基础 */
+	w->base.box.border.x = w->base.x;
+	w->base.box.border.y = w->base.y;
+	w->base.box.content.x = w->base.x;
+	w->base.box.content.y = w->base.y;
+	w->base.box.outer.x = w->base.x;
+	w->base.box.outer.y = w->base.y;
+	w->base.box.graph.x = w->base.x;
+	w->base.box.graph.y = w->base.y;
+	/* 计算各个框的坐标 */
+	w->base.box.content.x += w->style.border.left.width + w->base.padding.left;
+	w->base.box.content.y += w->style.border.top.width + w->base.padding.top;
+	w->base.box.outer.x -= w->base.margin.left;
+	w->base.box.outer.y -= w->base.margin.top;
+	w->base.box.graph.x -= BoxShadow_GetBoxX(&w->style.shadow);
+	w->base.box.graph.y -= BoxShadow_GetBoxY(&w->style.shadow);
+}
+
+/** 计算尺寸 */
+void $(ComputeSize)( LCUI_Widget w )
+{
+	double n;
+
+	switch( w->style.width.type ) {
+	case SVT_SCALE:
+		if( !w->parent ) {
+			break;
+		 }
+		n = w->style.width.scale / 100.0;
+		w->base.width = n * w->parent->base.box.content.width;
+		break;
+	case SVT_PX:
+		w->base.width = w->style.width.px;
+		break;
+	case SVT_NONE:
+	case SVT_AUTO:
+	default:
+		w->base.width = 0;
+		break;
+	}
+	switch( w->style.height.type ) {
+	case SVT_SCALE:
+		if( !w->parent ) {
+			break;
+		 }
+		n = w->style.height.scale / 100.0;
+		w->base.height = n * w->parent->base.box.content.width;
+		break;
+	case SVT_PX:
+		w->base.height = w->style.height.px;
+		break;
+	case SVT_NONE:
+	case SVT_AUTO:
+	default:
+		w->base.height = 0;
+		break;
+	}
+
+	w->base.box.border.width = w->base.width;
+	w->base.box.border.height = w->base.height;
+	w->base.box.content.width = w->base.width;
+	w->base.box.content.height = w->base.height;
+	/* 如果是以边框盒作为尺寸调整对象，则需根据边框盒计算内容框尺寸 */
+	if( w->style.box_sizing == BORDER_BOX ) {
+		/* 名字太长了，都放一行里代码会太长，只好分解成多行了 */
+		w->base.box.content.width -= w->style.border.left.width;
+		w->base.box.content.width -= w->style.border.right.width;
+		w->base.box.content.width -= w->base.padding.left;
+		w->base.box.content.width -= w->base.padding.right;
+		w->base.box.content.height -= w->style.border.top.width;
+		w->base.box.content.height -= w->style.border.bottom.width;
+		w->base.box.content.height -= w->base.padding.top;
+		w->base.box.content.height -= w->base.padding.bottom;
+	} else {
+		/* 否则是以内容框作为尺寸调整对象，需计算边框盒的尺寸 */
+		w->base.box.border.width += w->style.border.left.width;
+		w->base.box.border.width += w->style.border.right.width;
+		w->base.box.border.width += w->base.padding.left;
+		w->base.box.border.width += w->base.padding.right;
+		w->base.box.border.height += w->style.border.top.width;
+		w->base.box.border.height += w->style.border.bottom.width;
+		w->base.box.border.height += w->base.padding.top;
+		w->base.box.border.height += w->base.padding.bottom;
+	}
+}
+
+/** 计算内边距 */
+void $(ComputePadding)( LCUI_Widget w )
+{
+	int i;
+	double result;
+	struct {
+		LCUI_StyleVar *value;
+		int *buffer;
+		int size;
+	} map[4] = {
+		{
+			&w->style.padding.top,
+			&w->base.padding.top,
+			w->parent->base.box.content.height
+		}, {
+			&w->style.padding.right,
+			&w->base.padding.right,
+			w->parent->base.box.content.width
+		}, {
+			&w->style.padding.bottom,
+			&w->base.padding.bottom,
+			w->parent->base.box.content.height
+		}, {
+			&w->style.padding.left,
+			&w->base.padding.left,
+			w->parent->base.box.content.width
+		}
+	};
+	for( i=0; i<4; ++i ) {
+		switch( map[i].value->type ) {
+		case SVT_SCALE:
+			if( !w->parent ) {
+				break;
+			}
+			result = map[i].size * map[i].value->scale / 100;
+			*map[i].buffer = (int)result;
+			break;
+		case SVT_PX:
+			*map[i].buffer = map[i].value->px;
+			break;
+		case SVT_NONE:
+		case SVT_AUTO:
+		default:
+			// ...
+			break;
+		}
+	}
+}
+
+/** 计算内边距 */
+void $(ComputeMargin)( LCUI_Widget w )
+{
+	int i;
+	double result;
+	struct {
+		LCUI_StyleVar *value;
+		int *buffer;
+		int size;
+	} map[4] = {
+		{
+			&w->style.margin.top,
+			&w->base.margin.top,
+			w->parent->base.box.content.height
+		}, {
+			&w->style.margin.right,
+			&w->base.margin.right,
+			w->parent->base.box.content.width
+		}, {
+			&w->style.margin.bottom,
+			&w->base.margin.bottom,
+			w->parent->base.box.content.height
+		}, {
+			&w->style.margin.left,
+			&w->base.margin.left,
+			w->parent->base.box.content.width
+		}
+	};
+	for( i=0; i<4; ++i ) {
+		switch( map[i].value->type ) {
+		case SVT_SCALE:
+			if( !w->parent ) {
+				break;
+			}
+			result = map[i].size * map[i].value->scale / 100;
+			*map[i].buffer = (int)result;
+			break;
+		case SVT_PX:
+			*map[i].buffer = map[i].value->px;
+			break;
+		case SVT_NONE:
+		case SVT_AUTO:
+		default:
+			// ...
+			break;
+		}
+	}
+}
+
+/** 设置内边距 */
+void $(SetPadding)( LCUI_Widget w, int top, int right, int bottom, int left )
+{
+	LCUI_WidgetTask t;
+	w->style.padding.top.px = top;
+	w->style.padding.right.px = left;
+	w->style.padding.bottom.px = left;
+	w->style.padding.left.px = left;
+	w->style.padding.top.type = SVT_PX;
+	w->style.padding.right.type = SVT_PX;
+	w->style.padding.bottom.type = SVT_PX;
+	w->style.padding.left.type = SVT_PX;
+	$(ComputeMargin)( w );
+	$(ComputeSize)( w );
+	$(ComputeCoord)( w );
+	Widget_AddTask( w, (t.type = WTT_AUTO_SIZE, &t) );
+	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
+}
+
+void $(SetPaddingS)(
+	LCUI_Widget w, 
+	const char *top,
+	const char *right,
+	const char *bottom,
+	const char *left 
+)
+{
+
+}
+
+/** 设置外边距 */
+void $(SetMargin)( LCUI_Widget w, int top, int right, int bottom, int left )
+{
+	LCUI_WidgetTask t;
+	w->style.margin.top.px = top;
+	w->style.margin.right.px = left;
+	w->style.margin.bottom.px = left;
+	w->style.margin.left.px = left;
+	w->style.margin.top.type = SVT_PX;
+	w->style.margin.right.type = SVT_PX;
+	w->style.margin.bottom.type = SVT_PX;
+	w->style.margin.left.type = SVT_PX;
+	$(ComputeMargin)( w );
+	$(ComputeSize)( w );
+	$(ComputeCoord)( w );
+	Widget_AddTask( w, (t.type = WTT_AUTO_SIZE, &t) );
+	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
+}
+
+/** 设置左边距 */
+void $(SetLeft)( LCUI_Widget w, const char *value )
+{
+
+}
+
+/** 设置顶边距 */
+void $(SetTop)( LCUI_Widget w, const char *value )
+{
+
+}
+
+/** 移动部件位置 */
+void $(Move)( LCUI_Widget w, int top, int left )
+{
+	LCUI_WidgetTask t;
+	t.type = WTT_MOVE;
+	/* 记录当前的图形呈现框的坐标 */
+	t.move.x = w->base.box.graph.x;
+	t.move.y = w->base.box.graph.y;
+	w->style.y.px = top;
+	w->style.x.px = left;
+	w->style.y.type = SVT_PX;
+	w->style.x.type = SVT_PX;
+	// 重新计算各个区域的坐标
+	$(ComputeCoord)( w );
+	Widget_AddTask( w, &t );
+}
+
+/** 调整部件尺寸 */
+void $(Resize)( LCUI_Widget w, int width, int height )
+{
+	LCUI_WidgetTask t;
+	t.type = WTT_RESIZE;
+	t.resize.w = w->base.width;
+	t.resize.h = w->base.height;
+	w->style.width.px = width;
+	w->style.height.px = height;
+	w->style.width.type = SVT_PX;
+	w->style.height.type = SVT_PX;
+	$(ComputeSize)( w );
+	Widget_AddTask( w, &t );
+	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
+}
+
+void $(SetWidth)( LCUI_Widget w, const char *value )
+{
+
+}
+
+void $(SetHeight)( LCUI_Widget w, const char *value )
 {
 
 }
 
 void $(Show)( LCUI_Widget w )
 {
-	
+	LCUI_WidgetTask t;
+	t.type = WTT_SHOW;
+	t.visible = w->style.visible;
+	w->style.visible = TRUE;
+	Widget_AddTask( w, &t );
 }
 
 void $(Hide)( LCUI_Widget w )
 {
-	
+	LCUI_WidgetTask t;
+	t.type = WTT_SHOW;
+	t.visible = w->style.visible;
+	w->style.visible = FALSE;
+	Widget_AddTask( w, &t );
 }
 
 void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color )

@@ -84,6 +84,8 @@ typedef struct LCUI_WidgetBase {
 		LCUI_Rect outer;	/**< 外边框的区域，包括边框盒和外边距框区域 */
 		LCUI_Rect graph;	/**< 图层的区域，包括边框盒和阴影区域 */
 	} box;				/**< 部件的各个区域信息 */
+	LCUI_Rect2 padding;		/**< 内边框 */
+	LCUI_Rect2 margin;		/**< 外边框 */
 } LCUI_WidgetBase;
 
 #undef $
@@ -114,7 +116,7 @@ LCUI_API void $(GetBorderRect)( LCUI_Widget widget, LCUI_Rect *rect );
 /** 获取部件当前占用的矩形区域（包括阴影区域） */
 LCUI_API void $(GetOuterRect)( LCUI_Widget widget, LCUI_Rect *rect );
 
-LCUI_API void $(Resize)( LCUI_Widget w, LCUI_Size new_size );
+LCUI_API void $(Resize)( LCUI_Widget w, int width, int height );
 
 LCUI_API void $(Show)( LCUI_Widget w );
 

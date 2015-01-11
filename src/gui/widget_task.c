@@ -67,10 +67,13 @@ struct LCUI_WidgetTaskBoxRec_ {
 static void HandleMove( LCUI_Widget w, LCUI_WidgetTask *t )
 {
 	LCUI_Rect rect;
-	Widget_GetRect( w, &rect );
+	rect = w->base.box.graph;
+	/* 标记移动后的区域 */
 	Widget_InvalidateArea( w->parent, &rect );
+	/* 应用移动前的坐标 */
 	rect.x = t->move.x;
 	rect.y = t->move.y;
+	/* 标记移动前的区域 */
 	Widget_InvalidateArea( w->parent, &rect );
 }
 
