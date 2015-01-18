@@ -1,8 +1,45 @@
-﻿
+﻿/* ***************************************************************************
+ * widget_paint.c -- LCUI widget paint module.
+ * 
+ * Copyright (C) 2013-2015 by Liu Chao <lc-soft@live.cn>
+ * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ * 
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ***************************************************************************/
+ 
+/* ****************************************************************************
+ * widget_paint.c -- LCUI部件绘制模块
+ *
+ * 版权所有 (C) 2013-2015 归属于 刘超 <lc-soft@live.cn>
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ***************************************************************************/
+
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
-#include <LCUI/misc/rbtree.h>
 #include <LCUI/widget_build.h>
 
 static LCUI_BOOL painter_is_active = FALSE;
@@ -23,28 +60,59 @@ void LCUIWidgetPainter_Destroy(void)
 	RBTree_Destroy( &widget_paint_tree );
 }
 
-/* 设置部件内无效区域，该无效区域将被重绘 */
-int Widget_InvalidateArea( LCUI_Widget widget, LCUI_Rect *r )
+/**  
+ * 根据所处框区域，调整矩形
+ * @param[in] w		目标部件
+ * @param[in,out] r	矩形区域
+ * @param[in] box_type	区域相对于何种框进行定位
+ */
+static void Widget_AdjustArea(	LCUI_Widget w, LCUI_Rect *in_rect, 
+				LCUI_Rect *out_rect, int box_type )
 {
-	LCUI_Rect rect;
-	/** 如果为NULL，那将整个部件区域需要刷新 */
-	if( !r ) {
-		rect.x = rect.y = 0;
-		rect.w = widget->base.outerWidth;
-		rect.h = widget->base.outerHeight;
-		r = &rect;
+	LCUI_Rect *box;
+	switch( box_type ) {
+	case BORDER_BOX: box = &w->base.box.border; break;
+	case GRAPH_BOX: box = &w->base.box.graph; break;
+	case CONTENT_BOX: 
+	default: box = &w->base.box.content; break;
 	}
-	LCUIRect_ValidateArea( r, Size(widget->base.outerWidth, widget->base.outerHeight) );
-	DEBUG_MSG("widget:%p, rect: %d,%d,%d,%d\n", widget, r->x, r->y, r->w, r->h);
-	if( painter_is_active ) {
-		/* 记录该部件，需要进行绘制 */
-		RBTree_Insert( &widget_paint_tree, (int)widget, NULL );
-		return DirtyRectList_Add( &widget->dirty_rects, r );
+	/* 如果为NULL，则视为使用整个部件区域 */
+	if( !in_rect ) {
+		out_rect->x = out_rect->y = 0;
+		out_rect->w = box->w;
+		out_rect->h = box->h;
+	} else {
+		*out_rect = *in_rect;
 	}
-	return -1;
+	LCUIRect_ValidateArea( out_rect, Size(box->w, box->h) );
+	/* 将坐标转换成相对于图像呈现区的坐标 */
+	out_rect->x += (box->x - w->base.box.graph.x);
+	out_rect->y += (box->y - w->base.box.graph.y);
 }
 
-/** 获取部件中的无效区域 */
+/** 
+ * 标记部件内的一个区域为无效的，以使其重绘
+ * @param[in] w		目标部件
+ * @param[in] r		矩形区域
+ * @param[in] box_type	区域相对于何种框进行定位
+ */
+int Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
+{
+	LCUI_Rect rect;
+	if( painter_is_active ) {
+		return -1;
+	}
+	Widget_AdjustArea( w, r, &rect, box_type );
+	/* 记录该部件，需要进行绘制 */
+	RBTree_CustomInsert( &widget_paint_tree, w, w );
+	return DirtyRectList_Add( &w->dirty_rects, &rect );
+}
+
+/** 
+ * 获取部件中的无效区域
+ * @param[in] widget	目标部件
+ * @area[out] area	无效区域
+ */
 int Widget_GetInvalidArea( LCUI_Widget widget, LCUI_Rect *area )
 {
 	LCUI_Rect *p_rect;
@@ -64,113 +132,54 @@ int Widget_GetInvalidArea( LCUI_Widget widget, LCUI_Rect *area )
 	return 0;
 }
 
-/** 使部件中的一块区域有效化 */
-void Widget_ValidateArea( LCUI_Widget widget, LCUI_Rect *area )
+/**  
+ * 标记部件内的一个区域为有效的
+ * @param[in] w		目标部件
+ * @param[in] r		矩形区域
+ * @param[in] box_type	区域相对于何种框进行定位
+ */
+void Widget_ValidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 {
 	LCUI_Rect rect;
-	if( !area ) {
-		rect.x = rect.y = 0;
-		rect.w = widget->base.outerWidth;
-		rect.h = widget->base.outerHeight;
-		area= &rect;
-	}
-	DirtyRectList_Delete( &widget->dirty_rects, area );
+	Widget_AdjustArea( w, r, &rect, box_type );
+	DirtyRectList_Delete( &w->dirty_rects, &rect );
 }
 
-/** 将部件的区域推送至屏幕 */
-int Widget_PushAreaToScreen( LCUI_Widget widget, LCUI_Rect *area )
+/**  
+ * 将部件的区域推送至屏幕
+ * @param[in] w		目标部件
+ * @param[in] r		矩形区域
+ * @param[in] box_type	区域相对于何种框进行定位
+ */
+int Widget_PushAreaToScreen( LCUI_Widget w, LCUI_Rect *r, int box_type )
 {
-	int n;
 	LCUI_Rect rect;
-	LCUI_Widget root;
-
-	if( !widget ) {
-		return LCUIScreen_InvalidateArea( area );
+	if( !w ) {
+		return LCUIScreen_InvalidateArea( r );
 	}
-
-	if( !area ) {
-		rect.x = rect.y = 0;
-		rect.w = widget->base.outerWidth;
-		rect.h = widget->base.outerHeight;
-		area = &rect;
-	}
-	root = LCUIRootWidget;
-	while( widget && widget != root ) {
-		if( !widget->base.isVisible ) {
+	Widget_AdjustArea( w, r, &rect, box_type );
+	/* 向上级遍历，调整该矩形区域，直至根部件为止 */
+	while( w && w != LCUIRootWidget ) {
+		if( !w->style.visible ) {
 			return 1;
 		}
-		if( area->x < 0 ) {
-			area->w += area->x;
-			area->x = 0;
-		}
-		if( area->y < 0 ) {
-			area->h += area->y;
-			area->y = 0;
-		}
-		if( area->x + area->w > widget->base.outerWidth ) {
-			area->w = widget->base.outerWidth - area->x;
-		}
-		if( area->y + area->h > widget->base.outerHeight ) {
-			area->h = widget->base.outerHeight - area->y;
-		}
-		/* 加上所在部件的坐标 */
-		area->x += widget->base.x;
-		area->y += widget->base.y;
-		/* 加上父级部件的内边距 */
-		if( !widget->parent ) {
-			break;
-		}
-		
-		/* 切换至父级部件 */
-		widget = widget->parent;
-		area->x += widget->style.padding.left.px;
-		area->y += widget->style.padding.top.px;
-		/* 计算父部件的内边距框，然后再调整矩形区域 */
-		n = widget->base.outerWidth - widget->style.padding.right.px;
-		if( area->x + area->w > n ) {
-			area->w = n - area->x;
-		}
-		n = widget->base.outerHeight - widget->style.padding.bottom.px;
-		if( area->y + area->h > n ) {
-			area->h = n - area->y;
-		}
-
-		if( area->w <= 0 || area->h <= 0 ) {
-			return -1;
+		rect.x += w->base.box.graph.x;
+		rect.y += w->base.box.graph.y;
+		w = w->parent;
+		Widget_AdjustArea( w, &rect, &rect, CONTENT_BOX );
+		if( rect.w <= 0 || rect.h <= 0 ) {
+			return -2;
 		}
 	}
-	return LCUIScreen_InvalidateArea( area );
+	return LCUIScreen_InvalidateArea( &rect );
 }
 
-static int Widget_DrawBackground( LCUI_Widget widget, LCUI_Rect area )
+static int Widget_DrawBackground( LCUI_Widget widget, LCUI_Rect *area )
 {
-	LCUI_Graph graph;
-	Widget_QuoteInnerGraph( widget, &graph, &area );
 	// ...
 	return 0;
 }
 
-/* 获取部件内部区域的位图 */
-int Widget_QuoteInnerGraph( LCUI_Widget widget, LCUI_Graph *graph, LCUI_Rect *r )
-{
-	LCUI_Rect rect;
-	if( !r ) {
-		rect.x = 0;
-		rect.y = 0;
-		rect.w = widget->base.outerWidth;
-		rect.h = widget->base.outerHeight;
-	} else {
-		rect.x = r->x;
-		rect.y = r->y;
-		rect.w = r->w;
-		rect.h = r->h;
-		LCUIRect_ValidateArea( &rect, Size(widget->base.outerWidth, widget->base.outerHeight) );
-	}
-
-	//rect.x += BoxShadow_GetBoxX( &widget->style.shadow );
-	//rect.y += BoxShadow_GetBoxY( &widget->style.shadow );
-	return Graph_Quote( graph, &widget->glayer.graph, rect );
-}
 
 /** 
  * 执行重绘部件前的一些任务
@@ -187,21 +196,117 @@ LCUI_BOOL Widget_BeginPaint( LCUI_Widget widget, LCUI_Rect *area )
 		DEBUG_MSG("quit1\n");
 		return FALSE;
 	}
-	Widget_DrawBackground( widget, *area );
+	//Widget_DrawShadow( widget, area );
+	//Widget_DrawBackground( widget, area );
 	DEBUG_MSG("quit2\n");
 	return TRUE;
 }
 
-/** 执行重绘部件后的一些任务 */
+/** 
+ * 执行重绘部件后的一些任务
+ * @param[in] widget	已被重绘的部件
+ * @param[in] area	被重绘的区域
+ */
 void Widget_EndPaint( LCUI_Widget widget, LCUI_Rect *area )
 {
-	LCUI_Graph graph;
-	Widget_QuoteInnerGraph( widget, &graph, area );
-	//Graph_DrawBorderEx( &graph, widget->border, *area );
-	Widget_ValidateArea( widget, area );
-	Widget_PushAreaToScreen( widget, area );
+	//Widget_DrawBorder( &graph, area );
+	Widget_ValidateArea( widget, area, BORDER_BOX );
+	Widget_PushAreaToScreen( widget, area, BORDER_BOX );
 }
 
+/** 
+ * 将转换部件中的矩形区域转换成指定范围框内有效的矩形区域
+ * @param[in]	w		目标部件
+ * @param[in]	in_rect		相对于部件呈现框的矩形区域
+ * @param[out]	out_rect	转换后的区域
+ * @param[in]	box_type	转换后的区域所处的范围框
+ */
+int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
+			LCUI_Rect *out_rect, int box_type )
+{
+	LCUI_Rect rect;
+	if( !in_rect ) {
+		return -1;
+	}
+	switch( box_type ) {
+	case CONTENT_BOX:
+		rect = w->base.box.content;
+		break;
+	case PADDING_BOX:
+		rect = w->base.box.content;
+		rect.x -= w->base.padding.left;
+		rect.y -= w->base.padding.top;
+		rect.w += w->base.padding.left;
+		rect.w += w->base.padding.right;
+		rect.h += w->base.padding.top;
+		rect.h += w->base.padding.bottom;
+		break;
+	case BORDER_BOX:
+		rect = w->base.box.border;
+		break;
+	case GRAPH_BOX:
+	default:
+		return -2;
+	}
+	/* 转换成相对坐标 */
+	rect.x -= w->base.box.graph.x;
+	rect.y -= w->base.box.graph.y;
+	out_rect->x = in_rect->x - rect.x;
+	out_rect->y = in_rect->y - rect.y;
+	out_rect->w = in_rect->w;
+	out_rect->h = in_rect->h;
+	/* 裁剪掉超出范围的区域 */
+	if( out_rect->x < 0 ) {
+		out_rect->w += out_rect->x;
+		out_rect->x = 0;
+	}
+	if( out_rect->y < 0 ) {
+		out_rect->h += out_rect->y;
+		out_rect->y = 0;
+	}
+	if( out_rect->x + out_rect->w > rect.w ) {
+		out_rect->w = rect.w - out_rect->x;
+	}
+	if( out_rect->y + out_rect->h > rect.h ) {
+		out_rect->h = rect.h - out_rect->y;
+	}
+	return 0;
+}
+
+/** 
+ * 引用部件中指定区域内的图形
+ * @param[in]	w		目标部件
+ * @param[out]	graph		图形的引用
+ * @param[in]	rect		被引用的区域
+ * @param[in]	box_type	该区域相对于何种范围框进行定位
+ */
+void Widget_QuoteGraph(	LCUI_Widget w, LCUI_Graph *graph, 
+			LCUI_Rect *rect, int box_type )
+{
+	LCUI_Rect r;
+	Widget_AdjustArea( w, rect, &r, box_type );
+	switch( box_type ) {
+	case CONTENT_BOX:
+		r.x += (w->base.box.content.x - w->base.box.graph.x);
+		r.y += (w->base.box.content.y - w->base.box.graph.y);
+		break;
+	case BORDER_BOX:
+		r.x += (w->base.box.border.x - w->base.box.graph.x);
+		r.y += (w->base.box.border.y - w->base.box.graph.y);
+		break;
+	case PADDING_BOX:
+		r.x += (w->base.box.border.x - w->base.box.graph.x);
+		r.y += (w->base.box.border.y - w->base.box.graph.y);
+		r.x += w->base.padding.left;
+		r.y += w->base.padding.top;
+		break;
+	case GRAPH_BOX:
+	default: break;
+	}
+	Graph_Quote( &w->graph, graph, r );
+}
+
+/** 默认的绘制函数 */
 static void Widget_OnPaint( LCUI_Widget widget )
 {
 	LCUI_Rect rect;
@@ -213,8 +318,7 @@ static void Widget_OnPaint( LCUI_Widget widget )
 /** 更新各个部件的无效区域中的内容 */
 int LCUIWidget_ProcInvalidArea(void)
 {
-	int count = 0, old_num;
-	LCUI_Widget widget;
+	LCUI_Widget w;
 	LCUI_RBTreeNode *node;
 	LCUI_WidgetClass *wc;
 
@@ -222,36 +326,24 @@ int LCUIWidget_ProcInvalidArea(void)
 		return -1;
 	}
 	node = RBTree_First( &widget_paint_tree );
-	if( !node ) {
-		return 0;
-	}
 	DEBUG_MSG("tip1\n");
+	/** 遍历当前需要更新位图缓存的部件 */
 	while( node ) {
-		widget = (LCUI_Widget)node->key;
-		wc = LCUIWidget_GetClass( widget->type_name );
-		DEBUG_MSG("widget, %p, dirty rect num: %d\n", widget, widget->dirty_rects.used_node_num);
-		old_num = widget->dirty_rects.used_node_num;
-		/* 有多少个脏矩形就调用多少次部件的绘制函数 */
-		while( widget->dirty_rects.used_node_num > 0 ) {
-			wc->methods.paint ? wc->methods.paint(widget):FALSE;
-			if( widget->dirty_rects.used_node_num >= old_num ) {
-				++count;
-				if( count > 10 ) {
-					break;
-				}
-			} else {
-				count = 0;
-				widget->dirty_rects.used_node_num;
-			}
+		w = (LCUI_Widget)node->data;
+		/** 过滤掉不可见或无独立缓存的部件 */
+		if( !w->style.visible || Graph_IsValid(&w->graph) ) {
+			node = RBTree_Next( node );
+			continue;
 		}
-		if( count > 0 ) {
-			_DEBUG_MSG("warning: widget(%s): "
-				"the dirty-rect of does not reduce.\n",
-				widget->type_name);
+		wc = LCUIWidget_GetClass( w->type_name );
+		DEBUG_MSG("widget, %p, dirty rect num: %d\n", widget, widget->dirty_rects.used_node_num);
+		/* 有多少个脏矩形就调用多少次部件的绘制函数 */
+		while( w->dirty_rects.used_node_num > 0 ) {
+			wc->methods.paint ? wc->methods.paint(w) : Widget_OnPaint(w);
 		}
 		node = RBTree_Next( node );
-		RBTree_Erase( &widget_paint_tree, (int)widget );
+		RBTree_CustomErase( &widget_paint_tree, w );
 	}
 	DEBUG_MSG("tip2\n");
-	return 1;
+	return 0;
 }

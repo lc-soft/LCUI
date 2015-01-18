@@ -71,8 +71,9 @@ enum LCUI_WidgetBorderStyle {
 /** 框类型 */
 enum LCUI_WidgetBoxType {
 	CONTENT_BOX,	/**< 内容框 */
+	PADDING_BOX,	/**< 内边距框 */
 	BORDER_BOX,	/**< 边框盒 */
-	PADDING_BOX	/**< 内边距框 */
+	GRAPH_BOX	/**< 图形呈现框 */
 };
 
 typedef struct LCUI_WidgetBase {
