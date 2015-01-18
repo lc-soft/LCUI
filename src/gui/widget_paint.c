@@ -46,10 +46,17 @@ static LCUI_BOOL painter_is_active = FALSE;
 /** 记录需要进行绘制的部件 */
 static LCUI_RBTree widget_paint_tree;
 
+static int CompareWidget( void *data, const void *key )
+{
+	return data == key ? 0:(data > key ? 1:-1);
+}
+
 /** 初始化GUI部件绘制器 */
 void LCUIWidgetPainter_Init(void)
 {
 	RBTree_Init( &widget_paint_tree );
+	RBTree_SetDataNeedFree( &widget_paint_tree, FALSE );
+	RBTree_OnJudge( &widget_paint_tree, CompareWidget );
 	painter_is_active = TRUE;
 }
 
@@ -180,7 +187,6 @@ static int Widget_DrawBackground( LCUI_Widget widget, LCUI_Rect *area )
 	return 0;
 }
 
-
 /** 
  * 执行重绘部件前的一些任务
  * @param[in] widget 需要重绘的部件
@@ -278,30 +284,48 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
  * @param[in]	w		目标部件
  * @param[out]	graph		图形的引用
  * @param[in]	rect		被引用的区域
+ * @param[in]	rect		实际引用的区域，相对于被引用的区域
  * @param[in]	box_type	该区域相对于何种范围框进行定位
  */
-void Widget_QuoteGraph(	LCUI_Widget w, LCUI_Graph *graph, 
+int Widget_QuoteGraph(	LCUI_Widget w, LCUI_Graph *graph, 
 			LCUI_Rect *rect, int box_type )
 {
 	LCUI_Rect r;
-	Widget_AdjustArea( w, rect, &r, box_type );
-	switch( box_type ) {
-	case CONTENT_BOX:
-		r.x += (w->base.box.content.x - w->base.box.graph.x);
-		r.y += (w->base.box.content.y - w->base.box.graph.y);
-		break;
-	case BORDER_BOX:
-		r.x += (w->base.box.border.x - w->base.box.graph.x);
-		r.y += (w->base.box.border.y - w->base.box.graph.y);
-		break;
-	case PADDING_BOX:
-		r.x += (w->base.box.border.x - w->base.box.graph.x);
-		r.y += (w->base.box.border.y - w->base.box.graph.y);
-		r.x += w->base.padding.left;
-		r.y += w->base.padding.top;
-		break;
-	case GRAPH_BOX:
-	default: break;
+	r = *rect;
+	/* 从当前部件向上级部件遍历 */
+	while( w ) {
+		Widget_AdjustArea( w, &r, &r, box_type );
+		switch( box_type ) {
+		case CONTENT_BOX:
+			r.x += (w->base.box.content.x - w->base.box.graph.x);
+			r.y += (w->base.box.content.y - w->base.box.graph.y);
+			break;
+		case BORDER_BOX:
+			r.x += (w->base.box.border.x - w->base.box.graph.x);
+			r.y += (w->base.box.border.y - w->base.box.graph.y);
+			break;
+		case PADDING_BOX:
+			r.x += (w->base.box.border.x - w->base.box.graph.x);
+			r.y += (w->base.box.border.y - w->base.box.graph.y);
+			r.x += w->base.padding.left;
+			r.y += w->base.padding.top;
+			break;
+		case GRAPH_BOX:
+		default: break;
+		}
+		/* 若这级部件有单独位图缓存，则用它的 */
+		if( Graph_IsValid(&w->graph) ) {
+			break;
+		}
+		/* 不可见就不处理 */
+		if( !w->style.visible ) {
+			return -1;
+		}
+		/* 该部件在父部件的内容框中可见，所以参照物改为内容框 */
+		box_type = CONTENT_BOX;
+		r.x += w->base.box.graph.x;
+		r.y += w->base.box.graph.y;
+		w = w->parent;
 	}
 	Graph_Quote( &w->graph, graph, r );
 }
@@ -330,7 +354,7 @@ int LCUIWidget_ProcInvalidArea(void)
 	/** 遍历当前需要更新位图缓存的部件 */
 	while( node ) {
 		w = (LCUI_Widget)node->data;
-		/** 过滤掉不可见或无独立缓存的部件 */
+		/** 过滤掉不可见或无独立位图缓存的部件 */
 		if( !w->style.visible || Graph_IsValid(&w->graph) ) {
 			node = RBTree_Next( node );
 			continue;
