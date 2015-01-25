@@ -371,3 +371,71 @@ int LCUIWidget_ProcInvalidArea(void)
 	DEBUG_MSG("tip2\n");
 	return 0;
 }
+
+void render( LCUI_Widget w, LCUI_Rect *rect, LCUI_Graph *buffer )
+{
+	int i = LinkedList_GetTotal( &w->children_show );
+	LCUI_BOOL has_content_graph = FALSE, has_self_graph = FALSE,
+		  has_layer_graph = FALSE, is_cover_border = FALSE;
+	LCUI_Graph content_graph, self_graph, layer_graph;
+	
+	/* 若部件本身是透明的 */
+	if( w->style.opacity < 1.0 ) {
+		has_self_graph = TRUE;
+		has_content_graph = TRUE;
+		has_layer_graph = TRUE;
+	} else {
+		// 若使用了圆角边框，则判断当前脏矩形区域是否在圆角边框内
+		...
+		if( ... ) {
+			has_content_graph = TRUE;
+			is_cover_border = TRUE;
+		}
+	}
+	/* 如果需要缓存自身的位图 */
+	if( has_self_graph ) {
+		Graph_Init( &self_graph );
+		/* 有位图缓存则直接截取出来，否则绘制一次 */
+		if( Graph_IsValid(&w->graph) ) {
+			Graph_Cut( &w->graph, *rect, &self_graph );
+		} else {
+			...
+		}
+	} else {
+		/* 直接将部件绘制到目标位图缓存中 */
+		...
+	}
+	/* 若需要部件内容区的位图缓存 */
+	if( has_content_graph ) {
+		Graph_Init( &content_graph );
+		content_graph.color_type = COLOR_TYPE_ARGB;
+		Graph_Create( &content_graph, rect->w, rect->h );
+	}
+	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
+	while( i-- ) {
+		LCUI_Widget child;
+		child = (LCUI_Widget)LinkedList_Get( &w->children_show );
+		/* 为子部件准备相应的绘制区域、位图缓存 */
+		...
+		render( child, ..., ... );
+	}
+	/* 如果与圆角边框重叠，则裁剪掉边框外的内容 */
+	if( is_cover_border ) {
+		content_graph ...
+	}
+	/* 若需要绘制的是当前部件图层，则先混合部件自身位图和内容位图，得出当
+	 * 前部件的图层，然后将该图层混合到输出的位图中 
+	 */
+	if( has_layer_graph ) {
+		Graph_Init( &content_graph );
+		content_graph.color_type = COLOR_TYPE_ARGB;
+		Graph_Copy( &layer_graph, &self_graph );
+		Graph_Mix( &layer_graph, &connect_graph, ... );
+		layer_graph.alpha = (uchar_t)(255.0*w->style.opacity);
+		Graph_Mix( buffer, &layer_graph, ... );
+		return;
+	}
+	
+	/* 到这里，只需要将部件内容绘制上去 */
+	Graph_Mix( buffer, content_graph, ... );
+}
