@@ -372,13 +372,19 @@ int LCUIWidget_ProcInvalidArea(void)
 	return 0;
 }
 
-void render( LCUI_Widget w, LCUI_Rect *rect, LCUI_Graph *buffer )
+typedef struct LCUI_PaintContextRec_ {
+	LCUI_Rect rect;
+	LCUI_Graph canvas;
+} LCUI_PaintContextRec_, *LCUI_PaintContext;
+
+void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
-	int i = LinkedList_GetTotal( &w->children_show );
+	int i;
+	LCUI_Graph content_graph, self_graph, layer_graph;
 	LCUI_BOOL has_content_graph = FALSE, has_self_graph = FALSE,
 		  has_layer_graph = FALSE, is_cover_border = FALSE;
-	LCUI_Graph content_graph, self_graph, layer_graph;
-	
+	LCUI_PanitContextRec_ child_paint;
+
 	/* 若部件本身是透明的 */
 	if( w->style.opacity < 1.0 ) {
 		has_self_graph = TRUE;
@@ -405,19 +411,56 @@ void render( LCUI_Widget w, LCUI_Rect *rect, LCUI_Graph *buffer )
 		/* 直接将部件绘制到目标位图缓存中 */
 		...
 	}
+	/* 计算内容框相对于图层的坐标 */
+	content_left = w->base.box.content.x - w->base.box.graph.x;
+	content_top = w->base.box.content.y - w->base.box.graph.y;
+	/* 获取内容框 */
+	content_rect.x = content_left;
+	content_rect.y = content_top;
+	content_rect.height = w->base.box.content.width;
+	content_rect.height = w->base.box.content.height;
+	/* 获取内容框与脏矩形重叠的区域 */
+	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &content_rect );
+	/* 将换重叠区域的坐标转换为相对于脏矩形的坐标 */
+	content_rect.x -= paint->rect.x;
+	content_rect.y -= paint->rect.y;
 	/* 若需要部件内容区的位图缓存 */
 	if( has_content_graph ) {
 		Graph_Init( &content_graph );
 		content_graph.color_type = COLOR_TYPE_ARGB;
-		Graph_Create( &content_graph, rect->w, rect->h );
+		Graph_Create( &content_graph, content_rect.w, content_rect.h );
+	} else {
+		/* 引用该区域的位图，作为内容框的位图 */
+		Graph_Quote( &content_graph, &paint.canvas, &content_rect );
 	}
+	i = LinkedList_GetTotal( &w->children_show );
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
 	while( i-- ) {
 		LCUI_Widget child;
+		LCUI_Rect child_rect;
+		LCUI_BOOL has_overlay;
+
 		child = (LCUI_Widget)LinkedList_Get( &w->children_show );
-		/* 为子部件准备相应的绘制区域、位图缓存 */
-		...
-		render( child, ..., ... );
+		/* 将子部件的区域，由相对于内容框转换为相对于当前脏矩形 */
+		child_rect = child->base.box.graph;
+		child_rect.x += (content_left - paint->rect.x);
+		child_rect.y += (content_top - paint->rect.y);
+		/* 获取于内容框重叠的区域，作为子部件的绘制区域 */
+		has_overlay = LCUIRect_GetOverlayRect( 
+			&content_rect, &child_rect, &child_paint.rect 
+		);
+		/* 区域无效则不绘制 */
+		if( !has_overlay ) {
+			continue;
+		}
+		/* 将子部件绘制区域转换相对于当前部件内容框 */
+		child_rect.x = child_paint.rect.x - content_rect.x;
+		child_rect.y = child_paint.rect.y - content_rect.y;
+		child_rect.width = child_paint.rect.width;
+		child_rect.height = child_paint.rect.height;
+		/* 在内容位图中引用所需的区域，作为子部件的画布 */
+		Graph_Quote( &child_paint.canvas, &content_graph, &child_rect );
+		Widget_Render( child, &child_paint );
 	}
 	/* 如果与圆角边框重叠，则裁剪掉边框外的内容 */
 	if( is_cover_border ) {
@@ -427,15 +470,22 @@ void render( LCUI_Widget w, LCUI_Rect *rect, LCUI_Graph *buffer )
 	 * 前部件的图层，然后将该图层混合到输出的位图中 
 	 */
 	if( has_layer_graph ) {
-		Graph_Init( &content_graph );
-		content_graph.color_type = COLOR_TYPE_ARGB;
+		Graph_Init( &layer_graph );
+		layer_graph.color_type = COLOR_TYPE_ARGB;
 		Graph_Copy( &layer_graph, &self_graph );
-		Graph_Mix( &layer_graph, &connect_graph, ... );
+		Graph_Mix( 
+			&layer_graph, &connect_graph, 
+			Pos(content_rect.x, content_rect.y) 
+		);
 		layer_graph.alpha = (uchar_t)(255.0*w->style.opacity);
-		Graph_Mix( buffer, &layer_graph, ... );
+		Graph_Mix( &paint.canvas, &layer_graph, Pos(0,0) );
 		return;
 	}
 	
-	/* 到这里，只需要将部件内容绘制上去 */
-	Graph_Mix( buffer, content_graph, ... );
+	if( has_content_graph ) {
+		Graph_Mix( 
+			&paint.canvas, &content_graph, 
+			Pos(content_rect.x, content_rect.y) 
+		);
+	}
 }
