@@ -381,8 +381,9 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	int i;
 	LCUI_Graph content_graph, self_graph, layer_graph;
-	LCUI_BOOL has_content_graph = FALSE, has_self_graph = FALSE,
-		  has_layer_graph = FALSE, is_cover_border = FALSE;
+	LCUI_BOOL has_overlay, has_content_graph = FALSE, 
+		  has_self_graph = FALSE,has_layer_graph = FALSE, 
+		  is_cover_border = FALSE;
 	LCUI_PanitContextRec_ child_paint;
 
 	/* 若部件本身是透明的 */
@@ -403,13 +404,19 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		Graph_Init( &self_graph );
 		/* 有位图缓存则直接截取出来，否则绘制一次 */
 		if( Graph_IsValid(&w->graph) ) {
-			Graph_Cut( &w->graph, *rect, &self_graph );
+			Graph_Quote( &self_graph, &w->graph, paint->rect );
 		} else {
-			...
+			Graph_Create( &self_graph, paint->rect.width, paint->rect.height );
 		}
+		Widget_OnRender( w,  ... );
 	} else {
 		/* 直接将部件绘制到目标位图缓存中 */
-		...
+		if( Graph_IsValid(&w->graph) ) {
+			Graph_Quote( &self_graph, &w->graph, paint->rect );
+			Graph_Mix( &paint.canvas, &self_graph, Pos(0,0) );
+		} else {
+			Widget_OnRender( w,  ... );
+		}
 	}
 	/* 计算内容框相对于图层的坐标 */
 	content_left = w->base.box.content.x - w->base.box.graph.x;
@@ -420,7 +427,13 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	content_rect.height = w->base.box.content.width;
 	content_rect.height = w->base.box.content.height;
 	/* 获取内容框与脏矩形重叠的区域 */
-	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &content_rect );
+	has_overlay = LCUIRect_GetOverlayRect( 
+		&content_rect, &paint->rect, &content_rect 
+	);
+	/* 如果没有与内容框重叠 */
+	if( !has_overlay ) {
+		...
+	}
 	/* 将换重叠区域的坐标转换为相对于脏矩形的坐标 */
 	content_rect.x -= paint->rect.x;
 	content_rect.y -= paint->rect.y;
@@ -438,7 +451,6 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	while( i-- ) {
 		LCUI_Widget child;
 		LCUI_Rect child_rect;
-		LCUI_BOOL has_overlay;
 
 		child = (LCUI_Widget)LinkedList_Get( &w->children_show );
 		/* 将子部件的区域，由相对于内容框转换为相对于当前脏矩形 */
