@@ -188,39 +188,6 @@ static int Widget_DrawBackground( LCUI_Widget widget, LCUI_Rect *area )
 }
 
 /** 
- * 执行重绘部件前的一些任务
- * @param[in] widget 需要重绘的部件
- * @param[out] area 需要进行重绘的区域
- * @returns 正常返回TRUE，没有无效区域则返回FALSE
- */
-LCUI_BOOL Widget_BeginPaint( LCUI_Widget widget, LCUI_Rect *area )
-{
-	int ret;
-	DEBUG_MSG("enter\n");
-	ret = Widget_GetInvalidArea( widget, area );
-	if( ret != 0 ) {
-		DEBUG_MSG("quit1\n");
-		return FALSE;
-	}
-	//Widget_DrawShadow( widget, area );
-	//Widget_DrawBackground( widget, area );
-	DEBUG_MSG("quit2\n");
-	return TRUE;
-}
-
-/** 
- * 执行重绘部件后的一些任务
- * @param[in] widget	已被重绘的部件
- * @param[in] area	被重绘的区域
- */
-void Widget_EndPaint( LCUI_Widget widget, LCUI_Rect *area )
-{
-	//Widget_DrawBorder( &graph, area );
-	Widget_ValidateArea( widget, area, BORDER_BOX );
-	Widget_PushAreaToScreen( widget, area, BORDER_BOX );
-}
-
-/** 
  * 将转换部件中的矩形区域转换成指定范围框内有效的矩形区域
  * @param[in]	w		目标部件
  * @param[in]	in_rect		相对于部件呈现框的矩形区域
@@ -279,72 +246,14 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 	return 0;
 }
 
-/** 
- * 引用部件中指定区域内的图形
- * @param[in]	w		目标部件
- * @param[out]	graph		图形的引用
- * @param[in]	rect		被引用的区域
- * @param[in]	rect		实际引用的区域，相对于被引用的区域
- * @param[in]	box_type	该区域相对于何种范围框进行定位
- */
-int Widget_QuoteGraph(	LCUI_Widget w, LCUI_Graph *graph, 
-			LCUI_Rect *rect, int box_type )
-{
-	LCUI_Rect r;
-	r = *rect;
-	/* 从当前部件向上级部件遍历 */
-	while( w ) {
-		Widget_AdjustArea( w, &r, &r, box_type );
-		switch( box_type ) {
-		case CONTENT_BOX:
-			r.x += (w->base.box.content.x - w->base.box.graph.x);
-			r.y += (w->base.box.content.y - w->base.box.graph.y);
-			break;
-		case BORDER_BOX:
-			r.x += (w->base.box.border.x - w->base.box.graph.x);
-			r.y += (w->base.box.border.y - w->base.box.graph.y);
-			break;
-		case PADDING_BOX:
-			r.x += (w->base.box.border.x - w->base.box.graph.x);
-			r.y += (w->base.box.border.y - w->base.box.graph.y);
-			r.x += w->base.padding.left;
-			r.y += w->base.padding.top;
-			break;
-		case GRAPH_BOX:
-		default: break;
-		}
-		/* 若这级部件有单独位图缓存，则用它的 */
-		if( Graph_IsValid(&w->graph) ) {
-			break;
-		}
-		/* 不可见就不处理 */
-		if( !w->style.visible ) {
-			return -1;
-		}
-		/* 该部件在父部件的内容框中可见，所以参照物改为内容框 */
-		box_type = CONTENT_BOX;
-		r.x += w->base.box.graph.x;
-		r.y += w->base.box.graph.y;
-		w = w->parent;
-	}
-	Graph_Quote( &w->graph, graph, r );
-}
-
-/** 默认的绘制函数 */
-static void Widget_OnPaint( LCUI_Widget widget )
-{
-	LCUI_Rect rect;
-	Widget_BeginPaint( widget, &rect );
-	DEBUG_MSG("begin paint rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
-	Widget_EndPaint( widget, &rect );
-}
-
 /** 更新各个部件的无效区域中的内容 */
 int LCUIWidget_ProcInvalidArea(void)
 {
+	int n;
 	LCUI_Widget w;
+	LCUI_Rect *rect_ptr;
 	LCUI_RBTreeNode *node;
-	LCUI_WidgetClass *wc;
+	LCUI_PaintContextRec_ paint;
 
 	if( !painter_is_active ) {
 		return -1;
@@ -359,11 +268,18 @@ int LCUIWidget_ProcInvalidArea(void)
 			node = RBTree_Next( node );
 			continue;
 		}
-		wc = LCUIWidget_GetClass( w->type_name );
-		DEBUG_MSG("widget, %p, dirty rect num: %d\n", widget, widget->dirty_rects.used_node_num);
-		/* 有多少个脏矩形就调用多少次部件的绘制函数 */
-		while( w->dirty_rects.used_node_num > 0 ) {
-			wc->methods.paint ? wc->methods.paint(w) : Widget_OnPaint(w);
+		LinkedList_Goto( &w->dirty_rects, 0 );
+		n = LinkedList_GetTotal( &w->dirty_rects );
+		while( n-- ) {
+			rect_ptr = LinkedList_Get( &w->dirty_rects );
+			if( !rect_ptr ) {
+				break;
+			}
+			paint.rect = *rect_ptr;
+			LinkedList_Delete( &w->dirty_rects );
+			Graph_Quote( &paint.canvas, &w->graph, &paint.rect );
+			Widget_OnPaint( w, &paint );
+			Widget_PushAreaToScreen( w, &paint.rect, GRAPH_BOX );
 		}
 		node = RBTree_Next( node );
 		RBTree_CustomErase( &widget_paint_tree, w );
@@ -372,11 +288,28 @@ int LCUIWidget_ProcInvalidArea(void)
 	return 0;
 }
 
+/** 进行绘制时所需的上下文 */
 typedef struct LCUI_PaintContextRec_ {
-	LCUI_Rect rect;
-	LCUI_Graph canvas;
+	LCUI_Rect rect;			/**< 需要绘制的区域 */
+	LCUI_Graph canvas;		/**< 绘制后的位图缓存（可称为：画布） */
 } LCUI_PaintContextRec_, *LCUI_PaintContext;
 
+/** 当前部件的绘制函数 */
+static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
+{
+	LCUI_WidgetClass *wc;
+	//Widget_DrawShadow( ... );
+	//Widget_DrawBackground( ... );
+	//Widget_DrawBorder( ... );
+	wc = LCUIWidget_GetClass( w->type_name );
+	wc->methods.paint ? wc->methods.paint(w, paint): FALSE;
+}
+
+/**
+ * 渲染指定部件呈现的图形内容
+ * @param[in] w		部件
+ * @param[in] paint 	进行绘制时所需的上下文
+ */
 void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	int i;
@@ -384,38 +317,46 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_BOOL has_overlay, has_content_graph = FALSE, 
 		  has_self_graph = FALSE,has_layer_graph = FALSE, 
 		  is_cover_border = FALSE;
-	LCUI_PanitContextRec_ child_paint;
 
+	Graph_Init( &layer_graph );
+	Graph_Init( &self_graph );
+	Graph_Init( &content_graph );
 	/* 若部件本身是透明的 */
 	if( w->style.opacity < 1.0 ) {
 		has_self_graph = TRUE;
 		has_content_graph = TRUE;
 		has_layer_graph = TRUE;
 	} else {
-		// 若使用了圆角边框，则判断当前脏矩形区域是否在圆角边框内
+		/* 若使用了圆角边框，则判断当前脏矩形区域是否在圆角边框内
 		...
 		if( ... ) {
 			has_content_graph = TRUE;
 			is_cover_border = TRUE;
 		}
+		*/
 	}
 	/* 如果需要缓存自身的位图 */
 	if( has_self_graph ) {
-		Graph_Init( &self_graph );
+		LCUI_PanitContextRec_ self_paint;
 		/* 有位图缓存则直接截取出来，否则绘制一次 */
 		if( Graph_IsValid(&w->graph) ) {
 			Graph_Quote( &self_graph, &w->graph, paint->rect );
 		} else {
-			Graph_Create( &self_graph, paint->rect.width, paint->rect.height );
+			Graph_Create( 
+				&self_graph, 
+				paint->rect.width, paint->rect.height 
+			);
 		}
-		Widget_OnRender( w,  ... );
+		self_paint.canvas = self_graph;
+		self_paint.rect = rect;
+		Widget_OnPaint( w,  &self_paint );
 	} else {
 		/* 直接将部件绘制到目标位图缓存中 */
 		if( Graph_IsValid(&w->graph) ) {
 			Graph_Quote( &self_graph, &w->graph, paint->rect );
 			Graph_Mix( &paint.canvas, &self_graph, Pos(0,0) );
 		} else {
-			Widget_OnRender( w,  ... );
+			Widget_OnPaint( w, paint );
 		}
 	}
 	/* 计算内容框相对于图层的坐标 */
@@ -430,16 +371,15 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	has_overlay = LCUIRect_GetOverlayRect( 
 		&content_rect, &paint->rect, &content_rect 
 	);
-	/* 如果没有与内容框重叠 */
+	/* 如果没有与内容框重叠，则跳过内容绘制 */
 	if( !has_overlay ) {
-		...
+		goto content_paint_done;
 	}
 	/* 将换重叠区域的坐标转换为相对于脏矩形的坐标 */
 	content_rect.x -= paint->rect.x;
 	content_rect.y -= paint->rect.y;
 	/* 若需要部件内容区的位图缓存 */
 	if( has_content_graph ) {
-		Graph_Init( &content_graph );
 		content_graph.color_type = COLOR_TYPE_ARGB;
 		Graph_Create( &content_graph, content_rect.w, content_rect.h );
 	} else {
@@ -451,8 +391,12 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	while( i-- ) {
 		LCUI_Widget child;
 		LCUI_Rect child_rect;
+		LCUI_PanitContextRec_ child_paint;
 
 		child = (LCUI_Widget)LinkedList_Get( &w->children_show );
+		if( !child->style.visible ) {
+			continue;
+		}
 		/* 将子部件的区域，由相对于内容框转换为相对于当前脏矩形 */
 		child_rect = child->base.box.graph;
 		child_rect.x += (content_left - paint->rect.x);
@@ -476,8 +420,11 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	}
 	/* 如果与圆角边框重叠，则裁剪掉边框外的内容 */
 	if( is_cover_border ) {
-		content_graph ...
+		/* content_graph ... */
 	}
+
+content_paint_done:
+
 	/* 若需要绘制的是当前部件图层，则先混合部件自身位图和内容位图，得出当
 	 * 前部件的图层，然后将该图层混合到输出的位图中 
 	 */
@@ -490,14 +437,16 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 			Pos(content_rect.x, content_rect.y) 
 		);
 		layer_graph.alpha = (uchar_t)(255.0*w->style.opacity);
-		Graph_Mix( &paint.canvas, &layer_graph, Pos(0,0) );
-		return;
-	}
-	
-	if( has_content_graph ) {
+		Graph_Mix( &paint.canvas, &layer_graph, 0, 0 );
+	} 
+	else if( has_content_graph ) {
 		Graph_Mix( 
 			&paint.canvas, &content_graph, 
-			Pos(content_rect.x, content_rect.y) 
+			content_rect.x, content_rect.y
 		);
 	}
+
+	Graph_Free( &layer_graph );
+	Graph_Free( &self_graph );
+	Graph_Free( &content_graph );
 }
