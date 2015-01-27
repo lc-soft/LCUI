@@ -47,7 +47,7 @@
 	&& b->y >= a->y && b->y + b->h <= a->y + a->h
 
 /* 将数值转换成LCUI_Rect型结构体 */
-LCUI_API LCUI_Rect Rect( int x, int y, int w, int h )
+LCUI_Rect Rect( int x, int y, int w, int h )
 {
 	LCUI_Rect r;
 	r.x = x;
@@ -58,7 +58,7 @@ LCUI_API LCUI_Rect Rect( int x, int y, int w, int h )
 }
 
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
-LCUI_API void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
+void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
 							LCUI_Rect *cut )
 {
 	cut->x = 0;
@@ -84,7 +84,7 @@ LCUI_API void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
 }
 
 /** 将矩形区域范围调整在容器有效范围内 */
-LCUI_API void LCUIRect_ValidateArea( LCUI_Rect *rect, LCUI_Size box_size )
+void LCUIRect_ValidateArea( LCUI_Rect *rect, LCUI_Size box_size )
 {
 	if( rect->x < 0 ) {
 		rect->width += rect->x;
@@ -112,7 +112,7 @@ LCUI_API void LCUIRect_ValidateArea( LCUI_Rect *rect, LCUI_Size box_size )
 }
 
 /** 检测矩形是否遮盖另一个矩形 */
-LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 )
+LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 )
 {
 	if( rect1.x > rect2.x ) {
 		if( rect2.x + rect2.w <= rect1.x ) {
@@ -137,10 +137,12 @@ LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 )
 
 /** 
  * 获取两个矩形中的重叠矩形
+ * @param[in] a		矩形A
+ * @param[in] b		矩形B
+ * @param[out] out	矩形A和B重叠处的矩形
  * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
-static LCUI_BOOL 
-LCUIRect_GetOverlayRect( LCUI_Rect *a, LCUI_Rect *b, LCUI_Rect *out )
+LCUI_BOOL LCUIRect_GetOverlayRect( LCUI_Rect *a, LCUI_Rect *b, LCUI_Rect *out )
 {
 	if( a->x > b->x ) {
 		out->x = a->x;
@@ -201,7 +203,7 @@ static void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b )
 	}
 }
 
-LCUI_API void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
+void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
 					LCUI_Rect rects[4] )
 {
 	rects[0].x = rect2->x;
@@ -226,7 +228,7 @@ LCUI_API void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 }
 
 /** 初始化脏矩形记录 */
-LCUI_API void DirtyRectList_Init( LCUI_DirtyRectList *list )
+void DirtyRectList_Init( LCUI_DirtyRectList *list )
 {
 	LinkedList_Init( list, sizeof(LCUI_Rect) );
 	LinkedList_SetDataMemReuse( list, TRUE );
@@ -234,13 +236,13 @@ LCUI_API void DirtyRectList_Init( LCUI_DirtyRectList *list )
 }
 
 /** 销毁脏矩形记录 */
-LCUI_API void DirtyRectList_Destroy( LCUI_DirtyRectList *list )
+void DirtyRectList_Destroy( LCUI_DirtyRectList *list )
 {
 	LinkedList_Destroy( list );
 }
 
 /** 添加一个脏矩形记录 */
-LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
+int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 {
 	int i, ret;
 	LCUI_Rect *p_rect, o_rect, tmp_rect[4];
@@ -303,7 +305,7 @@ LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 }
 
 /** 删除脏矩形 */
-LCUI_API int DirtyRectList_Delete( LCUI_DirtyRectList *list, LCUI_Rect *rect )
+int DirtyRectList_Delete( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 {
 	int i;
 	LCUI_Rect *p_rect, o_rect, tmp_rect[4];

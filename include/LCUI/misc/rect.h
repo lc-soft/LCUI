@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * rect.h -- Rectangle area handling
  * 
- * Copyright (C) 2012-2014 by
+ * Copyright (C) 2012-2015 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * rect.h -- 矩形区域处理
  *
- * 版权所有 (C) 2012-2014 归属于
+ * 版权所有 (C) 2012-2015 归属于
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -57,6 +57,16 @@ LCUI_API void LCUIRect_ValidateArea( LCUI_Rect *rect, LCUI_Size box_size );
 
 /** 检测矩形是否遮盖另一个矩形 */
 LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 );
+
+
+/** 
+ * 获取两个矩形中的重叠矩形
+ * @param[in] a		矩形A
+ * @param[in] b		矩形B
+ * @param[out] out	矩形A和B重叠处的矩形
+ * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
+ */
+LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect( LCUI_Rect *a, LCUI_Rect *b, LCUI_Rect *out );
 
 /** 
  * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形
