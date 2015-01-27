@@ -106,8 +106,8 @@ struct LCUI_WidgetFull {
 
 LCUI_END_HEADER
 
+#include <LCUI/gui/widget_paint.h>
 #include <LCUI/gui/widget_library.h>
 #include <LCUI/gui/widget_event.h>
-#include <LCUI/gui/widget_paint.h>
 
 #endif

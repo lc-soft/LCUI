@@ -43,12 +43,15 @@
 LCUI_BEGIN_HEADER
 
 typedef struct LCUI_WidgetClass {
-	char *name;				/**< 类名 */
+	char *name;	/**< 类名 */
 	struct {
-		void (*init)(LCUI_Widget);	/**< 构造函数 */
-		void (*destroy)(LCUI_Widget);	/**< 析构函数 */
-		void (*paint)(LCUI_Widget);	/**< 绘制函数 */
-	} methods;				/**< 该类部件的自定义方法集 */
+		/** 构造函数 */
+		void (*init)(LCUI_Widget);
+		/** 析构函数 */		
+		void (*destroy)(LCUI_Widget);
+		/** 绘制函数 */
+		void (*paint)(LCUI_Widget, LCUI_PaintContext);
+	} methods;	/**< 该类部件的自定义方法集 */
 	/** 部件任务处理器 */
 	void (*task_handler)(LCUI_Widget,LCUI_WidgetTask*);
 } LCUI_WidgetClass;
