@@ -246,6 +246,17 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 	return 0;
 }
 
+/** 当前部件的绘制函数 */
+static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
+{
+	LCUI_WidgetClass *wc;
+	//Widget_DrawShadow( ... );
+	//Widget_DrawBackground( ... );
+	//Widget_DrawBorder( ... );
+	wc = LCUIWidget_GetClass( w->type_name );
+	wc->methods.paint ? wc->methods.paint(w, paint): FALSE;
+}
+
 /** 更新各个部件的无效区域中的内容 */
 int LCUIWidget_ProcInvalidArea(void)
 {
@@ -271,13 +282,13 @@ int LCUIWidget_ProcInvalidArea(void)
 		LinkedList_Goto( &w->dirty_rects, 0 );
 		n = LinkedList_GetTotal( &w->dirty_rects );
 		while( n-- ) {
-			rect_ptr = LinkedList_Get( &w->dirty_rects );
+			rect_ptr = (LCUI_Rect*)LinkedList_Get( &w->dirty_rects );
 			if( !rect_ptr ) {
 				break;
 			}
 			paint.rect = *rect_ptr;
 			LinkedList_Delete( &w->dirty_rects );
-			Graph_Quote( &paint.canvas, &w->graph, &paint.rect );
+			Graph_Quote( &paint.canvas, &w->graph, paint.rect );
 			Widget_OnPaint( w, &paint );
 			Widget_PushAreaToScreen( w, &paint.rect, GRAPH_BOX );
 		}
@@ -288,23 +299,6 @@ int LCUIWidget_ProcInvalidArea(void)
 	return 0;
 }
 
-/** 进行绘制时所需的上下文 */
-typedef struct LCUI_PaintContextRec_ {
-	LCUI_Rect rect;			/**< 需要绘制的区域 */
-	LCUI_Graph canvas;		/**< 绘制后的位图缓存（可称为：画布） */
-} LCUI_PaintContextRec_, *LCUI_PaintContext;
-
-/** 当前部件的绘制函数 */
-static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
-{
-	LCUI_WidgetClass *wc;
-	//Widget_DrawShadow( ... );
-	//Widget_DrawBackground( ... );
-	//Widget_DrawBorder( ... );
-	wc = LCUIWidget_GetClass( w->type_name );
-	wc->methods.paint ? wc->methods.paint(w, paint): FALSE;
-}
-
 /**
  * 渲染指定部件呈现的图形内容
  * @param[in] w		部件
@@ -312,7 +306,8 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
  */
 void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
-	int i;
+	int i, content_left, content_top;
+	LCUI_Rect content_rect;
 	LCUI_Graph content_graph, self_graph, layer_graph;
 	LCUI_BOOL has_overlay, has_content_graph = FALSE, 
 		  has_self_graph = FALSE,has_layer_graph = FALSE, 
@@ -337,7 +332,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	}
 	/* 如果需要缓存自身的位图 */
 	if( has_self_graph ) {
-		LCUI_PanitContextRec_ self_paint;
+		LCUI_PaintContextRec_ self_paint;
 		/* 有位图缓存则直接截取出来，否则绘制一次 */
 		if( Graph_IsValid(&w->graph) ) {
 			Graph_Quote( &self_graph, &w->graph, paint->rect );
@@ -348,13 +343,13 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 			);
 		}
 		self_paint.canvas = self_graph;
-		self_paint.rect = rect;
+		self_paint.rect = paint->rect;
 		Widget_OnPaint( w,  &self_paint );
 	} else {
 		/* 直接将部件绘制到目标位图缓存中 */
 		if( Graph_IsValid(&w->graph) ) {
 			Graph_Quote( &self_graph, &w->graph, paint->rect );
-			Graph_Mix( &paint.canvas, &self_graph, Pos(0,0) );
+			Graph_Mix( &paint->canvas, &self_graph, Pos(0,0) );
 		} else {
 			Widget_OnPaint( w, paint );
 		}
@@ -384,14 +379,14 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		Graph_Create( &content_graph, content_rect.w, content_rect.h );
 	} else {
 		/* 引用该区域的位图，作为内容框的位图 */
-		Graph_Quote( &content_graph, &paint.canvas, &content_rect );
+		Graph_Quote( &content_graph, &paint->canvas, content_rect );
 	}
 	i = LinkedList_GetTotal( &w->children_show );
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
 	while( i-- ) {
 		LCUI_Widget child;
 		LCUI_Rect child_rect;
-		LCUI_PanitContextRec_ child_paint;
+		LCUI_PaintContextRec_ child_paint;
 
 		child = (LCUI_Widget)LinkedList_Get( &w->children_show );
 		if( !child->style.visible ) {
@@ -415,7 +410,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		child_rect.width = child_paint.rect.width;
 		child_rect.height = child_paint.rect.height;
 		/* 在内容位图中引用所需的区域，作为子部件的画布 */
-		Graph_Quote( &child_paint.canvas, &content_graph, &child_rect );
+		Graph_Quote( &child_paint.canvas, &content_graph, child_rect );
 		Widget_Render( child, &child_paint );
 	}
 	/* 如果与圆角边框重叠，则裁剪掉边框外的内容 */
@@ -433,16 +428,16 @@ content_paint_done:
 		layer_graph.color_type = COLOR_TYPE_ARGB;
 		Graph_Copy( &layer_graph, &self_graph );
 		Graph_Mix( 
-			&layer_graph, &connect_graph, 
+			&layer_graph, &content_graph, 
 			Pos(content_rect.x, content_rect.y) 
 		);
 		layer_graph.alpha = (uchar_t)(255.0*w->style.opacity);
-		Graph_Mix( &paint.canvas, &layer_graph, 0, 0 );
+		Graph_Mix( &paint->canvas, &layer_graph, Pos(0,0) );
 	} 
 	else if( has_content_graph ) {
 		Graph_Mix( 
-			&paint.canvas, &content_graph, 
-			content_rect.x, content_rect.y
+			&paint->canvas, &content_graph, 
+			Pos(content_rect.x, content_rect.y)
 		);
 	}
 
