@@ -649,4 +649,5 @@ void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color )
 void LCUIModule_Widget_Init(void)
 {
 	$(Init)(LCUIRootWidget);
+	LCUIWidget_Task_Init();
 }

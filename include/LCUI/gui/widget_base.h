@@ -69,12 +69,12 @@ enum LCUI_WidgetBorderStyle {
 };
 
 /** 框类型 */
-enum LCUI_WidgetBoxType {
+typedef enum LCUI_WidgetBoxType {
 	CONTENT_BOX,	/**< 内容框 */
 	PADDING_BOX,	/**< 内边距框 */
 	BORDER_BOX,	/**< 边框盒 */
 	GRAPH_BOX	/**< 图形呈现框 */
-};
+} LCUI_WidgetBoxType;
 
 typedef struct LCUI_WidgetBase {
 	int x, y;			/**< 部件当前坐标 */

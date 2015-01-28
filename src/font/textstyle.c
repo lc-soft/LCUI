@@ -449,7 +449,7 @@ scan_style_tag_data( const wchar_t *wstr, LCUI_StyleTagData *style_buff )
 	}
 
 	if( (q = scan_style_tag_by_name( p, "size", tag_data)) ) {
-		StyleVar size;
+		LCUI_StyleVar size;
 		if( ParseNumer( &size, tag_data ) != 0) {
 			return NULL;
 		}

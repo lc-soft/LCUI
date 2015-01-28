@@ -241,7 +241,7 @@ static int Win32Screen_Init( int w, int h, int mode )
 	/* 为帧缓冲的DC选择client_bitmap作为对象 */
 	SelectObject( hdc_framebuffer, client_bitmap );
 
-	Widget_Resize( LCUIRootWidget, screen_info.size );
+	Widget_Resize( LCUIRootWidget, screen_info.size.w, screen_info.size.h );
 	Widget_SetBackgroundColor( LCUIRootWidget, RGB(255,255,255) );
 	Widget_Show( LCUIRootWidget );
 
@@ -311,7 +311,7 @@ static int Win32Screen_SetMode( int w, int h, int mode )
 		return -2;
 	}
 	LCUIScreen_SetInfo( &screen_info );
-	Widget_Resize( LCUIRootWidget, screen_info.size );
+	Widget_Resize( LCUIRootWidget, w, h );
 
 	LCUIMutex_Unlock( &screen_mutex );
 	return 0;

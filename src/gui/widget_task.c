@@ -69,12 +69,12 @@ static void HandleMove( LCUI_Widget w, LCUI_WidgetTask *t )
 	LCUI_Rect rect;
 	rect = w->base.box.graph;
 	/* 标记移动后的区域 */
-	Widget_InvalidateArea( w->parent, &rect );
+	Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
 	/* 应用移动前的坐标 */
 	rect.x = t->move.x;
 	rect.y = t->move.y;
 	/* 标记移动前的区域 */
-	Widget_InvalidateArea( w->parent, &rect );
+	Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
 }
 
 /** 处理尺寸调整 */
@@ -162,6 +162,7 @@ static void MapTaskHandler(void)
 /** 初始化 LCUI 部件任务处理功能 */
 void LCUIWidget_Task_Init(void)
 {
+	_DEBUG_MSG("tip\n");
 	MapTaskHandler();
 }
 
@@ -209,7 +210,7 @@ static void Widget_ProcTask( LCUI_Widget w )
 			return;
 		}
 		for( i=0; i<WTT_USER; ++i ) {
-			if( buffer[i].is_valid ) {
+			if( buffer[i].is_valid && task_handlers[i] ) {
 				task_handlers[i](w, &buffer[i].data);
 			}
 		}

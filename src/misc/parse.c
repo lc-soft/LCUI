@@ -3,7 +3,7 @@
 #include <LCUI/misc/parse.h>
 
 /** 从字符串中解析出数字，支持的单位：点(pt)、像素(px)、百分比(%) */
-LCUI_BOOL ParseNumer( StyleVar *var, const char *str )
+LCUI_BOOL ParseNumer( LCUI_StyleVar *var, const char *str )
 {
 	const char *p = str;
 	char num[32], n = 0;
@@ -59,7 +59,7 @@ LCUI_BOOL ParseNumer( StyleVar *var, const char *str )
 }
 
 /** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A) */
-LCUI_BOOL ParseColor( StyleVar *var, const char *str )
+LCUI_BOOL ParseColor( LCUI_StyleVar *var, const char *str )
 {
 	return FALSE;
 }

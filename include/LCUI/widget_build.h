@@ -42,7 +42,14 @@
 #ifndef __LCUI_WIDGET_BUILD_H__
 #define __LCUI_WIDGET_BUILD_H__
 
+typedef struct LCUI_WidgetFull* LCUI_Widget;
+
 #include <LCUI/graph.h>
+#include <LCUI/gui/widget_base.h>
+#include <LCUI/gui/widget_task.h>
+#include <LCUI/gui/widget_paint.h>
+#include <LCUI/gui/widget_library.h>
+#include <LCUI/gui/widget_event.h>
 
 LCUI_BEGIN_HEADER
 
@@ -50,11 +57,11 @@ LCUI_BEGIN_HEADER
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
 	int position;			/**< 定位方式 */
-	int box_sizing;			/**< 以何种方式计算宽度和高度 */
 	int left, top;			/**< 水平、垂直坐标偏移量 */
 	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
 	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
 	LCUI_StyleVar x, y;		/**< 当前平面坐标 */
+	LCUI_WidgetBoxType box_sizing;	/**< 以何种方式计算宽度和高度 */
 
 	union {
 		LCUI_StyleVar w, width;	/**< 部件区域宽度 */
@@ -80,11 +87,6 @@ typedef struct LCUI_WidgetStyle {
 
 } LCUI_WidgetStyle;
 
-typedef struct LCUI_WidgetFull* LCUI_Widget;
-
-#include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_task.h>
-
 /** 部件结构（完整版） */
 struct LCUI_WidgetFull {
 	LCUI_WidgetBase		base;		/**< 基础数据及操作集 */
@@ -105,9 +107,5 @@ struct LCUI_WidgetFull {
 };
 
 LCUI_END_HEADER
-
-#include <LCUI/gui/widget_paint.h>
-#include <LCUI/gui/widget_library.h>
-#include <LCUI/gui/widget_event.h>
 
 #endif

@@ -98,7 +98,7 @@ typedef struct LCUI_StyleTagData_ {
 	LCUI_StyleTagID tag_id;
 	union {
 		LCUI_Color color;
-		StyleVar size;
+		LCUI_StyleVar size;
 	} style;
 } LCUI_StyleTagData;
 

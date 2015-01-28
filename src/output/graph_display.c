@@ -206,10 +206,7 @@ LCUI_API void LCUIScreen_UnlockGraphLayerTree( void )
 LCUI_API void LCUIScreen_GetRealGraph( LCUI_Rect rect, LCUI_Graph *graph )
 {
 	LCUI_Pos pos, cursor_pos;
-	/* 设置互斥锁，避免在统计图层时，图层记录被其它线程修改 */
-	LCUIScreen_LockGraphLayerTree();
-	GraphLayer_GetGraph( &LCUIRootWidget->glayer, graph, rect );
-	LCUIScreen_UnlockGraphLayerTree();
+	//...
 	/* 如果游标不可见 */
 	if ( !LCUICursor_IsVisible() ) {
 		return;

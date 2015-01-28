@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * event.c -- event processing module
  *
- * Copyright (C) 2012-2014 by
+ * Copyright (C) 2012-2015 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -42,9 +42,7 @@
 #define __IN_EVENT_SOURCE_FILE__
 
 #include <LCUI_Build.h>
-#include <LCUI/misc/rbtree.h>
-#include <LCUI/misc/linkedlist.h>
-#include <LCUI/kernel/event.h>
+#include <LCUI/LCUI.h>
 
 #include <string.h>
 

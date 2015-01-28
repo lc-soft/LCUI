@@ -275,7 +275,6 @@ int Surface_Paint( LCUI_Surface *surface, LCUI_Rect *p_rect )
 {
 	LCUI_Graph graph;
 	LCUI_Rect rect;
-	LCUI_GraphLayer *glayer;
 
 	if( !surface->target ) {
 		return -1;
@@ -288,10 +287,10 @@ int Surface_Paint( LCUI_Surface *surface, LCUI_Rect *p_rect )
 		p_rect = &rect;
 	}
 
-	glayer = &surface->target->glayer;
-	Graph_Quote( &graph, &surface->fb, *p_rect );
+	//glayer = &surface->target->glayer;
+	//Graph_Quote( &graph, &surface->fb, *p_rect );
 	Graph_FillColor( &graph, ARGB(255,255,255,255) );
-	GraphLayer_GetGraph( glayer, &graph, *p_rect );
+	//GraphLayer_GetGraph( glayer, &graph, *p_rect );
 	return 0;
 }
 
