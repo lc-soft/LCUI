@@ -47,6 +47,7 @@
 #include <LCUI/font.h>
 #include <LCUI/widget.h>
 #include <LCUI/input.h>
+#include <LCUI/surface.h>
 
 #include <time.h>
 
@@ -512,7 +513,8 @@ int LCUI_Init( int w, int h, int mode )
 	LCUIModule_TouchScreen_Init();
 	LCUIModule_Cursor_Init();
 	LCUIModule_Widget_Init();
-	LCUIModule_Video_Init(w, h, mode);
+	//LCUIModule_Video_Init(w, h, mode);
+	LCUISurface_Init();
 	/* 让鼠标游标居中显示 */
 	//LCUICursor_SetPos( LCUIScreen_GetCenter() );  
 	//LCUICursor_Show();

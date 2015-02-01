@@ -13,7 +13,8 @@
 static struct {
 	HINSTANCE main_instance;	/**< 主程序的资源句柄 */
 	HINSTANCE dll_instance;		/**< 动态库中的资源句柄 */
-} win32;
+	LCUI_Thread loop_thread;	/**< 消息循环线程 */
+} win32 = { NULL, NULL };
 
 static FrameCtrlCtx surface_framectrl_ctx;
 static LinkedList surface_list;
@@ -39,12 +40,12 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD reason, LPVOID unused )
 }
 
 /** 根据 hwnd 获取 Surface */
-static LCUI_Surface *GetSurfaceByHWND( HWND hwnd )
+static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 {
 	return NULL;
 }
 
-static LCUI_Surface *GetSurfaceByWidget( LCUI_Widget widget )
+static LCUI_Surface GetSurfaceByWidget( LCUI_Widget widget )
 {
 	return NULL;
 }
@@ -52,11 +53,12 @@ static LCUI_Surface *GetSurfaceByWidget( LCUI_Widget widget )
 static LRESULT CALLBACK 
 WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 {
-	LCUI_Surface *surface;
+	LCUI_Surface surface;
 	surface = GetSurfaceByHWND( hwnd);
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
+	_DEBUG_MSG("tip");
 	switch(msg) {
 	case WM_SETFOCUS:
 		break;
@@ -80,7 +82,7 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 }
 
 /** 删除 Surface */
-void Surface_Delete( LCUI_Surface *surface )
+void Surface_Delete( LCUI_Surface surface )
 {
 	int i, n;
 
@@ -99,10 +101,10 @@ void Surface_Delete( LCUI_Surface *surface )
 }
 
 /** 新建一个 Surface */
-LCUI_Surface *Surface_New(void)
+LCUI_Surface Surface_New(void)
 {
-	LCUI_Surface *surface;
-	surface = (LCUI_Surface*)malloc(sizeof(LCUI_Surface));
+	LCUI_Surface surface;
+	surface = (LCUI_Surface)malloc(sizeof(struct LCUI_SurfaceRec_));
 	surface->target = NULL;
 	surface->mode = RENDER_MODE_BIT_BLT;
 	surface->fb_hdc = NULL;
@@ -112,18 +114,18 @@ LCUI_Surface *Surface_New(void)
 	DirtyRectList_Init( &surface->rect );
 	/* 创建窗口 */
 	surface->hwnd = CreateWindow(
-			TEXT("LCUI"), TEXT ("LCUI Surface"),
+			TEXT("LCUI"), TEXT("LCUI Surface"),
 			WIN32_WINDOW_STYLE,
 			CW_USEDEFAULT, CW_USEDEFAULT,
 			0, 0,
 			NULL, NULL, win32.main_instance, NULL);
-
+	_DEBUG_MSG("surface->hwnd: %p\n", surface->hwnd);
 	LinkedList_Insert( &surface_list, surface );
 	return surface;
 }
 
 /** 标记 Surface 中的无效区域 */
-void Surface_InvalidateArea( LCUI_Surface *surface, LCUI_Rect *p_rect )
+void Surface_InvalidateArea( LCUI_Surface surface, LCUI_Rect *p_rect )
 {
 	LCUI_Rect rect;
 	if( !p_rect ) {
@@ -136,7 +138,7 @@ void Surface_InvalidateArea( LCUI_Surface *surface, LCUI_Rect *p_rect )
 	DirtyRectList_Add( &surface->rect, p_rect );
 }
 
-void Surface_Move( LCUI_Surface *surface, int x, int y )
+void Surface_Move( LCUI_Surface surface, int x, int y )
 {
 	x += GetSystemMetrics(SM_CXFIXEDFRAME);
 	y += GetSystemMetrics(SM_CYFIXEDFRAME);
@@ -144,7 +146,7 @@ void Surface_Move( LCUI_Surface *surface, int x, int y )
 			SWP_NOSIZE|SWP_NOZORDER );
 }
 
-void Surface_Resize( LCUI_Surface *surface, int w, int h )
+void Surface_Resize( LCUI_Surface surface, int w, int h )
 {
 	/* 调整位图缓存的尺寸 */
 	Graph_Create( &surface->fb, w, h );
@@ -162,27 +164,27 @@ void Surface_Resize( LCUI_Surface *surface, int w, int h )
 			SWP_NOMOVE|SWP_NOZORDER );
 }
 
-void Surface_Show( LCUI_Surface *surface )
+void Surface_Show( LCUI_Surface surface )
 {
 	ShowWindow( surface->hwnd, SW_SHOWNORMAL );
 }
 
-void Surface_Hide( LCUI_Surface *surface )
+void Surface_Hide( LCUI_Surface surface )
 {
 	ShowWindow( surface->hwnd, SW_HIDE );
 }
 
-void Surface_SetCaptionW( LCUI_Surface *surface, const wchar_t *str )
+void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 {
 	SetWindowText( surface->hwnd, str );
 }
 
-void Surface_SetOpacity( LCUI_Surface *surface, float opacity )
+void Surface_SetOpacity( LCUI_Surface surface, float opacity )
 {
 
 }
 
-void Surface_UnmapWidget( LCUI_Surface *surface )
+void Surface_UnmapWidget( LCUI_Surface surface )
 {
 	if( !surface->target ) {
 		return;
@@ -194,7 +196,7 @@ void Surface_UnmapWidget( LCUI_Surface *surface )
 static void
 OnWidgetShow( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 {
-	LCUI_Surface *surface;
+	LCUI_Surface surface;
 	surface = GetSurfaceByWidget( widget );
 	if( !surface ) {
 		return;
@@ -205,7 +207,7 @@ OnWidgetShow( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 static void
 OnWidgetHide( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 {
-	LCUI_Surface *surface;
+	LCUI_Surface surface;
 	surface = GetSurfaceByWidget( widget );
 	if( !surface ) {
 		return;
@@ -216,7 +218,7 @@ OnWidgetHide( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 static void
 OnWidgetDestroy( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 {
-	LCUI_Surface *surface;
+	LCUI_Surface surface;
 	surface = GetSurfaceByWidget( widget );
 	if( !surface ) {
 		return;
@@ -227,7 +229,7 @@ OnWidgetDestroy( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 static void
 OnWidgetResize( LCUI_Widget widget, LCUI_WidgetEvent *e )
 {
-	LCUI_Surface *surface;
+	LCUI_Surface surface;
 	surface = GetSurfaceByWidget( widget );
 	if( !surface ) {
 		return;
@@ -238,7 +240,7 @@ OnWidgetResize( LCUI_Widget widget, LCUI_WidgetEvent *e )
 static void
 OnWidgetOpacityChange( LCUI_Widget widget, LCUI_WidgetEvent *e )
 {
-	LCUI_Surface *surface;
+	LCUI_Surface surface;
 	surface = GetSurfaceByWidget( widget );
 	if( !surface ) {
 		return;
@@ -247,7 +249,7 @@ OnWidgetOpacityChange( LCUI_Widget widget, LCUI_WidgetEvent *e )
 }
 
 /** 将指定部件映射至 Surface 上 */
-void Surface_MapWidget( LCUI_Surface *surface, LCUI_Widget widget )
+void Surface_MapWidget( LCUI_Surface surface, LCUI_Widget widget )
 {
 	/**
 	 * 关联部件相关事件，以在部件变化时让 surface 做相应变化
@@ -258,7 +260,7 @@ void Surface_MapWidget( LCUI_Surface *surface, LCUI_Widget widget )
 }
 
 /** 设置 Surface 的渲染模式 */
-int Surface_SetRenderMode( LCUI_Surface *surface, int mode )
+int Surface_SetRenderMode( LCUI_Surface surface, int mode )
 {
 	switch(mode) {
 	case RENDER_MODE_BIT_BLT: 
@@ -271,7 +273,7 @@ int Surface_SetRenderMode( LCUI_Surface *surface, int mode )
 }
 
 /** 重绘Surface中的一块区域内的图像 */
-int Surface_Paint( LCUI_Surface *surface, LCUI_Rect *p_rect )
+int Surface_Paint( LCUI_Surface surface, LCUI_Rect *p_rect )
 {
 	LCUI_Graph graph;
 	LCUI_Rect rect;
@@ -295,7 +297,7 @@ int Surface_Paint( LCUI_Surface *surface, LCUI_Rect *p_rect )
 }
 
 /** 处理Surface的无效区域 */
-void Surface_ProcInvalidArea( LCUI_Surface *surface )
+void Surface_ProcInvalidArea( LCUI_Surface surface )
 {
 	int i, n;
 	LCUI_Rect *p_rect;
@@ -310,7 +312,7 @@ void Surface_ProcInvalidArea( LCUI_Surface *surface )
 }
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
-void Surface_Present( LCUI_Surface *surface )
+void Surface_Present( LCUI_Surface surface )
 {
 	HDC hdc_client;
 	RECT client_rect;
@@ -332,6 +334,19 @@ void Surface_Present( LCUI_Surface *surface )
 	default:break;
 	}
 	ValidateRect( surface->hwnd, NULL );
+}
+
+static void LCUISurface_Loop( void *unused )
+{
+	MSG msg;
+	_DEBUG_MSG("start\n");
+	while( GetMessage( &msg, NULL, 0, 0 ) ) {
+		_DEBUG_MSG("get message\n");
+		TranslateMessage( &msg );
+		DispatchMessage( &msg );
+	}
+	_DEBUG_MSG("quit\n");
+	LCUIThread_Exit(NULL);
 }
 
 int LCUISurface_Init(void)
@@ -360,6 +375,7 @@ int LCUISurface_Init(void)
 	/** 初始化 Surface 列表 */
 	LinkedList_Init( &surface_list, sizeof(LCUI_Surface) );
 	LinkedList_SetDataNeedFree( &surface_list, TRUE );
+	LCUIThread_Create( &win32.loop_thread, LCUISurface_Loop, NULL );
 	return 0;
 }
 
@@ -370,35 +386,27 @@ static void LCUISurface_ProcThread(void *unused)
 	 * 处理列表中每个 Surface 的更新，包括映射的被部件的消息处理、无效区
 	 * 域更新、Surface 内容的更新。
 	 */
-	int i, n;
-	LCUI_Surface *surface;
+	//int i, n;
+	//LCUI_Surface surface;
 
 	FrameControl_Init( &surface_framectrl_ctx );
 	FrameControl_SetMaxFPS( &surface_framectrl_ctx, 100 );
 	surface_proc_active = TRUE;
 
 	while( surface_proc_active ) {
-		LCUIWidget_ProcInvalidArea();
+		/*LCUIWidget_ProcInvalidArea();
 		LinkedList_Goto( &surface_list, 0 );
 		n = LinkedList_GetTotal( &surface_list );
 		for( i=0; i<n; ++i ) {
-			surface = (LCUI_Surface*)LinkedList_Get( &surface_list );
+			surface = (LCUI_Surface)LinkedList_Get( &surface_list );
 			Surface_ProcInvalidArea( surface );
 			Surface_Present( surface );
 			LinkedList_ToNext( &surface_list );
-		}
+		}*/
 		FrameControl_Remain( &surface_framectrl_ctx );
 	}
 
 	LCUIThread_Exit(NULL);
 }
 
-void LCUISurface_Loop(void)
-{
-	MSG msg;
-	while( GetMessage( &msg, NULL, 0, 0 ) ) {
-		TranslateMessage( &msg );
-		DispatchMessage( &msg );
-	}
-}
 #endif
