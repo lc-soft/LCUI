@@ -8,12 +8,15 @@
 #include <LCUI/surface.h>
 #include "resource.h"
 
-#define WIN32_WINDOW_STYLE (WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
+#define WIN32_WINDOW_STYLE	(WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
+#define MSG_SURFACE_CREATE	WM_USER+100
 
 static struct {
 	HINSTANCE main_instance;	/**< 主程序的资源句柄 */
 	HINSTANCE dll_instance;		/**< 动态库中的资源句柄 */
 	LCUI_Thread loop_thread;	/**< 消息循环线程 */
+	LCUI_Cond cond;			/**< 条件，指示消息循环是否已创建 */
+	LCUI_BOOL is_ready;		/**< 消息循环线程是否已准备好 */
 } win32 = { NULL, NULL };
 
 static FrameCtrlCtx surface_framectrl_ctx;
@@ -54,12 +57,13 @@ static LRESULT CALLBACK
 WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 {
 	LCUI_Surface surface;
+	_DEBUG_MSG("msg: %d\n", msg);
 	surface = GetSurfaceByHWND( hwnd);
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
 	_DEBUG_MSG("tip");
-	switch(msg) {
+	switch( msg ) {
 	case WM_SETFOCUS:
 		break;
 	case WM_KILLFOCUS:
@@ -112,15 +116,16 @@ LCUI_Surface Surface_New(void)
 	Graph_Init( &surface->fb );
 	surface->fb.color_type = COLOR_TYPE_ARGB;
 	DirtyRectList_Init( &surface->rect );
-	/* 创建窗口 */
-	surface->hwnd = CreateWindow(
-			TEXT("LCUI"), TEXT("LCUI Surface"),
-			WIN32_WINDOW_STYLE,
-			CW_USEDEFAULT, CW_USEDEFAULT,
-			0, 0,
-			NULL, NULL, win32.main_instance, NULL);
-	_DEBUG_MSG("surface->hwnd: %p\n", surface->hwnd);
+	surface->hwnd = NULL;
 	LinkedList_Insert( &surface_list, surface );
+	_DEBUG_MSG("wait...\n");
+	if( !win32.is_ready ) {
+		/* 等待 Surface 线程创建完 windows 消息队列 */
+		LCUICond_Wait( &win32.cond );
+	}
+	_DEBUG_MSG("ok\n");
+	/* 让 Surface 线程去完成 windows 窗口的创建 */
+	_DEBUG_MSG("post result: %d\n", PostThreadMessage( win32.loop_thread, MSG_SURFACE_CREATE, 0, (LPARAM)surface ));
 	return surface;
 }
 
@@ -158,6 +163,9 @@ void Surface_Resize( LCUI_Surface surface, int w, int h )
 	w += GetSystemMetrics(SM_CXFIXEDFRAME)*2;
 	h += GetSystemMetrics(SM_CYFIXEDFRAME)*2;
 	h += GetSystemMetrics(SM_CYCAPTION);
+	if( !surface->hwnd ) {
+		return;
+	}
 	SetWindowLong( surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE );
 	/* 调整窗口尺寸 */
 	SetWindowPos( surface->hwnd, HWND_NOTOPMOST, 0, 0, w, h,
@@ -166,11 +174,17 @@ void Surface_Resize( LCUI_Surface surface, int w, int h )
 
 void Surface_Show( LCUI_Surface surface )
 {
+	if( !surface->hwnd ) {
+		return;
+	}
 	ShowWindow( surface->hwnd, SW_SHOWNORMAL );
 }
 
 void Surface_Hide( LCUI_Surface surface )
 {
+	if( !surface->hwnd ) {
+		return;
+	}
 	ShowWindow( surface->hwnd, SW_HIDE );
 }
 
@@ -339,9 +353,26 @@ void Surface_Present( LCUI_Surface surface )
 static void LCUISurface_Loop( void *unused )
 {
 	MSG msg;
+	LCUI_Surface surface;
 	_DEBUG_MSG("start\n");
+	/* 创建消息队列 */
+	PeekMessage(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+	win32.is_ready = TRUE;
+	LCUICond_Broadcast( &win32.cond );
 	while( GetMessage( &msg, NULL, 0, 0 ) ) {
-		_DEBUG_MSG("get message\n");
+		if( msg.message == MSG_SURFACE_CREATE ) {
+			surface = (LCUI_Surface)msg.lParam;
+			/* 为 Surface 创建窗口 */
+			surface->hwnd = CreateWindow(
+				TEXT("LCUI"), TEXT("LCUI Surface"),
+				WIN32_WINDOW_STYLE,
+				CW_USEDEFAULT, CW_USEDEFAULT,
+				0, 0,
+				NULL, NULL, win32.main_instance, NULL
+			);
+			_DEBUG_MSG("surface->hwnd: %p\n", surface->hwnd);
+			continue;
+		}
 		TranslateMessage( &msg );
 		DispatchMessage( &msg );
 	}
@@ -375,6 +406,7 @@ int LCUISurface_Init(void)
 	/** 初始化 Surface 列表 */
 	LinkedList_Init( &surface_list, sizeof(LCUI_Surface) );
 	LinkedList_SetDataNeedFree( &surface_list, TRUE );
+	LCUICond_Init( &win32.cond );
 	LCUIThread_Create( &win32.loop_thread, LCUISurface_Loop, NULL );
 	return 0;
 }
