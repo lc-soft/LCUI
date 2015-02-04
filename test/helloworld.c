@@ -1,6 +1,8 @@
 ﻿#define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include <LCUI/widget.h>
+#include <LCUI/surface.h>
 
 #include <io.h>
 #include <fcntl.h>
@@ -19,9 +21,36 @@ static void InitConsoleWindow(void)
 	printf ("InitConsoleWindow OK!\n");
 }
 
+void onTimer( void *arg )
+{
+	_DEBUG_MSG("tip");
+	Surface_Show( arg );
+}
+
 int main( int argc, char **argv )
 {
+	LCUI_Surface s[4];
 	InitConsoleWindow();
-	LCUI_Init(0,0,0);
+	LCUI_Init(800,600,0);
+	s[0] = Surface_New();
+	s[1] = Surface_New();
+	s[2] = Surface_New();
+	s[3] = Surface_New();
+	Surface_Resize( s[0], 320, 240 );
+	Surface_Resize( s[1], 640, 480 );
+	Surface_Resize( s[2], 160, 120 );
+	Surface_Resize( s[3], 80, 60 );
+	Surface_Show( s[0] );
+	Surface_Show( s[1] );
+	Surface_Show( s[3] );
+	Surface_Move( s[0], 320, 240 );
+	Surface_Move( s[1], 640, 380 );
+	Surface_Move( s[2], 800, 380 );
+	Surface_Move( s[3], 1080, 600 );
+	Surface_SetCaptionW( s[0], L"第一个窗口" );
+	Surface_SetCaptionW( s[1], L"第二个窗口" );
+	Surface_SetCaptionW( s[2], L"第三个窗口" );
+	Surface_SetCaptionW( s[3], L"第四个窗口" );
+	LCUITimer_Set( 1000, onTimer, s[2], FALSE );
 	return LCUI_Main();
 }
