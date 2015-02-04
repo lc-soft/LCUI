@@ -1,5 +1,5 @@
 ﻿#include <LCUI_Build.h>
-
+#define __IN_SURFACE_SOURCE_FILE__
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -11,11 +11,45 @@
 #define WIN32_WINDOW_STYLE	(WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
 #define MSG_SURFACE_CREATE	WM_USER+100
 
+enum SurfaceTaskType {
+	TASK_MOVE,
+	TASK_RESIZE,
+	TASK_SHOW,
+	TASK_SET_CAPTION,
+	TASK_TOTAL_NUM
+};
+
+typedef struct LCUI_SurfaceTask {
+	LCUI_BOOL is_valid;
+	union {
+		struct {
+			int x, y;
+		};
+		struct {
+			int width, height;
+		};
+		LCUI_BOOL show;
+		wchar_t *caption;
+	};
+} LCUI_SurfaceTask;
+
+struct LCUI_SurfaceRec_ {
+	HWND hwnd;
+	int mode;
+	int w, h;
+	LCUI_Widget target;
+	LCUI_DirtyRectList rect;
+	HDC fb_hdc;
+	HBITMAP fb_bmp;
+	LCUI_Graph fb;
+	LCUI_SurfaceTask task_buffer[TASK_TOTAL_NUM];
+};
+
 static struct {
 	HINSTANCE main_instance;	/**< 主程序的资源句柄 */
 	HINSTANCE dll_instance;		/**< 动态库中的资源句柄 */
 	LCUI_Thread loop_thread;	/**< 消息循环线程 */
-	LCUI_Cond cond;			/**< 条件，指示消息循环是否已创建 */
+	LCUI_Cond cond;			/**< 条件，当消息循环已创建时成立 */
 	LCUI_BOOL is_ready;		/**< 消息循环线程是否已准备好 */
 } win32 = { NULL, NULL };
 
@@ -107,7 +141,9 @@ void Surface_Delete( LCUI_Surface surface )
 /** 新建一个 Surface */
 LCUI_Surface Surface_New(void)
 {
+	int i;
 	LCUI_Surface surface;
+
 	surface = (LCUI_Surface)malloc(sizeof(struct LCUI_SurfaceRec_));
 	surface->target = NULL;
 	surface->mode = RENDER_MODE_BIT_BLT;
@@ -117,6 +153,9 @@ LCUI_Surface Surface_New(void)
 	surface->fb.color_type = COLOR_TYPE_ARGB;
 	DirtyRectList_Init( &surface->rect );
 	surface->hwnd = NULL;
+	for( i=0; i<TASK_TOTAL_NUM; ++i ) {
+		surface->task_buffer[i].is_valid = FALSE;
+	}
 	LinkedList_Insert( &surface_list, surface );
 	_DEBUG_MSG("wait...\n");
 	if( !win32.is_ready ) {
@@ -147,8 +186,18 @@ void Surface_Move( LCUI_Surface surface, int x, int y )
 {
 	x += GetSystemMetrics(SM_CXFIXEDFRAME);
 	y += GetSystemMetrics(SM_CYFIXEDFRAME);
-	SetWindowPos( surface->hwnd, HWND_NOTOPMOST, x, y, 0, 0,
-			SWP_NOSIZE|SWP_NOZORDER );
+	/* 如果已经得到窗口句柄，则直接改变窗口位置 */
+	if( surface->hwnd ) {
+		SetWindowPos( 
+			surface->hwnd, HWND_NOTOPMOST,
+			x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER 
+		);
+		return;
+	}
+	/* 缓存任务，等获得窗口句柄后处理 */
+	surface->task_buffer[TASK_MOVE].x = x;
+	surface->task_buffer[TASK_MOVE].y = y;
+	surface->task_buffer[TASK_MOVE].is_valid = TRUE;
 }
 
 void Surface_Resize( LCUI_Surface surface, int w, int h )
@@ -163,34 +212,59 @@ void Surface_Resize( LCUI_Surface surface, int w, int h )
 	w += GetSystemMetrics(SM_CXFIXEDFRAME)*2;
 	h += GetSystemMetrics(SM_CYFIXEDFRAME)*2;
 	h += GetSystemMetrics(SM_CYCAPTION);
-	if( !surface->hwnd ) {
+	if( surface->hwnd ) {
+		SetWindowLong( 
+			surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE 
+		);
+		SetWindowPos( 
+			surface->hwnd, HWND_NOTOPMOST, 
+			0, 0, w, h, SWP_NOMOVE|SWP_NOZORDER
+		);
 		return;
 	}
-	SetWindowLong( surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE );
-	/* 调整窗口尺寸 */
-	SetWindowPos( surface->hwnd, HWND_NOTOPMOST, 0, 0, w, h,
-			SWP_NOMOVE|SWP_NOZORDER );
+	surface->task_buffer[TASK_RESIZE].width = w;
+	surface->task_buffer[TASK_RESIZE].height = h;
+	surface->task_buffer[TASK_RESIZE].is_valid = TRUE;
 }
 
 void Surface_Show( LCUI_Surface surface )
 {
-	if( !surface->hwnd ) {
+	if( surface->hwnd ) {
+		ShowWindow( surface->hwnd, SW_SHOWNORMAL );
 		return;
 	}
-	ShowWindow( surface->hwnd, SW_SHOWNORMAL );
+	surface->task_buffer[TASK_RESIZE].show = TRUE;
+	surface->task_buffer[TASK_RESIZE].is_valid = TRUE;
 }
 
 void Surface_Hide( LCUI_Surface surface )
 {
 	if( !surface->hwnd ) {
+		ShowWindow( surface->hwnd, SW_HIDE );
 		return;
 	}
-	ShowWindow( surface->hwnd, SW_HIDE );
+	surface->task_buffer[TASK_RESIZE].show = FALSE;
+	surface->task_buffer[TASK_RESIZE].is_valid = TRUE;
 }
 
 void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 {
-	SetWindowText( surface->hwnd, str );
+	int len;
+	wchar_t *caption;
+
+	if( surface->hwnd ) {
+		SetWindowText( surface->hwnd, str );
+		return;
+	}
+	len = wcslen(str);
+	caption = (wchar_t*)malloc(sizeof(wchar_t)*(len+1));
+	wcsncpy( caption, str, len );
+	if( surface->task_buffer[TASK_SET_CAPTION].is_valid 
+	 && surface->task_buffer[TASK_SET_CAPTION].caption ) {
+		free( surface->task_buffer[TASK_SET_CAPTION].caption );
+	}
+	surface->task_buffer[TASK_SET_CAPTION].caption = caption;
+	surface->task_buffer[TASK_SET_CAPTION].is_valid = TRUE;
 }
 
 void Surface_SetOpacity( LCUI_Surface surface, float opacity )
@@ -350,6 +424,55 @@ void Surface_Present( LCUI_Surface surface )
 	ValidateRect( surface->hwnd, NULL );
 }
 
+/** 处理当前缓存的任务 */
+static void Surface_ProcTaskBuffer( LCUI_Surface surface )
+{
+	LCUI_SurfaceTask *t, *t2;
+	t = &surface->task_buffer[TASK_MOVE];
+	t2 = &surface->task_buffer[TASK_RESIZE];
+	/* 此判断只是为了合并 移动 和 调整尺寸 操作 */
+	if( t->is_valid ) {
+		if( t2->is_valid ) {
+			SetWindowPos( surface->hwnd, HWND_NOTOPMOST, 
+				t->x, t->y, t2->width, t2->height, 
+				SWP_NOZORDER
+			);
+		} else {
+			SetWindowPos( surface->hwnd, HWND_NOTOPMOST, 
+				t->x, t->y, 0, 0, 
+				SWP_NOSIZE|SWP_NOZORDER
+			);
+		}
+	} else if( t2->is_valid ) {
+		SetWindowPos( surface->hwnd, HWND_NOTOPMOST, 
+			t->x, t->y, t2->width, t2->height,
+			SWP_NOMOVE|SWP_NOZORDER
+		);
+	}
+	t->is_valid = FALSE;
+	t2->is_valid = FALSE;
+
+	t = &surface->task_buffer[TASK_SET_CAPTION];
+	if( t->is_valid ) {
+		SetWindowText( surface->hwnd, t->caption );
+		if( t->caption ) {
+			free( t->caption );
+			t->caption = NULL;
+		}
+	}
+	t->is_valid = FALSE;
+
+	t = &surface->task_buffer[TASK_SHOW];
+	if( t->is_valid ) {
+		if( t->show ) {
+			ShowWindow( surface->hwnd, SW_SHOWNORMAL );
+		} else {
+			ShowWindow( surface->hwnd, SW_HIDE );
+		}
+	}
+	t->is_valid = FALSE;
+}
+
 static void LCUISurface_Loop( void *unused )
 {
 	MSG msg;
@@ -371,6 +494,7 @@ static void LCUISurface_Loop( void *unused )
 				NULL, NULL, win32.main_instance, NULL
 			);
 			_DEBUG_MSG("surface->hwnd: %p\n", surface->hwnd);
+			Surface_ProcTaskBuffer( surface );
 			continue;
 		}
 		TranslateMessage( &msg );

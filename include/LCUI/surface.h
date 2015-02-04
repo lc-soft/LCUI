@@ -4,16 +4,11 @@
 #define RENDER_MODE_BIT_BLT	0
 #define RENDER_MODE_STRETCH_BLT 1
 
-typedef struct LCUI_SurfaceRec_ {
-	HWND hwnd;
-	int mode;
-	int w, h;
-	LCUI_Widget target;
-	LCUI_DirtyRectList rect;
-	HDC fb_hdc;
-	HBITMAP fb_bmp;
-	LCUI_Graph fb;
-} *LCUI_Surface;
+#ifdef __IN_SURFACE_SOURCE_FILE__
+typedef struct LCUI_SurfaceRec_ * LCUI_Surface;
+#else
+typedef void* LCUI_Surface;
+#endif
 
 LCUI_API int LCUISurface_Init(void);
 
