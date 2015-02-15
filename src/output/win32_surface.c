@@ -51,11 +51,10 @@ static struct {
 	LCUI_Thread loop_thread;	/**< 消息循环线程 */
 	LCUI_Cond cond;			/**< 条件，当消息循环已创建时成立 */
 	LCUI_BOOL is_ready;		/**< 消息循环线程是否已准备好 */
+	LCUI_BOOL is_active;
+	LinkedList surface_list;
+	FrameCtrlCtx framectrl;
 } win32 = { NULL, NULL };
-
-static FrameCtrlCtx surface_framectrl_ctx;
-static LinkedList surface_list;
-static LCUI_BOOL surface_proc_active = FALSE;
 
 void Win32_LCUI_Init( HINSTANCE hInstance )
 {
@@ -91,12 +90,10 @@ static LRESULT CALLBACK
 WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 {
 	LCUI_Surface surface;
-	_DEBUG_MSG("msg: %d\n", msg);
 	surface = GetSurfaceByHWND( hwnd);
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
-	_DEBUG_MSG("tip");
 	switch( msg ) {
 	case WM_SETFOCUS:
 		break;
@@ -128,13 +125,13 @@ void Surface_Delete( LCUI_Surface surface )
 	surface->h = 0;
 	Graph_Free( &surface->fb );
 	DirtyRectList_Destroy( &surface->rect );
-	n = LinkedList_GetTotal( &surface_list );
+	n = LinkedList_GetTotal( &win32.surface_list );
 	for( i=0; i<n; ++i ) {
-		if( surface == LinkedList_Get(&surface_list) ) {
-			LinkedList_Delete( &surface_list );
+		if( surface == LinkedList_Get(&win32.surface_list) ) {
+			LinkedList_Delete( &win32.surface_list );
 			break;
 		}
-		LinkedList_ToNext( &surface_list );
+		LinkedList_ToNext( &win32.surface_list );
 	}
 }
 
@@ -156,15 +153,13 @@ LCUI_Surface Surface_New(void)
 	for( i=0; i<TASK_TOTAL_NUM; ++i ) {
 		surface->task_buffer[i].is_valid = FALSE;
 	}
-	LinkedList_Insert( &surface_list, surface );
-	_DEBUG_MSG("wait...\n");
+	LinkedList_Insert( &win32.surface_list, surface );
 	if( !win32.is_ready ) {
 		/* 等待 Surface 线程创建完 windows 消息队列 */
 		LCUICond_Wait( &win32.cond );
 	}
-	_DEBUG_MSG("ok\n");
 	/* 让 Surface 线程去完成 windows 窗口的创建 */
-	_DEBUG_MSG("post result: %d\n", PostThreadMessage( win32.loop_thread, MSG_SURFACE_CREATE, 0, (LPARAM)surface ));
+	PostThreadMessage( win32.loop_thread, MSG_SURFACE_CREATE, 0, (LPARAM)surface );
 	return surface;
 }
 
@@ -230,21 +225,23 @@ void Surface_Resize( LCUI_Surface surface, int w, int h )
 void Surface_Show( LCUI_Surface surface )
 {
 	if( surface->hwnd ) {
+		_DEBUG_MSG("surface: %p, direct show.\n", surface);
 		ShowWindow( surface->hwnd, SW_SHOWNORMAL );
 		return;
 	}
-	surface->task_buffer[TASK_RESIZE].show = TRUE;
-	surface->task_buffer[TASK_RESIZE].is_valid = TRUE;
+	_DEBUG_MSG("surface: %p, buffer show.\n", surface);
+	surface->task_buffer[TASK_SHOW].show = TRUE;
+	surface->task_buffer[TASK_SHOW].is_valid = TRUE;
 }
 
 void Surface_Hide( LCUI_Surface surface )
 {
-	if( !surface->hwnd ) {
+	if( surface->hwnd ) {
 		ShowWindow( surface->hwnd, SW_HIDE );
 		return;
 	}
-	surface->task_buffer[TASK_RESIZE].show = FALSE;
-	surface->task_buffer[TASK_RESIZE].is_valid = TRUE;
+	surface->task_buffer[TASK_SHOW].show = FALSE;
+	surface->task_buffer[TASK_SHOW].is_valid = TRUE;
 }
 
 void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
@@ -256,9 +253,10 @@ void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 		SetWindowText( surface->hwnd, str );
 		return;
 	}
-	len = wcslen(str);
-	caption = (wchar_t*)malloc(sizeof(wchar_t)*(len+1));
+	len = wcslen(str) + 1;
+	caption = (wchar_t*)malloc(sizeof(wchar_t)*len);
 	wcsncpy( caption, str, len );
+
 	if( surface->task_buffer[TASK_SET_CAPTION].is_valid 
 	 && surface->task_buffer[TASK_SET_CAPTION].caption ) {
 		free( surface->task_buffer[TASK_SET_CAPTION].caption );
@@ -428,6 +426,7 @@ void Surface_Present( LCUI_Surface surface )
 static void Surface_ProcTaskBuffer( LCUI_Surface surface )
 {
 	LCUI_SurfaceTask *t, *t2;
+	_DEBUG_MSG("surface: %p\n", surface);
 	t = &surface->task_buffer[TASK_MOVE];
 	t2 = &surface->task_buffer[TASK_RESIZE];
 	/* 此判断只是为了合并 移动 和 调整尺寸 操作 */
@@ -463,6 +462,8 @@ static void Surface_ProcTaskBuffer( LCUI_Surface surface )
 	t->is_valid = FALSE;
 
 	t = &surface->task_buffer[TASK_SHOW];
+	_DEBUG_MSG("surface: %p, hwnd: %p, is_valid: %d, show: %d\n",
+	 surface, surface->hwnd, t->is_valid, t->show);
 	if( t->is_valid ) {
 		if( t->show ) {
 			ShowWindow( surface->hwnd, SW_SHOWNORMAL );
@@ -493,7 +494,7 @@ static void LCUISurface_Loop( void *unused )
 				0, 0,
 				NULL, NULL, win32.main_instance, NULL
 			);
-			_DEBUG_MSG("surface->hwnd: %p\n", surface->hwnd);
+			_DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 			Surface_ProcTaskBuffer( surface );
 			continue;
 		}
@@ -517,7 +518,7 @@ int LCUISurface_Init(void)
 	/* 载入动态库里的图标 */
 	wndclass.hIcon         = LoadIcon( win32.dll_instance, MAKEINTRESOURCE(IDI_MAIN_ICON) );
 	wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
-	wndclass.hbrBackground = (HBRUSH) GetStockObject( WHITE_BRUSH );
+	wndclass.hbrBackground = (HBRUSH)GetStockObject( WHITE_BRUSH );
 	wndclass.lpszMenuName  = NULL;
 	wndclass.lpszClassName = szAppName;
 	
@@ -528,8 +529,10 @@ int LCUISurface_Init(void)
 		return -1;
 	}
 	/** 初始化 Surface 列表 */
-	LinkedList_Init( &surface_list, sizeof(LCUI_Surface) );
-	LinkedList_SetDataNeedFree( &surface_list, TRUE );
+	LinkedList_Init( &win32.surface_list, sizeof(LCUI_Surface) );
+	LinkedList_SetDataNeedFree( &win32.surface_list, TRUE );
+	win32.is_ready = FALSE;
+	win32.is_active = FALSE;
 	LCUICond_Init( &win32.cond );
 	LCUIThread_Create( &win32.loop_thread, LCUISurface_Loop, NULL );
 	return 0;
@@ -545,21 +548,21 @@ static void LCUISurface_ProcThread(void *unused)
 	//int i, n;
 	//LCUI_Surface surface;
 
-	FrameControl_Init( &surface_framectrl_ctx );
-	FrameControl_SetMaxFPS( &surface_framectrl_ctx, 100 );
-	surface_proc_active = TRUE;
+	FrameControl_Init( &win32.framectrl );
+	FrameControl_SetMaxFPS( &win32.framectrl, 100 );
+	win32.is_active = TRUE;
 
-	while( surface_proc_active ) {
+	while( win32.is_active ) {
 		/*LCUIWidget_ProcInvalidArea();
-		LinkedList_Goto( &surface_list, 0 );
-		n = LinkedList_GetTotal( &surface_list );
+		LinkedList_Goto( &win32.surface_list, 0 );
+		n = LinkedList_GetTotal( &win32.surface_list );
 		for( i=0; i<n; ++i ) {
-			surface = (LCUI_Surface)LinkedList_Get( &surface_list );
+			surface = (LCUI_Surface)LinkedList_Get( &win32.surface_list );
 			Surface_ProcInvalidArea( surface );
 			Surface_Present( surface );
-			LinkedList_ToNext( &surface_list );
+			LinkedList_ToNext( &win32.surface_list );
 		}*/
-		FrameControl_Remain( &surface_framectrl_ctx );
+		FrameControl_Remain( &win32.framectrl );
 	}
 
 	LCUIThread_Exit(NULL);
