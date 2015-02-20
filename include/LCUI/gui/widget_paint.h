@@ -49,19 +49,13 @@ typedef struct LCUI_PaintContextRec_ {
 	LCUI_Graph canvas;		/**< 绘制后的位图缓存（可称为：画布） */
 } LCUI_PaintContextRec_, *LCUI_PaintContext;
 
-/** 初始化GUI部件绘制器 */
-void LCUIWidgetPainter_Init(void);
-
-/** 销毁GUI部件绘制器 */
-void LCUIWidgetPainter_Destroy(void);
-
 /** 
  * 标记部件内的一个区域为无效的，以使其重绘
  * @param[in] w		目标部件
  * @param[in] r		矩形区域
  * @param[in] box_type	区域相对于何种框进行定位
  */
-LCUI_API int Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type );
+LCUI_API void Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type );
 
 /** 
  * 获取部件中的无效区域
@@ -78,27 +72,29 @@ LCUI_API int Widget_GetInvalidArea( LCUI_Widget widget, LCUI_Rect *area );
  */
 LCUI_API void Widget_ValidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type );
 
-/**  
- * 将部件的区域推送至屏幕
- * @param[in] w		目标部件
- * @param[in] r		矩形区域
- * @param[in] box_type	区域相对于何种框进行定位
+/**
+ * 处理部件及其子级部件中的脏矩形，并合并至一个记录中
+ * @param[in]	w	目标部件
+ * @param[out]	rlist	合并后的脏矩形记录
  */
-LCUI_API int Widget_PushAreaToScreen( LCUI_Widget w, LCUI_Rect *r, int box_type );
+LCUI_API int Widget_ProcInvalidArea( LCUI_Widget w, LCUI_DirtyRectList *rlist );
 
 /** 
- * 执行重绘部件前的一些任务
- * @param[in] widget 需要重绘的部件
- * @param[out] area 需要进行重绘的区域
- * @returns 正常返回TRUE，没有无效区域则返回FALSE
+ * 将转换部件中的矩形区域转换成指定范围框内有效的矩形区域
+ * @param[in]	w		目标部件
+ * @param[in]	in_rect		相对于部件呈现框的矩形区域
+ * @param[out]	out_rect	转换后的区域
+ * @param[in]	box_type	转换后的区域所处的范围框
  */
-LCUI_API LCUI_BOOL Widget_BeginPaint( LCUI_Widget widget, LCUI_Rect *area );
+LCUI_API int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
+				LCUI_Rect *out_rect, int box_type );
 
-/** 执行重绘部件后的一些任务 */
-LCUI_API void Widget_EndPaint( LCUI_Widget widget, LCUI_Rect *area );
-
-/** 更新各个部件的无效区域中的内容 */
-int LCUIWidget_ProcInvalidArea(void);
+/**
+ * 渲染指定部件呈现的图形内容
+ * @param[in] w		部件
+ * @param[in] paint 	进行绘制时所需的上下文
+ */
+LCUI_API void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint );
 
 LCUI_END_HEADER
 
