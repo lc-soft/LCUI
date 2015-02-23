@@ -29,6 +29,24 @@ LCUI_API void Surface_Show( LCUI_Surface surface );
 LCUI_API void Surface_Hide( LCUI_Surface surface );
 
 /** 设置 Surface 的渲染模式 */
-int Surface_SetRenderMode( LCUI_Surface surface, int mode );
+LCUI_API void Surface_SetRenderMode( LCUI_Surface surface, int mode );
+
+/** 
+ * 准备绘制 Surface 中的内容
+ * @param[in] surface	目标 surface
+ * @param[in] rect	需进行绘制的区域，若为NULL，则绘制整个 surface
+ * @return		返回绘制上下文句柄
+ */
+LCUI_API LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect );
+
+/** 
+ * 结束对 Surface 的绘制操作
+ * @param[in] surface	目标 surface
+ * @param[in] paint_ctx	绘制上下文句柄
+ */
+LCUI_API void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx );
+
+/** 将帧缓存中的数据呈现至Surface的窗口内 */
+LCUI_API void Surface_Present( LCUI_Surface surface );
 
 #endif

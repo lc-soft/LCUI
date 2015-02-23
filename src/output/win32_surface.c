@@ -1,4 +1,43 @@
-﻿#include <LCUI_Build.h>
+﻿/* ***************************************************************************
+ * win32_surface.c -- surface support for win32 platform.
+ * 
+ * Copyright (C) 2014-2015 by Liu Chao <lc-soft@live.cn>
+ * 
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ * 
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ * 
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *  
+ * The LCUI project is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ * 
+ * You should have received a copy of the GPLv2 along with this file. It is 
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ***************************************************************************/
+ 
+/* ****************************************************************************
+ * win32_surface.c -- win32平台的 surface 功能支持。
+ *
+ * 版权所有 (C) 2014-2015 归属于 刘超 <lc-soft@live.cn>
+ * 
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ * 
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ * 
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * ***************************************************************************/
+
+#include <LCUI_Build.h>
 #define __IN_SURFACE_SOURCE_FILE__
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
@@ -37,8 +76,6 @@ struct LCUI_SurfaceRec_ {
 	HWND hwnd;
 	int mode;
 	int w, h;
-	LCUI_Widget target;
-	LCUI_DirtyRectList rect;
 	HDC fb_hdc;
 	HBITMAP fb_bmp;
 	LCUI_Graph fb;
@@ -51,10 +88,9 @@ static struct {
 	LCUI_Thread loop_thread;	/**< 消息循环线程 */
 	LCUI_Cond cond;			/**< 条件，当消息循环已创建时成立 */
 	LCUI_BOOL is_ready;		/**< 消息循环线程是否已准备好 */
-	LCUI_BOOL is_active;
 	LinkedList surface_list;
 	FrameCtrlCtx framectrl;
-} win32 = { NULL, NULL };
+} win32;
 
 void Win32_LCUI_Init( HINSTANCE hInstance )
 {
@@ -124,14 +160,13 @@ void Surface_Delete( LCUI_Surface surface )
 	surface->w = 0;
 	surface->h = 0;
 	Graph_Free( &surface->fb );
-	DirtyRectList_Destroy( &surface->rect );
 	n = LinkedList_GetTotal( &win32.surface_list );
 	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &win32.surface_list, i );
 		if( surface == LinkedList_Get(&win32.surface_list) ) {
 			LinkedList_Delete( &win32.surface_list );
 			break;
 		}
-		LinkedList_ToNext( &win32.surface_list );
 	}
 }
 
@@ -142,13 +177,11 @@ LCUI_Surface Surface_New(void)
 	LCUI_Surface surface;
 
 	surface = (LCUI_Surface)malloc(sizeof(struct LCUI_SurfaceRec_));
-	surface->target = NULL;
 	surface->mode = RENDER_MODE_BIT_BLT;
 	surface->fb_hdc = NULL;
 	surface->fb_bmp = NULL;
 	Graph_Init( &surface->fb );
 	surface->fb.color_type = COLOR_TYPE_ARGB;
-	DirtyRectList_Init( &surface->rect );
 	surface->hwnd = NULL;
 	for( i=0; i<TASK_TOTAL_NUM; ++i ) {
 		surface->task_buffer[i].is_valid = FALSE;
@@ -161,20 +194,6 @@ LCUI_Surface Surface_New(void)
 	/* 让 Surface 线程去完成 windows 窗口的创建 */
 	PostThreadMessage( win32.loop_thread, MSG_SURFACE_CREATE, 0, (LPARAM)surface );
 	return surface;
-}
-
-/** 标记 Surface 中的无效区域 */
-void Surface_InvalidateArea( LCUI_Surface surface, LCUI_Rect *p_rect )
-{
-	LCUI_Rect rect;
-	if( !p_rect ) {
-		rect.x = 0;
-		rect.y = 0;
-		rect.w = surface->w;
-		rect.h = surface->h;
-		p_rect = &rect;
-	}
-	DirtyRectList_Add( &surface->rect, p_rect );
 }
 
 void Surface_Move( LCUI_Surface surface, int x, int y )
@@ -202,7 +221,6 @@ void Surface_Resize( LCUI_Surface surface, int w, int h )
 	surface->w = w;
 	surface->h = h;
 	// surface->fb_bmp
-	Surface_InvalidateArea( surface, NULL );
 	/* 加上窗口边框的尺寸 */
 	w += GetSystemMetrics(SM_CXFIXEDFRAME)*2;
 	h += GetSystemMetrics(SM_CYFIXEDFRAME)*2;
@@ -270,15 +288,6 @@ void Surface_SetOpacity( LCUI_Surface surface, float opacity )
 
 }
 
-void Surface_UnmapWidget( LCUI_Surface surface )
-{
-	if( !surface->target ) {
-		return;
-	}
-	Surface_InvalidateArea( surface, NULL );
-	surface->target = NULL;
-}
-
 static void
 OnWidgetShow( LCUI_Widget widget, LCUI_WidgetEvent *unused )
 {
@@ -334,67 +343,34 @@ OnWidgetOpacityChange( LCUI_Widget widget, LCUI_WidgetEvent *e )
 	Surface_SetOpacity( surface, 1.0 );
 }
 
-/** 将指定部件映射至 Surface 上 */
-void Surface_MapWidget( LCUI_Surface surface, LCUI_Widget widget )
-{
-	/**
-	 * 关联部件相关事件，以在部件变化时让 surface 做相应变化
-	 */
-	/*解除与之前映射的部件的关系 */
-	Surface_UnmapWidget( surface );
-	surface->target = widget;
-}
-
 /** 设置 Surface 的渲染模式 */
-int Surface_SetRenderMode( LCUI_Surface surface, int mode )
+void Surface_SetRenderMode( LCUI_Surface surface, int mode )
 {
-	switch(mode) {
-	case RENDER_MODE_BIT_BLT: 
-	case RENDER_MODE_STRETCH_BLT:
-		surface->mode = mode;
-		break;
-	default: return -1;
-	}
-	return 0;
+	surface->mode = mode;
 }
 
-/** 重绘Surface中的一块区域内的图像 */
-int Surface_Paint( LCUI_Surface surface, LCUI_Rect *p_rect )
+/** 
+ * 准备绘制 Surface 中的内容
+ * @param[in] surface	目标 surface
+ * @param[in] rect	需进行绘制的区域，若为NULL，则绘制整个 surface
+ * @return		返回绘制上下文句柄
+ */
+LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 {
-	LCUI_Graph graph;
-	LCUI_Rect rect;
-
-	if( !surface->target ) {
-		return -1;
-	}
-	if( !p_rect ) {
-		rect.x = 0;
-		rect.y = 0;
-		rect.w = surface->w;
-		rect.h = surface->h;
-		p_rect = &rect;
-	}
-
-	//glayer = &surface->target->glayer;
-	//Graph_Quote( &graph, &surface->fb, *p_rect );
-	Graph_FillColor( &graph, ARGB(255,255,255,255) );
-	//GraphLayer_GetGraph( glayer, &graph, *p_rect );
-	return 0;
+	LCUI_PaintContext paint;
+	paint = (LCUI_PaintContext)malloc(sizeof(LCUI_PaintContextRec_));
+	Graph_Quote( &paint->canvas, &surface->fb, *rect );
+	return paint;
 }
 
-/** 处理Surface的无效区域 */
-void Surface_ProcInvalidArea( LCUI_Surface surface )
+/** 
+ * 结束对 Surface 的绘制操作
+ * @param[in] surface	目标 surface
+ * @param[in] paint_ctx	绘制上下文句柄
+ */
+void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 {
-	int i, n;
-	LCUI_Rect *p_rect;
-
-	n = LinkedList_GetTotal( &surface->rect );
-	LinkedList_Goto( &surface->rect, 0 );
-	for( i=0; i<n; ++i ) {
-		p_rect = (LCUI_Rect*)LinkedList_Get( &surface->rect );
-		Surface_Paint( surface, p_rect );
-		LinkedList_Delete( &surface->rect );
-	}
+	free( paint_ctx );
 }
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
@@ -532,40 +508,9 @@ int LCUISurface_Init(void)
 	LinkedList_Init( &win32.surface_list, sizeof(LCUI_Surface) );
 	LinkedList_SetDataNeedFree( &win32.surface_list, TRUE );
 	win32.is_ready = FALSE;
-	win32.is_active = FALSE;
 	LCUICond_Init( &win32.cond );
 	LCUIThread_Create( &win32.loop_thread, LCUISurface_Loop, NULL );
 	return 0;
-}
-
-/** Surface 处理线程 */
-static void LCUISurface_ProcThread(void *unused)
-{
-	/*
-	 * 处理列表中每个 Surface 的更新，包括映射的被部件的消息处理、无效区
-	 * 域更新、Surface 内容的更新。
-	 */
-	//int i, n;
-	//LCUI_Surface surface;
-
-	FrameControl_Init( &win32.framectrl );
-	FrameControl_SetMaxFPS( &win32.framectrl, 100 );
-	win32.is_active = TRUE;
-
-	while( win32.is_active ) {
-		/*LCUIWidget_ProcInvalidArea();
-		LinkedList_Goto( &win32.surface_list, 0 );
-		n = LinkedList_GetTotal( &win32.surface_list );
-		for( i=0; i<n; ++i ) {
-			surface = (LCUI_Surface)LinkedList_Get( &win32.surface_list );
-			Surface_ProcInvalidArea( surface );
-			Surface_Present( surface );
-			LinkedList_ToNext( &win32.surface_list );
-		}*/
-		FrameControl_Remain( &win32.framectrl );
-	}
-
-	LCUIThread_Exit(NULL);
 }
 
 #endif
