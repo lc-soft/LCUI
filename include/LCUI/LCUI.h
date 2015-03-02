@@ -61,11 +61,8 @@
 #define TRUE 1
 #endif
 
-/* 触屏校准后的文件 */
-#define LCUI_CALIBFILE "/mnt/Data/LC-SOFT/pointercal"
-
 LCUI_BEGIN_HEADER
-	
+
 typedef unsigned int uint_t;
 typedef unsigned long int LCUI_ID;
 typedef unsigned char LCUI_BOOL;
@@ -102,35 +99,25 @@ typedef union LCUI_ARGB8888_ {
 		uchar_t alpha;
 	};
 } LCUI_ARGB, LCUI_ARGB8888, LCUI_Color;
-/*----------- END -----------*/
 
-/*------- 二维坐标 --------*/
 typedef struct LCUI_Pos_ {
 	int x, y;
 } LCUI_Pos;
-/*--------- END -----------*/
 
-/*---------- 尺寸 -----------*/
 typedef struct LCUI_Size_ {
 	int w, h;
 } LCUI_Size;
-/*---------- END ------------*/
 
-/*---------------- 字符串 ----------------*/
 typedef struct LCUI_String_ {
 	char   *string; /* 字符串内容 */
 	uint_t length;	/* 长度 */
 } LCUI_String;
-/*----------------- END -----------------*/
 
-/*---------- 宽字符串 ----------*/
 typedef struct LCUI_WString_ {
 	wchar_t *string;
 	uint_t length;
 } LCUI_WString;
-/*------------ END ------------*/
 
-/*------------- 区域数据 -------------*/
 typedef struct LCUI_Rect_ {
 	int x, y;
 	union {
@@ -155,27 +142,23 @@ typedef struct LCUI_Rect2_ {
 		int bottom, b;
 	};
 } LCUI_Rect2;
-/*--------------- END ----------------*/
 
-/*---------------------------- 图形数据 -------------------------------*/
 typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
 	int x, y;			/**< 源图形中的引用区域所在的坐标 */
 	int w, h;			/**< 图形的尺寸 */
 	int color_type;			/**< 色彩类型 */
 	uchar_t *palette;		/**< 调色板 */
-	uchar_t	alpha;			/**< 全局透明度 */
+	uchar_t alpha;			/**< 全局透明度 */
 	LCUI_BOOL quote;		/**< 标志，指示是否引用了另一图形 */
 	LCUI_Graph *src;		/**< 所引用的源图形 */
 	/** 像素数据缓存区 */
 	union {
-		uchar_t *bytes;	
+		uchar_t *bytes;
 		LCUI_ARGB *argb;
 	};
 	size_t mem_size;		/**< 像素数据缓冲区大小 */
-
 };
-/*------------------------------ END ---------------------------------*/
 
 LCUI_END_HEADER
 
@@ -229,7 +212,7 @@ WinMain (
 	TCHAR *p_cmd_line, *cmdline_buff;
 	TCHAR *token = NULL, *next_token = NULL;
 	TCHAR **argv = NULL;
-	
+
 	Win32_LCUI_Init( hInstance );
 	/* 获取命令行 */
 	p_cmd_line = GetCommandLine();
