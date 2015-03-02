@@ -75,8 +75,8 @@ int LCUIDisplay_GetFPS(void)
 	return FrameControl_GetFPS( display.fc_ctx );
 }
 
-/** 更新屏幕内的图形显示 */
-static void LCUIDisplay_Update( void *unused )
+/** 更新各种图形元素的显示 */
+static void LCUIDisplay_Update(void)
 {
 	int i, n, j, m;
 	LCUI_Rect *p_rect;
@@ -84,6 +84,35 @@ static void LCUIDisplay_Update( void *unused )
 	LCUI_DirtyRectList rlist;
 	LCUI_PaintContext paint;
 
+	n = LinkedList_GetTotal( &display.surface_list );
+	/* 遍历当前的 surface 记录列表 */
+	for( i=0; i<n; ++i ) {
+		p_sr = (SurfaceRecord*)
+		LinkedList_Get( &display.surface_list );
+		if( !p_sr->widget || !p_sr->surface ) {
+			continue;
+		}
+		/* 收集无效区域记录 */
+		Widget_ProcInvalidArea( p_sr->widget, &rlist );
+		m = LinkedList_GetTotal( &rlist );
+		LinkedList_Goto( &rlist, 0 );
+		/* 在 surface 上逐个重绘无效区域 */
+		for( j=0; j<m; ++j ) {
+			p_rect = (LCUI_Rect*)LinkedList_Get( &rlist );
+			paint = Surface_BeginPaint( p_sr->surface, p_rect );
+			Widget_Render( p_sr->widget, paint );
+			Surface_EndPaint( p_sr->surface, paint );
+			Surface_Present( p_sr->surface );
+			LinkedList_Delete( &rlist );
+		}
+	}
+
+	LinkedList_Destroy( &rlist );
+}
+
+/** LCUI的图形显示处理线程 */
+static void LCUIDisplayThread( void *unused )
+{
 	DirtyRectList_Init( &rlist );
 	/* 初始化帧数控制 */
 	FrameControl_Init( &display.fc_ctx );
@@ -92,28 +121,7 @@ static void LCUIDisplay_Update( void *unused )
 		LCUICursor_UpdatePos();		/* 更新鼠标位置 */
 		LCUIWidget_Task_Step();		/* 处理所有部件任务 */
 		LCUIWidget_Event_Step();	/* 派发所有事件 */
-		n = LinkedList_GetTotal( &display.surface_list );
-		/* 遍历当前的 surface 记录列表 */
-		for( i=0; i<n; ++i ) {
-			p_sr = (SurfaceRecord*)
-			LinkedList_Get( &display.surface_list );
-			if( !p_sr->widget || !p_sr->surface ) {
-				continue;
-			}
-			/* 收集无效区域记录 */
-			Widget_ProcInvalidArea( p_sr->widget, &rlist );
-			m = LinkedList_GetTotal( &rlist );
-			LinkedList_Goto( &rlist, 0 );
-			/* 在 surface 上逐个重绘无效区域 */
-			for( j=0; j<m; ++j ) {
-				p_rect = (LCUI_Rect*)LinkedList_Get( &rlist );
-				paint = Surface_BeginPaint( p_sr->surface, p_rect );
-				Widget_Render( p_sr->widget, paint );
-				Surface_EndPaint( p_sr->surface, paint );
-				Surface_Present( p_sr->surface );
-				LinkedList_Delete( &rlist );
-			}
-		}
+		LCUIDisplay_Update();
 		/* 让本帧停留一段时间 */
 		FrameControl_Remain( &display.fc_ctx );
 	}
@@ -128,7 +136,7 @@ int LCUIModule_Video_Init( int w, int h, int mode )
 	}
 	display.is_working = TRUE;
 	LinkedList_Init( &display.surface_list, sizeof(SurfaceRecord) );
-	return LCUIThread_Create( &display.thread, LCUIDisplay_Update, NULL );
+	return LCUIThread_Create( &display.thread, LCUIDisplayThread, NULL );
 }
 
 /** 停用图形输出模块 */
