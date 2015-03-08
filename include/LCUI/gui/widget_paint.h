@@ -43,12 +43,6 @@
 
 LCUI_BEGIN_HEADER
 
-/** 进行绘制时所需的上下文 */
-typedef struct LCUI_PaintContextRec_ {
-	LCUI_Rect rect;			/**< 需要绘制的区域 */
-	LCUI_Graph canvas;		/**< 绘制后的位图缓存（可称为：画布） */
-} LCUI_PaintContextRec_, *LCUI_PaintContext;
-
 /** 
  * 标记部件内的一个区域为无效的，以使其重绘
  * @param[in] w		目标部件

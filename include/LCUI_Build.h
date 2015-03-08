@@ -59,13 +59,6 @@
 #  endif
 #endif /* compiler */
 
-enum LCUIMode {
-	LCUI_MODE_AUTO,		/**< 自动模式，LCUI初始化时会自动选择一个模式 */
-	LCUI_MODE_WINDOWED,	/**< 全屏模式，使用整个屏幕进行图形显示 */
-	LCUI_MODE_FULLSCREEN,	/**< 窗口模式，LCUI的图形将输出至系统创建的窗口内 */
-	LCUI_MODE_GUI		/**< GUI模式，结合操作系统现有GUI系统，实现图形界面 */
-};
-
 #ifdef DEBUG
 #define DEBUG_MSG _DEBUG_MSG
 #else

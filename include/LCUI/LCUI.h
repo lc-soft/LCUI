@@ -69,7 +69,6 @@ typedef unsigned char LCUI_BOOL;
 typedef unsigned char uchar_t;
 typedef void (*CallBackFunc)(void*,void*);
 
-/*--------- 色彩值 ----------*/
 typedef union LCUI_RGB565_ {
 	short unsigned int value;
 	struct {
@@ -109,8 +108,8 @@ typedef struct LCUI_Size_ {
 } LCUI_Size;
 
 typedef struct LCUI_String_ {
-	char   *string; /* 字符串内容 */
-	uint_t length;	/* 长度 */
+	char   *string;
+	uint_t length;
 } LCUI_String;
 
 typedef struct LCUI_WString_ {
@@ -159,6 +158,12 @@ struct LCUI_Graph_ {
 	};
 	size_t mem_size;		/**< 像素数据缓冲区大小 */
 };
+
+/** 进行绘制时所需的上下文 */
+typedef struct LCUI_PaintContextRec_ {
+	LCUI_Rect rect;			/**< 需要绘制的区域 */
+	LCUI_Graph canvas;		/**< 绘制后的位图缓存（可称为：画布） */
+} LCUI_PaintContextRec_, *LCUI_PaintContext;
 
 LCUI_END_HEADER
 
