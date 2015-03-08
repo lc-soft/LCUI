@@ -62,9 +62,11 @@ struct FrameControlContext {
 	int64_t prev_fps_update_time;
 };
 
-/** 初始化帧数控制 */
-void FrameControl_Init( FrameCtrlCtx ctx )
+/** 新建帧数控制实例 */
+FrameCtrlCtx FrameControl_Create( void )
 {
+	FrameCtrlCtx ctx;
+	ctx = (FrameCtrlCtx)malloc(sizeof(struct FrameControlContext));
 	ctx->temp_fps = 0;
 	ctx->current_fps = 0;
 	ctx->pause_time = 0;
@@ -73,6 +75,15 @@ void FrameControl_Init( FrameCtrlCtx ctx )
 	ctx->prev_fps_update_time = LCUI_GetTickCount();
 	LCUICond_Init( &ctx->wait_continue );
 	LCUICond_Init( &ctx->wait_pause );
+	return ctx;
+}
+
+/** 销毁帧数控制相关资源 */
+void FrameControl_Destroy( FrameCtrlCtx ctx )
+{
+	LCUICond_Destroy( &ctx->wait_continue );
+	LCUICond_Destroy( &ctx->wait_pause );
+	free( ctx );
 }
 
 /** 设置最大FPS（帧数/秒） */

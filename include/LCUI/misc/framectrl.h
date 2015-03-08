@@ -51,8 +51,12 @@ typedef struct FrameControlContext* FrameCtrlCtx;
 typedef void* FrameCtrlCtx;
 #endif
 
-/** 初始化帧数控制 */
-LCUI_API void FrameControl_Init( FrameCtrlCtx ctx );
+/** 新建帧数控制实例 */
+LCUI_API FrameCtrlCtx FrameControl_Create( void );
+
+/** 销毁帧数控制相关资源 */
+LCUI_API void FrameControl_Destroy( FrameCtrlCtx ctx );
+
 
 /** 设置最大FPS（帧数/秒） */
 LCUI_API void FrameControl_SetMaxFPS( FrameCtrlCtx ctx, unsigned int fps );
