@@ -36,7 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
-#define DEBUG
+//#define DEBUG
 #define __IN_MAIN_SOURCE_FILE__
 
 #include <LCUI_Build.h>
@@ -464,7 +464,7 @@ static void LCUI_ShowCopyrightText(void)
 {
 	printf(
 	"============| LCUI v%s |============\n"
-	"Copyright (C) 2012-2014 Liu Chao.\n"
+	"Copyright (C) 2012-2015 Liu Chao.\n"
 	"Licensed under GPLv2.\n"
 	"Report bugs to <lc-soft@live.cn>.\n"
 	"Project Homepage: www.lcui.org.\n"
@@ -483,6 +483,9 @@ LCUI_BOOL LCUI_IsActive(void)
 /** 检测当前是否在主线程上 */
 LCUI_BOOL LCUI_IsOnMainLoop(void)
 {
+	if( !MainApp.loop ) {
+		return FALSE;
+	}
 	return (MainApp.loop->tid == LCUIThread_SelfID());
 }
 
@@ -513,7 +516,7 @@ int LCUI_Init( int w, int h, int mode )
 	LCUIModule_TouchScreen_Init();
 	LCUIModule_Cursor_Init();
 	LCUIModule_Widget_Init();
-	//LCUIModule_Video_Init(w, h, mode);
+	LCUIModule_Video_Init();
 	LCUISurface_Init();
 	/* 让鼠标游标居中显示 */
 	//LCUICursor_SetPos( LCUIScreen_GetCenter() );  
