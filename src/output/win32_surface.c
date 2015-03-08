@@ -153,19 +153,9 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 /** 删除 Surface */
 void Surface_Delete( LCUI_Surface surface )
 {
-	int i, n;
-
 	surface->w = 0;
 	surface->h = 0;
 	Graph_Free( &surface->fb );
-	n = LinkedList_GetTotal( &win32.surface_list );
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &win32.surface_list, i );
-		if( surface == LinkedList_Get(&win32.surface_list) ) {
-			LinkedList_Delete( &win32.surface_list );
-			break;
-		}
-	}
 }
 
 /** 新建一个 Surface */
@@ -184,7 +174,6 @@ LCUI_Surface Surface_New(void)
 	for( i=0; i<TASK_TOTAL_NUM; ++i ) {
 		surface->task_buffer[i].is_valid = FALSE;
 	}
-	LinkedList_Insert( &win32.surface_list, surface );
 	if( !win32.is_ready ) {
 		/* 等待 Surface 线程创建完 windows 消息队列 */
 		LCUICond_Wait( &win32.cond );
@@ -388,10 +377,10 @@ void Surface_Present( LCUI_Surface surface )
 			surface->w, surface->h, SRCCOPY );
 		break;
        case RENDER_MODE_BIT_BLT:
+       default:
 		BitBlt( hdc_client, 0, 0, surface->w, surface->h,
 			surface->fb_hdc, 0, 0, SRCCOPY );
 		break;
-	default:break;
 	}
 	ValidateRect( surface->hwnd, NULL );
 }
@@ -465,8 +454,8 @@ static void LCUISurface_Loop( void *unused )
 				TEXT("LCUI"), TEXT("LCUI Surface"),
 				WIN32_WINDOW_STYLE,
 				CW_USEDEFAULT, CW_USEDEFAULT,
-				0, 0,
-				NULL, NULL, win32.main_instance, NULL
+				0, 0, NULL, NULL, 
+				win32.main_instance, NULL
 			);
 			_DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 			Surface_ProcTaskBuffer( surface );
@@ -502,9 +491,6 @@ int LCUISurface_Init(void)
 		MessageBox( NULL, str, szAppName, MB_ICONERROR );
 		return -1;
 	}
-	/** 初始化 Surface 列表 */
-	LinkedList_Init( &win32.surface_list, sizeof(LCUI_Surface) );
-	LinkedList_SetDataNeedFree( &win32.surface_list, TRUE );
 	win32.is_ready = FALSE;
 	LCUICond_Init( &win32.cond );
 	LCUIThread_Create( &win32.loop_thread, LCUISurface_Loop, NULL );

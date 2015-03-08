@@ -3,6 +3,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/widget.h>
 #include <LCUI/surface.h>
+#include <LCUI/display.h>
 
 #include <io.h>
 #include <fcntl.h>
@@ -23,15 +24,18 @@ static void InitConsoleWindow(void)
 
 void onTimer( void *arg )
 {
-	_DEBUG_MSG("tip");
+	_DEBUG_MSG("tip\n");
 	Surface_Show( arg );
 }
 
 int main( int argc, char **argv )
 {
 	LCUI_Surface s[4];
+	LCUI_Widget widget[4];
+
 	InitConsoleWindow();
 	LCUI_Init(800,600,0);
+	
 	s[0] = Surface_New();
 	s[1] = Surface_New();
 	s[2] = Surface_New();
@@ -41,6 +45,7 @@ int main( int argc, char **argv )
 	Surface_Resize( s[2], 160, 120 );
 	Surface_Resize( s[3], 80, 60 );
 	Surface_Show( s[0] );
+	//LCUI_MSleep(500);
 	Surface_Show( s[1] );
 	Surface_Show( s[3] );
 	Surface_Move( s[0], 320, 240 );
@@ -52,5 +57,10 @@ int main( int argc, char **argv )
 	Surface_SetCaptionW( s[2], L"第三个窗口" );
 	Surface_SetCaptionW( s[3], L"第四个窗口" );
 	LCUITimer_Set( 1000, onTimer, s[2], FALSE );
+	widget[0] = Widget_New(NULL);
+	widget[1] = Widget_New(NULL);
+	widget[2] = Widget_New(NULL);
+	widget[3] = Widget_New(NULL);
+	LCUIDisplay_SetMode( LDM_SEAMLESS );
 	return LCUI_Main();
 }
