@@ -53,6 +53,8 @@
 #include <Windows.h>
 #endif
 
+#define $(FUNC_NAME) LCUIDisplay_##FUNC_NAME
+
 #define MS_PER_FRAME (1000/MAX_FRAMES_PER_SEC)	/**< 每帧画面的最少耗时(ms) */
 
 /** surface 记录 */
@@ -74,13 +76,13 @@ static struct DisplayContext {
 } display = { FALSE, NULL, 0 };
 
 /** 获取当前的屏幕内容每秒更新的帧数 */
-int LCUIDisplay_GetFPS(void)
+int $(GetFPS)(void)
 {
 	return FrameControl_GetFPS( display.fc_ctx );
 }
 
 /** 更新各种图形元素的显示 */
-static void LCUIDisplay_Update(void)
+static void $(Update)(void)
 {
 	int i, n, j, m;
 	LCUI_Rect *p_rect;
@@ -116,19 +118,57 @@ static void LCUIDisplay_Update(void)
 	LinkedList_Destroy( &rlist );
 }
 
-static void LCUIDisplay_BindSurface( LCUI_Widget widget )
+static LCUI_Surface $(GetBindSurface)( LCUI_Widget widget )
 {
+	int i, n;
 	SurfaceRecord *p_sr;
 
+	n = LinkedList_GetTotal( &display.surface_list );
+	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &display.surface_list, i );
+		p_sr = (SurfaceRecord*)
+		LinkedList_Get( &display.surface_list );
+		if( p_sr->widget == widget ) {
+			return p_sr->surface;
+		}
+	}
+	return NULL;
+}
+
+/** 将 widget 与 sruface 进行绑定 */
+static void $(BindSurface)( LCUI_Widget widget )
+{
+	SurfaceRecord *p_sr;
+	if( $(GetBindSurface)(widget) ) {
+		return;
+	}
 	p_sr = (SurfaceRecord*)malloc(sizeof(SurfaceRecord));
 	p_sr->surface = Surface_New();
 	p_sr->widget = widget;
-	// 同步样式属性，绑定相应事件
-	// code ...
 	LinkedList_AddData( &display.surface_list, p_sr );
 }
 
-static void LCUIDisplay_CleanSurfaces( void )
+/** 解除 widget 与 sruface 的绑定 */
+static void $(UnbindSurface)( LCUI_Widget widget )
+{
+	int i, n;
+	SurfaceRecord *p_sr;
+
+	n = LinkedList_GetTotal( &display.surface_list );
+	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &display.surface_list, i );
+		p_sr = (SurfaceRecord*)
+		LinkedList_Get( &display.surface_list );
+		if( p_sr->widget != widget ) {
+			continue;
+		}
+		Surface_Delete( p_sr->surface  );
+		LinkedList_Delete( &display.surface_list );
+		break;
+	}
+}
+
+static void $(CleanSurfaces)( void )
 {
 	int i, n;
 	SurfaceRecord *p_sr;
@@ -139,21 +179,19 @@ static void LCUIDisplay_CleanSurfaces( void )
 		p_sr = (SurfaceRecord*)
 		LinkedList_Get( &display.surface_list );
 		Surface_Delete( p_sr->surface );
-		// 解除 widget 与 surface 的相关绑定
-		// code ...
 		LinkedList_Delete( &display.surface_list );
 	}
 }
 
-static int LCUIDisplay_Windowed( void )
+static int $(Windowed)( void )
 {
 	LCUI_Surface surface;
 	SurfaceRecord *p_sr;
 
 	switch( display.mode ) {
 	case LDM_SEAMLESS:
-		LCUIDisplay_CleanSurfaces();
-		LCUIDisplay_BindSurface( LCUIRootWidget );
+		$(CleanSurfaces)();
+		$(BindSurface)( LCUIRootWidget );
 	case LDM_FULLSCREEN:
 		break;
 	case LDM_WINDOWED:
@@ -167,13 +205,13 @@ static int LCUIDisplay_Windowed( void )
 	return 0;
 }
 
-static int LCUIDisplay_FullScreen( void )
+static int $(FullScreen)( void )
 {
 	SurfaceRecord *p_sr;
 	switch( display.mode ) {
 	case LDM_SEAMLESS:
-		LCUIDisplay_CleanSurfaces();
-		LCUIDisplay_BindSurface( LCUIRootWidget );
+		$(CleanSurfaces)();
+		$(BindSurface)( LCUIRootWidget );
 	case LDM_WINDOWED:
 		break;
 	case LDM_FULLSCREEN:
@@ -186,7 +224,7 @@ static int LCUIDisplay_FullScreen( void )
 	return 0;
 }
 
-static int LCUIDisplay_Seamless( void )
+static int $(Seamless)( void )
 {
 	int i, n;
 	LCUI_Widget widget;
@@ -197,42 +235,42 @@ static int LCUIDisplay_Seamless( void )
 	case LDM_FULLSCREEN:
 	case LDM_WINDOWED:
 	default:
-		LCUIDisplay_CleanSurfaces();
+		$(CleanSurfaces)();
 		break;
 	}
 	n = LinkedList_GetTotal( &LCUIRootWidget->children );
 	for( i=0; i<n; ++i ) {
 		widget = (LCUI_Widget)
 		LinkedList_Get( &LCUIRootWidget->children );
-		LCUIDisplay_BindSurface( widget );
+		$(BindSurface)( widget );
 	}
 	display.mode = LDM_SEAMLESS;
 	return 0;
 }
 
 /* 设置呈现模式 */
-int LCUIDisplay_SetMode( int mode )
+int $(SetMode)( int mode )
 {
 	int ret;
 	_DEBUG_MSG("mode: %d\n", mode);
 	LCUIMutex_Lock( &display.mutex );
 	switch( mode ) {
 	case LDM_WINDOWED:
-		ret = LCUIDisplay_Windowed();
+		ret = $(Windowed)();
 		break;
 	case LDM_SEAMLESS:
-		ret = LCUIDisplay_Seamless();
+		ret = $(Seamless)();
 		break;
 	case LDM_FULLSCREEN:
 	default:
-		ret = LCUIDisplay_FullScreen();
+		ret = $(FullScreen)();
 		break;
 	}
 	LCUIMutex_Unlock( &display.mutex );
 	return ret;
 }
 
-void LCUIDisplay_SetSize( int width, int height )
+void $(SetSize)( int width, int height )
 {
 	display.width = width;
 	display.height = height;
@@ -240,31 +278,76 @@ void LCUIDisplay_SetSize( int width, int height )
 }
 
 /** 获取屏幕宽度 */
-int LCUIDisplay_GetWidth( void )
+int $(GetWidth)( void )
 {
 	return 0;
 }
 
 /** 获取屏幕高度 */
-int LCUIDisplay_GetHeight( void )
+int $(GetHeight)( void )
 {
 	return 0;
 }
 
 /** LCUI的图形显示处理线程 */
-static void LCUIDisplayThread( void *unused )
+static void $(Thread)( void *unused )
 {
 	while( LCUI_IsActive() && display.is_working ) {
 		LCUICursor_UpdatePos();		/* 更新鼠标位置 */
 		LCUIWidget_Task_Step();		/* 处理所有部件任务 */
 		LCUIWidget_Event_Step();	/* 派发所有事件 */
 		LCUIMutex_Lock( &display.mutex );
-		LCUIDisplay_Update();
+		$(Update)();
 		LCUIMutex_Unlock( &display.mutex );
 		/* 让本帧停留一段时间 */
 		FrameControl_Remain( display.fc_ctx );
 	}
 	LCUIThread_Exit(NULL);
+}
+
+static void OnWidgetEvent( LCUI_SystemEvent *e, void *unused )
+{
+	LCUI_Surface surface;
+	LCUI_BaseWidgetEvent *p_data;
+
+	p_data = (LCUI_BaseWidgetEvent*)e->data;
+	/* 忽略非顶层部件 */
+	if( p_data->widget->parent != LCUIRootWidget ) {
+		return;
+	}
+	surface = $(GetBindSurface)( p_data->widget );
+	if( !surface && p_data->type != WET_CREATE ) {
+		return;
+	}
+	switch( p_data->type ) {
+	case WET_CREATE:
+		$(BindSurface)( p_data->widget );
+		break;
+	case WET_DESTROY:
+		$(UnbindSurface)( p_data->widget );
+		break;
+	case WET_SHOW:
+		Surface_Show( surface );
+		break;
+	case WET_HIDE:
+		Surface_Hide( surface );
+		break;
+	case WET_RESIZE: {
+		int w, h;
+		w = p_data->widget->base.box.graph.w;
+		h = p_data->widget->base.box.graph.h;
+		Surface_Resize( surface, w, h );
+		break;
+	}
+	case WET_MOVE: {
+		int x, y;
+		x = p_data->widget->base.box.graph.x;
+		y = p_data->widget->base.box.graph.y;
+		Surface_Move( surface, x, y );
+		break;
+	}
+	default: break;
+	}
 }
 
 /** 初始化图形输出模块 */
@@ -279,7 +362,8 @@ int LCUIModule_Video_Init( void )
 	LinkedList_Init( &display.surface_list, sizeof(SurfaceRecord) );
 	display.fc_ctx = FrameControl_Create();
 	FrameControl_SetMaxFPS( display.fc_ctx, 1000/MAX_FRAMES_PER_SEC );
-	return LCUIThread_Create( &display.thread, LCUIDisplayThread, NULL );
+	LCUI_BindEvent( "LCUIWidget", OnWidgetEvent, NULL, NULL );
+	return LCUIThread_Create( &display.thread, $(Thread), NULL );
 }
 
 /** 停用图形输出模块 */
