@@ -43,7 +43,12 @@
 LCUI_BEGIN_HEADER
 
 enum WidgetEventType {
+	WET_CREATE,
+	WET_DESTROY,
+	WET_MOVE,
 	WET_RESIZE,
+	WET_SHOW,
+	WET_HIDE,
 
 	WET_KEYDOWN,
 	WET_KEYUP,
@@ -60,6 +65,13 @@ enum WidgetEventType {
 	WET_USER
 };
 
+/** 面向系统级的事件附加数据的结构，主要用于响应全局部件的事件 */
+typedef struct LCUI_BaseWidgetEvent {
+	int type;
+	LCUI_Widget widget;
+} LCUI_BaseWidgetEvent;
+
+/** 面向部件级的事件内容结构 */
 typedef struct LCUI_WidgetEvent {
 	int type;			/**< 事件类型标识号 */
 	const char *type_name;		/**< 事件类型名称 */

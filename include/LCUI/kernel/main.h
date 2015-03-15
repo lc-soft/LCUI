@@ -59,6 +59,7 @@ enum SystemEventType {
 	LCUI_MOUSEDOWN,		/**< 鼠标触发的按钮按下事件 */
 	LCUI_MOUSEUP,		/**< 鼠标触发的按钮释放事件 */
 	LCUI_INPUT,		/**< 输入法触发的文本输入事件 */
+	LCUI_WIDGET,
 	LCUI_USER = 100		/**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
 };
 

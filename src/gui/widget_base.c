@@ -143,13 +143,22 @@ int $(Front)( LCUI_Widget widget )
 /** 部件析构函数 */
 static void $(OnDestroy)( void *arg )
 {
+	LCUI_SystemEvent e;
+	LCUI_BaseWidgetEvent *p_data;
 	LCUI_Widget widget = (LCUI_Widget)arg;
+
 	Widget_DestroyTaskBox( widget );
 	LCUIEventBox_Destroy( widget->event );
 	widget->event = NULL;
 	LinkedList_Destroy( &widget->children );
 	LinkedList_Destroy( &widget->children_show );
 	DirtyRectList_Destroy( &widget->dirty_rects );
+
+	e.type = LCUI_WIDGET;
+	p_data = NEW_ONE(LCUI_BaseWidgetEvent);
+	p_data->type = WET_DESTROY;
+	p_data->widget = widget;
+	LCUI_PostEvent( &e );
 }
 
 /** 构造函数 */
@@ -194,10 +203,20 @@ static void $(Init)( LCUI_Widget widget )
 /** 新建一个GUI部件 */
 LCUI_Widget $(New)( const char *type_name )
 {
+	LCUI_SystemEvent e;
+	LCUI_BaseWidgetEvent *p_data;
 	LCUI_Widget widget = NEW_ONE(struct LCUI_WidgetFull);
+
 	$(Init)(widget);
 	LinkedList_AddData( &LCUIRootWidget->children, widget );
 	LinkedList_AddData( &LCUIRootWidget->children_show, widget );
+
+	e.type = LCUI_WIDGET;
+	p_data = NEW_ONE(LCUI_BaseWidgetEvent);
+	p_data->type = WET_CREATE;
+	p_data->widget = widget;
+	LCUI_PostEvent( &e );
+
 	return widget;
 }
 
