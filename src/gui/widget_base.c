@@ -188,6 +188,13 @@ static void $(Init)( LCUI_Widget widget )
 	widget->style.padding.bottom.type = SVT_PX;
 	widget->style.padding.left.type = SVT_PX;
 	widget->event = LCUIEventBox_Create();
+	widget->base.x = widget->base.y = 0;
+	widget->base.width = widget->base.height = 0;
+	widget->base.margin.left = 0;
+	widget->base.margin.top = 0;
+	widget->base.margin.bottom = 0;
+	widget->base.margin.right = 0;
+	widget->parent = NULL;
 	Widget_InitTaskBox( widget );
 	Background_Init( &widget->style.background );
 	BoxShadow_Init( &widget->style.shadow );
@@ -210,11 +217,15 @@ LCUI_Widget $(New)( const char *type_name )
 	$(Init)(widget);
 	LinkedList_AddData( &LCUIRootWidget->children, widget );
 	LinkedList_AddData( &LCUIRootWidget->children_show, widget );
+	widget->parent = LCUIRootWidget;
 
 	e.type = LCUI_WIDGET;
+	e.type_name ="widget";
 	p_data = NEW_ONE(LCUI_BaseWidgetEvent);
 	p_data->type = WET_CREATE;
 	p_data->widget = widget;
+	e.data = p_data;
+	e.destroy_data = free;
 	LCUI_PostEvent( &e );
 
 	return widget;
@@ -645,19 +656,43 @@ void $(SetHeight)( LCUI_Widget w, const char *value )
 void $(Show)( LCUI_Widget w )
 {
 	LCUI_WidgetTask t;
+	LCUI_SystemEvent e;
+	LCUI_BaseWidgetEvent *p_data;
+
 	t.type = WTT_SHOW;
 	t.visible = w->style.visible;
 	w->style.visible = TRUE;
 	Widget_AddTask( w, &t );
+
+	e.type = LCUI_WIDGET;
+	e.type_name ="widget";
+	p_data = NEW_ONE(LCUI_BaseWidgetEvent);
+	p_data->type = WET_SHOW;
+	p_data->widget = w;
+	e.data = p_data;
+	e.destroy_data = free;
+	LCUI_PostEvent( &e );
 }
 
 void $(Hide)( LCUI_Widget w )
 {
 	LCUI_WidgetTask t;
+	LCUI_SystemEvent e;
+	LCUI_BaseWidgetEvent *p_data;
+
 	t.type = WTT_SHOW;
 	t.visible = w->style.visible;
 	w->style.visible = FALSE;
 	Widget_AddTask( w, &t );
+
+	e.type = LCUI_WIDGET;
+	e.type_name ="widget";
+	p_data = NEW_ONE(LCUI_BaseWidgetEvent);
+	p_data->type = WET_HIDE;
+	p_data->widget = w;
+	e.data = p_data;
+	e.destroy_data = free;
+	LCUI_PostEvent( &e );
 }
 
 void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color )
@@ -669,4 +704,5 @@ void LCUIModule_Widget_Init(void)
 {
 	$(Init)(LCUIRootWidget);
 	LCUIWidget_Task_Init();
+	LCUI_RegisterEventWithId("widget", LCUI_WIDGET);
 }

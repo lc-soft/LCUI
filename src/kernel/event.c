@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * event.c -- 事件处理模块
  *
- * 版权所有 (C) 2012-2014 归属于
+ * 版权所有 (C) 2012-2015 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -102,8 +102,9 @@ static void DestroyEventHandler( void *data )
 static void DestroyEvent( void *data )
 {
 	LCUI_Event *event = (LCUI_Event*)data;
-	if( event->destroy_data ) {
+	if( event->destroy_data && event->data ) {
 		event->destroy_data( event->data );
+		event->data = NULL;
 	}
 }
 
@@ -314,7 +315,7 @@ int $(Send)( LCUI_EventBox box, const char *name, void *data )
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
-	
+	_DEBUG_MSG("send event: %s\n", name);
 	if( !(node = RBTree_CustomSearch(&box->event_name, (const void*)name)) ) {
 		return -1;
 	}
@@ -367,18 +368,18 @@ int $(Dispatch)( LCUI_EventBox box )
 	LCUI_Event *e;
 	LinkedList *elist;
 	
+	elist = &box->events[box->current];
 	box->current = box->current ? 0:1;
-	elist = &box->events[box->current ? 0:1];
 	n = LinkedList_GetTotal( elist );
 	LinkedList_Goto( elist, 0 );
+	_DEBUG_MSG("event total: %d\n", n);
 	for( i=0; i<n; ++i ) {
 		e = (LCUI_Event*)LinkedList_Get( elist );
 		$(Send)( box, e->name, e->data );
-		e->destroy_data ? e->destroy_data( e->data ):0;
+		e->destroy_data ? e->destroy_data( e->data ),e->data = NULL:0;
 		LinkedList_Goto( elist, 0 );
 		LinkedList_Delete( elist );
 	}
-	box->current = box->current ? 0:1;
 	return 0;
 }
 
@@ -389,7 +390,7 @@ int $(GetEvent)( LCUI_EventBox box, LCUI_Event *ebuff )
 	LCUI_Event *event;
 	LinkedList *elist;
 	
-	elist = &box->events[box->current == 1 ? 0:1];
+	elist = &box->events[box->current];
 	n = LinkedList_GetTotal( elist );
 	if( n <= 0 ) {
 		return -1;
@@ -404,7 +405,7 @@ int $(GetEvent)( LCUI_EventBox box, LCUI_Event *ebuff )
 int $(DeleteEvent)( LCUI_EventBox box )
 {
 	LinkedList *elist;
-	elist = &box->events[box->current == 1 ? 0:1];
+	elist = &box->events[box->current];
 	if( LinkedList_GetTotal( elist ) <= 0 ) {
 		return -2;
 	}

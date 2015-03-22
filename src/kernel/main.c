@@ -36,7 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
-//#define DEBUG
+#define DEBUG
 #define __IN_MAIN_SOURCE_FILE__
 
 #include <LCUI_Build.h>
@@ -113,8 +113,10 @@ static void SystemEventThread(void *arg)
 {
 	System.event.is_running = TRUE;
 	while( System.event.is_running ) {
+		DEBUG_MSG("waiting event...\n");
 		LCUICond_Wait( &System.event.cond );
-		LCUIEventBox_Dispatch( &System.event.box );
+		DEBUG_MSG("get event.\n");
+		LCUIEventBox_Dispatch( System.event.box );
 	}
 }
 
@@ -151,6 +153,12 @@ static void FuncDataDestroy( void *arg )
 	FuncData *data = (FuncData*)arg;
 	data->arg_destroy( data->arg );
 	data->arg = NULL;
+}
+
+/** 预先注册指定名称和ID的事件 */
+int LCUI_RegisterEventWithId( const char *event_name, int id )
+{
+	return LCUIEventBox_RegisterEventWithId( System.event.box, event_name, id );
 }
 
 /** 绑定指定ID的事件 */

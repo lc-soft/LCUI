@@ -37,7 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-//#define DEBUG
+#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -139,6 +139,7 @@ static LCUI_Surface $(GetBindSurface)( LCUI_Widget widget )
 static void $(BindSurface)( LCUI_Widget widget )
 {
 	SurfaceRecord *p_sr;
+	_DEBUG_MSG("tip\n");
 	if( $(GetBindSurface)(widget) ) {
 		return;
 	}
@@ -228,7 +229,7 @@ static int $(Seamless)( void )
 {
 	int i, n;
 	LCUI_Widget widget;
-	_DEBUG_MSG("display.mode: %d\n", display.mode);
+	DEBUG_MSG("display.mode: %d\n", display.mode);
 	switch( display.mode ) {
 	case LDM_SEAMLESS:
 		return 0;
@@ -309,15 +310,17 @@ static void OnWidgetEvent( LCUI_SystemEvent *e, void *unused )
 {
 	LCUI_Surface surface;
 	LCUI_BaseWidgetEvent *p_data;
-
 	p_data = (LCUI_BaseWidgetEvent*)e->data;
+	DEBUG_MSG("it work! data: type = %d, widget = %p\n", p_data->type, p_data->widget);
 	/* 忽略非顶层部件 */
 	if( p_data->widget->parent != LCUIRootWidget ) {
 		return;
 	}
 	surface = $(GetBindSurface)( p_data->widget );
-	if( !surface && p_data->type != WET_CREATE ) {
-		return;
+	if( display.mode == LDM_SEAMLESS ) {
+		if( !surface && p_data->type != WET_CREATE ) {
+			return;
+		}
 	}
 	switch( p_data->type ) {
 	case WET_CREATE:
@@ -362,7 +365,8 @@ int LCUIModule_Video_Init( void )
 	LinkedList_Init( &display.surface_list, sizeof(SurfaceRecord) );
 	display.fc_ctx = FrameControl_Create();
 	FrameControl_SetMaxFPS( display.fc_ctx, 1000/MAX_FRAMES_PER_SEC );
-	LCUI_BindEvent( "LCUIWidget", OnWidgetEvent, NULL, NULL );
+	DEBUG_MSG("bind event.\n");
+	LCUI_BindEvent( "widget", OnWidgetEvent, NULL, NULL );
 	return LCUIThread_Create( &display.thread, $(Thread), NULL );
 }
 

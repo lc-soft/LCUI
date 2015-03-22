@@ -50,7 +50,7 @@ typedef struct {
 	LCUI_BOOL destroy_arg[2];	/**< 指定在调用完回调函数后，是否释放参数 */
 } LCUI_Task;
 
-enum SystemEventType {
+enum LCUI_SystemEventType {
 	LCUI_KEYDOWN,		/**< 键盘触发的按键按下事件 */
 	LCUI_KEYPRESS,		/**< 按键输入事件，仅字母、数字等ANSI字符键可触发 */
 	LCUI_KEYUP,		/**< 键盘触发的按键释放事件 */
@@ -85,6 +85,9 @@ LCUI_API void Win32_LCUI_Init( HINSTANCE hInstance );
 #endif
 
 /*-------------------------- system event <START> ---------------------------*/
+
+/** 预先注册指定名称和ID的事件 */
+LCUI_API int LCUI_RegisterEventWithId( const char *event_name, int id );
 
 /** 绑定事件 */
 LCUI_API int LCUI_BindEvent( const char *event_name,

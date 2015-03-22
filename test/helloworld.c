@@ -32,6 +32,7 @@ int main( int argc, char **argv )
 {
 	LCUI_Surface s[4];
 	LCUI_Widget widget[4];
+	char str[] = "文本"; 
 
 	InitConsoleWindow();
 	LCUI_Init(800,600,0);
@@ -61,6 +62,7 @@ int main( int argc, char **argv )
 	widget[1] = Widget_New(NULL);
 	widget[2] = Widget_New(NULL);
 	widget[3] = Widget_New(NULL);
+	Widget_Show( widget[0] );
 	LCUIDisplay_SetMode( LDM_SEAMLESS );
 	return LCUI_Main();
 }
