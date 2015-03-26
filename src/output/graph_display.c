@@ -68,7 +68,7 @@ static struct DisplayContext {
 	LCUI_BOOL	is_working;	/**< 标志，指示当前模块是否处于工作状态 */
 	FrameCtrlCtx	fc_ctx;		/**< 上下文句柄，用于画面更新时的帧数控制 */
 	LCUI_Thread	thread;		/**< 线程，负责画面更新工作 */
-	LinkedList	surface_list;	/**< surface 列表 */
+	LinkedList	surfaces;	/**< surface 列表 */
 	LCUI_Mutex	mutex;
 	int		mode;
 	int		width;
@@ -91,12 +91,12 @@ static void $(Update)(void)
 	LCUI_PaintContext paint;
 	
 	DirtyRectList_Init( &rlist );
-	n = LinkedList_GetTotal( &display.surface_list );
+	n = LinkedList_GetTotal( &display.surfaces );
 	/* 遍历当前的 surface 记录列表 */
 	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &display.surface_list, i );
+		LinkedList_Goto( &display.surfaces, i );
 		p_sr = (SurfaceRecord*)
-		LinkedList_Get( &display.surface_list );
+		LinkedList_Get( &display.surfaces );
 		if( !p_sr->widget || !p_sr->surface ) {
 			continue;
 		}
@@ -123,11 +123,11 @@ static LCUI_Surface $(GetBindSurface)( LCUI_Widget widget )
 	int i, n;
 	SurfaceRecord *p_sr;
 
-	n = LinkedList_GetTotal( &display.surface_list );
+	n = LinkedList_GetTotal( &display.surfaces );
 	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &display.surface_list, i );
+		LinkedList_Goto( &display.surfaces, i );
 		p_sr = (SurfaceRecord*)
-		LinkedList_Get( &display.surface_list );
+		LinkedList_Get( &display.surfaces );
 		if( p_sr->widget == widget ) {
 			return p_sr->surface;
 		}
@@ -146,7 +146,7 @@ static void $(BindSurface)( LCUI_Widget widget )
 	p_sr = (SurfaceRecord*)malloc(sizeof(SurfaceRecord));
 	p_sr->surface = Surface_New();
 	p_sr->widget = widget;
-	LinkedList_AddData( &display.surface_list, p_sr );
+	LinkedList_AddData( &display.surfaces, p_sr );
 }
 
 /** 解除 widget 与 sruface 的绑定 */
@@ -155,16 +155,16 @@ static void $(UnbindSurface)( LCUI_Widget widget )
 	int i, n;
 	SurfaceRecord *p_sr;
 
-	n = LinkedList_GetTotal( &display.surface_list );
+	n = LinkedList_GetTotal( &display.surfaces );
 	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &display.surface_list, i );
+		LinkedList_Goto( &display.surfaces, i );
 		p_sr = (SurfaceRecord*)
-		LinkedList_Get( &display.surface_list );
+		LinkedList_Get( &display.surfaces );
 		if( p_sr->widget != widget ) {
 			continue;
 		}
 		Surface_Delete( p_sr->surface  );
-		LinkedList_Delete( &display.surface_list );
+		LinkedList_Delete( &display.surfaces );
 		break;
 	}
 }
@@ -174,13 +174,13 @@ static void $(CleanSurfaces)( void )
 	int i, n;
 	SurfaceRecord *p_sr;
 
-	n = LinkedList_GetTotal( &display.surface_list );
+	n = LinkedList_GetTotal( &display.surfaces );
 	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &display.surface_list, 0 );
+		LinkedList_Goto( &display.surfaces, 0 );
 		p_sr = (SurfaceRecord*)
-		LinkedList_Get( &display.surface_list );
+		LinkedList_Get( &display.surfaces );
 		Surface_Delete( p_sr->surface );
-		LinkedList_Delete( &display.surface_list );
+		LinkedList_Delete( &display.surfaces );
 	}
 }
 
@@ -198,8 +198,8 @@ static int $(Windowed)( void )
 	case LDM_WINDOWED:
 	default: return 0;
 	}
-	LinkedList_Goto( &display.surface_list, 0 );
-	p_sr = (SurfaceRecord*)LinkedList_Get(&display.surface_list);
+	LinkedList_Goto( &display.surfaces, 0 );
+	p_sr = (SurfaceRecord*)LinkedList_Get(&display.surfaces);
 	surface = p_sr->surface;
 	Surface_Resize( surface, display.width, display.height );
 	display.mode = LDM_WINDOWED;
@@ -218,8 +218,8 @@ static int $(FullScreen)( void )
 	case LDM_FULLSCREEN:
 	default: return 0;
 	}
-	LinkedList_Goto( &display.surface_list, 0 );
-	p_sr = (SurfaceRecord*)LinkedList_Get(&display.surface_list);
+	LinkedList_Goto( &display.surfaces, 0 );
+	p_sr = (SurfaceRecord*)LinkedList_Get(&display.surfaces);
 	// ...
 	display.mode = LDM_FULLSCREEN;
 	return 0;
@@ -306,28 +306,26 @@ static void $(Thread)( void *unused )
 	LCUIThread_Exit(NULL);
 }
 
-static void OnWidgetEvent( LCUI_SystemEvent *e, void *unused )
+/** 响应顶级部件的各种事件 */
+static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 {
+	int e_type = *((int*)e->data);
 	LCUI_Surface surface;
-	LCUI_BaseWidgetEvent *p_data;
-	p_data = (LCUI_BaseWidgetEvent*)e->data;
-	DEBUG_MSG("it work! data: type = %d, widget = %p\n", p_data->type, p_data->widget);
-	/* 忽略非顶层部件 */
-	if( p_data->widget->parent != LCUIRootWidget ) {
-		return;
-	}
-	surface = $(GetBindSurface)( p_data->widget );
+	
+	_DEBUG_MSG("tip, e_type = %d\n", e_type);
+	surface = $(GetBindSurface)( e->target );
 	if( display.mode == LDM_SEAMLESS ) {
-		if( !surface && p_data->type != WET_CREATE ) {
+		if( !surface && e_type != WET_ADD ) {
 			return;
 		}
 	}
-	switch( p_data->type ) {
-	case WET_CREATE:
-		$(BindSurface)( p_data->widget );
+	switch( e_type ) {
+	case WET_ADD:
+		$(BindSurface)( e->target );
 		break;
+	case WET_REMOVE:
 	case WET_DESTROY:
-		$(UnbindSurface)( p_data->widget );
+		$(UnbindSurface)( e->target );
 		break;
 	case WET_SHOW:
 		Surface_Show( surface );
@@ -337,15 +335,15 @@ static void OnWidgetEvent( LCUI_SystemEvent *e, void *unused )
 		break;
 	case WET_RESIZE: {
 		int w, h;
-		w = p_data->widget->base.box.graph.w;
-		h = p_data->widget->base.box.graph.h;
+		w = e->target->base.box.graph.w;
+		h = e->target->base.box.graph.h;
 		Surface_Resize( surface, w, h );
 		break;
 	}
 	case WET_MOVE: {
 		int x, y;
-		x = p_data->widget->base.box.graph.x;
-		y = p_data->widget->base.box.graph.y;
+		x = e->target->base.box.graph.x;
+		y = e->target->base.box.graph.y;
 		Surface_Move( surface, x, y );
 		break;
 	}
@@ -356,17 +354,21 @@ static void OnWidgetEvent( LCUI_SystemEvent *e, void *unused )
 /** 初始化图形输出模块 */
 int LCUIModule_Video_Init( void )
 {
+	int ret;
 	if( display.is_working ) {
 		return -1;
 	}
 	display.is_working = TRUE;
 	display.mode = LDM_DEFAULT;
 	LCUIMutex_Init( &display.mutex );
-	LinkedList_Init( &display.surface_list, sizeof(SurfaceRecord) );
+	LinkedList_Init( &display.surfaces, sizeof(SurfaceRecord) );
 	display.fc_ctx = FrameControl_Create();
 	FrameControl_SetMaxFPS( display.fc_ctx, 1000/MAX_FRAMES_PER_SEC );
-	DEBUG_MSG("bind event.\n");
-	LCUI_BindEvent( "widget", OnWidgetEvent, NULL, NULL );
+	ret = Widget_BindEvent(
+		LCUIRootWidget, "TopLevelWidget", 
+		OnTopLevelWidgetEvent, NULL, NULL
+	);
+	DEBUG_MSG("bind event, ret = %d\n", ret);
 	return LCUIThread_Create( &display.thread, $(Thread), NULL );
 }
 

@@ -102,9 +102,11 @@ extern LCUI_Widget LCUIRootWidget;	/**< 根级部件 */
 /** 新建一个GUI部件 */
 LCUI_API LCUI_Widget $(New)( const char *type_name );
 
-/* 获取当前点命中的最上层可见部件 */
+/** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget $(At)( LCUI_Widget widget, int x, int y );
 
+/** 设置部件为顶级部件 */
+LCUI_API int $(Top)( LCUI_Widget w );
 /** 获取内边距框占用的矩形区域 */
 LCUI_API void $(GetPaddingRect)( LCUI_Widget widget, LCUI_Rect *rect );
 

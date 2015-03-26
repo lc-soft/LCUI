@@ -59,7 +59,8 @@ int $(Append)( LCUI_Widget container, LCUI_Widget widget )
 {
 	int i, n;
 	LCUI_Widget old_container;
-
+	LCUI_WidgetEvent e;
+	_DEBUG_MSG("container: %p, widget: %p\n", container, widget);
 	if( !container || !widget || container == widget->parent ) {
 		return -1;
 	}
@@ -69,7 +70,7 @@ int $(Append)( LCUI_Widget container, LCUI_Widget widget )
 	if( widget->parent ) {
 		old_container = widget->parent;
 	} else {
-		old_container = LCUIRootWidget;
+		goto remove_done;
 	}
 
 	/* 移除在之前的容器中的记录 */
@@ -81,6 +82,12 @@ int $(Append)( LCUI_Widget container, LCUI_Widget widget )
 			break;
 		}
 	}
+	/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
+	if( i < n && old_container == LCUIRootWidget ) {
+		e.type_name = "TopLevelWidget";
+		e.target = widget;
+		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
+	}
 	n = LinkedList_GetTotal( &old_container->children_show );
 	for( i=0; i<n; ++i ) {
 		LinkedList_Goto( &old_container->children_show, i );
@@ -89,10 +96,21 @@ int $(Append)( LCUI_Widget container, LCUI_Widget widget )
 			break;
 		}
 	}
+
+remove_done:
+
 	widget->parent = container;
 	LinkedList_AddData( &container->children, widget );
 	LinkedList_AddData( &container->children_show, widget );
-	// XXX
+	/* 如果是添加至根部件内，则触发 WET_ADD 事件 */
+	if( container == LCUIRootWidget ) {
+		int ret;
+		e.type_name = "TopLevelWidget";
+		e.target = widget;
+		ret = Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_ADD );
+		_DEBUG_MSG("post done, ret = %d\n", ret);
+	}
+	_DEBUG_MSG("tip\n");
 	return 0;
 }
 
@@ -143,8 +161,7 @@ int $(Front)( LCUI_Widget widget )
 /** 部件析构函数 */
 static void $(OnDestroy)( void *arg )
 {
-	LCUI_SystemEvent e;
-	LCUI_BaseWidgetEvent *p_data;
+	LCUI_WidgetEvent e;
 	LCUI_Widget widget = (LCUI_Widget)arg;
 
 	Widget_DestroyTaskBox( widget );
@@ -153,12 +170,12 @@ static void $(OnDestroy)( void *arg )
 	LinkedList_Destroy( &widget->children );
 	LinkedList_Destroy( &widget->children_show );
 	DirtyRectList_Destroy( &widget->dirty_rects );
-
-	e.type = LCUI_WIDGET;
-	p_data = NEW_ONE(LCUI_BaseWidgetEvent);
-	p_data->type = WET_DESTROY;
-	p_data->widget = widget;
-	LCUI_PostEvent( &e );
+	/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
+	if( widget->parent == LCUIRootWidget ) {
+		e.type_name = "TopLevelWidget";
+		e.target = widget;
+		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
+	}
 }
 
 /** 构造函数 */
@@ -195,6 +212,7 @@ static void $(Init)( LCUI_Widget widget )
 	widget->base.margin.bottom = 0;
 	widget->base.margin.right = 0;
 	widget->parent = NULL;
+	widget->event = LCUIEventBox_Create();
 	Widget_InitTaskBox( widget );
 	Background_Init( &widget->style.background );
 	BoxShadow_Init( &widget->style.shadow );
@@ -210,28 +228,12 @@ static void $(Init)( LCUI_Widget widget )
 /** 新建一个GUI部件 */
 LCUI_Widget $(New)( const char *type_name )
 {
-	LCUI_SystemEvent e;
-	LCUI_BaseWidgetEvent *p_data;
 	LCUI_Widget widget = NEW_ONE(struct LCUI_WidgetFull);
-
 	$(Init)(widget);
-	LinkedList_AddData( &LCUIRootWidget->children, widget );
-	LinkedList_AddData( &LCUIRootWidget->children_show, widget );
-	widget->parent = LCUIRootWidget;
-
-	e.type = LCUI_WIDGET;
-	e.type_name ="widget";
-	p_data = NEW_ONE(LCUI_BaseWidgetEvent);
-	p_data->type = WET_CREATE;
-	p_data->widget = widget;
-	e.data = p_data;
-	e.destroy_data = free;
-	LCUI_PostEvent( &e );
-
 	return widget;
 }
 
-/* 获取当前点命中的最上层可见部件 */
+/** 获取当前点命中的最上层可见部件 */
 LCUI_Widget $(At)( LCUI_Widget widget, int x, int y )
 {
 	int i, n;
@@ -256,6 +258,13 @@ LCUI_Widget $(At)( LCUI_Widget widget, int x, int y )
 	} while( i >= n );
 
 	return target;
+}
+
+/** 设置部件为顶级部件 */
+int $(Top)( LCUI_Widget w )
+{
+	_DEBUG_MSG("tip\n");
+	return $(Append)( LCUIRootWidget, w );
 }
 
 /** 获取内边距框占用的矩形区域 */
@@ -631,6 +640,7 @@ void $(Move)( LCUI_Widget w, int top, int left )
 void $(Resize)( LCUI_Widget w, int width, int height )
 {
 	LCUI_WidgetTask t;
+
 	t.type = WTT_RESIZE;
 	t.resize.w = w->base.width;
 	t.resize.h = w->base.height;
@@ -641,6 +651,7 @@ void $(Resize)( LCUI_Widget w, int width, int height )
 	$(ComputeSize)( w );
 	Widget_AddTask( w, &t );
 	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
+
 }
 
 void $(SetWidth)( LCUI_Widget w, const char *value )
@@ -656,43 +667,19 @@ void $(SetHeight)( LCUI_Widget w, const char *value )
 void $(Show)( LCUI_Widget w )
 {
 	LCUI_WidgetTask t;
-	LCUI_SystemEvent e;
-	LCUI_BaseWidgetEvent *p_data;
-
 	t.type = WTT_SHOW;
 	t.visible = w->style.visible;
 	w->style.visible = TRUE;
 	Widget_AddTask( w, &t );
-
-	e.type = LCUI_WIDGET;
-	e.type_name ="widget";
-	p_data = NEW_ONE(LCUI_BaseWidgetEvent);
-	p_data->type = WET_SHOW;
-	p_data->widget = w;
-	e.data = p_data;
-	e.destroy_data = free;
-	LCUI_PostEvent( &e );
 }
 
 void $(Hide)( LCUI_Widget w )
 {
 	LCUI_WidgetTask t;
-	LCUI_SystemEvent e;
-	LCUI_BaseWidgetEvent *p_data;
-
 	t.type = WTT_SHOW;
 	t.visible = w->style.visible;
 	w->style.visible = FALSE;
 	Widget_AddTask( w, &t );
-
-	e.type = LCUI_WIDGET;
-	e.type_name ="widget";
-	p_data = NEW_ONE(LCUI_BaseWidgetEvent);
-	p_data->type = WET_HIDE;
-	p_data->widget = w;
-	e.data = p_data;
-	e.destroy_data = free;
-	LCUI_PostEvent( &e );
 }
 
 void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color )

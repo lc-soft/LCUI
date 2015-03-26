@@ -132,6 +132,7 @@ LCUI_EventBox $(Create)(void)
 	LinkedList_SetDataNeedFree( &box->events[1], 1 );
 	LinkedList_SetDestroyFunc( &box->events[0], DestroyEvent );
 	LinkedList_SetDestroyFunc( &box->events[1], DestroyEvent );
+	_DEBUG_MSG("eventbox: %p, handler_id: %d\n", box, box->handler_id);
 	return box;
 }
 
@@ -242,6 +243,7 @@ int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
 	}
 	slot = (LCUI_EventSlot*)node->data;
 	handler = NEW_ONE(LCUI_EventHandler);
+	_DEBUG_MSG("eventbox: %p, handler_id: %d\n", box, box->handler_id);
 	handler->id = ++box->handler_id;
 	handler->func = func;
 	handler->func_data = func_data;
@@ -346,6 +348,7 @@ int $(Post)(	LCUI_EventBox box, const char *name, void *data,
 	LCUI_EventSlot *slot;
 	LinkedList *elist = &box->events[box->current];
 	
+	_DEBUG_MSG("eventbox: %p, handler_id: %d\n", box, box->handler_id);
 	if( !(node = RBTree_CustomSearch(&box->event_name, (const void*)name)) ) {
 		return -1;
 	}

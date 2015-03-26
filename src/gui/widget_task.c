@@ -75,38 +75,39 @@ static void HandleMove( LCUI_Widget w, LCUI_WidgetTask *t )
 	rect.y = t->move.y;
 	/* 标记移动前的区域 */
 	Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+	/* 如果是顶级部件 */
+	if( w->parent == LCUIRootWidget ) {
+		LCUI_WidgetEvent e;
+		e.type_name = "TopLevelWidget";
+		e.target = w;
+		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_MOVE );
+	}
 }
 
 /** 处理尺寸调整 */
 static void HandleResize( LCUI_Widget w, LCUI_WidgetTask *t )
 {
-	LCUI_SystemEvent e;
-	LCUI_BaseWidgetEvent *p_data;
-
-	// code ...
-
-	e.type = LCUI_WIDGET;
-	p_data = (LCUI_BaseWidgetEvent*)
-	malloc(sizeof(LCUI_BaseWidgetEvent));
-	p_data->type = WET_CREATE;
-	p_data->widget = w;
-	LCUI_PostEvent( &e );
+	if( w->parent == LCUIRootWidget ) {
+		LCUI_WidgetEvent e;
+		e.type_name = "TopLevelWidget";
+		e.target = w;
+		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_RESIZE );
+	}
 }
 
 /** 处理可见性 */
 static void HandleVisibility( LCUI_Widget w, LCUI_WidgetTask *t )
 {
-	LCUI_SystemEvent e;
-	LCUI_BaseWidgetEvent *p_data;
+	/* 如果是顶级部件 */
+	if( w->parent == LCUIRootWidget ) {
+		int *type;
+		LCUI_WidgetEvent e;
 
-	// code ...
-
-	e.type = LCUI_WIDGET;
-	p_data = (LCUI_BaseWidgetEvent*)
-	malloc(sizeof(LCUI_BaseWidgetEvent));
-	p_data->type = t->visible ? WET_SHOW:WET_HIDE;
-	p_data->widget = w;
-	LCUI_PostEvent( &e );
+		e.type_name = "TopLevelWidget";
+		e.target = w;
+		type = (int*)(t->visible ? WET_SHOW:WET_HIDE);
+		Widget_PostEvent( LCUIRootWidget, &e, type );
+	}
 }
 
 /** 处理透明度 */
