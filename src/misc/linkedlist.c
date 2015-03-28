@@ -81,34 +81,37 @@
 /** 初始化链表 */
 void LinkedList_Init( LinkedList *list, int node_data_size )
 {
-        list->node_data_size = node_data_size;
-        list->used_node_num = 0;
-        list->usable_node_num = 0;
-        list->current_node_pos = 0;
-        list->need_free_data = 0;
-        list->need_reuse_mem = 0;
+	list->node_data_size = node_data_size;
+	list->used_node_num = 0;
+	list->usable_node_num = 0;
+	list->current_node_pos = 0;
+	list->need_free_data = 0;
+	list->need_reuse_mem = 0;
 	list->usable_head_node = NULL;
 	list->used_head_node = NULL;
 	list->used_tail_node = NULL;
-        list->current_node = NULL;
-        list->destroy_func = NULL;
+	list->current_node = NULL;
+	list->destroy_func = NULL;
 }
 
 /** 销毁整个链表 */
 void LinkedList_Destroy( LinkedList *list )
 {
 	LinkedListNode *node;
-        list->current_node_pos = 0;
+	list->current_node_pos = 0;
 	list->current_node = NULL;
 	list->used_tail_node = NULL;
 	list->used_node_num = 0;
 	list->usable_node_num = 0;
-        /* 先释放未使用的结点 */
+	/* 先释放未使用的结点 */
 	if( list->usable_head_node ) {
 		node = list->usable_head_node;
 		while( node ) {
 			list->usable_head_node = node->next;
 			if( list->need_free_data && node->data ) {
+				if( list->destroy_func ) {
+					list->destroy_func( list->current_node->data );
+				}
 				free( node->data );
 			}
 			node->data = NULL;
@@ -118,12 +121,15 @@ void LinkedList_Destroy( LinkedList *list )
 			node = list->usable_head_node;
 		}
 	}
-        /* 释放已使用的结点 */
+	/* 释放已使用的结点 */
 	if( list->used_head_node ) {
 		node = list->used_head_node;
 		while( node ) {
 			list->used_head_node = node->next;
 			if( list->need_free_data && node->data ) {
+				if( list->destroy_func ) {
+					list->destroy_func( list->current_node->data );
+				}
 				free( node->data );
 			}
 			node->data = NULL;
@@ -138,25 +144,32 @@ void LinkedList_Destroy( LinkedList *list )
 /** 移除当前结点 */
 int LinkedList_Delete( LinkedList *list )
 {
-        if( list->used_node_num <= 0 ) {
-                return -2;
-        }
+	if( list->used_node_num <= 0 ) {
+		return -2;
+	}
 
-        if( !list->current_node || list->current_node_pos < 0
-         || list->current_node_pos >= list->used_node_num ) {
-                return -1;
-        }
+	if( !list->current_node || list->current_node_pos < 0
+	 || list->current_node_pos >= list->used_node_num ) {
+		return -1;
+	}
 
-        --list->used_node_num;
+	--list->used_node_num;
 	++list->usable_node_num;
-
-        if( list->destroy_func ) {
-                list->destroy_func( list->current_node->data );
-        }
-        if( !list->need_reuse_mem ) {
-                free( list->current_node->data );
-                list->current_node->data = NULL;
-        }
+	
+	if( list->need_free_data ) {
+		if( list->current_node->data ) {
+			if( list->destroy_func ) {
+				list->destroy_func( list->current_node->data );
+			}
+			if( !list->need_reuse_mem ) {
+				free( list->current_node->data );
+				list->current_node->data = NULL;
+			}
+		}
+	}
+	else if( !list->need_reuse_mem ) {
+		list->current_node->data = NULL;
+	}
 	/* 如果在链表尾端 */
 	DEBUG_MSG("current = %p, head = %p, tail = %p, used_node_num = %d\n", list->current_node, list->used_head_node, list->used_tail_node, list->used_node_num);
 	if( list->current_node == list->used_tail_node ) {
@@ -174,8 +187,8 @@ int LinkedList_Delete( LinkedList *list )
 	}
 	DEBUG_MSG("list->current_node->next = %p\n", list->current_node->next);
 	DEBUG_MSG("list->current_node->prev = %p\n", list->current_node->prev);
-        /* 分离当前结点 */
-        if( list->current_node->next ) {
+	/* 分离当前结点 */
+	if( list->current_node->next ) {
 		if( list->current_node->prev ) {
 			list->current_node->next->prev = list->current_node->prev;
 			list->current_node->prev->next = list->current_node->next;
@@ -183,7 +196,7 @@ int LinkedList_Delete( LinkedList *list )
 			list->used_head_node = list->current_node->next;
 			list->used_head_node->prev = NULL;
 		}
-        } else {
+	} else {
 		if( list->current_node->prev ) {
 			list->current_node->prev->next = list->current_node->next;
 		} else {
@@ -202,115 +215,115 @@ int LinkedList_Delete( LinkedList *list )
 		list->current_node = list->current_node->next;
 		list->usable_head_node->next = NULL;
 	}
-        return 0;
+	return 0;
 }
 
 /** 跳转至指定结点 */
 int LinkedList_Goto( LinkedList *list, int pos )
 {
-        if( pos < 0 || pos >= list->used_node_num ) {
-                return -1;
-        }
-        /* 如果该结点离头结点比较近，则直接从头结点开始遍历 */
-        if( pos < list->current_node_pos-pos ) {
-                list->current_node_pos = 0;
+	if( pos < 0 || pos >= list->used_node_num ) {
+		return -1;
+	}
+	/* 如果该结点离头结点比较近，则直接从头结点开始遍历 */
+	if( pos < list->current_node_pos-pos ) {
+		list->current_node_pos = 0;
 		list->current_node = list->used_head_node;
-        }
-        /* 如果该结点离边界结点比较近，则直接从边界结点开始遍历 */
-        else if( pos - list->current_node_pos > list->used_node_num - pos ) {
-                list->current_node_pos = list->used_node_num-1;
+	}
+	/* 如果该结点离边界结点比较近，则直接从边界结点开始遍历 */
+	else if( pos - list->current_node_pos > list->used_node_num - pos ) {
+		list->current_node_pos = list->used_node_num-1;
 		list->current_node = list->used_tail_node;
-        }
+	}
 
-        while( list->current_node_pos < pos ) {
-                list->current_node = list->current_node->next;
-                ++list->current_node_pos;
-        }
-        while( list->current_node_pos > pos ) {
-                list->current_node = list->current_node->prev;
-                --list->current_node_pos;
-        }
-        return 0;
+	while( list->current_node_pos < pos ) {
+		list->current_node = list->current_node->next;
+		++list->current_node_pos;
+	}
+	while( list->current_node_pos > pos ) {
+		list->current_node = list->current_node->prev;
+		--list->current_node_pos;
+	}
+	return 0;
 }
 
 /** 获取指定位置上的结点 */
 static LinkedListNode* LinkedList_GetNode( LinkedList *list, int pos )
 {
-        int i;
-        LinkedListNode *node = NULL;
+	int i;
+	LinkedListNode *node = NULL;
 
-        if( pos < 0 || pos >= list->used_node_num ) {
-                return NULL;
-        }
-        if( pos < list->current_node_pos-pos ) {
-                i = 0;
+	if( pos < 0 || pos >= list->used_node_num ) {
+		return NULL;
+	}
+	if( pos < list->current_node_pos-pos ) {
+		i = 0;
 		node = list->used_head_node;
-        }
-        else if( pos - list->current_node_pos > list->used_node_num - pos ) {
-                i = list->used_node_num-1;
+	}
+	else if( pos - list->current_node_pos > list->used_node_num - pos ) {
+		i = list->used_node_num-1;
 		node = list->used_tail_node;
-        } else {
-                i = list->current_node_pos;
-        }
+	} else {
+		i = list->current_node_pos;
+	}
 
-        while( i < pos ) {
-                node = list->current_node->next;
-                ++i;
-        }
-        while( i > pos ) {
-                node = list->current_node->prev;
-                --i;
-        }
-        return node;
+	while( i < pos ) {
+		node = list->current_node->next;
+		++i;
+	}
+	while( i > pos ) {
+		node = list->current_node->prev;
+		--i;
+	}
+	return node;
 }
 
 /** 将当前结点移动至指定位置 */
 int LinkedList_MoveTo( LinkedList *list, int pos )
 {
-        LinkedListNode *src_node, *des_node;
+	LinkedListNode *src_node, *des_node;
 
-        des_node = LinkedList_GetNode( list, pos );
-        if( !des_node ) {
-                return -1;
-        }
-        
-        src_node = list->current_node;
-        src_node->prev->next = src_node->next;
-        if( src_node->next ) {
-                src_node->next->prev = src_node->prev;
-        }
+	des_node = LinkedList_GetNode( list, pos );
+	if( !des_node ) {
+		return -1;
+	}
+	
+	src_node = list->current_node;
+	src_node->prev->next = src_node->next;
+	if( src_node->next ) {
+		src_node->next->prev = src_node->prev;
+	}
 
-        if( list->current_node_pos < pos ) {
-                src_node->prev = des_node;
-                src_node->next = des_node->next;
-                des_node->next->prev = src_node;
-                des_node->next = src_node;
-        }
-        else if( list->current_node_pos > pos ) {
-                if( des_node->prev ) {
-                        des_node->prev->next = src_node;
-                } else {
+	if( list->current_node_pos < pos ) {
+		src_node->prev = des_node;
+		src_node->next = des_node->next;
+		des_node->next->prev = src_node;
+		des_node->next = src_node;
+	}
+	else if( list->current_node_pos > pos ) {
+		if( des_node->prev ) {
+			des_node->prev->next = src_node;
+		} else {
 			list->used_head_node = src_node;
-                }
-                src_node->prev = des_node->prev;
-                des_node->prev = src_node;
-                src_node->next = des_node;
-        }
-        return 0;
+		}
+		src_node->prev = des_node->prev;
+		des_node->prev = src_node;
+		src_node->next = des_node;
+	}
+	return 0;
 }
 
 /** 分配一个可用的结点 */
 static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
 {
-        if( !list->usable_head_node ) {
+	if( !list->usable_head_node ) {
 		list->usable_head_node = MALLOC_ONE(LinkedListNode);
 		list->usable_head_node->next = NULL;
 		list->usable_head_node->prev = NULL;
 		list->usable_head_node->data = NULL;
 		++list->usable_node_num;
-        }
+	}
 
-        ++list->used_node_num;
+	++list->used_node_num;
 	--list->usable_node_num;
 
 	if( !list->used_head_node ) {
@@ -338,7 +351,7 @@ static LinkedListNode *LinkedList_AllocNode( LinkedList *list )
 	list->used_tail_node = list->used_tail_node->next;
 	DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
 	list->used_tail_node->next = NULL;
-        return list->used_tail_node;
+	return list->used_tail_node;
 }
 
 /** 在当前结点前面插入新结点，并引用数据 */
@@ -383,7 +396,7 @@ void* LinkedList_InsertCopy( LinkedList *list, void *data )
 {
 	void *data_copy;
 	data_copy = malloc( list->node_data_size );
-        memcpy( data_copy, data, list->node_data_size );
+	memcpy( data_copy, data, list->node_data_size );
 	LinkedList_Insert( list, data_copy );
 	return data_copy;
 }
@@ -391,22 +404,22 @@ void* LinkedList_InsertCopy( LinkedList *list, void *data )
 /** 将数据的副本记录至链表的相应结点上 */
 void *LinkedList_AddDataCopy( LinkedList *list, void *data )
 {
-        LinkedListNode *node;
-        node = LinkedList_AllocNode( list );
-        if( !node->data ) {
-                node->data = malloc( list->node_data_size );
-        }
-        memcpy( node->data, data, list->node_data_size );
-        return node->data;
+	LinkedListNode *node;
+	node = LinkedList_AllocNode( list );
+	if( !node->data ) {
+		node->data = malloc( list->node_data_size );
+	}
+	memcpy( node->data, data, list->node_data_size );
+	return node->data;
 }
 
 /** 将数据引用至链表的相应结点 */
 void LinkedList_AddData( LinkedList *list, void *data_ptr )
 {
-        LinkedListNode *node;
-        node = LinkedList_AllocNode( list );
-        if( node->data ) {
-                free( node->data );
-        }
-        node->data = data_ptr;
+	LinkedListNode *node;
+	node = LinkedList_AllocNode( list );
+	if( node->data ) {
+		free( node->data );
+	}
+	node->data = data_ptr;
 }
