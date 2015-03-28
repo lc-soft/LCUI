@@ -37,7 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#define DEBUG
+//#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -139,7 +139,6 @@ static LCUI_Surface $(GetBindSurface)( LCUI_Widget widget )
 static void $(BindSurface)( LCUI_Widget widget )
 {
 	SurfaceRecord *p_sr;
-	_DEBUG_MSG("tip\n");
 	if( $(GetBindSurface)(widget) ) {
 		return;
 	}
@@ -253,7 +252,7 @@ static int $(Seamless)( void )
 int $(SetMode)( int mode )
 {
 	int ret;
-	_DEBUG_MSG("mode: %d\n", mode);
+	DEBUG_MSG("mode: %d\n", mode);
 	LCUIMutex_Lock( &display.mutex );
 	switch( mode ) {
 	case LDM_WINDOWED:
@@ -309,10 +308,10 @@ static void $(Thread)( void *unused )
 /** 响应顶级部件的各种事件 */
 static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 {
-	int e_type = *((int*)e->data);
+	int e_type = *((int*)&arg);
 	LCUI_Surface surface;
 	
-	_DEBUG_MSG("tip, e_type = %d\n", e_type);
+	DEBUG_MSG("tip, e_type = %d, e->data = %p, e->target = %p, arg: %p\n", e_type, e->data, e->target, arg);
 	surface = $(GetBindSurface)( e->target );
 	if( display.mode == LDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
