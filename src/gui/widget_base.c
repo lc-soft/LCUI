@@ -206,12 +206,7 @@ static void $(Init)( LCUI_Widget widget )
 	widget->style.padding.bottom.type = SVT_PX;
 	widget->style.padding.left.type = SVT_PX;
 	widget->event = LCUIEventBox_Create();
-	widget->base.x = widget->base.y = 0;
-	widget->base.width = widget->base.height = 0;
-	widget->base.margin.left = 0;
-	widget->base.margin.top = 0;
-	widget->base.margin.bottom = 0;
-	widget->base.margin.right = 0;
+	memset( &widget->base, 0, sizeof(widget->base));
 	widget->parent = NULL;
 	widget->event = LCUIEventBox_Create();
 	Widget_InitTaskBox( widget );
@@ -224,6 +219,7 @@ static void $(Init)( LCUI_Widget widget )
 	LinkedList_SetDataNeedFree( &widget->children, TRUE );
 	LinkedList_SetDataNeedFree( &widget->children_show, FALSE );
 	DirtyRectList_Init( &widget->dirty_rects );
+	Graph_Init( &widget->graph );
 }
 
 /** 新建一个GUI部件 */
@@ -391,6 +387,18 @@ void $(ComputeCoord)( LCUI_Widget w )
 	w->base.box.outer.y -= w->base.margin.top;
 	w->base.box.graph.x -= BoxShadow_GetBoxX(&w->style.shadow);
 	w->base.box.graph.y -= BoxShadow_GetBoxY(&w->style.shadow);
+}
+
+/** 更新位图尺寸 */
+void $(UpdateGraphBox)( LCUI_Widget w )
+{
+	LCUI_Rect *rb = &w->base.box.border;
+	LCUI_Rect *rg = &w->base.box.graph;
+	rg->x = w->base.x - BoxShadow_GetBoxX( &w->style.shadow );
+	rg->y = w->base.y - BoxShadow_GetBoxY( &w->style.shadow );
+	rg->width = BoxShadow_GetWidth( &w->style.shadow, rb->width );
+	rg->height = BoxShadow_GetHeight( &w->style.shadow, rb->height );
+	Graph_Create( &w->graph, rg->width, rg->height );
 }
 
 /** 计算尺寸 */

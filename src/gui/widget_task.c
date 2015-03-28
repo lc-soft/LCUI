@@ -87,6 +87,21 @@ static void HandleMove( LCUI_Widget w, LCUI_WidgetTask *t )
 /** 处理尺寸调整 */
 static void HandleResize( LCUI_Widget w, LCUI_WidgetTask *t )
 {
+	LCUI_WidgetTask task;
+	LCUI_Rect rect;
+	
+	rect.x = w->base.box.graph.x;
+	rect.y = w->base.box.graph.y;
+	rect.width = t->resize.w;
+	rect.height = t->resize.h;
+	_DEBUG_MSG("old_w: %d, old_h: %d\n", t->resize.w, t->resize.w);
+	Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+	rect.width = w->base.box.graph.width;
+	rect.height = w->base.box.graph.height;
+	Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+	Widget_UpdateGraphBox( w );
+	task.type = WTT_REFRESH;
+	Widget_AddTask( w, &task );
 	if( w->parent == LCUIRootWidget ) {
 		LCUI_WidgetEvent e;
 		e.type_name = "TopLevelWidget";

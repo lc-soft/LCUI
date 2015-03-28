@@ -107,6 +107,10 @@ LCUI_API LCUI_Widget $(At)( LCUI_Widget widget, int x, int y );
 
 /** 设置部件为顶级部件 */
 LCUI_API int $(Top)( LCUI_Widget w );
+
+/** 更新位图尺寸 */
+void $(UpdateGraphBox)( LCUI_Widget w );
+
 /** 获取内边距框占用的矩形区域 */
 LCUI_API void $(GetPaddingRect)( LCUI_Widget widget, LCUI_Rect *rect );
 
@@ -118,6 +122,9 @@ LCUI_API void $(GetBorderRect)( LCUI_Widget widget, LCUI_Rect *rect );
 
 /** 获取部件当前占用的矩形区域（包括阴影区域） */
 LCUI_API void $(GetOuterRect)( LCUI_Widget widget, LCUI_Rect *rect );
+
+/** 移动部件位置 */
+LCUI_API void $(Move)( LCUI_Widget w, int top, int left );
 
 LCUI_API void $(Resize)( LCUI_Widget w, int width, int height );
 
