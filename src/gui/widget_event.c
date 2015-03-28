@@ -75,15 +75,15 @@ static void DestroyWidgetEventTask( void *arg )
 }
 
 /** 将原始事件转换成部件事件 */
-static void WidgetEventHandler( LCUI_Event *event, void *arg )
+static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 {
 	LCUI_Widget widget;
-	LCUI_WidgetEventTask *task = (LCUI_WidgetEventTask*)event->data;
-	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)arg;
+	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)event->data;
 
 	pack->event.data = task->data;
 	pack->event.type = event->id;
 	pack->event.type_name = event->name;
+	_DEBUG_MSG("event: %s, task: %p\n", event->name, task);
 
 	switch( event->id ) {
 	case LCUI_INPUT:
@@ -139,10 +139,12 @@ static void WidgetEventHandler( LCUI_Event *event, void *arg )
 static void OnWidgetEvent( LCUI_Event *event, void *arg )
 {
 	LCUI_Task task;
-	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)arg;
+	LCUI_WidgetEventTask *p_wet = (LCUI_WidgetEventTask*)arg;
+	LCUI_WidgetEventPack *p_wep = (LCUI_WidgetEventPack*)event->data;
+	_DEBUG_MSG("pack: %p, task: %p\n", p_wep, p_wet);
 	/* 如果需要直接执行 */
-	if( pack->is_direct_run ) {
-		WidgetEventHandler( event, arg );
+	if( p_wep->is_direct_run ) {
+		WidgetEventHandler( event, p_wet );
 		return;
 	}
 	/* 准备任务 */
@@ -152,9 +154,11 @@ static void OnWidgetEvent( LCUI_Event *event, void *arg )
 	/* 这两个参数都需要在任务执行完后释放 */
 	task.destroy_arg[0] = TRUE;
 	task.destroy_arg[1] = TRUE;
+	task.destroy_func[0] = NULL;
+	task.destroy_func[1] = NULL;
 	/* 复制所需数据，因为在本函数退出后，这两个参数会被销毁 */
 	*((LCUI_Event*)task.arg[0]) = *event;
-	*((LCUI_WidgetEventPack*)task.arg[1]) = *pack;
+	*((LCUI_WidgetEventTask*)task.arg[1]) = *p_wet;
 	/* 把任务扔给当前跑主循环的线程 */
 	LCUI_AddTask( &task );
 }
@@ -187,8 +191,9 @@ int Widget_BindEvent(	LCUI_Widget widget, const char *event_name,
 	task->func = func;
 	task->data = func_data;
 	task->data_destroy = destroy_data;
+	_DEBUG_MSG("event: %s, task: %p\n", event_name, task);
 	return LCUIEventBox_Bind( 
-		&widget->event, event_name, 
+		widget->event, event_name, 
 		OnWidgetEvent, task, DestroyWidgetEventTask
 	);
 }
@@ -226,9 +231,11 @@ int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 	pack->event = *e;
 	pack->widget = widget;
 	pack->is_direct_run = FALSE;
+	_DEBUG_MSG("pack: %p\n", pack);
 	ret = LCUIEventBox_Post( widget->event, e->type_name, pack, NULL );
 	if( !RBTree_CustomSearch( &widget_mark_tree, widget ) ) {
 		RBTree_CustomInsert( &widget_mark_tree, widget, widget );
+		LinkedList_AddData( &widget_list, widget );
 	}
 	return ret;
 }
@@ -338,10 +345,12 @@ void LCUIWidget_Event_Step(void)
 	LCUI_Widget widget;
 
 	n = LinkedList_GetTotal( &widget_list );
+	DEBUG_MSG("widget total: %d\n", n);
 	for( i=0; i<n; ++i ) {
 		LinkedList_Goto( &widget_list, 0 );
 		widget = (LCUI_Widget)LinkedList_Get( &widget_list );
 		LinkedList_Delete( &widget_list );
+		DEBUG_MSG("dispatch event, widget: %p, is_root: %s\n", widget, widget == LCUIRootWidget ? "TURE":"FALSE");
 		LCUIEventBox_Dispatch( widget->event );
 		RBTree_CustomErase( &widget_mark_tree, widget );
 	}

@@ -110,6 +110,7 @@ remove_done:
 		ret = Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_ADD );
 		_DEBUG_MSG("post done, ret = %d\n", ret);
 	}
+	Widget_UpdateTaskStatus( widget );
 	_DEBUG_MSG("tip\n");
 	return 0;
 }
@@ -651,7 +652,6 @@ void $(Resize)( LCUI_Widget w, int width, int height )
 	$(ComputeSize)( w );
 	Widget_AddTask( w, &t );
 	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
-
 }
 
 void $(SetWidth)( LCUI_Widget w, const char *value )
@@ -670,6 +670,7 @@ void $(Show)( LCUI_Widget w )
 	t.type = WTT_SHOW;
 	t.visible = w->style.visible;
 	w->style.visible = TRUE;
+	_DEBUG_MSG("tip, type: %d, %d\n", t.type, WTT_SHOW);
 	Widget_AddTask( w, &t );
 }
 
@@ -691,5 +692,4 @@ void LCUIModule_Widget_Init(void)
 {
 	$(Init)(LCUIRootWidget);
 	LCUIWidget_Task_Init();
-	LCUI_RegisterEventWithId("widget", LCUI_WIDGET);
 }
