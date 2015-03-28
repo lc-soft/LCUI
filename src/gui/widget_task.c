@@ -102,7 +102,7 @@ static void HandleVisibility( LCUI_Widget w, LCUI_WidgetTask *t )
 	if( w->parent == LCUIRootWidget ) {
 		int *type;
 		LCUI_WidgetEvent e;
-
+		
 		e.type_name = "TopLevelWidget";
 		e.target = w;
 		type = (int*)(t->visible ? WET_SHOW:WET_HIDE);
@@ -143,22 +143,45 @@ static void HandleDestroy( LCUI_Widget w, LCUI_WidgetTask *t )
 	// code ...
 }
 
+/** 更新当前任务状态，确保部件的任务能够被处理到 */
+void Widget_UpdateTaskStatus( LCUI_Widget widget )
+{
+	int i;
+	for( i=0; i<WTT_TOTAL_NUM && !widget->task->for_self; ++i ) {
+		if( widget->task->buffer[i]->is_valid ) {
+			widget->task->for_self = TRUE;
+		}
+	}
+	if( !widget->task->for_self ) {
+		return;
+	}
+	widget = widget->parent;
+	/* 向没有标记的父级部件添加标记 */
+	while( widget && !widget->task->for_children ) {
+		widget->task->for_children = TRUE;
+		widget = widget->parent;
+	}
+}
+
 /** 添加任务 */
 int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data )
 {
 	TaskRecord *buffer;
-	buffer = widget->task->buffer[widget->task->i == 1 ? 0:1];
+	buffer = widget->task->buffer[widget->task->i];
 	if( buffer[data->type].is_valid ) {
 		return -1;
 	}
 	buffer[data->type].is_valid = TRUE;
 	buffer[data->type].data = *data;
 	widget->task->for_self = TRUE;
+	DEBUG_MSG("widget: %p, parent_is_root: %d, for_childen: %d, task_id: %d\n", 
+	widget, widget->parent == LCUIRootWidget, widget->task->for_children, data->type);
 	widget = widget->parent;
 	/* 向没有标记的父级部件添加标记 */
 	while( widget && !widget->task->for_children ) {
 		widget->task->for_children = TRUE;
 		widget = widget->parent;
+		DEBUG_MSG("widget: %p\n", widget );
 	}
 	return 0;
 }
@@ -183,7 +206,6 @@ static void MapTaskHandler(void)
 /** 初始化 LCUI 部件任务处理功能 */
 void LCUIWidget_Task_Init(void)
 {
-	_DEBUG_MSG("tip\n");
 	MapTaskHandler();
 }
 
@@ -201,6 +223,7 @@ void Widget_InitTaskBox( LCUI_Widget widget )
 	malloc(sizeof(struct LCUI_WidgetTaskBoxRec_));
 	widget->task->for_children = FALSE;
 	widget->task->for_self = FALSE;
+	widget->task->i = 0;
 	for( i=0; i<WTT_TOTAL_NUM; ++i ) {
 		widget->task->buffer[0][i].is_valid = FALSE;
 		widget->task->buffer[1][i].is_valid = FALSE;
@@ -219,12 +242,13 @@ static void Widget_ProcTask( LCUI_Widget w )
 {
 	int i, n;
 	TaskRecord *buffer;
+	DEBUG_MSG("widget: %p, is_root: %d, for_self: %d, for_children: %d\n", w, w == LCUIRootWidget, w->task->for_self, w->task->for_children);
 	/* 如果该部件有任务需要处理 */
 	if( w->task->for_self ) {
 		w->task->for_self = FALSE;
+		buffer = w->task->buffer[w->task->i];
 		/* 切换前后台记录 */
 		w->task->i = w->task->i == 1 ? 0:1;
-		buffer = w->task->buffer[w->task->i];
 		/* 如果该部件需要销毁，其它任务就不用再处理了 */
 		if( buffer[WTT_DESTROY].is_valid ) {
 			task_handlers[WTT_DESTROY]( w, NULL );
@@ -249,6 +273,7 @@ static void Widget_ProcTask( LCUI_Widget w )
 		w->task->for_children = FALSE;
 		n = LinkedList_GetTotal( &w->children );
 		LinkedList_Goto( &w->children, 0 );
+		DEBUG_MSG("children_total: %d\n", n);
 		for( i=0; i<n; ++i ) {
 			child = (LCUI_Widget)LinkedList_Get( &w->children );
 			LinkedList_ToNext( &w->children );

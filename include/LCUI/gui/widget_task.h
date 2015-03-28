@@ -61,7 +61,7 @@ enum WidgetTaskType {
 
 #define WTT_TOTAL_NUM (WTT_DESTROY+1)
 
-typedef union LCUI_WidgetTask {
+typedef struct LCUI_WidgetTask {
 	int type;
 	/** 主要用于记录更新前的属性值，在更新时通过对比新旧属性来计算脏矩形 */
 	union {
@@ -83,6 +83,9 @@ typedef void* LCUI_WidgetTaskBox;
 #else
 typedef struct LCUI_WidgetTaskBoxRec_* LCUI_WidgetTaskBox;
 #endif
+
+/** 更新当前任务状态，确保部件的任务能够被处理到 */
+LCUI_API void Widget_UpdateTaskStatus( LCUI_Widget widget );
 
 /** 添加任务 */
 LCUI_API int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data );
