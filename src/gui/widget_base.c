@@ -1,8 +1,7 @@
 /* ***************************************************************************
  * widget_base.c -- the widget base operation set.
  *
- * Copyright (C) 2012-2014 by
- * Liu Chao
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,8 +22,7 @@
 /* ****************************************************************************
  * widget_base.c -- 部件的基本操作集。
  *
- * 版权所有 (C) 2012-2014 归属于
- * 刘超
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -208,6 +206,7 @@ static void $(Init)( LCUI_Widget widget )
 	widget->event = LCUIEventBox_Create();
 	memset( &widget->base, 0, sizeof(widget->base));
 	widget->parent = NULL;
+	widget->title = NULL;
 	widget->event = LCUIEventBox_Create();
 	Widget_InitTaskBox( widget );
 	Background_Init( &widget->style.background );
@@ -262,6 +261,22 @@ int $(Top)( LCUI_Widget w )
 {
 	_DEBUG_MSG("tip\n");
 	return $(Append)( LCUIRootWidget, w );
+}
+
+/** 设置部件标题 */
+void $(SetTitleW)( LCUI_Widget w, const wchar_t *title )
+{
+	int len;
+	LCUI_WidgetTask t;
+
+	if( w->title ) {
+		free( w->title );
+		w->title = NULL;
+	}
+	len = wcslen(title) + 1;
+	w->title = (wchar_t*)malloc(sizeof(wchar_t)*len);
+	wcsncpy( w->title, title, len );
+	Widget_AddTask( w, (t.type = WTT_TITLE, &t) );
 }
 
 /** 获取内边距框占用的矩形区域 */
@@ -693,7 +708,75 @@ void $(Hide)( LCUI_Widget w )
 
 void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color )
 {
+	w->style.background.color = color;
+}
 
+#define PULL(WIDGET, STYLE) WIDGET##->base.style.STYLE## = WIDGET##->style.##STYLE
+#define PUSH(WIDGET, STYLE) WIDGET##->style.STYLE## = WIDGET##->base.style.##STYLE
+
+
+/** 拉取现有样式至缓存区 */
+void $(PullStyle)( LCUI_Widget w, int style )
+{
+	if(!(style & WSS_POSITION) ) goto PULL_WSS_BOX;
+	PULL(w, position);
+	PULL(w, x);
+	PULL(w, y);
+	PULL(w, z_index);
+	PULL(w, top);
+	PULL(w, right);
+	PULL(w, bottom);
+	PULL(w, left);
+PULL_WSS_BOX:
+	if( !(style & WSS_BOX) ) goto PULL_WSS_BACKGROUND;
+	PULL(w, box_sizing);
+	PULL(w, width);
+	PULL(w, height);
+	PULL(w, margin);
+	PULL(w, padding);
+PULL_WSS_BACKGROUND:
+	if( !(style & WSS_BACKGROUND) ) goto PULL_WSS_BORDER;
+	PULL(w, background);
+PULL_WSS_BORDER:
+	if( !(style & WSS_BORDER) ) goto PULL_WSS_SHADOW;
+	PULL(w, border);
+PULL_WSS_SHADOW:
+	if( !(style & WSS_SHADOW) ) goto PULL_DONE;
+	PULL(w, shadow);
+PULL_DONE:
+	return;
+}
+
+/** 推送缓存区中的样式，以让部件应用新样式 */
+void $(PushStyle)( LCUI_Widget w, int style )
+{
+	if(!(style & WSS_POSITION) ) goto PUSH_WSS_BOX;
+	PUSH(w, position);
+	PUSH(w, x);
+	PUSH(w, y);
+	PUSH(w, z_index);
+	PUSH(w, top);
+	PUSH(w, right);
+	PUSH(w, bottom);
+	PUSH(w, left);
+PUSH_WSS_BOX:
+	if( !(style & WSS_BOX) ) goto PUSH_WSS_BACKGROUND;
+	PUSH(w, box_sizing);
+	PUSH(w, width);
+	PUSH(w, height);
+	PUSH(w, margin);
+	PUSH(w, padding);
+PUSH_WSS_BACKGROUND:
+	if( !(style & WSS_BACKGROUND) ) goto PUSH_WSS_BORDER;
+	PUSH(w, background);
+PUSH_WSS_BORDER:
+	if( !(style & WSS_BORDER) ) goto PUSH_WSS_SHADOW;
+	PUSH(w, border);
+PUSH_WSS_SHADOW:
+	if( !(style & WSS_SHADOW) ) goto PUSH_DONE;
+	PUSH(w, shadow);
+PUSH_DONE:
+	return;
 }
 
 void LCUIModule_Widget_Init(void)

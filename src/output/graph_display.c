@@ -311,7 +311,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 	int e_type = *((int*)&arg);
 	LCUI_Surface surface;
 	
-	DEBUG_MSG("tip, e_type = %d, e->data = %p, e->target = %p, arg: %p\n", e_type, e->data, e->target, arg);
+	_DEBUG_MSG("tip, e_type = %d\n", e_type);
 	surface = $(GetBindSurface)( e->target );
 	if( display.mode == LDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
@@ -332,10 +332,16 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 	case WET_HIDE:
 		Surface_Hide( surface );
 		break;
+	case WET_TITLE: {
+		_DEBUG_MSG("%S\n", e->target->title );
+		Surface_SetCaptionW( surface, e->target->title );
+		break;
+	}
 	case WET_RESIZE: {
 		int w, h;
 		w = e->target->base.box.graph.w;
 		h = e->target->base.box.graph.h;
+		_DEBUG_MSG("w: %d, h: %d\n", w, h);
 		Surface_Resize( surface, w, h );
 		break;
 	}
@@ -343,6 +349,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 		int x, y;
 		x = e->target->base.box.graph.x;
 		y = e->target->base.box.graph.y;
+		_DEBUG_MSG("x: %d, y: %d\n", x, y);
 		Surface_Move( surface, x, y );
 		break;
 	}

@@ -84,6 +84,16 @@ static void HandleMove( LCUI_Widget w, LCUI_WidgetTask *t )
 	}
 }
 
+static void HandleSetTitle( LCUI_Widget w, LCUI_WidgetTask *t )
+{
+	if( w->parent == LCUIRootWidget ) {
+		LCUI_WidgetEvent e;
+		e.type_name = "TopLevelWidget";
+		e.target = w;
+		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_TITLE );
+	}
+}
+
 /** 处理尺寸调整 */
 static void HandleResize( LCUI_Widget w, LCUI_WidgetTask *t )
 {
@@ -113,7 +123,6 @@ static void HandleResize( LCUI_Widget w, LCUI_WidgetTask *t )
 /** 处理可见性 */
 static void HandleVisibility( LCUI_Widget w, LCUI_WidgetTask *t )
 {
-	/* 如果是顶级部件 */
 	if( w->parent == LCUIRootWidget ) {
 		int *type;
 		LCUI_WidgetEvent e;
@@ -215,6 +224,7 @@ static void MapTaskHandler(void)
 	task_handlers[WTT_SHADOW] = HandleShadow;
 	task_handlers[WTT_OPACITY] = HandleOpacity;
 	task_handlers[WTT_BODY] = HandleBody;
+	task_handlers[WTT_TITLE] = HandleSetTitle;
 	task_handlers[WTT_REFRESH] = HandleRefresh;
 }
 
