@@ -40,15 +40,6 @@
 #ifndef __LCUI_DRAW_BOXSHADOW_H__
 #define __LCUI_DRAW_BOXSHADOW_H__
 
-#define BLUR_SIZE_SCALE	1.5
-
-typedef struct LCUI_BoxShadow {
-	int x, y;		/**< 位置 */
-	int blur;		/**< 模糊距离 */
-	int spread;		/**< 扩散大小 */
-	LCUI_Color color;	/**<　颜色　*/
-} LCUI_BoxShadow;
-
 static inline LCUI_BoxShadow BoxShadow( int x, int y, int blur, LCUI_Color color )
 {
 	LCUI_BoxShadow shadow;

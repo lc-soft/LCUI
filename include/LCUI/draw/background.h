@@ -42,23 +42,6 @@
 
 LCUI_BEGIN_HEADER
 
-typedef struct LCUI_Background {
-	LCUI_Graph image;	/**< 背景图 */
-	LCUI_Color color;	/**< 背景色 */
-	int clip;		/**< 背景图的裁剪方式 */
-	int origin;		/**< 相对于何种位置进行定位 */
-	
-	struct {
-		LCUI_BOOL x, y;
-	} repeat;		/**< 背景图是否重复 */
-	struct {
-		LCUI_StyleVar x, y;
-	} position;		/**< 定位方式 */
-	struct {
-		LCUI_StyleVar w, h;
-	} size;
-} LCUI_Background;
-
 /** 初始化背景绘制参数 */
 LCUI_API void Background_Init( LCUI_Background *bg );
 

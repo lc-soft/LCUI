@@ -42,19 +42,6 @@
 
 LCUI_BEGIN_HEADER
 
-/* 完整的边框信息 */
-typedef struct LCUI_Border {
-	struct {
-		int width;
-		int style;
-		LCUI_Color color;
-	} top, right, bottom, left;
-	unsigned int top_left_radius;
-	unsigned int top_right_radius;
-	unsigned int bottom_left_radius;
-	unsigned int bottom_right_radius;
-} LCUI_Border;
-
 LCUI_API void Border_Init( LCUI_Border *border );
 /* 初始化边框数据 */
 

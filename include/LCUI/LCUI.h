@@ -142,6 +142,47 @@ typedef struct LCUI_Rect2_ {
 	};
 } LCUI_Rect2;
 
+/** 样式变量类型 */
+typedef enum LCUI_StyleVarType {
+	SVT_NONE,
+	SVT_AUTO,
+	SVT_SCALE,		/**< 比例 */
+	SVT_PX,			/**< 像素 */
+	SVT_PT,			/**< 点 */
+	SVT_COLOR		/**< 色彩 */
+} LCUI_StyleVarType;
+
+/** 用于描述样式的变量类型 */
+typedef struct LCUI_StyleVar {
+	LCUI_StyleVarType type;		/**< 哪一种类型 */
+	union {
+		int px;			/**< pixel, 像素 */
+		int pt;			/**< point，点数（一般用于字体大小单位） */
+		double scale;		/**< 比例 */
+		LCUI_Color color;	/**< 色彩值 */
+	};
+} LCUI_StyleVar;
+
+typedef struct LCUI_BoxShadow {
+	int x, y;		/**< 位置 */
+	int blur;		/**< 模糊距离 */
+	int spread;		/**< 扩散大小 */
+	LCUI_Color color;	/**<　颜色　*/
+} LCUI_BoxShadow;
+
+/* 完整的边框信息 */
+typedef struct LCUI_Border {
+	struct {
+		int width;
+		int style;
+		LCUI_Color color;
+	} top, right, bottom, left;
+	unsigned int top_left_radius;
+	unsigned int top_right_radius;
+	unsigned int bottom_left_radius;
+	unsigned int bottom_right_radius;
+} LCUI_Border;
+
 typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
 	int x, y;			/**< 源图形中的引用区域所在的坐标 */
@@ -158,6 +199,23 @@ struct LCUI_Graph_ {
 	};
 	size_t mem_size;		/**< 像素数据缓冲区大小 */
 };
+
+typedef struct LCUI_Background {
+	LCUI_Graph image;	/**< 背景图 */
+	LCUI_Color color;	/**< 背景色 */
+	int clip;		/**< 背景图的裁剪方式 */
+	int origin;		/**< 相对于何种位置进行定位 */
+	
+	struct {
+		LCUI_BOOL x, y;
+	} repeat;		/**< 背景图是否重复 */
+	struct {
+		LCUI_StyleVar x, y;
+	} position;		/**< 定位方式 */
+	struct {
+		LCUI_StyleVar w, h;
+	} size;
+} LCUI_Background;
 
 /** 进行绘制时所需的上下文 */
 typedef struct LCUI_PaintContextRec_ {

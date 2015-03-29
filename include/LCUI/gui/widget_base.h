@@ -1,8 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_base.h -- the widget base operation set.
  *
- * Copyright (C) 2012-2014 by
- * Liu Chao
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,8 +22,7 @@
 /* ****************************************************************************
  * widget_base.h -- 部件的基本操作集。
  *
- * 版权所有 (C) 2012-2014 归属于
- * 刘超
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -68,6 +66,16 @@ enum LCUI_WidgetBorderStyle {
 	BORDER_DASHED	/**< 虚线 */
 };
 
+/** 部件样式域 */
+enum LCUI_WidgetStyleScope {
+	WSS_POSITION	= 1,		/**< 位置，包括坐标、定位方式等 */
+	WSS_BOX		= 1<<1,		/**< 区域框，包括内容框、内边距框、外边距框 */
+	WSS_BACKGROUND	= 1<<2,		/**< 背景，包括背景色、背景图、背景定位、背景尺寸等 */
+	WSS_BORDER	= 1<<3,		/**< 边框 */
+	WSS_SHADOW	= 1<<4,		/**< 阴影 */
+	WSS_ALL		= 0xffffffff,	/**< 全部 */
+};
+
 /** 框类型 */
 typedef enum LCUI_WidgetBoxType {
 	CONTENT_BOX,	/**< 内容框 */
@@ -75,6 +83,41 @@ typedef enum LCUI_WidgetBoxType {
 	BORDER_BOX,	/**< 边框盒 */
 	GRAPH_BOX	/**< 图形呈现框 */
 } LCUI_WidgetBoxType;
+
+/** 部件样式 */
+typedef struct LCUI_WidgetStyle {
+	LCUI_BOOL visible;		/**< 是否可见 */
+	int position;			/**< 定位方式 */
+	int left, top;			/**< 左边界、顶边界的偏移距离 */
+	int right, bottom;		/**< 右边界、底边界的偏移距离 */
+	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
+	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
+	LCUI_StyleVar x, y;		/**< 当前平面坐标 */
+	LCUI_WidgetBoxType box_sizing;	/**< 以何种方式计算宽度和高度 */
+
+	union {
+		LCUI_StyleVar w, width;	/**< 部件区域宽度 */
+	};
+	union {
+		LCUI_StyleVar h, height;	/**< 部件区域高度 */
+	};
+
+	struct {
+		LCUI_StyleVar top, right, bottom, left;
+	} margin, padding;		/**< 外边距, 内边距 */
+
+	LCUI_Background background;	/**< 背景 */
+	LCUI_BoxShadow shadow;		/**< 阴影 */
+	LCUI_Border border;		/**< 边框 */
+
+	struct {
+		struct {
+			float x, y;
+		} scale;		/**< 2D 缩放 */
+		float rotate;		/**< 2D 旋转角度 */
+	} transform;
+
+} LCUI_WidgetStyle;
 
 typedef struct LCUI_WidgetBase {
 	int x, y;			/**< 部件当前坐标 */
@@ -87,6 +130,7 @@ typedef struct LCUI_WidgetBase {
 	} box;				/**< 部件的各个区域信息 */
 	LCUI_Rect2 padding;		/**< 内边框 */
 	LCUI_Rect2 margin;		/**< 外边框 */
+	LCUI_WidgetStyle style;		/**< 样式缓存 */
 } LCUI_WidgetBase;
 
 #undef $
@@ -110,6 +154,9 @@ LCUI_API int $(Top)( LCUI_Widget w );
 
 /** 更新位图尺寸 */
 void $(UpdateGraphBox)( LCUI_Widget w );
+
+/** 设置部件标题 */
+LCUI_API void $(SetTitleW)( LCUI_Widget w, const wchar_t *title );
 
 /** 获取内边距框占用的矩形区域 */
 LCUI_API void $(GetPaddingRect)( LCUI_Widget widget, LCUI_Rect *rect );

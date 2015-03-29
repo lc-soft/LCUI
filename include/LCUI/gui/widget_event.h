@@ -63,6 +63,7 @@ enum WidgetEventType {
 	WET_MOUSEUP,
 	WET_CLICK,
 	
+	WET_TITLE,
 	WET_USER
 };
 
