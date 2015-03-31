@@ -17,9 +17,12 @@ m4/
 *.tlog
 *.log
 *.obj
+*.aps
+*.psess
 .deps
 .libs
 *.la
+*.vspx
 *.*~
 aclocal.m4
 Makefile
