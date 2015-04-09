@@ -38,7 +38,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
- 
+
 #define __IN_EVENT_SOURCE_FILE__
 
 #include <LCUI_Build.h>
@@ -151,14 +151,12 @@ static int _RegisterEvent( LCUI_EventBox box, const char *event_name, int id )
 {
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
-	
+
 	/* 查找事件槽记录 */
-	if( node = RBTree_CustomSearch( 
-		&box->event_name, (const void*)event_name
-	) ) {
+	if( RBTree_CustomSearch( &box->event_name, event_name ) ) {
 		return -1;
 	}
-	if( node = RBTree_Search( &box->used_evnet_id, id ) ) {
+	if( RBTree_Search( &box->used_evnet_id, id ) ) {
 		return -2;
 	}
 	/* 新建一个事件槽 */
@@ -170,7 +168,7 @@ static int _RegisterEvent( LCUI_EventBox box, const char *event_name, int id )
 	/* 添加事件槽记录 */
 	RBTree_Insert( &box->event_slot, slot->id, slot );
 	/* 添加事件名记录 */
-	node = RBTree_CustomInsert( 
+	node = RBTree_CustomInsert(
 		&box->event_name, (const void*)event_name, &slot->name
 	);
 	/* 结点的 key 就是事件槽的 id */
@@ -222,8 +220,8 @@ int $(IsExistEventId)( LCUI_EventBox box, int id )
 /** 获取指定事件ID的名称 */
 const char *$(GetEventName)( LCUI_EventBox box, int id )
 {
-	LCUI_RBTreeNode *node;
-	if( node = RBTree_Search( &box->event_slot, id ) ) {
+	LCUI_RBTreeNode *node = RBTree_Search( &box->event_slot, id );
+	if( node ) {
 		return (const char*)node->data;
 	}
 	return NULL;
@@ -236,7 +234,8 @@ int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
-	
+	void *data;
+
 	node = RBTree_Search( &box->event_slot, event_id );
 	if( !node ) {
 		return -1;
@@ -249,9 +248,10 @@ int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
 	handler->func_data = func_data;
 	handler->destroy_data = destroy_data;
 	LinkedList_AddData( &slot->handlers, handler );
-	RBTree_Insert( 
-		&box->event_handler, handler->id, (void*)(slot->id)
-	);
+	/* 将int类型的值转换成void×类型的值 */
+	data = &slot->id;
+	data = *(void**)data;
+	RBTree_Insert( &box->event_handler, handler->id, data );
 	return handler->id;
 }
 
@@ -275,7 +275,7 @@ int $(Bind)(	LCUI_EventBox box, const char *event_name, EventCallBack func,
 	} else {
 		id = node->key;
 	}
-	return $(BindById)( 
+	return $(BindById)(
 		box, id, func, func_data, destroy_data
 	);
 }
@@ -283,15 +283,19 @@ int $(Bind)(	LCUI_EventBox box, const char *event_name, EventCallBack func,
 /** 解除事件连接 */
 int $(Unbind)( LCUI_EventBox box, int handler_id )
 {
-	int i, n;
+	int i, n, *data;
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
 
-	if( !(node = RBTree_Search(&box->event_handler, handler_id)) ) {
+	node = RBTree_Search(&box->event_handler, handler_id);
+	if( !node ) {
 		return -1;
 	}
-	if( !(node = RBTree_Search(&box->event_slot, (int)(node->data))) ) {
+	/* 将data指针的值转换成 int 型数据 */
+	data = (int*)&node->data;
+	node = RBTree_Search(&box->event_slot, *data);
+	if( !node ) {
 		return -2;
 	}
 	slot = (LCUI_EventSlot*)node->data;
@@ -347,7 +351,7 @@ int $(Post)(	LCUI_EventBox box, const char *name, void *data,
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	LinkedList *elist = &box->events[box->current];
-	
+
 	_DEBUG_MSG("eventbox: %p, handler_id: %d\n", box, box->handler_id);
 	if( !(node = RBTree_CustomSearch(&box->event_name, (const void*)name)) ) {
 		return -1;
@@ -370,7 +374,7 @@ int $(Dispatch)( LCUI_EventBox box )
 	int i, n;
 	LCUI_Event *e;
 	LinkedList *elist;
-	
+
 	elist = &box->events[box->current];
 	box->current = box->current ? 0:1;
 	n = LinkedList_GetTotal( elist );
@@ -392,7 +396,7 @@ int $(GetEvent)( LCUI_EventBox box, LCUI_Event *ebuff )
 	int n;
 	LCUI_Event *event;
 	LinkedList *elist;
-	
+
 	elist = &box->events[box->current];
 	n = LinkedList_GetTotal( elist );
 	if( n <= 0 ) {
