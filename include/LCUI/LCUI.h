@@ -185,19 +185,23 @@ typedef struct LCUI_Border {
 
 typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
-	int x, y;			/**< 源图形中的引用区域所在的坐标 */
-	int w, h;			/**< 图形的尺寸 */
-	int color_type;			/**< 色彩类型 */
-	uchar_t *palette;		/**< 调色板 */
-	uchar_t alpha;			/**< 全局透明度 */
-	LCUI_BOOL quote;		/**< 标志，指示是否引用了另一图形 */
-	LCUI_Graph *src;		/**< 所引用的源图形 */
+	union { int w, width; };	/**< 宽度，一个整数值，单位为像素(px) */
+	union { int h, height; };	/**< 高度，一个整数值，单位为像素(px) */
+	struct {
+		int top;		/**< 源图形中的引用区域所在的坐标 */
+		int left;
+		LCUI_BOOL is_valid;	/**< 标志，指示是否引用了另一图形 */
+		LCUI_Graph *source;	/**< 所引用的源图形 */
+	} quote;
 	/** 像素数据缓存区 */
 	union {
-		uchar_t *bytes;
-		LCUI_ARGB *argb;
+		uchar_t *bytes;		/**< 指针，用于一次访问一个字节的数据 */
+		LCUI_ARGB *argb;	/**< 指针，用于一次访问一个像素的数据 */
 	};
+	int color_type;			/**< 色彩类型 */
+	float opacity;			/**< 全局不透明度，取值范围为 0~1.0 */
 	size_t mem_size;		/**< 像素数据缓冲区大小 */
+	uchar_t *palette;		/**< 调色板 */
 };
 
 typedef struct LCUI_Background {
@@ -205,7 +209,7 @@ typedef struct LCUI_Background {
 	LCUI_Color color;	/**< 背景色 */
 	int clip;		/**< 背景图的裁剪方式 */
 	int origin;		/**< 相对于何种位置进行定位 */
-	
+
 	struct {
 		LCUI_BOOL x, y;
 	} repeat;		/**< 背景图是否重复 */

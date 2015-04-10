@@ -1,42 +1,42 @@
 ﻿/* ***************************************************************************
  * LCUI_Graph.h -- The base graphics handling module for LCUI
- * 
+ *
  * Copyright (C) 2012-2014 by
  * Liu Chao
- * 
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
- 
+
 /* ****************************************************************************
  * LCUI_Graph.h -- LCUI的基本图形处理模块
  *
  * 版权所有 (C) 2012-2014 归属于
  * 刘超
- * 
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果s
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 #ifndef __LCUI_GRAPH_H__
 #define __LCUI_GRAPH_H__
@@ -125,11 +125,13 @@ enum GraphColorType {
 {							\
 	pixel = (r<<16)|(g<<8)|b;			\
 }
- 
+
 /* 解除RGB宏 */
 #ifdef RGB
 #undef RGB
 #endif
+
+#define Graph_GetQuote(g) (g)->quote.is_valid ? (g)->quote.source:(g)
 
 static inline LCUI_Color RGB( uchar_t r, uchar_t g, uchar_t b)
 {
@@ -179,7 +181,7 @@ LCUI_API void Graph_Copy( LCUI_Graph *des, const LCUI_Graph *src );
 
 LCUI_API void Graph_Free( LCUI_Graph *graph );
 
-LCUI_API int Graph_Quote( LCUI_Graph *des, LCUI_Graph *src, LCUI_Rect area );
+LCUI_API int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, LCUI_Rect rect );
 
 LCUI_API LCUI_BOOL Graph_HaveAlpha( const LCUI_Graph *graph );
 
@@ -189,16 +191,6 @@ LCUI_API LCUI_Size Graph_GetSize( const LCUI_Graph *graph );
 
 LCUI_API LCUI_Rect Graph_GetValidRect( const LCUI_Graph *graph );
 
-/**
- * 获取被引用的图像
- * 如果当前图形引用了另一个图形，并且，该图形处于一条引用链中（多重引用），
- * 那么，本函数会返回被引用的源图像
- */
-LCUI_API LCUI_Graph* Graph_GetQuote( LCUI_Graph *graph );
-
-
-LCUI_API const LCUI_Graph* Graph_GetQuoteConst( const LCUI_Graph *graph );
-
 LCUI_API int Graph_SetAlphaBits( LCUI_Graph *graph, uchar_t *a, size_t size );
 
 LCUI_API int Graph_SetRedBits( LCUI_Graph *graph, uchar_t *r, size_t size );
@@ -207,7 +199,7 @@ LCUI_API int Graph_SetGreenBits( LCUI_Graph *graph, uchar_t *g, size_t size );
 
 LCUI_API int Graph_SetBlueBits( LCUI_Graph *graph, uchar_t *b, size_t size );
 
-LCUI_API int Graph_Zoom( const LCUI_Graph *graph, LCUI_Graph *buff, 
+LCUI_API int Graph_Zoom( const LCUI_Graph *graph, LCUI_Graph *buff,
 			 LCUI_BOOL keep_scale, LCUI_Size size );
 
 LCUI_API int Graph_Cut( const LCUI_Graph *graph, LCUI_Rect rect,
@@ -217,14 +209,14 @@ LCUI_API int Graph_HorizFlip( const LCUI_Graph *graph, LCUI_Graph *buff );
 
 LCUI_API int Graph_VertiFlip( const LCUI_Graph *graph, LCUI_Graph *buff );
 
-LCUI_API int Graph_FillRect( LCUI_Graph *graph, LCUI_Color color, 
+LCUI_API int Graph_FillRect( LCUI_Graph *graph, LCUI_Color color,
 				LCUI_Rect rect );
 
 LCUI_API int Graph_FillColor( LCUI_Graph *graph, LCUI_Color color );
 
 LCUI_API int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha );
 
-LCUI_API int Graph_Tile( LCUI_Graph *buff,  const LCUI_Graph *graph, 
+LCUI_API int Graph_Tile( LCUI_Graph *buff,  const LCUI_Graph *graph,
 			 LCUI_BOOL replace );
 
 LCUI_API int Graph_Mix(	LCUI_Graph *bg, const LCUI_Graph *fg, LCUI_Pos pos );
@@ -251,14 +243,14 @@ LCUI_API int Graph_FillImageEx( LCUI_Graph *graph, const LCUI_Graph *backimg,
  * @param color		背景色
  * @param area		需要绘制的区域
  */
-LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph, 
+LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph,
 					const LCUI_Graph *backimg, int layout,
 					LCUI_Color color, LCUI_Rect area );
 
 LCUI_API int Graph_FillImage( LCUI_Graph *graph, const LCUI_Graph *backimg,
 				int layout );
 
-LCUI_API int Graph_FillImageWithColor( LCUI_Graph *graph, 
+LCUI_API int Graph_FillImageWithColor( LCUI_Graph *graph,
 		const LCUI_Graph *backimg, int layout, LCUI_Color color );
 
 LCUI_END_HEADER
