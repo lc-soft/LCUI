@@ -51,7 +51,7 @@ typedef struct LCUI_WidgetBase* LCUI_Widget;
 #undef $
 #endif
 
-/** 
+/**
  * $ 可以看成是 self，部件操作函数的第一个参数类型都是LCUI_Widget，想用
  * 一个字符的来代替，以减少源代码的字符量，再加上又想试试 $，于是就用它了
  */
@@ -180,6 +180,12 @@ LCUI_API void $(Show)( LCUI_Widget w );
 LCUI_API void $(Hide)( LCUI_Widget w );
 
 LCUI_API void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color );
+
+/** 拉取现有样式至缓存区 */
+LCUI_API void $(PullStyle)( LCUI_Widget w, int style );
+
+/** 推送缓存区中的样式，以让部件应用新样式 */
+LCUI_API void $(PushStyle)( LCUI_Widget w, int style );
 
 LCUI_API void LCUIModule_Widget_Init(void);
 

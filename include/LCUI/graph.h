@@ -181,15 +181,37 @@ LCUI_API void Graph_Copy( LCUI_Graph *des, const LCUI_Graph *src );
 
 LCUI_API void Graph_Free( LCUI_Graph *graph );
 
-LCUI_API int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, LCUI_Rect rect );
+/**
+* 为图像创建一个引用
+* @param self	用于存放图像引用的缓存区
+* @param source	引用的源图像
+* &param rect	引用的区域，若为NULL，则引用整个图像
+*/
+LCUI_API int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect );
 
-LCUI_API LCUI_BOOL Graph_HaveAlpha( const LCUI_Graph *graph );
+/** 判断图像是否有Alpha透明通道 */
+static inline LCUI_BOOL Graph_HaveAlpha( const LCUI_Graph *graph )
+{
+	return graph->quote.is_valid ? (
+		graph->quote.source->color_type == COLOR_TYPE_ARGB
+	) : graph->color_type == COLOR_TYPE_ARGB;
+}
 
-LCUI_API LCUI_BOOL Graph_IsValid( const LCUI_Graph *graph );
+/** 判断图像是否有效 */
+static inline LCUI_BOOL Graph_IsValid( const LCUI_Graph *graph )
+{
+	return graph->quote.is_valid ? (graph->quote.source
+	 && graph->quote.source->w > 0 && graph->quote.source->h > 0
+	) : (graph && graph->bytes && graph->h > 0 && graph->w > 0);
+}
 
-LCUI_API LCUI_Size Graph_GetSize( const LCUI_Graph *graph );
+static inline void Graph_GetSize( const LCUI_Graph *graph, LCUI_Size *size )
+{
+	size->w = graph->w;
+	size->h = graph->h;
+}
 
-LCUI_API LCUI_Rect Graph_GetValidRect( const LCUI_Graph *graph );
+LCUI_API void Graph_GetValidRect( const LCUI_Graph *graph, LCUI_Rect *rect );
 
 LCUI_API int Graph_SetAlphaBits( LCUI_Graph *graph, uchar_t *a, size_t size );
 
