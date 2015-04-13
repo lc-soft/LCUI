@@ -230,11 +230,11 @@ void Surface_Resize( LCUI_Surface surface, int w, int h )
 void Surface_Show( LCUI_Surface surface )
 {
 	if( surface->hwnd ) {
-		_DEBUG_MSG("surface: %p, direct show.\n", surface);
+		DEBUG_MSG("surface: %p, direct show.\n", surface);
 		ShowWindow( surface->hwnd, SW_SHOWNORMAL );
 		return;
 	}
-	_DEBUG_MSG("surface: %p, buffer show.\n", surface);
+	DEBUG_MSG("surface: %p, buffer show.\n", surface);
 	surface->task_buffer[TASK_SHOW].show = TRUE;
 	surface->task_buffer[TASK_SHOW].is_valid = TRUE;
 }
@@ -346,7 +346,7 @@ LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 {
 	LCUI_PaintContext paint;
 	paint = (LCUI_PaintContext)malloc(sizeof(LCUI_PaintContextRec_));
-	Graph_Quote( &paint->canvas, &surface->fb, *rect );
+	Graph_Quote( &paint->canvas, &surface->fb, rect );
 	return paint;
 }
 
@@ -389,7 +389,7 @@ void Surface_Present( LCUI_Surface surface )
 static void Surface_ProcTaskBuffer( LCUI_Surface surface )
 {
 	LCUI_SurfaceTask *t, *t2;
-	_DEBUG_MSG("surface: %p\n", surface);
+	DEBUG_MSG("surface: %p\n", surface);
 	t = &surface->task_buffer[TASK_MOVE];
 	t2 = &surface->task_buffer[TASK_RESIZE];
 	/* 此判断只是为了合并 移动 和 调整尺寸 操作 */
@@ -425,7 +425,7 @@ static void Surface_ProcTaskBuffer( LCUI_Surface surface )
 	t->is_valid = FALSE;
 
 	t = &surface->task_buffer[TASK_SHOW];
-	_DEBUG_MSG("surface: %p, hwnd: %p, is_valid: %d, show: %d\n",
+	DEBUG_MSG("surface: %p, hwnd: %p, is_valid: %d, show: %d\n",
 	 surface, surface->hwnd, t->is_valid, t->show);
 	if( t->is_valid ) {
 		if( t->show ) {
@@ -441,7 +441,7 @@ static void LCUISurface_Loop( void *unused )
 {
 	MSG msg;
 	LCUI_Surface surface;
-	_DEBUG_MSG("start\n");
+	DEBUG_MSG("start\n");
 	/* 创建消息队列 */
 	PeekMessage(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
 	win32.is_ready = TRUE;
@@ -454,17 +454,17 @@ static void LCUISurface_Loop( void *unused )
 				TEXT("LCUI"), TEXT("LCUI Surface"),
 				WIN32_WINDOW_STYLE,
 				CW_USEDEFAULT, CW_USEDEFAULT,
-				0, 0, NULL, NULL, 
+				0, 0, NULL, NULL,
 				win32.main_instance, NULL
 			);
-			_DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
+			DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 			Surface_ProcTaskBuffer( surface );
 			continue;
 		}
 		TranslateMessage( &msg );
 		DispatchMessage( &msg );
 	}
-	_DEBUG_MSG("quit\n");
+	DEBUG_MSG("quit\n");
 	LCUIThread_Exit(NULL);
 }
 

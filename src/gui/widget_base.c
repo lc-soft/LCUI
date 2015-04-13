@@ -348,7 +348,7 @@ void $(GetValidRect)( LCUI_Widget widget, LCUI_Rect *rect )
 void $(ComputeCoord)( LCUI_Widget w )
 {
 	double n;
-	
+
 	// 需要考虑到其它定位相关的属性
 	// code ...
 
@@ -602,11 +602,11 @@ void $(SetPadding)( LCUI_Widget w, int top, int right, int bottom, int left )
 }
 
 void $(SetPaddingS)(
-	LCUI_Widget w, 
+	LCUI_Widget w,
 	const char *top,
 	const char *right,
 	const char *bottom,
-	const char *left 
+	const char *left
 )
 {
 
@@ -714,7 +714,6 @@ void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color )
 #define PULL(WIDGET, STYLE) WIDGET##->base.style.STYLE## = WIDGET##->style.##STYLE
 #define PUSH(WIDGET, STYLE) WIDGET##->style.STYLE## = WIDGET##->base.style.##STYLE
 
-
 /** 拉取现有样式至缓存区 */
 void $(PullStyle)( LCUI_Widget w, int style )
 {
@@ -750,6 +749,7 @@ PULL_DONE:
 /** 推送缓存区中的样式，以让部件应用新样式 */
 void $(PushStyle)( LCUI_Widget w, int style )
 {
+	LCUI_WidgetTask t;
 	if(!(style & WSS_POSITION) ) goto PUSH_WSS_BOX;
 	PUSH(w, position);
 	PUSH(w, x);
@@ -758,23 +758,29 @@ void $(PushStyle)( LCUI_Widget w, int style )
 	PUSH(w, top);
 	PUSH(w, right);
 	PUSH(w, bottom);
-	PUSH(w, left);
+	PUSH( w, left );
+	Widget_AddTask( w, (t.type = WTT_MOVE, &t) );
 PUSH_WSS_BOX:
 	if( !(style & WSS_BOX) ) goto PUSH_WSS_BACKGROUND;
 	PUSH(w, box_sizing);
 	PUSH(w, width);
 	PUSH(w, height);
 	PUSH(w, margin);
-	PUSH(w, padding);
+	PUSH( w, padding );
+	Widget_AddTask( w, (t.type = WTT_MARGIN, &t) );
+	Widget_AddTask( w, (t.type = WTT_PADDING, &t) );
 PUSH_WSS_BACKGROUND:
 	if( !(style & WSS_BACKGROUND) ) goto PUSH_WSS_BORDER;
-	PUSH(w, background);
+	PUSH( w, background );
+	Widget_AddTask( w, (t.type = WTT_BODY, &t) );
 PUSH_WSS_BORDER:
 	if( !(style & WSS_BORDER) ) goto PUSH_WSS_SHADOW;
-	PUSH(w, border);
+	PUSH( w, border );
+	Widget_AddTask( w, (t.type = WTT_BODY, &t) );
 PUSH_WSS_SHADOW:
 	if( !(style & WSS_SHADOW) ) goto PUSH_DONE;
-	PUSH(w, shadow);
+	PUSH( w, shadow );
+	Widget_AddTask( w, (t.type = WTT_SHADOW, &t) );
 PUSH_DONE:
 	return;
 }

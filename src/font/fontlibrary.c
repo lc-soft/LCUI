@@ -65,6 +65,8 @@ typedef void* FT_Face;
  * 获取字体位图时的搜索顺序为：先找到字符的记录，然后在记录中的字体数据库里找
  * 到指定字体样式标识号的字体位图库，之后在字体位图库中找到指定像素大小的字体
  * 位图。
+ * 此模块的设计只考虑到支持 FreeType，且必须在编译时确定使用哪个字体引擎，以
+ * 后会考虑进行调整，以同时支持多个字体引擎，并能够随时切换，不用重新编译。
  */
 
 typedef struct LCUI_FontInfo_ {
@@ -104,7 +106,7 @@ LCUI_API void FontLIB_DestroyAll( void )
 	RBTree_Destroy( &fontlib.info_cache );
 	RBTree_Destroy( &fontlib.bitmap_cache );
 #ifdef LCUI_FONT_ENGINE_FREETYPE
-	FT_Done_FreeType( library );
+	FT_Done_FreeType( fontlib.library );
 #endif
 }
 
@@ -120,7 +122,7 @@ void FontLIB_Init( void )
 	RBTree_SetDataNeedFree( &fontlib.info_cache, TRUE );
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 	/* 当初始化库时发生了一个错误 */
-	if ( FT_Init_FreeType( &library ) ) {
+	if( FT_Init_FreeType(&fontlib.library) ) {
 		_DEBUG_MSG("failed to initialize.\n");
 		return;
 	}
@@ -336,7 +338,7 @@ LCUI_API int FontLIB_LoadFontFile( const char *filepath )
 	}
 
 #ifdef LCUI_FONT_ENGINE_FREETYPE
-	error_code = FT_New_Face( library, filepath , 0 , &face );
+	error_code = FT_New_Face( fontlib.library, filepath, 0, &face );
 	if( error_code != 0 ) {
 		_DEBUG_MSG( "%s: open error\n", filepath );
 		if ( error_code == FT_Err_Unknown_File_Format ) {

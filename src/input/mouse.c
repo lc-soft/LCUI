@@ -63,7 +63,10 @@ static struct LCUIMouseDeviceContext {
 #endif
 	int button_state[2];	/** 鼠标左右键的状态 */
 } mouse = {
-	0, 0, {LCUIKEYSTATE_RELEASE, LCUIKEYSTATE_RELEASE}
+#ifdef LCUI_MOUSE_DRIVER_LINUX
+	0, 0,
+#endif
+	{LCUIKEYSTATE_RELEASE, LCUIKEYSTATE_RELEASE}
 };
 
 /** 投递鼠标按键按下事件 */
@@ -196,6 +199,7 @@ static LCUI_BOOL MouseProc( void )
 
 static LCUI_BOOL MouseProc( void )
 {
+#ifdef USE_THIS_CODE
 	LCUI_Pos pos;
 	POINT new_pos;
 
@@ -203,11 +207,11 @@ static LCUI_BOOL MouseProc( void )
 	GetCursorPos( &new_pos );
 	/* 转换成相对于窗口客户区的坐标 */
 	ScreenToClient( Win32_GetSelfHWND(), &new_pos );
-	if (new_pos.x > LCUIScreen_GetWidth() ) {
-		new_pos.x = LCUIScreen_GetWidth();
+	if (new_pos.x > LCUIDisplay_GetWidth() ) {
+		new_pos.x = LCUIDisplay_GetWidth();
 	}
-	if (new_pos.y > LCUIScreen_GetHeight() ) {
-		new_pos.y = LCUIScreen_GetHeight();
+	if( new_pos.y > LCUIDisplay_GetHeight() ) {
+		new_pos.y = LCUIDisplay_GetHeight();
 	}
 	new_pos.x = new_pos.x<0 ? 0:new_pos.x;
 	new_pos.y = new_pos.y<0 ? 0:new_pos.y;
@@ -220,8 +224,10 @@ static LCUI_BOOL MouseProc( void )
 	/* 更新鼠标游标的位置 */
 	LCUICursor_SetPos( pos );
 	LCUI_PostMouseMoveEvent( pos );
+#endif
 	return TRUE;
 }
+
 #endif
 
 /** 初始化鼠标输入处理 */
