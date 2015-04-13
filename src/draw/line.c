@@ -11,7 +11,7 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 	LCUI_Graph *des;
 
 	des = Graph_GetQuote(graph);
-	area = Graph_GetValidRect(graph);
+	Graph_GetValidRect( graph, &area );
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
 
@@ -67,7 +67,7 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 	LCUI_Graph *des;
 
 	des = Graph_GetQuote(graph);
-	area = Graph_GetValidRect(graph);
+	Graph_GetValidRect( graph, &area );
 	start.x = area.x + start.x;
 	start.y = area.y + start.y;
 
@@ -78,7 +78,7 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 	if( start.x + size > area.x + area.width ) {
 		size = area.x + area.width - start.x;
 	}
-	
+
 	if( start.y < area.y ) {
 		len -= (area.y-start.y);
 		start.y = area.y;
@@ -86,7 +86,7 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 	if( start.y + len > area.y + area.height ) {
 		len = area.y + area.height - start.y;
 	}
-	
+
 	if( des->color_type == COLOR_TYPE_ARGB ) {
 		LCUI_ARGB *pPixel, *pRowPixel;
 		pRowPixel = des->argb + start.y*des->w + start.x;

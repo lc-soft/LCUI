@@ -1,21 +1,21 @@
 ﻿/* ****************************************************************************
 * boxshadow.c -- graph box shadow draw support.
-* 
+*
 * Copyright (C) 2014 by Liu Chao <lc-soft@live.cn>
-* 
+*
 * This file is part of the LCUI project, and may only be used, modified, and
 * distributed under the terms of the GPLv2.
-* 
+*
 * (GPLv2 is abbreviation of GNU General Public License Version 2)
-* 
+*
 * By continuing to use, modify, or distribute this file you indicate that you
 * have read the license and understand and accept it fully.
-*  
-* The LCUI project is distributed in the hope that it will be useful, but 
-* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+*
+* The LCUI project is distributed in the hope that it will be useful, but
+* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
-* 
-* You should have received a copy of the GPLv2 along with this file. It is 
+*
+* You should have received a copy of the GPLv2 along with this file. It is
 * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
 * ***************************************************************************/
 
@@ -23,18 +23,18 @@
 * boxshadow.c -- 矩形阴影绘制支持
 *
 * 版权所有 (C) 2014-2015 归属于 刘超 <lc-soft@live.cn>
-* 
+*
 * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
 *
 * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
-* 
+*
 * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
-* 
+*
 * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
 * 定用途的隐含担保，详情请参照GPLv2许可协议。
 *
 * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
-* 没有，请查看：<http://www.gnu.org/licenses/>. 
+* 没有，请查看：<http://www.gnu.org/licenses/>.
 * ***************************************************************************/
 
 /**
@@ -49,7 +49,7 @@
 
 #define RADIUS_N	1.5
 
-static void 
+static void
 draw_circle( LCUI_Graph *graph, LCUI_Pos center, int r, LCUI_ARGB color )
 {
 	LCUI_Graph *src, box_graph;
@@ -59,14 +59,14 @@ draw_circle( LCUI_Graph *graph, LCUI_Pos center, int r, LCUI_ARGB color )
 	float v, a;
 	int s, t, x, y;
 	LCUI_Rect2 circle;
-	
+
 	s = 255;
 	t = r;
 	v = 512.0/t;
 	a = 2*(v*t-s)/(t*t);
 	pixel_color = color;
 
-	area = Graph_GetValidRect( graph );
+	Graph_GetValidRect( graph, &area );
 	src = Graph_GetQuote( graph );
 	center.x += area.x;
 	center.y += area.y;
@@ -80,13 +80,13 @@ draw_circle( LCUI_Graph *graph, LCUI_Pos center, int r, LCUI_ARGB color )
 	box_rect.y = area.y;
 	box_rect.w = area.w;
 	box_rect.h = circle.t - area.y;
-	Graph_Quote( &box_graph, src, box_rect );
+	Graph_Quote( &box_graph, src, &box_rect );
 	Graph_FillAlpha( &box_graph, 0 );
 
 	box_rect.y = circle.t;
 	box_rect.w = circle.l - area.x;
 	box_rect.h = area.y + area.h - circle.t;
-	Graph_Quote( &box_graph, src, box_rect );
+	Graph_Quote( &box_graph, src, &box_rect );
 	Graph_FillAlpha( &box_graph, 0 );
 
 	/* 调整圆的区域 */
@@ -120,7 +120,7 @@ draw_circle( LCUI_Graph *graph, LCUI_Pos center, int r, LCUI_ARGB color )
 			Graph_SetPixel( src, x, y, pixel_color );
 		}
 	}
-	
+
 }
 
 static void
@@ -130,13 +130,13 @@ Graph_DrawTopLeftShadow( LCUI_Graph *graph, LCUI_Rect area,
 	LCUI_Graph box;
 	LCUI_Rect bound;
 	LCUI_Pos pos;
-	
+
 	bound.w = bound.h = (shadow.blur + shadow.spread)*RADIUS_N;
 	pos.x = bound.w;
 	pos.y = bound.h;
 	bound.x = BoxShadow_GetX( &shadow );
 	bound.y = BoxShadow_GetY( &shadow );
-	Graph_Quote( &box, graph, bound );
+	Graph_Quote( &box, graph, &bound );
 	draw_circle( &box, pos, bound.w, shadow.color );
 }
 
@@ -155,7 +155,7 @@ Graph_DrawTopRightShadow( LCUI_Graph *graph, LCUI_Rect area,
 	bound.w = bound.h = (shadow.blur + shadow.spread)*RADIUS_N;
 	pos.x = 0;
 	pos.y = bound.h;
-	Graph_Quote( &box, graph, bound );
+	Graph_Quote( &box, graph, &bound );
 	draw_circle( &box, pos, bound.w, shadow.color );
 }
 
@@ -166,7 +166,7 @@ Graph_DrawBottomLeftShadow( LCUI_Graph *graph, LCUI_Rect area,
 	LCUI_Graph box;
 	LCUI_Rect bound;
 	LCUI_Pos pos;
-	
+
 	bound.w = bound.h = (shadow.blur + shadow.spread)*RADIUS_N;
 	pos.x = bound.w;
 	pos.y = 0;
@@ -174,7 +174,7 @@ Graph_DrawBottomLeftShadow( LCUI_Graph *graph, LCUI_Rect area,
 	bound.y = BoxShadow_GetY( &shadow );
 	bound.y += BoxShadow_GetBoxHeight( &shadow, graph->h );
 	bound.y += (shadow.blur + shadow.spread)*(RADIUS_N-1.0);
-	Graph_Quote( &box, graph, bound );
+	Graph_Quote( &box, graph, &bound );
 	draw_circle( &box, pos, bound.w, shadow.color );
 }
 
@@ -195,11 +195,11 @@ Graph_DrawBottomRightShadow( LCUI_Graph *graph, LCUI_Rect area,
 	bound.w = bound.h = (shadow.blur + shadow.spread)*RADIUS_N;
 	pos.x = 0;
 	pos.y = 0;
-	Graph_Quote( &box, graph, bound );
+	Graph_Quote( &box, graph, &bound );
 	draw_circle( &box, pos, bound.w, shadow.color );
 }
 
-static void 
+static void
 Graph_DrawTopShadow( LCUI_Graph *graph, LCUI_Rect area,
 				LCUI_BoxShadow shadow )
 {
@@ -220,8 +220,8 @@ Graph_DrawTopShadow( LCUI_Graph *graph, LCUI_Rect area,
 	color = shadow.color;
 	bound_x = shadow_area.x + shadow_area.w;
 	bound_y = shadow_area.y + shadow_area.h;
-	
-	/** 
+
+	/**
 	* 这里采用匀减速直线运动的公式： s = vt - at²/2
 	* 加速度 a 的求值公式为：a = 2x(vt - s)/t²
 	*/
@@ -229,7 +229,7 @@ Graph_DrawTopShadow( LCUI_Graph *graph, LCUI_Rect area,
 	t = (shadow.blur + shadow.spread)*RADIUS_N;
 	v = 512.0/t;
 	a = 2*(v*t-s)/(t*t);
-	
+
 	for( y=shadow_area.y; y<bound_y; ++y,--t ) {
 		/* 忽略不在有效区域内的像素 */
 		if( y < area.y || y >= area.y + area.h ) {
@@ -271,12 +271,12 @@ static void Graph_DrawBottomShadow( LCUI_Graph *graph, LCUI_Rect area,
 	color = shadow.color;
 	bound_x = shadow_area.x + shadow_area.w;
 	bound_y = shadow_area.y + shadow_area.h;
-	
+
 	s = 255;
 	t = (shadow.blur + shadow.spread)*RADIUS_N;
 	v = 512.0/t;
 	a = 2*(v*t-s)/(t*t);
-	
+
 	for( t=0,y=shadow_area.y; y<bound_y; ++y,++t ) {
 		if( y < area.y || y >= area.y + area.h ) {
 			continue;
@@ -315,12 +315,12 @@ static void Graph_DrawLeftShadow( LCUI_Graph *graph, LCUI_Rect area,
 	color = shadow.color;
 	bound_x = shadow_area.x + shadow_area.w;
 	bound_y = shadow_area.y + shadow_area.h;
-	
+
 	s = 255;
 	t = (shadow.blur + shadow.spread)*RADIUS_N;
 	v = 512.0/t;
 	a = 2*(v*t-s)/(t*t);
-	
+
 	for( x=shadow_area.x; x<bound_x; ++x,--t ) {
 		if( x < area.x || x >= area.x + area.w ) {
 			continue;
@@ -365,7 +365,7 @@ static void Graph_DrawRightShadow( LCUI_Graph *graph, LCUI_Rect area,
 	t = (shadow.blur + shadow.spread)*RADIUS_N;
 	v = 512.0/t;
 	a = 2*(v*t-s)/(t*t);
-	
+
 	for( t=0,x=shadow_area.x; x<bound_x; ++x,++t ) {
 		if( x < area.x || x >= area.x + area.w ) {
 			continue;
@@ -400,7 +400,7 @@ static void clear_shadow_area( LCUI_Graph *graph, LCUI_Rect area,
 	rect.h = graph->h;
 	LCUIRect_CutFourRect( &box_area, &rect, rects );
 	for( i=0; i<4; ++i ) {
-		Graph_Quote( &box_graph, graph, rects[i] );
+		Graph_Quote( &box_graph, graph, &rects[i] );
 		Graph_FillAlpha( &box_graph, 0 );
 	}
 }
@@ -422,7 +422,7 @@ static void draw_center_shadow( LCUI_Graph *graph, LCUI_Rect area,
 	LCUIRect_CutFourRect( &box_area, &shadow_area, rects );
 	/* 从阴影区域中排除部件占用的区域 */
 	for( i=0; i<4; ++i ) {
-		Graph_Quote( &shadow_graph, graph, rects[i] );
+		Graph_Quote( &shadow_graph, graph, &rects[i] );
 		Graph_FillAlpha( &shadow_graph, shadow.color.a );
 		Graph_FillColor( &shadow_graph, shadow.color );
 	}

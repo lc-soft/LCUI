@@ -1606,7 +1606,7 @@ void TextLayer_ClearInvalidRect( LCUI_TextLayer *layer )
 	LinkedList_Goto( &layer->dirty_rect, 0 );
 	while(n--) {
 		rect_ptr = (LCUI_Rect*)LinkedList_Get( &layer->dirty_rect );
-		Graph_Quote( &invalid_graph, &layer->graph, *rect_ptr );
+		Graph_Quote( &invalid_graph, &layer->graph, rect_ptr );
 		Graph_FillAlpha( &invalid_graph, 0 );
 		LinkedList_ToNext( &layer->dirty_rect );
 	}

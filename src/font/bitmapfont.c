@@ -219,12 +219,11 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
 	uchar_t *bmp_src, *bmp_row_src, *byte_row_des, *byte_des;
 
 	/* 数据有效性检测 */
-	if( !FontBMP_IsValid( bmp )
-	 || !Graph_IsValid( graph ) ) {
+	if( !FontBMP_IsValid( bmp ) || !Graph_IsValid( graph ) ) {
 		return -1;
 	}
 	/* 获取背景图形的有效区域 */
-	des_rect = Graph_GetValidRect( graph );
+	Graph_GetValidRect( graph, &des_rect );
 	/* 获取背景图引用的源图形 */
 	des = Graph_GetQuote( graph );
 	/* 起点位置的有效性检测 */
