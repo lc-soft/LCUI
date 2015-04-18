@@ -788,5 +788,6 @@ PUSH_DONE:
 void LCUIModule_Widget_Init(void)
 {
 	$(Init)(LCUIRootWidget);
+	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
 	LCUIWidget_Task_Init();
 }
