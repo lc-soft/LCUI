@@ -159,12 +159,13 @@ int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
 {
 #ifdef USE_LIBPNG
         FILE *fp;
-        int x, y, row_size;
+        int x, y, row_size, pixel_bytes;
+	LCUI_Rect rect;
         png_byte color_type; 
         png_structp png_ptr;
         png_infop info_ptr; 
         png_bytep *row_pointers;
-        uchar_t *pixel_ptr;
+        uchar_t *pixel_ptr, *pixel_row_ptr;
 
         if(!Graph_IsValid(graph)) {
                 _DEBUG_MSG("graph is not valid\n");
@@ -225,26 +226,29 @@ int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
                 return -1;
         }
 	if( graph->color_type == COLOR_TYPE_ARGB ) {
-                row_size = sizeof(uchar_t) * 4 * graph->w;
+		pixel_bytes = 4;
+		row_size = sizeof(uchar_t) * pixel_bytes * graph->w;
         } else {
-                row_size = sizeof(uchar_t) * 3 * graph->w;
+		pixel_bytes = 3;
+		row_size = sizeof(uchar_t) * pixel_bytes * graph->w;
         }
-        
-	pixel_ptr = graph->bytes;
+
+	Graph_GetValidRect( graph, &rect );
+	graph = Graph_GetQuote( graph );
+	pixel_row_ptr = graph->bytes + rect.top * row_size;
         row_pointers = (png_bytep*)malloc( graph->h*sizeof(png_bytep) );
-        for(y=0; y < graph->h; y++) {
+        for( y=0; y<graph->h; ++y ) {
                 row_pointers[y] = (png_bytep)malloc(row_size);
-                for(x=0; x < row_size; ) {
+		pixel_ptr = pixel_row_ptr;
+                for( x=0; x<row_size; x+=pixel_bytes ) {
                         row_pointers[y][x+2] = *pixel_ptr++; // blue
                         row_pointers[y][x+1] = *pixel_ptr++; // green
                         row_pointers[y][x] = *pixel_ptr++;   // red
-                        if( graph->color_type == COLOR_TYPE_ARGB ) {
-                                row_pointers[y][x+3] = *pixel_ptr++; // alpha 
-				x += 4;
-			} else {
-				x += 3;
+			if( graph->color_type == COLOR_TYPE_ARGB ) {
+				row_pointers[y][x + 3] = *pixel_ptr++; // alpha
 			}
                 }
+		pixel_row_ptr += row_size;
         }
         png_write_image( png_ptr, row_pointers );
 
