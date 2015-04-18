@@ -1,6 +1,7 @@
 ﻿#define I_NEED_WINMAIN
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
 #include <LCUI/widget.h>
 #include <LCUI/surface.h>
 #include <LCUI/display.h>
@@ -40,5 +41,8 @@ int main( int argc, char **argv )
 	Widget_Resize( w, 320, 240 );
 	Widget_Move( w, 480, 480 );
 	Widget_SetTitleW( w, L"测试" );
+	Widget_PullStyle( w, WSS_BACKGROUND );
+	w->style.background.color = RGB(255,0,0);
+	Widget_PushStyle( w, WSS_BACKGROUND );
 	return LCUI_Main();
 }
