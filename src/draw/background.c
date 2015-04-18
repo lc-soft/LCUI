@@ -44,7 +44,7 @@
 /** 初始化背景绘制参数 */
 void Background_Init( LCUI_Background *bg )
 {
-	bg->color = ARGB( 255, 255, 255, 255, 255 );
+	bg->color = RGB( 255, 255, 255 );
 	Graph_Init( &bg->image );
 	bg->size.w.scale = 1.0;
 	bg->size.h.scale = 1.0;
@@ -56,8 +56,11 @@ void Background_Init( LCUI_Background *bg )
 void Graph_DrawBackground(
 	LCUI_Graph	*graph,
 	LCUI_Background	*bg,
-	LCUI_Rect	*area
+	LCUI_Rect	*rect
 )
 {
-
+	_DEBUG_MSG("graph: w =%d, h = %d, rect: %d,%d,%d,%d, background-color: %d,%d,%d\n",
+		    graph->w, graph->h, rect->top, rect->left, rect->w, rect->h, bg->color.r, bg->color.g, bg->color.b);
+	Graph_FillColor( graph, bg->color );
+	Graph_WritePNG( "debug_image.png", graph );
 }
