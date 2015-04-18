@@ -183,16 +183,22 @@ LCUI_Surface Surface_New(void)
 	return surface;
 }
 
+static void Surface_ExecMove( LCUI_Surface surface, int x, int y )
+{
+	x += GetSystemMetrics( SM_CXFIXEDFRAME );
+	y += GetSystemMetrics( SM_CYFIXEDFRAME );
+	SetWindowPos(
+		surface->hwnd, HWND_NOTOPMOST,
+		x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER
+		);
+	return;
+}
+
 void Surface_Move( LCUI_Surface surface, int x, int y )
 {
-	x += GetSystemMetrics(SM_CXFIXEDFRAME);
-	y += GetSystemMetrics(SM_CYFIXEDFRAME);
 	/* 如果已经得到窗口句柄，则直接改变窗口位置 */
 	if( surface->hwnd ) {
-		SetWindowPos(
-			surface->hwnd, HWND_NOTOPMOST,
-			x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER
-		);
+		Surface_ExecMove( surface, x, y );
 		return;
 	}
 	/* 缓存任务，等获得窗口句柄后处理 */
@@ -201,25 +207,35 @@ void Surface_Move( LCUI_Surface surface, int x, int y )
 	surface->task_buffer[TASK_MOVE].is_valid = TRUE;
 }
 
-void Surface_Resize( LCUI_Surface surface, int w, int h )
+void Surface_ExecResize( LCUI_Surface surface, int w, int h )
 {
-	/* 调整位图缓存的尺寸 */
-	Graph_Create( &surface->fb, w, h );
+	HDC hdc_client;
+	HBITMAP old_bmp;
+
 	surface->w = w;
 	surface->h = h;
-	// surface->fb_bmp
+	Graph_Create( &surface->fb, w, h );
+	hdc_client = GetDC( surface->hwnd );
+	surface->fb_bmp = CreateCompatibleBitmap( hdc_client, w, h );
+	old_bmp = (HBITMAP)SelectObject( surface->fb_hdc, surface->fb_bmp );
+	if( old_bmp ) {
+		DeleteObject( old_bmp );
+	}
 	/* 加上窗口边框的尺寸 */
-	w += GetSystemMetrics(SM_CXFIXEDFRAME)*2;
-	h += GetSystemMetrics(SM_CYFIXEDFRAME)*2;
-	h += GetSystemMetrics(SM_CYCAPTION);
+	w += GetSystemMetrics( SM_CXFIXEDFRAME ) * 2;
+	h += GetSystemMetrics( SM_CYFIXEDFRAME ) * 2;
+	h += GetSystemMetrics( SM_CYCAPTION );
+	SetWindowLong( surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE );
+	SetWindowPos(
+		surface->hwnd, HWND_NOTOPMOST,
+		0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER
+	);
+}
+
+void Surface_Resize( LCUI_Surface surface, int w, int h )
+{
 	if( surface->hwnd ) {
-		SetWindowLong(
-			surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE
-		);
-		SetWindowPos(
-			surface->hwnd, HWND_NOTOPMOST,
-			0, 0, w, h, SWP_NOMOVE|SWP_NOZORDER
-		);
+		Surface_ExecResize( surface, w, h );
 		return;
 	}
 	surface->task_buffer[TASK_RESIZE].width = w;
@@ -347,6 +363,7 @@ LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 	LCUI_PaintContext paint;
 	paint = (LCUI_PaintContext)malloc(sizeof(LCUI_PaintContextRec_));
 	Graph_Quote( &paint->canvas, &surface->fb, rect );
+	paint->rect = *rect;
 	return paint;
 }
 
@@ -367,6 +384,7 @@ void Surface_Present( LCUI_Surface surface )
 	RECT client_rect;
 
 	hdc_client = GetDC( surface->hwnd );
+	Graph_WritePNG( "fb.png", &surface->fb );
 	SetBitmapBits( surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes );
 	switch(surface->mode) {
 	case RENDER_MODE_STRETCH_BLT:
@@ -388,31 +406,19 @@ void Surface_Present( LCUI_Surface surface )
 /** 处理当前缓存的任务 */
 static void Surface_ProcTaskBuffer( LCUI_Surface surface )
 {
-	LCUI_SurfaceTask *t, *t2;
+	LCUI_SurfaceTask *t;
 	DEBUG_MSG("surface: %p\n", surface);
 	t = &surface->task_buffer[TASK_MOVE];
-	t2 = &surface->task_buffer[TASK_RESIZE];
-	/* 此判断只是为了合并 移动 和 调整尺寸 操作 */
 	if( t->is_valid ) {
-		if( t2->is_valid ) {
-			SetWindowPos( surface->hwnd, HWND_NOTOPMOST,
-				t->x, t->y, t2->width, t2->height,
-				SWP_NOZORDER
-			);
-		} else {
-			SetWindowPos( surface->hwnd, HWND_NOTOPMOST,
-				t->x, t->y, 0, 0,
-				SWP_NOSIZE|SWP_NOZORDER
-			);
-		}
-	} else if( t2->is_valid ) {
-		SetWindowPos( surface->hwnd, HWND_NOTOPMOST,
-			t->x, t->y, t2->width, t2->height,
-			SWP_NOMOVE|SWP_NOZORDER
-		);
+		Surface_ExecMove( surface, t->x, t->y );
+		t->is_valid = FALSE;
 	}
-	t->is_valid = FALSE;
-	t2->is_valid = FALSE;
+
+	t = &surface->task_buffer[TASK_RESIZE];
+	if( t->is_valid ) {
+		Surface_ExecResize( surface, t->width, t->height );
+		t->is_valid = FALSE;
+	}
 
 	t = &surface->task_buffer[TASK_SET_CAPTION];
 	if( t->is_valid ) {
@@ -448,6 +454,7 @@ static void LCUISurface_Loop( void *unused )
 	LCUICond_Broadcast( &win32.cond );
 	while( GetMessage( &msg, NULL, 0, 0 ) ) {
 		if( msg.message == MSG_SURFACE_CREATE ) {
+			HDC hdc_client;
 			surface = (LCUI_Surface)msg.lParam;
 			/* 为 Surface 创建窗口 */
 			surface->hwnd = CreateWindow(
@@ -457,6 +464,8 @@ static void LCUISurface_Loop( void *unused )
 				0, 0, NULL, NULL,
 				win32.main_instance, NULL
 			);
+			hdc_client = GetDC( surface->hwnd );
+			surface->fb_hdc = CreateCompatibleDC( hdc_client );
 			DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 			Surface_ProcTaskBuffer( surface );
 			continue;

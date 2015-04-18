@@ -139,6 +139,7 @@ static LCUI_Surface $(GetBindSurface)( LCUI_Widget widget )
 static void $(BindSurface)( LCUI_Widget widget )
 {
 	SurfaceRecord *p_sr;
+	LCUI_Rect *p_rect;
 	if( $(GetBindSurface)(widget) ) {
 		return;
 	}
@@ -146,6 +147,14 @@ static void $(BindSurface)( LCUI_Widget widget )
 	p_sr->surface = Surface_New();
 	p_sr->widget = widget;
 	LinkedList_AddData( &display.surfaces, p_sr );
+	Surface_SetCaptionW( p_sr->surface,widget->title );
+	p_rect = &widget->base.box.graph;
+	Surface_Move( p_sr->surface, p_rect->x, p_rect->y );
+	Surface_Resize( p_sr->surface, p_rect->w, p_rect->h );
+	if( widget->style.visible ) {
+		Surface_Hide( p_sr->surface );
+		Surface_Show( p_sr->surface );
+	}
 }
 
 /** 解除 widget 与 sruface 的绑定 */
