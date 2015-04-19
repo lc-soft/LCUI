@@ -203,19 +203,6 @@
     <ClCompile Include="..\..\..\src\font\in-core\font_8x8.c" />
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
-    <ClCompile Include="..\..\..\src\gui\messagebox.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\activebox.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\button.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\checkbox.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\label.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\listview.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\menu.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\picturebox.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\progressbar.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\radiobutton.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\textbox.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\window.c" />
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
     <ClCompile Include="..\..\..\src\gui\widget_library.c" />
@@ -247,7 +234,6 @@
     <ClCompile Include="..\..\..\src\misc\string.c" />
     <ClCompile Include="..\..\..\src\output\dummy.c" />
     <ClCompile Include="..\..\..\src\output\graph_display.c" />
-    <ClCompile Include="..\..\..\src\output\win32.c" />
     <ClCompile Include="..\..\..\src\output\win32_surface.c" />
     <ClCompile Include="..\..\..\src\thread\win32\cond.c" />
     <ClCompile Include="..\..\..\src\thread\win32\mutex.c" />

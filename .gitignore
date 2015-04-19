@@ -8,6 +8,10 @@ build/VS2010/include
 build/VS2010/lib
 build/VS2012/include
 build/VS2012/lib
+build/*.png
+build/*.jpg
+build/VS2012/*/*.png
+build/VS2012/*/*.jpg
 include/LCUI/config.h
 m4/
 *.lastbuildstate
