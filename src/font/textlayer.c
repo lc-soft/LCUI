@@ -1464,7 +1464,7 @@ void TextLayer_Update( LCUI_TextLayer* layer, LinkedList *rect_list )
  * @param graph 目标图像
  */
 int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
-		LCUI_Pos layer_pos, LCUI_BOOL need_replace, LCUI_Graph *graph )
+			   LCUI_Pos layer_pos, LCUI_Graph *graph )
 {
 	int x, y, row, col;
 	LCUI_Pos char_pos;
@@ -1549,15 +1549,12 @@ int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
 				FontBMP_Mix( 
 					graph, char_pos,
 					p_char->bitmap,
-					p_char->style->fore_color,
-					need_replace );
+					p_char->style->fore_color );
 			} else {
-				FontBMP_Mix( 
+				FontBMP_Mix(
 					graph, char_pos,
-					p_char->bitmap, 
-					layer->text_style.fore_color,
-					need_replace 
-				);
+					p_char->bitmap,
+					layer->text_style.fore_color );
 			}
 			/* 如果超过绘制区域则不继续绘制该行文本 */
 			if( x > area.x + area.width ) {
@@ -1586,7 +1583,7 @@ int TextLayer_Draw( LCUI_TextLayer* layer )
 	rect.y = 0;
 	rect.w = layer->max_width;
 	rect.h = layer->max_height;
-	return TextLayer_DrawToGraph( layer, rect, Pos(0,0), TRUE, &layer->graph );
+	return TextLayer_DrawToGraph( layer, rect, Pos(0,0), &layer->graph );
 }
 
 /** 清除已记录的无效矩形 */

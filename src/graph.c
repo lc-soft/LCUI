@@ -449,10 +449,13 @@ static int Graph_CutARGB( const LCUI_Graph *graph, LCUI_Rect rect,
 	return 0;
 }
 
+/**
+ * 将前景图形混合到背景图形上，两个图形都是ARGB像素格式
+ */
 static int Graph_MixARGB( LCUI_Graph *des, LCUI_Rect des_rect,
 			  const LCUI_Graph *src, LCUI_Pos src_pos )
 {
-	int x, y;
+	int x, y, val;
 	uchar_t alpha;
 	LCUI_ARGB *px_src, *px_des;
 	LCUI_ARGB *px_row_src, *px_row_des;
@@ -466,12 +469,22 @@ static int Graph_MixARGB( LCUI_Graph *des, LCUI_Rect des_rect,
 			px_des = px_row_des;
 			for( x=0; x<des_rect.w; ++x ) {
 				alpha = px_src->a * src->opacity;
+				/* 将R、G、B三个色彩值进行alpha混合 */
 				ALPHA_BLEND( px_des->r, px_src->r, alpha );
 				ALPHA_BLEND( px_des->g, px_src->g, alpha );
 				ALPHA_BLEND( px_des->b, px_src->b, alpha );
+				if( px_des->alpha == 255 || px_src->alpha == 255 ) {
+					px_des->alpha = 255;
+				} else {
+					/* alpha = 1.0 - (1.0 - a1)*(1.0 - a2) */
+					val = (255 - px_src->alpha)*(255 - px_des->alpha);
+					px_des->alpha = (uchar_t)(255 - val / 65025);
+				}
+				/* 切换到下个像素的数据 */
 				++px_src;
 				++px_des;
 			}
+			/* 切换到下一行像素 */
 			px_row_des += des->w;
 			px_row_src += src->w;
 		}
@@ -482,15 +495,18 @@ static int Graph_MixARGB( LCUI_Graph *des, LCUI_Rect des_rect,
 		px_src = px_row_src;
 		px_des = px_row_des;
 		for( x=0; x<des_rect.w; ++x ) {
-			/* 将R、G、B三个色彩值进行alpha混合 */
 			ALPHA_BLEND( px_des->r, px_src->r, px_src->a );
 			ALPHA_BLEND( px_des->g, px_src->g, px_src->a );
 			ALPHA_BLEND( px_des->b, px_src->b, px_src->a );
-			/* 切换到下个像素的数据 */
+			if( px_des->alpha == 255 || px_src->alpha == 255 ) {
+				px_des->alpha = 255;
+			} else {
+				val = (255 - px_src->alpha)*(255 - px_des->alpha);
+				px_des->alpha = (uchar_t)(255 - val / 65025);
+			}
 			++px_src;
 			++px_des;
 		}
-		/* 切换到下一行像素 */
 		px_row_des += des->w;
 		px_row_src += src->w;
 	}
@@ -705,6 +721,7 @@ int Graph_Create( LCUI_Graph *graph, int w, int h )
 			if( (w != graph->w || h != graph->h)
 			 && graph->color_type == COLOR_TYPE_ARGB ) {
 				Graph_FillAlpha( graph, 0 );
+				Graph_FillColor(graph, RGB(255,255,255));
 			}
 			graph->w = w;
 			graph->h = h;

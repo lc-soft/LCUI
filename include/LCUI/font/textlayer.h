@@ -275,7 +275,7 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer* layer, LinkedList *rect_list );
  * @param need_replace 绘制时是否需要覆盖像素
  */
 LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer *layer, LCUI_Rect area,
-		LCUI_Pos pos, LCUI_BOOL need_replace, LCUI_Graph *graph );
+				    LCUI_Pos pos, LCUI_Graph *graph );
 
 /** 绘制文本 */
 LCUI_API int TextLayer_Draw( LCUI_TextLayer* layer );

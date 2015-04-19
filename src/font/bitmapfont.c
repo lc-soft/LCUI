@@ -209,10 +209,10 @@ LCUI_API int FontBMP_Print( LCUI_FontBMP *fontbmp )
 }
 
 /** 将字体位图绘制到目标图像上 */
-LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
-				LCUI_Color color, LCUI_BOOL need_replace )
+int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, 
+		 LCUI_FontBMP *bmp, LCUI_Color color )
 {
-	int k, x, y;
+	int val, x, y;
 	LCUI_Graph *des;
 	LCUI_Rect des_rect, cut;
 	LCUI_ARGB *px_des, *px_row_des;
@@ -235,31 +235,10 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
 			Rect( pos.x, pos.y, bmp->width, bmp->rows ), &cut );
 	pos.x += cut.x;
 	pos.y += cut.y;
-	
 	if( graph->color_type == COLOR_TYPE_ARGB ) {
 		bmp_row_src = bmp->buffer + cut.y*bmp->width + cut.x;
-		k = (pos.y + des_rect.y) * des->w + pos.x + des_rect.x;
-		px_row_des = des->argb + k;
-		if( need_replace ) {
-			for( y=0; y<cut.h; ++y ) {
-				bmp_src = bmp_row_src;
-				px_des = px_row_des;
-				for( x=0; x<cut.w; ++x ) {
-					if( *bmp_src ) {
-						px_des->r = color.r;
-						px_des->g = color.g;
-						px_des->b = color.b;
-						px_des->a = *bmp_src;
-					}
-					++bmp_src;
-					++px_des;
-				}
-				px_row_des += des->w;
-				bmp_row_src += bmp->width;
-			}
-			return 0;
-		}
-		
+		px_row_des = des->argb + (pos.y + des_rect.y) * des->w;
+		px_row_des += pos.x + des_rect.x;
 		for( y=0; y<cut.h; ++y ) {
 			bmp_src = bmp_row_src;
 			px_des = px_row_des;
@@ -267,6 +246,12 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
 				ALPHA_BLEND( px_des->r, color.r, *bmp_src );
 				ALPHA_BLEND( px_des->g, color.g, *bmp_src );
 				ALPHA_BLEND( px_des->b, color.b, *bmp_src );
+				if( px_des->alpha == 255 || *bmp_src == 255 ) {
+					px_des->alpha = 255;
+				} else {
+					val = (255 - *bmp_src)*(255 - px_des->alpha);
+					px_des->alpha = (uchar_t)(255 - val / 65025);
+				}
 				++bmp_src;
 				++px_des;
 			}
@@ -277,34 +262,18 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, LCUI_FontBMP *bmp,
 	}
 	
 	bmp_row_src = bmp->buffer + cut.y*bmp->width + cut.x;
-	k = (pos.y + des_rect.y) * des->w + pos.x + des_rect.x;
-	byte_row_des = des->bytes + k*3;
-	if( !need_replace ) {
-		for( y=0; y<cut.h; ++y ) { 
-			bmp_src = bmp_row_src;
-			byte_des = byte_row_des;
-			for( x=0; x<cut.w; ++x ) {
-				ALPHA_BLEND( *byte_des, color.b, *bmp_src );
-				byte_des++;
-				ALPHA_BLEND( *byte_des, color.g, *bmp_src );
-				byte_des++;
-				ALPHA_BLEND( *byte_des, color.r, *bmp_src );
-				byte_des++;
-				++bmp_src;
-			}
-			byte_row_des += des->w*3;
-			bmp_row_src += bmp->width;
-		}
-		return 0;
-	}
-
+	byte_row_des = des->bytes + (pos.y + des_rect.y) * des->bytes_per_row;
+	byte_row_des += (pos.x + des_rect.x)*des->bytes_per_pixel;
 	for( y=0; y<cut.h; ++y ) { 
 		bmp_src = bmp_row_src;
 		byte_des = byte_row_des;
 		for( x=0; x<cut.w; ++x ) {
-			*byte_des++ = _ALPHA_BLEND( 255, color.b, *bmp_src );
-			*byte_des++ = _ALPHA_BLEND( 255, color.g, *bmp_src );
-			*byte_des++ = _ALPHA_BLEND( 255, color.r, *bmp_src );
+			ALPHA_BLEND( *byte_des, color.b, *bmp_src );
+			byte_des++;
+			ALPHA_BLEND( *byte_des, color.g, *bmp_src );
+			byte_des++;
+			ALPHA_BLEND( *byte_des, color.r, *bmp_src );
+			byte_des++;
 			++bmp_src;
 		}
 		byte_row_des += des->w*3;
