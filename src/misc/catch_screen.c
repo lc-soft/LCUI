@@ -39,7 +39,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-
+#ifdef USE_THIS_CODE
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -106,3 +106,4 @@ LCUIScreen_EndRecord( void )
 	need_break = TRUE;
 	return LCUIThread_Join(t, NULL);
 }
+#endif
