@@ -176,7 +176,6 @@ int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
         fp = fopen(file_name, "wb");
         if (!fp) {
                 _DEBUG_MSG("file %s could not be opened for writing\n", file_name);
-                fclose( fp );
                 return -1;
         }
         /* initialize stuff */
