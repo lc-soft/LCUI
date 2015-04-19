@@ -128,8 +128,12 @@ void Widget_ValidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LCUI_WidgetClass *wc;
+	LCUI_Size box_size;
 	//Widget_DrawShadow( ... );
-	Graph_DrawBackground( &paint->canvas, &w->style.background, &paint->rect );
+	box_size.w = w->base.box.content.width;
+	box_size.h = w->base.box.content.height;
+	Graph_DrawBackground( &paint->canvas, &w->style.background, 
+			      &box_size, &paint->rect );
 	//Widget_DrawBorder( ... );
 	wc = LCUIWidget_GetClass( w->type_name );
 	wc && wc->methods.paint ? wc->methods.paint(w, paint):FALSE;

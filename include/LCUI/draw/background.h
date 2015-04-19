@@ -45,11 +45,18 @@ LCUI_BEGIN_HEADER
 /** 初始化背景绘制参数 */
 LCUI_API void Background_Init( LCUI_Background *bg );
 
-/** 在图层上绘制背景 */
+/**
+* 在图层上绘制背景
+* @param graph		需进行绘制的图层
+* @param bg		背景样式数据
+* @param box_size	容器尺寸
+* @param rect		背景中实际需要绘制的区域，如果为NULL，则绘制整个背景
+*/
 LCUI_API void Graph_DrawBackground(
-		LCUI_Graph	*graph, 
-		LCUI_Background	*bg, 
-		LCUI_Rect	*area 
+	LCUI_Graph		*graph,
+	const LCUI_Background	*bg,
+	const LCUI_Size		*box_size,
+	const LCUI_Rect		*rect
 );
 
 LCUI_END_HEADER

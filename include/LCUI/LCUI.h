@@ -193,6 +193,24 @@ struct LCUI_Graph_ {
 	uchar_t *palette;		/**< 调色板 */
 };
 
+/** 样式值枚举，用于代替使用字符串 */
+enum StyleValue {
+	SV_AUTO,
+	SV_CONTAIN,
+	SV_COVER,
+	SV_CENTER,
+	SV_TOP,
+	SV_TOP_LEFT,
+	SV_TOP_CENTER,
+	SV_TOP_RIGHT,
+	SV_CENTER_LEFT,
+	SV_CENTER_CENTER,
+	SV_CENTER_RIGHT,
+	SV_BOTTOM_LEFT,
+	SV_BOTTOM_CENTER,
+	SV_BOTTOM_RIGHT
+};
+
 typedef struct LCUI_Background {
 	LCUI_Graph image;	/**< 背景图 */
 	LCUI_Color color;	/**< 背景色 */
@@ -203,10 +221,22 @@ typedef struct LCUI_Background {
 		LCUI_BOOL x, y;
 	} repeat;		/**< 背景图是否重复 */
 	struct {
-		LCUI_StyleVar x, y;
+		LCUI_BOOL using_value;
+		union {
+			struct {
+				LCUI_StyleVar x, y;
+			};
+			int value;
+		};
 	} position;		/**< 定位方式 */
 	struct {
-		LCUI_StyleVar w, h;
+		LCUI_BOOL using_value;
+		union {
+			struct {
+				LCUI_StyleVar w, h;
+			};
+			int value;
+		};
 	} size;
 } LCUI_Background;
 

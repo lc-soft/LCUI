@@ -347,8 +347,6 @@ void $(GetValidRect)( LCUI_Widget widget, LCUI_Rect *rect )
 /** 计算坐标 */
 void $(ComputeCoord)( LCUI_Widget w )
 {
-	double n;
-
 	// 需要考虑到其它定位相关的属性
 	// code ...
 
@@ -357,8 +355,8 @@ void $(ComputeCoord)( LCUI_Widget w )
 		if( !w->parent ) {
 			break;
 		 }
-		n = w->style.x.scale / 100.0;
-		w->base.x = n * w->parent->base.box.content.width;
+		w->base.x =  w->parent->base.box.content.width;
+		w->base.x *= w->style.x.scale;
 		break;
 	case SVT_PX:
 		w->base.x = w->style.x.px;
@@ -374,8 +372,8 @@ void $(ComputeCoord)( LCUI_Widget w )
 		if( !w->parent ) {
 			break;
 		 }
-		n = w->style.y.scale / 100.0;
-		w->base.y = n * w->parent->base.box.content.width;
+		w->base.y = w->parent->base.box.content.height;
+		w->base.y *= w->style.y.scale;
 		break;
 	case SVT_PX:
 		w->base.y = w->style.y.px;
@@ -419,15 +417,13 @@ void $(UpdateGraphBox)( LCUI_Widget w )
 /** 计算尺寸 */
 void $(ComputeSize)( LCUI_Widget w )
 {
-	double n;
-
 	switch( w->style.width.type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
-		n = w->style.width.scale / 100.0;
-		w->base.width = n * w->parent->base.box.content.width;
+		w->base.width = w->parent->base.box.content.width;
+		w->base.width *= w->style.width.scale;
 		break;
 	case SVT_PX:
 		w->base.width = w->style.width.px;
@@ -443,8 +439,8 @@ void $(ComputeSize)( LCUI_Widget w )
 		if( !w->parent ) {
 			break;
 		 }
-		n = w->style.height.scale / 100.0;
-		w->base.height = n * w->parent->base.box.content.width;
+		w->base.height = w->parent->base.box.content.height;
+		w->base.height *= w->style.height.scale;
 		break;
 	case SVT_PX:
 		w->base.height = w->style.height.px;
