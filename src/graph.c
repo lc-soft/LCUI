@@ -94,6 +94,77 @@ static size_t get_pixel_size( int color_type )
 
 /*----------------------------------- RGB ----------------------------------*/
 
+static void Pixels_ARGBFormatToRGB( const uchar_t *in_pixels, 
+				    uchar_t *out_pixels, 
+				    size_t pixel_count )
+{
+	const LCUI_ARGB8888 *p_px, *p_end_px;
+	LCUI_ARGB8888 *p_out_px;
+	uchar_t *p_out_byte;
+
+	p_out_byte = out_pixels;
+	p_out_px = (LCUI_ARGB8888*)out_pixels;
+	p_px = (const LCUI_ARGB8888*)in_pixels;
+	/* 遍历到倒数第二个像素为止 */
+	p_end_px = p_px + pixel_count - 1;
+	for( ; p_px < p_end_px; ++p_px ) {
+		*p_out_px = *p_px;
+		/* 将后3字节的数据当成4字节（LCUI_ARGB8888）的像素点访问 */
+		p_out_px = (LCUI_ARGB8888*)(((uchar_t*)p_out_px) + 3);
+	}
+	/* 最后一个像素，以逐个字节的形式写数据 */
+	p_out_byte = (uchar_t*)(p_out_px + 1);
+	*p_out_byte++ = p_px->blue;
+	*p_out_byte++ = p_px->green;
+	*p_out_byte++ = p_px->red;
+}
+
+static void Pixels_RGBFormatToARGB( const uchar_t *in_pixels, 
+				    uchar_t *out_pixels, 
+				    size_t pixel_count )
+{
+	const LCUI_ARGB8888 *p_px, *p_end_px;
+	LCUI_ARGB8888 *p_out_px;
+	const uchar_t *p_in_byte;
+
+	p_in_byte = in_pixels;
+	p_out_px = (LCUI_ARGB8888*)out_pixels;
+	p_px = (const LCUI_ARGB8888*)in_pixels;
+	p_end_px = p_px + pixel_count - 1;
+	while( p_px < p_end_px ) {
+		*p_out_px = *p_px;
+		p_out_px->alpha = 255;
+		p_px = (const LCUI_ARGB8888*)(((const uchar_t*)p_px) + 3);
+		++p_out_px;
+	}
+	p_in_byte = (const uchar_t*)(p_px + 1);
+	p_out_px->blue = *p_in_byte++;
+	p_out_px->green = *p_in_byte++;
+	p_out_px->red = *p_in_byte++;
+	p_out_px->alpha = 255;
+}
+
+static void Pixels_Format( const uchar_t *in_pixels, int in_color_type,
+			   uchar_t *out_pixels, int out_color_type,
+			   size_t pixel_count )
+{
+	switch( in_color_type ) {
+	case COLOR_TYPE_ARGB8888:
+		if( out_color_type == COLOR_TYPE_ARGB8888 ) {
+			return;
+		}
+		Pixels_ARGBFormatToRGB( in_pixels, out_pixels, pixel_count );
+		break;
+	case COLOR_TYPE_RGB888:
+		if( out_color_type == COLOR_TYPE_RGB888 ) {
+			return;
+		}
+		Pixels_RGBFormatToARGB( in_pixels, out_pixels, pixel_count );
+		break;
+	default: break;
+	}
+}
+
 static int Graph_RGBToARGB( LCUI_Graph *graph )
 {
 	int x, y;
@@ -154,23 +225,34 @@ static int Graph_CutRGB( const LCUI_Graph *graph, LCUI_Rect rect,
 static int Graph_ReplaceRGB( LCUI_Graph *des, LCUI_Rect des_rect,
 			     const LCUI_Graph *src, LCUI_Pos src_pos )
 {
-	int x, y;
+	int y, row_size, src_row_size, des_row_size;
 	uchar_t *byte_row_des, *byte_row_src;
-	uchar_t *byte_des, *byte_src, a;
 
-	byte_row_src = src->bytes + (src_pos.y * src->w + src_pos.x)*3;
-	byte_row_des = des->bytes + (des_rect.y * des->w + des_rect.x)*3;
-	a = (uchar_t)(src->opacity * 255.0);
-	for( y=0; y<des_rect.h; ++y ) {
-		byte_src = byte_row_src;
-		byte_des = byte_row_des;
-		for( x=0; x<des_rect.w; ++x ) {
-			*byte_des++ = _ALPHA_BLEND( 255, *byte_src++, a );
-			*byte_des++ = _ALPHA_BLEND( 255, *byte_src++, a );
-			*byte_des++ = _ALPHA_BLEND( 255, *byte_src++, a );
+	src_row_size = 3 * src->w;
+	byte_row_src = src->bytes + (src_pos.y * src->w + src_pos.x) * 3;
+	if( des->color_type == COLOR_TYPE_RGB888 ) {
+		row_size = 3 * des_rect.w;
+		des_row_size = 3 * des->w;
+		byte_row_des = des->bytes + (des_rect.y * des->w + des_rect.x) * 3;
+		for( y = 0; y < des_rect.h; ++y ) {
+			memcpy( byte_row_des, byte_row_src, row_size );
+			byte_row_src += src_row_size;
+			byte_row_des += des_row_size;
 		}
-		byte_row_src += src->w*3;
-		byte_row_des += des->w*3;
+		return 0;
+	}
+
+	if( des->color_type != COLOR_TYPE_ARGB8888 ) {
+		return 0;
+	}
+	byte_row_des = des->bytes + (des_rect.y * des->w + des_rect.x) * 4;
+	des_row_size = 4 * des->w;
+	for( y = 0; y < des_rect.h; ++y ) {
+		Pixels_Format( byte_row_src, src->color_type,
+				byte_row_des, des->color_type,
+				des_rect.w );
+		byte_row_src += src_row_size;
+		byte_row_des += des_row_size;
 	}
 	return 0;
 }
@@ -706,6 +788,7 @@ int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect )
 		LCUIRect_ValidateArea( &quote_rect, box_size );
 		quote_rect.x += source->quote.left;
 		quote_rect.y += source->quote.top;
+		source = source->quote.source;
 	} else {
 		LCUIRect_ValidateArea( &quote_rect, box_size );
 	}

@@ -103,15 +103,22 @@ static void $(Update)(void)
 		/* 收集无效区域记录 */
 		Widget_ProcInvalidArea( p_sr->widget, &rlist );
 		m = LinkedList_GetTotal( &rlist );
+		_DEBUG_MSG("proc invalid area, m = %d\n", m);
 		LinkedList_Goto( &rlist, 0 );
 		/* 在 surface 上逐个重绘无效区域 */
 		for( j=0; j<m; ++j ) {
+			char str[64];
 			p_rect = (LCUI_Rect*)LinkedList_Get( &rlist );
 			paint = Surface_BeginPaint( p_sr->surface, p_rect );
 			Widget_Render( p_sr->widget, paint );
+			sprintf( str, "canvas-%d-%d-%d-%d (%d).png", paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
+			_DEBUG_MSG("write png: %s\n",str);
+			Graph_WritePNG( str, &paint->canvas );
 			Surface_EndPaint( p_sr->surface, paint );
-			Surface_Present( p_sr->surface );
 			LinkedList_Delete( &rlist );
+		}
+		if( m > 0 ) {
+			Surface_Present( p_sr->surface );
 		}
 	}
 
@@ -155,6 +162,7 @@ static void $(BindSurface)( LCUI_Widget widget )
 		Surface_Hide( p_sr->surface );
 		Surface_Show( p_sr->surface );
 	}
+	Widget_InvalidateArea( widget, NULL, GRAPH_BOX );
 }
 
 /** 解除 widget 与 sruface 的绑定 */
@@ -319,6 +327,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 {
 	int e_type = *((int*)&arg);
 	LCUI_Surface surface;
+	LCUI_Rect *p_rect;
 	
 	_DEBUG_MSG("tip, e_type = %d\n", e_type);
 	surface = $(GetBindSurface)( e->target );
@@ -327,6 +336,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 			return;
 		}
 	}
+	p_rect = &e->target->base.box.graph;
 	switch( e_type ) {
 	case WET_ADD:
 		$(BindSurface)( e->target );
@@ -341,27 +351,19 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 	case WET_HIDE:
 		Surface_Hide( surface );
 		break;
-	case WET_TITLE: {
+	case WET_TITLE:
 		_DEBUG_MSG("%S\n", e->target->title );
 		Surface_SetCaptionW( surface, e->target->title );
 		break;
-	}
-	case WET_RESIZE: {
-		int w, h;
-		w = e->target->base.box.graph.w;
-		h = e->target->base.box.graph.h;
-		_DEBUG_MSG("w: %d, h: %d\n", w, h);
-		Surface_Resize( surface, w, h );
+	case WET_RESIZE: 
+		_DEBUG_MSG( "resize, w: %d, h: %d\n", p_rect->w, p_rect->h );
+		Surface_Resize( surface, p_rect->w, p_rect->h );
+		Widget_InvalidateArea( w, NULL, GRAPH_BOX );
 		break;
-	}
-	case WET_MOVE: {
-		int x, y;
-		x = e->target->base.box.graph.x;
-		y = e->target->base.box.graph.y;
-		_DEBUG_MSG("x: %d, y: %d\n", x, y);
-		Surface_Move( surface, x, y );
+	case WET_MOVE: 
+		_DEBUG_MSG( "x: %d, y: %d\n", p_rect->left, p_rect->top );
+		Surface_Move( surface, p_rect->left, p_rect->top );
 		break;
-	}
 	default: break;
 	}
 }

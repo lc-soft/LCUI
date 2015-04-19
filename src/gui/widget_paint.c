@@ -324,6 +324,8 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		if( Graph_IsValid(&w->graph) ) {
 			Graph_Quote( &self_graph, &w->graph, &paint->rect );
 			Graph_Mix( &paint->canvas, &self_graph, Pos(0,0) );
+			Graph_WritePNG( "1,paint_canvas.png", &paint->canvas );
+			Graph_WritePNG( "2,self_graph.png", &self_graph );
 		} else {
 			Widget_OnPaint( w, paint );
 		}
@@ -353,7 +355,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		Graph_Create( &content_graph, content_rect.w, content_rect.h );
 	} else {
 		/* 引用该区域的位图，作为内容框的位图 */
-		Graph_Quote( &paint->canvas, &content_graph, &content_rect );
+		Graph_Quote( &content_graph, &paint->canvas, &content_rect );
 	}
 	i = LinkedList_GetTotal( &w->children_show );
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
