@@ -175,8 +175,8 @@ struct LCUI_Graph_ {
 	union { int w, width; };	/**< 宽度，一个整数值，单位为像素(px) */
 	union { int h, height; };	/**< 高度，一个整数值，单位为像素(px) */
 	struct {
-		int top;		/**< 源图形中的引用区域所在的坐标 */
-		int left;
+		int top;		/**< 源图形中的引用区域的上边距 */
+		int left;		/**< 源图形中的引用区域的左边距 */
 		LCUI_BOOL is_valid;	/**< 标志，指示是否引用了另一图形 */
 		LCUI_Graph *source;	/**< 所引用的源图形 */
 	} quote;

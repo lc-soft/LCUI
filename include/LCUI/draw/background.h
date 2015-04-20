@@ -54,7 +54,7 @@ LCUI_API void Background_Init( LCUI_Background *bg );
 */
 LCUI_API void Graph_DrawBackground(
 	LCUI_Graph		*graph,
-	const LCUI_Background	*bg,
+	LCUI_Background		*bg,
 	const LCUI_Size		*box_size,
 	const LCUI_Rect		*rect
 );

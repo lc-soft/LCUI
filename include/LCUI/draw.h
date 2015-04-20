@@ -1,7 +1,7 @@
 ﻿/* ****************************************************************************
  * LCUI_Draw.h -- The graphics draw module of LCUI.
  * 
- * Copyright (C) 2012 by
+ * Copyright (C) 2012-2015 by
  * Liu Chao
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Draw.h -- LCUI的图形绘制模块
  *
- * 版权所有 (C) 2012 归属于 
+ * 版权所有 (C) 2012-2015 归属于 
  * 刘超
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -56,37 +56,25 @@ LCUI_BEGIN_HEADER
 #include <LCUI/draw/boxshadow.h>
 #include <LCUI/draw/background.h>
 
-LCUI_API int
-Graph_Rotate(LCUI_Graph *src, int rotate_angle, LCUI_Graph *des);
 /* 
  * 功能：旋转图形
  * 说明：指定旋转中心点坐标以及旋转角度，即可得到旋转后的图形
  * 本源代码参考自互联网相关代码
  * 算法有待优化完善。
  */
-
-/* 载入BMP图片文件 */
-LCUI_API int Graph_LoadBMP( const char *filepath, LCUI_Graph *out );
-
-/* 载入jpeg图片文件 */
-LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *out );
-
-/* 载入png图片文件 */
-LCUI_API int Graph_LoadPNG( const char *filepath, LCUI_Graph *out );
+LCUI_API int Graph_Rotate( LCUI_Graph *src, int rotate_angle, LCUI_Graph *des );
 
 /* 将图像数据写入至png文件 */
-LCUI_API int Graph_WritePNG( const char *file_name, LCUI_Graph *graph );
+LCUI_API int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph );
 
 /* 载入指定图片文件的图像数据 */
 LCUI_API int Graph_LoadImage( const char *filepath, LCUI_Graph *out );
 
-LCUI_API int
-GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
-/* 对图像进行高斯模糊处理 */ 
+/* 对图像进行高斯模糊处理 */
+LCUI_API int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
 
-LCUI_API int
-Graph_Smooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
 /* 对图像进行模糊处理 */
+LCUI_API int Graph_Smooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
 
 LCUI_END_HEADER
 

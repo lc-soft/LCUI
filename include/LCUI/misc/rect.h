@@ -66,7 +66,9 @@ LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 );
  * @param[out] out	矩形A和B重叠处的矩形
  * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
-LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect( LCUI_Rect *a, LCUI_Rect *b, LCUI_Rect *out );
+LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a, 
+					    const LCUI_Rect *b, 
+					    LCUI_Rect *out );
 
 /** 
  * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形

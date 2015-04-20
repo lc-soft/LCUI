@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * LCUI_Graph.h -- The base graphics handling module for LCUI
  *
- * Copyright (C) 2012-2014 by
+ * Copyright (C) 2012-2015 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Graph.h -- LCUI的基本图形处理模块
  *
- * 版权所有 (C) 2012-2014 归属于
+ * 版权所有 (C) 2012-2015 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
