@@ -59,7 +59,7 @@ LCUI_Rect Rect( int x, int y, int w, int h )
 
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
 void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
-							LCUI_Rect *cut )
+			  LCUI_Rect *cut )
 {
 	cut->x = 0;
 	cut->y = 0;
@@ -142,7 +142,9 @@ LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 )
  * @param[out] out	矩形A和B重叠处的矩形
  * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
-LCUI_BOOL LCUIRect_GetOverlayRect( LCUI_Rect *a, LCUI_Rect *b, LCUI_Rect *out )
+LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a, 
+				   const LCUI_Rect *b, 
+				   LCUI_Rect *out )
 {
 	if( a->x > b->x ) {
 		out->x = a->x;

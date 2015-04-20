@@ -32,6 +32,7 @@ void onTimer( void *arg )
 int main( int argc, char **argv )
 {
 	LCUI_Widget w;
+	LCUI_Graph image;
 
 	InitConsoleWindow();
 	LCUI_Init(0, 0, LDM_SEAMLESS);
@@ -41,8 +42,11 @@ int main( int argc, char **argv )
 	Widget_Resize( w, 320, 240 );
 	Widget_Move( w, 480, 480 );
 	Widget_SetTitleW( w, L"测试" );
+	Graph_Init( &image );
+	_DEBUG_MSG( "load image, result: %d\n", Graph_LoadImage( "bg.png", &image ) );
 	Widget_PullStyle( w, WSS_BACKGROUND );
 	w->style.background.color = RGB(255,0,0);
+	w->style.background.image = image;
 	Widget_PushStyle( w, WSS_BACKGROUND );
 	return LCUI_Main();
 }

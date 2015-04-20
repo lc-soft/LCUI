@@ -268,7 +268,7 @@ static void Widget_ProcTask( LCUI_Widget w )
 {
 	int i, n;
 	TaskRecord *buffer;
-	_DEBUG_MSG("widget: %p, is_root: %d, for_self: %d, for_children: %d\n", w, w == LCUIRootWidget, w->task->for_self, w->task->for_children);
+	DEBUG_MSG("widget: %p, is_root: %d, for_self: %d, for_children: %d\n", w, w == LCUIRootWidget, w->task->for_self, w->task->for_children);
 	/* 如果该部件有任务需要处理 */
 	if( w->task->for_self ) {
 		w->task->for_self = FALSE;
@@ -281,7 +281,7 @@ static void Widget_ProcTask( LCUI_Widget w )
 			return;
 		}
 		for( i=0; i<WTT_USER; ++i ) {
-			_DEBUG_MSG( "task_id: %d, is_valid: %d\n", i, buffer[i].is_valid );
+			DEBUG_MSG( "task_id: %d, is_valid: %d\n", i, buffer[i].is_valid );
 			if( buffer[i].is_valid && task_handlers[i] ) {
 				task_handlers[i](w, &buffer[i].data);
 			}
@@ -300,7 +300,7 @@ static void Widget_ProcTask( LCUI_Widget w )
 		w->task->for_children = FALSE;
 		n = LinkedList_GetTotal( &w->children );
 		LinkedList_Goto( &w->children, 0 );
-		_DEBUG_MSG("children_total: %d\n", n);
+		DEBUG_MSG("children_total: %d\n", n);
 		for( i=0; i<n; ++i ) {
 			child = (LCUI_Widget)LinkedList_Get( &w->children );
 			LinkedList_ToNext( &w->children );

@@ -103,7 +103,7 @@ static void $(Update)(void)
 		/* 收集无效区域记录 */
 		Widget_ProcInvalidArea( p_sr->widget, &rlist );
 		m = LinkedList_GetTotal( &rlist );
-		_DEBUG_MSG("proc invalid area, m = %d\n", m);
+		DEBUG_MSG("proc invalid area, m = %d\n", m);
 		LinkedList_Goto( &rlist, 0 );
 		/* 在 surface 上逐个重绘无效区域 */
 		for( j=0; j<m; ++j ) {
@@ -112,7 +112,7 @@ static void $(Update)(void)
 			paint = Surface_BeginPaint( p_sr->surface, p_rect );
 			Widget_Render( p_sr->widget, paint );
 			sprintf( str, "canvas-%d-%d-%d-%d (%d).png", paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
-			_DEBUG_MSG("write png: %s\n",str);
+			DEBUG_MSG("write png: %s\n",str);
 			Graph_WritePNG( str, &paint->canvas );
 			Surface_EndPaint( p_sr->surface, paint );
 			LinkedList_Delete( &rlist );

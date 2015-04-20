@@ -155,7 +155,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 }
 
 /* 将图像数据写入至png文件 */
-int Graph_WritePNG( const char *file_name, LCUI_Graph *graph )
+int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 {
 #ifdef USE_LIBPNG
         FILE *fp;
