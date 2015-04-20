@@ -64,7 +64,7 @@ void Background_Init( LCUI_Background *bg )
  */
 void Graph_DrawBackground(
 	LCUI_Graph		*graph,
-	const LCUI_Background	*bg,
+	LCUI_Background		*bg,
 	const LCUI_Size		*box_size,
 	const LCUI_Rect		*rect
 )
@@ -72,6 +72,7 @@ void Graph_DrawBackground(
 	LCUI_Graph image;
 	LCUI_Size image_size;
 	LCUI_Pos image_pos;
+	LCUI_Rect read_rect;
 
 	Graph_FillColor( graph, bg->color );
 	/* 计算背景图应有的尺寸 */
@@ -115,7 +116,7 @@ void Graph_DrawBackground(
 			image_size.w = bg->size.w.px;
 			break;
 		default:
-			image_size.w = 0;
+			image_size.w = bg->image.width;
 			break;
 		}
 		switch( bg->size.h.type ) {
@@ -126,7 +127,7 @@ void Graph_DrawBackground(
 			image_size.h = bg->size.h.px;
 			break;
 		default:
-			image_size.h = 0;
+			image_size.h = bg->image.height;
 			break;
 		}
 	}
@@ -195,7 +196,46 @@ void Graph_DrawBackground(
 			break;
 		}
 	}
-	// 绘制 ...
-	// code ...
+	/* 保存背景图像区域 */
+	read_rect.x = image_pos.x;
+	read_rect.y = image_pos.y;
+	read_rect.width = image_size.w;
+	read_rect.height = image_size.h;
+	Graph_WritePNG( "background-image.png", &bg->image );
+	/* 获取当前绘制区域与背景图像的重叠区域 */
+	if( LCUIRect_GetOverlayRect( &read_rect, rect, &read_rect ) ) {
+		/* 转换成相对于图像的坐标 */
+		read_rect.x -= image_pos.x;
+		read_rect.y -= image_pos.y;
+		/* 如果尺寸没有变化则直接引用 */
+		if( image_size.w == bg->image.w && image_size.h == bg->image.h ) {
+			Graph_Quote( &image, &bg->image, &read_rect );
+			/* 转换成相对于当前绘制区域的坐标 */
+			image_pos.x -= rect->x;
+			image_pos.y -= rect->y;
+			Graph_Mix( graph, &image, image_pos );
+		} else {
+			LCUI_Graph buffer;
+			/* 根据宽高的缩放比例，计算实际需要引用的区域 */
+			if( image_size.w != bg->image.w ) {
+				read_rect.x *= image_size.w / bg->image.width;
+				read_rect.width *= image_size.w / bg->image.width;
+			}
+			if( image_size.h != bg->image.h ) {
+				read_rect.y *= image_size.h / bg->image.height;
+				read_rect.height *= image_size.h / bg->image.height;
+			}
+			/* 引用源背景图像的一块区域 */
+			Graph_Quote( &image, &bg->image, &read_rect );
+			image_size.w = read_rect.w;
+			image_size.h = read_rect.h;
+			image_pos.x -= rect->x;
+			image_pos.y -= rect->y;
+			/* 按比例进行缩放 */
+			Graph_Zoom( &image, &buffer, FALSE, image_size );
+			Graph_Mix( graph, &buffer, image_pos );
+			Graph_Free( &buffer );
+		}
+	}
 	Graph_WritePNG( "debug_image.png", graph );
 }
