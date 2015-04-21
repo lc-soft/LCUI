@@ -932,10 +932,8 @@ int Graph_Zoom( const LCUI_Graph *graph, LCUI_Graph *buff,
 		LCUI_BOOL keep_scale, LCUI_Size size )
 {
 	LCUI_Rect rect;
-	LCUI_ARGB *pixel_src, *pixel_des;
-	int x, y, src_x, src_y, tmp;
+	int x, y, src_x, src_y;
 	double scale_x, scale_y;
-	uchar_t *byte_src, *byte_des;
 
 	if( !Graph_IsValid(graph) ) {
 		return -1;
@@ -962,28 +960,34 @@ int Graph_Zoom( const LCUI_Graph *graph, LCUI_Graph *buff,
 		return -2;
 	}
 	if( graph->color_type == COLOR_TYPE_ARGB ) {
+		LCUI_ARGB *px_src, *px_des, *px_row_src;
 		for( y=0; y < size.h; ++y )  {
 			src_y = y * scale_y;
-			tmp = (src_y + rect.y) * graph->w + rect.x;
-			pixel_des = buff->argb + y * size.w;
+			px_row_src = graph->argb;
+			px_row_src += (src_y + rect.y) * graph->w + rect.x;
+			px_des = buff->argb + y * size.w;
 			for( x=0; x < size.w; ++x ) {
 				src_x = x * scale_x;
-				pixel_src = graph->argb + tmp + src_x;
-				*pixel_des++ = *pixel_src++;
+				px_src = px_row_src + src_x;
+				*px_des++ = *px_src;
 			}
 		}
-		return 0;
-	}
-	for( y=0; y < size.h; ++y )  {
-		src_y = y * scale_y;
-		tmp = ((src_y + rect.y) * graph->w + rect.x) * 3;
-		byte_des = buff->bytes + y * size.w * 3;
-		for( x=0; x < size.w; ++x ) {
-			src_x = x * scale_x * 3;
-			byte_src = graph->bytes + tmp + src_x;
-			*byte_des++ = *byte_src++;
-			*byte_des++ = *byte_src++;
-			*byte_des++ = *byte_src++;
+	} else {
+		uchar_t *byte_src, *byte_des, *byte_row_src;
+		for( y = 0; y < size.h; ++y ) {
+			src_y = y * scale_y;
+			byte_row_src = graph->bytes;
+			byte_row_src += (src_y + rect.y) * graph->bytes_per_row;
+			byte_row_src += rect.x * graph->bytes_per_pixel;
+			byte_des = buff->bytes + y * buff->bytes_per_row;
+			for( x = 0; x < size.w; ++x ) {
+				src_x = x * scale_x;
+				src_x *= graph->bytes_per_pixel;
+				byte_src = byte_row_src + src_x;
+				*byte_des++ = *byte_src++;
+				*byte_des++ = *byte_src++;
+				*byte_des++ = *byte_src;
+			}
 		}
 	}
 	return 0;
