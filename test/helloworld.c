@@ -45,8 +45,10 @@ int main( int argc, char **argv )
 	Graph_Init( &image );
 	_DEBUG_MSG( "load image, result: %d\n", Graph_LoadImage( "bg.png", &image ) );
 	Widget_PullStyle( w, WSS_BACKGROUND );
-	w->style.background.color = RGB(255,0,0);
+	w->style.background.color = RGB(100,240,100);
 	w->style.background.image = image;
+	w->style.background.size.value = SV_COVER;
+	w->style.background.size.using_value = TRUE;
 	Widget_PushStyle( w, WSS_BACKGROUND );
 	return LCUI_Main();
 }
