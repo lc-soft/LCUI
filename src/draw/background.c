@@ -48,11 +48,8 @@ void Background_Init( LCUI_Background *bg )
 	Graph_Init( &bg->image );
 	bg->size.using_value = TRUE;
 	bg->size.value = SV_AUTO;
-	bg->position.using_value = FALSE;
-	bg->position.x.px = 0;
-	bg->position.y.px = 0;
-	bg->position.x.type = SVT_PX;
-	bg->position.y.type = SVT_PX;
+	bg->position.using_value = TRUE;
+	bg->position.value = SV_AUTO;
 }
 
 /** 
@@ -71,35 +68,31 @@ void Graph_DrawBackground(
 {
 	LCUI_Graph image;
 	LCUI_Size image_size;
-	LCUI_Pos image_pos;
+	LCUI_Pos image_pos = { 0, 0 };
 	LCUI_Rect read_rect;
 
 	Graph_FillColor( graph, bg->color );
 	/* 计算背景图应有的尺寸 */
 	if( bg->size.using_value ) {
+		/* 默认是取宽和高里最小的一个来计算缩放后的图形尺寸 */
+		int mode = bg->image.width < bg->image.height;
 		switch( bg->size.value ) {
 		case SV_CONTAIN:
 			/* 取宽和高里最大的一个来计算缩放后的图形尺寸 */
-			if( bg->image.width > bg->image.height ) {
-				image_size.w = box_size->w;
-				image_size.h = bg->image.height;
-				image_size.h *= (bg->image.width / box_size->w);
-			} else {
-				image_size.h = box_size->h;
-				image_size.w = bg->image.width;
-				image_size.w *= (bg->image.height / box_size->h);
-			}
-			break;
+			mode = bg->image.width > bg->image.height;
 		case SV_COVER:
-			/* 取宽和高里最小的一个来计算缩放后的图形尺寸 */
-			if( bg->image.width < bg->image.height ) {
+			if( mode ) {
 				image_size.w = box_size->w;
-				image_size.h = bg->image.height;
-				image_size.h *= (bg->image.width / box_size->w);
+				image_size.h = bg->image.height*box_size->w;
+				image_size.h = 1.0*image_size.h / bg->image.width;
+				image_pos.x = 0;
+				image_pos.y = (box_size->h - image_size.h) / 2;
 			} else {
 				image_size.h = box_size->h;
-				image_size.w = bg->image.width;
-				image_size.w *= (bg->image.height / box_size->h);
+				image_size.w = bg->image.width*box_size->h;
+				image_size.w = 1.0*image_size.w / bg->image.height;
+				image_pos.x = (box_size->w - image_size.w) / 2;
+				image_pos.y = 0;
 			}
 			break;
 		case SV_AUTO:
@@ -139,6 +132,10 @@ void Graph_DrawBackground(
 			image_pos.x = (box_size->w - image_size.w) / 2;
 			image_pos.y = 0;
 			break;
+		case SV_TOP_RIGHT:
+			image_pos.x = box_size->w - image_size.w;
+			image_pos.y = 0;
+			break;
 		case SV_CENTER_LEFT:
 			image_pos.x = 0;
 			image_pos.y = (box_size->h - image_size.h) / 2;
@@ -164,10 +161,8 @@ void Graph_DrawBackground(
 			image_pos.x = box_size->w - image_size.w;
 			image_pos.y = box_size->h - image_size.h;
 			break;
-		case SV_TOP_RIGHT:
+		case SV_TOP_LEFT:
 		default:
-			image_pos.x = 0;
-			image_pos.y = 0;
 			break;
 		}
 	} else {
@@ -179,9 +174,7 @@ void Graph_DrawBackground(
 		case SVT_PX:
 			image_pos.x = bg->position.x.px;
 			break;
-		default:
-			image_pos.x = 0;
-			break;
+		default:break;
 		}
 		switch( bg->position.y.type ) {
 		case SVT_SCALE:
@@ -191,9 +184,7 @@ void Graph_DrawBackground(
 		case SVT_PX:
 			image_pos.y = bg->position.y.px;
 			break;
-		default:
-			image_pos.y = 0;
-			break;
+		default:break;
 		}
 	}
 	/* 保存背景图像区域 */
@@ -215,24 +206,33 @@ void Graph_DrawBackground(
 			image_pos.y -= rect->y;
 			Graph_Mix( graph, &image, image_pos );
 		} else {
+			float scale;
 			LCUI_Graph buffer;
+			LCUI_Rect quote_rect;
+
+			Graph_Init( &buffer );
+			quote_rect = read_rect;
 			/* 根据宽高的缩放比例，计算实际需要引用的区域 */
 			if( image_size.w != bg->image.w ) {
-				read_rect.x *= image_size.w / bg->image.width;
-				read_rect.width *= image_size.w / bg->image.width;
+				scale = 1.0 * bg->image.width / image_size.w;
+				quote_rect.x *= scale;
+				quote_rect.width *= scale;
 			}
 			if( image_size.h != bg->image.h ) {
-				read_rect.y *= image_size.h / bg->image.height;
-				read_rect.height *= image_size.h / bg->image.height;
+				scale = 1.0 * bg->image.height / image_size.h;
+				quote_rect.y *= scale;
+				quote_rect.height *= scale;
 			}
 			/* 引用源背景图像的一块区域 */
-			Graph_Quote( &image, &bg->image, &read_rect );
-			image_size.w = read_rect.w;
-			image_size.h = read_rect.h;
-			image_pos.x -= rect->x;
-			image_pos.y -= rect->y;
+			Graph_Quote( &image, &bg->image, &quote_rect );
+			image_size.w = read_rect.width;
+			image_size.h = read_rect.height;
+			/* 计算相对于绘制区域的坐标 */
+			image_pos.x = read_rect.x + image_pos.x - rect->x;
+			image_pos.y = read_rect.y + image_pos.y - rect->y;
 			/* 按比例进行缩放 */
 			Graph_Zoom( &image, &buffer, FALSE, image_size );
+			Graph_WritePNG( "buffer.png", &buffer );
 			Graph_Mix( graph, &buffer, image_pos );
 			Graph_Free( &buffer );
 		}
