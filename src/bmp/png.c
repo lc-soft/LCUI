@@ -247,7 +247,7 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 				row_pointers[y][x + 3] = *pixel_ptr++; // alpha
 			}
                 }
-		pixel_row_ptr += row_size;
+		pixel_row_ptr += graph->bytes_per_row;
         }
         png_write_image( png_ptr, row_pointers );
 
