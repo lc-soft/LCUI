@@ -53,10 +53,9 @@ LCUI_API void Background_Init( LCUI_Background *bg );
 * @param rect		背景中实际需要绘制的区域，如果为NULL，则绘制整个背景
 */
 LCUI_API void Graph_DrawBackground(
-	LCUI_Graph		*graph,
-	LCUI_Background		*bg,
+	LCUI_PaintContext	paint,
 	const LCUI_Size		*box_size,
-	const LCUI_Rect		*rect
+	LCUI_Background		*bg
 );
 
 LCUI_END_HEADER

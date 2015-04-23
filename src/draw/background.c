@@ -60,10 +60,9 @@ void Background_Init( LCUI_Background *bg )
  * @param rect		背景中实际需要绘制的区域，如果为NULL，则绘制整个背景
  */
 void Graph_DrawBackground(
-	LCUI_Graph		*graph,
-	LCUI_Background		*bg,
+	LCUI_PaintContext	paint,
 	const LCUI_Size		*box_size,
-	const LCUI_Rect		*rect
+	LCUI_Background		*bg
 )
 {
 	LCUI_Graph image;
@@ -71,7 +70,7 @@ void Graph_DrawBackground(
 	LCUI_Pos image_pos = { 0, 0 };
 	LCUI_Rect read_rect;
 
-	Graph_FillColor( graph, bg->color );
+	Graph_FillColor( &paint->canvas, bg->color );
 	/* 计算背景图应有的尺寸 */
 	if( bg->size.using_value ) {
 		/* 默认是取宽和高里最小的一个来计算缩放后的图形尺寸 */
@@ -192,9 +191,8 @@ void Graph_DrawBackground(
 	read_rect.y = image_pos.y;
 	read_rect.width = image_size.w;
 	read_rect.height = image_size.h;
-	Graph_WritePNG( "background-image.png", &bg->image );
 	/* 获取当前绘制区域与背景图像的重叠区域 */
-	if( LCUIRect_GetOverlayRect( &read_rect, rect, &read_rect ) ) {
+	if( LCUIRect_GetOverlayRect( &read_rect, &paint->rect, &read_rect ) ) {
 		/* 转换成相对于图像的坐标 */
 		read_rect.x -= image_pos.x;
 		read_rect.y -= image_pos.y;
@@ -202,9 +200,9 @@ void Graph_DrawBackground(
 		if( image_size.w == bg->image.w && image_size.h == bg->image.h ) {
 			Graph_Quote( &image, &bg->image, &read_rect );
 			/* 转换成相对于当前绘制区域的坐标 */
-			image_pos.x -= rect->x;
-			image_pos.y -= rect->y;
-			Graph_Mix( graph, &image, image_pos );
+			image_pos.x -= paint->rect.x;
+			image_pos.y -= paint->rect.y;
+			Graph_Mix( &paint->canvas, &image, image_pos );
 		} else {
 			float scale;
 			LCUI_Graph buffer;
@@ -228,14 +226,12 @@ void Graph_DrawBackground(
 			image_size.w = read_rect.width;
 			image_size.h = read_rect.height;
 			/* 计算相对于绘制区域的坐标 */
-			image_pos.x = read_rect.x + image_pos.x - rect->x;
-			image_pos.y = read_rect.y + image_pos.y - rect->y;
+			image_pos.x = read_rect.x + image_pos.x - paint->rect.x;
+			image_pos.y = read_rect.y + image_pos.y - paint->rect.y;
 			/* 按比例进行缩放 */
 			Graph_Zoom( &image, &buffer, FALSE, image_size );
-			Graph_WritePNG( "buffer.png", &buffer );
-			Graph_Mix( graph, &buffer, image_pos );
+			Graph_Mix( &paint->canvas, &buffer, image_pos );
 			Graph_Free( &buffer );
 		}
 	}
-	Graph_WritePNG( "debug_image.png", graph );
 }
