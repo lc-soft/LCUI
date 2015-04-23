@@ -44,11 +44,21 @@ int main( int argc, char **argv )
 	Widget_SetTitleW( w, L"测试" );
 	Graph_Init( &image );
 	_DEBUG_MSG( "load image, result: %d\n", Graph_LoadImage( "bg.png", &image ) );
-	Widget_PullStyle( w, WSS_BACKGROUND );
-	w->style.background.color = RGB(100,240,100);
-	w->style.background.image = image;
-	w->style.background.size.value = SV_COVER;
-	w->style.background.size.using_value = TRUE;
-	Widget_PushStyle( w, WSS_BACKGROUND );
+	Widget_PullStyle( w, WSS_BACKGROUND|WSS_SHADOW );
+	w->style.background.color.value = 0xf6f6f6;
+	w->style.background.image = image; 
+	w->style.background.size.w.scale = 0.50;
+	w->style.background.size.h.px = 200;
+	w->style.background.size.w.type = SVT_SCALE;
+	w->style.background.size.h.type = SVT_PX;
+	w->style.background.size.using_value = FALSE;
+	w->style.background.position.using_value = TRUE;
+	w->style.background.position.value = SV_BOTTOM_CENTER;
+	w->style.shadow.color = ARGB( 50, 0, 0, 0 );
+	w->style.shadow.x = 1;
+	w->style.shadow.y = 1;
+	w->style.shadow.spread = 5;
+	w->style.shadow.blur = 5;
+	Widget_PushStyle( w, WSS_BACKGROUND|WSS_SHADOW );
 	return LCUI_Main();
 }

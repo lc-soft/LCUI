@@ -129,11 +129,11 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LCUI_WidgetClass *wc;
 	LCUI_Size box_size;
-	//Widget_DrawShadow( ... );
+
 	box_size.w = w->base.box.content.width;
 	box_size.h = w->base.box.content.height;
-	Graph_DrawBackground( &paint->canvas, &w->style.background, 
-			      &box_size, &paint->rect );
+	Graph_DrawBackground( paint, &box_size, &w->style.background );
+	Graph_DrawBoxShadow( paint, &box_size, &w->style.shadow );
 	//Widget_DrawBorder( ... );
 	wc = LCUIWidget_GetClass( w->type_name );
 	wc && wc->methods.paint ? wc->methods.paint(w, paint):FALSE;
