@@ -159,19 +159,17 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 {
 #ifdef USE_LIBPNG
         FILE *fp;
-        int x, y, row_size, pixel_bytes;
 	LCUI_Rect rect;
         png_byte color_type; 
         png_structp png_ptr;
         png_infop info_ptr; 
-        png_bytep *row_pointers;
-        uchar_t *pixel_ptr, *pixel_row_ptr;
+	png_bytep *row_pointers;
+	int x, y, row_size;
 
         if(!Graph_IsValid(graph)) {
                 _DEBUG_MSG("graph is not valid\n");
                 return -1;
         }
-        
         /* create file */
         fp = fopen(file_name, "wb");
         if (!fp) {
@@ -180,7 +178,6 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
         }
         /* initialize stuff */
         png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-
         if (!png_ptr) {
                 _DEBUG_MSG("png_create_write_struct failed\n");
                 fclose( fp );
@@ -198,59 +195,69 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
                 return -1;
         }
         png_init_io(png_ptr, fp);
-
         /* write header */
         if (setjmp(png_jmpbuf(png_ptr))) {
                 _DEBUG_MSG("error during writing header\n");
                 fclose( fp );
                 return -1;
         }
-
-        if(Graph_HaveAlpha(graph)) {
+        if(Graph_HasAlpha(graph)) {
                 color_type = PNG_COLOR_TYPE_RGB_ALPHA;
         } else {
                 color_type = PNG_COLOR_TYPE_RGB;
         }
-        
         png_set_IHDR(png_ptr, info_ptr, graph->w, graph->h,
         8, color_type, PNG_INTERLACE_NONE,
         PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-        
         png_write_info(png_ptr, info_ptr);
-
         /* write bytes */
         if (setjmp(png_jmpbuf(png_ptr))) {
                 _DEBUG_MSG("error during writing bytes\n");
                 fclose( fp );
                 return -1;
         }
-	if( graph->color_type == COLOR_TYPE_ARGB ) {
-		pixel_bytes = 4;
-		row_size = sizeof(uchar_t) * pixel_bytes * graph->w;
-        } else {
-		pixel_bytes = 3;
-		row_size = sizeof(uchar_t) * pixel_bytes * graph->w;
-        }
 
 	Graph_GetValidRect( graph, &rect );
 	graph = Graph_GetQuote( graph );
-	pixel_row_ptr = graph->bytes + rect.top * row_size;
-        row_pointers = (png_bytep*)malloc( graph->h*sizeof(png_bytep) );
-        for( y=0; y<graph->h; ++y ) {
-                row_pointers[y] = (png_bytep)malloc(row_size);
-		pixel_ptr = pixel_row_ptr;
-                for( x=0; x<row_size; x+=pixel_bytes ) {
-                        row_pointers[y][x+2] = *pixel_ptr++; // blue
-                        row_pointers[y][x+1] = *pixel_ptr++; // green
-                        row_pointers[y][x] = *pixel_ptr++;   // red
-			if( graph->color_type == COLOR_TYPE_ARGB ) {
-				row_pointers[y][x + 3] = *pixel_ptr++; // alpha
-			}
-                }
-		pixel_row_ptr += graph->bytes_per_row;
-        }
-        png_write_image( png_ptr, row_pointers );
+	if( graph->color_type == COLOR_TYPE_ARGB ) {
+		LCUI_ARGB *px_ptr, *px_row_ptr;
 
+		row_size = sizeof( uchar_t ) * 4 * rect.width;
+		px_row_ptr = graph->argb + rect.top * graph->width + rect.left;
+		row_pointers = (png_bytep*)malloc( rect.height*sizeof( png_bytep ) );
+		for( y = 0; y<rect.height; ++y ) {
+			row_pointers[y] = (png_bytep)malloc( row_size );
+			if( row_pointers[y] == NULL ) {
+				abort();
+			}
+			px_ptr = px_row_ptr;
+			for( x = 0; x < row_size; ++px_ptr ) {
+				row_pointers[y][x++] = px_ptr->red;
+				row_pointers[y][x++] = px_ptr->green;
+				row_pointers[y][x++] = px_ptr->blue;
+				row_pointers[y][x++] = px_ptr->alpha;
+			}
+			px_row_ptr += graph->w;
+		}
+	} else {
+		uchar_t *px_ptr, *px_row_ptr;
+
+		row_size = sizeof( uchar_t ) * 3 * rect.width;
+		px_row_ptr = graph->bytes + rect.top * graph->bytes_per_row;
+		px_row_ptr += rect.left * graph->bytes_per_pixel;
+		row_pointers = (png_bytep*)malloc( rect.height*sizeof( png_bytep ) );
+		for( y = 0; y<rect.height; ++y ) {
+			row_pointers[y] = (png_bytep)malloc( row_size );
+			px_ptr = px_row_ptr;
+			for( x = 0; x < row_size; x+=3 ) {
+				row_pointers[y][x + 2] = *px_ptr++; // blue
+				row_pointers[y][x + 1] = *px_ptr++; // green
+				row_pointers[y][x] = *px_ptr++;   // red
+			}
+			px_row_ptr += graph->bytes_per_row;
+		}
+	}
+        png_write_image( png_ptr, row_pointers );
         /* end write */
         if (setjmp(png_jmpbuf(png_ptr))) {
                 _DEBUG_MSG("error during end of write\n");
@@ -258,13 +265,11 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 		return -1;
         }
         png_write_end(png_ptr, NULL);
-
         /* cleanup heap allocation */
-        for( y=0; y<graph->h; ++y ) {
+        for( y=0; y<rect.height; ++y ) {
                 free( row_pointers[y] );
         }
         free( row_pointers );
-        
         fclose( fp );
         return 0;
 #else

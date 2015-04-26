@@ -190,7 +190,7 @@ LCUI_API void Graph_Free( LCUI_Graph *graph );
 LCUI_API int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect );
 
 /** 判断图像是否有Alpha透明通道 */
-static inline LCUI_BOOL Graph_HaveAlpha( const LCUI_Graph *graph )
+static inline LCUI_BOOL Graph_HasAlpha( const LCUI_Graph *graph )
 {
 	return graph->quote.is_valid ? (
 		graph->quote.source->color_type == COLOR_TYPE_ARGB

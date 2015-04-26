@@ -307,7 +307,7 @@ static void TimerThread( void *arg )
 		} else { /* 否则，释放该定时器 */
 			LCUITimer_Free( timer->id );
 		}
-		DEBUG_MSG("add task: %p, timer id: %d\n", task_data.func, timer->id);
+		DEBUG_MSG( "add task: %p, timer id: %d\n", task_data.func, timer->id );
 		/* 添加该任务至指定程序的任务队列 */
 		LCUI_AddTask( &task_data );
 	}

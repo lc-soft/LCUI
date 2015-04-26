@@ -115,23 +115,3 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 		}
 	}
 }
-
-/* 绘制线条框 */
-LCUI_API void
-Graph_DrawBoxLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Rect rect )
-{
-	int end;
-	LCUI_Pos start;
-	start.x = rect.x;
-	start.y = rect.y;
-	end = rect.x+rect.width;
-	Graph_DrawHorizLine( graph, color, size, start, end );
-	start.y = rect.y+rect.height-size;
-	Graph_DrawHorizLine( graph, color, size, start, end );
-
-	start.y = rect.y;
-	end = rect.y+rect.height;
-	Graph_DrawVertiLine( graph, color, size, start, end );
-	start.x = rect.x+rect.width-size;
-	Graph_DrawVertiLine( graph, color, size, start, end );
-}

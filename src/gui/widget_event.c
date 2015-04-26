@@ -83,7 +83,7 @@ static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 	pack->event.data = task->data;
 	pack->event.type = event->id;
 	pack->event.type_name = event->name;
-	_DEBUG_MSG("event: %s, task: %p\n", event->name, task);
+	DEBUG_MSG("event: %s, task: %p\n", event->name, task);
 
 	switch( event->id ) {
 	case LCUI_INPUT:
@@ -141,7 +141,7 @@ static void OnWidgetEvent( LCUI_Event *event, void *arg )
 	LCUI_Task task;
 	LCUI_WidgetEventTask *p_wet = (LCUI_WidgetEventTask*)arg;
 	LCUI_WidgetEventPack *p_wep = (LCUI_WidgetEventPack*)event->data;
-	_DEBUG_MSG("pack: %p, task: %p\n", p_wep, p_wet);
+	DEBUG_MSG("pack: %p, task: %p\n", p_wep, p_wet);
 	/* 如果需要直接执行 */
 	if( p_wep->is_direct_run ) {
 		WidgetEventHandler( event, p_wet );
@@ -231,7 +231,7 @@ int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 	pack->event = *e;
 	pack->widget = widget;
 	pack->is_direct_run = FALSE;
-	_DEBUG_MSG("pack: %p\n", pack);
+	DEBUG_MSG("pack: %p\n", pack);
 	ret = LCUIEventBox_Post( widget->event, e->type_name, pack, NULL );
 	if( !RBTree_CustomSearch( &widget_mark_tree, widget ) ) {
 		RBTree_CustomInsert( &widget_mark_tree, widget, widget );

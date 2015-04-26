@@ -1067,7 +1067,7 @@ int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha )
 	if( !Graph_IsValid(graph) ) {
 		return -1;
 	}
-	if( !Graph_HaveAlpha(graph) ) {
+	if( !Graph_HasAlpha(graph) ) {
 		return -2;
 	}
 
