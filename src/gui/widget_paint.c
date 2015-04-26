@@ -128,13 +128,15 @@ void Widget_ValidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LCUI_WidgetClass *wc;
-	LCUI_Size box_size;
+	LCUI_Rect box;
 
-	box_size.w = w->base.box.content.width;
-	box_size.h = w->base.box.content.height;
-	Graph_DrawBackground( paint, &box_size, &w->style.background );
-	Graph_DrawBoxShadow( paint, &box_size, &w->style.shadow );
-	//Widget_DrawBorder( ... );
+	box.x = w->base.box.content.x - w->base.box.graph.x;
+	box.y = w->base.box.content.y - w->base.box.graph.y;
+	box.width = w->base.box.content.width;
+	box.height = w->base.box.content.height;
+	//Graph_DrawBoxShadow( paint, &box_size, &w->style.shadow );
+	Graph_DrawBackground( paint, &box, &w->style.background );
+	Graph_DrawBorder( paint, &box, &w->style.border );
 	wc = LCUIWidget_GetClass( w->type_name );
 	wc && wc->methods.paint ? wc->methods.paint(w, paint):FALSE;
 }
@@ -308,6 +310,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		}
 		*/
 	}
+	_DEBUG_MSG( "%d,%d\n", paint->canvas.width, paint->canvas.height );
 	/* 如果需要缓存自身的位图 */
 	if( has_self_graph ) {
 		LCUI_PaintContextRec_ self_paint;
@@ -315,10 +318,8 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		if( Graph_IsValid(&w->graph) ) {
 			Graph_Quote( &self_graph, &w->graph, &paint->rect );
 		} else {
-			Graph_Create(
-				&self_graph,
-				paint->rect.width, paint->rect.height
-			);
+			Graph_Create( &self_graph, paint->rect.width,
+				      paint->rect.height );
 		}
 		self_paint.canvas = self_graph;
 		self_paint.rect = paint->rect;
@@ -328,12 +329,11 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		if( Graph_IsValid(&w->graph) ) {
 			Graph_Quote( &self_graph, &w->graph, &paint->rect );
 			Graph_Mix( &paint->canvas, &self_graph, Pos(0,0) );
-			Graph_WritePNG( "1,paint_canvas.png", &paint->canvas );
-			Graph_WritePNG( "2,self_graph.png", &self_graph );
 		} else {
 			Widget_OnPaint( w, paint );
 		}
 	}
+	_DEBUG_MSG( "%d,%d\n", paint->canvas.width, paint->canvas.height );
 	/* 计算内容框相对于图层的坐标 */
 	content_left = w->base.box.content.x - w->base.box.graph.x;
 	content_top = w->base.box.content.y - w->base.box.graph.y;

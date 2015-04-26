@@ -771,8 +771,11 @@ PUSH_WSS_BACKGROUND:
 	Widget_AddTask( w, (t.type = WTT_BODY, &t) );
 PUSH_WSS_BORDER:
 	if( !(style & WSS_BORDER) ) goto PUSH_WSS_SHADOW;
+	t.type = WTT_BORDER;
+	t.border = w->style.border;
+	$( ComputeSize )(w);
+	Widget_AddTask( w, &t );
 	PUSH( w, border );
-	Widget_AddTask( w, (t.type = WTT_BODY, &t) );
 PUSH_WSS_SHADOW:
 	if( !(style & WSS_SHADOW) ) goto PUSH_DONE;
 	PUSH( w, shadow );

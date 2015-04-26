@@ -46,13 +46,14 @@ LCUI_BEGIN_HEADER
 enum WidgetTaskType {
 	WTT_AUTO_SIZE,
 	WTT_AUTO_LAYOUT,
-	WTT_RESIZE,
 	WTT_TITLE,
 	WTT_PADDING,
 	WTT_MARGIN,
 	WTT_MOVE,
 	WTT_SHOW,
 	WTT_SHADOW,
+	WTT_BORDER,
+	WTT_RESIZE,
 	WTT_OPACITY,
 	WTT_BODY,
 	WTT_REFRESH,
@@ -73,6 +74,7 @@ typedef struct LCUI_WidgetTask {
 			int w, h;
 		} resize;			/**< 调整大小 */
 		LCUI_BoxShadow shadow;		/**< 阴影 */
+		LCUI_Border border;		/**< 边框 */
 		LCUI_BOOL visible;		/**< 显示/隐藏 */
 		float opacity;			/**< 不透明度 */
 		void *data;			/**< 自定义任务数据 */

@@ -159,6 +159,48 @@ static void HandleRefresh( LCUI_Widget w, LCUI_WidgetTask *t )
 
 }
 
+static void HandleBorder( LCUI_Widget w, LCUI_WidgetTask *t )
+{
+	LCUI_Rect rect;
+	LCUI_Border *b;
+	LCUI_WidgetTask task;
+
+	b = &w->style.border;
+	/* 如果边框变化并未导致图层尺寸变化的话，则只重绘边框 */
+	if( t->border.top.width == b->top.width
+	    && t->border.right.width == b->right.width
+	    && t->border.bottom.width == b->bottom.width
+	    && t->border.left.width == b->left.width ) {
+		rect.x = rect.y = 0;
+		rect.width = w->base.box.border.width;
+		rect.width -= max( b->top_right_radius, b->right.width );
+		rect.height = max( b->top_left_radius, b->top.width );
+		Widget_InvalidateArea( w, &rect, BORDER_BOX );
+		rect.x = w->base.box.border.w;
+		rect.width = max( b->top_right_radius, b->right.width );
+		rect.x -= rect.width;
+		rect.height = w->base.box.border.height; 
+		rect.height -= max( b->bottom_right_radius, b->bottom.width );
+		Widget_InvalidateArea( w, &rect, BORDER_BOX );
+		rect.x = max( b->bottom_left_radius, b->left.width );
+		rect.width = w->base.box.border.width;
+		rect.width -= rect.x;
+		rect.height = max( b->bottom_right_radius, b->bottom.width );
+		Widget_InvalidateArea( w, &rect, BORDER_BOX );
+		rect.width = rect.x;
+		rect.x = 0;
+		rect.height = w->base.box.border.height;
+		rect.height -= max( b->top_left_radius, b->left.width );
+		Widget_InvalidateArea( w, &rect, BORDER_BOX );
+		return;
+	}
+	/* 更新尺寸 */
+	task.type = WTT_RESIZE;
+	task.resize.w = w->base.width;
+	task.resize.h = w->base.height;
+	Widget_AddTask( w, &task );
+}
+
 /** 处理销毁任务 */
 static void HandleDestroy( LCUI_Widget w, LCUI_WidgetTask *t )
 {
@@ -223,6 +265,7 @@ static void MapTaskHandler(void)
 	task_handlers[WTT_MOVE] = HandleMove;
 	task_handlers[WTT_RESIZE] = HandleResize;
 	task_handlers[WTT_SHADOW] = HandleShadow;
+	task_handlers[WTT_BORDER] = HandleBorder;
 	task_handlers[WTT_OPACITY] = HandleOpacity;
 	task_handlers[WTT_BODY] = HandleBody;
 	task_handlers[WTT_TITLE] = HandleSetTitle;

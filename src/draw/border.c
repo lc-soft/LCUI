@@ -244,111 +244,56 @@ static int Graph_DrawRoundBorderBottomRight(
 	return 0;
 }
 
-/** 只绘制目标区域内的边框 */
-int Graph_DrawBorderEx( LCUI_Graph *des, LCUI_Border border,
-							LCUI_Rect area )
+/** 绘制边框 */
+int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *border )
 {
 	int  radius;
 	LCUI_Rect bound;
 	LCUI_Pos start, end;
-	LCUI_Graph des_area;
+	LCUI_Graph canvas;
 
-	if( !Graph_IsValid(des) ) {
+	if( !Graph_IsValid(&paint->canvas) ) {
 		return -1;
 	}
 
-	/* 绘制左上角的圆角，先引用左上角区域，再将圆绘制到这个区域里 */
-	radius = border.top_left_radius;
-	bound.x = bound.y = 0;
-	bound.w = bound.h = radius;
-	Graph_Quote( &des_area, des, &bound );
-	Graph_DrawRoundBorderLeftTop(
-		&des_area		, Pos( radius, radius ),
-		radius			, border.left.width,
-		border.left.color	, TRUE
-	);
-	Graph_DrawRoundBorderTopLeft(
-		&des_area		, Pos( radius, radius ),
-		radius			, border.top.width,
-		border.top.color	, TRUE
-	);
-
-	/* 右上角 */
-	radius = border.top_right_radius;
-	bound.x = des->w-radius-1;
-	Graph_Quote( &des_area, des, &bound );
-	Graph_DrawRoundBorderRightTop(
-		&des_area		, Pos( 0, radius ),
-		radius			, border.right.width,
-		border.right.color	, TRUE
-	);
-	Graph_DrawRoundBorderTopRight(
-		&des_area		, Pos( 0, radius ),
-		radius			, border.top.width,
-		border.top.color	, TRUE
-	);
-
-	/* 左下角 */
-	radius = border.bottom_left_radius;
-	bound.x = 0;
-	bound.y = des->h-radius-1;
-	Graph_Quote( &des_area, des, &bound );
-	Graph_DrawRoundBorderLeftBottom(
-		&des_area		, Pos( radius, 0 ),
-		radius			, border.left.width,
-		border.left.color	, TRUE
-	);
-	Graph_DrawRoundBorderBottomLeft(
-		&des_area		, Pos( radius, 0 ),
-		radius			, border.bottom.width,
-		border.bottom.color	, TRUE
-	);
-
-	/* 右下角 */
-	radius = border.bottom_left_radius;
-	bound.x = des->w-radius-1,
-	Graph_Quote( &des_area, des, &bound );
-	Graph_DrawRoundBorderRightBottom(
-		&des_area		, Pos( 0, 0 ),
-		radius			, border.right.width,
-		border.right.color	, TRUE
-	);
-	Graph_DrawRoundBorderBottomRight(
-		&des_area		, Pos( 0, 0 ),
-		radius			, border.bottom.width,
-		border.bottom.color	, TRUE
-	);
-
-	start.x = border.top_left_radius;
-	start.y = 0;
-	end.x = des->w - border.top_right_radius;
-	/* 引用目标区域 */
-	Graph_Quote( &des_area, des, &area );
-	/* 绘制上边框 */
-	Graph_DrawHorizLine( des, border.top.color, border.top.width, start, end.x );
-	/* 绘制下边的线 */
-	start.y = des->h - border.bottom.width;
-	end.x = des->w - border.bottom_right_radius;
-	Graph_DrawHorizLine( des, border.bottom.color, border.bottom.width, start, end.x );
-	/* 绘制左边的线 */
-	start.x = start.y = 0;
-	end.y = des->h - border.bottom_left_radius;
-	Graph_DrawVertiLine( des, border.left.color, border.left.width, start, end.y );
-	/* 绘制右边的线 */
-	start.x = des->w - border.right.width;
-	start.y = border.top_right_radius;
-	end.y = des->h - border.bottom_right_radius;
-	Graph_DrawVertiLine( des, border.right.color, border.right.width, start, end.y );
-	/* 边框线绘制完成 */
+	/* 绘制上边框线 */
+	bound.x = box->x + border->top_left_radius;
+	bound.y = box->y;
+	bound.width = box->width - border->top_right_radius;
+	bound.width -= border->top_left_radius;
+	bound.height = border->top.width;
+	if( LCUIRect_GetOverlayRect( &bound, &paint->rect, &bound ) ) {
+		Graph_Quote( &canvas, &paint->canvas, &bound );
+		Graph_FillColor( &canvas, border->top.color );
+	}
+	/* 绘制下边框线 */
+	bound.y = box->y + box->height - border->bottom.width;
+	bound.width = box->width - border->bottom_right_radius;
+	bound.width -= border->bottom_left_radius;
+	bound.height = border->bottom.width;
+	if( LCUIRect_GetOverlayRect( &bound, &paint->rect, &bound ) ) {
+		Graph_Quote( &canvas, &paint->canvas, &bound );
+		Graph_FillColor( &canvas, border->bottom.color );
+	}
+	/* 绘制左边框线 */
+	bound.y = box->y + border->top_left_radius;
+	bound.x = box->x;
+	bound.width = border->left.width;
+	bound.height = box->height - border->top_left_radius;
+	bound.height -= border->bottom_left_radius;
+	if( LCUIRect_GetOverlayRect( &bound, &paint->rect, &bound ) ) {
+		Graph_Quote( &canvas, &paint->canvas, &bound );
+		Graph_FillColor( &canvas, border->left.color );
+	}
+	/* 绘制右边框线 */
+	bound.x = box->x + box->width - border->right.width;
+	bound.y = box->y + border->top_right_radius;
+	bound.width = border->right.width;
+	bound.height = box->height - border->top_right_radius;
+	bound.height -= border->bottom_right_radius;
+	if( LCUIRect_GetOverlayRect( &bound, &paint->rect, &bound ) ) {
+		Graph_Quote( &canvas, &paint->canvas, &bound );
+		Graph_FillColor( &canvas, border->right.color );
+	}
 	return 0;
-}
-
-/** 简单的为图形边缘绘制边框 */
-int Graph_DrawBorder( LCUI_Graph *des, LCUI_Border border )
-{
-	LCUI_Rect area;
-	area.x = area.y = 0;
-	area.w = des->w;
-	area.h = des->h;
-	return Graph_DrawBorderEx( des, border, area );
 }

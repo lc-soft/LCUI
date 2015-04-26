@@ -160,8 +160,8 @@ typedef struct LCUI_BoxShadow {
 /* 完整的边框信息 */
 typedef struct LCUI_Border {
 	struct {
-		int width;
 		int style;
+		unsigned int width;
 		LCUI_Color color;
 	} top, right, bottom, left;
 	unsigned int top_left_radius;
