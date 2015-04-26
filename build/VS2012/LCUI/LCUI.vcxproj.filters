@@ -278,9 +278,6 @@
     <ClCompile Include="..\..\..\src\input\touchscreen.c">
       <Filter>源文件\input</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\messagebox.c">
-      <Filter>源文件\gui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\kernel\device.c">
       <Filter>源文件\kernel</Filter>
     </ClCompile>
@@ -297,9 +294,6 @@
       <Filter>源文件\output</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\output\graph_display.c">
-      <Filter>源文件\output</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\output\win32.c">
       <Filter>源文件\output</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\thread\win32\mutex.c">
@@ -341,39 +335,6 @@
     <ClCompile Include="..\..\..\src\draw\line.c">
       <Filter>源文件\draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\activebox.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\button.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\checkbox.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\label.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\menu.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\picturebox.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\progressbar.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\radiobutton.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\textbox.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\window.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_event.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
@@ -388,9 +349,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\misc\dirent.c">
       <Filter>源文件\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\listview.c">
-      <Filter>源文件\gui\widget</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\misc\rbtree.c">
       <Filter>源文件\misc</Filter>
