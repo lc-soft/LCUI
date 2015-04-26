@@ -100,6 +100,8 @@ static void $(Update)(void)
 		if( !p_sr->widget || !p_sr->surface ) {
 			continue;
 		}
+		/* 更新表面 */
+		Surface_Update( p_sr->surface );
 		/* 收集无效区域记录 */
 		Widget_ProcInvalidArea( p_sr->widget, &rlist );
 		m = LinkedList_GetTotal( &rlist );
@@ -107,13 +109,11 @@ static void $(Update)(void)
 		LinkedList_Goto( &rlist, 0 );
 		/* 在 surface 上逐个重绘无效区域 */
 		for( j=0; j<m; ++j ) {
-			char str[64];
 			p_rect = (LCUI_Rect*)LinkedList_Get( &rlist );
 			paint = Surface_BeginPaint( p_sr->surface, p_rect );
+			_DEBUG_MSG( "%d-%d-%d-%d,%d\n", paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
 			Widget_Render( p_sr->widget, paint );
-			sprintf( str, "canvas-%d-%d-%d-%d (%d).png", paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
-			DEBUG_MSG("write png: %s\n",str);
-			Graph_WritePNG( str, &paint->canvas );
+			_DEBUG_MSG("%d-%d-%d-%d,%d\n", paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
 			Surface_EndPaint( p_sr->surface, paint );
 			LinkedList_Delete( &rlist );
 		}
@@ -154,13 +154,14 @@ static void $(BindSurface)( LCUI_Widget widget )
 	p_sr->surface = Surface_New();
 	p_sr->widget = widget;
 	LinkedList_AddData( &display.surfaces, p_sr );
-	Surface_SetCaptionW( p_sr->surface,widget->title );
+	Surface_SetCaptionW( p_sr->surface, widget->title );
 	p_rect = &widget->base.box.graph;
 	Surface_Move( p_sr->surface, p_rect->x, p_rect->y );
 	Surface_Resize( p_sr->surface, p_rect->w, p_rect->h );
 	if( widget->style.visible ) {
-		Surface_Hide( p_sr->surface );
 		Surface_Show( p_sr->surface );
+	} else {
+		Surface_Hide( p_sr->surface );
 	}
 	Widget_InvalidateArea( widget, NULL, GRAPH_BOX );
 }
@@ -352,7 +353,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 		Surface_Hide( surface );
 		break;
 	case WET_TITLE:
-		_DEBUG_MSG("%S\n", e->target->title );
+		//_DEBUG_MSG("%S\n", e->target->title );
 		Surface_SetCaptionW( surface, e->target->title );
 		break;
 	case WET_RESIZE: 

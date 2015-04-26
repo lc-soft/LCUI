@@ -124,7 +124,7 @@ static LRESULT CALLBACK
 WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 {
 	LCUI_Surface surface;
-	surface = GetSurfaceByHWND( hwnd);
+	surface = GetSurfaceByHWND(hwnd);
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
@@ -187,20 +187,13 @@ static void Surface_ExecMove( LCUI_Surface surface, int x, int y )
 {
 	x += GetSystemMetrics( SM_CXFIXEDFRAME );
 	y += GetSystemMetrics( SM_CYFIXEDFRAME );
-	SetWindowPos(
-		surface->hwnd, HWND_NOTOPMOST,
-		x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER
-		);
+	SetWindowPos( surface->hwnd, HWND_NOTOPMOST,
+		x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
 	return;
 }
 
 void Surface_Move( LCUI_Surface surface, int x, int y )
 {
-	/* 如果已经得到窗口句柄，则直接改变窗口位置 */
-	if( surface->hwnd ) {
-		Surface_ExecMove( surface, x, y );
-		return;
-	}
 	/* 缓存任务，等获得窗口句柄后处理 */
 	surface->task_buffer[TASK_MOVE].x = x;
 	surface->task_buffer[TASK_MOVE].y = y;
@@ -214,6 +207,7 @@ void Surface_ExecResize( LCUI_Surface surface, int w, int h )
 
 	surface->w = w;
 	surface->h = h;
+	_DEBUG_MSG("w = %d, h = %d\n", w, h);
 	Graph_Create( &surface->fb, w, h );
 	hdc_client = GetDC( surface->hwnd );
 	surface->fb_bmp = CreateCompatibleBitmap( hdc_client, w, h );
@@ -226,18 +220,12 @@ void Surface_ExecResize( LCUI_Surface surface, int w, int h )
 	h += GetSystemMetrics( SM_CYFIXEDFRAME ) * 2;
 	h += GetSystemMetrics( SM_CYCAPTION );
 	SetWindowLong( surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE );
-	SetWindowPos(
-		surface->hwnd, HWND_NOTOPMOST,
-		0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER
-	);
+	SetWindowPos( surface->hwnd, HWND_NOTOPMOST,
+		      0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER );
 }
 
 void Surface_Resize( LCUI_Surface surface, int w, int h )
 {
-	if( surface->hwnd ) {
-		Surface_ExecResize( surface, w, h );
-		return;
-	}
 	surface->task_buffer[TASK_RESIZE].width = w;
 	surface->task_buffer[TASK_RESIZE].height = h;
 	surface->task_buffer[TASK_RESIZE].is_valid = TRUE;
@@ -245,11 +233,6 @@ void Surface_Resize( LCUI_Surface surface, int w, int h )
 
 void Surface_Show( LCUI_Surface surface )
 {
-	if( surface->hwnd ) {
-		DEBUG_MSG("surface: %p, direct show.\n", surface);
-		ShowWindow( surface->hwnd, SW_SHOWNORMAL );
-		return;
-	}
 	DEBUG_MSG("surface: %p, buffer show.\n", surface);
 	surface->task_buffer[TASK_SHOW].show = TRUE;
 	surface->task_buffer[TASK_SHOW].is_valid = TRUE;
@@ -257,10 +240,6 @@ void Surface_Show( LCUI_Surface surface )
 
 void Surface_Hide( LCUI_Surface surface )
 {
-	if( surface->hwnd ) {
-		ShowWindow( surface->hwnd, SW_HIDE );
-		return;
-	}
 	surface->task_buffer[TASK_SHOW].show = FALSE;
 	surface->task_buffer[TASK_SHOW].is_valid = TRUE;
 }
@@ -270,10 +249,6 @@ void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 	int len;
 	wchar_t *caption;
 
-	if( surface->hwnd ) {
-		SetWindowText( surface->hwnd, str );
-		return;
-	}
 	len = wcslen(str) + 1;
 	caption = (wchar_t*)malloc(sizeof(wchar_t)*len);
 	wcsncpy( caption, str, len );
@@ -380,11 +355,14 @@ void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
 void Surface_Present( LCUI_Surface surface )
 {
+	static count = 0;
 	HDC hdc_client;
 	RECT client_rect;
-
+	char str[32];
 	hdc_client = GetDC( surface->hwnd );
-	Graph_WritePNG( "fb.png", &surface->fb );
+	sprintf( str, "fb-%03d.png", ++count );
+	_DEBUG_MSG("%s\n", str);
+	Graph_WritePNG( str, &surface->fb );
 	SetBitmapBits( surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes );
 	switch(surface->mode) {
 	case RENDER_MODE_STRETCH_BLT:
@@ -403,10 +381,13 @@ void Surface_Present( LCUI_Surface surface )
 	ValidateRect( surface->hwnd, NULL );
 }
 
-/** 处理当前缓存的任务 */
-static void Surface_ProcTaskBuffer( LCUI_Surface surface )
+/** 更新 surface，应用缓存的变更 */
+void Surface_Update( LCUI_Surface surface )
 {
 	LCUI_SurfaceTask *t;
+	if( !surface->hwnd ) {
+		return;
+	}
 	DEBUG_MSG("surface: %p\n", surface);
 	t = &surface->task_buffer[TASK_MOVE];
 	if( t->is_valid ) {
@@ -443,7 +424,7 @@ static void Surface_ProcTaskBuffer( LCUI_Surface surface )
 	t->is_valid = FALSE;
 }
 
-static void LCUISurface_Loop( void *unused )
+static void LCUISurface_Loop( void *args )
 {
 	MSG msg;
 	LCUI_Surface surface;
@@ -467,7 +448,6 @@ static void LCUISurface_Loop( void *unused )
 			hdc_client = GetDC( surface->hwnd );
 			surface->fb_hdc = CreateCompatibleDC( hdc_client );
 			DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
-			Surface_ProcTaskBuffer( surface );
 			continue;
 		}
 		TranslateMessage( &msg );

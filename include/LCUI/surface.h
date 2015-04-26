@@ -70,6 +70,9 @@ LCUI_API void Surface_Hide( LCUI_Surface surface );
 /** 设置 Surface 的渲染模式 */
 LCUI_API void Surface_SetRenderMode( LCUI_Surface surface, int mode );
 
+/** 更新 surface，应用缓存的变更 */
+LCUI_API void Surface_Update( LCUI_Surface surface );
+
 /**
  * 准备绘制 Surface 中的内容
  * @param[in] surface	目标 surface
