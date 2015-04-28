@@ -401,6 +401,17 @@ void* LinkedList_InsertCopy( LinkedList *list, void *data )
 	return data_copy;
 }
 
+/** 分配一个节点的数据空间 */
+void *LinkedList_Alloc( LinkedList *list )
+{
+	LinkedListNode *node;
+	node = LinkedList_AllocNode( list );
+	if( !node->data ) {
+		node->data = malloc( list->node_data_size );
+	}
+	return node->data;
+}
+
 /** 将数据的副本记录至链表的相应结点上 */
 void *LinkedList_AddDataCopy( LinkedList *list, void *data )
 {
