@@ -77,7 +77,7 @@ LCUI_API int LCUIDisplay_GetHeight( void );
 LCUI_API int LCUIDisplay_GetFPS(void);
 
 /** 初始化图形输出模块 */
-int LCUIModule_Video_Init( void );
+int LCUI_InitDisplay( void );
 
 /** 停用图形输出模块 */
 int LCUIModule_Video_End( void );

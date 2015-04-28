@@ -88,6 +88,8 @@ static struct {
 	LCUI_Thread loop_thread;	/**< 消息循环线程 */
 	LCUI_Cond cond;			/**< 条件，当消息循环已创建时成立 */
 	LCUI_BOOL is_ready;		/**< 消息循环线程是否已准备好 */
+	LinkedList surfaces;		/**< surface 记录 */
+	LCUI_SurfaceMethods methods;	/**< 方法集 */
 } win32;
 
 void Win32_LCUI_Init( HINSTANCE hInstance )
@@ -112,6 +114,17 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD reason, LPVOID unused )
 /** 根据 hwnd 获取 Surface */
 static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 {
+	int i, n;
+	LCUI_Surface surface;
+
+	n = LinkedList_GetTotal( &win32.surfaces );
+	for( i = 0; i < n; ++i ) {
+		LinkedList_Goto( &win32.surfaces, i );
+		surface = (LCUI_Surface)LinkedList_Get( &win32.surfaces );
+		if( surface->hwnd == hwnd ) {
+			return surface;
+		}
+	}
 	return NULL;
 }
 
@@ -123,8 +136,12 @@ static LCUI_Surface GetSurfaceByWidget( LCUI_Widget widget )
 static LRESULT CALLBACK
 WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 {
+	PAINTSTRUCT ps;
+	LCUI_Rect area;
 	LCUI_Surface surface;
+
 	surface = GetSurfaceByHWND(hwnd);
+	_DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
@@ -133,6 +150,18 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 		break;
 	case WM_KILLFOCUS:
 		break;
+	case WM_PAINT:
+		BeginPaint( hwnd, &ps );
+		/* 获取区域坐标及尺寸 */
+		area.x = ps.rcPaint.left;
+		area.y = ps.rcPaint.top;
+		area.width = ps.rcPaint.right - area.x;
+		area.height = ps.rcPaint.bottom - area.y;
+		if( win32.methods.onInvalidRect ) {
+			win32.methods.onInvalidRect( surface, &area );
+		}
+		EndPaint( hwnd, &ps );
+		return 0;
 	case WM_CLOSE:
 		Surface_Delete( surface );
 		break;
@@ -151,20 +180,31 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 }
 
 /** 删除 Surface */
-void Surface_Delete( LCUI_Surface surface )
+static void Win32Surface_Delete( LCUI_Surface surface )
 {
 	surface->w = 0;
 	surface->h = 0;
+	if( surface->hwnd ) {
+		if( surface->fb_hdc ) {
+			ReleaseDC( surface->hwnd, surface->fb_hdc );
+		}
+		CloseWindow( surface->hwnd );
+	}
+	if( surface->fb_bmp ) {
+		DeleteObject( surface->fb_bmp );
+	}
+	surface->fb_hdc = NULL;
+	surface->fb_bmp = NULL;
+	surface->hwnd = NULL;
 	Graph_Free( &surface->fb );
 }
 
 /** 新建一个 Surface */
-LCUI_Surface Surface_New(void)
+static LCUI_Surface Win32Surface_New(void)
 {
 	int i;
 	LCUI_Surface surface;
-
-	surface = (LCUI_Surface)malloc(sizeof(struct LCUI_SurfaceRec_));
+	surface = (LCUI_Surface)LinkedList_Alloc( &win32.surfaces );
 	surface->mode = RENDER_MODE_BIT_BLT;
 	surface->fb_hdc = NULL;
 	surface->fb_bmp = NULL;
@@ -183,7 +223,7 @@ LCUI_Surface Surface_New(void)
 	return surface;
 }
 
-static void Surface_ExecMove( LCUI_Surface surface, int x, int y )
+static void Win32Surface_ExecMove( LCUI_Surface surface, int x, int y )
 {
 	x += GetSystemMetrics( SM_CXFIXEDFRAME );
 	y += GetSystemMetrics( SM_CYFIXEDFRAME );
@@ -192,7 +232,7 @@ static void Surface_ExecMove( LCUI_Surface surface, int x, int y )
 	return;
 }
 
-void Surface_Move( LCUI_Surface surface, int x, int y )
+static void Win32Surface_Move( LCUI_Surface surface, int x, int y )
 {
 	/* 缓存任务，等获得窗口句柄后处理 */
 	surface->task_buffer[TASK_MOVE].x = x;
@@ -200,7 +240,7 @@ void Surface_Move( LCUI_Surface surface, int x, int y )
 	surface->task_buffer[TASK_MOVE].is_valid = TRUE;
 }
 
-void Surface_ExecResize( LCUI_Surface surface, int w, int h )
+static void Win32Surface_ExecResize( LCUI_Surface surface, int w, int h )
 {
 	HDC hdc_client;
 	HBITMAP old_bmp;
@@ -224,27 +264,27 @@ void Surface_ExecResize( LCUI_Surface surface, int w, int h )
 		      0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER );
 }
 
-void Surface_Resize( LCUI_Surface surface, int w, int h )
+static void Win32Surface_Resize( LCUI_Surface surface, int w, int h )
 {
 	surface->task_buffer[TASK_RESIZE].width = w;
 	surface->task_buffer[TASK_RESIZE].height = h;
 	surface->task_buffer[TASK_RESIZE].is_valid = TRUE;
 }
 
-void Surface_Show( LCUI_Surface surface )
+static void Win32Surface_Show( LCUI_Surface surface )
 {
 	DEBUG_MSG("surface: %p, buffer show.\n", surface);
 	surface->task_buffer[TASK_SHOW].show = TRUE;
 	surface->task_buffer[TASK_SHOW].is_valid = TRUE;
 }
 
-void Surface_Hide( LCUI_Surface surface )
+static void Win32Surface_Hide( LCUI_Surface surface )
 {
 	surface->task_buffer[TASK_SHOW].show = FALSE;
 	surface->task_buffer[TASK_SHOW].is_valid = TRUE;
 }
 
-void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
+static void Win32Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 {
 	int len;
 	wchar_t *caption;
@@ -261,7 +301,7 @@ void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 	surface->task_buffer[TASK_SET_CAPTION].is_valid = TRUE;
 }
 
-void Surface_SetOpacity( LCUI_Surface surface, float opacity )
+void Win32Surface_SetOpacity( LCUI_Surface surface, float opacity )
 {
 
 }
@@ -318,11 +358,11 @@ OnWidgetOpacityChange( LCUI_Widget widget, LCUI_WidgetEvent *e )
 	if( !surface ) {
 		return;
 	}
-	Surface_SetOpacity( surface, 1.0 );
+	Win32Surface_SetOpacity( surface, 1.0 );
 }
 
 /** 设置 Surface 的渲染模式 */
-void Surface_SetRenderMode( LCUI_Surface surface, int mode )
+static void Win32Surface_SetRenderMode( LCUI_Surface surface, int mode )
 {
 	surface->mode = mode;
 }
@@ -333,7 +373,7 @@ void Surface_SetRenderMode( LCUI_Surface surface, int mode )
  * @param[in] rect	需进行绘制的区域，若为NULL，则绘制整个 surface
  * @return		返回绘制上下文句柄
  */
-LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
+static LCUI_PaintContext Win32Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 {
 	LCUI_PaintContext paint;
 	paint = (LCUI_PaintContext)malloc(sizeof(LCUI_PaintContextRec_));
@@ -347,13 +387,13 @@ LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
  * @param[in] surface	目标 surface
  * @param[in] paint_ctx	绘制上下文句柄
  */
-void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
+static void Win32Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 {
 	free( paint_ctx );
 }
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
-void Surface_Present( LCUI_Surface surface )
+static void Win32Surface_Present( LCUI_Surface surface )
 {
 	static count = 0;
 	HDC hdc_client;
@@ -382,7 +422,7 @@ void Surface_Present( LCUI_Surface surface )
 }
 
 /** 更新 surface，应用缓存的变更 */
-void Surface_Update( LCUI_Surface surface )
+static void Win32Surface_Update( LCUI_Surface surface )
 {
 	LCUI_SurfaceTask *t;
 	if( !surface->hwnd ) {
@@ -391,13 +431,13 @@ void Surface_Update( LCUI_Surface surface )
 	DEBUG_MSG("surface: %p\n", surface);
 	t = &surface->task_buffer[TASK_MOVE];
 	if( t->is_valid ) {
-		Surface_ExecMove( surface, t->x, t->y );
+		Win32Surface_ExecMove( surface, t->x, t->y );
 		t->is_valid = FALSE;
 	}
 
 	t = &surface->task_buffer[TASK_RESIZE];
 	if( t->is_valid ) {
-		Surface_ExecResize( surface, t->width, t->height );
+		Win32Surface_ExecResize( surface, t->width, t->height );
 		t->is_valid = FALSE;
 	}
 
@@ -457,7 +497,8 @@ static void LCUISurface_Loop( void *args )
 	LCUIThread_Exit(NULL);
 }
 
-int LCUISurface_Init(void)
+/** 初始化适用于 Win32 平台的 surface 支持 */
+LCUI_SurfaceMethods *LCUISurface_InitWin32(void)
 {
 	WNDCLASS wndclass;
 	TCHAR szAppName[] = TEXT ("LCUI");
@@ -478,12 +519,30 @@ int LCUISurface_Init(void)
 		wchar_t str[256];
 		wsprintf(str, L"LCUISurface_Init(): error code: %d\n", GetLastError());
 		MessageBox( NULL, str, szAppName, MB_ICONERROR );
-		return -1;
+		return NULL;
 	}
 	win32.is_ready = FALSE;
+	strncpy( win32.methods.name, "win32", 32 );
+	win32.methods.new = Win32Surface_New;
+	win32.methods.delete = Win32Surface_Delete;
+	win32.methods.show = Win32Surface_Show;
+	win32.methods.hide = Win32Surface_Hide;
+	win32.methods.move = Win32Surface_Move;
+	win32.methods.resize = Win32Surface_Resize;
+	win32.methods.update = Win32Surface_Update;
+	win32.methods.present = Win32Surface_Present;
+	win32.methods.setCaptionW = Win32Surface_SetCaptionW;
+	win32.methods.setRenderMode = Win32Surface_SetRenderMode;
+	win32.methods.setOpacity = Win32Surface_SetOpacity;
+	win32.methods.beginPaint = Win32Surface_BeginPaint;
+	win32.methods.endPaint = Win32Surface_EndPaint;
+	win32.methods.onInvalidRect = NULL;
 	LCUICond_Init( &win32.cond );
+	LinkedList_Init( &win32.surfaces, sizeof( struct LCUI_SurfaceRec_ ) );
+	LinkedList_SetDataMemReuse( &win32.surfaces, TRUE );
+	LinkedList_SetDataNeedFree( &win32.surfaces, FALSE );
 	LCUIThread_Create( &win32.loop_thread, LCUISurface_Loop, NULL );
-	return 0;
+	return &win32.methods;
 }
 
 #endif

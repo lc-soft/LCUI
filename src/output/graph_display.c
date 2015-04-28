@@ -41,11 +41,11 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
+#include <LCUI/surface.h>
 #include <LCUI/display.h>
 #include <LCUI/cursor.h>
 #include <LCUI/thread.h>
 #include <LCUI/widget_build.h>
-#include <LCUI/surface.h>
 
 #include <time.h>
 
@@ -65,14 +65,15 @@ typedef struct SurfaceRecord {
 
 /** 图形显示功能的上下文数据 */
 static struct DisplayContext {
-	LCUI_BOOL	is_working;	/**< 标志，指示当前模块是否处于工作状态 */
-	FrameCtrlCtx	fc_ctx;		/**< 上下文句柄，用于画面更新时的帧数控制 */
-	LCUI_Thread	thread;		/**< 线程，负责画面更新工作 */
-	LinkedList	surfaces;	/**< surface 列表 */
-	LCUI_Mutex	mutex;
-	int		mode;
-	int		width;
-	int		height;
+	LCUI_BOOL		is_working;	/**< 标志，指示当前模块是否处于工作状态 */
+	FrameCtrlCtx		fc_ctx;		/**< 上下文句柄，用于画面更新时的帧数控制 */
+	LCUI_Thread		thread;		/**< 线程，负责画面更新工作 */
+	LinkedList		surfaces;	/**< surface 列表 */
+	LCUI_Mutex		mutex;
+	int			mode;
+	int			width;
+	int			height;
+	LCUI_SurfaceMethods	*methods;
 } display = { FALSE, NULL, 0 };
 
 /** 获取当前的屏幕内容每秒更新的帧数 */
@@ -125,6 +126,24 @@ static void $(Update)(void)
 	LinkedList_Destroy( &rlist );
 }
 
+/** 获取与 surface 绑定的 widget */
+LCUI_Widget $(GetBindWidget)( LCUI_Surface surface )
+{
+	int i, n;
+	SurfaceRecord *p_sr;
+
+	n = LinkedList_GetTotal( &display.surfaces );
+	for( i = 0; i<n; ++i ) {
+		LinkedList_Goto( &display.surfaces, i );
+		p_sr = (SurfaceRecord*)
+		LinkedList_Get( &display.surfaces );
+		if( p_sr->surface == surface ) {
+			return p_sr->widget;
+		}
+	}
+	return NULL;
+}
+
 static LCUI_Surface $(GetBindSurface)( LCUI_Widget widget )
 {
 	int i, n;
@@ -150,10 +169,9 @@ static void $(BindSurface)( LCUI_Widget widget )
 	if( $(GetBindSurface)(widget) ) {
 		return;
 	}
-	p_sr = (SurfaceRecord*)malloc(sizeof(SurfaceRecord));
+	p_sr = (SurfaceRecord*)LinkedList_Alloc( &display.surfaces );
 	p_sr->surface = Surface_New();
 	p_sr->widget = widget;
-	LinkedList_AddData( &display.surfaces, p_sr );
 	Surface_SetCaptionW( p_sr->surface, widget->title );
 	p_rect = &widget->base.box.graph;
 	Surface_Move( p_sr->surface, p_rect->x, p_rect->y );
@@ -369,8 +387,103 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 	}
 }
 
+/** 在 surface 主动产生无效区域的时候 */
+static void OnInvalidRect( LCUI_Surface surface, LCUI_Rect *rect )
+{
+	int i, n;
+	SurfaceRecord *p_sr;
+
+	n = LinkedList_GetTotal( &display.surfaces );
+	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &display.surfaces, i );
+		p_sr = (SurfaceRecord*)
+		LinkedList_Get( &display.surfaces );
+		if( p_sr->surface != surface ) {
+			continue;
+		}
+		Widget_InvalidateArea( p_sr->widget, rect, GRAPH_BOX );
+		continue;
+	}
+}
+
+/** 删除 Surface */
+void Surface_Delete( LCUI_Surface surface )
+{
+	display.methods->delete( surface );
+}
+
+/** 新建一个 Surface */
+LCUI_Surface Surface_New( void )
+{
+	return display.methods->new();
+}
+
+void Surface_Move( LCUI_Surface surface, int x, int y )
+{
+	display.methods->move( surface, x, y );
+}
+
+void Surface_Resize( LCUI_Surface surface, int w, int h )
+{
+	display.methods->resize( surface, w, h );
+}
+
+void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
+{
+	display.methods->setCaptionW( surface, str );
+}
+
+void Surface_Show( LCUI_Surface surface )
+{
+	display.methods->show( surface );
+}
+
+void Surface_Hide( LCUI_Surface surface )
+{
+	display.methods->hide( surface );
+}
+
+/** 设置 Surface 的渲染模式 */
+void Surface_SetRenderMode( LCUI_Surface surface, int mode )
+{
+	display.methods->setRenderMode( surface, mode );
+}
+
+/** 更新 surface，应用缓存的变更 */
+void Surface_Update( LCUI_Surface surface )
+{
+	display.methods->update( surface );
+}
+
+/**
+ * 准备绘制 Surface 中的内容
+ * @param[in] surface	目标 surface
+ * @param[in] rect	需进行绘制的区域，若为NULL，则绘制整个 surface
+ * @return		返回绘制上下文句柄
+ */
+LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
+{
+	return display.methods->beginPaint( surface, rect );
+}
+
+/**
+ * 结束对 Surface 的绘制操作
+ * @param[in] surface	目标 surface
+ * @param[in] paint_ctx	绘制上下文句柄
+ */
+void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
+{
+	display.methods->endPaint( surface, paint_ctx );
+}
+
+/** 将帧缓存中的数据呈现至Surface的窗口内 */
+void Surface_Present( LCUI_Surface surface )
+{
+	display.methods->present( surface );
+}
+
 /** 初始化图形输出模块 */
-int LCUIModule_Video_Init( void )
+int LCUI_InitDisplay( void )
 {
 	int ret;
 	if( display.is_working ) {
@@ -380,6 +493,10 @@ int LCUIModule_Video_Init( void )
 	display.mode = LDM_DEFAULT;
 	LCUIMutex_Init( &display.mutex );
 	LinkedList_Init( &display.surfaces, sizeof(SurfaceRecord) );
+#ifdef LCUI_BUILD_IN_WIN32
+	display.methods = LCUISurface_InitWin32();
+	display.methods->onInvalidRect = OnInvalidRect;
+#endif
 	display.fc_ctx = FrameControl_Create();
 	FrameControl_SetMaxFPS( display.fc_ctx, 1000/MAX_FRAMES_PER_SEC );
 	ret = Widget_BindEvent(
