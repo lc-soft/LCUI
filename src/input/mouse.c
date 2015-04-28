@@ -273,7 +273,7 @@ static LCUI_BOOL MouseExit(void)
 }
 
 /** 初始化鼠标输入模块 */
-int LCUIModule_Mouse_Init( void )
+int LCUI_InitMouse( void )
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 	mouse.fd = -1;

@@ -163,7 +163,7 @@ void* Get_TouchScreen(void)
 }
 
 /* 初始化触屏输入模块 */
-void LCUIModule_TouchScreen_Init( void )
+void LCUI_InitTouchScreen( void )
 {
 	ts_data.td = NULL;
 	ts_data.state = STATE_REMOVE;

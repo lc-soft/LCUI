@@ -784,7 +784,7 @@ PUSH_DONE:
 	return;
 }
 
-void LCUIModule_Widget_Init(void)
+void LCUI_InitWidget(void)
 {
 	$(Init)(LCUIRootWidget);
 	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );

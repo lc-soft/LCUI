@@ -41,7 +41,7 @@ LCUIIME_SetTarget( LCUI_Widget widget );
 
 /* 初始化LCUI输入法模块 */
 LCUI_API void
-LCUIModule_IME_Init(void);
+LCUI_InitIME(void);
 
 /* 停用LCUI输入法模块 */
 LCUI_API void

@@ -505,7 +505,7 @@ int LCUITimer_Reset( int timer_id, long int n_ms )
 }
 
 /* 初始化定时器模块 */
-void LCUIModule_Timer_Init( void )
+void LCUI_InitTimer( void )
 {
 	LCUI_StartTicks();
 	LinkedList_Init( &self.timer_list, sizeof(TimerData) );

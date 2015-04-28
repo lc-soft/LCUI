@@ -121,7 +121,7 @@ static void SystemEventThread(void *arg)
 }
 
 /** 初始化事件模块 */
-static void LCUIModule_Event_Init(void)
+static void LCUI_InitEvent(void)
 {
 	LCUICond_Init( &System.event.cond );
 	System.event.box = LCUIEventBox_Create();
@@ -514,18 +514,17 @@ int LCUI_Init( int w, int h, int mode )
 	LCUI_ShowCopyrightText();
 	LCUIApp_Init();
 	/* 初始化各个模块 */
-	LCUIModule_Event_Init();
-	//LCUIModule_IME_Init();
-	LCUIModule_Font_Init();
-	LCUIModule_Timer_Init();
-	LCUIModule_Device_Init();
-	LCUIModule_Keyboard_Init();
-	LCUIModule_Mouse_Init();
-	LCUIModule_TouchScreen_Init();
-	LCUIModule_Cursor_Init();
-	LCUIModule_Widget_Init();
-	LCUIModule_Video_Init();
-	LCUISurface_Init();
+	LCUI_InitEvent();
+	//LCUI_InitIME();
+	LCUI_InitFont();
+	LCUI_InitTimer();
+	LCUI_InitDevice();
+	LCUI_InitKeyboard();
+	LCUI_InitMouse();
+	LCUI_InitTouchScreen();
+	LCUI_InitCursor();
+	LCUI_InitWidget();
+	LCUI_InitDisplay();
 	/* 让鼠标游标居中显示 */
 	//LCUICursor_SetPos( LCUIScreen_GetCenter() );  
 	//LCUICursor_Show();

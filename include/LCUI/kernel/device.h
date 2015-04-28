@@ -51,7 +51,7 @@ LCUI_API int LCUIDevice_Add(	LCUI_BOOL (*init)(void),
 				LCUI_BOOL (*destroy)(void) );
 
 /* 初始化设备处理模块 */
-LCUI_API int LCUIModule_Device_Init(void);
+LCUI_API int LCUI_InitDevice(void);
 
 /* 停用设备处理模块 */
 LCUI_API void LCUIModule_Device_End(void);

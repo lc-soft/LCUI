@@ -45,7 +45,7 @@
 LCUI_BEGIN_HEADER
 	
 /* 初始化游标数据 */
-void LCUIModule_Cursor_Init( void );
+void LCUI_InitCursor( void );
 
 void LCUIModule_Cursor_End( void );
 

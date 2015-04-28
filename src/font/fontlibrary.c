@@ -389,7 +389,7 @@ static int FontLIB_AddInCoreFontInfo( void )
 #endif
 
 /** 初始化字体处理模块 */
-void LCUIModule_Font_Init( void )
+void LCUI_InitFont( void )
 {
 	char *p;
 	int font_id = -1, i;

@@ -106,7 +106,7 @@ static int LCUICursor_LoadDefualtGraph(LCUI_Graph *buff )
 }
 
 /* 初始化游标数据 */
-void LCUIModule_Cursor_Init( void )
+void LCUI_InitCursor( void )
 {
 	LCUI_Graph pic;
 	Graph_Init( &pic );

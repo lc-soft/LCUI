@@ -148,7 +148,7 @@ LCUI_API int LCUI_PostMouseUpEvent( int key_code );
 LCUI_API void LCUI_PostMouseMoveEvent( LCUI_Pos new_pos );
 
 /** 初始化鼠标输入模块 */
-LCUI_API int LCUIModule_Mouse_Init( void );
+LCUI_API int LCUI_InitMouse( void );
 
 /*-------------------------------- Mouse End -------------------------------*/
 
@@ -183,7 +183,7 @@ LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( void );
 LCUI_API int LCUIKeyboard_GetKey( void );
 
 /** 初始化键盘输入模块 */
-LCUI_API void LCUIModule_Keyboard_Init( void );
+LCUI_API void LCUI_InitKeyboard( void );
 
 /** 停用键盘输入模块 */
 LCUI_API void LCUIModule_Keyboard_End( void );
@@ -201,7 +201,7 @@ LCUI_API LCUI_BOOL DisableTouchScreenInput(void);
 LCUI_API void* Get_TouchScreen(void);
 
 /** 初始化触屏输入模块 */
-LCUI_API void LCUIModule_TouchScreen_Init( void );
+LCUI_API void LCUI_InitTouchScreen( void );
 /*---------------------------- TouchScreen End -----------------------------*/ 
 
 LCUI_END_HEADER

@@ -302,7 +302,7 @@ LCUI_API int LCUIIME_SetTarget( LCUI_Widget widget )
 static int LCUI_DefaultIMERegister(void);
 
 /* 初始化LCUI输入法模块 */
-LCUI_API void LCUIModule_IME_Init(void)
+LCUI_API void LCUI_InitIME(void)
 {
 	int ime_id;
 	Queue_Init( &imelist, sizeof(LCUIIME_Info), LCUIIME_DestroyInfo );

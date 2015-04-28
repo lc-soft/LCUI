@@ -308,7 +308,7 @@ static LCUI_BOOL LCUIKeyboard_Proc(void)
 #endif
 
 /** 初始化键盘输入模块 */
-void LCUIModule_Keyboard_Init( void )
+void LCUI_InitKeyboard( void )
 {
 	LCUIMutex_Init( &record_mutex );
 	LinkedList_Init( &key_state_record, sizeof(key_state) );

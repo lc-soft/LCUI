@@ -117,7 +117,7 @@ static void DeviceThread( void *arg )
 }
 
 /** 初始化设备处理模块 */
-int LCUIModule_Device_Init(void)
+int LCUI_InitDevice(void)
 {
 	LCUIMutex_Init( &list_mutex );
 	LinkedList_Init( &dev_list, sizeof(DeviceData) );

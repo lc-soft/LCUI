@@ -187,7 +187,7 @@ LCUI_API void $(PullStyle)( LCUI_Widget w, int style );
 /** 推送缓存区中的样式，以让部件应用新样式 */
 LCUI_API void $(PushStyle)( LCUI_Widget w, int style );
 
-LCUI_API void LCUIModule_Widget_Init(void);
+LCUI_API void LCUI_InitWidget(void);
 
 #undef $
 
