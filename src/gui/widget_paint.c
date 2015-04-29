@@ -407,18 +407,14 @@ content_paint_done:
 		Graph_Init( &layer_graph );
 		layer_graph.color_type = COLOR_TYPE_ARGB;
 		Graph_Copy( &layer_graph, &self_graph );
-		Graph_Mix(
-			&layer_graph, &content_graph,
-			Pos(content_rect.x, content_rect.y)
-		);
+		Graph_Mix( &layer_graph, &content_graph,
+			   Pos(content_rect.x, content_rect.y) );
 		layer_graph.opacity = w->style.opacity;
 		Graph_Mix( &paint->canvas, &layer_graph, Pos(0,0) );
 	}
 	else if( has_content_graph ) {
-		Graph_Mix(
-			&paint->canvas, &content_graph,
-			Pos(content_rect.x, content_rect.y)
-		);
+		Graph_Mix( &paint->canvas, &content_graph,
+			   Pos(content_rect.x, content_rect.y) );
 	}
 	Graph_WritePNG( "layer_graph.png", &layer_graph );
 	Graph_WritePNG( "self_graph.png", &self_graph );

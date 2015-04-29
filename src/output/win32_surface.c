@@ -377,6 +377,7 @@ static LCUI_PaintContext Win32Surface_BeginPaint( LCUI_Surface surface, LCUI_Rec
 {
 	LCUI_PaintContext paint;
 	paint = (LCUI_PaintContext)malloc(sizeof(LCUI_PaintContextRec_));
+	Graph_Init( &paint->canvas );
 	Graph_Quote( &paint->canvas, &surface->fb, rect );
 	paint->rect = *rect;
 	return paint;

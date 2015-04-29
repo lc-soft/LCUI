@@ -125,25 +125,19 @@ static void Pixels_RGBFormatToARGB( const uchar_t *in_pixels,
 				    uchar_t *out_pixels, 
 				    size_t pixel_count )
 {
-	const LCUI_ARGB8888 *p_px, *p_end_px;
-	LCUI_ARGB8888 *p_out_px;
+	LCUI_ARGB8888 *p_px, *p_end_px;
 	const uchar_t *p_in_byte;
 
 	p_in_byte = in_pixels;
-	p_out_px = (LCUI_ARGB8888*)out_pixels;
-	p_px = (const LCUI_ARGB8888*)in_pixels;
-	p_end_px = p_px + pixel_count - 1;
+	p_px = (LCUI_ARGB8888*)out_pixels;
+	p_end_px = p_px + pixel_count;
 	while( p_px < p_end_px ) {
-		*p_out_px = *p_px;
-		p_out_px->alpha = 255;
-		p_px = (const LCUI_ARGB8888*)(((const uchar_t*)p_px) + 3);
-		++p_out_px;
+		p_px->blue = *p_in_byte++;
+		p_px->green = *p_in_byte++;
+		p_px->red = *p_in_byte++;
+		p_px->alpha = 255;
+		++p_px;
 	}
-	p_in_byte = (const uchar_t*)(p_px + 1);
-	p_out_px->blue = *p_in_byte++;
-	p_out_px->green = *p_in_byte++;
-	p_out_px->red = *p_in_byte++;
-	p_out_px->alpha = 255;
 }
 
 static void Pixels_Format( const uchar_t *in_pixels, int in_color_type,
@@ -227,7 +221,8 @@ static int Graph_ReplaceRGB( LCUI_Graph *des, LCUI_Rect des_rect,
 	int y, row_size;
 	uchar_t *byte_row_des, *byte_row_src;
 
-	byte_row_src = src->bytes + (src_pos.y * src->w + src_pos.x) * 3;
+	byte_row_src = src->bytes + src_pos.y * src->bytes_per_row;
+	byte_row_src += src_pos.x * src->bytes_per_pixel;
 	if( des->color_type == COLOR_TYPE_RGB888 ) {
 		row_size = 3 * des_rect.w;
 		byte_row_des = des->bytes + (des_rect.y * des->w + des_rect.x) * 3;
@@ -242,11 +237,12 @@ static int Graph_ReplaceRGB( LCUI_Graph *des, LCUI_Rect des_rect,
 	if( des->color_type != COLOR_TYPE_ARGB8888 ) {
 		return 0;
 	}
-	byte_row_des = des->bytes + (des_rect.y * des->w + des_rect.x) * 4;
+	byte_row_des = des->bytes + des_rect.y * des->bytes_per_row;
+	byte_row_des += des_rect.x * des->bytes_per_pixel;
 	for( y = 0; y < des_rect.h; ++y ) {
 		Pixels_Format( byte_row_src, src->color_type,
-				byte_row_des, des->color_type,
-				des_rect.w );
+			       byte_row_des, des->color_type,
+			       des_rect.w );
 		byte_row_src += src->bytes_per_row;
 		byte_row_des += des->bytes_per_row;
 	}
