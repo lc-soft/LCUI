@@ -114,7 +114,6 @@ static void $(Update)(void)
 			paint = Surface_BeginPaint( p_sr->surface, p_rect );
 			_DEBUG_MSG( "%d-%d-%d-%d,%d\n", paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
 			Widget_Render( p_sr->widget, paint );
-			_DEBUG_MSG("%d-%d-%d-%d,%d\n", paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
 			Surface_EndPaint( p_sr->surface, paint );
 			LinkedList_Delete( &rlist );
 		}

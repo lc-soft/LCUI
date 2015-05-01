@@ -267,6 +267,7 @@ int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *bord
 		Graph_FillColor( &canvas, border->top.color );
 	}
 	/* 绘制下边框线 */
+	bound.x = box->x;
 	bound.y = box->y + box->height - border->bottom.width;
 	bound.width = box->width - border->bottom_right_radius;
 	bound.width -= border->bottom_left_radius;

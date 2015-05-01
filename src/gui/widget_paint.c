@@ -310,7 +310,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		}
 		*/
 	}
-	_DEBUG_MSG( "%d,%d\n", paint->canvas.width, paint->canvas.height );
+	DEBUG_MSG( "%d,%d\n", paint->canvas.width, paint->canvas.height );
 	/* 如果需要缓存自身的位图 */
 	if( has_self_graph ) {
 		LCUI_PaintContextRec_ self_paint;
@@ -333,7 +333,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 			Widget_OnPaint( w, paint );
 		}
 	}
-	_DEBUG_MSG( "%d,%d\n", paint->canvas.width, paint->canvas.height );
+	DEBUG_MSG( "%d,%d\n", paint->canvas.width, paint->canvas.height );
 	/* 计算内容框相对于图层的坐标 */
 	content_left = w->base.box.content.x - w->base.box.graph.x;
 	content_top = w->base.box.content.y - w->base.box.graph.y;

@@ -141,7 +141,7 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 	LCUI_Surface surface;
 
 	surface = GetSurfaceByHWND(hwnd);
-	_DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
+	DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
