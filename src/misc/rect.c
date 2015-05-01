@@ -147,34 +147,34 @@ LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a,
 				   LCUI_Rect *out )
 {
 	if( a->x > b->x ) {
-		out->x = a->x;
 		if( b->x + b->w > a->x + a->w ) {
 			out->w = a->w;
 		} else {
-			out->w = b->x + b->w - out->x;
+			out->w = b->x + b->w - a->x;
 		}
+		out->x = a->x;
 	} else {
-		out->x = b->x;
 		if( a->x + a->w > b->x + b->w ) {
 			out->w = b->w;
 		} else {
-			out->w = a->x + a->w - out->x;
+			out->w = a->x + a->w - b->x;
 		}
+		out->x = b->x;
 	}
 	if( a->y > b->y ) {
-		out->y = a->y;
 		if( b->y + b->h > a->y + a->h ) {
 			out->h = a->h;
 		} else {
-			out->h = b->y + b->h - out->y;
+			out->h = b->y + b->h - a->y;
 		}
+		out->y = a->y;
 	} else {
-		out->y = b->y;
 		if( a->y + a->h > b->y + b->h ) {
 			out->h = b->h;
 		} else {
-			out->h = a->y + a->h - out->y;
+			out->h = a->y + a->h - b->y;
 		}
+		out->y = b->y;
 	}
 	if( out->w <= 0 || out->h <= 0 ) {
 		return FALSE;
