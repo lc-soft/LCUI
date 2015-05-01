@@ -143,7 +143,26 @@ static void HandleOpacity( LCUI_Widget w, LCUI_WidgetTask *t )
 /** 处理阴影（标记阴影区域为脏矩形，但不包括主体区域） */
 static void HandleShadow( LCUI_Widget w, LCUI_WidgetTask *t )
 {
-
+	LCUI_Rect rects[4];
+	LCUI_BoxShadow *bs;
+	LCUI_WidgetTask task;
+	_DEBUG_MSG("update shadow\n");
+	bs = &w->style.shadow;
+	/* 如果阴影变化并未导致图层尺寸变化的话，则只重绘阴影 */
+	if( bs->x == t->shadow.x && bs->y == t->shadow.y
+	 && bs->spread == t->shadow.spread ) {
+		LCUIRect_CutFourRect( &w->base.box.border, 
+				      &w->base.box.graph, rects );
+		Widget_InvalidateArea( w, &rects[0], GRAPH_BOX );
+		Widget_InvalidateArea( w, &rects[1], GRAPH_BOX );
+		Widget_InvalidateArea( w, &rects[2], GRAPH_BOX );
+		Widget_InvalidateArea( w, &rects[3], GRAPH_BOX );
+		return;
+	}
+	task.type = WTT_RESIZE;
+	task.resize.w = w->base.width;
+	task.resize.h = w->base.height;
+	Widget_AddTask( w, &task );
 }
 
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
@@ -241,7 +260,7 @@ int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data )
 	buffer[data->type].is_valid = TRUE;
 	buffer[data->type].data = *data;
 	widget->task->for_self = TRUE;
-	_DEBUG_MSG("widget: %p, parent_is_root: %d, for_childen: %d, task_id: %d\n",
+	DEBUG_MSG("widget: %p, parent_is_root: %d, for_childen: %d, task_id: %d\n",
 	widget, widget->parent == LCUIRootWidget, widget->task->for_children, data->type);
 	widget = widget->parent;
 	/* 向没有标记的父级部件添加标记 */
@@ -320,13 +339,15 @@ static void Widget_ProcTask( LCUI_Widget w )
 		w->task->i = w->task->i == 1 ? 0:1;
 		/* 如果该部件需要销毁，其它任务就不用再处理了 */
 		if( buffer[WTT_DESTROY].is_valid ) {
+			buffer[WTT_DESTROY].is_valid = FALSE;
 			task_handlers[WTT_DESTROY]( w, NULL );
 			return;
 		}
 		for( i=0; i<WTT_USER; ++i ) {
 			DEBUG_MSG( "task_id: %d, is_valid: %d\n", i, buffer[i].is_valid );
 			if( buffer[i].is_valid && task_handlers[i] ) {
-				task_handlers[i](w, &buffer[i].data);
+				buffer[i].is_valid = FALSE;
+				task_handlers[i]( w, &buffer[i].data );
 			}
 		}
 		/* 如果有用户自定义任务 */

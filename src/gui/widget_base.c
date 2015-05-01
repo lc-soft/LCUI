@@ -451,7 +451,6 @@ void $(ComputeSize)( LCUI_Widget w )
 		w->base.height = 0;
 		break;
 	}
-
 	w->base.box.border.width = w->base.width;
 	w->base.box.border.height = w->base.height;
 	w->base.box.content.width = w->base.width;
@@ -746,22 +745,22 @@ PULL_DONE:
 void $(PushStyle)( LCUI_Widget w, int style )
 {
 	LCUI_WidgetTask t;
-	if(!(style & WSS_POSITION) ) goto PUSH_WSS_BOX;
-	PUSH(w, position);
-	PUSH(w, x);
-	PUSH(w, y);
-	PUSH(w, z_index);
-	PUSH(w, top);
-	PUSH(w, right);
-	PUSH(w, bottom);
+	if( !(style & WSS_POSITION) ) goto PUSH_WSS_BOX;
+	PUSH( w, position );
+	PUSH( w, x );
+	PUSH( w, y );
+	PUSH( w, z_index );
+	PUSH( w, top );
+	PUSH( w, right );
+	PUSH( w, bottom );
 	PUSH( w, left );
 	Widget_AddTask( w, (t.type = WTT_MOVE, &t) );
 PUSH_WSS_BOX:
 	if( !(style & WSS_BOX) ) goto PUSH_WSS_BACKGROUND;
-	PUSH(w, box_sizing);
-	PUSH(w, width);
-	PUSH(w, height);
-	PUSH(w, margin);
+	PUSH( w, box_sizing );
+	PUSH( w, width );
+	PUSH( w, height );
+	PUSH( w, margin );
 	PUSH( w, padding );
 	Widget_AddTask( w, (t.type = WTT_MARGIN, &t) );
 	Widget_AddTask( w, (t.type = WTT_PADDING, &t) );
@@ -771,14 +770,16 @@ PUSH_WSS_BACKGROUND:
 	Widget_AddTask( w, (t.type = WTT_BODY, &t) );
 PUSH_WSS_BORDER:
 	if( !(style & WSS_BORDER) ) goto PUSH_WSS_SHADOW;
+	PUSH( w, border );
+	$(ComputeSize)( w );
 	t.type = WTT_BORDER;
 	t.border = w->style.border;
-	$( ComputeSize )(w);
 	Widget_AddTask( w, &t );
-	PUSH( w, border );
 PUSH_WSS_SHADOW:
 	if( !(style & WSS_SHADOW) ) goto PUSH_DONE;
+	t.shadow = w->style.shadow;
 	PUSH( w, shadow );
+	$(ComputeSize)( w );
 	Widget_AddTask( w, (t.type = WTT_SHADOW, &t) );
 PUSH_DONE:
 	return;
