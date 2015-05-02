@@ -63,35 +63,37 @@ struct LCUI_WidgetTaskBoxRec_ {
 	TaskRecord	buffer[2][WTT_TOTAL_NUM];	/**< 两个记录缓存 */
 };
 
+static void HandleTopLevelWidgetEvent( LCUI_Widget w, int event_type )
+{
+	if( w->parent == LCUIRootWidget || w == LCUIRootWidget ) {
+		LCUI_WidgetEvent e;
+		e.type_name = "TopLevelWidget";
+		e.target = w;
+		Widget_PostEvent( LCUIRootWidget, &e, (int*)event_type );
+	}
+}
+
 /** 处理位置移动 */
 static void HandleMove( LCUI_Widget w, LCUI_WidgetTask *t )
 {
 	LCUI_Rect rect;
 	rect = w->base.box.graph;
-	/* 标记移动后的区域 */
-	Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
-	/* 应用移动前的坐标 */
-	rect.x = t->move.x;
-	rect.y = t->move.y;
-	/* 标记移动前的区域 */
-	Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
-	/* 如果是顶级部件 */
-	if( w->parent == LCUIRootWidget ) {
-		LCUI_WidgetEvent e;
-		e.type_name = "TopLevelWidget";
-		e.target = w;
-		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_MOVE );
+	if( w->parent ) {
+		/* 标记移动后的区域 */
+		Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+		/* 应用移动前的坐标 */
+		rect.x = t->move.x;
+		rect.y = t->move.y;
+		/* 标记移动前的区域 */
+		Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
 	}
+	/* 检测是否为顶级部件并做相应处理 */
+	HandleTopLevelWidgetEvent( w, WET_MOVE );
 }
 
 static void HandleSetTitle( LCUI_Widget w, LCUI_WidgetTask *t )
 {
-	if( w->parent == LCUIRootWidget ) {
-		LCUI_WidgetEvent e;
-		e.type_name = "TopLevelWidget";
-		e.target = w;
-		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_TITLE );
-	}
+	HandleTopLevelWidgetEvent( w, WET_TITLE );
 }
 
 /** 处理尺寸调整 */
@@ -104,34 +106,23 @@ static void HandleResize( LCUI_Widget w, LCUI_WidgetTask *t )
 	rect.y = w->base.box.graph.y;
 	rect.width = t->resize.w;
 	rect.height = t->resize.h;
-	_DEBUG_MSG("old_w: %d, old_h: %d\n", t->resize.w, t->resize.w);
-	Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
-	rect.width = w->base.box.graph.width;
-	rect.height = w->base.box.graph.height;
-	Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+	_DEBUG_MSG( "old_w: %d, old_h: %d\n", t->resize.w, t->resize.w );
+	if( w->parent ) {
+		Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+		rect.width = w->base.box.graph.width;
+		rect.height = w->base.box.graph.height;
+		Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+	}
 	Widget_UpdateGraphBox( w );
 	task.type = WTT_REFRESH;
 	Widget_AddTask( w, &task );
-	if( w->parent == LCUIRootWidget ) {
-		LCUI_WidgetEvent e;
-		e.type_name = "TopLevelWidget";
-		e.target = w;
-		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_RESIZE );
-	}
+	HandleTopLevelWidgetEvent( w, WET_RESIZE );
 }
 
 /** 处理可见性 */
 static void HandleVisibility( LCUI_Widget w, LCUI_WidgetTask *t )
 {
-	if( w->parent == LCUIRootWidget ) {
-		int *type;
-		LCUI_WidgetEvent e;
-
-		e.type_name = "TopLevelWidget";
-		e.target = w;
-		type = (int*)(t->visible ? WET_SHOW:WET_HIDE);
-		Widget_PostEvent( LCUIRootWidget, &e, type );
-	}
+	HandleTopLevelWidgetEvent( w, w->style.visible ? WET_SHOW:WET_HIDE );
 }
 
 /** 处理透明度 */

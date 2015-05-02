@@ -112,7 +112,7 @@ static void $(Update)(void)
 		for( j=0; j<m; ++j ) {
 			p_rect = (LCUI_Rect*)LinkedList_Get( &rlist );
 			paint = Surface_BeginPaint( p_sr->surface, p_rect );
-			_DEBUG_MSG( "%d-%d-%d-%d,%d\n", paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
+			DEBUG_MSG( "%d-%d-%d-%d,%d\n", paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
 			Widget_Render( p_sr->widget, paint );
 			Surface_EndPaint( p_sr->surface, paint );
 			LinkedList_Delete( &rlist );
@@ -168,6 +168,9 @@ static void $(BindSurface)( LCUI_Widget widget )
 	if( $(GetBindSurface)(widget) ) {
 		return;
 	}
+	if( widget != LCUIRootWidget ) {
+		abort();
+	}
 	p_sr = (SurfaceRecord*)LinkedList_Alloc( &display.surfaces );
 	p_sr->surface = Surface_New();
 	p_sr->widget = widget;
@@ -220,22 +223,18 @@ static void $(CleanSurfaces)( void )
 
 static int $(Windowed)( void )
 {
-	LCUI_Surface surface;
-	SurfaceRecord *p_sr;
-
 	switch( display.mode ) {
+	case LDM_FULLSCREEN:
+	case LDM_WINDOWED:
+		return 0;
 	case LDM_SEAMLESS:
+	default: 
 		$(CleanSurfaces)();
 		$(BindSurface)( LCUIRootWidget );
-	case LDM_FULLSCREEN:
 		break;
-	case LDM_WINDOWED:
-	default: return 0;
 	}
-	LinkedList_Goto( &display.surfaces, 0 );
-	p_sr = (SurfaceRecord*)LinkedList_Get(&display.surfaces);
-	surface = p_sr->surface;
-	Surface_Resize( surface, display.width, display.height );
+	Widget_Show( LCUIRootWidget );
+	Widget_Resize( LCUIRootWidget, display.width, display.height );
 	display.mode = LDM_WINDOWED;
 	return 0;
 }
@@ -248,9 +247,9 @@ static int $(FullScreen)( void )
 		$(CleanSurfaces)();
 		$(BindSurface)( LCUIRootWidget );
 	case LDM_WINDOWED:
-		break;
+	default: break;
 	case LDM_FULLSCREEN:
-	default: return 0;
+		return 0;
 	}
 	LinkedList_Goto( &display.surfaces, 0 );
 	p_sr = (SurfaceRecord*)LinkedList_Get(&display.surfaces);
@@ -287,7 +286,7 @@ static int $(Seamless)( void )
 int $(SetMode)( int mode )
 {
 	int ret;
-	DEBUG_MSG("mode: %d\n", mode);
+	_DEBUG_MSG("mode: %d\n", mode);
 	LCUIMutex_Lock( &display.mutex );
 	switch( mode ) {
 	case LDM_WINDOWED:
@@ -305,11 +304,15 @@ int $(SetMode)( int mode )
 	return ret;
 }
 
+/** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
 void $(SetSize)( int width, int height )
 {
 	display.width = width;
 	display.height = height;
-	// ...
+	if( display.mode != LDM_WINDOWED && display.mode != LDM_FULLSCREEN ) {
+		return;
+	}
+	Widget_Resize( LCUIRootWidget, display.width, display.height );
 }
 
 /** 获取屏幕宽度 */
@@ -353,6 +356,12 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 		if( !surface && e_type != WET_ADD ) {
 			return;
 		}
+	} else if ( e->target == LCUIRootWidget ) {
+		if( !surface && e_type != WET_ADD ) {
+			return;
+		}
+	} else {
+		return;
 	}
 	p_rect = &e->target->base.box.graph;
 	switch( e_type ) {

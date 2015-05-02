@@ -67,6 +67,9 @@ LCUI_API int LCUIDisplay_SetMode( int mode );
 /** 获取屏幕显示模式 */
 LCUI_API int LCUIDisplay_GetMode( void );
 
+/** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
+LCUI_API void LCUIDisplay_SetSize( int width, int height );
+
 /** 获取屏幕宽度 */
 LCUI_API int LCUIDisplay_GetWidth( void );
 

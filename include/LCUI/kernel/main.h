@@ -132,7 +132,7 @@ LCUI_API LCUI_BOOL LCUI_IsActive(void);
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */ 
-LCUI_API int LCUI_Init( int w, int h, int mode );
+LCUI_API int LCUI_Init( void );
 
 /* 
  * 功能：LCUI程序的主循环
