@@ -312,16 +312,17 @@ static int Graph_VertiFlipRGB( const LCUI_Graph *graph, LCUI_Graph *buff )
 int Graph_FillRectRGB( LCUI_Graph *graph, LCUI_Color color, LCUI_Rect rect )
 {
 	int x, y;
-	LCUI_Rect rect_src;
+	LCUI_Graph canvas;
 	uchar_t *rowbytep, *bytep;
 
 	if(!Graph_IsValid(graph)) {
 		return -1;
 	}
-	Graph_GetValidRect( graph, &rect_src );
-	graph = Graph_GetQuote( graph );
-	rowbytep = graph->bytes + (rect_src.y + rect.y)*graph->bytes_per_row;
-	rowbytep += (rect.x + rect_src.x)*graph->bytes_per_pixel;
+	Graph_Quote( &canvas, graph, &rect );
+	Graph_GetValidRect( &canvas, &rect );
+	graph = Graph_GetQuote( &canvas );
+	rowbytep = graph->bytes + rect.y*graph->bytes_per_row;
+	rowbytep += rect.x*graph->bytes_per_pixel;
 	for( y=0; y<rect.h; ++y ) {
 		bytep = rowbytep;
 		for( x=0; x<rect.w; ++x ) {
@@ -794,16 +795,12 @@ int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect )
 
 	box_size.w = source->width;
 	box_size.h = source->height;
+	LCUIRect_ValidateArea( &quote_rect, box_size );
 	/* 如果引用源本身已经引用了另一个源 */
 	if( source->quote.is_valid ) {
-		quote_rect.x -= source->quote.left;
-		quote_rect.y -= source->quote.top;
-		LCUIRect_ValidateArea( &quote_rect, box_size );
 		quote_rect.x += source->quote.left;
 		quote_rect.y += source->quote.top;
 		source = source->quote.source;
-	} else {
-		LCUIRect_ValidateArea( &quote_rect, box_size );
 	}
 	if( quote_rect.w <= 0 || quote_rect.h <= 0 ) {
 		self->width = 0;
@@ -820,6 +817,7 @@ int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect )
 	self->height = quote_rect.height;
 	self->opacity = 1.0;
 	self->bytes = NULL;
+	self->mem_size = 0;
 	self->color_type = source->color_type;
 	self->bytes_per_pixel = source->bytes_per_pixel;
 	self->bytes_per_row = source->bytes_per_row;
