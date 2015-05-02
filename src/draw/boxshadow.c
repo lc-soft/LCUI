@@ -123,10 +123,10 @@ draw_circle( LCUI_Graph *graph, LCUI_Pos center, int r, LCUI_ARGB color )
 
 }
 
-static void Graph_DrawTopLeftShadow( LCUI_PaintContext paint, LCUI_Size *box_size, 
+static void Graph_DrawTopLeftShadow( LCUI_PaintContext paint, LCUI_Rect *box, 
 				     LCUI_BoxShadow *shadow )
 {
-	LCUI_Graph box;
+	LCUI_Graph canvas;
 	LCUI_Rect bound;
 	LCUI_Pos pos;
 
@@ -140,20 +140,21 @@ static void Graph_DrawTopLeftShadow( LCUI_PaintContext paint, LCUI_Size *box_siz
 		bound.y -= paint->rect.y;
 		pos.x -= paint->rect.x;
 		pos.y -= paint->rect.y;
-		Graph_Quote( &box, &paint->canvas, &bound );
-		draw_circle( &box, pos, bound.w, shadow->color );
+		Graph_Init( &canvas );
+		Graph_Quote( &canvas, &paint->canvas, &bound );
+		draw_circle( &canvas, pos, bound.w, shadow->color );
 	}
 }
 
-static void Graph_DrawTopRightShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
+static void Graph_DrawTopRightShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 				      LCUI_BoxShadow *shadow )
 {
-	LCUI_Graph box;
+	LCUI_Graph canvas;
 	LCUI_Rect bound;
 	LCUI_Pos pos;
 
 	bound.x = BoxShadow_GetX( shadow );
-	bound.x += BoxShadow_GetBoxWidth( shadow, box_size->w );
+	bound.x += BoxShadow_GetBoxWidth( shadow, box->w );
 	bound.x += (shadow->blur + shadow->spread)*(RADIUS_N - 1.0);
 	bound.y = BoxShadow_GetY( shadow );
 	bound.w = bound.h = (shadow->blur + shadow->spread)*RADIUS_N;
@@ -164,15 +165,15 @@ static void Graph_DrawTopRightShadow( LCUI_PaintContext paint, LCUI_Size *box_si
 		bound.y -= paint->rect.y;
 		pos.x -= paint->rect.x;
 		pos.y -= paint->rect.y;
-		Graph_Quote( &box, &paint->canvas, &bound );
-		draw_circle( &box, pos, bound.w, shadow->color );
+		Graph_Quote( &canvas, &paint->canvas, &bound );
+		draw_circle( &canvas, pos, bound.w, shadow->color );
 	}
 }
 
-static void Graph_DrawBottomLeftShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
+static void Graph_DrawBottomLeftShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 					LCUI_BoxShadow *shadow )
 {
-	LCUI_Graph box;
+	LCUI_Graph canvas;
 	LCUI_Rect bound;
 	LCUI_Pos pos;
 
@@ -181,30 +182,30 @@ static void Graph_DrawBottomLeftShadow( LCUI_PaintContext paint, LCUI_Size *box_
 	pos.y = 0;
 	bound.x = BoxShadow_GetX( shadow );
 	bound.y = BoxShadow_GetY( shadow );
-	bound.y += BoxShadow_GetBoxHeight( shadow, box_size->h );
+	bound.y += BoxShadow_GetBoxHeight( shadow, box->h );
 	bound.y += (shadow->blur + shadow->spread)*(RADIUS_N - 1.0);
 	if( LCUIRect_GetOverlayRect( &bound, &paint->rect, &bound ) ) {
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		pos.x -= paint->rect.x;
 		pos.y -= paint->rect.y;
-		Graph_Quote( &box, &paint->canvas, &bound );
-		draw_circle( &box, pos, bound.w, shadow->color );
+		Graph_Quote( &canvas, &paint->canvas, &bound );
+		draw_circle( &canvas, pos, bound.w, shadow->color );
 	}
 }
 
-static void Graph_DrawBottomRightShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
+static void Graph_DrawBottomRightShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 					 LCUI_BoxShadow *shadow )
 {
-	LCUI_Graph box;
+	LCUI_Graph canvas;
 	LCUI_Rect bound;
 	LCUI_Pos pos;
 
 	bound.x = BoxShadow_GetX( shadow );
-	bound.x += BoxShadow_GetBoxWidth( shadow, box_size->w );
+	bound.x += BoxShadow_GetBoxWidth( shadow, box->w );
 	bound.x += (shadow->blur + shadow->spread)*(RADIUS_N - 1.0);
 	bound.y = BoxShadow_GetY( shadow );
-	bound.y += BoxShadow_GetBoxHeight( shadow, box_size->h );
+	bound.y += BoxShadow_GetBoxHeight( shadow, box->h );
 	bound.y += (shadow->blur + shadow->spread)*(RADIUS_N - 1.0);
 	bound.w = bound.h = (shadow->blur + shadow->spread)*RADIUS_N;
 	pos.x = 0;
@@ -214,12 +215,12 @@ static void Graph_DrawBottomRightShadow( LCUI_PaintContext paint, LCUI_Size *box
 		bound.y -= paint->rect.y;
 		pos.x -= paint->rect.x;
 		pos.y -= paint->rect.y;
-		Graph_Quote( &box, &paint->canvas, &bound );
-		draw_circle( &box, pos, bound.w, shadow->color );
+		Graph_Quote( &canvas, &paint->canvas, &bound );
+		draw_circle( &canvas, pos, bound.w, shadow->color );
 	}
 }
 
-static void Graph_DrawTopShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
+static void Graph_DrawTopShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 				 LCUI_BoxShadow *shadow )
 {
 	float v, a;
@@ -230,8 +231,8 @@ static void Graph_DrawTopShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
 
 	box_area.x = BoxShadow_GetBoxX( shadow );
 	box_area.y = BoxShadow_GetBoxY( shadow );
-	box_area.w = BoxShadow_GetBoxWidth( shadow, box_size->w );
-	box_area.h = BoxShadow_GetBoxHeight( shadow, box_size->h );
+	box_area.w = BoxShadow_GetBoxWidth( shadow, box->w );
+	box_area.h = BoxShadow_GetBoxHeight( shadow, box->h );
 	/* 计算需要绘制上边阴影的区域 */
 	shadow_area.x = BoxShadow_GetX( shadow ) + (shadow->blur + shadow->spread)*RADIUS_N;
 	shadow_area.y = BoxShadow_GetY( shadow );
@@ -275,7 +276,7 @@ static void Graph_DrawTopShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
 	}
 }
 
-static void Graph_DrawBottomShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
+static void Graph_DrawBottomShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 				    LCUI_BoxShadow *shadow )
 {
 	float v, a;
@@ -286,8 +287,8 @@ static void Graph_DrawBottomShadow( LCUI_PaintContext paint, LCUI_Size *box_size
 
 	box_area.x = BoxShadow_GetBoxX( shadow );
 	box_area.y = BoxShadow_GetBoxY( shadow );
-	box_area.w = BoxShadow_GetBoxWidth( shadow, box_size->w );
-	box_area.h = BoxShadow_GetBoxHeight( shadow, box_size->h );
+	box_area.w = BoxShadow_GetBoxWidth( shadow, box->w );
+	box_area.h = BoxShadow_GetBoxHeight( shadow, box->h );
 	shadow_area.x = BoxShadow_GetX( shadow ) + (shadow->blur + shadow->spread)*RADIUS_N;
 	shadow_area.y = BoxShadow_GetY( shadow ) + box_area.h;
 	shadow_area.y += (shadow->blur + shadow->spread)*(RADIUS_N-1.0);
@@ -325,7 +326,7 @@ static void Graph_DrawBottomShadow( LCUI_PaintContext paint, LCUI_Size *box_size
 	}
 }
 
-static void Graph_DrawLeftShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
+static void Graph_DrawLeftShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 				  LCUI_BoxShadow *shadow )
 {
 	float v, a;
@@ -336,8 +337,8 @@ static void Graph_DrawLeftShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
 
 	box_area.x = BoxShadow_GetBoxX( shadow );
 	box_area.y = BoxShadow_GetBoxY( shadow );
-	box_area.w = BoxShadow_GetBoxWidth( shadow, box_size->w );
-	box_area.h = BoxShadow_GetBoxHeight( shadow, box_size->h );
+	box_area.w = BoxShadow_GetBoxWidth( shadow, box->w );
+	box_area.h = BoxShadow_GetBoxHeight( shadow, box->h );
 	shadow_area.x = BoxShadow_GetX( shadow );
 	shadow_area.y = BoxShadow_GetY( shadow ) + (shadow->blur + shadow->spread)*RADIUS_N;
 	shadow_area.w = (shadow->blur + shadow->spread)*RADIUS_N;
@@ -374,7 +375,7 @@ static void Graph_DrawLeftShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
 	}
 }
 
-static void Graph_DrawRightShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
+static void Graph_DrawRightShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 				   LCUI_BoxShadow *shadow )
 {
 	float v, a;
@@ -385,8 +386,8 @@ static void Graph_DrawRightShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
 
 	box_area.x = BoxShadow_GetBoxX( shadow );
 	box_area.y = BoxShadow_GetBoxY( shadow );
-	box_area.w = BoxShadow_GetBoxWidth( shadow, box_size->w );
-	box_area.h = BoxShadow_GetBoxHeight( shadow, box_size->h );
+	box_area.w = BoxShadow_GetBoxWidth( shadow, box->w );
+	box_area.h = BoxShadow_GetBoxHeight( shadow, box->h );
 	shadow_area.x = BoxShadow_GetX( shadow ) + box_area.w;
 	shadow_area.x += (shadow->blur + shadow->spread)*(RADIUS_N-1.0);
 	shadow_area.y = BoxShadow_GetY( shadow ) + (shadow->blur + shadow->spread)*RADIUS_N;
@@ -424,30 +425,34 @@ static void Graph_DrawRightShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
 	}
 }
 
-static void clear_shadow_area( LCUI_PaintContext paint, LCUI_Size *box_size, LCUI_BoxShadow *shadow )
+static void clear_shadow_area( LCUI_PaintContext paint, LCUI_Rect *box,
+			       LCUI_BoxShadow *shadow )
 {
 	int i;
-	LCUI_Graph box_graph;
+	LCUI_Graph canvas;
 	LCUI_Rect rect, box_area, rects[4];
-	box_area.x = BoxShadow_GetBoxX( shadow );
-	box_area.y = BoxShadow_GetBoxY( shadow );
-	box_area.w = BoxShadow_GetBoxWidth( shadow, box_size->w );
-	box_area.h = BoxShadow_GetBoxHeight( shadow, box_size->h );
+	/* 获取内容框区域 */
+	box_area.x = box->x + BoxShadow_GetBoxX( shadow );
+	box_area.y = box->y + BoxShadow_GetBoxY( shadow );
+	box_area.w = BoxShadow_GetBoxWidth( shadow, box->w );
+	box_area.h = BoxShadow_GetBoxHeight( shadow, box->h );
 	rect.x = rect.y = 0;
-	rect.w = box_size->w;
-	rect.h = box_size->h;
+	rect.w = box->w;
+	rect.h = box->h;
+	/* 获取内容框外的阴影区域 */
 	LCUIRect_CutFourRect( &box_area, &rect, rects );
 	for( i=0; i<4; ++i ) {
 		if( LCUIRect_GetOverlayRect( &paint->rect, &rects[i], &rects[i] ) ) {
 			rects[i].x -= paint->rect.x;
 			rects[i].y -= paint->rect.y;
-			Graph_Quote( &box_graph, &paint->canvas, &rects[i] );
-			Graph_FillAlpha( &box_graph, 0 );
+			Graph_Quote( &canvas, &paint->canvas, &rects[i] );
+			//Graph_FillAlpha( &canvas, 0 );
+			Graph_FillColor( &canvas, RGB(100,100,100) );
 		}
 	}
 }
 
-static void draw_center_shadow( LCUI_PaintContext paint, LCUI_Size *box_size,
+static void draw_center_shadow( LCUI_PaintContext paint, LCUI_Rect *box,
 				LCUI_BoxShadow *shadow )
 {
 	int i;
@@ -455,8 +460,8 @@ static void draw_center_shadow( LCUI_PaintContext paint, LCUI_Size *box_size,
 	LCUI_Rect shadow_area, box_area, rects[4];
 	box_area.x = BoxShadow_GetBoxX( shadow );
 	box_area.y = BoxShadow_GetBoxY( shadow );
-	box_area.w = BoxShadow_GetBoxWidth( shadow, box_size->w );
-	box_area.h = BoxShadow_GetBoxHeight( shadow, box_size->h );
+	box_area.w = BoxShadow_GetBoxWidth( shadow, box->w );
+	box_area.h = BoxShadow_GetBoxHeight( shadow, box->h );
 	shadow_area.x = BoxShadow_GetX( shadow ) + (shadow->blur + shadow->spread)*RADIUS_N;
 	shadow_area.y = BoxShadow_GetY( shadow ) + (shadow->blur + shadow->spread)*RADIUS_N;
 	shadow_area.w = box_area.w - (shadow->blur + shadow->spread)*(RADIUS_N - 1.0) * 2;
@@ -484,23 +489,23 @@ void BoxShadow_Init( LCUI_BoxShadow *shadow )
 	shadow->y = 0;
 }
 
-int Graph_DrawBoxShadow( LCUI_PaintContext paint, LCUI_Size *box_size,
+int Graph_DrawBoxShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 			 LCUI_BoxShadow *shadow )
 {
 	/* 判断容器尺寸是否低于阴影占用的最小尺寸 */
-	if( box_size->w < BoxShadow_GetWidth(shadow, 0)
-	 || box_size->h < BoxShadow_GetHeight(shadow, 0) ) {
+	if( box->w < BoxShadow_GetWidth(shadow, 0)
+	 || box->h < BoxShadow_GetHeight(shadow, 0) ) {
 		return -1;
 	}
-	clear_shadow_area( paint, box_size, shadow );
-	draw_center_shadow( paint, box_size, shadow );
-	Graph_DrawTopLeftShadow( paint, box_size, shadow );
-	Graph_DrawTopRightShadow( paint, box_size, shadow );
-	Graph_DrawBottomLeftShadow( paint, box_size, shadow );
-	Graph_DrawBottomRightShadow( paint, box_size, shadow );
-	Graph_DrawTopShadow( paint, box_size, shadow );
-	Graph_DrawBottomShadow( paint, box_size, shadow );
-	Graph_DrawLeftShadow( paint, box_size, shadow );
-	Graph_DrawRightShadow( paint, box_size, shadow );
+	clear_shadow_area( paint, box, shadow );
+	draw_center_shadow( paint, box, shadow );/*
+	Graph_DrawTopLeftShadow( paint, box, shadow );
+	Graph_DrawTopRightShadow( paint, box, shadow );
+	Graph_DrawBottomLeftShadow( paint, box, shadow );
+	Graph_DrawBottomRightShadow( paint, box, shadow );
+	Graph_DrawTopShadow( paint, box, shadow );
+	Graph_DrawBottomShadow( paint, box, shadow );
+	Graph_DrawLeftShadow( paint, box, shadow );
+	Graph_DrawRightShadow( paint, box, shadow );*/
 	return 0;
 }
