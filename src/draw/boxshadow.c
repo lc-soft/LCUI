@@ -425,8 +425,8 @@ static void Graph_DrawRightShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 	}
 }
 
-static void clear_shadow_area( LCUI_PaintContext paint, LCUI_Rect *box,
-			       LCUI_BoxShadow *shadow )
+void Graph_ClearShadowArea( LCUI_PaintContext paint, LCUI_Rect *box,
+			    LCUI_BoxShadow *shadow )
 {
 	int i;
 	LCUI_Graph canvas;
@@ -446,8 +446,7 @@ static void clear_shadow_area( LCUI_PaintContext paint, LCUI_Rect *box,
 			rects[i].x -= paint->rect.x;
 			rects[i].y -= paint->rect.y;
 			Graph_Quote( &canvas, &paint->canvas, &rects[i] );
-			//Graph_FillAlpha( &canvas, 0 );
-			Graph_FillColor( &canvas, RGB(100,100,100) );
+			Graph_FillAlpha( &canvas, 0 );
 		}
 	}
 }
@@ -497,7 +496,6 @@ int Graph_DrawBoxShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 	 || box->h < BoxShadow_GetHeight(shadow, 0) ) {
 		return -1;
 	}
-	clear_shadow_area( paint, box, shadow );
 	draw_center_shadow( paint, box, shadow );/*
 	Graph_DrawTopLeftShadow( paint, box, shadow );
 	Graph_DrawTopRightShadow( paint, box, shadow );

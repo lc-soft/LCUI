@@ -130,6 +130,8 @@ static inline int BoxShadow_GetX( LCUI_BoxShadow *shadow )
 
 LCUI_API void BoxShadow_Init( LCUI_BoxShadow *shadow );
 
+LCUI_API void Graph_ClearShadowArea( LCUI_PaintContext paint, LCUI_Rect *box,
+				     LCUI_BoxShadow *shadow );
 
 LCUI_API int Graph_DrawBoxShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 				  LCUI_BoxShadow *shadow );
