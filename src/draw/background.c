@@ -65,12 +65,11 @@ void Graph_DrawBackground(
 	LCUI_Background		*bg
 )
 {
-	LCUI_Graph image;
+	LCUI_Graph graph;
 	LCUI_Size image_size;
 	LCUI_Pos image_pos = { 0, 0 };
 	LCUI_Rect read_rect, paint_rect;
 
-	Graph_FillColor( &paint->canvas, bg->color );
 	/* 计算背景图应有的尺寸 */
 	if( bg->size.using_value ) {
 		/* 默认是取宽和高里最小的一个来计算缩放后的图形尺寸 */
@@ -190,6 +189,8 @@ void Graph_DrawBackground(
 	if( !LCUIRect_GetOverlayRect( box, &paint->rect, &paint_rect ) ) {
 		return;
 	}
+	Graph_Quote( &graph, &paint->canvas, &paint_rect );
+	Graph_FillColor( &graph, bg->color );
 	/* 将坐标转换为相对于背景内容框 */
 	paint_rect.x -= box->x;
 	paint_rect.y -= box->y;
@@ -207,11 +208,11 @@ void Graph_DrawBackground(
 	read_rect.y -= image_pos.y;
 	/* 如果尺寸没有变化则直接引用 */
 	if( image_size.w == bg->image.w && image_size.h == bg->image.h ) {
-		Graph_Quote( &image, &bg->image, &read_rect );
+		Graph_Quote( &graph, &bg->image, &read_rect );
 		/* 转换成相对于当前绘制区域的坐标 */
 		image_pos.x = image_pos.x + box->x - paint->rect.x;
 		image_pos.y = image_pos.y + box->y - paint->rect.y;
-		Graph_Mix( &paint->canvas, &image, image_pos );
+		Graph_Mix( &paint->canvas, &graph, image_pos );
 	} else {
 		float scale;
 		LCUI_Graph buffer;
@@ -231,7 +232,7 @@ void Graph_DrawBackground(
 			quote_rect.height *= scale;
 		}
 		/* 引用源背景图像的一块区域 */
-		Graph_Quote( &image, &bg->image, &quote_rect );
+		Graph_Quote( &graph, &bg->image, &quote_rect );
 		image_size.w = read_rect.width;
 		image_size.h = read_rect.height;
 		/* 计算相对于绘制区域的坐标 */
@@ -240,7 +241,7 @@ void Graph_DrawBackground(
 		image_pos.y = read_rect.y + image_pos.y;
 		image_pos.y = image_pos.y + box->y - paint->rect.y;
 		/* 按比例进行缩放 */
-		Graph_Zoom( &image, &buffer, FALSE, image_size );
+		Graph_Zoom( &graph, &buffer, FALSE, image_size );
 		Graph_Mix( &paint->canvas, &buffer, image_pos );
 		Graph_Free( &buffer );
 	}
