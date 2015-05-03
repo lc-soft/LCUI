@@ -133,6 +133,10 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	box.x = box.y = 0;
 	box.width = w->base.box.graph.width;
 	box.height = w->base.box.graph.height;
+	/* 如果是有位图缓存的话，则先清空缓存里的阴影区域 */
+	if( Graph_IsValid(&w->graph) ) {
+		Graph_ClearShadowArea( paint, &box, &w->style.shadow );
+	}
 	Graph_DrawBoxShadow( paint, &box, &w->style.shadow );
 	box.x = w->base.box.content.x - w->base.box.graph.x;
 	box.y = w->base.box.content.y - w->base.box.graph.y;
@@ -148,8 +152,9 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	wc && wc->methods.paint ? wc->methods.paint(w, paint):FALSE;
 }
 
-static int _Widget_ProcInvalidArea( LCUI_Widget w, LCUI_BOOL is_root, int x, int y,
-			LCUI_Rect *valid_box, LCUI_DirtyRectList *rlist )
+static int _Widget_ProcInvalidArea( LCUI_Widget w, LCUI_BOOL is_root, 
+				    int x, int y, LCUI_Rect *valid_box, 
+				    LCUI_DirtyRectList *rlist )
 {
 	int i, n, count;
 	LCUI_Widget child;
@@ -200,6 +205,7 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, LCUI_BOOL is_root, int x, int
 	n = LinkedList_GetTotal( &w->children );
 	/* 向子级部件递归 */
 	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &w->children, i );
 		child = (LCUI_Widget)LinkedList_Get( &w->children );
 		if( !child->style.visible ) {
 			continue;
@@ -299,7 +305,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_BOOL has_overlay, has_content_graph = FALSE,
 		  has_self_graph = FALSE,has_layer_graph = FALSE,
 		  is_cover_border = FALSE;
-
+	
 	Graph_Init( &layer_graph );
 	Graph_Init( &self_graph );
 	Graph_Init( &content_graph );
@@ -317,7 +323,6 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		}
 		*/
 	}
-	DEBUG_MSG( "%d,%d\n", paint->canvas.width, paint->canvas.height );
 	/* 如果需要缓存自身的位图 */
 	if( has_self_graph ) {
 		LCUI_PaintContextRec_ self_paint;
@@ -340,7 +345,6 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 			Widget_OnPaint( w, paint );
 		}
 	}
-	DEBUG_MSG( "%d,%d\n", paint->canvas.width, paint->canvas.height );
 	/* 计算内容框相对于图层的坐标 */
 	content_left = w->base.box.content.x - w->base.box.graph.x;
 	content_top = w->base.box.content.y - w->base.box.graph.y;
@@ -357,7 +361,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	if( !has_overlay ) {
 		goto content_paint_done;
 	}
-	/* 将换重叠区域的坐标转换为相对于脏矩形的坐标 */
+	/* 转换重叠区域的坐标转换为相对于脏矩形的坐标 */
 	content_rect.x -= paint->rect.x;
 	content_rect.y -= paint->rect.y;
 	/* 若需要部件内容区的位图缓存 */
@@ -372,7 +376,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
 	while( i-- ) {
 		LCUI_Widget child;
-		LCUI_Rect child_rect;
+		LCUI_Rect child_rect, canvas_rect;
 		LCUI_PaintContextRec_ child_paint;
 
 		child = (LCUI_Widget)LinkedList_Get( &w->children_show );
@@ -392,12 +396,15 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 			continue;
 		}
 		/* 将子部件绘制区域转换相对于当前部件内容框 */
-		child_rect.x = child_paint.rect.x - content_rect.x;
-		child_rect.y = child_paint.rect.y - content_rect.y;
-		child_rect.width = child_paint.rect.width;
-		child_rect.height = child_paint.rect.height;
+		canvas_rect.x = child_paint.rect.x - content_rect.x;
+		canvas_rect.y = child_paint.rect.y - content_rect.y;
+		canvas_rect.width = child_paint.rect.width;
+		canvas_rect.height = child_paint.rect.height;
+		/* 将绘制区域转换为相对于子部件 */
+		child_paint.rect.x -= child_rect.x;
+		child_paint.rect.y -= child_rect.y;
 		/* 在内容位图中引用所需的区域，作为子部件的画布 */
-		Graph_Quote( &child_paint.canvas, &content_graph, &child_rect );
+		Graph_Quote( &child_paint.canvas, &content_graph, &canvas_rect );
 		Widget_Render( child, &child_paint );
 	}
 	/* 如果与圆角边框重叠，则裁剪掉边框外的内容 */
@@ -423,9 +430,6 @@ content_paint_done:
 		Graph_Mix( &paint->canvas, &content_graph,
 			   Pos(content_rect.x, content_rect.y) );
 	}
-	Graph_WritePNG( "layer_graph.png", &layer_graph );
-	Graph_WritePNG( "self_graph.png", &self_graph );
-	Graph_WritePNG( "content_graph.png", &content_graph );
 	Graph_Free( &layer_graph );
 	Graph_Free( &self_graph );
 	Graph_Free( &content_graph );
