@@ -25,8 +25,14 @@ static void InitConsoleWindow(void)
 
 void onTimer( void *arg )
 {
+	static int mode = LDM_SEAMLESS;
 	_DEBUG_MSG("tip\n");
-	Surface_Show( arg );
+	LCUIDisplay_SetMode( mode );
+	if( mode == LDM_SEAMLESS ) {
+		mode = LDM_WINDOWED;
+	} else {
+		mode = LDM_SEAMLESS;
+	}
 }
 
 int main( int argc, char **argv )
@@ -35,14 +41,16 @@ int main( int argc, char **argv )
 	LCUI_Graph image;
 
 	InitConsoleWindow();
-	LCUI_Init(0, 0, LDM_SEAMLESS);
+	LCUI_Init();
+	LCUIDisplay_SetMode( LDM_WINDOWED );
+	LCUIDisplay_SetSize( 800, 600 );
 	w = Widget_New(NULL);
 	Widget_Top( w );
 	Widget_Show( w );
 	Widget_Resize( w, 320, 240 );
-	Widget_Move( w, 480, 480 );
+	Widget_Move( w, 100, 200 );
 	Widget_SetTitleW( w, L"测试" );
-	Graph_Init( &image );
+	Graph_Init( &image ); 
 	_DEBUG_MSG( "load image, result: %d\n", Graph_LoadImage( "background-image.png", &image ) );
 	Widget_PullStyle( w, WSS_BACKGROUND | WSS_SHADOW | WSS_BORDER );
 	w->style.background.color.value = 0xf6f6f6;
@@ -67,5 +75,6 @@ int main( int argc, char **argv )
 	w->style.border.bottom.color = RGB( 0, 0, 255 );
 	w->style.border.left.width = 10;
 	Widget_PushStyle( w, WSS_BACKGROUND | WSS_SHADOW | WSS_BORDER );
+	LCUITimer_Set( 2000, onTimer, NULL, TRUE );
 	return LCUI_Main();
 }
