@@ -168,9 +168,6 @@ static void $(BindSurface)( LCUI_Widget widget )
 	if( $(GetBindSurface)(widget) ) {
 		return;
 	}
-	if( widget != LCUIRootWidget ) {
-		abort();
-	}
 	p_sr = (SurfaceRecord*)LinkedList_Alloc( &display.surfaces );
 	p_sr->surface = Surface_New();
 	p_sr->widget = widget;
@@ -274,6 +271,7 @@ static int $(Seamless)( void )
 	}
 	n = LinkedList_GetTotal( &LCUIRootWidget->children );
 	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &LCUIRootWidget->children, i );
 		widget = (LCUI_Widget)
 		LinkedList_Get( &LCUIRootWidget->children );
 		$(BindSurface)( widget );

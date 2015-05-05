@@ -79,6 +79,7 @@ struct LCUI_SurfaceRec_ {
 	HDC fb_hdc;
 	HBITMAP fb_bmp;
 	LCUI_Graph fb;
+	LCUI_BOOL is_wait_destroy;
 	LCUI_SurfaceTask task_buffer[TASK_TOTAL_NUM];
 };
 
@@ -133,6 +134,56 @@ static LCUI_Surface GetSurfaceByWidget( LCUI_Widget widget )
 	return NULL;
 }
 
+static void Win32Surface_OnDestroy( void *args )
+{
+	LCUI_Surface surface = (LCUI_Surface)args;
+	surface->w = 0;
+	surface->h = 0;
+	if( surface->hwnd ) {
+		if( surface->fb_hdc ) {
+			ReleaseDC( surface->hwnd, surface->fb_hdc );
+		}
+	}
+	if( surface->fb_bmp ) {
+		DeleteObject( surface->fb_bmp );
+	}
+	surface->fb_hdc = NULL;
+	surface->fb_bmp = NULL;
+	surface->hwnd = NULL;
+	Graph_Free( &surface->fb );
+}
+
+static void Win32Surface_ExecDelete( LCUI_Surface surface )
+{
+	int i, n;
+	LCUI_Surface s;
+
+	if( !surface->is_wait_destroy ) {
+		return;
+	}
+	n = LinkedList_GetTotal( &win32.surfaces );
+	for( i = 0; i < n; ++i ) {
+		LinkedList_Goto( &win32.surfaces, i );
+		s = (LCUI_Surface)LinkedList_Get( &win32.surfaces );
+		if( surface == s ) {
+			LinkedList_Delete( &win32.surfaces );
+			break;
+		}
+	}
+}
+
+/** 删除 Surface */
+static void Win32Surface_Delete( LCUI_Surface surface )
+{
+	if( surface->is_wait_destroy ) {
+		return;
+	}
+	if( surface->hwnd ) {
+		PostMessage( surface->hwnd, WM_CLOSE, 0, 0 );
+	}
+	surface->is_wait_destroy = TRUE;
+}
+
 static LRESULT CALLBACK
 WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 {
@@ -141,7 +192,7 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 	LCUI_Surface surface;
 
 	surface = GetSurfaceByHWND(hwnd);
-	DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
+	_DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
@@ -163,7 +214,9 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 		EndPaint( hwnd, &ps );
 		return 0;
 	case WM_CLOSE:
-		Surface_Delete( surface );
+		break;
+	case WM_DESTROY:
+		Win32Surface_ExecDelete( surface );
 		break;
 	case WM_SHOWWINDOW:
 		if( arg1 ) {
@@ -179,26 +232,6 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 	return DefWindowProc( hwnd, msg, arg1, arg2 );
 }
 
-/** 删除 Surface */
-static void Win32Surface_Delete( LCUI_Surface surface )
-{
-	surface->w = 0;
-	surface->h = 0;
-	if( surface->hwnd ) {
-		if( surface->fb_hdc ) {
-			ReleaseDC( surface->hwnd, surface->fb_hdc );
-		}
-		CloseWindow( surface->hwnd );
-	}
-	if( surface->fb_bmp ) {
-		DeleteObject( surface->fb_bmp );
-	}
-	surface->fb_hdc = NULL;
-	surface->fb_bmp = NULL;
-	surface->hwnd = NULL;
-	Graph_Free( &surface->fb );
-}
-
 /** 新建一个 Surface */
 static LCUI_Surface Win32Surface_New(void)
 {
@@ -208,6 +241,7 @@ static LCUI_Surface Win32Surface_New(void)
 	surface->mode = RENDER_MODE_BIT_BLT;
 	surface->fb_hdc = NULL;
 	surface->fb_bmp = NULL;
+	surface->is_wait_destroy = FALSE;
 	Graph_Init( &surface->fb );
 	surface->fb.color_type = COLOR_TYPE_ARGB;
 	surface->hwnd = NULL;
@@ -402,7 +436,6 @@ static void Win32Surface_Present( LCUI_Surface surface )
 	char str[32];
 	hdc_client = GetDC( surface->hwnd );
 	sprintf( str, "fb-%03d.png", ++count );
-	_DEBUG_MSG("%s\n", str);
 	Graph_WritePNG( str, &surface->fb );
 	SetBitmapBits( surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes );
 	switch(surface->mode) {
@@ -488,7 +521,7 @@ static void LCUISurface_Loop( void *args )
 			);
 			hdc_client = GetDC( surface->hwnd );
 			surface->fb_hdc = CreateCompatibleDC( hdc_client );
-			DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
+			_DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 			continue;
 		}
 		TranslateMessage( &msg );
@@ -541,7 +574,8 @@ LCUI_SurfaceMethods *LCUISurface_InitWin32(void)
 	LCUICond_Init( &win32.cond );
 	LinkedList_Init( &win32.surfaces, sizeof( struct LCUI_SurfaceRec_ ) );
 	LinkedList_SetDataMemReuse( &win32.surfaces, TRUE );
-	LinkedList_SetDataNeedFree( &win32.surfaces, FALSE );
+	LinkedList_SetDataNeedFree( &win32.surfaces, TRUE );
+	LinkedList_SetDestroyFunc( &win32.surfaces, Win32Surface_OnDestroy );
 	LCUIThread_Create( &win32.loop_thread, LCUISurface_Loop, NULL );
 	return &win32.methods;
 }
