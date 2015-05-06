@@ -226,6 +226,9 @@ LCUI_Widget $(New)( const char *type_name )
 {
 	LCUI_Widget widget = NEW_ONE(struct LCUI_WidgetFull);
 	$(Init)(widget);
+	if( type_name ) {
+		widget->type_name = strdup( type_name );
+	}
 	return widget;
 }
 

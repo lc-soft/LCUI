@@ -38,7 +38,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
- 
+
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 
@@ -233,7 +233,7 @@ void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 void DirtyRectList_Init( LCUI_DirtyRectList *list )
 {
 	LinkedList_Init( list, sizeof(LCUI_Rect) );
-	LinkedList_SetDataMemReuse( list, TRUE );
+	LinkedList_SetDataMemReuse( list, FALSE );
 	LinkedList_SetDataNeedFree( list, TRUE );
 }
 
@@ -302,7 +302,8 @@ int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 	}
 	DEBUG_MSG("add\n");
 	/* 验证通过，则添加进去 */
-	LinkedList_AddDataCopy( list, rect );
+	p_rect = (LCUI_Rect*)LinkedList_Alloc( list );
+	*p_rect = *rect;
 	return 0;
 }
 
