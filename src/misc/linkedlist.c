@@ -108,11 +108,13 @@ void LinkedList_Destroy( LinkedList *list )
 		node = list->usable_head_node;
 		while( node ) {
 			list->usable_head_node = node->next;
-			if( list->need_free_data && node->data ) {
+			if( node->data ) {
 				if( list->destroy_func ) {
-					list->destroy_func( list->current_node->data );
+					list->destroy_func( node->data );
 				}
-				free( node->data );
+				if( list->need_free_data ) {
+					free( node->data );
+				}
 			}
 			node->data = NULL;
 			node->prev = NULL;
@@ -126,11 +128,13 @@ void LinkedList_Destroy( LinkedList *list )
 		node = list->used_head_node;
 		while( node ) {
 			list->used_head_node = node->next;
-			if( list->need_free_data && node->data ) {
+			if( node->data ) {
 				if( list->destroy_func ) {
-					list->destroy_func( list->current_node->data );
+					list->destroy_func( node->data );
 				}
-				free( node->data );
+				if( list->need_free_data ) {
+					free( node->data );
+				}
 			}
 			node->data = NULL;
 			node->prev = NULL;
@@ -156,18 +160,13 @@ int LinkedList_Delete( LinkedList *list )
 	--list->used_node_num;
 	++list->usable_node_num;
 	
-	if( list->need_free_data ) {
-		if( list->current_node->data ) {
-			if( list->destroy_func ) {
-				list->destroy_func( list->current_node->data );
-			}
-			if( !list->need_reuse_mem ) {
-				free( list->current_node->data );
-				list->current_node->data = NULL;
-			}
-		}
+	if( list->destroy_func ) {
+		list->destroy_func( list->current_node->data );
 	}
-	else if( !list->need_reuse_mem ) {
+	if( !list->need_reuse_mem ) {
+		if( list->need_free_data && list->current_node->data ) {
+			free( list->current_node->data );
+		}
 		list->current_node->data = NULL;
 	}
 	/* 如果在链表尾端 */

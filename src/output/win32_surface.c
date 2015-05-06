@@ -79,7 +79,6 @@ struct LCUI_SurfaceRec_ {
 	HDC fb_hdc;
 	HBITMAP fb_bmp;
 	LCUI_Graph fb;
-	LCUI_BOOL is_wait_destroy;
 	LCUI_SurfaceTask task_buffer[TASK_TOTAL_NUM];
 };
 
@@ -158,9 +157,6 @@ static void Win32Surface_ExecDelete( LCUI_Surface surface )
 	int i, n;
 	LCUI_Surface s;
 
-	if( !surface->is_wait_destroy ) {
-		return;
-	}
 	n = LinkedList_GetTotal( &win32.surfaces );
 	for( i = 0; i < n; ++i ) {
 		LinkedList_Goto( &win32.surfaces, i );
@@ -175,13 +171,9 @@ static void Win32Surface_ExecDelete( LCUI_Surface surface )
 /** 删除 Surface */
 static void Win32Surface_Delete( LCUI_Surface surface )
 {
-	if( surface->is_wait_destroy ) {
-		return;
-	}
 	if( surface->hwnd ) {
 		PostMessage( surface->hwnd, WM_CLOSE, 0, 0 );
 	}
-	surface->is_wait_destroy = TRUE;
 }
 
 static LRESULT CALLBACK
@@ -241,7 +233,6 @@ static LCUI_Surface Win32Surface_New(void)
 	surface->mode = RENDER_MODE_BIT_BLT;
 	surface->fb_hdc = NULL;
 	surface->fb_bmp = NULL;
-	surface->is_wait_destroy = FALSE;
 	Graph_Init( &surface->fb );
 	surface->fb.color_type = COLOR_TYPE_ARGB;
 	surface->hwnd = NULL;
@@ -430,13 +421,10 @@ static void Win32Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
 static void Win32Surface_Present( LCUI_Surface surface )
 {
-	static count = 0;
 	HDC hdc_client;
 	RECT client_rect;
-	char str[32];
+
 	hdc_client = GetDC( surface->hwnd );
-	sprintf( str, "fb-%03d.png", ++count );
-	Graph_WritePNG( str, &surface->fb );
 	SetBitmapBits( surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes );
 	switch(surface->mode) {
 	case RENDER_MODE_STRETCH_BLT:
