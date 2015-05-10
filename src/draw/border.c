@@ -263,6 +263,8 @@ int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *bord
 	bound.width -= border->top_left_radius;
 	bound.height = border->top.width;
 	if( LCUIRect_GetOverlayRect( &bound, &paint->rect, &bound ) ) {
+		bound.x -= paint->rect.x;
+		bound.y -= paint->rect.y;
 		Graph_Quote( &canvas, &paint->canvas, &bound );
 		Graph_FillColor( &canvas, border->top.color );
 	}
@@ -273,6 +275,8 @@ int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *bord
 	bound.width -= border->bottom_left_radius;
 	bound.height = border->bottom.width;
 	if( LCUIRect_GetOverlayRect( &bound, &paint->rect, &bound ) ) {
+		bound.x -= paint->rect.x;
+		bound.y -= paint->rect.y;
 		Graph_Quote( &canvas, &paint->canvas, &bound );
 		Graph_FillColor( &canvas, border->bottom.color );
 	}
@@ -283,6 +287,8 @@ int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *bord
 	bound.height = box->height - border->top_left_radius;
 	bound.height -= border->bottom_left_radius;
 	if( LCUIRect_GetOverlayRect( &bound, &paint->rect, &bound ) ) {
+		bound.x -= paint->rect.x;
+		bound.y -= paint->rect.y;
 		Graph_Quote( &canvas, &paint->canvas, &bound );
 		Graph_FillColor( &canvas, border->left.color );
 	}
@@ -293,6 +299,8 @@ int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *bord
 	bound.height = box->height - border->top_right_radius;
 	bound.height -= border->bottom_right_radius;
 	if( LCUIRect_GetOverlayRect( &bound, &paint->rect, &bound ) ) {
+		bound.x -= paint->rect.x;
+		bound.y -= paint->rect.y;
 		Graph_Quote( &canvas, &paint->canvas, &bound );
 		Graph_FillColor( &canvas, border->right.color );
 	}

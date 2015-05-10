@@ -189,11 +189,13 @@ void Graph_DrawBackground(
 	if( !LCUIRect_GetOverlayRect( box, &paint->rect, &paint_rect ) ) {
 		return;
 	}
+	paint_rect.x -= paint->rect.x;
+	paint_rect.y -= paint->rect.y;
 	Graph_Quote( &graph, &paint->canvas, &paint_rect );
 	Graph_FillColor( &graph, bg->color );
 	/* 将坐标转换为相对于背景内容框 */
-	paint_rect.x -= box->x;
-	paint_rect.y -= box->y;
+	paint_rect.x += paint->rect.x - box->x;
+	paint_rect.y += paint->rect.y - box->y;
 	/* 保存背景图像区域 */
 	read_rect.x = image_pos.x;
 	read_rect.y = image_pos.y;

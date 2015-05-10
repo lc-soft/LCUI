@@ -40,6 +40,9 @@
 #ifndef __LCUI_DRAW_BOXSHADOW_H__
 #define __LCUI_DRAW_BOXSHADOW_H__
 
+#define BLUR_N			1.5
+#define SHADOW_WIDTH(sd)	(int)(sd->blur*(BLUR_N-1.0) + shadow->spread)
+
 static inline LCUI_BoxShadow BoxShadow( int x, int y, int blur, LCUI_Color color )
 {
 	LCUI_BoxShadow shadow;
@@ -53,79 +56,89 @@ static inline LCUI_BoxShadow BoxShadow( int x, int y, int blur, LCUI_Color color
 
 static inline int BoxShadow_GetBoxWidth( LCUI_BoxShadow *shadow, int w )
 {
-	if( shadow->x >= shadow->blur + shadow->spread ) {
-		return w - (shadow->blur + shadow->spread)*2
-			 - (shadow->x - (shadow->blur + shadow->spread));
+	/* 如果水平向右的偏移距离大于阴影宽度，说明内容区左上角与容器一致 */
+	if( shadow->x >= SHADOW_WIDTH(shadow) ) {
+		return w - SHADOW_WIDTH(shadow)*2
+			 - (shadow->x - SHADOW_WIDTH(shadow));
 	}
-	else if( shadow->x <= -(shadow->blur + shadow->spread) ) {
-		return w - (shadow->blur + shadow->spread)*2
-			 + shadow->x + (shadow->blur + shadow->spread);
+	/* 如果水平向左的偏移距离大于阴影宽度，说明阴影区左上角与容器一致 */
+	else if( shadow->x <= -SHADOW_WIDTH(shadow) ) {
+		return w - SHADOW_WIDTH(shadow)*2
+			 + shadow->x + SHADOW_WIDTH(shadow);
 	}
-	return w - (shadow->blur + shadow->spread)*2;
+	/* 水平偏移距离没有超出阴影宽度，容器大小会是固定的，所以直接减
+	 * 去两边的阴影宽度即可得到内容区宽度  
+	 */
+	return w - SHADOW_WIDTH(shadow)*2;
 }
 
 static inline int BoxShadow_GetBoxHeight( LCUI_BoxShadow *shadow, int h )
 {
-	if( shadow->y > 0 ) {
-		return h - (shadow->blur + shadow->spread)*2 - shadow->y;
+	if( shadow->y >= SHADOW_WIDTH(shadow) ) {
+		return h - SHADOW_WIDTH(shadow)*2
+			 - (shadow->y - SHADOW_WIDTH(shadow));
 	}
-	return h - (shadow->blur + shadow->spread)*2 + shadow->y;
+	else if( shadow->y <= -SHADOW_WIDTH(shadow) ) {
+		return h - SHADOW_WIDTH(shadow)*2
+			 + shadow->y + SHADOW_WIDTH(shadow);
+	}
+	return h - SHADOW_WIDTH(shadow)*2 + shadow->y;
 }
 
 /** 计算Box在添加阴影后的宽度 */
 static inline int BoxShadow_GetWidth( LCUI_BoxShadow *shadow, int box_w )
 {
-	if( shadow->x >= (shadow->blur + shadow->spread) ) {
-		return box_w + (shadow->blur + shadow->spread) + shadow->x;
+	if( shadow->x >= SHADOW_WIDTH(shadow) ) {
+		return box_w + SHADOW_WIDTH(shadow) + shadow->x;
 	}
-	else if( shadow->x <= -(shadow->blur + shadow->spread) ) {
-		return box_w + (shadow->blur + shadow->spread) - shadow->x;
+	else if( shadow->x <= -SHADOW_WIDTH(shadow) ) {
+		return box_w + SHADOW_WIDTH(shadow) - shadow->x;
 	}
-	return box_w + (shadow->blur + shadow->spread)*2;
+	return box_w + SHADOW_WIDTH(shadow)*2;
 }
 
 /** 计算Box在添加阴影后的高度 */
 static inline int BoxShadow_GetHeight( LCUI_BoxShadow *shadow, int box_h )
 {
-	if( shadow->y >= (shadow->blur + shadow->spread) ) {
-		return box_h + (shadow->blur + shadow->spread) + shadow->y;
+	if( shadow->y >= SHADOW_WIDTH(shadow) ) {
+		return box_h + SHADOW_WIDTH(shadow) + shadow->y;
 	}
-	else if( shadow->y <= -(shadow->blur + shadow->spread) ) {
-		return box_h + (shadow->blur + shadow->spread) - shadow->y;
+	else if( shadow->y <= -SHADOW_WIDTH(shadow) ) {
+		return box_h + SHADOW_WIDTH(shadow) - shadow->y;
 	}
-	return box_h + (shadow->blur + shadow->spread)*2;
+	return box_h + SHADOW_WIDTH(shadow)*2;
 }
 
 static inline int BoxShadow_GetBoxX( LCUI_BoxShadow *shadow )
 {
-	if( shadow->x >= (shadow->blur + shadow->spread) ) {
+	if( shadow->x >= SHADOW_WIDTH(shadow) ) {
 		return 0;
 	}
-	return (shadow->blur + shadow->spread) - shadow->x;
+	return SHADOW_WIDTH(shadow) - shadow->x;
 }
 
 static inline int BoxShadow_GetBoxY( LCUI_BoxShadow *shadow )
 {
-	if( shadow->y >= (shadow->blur + shadow->spread) ) {
+	if( shadow->y >= SHADOW_WIDTH(shadow) ) {
 		return 0;
 	}
-	return (shadow->blur + shadow->spread) - shadow->y;
+	return SHADOW_WIDTH(shadow) - shadow->y;
 }
 
 static inline int BoxShadow_GetY( LCUI_BoxShadow *shadow )
 {
-	if( shadow->y <= (shadow->blur + shadow->spread) ) {
+	if( shadow->y <= SHADOW_WIDTH(shadow) ) {
 		return 0;
 	}
-	return shadow->y - (shadow->blur + shadow->spread);
+	return shadow->y - SHADOW_WIDTH(shadow);
 }
 
 static inline int BoxShadow_GetX( LCUI_BoxShadow *shadow )
 {
-	if( shadow->x <= (shadow->blur + shadow->spread) ) {
+	if( shadow->x <= SHADOW_WIDTH(shadow) ) {
 		return 0;
 	}
-	return shadow->x - (shadow->blur + shadow->spread);
+	return shadow->x - SHADOW_WIDTH(shadow);
 }
 
 LCUI_API void BoxShadow_Init( LCUI_BoxShadow *shadow );
