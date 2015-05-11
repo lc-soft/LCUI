@@ -106,7 +106,7 @@ static void HandleResize( LCUI_Widget w, LCUI_WidgetTask *t )
 	rect.y = w->base.box.graph.y;
 	rect.width = t->resize.w;
 	rect.height = t->resize.h;
-	_DEBUG_MSG( "old_w: %d, old_h: %d\n", t->resize.w, t->resize.w );
+	_DEBUG_MSG( "old_w: %d, old_h: %d\n", t->resize.w, t->resize.h );
 	if( w->parent ) {
 		Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
 		rect.width = w->base.box.graph.width;
@@ -159,14 +159,15 @@ static void HandleShadow( LCUI_Widget w, LCUI_WidgetTask *t )
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
 static void HandleBody( LCUI_Widget w, LCUI_WidgetTask *t )
 {
-	_DEBUG_MSG( "tip\n" );
+	_DEBUG_MSG( "body\n" );
 	Widget_InvalidateArea( w, NULL, BORDER_BOX );
 }
 
 /** 处理刷新（标记整个部件区域为脏矩形） */
 static void HandleRefresh( LCUI_Widget w, LCUI_WidgetTask *t )
 {
-
+	_DEBUG_MSG( "refresh\n" );
+	Widget_InvalidateArea( w, NULL, GRAPH_BOX );
 }
 
 static void HandleBorder( LCUI_Widget w, LCUI_WidgetTask *t )

@@ -414,6 +414,17 @@ void $(UpdateGraphBox)( LCUI_Widget w )
 	rg->y = w->base.y - BoxShadow_GetBoxY( &w->style.shadow );
 	rg->width = BoxShadow_GetWidth( &w->style.shadow, rb->width );
 	rg->height = BoxShadow_GetHeight( &w->style.shadow, rb->height );
+	/* 如果有会产生透明效果的样式 */
+	if( w->style.border.bottom_left_radius > 0
+	 || w->style.border.bottom_right_radius > 0
+	 || w->style.border.top_left_radius > 0
+	 || w->style.border.top_right_radius > 0
+	 || w->style.background.color.alpha < 255
+	 || w->style.shadow.blur > 0 ) {
+		w->graph.color_type = COLOR_TYPE_ARGB;
+	} else {
+		w->graph.color_type = COLOR_TYPE_RGB;
+	}
 	Graph_Create( &w->graph, rg->width, rg->height );
 }
 
