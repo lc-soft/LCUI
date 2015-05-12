@@ -614,10 +614,7 @@ static int Graph_FillRectARGB( LCUI_Graph *graph, LCUI_Color color,
 	for( y=0; y<rect.h; ++y ) {
 		px_p = px_row_p;
 		for( x=0; x<rect.w; ++x ) {
-			px_p->b = color.b;
-			px_p->g = color.g;
-			px_p->r = color.r;
-			++px_p;
+			*px_p++ = color;
 		}
 		px_row_p += graph->w;
 	}
