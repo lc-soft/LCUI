@@ -42,6 +42,8 @@
 
 #define BLUR_N			1.5
 #define SHADOW_WIDTH(sd)	(int)(sd->blur*(BLUR_N-1.0) + shadow->spread)
+#define BLUR_WIDTH(sd)		(int)(sd->blur*BLUR_N)
+#define INNER_SHADOW_WIDTH(sd)	(SHADOW_WIDTH(sd)-BLUR_WIDTH(sd))
 
 static inline LCUI_BoxShadow BoxShadow( int x, int y, int blur, LCUI_Color color )
 {
