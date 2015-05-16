@@ -52,13 +52,19 @@
 static struct LCUI_WidgetFull LCUIRootWidgetData;	/**< 根级部件 */
 LCUI_Widget LCUIRootWidget = &LCUIRootWidgetData;	/**< 创建外部引用 */
 
+/** 获取根级部件 */
+LCUI_Widget LCUIWidget_GetRoot(void)
+{
+	return &LCUIRootWidgetData;
+}
+
 /** 追加子部件 */
 int $(Append)( LCUI_Widget container, LCUI_Widget widget )
 {
 	int i, n;
 	LCUI_Widget old_container;
 	LCUI_WidgetEvent e;
-	_DEBUG_MSG("container: %p, widget: %p\n", container, widget);
+	DEBUG_MSG("container: %p, widget: %p\n", container, widget);
 	if( !container || !widget || container == widget->parent ) {
 		return -1;
 	}
@@ -106,10 +112,10 @@ remove_done:
 		e.type_name = "TopLevelWidget";
 		e.target = widget;
 		ret = Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_ADD );
-		_DEBUG_MSG("post done, ret = %d\n", ret);
+		DEBUG_MSG("post done, ret = %d\n", ret);
 	}
 	Widget_UpdateTaskStatus( widget );
-	_DEBUG_MSG("tip\n");
+	DEBUG_MSG("tip\n");
 	return 0;
 }
 
@@ -222,7 +228,7 @@ static void $(Init)( LCUI_Widget widget )
 }
 
 /** 新建一个GUI部件 */
-LCUI_Widget $(New)( const char *type_name )
+LCUI_Widget LCUIWidget_New( const char *type_name )
 {
 	LCUI_Widget widget = NEW_ONE(struct LCUI_WidgetFull);
 	$(Init)(widget);
@@ -262,7 +268,7 @@ LCUI_Widget $(At)( LCUI_Widget widget, int x, int y )
 /** 设置部件为顶级部件 */
 int $(Top)( LCUI_Widget w )
 {
-	_DEBUG_MSG("tip\n");
+	DEBUG_MSG("tip\n");
 	return $(Append)( LCUIRootWidget, w );
 }
 
@@ -702,7 +708,7 @@ void $(Show)( LCUI_Widget w )
 	t.type = WTT_SHOW;
 	t.visible = w->style.visible;
 	w->style.visible = TRUE;
-	_DEBUG_MSG("tip, type: %d, %d\n", t.type, WTT_SHOW);
+	DEBUG_MSG("tip, type: %d, %d\n", t.type, WTT_SHOW);
 	Widget_AddTask( w, &t );
 }
 

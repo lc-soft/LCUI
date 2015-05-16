@@ -40,6 +40,8 @@
 #ifndef __LCUI_WIDGET_BASE_H__
 #define __LCUI_WIDGET_BASE_H__
 
+LCUI_BEGIN_HEADER
+
 /** 如果没有包含 widget_build.h 头文件 */
 #ifndef __LCUI_WIDGET_BUILD_H__
 
@@ -141,10 +143,12 @@ typedef struct LCUI_WidgetBase {
 /** 一般来说部件占用的矩形区域看上去是指边框盒区域 */
 #define Widget_GetRect Widget_GetBorderRect
 
-extern LCUI_Widget LCUIRootWidget;	/**< 根级部件 */
+extern LCUI_Widget LCUIRootWidget;
+
+LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
 
 /** 新建一个GUI部件 */
-LCUI_API LCUI_Widget $(New)( const char *type_name );
+LCUI_API LCUI_Widget LCUIWidget_New( const char *type_name );
 
 /** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget $(At)( LCUI_Widget widget, int x, int y );
