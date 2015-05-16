@@ -163,6 +163,7 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
         png_byte color_type; 
         png_structp png_ptr;
         png_infop info_ptr; 
+	png_text text_ptr[3];
 	png_bytep *row_pointers;
 	int x, y, row_size;
 
@@ -179,26 +180,29 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
         /* initialize stuff */
         png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
         if (!png_ptr) {
-                _DEBUG_MSG("png_create_write_struct failed\n");
                 fclose( fp );
+                _DEBUG_MSG("png_create_write_struct failed\n");
                 return -1;
         }
         info_ptr = png_create_info_struct(png_ptr);
         if (!info_ptr) {
-                _DEBUG_MSG("png_create_info_struct failed\n");
                 fclose( fp );
+                _DEBUG_MSG("png_create_info_struct failed\n");
+		png_destroy_write_struct( &png_ptr, &info_ptr );
                 return -1;
         }
         if (setjmp(png_jmpbuf(png_ptr))) {
-                _DEBUG_MSG("error during init_io\n");
                 fclose( fp );
+                _DEBUG_MSG("error during init_io\n");
+		png_destroy_write_struct( &png_ptr, &info_ptr );
                 return -1;
         }
         png_init_io(png_ptr, fp);
         /* write header */
         if (setjmp(png_jmpbuf(png_ptr))) {
-                _DEBUG_MSG("error during writing header\n");
                 fclose( fp );
+                _DEBUG_MSG("error during writing header\n");
+		png_destroy_write_struct( &png_ptr, &info_ptr );
                 return -1;
         }
         if(Graph_HasAlpha(graph)) {
@@ -209,11 +213,35 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
         png_set_IHDR(png_ptr, info_ptr, graph->w, graph->h,
         8, color_type, PNG_INTERLACE_NONE,
         PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+	text_ptr[0].key = "Title";
+	text_ptr[0].text = "png output file";
+	text_ptr[0].compression = PNG_TEXT_COMPRESSION_NONE;
+	text_ptr[0].itxt_length = 0;
+	text_ptr[0].lang = NULL;
+	text_ptr[0].lang_key = NULL;
+
+	text_ptr[1].key = "Author";
+	text_ptr[1].text = "LCUI Application";
+	text_ptr[1].compression = PNG_TEXT_COMPRESSION_NONE;
+	text_ptr[1].itxt_length = 0;
+	text_ptr[1].lang = NULL;
+	text_ptr[1].lang_key = NULL;
+
+	text_ptr[2].key = "Description";
+	text_ptr[2].text = "this png file generate from LCUI Application.";
+	text_ptr[2].compression = PNG_TEXT_COMPRESSION_zTXt;
+	text_ptr[2].itxt_length = 0;
+	text_ptr[2].lang = NULL;
+	text_ptr[2].lang_key = NULL;
+
+	png_set_text(png_ptr, info_ptr, text_ptr, 3);
         png_write_info(png_ptr, info_ptr);
         /* write bytes */
         if (setjmp(png_jmpbuf(png_ptr))) {
-                _DEBUG_MSG("error during writing bytes\n");
                 fclose( fp );
+                _DEBUG_MSG("error during writing bytes\n");
+		png_destroy_write_struct( &png_ptr, &info_ptr );
                 return -1;
         }
 
@@ -222,14 +250,11 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 	if( graph->color_type == COLOR_TYPE_ARGB ) {
 		LCUI_ARGB *px_ptr, *px_row_ptr;
 
-		row_size = sizeof( uchar_t ) * 4 * rect.width;
+		row_size = png_get_rowbytes(png_ptr, info_ptr);
 		px_row_ptr = graph->argb + rect.top * graph->width + rect.left;
-		row_pointers = (png_bytep*)malloc( rect.height*sizeof( png_bytep ) );
+		row_pointers = (png_bytep*)malloc( rect.height*sizeof(png_bytep) );
 		for( y = 0; y<rect.height; ++y ) {
-			row_pointers[y] = (png_bytep)malloc( row_size );
-			if( row_pointers[y] == NULL ) {
-				abort();
-			}
+			row_pointers[y] = png_malloc( png_ptr, row_size );
 			px_ptr = px_row_ptr;
 			for( x = 0; x < row_size; ++px_ptr ) {
 				row_pointers[y][x++] = px_ptr->red;
@@ -241,11 +266,11 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 		}
 	} else {
 		uchar_t *px_ptr, *px_row_ptr;
-
-		row_size = sizeof( uchar_t ) * 3 * rect.width;
+		
+		row_size = png_get_rowbytes(png_ptr, info_ptr);
 		px_row_ptr = graph->bytes + rect.top * graph->bytes_per_row;
 		px_row_ptr += rect.left * graph->bytes_per_pixel;
-		row_pointers = (png_bytep*)malloc( rect.height*sizeof( png_bytep ) );
+		row_pointers = (png_bytep*)malloc( rect.height*sizeof(png_bytep) );
 		for( y = 0; y<rect.height; ++y ) {
 			row_pointers[y] = (png_bytep)malloc( row_size );
 			px_ptr = px_row_ptr;
@@ -258,18 +283,19 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 		}
 	}
         png_write_image( png_ptr, row_pointers );
-        /* end write */
-        if (setjmp(png_jmpbuf(png_ptr))) {
-                _DEBUG_MSG("error during end of write\n");
-		fclose( fp );
-		return -1;
-        }
-        png_write_end(png_ptr, NULL);
         /* cleanup heap allocation */
         for( y=0; y<rect.height; ++y ) {
                 free( row_pointers[y] );
         }
         free( row_pointers );
+        /* end write */
+        if (setjmp(png_jmpbuf(png_ptr))) {
+		fclose( fp );
+                _DEBUG_MSG("error during end of write\n");
+		return -1;
+        }
+        png_write_end(png_ptr, NULL);
+	png_destroy_write_struct( &png_ptr, &info_ptr );
         fclose( fp );
         return 0;
 #else
