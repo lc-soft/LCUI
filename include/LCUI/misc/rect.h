@@ -85,7 +85,7 @@ LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a,
  * rect2 必须被 rect1 完全包含
  */
 LCUI_API void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
-					LCUI_Rect rects[4] );
+				    LCUI_Rect rects[4] );
 
 /** 初始化脏矩形记录 */
 LCUI_API void DirtyRectList_Init( LCUI_DirtyRectList *list );

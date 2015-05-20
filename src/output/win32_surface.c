@@ -184,7 +184,7 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 	LCUI_Surface surface;
 
 	surface = GetSurfaceByHWND(hwnd);
-	_DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
+	DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
@@ -423,7 +423,7 @@ static void Win32Surface_Present( LCUI_Surface surface )
 {
 	HDC hdc_client;
 	RECT client_rect;
-
+	DEBUG_MSG("tip\n");
 	hdc_client = GetDC( surface->hwnd );
 	SetBitmapBits( surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes );
 	switch(surface->mode) {
@@ -509,7 +509,7 @@ static void LCUISurface_Loop( void *args )
 			);
 			hdc_client = GetDC( surface->hwnd );
 			surface->fb_hdc = CreateCompatibleDC( hdc_client );
-			_DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
+			DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 			continue;
 		}
 		TranslateMessage( &msg );

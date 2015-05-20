@@ -112,7 +112,7 @@ static void $(Update)(void)
 		for( j=0; j<m; ++j ) {
 			p_rect = (LCUI_Rect*)LinkedList_Get( &rlist );
 			paint = Surface_BeginPaint( p_sr->surface, p_rect );
-			DEBUG_MSG( "%d-%d-%d-%d,%d\n", paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
+			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d), %d\n", p_sr->widget->type_name, paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
 			Widget_Render( p_sr->widget, paint );
 			Surface_EndPaint( p_sr->surface, paint );
 			LinkedList_Delete( &rlist );
@@ -348,7 +348,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 	LCUI_Surface surface;
 	LCUI_Rect *p_rect;
 	
-	_DEBUG_MSG("tip, e_type = %d\n", e_type);
+	DEBUG_MSG("tip, e_type = %d\n", e_type);
 	surface = $(GetBindSurface)( e->target );
 	if( display.mode == LDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
@@ -381,12 +381,12 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 		Surface_SetCaptionW( surface, e->target->title );
 		break;
 	case WET_RESIZE: 
-		_DEBUG_MSG( "resize, w: %d, h: %d\n", p_rect->w, p_rect->h );
+		DEBUG_MSG( "resize, w: %d, h: %d\n", p_rect->w, p_rect->h );
 		Surface_Resize( surface, p_rect->w, p_rect->h );
 		Widget_InvalidateArea( w, NULL, GRAPH_BOX );
 		break;
 	case WET_MOVE: 
-		_DEBUG_MSG( "x: %d, y: %d\n", p_rect->left, p_rect->top );
+		DEBUG_MSG( "x: %d, y: %d\n", p_rect->left, p_rect->top );
 		Surface_Move( surface, p_rect->left, p_rect->top );
 		break;
 	default: break;

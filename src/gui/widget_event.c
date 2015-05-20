@@ -191,7 +191,7 @@ int Widget_BindEvent(	LCUI_Widget widget, const char *event_name,
 	task->func = func;
 	task->data = func_data;
 	task->data_destroy = destroy_data;
-	_DEBUG_MSG("event: %s, task: %p\n", event_name, task);
+	DEBUG_MSG("event: %s, task: %p\n", event_name, task);
 	return LCUIEventBox_Bind( 
 		widget->event, event_name, 
 		OnWidgetEvent, task, DestroyWidgetEventTask
