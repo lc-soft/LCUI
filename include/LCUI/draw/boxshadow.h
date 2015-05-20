@@ -41,7 +41,7 @@
 #define __LCUI_DRAW_BOXSHADOW_H__
 
 #define BLUR_N			1.5
-#define SHADOW_WIDTH(sd)	(int)(sd->blur*(BLUR_N-1.0) + shadow->spread)
+#define SHADOW_WIDTH(sd)	(sd->blur + shadow->spread)
 #define BLUR_WIDTH(sd)		(int)(sd->blur*BLUR_N)
 #define INNER_SHADOW_WIDTH(sd)	(SHADOW_WIDTH(sd)-BLUR_WIDTH(sd))
 
@@ -58,33 +58,31 @@ static inline LCUI_BoxShadow BoxShadow( int x, int y, int blur, LCUI_Color color
 
 static inline int BoxShadow_GetBoxWidth( LCUI_BoxShadow *shadow, int w )
 {
+	w -= SHADOW_WIDTH(shadow)*2;
 	/* 如果水平向右的偏移距离大于阴影宽度，说明内容区左上角与容器一致 */
 	if( shadow->x >= SHADOW_WIDTH(shadow) ) {
-		return w - SHADOW_WIDTH(shadow)*2
-			 - (shadow->x - SHADOW_WIDTH(shadow));
+		return w - (shadow->x - SHADOW_WIDTH(shadow));
 	}
 	/* 如果水平向左的偏移距离大于阴影宽度，说明阴影区左上角与容器一致 */
 	else if( shadow->x <= -SHADOW_WIDTH(shadow) ) {
-		return w - SHADOW_WIDTH(shadow)*2
-			 + shadow->x + SHADOW_WIDTH(shadow);
+		return w + shadow->x + SHADOW_WIDTH(shadow);
 	}
 	/* 水平偏移距离没有超出阴影宽度，容器大小会是固定的，所以直接减
 	 * 去两边的阴影宽度即可得到内容区宽度  
 	 */
-	return w - SHADOW_WIDTH(shadow)*2;
+	return w;
 }
 
 static inline int BoxShadow_GetBoxHeight( LCUI_BoxShadow *shadow, int h )
 {
+	h -= SHADOW_WIDTH(shadow)*2;
 	if( shadow->y >= SHADOW_WIDTH(shadow) ) {
-		return h - SHADOW_WIDTH(shadow)*2
-			 - (shadow->y - SHADOW_WIDTH(shadow));
+		return h - shadow->y + SHADOW_WIDTH(shadow);
 	}
 	else if( shadow->y <= -SHADOW_WIDTH(shadow) ) {
-		return h - SHADOW_WIDTH(shadow)*2
-			 + shadow->y + SHADOW_WIDTH(shadow);
+		return h + shadow->y + SHADOW_WIDTH(shadow);
 	}
-	return h - SHADOW_WIDTH(shadow)*2 + shadow->y;
+	return h;
 }
 
 /** 计算Box在添加阴影后的宽度 */

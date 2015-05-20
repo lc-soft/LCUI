@@ -101,9 +101,6 @@ draw_circle( LCUI_Graph *graph, LCUI_Pos center, int r, LCUI_ARGB color )
 	if( circle.b > area.y + area.h ) {
 		circle.b = area.y + area.h;
 	}
-	if( area.w > 50 ) {
-		_DEBUG_MSG("circle: %d,%d,%d,%d\n", circle.l, circle.t, circle.r, circle.b);
-	}
 	if( src->color_type != COLOR_TYPE_ARGB ) {
 		return;
 	}
@@ -296,8 +293,8 @@ static void Graph_DrawBottomShadow( LCUI_PaintContext paint, LCUI_Rect *box,
 	box_area.w = BoxShadow_GetBoxWidth( shadow, box->w );
 	box_area.h = BoxShadow_GetBoxHeight( shadow, box->h );
 	shadow_area.x = BoxShadow_GetX( shadow ) + BLUR_WIDTH(shadow);
-	shadow_area.y = BoxShadow_GetY( shadow ) + SHADOW_WIDTH(shadow);
-	shadow_area.y += box_area.h + INNER_SHADOW_WIDTH(shadow);
+	shadow_area.y = BoxShadow_GetY( shadow ) + BLUR_WIDTH(shadow);
+	shadow_area.y += box_area.h + INNER_SHADOW_WIDTH(shadow)*2;
 	shadow_area.w = box_area.w + INNER_SHADOW_WIDTH(shadow)*2;
 	shadow_area.h = BLUR_WIDTH(shadow);
 	color = shadow->color;
@@ -452,7 +449,7 @@ void Graph_ClearShadowArea( LCUI_PaintContext paint, LCUI_Rect *box,
 			rects[i].x -= paint->rect.x;
 			rects[i].y -= paint->rect.y;
 			Graph_Quote( &canvas, &paint->canvas, &rects[i] );
-			Graph_FillColor( &canvas, ARGB(0,255,0,0) );
+			Graph_FillColor( &canvas, shadow->color );
 		}
 	}
 }
