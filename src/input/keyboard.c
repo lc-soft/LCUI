@@ -1,7 +1,7 @@
  /* ***************************************************************************
  * keyboard.c -- keyboard support
  * 
- * Copyright (C) 2013-2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2013-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * keyboard.c -- 键盘支持
  *
- * 版权所有 (C) 2013-2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2013-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -51,7 +51,7 @@ typedef struct key_state_ {
 	int state;		/**< 当前状态 */
 	clock_t hit_time;	/**< 按下此键时的时间 */
 	clock_t interval_time;	/**< 近两次按下此键的时间间隔 */
-} key_state;
+} KeyState;
 
 static LCUI_Mutex record_mutex;
 static LinkedList key_state_record;
@@ -73,14 +73,14 @@ static int fd = STDIN_FILENO;
 #endif
 
 /** 获取指定按键的状态数据 */
-static key_state* KeyStateRecord_FindData( int key_code )
+static KeyState* GetKeySate( int key_code )
 {
 	int i, n;
-	key_state* data_ptr;
+	KeyState* data_ptr;
 
 	n = LinkedList_GetTotal( &key_state_record );
 	for( i=0; i<n; ++i ) {
-		data_ptr = (key_state*)LinkedList_Get( &key_state_record );
+		data_ptr = (KeyState*)LinkedList_Get( &key_state_record );
 		if( data_ptr && data_ptr->key_code == key_code ) {
 			return data_ptr;
 		}
@@ -92,11 +92,11 @@ static key_state* KeyStateRecord_FindData( int key_code )
 /** 检测指定键值的按键是否处于按下状态 */
 LCUI_BOOL LCUIKey_IsHit( int key_code )
 {
-	key_state *data_ptr;
+	KeyState *state_ptr;
 	LCUIMutex_Lock( &record_mutex );
-	data_ptr = KeyStateRecord_FindData( key_code );
+	state_ptr = GetKeySate( key_code );
 	LCUIMutex_Unlock( &record_mutex );
-	if( data_ptr && data_ptr->state == LCUIKEYSTATE_PRESSED ) {
+	if( state_ptr && state_ptr->state == LCUIKEYSTATE_PRESSED ) {
 		return TRUE;
 	}
 	return FALSE;
@@ -112,11 +112,11 @@ LCUI_BOOL LCUIKey_IsHit( int key_code )
 LCUI_BOOL LCUIKey_IsDoubleHit( int key_code, int interval_time )
 {
 	clock_t ct;
-	key_state* data_ptr;
+	KeyState* data_ptr;
 	/* 计算当前时间（单位：毫秒） */
 	ct = clock()*1000 / CLOCKS_PER_SEC;
 	LCUIMutex_Lock( &record_mutex );
-	data_ptr = KeyStateRecord_FindData( key_code );
+	data_ptr = GetKeySate( key_code );
 	LCUIMutex_Unlock( &record_mutex );
 	if( !data_ptr ) {
 		return FALSE;
@@ -137,11 +137,11 @@ LCUI_BOOL LCUIKey_IsDoubleHit( int key_code, int interval_time )
 void LCUIKeyBoard_HitKey( int key_code )
 {
 	clock_t ct;
-	key_state data, *data_ptr;
+	KeyState data, *data_ptr;
 
 	LCUIMutex_Lock( &record_mutex );
 	ct = clock()*1000 / CLOCKS_PER_SEC;
-	data_ptr = KeyStateRecord_FindData( key_code );
+	data_ptr = GetKeySate( key_code );
 	if( !data_ptr ) {
 		data.key_code = key_code;
 		data.interval_time = -1;
@@ -164,9 +164,9 @@ void LCUIKeyBoard_HitKey( int key_code )
 /** 标记指定键值的按键已释放 */
 void LCUIKeyBoard_ReleaseKey( int key_code )
 {
-	key_state *data_ptr;
+	KeyState *data_ptr;
 	LCUIMutex_Lock( &record_mutex );
-	data_ptr = KeyStateRecord_FindData( key_code );
+	data_ptr = GetKeySate( key_code );
 	if( data_ptr ) {
 		data_ptr->state = LCUIKEYSTATE_RELEASE;
 	}
@@ -208,33 +208,14 @@ static LCUI_BOOL LCUIKeyboard_Exit( void )
 	return TRUE;
 }
 
-/* 添加键盘的按键按下事件 */
-void LCUI_PostKeyDownEvent( int key_code )
+static void OnKeyboardEvent( LCUI_SystemEvent *e, void *arg )
 {
-	key_state *data_ptr;
-	LCUI_SystemEvent event;
-	
-	LCUIMutex_Lock( &record_mutex );
-	data_ptr = KeyStateRecord_FindData( key_code );
-	LCUIMutex_Unlock( &record_mutex );
-	/* 已经按下过的按键就不用再触发KEYDOWN事件了 */
-	if( data_ptr && data_ptr->state == LCUIKEYSTATE_PRESSED ) {
-		return;
+	if( e->type == LCUI_KEYDOWN ) {
+		LCUIKeyBoard_HitKey( e->key_code );
 	}
-	event.type = LCUI_KEYDOWN;
-	event.which = key_code;
-	LCUIKeyBoard_HitKey( key_code );
-	LCUI_PostEvent( &event );
-}
-
-/* 添加键盘的按键释放事件 */
-void LCUI_PostKeyUpEvent( int key_code )
-{
-	LCUI_SystemEvent event;
-	event.type = LCUI_KEYUP;
-	event.which = key_code;
-	LCUIKeyBoard_ReleaseKey( key_code );
-	LCUI_PostEvent( &event );
+	else if( e->type == LCUI_KEYUP ) {
+		LCUIKeyBoard_ReleaseKey( e->key_code );
+	}
 }
 
 /** 检测键盘是否有按键按下（类似于kbhit函数） */
@@ -311,14 +292,18 @@ static LCUI_BOOL LCUIKeyboard_Proc(void)
 void LCUI_InitKeyboard( void )
 {
 	LCUIMutex_Init( &record_mutex );
-	LinkedList_Init( &key_state_record, sizeof(key_state) );
+	LinkedList_Init( &key_state_record, sizeof(KeyState) );
+	LCUI_RegisterEventWithId( "keydown", LCUI_KEYDOWN );
+	LCUI_RegisterEventWithId( "keyup", LCUI_KEYUP );
+	LCUI_BindEvent( "keydown", OnKeyboardEvent, NULL, NULL );
+	LCUI_BindEvent( "keyup", OnKeyboardEvent, NULL, NULL );
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	LCUIDevice_Add( LCUIKeyboard_Init, LCUIKeyboard_Proc, LCUIKeyboard_Exit );
 #endif
 }
 
 /** 停用键盘输入模块 */
-void LCUIModule_Keyboard_End( void )
+void LCUI_ExitKeyboard( void )
 {
 	LinkedList_Destroy( &key_state_record );
 	LCUIMutex_Destroy( &record_mutex );

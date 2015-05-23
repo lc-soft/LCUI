@@ -1,8 +1,7 @@
 ﻿/* ***************************************************************************
- * LCUI_Cursor.h -- mouse cursor operation set.
+ * cursor.h -- mouse cursor operation set.
  *
- * Copyright (C) 2012-2013 by
- * Liu Chao
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -21,10 +20,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * LCUI_Cursor.h -- 鼠标游标的操作集
+ * cursor.h -- 鼠标游标的操作集
  *
- * 版权所有 (C) 2012-2013 归属于
- * 刘超
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -47,7 +45,7 @@ LCUI_BEGIN_HEADER
 /* 初始化游标数据 */
 void LCUI_InitCursor( void );
 
-void LCUIModule_Cursor_End( void );
+void LCUI_ExitCursor( void );
 
 /* 获取鼠标游标的区域范围 */
 LCUI_API void LCUICursor_GetRect( LCUI_Rect *rect );

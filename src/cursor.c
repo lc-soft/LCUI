@@ -1,8 +1,7 @@
 /* ***************************************************************************
- * LCUI_Cursor.c -- control mouse global_cursor
+ * cursor.c -- mouse cursor operation set.
  *
- * Copyright (C) 2012-2013 by
- * Liu Chao
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -21,10 +20,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * LCUI_Cursor.c -- 控制鼠标光标
+ * cursor.c -- 鼠标游标的操作集
  *
- * 版权所有 (C) 2012-2013 归属于
- * 刘超
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -38,6 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
+
 //#define DEBUG
 #include <LCUI_Build.h>
 
@@ -47,8 +46,9 @@
 #include <LCUI/display.h>
 
 static struct LCUI_Cursor {
-	LCUI_Pos current_pos;	/* 当前的坐标 */
-	LCUI_Pos new_pos;	/* 将要更新的坐标 */
+	LCUI_Pos current_pos;	/* 当前帧的坐标 */
+	LCUI_Pos new_pos;	/* 下一帧将要更新的坐标 */
+	LCUI_Pos pos;		/* 当前实时坐标 */
 	int visible;		/* 是否可见 */
 	LCUI_Graph graph;	/* 游标的图形 */
 } global_cursor;
@@ -105,6 +105,14 @@ static int LCUICursor_LoadDefualtGraph(LCUI_Graph *buff )
 	return 0;
 }
 
+static void OnMouseMoveEvent( LCUI_SystemEvent *e, void *arg )
+{
+	global_cursor.pos.x += e->rel_x;
+	global_cursor.pos.y += e->rel_y;
+	global_cursor.new_pos = global_cursor.pos;
+	_DEBUG_MSG("x: %d, y: %d\n", global_cursor.pos.x, global_cursor.pos.y);
+}
+
 /* 初始化游标数据 */
 void LCUI_InitCursor( void )
 {
@@ -114,15 +122,16 @@ void LCUI_InitCursor( void )
 	/* 载入自带的游标的图形数据 */ 
 	LCUICursor_LoadDefualtGraph( &pic );
 	LCUICursor_SetGraph( &pic );
+	LCUI_BindEvent( "mousemove", OnMouseMoveEvent, NULL, NULL );
 }
 
-void LCUIModule_Cursor_End( void )
+void LCUI_ExitCursor( void )
 {
 	Graph_Free( &global_cursor.graph );
 }
 
 /* 获取鼠标游标的区域范围 */
-LCUI_API void LCUICursor_GetRect( LCUI_Rect *rect )
+void LCUICursor_GetRect( LCUI_Rect *rect )
 {
 	rect->x = global_cursor.current_pos.x;
 	rect->y = global_cursor.current_pos.y;
@@ -131,7 +140,7 @@ LCUI_API void LCUICursor_GetRect( LCUI_Rect *rect )
 }
 
 /* 刷新鼠标游标在屏幕上显示的图形 */
-LCUI_API void LCUICursor_Refresh( void )
+void LCUICursor_Refresh( void )
 {
 	LCUI_Rect rect;
 	if( !global_cursor.visible ) {
@@ -141,21 +150,20 @@ LCUI_API void LCUICursor_Refresh( void )
 }
 
 /* 检测鼠标游标是否可见 */
-LCUI_API LCUI_BOOL LCUICursor_IsVisible( void )
+LCUI_BOOL LCUICursor_IsVisible( void )
 {
 	return global_cursor.visible;
 }
 
 /* 显示鼠标游标 */
-LCUI_API void LCUICursor_Show( void )
+void LCUICursor_Show( void )
 {
 	global_cursor.visible = TRUE;	/* 标识游标为可见 */
 	LCUICursor_Refresh();
-
 }
 
 /* 隐藏鼠标游标 */
-LCUI_API void LCUICursor_Hide( void )
+void LCUICursor_Hide( void )
 {
 	LCUI_Rect rect;
 	global_cursor.visible = FALSE;
@@ -163,7 +171,7 @@ LCUI_API void LCUICursor_Hide( void )
 }
 
 /* 更新鼠标指针的位置 */
-LCUI_API void LCUICursor_UpdatePos( void )
+void LCUICursor_UpdatePos( void )
 {
 	if( global_cursor.current_pos.x == global_cursor.new_pos.x
 	 && global_cursor.current_pos.y == global_cursor.new_pos.y ) {
@@ -175,14 +183,14 @@ LCUI_API void LCUICursor_UpdatePos( void )
 }
 
 /* 设定游标的位置 */
-LCUI_API void LCUICursor_SetPos( LCUI_Pos pos )
+void LCUICursor_SetPos( LCUI_Pos pos )
 {
 	global_cursor.new_pos = pos;
 	DEBUG_MSG("new pos: %d,%d\n", pos.x, pos.y);
 }
 
 /** 设置游标的图形 */
-LCUI_API int LCUICursor_SetGraph( LCUI_Graph *graph )
+int LCUICursor_SetGraph( LCUI_Graph *graph )
 {
 	if( Graph_IsValid (graph) ) {
 		LCUICursor_Refresh();
@@ -197,13 +205,13 @@ LCUI_API int LCUICursor_SetGraph( LCUI_Graph *graph )
 }
 
 /* 获取鼠标指针当前的坐标 */
-LCUI_API void LCUICursor_GetPos( LCUI_Pos *pos )
+void LCUICursor_GetPos( LCUI_Pos *pos )
 {
 	*pos = global_cursor.current_pos;
 }
 
 /* 获取鼠标指针将要更新的坐标 */
-LCUI_API void LCUICursor_GetNewPos( LCUI_Pos *pos )
+void LCUICursor_GetNewPos( LCUI_Pos *pos )
 {
 	*pos = global_cursor.new_pos;
 }

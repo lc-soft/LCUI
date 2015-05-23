@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * LCUI_Input.h -- The input devices handling module of LCUI.
  * 
- * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * LCUI_Input.h -- LCUI的输入设备处理模块。
  *
- * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -136,24 +136,8 @@
 
 LCUI_BEGIN_HEADER
 
-/*---------------------------------- Mouse ---------------------------------*/
-
-/** 投递鼠标按键按下事件 */
-LCUI_API int LCUI_PostMouseDownEvent( int key_code );
-
-/** 投递鼠标按键释放事件 */
-LCUI_API int LCUI_PostMouseUpEvent( int key_code );
-
-/** 投递鼠标移动事件 */
-LCUI_API void LCUI_PostMouseMoveEvent( LCUI_Pos new_pos );
-
 /** 初始化鼠标输入模块 */
 LCUI_API int LCUI_InitMouse( void );
-
-/*-------------------------------- Mouse End -------------------------------*/
-
-
-/*-------------------------------- Keyboard --------------------------------*/
 
 /**
  * 检测指定键值的按键是否按了两次
@@ -170,12 +154,6 @@ LCUI_API void LCUIKeyBoard_HitKey( int key_code );
 /** 标记指定键值的按键已释放 */
 LCUI_API void LCUIKeyBoard_ReleaseKey( int key_code );
 
-/** 添加键盘的按键按下事件 */
-LCUI_API void LCUI_PostKeyDownEvent( int key_code );
-
-/** 添加键盘的按键释放事件 */
-LCUI_API void LCUI_PostKeyUpEvent( int key_code );
-
 /** 检测键盘是否有按键按下（类似于kbhit函数） */
 LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( void );
 
@@ -186,23 +164,7 @@ LCUI_API int LCUIKeyboard_GetKey( void );
 LCUI_API void LCUI_InitKeyboard( void );
 
 /** 停用键盘输入模块 */
-LCUI_API void LCUIModule_Keyboard_End( void );
-/*------------------------------ Keyboard End ------------------------------*/
-
-
-/*------------------------------ TouchScreen -------------------------------*/ 
-/** 启用触屏输入处理 */
-LCUI_API LCUI_BOOL EnableTouchScreenInput(void);
-
-/** 禁用触屏输入处理 */
-LCUI_API LCUI_BOOL DisableTouchScreenInput(void);
-
-/** 获取触屏的私有数据 */
-LCUI_API void* Get_TouchScreen(void);
-
-/** 初始化触屏输入模块 */
-LCUI_API void LCUI_InitTouchScreen( void );
-/*---------------------------- TouchScreen End -----------------------------*/ 
+LCUI_API void LCUI_ExitKeyboard( void );
 
 LCUI_END_HEADER
 

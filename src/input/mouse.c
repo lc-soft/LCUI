@@ -40,7 +40,6 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
-#include <LCUI/cursor.h>
 #include <LCUI/display.h>
 
 #ifdef LCUI_MOUSE_DRIVER_LINUX
@@ -69,61 +68,19 @@ static struct LCUIMouseDeviceContext {
 	{LCUIKEYSTATE_RELEASE, LCUIKEYSTATE_RELEASE}
 };
 
-/** 投递鼠标按键按下事件 */
-int LCUI_PostMouseDownEvent( int key_code )
+static void OnMouseButtonEvent( LCUI_SystemEvent *e, void *arg )
 {
-	LCUI_Pos pos;
-	LCUI_SystemEvent event;
-
-	if( mouse.button_state[key_code] == LCUIKEYSTATE_PRESSED ) {
-		return -1;
-	}
-	mouse.button_state[key_code] = LCUIKEYSTATE_PRESSED;
-	LCUICursor_GetPos( &pos );
-	event.type = LCUI_MOUSEDOWN;
-	event.type_name = NULL;
-	event.x = pos.x;
-	event.y = pos.y;
-	event.which = key_code;
-	LCUI_PostEvent( &event );
-	return 0;
-}
-
-/** 投递鼠标按键释放事件 */
-int LCUI_PostMouseUpEvent( int key_code )
-{
-	LCUI_Pos pos;
-	LCUI_SystemEvent event;
-
-	if( mouse.button_state[key_code] == LCUIKEYSTATE_RELEASE ) {
-		return -1;
-	}
-	mouse.button_state[key_code] = LCUIKEYSTATE_RELEASE;
-	LCUICursor_GetPos( &pos );
-	event.type = LCUI_MOUSEUP;
-	event.type_name = NULL;
-	event.x = pos.x;
-	event.y = pos.y;
-	event.which = key_code;
-	LCUI_PostEvent( &event );
-	return 0;
-}
-
-/** 投递鼠标移动事件 */
-void LCUI_PostMouseMoveEvent( LCUI_Pos new_pos )
-{
-	LCUI_SystemEvent event;
-	static LCUI_Pos old_pos = {0,0};
-
-	if( new_pos.x == old_pos.x && new_pos.y == old_pos.y ) {
+	if( e->key_code < 1 || e->key_code > 2 ) {
 		return;
 	}
-	event.type = LCUI_MOUSEMOVE;
-	event.type_name = NULL;
-	event.x = new_pos.x;
-	event.y = new_pos.y;
-	LCUI_PostEvent( &event );
-	old_pos = new_pos;
+	switch( e->type ) {
+	case LCUI_MOUSEDOWN:
+		mouse.button_state[e->key_code] = LCUIKEYSTATE_PRESSED;
+		break;
+	case LCUI_MOUSEUP:
+		mouse.button_state[e->key_code] = LCUIKEYSTATE_RELEASE;
+	default:break;
+	}
 }
 
 #ifdef LCUI_MOUSE_DRIVER_LINUX
@@ -199,32 +156,27 @@ static LCUI_BOOL MouseProc( void )
 
 static LCUI_BOOL MouseProc( void )
 {
-#ifdef USE_THIS_CODE
-	LCUI_Pos pos;
 	POINT new_pos;
+	LCUI_SystemEvent e;
+	static LCUI_Pos old_pos = {0, 0};
 
-	/* 获取鼠标坐标 */
-	GetCursorPos( &new_pos );
-	/* 转换成相对于窗口客户区的坐标 */
-	ScreenToClient( Win32_GetSelfHWND(), &new_pos );
-	if (new_pos.x > LCUIDisplay_GetWidth() ) {
-		new_pos.x = LCUIDisplay_GetWidth();
-	}
-	if( new_pos.y > LCUIDisplay_GetHeight() ) {
-		new_pos.y = LCUIDisplay_GetHeight();
-	}
-	new_pos.x = new_pos.x<0 ? 0:new_pos.x;
-	new_pos.y = new_pos.y<0 ? 0:new_pos.y;
-	LCUICursor_GetPos( &pos );
-	if( pos.x == new_pos.x && pos.y == new_pos.y ) {
+	/* 如果不是无缝模式 */
+	if( LCUIDisplay_GetMode() != LDM_SEAMLESS ) {
 		return FALSE;
 	}
-	pos.x = new_pos.x;
-	pos.y = new_pos.y;
-	/* 更新鼠标游标的位置 */
-	LCUICursor_SetPos( pos );
-	LCUI_PostMouseMoveEvent( pos );
-#endif
+	/* 获取鼠标坐标 */
+	GetCursorPos( &new_pos );
+	e.type = LCUI_MOUSEMOVE;
+	e.type_name = NULL;
+	e.rel_x = new_pos.x - old_pos.x;
+	e.rel_y = new_pos.y - old_pos.y;
+	DEBUG_MSG("x: %d, y: %d, rel_x: %d, rel_y: %d\n", new_pos.x, new_pos.y, e.rel_x, e.rel_y);
+	if( e.rel_x == 0 && e.rel_y == 0 ) {
+		return FALSE;
+	}
+	LCUI_PostEvent( &e );
+	old_pos.x = new_pos.x;
+	old_pos.y = new_pos.y;
 	return TRUE;
 }
 
@@ -281,6 +233,11 @@ int LCUI_InitMouse( void )
 	/* 启用鼠标输入处理 */
 	nobuff_printf("enable mouse input: ");
 #endif
+	LCUI_RegisterEventWithId( "mousedown", LCUI_MOUSEDOWN );
+	LCUI_RegisterEventWithId( "mouseup", LCUI_MOUSEUP );
+	LCUI_RegisterEventWithId( "mousemove", LCUI_MOUSEMOVE );
+	LCUI_BindEvent( "mousedown", OnMouseButtonEvent, NULL, NULL );
+	LCUI_BindEvent( "mouseup", OnMouseButtonEvent, NULL, NULL );
 	/* 注册鼠标设备 */
 	return LCUIDevice_Add( MouseInit, MouseProc, MouseExit );
 }
