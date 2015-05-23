@@ -51,6 +51,7 @@ typedef struct {
 } LCUI_Task;
 
 enum LCUI_SystemEventType {
+	LCUI_NONE,
 	LCUI_KEYDOWN,		/**< 键盘触发的按键按下事件 */
 	LCUI_KEYPRESS,		/**< 按键输入事件，仅字母、数字等ANSI字符键可触发 */
 	LCUI_KEYUP,		/**< 键盘触发的按键释放事件 */
@@ -66,9 +67,8 @@ enum LCUI_SystemEventType {
 typedef struct {
 	int type;			/**< 事件类型标识号 */
 	const char *type_name;		/**< 事件类型名称 */
-	int which;			/**< 指示按了哪个键或按钮 */
-	int x, y;			/**< 当前鼠标坐标 */
-	int offset_x, offset_y;		/**< 鼠标的坐标偏移量 */
+	int key_code;			/**< 按键的键值 */
+	int rel_x, rel_y;		/**< 鼠标的坐标与上次坐标的差值 */
 	void *data;			/**< 附加数据 */
 	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 } LCUI_SystemEvent;
