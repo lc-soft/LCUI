@@ -43,6 +43,7 @@
 LCUI_BEGIN_HEADER
 
 enum WidgetEventType {
+	WET_NONE,
 	WET_ADD,
 	WET_REMOVE,
 	WET_DESTROY,
@@ -50,7 +51,8 @@ enum WidgetEventType {
 	WET_RESIZE,
 	WET_SHOW,
 	WET_HIDE,
-
+	WET_FOCUS,
+	WET_BLUR,
 	WET_KEYDOWN,
 	WET_KEYUP,
 	WET_KEYPRESS,

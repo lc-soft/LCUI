@@ -812,4 +812,5 @@ void LCUI_InitWidget(void)
 	$(Init)(LCUIRootWidget);
 	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
 	LCUIWidget_Task_Init();
+	LCUIWidget_Event_Init();
 }

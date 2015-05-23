@@ -39,6 +39,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/widget_build.h>
+#include <LCUI/cursor.h>
 #include <LCUI/thread.h>
 
 #define NEW_ONE(type) (type*)malloc(sizeof(type))
@@ -254,63 +255,34 @@ int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 	return LCUIEventBox_Send( widget->event, e->type_name, &pack );
 }
 
-/** 响应系统的鼠标移动事件，向目标部件投递 mousemove 部件事件 */
-static void OnMouseMove( LCUI_SystemEvent *e, void *arg )
+/** 响应系统的鼠标移动事件，向目标部件投递相关鼠标事件 */
+static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 {
 	LCUI_Widget target;
 	LCUI_WidgetEvent ebuff;
+	LCUI_Pos pos;
 
-	target = Widget_At( NULL, e->x, e->y );
+	LCUICursor_GetPos( &pos );
+	target = Widget_At( NULL, pos.x, pos.y );
 	if( !target ) {
 		return;
 	}
-	ebuff.type = LCUI_MOUSEMOVE;
-	ebuff.type_name = "mousemove";
-	ebuff.x = e->x;
-	ebuff.y = e->y;
+	ebuff.x = pos.x;
+	ebuff.y = pos.y;
 	ebuff.target = target;
 	ebuff.which = 0;
 	ebuff.cancel_bubble = FALSE;
-	Widget_PostEvent( target, &ebuff, NULL );
-}
-
-/** 响应鼠标按键的按下 */
-static void OnMouseDown( LCUI_SystemEvent *e, void *arg )
-{
-	LCUI_Widget target;
-	LCUI_WidgetEvent ebuff;
-
-	target = Widget_At( NULL, e->x, e->y );
-	if( !target ) {
-		return;
+	switch( e->type ) {
+	case LCUI_MOUSEDOWN:
+		ebuff.type = WET_MOUSEDOWN;
+		ebuff.type_name = "mousedown";
+	case LCUI_MOUSEUP:
+		ebuff.type = WET_MOUSEUP;
+		ebuff.type_name = "mouseup";
+	case LCUI_MOUSEMOVE:
+		ebuff.type = WET_MOUSEMOVE;
+		ebuff.type_name = "mousemove";
 	}
-	ebuff.type = LCUI_MOUSEDOWN;
-	ebuff.type_name = "mousedown";
-	ebuff.x = e->x;
-	ebuff.y = e->y;
-	ebuff.target = target;
-	ebuff.which = e->which;
-	ebuff.cancel_bubble = FALSE;
-	Widget_PostEvent( target, &ebuff, NULL );
-}
-
-/** 响应鼠标按键的释放 */
-static void OnMouseUp( LCUI_SystemEvent *e, void *arg )
-{
-	LCUI_Widget target;
-	LCUI_WidgetEvent ebuff;
-
-	target = Widget_At( NULL, e->x, e->y );
-	if( !target ) {
-		return;
-	}
-	ebuff.type = LCUI_MOUSEUP;
-	ebuff.type_name = "mouseup";
-	ebuff.x = e->x;
-	ebuff.y = e->y;
-	ebuff.target = target;
-	ebuff.which = e->which;
-	ebuff.cancel_bubble = FALSE;
 	Widget_PostEvent( target, &ebuff, NULL );
 }
 
@@ -364,11 +336,9 @@ void LCUIWidget_Event_Init(void)
 	RBTree_SetDataNeedFree( &widget_mark_tree, FALSE );
 	LinkedList_Init( &widget_list, sizeof(LCUI_Widget) );
 	LinkedList_SetDataNeedFree( &widget_list, FALSE );
-
-	LCUI_BindEvent( "mouseup", OnMouseUp, NULL, NULL );
-	LCUI_BindEvent( "mousedown", OnMouseDown, NULL, NULL );
-	LCUI_BindEvent( "mousemove", OnMouseMove, NULL, NULL );
-	LCUI_BindEvent( "mouseup", OnMouseUp, NULL, NULL );
+	LCUI_BindEvent( "mousedown", OnMouseEvent, NULL, NULL );
+	LCUI_BindEvent( "mousemove", OnMouseEvent, NULL, NULL );
+	LCUI_BindEvent( "mouseup", OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( "keyup", OnKeyUp, NULL, NULL );
 	LCUI_BindEvent( "keydown", OnKeyDown, NULL, NULL );
 	LCUI_BindEvent( "keypress", OnKeyPress, NULL, NULL );

@@ -49,16 +49,6 @@ typedef struct LCUI_WidgetBase* LCUI_Widget;
 
 #endif
 
-#ifdef $
-#undef $
-#endif
-
-/**
- * $ 可以看成是 self，部件操作函数的第一个参数类型都是LCUI_Widget，想用
- * 一个字符的来代替，以减少源代码的字符量，再加上又想试试 $，于是就用它了
- */
-#define $ LCUI_Widget
-
 /** 边框风格 */
 enum LCUI_WidgetBorderStyle {
 	BORDER_NONE,	/**< 无边框 */
@@ -135,9 +125,7 @@ typedef struct LCUI_WidgetBase {
 	LCUI_WidgetStyle style;		/**< 样式缓存 */
 } LCUI_WidgetBase;
 
-#undef $
-
-/** 上面用完 $，接着用 $ 定义个宏，为函数加前缀名 */
+/** 为函数加前缀名 */
 #define $(FUNC_NAME) Widget_##FUNC_NAME
 
 /** 一般来说部件占用的矩形区域看上去是指边框盒区域 */
