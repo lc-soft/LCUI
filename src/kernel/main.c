@@ -45,8 +45,8 @@
 #include <LCUI/cursor.h>
 #include <LCUI/display.h>
 #include <LCUI/font.h>
-#include <LCUI/widget.h>
 #include <LCUI/input.h>
+#include <LCUI/widget.h>
 #include <LCUI/surface.h>
 
 #include <time.h>
@@ -208,7 +208,7 @@ int LCUI_PostEvent( LCUI_SystemEvent *event )
 			System.event.box, event->type 
 		);
 		if( !event_name ) {
-			_DEBUG_MSG("event handler dose not exist.\n");
+			DEBUG_MSG("event handler dose not exist.\n");
 			return -1;
 		}
 	}
@@ -521,13 +521,18 @@ int LCUI_Init(void)
 	LCUI_InitDevice();
 	LCUI_InitKeyboard();
 	LCUI_InitMouse();
-	LCUI_InitTouchScreen();
+	//LCUI_InitTouchScreen();
 	LCUI_InitCursor();
 	LCUI_InitWidget();
 	LCUI_InitDisplay();
-	/* 让鼠标游标居中显示 */
-	//LCUICursor_SetPos( LCUIScreen_GetCenter() );  
-	//LCUICursor_Show();
+	{
+		LCUI_Pos pos;
+		pos.x = LCUIDisplay_GetWidth()/2;
+		pos.y = LCUIDisplay_GetHeight()/2;
+		/* 让鼠标游标居中显示 */
+		LCUICursor_SetPos( pos );
+		LCUICursor_Show();
+	}
 	return 0;
 }
 
@@ -540,15 +545,15 @@ static int LCUI_Destroy( void )
 	}
 	//LCUIModule_IME_End();
 	LCUIModule_Event_Exit();
-	LCUIModule_Cursor_End();
+	LCUI_ExitCursor();
 	//LCUIModule_Widget_End();
 	LCUIModule_Font_End();
 	LCUIModule_Timer_Exit();
-	//LCUIModule_Keyboard_End();
+	//LCUI_ExitKeyboard();
 	//LCUIModule_Mouse_End();
 	//LCUIModule_TouchScreen_End();
 	LCUIModule_Device_End();
-	LCUIModule_Video_End();
+	LCUI_ExitDisplay();
 	LCUIApp_Destroy();
 	return System.exit_code;
 }

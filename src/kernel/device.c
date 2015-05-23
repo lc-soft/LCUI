@@ -108,10 +108,10 @@ static void DeviceThread( void *arg )
 		}
 		LCUIMutex_Unlock( &list_mutex );
 		if( timeout_count > 20 ) {
-			LCUI_MSleep( 10 );
+			LCUI_MSleep( 50 );
 			timeout_count = 0;
 		}
-		LCUI_MSleep( 5 );
+		LCUI_MSleep( 10 );
 	}
 	LCUIThread_Exit(NULL);
 }
