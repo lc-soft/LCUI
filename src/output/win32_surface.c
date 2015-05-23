@@ -45,6 +45,7 @@
 #include <LCUI/thread.h>
 #include <LCUI/widget_build.h>
 #include <LCUI/surface.h>
+#include <LCUI/cursor.h>
 #include "resource.h"
 
 #define WIN32_WINDOW_STYLE	(WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
@@ -78,6 +79,7 @@ struct LCUI_SurfaceRec_ {
 	int w, h;
 	HDC fb_hdc;
 	HBITMAP fb_bmp;
+	LCUI_BOOL is_ready;
 	LCUI_Graph fb;
 	LCUI_SurfaceTask task_buffer[TASK_TOTAL_NUM];
 };
@@ -128,11 +130,6 @@ static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 	return NULL;
 }
 
-static LCUI_Surface GetSurfaceByWidget( LCUI_Widget widget )
-{
-	return NULL;
-}
-
 static void Win32Surface_OnDestroy( void *args )
 {
 	LCUI_Surface surface = (LCUI_Surface)args;
@@ -179,21 +176,62 @@ static void Win32Surface_Delete( LCUI_Surface surface )
 static LRESULT CALLBACK
 WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 {
-	PAINTSTRUCT ps;
-	LCUI_Rect area;
+	LCUI_SystemEvent e;
 	LCUI_Surface surface;
 
+	e.type = LCUI_NONE;
+	e.rel_x = e.rel_y = e.key_code = 0;
+	e.type_name = NULL;
+
 	surface = GetSurfaceByHWND(hwnd);
-	DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
+	_DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
 	switch( msg ) {
-	case WM_SETFOCUS:
+	case WM_KEYDOWN:
+		e.type = WET_KEYDOWN;
+		e.key_code = arg1;
 		break;
-	case WM_KILLFOCUS:
+	case WM_KEYUP:
+		e.type = WET_KEYUP;
+		e.key_code = arg1;
 		break;
-	case WM_PAINT:
+	case WM_MOUSEMOVE: {
+		POINT new_pos;
+		LCUI_Pos old_pos;
+
+		GetCursorPos( &new_pos );
+		ScreenToClient( hwnd, &new_pos );
+		LCUICursor_GetPos( &old_pos );
+		e.rel_x = new_pos.x - old_pos.x;
+		e.rel_y = new_pos.y - old_pos.y;
+		if( e.rel_x == 0 && e.rel_y == 0 ) {
+			break;
+		}
+		e.type = WET_MOUSEMOVE;
+		break;
+	}
+	case WM_LBUTTONDOWN:
+		e.type = WET_MOUSEDOWN;
+		e.key_code = 1;
+		break;
+	case WM_LBUTTONUP:
+		e.type = WET_MOUSEUP;
+		e.key_code = 1;
+		break;
+	case WM_RBUTTONDOWN:
+		e.type = WET_MOUSEDOWN;
+		e.key_code = 2;
+		break;
+	case WM_RBUTTONUP:
+		e.type = WET_MOUSEUP;
+		e.key_code = 2;
+		break;
+	case WM_PAINT: {
+		PAINTSTRUCT ps;
+		LCUI_Rect area;
+
 		BeginPaint( hwnd, &ps );
 		/* 获取区域坐标及尺寸 */
 		area.x = ps.rcPaint.left;
@@ -205,6 +243,7 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 		}
 		EndPaint( hwnd, &ps );
 		return 0;
+	}
 	case WM_CLOSE:
 		break;
 	case WM_DESTROY:
@@ -221,6 +260,9 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 		break;
 	default:break;
 	}
+	if( e.type != LCUI_NONE && win32.methods.onEvent ) {
+		win32.methods.onEvent( surface, &e );
+	}
 	return DefWindowProc( hwnd, msg, arg1, arg2 );
 }
 
@@ -231,11 +273,12 @@ static LCUI_Surface Win32Surface_New(void)
 	LCUI_Surface surface;
 	surface = (LCUI_Surface)LinkedList_Alloc( &win32.surfaces );
 	surface->mode = RENDER_MODE_BIT_BLT;
+	surface->hwnd = NULL;
 	surface->fb_hdc = NULL;
 	surface->fb_bmp = NULL;
+	surface->is_ready = FALSE;
 	Graph_Init( &surface->fb );
 	surface->fb.color_type = COLOR_TYPE_ARGB;
-	surface->hwnd = NULL;
 	for( i=0; i<TASK_TOTAL_NUM; ++i ) {
 		surface->task_buffer[i].is_valid = FALSE;
 	}
@@ -246,6 +289,11 @@ static LCUI_Surface Win32Surface_New(void)
 	/* 让 Surface 线程去完成 windows 窗口的创建 */
 	PostThreadMessage( win32.loop_thread, MSG_SURFACE_CREATE, 0, (LPARAM)surface );
 	return surface;
+}
+
+static LCUI_BOOL Win32Surface_IsReady( LCUI_Surface surface )
+{
+	return surface->is_ready;
 }
 
 static void Win32Surface_ExecMove( LCUI_Surface surface, int x, int y )
@@ -284,7 +332,7 @@ static void Win32Surface_ExecResize( LCUI_Surface surface, int w, int h )
 	w += GetSystemMetrics( SM_CXFIXEDFRAME ) * 2;
 	h += GetSystemMetrics( SM_CYFIXEDFRAME ) * 2;
 	h += GetSystemMetrics( SM_CYCAPTION );
-	SetWindowLong( surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE );
+	//SetWindowLong( surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE );
 	SetWindowPos( surface->hwnd, HWND_NOTOPMOST,
 		      0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER );
 }
@@ -331,61 +379,6 @@ void Win32Surface_SetOpacity( LCUI_Surface surface, float opacity )
 
 }
 
-static void
-OnWidgetShow( LCUI_Widget widget, LCUI_WidgetEvent *unused )
-{
-	LCUI_Surface surface;
-	surface = GetSurfaceByWidget( widget );
-	if( !surface ) {
-		return;
-	}
-	Surface_Show( surface );
-}
-
-static void
-OnWidgetHide( LCUI_Widget widget, LCUI_WidgetEvent *unused )
-{
-	LCUI_Surface surface;
-	surface = GetSurfaceByWidget( widget );
-	if( !surface ) {
-		return;
-	}
-	Surface_Hide( surface );
-}
-
-static void
-OnWidgetDestroy( LCUI_Widget widget, LCUI_WidgetEvent *unused )
-{
-	LCUI_Surface surface;
-	surface = GetSurfaceByWidget( widget );
-	if( !surface ) {
-		return;
-	}
-	Surface_Delete( surface );
-}
-
-static void
-OnWidgetResize( LCUI_Widget widget, LCUI_WidgetEvent *e )
-{
-	LCUI_Surface surface;
-	surface = GetSurfaceByWidget( widget );
-	if( !surface ) {
-		return;
-	}
-	//...
-}
-
-static void
-OnWidgetOpacityChange( LCUI_Widget widget, LCUI_WidgetEvent *e )
-{
-	LCUI_Surface surface;
-	surface = GetSurfaceByWidget( widget );
-	if( !surface ) {
-		return;
-	}
-	Win32Surface_SetOpacity( surface, 1.0 );
-}
-
 /** 设置 Surface 的渲染模式 */
 static void Win32Surface_SetRenderMode( LCUI_Surface surface, int mode )
 {
@@ -423,7 +416,8 @@ static void Win32Surface_Present( LCUI_Surface surface )
 {
 	HDC hdc_client;
 	RECT client_rect;
-	DEBUG_MSG("tip\n");
+
+	_DEBUG_MSG("surface: %p, hwnd: %p\n", surface, surface->hwnd);
 	hdc_client = GetDC( surface->hwnd );
 	SetBitmapBits( surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes );
 	switch(surface->mode) {
@@ -447,6 +441,7 @@ static void Win32Surface_Present( LCUI_Surface surface )
 static void Win32Surface_Update( LCUI_Surface surface )
 {
 	LCUI_SurfaceTask *t;
+
 	if( !surface->hwnd ) {
 		return;
 	}
@@ -509,7 +504,8 @@ static void LCUISurface_Loop( void *args )
 			);
 			hdc_client = GetDC( surface->hwnd );
 			surface->fb_hdc = CreateCompatibleDC( hdc_client );
-			DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
+			surface->is_ready = TRUE;
+			_DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 			continue;
 		}
 		TranslateMessage( &msg );
@@ -547,6 +543,7 @@ LCUI_SurfaceMethods *LCUISurface_InitWin32(void)
 	strncpy( win32.methods.name, "win32", 32 );
 	win32.methods.new = Win32Surface_New;
 	win32.methods.delete = Win32Surface_Delete;
+	win32.methods.isReady = Win32Surface_IsReady;
 	win32.methods.show = Win32Surface_Show;
 	win32.methods.hide = Win32Surface_Hide;
 	win32.methods.move = Win32Surface_Move;
@@ -559,6 +556,7 @@ LCUI_SurfaceMethods *LCUISurface_InitWin32(void)
 	win32.methods.beginPaint = Win32Surface_BeginPaint;
 	win32.methods.endPaint = Win32Surface_EndPaint;
 	win32.methods.onInvalidRect = NULL;
+	win32.methods.onEvent = NULL;
 	LCUICond_Init( &win32.cond );
 	LinkedList_Init( &win32.surfaces, sizeof( struct LCUI_SurfaceRec_ ) );
 	LinkedList_SetDataMemReuse( &win32.surfaces, TRUE );

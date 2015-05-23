@@ -44,11 +44,12 @@ LCUI_BEGIN_HEADER
 
 /** 图形显示模式 */
 enum LCUIDisplayMode {
-	LDM_DEFAULT,
 	LDM_WINDOWED,		/**< 窗口化 */
 	LDM_SEAMLESS,		/**< 与系统GUI无缝结合 */
 	LDM_FULLSCREEN		/**< 全屏模式 */
 };
+
+#define LDM_DEFAULT LDM_SEAMLESS
 
 /** 一秒内的最大画面帧数 */
 #define MAX_FRAMES_PER_SEC	100
@@ -83,7 +84,7 @@ LCUI_API int LCUIDisplay_GetFPS(void);
 int LCUI_InitDisplay( void );
 
 /** 停用图形输出模块 */
-int LCUIModule_Video_End( void );
+int LCUI_ExitDisplay( void );
 
 LCUI_END_HEADER
 

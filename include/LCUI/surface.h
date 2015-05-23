@@ -60,12 +60,14 @@ typedef struct LCUI_SurfaceMethods {
 	void			(*hide)(LCUI_Surface);
 	void			(*update)(LCUI_Surface);
 	void			(*present)(LCUI_Surface);
-	LCUI_PaintContext	(*beginPaint)(LCUI_Surface, LCUI_Rect*);
+	LCUI_BOOL		(*isReady)(LCUI_Surface);
+	LCUI_PaintContext	(*beginPaint)(LCUI_Surface,LCUI_Rect*);
 	void			(*endPaint)(LCUI_Surface,LCUI_PaintContext);
-	void			(*setCaptionW)(LCUI_Surface, const wchar_t*);
-	void			(*setRenderMode)(LCUI_Surface, int);
-	void			(*setOpacity)(LCUI_Surface, float);
+	void			(*setCaptionW)(LCUI_Surface,const wchar_t*);
+	void			(*setRenderMode)(LCUI_Surface,int);
+	void			(*setOpacity)(LCUI_Surface,float);
 	void			(*onInvalidRect)(LCUI_Surface,LCUI_Rect*);
+	void			(*onEvent)(LCUI_Surface,LCUI_SystemEvent*);
 } LCUI_SurfaceMethods;
 
 #ifdef LCUI_BUILD_IN_WIN32
@@ -78,6 +80,8 @@ LCUI_API void Surface_Delete( LCUI_Surface surface );
 
 /** 新建一个 Surface */
 LCUI_API LCUI_Surface Surface_New(void);
+
+LCUI_API LCUI_BOOL Surface_IsReady( LCUI_Surface surface );
 
 LCUI_API void Surface_Move( LCUI_Surface surface, int x, int y );
 
