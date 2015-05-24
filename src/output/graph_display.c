@@ -415,12 +415,10 @@ static void OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
 		return;
 	}
 	_DEBUG_MSG("surface: %p, event: %d, rel_x: %d, rel_y: %d\n", surface, e->type, e->rel_x, e->rel_y);
-#ifdef LCUI_BUILD_IN_WIN32
 	if( e->type == LCUI_MOUSEMOVE ) {
 		LCUIMouse_SetPos( e->rel_x, e->rel_y );
 		return;
 	}
-#endif
 	LCUI_PostEvent( e );
 }
 

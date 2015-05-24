@@ -139,11 +139,7 @@ LCUI_BEGIN_HEADER
 /** 初始化鼠标输入模块 */
 LCUI_API int LCUI_InitMouse( void );
 
-#ifdef LCUI_BUILD_IN_WIN32
-
 void LCUIMouse_SetPos( int x, int y );
-
-#endif
 
 /**
  * 检测指定键值的按键是否按了两次

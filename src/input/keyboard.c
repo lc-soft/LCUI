@@ -294,7 +294,7 @@ int LCUI_InitKeyboard( void )
 	int ret;
 	LCUIMutex_Init( &record_mutex );
 	LinkedList_Init( &key_state_record, sizeof(KeyState) );
-	nobuff_printf("initialize keyboard support... ");
+	nobuff_printf("[keyboard] set event ... ");
 	ret = LCUI_AddEvent( "keydown", LCUI_KEYDOWN );
 	ret |= LCUI_AddEvent( "keyup", LCUI_KEYUP );
 	ret |= LCUI_BindEvent( "keydown", OnKeyboardEvent, NULL, NULL );

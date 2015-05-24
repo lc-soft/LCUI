@@ -244,7 +244,7 @@ int LCUI_InitMouse( void )
 	mouse.fd = -1;
 	mouse.state = STATE_REMOVE;	/* 鼠标为移除状态 */
 #endif
-	nobuff_printf("initialize mouse support... ");
+	nobuff_printf("[mouse] set event ... ");
 	ret = LCUI_AddEvent( "mousedown", LCUI_MOUSEDOWN );
 	ret |= LCUI_AddEvent( "mouseup", LCUI_MOUSEUP );
 	ret |= LCUI_AddEvent( "mousemove", LCUI_MOUSEMOVE );
