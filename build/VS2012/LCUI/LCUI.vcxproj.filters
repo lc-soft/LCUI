@@ -81,9 +81,6 @@
     <ClInclude Include="..\..\..\include\LCUI\LCUI.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\font\bitmapfont.h">
-      <Filter>头文件\LCUI\font</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\font\charset.h">
       <Filter>头文件\LCUI\font</Filter>
     </ClInclude>
@@ -302,9 +299,6 @@
     <ClCompile Include="..\..\..\src\thread\win32\thread.c">
       <Filter>源文件\thread\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\font\bitmapfont.c">
-      <Filter>源文件\font</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\font\charset.c">
       <Filter>源文件\font</Filter>
     </ClCompile>
@@ -391,6 +385,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\draw\background.c">
       <Filter>源文件\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\misc\mem_debug.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\font\freetype.c">
+      <Filter>源文件\font</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

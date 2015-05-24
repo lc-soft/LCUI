@@ -73,6 +73,7 @@
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <OpenMPSupport>true</OpenMPSupport>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -85,6 +86,9 @@
     <ResourceCompile>
       <Culture>0x0804</Culture>
     </ResourceCompile>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -133,7 +137,6 @@
     <ClInclude Include="..\..\..\include\LCUI\draw\border.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h" />
     <ClInclude Include="..\..\..\include\LCUI\draw\line.h" />
-    <ClInclude Include="..\..\..\include\LCUI\font\bitmapfont.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\charset.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\fontlibrary.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\textlayer.h" />
@@ -197,9 +200,9 @@
     <ClCompile Include="..\..\..\src\draw\line.c" />
     <ClCompile Include="..\..\..\src\draw\rotate.c" />
     <ClCompile Include="..\..\..\src\draw\smooth.c" />
-    <ClCompile Include="..\..\..\src\font\bitmapfont.c" />
     <ClCompile Include="..\..\..\src\font\charset.c" />
     <ClCompile Include="..\..\..\src\font\fontlibrary.c" />
+    <ClCompile Include="..\..\..\src\font\freetype.c" />
     <ClCompile Include="..\..\..\src\font\in-core\font_8x8.c" />
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
@@ -221,6 +224,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
     <ClCompile Include="..\..\..\src\ime.c" />
+    <ClCompile Include="..\..\..\src\misc\mem_debug.c" />
     <ClCompile Include="..\..\..\src\style_parser.c" />
     <ClCompile Include="..\..\..\src\misc\catch_screen.c" />
     <ClCompile Include="..\..\..\src\misc\delay.c" />
