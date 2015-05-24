@@ -126,7 +126,7 @@ int LCUI_InitDevice(void)
 }
 
 /** 停用设备处理模块 */
-void LCUIModule_Device_End(void)
+void LCUI_ExitDevice(void)
 {
 	int n, i;
 	DeviceData *data_ptr;
