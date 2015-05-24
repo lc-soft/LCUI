@@ -38,13 +38,17 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
-
+//#define DEBUG
 #define __IN_EVENT_SOURCE_FILE__
 
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+
+#include <LCUI_Build.h>
+#include <LCUI/misc/linkedlist.h>
+#include <LCUI/misc/rbtree.h>
+#include <LCUI/kernel/event.h>
 
 #define NEW_ONE(type) (type*)malloc(sizeof(type))
 
@@ -68,7 +72,6 @@ typedef struct EventSlotRec_ {
 
 /** 事件处理器相关数据 */
 struct LCUI_EventBoxRec_ {
-	LCUI_RBTree used_evnet_id;	/**< 已被使用的事件标识号 */
 	LCUI_RBTree event_slot;		/**< 事件槽记录 */
 	LCUI_RBTree event_name;		/**< 事件名称记录 */
 	LCUI_RBTree event_handler;	/**< 事件处理器记录 */
@@ -119,13 +122,11 @@ LCUI_EventBox $(Create)(void)
 	RBTree_Init( &box->event_slot );
 	RBTree_Init( &box->event_name );
 	RBTree_Init( &box->event_handler );
-	RBTree_Init( &box->used_evnet_id );
 	RBTree_OnJudge( &box->event_name, CompareEventName );
 	RBTree_OnDestroy( &box->event_handler, DestroyEventHandler );
 	RBTree_OnDestroy( &box->event_slot, DestroyEventSlot );
 	RBTree_SetDataNeedFree( &box->event_handler, 0 );
 	RBTree_SetDataNeedFree( &box->event_name, 0 );
-	RBTree_SetDataNeedFree( &box->used_evnet_id, 0 );
 	LinkedList_Init( &box->events[0], sizeof(LCUI_Event) );
 	LinkedList_Init( &box->events[1], sizeof(LCUI_Event) );
 	LinkedList_SetDataNeedFree( &box->events[0], 1 );
@@ -139,7 +140,6 @@ LCUI_EventBox $(Create)(void)
 /** 销毁事件容器实例 */
 void $(Destroy)( LCUI_EventBox box )
 {
-	RBTree_Destroy( &box->used_evnet_id );
 	RBTree_Destroy( &box->event_name );
 	RBTree_Destroy( &box->event_handler );
 	RBTree_Destroy( &box->event_slot );
@@ -147,7 +147,8 @@ void $(Destroy)( LCUI_EventBox box )
 	LinkedList_Destroy( &box->events[1] );
 }
 
-static int _RegisterEvent( LCUI_EventBox box, const char *event_name, int id )
+/** 注册事件，指定事件名称和ID */
+int $(AddEvent)( LCUI_EventBox box, const char *event_name, int id )
 {
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
@@ -156,7 +157,7 @@ static int _RegisterEvent( LCUI_EventBox box, const char *event_name, int id )
 	if( RBTree_CustomSearch( &box->event_name, event_name ) ) {
 		return -1;
 	}
-	if( RBTree_Search( &box->used_evnet_id, id ) ) {
+	if( RBTree_Search( &box->event_slot, id ) ) {
 		return -2;
 	}
 	/* 新建一个事件槽 */
@@ -174,29 +175,6 @@ static int _RegisterEvent( LCUI_EventBox box, const char *event_name, int id )
 	/* 结点的 key 就是事件槽的 id */
 	node->key = slot->id;
 	return 0;
-}
-
-/** 注册事件，指定事件名称和ID */
-int $(RegisterEventWithId)( LCUI_EventBox box, const char *event_name, int id )
-{
-	/** 如果该ID已经被使用 */
-	if( RBTree_Search( &box->used_evnet_id, id ) ) {
-		return -1;
-	}
-	RBTree_Insert( &box->used_evnet_id, id, NULL );
-	return _RegisterEvent( box, event_name, id );
-}
-
-/** 注册事件，只指定事件名称，事件ID由内部自动生成 */
-int $(RegisterEvent)( LCUI_EventBox box, const char *event_name )
-{
-	int ret, id;
-	id = ++box->event_id;
-	ret = _RegisterEvent( box, event_name, id );
-	if( ret == 0 ) {
-		return id;
-	}
-	return ret;
 }
 
 /** 检测事件名是否已经存在（已注册） */
@@ -222,7 +200,7 @@ const char *$(GetEventName)( LCUI_EventBox box, int id )
 {
 	LCUI_RBTreeNode *node = RBTree_Search( &box->event_slot, id );
 	if( node ) {
-		return (const char*)node->data;
+		return ((LCUI_EventSlot*)node->data)->name;
 	}
 	return NULL;
 }
@@ -263,21 +241,18 @@ int $(Bind)(	LCUI_EventBox box, const char *event_name, EventCallBack func,
 	LCUI_RBTreeNode *node;
 
 	/* 查找事件槽记录 */
-	node = RBTree_CustomSearch(
-		&box->event_name, (const void*)event_name
-	);
+	node = RBTree_CustomSearch( &box->event_name, 
+				    (const void*)event_name );
 	/** 没有就注册一个事件槽 */
 	if( !node ) {
-		id = $(RegisterEvent)( box, event_name );
-		if( id < 0 ) {
+		id = ++box->event_id;
+		if( $(AddEvent)( box, event_name, id ) != 0 ) {
 			return -1;
 		}
 	} else {
 		id = node->key;
 	}
-	return $(BindById)(
-		box, id, func, func_data, destroy_data
-	);
+	return $(BindById)( box, id, func, func_data, destroy_data );
 }
 
 /** 解除事件连接 */
@@ -334,11 +309,12 @@ int $(Send)( LCUI_EventBox box, const char *name, void *data )
 	event.data = data;
 	event.destroy_data = NULL;
 	n = LinkedList_GetTotal( &slot->handlers );
-	LinkedList_Goto( &slot->handlers, 0 );
 	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( &slot->handlers, i );
 		handler = (LCUI_EventHandler*)LinkedList_Get( &slot->handlers );
-		handler->func( &event, handler->func_data );
-		LinkedList_ToNext( &slot->handlers );
+		if( handler && handler->func ) {
+			handler->func( &event, handler->func_data );
+		}
 	}
 	return 0;
 }
@@ -347,7 +323,7 @@ int $(Send)( LCUI_EventBox box, const char *name, void *data )
 int $(Post)(	LCUI_EventBox box, const char *name, void *data,
 		 void (*destroy_data)(void*) )
 {
-	LCUI_Event event;
+	LCUI_Event *e;
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	LinkedList *elist = &box->events[box->current];
@@ -359,12 +335,12 @@ int $(Post)(	LCUI_EventBox box, const char *name, void *data,
 	if( !(node = RBTree_Search(&box->event_slot, node->key)) ) {
 		return -2;
 	}
+	e = (LCUI_Event*)LinkedList_Alloc( elist );
 	slot = (LCUI_EventSlot*)node->data;
-	event.id = slot->id;
-	event.name =slot->name;
-	event.data = data;
-	event.destroy_data = destroy_data;
-	LinkedList_AddDataCopy( elist, &event );
+	e->id = slot->id;
+	e->name = slot->name;
+	e->data = data;
+	e->destroy_data = destroy_data;
 	return 0;
 }
 
@@ -383,10 +359,12 @@ int $(Dispatch)( LCUI_EventBox box )
 	for( i=0; i<n; ++i ) {
 		e = (LCUI_Event*)LinkedList_Get( elist );
 		$(Send)( box, e->name, e->data );
-		e->destroy_data ? e->destroy_data( e->data ),e->data = NULL:0;
+		e->destroy_data ? e->destroy_data( e->data ):0;
+		e->data = NULL;
 		LinkedList_Goto( elist, 0 );
 		LinkedList_Delete( elist );
 	}
+	DEBUG_MSG("quit\n");
 	return 0;
 }
 
