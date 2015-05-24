@@ -517,7 +517,7 @@ void LCUI_InitTimer( void )
 }
 
 /* 停用定时器模块 */
-void LCUIModule_Timer_Exit( void )
+void LCUI_ExitTimer( void )
 {
 	self.is_running = FALSE;
 	LCUICond_Broadcast( &self.sleep_cond );

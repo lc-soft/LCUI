@@ -284,7 +284,7 @@ static void MapTaskHandler(void)
 }
 
 /** 初始化 LCUI 部件任务处理功能 */
-void LCUIWidget_Task_Init(void)
+void LCUIWidget_InitTask(void)
 {
 	MapTaskHandler();
 }
@@ -366,7 +366,7 @@ static void Widget_ProcTask( LCUI_Widget w )
 }
 
 /** 处理一次当前积累的部件任务 */
-void LCUIWidget_Task_Step(void)
+void LCUIWidget_StepTask(void)
 {
 	Widget_ProcTask( LCUIRootWidget );
 }

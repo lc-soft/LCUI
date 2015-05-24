@@ -87,7 +87,7 @@ LCUI_API void Win32_LCUI_Init( HINSTANCE hInstance );
 /*-------------------------- system event <START> ---------------------------*/
 
 /** 预先注册指定名称和ID的事件 */
-LCUI_API int LCUI_RegisterEventWithId( const char *event_name, int id );
+LCUI_API int LCUI_AddEvent( const char *event_name, int id );
 
 /** 绑定事件 */
 LCUI_API int LCUI_BindEvent( const char *event_name,

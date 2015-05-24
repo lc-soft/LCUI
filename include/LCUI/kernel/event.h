@@ -69,10 +69,7 @@ LCUI_EventBox $(Create)(void);
 LCUI_API void $(Destroy)( LCUI_EventBox box );
 
 /** 注册事件，指定事件名称和ID */
-LCUI_API int $(RegisterEventWithId)( LCUI_EventBox box, const char *event_name, int id );
-
-/** 注册事件，只指定事件名称，事件ID由内部自动生成 */
-LCUI_API int $(RegisterEvent)( LCUI_EventBox box, const char *event_name );
+LCUI_API int $(AddEvent)( LCUI_EventBox box, const char *event_name, int id );
 
 /** 检测事件名是否已经存在（已注册） */
 LCUI_API int $(IsExistEventName)( LCUI_EventBox box, const char *event_name );

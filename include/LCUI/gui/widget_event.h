@@ -87,7 +87,7 @@ typedef struct LCUI_WidgetEvent {
  * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WIDGET_USER 
  * 以后的值都可以使用，例如：WET_USER + 1，WET_USER + 200。
  */
-LCUI_API int Widget_RegisterEventWithId( LCUI_Widget widget, const char *event_name, int id );
+LCUI_API int Widget_AddEvent( LCUI_Widget widget, const char *event_name, int id );
 
 /**
  * 为部件绑定事件
@@ -126,13 +126,13 @@ LCUI_API int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *da
 LCUI_API int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data );
 
 /** 处理一次当前积累的部件事件 */
-void LCUIWidget_Event_Step(void);
+void LCUIWidget_StepEvent(void);
 
 /** 初始化 LCUI 部件的事件系统 */
-void LCUIWidget_Event_Init(void);
+void LCUIWidget_InitEvent(void);
 
 /** 销毁（释放） LCUI 部件的事件系统的相关资源 */
-void LCUIWidget_Event_Destroy(void);
+void LCUIWidget_ExitEvent(void);
 
 LCUI_END_HEADER
 

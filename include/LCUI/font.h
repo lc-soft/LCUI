@@ -52,7 +52,7 @@ LCUI_BEGIN_HEADER
 LCUI_API void LCUI_InitFont( void );
 
 /** 停用字体处理模块 */
-LCUI_API void LCUIModule_Font_End( void );
+LCUI_API void LCUI_ExitFont( void );
 
 LCUI_END_HEADER
 

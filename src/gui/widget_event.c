@@ -171,9 +171,9 @@ static void OnWidgetEvent( LCUI_Event *event, void *arg )
  * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WIDGET_USER 
  * 以后的值都可以使用，例如：WET_USER + 1，WET_USER + 200。
  */
-int Widget_RegisterEventWithId( LCUI_Widget widget, const char *event_name, int id )
+int Widget_AddEvent( LCUI_Widget widget, const char *event_name, int id )
 {
-	return LCUIEventBox_RegisterEventWithId( &widget->event, event_name, id );
+	return LCUIEventBox_AddEvent( &widget->event, event_name, id );
 }
 
 /**
@@ -263,7 +263,7 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 	LCUI_Pos pos;
 
 	LCUICursor_GetPos( &pos );
-	target = Widget_At( NULL, pos.x, pos.y );
+	target = Widget_At( LCUIRootWidget, pos.x, pos.y );
 	if( !target ) {
 		return;
 	}
@@ -276,12 +276,16 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 	case LCUI_MOUSEDOWN:
 		ebuff.type = WET_MOUSEDOWN;
 		ebuff.type_name = "mousedown";
+		break;
 	case LCUI_MOUSEUP:
 		ebuff.type = WET_MOUSEUP;
 		ebuff.type_name = "mouseup";
+		break;
 	case LCUI_MOUSEMOVE:
 		ebuff.type = WET_MOUSEMOVE;
 		ebuff.type_name = "mousemove";
+		break;
+	default:return;
 	}
 	Widget_PostEvent( target, &ebuff, NULL );
 }
@@ -311,7 +315,7 @@ static void OnInput( LCUI_SystemEvent *e, void *arg )
 }
 
 /** 处理一次当前积累的部件事件 */
-void LCUIWidget_Event_Step(void)
+void LCUIWidget_StepEvent(void)
 {
 	int i, n;
 	LCUI_Widget widget;
@@ -329,7 +333,7 @@ void LCUIWidget_Event_Step(void)
 }
 
 /** 初始化 LCUI 部件的事件系统 */
-void LCUIWidget_Event_Init(void)
+void LCUIWidget_InitEvent(void)
 {
 	RBTree_Init( &widget_mark_tree );
 	RBTree_OnJudge( &widget_mark_tree, CompareWidgetMark );
@@ -346,7 +350,7 @@ void LCUIWidget_Event_Init(void)
 }
 
 /** 销毁（释放） LCUI 部件的事件系统的相关资源 */
-void LCUIWidget_Event_Destroy(void)
+void LCUIWidget_ExitEvent(void)
 {
 	
 }

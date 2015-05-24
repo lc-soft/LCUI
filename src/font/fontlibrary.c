@@ -429,7 +429,7 @@ void LCUI_InitFont( void )
 }
 
 /** 停用字体处理模块 */
-void LCUIModule_Font_End( void )
+void LCUI_ExitFont( void )
 {
 	FontLIB_DestroyAll();
 }

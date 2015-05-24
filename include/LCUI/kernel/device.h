@@ -54,7 +54,7 @@ LCUI_API int LCUIDevice_Add(	LCUI_BOOL (*init)(void),
 LCUI_API int LCUI_InitDevice(void);
 
 /* 停用设备处理模块 */
-LCUI_API void LCUIModule_Device_End(void);
+LCUI_API void LCUI_ExitDevice(void);
 
 LCUI_END_HEADER
 
