@@ -59,10 +59,14 @@ static struct LCUIMouseDeviceContext {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 	int fd;			/**< 鼠标设备标示符 */
 	int state;		/**< 鼠标设备的状态 */
+#elif defined(LCUI_BUILD_IN_WIN32)
+	int x, y;
 #endif
 	int button_state[2];	/** 鼠标左右键的状态 */
 } mouse = {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
+	0, 0,
+#elif defined(LCUI_BUILD_IN_WIN32)
 	0, 0,
 #endif
 	{LCUIKEYSTATE_RELEASE, LCUIKEYSTATE_RELEASE}
@@ -73,6 +77,7 @@ static void OnMouseButtonEvent( LCUI_SystemEvent *e, void *arg )
 	if( e->key_code < 1 || e->key_code > 2 ) {
 		return;
 	}
+	_DEBUG_MSG("key_code: %d\n", e->key_code);
 	switch( e->type ) {
 	case LCUI_MOUSEDOWN:
 		mouse.button_state[e->key_code] = LCUIKEYSTATE_PRESSED;
@@ -160,26 +165,33 @@ static LCUI_BOOL MouseProc( void )
 	LCUI_SystemEvent e;
 	static LCUI_Pos old_pos = {0, 0};
 
-	/* 如果不是无缝模式 */
-	if( LCUIDisplay_GetMode() != LDM_SEAMLESS ) {
-		return FALSE;
+	/* 如果是无缝模式则获取系统鼠标游标的坐标 */
+	if( LCUIDisplay_GetMode() == LDM_SEAMLESS ) {
+		GetCursorPos( &new_pos );
+	} else {
+		new_pos.x = mouse.x;
+		new_pos.y = mouse.y;
 	}
-	/* 获取鼠标坐标 */
-	GetCursorPos( &new_pos );
 	e.type = LCUI_MOUSEMOVE;
 	e.type_name = NULL;
+	e.data = e.destroy_data = NULL;
 	e.rel_x = new_pos.x - old_pos.x;
 	e.rel_y = new_pos.y - old_pos.y;
-	DEBUG_MSG("x: %d, y: %d, rel_x: %d, rel_y: %d\n", new_pos.x, new_pos.y, e.rel_x, e.rel_y);
 	if( e.rel_x == 0 && e.rel_y == 0 ) {
 		return FALSE;
 	}
-	LCUI_PostEvent( &e );
 	old_pos.x = new_pos.x;
 	old_pos.y = new_pos.y;
+	_DEBUG_MSG("x: %d, y: %d, rel_x: %d, rel_y: %d\n", new_pos.x, new_pos.y, e.rel_x, e.rel_y);
+	_DEBUG_MSG("post result: %d\n", LCUI_PostEvent( &e ));
 	return TRUE;
 }
 
+void LCUIMouse_SetPos( int x, int y )
+{
+	mouse.x = x;
+	mouse.y = y;
+}
 #endif
 
 /** 初始化鼠标输入处理 */
@@ -227,17 +239,18 @@ static LCUI_BOOL MouseExit(void)
 /** 初始化鼠标输入模块 */
 int LCUI_InitMouse( void )
 {
+	int ret;
 #ifdef LCUI_MOUSE_DRIVER_LINUX
 	mouse.fd = -1;
 	mouse.state = STATE_REMOVE;	/* 鼠标为移除状态 */
-	/* 启用鼠标输入处理 */
-	nobuff_printf("enable mouse input: ");
 #endif
-	LCUI_RegisterEventWithId( "mousedown", LCUI_MOUSEDOWN );
-	LCUI_RegisterEventWithId( "mouseup", LCUI_MOUSEUP );
-	LCUI_RegisterEventWithId( "mousemove", LCUI_MOUSEMOVE );
-	LCUI_BindEvent( "mousedown", OnMouseButtonEvent, NULL, NULL );
-	LCUI_BindEvent( "mouseup", OnMouseButtonEvent, NULL, NULL );
-	/* 注册鼠标设备 */
-	return LCUIDevice_Add( MouseInit, MouseProc, MouseExit );
+	nobuff_printf("initialize mouse support... ");
+	ret = LCUI_AddEvent( "mousedown", LCUI_MOUSEDOWN );
+	ret |= LCUI_AddEvent( "mouseup", LCUI_MOUSEUP );
+	ret |= LCUI_AddEvent( "mousemove", LCUI_MOUSEMOVE );
+	ret |= LCUI_BindEvent( "mousedown", OnMouseButtonEvent, NULL, NULL );
+	ret |= LCUI_BindEvent( "mouseup", OnMouseButtonEvent, NULL, NULL );
+	nobuff_printf(ret < 0 ? "failed\n":"ok\n");
+	ret |= LCUIDevice_Add( MouseInit, MouseProc, MouseExit );
+	return ret;
 }

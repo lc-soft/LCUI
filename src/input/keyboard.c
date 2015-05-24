@@ -289,22 +289,27 @@ static LCUI_BOOL LCUIKeyboard_Proc(void)
 #endif
 
 /** 初始化键盘输入模块 */
-void LCUI_InitKeyboard( void )
+int LCUI_InitKeyboard( void )
 {
+	int ret;
 	LCUIMutex_Init( &record_mutex );
 	LinkedList_Init( &key_state_record, sizeof(KeyState) );
-	LCUI_RegisterEventWithId( "keydown", LCUI_KEYDOWN );
-	LCUI_RegisterEventWithId( "keyup", LCUI_KEYUP );
-	LCUI_BindEvent( "keydown", OnKeyboardEvent, NULL, NULL );
-	LCUI_BindEvent( "keyup", OnKeyboardEvent, NULL, NULL );
+	nobuff_printf("initialize keyboard support... ");
+	ret = LCUI_AddEvent( "keydown", LCUI_KEYDOWN );
+	ret |= LCUI_AddEvent( "keyup", LCUI_KEYUP );
+	ret |= LCUI_BindEvent( "keydown", OnKeyboardEvent, NULL, NULL );
+	ret |= LCUI_BindEvent( "keyup", OnKeyboardEvent, NULL, NULL );
+	nobuff_printf(ret < 0 ? "failed\n":"ok\n");
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
-	LCUIDevice_Add( LCUIKeyboard_Init, LCUIKeyboard_Proc, LCUIKeyboard_Exit );
+	ret |= LCUIDevice_Add( LCUIKeyboard_Init, LCUIKeyboard_Proc, LCUIKeyboard_Exit );
 #endif
+	return ret;
 }
 
 /** 停用键盘输入模块 */
-void LCUI_ExitKeyboard( void )
+int LCUI_ExitKeyboard( void )
 {
 	LinkedList_Destroy( &key_state_record );
 	LCUIMutex_Destroy( &record_mutex );
+	return 0;
 }
