@@ -42,6 +42,21 @@
 
 LCUI_BEGIN_HEADER
 
+typedef struct LCUI_FontEngineRec {
+	char name[64];
+	void *(*open)(const char*);
+	int (*render)(LCUI_FontBMP*, wchar_t, int, void*);
+	void (*close)(void*);
+} LCUI_FontEngine;
+
+#ifdef LCUI_FONT_ENGINE_FREETYPE
+
+int LCUIFont_InitFreeType( LCUI_FontEngine *engine );
+
+int LCUIFont_ExitFreeType( void );
+
+#endif
+
 /** 初始化字体数据库 */
 LCUI_API void FontLIB_Init( void );
 
