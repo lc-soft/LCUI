@@ -45,7 +45,6 @@
 #include <LCUI/thread.h>
 #include <LCUI/widget_build.h>
 #include <LCUI/surface.h>
-#include <LCUI/cursor.h>
 #include "resource.h"
 
 #define WIN32_WINDOW_STYLE	(WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
@@ -184,48 +183,42 @@ WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
 	e.type_name = NULL;
 
 	surface = GetSurfaceByHWND(hwnd);
-	_DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
+	DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
 	switch( msg ) {
 	case WM_KEYDOWN:
-		e.type = WET_KEYDOWN;
+		e.type = LCUI_KEYDOWN;
 		e.key_code = arg1;
 		break;
 	case WM_KEYUP:
-		e.type = WET_KEYUP;
+		e.type = LCUI_KEYUP;
 		e.key_code = arg1;
 		break;
 	case WM_MOUSEMOVE: {
 		POINT new_pos;
-		LCUI_Pos old_pos;
-
 		GetCursorPos( &new_pos );
 		ScreenToClient( hwnd, &new_pos );
-		LCUICursor_GetPos( &old_pos );
-		e.rel_x = new_pos.x - old_pos.x;
-		e.rel_y = new_pos.y - old_pos.y;
-		if( e.rel_x == 0 && e.rel_y == 0 ) {
-			break;
-		}
-		e.type = WET_MOUSEMOVE;
+		e.rel_x = new_pos.x;
+		e.rel_y = new_pos.y;
+		e.type = LCUI_MOUSEMOVE;
 		break;
 	}
 	case WM_LBUTTONDOWN:
-		e.type = WET_MOUSEDOWN;
+		e.type = LCUI_MOUSEDOWN;
 		e.key_code = 1;
 		break;
 	case WM_LBUTTONUP:
-		e.type = WET_MOUSEUP;
+		e.type = LCUI_MOUSEUP;
 		e.key_code = 1;
 		break;
 	case WM_RBUTTONDOWN:
-		e.type = WET_MOUSEDOWN;
+		e.type = LCUI_MOUSEDOWN;
 		e.key_code = 2;
 		break;
 	case WM_RBUTTONUP:
-		e.type = WET_MOUSEUP;
+		e.type = LCUI_MOUSEUP;
 		e.key_code = 2;
 		break;
 	case WM_PAINT: {
