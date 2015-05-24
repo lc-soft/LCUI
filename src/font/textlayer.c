@@ -291,7 +291,7 @@ static void TextChar_UpdateBitmap( TextCharData* p_data,
 		pixel_size = default_style->pixel_size;
 
 	}
-	p_data->bitmap = FontLIB_GetExistFontBMP( font_id, p_data->char_code,
+	p_data->bitmap = FontLIB_GeFontBMP( font_id, p_data->char_code,
 								pixel_size );
 	//printf("char_code: %c, pixel_size: %d, font_id: %d, bitmap: %p\n", 
 	//p_data->char_code, default_style->pixel_size, default_style->font_id, p_data->bitmap);

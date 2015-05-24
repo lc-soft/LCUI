@@ -40,20 +40,10 @@
 #ifndef __LCUI_FONT_H__
 #define __LCUI_FONT_H__
 
-LCUI_BEGIN_HEADER
-
-#include <LCUI/font/bitmapfont.h>
 #include <LCUI/font/fontlibrary.h>
 #include <LCUI/font/textstyle.h>
 #include <LCUI/font/textlayer.h>
 #include <LCUI/font/charset.h>
 
-/** 初始化字体处理模块 */
-LCUI_API void LCUI_InitFont( void );
-
-/** 停用字体处理模块 */
-LCUI_API void LCUI_ExitFont( void );
-
-LCUI_END_HEADER
 
 #endif /* __LCUI_FONTS_H__ */
