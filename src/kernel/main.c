@@ -129,7 +129,7 @@ static void LCUI_InitEvent(void)
 }
 
 /** 停用事件模块并进行清理 */
-static void LCUIModule_Event_Exit(void)
+static void LCUI_ExitEvent(void)
 {
 	System.event.is_running = FALSE;
 	LCUICond_Broadcast( &System.event.cond );
@@ -156,9 +156,9 @@ static void FuncDataDestroy( void *arg )
 }
 
 /** 预先注册指定名称和ID的事件 */
-int LCUI_RegisterEventWithId( const char *event_name, int id )
+int LCUI_AddEvent( const char *event_name, int id )
 {
-	return LCUIEventBox_RegisterEventWithId( System.event.box, event_name, id );
+	return LCUIEventBox_AddEvent( System.event.box, event_name, id );
 }
 
 /** 绑定指定ID的事件 */
@@ -470,13 +470,39 @@ static void LCUIApp_Destroy(void)
 /** 打印LCUI的信息 */
 static void LCUI_ShowCopyrightText(void)
 {
-	printf(
-	"============| LCUI v%s |============\n"
-	"Copyright (C) 2012-2015 Liu Chao.\n"
-	"Licensed under GPLv2.\n"
-	"Report bugs to <lc-soft@live.cn>.\n"
-	"Project Homepage: www.lcui.org.\n"
-	"========================================\n", LCUI_VERSION );
+	printf(	
+		"LCUI version "LCUI_VERSION"\n"
+#ifdef _MSC_VER
+		"Build tool: "
+#if (_MSC_VER > 1800)
+		"MS VC++ (higher version)"
+#elif (_MSC_VER == 1800)
+		"MS VC++ 12.0"
+#elif (_MSC_VER == 1700)
+		"MS VC++ 11.0"
+#elif (_MSC_VER == 1600)
+		"MS VC++ 10.0"
+#elif (_MSC_VER == 1500)
+		"MS VC++ 9.0"
+#elif (_MSC_VER == 1400)
+		"MS VC++ 8.0"
+#elif (_MSC_VER == 1310)
+		"MS VC++ 7.1"
+#elif (_MSC_VER == 1300)
+		"MS VC++ 7.0"
+#elif (_MSC_VER == 1200)
+		"MS VC++ 6.0"
+#else
+		"MS VC++"
+#endif
+		"\n"
+#endif
+		"Build time: "__DATE__" - "__TIME__"\n"
+		"Copyright (C) 2012-2015 Liu Chao.\n"
+		"Licensed under GPLv2.\n"
+		"Report bugs to <lc-soft@live.cn>.\n"
+		"Home Page: www.lcui.org.\n"
+	);
 }
 
 /** 检测LCUI是否活动 */
@@ -515,13 +541,11 @@ int LCUI_Init(void)
 	LCUIApp_Init();
 	/* 初始化各个模块 */
 	LCUI_InitEvent();
-	//LCUI_InitIME();
 	LCUI_InitFont();
 	LCUI_InitTimer();
 	LCUI_InitDevice();
 	LCUI_InitKeyboard();
 	LCUI_InitMouse();
-	//LCUI_InitTouchScreen();
 	LCUI_InitCursor();
 	LCUI_InitWidget();
 	LCUI_InitDisplay();
@@ -543,16 +567,12 @@ static int LCUI_Destroy( void )
 	if( System.func_atexit ) {
 		System.func_atexit();
 	}
-	//LCUIModule_IME_End();
-	LCUIModule_Event_Exit();
+	LCUI_ExitEvent();
 	LCUI_ExitCursor();
-	//LCUIModule_Widget_End();
-	LCUIModule_Font_End();
-	LCUIModule_Timer_Exit();
-	//LCUI_ExitKeyboard();
-	//LCUIModule_Mouse_End();
-	//LCUIModule_TouchScreen_End();
-	LCUIModule_Device_End();
+	LCUI_ExitWidget();
+	LCUI_ExitFont();
+	LCUI_ExitTimer();
+	LCUI_ExitDevice();
 	LCUI_ExitDisplay();
 	LCUIApp_Destroy();
 	return System.exit_code;
