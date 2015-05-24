@@ -242,27 +242,25 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 LCUI_Widget $(At)( LCUI_Widget widget, int x, int y )
 {
 	int i, n;
-	LCUI_Widget target = NULL;
-
+	LCUI_Widget target = widget, child = NULL;
 	do {
-		n = LinkedList_GetTotal( &widget->children_show );
+		n = LinkedList_GetTotal( &target->children_show );
 		for( i=0; i<n; ++i ) {
-			LinkedList_Goto( &widget->children_show, i );
-			target = (LCUI_Widget)
-			LinkedList_Get( &widget->children_show );
-			if( !target->style.visible ) {
+			LinkedList_Goto( &target->children_show, i );
+			child = (LCUI_Widget)
+			LinkedList_Get( &target->children_show );
+			if( !child->style.visible ) {
 				continue;
 			}
-			if( target->style.x.px <= x && target->style.y.px
-			 && target->style.x.px + x < target->style.w.px
-			 && target->style.y.px + x < target->style.h.px ) {
-				widget = target;
+			if( child->style.x.px <= x && child->style.y.px
+			 && child->style.x.px + x < child->style.w.px
+			 && child->style.y.px + x < child->style.h.px ) {
+				target = child;
 				break;
 			 }
 		}
-	} while( i >= n );
-
-	return target;
+	} while( i < n );
+	return (target == widget) ? NULL:target;
 }
 
 /** 设置部件为顶级部件 */
@@ -811,6 +809,11 @@ void LCUI_InitWidget(void)
 {
 	$(Init)(LCUIRootWidget);
 	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
-	LCUIWidget_Task_Init();
-	LCUIWidget_Event_Init();
+	LCUIWidget_InitTask();
+	LCUIWidget_InitEvent();
+}
+
+void LCUI_ExitWidget(void)
+{
+
 }
