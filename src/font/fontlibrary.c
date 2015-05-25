@@ -418,7 +418,7 @@ int FontBMP_Print( LCUI_FontBMP *fontbmp )
 }
 
 /** 将字体位图绘制到目标图像上 */
-int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos, 
+int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 		 LCUI_FontBMP *bmp, LCUI_Color color )
 {
 	int val, x, y;
@@ -469,11 +469,11 @@ int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 		}
 		return 0;
 	}
-	
+
 	bmp_row_src = bmp->buffer + cut.y*bmp->width + cut.x;
 	byte_row_des = des->bytes + (pos.y + des_rect.y) * des->bytes_per_row;
 	byte_row_des += (pos.x + des_rect.x)*des->bytes_per_pixel;
-	for( y=0; y<cut.h; ++y ) { 
+	for( y=0; y<cut.h; ++y ) {
 		bmp_src = bmp_row_src;
 		byte_des = byte_row_des;
 		for( x=0; x<cut.w; ++x ) {
@@ -493,7 +493,7 @@ int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 
 
 /** 载入字体位图 */
-int FontBMP_Load( LCUI_FontBMP *buff, int font_id, 
+int FontBMP_Load( LCUI_FontBMP *buff, int font_id,
 		  wchar_t ch, int pixel_size )
 {
 	LCUI_FontInfo *info;
@@ -534,11 +534,15 @@ void LCUI_InitFont( void )
 #endif
 	};
 	FontLIB_Init();
+	fontlib.engine = NULL;
+#ifdef LCUI_FONT_ENGINE_FREETYPE
 	if( LCUIFont_InitFreeType( &fontlib.engines[0] ) == 0 ) {
 		fontlib.engine = &fontlib.engines[0];
+	}
+#endif
+	if( fontlib.engine ) {
 		printf("[font] current font engine is: %s\n", fontlib.engine->name);
 	} else {
-		fontlib.engine = NULL;
 		printf("[font] warning: not font engine support!\n");
 	}
 	/* 如果在环境变量中定义了字体文件路径，那就使用它 */
@@ -555,7 +559,7 @@ void LCUI_InitFont( void )
 		}
 		FontLIB_SetDefaultFont( font_id );
 		if( fontlib.default_font ) {
-			printf("[font] select font: %s\n", 
+			printf("[font] select font: %s\n",
 				fontlib.default_font->face->family_name);
 		}
 		break;
