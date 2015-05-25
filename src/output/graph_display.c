@@ -42,7 +42,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/widget_build.h>
-#include <LCUI/surface.h>
 #include <LCUI/display.h>
 #include <LCUI/input.h>
 #include <LCUI/cursor.h>
@@ -69,9 +68,7 @@ static struct DisplayContext {
 	LCUI_Thread		thread;		/**< 线程，负责画面更新工作 */
 	LinkedList		surfaces;	/**< surface 列表 */
 	LCUI_Mutex		mutex;
-	int			mode;
-	int			width;
-	int			height;
+	LCUI_DisplayInfo	info;
 	LCUI_SurfaceMethods	*methods;
 } display = { FALSE, NULL, 0 };
 
@@ -89,7 +86,7 @@ static void LCUIDisplay_Update(void)
 	SurfaceRecord *p_sr;
 	LCUI_DirtyRectList rlist;
 	LCUI_PaintContext paint;
-	
+
 	DirtyRectList_Init( &rlist );
 	n = LinkedList_GetTotal( &display.surfaces );
 	/* 遍历当前的 surface 记录列表 */
@@ -97,7 +94,7 @@ static void LCUIDisplay_Update(void)
 		LinkedList_Goto( &display.surfaces, i );
 		p_sr = (SurfaceRecord*)
 		LinkedList_Get( &display.surfaces );
-		if( !p_sr->widget || !p_sr->surface 
+		if( !p_sr->widget || !p_sr->surface
 		 || !Surface_IsReady(p_sr->surface) ) {
 			continue;
 		}
@@ -170,7 +167,7 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 	}
 	p_sr = (SurfaceRecord*)LinkedList_Alloc( &display.surfaces );
 	p_sr->widget = widget;
-	/** 
+	/**
 	 * 初次调用 Surface_New() 耗时较长， 所以先为 p_sr->surface 设置初
 	 * 始值，避免在 Surface_New() 返回前被当成正常指针使用。
 	 */
@@ -225,26 +222,25 @@ static void LCUIDisplay_CleanSurfaces( void )
 
 static int LCUIDisplay_Windowed( void )
 {
-	switch( display.mode ) {
+	switch( display.info.mode ) {
 	case LDM_FULLSCREEN:
 	case LDM_WINDOWED:
 		return 0;
 	case LDM_SEAMLESS:
-	default: 
+	default:
 		LCUIDisplay_CleanSurfaces();
 		LCUIDisplay_BindSurface( LCUIRootWidget );
 		break;
 	}
 	Widget_Show( LCUIRootWidget );
-	Widget_Resize( LCUIRootWidget, display.width, display.height );
-	display.mode = LDM_WINDOWED;
+	Widget_Resize( LCUIRootWidget, display.info.width, display.info.height );
+	display.info.mode = LDM_WINDOWED;
 	return 0;
 }
 
 static int LCUIDisplay_FullScreen( void )
 {
-	int w, h;
-	switch( display.mode ) {
+	switch( display.info.mode ) {
 	case LDM_SEAMLESS:
 		LCUIDisplay_CleanSurfaces();
 		LCUIDisplay_BindSurface( LCUIRootWidget );
@@ -253,10 +249,8 @@ static int LCUIDisplay_FullScreen( void )
 	case LDM_FULLSCREEN:
 		return 0;
 	}
-	w = GetSystemMetrics(SM_CXSCREEN);
-	h = GetSystemMetrics(SM_CYSCREEN);
-	LCUIDisplay_SetSize( w, h );
-	display.mode = LDM_FULLSCREEN;
+	LCUIDisplay_SetSize( display.info.width, display.info.height );
+	display.info.mode = LDM_FULLSCREEN;
 	return 0;
 }
 
@@ -264,8 +258,8 @@ static int LCUIDisplay_Seamless( void )
 {
 	int i, n;
 	LCUI_Widget widget;
-	DEBUG_MSG("display.mode: %d\n", display.mode);
-	switch( display.mode ) {
+	DEBUG_MSG("display.info.mode: %d\n", display.info.mode);
+	switch( display.info.mode ) {
 	case LDM_SEAMLESS:
 		return 0;
 	case LDM_FULLSCREEN:
@@ -281,7 +275,7 @@ static int LCUIDisplay_Seamless( void )
 		LinkedList_Get( &LCUIRootWidget->children );
 		LCUIDisplay_BindSurface( widget );
 	}
-	display.mode = LDM_SEAMLESS;
+	display.info.mode = LDM_SEAMLESS;
 	return 0;
 }
 
@@ -310,30 +304,30 @@ int LCUIDisplay_SetMode( int mode )
 /* 获取呈现模式 */
 int LCUIDisplay_GetMode(void)
 {
-	return display.mode;
+	return display.info.mode;
 }
 
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
 void LCUIDisplay_SetSize( int width, int height )
 {
-	display.width = width;
-	display.height = height;
-	if( display.mode != LDM_WINDOWED && display.mode != LDM_FULLSCREEN ) {
+	display.info.width = width;
+	display.info.height = height;
+	if( display.info.mode != LDM_WINDOWED && display.info.mode != LDM_FULLSCREEN ) {
 		return;
 	}
-	Widget_Resize( LCUIRootWidget, display.width, display.height );
+	Widget_Resize( LCUIRootWidget, display.info.width, display.info.height );
 }
 
 /** 获取屏幕宽度 */
 int LCUIDisplay_GetWidth( void )
 {
-	return display.width;
+	return display.info.width;
 }
 
 /** 获取屏幕高度 */
 int LCUIDisplay_GetHeight( void )
 {
-	return display.height;
+	return display.info.height;
 }
 
 /** LCUI的图形显示处理线程 */
@@ -358,10 +352,10 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 	int e_type = *((int*)&arg);
 	LCUI_Surface surface;
 	LCUI_Rect *p_rect;
-	
+
 	DEBUG_MSG("tip, e_type = %d\n", e_type);
 	surface = LCUIDisplay_GetBindSurface( e->target );
-	if( display.mode == LDM_SEAMLESS ) {
+	if( display.info.mode == LDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
 			return;
 		}
@@ -391,16 +385,16 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 		//_DEBUG_MSG("%S\n", e->target->title );
 		Surface_SetCaptionW( surface, e->target->title );
 		break;
-	case WET_RESIZE: 
+	case WET_RESIZE:
 		DEBUG_MSG( "resize, w: %d, h: %d\n", p_rect->w, p_rect->h );
 		Surface_Resize( surface, p_rect->w, p_rect->h );
 		Widget_InvalidateArea( w, NULL, GRAPH_BOX );
-		if( w == LCUIRootWidget && display.mode != LDM_SEAMLESS ) {
-			display.width = p_rect->w;
-			display.height = p_rect->h;
+		if( w == LCUIRootWidget && display.info.mode != LDM_SEAMLESS ) {
+			display.info.width = p_rect->w;
+			display.info.height = p_rect->h;
 		}
 		break;
-	case WET_MOVE: 
+	case WET_MOVE:
 		DEBUG_MSG( "x: %d, y: %d\n", p_rect->left, p_rect->top );
 		Surface_Move( surface, p_rect->left, p_rect->top );
 		break;
@@ -410,8 +404,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 
 static void OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
 {
-	LCUI_Widget widget = LCUIDisplay_GetBindWidget( surface );
-	if( display.mode == LDM_SEAMLESS ) {
+	if( display.info.mode == LDM_SEAMLESS ) {
 		return;
 	}
 	_DEBUG_MSG("surface: %p, event: %d, rel_x: %d, rel_y: %d\n", surface, e->type, e->rel_x, e->rel_y);
@@ -523,24 +516,24 @@ void Surface_Present( LCUI_Surface surface )
 /** 初始化图形输出模块 */
 int LCUI_InitDisplay( void )
 {
-	int ret;
 	if( display.is_working ) {
 		return -1;
 	}
 	display.is_working = TRUE;
-	display.mode = LDM_DEFAULT;
+	display.info.mode = LDM_DEFAULT;
 	LCUIMutex_Init( &display.mutex );
 	LinkedList_Init( &display.surfaces, sizeof(SurfaceRecord) );
 #ifdef LCUI_BUILD_IN_WIN32
-	display.methods = LCUISurface_InitWin32();
+	display.methods = LCUIDisplay_InitWin32( &display.info );
 	display.methods->onInvalidRect = OnInvalidRect;
 	display.methods->onEvent = OnEvent;
+#elif defined(LCUI_VIDEO_DRIVER_FRAMEBUFFER)
+	display.methods = LCUIDisplay_InitLinuxFB( &display.info );
 #endif
 	display.fc_ctx = FrameControl_Create();
 	FrameControl_SetMaxFPS( display.fc_ctx, 1000/MAX_FRAMES_PER_SEC );
-	ret = Widget_BindEvent( LCUIRootWidget, "TopLevelWidget", 
-				OnTopLevelWidgetEvent, NULL, NULL );
-	DEBUG_MSG("bind event, ret = %d\n", ret);
+	Widget_BindEvent( LCUIRootWidget, "TopLevelWidget",
+			  OnTopLevelWidgetEvent, NULL, NULL );
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
 }
 

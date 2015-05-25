@@ -44,7 +44,7 @@
 #include <LCUI/graph.h>
 #include <LCUI/thread.h>
 #include <LCUI/widget_build.h>
-#include <LCUI/surface.h>
+#include <LCUI/display.h>
 #include "resource.h"
 
 #define WIN32_WINDOW_STYLE	(WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
@@ -509,7 +509,7 @@ static void LCUISurface_Loop( void *args )
 }
 
 /** 初始化适用于 Win32 平台的 surface 支持 */
-LCUI_SurfaceMethods *LCUISurface_InitWin32(void)
+LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info )
 {
 	WNDCLASS wndclass;
 	TCHAR szAppName[] = TEXT ("LCUI");
@@ -532,6 +532,8 @@ LCUI_SurfaceMethods *LCUISurface_InitWin32(void)
 		MessageBox( NULL, str, szAppName, MB_ICONERROR );
 		return NULL;
 	}
+	info->width = GetSystemMetrics(SM_CXSCREEN);
+	info->height = GetSystemMetrics(SM_CYSCREEN);
 	win32.is_ready = FALSE;
 	strncpy( win32.methods.name, "win32", 32 );
 	win32.methods.new = Win32Surface_New;
@@ -557,6 +559,11 @@ LCUI_SurfaceMethods *LCUISurface_InitWin32(void)
 	LinkedList_SetDestroyFunc( &win32.surfaces, Win32Surface_OnDestroy );
 	LCUIThread_Create( &win32.loop_thread, LCUISurface_Loop, NULL );
 	return &win32.methods;
+}
+
+void LCUIDisplay_ExitWin32(void)
+{
+
 }
 
 #endif
