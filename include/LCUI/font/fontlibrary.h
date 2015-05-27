@@ -53,30 +53,38 @@ typedef struct LCUI_FontBMP_ {
 	short num_grays;
 	char pixel_mode;
 	LCUI_Pos advance;	/**< XY轴的跨距 */
-} LCUI_FontBMP;
+} LCUI_FontBitmap;
 
 /** 宽字符位图及相关数据 */
 typedef struct LCUI_WChar_ {
 	wchar_t		char_code;	/**< 字符码 */
-	LCUI_FontBMP	*bitmap;	/**< 字符的位图数据 */
+	LCUI_FontBitmap	*bitmap;	/**< 字符的位图数据 */
 	LCUI_Color	color;		/**< 该文字的配色 */
 	LCUI_BOOL	update;		/**< 标明这个字符是否需要刷新 */
 	int		color_type;	/**< 颜色类型(DEFAULT / CUSTOM) */
 } LCUI_WChar;
 
-typedef struct LCUI_FontFace {
-	char style_name[64];
-	char family_name[64];
-	void *data;
-} LCUI_FontFace;
+typedef struct LCUI_FontEngine	LCUI_FontEngine;
+typedef struct LCUI_FontFace	LCUI_FontFace;
 
-typedef struct LCUI_FontEngine {
+struct LCUI_FontFace {
+	LCUI_FontEngine *engine;	/**< 所属的字体引擎 */
+	char style_name[64];		/**< 样式名称 */
+	char family_name[64];		/**< 字族名称 */
+	void *data;			/**< 相关数据 */
+};
+
+struct LCUI_FontEngine {
 	char name[64];
 	int (*open)(const char*, LCUI_FontFace**);
-	int (*render)(LCUI_FontBMP*, wchar_t, int, LCUI_FontFace*);
+	int (*render)(LCUI_FontBitmap*, wchar_t, int, LCUI_FontFace*);
 	void (*close)(void*);
-} LCUI_FontEngine;
+};
 
+
+int LCUIFont_InitInCoreFont( LCUI_FontEngine *engine );
+
+int LCUIFont_ExitInCoreFont( void );
 
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 
@@ -86,33 +94,37 @@ int LCUIFont_ExitFreeType( void );
 
 #endif
 
-LCUI_API uchar_t const* in_core_font_8x8( void );
+/** 获取内置的 Inconsolata 字体位图 */
+LCUI_API int FontInconsolata_GetBitmap( LCUI_FontBitmap *bmp, wchar_t ch, int size );
 
 /** 打印字体位图的信息 */
-LCUI_API void FontBMP_PrintInfo( LCUI_FontBMP *bitmap );
+LCUI_API void FontBMP_PrintInfo( LCUI_FontBitmap *bitmap );
 
 /** 初始化字体位图 */
-LCUI_API void FontBMP_Init( LCUI_FontBMP *bitmap );
+LCUI_API void FontBMP_Init( LCUI_FontBitmap *bitmap );
 
 /** 释放字体位图占用的资源 */
-LCUI_API void FontBMP_Free( LCUI_FontBMP *bitmap );
+LCUI_API void FontBMP_Free( LCUI_FontBitmap *bitmap );
 
 /** 创建字体位图 */
-LCUI_API int FontBMP_Create( LCUI_FontBMP *bitmap, int width, int rows );
+LCUI_API int FontBMP_Create( LCUI_FontBitmap *bitmap, int width, int rows );
 
 /** 在屏幕打印以0和1表示字体位图 */
-LCUI_API int FontBMP_Print( LCUI_FontBMP *fontbmp );
+LCUI_API int FontBMP_Print( LCUI_FontBitmap *fontbmp );
 
 /** 将字体位图绘制到目标图像上 */
 LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
-			  LCUI_FontBMP *bmp, LCUI_Color color );
+			  LCUI_FontBitmap *bmp, LCUI_Color color );
 
 /** 载入字体位图 */
-LCUI_API int FontBMP_Load( LCUI_FontBMP *buff, int font_id,
+LCUI_API int FontBMP_Load( LCUI_FontBitmap *buff, int font_id,
 			   wchar_t ch, int pixel_size );
 
 /** 初始化字体数据库 */
 LCUI_API void FontLIB_Init( void );
+
+/** 添加字体族，并返回该字族的ID */
+LCUI_API int FontLIB_AddFontInfo( LCUI_FontFace *face, const char *filepath );
 
 /** 通过字体文件路径来查找字体信息，并获取字体ID */
 LCUI_API int FontLIB_FindInfoByFilePath( const char *filepath );
@@ -132,18 +144,18 @@ LCUI_API void FontLIB_SetDefaultFont( int id );
  * 调用此函数后，作为参数fontbmp_buff的变量，不能被free掉，否则，数据库中记录
  * 的此数据会无效 
  * */
-LCUI_API LCUI_FontBMP* FontLIB_AddFontBMP(	wchar_t char_code,
+LCUI_API LCUI_FontBitmap* FontLIB_AddFontBMP(	wchar_t char_code,
 						int font_id,
 						int pixel_size,
-						LCUI_FontBMP *fontbmp_buff );
+						LCUI_FontBitmap *fontbmp_buff );
 
 /** 获取库中的字体位图 */
-LCUI_API LCUI_FontBMP* FontLIB_GetFontBMP(	wchar_t char_code,
+LCUI_API LCUI_FontBitmap* FontLIB_GetFontBMP(	wchar_t char_code,
 						int font_id,
 						int pixel_size );
 
 /** 获取库中现有的字体位图，若没有则载入新的 */
-LCUI_API LCUI_FontBMP* FontLIB_GeFontBMP(	int font_id,
+LCUI_API LCUI_FontBitmap* FontLIB_GeFontBMP(	int font_id,
 						wchar_t ch,
 						int pixel_size );
 

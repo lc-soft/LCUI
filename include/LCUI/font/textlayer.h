@@ -59,7 +59,7 @@ typedef enum TextAddType_ {
 typedef struct TextCharDataRec_ {
         wchar_t char_code;		/* 字符码 */
         LCUI_TextStyle *style;		/* 该字符使用的样式数据 */
-	LCUI_FontBMP *bitmap;		/* 字体位图数据 */
+	LCUI_FontBitmap *bitmap;		/* 字体位图数据 */
 } TextCharData;
 
 /** 文本行结尾符 */

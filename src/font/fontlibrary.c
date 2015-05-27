@@ -74,7 +74,7 @@ static struct FontLibraryContext {
 
 static void FontLIB_DestroyFontBitmap( void *arg )
 {
-	FontBMP_Free( (LCUI_FontBMP*)arg );
+	FontBMP_Free( (LCUI_FontBitmap*)arg );
 }
 
 static void FontLIB_DestroyTreeNode( void *arg )
@@ -83,7 +83,7 @@ static void FontLIB_DestroyTreeNode( void *arg )
 }
 
 /** 添加字体族，并返回该字族的ID */
-static int FontLIB_AddFontInfo(	LCUI_FontFace *face, const char *filepath )
+int FontLIB_AddFontInfo( LCUI_FontFace *face, const char *filepath )
 {
 	LCUI_FontInfo *info;
 	info = (LCUI_FontInfo*)malloc( sizeof(LCUI_FontInfo) );
@@ -106,7 +106,6 @@ static LCUI_FontInfo* FontLIB_GetFont( int font_id )
 void FontLIB_Init( void )
 {
 	int font_id;
-	LCUI_FontFace *face;
 
 	if( fontlib.is_inited ) {
 		return;
@@ -118,11 +117,7 @@ void FontLIB_Init( void )
 	RBTree_SetDataNeedFree( &fontlib.info_cache, TRUE );
 	fontlib.is_inited = TRUE;
 
-	face = (LCUI_FontFace*)malloc(sizeof(LCUI_FontFace));
-	strcpy( face->style_name, "default" );
-	strcpy( face->family_name, "in-core.font_8x8" );
-	face->data = NULL;
-	font_id = FontLIB_AddFontInfo( face, "<in-core>" );
+	font_id = FontLIB_GetFontIDByFamilyName("inconsolata");
 	fontlib.incore_font = FontLIB_GetFont( font_id );
 }
 
@@ -184,10 +179,10 @@ void FontLIB_SetDefaultFont( int id )
 	}
 }
 
-LCUI_FontBMP* FontLIB_AddFontBMP( wchar_t ch, int font_id,
-				  int pixel_size, LCUI_FontBMP *bmp )
+LCUI_FontBitmap* FontLIB_AddFontBMP( wchar_t ch, int font_id,
+				  int pixel_size, LCUI_FontBitmap *bmp )
 {
-	LCUI_FontBMP *bmp_cache;
+	LCUI_FontBitmap *bmp_cache;
 	LCUI_RBTree *tree_font, *tree_bmp;
 
 	if( !fontlib.is_inited ) {
@@ -222,23 +217,23 @@ LCUI_FontBMP* FontLIB_AddFontBMP( wchar_t ch, int font_id,
 		RBTree_Insert( tree_font, font_id, tree_bmp );
 	}
 	/* 在字体位图库中获取指定像素大小的字体位图 */
-	bmp_cache = (LCUI_FontBMP*)RBTree_GetData( tree_bmp, pixel_size );
+	bmp_cache = (LCUI_FontBitmap*)RBTree_GetData( tree_bmp, pixel_size );
 	if( !bmp_cache ) {
-		bmp_cache = (LCUI_FontBMP*)malloc( sizeof(LCUI_FontBMP) );
+		bmp_cache = (LCUI_FontBitmap*)malloc( sizeof(LCUI_FontBitmap) );
 		if( !bmp_cache ) {
 			return NULL;
 		}
 		RBTree_Insert( tree_bmp, pixel_size, bmp_cache );
 	}
 	/* 拷贝数据至该空间内 */
-	memcpy( bmp_cache, bmp, sizeof(LCUI_FontBMP) );
+	memcpy( bmp_cache, bmp, sizeof(LCUI_FontBitmap) );
 	return bmp_cache;
 }
 
-LCUI_FontBMP* FontLIB_GeFontBMP( int font_id, wchar_t ch, int pixel_size )
+LCUI_FontBitmap* FontLIB_GeFontBMP( int font_id, wchar_t ch, int pixel_size )
 {
 	LCUI_RBTree *tree;
-	LCUI_FontBMP *bmp, bmp_cache;
+	LCUI_FontBitmap *bmp, bmp_cache;
 
 	if( !fontlib.is_inited ) {
 		return NULL;
@@ -254,7 +249,7 @@ LCUI_FontBMP* FontLIB_GeFontBMP( int font_id, wchar_t ch, int pixel_size )
 	if( !tree ) {
 		return NULL;
 	}
-	bmp = (LCUI_FontBMP*)RBTree_GetData( tree, pixel_size );
+	bmp = (LCUI_FontBitmap*)RBTree_GetData( tree, pixel_size );
 	if( bmp ) {
 		return bmp;
 	}
@@ -296,7 +291,7 @@ int FontLIB_DeleteFontInfo( int id )
 #define FontBMP_IsValid(fbmp) (fbmp && fbmp->width>0 && fbmp->rows>0)
 
 /** 打印字体位图的信息 */
-void FontBMP_PrintInfo( LCUI_FontBMP *bitmap )
+void FontBMP_PrintInfo( LCUI_FontBitmap *bitmap )
 {
 	printf("address:%p\n",bitmap);
 	if( !bitmap ) {
@@ -307,7 +302,7 @@ void FontBMP_PrintInfo( LCUI_FontBMP *bitmap )
 }
 
 /** 初始化字体位图 */
-void FontBMP_Init( LCUI_FontBMP *bitmap )
+void FontBMP_Init( LCUI_FontBitmap *bitmap )
 {
 	bitmap->rows = 0;
 	bitmap->width = 0;
@@ -317,7 +312,7 @@ void FontBMP_Init( LCUI_FontBMP *bitmap )
 }
 
 /** 释放字体位图占用的资源 */
-void FontBMP_Free( LCUI_FontBMP *bitmap )
+void FontBMP_Free( LCUI_FontBitmap *bitmap )
 {
 	if( FontBMP_IsValid(bitmap) ) {
 		free( bitmap->buffer );
@@ -326,7 +321,7 @@ void FontBMP_Free( LCUI_FontBMP *bitmap )
 }
 
 /** 创建字体位图 */
-int FontBMP_Create( LCUI_FontBMP *bitmap, int width, int rows )
+int FontBMP_Create( LCUI_FontBitmap *bitmap, int width, int rows )
 {
 	size_t size;
 	if(width < 0 || rows < 0) {
@@ -346,58 +341,8 @@ int FontBMP_Create( LCUI_FontBMP *bitmap, int width, int rows )
 	return 0;
 }
 
-/** 根据字符编码，获取内置的字体位图 */
-static void GetDefaultFontBMP( unsigned short code, LCUI_FontBMP *out_bitmap )
-{
-	int i,j, start, m;
-	uchar_t const *p;
-
-	p = in_core_font_8x8(); /* 获取指向内置字体位图数组的指针 */
-	FontBMP_Create(out_bitmap, 8, 8); /* 为位图分配内存，8x8的尺寸 */
-	out_bitmap->left = 0;
-	out_bitmap->top = 0;
-	if(code < 256) { /* 如果在ASCII编码范围内 */
-		if(code == ' ') { /* 空格就直接置0 */
-			memset(out_bitmap->buffer, 0, sizeof(uchar_t)*64);
-		} else {
-			start = code * 8;
-			for (i=start;i<start+8;++i) {
-				m = (i-start) * 8 + 7;
-				/* 将数值转换成一行位图 */
-				for (j=0;j<8;++j,--m) {
-					out_bitmap->buffer[m]
-					 = (p[i]&(1<<j))?255:0;
-				}
-			}
-		}
-	} else { /* 否则用“口”表示未知编码字符 */
-		static uchar_t null_bmp[] = {
-			1,1,1,1,1,1,1,1,
-			1,0,0,0,0,0,0,1,
-			1,0,0,0,0,0,0,1,
-			1,0,0,0,0,0,0,1,
-			1,0,0,0,0,0,0,1,
-			1,0,0,0,0,0,0,1,
-			1,0,0,0,0,0,0,1,
-			1,1,1,1,1,1,1,1 };
-		for (i=0;i<8;i++) {
-			m = i*8;
-			for (j=0;j<8;j++,++m) {
-				out_bitmap->buffer[m] = (null_bmp[m]>0)?255:0;
-			}
-		}
-	}
-	/* 修改相关属性 */
-	out_bitmap->top = 8;
-	out_bitmap->left = 0;
-	out_bitmap->rows = 8;
-	out_bitmap->width = 8;
-	out_bitmap->advance.x = 8;
-	out_bitmap->advance.y = 8;
-}
-
 /** 在屏幕打印以0和1表示字体位图 */
-int FontBMP_Print( LCUI_FontBMP *fontbmp )
+int FontBMP_Print( LCUI_FontBitmap *fontbmp )
 {
 	int x,y,m;
 	for(y = 0;y < fontbmp->rows; ++y){
@@ -419,7 +364,7 @@ int FontBMP_Print( LCUI_FontBMP *fontbmp )
 
 /** 将字体位图绘制到目标图像上 */
 int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
-		 LCUI_FontBMP *bmp, LCUI_Color color )
+		 LCUI_FontBitmap *bmp, LCUI_Color color )
 {
 	int val, x, y;
 	LCUI_Graph *des;
@@ -493,19 +438,17 @@ int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 
 
 /** 载入字体位图 */
-int FontBMP_Load( LCUI_FontBMP *buff, int font_id,
+int FontBMP_Load( LCUI_FontBitmap *buff, int font_id,
 		  wchar_t ch, int pixel_size )
 {
 	LCUI_FontInfo *info;
 
 	if( font_id <= 0 || !fontlib.engine ) {
-		GetDefaultFontBMP( ch, buff );
-		return -1;
+		return FontInconsolata_GetBitmap( buff, ch, pixel_size );
 	}
 	info = FontLIB_GetFont( font_id );
 	if( !info ) {
-		GetDefaultFontBMP( ch, buff );
-		return -1;
+		return FontInconsolata_GetBitmap( buff, ch, pixel_size );
 	}
 	return fontlib.engine->render( buff, ch, pixel_size, info->face );
 }
@@ -534,13 +477,16 @@ void LCUI_InitFont( void )
 #endif
 	};
 	FontLIB_Init();
-	fontlib.engine = NULL;
+	/* 先初始化内置的字体引擎 */
+	LCUIFont_InitInCoreFont( &fontlib.engines[0] );
+	fontlib.engine = &fontlib.engines[0];
+	/* 然后看情况启用其它字体引擎 */
 #ifdef LCUI_FONT_ENGINE_FREETYPE
-	if( LCUIFont_InitFreeType( &fontlib.engines[0] ) == 0 ) {
-		fontlib.engine = &fontlib.engines[0];
+	if( LCUIFont_InitFreeType( &fontlib.engines[1] ) == 0 ) {
+		fontlib.engine = &fontlib.engines[1];
 	}
 #endif
-	if( fontlib.engine ) {
+	if( fontlib.engine && fontlib.engine != &fontlib.engines[0] ) {
 		printf("[font] current font engine is: %s\n", fontlib.engine->name);
 	} else {
 		printf("[font] warning: not font engine support!\n");
