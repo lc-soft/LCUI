@@ -311,9 +311,6 @@
     <ClCompile Include="..\..\..\src\font\textstyle.c">
       <Filter>源文件\font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\font\in-core\font_8x8.c">
-      <Filter>源文件\font\in-core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\bmp\bmp.c">
       <Filter>源文件\bmp</Filter>
     </ClCompile>
@@ -390,6 +387,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\font\freetype.c">
+      <Filter>源文件\font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\font\in-core\font_inconsolata.c">
+      <Filter>源文件\font\in-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\font\in-core\in_core_font.c">
       <Filter>源文件\font</Filter>
     </ClCompile>
   </ItemGroup>

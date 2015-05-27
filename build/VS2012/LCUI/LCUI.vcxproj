@@ -203,7 +203,8 @@
     <ClCompile Include="..\..\..\src\font\charset.c" />
     <ClCompile Include="..\..\..\src\font\fontlibrary.c" />
     <ClCompile Include="..\..\..\src\font\freetype.c" />
-    <ClCompile Include="..\..\..\src\font\in-core\font_8x8.c" />
+    <ClCompile Include="..\..\..\src\font\in-core\font_inconsolata.c" />
+    <ClCompile Include="..\..\..\src\font\in-core\in_core_font.c" />
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
