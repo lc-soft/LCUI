@@ -508,6 +508,16 @@ static void LCUISurface_Loop( void *args )
 	LCUIThread_Exit(NULL);
 }
 
+static int Win32Display_GetWidth( void )
+{
+	return GetSystemMetrics( SM_CXSCREEN );
+}
+
+static int Win32Display_GetHeight( void )
+{
+	return GetSystemMetrics( SM_CYSCREEN );
+}
+
 /** 初始化适用于 Win32 平台的 surface 支持 */
 LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info )
 {
@@ -532,10 +542,10 @@ LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info )
 		MessageBox( NULL, str, szAppName, MB_ICONERROR );
 		return NULL;
 	}
-	info->width = GetSystemMetrics(SM_CXSCREEN);
-	info->height = GetSystemMetrics(SM_CYSCREEN);
+	info->getWidth = Win32Display_GetWidth;
+	info->getHeight = Win32Display_GetHeight;
+	strncpy( info->name, "win32", 32 );
 	win32.is_ready = FALSE;
-	strncpy( win32.methods.name, "win32", 32 );
 	win32.methods.new = Win32Surface_New;
 	win32.methods.delete = Win32Surface_Delete;
 	win32.methods.isReady = Win32Surface_IsReady;
@@ -561,9 +571,10 @@ LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info )
 	return &win32.methods;
 }
 
-void LCUIDisplay_ExitWin32(void)
+int LCUIDisplay_ExitWin32(void)
 {
-
+	// ...
+	return 0;
 }
 
 #endif

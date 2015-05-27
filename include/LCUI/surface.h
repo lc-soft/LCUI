@@ -49,32 +49,6 @@ typedef struct LCUI_SurfaceRec_ * LCUI_Surface;
 typedef void* LCUI_Surface;
 #endif
 
-/** surface 的操作方法集 */
-typedef struct LCUI_SurfaceMethods {
-	char			name[32];
-	LCUI_Surface		(*new)(void);
-	void			(*delete)(LCUI_Surface);
-	void			(*resize)(LCUI_Surface,int,int);
-	void			(*move)(LCUI_Surface,int,int);
-	void			(*show)(LCUI_Surface);
-	void			(*hide)(LCUI_Surface);
-	void			(*update)(LCUI_Surface);
-	void			(*present)(LCUI_Surface);
-	LCUI_BOOL		(*isReady)(LCUI_Surface);
-	LCUI_PaintContext	(*beginPaint)(LCUI_Surface,LCUI_Rect*);
-	void			(*endPaint)(LCUI_Surface,LCUI_PaintContext);
-	void			(*setCaptionW)(LCUI_Surface,const wchar_t*);
-	void			(*setRenderMode)(LCUI_Surface,int);
-	void			(*setOpacity)(LCUI_Surface,float);
-	void			(*onInvalidRect)(LCUI_Surface,LCUI_Rect*);
-	void			(*onEvent)(LCUI_Surface,LCUI_SystemEvent*);
-} LCUI_SurfaceMethods;
-
-#ifdef LCUI_BUILD_IN_WIN32
-/** 初始化适用于 Win32 平台的 surface 支持 */
-LCUI_SurfaceMethods *LCUISurface_InitWin32();
-#endif
-
 /** 删除 Surface */
 LCUI_API void Surface_Delete( LCUI_Surface surface );
 

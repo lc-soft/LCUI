@@ -40,6 +40,8 @@
 #ifndef __LCUI_DISPLAY_H__
 #define __LCUI_DISPLAY_H__
 
+#include <LCUI/surface.h>
+
 LCUI_BEGIN_HEADER
 
 /** 图形显示模式 */
@@ -51,16 +53,45 @@ enum LCUIDisplayMode {
 
 #define LDM_DEFAULT LDM_SEAMLESS
 
+/** surface 的操作方法集 */
+typedef struct LCUI_SurfaceMethods {
+	LCUI_Surface		(*new)(void);
+	void			(*delete)(LCUI_Surface);
+	void			(*resize)(LCUI_Surface,int,int);
+	void			(*move)(LCUI_Surface,int,int);
+	void			(*show)(LCUI_Surface);
+	void			(*hide)(LCUI_Surface);
+	void			(*update)(LCUI_Surface);
+	void			(*present)(LCUI_Surface);
+	LCUI_BOOL		(*isReady)(LCUI_Surface);
+	LCUI_PaintContext	(*beginPaint)(LCUI_Surface,LCUI_Rect*);
+	void			(*endPaint)(LCUI_Surface,LCUI_PaintContext);
+	void			(*setCaptionW)(LCUI_Surface,const wchar_t*);
+	void			(*setRenderMode)(LCUI_Surface,int);
+	void			(*setOpacity)(LCUI_Surface,float);
+	void			(*onInvalidRect)(LCUI_Surface,LCUI_Rect*);
+	void			(*onEvent)(LCUI_Surface,LCUI_SystemEvent*);
+} LCUI_SurfaceMethods;
+
+typedef struct LCUI_DisplayInfo {
+	char name[32];
+	int (*getWidth)(void);
+	int (*getHeight)(void);
+} LCUI_DisplayInfo;
+
+#ifdef LCUI_BUILD_IN_WIN32
+/** 初始化适用于 Win32 平台的 surface 支持 */
+LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info );
+int LCUIDisplay_ExitWin32( void );
+#elif defined(LCUI_VIDEO_DRIVER_FRAMEBUFFER)
+/** 初始化适用于 Linux 帧缓冲（FrameBuffer） 的 surface 支持 */
+LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info );
+int LCUIDisplay_ExitLinuxFB( void );
+#endif
+
 /** 一秒内的最大画面帧数 */
 #define MAX_FRAMES_PER_SEC	100
 
-#ifdef LCUI_BUILD_IN_WIN32
-#define WIN32_WINDOW_WIDTH 800
-#define WIN32_WINDOW_HEIGHT 600
-
-HWND Win32_GetSelfHWND( void );
-void Win32_SetSelfHWND( HWND hwnd );
-#endif
 
 /* 设置呈现模式 */
 LCUI_API int LCUIDisplay_SetMode( int mode );

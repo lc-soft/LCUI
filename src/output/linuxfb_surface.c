@@ -88,6 +88,16 @@ static int LinuxFB_Restore(void)
 	return system( cmd );
 }
 
+static int LinuxFB_GetWidth(void)
+{
+	return linuxfb.width;
+}
+
+static int LinuxFB_GetHeight(void)
+{
+	return linuxfb.height;
+}
+
 /** 打印屏幕相关的信息 */
 static void print_screeninfo(	struct fb_var_screeninfo fb_vinfo,
 				struct fb_fix_screeninfo fb_fix )
@@ -417,7 +427,9 @@ LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info )
 	info->width = fb_vinfo.xres;
 	info->height = fb_vinfo.yres;
 
-	strncpy( linuxfb.methods.name, "linux framebuffer", 32 );
+	strncpy( info->name, "linux framebuffer", 32 );
+	info->getWidth = LinuxFB_GetWidth;
+	info->getHeight = LinuxFB_GetHeight;
 	linuxfb.methods.new = LinuxFB_New;
 	linuxfb.methods.delete = LinuxFB_Delete;
 	linuxfb.methods.isReady = LinuxFB_IsReady;
@@ -437,9 +449,10 @@ LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info )
 	return &linuxfb.methods;
 }
 
-void LCUIDisplay_ExitLinuxFB(void)
+int LCUIDisplay_ExitLinuxFB(void)
 {
 	LinuxFB_Restore();
+	return 0;
 }
 
 #endif

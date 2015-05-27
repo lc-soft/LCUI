@@ -68,6 +68,7 @@ static struct DisplayContext {
 	LCUI_Thread		thread;		/**< 线程，负责画面更新工作 */
 	LinkedList		surfaces;	/**< surface 列表 */
 	LCUI_Mutex		mutex;
+	int			mode;
 	LCUI_DisplayInfo	info;
 	LCUI_SurfaceMethods	*methods;
 } display = { FALSE, NULL, 0 };
@@ -222,7 +223,7 @@ static void LCUIDisplay_CleanSurfaces( void )
 
 static int LCUIDisplay_Windowed( void )
 {
-	switch( display.info.mode ) {
+	switch( display.mode ) {
 	case LDM_FULLSCREEN:
 	case LDM_WINDOWED:
 		return 0;
@@ -233,14 +234,15 @@ static int LCUIDisplay_Windowed( void )
 		break;
 	}
 	Widget_Show( LCUIRootWidget );
-	Widget_Resize( LCUIRootWidget, display.info.width, display.info.height );
-	display.info.mode = LDM_WINDOWED;
+	Widget_Resize( LCUIRootWidget, display.info.getWidth(), 
+		       display.info.getHeight() );
+	display.mode = LDM_WINDOWED;
 	return 0;
 }
 
 static int LCUIDisplay_FullScreen( void )
 {
-	switch( display.info.mode ) {
+	switch( display.mode ) {
 	case LDM_SEAMLESS:
 		LCUIDisplay_CleanSurfaces();
 		LCUIDisplay_BindSurface( LCUIRootWidget );
@@ -249,8 +251,8 @@ static int LCUIDisplay_FullScreen( void )
 	case LDM_FULLSCREEN:
 		return 0;
 	}
-	LCUIDisplay_SetSize( display.info.width, display.info.height );
-	display.info.mode = LDM_FULLSCREEN;
+	LCUIDisplay_SetSize( display.info.getWidth(), display.info.getHeight() );
+	display.mode = LDM_FULLSCREEN;
 	return 0;
 }
 
@@ -258,8 +260,8 @@ static int LCUIDisplay_Seamless( void )
 {
 	int i, n;
 	LCUI_Widget widget;
-	DEBUG_MSG("display.info.mode: %d\n", display.info.mode);
-	switch( display.info.mode ) {
+	DEBUG_MSG("display.mode: %d\n", display.mode);
+	switch( display.mode ) {
 	case LDM_SEAMLESS:
 		return 0;
 	case LDM_FULLSCREEN:
@@ -275,7 +277,7 @@ static int LCUIDisplay_Seamless( void )
 		LinkedList_Get( &LCUIRootWidget->children );
 		LCUIDisplay_BindSurface( widget );
 	}
-	display.info.mode = LDM_SEAMLESS;
+	display.mode = LDM_SEAMLESS;
 	return 0;
 }
 
@@ -304,30 +306,33 @@ int LCUIDisplay_SetMode( int mode )
 /* 获取呈现模式 */
 int LCUIDisplay_GetMode(void)
 {
-	return display.info.mode;
+	return display.mode;
+}
+
+void LCUIDisplay_ExecResize( int width, int height )
+{
+	// ...
 }
 
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
 void LCUIDisplay_SetSize( int width, int height )
 {
-	display.info.width = width;
-	display.info.height = height;
-	if( display.info.mode != LDM_WINDOWED && display.info.mode != LDM_FULLSCREEN ) {
+	if( display.mode != LDM_WINDOWED && display.mode != LDM_FULLSCREEN ) {
 		return;
 	}
-	Widget_Resize( LCUIRootWidget, display.info.width, display.info.height );
+	Widget_Resize( LCUIRootWidget, width, height );
 }
 
 /** 获取屏幕宽度 */
 int LCUIDisplay_GetWidth( void )
 {
-	return display.info.width;
+	return display.info.getWidth();
 }
 
 /** 获取屏幕高度 */
 int LCUIDisplay_GetHeight( void )
 {
-	return display.info.height;
+	return display.info.getHeight();
 }
 
 /** LCUI的图形显示处理线程 */
@@ -355,7 +360,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 
 	DEBUG_MSG("tip, e_type = %d\n", e_type);
 	surface = LCUIDisplay_GetBindSurface( e->target );
-	if( display.info.mode == LDM_SEAMLESS ) {
+	if( display.mode == LDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
 			return;
 		}
@@ -389,9 +394,8 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 		DEBUG_MSG( "resize, w: %d, h: %d\n", p_rect->w, p_rect->h );
 		Surface_Resize( surface, p_rect->w, p_rect->h );
 		Widget_InvalidateArea( w, NULL, GRAPH_BOX );
-		if( w == LCUIRootWidget && display.info.mode != LDM_SEAMLESS ) {
-			display.info.width = p_rect->w;
-			display.info.height = p_rect->h;
+		if( w == LCUIRootWidget && display.mode != LDM_SEAMLESS ) {
+			LCUIDisplay_ExecResize( p_rect->w, p_rect->h );
 		}
 		break;
 	case WET_MOVE:
@@ -404,7 +408,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 
 static void OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
 {
-	if( display.info.mode == LDM_SEAMLESS ) {
+	if( display.mode == LDM_SEAMLESS ) {
 		return;
 	}
 	_DEBUG_MSG("surface: %p, event: %d, rel_x: %d, rel_y: %d\n", surface, e->type, e->rel_x, e->rel_y);
@@ -520,7 +524,7 @@ int LCUI_InitDisplay( void )
 		return -1;
 	}
 	display.is_working = TRUE;
-	display.info.mode = LDM_DEFAULT;
+	display.mode = LDM_DEFAULT;
 	LCUIMutex_Init( &display.mutex );
 	LinkedList_Init( &display.surfaces, sizeof(SurfaceRecord) );
 #ifdef LCUI_BUILD_IN_WIN32
