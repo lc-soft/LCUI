@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * freetype.c -- The FreeType font-engine support module.
  *
  * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
@@ -20,21 +20,21 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * freetype.c -- FreeType ���������֧��ģ�顣
+ * freetype.c -- FreeType 字体引擎的支持模块。
  *
- * ��Ȩ���� (C) 2015 ������ ���� <lc-soft@live.cn>
+ * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
  *
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  *
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  *
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>.
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -80,21 +80,21 @@ static void FreeType_Close( void *face )
 	FT_Done_Face( face );
 }
 
-/** ת�� FT_GlyphSlot ��������Ϊ LCUI_FontBMP */
-static size_t Convert_FTGlyph( LCUI_FontBMP *bmp, FT_GlyphSlot slot, int mode )
+/** 转换 FT_GlyphSlot 类型数据为 LCUI_FontBitmap */
+static size_t Convert_FTGlyph( LCUI_FontBitmap *bmp, FT_GlyphSlot slot, int mode )
 {
 	int error;
 	size_t size;
 	FT_BitmapGlyph bitmap_glyph;
 	FT_Glyph  glyph;
 
-	/* �����β�����ȡһ������ͼ��
-	 * ��ע�⣬������FT_Glyph���������FT_Done_Glyph�ɶ�ʹ�� */
+	/* 从字形槽中提取一个字形图像
+	 * 请注意，创建的FT_Glyph对象必须与FT_Done_Glyph成对使用 */
 	error = FT_Get_Glyph( slot, &glyph );
 	if(error) {
 		return -1;
 	}
-	/*---------------------- ��ӡ������Ϣ --------------------------
+	/*---------------------- 打印字体信息 --------------------------
 	printf(" width= %ld,  met->height= %ld\n"
 	"horiBearingX = %ld, horiBearingY = %ld, horiAdvance = %ld\n"
 	"vertBearingX = %ld, vertBearingY = %ld,  vertAdvance = %ld\n",
@@ -111,19 +111,19 @@ static size_t Convert_FTGlyph( LCUI_FontBMP *bmp, FT_GlyphSlot slot, int mode )
 	}
 	bitmap_glyph = (FT_BitmapGlyph)glyph;
 	/*
-	 * FT_Glyph_Metrics�ṹ���б������ζ�����ͨ��face->glyph->metrics��
-	 * �����ʣ��ɵõ����εĿ����ߡ���߽�ࡢ�ϱ߽�ࡢˮƽ���ȵȡ�
-	 * ע�⣺��Ϊ�������е����嶼������ֱ��������FT_HAS_VERTICALΪ��ʱ��
-	 * vertBearingX��vertBearingY��vertAdvance��ֵ�ǲ��ɿ��ģ�Ŀǰ�ݲ�����
-	 * ������Ĵ�����
+	 * FT_Glyph_Metrics结构体中保存字形度量，通过face->glyph->metrics结
+	 * 构访问，可得到字形的宽、高、左边界距、上边界距、水平跨距等等。
+	 * 注意：因为不是所有的字体都包含垂直度量，当FT_HAS_VERTICAL为假时，
+	 * vertBearingX，vertBearingY和vertAdvance的值是不可靠的，目前暂不考虑
+	 * 此情况的处理。
 	 * */
 	bmp->top = bitmap_glyph->top;
 	bmp->left = slot->metrics.horiBearingX>>6;
 	bmp->rows = bitmap_glyph->bitmap.rows;
 	bmp->width = bitmap_glyph->bitmap.width;
-	bmp->advance.x = slot->metrics.horiAdvance>>6;	/* ˮƽ��� */
-	bmp->advance.y = slot->metrics.vertAdvance>>6;	/* ��ֱ��� */
-	/* �����ڴ棬���ڱ�������λͼ */
+	bmp->advance.x = slot->metrics.horiAdvance>>6;	/* 水平跨距 */
+	bmp->advance.y = slot->metrics.vertAdvance>>6;	/* 垂直跨距 */
+	/* 分配内存，用于保存字体位图 */
 	size = bmp->rows * bmp->width * sizeof(uchar_t);
 	bmp->buffer = (uchar_t*)malloc( size );
 	if( !bmp->buffer ) {
@@ -132,18 +132,18 @@ static size_t Convert_FTGlyph( LCUI_FontBMP *bmp, FT_GlyphSlot slot, int mode )
 	}
 
 	switch( bitmap_glyph->bitmap.pixel_mode ) {
-	    /* 8λ�Ҷ�λͼ��ֱ�ӿ��� */
+	    /* 8位灰度位图，直接拷贝 */
 	    case FT_PIXEL_MODE_GRAY:
 		memcpy( bmp->buffer, bitmap_glyph->bitmap.buffer, size );
 		break;
-	    /* ��ɫ����ͼ����Ҫת�� */
+	    /* 单色点阵图，需要转换 */
 	    case FT_PIXEL_MODE_MONO: {
 		FT_Bitmap bitmap;
 		FT_Int x, y;
 		uchar_t *bit_ptr, *byte_ptr;
 
 		FT_Bitmap_New( &bitmap );
-		/* ת��λͼbitmap_glyph->bitmap��bitmap��1������ռ1���ֽ� */
+		/* 转换位图bitmap_glyph->bitmap至bitmap，1个像素占1个字节 */
 		FT_Bitmap_Convert( freetype.library, &bitmap_glyph->bitmap, &bitmap, 1 );
 		bit_ptr = bitmap.buffer;
 		byte_ptr = bmp->buffer;
@@ -156,7 +156,7 @@ static size_t Convert_FTGlyph( LCUI_FontBMP *bmp, FT_GlyphSlot slot, int mode )
 		FT_Bitmap_Done( freetype.library, &bitmap );
 		break;
 	    }
-	    /* ��������ģʽ��λͼ����ʱ��ֱ�����255������Ҫʱ������ */
+	    /* 其它像素模式的位图，暂时先直接填充255，等需要时再完善 */
 	    case FT_PIXEL_MODE_BGRA:
 	    default:
 		memset( bmp->buffer, 255, size );
@@ -166,7 +166,7 @@ static size_t Convert_FTGlyph( LCUI_FontBMP *bmp, FT_GlyphSlot slot, int mode )
 	return size;
 }
 
-static int FreeType_Render( LCUI_FontBMP *bmp, wchar_t ch, 
+static int FreeType_Render( LCUI_FontBitmap *bmp, wchar_t ch, 
 			    int pixel_size, LCUI_FontFace *face )
 {
 	int error;
@@ -174,20 +174,20 @@ static int FreeType_Render( LCUI_FontBMP *bmp, wchar_t ch,
 	LCUI_BOOL has_space = FALSE;
 	FT_Face ft_face = (FT_Face)face->data;
 
-	/* �趨����ߴ� */
+	/* 设定字体尺寸 */
 	FT_Set_Pixel_Sizes( ft_face, 0, pixel_size );
-	/* ����ǿո� */
+	/* 如果是空格 */
 	if( ch == ' ' ) {
 		ch = 'a';
 		has_space = TRUE;
 	}
-	/* ������ֵ��������� */
+	/* 载入该字的字形数据 */
 	error = FT_Load_Char( ft_face, ch, LCUI_FONT_LOAD_FALGS );
 	if(error) {
 		return error;
 	}
 	size = Convert_FTGlyph( bmp, ft_face->glyph, LCUI_FONT_RENDER_MODE );
-	/* ����ǿո���λͼ������� */
+	/* 如果是空格则将位图内容清空 */
 	if( has_space ) {
 		memset( bmp->buffer, 0, size );
 	}
