@@ -40,7 +40,6 @@
  * ****************************************************************************/
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/font.h>
 
 /* 初始化字体样式数据 */
@@ -57,8 +56,8 @@ TextStyle_Init ( LCUI_TextStyle *data )
 	data->style = FONT_STYLE_NORMAL;
 	data->weight = FONT_WEIGHT_NORMAL;
 	data->decoration = FONT_DECORATION_NONE;
-	data->fore_color = RGB(0,0,0);
-	data->back_color = RGB(255,255,255);
+	data->fore_color.value = 0x00000000;
+	data->back_color.value = 0xffffffff;
 	data->pixel_size = 12;
 }
 
@@ -201,7 +200,7 @@ LCUI_TextStyle* StyleTagStack_GetTextStyle( LCUI_StyleTagStack *tags )
 }
 
 /** 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
-static void StyleTagStack_Delete( LCUI_StyleTagStack *tags, LCUI_StyleTagID tag )
+static void StyleTagStack_Delete( LCUI_StyleTagStack *tags, int tag_id )
 {
 	int i, total;
 	LCUI_StyleTagData *p; 
@@ -214,7 +213,7 @@ static void StyleTagStack_Delete( LCUI_StyleTagStack *tags, LCUI_StyleTagID tag 
 	for(i=total-1; i>=0; --i) {
 		LinkedList_Goto( tags, i );
 		p = (LCUI_StyleTagData*)LinkedList_Get( tags );
-		if( p->tag_id == tag ) {
+		if( p->tag_id == tag_id ) {
 			LinkedList_Delete( tags );
 			break;
 		}

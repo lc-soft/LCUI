@@ -46,18 +46,18 @@ LCUI_BEGIN_HEADER
 
 /** 下面三种字体样式虽然有定义，但还未添加能够实现该字体样式效果的功能 */
 
-enum font_style { 
+enum FontStyle { 
 	FONT_STYLE_NORMAL = 0, 
 	FONT_STYLE_ITALIC = 1, 
 	FONT_STYLE_OBIQUE = 2 
 };
 
-enum font_weight {
+enum FontWeight {
 	FONT_WEIGHT_NORMAL	= 0,
 	FONT_WEIGHT_BOLD	= 1 
 };
 
-enum font_decoration {
+enum FontDecoration {
 	FONT_DECORATION_NONE		= 0,	/* 无装饰 */
 	FONT_DECORATION_BLINK		= 1,	/* 闪烁 */
 	FONT_DECORATION_UNDERLINE	= 2,	/* 下划线 */
@@ -65,7 +65,7 @@ enum font_decoration {
 	FONT_DECORATION_OVERLINE	= 4	/* 上划线 */
 };
 
-typedef struct LCUI_TextStyle_ {
+typedef struct LCUI_TextStyle {
 	LCUI_BOOL _family:1;
 	LCUI_BOOL _style:1;
 	LCUI_BOOL _weight:1;
@@ -75,9 +75,9 @@ typedef struct LCUI_TextStyle_ {
 	LCUI_BOOL _pixel_size:1;
 	
 	int font_id;
-	enum font_style	style:3;
-	enum font_weight weight:3;
-	enum font_decoration decoration:4;
+	int style:3;
+	int weight:3;
+	int decoration:4;
 	
 	LCUI_Color fore_color;
 	LCUI_Color back_color;
@@ -85,17 +85,17 @@ typedef struct LCUI_TextStyle_ {
 	int pixel_size;	
 } LCUI_TextStyle;
 
-typedef enum {
-	TAG_ID_FAMILY = 0,
-	TAG_ID_STYLE = 1,
-	TAG_ID_WIEGHT = 2,
-	TAG_ID_DECORATION = 3,
-	TAG_ID_SIZE = 4,
-	TAG_ID_COLOR = 5
-} LCUI_StyleTagID;
+enum LCUI_StyleTagID {
+	TAG_ID_FAMILY,
+	TAG_ID_STYLE,
+	TAG_ID_WIEGHT,
+	TAG_ID_DECORATION,
+	TAG_ID_SIZE,
+	TAG_ID_COLOR
+};
 
 typedef struct LCUI_StyleTagData_ {
-	LCUI_StyleTagID tag_id;
+	int tag_id;
 	union {
 		LCUI_Color color;
 		LCUI_StyleVar size;
