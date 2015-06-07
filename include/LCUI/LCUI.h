@@ -198,7 +198,9 @@ enum StyleValue {
 	SV_AUTO,
 	SV_CONTAIN,
 	SV_COVER,
+	SV_LEFT,
 	SV_CENTER,
+	SV_RIGHT,
 	SV_TOP,
 	SV_TOP_LEFT,
 	SV_TOP_CENTER,
@@ -208,7 +210,7 @@ enum StyleValue {
 	SV_CENTER_RIGHT,
 	SV_BOTTOM_LEFT,
 	SV_BOTTOM_CENTER,
-	SV_BOTTOM_RIGHT
+	SV_BOTTOM_RIGHT,
 };
 
 typedef struct LCUI_Background {

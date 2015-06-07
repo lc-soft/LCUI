@@ -43,13 +43,6 @@
 #include <LCUI/graph.h>
 #include <LCUI/font.h>
 
-/** 文本对齐方式 */
-typedef enum TextAlignType {
-	TEXT_ALIGN_LEFT,	/**< 向左对齐 */
-	TEXT_ALIGN_CENTER,	/**< 居中对齐 */
-	TEXT_ALIGN_RIGHT	/**< 向右对齐 */
-} TextAlignType;
-
 /** 文本添加类型 */
 typedef enum TextAddType_ {
         TEXT_ADD_TYPE_INSERT,		/**< 插入至插入点处 */
@@ -111,7 +104,7 @@ struct LCUI_TextLayerRec_  {
         LCUI_BOOL is_using_buffer;	/**< 是否使用缓存空间来存储文本位图 */
 	LCUI_DirtyRectList dirty_rect;	/**< 脏矩形记录 */
 
-        TextAlignType text_align;	/**< 文本的对齐方式 */
+        int text_align;			/**< 文本的对齐方式 */
         TextRowList row_list;		/**< 文本行列表 */
         LCUI_TextStyle text_style;	/**< 文本全局样式 */
 	LCUI_StyleVar line_height;	/**< 全局文本行高度 */
@@ -120,6 +113,15 @@ struct LCUI_TextLayerRec_  {
 };
 
 #define TextLayer_GetRow(layer, n) (n >= layer->row_list.length) ? NULL:layer->row_list.rows[n]
+
+/* 根据对齐方式，计算文本行的起始X轴位置 */
+#define TextLayer_GetRowStartX( layer, p_row, x ) \
+	switch( layer->text_align ) { \
+	case SV_CENTER: x = (layer->max_width - p_row->width)/2; break; \
+	case SV_RIGHT: x = layer->max_width - p_row->width; break; \
+	case SV_LEFT: \
+	default: x = 0; break; \
+	}
 
 /** 获取文本行总数 */
 int TextLayer_GetRowTotal( LCUI_TextLayer layer )
@@ -446,7 +448,7 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->is_autowrap_mode = FALSE;
 	layer->is_using_style_tags = FALSE;
 	layer->is_using_buffer = TRUE;
-	layer->text_align = TEXT_ALIGN_LEFT;
+	layer->text_align = SV_LEFT;
 	layer->row_list.max_length = 0;
 	layer->row_list.length = 0;
 	layer->row_list.rows = NULL;
@@ -484,15 +486,6 @@ void TextLayer_Destroy( LCUI_TextLayer layer )
 	TextRowList_Destroy( &layer->row_list );
 	free( layer );
 }
-
-/* 根据对齐方式，计算文本行的起始X轴位置 */
-#define TextLayer_GetRowStartX( layer, p_row, x ) \
-	switch( layer->text_align ) { \
-	case TEXT_ALIGN_CENTER: x = (layer->max_width - p_row->width)/2; break; \
-	case TEXT_ALIGN_RIGHT: x = layer->max_width - p_row->width; break; \
-	case TEXT_ALIGN_LEFT: \
-	default: x = 0; break; \
-	}
 
 /** 获取指定文本行中的文本段的矩形区域 */
 static int TextLayer_GetRowRect( LCUI_TextLayer layer, int row, int start_col, 
