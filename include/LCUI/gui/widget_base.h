@@ -128,6 +128,8 @@ typedef struct LCUI_WidgetBase {
 /** 为函数加前缀名 */
 #define $(FUNC_NAME) Widget_##FUNC_NAME
 
+#define Widget_NewPrivateData(w, type) (type*)(w->private_data = malloc(sizeof(type)))
+
 /** 一般来说部件占用的矩形区域看上去是指边框盒区域 */
 #define Widget_GetRect Widget_GetBorderRect
 
@@ -170,6 +172,10 @@ LCUI_API void $(Resize)( LCUI_Widget w, int width, int height );
 LCUI_API void $(Show)( LCUI_Widget w );
 
 LCUI_API void $(Hide)( LCUI_Widget w );
+
+LCUI_API void Widget_Lock( LCUI_Widget w );
+
+LCUI_API void Widget_Unlock( LCUI_Widget w );
 
 LCUI_API void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color );
 

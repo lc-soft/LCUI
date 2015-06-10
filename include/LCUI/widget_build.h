@@ -43,6 +43,7 @@
 typedef struct LCUI_WidgetFull* LCUI_Widget;
 
 #include <LCUI/graph.h>
+#include <LCUI/thread.h>
 #include <LCUI/gui/widget_base.h>
 #include <LCUI/gui/widget_task.h>
 #include <LCUI/gui/widget_paint.h>
@@ -53,23 +54,24 @@ LCUI_BEGIN_HEADER
 
 /** 部件结构（完整版） */
 struct LCUI_WidgetFull {
-	LCUI_WidgetBase		base;		/**< 基础数据及操作集 */
-	LCUI_WidgetStyle	style;		/**< 样式 */
-	char			*type_name;	/**< 类型名称 */
-	wchar_t			*title;		/**< 标题 */
-	LCUI_BOOL		autosize;	/**< 指定是否自动调整自身的大小，以适应内容的大小 */
-	LCUI_BOOL		focus;		/**< 指定该部件是否需要焦点 */
-	LCUI_Widget		focus_widget;	/**< 获得焦点的子部件 */
+	LCUI_WidgetBase		base;			/**< 基础数据及操作集 */
+	LCUI_WidgetStyle	style;			/**< 样式 */
+	char			*type_name;		/**< 类型名称 */
+	wchar_t			*title;			/**< 标题 */
+	LCUI_BOOL		autosize;		/**< 指定是否自动调整自身的大小，以适应内容的大小 */
+	LCUI_BOOL		focus;			/**< 指定该部件是否需要焦点 */
+	LCUI_Widget		focus_widget;		/**< 获得焦点的子部件 */
 
-	LCUI_Widget		parent;		/**< 父部件 */
-	LinkedList		children;	/**< 子部件 */
-	LinkedList		children_show;	/**< 子部件的堆叠顺序记录，由顶到底 */
-	LCUI_EventBox		event;		/**< 事件记录 */
-	LCUI_WidgetTaskBox	task;		/**< 任务记录 */
-	LCUI_DirtyRectList	dirty_rects;	/**< 记录无效区域（脏矩形） */
+	LCUI_Widget		parent;			/**< 父部件 */
+	LinkedList		children;		/**< 子部件 */
+	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
+	LCUI_EventBox		event;			/**< 事件记录 */
+	LCUI_WidgetTaskBox	task;			/**< 任务记录 */
+	LCUI_DirtyRectList	dirty_rects;		/**< 记录无效区域（脏矩形） */
 	LCUI_BOOL		has_dirty_child;	/**< 标志，指示子级部件是否有无效区域 */
-	LCUI_Graph		graph;		/**< 位图缓存 */
-	void			*private_data;	/**< 私有数据 */
+	LCUI_Graph		graph;			/**< 位图缓存 */
+	LCUI_Mutex		mutex;			/**< 互斥锁 */
+	void			*private_data;		/**< 私有数据 */
 };
 
 LCUI_END_HEADER

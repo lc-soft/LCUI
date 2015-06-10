@@ -219,6 +219,7 @@ static void HandleDestroy( LCUI_Widget w, LCUI_WidgetTask *t )
 	// code ...
 	/* 向父级部件添加相关任务 */
 	// code ...
+	LCUIMutex_Unlock( &w->mutex );
 }
 
 /** 更新当前任务状态，确保部件的任务能够被处理到 */
@@ -318,13 +319,19 @@ void Widget_DestroyTaskBox( LCUI_Widget widget )
 }
 
 /** 处理部件的各种任务 */
-static void Widget_ProcTask( LCUI_Widget w )
+static int Widget_ProcTask( LCUI_Widget w )
 {
-	int i, n;
+	int ret = 1, i, n;
 	TaskRecord *buffer;
 	DEBUG_MSG("widget: %p, is_root: %d, for_self: %d, for_children: %d\n", w, w == LCUIRootWidget, w->task->for_self, w->task->for_children);
+
 	/* 如果该部件有任务需要处理 */
 	if( w->task->for_self ) {
+		ret = LCUIMutex_TryLock( &w->mutex );
+		if( ret != 0 ) {
+			ret = 1;
+			goto skip_proc_self_task;
+		}
 		w->task->for_self = FALSE;
 		buffer = w->task->buffer[w->task->i];
 		/* 切换前后台记录 */
@@ -333,7 +340,13 @@ static void Widget_ProcTask( LCUI_Widget w )
 		if( buffer[WTT_DESTROY].is_valid ) {
 			buffer[WTT_DESTROY].is_valid = FALSE;
 			task_handlers[WTT_DESTROY]( w, NULL );
-			return;
+			return -1;
+		}
+		/* 如果有用户自定义任务 */
+		if( buffer[WTT_USER].is_valid ) {
+			LCUI_WidgetClass *wc;
+			wc = LCUIWidget_GetClass( w->type_name );
+			wc->task_handler(w, &buffer[i].data);
 		}
 		for( i=0; i<WTT_USER; ++i ) {
 			DEBUG_MSG( "task_id: %d, is_valid: %d\n", i, buffer[i].is_valid );
@@ -342,14 +355,13 @@ static void Widget_ProcTask( LCUI_Widget w )
 				task_handlers[i]( w, &buffer[i].data );
 			}
 		}
-		/* 如果有用户自定义任务 */
-		if( buffer[WTT_USER].is_valid ) {
-			LCUI_WidgetClass *wc;
-			wc = LCUIWidget_GetClass( w->type_name );
-			wc->task_handler(w, &buffer[i].data);
-		}
 		/* 只留了一个位置用于存放用户自定义任务，以后真有需求再改吧 */
+		LCUIMutex_Unlock( &w->mutex );
+		ret = 0;
 	}
+
+skip_proc_self_task:;
+
 	/* 如果子级部件中有待处理的部件，则递归进去 */
 	if( w->task->for_children ) {
 		LCUI_Widget child;
@@ -360,9 +372,13 @@ static void Widget_ProcTask( LCUI_Widget w )
 		for( i=0; i<n; ++i ) {
 			child = (LCUI_Widget)LinkedList_Get( &w->children );
 			LinkedList_ToNext( &w->children );
-			Widget_ProcTask( child );
+			/* 如果该级部件的任务需要留到下次再处理 */
+			if( Widget_ProcTask( child ) == 1 ) {
+				w->task->for_children = TRUE;
+			}
 		}
 	}
+	return ret;
 }
 
 /** 处理一次当前积累的部件任务 */

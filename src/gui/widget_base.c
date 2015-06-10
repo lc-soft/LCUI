@@ -43,12 +43,6 @@
 
 #define NEW_ONE(TYPE) (TYPE*)malloc(sizeof(TYPE))
 
-/**
- * $ 可以看成是 Self，指当前模块(Widget)、函数的操作对象，这样省的手工为每个函
- * 数名加 Widget_ 前缀了。
- */
-#define $(FUNC_NAME) Widget_##FUNC_NAME
-
 static struct LCUI_WidgetFull LCUIRootWidgetData;	/**< 根级部件 */
 LCUI_Widget LCUIRootWidget = &LCUIRootWidgetData;	/**< 创建外部引用 */
 
@@ -59,7 +53,7 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 }
 
 /** 追加子部件 */
-int $(Append)( LCUI_Widget container, LCUI_Widget widget )
+int Widget_Append( LCUI_Widget container, LCUI_Widget widget )
 {
 	int i, n;
 	LCUI_Widget old_container;
@@ -120,7 +114,7 @@ remove_done:
 }
 
 /** 前置显示 */
-int $(Front)( LCUI_Widget widget )
+int Widget_Front( LCUI_Widget widget )
 {
 	int i, n, src_pos = -1, des_pos = -1;
 	LCUI_Widget parent, child;
@@ -164,7 +158,7 @@ int $(Front)( LCUI_Widget widget )
 }
 
 /** 部件析构函数 */
-static void $(OnDestroy)( void *arg )
+static void Widget_OnDestroy( void *arg )
 {
 	LCUI_WidgetEvent e;
 	LCUI_Widget widget = (LCUI_Widget)arg;
@@ -184,7 +178,7 @@ static void $(OnDestroy)( void *arg )
 }
 
 /** 构造函数 */
-static void $(Init)( LCUI_Widget widget )
+static void Widget_Init( LCUI_Widget widget )
 {
 	widget->style.z_index = 0;
 	widget->style.x.type = SVT_NONE;
@@ -220,18 +214,19 @@ static void $(Init)( LCUI_Widget widget )
 	Border_Init( &widget->style.border );
 	LinkedList_Init( &widget->children, sizeof(struct LCUI_WidgetFull) );
 	LinkedList_Init( &widget->children_show, 0 );
-	LinkedList_SetDestroyFunc( &widget->children, $(OnDestroy) );
+	LinkedList_SetDestroyFunc( &widget->children, Widget_OnDestroy) );
 	LinkedList_SetDataNeedFree( &widget->children, TRUE );
 	LinkedList_SetDataNeedFree( &widget->children_show, FALSE );
 	DirtyRectList_Init( &widget->dirty_rects );
 	Graph_Init( &widget->graph );
+	LCUIMutex_Init( &widget->mutex );
 }
 
 /** 新建一个GUI部件 */
 LCUI_Widget LCUIWidget_New( const char *type_name )
 {
 	LCUI_Widget widget = NEW_ONE(struct LCUI_WidgetFull);
-	$(Init)(widget);
+	Widget_Init)(widget);
 	if( type_name ) {
 		widget->type_name = strdup( type_name );
 	}
@@ -239,7 +234,7 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 }
 
 /** 获取当前点命中的最上层可见部件 */
-LCUI_Widget $(At)( LCUI_Widget widget, int x, int y )
+LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 {
 	int i, n;
 	LCUI_Widget target = widget, child = NULL;
@@ -264,14 +259,14 @@ LCUI_Widget $(At)( LCUI_Widget widget, int x, int y )
 }
 
 /** 设置部件为顶级部件 */
-int $(Top)( LCUI_Widget w )
+int Widget_Top( LCUI_Widget w )
 {
 	DEBUG_MSG("tip\n");
-	return $(Append)( LCUIRootWidget, w );
+	return Widget_Append( LCUIRootWidget, w );
 }
 
 /** 设置部件标题 */
-void $(SetTitleW)( LCUI_Widget w, const wchar_t *title )
+void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 {
 	int len;
 	LCUI_WidgetTask t;
@@ -287,7 +282,7 @@ void $(SetTitleW)( LCUI_Widget w, const wchar_t *title )
 }
 
 /** 获取内边距框占用的矩形区域 */
-void $(GetPaddingRect)( LCUI_Widget widget, LCUI_Rect *rect )
+void Widget_GetPaddingRect( LCUI_Widget widget, LCUI_Rect *rect )
 {
 	rect->x = 0;
 	rect->y = 0;
@@ -296,7 +291,7 @@ void $(GetPaddingRect)( LCUI_Widget widget, LCUI_Rect *rect )
 }
 
 /** 获取内容框占用的矩形区域 */
-void $(GetContentRect)( LCUI_Widget widget, LCUI_Rect *rect )
+void Widget_GetContentRect( LCUI_Widget widget, LCUI_Rect *rect )
 {
 	rect->x = 0;
 	rect->y = 0;
@@ -305,7 +300,7 @@ void $(GetContentRect)( LCUI_Widget widget, LCUI_Rect *rect )
 }
 
 /** 获取边框盒占用的矩形区域 */
-void $(GetBorderRect)( LCUI_Widget widget, LCUI_Rect *rect )
+void Widget_GetBorderRect( LCUI_Widget widget, LCUI_Rect *rect )
 {
 	rect->x = 0;
 	rect->y = 0;
@@ -314,7 +309,7 @@ void $(GetBorderRect)( LCUI_Widget widget, LCUI_Rect *rect )
 }
 
 /** 获取部件当前占用的矩形区域（包括阴影区域） */
-void $(GetOuterRect)( LCUI_Widget widget, LCUI_Rect *rect )
+void Widget_GetOuterRect( LCUI_Widget widget, LCUI_Rect *rect )
 {
 	rect->x = 0;
 	rect->y = 0;
@@ -323,12 +318,12 @@ void $(GetOuterRect)( LCUI_Widget widget, LCUI_Rect *rect )
 }
 
 /** 获取部件当前可见的矩形区域 */
-void $(GetValidRect)( LCUI_Widget widget, LCUI_Rect *rect )
+void Widget_GetValidRect( LCUI_Widget widget, LCUI_Rect *rect )
 {
 	LCUI_Rect container_rect;
-	$(GetRect)( widget, rect );
+	Widget_GetRect( widget, rect );
 	while( widget ) {
-		$(GetRect)( widget->parent, &container_rect );
+		Widget_GetRect( widget->parent, &container_rect );
 		if( rect->x < 0 ) {
 			rect->w = rect->w + rect->x;
 			rect->x = 0;
@@ -352,7 +347,7 @@ void $(GetValidRect)( LCUI_Widget widget, LCUI_Rect *rect )
 }
 
 /** 计算坐标 */
-void $(ComputeCoord)( LCUI_Widget w )
+void Widget_ComputeCoord( LCUI_Widget w )
 {
 	// 需要考虑到其它定位相关的属性
 	// code ...
@@ -410,7 +405,7 @@ void $(ComputeCoord)( LCUI_Widget w )
 }
 
 /** 更新位图尺寸 */
-void $(UpdateGraphBox)( LCUI_Widget w )
+void Widget_UpdateGraphBox( LCUI_Widget w )
 {
 	LCUI_Rect *rb = &w->base.box.border;
 	LCUI_Rect *rg = &w->base.box.graph;
@@ -433,7 +428,7 @@ void $(UpdateGraphBox)( LCUI_Widget w )
 }
 
 /** 计算尺寸 */
-void $(ComputeSize)( LCUI_Widget w )
+void Widget_ComputeSize( LCUI_Widget w )
 {
 	switch( w->style.width.type ) {
 	case SVT_SCALE:
@@ -498,7 +493,7 @@ void $(ComputeSize)( LCUI_Widget w )
 }
 
 /** 计算内边距 */
-void $(ComputePadding)( LCUI_Widget w )
+void Widget_ComputePadding( LCUI_Widget w )
 {
 	int i;
 	double result;
@@ -547,7 +542,7 @@ void $(ComputePadding)( LCUI_Widget w )
 }
 
 /** 计算内边距 */
-void $(ComputeMargin)( LCUI_Widget w )
+void Widget_ComputeMargin( LCUI_Widget w )
 {
 	int i;
 	double result;
@@ -596,7 +591,7 @@ void $(ComputeMargin)( LCUI_Widget w )
 }
 
 /** 设置内边距 */
-void $(SetPadding)( LCUI_Widget w, int top, int right, int bottom, int left )
+void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left )
 {
 	LCUI_WidgetTask t;
 	w->style.padding.top.px = top;
@@ -607,14 +602,14 @@ void $(SetPadding)( LCUI_Widget w, int top, int right, int bottom, int left )
 	w->style.padding.right.type = SVT_PX;
 	w->style.padding.bottom.type = SVT_PX;
 	w->style.padding.left.type = SVT_PX;
-	$(ComputeMargin)( w );
-	$(ComputeSize)( w );
-	$(ComputeCoord)( w );
+	Widget_ComputeMargin( w );
+	Widget_ComputeSize( w );
+	Widget_ComputeCoord( w );
 	Widget_AddTask( w, (t.type = WTT_AUTO_SIZE, &t) );
 	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
 }
 
-void $(SetPaddingS)(
+void Widget_SetPaddingS(
 	LCUI_Widget w,
 	const char *top,
 	const char *right,
@@ -626,7 +621,7 @@ void $(SetPaddingS)(
 }
 
 /** 设置外边距 */
-void $(SetMargin)( LCUI_Widget w, int top, int right, int bottom, int left )
+void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left )
 {
 	LCUI_WidgetTask t;
 	w->style.margin.top.px = top;
@@ -637,27 +632,27 @@ void $(SetMargin)( LCUI_Widget w, int top, int right, int bottom, int left )
 	w->style.margin.right.type = SVT_PX;
 	w->style.margin.bottom.type = SVT_PX;
 	w->style.margin.left.type = SVT_PX;
-	$(ComputeMargin)( w );
-	$(ComputeSize)( w );
-	$(ComputeCoord)( w );
+	Widget_ComputeMargin( w );
+	Widget_ComputeSize( w );
+	Widget_ComputeCoord( w );
 	Widget_AddTask( w, (t.type = WTT_AUTO_SIZE, &t) );
 	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
 }
 
 /** 设置左边距 */
-void $(SetLeft)( LCUI_Widget w, const char *value )
+void Widget_SetLeft( LCUI_Widget w, const char *value )
 {
 
 }
 
 /** 设置顶边距 */
-void $(SetTop)( LCUI_Widget w, const char *value )
+void Widget_SetTop( LCUI_Widget w, const char *value )
 {
 
 }
 
 /** 移动部件位置 */
-void $(Move)( LCUI_Widget w, int top, int left )
+void Widget_Move( LCUI_Widget w, int top, int left )
 {
 	LCUI_WidgetTask t;
 	t.type = WTT_MOVE;
@@ -669,12 +664,12 @@ void $(Move)( LCUI_Widget w, int top, int left )
 	w->style.y.type = SVT_PX;
 	w->style.x.type = SVT_PX;
 	// 重新计算各个区域的坐标
-	$(ComputeCoord)( w );
+	Widget_ComputeCoord( w );
 	Widget_AddTask( w, &t );
 }
 
 /** 调整部件尺寸 */
-void $(Resize)( LCUI_Widget w, int width, int height )
+void Widget_Resize( LCUI_Widget w, int width, int height )
 {
 	LCUI_WidgetTask t;
 
@@ -685,22 +680,22 @@ void $(Resize)( LCUI_Widget w, int width, int height )
 	w->style.height.px = height;
 	w->style.width.type = SVT_PX;
 	w->style.height.type = SVT_PX;
-	$(ComputeSize)( w );
+	Widget_ComputeSize( w );
 	Widget_AddTask( w, &t );
 	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
 }
 
-void $(SetWidth)( LCUI_Widget w, const char *value )
+void Widget_SetWidth( LCUI_Widget w, const char *value )
 {
 
 }
 
-void $(SetHeight)( LCUI_Widget w, const char *value )
+void Widget_SetHeight( LCUI_Widget w, const char *value )
 {
 
 }
 
-void $(Show)( LCUI_Widget w )
+void Widget_Show( LCUI_Widget w )
 {
 	LCUI_WidgetTask t;
 	t.type = WTT_SHOW;
@@ -710,7 +705,7 @@ void $(Show)( LCUI_Widget w )
 	Widget_AddTask( w, &t );
 }
 
-void $(Hide)( LCUI_Widget w )
+void Widget_Hide( LCUI_Widget w )
 {
 	LCUI_WidgetTask t;
 	t.type = WTT_SHOW;
@@ -719,7 +714,7 @@ void $(Hide)( LCUI_Widget w )
 	Widget_AddTask( w, &t );
 }
 
-void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color )
+void Widget_SetBackgroundColor( LCUI_Widget w, LCUI_Color color )
 {
 	w->style.background.color = color;
 }
@@ -728,7 +723,7 @@ void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color )
 #define PUSH(WIDGET, STYLE) WIDGET##->style.STYLE## = WIDGET##->base.style.##STYLE
 
 /** 拉取现有样式至缓存区 */
-void $(PullStyle)( LCUI_Widget w, int style )
+void Widget_PullStyle( LCUI_Widget w, int style )
 {
 	if(!(style & WSS_POSITION) ) goto PULL_WSS_BOX;
 	PULL(w, position);
@@ -760,7 +755,7 @@ PULL_DONE:
 }
 
 /** 推送缓存区中的样式，以让部件应用新样式 */
-void $(PushStyle)( LCUI_Widget w, int style )
+void Widget_PushStyle( LCUI_Widget w, int style )
 {
 	LCUI_WidgetTask t;
 	if( !(style & WSS_POSITION) ) goto PUSH_WSS_BOX;
@@ -789,8 +784,8 @@ PUSH_WSS_BACKGROUND:
 PUSH_WSS_BORDER:
 	if( !(style & WSS_BORDER) ) goto PUSH_WSS_SHADOW;
 	PUSH( w, border );
-	$(ComputeCoord)( w );
-	$(ComputeSize)( w );
+	Widget_ComputeCoord( w );
+	Widget_ComputeSize( w );
 	t.type = WTT_BORDER;
 	t.border = w->style.border;
 	Widget_AddTask( w, &t );
@@ -798,16 +793,26 @@ PUSH_WSS_SHADOW:
 	if( !(style & WSS_SHADOW) ) goto PUSH_DONE;
 	t.shadow = w->style.shadow;
 	PUSH( w, shadow );
-	$(ComputeCoord)( w );
-	$(ComputeSize)( w );
+	Widget_ComputeCoord( w );
+	Widget_ComputeSize( w );
 	Widget_AddTask( w, (t.type = WTT_SHADOW, &t) );
 PUSH_DONE:
 	return;
 }
 
+void Widget_Lock( LCUI_Widget w )
+{
+	LCUIMutex_Lock( &w->mutex );
+}
+
+void Widget_Unlock( LCUI_Widget w )
+{
+	LCUIMutex_Unlock( &w->mutex );
+}
+
 void LCUI_InitWidget(void)
 {
-	$(Init)(LCUIRootWidget);
+	Widget_Init(LCUIRootWidget);
 	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
 	LCUIWidget_InitTask();
 	LCUIWidget_InitEvent();
