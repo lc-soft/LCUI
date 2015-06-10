@@ -132,9 +132,6 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\checkbox.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\label.h">
-      <Filter>头文件\LCUI\gui\widget</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\menu.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
     </ClInclude>
@@ -239,6 +236,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\draw\background.h">
       <Filter>头文件\LCUI\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textview.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -392,8 +392,11 @@
     <ClCompile Include="..\..\..\src\font\in-core\font_inconsolata.c">
       <Filter>源文件\font\in-core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\font\in-core\in_core_font.c">
+    <ClCompile Include="..\..\..\src\font\in_core_font.c">
       <Filter>源文件\font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\textview.c">
+      <Filter>源文件\gui\widget</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -430,6 +433,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="lcui.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="lcui.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

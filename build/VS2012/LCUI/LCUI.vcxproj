@@ -145,7 +145,7 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\activebox.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\checkbox.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\label.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textview.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\menu.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\picturebox.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\progressbar.h" />
@@ -204,9 +204,10 @@
     <ClCompile Include="..\..\..\src\font\fontlibrary.c" />
     <ClCompile Include="..\..\..\src\font\freetype.c" />
     <ClCompile Include="..\..\..\src\font\in-core\font_inconsolata.c" />
-    <ClCompile Include="..\..\..\src\font\in-core\in_core_font.c" />
+    <ClCompile Include="..\..\..\src\font\in_core_font.c" />
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\textview.c" />
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
     <ClCompile Include="..\..\..\src\gui\widget_library.c" />
@@ -269,6 +270,7 @@
     <Image Include="lcui.ico">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </Image>
+    <Image Include="lcui.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
