@@ -42,11 +42,74 @@
 
 LCUI_BEGIN_HEADER
 
-#ifdef __IN_TEXTLAYER_SOURCE_FILE__
-typedef struct LCUI_TextLayerRec_* LCUI_TextLayer;
-#else
-typedef void* LCUI_TextLayer;
-#endif
+/** 文本添加类型 */
+enum TextAddType {
+        TEXT_ADD_TYPE_INSERT,		/**< 插入至插入点处 */
+        TEXT_ADD_TYPE_APPEND		/**< 追加至文本末尾 */
+};
+
+typedef struct TextCharData {
+        wchar_t char_code;		/**< 字符码 */
+        LCUI_TextStyle *style;		/**< 该字符使用的样式数据 */
+	LCUI_FontBitmap *bitmap;	/**< 字体位图数据 */
+} TextCharData;
+
+/** 文本行结尾符 */
+typedef enum EOLChar {
+	EOL_NONE,	/**< 无换行 */
+	EOL_CR,		/**< Mac OS 格式换行，CF = Carriage-Return，字符：\r */
+	EOL_LF,		/**< UNIX/Linux 格式换行，LF = Line-Feed，字符：\r */
+	EOL_CR_LF	/**< Windows 格式换行： \r\n */
+} EOLChar;
+
+/* 文本行 */
+typedef struct TextRowData {
+        int width;			/**< 宽度 */
+        int height;			/**< 高度 */
+	int text_height;		/**< 当前行中最大字体的高度 */
+        int length;			/**< 该行文本长度 */
+        int max_length;			/**< 该行文本最大长度 */
+        TextCharData **string;		/**< 该行文本的数据 */
+	EOLChar eol;			/**< 行尾结束类型 */
+} TextRowData;
+
+/* 文本行列表 */
+typedef struct TextRowList {
+        int length;			/**< 当前总行数 */
+        int max_length;			/**< 最大行数 */
+        TextRowData **rows;		/**< 每一行文本的数据 */
+} TextRowList;
+
+/* 任务数据 */
+typedef struct TaskData {
+        LCUI_BOOL update_bitmap;	/**< 更新文本的字体位图 */
+        LCUI_BOOL update_typeset;	/**< 重新对文本进行排版 */
+        int typeset_start_row;		/**< 排版处理的起始行 */	
+        LCUI_BOOL redraw_all;		/**< 重绘所有字体位图 */
+} TaskData;
+
+typedef struct LCUI_TextLayerRec_  {
+        int offset_x;			/**< X轴坐标偏移量 */
+        int offset_y;			/**< Y轴坐标偏移量 */
+	int new_offset_x;		/**< 新的X轴坐标偏移量 */
+	int new_offset_y;		/**< 新的Y轴坐标偏移量 */
+        int insert_x;			/**< 光标所在列数 */
+        int insert_y;			/**< 光标所在行数 */
+        int max_width;			/**< 最大文本宽度 */
+        int max_height;			/**< 最大文本高度 */
+	LCUI_BOOL is_mulitiline_mode;	/**< 是否启用多行文本模式 */
+        LCUI_BOOL is_autowrap_mode;	/**< 是否启用自动换行模式 */
+	LCUI_BOOL is_using_style_tags;	/**< 是否使用文本样式标签 */
+        LCUI_BOOL is_using_buffer;	/**< 是否使用缓存空间来存储文本位图 */
+	LCUI_DirtyRectList dirty_rect;	/**< 脏矩形记录 */
+
+        int text_align;			/**< 文本的对齐方式 */
+        TextRowList row_list;		/**< 文本行列表 */
+        LCUI_TextStyle text_style;	/**< 文本全局样式 */
+	LCUI_StyleVar line_height;	/**< 全局文本行高度 */
+        TaskData task;			/**< 任务 */
+        LCUI_Graph graph;		/**< 文本位图缓存 */
+}* LCUI_TextLayer;
 
 /** 获取文本行总数 */
 LCUI_API int TextLayer_GetRowTotal( LCUI_TextLayer layer );
@@ -75,7 +138,7 @@ LCUI_API void TextLayer_SetOffset( LCUI_TextLayer layer, int offset_x, int offse
 LCUI_API LCUI_TextLayer TextLayer_New(void);
 
 /** 销毁TextLayer */
-LCUI_API void TextLayer_Destroy( LCUI_TextLayer layer );
+LCUI_API void TextLayer_Destroy( LCUI_TextLayer *layer );
 
 /** 标记指定范围内容的文本行的矩形为无效 */
 LCUI_API void TextLayer_InvalidateRowsRect( LCUI_TextLayer layer, 
@@ -169,7 +232,6 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list );
  * @param layer 要使用的文本图层
  * @param area 文本图层中需要绘制的区域
  * @param layer_pos 文本图层在目标图像中的位置
- * @param need_replace 绘制时是否需要覆盖像素
  * @param graph 目标图像
  */
 LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,

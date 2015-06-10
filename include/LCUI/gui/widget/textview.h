@@ -1,8 +1,7 @@
 ﻿/* ***************************************************************************
- * label.h -- LCUI's Label widget
+ * textview.h -- LCUI's TextView Widget
  * 
- * Copyright (C) 2012-2014 by
- * Liu Chao
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -21,10 +20,9 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * label.h -- LCUI 的文本标签部件
+ * textview.h -- LCUI 的文本显示部件
  *
- * 版权所有 (C) 2012-2014 归属于
- * 刘超
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -38,41 +36,21 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-#ifndef __LCUI_LABEL_H__
-#define __LCUI_LABEL_H__
+
+#ifndef __LCUI_TEXTVIEW_H__
+#define __LCUI_TEXTVIEW_H__
 
 #include <LCUI/font.h>
 
 LCUI_BEGIN_HEADER
-	
-#define WIDGET_LABEL "LCUI::Label"
-#define Label_New() Widget_New(WIDGET_LABEL)
 
 /** 设定与标签关联的文本内容 */
-LCUI_API int Label_SetTextW( LCUI_Widget widget, const wchar_t *text );
+LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text );
 
-LCUI_API int Label_SetText( LCUI_Widget widget, const char *utf8_text );
+LCUI_API int TextView_SetText( LCUI_Widget w, const char *utf8_text );
 
-LCUI_API int Label_SetTextA( LCUI_Widget widget, const char *ansi_text );
-
-/** 设置Label部件显示的文本是否自动换行 */
-LCUI_API void Label_SetAutoWrap( LCUI_Widget widget, LCUI_BOOL flag );
-
-/** 设置文本对齐方式 */
-LCUI_API void Label_SetTextAlign( LCUI_Widget widget, TextAlignType align );
-
-/** 为Label部件内显示的文本设定文本样式 */
-LCUI_API int Label_SetTextStyle( LCUI_Widget widget, LCUI_TextStyle style );
-
-/** 获取Label部件的全局文本样式 */
-LCUI_API void Label_GetTextStyle( LCUI_Widget widget, LCUI_TextStyle *style );
-
-/** 刷新label部件显示的文本 */
-LCUI_API void Label_Refresh( LCUI_Widget widget );
-
-/** 启用或禁用Label部件的自动尺寸调整功能 */
-LCUI_API void Label_SetAutoSize( LCUI_Widget widget, LCUI_BOOL flag,
-							AUTOSIZE_MODE mode );
+/** 注册 TextView 部件类型 */
+void RegisterTextView(void);
 
 LCUI_END_HEADER
 
