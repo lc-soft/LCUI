@@ -117,8 +117,8 @@ LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 			  LCUI_FontBitmap *bmp, LCUI_Color color );
 
 /** 载入字体位图 */
-LCUI_API int FontBMP_Load( LCUI_FontBitmap *buff, int font_id,
-			   wchar_t ch, int pixel_size );
+LCUI_API int FontBMP_Load( LCUI_FontBitmap *buff, wchar_t ch, 
+			   int font_id, int pixel_size );
 
 /** 初始化字体数据库 */
 LCUI_API void FontLIB_Init( void );
@@ -150,14 +150,7 @@ LCUI_API LCUI_FontBitmap* FontLIB_AddFontBMP(	wchar_t char_code,
 						LCUI_FontBitmap *fontbmp_buff );
 
 /** 获取库中的字体位图 */
-LCUI_API LCUI_FontBitmap* FontLIB_GetFontBMP(	wchar_t char_code,
-						int font_id,
-						int pixel_size );
-
-/** 获取库中现有的字体位图，若没有则载入新的 */
-LCUI_API LCUI_FontBitmap* FontLIB_GeFontBMP(	int font_id,
-						wchar_t ch,
-						int pixel_size );
+LCUI_API LCUI_FontBitmap* FontLIB_GeFontBMP( wchar_t ch, int font_id, int pixel_size );
 
 /** 载入字体值数据库中 */
 LCUI_API int FontLIB_LoadFontFile( const char *filepath );

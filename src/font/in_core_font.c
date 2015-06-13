@@ -93,8 +93,8 @@ int LCUIFont_InitInCoreFont( LCUI_FontEngine *engine )
 	code = (int*)malloc(sizeof(int));
 	*code = FONT_INCONSOLATA;
 	face->data = code;
+	face->engine = engine;
 	FontLIB_AddFontInfo( face, "in-core.inconsolata" );
-
 	engine->render = InCoreFont_Render;
 	engine->open = InCoreFont_Open;
 	engine->close = InCoreFont_Close;

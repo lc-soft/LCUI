@@ -51,8 +51,6 @@
  * 获取字体位图时的搜索顺序为：先找到字符的记录，然后在记录中的字体数据库里找
  * 到指定字体样式标识号的字体位图库，之后在字体位图库中找到指定像素大小的字体
  * 位图。
- * 此模块的设计只考虑到支持 FreeType，且必须在编译时确定使用哪个字体引擎，以
- * 后会考虑进行调整，以同时支持多个字体引擎，并能够随时切换，不用重新编译。
  */
 
 typedef struct LCUI_FontInfo_ {
@@ -71,6 +69,10 @@ static struct FontLibraryContext {
 	LCUI_FontEngine engines[2];		/**< 当前可用字体引擎列表 */
 	LCUI_FontEngine *engine;		/**< 当前选择的字体引擎 */
 } fontlib = {0, FALSE};
+
+#define SelectChar(ch) (LCUI_RBTree*)RBTree_GetData( &fontlib.bitmap_cache, ch )
+#define SelectFont(ch, font_id) (LCUI_RBTree*)RBTree_GetData( ch, font_id )
+#define SelectBitmap(font, size) (LCUI_FontBitmap*)RBTree_GetData( font, size )
 
 static void FontLIB_DestroyFontBitmap( void *arg )
 {
@@ -105,8 +107,6 @@ static LCUI_FontInfo* FontLIB_GetFont( int font_id )
 
 void FontLIB_Init( void )
 {
-	int font_id;
-
 	if( fontlib.is_inited ) {
 		return;
 	}
@@ -116,9 +116,6 @@ void FontLIB_Init( void )
 	RBTree_SetDataNeedFree( &fontlib.bitmap_cache, TRUE );
 	RBTree_SetDataNeedFree( &fontlib.info_cache, TRUE );
 	fontlib.is_inited = TRUE;
-
-	font_id = FontLIB_GetFontIDByFamilyName("inconsolata");
-	fontlib.incore_font = FontLIB_GetFont( font_id );
 }
 
 int FontLIB_FindInfoByFilePath( const char *filepath )
@@ -180,7 +177,7 @@ void FontLIB_SetDefaultFont( int id )
 }
 
 LCUI_FontBitmap* FontLIB_AddFontBMP( wchar_t ch, int font_id,
-				  int pixel_size, LCUI_FontBitmap *bmp )
+				     int pixel_size, LCUI_FontBitmap *bmp )
 {
 	LCUI_FontBitmap *bmp_cache;
 	LCUI_RBTree *tree_font, *tree_bmp;
@@ -189,7 +186,7 @@ LCUI_FontBitmap* FontLIB_AddFontBMP( wchar_t ch, int font_id,
 		return NULL;
 	}
 	/* 获取字符的字体信息集 */
-	tree_font = (LCUI_RBTree*)RBTree_GetData( &fontlib.bitmap_cache, ch );
+	tree_font = SelectChar( ch );
 	if( !tree_font ) {
 		tree_font = (LCUI_RBTree*)malloc( sizeof(LCUI_RBTree) );
 		if( !tree_font ) {
@@ -230,31 +227,31 @@ LCUI_FontBitmap* FontLIB_AddFontBMP( wchar_t ch, int font_id,
 	return bmp_cache;
 }
 
-LCUI_FontBitmap* FontLIB_GeFontBMP( int font_id, wchar_t ch, int pixel_size )
+LCUI_FontBitmap* FontLIB_GeFontBMP( wchar_t ch, int font_id, int pixel_size )
 {
-	LCUI_RBTree *tree;
+	LCUI_RBTree *ctx;
 	LCUI_FontBitmap *bmp, bmp_cache;
 
-	if( !fontlib.is_inited ) {
-		return NULL;
-	}
-	tree = (LCUI_RBTree*)RBTree_GetData( &fontlib.bitmap_cache, ch );
-	if( !tree ) {
-		return NULL;
-	}
-	if( font_id <= 0 ) {
-		font_id = fontlib.incore_font->id;
-	}
-	tree = (LCUI_RBTree*)RBTree_GetData( tree, font_id );
-	if( !tree ) {
-		return NULL;
-	}
-	bmp = (LCUI_FontBitmap*)RBTree_GetData( tree, pixel_size );
-	if( bmp ) {
-		return bmp;
+	while( TRUE ) {
+		if( !fontlib.is_inited ) {
+			return NULL;
+		}
+		if( !(ctx = SelectChar(ch)) ) {
+			break;
+		}
+		if( font_id <= 0 ) {
+			font_id = fontlib.incore_font->id;
+		}
+		if( !(ctx = SelectFont(ctx, font_id)) ) {
+			break;
+		}
+		if( bmp = SelectBitmap(ctx, pixel_size) ) {
+			return bmp;
+		}
+		break;
 	}
 	FontBMP_Init( &bmp_cache );
-	FontBMP_Load( &bmp_cache, font_id, ch, pixel_size );
+	FontBMP_Load( &bmp_cache, ch, font_id, pixel_size );
 	return FontLIB_AddFontBMP( ch, font_id, pixel_size, &bmp_cache );
 }
 
@@ -276,6 +273,7 @@ int FontLIB_LoadFontFile( const char *filepath )
 	if( ret != 0 ) {
 		return -2;
 	}
+	face->engine = fontlib.engine;
 	id = FontLIB_AddFontInfo( face, filepath );
 	return id;
 }
@@ -367,36 +365,40 @@ int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 		 LCUI_FontBitmap *bmp, LCUI_Color color )
 {
 	int val, x, y;
-	LCUI_Graph *des;
-	LCUI_Rect des_rect, cut;
+	LCUI_Rect read_rect, write_rect;
+	LCUI_Graph write_slot;
 	LCUI_ARGB *px_des, *px_row_des;
 	uchar_t *bmp_src, *bmp_row_src, *byte_row_des, *byte_des;
 
-	/* 数据有效性检测 */
-	if( !FontBMP_IsValid( bmp ) || !Graph_IsValid( graph ) ) {
-		return -1;
-	}
-	/* 获取背景图形的有效区域 */
-	Graph_GetValidRect( graph, &des_rect );
-	/* 获取背景图引用的源图形 */
-	des = Graph_GetQuote( graph );
 	/* 起点位置的有效性检测 */
-	if(pos.x > des->w || pos.y > des->h) {
+	if( pos.x > graph->w || pos.y > graph->h ) {
 		return -2;
 	}
+	/* 获取写入区域 */
+	write_rect.x = pos.x;
+	write_rect.y = pos.y;
+	write_rect.width = bmp->width;
+	write_rect.height = bmp->rows;
 	/* 获取需要裁剪的区域 */
-	LCUIRect_GetCutArea( Size( des_rect.width, des_rect.height ),
-			Rect( pos.x, pos.y, bmp->width, bmp->rows ), &cut );
-	pos.x += cut.x;
-	pos.y += cut.y;
+	LCUIRect_GetCutArea( Size( graph->width, graph->height ),
+			     write_rect, &read_rect );
+	write_rect.x += read_rect.x;
+	write_rect.y += read_rect.y;
+	write_rect.width = read_rect.width;
+	write_rect.height = read_rect.height;
+	Graph_Quote( &write_slot, graph, &write_rect );
+	Graph_GetValidRect( &write_slot, &write_rect );
+	/* 获取背景图引用的源图形 */
+	graph = Graph_GetQuote( graph );
 	if( graph->color_type == COLOR_TYPE_ARGB ) {
-		bmp_row_src = bmp->buffer + cut.y*bmp->width + cut.x;
-		px_row_des = des->argb + (pos.y + des_rect.y) * des->w;
-		px_row_des += pos.x + des_rect.x;
-		for( y=0; y<cut.h; ++y ) {
+		bmp_row_src = bmp->buffer + read_rect.y*bmp->width;
+		bmp_row_src += read_rect.x;
+		px_row_des = graph->argb + write_rect.y * graph->w;
+		px_row_des += write_rect.x;
+		for( y=0; y<read_rect.h; ++y ) {
 			bmp_src = bmp_row_src;
 			px_des = px_row_des;
-			for( x=0; x<cut.w; ++x ) {
+			for( x=0; x<read_rect.w; ++x ) {
 				ALPHA_BLEND( px_des->r, color.r, *bmp_src );
 				ALPHA_BLEND( px_des->g, color.g, *bmp_src );
 				ALPHA_BLEND( px_des->b, color.b, *bmp_src );
@@ -409,19 +411,19 @@ int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 				++bmp_src;
 				++px_des;
 			}
-			px_row_des += des->w;
+			px_row_des += graph->w;
 			bmp_row_src += bmp->width;
 		}
 		return 0;
 	}
 
-	bmp_row_src = bmp->buffer + cut.y*bmp->width + cut.x;
-	byte_row_des = des->bytes + (pos.y + des_rect.y) * des->bytes_per_row;
-	byte_row_des += (pos.x + des_rect.x)*des->bytes_per_pixel;
-	for( y=0; y<cut.h; ++y ) {
+	bmp_row_src = bmp->buffer + read_rect.y*bmp->width + read_rect.x;
+	byte_row_des = graph->bytes + write_rect.y * graph->bytes_per_row;
+	byte_row_des += write_rect.x*graph->bytes_per_pixel;
+	for( y=0; y<read_rect.h; ++y ) {
 		bmp_src = bmp_row_src;
 		byte_des = byte_row_des;
-		for( x=0; x<cut.w; ++x ) {
+		for( x=0; x<read_rect.w; ++x ) {
 			ALPHA_BLEND( *byte_des, color.b, *bmp_src );
 			byte_des++;
 			ALPHA_BLEND( *byte_des, color.g, *bmp_src );
@@ -430,7 +432,7 @@ int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 			byte_des++;
 			++bmp_src;
 		}
-		byte_row_des += des->w*3;
+		byte_row_des += graph->bytes_per_row;
 		bmp_row_src += bmp->width;
 	}
 	return 0;
@@ -438,19 +440,22 @@ int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 
 
 /** 载入字体位图 */
-int FontBMP_Load( LCUI_FontBitmap *buff, int font_id,
-		  wchar_t ch, int pixel_size )
+int FontBMP_Load( LCUI_FontBitmap *buff, wchar_t ch, 
+		  int font_id, int pixel_size )
 {
-	LCUI_FontInfo *info;
-
-	if( font_id <= 0 || !fontlib.engine ) {
-		return FontInconsolata_GetBitmap( buff, ch, pixel_size );
+	LCUI_FontInfo *info = fontlib.incore_font;
+	LCUI_FontEngine *engine = &fontlib.engines[0];
+	while( TRUE ) {
+		if( font_id <= 0 || !fontlib.engine ) {
+			break;
+		}
+		info = FontLIB_GetFont( font_id );
+		if( info ) {
+			engine = info->face->engine;
+		}
+		break;
 	}
-	info = FontLIB_GetFont( font_id );
-	if( !info ) {
-		return FontInconsolata_GetBitmap( buff, ch, pixel_size );
-	}
-	return fontlib.engine->render( buff, ch, pixel_size, info->face );
+	return engine->render( buff, ch, pixel_size, info->face );
 }
 
 
@@ -479,6 +484,8 @@ void LCUI_InitFont( void )
 	FontLIB_Init();
 	/* 先初始化内置的字体引擎 */
 	LCUIFont_InitInCoreFont( &fontlib.engines[0] );
+	font_id = FontLIB_GetFontIDByFamilyName("inconsolata");
+	fontlib.incore_font = FontLIB_GetFont( font_id );
 	fontlib.engine = &fontlib.engines[0];
 	/* 然后看情况启用其它字体引擎 */
 #ifdef LCUI_FONT_ENGINE_FREETYPE

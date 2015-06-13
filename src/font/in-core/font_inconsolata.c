@@ -16,7 +16,6 @@ enum font_index {
 /* inconsolata 字体数据索引 */
 static const LCUI_FontBitmap font_info_index[SIZE_TOTAL][95] = {
 	{
-		{ 0, 0, 0, 0, 0, (uchar_t*)0x00000000, 8, 0, { 6, 12 } },
 		{ 4, 1, 2, 8, 8, (uchar_t*)0x00000000, 8, 0, { 6, 12 } },
 		{ 4, 1, 3, 2, 2, (uchar_t*)0x00000038, 8, 0, { 6, 12 } },
 		{ 4, 1, 3, 7, 7, (uchar_t*)0x00000046, 8, 0, { 6, 12 } },
@@ -6934,7 +6933,7 @@ int FontInconsolata_GetBitmap( LCUI_FontBitmap *bmp, wchar_t ch, int size )
 		bmp->buffer = calloc(bmp->rows*bmp->width, 1);
 		bmp->pitch = bmp->width;
 		bmp->pixel_mode = 0;
-		bmp->top = 0;
+		bmp->top = size*4/5;
 		bmp->left = 0;
 		j = (bmp->rows-1)*bmp->width;
 		for( i = 0; i<bmp->width; ++i,++j ) {
@@ -6943,7 +6942,8 @@ int FontInconsolata_GetBitmap( LCUI_FontBitmap *bmp, wchar_t ch, int size )
 		}
 		i = 0;
 		j = bmp->width-1;
-		while( i<bmp->rows ) {
+		size = bmp->width * bmp->rows;
+		while( i < size ) {
 			bmp->buffer[i] = 255;
 			bmp->buffer[j] = 255;
 			i += bmp->width;
@@ -6966,11 +6966,13 @@ int FontInconsolata_GetBitmap( LCUI_FontBitmap *bmp, wchar_t ch, int size )
 	}
 	i = size - 12;
 	j = ch - ' ' - 1;
-	size = sizeof(unsigned char)*bmp->width*bmp->rows;
 	*bmp = font_info_index[i][j];
-	bmp->buffer = (uchar_t*)malloc(size);
 	j = *((int*)&bmp->buffer);
-	byte_ptr = font_bitmap[i] + j;
-	memcpy( bmp->buffer,  byte_ptr, size );
+	byte_ptr = &font_bitmap[i][j];
+	bmp->width = bmp->advance.x+1;
+	size = sizeof(unsigned char)*bmp->width*bmp->rows;
+	bmp->buffer = (uchar_t*)malloc(size);
+	memcpy( bmp->buffer, byte_ptr, size );
+	FontBMP_Print( bmp );
 	return 0;
 }
