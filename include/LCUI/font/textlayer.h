@@ -106,6 +106,7 @@ typedef struct LCUI_TextLayerRec_  {
         int text_align;			/**< 文本的对齐方式 */
         TextRowList row_list;		/**< 文本行列表 */
         LCUI_TextStyle text_style;	/**< 文本全局样式 */
+	LinkedList style_cache;		/**< 样式缓存 */
 	LCUI_StyleVar line_height;	/**< 全局文本行高度 */
         TaskData task;			/**< 任务 */
         LCUI_Graph graph;		/**< 文本位图缓存 */
@@ -162,7 +163,7 @@ LCUI_API void TextLayer_ClearText( LCUI_TextLayer layer );
 
 /** 插入文本内容（宽字符版） */
 LCUI_API int TextLayer_InsertTextW( LCUI_TextLayer layer, const wchar_t *wstr,
-				    LCUI_StyleTagStack *tag_stack );
+				    LinkedList *tag_stack );
 
 /** 插入文本内容 */
 LCUI_API int TextLayer_InsertTextA( LCUI_TextLayer layer, const char *str );
@@ -172,7 +173,7 @@ LCUI_API int TextLayer_InsertText( LCUI_TextLayer layer, const char *utf8_str );
 
 /** 追加文本内容（宽字符版） */
 LCUI_API int TextLayer_AppendTextW( LCUI_TextLayer layer, const wchar_t *wstr, 
-				    LCUI_StyleTagStack *tag_stack );
+				    LinkedList *tag_stack );
 
 /** 追加文本内容 */
 LCUI_API int TextLayer_AppendTextA( LCUI_TextLayer layer, const char *ascii_text );
@@ -182,7 +183,7 @@ LCUI_API int TextLayer_AppendText( LCUI_TextLayer layer, const char *utf8_text )
 
 /** 设置文本内容（宽字符版） */
 LCUI_API int TextLayer_SetTextW( LCUI_TextLayer layer, const wchar_t *wstr,
-				 LCUI_StyleTagStack *tag_stack );
+				 LinkedList *tag_stack );
 
 /** 设置文本内容 */
 LCUI_API int TextLayer_SetTextA( LCUI_TextLayer layer, const char *ascii_text );
@@ -235,7 +236,7 @@ LCUI_API void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list );
  * @param graph 目标图像
  */
 LCUI_API int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
-			   LCUI_Pos layer_pos, LCUI_Graph *graph );
+				    LCUI_Pos layer_pos, LCUI_Graph *graph );
 
 /** 绘制文本 */
 LCUI_API int TextLayer_Draw( LCUI_TextLayer layer );

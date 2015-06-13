@@ -77,41 +77,6 @@ int TextLayer_GetRowTextLength( LCUI_TextLayer layer, int row )
         return layer->row_list.rows[row]->length;
 }
 
-/** 设置文本颜色 */
-void TextLayer_SetFontColor( LCUI_TextLayer layer, LCUI_Color color )
-{
-	TextStyle_FontColor( &layer->text_style, color );
-	layer->task.redraw_all = TRUE;
-}
-
-/** 设置文本所使用的字体字族 */
-void TextLayer_SetFontFamily( LCUI_TextLayer layer, const char *family_name )
-{
-	TextStyle_FontFamily( &layer->text_style, family_name );
-        layer->task.update_bitmap = TRUE;
-}
-
-/** 设置文本的字体像素大小 */
-void TextLayer_SetFontPixelSize( LCUI_TextLayer layer, int pixel_size )
-{
-	TextStyle_FontSize( &layer->text_style, pixel_size );
-        layer->task.update_bitmap = TRUE;
-}
-
-/** 设置文本对齐方式 */
-void TextLayer_SetTextAlign( LCUI_TextLayer layer, int align )
-{
-        layer->text_align = align;
-        layer->task.redraw_all = TRUE;
-}
-
-/** 设置坐标偏移量 */
-void TextLayer_SetOffset( LCUI_TextLayer layer, int offset_x, int offset_y )
-{
-        layer->new_offset_x = offset_x;
-        layer->new_offset_y = offset_y;
-}
-
 static void TaskData_Init( TaskData *task )
 {
 	task->redraw_all = 0;
@@ -341,24 +306,23 @@ static void TextRow_LeftMove( TextRowData *p_row, int n )
 
 /** 更新字体位图 */
 static void 
-TextChar_UpdateBitmap( TextCharData *p_data, LCUI_TextStyle *default_style )
+TextChar_UpdateBitmap( TextCharData *ch, LCUI_TextStyle *style )
 {
 	int pixel_size, font_id;
 
-	font_id = default_style->font_id;
-	pixel_size = default_style->pixel_size;
-	if( p_data->style ) {
-		if( p_data->style->_family ) {
-			font_id = p_data->style->font_id;
+	font_id = style->font_id;
+	pixel_size = style->pixel_size;
+	if( ch->style ) {
+		if( ch->style->has_family ) {
+			font_id = ch->style->font_id;
 		}
-		if( p_data->style->_pixel_size ) {
-			pixel_size = p_data->style->pixel_size;
+		if( ch->style->_pixel_size ) {
+			pixel_size = ch->style->pixel_size;
 		}
 	}
-	p_data->bitmap = FontLIB_GeFontBMP( font_id, p_data->char_code, 
-					    pixel_size );
+	ch->bitmap = FontLIB_GeFontBMP( ch->char_code, font_id, pixel_size );
 	//printf("char_code: %c, pixel_size: %d, font_id: %d, bitmap: %p\n", 
-	//p_data->char_code, default_style->pixel_size, default_style->font_id, p_data->bitmap);
+	//ch->char_code, style->pixel_size, style->font_id, ch->bitmap);
 }
 
 /** 新建文本图层 */
@@ -384,6 +348,7 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->row_list.rows = NULL;
 	layer->line_height.type = SVT_SCALE;
 	layer->line_height.scale = 1.428;
+	LinkedList_Init( &layer->style_cache, sizeof(LCUI_TextStyle) );
 	TextStyle_Init( &layer->text_style );
 	TaskData_Init( &layer->task );
 	DirtyRectList_Init( &layer->dirty_rect );
@@ -622,6 +587,7 @@ void TextLayer_ClearText( LCUI_TextLayer layer )
 	layer->insert_y = 0;
 	TextLayer_InvalidateRowsRect( layer, 0, -1 );
 	TextRowList_Destroy( &layer->row_list );
+	LinkedList_Destroy( &layer->style_cache );
 	layer->task.redraw_all = TRUE;
 }
 
@@ -748,14 +714,15 @@ static void TextLayer_TextTypeset( LCUI_TextLayer layer, int start_row )
 static int TextLayer_ProcessText( LCUI_TextLayer layer, 
 				  const wchar_t *wstr,
 				  int add_type, 
-				  LCUI_StyleTagStack *tag_stack )
+				  LinkedList *tags )
 {
 	EOLChar eol;
-	int cur_col, cur_row, start_row, ins_x, ins_y;
 	const wchar_t *p_end, *p, *pp;
+	int cur_col, cur_row, start_row, ins_x, ins_y;
 	TextRowData *p_row;
 	TextCharData char_data;
-	LCUI_StyleTagStack tmp_tag_stack;
+	LinkedList tmp_tags;
+	LCUI_TextStyle *style = NULL;
 	LCUI_BOOL is_tmp_tag_stack, need_typeset, rect_has_added;
 
 	if( !wstr ) {
@@ -788,33 +755,35 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer,
 	ins_x = cur_col;
 	ins_y = cur_row;
 	/* 如果没有可用的标签栈，则使用临时的标签栈 */
-	if( !tag_stack ) {
+	if( !tags ) {
 		is_tmp_tag_stack = TRUE;
-		StyleTagStack_Init( &tmp_tag_stack );
-		tag_stack = &tmp_tag_stack;
+		StyleTags_Init( &tmp_tags );
+		tags = &tmp_tags;
 	}
 	p_end = wstr + wcslen(wstr);
 	for( p=wstr; p<p_end; ++p ) {
+		/* 如果启用的样式标签支持，则处理样式的结束标签 */ 
 		if( layer->is_using_style_tags ) {
-			/* 处理样式的结束标签 */ 
-			pp = StyleTagStack_ScanEndingTag( tag_stack, p );
+			pp = StyleTags_ScanEndingTag( tags, p );
 			if( pp ) {
-				p = pp;
 				/* 抵消本次循环后的++p，以在下次循环时还能够在当前位置 */
-				--p; 
+				p = pp - 1;
+				style = StyleTags_GetTextStyle( tags );
+				LinkedList_Append( &layer->style_cache, style );
 				continue;
 			}
-			/* 处理样式标签 */
-			pp = StyleTagStack_ScanBeginTag( tag_stack, p );
+			pp = StyleTags_ScanBeginTag( tags, p );
 			if( pp ) {
 				p = pp - 1;
+				style = StyleTags_GetTextStyle( tags );
+				LinkedList_Append( &layer->style_cache, style );
 				continue;
 			}
 		}
 		
 		if( *p == '\r' || *p == '\n' ) {
 			/* 如果后面还有 \n，则说明是CR/LF换行模式 */
-			if( *p == 'r' ) {
+			if( *p == '\r' ) {
 				if( p+1 < p_end && *(p+1) == '\n' ) {
 					eol = EOL_CR_LF;
 				} else {
@@ -840,9 +809,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer,
 		}
 
 		char_data.char_code = *p;
-		/* 获取当前文本样式数据 */
-		char_data.style = StyleTagStack_GetTextStyle( tag_stack );
-		/* 更新字体位图 */
+		char_data.style = style;
 		TextChar_UpdateBitmap( &char_data, &layer->text_style );
 		TextRow_InsertCopy( p_row, ins_x, &char_data );
 		++ins_x;
@@ -866,14 +833,14 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer,
 	}
 	/* 如果使用的是临时标签栈，则销毁它 */
 	if( is_tmp_tag_stack ) {
-		StyleTagStack_Destroy( tag_stack );
+		StyleTags_Destroy( tags );
 	}
 	return 0;
 }
 
 /** 插入文本内容（宽字符版） */
 int TextLayer_InsertTextW( LCUI_TextLayer layer, const wchar_t *wstr,
-			   LCUI_StyleTagStack *tag_stack )
+			   LinkedList *tag_stack )
 {
 	return TextLayer_ProcessText( layer, wstr, TEXT_ADD_TYPE_INSERT, tag_stack );
 }
@@ -892,7 +859,7 @@ int TextLayer_InsertText( LCUI_TextLayer layer, const char *utf8_str )
 
 /** 追加文本内容（宽字符版） */
 int TextLayer_AppendTextW( LCUI_TextLayer layer, const wchar_t *wstr, 
-			   LCUI_StyleTagStack *tag_stack )
+			   LinkedList *tag_stack )
 {
 	return TextLayer_ProcessText( layer, wstr, TEXT_ADD_TYPE_APPEND, tag_stack );
 }
@@ -911,7 +878,7 @@ int TextLayer_AppendText( LCUI_TextLayer layer, const char *utf8_text )
 
 /** 设置文本内容（宽字符版） */
 int TextLayer_SetTextW( LCUI_TextLayer layer, const wchar_t *wstr,
-			LCUI_StyleTagStack *tag_stack )
+			LinkedList *tag_stack )
 {
 	TextLayer_ClearText( layer );
 	return TextLayer_AppendTextW( layer, wstr, tag_stack );
@@ -1271,7 +1238,7 @@ void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list )
 		/* 转移脏矩形记录，供利用 */
 		while(n--) {
 			data_ptr = LinkedList_Get( &layer->dirty_rect );
-			LinkedList_AddDataCopy( rect_list, data_ptr );
+			LinkedList_AppendCopy( rect_list, data_ptr );
 			LinkedList_ToNext( &layer->dirty_rect );
 		}
 	 } 
@@ -1282,7 +1249,6 @@ void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list )
  * @param layer 要使用的文本图层
  * @param area 文本图层中需要绘制的区域
  * @param layer_pos 文本图层在目标图像中的位置
- * @param need_replace 绘制时是否需要覆盖像素
  * @param graph 目标图像
  */
 int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
@@ -1313,13 +1279,11 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 	if( row >= layer->row_list.length ) {
 		return -1;
 	}
-	
 	for( ; row < layer->row_list.length; ++row ) {
 		p_row = TextLayer_GetRow( layer, row );
 		TextLayer_GetRowStartX( layer, p_row, x );
 		x += layer_pos.x;
 		x += layer->offset_x;
-		
 		/* 确定从哪个文字开始绘制 */
 		for( col=0; col<p_row->length; ++col ) {
 			p_char = p_row->string[col];
@@ -1350,7 +1314,7 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 			char_pos.y -= p_char->bitmap->top;
 			x += p_char->bitmap->advance.x;
 			/* 判断文字使用的前景颜色，再进行绘制 */
-			if( p_char->style && p_char->style->_fore_color ) {
+			if( p_char->style && p_char->style->has_fore_color ) {
 				FontBMP_Mix( graph, char_pos, p_char->bitmap,
 					     p_char->style->fore_color );
 			} else {
