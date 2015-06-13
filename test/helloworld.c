@@ -3,8 +3,9 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/widget.h>
-#include <LCUI/surface.h>
 #include <LCUI/display.h>
+#include <LCUI/font.h>
+#include <LCUI/gui/widget/textview.h>
 
 #include <io.h>
 #include <fcntl.h>
@@ -37,28 +38,31 @@ void onTimer( void *arg )
 
 int main( int argc, char **argv )
 {
-	LCUI_Widget w, root;
+	LCUI_Widget w, root, text;
 	LCUI_Graph desktop_image;
 
 	InitConsoleWindow();
 	LCUI_Init();
 	LCUIDisplay_SetMode( LDM_WINDOWED );
-	LCUIDisplay_SetSize( 800, 600 );
+	LCUIDisplay_SetSize( 960, 540 );
 	w = LCUIWidget_New("debug-widget");
+	text = LCUIWidget_New("textview");
+	Widget_Append( w, text );
+	TextView_SetTextW( text, L"测试文本内容，呵呵达！\nABCDEFG,abcdefg,[color=#ff0000]color font[/color]");
 	Widget_Top( w );
 	Widget_Show( w );
 	Widget_Resize( w, 320, 240 );
 	Widget_Move( w, 200, 200 );
 	Widget_SetTitleW( w, L"测试" );
 	Graph_Init( &desktop_image );
-	_DEBUG_MSG("load image, result: %d\n",  Graph_LoadImage( "images/background-image.png", &desktop_image ));
+	Graph_LoadImage( "images/background-image.png", &desktop_image );
 	root = LCUIWidget_GetRoot();
 
 	Widget_PullStyle( root, WSS_BACKGROUND );
 	root->style.background.color = RGB(255,242,223);
 	root->style.background.image = desktop_image;
 	root->style.background.size.using_value = TRUE;
-	root->style.background.size.value = SV_CONTAIN;
+	root->style.background.size.value = SV_COVER;
 	Widget_PushStyle( root, WSS_BACKGROUND );
 
 	Widget_PullStyle( w, WSS_BACKGROUND | WSS_SHADOW | WSS_BORDER );
