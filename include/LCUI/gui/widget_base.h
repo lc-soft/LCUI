@@ -140,6 +140,9 @@ LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
 /** 新建一个GUI部件 */
 LCUI_API LCUI_Widget LCUIWidget_New( const char *type_name );
 
+/** 追加子部件 */
+LCUI_API int Widget_Append( LCUI_Widget container, LCUI_Widget widget );
+
 /** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget $(At)( LCUI_Widget widget, int x, int y );
 

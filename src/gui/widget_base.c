@@ -40,6 +40,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/widget_build.h>
+#include <LCUI/gui/widget/textview.h>
 
 #define NEW_ONE(TYPE) (TYPE*)malloc(sizeof(TYPE))
 
@@ -98,8 +99,8 @@ int Widget_Append( LCUI_Widget container, LCUI_Widget widget )
 remove_done:
 
 	widget->parent = container;
-	LinkedList_AddData( &container->children, widget );
-	LinkedList_AddData( &container->children_show, widget );
+	LinkedList_Append( &container->children, widget );
+	LinkedList_Append( &container->children_show, widget );
 	/* 如果是添加至根部件内，则触发 WET_ADD 事件 */
 	if( container == LCUIRootWidget ) {
 		int ret;
@@ -214,7 +215,7 @@ static void Widget_Init( LCUI_Widget widget )
 	Border_Init( &widget->style.border );
 	LinkedList_Init( &widget->children, sizeof(struct LCUI_WidgetFull) );
 	LinkedList_Init( &widget->children_show, 0 );
-	LinkedList_SetDestroyFunc( &widget->children, Widget_OnDestroy) );
+	LinkedList_SetDestroyFunc( &widget->children, Widget_OnDestroy );
 	LinkedList_SetDataNeedFree( &widget->children, TRUE );
 	LinkedList_SetDataNeedFree( &widget->children_show, FALSE );
 	DirtyRectList_Init( &widget->dirty_rects );
@@ -225,10 +226,17 @@ static void Widget_Init( LCUI_Widget widget )
 /** 新建一个GUI部件 */
 LCUI_Widget LCUIWidget_New( const char *type_name )
 {
-	LCUI_Widget widget = NEW_ONE(struct LCUI_WidgetFull);
-	Widget_Init)(widget);
+	LCUI_Widget widget;
+	LCUI_WidgetClass *wc;
+
+	widget = NEW_ONE(struct LCUI_WidgetFull);
+	Widget_Init( widget );
 	if( type_name ) {
 		widget->type_name = strdup( type_name );
+		wc = LCUIWidget_GetClass( type_name );
+		if( wc ) {
+			wc->methods.init( widget );
+		}
 	}
 	return widget;
 }
@@ -812,10 +820,12 @@ void Widget_Unlock( LCUI_Widget w )
 
 void LCUI_InitWidget(void)
 {
-	Widget_Init(LCUIRootWidget);
-	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
 	LCUIWidget_InitTask();
 	LCUIWidget_InitEvent();
+	LCUIWidget_InitLibrary();
+	LCUIWidget_AddTextView();
+	Widget_Init(LCUIRootWidget);
+	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
 }
 
 void LCUI_ExitWidget(void)

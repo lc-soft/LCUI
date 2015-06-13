@@ -49,8 +49,8 @@ LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text );
 
 LCUI_API int TextView_SetText( LCUI_Widget w, const char *utf8_text );
 
-/** 注册 TextView 部件类型 */
-void RegisterTextView(void);
+/** 添加 TextView 部件类型 */
+void LCUIWidget_AddTextView( void );
 
 LCUI_END_HEADER
 

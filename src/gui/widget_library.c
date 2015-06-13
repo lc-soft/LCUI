@@ -71,6 +71,9 @@ void LCUIWidget_DestroyLibrary(void)
 /** 获取部件类数据 */
 LCUI_WidgetClass* LCUIWidget_GetClass( const char *class_name )
 {
+	if( !class_name ) {
+		return NULL;
+	}
 	return (LCUI_WidgetClass*)RBTree_CustomGetData(
 		&widget_class_library, class_name
 	);

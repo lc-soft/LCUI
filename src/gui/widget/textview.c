@@ -137,7 +137,7 @@ static void TextView_OnUpdate( LCUI_Widget w )
 			TextLayer_Update( txt->layer, &rect_list );
 		}
 	} else {
-		/* 能到这里，则说明部件启用了文本自动换行，以及自动尺寸调整 */
+		/* 能到这里，则说明部件启用了文本自动换行和自动尺寸调整 */
 		new_size.w = w->base.width;
 		new_size.h = w->base.height;
 		/* 将部件所在容器的宽度作为图像宽度 */
@@ -202,20 +202,20 @@ static void TextView_OnTask( LCUI_Widget w, LCUI_WidgetTask *t )
 static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LCUI_TextView *txt;
-	LCUI_Rect area;
+	LCUI_Rect content_rect, rect;
 	LCUI_Pos layer_pos;
-	LCUI_Size size;
 
 	txt = (LCUI_TextView*)w->private_data;
-	layer_pos.x = w->base.box.content.left - w->base.box.graph.left;
-	layer_pos.y = w->base.box.content.top - w->base.box.graph.top;
-	area = paint->rect;
-	area.x -= layer_pos.x;
-	area.y -= layer_pos.y;
-	size.w = w->base.box.content.width;
-	size.h = w->base.box.content.height;
-	LCUIRect_ValidateArea( &area, size );
-	TextLayer_DrawToGraph( txt->layer, area, layer_pos, &paint->canvas );
+	content_rect.x = w->base.box.content.left - w->base.box.graph.left;
+	content_rect.y = w->base.box.content.top - w->base.box.graph.top;
+	content_rect.width = w->base.box.content.width;
+	content_rect.height = w->base.box.content.height;
+	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect );
+	rect.x -= content_rect.x;
+	rect.y -= content_rect.y;
+	layer_pos.x = -rect.x;
+	layer_pos.y = -rect.y;
+	TextLayer_DrawToGraph( txt->layer, rect, layer_pos, &paint->canvas );
 }
 
 /*-------------------------- End Private -----------------------------*/
@@ -228,6 +228,7 @@ LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	int len;
 	wchar_t *text_ptr;
 	LCUI_TextView *txt;
+	LCUI_WidgetTask task;
 
 	len = text ? wcslen( text ):0;
 	text_ptr = (wchar_t*)malloc( sizeof(wchar_t)*(len+1) );
@@ -247,6 +248,7 @@ LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	}
 	txt->tasks[TASK_SET_TEXT].is_valid = TRUE;
 	txt->tasks[TASK_SET_TEXT].text = text_ptr;
+	Widget_AddTask( w, (task.type = WTT_USER, &task) );
 	Widget_Unlock( w );
 	return 0;
 }
@@ -266,10 +268,10 @@ LCUI_API int TextView_SetText( LCUI_Widget w, const char *utf8_text )
 
 /*-------------------------- End Public ------------------------------*/
 
-/** 注册 TextView 部件类型 */
-void RegisterTextView( void )
+/** 添加 TextView 部件类型 */
+void LCUIWidget_AddTextView( void )
 {
-	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "TextView" );
+	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "textview" );
 	wc->methods.init = TextView_OnInit;
 	wc->methods.paint = TextView_OnPaint;
 	wc->methods.destroy = TextView_OnDestroy;

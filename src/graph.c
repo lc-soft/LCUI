@@ -1151,6 +1151,12 @@ int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore, LCUI_Pos pos )
 	write_rect.y = pos.y;
 	write_rect.width = fore->width;
 	write_rect.height = fore->height;
+	LCUIRect_GetCutArea( Size( back->width, back->height ),
+			     write_rect, &read_rect );
+	write_rect.x += read_rect.x;
+	write_rect.y += read_rect.y;
+	write_rect.width = read_rect.width;
+	write_rect.height = read_rect.height;
 	Graph_Quote( &write_slot, back, &write_rect );
 	/* 获取实际操作区域 */
 	Graph_GetValidRect( &write_slot, &write_rect );
