@@ -1,8 +1,7 @@
 ﻿/* ***************************************************************************
  * textstyle.h -- text style processing module.
  * 
- * Copyright (C) 2012-2013 by
- * Liu Chao
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,8 +22,7 @@
 /* ****************************************************************************
  * textstyle.h -- 文本样式处理模块
  *
- * 版权所有 (C) 2012-2014 归属于
- * 刘超
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -66,12 +64,12 @@ enum FontDecoration {
 };
 
 typedef struct LCUI_TextStyle {
-	LCUI_BOOL _family:1;
-	LCUI_BOOL _style:1;
-	LCUI_BOOL _weight:1;
-	LCUI_BOOL _decoration:1;
-	LCUI_BOOL _back_color:1;
-	LCUI_BOOL _fore_color:1;
+	LCUI_BOOL has_family:1;
+	LCUI_BOOL has_style:1;
+	LCUI_BOOL has_weight:1;
+	LCUI_BOOL has_decoration:1;
+	LCUI_BOOL has_back_color:1;
+	LCUI_BOOL has_fore_color:1;
 	LCUI_BOOL _pixel_size:1;
 	
 	int font_id;
@@ -85,64 +83,22 @@ typedef struct LCUI_TextStyle {
 	int pixel_size;	
 } LCUI_TextStyle;
 
-enum LCUI_StyleTagID {
-	TAG_ID_FAMILY,
-	TAG_ID_STYLE,
-	TAG_ID_WIEGHT,
-	TAG_ID_DECORATION,
-	TAG_ID_SIZE,
-	TAG_ID_COLOR
-};
-
-typedef struct LCUI_StyleTagData_ {
-	int tag_id;
-	union {
-		LCUI_Color color;
-		LCUI_StyleVar size;
-	} style;
-} LCUI_StyleTagData;
-
-typedef LinkedList LCUI_StyleTagStack;
+typedef LinkedList LinkedList;
 
 /* 初始化字体样式数据 */
 LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );
-
-/* 设置字体族 */
-LCUI_API void TextStyle_FontFamily( LCUI_TextStyle *style, const char *fontfamily );
-
-/* 设置字体族ID */
-LCUI_API void TextStyle_FontFamilyID( LCUI_TextStyle *style, int id );
-
-/* 设置字体大小 */
-LCUI_API void TextStyle_FontSize( LCUI_TextStyle *style, int fontsize );
-
-/* 设置字体颜色 */
-LCUI_API void TextStyle_FontColor( LCUI_TextStyle *style, LCUI_Color color );
-
-/* 设置字体背景颜色 */
-LCUI_API void TextStyle_FontBackColor( LCUI_TextStyle *style, LCUI_Color color );
-
-/* 设置字体样式 */
-LCUI_API void TextStyle_FontStyle( LCUI_TextStyle *style, enum font_style fontstyle );
-
-LCUI_API void TextStyle_FontWeight( LCUI_TextStyle *style, enum font_weight fontweight );
-
-/* 设置字体下划线 */
-LCUI_API void TextStyle_FontDecoration( LCUI_TextStyle *style, enum font_decoration decoration );
-
-LCUI_API int TextStyle_Cmp( LCUI_TextStyle *a, LCUI_TextStyle *b );
 
 /*-------------------------- StyleTag --------------------------------*/
 #define MAX_TAG_NUM 2
 
 /** 初始化样式标签栈 */
-LCUI_API void StyleTagStack_Init( LCUI_StyleTagStack *tags );
+LCUI_API void StyleTags_Init( LinkedList *tags );
 
 /** 销毁样式标签栈 */
-LCUI_API void StyleTagStack_Destroy( LCUI_StyleTagStack *tags );
+LCUI_API void StyleTags_Destroy( LinkedList *tags );
 
 /** 获取当前的文本样式 */
-LCUI_API LCUI_TextStyle* StyleTagStack_GetTextStyle( LCUI_StyleTagStack *tags );
+LCUI_API LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags );
 
 /** 在字符串中获取样式的结束标签，输出的是标签名 */
 LCUI_API const wchar_t* scan_style_ending_tag( const wchar_t *wstr, 
@@ -153,11 +109,11 @@ LCUI_API const wchar_t* scan_style_tag(	const wchar_t *wstr, char *name_buff,
 					int max_name_len, char *data_buff );
 
 /** 处理样式标签 */
-LCUI_API const wchar_t* StyleTagStack_ScanBeginTag( LCUI_StyleTagStack *tags,
+LCUI_API const wchar_t* StyleTags_ScanBeginTag( LinkedList *tags,
 						const wchar_t *str );
 
 /** 处理样式结束标签 */
-LCUI_API const wchar_t* StyleTagStack_ScanEndingTag( LCUI_StyleTagStack *tags,
+LCUI_API const wchar_t* StyleTags_ScanEndingTag( LinkedList *tags,
 							const wchar_t *str );
 
 /*------------------------- End StyleTag -----------------------------*/
