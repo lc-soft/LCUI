@@ -236,7 +236,7 @@ int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 	ret = LCUIEventBox_Post( widget->event, e->type_name, pack, NULL );
 	if( !RBTree_CustomSearch( &widget_mark_tree, widget ) ) {
 		RBTree_CustomInsert( &widget_mark_tree, widget, widget );
-		LinkedList_AddData( &widget_list, widget );
+		LinkedList_Append( &widget_list, widget );
 	}
 	return ret;
 }

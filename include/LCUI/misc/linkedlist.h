@@ -147,13 +147,13 @@ LCUI_API int LinkedList_Insert( LinkedList *list, void *data );
 LCUI_API void* LinkedList_InsertCopy( LinkedList *list, void *data );
 
 /** 将数据的副本记录至链表的相应结点上 */
-LCUI_API void *LinkedList_AddDataCopy( LinkedList *list, void *data );
+LCUI_API void *LinkedList_AppendCopy( LinkedList *list, void *data );
 
 /** 分配一个节点的数据空间 */
 void *LinkedList_Alloc( LinkedList *list );
 
 /** 将数据引用至链表的相应结点 */
-LCUI_API void LinkedList_AddData( LinkedList *list, void *data_ptr );
+LCUI_API void LinkedList_Append( LinkedList *list, void *data_ptr );
 
 /** 跳转至指定结点 */
 LCUI_API int LinkedList_Goto( LinkedList *list, int pos );

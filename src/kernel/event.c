@@ -225,7 +225,7 @@ int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
 	handler->func = func;
 	handler->func_data = func_data;
 	handler->destroy_data = destroy_data;
-	LinkedList_AddData( &slot->handlers, handler );
+	LinkedList_Append( &slot->handlers, handler );
 	/* 将int类型的值转换成void×类型的值 */
 	data = &slot->id;
 	data = *(void**)data;

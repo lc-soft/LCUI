@@ -385,7 +385,7 @@ void LCUI_UnlockRunTask(void)
 int LCUI_AddTask( LCUI_Task *task )
 {
 	LCUIMutex_Lock( &MainApp.task_list_mutex );
-	if( !LinkedList_AddDataCopy( &MainApp.task_list, task ) ) {
+	if( !LinkedList_AppendCopy( &MainApp.task_list, task ) ) {
 		LCUIMutex_Unlock( &MainApp.task_list_mutex );
 		return -2;
 	}

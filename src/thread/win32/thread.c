@@ -83,7 +83,7 @@ int LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 		*thread = 0;
 		return -1;
 	}
-	LinkedList_AddData( &thread_database, thread_ptr );
+	LinkedList_Append( &thread_database, thread_ptr );
 	*thread = thread_ptr->tid;
 	return 0;
 }

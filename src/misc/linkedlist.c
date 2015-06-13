@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * linkedlist.c -- Linked List
  * 
- * Copyright (C) 2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2014-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * linkedlist.c -- 链表
  *
- * 版权所有 (C) 2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2014-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -412,7 +412,7 @@ void *LinkedList_Alloc( LinkedList *list )
 }
 
 /** 将数据的副本记录至链表的相应结点上 */
-void *LinkedList_AddDataCopy( LinkedList *list, void *data )
+void *LinkedList_AppendCopy( LinkedList *list, void *data )
 {
 	LinkedListNode *node;
 	node = LinkedList_AllocNode( list );
@@ -424,7 +424,7 @@ void *LinkedList_AddDataCopy( LinkedList *list, void *data )
 }
 
 /** 将数据引用至链表的相应结点 */
-void LinkedList_AddData( LinkedList *list, void *data_ptr )
+void LinkedList_Append( LinkedList *list, void *data_ptr )
 {
 	LinkedListNode *node;
 	node = LinkedList_AllocNode( list );

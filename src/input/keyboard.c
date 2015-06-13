@@ -147,7 +147,7 @@ void LCUIKeyBoard_HitKey( int key_code )
 		data.interval_time = -1;
 		data.hit_time = ct;
 		data.state = LCUIKEYSTATE_PRESSED;
-		LinkedList_AddDataCopy( &key_state_record, &data );
+		LinkedList_AppendCopy( &key_state_record, &data );
 		LCUIMutex_Unlock( &record_mutex );
 		return;
 	}

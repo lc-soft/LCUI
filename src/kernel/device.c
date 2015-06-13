@@ -75,7 +75,7 @@ int LCUIDevice_Add(	LCUI_BOOL (*init)(void),
 	device.proc = proc;
 	device.exit = exit;
 	LCUIMutex_Lock( &list_mutex );
-	p = (DeviceData*)LinkedList_AddDataCopy( &dev_list, &device );
+	p = (DeviceData*)LinkedList_AppendCopy( &dev_list, &device );
 	LCUIMutex_Unlock( &list_mutex );
 	if( !p ) {
 		return -1;
