@@ -31,7 +31,7 @@ LCUI_BOOL ParseNumer( LCUI_StyleVar *var, const char *str )
 	if( n == 0 ) {
 		return FALSE;
 	}
-	num[31] = 0;
+	num[n] = 0;
 	switch( *p ) {
 	case 'P':
 	case 'p':
