@@ -253,10 +253,12 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 			if( !child->style.visible ) {
 				continue;
 			}
-			if( child->style.x.px <= x && child->style.y.px
-			 && child->style.x.px + x < child->style.w.px
-			 && child->style.y.px + x < child->style.h.px ) {
+			if( x >= child->base.x && y >= child->base.y 
+			&& x < child->base.x + child->base.width
+			&& y < child->base.y + child->base.height ) {
 				target = child;
+				x -= child->base.box.content.x;
+				y -= child->base.box.content.y;
 				break;
 			 }
 		}
