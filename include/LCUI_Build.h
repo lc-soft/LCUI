@@ -43,7 +43,7 @@
 #define __LCUI_BUILD_H__
 
 #if defined(__GNUC__)
-#  define LCUI_API 
+#  define LCUI_API
 #elif (defined(_MSC_VER) && _MSC_VER < 800) ||\
     (defined(__BORLANDC__) && __BORLANDC__ < 0x500)
   /* older Borland and MSC
@@ -55,7 +55,7 @@
 #  ifdef LCUI_EXPORTS
 #    define LCUI_API __declspec(dllexport)
 #  else
-#    define LCUI_API 
+#    define LCUI_API
 #  endif
 #endif /* compiler */
 

@@ -66,10 +66,13 @@ struct LCUI_WidgetTaskBoxRec_ {
 static void HandleTopLevelWidgetEvent( LCUI_Widget w, int event_type )
 {
 	if( w->parent == LCUIRootWidget || w == LCUIRootWidget ) {
+		int *n;
 		LCUI_WidgetEvent e;
+
+		n = (int*)&event_type;
 		e.type_name = "TopLevelWidget";
 		e.target = w;
-		Widget_PostEvent( LCUIRootWidget, &e, (int*)event_type );
+		Widget_PostEvent( LCUIRootWidget, &e, *((int**)n) );
 	}
 }
 
@@ -142,7 +145,7 @@ static void HandleShadow( LCUI_Widget w, LCUI_WidgetTask *t )
 	/* 如果阴影变化并未导致图层尺寸变化的话，则只重绘阴影 */
 	if( bs->x == t->shadow.x && bs->y == t->shadow.y
 	 && bs->spread == t->shadow.spread ) {
-		LCUIRect_CutFourRect( &w->base.box.border, 
+		LCUIRect_CutFourRect( &w->base.box.border,
 				      &w->base.box.graph, rects );
 		Widget_InvalidateArea( w, &rects[0], GRAPH_BOX );
 		Widget_InvalidateArea( w, &rects[1], GRAPH_BOX );
@@ -170,6 +173,8 @@ static void HandleRefresh( LCUI_Widget w, LCUI_WidgetTask *t )
 	Widget_InvalidateArea( w, NULL, GRAPH_BOX );
 }
 
+#define max(a,b) (a) > (b) ? a:b
+
 static void HandleBorder( LCUI_Widget w, LCUI_WidgetTask *t )
 {
 	LCUI_Rect rect;
@@ -190,7 +195,7 @@ static void HandleBorder( LCUI_Widget w, LCUI_WidgetTask *t )
 		rect.x = w->base.box.border.w;
 		rect.width = max( b->top_right_radius, b->right.width );
 		rect.x -= rect.width;
-		rect.height = w->base.box.border.height; 
+		rect.height = w->base.box.border.height;
 		rect.height -= max( b->bottom_right_radius, b->bottom.width );
 		Widget_InvalidateArea( w, &rect, BORDER_BOX );
 		rect.x = max( b->bottom_left_radius, b->left.width );
@@ -273,6 +278,7 @@ static callback task_handlers[WTT_TOTAL_NUM];
 static void MapTaskHandler(void)
 {
 	/** 不能用C99标准中的初始化方式真蛋疼... */
+	task_handlers[WTT_DESTROY] = HandleDestroy;
 	task_handlers[WTT_SHOW] = HandleVisibility;
 	task_handlers[WTT_MOVE] = HandleMove;
 	task_handlers[WTT_RESIZE] = HandleResize;

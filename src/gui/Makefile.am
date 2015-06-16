@@ -7,16 +7,5 @@ widget_event.c		\
 widget_library.c	\
 widget_style.c		\
 widget_task.c		\
-widget_paint.c      \
-messagebox.c		\
-widget/activebox.c	\
-widget/button.c		\
-widget/checkbox.c	\
-widget/label.c		\
-widget/menu.c		\
-widget/picturebox.c	\
-widget/progressbar.c	\
-widget/radiobutton.c	\
-widget/textbox.c	\
-widget/window.c		\
-widget/scrollbar.c
+widget_paint.c 		\
+widget/textview.c

@@ -1,40 +1,40 @@
 /* ***************************************************************************
  * textview.c -- LCUI's TextView Widget
- * 
+ *
  * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
- * 
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
- 
+
 /* ****************************************************************************
  * textview.c -- LCUI 的文本显示部件
  *
  * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
- * 
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
 #include <LCUI_Build.h>
@@ -64,14 +64,6 @@ typedef struct LCUI_TextView_ {
 
 /*---------------------------- Private -------------------------------*/
 
-/** 获取 TextView 部件内的文本图层的指针 */
-static LCUI_TextLayer TextView_GetTextLayer( LCUI_Widget w )
-{
-	LCUI_TextView *txt;
-	txt = (LCUI_TextView*)w->private_data;
-	return txt->layer;
-}
-
 /** 初始化 TextView 部件数据 */
 static void TextView_OnInit( LCUI_Widget w )
 {
@@ -85,7 +77,7 @@ static void TextView_OnInit( LCUI_Widget w )
 		txt->tasks[i].is_valid = FALSE;
 	}
 	/* 初始化文本图层 */
-	txt->layer = TextLayer_New(); 
+	txt->layer = TextLayer_New();
 	/* 启用多行文本显示 */
 	TextLayer_SetMultiline( txt->layer, TRUE );
 	/* 启用样式标签的支持 */
@@ -107,7 +99,7 @@ static void TextView_OnUpdate( LCUI_Widget w )
 	LCUI_Rect *p_rect;
 	LinkedList rect_list;
 	LCUI_Size new_size;
-	
+
 	txt = (LCUI_TextView*)w->private_data;
 	DirtyRectList_Init( &rect_list );
 	/* 先更新文本图层的数据 */
@@ -158,7 +150,7 @@ static void TextView_OnUpdate( LCUI_Widget w )
 			Widget_Resize( w, new_size.w, new_size.h );
 		}
 	}
-	
+
 	n = LinkedList_GetTotal( &rect_list );
 	LinkedList_Goto( &rect_list, 0 );
 	/* 将得到的无效区域导入至部件的无效区域列表 */

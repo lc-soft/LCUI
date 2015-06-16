@@ -234,7 +234,7 @@ static int LCUIDisplay_Windowed( void )
 		break;
 	}
 	Widget_Show( LCUIRootWidget );
-	Widget_Resize( LCUIRootWidget, display.info.getWidth(), 
+	Widget_Resize( LCUIRootWidget, display.info.getWidth(),
 		       display.info.getHeight() );
 	display.mode = LDM_WINDOWED;
 	return 0;
@@ -529,11 +529,11 @@ int LCUI_InitDisplay( void )
 	LinkedList_Init( &display.surfaces, sizeof(SurfaceRecord) );
 #ifdef LCUI_BUILD_IN_WIN32
 	display.methods = LCUIDisplay_InitWin32( &display.info );
-	display.methods->onInvalidRect = OnInvalidRect;
-	display.methods->onEvent = OnEvent;
 #elif defined(LCUI_VIDEO_DRIVER_FRAMEBUFFER)
 	display.methods = LCUIDisplay_InitLinuxFB( &display.info );
 #endif
+	display.methods->onInvalidRect = OnInvalidRect;
+	display.methods->onEvent = OnEvent;
 	display.fc_ctx = FrameControl_Create();
 	FrameControl_SetMaxFPS( display.fc_ctx, 1000/MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( LCUIRootWidget, "TopLevelWidget",

@@ -90,12 +90,12 @@ static int LinuxFB_Restore(void)
 
 static int LinuxFB_GetWidth(void)
 {
-	return linuxfb.width;
+	return linuxfb.screen_size.w;
 }
 
 static int LinuxFB_GetHeight(void)
 {
-	return linuxfb.height;
+	return linuxfb.screen_size.h;
 }
 
 /** 打印屏幕相关的信息 */
@@ -422,11 +422,8 @@ LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info )
 		printf("success\n");
 	}
 	LinuxFB_Backup();
-
-	info->bits_per_pixel = fb_vinfo.bits_per_pixel;
-	info->width = fb_vinfo.xres;
-	info->height = fb_vinfo.yres;
-
+	linuxfb.screen_size.w = fb_vinfo.xres;
+	linuxfb.screen_size.h = fb_vinfo.yres;
 	strncpy( info->name, "linux framebuffer", 32 );
 	info->getWidth = LinuxFB_GetWidth;
 	info->getHeight = LinuxFB_GetHeight;

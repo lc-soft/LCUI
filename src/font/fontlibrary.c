@@ -245,7 +245,7 @@ LCUI_FontBitmap* FontLIB_GeFontBMP( wchar_t ch, int font_id, int pixel_size )
 		if( !(ctx = SelectFont(ctx, font_id)) ) {
 			break;
 		}
-		if( bmp = SelectBitmap(ctx, pixel_size) ) {
+		if( (bmp = SelectBitmap(ctx, pixel_size)) != NULL ) {
 			return bmp;
 		}
 		break;
@@ -440,7 +440,7 @@ int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 
 
 /** 载入字体位图 */
-int FontBMP_Load( LCUI_FontBitmap *buff, wchar_t ch, 
+int FontBMP_Load( LCUI_FontBitmap *buff, wchar_t ch,
 		  int font_id, int pixel_size )
 {
 	LCUI_FontInfo *info = fontlib.incore_font;

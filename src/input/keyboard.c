@@ -1,40 +1,40 @@
  /* ***************************************************************************
  * keyboard.c -- keyboard support
- * 
+ *
  * Copyright (C) 2013-2015 by Liu Chao <lc-soft@live.cn>
- * 
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ***************************************************************************/
- 
+
 /* ****************************************************************************
  * keyboard.c -- 键盘支持
  *
  * 版权所有 (C) 2013-2015 归属于 刘超 <lc-soft@live.cn>
- * 
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
 #include <LCUI_Build.h>
@@ -68,7 +68,7 @@ static LinkedList key_state_record;
 #include <unistd.h>
 #include <sys/fcntl.h>
 
-static struct termios tm;//, tm_old; 
+static struct termios tm;//, tm_old;
 static int fd = STDIN_FILENO;
 #endif
 
@@ -178,14 +178,14 @@ static LCUI_BOOL LCUIKeyboard_Init( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	if(tcgetattr(fd, &tm) < 0) {
-		return -1; 
-	} 
+		return -1;
+	}
 	/* 设置终端为无回显无缓冲模式 */
 	tm.c_lflag &= ~(ICANON|ECHO);
 	tm.c_cc[VMIN] = 1;
 	tm.c_cc[VTIME] = 0;
 	if(tcsetattr(fd, TCSANOW, &tm) < 0) {
-		return -1; 
+		return -1;
 	}
 	printf("\033[?25l");/* 隐藏光标 */
 #endif
@@ -203,7 +203,7 @@ static LCUI_BOOL LCUIKeyboard_Exit( void )
 	if(tcsetattr(fd,TCSANOW,&tm)<0) {
 		return FALSE;
 	}
-	printf("\033[?25h"); /* 显示光标 */ 
+	printf("\033[?25h"); /* 显示光标 */
 #endif
 	return TRUE;
 }
@@ -222,22 +222,22 @@ static void OnKeyboardEvent( LCUI_SystemEvent *e, void *arg )
 LCUI_BOOL LCUIKeyboard_IsHit( void )
 {
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
-	struct termios oldt;//, newt;  
-	int ch, oldf;  
-	tcgetattr(STDIN_FILENO, &oldt);  
-	//newt = oldt;  
-	//newt.c_lflag &= ~(ICANON | ECHO);  
-	//tcsetattr(STDIN_FILENO, TCSANOW, &newt);  
-	oldf = fcntl(STDIN_FILENO, F_GETFL, 0);  
-	fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);  
+	struct termios oldt;//, newt;
+	int ch, oldf;
+	tcgetattr(STDIN_FILENO, &oldt);
+	//newt = oldt;
+	//newt.c_lflag &= ~(ICANON | ECHO);
+	//tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+	fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 	ch = getchar();  /* 获取一个字符 */
-	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  
-	fcntl(STDIN_FILENO, F_SETFL, oldf); 
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+	fcntl(STDIN_FILENO, F_SETFL, oldf);
 	/* 如果字符有效，将字符放回输入缓冲区中 */
 	if(ch != EOF) {
-		ungetc(ch, stdin);  
+		ungetc(ch, stdin);
 		return TRUE;
-	} 
+	}
 	return FALSE;
 #endif
 	return FALSE;
@@ -245,7 +245,7 @@ LCUI_BOOL LCUIKeyboard_IsHit( void )
 
 /** 获取被按下的按键的键值（类似于getch函数） */
 int LCUIKeyboard_GetKey( void )
-{ 
+{
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	int k,c;
 	static int input = 0, count = 0;
@@ -266,8 +266,8 @@ int LCUIKeyboard_GetKey( void )
 	if(c == 3) {
 		exit(1);
 	}
-	return c; 
-#else 
+	return c;
+#else
 	return -1;
 #endif
 }
@@ -276,13 +276,13 @@ int LCUIKeyboard_GetKey( void )
 static LCUI_BOOL LCUIKeyboard_Proc(void)
 {
 	LCUI_SystemEvent e;
-	 /* 如果没有按键输入 */ 
+	 /* 如果没有按键输入 */
 	if ( !LCUIKeyboard_IsHit() ) {
 		return FALSE;
 	}
-	
+
 	e.type = LCUI_KEYDOWN;
-	e.which = LCUIKeyboard_GetKey();
+	e.key_code = LCUIKeyboard_GetKey();
 	LCUI_PostEvent( &e );
 	return TRUE;
 }

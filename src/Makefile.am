@@ -18,7 +18,6 @@ LCUI_LDFLAGS = -version-info 3:0:0
 
 LCUI_SOURCES = \
 	graph.c			\
-	graphlayer.c	\
 	style_parser.c	\
 	ime.c			\
 	cursor.c

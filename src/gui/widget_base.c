@@ -103,11 +103,9 @@ remove_done:
 	LinkedList_Append( &container->children_show, widget );
 	/* 如果是添加至根部件内，则触发 WET_ADD 事件 */
 	if( container == LCUIRootWidget ) {
-		int ret;
 		e.type_name = "TopLevelWidget";
 		e.target = widget;
-		ret = Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_ADD );
-		DEBUG_MSG("post done, ret = %d\n", ret);
+		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_ADD );
 	}
 	Widget_UpdateTaskStatus( widget );
 	DEBUG_MSG("tip\n");
@@ -727,8 +725,8 @@ void Widget_SetBackgroundColor( LCUI_Widget w, LCUI_Color color )
 	w->style.background.color = color;
 }
 
-#define PULL(WIDGET, STYLE) WIDGET##->base.style.STYLE## = WIDGET##->style.##STYLE
-#define PUSH(WIDGET, STYLE) WIDGET##->style.STYLE## = WIDGET##->base.style.##STYLE
+#define PULL(WIDGET, STYLE) WIDGET->base.style.STYLE = WIDGET->style.STYLE
+#define PUSH(WIDGET, STYLE) WIDGET->style.STYLE = WIDGET->base.style.STYLE
 
 /** 拉取现有样式至缓存区 */
 void Widget_PullStyle( LCUI_Widget w, int style )
