@@ -330,7 +330,7 @@ rb_insert( LCUI_RBTree *rbt, int key, const void *keydata, void *data )
 
         if( parent_node ) {
 		if( rbt->judge && keydata ) {
-			if( rbt->judge( node->data, keydata ) > 0 ) {
+			if( rbt->judge( parent_node->data, keydata ) > 0 ) {
 				parent_node->left = node;
 			} else {
 				parent_node->right = node;
