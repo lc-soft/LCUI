@@ -470,7 +470,16 @@ static void LCUIApp_Destroy(void)
 /** 打印LCUI的信息 */
 static void LCUI_ShowCopyrightText(void)
 {
-	printf(
+	printf( "               ________\n"
+		" _            |______  |\n"
+		"| |     __    __     | |\n"
+		"| |    |  |  |__|    | |\n"
+		"| |    |  |   __     | |\n"
+		"| |    |  |  |  |    | |\n"
+		"| |    |  |__|  |    | |\n"
+		"| |    \\________/    | |\n"
+		"| |_______    _______| |\n"
+		"\\_________|  |_________/\n\n"
 		"LCUI (LC's UI) version "LCUI_VERSION"\n"
 #ifdef _MSC_VER
 		"Build tool: "
