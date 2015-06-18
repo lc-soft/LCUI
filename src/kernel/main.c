@@ -1,40 +1,40 @@
 /* ***************************************************************************
  * main.c -- The main functions for the LCUI normal work
- * 
+ *
  * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
- * 
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ***************************************************************************/
- 
+
 /* ****************************************************************************
  * main.c -- 使LCUI能够正常工作的相关主要函数
  *
  * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
- * 
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 //#define DEBUG
 #define __IN_MAIN_SOURCE_FILE__
@@ -74,12 +74,12 @@ typedef struct FuncDataRec_ {
 
 /** LCUI 系统相关数据 */
 static struct LCUI_System {
-	int state;			/**< 状态 */ 
+	int state;			/**< 状态 */
 	int mode;			/**< LCUI的运行模式 */
 	LCUI_BOOL is_inited;		/**< 标志，指示LCUI是否初始化过 */
-	
+
 	unsigned long int main_tid;	/**< 主线程ID */
-	
+
 	struct {
 		LCUI_BOOL is_running;	/**< 是否处于运行状态 */
 		LCUI_EventBox box;	/**< 系统事件容器 */
@@ -185,7 +185,7 @@ int LCUI_BindEvent( const char *event_name,
 	data->func = func;
 	data->arg = func_arg;
 	data->arg_destroy = arg_destroy;
-	return LCUIEventBox_Bind( System.event.box, event_name, 
+	return LCUIEventBox_Bind( System.event.box, event_name,
 					OnEvent, data, FuncDataDestroy );
 }
 
@@ -204,8 +204,8 @@ int LCUI_PostEvent( LCUI_SystemEvent *event )
 
 	event_name = event->type_name;
 	if( !event_name ) {
-		event_name = LCUIEventBox_GetEventName( 
-			System.event.box, event->type 
+		event_name = LCUIEventBox_GetEventName(
+			System.event.box, event->type
 		);
 		if( !event_name ) {
 			DEBUG_MSG("event handler dose not exist.\n");
@@ -235,7 +235,7 @@ LCUI_MainLoop LCUI_MainLoop_New( void )
 }
 
 static int LCUI_RunTask(void)
-{ 
+{
 	LCUI_Task *task, task_bak;
 	LCUIMutex_Lock( &MainApp.task_run_mutex );
 	LCUIMutex_Lock( &MainApp.task_list_mutex );
@@ -404,7 +404,7 @@ int LCUI_RemoveTask( CallBackFunc task_func, LCUI_BOOL need_lock )
 		LCUIMutex_Lock( &MainApp.task_list_mutex );
 	}
 	n = LinkedList_GetTotal( &MainApp.task_list );
-	for ( ; n>0; --n ) { 
+	for ( ; n>0; --n ) {
 		exist_task = (LCUI_Task*)LinkedList_Get( &MainApp.task_list );
 		if( exist_task && exist_task->func == task_func ) {
 			LinkedList_Delete( &MainApp.task_list );
@@ -470,8 +470,8 @@ static void LCUIApp_Destroy(void)
 /** 打印LCUI的信息 */
 static void LCUI_ShowCopyrightText(void)
 {
-	printf(	
-		"LCUI version "LCUI_VERSION"\n"
+	printf(
+		"LCUI (LC's UI) version "LCUI_VERSION"\n"
 #ifdef _MSC_VER
 		"Build tool: "
 #if (_MSC_VER > 1800)
@@ -497,11 +497,11 @@ static void LCUI_ShowCopyrightText(void)
 #endif
 		"\n"
 #endif
-		"Build time: "__DATE__" - "__TIME__"\n"
-		"Copyright (C) 2012-2015 Liu Chao.\n"
-		"Licensed under GPLv2.\n"
-		"Report bugs to <lc-soft@live.cn>.\n"
-		"Home Page: www.lcui.org.\n"
+		"Build at "__DATE__" - "__TIME__"\n"
+		"Copyright (C) 2012-2015 Liu Chao <lc-soft@live.cn>.\n"
+		"This is free software, licensed under GPLv2. \n"
+		"See source distribution for detailed copyright notices.\n"
+		"To learn more, visit http://www.lcui.org.\n\n"
 	);
 }
 
@@ -523,8 +523,8 @@ LCUI_BOOL LCUI_IsOnMainLoop(void)
 	return (MainApp.loop->tid == LCUIThread_SelfID());
 }
 
-/* 
- * 功能：用于对LCUI进行初始化操作 
+/*
+ * 功能：用于对LCUI进行初始化操作
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */
 int LCUI_Init(void)
@@ -590,7 +590,7 @@ void LCUI_Exit( int exit_code )
 	LCUI_Quit();
 }
 
-/* 
+/*
  * 功能：LCUI程序的主循环
  * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
  *  */
