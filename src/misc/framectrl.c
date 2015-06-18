@@ -124,7 +124,7 @@ void FrameControl_Remain( FrameCtrlCtx ctx )
 		goto normal_exit;
 	}
 	/** 需要暂停，进行睡眠，直到需要继续为止 */
-	lost_ms = LCUICond_TimedWait( &ctx->wait_continue, INT_MAX );
+	lost_ms = LCUICond_Wait( &ctx->wait_continue );
 	ctx->pause_time = lost_ms;
 	ctx->prev_frame_start_time += lost_ms;
 	return;
