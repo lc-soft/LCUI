@@ -393,11 +393,11 @@ LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info )
 	nobuff_printf("[linuxfb] open video output device...");
 	linuxfb.dev_fd = open(fb_dev, O_RDWR);
 	if( linuxfb.dev_fd == -1 ) {
-		printf("fail\n");
+		printf("failed\n");
 		perror("[linuxfb] error");
 		exit(-1);
 	} else {
-		printf("success\n");
+		printf("ok\n");
 	}
 	/* 获取屏幕相关信息 */
 	ioctl( linuxfb.dev_fd, FBIOGET_VSCREENINFO, &fb_vinfo );

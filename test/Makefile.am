@@ -12,7 +12,7 @@ test_messagebox
 ##指定测试程序的源码文件
 helloworld_SOURCES = helloworld.c
 ##指定测试程序编译时需要链接的库
-helloworld_LDADD   = $(top_builddir)/src/libLCUI.la
+helloworld_LDADD   = $(top_builddir)/src/libLCUI.la -lm
 
 ##同上
 test_progressbar_SOURCES = test_progressbar.c

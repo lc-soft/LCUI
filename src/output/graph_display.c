@@ -408,6 +408,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 
 static void OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
 {
+#ifdef LCUI_BUILD_IN_WIN32
 	if( display.mode == LDM_SEAMLESS ) {
 		return;
 	}
@@ -417,6 +418,7 @@ static void OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
 		return;
 	}
 	LCUI_PostEvent( e );
+#endif
 }
 
 /** 在 surface 主动产生无效区域的时候 */
