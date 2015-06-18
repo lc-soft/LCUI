@@ -95,7 +95,6 @@ static LCUI_BOOL MouseProc( void )
 	static char buf[6];
 	static fd_set readfds;
 	static struct timeval tv;
-	static LCUI_Pos pos;
 
 	if (mouse.state == STATE_REMOVE || mouse.fd < 0) {
 		return FALSE;
@@ -123,38 +122,6 @@ static LCUI_BOOL MouseProc( void )
 		return FALSE;
 	}
 
-	LCUICursor_GetNewPos( &pos );
-	pos.x += buf[1];
-	pos.y -= buf[2];
-	if( pos.x > LCUIScreen_GetWidth() ) {
-		pos.x = LCUIScreen_GetWidth();
-	}
-	if( pos.y > LCUIScreen_GetHeight() ) {
-		pos.y = LCUIScreen_GetHeight();
-	}
-	pos.x = pos.x<0 ? 0:pos.x;
-	pos.y = pos.y<0 ? 0:pos.y;
-	/* 应用鼠标游标的位置变更 */
-	LCUICursor_SetPos( pos );
-	LCUI_PostMouseMoveEvent( pos );
-	switch ( buf[0]&0x07 ) {
-	    case 1:		/* 鼠标左键被按下 */
-		LCUI_PostMouseDownEvent( LCUIKEY_LEFTBUTTON );
-		LCUI_PostMouseUpEvent( LCUIKEY_RIGHTBUTTON );
-		break;
-	    case 2:		/* 鼠标右键被按下 */
-		LCUI_PostMouseDownEvent( LCUIKEY_RIGHTBUTTON );
-		LCUI_PostMouseUpEvent( LCUIKEY_LEFTBUTTON );
-		break;
-	    case 3:		/* 鼠标左右键被按下 */
-		LCUI_PostMouseDownEvent( LCUIKEY_RIGHTBUTTON );
-		LCUI_PostMouseDownEvent( LCUIKEY_LEFTBUTTON );
-		break;
-	    default:		/* 默认是释放的 */
-		LCUI_PostMouseUpEvent( LCUIKEY_RIGHTBUTTON );
-		LCUI_PostMouseUpEvent( LCUIKEY_LEFTBUTTON );
-		break;
-	}
 	return TRUE;
 }
 #else
@@ -198,7 +165,7 @@ void LCUIMouse_SetPos( int x, int y )
 static LCUI_BOOL MouseInit(void)
 {
 #ifdef LCUI_MOUSE_DRIVER_LINUX
-	char *msdev;
+	char *msdev, err_str[64];
 
 	if(mouse.state != STATE_REMOVE) {
 		return FALSE;
@@ -208,8 +175,8 @@ static LCUI_BOOL MouseInit(void)
 		msdev = MS_DEV;
 	}
 	if ((mouse.fd = open (MS_DEV, O_RDONLY)) < 0) {
-		printf("failed to open %s.\n", msdev );
-		perror(NULL);
+		sprintf(err_str, "[mouse] failed to open %s", msdev);
+		perror(err_str);
 		mouse.state = STATE_REMOVE;
 		return FALSE;
 	}
@@ -229,7 +196,6 @@ static LCUI_BOOL MouseExit(void)
 	if( mouse.state != STATE_INSIDE ) {
 		return FALSE;
 	}
-	LCUICursor_Hide();
 	close( mouse.fd );
 	mouse.state = STATE_REMOVE;
 #endif
