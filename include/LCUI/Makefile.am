@@ -7,7 +7,6 @@ config.h \
 display.h \
 graph.h \
 draw.h \
-graphlayer.h \
 font.h \
 widget.h \
 widget_build.h \

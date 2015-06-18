@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS=foreign 
-AM_CFLAGS = -I$(abs_top_srcdir)/include 
+AUTOMAKE_OPTIONS=foreign
+AM_CFLAGS = -I$(abs_top_srcdir)/include
 noinst_LTLIBRARIES = libfont_incore.la
-libfont_incore_la_SOURCES = font_8x8.c
+libfont_incore_la_SOURCES = font_inconsolata.c
