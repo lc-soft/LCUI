@@ -1,484 +1,541 @@
-﻿#ifdef ENABLE_THIS_MODULE
+﻿/* ***************************************************************************
+ * widget_style.c -- widget style library module for LCUI.
+ *
+ * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ *
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ *
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ *
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
+
+/* ****************************************************************************
+ * widget_style.c -- LCUI 的部件样式库模块。
+ *
+ * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
+ *
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ *
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ *
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
+
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/widget.h>
-#include <LCUI/graph.h>
-#include LC_STYLE_LIBRARY_H
+#include <LCUI/widget_build.h>
 
-#include <math.h>
+#define MAX_NAME_LEN		128
+#define MAX_NODE_DEPTH		32
+#define MAX_SELECTOR_DEPTH	32
 
-typedef struct image_data_ {
-	LCUI_String path;	/* 图片文件的文件路径 */
-	LCUI_Graph img;		/* 图片文件的图像数据 */
-} image_data;
+typedef struct StyleListNode {
+	LCUI_StyleSheet style;		/**< 样式表 */
+	LCUI_Selector selector;		/**< 作用范围 */
+} StyleListNode;
 
-static StyleLIB_Library style_library;
-static LCUI_Queue imagefile_library;
+typedef struct StyleTreeNode {
+	char name[MAX_NAME_LEN];	/**< 作用对象的名称 */
+	LinkedList styles;		/**< 其它样式表 */
+} StyleTreeNode;
 
-static void destroy_imagefile_library( void *arg )
+static struct {
+	LCUI_BOOL is_inited;
+	LCUI_RBTree style;		/**< 样式树 */
+} style_library;
+
+/** 获取指针数组的长度 */
+static size_t ptrslen( char *const *list )
 {
-	image_data *data = (image_data*)arg;
-	LCUIString_Free( &data->path );
-	Graph_Free( &data->img );
+	char *const *p = list;
+	while( *p ) {
+		p++;
+	}
+	return p - list;
 }
 
-/* 添加指定路径下的图片文件，并获取该图片文件的图像数据 */
-static int add_imagefile( const char *filepath, LCUI_Graph *buff )
+static int CompareName( void *data, const void *keydata )
 {
-	int i, n;
-	image_data imgdata, *data_ptr;
-
-	if( filepath == NULL ) {
-		return -1;
-	}
-	n = Queue_GetTotal( &imagefile_library );
-	for(i=0; i<n; ++i) {
-		data_ptr = (image_data*)Queue_Get( &imagefile_library , i );
-		if( data_ptr == NULL ) {
-			continue;
-		}
-		/* 如果已经存在该图片文件的记录，则直接取出图像数据 */
-		if( _LCUIString_Cmp( &data_ptr->path, filepath ) == 0 ) {
-			*buff = data_ptr->img;
-			return 1;
-		}
-	}
-	/* 该图片文件记录不存在，则从图片文件中载入图像数据 */
-	if( Graph_LoadImage( filepath, &imgdata.img ) != 0 ) {
-		return -1;
-	}
-	/* 载入成功后，就添加该图片文件记录 */
-	LCUIString_Init( &imgdata.path );
-	_LCUIString_Copy( &imgdata.path, filepath );
-	Queue_Add( &imagefile_library, &imgdata );
-	*buff = imgdata.img;
-	return 0;
+	return strcmp( ((StyleTreeNode*)data)->name, (const char*)keydata );
 }
 
-void LCUIWidgetStyleLibrary_Init( void )
+/** 删除选择器 */
+void DeleteSelector( LCUI_Selector *selector )
 {
-	StyleLIB_Init( &style_library );
-	Queue_Init( &imagefile_library, sizeof(image_data), destroy_imagefile_library );
+	LCUI_SelectorNode *node_ptr;
+	for( node_ptr=*selector; node_ptr; ++node_ptr ) {
+		if( (*node_ptr)->type ) {
+			free( (*node_ptr)->type );
+			(*node_ptr)->type = NULL;
+		}
+		if( (*node_ptr)->class_name ) {
+			free( (*node_ptr)->class_name );
+			(*node_ptr)->class_name = NULL;
+		}
+		if( (*node_ptr)->id ) {
+			free( (*node_ptr)->id );
+			(*node_ptr)->id = NULL;
+		}
+		if( (*node_ptr)->pseudo_class_name ) {
+			free( (*node_ptr)->pseudo_class_name );
+			(*node_ptr)->pseudo_class_name = NULL;
+		}
+	}
+	free( *selector );
+	*selector = NULL;
 }
 
-void LCUIWidgetStyleLibrary_Destroy( void )
+/** 删除样式表 */
+void DeleteStyleSheet( LCUI_StyleSheet *ss )
 {
-	StyleLIB_Destroy( &style_library );
-	Queue_Destroy( &imagefile_library );
+	free( *ss );
+	*ss = NULL;
 }
 
-LCUI_API int WidgetStyle_LoadFromString( const char *style_str )
+static void DestroyStyleListNode( void *data )
 {
-	return StyleLIB_AddStyleFromString( &style_library, style_str );
+	StyleListNode *node = (StyleListNode*)data;
+	DeleteStyleSheet( &node->style );
+	DeleteSelector( &node->selector );
 }
 
-LCUI_API int WidgetStyle_LoadFromFile( const char *filepath )
+static void DestroyStyleTreeNode( void *data )
 {
-	return StyleLIB_AddStyleFromFile( &style_library, filepath );
+	LinkedList_Destroy( &((StyleTreeNode*)data)->styles );
 }
 
-/* 从字符串中指定段内获取出16进制的数 */
-static int str_scan_hex_number( const char *str, int start, int end )
-{
-	int i, n, k;
-	n = 0;
-	k = end - start - 1;
-	for(i=start; i<end; ++i) {
-		if(str[i] >= '0' && str[i] <= '9') {
-			n += ((str[i]-'0')*pow(16,k));
-			--k;
-		} else if(str[i] >= 'a' && str[i] <= 'f') {
-			n += ((str[i]-'a'+10)*pow(16,k));
-			--k;
-		}
-		else if(str[i] >= 'A' && str[i] <= 'F') {
-			n += ((str[i]-'A'+10)*pow(16,k));
-			--k;
-		}
-	}
-	return n;
-}
-
-/* 从字符串中获取RGB值，获取失败则返回0 */
-static int style_color_convert( const char *style_str, LCUI_Color *rgb )
-{
-	int len;
-	uchar_t r, g, b;
-
-	len = strlen(style_str);
-	if(style_str[0] == '#') {
-		switch(len) {
-		case 4:
-			r = str_scan_hex_number( style_str, 1, 2 );
-			g = str_scan_hex_number( style_str, 2, 3 );
-			b = str_scan_hex_number( style_str, 3, 4 );
-			r*=17; g*=17; b*=17;
-			break;
-		case 7:
-			r = str_scan_hex_number( style_str, 1, 3 );
-			g = str_scan_hex_number( style_str, 3, 5 );
-			b = str_scan_hex_number( style_str, 5, 7 );
-			break;
-		default:
-			return -1;
-		}
-	} else {
-		return -1;
-	}
-	rgb->red = r;
-	rgb->green = g;
-	rgb->blue = b;
-	DEBUG_MSG("%s: %d,%d,%d\n", style_str, r,g,b);
-	return 0;
-}
-
-/* 根据部件的样式，同步设置部件的背景 */
-static int WidgetStyle_SyncBackground(
-		LCUI_Widget widget,
-		StyleLIB_Selector *selector,
-		StyleLIB_Class *style_class,
-		const char *pseudo_class_name )
-{
-	int ret;
-	char *attr_value;
-	LCUI_Color back_color;
-	LCUI_Graph img_bg;
-	StyleLIB_Property *widget_attr;
-
-	/* 根据样式类句柄，获取样式属性句柄 */
-	widget_attr = StyleLIB_GetProperty( selector, style_class,
-			pseudo_class_name, "background-color" );
-	if( widget_attr != NULL ) {
-		/* 引用属性值 */
-		attr_value = widget_attr->value.string;
-		/* 将属性值转换成颜色数据 */
-		ret = style_color_convert( attr_value, &back_color );
-		if( ret != -1 ) { /* 如果转换成功，则设置部件背景色 */
-			Widget_SetBackgroundColor( widget, back_color );
-		}
-	}
-
-	widget_attr = StyleLIB_GetProperty( selector, style_class,
-			pseudo_class_name, "background-image" );
-	if( widget_attr != NULL ) {
-		attr_value = widget_attr->value.string;
-		Graph_Init( &img_bg );
-		/* 添加该路径的图片文件，并载入它 */
-		ret = add_imagefile( attr_value, &img_bg );
-		if( ret != -1 ) { /* 若正确获得图像数据，则设置为部件背景图 */
-			Widget_SetBackgroundImage( widget, &img_bg );
-		}
-	}
-	
-	widget_attr = StyleLIB_GetProperty( selector, style_class,
-			pseudo_class_name, "background-transparent" );
-	if( widget_attr != NULL ) {
-		attr_value = widget_attr->value.string;
-		/* 判断属性值是"true"还是"false" */
-		if( strcmp("1", attr_value) == 0
-		 || LCUI_strcasecmpA("true",attr_value) == 0) {
-			Widget_SetBackgroundTransparent( widget, TRUE );
-		 }
-		else if( strcmp("0", attr_value) == 0
-		 || LCUI_strcasecmpA("false",attr_value) == 0 ) {
-			Widget_SetBackgroundTransparent( widget, FALSE );
-		 }
-	}
-	
-	widget_attr = StyleLIB_GetProperty( selector, style_class,
-			pseudo_class_name, "background-layout" );
-	if( widget_attr != NULL ) {
-		attr_value = widget_attr->value.string;
-		/* 判断背景图的布局方式 */
-		if( LCUI_strcasecmpA("center",attr_value) == 0 ) {
-			Widget_SetBackgroundLayout( widget, LAYOUT_CENTER );
-		} else if( LCUI_strcasecmpA("tile",attr_value) == 0 ) {
-			Widget_SetBackgroundLayout( widget, LAYOUT_TILE );
-		} else if( LCUI_strcasecmpA("stretch",attr_value) == 0 ) {
-			Widget_SetBackgroundLayout( widget, LAYOUT_STRETCH );
-		} else if( LCUI_strcasecmpA("zoom",attr_value) == 0  ) {
-			Widget_SetBackgroundLayout( widget, LAYOUT_ZOOM );
-		} else if( LCUI_strcasecmpA("none",attr_value) == 0  ) {
-			Widget_SetBackgroundLayout( widget, LAYOUT_NONE );
-		} else if( LCUI_strcasecmpA("normal",attr_value) == 0  ) {
-			Widget_SetBackgroundLayout( widget, LAYOUT_NORMAL );
-		}
-	}
-	return 0;
-}
-
-/* 根据样式，同步部件的定位 */
-static int WidgetStyle_SyncPostion(
-		LCUI_Widget widget,
-		StyleLIB_Selector *selector,
-		StyleLIB_Class *style_class,
-		const char *pseudo_class_name )
-{
-	int ret;
-	LCUI_Pos offset;
-	char *attr_value;
-	IntOrFloat_t num;
-	AlignType align;
-	StyleLIB_Property *widget_attr;
-	
-	offset.x = widget->offset.x;
-	offset.y = widget->offset.y;
-	align = widget->align;
-	IntOrFloat_Init( &num );
-	/* 获取align属性的值 */
-	widget_attr = StyleLIB_GetProperty( selector, style_class,
-					pseudo_class_name, "align" );
-	if( widget_attr != NULL ) {
-		attr_value = widget_attr->value.string;
-		if( LCUI_strcasecmpA("none",attr_value) == 0 ) {
-			align = ALIGN_NONE;
-		} else if( LCUI_strcasecmpA("top-left",attr_value) == 0 ) {
-			align = ALIGN_TOP_LEFT;
-		} else if( LCUI_strcasecmpA("top-center",attr_value) == 0 ) {
-			align = ALIGN_TOP_CENTER;
-		} else if( LCUI_strcasecmpA("top-right",attr_value) == 0 ) {
-			align = ALIGN_TOP_RIGHT;
-		} else if( LCUI_strcasecmpA("middle-left",attr_value) == 0 ) {
-			align = ALIGN_MIDDLE_LEFT;
-		} else if( LCUI_strcasecmpA("middle-center",attr_value) == 0 ) {
-			align = ALIGN_MIDDLE_CENTER;
-		} else if( LCUI_strcasecmpA("middle-right",attr_value) == 0 ) {
-			align = ALIGN_MIDDLE_RIGHT;
-		} else if( LCUI_strcasecmpA("bottom-left",attr_value) == 0 ) {
-			align = ALIGN_BOTTOM_LEFT;
-		} else if( LCUI_strcasecmpA("bottom-center",attr_value) == 0 ) {
-			align = ALIGN_BOTTOM_CENTER;
-		} else if( LCUI_strcasecmpA("bottom-right",attr_value) == 0 ) {
-			align = ALIGN_BOTTOM_RIGHT;
-		}
-	}
-	/* 获取left属性的值 */
-	widget_attr = StyleLIB_GetProperty( selector, style_class,
-					pseudo_class_name, "left" );
-	if( widget_attr != NULL ) {
-		attr_value = widget_attr->value.string;
-		ret = ScanIntOrFloat( attr_value, &num );
-		if( ret == 0 ) {
-			if( num.which_one == 1 ) {
-				offset.x = Widget_GetContainerWidth( widget->parent );
-				offset.x = (int)(offset.x * num.scale);
-			} else {
-				offset.x = num.px;
-			}
-		}
-	}
-	/* 获取top属性的值 */
-	widget_attr = StyleLIB_GetProperty( selector, style_class,
-					pseudo_class_name, "top" );
-	if( widget_attr != NULL ) {
-		attr_value = widget_attr->value.string;
-		ScanIntOrFloat( attr_value, &num );
-		ret = ScanIntOrFloat( attr_value, &num );
-		if( ret == 0 ) {
-			if( num.which_one == 1 ) {
-				offset.y = Widget_GetContainerHeight( widget->parent );
-				offset.y = (int)(offset.y * num.scale);
-			} else {
-				offset.y = num.px;
-			}
-		}
-	}
-
-	Widget_SetAlign( widget, align, offset );
-	return 0;
-}
-
-
-/* 从字符串中获取边框数据，获取失败则返回-1 */
-static int style_border_convert( const char *style_str, LCUI_Border *border )
+/** 合并两个样式表 */
+static void MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet source )
 {
 	int i;
-	char buff[64];
-	const char *str_ptr;
-	LCUI_Color color;
-	IntOrFloat_t num;
-	BORDER_STYLE style_type;
-	LCUI_BOOL have_color=FALSE, have_size=FALSE, have_type=FALSE;
-
-	IntOrFloat_Init( &num );
-	str_ptr = style_str;
-	while(1) {
-		for(i=0; i<64; ++i) {
-			if( *str_ptr == ' ' ) {
-				++str_ptr;
-				break;
-			}
-			if( *str_ptr == 0 ) {
-				break;
-			}
-			buff[i] = *str_ptr;
-			++str_ptr;
-		}
-		buff[i] = 0;
-		if( style_color_convert(buff,&color) != -1 ) {
-			/* 如果已经有了边框颜色 */
-			if( have_color ) {
-				return -1;
-			}
-			have_color = TRUE;
-		} else if( ScanIntOrFloat(buff, &num) != -1 ) {
-			/* 如果已经有了边框大小 */
-			if( have_size ) {
-				return -1;
-			}
-			/* 不支持百分比 */
-			if( num.which_one == 1 ) {
-				return -1;
-			}
-			have_size = TRUE;
-		} else if( LCUI_strcasecmpA(buff,"solid") == 0 ) {
-			if( have_type ) {
-				return -1;
-			}
-			style_type = BORDER_SOLID;
-			have_type = TRUE;
-		} else if( LCUI_strcasecmpA(buff,"none") == 0 ) {
-			if( have_type ) {
-				return -1;
-			}
-			style_type = BORDER_NONE;
-			have_type = TRUE;
-		} else if( LCUI_strcasecmpA(buff,"dotted") == 0 ) {
-			if( have_type ) {
-				return -1;
-			}
-			style_type = BORDER_DOTTED;
-			have_type = TRUE;
-		} else if( LCUI_strcasecmpA(buff,"double") == 0 ) {
-			if( have_type ) {
-				return -1;
-			}
-			style_type = BORDER_DOUBLE;
-			have_type = TRUE;
-		} else if( LCUI_strcasecmpA(buff,"dashed") == 0 ) {
-			if( have_type ) {
-				return -1;
-			}
-			style_type = BORDER_DASHED;
-			have_type = TRUE;
-		}
-		if( *str_ptr == 0 ) {
-			break;
+	for( i=0; i<STYLE_KEY_TOTAL; ++i ) {
+		if( source[i].is_valid && !dest[i].is_valid ) {
+			dest[i] = source[i];
 		}
 	}
-	if( have_color && have_size && have_type ) {
-		*border = Border( num.px, style_type, color );
+}
+
+/** 覆盖样式表 */
+static void ReplaceStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet source )
+{
+	int i;
+	for( i=0; i<STYLE_KEY_TOTAL; ++i ) {
+		if( source[i].is_valid ) {
+			dest[i] = source[i];
+			dest[i].is_valid = TRUE;
+		}
+	}
+}
+
+/** 初始化 */
+void LCUIWidget_InitStyle( void )
+{
+	RBTree_Init( &style_library.style );
+	RBTree_OnJudge( &style_library.style, CompareName );
+	RBTree_OnDestroy( &style_library.style, DestroyStyleTreeNode );
+	style_library.is_inited = TRUE;
+}
+
+/** 销毁，释放资源 */
+void LCUIWidget_ExitStyle( void )
+{
+	RBTree_Destroy( &style_library.style );
+	style_library.is_inited = FALSE;
+}
+
+LCUI_StyleSheet StyleSheet( void )
+{
+	LCUI_StyleSheet ss;
+	ss = (LCUI_StyleSheet)calloc( STYLE_KEY_TOTAL, sizeof(LCUI_Style) );
+	return ss;
+}
+
+static int SaveSelectorNode( LCUI_SelectorNode node, const char *name, char type )
+{
+
+	switch( type ) {
+	case 0:
+		if( node->type ) {
+			return -1;
+		}
+		node->type = strdup( name );
+		break;
+	case ':':
+		if( node->pseudo_class_name ) {
+			return -2;
+		}
+		node->pseudo_class_name = strdup( name );
+		break;
+	case '.':
+		if( node->class_name ) {
+			return -3;
+		}
+		node->class_name = strdup( name );
+		break;
+	case '#':
+		if( node->id ) {
+			return -4;
+		}
+		node->id = strdup( name );
+		break;
+	default: break;
+	}
+	return 0;
+}
+
+/** 根据字符串内容生成相应的选择器 */
+LCUI_Selector Selector( const char *selector )
+{
+	int ni, si;
+	const char *p;
+	char type = 0, name[MAX_NAME_LEN];
+	size_t size;
+	LCUI_BOOL is_saving = FALSE;
+	LCUI_SelectorNode node = NULL;
+	LCUI_Selector s;
+
+	size = sizeof(LCUI_SelectorNode)*MAX_SELECTOR_DEPTH;
+	s = (LCUI_Selector)malloc( size );
+	for( ni = 0, si = 0, p = selector; *p; ++p ) {
+		if( node == NULL && is_saving ) {
+			size = sizeof( struct LCUI_SelectorNodeRec_ );
+			node = (LCUI_SelectorNode)malloc( size );
+			if( si >= MAX_SELECTOR_DEPTH ) {
+				_DEBUG_MSG( "%s: selector node list is too long.\n",
+					    selector );
+				return NULL;
+			}
+			s[si++] = node;
+		}
+		if( *p == ':' || *p == '.' || *p == '#' ) {
+			if( is_saving ) {
+				if( SaveSelectorNode(node, name, type) != 0 ) {
+					_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
+						    selector, p - selector - ni );
+					return NULL;
+				}
+				ni = 0;
+			}
+			is_saving = TRUE;
+			type = *p;
+			continue;
+		}
+		if( *p == ' ' ) {
+			if( is_saving ) {
+				if( SaveSelectorNode(node, name, type) != 0 ) {
+					_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
+						    selector, p - selector - ni );
+					return NULL;
+				}
+				is_saving = FALSE;
+			}
+			ni = 0;
+			node = NULL;
+			continue;
+		}
+		if( (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z')
+		 || (*p >= '0' && *p <= '9') || *p == '-' || *p == '_' ) {
+			if( !is_saving ) {
+				type = 0;
+				is_saving = TRUE;
+			}
+			name[ni++] = *p;
+			name[ni] = 0;
+			continue;
+		}
+		_DEBUG_MSG( "%s: unknown char %02x at %ld.\n",
+			    selector, *p, p - selector );
+		return NULL;
+	}
+	return s;
+}
+
+static int mystrcmp( const char *str1, const char *str2 )
+{
+	if( str1 == str2 ) {
 		return 0;
 	}
-	return -1;
-}
-
-static int WidgetStyle_SyncBorder(
-		LCUI_Widget widget,
-		StyleLIB_Selector *selector,
-		StyleLIB_Class *style_class,
-		const char *pseudo_class_name )
-{
-	int ret;
-	LCUI_Border border;
-	char *attr_value;
-	IntOrFloat_t num;
-	StyleLIB_Property *widget_attr;
-
-	IntOrFloat_Init( &num );
-	/* 获取border属性的值 */
-	widget_attr = StyleLIB_GetProperty( selector, style_class,
-					pseudo_class_name, "border" );
-	if( widget_attr != NULL ) {
-		attr_value = widget_attr->value.string;
-		ret = style_border_convert( attr_value, &border );
-		if( ret != -1 ) {
-			Widget_SetBorder( widget, border );
-		}
-	}
-	return 0;
-}
-
-/* 根据部件样式，同步部件的尺寸 */
-static int WidgetStyle_SyncSize(
-		LCUI_Widget widget,
-		StyleLIB_Selector *selector,
-		StyleLIB_Class *style_class,
-		const char *pseudo_class_name )
-{
-	int ret;
-	char *attr_value;
-	IntOrFloat_t num;
-	StyleLIB_Property *widget_attr;
-
-	widget_attr = StyleLIB_GetProperty( selector, style_class,
-					pseudo_class_name, "width" );
-	if( widget_attr != NULL ) {
-		attr_value = widget_attr->value.string;
-		ret = ScanIntOrFloat( attr_value, &num );
-		if( ret == 0 ) {
-			widget->w = num;
-			Widget_UpdateSize( widget );
-		}
-	}
-	
-	widget_attr = StyleLIB_GetProperty( selector, style_class,
-					pseudo_class_name, "height" );
-	if( widget_attr != NULL ) {
-		attr_value = widget_attr->value.string;
-		ret = ScanIntOrFloat( attr_value, &num );
-		if( ret == 0 ) {
-			widget->h = num;
-			Widget_UpdateSize( widget );
-		}
-	}
-	return 0;
-}
-
-LCUI_API int WidgetStyle_Sync( LCUI_Widget widget )
-{
-	StyleLIB_Class *style_class;
-	StyleLIB_Selector *style_selector;
-	char type_name[256], *class_name_ptr, class_name[256], *pseudo_class_name;
-	
-	if( widget == NULL ) {
+	if( str1 == NULL || str2 == NULL ) {
 		return -1;
 	}
-	/* 如果部件指定了类型名，则直接用该类型名作为样式选择器名 */
-	if( widget->type_name.string != NULL
-	 && widget->type_name.length > 0 ) {
-		strcpy( type_name, widget->type_name.string );
-	} else {/* 否则，用void-widget作为缺省选择器名 */
-		strcpy( type_name, "void-widget" );
-	}
-	/* 从样式库中获取指定名称的 选择器 的句柄 */
-	style_selector = StyleLIB_GetSelector( &style_library, type_name );
+	return strcmp( str1, str2 );
+}
 
-	/* 如果部件指定了样式类名，则直接用该名称作为样式类名 */
-	if( widget->style_name.string != NULL
-	 && widget->style_name.length > 0 ) {
-		strcpy( class_name, widget->style_name.string );
-		class_name_ptr = class_name;
-	} else {
-		class_name_ptr = NULL;
+/** 判断两个选择器是否相等 */
+LCUI_BOOL SelectorIsEqual( LCUI_Selector s1, LCUI_Selector s2 )
+{
+	LCUI_SelectorNode *sn1_ptr = s1, *sn2_ptr = s2;
+	for( ; sn1_ptr && sn2_ptr; ++sn1_ptr,++sn2_ptr ) {
+		if( mystrcmp((*sn1_ptr)->type, (*sn2_ptr)->type) ) {
+			return FALSE;
+		}
+		if( mystrcmp((*sn1_ptr)->class_name,
+			(*sn2_ptr)->class_name) ) {
+			return FALSE;
+		}
+		if( mystrcmp((*sn1_ptr)->pseudo_class_name,
+			(*sn2_ptr)->pseudo_class_name) ) {
+			return FALSE;
+		}
+		if( mystrcmp((*sn1_ptr)->id, (*sn2_ptr)->id) ) {
+			return FALSE;
+		}
 	}
-	/* 从样式库中获取指定名称的 样式类 的句柄 */
-	style_class = StyleLIB_GetClass( &style_library, class_name_ptr );
+	if( sn1_ptr == sn2_ptr ) {
+		return TRUE;
+	}
+	return FALSE;
+}
 
-	/* 根据当前部件状态，选定伪类名 */
-	switch(widget->state) {
-	case WIDGET_STATE_ACTIVE:pseudo_class_name="active"; break;
-	case WIDGET_STATE_OVERLAY:pseudo_class_name="overlay"; break;
-	case WIDGET_STATE_DISABLE:pseudo_class_name="disable"; break;
-	case WIDGET_STATE_NORMAL:
-	default: pseudo_class_name=NULL; break;
+static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
+					       const char *name )
+{
+	int i, n;
+	LCUI_RBTreeNode *node;
+	StyleTreeNode *stn;
+	StyleListNode *sln;
+	LCUI_SelectorNode sn;
+
+	node = RBTree_CustomSearch( &style_library.style, (const void*)name );
+	if( !node ) {
+		stn = (StyleTreeNode*)malloc(sizeof(StyleTreeNode));
+		strncpy( stn->name, name, MAX_NAME_LEN );
+		LinkedList_Init( &stn->styles, sizeof(StyleListNode) );
+		LinkedList_SetDataNeedFree( &stn->styles, TRUE );
+		LinkedList_SetDestroyFunc( &stn->styles, DestroyStyleListNode );
+		node = RBTree_CustomInsert( &style_library.style,
+					    (const void*)name, stn );
 	}
-	DEBUG_MSG1("selector: %p, class: %p\n", style_selector, style_class);
-	/* 从样式库中同步部件属性 */
-	WidgetStyle_SyncPostion( widget, style_selector, style_class, pseudo_class_name );
-	WidgetStyle_SyncSize( widget, style_selector, style_class, pseudo_class_name );
-	WidgetStyle_SyncBackground( widget, style_selector, style_class, pseudo_class_name );
-	WidgetStyle_SyncBorder( widget, style_selector, style_class, pseudo_class_name );
+	stn = (StyleTreeNode*)node->data;
+	LinkedList_Goto( &stn->styles, 0 );
+	while( LinkedList_IsAtEnd( &stn->styles ) ) {
+		sln = (StyleListNode*)LinkedList_Get( &stn->styles );
+		if( SelectorIsEqual(sln->selector, selector) ) {
+			return sln->style;
+		}
+		LinkedList_ToNext( &stn->styles );
+	}
+	sln = (StyleListNode*)malloc(sizeof(StyleListNode));
+	sln->style = StyleSheet();
+	for( n=0; selector[n]; ++n );
+	sln->selector = (LCUI_Selector)malloc( sizeof(LCUI_SelectorNode*)*n );
+	for( i=0, n-=1; i<n; ++i ) {
+		sn = (LCUI_SelectorNode)malloc( sizeof(struct LCUI_SelectorNodeRec_) );
+		sn->type = NULL;
+		sn->id = NULL;
+		sn->class_name = NULL;
+		sn->pseudo_class_name = NULL;
+		if( selector[i]->type ) {
+			sn->type = strdup( selector[i]->type );
+		}
+		if( selector[i]->id ) {
+			sn->id = strdup( selector[i]->id );
+		}
+		if( selector[i]->class_name ) {
+			sn->class_name = strdup( selector[i]->class_name );
+		}
+		if( selector[i]->pseudo_class_name ) {
+			sn->pseudo_class_name = strdup( selector[i]->pseudo_class_name );
+		}
+		sln->selector[i] = sn;
+	}
+	sln->selector[n] = NULL;
+	LinkedList_Append( &stn->styles, sln );
+	return sln->style;
+}
+
+static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector )
+{
+	int depth;
+	char fullname[MAX_NAME_LEN];
+	LCUI_SelectorNode sn;
+
+	for( depth = 0; selector[depth]; ++depth );
+	sn = selector[depth-1];
+	/* 优先级：伪类 > 类 > ID > 名称 */
+	if( sn->pseudo_class_name ) {
+		fullname[0] = ':';
+		strncpy( fullname + 1, sn->pseudo_class_name, MAX_NAME_LEN-1 );
+		return SelectStyleSheetByName( selector, fullname );
+	}
+	if( sn->class_name ) {
+		fullname[0] = '.';
+		strncpy( fullname + 1, sn->class_name, MAX_NAME_LEN-1 );
+		return SelectStyleSheetByName( selector, fullname );
+	}
+	if( sn->id ) {
+		fullname[0] = '#';
+		strncpy( fullname + 1, sn->id, MAX_NAME_LEN-1 );
+		return SelectStyleSheetByName( selector, fullname );
+	}
+	if( sn->type ) {
+		return SelectStyleSheetByName( selector, fullname );
+	}
+	return NULL;
+}
+
+/** 添加样式表 */
+int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
+{
+	LCUI_StyleSheet ss;
+	ss = SelectStyleSheet( selector );
+	if( ss ) {
+		ReplaceStyleSheet( ss, in_ss );
+	}
 	return 0;
 }
-#endif
+
+/** 匹配元素路径与样式结点路径 */
+LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
+{
+	int i, n;
+	LCUI_SelectorNode *sn_ptr = selector;
+	LCUI_Widget *obj_ptr = wlist, w;
+
+	while( ++obj_ptr && sn_ptr ) {
+		w = *obj_ptr;
+		if( (*sn_ptr)->id ) {
+			if( strcmp(w->id, (*sn_ptr)->id) ) {
+				continue;
+			}
+		}
+		if( (*sn_ptr)->type ) {
+			if( strcmp(w->type, (*sn_ptr)->type) ) {
+				continue;
+			}
+		}
+		if( (*sn_ptr)->class_name ) {
+			n = ptrslen( w->classes );
+			for( i = 0; i < n; ++i ) {
+				if( strcmp(w->classes[i],
+					(*sn_ptr)->class_name) ) {
+					break;
+				}
+			}
+			if( i >= n ) {
+				continue;
+			}
+		}
+		if( (*sn_ptr)->pseudo_class_name ) {
+			n = ptrslen( w->pseudo_classes );
+			for( i = 0; i < n; ++i ) {
+				if( strcmp(w->pseudo_classes[i],
+					(*sn_ptr)->pseudo_class_name) ) {
+					break;
+				}
+			}
+			if( i >= n ) {
+				continue;
+			}
+		}
+		++sn_ptr;
+	}
+	if( sn_ptr == NULL ) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
+				LinkedList *list )
+{
+	LCUI_RBTreeNode *node;
+	StyleListNode *sln;
+	LinkedList *styles;
+	LCUI_Widget w, wlist[MAX_SELECTOR_DEPTH];
+	int i, n, count;
+
+	node = RBTree_CustomSearch( &style_library.style, (const void*)name );
+	if( !node ) {
+		return 0;
+	}
+	for( n = 0, w = widget; w; ++n, w = w->parent );
+	if( n >= MAX_SELECTOR_DEPTH ) {
+		return -1;
+	}
+	if( n == 0 ) {
+		wlist[0] = NULL;
+	} else {
+		n -= 1;
+		wlist[n] = NULL;
+		w = w->parent;
+		while( --n >= 0 ) {
+			wlist[n] = w;
+			w = w->parent;
+		}
+	}
+	styles = &((StyleTreeNode*)node->data)->styles;
+	n = LinkedList_GetTotal( styles );
+	LinkedList_Goto( styles, 0 );
+	for( count=0,i=0; i<n; ++i ) {
+		sln = (StyleListNode*)LinkedList_Get( styles );
+		/* 如果当前元素在该样式结点的作用范围内 */
+		if( IsMatchPath(wlist, sln->selector) ) {
+			LinkedList_Append( list, sln->style );
+			++count;
+		}
+		LinkedList_ToNext( styles );
+	}
+	return count;
+}
+
+static int FindStyleNode( LCUI_Widget w, LinkedList *list )
+{
+	int i, count = 0;
+	char fullname[MAX_NAME_LEN];
+
+	i = ptrslen( w->classes );
+	/* 记录类选择器匹配的样式表 */
+	while( --i >= 0 ) {
+		fullname[0] = '.';
+		strncpy( fullname + 1, w->classes[i], MAX_NAME_LEN-1 );
+		count += FindStyleNodeByName( fullname, w, list );
+	}
+	/* 记录ID选择器匹配的样式表 */
+	if( w->id ) {
+		fullname[0] = '#';
+		strncpy( fullname + 1, w->id, MAX_NAME_LEN - 1 );
+		count += FindStyleNodeByName( fullname, w, list );
+	}
+	/* 记录名称选择器匹配的样式表 */
+	if( w->type ) {
+		count += FindStyleNodeByName( w->type, w, list );
+	}
+	return count;
+}
+
+/** 获取样式表 */
+int Widget_GetStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
+{
+	int i, n;
+	LCUI_StyleSheet ss;
+	LinkedList list;
+
+	LinkedList_Init( &list, sizeof(LCUI_StyleSheet) );
+	LinkedList_SetDataNeedFree( &list, FALSE );
+	n = FindStyleNode( w, &list );
+	LinkedList_Goto( &list, 0 );
+	for( i=0; i<n; ++i ) {
+		ss = (LCUI_StyleSheet)LinkedList_Get( &list );
+		MergeStyleSheet( out_ss, ss );
+		LinkedList_ToNext( &list );
+	}
+	LinkedList_Destroy( &list );
+	return 0;
+}

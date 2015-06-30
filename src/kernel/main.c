@@ -48,7 +48,6 @@
 #include <LCUI/input.h>
 #include <LCUI/widget.h>
 #include <LCUI/surface.h>
-#include <LCUI/style_library.h>
 
 #include <time.h>
 
@@ -557,7 +556,6 @@ int LCUI_Init(void)
 	LCUI_InitKeyboard();
 	LCUI_InitMouse();
 	LCUI_InitCursor();
-	LCUI_InitStyleLibrary();
 	LCUI_InitWidget();
 	LCUI_InitDisplay();
 	{
@@ -581,7 +579,6 @@ static int LCUI_Destroy( void )
 	LCUI_ExitEvent();
 	LCUI_ExitCursor();
 	LCUI_ExitWidget();
-	LCUI_ExitStyleLibrary();
 	LCUI_ExitFont();
 	LCUI_ExitTimer();
 	LCUI_ExitDevice();

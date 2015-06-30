@@ -49,6 +49,7 @@ typedef struct LCUI_WidgetFull* LCUI_Widget;
 #include <LCUI/gui/widget_paint.h>
 #include <LCUI/gui/widget_library.h>
 #include <LCUI/gui/widget_event.h>
+#include <LCUI/gui/widget_style.h>
 
 LCUI_BEGIN_HEADER
 
@@ -56,11 +57,11 @@ LCUI_BEGIN_HEADER
 struct LCUI_WidgetFull {
 	LCUI_WidgetBase		base;			/**< 基础数据及操作集 */
 	LCUI_WidgetStyle	style;			/**< 样式 */
-	char			*type_name;		/**< 类型名称 */
+	char			*id;			/**< ID */
+	char			*type;			/**< 类型 */
+	char			**classes;		/**< 类列表 */
+	char			**pseudo_classes;	/**< 伪类列表 */
 	wchar_t			*title;			/**< 标题 */
-	LCUI_BOOL		autosize;		/**< 指定是否自动调整自身的大小，以适应内容的大小 */
-	LCUI_BOOL		focus;			/**< 指定该部件是否需要焦点 */
-	LCUI_Widget		focus_widget;		/**< 获得焦点的子部件 */
 
 	LCUI_Widget		parent;			/**< 父部件 */
 	LinkedList		children;		/**< 子部件 */

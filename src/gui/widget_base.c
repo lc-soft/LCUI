@@ -230,7 +230,7 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 	widget = NEW_ONE(struct LCUI_WidgetFull);
 	Widget_Init( widget );
 	if( type_name ) {
-		widget->type_name = strdup( type_name );
+		widget->type = strdup( type_name );
 		wc = LCUIWidget_GetClass( type_name );
 		if( wc ) {
 			wc->methods.init( widget );
@@ -253,7 +253,7 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 			if( !child->style.visible ) {
 				continue;
 			}
-			if( x >= child->base.x && y >= child->base.y 
+			if( x >= child->base.x && y >= child->base.y
 			&& x < child->base.x + child->base.width
 			&& y < child->base.y + child->base.height ) {
 				target = child;
@@ -823,6 +823,7 @@ void LCUI_InitWidget(void)
 	LCUIWidget_InitTask();
 	LCUIWidget_InitEvent();
 	LCUIWidget_InitLibrary();
+	LCUIWidget_InitStyle();
 	LCUIWidget_AddTextView();
 	Widget_Init(LCUIRootWidget);
 	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
