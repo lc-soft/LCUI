@@ -207,6 +207,7 @@
     <ClCompile Include="..\..\..\src\font\in_core_font.c" />
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\textview.c" />
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
@@ -267,10 +268,7 @@
     <ResourceCompile Include="LCUI.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="lcui.ico">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-    </Image>
-    <Image Include="lcui.png" />
+    <Image Include="lcui.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

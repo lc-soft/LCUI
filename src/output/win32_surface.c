@@ -410,7 +410,7 @@ static void Win32Surface_Present( LCUI_Surface surface )
 	HDC hdc_client;
 	RECT client_rect;
 
-	_DEBUG_MSG("surface: %p, hwnd: %p\n", surface, surface->hwnd);
+	DEBUG_MSG("surface: %p, hwnd: %p\n", surface, surface->hwnd);
 	hdc_client = GetDC( surface->hwnd );
 	SetBitmapBits( surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes );
 	switch(surface->mode) {
@@ -530,7 +530,7 @@ LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info )
 	wndclass.cbWndExtra    = 0;
 	wndclass.hInstance     = win32.main_instance;
 	/* 载入动态库里的图标 */
-	wndclass.hIcon         = LoadIcon( win32.dll_instance, MAKEINTRESOURCE(IDI_MAIN_ICON) );
+	wndclass.hIcon         = LoadIcon( win32.dll_instance, MAKEINTRESOURCE(IDI_LCUI_ICON) );
 	wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
 	wndclass.hbrBackground = (HBRUSH)GetStockObject( WHITE_BRUSH );
 	wndclass.lpszMenuName  = NULL;

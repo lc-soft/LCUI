@@ -398,6 +398,9 @@
     <ClCompile Include="..\..\..\src\gui\widget\textview.c">
       <Filter>源文件\gui\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\button.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\README" />
@@ -433,9 +436,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="lcui.ico">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="lcui.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
