@@ -136,8 +136,15 @@ typedef enum LCUI_StyleVarType {
 	SVT_SCALE,		/**< 比例 */
 	SVT_PX,			/**< 像素 */
 	SVT_PT,			/**< 点 */
-	SVT_COLOR		/**< 色彩 */
+	SVT_COLOR,		/**< 色彩 */
+	SVT_color,
+	SVT_image,
+	SVT_style
 } LCUI_StyleVarType;
+
+#define SVT_px		SVT_PX
+#define SVT_pt		SVT_PT
+#define SVT_scale	SVT_SCALE
 
 /** 用于描述样式的变量类型 */
 typedef struct LCUI_StyleVar {
@@ -195,6 +202,7 @@ struct LCUI_Graph_ {
 
 /** 样式值枚举，用于代替使用字符串 */
 enum StyleValue {
+	SV_NONE,
 	SV_AUTO,
 	SV_CONTAIN,
 	SV_COVER,
@@ -211,6 +219,14 @@ enum StyleValue {
 	SV_BOTTOM_LEFT,
 	SV_BOTTOM_CENTER,
 	SV_BOTTOM_RIGHT,
+	SV_SOLID,
+	SV_DOTTED,
+	SV_DOUBLE,
+	SV_DASHED,
+	SV_CONTENT_BOX,
+	SV_PADDING_BOX,
+	SV_BORDER_BOX,
+	SV_GRAPH_BOX
 };
 
 typedef struct LCUI_Background {

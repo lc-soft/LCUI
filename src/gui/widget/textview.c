@@ -52,14 +52,14 @@ enum TaskType {
 };
 
 typedef struct LCUI_TextView_ {
-	LCUI_TextLayer layer;	/* 文本图层 */
+	LCUI_TextLayer layer;	/**< 文本图层 */
 	struct {
 		LCUI_BOOL is_valid;
 		union {
 			wchar_t *text;
 			LCUI_BOOL autowrap;
 		};
-	} tasks[4];
+	} tasks[TASK_TOTAL];
 } LCUI_TextView;
 
 /*---------------------------- Private -------------------------------*/
@@ -154,7 +154,7 @@ static void TextView_OnUpdate( LCUI_Widget w )
 	/* 将得到的无效区域导入至部件的无效区域列表 */
 	while(n--) {
 		p_rect = (LCUI_Rect*)LinkedList_Get( &rect_list );
-		Widget_InvalidateArea( w, p_rect, CONTENT_BOX );
+		Widget_InvalidateArea( w, p_rect, SV_CONTENT_BOX );
 		LinkedList_ToNext( &rect_list );
 	}
 	DirtyRectList_Destroy( &rect_list );

@@ -52,9 +52,9 @@ static void Widget_AdjustArea(	LCUI_Widget w, LCUI_Rect *in_rect,
 {
 	LCUI_Rect *box;
 	switch( box_type ) {
-	case BORDER_BOX: box = &w->base.box.border; break;
-	case GRAPH_BOX: box = &w->base.box.graph; break;
-	case CONTENT_BOX:
+	case SV_BORDER_BOX: box = &w->base.box.border; break;
+	case SV_GRAPH_BOX: box = &w->base.box.graph; break;
+	case SV_CONTENT_BOX:
 	default: box = &w->base.box.content; break;
 	}
 	/* 如果为NULL，则视为使用整个部件区域 */
@@ -153,8 +153,8 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	wc && wc->methods.paint ? wc->methods.paint(w, paint):FALSE;
 }
 
-static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
-				    LCUI_Rect *valid_box,
+static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y, 
+				    LCUI_Rect *valid_box, 
 				    LCUI_DirtyRectList *rlist )
 {
 	int i, n, count;
@@ -246,10 +246,10 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 		return -1;
 	}
 	switch( box_type ) {
-	case CONTENT_BOX:
+	case SV_CONTENT_BOX:
 		rect = w->base.box.content;
 		break;
-	case PADDING_BOX:
+	case SV_PADDING_BOX:
 		rect = w->base.box.content;
 		rect.x -= w->base.padding.left;
 		rect.y -= w->base.padding.top;
@@ -258,10 +258,10 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 		rect.h += w->base.padding.top;
 		rect.h += w->base.padding.bottom;
 		break;
-	case BORDER_BOX:
+	case SV_BORDER_BOX:
 		rect = w->base.box.border;
 		break;
-	case GRAPH_BOX:
+	case SV_GRAPH_BOX:
 	default:
 		return -2;
 	}
@@ -303,7 +303,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_BOOL has_overlay, has_content_graph = FALSE,
 		  has_self_graph = FALSE,has_layer_graph = FALSE,
 		  is_cover_border = FALSE;
-
+	
 	Graph_Init( &layer_graph );
 	Graph_Init( &self_graph );
 	Graph_Init( &content_graph );

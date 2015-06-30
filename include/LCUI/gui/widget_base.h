@@ -44,19 +44,8 @@ LCUI_BEGIN_HEADER
 
 /** 如果没有包含 widget_build.h 头文件 */
 #ifndef __LCUI_WIDGET_BUILD_H__
-
 typedef struct LCUI_WidgetBase* LCUI_Widget;
-
 #endif
-
-/** 边框风格 */
-enum LCUI_WidgetBorderStyle {
-	BORDER_NONE,	/**< 无边框 */
-	BORDER_SOLID,	/**< 实线 */
-	BORDER_DOTTED,	/**< 点状 */
-	BORDER_DOUBLE,	/**< 双线 */
-	BORDER_DASHED	/**< 虚线 */
-};
 
 /** 部件样式域 */
 enum LCUI_WidgetStyleScope {
@@ -68,14 +57,6 @@ enum LCUI_WidgetStyleScope {
 	WSS_ALL		= 0xffffffff,	/**< 全部 */
 };
 
-/** 框类型 */
-typedef enum LCUI_WidgetBoxType {
-	CONTENT_BOX,	/**< 内容框 */
-	PADDING_BOX,	/**< 内边距框 */
-	BORDER_BOX,	/**< 边框盒 */
-	GRAPH_BOX	/**< 图形呈现框 */
-} LCUI_WidgetBoxType;
-
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
@@ -85,10 +66,10 @@ typedef struct LCUI_WidgetStyle {
 	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
 	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
 	LCUI_StyleVar x, y;		/**< 当前平面坐标 */
-	LCUI_WidgetBoxType box_sizing;	/**< 以何种方式计算宽度和高度 */
+	int box_sizing;			/**< 以何种方式计算宽度和高度 */
 
 	union {
-		LCUI_StyleVar w, width;	/**< 部件区域宽度 */
+		LCUI_StyleVar w, width;		/**< 部件区域宽度 */
 	};
 	union {
 		LCUI_StyleVar h, height;	/**< 部件区域高度 */
@@ -101,14 +82,6 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_Background background;	/**< 背景 */
 	LCUI_BoxShadow shadow;		/**< 阴影 */
 	LCUI_Border border;		/**< 边框 */
-
-	struct {
-		struct {
-			float x, y;
-		} scale;		/**< 2D 缩放 */
-		float rotate;		/**< 2D 旋转角度 */
-	} transform;
-
 } LCUI_WidgetStyle;
 
 typedef struct LCUI_WidgetBase {
@@ -120,8 +93,8 @@ typedef struct LCUI_WidgetBase {
 		LCUI_Rect outer;	/**< 外边框的区域，包括边框盒和外边距框区域 */
 		LCUI_Rect graph;	/**< 图层的区域，包括边框盒和阴影区域 */
 	} box;				/**< 部件的各个区域信息 */
-	LCUI_Rect2 padding;		/**< 内边框 */
-	LCUI_Rect2 margin;		/**< 外边框 */
+	LCUI_Rect2 padding;		/**< 内边距框 */
+	LCUI_Rect2 margin;		/**< 外边距框 */
 	LCUI_WidgetStyle style;		/**< 样式缓存 */
 } LCUI_WidgetBase;
 
@@ -195,3 +168,4 @@ void LCUI_ExitWidget(void);
 #undef $
 
 #endif
+

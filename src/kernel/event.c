@@ -83,7 +83,7 @@ struct LCUI_EventBoxRec_ {
 
 static int CompareEventName( void *data, const void *keydata )
 {
-	return strcmp(*(char**)data, (const char*)keydata);
+	return strcmp((char*)data, (const char*)keydata);
 }
 
 static void DestroyEventSlot( void *data )
@@ -170,7 +170,7 @@ int $(AddEvent)( LCUI_EventBox box, const char *event_name, int id )
 	RBTree_Insert( &box->event_slot, slot->id, slot );
 	/* 添加事件名记录 */
 	node = RBTree_CustomInsert(
-		&box->event_name, (const void*)event_name, &slot->name
+		&box->event_name, (const void*)slot->name, slot->name
 	);
 	/* 结点的 key 就是事件槽的 id */
 	node->key = slot->id;

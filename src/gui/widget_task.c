@@ -83,12 +83,12 @@ static void HandleMove( LCUI_Widget w, LCUI_WidgetTask *t )
 	rect = w->base.box.graph;
 	if( w->parent ) {
 		/* 标记移动后的区域 */
-		Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
 		/* 应用移动前的坐标 */
 		rect.x = t->move.x;
 		rect.y = t->move.y;
 		/* 标记移动前的区域 */
-		Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
 	}
 	/* 检测是否为顶级部件并做相应处理 */
 	HandleTopLevelWidgetEvent( w, WET_MOVE );
@@ -111,10 +111,10 @@ static void HandleResize( LCUI_Widget w, LCUI_WidgetTask *t )
 	rect.height = t->resize.h;
 	_DEBUG_MSG( "old_w: %d, old_h: %d\n", t->resize.w, t->resize.h );
 	if( w->parent ) {
-		Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
 		rect.width = w->base.box.graph.width;
 		rect.height = w->base.box.graph.height;
-		Widget_InvalidateArea( w->parent, &rect, CONTENT_BOX );
+		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
 	}
 	Widget_UpdateGraphBox( w );
 	task.type = WTT_REFRESH;
@@ -147,10 +147,10 @@ static void HandleShadow( LCUI_Widget w, LCUI_WidgetTask *t )
 	 && bs->spread == t->shadow.spread ) {
 		LCUIRect_CutFourRect( &w->base.box.border,
 				      &w->base.box.graph, rects );
-		Widget_InvalidateArea( w, &rects[0], GRAPH_BOX );
-		Widget_InvalidateArea( w, &rects[1], GRAPH_BOX );
-		Widget_InvalidateArea( w, &rects[2], GRAPH_BOX );
-		Widget_InvalidateArea( w, &rects[3], GRAPH_BOX );
+		Widget_InvalidateArea( w, &rects[0], SV_GRAPH_BOX );
+		Widget_InvalidateArea( w, &rects[1], SV_GRAPH_BOX );
+		Widget_InvalidateArea( w, &rects[2], SV_GRAPH_BOX );
+		Widget_InvalidateArea( w, &rects[3], SV_GRAPH_BOX );
 		return;
 	}
 	task.type = WTT_RESIZE;
@@ -163,17 +163,18 @@ static void HandleShadow( LCUI_Widget w, LCUI_WidgetTask *t )
 static void HandleBody( LCUI_Widget w, LCUI_WidgetTask *t )
 {
 	_DEBUG_MSG( "body\n" );
-	Widget_InvalidateArea( w, NULL, BORDER_BOX );
+	Widget_InvalidateArea( w, NULL, SV_BORDER_BOX );
 }
 
 /** 处理刷新（标记整个部件区域为脏矩形） */
 static void HandleRefresh( LCUI_Widget w, LCUI_WidgetTask *t )
 {
 	_DEBUG_MSG( "refresh\n" );
-	Widget_InvalidateArea( w, NULL, GRAPH_BOX );
+	Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 }
 
-#define max(a,b) (a) > (b) ? a:b
+#undef max
+#define max(a,b)    (((a) > (b)) ? (a) : (b))
 
 static void HandleBorder( LCUI_Widget w, LCUI_WidgetTask *t )
 {
@@ -191,23 +192,23 @@ static void HandleBorder( LCUI_Widget w, LCUI_WidgetTask *t )
 		rect.width = w->base.box.border.width;
 		rect.width -= max( b->top_right_radius, b->right.width );
 		rect.height = max( b->top_left_radius, b->top.width );
-		Widget_InvalidateArea( w, &rect, BORDER_BOX );
+		Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 		rect.x = w->base.box.border.w;
 		rect.width = max( b->top_right_radius, b->right.width );
 		rect.x -= rect.width;
 		rect.height = w->base.box.border.height;
 		rect.height -= max( b->bottom_right_radius, b->bottom.width );
-		Widget_InvalidateArea( w, &rect, BORDER_BOX );
+		Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 		rect.x = max( b->bottom_left_radius, b->left.width );
 		rect.width = w->base.box.border.width;
 		rect.width -= rect.x;
 		rect.height = max( b->bottom_right_radius, b->bottom.width );
-		Widget_InvalidateArea( w, &rect, BORDER_BOX );
+		Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 		rect.width = rect.x;
 		rect.x = 0;
 		rect.height = w->base.box.border.height;
 		rect.height -= max( b->top_left_radius, b->left.width );
-		Widget_InvalidateArea( w, &rect, BORDER_BOX );
+		Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 		return;
 	}
 	/* 更新尺寸 */

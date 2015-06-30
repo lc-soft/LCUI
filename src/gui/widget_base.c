@@ -184,7 +184,7 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->style.y.type = SVT_NONE;
 	widget->style.width.type = SVT_AUTO;
 	widget->style.height.type = SVT_AUTO;
-	widget->style.box_sizing = CONTENT_BOX;
+	widget->style.box_sizing = SV_CONTENT_BOX;
 	widget->style.opacity = 1.0;
 	widget->style.margin.top.px = 0;
 	widget->style.margin.right.px = 0;
@@ -477,7 +477,7 @@ void Widget_ComputeSize( LCUI_Widget w )
 	w->base.box.content.width = w->base.width;
 	w->base.box.content.height = w->base.height;
 	/* 如果是以边框盒作为尺寸调整对象，则需根据边框盒计算内容框尺寸 */
-	if( w->style.box_sizing == BORDER_BOX ) {
+	if( w->style.box_sizing == SV_BORDER_BOX ) {
 		/* 名字太长了，都放一行里代码会太长，只好分解成多行了 */
 		w->base.box.content.width -= w->style.border.left.width;
 		w->base.box.content.width -= w->style.border.right.width;
@@ -806,6 +806,174 @@ PUSH_WSS_SHADOW:
 	Widget_AddTask( w, (t.type = WTT_SHADOW, &t) );
 PUSH_DONE:
 	return;
+}
+
+/** 计算背景样式 */
+static void ComputeBackgroundStyle( LCUI_StyleSheet *ss, LCUI_Background *bg )
+{
+	LCUI_Style *style;
+	int key = key_background_start + 1;
+
+	for( ; key < key_background_end; ++key ) {
+		style = ss[key];
+		if( style->is_valid ) {
+			continue;
+		}
+		switch( key ) {
+		case key_background_color:
+			bg->color = style->color;
+			break;
+		case key_background_image:
+			Graph_Quote( &bg->image, &style->value_image, NULL );
+			break;
+		case key_background_position:
+			bg->position.using_value = TRUE;
+			bg->position.value = style->value_style;
+			break;
+		case key_background_position_x:
+			bg->position.using_value = FALSE;
+			bg->position.x.type = style->type;
+			if( style->type == SVT_SCALE ) {
+				bg->position.x.scale = style->value_scale;
+			} else {
+				bg->position.x.px = style->value;
+			}
+			break;
+		case key_background_position_y:
+			bg->position.using_value = FALSE;
+			bg->position.x.type = style->type;
+			if( style->type == SVT_SCALE ) {
+				bg->position.x.scale = style->value_scale;
+			} else {
+				bg->position.x.px = style->value;
+			}
+			break;
+		case key_background_size:
+			bg->size.using_value = TRUE;
+			bg->position.value = style->value_style;
+			break;
+		case key_background_size_width:
+			bg->size.using_value = FALSE;
+			bg->size.w.type = style->type;
+			if( style->type == SVT_SCALE ) {
+				bg->size.w.scale = style->value_scale;
+			} else {
+				bg->size.w.px = style->value;
+			}
+			break;
+		case key_background_size_height:
+			bg->size.using_value = FALSE;
+			bg->size.h.type = style->type;
+			if( style->type == SVT_SCALE ) {
+				bg->size.h.scale = style->value_scale;
+			} else {
+				bg->size.h.px = style->value;
+			}
+			break;
+		default: break;
+		}
+	}
+}
+
+/** 计算边框样式 */
+static void ComputeBorderStyle( LCUI_StyleSheet *ss, LCUI_Border *b )
+{
+	LCUI_Style *style;
+	int key = key_border_start + 1;
+
+	for( ; key < key_border_end; ++key ) {
+		style = ss[key];
+		if( style->is_valid ) {
+			continue;
+		}
+		switch( key ) {
+		case key_border_color:
+			b->top.color = style->color;
+			b->right.color = style->color;
+			b->bottom.color = style->color;
+			b->left.color = style->color;
+			break;
+		case key_border_style:
+			b->top.style = style->value;
+			b->right.style = style->value;
+			b->bottom.style = style->value;
+			b->left.style = style->value;
+			break;
+		case key_border_width:
+			b->top.width = style->value;
+			b->right.width = style->value;
+			b->bottom.width = style->value;
+			b->left.width = style->value;
+			break;
+		case key_border_top_color:
+			b->top.color = style->color;
+			break;
+		case key_border_right_color:
+			b->right.color = style->color;
+			break;
+		case key_border_bottom_color:
+			b->bottom.color = style->color;
+			break;
+		case key_border_left_color:
+			b->left.color = style->color;
+			break;
+		case key_border_top_width:
+			b->top.width = style->value;
+			break;
+		case key_border_right_width:
+			b->right.width = style->value;
+			break;
+		case key_border_bottom_width:
+			b->bottom.width = style->value;
+			break;
+		case key_border_left_width:
+			b->left.width = style->value;
+			break;
+		case key_border_top_style:
+			b->top.style = style->value;
+			break;
+		case key_border_right_style:
+			b->right.style = style->value;
+			break;
+		case key_border_bottom_style:
+			b->bottom.style = style->value;
+			break;
+		case key_border_left_style:
+			b->left.style = style->value;
+			break;
+		default: break;
+		}
+	}
+}
+
+/** 计算矩形阴影样式 */
+static void ComputeBoxShadowStyle( LCUI_StyleSheet *ss, LCUI_BoxShadow *bsd )
+{
+	LCUI_Style *style;
+	int key = key_box_shadow_start + 1;
+
+	for( ; key < key_box_shadow_end; ++key ) {
+		style = ss[key];
+		if( style->is_valid ) {
+			continue;
+		}
+		switch( key ) {
+		case key_box_shadow_x: bsd->x = style->value; break;
+		case key_box_shadow_y: bsd->y = style->value; break;
+		case key_box_shadow_spread: bsd->spread = style->value; break;
+		case key_box_shadow_color: bsd->color = style->color; break;
+		default: break;
+		}
+	}
+}
+
+/** 计算当前部件的样式 */
+int Widget_ComputeStyle( LCUI_Widget w )
+{
+	//ComputeBoxShadowStyle( w->style_sheet, &w->base.style.shadow );
+	//ComputeBorderStyle( w->style_sheet, &w->base.style.border );
+	//ComputeBackgroundStyle( w->style_sheet, &w->base.style.background );
+	return 0;
 }
 
 void Widget_Lock( LCUI_Widget w )

@@ -183,7 +183,7 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 	} else {
 		Surface_Hide( p_sr->surface );
 	}
-	Widget_InvalidateArea( widget, NULL, GRAPH_BOX );
+	Widget_InvalidateArea( widget, NULL, SV_GRAPH_BOX );
 }
 
 /** 解除 widget 与 sruface 的绑定 */
@@ -393,7 +393,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 	case WET_RESIZE:
 		DEBUG_MSG( "resize, w: %d, h: %d\n", p_rect->w, p_rect->h );
 		Surface_Resize( surface, p_rect->w, p_rect->h );
-		Widget_InvalidateArea( w, NULL, GRAPH_BOX );
+		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 		if( w == LCUIRootWidget && display.mode != LDM_SEAMLESS ) {
 			LCUIDisplay_ExecResize( p_rect->w, p_rect->h );
 		}
@@ -435,7 +435,7 @@ static void OnInvalidRect( LCUI_Surface surface, LCUI_Rect *rect )
 		if( p_sr->surface != surface ) {
 			continue;
 		}
-		Widget_InvalidateArea( p_sr->widget, rect, GRAPH_BOX );
+		Widget_InvalidateArea( p_sr->widget, rect, SV_GRAPH_BOX );
 		continue;
 	}
 }
