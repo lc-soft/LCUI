@@ -149,12 +149,12 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	box.width = w->base.box.border.width;
 	box.height = w->base.box.border.height;
 	Graph_DrawBorder( paint, &box, &w->style.border );
-	wc = LCUIWidget_GetClass( w->type_name );
+	wc = LCUIWidget_GetClass( w->type );
 	wc && wc->methods.paint ? wc->methods.paint(w, paint):FALSE;
 }
 
-static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y, 
-				    LCUI_Rect *valid_box, 
+static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
+				    LCUI_Rect *valid_box,
 				    LCUI_DirtyRectList *rlist )
 {
 	int i, n, count;
@@ -303,7 +303,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_BOOL has_overlay, has_content_graph = FALSE,
 		  has_self_graph = FALSE,has_layer_graph = FALSE,
 		  is_cover_border = FALSE;
-	
+
 	Graph_Init( &layer_graph );
 	Graph_Init( &self_graph );
 	Graph_Init( &content_graph );

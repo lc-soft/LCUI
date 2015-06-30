@@ -351,7 +351,7 @@ static int Widget_ProcTask( LCUI_Widget w )
 		/* 如果有用户自定义任务 */
 		if( buffer[WTT_USER].is_valid ) {
 			LCUI_WidgetClass *wc;
-			wc = LCUIWidget_GetClass( w->type_name );
+			wc = LCUIWidget_GetClass( w->type );
 			wc->task_handler( w, &buffer[WTT_USER].data );
 		}
 		for( i=0; i<WTT_USER; ++i ) {

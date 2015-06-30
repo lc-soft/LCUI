@@ -70,8 +70,6 @@ static void TextView_OnInit( LCUI_Widget w )
 	int i;
 	LCUI_TextView *txt;
 
-	/* txt部件不需要焦点 */
-	w->focus = FALSE;
 	txt = Widget_NewPrivateData( w, LCUI_TextView );
 	for( i = 0; i < TASK_TOTAL; ++i ) {
 		txt->tasks[i].is_valid = FALSE;

@@ -278,6 +278,5 @@ LCUI_API int Graph_FillImageWithColor( LCUI_Graph *graph,
 LCUI_END_HEADER
 
 #include <LCUI/draw.h>
-#include <LCUI/graphlayer.h>
 
 #endif /* __LCUI_GRAPH_H__ */
