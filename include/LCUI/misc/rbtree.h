@@ -47,7 +47,10 @@ typedef struct LCUI_RBTreeNodeRec_ LCUI_RBTreeNode;
 struct LCUI_RBTreeNodeRec_ {
         unsigned char color;
         int key;
-        void *data;
+	union {
+		void *data;
+		char *str;
+	};
         LCUI_RBTreeNode *parent, *left, *right;
 };
 

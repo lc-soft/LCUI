@@ -44,48 +44,6 @@
 
 LCUI_BEGIN_HEADER
 
-typedef struct _LCUI_Button LCUI_Button;
-
-/***********************按钮**************************/
-struct _LCUI_Button
-{
-	/* 当风格为Custom_Style(自定义)时，将根据按钮的状态使用这些图形 */
-	LCUI_Graph	btn_normal;	/* 普通状态 */
-	LCUI_Graph	btn_over;	/* 被鼠标覆盖 */
-	LCUI_Graph	btn_down;	/* 按下状态 */
-	LCUI_Graph	btn_focus;	/* 焦点状态 */
-	LCUI_Graph	btn_disable;	/* 不可用的状态 */
-	
-	LCUI_Widget	*label;	/* 嵌套的文本标签 */
-};
-/****************************************************/
-
-typedef enum BUTTON_STYLE_{
-	BUTTON_STYLE_DEFAULT,	/** 默认的普通按钮风格 */
-	BUTTON_STYLE_CUSTOM,	/** 按钮图像自定义 */
-} BUTTON_STYLE;
-
-/* 获取嵌套在按钮部件里的label部件 */
-LCUI_API LCUI_Widget*
-Button_GetLabel( LCUI_Widget widget );
-
-/* 自定义按钮在各种状态下显示的位图 */
-LCUI_API void
-Button_CustomStyle(	LCUI_Widget widget, LCUI_Graph *normal, 
-			LCUI_Graph *over, LCUI_Graph *down, 
-			LCUI_Graph *focus, LCUI_Graph *disable);
-
-/* 设定按钮部件显示的文本内容 */
-LCUI_API void
-Button_Text( LCUI_Widget widget, const char *text );
-
-LCUI_API void
-Button_TextW( LCUI_Widget widget, const wchar_t *text );
-
-/* 创建一个带文本内容的按钮 */
-LCUI_API LCUI_Widget*
-Button_New( const char *text );
-
 LCUI_END_HEADER
 
 #endif

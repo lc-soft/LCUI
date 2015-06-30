@@ -113,9 +113,9 @@ typedef struct LCUI_SelectorNodeRec_ {
 	char *pseudo_class_name;
 } *LCUI_SelectorNode, **LCUI_Selector;
 
-#define SetStyle(S, NAME, VAL, TYPE)	S[key_##NAME].is_valid = TRUE, \
-					S[key_##NAME].type = SVT_##TYPE, \
-					S[key_##NAME].value_##TYPE = VAL
+#define SetStyle(S, NAME, VAL, TYPE)	S[NAME].is_valid = TRUE, \
+					S[NAME].type = SVT_##TYPE, \
+					S[NAME].value_##TYPE = VAL
 
 
 /** 初始化 */

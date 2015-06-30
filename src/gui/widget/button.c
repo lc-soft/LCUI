@@ -1,8 +1,7 @@
 /* ***************************************************************************
  * button.c -- LCUI‘s Button widget
  * 
- * Copyright (C) 2012-2013 by
- * Liu Chao
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,8 +22,7 @@
 /* ****************************************************************************
  * button.c -- LCUI 的按钮部件
  *
- * 版权所有 (C) 2012-2013 归属于
- * 刘超
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -38,211 +36,87 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-#ifdef ENABLE_THIS_MODULE
-//#define DEBUG
+
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/widget.h>
-#include LC_LABEL_H
-#include LC_BUTTON_H
-#include <LCUI/graph.h>
+#include <LCUI/font.h>
+#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget/button.h>
 
-static void Button_ExecDefalutUpdate( LCUI_Widget widget )
-{
-	LCUI_Border border;
-	LCUI_RGB border_color;
+typedef struct LCUI_Button {
+	LCUI_TextLayer layer;
+} LCUI_Button;
 
-	switch( widget->state ) {
-	case WIDGET_STATE_NORMAL:
-		Widget_SetBackgroundColor( widget, RGB(230,230,230) );
-		/* 获得焦点的按钮，使用另一种颜色的边框 */
-		if( Widget_GetFocus(widget) ) {
-			border_color = RGB(50,150,255);
-		} else {
-			border_color = RGB(172,172,172);
-		}
-		break;
-	case WIDGET_STATE_OVERLAY :
-		Widget_SetBackgroundColor( widget, RGB(232,242,252) );
-		border_color = RGB(126,180,234);
-		break;
-	case WIDGET_STATE_ACTIVE :
-		Widget_SetBackgroundColor( widget, RGB(207,230,252) );
-		border_color = RGB(86,157,229);
-		break;
-	case WIDGET_STATE_DISABLE :
-		Widget_SetBackgroundColor( widget, RGB(200,200,200) );
-		border_color = RGB(172,172,172);
-		break;
-		default : break;
-	}
-	border = Border(1, BORDER_SOLID, border_color );
-	Widget_SetBorder( widget, border );
-	Widget_SetBackgroundTransparent( widget, FALSE );
-}
-
-static void Button_ExecCustomUpdate( LCUI_Widget widget )
+static void Button_OnInit( LCUI_Widget w )
 {
 	LCUI_Button *btn;
-	LCUI_Graph *img;
+	btn = Widget_NewPrivateData( w, LCUI_Button );
+	btn->layer = TextLayer_New();
+}
+
+static void Button_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
+{
+
+}
+
+static void Button_OnDestroy( LCUI_Widget w )
+{
+
+}
+
+static void Button_OnTask( LCUI_Widget w, LCUI_WidgetTask *t )
+{
+
+}
+
+void Button_SetTextW( LCUI_Widget w, const wchar_t *wstr )
+{
+
+}
+
+void Button_SetTextA( LCUI_Widget w, const char *str )
+{
+
+}
+
+/** 添加按钮部件类型 */
+void LCUIWidget_AddButton( void )
+{
+	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "button" );
+	LCUI_Selector selector = Selector("button");
+	LCUI_StyleSheet css = StyleSheet();
+
+	SetStyle(css, key_border_top_width, 1, px);
+	SetStyle(css, key_border_right_width, 1, px);
+	SetStyle(css, key_border_bottom_width, 1, px);
+	SetStyle(css, key_border_left_width, 1, px);
+	SetStyle(css, key_border_top_style, SV_SOLID,style);
+	SetStyle(css, key_border_right_style, SV_SOLID, style);
+	SetStyle(css, key_border_bottom_style, SV_SOLID, style);
+	SetStyle(css, key_border_left_style, SV_SOLID, style);
+	SetStyle(css, key_border_top_color, RGB(210,210,210), color);
+	SetStyle(css, key_border_right_color, RGB(210,210,210), color);
+	SetStyle(css, key_border_bottom_color, RGB(210,210,210), color);
+	SetStyle(css, key_border_left_color, RGB(210,210,210), color);
+	SetStyle(css, key_background_color, RGB(255,255,255), color);
+	LCUI_PutStyle( selector, css );
+	DeleteSelector( &selector );
+	DeleteStyleSheet( &css );
+
+	css = StyleSheet();
+	selector = Selector("button:hover");
+	SetStyle(css, key_background_color, RGB(230,230,230), color);
+	DeleteSelector( &selector );
+	DeleteStyleSheet( &css );
 	
-	btn = Widget_GetPrivateData( widget );
-	switch(widget->state) {
-	case WIDGET_STATE_NORMAL: img = &btn->btn_normal; break;
-	case WIDGET_STATE_OVERLAY: img = &btn->btn_over; break;
-	case WIDGET_STATE_ACTIVE: img = &btn->btn_down; break;
-	case WIDGET_STATE_DISABLE: img = &btn->btn_disable; break;
-	default : img = NULL; break;
-	}
-	Widget_SetBackgroundImage( widget, img );
-	/* 如果图像不可用，则使用默认样式 */
-	if( !Graph_IsValid(img) ) {
-		Button_ExecDefalutUpdate( widget );
-	} else {
-		Widget_SetBackgroundTransparent( widget, TRUE );
-		Widget_SetBackgroundLayout( widget, LAYOUT_STRETCH );
-	}
-}
-
-static void Button_ExecUpdate( LCUI_Widget widget )
-{
-	switch(widget->style_id) {
-	case BUTTON_STYLE_CUSTOM:
-		Button_ExecCustomUpdate( widget );
-		break;
-	default:
-		Button_ExecDefalutUpdate( widget );
-		break;
-	}
-	Widget_Refresh( widget );
-}
-
-static void 
-Button_ProcFocusOut( LCUI_Widget widget, LCUI_WidgetEvent *unused )
-{
-	Widget_Update( widget );
-}
-
-
-/* 初始化按钮部件的数据 */
-static void Button_Init( LCUI_Widget widget )
-{
-	int valid_state;
-	LCUI_Button *button;
+	css = StyleSheet();
+	selector = Selector("button:active");
+	SetStyle(css, key_background_color, RGB(200,200,200), color);
+	DeleteSelector( &selector );
+	DeleteStyleSheet( &css );
 	
-	button = Widget_NewPrivateData( widget, LCUI_Button );
-	/* 初始化图像数据 */ 
-	Graph_Init(&button->btn_disable);
-	Graph_Init(&button->btn_normal);
-	Graph_Init(&button->btn_focus);
-	Graph_Init(&button->btn_down);
-	Graph_Init(&button->btn_over);
-	
-	valid_state = (WIDGET_STATE_NORMAL | WIDGET_STATE_ACTIVE);
-	valid_state |= (WIDGET_STATE_DISABLE | WIDGET_STATE_OVERLAY);
-	Widget_SetValidState( widget, valid_state );
-	button->label = Label_New();/* 创建label部件 */ 
-	/* 将按钮部件作为label部件的容器 */
-	Widget_Container_Add(widget, button->label);
-	/* label部件居中显示 */
-	Widget_SetAlign(button->label, ALIGN_MIDDLE_CENTER, Pos(0,0));
-	Widget_Show(button->label); /* 显示label部件 */
-	/* 启用自动尺寸调整，以适应内容 */
-	Widget_SetAutoSize( widget, TRUE, AUTOSIZE_MODE_GROW_AND_SHRINK);
-	Widget_SetStyleID( widget, BUTTON_STYLE_DEFAULT );
-	/* 关联EVENT_FOCUSOUT事件，以在按钮失去焦点时重绘按钮 */
-	Widget_ConnectEvent( widget, EVENT_FOCUSOUT, Button_ProcFocusOut );
+	wc->methods.init = Button_OnInit;
+	wc->methods.paint = Button_OnPaint;
+	wc->methods.destroy = Button_OnDestroy;
+	wc->task_handler = Button_OnTask;
 }
-
-/* 获取嵌套在按钮部件里的label部件 */
-LCUI_API LCUI_Widget*
-Button_GetLabel( LCUI_Widget widget )
-{
-	LCUI_Button *button = (LCUI_Button*)Widget_GetPrivateData(widget);
-	return button->label;
-}
-
-/* 自定义按钮在各种状态下显示的位图 */
-LCUI_API void
-Button_CustomStyle(	LCUI_Widget widget, LCUI_Graph *normal, 
-			LCUI_Graph *over, LCUI_Graph *down, 
-			LCUI_Graph *focus, LCUI_Graph *disable)
-{
-	LCUI_Button *btn_data;
-	btn_data = (LCUI_Button*)Widget_GetPrivateData(widget);
-	if( Graph_IsValid(normal) ) {
-		btn_data->btn_normal = *normal;
-	} else {
-		Graph_Init( &btn_data->btn_normal );
-	}
-	if( Graph_IsValid(over) ) {
-		btn_data->btn_over = *over;
-	} else {
-		Graph_Init( &btn_data->btn_over );
-	}
-	if( Graph_IsValid(down) ) {
-		btn_data->btn_down = *down;
-	} else {
-		Graph_Init( &btn_data->btn_down );
-	}
-	if( Graph_IsValid(focus) ) {
-		btn_data->btn_focus = *focus;
-	} else {
-		Graph_Init( &btn_data->btn_focus );
-	}
-	if( Graph_IsValid(disable) ) {
-		btn_data->btn_disable = *disable;
-	} else {
-		Graph_Init( &btn_data->btn_disable );
-	}
-	/* 设定为自定义风格 */
-	Widget_SetStyleID(widget, BUTTON_STYLE_CUSTOM);
-	Widget_InvalidateArea( widget, NULL );
-}
-
-/* 设定按钮部件显示的文本内容 */
-LCUI_API void
-Button_Text( LCUI_Widget widget, const char *text )
-{
-	LCUI_Button *button;
-	LCUI_Widget label;
-	
-	button = (LCUI_Button*)Widget_GetPrivateData(widget);
-	label = button->label;
-	/* 设定部件显示的文本 */
-	Label_SetText( label, text );
-}
-
-LCUI_API void
-Button_TextW( LCUI_Widget widget, const wchar_t *text )
-{
-	LCUI_Button *button;
-	LCUI_Widget label;
-	
-	button = (LCUI_Button*)Widget_GetPrivateData(widget);
-	label = button->label;
-	Label_SetTextW( label, text );
-}
-
-/* 创建一个带文本内容的按钮 */
-LCUI_API LCUI_Widget*
-Button_New( const char *text )
-{
-	LCUI_Widget widget;
-	widget = Widget_New("button");
-	Button_Text(widget, text);
-	return widget;
-}
-
-/* 将按钮部件类型注册至部件库 */
-LCUI_API void
-Register_Button(void)
-{
-	/* 添加部件类型 */
-	WidgetType_Add("button");
-	
-	/* 为部件类型关联相关函数 */
-	WidgetFunc_Add("button", Button_Init,		FUNC_TYPE_INIT);
-	WidgetFunc_Add("button", Button_ExecUpdate,	FUNC_TYPE_UPDATE);
-}
-#endif
