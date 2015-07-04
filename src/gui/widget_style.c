@@ -401,8 +401,8 @@ static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector )
 	return NULL;
 }
 
-/** 添加样式表 */
-int Widget_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
+/** 向样式库添加样式表 */
+int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
 {
 	LCUI_StyleSheet ss;
 	ss = SelectStyleSheet( selector );

@@ -99,7 +99,7 @@ void LCUIWidget_AddButton( void )
 	SetStyle(css, key_border_bottom_color, RGB(210,210,210), color);
 	SetStyle(css, key_border_left_color, RGB(210,210,210), color);
 	SetStyle(css, key_background_color, RGB(255,255,255), color);
-	Widget_PutStyle( selector, css );
+	LCUI_PutStyle( selector, css );
 	DeleteSelector( &selector );
 	DeleteStyleSheet( &css );
 

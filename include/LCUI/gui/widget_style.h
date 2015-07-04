@@ -142,8 +142,8 @@ LCUI_API LCUI_BOOL SelectorIsEqual( LCUI_Selector s1, LCUI_Selector s2 );
 /** 匹配元素路径与样式结点路径 */
 LCUI_API LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector );
 
-/** 添加样式表 */
-LCUI_API int Widget_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss );
+/** 向样式库添加样式表 */
+LCUI_API int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss );
 
 /** 获取样式表 */
 LCUI_API int Widget_GetStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
