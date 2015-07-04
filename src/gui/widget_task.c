@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_task.c -- LCUI widget task module.
  *
- * Copyright (C) 2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2014-2015 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_task.c -- LCUI部件任务处理模块
  *
- * 版权所有 (C) 2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2014-2015 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -328,7 +328,7 @@ void Widget_DestroyTaskBox( LCUI_Widget widget )
 /** 处理部件的各种任务 */
 static int Widget_ProcTask( LCUI_Widget w )
 {
-	int ret = 1, i, n;
+	int ret = 1, i;
 	TaskRecord *buffer;
 	DEBUG_MSG("widget: %p, is_root: %d, for_self: %d, for_children: %d\n", w, w == LCUIRootWidget, w->task->for_self, w->task->for_children);
 
@@ -372,13 +372,10 @@ skip_proc_self_task:;
 	/* 如果子级部件中有待处理的部件，则递归进去 */
 	if( w->task->for_children ) {
 		LCUI_Widget child;
+		int i = 0;
 		w->task->for_children = FALSE;
-		n = LinkedList_GetTotal( &w->children );
-		LinkedList_Goto( &w->children, 0 );
-		DEBUG_MSG("children_total: %d\n", n);
-		for( i=0; i<n; ++i ) {
-			child = (LCUI_Widget)LinkedList_Get( &w->children );
-			LinkedList_ToNext( &w->children );
+		LinkedList_ForEach( child, 0, &w->children ) {
+			_DEBUG_MSG("%d: %p\n", i++, child);
 			/* 如果该级部件的任务需要留到下次再处理 */
 			if( Widget_ProcTask( child ) == 1 ) {
 				w->task->for_children = TRUE;

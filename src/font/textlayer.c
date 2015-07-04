@@ -1230,16 +1230,10 @@ void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list )
 	}
 	
 	if( rect_list ) {
-		int n;
 		void *data_ptr;
-
-		n = LinkedList_GetTotal( &layer->dirty_rect );
-		LinkedList_Goto( &layer->dirty_rect, 0 );
 		/* 转移脏矩形记录，供利用 */
-		while(n--) {
-			data_ptr = LinkedList_Get( &layer->dirty_rect );
+		LinkedList_ForEach( data_ptr, 0, &layer->dirty_rect ) {
 			LinkedList_AppendCopy( rect_list, data_ptr );
-			LinkedList_ToNext( &layer->dirty_rect );
 		}
 	 } 
 }

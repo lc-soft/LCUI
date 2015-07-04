@@ -255,8 +255,7 @@ int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 	/* 定位至链表表头 */
 	LinkedList_Goto( list, 0 );
 	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list, LinkedList_GetTotal(list), rect->x, rect->y, rect->w, rect->h);
-	while( !LinkedList_IsAtEnd(list) ) {
-		p_rect = (LCUI_Rect*)LinkedList_Get( list );
+	LinkedList_ForEach( p_rect, 0, list ) {
 		DEBUG_MSG("p_rect(%d,%d,%d,%d)\n", 
 			p_rect->x, p_rect->y, p_rect->w, p_rect->h);
 		/* 如果被现有的矩形包含 */

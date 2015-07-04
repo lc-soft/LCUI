@@ -65,68 +65,31 @@ struct LinkedListRec_ {
 };
 
 /** 获取当前数据元素的总数量 */
-static inline int LinkedList_GetTotal( LinkedList *list )
-{
-	return list->used_node_num;
-}
+#define LinkedList_GetTotal(list) (list)->used_node_num
 
 /** 设置是否需要重复使用结点的数据内存空间 */
-static inline void LinkedList_SetDataMemReuse( LinkedList *list, int is_true )
-{
-	list->need_reuse_mem = is_true;
-}
+#define LinkedList_SetDataMemReuse(list, val) (list)->need_reuse_mem = val
 
 /** 设置结点中的数据是否需要释放 */
-static inline void LinkedList_SetDataNeedFree( LinkedList *list, int is_true )
-{
-	list->need_free_data = is_true;
-}
+#define LinkedList_SetDataNeedFree(list, val) (list)->need_free_data = val
 
 /** 设置结点中的数据的销毁函数 */
-static inline void LinkedList_SetDestroyFunc( LinkedList *list, void (*func)(void*) )
-{
-	list->destroy_func = func;
-}
+#define LinkedList_SetDestroyFunc(list, fn) (list)->destroy_func = fn
 
 /** 获取当前结点中的数据 */
-static inline void* LinkedList_Get( LinkedList *list )
-{
-	if( list->current_node ) {
-		return list->current_node->data;
-	}
-	return NULL;
-}
+#define LinkedList_Get(list) (list)->current_node ? (list)->current_node->data:NULL
 
 /** 判断是否处于链表末尾 */
-static inline int LinkedList_IsAtEnd( LinkedList *list )
-{
-	if( list->current_node_pos >= list->used_node_num
-	 || !list->current_node	 ) {
-		return 1;
-	}
-	return 0;
-}
-
-/** 获取当前结点的上个结点中的数据 */
-static inline void* LinkedList_GetPrev( LinkedList *list )
-{
-	return list->current_node->prev->data;
-}
-
-/** 获取当前结点的下个结点中的数据 */
-static inline void* LinkedList_GetNext( LinkedList *list )
-{
-	return list->current_node->next->data;
-}
+#define LinkedList_IsAtEnd(list) ((list)->current_node_pos >= (list)->used_node_num\
+				 || !(list)->current_node ? 1:0)
 
 /** 切换至下个结点 */
-static inline void LinkedList_ToNext( LinkedList *list )
-{
-	list->current_node ?
-		++list->current_node_pos,
-		list->current_node = list->current_node->next
-	: NULL;
-}
+#define LinkedList_ToNext(list) (list)->current_node ? (++(list)->current_node_pos,\
+				(list)->current_node = (list)->current_node->next): NULL
+
+#define LinkedList_ForEach(elem, pos, list) \
+	for( LinkedList_Goto(list, pos), elem = LinkedList_Get(list); \
+		!LinkedList_IsAtEnd(list); LinkedList_ToNext(list), elem = LinkedList_Get(list))
 
 /** 初始化链表 */
 LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size );
