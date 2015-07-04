@@ -44,6 +44,9 @@
 
 LCUI_BEGIN_HEADER
 
+/** 添加按钮部件类型 */
+void LCUIWidget_AddButton( void );
+
 LCUI_END_HEADER
 
 #endif

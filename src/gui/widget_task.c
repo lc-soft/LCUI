@@ -76,6 +76,12 @@ static void HandleTopLevelWidgetEvent( LCUI_Widget w, int event_type )
 	}
 }
 
+static void HandleUpdateStyle( LCUI_Widget w, LCUI_WidgetTask *t )
+{
+	Widget_GetStyle( w, w->css );
+	Widget_UpdateStyle( w );
+}
+
 /** 处理位置移动 */
 static void HandleMove( LCUI_Widget w, LCUI_WidgetTask *t )
 {
@@ -248,13 +254,31 @@ void Widget_UpdateTaskStatus( LCUI_Widget widget )
 	}
 }
 
+/** 添加任务并扩散到子级部件 */
+void Widget_AddTaskToSpread( LCUI_Widget widget, LCUI_WidgetTask *data )
+{
+	TaskRecord *buffer;
+	LCUI_Widget child;
+
+	buffer = widget->task->buffer[widget->task->i];
+	if( !buffer[data->type].is_valid ) {
+		buffer[data->type].is_valid = TRUE;
+		buffer[data->type].data = *data;
+	}
+	widget->task->for_self = TRUE;
+	widget->task->for_children = TRUE;
+	LinkedList_ForEach( child, 0, &widget->children ) {
+		Widget_AddTaskToSpread( child, data );
+	}
+}
+
 /** 添加任务 */
-int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data )
+void Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data )
 {
 	TaskRecord *buffer;
 	buffer = widget->task->buffer[widget->task->i];
 	if( buffer[data->type].is_valid ) {
-		return -1;
+		return;
 	}
 	buffer[data->type].is_valid = TRUE;
 	buffer[data->type].data = *data;
@@ -268,7 +292,6 @@ int Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data )
 		widget = widget->parent;
 		DEBUG_MSG("widget: %p\n", widget );
 	}
-	return 0;
 }
 
 typedef void (*callback)(LCUI_Widget, LCUI_WidgetTask*);
@@ -289,6 +312,7 @@ static void MapTaskHandler(void)
 	task_handlers[WTT_BODY] = HandleBody;
 	task_handlers[WTT_TITLE] = HandleSetTitle;
 	task_handlers[WTT_REFRESH] = HandleRefresh;
+	task_handlers[WTT_UPDATE_STYLE] = HandleUpdateStyle;
 }
 
 /** 初始化 LCUI 部件任务处理功能 */
@@ -298,7 +322,7 @@ void LCUIWidget_InitTask(void)
 }
 
 /** 销毁（释放） LCUI 部件任务处理功能的相关资源 */
-void LCUIWidget_Task_Destroy(void)
+void LCUIWidget_ExitTask(void)
 {
 
 }

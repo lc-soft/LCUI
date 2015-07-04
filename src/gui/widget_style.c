@@ -64,6 +64,9 @@ static struct {
 static size_t ptrslen( char *const *list )
 {
 	char *const *p = list;
+	if( list == NULL ) {
+		return 0;
+	}
 	while( *p ) {
 		p++;
 	}
@@ -79,7 +82,7 @@ static int CompareName( void *data, const void *keydata )
 void DeleteSelector( LCUI_Selector *selector )
 {
 	LCUI_SelectorNode *node_ptr;
-	for( node_ptr=*selector; node_ptr; ++node_ptr ) {
+	for( node_ptr=*selector; *node_ptr; ++node_ptr ) {
 		if( (*node_ptr)->type ) {
 			free( (*node_ptr)->type );
 			(*node_ptr)->type = NULL;
@@ -96,6 +99,7 @@ void DeleteSelector( LCUI_Selector *selector )
 			free( (*node_ptr)->pseudo_class_name );
 			(*node_ptr)->pseudo_class_name = NULL;
 		}
+		free( *node_ptr );
 	}
 	free( *selector );
 	*selector = NULL;
@@ -216,14 +220,19 @@ LCUI_Selector Selector( const char *selector )
 		if( node == NULL && is_saving ) {
 			size = sizeof( struct LCUI_SelectorNodeRec_ );
 			node = (LCUI_SelectorNode)malloc( size );
+			node->id = NULL;
+			node->type = NULL;
+			node->class_name = NULL;
+			node->pseudo_class_name = NULL;
 			if( si >= MAX_SELECTOR_DEPTH ) {
 				_DEBUG_MSG( "%s: selector node list is too long.\n",
 					    selector );
 				return NULL;
 			}
-			s[si++] = node;
+			s[si] = node;
 		}
 		if( *p == ':' || *p == '.' || *p == '#' ) {
+			/* 保存上个结点 */
 			if( is_saving ) {
 				if( SaveSelectorNode(node, name, type) != 0 ) {
 					_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
@@ -244,6 +253,7 @@ LCUI_Selector Selector( const char *selector )
 					return NULL;
 				}
 				is_saving = FALSE;
+				++si;
 			}
 			ni = 0;
 			node = NULL;
@@ -263,6 +273,10 @@ LCUI_Selector Selector( const char *selector )
 			    selector, *p, p - selector );
 		return NULL;
 	}
+	if( is_saving ) {
+		SaveSelectorNode( s[si++], name, type );
+	}
+	s[si] = NULL;
 	return s;
 }
 
@@ -323,13 +337,10 @@ static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 					    (const void*)name, stn );
 	}
 	stn = (StyleTreeNode*)node->data;
-	LinkedList_Goto( &stn->styles, 0 );
-	while( LinkedList_IsAtEnd( &stn->styles ) ) {
-		sln = (StyleListNode*)LinkedList_Get( &stn->styles );
+	LinkedList_ForEach( sln, 0, &stn->styles ) {
 		if( SelectorIsEqual(sln->selector, selector) ) {
 			return sln->style;
 		}
-		LinkedList_ToNext( &stn->styles );
 	}
 	sln = (StyleListNode*)malloc(sizeof(StyleListNode));
 	sln->style = StyleSheet();
@@ -385,13 +396,13 @@ static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector )
 		return SelectStyleSheetByName( selector, fullname );
 	}
 	if( sn->type ) {
-		return SelectStyleSheetByName( selector, fullname );
+		return SelectStyleSheetByName( selector, sn->type );
 	}
 	return NULL;
 }
 
 /** 添加样式表 */
-int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
+int Widget_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
 {
 	LCUI_StyleSheet ss;
 	ss = SelectStyleSheet( selector );
@@ -408,7 +419,7 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 	LCUI_SelectorNode *sn_ptr = selector;
 	LCUI_Widget *obj_ptr = wlist, w;
 
-	while( ++obj_ptr && sn_ptr ) {
+	for( ; *obj_ptr && *sn_ptr; ++obj_ptr ) {
 		w = *obj_ptr;
 		if( (*sn_ptr)->id ) {
 			if( strcmp(w->id, (*sn_ptr)->id) ) {
@@ -446,7 +457,7 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 		}
 		++sn_ptr;
 	}
-	if( sn_ptr == NULL ) {
+	if( *sn_ptr == NULL ) {
 		return TRUE;
 	}
 	return FALSE;
@@ -459,7 +470,7 @@ static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 	StyleListNode *sln;
 	LinkedList *styles;
 	LCUI_Widget w, wlist[MAX_SELECTOR_DEPTH];
-	int i, n, count;
+	int n, count = 0;
 
 	node = RBTree_CustomSearch( &style_library.style, (const void*)name );
 	if( !node ) {
@@ -474,23 +485,19 @@ static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 	} else {
 		n -= 1;
 		wlist[n] = NULL;
-		w = w->parent;
+		w = widget->parent;
 		while( --n >= 0 ) {
 			wlist[n] = w;
 			w = w->parent;
 		}
 	}
 	styles = &((StyleTreeNode*)node->data)->styles;
-	n = LinkedList_GetTotal( styles );
-	LinkedList_Goto( styles, 0 );
-	for( count=0,i=0; i<n; ++i ) {
-		sln = (StyleListNode*)LinkedList_Get( styles );
+	LinkedList_ForEach( sln, 0, styles ) {
 		/* 如果当前元素在该样式结点的作用范围内 */
 		if( IsMatchPath(wlist, sln->selector) ) {
 			LinkedList_Append( list, sln->style );
 			++count;
 		}
-		LinkedList_ToNext( styles );
 	}
 	return count;
 }
@@ -523,19 +530,184 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 /** 获取样式表 */
 int Widget_GetStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 {
-	int i, n;
 	LCUI_StyleSheet ss;
 	LinkedList list;
 
 	LinkedList_Init( &list, sizeof(LCUI_StyleSheet) );
 	LinkedList_SetDataNeedFree( &list, FALSE );
-	n = FindStyleNode( w, &list );
-	LinkedList_Goto( &list, 0 );
-	for( i=0; i<n; ++i ) {
-		ss = (LCUI_StyleSheet)LinkedList_Get( &list );
+	FindStyleNode( w, &list );
+	LinkedList_ForEach( ss, 0, &list ) {
 		MergeStyleSheet( out_ss, ss );
-		LinkedList_ToNext( &list );
 	}
 	LinkedList_Destroy( &list );
 	return 0;
+}
+
+/** 计算背景样式 */
+static void ComputeBackgroundStyle( LCUI_StyleSheet ss, LCUI_Background *bg )
+{
+	LCUI_Style *style;
+	int key = key_background_start + 1;
+
+	for( ; key < key_background_end; ++key ) {
+		style = &ss[key];
+		if( style->is_valid ) {
+			continue;
+		}
+		switch( key ) {
+		case key_background_color:
+			bg->color = style->color;
+			break;
+		case key_background_image:
+			Graph_Quote( &bg->image, &style->value_image, NULL );
+			break;
+		case key_background_position:
+			bg->position.using_value = TRUE;
+			bg->position.value = style->value_style;
+			break;
+		case key_background_position_x:
+			bg->position.using_value = FALSE;
+			bg->position.x.type = style->type;
+			if( style->type == SVT_SCALE ) {
+				bg->position.x.scale = style->value_scale;
+			} else {
+				bg->position.x.px = style->value;
+			}
+			break;
+		case key_background_position_y:
+			bg->position.using_value = FALSE;
+			bg->position.x.type = style->type;
+			if( style->type == SVT_SCALE ) {
+				bg->position.x.scale = style->value_scale;
+			} else {
+				bg->position.x.px = style->value;
+			}
+			break;
+		case key_background_size:
+			bg->size.using_value = TRUE;
+			bg->position.value = style->value_style;
+			break;
+		case key_background_size_width:
+			bg->size.using_value = FALSE;
+			bg->size.w.type = style->type;
+			if( style->type == SVT_SCALE ) {
+				bg->size.w.scale = style->value_scale;
+			} else {
+				bg->size.w.px = style->value;
+			}
+			break;
+		case key_background_size_height:
+			bg->size.using_value = FALSE;
+			bg->size.h.type = style->type;
+			if( style->type == SVT_SCALE ) {
+				bg->size.h.scale = style->value_scale;
+			} else {
+				bg->size.h.px = style->value;
+			}
+			break;
+		default: break;
+		}
+	}
+}
+
+/** 计算边框样式 */
+static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
+{
+	LCUI_Style *style;
+	int key = key_border_start + 1;
+
+	for( ; key < key_border_end; ++key ) {
+		style = &ss[key];
+		if( style->is_valid ) {
+			continue;
+		}
+		switch( key ) {
+		case key_border_color:
+			b->top.color = style->color;
+			b->right.color = style->color;
+			b->bottom.color = style->color;
+			b->left.color = style->color;
+			break;
+		case key_border_style:
+			b->top.style = style->value;
+			b->right.style = style->value;
+			b->bottom.style = style->value;
+			b->left.style = style->value;
+			break;
+		case key_border_width:
+			b->top.width = style->value;
+			b->right.width = style->value;
+			b->bottom.width = style->value;
+			b->left.width = style->value;
+			break;
+		case key_border_top_color:
+			b->top.color = style->color;
+			break;
+		case key_border_right_color:
+			b->right.color = style->color;
+			break;
+		case key_border_bottom_color:
+			b->bottom.color = style->color;
+			break;
+		case key_border_left_color:
+			b->left.color = style->color;
+			break;
+		case key_border_top_width:
+			b->top.width = style->value;
+			break;
+		case key_border_right_width:
+			b->right.width = style->value;
+			break;
+		case key_border_bottom_width:
+			b->bottom.width = style->value;
+			break;
+		case key_border_left_width:
+			b->left.width = style->value;
+			break;
+		case key_border_top_style:
+			b->top.style = style->value;
+			break;
+		case key_border_right_style:
+			b->right.style = style->value;
+			break;
+		case key_border_bottom_style:
+			b->bottom.style = style->value;
+			break;
+		case key_border_left_style:
+			b->left.style = style->value;
+			break;
+		default: break;
+		}
+	}
+}
+
+/** 计算矩形阴影样式 */
+static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
+{
+	LCUI_Style *style;
+	int key = key_box_shadow_start + 1;
+
+	for( ; key < key_box_shadow_end; ++key ) {
+		style = &ss[key];
+		if( style->is_valid ) {
+			continue;
+		}
+		switch( key ) {
+		case key_box_shadow_x: bsd->x = style->value; break;
+		case key_box_shadow_y: bsd->y = style->value; break;
+		case key_box_shadow_spread: bsd->spread = style->value; break;
+		case key_box_shadow_color: bsd->color = style->color; break;
+		default: break;
+		}
+	}
+}
+
+/** 更新当前部件的样式 */
+void Widget_UpdateStyle( LCUI_Widget w )
+{
+	Widget_PullStyle( w, WSS_SHADOW | WSS_BACKGROUND | WSS_BORDER );
+	ComputeBoxShadowStyle( w->css, &w->base.style.shadow );
+	ComputeBorderStyle( w->css, &w->base.style.border );
+	ComputeBackgroundStyle( w->css, &w->base.style.background );
+	Widget_PushStyle( w, WSS_SHADOW | WSS_BACKGROUND | WSS_BORDER );
 }

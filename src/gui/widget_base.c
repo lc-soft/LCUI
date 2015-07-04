@@ -41,6 +41,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/widget_build.h>
 #include <LCUI/gui/widget/textview.h>
+#include <LCUI/gui/widget/button.h>
 
 #define NEW_ONE(TYPE) (TYPE*)malloc(sizeof(TYPE))
 
@@ -56,9 +57,10 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 /** 追加子部件 */
 int Widget_Append( LCUI_Widget container, LCUI_Widget widget )
 {
-	int i, n;
-	LCUI_Widget old_container;
+	LCUI_Widget w, old_container;
+	LCUI_WidgetTask t;
 	LCUI_WidgetEvent e;
+
 	DEBUG_MSG("container: %p, widget: %p\n", container, widget);
 	if( !container || !widget || container == widget->parent ) {
 		return -1;
@@ -73,24 +75,21 @@ int Widget_Append( LCUI_Widget container, LCUI_Widget widget )
 	}
 
 	/* 移除在之前的容器中的记录 */
-	n = LinkedList_GetTotal( &old_container->children );
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &old_container->children, i );
-		if( LinkedList_Get(&old_container->children) == widget ) {
-			LinkedList_Delete( &old_container->children );
-			break;
+	LinkedList_ForEach( w, 0, &old_container->children ) {
+		if( w != widget ) {
+			continue;
 		}
+		LinkedList_Delete( &old_container->children );
+		/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
+		if( old_container == LCUIRootWidget ) {
+			e.type_name = "TopLevelWidget";
+			e.target = widget;
+			Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
+		}
+		break;
 	}
-	/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
-	if( i < n && old_container == LCUIRootWidget ) {
-		e.type_name = "TopLevelWidget";
-		e.target = widget;
-		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
-	}
-	n = LinkedList_GetTotal( &old_container->children_show );
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &old_container->children_show, i );
-		if( LinkedList_Get(&old_container->children_show) == widget ) {
+	LinkedList_ForEach( w, 0, &old_container->children_show ) {
+		if( w == widget ) {
 			LinkedList_Delete( &old_container->children_show );
 			break;
 		}
@@ -107,6 +106,7 @@ remove_done:
 		e.target = widget;
 		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_ADD );
 	}
+	Widget_AddTaskToSpread( widget, (t.type = WTT_UPDATE_STYLE, &t) );
 	Widget_UpdateTaskStatus( widget );
 	DEBUG_MSG("tip\n");
 	return 0;
@@ -179,6 +179,11 @@ static void Widget_OnDestroy( void *arg )
 /** 构造函数 */
 static void Widget_Init( LCUI_Widget widget )
 {
+	widget->id = NULL;
+	widget->classes = NULL;
+	widget->type = NULL;
+	widget->pseudo_classes = NULL;
+	widget->css = StyleSheet();
 	widget->style.z_index = 0;
 	widget->style.x.type = SVT_NONE;
 	widget->style.y.type = SVT_NONE;
@@ -225,6 +230,7 @@ static void Widget_Init( LCUI_Widget widget )
 LCUI_Widget LCUIWidget_New( const char *type_name )
 {
 	LCUI_Widget widget;
+	LCUI_WidgetTask t;
 	LCUI_WidgetClass *wc;
 
 	widget = NEW_ONE(struct LCUI_WidgetFull);
@@ -236,6 +242,7 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 			wc->methods.init( widget );
 		}
 	}
+	Widget_AddTask( widget, (t.type = WTT_UPDATE_STYLE,&t) );
 	return widget;
 }
 
@@ -808,174 +815,6 @@ PUSH_DONE:
 	return;
 }
 
-/** 计算背景样式 */
-static void ComputeBackgroundStyle( LCUI_StyleSheet *ss, LCUI_Background *bg )
-{
-	LCUI_Style *style;
-	int key = key_background_start + 1;
-
-	for( ; key < key_background_end; ++key ) {
-		style = ss[key];
-		if( style->is_valid ) {
-			continue;
-		}
-		switch( key ) {
-		case key_background_color:
-			bg->color = style->color;
-			break;
-		case key_background_image:
-			Graph_Quote( &bg->image, &style->value_image, NULL );
-			break;
-		case key_background_position:
-			bg->position.using_value = TRUE;
-			bg->position.value = style->value_style;
-			break;
-		case key_background_position_x:
-			bg->position.using_value = FALSE;
-			bg->position.x.type = style->type;
-			if( style->type == SVT_SCALE ) {
-				bg->position.x.scale = style->value_scale;
-			} else {
-				bg->position.x.px = style->value;
-			}
-			break;
-		case key_background_position_y:
-			bg->position.using_value = FALSE;
-			bg->position.x.type = style->type;
-			if( style->type == SVT_SCALE ) {
-				bg->position.x.scale = style->value_scale;
-			} else {
-				bg->position.x.px = style->value;
-			}
-			break;
-		case key_background_size:
-			bg->size.using_value = TRUE;
-			bg->position.value = style->value_style;
-			break;
-		case key_background_size_width:
-			bg->size.using_value = FALSE;
-			bg->size.w.type = style->type;
-			if( style->type == SVT_SCALE ) {
-				bg->size.w.scale = style->value_scale;
-			} else {
-				bg->size.w.px = style->value;
-			}
-			break;
-		case key_background_size_height:
-			bg->size.using_value = FALSE;
-			bg->size.h.type = style->type;
-			if( style->type == SVT_SCALE ) {
-				bg->size.h.scale = style->value_scale;
-			} else {
-				bg->size.h.px = style->value;
-			}
-			break;
-		default: break;
-		}
-	}
-}
-
-/** 计算边框样式 */
-static void ComputeBorderStyle( LCUI_StyleSheet *ss, LCUI_Border *b )
-{
-	LCUI_Style *style;
-	int key = key_border_start + 1;
-
-	for( ; key < key_border_end; ++key ) {
-		style = ss[key];
-		if( style->is_valid ) {
-			continue;
-		}
-		switch( key ) {
-		case key_border_color:
-			b->top.color = style->color;
-			b->right.color = style->color;
-			b->bottom.color = style->color;
-			b->left.color = style->color;
-			break;
-		case key_border_style:
-			b->top.style = style->value;
-			b->right.style = style->value;
-			b->bottom.style = style->value;
-			b->left.style = style->value;
-			break;
-		case key_border_width:
-			b->top.width = style->value;
-			b->right.width = style->value;
-			b->bottom.width = style->value;
-			b->left.width = style->value;
-			break;
-		case key_border_top_color:
-			b->top.color = style->color;
-			break;
-		case key_border_right_color:
-			b->right.color = style->color;
-			break;
-		case key_border_bottom_color:
-			b->bottom.color = style->color;
-			break;
-		case key_border_left_color:
-			b->left.color = style->color;
-			break;
-		case key_border_top_width:
-			b->top.width = style->value;
-			break;
-		case key_border_right_width:
-			b->right.width = style->value;
-			break;
-		case key_border_bottom_width:
-			b->bottom.width = style->value;
-			break;
-		case key_border_left_width:
-			b->left.width = style->value;
-			break;
-		case key_border_top_style:
-			b->top.style = style->value;
-			break;
-		case key_border_right_style:
-			b->right.style = style->value;
-			break;
-		case key_border_bottom_style:
-			b->bottom.style = style->value;
-			break;
-		case key_border_left_style:
-			b->left.style = style->value;
-			break;
-		default: break;
-		}
-	}
-}
-
-/** 计算矩形阴影样式 */
-static void ComputeBoxShadowStyle( LCUI_StyleSheet *ss, LCUI_BoxShadow *bsd )
-{
-	LCUI_Style *style;
-	int key = key_box_shadow_start + 1;
-
-	for( ; key < key_box_shadow_end; ++key ) {
-		style = ss[key];
-		if( style->is_valid ) {
-			continue;
-		}
-		switch( key ) {
-		case key_box_shadow_x: bsd->x = style->value; break;
-		case key_box_shadow_y: bsd->y = style->value; break;
-		case key_box_shadow_spread: bsd->spread = style->value; break;
-		case key_box_shadow_color: bsd->color = style->color; break;
-		default: break;
-		}
-	}
-}
-
-/** 计算当前部件的样式 */
-int Widget_ComputeStyle( LCUI_Widget w )
-{
-	//ComputeBoxShadowStyle( w->style_sheet, &w->base.style.shadow );
-	//ComputeBorderStyle( w->style_sheet, &w->base.style.border );
-	//ComputeBackgroundStyle( w->style_sheet, &w->base.style.background );
-	return 0;
-}
-
 void Widget_Lock( LCUI_Widget w )
 {
 	LCUIMutex_Lock( &w->mutex );
@@ -986,6 +825,136 @@ void Widget_Unlock( LCUI_Widget w )
 	LCUIMutex_Unlock( &w->mutex );
 }
 
+int strlist_add_str( char ***strlist, const char *str )
+{
+	int i, len;
+	char **newlist;
+
+	if( *strlist ) {
+		for( i = 0; *strlist[i]; ++i ) {
+			if( strcmp(*strlist[i], str) == 0 ) {
+				return 0;
+			}
+		}
+		len = i + 2;
+		newlist = (char**)realloc( *strlist, len * sizeof(char*) );
+		if( newlist == NULL ) {
+			return -1;
+		}
+		*strlist = newlist;
+	} else {
+		i = 0;
+		*strlist = (char**)malloc( sizeof(char*) * 2 );
+	}
+	*strlist[i] = strdup(str);
+	*strlist[i+1] = NULL;
+	return 1;
+}
+
+LCUI_BOOL strlist_has_str( char **strlist, const char *str )
+{
+	int i;
+	if( !strlist ) {
+		return FALSE;
+	}
+	for( i = 0; strlist[i]; ++i ) {
+		if( strcmp(strlist[i], str) == 0 ) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+int strlist_remove_str( char ***strlist, const char *str )
+{
+	int i, pos, len;
+	char **newlist;
+
+	if( !*strlist ) {
+		return 0;
+	}
+	for( i = 0; *strlist[i]; ++i ) {
+		if( strcmp(*strlist[i], str) == 0 ) {
+			pos = i;
+		}
+	}
+	if( pos == 0 && i == 0 ) {
+		free( *strlist );
+		*strlist = NULL;
+	} else {
+		len = i - 1;
+		newlist = (char**)realloc( *strlist, i * sizeof(char*) );
+		for( i = 0; i < pos; ++i ) {
+			newlist[i] = *strlist[i];
+		}
+		for( i = pos; i < len; ++i ) {
+			newlist[i] = *strlist[i+1];
+		}
+		newlist[i] = NULL;
+		free( *strlist[pos] );
+		free( *strlist );
+		*strlist = newlist;
+	}
+	return 1;
+}
+
+/** 为部件添加一个类 */
+int Widget_AddClass( LCUI_Widget w, const char *class_name )
+{
+	LCUI_WidgetTask t;
+	if( strlist_add_str( &w->classes, class_name ) != 1 ) {
+		return 0;
+	}
+	// 标记需要更新该部件及子级部件的样式表
+	Widget_AddTaskToSpread( w, (t.type = WTT_UPDATE_STYLE, &t) );
+	return 1;
+}
+
+/** 判断部件是否包含指定的类 */
+LCUI_BOOL Widget_HasClass( LCUI_Widget w, const char *class_name )
+{
+	return strlist_has_str( w->classes, class_name );
+}
+
+/** 从部件中移除一个类 */
+int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
+{
+	LCUI_WidgetTask t;
+	if( strlist_remove_str( &w->classes, class_name ) != 1 ) {
+		return 0;
+	}
+	Widget_AddTaskToSpread( w, (t.type = WTT_UPDATE_STYLE, &t) );
+	return 1;
+}
+
+/** 为部件添加一个状态 */
+int Widget_AddStatus( LCUI_Widget w, const char *status_name )
+{
+	LCUI_WidgetTask t;
+	if( strlist_add_str( &w->pseudo_classes, status_name ) != 1 ) {
+		return 0;
+	}
+	Widget_AddTaskToSpread( w, (t.type = WTT_UPDATE_STYLE, &t) );
+	return 1;
+}
+
+/** 判断部件是否包含指定的状态 */
+LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name )
+{
+	return strlist_has_str( w->pseudo_classes, status_name );
+}
+
+/** 从部件中移除一个状态 */
+int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
+{
+	LCUI_WidgetTask t;
+	if( strlist_remove_str( &w->pseudo_classes, status_name ) != 1 ) {
+		return 0;
+	}
+	Widget_AddTaskToSpread( w, (t.type = WTT_UPDATE_STYLE, &t) );
+	return 1;
+}
+
 void LCUI_InitWidget(void)
 {
 	LCUIWidget_InitTask();
@@ -993,6 +962,7 @@ void LCUI_InitWidget(void)
 	LCUIWidget_InitLibrary();
 	LCUIWidget_InitStyle();
 	LCUIWidget_AddTextView();
+	LCUIWidget_AddButton();
 	Widget_Init(LCUIRootWidget);
 	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
 }

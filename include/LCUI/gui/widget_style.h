@@ -143,10 +143,12 @@ LCUI_API LCUI_BOOL SelectorIsEqual( LCUI_Selector s1, LCUI_Selector s2 );
 LCUI_API LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector );
 
 /** 添加样式表 */
-LCUI_API int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss );
+LCUI_API int Widget_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss );
 
 /** 获取样式表 */
-LCUI_API int LCUI_GetStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
+LCUI_API int Widget_GetStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 
+/** 计算当前部件的样式 */
+void Widget_UpdateStyle( LCUI_Widget w );
 
 #endif
