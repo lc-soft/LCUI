@@ -44,5 +44,6 @@
 
 #include <LCUI/gui/widget_base.h>
 #include <LCUI/gui/widget_event.h>
+#include <LCUI/gui/widget_style.h>
 
 #endif

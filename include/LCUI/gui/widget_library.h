@@ -53,7 +53,7 @@ typedef struct LCUI_WidgetClass {
 		void (*paint)(LCUI_Widget, LCUI_PaintContext);
 	} methods;	/**< 该类部件的自定义方法集 */
 	/** 部件任务处理器 */
-	void (*task_handler)(LCUI_Widget,LCUI_WidgetTask*);
+	void (*task_handler)(LCUI_Widget);
 } LCUI_WidgetClass;
 
 void LCUIWidget_InitLibrary(void);

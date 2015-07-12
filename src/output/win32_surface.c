@@ -36,7 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
-
+//#define DEBUG
 #include <LCUI_Build.h>
 #define __IN_SURFACE_SOURCE_FILE__
 #ifdef LCUI_BUILD_IN_WIN32

@@ -44,17 +44,18 @@ LCUI_BEGIN_HEADER
 
 /** 部件任务类型，主要是按所对应的部件属性或具体刷新区域进行区分 */
 enum WidgetTaskType {
-	WTT_UPDATE_STYLE,
-	WTT_AUTO_SIZE,
-	WTT_AUTO_LAYOUT,
+	WTT_REFRESH_STYLE,	/**< 刷新部件全部样式 */
+	WTT_UPDATE_STYLE,	/**< 更新部件自定义样式 */
 	WTT_TITLE,
+	WTT_BOX_SIZING,
 	WTT_PADDING,
 	WTT_MARGIN,
-	WTT_MOVE,
-	WTT_SHOW,
+	WTT_VISIBLE,
 	WTT_SHADOW,
 	WTT_BORDER,
+	WTT_BACKGROUND,
 	WTT_RESIZE,
+	WTT_POSITION,
 	WTT_OPACITY,
 	WTT_BODY,
 	WTT_REFRESH,
@@ -63,24 +64,6 @@ enum WidgetTaskType {
 };
 
 #define WTT_TOTAL_NUM (WTT_DESTROY+1)
-
-typedef struct LCUI_WidgetTask {
-	int type;
-	/** 主要用于记录更新前的属性值，在更新时通过对比新旧属性来计算脏矩形 */
-	union {
-		struct {
-			int x, y;
-		} move;				/**< 移动位置 */
-		struct {
-			int w, h;
-		} resize;			/**< 调整大小 */
-		LCUI_BoxShadow shadow;		/**< 阴影 */
-		LCUI_Border border;		/**< 边框 */
-		LCUI_BOOL visible;		/**< 显示/隐藏 */
-		float opacity;			/**< 不透明度 */
-		void *data;			/**< 自定义任务数据 */
-	};
-} LCUI_WidgetTask;	/**< 部件任务数据 */
 
 #ifndef __IN_WIDGET_TASK_SOURCE_FILE__
 typedef void* LCUI_WidgetTaskBox;
@@ -92,10 +75,10 @@ typedef struct LCUI_WidgetTaskBoxRec_* LCUI_WidgetTaskBox;
 LCUI_API void Widget_UpdateTaskStatus( LCUI_Widget widget );
 
 /** 添加任务 */
-LCUI_API void Widget_AddTask( LCUI_Widget widget, LCUI_WidgetTask *data );
+LCUI_API void Widget_AddTask( LCUI_Widget widget, int task_type );
 
 /** 添加任务并扩散到子级部件 */
-LCUI_API void Widget_AddTaskToSpread( LCUI_Widget widget, LCUI_WidgetTask *data );
+LCUI_API void Widget_AddTaskToSpread( LCUI_Widget widget, int task_type );
 
 /** 初始化部件的任务处理 */
 void Widget_InitTaskBox( LCUI_Widget widget );

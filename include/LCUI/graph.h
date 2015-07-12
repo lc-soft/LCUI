@@ -172,6 +172,8 @@ LCUI_API void Graph_PrintInfo( LCUI_Graph *graph );
 
 LCUI_API void Graph_Init( LCUI_Graph *graph );
 
+LCUI_API LCUI_Graph *Graph_New(void);
+
 /** 改变色彩类型 */
 LCUI_API int Graph_ChangeColorType( LCUI_Graph *graph, int color_type );
 

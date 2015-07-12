@@ -75,6 +75,13 @@ void Graph_Init( LCUI_Graph *graph )
 	graph->bytes_per_row = 0;
 }
 
+LCUI_Graph *Graph_New(void)
+{
+	LCUI_Graph *g = (LCUI_Graph*)malloc(sizeof(LCUI_Graph));
+	Graph_Init( g );
+	return g;
+}
+
 static size_t get_pixel_size( int color_type )
 {
 	switch( color_type ) {

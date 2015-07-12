@@ -64,7 +64,7 @@ static void Button_OnDestroy( LCUI_Widget w )
 
 }
 
-static void Button_OnTask( LCUI_Widget w, LCUI_WidgetTask *t )
+static void Button_OnTask( LCUI_Widget w )
 {
 
 }

@@ -58,7 +58,6 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 int Widget_Append( LCUI_Widget container, LCUI_Widget widget )
 {
 	LCUI_Widget w, old_container;
-	LCUI_WidgetTask t;
 	LCUI_WidgetEvent e;
 
 	DEBUG_MSG("container: %p, widget: %p\n", container, widget);
@@ -106,7 +105,7 @@ remove_done:
 		e.target = widget;
 		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_ADD );
 	}
-	Widget_AddTaskToSpread( widget, (t.type = WTT_UPDATE_STYLE, &t) );
+	Widget_AddTaskToSpread( widget,  WTT_UPDATE_STYLE );
 	Widget_UpdateTaskStatus( widget );
 	DEBUG_MSG("tip\n");
 	return 0;
@@ -183,7 +182,11 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->classes = NULL;
 	widget->type = NULL;
 	widget->pseudo_classes = NULL;
+	memset( &widget->base, 0, sizeof(widget->base));
+	widget->base.style = StyleSheet();
+	widget->base.css = StyleSheet();
 	widget->css = StyleSheet();
+	widget->inherited_css = StyleSheet();
 	widget->style.z_index = 0;
 	widget->style.x.type = SVT_NONE;
 	widget->style.y.type = SVT_NONE;
@@ -208,7 +211,6 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->style.padding.bottom.type = SVT_PX;
 	widget->style.padding.left.type = SVT_PX;
 	widget->event = LCUIEventBox_Create();
-	memset( &widget->base, 0, sizeof(widget->base));
 	widget->parent = NULL;
 	widget->title = NULL;
 	widget->event = LCUIEventBox_Create();
@@ -230,7 +232,6 @@ static void Widget_Init( LCUI_Widget widget )
 LCUI_Widget LCUIWidget_New( const char *type_name )
 {
 	LCUI_Widget widget;
-	LCUI_WidgetTask t;
 	LCUI_WidgetClass *wc;
 
 	widget = NEW_ONE(struct LCUI_WidgetFull);
@@ -242,7 +243,7 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 			wc->methods.init( widget );
 		}
 	}
-	Widget_AddTask( widget, (t.type = WTT_UPDATE_STYLE,&t) );
+	Widget_AddTask( widget, WTT_UPDATE_STYLE );
 	return widget;
 }
 
@@ -284,16 +285,20 @@ int Widget_Top( LCUI_Widget w )
 void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 {
 	int len;
-	LCUI_WidgetTask t;
+	wchar_t *new_title, *old_title;
 
-	if( w->title ) {
-		free( w->title );
-		w->title = NULL;
-	}
 	len = wcslen(title) + 1;
-	w->title = (wchar_t*)malloc(sizeof(wchar_t)*len);
-	wcsncpy( w->title, title, len );
-	Widget_AddTask( w, (t.type = WTT_TITLE, &t) );
+	new_title = (wchar_t*)malloc(sizeof(wchar_t)*len);
+	if( !new_title ) {
+		return;
+	}
+	wcsncpy( new_title, title, len );
+	old_title = w->title;
+	w->title = new_title;
+	if( old_title ) {
+		free( old_title );
+	}
+	Widget_AddTask( w, WTT_TITLE );
 }
 
 /** 获取内边距框占用的矩形区域 */
@@ -362,7 +367,7 @@ void Widget_GetValidRect( LCUI_Widget widget, LCUI_Rect *rect )
 }
 
 /** 计算坐标 */
-void Widget_ComputeCoord( LCUI_Widget w )
+void Widget_ComputePosition( LCUI_Widget w )
 {
 	// 需要考虑到其它定位相关的属性
 	// code ...
@@ -608,20 +613,7 @@ void Widget_ComputeMargin( LCUI_Widget w )
 /** 设置内边距 */
 void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left )
 {
-	LCUI_WidgetTask t;
-	w->style.padding.top.px = top;
-	w->style.padding.right.px = left;
-	w->style.padding.bottom.px = left;
-	w->style.padding.left.px = left;
-	w->style.padding.top.type = SVT_PX;
-	w->style.padding.right.type = SVT_PX;
-	w->style.padding.bottom.type = SVT_PX;
-	w->style.padding.left.type = SVT_PX;
-	Widget_ComputeMargin( w );
-	Widget_ComputeSize( w );
-	Widget_ComputeCoord( w );
-	Widget_AddTask( w, (t.type = WTT_AUTO_SIZE, &t) );
-	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
+	
 }
 
 void Widget_SetPaddingS(
@@ -638,20 +630,7 @@ void Widget_SetPaddingS(
 /** 设置外边距 */
 void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left )
 {
-	LCUI_WidgetTask t;
-	w->style.margin.top.px = top;
-	w->style.margin.right.px = left;
-	w->style.margin.bottom.px = left;
-	w->style.margin.left.px = left;
-	w->style.margin.top.type = SVT_PX;
-	w->style.margin.right.type = SVT_PX;
-	w->style.margin.bottom.type = SVT_PX;
-	w->style.margin.left.type = SVT_PX;
-	Widget_ComputeMargin( w );
-	Widget_ComputeSize( w );
-	Widget_ComputeCoord( w );
-	Widget_AddTask( w, (t.type = WTT_AUTO_SIZE, &t) );
-	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
+	
 }
 
 /** 设置左边距 */
@@ -669,150 +648,34 @@ void Widget_SetTop( LCUI_Widget w, const char *value )
 /** 移动部件位置 */
 void Widget_Move( LCUI_Widget w, int top, int left )
 {
-	LCUI_WidgetTask t;
-	t.type = WTT_MOVE;
-	/* 记录当前的图形呈现框的坐标 */
-	t.move.x = w->base.box.graph.x;
-	t.move.y = w->base.box.graph.y;
-	w->style.y.px = top;
-	w->style.x.px = left;
-	w->style.y.type = SVT_PX;
-	w->style.x.type = SVT_PX;
-	// 重新计算各个区域的坐标
-	Widget_ComputeCoord( w );
-	Widget_AddTask( w, &t );
+	SetStyle( w->base.style, key_top, top, px );
+	SetStyle( w->base.style, key_left, left, px );
+	Widget_AddTask( w, WTT_POSITION );
 }
 
 /** 调整部件尺寸 */
 void Widget_Resize( LCUI_Widget w, int width, int height )
 {
-	LCUI_WidgetTask t;
-
-	t.type = WTT_RESIZE;
-	t.resize.w = w->base.width;
-	t.resize.h = w->base.height;
-	w->style.width.px = width;
-	w->style.height.px = height;
-	w->style.width.type = SVT_PX;
-	w->style.height.type = SVT_PX;
-	Widget_ComputeSize( w );
-	Widget_AddTask( w, &t );
-	Widget_AddTask( w, (t.type = WTT_AUTO_LAYOUT, &t) );
-}
-
-void Widget_SetWidth( LCUI_Widget w, const char *value )
-{
-
-}
-
-void Widget_SetHeight( LCUI_Widget w, const char *value )
-{
-
+	SetStyle( w->base.style, key_width, width, px );
+	SetStyle( w->base.style, key_height, height, px );
+	Widget_AddTask( w, WTT_RESIZE );
 }
 
 void Widget_Show( LCUI_Widget w )
 {
-	LCUI_WidgetTask t;
-	t.type = WTT_SHOW;
-	t.visible = w->style.visible;
-	w->style.visible = TRUE;
-	DEBUG_MSG("tip, type: %d, %d\n", t.type, WTT_SHOW);
-	Widget_AddTask( w, &t );
+	SetStyle( w->base.style, key_visible, TRUE, boolean );
+	Widget_AddTask( w, WTT_VISIBLE );
 }
 
 void Widget_Hide( LCUI_Widget w )
 {
-	LCUI_WidgetTask t;
-	t.type = WTT_SHOW;
-	t.visible = w->style.visible;
-	w->style.visible = FALSE;
-	Widget_AddTask( w, &t );
+	SetStyle( w->base.style, key_visible, FALSE, boolean );
+	Widget_AddTask( w, WTT_VISIBLE );
 }
 
 void Widget_SetBackgroundColor( LCUI_Widget w, LCUI_Color color )
 {
 	w->style.background.color = color;
-}
-
-#define PULL(WIDGET, STYLE) WIDGET->base.style.STYLE = WIDGET->style.STYLE
-#define PUSH(WIDGET, STYLE) WIDGET->style.STYLE = WIDGET->base.style.STYLE
-
-/** 拉取现有样式至缓存区 */
-void Widget_PullStyle( LCUI_Widget w, int style )
-{
-	if(!(style & WSS_POSITION) ) goto PULL_WSS_BOX;
-	PULL(w, position);
-	PULL(w, x);
-	PULL(w, y);
-	PULL(w, z_index);
-	PULL(w, top);
-	PULL(w, right);
-	PULL(w, bottom);
-	PULL(w, left);
-PULL_WSS_BOX:
-	if( !(style & WSS_BOX) ) goto PULL_WSS_BACKGROUND;
-	PULL(w, box_sizing);
-	PULL(w, width);
-	PULL(w, height);
-	PULL(w, margin);
-	PULL(w, padding);
-PULL_WSS_BACKGROUND:
-	if( !(style & WSS_BACKGROUND) ) goto PULL_WSS_BORDER;
-	PULL(w, background);
-PULL_WSS_BORDER:
-	if( !(style & WSS_BORDER) ) goto PULL_WSS_SHADOW;
-	PULL(w, border);
-PULL_WSS_SHADOW:
-	if( !(style & WSS_SHADOW) ) goto PULL_DONE;
-	PULL(w, shadow);
-PULL_DONE:
-	return;
-}
-
-/** 推送缓存区中的样式，以让部件应用新样式 */
-void Widget_PushStyle( LCUI_Widget w, int style )
-{
-	LCUI_WidgetTask t;
-	if( !(style & WSS_POSITION) ) goto PUSH_WSS_BOX;
-	PUSH( w, position );
-	PUSH( w, x );
-	PUSH( w, y );
-	PUSH( w, z_index );
-	PUSH( w, top );
-	PUSH( w, right );
-	PUSH( w, bottom );
-	PUSH( w, left );
-	Widget_AddTask( w, (t.type = WTT_MOVE, &t) );
-PUSH_WSS_BOX:
-	if( !(style & WSS_BOX) ) goto PUSH_WSS_BACKGROUND;
-	PUSH( w, box_sizing );
-	PUSH( w, width );
-	PUSH( w, height );
-	PUSH( w, margin );
-	PUSH( w, padding );
-	Widget_AddTask( w, (t.type = WTT_MARGIN, &t) );
-	Widget_AddTask( w, (t.type = WTT_PADDING, &t) );
-PUSH_WSS_BACKGROUND:
-	if( !(style & WSS_BACKGROUND) ) goto PUSH_WSS_BORDER;
-	PUSH( w, background );
-	Widget_AddTask( w, (t.type = WTT_BODY, &t) );
-PUSH_WSS_BORDER:
-	if( !(style & WSS_BORDER) ) goto PUSH_WSS_SHADOW;
-	PUSH( w, border );
-	Widget_ComputeCoord( w );
-	Widget_ComputeSize( w );
-	t.type = WTT_BORDER;
-	t.border = w->style.border;
-	Widget_AddTask( w, &t );
-PUSH_WSS_SHADOW:
-	if( !(style & WSS_SHADOW) ) goto PUSH_DONE;
-	t.shadow = w->style.shadow;
-	PUSH( w, shadow );
-	Widget_ComputeCoord( w );
-	Widget_ComputeSize( w );
-	Widget_AddTask( w, (t.type = WTT_SHADOW, &t) );
-PUSH_DONE:
-	return;
 }
 
 void Widget_Lock( LCUI_Widget w )
@@ -901,12 +764,11 @@ int strlist_remove_str( char ***strlist, const char *str )
 /** 为部件添加一个类 */
 int Widget_AddClass( LCUI_Widget w, const char *class_name )
 {
-	LCUI_WidgetTask t;
 	if( strlist_add_str( &w->classes, class_name ) != 1 ) {
 		return 0;
 	}
 	// 标记需要更新该部件及子级部件的样式表
-	Widget_AddTaskToSpread( w, (t.type = WTT_UPDATE_STYLE, &t) );
+	Widget_AddTaskToSpread( w, WTT_UPDATE_STYLE );
 	return 1;
 }
 
@@ -919,22 +781,20 @@ LCUI_BOOL Widget_HasClass( LCUI_Widget w, const char *class_name )
 /** 从部件中移除一个类 */
 int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 {
-	LCUI_WidgetTask t;
 	if( strlist_remove_str( &w->classes, class_name ) != 1 ) {
 		return 0;
 	}
-	Widget_AddTaskToSpread( w, (t.type = WTT_UPDATE_STYLE, &t) );
+	Widget_AddTaskToSpread( w, WTT_UPDATE_STYLE );
 	return 1;
 }
 
 /** 为部件添加一个状态 */
 int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 {
-	LCUI_WidgetTask t;
 	if( strlist_add_str( &w->pseudo_classes, status_name ) != 1 ) {
 		return 0;
 	}
-	Widget_AddTaskToSpread( w, (t.type = WTT_UPDATE_STYLE, &t) );
+	Widget_AddTaskToSpread( w,  WTT_UPDATE_STYLE );
 	return 1;
 }
 
@@ -947,11 +807,10 @@ LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name )
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 {
-	LCUI_WidgetTask t;
 	if( strlist_remove_str( &w->pseudo_classes, status_name ) != 1 ) {
 		return 0;
 	}
-	Widget_AddTaskToSpread( w, (t.type = WTT_UPDATE_STYLE, &t) );
+	Widget_AddTaskToSpread( w, WTT_UPDATE_STYLE );
 	return 1;
 }
 

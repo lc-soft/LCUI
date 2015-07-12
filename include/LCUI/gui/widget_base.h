@@ -47,16 +47,6 @@ LCUI_BEGIN_HEADER
 typedef struct LCUI_WidgetBase* LCUI_Widget;
 #endif
 
-/** 部件样式域 */
-enum LCUI_WidgetStyleScope {
-	WSS_POSITION	= 1,		/**< 位置，包括坐标、定位方式等 */
-	WSS_BOX		= 1<<1,		/**< 区域框，包括内容框、内边距框、外边距框 */
-	WSS_BACKGROUND	= 1<<2,		/**< 背景，包括背景色、背景图、背景定位、背景尺寸等 */
-	WSS_BORDER	= 1<<3,		/**< 边框 */
-	WSS_SHADOW	= 1<<4,		/**< 阴影 */
-	WSS_ALL		= 0xffffffff,	/**< 全部 */
-};
-
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
@@ -84,6 +74,107 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_Border border;		/**< 边框 */
 } LCUI_WidgetStyle;
 
+/** 样式属性名 */
+enum LCUI_StyleKeyName {
+	key_position_start,
+	key_left,
+	key_right,
+	key_top,
+	key_bottom,
+	key_position,
+	key_position_end,
+	key_visible,
+	key_z_index,
+	key_opacity,
+	key_box_sizing,
+	key_width,
+	key_height,
+	key_margin_top,
+	key_margin_right,
+	key_margin_bottom,
+	key_margin_left,
+	key_padding_top,
+	key_padding_right,
+	key_padding_bottom,
+	key_padding_left,
+	key_border_start,
+	key_border_color,
+	key_border_style,
+	key_border_width,
+	key_border_top_width,
+	key_border_top_style,
+	key_border_top_color,
+	key_border_right_width,
+	key_border_right_style,
+	key_border_right_color,
+	key_border_bottom_width,
+	key_border_bottom_style,
+	key_border_bottom_color,
+	key_border_left_width,
+	key_border_left_style,
+	key_border_left_color,
+	key_border_top_left_radius,
+	key_border_top_right_radius,
+	key_border_bottom_left_radius,
+	key_border_bottom_right_radius,
+	key_border_end,
+	key_background_start,
+	key_background_color,
+	key_background_image,
+	key_background_size,
+	key_background_size_width,
+	key_background_size_height,
+	key_background_repeat,
+	key_background_repeat_x,
+	key_background_repeat_y,
+	key_background_position,
+	key_background_position_x,
+	key_background_position_y,
+	key_background_origin,
+	key_background_end,
+	key_box_shadow_start,
+	key_box_shadow_x,
+	key_box_shadow_y,
+	key_box_shadow_spread,
+	key_box_shadow_blur,
+	key_box_shadow_color,
+	key_box_shadow_end,
+	STYLE_KEY_TOTAL
+};
+
+typedef struct LCUI_Style {
+	LCUI_BOOL is_valid;
+	LCUI_BOOL is_changed;
+	LCUI_StyleVarType type;
+	union {
+		int value;
+		int value_px;
+		int value_pt;
+		int value_style;
+		float value_scale;
+		float scale;
+		LCUI_BOOL value_boolean;
+		LCUI_Color value_color;
+		LCUI_Color color;
+		LCUI_Graph *value_image;
+		LCUI_Graph *image;
+	};
+} LCUI_Style;
+
+typedef LCUI_Style *LCUI_StyleSheet;
+
+typedef struct LCUI_SelectorNodeRec_ {
+	char *id;
+	char *type;
+	char *class_name;
+	char *pseudo_class_name;
+} *LCUI_SelectorNode, **LCUI_Selector;
+
+#define SetStyle(S, NAME, VAL, TYPE)	S[NAME].is_valid = TRUE, \
+					S[NAME].is_changed = TRUE, \
+					S[NAME].type = SVT_##TYPE, \
+					S[NAME].value_##TYPE = VAL
+
 typedef struct LCUI_WidgetBase {
 	int x, y;			/**< 部件当前坐标 */
 	int width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
@@ -95,7 +186,8 @@ typedef struct LCUI_WidgetBase {
 	} box;				/**< 部件的各个区域信息 */
 	LCUI_Rect2 padding;		/**< 内边距框 */
 	LCUI_Rect2 margin;		/**< 外边距框 */
-	LCUI_WidgetStyle style;		/**< 样式缓存 */
+	LCUI_StyleSheet style;		/**< 自定义样式表 */
+	LCUI_StyleSheet css;		/**< 应用在部件上的完整样式表 */
 } LCUI_WidgetBase;
 
 /** 为函数加前缀名 */
@@ -117,49 +209,38 @@ LCUI_API LCUI_Widget LCUIWidget_New( const char *type_name );
 LCUI_API int Widget_Append( LCUI_Widget container, LCUI_Widget widget );
 
 /** 获取当前点命中的最上层可见部件 */
-LCUI_API LCUI_Widget $(At)( LCUI_Widget widget, int x, int y );
+LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 
 /** 设置部件为顶级部件 */
-LCUI_API int $(Top)( LCUI_Widget w );
+LCUI_API int Widget_Top( LCUI_Widget w );
 
 /** 更新位图尺寸 */
-void $(UpdateGraphBox)( LCUI_Widget w );
+void Widget_UpdateGraphBox( LCUI_Widget w );
+
+/** 计算位置 */
+void Widget_ComputePosition( LCUI_Widget w );
+
+/** 计算尺寸 */
+void Widget_ComputeSize( LCUI_Widget w );
+
+/** 计算部件通过继承得到的样式表 */
+LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 
 /** 设置部件标题 */
-LCUI_API void $(SetTitleW)( LCUI_Widget w, const wchar_t *title );
-
-/** 获取内边距框占用的矩形区域 */
-LCUI_API void $(GetPaddingRect)( LCUI_Widget widget, LCUI_Rect *rect );
-
-/** 获取内容框占用的矩形区域 */
-LCUI_API void $(GetContentRect)( LCUI_Widget widget, LCUI_Rect *rect );
-
-/** 获取边框盒占用的矩形区域 */
-LCUI_API void $(GetBorderRect)( LCUI_Widget widget, LCUI_Rect *rect );
-
-/** 获取部件当前占用的矩形区域（包括阴影区域） */
-LCUI_API void $(GetOuterRect)( LCUI_Widget widget, LCUI_Rect *rect );
+LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 
 /** 移动部件位置 */
-LCUI_API void $(Move)( LCUI_Widget w, int top, int left );
+LCUI_API void Widget_Move( LCUI_Widget w, int top, int left );
 
-LCUI_API void $(Resize)( LCUI_Widget w, int width, int height );
+LCUI_API void Widget_Resize( LCUI_Widget w, int width, int height );
 
-LCUI_API void $(Show)( LCUI_Widget w );
+LCUI_API void Widget_Show( LCUI_Widget w );
 
-LCUI_API void $(Hide)( LCUI_Widget w );
+LCUI_API void Widget_Hide( LCUI_Widget w );
 
 LCUI_API void Widget_Lock( LCUI_Widget w );
 
 LCUI_API void Widget_Unlock( LCUI_Widget w );
-
-LCUI_API void $(SetBackgroundColor)( LCUI_Widget w, LCUI_Color color );
-
-/** 拉取现有样式至缓存区 */
-LCUI_API void $(PullStyle)( LCUI_Widget w, int style );
-
-/** 推送缓存区中的样式，以让部件应用新样式 */
-LCUI_API void $(PushStyle)( LCUI_Widget w, int style );
 
 void LCUI_InitWidget(void);
 

@@ -136,6 +136,7 @@ typedef enum LCUI_StyleVarType {
 	SVT_SCALE,		/**< 比例 */
 	SVT_PX,			/**< 像素 */
 	SVT_PT,			/**< 点 */
+	SVT_BOOLEAN,
 	SVT_COLOR,		/**< 色彩 */
 	SVT_color,
 	SVT_image,
@@ -145,6 +146,7 @@ typedef enum LCUI_StyleVarType {
 #define SVT_px		SVT_PX
 #define SVT_pt		SVT_PT
 #define SVT_scale	SVT_SCALE
+#define SVT_boolean	SVT_BOOLEAN
 
 /** 用于描述样式的变量类型 */
 typedef struct LCUI_StyleVar {

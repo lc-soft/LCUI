@@ -110,7 +110,7 @@ static void LCUIDisplay_Update(void)
 		for( j=0; j<m; ++j ) {
 			p_rect = (LCUI_Rect*)LinkedList_Get( &rlist );
 			paint = Surface_BeginPaint( p_sr->surface, p_rect );
-			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d), %d\n", p_sr->widget->type_name, paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
+			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d), %d\n", p_sr->widget->type, paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
 			Widget_Render( p_sr->widget, paint );
 			Surface_EndPaint( p_sr->surface, paint );
 			LinkedList_Delete( &rlist );

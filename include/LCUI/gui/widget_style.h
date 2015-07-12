@@ -41,83 +41,6 @@
 #ifndef __LCUI_WIDGET_STYLE_LIBRARY_H__
 #define __LCUI_WIDGET_STYLE_LIBRARY_H__
 
-/** 样式属性名 */
-enum LCUI_StyleKeyName {
-	key_border_start,
-	key_border_color,
-	key_border_style,
-	key_border_width,
-	key_border_top_width,
-	key_border_top_style,
-	key_border_top_color,
-	key_border_right_width,
-	key_border_right_style,
-	key_border_right_color,
-	key_border_bottom_width,
-	key_border_bottom_style,
-	key_border_bottom_color,
-	key_border_left_width,
-	key_border_left_style,
-	key_border_left_color,
-	key_border_top_left_radius,
-	key_border_top_right_radius,
-	key_border_bottom_left_radius,
-	key_border_bottom_right_radius,
-	key_border_end,
-	key_background_start,
-	key_background_color,
-	key_background_image,
-	key_background_size,
-	key_background_size_width,
-	key_background_size_height,
-	key_background_repeat,
-	key_background_repeat_x,
-	key_background_repeat_y,
-	key_background_position,
-	key_background_position_x,
-	key_background_position_y,
-	key_background_origin,
-	key_background_end,
-	key_box_shadow_start,
-	key_box_shadow_x,
-	key_box_shadow_y,
-	key_box_shadow_spread,
-	key_box_shadow_color,
-	key_box_shadow_end,
-	STYLE_KEY_TOTAL
-};
-
-typedef struct LCUI_Style {
-	LCUI_BOOL is_valid;
-	LCUI_StyleVarType type;
-	union {
-		int value;
-		int value_px;
-		int value_pt;
-		int value_style;
-		float value_scale;
-		float scale;
-		LCUI_Color value_color;
-		LCUI_Color color;
-		LCUI_Graph value_image;
-		LCUI_Graph image;
-	};
-} LCUI_Style;
-
-typedef LCUI_Style *LCUI_StyleSheet;
-
-typedef struct LCUI_SelectorNodeRec_ {
-	char *id;
-	char *type;
-	char *class_name;
-	char *pseudo_class_name;
-} *LCUI_SelectorNode, **LCUI_Selector;
-
-#define SetStyle(S, NAME, VAL, TYPE)	S[NAME].is_valid = TRUE, \
-					S[NAME].type = SVT_##TYPE, \
-					S[NAME].value_##TYPE = VAL
-
-
 /** 初始化 */
 void LCUIWidget_InitStyle( void );
 
@@ -145,10 +68,10 @@ LCUI_API LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector );
 /** 向样式库添加样式表 */
 LCUI_API int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss );
 
-/** 获取样式表 */
-LCUI_API int Widget_GetStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
+/** 计算部件继承得到的样式表 */
+LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 
-/** 计算当前部件的样式 */
-void Widget_UpdateStyle( LCUI_Widget w );
+/** 更新当前部件的样式 */
+LCUI_API void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all );
 
 #endif

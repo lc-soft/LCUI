@@ -56,8 +56,9 @@ LCUI_BEGIN_HEADER
 /** 部件结构（完整版） */
 struct LCUI_WidgetFull {
 	LCUI_WidgetBase		base;			/**< 基础数据 */
-	LCUI_WidgetStyle	style;			/**< 当前缓存的样式数据 */
-	LCUI_StyleSheet		css;			/**< 当前缓存的样式表 */
+	LCUI_WidgetStyle	style;			/**< 已经计算的样式数据 */
+	LCUI_StyleSheet		css;			/**< 应用在部件上的完整样式表 */
+	LCUI_StyleSheet		inherited_css;		/**< 通过继承得到的样式表 */
 	char			*id;			/**< ID */
 	char			*type;			/**< 类型 */
 	char			**classes;		/**< 类列表 */

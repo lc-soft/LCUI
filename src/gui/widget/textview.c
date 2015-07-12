@@ -162,7 +162,7 @@ static void TextView_OnUpdate( LCUI_Widget w )
 }
 
 /** 私有的任务处理接口 */
-static void TextView_OnTask( LCUI_Widget w, LCUI_WidgetTask *t )
+static void TextView_OnTask( LCUI_Widget w )
 {
 	int i;
 	LinkedList rects;
@@ -218,7 +218,6 @@ LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	int len;
 	wchar_t *text_ptr;
 	LCUI_TextView *txt;
-	LCUI_WidgetTask task;
 
 	len = text ? wcslen( text ):0;
 	text_ptr = (wchar_t*)malloc( sizeof(wchar_t)*(len+1) );
@@ -238,7 +237,7 @@ LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	}
 	txt->tasks[TASK_SET_TEXT].is_valid = TRUE;
 	txt->tasks[TASK_SET_TEXT].text = text_ptr;
-	Widget_AddTask( w, (task.type = WTT_USER, &task) );
+	Widget_AddTask( w, WTT_USER );
 	Widget_Unlock( w );
 	return 0;
 }
