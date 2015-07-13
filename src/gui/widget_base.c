@@ -188,8 +188,6 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->css = StyleSheet();
 	widget->inherited_css = StyleSheet();
 	widget->style.z_index = 0;
-	widget->style.x.type = SVT_NONE;
-	widget->style.y.type = SVT_NONE;
 	widget->style.width.type = SVT_AUTO;
 	widget->style.height.type = SVT_AUTO;
 	widget->style.box_sizing = SV_CONTENT_BOX;
@@ -372,16 +370,16 @@ void Widget_ComputePosition( LCUI_Widget w )
 	// 需要考虑到其它定位相关的属性
 	// code ...
 
-	switch( w->style.x.type ) {
+	switch( w->css[key_top].type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
 		w->base.x =  w->parent->base.box.content.width;
-		w->base.x *= w->style.x.scale;
+		w->base.x *= w->css[key_top].value_scale;
 		break;
 	case SVT_PX:
-		w->base.x = w->style.x.px;
+		w->base.x = w->css[key_top].value_px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
@@ -389,16 +387,16 @@ void Widget_ComputePosition( LCUI_Widget w )
 		w->base.x = 0;
 		break;
 	}
-	switch( w->style.y.type ) {
+	switch( w->css[key_left].type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
 		w->base.y = w->parent->base.box.content.height;
-		w->base.y *= w->style.y.scale;
+		w->base.y *= w->css[key_left].value_scale;
 		break;
 	case SVT_PX:
-		w->base.y = w->style.y.px;
+		w->base.y = w->css[key_top].value_px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:

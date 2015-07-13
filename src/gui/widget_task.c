@@ -231,6 +231,7 @@ static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
 		case key_box_shadow_x: bsd->x = style->value; break;
 		case key_box_shadow_y: bsd->y = style->value; break;
 		case key_box_shadow_spread: bsd->spread = style->value; break;
+		case key_box_shadow_blur: bsd->blur = style->value; break;
 		case key_box_shadow_color: bsd->color = style->color; break;
 		default: break;
 		}

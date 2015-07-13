@@ -55,7 +55,6 @@ typedef struct LCUI_WidgetStyle {
 	int right, bottom;		/**< 右边界、底边界的偏移距离 */
 	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
 	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
-	LCUI_StyleVar x, y;		/**< 当前平面坐标 */
 	int box_sizing;			/**< 以何种方式计算宽度和高度 */
 
 	union {
