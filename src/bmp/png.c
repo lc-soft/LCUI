@@ -1,40 +1,40 @@
 /* ***************************************************************************
  * png.c -- LCUI PNG image file processing module.
- * 
- * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
- * 
+ *
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ***************************************************************************/
- 
+
 /* ****************************************************************************
  * png.c -- LCUI的PNG图像文件读写支持模块。
  *
- * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
- * 
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
 #include <LCUI_Build.h>
@@ -60,14 +60,14 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
         int w, h, x, y, temp, color_type;
 
         fp = fopen(filepath, "rb");
-        if( fp == NULL ) { 
+        if( fp == NULL ) {
                 return FILE_ERROR_OPEN_ERROR;
         }
-        
+
         png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
         info_ptr = png_create_info_struct(png_ptr);
 
-        setjmp(png_jmpbuf(png_ptr)); 
+        setjmp(png_jmpbuf(png_ptr));
         /* 读取PNG_BYTES_TO_CHECK个字节的数据 */
         temp = fread(buf, 1, PNG_BYTES_TO_CHECK, fp);
         /* 若读到的数据并没有PNG_BYTES_TO_CHECK个字节 */
@@ -87,7 +87,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
         /* 复位文件指针 */
         rewind(fp);
         /* 开始读文件 */
-        png_init_io(png_ptr, fp); 
+        png_init_io(png_ptr, fp);
         /* 读取PNG图片信息 */
         png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0);
         /* 获取图像的色彩类型 */
@@ -100,14 +100,14 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 	/* 根据不同的色彩类型进行相应处理 */
         switch( color_type ) {
 	case PNG_COLOR_TYPE_RGB_ALPHA:
-                graph->color_type = COLOR_TYPE_ARGB; 
+                graph->color_type = COLOR_TYPE_ARGB;
                 temp = Graph_Create( graph, w, h );
 		if( temp != 0 ) {
 			fclose(fp);
 			png_destroy_read_struct( &png_ptr, &info_ptr, 0);
 			return FILE_ERROR_MALLOC_ERROR;
 		}
-		
+
 		pixel_ptr = graph->bytes;
                 for( y=0; y<h; ++y ) {
 			/*
@@ -124,14 +124,14 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 		break;
 
         case PNG_COLOR_TYPE_RGB:
-                graph->color_type = COLOR_TYPE_RGB; 
+                graph->color_type = COLOR_TYPE_RGB;
                 temp = Graph_Create( graph, w, h );
 		if( temp != 0 ) {
 			fclose(fp);
 			png_destroy_read_struct( &png_ptr, &info_ptr, 0);
 			return FILE_ERROR_MALLOC_ERROR;
 		}
-		
+
 		pixel_ptr = graph->bytes;
                 for( y=0; y<h; ++y ) {
 			for( x=0; x<w*3; x+=3 ) {
@@ -149,7 +149,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
         }
         png_destroy_read_struct( &png_ptr, &info_ptr, 0);
 #else
-        _DEBUG_MSG("warning: not PNG support!"); 
+        _DEBUG_MSG("warning: not PNG support!");
 #endif
         return 0;
 }
@@ -160,10 +160,10 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 #ifdef USE_LIBPNG
         FILE *fp;
 	LCUI_Rect rect;
-        png_byte color_type; 
+        png_byte color_type;
         png_structp png_ptr;
-        png_infop info_ptr; 
-	png_text text_ptr[3];
+        png_infop info_ptr;
+	png_text text[3];
 	png_bytep *row_pointers;
 	int x, y, row_size;
 
@@ -214,28 +214,24 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
         8, color_type, PNG_INTERLACE_NONE,
         PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
-	text_ptr[0].key = "Title";
-	text_ptr[0].text = "png output file";
-	text_ptr[0].compression = PNG_TEXT_COMPRESSION_NONE;
-	text_ptr[0].itxt_length = 0;
-	text_ptr[0].lang = NULL;
-	text_ptr[0].lang_key = NULL;
+	text[0].key = "Title";
+	text[0].text = "png output file";
+	text[0].compression = PNG_TEXT_COMPRESSION_NONE;
+	text[0].text_length = strlen(text[0].text);
 
-	text_ptr[1].key = "Author";
-	text_ptr[1].text = "LCUI Application";
-	text_ptr[1].compression = PNG_TEXT_COMPRESSION_NONE;
-	text_ptr[1].itxt_length = 0;
-	text_ptr[1].lang = NULL;
-	text_ptr[1].lang_key = NULL;
+	text[1].key = "Author";
+	text[1].text = "LCUI Application";
+	text[1].compression = PNG_TEXT_COMPRESSION_NONE;
+	text[1].text_length = strlen(text[1].text);
 
-	text_ptr[2].key = "Description";
-	text_ptr[2].text = "this png file generate from LCUI Application.";
-	text_ptr[2].compression = PNG_TEXT_COMPRESSION_zTXt;
-	text_ptr[2].itxt_length = 0;
-	text_ptr[2].lang = NULL;
-	text_ptr[2].lang_key = NULL;
+	text[2].key = "Description";
+	text[2].text = "this png file generate from LCUI Application.";
+	text[2].compression = PNG_TEXT_COMPRESSION_zTXt;
+	text[2].text_length = strlen(text[2].text);
 
-	png_set_text(png_ptr, info_ptr, text_ptr, 3);
+	png_set_text(png_ptr, info_ptr, &text[0], 3);
+	png_set_text(png_ptr, info_ptr, &text[1], 3);
+	png_set_text(png_ptr, info_ptr, &text[2], 3);
         png_write_info(png_ptr, info_ptr);
         /* write bytes */
         if (setjmp(png_jmpbuf(png_ptr))) {
@@ -266,7 +262,7 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 		}
 	} else {
 		uchar_t *px_ptr, *px_row_ptr;
-		
+
 		row_size = png_get_rowbytes(png_ptr, info_ptr);
 		px_row_ptr = graph->bytes + rect.top * graph->bytes_per_row;
 		px_row_ptr += rect.left * graph->bytes_per_pixel;
@@ -299,7 +295,7 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
         fclose( fp );
         return 0;
 #else
-        printf("warning: not PNG support!"); 
+        printf("warning: not PNG support!");
         return 0;
 #endif
 }

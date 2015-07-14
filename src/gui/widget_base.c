@@ -611,7 +611,7 @@ void Widget_ComputeMargin( LCUI_Widget w )
 /** 设置内边距 */
 void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left )
 {
-	
+
 }
 
 void Widget_SetPaddingS(
@@ -628,7 +628,7 @@ void Widget_SetPaddingS(
 /** 设置外边距 */
 void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left )
 {
-	
+
 }
 
 /** 设置左边距 */
@@ -734,7 +734,7 @@ int strlist_remove_str( char ***strlist, const char *str )
 	if( !*strlist ) {
 		return 0;
 	}
-	for( i = 0; *strlist[i]; ++i ) {
+	for( pos = 0,i = 0; *strlist[i]; ++i ) {
 		if( strcmp(*strlist[i], str) == 0 ) {
 			pos = i;
 		}
