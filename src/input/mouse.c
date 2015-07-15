@@ -181,7 +181,7 @@ static LCUI_BOOL MouseInit(void)
 		return FALSE;
 	}
 	mouse.state = STATE_INSIDE;
-	printf("open %s successfuly.\n", msdev);
+	printf("[mouse] open %s successfuly.\n", msdev);
 #else
 	/* 隐藏windows的鼠标游标 */
 	ShowCursor( FALSE );

@@ -42,6 +42,7 @@
 #include <LCUI/thread.h>
 
 #ifdef LCUI_BUILD_IN_LINUX
+#include <errno.h>
 #include <sys/time.h>
 
 /** 初始化一个条件变量 */
@@ -64,26 +65,30 @@ unsigned int LCUICond_Wait( LCUI_Cond *cond )
 {
 	int64_t lost_time;
 	lost_time = LCUI_GetTickCount();
-	pthread_mutex_lock( &cond->mutex );
 	pthread_cond_wait( &cond->cond, &cond->mutex );
 	lost_time = LCUI_GetTicks( lost_time );
+        pthread_mutex_unlock( &cond->mutex );
 	return (unsigned int)lost_time;
 }
 
 /** 计时阻塞当前线程，等待条件成立 */
 unsigned int LCUICond_TimedWait( LCUI_Cond *cond, unsigned int ms )
 {
+	int ret;
 	struct timeval now;
 	struct timespec outtime;
 	int64_t lost_time;
 
 	lost_time = LCUI_GetTickCount();
 	gettimeofday(&now, NULL);
-	outtime.tv_sec = now.tv_sec + 5;
-	outtime.tv_nsec = now.tv_usec * 1000;
-	pthread_mutex_lock( &cond->mutex );
-	pthread_cond_timedwait( &cond->cond, &cond->mutex, &outtime );
+	ret = (int)(ms / 1000);
+	outtime.tv_sec = now.tv_sec + ret;
+	outtime.tv_nsec = now.tv_usec * (ms - ret * 1000) * 1000000;
+	ret = pthread_cond_timedwait( &cond->cond, &cond->mutex, &outtime );
 	lost_time = LCUI_GetTicks( lost_time );
+	if( ret != ETIMEDOUT ) {
+		pthread_mutex_unlock( &cond->mutex );
+	}
 	return (unsigned int)lost_time;
 }
 
@@ -91,7 +96,6 @@ unsigned int LCUICond_TimedWait( LCUI_Cond *cond, unsigned int ms )
 int LCUICond_Broadcast( LCUI_Cond *cond )
 {
 	pthread_cond_broadcast( &cond->cond );
-        pthread_mutex_unlock( &cond->mutex );
         return 0;
 }
 

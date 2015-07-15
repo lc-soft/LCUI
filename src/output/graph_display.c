@@ -452,44 +452,61 @@ LCUI_Surface Surface_New( void )
 
 LCUI_BOOL Surface_IsReady( LCUI_Surface surface )
 {
-	return display.methods->isReady( surface );
+	if( display.methods->isReady ) {
+		return display.methods->isReady( surface );
+	}
+	return TRUE;
 }
 
 void Surface_Move( LCUI_Surface surface, int x, int y )
 {
-	display.methods->move( surface, x, y );
+	if( display.methods->move ) {
+		display.methods->move( surface, x, y );
+	}
 }
 
 void Surface_Resize( LCUI_Surface surface, int w, int h )
 {
-	display.methods->resize( surface, w, h );
+	if( display.methods->resize ) {
+		display.methods->resize( surface, w, h );
+	}
 }
 
 void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 {
-	display.methods->setCaptionW( surface, str );
+	if( display.methods->setCaptionW ) {
+		display.methods->setCaptionW( surface, str );
+	}
 }
 
 void Surface_Show( LCUI_Surface surface )
 {
-	display.methods->show( surface );
+	if( display.methods->show ) {
+		display.methods->show( surface );
+	}
 }
 
 void Surface_Hide( LCUI_Surface surface )
 {
-	display.methods->hide( surface );
+	if( display.methods->hide ) {
+		display.methods->hide( surface );
+	}
 }
 
 /** 设置 Surface 的渲染模式 */
 void Surface_SetRenderMode( LCUI_Surface surface, int mode )
 {
-	display.methods->setRenderMode( surface, mode );
+	if( display.methods->setRenderMode ) {
+		display.methods->setRenderMode( surface, mode );
+	}
 }
 
 /** 更新 surface，应用缓存的变更 */
 void Surface_Update( LCUI_Surface surface )
 {
-	display.methods->update( surface );
+	if( display.methods->update ) {
+		display.methods->update( surface );
+	}
 }
 
 /**
