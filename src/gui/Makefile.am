@@ -8,4 +8,5 @@ widget_library.c	\
 widget_style.c		\
 widget_task.c		\
 widget_paint.c 		\
-widget/textview.c
+widget/textview.c	\
+widget/button.c

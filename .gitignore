@@ -1,5 +1,7 @@
 *.lo
 *.o
+*.dirstamp
+*.zip
 bin/
 build/*/*.sdf
 build/*/*.opensdf
