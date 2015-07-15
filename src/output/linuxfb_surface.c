@@ -234,6 +234,7 @@ static void LinuxFB_PutGraph24( LCUI_Rect rect, LCUI_Graph *canvas )
 	dest_line_bytes = linuxfb.screen_size.w*3;
 	src_pixel_line = canvas->bytes;
 	for( y=0; y<canvas->h; ++y ) {
+		dest = dest_line;
 		src_pixel = (LCUI_Color*)src_pixel_line;
 		for( x=0; x<canvas->w; ++x ) {
 			*dest++ = src_pixel->blue;
@@ -260,6 +261,7 @@ static void LinuxFB_PutGraph16( LCUI_Rect rect, LCUI_Graph *canvas )
 	dest_line_bytes = linuxfb.screen_size.w*2;
 	src_pixel_line = canvas->bytes;
 	for( y=0; y<canvas->h; ++y ) {
+		dest = dest_line;
 		src_pixel = (LCUI_Color*)src_pixel_line;
 		for( x=0; x<canvas->w; ++x ) {
 			/*
