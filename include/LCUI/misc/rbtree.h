@@ -62,25 +62,13 @@ typedef struct LCUI_RBTreeRec_ {
         LCUI_RBTreeNode *root;
 } LCUI_RBTree;
 
-static inline int RBTree_GetTotal( LCUI_RBTree *rbt )
-{
-        return rbt->total_node;
-}
+#define RBTree_GetTotal(rbt) (rbt)->total_node;
 
-static inline void RBTree_OnJudge( LCUI_RBTree *rbt, int (*func)(void*,const void*) )
-{
-	rbt->judge = func;
-}
+#define RBTree_OnJudge(rbt, func) (rbt)->judge = func
 
-static inline void RBTree_OnDestroy( LCUI_RBTree *rbt, void (*func)(void*) )
-{
-	rbt->destroy = func;
-}
+#define RBTree_OnDestroy(rbt, func) (rbt)->destroy = func
 
-static inline void RBTree_SetDataNeedFree( LCUI_RBTree *rbt, int is_true )
-{
-	rbt->need_free_data = is_true;
-}
+#define RBTree_SetDataNeedFree(rbt, flag) (rbt)->need_free_data = flag
 
 /** 初始化红黑树 */
 LCUI_API void RBTree_Init( LCUI_RBTree *rbt );

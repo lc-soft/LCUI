@@ -699,16 +699,16 @@ int strlist_add_str( char ***strlist, const char *str )
 		}
 		len = i + 2;
 		newlist = (char**)realloc( *strlist, len * sizeof(char*) );
-		if( newlist == NULL ) {
-			return -1;
-		}
-		*strlist = newlist;
 	} else {
 		i = 0;
-		*strlist = (char**)malloc( sizeof(char*) * 2 );
+		newlist = (char**)malloc( sizeof(char*) * 2 );
 	}
-	*strlist[i] = strdup(str);
-	*strlist[i+1] = NULL;
+	if( newlist == NULL ) {
+		return -1;
+	}
+	newlist[i] = strdup(str);
+	newlist[i+1] = NULL;
+	*strlist = newlist;
 	return 1;
 }
 
@@ -734,28 +734,28 @@ int strlist_remove_str( char ***strlist, const char *str )
 	if( !*strlist ) {
 		return 0;
 	}
-	for( pos = 0,i = 0; *strlist[i]; ++i ) {
-		if( strcmp(*strlist[i], str) == 0 ) {
+	for( pos = 0,i = 0; (*strlist)[i] != NULL; ++i ) {
+		if( strcmp((*strlist)[i], str) == 0 ) {
 			pos = i;
 		}
 	}
-	if( pos == 0 && i == 0 ) {
+	if( pos == 0 && i < 2 ) {
 		free( *strlist );
 		*strlist = NULL;
-	} else {
-		len = i - 1;
-		newlist = (char**)realloc( *strlist, i * sizeof(char*) );
-		for( i = 0; i < pos; ++i ) {
-			newlist[i] = *strlist[i];
-		}
-		for( i = pos; i < len; ++i ) {
-			newlist[i] = *strlist[i+1];
-		}
-		newlist[i] = NULL;
-		free( *strlist[pos] );
-		free( *strlist );
-		*strlist = newlist;
+		return 1;
 	}
+	len = i - 1;
+	newlist = (char**)malloc( i * sizeof(char*) );
+	for( i = 0; i < pos; ++i ) {
+		newlist[i] = (*strlist)[i];
+	}
+	for( i = pos; i < len; ++i ) {
+		newlist[i] = (*strlist)[i+1];
+	}
+	newlist[i] = NULL;
+	free( (*strlist)[pos] );
+	free( *strlist );
+	*strlist = newlist;
 	return 1;
 }
 

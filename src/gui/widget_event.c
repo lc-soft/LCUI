@@ -57,8 +57,17 @@ typedef struct LCUI_WidgetEventTask {
 	void (*data_destroy)(void*);
 } LCUI_WidgetEventTask;
 
-static LCUI_RBTree widget_mark_tree;	/**< 记录当前已经标记的部件 */
-static LinkedList widget_list;		/**< 待处理部件列表（按事件触发时间先后排列） */
+enum WidgetStatusType { 
+	WST_HOVER,
+	WST_ACTIVE,
+	WST_TOTAL
+};
+
+static struct ModuleContext { 
+	LinkedList pending_list;		/**< 待处理部件列表（按事件触发时间先后排列） */
+	LCUI_Widget targets[WST_TOTAL];		/**< 相关的部件 */
+	LCUI_RBTree mark_tree;			/**< 记录当前已经标记的部件 */
+} self;
 
 static int CompareWidgetMark( void *data, const void *key )
 {
@@ -103,7 +112,7 @@ static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 	}
 	/* 开始进行事件冒泡传播 */
 	while( widget ) {
-		int i = 0, n = 0;
+		int i = 0;
 		LinkedList *children;
 		
 		if( widget->parent ) {
@@ -111,18 +120,15 @@ static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 		} else {
 			children = &LCUIRootWidget->children_show;
 		}
-		n = LinkedList_GetTotal( children );
 		/* 确定自己的显示位置，忽略显示在它前面的部件 */
-		for( i=0; i<n; ++i ) {
-			LinkedList_Goto( children, i );
+		LinkedList_ForEach( widget, 0, children ) {
 			if( widget == (LCUI_Widget)LinkedList_Get(children) ) {
 				break;
 			}
+			i += 1;
 		}
 		/* 向后面的部件传播事件 */
-		for( i=i+1; i<n; ++i ) {
-			LinkedList_Goto( children, i );
-			widget = (LCUI_Widget)LinkedList_Get( children );
+		LinkedList_ForEach( widget, i+1, children ) {
 			if( !widget->style.visible ) {
 				continue;
 			}
@@ -234,9 +240,9 @@ int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 	pack->is_direct_run = FALSE;
 	DEBUG_MSG("pack: %p\n", pack);
 	ret = LCUIEventBox_Post( widget->event, e->type_name, pack, NULL );
-	if( !RBTree_CustomSearch( &widget_mark_tree, widget ) ) {
-		RBTree_CustomInsert( &widget_mark_tree, widget, widget );
-		LinkedList_Append( &widget_list, widget );
+	if( !RBTree_CustomSearch( &self.mark_tree, widget ) ) {
+		RBTree_CustomInsert( &self.mark_tree, widget, widget );
+		LinkedList_Append( &self.pending_list, widget );
 	}
 	return ret;
 }
@@ -253,6 +259,42 @@ int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 	pack.widget = widget;
 	pack.is_direct_run = TRUE;
 	return LCUIEventBox_Send( widget->event, e->type_name, &pack );
+}
+
+/** 处理部件对鼠标覆盖/移开时的反应 */
+static void Widget_ProcHover( LCUI_Widget widget )
+{
+	LCUI_WidgetEvent e;
+	LCUI_Widget w, new_w = widget, old_w = self.targets[WST_HOVER];
+
+	if( self.targets[WST_HOVER] == widget ) {
+		return;
+	}
+	for( ; new_w && new_w != LCUIRootWidget; new_w = new_w->parent ) {
+		for( w = old_w; w != LCUIRootWidget && w; w = w->parent ) {
+			if( new_w == old_w ) {
+				break;
+			}
+			Widget_AddStatus( new_w, "hover" );
+			Widget_RemoveStatus( old_w, "hover" );
+			e.target = new_w;
+			e.type = WET_MOUSEOVER;
+			e.cancel_bubble = FALSE;
+			e.type_name = "mouseover";
+			Widget_PostEvent( new_w, &e, NULL );
+			e.target = old_w;
+			e.type = WET_MOUSEOUT;
+			e.type_name = "mouseout";
+			Widget_PostEvent( old_w, &e, NULL );
+		}
+		if( new_w == old_w ) {
+			break;
+		}
+		if( old_w ) {
+			old_w = old_w->parent;
+		}
+	}
+	self.targets[WST_HOVER] = widget;
 }
 
 /** 响应系统的鼠标移动事件，向目标部件投递相关鼠标事件 */
@@ -276,18 +318,30 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 	case LCUI_MOUSEDOWN:
 		ebuff.type = WET_MOUSEDOWN;
 		ebuff.type_name = "mousedown";
+		self.targets[WST_ACTIVE] = target;
+		Widget_PostEvent( target, &ebuff, NULL );
 		break;
 	case LCUI_MOUSEUP:
 		ebuff.type = WET_MOUSEUP;
 		ebuff.type_name = "mouseup";
+		Widget_PostEvent( target, &ebuff, NULL );
+		if( self.targets[WST_ACTIVE] == target ) {
+			ebuff.type = WET_CLICK;
+			ebuff.type_name = "click";
+			ebuff.cancel_bubble = TRUE;
+			Widget_PostEvent( target, &ebuff, NULL );
+		}
+		self.targets[WST_ACTIVE] = NULL;
 		break;
 	case LCUI_MOUSEMOVE:
 		ebuff.type = WET_MOUSEMOVE;
 		ebuff.type_name = "mousemove";
+		Widget_PostEvent( target, &ebuff, NULL );
 		break;
 	default:return;
 	}
-	Widget_PostEvent( target, &ebuff, NULL );
+	_DEBUG_MSG("event = %s, x: %d, y = %d\n", ebuff.type_name, ebuff.x, ebuff.y);
+	Widget_ProcHover( target );
 }
 
 /** 响应按键的按下 */
@@ -320,26 +374,26 @@ void LCUIWidget_StepEvent(void)
 	int i, n;
 	LCUI_Widget widget;
 
-	n = LinkedList_GetTotal( &widget_list );
+	n = LinkedList_GetTotal( &self.pending_list );
 	DEBUG_MSG("widget total: %d\n", n);
 	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &widget_list, 0 );
-		widget = (LCUI_Widget)LinkedList_Get( &widget_list );
-		LinkedList_Delete( &widget_list );
+		LinkedList_Goto( &self.pending_list, 0 );
+		widget = (LCUI_Widget)LinkedList_Get( &self.pending_list );
+		LinkedList_Delete( &self.pending_list );
 		DEBUG_MSG("dispatch event, widget: %p, is_root: %s\n", widget, widget == LCUIRootWidget ? "TURE":"FALSE");
 		LCUIEventBox_Dispatch( widget->event );
-		RBTree_CustomErase( &widget_mark_tree, widget );
+		RBTree_CustomErase( &self.mark_tree, widget );
 	}
 }
 
 /** 初始化 LCUI 部件的事件系统 */
 void LCUIWidget_InitEvent(void)
 {
-	RBTree_Init( &widget_mark_tree );
-	RBTree_OnJudge( &widget_mark_tree, CompareWidgetMark );
-	RBTree_SetDataNeedFree( &widget_mark_tree, FALSE );
-	LinkedList_Init( &widget_list, sizeof(LCUI_Widget) );
-	LinkedList_SetDataNeedFree( &widget_list, FALSE );
+	RBTree_Init( &self.mark_tree );
+	RBTree_OnJudge( &self.mark_tree, CompareWidgetMark );
+	RBTree_SetDataNeedFree( &self.mark_tree, FALSE );
+	LinkedList_Init( &self.pending_list, sizeof(LCUI_Widget) );
+	LinkedList_SetDataNeedFree( &self.pending_list, FALSE );
 	LCUI_BindEvent( "mousedown", OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( "mousemove", OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( "mouseup", OnMouseEvent, NULL, NULL );
@@ -347,6 +401,8 @@ void LCUIWidget_InitEvent(void)
 	LCUI_BindEvent( "keydown", OnKeyDown, NULL, NULL );
 	LCUI_BindEvent( "keypress", OnKeyPress, NULL, NULL );
 	LCUI_BindEvent( "input", OnInput, NULL, NULL );
+	self.targets[WST_ACTIVE] = NULL;
+	self.targets[WST_HOVER] = NULL;
 }
 
 /** 销毁（释放） LCUI 部件的事件系统的相关资源 */

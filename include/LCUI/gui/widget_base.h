@@ -241,6 +241,24 @@ LCUI_API void Widget_Lock( LCUI_Widget w );
 
 LCUI_API void Widget_Unlock( LCUI_Widget w );
 
+/** 为部件添加一个类 */
+LCUI_API int Widget_AddClass( LCUI_Widget w, const char *class_name );
+
+/** 判断部件是否包含指定的类 */
+LCUI_API LCUI_BOOL Widget_HasClass( LCUI_Widget w, const char *class_name );
+
+/** 从部件中移除一个类 */
+LCUI_API int Widget_RemoveClass( LCUI_Widget w, const char *class_name );
+
+/** 为部件添加一个状态 */
+LCUI_API int Widget_AddStatus( LCUI_Widget w, const char *status_name );
+
+/** 判断部件是否包含指定的状态 */
+LCUI_API LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name );
+
+/** 从部件中移除一个状态 */
+int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
+
 void LCUI_InitWidget(void);
 
 void LCUI_ExitWidget(void);
