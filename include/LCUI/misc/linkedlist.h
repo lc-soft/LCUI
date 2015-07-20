@@ -77,19 +77,19 @@ struct LinkedListRec_ {
 #define LinkedList_SetDestroyFunc(list, fn) (list)->destroy_func = fn
 
 /** 获取当前结点中的数据 */
-#define LinkedList_Get(list) (list)->current_node ? (list)->current_node->data:NULL
+#define LinkedList_Get(list) ((list)->current_node ? (list)->current_node->data:NULL)
 
 /** 判断是否处于链表末尾 */
 #define LinkedList_IsAtEnd(list) ((list)->current_node_pos >= (list)->used_node_num\
 				 || !(list)->current_node ? 1:0)
 
 /** 切换至下个结点 */
-#define LinkedList_ToNext(list) (list)->current_node ? (++(list)->current_node_pos,\
-				(list)->current_node = (list)->current_node->next): NULL
+#define LinkedList_ToNext(list) ((list)->current_node ? (++(list)->current_node_pos,\
+				(list)->current_node = (list)->current_node->next):NULL)
 
 #define LinkedList_ForEach(elem, pos, list) \
-	for( LinkedList_Goto(list, pos), elem = LinkedList_Get(list); \
-		!LinkedList_IsAtEnd(list); LinkedList_ToNext(list), elem = LinkedList_Get(list))
+	for( LinkedList_Goto(list, pos) == 0 ? elem = LinkedList_Get(list):NULL; \
+		!LinkedList_IsAtEnd(list); LinkedList_ToNext(list) ? elem = LinkedList_Get(list):0)
 
 /** 初始化链表 */
 LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size );

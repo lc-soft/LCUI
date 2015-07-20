@@ -198,6 +198,7 @@ int LinkedList_Delete( LinkedList *list )
 	} else {
 		if( list->current_node->prev ) {
 			list->current_node->prev->next = list->current_node->next;
+			--list->current_node_pos;
 		} else {
 			list->used_head_node = list->current_node->next;
 		}
