@@ -224,11 +224,7 @@ AC_OUTPUT([Makefile
                  src/input/Makefile
                  src/output/Makefile
                  src/gui/Makefile
-                 test/Makefile
-                 test/mora/Makefile
-                 test/clock/Makefile
-                 test/login/Makefile
-                 test/screenlock/Makefile])
+                 test/Makefile])
 echo
 echo
 echo -e "Build with tslib support ........... : $want_ts"
