@@ -306,6 +306,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 		if( LinkedList_GetTotal(&MainApp.task_list) > 0 ) {
 			DEBUG_MSG("loop: %p, run task.\n", loop);
 			LCUI_RunTask();
+			continue;
 		}
 		DEBUG_MSG("loop: %p, sleeping...\n", loop);
 		LCUICond_TimedWait( &MainApp.loop_cond, 1000 );

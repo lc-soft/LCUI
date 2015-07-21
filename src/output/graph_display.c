@@ -137,7 +137,7 @@ LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
 static LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
 {
 	SurfaceRecord *p_sr;
-    LinkedList_ForEach( p_sr, 0, &display.surfaces ) {
+	LinkedList_ForEach( p_sr, 0, &display.surfaces ) {
 		if( p_sr->widget == widget ) {
 			return p_sr->surface;
 		}
@@ -177,7 +177,7 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 static void LCUIDisplay_UnbindSurface( LCUI_Widget widget )
 {
 	SurfaceRecord *p_sr;
-    LinkedList_ForEach( p_sr, 0, &display.surfaces ) {
+	LinkedList_ForEach( p_sr, 0, &display.surfaces ) {
 		if( p_sr->widget != widget ) {
 			continue;
 		}
@@ -232,8 +232,8 @@ static int LCUIDisplay_FullScreen( void )
 	case LDM_FULLSCREEN:
 		return 0;
 	}
-	LCUIDisplay_SetSize( display.info.getWidth(), display.info.getHeight() );
 	display.mode = LDM_FULLSCREEN;
+	LCUIDisplay_SetSize( display.info.getWidth(), display.info.getHeight() );
 	return 0;
 }
 
@@ -250,7 +250,7 @@ static int LCUIDisplay_Seamless( void )
 		LCUIDisplay_CleanSurfaces();
 		break;
 	}
-    LinkedList_ForEach( widget, 0, &LCUIRootWidget->children ) {
+	LinkedList_ForEach( widget, 0, &LCUIRootWidget->children ) {
 		LCUIDisplay_BindSurface( widget );
 	}
 	display.mode = LDM_SEAMLESS;
@@ -261,7 +261,7 @@ static int LCUIDisplay_Seamless( void )
 int LCUIDisplay_SetMode( int mode )
 {
 	int ret;
-	_DEBUG_MSG("mode: %d\n", mode);
+	DEBUG_MSG("mode: %d\n", mode);
 	LCUIMutex_Lock( &display.mutex );
 	switch( mode ) {
 	case LDM_WINDOWED:
@@ -293,7 +293,7 @@ void LCUIDisplay_ExecResize( int width, int height )
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
 void LCUIDisplay_SetSize( int width, int height )
 {
-	if( display.mode != LDM_WINDOWED && display.mode != LDM_FULLSCREEN ) {
+	if( display.mode == LDM_SEAMLESS ) {
 		return;
 	}
 	Widget_Resize( LCUIRootWidget, width, height );

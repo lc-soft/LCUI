@@ -157,15 +157,13 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 				    LCUI_Rect *valid_box, 
 				    LCUI_DirtyRectList *rlist )
 {
-	int i, n, count;
+	int count;
 	LCUI_Widget child;
 	LCUI_Rect rect, child_box, *r;
 
-	count = n = LinkedList_GetTotal( &w->dirty_rects );
+	count = LinkedList_GetTotal( &w->dirty_rects );
 	/* 取出当前记录的脏矩形 */
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &w->dirty_rects, 0 );
-		r = (LCUI_Rect*)LinkedList_Get( &w->dirty_rects );
+	LinkedList_ForEach( r, 0, &w->dirty_rects ) {
 		/* 若有独立位图缓存，则重绘脏矩形区域 */
 		if( Graph_IsValid(&w->graph) ) {
 			LCUI_PaintContextRec_ paint;
@@ -187,8 +185,8 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 			DEBUG_MSG("[%s]: merge rect:(%d,%d,%d,%d)\n", w->type_name, rect.x, rect.y, rect.width, rect.height);
 			DirtyRectList_Add( rlist, &rect );
 		}
-		LinkedList_Delete( &w->dirty_rects );
 	}
+	LinkedList_Destroy( &w->dirty_rects );
 	/* 若子级部件没有脏矩形记录 */
 	if( !w->has_dirty_child ) {
 		return count;
@@ -200,11 +198,8 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 	/* 转换有效区域的坐标，相对于当前部件的内容框 */
 	child_box.x -= w->base.box.content.x;
 	child_box.y -= w->base.box.content.y;
-	n = LinkedList_GetTotal( &w->children );
 	/* 向子级部件递归 */
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &w->children, i );
-		child = (LCUI_Widget)LinkedList_Get( &w->children );
+	LinkedList_ForEach( child, 0, &w->children ) {
 		if( !child->style.visible ) {
 			continue;
 		}
