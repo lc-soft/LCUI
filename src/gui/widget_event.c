@@ -36,6 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
+//#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/widget_build.h>
@@ -87,6 +88,8 @@ static void DestroyWidgetEventTask( void *arg )
 /** 将原始事件转换成部件事件 */
 static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 {
+	int i;
+	LinkedList *children;
 	LCUI_Widget widget;
 	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)event->data;
 
@@ -111,15 +114,13 @@ static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 		return;
 	}
 	/* 开始进行事件冒泡传播 */
-	while( widget ) {
-		int i = 0;
-		LinkedList *children;
-		
+	while( widget && widget->parent ) {
 		if( widget->parent ) {
 			children = &widget->parent->children_show;	
 		} else {
 			children = &LCUIRootWidget->children_show;
 		}
+		i = 0;
 		/* 确定自己的显示位置，忽略显示在它前面的部件 */
 		LinkedList_ForEach( widget, 0, children ) {
 			if( widget == (LCUI_Widget)LinkedList_Get(children) ) {
@@ -380,10 +381,11 @@ void LCUIWidget_StepEvent(void)
 		LinkedList_Goto( &self.pending_list, 0 );
 		widget = (LCUI_Widget)LinkedList_Get( &self.pending_list );
 		LinkedList_Delete( &self.pending_list );
-		DEBUG_MSG("dispatch event, widget: %p, is_root: %s\n", widget, widget == LCUIRootWidget ? "TURE":"FALSE");
+		DEBUG_MSG("dispatch event, widget: %p\n", widget->type);
 		LCUIEventBox_Dispatch( widget->event );
 		RBTree_CustomErase( &self.mark_tree, widget );
 	}
+	DEBUG_MSG("exit\n");
 }
 
 /** 初始化 LCUI 部件的事件系统 */

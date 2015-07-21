@@ -297,8 +297,10 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
  */
 void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
-	int i, content_left, content_top;
-	LCUI_Rect content_rect;
+	int content_left, content_top;
+	LCUI_Widget child;
+	LCUI_Rect child_rect, canvas_rect, content_rect;
+	LCUI_PaintContextRec_ child_paint;
 	LCUI_Graph content_graph, self_graph, layer_graph;
 	LCUI_BOOL has_overlay, has_content_graph = FALSE,
 		  has_self_graph = FALSE,has_layer_graph = FALSE,
@@ -370,14 +372,8 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		/* 引用该区域的位图，作为内容框的位图 */
 		Graph_Quote( &content_graph, &paint->canvas, &content_rect );
 	}
-	i = LinkedList_GetTotal( &w->children_show );
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
-	while( i-- ) {
-		LCUI_Widget child;
-		LCUI_Rect child_rect, canvas_rect;
-		LCUI_PaintContextRec_ child_paint;
-
-		child = (LCUI_Widget)LinkedList_Get( &w->children_show );
+	LinkedList_ForEach( child, 0, &w->children_show ) {
 		if( !child->style.visible ) {
 			continue;
 		}

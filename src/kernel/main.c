@@ -303,26 +303,26 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	LCUIMutex_Unlock( &MainApp.loop_changed );
 	loop->tid = LCUIThread_SelfID();
 	while( loop->state != STATE_EXITED ) {
-		if( LinkedList_GetTotal(&MainApp.task_list) <= 0 ) {
-			DEBUG_MSG("loop: %p, sleeping...\n", loop);
-			LCUICond_TimedWait( &MainApp.loop_cond, 1000 );
-			DEBUG_MSG("loop: %p, wakeup\n", loop);
-			/** 如果当前运行的主循环不是自己 */
-			if( MainApp.loop != loop ) {
-				loop->state = STATE_PAUSED;
-				DEBUG_MSG("loop: %p, release control.\n", loop);
-				LCUIMutex_Unlock( &MainApp.loop_mutex );
-				/* 等待其它线程获得主循环运行权 */
-				LCUIMutex_Lock( &MainApp.loop_changed );
-				LCUIMutex_Unlock( &MainApp.loop_changed );
-				DEBUG_MSG("loop: %p, waiting...\n", loop);
-				/* 等待其它线程释放主循环运行权 */
-				LCUIMutex_Lock( &MainApp.loop_mutex );
-			}
+		if( LinkedList_GetTotal(&MainApp.task_list) > 0 ) {
+			DEBUG_MSG("loop: %p, run task.\n", loop);
+			LCUI_RunTask();
+		}
+		DEBUG_MSG("loop: %p, sleeping...\n", loop);
+		LCUICond_TimedWait( &MainApp.loop_cond, 1000 );
+		DEBUG_MSG("loop: %p, wakeup\n", loop);
+		if( MainApp.loop == loop ) {
 			continue;
 		}
-		DEBUG_MSG("loop: %p, run task.\n", loop);
-		LCUI_RunTask();
+		/* 如果当前运行的主循环不是自己 */
+		loop->state = STATE_PAUSED;
+		DEBUG_MSG("loop: %p, release control.\n", loop);
+		LCUIMutex_Unlock( &MainApp.loop_mutex );
+		/* 等待其它线程获得主循环运行权 */
+		LCUIMutex_Lock( &MainApp.loop_changed );
+		LCUIMutex_Unlock( &MainApp.loop_changed );
+		DEBUG_MSG("loop: %p, waiting...\n", loop);
+		/* 等待其它线程释放主循环运行权 */
+		LCUIMutex_Lock( &MainApp.loop_mutex );
 	}
 	loop->state = STATE_EXITED;
 	LinkedList_Goto( &MainApp.loop_list, 0 );

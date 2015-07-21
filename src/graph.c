@@ -147,9 +147,9 @@ static void Pixels_RGBFormatToARGB( const uchar_t *in_pixels,
 	}
 }
 
-static void Pixels_Format( const uchar_t *in_pixels, int in_color_type,
-			   uchar_t *out_pixels, int out_color_type,
-			   size_t pixel_count )
+void PixelsFormat( const uchar_t *in_pixels, int in_color_type,
+		   uchar_t *out_pixels, int out_color_type,
+		   size_t pixel_count )
 {
 	switch( in_color_type ) {
 	case COLOR_TYPE_ARGB8888:
@@ -234,9 +234,9 @@ static void Graph_ARGBReplaceRGB( LCUI_Graph *des, LCUI_Rect des_rect,
 	byte_row_des += des_rect.x * des->bytes_per_pixel;
 	for( y = 0; y < des_rect.h; ++y ) {
 		/* 将前景图当前行像素转换成ARGB格式，并直接覆盖至背景图上 */
-		Pixels_Format( byte_row_src, src->color_type,
-			       byte_row_des, des->color_type,
-			       des_rect.w );
+		PixelsFormat( byte_row_src, src->color_type,
+			      byte_row_des, des->color_type,
+			      des_rect.w );
 		byte_row_src += src->bytes_per_row;
 		byte_row_des += des->bytes_per_row;
 	}

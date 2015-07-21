@@ -153,26 +153,24 @@ static inline LCUI_Color ARGB( uchar_t a, uchar_t r, uchar_t g, uchar_t b )
 	return color;
 }
 
-static inline void Graph_SetPixel( LCUI_Graph *graph, int x, int y, LCUI_Color color )
-{
-	if( graph->color_type == COLOR_TYPE_ARGB ) {
-		graph->argb[graph->w*y+x] = color;
-	} else {
-		/* 右移8位是为了去除ARGB中的alpha值 */
-		graph->bytes[(graph->w*y+x)*3] = color.value>>8;
+#define Graph_SetPixel(G, X, Y, C) 				\
+	if( (G)->color_type == COLOR_TYPE_ARGB ) {		\
+		(G)->argb[(G)->w*(Y)+(X)] = (C);		\
+	} else {						\
+		(G)->bytes[((G)->w*(Y)+(X))*3] = (C).value>>8;	\
 	}
-}
 
-static inline void Graph_SetPixelAlpha( LCUI_Graph *graph, int x, int y, uchar_t alpha )
-{
-	graph->argb[graph->w*y+x].alpha = alpha;
-}
+#define Graph_SetPixelAlpha(G, X, Y, A) (G)->argb[(G)->w*(Y)+(X)].alpha = (A)
 
 LCUI_API void Graph_PrintInfo( LCUI_Graph *graph );
 
 LCUI_API void Graph_Init( LCUI_Graph *graph );
 
 LCUI_API LCUI_Graph *Graph_New(void);
+
+LCUI_API void PixelsFormat( const uchar_t *in_pixels, int in_color_type,
+		   	    uchar_t *out_pixels, int out_color_type,
+		   	    size_t pixel_count );
 
 /** 改变色彩类型 */
 LCUI_API int Graph_ChangeColorType( LCUI_Graph *graph, int color_type );
@@ -192,26 +190,18 @@ LCUI_API void Graph_Free( LCUI_Graph *graph );
 LCUI_API int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect );
 
 /** 判断图像是否有Alpha透明通道 */
-static inline LCUI_BOOL Graph_HasAlpha( const LCUI_Graph *graph )
-{
-	return graph->quote.is_valid ? (
-		graph->quote.source->color_type == COLOR_TYPE_ARGB
-	) : graph->color_type == COLOR_TYPE_ARGB;
-}
+#define Graph_HasAlpha(G) 						\
+	((G)->quote.is_valid ? (					\
+		(G)->quote.source->color_type == COLOR_TYPE_ARGB	\
+	) : ((G)->color_type == COLOR_TYPE_ARGB))
 
 /** 判断图像是否有效 */
-static inline LCUI_BOOL Graph_IsValid( const LCUI_Graph *graph )
-{
-	return graph->quote.is_valid ? (graph->quote.source
-	 && graph->quote.source->w > 0 && graph->quote.source->h > 0
-	) : (graph && graph->bytes && graph->h > 0 && graph->w > 0);
-}
+#define Graph_IsValid(G)						\
+	((G)->quote.is_valid ? ((G)->quote.source			\
+	 && (G)->quote.source->w > 0 && (G)->quote.source->h > 0	\
+	) : ((G) && (G)->bytes && (G)->h > 0 && (G)->w > 0))
 
-static inline void Graph_GetSize( const LCUI_Graph *graph, LCUI_Size *size )
-{
-	size->w = graph->w;
-	size->h = graph->h;
-}
+#define Graph_GetSize(G, S) ((S)->w = (G)->w, (S)->h = (G)->h)
 
 LCUI_API void Graph_GetValidRect( const LCUI_Graph *graph, LCUI_Rect *rect );
 
@@ -243,39 +233,10 @@ LCUI_API int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha );
 LCUI_API int Graph_Tile( LCUI_Graph *buff,  const LCUI_Graph *graph,
 			 LCUI_BOOL replace );
 
-LCUI_API int Graph_Mix(	LCUI_Graph *bg, const LCUI_Graph *fg, LCUI_Pos pos );
+LCUI_API int Graph_Mix( LCUI_Graph *bg, const LCUI_Graph *fg, LCUI_Pos pos );
 
 LCUI_API int Graph_Replace( LCUI_Graph *bg,  const LCUI_Graph *fg,
 			    LCUI_Pos pos );
-
-LCUI_API int Graph_PutImage( LCUI_Graph *graph, LCUI_Graph *image, int align, LCUI_BOOL replace );
-
-
-/** 填充图像
- * @param graph		目标图像
- * @param backimg	要填充的背景图
- * @param layout	背景图的布局
- * @param area		需要绘制的区域
- */
-LCUI_API int Graph_FillImageEx( LCUI_Graph *graph, const LCUI_Graph *backimg,
-				int layout, LCUI_Rect area );
-
-/** 填充图像和背景色
- * @param graph		目标图像
- * @param backimg	背景图
- * @param layout	背景图的布局
- * @param color		背景色
- * @param area		需要绘制的区域
- */
-LCUI_API int Graph_FillImageWithColorEx( LCUI_Graph *graph,
-					const LCUI_Graph *backimg, int layout,
-					LCUI_Color color, LCUI_Rect area );
-
-LCUI_API int Graph_FillImage( LCUI_Graph *graph, const LCUI_Graph *backimg,
-				int layout );
-
-LCUI_API int Graph_FillImageWithColor( LCUI_Graph *graph,
-		const LCUI_Graph *backimg, int layout, LCUI_Color color );
 
 LCUI_END_HEADER
 

@@ -198,6 +198,9 @@ LCUI_PaintContext LinuxFB_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 	paint = (LCUI_PaintContext)malloc(sizeof(LCUI_PaintContextRec_));
 	Graph_Init( &paint->canvas );
 	Graph_Create( &paint->canvas, rect->w, rect->h );
+	paint->rect = *rect;
+	_DEBUG_MSG("canvas: %p, rect: %d,%d,%d,%d\n", 
+		&paint->canvas, rect->x, rect->y, rect->w, rect->h);
 	return paint;
 }
 
@@ -208,15 +211,26 @@ LCUI_PaintContext LinuxFB_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
  */
 static void LinuxFB_PutGraph32( LCUI_Rect rect, LCUI_Graph *canvas )
 {
-	int y, line_bytes;
-	uchar_t *pixel_line;
+	int y, des_row_bytes;
+	uchar_t *des_row, *src_row;
+	LCUI_Rect read_rect;
 
-	line_bytes = linuxfb.screen_size.w*4;
-	pixel_line = linuxfb.mem + rect.y*linuxfb.screen_size.w + rect.x;
+	des_row_bytes = linuxfb.screen_size.w*4;
+	des_row = linuxfb.mem + rect.y*des_row_bytes + rect.x*4;
+	Graph_GetValidRect( canvas, &read_rect );
+	if( read_rect.width <= 0 || read_rect.height <= 0 ) {
+		return;
+	}
+	canvas = Graph_GetQuote( canvas );
+	src_row = canvas->bytes + read_rect.y*canvas->bytes_per_row;
+	src_row += read_rect.x * canvas->bytes_per_pixel;
 	for( y=0; y<canvas->h; ++y ) {
-		/* 都是BRGA格式，直接填充 */
-		memcpy( pixel_line, canvas->bytes, line_bytes );
-		pixel_line += line_bytes;
+		/* 将当前行像素转换成ARGB格式，并直接覆盖至帧缓存中 */
+		PixelsFormat( src_row, canvas->color_type,
+			      des_row, COLOR_TYPE_ARGB,
+			      canvas->w );
+		des_row += des_row_bytes;
+		src_row += canvas->bytes_per_row;
 	}
 }
 
@@ -354,6 +368,7 @@ void LinuxFB_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 		Graph_Quote( &canvas, &paint_ctx->canvas, NULL );
 	}
 
+	_DEBUG_MSG("linuxfb.bits_per_pixel: %d\n", linuxfb.bits_per_pixel);
 	switch( linuxfb.bits_per_pixel ) {
 	    case 32:
 		LinuxFB_PutGraph32( paint_ctx->rect, &canvas );
@@ -371,6 +386,7 @@ void LinuxFB_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 	}
 	Graph_Free( &canvas );
 	free( paint_ctx );
+	_DEBUG_MSG("%d,%d,%d,%d\n", paint_ctx->rect.x, paint_ctx->rect.y, paint_ctx->rect.w, paint_ctx->rect.h);
 }
 
 static void LinuxFB_Present( LCUI_Surface surface )
@@ -410,6 +426,7 @@ LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info )
 		ioctl( linuxfb.dev_fd, FBIOGETCMAP, &oldcmap );
 	}
 	nobuff_printf("[linuxfb] mapping framebuffer...");
+	linuxfb.bits_per_pixel = fb_vinfo.bits_per_pixel;
 	linuxfb.mem_len = fb_fix.smem_len;
 	/* 映射帧缓存至内存空间 */
 	linuxfb.mem = mmap( NULL, fb_fix.smem_len,

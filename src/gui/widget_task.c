@@ -44,6 +44,7 @@
  * 件数据只保留第一个，后面添加的任务数据都会被忽略，不会覆盖掉。
  */
 
+//#define DEBUG
 #define __IN_WIDGET_TASK_SOURCE_FILE__
 
 #include <LCUI_Build.h>
@@ -70,6 +71,7 @@ static void HandleTopLevelWidgetEvent( LCUI_Widget w, int event_type )
 		n = (int*)&event_type;
 		e.type_name = "TopLevelWidget";
 		e.target = w;
+		_DEBUG_MSG("widget: %s, post event: %d\n", w->type,event_type );
 		Widget_PostEvent( LCUIRootWidget, &e, *((int**)n) );
 	}
 }
@@ -266,6 +268,7 @@ static void HandlePosition( LCUI_Widget w )
 
 static void HandleSetTitle( LCUI_Widget w )
 {
+	_DEBUG_MSG("widget: %s\n", w->type);
 	HandleTopLevelWidgetEvent( w, WET_TITLE );
 }
 
@@ -456,7 +459,7 @@ void Widget_AddTask( LCUI_Widget widget, int task_type )
 	buffer[task_type] = TRUE;
 	widget->task->for_self = TRUE;
 	DEBUG_MSG("widget: %p, parent_is_root: %d, for_childen: %d, task_id: %d\n",
-	widget, widget->parent == LCUIRootWidget, widget->task->for_children, data->type);
+	widget, widget->parent == LCUIRootWidget, widget->task->for_children, task_type);
 	widget = widget->parent;
 	/* 向没有标记的父级部件添加标记 */
 	while( widget && !widget->task->for_children ) {
@@ -553,11 +556,11 @@ static int Widget_ProcTask( LCUI_Widget w )
 			wc->task_handler( w );
 		}
 		for( i=0; i<WTT_USER; ++i ) {
-			DEBUG_MSG( "task_id: %d, is_valid: %d\n", i, buffer[i].is_valid );
+			DEBUG_MSG( "task_id: %d, is_valid: %d\n", i, buffer[i] );
 			if( buffer[i] && task_handlers[i] ) {
-				buffer[i] = FALSE;
 				task_handlers[i]( w );
 			}
+			buffer[i] = FALSE;
 		}
 		/* 只留了一个位置用于存放用户自定义任务，以后真有需求再改吧 */
 		LCUIMutex_Unlock( &w->mutex );

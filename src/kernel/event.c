@@ -357,11 +357,12 @@ int $(Dispatch)( LCUI_EventBox box )
 	LinkedList_Goto( elist, 0 );
 	DEBUG_MSG("event total: %d\n", n);
 	for( i=0; i<n; ++i ) {
+		LinkedList_Goto( elist, 0 );
 		e = (LCUI_Event*)LinkedList_Get( elist );
+		DEBUG_MSG("send, name = %s\n", e->name);
 		$(Send)( box, e->name, e->data );
 		e->destroy_data ? e->destroy_data( e->data ):0;
 		e->data = NULL;
-		LinkedList_Goto( elist, 0 );
 		LinkedList_Delete( elist );
 	}
 	DEBUG_MSG("quit\n");

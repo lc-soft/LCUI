@@ -37,7 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-//#define DEBUG
+#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -82,19 +82,14 @@ int LCUIDisplay_GetFPS(void)
 /** 更新各种图形元素的显示 */
 static void LCUIDisplay_Update(void)
 {
-	int i, n, j, m;
 	LCUI_Rect *p_rect;
 	SurfaceRecord *p_sr;
 	LCUI_DirtyRectList rlist;
 	LCUI_PaintContext paint;
 
 	DirtyRectList_Init( &rlist );
-	n = LinkedList_GetTotal( &display.surfaces );
 	/* 遍历当前的 surface 记录列表 */
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &display.surfaces, i );
-		p_sr = (SurfaceRecord*)
-		LinkedList_Get( &display.surfaces );
+	LinkedList_ForEach( p_sr, 0, &display.surfaces ) {
 		if( !p_sr->widget || !p_sr->surface
 		 || !Surface_IsReady(p_sr->surface) ) {
 			continue;
@@ -103,21 +98,19 @@ static void LCUIDisplay_Update(void)
 		Surface_Update( p_sr->surface );
 		/* 收集无效区域记录 */
 		Widget_ProcInvalidArea( p_sr->widget, &rlist );
-		m = LinkedList_GetTotal( &rlist );
-		DEBUG_MSG("proc invalid area, m = %d\n", m);
-		LinkedList_Goto( &rlist, 0 );
 		/* 在 surface 上逐个重绘无效区域 */
-		for( j=0; j<m; ++j ) {
-			p_rect = (LCUI_Rect*)LinkedList_Get( &rlist );
+		LinkedList_ForEach( p_rect, 0, &rlist ) {
 			paint = Surface_BeginPaint( p_sr->surface, p_rect );
-			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d), %d\n", p_sr->widget->type, paint->rect.left, paint->rect.top, paint->rect.w, paint->rect.h, j );
+			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
+				p_sr->widget->type, paint->rect.left,
+				paint->rect.top, paint->rect.w, paint->rect.h );
 			Widget_Render( p_sr->widget, paint );
 			Surface_EndPaint( p_sr->surface, paint );
-			LinkedList_Delete( &rlist );
 		}
-		if( m > 0 ) {
+		if( LinkedList_GetTotal( &rlist ) > 0 ) {
 			Surface_Present( p_sr->surface );
 		}
+		LinkedList_Destroy( &rlist );
 	}
 
 	LinkedList_Destroy( &rlist );
@@ -143,14 +136,8 @@ LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
 
 static LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
 {
-	int i, n;
 	SurfaceRecord *p_sr;
-
-	n = LinkedList_GetTotal( &display.surfaces );
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &display.surfaces, i );
-		p_sr = (SurfaceRecord*)
-		LinkedList_Get( &display.surfaces );
+    LinkedList_ForEach( p_sr, 0, &display.surfaces ) {
 		if( p_sr->widget == widget ) {
 			return p_sr->surface;
 		}
@@ -189,18 +176,12 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 /** 解除 widget 与 sruface 的绑定 */
 static void LCUIDisplay_UnbindSurface( LCUI_Widget widget )
 {
-	int i, n;
 	SurfaceRecord *p_sr;
-
-	n = LinkedList_GetTotal( &display.surfaces );
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &display.surfaces, i );
-		p_sr = (SurfaceRecord*)
-		LinkedList_Get( &display.surfaces );
+    LinkedList_ForEach( p_sr, 0, &display.surfaces ) {
 		if( p_sr->widget != widget ) {
 			continue;
 		}
-		Surface_Delete( p_sr->surface  );
+		Surface_Delete( p_sr->surface );
 		LinkedList_Delete( &display.surfaces );
 		break;
 	}
@@ -258,7 +239,6 @@ static int LCUIDisplay_FullScreen( void )
 
 static int LCUIDisplay_Seamless( void )
 {
-	int i, n;
 	LCUI_Widget widget;
 	DEBUG_MSG("display.mode: %d\n", display.mode);
 	switch( display.mode ) {
@@ -270,11 +250,7 @@ static int LCUIDisplay_Seamless( void )
 		LCUIDisplay_CleanSurfaces();
 		break;
 	}
-	n = LinkedList_GetTotal( &LCUIRootWidget->children );
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &LCUIRootWidget->children, i );
-		widget = (LCUI_Widget)
-		LinkedList_Get( &LCUIRootWidget->children );
+    LinkedList_ForEach( widget, 0, &LCUIRootWidget->children ) {
 		LCUIDisplay_BindSurface( widget );
 	}
 	display.mode = LDM_SEAMLESS;
@@ -357,8 +333,14 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 	int e_type = *((int*)&arg);
 	LCUI_Surface surface;
 	LCUI_Rect *p_rect;
-
-	DEBUG_MSG("tip, e_type = %d\n", e_type);
+	static int count = 0;
+	DEBUG_MSG("tip, widget: %s, e_type = %d\n", w->type, e_type);
+	if( e_type == 20 ) {
+		++count;
+		if( count > 12 ) {
+			abort();
+		}
+	}
 	surface = LCUIDisplay_GetBindSurface( e->target );
 	if( display.mode == LDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
@@ -387,7 +369,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 		Surface_Hide( surface );
 		break;
 	case WET_TITLE:
-		//_DEBUG_MSG("%S\n", e->target->title );
+		_DEBUG_MSG("%S\n", e->target->title );
 		Surface_SetCaptionW( surface, e->target->title );
 		break;
 	case WET_RESIZE:
@@ -424,19 +406,12 @@ static void OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
 /** 在 surface 主动产生无效区域的时候 */
 static void OnInvalidRect( LCUI_Surface surface, LCUI_Rect *rect )
 {
-	int i, n;
 	SurfaceRecord *p_sr;
-
-	n = LinkedList_GetTotal( &display.surfaces );
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &display.surfaces, i );
-		p_sr = (SurfaceRecord*)
-		LinkedList_Get( &display.surfaces );
+	LinkedList_ForEach( p_sr, 0, &display.surfaces ) {
 		if( p_sr->surface != surface ) {
 			continue;
 		}
 		Widget_InvalidateArea( p_sr->widget, rect, SV_GRAPH_BOX );
-		continue;
 	}
 }
 
