@@ -60,47 +60,39 @@ int LCUICond_Init( LCUI_Cond *cond )
 }
 
 /** 销毁一个条件变量 */
-void LCUICond_Destroy( LCUI_Cond *cond )
+int LCUICond_Destroy( LCUI_Cond *cond )
 {
 	CloseHandle(cond);
+	return 0;
 }
 
 /** 阻塞当前线程，等待条件成立 */
-unsigned int LCUICond_Wait( LCUI_Cond *cond )
+int LCUICond_Wait( LCUI_Cond *cond, LCUI_Mutex *mutex )
 {
-	int ret;
-	int64_t lost_time;
-
-	lost_time = LCUI_GetTickCount();
-	ret = WaitForSingleObject( *cond, INFINITE );
-	lost_time = LCUI_GetTicks( lost_time );
-	/* 暂不对返回值进行处理 */
+	int ret = WaitForSingleObject( *cond, INFINITE );
 	switch( ret ) {
-	case WAIT_TIMEOUT:
-	case WAIT_OBJECT_0:
-	case WAIT_FAILED:
+	case WAIT_OBJECT_0: 
+		LCUIMutex_Lock( mutex );
+		return 0;
+	case WAIT_FAILED: return -1;
+	case WAIT_TIMEOUT: break;
 	default: break;
 	}
-	return (unsigned int)lost_time;
+	return 0;
 }
 
 /** 计时阻塞当前线程，等待条件成立 */
-unsigned int LCUICond_TimedWait( LCUI_Cond *cond, unsigned int ms )
+int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms )
 {
-	int ret;
-	int64_t lost_time;
-
-	lost_time = LCUI_GetTickCount();
-	ret = WaitForSingleObject( *cond, ms );
-	lost_time = LCUI_GetTicks( lost_time );
-
-	switch( ret ) {
+	switch(  WaitForSingleObject( *cond, ms ) ) {
+	case WAIT_OBJECT_0: 
+		LCUIMutex_Lock( mutex );
+		return 0;
+	case WAIT_FAILED: return -1;
 	case WAIT_TIMEOUT:
-	case WAIT_OBJECT_0:
-	case WAIT_FAILED:
 	default: break;
 	}
-	return (unsigned int)lost_time;
+	return 1;
 }
 
 /** 唤醒所有阻塞等待条件成立的线程 */

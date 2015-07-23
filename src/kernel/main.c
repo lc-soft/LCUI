@@ -36,7 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
-//#define DEBUG
+#define DEBUG
 #define __IN_MAIN_SOURCE_FILE__
 
 #include <LCUI_Build.h>
@@ -84,6 +84,7 @@ static struct LCUI_System {
 		LCUI_BOOL is_running;	/**< 是否处于运行状态 */
 		LCUI_EventBox box;	/**< 系统事件容器 */
 		LCUI_Cond cond;		/**< 条件变量 */
+		LCUI_Mutex mutex;	/**< 互斥锁 */
 		LCUI_Thread tid;	/**< 线程ID */
 	} event;
 
@@ -94,14 +95,12 @@ static struct LCUI_System {
 /** LCUI 应用程序数据 */
 static struct LCUI_App {
 	LinkedList task_list;		/**< 程序的任务队列 */
-	LCUI_Mutex task_run_mutex;	/**< 任务互斥锁，当运行程序任务时会锁上 */
 	LCUI_Mutex task_list_mutex;	/**< 任务记录互斥锁 */
 	LCUI_Mutex loop_mutex;		/**< 互斥锁，确保一次只允许一个线程跑主循环 */
 	LCUI_Mutex loop_changed;	/**< 互斥锁，用于指示当前运行的主循环是否改变 */
 	LCUI_Cond loop_cond;		/**< 条件变量，用于决定是否继续任务循环 */
 	LCUI_MainLoop loop;		/**< 当前运行的主循环 */
 	LinkedList loop_list;		/**< 主循环列表 */
-	LCUI_Cond loop_list_empty;	/**< 条件变量，当主循环列表为空时条件成立 */
 } MainApp;
 
 /*-------------------------- system event <START> ---------------------------*/
@@ -114,9 +113,10 @@ static void SystemEventThread(void *arg)
 	System.event.is_running = TRUE;
 	while( System.event.is_running ) {
 		DEBUG_MSG("waiting event...\n");
-		LCUICond_Wait( &System.event.cond );
+		LCUICond_Wait( &System.event.cond, &System.event.mutex );
 		DEBUG_MSG("get event.\n");
 		LCUIEventBox_Dispatch( System.event.box );
+		LCUIMutex_Unlock( &System.event.mutex );
 	}
 }
 
@@ -124,6 +124,7 @@ static void SystemEventThread(void *arg)
 static void LCUI_InitEvent(void)
 {
 	LCUICond_Init( &System.event.cond );
+	LCUIMutex_Init( &System.event.mutex );
 	System.event.box = LCUIEventBox_Create();
 	LCUIThread_Create( &System.event.tid, SystemEventThread, NULL );
 }
@@ -231,55 +232,8 @@ LCUI_MainLoop LCUI_MainLoop_New( void )
 	LCUI_MainLoop loop;
 	loop = (LCUI_MainLoop)malloc(sizeof(struct LCUI_MainLoopRec_));
 	loop->state = STATE_PAUSED;
+	loop->tid = 0;
 	return loop;
-}
-
-static int LCUI_RunTask(void)
-{
-	LCUI_Task *task, task_bak;
-	LCUIMutex_Lock( &MainApp.task_run_mutex );
-	LCUIMutex_Lock( &MainApp.task_list_mutex );
-	task = (LCUI_Task*)LinkedList_Get( &MainApp.task_list );
-	if( !task ) {
-		LCUIMutex_Unlock( &MainApp.task_list_mutex );
-		LCUIMutex_Unlock( &MainApp.task_run_mutex );
-		return -1;
-	}
-	if( !task->func ) {
-		LinkedList_Delete( &MainApp.task_list );
-		LCUIMutex_Unlock( &MainApp.task_list_mutex );
-		LCUIMutex_Unlock( &MainApp.task_run_mutex );
-		return -2;
-	}
-	/* 备份该任务数据 */
-	task_bak = *task;
-	/* 重置数据 */
-	task->func = NULL;
-	task->arg[0] = NULL;
-	task->arg[1] = NULL;
-	task->destroy_arg[0] = FALSE;
-	task->destroy_arg[1] = FALSE;
-	/* 删除之 */
-	LinkedList_Delete( &MainApp.task_list );
-	/* 解锁，现在的任务数据已经与任务列表独立开了 */
-	LCUIMutex_Unlock( &MainApp.task_list_mutex );
-	/* 调用函数指针指向的函数，并传递参数 */
-	task_bak.func( task_bak.arg[0], task_bak.arg[1] );
-	/* 若需要在调用回调函数后销毁参数 */
-	if( task_bak.destroy_arg[0] && task_bak.arg[0] ) {
-		if( task_bak.destroy_func[0] ) {
-			task_bak.destroy_func[0]( task_bak.arg[0] );
-		}
-		free( task_bak.arg[0] );
-	}
-	if( task_bak.destroy_arg[1] && task_bak.arg[1] ) {
-		if( task_bak.destroy_func[1] ) {
-			task_bak.destroy_func[1]( task_bak.arg[1] );
-		}
-		free( task_bak.arg[1] );
-	}
-	LCUIMutex_Unlock( &MainApp.task_run_mutex );
-	return 0;
 }
 
 /** 运行目标主循环 */
@@ -303,14 +257,26 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	LCUIMutex_Unlock( &MainApp.loop_changed );
 	loop->tid = LCUIThread_SelfID();
 	while( loop->state != STATE_EXITED ) {
-		if( LinkedList_GetTotal(&MainApp.task_list) > 0 ) {
-			DEBUG_MSG("loop: %p, run task.\n", loop);
-			LCUI_RunTask();
-			continue;
-		}
+		int64_t ct;		
+		LCUI_Task *task;
 		DEBUG_MSG("loop: %p, sleeping...\n", loop);
-		LCUICond_TimedWait( &MainApp.loop_cond, 1000 );
-		DEBUG_MSG("loop: %p, wakeup\n", loop);
+		ct = LCUI_GetTickCount();
+		LCUICond_Wait( &MainApp.loop_cond, &MainApp.task_list_mutex );
+		ct = LCUI_GetTicks(ct);
+		DEBUG_MSG("loop: %p, wakeup, lost_time: %ld\n", loop, ct);
+		if( ct > 50 ) {
+			DEBUG_MSG("timeout!\n");
+		}
+		LinkedList_ForEach( task, 0, &MainApp.task_list ) {
+			if( !task || !task->func ) {
+				return -1;
+			}
+			DEBUG_MSG("task: %p, start\n", task);
+			task->func( task->arg[0], task->arg[1] );
+			DEBUG_MSG("task: %p, end\n", task);
+		}
+		LinkedList_Destroy( &MainApp.task_list );
+		LCUIMutex_Unlock( &MainApp.task_list_mutex );
 		if( MainApp.loop == loop ) {
 			continue;
 		}
@@ -337,11 +303,6 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	}
 	/* 释放运行权 */
 	LCUIMutex_Unlock( &MainApp.loop_mutex );
-	/* 如果列表为空，一般意味着LCUI需要退出了 */
-	if( LinkedList_GetTotal( &MainApp.loop_list ) <= 0 ) {
-		/** 广播，通知相关线程开始进行清理操作 */
-		LCUICond_Broadcast( &MainApp.loop_list_empty );
-	}
 	DEBUG_MSG("loop: %p, exit\n", loop);
 	return 0;
 }
@@ -370,53 +331,19 @@ static void DestroyTask( void *arg )
 	}
 }
 
-/** 锁住任务的运行 */
-void LCUI_LockRunTask(void)
-{
-	LCUIMutex_Lock( &MainApp.task_run_mutex );
-}
-
-/** 解锁任务的运行 */
-void LCUI_UnlockRunTask(void)
-{
-	LCUIMutex_Unlock( &MainApp.task_run_mutex );
-}
-
 /** 添加任务 */
 int LCUI_AddTask( LCUI_Task *task )
 {
-	LCUIMutex_Lock( &MainApp.task_list_mutex );
-	if( !LinkedList_AppendCopy( &MainApp.task_list, task ) ) {
-		LCUIMutex_Unlock( &MainApp.task_list_mutex );
-		return -2;
+	void *res;
+	if( LCUI_IsOnMainLoop() ) {
+		res = LinkedList_AppendCopy( &MainApp.task_list, task );
+		return res ? 0:-1;
 	}
+	LCUIMutex_Lock( &MainApp.task_list_mutex );
+	res = LinkedList_AppendCopy( &MainApp.task_list, task );
 	LCUIMutex_Unlock( &MainApp.task_list_mutex );
 	LCUICond_Broadcast( &MainApp.loop_cond );
-	return 0;
-}
-
-/** 从程序任务队列中删除有指定回调函数的任务 */
-int LCUI_RemoveTask( CallBackFunc task_func, LCUI_BOOL need_lock )
-{
-	int n;
-	LCUI_Task *exist_task;
-
-	if( need_lock ) {
-		LCUIMutex_Lock( &MainApp.task_list_mutex );
-	}
-	n = LinkedList_GetTotal( &MainApp.task_list );
-	for ( ; n>0; --n ) {
-		exist_task = (LCUI_Task*)LinkedList_Get( &MainApp.task_list );
-		if( exist_task && exist_task->func == task_func ) {
-			LinkedList_Delete( &MainApp.task_list );
-		} else {
-			LinkedList_ToNext( &MainApp.task_list );
-		}
-	}
-	if( need_lock ) {
-		LCUIMutex_Unlock( &MainApp.task_list_mutex );
-	}
-	return n;
+	return res ? 0:-1;
 }
 
 /** 初始化程序数据结构体 */
@@ -428,7 +355,6 @@ static void LCUIApp_Init(void)
 	LinkedList_Init( &MainApp.loop_list, sizeof(LCUI_MainLoop));
 	LinkedList_SetDataNeedFree( &MainApp.loop_list, FALSE );
 
-	LCUIMutex_Init( &MainApp.task_run_mutex );
 	LCUIMutex_Init( &MainApp.task_list_mutex );
 	LinkedList_Init( &MainApp.task_list, sizeof(LCUI_Task) );
 	LinkedList_SetDestroyFunc( &MainApp.task_list, DestroyTask );
@@ -454,16 +380,15 @@ static void LCUIApp_QuitAllMainLoop(void)
 /* 销毁程序占用的资源 */
 static void LCUIApp_Destroy(void)
 {
-	if( LinkedList_GetTotal(&MainApp.loop_list) > 0 ) {
-		/* 等待其它线程上的主循环都完全退出 */
-		LCUICond_Wait( &MainApp.loop_list_empty );
+	LCUI_MainLoop loop;
+	LinkedList_ForEach( loop, 0, &MainApp.loop_list ) {
+		LCUI_MainLoop_Quit( loop );
+		LCUIThread_Join( loop->tid, NULL );
 	}
 	/* 开始清理 */
-	LCUICond_Destroy( &MainApp.loop_list_empty );
 	LCUICond_Destroy( &MainApp.loop_cond );
 	LCUIMutex_Destroy( &MainApp.loop_mutex );
 	LCUIMutex_Destroy( &MainApp.loop_changed );
-	LCUIMutex_Destroy( &MainApp.task_run_mutex );
 	LCUIMutex_Destroy( &MainApp.task_list_mutex );
 	LinkedList_Destroy( &MainApp.loop_list );
 }

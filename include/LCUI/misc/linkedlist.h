@@ -88,7 +88,7 @@ struct LinkedListRec_ {
 				(list)->current_node = (list)->current_node->next):NULL)
 
 #define LinkedList_ForEach(elem, pos, list) \
-	for( LinkedList_Goto(list, pos) == 0 ? elem = LinkedList_Get(list):NULL; \
+	for( elem = LinkedList_Goto(list, pos) == 0 ? LinkedList_Get(list):NULL; \
 		!LinkedList_IsAtEnd(list); LinkedList_ToNext(list) ? elem = LinkedList_Get(list):0)
 
 /** 初始化链表 */

@@ -54,6 +54,7 @@ struct FrameControlContext {
 	int state;
 	LCUI_Cond wait_continue;
 	LCUI_Cond wait_pause;
+	LCUI_Mutex mutex;
 	unsigned int temp_fps;
 	unsigned int current_fps;
 	unsigned int one_frame_remain_time;
@@ -75,6 +76,7 @@ FrameCtrlCtx FrameControl_Create( void )
 	ctx->prev_fps_update_time = LCUI_GetTickCount();
 	LCUICond_Init( &ctx->wait_continue );
 	LCUICond_Init( &ctx->wait_pause );
+	LCUIMutex_Init( &ctx->mutex );
 	return ctx;
 }
 
@@ -83,6 +85,7 @@ void FrameControl_Destroy( FrameCtrlCtx ctx )
 {
 	LCUICond_Destroy( &ctx->wait_continue );
 	LCUICond_Destroy( &ctx->wait_pause );
+	LCUIMutex_Destroy( &ctx->mutex );
 	free( ctx );
 }
 
@@ -101,13 +104,13 @@ int FrameControl_GetFPS( FrameCtrlCtx ctx )
 /** 让当前帧停留一定时间 */
 void FrameControl_Remain( FrameCtrlCtx ctx )
 {
+	int ret = 0;
 	unsigned int n_ms, lost_ms;
 	int64_t current_time;
 
 	if( ctx->state == FRAME_CTRL_STATE_QUIT ) {
 		return;
 	}
-
 	current_time = LCUI_GetTickCount();
 	n_ms = (int)(current_time - ctx->prev_frame_start_time);
 	if( n_ms > ctx->one_frame_remain_time ) {
@@ -117,16 +120,24 @@ void FrameControl_Remain( FrameCtrlCtx ctx )
 	if( n_ms < 1 ) {
 		goto normal_exit;
 	}
-	/** 进行睡眠，直到需要暂停为止 */
-	LCUICond_TimedWait( &ctx->wait_pause, n_ms );
-	/** 睡眠结束后，如果当前状态不为PAUSE，则说明睡眠不是因为要暂停而终止的 */
+	/* 进行睡眠，直到需要暂停为止 */
+	ret = LCUICond_TimedWait( &ctx->wait_pause, &ctx->mutex, n_ms );
+	if( ret == 0 ) {
+		LCUIMutex_Unlock( &ctx->mutex );
+	}
+	/* 睡眠结束后，如果当前状态不为PAUSE，则说明睡眠不是因为要暂停而终止的 */
 	if( ctx->state != FRAME_CTRL_STATE_PAUSE ) {
 		goto normal_exit;
 	}
-	/** 需要暂停，进行睡眠，直到需要继续为止 */
-	lost_ms = LCUICond_Wait( &ctx->wait_continue );
+	current_time = LCUI_GetTickCount();
+	/* 需要暂停，进行睡眠，直到需要继续为止 */
+	ret = LCUICond_Wait( &ctx->wait_continue, &ctx->mutex );
+	lost_ms = (unsigned int)LCUI_GetTicks( current_time );
 	ctx->pause_time = lost_ms;
 	ctx->prev_frame_start_time += lost_ms;
+	if( ret == 0 ) {
+		LCUIMutex_Unlock( &ctx->mutex );
+	}
 	return;
 
 normal_exit:;
@@ -144,11 +155,16 @@ normal_exit:;
 void FrameControl_Pause( FrameCtrlCtx ctx, LCUI_BOOL need_pause )
 {
 	if( ctx->state == FRAME_CTRL_STATE_RUN && need_pause ) {
-		LCUICond_Broadcast( &ctx->wait_pause );
+		LCUIMutex_Lock( &ctx->mutex );
 		ctx->state = FRAME_CTRL_STATE_PAUSE;
+		LCUIMutex_Unlock( &ctx->mutex );
+		LCUICond_Broadcast( &ctx->wait_pause );
 	}
 	else if( ctx->state == FRAME_CTRL_STATE_PAUSE && !need_pause ){
-		LCUICond_Broadcast( &ctx->wait_continue );
+		LCUIMutex_Lock( &ctx->mutex );
 		ctx->state = FRAME_CTRL_STATE_RUN;
+		LCUIMutex_Unlock( &ctx->mutex );
+		LCUICond_Broadcast( &ctx->wait_continue );
 	}
 }
+

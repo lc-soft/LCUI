@@ -37,7 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
-//#define DEBUG
+#define DEBUG
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -143,28 +143,27 @@ int64_t LCUI_GetTicks( int64_t start_ticks )
 /** 更新定时器在定时器列表中的位置 */
 static void TimerList_UpdateTimerPos( TimerData *timer )
 {
-	int n, src_i=-1, des_i=-1;
+	int i = 0, src_i=-1, des_i=-1;
 	int64_t time_left, tmp_time_left;
 	TimerData *tmp_timer;
+
 	/* 计算该定时器的剩余定时时长 */
 	time_left = LCUI_GetTicks( timer->start_time );
 	time_left -= timer->pause_ms;
 	time_left = timer->total_ms - time_left;
-	/* 锁上定时器列表 */
-	LCUIMutex_Lock( &self.mutex );
-	n = LinkedList_GetTotal( &self.timer_list );
-	for(; --n >= 0; LinkedList_ToNext(&self.timer_list) ) {
-		tmp_timer = (TimerData*)LinkedList_Get( &self.timer_list );
+	LinkedList_ForEach( tmp_timer, 0, &self.timer_list ) {
 		if( !tmp_timer ) {
+			++i;
 			continue;
 		}
 		/* 若找到自己的位置，则记录 */
 		if( tmp_timer->id == timer->id ) {
-			src_i = n;
+			src_i = i;
 			/* 如果已经找到目标位置，则退出循环 */
 			if( des_i != -1 ) {
 				break;
 			}
+			++i;
 			continue;
 		}
 		tmp_time_left = LCUI_GetTicks( tmp_timer->start_time );
@@ -172,15 +171,16 @@ static void TimerList_UpdateTimerPos( TimerData *timer )
 		tmp_time_left = tmp_timer->total_ms - tmp_time_left;
 		/* 若该定时器的剩余定时时长不大于当前定时器，则记录 */
 		if( des_i == -1 && time_left >= tmp_time_left ) {
-			DEBUG_MSG("src timer: %d, pos: %d, , cur_ms: %I64dms, des timer: %d, pos: %d, cur_ms: %I64dms\n",
+			DEBUG_MSG("src timer: %ld, pos: %d, cur_ms: %ldms, des timer: %ld, pos: %d, cur_ms: %ldms\n",
 				timer->id, src_i, LCUI_GetTicks(timer->start_time), 
 				tmp_timer->id, des_i, LCUI_GetTicks(tmp_timer->start_time) );
-			des_i = n;
+			des_i = i;
 			/* 如果已经找到源位置，则退出循环 */
 			if( src_i != -1 ) {
 				break;
 			}
 		}
+		++i;
 	}
 	/* 若目标位置无效，则将末尾作为目标位置 */
 	if( des_i == -1 ) {
@@ -193,7 +193,6 @@ static void TimerList_UpdateTimerPos( TimerData *timer )
 		LinkedList_Goto( &self.timer_list, src_i );
 		LinkedList_MoveTo( &self.timer_list, des_i );
 	}
-	LCUIMutex_Unlock( &self.mutex );
 }
 
 //#define DEBUG_TIMER
@@ -201,13 +200,11 @@ static void TimerList_UpdateTimerPos( TimerData *timer )
 /** 打印列表中的定时器信息 */
 static void TimerList_Print( void )
 {
-	int i, n;
+	int i;
 	TimerData *timer;
 
-	n = LinkedList_GetTotal( &self.timer_list );
 	_DEBUG_MSG("timer list(%d) start:\n", n);
-	for( i=0; i<n; ++i, LinkedList_ToNext(&self.timer_list) ) {
-		timer = (TimerData*)LinkedList_Get( &self.timer_list );
+	LinkedList_ForEach( timer, 0, &self.timer_list ) {
 		if( !timer ) {
 			continue;
 		}
@@ -217,30 +214,18 @@ static void TimerList_Print( void )
 	_DEBUG_MSG("timer list end\n\n");
 }
 #endif
-/** 记录等待获取互斥锁的线程数 */
-static int threads_of_wait_lock = 0;
 
 /** 获取定时器列表的互斥锁 */
 static void TimerList_GetLock(void)
 {
-	++threads_of_wait_lock;
-	LCUICond_Broadcast( &self.sleep_cond );
 	LCUIMutex_Lock( &self.mutex );
-	if( threads_of_wait_lock > 0 ) {
-		--threads_of_wait_lock;
-	}
 }
 
 /** 释放定时器列表的互斥锁 */
 static void TimerList_FreeLock(void)
 {
 	LCUIMutex_Unlock( &self.mutex );
-}
-
-/** 等待其它线程获得线程锁，主要供定时器线程调用 */
-static void TimerList_WaitOtherThreadGetLock(void)
-{
-	while(threads_of_wait_lock > 0);
+	LCUICond_Broadcast( &self.sleep_cond );
 }
 
 /** 定时器线程，用于处理列表中各个定时器 */
@@ -260,24 +245,21 @@ static void TimerThread( void *arg )
 	task_data.destroy_func[0] = NULL;
 	task_data.destroy_func[1] = NULL;
 	DEBUG_MSG("start\n");
+	LCUIMutex_Lock( &self.mutex );
 	while( self.is_running ) {
-		DEBUG_MSG("lock mutex.\n");
-		LCUIMutex_Lock( &self.mutex );
+		i = 0;
 		n = LinkedList_GetTotal( &self.timer_list );
-		for( i=0; i<n; ++i, LinkedList_ToNext(&self.timer_list) ) {
-			timer = (TimerData*)LinkedList_Get( &self.timer_list );
-			if( !timer ) {
-				continue;
-			}
-			if( timer->state == STATE_RUN ) {
+		LinkedList_ForEach( timer, 0, &self.timer_list ) {
+			if( timer && timer->state == STATE_RUN ) {
 				break;
 			}
+			++i;
 		}
-		LCUIMutex_Unlock( &self.mutex );
-		DEBUG_MSG("unlock mutex.\n");
 		/* 没有要处理的定时器，停留一段时间再进行下次循环 */
 		if(i >= n || !timer ) {
+			LCUIMutex_Unlock( &self.mutex );
 			LCUI_MSleep(10);
+			LCUIMutex_Lock( &self.mutex );
 			continue;
 		}
 		lost_ms = LCUI_GetTicks( timer->start_time );
@@ -285,19 +267,17 @@ static void TimerThread( void *arg )
 		lost_ms -= timer->pause_ms;
 		/* 若流失的时间未达到总定时时长 */
 		if( lost_ms < timer->total_ms ) {
-			LCUIMutex_Lock( &self.mutex );
+			LCUIMutex_Unlock( &self.mutex );
 			n_ms = timer->total_ms - lost_ms;
 			/* 开始睡眠 */
-			LCUICond_TimedWait( &self.sleep_cond, n_ms );
-			LCUIMutex_Unlock( &self.mutex );
-			TimerList_WaitOtherThreadGetLock();
+			LCUICond_TimedWait( &self.sleep_cond, &self.mutex, n_ms );
 			continue;
 		}
 		/* 准备任务数据 */
 		task_data.func = (CallBackFunc)timer->func;
 		task_data.arg[0] = timer->arg;
 		task_data.destroy_arg[0] = FALSE;
-		DEBUG_MSG("timer: %d, start_time: %I64dms, cur_time: %I64dms, cur_ms: %I64d, total_ms: %ld\n", 
+		DEBUG_MSG("timer: %ld, start_time: %ldms, cur_time: %ldms, cur_ms: %ld, total_ms: %ld\n", 
 			timer->id, timer->start_time, LCUI_GetTickCount(), timer->total_ms-lost_ms, timer->total_ms);
 		/* 若需要重复使用，则重置剩余等待时间 */
 		if( timer->reuse ) {
@@ -305,9 +285,9 @@ static void TimerThread( void *arg )
 			timer->pause_ms = 0;
 			TimerList_UpdateTimerPos( timer );
 		} else { /* 否则，释放该定时器 */
-			LCUITimer_Free( timer->id );
+			LinkedList_Delete( &self.timer_list );
 		}
-		DEBUG_MSG( "add task: %p, timer id: %d\n", task_data.func, timer->id );
+		DEBUG_MSG( "add task: %p, timer id: %ld\n", task_data.func, timer->id );
 		/* 添加该任务至指定程序的任务队列 */
 		LCUI_AddTask( &task_data );
 	}
@@ -316,12 +296,8 @@ static void TimerThread( void *arg )
 
 static TimerData *TimerList_Find( int timer_id )
 {
-	int i, n;
 	TimerData *timer = NULL;
-
-	n = LinkedList_GetTotal( &self.timer_list );
-	for( i=0; i<n; ++i ) {
-		timer = (TimerData*)LinkedList_Get( &self.timer_list );
+	LinkedList_ForEach( timer, 0, &self.timer_list ) {
 		if( !timer ) {
 			continue;
 		}
@@ -351,16 +327,15 @@ static TimerData *TimerList_Find( int timer_id )
 int LCUITimer_Set( long int n_ms, void (*func)(void*),
 			void *arg, LCUI_BOOL reuse )
 {
-	int n;
+	int i = 0;
 	int64_t time_left;
 	TimerData timer, *timer_ptr;
 	static int id = 100;
 
 	TimerList_GetLock();
-	n = LinkedList_GetTotal( &self.timer_list );
-	for( ; n>0; --n, LinkedList_ToNext(&self.timer_list) ) {
-		timer_ptr = (TimerData*)LinkedList_Get( &self.timer_list );
+	LinkedList_ForEach( timer_ptr, 0, &self.timer_list ) {
 		if( !timer_ptr ) {
+			++i;
 			continue;
 		}
 		time_left = LCUI_GetTicks( timer_ptr->start_time );
@@ -369,6 +344,7 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 		if( time_left <= n_ms ) {
 			break;
 		}
+		++i;
 	}
 	
 	timer.id = ++id;
@@ -380,10 +356,10 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 	timer.func = func;
 	timer.arg = arg;
 
-	LinkedList_Goto( &self.timer_list, n+1 );
+	LinkedList_Goto( &self.timer_list, i+1 );
 	LinkedList_InsertCopy( &self.timer_list, &timer );
 	TimerList_FreeLock();
-	DEBUG_MSG("set timer, id: %d, total_ms: %d\n", timer.id, timer.total_ms);
+	DEBUG_MSG("set timer, id: %ld, total_ms: %ld\n", timer.id, timer.total_ms);
 	return timer.id;
 }
 
@@ -398,32 +374,22 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
  * */
 int LCUITimer_Free( int timer_id )
 {
-	int i, n;
+	int i = 0, n;
 	TimerData *timer;
-	LCUI_BOOL need_lock;
 	
-	/* 如果当前与主循环不在同一线程上，则需要锁上程序任务锁 */
-	need_lock = !LCUI_IsOnMainLoop();
-	if( need_lock ) {
-		LCUI_LockRunTask();
-	}
 	TimerList_GetLock();
 	n = LinkedList_GetTotal( &self.timer_list );
-	for( i=0; i<n; ++i ) {
-		timer = (TimerData*)LinkedList_Get( &self.timer_list );
+	LinkedList_ForEach( timer, 0, &self.timer_list ) {
 		/* 忽略无效或ID不一致的定时器 */
 		if( !timer || timer->id != timer_id ) {
+			++i;
 			continue;
 		}
 		/* 移除定时器任务，并且只在非主线程上时使用互斥锁 */
-		LCUI_RemoveTask( (CallBackFunc)timer->func, need_lock );
 		LinkedList_Delete( &self.timer_list );
 		break;
 	}
 	TimerList_FreeLock();
-	if( need_lock ) {
-		LCUI_UnlockRunTask();
-	}
 	if( i < n ) {
 		return 0;
 	}

@@ -48,55 +48,49 @@
 /** 初始化一个条件变量 */
 int LCUICond_Init( LCUI_Cond *cond )
 {
-	pthread_cond_init( &cond->cond, NULL );
-	pthread_mutex_init( &cond->mutex, NULL );
-	return 0;
+	return pthread_cond_init( cond, NULL );
 }
 
 /** 销毁一个条件变量 */
-void LCUICond_Destroy( LCUI_Cond *cond )
+int LCUICond_Destroy( LCUI_Cond *cond )
 {
-	pthread_cond_destroy( &cond->cond );
-	pthread_mutex_destroy( &cond->mutex );
+	return pthread_cond_destroy( cond );
 }
 
 /** 阻塞当前线程，等待条件成立 */
-unsigned int LCUICond_Wait( LCUI_Cond *cond )
+int LCUICond_Wait( LCUI_Cond *cond, LCUI_Mutex *mutex )
 {
-	int64_t lost_time;
-	lost_time = LCUI_GetTickCount();
-	pthread_cond_wait( &cond->cond, &cond->mutex );
-	lost_time = LCUI_GetTicks( lost_time );
-        pthread_mutex_unlock( &cond->mutex );
-	return (unsigned int)lost_time;
+	return pthread_cond_wait( cond, mutex );
 }
 
 /** 计时阻塞当前线程，等待条件成立 */
-unsigned int LCUICond_TimedWait( LCUI_Cond *cond, unsigned int ms )
+int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms )
 {
 	int ret;
 	struct timeval now;
 	struct timespec outtime;
-	int64_t lost_time;
 
-	lost_time = LCUI_GetTickCount();
 	gettimeofday(&now, NULL);
 	ret = (int)(ms / 1000);
 	outtime.tv_sec = now.tv_sec + ret;
 	outtime.tv_nsec = now.tv_usec * (ms - ret * 1000) * 1000000;
-	ret = pthread_cond_timedwait( &cond->cond, &cond->mutex, &outtime );
-	lost_time = LCUI_GetTicks( lost_time );
-	if( ret != ETIMEDOUT ) {
-		pthread_mutex_unlock( &cond->mutex );
+	ret = pthread_cond_timedwait( cond, mutex, &outtime );
+	if( ret == ETIMEDOUT ) {
+		return 0;
 	}
-	return (unsigned int)lost_time;
+	return 1;
+}
+
+/** 唤醒一个阻塞等待条件成立的线程 */
+int LCUICond_Signal( LCUI_Cond *cond )
+{
+	return pthread_cond_signal( cond );
 }
 
 /** 唤醒所有阻塞等待条件成立的线程 */
 int LCUICond_Broadcast( LCUI_Cond *cond )
 {
-	pthread_cond_broadcast( &cond->cond );
-        return 0;
+	return pthread_cond_broadcast( cond );
 }
 
 #endif

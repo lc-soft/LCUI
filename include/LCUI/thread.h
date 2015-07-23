@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * LCUI_Thread.h -- basic thread management
  *
- * Copyright (C) 2012-2013 by
+ * Copyright (C) 2012-2015 by
  * Liu Chao
  *
  * This file is part of the LCUI project, and may only be used, modified, and
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI_Thread.h -- 基本的线程管理
  *
- * 版权所有 (C) 2012-2013 归属于
+ * 版权所有 (C) 2012-2015 归属于
  * 刘超
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
@@ -46,10 +46,7 @@
 #include <pthread.h>
 typedef pthread_t LCUI_Thread;
 typedef pthread_mutex_t LCUI_Mutex;
-typedef struct LCUI_Cond {
-	pthread_cond_t cond;
-	pthread_mutex_t mutex;
-} LCUI_Cond;
+typedef pthread_cond_t LCUI_Cond;
 #else
 #ifdef LCUI_THREAD_WIN32
 #include <windows.h>
@@ -84,20 +81,23 @@ LCUI_API int LCUIMutex_Unlock( LCUI_Mutex *mutex );
 
 /*------------------------------ Cond <START> -------------------------------*/
 
-/** 新建一个条件变量 */
-LCUI_API int LCUICond_Init( LCUI_Cond *cond );
+/** 初始化一个条件变量 */
+int LCUICond_Init( LCUI_Cond *cond );
 
 /** 销毁一个条件变量 */
-LCUI_API void LCUICond_Destroy( LCUI_Cond *cond );
+int LCUICond_Destroy( LCUI_Cond *cond );
 
 /** 阻塞当前线程，等待条件成立 */
-LCUI_API unsigned int LCUICond_Wait( LCUI_Cond *cond );
+int LCUICond_Wait( LCUI_Cond *cond, LCUI_Mutex *mutex );
 
 /** 计时阻塞当前线程，等待条件成立 */
-LCUI_API unsigned int LCUICond_TimedWait( LCUI_Cond *cond, unsigned int ms );
+int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms );
+
+/** 唤醒一个阻塞等待条件成立的线程 */
+int LCUICond_Signal( LCUI_Cond *cond );
 
 /** 唤醒所有阻塞等待条件成立的线程 */
-LCUI_API int LCUICond_Broadcast( LCUI_Cond *cond );
+int LCUICond_Broadcast( LCUI_Cond *cond );
 
 /*------------------------------- Cond <END> --------------------------------*/
 
