@@ -411,9 +411,8 @@ LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info )
 	nobuff_printf("[linuxfb] open video output device...");
 	linuxfb.dev_fd = open(fb_dev, O_RDWR);
 	if( linuxfb.dev_fd == -1 ) {
-		printf("failed\n");
-		perror("[linuxfb] error");
-		exit(-1);
+		printf("failed\n[linuxfb] %s: %s\n", fb_dev, strerror(errno));
+		return NULL;
 	} else {
 		printf("ok\n");
 	}

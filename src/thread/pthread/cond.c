@@ -67,18 +67,23 @@ int LCUICond_Wait( LCUI_Cond *cond, LCUI_Mutex *mutex )
 int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms )
 {
 	int ret;
+	long int out_usec;
 	struct timeval now;
 	struct timespec outtime;
 
 	gettimeofday(&now, NULL);
-	ret = (int)(ms / 1000);
-	outtime.tv_sec = now.tv_sec + ret;
-	outtime.tv_nsec = now.tv_usec * (ms - ret * 1000) * 1000000;
+	out_usec = now.tv_usec + ms*1000;
+	outtime.tv_sec = now.tv_sec + out_usec / 1000000;
+	outtime.tv_nsec = (out_usec % 1000000) *1000;
+	DEBUG_MSG("wait, ms = %u, outtime.tv_nsec: %ld\n", ms, outtime.tv_nsec);
 	ret = pthread_cond_timedwait( cond, mutex, &outtime );
-	if( ret == ETIMEDOUT ) {
-		return 0;
+	DEBUG_MSG("ret: %d, ETIMEDOUT = %d, EINVAL = %d\n", ret, ETIMEDOUT, EINVAL);
+	switch( ret ) {
+	case 0: return 0;
+	case ETIMEDOUT: return 1;
+	default: break;
 	}
-	return 1;
+	return -1;
 }
 
 /** 唤醒一个阻塞等待条件成立的线程 */

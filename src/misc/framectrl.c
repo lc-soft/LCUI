@@ -2,8 +2,7 @@
  * framectrl.c -- frame control, limit the maximum number of tasks for program
  * in 1 sec.
  *
- * Copyright (C) 2014 by
- * Liu Chao
+ * Copyright (C) 2014-2015 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -24,8 +23,7 @@
 /* ****************************************************************************
  * framectrl.c -- 帧数控制，能够限制程序在一秒内执行的最大任务数量。
  *
- * 版权所有 (C) 2014 归属于
- * 刘超
+ * 版权所有 (C) 2014-2015 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -77,12 +75,14 @@ FrameCtrlCtx FrameControl_Create( void )
 	LCUICond_Init( &ctx->wait_continue );
 	LCUICond_Init( &ctx->wait_pause );
 	LCUIMutex_Init( &ctx->mutex );
+	LCUIMutex_Lock( &ctx->mutex );
 	return ctx;
 }
 
 /** 销毁帧数控制相关资源 */
 void FrameControl_Destroy( FrameCtrlCtx ctx )
 {
+	LCUIMutex_Unlock( &ctx->mutex );
 	LCUICond_Destroy( &ctx->wait_continue );
 	LCUICond_Destroy( &ctx->wait_pause );
 	LCUIMutex_Destroy( &ctx->mutex );
@@ -104,10 +104,9 @@ int FrameControl_GetFPS( FrameCtrlCtx ctx )
 /** 让当前帧停留一定时间 */
 void FrameControl_Remain( FrameCtrlCtx ctx )
 {
-	int ret = 0;
 	unsigned int n_ms, lost_ms;
 	int64_t current_time;
-
+	
 	if( ctx->state == FRAME_CTRL_STATE_QUIT ) {
 		return;
 	}
@@ -121,23 +120,17 @@ void FrameControl_Remain( FrameCtrlCtx ctx )
 		goto normal_exit;
 	}
 	/* 进行睡眠，直到需要暂停为止 */
-	ret = LCUICond_TimedWait( &ctx->wait_pause, &ctx->mutex, n_ms );
-	if( ret == 0 ) {
-		LCUIMutex_Unlock( &ctx->mutex );
-	}
+	LCUICond_TimedWait( &ctx->wait_pause, &ctx->mutex, n_ms );
 	/* 睡眠结束后，如果当前状态不为PAUSE，则说明睡眠不是因为要暂停而终止的 */
 	if( ctx->state != FRAME_CTRL_STATE_PAUSE ) {
 		goto normal_exit;
 	}
 	current_time = LCUI_GetTickCount();
 	/* 需要暂停，进行睡眠，直到需要继续为止 */
-	ret = LCUICond_Wait( &ctx->wait_continue, &ctx->mutex );
+	LCUICond_Wait( &ctx->wait_continue, &ctx->mutex );
 	lost_ms = (unsigned int)LCUI_GetTicks( current_time );
 	ctx->pause_time = lost_ms;
 	ctx->prev_frame_start_time += lost_ms;
-	if( ret == 0 ) {
-		LCUIMutex_Unlock( &ctx->mutex );
-	}
 	return;
 
 normal_exit:;
@@ -157,14 +150,14 @@ void FrameControl_Pause( FrameCtrlCtx ctx, LCUI_BOOL need_pause )
 	if( ctx->state == FRAME_CTRL_STATE_RUN && need_pause ) {
 		LCUIMutex_Lock( &ctx->mutex );
 		ctx->state = FRAME_CTRL_STATE_PAUSE;
+		LCUICond_Signal( &ctx->wait_pause );
 		LCUIMutex_Unlock( &ctx->mutex );
-		LCUICond_Broadcast( &ctx->wait_pause );
 	}
 	else if( ctx->state == FRAME_CTRL_STATE_PAUSE && !need_pause ){
 		LCUIMutex_Lock( &ctx->mutex );
 		ctx->state = FRAME_CTRL_STATE_RUN;
+		LCUICond_Signal( &ctx->wait_continue );
 		LCUIMutex_Unlock( &ctx->mutex );
-		LCUICond_Broadcast( &ctx->wait_continue );
 	}
 }
 

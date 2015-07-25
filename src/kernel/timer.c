@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * timer.c -- timer support.
  * 
- * Copyright (C) 2013-2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2013-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * timer.c -- 定时器支持
  *
- * 版权所有 (C) 2013-2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2013-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,7 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
-#define DEBUG
+//#define DEBUG
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -215,19 +215,6 @@ static void TimerList_Print( void )
 }
 #endif
 
-/** 获取定时器列表的互斥锁 */
-static void TimerList_GetLock(void)
-{
-	LCUIMutex_Lock( &self.mutex );
-}
-
-/** 释放定时器列表的互斥锁 */
-static void TimerList_FreeLock(void)
-{
-	LCUIMutex_Unlock( &self.mutex );
-	LCUICond_Broadcast( &self.sleep_cond );
-}
-
 /** 定时器线程，用于处理列表中各个定时器 */
 static void TimerThread( void *arg )
 {
@@ -267,7 +254,6 @@ static void TimerThread( void *arg )
 		lost_ms -= timer->pause_ms;
 		/* 若流失的时间未达到总定时时长 */
 		if( lost_ms < timer->total_ms ) {
-			LCUIMutex_Unlock( &self.mutex );
 			n_ms = timer->total_ms - lost_ms;
 			/* 开始睡眠 */
 			LCUICond_TimedWait( &self.sleep_cond, &self.mutex, n_ms );
@@ -291,6 +277,7 @@ static void TimerThread( void *arg )
 		/* 添加该任务至指定程序的任务队列 */
 		LCUI_AddTask( &task_data );
 	}
+	LCUIMutex_Unlock( &self.mutex );
 	LCUIThread_Exit(NULL);
 }
 
@@ -332,7 +319,7 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 	TimerData timer, *timer_ptr;
 	static int id = 100;
 
-	TimerList_GetLock();
+	LCUIMutex_Lock( &self.mutex );
 	LinkedList_ForEach( timer_ptr, 0, &self.timer_list ) {
 		if( !timer_ptr ) {
 			++i;
@@ -358,7 +345,8 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 
 	LinkedList_Goto( &self.timer_list, i+1 );
 	LinkedList_InsertCopy( &self.timer_list, &timer );
-	TimerList_FreeLock();
+	LCUICond_Signal( &self.sleep_cond );
+	LCUIMutex_Unlock( &self.mutex );
 	DEBUG_MSG("set timer, id: %ld, total_ms: %ld\n", timer.id, timer.total_ms);
 	return timer.id;
 }
@@ -377,7 +365,7 @@ int LCUITimer_Free( int timer_id )
 	int i = 0, n;
 	TimerData *timer;
 	
-	TimerList_GetLock();
+	LCUIMutex_Lock( &self.mutex );
 	n = LinkedList_GetTotal( &self.timer_list );
 	LinkedList_ForEach( timer, 0, &self.timer_list ) {
 		/* 忽略无效或ID不一致的定时器 */
@@ -389,7 +377,8 @@ int LCUITimer_Free( int timer_id )
 		LinkedList_Delete( &self.timer_list );
 		break;
 	}
-	TimerList_FreeLock();
+	LCUICond_Signal( &self.sleep_cond );
+	LCUIMutex_Unlock( &self.mutex );
 	if( i < n ) {
 		return 0;
 	}
@@ -407,17 +396,16 @@ int LCUITimer_Free( int timer_id )
 int LCUITimer_Pause( int timer_id )
 {
 	TimerData *timer;
-	TimerList_GetLock();
+	LCUIMutex_Lock( &self.mutex );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
 		/* 记录暂停时的时间 */
 		timer->pause_time = LCUI_GetTickCount();
 		timer->state = STATE_PAUSE;
-		TimerList_FreeLock();
-		return 0;
 	}
-	TimerList_FreeLock();
-	return -1;
+	LCUICond_Signal( &self.sleep_cond );
+	LCUIMutex_Unlock( &self.mutex );
+	return timer ? 0:-1;
 }
 
 /**
@@ -430,17 +418,16 @@ int LCUITimer_Pause( int timer_id )
 int LCUITimer_Continue( int timer_id )
 {
 	TimerData *timer;
-	TimerList_GetLock();
+	LCUIMutex_Lock( &self.mutex );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
 		/* 计算处于暂停状态的时长 */
 		timer->pause_ms += (long int)LCUI_GetTicks( timer->pause_time );
 		timer->state = STATE_RUN;
-		TimerList_FreeLock();
-		return 0;
 	}
-	TimerList_FreeLock();
-	return -1;
+	LCUICond_Signal( &self.sleep_cond );
+	LCUIMutex_Unlock( &self.mutex );
+	return timer ? 0:-1;
 }
 
 /**
@@ -456,18 +443,16 @@ int LCUITimer_Reset( int timer_id, long int n_ms )
 {
 	TimerData *timer;
 	
-	TimerList_GetLock();
+	LCUIMutex_Lock( &self.mutex );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
 		timer->start_time = LCUI_GetTickCount();
 		timer->pause_ms = 0;
 		timer->total_ms = n_ms;
-		TimerList_UpdateTimerPos( timer );
-		TimerList_FreeLock();
-		return 0;
 	}
-	TimerList_FreeLock();
-	return -1;
+	LCUICond_Signal( &self.sleep_cond );
+	LCUIMutex_Unlock( &self.mutex );
+	return timer ? 0:-1;
 }
 
 /* 初始化定时器模块 */

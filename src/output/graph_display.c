@@ -53,8 +53,6 @@
 #include <Windows.h>
 #endif
 
-#define MS_PER_FRAME (1000/MAX_FRAMES_PER_SEC)	/**< 每帧画面的最少耗时(ms) */
-
 /** surface 记录 */
 typedef struct SurfaceRecord {
 	LCUI_Surface	surface;	/**< surface */
@@ -333,14 +331,8 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 	int e_type = *((int*)&arg);
 	LCUI_Surface surface;
 	LCUI_Rect *p_rect;
-	static int count = 0;
+
 	DEBUG_MSG("tip, widget: %s, e_type = %d\n", w->type, e_type);
-	if( e_type == 20 ) {
-		++count;
-		if( count > 12 ) {
-			abort();
-		}
-	}
 	surface = LCUIDisplay_GetBindSurface( e->target );
 	if( display.mode == LDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
@@ -529,7 +521,7 @@ int LCUI_InitDisplay( void )
 	display.methods->onInvalidRect = OnInvalidRect;
 	display.methods->onEvent = OnEvent;
 	display.fc_ctx = FrameControl_Create();
-	FrameControl_SetMaxFPS( display.fc_ctx, 1000/MAX_FRAMES_PER_SEC );
+	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( LCUIRootWidget, "TopLevelWidget",
 			  OnTopLevelWidgetEvent, NULL, NULL );
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
