@@ -7,6 +7,7 @@
 #include <LCUI/font.h>
 #include <LCUI/gui/widget/textview.h>
 
+#ifdef LCUI_BUILD_IN_WIN32
 #include <io.h>
 #include <fcntl.h>
 
@@ -24,16 +25,19 @@ static void InitConsoleWindow(void)
 	printf ("InitConsoleWindow OK!\n");
 }
 
+#endif
+
 void onTimer( void *arg )
 {
-	static int mode = LDM_SEAMLESS;
-	_DEBUG_MSG("tip\n");
-	LCUIDisplay_SetMode( mode );
-	if( mode == LDM_SEAMLESS ) {
-		mode = LDM_WINDOWED;
-	} else {
-		mode = LDM_SEAMLESS;
-	}
+	static int x = 0, y = 0, vx = 1, vy = 1;
+	vx = x > 320 ? -1:vx;
+	vx = x < 0 ? 1:vx;
+	vy = y > 320 ? -1:vy;
+	vy = y < 0 ? 1:vy;
+	x += vx;
+	y += vy;
+	Widget_Move( arg, x, y );
+	_DEBUG_MSG("fps: %d\n", LCUIDisplay_GetFPS());
 }
 
 void test_gen_font_code(void)
@@ -197,7 +201,9 @@ int main( int argc, char **argv )
 	LCUI_Widget w, root, text, btn;
 	LCUI_Graph *desktop_image = Graph_New();
 
+#ifdef LCUI_BUILD_IN_WIN32
 	InitConsoleWindow();//test_gen_font_code();return 0;
+#endif
 	_DEBUG_MSG("test\n");
 	LCUI_Init();
 	LCUIDisplay_SetMode( LDM_WINDOWED );
@@ -241,5 +247,6 @@ int main( int argc, char **argv )
 	SetStyle( w->style, key_border_bottom_color, RGB(0,122,204), color );
 	SetStyle( w->style, key_border_left_color, RGB(0,122,204), color );
 	Widget_Update( w, FALSE );
+	LCUITimer_Set( 20, onTimer, btn, TRUE );
 	return LCUI_Main();
 }
