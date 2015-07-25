@@ -56,10 +56,9 @@
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
 
 struct LCUI_WidgetTaskBoxRec_ {
-	int		i;				/**< 当前使用的记录号 */
 	LCUI_BOOL	for_self;			/**< 标志，指示当前部件是否有待处理的任务 */
 	LCUI_BOOL	for_children;			/**< 标志，指示是否有待处理的子级部件 */
-	LCUI_BOOL	buffer[2][WTT_TOTAL_NUM];	/**< 两个记录缓存 */
+	LCUI_BOOL	buffer[WTT_TOTAL_NUM];		/**< 记录缓存 */
 };
 
 static void HandleTopLevelWidgetEvent( LCUI_Widget w, int event_type )
@@ -243,7 +242,7 @@ static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
 static void HandleRefreshStyle( LCUI_Widget w )
 {
 	Widget_Update( w, TRUE );
-	w->task->buffer[w->task->i][WTT_UPDATE_STYLE] = FALSE;
+	w->task->buffer[WTT_UPDATE_STYLE] = FALSE;
 }
 
 static void HandleUpdateStyle( LCUI_Widget w )
@@ -258,6 +257,8 @@ static void HandlePosition( LCUI_Widget w )
 	rect = w->base.box.graph;
 	Widget_ComputePosition( w );
 	if( w->parent ) {
+		_DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->base.box.graph.x, w->base.box.graph.y, w->base.box.graph.w, w->base.box.graph.h);
+		_DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
 		/* 标记移动前后的区域 */
 		Widget_InvalidateArea( w->parent, &w->base.box.graph, SV_CONTENT_BOX );
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
@@ -436,11 +437,9 @@ void Widget_UpdateTaskStatus( LCUI_Widget widget )
 /** 添加任务并扩散到子级部件 */
 void Widget_AddTaskToSpread( LCUI_Widget widget, int task_type )
 {
-	LCUI_BOOL *buffer;
 	LCUI_Widget child;
 
-	buffer = widget->task->buffer[widget->task->i];
-	buffer[task_type] = TRUE;
+	widget->task->buffer[task_type] = TRUE;
 	widget->task->for_self = TRUE;
 	widget->task->for_children = TRUE;
 	LinkedList_ForEach( child, 0, &widget->children ) {
@@ -451,21 +450,19 @@ void Widget_AddTaskToSpread( LCUI_Widget widget, int task_type )
 /** 添加任务 */
 void Widget_AddTask( LCUI_Widget widget, int task_type )
 {
-	LCUI_BOOL *buffer;
-	buffer = widget->task->buffer[widget->task->i];
-	if( buffer[task_type] ) {
+	if( widget->task->buffer[task_type] ) {
 		return;
 	}
-	buffer[task_type] = TRUE;
+	widget->task->buffer[task_type] = TRUE;
 	widget->task->for_self = TRUE;
-	DEBUG_MSG("widget: %p, parent_is_root: %d, for_childen: %d, task_id: %d\n",
-	widget, widget->parent == LCUIRootWidget, widget->task->for_children, task_type);
+	DEBUG_MSG("widget: %s, for_self: %d, for_childen: %d, task_id: %d\n",
+	widget->type, widget->task->for_self, widget->task->for_children, task_type);
 	widget = widget->parent;
 	/* 向没有标记的父级部件添加标记 */
 	while( widget && !widget->task->for_children ) {
+		DEBUG_MSG("widget: %s\n", widget->type );
 		widget->task->for_children = TRUE;
 		widget = widget->parent;
-		DEBUG_MSG("widget: %p\n", widget );
 	}
 }
 
@@ -511,10 +508,8 @@ void Widget_InitTaskBox( LCUI_Widget widget )
 	malloc(sizeof(struct LCUI_WidgetTaskBoxRec_));
 	widget->task->for_children = FALSE;
 	widget->task->for_self = FALSE;
-	widget->task->i = 0;
 	for( i=0; i<WTT_TOTAL_NUM; ++i ) {
-		widget->task->buffer[0][i] = FALSE;
-		widget->task->buffer[1][i] = FALSE;
+		widget->task->buffer[i] = FALSE;
 	}
 }
 
@@ -530,7 +525,7 @@ static int Widget_ProcTask( LCUI_Widget w )
 {
 	int ret = 1, i;
 	LCUI_BOOL *buffer;
-	DEBUG_MSG("widget: %p, is_root: %d, for_self: %d, for_children: %d\n", w, w == LCUIRootWidget, w->task->for_self, w->task->for_children);
+	DEBUG_MSG("widget: %s, for_self: %d, for_children: %d\n", w->type, w->task->for_self, w->task->for_children);
 
 	/* 如果该部件有任务需要处理 */
 	if( w->task->for_self ) {
@@ -540,9 +535,7 @@ static int Widget_ProcTask( LCUI_Widget w )
 			goto skip_proc_self_task;
 		}
 		w->task->for_self = FALSE;
-		buffer = w->task->buffer[w->task->i];
-		/* 切换前后台记录 */
-		w->task->i = w->task->i == 1 ? 0:1;
+		buffer = w->task->buffer;
 		/* 如果该部件需要销毁，其它任务就不用再处理了 */
 		if( buffer[WTT_DESTROY] ) {
 			buffer[WTT_DESTROY] = FALSE;
@@ -572,10 +565,8 @@ skip_proc_self_task:;
 	/* 如果子级部件中有待处理的部件，则递归进去 */
 	if( w->task->for_children ) {
 		LCUI_Widget child;
-		int i = 0;
 		w->task->for_children = FALSE;
 		LinkedList_ForEach( child, 0, &w->children ) {
-			_DEBUG_MSG("%d: %p\n", i++, child);
 			/* 如果该级部件的任务需要留到下次再处理 */
 			if( Widget_ProcTask( child ) == 1 ) {
 				w->task->for_children = TRUE;

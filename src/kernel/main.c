@@ -36,7 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
-#define DEBUG
+//#define DEBUG
 #define __IN_MAIN_SOURCE_FILE__
 
 #include <LCUI_Build.h>
@@ -257,16 +257,10 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	LCUIMutex_Unlock( &MainApp.loop_changed );
 	loop->tid = LCUIThread_SelfID();
 	while( loop->state != STATE_EXITED ) {
-		int64_t ct;		
 		LCUI_Task *task;
 		DEBUG_MSG("loop: %p, sleeping...\n", loop);
-		ct = LCUI_GetTickCount();
 		LCUICond_Wait( &MainApp.loop_cond, &MainApp.task_list_mutex );
-		ct = LCUI_GetTicks(ct);
 		DEBUG_MSG("loop: %p, wakeup, lost_time: %ld\n", loop, ct);
-		if( ct > 50 ) {
-			DEBUG_MSG("timeout!\n");
-		}
 		LinkedList_ForEach( task, 0, &MainApp.task_list ) {
 			if( !task || !task->func ) {
 				return -1;
@@ -396,16 +390,15 @@ static void LCUIApp_Destroy(void)
 /** 打印LCUI的信息 */
 static void LCUI_ShowCopyrightText(void)
 {
-	printf( "               ________\n"
-		" _            |______  |\n"
-		"| |     __    __     | |\n"
-		"| |    |  |  |__|    | |\n"
-		"| |    |  |   __     | |\n"
-		"| |    |  |  |  |    | |\n"
-		"| |    |  |__|  |    | |\n"
-		"| |    \\________/    | |\n"
-		"| |_______    _______| |\n"
-		"\\_________|  |_________/\n\n"
+	printf( "           ________\n"
+		" _        |______  |\n"
+		"| |   __    __   | |\n"
+		"| |  |  |  |__|  | |\n"
+		"| |  |  |   __   | |\n"
+		"| |  |  |__|  |  | |\n"
+		"| |  \\________/  | |\n"
+		"| |_____    _____| |\n"
+		"\\_______|  |_______/\n\n"
 		"LCUI (LC's UI) version "LCUI_VERSION"\n"
 #ifdef _MSC_VER
 		"Build tool: "

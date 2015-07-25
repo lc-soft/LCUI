@@ -369,17 +369,16 @@ void Widget_ComputePosition( LCUI_Widget w )
 {
 	// 需要考虑到其它定位相关的属性
 	// code ...
-
-	switch( w->css[key_top].type ) {
+	switch( w->css[key_left].type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
 		w->base.x =  w->parent->base.box.content.width;
-		w->base.x *= w->css[key_top].value_scale;
+		w->base.x *= w->css[key_left].value_scale;
 		break;
 	case SVT_PX:
-		w->base.x = w->css[key_top].value_px;
+		w->base.x = w->css[key_left].value_px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
@@ -387,13 +386,13 @@ void Widget_ComputePosition( LCUI_Widget w )
 		w->base.x = 0;
 		break;
 	}
-	switch( w->css[key_left].type ) {
+	switch( w->css[key_top].type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
 		w->base.y = w->parent->base.box.content.height;
-		w->base.y *= w->css[key_left].value_scale;
+		w->base.y *= w->css[key_top].value_scale;
 		break;
 	case SVT_PX:
 		w->base.y = w->css[key_top].value_px;
@@ -644,11 +643,12 @@ void Widget_SetTop( LCUI_Widget w, const char *value )
 }
 
 /** 移动部件位置 */
-void Widget_Move( LCUI_Widget w, int top, int left )
+void Widget_Move( LCUI_Widget w, int left, int top )
 {
 	SetStyle( w->base.style, key_top, top, px );
 	SetStyle( w->base.style, key_left, left, px );
-	Widget_AddTask( w, WTT_POSITION );
+	_DEBUG_MSG("top = %d, left = %d\n", top, left);
+	Widget_Update( w, FALSE );
 }
 
 /** 调整部件尺寸 */
@@ -656,19 +656,19 @@ void Widget_Resize( LCUI_Widget w, int width, int height )
 {
 	SetStyle( w->base.style, key_width, width, px );
 	SetStyle( w->base.style, key_height, height, px );
-	Widget_AddTask( w, WTT_RESIZE );
+	Widget_Update( w, FALSE );
 }
 
 void Widget_Show( LCUI_Widget w )
 {
 	SetStyle( w->base.style, key_visible, TRUE, boolean );
-	Widget_AddTask( w, WTT_VISIBLE );
+	Widget_Update( w, FALSE );
 }
 
 void Widget_Hide( LCUI_Widget w )
 {
 	SetStyle( w->base.style, key_visible, FALSE, boolean );
-	Widget_AddTask( w, WTT_VISIBLE );
+	Widget_Update( w, FALSE );
 }
 
 void Widget_SetBackgroundColor( LCUI_Widget w, LCUI_Color color )
@@ -821,6 +821,7 @@ void LCUI_InitWidget(void)
 	LCUIWidget_AddTextView();
 	LCUIWidget_AddButton();
 	Widget_Init(LCUIRootWidget);
+	LCUIRootWidget->type = strdup("root");
 	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
 }
 
