@@ -88,6 +88,7 @@ static struct {
 	HINSTANCE dll_instance;		/**< 动态库中的资源句柄 */
 	LCUI_Thread loop_thread;	/**< 消息循环线程 */
 	LCUI_Cond cond;			/**< 条件，当消息循环已创建时成立 */
+	LCUI_Mutex mutex;		/**< 互斥锁 */
 	LCUI_BOOL is_ready;		/**< 消息循环线程是否已准备好 */
 	LinkedList surfaces;		/**< surface 记录 */
 	LCUI_SurfaceMethods methods;	/**< 方法集 */
@@ -276,8 +277,10 @@ static LCUI_Surface Win32Surface_New(void)
 		surface->task_buffer[i].is_valid = FALSE;
 	}
 	if( !win32.is_ready ) {
+		LCUIMutex_Lock( &win32.mutex );
 		/* 等待 Surface 线程创建完 windows 消息队列 */
-		LCUICond_Wait( &win32.cond );
+		LCUICond_Wait( &win32.cond, &win32.mutex );
+		LCUIMutex_Unlock( &win32.mutex );
 	}
 	/* 让 Surface 线程去完成 windows 窗口的创建 */
 	PostThreadMessage( win32.loop_thread, MSG_SURFACE_CREATE, 0, (LPARAM)surface );
@@ -482,7 +485,9 @@ static void LCUISurface_Loop( void *args )
 	/* 创建消息队列 */
 	PeekMessage(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
 	win32.is_ready = TRUE;
+	LCUIMutex_Lock( &win32.mutex );
 	LCUICond_Broadcast( &win32.cond );
+	LCUIMutex_Unlock( &win32.mutex );
 	while( GetMessage( &msg, NULL, 0, 0 ) ) {
 		if( msg.message == MSG_SURFACE_CREATE ) {
 			HDC hdc_client;
@@ -498,7 +503,7 @@ static void LCUISurface_Loop( void *args )
 			hdc_client = GetDC( surface->hwnd );
 			surface->fb_hdc = CreateCompatibleDC( hdc_client );
 			surface->is_ready = TRUE;
-			_DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
+			DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 			continue;
 		}
 		TranslateMessage( &msg );
@@ -563,6 +568,7 @@ LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info )
 	win32.methods.onInvalidRect = NULL;
 	win32.methods.onEvent = NULL;
 	LCUICond_Init( &win32.cond );
+	LCUIMutex_Init( &win32.mutex );
 	LinkedList_Init( &win32.surfaces, sizeof( struct LCUI_SurfaceRec_ ) );
 	LinkedList_SetDataMemReuse( &win32.surfaces, TRUE );
 	LinkedList_SetDataNeedFree( &win32.surfaces, TRUE );

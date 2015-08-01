@@ -75,8 +75,6 @@ int LCUIMutex_TryLock( LCUI_Mutex *mutex )
 int LCUIMutex_Lock( LCUI_Mutex *mutex )
 {
 	if ( WaitForSingleObject( *mutex, INFINITE ) == WAIT_FAILED ) {
-		printf("Couldn't wait on mutex\n");
-		abort();
 		return -1;
 	}
 	return 0;
@@ -86,8 +84,6 @@ int LCUIMutex_Lock( LCUI_Mutex *mutex )
 int LCUIMutex_Unlock( LCUI_Mutex *mutex )
 {
 	if ( ReleaseMutex( *mutex ) == FALSE ) {
-		printf("Couldn't release mutex\n");
-		abort();
 		return -1;
 	}
 	return 0;

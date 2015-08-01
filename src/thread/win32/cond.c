@@ -69,34 +69,42 @@ int LCUICond_Destroy( LCUI_Cond *cond )
 /** 阻塞当前线程，等待条件成立 */
 int LCUICond_Wait( LCUI_Cond *cond, LCUI_Mutex *mutex )
 {
-	int ret = WaitForSingleObject( *cond, INFINITE );
+	int ret;
+	LCUIMutex_Unlock( mutex );
+	ret = WaitForSingleObject( *cond, INFINITE );
 	switch( ret ) {
-	case WAIT_OBJECT_0: 
-		LCUIMutex_Lock( mutex );
-		return 0;
-	case WAIT_FAILED: return -1;
 	case WAIT_TIMEOUT: break;
-	default: break;
+	case WAIT_OBJECT_0: LCUIMutex_Lock( mutex ); return 0;
+	case WAIT_FAILED: 
+	default: return -1;
 	}
-	return 0;
+	return 1;
 }
 
 /** 计时阻塞当前线程，等待条件成立 */
 int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms )
 {
+	LCUIMutex_Unlock( mutex );
 	switch(  WaitForSingleObject( *cond, ms ) ) {
-	case WAIT_OBJECT_0: 
-		LCUIMutex_Lock( mutex );
-		return 0;
-	case WAIT_FAILED: return -1;
-	case WAIT_TIMEOUT:
-	default: break;
+	case WAIT_TIMEOUT: break;
+	case WAIT_OBJECT_0: LCUIMutex_Lock( mutex ); return 0;
+	case WAIT_FAILED: 
+	default: return -1;
 	}
 	return 1;
 }
 
+/** 唤醒一个阻塞等待条件成立的线程 */
+int LCUICond_Signal( LCUI_Cond *cond )
+{
+	if( PulseEvent( *cond ) ) {
+		return 0;
+	}
+	return -1;
+}
+
 /** 唤醒所有阻塞等待条件成立的线程 */
-int LCUICond_Broadcast( LCUI_Cond* cond )
+int LCUICond_Broadcast( LCUI_Cond *cond )
 {
 	if( SetEvent( *cond ) ) {
 		return 0;

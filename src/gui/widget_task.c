@@ -37,13 +37,6 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
-/*
- * 任务数据主要用于存储执行任务前的数据，例如：“移动”任务，在添加该任务时会
- * 存储部件当前位置，供执行“移动”任务时计算脏矩形。
- * 同一帧下，同一种任务只存在一个，当在同一帧内对同一部件添加重复的任务时，部
- * 件数据只保留第一个，后面添加的任务数据都会被忽略，不会覆盖掉。
- */
-
 //#define DEBUG
 #define __IN_WIDGET_TASK_SOURCE_FILE__
 
@@ -257,8 +250,8 @@ static void HandlePosition( LCUI_Widget w )
 	rect = w->base.box.graph;
 	Widget_ComputePosition( w );
 	if( w->parent ) {
-		_DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->base.box.graph.x, w->base.box.graph.y, w->base.box.graph.w, w->base.box.graph.h);
-		_DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
+		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->base.box.graph.x, w->base.box.graph.y, w->base.box.graph.w, w->base.box.graph.h);
+		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
 		/* 标记移动前后的区域 */
 		Widget_InvalidateArea( w->parent, &w->base.box.graph, SV_CONTENT_BOX );
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
@@ -373,35 +366,35 @@ static void HandleBorder( LCUI_Widget w )
 	ComputeBorderStyle( w->base.css, &w->style.border );
 	nb = &w->style.border;
 	/* 如果边框变化并未导致图层尺寸变化的话，则只重绘边框 */
-	if( ob.top.width == nb->top.width
-	 && ob.right.width == nb->right.width
-	 && ob.bottom.width == nb->bottom.width
-	 && ob.left.width == nb->left.width ) {
-		rect.x = rect.y = 0;
-		rect.width = w->base.box.border.width;
-		rect.width -= max( ob.top_right_radius, ob.right.width );
-		rect.height = max( ob.top_left_radius, ob.top.width );
-		Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-		rect.x = w->base.box.border.w;
-		rect.width = max( ob.top_right_radius, ob.right.width );
-		rect.x -= rect.width;
-		rect.height = w->base.box.border.height;
-		rect.height -= max( ob.bottom_right_radius, ob.bottom.width );
-		Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-		rect.x = max( ob.bottom_left_radius, ob.left.width );
-		rect.width = w->base.box.border.width;
-		rect.width -= rect.x;
-		rect.height = max( ob.bottom_right_radius, ob.bottom.width );
-		Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-		rect.width = rect.x;
-		rect.x = 0;
-		rect.height = w->base.box.border.height;
-		rect.height -= max( ob.top_left_radius, ob.left.width );
-		Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
+	if( ob.top.width != nb->top.width
+	 || ob.right.width != nb->right.width
+	 || ob.bottom.width != nb->bottom.width
+	 || ob.left.width != nb->left.width ) {
+		Widget_AddTask( w, WTT_RESIZE );
 		return;
 	}
-	/* 更新尺寸 */
-	Widget_AddTask( w, WTT_RESIZE );
+
+	rect.x = rect.y = 0;
+	rect.width = w->base.box.border.width;
+	rect.width -= max( ob.top_right_radius, ob.right.width );
+	rect.height = max( ob.top_left_radius, ob.top.width );
+	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
+	rect.x = w->base.box.border.w;
+	rect.width = max( ob.top_right_radius, ob.right.width );
+	rect.x -= rect.width;
+	rect.height = w->base.box.border.height;
+	rect.height -= max( ob.bottom_right_radius, ob.bottom.width );
+	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
+	rect.x = max( ob.bottom_left_radius, ob.left.width );
+	rect.width = w->base.box.border.width;
+	rect.width -= rect.x;
+	rect.height = max( ob.bottom_right_radius, ob.bottom.width );
+	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
+	rect.width = rect.x;
+	rect.x = 0;
+	rect.height = w->base.box.border.height;
+	rect.height -= max( ob.top_left_radius, ob.left.width );
+	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 }
 
 /** 处理销毁任务 */
@@ -525,7 +518,7 @@ static int Widget_ProcTask( LCUI_Widget w )
 {
 	int ret = 1, i;
 	LCUI_BOOL *buffer;
-	DEBUG_MSG("widget: %s, for_self: %d, for_children: %d\n", w->type, w->task->for_self, w->task->for_children);
+	DEBUG_MSG("1,widget: %s, for_self: %d, for_children: %d\n", w->type, w->task->for_self, w->task->for_children);
 
 	/* 如果该部件有任务需要处理 */
 	if( w->task->for_self ) {
@@ -546,18 +539,20 @@ static int Widget_ProcTask( LCUI_Widget w )
 		if( buffer[WTT_USER] ) {
 			LCUI_WidgetClass *wc;
 			wc = LCUIWidget_GetClass( w->type );
-			wc->task_handler( w );
+			wc ? wc->task_handler( w ):FALSE;
 		}
 		for( i=0; i<WTT_USER; ++i ) {
 			DEBUG_MSG( "task_id: %d, is_valid: %d\n", i, buffer[i] );
-			if( buffer[i] && task_handlers[i] ) {
-				task_handlers[i]( w );
+			if( buffer[i] ) {
+				buffer[i] = FALSE;
+				if( task_handlers[i] ) {
+					task_handlers[i]( w );
+				}
+			} else {
+				buffer[i] = FALSE;
 			}
-			buffer[i] = FALSE;
 		}
-		/* 只留了一个位置用于存放用户自定义任务，以后真有需求再改吧 */
 		LCUIMutex_Unlock( &w->mutex );
-		ret = 0;
 	}
 
 skip_proc_self_task:;
@@ -573,7 +568,9 @@ skip_proc_self_task:;
 			}
 		}
 	}
-	return ret;
+	DEBUG_MSG("2,widget: %s, for_self: %d, for_children: %d\n", w->type, w->task->for_self, w->task->for_children);
+
+	return (w->task->for_self || w->task->for_children) ? 1:0;
 }
 
 /** 处理一次当前积累的部件任务 */

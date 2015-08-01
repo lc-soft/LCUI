@@ -45,13 +45,12 @@
 
 #define NEW_ONE(TYPE) (TYPE*)malloc(sizeof(TYPE))
 
-static struct LCUI_WidgetFull LCUIRootWidgetData;	/**< 根级部件 */
-LCUI_Widget LCUIRootWidget = &LCUIRootWidgetData;	/**< 创建外部引用 */
+LCUI_Widget LCUIRootWidget = NULL;
 
 /** 获取根级部件 */
 LCUI_Widget LCUIWidget_GetRoot(void)
 {
-	return &LCUIRootWidgetData;
+	return LCUIRootWidget;
 }
 
 /** 追加子部件 */
@@ -241,21 +240,18 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 			wc->methods.init( widget );
 		}
 	}
-	Widget_AddTask( widget, WTT_UPDATE_STYLE );
+	Widget_AddTask( widget, WTT_REFRESH_STYLE );
 	return widget;
 }
 
 /** 获取当前点命中的最上层可见部件 */
 LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 {
-	int i, n;
+	LCUI_BOOL is_hit;
 	LCUI_Widget target = widget, child = NULL;
 	do {
-		n = LinkedList_GetTotal( &target->children_show );
-		for( i=0; i<n; ++i ) {
-			LinkedList_Goto( &target->children_show, i );
-			child = (LCUI_Widget)
-			LinkedList_Get( &target->children_show );
+		is_hit = FALSE;
+		LinkedList_ForEach( child, 0, &target->children_show ) {
 			if( !child->style.visible ) {
 				continue;
 			}
@@ -265,10 +261,11 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 				target = child;
 				x -= child->base.box.content.x;
 				y -= child->base.box.content.y;
+				is_hit = TRUE;
 				break;
 			 }
 		}
-	} while( i < n );
+	} while( is_hit );
 	return (target == widget) ? NULL:target;
 }
 
@@ -647,7 +644,7 @@ void Widget_Move( LCUI_Widget w, int left, int top )
 {
 	SetStyle( w->base.style, key_top, top, px );
 	SetStyle( w->base.style, key_left, left, px );
-	_DEBUG_MSG("top = %d, left = %d\n", top, left);
+	DEBUG_MSG("top = %d, left = %d\n", top, left);
 	Widget_Update( w, FALSE );
 }
 
@@ -820,8 +817,7 @@ void LCUI_InitWidget(void)
 	LCUIWidget_InitStyle();
 	LCUIWidget_AddTextView();
 	LCUIWidget_AddButton();
-	Widget_Init(LCUIRootWidget);
-	LCUIRootWidget->type = strdup("root");
+	LCUIRootWidget = LCUIWidget_New("root");
 	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
 }
 
