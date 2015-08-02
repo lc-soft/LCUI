@@ -225,7 +225,7 @@ int LinkedList_Goto( LinkedList *list, int pos )
 		return -1;
 	}
 	/* 如果该结点离头结点比较近，则直接从头结点开始遍历 */
-	if( pos < list->current_node_pos-pos ) {
+	if( pos < list->current_node_pos-pos || list->current_node_pos < 0 ) {
 		list->current_node_pos = 0;
 		list->current_node = list->used_head_node;
 	}
@@ -371,23 +371,14 @@ int LinkedList_Insert( LinkedList *list, void *data )
 		if( node == list->used_head_node ) {
 			return 0;
 		}
-		DEBUG_MSG("%p, %p\n", node, list->current_node);
-		node->next = list->used_head_node;
-		list->used_head_node = node;
-		list->used_tail_node = node->prev;
-		DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
-		list->used_tail_node->next = NULL;
-		node->prev = NULL;
-	} else {
-		node->next = list->current_node;
-		list->used_tail_node = node->prev;
-		DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
-		list->used_tail_node->next = NULL;
-		node->prev = list->current_node->prev;
-		list->current_node->prev = node;
-		list->current_node = node;
 	}
-
+	node->next = list->current_node;
+	list->used_tail_node = node->prev;
+	DEBUG_MSG("list->used_tail_node = %p\n", list->used_tail_node);
+	list->used_tail_node->next = NULL;
+	node->prev = list->current_node->prev;
+	list->current_node->prev = node;
+	list->current_node = node;
 	return 0;
 }
 

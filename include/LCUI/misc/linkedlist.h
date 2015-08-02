@@ -87,9 +87,19 @@ struct LinkedListRec_ {
 #define LinkedList_ToNext(list) ((list)->current_node ? (++(list)->current_node_pos,\
 				(list)->current_node = (list)->current_node->next):NULL)
 
+/** 切换至上个结点 */
+#define LinkedList_ToPrev(list) ((list)->current_node ? (--(list)->current_node_pos,\
+				(list)->current_node = (list)->current_node->prev):NULL)
+
+/** 遍历 */
 #define LinkedList_ForEach(elem, pos, list) \
 	for( elem = LinkedList_Goto(list, pos) == 0 ? LinkedList_Get(list):NULL; \
 		!LinkedList_IsAtEnd(list); LinkedList_ToNext(list) ? elem = LinkedList_Get(list):0)
+
+/** 倒序遍历 */
+#define LinkedList_ForEachReverse(elem, pos, list) \
+	for( elem = LinkedList_Goto(list, (list)->used_node_num - pos - 1) == 0 ? LinkedList_Get(list):NULL; \
+		!((list)->current_node_pos < 0 || !(list)->current_node); LinkedList_ToPrev(list) ? elem = LinkedList_Get(list):0)
 
 /** 初始化链表 */
 LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size );
