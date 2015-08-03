@@ -368,7 +368,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		Graph_Quote( &content_graph, &paint->canvas, &content_rect );
 	}
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
-	LinkedList_ForEach( child, 0, &w->children_show ) {
+	LinkedList_ForEachReverse( child, 0, &w->children_show ) {
 		if( !child->style.visible ) {
 			continue;
 		}

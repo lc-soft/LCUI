@@ -97,14 +97,15 @@ remove_done:
 
 	widget->parent = container;
 	LinkedList_Append( &container->children, widget );
-	LinkedList_Append( &container->children_show, widget );
+	LinkedList_Goto( &container->children_show, 0 );
+	LinkedList_Insert( &container->children_show, widget );
 	/* 如果是添加至根部件内，则触发 WET_ADD 事件 */
 	if( container == LCUIRootWidget ) {
 		e.type_name = "TopLevelWidget";
 		e.target = widget;
 		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_ADD );
 	}
-	Widget_AddTaskToSpread( widget,  WTT_UPDATE_STYLE );
+	Widget_AddTaskToSpread( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
 	DEBUG_MSG("tip\n");
 	return 0;
@@ -252,6 +253,7 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 	do {
 		is_hit = FALSE;
 		LinkedList_ForEach( child, 0, &target->children_show ) {
+			_DEBUG_MSG("%s > %s:%d\n", target->type, child->type, child->style.visible);
 			if( !child->style.visible ) {
 				continue;
 			}
@@ -818,7 +820,7 @@ void LCUI_InitWidget(void)
 	LCUIWidget_AddTextView();
 	LCUIWidget_AddButton();
 	LCUIRootWidget = LCUIWidget_New("root");
-	Widget_SetTitleW( LCUIRootWidget, L"LCUI's widget container" );
+	Widget_SetTitleW( LCUIRootWidget, L"LCUI Display" );
 }
 
 void LCUI_ExitWidget(void)
