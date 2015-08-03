@@ -32,160 +32,12 @@ void onTimer( void *arg )
 	static int x = 0, y = 0, vx = 1, vy = 1;
 	vx = x > 320 ? -1:vx;
 	vx = x < 0 ? 1:vx;
-	vy = y > 320 ? -1:vy;
+	vy = y > 240 ? -1:vy;
 	vy = y < 0 ? 1:vy;
 	x += vx;
 	y += vy;
 	Widget_Move( arg, x, y );
-	_DEBUG_MSG("fps: %d\n", LCUIDisplay_GetFPS());
-}
-
-void test_gen_font_code(void)
-{
-	LCUI_Graph font_img;
-	uchar_t *bp, *src_row_bp, *row_bp;
-	int i, ch, x, y, base_y;
-	char str[64];
-	LCUI_Rect rect;
-	LCUI_FontBitmap bitmap;
-	struct {
-		char name[64];
-		int is_solid;
-		int width;
-		int size;
-		int line_height;
-	} config[7] = {
-		{ "font_inconsolata_12px", 1, 6, 12, 20 },
-		{ "font_inconsolata_13px", 1, 7, 13, 20 },
-		{ "font_inconsolata_14px", 1, 7, 14, 20 },
-		{ "font_inconsolata_15px", 1, 8, 15, 22 },
-		{ "font_inconsolata_16px", 1, 8, 16, 24 },
-		{ "font_inconsolata_17px", 1, 9, 17, 26 },
-		{ "font_inconsolata_18px", 1, 9, 18, 26 }
-	};
-	Graph_Init(&font_img);
-	for( i=0; i<7; ++i ) {
-		LCUI_BOOL has_pixel;
-		int ch_left, ch_right, ch_top, ch_bottom;
-		FILE *font_index_fp, *font_data_fp;
-		uchar_t *byte_cursor;
-
-		sprintf(str, "%s.png", config[i].name);
-		if( Graph_LoadImage(str, &font_img) != 0 ) {
-			continue;
-		}
-		byte_cursor = NULL;
-		base_y = (int)(config[i].line_height * 4.0/5.0);
-		sprintf(str, "%s-index.c", config[i].name);
-		font_index_fp = fopen(str, "wt+");
-		sprintf(str, "%s-data.c", config[i].name);
-		font_data_fp = fopen(str, "wt+");
-		src_row_bp = font_img.bytes;
-		fprintf( font_index_fp, 
-			 "#include <LCUI_Build.h>\n"
-			 "#include <LCUI/LCUI.h>\n"
-			 "#include <LCUI/font.h>\n\n"
-			 "/* %s */\n"
-			 "static const LCUI_FontBMP font_bitmap_info[] = {\n", config[i].name);
-		fprintf(font_data_fp, "/* %s */\n", config[i].name);
-		fprintf(font_data_fp, "static const unsigned char font_bitmap_bytes[] = {\n");
-		for( ch = ' '; ch <= '~'; ++ch ) {
-			bitmap.top = -1000;
-			bitmap.left = 0;
-			bitmap.rows = 0;
-			bitmap.width = 0;
-			row_bp = src_row_bp;
-			ch_top = ch_bottom = -1;
-			for( y=0; y<config[i].line_height; ++y ) {
-				bp = row_bp;
-				has_pixel = FALSE;
-				ch_right = ch_left = -1;
-				for( x = 0; x <= config[i].width; ++x ) {
-					if( *bp == 255 ) {
-						DEBUG_MSG( "     ");
-					} else {
-						if( ch_left == -1 ) {
-							ch_left = x;
-						} else {
-							ch_right = x;
-						}
-						has_pixel = TRUE;
-						DEBUG_MSG( "0x%02x,", 255 - *bp );
-					}
-					bp += font_img.bytes_per_pixel;
-				}
-				DEBUG_MSG("%d\n", y);
-				if( ch_left >= 0 && ch_right > ch_left && ch_right - ch_left >= bitmap.width ) {
-					bitmap.width = ch_right - ch_left + 1;
-					bitmap.left = ch_left;
-				}
-				if( has_pixel ) {
-					if( ch_top == -1 ) {
-						ch_top = y;
-					} else {
-						ch_bottom = y;
-					}
-				}
-				row_bp += font_img.bytes_per_row;
-			}
-			if( ch_top >= 0 && ch_bottom > ch_top ) {
-				bitmap.top = base_y - ch_top;
-				 bitmap.rows = ch_bottom - ch_top + 1;
-			}
-			if( bitmap.top == -1000 ) {
-				bitmap.top = base_y;
-			}
-			// 如果是等宽字体
-			if( config[i].is_solid ) {
-				bitmap.advance.x = config[i].width;
-				bitmap.advance.y = config[i].size;
-			} else {
-				bitmap.left = 0;
-				bitmap.advance.x = bitmap.width;
-				bitmap.advance.y = config[i].size;
-			}
-			rect.x = 0;
-			rect.y = (ch - ' ') * config[i].line_height;
-			rect.width = 12;
-			rect.height = config[i].line_height;
-			//Graph_Quote(&ch_img, &font_img, &rect);
-			//sprintf(str, "%s-%d.png", config[i].name, ch);
-			//Graph_WritePNG(str, &ch_img);
-			row_bp = src_row_bp;
-			bitmap.pitch = bitmap.rows;
-			DEBUG_MSG( "%c: {%d,%d,%d,%d,%d,%p,8,0,{%d,%d}},\n", 
-				 ch, bitmap.top, bitmap.left, bitmap.width, bitmap.rows,
-				 bitmap.pitch,byte_cursor, bitmap.advance.x, bitmap.advance.y);
-			fprintf( font_index_fp, "\t{%d,%d,%d,%d,%d,(unsigned char*)0x%p,8,0,{%d,%d}},\n", 
-				 bitmap.top, bitmap.left, bitmap.width, bitmap.rows,
-				 bitmap.pitch,byte_cursor, bitmap.advance.x, bitmap.advance.y);
-			fprintf(font_data_fp, "\t/* ch = '%c' */\n", ch);
-			ch_top = base_y - bitmap.top;
-			for( y=0; y<config[i].line_height; ++y ) {
-				bp = row_bp;
-				if( y < ch_top || y >= ch_top + bitmap.rows ) {
-					row_bp += font_img.bytes_per_row;
-					continue;
-				}
-				fputc( '\t', font_data_fp );
-				for( x = 0; x <= config[i].width; ++x ) {
-					if( x >= bitmap.left && x < bitmap.left + bitmap.width ) {
-						fprintf(font_data_fp, "0x%02x,", 255 - *bp);
-						++byte_cursor;
-					}
-					bp += font_img.bytes_per_pixel;
-				}
-				fputc( '\n', font_data_fp );
-				row_bp += font_img.bytes_per_row;
-			}
-			src_row_bp += font_img.bytes_per_row * config[i].line_height;
-		}
-		fprintf(font_index_fp, "};\n");
-		fprintf(font_data_fp, "};\n");
-		fclose(font_index_fp);
-		fclose(font_data_fp);
-		Graph_Free(&font_img);
-	}
+	DEBUG_MSG("fps: %d\n", LCUIDisplay_GetFPS());
 }
 
 const wchar_t test_str[] = L"[size=12px]12px, 0123456789, hello,world! are you OK? I like this![/size]\n\
@@ -198,35 +50,47 @@ const wchar_t test_str[] = L"[size=12px]12px, 0123456789, hello,world! are you O
 
 int main( int argc, char **argv )
 {
-	LCUI_Widget w, root, text, btn;
+	int i;
+	wchar_t str[64];
+	LCUI_Widget w, root, text[4], btn;
 	LCUI_Graph *desktop_image = Graph_New();
-
+	
 #ifdef LCUI_BUILD_IN_WIN32
 	InitConsoleWindow();//test_gen_font_code();return 0;
 #endif
 	_DEBUG_MSG("test\n");
+	
 	LCUI_Init();
 	LCUIDisplay_SetMode( LDM_WINDOWED );
 	LCUIDisplay_SetSize( 960, 540 );
 	w = LCUIWidget_New("debug-widget");
-	text = LCUIWidget_New("textview");
+	for( i=0; i<4; ++i ) {
+		text[i] = LCUIWidget_New("textview");
+		swprintf( str, 60, L"textview-%d", i );
+		TextView_SetTextW( text[i], str );
+		Widget_Append( w, text[i] );
+		Widget_Show( text[i] );
+		Widget_Move( text[i], i*15, i*15 );
+	}
 	btn = LCUIWidget_New("button");
-	Widget_Append( w, text );
 	Widget_Append( w, btn );
-	TextView_SetTextW( text, test_str);//测试文本内容，呵呵达！\nABCDEFG,abcdefg,[color=#ff0000]color font[/color]");
 	Widget_Top( w );
 	Widget_Show( w );
 	Widget_Show( btn );
 	Widget_Resize( w, 520, 240 );
 	Widget_Resize( btn, 80, 40 );
 	Widget_Move( w, 200, 200 );
+	Widget_Move( btn, 80, 120 );
 	Widget_SetTitleW( w, L"测试" );
 	Graph_LoadImage( "images/background-image.png", desktop_image );
 	root = LCUIWidget_GetRoot();
 	
 	SetStyle( root->style, key_background_color, RGB(255,242,223), color );
 	SetStyle( root->style, key_background_image, desktop_image, image );
-	SetStyle( root->style, key_background_size, SV_COVER, style );
+	//SetStyle( root->style, key_background_size, SV_COVER, style );
+	SetStyle( root->style, key_background_position, SV_CENTER, style );
+	SetStyle( root->style, key_background_size_width, 0.75, scale );
+	SetStyle( root->style, key_background_size_height, 0.75, scale );
 	Widget_Update( root, FALSE );
 
 	SetStyle( w->style, key_background_color, ARGB(200,255,255,255), color );
@@ -247,6 +111,6 @@ int main( int argc, char **argv )
 	SetStyle( w->style, key_border_bottom_color, RGB(0,122,204), color );
 	SetStyle( w->style, key_border_left_color, RGB(0,122,204), color );
 	Widget_Update( w, FALSE );
-	LCUITimer_Set( 20, onTimer, btn, TRUE );
+	//LCUITimer_Set( 10, onTimer, btn, TRUE );
 	return LCUI_Main();
 }
