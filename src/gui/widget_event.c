@@ -271,31 +271,64 @@ static void Widget_ProcHover( LCUI_Widget widget )
 	if( self.targets[WST_HOVER] == widget ) {
 		return;
 	}
-	for( ; new_w && new_w != LCUIRootWidget; new_w = new_w->parent ) {
-		for( w = old_w; w != LCUIRootWidget && w; w = w->parent ) {
-			if( new_w == old_w ) {
-				break;
-			}
-			Widget_AddStatus( new_w, "hover" );
-			Widget_RemoveStatus( old_w, "hover" );
-			e.target = new_w;
+	_DEBUG_MSG("widget: %s, target: %s\n", widget ? widget->type:NULL, self.targets[WST_HOVER]?self.targets[WST_HOVER]->type:NULL);
+	self.targets[WST_HOVER] = widget;
+	/* 检测新部件是否为老部件的父级 */
+	for( w = old_w; w != LCUIRootWidget && w; w = w->parent ) {
+		if( w == new_w ) {
+			break;
+		}
+	}
+	if( w == new_w ) {
+		_DEBUG_MSG("old_w is new_w 's child\n");
+		for( w = old_w; w != new_w; w = w->parent ) {
+			_DEBUG_MSG("%s no hover\n", w->type);
+			Widget_RemoveStatus( w, "hover" );
+			e.target = w;
+			e.type = WET_MOUSEOUT;
+			e.type_name = "mouseout";
+			Widget_PostEvent( w, &e, NULL );
+		}
+		return;
+	}
+	/* 检测老部件是否为新部件的父级 */
+	for( w = new_w; w != LCUIRootWidget && w; w = w->parent ) {
+		if( w == old_w ) {
+			break;
+		}
+	}
+	if( w == old_w ) {
+		_DEBUG_MSG("new_w is old_w 's child\n");
+		for( w = new_w; w != old_w; w = w->parent ) {
+			_DEBUG_MSG("%s is hover\n", w->type);
+			Widget_AddStatus( w, "hover" );
+			e.target = w;
 			e.type = WET_MOUSEOVER;
 			e.cancel_bubble = FALSE;
 			e.type_name = "mouseover";
 			Widget_PostEvent( new_w, &e, NULL );
-			e.target = old_w;
-			e.type = WET_MOUSEOUT;
-			e.type_name = "mouseout";
-			Widget_PostEvent( old_w, &e, NULL );
 		}
-		if( new_w == old_w ) {
-			break;
-		}
-		if( old_w ) {
-			old_w = old_w->parent;
-		}
+		return;
 	}
-	self.targets[WST_HOVER] = widget;
+	_DEBUG_MSG("no relation\n");
+	/* 两个部件完全不相干，分开处理 */
+	for( w = new_w; w != LCUIRootWidget && w; w = w->parent ) {
+		_DEBUG_MSG("%s is hover\n", w->type);
+		Widget_AddStatus( w, "hover" );
+		e.target = w;
+		e.type = WET_MOUSEOVER;
+		e.cancel_bubble = FALSE;
+		e.type_name = "mouseover";
+		Widget_PostEvent( new_w, &e, NULL );
+	}
+	for( w = old_w; w != LCUIRootWidget && w; w = w->parent ) {
+		_DEBUG_MSG("%s no hover\n", w->type);
+		Widget_RemoveStatus( w, "hover" );
+		e.target = w;
+		e.type = WET_MOUSEOUT;
+		e.type_name = "mouseout";
+		Widget_PostEvent( w, &e, NULL );
+	}
 }
 
 /** 响应系统的鼠标移动事件，向目标部件投递相关鼠标事件 */
@@ -308,8 +341,10 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 	LCUICursor_GetPos( &pos );
 	target = Widget_At( LCUIRootWidget, pos.x, pos.y );
 	if( !target ) {
+		Widget_ProcHover( NULL );
 		return;
 	}
+	_DEBUG_MSG("target: %s\n", target->type);
 	ebuff.x = pos.x;
 	ebuff.y = pos.y;
 	ebuff.target = target;
