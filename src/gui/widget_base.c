@@ -253,7 +253,6 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 	do {
 		is_hit = FALSE;
 		LinkedList_ForEach( child, 0, &target->children_show ) {
-			_DEBUG_MSG("%s > %s:%d\n", target->type, child->type, child->style.visible);
 			if( !child->style.visible ) {
 				continue;
 			}
@@ -781,7 +780,8 @@ int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 	if( strlist_remove_str( &w->classes, class_name ) != 1 ) {
 		return 0;
 	}
-	Widget_AddTaskToSpread( w, WTT_UPDATE_STYLE );
+	Widget_AddTask( w, WTT_REFRESH_STYLE );
+	Widget_AddTaskToSpread( w, WTT_REFRESH_STYLE );
 	return 1;
 }
 
@@ -791,7 +791,8 @@ int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 	if( strlist_add_str( &w->pseudo_classes, status_name ) != 1 ) {
 		return 0;
 	}
-	Widget_AddTaskToSpread( w,  WTT_UPDATE_STYLE );
+	Widget_AddTask( w, WTT_REFRESH_STYLE );
+	Widget_AddTaskToSpread( w,  WTT_REFRESH_STYLE );
 	return 1;
 }
 
