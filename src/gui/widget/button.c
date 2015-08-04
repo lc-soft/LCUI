@@ -106,12 +106,14 @@ void LCUIWidget_AddButton( void )
 	css = StyleSheet();
 	selector = Selector("button:hover");
 	SetStyle(css, key_background_color, RGB(230,230,230), color);
+	LCUI_PutStyle( selector, css );
 	DeleteSelector( &selector );
 	DeleteStyleSheet( &css );
 	
 	css = StyleSheet();
 	selector = Selector("button:active");
-	SetStyle(css, key_background_color, RGB(200,200,200), color);
+	SetStyle(css, key_background_color, RGB(215,215,215), color);
+	LCUI_PutStyle( selector, css );
 	DeleteSelector( &selector );
 	DeleteStyleSheet( &css );
 	
