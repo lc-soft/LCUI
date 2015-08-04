@@ -124,6 +124,16 @@ static void DestroyStyleTreeNode( void *data )
 	LinkedList_Destroy( &((StyleTreeNode*)data)->styles );
 }
 
+/** 清空样式表 */
+static void ClearStyleSheet( LCUI_StyleSheet ss )
+{
+	int i;
+	for( i=0; i<STYLE_KEY_TOTAL; ++i ) {
+		ss[i].is_valid = FALSE;
+	}
+}
+
+
 /** 合并两个样式表 */
 static void MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet source )
 {
@@ -524,6 +534,13 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 		strncpy( fullname + 1, w->classes[i], MAX_NAME_LEN-1 );
 		count += FindStyleNodeByName( fullname, w, list );
 	}
+	i = ptrslen( w->pseudo_classes );
+	/* 记录伪类选择器匹配的样式表 */
+	while( --i >= 0 ) {
+		fullname[0] = ':';
+		strncpy( fullname + 1, w->pseudo_classes[i], MAX_NAME_LEN-1 );
+		count += FindStyleNodeByName( fullname, w, list );
+	}
 	/* 记录ID选择器匹配的样式表 */
 	if( w->id ) {
 		fullname[0] = '#';
@@ -543,9 +560,11 @@ int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 	LCUI_StyleSheet ss;
 	LinkedList list;
 
+	_DEBUG_MSG("widget: %s\n", w->type);
 	LinkedList_Init( &list, sizeof(LCUI_StyleSheet) );
 	LinkedList_SetDataNeedFree( &list, FALSE );
 	FindStyleNode( w, &list );
+	ClearStyleSheet( out_ss );
 	LinkedList_ForEach( ss, 0, &list ) {
 		MergeStyleSheet( out_ss, ss );
 	}
@@ -568,8 +587,11 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 	};
 	LCUI_BOOL task_flags[TASK_TOTAL] = { 0 };
 
+	DEBUG_MSG("widget: %s, is_update_all: %d\n", w->type, is_update_all);
 	if( is_update_all ) {
 		Widget_ComputeInheritStyle( w, w->inherited_css );
+		_DEBUG_MSG("background-color: %x\n", w->inherited_css[key_background_color].color.value);
+		_DEBUG_MSG("border-top-color: %x\n", w->inherited_css[key_border_top_color].color.value);
 	}
 	ReplaceStyleSheet( w->base.css, w->inherited_css, w->base.style );
 	/* 对比两张样式表，确定哪些需要更新 */
