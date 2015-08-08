@@ -81,7 +81,7 @@ void Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 {
 	LCUI_Rect rect;
 	Widget_AdjustArea( w, r, &rect, box_type );
-	DEBUG_MSG("[%s]: invalidRect:(%d,%d,%d,%d)\n", w->type_name, rect.x, rect.y, rect.width, rect.height);
+	DEBUG_MSG("[%s]: invalidRect:(%d,%d,%d,%d)\n", w->type, rect.x, rect.y, rect.width, rect.height);
 	DirtyRectList_Add( &w->dirty_rects, &rect );
 	while( w = w->parent, w && !w->has_dirty_child ) {
 		w->has_dirty_child = TRUE;
@@ -169,20 +169,15 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 			LCUI_PaintContextRec_ paint;
 			paint.rect = *r;
 			Graph_Quote( &paint.canvas, &w->graph, &paint.rect );
-			DEBUG_MSG("[%s]: paint, rect:(%d,%d,%d,%d)\n", w->type_name, r->x, r->y, r->width, r->height);
+			DEBUG_MSG("[%s]: paint, rect:(%d,%d,%d,%d)\n", w->type, r->x, r->y, r->width, r->height);
 			Widget_OnPaint( w, &paint );
 		}
-		/* 转换为相对于父部件的坐标 */
-		rect.x = r->x;
-		rect.y = r->y;
-		rect.w = r->w;
-		rect.h = r->h;
 		/* 取出与容器内有效区域相交的区域 */
-		if( LCUIRect_GetOverlayRect(&rect, valid_box, &rect) ) {
+		if( LCUIRect_GetOverlayRect(r, valid_box, &rect) ) {
 			/* 转换相对于根级部件的坐标 */
 			rect.x += x;
 			rect.y += y;
-			DEBUG_MSG("[%s]: merge rect:(%d,%d,%d,%d)\n", w->type_name, rect.x, rect.y, rect.width, rect.height);
+			DEBUG_MSG("[%s]: merge rect:(%d,%d,%d,%d)\n", w->type, rect.x, rect.y, rect.width, rect.height);
 			DirtyRectList_Add( rlist, &rect );
 		}
 	}
@@ -204,8 +199,8 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 			continue;
 		}
 		count += _Widget_ProcInvalidArea(
-			child, child->base.box.graph.x + x,
-			child->base.box.graph.y + y, &child_box, rlist
+			child, child->base.box.content.x + x,
+			child->base.box.content.y + y, &child_box, rlist
 		);
 	}
 	return count;
@@ -392,7 +387,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		/* 将绘制区域转换为相对于子部件 */
 		child_paint.rect.x -= child_rect.x;
 		child_paint.rect.y -= child_rect.y;
-		DEBUG_MSG("[%s]: canvas_rect:(%d,%d,%d,%d)\n", w->type_name, canvas_rect.left, canvas_rect.top, canvas_rect.w, canvas_rect.h);
+		DEBUG_MSG("[%s]: canvas_rect:(%d,%d,%d,%d)\n", w->type, canvas_rect.left, canvas_rect.top, canvas_rect.w, canvas_rect.h);
 		/* 在内容位图中引用所需的区域，作为子部件的画布 */
 		Graph_Quote( &child_paint.canvas, &content_graph, &canvas_rect );
 		Widget_Render( child, &child_paint );
@@ -419,14 +414,7 @@ content_paint_done:
 	else if( has_content_graph ) {
 		Graph_Mix( &paint->canvas, &content_graph,
 			   Pos(content_rect.x, content_rect.y) );
-	}/*
-	if( w == LCUIRootWidget ) {
-		Graph_WritePNG( "1, debug_self_graph.png", &self_graph );
-		Graph_WritePNG( "1, debug_content_graph.png", &content_graph );
-	} else {
-		Graph_WritePNG( "2, debug_self_graph.png", &self_graph );
-		Graph_WritePNG( "2, debug_content_graph.png", &content_graph );
-	}*/
+	}
 	Graph_Free( &layer_graph );
 	Graph_Free( &self_graph );
 	Graph_Free( &content_graph );

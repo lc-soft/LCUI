@@ -262,17 +262,17 @@ int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 	return LCUIEventBox_Send( widget->event, e->type_name, &pack );
 }
 
-/** 处理部件对鼠标覆盖/移开时的反应 */
-static void Widget_ProcHover( LCUI_Widget widget )
+/** 更新状态 */
+static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 {
 	LCUI_WidgetEvent e;
-	LCUI_Widget w, new_w = widget, old_w = self.targets[WST_HOVER];
+	const char *sname = type == WST_HOVER ? "hover":"active";
+	LCUI_Widget w, new_w = widget, old_w = self.targets[type];
 
-	if( self.targets[WST_HOVER] == widget ) {
+	if( self.targets[type] == widget ) {
 		return;
 	}
-	_DEBUG_MSG("widget: %s, target: %s\n", widget ? widget->type:NULL, self.targets[WST_HOVER]?self.targets[WST_HOVER]->type:NULL);
-	self.targets[WST_HOVER] = widget;
+	self.targets[type] = widget;
 	/* 检测新部件是否为老部件的父级 */
 	for( w = old_w; w != LCUIRootWidget && w; w = w->parent ) {
 		if( w == new_w ) {
@@ -280,14 +280,14 @@ static void Widget_ProcHover( LCUI_Widget widget )
 		}
 	}
 	if( w == new_w ) {
-		_DEBUG_MSG("old_w is new_w 's child\n");
 		for( w = old_w; w != new_w; w = w->parent ) {
-			_DEBUG_MSG("%s no hover\n", w->type);
-			Widget_RemoveStatus( w, "hover" );
-			e.target = w;
-			e.type = WET_MOUSEOUT;
-			e.type_name = "mouseout";
-			Widget_PostEvent( w, &e, NULL );
+			Widget_RemoveStatus( w, sname );
+			if( type == WST_HOVER ) {
+				e.target = w;
+				e.type = WET_MOUSEOUT;
+				e.type_name = "mouseout";
+				Widget_PostEvent( w, &e, NULL );
+			}
 		}
 		return;
 	}
@@ -298,36 +298,37 @@ static void Widget_ProcHover( LCUI_Widget widget )
 		}
 	}
 	if( w == old_w ) {
-		_DEBUG_MSG("new_w is old_w 's child\n");
 		for( w = new_w; w != old_w; w = w->parent ) {
-			_DEBUG_MSG("%s is hover\n", w->type);
-			Widget_AddStatus( w, "hover" );
+			Widget_AddStatus( w, sname );
+			if( type == WST_HOVER ) {
+				e.target = w;
+				e.type = WET_MOUSEOVER;
+				e.cancel_bubble = FALSE;
+				e.type_name = "mouseover";
+				Widget_PostEvent( new_w, &e, NULL );
+			}
+		}
+		return;
+	}
+	/* 两个部件完全不相干，分开处理 */
+	for( w = new_w; w != LCUIRootWidget && w; w = w->parent ) {
+		Widget_AddStatus( w, sname );
+		if( type == WST_HOVER ) {
 			e.target = w;
 			e.type = WET_MOUSEOVER;
 			e.cancel_bubble = FALSE;
 			e.type_name = "mouseover";
 			Widget_PostEvent( new_w, &e, NULL );
 		}
-		return;
-	}
-	_DEBUG_MSG("no relation\n");
-	/* 两个部件完全不相干，分开处理 */
-	for( w = new_w; w != LCUIRootWidget && w; w = w->parent ) {
-		_DEBUG_MSG("%s is hover\n", w->type);
-		Widget_AddStatus( w, "hover" );
-		e.target = w;
-		e.type = WET_MOUSEOVER;
-		e.cancel_bubble = FALSE;
-		e.type_name = "mouseover";
-		Widget_PostEvent( new_w, &e, NULL );
 	}
 	for( w = old_w; w != LCUIRootWidget && w; w = w->parent ) {
-		_DEBUG_MSG("%s no hover\n", w->type);
-		Widget_RemoveStatus( w, "hover" );
-		e.target = w;
-		e.type = WET_MOUSEOUT;
-		e.type_name = "mouseout";
-		Widget_PostEvent( w, &e, NULL );
+		Widget_RemoveStatus( w, sname );
+		if( type == WST_HOVER ) {
+			e.target = w;
+			e.type = WET_MOUSEOUT;
+			e.type_name = "mouseout";
+			Widget_PostEvent( w, &e, NULL );
+		}
 	}
 }
 
@@ -341,10 +342,9 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 	LCUICursor_GetPos( &pos );
 	target = Widget_At( LCUIRootWidget, pos.x, pos.y );
 	if( !target ) {
-		Widget_ProcHover( NULL );
+		Widget_UpdateStatus( NULL, WST_HOVER );
 		return;
 	}
-	_DEBUG_MSG("target: %s\n", target->type);
 	ebuff.x = pos.x;
 	ebuff.y = pos.y;
 	ebuff.target = target;
@@ -354,8 +354,8 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 	case LCUI_MOUSEDOWN:
 		ebuff.type = WET_MOUSEDOWN;
 		ebuff.type_name = "mousedown";
-		self.targets[WST_ACTIVE] = target;
 		Widget_PostEvent( target, &ebuff, NULL );
+		Widget_UpdateStatus( target, WST_ACTIVE );
 		break;
 	case LCUI_MOUSEUP:
 		ebuff.type = WET_MOUSEUP;
@@ -367,7 +367,7 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 			ebuff.cancel_bubble = TRUE;
 			Widget_PostEvent( target, &ebuff, NULL );
 		}
-		self.targets[WST_ACTIVE] = NULL;
+		Widget_UpdateStatus( NULL, WST_ACTIVE );
 		break;
 	case LCUI_MOUSEMOVE:
 		ebuff.type = WET_MOUSEMOVE;
@@ -376,8 +376,7 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 		break;
 	default:return;
 	}
-	_DEBUG_MSG("event = %s, x: %d, y = %d\n", ebuff.type_name, ebuff.x, ebuff.y);
-	Widget_ProcHover( target );
+	Widget_UpdateStatus( target, WST_HOVER );
 }
 
 /** 响应按键的按下 */

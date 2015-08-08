@@ -690,8 +690,8 @@ int strlist_add_str( char ***strlist, const char *str )
 	char **newlist;
 
 	if( *strlist ) {
-		for( i = 0; *strlist[i]; ++i ) {
-			if( strcmp(*strlist[i], str) == 0 ) {
+		for( i = 0; (*strlist)[i]; ++i ) {
+			if( strcmp((*strlist)[i], str) == 0 ) {
 				return 0;
 			}
 		}
@@ -808,7 +808,8 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 	if( strlist_remove_str( &w->pseudo_classes, status_name ) != 1 ) {
 		return 0;
 	}
-	Widget_AddTaskToSpread( w, WTT_UPDATE_STYLE );
+	Widget_AddTask( w, WTT_REFRESH_STYLE );
+	Widget_AddTaskToSpread( w,  WTT_REFRESH_STYLE );
 	return 1;
 }
 

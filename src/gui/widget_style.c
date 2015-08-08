@@ -365,6 +365,7 @@ static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 	sln = (StyleListNode*)malloc(sizeof(StyleListNode));
 	sln->style = StyleSheet();
 	for( n=0; selector[n]; ++n );
+	++n;
 	sln->selector = (LCUI_Selector)malloc( sizeof(LCUI_SelectorNode*)*n );
 	for( i=0, n-=1; i<n; ++i ) {
 		sn = (LCUI_SelectorNode)malloc( sizeof(struct LCUI_SelectorNodeRec_) );
@@ -455,7 +456,7 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 			n = ptrslen( w->classes );
 			for( i = 0; i < n; ++i ) {
 				if( strcmp(w->classes[i],
-					(*sn_ptr)->class_name) ) {
+					(*sn_ptr)->class_name) == 0 ) {
 					break;
 				}
 			}
@@ -467,7 +468,7 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 			n = ptrslen( w->pseudo_classes );
 			for( i = 0; i < n; ++i ) {
 				if( strcmp(w->pseudo_classes[i],
-					(*sn_ptr)->pseudo_class_name) ) {
+					(*sn_ptr)->pseudo_class_name) == 0 ) {
 					break;
 				}
 			}
@@ -503,9 +504,8 @@ static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 	if( n == 0 ) {
 		wlist[0] = NULL;
 	} else {
-		n -= 1;
 		wlist[n] = NULL;
-		w = widget->parent;
+		w = widget;
 		while( --n >= 0 ) {
 			wlist[n] = w;
 			w = w->parent;
@@ -560,7 +560,6 @@ int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 	LCUI_StyleSheet ss;
 	LinkedList list;
 
-	_DEBUG_MSG("widget: %s\n", w->type);
 	LinkedList_Init( &list, sizeof(LCUI_StyleSheet) );
 	LinkedList_SetDataNeedFree( &list, FALSE );
 	FindStyleNode( w, &list );
@@ -587,11 +586,8 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 	};
 	LCUI_BOOL task_flags[TASK_TOTAL] = { 0 };
 
-	DEBUG_MSG("widget: %s, is_update_all: %d\n", w->type, is_update_all);
 	if( is_update_all ) {
 		Widget_ComputeInheritStyle( w, w->inherited_css );
-		_DEBUG_MSG("background-color: %x\n", w->inherited_css[key_background_color].color.value);
-		_DEBUG_MSG("border-top-color: %x\n", w->inherited_css[key_border_top_color].color.value);
 	}
 	ReplaceStyleSheet( w->base.css, w->inherited_css, w->base.style );
 	/* 对比两张样式表，确定哪些需要更新 */

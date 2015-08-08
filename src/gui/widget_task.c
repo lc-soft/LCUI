@@ -335,6 +335,7 @@ static void HandleShadow( LCUI_Widget w )
 		return;
 	}
 	Widget_AddTask( w, WTT_RESIZE );
+	Widget_AddTask( w, WTT_POSITION );
 }
 
 static void HandleBackground( LCUI_Widget w )
@@ -346,14 +347,14 @@ static void HandleBackground( LCUI_Widget w )
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
 static void HandleBody( LCUI_Widget w )
 {
-	_DEBUG_MSG( "body\n" );
+	DEBUG_MSG( "body\n" );
 	Widget_InvalidateArea( w, NULL, SV_BORDER_BOX );
 }
 
 /** 处理刷新（标记整个部件区域为脏矩形） */
 static void HandleRefresh( LCUI_Widget w )
 {
-	_DEBUG_MSG( "refresh\n" );
+	DEBUG_MSG( "refresh\n" );
 	Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 }
 
@@ -371,6 +372,7 @@ static void HandleBorder( LCUI_Widget w )
 	 || ob.bottom.width != nb->bottom.width
 	 || ob.left.width != nb->left.width ) {
 		Widget_AddTask( w, WTT_RESIZE );
+		Widget_AddTask( w, WTT_POSITION );
 		return;
 	}
 
