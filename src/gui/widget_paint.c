@@ -91,7 +91,7 @@ void Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 /**
  * 获取部件中的无效区域
  * @param[in] widget	目标部件
- * @area[out] area	无效区域
+ * @param[out] area	无效区域
  */
 int Widget_GetInvalidArea( LCUI_Widget widget, LCUI_Rect *area )
 {
@@ -195,14 +195,19 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 	child_box.y -= w->base.box.content.y;
 	/* 向子级部件递归 */
 	LinkedList_ForEach( child, 0, &w->children ) {
+		int child_x, child_y;
+
 		if( !child->style.visible ) {
 			continue;
 		}
-		count += _Widget_ProcInvalidArea(
-			child, child->base.box.content.x + x,
-			child->base.box.content.y + y, &child_box, rlist
-		);
+		child_x = child->base.box.graph.x + x;
+		child_x += w->base.box.content.x - w->base.box.graph.x;
+		child_y = child->base.box.graph.y + y;
+		child_y += w->base.box.content.y - w->base.box.graph.y;
+		count += _Widget_ProcInvalidArea( child, child_x, child_y, 
+						  &child_box, rlist );
 	}
+	w->has_dirty_child = FALSE;
 	return count;
 }
 
