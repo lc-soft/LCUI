@@ -214,24 +214,6 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
         8, color_type, PNG_INTERLACE_NONE,
         PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
-	text[0].key = "Title";
-	text[0].text = "png output file";
-	text[0].compression = PNG_TEXT_COMPRESSION_NONE;
-	text[0].text_length = strlen(text[0].text);
-
-	text[1].key = "Author";
-	text[1].text = "LCUI Application";
-	text[1].compression = PNG_TEXT_COMPRESSION_NONE;
-	text[1].text_length = strlen(text[1].text);
-
-	text[2].key = "Description";
-	text[2].text = "this png file generate from LCUI Application.";
-	text[2].compression = PNG_TEXT_COMPRESSION_zTXt;
-	text[2].text_length = strlen(text[2].text);
-
-	png_set_text(png_ptr, info_ptr, &text[0], 3);
-	png_set_text(png_ptr, info_ptr, &text[1], 3);
-	png_set_text(png_ptr, info_ptr, &text[2], 3);
         png_write_info(png_ptr, info_ptr);
         /* write bytes */
         if (setjmp(png_jmpbuf(png_ptr))) {
