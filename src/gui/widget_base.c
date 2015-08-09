@@ -249,19 +249,17 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 {
 	LCUI_BOOL is_hit;
-	LCUI_Widget target = widget, child = NULL;
+	LCUI_Widget target = widget, c = NULL;
 	do {
 		is_hit = FALSE;
-		LinkedList_ForEach( child, 0, &target->children_show ) {
-			if( !child->style.visible ) {
+		LinkedList_ForEach( c, 0, &target->children_show ) {
+			if( !c->style.visible ) {
 				continue;
 			}
-			if( x >= child->base.x && y >= child->base.y
-			&& x < child->base.x + child->base.width
-			&& y < child->base.y + child->base.height ) {
-				target = child;
-				x -= child->base.box.content.x;
-				y -= child->base.box.content.y;
+			if( LCUIRect_HasPoint(&c->base.box.border, x, y) ) {
+				target = c;
+				x -= c->base.box.content.x;
+				y -= c->base.box.content.y;
 				is_hit = TRUE;
 				break;
 			 }

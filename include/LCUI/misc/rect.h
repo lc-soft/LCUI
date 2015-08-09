@@ -52,6 +52,10 @@ LCUI_API LCUI_Rect Rect( int x, int y, int w, int h );
 LCUI_API void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
 							LCUI_Rect *cut );
 
+#define LCUIRect_HasPoint(rect, x, y) (x >= (rect)->x && y >= (rect)->y \
+					&& x < (rect)->x + (rect)->width \
+					&& y < (rect)->y + (rect)->height)
+
 /** 将矩形区域范围调整在容器有效范围内 */
 LCUI_API void LCUIRect_ValidateArea( LCUI_Rect *rect, LCUI_Size box_size );
 
