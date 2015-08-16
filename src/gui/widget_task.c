@@ -269,8 +269,18 @@ static void HandleSetTitle( LCUI_Widget w )
 /** 处理尺寸调整 */
 static void HandleResize( LCUI_Widget w )
 {
+	int i;
 	LCUI_Rect rect;
-	
+	struct { 
+		LCUI_StyleVar *sval;
+		int *ival;
+		int key;
+	} pd_map[4] = {
+		{ &w->style.padding.top, &w->base.padding.top, key_padding_top },
+		{ &w->style.padding.right, &w->base.padding.right, key_padding_right },
+		{ &w->style.padding.bottom, &w->base.padding.bottom, key_padding_bottom },
+		{ &w->style.padding.left, &w->base.padding.left, key_padding_left }
+	};
 	rect = w->base.box.graph;
 	/* 从样式表中获取尺寸 */
 	w->style.width.type = w->css[key_width].type;
@@ -284,6 +294,17 @@ static void HandleResize( LCUI_Widget w )
 		w->style.height.scale = w->css[key_height].value_scale;
 	} else {
 		w->style.height.px = w->css[key_height].value_px;
+	}
+	/* 内边距的单位暂时都用 px  */
+	for( i=0; i<4; ++i ) {
+		pd_map[i].sval->type = SVT_PX;
+		if( w->css[pd_map[i].key].type != SVT_PX ) {
+			pd_map[i].sval->px = 0;
+			*pd_map[i].ival = 0;
+			continue;
+		}
+		pd_map[i].sval->px = w->css[pd_map[i].key].value_px;
+		*pd_map[i].ival = pd_map[i].sval->px;
 	}
 	Widget_ComputeSize( w );
 	if( w->parent ) {
@@ -380,22 +401,29 @@ static void HandleBorder( LCUI_Widget w )
 	rect.width = w->base.box.border.width;
 	rect.width -= max( ob.top_right_radius, ob.right.width );
 	rect.height = max( ob.top_left_radius, ob.top.width );
+	/* 上 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 	rect.x = w->base.box.border.w;
 	rect.width = max( ob.top_right_radius, ob.right.width );
 	rect.x -= rect.width;
 	rect.height = w->base.box.border.height;
 	rect.height -= max( ob.bottom_right_radius, ob.bottom.width );
+	/* 右 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 	rect.x = max( ob.bottom_left_radius, ob.left.width );
+	rect.y = w->base.box.border.height;
 	rect.width = w->base.box.border.width;
 	rect.width -= rect.x;
 	rect.height = max( ob.bottom_right_radius, ob.bottom.width );
+	rect.y -= rect.height;
+	/* 下 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 	rect.width = rect.x;
 	rect.x = 0;
+	rect.y = max( ob.top_left_radius, ob.left.width );
 	rect.height = w->base.box.border.height;
-	rect.height -= max( ob.top_left_radius, ob.left.width );
+	rect.height -= rect.y;
+	/* 左 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 }
 

@@ -582,6 +582,7 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 	TaskMap task_map[] = { 
 		{ key_visible, key_visible, WTT_VISIBLE, TRUE },
 		{ key_width, key_height, WTT_RESIZE, TRUE },
+		{ key_padding_top, key_padding_left, WTT_RESIZE, TRUE },
 		{ key_position_start, key_position_end, WTT_POSITION, TRUE },
 		{ key_border_start, key_border_end, WTT_BORDER, TRUE },
 		{ key_background_start, key_background_end, WTT_BACKGROUND, TRUE },
