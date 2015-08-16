@@ -478,7 +478,7 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 		}
 		++sn_ptr;
 	}
-	if( *sn_ptr == NULL ) {
+	if( *obj_ptr == NULL && *sn_ptr == NULL ) {
 		return TRUE;
 	}
 	return FALSE;
@@ -574,18 +574,20 @@ int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 /** 更新当前部件的样式 */
 void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
-	int key;
-	enum { 
-		CHG_POSITION,
-		CHG_BORDER,
-		CHG_BACKGROUND,
-		CHG_SIZE,
-		CHG_BOX_SHADOW,
-		CHG_VISIBLE,
-		TASK_TOTAL
+	int i, key;
+	typedef struct { 
+		int start, end, task;
+		LCUI_BOOL is_valid;
+	} TaskMap;
+	TaskMap task_map[] = { 
+		{ key_visible, key_visible, WTT_VISIBLE, TRUE },
+		{ key_width, key_height, WTT_RESIZE, TRUE },
+		{ key_position_start, key_position_end, WTT_POSITION, TRUE },
+		{ key_border_start, key_border_end, WTT_BORDER, TRUE },
+		{ key_background_start, key_background_end, WTT_BACKGROUND, TRUE },
+		{ key_box_shadow_start, key_box_shadow_end, WTT_SHADOW, TRUE }
 	};
-	LCUI_BOOL task_flags[TASK_TOTAL] = { 0 };
-
+	
 	if( is_update_all ) {
 		Widget_ComputeInheritStyle( w, w->inherited_css );
 	}
@@ -610,47 +612,14 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 		}
 		w->base.css[key].is_changed = FALSE;
 		w->css[key] = w->base.css[key];
-		if( key == key_visible ) {
-			task_flags[CHG_VISIBLE] = TRUE;
-			continue;
+		for( i = 0; i < sizeof(task_map) / sizeof(TaskMap); ++i ) {
+			if( !task_map[i].is_valid ) {
+				continue;
+			}
+			if( key >= task_map[i].start && key <= task_map[i].end ) {
+				task_map[i].is_valid = FALSE;
+				Widget_AddTask( w, task_map[i].task );
+			}
 		}
-		if( key == key_width || key == key_height ) {
-			task_flags[CHG_SIZE] = TRUE;
-			continue;
-		}
-		if( key > key_position_start && key < key_position_end ) {
-			task_flags[CHG_POSITION] = TRUE;
-			continue;
-		}
-		if( key > key_border_start && key < key_border_end ) {
-			task_flags[CHG_BORDER] = TRUE;
-			continue;
-		}
-		if( key > key_background_start && key < key_background_end ) {
-			task_flags[CHG_BACKGROUND] = TRUE;
-			continue;
-		}
-		if( key > key_box_shadow_start && key < key_box_shadow_end ) {
-			task_flags[CHG_BOX_SHADOW] = TRUE;
-			continue;
-		}
-	}
-	if( task_flags[CHG_VISIBLE] ) {
-		Widget_AddTask( w, WTT_VISIBLE );
-	}
-	if( task_flags[CHG_SIZE] ) {
-		Widget_AddTask( w, WTT_RESIZE );
-	}
-	if( task_flags[CHG_POSITION] ) {
-		Widget_AddTask( w, WTT_POSITION );
-	}
-	if( task_flags[CHG_BOX_SHADOW] ) {
-		Widget_AddTask( w, WTT_SHADOW );
-	}
-	if( task_flags[CHG_BORDER] ) {
-		Widget_AddTask( w, WTT_BORDER );
-	}
-	if( task_flags[CHG_BACKGROUND] ) {
-		Widget_AddTask( w, WTT_BACKGROUND );
 	}
 }
