@@ -271,6 +271,7 @@ static void HandleResize( LCUI_Widget w )
 {
 	int i;
 	LCUI_Rect rect;
+	LCUI_WidgetEvent e;
 	struct { 
 		LCUI_StyleVar *sval;
 		int *ival;
@@ -311,9 +312,19 @@ static void HandleResize( LCUI_Widget w )
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
 		rect.width = w->base.box.graph.width;
 		rect.height = w->base.box.graph.height;
-		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
+		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );	
+		if( w->parent->style.width.type == SVT_AUTO
+		 || w->parent->style.height.type == SVT_AUTO ) {
+			Widget_AddTask( w->parent, WTT_RESIZE );
+		}
 	}
+	e.type_name = "resize";
+	e.type = WET_RESIZE;
+	e.cancel_bubble = TRUE;
+	e.target = w;
+	e.data = NULL;
 	Widget_UpdateGraphBox( w );
+	Widget_PostEvent( w, &e, NULL );
 	Widget_AddTask( w, WTT_REFRESH );
 	HandleTopLevelWidgetEvent( w, WET_RESIZE );
 }
@@ -473,9 +484,6 @@ void Widget_AddTaskToSpread( LCUI_Widget widget, int task_type )
 /** 添加任务 */
 void Widget_AddTask( LCUI_Widget widget, int task_type )
 {
-	if( widget->task->buffer[task_type] ) {
-		return;
-	}
 	widget->task->buffer[task_type] = TRUE;
 	widget->task->for_self = TRUE;
 	DEBUG_MSG("widget: %s, for_self: %d, for_childen: %d, task_id: %d\n",

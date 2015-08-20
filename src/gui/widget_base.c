@@ -440,6 +440,29 @@ void Widget_UpdateGraphBox( LCUI_Widget w )
 	Graph_Create( &w->graph, rg->width, rg->height );
 }
 
+/** 获取合适的内容框大小 */
+void Widget_GetContentSize( LCUI_Widget w, int *width, int *height )
+{
+	int n;
+	LCUI_Widget child;
+
+	*width = 0;
+	*height = 0;
+	LinkedList_ForEach( child, 0, &w->children_show ) {
+		if( !child->style.visible ) {
+			continue;
+		}
+		n = child->base.box.outer.x + child->base.box.outer.width;
+		if( n > *width ) {
+			*width = n;
+		}
+		n = child->base.box.outer.y + child->base.box.outer.height;
+		if( n > *height ) {
+			*height = n;
+		}
+	}
+}
+
 /** 计算尺寸 */
 void Widget_ComputeSize( LCUI_Widget w )
 {
@@ -477,6 +500,23 @@ void Widget_ComputeSize( LCUI_Widget w )
 		w->base.height = 0;
 		break;
 	}
+	if( w->style.height.type == SVT_AUTO || w->style.width.type == SVT_AUTO ) {
+		LCUI_WidgetClass *wc;
+		int width, height;
+
+		wc = LCUIWidget_GetClass( w->type );
+		if( wc && wc->methods.autosize ) {
+			wc->methods.autosize( w, &width, &height );
+		} else {
+			Widget_GetContentSize( w, &width, &height );
+		}
+		if( w->style.width.type == SVT_AUTO ) {
+			w->base.width = width;
+		}
+		if( w->style.height.type == SVT_AUTO ) {
+			w->base.height = height;
+		}
+	}
 	w->base.box.border.width = w->base.width;
 	w->base.box.border.height = w->base.height;
 	w->base.box.content.width = w->base.width;
@@ -503,6 +543,8 @@ void Widget_ComputeSize( LCUI_Widget w )
 		w->base.box.border.height += w->base.padding.top;
 		w->base.box.border.height += w->base.padding.bottom;
 	}
+	/* 先暂时用边框盒区域作为外部区域，等加入外边距设置后再改 */
+	w->base.box.outer = w->base.box.border;
 }
 
 /** 计算内边距 */

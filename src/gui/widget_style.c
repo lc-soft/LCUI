@@ -187,6 +187,10 @@ LCUI_StyleSheet StyleSheet( void )
 {
 	LCUI_StyleSheet ss;
 	ss = (LCUI_StyleSheet)calloc( STYLE_KEY_TOTAL, sizeof(LCUI_Style) );
+	ss[key_width].type = SVT_AUTO;
+	ss[key_width].value = SV_AUTO;
+	ss[key_height].type = SVT_AUTO;
+	ss[key_height].value = SV_AUTO;
 	return ss;
 }
 

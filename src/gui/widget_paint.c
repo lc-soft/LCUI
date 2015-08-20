@@ -139,15 +139,11 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 		Graph_ClearShadowArea( paint, &box, &w->style.shadow );
 	}
 	Graph_DrawBoxShadow( paint, &box, &w->style.shadow );
-	box.x = w->base.box.content.x - w->base.box.graph.x;
-	box.y = w->base.box.content.y - w->base.box.graph.y;
-	box.width = w->base.box.content.width;
-	box.height = w->base.box.content.height;
-	Graph_DrawBackground( paint, &box, &w->style.background );
 	box.x = w->base.box.border.x - w->base.box.graph.x;
 	box.y = w->base.box.border.y - w->base.box.graph.y;
 	box.width = w->base.box.border.width;
 	box.height = w->base.box.border.height;
+	Graph_DrawBackground( paint, &box, &w->style.background );
 	Graph_DrawBorder( paint, &box, &w->style.border );
 	wc = LCUIWidget_GetClass( w->type );
 	wc && wc->methods.paint ? wc->methods.paint(w, paint):FALSE;
