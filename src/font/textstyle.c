@@ -124,7 +124,7 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 			if( flags[1] != 0 ) {
 				break;
 			}
-			style_data->_pixel_size = TRUE;
+			style_data->has_pixel_size = TRUE;
 			style_data->pixel_size = tag_data->style.size.px;
 			flags[1] = 1;
 			++equal;

@@ -70,7 +70,7 @@ typedef struct LCUI_TextStyle {
 	LCUI_BOOL has_decoration:1;
 	LCUI_BOOL has_back_color:1;
 	LCUI_BOOL has_fore_color:1;
-	LCUI_BOOL _pixel_size:1;
+	LCUI_BOOL has_pixel_size:1;
 
 	int font_id;
 	int style:3;

@@ -41,17 +41,21 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
 #include <LCUI/widget_build.h>
+#include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/button.h>
 
 typedef struct LCUI_Button {
-	LCUI_TextLayer layer;
+	LCUI_Widget text;
 } LCUI_Button;
 
 static void Button_OnInit( LCUI_Widget w )
 {
 	LCUI_Button *btn;
 	btn = Widget_NewPrivateData( w, LCUI_Button );
-	btn->layer = TextLayer_New();
+	btn->text = LCUIWidget_New("textview");
+	TextView_SetTextAlign( btn->text, SV_CENTER );
+	Widget_Append( w, btn->text );
+	Widget_Show( btn->text );
 }
 
 static void Button_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
@@ -71,12 +75,14 @@ static void Button_OnTask( LCUI_Widget w )
 
 void Button_SetTextW( LCUI_Widget w, const wchar_t *wstr )
 {
-
+	LCUI_Button *btn = (LCUI_Button*)w->private_data;
+	TextView_SetTextW( btn->text, wstr );
 }
 
-void Button_SetTextA( LCUI_Widget w, const char *str )
+void Button_SetText( LCUI_Widget w, const char *str )
 {
-
+	LCUI_Button *btn = (LCUI_Button*)w->private_data;
+	TextView_SetText( btn->text, str );
 }
 
 /** 添加按钮部件类型 */
@@ -85,27 +91,23 @@ void LCUIWidget_AddButton( void )
 	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "button" );
 	LCUI_Selector selector = Selector("button");
 	LCUI_StyleSheet css = StyleSheet();
-
-	SetStyle(css, key_border_top_width, 1, px);
-	SetStyle(css, key_border_right_width, 1, px);
-	SetStyle(css, key_border_bottom_width, 1, px);
-	SetStyle(css, key_border_left_width, 1, px);
-	SetStyle(css, key_border_top_style, SV_SOLID,style);
-	SetStyle(css, key_border_right_style, SV_SOLID, style);
-	SetStyle(css, key_border_bottom_style, SV_SOLID, style);
-	SetStyle(css, key_border_left_style, SV_SOLID, style);
-	SetStyle(css, key_border_top_color, RGB(210,210,210), color);
-	SetStyle(css, key_border_right_color, RGB(210,210,210), color);
-	SetStyle(css, key_border_bottom_color, RGB(210,210,210), color);
-	SetStyle(css, key_border_left_color, RGB(210,210,210), color);
-	SetStyle(css, key_background_color, RGB(255,255,255), color);
+	
+	SetStyle(css, key_padding_top, 6, px);
+	SetStyle(css, key_padding_bottom, 6, px);
+	SetStyle(css, key_padding_left, 12, px);
+	SetStyle(css, key_padding_right, 12, px);
+	SetStyle(css, key_border_width, 1, px);
+	SetStyle(css, key_border_style, SV_SOLID,style);
+	SetStyle(css, key_border_color, RGB(0xea,0xea,0xea), color);
+	SetStyle(css, key_background_color, RGB(0xff,0xff,0xff), color);
 	LCUI_PutStyle( selector, css );
 	DeleteSelector( &selector );
 	DeleteStyleSheet( &css );
 
 	css = StyleSheet();
 	selector = Selector("button:hover");
-	SetStyle(css, key_background_color, RGB(230,230,230), color);
+	SetStyle(css, key_border_color, RGB(0xcb,0xcb,0xcb), color);
+	SetStyle(css, key_background_color, RGB(0xe6,0xe6,0xe6), color);
 	LCUI_PutStyle( selector, css );
 	DeleteSelector( &selector );
 	DeleteStyleSheet( &css );

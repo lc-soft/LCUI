@@ -316,7 +316,7 @@ TextChar_UpdateBitmap( TextCharData *ch, LCUI_TextStyle *style )
 		if( ch->style->has_family ) {
 			font_id = ch->style->font_id;
 		}
-		if( ch->style->_pixel_size ) {
+		if( ch->style->has_pixel_size ) {
 			pixel_size = ch->style->pixel_size;
 		}
 	}
@@ -1374,4 +1374,11 @@ void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle *style )
 {
 	layer->text_style = *style;
 	layer->task.update_bitmap = TRUE;
+}
+
+/** 设置文本对齐方式 */
+void TextLayer_SetTextAlign( LCUI_TextLayer layer, int align )
+{
+	layer->text_align = align;
+	layer->task.update_typeset = TRUE;
 }

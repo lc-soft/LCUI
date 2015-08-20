@@ -225,7 +225,8 @@ int LinkedList_Goto( LinkedList *list, int pos )
 		return -1;
 	}
 	/* 如果该结点离头结点比较近，则直接从头结点开始遍历 */
-	if( list->current_node_pos < 0  || pos < list->current_node_pos-pos ) {
+	if( (list->current_node == NULL && list->used_node_num > 0)
+	 || list->current_node_pos < 0  || pos < list->current_node_pos-pos ) {
 		list->current_node_pos = 0;
 		list->current_node = list->used_head_node;
 	}
@@ -234,7 +235,6 @@ int LinkedList_Goto( LinkedList *list, int pos )
 		list->current_node_pos = list->used_node_num-1;
 		list->current_node = list->used_tail_node;
 	}
-
 	while( list->current_node_pos < pos ) {
 		list->current_node = list->current_node->next;
 		++list->current_node_pos;

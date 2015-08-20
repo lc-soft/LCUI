@@ -58,11 +58,39 @@ typedef struct LCUI_TextView_ {
 		union {
 			wchar_t *text;
 			LCUI_BOOL autowrap;
+			int align;
 		};
 	} tasks[TASK_TOTAL];
 } LCUI_TextView;
 
 /*---------------------------- Private -------------------------------*/
+
+static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
+{
+	LinkedList rects;
+	LCUI_Rect *p_rect;
+	LCUI_Size new_size = {16, 16};
+	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	
+	_DEBUG_MSG("on resize\n");
+	if( w->style.w.type != SVT_PX && w->style.h.type != SVT_PX ) {
+		return;
+	}
+	if( w->style.w.type == SVT_PX && w->base.width > new_size.w ) {
+		new_size.w = w->base.width;
+	}
+	if( w->style.h.type == SVT_PX && w->base.height > new_size.h ) {
+		new_size.h = w->base.height;
+	}
+	DirtyRectList_Init( &rects );
+	TextLayer_SetMaxSize( txt->layer, new_size );
+	TextLayer_Update( txt->layer, &rects );
+	LinkedList_ForEach( p_rect, 0, &rects ) {
+		Widget_InvalidateArea( w, p_rect, SV_CONTENT_BOX );
+	}
+	DirtyRectList_Destroy( &rects );
+	TextLayer_ClearInvalidRect( txt->layer );
+}
 
 /** 初始化 TextView 部件数据 */
 static void TextView_OnInit( LCUI_Widget w )
@@ -80,6 +108,7 @@ static void TextView_OnInit( LCUI_Widget w )
 	TextLayer_SetMultiline( txt->layer, TRUE );
 	/* 启用样式标签的支持 */
 	TextLayer_SetUsingStyleTags( txt->layer, TRUE );
+	Widget_BindEvent( w, "resize", TextView_OnResize, NULL, NULL );
 }
 
 /** 释放 TextView 部件占用的资源 */
@@ -90,75 +119,31 @@ static void TextView_OnDestroy( LCUI_Widget w )
 	TextLayer_Destroy( &txt->layer );
 }
 
+static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )
+{
+	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	*width = TextLayer_GetWidth( txt->layer );
+	*height = TextLayer_GetHeight( txt->layer );
+	_DEBUG_MSG("width: %d, height: %d\n", *width, *height);
+}
+
 static void TextView_OnUpdate( LCUI_Widget w )
 {
-	int n;
 	LCUI_TextView *txt;
 	LCUI_Rect *p_rect;
-	LinkedList rect_list;
-	LCUI_Size new_size;
+	LinkedList rects;
 
 	txt = (LCUI_TextView*)w->private_data;
-	DirtyRectList_Init( &rect_list );
-	/* 先更新文本图层的数据 */
-	TextLayer_Update( txt->layer, &rect_list );
-	new_size.w = TextLayer_GetWidth( txt->layer );
-	new_size.h = TextLayer_GetHeight( txt->layer );
-	/* 如果部件尺寸不是由LCUI自动调整的 */
-	if( w->style.w.type == SVT_PX ) {
-		new_size.w = w->base.width;
-		new_size.h = w->base.height;
-		/* 最小尺寸为20x20 */
-		if( new_size.w < 20 ) {
-			new_size.w = 20;
-		}
-		if( new_size.h < 20 ) {
-			new_size.h = 20;
-		}
-		TextLayer_SetMaxSize( txt->layer, new_size );
-		TextLayer_Update( txt->layer, &rect_list );
-	}
-	else if( !txt->layer->is_autowrap_mode ) {
-		/* 既然未启用自动换行，那么自动调整部件尺寸 */
-		if( new_size.w != w->base.width
-		 || new_size.h != w->base.height ) {
-			TextLayer_SetMaxSize( txt->layer, new_size );
-			Widget_Resize( w, new_size.w, new_size.h );
-			TextLayer_Update( txt->layer, &rect_list );
-		}
-	} else {
-		/* 能到这里，则说明部件启用了文本自动换行和自动尺寸调整 */
-		new_size.w = w->base.width;
-		new_size.h = w->base.height;
-		/* 将部件所在容器的宽度作为图像宽度 */
-		new_size.w = w->parent->base.box.content.width;
-		/* 高度必须有效，最小高度为20 */
-		if( new_size.h < 20 ) {
-			new_size.h = 20;
-		}
-		if( txt->layer->graph.w != new_size.w
-		 || txt->layer->graph.h != new_size.h ) {
-			/* 重新设置最大尺寸 */
-			TextLayer_SetMaxSize( txt->layer, new_size );
-			TextLayer_Update( txt->layer, &rect_list );
-			/* 重新计算文本图层的尺寸 */
-			new_size.w = TextLayer_GetWidth( txt->layer );
-			new_size.h = TextLayer_GetHeight( txt->layer );
-			TextLayer_SetMaxSize( txt->layer, new_size );
-			Widget_Resize( w, new_size.w, new_size.h );
-		}
-	}
-
-	n = LinkedList_GetTotal( &rect_list );
-	LinkedList_Goto( &rect_list, 0 );
-	/* 将得到的无效区域导入至部件的无效区域列表 */
-	while(n--) {
-		p_rect = (LCUI_Rect*)LinkedList_Get( &rect_list );
+	DirtyRectList_Init( &rects );
+	TextLayer_Update( txt->layer, &rects );
+	LinkedList_ForEach( p_rect, 0, &rects ) {
 		Widget_InvalidateArea( w, p_rect, SV_CONTENT_BOX );
-		LinkedList_ToNext( &rect_list );
 	}
-	DirtyRectList_Destroy( &rect_list );
+	DirtyRectList_Destroy( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
+	if( w->style.w.type == SVT_AUTO || w->style.h.type == SVT_AUTO ) {
+		Widget_AddTask( w, WTT_RESIZE );
+	}
 }
 
 /** 私有的任务处理接口 */
@@ -213,7 +198,7 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 /*---------------------------- Public --------------------------------*/
 
 /** 设定与 TextView 关联的文本内容 */
-LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
+int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 {
 	int len;
 	wchar_t *text_ptr;
@@ -242,7 +227,7 @@ LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	return 0;
 }
 
-LCUI_API int TextView_SetText( LCUI_Widget w, const char *utf8_text )
+int TextView_SetText( LCUI_Widget w, const char *utf8_text )
 {
 	int ret;
 	wchar_t *wstr;
@@ -255,6 +240,16 @@ LCUI_API int TextView_SetText( LCUI_Widget w, const char *utf8_text )
 	return ret;
 }
 
+void TextView_SetTextAlign( LCUI_Widget w, int align )
+{
+	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	Widget_Lock( w );
+	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
+	txt->tasks[TASK_SET_TEXT_ALIGN].align = align;
+	Widget_AddTask( w, WTT_USER );
+	Widget_Unlock( w );
+}
+
 /*-------------------------- End Public ------------------------------*/
 
 /** 添加 TextView 部件类型 */
@@ -264,5 +259,6 @@ void LCUIWidget_AddTextView( void )
 	wc->methods.init = TextView_OnInit;
 	wc->methods.paint = TextView_OnPaint;
 	wc->methods.destroy = TextView_OnDestroy;
+	wc->methods.autosize = TextView_AutoSize;
 	wc->task_handler = TextView_OnTask;
 }

@@ -47,6 +47,10 @@ LCUI_BEGIN_HEADER
 /** 添加按钮部件类型 */
 void LCUIWidget_AddButton( void );
 
+LCUI_API void Button_SetTextW( LCUI_Widget w, const wchar_t *wstr );
+
+LCUI_API void Button_SetText( LCUI_Widget w, const char *str );
+
 LCUI_END_HEADER
 
 #endif
