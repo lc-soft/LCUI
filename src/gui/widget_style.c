@@ -269,7 +269,7 @@ LCUI_Selector Selector( const char *selector )
 			type = *p;
 			continue;
 		}
-		if( *p == ' ' ) {
+		if( *p == ' ' || *p == '\r' || *p == '\n' || *p == '\t' ) {
 			if( is_saving ) {
 				if( SaveSelectorNode(node, name, type) != 0 ) {
 					_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
@@ -579,11 +579,11 @@ int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
 	int i, key;
-	typedef struct { 
+	typedef struct {
 		int start, end, task;
 		LCUI_BOOL is_valid;
 	} TaskMap;
-	TaskMap task_map[] = { 
+	TaskMap task_map[] = {
 		{ key_visible, key_visible, WTT_VISIBLE, TRUE },
 		{ key_width, key_height, WTT_RESIZE, TRUE },
 		{ key_padding_top, key_padding_left, WTT_RESIZE, TRUE },
@@ -592,7 +592,7 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 		{ key_background_start, key_background_end, WTT_BACKGROUND, TRUE },
 		{ key_box_shadow_start, key_box_shadow_end, WTT_SHADOW, TRUE }
 	};
-	
+
 	if( is_update_all ) {
 		Widget_ComputeInheritStyle( w, w->inherited_css );
 	}
