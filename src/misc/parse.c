@@ -3,7 +3,7 @@
 #include <LCUI/misc/parse.h>
 
 /** 从字符串中解析出数字，支持的单位：点(pt)、像素(px)、百分比(%) */
-LCUI_BOOL ParseNumer( LCUI_StyleVar *var, const char *str )
+LCUI_BOOL ParseNumber( LCUI_StyleVar *var, const char *str )
 {
 	int n = 0;
 	char num_str[32];
@@ -59,8 +59,64 @@ LCUI_BOOL ParseNumer( LCUI_StyleVar *var, const char *str )
 	return TRUE;
 }
 
-/** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A) */
+/** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A)、rgb(R,G,B) */
 LCUI_BOOL ParseColor( LCUI_StyleVar *var, const char *str )
 {
+	double a;
+	int len, status, r, g, b;
+	const char *p;
+
+	len = status = 0;
+	for( p=str; *p; ++p, ++len ) {
+		switch( *p ) {
+		case '#':
+			len == 0 ? status = 3 : 0;
+			break;
+		case 'r':
+			status == 0 ? status = 1 : 0;
+			break;
+		case 'g':
+			status == 1 ? status << 1 : 0;
+			break;
+		case 'b':
+			status == 2 ? status << 1 : 0;
+			break;
+		case 'a':
+			status == 4 ? status << 1 : 0;
+			break;
+		default: 
+			status = 0;
+			break;
+		}
+	}
+	switch( status ) {
+	case 3:
+		status = 0;
+		if( len == 4 ) {
+			status = sscanf( str, "#%1X%1X%1X", &r, &g, &b );
+			r <<= 4; g <<= 4; b <<= 4;
+		} else if( len == 7 ) {
+			status = sscanf( str, "#%2X%2X%2X", &r, &g, &b );
+		}
+		break;
+	case 4:
+		status = sscanf( str, "rgb(%d,%d,%d)", &r, &g, &b );
+		break;
+	case 8: 
+		status = sscanf( str, "rgba(%d,%d,%d,%lf)", &r, &g, &b, &a );
+	default:break;
+	}
+	if( status >= 3 ) {
+		var->type = SVT_COLOR;
+		if( status == 4 ) {
+			var->color.a = (uchar_t)(255.0*a);
+		} else {
+			var->color.a = 255;
+		}
+		var->color.r = r;
+		var->color.g = g;
+		var->color.b = b;
+		return TRUE;
+	}
 	return FALSE;
 }

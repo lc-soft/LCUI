@@ -51,10 +51,7 @@ enum LCUI_StyleTagID {
 
 typedef struct LCUI_StyleTag {
 	int id;
-	union {
-		LCUI_Color color;
-		LCUI_StyleVar size;
-	} style;
+	LCUI_StyleVar style;
 } LCUI_StyleTag;
 
 /** 初始化字体样式数据 */
@@ -125,7 +122,7 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 				break;
 			}
 			style_data->has_pixel_size = TRUE;
-			style_data->pixel_size = tag_data->style.size.px;
+			style_data->pixel_size = tag_data->style.px;
 			flags[1] = 1;
 			++equal;
 			break;
@@ -352,49 +349,18 @@ scan_style_tag_data( const wchar_t *wstr, LCUI_StyleTag *tag )
 	
 	p = wstr; 
 	if( (q = scan_style_tag_by_name( p, "color", tag_data)) ) {
-		int r,g,b, len, i, j;
-		
 		DEBUG_MSG("is color style tag, data: %s\n", tag_data);
-		len = strlen(tag_data); 
-		for(j=0,i=0; i<len; ++i) {
-			if(tag_data[i] == ',') {
-				++j;
-			}
+		if( !ParseColor( &tag->style, tag_data ) ) {
+			return NULL;
 		}
-		if(j == 2) {
-			sscanf( tag_data, "%d,%d,%d", &r, &g, &b ); 
-		}
-		else if(tag_data[0] == '#') {
-			switch(len) {
-			    case 4: 
-				sscanf( tag_data, "#%1X%1X%1X", &r, &g, &b );
-				r<<=4; g<<=4; b<<=4;
-				break;
-			    case 7:
-				sscanf( tag_data, "#%2X%2X%2X", &r, &g, &b ); 
-				break;
-			    default:
-				r=0; g=0; b=0;
-				break;
-			}
-		} else {
-			r=0; g=0; b=0;
-		}
-		DEBUG_MSG("color: %d,%d,%d\n", r,g,b);
 		tag->id = TAG_ID_COLOR;
-		tag->style.color.red = r;
-		tag->style.color.green = g;
-		tag->style.color.blue = b;
 		return q;
 	}
-	 
 	if( (q = scan_style_tag_by_name( p, "size", tag_data)) ) {
-		LCUI_StyleVar size;
-		if( !ParseNumer( &size, tag_data ) ) {
+		if( !ParseNumber( &tag->style, tag_data ) ) {
 			return NULL;
 		}
 		tag->id = TAG_ID_SIZE;
-		tag->style.size = size;
 		return q;
 	}
 	return NULL;
