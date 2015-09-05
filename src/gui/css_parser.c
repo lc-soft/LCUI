@@ -62,6 +62,20 @@ typedef struct StyleParser {
 static LCUI_RBTree style_parser_tree;
 static LCUI_RBTree style_key_tree;
 
+#define SPLIT_NUMBER	1
+#define SPLIT_COLOR	(1<<1)
+#define SPLIT_STYLE	(1<<2)
+
+static int ParseStyleKey( const char *str )
+{ 
+	LCUI_RBTreeNode *node;
+	node = RBTree_CustomSearch( &style_key_tree, str );
+	if( !node ) {
+		return -1;
+	}
+	return ((StyleKeyNode*)node)->key;
+}
+
 static void ConvertStyleValue( LCUI_Style *s, LCUI_StyleVar *sv )
 {
 	s->type = sv->type;
@@ -80,7 +94,71 @@ static void ConvertStyleValue( LCUI_Style *s, LCUI_StyleVar *sv )
 	}
 }
 
-static int parseNumber( LCUI_Style *s, const char *str )
+static int SplitValues( const char *str, LCUI_Style *slist, 
+			int max_len, int mode )
+{
+	int vi = 0, vj = 0, has_error;
+	char **values;
+	const char *p;
+	LCUI_StyleVar sv;
+
+	values = (char**)calloc(max_len, sizeof(char*));
+	values[0] = (char*)malloc(sizeof(char)*64);
+	for( p = str; *p; ++p ) {
+		if( *p != ' ' ) {
+			values[vi][vj] = *p;
+			continue;
+		}
+		if( vj > 0 ) {
+			values[vi][vj] = 0;
+			++vi;
+			vj = 0;
+			if( vi >= max_len ) {
+				goto clean;
+			}
+			values[vi] = (char*)malloc(sizeof(char)*64);
+		}
+	}
+	values[vi][vj] = 0;
+	for( vj = 0; vj < 4; ++vj ) {
+		has_error = 0;
+		if( mode & SPLIT_NUMBER ) {
+			if( ParseNumber( &sv, values[vj] ) ) {
+				ConvertStyleValue( &slist[vj], &sv );
+				continue;
+			}
+			has_error = 1;
+		}
+		if( mode & SPLIT_COLOR ) {
+			if( ParseColor(&sv, values[vj]) ) {
+				ConvertStyleValue( &slist[vj], &sv );
+				continue;
+			}
+			has_error = 1;
+		}
+		if( mode & SPLIT_STYLE ) {
+			has_error = ParseStyleKey( values[vj] );
+			if( has_error > 0 )  {
+				slist[vj].value_style = has_error;
+				slist[vj].type = SVT_style;
+				continue;
+			}
+			has_error = 1;
+		}
+		if( has_error ) {
+			vi = -1;
+			goto clean;
+		}
+	}
+clean:
+	for( vj = 0; vj < max_len; ++vj ) {
+		values[vj] ? free(values[vj]) : 0;
+	}
+	free( values );
+	return vi;
+}
+
+static int OnParseNumber( LCUI_Style *s, const char *str )
 {
 	LCUI_StyleVar sv;
 	if( ParseNumber( &sv, str ) ) {
@@ -90,7 +168,7 @@ static int parseNumber( LCUI_Style *s, const char *str )
 	return -1;
 }
 
-static int parseColor( LCUI_Style *s, const char *str )
+static int OnParseColor( LCUI_Style *s, const char *str )
 {
 	LCUI_StyleVar sv;
 	if( ParseColor( &sv, str ) ) {
@@ -100,77 +178,244 @@ static int parseColor( LCUI_Style *s, const char *str )
 	return -1;
 }
 
-static int parseImage( LCUI_Style *s, const char *str )
+static int OnParseImage( LCUI_Style *s, const char *str )
 {
 	return 0;
 }
 
-static int parseStyleKey( LCUI_Style *s, const char *str )
+static int OnParseStyleKey( LCUI_Style *s, const char *str )
 {
-	LCUI_RBTreeNode *node;
-	node = RBTree_CustomSearch( &style_key_tree, str );
-	if( !node ) {
+	int v;
+	v = ParseStyleKey( str );
+	if( v < 0 ) {
 		return -1;
 	}
-	return ((StyleKeyNode*)node)->key;
+	s->type = SVT_style;
+	s->value_style = v;
+	return 0;
 }
 
-static int parseBorder( LCUI_StyleSheet ss, const char *str )
+static int OnParseBorder( LCUI_StyleSheet ss, const char *str )
+{
+	LCUI_Style slist[3];
+	int i, mode;
+
+	mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
+	if( SplitValues(str, slist, 3, mode) < 3 ) {
+		return -1;
+	}
+	for( i = 0; i < 3; ++i ) {
+		switch( slist[i].type ) {
+		case SVT_COLOR:
+			ss[key_border_color] = slist[i];
+			break;
+		case SVT_PX:
+			ss[key_border_width] = slist[i];
+			break;
+		case SVT_style:
+			ss[key_border_style] = slist[i];
+			break;
+		default: return -1;
+		}
+	}
+	return 0;
+}
+
+static int OnParseBorderLeft( LCUI_StyleSheet ss, const char *str )
+{
+	LCUI_Style slist[3];
+	int i, mode;
+
+	mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
+	if( SplitValues(str, slist, 3, mode) < 3 ) {
+		return -1;
+	}
+	for( i = 0; i < 3; ++i ) {
+		switch( slist[i].type ) {
+		case SVT_COLOR:
+			ss[key_border_left_color] = slist[i];
+			break;
+		case SVT_PX:
+			ss[key_border_left_width] = slist[i];
+			break;
+		case SVT_style:
+			ss[key_border_left_style] = slist[i];
+			break;
+		default: return -1;
+		}
+	}
+	return 0;
+}
+
+static int OnParseBorderTop( LCUI_StyleSheet ss, const char *str )
+{
+	LCUI_Style slist[3];
+	int i, mode;
+
+	mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
+	if( SplitValues(str, slist, 3, mode) < 3 ) {
+		return -1;
+	}
+	for( i = 0; i < 3; ++i ) {
+		switch( slist[i].type ) {
+		case SVT_COLOR:
+			ss[key_border_top_color] = slist[i];
+			break;
+		case SVT_PX:
+			ss[key_border_top_width] = slist[i];
+			break;
+		case SVT_style:
+			ss[key_border_top_style] = slist[i];
+			break;
+		default: return -1;
+		}
+	}
+	return 0;
+}
+
+static int OnParseBorderRight( LCUI_StyleSheet ss, const char *str )
+{
+	LCUI_Style slist[3];
+	int i, mode;
+
+	mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
+	if( SplitValues(str, slist, 3, mode) < 3 ) {
+		return -1;
+	}
+	for( i = 0; i < 3; ++i ) {
+		switch( slist[i].type ) {
+		case SVT_COLOR:
+			ss[key_border_right_color] = slist[i];
+			break;
+		case SVT_PX:
+			ss[key_border_right_width] = slist[i];
+			break;
+		case SVT_style:
+			ss[key_border_right_style] = slist[i];
+			break;
+		default: return -1;
+		}
+	}
+	return 0;
+}
+
+static int OnParseBorderBottom( LCUI_StyleSheet ss, const char *str )
+{
+	LCUI_Style slist[3];
+	int i, mode;
+
+	mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
+	if( SplitValues(str, slist, 3, mode) < 3 ) {
+		return -1;
+	}
+	for( i = 0; i < 3; ++i ) {
+		switch( slist[i].type ) {
+		case SVT_COLOR:
+			ss[key_border_bottom_color] = slist[i];
+			break;
+		case SVT_PX:
+			ss[key_border_bottom_width] = slist[i];
+			break;
+		case SVT_style:
+			ss[key_border_bottom_style] = slist[i];
+			break;
+		default: return -1;
+		}
+	}
+	return 0;
+}
+
+static int OnParseBorderColor( LCUI_StyleSheet ss, const char *str )
+{
+	return OnParseColor( &ss[key_border_color], str );
+}
+
+static int OnParseBorderWidth( LCUI_StyleSheet ss, const char *str )
+{
+	return OnParseNumber( &ss[key_border_width], str );
+}
+
+static int OnParseBorderStyle( LCUI_StyleSheet ss, const char *str )
+{
+	return OnParseStyleKey( &ss[key_border_style], str );
+}
+
+static int OnParsePadding( LCUI_StyleSheet ss, const char *str )
+{
+	int value_count;
+	LCUI_Style s[4];
+	
+	value_count = SplitValues( str, s, 4, SPLIT_NUMBER );
+	switch( value_count ) {
+	case 1:
+		ss[key_padding_top] = s[0];
+		ss[key_padding_right] = s[0];
+		ss[key_padding_bottom] = s[0];
+		ss[key_padding_left] = s[0];
+		break;
+	case 2:
+		ss[key_padding_top] = s[0];
+		ss[key_padding_bottom] = s[0];
+		ss[key_padding_left] = s[1];
+		ss[key_padding_right] = s[1];
+		break;
+	case 3:
+		ss[key_padding_top] = s[0];
+		ss[key_padding_left] = s[1];
+		ss[key_padding_right] = s[1];
+		ss[key_padding_bottom] = s[2];
+		break;
+	case 4:
+		ss[key_padding_top] = s[0];
+		ss[key_padding_left] = s[1];
+		ss[key_padding_right] = s[2];
+		ss[key_padding_bottom] = s[3];
+	default: break;
+	}
+	return 0;
+}
+
+static int OnParseMargin( LCUI_StyleSheet ss, const char *str )
+{
+	int value_count;
+	LCUI_Style s[4];
+	
+	value_count = SplitValues( str, s, 4, SPLIT_NUMBER );
+	switch( value_count ) {
+	case 1:
+		ss[key_margin_top] = s[0];
+		ss[key_margin_right] = s[0];
+		ss[key_margin_bottom] = s[0];
+		ss[key_margin_left] = s[0];
+		break;
+	case 2:
+		ss[key_margin_top] = s[0];
+		ss[key_margin_bottom] = s[0];
+		ss[key_margin_left] = s[1];
+		ss[key_margin_right] = s[1];
+		break;
+	case 3:
+		ss[key_margin_top] = s[0];
+		ss[key_margin_left] = s[1];
+		ss[key_margin_right] = s[1];
+		ss[key_margin_bottom] = s[2];
+		break;
+	case 4:
+		ss[key_margin_top] = s[0];
+		ss[key_margin_left] = s[1];
+		ss[key_margin_right] = s[2];
+		ss[key_margin_bottom] = s[3];
+	default: break;
+	}
+	return 0;
+}
+
+static int OnParseBoxShadow( LCUI_StyleSheet ss, const char *str )
 {
 	return 0;
 }
 
-static int parseBorderLeft( LCUI_StyleSheet ss, const char *str )
-{
-	return 0;
-}
-
-static int parseBorderTop( LCUI_StyleSheet ss, const char *str )
-{
-	return 0;
-}
-
-static int parseBorderRight( LCUI_StyleSheet ss, const char *str )
-{
-	return 0;
-}
-
-static int parseBorderBottom( LCUI_StyleSheet ss, const char *str )
-{
-	return 0;
-}
-
-static int parseBorderColor( LCUI_StyleSheet ss, const char *str )
-{
-	return parseColor( &ss[key_border_color], str );
-}
-
-static int parseBorderWidth( LCUI_StyleSheet ss, const char *str )
-{
-	return parseNumber( &ss[key_border_width], str );
-}
-
-static int parseBorderStyle( LCUI_StyleSheet ss, const char *str )
-{
-	return parseStyleKey( &ss[key_border_style], str );
-}
-
-static int parsePadding( LCUI_StyleSheet ss, const char *str )
-{
-	return 0;
-}
-
-static int parseMargin( LCUI_StyleSheet ss, const char *str )
-{
-	return 0;
-}
-
-static int parseBoxShadow( LCUI_StyleSheet ss, const char *str )
-{
-	return 0;
-}
-
-static int parseBackground( LCUI_StyleSheet ss, const char *str )
+static int OnParseBackground( LCUI_StyleSheet ss, const char *str )
 {
 	return 0;
 }
@@ -206,38 +451,38 @@ static StyleKeyNode style_key_map[] = {
 
 /** 各个样式的解析器映射表 */
 static StyleParser style_parser_map[] = {
-	{0, key_width, "width", parseNumber},
-	{0, key_height, "height", parseNumber},
-	{0, key_background_color, "background-color", parseColor},
-	{0, key_background_image, "background-image", parseImage},
-	{0, key_border_top_color, "border-top-color", parseColor},
-	{0, key_border_right_color, "border-right-color", parseColor},
-	{0, key_border_bottom_color, "border-bottom-color", parseColor},
-	{0, key_border_left_color, "border-left-color", parseColor},
-	{0, key_border_top_width, "border-top-width", parseNumber},
-	{0, key_border_right_width, "border-right-width", parseNumber},
-	{0, key_border_bottom_width, "border-bottom-width", parseNumber},
-	{0, key_border_left_width, "border-left-width", parseNumber},
-	{0, key_border_top_width, "border-top-width", parseNumber},
-	{0, key_border_right_width, "border-right-width", parseNumber},
-	{0, key_border_bottom_width, "border-bottom-width", parseNumber},
-	{0, key_border_left_width, "border-left-width", parseNumber},
-	{0, key_border_top_style, "border-top-style", parseStyleKey},
-	{0, key_border_right_style, "border-right-style", parseStyleKey},
-	{0, key_border_bottom_style, "border-bottom-style", parseStyleKey},
-	{0, key_border_left_style, "border-left-style", parseStyleKey},
-	{1, -1, "border", parseBorder},
-	{1, -1, "border-left", parseBorderLeft},
-	{1, -1, "border-top", parseBorderTop},
-	{1, -1, "border-right", parseBorderRight},
-	{1, -1, "border-bottom", parseBorderBottom},
-	{1, -1, "border-color", parseBorderColor},
-	{1, -1, "border-width", parseBorderWidth},
-	{1, -1, "border-style", parseBorderStyle},
-	{1, -1, "padding", parsePadding},
-	{1, -1, "margin", parseMargin},
-	{1, -1, "box-shadow", parseBoxShadow},
-	{1, -1, "background", parseBackground}
+	{0, key_width, "width", OnParseNumber},
+	{0, key_height, "height", OnParseNumber},
+	{0, key_background_color, "background-color", OnParseColor},
+	{0, key_background_image, "background-image",OnParseImage},
+	{0, key_border_top_color, "border-top-color",OnParseColor},
+	{0, key_border_right_color, "border-right-color",OnParseColor},
+	{0, key_border_bottom_color, "border-bottom-color",OnParseColor},
+	{0, key_border_left_color, "border-left-color",OnParseColor},
+	{0, key_border_top_width, "border-top-width",OnParseNumber},
+	{0, key_border_right_width, "border-right-width",OnParseNumber},
+	{0, key_border_bottom_width, "border-bottom-width",OnParseNumber},
+	{0, key_border_left_width, "border-left-width",OnParseNumber},
+	{0, key_border_top_width, "border-top-width",OnParseNumber},
+	{0, key_border_right_width, "border-right-width",OnParseNumber},
+	{0, key_border_bottom_width, "border-bottom-width",OnParseNumber},
+	{0, key_border_left_width, "border-left-width",OnParseNumber},
+	{0, key_border_top_style, "border-top-style",OnParseStyleKey},
+	{0, key_border_right_style, "border-right-style",OnParseStyleKey},
+	{0, key_border_bottom_style, "border-bottom-style",OnParseStyleKey},
+	{0, key_border_left_style, "border-left-style",OnParseStyleKey},
+	{1, -1, "border",OnParseBorder},
+	{1, -1, "border-left",OnParseBorderLeft},
+	{1, -1, "border-top",OnParseBorderTop},
+	{1, -1, "border-right",OnParseBorderRight},
+	{1, -1, "border-bottom",OnParseBorderBottom},
+	{1, -1, "border-color",OnParseBorderColor},
+	{1, -1, "border-width",OnParseBorderWidth},
+	{1, -1, "border-style",OnParseBorderStyle},
+	{1, -1, "padding",OnParsePadding},
+	{1, -1, "margin",OnParseMargin},
+	{1, -1, "box-shadow",OnParseBoxShadow},
+	{1, -1, "background",OnParseBackground}
 };
 
 static int CompareParserName( void *data, const void *keydata )
