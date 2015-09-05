@@ -42,6 +42,8 @@
 
 LCUI_BEGIN_HEADER
 
+LCUI_API const char *GetStyleName( int key );
+
 /** 初始化 LCUI 的 CSS 代码解析功能 */
 LCUI_API void LCUICssParser_Init(void);
 

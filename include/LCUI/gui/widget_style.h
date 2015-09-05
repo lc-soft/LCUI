@@ -68,10 +68,15 @@ LCUI_API LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector );
 /** 向样式库添加样式表 */
 LCUI_API int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss );
 
+/** 打印样式库中的内容 */
+LCUI_API void LCUI_PrintStyleLibrary(void);
+
 /** 计算部件继承得到的样式表 */
 LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 
 /** 更新当前部件的样式 */
 LCUI_API void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all );
+
+#include <LCUI/gui/css_parser.h>
 
 #endif

@@ -174,6 +174,7 @@ void LCUIWidget_InitStyle( void )
 	RBTree_OnJudge( &style_library.style, CompareName );
 	RBTree_OnDestroy( &style_library.style, DestroyStyleTreeNode );
 	style_library.is_inited = TRUE;
+	LCUICssParser_Init();
 }
 
 /** 销毁，释放资源 */
@@ -181,6 +182,7 @@ void LCUIWidget_ExitStyle( void )
 {
 	RBTree_Destroy( &style_library.style );
 	style_library.is_inited = FALSE;
+	LCUICssParser_Destroy();
 }
 
 LCUI_StyleSheet StyleSheet( void )
@@ -556,6 +558,85 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 		count += FindStyleNodeByName( w->type, w, list );
 	}
 	return count;
+}
+
+static LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
+{
+	int key;
+	for( key = 0; key < STYLE_KEY_TOTAL; ++key ) {
+		if( !ss[key].is_valid ) {
+			continue;
+		}
+		printf("\t\t%s: ", GetStyleName(key));
+		switch( ss[key].type ) {
+		case SVT_BOOLEAN: {
+			LCUI_BOOL b = ss[key].value_boolean;
+			printf( "%s\n", b ? "true" : "false" );
+			break;
+		}
+		case SVT_COLOR: {
+			LCUI_Color *clr = &ss[key].value_color;
+			if( clr->alpha < 255 ) {
+				printf("rgba(%d,%d,%d,%0.2f)\n", clr->r,
+					clr->g, clr->b, clr->a / 255.0);
+			} else {
+				printf("#%02x%02x%02x\n", clr->r, clr->g, clr->b);
+			}
+			break;
+		}
+		case SVT_PX:
+			printf("%dpx\n", ss[key].value_px);
+			break;
+		case SVT_SCALE:
+			printf("%.2lf%%\n", ss[key].value_scale*100);
+			break;
+		default:
+			printf("%d\n", ss[key].value);
+			break;
+		}
+	}
+}
+
+/** 打印样式库中的内容 */
+void LCUI_PrintStyleLibrary(void)
+{
+	LCUI_RBTreeNode *node;
+	StyleTreeNode *stn;
+	StyleListNode *sln;
+	LCUI_SelectorNode *sn;
+	char path[256];
+	
+	printf("style library begin\n");
+	node = RBTree_First( &style_library.style );
+	while( node ) {
+		stn = (StyleTreeNode*)node->data;
+		printf("target: %s\n", stn->name);
+		LinkedList_ForEach( sln, 0, &stn->styles ) {
+			path[0] = 0;
+			for( sn = sln->selector; *sn; ++sn ) {
+				if( (*sn)->id ) {
+					strcat( path, "#" );
+					strcat( path, (*sn)->id );
+				}
+				if( (*sn)->type ) {
+					strcat( path, (*sn)->type );
+				}
+				if( (*sn)->class_name ) {
+					strcat( path, "." );
+					strcat( path, (*sn)->class_name );
+				}
+				if( (*sn)->pseudo_class_name ) {
+					strcat( path, ":" );
+					strcat( path, (*sn)->pseudo_class_name );
+				}
+				strcat( path, " " );
+			}
+			printf("\tpath: %s\n", path);
+			LCUI_PrintStyleSheet( sln->style );
+		}
+		node = RBTree_Next( node );
+	}
+	printf("style library end\n");
 }
 
 /** 计算部件继承得到的样式表 */
