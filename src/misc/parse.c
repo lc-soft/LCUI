@@ -63,10 +63,9 @@ LCUI_BOOL ParseNumber( LCUI_StyleVar *var, const char *str )
 LCUI_BOOL ParseColor( LCUI_StyleVar *var, const char *str )
 {
 	double a;
-	int len, status, r, g, b;
+	int len = 0, status = 0, r, g, b;
 	const char *p;
 
-	len = status = 0;
 	for( p=str; *p; ++p, ++len ) {
 		switch( *p ) {
 		case '#':
@@ -76,17 +75,18 @@ LCUI_BOOL ParseColor( LCUI_StyleVar *var, const char *str )
 			status == 0 ? status = 1 : 0;
 			break;
 		case 'g':
-			status == 1 ? status << 1 : 0;
+			status == 1 ? status <<= 1 : 0;
 			break;
 		case 'b':
-			status == 2 ? status << 1 : 0;
+			status == 2 ? status <<= 1 : 0;
 			break;
 		case 'a':
-			status == 4 ? status << 1 : 0;
+			status == 4 ? status <<= 1 : 0;
 			break;
 		default: 
-			status = 0;
-			break;
+			if( status < 3 ) {
+				return -1;
+			}
 		}
 	}
 	switch( status ) {

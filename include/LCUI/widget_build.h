@@ -50,7 +50,6 @@ typedef struct LCUI_WidgetFull* LCUI_Widget;
 #include <LCUI/gui/widget_library.h>
 #include <LCUI/gui/widget_event.h>
 #include <LCUI/gui/widget_style.h>
-#include <LCUI/gui/css_parser.h>
 
 LCUI_BEGIN_HEADER
 
