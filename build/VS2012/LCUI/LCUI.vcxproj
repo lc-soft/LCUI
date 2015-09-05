@@ -141,10 +141,12 @@
     <ClInclude Include="..\..\..\include\LCUI\font\fontlibrary.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\textlayer.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\textstyle.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\messagebox.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\activebox.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\checkbox.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\sidebar.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\textview.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\menu.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\picturebox.h" />
@@ -173,7 +175,6 @@
     <ClInclude Include="..\..\..\include\LCUI\input.h" />
     <ClInclude Include="..\..\..\include\LCUI\ime.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc.h" />
-    <ClInclude Include="..\..\..\include\LCUI\style_parser.h" />
     <ClInclude Include="..\..\..\include\LCUI\surface.h" />
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\widget.h" />
@@ -207,7 +208,9 @@
     <ClCompile Include="..\..\..\src\font\in_core_font.c" />
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
+    <ClCompile Include="..\..\..\src\gui\css_parser.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\textview.c" />
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
@@ -228,7 +231,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\ime.c" />
     <ClCompile Include="..\..\..\src\misc\mem_debug.c" />
-    <ClCompile Include="..\..\..\src\style_parser.c" />
     <ClCompile Include="..\..\..\src\misc\catch_screen.c" />
     <ClCompile Include="..\..\..\src\misc\delay.c" />
     <ClCompile Include="..\..\..\src\misc\dirent.c" />

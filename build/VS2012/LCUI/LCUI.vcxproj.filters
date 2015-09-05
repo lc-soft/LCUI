@@ -231,14 +231,17 @@
     <ClInclude Include="..\..\..\include\LCUI\widget_build.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\style_parser.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\draw\background.h">
       <Filter>头文件\LCUI\draw</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\textview.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\sidebar.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h">
+      <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -362,9 +365,6 @@
     <ClCompile Include="..\..\..\src\thread\win32\cond.c">
       <Filter>源文件\thread\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\parse.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\ime.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -372,9 +372,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\cursor.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\style_parser.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_task.c">
@@ -400,6 +397,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget\button.c">
       <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\sidebar.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\css_parser.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\misc\parse.c">
+      <Filter>源文件\misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
