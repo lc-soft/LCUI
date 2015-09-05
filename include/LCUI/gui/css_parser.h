@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
- * widget_build.h -- system APIs for GUI widget.
+ * css_parser.h -- css parser module
  *
- * Copyright (C) 2013-2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,9 +20,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * widget_build.h -- GUI部件的系统操作函数，主要用于widget开发。
+ * css_parser.h -- css 样式解析模块
  *
- * 版权所有 (C) 2013-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,46 +37,18 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_WIDGET_BUILD_H__
-#define __LCUI_WIDGET_BUILD_H__
-
-typedef struct LCUI_WidgetFull* LCUI_Widget;
-
-#include <LCUI/graph.h>
-#include <LCUI/thread.h>
-#include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_task.h>
-#include <LCUI/gui/widget_paint.h>
-#include <LCUI/gui/widget_library.h>
-#include <LCUI/gui/widget_event.h>
-#include <LCUI/gui/widget_style.h>
-#include <LCUI/gui/css_parser.h>
+#ifndef __LCUI_CSS_PARSER_H__
+#define __LCUI_CSS_PARSER_H__
 
 LCUI_BEGIN_HEADER
 
-/** 部件结构（完整版） */
-struct LCUI_WidgetFull {
-	LCUI_WidgetBase		base;			/**< 基础数据 */
-	LCUI_WidgetStyle	style;			/**< 已经计算的样式数据 */
-	LCUI_StyleSheet		css;			/**< 应用在部件上的完整样式表 */
-	LCUI_StyleSheet		inherited_css;		/**< 通过继承得到的样式表 */
-	char			*id;			/**< ID */
-	char			*type;			/**< 类型 */
-	char			**classes;		/**< 类列表 */
-	char			**pseudo_classes;	/**< 伪类列表 */
-	wchar_t			*title;			/**< 标题 */
+/** 初始化 LCUI 的 CSS 代码解析功能 */
+LCUI_API void LCUICssParser_Init(void);
 
-	LCUI_Widget		parent;			/**< 父部件 */
-	LinkedList		children;		/**< 子部件 */
-	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
-	LCUI_EventBox		event;			/**< 事件记录 */
-	LCUI_WidgetTaskBox	task;			/**< 任务记录 */
-	LCUI_DirtyRectList	dirty_rects;		/**< 记录无效区域（脏矩形） */
-	LCUI_BOOL		has_dirty_child;	/**< 标志，指示子级部件是否有无效区域 */
-	LCUI_Graph		graph;			/**< 位图缓存 */
-	LCUI_Mutex		mutex;			/**< 互斥锁 */
-	void			*private_data;		/**< 私有数据 */
-};
+/** 从字符串中解析出样式，并导入至样式库中 */
+LCUI_API int LCUI_ParseStyle( const char *str );
+
+LCUI_API void LCUICssParser_Destroy(void);
 
 LCUI_END_HEADER
 

@@ -59,6 +59,8 @@
 #define TRUE 1
 #endif
 
+#define ToString(x) #x
+
 LCUI_BEGIN_HEADER
 
 typedef unsigned int uint_t;
@@ -267,9 +269,6 @@ typedef struct LCUI_PaintContextRec_ {
 } LCUI_PaintContextRec_, *LCUI_PaintContext;
 
 LCUI_END_HEADER
-
-#define MAX_APP_IDLE_TIME	50
-#define MAX_LCUI_IDLE_TIME	50
 
 #define nobuff_printf(format, ...) \
 	{ \

@@ -85,42 +85,33 @@ void Button_SetText( LCUI_Widget w, const char *str )
 	TextView_SetText( btn->text, str );
 }
 
+/** 按钮的 css 样式 */
+static const char *button_css = ToString(
+
+button {
+	padding: 6px 12px;
+	border: 1px solid #eaeaea;
+	background-color: #fff;
+}
+
+button:hover {
+	border-color: #cbcbcb;
+	background-color: #e6e6e6;
+}
+
+button:active {
+	background-color:rgb(215,215,215);
+}
+
+);
+
 /** 添加按钮部件类型 */
 void LCUIWidget_AddButton( void )
 {
 	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "button" );
-	LCUI_Selector selector = Selector("button");
-	LCUI_StyleSheet css = StyleSheet();
-	
-	SetStyle(css, key_padding_top, 6, px);
-	SetStyle(css, key_padding_bottom, 6, px);
-	SetStyle(css, key_padding_left, 12, px);
-	SetStyle(css, key_padding_right, 12, px);
-	SetStyle(css, key_border_width, 1, px);
-	SetStyle(css, key_border_style, SV_SOLID,style);
-	SetStyle(css, key_border_color, RGB(0xea,0xea,0xea), color);
-	SetStyle(css, key_background_color, RGB(0xff,0xff,0xff), color);
-	LCUI_PutStyle( selector, css );
-	DeleteSelector( &selector );
-	DeleteStyleSheet( &css );
-
-	css = StyleSheet();
-	selector = Selector("button:hover");
-	SetStyle(css, key_border_color, RGB(0xcb,0xcb,0xcb), color);
-	SetStyle(css, key_background_color, RGB(0xe6,0xe6,0xe6), color);
-	LCUI_PutStyle( selector, css );
-	DeleteSelector( &selector );
-	DeleteStyleSheet( &css );
-	
-	css = StyleSheet();
-	selector = Selector("button:active");
-	SetStyle(css, key_background_color, RGB(215,215,215), color);
-	LCUI_PutStyle( selector, css );
-	DeleteSelector( &selector );
-	DeleteStyleSheet( &css );
-	
 	wc->methods.init = Button_OnInit;
 	wc->methods.paint = Button_OnPaint;
 	wc->methods.destroy = Button_OnDestroy;
 	wc->task_handler = Button_OnTask;
+	LCUI_ParseStyle( button_css );
 }
