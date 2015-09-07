@@ -42,6 +42,7 @@
 #include <LCUI/widget_build.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/button.h>
+#include <LCUI/gui/widget/sidebar.h>
 
 #define NEW_ONE(TYPE) (TYPE*)malloc(sizeof(TYPE))
 
@@ -224,6 +225,28 @@ static void Widget_Init( LCUI_Widget widget )
 	DirtyRectList_Init( &widget->dirty_rects );
 	Graph_Init( &widget->graph );
 	LCUIMutex_Init( &widget->mutex );
+}
+
+/** 
+ * 获取与选择器相匹配的第一个部件
+ * 该方法主要用于精确搜索某个部件
+ * @param[in] selector 选择器
+ * @return  如果能找到匹配的部件，则返回该部件，否则返回 NULL
+ */
+LCUI_Widget LCUIWidget_Get( const char *selector )
+{
+	return NULL;
+}
+
+/** 
+ * 查询与选择器相匹配的部件列表
+ * @param[in]	selector 选择器
+ * @param[out]	list 部件列表
+ * @return 匹配到的部件总数
+ */
+int LCUIWidget_Find( const char *selector, LinkedList *list )
+{
+	return 0;
 }
 
 /** 新建一个GUI部件 */
@@ -861,6 +884,7 @@ void LCUI_InitWidget(void)
 	LCUIWidget_InitStyle();
 	LCUIWidget_AddTextView();
 	LCUIWidget_AddButton();
+	LCUIWidget_AddSideBar();
 	LCUIRootWidget = LCUIWidget_New("root");
 	Widget_SetTitleW( LCUIRootWidget, L"LCUI Display" );
 }

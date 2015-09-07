@@ -341,7 +341,7 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->is_mulitiline_mode = FALSE;
 	layer->is_autowrap_mode = FALSE;
 	layer->is_using_style_tags = FALSE;
-	layer->is_using_buffer = TRUE;
+	layer->is_using_buffer = FALSE;
 	layer->text_align = SV_LEFT;
 	layer->row_list.max_length = 0;
 	layer->row_list.length = 0;
@@ -1347,7 +1347,6 @@ int TextLayer_Draw( LCUI_TextLayer layer )
 /** 清除已记录的无效矩形 */
 void TextLayer_ClearInvalidRect( LCUI_TextLayer layer )
 {
-	int n;
 	LCUI_Rect *rect_ptr;
 	LCUI_Graph invalid_graph;
 
@@ -1356,14 +1355,9 @@ void TextLayer_ClearInvalidRect( LCUI_TextLayer layer )
 		DirtyRectList_Init( &layer->dirty_rect );
 		return;
 	}
-
-	n = LinkedList_GetTotal( &layer->dirty_rect );
-	LinkedList_Goto( &layer->dirty_rect, 0 );
-	while(n--) {
-		rect_ptr = (LCUI_Rect*)LinkedList_Get( &layer->dirty_rect );
+	LinkedList_ForEach( rect_ptr, 0, &layer->dirty_rect ) {
 		Graph_Quote( &invalid_graph, &layer->graph, rect_ptr );
 		Graph_FillAlpha( &invalid_graph, 0 );
-		LinkedList_ToNext( &layer->dirty_rect );
 	}
 	DirtyRectList_Destroy( &layer->dirty_rect );
 	DirtyRectList_Init( &layer->dirty_rect );
@@ -1380,5 +1374,12 @@ void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle *style )
 void TextLayer_SetTextAlign( LCUI_TextLayer layer, int align )
 {
 	layer->text_align = align;
+	layer->task.update_typeset = TRUE;
+}
+
+/** 设置文本行的高度 */
+void TextLayer_SetLineHeight( LCUI_TextLayer layer, LCUI_StyleVar *val )
+{
+	layer->line_height = *val;
 	layer->task.update_typeset = TRUE;
 }

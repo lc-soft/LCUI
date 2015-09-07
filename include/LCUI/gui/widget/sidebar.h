@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
- * textview.h -- LCUI's TextView Widget
+ * sidebar.c -- sidebar widget
  * 
- * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,9 +20,9 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * textview.h -- LCUI 的文本显示部件
+ * button.c -- LCUI 的侧边栏部件
  *
- * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,28 +37,19 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#ifndef __LCUI_TEXTVIEW_H__
-#define __LCUI_TEXTVIEW_H__
-
-#include <LCUI/font.h>
+#ifndef __LCUI_SIDEBAR_WIDGET_H__
+#define __LCUI_SIDEBAR_WIDGET_H__
 
 LCUI_BEGIN_HEADER
 
-/** 设定与标签关联的文本内容 */
-LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text );
+LCUI_API void SideBar_SetIconStyle( LCUI_Widget sidebar, LCUI_TextStyle *ts );
 
-LCUI_API int TextView_SetText( LCUI_Widget w, const char *utf8_text );
+LCUI_API void SideBar_GetIconStyle( LCUI_Widget sidebar, LCUI_TextStyle *ts );
 
-LCUI_API void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style );
+LCUI_API LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id, 
+				const wchar_t *icon, const wchar_t *text );
 
-LCUI_API void TextView_SetLineHeight( LCUI_Widget w, LCUI_StyleVar *val );
-
-LCUI_API void TextView_GetTextStyle( LCUI_Widget w, LCUI_TextStyle *style );
-
-LCUI_API void TextView_SetTextAlign( LCUI_Widget w, int align );
-
-/** 添加 TextView 部件类型 */
-void LCUIWidget_AddTextView( void );
+void LCUIWidget_AddSideBar(void);
 
 LCUI_END_HEADER
 

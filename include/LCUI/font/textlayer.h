@@ -247,6 +247,9 @@ LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer layer );
 /** 设置全局文本样式 */
 LCUI_API void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle *style );
 
+/** 设置文本行的高度 */
+LCUI_API void TextLayer_SetLineHeight( LCUI_TextLayer layer, LCUI_StyleVar *val );
+
 LCUI_END_HEADER
 
 #endif

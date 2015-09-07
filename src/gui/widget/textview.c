@@ -36,7 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
-
+#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
@@ -72,14 +72,11 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 	LCUI_Size new_size = {16, 16};
 	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
 	
-	_DEBUG_MSG("on resize\n");
-	if( w->style.w.type != SVT_PX && w->style.h.type != SVT_PX ) {
-		return;
-	}
-	if( w->style.w.type == SVT_PX && w->base.width > new_size.w ) {
+	DEBUG_MSG("on resize\n");
+	if( w->base.width > new_size.w ) {
 		new_size.w = w->base.width;
 	}
-	if( w->style.h.type == SVT_PX && w->base.height > new_size.h ) {
+	if( w->base.height > new_size.h ) {
 		new_size.h = w->base.height;
 	}
 	DirtyRectList_Init( &rects );
@@ -124,7 +121,7 @@ static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )
 	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
 	*width = TextLayer_GetWidth( txt->layer );
 	*height = TextLayer_GetHeight( txt->layer );
-	_DEBUG_MSG("width: %d, height: %d\n", *width, *height);
+	DEBUG_MSG("width: %d, height: %d\n", *width, *height);
 }
 
 static void TextView_OnUpdate( LCUI_Widget w )
@@ -240,14 +237,34 @@ int TextView_SetText( LCUI_Widget w, const char *utf8_text )
 	return ret;
 }
 
+void TextView_SetLineHeight( LCUI_Widget w, LCUI_StyleVar *val )
+{
+	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	TextLayer_SetLineHeight( txt->layer, val );
+	txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
+}
+
+void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style ) 
+{
+	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	TextLayer_SetTextStyle( txt->layer, style );
+	txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
+}
+
+void TextView_GetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
+{
+	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	*style = txt->layer->text_style;
+}
+
 void TextView_SetTextAlign( LCUI_Widget w, int align )
 {
 	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
-	Widget_Lock( w );
-	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
 	txt->tasks[TASK_SET_TEXT_ALIGN].align = align;
+	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
-	Widget_Unlock( w );
 }
 
 /*-------------------------- End Public ------------------------------*/
