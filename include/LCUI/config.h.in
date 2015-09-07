@@ -133,6 +133,9 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* Define to 1 if you enabled LCUIBuilder function module */
+#undef USE_LCUI_BUILDER
+
 /* Define to 1 if you have the libiconv */
 #undef USE_LIBICONV
 

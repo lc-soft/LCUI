@@ -70,6 +70,13 @@ if test "x$with_pthread" != "xno"; then
     fi
 fi
 
+enable_builder="yes"
+AC_ARG_ENABLE(lcui-builder, AC_HELP_STRING([--enable-lcui-builder],
+[enable lcui-builder function module [[default=yes]]]), enable_builder=$enableval)
+if test "$enable_builder" = "yes"; then
+	AC_DEFINE_UNQUOTED(USE_LCUI_BUILDER, 1, Define to 1 if you enabled LCUIBuilder function module)
+fi
+
 ##检测是否有freetype库
 want_font_engine="yes"
 font_engine_name="freetype"
@@ -137,7 +144,6 @@ if test "x$with_jpeg" != "xno"; then
 	AC_SUBST(JPEG_LIBS)
     fi
 fi
-
 
 # DEBUG option
 # 调试选项，如果需要对项目进行调试，可启用调试选项
