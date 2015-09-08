@@ -99,6 +99,7 @@ static void ConvertStyleValue( LCUI_Style *s, LCUI_StyleVar *sv )
 		break;
 	case SVT_SCALE:
 		s->value_scale = sv->scale;
+		break;
 	default:
 		s->type = SVT_NONE;
 		s->is_valid = FALSE;

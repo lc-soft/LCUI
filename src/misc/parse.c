@@ -47,7 +47,9 @@ LCUI_BOOL ParseNumber( LCUI_StyleVar *var, const char *str )
 		}
 		break;
 	case '%':
-		sscanf( num_str, "%lf", &var->scale );
+		if( 1 != sscanf(num_str, "%lf", &var->scale) ) {
+			return FALSE;
+		}
 		var->scale /= 100.0;
 		var->type = SVT_SCALE;
 		break;
@@ -94,7 +96,7 @@ LCUI_BOOL ParseColor( LCUI_StyleVar *var, const char *str )
 		status = 0;
 		if( len == 4 ) {
 			status = sscanf( str, "#%1X%1X%1X", &r, &g, &b );
-			r <<= 4; g <<= 4; b <<= 4;
+			r *= 255/0xf; g *= 255/0xf; b *= 255/0xf;
 		} else if( len == 7 ) {
 			status = sscanf( str, "#%2X%2X%2X", &r, &g, &b );
 		}
