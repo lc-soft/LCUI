@@ -60,6 +60,16 @@ static struct {
 	LCUI_RBTree style;		/**< 样式树 */
 } style_library;
 
+const char *global_css = ToString(
+
+* {
+	width: auto;
+	height: auto;
+	background-color: transparent;
+}
+
+);
+
 /** 获取指针数组的长度 */
 static size_t ptrslen( char *const *list )
 {
@@ -175,6 +185,7 @@ void LCUIWidget_InitStyle( void )
 	RBTree_OnDestroy( &style_library.style, DestroyStyleTreeNode );
 	style_library.is_inited = TRUE;
 	LCUICssParser_Init();
+	LCUI_ParseStyle( global_css );
 }
 
 /** 销毁，释放资源 */
@@ -189,10 +200,6 @@ LCUI_StyleSheet StyleSheet( void )
 {
 	LCUI_StyleSheet ss;
 	ss = (LCUI_StyleSheet)calloc( STYLE_KEY_TOTAL, sizeof(LCUI_Style) );
-	ss[key_width].type = SVT_AUTO;
-	ss[key_width].value = SV_AUTO;
-	ss[key_height].type = SVT_AUTO;
-	ss[key_height].value = SV_AUTO;
 	return ss;
 }
 
@@ -285,8 +292,9 @@ LCUI_Selector Selector( const char *selector )
 			node = NULL;
 			continue;
 		}
-		if( (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z')
-		 || (*p >= '0' && *p <= '9') || *p == '-' || *p == '_' ) {
+		if( *p == '-' || *p == '_' || *p == '*'
+		 || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z')
+		 || (*p >= '0' && *p <= '9') ) {
 			if( !is_saving ) {
 				type = 0;
 				is_saving = TRUE;
@@ -295,7 +303,7 @@ LCUI_Selector Selector( const char *selector )
 			name[ni] = 0;
 			continue;
 		}
-		_DEBUG_MSG( "%s: unknown char %02x at %ld.\n",
+		_DEBUG_MSG( "%s: unknown char 0x%02x at %ld.\n",
 			    selector, *p, p - selector );
 		return NULL;
 	}
@@ -449,7 +457,8 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 	for( ; *obj_ptr && *sn_ptr; ++obj_ptr ) {
 		w = *obj_ptr;
 		if( (*sn_ptr)->id ) {
-			if( strcmp(w->id, (*sn_ptr)->id) ) {
+			if( strcmp("*", (*sn_ptr)->id)
+			 && strcmp( w->id, (*sn_ptr)->id ) ) {
 				continue;
 			}
 		}
@@ -532,7 +541,8 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 {
 	int i, count = 0;
 	char fullname[MAX_NAME_LEN];
-
+	/* 记录作用于全局元素的样式表 */
+	count += FindStyleNodeByName( "*", w, list );
 	i = ptrslen( w->classes );
 	/* 记录类选择器匹配的样式表 */
 	while( --i >= 0 ) {
@@ -569,6 +579,9 @@ static LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 		}
 		printf("\t\t%s: ", GetStyleName(key));
 		switch( ss[key].type ) {
+		case SVT_AUTO: 
+			printf( "auto\n");
+			break;
 		case SVT_BOOLEAN: {
 			LCUI_BOOL b = ss[key].value_boolean;
 			printf( "%s\n", b ? "true" : "false" );
@@ -678,6 +691,7 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 		Widget_ComputeInheritStyle( w, w->inherited_css );
 	}
 	ReplaceStyleSheet( w->base.css, w->inherited_css, w->base.style );
+	DEBUG_MSG("widget: %s, background-color: 0x%08x, is_valid: %d\n", w->type, w->base.css[key_background_color].value_color.value, w->type, w->base.css[key_background_color].is_valid);
 	/* 对比两张样式表，确定哪些需要更新 */
 	for( key = 0; key < STYLE_KEY_TOTAL; ++key ) {
 		/* 忽略值没有变化的样式 */

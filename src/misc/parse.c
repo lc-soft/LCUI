@@ -67,7 +67,7 @@ LCUI_BOOL ParseColor( LCUI_StyleVar *var, const char *str )
 	double a;
 	int len = 0, status = 0, r, g, b;
 	const char *p;
-
+	
 	for( p=str; *p; ++p, ++len ) {
 		switch( *p ) {
 		case '#':
@@ -87,7 +87,7 @@ LCUI_BOOL ParseColor( LCUI_StyleVar *var, const char *str )
 			break;
 		default: 
 			if( status < 3 ) {
-				return -1;
+				return FALSE;
 			}
 		}
 	}

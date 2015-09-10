@@ -36,7 +36,7 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
-
+#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/misc/parse.h>
@@ -172,11 +172,19 @@ clean:
 	return vi;
 }
 
+
+
 static int OnParseNumber( LCUI_Style *s, const char *str )
 {
 	LCUI_StyleVar sv;
 	if( ParseNumber( &sv, str ) ) {
 		ConvertStyleValue( s, &sv );
+		return 0;
+	}
+	if( strcmp("auto", str) == 0 ) {
+		s->is_valid = TRUE;
+		s->type = SVT_AUTO;
+		s->value_style = SV_AUTO;
 		return 0;
 	}
 	return -1;
@@ -187,6 +195,12 @@ static int OnParseColor( LCUI_Style *s, const char *str )
 	LCUI_StyleVar sv;
 	if( ParseColor( &sv, str ) ) {
 		ConvertStyleValue( s, &sv );
+		return 0;
+	}
+	if( strcmp("transparent", str) == 0 ) {
+		s->is_valid = TRUE;
+		s->value_color = ARGB(0,255,255,255);
+		s->type = SVT_COLOR;
 		return 0;
 	}
 	return -1;
