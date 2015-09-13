@@ -174,20 +174,76 @@ typedef struct LCUI_SelectorNodeRec_ {
 					S[NAME].type = SVT_##TYPE, \
 					S[NAME].value_##TYPE = VAL
 
-typedef struct LCUI_WidgetBase {
-	int x, y;			/**< 部件当前坐标 */
-	int width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
-	struct LCUI_WidgetBoxRect {
-		LCUI_Rect content;	/**< 内容框的区域 */
-		LCUI_Rect border;	/**< 边框盒的区域，包括内边距框和内容框区域 */
-		LCUI_Rect outer;	/**< 外边框的区域，包括边框盒和外边距框区域 */
-		LCUI_Rect graph;	/**< 图层的区域，包括边框盒和阴影区域 */
-	} box;				/**< 部件的各个区域信息 */
-	LCUI_Rect2 padding;		/**< 内边距框 */
-	LCUI_Rect2 margin;		/**< 外边距框 */
-	LCUI_StyleSheet style;		/**< 自定义样式表 */
-	LCUI_StyleSheet css;		/**< 应用在部件上的完整样式表 */
-} LCUI_WidgetBase;
+/** 部件任务类型，主要是按所对应的部件属性或具体刷新区域进行区分 */
+enum WidgetTaskType {
+	WTT_REFRESH_STYLE,	/**< 刷新部件全部样式 */
+	WTT_UPDATE_STYLE,	/**< 更新部件自定义样式 */
+	WTT_TITLE,
+	WTT_BOX_SIZING,
+	WTT_PADDING,
+	WTT_MARGIN,
+	WTT_VISIBLE,
+	WTT_SHADOW,
+	WTT_BORDER,
+	WTT_BACKGROUND,
+	WTT_RESIZE,
+	WTT_POSITION,
+	WTT_OPACITY,
+	WTT_BODY,
+	WTT_REFRESH,
+	WTT_USER,
+	WTT_DESTROY
+};
+
+#define WTT_TOTAL_NUM (WTT_DESTROY+1)
+
+#ifndef __IN_WIDGET_TASK_SOURCE_FILE__
+typedef void* LCUI_WidgetTaskBox;
+#else
+typedef struct LCUI_WidgetTaskBoxRec_* LCUI_WidgetTaskBox;
+#endif
+
+typedef struct LCUI_WidgetBoxRect {
+	LCUI_Rect content;			/**< 内容框的区域 */
+	LCUI_Rect border;			/**< 边框盒的区域，包括内边距框和内容框区域 */
+	LCUI_Rect outer;			/**< 外边框的区域，包括边框盒和外边距框区域 */
+	LCUI_Rect graph;			/**< 图层的区域，包括边框盒和阴影区域 */
+} LCUI_WidgetBoxRect;
+
+typedef struct LCUI_WidgetRec_* LCUI_Widget;
+
+/** 部件结构 */
+struct LCUI_WidgetRec_ {
+	int			x, y;			/**< 部件当前坐标 */
+	int			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
+	char			*id;			/**< ID */
+	char			*type;			/**< 类型 */
+	char			**classes;		/**< 类列表 */
+	char			**pseudo_classes;	/**< 伪类列表 */
+	wchar_t			*title;			/**< 标题 */
+	LCUI_Rect2		padding;		/**< 内边距框 */
+	LCUI_Rect2		margin;			/**< 外边距框 */
+	LCUI_WidgetBoxRect	box;			/**< 部件的各个区域信息 */
+	LCUI_StyleSheet		style;			/**< 当前完整样式表 */
+	LCUI_StyleSheet		cached_style;		/**< 已缓存的完整样式表 */
+	LCUI_StyleSheet		inherited_style;	/**< 通过继承得到的样式表 */
+	LCUI_StyleSheet		custom_style;		/**< 自定义样式表 */
+	LCUI_WidgetStyle	computed_style;		/**< 已经计算的样式数据 */
+	LCUI_Widget		parent;			/**< 父部件 */
+	LinkedList		children;		/**< 子部件 */
+	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
+	
+	void			*private_data;		/**< 私有数据 */
+	void			*extend_data;		/**< 扩展数据 */
+	
+	LCUI_Graph		graph;			/**< 位图缓存 */
+	LCUI_Mutex		mutex;			/**< 互斥锁 */
+	LCUI_EventBox		event;			/**< 事件记录 */
+	LCUI_WidgetTaskBox	task;			/**< 任务记录 */
+	LCUI_DirtyRectList	dirty_rects;		/**< 记录无效区域（脏矩形） */
+	LCUI_BOOL		has_dirty_child;	/**< 标志，指示子级部件是否有无效区域 */
+};
+
 
 /** 为函数加前缀名 */
 #define $(FUNC_NAME) Widget_##FUNC_NAME

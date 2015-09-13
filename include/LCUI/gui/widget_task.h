@@ -42,35 +42,6 @@
 
 LCUI_BEGIN_HEADER
 
-/** 部件任务类型，主要是按所对应的部件属性或具体刷新区域进行区分 */
-enum WidgetTaskType {
-	WTT_REFRESH_STYLE,	/**< 刷新部件全部样式 */
-	WTT_UPDATE_STYLE,	/**< 更新部件自定义样式 */
-	WTT_TITLE,
-	WTT_BOX_SIZING,
-	WTT_PADDING,
-	WTT_MARGIN,
-	WTT_VISIBLE,
-	WTT_SHADOW,
-	WTT_BORDER,
-	WTT_BACKGROUND,
-	WTT_RESIZE,
-	WTT_POSITION,
-	WTT_OPACITY,
-	WTT_BODY,
-	WTT_REFRESH,
-	WTT_USER,
-	WTT_DESTROY
-};
-
-#define WTT_TOTAL_NUM (WTT_DESTROY+1)
-
-#ifndef __IN_WIDGET_TASK_SOURCE_FILE__
-typedef void* LCUI_WidgetTaskBox;
-#else
-typedef struct LCUI_WidgetTaskBoxRec_* LCUI_WidgetTaskBox;
-#endif
-
 /** 更新当前任务状态，确保部件的任务能够被处理到 */
 LCUI_API void Widget_UpdateTaskStatus( LCUI_Widget widget );
 
