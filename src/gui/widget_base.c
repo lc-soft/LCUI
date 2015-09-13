@@ -39,7 +39,7 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/button.h>
 #include <LCUI/gui/widget/sidebar.h>
@@ -135,7 +135,7 @@ int Widget_Front( LCUI_Widget widget )
 			continue;
 		}
 		/* 如果该位置的图层的z-index值不大于自己 */
-		if( child->style.z_index <= widget->style.z_index ) {
+		if( child->computed_style.z_index <= widget->computed_style.z_index ) {
 			/* 如果未找到自己的源位置 */
 			if( src_pos == -1 ) {
 				des_pos = i;
@@ -179,45 +179,39 @@ static void Widget_OnDestroy( void *arg )
 /** 构造函数 */
 static void Widget_Init( LCUI_Widget widget )
 {
-	widget->id = NULL;
-	widget->classes = NULL;
-	widget->type = NULL;
-	widget->pseudo_classes = NULL;
-	memset( &widget->base, 0, sizeof(widget->base));
-	widget->base.style = StyleSheet();
-	widget->base.css = StyleSheet();
-	widget->css = StyleSheet();
-	widget->inherited_css = StyleSheet();
-	widget->style.z_index = 0;
-	widget->style.width.type = SVT_AUTO;
-	widget->style.height.type = SVT_AUTO;
-	widget->style.box_sizing = SV_CONTENT_BOX;
-	widget->style.opacity = 1.0;
-	widget->style.margin.top.px = 0;
-	widget->style.margin.right.px = 0;
-	widget->style.margin.bottom.px = 0;
-	widget->style.margin.left.px = 0;
-	widget->style.margin.top.type = SVT_PX;
-	widget->style.margin.right.type = SVT_PX;
-	widget->style.margin.bottom.type = SVT_PX;
-	widget->style.margin.left.type = SVT_PX;
-	widget->style.padding.top.px = 0;
-	widget->style.padding.right.px = 0;
-	widget->style.padding.bottom.px = 0;
-	widget->style.padding.left.px = 0;
-	widget->style.padding.top.type = SVT_PX;
-	widget->style.padding.right.type = SVT_PX;
-	widget->style.padding.bottom.type = SVT_PX;
-	widget->style.padding.left.type = SVT_PX;
+	memset( widget, 0, sizeof(struct LCUI_WidgetRec_));
+	widget->custom_style = StyleSheet();
+	widget->cached_style = StyleSheet();
+	widget->style = StyleSheet();
+	widget->inherited_style = StyleSheet();
+	widget->computed_style.z_index = 0;
+	widget->computed_style.width.type = SVT_AUTO;
+	widget->computed_style.height.type = SVT_AUTO;
+	widget->computed_style.box_sizing = SV_CONTENT_BOX;
+	widget->computed_style.opacity = 1.0;
+	widget->computed_style.margin.top.px = 0;
+	widget->computed_style.margin.right.px = 0;
+	widget->computed_style.margin.bottom.px = 0;
+	widget->computed_style.margin.left.px = 0;
+	widget->computed_style.margin.top.type = SVT_PX;
+	widget->computed_style.margin.right.type = SVT_PX;
+	widget->computed_style.margin.bottom.type = SVT_PX;
+	widget->computed_style.margin.left.type = SVT_PX;
+	widget->computed_style.padding.top.px = 0;
+	widget->computed_style.padding.right.px = 0;
+	widget->computed_style.padding.bottom.px = 0;
+	widget->computed_style.padding.left.px = 0;
+	widget->computed_style.padding.top.type = SVT_PX;
+	widget->computed_style.padding.right.type = SVT_PX;
+	widget->computed_style.padding.bottom.type = SVT_PX;
+	widget->computed_style.padding.left.type = SVT_PX;
 	widget->event = LCUIEventBox_Create();
-	widget->parent = NULL;
-	widget->title = NULL;
 	widget->event = LCUIEventBox_Create();
 	Widget_InitTaskBox( widget );
-	Background_Init( &widget->style.background );
-	BoxShadow_Init( &widget->style.shadow );
-	Border_Init( &widget->style.border );
-	LinkedList_Init( &widget->children, sizeof(struct LCUI_WidgetFull) );
+	Background_Init( &widget->computed_style.background );
+	BoxShadow_Init( &widget->computed_style.shadow );
+	Border_Init( &widget->computed_style.border );
+	LinkedList_Init( &widget->children, sizeof(struct LCUI_WidgetRec_) );
 	LinkedList_Init( &widget->children_show, 0 );
 	LinkedList_SetDestroyFunc( &widget->children, Widget_OnDestroy );
 	LinkedList_SetDataNeedFree( &widget->children, TRUE );
@@ -255,7 +249,7 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 	LCUI_Widget widget;
 	LCUI_WidgetClass *wc;
 
-	widget = NEW_ONE(struct LCUI_WidgetFull);
+	widget = NEW_ONE(struct LCUI_WidgetRec_);
 	Widget_Init( widget );
 	if( type_name ) {
 		widget->type = strdup( type_name );
@@ -276,13 +270,13 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 	do {
 		is_hit = FALSE;
 		LinkedList_ForEach( c, 0, &target->children_show ) {
-			if( !c->style.visible ) {
+			if( !c->computed_style.visible ) {
 				continue;
 			}
-			if( LCUIRect_HasPoint(&c->base.box.border, x, y) ) {
+			if( LCUIRect_HasPoint(&c->box.border, x, y) ) {
 				target = c;
-				x -= c->base.box.content.x;
-				y -= c->base.box.content.y;
+				x -= c->box.content.x;
+				y -= c->box.content.y;
 				is_hit = TRUE;
 				break;
 			 }
@@ -388,74 +382,74 @@ void Widget_ComputePosition( LCUI_Widget w )
 {
 	// 需要考虑到其它定位相关的属性
 	// code ...
-	switch( w->css[key_left].type ) {
+	switch( w->cached_style[key_left].type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
-		w->base.x =  w->parent->base.box.content.width;
-		w->base.x *= w->css[key_left].value_scale;
+		w->x =  w->parent->box.content.width;
+		w->x *= w->cached_style[key_left].value_scale;
 		break;
 	case SVT_PX:
-		w->base.x = w->css[key_left].value_px;
+		w->x = w->cached_style[key_left].value_px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
 	default:
-		w->base.x = 0;
+		w->x = 0;
 		break;
 	}
-	switch( w->css[key_top].type ) {
+	switch( w->cached_style[key_top].type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
-		w->base.y = w->parent->base.box.content.height;
-		w->base.y *= w->css[key_top].value_scale;
+		w->y = w->parent->box.content.height;
+		w->y *= w->cached_style[key_top].value_scale;
 		break;
 	case SVT_PX:
-		w->base.y = w->css[key_top].value_px;
+		w->y = w->cached_style[key_top].value_px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
 	default:
-		w->base.y = 0;
+		w->y = 0;
 		break;
 	}
 	/* 以x、y为基础 */
-	w->base.box.border.x = w->base.x;
-	w->base.box.border.y = w->base.y;
-	w->base.box.content.x = w->base.x;
-	w->base.box.content.y = w->base.y;
-	w->base.box.outer.x = w->base.x;
-	w->base.box.outer.y = w->base.y;
-	w->base.box.graph.x = w->base.x;
-	w->base.box.graph.y = w->base.y;
+	w->box.border.x = w->x;
+	w->box.border.y = w->y;
+	w->box.content.x = w->x;
+	w->box.content.y = w->y;
+	w->box.outer.x = w->x;
+	w->box.outer.y = w->y;
+	w->box.graph.x = w->x;
+	w->box.graph.y = w->y;
 	/* 计算各个框的坐标 */
-	w->base.box.content.x += w->style.border.left.width + w->base.padding.left;
-	w->base.box.content.y += w->style.border.top.width + w->base.padding.top;
-	w->base.box.outer.x -= w->base.margin.left;
-	w->base.box.outer.y -= w->base.margin.top;
-	w->base.box.graph.x -= BoxShadow_GetBoxX(&w->style.shadow);
-	w->base.box.graph.y -= BoxShadow_GetBoxY(&w->style.shadow);
+	w->box.content.x += w->computed_style.border.left.width + w->padding.left;
+	w->box.content.y += w->computed_style.border.top.width + w->padding.top;
+	w->box.outer.x -= w->margin.left;
+	w->box.outer.y -= w->margin.top;
+	w->box.graph.x -= BoxShadow_GetBoxX(&w->computed_style.shadow);
+	w->box.graph.y -= BoxShadow_GetBoxY(&w->computed_style.shadow);
 }
 
 /** 更新位图尺寸 */
 void Widget_UpdateGraphBox( LCUI_Widget w )
 {
-	LCUI_Rect *rb = &w->base.box.border;
-	LCUI_Rect *rg = &w->base.box.graph;
-	rg->x = w->base.x - BoxShadow_GetBoxX( &w->style.shadow );
-	rg->y = w->base.y - BoxShadow_GetBoxY( &w->style.shadow );
-	rg->width = BoxShadow_GetWidth( &w->style.shadow, rb->width );
-	rg->height = BoxShadow_GetHeight( &w->style.shadow, rb->height );
+	LCUI_Rect *rb = &w->box.border;
+	LCUI_Rect *rg = &w->box.graph;
+	rg->x = w->x - BoxShadow_GetBoxX( &w->computed_style.shadow );
+	rg->y = w->y - BoxShadow_GetBoxY( &w->computed_style.shadow );
+	rg->width = BoxShadow_GetWidth( &w->computed_style.shadow, rb->width );
+	rg->height = BoxShadow_GetHeight( &w->computed_style.shadow, rb->height );
 	/* 如果有会产生透明效果的样式 */
-	if( w->style.border.bottom_left_radius > 0
-	 || w->style.border.bottom_right_radius > 0
-	 || w->style.border.top_left_radius > 0
-	 || w->style.border.top_right_radius > 0
-	 || w->style.background.color.alpha < 255
-	 || w->style.shadow.blur > 0 ) {
+	if( w->computed_style.border.bottom_left_radius > 0
+	 || w->computed_style.border.bottom_right_radius > 0
+	 || w->computed_style.border.top_left_radius > 0
+	 || w->computed_style.border.top_right_radius > 0
+	 || w->computed_style.background.color.alpha < 255
+	 || w->computed_style.shadow.blur > 0 ) {
 		w->graph.color_type = COLOR_TYPE_ARGB;
 	} else {
 		w->graph.color_type = COLOR_TYPE_RGB;
@@ -472,14 +466,14 @@ void Widget_GetContentSize( LCUI_Widget w, int *width, int *height )
 	*width = 0;
 	*height = 0;
 	LinkedList_ForEach( child, 0, &w->children_show ) {
-		if( !child->style.visible ) {
+		if( !child->computed_style.visible ) {
 			continue;
 		}
-		n = child->base.box.outer.x + child->base.box.outer.width;
+		n = child->box.outer.x + child->box.outer.width;
 		if( n > *width ) {
 			*width = n;
 		}
-		n = child->base.box.outer.y + child->base.box.outer.height;
+		n = child->box.outer.y + child->box.outer.height;
 		if( n > *height ) {
 			*height = n;
 		}
@@ -489,41 +483,41 @@ void Widget_GetContentSize( LCUI_Widget w, int *width, int *height )
 /** 计算尺寸 */
 void Widget_ComputeSize( LCUI_Widget w )
 {
-	switch( w->style.width.type ) {
+	switch( w->computed_style.width.type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
-		w->base.width = w->parent->base.box.content.width;
-		w->base.width *= w->style.width.scale;
+		w->width = w->parent->box.content.width;
+		w->width *= w->computed_style.width.scale;
 		break;
 	case SVT_PX:
-		w->base.width = w->style.width.px;
+		w->width = w->computed_style.width.px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
 	default:
-		w->base.width = 0;
+		w->width = 0;
 		break;
 	}
-	switch( w->style.height.type ) {
+	switch( w->computed_style.height.type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
-		w->base.height = w->parent->base.box.content.height;
-		w->base.height *= w->style.height.scale;
+		w->height = w->parent->box.content.height;
+		w->height *= w->computed_style.height.scale;
 		break;
 	case SVT_PX:
-		w->base.height = w->style.height.px;
+		w->height = w->computed_style.height.px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
 	default:
-		w->base.height = 0;
+		w->height = 0;
 		break;
 	}
-	if( w->style.height.type == SVT_AUTO || w->style.width.type == SVT_AUTO ) {
+	if( w->computed_style.height.type == SVT_AUTO || w->computed_style.width.type == SVT_AUTO ) {
 		LCUI_WidgetClass *wc;
 		int width, height;
 
@@ -533,41 +527,41 @@ void Widget_ComputeSize( LCUI_Widget w )
 		} else {
 			Widget_GetContentSize( w, &width, &height );
 		}
-		if( w->style.width.type == SVT_AUTO ) {
-			w->base.width = width;
+		if( w->computed_style.width.type == SVT_AUTO ) {
+			w->width = width;
 		}
-		if( w->style.height.type == SVT_AUTO ) {
-			w->base.height = height;
+		if( w->computed_style.height.type == SVT_AUTO ) {
+			w->height = height;
 		}
 	}
-	w->base.box.border.width = w->base.width;
-	w->base.box.border.height = w->base.height;
-	w->base.box.content.width = w->base.width;
-	w->base.box.content.height = w->base.height;
+	w->box.border.width = w->width;
+	w->box.border.height = w->height;
+	w->box.content.width = w->width;
+	w->box.content.height = w->height;
 	/* 如果是以边框盒作为尺寸调整对象，则需根据边框盒计算内容框尺寸 */
-	if( w->style.box_sizing == SV_BORDER_BOX ) {
+	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
 		/* 名字太长了，都放一行里代码会太长，只好分解成多行了 */
-		w->base.box.content.width -= w->style.border.left.width;
-		w->base.box.content.width -= w->style.border.right.width;
-		w->base.box.content.width -= w->base.padding.left;
-		w->base.box.content.width -= w->base.padding.right;
-		w->base.box.content.height -= w->style.border.top.width;
-		w->base.box.content.height -= w->style.border.bottom.width;
-		w->base.box.content.height -= w->base.padding.top;
-		w->base.box.content.height -= w->base.padding.bottom;
+		w->box.content.width -= w->computed_style.border.left.width;
+		w->box.content.width -= w->computed_style.border.right.width;
+		w->box.content.width -= w->padding.left;
+		w->box.content.width -= w->padding.right;
+		w->box.content.height -= w->computed_style.border.top.width;
+		w->box.content.height -= w->computed_style.border.bottom.width;
+		w->box.content.height -= w->padding.top;
+		w->box.content.height -= w->padding.bottom;
 	} else {
 		/* 否则是以内容框作为尺寸调整对象，需计算边框盒的尺寸 */
-		w->base.box.border.width += w->style.border.left.width;
-		w->base.box.border.width += w->style.border.right.width;
-		w->base.box.border.width += w->base.padding.left;
-		w->base.box.border.width += w->base.padding.right;
-		w->base.box.border.height += w->style.border.top.width;
-		w->base.box.border.height += w->style.border.bottom.width;
-		w->base.box.border.height += w->base.padding.top;
-		w->base.box.border.height += w->base.padding.bottom;
+		w->box.border.width += w->computed_style.border.left.width;
+		w->box.border.width += w->computed_style.border.right.width;
+		w->box.border.width += w->padding.left;
+		w->box.border.width += w->padding.right;
+		w->box.border.height += w->computed_style.border.top.width;
+		w->box.border.height += w->computed_style.border.bottom.width;
+		w->box.border.height += w->padding.top;
+		w->box.border.height += w->padding.bottom;
 	}
 	/* 先暂时用边框盒区域作为外部区域，等加入外边距设置后再改 */
-	w->base.box.outer = w->base.box.border;
+	w->box.outer = w->box.border;
 }
 
 /** 计算内边距 */
@@ -581,21 +575,21 @@ void Widget_ComputePadding( LCUI_Widget w )
 		int size;
 	} map[4] = {
 		{
-			&w->style.padding.top,
-			&w->base.padding.top,
-			w->parent->base.box.content.height
+			&w->computed_style.padding.top,
+			&w->padding.top,
+			w->parent->box.content.height
 		}, {
-			&w->style.padding.right,
-			&w->base.padding.right,
-			w->parent->base.box.content.width
+			&w->computed_style.padding.right,
+			&w->padding.right,
+			w->parent->box.content.width
 		}, {
-			&w->style.padding.bottom,
-			&w->base.padding.bottom,
-			w->parent->base.box.content.height
+			&w->computed_style.padding.bottom,
+			&w->padding.bottom,
+			w->parent->box.content.height
 		}, {
-			&w->style.padding.left,
-			&w->base.padding.left,
-			w->parent->base.box.content.width
+			&w->computed_style.padding.left,
+			&w->padding.left,
+			w->parent->box.content.width
 		}
 	};
 	for( i=0; i<4; ++i ) {
@@ -630,21 +624,21 @@ void Widget_ComputeMargin( LCUI_Widget w )
 		int size;
 	} map[4] = {
 		{
-			&w->style.margin.top,
-			&w->base.margin.top,
-			w->parent->base.box.content.height
+			&w->computed_style.margin.top,
+			&w->margin.top,
+			w->parent->box.content.height
 		}, {
-			&w->style.margin.right,
-			&w->base.margin.right,
-			w->parent->base.box.content.width
+			&w->computed_style.margin.right,
+			&w->margin.right,
+			w->parent->box.content.width
 		}, {
-			&w->style.margin.bottom,
-			&w->base.margin.bottom,
-			w->parent->base.box.content.height
+			&w->computed_style.margin.bottom,
+			&w->margin.bottom,
+			w->parent->box.content.height
 		}, {
-			&w->style.margin.left,
-			&w->base.margin.left,
-			w->parent->base.box.content.width
+			&w->computed_style.margin.left,
+			&w->margin.left,
+			w->parent->box.content.width
 		}
 	};
 	for( i=0; i<4; ++i ) {
@@ -706,8 +700,8 @@ void Widget_SetTop( LCUI_Widget w, const char *value )
 /** 移动部件位置 */
 void Widget_Move( LCUI_Widget w, int left, int top )
 {
-	SetStyle( w->base.style, key_top, top, px );
-	SetStyle( w->base.style, key_left, left, px );
+	SetStyle( w->custom_style, key_top, top, px );
+	SetStyle( w->custom_style, key_left, left, px );
 	DEBUG_MSG("top = %d, left = %d\n", top, left);
 	Widget_Update( w, FALSE );
 }
@@ -715,26 +709,26 @@ void Widget_Move( LCUI_Widget w, int left, int top )
 /** 调整部件尺寸 */
 void Widget_Resize( LCUI_Widget w, int width, int height )
 {
-	SetStyle( w->base.style, key_width, width, px );
-	SetStyle( w->base.style, key_height, height, px );
+	SetStyle( w->custom_style, key_width, width, px );
+	SetStyle( w->custom_style, key_height, height, px );
 	Widget_Update( w, FALSE );
 }
 
 void Widget_Show( LCUI_Widget w )
 {
-	SetStyle( w->base.style, key_visible, TRUE, boolean );
+	SetStyle( w->custom_style, key_visible, TRUE, boolean );
 	Widget_Update( w, FALSE );
 }
 
 void Widget_Hide( LCUI_Widget w )
 {
-	SetStyle( w->base.style, key_visible, FALSE, boolean );
+	SetStyle( w->custom_style, key_visible, FALSE, boolean );
 	Widget_Update( w, FALSE );
 }
 
 void Widget_SetBackgroundColor( LCUI_Widget w, LCUI_Color color )
 {
-	w->style.background.color = color;
+	w->computed_style.background.color = color;
 }
 
 void Widget_Lock( LCUI_Widget w )

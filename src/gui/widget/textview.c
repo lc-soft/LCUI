@@ -40,7 +40,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
-#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 
 enum TaskType {
@@ -73,11 +73,11 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
 	
 	DEBUG_MSG("on resize\n");
-	if( w->base.width > new_size.w ) {
-		new_size.w = w->base.width;
+	if( w->width > new_size.w ) {
+		new_size.w = w->width;
 	}
-	if( w->base.height > new_size.h ) {
-		new_size.h = w->base.height;
+	if( w->height > new_size.h ) {
+		new_size.h = w->height;
 	}
 	DirtyRectList_Init( &rects );
 	TextLayer_SetMaxSize( txt->layer, new_size );
@@ -138,7 +138,7 @@ static void TextView_OnUpdate( LCUI_Widget w )
 	}
 	DirtyRectList_Destroy( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
-	if( w->style.w.type == SVT_AUTO || w->style.h.type == SVT_AUTO ) {
+	if( w->computed_style.w.type == SVT_AUTO || w->computed_style.h.type == SVT_AUTO ) {
 		Widget_AddTask( w, WTT_RESIZE );
 	}
 }
@@ -178,10 +178,10 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_Pos layer_pos;
 
 	txt = (LCUI_TextView*)w->private_data;
-	content_rect.x = w->base.box.content.left - w->base.box.graph.left;
-	content_rect.y = w->base.box.content.top - w->base.box.graph.top;
-	content_rect.width = w->base.box.content.width;
-	content_rect.height = w->base.box.content.height;
+	content_rect.x = w->box.content.left - w->box.graph.left;
+	content_rect.y = w->box.content.top - w->box.graph.top;
+	content_rect.width = w->box.content.width;
+	content_rect.height = w->box.content.height;
 	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect );
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;

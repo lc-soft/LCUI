@@ -43,7 +43,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/thread.h>
-#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget.h>
 #include <LCUI/display.h>
 #include "resource.h"
 

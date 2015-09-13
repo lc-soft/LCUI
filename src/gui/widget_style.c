@@ -39,7 +39,7 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget.h>
 
 #define MAX_NAME_LEN		128
 #define MAX_NODE_DEPTH		32
@@ -688,30 +688,30 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 	};
 
 	if( is_update_all ) {
-		Widget_ComputeInheritStyle( w, w->inherited_css );
+		Widget_ComputeInheritStyle( w, w->inherited_style );
 	}
-	ReplaceStyleSheet( w->base.css, w->inherited_css, w->base.style );
-	DEBUG_MSG("widget: %s, background-color: 0x%08x, is_valid: %d\n", w->type, w->base.css[key_background_color].value_color.value, w->type, w->base.css[key_background_color].is_valid);
+	ReplaceStyleSheet( w->style, w->inherited_style, w->custom_style );
+	DEBUG_MSG("widget: %s, background-color: 0x%08x, is_valid: %d\n", w->type, w->css[key_background_color].value_color.value, w->type, w->css[key_background_color].is_valid);
 	/* 对比两张样式表，确定哪些需要更新 */
 	for( key = 0; key < STYLE_KEY_TOTAL; ++key ) {
 		/* 忽略值没有变化的样式 */
-		if( !w->base.css[key].is_valid ) {
-			if( !w->css[key].is_valid ) {
+		if( !w->style[key].is_valid ) {
+			if( !w->cached_style[key].is_valid ) {
 				continue;
 			}
 		}
-		else if( !w->base.css[key].is_changed ) {
-			if( w->base.css[key].type == w->css[key].type ) {
-				if( w->base.css[key].value == w->css[key].value ) {
+		else if( !w->style[key].is_changed ) {
+			if( w->cached_style[key].type == w->style[key].type ) {
+				if( w->cached_style[key].value == w->style[key].value ) {
 					continue;
 				}
 			}
-			else if( w->base.css[key].value == w->css[key].value ) {
+			else if( w->cached_style[key].value == w->style[key].value ) {
 				continue;
 			}
 		}
-		w->base.css[key].is_changed = FALSE;
-		w->css[key] = w->base.css[key];
+		w->style[key].is_changed = FALSE;
+		w->cached_style[key] = w->style[key];
 		for( i = 0; i < sizeof(task_map) / sizeof(TaskMap); ++i ) {
 			if( !task_map[i].is_valid ) {
 				continue;

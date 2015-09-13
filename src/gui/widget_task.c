@@ -43,7 +43,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/misc/rbtree.h>
-#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget.h>
 
 #undef max
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
@@ -63,7 +63,7 @@ static void HandleTopLevelWidgetEvent( LCUI_Widget w, int event_type )
 		n = (int*)&event_type;
 		e.type_name = "TopLevelWidget";
 		e.target = w;
-		_DEBUG_MSG("widget: %s, post event: %d\n", w->type,event_type );
+		DEBUG_MSG("widget: %s, post event: %d\n", w->type,event_type );
 		Widget_PostEvent( LCUIRootWidget, &e, *((int**)n) );
 	}
 }
@@ -247,13 +247,13 @@ static void HandleUpdateStyle( LCUI_Widget w )
 static void HandlePosition( LCUI_Widget w )
 {
 	LCUI_Rect rect;
-	rect = w->base.box.graph;
+	rect = w->box.graph;
 	Widget_ComputePosition( w );
 	if( w->parent ) {
-		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->base.box.graph.x, w->base.box.graph.y, w->base.box.graph.w, w->base.box.graph.h);
+		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
 		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
 		/* 标记移动前后的区域 */
-		Widget_InvalidateArea( w->parent, &w->base.box.graph, SV_CONTENT_BOX );
+		Widget_InvalidateArea( w->parent, &w->box.graph, SV_CONTENT_BOX );
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
 	}
 	/* 检测是否为顶级部件并做相应处理 */
@@ -277,44 +277,44 @@ static void HandleResize( LCUI_Widget w )
 		int *ival;
 		int key;
 	} pd_map[4] = {
-		{ &w->style.padding.top, &w->base.padding.top, key_padding_top },
-		{ &w->style.padding.right, &w->base.padding.right, key_padding_right },
-		{ &w->style.padding.bottom, &w->base.padding.bottom, key_padding_bottom },
-		{ &w->style.padding.left, &w->base.padding.left, key_padding_left }
+		{ &w->computed_style.padding.top, &w->padding.top, key_padding_top },
+		{ &w->computed_style.padding.right, &w->padding.right, key_padding_right },
+		{ &w->computed_style.padding.bottom, &w->padding.bottom, key_padding_bottom },
+		{ &w->computed_style.padding.left, &w->padding.left, key_padding_left }
 	};
-	rect = w->base.box.graph;
+	rect = w->box.graph;
 	/* 从样式表中获取尺寸 */
-	w->style.width.type = w->css[key_width].type;
-	if( w->style.width.type == SVT_SCALE ) {
-		w->style.width.scale = w->css[key_width].value_scale;
+	w->computed_style.width.type = w->cached_style[key_width].type;
+	if( w->computed_style.width.type == SVT_SCALE ) {
+		w->computed_style.width.scale = w->cached_style[key_width].value_scale;
 	} else {
-		w->style.width.px = w->css[key_width].value_px;
+		w->computed_style.width.px = w->cached_style[key_width].value_px;
 	}
-	w->style.height.type = w->css[key_height].type;
-	if( w->style.height.type == SVT_SCALE ) {
-		w->style.height.scale = w->css[key_height].value_scale;
+	w->computed_style.height.type = w->cached_style[key_height].type;
+	if( w->computed_style.height.type == SVT_SCALE ) {
+		w->computed_style.height.scale = w->cached_style[key_height].value_scale;
 	} else {
-		w->style.height.px = w->css[key_height].value_px;
+		w->computed_style.height.px = w->cached_style[key_height].value_px;
 	}
 	/* 内边距的单位暂时都用 px  */
 	for( i=0; i<4; ++i ) {
 		pd_map[i].sval->type = SVT_PX;
-		if( w->css[pd_map[i].key].type != SVT_PX ) {
+		if( w->style[pd_map[i].key].type != SVT_PX ) {
 			pd_map[i].sval->px = 0;
 			*pd_map[i].ival = 0;
 			continue;
 		}
-		pd_map[i].sval->px = w->css[pd_map[i].key].value_px;
+		pd_map[i].sval->px = w->cached_style[pd_map[i].key].value_px;
 		*pd_map[i].ival = pd_map[i].sval->px;
 	}
 	Widget_ComputeSize( w );
 	if( w->parent ) {
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
-		rect.width = w->base.box.graph.width;
-		rect.height = w->base.box.graph.height;
+		rect.width = w->box.graph.width;
+		rect.height = w->box.graph.height;
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );	
-		if( w->parent->style.width.type == SVT_AUTO
-		 || w->parent->style.height.type == SVT_AUTO ) {
+		if( w->parent->computed_style.width.type == SVT_AUTO
+		 || w->parent->computed_style.height.type == SVT_AUTO ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
 		}
 	}
@@ -324,7 +324,7 @@ static void HandleResize( LCUI_Widget w )
 	e.target = w;
 	e.data = NULL;
 	Widget_UpdateGraphBox( w );
-	Widget_PostEvent( w, &e, NULL );
+	Widget_SendEvent( w, &e, NULL );
 	Widget_AddTask( w, WTT_REFRESH );
 	HandleTopLevelWidgetEvent( w, WET_RESIZE );
 }
@@ -332,12 +332,12 @@ static void HandleResize( LCUI_Widget w )
 /** 处理可见性 */
 static void HandleVisibility( LCUI_Widget w )
 {
-	w->style.visible = w->base.css[key_visible].value_boolean;
+	w->computed_style.visible = w->style[key_visible].value_boolean;
 	if( w->parent ) {
 		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 	}
-	_DEBUG_MSG("visible: %s\n", w->style.visible ? "TRUE":"FALSE");
-	HandleTopLevelWidgetEvent( w, w->style.visible ? WET_SHOW:WET_HIDE );
+	DEBUG_MSG("visible: %s\n", w->computed_style.visible ? "TRUE":"FALSE");
+	HandleTopLevelWidgetEvent( w, w->computed_style.visible ? WET_SHOW:WET_HIDE );
 }
 
 /** 处理透明度 */
@@ -352,14 +352,14 @@ static void HandleShadow( LCUI_Widget w )
 	LCUI_BoxShadow bs;
 
 	_DEBUG_MSG("update shadow\n");
-	bs = w->style.shadow;
-	ComputeBoxShadowStyle( w->base.css, &w->style.shadow );
+	bs = w->computed_style.shadow;
+	ComputeBoxShadowStyle( w->style, &w->computed_style.shadow );
 	/* 如果阴影变化并未导致图层尺寸变化，则只重绘阴影 */
-	if( bs.x == w->style.shadow.x && bs.y == w->style.shadow.y
-	 && bs.spread == w->style.shadow.spread ) {
+	if( bs.x == w->computed_style.shadow.x && bs.y == w->computed_style.shadow.y
+	 && bs.spread == w->computed_style.shadow.spread ) {
 		LCUI_Rect rects[4];
-		LCUIRect_CutFourRect( &w->base.box.border,
-				      &w->base.box.graph, rects );
+		LCUIRect_CutFourRect( &w->box.border,
+				      &w->box.graph, rects );
 		Widget_InvalidateArea( w, &rects[0], SV_GRAPH_BOX );
 		Widget_InvalidateArea( w, &rects[1], SV_GRAPH_BOX );
 		Widget_InvalidateArea( w, &rects[2], SV_GRAPH_BOX );
@@ -372,7 +372,7 @@ static void HandleShadow( LCUI_Widget w )
 
 static void HandleBackground( LCUI_Widget w )
 {
-	ComputeBackgroundStyle( w->base.css, &w->style.background );
+	ComputeBackgroundStyle( w->style, &w->computed_style.background );
 	Widget_AddTask( w, WTT_BODY );
 }
 
@@ -395,9 +395,9 @@ static void HandleBorder( LCUI_Widget w )
 	LCUI_Rect rect;
 	LCUI_Border ob, *nb;
 	
-	ob = w->style.border;
-	ComputeBorderStyle( w->base.css, &w->style.border );
-	nb = &w->style.border;
+	ob = w->computed_style.border;
+	ComputeBorderStyle( w->style, &w->computed_style.border );
+	nb = &w->computed_style.border;
 	/* 如果边框变化并未导致图层尺寸变化的话，则只重绘边框 */
 	if( ob.top.width != nb->top.width
 	 || ob.right.width != nb->right.width
@@ -409,21 +409,21 @@ static void HandleBorder( LCUI_Widget w )
 	}
 
 	rect.x = rect.y = 0;
-	rect.width = w->base.box.border.width;
+	rect.width = w->box.border.width;
 	rect.width -= max( ob.top_right_radius, ob.right.width );
 	rect.height = max( ob.top_left_radius, ob.top.width );
 	/* 上 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.x = w->base.box.border.w;
+	rect.x = w->box.border.w;
 	rect.width = max( ob.top_right_radius, ob.right.width );
 	rect.x -= rect.width;
-	rect.height = w->base.box.border.height;
+	rect.height = w->box.border.height;
 	rect.height -= max( ob.bottom_right_radius, ob.bottom.width );
 	/* 右 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 	rect.x = max( ob.bottom_left_radius, ob.left.width );
-	rect.y = w->base.box.border.height;
-	rect.width = w->base.box.border.width;
+	rect.y = w->box.border.height;
+	rect.width = w->box.border.width;
 	rect.width -= rect.x;
 	rect.height = max( ob.bottom_right_radius, ob.bottom.width );
 	rect.y -= rect.height;
@@ -432,7 +432,7 @@ static void HandleBorder( LCUI_Widget w )
 	rect.width = rect.x;
 	rect.x = 0;
 	rect.y = max( ob.top_left_radius, ob.left.width );
-	rect.height = w->base.box.border.height;
+	rect.height = w->box.border.height;
 	rect.height -= rect.y;
 	/* 左 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );

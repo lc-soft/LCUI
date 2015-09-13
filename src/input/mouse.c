@@ -149,8 +149,8 @@ static LCUI_BOOL MouseProc( void )
 	}
 	old_pos.x = new_pos.x;
 	old_pos.y = new_pos.y;
-	_DEBUG_MSG("x: %d, y: %d, rel_x: %d, rel_y: %d\n", new_pos.x, new_pos.y, e.rel_x, e.rel_y);
-	_DEBUG_MSG("post result: %d\n", LCUI_PostEvent( &e ));
+	DEBUG_MSG("x: %d, y: %d, rel_x: %d, rel_y: %d\n", new_pos.x, new_pos.y, e.rel_x, e.rel_y);
+	LCUI_PostEvent( &e );
 	return TRUE;
 }
 

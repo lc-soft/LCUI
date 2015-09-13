@@ -40,7 +40,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/misc/parse.h>
-#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget.h>
 
 /** 样式字符串值与标识码 */
 typedef struct KeyNameGroup {

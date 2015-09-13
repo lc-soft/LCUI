@@ -39,7 +39,7 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/sidebar.h>
 
@@ -55,6 +55,27 @@ typedef struct {
 	LCUI_TextStyle icon_style;
 	LCUI_StyleVar line_height;
 } SideBar;
+
+static const char sidebar_css[] = ToString(
+
+sidebar {
+	width: 224px;
+	background-color: #fff;
+}
+
+sidebar sidebar-item {
+	width: 100%;
+	height: 38px;
+	background-color: rgba(255,255,255,0);
+	padding: 0 16px 0 7px;
+	border-top: 1px solid #f3f3f3;
+}
+
+sidebar sidebar-item:hover {
+	background-color: #f5f5f5;
+}
+
+);
 
 void SideBar_SetIconStyle( LCUI_Widget sidebar, LCUI_TextStyle *ts )
 {
@@ -136,42 +157,11 @@ void SideBar_OnDestroy( LCUI_Widget w )
 void LCUIWidget_AddSideBar(void)
 {
 	LCUI_WidgetClass *wc;
-	LCUI_Selector selector;
-	LCUI_StyleSheet css;
-	
 	wc = LCUIWidget_AddClass("sidebar");
 	wc->methods.init = SideBar_OnInit;
 	wc->methods.destroy = SideBar_OnDestroy;
-	
 	wc = LCUIWidget_AddClass("sidebar-item");
 	wc->methods.init = SideBarItem_OnInit;
 	wc->methods.destroy = SideBarItem_OnDestroy;
-
-	selector = Selector("sidebar");
-	css = StyleSheet();
-	SetStyle(css, key_width, 224, px);
-	SetStyle(css, key_background_color, RGB(0xff,0xff,0xff), color);
-	LCUI_PutStyle( selector, css );
-	DeleteSelector( &selector );
-	DeleteStyleSheet( &css );
-
-	css = StyleSheet();
-	selector = Selector("sidebar sidebar-item");
-	SetStyle(css, key_padding_right, 16, px);
-	SetStyle(css, key_padding_right, 7, px);
-	SetStyle(css, key_border_top_color, RGB(0xf3,0xf3,0xf3), color);
-	SetStyle(css, key_border_top_width, 1, px);
-	SetStyle(css, key_border_top_style, SV_SOLID, style);
-	SetStyle(css, key_height, 38, px);
-	SetStyle(css, key_width, 1.0, scale);
-	LCUI_PutStyle( selector, css );
-	DeleteSelector( &selector );
-	DeleteStyleSheet( &css );
-
-	css = StyleSheet();
-	selector = Selector("sidebar sidebar-item:hover");
-	SetStyle(css, key_background_color, RGB(0xf5,0xf5,0xf5), color);
-	LCUI_PutStyle( selector, css );
-	DeleteSelector( &selector );
-	DeleteStyleSheet( &css );
+	LCUI_ParseStyle( sidebar_css );
 }

@@ -4,7 +4,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
-#include <LCUI/widget.h>
+#include <LCUI/gui/widget.h>
 #include <LCUI/ime.h>
 
 typedef struct LCUIIME_Info_ {

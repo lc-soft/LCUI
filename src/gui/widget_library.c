@@ -39,7 +39,7 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget.h>
 
 static LCUI_RBTree widget_class_library;
 

@@ -39,7 +39,7 @@
 //#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget.h>
 #include <LCUI/cursor.h>
 #include <LCUI/thread.h>
 
@@ -130,7 +130,7 @@ static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 		}
 		/* 向后面的部件传播事件 */
 		LinkedList_ForEach( widget, i+1, children ) {
-			if( !widget->style.visible ) {
+			if( !widget->computed_style.visible ) {
 				continue;
 			}
 			task->func( widget, &pack->event, pack->data );

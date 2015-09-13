@@ -41,7 +41,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
-#include <LCUI/widget_build.h>
+#include <LCUI/gui/widget.h>
 #include <LCUI/display.h>
 #include <LCUI/input.h>
 #include <LCUI/cursor.h>
@@ -110,7 +110,7 @@ static void LCUIDisplay_Update(void)
 		}
 		LinkedList_Destroy( &rlist );
 	}
-
+	
 	LinkedList_Destroy( &rlist );
 }
 
@@ -160,10 +160,10 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 	p_sr->surface = NULL;
 	p_sr->surface = Surface_New();
 	Surface_SetCaptionW( p_sr->surface, widget->title );
-	p_rect = &widget->base.box.graph;
+	p_rect = &widget->box.graph;
 	Surface_Move( p_sr->surface, p_rect->x, p_rect->y );
 	Surface_Resize( p_sr->surface, p_rect->w, p_rect->h );
-	if( widget->style.visible ) {
+	if( widget->computed_style.visible ) {
 		Surface_Show( p_sr->surface );
 	} else {
 		Surface_Hide( p_sr->surface );
@@ -345,7 +345,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 	} else {
 		return;
 	}
-	p_rect = &e->target->base.box.graph;
+	p_rect = &e->target->box.graph;
 	switch( e_type ) {
 	case WET_ADD:
 		LCUIDisplay_BindSurface( e->target );
@@ -361,7 +361,7 @@ static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg
 		Surface_Hide( surface );
 		break;
 	case WET_TITLE:
-		_DEBUG_MSG("%S\n", e->target->title );
+		DEBUG_MSG("%S\n", e->target->title );
 		Surface_SetCaptionW( surface, e->target->title );
 		break;
 	case WET_RESIZE:
@@ -386,7 +386,7 @@ static void OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
 	if( display.mode == LDM_SEAMLESS ) {
 		return;
 	}
-	_DEBUG_MSG("surface: %p, event: %d, rel_x: %d, rel_y: %d\n", surface, e->type, e->rel_x, e->rel_y);
+	//DEBUG_MSG("surface: %p, event: %d, rel_x: %d, rel_y: %d\n", surface, e->type, e->rel_x, e->rel_y);
 	if( e->type == LCUI_MOUSEMOVE ) {
 		LCUIMouse_SetPos( e->rel_x, e->rel_y );
 		return;

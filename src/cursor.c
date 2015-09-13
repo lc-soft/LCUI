@@ -110,7 +110,7 @@ static void OnMouseMoveEvent( LCUI_SystemEvent *e, void *arg )
 	global_cursor.pos.x += e->rel_x;
 	global_cursor.pos.y += e->rel_y;
 	global_cursor.new_pos = global_cursor.pos;
-	_DEBUG_MSG("x: %d, y: %d\n", global_cursor.pos.x, global_cursor.pos.y);
+	DEBUG_MSG("x: %d, y: %d\n", global_cursor.pos.x, global_cursor.pos.y);
 }
 
 /* 初始化游标数据 */

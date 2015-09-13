@@ -46,7 +46,7 @@
 #include <LCUI/display.h>
 #include <LCUI/font.h>
 #include <LCUI/input.h>
-#include <LCUI/widget.h>
+#include <LCUI/gui/widget.h>
 #include <LCUI/surface.h>
 
 #include <time.h>

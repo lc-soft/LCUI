@@ -163,7 +163,6 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
         png_byte color_type;
         png_structp png_ptr;
         png_infop info_ptr;
-	png_text text[3];
 	png_bytep *row_pointers;
 	int x, y, row_size;
 
