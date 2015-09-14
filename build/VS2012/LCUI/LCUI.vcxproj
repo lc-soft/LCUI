@@ -141,8 +141,10 @@
     <ClInclude Include="..\..\..\include\LCUI\font\fontlibrary.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\textlayer.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\textstyle.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\builder.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\messagebox.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\activebox.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\checkbox.h" />
@@ -177,7 +179,6 @@
     <ClInclude Include="..\..\..\include\LCUI\misc.h" />
     <ClInclude Include="..\..\..\include\LCUI\surface.h" />
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
-    <ClInclude Include="..\..\..\include\LCUI\widget.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\delay.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\dirent.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\framectrl.h" />
@@ -186,7 +187,6 @@
     <ClInclude Include="..\..\..\include\LCUI\misc\rbtree.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\rect.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\string.h" />
-    <ClInclude Include="..\..\..\include\LCUI\widget_build.h" />
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -208,6 +208,7 @@
     <ClCompile Include="..\..\..\src\font\in_core_font.c" />
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
+    <ClCompile Include="..\..\..\src\gui\builder.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
