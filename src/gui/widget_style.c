@@ -453,16 +453,20 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 	int i, n;
 	LCUI_SelectorNode *sn_ptr = selector;
 	LCUI_Widget *obj_ptr = wlist, w;
-
-	for( ; *obj_ptr && *sn_ptr; ++obj_ptr ) {
+	/* 定位到最后一个元素 */
+	for( ;*sn_ptr; ++sn_ptr );
+	for( ;*obj_ptr; ++obj_ptr );
+	--sn_ptr;
+	--obj_ptr;
+	/* 从右到左遍历，进行匹配 */
+	for( ; obj_ptr >= wlist && sn_ptr >= selector; --obj_ptr ) {
 		w = *obj_ptr;
 		if( (*sn_ptr)->id ) {
-			if( strcmp("*", (*sn_ptr)->id)
-			 && strcmp( w->id, (*sn_ptr)->id ) ) {
+			if( strcmp( w->id, (*sn_ptr)->id ) ) {
 				continue;
 			}
 		}
-		if( (*sn_ptr)->type ) {
+		if( (*sn_ptr)->type && strcmp("*", (*sn_ptr)->type) ) {
 			if( strcmp(w->type, (*sn_ptr)->type) ) {
 				continue;
 			}
@@ -491,9 +495,10 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 				continue;
 			}
 		}
-		++sn_ptr;
+		--sn_ptr;
 	}
-	if( *obj_ptr == NULL && *sn_ptr == NULL ) {
+	/* 匹配成功的标志是遍历完选择器列表 */
+	if( sn_ptr < selector ) {
 		return TRUE;
 	}
 	return FALSE;
@@ -541,8 +546,7 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 {
 	int i, count = 0;
 	char fullname[MAX_NAME_LEN];
-	/* 记录作用于全局元素的样式表 */
-	count += FindStyleNodeByName( "*", w, list );
+
 	i = ptrslen( w->classes );
 	/* 记录类选择器匹配的样式表 */
 	while( --i >= 0 ) {
@@ -567,6 +571,8 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 	if( w->type ) {
 		count += FindStyleNodeByName( w->type, w, list );
 	}
+	/* 记录作用于全局元素的样式表 */
+	count += FindStyleNodeByName( "*", w, list );
 	return count;
 }
 
@@ -691,7 +697,6 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 		Widget_ComputeInheritStyle( w, w->inherited_style );
 	}
 	ReplaceStyleSheet( w->style, w->inherited_style, w->custom_style );
-	DEBUG_MSG("widget: %s, background-color: 0x%08x, is_valid: %d\n", w->type, w->css[key_background_color].value_color.value, w->type, w->css[key_background_color].is_valid);
 	/* 对比两张样式表，确定哪些需要更新 */
 	for( key = 0; key < STYLE_KEY_TOTAL; ++key ) {
 		/* 忽略值没有变化的样式 */

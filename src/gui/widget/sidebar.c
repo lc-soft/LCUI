@@ -66,7 +66,6 @@ sidebar {
 sidebar sidebar-item {
 	width: 100%;
 	height: 38px;
-	background-color: rgba(255,255,255,0);
 	padding: 0 16px 0 7px;
 	border-top: 1px solid #f3f3f3;
 }
@@ -119,6 +118,8 @@ LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id,
 	TextView_SetTextW( sbi->icon, icon );
 	TextView_SetTextW( sbi->text, text );
 	Widget_Show( w );
+	Widget_Show( sbi->icon );
+	Widget_Show( sbi->text );
 	LinkedList_Append( &sb->items, sbi );
 	return w;
 }

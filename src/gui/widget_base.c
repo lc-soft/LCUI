@@ -517,7 +517,8 @@ void Widget_ComputeSize( LCUI_Widget w )
 		w->height = 0;
 		break;
 	}
-	if( w->computed_style.height.type == SVT_AUTO || w->computed_style.width.type == SVT_AUTO ) {
+	if( w->computed_style.height.type == SVT_AUTO
+	 || w->computed_style.width.type == SVT_AUTO ) {
 		LCUI_WidgetClass *wc;
 		int width, height;
 
