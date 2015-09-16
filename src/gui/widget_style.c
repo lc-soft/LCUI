@@ -66,6 +66,8 @@ const char *global_css = ToString(
 	width: auto;
 	height: auto;
 	background-color: transparent;
+	display: block;
+	position: static;
 }
 
 );

@@ -51,6 +51,8 @@ typedef struct LCUI_WidgetBase* LCUI_Widget;
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
 	int position;			/**< 定位方式 */
+	int float_mode;			/**< 浮动模式 */
+	int display;			/**< 显示方式，决定以何种布局显示该部件 */
 	int left, top;			/**< 左边界、顶边界的偏移距离 */
 	int right, bottom;		/**< 右边界、底边界的偏移距离 */
 	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
@@ -186,6 +188,7 @@ enum WidgetTaskType {
 	WTT_SHADOW,
 	WTT_BORDER,
 	WTT_BACKGROUND,
+	WTT_LAYOUT,
 	WTT_RESIZE,
 	WTT_POSITION,
 	WTT_OPACITY,
@@ -311,6 +314,9 @@ LCUI_API int Widget_AddStatus( LCUI_Widget w, const char *status_name );
 
 /** 判断部件是否包含指定的状态 */
 LCUI_API LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name );
+
+/** 更新子部件的布局 */
+LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
 
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );

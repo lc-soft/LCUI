@@ -308,6 +308,10 @@ static void HandleResize( LCUI_Widget w )
 		*pd_map[i].ival = pd_map[i].sval->px;
 	}
 	Widget_ComputeSize( w );
+	/* 目前只有宽度变化会影响子部件的布局，所以只判断宽度 */
+	if( w->computed_style.width.type != SVT_AUTO ) {
+		Widget_UpdateLayout( w );
+	}
 	if( w->parent ) {
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
 		rect.width = w->box.graph.width;
@@ -517,6 +521,7 @@ static void MapTaskHandler(void)
 	task_handlers[WTT_UPDATE_STYLE] = HandleUpdateStyle;
 	task_handlers[WTT_REFRESH_STYLE] = HandleRefreshStyle;
 	task_handlers[WTT_BACKGROUND] = HandleBackground;
+	task_handlers[WTT_LAYOUT] = Widget_UpdateLayout;
 }
 
 /** 初始化 LCUI 部件任务处理功能 */
@@ -556,7 +561,8 @@ static int Widget_ProcTask( LCUI_Widget w )
 {
 	int ret = 1, i;
 	LCUI_BOOL *buffer;
-	DEBUG_MSG("1,widget: %s, for_self: %d, for_children: %d\n", w->type, w->task->for_self, w->task->for_children);
+	DEBUG_MSG("1,widget: %s, for_self: %d, for_children: %d\n",
+		   w->type, w->task->for_self, w->task->for_children);
 
 	/* 如果该部件有任务需要处理 */
 	if( w->task->for_self ) {
@@ -580,7 +586,7 @@ static int Widget_ProcTask( LCUI_Widget w )
 			wc ? wc->task_handler( w ):FALSE;
 		}
 		for( i=0; i<WTT_USER; ++i ) {
-			DEBUG_MSG( "task_id: %d, is_valid: %d\n", i, buffer[i] );
+			DEBUG_MSG("task_id: %d, is_valid: %d\n", i, buffer[i]);
 			if( buffer[i] ) {
 				buffer[i] = FALSE;
 				if( task_handlers[i] ) {
@@ -606,7 +612,8 @@ skip_proc_self_task:;
 			}
 		}
 	}
-	DEBUG_MSG("2,widget: %s, for_self: %d, for_children: %d\n", w->type, w->task->for_self, w->task->for_children);
+	DEBUG_MSG("2,widget: %s, for_self: %d, for_children: %d\n",
+		   w->type, w->task->for_self, w->task->for_children);
 
 	return (w->task->for_self || w->task->for_children) ? 1:0;
 }

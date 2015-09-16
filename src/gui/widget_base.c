@@ -183,24 +183,17 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->custom_style = StyleSheet();
 	widget->cached_style = StyleSheet();
 	widget->style = StyleSheet();
+	widget->computed_style.position = SV_STATIC;
+	widget->computed_style.display = SV_BLOCK;
 	widget->inherited_style = StyleSheet();
-	widget->computed_style.z_index = 0;
 	widget->computed_style.width.type = SVT_AUTO;
 	widget->computed_style.height.type = SVT_AUTO;
 	widget->computed_style.box_sizing = SV_CONTENT_BOX;
 	widget->computed_style.opacity = 1.0;
-	widget->computed_style.margin.top.px = 0;
-	widget->computed_style.margin.right.px = 0;
-	widget->computed_style.margin.bottom.px = 0;
-	widget->computed_style.margin.left.px = 0;
 	widget->computed_style.margin.top.type = SVT_PX;
 	widget->computed_style.margin.right.type = SVT_PX;
 	widget->computed_style.margin.bottom.type = SVT_PX;
 	widget->computed_style.margin.left.type = SVT_PX;
-	widget->computed_style.padding.top.px = 0;
-	widget->computed_style.padding.right.px = 0;
-	widget->computed_style.padding.bottom.px = 0;
-	widget->computed_style.padding.left.px = 0;
 	widget->computed_style.padding.top.type = SVT_PX;
 	widget->computed_style.padding.right.type = SVT_PX;
 	widget->computed_style.padding.bottom.type = SVT_PX;
@@ -380,41 +373,42 @@ void Widget_GetValidRect( LCUI_Widget widget, LCUI_Rect *rect )
 /** 计算坐标 */
 void Widget_ComputePosition( LCUI_Widget w )
 {
-	// 需要考虑到其它定位相关的属性
-	// code ...
-	switch( w->cached_style[key_left].type ) {
-	case SVT_SCALE:
-		if( !w->parent ) {
+	/* 如果有指定定位方式为绝对定位，则以样式表中指定的位置为准 */
+	if( w->computed_style.position == SV_ABSOLUTE ) {
+		switch( w->cached_style[key_left].type ) {
+		case SVT_SCALE:
+			if( !w->parent ) {
+				break;
+			}
+			w->x = w->parent->box.content.width;
+			w->x *= w->cached_style[key_left].value_scale;
 			break;
-		 }
-		w->x =  w->parent->box.content.width;
-		w->x *= w->cached_style[key_left].value_scale;
-		break;
-	case SVT_PX:
-		w->x = w->cached_style[key_left].value_px;
-		break;
-	case SVT_NONE:
-	case SVT_AUTO:
-	default:
-		w->x = 0;
-		break;
-	}
-	switch( w->cached_style[key_top].type ) {
-	case SVT_SCALE:
-		if( !w->parent ) {
+		case SVT_PX:
+			w->x = w->cached_style[key_left].value_px;
 			break;
-		 }
-		w->y = w->parent->box.content.height;
-		w->y *= w->cached_style[key_top].value_scale;
-		break;
-	case SVT_PX:
-		w->y = w->cached_style[key_top].value_px;
-		break;
-	case SVT_NONE:
-	case SVT_AUTO:
-	default:
-		w->y = 0;
-		break;
+		case SVT_NONE:
+		case SVT_AUTO:
+		default:
+			w->x = 0;
+			break;
+		}
+		switch( w->cached_style[key_top].type ) {
+		case SVT_SCALE:
+			if( !w->parent ) {
+				break;
+			}
+			w->y = w->parent->box.content.height;
+			w->y *= w->cached_style[key_top].value_scale;
+			break;
+		case SVT_PX:
+			w->y = w->cached_style[key_top].value_px;
+			break;
+		case SVT_NONE:
+		case SVT_AUTO:
+		default:
+			w->y = 0;
+			break;
+		}
 	}
 	/* 以x、y为基础 */
 	w->box.border.x = w->x;
@@ -869,6 +863,61 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 	Widget_AddTask( w, WTT_REFRESH_STYLE );
 	Widget_AddTaskToSpread( w,  WTT_REFRESH_STYLE );
 	return 1;
+}
+
+/** 更新子部件的布局 */
+void Widget_UpdateLayout( LCUI_Widget w )
+{
+	struct {
+		int x, y;
+		int line_height;
+		LCUI_Widget prev;
+		int prev_display;
+		int max_width;
+	} ctx = { 0 };
+	LCUI_Widget child;
+
+	ctx.max_width = 256;
+	for( child = w; child; child = child->parent ) {
+		if( child->computed_style.width.type != SVT_AUTO ) {
+			ctx.max_width = child->box.content.width;
+			break;
+		}
+	}
+	LinkedList_ForEach( child, 0, &w->children ) {
+		if( child->computed_style.position != SV_STATIC ) {
+			continue;
+		}
+		switch( child->computed_style.display ) {
+		case SV_NONE: continue;
+		case SV_BLOCK:
+			child->x = ctx.x;
+			child->y = ctx.y;
+			ctx.x = 0;
+			ctx.line_height = 0;
+			ctx.y += child->box.outer.height;
+			break;
+		case SV_INLINE_BLOCK:
+			if( child->box.outer.height > ctx.line_height ) {
+				ctx.line_height = child->box.outer.height;
+			}
+			if( ctx.prev && ctx.prev_display != SV_INLINE_BLOCK ) {
+				ctx.x = 0;
+				ctx.y += ctx.line_height;
+				break;
+			}
+			ctx.x += child->box.outer.width;
+			break;
+		default: continue;
+		}
+		Widget_AddTask( child, WTT_POSITION );
+		ctx.prev = child;
+		ctx.prev_display = child->computed_style.display;
+	}
+	if( w->computed_style.height.type == SVT_AUTO
+	 || w->computed_style.width.type == SVT_AUTO ) {
+		Widget_AddTask( w, WTT_RESIZE );
+	}
 }
 
 void LCUI_InitWidget(void)
