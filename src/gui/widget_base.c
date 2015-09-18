@@ -108,6 +108,7 @@ remove_done:
 	}
 	Widget_AddTaskToSpread( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
+	Widget_AddTask( container, WTT_LAYOUT );
 	DEBUG_MSG("tip\n");
 	return 0;
 }
@@ -486,7 +487,7 @@ void Widget_ComputeSize( LCUI_Widget w )
 		w->width *= w->computed_style.width.scale;
 		break;
 	case SVT_PX:
-		w->width = w->computed_style.width.px;
+		w->width = w->computed_style.width.value_px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
@@ -503,7 +504,7 @@ void Widget_ComputeSize( LCUI_Widget w )
 		w->height *= w->computed_style.height.scale;
 		break;
 	case SVT_PX:
-		w->height = w->computed_style.height.px;
+		w->height = w->computed_style.height.value_px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
@@ -565,7 +566,7 @@ void Widget_ComputePadding( LCUI_Widget w )
 	int i;
 	double result;
 	struct {
-		LCUI_StyleVar *value;
+		LCUI_Style *value;
 		int *buffer;
 		int size;
 	} map[4] = {
@@ -597,7 +598,7 @@ void Widget_ComputePadding( LCUI_Widget w )
 			*map[i].buffer = (int)result;
 			break;
 		case SVT_PX:
-			*map[i].buffer = map[i].value->px;
+			*map[i].buffer = map[i].value->value_px;
 			break;
 		case SVT_NONE:
 		case SVT_AUTO:
@@ -614,7 +615,7 @@ void Widget_ComputeMargin( LCUI_Widget w )
 	int i;
 	double result;
 	struct {
-		LCUI_StyleVar *value;
+		LCUI_Style *value;
 		int *buffer;
 		int size;
 	} map[4] = {
@@ -646,7 +647,7 @@ void Widget_ComputeMargin( LCUI_Widget w )
 			*map[i].buffer = (int)result;
 			break;
 		case SVT_PX:
-			*map[i].buffer = map[i].value->px;
+			*map[i].buffer = map[i].value->value_px;
 			break;
 		case SVT_NONE:
 		case SVT_AUTO:

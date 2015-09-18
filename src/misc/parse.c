@@ -3,7 +3,7 @@
 #include <LCUI/misc/parse.h>
 
 /** 从字符串中解析出数字，支持的单位：点(pt)、像素(px)、百分比(%) */
-LCUI_BOOL ParseNumber( LCUI_StyleVar *var, const char *str )
+LCUI_BOOL ParseNumber( LCUI_Style *var, const char *str )
 {
 	int n = 0;
 	char num_str[32];
@@ -38,31 +38,43 @@ LCUI_BOOL ParseNumber( LCUI_StyleVar *var, const char *str )
 	case 'p':
 		if( p[1] == 'x' || p[1] == 'X' ) {
 			var->type = SVT_PX;
-			sscanf( num_str, "%d", &var->px );
+			sscanf( num_str, "%d", &var->value_px );
 		} else if( p[1] == 't' || p[1] == 'T' ) {
 			var->type = SVT_PT;
-			sscanf( num_str, "%d", &var->pt );
+			sscanf( num_str, "%d", &var->value_pt );
 		} else {
 			var->type = SVT_NONE;
 		}
 		break;
 	case '%':
-		if( 1 != sscanf(num_str, "%lf", &var->scale) ) {
+		if( 1 != sscanf(num_str, "%lf", &var->value_scale) ) {
 			return FALSE;
 		}
-		var->scale /= 100.0;
+		var->value_scale /= 100.0;
 		var->type = SVT_SCALE;
 		break;
 	case 0:
+		if( 1 == sscanf(num_str, "%d", &var->value_px) ) {
+			var->type = SVT_PX;
+			break;
+		}
+		if( 1 == sscanf(num_str, "%lf", &var->value_pt) ) {
+			var->type = SVT_PT;
+			break;
+		}
+		break;
 	default:
 		var->type = SVT_NONE;
-		break;
+		var->is_valid = FALSE;
+		return FALSE;
 	}
+	var->is_valid = TRUE;
+	var->is_changed = TRUE;
 	return TRUE;
 }
 
 /** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A)、rgb(R,G,B) */
-LCUI_BOOL ParseColor( LCUI_StyleVar *var, const char *str )
+LCUI_BOOL ParseColor( LCUI_Style *var, const char *str )
 {
 	double a;
 	int len = 0, status = 0, r, g, b;
@@ -118,6 +130,8 @@ LCUI_BOOL ParseColor( LCUI_StyleVar *var, const char *str )
 		var->color.r = r;
 		var->color.g = g;
 		var->color.b = b;
+		var->is_valid = TRUE;
+		var->is_changed = TRUE;
 		return TRUE;
 	}
 	return FALSE;

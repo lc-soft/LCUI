@@ -237,7 +237,7 @@ int TextView_SetText( LCUI_Widget w, const char *utf8_text )
 	return ret;
 }
 
-void TextView_SetLineHeight( LCUI_Widget w, LCUI_StyleVar *val )
+void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style *val )
 {
 	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
 	TextLayer_SetLineHeight( txt->layer, val );

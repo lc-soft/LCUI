@@ -51,7 +51,7 @@ enum LCUI_StyleTagID {
 
 typedef struct LCUI_StyleTag {
 	int id;
-	LCUI_StyleVar style;
+	LCUI_Style style;
 } LCUI_StyleTag;
 
 /** 初始化字体样式数据 */
@@ -122,7 +122,7 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 				break;
 			}
 			style_data->has_pixel_size = TRUE;
-			style_data->pixel_size = tag_data->style.px;
+			style_data->pixel_size = tag_data->style.value_px;
 			flags[1] = 1;
 			++equal;
 			break;

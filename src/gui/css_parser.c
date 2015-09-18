@@ -86,34 +86,12 @@ const char *GetStyleName( int key )
 	return NULL;
 }
 
-static void ConvertStyleValue( LCUI_Style *s, LCUI_StyleVar *sv )
-{
-	s->type = sv->type;
-	s->is_valid = TRUE;
-	switch( sv->type ) {
-	case SVT_COLOR:
-		s->value_color = sv->color;
-		break;
-	case SVT_PX:
-		s->value_px = sv->px;
-		break;
-	case SVT_SCALE:
-		s->value_scale = sv->scale;
-		break;
-	default:
-		s->type = SVT_NONE;
-		s->is_valid = FALSE;
-		break;
-	}
-}
-
 static int SplitValues( const char *str, LCUI_Style *slist, 
 			int max_len, int mode )
 {
-	int vi = 0, vj = 0;
+	int val, vi = 0, vj = 0;
 	char **values;
 	const char *p;
-	LCUI_StyleVar sv;
 
 	values = (char**)calloc(max_len, sizeof(char*));
 	values[0] = (char*)malloc(sizeof(char)*64);
@@ -137,23 +115,21 @@ static int SplitValues( const char *str, LCUI_Style *slist,
 	for( vj = 0; vj < vi; ++vj ) {
 		DEBUG_MSG("[%d] %s\n", vj, values[vj]);
 		if( mode & SPLIT_NUMBER ) {
-			if( ParseNumber( &sv, values[vj] ) ) {
-				ConvertStyleValue( &slist[vj], &sv );
+			if( ParseNumber( &slist[vj], values[vj] ) ) {
 				DEBUG_MSG("[%d]:parse ok\n", vj);
 				continue;
 			}
 		}
 		if( mode & SPLIT_COLOR ) {
-			if( ParseColor(&sv, values[vj]) ) {
-				ConvertStyleValue( &slist[vj], &sv );
+			if( ParseColor(&slist[vj], values[vj]) ) {
 				DEBUG_MSG("[%d]:parse ok\n", vj);
 				continue;
 			}
 		}
 		if( mode & SPLIT_STYLE ) {
-			sv.px = ParseStyleOption( values[vj] );
-			if( sv.px > 0 )  {
-				slist[vj].value_style = sv.px;
+			val = ParseStyleOption( values[vj] );
+			if( val > 0 )  {
+				slist[vj].value_style = val;
 				slist[vj].type = SVT_style;
 				slist[vj].is_valid = TRUE;
 				DEBUG_MSG("[%d]:parse ok\n", vj);
@@ -176,9 +152,7 @@ clean:
 
 static int OnParseNumber( LCUI_Style *s, const char *str )
 {
-	LCUI_StyleVar sv;
-	if( ParseNumber( &sv, str ) ) {
-		ConvertStyleValue( s, &sv );
+	if( ParseNumber( s, str ) ) {
 		return 0;
 	}
 	if( strcmp("auto", str) == 0 ) {
@@ -192,9 +166,7 @@ static int OnParseNumber( LCUI_Style *s, const char *str )
 
 static int OnParseColor( LCUI_Style *s, const char *str )
 {
-	LCUI_StyleVar sv;
-	if( ParseColor( &sv, str ) ) {
-		ConvertStyleValue( s, &sv );
+	if( ParseColor( s, str ) ) {
 		return 0;
 	}
 	if( strcmp("transparent", str) == 0 ) {
@@ -449,6 +421,7 @@ static int OnParseBackground( LCUI_StyleSheet ss, const char *str )
 }
 
 static KeyNameGroup style_name_map[] = {
+	{ key_visible, "visible"},
 	{ key_width, "width" },
 	{ key_height, "height" },
 	{ key_background_color, "background-color" },
@@ -504,7 +477,11 @@ static KeyNameGroup style_option_map[] = {
 	{ SV_CONTENT_BOX, "content-box" },
 	{ SV_PADDING_BOX, "padding-box" },
 	{ SV_BORDER_BOX, "border-box" },
-	{ SV_GRAPH_BOX, "graph-box" }
+	{ SV_GRAPH_BOX, "graph-box" },
+	{ SV_STATIC, "static" },
+	{ SV_ABSOLUTE, "absolute" },
+	{ SV_BLOCK, "block" },
+	{ SV_INLINE_BLOCK, "inline-block" }
 };
 
 /** 各个样式的解析器映射表 */

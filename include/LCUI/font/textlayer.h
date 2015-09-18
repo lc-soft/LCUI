@@ -107,7 +107,7 @@ typedef struct LCUI_TextLayerRec_  {
         TextRowList row_list;		/**< 文本行列表 */
         LCUI_TextStyle text_style;	/**< 文本全局样式 */
 	LinkedList style_cache;		/**< 样式缓存 */
-	LCUI_StyleVar line_height;	/**< 全局文本行高度 */
+	LCUI_Style line_height;	/**< 全局文本行高度 */
         TaskData task;			/**< 任务 */
         LCUI_Graph graph;		/**< 文本位图缓存 */
 }* LCUI_TextLayer;
@@ -248,7 +248,7 @@ LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer layer );
 LCUI_API void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle *style );
 
 /** 设置文本行的高度 */
-LCUI_API void TextLayer_SetLineHeight( LCUI_TextLayer layer, LCUI_StyleVar *val );
+LCUI_API void TextLayer_SetLineHeight( LCUI_TextLayer layer, LCUI_Style *val );
 
 LCUI_END_HEADER
 

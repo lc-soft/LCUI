@@ -132,7 +132,7 @@ typedef struct LCUI_Rect2_ {
 } LCUI_Rect2;
 
 /** 样式变量类型 */
-typedef enum LCUI_StyleVarType {
+typedef enum LCUI_StyleType {
 	SVT_NONE,
 	SVT_AUTO,
 	SVT_SCALE,		/**< 比例 */
@@ -142,24 +142,13 @@ typedef enum LCUI_StyleVarType {
 	SVT_COLOR,		/**< 色彩 */
 	SVT_image,
 	SVT_style
-} LCUI_StyleVarType;
+} LCUI_StyleType;
 
 #define SVT_px		SVT_PX
 #define SVT_pt		SVT_PT
 #define SVT_color	SVT_COLOR
 #define SVT_scale	SVT_SCALE
 #define SVT_boolean	SVT_BOOLEAN
-
-/** 用于描述样式的变量类型 */
-typedef struct LCUI_StyleVar {
-	LCUI_StyleVarType type;		/**< 哪一种类型 */
-	union {
-		int px;			/**< pixel, 像素 */
-		int pt;			/**< point，点数（一般用于字体大小单位） */
-		double scale;		/**< 比例 */
-		LCUI_Color color;	/**< 色彩值 */
-	};
-} LCUI_StyleVar;
 
 typedef struct LCUI_BoxShadow {
 	int x, y;		/**< 位置 */
@@ -205,7 +194,7 @@ struct LCUI_Graph_ {
 };
 
 /** 样式值枚举，用于代替使用字符串 */
-enum StyleValue {
+typedef enum LCUI_StyleValue {
 	SV_NONE,
 	SV_AUTO,
 	SV_CONTAIN,
@@ -237,7 +226,26 @@ enum StyleValue {
 	SV_FLOAT_RIGHT,
 	SV_BLOCK,
 	SV_INLINE_BLOCK
-};
+} LCUI_StyleValue;
+
+typedef struct LCUI_Style {
+	LCUI_BOOL is_valid:1;
+	LCUI_BOOL is_changed:1;
+	LCUI_StyleType type:30;
+	union {
+		int value;
+		int value_px;
+		int value_pt;
+		int value_style;
+		float value_scale;
+		float scale;
+		LCUI_BOOL value_boolean;
+		LCUI_Color value_color;
+		LCUI_Color color;
+		LCUI_Graph *value_image;
+		LCUI_Graph *image;
+	};
+} LCUI_Style;
 
 typedef struct LCUI_Background {
 	LCUI_Graph image;	/**< 背景图 */
@@ -252,7 +260,7 @@ typedef struct LCUI_Background {
 		LCUI_BOOL using_value;
 		union {
 			struct {
-				LCUI_StyleVar x, y;
+				LCUI_Style x, y;
 			};
 			int value;
 		};
@@ -261,7 +269,7 @@ typedef struct LCUI_Background {
 		LCUI_BOOL using_value;
 		union {
 			struct {
-				LCUI_StyleVar w, h;
+				LCUI_Style w, h;
 			};
 			int value;
 		};

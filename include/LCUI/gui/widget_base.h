@@ -50,24 +50,24 @@ typedef struct LCUI_WidgetBase* LCUI_Widget;
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
-	int position;			/**< 定位方式 */
-	int float_mode;			/**< 浮动模式 */
-	int display;			/**< 显示方式，决定以何种布局显示该部件 */
 	int left, top;			/**< 左边界、顶边界的偏移距离 */
 	int right, bottom;		/**< 右边界、底边界的偏移距离 */
 	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
 	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
-	int box_sizing;			/**< 以何种方式计算宽度和高度 */
+	LCUI_StyleValue position;	/**< 定位方式 */
+	LCUI_StyleValue float_mode;	/**< 浮动模式 */
+	LCUI_StyleValue display;	/**< 显示方式，决定以何种布局显示该部件 */
+	LCUI_StyleValue box_sizing;	/**< 以何种方式计算宽度和高度 */
 
 	union {
-		LCUI_StyleVar w, width;		/**< 部件区域宽度 */
+		LCUI_Style w, width;	/**< 部件区域宽度 */
 	};
 	union {
-		LCUI_StyleVar h, height;	/**< 部件区域高度 */
+		LCUI_Style h, height;	/**< 部件区域高度 */
 	};
 
 	struct {
-		LCUI_StyleVar top, right, bottom, left;
+		LCUI_Style top, right, bottom, left;
 	} margin, padding;		/**< 外边距, 内边距 */
 
 	LCUI_Background background;	/**< 背景 */
@@ -142,25 +142,6 @@ enum LCUI_StyleKeyName {
 	key_box_shadow_end,
 	STYLE_KEY_TOTAL
 };
-
-typedef struct LCUI_Style {
-	LCUI_BOOL is_valid;
-	LCUI_BOOL is_changed;
-	LCUI_StyleVarType type;
-	union {
-		int value;
-		int value_px;
-		int value_pt;
-		int value_style;
-		float value_scale;
-		float scale;
-		LCUI_BOOL value_boolean;
-		LCUI_Color value_color;
-		LCUI_Color color;
-		LCUI_Graph *value_image;
-		LCUI_Graph *image;
-	};
-} LCUI_Style;
 
 typedef LCUI_Style *LCUI_StyleSheet;
 
