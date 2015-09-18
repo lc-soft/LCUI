@@ -197,30 +197,18 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
                 return -1;
         }
         png_init_io(png_ptr, fp);
-        /* write header */
-        if (setjmp(png_jmpbuf(png_ptr))) {
-                fclose( fp );
-                _DEBUG_MSG("error during writing header\n");
-		png_destroy_write_struct( &png_ptr, &info_ptr );
-                return -1;
-        }
         if(Graph_HasAlpha(graph)) {
                 color_type = PNG_COLOR_TYPE_RGB_ALPHA;
         } else {
                 color_type = PNG_COLOR_TYPE_RGB;
         }
+        /* write header */
         png_set_IHDR(png_ptr, info_ptr, graph->w, graph->h,
         8, color_type, PNG_INTERLACE_NONE,
         PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
         png_write_info(png_ptr, info_ptr);
         /* write bytes */
-        if (setjmp(png_jmpbuf(png_ptr))) {
-                fclose( fp );
-                _DEBUG_MSG("error during writing bytes\n");
-		png_destroy_write_struct( &png_ptr, &info_ptr );
-                return -1;
-        }
 
 	Graph_GetValidRect( graph, &rect );
 	graph = Graph_GetQuote( graph );
@@ -266,11 +254,6 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
         }
         free( row_pointers );
         /* end write */
-        if (setjmp(png_jmpbuf(png_ptr))) {
-		fclose( fp );
-                _DEBUG_MSG("error during end of write\n");
-		return -1;
-        }
         png_write_end(png_ptr, NULL);
 	png_destroy_write_struct( &png_ptr, &info_ptr );
         fclose( fp );
