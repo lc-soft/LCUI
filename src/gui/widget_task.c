@@ -96,21 +96,11 @@ static void ComputeBackgroundStyle( LCUI_StyleSheet ss, LCUI_Background *bg )
 			break;
 		case key_background_position_x:
 			bg->position.using_value = FALSE;
-			bg->position.x.type = style->type;
-			if( style->type == SVT_SCALE ) {
-				bg->position.x.scale = style->value_scale;
-			} else {
-				bg->position.x.px = style->value;
-			}
+			bg->position.x = *style;
 			break;
 		case key_background_position_y:
 			bg->position.using_value = FALSE;
-			bg->position.x.type = style->type;
-			if( style->type == SVT_SCALE ) {
-				bg->position.x.scale = style->value_scale;
-			} else {
-				bg->position.x.px = style->value;
-			}
+			bg->position.y = *style;
 			break;
 		case key_background_size:
 			bg->size.using_value = TRUE;
@@ -118,21 +108,11 @@ static void ComputeBackgroundStyle( LCUI_StyleSheet ss, LCUI_Background *bg )
 			break;
 		case key_background_size_width:
 			bg->size.using_value = FALSE;
-			bg->size.w.type = style->type;
-			if( style->type == SVT_SCALE ) {
-				bg->size.w.scale = style->value_scale;
-			} else {
-				bg->size.w.px = style->value;
-			}
+			bg->size.w = *style;
 			break;
 		case key_background_size_height:
 			bg->size.using_value = FALSE;
-			bg->size.h.type = style->type;
-			if( style->type == SVT_SCALE ) {
-				bg->size.h.scale = style->value_scale;
-			} else {
-				bg->size.h.px = style->value;
-			}
+			bg->size.h = *style;
 			break;
 		default: break;
 		}
@@ -235,12 +215,14 @@ static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
 static void HandleRefreshStyle( LCUI_Widget w )
 {
 	Widget_Update( w, TRUE );
+	ReplaceStyleSheet( w->cached_style, w->style );
 	w->task->buffer[WTT_UPDATE_STYLE] = FALSE;
 }
 
 static void HandleUpdateStyle( LCUI_Widget w )
 {
 	Widget_Update( w, FALSE );
+	ReplaceStyleSheet( w->cached_style, w->style );
 }
 
 /** 处理位置变化 */
@@ -273,7 +255,7 @@ static void HandleResize( LCUI_Widget w )
 	LCUI_Rect rect;
 	LCUI_WidgetEvent e;
 	struct { 
-		LCUI_StyleVar *sval;
+		LCUI_Style *sval;
 		int *ival;
 		int key;
 	} pd_map[4] = {
@@ -284,32 +266,25 @@ static void HandleResize( LCUI_Widget w )
 	};
 	rect = w->box.graph;
 	/* 从样式表中获取尺寸 */
-	w->computed_style.width.type = w->cached_style[key_width].type;
-	if( w->computed_style.width.type == SVT_SCALE ) {
-		w->computed_style.width.scale = w->cached_style[key_width].value_scale;
-	} else {
-		w->computed_style.width.px = w->cached_style[key_width].value_px;
-	}
-	w->computed_style.height.type = w->cached_style[key_height].type;
-	if( w->computed_style.height.type == SVT_SCALE ) {
-		w->computed_style.height.scale = w->cached_style[key_height].value_scale;
-	} else {
-		w->computed_style.height.px = w->cached_style[key_height].value_px;
-	}
+	w->computed_style.width = w->style[key_width];
+	w->computed_style.height = w->style[key_height];
 	/* 内边距的单位暂时都用 px  */
 	for( i=0; i<4; ++i ) {
-		pd_map[i].sval->type = SVT_PX;
-		if( w->style[pd_map[i].key].type != SVT_PX ) {
-			pd_map[i].sval->px = 0;
+		if( !w->style[pd_map[i].key].is_valid
+		 || w->style[pd_map[i].key].type != SVT_PX ) {
+			pd_map[i].sval->type = SVT_PX;
+			pd_map[i].sval->value_px = 0;
 			*pd_map[i].ival = 0;
 			continue;
 		}
-		pd_map[i].sval->px = w->cached_style[pd_map[i].key].value_px;
-		*pd_map[i].ival = pd_map[i].sval->px;
+		*pd_map[i].sval = w->style[pd_map[i].key];
+		*pd_map[i].ival = pd_map[i].sval->value_px;
 	}
 	Widget_ComputeSize( w );
+	Widget_UpdateGraphBox( w );
 	/* 目前只有宽度变化会影响子部件的布局，所以只判断宽度 */
-	if( w->computed_style.width.type != SVT_AUTO ) {
+	if( w->computed_style.width.type != SVT_AUTO
+	 && rect.width != w->box.graph.width ) {
 		Widget_UpdateLayout( w );
 	}
 	if( w->parent ) {
@@ -327,7 +302,6 @@ static void HandleResize( LCUI_Widget w )
 	e.cancel_bubble = TRUE;
 	e.target = w;
 	e.data = NULL;
-	Widget_UpdateGraphBox( w );
 	Widget_SendEvent( w, &e, NULL );
 	Widget_AddTask( w, WTT_REFRESH );
 	HandleTopLevelWidgetEvent( w, WET_RESIZE );
@@ -336,12 +310,27 @@ static void HandleResize( LCUI_Widget w )
 /** 处理可见性 */
 static void HandleVisibility( LCUI_Widget w )
 {
-	w->computed_style.visible = w->style[key_visible].value_boolean;
+	LCUI_BOOL visible = FALSE;
+	if( w->style[key_visible].is_valid
+	 && w->style[key_visible].value_boolean ) {
+		visible = TRUE;
+	}
+	w->computed_style.visible = visible;
+	if( (w->cached_style[key_visible].is_valid
+	 && w->cached_style[key_visible].value_boolean) == visible ) {
+		return;
+	}
 	if( w->parent ) {
 		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
+		if( (w->computed_style.display == SV_BLOCK
+		 || w->computed_style.display == SV_INLINE_BLOCK)
+		 && w->computed_style.position == SV_STATIC
+		 && w->computed_style.float_mode == SV_NONE ) {
+			Widget_AddTask( w->parent, WTT_LAYOUT );
+		}
 	}
-	DEBUG_MSG("visible: %s\n", w->computed_style.visible ? "TRUE":"FALSE");
-	HandleTopLevelWidgetEvent( w, w->computed_style.visible ? WET_SHOW:WET_HIDE );
+	DEBUG_MSG("visible: %s\n", visible ? "TRUE":"FALSE");
+	HandleTopLevelWidgetEvent( w, visible ? WET_SHOW:WET_HIDE );
 }
 
 /** 处理透明度 */

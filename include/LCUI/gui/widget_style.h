@@ -50,6 +50,12 @@ void LCUIWidget_ExitStyle( void );
 /** 新建一个样式表 */
 LCUI_API LCUI_StyleSheet StyleSheet( void );
 
+/** 合并两个样式表 */
+LCUI_API void MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet source );
+
+/** 覆盖样式表 */
+LCUI_API void ReplaceStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src );
+
 /** 删除样式表 */
 LCUI_API void DeleteStyleSheet( LCUI_StyleSheet *ss );
 

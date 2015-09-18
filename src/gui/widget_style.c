@@ -68,6 +68,9 @@ const char *global_css = ToString(
 	background-color: transparent;
 	display: block;
 	position: static;
+	visible: false;
+	padding: 0;
+	margin: 0;
 }
 
 );
@@ -147,7 +150,7 @@ static void ClearStyleSheet( LCUI_StyleSheet ss )
 
 
 /** 合并两个样式表 */
-static void MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet source )
+void MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet source )
 {
 	int i;
 	for( i=0; i<STYLE_KEY_TOTAL; ++i ) {
@@ -158,25 +161,9 @@ static void MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet source )
 }
 
 /** 覆盖样式表 */
-static void ReplaceStyleSheet( LCUI_StyleSheet out, LCUI_StyleSheet src1, LCUI_StyleSheet src2 )
+void ReplaceStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 {
-	int i;
-	for( i=0; i<STYLE_KEY_TOTAL; ++i ) {
-		if( src2[i].is_changed || src1[i].is_changed ) {
-			if( src2[i].is_valid ) {
-				out[i] = src2[i];
-			} else {
-				out[i] = src1[i];
-			}
-			out[i].is_changed = TRUE;
-		}
-		if( src2[i].is_valid ) {
-			out[i] = src2[i];
-		} else {
-			out[i] = src1[i];
-		}
-		out[i].is_changed = FALSE;
-	}
+	memcpy( dest, src, sizeof(LCUI_Style)*STYLE_KEY_TOTAL );
 }
 
 /** 初始化 */
@@ -444,7 +431,7 @@ int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
 	LCUI_StyleSheet ss;
 	ss = SelectStyleSheet( selector );
 	if( ss ) {
-		ReplaceStyleSheet( ss, ss, in_ss );
+		ReplaceStyleSheet( ss, in_ss );
 	}
 	return 0;
 }
@@ -698,9 +685,13 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 	if( is_update_all ) {
 		Widget_ComputeInheritStyle( w, w->inherited_style );
 	}
-	ReplaceStyleSheet( w->style, w->inherited_style, w->custom_style );
+	ReplaceStyleSheet( w->style, w->custom_style );
+	MergeStyleSheet( w->style, w->inherited_style );
 	/* 对比两张样式表，确定哪些需要更新 */
 	for( key = 0; key < STYLE_KEY_TOTAL; ++key ) {
+		if( key_visible == key ) {
+			_DEBUG_MSG("tip\n");
+		}
 		/* 忽略值没有变化的样式 */
 		if( !w->style[key].is_valid ) {
 			if( !w->cached_style[key].is_valid ) {
@@ -708,22 +699,17 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 			}
 		}
 		else if( !w->style[key].is_changed ) {
-			if( w->cached_style[key].type == w->style[key].type ) {
-				if( w->cached_style[key].value == w->style[key].value ) {
-					continue;
-				}
-			}
-			else if( w->cached_style[key].value == w->style[key].value ) {
+			if( w->cached_style[key].type == w->style[key].type
+			 && w->cached_style[key].value == w->style[key].value ) {
 				continue;
 			}
 		}
 		w->style[key].is_changed = FALSE;
-		w->cached_style[key] = w->style[key];
 		for( i = 0; i < sizeof(task_map) / sizeof(TaskMap); ++i ) {
-			if( !task_map[i].is_valid ) {
-				continue;
-			}
 			if( key >= task_map[i].start && key <= task_map[i].end ) {
+				if( !task_map[i].is_valid ) {
+					break;
+				}
 				task_map[i].is_valid = FALSE;
 				Widget_AddTask( w, task_map[i].task );
 			}
