@@ -8,8 +8,6 @@ display.h \
 graph.h \
 draw.h \
 font.h \
-widget.h \
-widget_build.h \
 surface.h \
 ime.h \
 input.h \
