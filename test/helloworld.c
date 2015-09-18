@@ -2,10 +2,13 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
-#include <LCUI/widget.h>
+#include <LCUI/gui/widget.h>
 #include <LCUI/display.h>
 #include <LCUI/font.h>
+#include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/widget/textview.h>
+#include <LCUI/gui/widget/button.h>
+#include <LCUI/gui/widget/sidebar.h>
 
 #ifdef LCUI_BUILD_IN_WIN32
 #include <io.h>
@@ -29,16 +32,49 @@ static void InitConsoleWindow(void)
 
 void onTimer( void *arg )
 {
+	LCUI_Widget w, sbi, sb = (LCUI_Widget)arg;
 	static int x = 0, y = 0, vx = 1, vy = 1;
+	char str[64];
 	vx = x > 320 ? -1:vx;
 	vx = x < 0 ? 1:vx;
 	vy = y > 240 ? -1:vy;
 	vy = y < 0 ? 1:vy;
 	x += vx;
 	y += vy;
-	Widget_Move( arg, x, y );
-	DEBUG_MSG("fps: %d\n", LCUIDisplay_GetFPS());
+	LCUI_PrintStyleLibrary();
+	printf("sidebar visible: %d\n", sb->computed_style.visible);
+	LinkedList_ForEach( sbi, 0, &sb->children ) {
+		printf("item: %p, pos: %d,%d, size: %d,%d, visibale: %d\n", 
+			sbi, sbi->x, sbi->y, sbi->width, sbi->height, sbi->computed_style.visible );
+		LinkedList_ForEach( w, 0, &sbi->children ) {
+			printf("child: %p, size: %d,%d, visibale: %d\n", w, w->width, w->height, w->computed_style.visible );
+		}
+	}
+	return;
+	//Widget_Move( arg, x, y );
+	//sprintf(str, "fps: %d", LCUIDisplay_GetFPS());
+	//Button_SetText(btn, str);
+	//_DEBUG_MSG("fps: %d\n", LCUIDisplay_GetFPS());
 }
+
+const char *main_css = ToString(
+
+debug-widget {
+	background-color: rgba(255,255,255,0.8);
+	background-size: 50% 200px;
+	background-position: bottom center;
+	border: 1px solid rgb(0,122,204);
+	box-shadow: 2px 2px 0 8px rgba(0,122,204,0.8);
+}
+
+root {
+	background-color: rgb(255,242,223);
+	background-image: file("images/background-image.png");
+	background-position: center;
+	background-size: 75% 75%;
+}
+
+);
 
 const wchar_t test_str[] = L"[size=12px]12px, 0123456789, hello,world! are you OK? I like this![/size]\n\
 [size=13px]13px, 0123456789, hello,world! are you OK? I like this![/size]\n\
@@ -50,10 +86,8 @@ const wchar_t test_str[] = L"[size=12px]12px, 0123456789, hello,world! are you O
 
 int main( int argc, char **argv )
 {
-	int i;
-	wchar_t str[64];
-	LCUI_Widget w, root, text[4], btn;
-	LCUI_Graph *desktop_image = Graph_New();
+	LCUI_TextStyle icon_style = { 0 };
+	LCUI_Widget w, root, sidebar;
 	
 #ifdef LCUI_BUILD_IN_WIN32
 	InitConsoleWindow();//test_gen_font_code();return 0;
@@ -64,53 +98,23 @@ int main( int argc, char **argv )
 	LCUIDisplay_SetMode( LDM_WINDOWED );
 	LCUIDisplay_SetSize( 960, 540 );
 	w = LCUIWidget_New("debug-widget");
-	for( i=0; i<4; ++i ) {
-		text[i] = LCUIWidget_New("textview");
-		swprintf( str, 60, L"textview-%d", i );
-		TextView_SetTextW( text[i], str );
-		Widget_Append( w, text[i] );
-		Widget_Show( text[i] );
-		Widget_Move( text[i], i*15, i*15 );
-	}
-	btn = LCUIWidget_New("button");
-	Widget_Append( w, btn );
+	sidebar = LCUIWidget_New("sidebar");
+	SideBar_GetIconStyle( sidebar, &icon_style );
+	icon_style.font_id = FontLIB_LoadFontFile( "../../../fonts/glyphicons-halflings-regular.ttf" );
+	_DEBUG_MSG("font_id: %d\n", icon_style.font_id);
+	SideBar_SetIconStyle( sidebar, &icon_style );
+	SideBar_AppendItem( sidebar, L"item-dashboard", L"\xe021", L"Dashboard" );
+	SideBar_AppendItem( sidebar, L"item-settings", L"\xe019", L"Settings" );
+	Widget_Append( w, sidebar );
 	Widget_Top( w );
 	Widget_Show( w );
-	Widget_Show( btn );
+	Widget_Show( sidebar );
 	Widget_Resize( w, 520, 240 );
-	Widget_Resize( btn, 80, 40 );
 	Widget_Move( w, 200, 200 );
-	Widget_Move( btn, 80, 120 );
-	Widget_SetTitleW( w, L"测试" );
-	Graph_LoadImage( "images/background-image.png", desktop_image );
 	root = LCUIWidget_GetRoot();
-	
-	SetStyle( root->style, key_background_color, RGB(255,242,223), color );
-	SetStyle( root->style, key_background_image, desktop_image, image );
-	//SetStyle( root->style, key_background_size, SV_COVER, style );
-	SetStyle( root->style, key_background_position, SV_CENTER, style );
-	SetStyle( root->style, key_background_size_width, 0.75, scale );
-	SetStyle( root->style, key_background_size_height, 0.75, scale );
-	Widget_Update( root, FALSE );
-
-	SetStyle( w->style, key_background_color, ARGB(200,255,255,255), color );
-	SetStyle( w->style, key_background_size_width, 0.50, scale ); 
-	SetStyle( w->style, key_background_size_height, 200, px );
-	SetStyle( w->style, key_background_position, SV_BOTTOM_CENTER, style );
-	SetStyle( w->style, key_box_shadow_color, ARGB(200,0,122,204), color );
-	SetStyle( w->style, key_box_shadow_x, 2, px );
-	SetStyle( w->style, key_box_shadow_y, 2, px );
-	SetStyle( w->style, key_box_shadow_spread, 0, px );
-	SetStyle( w->style, key_box_shadow_blur, 8, px );
-	SetStyle( w->style, key_border_top_width, 1, px );
-	SetStyle( w->style, key_border_right_width, 1, px );
-	SetStyle( w->style, key_border_bottom_width, 1, px );
-	SetStyle( w->style, key_border_left_width, 1, px );
-	SetStyle( w->style, key_border_top_color, RGB(0,122,204), color );
-	SetStyle( w->style, key_border_right_color, RGB(0,122,204), color );
-	SetStyle( w->style, key_border_bottom_color, RGB(0,122,204), color );
-	SetStyle( w->style, key_border_left_color, RGB(0,122,204), color );
-	Widget_Update( w, FALSE );
-	//LCUITimer_Set( 10, onTimer, btn, TRUE );
+	LCUI_ParseStyle( main_css );
+	Widget_Update( root, TRUE );
+	Widget_Update( w, TRUE );
+	LCUITimer_Set( 2000, onTimer, sidebar, FALSE );
 	return LCUI_Main();
 }

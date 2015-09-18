@@ -53,7 +53,7 @@ typedef struct {
 typedef struct {
 	LinkedList items;
 	LCUI_TextStyle icon_style;
-	LCUI_StyleVar line_height;
+	LCUI_Style line_height;
 } SideBar;
 
 static const char sidebar_css[] = ToString(
@@ -68,6 +68,15 @@ sidebar sidebar-item {
 	height: 38px;
 	padding: 0 16px 0 7px;
 	border-top: 1px solid #f3f3f3;
+}
+
+sidebar sidebar-item .text {
+	display: inline-block;
+}
+
+sidebar sidebar-item .icon {
+	width: 30px;
+	display: inline-block;
 }
 
 sidebar sidebar-item:hover {
@@ -86,7 +95,7 @@ void SideBar_SetIconStyle( LCUI_Widget sidebar, LCUI_TextStyle *ts )
 	}
 }
 
-void SideBar_SetLineHeight( LCUI_Widget sidebar, LCUI_StyleVar *val )
+void SideBar_SetLineHeight( LCUI_Widget sidebar, LCUI_Style *val )
 {
 	SideBar *sb = (SideBar*)sidebar->private_data;
 }
@@ -129,6 +138,8 @@ void SideBarItem_OnInit( LCUI_Widget w )
 	SideBarItem *sbi = Widget_NewPrivateData(w, SideBarItem);
 	sbi->icon = LCUIWidget_New("textview");
 	sbi->text = LCUIWidget_New("textview");
+	Widget_AddClass( sbi->icon, "icon" );
+	Widget_AddClass( sbi->text, "text" );
 	sbi->id = NULL;
 	Widget_Append( w, sbi->icon );
 	Widget_Append( w, sbi->text );
