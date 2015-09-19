@@ -268,38 +268,26 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 	LCUI_WidgetEvent e;
 	const char *sname = type == WST_HOVER ? "hover":"active";
 	LCUI_Widget w, new_w = widget, old_w = self.targets[type];
+	int depth = 0, i;
 
 	if( self.targets[type] == widget ) {
 		return;
 	}
 	self.targets[type] = widget;
-	/* 检测新部件是否为老部件的父级 */
-	for( w = old_w; w != LCUIRootWidget && w; w = w->parent ) {
-		if( w == new_w ) {
-			break;
-		}
-	}
-	if( w == new_w ) {
-		for( w = old_w; w != new_w; w = w->parent ) {
-			Widget_RemoveStatus( w, sname );
-			if( type == WST_HOVER ) {
-				e.target = w;
-				e.type = WET_MOUSEOUT;
-				e.type_name = "mouseout";
-				Widget_PostEvent( w, &e, NULL );
-			}
-		}
-		return;
-	}
-	/* 检测老部件是否为新部件的父级 */
+	/* 先计算两个部件的嵌套深度的差值 */
 	for( w = new_w; w != LCUIRootWidget && w; w = w->parent ) {
-		if( w == old_w ) {
-			break;
-		}
+		++depth;
 	}
-	if( w == old_w ) {
-		for( w = new_w; w != old_w; w = w->parent ) {
-			Widget_AddStatus( w, sname );
+	for( w = old_w; w != LCUIRootWidget && w; w = w->parent ) {
+		--depth;
+	}
+	i = depth > 0 ? depth : -depth;
+	/* 然后向父级遍历，直到两个部件的父级部件相同为止 */
+	for( ; new_w && old_w && new_w != old_w; ) {
+		/* 如果是新部件嵌套得较深，则先遍历几次直到深度
+		 * 相同时再一起遍历 */
+		if( i == 0 || (i > 0 && depth > 0) ) {
+			Widget_AddStatus( new_w, sname );
 			if( type == WST_HOVER ) {
 				e.target = w;
 				e.type = WET_MOUSEOVER;
@@ -307,28 +295,20 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 				e.type_name = "mouseover";
 				Widget_PostEvent( new_w, &e, NULL );
 			}
+			new_w = new_w->parent;
 		}
-		return;
-	}
-	/* 两个部件完全不相干，分开处理 */
-	for( w = new_w; w != LCUIRootWidget && w; w = w->parent ) {
-		Widget_AddStatus( w, sname );
-		if( type == WST_HOVER ) {
-			e.target = w;
-			e.type = WET_MOUSEOVER;
-			e.cancel_bubble = FALSE;
-			e.type_name = "mouseover";
-			Widget_PostEvent( new_w, &e, NULL );
+		if( i == 0 || (i > 0 && depth < 0) ) {
+			Widget_RemoveStatus( old_w, sname );
+			if( type == WST_HOVER ) {
+				e.target = old_w;
+				e.type = WET_MOUSEOUT;
+				e.cancel_bubble = FALSE;
+				e.type_name = "mouseout";
+				Widget_PostEvent( old_w, &e, NULL );
+			}
+			old_w = old_w->parent;
 		}
-	}
-	for( w = old_w; w != LCUIRootWidget && w; w = w->parent ) {
-		Widget_RemoveStatus( w, sname );
-		if( type == WST_HOVER ) {
-			e.target = w;
-			e.type = WET_MOUSEOUT;
-			e.type_name = "mouseout";
-			Widget_PostEvent( w, &e, NULL );
-		}
+		i > 0 ? --i:0;
 	}
 }
 
