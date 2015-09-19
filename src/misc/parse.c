@@ -58,7 +58,7 @@ LCUI_BOOL ParseNumber( LCUI_Style *var, const char *str )
 			var->type = SVT_PX;
 			break;
 		}
-		if( 1 == sscanf(num_str, "%lf", &var->value_pt) ) {
+		if( 1 == sscanf(num_str, "%f", &var->value_pt) ) {
 			var->type = SVT_PT;
 			break;
 		}
