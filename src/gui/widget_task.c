@@ -282,10 +282,12 @@ static void HandleResize( LCUI_Widget w )
 	}
 	Widget_ComputeSize( w );
 	Widget_UpdateGraphBox( w );
-	/* 目前只有宽度变化会影响子部件的布局，所以只判断宽度 */
-	if( w->computed_style.width.type != SVT_AUTO
-	 && rect.width != w->box.graph.width ) {
-		Widget_UpdateLayout( w );
+	if( rect.width == w->box.graph.width
+	 && rect.height == w->box.graph.height ) {
+		return;
+	}
+	if( w->computed_style.width.type != SVT_AUTO ) {
+		Widget_AddTask( w, WTT_LAYOUT );
 	}
 	if( w->parent ) {
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
@@ -295,6 +297,10 @@ static void HandleResize( LCUI_Widget w )
 		if( w->parent->computed_style.width.type == SVT_AUTO
 		 || w->parent->computed_style.height.type == SVT_AUTO ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
+		}
+		if( w->computed_style.display != SV_NONE
+		 && w->computed_style.position == SV_STATIC ) {
+			Widget_AddTask( w->parent, WTT_LAYOUT );
 		}
 	}
 	e.type_name = "resize";
@@ -310,16 +316,26 @@ static void HandleResize( LCUI_Widget w )
 /** 处理可见性 */
 static void HandleVisibility( LCUI_Widget w )
 {
-	LCUI_BOOL visible = FALSE;
-	if( w->style[key_visible].is_valid
-	 && w->style[key_visible].value_boolean ) {
-		visible = TRUE;
+	LCUI_BOOL visible = ( w->cached_style[key_visible].is_valid && 
+			      w->cached_style[key_visible].value_boolean &&
+			      w->computed_style.display != SV_NONE );
+
+	if( w->style[key_display].is_valid ) {
+		w->computed_style.display = w->style[key_display].value_style;
+	} else {
+		w->computed_style.display = SV_BLOCK;
 	}
-	w->computed_style.visible = visible;
-	if( (w->cached_style[key_visible].is_valid
-	 && w->cached_style[key_visible].value_boolean) == visible ) {
+	if( w->computed_style.display != SV_NONE 
+	 && w->style[key_visible].is_valid
+	 && w->style[key_visible].value_boolean ) {
+		w->computed_style.visible = TRUE;
+	} else {
+		w->computed_style.visible = FALSE;
+	}
+	if( w->computed_style.visible == visible ) {
 		return;
 	}
+	visible = w->computed_style.visible;
 	if( w->parent ) {
 		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 		if( (w->computed_style.display == SV_BLOCK

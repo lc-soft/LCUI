@@ -47,7 +47,7 @@ LCUI_BOOL ParseNumber( LCUI_Style *var, const char *str )
 		}
 		break;
 	case '%':
-		if( 1 != sscanf(num_str, "%lf", &var->value_scale) ) {
+		if( 1 != sscanf(num_str, "%f", &var->value_scale) ) {
 			return FALSE;
 		}
 		var->value_scale /= 100.0;
@@ -62,7 +62,6 @@ LCUI_BOOL ParseNumber( LCUI_Style *var, const char *str )
 			var->type = SVT_PT;
 			break;
 		}
-		break;
 	default:
 		var->type = SVT_NONE;
 		var->is_valid = FALSE;

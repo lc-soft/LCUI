@@ -899,6 +899,8 @@ void Widget_UpdateLayout( LCUI_Widget w )
 			ctx.y += child->box.outer.height;
 			break;
 		case SV_INLINE_BLOCK:
+			child->x = ctx.x;
+			child->y = ctx.y;
 			if( child->box.outer.height > ctx.line_height ) {
 				ctx.line_height = child->box.outer.height;
 			}

@@ -183,7 +183,7 @@ static int OnParseImage( LCUI_Style *s, const char *str )
 	return 0;
 }
 
-static int OnParseStyleKey( LCUI_Style *s, const char *str )
+static int OnParseStyleOption( LCUI_Style *s, const char *str )
 {
 	int v;
 	v = ParseStyleOption( str );
@@ -192,6 +192,8 @@ static int OnParseStyleKey( LCUI_Style *s, const char *str )
 	}
 	s->type = SVT_style;
 	s->value_style = v;
+	s->is_valid = TRUE;
+	s->is_changed = TRUE;
 	return 0;
 }
 
@@ -337,7 +339,7 @@ static int OnParseBorderWidth( LCUI_StyleSheet ss, const char *str )
 
 static int OnParseBorderStyle( LCUI_StyleSheet ss, const char *str )
 {
-	return OnParseStyleKey( &ss[key_border_style], str );
+	return OnParseStyleOption( &ss[key_border_style], str );
 }
 
 static int OnParsePadding( LCUI_StyleSheet ss, const char *str )
@@ -424,6 +426,8 @@ static KeyNameGroup style_name_map[] = {
 	{ key_visible, "visible"},
 	{ key_width, "width" },
 	{ key_height, "height" },
+	{ key_display, "display" },
+	{ key_position, "position" },
 	{ key_background_color, "background-color" },
 	{ key_background_image, "background-image" },
 	{ key_border_color, "border-color" },
@@ -488,6 +492,8 @@ static KeyNameGroup style_option_map[] = {
 static StyleParser style_parser_map[] = {
 	{ 0, key_width, NULL, OnParseNumber },
 	{ 0, key_height, NULL, OnParseNumber },
+	{ 0, key_position, NULL, OnParseStyleOption },
+	{ 0, key_display, NULL, OnParseStyleOption },
 	{ 0, key_background_color, NULL, OnParseColor },
 	{ 0, key_background_image, NULL, OnParseImage },
 	{ 0, key_border_top_color, NULL, OnParseColor },
@@ -502,10 +508,10 @@ static StyleParser style_parser_map[] = {
 	{ 0, key_border_right_width, NULL, OnParseNumber },
 	{ 0, key_border_bottom_width, NULL, OnParseNumber },
 	{ 0, key_border_left_width, NULL, OnParseNumber },
-	{ 0, key_border_top_style, NULL, OnParseStyleKey },
-	{ 0, key_border_right_style, NULL, OnParseStyleKey },
-	{ 0, key_border_bottom_style, NULL, OnParseStyleKey },
-	{ 0, key_border_left_style, NULL, OnParseStyleKey },
+	{ 0, key_border_top_style, NULL, OnParseStyleOption },
+	{ 0, key_border_right_style, NULL, OnParseStyleOption },
+	{ 0, key_border_bottom_style, NULL, OnParseStyleOption },
+	{ 0, key_border_left_style, NULL, OnParseStyleOption },
 	{ 1, -1, "border", OnParseBorder },
 	{ 1, -1, "border-left", OnParseBorderLeft },
 	{ 1, -1, "border-top", OnParseBorderTop },
