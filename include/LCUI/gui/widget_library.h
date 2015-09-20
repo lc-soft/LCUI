@@ -51,6 +51,8 @@ typedef struct LCUI_WidgetClass {
 		void (*destroy)(LCUI_Widget);
 		/** 大小计算，用于部件的自动大小调整功能 */
 		void (*autosize)(LCUI_Widget, int*, int*);
+		/** 扩展样式的更新处理函数 */
+		void (*update)(LCUI_Widget);
 		/** 绘制函数 */
 		void (*paint)(LCUI_Widget, LCUI_PaintContext);
 	} methods;	/**< 该类部件的自定义方法集 */

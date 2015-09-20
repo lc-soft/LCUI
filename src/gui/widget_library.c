@@ -96,6 +96,7 @@ LCUI_WidgetClass* LCUIWidget_AddClass( const char *class_name )
 	class_data->methods.destroy = NULL;
 	class_data->methods.paint = NULL;
 	class_data->methods.autosize = NULL;
+	class_data->methods.update = NULL;
 	class_data->task_handler = NULL;
 	class_data->name = (char*)malloc(sizeof(char)*(len+1));
 	strcpy( class_data->name, class_name );

@@ -187,9 +187,8 @@ void LCUIWidget_ExitStyle( void )
 
 LCUI_StyleSheet StyleSheet( void )
 {
-	LCUI_StyleSheet ss;
-	ss = (LCUI_StyleSheet)calloc( STYLE_KEY_TOTAL, sizeof(LCUI_Style) );
-	return ss;
+	return (LCUI_StyleSheet)calloc( LCUI_GetStyleTotal(),
+					sizeof(LCUI_Style) );
 }
 
 static int SaveSelectorNode( LCUI_SelectorNode node, const char *name, char type )
@@ -565,7 +564,7 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 	return count;
 }
 
-static LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
+static void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 {
 	int key;
 	for( key = 0; key < STYLE_KEY_TOTAL; ++key ) {
@@ -668,6 +667,7 @@ int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
 	int i, key;
+	LCUI_WidgetClass *wc;
 	typedef struct {
 		int start, end, task;
 		LCUI_BOOL is_valid;
@@ -715,4 +715,7 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 			}
 		}
 	}
+	/* 扩展部分的样式交给该部件自己处理 */
+	wc = LCUIWidget_GetClass( w->type );
+	wc && wc->methods.update ? wc->methods.update(w):0;
 }

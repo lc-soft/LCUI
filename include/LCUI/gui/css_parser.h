@@ -42,6 +42,13 @@
 
 LCUI_BEGIN_HEADER
 
+/** 样式的解析器 */
+typedef struct LCUI_StyleParser {
+	int key;
+	char *name;
+	int (*parse)(LCUI_StyleSheet, int, const char*);
+} LCUI_StyleParser;
+
 LCUI_API const char *GetStyleName( int key );
 
 /** 初始化 LCUI 的 CSS 代码解析功能 */
@@ -51,6 +58,12 @@ LCUI_API void LCUICssParser_Init(void);
 LCUI_API int LCUI_ParseStyle( const char *str );
 
 LCUI_API void LCUICssParser_Destroy(void);
+
+/** 获取当前记录的样式属性的总数 */
+int LCUI_GetStyleTotal(void);
+
+/** 注册新的属性和对应的属性值解析器 */
+LCUI_API int LCUICssParser_Register( LCUI_StyleParser *sp );
 
 LCUI_END_HEADER
 

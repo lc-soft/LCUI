@@ -48,20 +48,12 @@ typedef struct KeyNameGroup {
 	const char *name;
 } KeyNameGroup;
 
-/** 样式的解析器 */
-typedef struct StyleParser {
-	int type;
-	int key;
-	const char *name;
-	union {
-		int (*parse)(LCUI_Style*,const char*);
-		int (*parse_group)(LCUI_StyleSheet,const char*);
-	};
-} StyleParser;
-
-static LCUI_RBTree style_parser_tree;
-static LCUI_RBTree style_option_tree;
-static LCUI_RBTree style_name_tree;
+static struct {
+	LCUI_RBTree parser_tree;
+	LCUI_RBTree option_tree;
+	LCUI_RBTree name_tree;
+	int count;
+} self;
 
 #define SPLIT_NUMBER	1
 #define SPLIT_COLOR	(1<<1)
@@ -70,7 +62,7 @@ static LCUI_RBTree style_name_tree;
 static int ParseStyleOption( const char *str )
 { 
 	LCUI_RBTreeNode *node;
-	node = RBTree_CustomSearch( &style_option_tree, str );
+	node = RBTree_CustomSearch( &self.option_tree, str );
 	if( !node ) {
 		return -1;
 	}
@@ -79,7 +71,7 @@ static int ParseStyleOption( const char *str )
 
 const char *GetStyleName( int key )
 {
-	KeyNameGroup *data = RBTree_GetData( &style_name_tree, key );
+	KeyNameGroup *data = RBTree_GetData( &self.name_tree, key );
 	if( data ) {
 		return data->name;
 	}
@@ -150,8 +142,9 @@ clean:
 
 
 
-static int OnParseNumber( LCUI_Style *s, const char *str )
+static int OnParseNumber( LCUI_StyleSheet ss, int key, const char *str )
 {
+	LCUI_Style *s = &ss[key];
 	if( ParseNumber( s, str ) ) {
 		return 0;
 	}
@@ -164,8 +157,9 @@ static int OnParseNumber( LCUI_Style *s, const char *str )
 	return -1;
 }
 
-static int OnParseColor( LCUI_Style *s, const char *str )
+static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 {
+	LCUI_Style *s = &ss[key];
 	if( ParseColor( s, str ) ) {
 		return 0;
 	}
@@ -178,15 +172,15 @@ static int OnParseColor( LCUI_Style *s, const char *str )
 	return -1;
 }
 
-static int OnParseImage( LCUI_Style *s, const char *str )
+static int OnParseImage( LCUI_StyleSheet ss, int key, const char *str )
 {
 	return 0;
 }
 
-static int OnParseStyleOption( LCUI_Style *s, const char *str )
+static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
 {
-	int v;
-	v = ParseStyleOption( str );
+	LCUI_Style *s = &ss[key];
+	int v = ParseStyleOption( str );
 	if( v < 0 ) {
 		return -1;
 	}
@@ -197,7 +191,7 @@ static int OnParseStyleOption( LCUI_Style *s, const char *str )
 	return 0;
 }
 
-static int OnParseBorder( LCUI_StyleSheet ss, const char *str )
+static int OnParseBorder( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style slist[3];
 	int i, mode;
@@ -223,7 +217,7 @@ static int OnParseBorder( LCUI_StyleSheet ss, const char *str )
 	return 0;
 }
 
-static int OnParseBorderLeft( LCUI_StyleSheet ss, const char *str )
+static int OnParseBorderLeft( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style slist[3];
 	int i, mode;
@@ -249,7 +243,7 @@ static int OnParseBorderLeft( LCUI_StyleSheet ss, const char *str )
 	return 0;
 }
 
-static int OnParseBorderTop( LCUI_StyleSheet ss, const char *str )
+static int OnParseBorderTop( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style slist[3];
 	int i, mode;
@@ -275,7 +269,7 @@ static int OnParseBorderTop( LCUI_StyleSheet ss, const char *str )
 	return 0;
 }
 
-static int OnParseBorderRight( LCUI_StyleSheet ss, const char *str )
+static int OnParseBorderRight( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style slist[3];
 	int i, mode;
@@ -301,7 +295,7 @@ static int OnParseBorderRight( LCUI_StyleSheet ss, const char *str )
 	return 0;
 }
 
-static int OnParseBorderBottom( LCUI_StyleSheet ss, const char *str )
+static int OnParseBorderBottom( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style slist[3];
 	int i, mode;
@@ -327,22 +321,22 @@ static int OnParseBorderBottom( LCUI_StyleSheet ss, const char *str )
 	return 0;
 }
 
-static int OnParseBorderColor( LCUI_StyleSheet ss, const char *str )
+static int OnParseBorderColor( LCUI_StyleSheet ss, int key, const char *str )
 {
-	return OnParseColor( &ss[key_border_color], str );
+	return OnParseColor( ss, key_border_color, str );
 }
 
-static int OnParseBorderWidth( LCUI_StyleSheet ss, const char *str )
+static int OnParseBorderWidth( LCUI_StyleSheet ss, int key, const char *str )
 {
-	return OnParseNumber( &ss[key_border_width], str );
+	return OnParseNumber( ss, key_border_width, str );
 }
 
-static int OnParseBorderStyle( LCUI_StyleSheet ss, const char *str )
+static int OnParseBorderStyle( LCUI_StyleSheet ss, int key, const char *str )
 {
-	return OnParseStyleOption( &ss[key_border_style], str );
+	return OnParseStyleOption( ss, key_border_style, str );
 }
 
-static int OnParsePadding( LCUI_StyleSheet ss, const char *str )
+static int OnParsePadding( LCUI_StyleSheet ss, int key, const char *str )
 {
 	int value_count;
 	LCUI_Style s[4];
@@ -377,7 +371,7 @@ static int OnParsePadding( LCUI_StyleSheet ss, const char *str )
 	return 0;
 }
 
-static int OnParseMargin( LCUI_StyleSheet ss, const char *str )
+static int OnParseMargin( LCUI_StyleSheet ss, int key, const char *str )
 {
 	int value_count;
 	LCUI_Style s[4];
@@ -412,12 +406,12 @@ static int OnParseMargin( LCUI_StyleSheet ss, const char *str )
 	return 0;
 }
 
-static int OnParseBoxShadow( LCUI_StyleSheet ss, const char *str )
+static int OnParseBoxShadow( LCUI_StyleSheet ss, int key, const char *str )
 {
 	return 0;
 }
 
-static int OnParseBackground( LCUI_StyleSheet ss, const char *str )
+static int OnParseBackground( LCUI_StyleSheet ss, int key, const char *str )
 {
 	return 0;
 }
@@ -489,86 +483,51 @@ static KeyNameGroup style_option_map[] = {
 };
 
 /** 各个样式的解析器映射表 */
-static StyleParser style_parser_map[] = {
-	{ 0, key_width, NULL, OnParseNumber },
-	{ 0, key_height, NULL, OnParseNumber },
-	{ 0, key_position, NULL, OnParseStyleOption },
-	{ 0, key_display, NULL, OnParseStyleOption },
-	{ 0, key_background_color, NULL, OnParseColor },
-	{ 0, key_background_image, NULL, OnParseImage },
-	{ 0, key_border_top_color, NULL, OnParseColor },
-	{ 0, key_border_right_color, NULL, OnParseColor },
-	{ 0, key_border_bottom_color, NULL, OnParseColor },
-	{ 0, key_border_left_color, NULL, OnParseColor },
-	{ 0, key_border_top_width, NULL, OnParseNumber },
-	{ 0, key_border_right_width, NULL, OnParseNumber },
-	{ 0, key_border_bottom_width, NULL, OnParseNumber },
-	{ 0, key_border_left_width, NULL, OnParseNumber },
-	{ 0, key_border_top_width, NULL, OnParseNumber },
-	{ 0, key_border_right_width, NULL, OnParseNumber },
-	{ 0, key_border_bottom_width, NULL, OnParseNumber },
-	{ 0, key_border_left_width, NULL, OnParseNumber },
-	{ 0, key_border_top_style, NULL, OnParseStyleOption },
-	{ 0, key_border_right_style, NULL, OnParseStyleOption },
-	{ 0, key_border_bottom_style, NULL, OnParseStyleOption },
-	{ 0, key_border_left_style, NULL, OnParseStyleOption },
-	{ 1, -1, "border", OnParseBorder },
-	{ 1, -1, "border-left", OnParseBorderLeft },
-	{ 1, -1, "border-top", OnParseBorderTop },
-	{ 1, -1, "border-right", OnParseBorderRight },
-	{ 1, -1, "border-bottom", OnParseBorderBottom },
-	{ 1, -1, "border-color", OnParseBorderColor },
-	{ 1, -1, "border-width", OnParseBorderWidth },
-	{ 1, -1, "border-style", OnParseBorderStyle },
-	{ 1, -1, "padding", OnParsePadding },
-	{ 1, -1, "margin", OnParseMargin },
-	{ 1, -1, "box-shadow", OnParseBoxShadow },
-	{ 1, -1, "background", OnParseBackground }
+static LCUI_StyleParser style_parser_map[] = {
+	{ key_width, NULL, OnParseNumber },
+	{ key_height, NULL, OnParseNumber },
+	{ key_position, NULL, OnParseStyleOption },
+	{ key_display, NULL, OnParseStyleOption },
+	{ key_background_color, NULL, OnParseColor },
+	{ key_background_image, NULL, OnParseImage },
+	{ key_border_top_color, NULL, OnParseColor },
+	{ key_border_right_color, NULL, OnParseColor },
+	{ key_border_bottom_color, NULL, OnParseColor },
+	{ key_border_left_color, NULL, OnParseColor },
+	{ key_border_top_width, NULL, OnParseNumber },
+	{ key_border_right_width, NULL, OnParseNumber },
+	{ key_border_bottom_width, NULL, OnParseNumber },
+	{ key_border_left_width, NULL, OnParseNumber },
+	{ key_border_top_width, NULL, OnParseNumber },
+	{ key_border_right_width, NULL, OnParseNumber },
+	{ key_border_bottom_width, NULL, OnParseNumber },
+	{ key_border_left_width, NULL, OnParseNumber },
+	{ key_border_top_style, NULL, OnParseStyleOption },
+	{ key_border_right_style, NULL, OnParseStyleOption },
+	{ key_border_bottom_style, NULL, OnParseStyleOption },
+	{ key_border_left_style, NULL, OnParseStyleOption },
+	{ -1, "border", OnParseBorder },
+	{ -1, "border-left", OnParseBorderLeft },
+	{ -1, "border-top", OnParseBorderTop },
+	{ -1, "border-right", OnParseBorderRight },
+	{ -1, "border-bottom", OnParseBorderBottom },
+	{ -1, "border-color", OnParseBorderColor },
+	{ -1, "border-width", OnParseBorderWidth },
+	{ -1, "border-style", OnParseBorderStyle },
+	{ -1, "padding", OnParsePadding },
+	{ -1, "margin", OnParseMargin },
+	{ -1, "box-shadow", OnParseBoxShadow },
+	{ -1, "background", OnParseBackground }
 };
 
 static int CompareParserName( void *data, const void *keydata )
 {
-	return strcmp(((StyleParser*)data)->name, (const char*)keydata);
+	return strcmp(((LCUI_StyleParser*)data)->name, (const char*)keydata);
 }
 
 static int CompareName( void *data, const void *keydata )
 {
 	return strcmp(((KeyNameGroup*)data)->name, (const char*)keydata);
-}
-
-/** 初始化 LCUI 的 CSS 代码解析功能 */
-void LCUICssParser_Init(void)
-{
-	StyleParser *ssp, *ssp_end;
-	KeyNameGroup *skn, *skn_end;
-
-	/* 构建一个红黑树树，方便按名称查找解析器 */
-	RBTree_Init( &style_parser_tree );
-	RBTree_Init( &style_option_tree );
-	RBTree_Init( &style_name_tree );
-	RBTree_SetDataNeedFree( &style_parser_tree, FALSE );
-	RBTree_SetDataNeedFree( &style_option_tree, FALSE );
-	RBTree_SetDataNeedFree( &style_name_tree, FALSE );
-	RBTree_OnJudge( &style_parser_tree, CompareParserName );
-	RBTree_OnJudge( &style_option_tree, CompareName );
-	skn = style_name_map;
-	skn_end = skn + sizeof(style_name_map)/sizeof(KeyNameGroup);
-	for( ; skn < skn_end; ++skn ) {
-		RBTree_Insert( &style_name_tree, skn->key, skn );
-	}
-	ssp = style_parser_map;
-	ssp_end = ssp + sizeof(style_parser_map)/sizeof(StyleParser);
-	for( ; ssp < ssp_end; ++ssp ) {
-		if( ssp->type == 0 && !ssp->name ) {
-			ssp->name = GetStyleName( ssp->key );
-		}
-		RBTree_CustomInsert( &style_parser_tree, ssp->name, ssp );
-	}
-	skn = style_option_map;
-	skn_end = skn + sizeof(style_option_map)/sizeof(KeyNameGroup);
-	for( ; skn < skn_end; ++skn ) {
-		RBTree_CustomInsert( &style_option_tree, skn->name, skn );
-	}
 }
 
 /** 从字符串中解析出样式，并导入至样式库中 */
@@ -590,7 +549,7 @@ int LCUI_ParseStyle( const char *str )
 		const char *ptr;	/**< 用于遍历字符串的指针 */
 		LinkedList selectors;	/**< 当前匹配到的选择器列表 */
 		LCUI_StyleSheet css;	/**< 当前缓存的样式表 */
-		StyleParser *parser;	/**< 当前找到的解析器 */
+		LCUI_StyleParser *parser;	/**< 当前找到的解析器 */
 	} ctx = { 0 };
 	DEBUG_MSG("parse begin\n");
 	LinkedList_Init( &ctx.selectors, sizeof(LCUI_Selector) );
@@ -686,7 +645,7 @@ select_parser:
 		ctx.target = is_value;
 		ctx.buffer[ctx.pos] = 0;
 		ctx.pos = 0;
-		ctx.parser = RBTree_CustomGetData( &style_parser_tree, 
+		ctx.parser = RBTree_CustomGetData( &self.parser_tree, 
 						   ctx.buffer );
 		DEBUG_MSG("select style: %s, parser: %p\n",
 			   ctx.buffer, ctx.parser);
@@ -700,13 +659,7 @@ parse_value:
 		}
 		ctx.buffer[ctx.pos] = 0;
 		ctx.pos = 0;
-		if( ctx.parser->type == 1 ) {
-			ret = ctx.parser->parse_group( ctx.css, ctx.buffer );
-			DEBUG_MSG("parse style value: %s, result: %d\n",
-				   ctx.buffer, ret);
-			continue;
-		}
-		ret = ctx.parser->parse( &ctx.css[ctx.parser->key],
+		ret = ctx.parser->parse( ctx.css, ctx.parser->key,
 					 ctx.buffer );
 		DEBUG_MSG("parse style value: %s, result: %d\n",
 			   ctx.buffer, ret);
@@ -717,6 +670,74 @@ parse_value:
 	}
 	DEBUG_MSG("parse end\n");
 	return 0;
+}
+
+/** 获取当前记录的样式属性的总数 */
+int LCUI_GetStyleTotal(void)
+{
+	return self.count;
+}
+
+/** 注册新的属性和对应的属性值解析器 */
+int LCUICssParser_Register( LCUI_StyleParser *sp )
+{
+	int key;
+	LCUI_StyleParser *new_sp;
+	if( !sp->name || strlen(sp->name) < 1 ) {
+		return -1;
+	}
+	if( RBTree_CustomSearch(&self.name_tree, sp->name) == NULL ) {
+		return -2;
+	}
+	key = self.count++;
+	new_sp = calloc(1, sizeof(LCUI_StyleParser));
+	new_sp->key = sp->key;
+	new_sp->parse = sp->parse;
+	new_sp->name = strdup( sp->name );
+	RBTree_Insert( &self.name_tree, key, new_sp->name );
+	RBTree_CustomInsert( &self.parser_tree, new_sp->name, new_sp );
+	return key;
+}
+
+/** 初始化 LCUI 的 CSS 代码解析功能 */
+void LCUICssParser_Init(void)
+{
+	LCUI_StyleParser *new_sp, *sp, *sp_end;
+	KeyNameGroup *skn, *skn_end;
+
+	/* 构建一个红黑树树，方便按名称查找解析器 */
+	RBTree_Init( &self.parser_tree );
+	RBTree_Init( &self.option_tree );
+	RBTree_Init( &self.name_tree );
+	RBTree_SetDataNeedFree( &self.parser_tree, TRUE );
+	RBTree_SetDataNeedFree( &self.option_tree, FALSE );
+	RBTree_SetDataNeedFree( &self.name_tree, FALSE );
+	RBTree_OnJudge( &self.parser_tree, CompareParserName );
+	RBTree_OnJudge( &self.option_tree, CompareName );
+	skn = style_name_map;
+	skn_end = skn + sizeof(style_name_map)/sizeof(KeyNameGroup);
+	for( ; skn < skn_end; ++skn ) {
+		RBTree_Insert( &self.name_tree, skn->key, skn );
+	}
+	sp = style_parser_map;
+	sp_end = sp + sizeof(style_parser_map)/sizeof(LCUI_StyleParser);
+	for( ; sp < sp_end; ++sp ) {
+		new_sp = malloc(sizeof(LCUI_StyleParser));
+		new_sp->key = sp->key;
+		new_sp->parse = sp->parse;
+		if( !sp->name && sp->key >= 0 ) {
+			new_sp->name = strdup( GetStyleName(sp->key) );
+		} else {
+			new_sp->name = strdup( sp->name );
+		}
+		RBTree_CustomInsert( &self.parser_tree, new_sp->name, new_sp );
+	}
+	skn = style_option_map;
+	skn_end = skn + sizeof(style_option_map)/sizeof(KeyNameGroup);
+	for( ; skn < skn_end; ++skn ) {
+		RBTree_CustomInsert( &self.option_tree, skn->name, skn );
+	}
+	self.count = STYLE_KEY_TOTAL;
 }
 
 void LCUICssParser_Destroy(void)
