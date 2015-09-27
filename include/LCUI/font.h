@@ -46,4 +46,4 @@
 #include <LCUI/font/charset.h>
 
 
-#endif /* __LCUI_FONTS_H__ */
+#endif

@@ -45,19 +45,19 @@ enum in_core_font_type {
 	FONT_INCONSOLATA
 };
 
-static int InCoreFont_Open( const char *filepath, LCUI_FontFace **out_face )
+static int InCoreFont_Open( const char *filepath, LCUI_Font **outfont )
 {
 	int *code;
-	LCUI_FontFace *my_face;
+	LCUI_Font *font;
 
 	code = (int*)malloc( sizeof( int ) );
 	if( strcmp( filepath, "in-core.inconsolata" ) == 0 ) {
-		my_face = (LCUI_FontFace*)malloc(sizeof(LCUI_FontFace));
+		font = (LCUI_Font*)malloc(sizeof(LCUI_Font));
 		*code = FONT_INCONSOLATA;
-		my_face->data = code;
-		strcpy( my_face->family_name, "inconsolata" );
-		strcpy( my_face->style_name, "regular" );
-		*out_face = my_face;
+		font->data = code;
+		font->family_name = strdup("inconsolata");
+		font->style_name = strdup("regular");
+		*outfont = font;
 		return 0;
 	}
 	return -1;
@@ -69,9 +69,9 @@ static void InCoreFont_Close( void *face )
 }
 
 static int InCoreFont_Render( LCUI_FontBitmap *bmp, wchar_t ch, 
-			      int pixel_size, LCUI_FontFace *face )
+			      int pixel_size, LCUI_Font *font )
 {
-	int *code = (int*)face->data;
+	int *code = (int*)font->data;
 	switch( *code ) {
 	case FONT_INCONSOLATA:
 	default:
@@ -83,18 +83,18 @@ static int InCoreFont_Render( LCUI_FontBitmap *bmp, wchar_t ch,
 int LCUIFont_InitInCoreFont( LCUI_FontEngine *engine )
 {
 	int *code;
-	LCUI_FontFace* face;
+	LCUI_Font *font;
 	
 	strcpy( engine->name, "in-core" );
+	font = (LCUI_Font*)malloc(sizeof(LCUI_Font));
 	/* 先添加 LCUI 内置字体的信息 */
-	face = (LCUI_FontFace*)malloc(sizeof(LCUI_FontFace));
-	strcpy( face->style_name, "regular" );
-	strcpy( face->family_name, "inconsolata" );
+	font->style_name = strdup("regular");
+	font->family_name = strdup("inconsolata");
 	code = (int*)malloc(sizeof(int));
 	*code = FONT_INCONSOLATA;
-	face->data = code;
-	face->engine = engine;
-	FontLIB_AddFontInfo( face, "in-core.inconsolata" );
+	font->data = code;
+	font->engine = engine;
+	LCUIFont_Add( font, "in-core.inconsolata" );
 	engine->render = InCoreFont_Render;
 	engine->open = InCoreFont_Open;
 	engine->close = InCoreFont_Close;

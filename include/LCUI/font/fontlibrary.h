@@ -65,19 +65,19 @@ typedef struct LCUI_WChar_ {
 } LCUI_WChar;
 
 typedef struct LCUI_FontEngine	LCUI_FontEngine;
-typedef struct LCUI_FontFace	LCUI_FontFace;
 
-struct LCUI_FontFace {
-	LCUI_FontEngine *engine;	/**< 所属的字体引擎 */
-	char style_name[64];		/**< 样式名称 */
-	char family_name[64];		/**< 字族名称 */
+typedef struct LCUI_Font {
+	int id;                         /**< 字体信息ID */
+	char *style_name;		/**< 样式名称 */
+	char *family_name;		/**< 字族名称 */
 	void *data;			/**< 相关数据 */
-};
+	LCUI_FontEngine *engine;	/**< 所属的字体引擎 */
+} LCUI_Font;
 
 struct LCUI_FontEngine {
 	char name[64];
-	int (*open)(const char*, LCUI_FontFace**);
-	int (*render)(LCUI_FontBitmap*, wchar_t, int, LCUI_FontFace*);
+	int (*open)(const char*, LCUI_Font**);
+	int (*render)(LCUI_FontBitmap*, wchar_t, int, LCUI_Font*);
 	void (*close)(void*);
 };
 
@@ -124,19 +124,24 @@ LCUI_API int FontBMP_Load( LCUI_FontBitmap *buff, wchar_t ch,
 LCUI_API void FontLIB_Init( void );
 
 /** 添加字体族，并返回该字族的ID */
-LCUI_API int FontLIB_AddFontInfo( LCUI_FontFace *face, const char *filepath );
+LCUI_API int LCUIFont_Add( LCUI_Font *font, const char *filepath );
 
 /** 通过字体文件路径来查找字体信息，并获取字体ID */
-LCUI_API int FontLIB_FindInfoByFilePath( const char *filepath );
+LCUI_API int LCUIFont_GetIdByPath( const char *filepath );
 
-/** 获取指定字族名的字体ID */
-LCUI_API int FontLIB_GetFontIDByFamilyName( const char *family_name );
+/** 
+ * 获取字体的ID 
+ * @param[in] family_name 字族名称
+ * @param[in] style_name 样式名称，若设为 NULL，则默认获取 regular 样式或
+ * 最后一个样式的字体
+ */
+LCUI_API int LCUIFont_GetId( const char *family_name, const char *style_name );
 
 /** 获取默认的字体ID */
-LCUI_API int FontLIB_GetDefaultFontID( void );
+LCUI_API int LCUIFont_GetDefault( void );
 
 /** 设定默认的字体 */
-LCUI_API void FontLIB_SetDefaultFont( int id );
+LCUI_API void LCUIFont_SetDefault( int id );
 
 /**
  * 添加一个字体位图数据至数据库中
@@ -144,7 +149,7 @@ LCUI_API void FontLIB_SetDefaultFont( int id );
  * 调用此函数后，作为参数fontbmp_buff的变量，不能被free掉，否则，数据库中记录
  * 的此数据会无效 
  * */
-LCUI_API LCUI_FontBitmap* FontLIB_AddFontBMP(	wchar_t char_code,
+LCUI_API LCUI_FontBitmap* LCUIFont_AddBitmap(	wchar_t char_code,
 						int font_id,
 						int pixel_size,
 						LCUI_FontBitmap *fontbmp_buff );
@@ -153,7 +158,7 @@ LCUI_API LCUI_FontBitmap* FontLIB_AddFontBMP(	wchar_t char_code,
 LCUI_API LCUI_FontBitmap* FontLIB_GeFontBMP( wchar_t ch, int font_id, int pixel_size );
 
 /** 载入字体值数据库中 */
-LCUI_API int FontLIB_LoadFontFile( const char *filepath );
+LCUI_API int LCUIFont_LoadFile( const char *filepath );
 
 /** 初始化字体处理模块 */
 void LCUI_InitFont( void );

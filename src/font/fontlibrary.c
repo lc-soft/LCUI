@@ -42,8 +42,8 @@
 #include <LCUI/graph.h>
 #include <LCUI/font.h>
 
-#define NAME_MAX_LEN    64
-#define PATH_MAX_LEN    1024
+#define FONT_CACHE_SIZE	32
+#define MALLOC(type, count) (type*)malloc(sizeof(type)*count);
 
 /**
  * 库中缓存的字体位图是分组存放的，共有三级分组，分别为：
@@ -53,28 +53,48 @@
  * 位图。
  */
 
-typedef struct LCUI_FontInfo_ {
-	int id;                         /**< 字体信息ID */
-	char filepath[PATH_MAX_LEN];    /**< 字体文件路径 */
-	LCUI_FontFace *face;
-} LCUI_FontInfo;
+/** 字体字族索引结点 */
+typedef struct LCUI_FontFamilyNode {
+	char *family_name;	/**< 字族名称  */
+	LinkedList styles;	/**< 该字族下的各种样式的字体信息 */
+} LCUI_FontFamilyNode;
 
-static struct FontLibraryContext {
-	int count;				/**, 计数器，主要用于为字体信息生成标识号 */
+/** 字体路径索引结点 */
+typedef struct LCUI_FontPathNode {
+	char *path;		/**< 路径  */
+	LCUI_Font *font;	/**< 被索引的字体信息 */
+} LCUI_FontPathNode;
+
+static struct LCUI_FontLibraryContext {
+	int count;				/**< 计数器，主要用于为字体信息生成标识号 */
+	int font_cache_num;			/**< 字体信息缓存区的数量 */
 	LCUI_BOOL is_inited;			/**< 标记，指示数据库是否初始化 */
-	LCUI_RBTree info_cache;			/**< 字体信息缓存 */
-	LCUI_RBTree bitmap_cache;		/**< 字体位图缓存 */
-	LCUI_FontInfo *default_font;		/**< 指针，引用的是默认字体信息 */
-	LCUI_FontInfo *incore_font;		/**< 指针，引用的是内置字体的信息 */
+	LCUI_RBTree path_map;			/**< 字体路径映射表，用于实现按路径获取字体信息 */
+	LCUI_RBTree family_tree;		/**< 字族信息树，按字族名称记录着各个字体的信息 */
+	LCUI_RBTree bitmap_cache;		/**< 字体位图缓存区 */
+	LCUI_Font ***font_cache;		/**< 字体信息缓存区 */
+	LCUI_Font *default_font;		/**< 指针，引用的是默认字体信息 */
+	LCUI_Font *incore_font;			/**< 指针，引用的是内置字体的信息 */
 	LCUI_FontEngine engines[2];		/**< 当前可用字体引擎列表 */
 	LCUI_FontEngine *engine;		/**< 当前选择的字体引擎 */
 } fontlib = {0, FALSE};
 
+/** 检测位图数据是否有效 */
+#define FontBMP_IsValid(fbmp) (fbmp && fbmp->width>0 && fbmp->rows>0)
 #define SelectChar(ch) (LCUI_RBTree*)RBTree_GetData( &fontlib.bitmap_cache, ch )
 #define SelectFont(ch, font_id) (LCUI_RBTree*)RBTree_GetData( ch, font_id )
 #define SelectBitmap(font, size) (LCUI_FontBitmap*)RBTree_GetData( font, size )
+#define SelectFontFamliy(family_name) (LCUI_FontFamilyNode*)\
+	RBTree_CustomGetData( &fontlib.family_tree, family_name );
+#define SelectFontCache(id) \
+	fontlib.font_cache[fontlib.font_cache_num-1][id % FONT_CACHE_SIZE]
 
-static void FontLIB_DestroyFontBitmap( void *arg )
+static int OnComparePath( void *data, const void *keydata )
+{
+	return strcmp(((LCUI_FontPathNode*)data)->path, keydata);
+}
+
+static void DestroyFontBitmap( void *arg )
 {
 	FontBMP_Free( (LCUI_FontBitmap*)arg );
 }
@@ -84,81 +104,122 @@ static void FontLIB_DestroyTreeNode( void *arg )
 	RBTree_Destroy( (LCUI_RBTree*)arg );
 }
 
-/** 添加字体族，并返回该字族的ID */
-int FontLIB_AddFontInfo( LCUI_FontFace *face, const char *filepath )
+/** 
+ * 添加字体信息记录，并返回该字体的ID 
+ * @warning 该函数仅仅是将 font 参数的引用添加至记录中，为保证记录的有效性，
+ * 传入的 font 参数必须是动态分配的。
+ */
+int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 {
-	LCUI_FontInfo *info;
-	info = (LCUI_FontInfo*)malloc( sizeof(LCUI_FontInfo) );
-	info->id = ++fontlib.count;
-	strncpy( info->filepath, filepath, PATH_MAX_LEN );
-	info->face = face;
-	RBTree_Insert( &fontlib.info_cache, info->id, info );
-	return info->id;
+	LCUI_Font *f;
+	LCUI_FontFamilyNode *fn;
+	font->id = ++fontlib.count;
+	if( font->id >= fontlib.font_cache_num * FONT_CACHE_SIZE ) {
+		LCUI_Font ***caches, **cache;
+		fontlib.font_cache_num += 1;
+		caches = (LCUI_Font***)realloc( fontlib.font_cache, 
+			fontlib.font_cache_num * sizeof(LCUI_Font**) );
+		if( caches == NULL ) {
+			fontlib.font_cache_num -= 1;
+			return -1;
+		}
+		cache = MALLOC(LCUI_Font*, FONT_CACHE_SIZE);
+		if( cache == NULL ) {
+			return -2;
+		}
+		caches[fontlib.font_cache_num-1] = cache;
+		fontlib.font_cache = caches;
+	}
+	SelectFontCache(font->id) = font;
+	fn = SelectFontFamliy(font->family_name);
+	if( !fn ) {
+		fn = MALLOC(LCUI_FontFamilyNode, 1);
+		fn->family_name = strdup(font->family_name);
+		LinkedList_Init( &fn->styles, 0 );
+		LinkedList_SetDataNeedFree( &fn->styles, FALSE );
+		RBTree_CustomInsert( &fontlib.family_tree,
+				     font->family_name, fn );
+	}
+	LinkedList_ForEach( f, 0, &fn->styles ) {
+		if( strcmp( f->style_name, font->family_name ) == 0 ) {
+			return -3;
+		}
+	}
+	LinkedList_Append( &fn->styles, font );
+	if( filepath ) {
+		if( LCUIFont_GetIdByPath( filepath ) ) {
+			return -4;
+		}
+		RBTree_CustomInsert( &fontlib.path_map, filepath, font );
+	}
+	return font->id;
 }
 
 /** 获取指定字体ID的字体信息 */
-static LCUI_FontInfo* FontLIB_GetFont( int font_id )
+static LCUI_Font* LCUIFont_GetById( int id )
 {
 	if( !fontlib.is_inited ) {
 		return NULL;
 	}
-	return (LCUI_FontInfo*)RBTree_GetData( &fontlib.info_cache, font_id );
-}
-
-void FontLIB_Init( void )
-{
-	if( fontlib.is_inited ) {
-		return;
+	if( id < 0 || id >= fontlib.font_cache_num * FONT_CACHE_SIZE ) {
+		return NULL;
 	}
-	RBTree_Init( &fontlib.bitmap_cache );
-	RBTree_Init( &fontlib.info_cache );
-	RBTree_OnDestroy( &fontlib.bitmap_cache, FontLIB_DestroyTreeNode );
-	RBTree_SetDataNeedFree( &fontlib.bitmap_cache, TRUE );
-	RBTree_SetDataNeedFree( &fontlib.info_cache, TRUE );
-	fontlib.is_inited = TRUE;
+	
+	return SelectFontCache(id);
 }
 
-int FontLIB_FindInfoByFilePath( const char *filepath )
+/** 根据字体文件路径，获取字体的ID */
+int LCUIFont_GetIdByPath( const char *filepath )
 {
-	LCUI_FontInfo *font;
-	LCUI_RBTreeNode *node;
+	LCUI_Font *font;
+	if( !fontlib.is_inited ) {
+		return -1;
+	}
+	font = RBTree_CustomGetData( &fontlib.path_map, filepath );
+	if( !font ) {
+		return -2;
+	}
+	return font->id;
+}
+
+/** 
+ * 获取字体的ID 
+ * @param[in] family_name 字族名称
+ * @param[in] style_name 样式名称，若设为 NULL，则默认获取 regular 样式或
+ * 最后一个样式的字体
+ */
+int LCUIFont_GetId( const char *family_name, const char *style_name )
+{
+	LCUI_Font *font;
+	LCUI_FontFamilyNode *node;
 
 	if( !fontlib.is_inited ) {
 		return -1;
 	}
-	node = RBTree_First( &fontlib.info_cache );
-	while( node ) {
-		font = (LCUI_FontInfo*)node->data;
-		if( strcmp( filepath, font->filepath ) == 0 ) {
-			return node->key;
+	node = SelectFontFamliy( family_name );
+	if( !node ) {
+		return -2;
+	}
+	LinkedList_ForEach( font, 0, &node->styles ) {
+		if( style_name ) {
+			if( strcmp( font->style_name, style_name ) ) {
+				continue;
+			}
+		} else {
+			if( strcmp( font->style_name, "regular" ) ) {
+				continue;
+			}
 		}
-		node = RBTree_Next( node );
+		return font->id;
 	}
-	return -2;
-}
-
-int FontLIB_GetFontIDByFamilyName( const char *family_name )
-{
-	LCUI_FontInfo *font;
-	LCUI_RBTreeNode *node;
-
-	if( !fontlib.is_inited ) {
-		return -1;
+	if( !style_name && font ) {
+		return font->id;
 	}
-	node = RBTree_First( &fontlib.info_cache );
-	while( node ) {
-		font = (LCUI_FontInfo*)node->data;
-		/* 不区分大小写，进行对比 */
-		if( strcmp(font->face->family_name, family_name) == 0 ) {
-			return node->key;
-		}
-		node = RBTree_Next( node );
-	}
-	return -2;
+	return -3;
 }
 
 /** 获取默认的字体ID */
-int FontLIB_GetDefaultFontID( void )
+int LCUIFont_GetDefault( void )
 {
 	if( !fontlib.default_font ) {
 		return -1;
@@ -167,16 +228,16 @@ int FontLIB_GetDefaultFontID( void )
 }
 
 /** 设定默认的字体 */
-void FontLIB_SetDefaultFont( int id )
+void LCUIFont_SetDefault( int id )
 {
-	LCUI_FontInfo *p;
-	p = FontLIB_GetFont( id );
+	LCUI_Font *p;
+	p = LCUIFont_GetById( id );
 	if( p ) {
 		fontlib.default_font = p;
 	}
 }
 
-LCUI_FontBitmap* FontLIB_AddFontBMP( wchar_t ch, int font_id,
+LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 				     int pixel_size, LCUI_FontBitmap *bmp )
 {
 	LCUI_FontBitmap *bmp_cache;
@@ -188,7 +249,7 @@ LCUI_FontBitmap* FontLIB_AddFontBMP( wchar_t ch, int font_id,
 	/* 获取字符的字体信息集 */
 	tree_font = SelectChar( ch );
 	if( !tree_font ) {
-		tree_font = (LCUI_RBTree*)malloc( sizeof(LCUI_RBTree) );
+		tree_font = MALLOC(LCUI_RBTree, 1);
 		if( !tree_font ) {
 			return NULL;
 		}
@@ -202,21 +263,21 @@ LCUI_FontBitmap* FontLIB_AddFontBMP( wchar_t ch, int font_id,
 		font_id = fontlib.incore_font->id;
 	}
 	/* 获取相应字体样式标识号的字体位图库 */
-	tree_bmp = (LCUI_RBTree*)RBTree_GetData( tree_font, font_id );
+	tree_bmp = SelectFont( tree_font, font_id );
 	if( !tree_bmp ) {
-		tree_bmp = (LCUI_RBTree*)malloc( sizeof(LCUI_RBTree) );
+		tree_bmp = MALLOC(LCUI_RBTree, 1);
 		if( !tree_bmp ) {
 			return NULL;
 		}
 		RBTree_Init( tree_bmp );
-		RBTree_OnDestroy( tree_bmp, FontLIB_DestroyFontBitmap );
+		RBTree_OnDestroy( tree_bmp, DestroyFontBitmap );
 		RBTree_SetDataNeedFree( tree_bmp, TRUE );
 		RBTree_Insert( tree_font, font_id, tree_bmp );
 	}
 	/* 在字体位图库中获取指定像素大小的字体位图 */
-	bmp_cache = (LCUI_FontBitmap*)RBTree_GetData( tree_bmp, pixel_size );
+	bmp_cache = SelectBitmap( tree_bmp, pixel_size );
 	if( !bmp_cache ) {
-		bmp_cache = (LCUI_FontBitmap*)malloc( sizeof(LCUI_FontBitmap) );
+		bmp_cache = MALLOC(LCUI_FontBitmap, 1);
 		if( !bmp_cache ) {
 			return NULL;
 		}
@@ -252,29 +313,31 @@ LCUI_FontBitmap* FontLIB_GeFontBMP( wchar_t ch, int font_id, int pixel_size )
 	}
 	FontBMP_Init( &bmp_cache );
 	FontBMP_Load( &bmp_cache, ch, font_id, pixel_size );
-	return FontLIB_AddFontBMP( ch, font_id, pixel_size, &bmp_cache );
+	bmp = LCUIFont_AddBitmap( ch, font_id, pixel_size, &bmp_cache );
+	FontBMP_Free( &bmp_cache );
+	return bmp;
 }
 
 /** 载入字体值数据库中 */
-int FontLIB_LoadFontFile( const char *filepath )
+int LCUIFont_LoadFile( const char *filepath )
 {
 	int ret, id;
-	LCUI_FontFace *face;
+	LCUI_Font *font;
 
 	/* 如果有同一文件路径的字族信息 */
-	id = FontLIB_FindInfoByFilePath( filepath );
+	id = LCUIFont_GetIdByPath( filepath );
 	if( id >= 0 ) {
 		return id;
 	}
 	if( !fontlib.engine ) {
 		return -1;
 	}
-	ret = fontlib.engine->open( filepath, &face );
+	ret = fontlib.engine->open( filepath, &font );
 	if( ret != 0 ) {
 		return -2;
 	}
-	face->engine = fontlib.engine;
-	id = FontLIB_AddFontInfo( face, filepath );
+	font->engine = fontlib.engine;
+	id = LCUIFont_Add( font, filepath );
 	return id;
 }
 
@@ -283,10 +346,6 @@ int FontLIB_DeleteFontInfo( int id )
 {
 	return 0;
 }
-
-
-/** 检测位图数据是否有效 */
-#define FontBMP_IsValid(fbmp) (fbmp && fbmp->width>0 && fbmp->rows>0)
 
 /** 打印字体位图的信息 */
 void FontBMP_PrintInfo( LCUI_FontBitmap *bitmap )
@@ -443,19 +502,19 @@ int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 int FontBMP_Load( LCUI_FontBitmap *buff, wchar_t ch,
 		  int font_id, int pixel_size )
 {
-	LCUI_FontInfo *info = fontlib.incore_font;
+	LCUI_Font *info = fontlib.incore_font;
 	LCUI_FontEngine *engine = &fontlib.engines[0];
 	while( TRUE ) {
 		if( font_id <= 0 || !fontlib.engine ) {
 			break;
 		}
-		info = FontLIB_GetFont( font_id );
+		info = LCUIFont_GetById( font_id );
 		if( info ) {
-			engine = info->face->engine;
+			engine = info->engine;
 		}
 		break;
 	}
-	return engine->render( buff, ch, pixel_size, info->face );
+	return engine->render( buff, ch, pixel_size, info );
 }
 
 
@@ -481,11 +540,21 @@ void LCUI_InitFont( void )
 		"../fonts/msyh.ttf"
 #endif
 	};
-	FontLIB_Init();
+
+	fontlib.font_cache_num = 1;
+	fontlib.font_cache = MALLOC(LCUI_Font**, 1);
+	fontlib.font_cache[0] = MALLOC(LCUI_Font*, FONT_CACHE_SIZE);
+	RBTree_Init( &fontlib.bitmap_cache );
+	RBTree_Init( &fontlib.path_map );
+	RBTree_OnJudge( &fontlib.path_map, OnComparePath );
+	RBTree_OnDestroy( &fontlib.bitmap_cache, FontLIB_DestroyTreeNode );
+	RBTree_SetDataNeedFree( &fontlib.bitmap_cache, TRUE );
+	fontlib.is_inited = TRUE;
+
 	/* 先初始化内置的字体引擎 */
 	LCUIFont_InitInCoreFont( &fontlib.engines[0] );
-	font_id = FontLIB_GetFontIDByFamilyName("inconsolata");
-	fontlib.incore_font = FontLIB_GetFont( font_id );
+	font_id = LCUIFont_GetId( "inconsolata", NULL );
+	fontlib.incore_font = LCUIFont_GetById( font_id );
 	fontlib.engine = &fontlib.engines[0];
 	/* 然后看情况启用其它字体引擎 */
 #ifdef LCUI_FONT_ENGINE_FREETYPE
@@ -506,14 +575,14 @@ void LCUI_InitFont( void )
 		}
 		printf( "[font] load font: %s\n", target_font );
 		/* 如果载入成功，则设定该字体为默认字体 */
-		font_id = FontLIB_LoadFontFile( target_font );
+		font_id = LCUIFont_LoadFile( target_font );
 		if( font_id <= 0 ) {
 			continue;
 		}
-		FontLIB_SetDefaultFont( font_id );
+		LCUIFont_SetDefault( font_id );
 		if( fontlib.default_font ) {
 			printf("[font] select font: %s\n",
-				fontlib.default_font->face->family_name);
+				fontlib.default_font->family_name);
 		}
 		break;
 	} while( ++i, target_font = font_files[i], i<MAX_FONTFILE_NUM );
@@ -526,6 +595,6 @@ void LCUI_ExitFont( void )
 		return;
 	}
 	fontlib.is_inited = FALSE;
-	RBTree_Destroy( &fontlib.info_cache );
+	RBTree_Destroy( &fontlib.path_map );
 	RBTree_Destroy( &fontlib.bitmap_cache );
 }

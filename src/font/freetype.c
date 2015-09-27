@@ -55,23 +55,23 @@ static struct {
 	FT_Library library;
 } freetype;
 
-static int FreeType_Open( const char *filepath, LCUI_FontFace **out_face )
+static int FreeType_Open( const char *filepath, LCUI_Font **outfont )
 {
 	int err;
 	FT_Face ft_face;
-	LCUI_FontFace *my_face;
+	LCUI_Font *font;
 
 	err = FT_New_Face( freetype.library, filepath, 0, &ft_face );
 	if( err ) {
-		*out_face = NULL;
+		*outfont = NULL;
 		return err;
 	}
-	my_face = (LCUI_FontFace*)malloc(sizeof(LCUI_FontFace));
+	font = (LCUI_Font*)malloc(sizeof(LCUI_Font));
 	FT_Select_Charmap( ft_face, FT_ENCODING_UNICODE );
-	strcpy( my_face->family_name, ft_face->family_name );
-	strcpy( my_face->style_name, ft_face->style_name );
-	my_face->data = ft_face;
-	*out_face = my_face;
+	font->family_name = strdup(ft_face->family_name);
+	font->style_name = strdup(ft_face->style_name);
+	font->data = ft_face;
+	*outfont = font;
 	return 0;
 }
 
@@ -167,12 +167,12 @@ static size_t Convert_FTGlyph( LCUI_FontBitmap *bmp, FT_GlyphSlot slot, int mode
 }
 
 static int FreeType_Render( LCUI_FontBitmap *bmp, wchar_t ch, 
-			    int pixel_size, LCUI_FontFace *face )
+			    int pixel_size, LCUI_Font *font )
 {
 	int error;
 	size_t size;
 	LCUI_BOOL has_space = FALSE;
-	FT_Face ft_face = (FT_Face)face->data;
+	FT_Face ft_face = (FT_Face)font->data;
 
 	/* 设定字体尺寸 */
 	FT_Set_Pixel_Sizes( ft_face, 0, pixel_size );
