@@ -63,7 +63,7 @@ void TextStyle_Init( LCUI_TextStyle *data )
 	data->has_family = FALSE;
 	data->has_back_color = FALSE;
 	data->has_fore_color = FALSE;
-	data->font_id = FontLIB_GetDefaultFontID();
+	data->font_id = LCUIFont_GetDefault();
 	data->style = FONT_STYLE_NORMAL;
 	data->weight = FONT_WEIGHT_NORMAL;
 	data->decoration = FONT_DECORATION_NONE;

@@ -320,7 +320,7 @@ TextChar_UpdateBitmap( TextCharData *ch, LCUI_TextStyle *style )
 			pixel_size = ch->style->pixel_size;
 		}
 	}
-	ch->bitmap = FontLIB_GeFontBMP( ch->char_code, font_id, pixel_size );
+	ch->bitmap = LCUIFont_GetBitmap( ch->char_code, font_id, pixel_size );
 	//printf("char_code: %c, pixel_size: %d, font_id: %d, bitmap: %p\n", 
 	//ch->char_code, style->pixel_size, style->font_id, ch->bitmap);
 }
@@ -1309,11 +1309,11 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 			x += p_char->bitmap->advance.x;
 			/* 判断文字使用的前景颜色，再进行绘制 */
 			if( p_char->style && p_char->style->has_fore_color ) {
-				FontBMP_Mix( graph, char_pos, p_char->bitmap,
-					     p_char->style->fore_color );
+				FontBitmap_Mix( graph, char_pos, p_char->bitmap,
+						p_char->style->fore_color );
 			} else {
-				FontBMP_Mix( graph, char_pos, p_char->bitmap,
-					     layer->text_style.fore_color );
+				FontBitmap_Mix( graph, char_pos, p_char->bitmap,
+						layer->text_style.fore_color );
 			}
 			/* 如果超过绘制区域则不继续绘制该行文本 */
 			if( x > area.x + area.width ) {

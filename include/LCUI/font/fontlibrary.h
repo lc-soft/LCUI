@@ -43,7 +43,7 @@
 LCUI_BEGIN_HEADER
 
 /** 字体位图数据 */
-typedef struct LCUI_FontBMP_ {
+typedef struct LCUI_FontBitmap_ {
 	int top;		/**< 与顶边框的距离 */
 	int left;		/**< 与左边框的距离 */
 	int width;		/**< 位图宽度 */
@@ -98,26 +98,26 @@ int LCUIFont_ExitFreeType( void );
 LCUI_API int FontInconsolata_GetBitmap( LCUI_FontBitmap *bmp, wchar_t ch, int size );
 
 /** 打印字体位图的信息 */
-LCUI_API void FontBMP_PrintInfo( LCUI_FontBitmap *bitmap );
+LCUI_API void FontBitmap_PrintInfo( LCUI_FontBitmap *bitmap );
 
 /** 初始化字体位图 */
-LCUI_API void FontBMP_Init( LCUI_FontBitmap *bitmap );
+LCUI_API void FontBitmap_Init( LCUI_FontBitmap *bitmap );
 
 /** 释放字体位图占用的资源 */
-LCUI_API void FontBMP_Free( LCUI_FontBitmap *bitmap );
+LCUI_API void FontBitmap_Free( LCUI_FontBitmap *bitmap );
 
 /** 创建字体位图 */
-LCUI_API int FontBMP_Create( LCUI_FontBitmap *bitmap, int width, int rows );
+LCUI_API int FontBitmap_Create( LCUI_FontBitmap *bitmap, int width, int rows );
 
 /** 在屏幕打印以0和1表示字体位图 */
-LCUI_API int FontBMP_Print( LCUI_FontBitmap *fontbmp );
+LCUI_API int FontBitmap_Print( LCUI_FontBitmap *fontbmp );
 
 /** 将字体位图绘制到目标图像上 */
-LCUI_API int FontBMP_Mix( LCUI_Graph *graph, LCUI_Pos pos,
+LCUI_API int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 			  LCUI_FontBitmap *bmp, LCUI_Color color );
 
 /** 载入字体位图 */
-LCUI_API int FontBMP_Load( LCUI_FontBitmap *buff, wchar_t ch, 
+LCUI_API int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch, 
 			   int font_id, int pixel_size );
 
 /** 初始化字体数据库 */
@@ -155,7 +155,7 @@ LCUI_API LCUI_FontBitmap* LCUIFont_AddBitmap(	wchar_t char_code,
 						LCUI_FontBitmap *fontbmp_buff );
 
 /** 获取库中的字体位图 */
-LCUI_API LCUI_FontBitmap* FontLIB_GeFontBMP( wchar_t ch, int font_id, int pixel_size );
+LCUI_API LCUI_FontBitmap* LCUIFont_GetBitmap( wchar_t ch, int font_id, int pixel_size );
 
 /** 载入字体值数据库中 */
 LCUI_API int LCUIFont_LoadFile( const char *filepath );
