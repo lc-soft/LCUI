@@ -52,6 +52,7 @@ enum TaskType {
 };
 
 typedef struct LCUI_TextView_ {
+	LCUI_TextStyle style;
 	LCUI_TextLayer layer;	/**< 文本图层 */
 	struct {
 		LCUI_BOOL is_valid;
@@ -64,6 +65,115 @@ typedef struct LCUI_TextView_ {
 } LCUI_TextView;
 
 /*---------------------------- Private -------------------------------*/
+
+enum FontStyleKey {
+	key_color,
+	key_font_size,
+	key_font_style,
+	key_font_weight,
+	key_font_family,
+	TOTAL_FONT_STYLE_KEY
+};
+
+enum FontStyleType {
+	FS_NORMAL,
+	FS_ITALIC,
+	FS_OBLIQUE
+};
+
+static int style_key_map[TOTAL_FONT_STYLE_KEY];
+
+static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
+{
+	LCUI_Style *s = &ss->sheet[key];
+	if( ParseColor( s, str ) ) {
+		return 0;
+	}
+	return -1;
+}
+
+static int OnParseFontSize( LCUI_StyleSheet ss, int key, const char *str )
+{
+	LCUI_Style *s = &ss->sheet[key];
+	if( ParseNumber( s, str ) ) {
+		return 0;
+	}
+	return -1;
+}
+
+static int OnParseFontFamily( LCUI_StyleSheet ss, int key, const char *str )
+{
+	if( ss->sheet[style_key_map[key]].is_valid
+	 && ss->sheet[style_key_map[key]].string) {
+		free( ss->sheet[style_key_map[key]].string );
+	}
+	SetStyle( ss, style_key_map[key], strdup(str), string );
+	return 0;
+}
+
+static int OnParseFontStyle( LCUI_StyleSheet ss, int key, const char *str )
+{
+	if( strcmp(str, "normal") == 0 ) {
+		ss->sheet[style_key_map[key]].type = SVT_VALUE;
+		ss->sheet[style_key_map[key]].value = 0;
+		return 0;
+	}
+	return -1;
+}
+
+static int OnParseFontWeight( LCUI_StyleSheet ss, int key, const char *str )
+{
+	return -1;
+}
+
+static LCUI_StyleParser style_parsers[] = { 
+	{ key_color, "color", OnParseColor },
+	{ key_font_family, "font-family", OnParseFontFamily },
+	{ key_font_size, "font-size", OnParseFontSize },
+	{ key_font_style, "font-style", OnParseFontStyle },
+	{ key_font_weight, "font-weight", OnParseFontWeight },
+};
+
+static void TextView_UpdateStyle( LCUI_Widget w )
+{
+	int i, key;
+	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+
+	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
+		key = style_key_map[i];
+		if( key < 0 ) {
+			continue;
+		}
+		if( !w->style->sheet[key].is_changed ) {
+			continue;
+		}
+		switch( key ) {
+		case key_color:
+			txt->style.fore_color = w->style->sheet[key].color;
+			break;
+		case key_font_family:
+			_DEBUG_MSG("font_family: %s\n", w->style->sheet[key].string);
+			TextStyle_SetFont( &txt->style, w->style->sheet[key].string );
+			break;
+		case key_font_size:
+			if( w->style->sheet[key].type == SVT_PX ) {
+				txt->style.pixel_size = w->style->sheet[key].px;
+			} else if( w->style->sheet[key].type == SVT_PT ) {
+				// ...
+			} else {
+				txt->style.pixel_size = 13;
+			}
+			break;
+		case key_font_style:
+			txt->style.style = w->style->sheet[key].value;
+			break;
+		case key_font_weight:
+			// ...
+		default:
+			break;
+		}
+	}
+}
 
 static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 {
@@ -96,6 +206,7 @@ static void TextView_OnInit( LCUI_Widget w )
 	LCUI_TextView *txt;
 
 	txt = Widget_NewPrivateData( w, LCUI_TextView );
+	TextStyle_Init( &txt->style );
 	for( i = 0; i < TASK_TOTAL; ++i ) {
 		txt->tasks[i].is_valid = FALSE;
 	}
@@ -138,7 +249,8 @@ static void TextView_OnUpdate( LCUI_Widget w )
 	}
 	DirtyRectList_Destroy( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
-	if( w->computed_style.w.type == SVT_AUTO || w->computed_style.h.type == SVT_AUTO ) {
+	if( w->computed_style.w.type == SVT_AUTO
+	 || w->computed_style.h.type == SVT_AUTO ) {
 		Widget_AddTask( w, WTT_RESIZE );
 	}
 }
@@ -272,10 +384,17 @@ void TextView_SetTextAlign( LCUI_Widget w, int align )
 /** 添加 TextView 部件类型 */
 void LCUIWidget_AddTextView( void )
 {
+	int i;
 	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "textview" );
 	wc->methods.init = TextView_OnInit;
 	wc->methods.paint = TextView_OnPaint;
 	wc->methods.destroy = TextView_OnDestroy;
 	wc->methods.autosize = TextView_AutoSize;
+	wc->methods.update = TextView_UpdateStyle;
 	wc->task_handler = TextView_OnTask;
+	
+	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
+		style_key_map[style_parsers[i].key] = 
+		LCUICssParser_Register( &style_parsers[i] );
+	}
 }
