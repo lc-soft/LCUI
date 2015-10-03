@@ -38,27 +38,27 @@ LCUI_BOOL ParseNumber( LCUI_Style *var, const char *str )
 	case 'p':
 		if( p[1] == 'x' || p[1] == 'X' ) {
 			var->type = SVT_PX;
-			sscanf( num_str, "%d", &var->value_px );
+			sscanf( num_str, "%d", &var->px );
 		} else if( p[1] == 't' || p[1] == 'T' ) {
 			var->type = SVT_PT;
-			sscanf( num_str, "%d", &var->value_pt );
+			sscanf( num_str, "%d", &var->pt );
 		} else {
 			var->type = SVT_NONE;
 		}
 		break;
 	case '%':
-		if( 1 != sscanf(num_str, "%f", &var->value_scale) ) {
+		if( 1 != sscanf(num_str, "%f", &var->scale) ) {
 			return FALSE;
 		}
-		var->value_scale /= 100.0;
+		var->scale /= 100.0;
 		var->type = SVT_SCALE;
 		break;
 	case 0:
-		if( 1 == sscanf(num_str, "%d", &var->value_px) ) {
+		if( 1 == sscanf(num_str, "%d", &var->px) ) {
 			var->type = SVT_PX;
 			break;
 		}
-		if( 1 == sscanf(num_str, "%f", &var->value_pt) ) {
+		if( 1 == sscanf(num_str, "%f", &var->pt) ) {
 			var->type = SVT_PT;
 			break;
 		}

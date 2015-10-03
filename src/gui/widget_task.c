@@ -75,7 +75,7 @@ static void ComputeBackgroundStyle( LCUI_StyleSheet ss, LCUI_Background *bg )
 	int key = key_background_start + 1;
 
 	for( ; key < key_background_end; ++key ) {
-		style = &ss[key];
+		style = &ss->sheet[key];
 		if( !style->is_valid ) {
 			continue;
 		}
@@ -84,15 +84,15 @@ static void ComputeBackgroundStyle( LCUI_StyleSheet ss, LCUI_Background *bg )
 			bg->color = style->color;
 			break;
 		case key_background_image:
-			if( !style->value_image ) {
+			if( !style->image ) {
 				Graph_Init( &bg->image );
 				break;
 			}
-			Graph_Quote( &bg->image, style->value_image, NULL );
+			Graph_Quote( &bg->image, style->image, NULL );
 			break;
 		case key_background_position:
 			bg->position.using_value = TRUE;
-			bg->position.value = style->value_style;
+			bg->position.value = style->style;
 			break;
 		case key_background_position_x:
 			bg->position.using_value = FALSE;
@@ -104,7 +104,7 @@ static void ComputeBackgroundStyle( LCUI_StyleSheet ss, LCUI_Background *bg )
 			break;
 		case key_background_size:
 			bg->size.using_value = TRUE;
-			bg->position.value = style->value_style;
+			bg->position.value = style->style;
 			break;
 		case key_background_size_width:
 			bg->size.using_value = FALSE;
@@ -126,7 +126,7 @@ static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
 	int key = key_border_start + 1;
 
 	for( ; key < key_border_end; ++key ) {
-		style = &ss[key];
+		style = &ss->sheet[key];
 		if( !style->is_valid ) {
 			continue;
 		}
@@ -197,7 +197,7 @@ static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
 	int key = key_box_shadow_start + 1;
 
 	for( ; key < key_box_shadow_end; ++key ) {
-		style = &ss[key];
+		style = &ss->sheet[key];
 		if( !style->is_valid ) {
 			continue;
 		}
@@ -266,19 +266,19 @@ static void HandleResize( LCUI_Widget w )
 	};
 	rect = w->box.graph;
 	/* 从样式表中获取尺寸 */
-	w->computed_style.width = w->style[key_width];
-	w->computed_style.height = w->style[key_height];
+	w->computed_style.width = w->style->sheet[key_width];
+	w->computed_style.height = w->style->sheet[key_height];
 	/* 内边距的单位暂时都用 px  */
 	for( i=0; i<4; ++i ) {
-		if( !w->style[pd_map[i].key].is_valid
-		 || w->style[pd_map[i].key].type != SVT_PX ) {
+		if( !w->style->sheet[pd_map[i].key].is_valid
+		 || w->style->sheet[pd_map[i].key].type != SVT_PX ) {
 			pd_map[i].sval->type = SVT_PX;
-			pd_map[i].sval->value_px = 0;
+			pd_map[i].sval->px = 0;
 			*pd_map[i].ival = 0;
 			continue;
 		}
-		*pd_map[i].sval = w->style[pd_map[i].key];
-		*pd_map[i].ival = pd_map[i].sval->value_px;
+		*pd_map[i].sval = w->style->sheet[pd_map[i].key];
+		*pd_map[i].ival = pd_map[i].sval->px;
 	}
 	Widget_ComputeSize( w );
 	Widget_UpdateGraphBox( w );
@@ -316,18 +316,18 @@ static void HandleResize( LCUI_Widget w )
 /** 处理可见性 */
 static void HandleVisibility( LCUI_Widget w )
 {
-	LCUI_BOOL visible = ( w->cached_style[key_visible].is_valid && 
-			      w->cached_style[key_visible].value_boolean &&
+	LCUI_BOOL visible = ( w->cached_style->sheet[key_visible].is_valid && 
+			      w->cached_style->sheet[key_visible].value &&
 			      w->computed_style.display != SV_NONE );
 
-	if( w->style[key_display].is_valid ) {
-		w->computed_style.display = w->style[key_display].value_style;
+	if( w->style->sheet[key_display].is_valid ) {
+		w->computed_style.display = w->style->sheet[key_display].style;
 	} else {
 		w->computed_style.display = SV_BLOCK;
 	}
 	if( w->computed_style.display != SV_NONE 
-	 && w->style[key_visible].is_valid
-	 && w->style[key_visible].value_boolean ) {
+	 && w->style->sheet[key_visible].is_valid
+	 && w->style->sheet[key_visible].value ) {
 		w->computed_style.visible = TRUE;
 	} else {
 		w->computed_style.visible = FALSE;

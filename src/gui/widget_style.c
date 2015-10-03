@@ -120,9 +120,30 @@ void DeleteSelector( LCUI_Selector *selector )
 	*selector = NULL;
 }
 
+/** 清空样式表 */
+static void ClearStyleSheet( LCUI_StyleSheet ss )
+{
+	int i;
+	LCUI_Style *s;
+	for( i=0; i<ss->length; ++i ) {
+		s = &ss->sheet[i];
+		switch( s->type ) {
+		case SVT_DATA:
+		case SVT_STRING:
+			if( s->string ) {
+				free( s->string );
+			}
+			s->string = NULL;
+		default: break;
+		}
+		s->is_valid = FALSE;
+	}
+}
 /** 删除样式表 */
 void DeleteStyleSheet( LCUI_StyleSheet *ss )
 {
+	ClearStyleSheet( *ss );
+	free( (*ss)->sheet );
 	free( *ss );
 	*ss = NULL;
 }
@@ -139,31 +160,74 @@ static void DestroyStyleTreeNode( void *data )
 	LinkedList_Destroy( &((StyleTreeNode*)data)->styles );
 }
 
-/** 清空样式表 */
-static void ClearStyleSheet( LCUI_StyleSheet ss )
-{
-	int i;
-	for( i=0; i<STYLE_KEY_TOTAL; ++i ) {
-		ss[i].is_valid = FALSE;
-	}
-}
-
-
 /** 合并两个样式表 */
-void MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet source )
+int MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 {
-	int i;
-	for( i=0; i<STYLE_KEY_TOTAL; ++i ) {
-		if( source[i].is_valid && !dest[i].is_valid ) {
-			dest[i] = source[i];
+	int i, count;
+	if( src->length > dest->length ) {
+		LCUI_Style *sheet;
+		sheet = (LCUI_Style*)realloc( dest->sheet, 
+			sizeof(LCUI_Style)*src->length );
+		if( !sheet ) {
+			return -1;
 		}
+		for( i=dest->length; i<src->length; ++i ) {
+			sheet[i].is_valid = FALSE;
+		}
+		dest->sheet = sheet;
+		dest->length = src->length;
 	}
+	for( count=0,i=0; i<src->length; ++i ) {
+		if( !src->sheet[i].is_valid || dest->sheet[i].is_valid ) {
+			continue;
+		}
+		dest->sheet[i] = src->sheet[i];
+		if( src->sheet[i].type != SVT_STRING 
+		 || !src->sheet[i].string ) {
+			++count;
+			continue;
+		}
+		dest->sheet[i].string = strdup( dest->sheet[i].string );
+		++count;
+	}
+	return 0;
 }
 
 /** 覆盖样式表 */
-void ReplaceStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
+int ReplaceStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 {
-	memcpy( dest, src, sizeof(LCUI_Style)*STYLE_KEY_TOTAL );
+	int i, count;
+	if( src->length > dest->length ) {
+		LCUI_Style *sheet;
+		sheet = (LCUI_Style*)realloc( dest->sheet, 
+			sizeof(LCUI_Style)*src->length );
+		if( !sheet ) {
+			return -1;
+		}
+		dest->sheet = sheet;
+		dest->length = src->length;
+	}
+	for( count=0,i=0; i<src->length; ++i ) {
+		if( !src->sheet[i].is_valid ) {
+			continue;
+		}
+		if( dest->sheet[i].is_valid
+		 && dest->sheet[i].type == SVT_STRING ) {
+			if( dest->sheet[i].string ) {
+				free( dest->sheet[i].string );
+			}
+			dest->sheet[i].string = NULL;
+		}
+		dest->sheet[i] = src->sheet[i];
+		if( src->sheet[i].type != SVT_STRING 
+		 || !src->sheet[i].string ) {
+			++count;
+			continue;
+		}
+		dest->sheet[i].string = strdup( dest->sheet[i].string );
+		++count;
+	}
+	return count;
 }
 
 /** 初始化 */
@@ -187,8 +251,14 @@ void LCUIWidget_ExitStyle( void )
 
 LCUI_StyleSheet StyleSheet( void )
 {
-	return (LCUI_StyleSheet)calloc( LCUI_GetStyleTotal(),
-					sizeof(LCUI_Style) );
+	LCUI_StyleSheet ss;
+	ss = (LCUI_StyleSheet)malloc( sizeof(LCUI_StyleSheetRec_) );
+	if( !ss ) {
+		return ss;
+	}
+	ss->length = LCUI_GetStyleTotal();
+	ss->sheet = (LCUI_Style*)calloc( ss->length+1, sizeof(LCUI_Style) );
+	return ss;
 }
 
 static int SaveSelectorNode( LCUI_SelectorNode node, const char *name, char type )
@@ -567,22 +637,24 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 static void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 {
 	int key;
-	for( key = 0; key < STYLE_KEY_TOTAL; ++key ) {
-		if( !ss[key].is_valid ) {
+	const char *name;
+	for( key = 0; key<ss->length; ++key ) {
+		if( !ss->sheet[key].is_valid ) {
 			continue;
 		}
-		printf("\t\t%s: ", GetStyleName(key));
-		switch( ss[key].type ) {
+		name = GetStyleName(key);
+		printf( "\t\t%s%s: ", name, key > STYLE_KEY_TOTAL ? " (+)":"");
+		switch( ss->sheet[key].type ) {
 		case SVT_AUTO: 
 			printf( "auto\n");
 			break;
-		case SVT_BOOLEAN: {
-			LCUI_BOOL b = ss[key].value_boolean;
+		case SVT_VALUE: {
+			LCUI_BOOL b = ss->sheet[key].value;
 			printf( "%s\n", b ? "true" : "false" );
 			break;
 		}
 		case SVT_COLOR: {
-			LCUI_Color *clr = &ss[key].value_color;
+			LCUI_Color *clr = &ss->sheet[key].color;
 			if( clr->alpha < 255 ) {
 				printf("rgba(%d,%d,%d,%0.2f)\n", clr->r,
 					clr->g, clr->b, clr->a / 255.0);
@@ -592,13 +664,16 @@ static void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 			break;
 		}
 		case SVT_PX:
-			printf("%dpx\n", ss[key].value_px);
+			printf("%dpx\n", ss->sheet[key].px);
+			break;
+		case SVT_STRING:
+			printf("%s\n", ss->sheet[key].string);
 			break;
 		case SVT_SCALE:
-			printf("%.2lf%%\n", ss[key].value_scale*100);
+			printf("%.2lf%%\n", ss->sheet[key].scale*100);
 			break;
 		default:
-			printf("%d\n", ss[key].value);
+			printf("%d\n", ss->sheet[key].value);
 			break;
 		}
 	}
@@ -668,6 +743,7 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
 	int i, key;
 	LCUI_WidgetClass *wc;
+	LCUI_Style *s;
 	typedef struct {
 		int start, end, task;
 		LCUI_BOOL is_valid;
@@ -685,26 +761,28 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 	if( is_update_all ) {
 		Widget_ComputeInheritStyle( w, w->inherited_style );
 	}
-	ReplaceStyleSheet( w->style, w->custom_style );
+	ClearStyleSheet( w->style );
+	MergeStyleSheet( w->style, w->custom_style );
 	MergeStyleSheet( w->style, w->inherited_style );
 	/* 对比两张样式表，确定哪些需要更新 */
 	for( key = 0; key < STYLE_KEY_TOTAL; ++key ) {
+		s = &w->style->sheet[key];
 		if( key_visible == key ) {
 			_DEBUG_MSG("tip\n");
 		}
 		/* 忽略值没有变化的样式 */
-		if( !w->style[key].is_valid ) {
-			if( !w->cached_style[key].is_valid ) {
+		if( !s->is_valid ) {
+			if( !w->cached_style->sheet[key].is_valid ) {
 				continue;
 			}
 		}
-		else if( !w->style[key].is_changed ) {
-			if( w->cached_style[key].type == w->style[key].type
-			 && w->cached_style[key].value == w->style[key].value ) {
+		else if( !w->style->sheet[key].is_changed ) {
+			if( w->cached_style->sheet[key].type == s->type
+			 && w->cached_style->sheet[key].value == s->value ) {
 				continue;
 			}
 		}
-		w->style[key].is_changed = FALSE;
+		s->is_changed = FALSE;
 		for( i = 0; i < sizeof(task_map) / sizeof(TaskMap); ++i ) {
 			if( key >= task_map[i].start && key <= task_map[i].end ) {
 				if( !task_map[i].is_valid ) {

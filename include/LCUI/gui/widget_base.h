@@ -146,7 +146,10 @@ enum LCUI_StyleKeyName {
 	STYLE_KEY_TOTAL
 };
 
-typedef LCUI_Style *LCUI_StyleSheet;
+typedef struct LCUI_StyleSheetRec_ {
+	LCUI_Style *sheet;
+	int length;
+} LCUI_StyleSheetRec_, *LCUI_StyleSheet;
 
 typedef struct LCUI_SelectorNodeRec_ {
 	char *id;
@@ -155,10 +158,10 @@ typedef struct LCUI_SelectorNodeRec_ {
 	char *pseudo_class_name;
 } *LCUI_SelectorNode, **LCUI_Selector;
 
-#define SetStyle(S, NAME, VAL, TYPE)	S[NAME].is_valid = TRUE, \
-					S[NAME].is_changed = TRUE, \
-					S[NAME].type = SVT_##TYPE, \
-					S[NAME].value_##TYPE = VAL
+#define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \
+					S->sheet[NAME].is_changed = TRUE, \
+					S->sheet[NAME].type = SVT_##TYPE, \
+					S->sheet[NAME].##TYPE = VAL
 
 /** 部件任务类型，主要是按所对应的部件属性或具体刷新区域进行区分 */
 enum WidgetTaskType {

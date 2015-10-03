@@ -376,16 +376,16 @@ void Widget_ComputePosition( LCUI_Widget w )
 {
 	/* 如果有指定定位方式为绝对定位，则以样式表中指定的位置为准 */
 	if( w->computed_style.position == SV_ABSOLUTE ) {
-		switch( w->cached_style[key_left].type ) {
+		switch( w->cached_style->sheet[key_left].type ) {
 		case SVT_SCALE:
 			if( !w->parent ) {
 				break;
 			}
 			w->x = w->parent->box.content.width;
-			w->x *= w->cached_style[key_left].value_scale;
+			w->x *= w->cached_style->sheet[key_left].scale;
 			break;
 		case SVT_PX:
-			w->x = w->cached_style[key_left].value_px;
+			w->x = w->cached_style->sheet[key_left].px;
 			break;
 		case SVT_NONE:
 		case SVT_AUTO:
@@ -393,16 +393,16 @@ void Widget_ComputePosition( LCUI_Widget w )
 			w->x = 0;
 			break;
 		}
-		switch( w->cached_style[key_top].type ) {
+		switch( w->cached_style->sheet[key_top].type ) {
 		case SVT_SCALE:
 			if( !w->parent ) {
 				break;
 			}
 			w->y = w->parent->box.content.height;
-			w->y *= w->cached_style[key_top].value_scale;
+			w->y *= w->cached_style->sheet[key_top].scale;
 			break;
 		case SVT_PX:
-			w->y = w->cached_style[key_top].value_px;
+			w->y = w->cached_style->sheet[key_top].px;
 			break;
 		case SVT_NONE:
 		case SVT_AUTO:
@@ -487,7 +487,7 @@ void Widget_ComputeSize( LCUI_Widget w )
 		w->width *= w->computed_style.width.scale;
 		break;
 	case SVT_PX:
-		w->width = w->computed_style.width.value_px;
+		w->width = w->computed_style.width.px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
@@ -504,7 +504,7 @@ void Widget_ComputeSize( LCUI_Widget w )
 		w->height *= w->computed_style.height.scale;
 		break;
 	case SVT_PX:
-		w->height = w->computed_style.height.value_px;
+		w->height = w->computed_style.height.px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
@@ -598,7 +598,7 @@ void Widget_ComputePadding( LCUI_Widget w )
 			*map[i].buffer = (int)result;
 			break;
 		case SVT_PX:
-			*map[i].buffer = map[i].value->value_px;
+			*map[i].buffer = map[i].value->px;
 			break;
 		case SVT_NONE:
 		case SVT_AUTO:
@@ -647,7 +647,7 @@ void Widget_ComputeMargin( LCUI_Widget w )
 			*map[i].buffer = (int)result;
 			break;
 		case SVT_PX:
-			*map[i].buffer = map[i].value->value_px;
+			*map[i].buffer = map[i].value->px;
 			break;
 		case SVT_NONE:
 		case SVT_AUTO:
@@ -712,13 +712,13 @@ void Widget_Resize( LCUI_Widget w, int width, int height )
 
 void Widget_Show( LCUI_Widget w )
 {
-	SetStyle( w->custom_style, key_visible, TRUE, boolean );
+	SetStyle( w->custom_style, key_visible, TRUE, value );
 	Widget_Update( w, FALSE );
 }
 
 void Widget_Hide( LCUI_Widget w )
 {
-	SetStyle( w->custom_style, key_visible, FALSE, boolean );
+	SetStyle( w->custom_style, key_visible, FALSE, value );
 	Widget_Update( w, FALSE );
 }
 

@@ -121,7 +121,7 @@ static int SplitValues( const char *str, LCUI_Style *slist,
 		if( mode & SPLIT_STYLE ) {
 			val = ParseStyleOption( values[vj] );
 			if( val > 0 )  {
-				slist[vj].value_style = val;
+				slist[vj].style = val;
 				slist[vj].type = SVT_style;
 				slist[vj].is_valid = TRUE;
 				DEBUG_MSG("[%d]:parse ok\n", vj);
@@ -140,18 +140,16 @@ clean:
 	return vi;
 }
 
-
-
 static int OnParseNumber( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style *s = &ss[key];
+	LCUI_Style *s = &ss->sheet[key];
 	if( ParseNumber( s, str ) ) {
 		return 0;
 	}
 	if( strcmp("auto", str) == 0 ) {
 		s->is_valid = TRUE;
 		s->type = SVT_AUTO;
-		s->value_style = SV_AUTO;
+		s->style = SV_AUTO;
 		return 0;
 	}
 	return -1;
@@ -159,13 +157,13 @@ static int OnParseNumber( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style *s = &ss[key];
+	LCUI_Style *s = &ss->sheet[key];
 	if( ParseColor( s, str ) ) {
 		return 0;
 	}
 	if( strcmp("transparent", str) == 0 ) {
 		s->is_valid = TRUE;
-		s->value_color = ARGB(0,255,255,255);
+		s->color = ARGB(0,255,255,255);
 		s->type = SVT_COLOR;
 		return 0;
 	}
@@ -179,13 +177,13 @@ static int OnParseImage( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style *s = &ss[key];
+	LCUI_Style *s = &ss->sheet[key];
 	int v = ParseStyleOption( str );
 	if( v < 0 ) {
 		return -1;
 	}
 	s->type = SVT_style;
-	s->value_style = v;
+	s->style = v;
 	s->is_valid = TRUE;
 	s->is_changed = TRUE;
 	return 0;
@@ -203,13 +201,13 @@ static int OnParseBorder( LCUI_StyleSheet ss, int key, const char *str )
 	for( i = 0; i < 3; ++i ) {
 		switch( slist[i].type ) {
 		case SVT_COLOR:
-			ss[key_border_color] = slist[i];
+			ss->sheet[key_border_color] = slist[i];
 			break;
 		case SVT_PX:
-			ss[key_border_width] = slist[i];
+			ss->sheet[key_border_width] = slist[i];
 			break;
 		case SVT_style:
-			ss[key_border_style] = slist[i];
+			ss->sheet[key_border_style] = slist[i];
 			break;
 		default: return -1;
 		}
@@ -229,13 +227,13 @@ static int OnParseBorderLeft( LCUI_StyleSheet ss, int key, const char *str )
 	for( i = 0; i < 3; ++i ) {
 		switch( slist[i].type ) {
 		case SVT_COLOR:
-			ss[key_border_left_color] = slist[i];
+			ss->sheet[key_border_left_color] = slist[i];
 			break;
 		case SVT_PX:
-			ss[key_border_left_width] = slist[i];
+			ss->sheet[key_border_left_width] = slist[i];
 			break;
 		case SVT_style:
-			ss[key_border_left_style] = slist[i];
+			ss->sheet[key_border_left_style] = slist[i];
 			break;
 		default: return -1;
 		}
@@ -255,13 +253,13 @@ static int OnParseBorderTop( LCUI_StyleSheet ss, int key, const char *str )
 	for( i = 0; i < 3; ++i ) {
 		switch( slist[i].type ) {
 		case SVT_COLOR:
-			ss[key_border_top_color] = slist[i];
+			ss->sheet[key_border_top_color] = slist[i];
 			break;
 		case SVT_PX:
-			ss[key_border_top_width] = slist[i];
+			ss->sheet[key_border_top_width] = slist[i];
 			break;
 		case SVT_style:
-			ss[key_border_top_style] = slist[i];
+			ss->sheet[key_border_top_style] = slist[i];
 			break;
 		default: return -1;
 		}
@@ -281,13 +279,13 @@ static int OnParseBorderRight( LCUI_StyleSheet ss, int key, const char *str )
 	for( i = 0; i < 3; ++i ) {
 		switch( slist[i].type ) {
 		case SVT_COLOR:
-			ss[key_border_right_color] = slist[i];
+			ss->sheet[key_border_right_color] = slist[i];
 			break;
 		case SVT_PX:
-			ss[key_border_right_width] = slist[i];
+			ss->sheet[key_border_right_width] = slist[i];
 			break;
 		case SVT_style:
-			ss[key_border_right_style] = slist[i];
+			ss->sheet[key_border_right_style] = slist[i];
 			break;
 		default: return -1;
 		}
@@ -307,13 +305,13 @@ static int OnParseBorderBottom( LCUI_StyleSheet ss, int key, const char *str )
 	for( i = 0; i < 3; ++i ) {
 		switch( slist[i].type ) {
 		case SVT_COLOR:
-			ss[key_border_bottom_color] = slist[i];
+			ss->sheet[key_border_bottom_color] = slist[i];
 			break;
 		case SVT_PX:
-			ss[key_border_bottom_width] = slist[i];
+			ss->sheet[key_border_bottom_width] = slist[i];
 			break;
 		case SVT_style:
-			ss[key_border_bottom_style] = slist[i];
+			ss->sheet[key_border_bottom_style] = slist[i];
 			break;
 		default: return -1;
 		}
@@ -344,28 +342,28 @@ static int OnParsePadding( LCUI_StyleSheet ss, int key, const char *str )
 	value_count = SplitValues( str, s, 4, SPLIT_NUMBER );
 	switch( value_count ) {
 	case 1:
-		ss[key_padding_top] = s[0];
-		ss[key_padding_right] = s[0];
-		ss[key_padding_bottom] = s[0];
-		ss[key_padding_left] = s[0];
+		ss->sheet[key_padding_top] = s[0];
+		ss->sheet[key_padding_right] = s[0];
+		ss->sheet[key_padding_bottom] = s[0];
+		ss->sheet[key_padding_left] = s[0];
 		break;
 	case 2:
-		ss[key_padding_top] = s[0];
-		ss[key_padding_bottom] = s[0];
-		ss[key_padding_left] = s[1];
-		ss[key_padding_right] = s[1];
+		ss->sheet[key_padding_top] = s[0];
+		ss->sheet[key_padding_bottom] = s[0];
+		ss->sheet[key_padding_left] = s[1];
+		ss->sheet[key_padding_right] = s[1];
 		break;
 	case 3:
-		ss[key_padding_top] = s[0];
-		ss[key_padding_left] = s[1];
-		ss[key_padding_right] = s[1];
-		ss[key_padding_bottom] = s[2];
+		ss->sheet[key_padding_top] = s[0];
+		ss->sheet[key_padding_left] = s[1];
+		ss->sheet[key_padding_right] = s[1];
+		ss->sheet[key_padding_bottom] = s[2];
 		break;
 	case 4:
-		ss[key_padding_top] = s[0];
-		ss[key_padding_left] = s[1];
-		ss[key_padding_right] = s[2];
-		ss[key_padding_bottom] = s[3];
+		ss->sheet[key_padding_top] = s[0];
+		ss->sheet[key_padding_left] = s[1];
+		ss->sheet[key_padding_right] = s[2];
+		ss->sheet[key_padding_bottom] = s[3];
 	default: break;
 	}
 	return 0;
@@ -379,28 +377,28 @@ static int OnParseMargin( LCUI_StyleSheet ss, int key, const char *str )
 	value_count = SplitValues( str, s, 4, SPLIT_NUMBER );
 	switch( value_count ) {
 	case 1:
-		ss[key_margin_top] = s[0];
-		ss[key_margin_right] = s[0];
-		ss[key_margin_bottom] = s[0];
-		ss[key_margin_left] = s[0];
+		ss->sheet[key_margin_top] = s[0];
+		ss->sheet[key_margin_right] = s[0];
+		ss->sheet[key_margin_bottom] = s[0];
+		ss->sheet[key_margin_left] = s[0];
 		break;
 	case 2:
-		ss[key_margin_top] = s[0];
-		ss[key_margin_bottom] = s[0];
-		ss[key_margin_left] = s[1];
-		ss[key_margin_right] = s[1];
+		ss->sheet[key_margin_top] = s[0];
+		ss->sheet[key_margin_bottom] = s[0];
+		ss->sheet[key_margin_left] = s[1];
+		ss->sheet[key_margin_right] = s[1];
 		break;
 	case 3:
-		ss[key_margin_top] = s[0];
-		ss[key_margin_left] = s[1];
-		ss[key_margin_right] = s[1];
-		ss[key_margin_bottom] = s[2];
+		ss->sheet[key_margin_top] = s[0];
+		ss->sheet[key_margin_left] = s[1];
+		ss->sheet[key_margin_right] = s[1];
+		ss->sheet[key_margin_bottom] = s[2];
 		break;
 	case 4:
-		ss[key_margin_top] = s[0];
-		ss[key_margin_left] = s[1];
-		ss[key_margin_right] = s[2];
-		ss[key_margin_bottom] = s[3];
+		ss->sheet[key_margin_top] = s[0];
+		ss->sheet[key_margin_left] = s[1];
+		ss->sheet[key_margin_right] = s[2];
+		ss->sheet[key_margin_bottom] = s[3];
 	default: break;
 	}
 	return 0;
@@ -431,6 +429,10 @@ static KeyNameGroup style_name_map[] = {
 	{ key_padding_right, "padding-right" },
 	{ key_padding_top, "padding-top" },
 	{ key_padding_bottom, "padding-bottom" },
+	{ key_margin_left, "margin-left" },
+	{ key_margin_right, "margin-right" },
+	{ key_margin_top, "margin-top" },
+	{ key_margin_bottom, "margin-bottom" },
 	{ key_border_top_color, "border-top-color" },
 	{ key_border_right_color, "border-right-color" },
 	{ key_border_bottom_color, "border-bottom-color" },
@@ -686,7 +688,7 @@ int LCUICssParser_Register( LCUI_StyleParser *sp )
 	if( !sp->name || strlen(sp->name) < 1 ) {
 		return -1;
 	}
-	if( RBTree_CustomSearch(&self.name_tree, sp->name) == NULL ) {
+	if( RBTree_CustomSearch(&self.name_tree, sp->name) ) {
 		return -2;
 	}
 	key = self.count++;
@@ -694,7 +696,7 @@ int LCUICssParser_Register( LCUI_StyleParser *sp )
 	new_sp->key = sp->key;
 	new_sp->parse = sp->parse;
 	new_sp->name = strdup( sp->name );
-	RBTree_Insert( &self.name_tree, key, new_sp->name );
+	RBTree_Insert( &self.name_tree, key, new_sp );
 	RBTree_CustomInsert( &self.parser_tree, new_sp->name, new_sp );
 	return key;
 }

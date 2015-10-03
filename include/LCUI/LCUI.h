@@ -138,17 +138,21 @@ typedef enum LCUI_StyleType {
 	SVT_SCALE,		/**< 比例 */
 	SVT_PX,			/**< 像素 */
 	SVT_PT,			/**< 点 */
-	SVT_BOOLEAN,
 	SVT_COLOR,		/**< 色彩 */
-	SVT_image,
-	SVT_style
+	SVT_IMAGE,
+	SVT_STYLE,
+	SVT_VALUE,
+	SVT_STRING
 } LCUI_StyleType;
 
 #define SVT_px		SVT_PX
 #define SVT_pt		SVT_PT
+#define SVT_value	SVT_VALUE
 #define SVT_color	SVT_COLOR
 #define SVT_scale	SVT_SCALE
-#define SVT_boolean	SVT_BOOLEAN
+#define SVT_style	SVT_STYLE
+#define SVT_data	SVT_DATA
+#define SVT_string	SVT_STRING
 
 typedef struct LCUI_BoxShadow {
 	int x, y;		/**< 位置 */
@@ -234,15 +238,12 @@ typedef struct LCUI_Style {
 	LCUI_StyleType type:30;
 	union {
 		int value;
-		int value_px;
-		int value_pt;
-		int value_style;
-		float value_scale;
+		int px;
+		int pt;
+		int style;
 		float scale;
-		LCUI_BOOL value_boolean;
-		LCUI_Color value_color;
+		char *string;
 		LCUI_Color color;
-		LCUI_Graph *value_image;
 		LCUI_Graph *image;
 	};
 } LCUI_Style;

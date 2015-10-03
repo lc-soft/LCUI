@@ -103,7 +103,7 @@ void Graph_DrawBackground(
 			image_size.w = box->w * bg->size.w.scale;
 			break;
 		case SVT_PX:
-			image_size.w = bg->size.w.value_px;
+			image_size.w = bg->size.w.px;
 			break;
 		default:
 			image_size.w = bg->image.width;
@@ -114,7 +114,7 @@ void Graph_DrawBackground(
 			image_size.h = box->h * bg->size.h.scale;
 			break;
 		case SVT_PX:
-			image_size.h = bg->size.h.value_px;
+			image_size.h = bg->size.h.px;
 			break;
 		default:
 			image_size.h = bg->image.height;
@@ -169,7 +169,7 @@ void Graph_DrawBackground(
 			image_pos.x *= bg->position.x.scale;
 			break;
 		case SVT_PX:
-			image_pos.x = bg->position.x.value_px;
+			image_pos.x = bg->position.x.px;
 			break;
 		default:break;
 		}
@@ -179,7 +179,7 @@ void Graph_DrawBackground(
 			image_pos.y *= bg->position.y.scale;
 			break;
 		case SVT_PX:
-			image_pos.y = bg->position.y.value_px;
+			image_pos.y = bg->position.y.px;
 			break;
 		default:break;
 		}
