@@ -47,7 +47,8 @@ void onTimer( void *arg )
 		printf("item: %p, pos: %d,%d, size: %d,%d, visibale: %d\n", 
 			sbi, sbi->x, sbi->y, sbi->width, sbi->height, sbi->computed_style.visible );
 		LinkedList_ForEach( w, 0, &sbi->children ) {
-			printf("child: %p, size: %d,%d, visibale: %d\n", w, w->width, w->height, w->computed_style.visible );
+			printf("child: %p, pos: %d,%d, size: %d,%d, visibale: %d\n", 
+				w, w->x, w->y, w->width, w->height, w->computed_style.visible );
 		}
 	}
 	return;
@@ -72,6 +73,10 @@ root {
 	background-image: file("images/background-image.png");
 	background-position: center;
 	background-size: 75% 75%;
+}
+
+sidebar-item text {
+	font-family: Microsoft YaHei;
 }
 
 );
@@ -99,10 +104,6 @@ int main( int argc, char **argv )
 	LCUIDisplay_SetSize( 960, 540 );
 	w = LCUIWidget_New("debug-widget");
 	sidebar = LCUIWidget_New("sidebar");
-	SideBar_GetIconStyle( sidebar, &icon_style );
-	icon_style.font_id = FontLIB_LoadFontFile( "../../../fonts/glyphicons-halflings-regular.ttf" );
-	_DEBUG_MSG("font_id: %d\n", icon_style.font_id);
-	SideBar_SetIconStyle( sidebar, &icon_style );
 	SideBar_AppendItem( sidebar, L"item-dashboard", L"\xe021", L"Dashboard" );
 	SideBar_AppendItem( sidebar, L"item-settings", L"\xe019", L"Settings" );
 	Widget_Append( w, sidebar );
