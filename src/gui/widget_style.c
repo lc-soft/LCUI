@@ -128,7 +128,6 @@ static void ClearStyleSheet( LCUI_StyleSheet ss )
 	for( i=0; i<ss->length; ++i ) {
 		s = &ss->sheet[i];
 		switch( s->type ) {
-		case SVT_DATA:
 		case SVT_STRING:
 			if( s->string ) {
 				free( s->string );
