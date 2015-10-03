@@ -144,18 +144,28 @@ LCUI_API int LCUIFont_GetDefault( void );
 LCUI_API void LCUIFont_SetDefault( int id );
 
 /**
- * 添加一个字体位图数据至数据库中
- * @warning
- * 调用此函数后，作为参数fontbmp_buff的变量，不能被free掉，否则，数据库中记录
- * 的此数据会无效 
- * */
-LCUI_API LCUI_FontBitmap* LCUIFont_AddBitmap(	wchar_t char_code,
-						int font_id,
-						int pixel_size,
-						LCUI_FontBitmap *fontbmp_buff );
+ * 向字体缓存中添加字体位图
+ * @param[in] ch 字符码
+ * @param[in] font_id 使用的字体ID
+ * @param[in] size 字体大小（单位为像素）
+ * @param[out] bmp 要添加的字体位图
+ * @warning 此函数仅仅是将 bmp 复制进缓存中，并未重新分配新的空间储存位图数
+ * 据，因此，请勿在调用此函数后手动释放 bmp。
+ */
+LCUI_API LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
+				int size, const LCUI_FontBitmap *bmp );
 
-/** 获取库中的字体位图 */
-LCUI_API LCUI_FontBitmap* LCUIFont_GetBitmap( wchar_t ch, int font_id, int pixel_size );
+/**
+ * 从缓存中获取字体位图
+ * @param[in] ch 字符码
+ * @param[in] font_id 使用的字体ID
+ * @param[in] size 字体大小（单位为像素）
+ * @param[out] bmp 输出的字体位图的引用
+ * @warning 请勿释放 bmp，bmp 仅仅是引用缓存中的字体位图，并未建分配新
+ * 空间存储字体位图的拷贝。
+ */
+LCUI_API int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
+				 const LCUI_FontBitmap **bmp );
 
 /** 载入字体值数据库中 */
 LCUI_API int LCUIFont_LoadFile( const char *filepath );

@@ -305,24 +305,31 @@ static void TextRow_LeftMove( TextRowData *p_row, int n )
 }
 
 /** 更新字体位图 */
-static void 
-TextChar_UpdateBitmap( TextCharData *ch, LCUI_TextStyle *style )
+static void TextChar_UpdateBitmap( TextCharData *ch, LCUI_TextStyle *style )
 {
-	int pixel_size, font_id;
+	int	i = 0, font_id = -1, 
+		*font_ids = style->font_ids, 
+		size = style->pixel_size;
 
-	font_id = style->font_id;
-	pixel_size = style->pixel_size;
 	if( ch->style ) {
 		if( ch->style->has_family ) {
-			font_id = ch->style->font_id;
+			font_ids = ch->style->font_ids;
 		}
 		if( ch->style->has_pixel_size ) {
-			pixel_size = ch->style->pixel_size;
+			size = ch->style->pixel_size;
 		}
 	}
-	ch->bitmap = LCUIFont_GetBitmap( ch->char_code, font_id, pixel_size );
-	//printf("char_code: %c, pixel_size: %d, font_id: %d, bitmap: %p\n", 
-	//ch->char_code, style->pixel_size, style->font_id, ch->bitmap);
+	if( !style->font_ids ) {
+		LCUIFont_GetBitmap( ch->char_code, -1, size, &ch->bitmap );
+		return;
+	}
+	while( style->font_ids[i] >= 0 ) {
+		if( 0 == LCUIFont_GetBitmap(ch->char_code, 
+			style->font_ids[i], size, &ch->bitmap) ) {
+			break;
+		}
+		++i;
+	}
 }
 
 /** 新建文本图层 */
@@ -347,7 +354,7 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->row_list.length = 0;
 	layer->row_list.rows = NULL;
 	layer->line_height.type = SVT_SCALE;
-	layer->line_height.scale = 1.428;
+	layer->line_height.scale = 1.428f;
 	LinkedList_Init( &layer->style_cache, sizeof(LCUI_TextStyle) );
 	TextStyle_Init( &layer->text_style );
 	TaskData_Init( &layer->task );

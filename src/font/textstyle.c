@@ -40,6 +40,12 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
 
+#define case_in_blank_char	\
+	case '\t':		\
+	case ' ':		\
+	case '\n':		\
+	case '\r'
+
 enum LCUI_StyleTagID {
 	TAG_ID_FAMILY,
 	TAG_ID_STYLE,
@@ -63,13 +69,92 @@ void TextStyle_Init( LCUI_TextStyle *data )
 	data->has_family = FALSE;
 	data->has_back_color = FALSE;
 	data->has_fore_color = FALSE;
-	data->font_id = LCUIFont_GetDefault();
+	data->font_ids = NULL;
 	data->style = FONT_STYLE_NORMAL;
 	data->weight = FONT_WEIGHT_NORMAL;
 	data->decoration = FONT_DECORATION_NONE;
 	data->fore_color.value = 0x33333333;
 	data->back_color.value = 0xffffffff;
 	data->pixel_size = 13;
+}
+
+static void trim( char *outstr, const char *instr )
+{
+	char *op = outstr;
+	const char *ip = instr;
+
+	while( *ip++ ) {
+		switch( *ip ) {
+		case_in_blank_char:
+			continue;
+		default:
+			*op = *ip;
+			++op;
+		}
+	}
+	*op = 0;
+	while( --op >= outstr ) {
+		switch( *ip ) {
+		case_in_blank_char:
+			break;
+		default:
+			op = outstr;
+			continue;
+		}
+		*op = 0;
+	}
+}
+
+/**
+ * 设置字体
+ * @param[in][out] ts 字体样式数据
+ * @param[in] str 字体名称，如果有多个名称则用逗号分隔
+ */
+int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
+{
+	char name[256];
+	const char *p, *style_name;
+	int count, i, *ids;
+	
+	if( ts->has_family && ts->font_ids ) {
+		free( ts->font_ids );
+	}
+	ts->font_ids = NULL;
+	for( p = str, count = 1; *p; ++p ) {
+		if( *p == ',' ) {
+			++count;
+		}
+	}
+	if( p - str == 0 ) {
+		return -1;
+	}
+	ids = (int*)malloc(sizeof(int)*(count+1));
+	if( !ids ) {
+		return -2;
+	}
+	ids[count] = -1;
+	switch( ts->style ) {
+	case FONT_STYLE_OBLIQUE: style_name = "oblique"; break;
+	case FONT_STYLE_ITALIC: style_name = "italic"; break;
+	case FONT_STYLE_NORMAL:
+	default: style_name = "regular"; break;
+	}
+	for( p = str, count = 0, i = 0; *p; ++p ) {
+		if( *p != ',' ) {
+			name[i++] = *p;
+			continue;
+		}
+		name[i] = 0;
+		trim( name, name );
+		ids[count] = LCUIFont_GetId( name, style_name );
+		if( ids[count] > 0 ) {
+			++count;
+		}
+		i = 0;
+	}
+	ts->has_family = TRUE;
+	ts->font_ids = ids;
+	return 0;
 }
 
 /*-------------------------- StyleTag --------------------------------*/
@@ -122,7 +207,7 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 				break;
 			}
 			style_data->has_pixel_size = TRUE;
-			style_data->pixel_size = tag_data->style.value_px;
+			style_data->pixel_size = tag_data->style.px;
 			flags[1] = 1;
 			++equal;
 			break;

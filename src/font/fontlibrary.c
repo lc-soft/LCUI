@@ -262,8 +262,17 @@ void LCUIFont_SetDefault( int id )
 	}
 }
 
+/**
+ * 向字体缓存中添加字体位图
+ * @param[in] ch 字符码
+ * @param[in] font_id 使用的字体ID
+ * @param[in] size 字体大小（单位为像素）
+ * @param[out] bmp 要添加的字体位图
+ * @warning 此函数仅仅是将 bmp 复制进缓存中，并未重新分配新的空间储存位图数
+ * 据，因此，请勿在调用此函数后手动释放 bmp。
+ */
 LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
-				     int pixel_size, LCUI_FontBitmap *bmp )
+				     int size, const LCUI_FontBitmap *bmp )
 {
 	LCUI_FontBitmap *bmp_cache;
 	LCUI_RBTree *tree_font, *tree_bmp;
@@ -300,27 +309,40 @@ LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 		RBTree_Insert( tree_font, font_id, tree_bmp );
 	}
 	/* 在字体位图库中获取指定像素大小的字体位图 */
-	bmp_cache = SelectBitmap( tree_bmp, pixel_size );
+	bmp_cache = SelectBitmap( tree_bmp, size );
 	if( !bmp_cache ) {
 		bmp_cache = MALLOC(LCUI_FontBitmap, 1);
 		if( !bmp_cache ) {
 			return NULL;
 		}
-		RBTree_Insert( tree_bmp, pixel_size, bmp_cache );
+		RBTree_Insert( tree_bmp, size, bmp_cache );
 	}
 	/* 拷贝数据至该空间内 */
 	memcpy( bmp_cache, bmp, sizeof(LCUI_FontBitmap) );
 	return bmp_cache;
 }
 
-LCUI_FontBitmap* LCUIFont_GetBitmap( wchar_t ch, int font_id, int pixel_size )
+/**
+ * 从缓存中获取字体位图
+ * @param[in] ch 字符码
+ * @param[in] font_id 使用的字体ID
+ * @param[in] size 字体大小（单位为像素）
+ * @param[out] bmp 输出的字体位图的引用
+ * @warning 请勿释放 bmp，bmp 仅仅是引用缓存中的字体位图，并未建分配新
+ * 空间存储字体位图的拷贝。
+ */
+int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
+			const LCUI_FontBitmap **bmp )
 {
+	int ret;
 	LCUI_RBTree *ctx;
-	LCUI_FontBitmap *bmp, bmp_cache;
+	LCUI_FontBitmap bmp_cache;
 
+	/* 这里的 while 只是为了减少缩进 */
 	while( TRUE ) {
 		if( !fontlib.is_inited ) {
-			return NULL;
+			*bmp = NULL;
+			return -2;
 		}
 		if( !(ctx = SelectChar(ch)) ) {
 			break;
@@ -328,19 +350,23 @@ LCUI_FontBitmap* LCUIFont_GetBitmap( wchar_t ch, int font_id, int pixel_size )
 		if( font_id <= 0 ) {
 			font_id = fontlib.incore_font->id;
 		}
-		if( !(ctx = SelectFont(ctx, font_id)) ) {
+		ctx = SelectFont( ctx, font_id );
+		if( !ctx ) {
 			break;
 		}
-		if( (bmp = SelectBitmap(ctx, pixel_size)) != NULL ) {
-			return bmp;
+		*bmp = SelectBitmap( ctx, size );
+		if( *bmp ) {
+			return 0;
 		}
 		break;
 	}
 	FontBitmap_Init( &bmp_cache );
-	FontBitmap_Load( &bmp_cache, ch, font_id, pixel_size );
-	bmp = LCUIFont_AddBitmap( ch, font_id, pixel_size, &bmp_cache );
-	FontBitmap_Free( &bmp_cache );
-	return bmp;
+	ret = FontBitmap_Load( &bmp_cache, ch, font_id, size );
+	*bmp = LCUIFont_AddBitmap( ch, font_id, size, &bmp_cache );
+	if( *bmp && ret == 0 ) {
+		return 0;
+	}
+	return -1;
 }
 
 /** 载入字体值数据库中 */

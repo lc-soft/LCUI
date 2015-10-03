@@ -45,22 +45,22 @@ LCUI_BEGIN_HEADER
 /** 下面三种字体样式虽然有定义，但还未添加能够实现该字体样式效果的功能 */
 
 enum FontStyle {
-	FONT_STYLE_NORMAL = 0,
-	FONT_STYLE_ITALIC = 1,
-	FONT_STYLE_OBIQUE = 2
+	FONT_STYLE_NORMAL,
+	FONT_STYLE_ITALIC,
+	FONT_STYLE_OBLIQUE
 };
 
 enum FontWeight {
-	FONT_WEIGHT_NORMAL	= 0,
-	FONT_WEIGHT_BOLD	= 1
+	FONT_WEIGHT_NORMAL,
+	FONT_WEIGHT_BOLD
 };
 
 enum FontDecoration {
-	FONT_DECORATION_NONE		= 0,	/* 无装饰 */
-	FONT_DECORATION_BLINK		= 1,	/* 闪烁 */
-	FONT_DECORATION_UNDERLINE	= 2,	/* 下划线 */
-	FONT_DECORATION_LINE_THROUGH	= 3,	/* 贯穿线 */
-	FONT_DECORATION_OVERLINE	= 4	/* 上划线 */
+	FONT_DECORATION_NONE,		/* 无装饰 */
+	FONT_DECORATION_BLINK,		/* 闪烁 */
+	FONT_DECORATION_UNDERLINE,	/* 下划线 */
+	FONT_DECORATION_LINE_THROUGH,	/* 贯穿线 */
+	FONT_DECORATION_OVERLINE	/* 上划线 */
 };
 
 typedef struct LCUI_TextStyle {
@@ -72,7 +72,7 @@ typedef struct LCUI_TextStyle {
 	LCUI_BOOL has_fore_color:1;
 	LCUI_BOOL has_pixel_size:1;
 
-	int font_id;
+	int *font_ids;
 	int style:3;
 	int weight:3;
 	int decoration:4;
@@ -83,8 +83,15 @@ typedef struct LCUI_TextStyle {
 	int pixel_size;
 } LCUI_TextStyle;
 
-/* 初始化字体样式数据 */
+/** 初始化字体样式数据 */
 LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );
+
+/**
+ * 设置字体
+ * @param[in][out] ts 字体样式数据
+ * @param[in] str 字体名称，如果有多个名称则用逗号分隔
+ */
+LCUI_API int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str );
 
 /*-------------------------- StyleTag --------------------------------*/
 #define MAX_TAG_NUM 2
