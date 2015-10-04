@@ -74,6 +74,12 @@ LCUI_API LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector );
 /** 向样式库添加样式表 */
 LCUI_API int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss );
 
+/** 打印样式表的内容 */
+LCUI_API void LCUI_PrintStyleSheet( LCUI_StyleSheet ss );
+
+/** 打印选择器的内容 */
+LCUI_API void LCUI_PrintSelector( LCUI_Selector selector );
+
 /** 打印样式库中的内容 */
 LCUI_API void LCUI_PrintStyleLibrary(void);
 

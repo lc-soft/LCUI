@@ -138,6 +138,7 @@ static void ClearStyleSheet( LCUI_StyleSheet ss )
 		s->is_valid = FALSE;
 	}
 }
+
 /** 删除样式表 */
 void DeleteStyleSheet( LCUI_StyleSheet *ss )
 {
@@ -181,6 +182,7 @@ int MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 			continue;
 		}
 		dest->sheet[i] = src->sheet[i];
+		dest->sheet[i].is_changed = TRUE;
 		if( src->sheet[i].type != SVT_STRING 
 		 || !src->sheet[i].string ) {
 			++count;
@@ -218,6 +220,7 @@ int ReplaceStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 			dest->sheet[i].string = NULL;
 		}
 		dest->sheet[i] = src->sheet[i];
+		dest->sheet[i].is_changed = TRUE;
 		if( src->sheet[i].type != SVT_STRING 
 		 || !src->sheet[i].string ) {
 			++count;
@@ -532,7 +535,7 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 			n = ptrslen( w->classes );
 			for( i = 0; i < n; ++i ) {
 				if( strcmp(w->classes[i],
-					(*sn_ptr)->class_name) == 0 ) {
+				 (*sn_ptr)->class_name) == 0 ) {
 					break;
 				}
 			}
@@ -569,7 +572,7 @@ static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 	LinkedList *styles;
 	LCUI_Widget w, wlist[MAX_SELECTOR_DEPTH];
 	int n, count = 0;
-
+	
 	node = RBTree_CustomSearch( &style_library.style, (const void*)name );
 	if( !node ) {
 		return 0;
@@ -603,7 +606,7 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 {
 	int i, count = 0;
 	char fullname[MAX_NAME_LEN];
-
+	
 	i = ptrslen( w->classes );
 	/* 记录类选择器匹配的样式表 */
 	while( --i >= 0 ) {
@@ -621,7 +624,7 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 	/* 记录ID选择器匹配的样式表 */
 	if( w->id ) {
 		fullname[0] = '#';
-		strncpy( fullname + 1, w->id, MAX_NAME_LEN - 1 );
+		strncpy( fullname + 1, w->id, MAX_NAME_LEN-1 );
 		count += FindStyleNodeByName( fullname, w, list );
 	}
 	/* 记录名称选择器匹配的样式表 */
@@ -633,7 +636,8 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 	return count;
 }
 
-static void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
+/** 打印样式表的内容 */
+void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 {
 	int key;
 	const char *name;
@@ -642,7 +646,12 @@ static void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 			continue;
 		}
 		name = GetStyleName(key);
-		printf( "\t\t%s%s: ", name, key > STYLE_KEY_TOTAL ? " (+)":"");
+		if( name ) {
+			printf( "\t\t%s", name );
+		} else {
+			printf( "\t\t<unknown style %d>", key);
+		}
+		printf( "%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "" );
 		switch( ss->sheet[key].type ) {
 		case SVT_AUTO: 
 			printf( "auto\n");
@@ -678,14 +687,40 @@ static void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 	}
 }
 
+/** 打印选择器的内容 */
+void LCUI_PrintSelector( LCUI_Selector selector )
+{
+	char path[256];
+	LCUI_SelectorNode *sn;
+
+	path[0] = 0;
+	for( sn = selector; *sn; ++sn ) {
+		if( (*sn)->id ) {
+			strcat( path, "#" );
+			strcat( path, (*sn)->id );
+		}
+		if( (*sn)->type ) {
+			strcat( path, (*sn)->type );
+		}
+		if( (*sn)->class_name ) {
+			strcat( path, "." );
+			strcat( path, (*sn)->class_name );
+		}
+		if( (*sn)->pseudo_class_name ) {
+			strcat( path, ":" );
+			strcat( path, (*sn)->pseudo_class_name );
+		}
+		strcat( path, " " );
+	}
+	printf("\tpath: %s\n", path);
+}
+
 /** 打印样式库中的内容 */
 void LCUI_PrintStyleLibrary(void)
 {
 	LCUI_RBTreeNode *node;
 	StyleTreeNode *stn;
 	StyleListNode *sln;
-	LCUI_SelectorNode *sn;
-	char path[256];
 	
 	printf("style library begin\n");
 	node = RBTree_First( &style_library.style );
@@ -693,26 +728,7 @@ void LCUI_PrintStyleLibrary(void)
 		stn = (StyleTreeNode*)node->data;
 		printf("target: %s\n", stn->name);
 		LinkedList_ForEach( sln, 0, &stn->styles ) {
-			path[0] = 0;
-			for( sn = sln->selector; *sn; ++sn ) {
-				if( (*sn)->id ) {
-					strcat( path, "#" );
-					strcat( path, (*sn)->id );
-				}
-				if( (*sn)->type ) {
-					strcat( path, (*sn)->type );
-				}
-				if( (*sn)->class_name ) {
-					strcat( path, "." );
-					strcat( path, (*sn)->class_name );
-				}
-				if( (*sn)->pseudo_class_name ) {
-					strcat( path, ":" );
-					strcat( path, (*sn)->pseudo_class_name );
-				}
-				strcat( path, " " );
-			}
-			printf("\tpath: %s\n", path);
+			LCUI_PrintSelector( sln->selector );
 			LCUI_PrintStyleSheet( sln->style );
 		}
 		node = RBTree_Next( node );
@@ -742,6 +758,7 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
 	int i, key;
 	LCUI_WidgetClass *wc;
+	LCUI_BOOL need_update_expend_style;
 	LCUI_Style *s;
 	typedef struct {
 		int start, end, task;
@@ -756,7 +773,6 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 		{ key_background_start, key_background_end, WTT_BACKGROUND, TRUE },
 		{ key_box_shadow_start, key_box_shadow_end, WTT_SHADOW, TRUE }
 	};
-
 	if( is_update_all ) {
 		Widget_ComputeInheritStyle( w, w->inherited_style );
 	}
@@ -764,11 +780,8 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 	MergeStyleSheet( w->style, w->custom_style );
 	MergeStyleSheet( w->style, w->inherited_style );
 	/* 对比两张样式表，确定哪些需要更新 */
-	for( key = 0; key < STYLE_KEY_TOTAL; ++key ) {
+	for( key = 0; key < w->style->length; ++key ) {
 		s = &w->style->sheet[key];
-		if( key_visible == key ) {
-			_DEBUG_MSG("tip\n");
-		}
 		/* 忽略值没有变化的样式 */
 		if( !s->is_valid ) {
 			if( !w->cached_style->sheet[key].is_valid ) {
@@ -782,6 +795,10 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 			}
 		}
 		s->is_changed = FALSE;
+		if( key >= STYLE_KEY_TOTAL ) {
+			need_update_expend_style = TRUE;
+			continue;
+		}
 		for( i = 0; i < sizeof(task_map) / sizeof(TaskMap); ++i ) {
 			if( key >= task_map[i].start && key <= task_map[i].end ) {
 				if( !task_map[i].is_valid ) {
@@ -792,7 +809,9 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 			}
 		}
 	}
-	/* 扩展部分的样式交给该部件自己处理 */
-	wc = LCUIWidget_GetClass( w->type );
-	wc && wc->methods.update ? wc->methods.update(w):0;
+	if( need_update_expend_style ) {
+		/* 扩展部分的样式交给该部件自己处理 */
+		wc = LCUIWidget_GetClass( w->type );
+		wc && wc->methods.update ? wc->methods.update( w ) : 0;
+	}
 }
