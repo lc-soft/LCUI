@@ -85,7 +85,7 @@ static int style_key_map[TOTAL_FONT_STYLE_KEY];
 
 static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style *s = &ss->sheet[key];
+	LCUI_Style *s = &ss->sheet[style_key_map[key]];
 	if( ParseColor( s, str ) ) {
 		return 0;
 	}
@@ -94,7 +94,7 @@ static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseFontSize( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style *s = &ss->sheet[key];
+	LCUI_Style *s = &ss->sheet[style_key_map[key]];
 	if( ParseNumber( s, str ) ) {
 		return 0;
 	}
@@ -136,36 +136,38 @@ static LCUI_StyleParser style_parsers[] = {
 
 static void TextView_UpdateStyle( LCUI_Widget w )
 {
-	int i, key;
+	int i;
+	LCUI_Style *s;
 	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
 
+	TextStyle_Init( &txt->style );
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
-		key = style_key_map[i];
-		if( key < 0 ) {
+		if( style_key_map[i] < 0 ) {
 			continue;
 		}
-		if( !w->style->sheet[key].is_changed ) {
+		s = &w->style->sheet[style_key_map[i]];
+		if( !s->is_valid ) {
 			continue;
 		}
-		switch( key ) {
+		switch( i ) {
 		case key_color:
-			txt->style.fore_color = w->style->sheet[key].color;
+			txt->style.fore_color = s->color;
+			txt->style.has_fore_color = TRUE;
 			break;
 		case key_font_family:
-			_DEBUG_MSG("font_family: %s\n", w->style->sheet[key].string);
-			TextStyle_SetFont( &txt->style, w->style->sheet[key].string );
+			TextStyle_SetFont( &txt->style, s->string );
 			break;
 		case key_font_size:
-			if( w->style->sheet[key].type == SVT_PX ) {
-				txt->style.pixel_size = w->style->sheet[key].px;
-			} else if( w->style->sheet[key].type == SVT_PT ) {
+			if( s->type == SVT_PX ) {
+				txt->style.pixel_size = s->px;
+			} else if( s->type == SVT_PT ) {
 				// ...
-			} else {
-				txt->style.pixel_size = 13;
 			}
+			txt->style.has_pixel_size = TRUE;
 			break;
 		case key_font_style:
-			txt->style.style = w->style->sheet[key].value;
+			txt->style.style = s->value;
+			txt->style.has_style = TRUE;
 			break;
 		case key_font_weight:
 			// ...
@@ -173,6 +175,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 			break;
 		}
 	}
+	TextLayer_SetTextStyle( txt->layer, &txt->style );
 }
 
 static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
