@@ -34,7 +34,6 @@ void onTimer( void *arg )
 {
 	LCUI_Widget w, sbi, sb = (LCUI_Widget)arg;
 	static int x = 0, y = 0, vx = 1, vy = 1;
-	char str[64];
 	vx = x > 320 ? -1:vx;
 	vx = x < 0 ? 1:vx;
 	vy = y > 240 ? -1:vy;
@@ -75,8 +74,13 @@ root {
 	background-size: 75% 75%;
 }
 
-sidebar-item text {
+sidebar-item .text {
 	font-family: Microsoft YaHei;
+}
+
+sidebar-item .icon {
+	color: rgb(132,240,109);
+	font-family: GLYPHICONS Halflings;
 }
 
 );
@@ -104,6 +108,7 @@ int main( int argc, char **argv )
 	LCUIDisplay_SetSize( 960, 540 );
 	w = LCUIWidget_New("debug-widget");
 	sidebar = LCUIWidget_New("sidebar");
+	LCUIFont_LoadFile("../../../fonts/glyphicons-halflings-regular.ttf");
 	SideBar_AppendItem( sidebar, L"item-dashboard", L"\xe021", L"Dashboard" );
 	SideBar_AppendItem( sidebar, L"item-settings", L"\xe019", L"Settings" );
 	Widget_Append( w, sidebar );
