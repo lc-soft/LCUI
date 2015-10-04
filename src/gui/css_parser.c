@@ -71,11 +71,7 @@ static int ParseStyleOption( const char *str )
 
 const char *GetStyleName( int key )
 {
-	KeyNameGroup *data = RBTree_GetData( &self.name_tree, key );
-	if( data ) {
-		return data->name;
-	}
-	return NULL;
+	return RBTree_GetData( &self.name_tree, key );
 }
 
 static int SplitValues( const char *str, LCUI_Style *slist, 
@@ -696,7 +692,7 @@ int LCUICssParser_Register( LCUI_StyleParser *sp )
 	new_sp->key = sp->key;
 	new_sp->parse = sp->parse;
 	new_sp->name = strdup( sp->name );
-	RBTree_Insert( &self.name_tree, key, new_sp );
+	RBTree_Insert( &self.name_tree, key, new_sp->name );
 	RBTree_CustomInsert( &self.parser_tree, new_sp->name, new_sp );
 	return key;
 }
@@ -707,7 +703,7 @@ void LCUICssParser_Init(void)
 	LCUI_StyleParser *new_sp, *sp, *sp_end;
 	KeyNameGroup *skn, *skn_end;
 
-	/* 构建一个红黑树树，方便按名称查找解析器 */
+	/* 构建一个红黑树，方便按名称查找解析器 */
 	RBTree_Init( &self.parser_tree );
 	RBTree_Init( &self.option_tree );
 	RBTree_Init( &self.name_tree );
@@ -719,7 +715,7 @@ void LCUICssParser_Init(void)
 	skn = style_name_map;
 	skn_end = skn + sizeof(style_name_map)/sizeof(KeyNameGroup);
 	for( ; skn < skn_end; ++skn ) {
-		RBTree_Insert( &self.name_tree, skn->key, skn );
+		RBTree_Insert( &self.name_tree, skn->key, skn->name );
 	}
 	sp = style_parser_map;
 	sp_end = sp + sizeof(style_parser_map)/sizeof(LCUI_StyleParser);

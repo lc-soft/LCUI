@@ -89,6 +89,10 @@ static struct LCUI_FontLibraryContext {
 #define SelectFontCache(id) \
 	fontlib.font_cache[fontlib.font_cache_num-1][id % FONT_CACHE_SIZE]
 
+#ifdef LCUI_BUILD_IN_LINUX
+#define stricmp strcasecmp 
+#endif
+
 static int OnComparePath( void *data, const void *keydata )
 {
 	return strcmp(((LCUI_FontPathNode*)data)->path, keydata);
@@ -227,11 +231,11 @@ int LCUIFont_GetId( const char *family_name, const char *style_name )
 	}
 	LinkedList_ForEach( font, 0, &node->styles ) {
 		if( style_name ) {
-			if( strcmp( font->style_name, style_name ) ) {
+			if( stricmp( font->style_name, style_name ) ) {
 				continue;
 			}
 		} else {
-			if( strcmp( font->style_name, "regular" ) ) {
+			if( stricmp( font->style_name, "regular" ) ) {
 				continue;
 			}
 		}

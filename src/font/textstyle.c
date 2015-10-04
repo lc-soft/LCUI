@@ -80,29 +80,35 @@ void TextStyle_Init( LCUI_TextStyle *data )
 
 static void trim( char *outstr, const char *instr )
 {
-	char *op = outstr;
+	char *op = outstr, *last_blank = NULL;
+	LCUI_BOOL clear_left = 1;
 	const char *ip = instr;
 
-	while( *ip++ ) {
+	for( ; *ip; ip++ ) {
 		switch( *ip ) {
 		case_in_blank_char:
+			if( !clear_left ) {	
+				*op = *ip;
+				if( !last_blank ) {
+					last_blank = op;
+				}
+				++op;
+			}
 			continue;
 		default:
+			if( clear_left ) {
+				clear_left = FALSE;
+			}
+			last_blank = NULL;
 			*op = *ip;
 			++op;
+			break;
 		}
+	}
+	if( last_blank ) {
+		*last_blank = 0;
 	}
 	*op = 0;
-	while( --op >= outstr ) {
-		switch( *ip ) {
-		case_in_blank_char:
-			break;
-		default:
-			op = outstr;
-			continue;
-		}
-		*op = 0;
-	}
 }
 
 /**
@@ -139,8 +145,8 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 	case FONT_STYLE_NORMAL:
 	default: style_name = "regular"; break;
 	}
-	for( p = str, count = 0, i = 0; *p; ++p ) {
-		if( *p != ',' ) {
+	for( p = str, count = 0, i = 0; ; ++p ) {
+		if( *p != ',' && *p ) {
 			name[i++] = *p;
 			continue;
 		}
@@ -151,6 +157,9 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 			++count;
 		}
 		i = 0;
+		if( !*p ) {
+			break;
+		}
 	}
 	ts->has_family = TRUE;
 	ts->font_ids = ids;
