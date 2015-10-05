@@ -42,10 +42,6 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API void SideBar_SetIconStyle( LCUI_Widget sidebar, LCUI_TextStyle *ts );
-
-LCUI_API void SideBar_GetIconStyle( LCUI_Widget sidebar, LCUI_TextStyle *ts );
-
 LCUI_API LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id, 
 				const wchar_t *icon, const wchar_t *text );
 

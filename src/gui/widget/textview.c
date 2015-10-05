@@ -72,6 +72,8 @@ enum FontStyleKey {
 	key_font_style,
 	key_font_weight,
 	key_font_family,
+	key_line_height,
+	key_text_align,
 	TOTAL_FONT_STYLE_KEY
 };
 
@@ -114,8 +116,7 @@ static int OnParseFontFamily( LCUI_StyleSheet ss, int key, const char *str )
 static int OnParseFontStyle( LCUI_StyleSheet ss, int key, const char *str )
 {
 	if( strcmp(str, "normal") == 0 ) {
-		ss->sheet[style_key_map[key]].type = SVT_VALUE;
-		ss->sheet[style_key_map[key]].value = 0;
+		SetStyle( ss, style_key_map[key], 0, value );
 		return 0;
 	}
 	return -1;
@@ -126,12 +127,37 @@ static int OnParseFontWeight( LCUI_StyleSheet ss, int key, const char *str )
 	return -1;
 }
 
+static int OnParseTextAlign( LCUI_StyleSheet ss, int key, const char *str )
+{
+	int val = ParseStyleOption( str );
+	if( val < 0 ) {
+		return -1;
+	}
+	SetStyle( ss, style_key_map[key], val, style );
+	return 0;
+}
+
+static int OnParseLineHeight( LCUI_StyleSheet ss, int key, const char *str )
+{
+	LCUI_Style sv;
+	if( !ParseNumber(&sv, str) ) {
+		return -1;
+	}
+	if( sv.type == SVT_PX || sv.type == SVT_SCALE ) {
+		ss->sheet[style_key_map[key]] = sv;
+		return 0;
+	}
+	return -1;
+}
+
 static LCUI_StyleParser style_parsers[] = { 
 	{ key_color, "color", OnParseColor },
 	{ key_font_family, "font-family", OnParseFontFamily },
 	{ key_font_size, "font-size", OnParseFontSize },
 	{ key_font_style, "font-style", OnParseFontStyle },
 	{ key_font_weight, "font-weight", OnParseFontWeight },
+	{ key_text_align, "text-align", OnParseTextAlign },
+	{ key_line_height, "line-height", OnParseLineHeight },
 };
 
 static void TextView_UpdateStyle( LCUI_Widget w )
@@ -170,12 +196,21 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 			txt->style.has_style = TRUE;
 			break;
 		case key_font_weight:
-			// ...
+			break;
+		case key_text_align:
+			TextLayer_SetTextAlign( txt->layer, s->style );
+			break;
+		case key_line_height:
+			TextLayer_SetLineHeight( txt->layer, s );
+			break;
 		default:
 			break;
 		}
 	}
 	TextLayer_SetTextStyle( txt->layer, &txt->style );
+	txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
+	
 }
 
 static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
@@ -238,31 +273,12 @@ static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )
 	DEBUG_MSG("width: %d, height: %d\n", *width, *height);
 }
 
-static void TextView_OnUpdate( LCUI_Widget w )
-{
-	LCUI_TextView *txt;
-	LCUI_Rect *p_rect;
-	LinkedList rects;
-
-	txt = (LCUI_TextView*)w->private_data;
-	DirtyRectList_Init( &rects );
-	TextLayer_Update( txt->layer, &rects );
-	LinkedList_ForEach( p_rect, 0, &rects ) {
-		Widget_InvalidateArea( w, p_rect, SV_CONTENT_BOX );
-	}
-	DirtyRectList_Destroy( &rects );
-	TextLayer_ClearInvalidRect( txt->layer );
-	if( w->computed_style.w.type == SVT_AUTO
-	 || w->computed_style.h.type == SVT_AUTO ) {
-		Widget_AddTask( w, WTT_RESIZE );
-	}
-}
-
 /** 私有的任务处理接口 */
 static void TextView_OnTask( LCUI_Widget w )
 {
 	int i;
 	LinkedList rects;
+	LCUI_Rect *p_rect;
 	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
 
 	DirtyRectList_Init( &rects );
@@ -279,9 +295,21 @@ static void TextView_OnTask( LCUI_Widget w )
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_UPDATE;
-	if( txt->tasks[i].is_valid ) {
-		txt->tasks[i].is_valid = FALSE;
-		TextView_OnUpdate( w );
+	if( !txt->tasks[i].is_valid ) {
+		return;
+	}
+	txt->tasks[i].is_valid = FALSE;
+	txt = (LCUI_TextView*)w->private_data;
+	DirtyRectList_Init( &rects );
+	TextLayer_Update( txt->layer, &rects );
+	LinkedList_ForEach( p_rect, 0, &rects ) {
+		Widget_InvalidateArea( w, p_rect, SV_CONTENT_BOX );
+	}
+	DirtyRectList_Destroy( &rects );
+	TextLayer_ClearInvalidRect( txt->layer );
+	if( w->computed_style.w.type == SVT_AUTO
+	 || w->computed_style.h.type == SVT_AUTO ) {
+		Widget_AddTask( w, WTT_RESIZE );
 	}
 }
 
@@ -291,6 +319,7 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_TextView *txt;
 	LCUI_Rect content_rect, rect;
 	LCUI_Pos layer_pos;
+	char filename[256];
 
 	txt = (LCUI_TextView*)w->private_data;
 	content_rect.x = w->box.content.left - w->box.graph.left;
@@ -302,7 +331,11 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	rect.y -= content_rect.y;
 	layer_pos.x = -rect.x;
 	layer_pos.y = -rect.y;
+	sprintf(filename, "textview-0x%08x-before.png", w);
+	Graph_WritePNG(filename, &paint->canvas);
 	TextLayer_DrawToGraph( txt->layer, rect, layer_pos, &paint->canvas );
+	sprintf(filename, "textview-0x%08x-after.png", w);
+	Graph_WritePNG(filename, &paint->canvas);
 }
 
 /*-------------------------- End Private -----------------------------*/

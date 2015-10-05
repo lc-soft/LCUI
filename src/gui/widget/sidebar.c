@@ -52,7 +52,6 @@ typedef struct {
 
 typedef struct {
 	LinkedList items;
-	LCUI_TextStyle icon_style;
 	LCUI_Style line_height;
 } SideBar;
 
@@ -65,8 +64,7 @@ sidebar {
 
 sidebar sidebar-item {
 	width: 100%;
-	height: 38px;
-	padding: 0 16px 0 7px;
+	padding: 12px 16px 12px 7px;
 	border-top: 1px solid #f3f3f3;
 }
 
@@ -76,6 +74,7 @@ sidebar sidebar-item .text {
 
 sidebar sidebar-item .icon {
 	width: 30px;
+	text-align: center;
 	display: inline-block;
 }
 
@@ -84,27 +83,6 @@ sidebar sidebar-item:hover {
 }
 
 );
-
-void SideBar_SetIconStyle( LCUI_Widget sidebar, LCUI_TextStyle *ts )
-{
-	SideBarItem *item;
-	SideBar *sb = (SideBar*)sidebar->private_data;
-	sb->icon_style = *ts;
-	LinkedList_ForEach( item, 0, &sb->items ) {
-		TextView_SetTextStyle( item->icon, &sb->icon_style );
-	}
-}
-
-void SideBar_SetLineHeight( LCUI_Widget sidebar, LCUI_Style *val )
-{
-	SideBar *sb = (SideBar*)sidebar->private_data;
-}
-
-void SideBar_GetIconStyle( LCUI_Widget sidebar, LCUI_TextStyle *ts )
-{
-	SideBar *sb = (SideBar*)sidebar->private_data;
-	*ts = sb->icon_style;
-}
 
 LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id, 
 				const wchar_t *icon, const wchar_t *text )
@@ -123,7 +101,6 @@ LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id,
 	sbi->id ? free( sbi->id ) : 0;
 	sbi->id = new_id;
 	Widget_Append( sidebar, w );
-	TextView_SetTextStyle( sbi->icon, &sb->icon_style );
 	TextView_SetTextW( sbi->icon, icon );
 	TextView_SetTextW( sbi->text, text );
 	Widget_Show( w );
@@ -154,11 +131,6 @@ void SideBar_OnInit( LCUI_Widget w )
 {
 	SideBar *sb = Widget_NewPrivateData( w, SideBar );
 	LinkedList_Init( &sb->items, sizeof(SideBarItem) );
-	memset( &sb->icon_style, 0, sizeof(LCUI_TextStyle) );
-	sb->icon_style.has_family = TRUE;
-	sb->icon_style.has_fore_color = TRUE;
-	sb->icon_style.fore_color = RGB(0x26,0x26,0x26);
-	sb->icon_style.pixel_size = 16;
 }
 
 void SideBar_OnDestroy( LCUI_Widget w )
