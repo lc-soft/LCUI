@@ -45,7 +45,7 @@
 /** 样式字符串值与标识码 */
 typedef struct KeyNameGroup {
 	int key;
-	const char *name;
+	char *name;
 } KeyNameGroup;
 
 static struct {
@@ -59,7 +59,7 @@ static struct {
 #define SPLIT_COLOR	(1<<1)
 #define SPLIT_STYLE	(1<<2)
 
-static int ParseStyleOption( const char *str )
+int ParseStyleOption( const char *str )
 { 
 	LCUI_RBTreeNode *node;
 	node = RBTree_CustomSearch( &self.option_tree, str );
@@ -357,9 +357,9 @@ static int OnParsePadding( LCUI_StyleSheet ss, int key, const char *str )
 		break;
 	case 4:
 		ss->sheet[key_padding_top] = s[0];
-		ss->sheet[key_padding_left] = s[1];
-		ss->sheet[key_padding_right] = s[2];
-		ss->sheet[key_padding_bottom] = s[3];
+		ss->sheet[key_padding_right] = s[1];
+		ss->sheet[key_padding_bottom] = s[2];
+		ss->sheet[key_padding_left] = s[3];
 	default: break;
 	}
 	return 0;
@@ -392,9 +392,9 @@ static int OnParseMargin( LCUI_StyleSheet ss, int key, const char *str )
 		break;
 	case 4:
 		ss->sheet[key_margin_top] = s[0];
-		ss->sheet[key_margin_left] = s[1];
-		ss->sheet[key_margin_right] = s[2];
-		ss->sheet[key_margin_bottom] = s[3];
+		ss->sheet[key_margin_right] = s[1];
+		ss->sheet[key_margin_bottom] = s[2];
+		ss->sheet[key_margin_left] = s[3];
 	default: break;
 	}
 	return 0;

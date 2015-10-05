@@ -49,6 +49,8 @@ typedef struct LCUI_StyleParser {
 	int (*parse)(LCUI_StyleSheet, int, const char*);
 } LCUI_StyleParser;
 
+LCUI_API int ParseStyleOption( const char *str );
+
 LCUI_API const char *GetStyleName( int key );
 
 /** 初始化 LCUI 的 CSS 代码解析功能 */
