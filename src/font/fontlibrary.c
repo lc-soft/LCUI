@@ -510,12 +510,8 @@ int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 				ALPHA_BLEND( px_des->r, color.r, *bmp_src );
 				ALPHA_BLEND( px_des->g, color.g, *bmp_src );
 				ALPHA_BLEND( px_des->b, color.b, *bmp_src );
-				if( px_des->alpha == 255 || *bmp_src == 255 ) {
-					px_des->alpha = 255;
-				} else {
-					val = (255 - *bmp_src)*(255 - px_des->alpha);
-					px_des->alpha = (uchar_t)(255 - val / 65025);
-				}
+				val = (255 - *bmp_src)*(255 - px_des->alpha);
+				px_des->alpha = (uchar_t)(255 - val / 255);
 				++bmp_src;
 				++px_des;
 			}
