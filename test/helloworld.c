@@ -79,13 +79,12 @@ sidebar-item .text {
 }
 
 sidebar-item .icon {
-	color: rgb(132,240,109);
 	font-family: GLYPHICONS Halflings;
 }
 
 );
 
-const wchar_t test_str[] = L"[size=12px]12px, 0123456789, hello,world! are you OK? I like this![/size]\n\
+const wchar_t test_str[] = L"测试文本，呵呵。\n[size=12px]12px, 0123456789, hello,world! are you OK? I like this![/size]\n\
 [size=13px]13px, 0123456789, hello,world! are you OK? I like this![/size]\n\
 [size=14px]14px, 0123456789, hello,world! are you OK? I like this![/size]\n\
 [size=15px]15px, 0123456789, hello,world! are you OK? I like this![/size]\n\
@@ -95,8 +94,7 @@ const wchar_t test_str[] = L"[size=12px]12px, 0123456789, hello,world! are you O
 
 int main( int argc, char **argv )
 {
-	LCUI_TextStyle icon_style = { 0 };
-	LCUI_Widget w, root, sidebar;
+	LCUI_Widget w, root, sidebar, text;
 	
 #ifdef LCUI_BUILD_IN_WIN32
 	InitConsoleWindow();//test_gen_font_code();return 0;
@@ -108,13 +106,18 @@ int main( int argc, char **argv )
 	LCUIDisplay_SetSize( 960, 540 );
 	w = LCUIWidget_New("debug-widget");
 	sidebar = LCUIWidget_New("sidebar");
+	text = LCUIWidget_New("textview");
+	TextView_SetTextW( text, test_str);
 	LCUIFont_LoadFile("../../../fonts/glyphicons-halflings-regular.ttf");
-	SideBar_AppendItem( sidebar, L"item-dashboard", L"\xe021", L"Dashboard" );
-	SideBar_AppendItem( sidebar, L"item-settings", L"\xe019", L"Settings" );
+	//SideBar_AppendItem( sidebar, L"item-home", L"\xe021", L"Home 测试" );
+	//SideBar_AppendItem( sidebar, L"item-widgets", L"\xe011", L"Widgets" );
+	//SideBar_AppendItem( sidebar, L"item-settings", L"\xe019", L"Settings" );
 	Widget_Append( w, sidebar );
+	Widget_Append( w, text );
 	Widget_Top( w );
 	Widget_Show( w );
 	Widget_Show( sidebar );
+	Widget_Show( text );
 	Widget_Resize( w, 520, 240 );
 	Widget_Move( w, 200, 200 );
 	root = LCUIWidget_GetRoot();
