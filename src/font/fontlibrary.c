@@ -548,21 +548,22 @@ int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch,
 		     int font_id, int pixel_size )
 {
-	LCUI_Font *info;
-	LCUI_FontEngine *engine = &fontlib.engines[0];
-
-	if( font_id >= 0 && fontlib.engine ) {
+	LCUI_Font *info = fontlib.default_font;
+	while( 1 ) {
+		if( font_id < 0 || !fontlib.engine ) {
+			break;
+		}
 		info = LCUIFont_GetById( font_id );
 		if( info ) {
-			engine = info->engine;
-			return engine->render( buff, ch, pixel_size, info );
+			break;
 		}
-	}	if( fontlib.default_font ) {
-		info = fontlib.default_font;
-	} else {
-		info = fontlib.incore_font;
+		if( fontlib.default_font ) {
+			info = fontlib.default_font;
+		} else {
+			info = fontlib.incore_font;
+		}
 	}
-	return engine->render( buff, ch, pixel_size, info );
+	return info->engine->render( buff, ch, pixel_size, info );
 }
 
 
