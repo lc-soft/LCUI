@@ -1,8 +1,7 @@
 ﻿/* ***************************************************************************
  * misc.h  no specific categories of miscellaneous function
  * 
- * Copyright (C) 2012-2014 by
- * Liu Chao
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,8 +22,7 @@
 /* ****************************************************************************
  * misc.h  没有具体分类的杂项功能
  *
- * 版权所有 (C) 2012-2014 归属于
- * 刘超
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -94,6 +92,7 @@ LCUI_END_HEADER
 #include <LCUI/misc/linkedlist.h>
 #include <LCUI/misc/rect.h>
 #include <LCUI/misc/framectrl.h>
+#include <LCUI/misc/string.h>
 #include <LCUI/misc/parse.h>
 
 #endif

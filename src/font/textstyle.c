@@ -40,12 +40,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
 
-#define case_in_blank_char	\
-	case '\t':		\
-	case ' ':		\
-	case '\n':		\
-	case '\r'
-
 enum LCUI_StyleTagID {
 	TAG_ID_FAMILY,
 	TAG_ID_STYLE,
@@ -76,39 +70,6 @@ void TextStyle_Init( LCUI_TextStyle *data )
 	data->fore_color.value = 0x33333333;
 	data->back_color.value = 0xffffffff;
 	data->pixel_size = 13;
-}
-
-static void trim( char *outstr, const char *instr )
-{
-	char *op = outstr, *last_blank = NULL;
-	LCUI_BOOL clear_left = 1;
-	const char *ip = instr;
-
-	for( ; *ip; ip++ ) {
-		switch( *ip ) {
-		case_in_blank_char:
-			if( !clear_left ) {	
-				*op = *ip;
-				if( !last_blank ) {
-					last_blank = op;
-				}
-				++op;
-			}
-			continue;
-		default:
-			if( clear_left ) {
-				clear_left = FALSE;
-			}
-			last_blank = NULL;
-			*op = *ip;
-			++op;
-			break;
-		}
-	}
-	if( last_blank ) {
-		*last_blank = 0;
-	}
-	*op = 0;
 }
 
 /**
@@ -151,7 +112,7 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 			continue;
 		}
 		name[i] = 0;
-		trim( name, name );
+		strtrim( name, name );
 		ids[count] = LCUIFont_GetId( name, style_name );
 		if( ids[count] > 0 ) {
 			++count;
