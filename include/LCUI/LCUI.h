@@ -59,7 +59,7 @@
 #define TRUE 1
 #endif
 
-#define ToString(x) #x
+#define ToString(...) ""#__VA_ARGS__""
 
 LCUI_BEGIN_HEADER
 
