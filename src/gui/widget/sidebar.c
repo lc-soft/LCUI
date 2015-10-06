@@ -68,18 +68,31 @@ sidebar sidebar-item {
 	border-top: 1px solid #f3f3f3;
 }
 
-sidebar sidebar-item .text {
+sidebar sidebar-item .text,
+sidebar sidebar-item .icon {
 	display: inline-block;
+	font-size: 14px;
+	color: #515253;
 }
 
 sidebar sidebar-item .icon {
 	width: 30px;
 	text-align: center;
-	display: inline-block;
+}
+
+sidebar sidebar-item:hover .text,
+sidebar sidebar-item:hover .icon,
+sidebar sidebar-item:active .text,
+sidebar sidebar-item:active .icon {
+	color: #262626;
 }
 
 sidebar sidebar-item:hover {
-	background-color: #f5f5f5;
+	background-color: #fbfbfb;
+}
+
+sidebar sidebar-item:acitve {
+	background-color: #f3f3f3;
 }
 
 );

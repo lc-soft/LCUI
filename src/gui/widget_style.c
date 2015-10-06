@@ -389,7 +389,7 @@ static int mystrcmp( const char *str1, const char *str2 )
 LCUI_BOOL SelectorIsEqual( LCUI_Selector s1, LCUI_Selector s2 )
 {
 	LCUI_SelectorNode *sn1_ptr = s1, *sn2_ptr = s2;
-	for( ; sn1_ptr && sn2_ptr; ++sn1_ptr,++sn2_ptr ) {
+	for( ; *sn1_ptr && *sn2_ptr; ++sn1_ptr,++sn2_ptr ) {
 		if( mystrcmp((*sn1_ptr)->type, (*sn2_ptr)->type) ) {
 			return FALSE;
 		}
