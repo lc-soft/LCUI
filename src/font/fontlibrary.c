@@ -89,10 +89,6 @@ static struct LCUI_FontLibraryContext {
 #define SelectFontCache(id) \
 	fontlib.font_cache[fontlib.font_cache_num-1][id % FONT_CACHE_SIZE]
 
-#ifdef LCUI_BUILD_IN_LINUX
-#define stricmp strcasecmp 
-#endif
-
 static int OnComparePath( void *data, const void *keydata )
 {
 	return strcmp(((LCUI_FontPathNode*)data)->path, keydata);
@@ -142,6 +138,7 @@ int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 {
 	LCUI_Font *f;
 	LCUI_FontFamilyNode *fn;
+
 	font->id = ++fontlib.count;
 	if( font->id >= fontlib.font_cache_num * FONT_CACHE_SIZE ) {
 		LCUI_Font ***caches, **cache;
@@ -176,10 +173,14 @@ int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 	}
 	LinkedList_Append( &fn->styles, font );
 	if( filepath ) {
-		if( LCUIFont_GetIdByPath( filepath ) ) {
+		LCUI_FontPathNode *fp;
+		if( LCUIFont_GetIdByPath( filepath ) >= 0 ) {
 			return -4;
 		}
-		RBTree_CustomInsert( &fontlib.path_map, filepath, font );
+		fp = MALLOC(LCUI_FontPathNode, 1);
+		fp->path = strdup( filepath );
+		fp->font = font;
+		RBTree_CustomInsert( &fontlib.path_map, filepath, fp );
 	}
 	return font->id;
 }
@@ -547,17 +548,19 @@ int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch,
 		     int font_id, int pixel_size )
 {
-	LCUI_Font *info = fontlib.incore_font;
+	LCUI_Font *info;
 	LCUI_FontEngine *engine = &fontlib.engines[0];
-	while( TRUE ) {
-		if( font_id <= 0 || !fontlib.engine ) {
-			break;
-		}
+
+	if( font_id >= 0 && fontlib.engine ) {
 		info = LCUIFont_GetById( font_id );
 		if( info ) {
 			engine = info->engine;
+			return engine->render( buff, ch, pixel_size, info );
 		}
-		break;
+	}	if( fontlib.default_font ) {
+		info = fontlib.default_font;
+	} else {
+		info = fontlib.incore_font;
 	}
 	return engine->render( buff, ch, pixel_size, info );
 }
