@@ -215,13 +215,19 @@ static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
 static void HandleRefreshStyle( LCUI_Widget w )
 {
 	Widget_Update( w, TRUE );
-	ReplaceStyleSheet( w->cached_style, w->style );
 	w->task->buffer[WTT_UPDATE_STYLE] = FALSE;
+	w->task->buffer[WTT_CACHE_STYLE] = TRUE;
 }
 
 static void HandleUpdateStyle( LCUI_Widget w )
 {
 	Widget_Update( w, FALSE );
+	w->task->buffer[WTT_CACHE_STYLE] = TRUE;
+}
+
+static void HandleCacheStyle( LCUI_Widget w )
+{
+	ClearStyleSheet( w->cached_style );
 	ReplaceStyleSheet( w->cached_style, w->style );
 }
 
@@ -319,7 +325,6 @@ static void HandleVisibility( LCUI_Widget w )
 	LCUI_BOOL visible = ( w->cached_style->sheet[key_visible].is_valid && 
 			      w->cached_style->sheet[key_visible].value &&
 			      w->computed_style.display != SV_NONE );
-
 	if( w->style->sheet[key_display].is_valid ) {
 		w->computed_style.display = w->style->sheet[key_display].style;
 	} else {
@@ -525,6 +530,7 @@ static void MapTaskHandler(void)
 	task_handlers[WTT_REFRESH] = HandleRefresh;
 	task_handlers[WTT_UPDATE_STYLE] = HandleUpdateStyle;
 	task_handlers[WTT_REFRESH_STYLE] = HandleRefreshStyle;
+	task_handlers[WTT_CACHE_STYLE] = HandleCacheStyle;
 	task_handlers[WTT_BACKGROUND] = HandleBackground;
 	task_handlers[WTT_LAYOUT] = Widget_UpdateLayout;
 }

@@ -163,7 +163,7 @@ typedef struct LCUI_SelectorNodeRec_ {
 					S->sheet[NAME].type = SVT_##TYPE, \
 					S->sheet[NAME].##TYPE = VAL
 
-/** 部件任务类型，主要是按所对应的部件属性或具体刷新区域进行区分 */
+/** 部件任务类型，按照任务的依赖顺序排列 */
 enum WidgetTaskType {
 	WTT_REFRESH_STYLE,	/**< 刷新部件全部样式 */
 	WTT_UPDATE_STYLE,	/**< 更新部件自定义样式 */
@@ -181,6 +181,7 @@ enum WidgetTaskType {
 	WTT_OPACITY,
 	WTT_BODY,
 	WTT_REFRESH,
+	WTT_CACHE_STYLE,	/**< 缓存当前样式 */
 	WTT_USER,
 	WTT_DESTROY
 };
@@ -222,10 +223,10 @@ struct LCUI_WidgetRec_ {
 	LCUI_Widget		parent;			/**< 父部件 */
 	LinkedList		children;		/**< 子部件 */
 	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
-	
+
 	void			*private_data;		/**< 私有数据 */
 	void			*extend_data;		/**< 扩展数据 */
-	
+
 	LCUI_Graph		graph;			/**< 位图缓存 */
 	LCUI_Mutex		mutex;			/**< 互斥锁 */
 	LCUI_EventBox		event;			/**< 事件记录 */

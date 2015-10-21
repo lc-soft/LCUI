@@ -121,7 +121,7 @@ void DeleteSelector( LCUI_Selector *selector )
 }
 
 /** 清空样式表 */
-static void ClearStyleSheet( LCUI_StyleSheet ss )
+void ClearStyleSheet( LCUI_StyleSheet ss )
 {
 	int i;
 	LCUI_Style *s;
@@ -782,17 +782,8 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 	/* 对比两张样式表，确定哪些需要更新 */
 	for( key = 0; key < w->style->length; ++key ) {
 		s = &w->style->sheet[key];
-		/* 忽略值没有变化的样式 */
-		if( !s->is_valid ) {
-			if( !w->cached_style->sheet[key].is_valid ) {
-				continue;
-			}
-		}
-		else if( !w->style->sheet[key].is_changed ) {
-			if( w->cached_style->sheet[key].type == s->type
-			 && w->cached_style->sheet[key].value == s->value ) {
-				continue;
-			}
+		if( !s->is_changed ) {
+			continue;
 		}
 		s->is_changed = FALSE;
 		if( key >= STYLE_KEY_TOTAL ) {
