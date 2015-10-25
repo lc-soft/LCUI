@@ -45,6 +45,14 @@
 #define MAX_NODE_DEPTH		32
 #define MAX_SELECTOR_DEPTH	32
 
+enum SelectorRank {
+	GENERAL_RANK = 0,
+	TYPE_RANK = 1,
+	CLASS_RANK = 10,
+	PCLASS_RANK = 10,
+	ID_RANK = 100
+};
+
 typedef struct StyleListNode {
 	LCUI_StyleSheet style;		/**< 样式表 */
 	LCUI_Selector selector;		/**< 作用范围 */
@@ -97,7 +105,7 @@ static int CompareName( void *data, const void *keydata )
 void DeleteSelector( LCUI_Selector *selector )
 {
 	LCUI_SelectorNode *node_ptr;
-	for( node_ptr=*selector; *node_ptr; ++node_ptr ) {
+	for( node_ptr=(*selector)->list; *node_ptr; ++node_ptr ) {
 		if( (*node_ptr)->type ) {
 			free( (*node_ptr)->type );
 			(*node_ptr)->type = NULL;
@@ -116,6 +124,9 @@ void DeleteSelector( LCUI_Selector *selector )
 		}
 		free( *node_ptr );
 	}
+	(*selector)->rank = 0;
+	(*selector)->length = 0;
+	free( (*selector)->list );
 	free( *selector );
 	*selector = NULL;
 }
@@ -272,25 +283,25 @@ static int SaveSelectorNode( LCUI_SelectorNode node, const char *name, char type
 			return -1;
 		}
 		node->type = strdup( name );
-		break;
+		return 0;
 	case ':':
 		if( node->pseudo_class_name ) {
 			return -2;
 		}
 		node->pseudo_class_name = strdup( name );
-		break;
+		return PCLASS_RANK;
 	case '.':
 		if( node->class_name ) {
 			return -3;
 		}
 		node->class_name = strdup( name );
-		break;
+		return CLASS_RANK;
 	case '#':
 		if( node->id ) {
 			return -4;
 		}
 		node->id = strdup( name );
-		break;
+		return ID_RANK;
 	default: break;
 	}
 	return 0;
@@ -299,58 +310,62 @@ static int SaveSelectorNode( LCUI_SelectorNode node, const char *name, char type
 /** 根据字符串内容生成相应的选择器 */
 LCUI_Selector Selector( const char *selector )
 {
-	int ni, si;
+	int ni, si, rank;
 	const char *p;
 	char type = 0, name[MAX_NAME_LEN];
-	size_t size;
 	LCUI_BOOL is_saving = FALSE;
 	LCUI_SelectorNode node = NULL;
 	LCUI_Selector s;
 
-	size = sizeof(LCUI_SelectorNode)*MAX_SELECTOR_DEPTH;
-	s = (LCUI_Selector)malloc( size );
+	s = NEW(LCUI_SelectorRec_, 1);
+	s->list = NEW(LCUI_SelectorNode, MAX_SELECTOR_DEPTH);
 	for( ni = 0, si = 0, p = selector; *p; ++p ) {
-		if( node == NULL && is_saving ) {
-			size = sizeof( struct LCUI_SelectorNodeRec_ );
-			node = (LCUI_SelectorNode)malloc( size );
-			node->id = NULL;
-			node->type = NULL;
-			node->class_name = NULL;
-			node->pseudo_class_name = NULL;
+		if( !node && is_saving ) {
+			node = NEW(LCUI_SelectorNodeRec_, 1);
 			if( si >= MAX_SELECTOR_DEPTH ) {
 				_DEBUG_MSG( "%s: selector node list is too long.\n",
 					    selector );
 				return NULL;
 			}
-			s[si] = node;
+			s->list[si] = node;
 		}
-		if( *p == ':' || *p == '.' || *p == '#' ) {
+		switch( *p ) {
+		case ':':
+		case '.':
+		case '#':
 			/* 保存上个结点 */
 			if( is_saving ) {
-				if( SaveSelectorNode(node, name, type) != 0 ) {
+				rank = SaveSelectorNode( node, name, type );
+				if( rank < 0 ) {
 					_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
 						    selector, p - selector - ni );
 					return NULL;
 				}
+				s->rank += rank;
 				ni = 0;
 			}
 			is_saving = TRUE;
 			type = *p;
 			continue;
-		}
-		if( *p == ' ' || *p == '\r' || *p == '\n' || *p == '\t' ) {
+		case ' ':
+		case '\r':
+		case '\n':
+		case '\t':
 			if( is_saving ) {
-				if( SaveSelectorNode(node, name, type) != 0 ) {
+				rank = SaveSelectorNode( node, name, type );
+				if(  rank < 0 ) {
 					_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
 						    selector, p - selector - ni );
 					return NULL;
 				}
+				s->rank += rank;
 				is_saving = FALSE;
 				++si;
 			}
 			ni = 0;
 			node = NULL;
 			continue;
+		default: break;
 		}
 		if( *p == '-' || *p == '_' || *p == '*'
 		 || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z')
@@ -368,9 +383,13 @@ LCUI_Selector Selector( const char *selector )
 		return NULL;
 	}
 	if( is_saving ) {
-		SaveSelectorNode( s[si++], name, type );
+		rank = SaveSelectorNode( s->list[si++], name, type );
+		if( rank > 0 ) {
+			s->rank += rank;
+		}
 	}
-	s[si] = NULL;
+	s->list[si] = NULL;
+	s->length += si;
 	return s;
 }
 
@@ -388,7 +407,7 @@ static int mystrcmp( const char *str1, const char *str2 )
 /** 判断两个选择器是否相等 */
 LCUI_BOOL SelectorIsEqual( LCUI_Selector s1, LCUI_Selector s2 )
 {
-	LCUI_SelectorNode *sn1_ptr = s1, *sn2_ptr = s2;
+	LCUI_SelectorNode *sn1_ptr = s1->list, *sn2_ptr = s2->list;
 	for( ; *sn1_ptr && *sn2_ptr; ++sn1_ptr,++sn2_ptr ) {
 		if( mystrcmp((*sn1_ptr)->type, (*sn2_ptr)->type) ) {
 			return FALSE;
@@ -414,15 +433,15 @@ LCUI_BOOL SelectorIsEqual( LCUI_Selector s1, LCUI_Selector s2 )
 static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 					       const char *name )
 {
-	int i, n;
+	int i = 0, pos = -1;
 	LCUI_RBTreeNode *node;
 	StyleTreeNode *stn;
 	StyleListNode *sln;
-	LCUI_SelectorNode sn;
+	LCUI_SelectorNode new_sn, *sn_ptr;
 
 	node = RBTree_CustomSearch( &style_library.style, (const void*)name );
 	if( !node ) {
-		stn = (StyleTreeNode*)malloc(sizeof(StyleTreeNode));
+		stn = NEW(StyleTreeNode, 1);
 		strncpy( stn->name, name, MAX_NAME_LEN );
 		LinkedList_Init( &stn->styles, sizeof(StyleListNode) );
 		LinkedList_SetDataNeedFree( &stn->styles, TRUE );
@@ -435,45 +454,49 @@ static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 		if( SelectorIsEqual(sln->selector, selector) ) {
 			return sln->style;
 		}
+		if( pos == -1 ) {
+			if( selector->rank > sln->selector->rank ) {
+				pos = i;
+			}
+		}
+		i += 1;
 	}
-	sln = (StyleListNode*)malloc(sizeof(StyleListNode));
+	sln = NEW(StyleListNode, 1);
 	sln->style = StyleSheet();
-	for( n=0; selector[n]; ++n );
-	++n;
-	sln->selector = (LCUI_Selector)malloc( sizeof(LCUI_SelectorNode*)*n );
-	for( i=0, n-=1; i<n; ++i ) {
-		sn = (LCUI_SelectorNode)malloc( sizeof(struct LCUI_SelectorNodeRec_) );
-		sn->type = NULL;
-		sn->id = NULL;
-		sn->class_name = NULL;
-		sn->pseudo_class_name = NULL;
-		if( selector[i]->type ) {
-			sn->type = strdup( selector[i]->type );
+	sln->selector = NEW(LCUI_SelectorRec_, 1);
+	sln->selector->list = NEW(LCUI_SelectorNode, selector->length+1);
+	for( sn_ptr = selector->list, i = 0; *sn_ptr; ++sn_ptr, ++i ) {
+		new_sn = NEW(LCUI_SelectorNodeRec_, 1);
+		if( (*sn_ptr)->type ) {
+			new_sn->type = strdup( (*sn_ptr)->type );
 		}
-		if( selector[i]->id ) {
-			sn->id = strdup( selector[i]->id );
+		if( (*sn_ptr)->id ) {
+			new_sn->id = strdup( (*sn_ptr)->id );
 		}
-		if( selector[i]->class_name ) {
-			sn->class_name = strdup( selector[i]->class_name );
+		if( (*sn_ptr)->class_name ) {
+			new_sn->class_name = strdup( (*sn_ptr)->class_name );
 		}
-		if( selector[i]->pseudo_class_name ) {
-			sn->pseudo_class_name = strdup( selector[i]->pseudo_class_name );
+		if( (*sn_ptr)->pseudo_class_name ) {
+			new_sn->pseudo_class_name = strdup( (*sn_ptr)->pseudo_class_name );
 		}
-		sln->selector[i] = sn;
+		sln->selector->list[i] = new_sn;
 	}
-	sln->selector[n] = NULL;
-	LinkedList_Append( &stn->styles, sln );
+	sln->selector->list[i] = NULL;
+	sln->selector->length = i;
+	sln->selector->rank = selector->rank;
+	if( pos >= 0 ) {
+		LinkedList_Goto( &stn->styles, pos );
+		LinkedList_Insert( &stn->styles, sln );
+	} else {
+		LinkedList_Append( &stn->styles, sln );
+	}
 	return sln->style;
 }
 
 static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector )
 {
-	int depth;
 	char fullname[MAX_NAME_LEN];
-	LCUI_SelectorNode sn;
-
-	for( depth = 0; selector[depth]; ++depth );
-	sn = selector[depth-1];
+	LCUI_SelectorNode sn = selector->list[selector->length-1];
 	/* 优先级：伪类 > 类 > ID > 名称 */
 	if( sn->pseudo_class_name ) {
 		fullname[0] = ':';
@@ -511,15 +534,14 @@ int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
 LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 {
 	int i, n;
-	LCUI_SelectorNode *sn_ptr = selector;
 	LCUI_Widget *obj_ptr = wlist, w;
+	LCUI_SelectorNode *sn_ptr = selector->list;
 	/* 定位到最后一个元素 */
-	for( ;*sn_ptr; ++sn_ptr );
+	sn_ptr += selector->length-1;
 	for( ;*obj_ptr; ++obj_ptr );
-	--sn_ptr;
 	--obj_ptr;
 	/* 从右到左遍历，进行匹配 */
-	for( ; obj_ptr >= wlist && sn_ptr >= selector; --obj_ptr ) {
+	for( ; obj_ptr >= wlist && sn_ptr >= selector->list; --obj_ptr ) {
 		w = *obj_ptr;
 		if( (*sn_ptr)->id ) {
 			if( strcmp( w->id, (*sn_ptr)->id ) ) {
@@ -558,7 +580,7 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 		--sn_ptr;
 	}
 	/* 匹配成功的标志是遍历完选择器列表 */
-	if( sn_ptr < selector ) {
+	if( sn_ptr < selector->list ) {
 		return TRUE;
 	}
 	return FALSE;
@@ -607,18 +629,18 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 	int i, count = 0;
 	char fullname[MAX_NAME_LEN];
 	
-	i = ptrslen( w->classes );
-	/* 记录类选择器匹配的样式表 */
-	while( --i >= 0 ) {
-		fullname[0] = '.';
-		strncpy( fullname + 1, w->classes[i], MAX_NAME_LEN-1 );
-		count += FindStyleNodeByName( fullname, w, list );
-	}
 	i = ptrslen( w->pseudo_classes );
 	/* 记录伪类选择器匹配的样式表 */
 	while( --i >= 0 ) {
 		fullname[0] = ':';
 		strncpy( fullname + 1, w->pseudo_classes[i], MAX_NAME_LEN-1 );
+		count += FindStyleNodeByName( fullname, w, list );
+	}
+	i = ptrslen( w->classes );
+	/* 记录类选择器匹配的样式表 */
+	while( --i >= 0 ) {
+		fullname[0] = '.';
+		strncpy( fullname + 1, w->classes[i], MAX_NAME_LEN-1 );
 		count += FindStyleNodeByName( fullname, w, list );
 	}
 	/* 记录ID选择器匹配的样式表 */
@@ -694,7 +716,7 @@ void LCUI_PrintSelector( LCUI_Selector selector )
 	LCUI_SelectorNode *sn;
 
 	path[0] = 0;
-	for( sn = selector; *sn; ++sn ) {
+	for( sn = selector->list; *sn; ++sn ) {
 		if( (*sn)->id ) {
 			strcat( path, "#" );
 			strcat( path, (*sn)->id );
@@ -739,8 +761,8 @@ void LCUI_PrintStyleLibrary(void)
 /** 计算部件继承得到的样式表 */
 int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 {
-	LCUI_StyleSheet ss;
 	LinkedList list;
+	LCUI_StyleSheet ss;
 
 	LinkedList_Init( &list, sizeof(LCUI_StyleSheet) );
 	LinkedList_SetDataNeedFree( &list, FALSE );

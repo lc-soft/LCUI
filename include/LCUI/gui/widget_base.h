@@ -156,7 +156,13 @@ typedef struct LCUI_SelectorNodeRec_ {
 	char *type;
 	char *class_name;
 	char *pseudo_class_name;
-} *LCUI_SelectorNode, **LCUI_Selector;
+} LCUI_SelectorNodeRec_, *LCUI_SelectorNode;
+
+typedef struct LCUI_SelectorRec_ {
+	LCUI_SelectorNode *list;	/**< 选择器结点列表 */
+	int length;			/**< 选择器结点长度 */
+	int rank;			/**< 权值，决定优先级 */
+} LCUI_SelectorRec_, *LCUI_Selector;
 
 #define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \
 					S->sheet[NAME].is_changed = TRUE, \
@@ -195,10 +201,10 @@ typedef struct LCUI_WidgetTaskBoxRec_* LCUI_WidgetTaskBox;
 #endif
 
 typedef struct LCUI_WidgetBoxRect {
-	LCUI_Rect content;			/**< 内容框的区域 */
-	LCUI_Rect border;			/**< 边框盒的区域，包括内边距框和内容框区域 */
-	LCUI_Rect outer;			/**< 外边框的区域，包括边框盒和外边距框区域 */
-	LCUI_Rect graph;			/**< 图层的区域，包括边框盒和阴影区域 */
+	LCUI_Rect content;	/**< 内容框的区域 */
+	LCUI_Rect border;	/**< 边框盒的区域，包括内边距框和内容框区域 */
+	LCUI_Rect outer;	/**< 外边框的区域，包括边框盒和外边距框区域 */
+	LCUI_Rect graph;	/**< 图层的区域，包括边框盒和阴影区域 */
 } LCUI_WidgetBoxRect;
 
 typedef struct LCUI_WidgetRec_* LCUI_Widget;
