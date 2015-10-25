@@ -664,31 +664,8 @@ void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left 
 
 }
 
-void Widget_SetPaddingS(
-	LCUI_Widget w,
-	const char *top,
-	const char *right,
-	const char *bottom,
-	const char *left
-)
-{
-
-}
-
 /** 设置外边距 */
 void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left )
-{
-
-}
-
-/** 设置左边距 */
-void Widget_SetLeft( LCUI_Widget w, const char *value )
-{
-
-}
-
-/** 设置顶边距 */
-void Widget_SetTop( LCUI_Widget w, const char *value )
 {
 
 }

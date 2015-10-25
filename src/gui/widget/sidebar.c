@@ -20,7 +20,7 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * button.c -- LCUI 的侧边栏部件
+ * sidebar.c -- LCUI 的侧边栏部件
  *
  * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
  * 
@@ -91,7 +91,7 @@ sidebar sidebar-item:hover {
 	background-color: #fbfbfb;
 }
 
-sidebar sidebar-item:acitve {
+sidebar sidebar-item:active {
 	background-color: #f3f3f3;
 }
 

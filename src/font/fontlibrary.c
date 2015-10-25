@@ -43,7 +43,6 @@
 #include <LCUI/font.h>
 
 #define FONT_CACHE_SIZE	32
-#define MALLOC(type, count) (type*)malloc(sizeof(type)*count);
 
 /**
  * 库中缓存的字体位图是分组存放的，共有三级分组，分别为：
@@ -149,7 +148,7 @@ int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 			fontlib.font_cache_num -= 1;
 			return -1;
 		}
-		cache = MALLOC(LCUI_Font*, FONT_CACHE_SIZE);
+		cache = NEW(LCUI_Font*, FONT_CACHE_SIZE);
 		if( cache == NULL ) {
 			return -2;
 		}
@@ -159,7 +158,7 @@ int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 	SelectFontCache(font->id) = font;
 	fn = SelectFontFamliy(font->family_name);
 	if( !fn ) {
-		fn = MALLOC(LCUI_FontFamilyNode, 1);
+		fn = NEW(LCUI_FontFamilyNode, 1);
 		fn->family_name = strdup(font->family_name);
 		LinkedList_Init( &fn->styles, 0 );
 		LinkedList_SetDataNeedFree( &fn->styles, FALSE );
@@ -177,7 +176,7 @@ int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 		if( LCUIFont_GetIdByPath( filepath ) >= 0 ) {
 			return -4;
 		}
-		fp = MALLOC(LCUI_FontPathNode, 1);
+		fp = NEW(LCUI_FontPathNode, 1);
 		fp->path = strdup( filepath );
 		fp->font = font;
 		RBTree_CustomInsert( &fontlib.path_map, filepath, fp );
@@ -288,7 +287,7 @@ LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 	/* 获取字符的字体信息集 */
 	tree_font = SelectChar( ch );
 	if( !tree_font ) {
-		tree_font = MALLOC(LCUI_RBTree, 1);
+		tree_font = NEW(LCUI_RBTree, 1);
 		if( !tree_font ) {
 			return NULL;
 		}
@@ -304,7 +303,7 @@ LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 	/* 获取相应字体样式标识号的字体位图库 */
 	tree_bmp = SelectFont( tree_font, font_id );
 	if( !tree_bmp ) {
-		tree_bmp = MALLOC(LCUI_RBTree, 1);
+		tree_bmp = NEW(LCUI_RBTree, 1);
 		if( !tree_bmp ) {
 			return NULL;
 		}
@@ -316,7 +315,7 @@ LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 	/* 在字体位图库中获取指定像素大小的字体位图 */
 	bmp_cache = SelectBitmap( tree_bmp, size );
 	if( !bmp_cache ) {
-		bmp_cache = MALLOC(LCUI_FontBitmap, 1);
+		bmp_cache = NEW(LCUI_FontBitmap, 1);
 		if( !bmp_cache ) {
 			return NULL;
 		}
@@ -471,9 +470,9 @@ int FontBitmap_Print( LCUI_FontBitmap *fontbmp )
 
 /** 将字体位图绘制到目标图像上 */
 int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
-		    LCUI_FontBitmap *bmp, LCUI_Color color )
+		    const LCUI_FontBitmap *bmp, LCUI_Color color )
 {
-	int val, x, y;
+	int x, y;
 	LCUI_Rect read_rect, write_rect;
 	LCUI_Graph write_slot;
 	LCUI_ARGB *px_des, *px_row_des;
@@ -507,14 +506,18 @@ int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 		for( y=0; y<read_rect.h; ++y ) {
 			bmp_src = bmp_row_src;
 			px_des = px_row_des;
-			for( x=0; x<read_rect.w; ++x ) {
+			for( x=0; x<read_rect.w; ++x,++bmp_src,++px_des ) {
+				switch( *bmp_src ) {
+				case 255:
+					*px_des = color;
+					px_des->alpha = 255;
+				case 0: continue;
+				default:break;
+				}
 				ALPHA_BLEND( px_des->r, color.r, *bmp_src );
 				ALPHA_BLEND( px_des->g, color.g, *bmp_src );
 				ALPHA_BLEND( px_des->b, color.b, *bmp_src );
-				val = (255 - *bmp_src)*(255 - px_des->alpha);
-				px_des->alpha = (uchar_t)(255 - val / 255);
-				++bmp_src;
-				++px_des;
+				px_des->a = 255;
 			}
 			px_row_des += graph->w;
 			bmp_row_src += bmp->width;
@@ -591,8 +594,8 @@ void LCUI_InitFont( void )
 	};
 
 	fontlib.font_cache_num = 1;
-	fontlib.font_cache = MALLOC(LCUI_Font**, 1);
-	fontlib.font_cache[0] = MALLOC(LCUI_Font*, FONT_CACHE_SIZE);
+	fontlib.font_cache = NEW(LCUI_Font**, 1);
+	fontlib.font_cache[0] = NEW(LCUI_Font*, FONT_CACHE_SIZE);
 	RBTree_Init( &fontlib.bitmap_cache );
 	RBTree_Init( &fontlib.path_map );
 	RBTree_Init( &fontlib.family_tree );

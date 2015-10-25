@@ -114,7 +114,7 @@ LCUI_API int FontBitmap_Print( LCUI_FontBitmap *fontbmp );
 
 /** 将字体位图绘制到目标图像上 */
 LCUI_API int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
-			  LCUI_FontBitmap *bmp, LCUI_Color color );
+			     const LCUI_FontBitmap *bmp, LCUI_Color color );
 
 /** 载入字体位图 */
 LCUI_API int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch, 

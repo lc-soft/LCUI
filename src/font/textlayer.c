@@ -307,7 +307,7 @@ static void TextRow_LeftMove( TextRowData *p_row, int n )
 /** 更新字体位图 */
 static void TextChar_UpdateBitmap( TextCharData *ch, LCUI_TextStyle *style )
 {
-	int	i = 0, font_id = -1, 
+	int	i = 0, 
 		*font_ids = style->font_ids, 
 		size = style->pixel_size;
 
@@ -319,11 +319,11 @@ static void TextChar_UpdateBitmap( TextCharData *ch, LCUI_TextStyle *style )
 			size = ch->style->pixel_size;
 		}
 	}
-	if( !style->font_ids ) {
+	if( !font_ids ) {
 		LCUIFont_GetBitmap( ch->char_code, -1, size, &ch->bitmap );
 		return;
 	}
-	while( style->font_ids[i] >= 0 ) {
+	while( font_ids[i] >= 0 ) {
 		if( 0 == LCUIFont_GetBitmap(ch->char_code, 
 			style->font_ids[i], size, &ch->bitmap) ) {
 			break;
