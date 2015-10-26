@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * textview.c -- LCUI's TextView Widget
  *
- * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * textview.c -- LCUI 的文本显示部件
  *
- * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -116,7 +116,7 @@ static int OnParseFontFamily( LCUI_StyleSheet ss, int key, const char *str )
 static int OnParseFontStyle( LCUI_StyleSheet ss, int key, const char *str )
 {
 	if( strcmp(str, "normal") == 0 ) {
-		SetStyle( ss, style_key_map[key], 0, value );
+		SetStyle( ss, style_key_map[key], 0, int );
 		return 0;
 	}
 	return -1;
@@ -319,7 +319,6 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_TextView *txt;
 	LCUI_Rect content_rect, rect;
 	LCUI_Pos layer_pos;
-	char filename[256];
 
 	txt = (LCUI_TextView*)w->private_data;
 	content_rect.x = w->box.content.left - w->box.graph.left;
@@ -331,11 +330,7 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	rect.y -= content_rect.y;
 	layer_pos.x = -rect.x;
 	layer_pos.y = -rect.y;
-	sprintf(filename, "textview-0x%08x-before.png", w);
-	Graph_WritePNG(filename, &paint->canvas);
 	TextLayer_DrawToGraph( txt->layer, rect, layer_pos, &paint->canvas );
-	sprintf(filename, "textview-0x%08x-after.png", w);
-	Graph_WritePNG(filename, &paint->canvas);
 }
 
 /*-------------------------- End Private -----------------------------*/
