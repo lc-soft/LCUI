@@ -136,10 +136,10 @@ typedef struct LCUI_Rect2_ {
 typedef enum LCUI_StyleType {
 	SVT_NONE,
 	SVT_AUTO,
-	SVT_SCALE,		/**< 比例 */
-	SVT_PX,			/**< 像素 */
-	SVT_PT,			/**< 点 */
-	SVT_COLOR,		/**< 色彩 */
+	SVT_SCALE,
+	SVT_PX,
+	SVT_PT,
+	SVT_COLOR,
 	SVT_IMAGE,
 	SVT_STYLE,
 	SVT_VALUE,
@@ -149,6 +149,7 @@ typedef enum LCUI_StyleType {
 #define SVT_px		SVT_PX
 #define SVT_pt		SVT_PT
 #define SVT_value	SVT_VALUE
+#define SVT_int		SVT_VALUE
 #define SVT_color	SVT_COLOR
 #define SVT_scale	SVT_SCALE
 #define SVT_style	SVT_STYLE
@@ -239,13 +240,21 @@ typedef struct LCUI_Style {
 	LCUI_StyleType type:30;
 	union {
 		int value;
+		int val_int;
 		int px;
+		int val_px;
 		int pt;
+		int val_pt;
 		int style;
+		int val_style;
 		float scale;
+		float val_scale;
 		char *string;
+		char *val_string;
 		LCUI_Color color;
+		LCUI_Color val_color;
 		LCUI_Graph *image;
+		LCUI_Graph *val_image;
 	};
 } LCUI_Style;
 

@@ -689,13 +689,13 @@ void Widget_Resize( LCUI_Widget w, int width, int height )
 
 void Widget_Show( LCUI_Widget w )
 {
-	SetStyle( w->custom_style, key_visible, TRUE, value );
+	SetStyle( w->custom_style, key_visible, TRUE, int );
 	Widget_Update( w, FALSE );
 }
 
 void Widget_Hide( LCUI_Widget w )
 {
-	SetStyle( w->custom_style, key_visible, FALSE, value );
+	SetStyle( w->custom_style, key_visible, FALSE, int );
 	Widget_Update( w, FALSE );
 }
 

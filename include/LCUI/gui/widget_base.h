@@ -167,7 +167,7 @@ typedef struct LCUI_SelectorRec_ {
 #define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \
 					S->sheet[NAME].is_changed = TRUE, \
 					S->sheet[NAME].type = SVT_##TYPE, \
-					S->sheet[NAME].##TYPE = VAL
+					S->sheet[NAME].val_##TYPE = VAL
 
 /** 部件任务类型，按照任务的依赖顺序排列 */
 enum WidgetTaskType {
@@ -242,9 +242,6 @@ struct LCUI_WidgetRec_ {
 };
 
 
-/** 为函数加前缀名 */
-#define $(FUNC_NAME) Widget_##FUNC_NAME
-
 #define Widget_NewPrivateData(w, type) (type*)(w->private_data = malloc(sizeof(type)))
 
 /** 一般来说部件占用的矩形区域看上去是指边框盒区域 */
@@ -318,8 +315,6 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
 void LCUI_InitWidget(void);
 
 void LCUI_ExitWidget(void);
-
-#undef $
 
 #endif
 
