@@ -395,9 +395,6 @@
     <ClCompile Include="..\..\..\src\gui\widget\textview.c">
       <Filter>源文件\gui\widget</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget\button.c">
-      <Filter>源文件\gui\widget</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c">
       <Filter>源文件\gui\widget</Filter>
     </ClCompile>
@@ -409,6 +406,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\builder.c">
       <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\button.c">
+      <Filter>源文件\gui\widget</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
