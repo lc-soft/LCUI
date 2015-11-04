@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_library.h -- LCUI widget library management module.
  * 
- * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2014-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_library.h -- LCUI部件库管理模块
  *
- * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2014-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -53,6 +53,10 @@ typedef struct LCUI_WidgetClass {
 		void (*autosize)(LCUI_Widget, int*, int*);
 		/** 扩展样式的更新处理函数 */
 		void (*update)(LCUI_Widget);
+		/** 设置属性 */
+		void (*set_attr)(LCUI_Widget, const char*,const char*);
+		/** 设置文本内容 */
+		void (*set_text)(LCUI_Widget, const char*);
 		/** 绘制函数 */
 		void (*paint)(LCUI_Widget, LCUI_PaintContext);
 	} methods;	/**< 该类部件的自定义方法集 */

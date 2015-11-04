@@ -39,37 +39,109 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
+#ifdef USE_LCUI_BUILDER
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+#endif
 
 #define WARNING_TEXT "[builder] warning: this module is not enabled before build."
 
-/**
- * 从字符串中载入界面配置代码，解析并生成相应的图形界面(元素)
- * @param[in] str 包含界面配置代码的字符串
- * @return 正常解析会返回 0，出现错误则返回 -1
- */
-int LCUIBuilder_LoadString( const char *str )
+
+static int ParseWidget( LCUI_Widget w, xmlNodePtr node )
+{
+	int count = 0;
+	xmlAttrPtr prop;
+	LCUI_Widget child;
+	LCUI_WidgetClass *wc = LCUIWidget_GetClass( w->type );
+
+	for( ; node; node = node->next ) {
+		switch( node->type ) {
+		case XML_ELEMENT_NODE: 
+			child = LCUIWidget_New( node->name );
+			if( !child ) {
+				continue;
+			}
+			count += ParseWidget( child, node->children );
+			Widget_Append( w, child );
+			break;
+		case XML_TEXT_NODE:
+			if( !wc || !wc->methods.set_text ) {
+				break;
+			}
+			wc->methods.set_text( w, node->content );
+		default: break;
+		}
+		if( !wc || !wc->methods.set_attr ) {
+			continue;
+		}
+		prop = node->properties;
+		while( prop ) {
+			wc->methods.set_attr( w, prop->name, 
+					      xmlGetProp(node, prop->name) );
+			prop = prop->next;
+		}
+	}
+	return count;
+}
+
+LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 {
 #ifndef USE_LCUI_BUILDER
 	printf(WARNING_TEXT);
 #else
-	//...
+	xmlDocPtr doc;
+	xmlNodePtr cur;
+	LCUI_Widget root;
+
+	doc = xmlParseMemory( str, size );
+	if( !doc ) {
+		printf( "[builder] Failed to parse xml form memory\n" );
+		goto FAILED;
+	}
+	cur = xmlDocGetRootElement( doc );
+	if( xmlStrcasecmp(cur->name, "LCUI") ) {
+		printf( "[builder] error root node name: %s\n", cur->name );
+		goto FAILED;
+	}
+	root = LCUIWidget_New(NULL);
+	ParseWidget( root, cur->children );
+	return root;
+FAILED:
+	if( doc ) {
+		xmlFreeDoc( doc );
+	}
 #endif
-	return -1;
+	return NULL;
 }
 
-/**
- * 从文件中载入界面配置代码，解析并生成相应的图形界面(元素)
- * @param[in] filepath 文件路径
- * @return 正常解析会返回 0，出现错误则返回 -1
- */
-int LCUIBuilder_Load( const char *filepath )
+LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 {
 #ifndef USE_LCUI_BUILDER
 	printf(WARNING_TEXT);
 #else
-	//...
-#endif
-	return -1;
-}
+	xmlDocPtr doc;
+	xmlNodePtr cur;
+	LCUI_Widget root;
 
+	doc = xmlParseFile( filepath );
+	if( !doc ) {
+		printf( "[builder] Failed to parse xml file: %s\n", filepath );
+		goto FAILED;
+	}
+	cur = xmlDocGetRootElement( doc );
+	if( xmlStrcasecmp(cur->name, "LCUI") ) {
+		printf( "[builder] error root node name: %s\n", cur->name );
+		goto FAILED;
+	}
+	root = LCUIWidget_New(NULL);
+	ParseWidget( root, cur->children );
+	return root;
+FAILED:
+	if( doc ) {
+		xmlFreeDoc( doc );
+	}
+#endif
+	return NULL;
+}

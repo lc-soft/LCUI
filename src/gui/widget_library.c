@@ -89,15 +89,8 @@ LCUI_WidgetClass* LCUIWidget_AddClass( const char *class_name )
 	if( class_data ) {
 		return class_data;
 	}
-
 	len = strlen( class_name );
-	class_data = (LCUI_WidgetClass*)malloc(sizeof(LCUI_WidgetClass));
-	class_data->methods.init = NULL;
-	class_data->methods.destroy = NULL;
-	class_data->methods.paint = NULL;
-	class_data->methods.autosize = NULL;
-	class_data->methods.update = NULL;
-	class_data->task_handler = NULL;
+	class_data = NEW(LCUI_WidgetClass, 1);
 	class_data->name = (char*)malloc(sizeof(char)*(len+1));
 	strcpy( class_data->name, class_name );
 	RBTree_CustomInsert( &widget_class_library, class_name, class_data );

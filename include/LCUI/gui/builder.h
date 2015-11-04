@@ -45,16 +45,16 @@ LCUI_BEGIN_HEADER
 /**
  * 从字符串中载入界面配置代码，解析并生成相应的图形界面(元素)
  * @param[in] str 包含界面配置代码的字符串
- * @return 正常解析会返回 0，出现错误则返回 -1
+ * @return 正常解析会返回部件列表，出现错误则返回 NULL
  */
-LCUI_API int LCUIBuilder_LoadString( const char *str );
+LCUI_API LCUI_Widget LCUIBuilder_LoadString( const char *str, int size );
 
 /**
  * 从文件中载入界面配置代码，解析并生成相应的图形界面(元素)
  * @param[in] filepath 文件路径
- * @return 正常解析会返回 0，出现错误则返回 -1
+ * @return 正常解析会返回部件列表，出现错误则返回 NULL
  */
-LCUI_API int LCUIBuilder_Load( const char *filepath );
+LCUI_API LCUI_Widget LCUIBuilder_LoadFile( const char *filepath );
 
 LCUI_END_HEADER
 
