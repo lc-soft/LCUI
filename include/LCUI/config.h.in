@@ -15,6 +15,9 @@
 /* Define to 1 if you have the <jpeglib.h> header file. */
 #undef HAVE_JPEGLIB_H
 
+/* Define to 1 if you have the <libxml/parser.h> header file. */
+#undef HAVE_LIBXML_PARSER_H
+
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
@@ -93,17 +96,11 @@
 /* Define to 1 if you have the FreeType font engine */
 #undef LCUI_FONT_ENGINE_FREETYPE
 
-/* Define to 1 if not have thread support */
-#undef LCUI_THREAD_NONE
-
 /* Define to 1 if you using pthread support */
 #undef LCUI_THREAD_PTHREAD
 
 /* Define to 1 if you select FrameBuffer for video support */
 #undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
-
-/* Define to 1 if not have video output support */
-#undef LCUI_VIDEO_DRIVER_NONE
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
