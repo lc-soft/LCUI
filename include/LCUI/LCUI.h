@@ -139,6 +139,7 @@ typedef enum LCUI_StyleType {
 	SVT_SCALE,
 	SVT_PX,
 	SVT_PT,
+	SVT_DP,
 	SVT_COLOR,
 	SVT_IMAGE,
 	SVT_STYLE,
@@ -245,6 +246,8 @@ typedef struct LCUI_Style {
 		int val_px;
 		int pt;
 		int val_pt;
+		int dp;
+		int val_dp;
 		int style;
 		int val_style;
 		float scale;

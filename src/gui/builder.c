@@ -41,13 +41,12 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
-#ifdef USE_LCUI_BUILDER
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#endif
 
 #define WARNING_TEXT "[builder] warning: this module is not enabled before build."
 
+#ifdef USE_LCUI_BUILDER
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 
 static int ParseWidget( LCUI_Widget w, xmlNodePtr node )
 {
@@ -85,6 +84,7 @@ static int ParseWidget( LCUI_Widget w, xmlNodePtr node )
 	}
 	return count;
 }
+#endif
 
 LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 {
@@ -101,7 +101,7 @@ LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 		goto FAILED;
 	}
 	cur = xmlDocGetRootElement( doc );
-	if( xmlStrcasecmp(cur->name, "LCUI") ) {
+	if( xmlStrcasecmp(cur->name, BAD_CAST"LCUI") ) {
 		printf( "[builder] error root node name: %s\n", cur->name );
 		goto FAILED;
 	}

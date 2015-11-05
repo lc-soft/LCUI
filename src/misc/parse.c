@@ -2,8 +2,8 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/misc/parse.h>
 
-/** 从字符串中解析出数字，支持的单位：点(pt)、像素(px)、百分比(%) */
-LCUI_BOOL ParseNumber( LCUI_Style *var, const char *str )
+/** 从字符串中解析出数值，包括px、%、dp等单位 */
+LCUI_BOOL ParseNumber( LCUI_Style *s, const char *str )
 {
 	int n = 0;
 	char num_str[32];
@@ -34,41 +34,46 @@ LCUI_BOOL ParseNumber( LCUI_Style *var, const char *str )
 	}
 	num_str[n] = 0;
 	switch( *p ) {
+	case 'd':
+	case 'D':
+		if( p[1] == 'p' || p[1] == 'P' ) {
+			s->type = SVT_DP;
+			sscanf( num_str, "%d", &s->dp );
+		}else {
+			s->type = SVT_NONE;
+		}
+		break;
 	case 'P':
 	case 'p':
 		if( p[1] == 'x' || p[1] == 'X' ) {
-			var->type = SVT_PX;
-			sscanf( num_str, "%d", &var->px );
+			s->type = SVT_PX;
+			sscanf( num_str, "%d", &s->px );
 		} else if( p[1] == 't' || p[1] == 'T' ) {
-			var->type = SVT_PT;
-			sscanf( num_str, "%d", &var->pt );
+			s->type = SVT_PT;
+			sscanf( num_str, "%d", &s->pt );
 		} else {
-			var->type = SVT_NONE;
+			s->type = SVT_NONE;
 		}
 		break;
 	case '%':
-		if( 1 != sscanf(num_str, "%f", &var->scale) ) {
+		if( 1 != sscanf(num_str, "%f", &s->scale) ) {
 			return FALSE;
 		}
-		var->scale /= 100.0;
-		var->type = SVT_SCALE;
+		s->scale /= 100.0;
+		s->type = SVT_SCALE;
 		break;
 	case 0:
-		if( 1 == sscanf(num_str, "%d", &var->px) ) {
-			var->type = SVT_PX;
-			break;
-		}
-		if( 1 == sscanf(num_str, "%f", &var->pt) ) {
-			var->type = SVT_PT;
+		if( 1 == sscanf(num_str, "%d", &s->px) ) {
+			s->type = SVT_PX;
 			break;
 		}
 	default:
-		var->type = SVT_NONE;
-		var->is_valid = FALSE;
+		s->type = SVT_NONE;
+		s->is_valid = FALSE;
 		return FALSE;
 	}
-	var->is_valid = TRUE;
-	var->is_changed = TRUE;
+	s->is_valid = TRUE;
+	s->is_changed = TRUE;
 	return TRUE;
 }
 
