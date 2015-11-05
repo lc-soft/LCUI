@@ -42,6 +42,23 @@
 #include <LCUI/misc/parse.h>
 #include <LCUI/gui/widget.h>
 
+/** 解析器的环境参数（上下文数据） */
+typedef struct LCUI_ParserContext {
+	enum {
+		is_none,		/**< 无 */
+		is_selector,		/**< 选择器 */
+		is_key,			/**< 属性名 */
+		is_value,		/**< 属性值 */
+		is_comment		/**< 注释 */
+	} target;			/**< 当前解析中的目标 */
+	char buffer[256];		/**< 缓存中的字符串 */
+	int pos;			/**< 缓存中的字符串的下标位置 */
+	const char *ptr;		/**< 用于遍历字符串的指针 */
+	LinkedList selectors;		/**< 当前匹配到的选择器列表 */
+	LCUI_StyleSheet css;		/**< 当前缓存的样式表 */
+	LCUI_StyleParser *parser;	/**< 当前找到的解析器 */
+} LCUI_ParserContext;
+
 /** 样式字符串值与标识码 */
 typedef struct KeyNameGroup {
 	int key;
@@ -531,24 +548,9 @@ static int CompareName( void *data, const void *keydata )
 /** 从字符串中解析出样式，并导入至样式库中 */
 int LCUI_ParseStyle( const char *str )
 {
-	int ret;
 	LCUI_Selector s;
-	/** 解析器的环境参数（上下文数据） */
-	struct ParserContext {
-		enum {
-			is_none,	/**< 无 */
-			is_selector,	/**< 选择器 */
-			is_key,		/**< 属性名 */
-			is_value,	/**< 属性值 */
-			is_comment	/**< 注释 */
-		} target;		/**< 当前解析中的目标 */
-		char buffer[256];	/**< 缓存中的字符串 */
-		int pos;		/**< 缓存中的字符串的下标位置 */
-		const char *ptr;	/**< 用于遍历字符串的指针 */
-		LinkedList selectors;	/**< 当前匹配到的选择器列表 */
-		LCUI_StyleSheet css;	/**< 当前缓存的样式表 */
-		LCUI_StyleParser *parser;	/**< 当前找到的解析器 */
-	} ctx = { 0 };
+	LCUI_ParserContext ctx = { 0 };
+
 	DEBUG_MSG("parse begin\n");
 	LinkedList_Init( &ctx.selectors, sizeof(LCUI_Selector) );
 	for( ctx.ptr = str; *ctx.ptr; ++ctx.ptr ) {
@@ -657,10 +659,8 @@ parse_value:
 		}
 		ctx.buffer[ctx.pos] = 0;
 		ctx.pos = 0;
-		ret = ctx.parser->parse( ctx.css, ctx.parser->key,
-					 ctx.buffer );
-		DEBUG_MSG("parse style value: %s, result: %d\n",
-			   ctx.buffer, ret);
+		ctx.parser->parse( ctx.css, ctx.parser->key, ctx.buffer );
+		DEBUG_MSG("parse style value: %s, result: %d\n", ctx.buffer);
 		if( *ctx.ptr == '}' ) {
 			ctx.target = is_none;
 			goto put_css;
