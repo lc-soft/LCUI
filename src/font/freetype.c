@@ -157,7 +157,6 @@ static size_t Convert_FTGlyph( LCUI_FontBitmap *bmp, FT_GlyphSlot slot, int mode
 		break;
 	    }
 	    /* 其它像素模式的位图，暂时先直接填充255，等需要时再完善 */
-	    case FT_PIXEL_MODE_BGRA:
 	    default:
 		memset( bmp->buffer, 255, size );
 		break;
