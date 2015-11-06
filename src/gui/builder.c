@@ -58,7 +58,7 @@ static int ParseWidget( LCUI_Widget w, xmlNodePtr node )
 	for( ; node; node = node->next ) {
 		switch( node->type ) {
 		case XML_ELEMENT_NODE: 
-			child = LCUIWidget_New( node->name );
+			child = LCUIWidget_New( (const char*)node->name );
 			if( !child ) {
 				continue;
 			}
@@ -69,7 +69,7 @@ static int ParseWidget( LCUI_Widget w, xmlNodePtr node )
 			if( !wc || !wc->methods.set_text ) {
 				break;
 			}
-			wc->methods.set_text( w, node->content );
+			wc->methods.set_text( w, (char*)node->content );
 		default: break;
 		}
 		if( !wc || !wc->methods.set_attr ) {
@@ -77,8 +77,8 @@ static int ParseWidget( LCUI_Widget w, xmlNodePtr node )
 		}
 		prop = node->properties;
 		while( prop ) {
-			wc->methods.set_attr( w, prop->name, 
-					      xmlGetProp(node, prop->name) );
+			wc->methods.set_attr( w, (const char*)prop->name, 
+					(char*)xmlGetProp(node, prop->name) );
 			prop = prop->next;
 		}
 	}
@@ -131,7 +131,7 @@ LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 		goto FAILED;
 	}
 	cur = xmlDocGetRootElement( doc );
-	if( xmlStrcasecmp(cur->name, "LCUI") ) {
+	if( xmlStrcasecmp(cur->name, BAD_CAST"LCUI") ) {
 		printf( "[builder] error root node name: %s\n", cur->name );
 		goto FAILED;
 	}
