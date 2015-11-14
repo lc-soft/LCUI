@@ -312,6 +312,9 @@ LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
 
+/** 打印部件树 */
+LCUI_API void LCUIWidget_PrintTree( LCUI_Widget w );
+
 void LCUI_InitWidget(void);
 
 void LCUI_ExitWidget(void);
