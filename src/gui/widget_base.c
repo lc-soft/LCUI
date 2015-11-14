@@ -714,30 +714,51 @@ void Widget_Unlock( LCUI_Widget w )
 	LCUIMutex_Unlock( &w->mutex );
 }
 
-int strlist_add_str( char ***strlist, const char *str )
+static int StrList_AddOne( char ***strlist, const char *str )
 {
-	int i, len;
+	int i = 0;
 	char **newlist;
 
-	if( *strlist ) {
-		for( i = 0; (*strlist)[i]; ++i ) {
-			if( strcmp((*strlist)[i], str) == 0 ) {
-				return 0;
-			}
-		}
-		len = i + 2;
-		newlist = (char**)realloc( *strlist, len * sizeof(char*) );
-	} else {
-		i = 0;
+	if( !*strlist ) {
 		newlist = (char**)malloc( sizeof(char*) * 2 );
+		goto check_done;
 	}
-	if( newlist == NULL ) {
-		return -1;
+	for( i = 0; (*strlist)[i]; ++i ) {
+		if( strcmp((*strlist)[i], str) == 0 ) {
+			return 0;
+		}
+	}
+	newlist = (char**)realloc( *strlist, (i+2)*sizeof(char*) );
+check_done:
+	if( !newlist ) {
+		return 0;
 	}
 	newlist[i] = strdup(str);
 	newlist[i+1] = NULL;
 	*strlist = newlist;
 	return 1;
+}
+
+int StrList_Add( char ***strlist, const char *str )
+{
+	char buff[256];
+	int count = 0, i, head;
+
+	for( head = 0, i = 0; str[i]; ++i ) {
+		if( str[i] != ' ' ) {
+			continue;
+		}
+		if( i - 1 > head ) {
+			strncpy( buff, &str[i], i - head );
+			count += StrList_AddOne( strlist, buff );
+		}
+		head = i;
+	}
+	if( head < i - 1 ) {
+		strncpy( buff, &str[i], i - head );
+		count += StrList_AddOne( strlist, buff );
+	}
+	return count;
 }
 
 LCUI_BOOL strlist_has_str( char **strlist, const char *str )
@@ -790,7 +811,7 @@ int strlist_remove_str( char ***strlist, const char *str )
 /** 为部件添加一个类 */
 int Widget_AddClass( LCUI_Widget w, const char *class_name )
 {
-	if( strlist_add_str( &w->classes, class_name ) != 1 ) {
+	if( StrList_Add(&w->classes, class_name) <= 0 ) {
 		return 0;
 	}
 	// 标记需要更新该部件及子级部件的样式表
@@ -807,7 +828,7 @@ LCUI_BOOL Widget_HasClass( LCUI_Widget w, const char *class_name )
 /** 从部件中移除一个类 */
 int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 {
-	if( strlist_remove_str( &w->classes, class_name ) != 1 ) {
+	if( strlist_remove_str( &w->classes, class_name ) <= 0 ) {
 		return 0;
 	}
 	Widget_AddTask( w, WTT_REFRESH_STYLE );
@@ -818,7 +839,7 @@ int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 /** 为部件添加一个状态 */
 int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 {
-	if( strlist_add_str( &w->pseudo_classes, status_name ) != 1 ) {
+	if( StrList_Add( &w->pseudo_classes, status_name ) <= 0 ) {
 		return 0;
 	}
 	Widget_AddTask( w, WTT_REFRESH_STYLE );
@@ -898,6 +919,31 @@ void Widget_UpdateLayout( LCUI_Widget w )
 	 || w->computed_style.width.type == SVT_AUTO ) {
 		Widget_AddTask( w, WTT_RESIZE );
 	}
+}
+
+static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth )
+{
+	int i;
+	LCUI_Widget child;
+	LinkedList_ForEach( child, 0, &w->children ) {
+		i = depth*4;
+		while( i-- ) {
+			printf(".");
+		}
+		printf("%s, xy:(%d,%d), size:(%d,%d)\n", child->type, 
+			child->x, child->y, child->width, child->height);
+		_LCUIWidget_PrintTree( child, depth+1 );
+	}
+}
+
+void LCUIWidget_PrintTree( LCUI_Widget w )
+{
+	if( !w ) {
+		w = LCUIRootWidget;
+	}
+	printf("widget tree begin\n");
+	_LCUIWidget_PrintTree( w, 0 );
+	printf("widget tree end\n");
 }
 
 void LCUI_InitWidget(void)
