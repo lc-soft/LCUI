@@ -16,6 +16,7 @@
 *.la
 *.txt
 *.vspx
+*.vs
 *~
 aclocal.m4
 Makefile
