@@ -322,19 +322,24 @@ static void HandleResize( LCUI_Widget w )
 /** 处理可见性 */
 static void HandleVisibility( LCUI_Widget w )
 {
-	LCUI_BOOL visible = ( w->cached_style->sheet[key_visible].is_valid && 
-			      w->cached_style->sheet[key_visible].value &&
-			      w->computed_style.display != SV_NONE );
+	LCUI_Style *s;
+	LCUI_BOOL visible = TRUE;
+
+	s = &w->cached_style->sheet[key_visible];
+	if( w->computed_style.display == SV_NONE
+	 || (s->is_valid && !s->value) ) {
+		visible = FALSE;
+	}
+	s = &w->style->sheet[key_display];
 	if( w->style->sheet[key_display].is_valid ) {
-		w->computed_style.display = w->style->sheet[key_display].style;
+		w->computed_style.display = s->style;
 	} else {
 		w->computed_style.display = SV_BLOCK;
 	}
-	if( w->computed_style.display != SV_NONE 
-	 && w->style->sheet[key_visible].is_valid
-	 && w->style->sheet[key_visible].value ) {
-		w->computed_style.visible = TRUE;
-	} else {
+	w->computed_style.visible = TRUE;
+	s = &w->style->sheet[key_visible];
+	if( w->computed_style.display == SV_NONE
+	|| (s->is_valid && !s->value) ) {
 		w->computed_style.visible = FALSE;
 	}
 	if( w->computed_style.visible == visible ) {
