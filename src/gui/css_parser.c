@@ -43,7 +43,7 @@
 #include <LCUI/gui/widget.h>
 
 /** 解析器的环境参数（上下文数据） */
-typedef struct LCUI_ParserContext {
+typedef struct ParserContext {
 	enum {
 		is_none,		/**< 无 */
 		is_selector,		/**< 选择器 */
@@ -57,7 +57,7 @@ typedef struct LCUI_ParserContext {
 	LinkedList selectors;		/**< 当前匹配到的选择器列表 */
 	LCUI_StyleSheet css;		/**< 当前缓存的样式表 */
 	LCUI_StyleParser *parser;	/**< 当前找到的解析器 */
-} LCUI_ParserContext;
+} ParserContext, *ParserContextPtr;
 
 /** 样式字符串值与标识码 */
 typedef struct KeyNameGroup {
@@ -545,57 +545,67 @@ static int CompareName( void *data, const void *keydata )
 	return strcmp(((KeyNameGroup*)data)->name, (const char*)keydata);
 }
 
-/** 从字符串中解析出样式，并导入至样式库中 */
-int LCUI_ParseStyle( const char *str )
+static ParserContextPtr NewParserContext( void )
+{
+	ParserContextPtr ctx = NEW(ParserContext, 1);
+	LinkedList_Init( &ctx->selectors, sizeof(LCUI_Selector) );
+	return ctx;
+}
+
+static void DeleteParserContext( ParserContextPtr *ctx )
+{
+	LinkedList_Destroy( &(*ctx)->selectors );
+	free( *ctx );
+	*ctx = NULL;
+}
+
+/** 载入CSS代码块，用于实现CSS代码的分块载入 */
+static void LCUI_LoadCSSBlock( ParserContextPtr ctx, const char *str )
 {
 	LCUI_Selector s;
-	LCUI_ParserContext ctx = { 0 };
-
-	DEBUG_MSG("parse begin\n");
-	LinkedList_Init( &ctx.selectors, sizeof(LCUI_Selector) );
-	for( ctx.ptr = str; *ctx.ptr; ++ctx.ptr ) {
-		switch( ctx.target ) {
+	for( ctx->ptr = str; *ctx->ptr; ++ctx->ptr ) {
+		switch( ctx->target ) {
 		case is_selector:
-			switch( *ctx.ptr ) {
+			switch( *ctx->ptr ) {
 			case '{':
-				ctx.target = is_key;
-				ctx.css = StyleSheet();
+				ctx->target = is_key;
+				ctx->css = StyleSheet();
 			case ',':
-				ctx.buffer[ctx.pos] = 0;
-				ctx.pos = 0;
-				DEBUG_MSG("selector: %s\n", ctx.buffer);
-				s = Selector(ctx.buffer);
+				ctx->buffer[ctx->pos] = 0;
+				ctx->pos = 0;
+				DEBUG_MSG("selector: %s\n", ctx->buffer);
+				s = Selector(ctx->buffer);
 				if( !s ) {
 					// 解析出错 ...
 					break;
 				}
-				LinkedList_Append( &ctx.selectors, s );
+				LinkedList_Append( &ctx->selectors, s );
 				break;
 			default:
-				ctx.buffer[ctx.pos++] = *ctx.ptr;
+				ctx->buffer[ctx->pos++] = *ctx->ptr;
 				break;
 			}
 			break;
 		case is_key:
-			switch( *ctx.ptr ) {
+			switch( *ctx->ptr ) {
 			case ' ':
 			case '\n':
 			case '\r':
 			case '\t':
 			case ';': 
-				ctx.pos = 0;
+				ctx->pos = 0;
 				continue;
 			case ':': break;
 			case '}':
-				ctx.target = is_none;
+				ctx->target = is_none;
 				goto put_css;
 			default:
-				ctx.buffer[ctx.pos++] = *ctx.ptr;
+				ctx->buffer[ctx->pos++] = *ctx->ptr;
 				continue;
 			}
 			goto select_parser;
 		case is_value:
-			switch( *ctx.ptr ) {
+			switch( *ctx->ptr ) {
 			case '}':
 			case ';':
 				goto parse_value;
@@ -603,18 +613,18 @@ int LCUI_ParseStyle( const char *str )
 			case '\r':
 			case '\t':
 			case ' ':
-				if( ctx.pos == 0 ) {
+				if( ctx->pos == 0 ) {
 					continue;
 				}
 			default:
-				ctx.buffer[ctx.pos++] = *ctx.ptr;
+				ctx->buffer[ctx->pos++] = *ctx->ptr;
 				continue;
 			}
 			break;
 		case is_comment:
 		case is_none:
 		default:
-			switch( *ctx.ptr ) {
+			switch( *ctx->ptr ) {
 			case '\n':
 			case '\t':
 			case '\r':
@@ -626,46 +636,75 @@ int LCUI_ParseStyle( const char *str )
 			case '}': continue;
 			default: break;
 			}
-			ctx.pos = 0;
-			ctx.buffer[ctx.pos++] = *ctx.ptr;
-			ctx.target = is_selector;
+			ctx->pos = 0;
+			ctx->buffer[ctx->pos++] = *ctx->ptr;
+			ctx->target = is_selector;
 			break;
 		}
 		continue;
 put_css:
 		DEBUG_MSG("put css\n");
 		/* 将记录的样式表添加至匹配到的选择器中 */
-		LinkedList_ForEach( s, 0, &ctx.selectors ) {
-			LCUI_PutStyle( s, ctx.css );
+		LinkedList_ForEach( s, 0, &ctx->selectors ) {
+			LCUI_PutStyle( s, ctx->css );
 		}
-		LinkedList_Destroy( &ctx.selectors );
-		DeleteStyleSheet( &ctx.css );
+		LinkedList_Destroy( &ctx->selectors );
+		DeleteStyleSheet( &ctx->css );
 		continue;
 select_parser:	
-		ctx.target = is_value;
-		ctx.buffer[ctx.pos] = 0;
-		ctx.pos = 0;
-		ctx.parser = RBTree_CustomGetData( &self.parser_tree, 
-						   ctx.buffer );
+		ctx->target = is_value;
+		ctx->buffer[ctx->pos] = 0;
+		ctx->pos = 0;
+		ctx->parser = RBTree_CustomGetData( &self.parser_tree, 
+						    ctx->buffer );
 		DEBUG_MSG("select style: %s, parser: %p\n",
-			   ctx.buffer, ctx.parser);
+			   ctx->buffer, ctx->parser);
 		continue;
 parse_value:
-		if( *ctx.ptr == ';' ) {
-			ctx.target = is_key;
+		if( *ctx->ptr == ';' ) {
+			ctx->target = is_key;
 		}
-		if( !ctx.parser ) {
+		if( !ctx->parser ) {
 			continue;
 		}
-		ctx.buffer[ctx.pos] = 0;
-		ctx.pos = 0;
-		ctx.parser->parse( ctx.css, ctx.parser->key, ctx.buffer );
-		DEBUG_MSG("parse style value: %s, result: %d\n", ctx.buffer);
-		if( *ctx.ptr == '}' ) {
-			ctx.target = is_none;
+		ctx->buffer[ctx->pos] = 0;
+		ctx->pos = 0;
+		ctx->parser->parse( ctx->css, ctx->parser->key, ctx->buffer );
+		DEBUG_MSG("parse style value: %s, result: %d\n", ctx->buffer);
+		if( *ctx->ptr == '}' ) {
+			ctx->target = is_none;
 			goto put_css;
 		}
 	}
+}
+
+/** 从文件中载入CSS样式数据，并导入至样式库中 */
+int LCUI_LoadCSSFile( const char *filepath )
+{
+	FILE *fp;
+	char buff[512];
+	ParserContextPtr ctx;
+	
+	fp = fopen( filepath, "rb" );
+	if( !fp ) {
+		return -1;
+	}
+	ctx = NewParserContext();
+	while( fread(buff, 512, 1, fp) ) {
+		LCUI_LoadCSSBlock( ctx, buff );
+	}
+	DeleteParserContext( &ctx );
+	return 0;
+}
+
+/** 从字符串中解析出样式，并导入至样式库中 */
+int LCUI_LoadCSS( const char *str )
+{
+	ParserContextPtr ctx;
+	DEBUG_MSG("parse begin\n");
+	ctx = NewParserContext();
+	LCUI_LoadCSSBlock( ctx, str );
+	DeleteParserContext( &ctx );
 	DEBUG_MSG("parse end\n");
 	return 0;
 }
@@ -677,7 +716,7 @@ int LCUI_GetStyleTotal(void)
 }
 
 /** 注册新的属性和对应的属性值解析器 */
-int LCUICssParser_Register( LCUI_StyleParser *sp )
+int LCUICSSParser_Register( LCUI_StyleParser *sp )
 {
 	int key;
 	LCUI_StyleParser *new_sp;
@@ -698,7 +737,7 @@ int LCUICssParser_Register( LCUI_StyleParser *sp )
 }
 
 /** 初始化 LCUI 的 CSS 代码解析功能 */
-void LCUICssParser_Init(void)
+void LCUICSSParser_Init(void)
 {
 	LCUI_StyleParser *new_sp, *sp, *sp_end;
 	KeyNameGroup *skn, *skn_end;
@@ -738,7 +777,7 @@ void LCUICssParser_Init(void)
 	self.count = STYLE_KEY_TOTAL;
 }
 
-void LCUICssParser_Destroy(void)
+void LCUICSSParser_Destroy(void)
 {
 
 }

@@ -422,10 +422,11 @@ void LCUIWidget_AddTextView( void )
 	wc->methods.destroy = TextView_OnDestroy;
 	wc->methods.autosize = TextView_AutoSize;
 	wc->methods.update = TextView_UpdateStyle;
+	wc->methods.set_text = TextView_SetText;
 	wc->task_handler = TextView_OnTask;
 	
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
 		style_key_map[style_parsers[i].key] = 
-		LCUICssParser_Register( &style_parsers[i] );
+		LCUICSSParser_Register( &style_parsers[i] );
 	}
 }

@@ -160,5 +160,5 @@ void LCUIWidget_AddSideBar(void)
 	wc = LCUIWidget_AddClass("sidebar-item");
 	wc->methods.init = SideBarItem_OnInit;
 	wc->methods.destroy = SideBarItem_OnDestroy;
-	LCUI_ParseStyle( sidebar_css );
+	LCUI_LoadCSS( sidebar_css );
 }

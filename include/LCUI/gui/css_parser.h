@@ -54,18 +54,21 @@ LCUI_API int ParseStyleOption( const char *str );
 LCUI_API const char *GetStyleName( int key );
 
 /** 初始化 LCUI 的 CSS 代码解析功能 */
-LCUI_API void LCUICssParser_Init(void);
+void LCUICSSParser_Init(void);
 
-/** 从字符串中解析出样式，并导入至样式库中 */
-LCUI_API int LCUI_ParseStyle( const char *str );
+/** 从文件中载入CSS样式数据，并导入至样式库中 */
+LCUI_API int LCUI_LoadCSSFile( const char *filepath );
 
-LCUI_API void LCUICssParser_Destroy(void);
+/** 从字符串中载入CSS样式数据，并导入至样式库中 */
+LCUI_API int LCUI_LoadCSS( const char *str );
+
+void LCUICSSParser_Destroy(void);
 
 /** 获取当前记录的样式属性的总数 */
 int LCUI_GetStyleTotal(void);
 
 /** 注册新的属性和对应的属性值解析器 */
-LCUI_API int LCUICssParser_Register( LCUI_StyleParser *sp );
+LCUI_API int LCUICSSParser_Register( LCUI_StyleParser *sp );
 
 LCUI_END_HEADER
 
