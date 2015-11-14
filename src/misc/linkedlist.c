@@ -170,7 +170,9 @@ int LinkedList_Delete( LinkedList *list )
 		list->current_node->data = NULL;
 	}
 	/* 如果在链表尾端 */
-	DEBUG_MSG("current = %p, head = %p, tail = %p, used_node_num = %d\n", list->current_node, list->used_head_node, list->used_tail_node, list->used_node_num);
+	DEBUG_MSG("current = %p, head = %p, tail = %p, used_node_num = %d\n", 
+		   list->current_node, list->used_head_node, 
+		   list->used_tail_node, list->used_node_num);
 	if( list->current_node == list->used_tail_node ) {
 		if( list->current_node->prev ) {
 			list->used_tail_node = list->current_node->prev;

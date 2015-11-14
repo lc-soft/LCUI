@@ -356,12 +356,13 @@ static void Win32Surface_Hide( LCUI_Surface surface )
 static void Win32Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 {
 	int len;
-	wchar_t *caption;
+	wchar_t *caption = NULL;
 
-	len = wcslen(str) + 1;
-	caption = (wchar_t*)malloc(sizeof(wchar_t)*len);
-	wcsncpy( caption, str, len );
-
+	if( str ) {
+		len = wcslen(str) + 1;
+		caption = (wchar_t*)malloc(sizeof(wchar_t)*len);
+		wcsncpy( caption, str, len );
+	}
 	if( surface->task_buffer[TASK_SET_CAPTION].is_valid
 	 && surface->task_buffer[TASK_SET_CAPTION].caption ) {
 		free( surface->task_buffer[TASK_SET_CAPTION].caption );
