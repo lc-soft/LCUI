@@ -50,8 +50,10 @@ typedef struct ParserContext {
 		is_key,			/**< 属性名 */
 		is_value,		/**< 属性值 */
 		is_comment		/**< 注释 */
-	} target;			/**< 当前解析中的目标 */
-	char buffer[256];		/**< 缓存中的字符串 */
+	} target, target_bak;		/**< 当前解析中的目标，以及当前备份的目标 */
+	LCUI_BOOL is_line_comment;	/**< 是否为单行注释 */
+	char *buffer;			/**< 缓存中的字符串 */
+	size_t buffer_size;		/**< 缓存区大小 */
 	int pos;			/**< 缓存中的字符串的下标位置 */
 	const char *ptr;		/**< 用于遍历字符串的指针 */
 	LinkedList selectors;		/**< 当前匹配到的选择器列表 */
@@ -545,28 +547,38 @@ static int CompareName( void *data, const void *keydata )
 	return strcmp(((KeyNameGroup*)data)->name, (const char*)keydata);
 }
 
-static ParserContextPtr NewParserContext( void )
+static ParserContextPtr NewParserContext( size_t buffer_size )
 {
 	ParserContextPtr ctx = NEW(ParserContext, 1);
 	LinkedList_Init( &ctx->selectors, sizeof(LCUI_Selector) );
+	ctx->buffer = (char*)malloc( sizeof(char) * buffer_size );
+	ctx->buffer_size = buffer_size;
+	ctx->target_bak = is_none;
+	ctx->target = is_none;
 	return ctx;
 }
 
-static void DeleteParserContext( ParserContextPtr *ctx )
+static void DeleteParserContext( ParserContextPtr *ctx_ptr )
 {
-	LinkedList_Destroy( &(*ctx)->selectors );
-	free( *ctx );
-	*ctx = NULL;
+	ParserContextPtr ctx = *ctx_ptr;
+	LinkedList_Destroy( &ctx->selectors );
+	free( ctx->buffer );
+	free( ctx );
+	*ctx_ptr = NULL;
 }
 
 /** 载入CSS代码块，用于实现CSS代码的分块载入 */
-static void LCUI_LoadCSSBlock( ParserContextPtr ctx, const char *str )
+static int LCUI_LoadCSSBlock( ParserContextPtr ctx, const char *str )
 {
+	size_t size = 0;
 	LCUI_Selector s;
-	for( ctx->ptr = str; *ctx->ptr; ++ctx->ptr ) {
+	
+	ctx->ptr = str;
+	for( ; *ctx->ptr && size < ctx->buffer_size; ++ctx->ptr, ++size ) {
 		switch( ctx->target ) {
 		case is_selector:
 			switch( *ctx->ptr ) {
+			case '/': goto proc_comment;
 			case '{':
 				ctx->target = is_key;
 				ctx->css = StyleSheet();
@@ -588,6 +600,7 @@ static void LCUI_LoadCSSBlock( ParserContextPtr ctx, const char *str )
 			break;
 		case is_key:
 			switch( *ctx->ptr ) {
+			case '/': goto proc_comment;
 			case ' ':
 			case '\n':
 			case '\r':
@@ -606,6 +619,7 @@ static void LCUI_LoadCSSBlock( ParserContextPtr ctx, const char *str )
 			goto select_parser;
 		case is_value:
 			switch( *ctx->ptr ) {
+			case '/': goto proc_comment;
 			case '}':
 			case ';':
 				goto parse_value;
@@ -622,16 +636,27 @@ static void LCUI_LoadCSSBlock( ParserContextPtr ctx, const char *str )
 			}
 			break;
 		case is_comment:
+			if( ctx->is_line_comment ) {
+				if( *ctx->ptr == '\n' ) {
+					ctx->target = ctx->target_bak;
+				}
+				break;
+			}
+			if( *ctx->ptr == '/' && *(ctx->ptr - 1) == '*' ) {
+				ctx->target = ctx->target_bak;
+			}
+			break;
 		case is_none:
 		default:
 			switch( *ctx->ptr ) {
+			case '/': goto proc_comment;
 			case '\n':
 			case '\t':
 			case '\r':
 			case ' ':
 			case ',':
 			case '{':
-			case '\'':
+			case '\\':
 			case '"':
 			case '}': continue;
 			default: break;
@@ -640,6 +665,17 @@ static void LCUI_LoadCSSBlock( ParserContextPtr ctx, const char *str )
 			ctx->buffer[ctx->pos++] = *ctx->ptr;
 			ctx->target = is_selector;
 			break;
+		}
+		continue;
+proc_comment:
+		switch( *(ctx->ptr + 1) ) {
+		case '/': ctx->is_line_comment = TRUE; break;
+		case '*': ctx->is_line_comment = FALSE; break;
+		default: continue;
+		}
+		if( ctx->target_bak != is_comment ) {
+			ctx->target_bak = ctx->target;
+			ctx->target = is_comment;
 		}
 		continue;
 put_css:
@@ -655,8 +691,9 @@ select_parser:
 		ctx->target = is_value;
 		ctx->buffer[ctx->pos] = 0;
 		ctx->pos = 0;
-		ctx->parser = RBTree_CustomGetData( &self.parser_tree, 
+		ctx->parser = RBTree_CustomGetData( &self.parser_tree,
 						    ctx->buffer );
+
 		DEBUG_MSG("select style: %s, parser: %p\n",
 			   ctx->buffer, ctx->parser);
 		continue;
@@ -676,6 +713,7 @@ parse_value:
 			goto put_css;
 		}
 	}
+	return size;
 }
 
 /** 从文件中载入CSS样式数据，并导入至样式库中 */
@@ -685,25 +723,30 @@ int LCUI_LoadCSSFile( const char *filepath )
 	char buff[512];
 	ParserContextPtr ctx;
 	
-	fp = fopen( filepath, "rb" );
+	fp = fopen( filepath, "r" );
 	if( !fp ) {
 		return -1;
 	}
-	ctx = NewParserContext();
+	ctx = NewParserContext( 512 );
 	while( fread(buff, 512, 1, fp) ) {
 		LCUI_LoadCSSBlock( ctx, buff );
 	}
 	DeleteParserContext( &ctx );
+	fclose( fp );
 	return 0;
 }
 
 /** 从字符串中解析出样式，并导入至样式库中 */
 int LCUI_LoadCSS( const char *str )
 {
+	int len = 1;
+	const char *cur;
 	ParserContextPtr ctx;
 	DEBUG_MSG("parse begin\n");
-	ctx = NewParserContext();
-	LCUI_LoadCSSBlock( ctx, str );
+	ctx = NewParserContext( 512 );
+	for( cur = str; len > 0; cur += len ) {
+		len = LCUI_LoadCSSBlock( ctx, cur );
+	}
 	DeleteParserContext( &ctx );
 	DEBUG_MSG("parse end\n");
 	return 0;
