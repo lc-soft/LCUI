@@ -50,8 +50,6 @@
 #include <LCUI/misc/rbtree.h>
 #include <LCUI/kernel/event.h>
 
-#define NEW_ONE(type) (type*)malloc(sizeof(type))
-
 /** 为本文件内的函数名加上前缀 */
 #define $(FUNC_NAME) LCUIEventBox_##FUNC_NAME
 
@@ -91,7 +89,7 @@ static void DestroyEventSlot( void *data )
 	LCUI_EventSlot *slot = (LCUI_EventSlot*)data;
 	free( slot->name );
 	slot->name = NULL;
-	LinkedList_Destroy( &slot->handlers );
+	LinkedList_Clear( &slot->handlers, NULL );
 }
 
 static void DestroyEventHandler( void *data )
@@ -114,8 +112,7 @@ static void DestroyEvent( void *data )
 /** 创建一个事件容器实例 */
 LCUI_EventBox $(Create)(void)
 {
-	LCUI_EventBox box;
-	box = NEW_ONE(struct LCUI_EventBoxRec_);
+	LCUI_EventBox box = malloc(sizeof(struct LCUI_EventBoxRec_));
 	box->event_id = 100;
 	box->handler_id = 100;
 	box->current = 0;
@@ -127,12 +124,8 @@ LCUI_EventBox $(Create)(void)
 	RBTree_OnDestroy( &box->event_slot, DestroyEventSlot );
 	RBTree_SetDataNeedFree( &box->event_handler, 0 );
 	RBTree_SetDataNeedFree( &box->event_name, 0 );
-	LinkedList_Init( &box->events[0], sizeof(LCUI_Event) );
-	LinkedList_Init( &box->events[1], sizeof(LCUI_Event) );
-	LinkedList_SetDataNeedFree( &box->events[0], 1 );
-	LinkedList_SetDataNeedFree( &box->events[1], 1 );
-	LinkedList_SetDestroyFunc( &box->events[0], DestroyEvent );
-	LinkedList_SetDestroyFunc( &box->events[1], DestroyEvent );
+	LinkedList_Init( &box->events[0] );
+	LinkedList_Init( &box->events[1] );
 	DEBUG_MSG("eventbox: %p, handler_id: %d\n", box, box->handler_id);
 	return box;
 }
@@ -143,8 +136,8 @@ void $(Destroy)( LCUI_EventBox box )
 	RBTree_Destroy( &box->event_name );
 	RBTree_Destroy( &box->event_handler );
 	RBTree_Destroy( &box->event_slot );
-	LinkedList_Destroy( &box->events[0] );
-	LinkedList_Destroy( &box->events[1] );
+	LinkedList_Clear( &box->events[0], DestroyEvent );
+	LinkedList_Clear( &box->events[1], DestroyEvent );
 }
 
 /** 注册事件，指定事件名称和ID */
@@ -161,17 +154,16 @@ int $(AddEvent)( LCUI_EventBox box, const char *event_name, int id )
 		return -2;
 	}
 	/* 新建一个事件槽 */
-	slot = NEW_ONE(LCUI_EventSlot);
+	slot = (LCUI_EventSlot*)malloc(sizeof(LCUI_EventSlot));
 	slot->name = (char*)malloc(sizeof(char)*(strlen(event_name)+1));
 	slot->id = id;
 	strcpy( slot->name, event_name );
-	LinkedList_Init( &slot->handlers, sizeof(LCUI_EventHandler) );
+	LinkedList_Init( &slot->handlers );
 	/* 添加事件槽记录 */
 	RBTree_Insert( &box->event_slot, slot->id, slot );
 	/* 添加事件名记录 */
-	node = RBTree_CustomInsert(
-		&box->event_name, (const void*)slot->name, slot->name
-	);
+	node = RBTree_CustomInsert( &box->event_name, (const void*)slot->name, 
+				    slot->name );
 	/* 结点的 key 就是事件槽的 id */
 	node->key = slot->id;
 	return 0;
@@ -219,7 +211,7 @@ int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
 		return -1;
 	}
 	slot = (LCUI_EventSlot*)node->data;
-	handler = NEW_ONE(LCUI_EventHandler);
+	handler = (LCUI_EventHandler*)malloc(sizeof(LCUI_EventHandler));
 	DEBUG_MSG("eventbox: %p, handler_id: %d\n", box, box->handler_id);
 	handler->id = ++box->handler_id;
 	handler->func = func;
@@ -258,32 +250,29 @@ int $(Bind)(	LCUI_EventBox box, const char *event_name, EventCallBack func,
 /** 解除事件连接 */
 int $(Unbind)( LCUI_EventBox box, int handler_id )
 {
-	int i, n, *data;
-	LCUI_RBTreeNode *node;
+	int *data;
+	LCUI_RBTreeNode *tnode;
+	LinkedListNode *lnode;
 	LCUI_EventSlot *slot;
-	LCUI_EventHandler *handler;
 
-	node = RBTree_Search(&box->event_handler, handler_id);
-	if( !node ) {
+	tnode = RBTree_Search(&box->event_handler, handler_id);
+	if( !tnode ) {
 		return -1;
 	}
 	/* 将data指针的值转换成 int 型数据 */
-	data = (int*)&node->data;
-	node = RBTree_Search(&box->event_slot, *data);
-	if( !node ) {
+	data = (int*)&tnode->data;
+	tnode = RBTree_Search( &box->event_slot, *data );
+	if( !tnode ) {
 		return -2;
 	}
-	slot = (LCUI_EventSlot*)node->data;
-	LinkedList_Goto( &slot->handlers, 0 );
-	n = LinkedList_GetTotal( &slot->handlers );
-	for( i=0; i<n; ++i ) {
-		handler = (LCUI_EventHandler*)LinkedList_Get( &slot->handlers );
-		if( handler->id == handler_id ) {
-			LinkedList_Delete( &slot->handlers );
-			RBTree_Erase( &box->event_handler, handler_id );
-			return 0;
+	slot = (LCUI_EventSlot*)tnode->data;
+	LinkedList_ForEach( lnode, &slot->handlers ) {
+		if( ((LCUI_EventHandler*)lnode->data)->id != handler_id ) {
+			continue;
 		}
-		LinkedList_ToNext( &slot->handlers );
+		LinkedList_DeleteNode( &slot->handlers, lnode );
+		RBTree_Erase( &box->event_handler, handler_id );
+		return 0;
 	}
 	return -3;
 }
@@ -291,27 +280,26 @@ int $(Unbind)( LCUI_EventBox box, int handler_id )
 /** 直接将事件发送至事件处理器进行处理 */
 int $(Send)( LCUI_EventBox box, const char *name, void *data )
 {
-	int i, n;
 	LCUI_Event event;
-	LCUI_RBTreeNode *node;
+	LCUI_RBTreeNode *tnode;
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
+	LinkedListNode *lnode;
+
 	DEBUG_MSG("send event: %s\n", name);
-	if( !(node = RBTree_CustomSearch(&box->event_name, (const void*)name)) ) {
+	if( !(tnode = RBTree_CustomSearch(&box->event_name, (const void*)name)) ) {
 		return -1;
 	}
-	if( !(node = RBTree_Search(&box->event_slot, node->key)) ) {
+	if( !(tnode = RBTree_Search(&box->event_slot, tnode->key)) ) {
 		return -2;
 	}
-	slot = (LCUI_EventSlot*)node->data;
+	slot = (LCUI_EventSlot*)tnode->data;
 	event.id = slot->id;
 	event.name = slot->name;
 	event.data = data;
 	event.destroy_data = NULL;
-	n = LinkedList_GetTotal( &slot->handlers );
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &slot->handlers, i );
-		handler = (LCUI_EventHandler*)LinkedList_Get( &slot->handlers );
+	LinkedList_ForEach( lnode, &slot->handlers ) {
+		handler = (LCUI_EventHandler*)lnode->data;
 		if( handler && handler->func ) {
 			handler->func( &event, handler->func_data );
 		}
@@ -320,8 +308,8 @@ int $(Send)( LCUI_EventBox box, const char *name, void *data )
 }
 
 /** 将事件投递给事件处理器，等待处理 */
-int $(Post)(	LCUI_EventBox box, const char *name, void *data,
-		 void (*destroy_data)(void*) )
+int $(Post)( LCUI_EventBox box, const char *name, void *data,
+	     void (*destroy_data)(void*) )
 {
 	LCUI_Event *e;
 	LCUI_RBTreeNode *node;
@@ -335,36 +323,34 @@ int $(Post)(	LCUI_EventBox box, const char *name, void *data,
 	if( !(node = RBTree_Search(&box->event_slot, node->key)) ) {
 		return -2;
 	}
-	e = (LCUI_Event*)LinkedList_Alloc( elist );
+	e = (LCUI_Event*)malloc(sizeof(LCUI_Event));
 	slot = (LCUI_EventSlot*)node->data;
 	e->id = slot->id;
 	e->name = slot->name;
 	e->data = data;
 	e->destroy_data = destroy_data;
+	LinkedList_Append( elist, e );
 	return 0;
 }
 
 /** 派发当前待处理的事件至对应的处理器 */
 int $(Dispatch)( LCUI_EventBox box )
 {
-	int i, n;
 	LCUI_Event *e;
 	LinkedList *elist;
+	LinkedListNode *node;
 
 	elist = &box->events[box->current];
 	box->current = box->current ? 0:1;
-	n = LinkedList_GetTotal( elist );
-	LinkedList_Goto( elist, 0 );
 	DEBUG_MSG("event total: %d\n", n);
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( elist, 0 );
-		e = (LCUI_Event*)LinkedList_Get( elist );
+	LinkedList_ForEach( node, elist ) {
+		e = (LCUI_Event*)node->data;
 		DEBUG_MSG("send, name = %s\n", e->name);
 		$(Send)( box, e->name, e->data );
 		e->destroy_data ? e->destroy_data( e->data ):0;
 		e->data = NULL;
-		LinkedList_Delete( elist );
 	}
+	LinkedList_Clear( elist, DestroyEvent );
 	DEBUG_MSG("quit\n");
 	return 0;
 }
@@ -372,17 +358,12 @@ int $(Dispatch)( LCUI_EventBox box )
 /** 从已触发的事件记录中取出（不会移除）一个事件信息 */
 int $(GetEvent)( LCUI_EventBox box, LCUI_Event *ebuff )
 {
-	int n;
 	LCUI_Event *event;
-	LinkedList *elist;
-
-	elist = &box->events[box->current];
-	n = LinkedList_GetTotal( elist );
-	if( n <= 0 ) {
+	LinkedList *elist = &box->events[box->current];
+	if( elist->length <= 0 ) {
 		return -1;
 	}
-	LinkedList_Goto( elist, 0 );
-	event = (LCUI_Event*)LinkedList_Get( elist );
+	event = (LCUI_Event*)LinkedList_Get( elist, 0 );
 	*ebuff = *event;
 	return 0;
 }
@@ -390,11 +371,10 @@ int $(GetEvent)( LCUI_EventBox box, LCUI_Event *ebuff )
 /** 从已触发的事件记录中删除一个事件信息 */
 int $(DeleteEvent)( LCUI_EventBox box )
 {
-	LinkedList *elist;
-	elist = &box->events[box->current];
-	if( LinkedList_GetTotal( elist ) <= 0 ) {
+	LinkedList *elist = &box->events[box->current];
+	if( elist->length <= 0 ) {
 		return -2;
 	}
-	LinkedList_Delete( elist );
+	LinkedList_Delete( elist, 0 );
 	return 0;
 }

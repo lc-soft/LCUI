@@ -42,8 +42,6 @@
 #define __LCUI_MISC_RECT_H__
 
 LCUI_BEGIN_HEADER
-	
-typedef LinkedList LCUI_DirtyRectList;
 
 /* 将数值转换成LCUI_Rect型结构体 */
 LCUI_API LCUI_Rect Rect( int x, int y, int w, int h );
@@ -91,17 +89,11 @@ LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a,
 LCUI_API void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
 				    LCUI_Rect rects[4] );
 
-/** 初始化脏矩形记录 */
-LCUI_API void DirtyRectList_Init( LCUI_DirtyRectList *list );
-
-/** 销毁脏矩形记录 */
-LCUI_API void DirtyRectList_Destroy( LCUI_DirtyRectList *list );
-
 /** 添加一个脏矩形记录 */
-LCUI_API int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect );
+LCUI_API int RectList_Add( LinkedList *list, LCUI_Rect *rect );
 
 /** 删除脏矩形 */
-LCUI_API int DirtyRectList_Delete( LCUI_DirtyRectList *list, LCUI_Rect *rect );
+LCUI_API int RectList_Delete( LinkedList *list, LCUI_Rect *rect );
 
 LCUI_END_HEADER
 

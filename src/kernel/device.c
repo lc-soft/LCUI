@@ -62,26 +62,21 @@ static LCUI_Mutex list_mutex;
 static LinkedList dev_list;
 static LCUI_Thread dev_tid;
 
-/** 
- * 功能：注册设备
- * 说明：为指定设备添加处理函数
- * */
-int LCUIDevice_Add(	LCUI_BOOL (*init)(void), 
-			LCUI_BOOL (*proc)(void),
-			LCUI_BOOL (*exit)(void) )
+int LCUIDevice_Add( LCUI_BOOL (*init)(void), LCUI_BOOL (*proc)(void),
+		    LCUI_BOOL (*exit)(void) )
 {
-	DeviceData device, *p;
-	device.init = init;
-	device.proc = proc;
-	device.exit = exit;
+	DeviceData *dev = NEW(DeviceData, 1);
+	dev->init = init;
+	dev->proc = proc;
+	dev->exit = exit;
 	LCUIMutex_Lock( &list_mutex );
-	p = (DeviceData*)LinkedList_AppendCopy( &dev_list, &device );
-	LCUIMutex_Unlock( &list_mutex );
-	if( !p ) {
+	if( !LinkedList_Append( &dev_list, dev ) ) {
+		LCUIMutex_Unlock( &list_mutex );
 		return -1;
 	}
-	if( device.init ) {
-		device.init();
+	LCUIMutex_Unlock( &list_mutex );
+	if( dev->init ) {
+		dev->init();
 	}
 	return 0;
 }
@@ -89,27 +84,26 @@ int LCUIDevice_Add(	LCUI_BOOL (*init)(void),
 /** 设备处理线程 */
 static void DeviceThread( void *arg )
 {
-	DeviceData *data_ptr;
-	int n, i, timeout_count = 0;
+	DeviceData *dev;
+	LinkedListNode *node;
+	int timeout = 0;
 	
 	is_running = TRUE;
 	while( is_running ) {
 		LCUIMutex_Lock( &list_mutex );
-		n = LinkedList_GetTotal( &dev_list );
-		LinkedList_Goto( &dev_list, 0 );
-		for( i=0; i<n; ++i ) {
-			data_ptr = (DeviceData*)LinkedList_Get( &dev_list );
-			if( !data_ptr || !data_ptr->proc ) {
+		LinkedList_ForEach( node, &dev_list ) {
+			dev = (DeviceData*)node->data;
+			if( !dev || !dev->proc ) {
 				continue;
 			}
-			if( data_ptr->proc() ) {
-				++timeout_count;
+			if( dev->proc() ) {
+				++timeout;
 			}
 		}
 		LCUIMutex_Unlock( &list_mutex );
-		if( timeout_count > 20 ) {
+		if( timeout > 20 ) {
 			LCUI_MSleep( 50 );
-			timeout_count = 0;
+			timeout = 0;
 		}
 		LCUI_MSleep( 10 );
 	}
@@ -120,30 +114,24 @@ static void DeviceThread( void *arg )
 int LCUI_InitDevice(void)
 {
 	LCUIMutex_Init( &list_mutex );
-	LinkedList_Init( &dev_list, sizeof(DeviceData) );
-	LinkedList_SetDataNeedFree( &dev_list, TRUE );
+	LinkedList_Init( &dev_list );
 	return LCUIThread_Create( &dev_tid, DeviceThread, NULL );
 }
 
 /** 停用设备处理模块 */
 void LCUI_ExitDevice(void)
 {
-	int n, i;
-	DeviceData *data_ptr;
+	DeviceData *dev;
+	LinkedListNode *node;
 	
 	LCUIMutex_Lock( &list_mutex );
-	n = LinkedList_GetTotal( &dev_list );
-	LinkedList_Goto( &dev_list, 0 );
-	for( i=0; i<n; ++i ) {
-		data_ptr = (DeviceData*)LinkedList_Get( &dev_list );
-		if( !data_ptr ) {
-			break;
+	LinkedList_ForEach( node, &dev_list ) {
+		dev = (DeviceData*)node->data;
+		if( dev && dev->exit ) {
+			dev->exit();
 		}
-		if( data_ptr->exit ) {
-			data_ptr->exit();
-		}
-		LinkedList_ToNext( &dev_list );
 	}
+	LinkedList_Clear( &dev_list, free );
 	LCUIMutex_Unlock( &list_mutex );
 	LCUIMutex_Destroy( &list_mutex );
 }

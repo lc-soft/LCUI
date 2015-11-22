@@ -88,8 +88,8 @@ static void DestroyWidgetEventTask( void *arg )
 /** 将原始事件转换成部件事件 */
 static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 {
-	int i;
 	LinkedList *children;
+	LinkedListNode *node;
 	LCUI_Widget widget;
 	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)event->data;
 
@@ -120,16 +120,15 @@ static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 		} else {
 			children = &LCUIRootWidget->children_show;
 		}
-		i = 0;
 		/* 确定自己的显示位置，忽略显示在它前面的部件 */
-		LinkedList_ForEach( widget, 0, children ) {
-			if( widget == (LCUI_Widget)LinkedList_Get(children) ) {
+		LinkedList_ForEach( node, children ) {
+			if( widget == node->data ) {
+				node = node->next;
 				break;
 			}
-			i += 1;
 		}
 		/* 向后面的部件传播事件 */
-		LinkedList_ForEach( widget, i+1, children ) {
+		while( node ) {
 			if( !widget->computed_style.visible ) {
 				continue;
 			}
@@ -386,15 +385,15 @@ static void OnInput( LCUI_SystemEvent *e, void *arg )
 /** 处理一次当前积累的部件事件 */
 void LCUIWidget_StepEvent(void)
 {
-	int i, n;
 	LCUI_Widget widget;
+	LinkedListNode *prev, *node;
 
-	n = LinkedList_GetTotal( &self.pending_list );
 	DEBUG_MSG("widget total: %d\n", n);
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &self.pending_list, 0 );
-		widget = (LCUI_Widget)LinkedList_Get( &self.pending_list );
-		LinkedList_Delete( &self.pending_list );
+	LinkedList_ForEach( node, &self.pending_list ) {
+		widget = node->data;;
+		prev = node->prev;
+		LinkedList_DeleteNode( &self.pending_list, node );
+		node = prev;
 		DEBUG_MSG("dispatch event, widget: %p\n", widget->type);
 		LCUIEventBox_Dispatch( widget->event );
 		RBTree_CustomErase( &self.mark_tree, widget );
@@ -408,8 +407,7 @@ void LCUIWidget_InitEvent(void)
 	RBTree_Init( &self.mark_tree );
 	RBTree_OnJudge( &self.mark_tree, CompareWidgetMark );
 	RBTree_SetDataNeedFree( &self.mark_tree, FALSE );
-	LinkedList_Init( &self.pending_list, sizeof(LCUI_Widget) );
-	LinkedList_SetDataNeedFree( &self.pending_list, FALSE );
+	LinkedList_Init( &self.pending_list );
 	LCUI_BindEvent( "mousedown", OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( "mousemove", OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( "mouseup", OnMouseEvent, NULL, NULL );

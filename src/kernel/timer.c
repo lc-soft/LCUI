@@ -73,6 +73,7 @@ static struct TimerModule {
 } self;
 
 #define TIME_WRAP_VALUE (~(int64_t)0)
+#define TimerNode(timer) (LinkedListNode*)(((char*)timer) + sizeof(TimerData))
 
 #ifdef LCUI_BUILD_IN_WIN32
 
@@ -141,58 +142,25 @@ int64_t LCUI_GetTicks( int64_t start_ticks )
 /*----------------------------- Private ------------------------------*/
 
 /** 更新定时器在定时器列表中的位置 */
-static void TimerList_UpdateTimerPos( TimerData *timer )
+static void TimerList_AddNode( LinkedListNode *node )
 {
-	int i = 0, src_i=-1, des_i=-1;
-	int64_t time_left, tmp_time_left;
-	TimerData *tmp_timer;
-
+	int64_t t, tt;
+	TimerData *timer;
+	LinkedListNode *cur;
 	/* 计算该定时器的剩余定时时长 */
-	time_left = LCUI_GetTicks( timer->start_time );
-	time_left -= timer->pause_ms;
-	time_left = timer->total_ms - time_left;
-	LinkedList_ForEach( tmp_timer, 0, &self.timer_list ) {
-		if( !tmp_timer ) {
-			++i;
-			continue;
+	timer = (TimerData*)node->data;
+	t = LCUI_GetTicks( timer->start_time );
+	t = timer->total_ms - t + timer->pause_ms;
+	LinkedList_ForEach( cur, &self.timer_list ) {
+		timer = (TimerData*)cur->data;
+		tt = LCUI_GetTicks( timer->start_time );
+		tt = timer->total_ms - tt + timer->pause_ms;
+		if( t <= tt ) {
+			LinkedList_Link( &self.timer_list, cur, node );
+			return;
 		}
-		/* 若找到自己的位置，则记录 */
-		if( tmp_timer->id == timer->id ) {
-			src_i = i;
-			/* 如果已经找到目标位置，则退出循环 */
-			if( des_i != -1 ) {
-				break;
-			}
-			++i;
-			continue;
-		}
-		tmp_time_left = LCUI_GetTicks( tmp_timer->start_time );
-		tmp_time_left -= tmp_timer->pause_ms;
-		tmp_time_left = tmp_timer->total_ms - tmp_time_left;
-		/* 若该定时器的剩余定时时长不大于当前定时器，则记录 */
-		if( des_i == -1 && time_left >= tmp_time_left ) {
-			DEBUG_MSG("src timer: %ld, pos: %d, cur_ms: %ldms, des timer: %ld, pos: %d, cur_ms: %ldms\n",
-				timer->id, src_i, LCUI_GetTicks(timer->start_time), 
-				tmp_timer->id, des_i, LCUI_GetTicks(tmp_timer->start_time) );
-			des_i = i;
-			/* 如果已经找到源位置，则退出循环 */
-			if( src_i != -1 ) {
-				break;
-			}
-		}
-		++i;
 	}
-	/* 若目标位置无效，则将末尾作为目标位置 */
-	if( des_i == -1 ) {
-		DEBUG_MSG("tip\n");
-		des_i = 0;
-	}
-	/* 若源位置和目标位置有效，则开始移动 */
-	if( src_i != -1 ) {
-		DEBUG_MSG("src: %d, des: %d\n", src_i, des_i );
-		LinkedList_Goto( &self.timer_list, src_i );
-		LinkedList_MoveTo( &self.timer_list, des_i );
-	}
+	LinkedList_AppendNode( &self.timer_list, node );
 }
 
 //#define DEBUG_TIMER
@@ -218,32 +186,24 @@ static void TimerList_Print( void )
 /** 定时器线程，用于处理列表中各个定时器 */
 static void TimerThread( void *arg )
 {
-	int i, n;
 	long int n_ms;
-	LCUI_Task task_data;
+	LCUI_Task task = {0};
 	TimerData *timer = NULL;
+	LinkedListNode *node, *prev;
 	int64_t lost_ms;
 
 	self.is_running = TRUE;
-	task_data.arg[0] = NULL;
-	task_data.arg[1] = NULL;
-	task_data.destroy_arg[0] = FALSE;
-	task_data.destroy_arg[1] = FALSE;
-	task_data.destroy_func[0] = NULL;
-	task_data.destroy_func[1] = NULL;
 	DEBUG_MSG("start\n");
 	LCUIMutex_Lock( &self.mutex );
 	while( self.is_running ) {
-		i = 0;
-		n = LinkedList_GetTotal( &self.timer_list );
-		LinkedList_ForEach( timer, 0, &self.timer_list ) {
+		LinkedList_ForEach( node, &self.timer_list ) {
+			timer = (TimerData*)node->data;
 			if( timer && timer->state == STATE_RUN ) {
 				break;
 			}
-			++i;
 		}
 		/* 没有要处理的定时器，停留一段时间再进行下次循环 */
-		if(i >= n || !timer ) {
+		if( !node ) {
 			LCUIMutex_Unlock( &self.mutex );
 			LCUI_MSleep(10);
 			LCUIMutex_Lock( &self.mutex );
@@ -260,22 +220,25 @@ static void TimerThread( void *arg )
 			continue;
 		}
 		/* 准备任务数据 */
-		task_data.func = (CallBackFunc)timer->func;
-		task_data.arg[0] = timer->arg;
-		task_data.destroy_arg[0] = FALSE;
+		task.func = (CallBackFunc)timer->func;
+		task.arg[0] = timer->arg;
 		DEBUG_MSG("timer: %ld, start_time: %ldms, cur_time: %ldms, cur_ms: %ld, total_ms: %ld\n", 
 			timer->id, timer->start_time, LCUI_GetTickCount(), timer->total_ms-lost_ms, timer->total_ms);
 		/* 若需要重复使用，则重置剩余等待时间 */
 		if( timer->reuse ) {
 			timer->start_time = LCUI_GetTickCount();
 			timer->pause_ms = 0;
-			TimerList_UpdateTimerPos( timer );
-		} else { /* 否则，释放该定时器 */
-			LinkedList_Delete( &self.timer_list );
+			LinkedList_Unlink( &self.timer_list, node );
+			TimerList_AddNode( node );
+		} else {
+			prev = node->prev;
+			LinkedList_DeleteNode( &self.timer_list, node );
+			free( node->data );
+			node = prev;
 		}
-		DEBUG_MSG( "add task: %p, timer id: %ld\n", task_data.func, timer->id );
+		DEBUG_MSG( "add task: %p, timer id: %ld\n", task.func, timer->id );
 		/* 添加该任务至指定程序的任务队列 */
-		LCUI_AddTask( &task_data );
+		LCUI_AddTask( &task );
 	}
 	LCUIMutex_Unlock( &self.mutex );
 	LCUIThread_Exit(NULL);
@@ -283,16 +246,15 @@ static void TimerThread( void *arg )
 
 static TimerData *TimerList_Find( int timer_id )
 {
-	TimerData *timer = NULL;
-	LinkedList_ForEach( timer, 0, &self.timer_list ) {
-		if( !timer ) {
-			continue;
-		}
-		if( timer->id == timer_id ) {
-			break;
+	TimerData *timer;
+	LinkedListNode *node;
+	LinkedList_ForEach( node, &self.timer_list ) {
+		timer = (TimerData*)node->data;
+		if( timer && timer->id == timer_id ) {
+			return timer;
 		}
 	}
-	return timer;
+	return NULL;
 }
 /*--------------------------- End Private ----------------------------*/
 
@@ -312,43 +274,30 @@ static TimerData *TimerList_Find( int timer_id )
  *	该定时器的标识符
  * */
 int LCUITimer_Set( long int n_ms, void (*func)(void*),
-			void *arg, LCUI_BOOL reuse )
+		   void *arg, LCUI_BOOL reuse )
 {
-	int i = 0;
-	int64_t time_left;
-	TimerData timer, *timer_ptr;
+	TimerData *timer;
+	LinkedListNode *node;
 	static int id = 100;
 
 	LCUIMutex_Lock( &self.mutex );
-	LinkedList_ForEach( timer_ptr, 0, &self.timer_list ) {
-		if( !timer_ptr ) {
-			++i;
-			continue;
-		}
-		time_left = LCUI_GetTicks( timer_ptr->start_time );
-		time_left -= timer_ptr->pause_ms;
-		time_left = timer_ptr->total_ms - time_left;
-		if( time_left <= n_ms ) {
-			break;
-		}
-		++i;
-	}
-	
-	timer.id = ++id;
-	timer.state = STATE_RUN;
-	timer.reuse = reuse;
-	timer.total_ms = n_ms;
-	timer.pause_ms = 0;
-	timer.start_time = LCUI_GetTickCount();
-	timer.func = func;
-	timer.arg = arg;
-
-	LinkedList_Goto( &self.timer_list, i+1 );
-	LinkedList_InsertCopy( &self.timer_list, &timer );
+	timer = (TimerData*)malloc( sizeof(TimerData) +
+				    sizeof(LinkedListNode) );
+	node = TimerNode( timer );
+	timer->id = ++id;
+	timer->state = STATE_RUN;
+	timer->reuse = reuse;
+	timer->total_ms = n_ms;
+	timer->pause_ms = 0;
+	timer->start_time = LCUI_GetTickCount();
+	timer->func = func;
+	timer->arg = arg;
+	node->data = timer;
+	TimerList_AddNode( node );
 	LCUICond_Signal( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
 	DEBUG_MSG("set timer, id: %ld, total_ms: %ld\n", timer.id, timer.total_ms);
-	return timer.id;
+	return timer->id;
 }
 
 /**
@@ -362,27 +311,20 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
  * */
 int LCUITimer_Free( int timer_id )
 {
-	int i = 0, n;
 	TimerData *timer;
+	LinkedListNode *node;
 	
 	LCUIMutex_Lock( &self.mutex );
-	n = LinkedList_GetTotal( &self.timer_list );
-	LinkedList_ForEach( timer, 0, &self.timer_list ) {
-		/* 忽略无效或ID不一致的定时器 */
-		if( !timer || timer->id != timer_id ) {
-			++i;
-			continue;
-		}
-		/* 移除定时器任务，并且只在非主线程上时使用互斥锁 */
-		LinkedList_Delete( &self.timer_list );
-		break;
+	timer = TimerList_Find( timer_id );
+	if( !timer ) {
+		return -1;
 	}
+	node = TimerNode( timer );
+	LinkedList_DeleteNode( &self.timer_list, node );
+	free( timer );
 	LCUICond_Signal( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
-	if( i < n ) {
-		return 0;
-	}
-	return -1;
+	return 0;
 }
 
 /**
@@ -459,9 +401,7 @@ int LCUITimer_Reset( int timer_id, long int n_ms )
 void LCUI_InitTimer( void )
 {
 	LCUI_StartTicks();
-	LinkedList_Init( &self.timer_list, sizeof(TimerData) );
-	LinkedList_SetDataMemReuse( &self.timer_list, TRUE );
-	LinkedList_SetDataNeedFree( &self.timer_list, TRUE );
+	LinkedList_Init( &self.timer_list );
 	LCUICond_Init( &self.sleep_cond );
 	LCUIMutex_Init( &self.mutex );
 	LCUIThread_Create( &self.thread_id, TimerThread, NULL );
@@ -475,7 +415,7 @@ void LCUI_ExitTimer( void )
 	LCUIThread_Join( self.thread_id, NULL );
 	LCUICond_Destroy( &self.sleep_cond );
 	LCUIMutex_Destroy( &self.mutex );
-	LinkedList_Destroy( &self.timer_list );
+	LinkedList_Clear( &self.timer_list, free );
 }
 /*---------------------------- End Public -----------------------------*/
 

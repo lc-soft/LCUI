@@ -115,7 +115,7 @@ static void DestroyFontFamilyNode( void *arg )
 		free( node->family_name );
 	}
 	node->family_name = NULL;
-	LinkedList_Destroy( &node->styles );
+	LinkedList_Clear( &node->styles, NULL );
 }
 
 static void DestroyFontBitmap( void *arg )
@@ -136,6 +136,7 @@ static void DestroyTreeNode( void *arg )
 int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 {
 	LCUI_Font *f;
+	LinkedListNode *node;
 	LCUI_FontFamilyNode *fn;
 
 	font->id = ++fontlib.count;
@@ -160,12 +161,12 @@ int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 	if( !fn ) {
 		fn = NEW(LCUI_FontFamilyNode, 1);
 		fn->family_name = strdup(font->family_name);
-		LinkedList_Init( &fn->styles, 0 );
-		LinkedList_SetDataNeedFree( &fn->styles, FALSE );
+		LinkedList_Init( &fn->styles );
 		RBTree_CustomInsert( &fontlib.family_tree,
 				     font->family_name, fn );
 	}
-	LinkedList_ForEach( f, 0, &fn->styles ) {
+	LinkedList_ForEach( node, &fn->styles ) {
+		f = (LCUI_Font*)node->data;
 		if( strcmp( f->style_name, font->style_name ) == 0 ) {
 			return -3;
 		}
@@ -219,17 +220,19 @@ int LCUIFont_GetIdByPath( const char *filepath )
  */
 int LCUIFont_GetId( const char *family_name, const char *style_name )
 {
-	LCUI_Font *font;
-	LCUI_FontFamilyNode *node;
+	LCUI_Font *font = NULL;
+	LinkedListNode *node;
+	LCUI_FontFamilyNode *fnode;
 
 	if( !fontlib.is_inited ) {
 		return -1;
 	}
-	node = SelectFontFamliy( family_name );
-	if( !node ) {
+	fnode = SelectFontFamliy( family_name );
+	if( !fnode ) {
 		return -2;
 	}
-	LinkedList_ForEach( font, 0, &node->styles ) {
+	LinkedList_ForEach( node, &fnode->styles ) {
+		font = (LCUI_Font*)node->data;
 		if( style_name ) {
 			if( stricmp( font->style_name, style_name ) ) {
 				continue;

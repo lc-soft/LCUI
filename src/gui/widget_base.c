@@ -44,8 +44,6 @@
 #include <LCUI/gui/widget/button.h>
 #include <LCUI/gui/widget/sidebar.h>
 
-#define NEW_ONE(TYPE) (TYPE*)malloc(sizeof(TYPE))
-
 LCUI_Widget LCUIRootWidget = NULL;
 
 /** 获取根级部件 */
@@ -55,126 +53,108 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 }
 
 /** 追加子部件 */
-int Widget_Append( LCUI_Widget container, LCUI_Widget widget )
+int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 {
-	LCUI_Widget w, old_container;
+	LinkedListNode *node;
 	LCUI_WidgetEvent e;
+	LCUI_Widget prev_parent;
 
-	DEBUG_MSG("container: %p, widget: %p\n", container, widget);
-	if( !container || !widget || container == widget->parent ) {
+	DEBUG_MSG("parent: %p, widget: %p\n", parent, widget);
+	if( !parent || !widget || parent == widget->parent ) {
 		return -1;
 	}
-	if( container == widget ) {
+	if( parent == widget ) {
 		return -2;
 	}
 	if( widget->parent ) {
-		old_container = widget->parent;
+		prev_parent = widget->parent;
 	} else {
 		goto remove_done;
 	}
 
 	/* 移除在之前的容器中的记录 */
-	LinkedList_ForEach( w, 0, &old_container->children ) {
-		if( w != widget ) {
+	LinkedList_ForEach( node, &prev_parent->children ) {
+		if( node->data != widget ) {
 			continue;
 		}
-		LinkedList_Delete( &old_container->children );
+		LinkedList_DeleteNode( &prev_parent->children, node );
 		/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
-		if( old_container == LCUIRootWidget ) {
+		if( prev_parent == LCUIRootWidget ) {
 			e.type_name = "TopLevelWidget";
 			e.target = widget;
 			Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
 		}
 		break;
 	}
-	LinkedList_ForEach( w, 0, &old_container->children_show ) {
-		if( w == widget ) {
-			LinkedList_Delete( &old_container->children_show );
-			break;
+	LinkedList_ForEach( node, &prev_parent->children_show ) {
+		if( node->data != widget ) {
+			continue;
 		}
+		LinkedList_DeleteNode( &prev_parent->children_show, node );
+		break;
 	}
 
 remove_done:
 
-	widget->parent = container;
-	LinkedList_Append( &container->children, widget );
-	LinkedList_Goto( &container->children_show, 0 );
-	LinkedList_Insert( &container->children_show, widget );
+	widget->parent = parent;
+	LinkedList_Append( &parent->children, widget );
+	LinkedList_Insert( &parent->children_show, 0, widget );
 	/* 如果是添加至根部件内，则触发 WET_ADD 事件 */
-	if( container == LCUIRootWidget ) {
+	if( parent == LCUIRootWidget ) {
 		e.type_name = "TopLevelWidget";
 		e.target = widget;
 		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_ADD );
 	}
 	Widget_AddTaskToSpread( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
-	Widget_AddTask( container, WTT_LAYOUT );
+	Widget_AddTask( parent, WTT_LAYOUT );
 	DEBUG_MSG("tip\n");
 	return 0;
 }
 
-/** 前置显示 */
-int Widget_Front( LCUI_Widget widget )
+int Widget_Unwrap( LCUI_Widget *widget )
 {
-	int i, n, src_pos = -1, des_pos = -1;
-	LCUI_Widget parent, child;
+	LCUI_Widget child;
+	LinkedList *list, *list_show;
+	LinkedListNode *node;
 
-	parent = widget->parent ? widget->parent:LCUIRootWidget;
-	n = LinkedList_GetTotal( &parent->children_show );
-	/* 先在队列中找到自己，以及z-index值小于或等于它的第一个部件 */
-	for( i=0; i<n; ++i ) {
-		LinkedList_Goto( &parent->children_show, i );
-		child = (LCUI_Widget)LinkedList_Get( &parent->children_show );
-		if( child == widget ) {
-			src_pos = i;
-			continue;
-		}
-		if( des_pos >= 0 ) {
-			if( src_pos >= 0 ) {
-				break;
-			}
-			continue;
-		}
-		/* 如果该位置的图层的z-index值不大于自己 */
-		if( child->computed_style.z_index <= widget->computed_style.z_index ) {
-			/* 如果未找到自己的源位置 */
-			if( src_pos == -1 ) {
-				des_pos = i;
-				continue;
-			}
-			/* 否则，退出循环，因为已经在前排了 */
-			break;
-		}
-	}
-	/* 没有找到就退出 */
-	if( des_pos == -1 || src_pos == -1 ) {
+	if( !(*widget)->parent ) {
 		return -1;
 	}
-	/* 找到的话就移动位置 */
-	LinkedList_Goto( &parent->children_show, src_pos );
-	LinkedList_MoveTo( &parent->children_show, des_pos );
-	// XXX
+	list = &(*widget)->parent->children;
+	list_show = &(*widget)->parent->children_show;
+	LinkedList_ForEach( node, list ) {
+		child = node->data;
+		LinkedList_Append( list, child );
+		LinkedList_Append( list_show, child );
+		Widget_AddTaskToSpread( child, WTT_REFRESH_STYLE );
+		Widget_UpdateTaskStatus( child );
+	}
+	LinkedList_Clear( list, NULL );
+	Widget_AddTask( (*widget)->parent, WTT_LAYOUT );
+	Widget_Destroy( widget );
 	return 0;
 }
 
-/** 部件析构函数 */
-static void Widget_OnDestroy( void *arg )
+void Widget_Front( LCUI_Widget widget )
 {
-	LCUI_WidgetEvent e;
-	LCUI_Widget widget = (LCUI_Widget)arg;
+	LCUI_Widget parent, child;
+	LinkedListNode *node, *child_node;
 
-	Widget_DestroyTaskBox( widget );
-	LCUIEventBox_Destroy( widget->event );
-	widget->event = NULL;
-	LinkedList_Destroy( &widget->children );
-	LinkedList_Destroy( &widget->children_show );
-	DirtyRectList_Destroy( &widget->dirty_rects );
-	/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
-	if( widget->parent == LCUIRootWidget ) {
-		e.type_name = "TopLevelWidget";
-		e.target = widget;
-		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
+	node = Widget_GetNode( widget );
+	parent = widget->parent ? widget->parent:LCUIRootWidget;
+	LinkedList_Unlink( &parent->children_show, node );
+	/* 先在队列中找到自己，以及z-index值小于或等于它的第一个部件 */
+	LinkedList_ForEach( child_node, &parent->children_show ) {
+		child = child_node->data;
+		if( child->computed_style.z_index >
+		    widget->computed_style.z_index ) {
+			continue;
+		}
+		LinkedList_Link( &parent->children_show, child_node, node );
+		return;
 	}
+	LinkedList_AppendNode( &parent->children_show, node );
 }
 
 /** 构造函数 */
@@ -205,12 +185,9 @@ static void Widget_Init( LCUI_Widget widget )
 	Background_Init( &widget->computed_style.background );
 	BoxShadow_Init( &widget->computed_style.shadow );
 	Border_Init( &widget->computed_style.border );
-	LinkedList_Init( &widget->children, sizeof(struct LCUI_WidgetRec_) );
-	LinkedList_Init( &widget->children_show, 0 );
-	LinkedList_SetDestroyFunc( &widget->children, Widget_OnDestroy );
-	LinkedList_SetDataNeedFree( &widget->children, TRUE );
-	LinkedList_SetDataNeedFree( &widget->children_show, FALSE );
-	DirtyRectList_Init( &widget->dirty_rects );
+	LinkedList_Init( &widget->children );
+	LinkedList_Init( &widget->children_show );
+	LinkedList_Init( &widget->dirty_rects );
 	Graph_Init( &widget->graph );
 	LCUIMutex_Init( &widget->mutex );
 }
@@ -240,11 +217,17 @@ int LCUIWidget_Find( const char *selector, LinkedList *list )
 /** 新建一个GUI部件 */
 LCUI_Widget LCUIWidget_New( const char *type_name )
 {
-	LCUI_Widget widget;
 	LCUI_WidgetClass *wc;
-
-	widget = NEW_ONE(struct LCUI_WidgetRec_);
+	LinkedListNode *node;
+	LCUI_Widget widget;
+	
+	widget = (LCUI_Widget)malloc( sizeof( struct LCUI_WidgetRec_ ) +
+				      sizeof(LinkedListNode));
 	Widget_Init( widget );
+	node = Widget_GetNode( widget );
+	node->data = widget;
+	node->next = NULL;
+	node->prev = NULL;
 	if( type_name ) {
 		widget->type = strdup( type_name );
 		wc = LCUIWidget_GetClass( type_name );
@@ -256,14 +239,59 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 	return widget;
 }
 
+static void Widget_OnDestroy( LCUI_Widget widget )
+{
+	LCUI_WidgetEvent e;
+	Widget_DestroyTaskBox( widget );
+	LCUIEventBox_Destroy( widget->event );
+	widget->event = NULL;
+	LinkedList_Clear( &widget->children, Widget_OnDestroy );
+	LinkedList_Clear( &widget->children_show, NULL );
+	LinkedList_Clear( &widget->dirty_rects, free );
+	/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
+	if( widget->parent == LCUIRootWidget ) {
+		e.type_name = "TopLevelWidget";
+		e.target = widget;
+		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
+	}
+	free( widget );
+}
+
+void Widget_ExecDestroy( LCUI_Widget *widget )
+{
+	LCUI_Widget w = *widget;
+	LinkedListNode *node = Widget_GetNode( w );
+	if( w->parent ) {
+		LinkedList_Unlink( &w->parent->children, node );
+	}
+	Widget_OnDestroy( w );
+	*widget = NULL;
+}
+
+void Widget_Destroy( LCUI_Widget *w )
+{
+	LCUI_Widget root = *w;
+	while( root->parent ) {
+		root = root->parent;
+	}
+	if( root == LCUIRootWidget ) {
+		Widget_AddTask( *w, WTT_DESTROY );
+		*w = NULL;
+	} else {
+		Widget_ExecDestroy( w );
+	}
+}
+
 /** 获取当前点命中的最上层可见部件 */
 LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 {
 	LCUI_BOOL is_hit;
+	LinkedListNode *node;
 	LCUI_Widget target = widget, c = NULL;
 	do {
 		is_hit = FALSE;
-		LinkedList_ForEach( c, 0, &target->children_show ) {
+		LinkedList_ForEach( node, &target->children_show ) {
+			c = node->data;
 			if( !c->computed_style.visible ) {
 				continue;
 			}
@@ -304,71 +332,6 @@ void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 		free( old_title );
 	}
 	Widget_AddTask( w, WTT_TITLE );
-}
-
-/** 获取内边距框占用的矩形区域 */
-void Widget_GetPaddingRect( LCUI_Widget widget, LCUI_Rect *rect )
-{
-	rect->x = 0;
-	rect->y = 0;
-	rect->w = 0;
-	rect->h = 0;
-}
-
-/** 获取内容框占用的矩形区域 */
-void Widget_GetContentRect( LCUI_Widget widget, LCUI_Rect *rect )
-{
-	rect->x = 0;
-	rect->y = 0;
-	rect->w = 0;
-	rect->h = 0;
-}
-
-/** 获取边框盒占用的矩形区域 */
-void Widget_GetBorderRect( LCUI_Widget widget, LCUI_Rect *rect )
-{
-	rect->x = 0;
-	rect->y = 0;
-	rect->w = 0;
-	rect->h = 0;
-}
-
-/** 获取部件当前占用的矩形区域（包括阴影区域） */
-void Widget_GetOuterRect( LCUI_Widget widget, LCUI_Rect *rect )
-{
-	rect->x = 0;
-	rect->y = 0;
-	rect->w = 0;
-	rect->h = 0;
-}
-
-/** 获取部件当前可见的矩形区域 */
-void Widget_GetValidRect( LCUI_Widget widget, LCUI_Rect *rect )
-{
-	LCUI_Rect container_rect;
-	Widget_GetRect( widget, rect );
-	while( widget ) {
-		Widget_GetRect( widget->parent, &container_rect );
-		if( rect->x < 0 ) {
-			rect->w = rect->w + rect->x;
-			rect->x = 0;
-		}
-		if( rect->y < 0 ) {
-			rect->h = rect->h + rect->y;
-			rect->y = 0;
-		}
-		if( rect->x + rect->w > container_rect.w ) {
-			rect->w = container_rect.w - rect->x;
-		}
-		if( rect->y + rect->h > container_rect.h ) {
-			rect->h = container_rect.h - rect->y;
-		}
-		/** 参照物改变，区域的坐标需要加上父部件的坐标 */
-		rect->x += container_rect.x;
-		rect->y += container_rect.y;
-		/** 切换至上一级部件 */
-		widget = widget->parent;
-	}
 }
 
 /** 计算坐标 */
@@ -457,10 +420,11 @@ void Widget_GetContentSize( LCUI_Widget w, int *width, int *height )
 {
 	int n;
 	LCUI_Widget child;
+	LinkedListNode *node;
 
-	*width = 0;
-	*height = 0;
-	LinkedList_ForEach( child, 0, &w->children_show ) {
+	*width = *height = 0;
+	LinkedList_ForEach( node, &w->children_show ) {
+		child = (LCUI_Widget)node->data;
 		if( !child->computed_style.visible ) {
 			continue;
 		}
@@ -875,6 +839,7 @@ void Widget_UpdateLayout( LCUI_Widget w )
 		int max_width;
 	} ctx = { 0 };
 	LCUI_Widget child;
+	LinkedListNode *node;
 
 	ctx.max_width = 256;
 	for( child = w; child; child = child->parent ) {
@@ -883,7 +848,8 @@ void Widget_UpdateLayout( LCUI_Widget w )
 			break;
 		}
 	}
-	LinkedList_ForEach( child, 0, &w->children ) {
+	LinkedList_ForEach( node, &w->children ) {
+		child = (LCUI_Widget)node->data;
 		if( child->computed_style.position != SV_STATIC ) {
 			continue;
 		}
@@ -925,7 +891,10 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth )
 {
 	int i;
 	LCUI_Widget child;
-	LinkedList_ForEach( child, 0, &w->children ) {
+	LinkedListNode *node;
+
+	LinkedList_ForEach( node, &w->children ) {
+		child = (LCUI_Widget)node->data;
 		i = depth*4;
 		while( i-- ) {
 			printf(".");

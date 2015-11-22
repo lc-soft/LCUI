@@ -216,7 +216,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 {
 	LinkedList rects;
-	LCUI_Rect *p_rect;
+	LinkedListNode *node;
 	LCUI_Size new_size = {16, 16};
 	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
 	
@@ -227,13 +227,13 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 	if( w->height > new_size.h ) {
 		new_size.h = w->height;
 	}
-	DirtyRectList_Init( &rects );
+	LinkedList_Init( &rects );
 	TextLayer_SetMaxSize( txt->layer, new_size );
 	TextLayer_Update( txt->layer, &rects );
-	LinkedList_ForEach( p_rect, 0, &rects ) {
-		Widget_InvalidateArea( w, p_rect, SV_CONTENT_BOX );
+	LinkedList_ForEach( node, &rects ) {
+		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
-	DirtyRectList_Destroy( &rects );
+	LinkedList_Clear( &rects, free );
 	TextLayer_ClearInvalidRect( txt->layer );
 }
 
@@ -278,10 +278,10 @@ static void TextView_OnTask( LCUI_Widget w )
 {
 	int i;
 	LinkedList rects;
-	LCUI_Rect *p_rect;
+	LinkedListNode *node;
 	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
 
-	DirtyRectList_Init( &rects );
+	LinkedList_Init( &rects );
 	i = TASK_SET_TEXT;
 	if( txt->tasks[i].is_valid ) {
 		txt->tasks[i].is_valid = FALSE;
@@ -300,12 +300,12 @@ static void TextView_OnTask( LCUI_Widget w )
 	}
 	txt->tasks[i].is_valid = FALSE;
 	txt = (LCUI_TextView*)w->private_data;
-	DirtyRectList_Init( &rects );
+	LinkedList_Init( &rects );
 	TextLayer_Update( txt->layer, &rects );
-	LinkedList_ForEach( p_rect, 0, &rects ) {
-		Widget_InvalidateArea( w, p_rect, SV_CONTENT_BOX );
+	LinkedList_ForEach( node, &rects ) {
+		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
-	DirtyRectList_Destroy( &rects );
+	LinkedList_Clear( &rects, free );
 	TextLayer_ClearInvalidRect( txt->layer );
 	if( w->computed_style.w.type == SVT_AUTO
 	 || w->computed_style.h.type == SVT_AUTO ) {

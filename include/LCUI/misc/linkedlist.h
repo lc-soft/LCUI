@@ -1,5 +1,5 @@
 ﻿/* ***************************************************************************
- * linkedlist.h -- Linked List
+ * linkedlist.h -- Linked LinkedList
  *
  * Copyright (C) 2014 by Liu Chao <lc-soft@live.cn>
  *
@@ -51,85 +51,62 @@ struct LinkedListNodeRec_ {
 };
 
 struct LinkedListRec_ {
-	int node_data_size;			/** 结点数据域的大小 */
-	int used_node_num;			/**< 已使用的结点数量 */
-	int usable_node_num;			/**< 可使用的结点数量 */
-	int current_node_pos;			/**< 当前结点位置 */
-	int need_free_data;			/**< 是否需要在释放结点时释放数据 */
-	int need_reuse_mem;			/**< 是否需要复用结点的内存 */
-	LinkedListNode *used_head_node;		/**< 已用的链表的头结点 */
-	LinkedListNode *current_node;		/**< 当前结点 */
-	LinkedListNode *used_tail_node;		/**< 已用的链表的尾结点 */
-	LinkedListNode *usable_head_node;	/**< 可用的链表的头结点 */
-	void (*destroy_func)(void*);		/**< 数据销毁函数 */
+	int length;
+	LinkedListNode head, tail;
 };
 
-/** 获取当前数据元素的总数量 */
-#define LinkedList_GetTotal(list) (list)->used_node_num
+#define LinkedList_ForEach(node, list) \
+	for( node = (list)->head.next; node; node = node->next )
 
-/** 设置是否需要重复使用结点的数据内存空间 */
-#define LinkedList_SetDataMemReuse(list, val) (list)->need_reuse_mem = val
+#define LinkedList_ForEachReverse(node, list) \
+	for( node = (list)->tail.prev; node != &(list)->head; node = node->prev )
 
-/** 设置结点中的数据是否需要释放 */
-#define LinkedList_SetDataNeedFree(list, val) (list)->need_free_data = val
+#define LinkedList_Init(list) {				\
+	(list)->length = 0;				\
+	(list)->head.next = (list)->tail.next = NULL;	\
+	(list)->head.data = (list)->tail.data = NULL;	\
+	(list)->head.prev = (list)->tail.prev = NULL;	\
+}
 
-/** 设置结点中的数据的销毁函数 */
-#define LinkedList_SetDestroyFunc(list, fn) (list)->destroy_func = fn
+#define LinkedList_Unlink(list, node)				\
+	(list)->length -= 1,					\
+	(node->prev ? node->prev->next = node->next : 0),	\
+	(node->next ? node->next->prev = node->prev : 0),	\
+	node->prev = NULL, node->next = NULL
 
-/** 获取当前结点中的数据 */
-#define LinkedList_Get(list) ((list)->current_node ? (list)->current_node->data:NULL)
+#define LinkedList_Link(list, cur, node) {	\
+	node->next = cur->next;			\
+	cur->next = node;			\
+	node->prev = cur;			\
+	(list)->length += 1;			\
+}
 
-/** 判断是否处于链表末尾 */
-#define LinkedList_IsAtEnd(list) ((list)->current_node_pos >= (list)->used_node_num\
-				 || !(list)->current_node ? 1:0)
+#define LinkedList_DeleteNode(list, node) {	\
+	LinkedList_Unlink(list, node);		\
+	node->data = NULL;			\
+	free( node );				\
+	node = NULL;				\
+}
 
-/** 切换至下个结点 */
-#define LinkedList_ToNext(list) ((list)->current_node ? (++(list)->current_node_pos,\
-				(list)->current_node = (list)->current_node->next):NULL)
+#define LinkedList_AppendNode(list, node) {		\
+	if( (list)->head.next ) {			\
+		(node)->prev = (list)->tail.prev;	\
+		(list)->tail.prev = node;		\
+	} else {					\
+		(list)->head.next = node;		\
+		(list)->tail.prev = node;		\
+	}						\
+	(list)->length += 1;				\
+}
 
-/** 切换至上个结点 */
-#define LinkedList_ToPrev(list) ((list)->current_node ? (--(list)->current_node_pos,\
-				(list)->current_node = (list)->current_node->prev):NULL)
-
-/** 遍历 */
-#define LinkedList_ForEach(elem, pos, list) \
-	for( elem = LinkedList_Goto(list, pos) == 0 ? LinkedList_Get(list):NULL; \
-		!LinkedList_IsAtEnd(list); LinkedList_ToNext(list) ? elem = LinkedList_Get(list):0)
-
-/** 倒序遍历 */
-#define LinkedList_ForEachReverse(elem, pos, list) \
-	for( elem = LinkedList_Goto(list, (list)->used_node_num - pos - 1) == 0 ? LinkedList_Get(list):NULL; \
-		!((list)->current_node_pos < 0 || !(list)->current_node); LinkedList_ToPrev(list) ? elem = LinkedList_Get(list):0)
-
-/** 初始化链表 */
-LCUI_API void LinkedList_Init( LinkedList *list, int node_data_size );
-
-/** 销毁整个链表 */
-LCUI_API void LinkedList_Destroy( LinkedList *list );
-
-/** 移除当前结点 */
-LCUI_API int LinkedList_Delete( LinkedList *list );
-
-/** 将当前结点移动至指定位置 */
-LCUI_API int LinkedList_MoveTo( LinkedList *list, int pos );
-
-/** 在当前结点前面插入新结点，并引用数据 */
-LCUI_API int LinkedList_Insert( LinkedList *list, void *data );
-
-/** 在当前结点前面插入新结点，并将数据的副本记录到该结点上 */
-LCUI_API void* LinkedList_InsertCopy( LinkedList *list, void *data );
-
-/** 将数据的副本记录至链表的相应结点上 */
-LCUI_API void *LinkedList_AppendCopy( LinkedList *list, void *data );
-
-/** 分配一个节点的数据空间 */
-void *LinkedList_Alloc( LinkedList *list );
-
-/** 将数据引用至链表的相应结点 */
-LCUI_API void LinkedList_Append( LinkedList *list, void *data_ptr );
-
-/** 跳转至指定结点 */
-LCUI_API int LinkedList_Goto( LinkedList *list, int pos );
+LCUI_API LinkedListNode *LinkedList_Append( LinkedList *list, void *data );
+LCUI_API LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data );
+LCUI_API LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos );
+LCUI_API void *LinkedList_Get( LinkedList *list, int pos );
+LCUI_API void LinkedList_Delete( LinkedList *list, int pos );
+LCUI_API void LinkedList_Sort( LinkedList *list, void(*on_sort)(void*, void*) );
+LCUI_API void LinkedList_Clear( LinkedList *list, void(*on_destroy)(void*) );
+LCUI_API void LinkedList_Concat( LinkedList *list1, LinkedList *list2 );
 
 LCUI_END_HEADER
 

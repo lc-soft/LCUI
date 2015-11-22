@@ -143,7 +143,7 @@ void SideBarItem_OnDestroy( LCUI_Widget w )
 void SideBar_OnInit( LCUI_Widget w )
 {
 	SideBar *sb = Widget_NewPrivateData( w, SideBar );
-	LinkedList_Init( &sb->items, sizeof(SideBarItem) );
+	LinkedList_Init( &sb->items );
 }
 
 void SideBar_OnDestroy( LCUI_Widget w )

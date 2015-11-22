@@ -82,7 +82,7 @@ void Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 	LCUI_Rect rect;
 	Widget_AdjustArea( w, r, &rect, box_type );
 	DEBUG_MSG("[%s]: invalidRect:(%d,%d,%d,%d)\n", w->type, rect.x, rect.y, rect.width, rect.height);
-	DirtyRectList_Add( &w->dirty_rects, &rect );
+	RectList_Add( &w->dirty_rects, &rect );
 	while( w = w->parent, w && !w->has_dirty_child ) {
 		w->has_dirty_child = TRUE;
 	}
@@ -95,20 +95,16 @@ void Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
  */
 int Widget_GetInvalidArea( LCUI_Widget widget, LCUI_Rect *area )
 {
-	LCUI_Rect *p_rect;
-	if( LinkedList_GetTotal(&widget->dirty_rects) <= 0 ) {
+	LCUI_Rect *rect;
+	if( widget->dirty_rects.length <= 0 ) {
 		return -1;
 	}
-	LinkedList_Goto( &widget->dirty_rects, 0 );
-	DEBUG_MSG("list: %p, used node num: %d, current: %p, pos: %d\n",
-		&widget->dirty_rects, widget->dirty_rects.used_node_num,
-		widget->dirty_rects.current_node, widget->dirty_rects.current_node_pos);
-	p_rect = (LCUI_Rect*)LinkedList_Get( &widget->dirty_rects );
-	if( !p_rect ) {
+	rect = (LCUI_Rect*)LinkedList_Get( &widget->dirty_rects, 0 );
+	if( !rect ) {
 		return -2;
 	}
-	DEBUG_MSG("p_rect: %d,%d,%d,%d\n", p_rect->x, p_rect->y, p_rect->w, p_rect->h);
-	*area = *p_rect;
+	DEBUG_MSG("p_rect: %d,%d,%d,%d\n", rect->x, rect->y, rect->w, rect->h);
+	*area = *rect;
 	return 0;
 }
 
@@ -122,7 +118,7 @@ void Widget_ValidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 {
 	LCUI_Rect rect;
 	Widget_AdjustArea( w, r, &rect, box_type );
-	DirtyRectList_Delete( &w->dirty_rects, &rect );
+	RectList_Delete( &w->dirty_rects, &rect );
 }
 
 /** 当前部件的绘制函数 */
@@ -151,15 +147,17 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 
 static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y, 
 				    LCUI_Rect *valid_box, 
-				    LCUI_DirtyRectList *rlist )
+				    LinkedList *rlist )
 {
 	int count;
 	LCUI_Widget child;
+	LinkedListNode *node;
 	LCUI_Rect rect, child_box, *r;
 
-	count = LinkedList_GetTotal( &w->dirty_rects );
+	count = w->dirty_rects.length;
 	/* 取出当前记录的脏矩形 */
-	LinkedList_ForEach( r, 0, &w->dirty_rects ) {
+	LinkedList_ForEach( node, &w->dirty_rects ) {
+		r = (LCUI_Rect*)node->data;
 		/* 若有独立位图缓存，则重绘脏矩形区域 */
 		if( Graph_IsValid(&w->graph) ) {
 			LCUI_PaintContextRec_ paint;
@@ -174,10 +172,10 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 			rect.x += x;
 			rect.y += y;
 			DEBUG_MSG("[%s]: merge rect:(%d,%d,%d,%d)\n", w->type, rect.x, rect.y, rect.width, rect.height);
-			DirtyRectList_Add( rlist, &rect );
+			RectList_Add( rlist, &rect );
 		}
 	}
-	LinkedList_Destroy( &w->dirty_rects );
+	LinkedList_Clear( &w->dirty_rects, free );
 	/* 若子级部件没有脏矩形记录 */
 	if( !w->has_dirty_child ) {
 		return count;
@@ -190,9 +188,9 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 	child_box.x -= w->box.content.x;
 	child_box.y -= w->box.content.y;
 	/* 向子级部件递归 */
-	LinkedList_ForEach( child, 0, &w->children ) {
+	LinkedList_ForEach( node, &w->children ) {
 		int child_x, child_y;
-
+		child = (LCUI_Widget)node->data;
 		if( !child->computed_style.visible ) {
 			continue;
 		}
@@ -212,7 +210,7 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
  * @param[in]	w	目标部件
  * @param[out]	rlist	合并后的脏矩形记录
  */
-int Widget_ProcInvalidArea( LCUI_Widget w, LCUI_DirtyRectList *rlist )
+int Widget_ProcInvalidArea( LCUI_Widget w, LinkedList *rlist )
 {
 	LCUI_Rect valid_box;
 	valid_box.x = 0;
@@ -289,6 +287,7 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	int content_left, content_top;
+	LinkedListNode *node;
 	LCUI_Widget child;
 	LCUI_Rect child_rect, canvas_rect, content_rect;
 	LCUI_PaintContextRec_ child_paint;
@@ -364,7 +363,8 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		Graph_Quote( &content_graph, &paint->canvas, &content_rect );
 	}
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
-	LinkedList_ForEachReverse( child, 0, &w->children_show ) {
+	LinkedList_ForEachReverse( node, &w->children_show ) {
+		child = (LCUI_Widget)node->data;
 		if( !child->computed_style.visible ) {
 			continue;
 		}

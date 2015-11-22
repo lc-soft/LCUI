@@ -71,9 +71,9 @@ int LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 	LCUI_ThreadData *thread_ptr;
 	if(!db_init) {
 		db_init = TRUE;
-		LinkedList_Init( &thread_database, sizeof(LCUI_ThreadData) );
+		LinkedList_Init( &thread_database );
 	}
-	thread_ptr = (LCUI_ThreadData*)malloc(sizeof(LCUI_ThreadData));
+	thread_ptr = NEW(LCUI_ThreadData, 1);
 	thread_ptr->func = func;
 	thread_ptr->arg = arg;
 	thread_ptr->retval = NULL;
@@ -90,38 +90,30 @@ int LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 
 static LCUI_ThreadData *LCUIThread_Find( LCUI_Thread tid )
 {
-	int i, n;
+	LinkedListNode *node;
 	LCUI_ThreadData *thread_data;
-	
-	n = LinkedList_GetTotal( &thread_database );
-	for(i=0; i<n; ++i) {
-		LinkedList_Goto( &thread_database, i );
-		thread_data = (LCUI_ThreadData*)LinkedList_Get( &thread_database );
-		if( !thread_data || thread_data->tid != tid ) {
-			continue;
+	LinkedList_ForEach( node, &thread_database ) {
+		thread_data = (LCUI_ThreadData*)node->data;
+		if( thread_data && thread_data->tid == tid ) {
+			return thread_data;
 		}
-		return thread_data;
 	}
 	return NULL;
 }
 
 static int LCUIThread_Destroy( LCUI_Thread thread )
 {
-	int i, n;
+	LinkedListNode *node;
 	LCUI_ThreadData *thread_data;
-	
 	if(!thread){
 		return -1;
 	}
-	n = LinkedList_GetTotal( &thread_database );
-	for(i=0; i<n; ++i) {
-		LinkedList_Goto( &thread_database, i );
-		thread_data = (LCUI_ThreadData*)LinkedList_Get( &thread_database );
-		if( !thread_data || thread != thread_data->tid ) {
-			continue;
+	LinkedList_ForEach( node, &thread_database ) {
+		thread_data = (LCUI_ThreadData*)node->data;
+		if( thread_data && thread_data->tid == thread ) {
+			LinkedList_DeleteNode( &thread_database, node );
+			return 0;
 		}
-		LinkedList_Delete( &thread_database );
-		return 0;
 	}
 	return -2;
 }

@@ -156,13 +156,13 @@ typedef struct LCUI_SelectorNodeRec_ {
 	char *type;
 	char *class_name;
 	char *pseudo_class_name;
-} LCUI_SelectorNodeRec_, *LCUI_SelectorNode;
+} LCUI_SelectorNodeRec, *LCUI_SelectorNode;
 
 typedef struct LCUI_SelectorRec_ {
 	LCUI_SelectorNode *list;	/**< 选择器结点列表 */
 	int length;			/**< 选择器结点长度 */
 	int rank;			/**< 权值，决定优先级 */
-} LCUI_SelectorRec_, *LCUI_Selector;
+} LCUI_SelectorRec, *LCUI_Selector;
 
 #define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \
 					S->sheet[NAME].is_changed = TRUE, \
@@ -210,7 +210,7 @@ typedef struct LCUI_WidgetBoxRect {
 typedef struct LCUI_WidgetRec_* LCUI_Widget;
 
 /** 部件结构 */
-struct LCUI_WidgetRec_ {
+typedef struct LCUI_WidgetRec_ {
 	int			x, y;			/**< 部件当前坐标 */
 	int			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
 	char			*id;			/**< ID */
@@ -237,15 +237,14 @@ struct LCUI_WidgetRec_ {
 	LCUI_Mutex		mutex;			/**< 互斥锁 */
 	LCUI_EventBox		event;			/**< 事件记录 */
 	LCUI_WidgetTaskBox	task;			/**< 任务记录 */
-	LCUI_DirtyRectList	dirty_rects;		/**< 记录无效区域（脏矩形） */
+	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
 	LCUI_BOOL		has_dirty_child;	/**< 标志，指示子级部件是否有无效区域 */
-};
+} LCUI_WidgetRec;
 
+
+#define Widget_GetNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec))
 
 #define Widget_NewPrivateData(w, type) (type*)(w->private_data = malloc(sizeof(type)))
-
-/** 一般来说部件占用的矩形区域看上去是指边框盒区域 */
-#define Widget_GetRect Widget_GetBorderRect
 
 extern LCUI_Widget LCUIRootWidget;
 
@@ -254,8 +253,17 @@ LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
 /** 新建一个GUI部件 */
 LCUI_API LCUI_Widget LCUIWidget_New( const char *type_name );
 
+/** 直接销毁部件 */
+LCUI_API void Widget_ExecDestroy( LCUI_Widget *w );
+
+/** 销毁部件 */
+LCUI_API void Widget_Destroy( LCUI_Widget *w );
+
 /** 追加子部件 */
 LCUI_API int Widget_Append( LCUI_Widget container, LCUI_Widget widget );
+
+/** 移除部件，并将其子级部件转移至父部件内 */
+LCUI_API int Widget_Unwrap( LCUI_Widget *widget );
 
 /** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );

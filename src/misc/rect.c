@@ -46,6 +46,8 @@
 	b->x >= a->x && b->x + b->w <= a->x + a->w \
 	&& b->y >= a->y && b->y + b->h <= a->y + a->h
 
+#define LCUIRect_IsMergeable(a, b)
+
 /* 将数值转换成LCUI_Rect型结构体 */
 LCUI_Rect Rect( int x, int y, int w, int h )
 {
@@ -206,7 +208,7 @@ static void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b )
 }
 
 void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
-					LCUI_Rect rects[4] )
+			   LCUI_Rect rects[4] )
 {
 	rects[0].x = rect2->x;
 	rects[0].y = rect2->y;
@@ -229,33 +231,19 @@ void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 	rects[3].h = rect1->y - rect2->y;
 }
 
-/** 初始化脏矩形记录 */
-void DirtyRectList_Init( LCUI_DirtyRectList *list )
-{
-	LinkedList_Init( list, sizeof(LCUI_Rect) );
-	LinkedList_SetDataMemReuse( list, FALSE );
-	LinkedList_SetDataNeedFree( list, TRUE );
-}
-
-/** 销毁脏矩形记录 */
-void DirtyRectList_Destroy( LCUI_DirtyRectList *list )
-{
-	LinkedList_Destroy( list );
-}
-
-/** 添加一个脏矩形记录 */
-int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
+int RectList_Add( LinkedList *list, LCUI_Rect *rect )
 {
 	int i, ret;
+	LinkedListNode *node, *prev;
 	LCUI_Rect *p_rect, o_rect, tmp_rect[4];
 
 	if( rect->w <= 0 || rect->h <= 0 ) {
 		return -1;
 	}
-	/* 定位至链表表头 */
-	LinkedList_Goto( list, 0 );
-	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list, LinkedList_GetTotal(list), rect->x, rect->y, rect->w, rect->h);
-	LinkedList_ForEach( p_rect, 0, list ) {
+	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list, 
+		   list->length, rect->x, rect->y, rect->w, rect->h);
+	LinkedList_ForEach( node, list ) {
+		p_rect = (LCUI_Rect*)node->data;
 		DEBUG_MSG("p_rect(%d,%d,%d,%d)\n", 
 			p_rect->x, p_rect->y, p_rect->w, p_rect->h);
 		/* 如果被现有的矩形包含 */
@@ -266,33 +254,32 @@ int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 		/* 如果包含现有的矩形 */
 		if( LCUIRect_IsIncludeRect( rect, p_rect ) ) {
 			DEBUG_MSG("delete\n");
-			LinkedList_Delete( list );
+			prev = node->prev;
+			free( node->data );
+			LinkedList_DeleteNode( list, node );
+			node = prev;
 			continue;
 		}
 		/* 如果与现有的矩形不重叠 */
 		if( !LCUIRect_GetOverlayRect( rect, p_rect, &o_rect ) ) {
 			DEBUG_MSG("skip\n");
-			LinkedList_ToNext( list );
 			continue;
 		}
-		DEBUG_MSG("overlay rect(%d,%d,%d,%d)\n",
-			o_rect.x, o_rect.y, o_rect.w, o_rect.h);
+		DEBUG_MSG("overlay rect(%d,%d,%d,%d)\n",o_rect.x, o_rect.y,
+			   o_rect.w, o_rect.h);
 		/* 如果两个矩形相距很近，则直接合并 */
-		if( (rect->w - o_rect.w < 20 && rect->h - o_rect.h < 20)
-		|| (p_rect->w - o_rect.w < 20 && p_rect->h - o_rect.h < 20)
-		|| (p_rect->x == rect->x && p_rect->w == rect->w)
-		|| (p_rect->y == rect->y && p_rect->h == rect->h) ) {
+		if( (rect->w - o_rect.w < 20 && rect->h - o_rect.h < 20) || 
+		    (p_rect->w - o_rect.w < 20 && p_rect->h - o_rect.h < 20) ) {
 			LCUIRect_MergeRect( &o_rect, p_rect, rect );
 			DEBUG_MSG("merge rect, rect(%d,%d,%d,%d)\n",
-				o_rect.x, o_rect.y, o_rect.w, o_rect.h);
-			/* 删除当前矩形 */
-			LinkedList_Delete( list );
-			/* 添加合并后的矩形 */
-			return DirtyRectList_Add( list, &o_rect );
+				   o_rect.x, o_rect.y, o_rect.w, o_rect.h);
+			free( node->data );
+			LinkedList_DeleteNode( list, node );
+			return RectList_Add( list, &o_rect );
 		}
 		LCUIRect_CutFourRect( &o_rect, rect, tmp_rect );
 		for( ret=0,i=0; i<4&&ret==0; ++i ) {
-			ret = DirtyRectList_Add( list, &tmp_rect[i] );
+			ret = RectList_Add( list, &tmp_rect[i] );
 		}
 		if( ret != 0 ) {
 			return -3;
@@ -300,44 +287,48 @@ int DirtyRectList_Add( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 		return 1;
 	}
 	DEBUG_MSG("add\n");
-	/* 验证通过，则添加进去 */
-	p_rect = (LCUI_Rect*)LinkedList_Alloc( list );
-	*p_rect = *rect;
+	LinkedList_Append( list, rect );
 	return 0;
 }
 
-/** 删除脏矩形 */
-int DirtyRectList_Delete( LCUI_DirtyRectList *list, LCUI_Rect *rect )
+int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 {
 	int i;
+	LinkedListNode *prev, *node;
 	LCUI_Rect *p_rect, o_rect, tmp_rect[4];
 
 	if( rect->w <= 0 || rect->h <= 0 ) {
 		return -1;
 	}
-	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list, LinkedList_GetTotal(list), rect->x, rect->y, rect->w, rect->h);
-	/* 定位至链表表头 */
-	LinkedList_Goto( list, 0 );
-	while( !LinkedList_IsAtEnd(list) ) {
-		p_rect = (LCUI_Rect*)LinkedList_Get( list );
-		DEBUG_MSG("[%d] p_rect(%d,%d,%d,%d)\n", list->current_node_pos, p_rect->x, p_rect->y, p_rect->w, p_rect->h);
+	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list, 
+		   list->length, rect->x, rect->y, rect->w, rect->h);
+	LinkedList_ForEach( node, list ) {
+		p_rect = (LCUI_Rect*)node->data;
+		DEBUG_MSG("p_rect(%d,%d,%d,%d)\n", p_rect->x, 
+			   p_rect->y, p_rect->w, p_rect->h);
 		/* 如果包含现有的矩形 */
 		if( LCUIRect_IsIncludeRect( rect, p_rect ) ) {
 			DEBUG_MSG("delete\n");
-			LinkedList_Delete( list );
+			prev = node->prev;
+			free(  node->data );
+			LinkedList_DeleteNode( list, node );
+			node = prev;
 			continue;
 		}
 		/* 如果被现有的矩形包含，则分割现有矩形 */
 		if( LCUIRect_IsIncludeRect( p_rect, rect ) ) {
 			DEBUG_MSG("cut 4\n");
 			LCUIRect_CutFourRect( rect, p_rect, tmp_rect );
-			LinkedList_Delete( list );
+			prev = node->prev;
+			free(  node->data );
+			LinkedList_DeleteNode( list, node );
+			node = prev;
 			for( i=0; i<4; ++i ) {
 				if( tmp_rect[i].w <= 0
 				|| tmp_rect[i].h <= 0 ) {
 					continue;
 				}
-				LinkedList_InsertCopy( list, &tmp_rect[0] );
+				LinkedList_Insert( list, 0, &tmp_rect[0] );
 			}
 			/* 
 			 * 既然现有矩形包含了这个矩形，那么不用继续遍历了，
@@ -347,19 +338,19 @@ int DirtyRectList_Delete( LCUI_DirtyRectList *list, LCUI_Rect *rect )
 		}
 		/* 如果与现有的矩形不重叠 */
 		if( !LCUIRect_GetOverlayRect( rect, p_rect, &o_rect ) ) {
-			DEBUG_MSG("skip\n");
-			LinkedList_ToNext( list );
 			continue;
 		}
 		DEBUG_MSG("cut 2\n");
 		LCUIRect_CutFourRect( &o_rect, p_rect, tmp_rect );
-		LinkedList_Delete( list );
+		prev = node->prev;
+		free(  node->data );
+		LinkedList_DeleteNode( list, node );
+		node = prev;
 		for( i=0; i<4; ++i ) {
 			if( tmp_rect[i].w <= 0 || tmp_rect[i].h <= 0 ) {
 				continue;
 			}
-			LinkedList_InsertCopy( list, &tmp_rect[i] );
-			LinkedList_ToNext( list );
+			LinkedList_Insert( list, 0, &tmp_rect[i] );
 		}
 	}
 	DEBUG_MSG("quit\n");

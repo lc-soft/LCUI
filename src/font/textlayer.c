@@ -355,10 +355,10 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->row_list.rows = NULL;
 	layer->line_height.type = SVT_SCALE;
 	layer->line_height.scale = 1.428f;
-	LinkedList_Init( &layer->style_cache, sizeof(LCUI_TextStyle) );
+	LinkedList_Init( &layer->style_cache );
 	TextStyle_Init( &layer->text_style );
 	TaskData_Init( &layer->task );
-	DirtyRectList_Init( &layer->dirty_rect );
+	LinkedList_Init( &layer->dirty_rect );
 	Graph_Init( &layer->graph );
 	TextRowList_InsertNewRow( &layer->row_list, 0 );
 	layer->graph.color_type = COLOR_TYPE_ARGB;
@@ -384,7 +384,7 @@ static void TextRowList_Destroy( TextRowList *list )
 void TextLayer_Destroy( LCUI_TextLayer *layer_ptr )
 {
 	LCUI_TextLayer layer = *layer_ptr;
-	DirtyRectList_Destroy( &layer->dirty_rect );
+	LinkedList_Clear( &layer->dirty_rect, free );
 	Graph_Free( &layer->graph );
 	TextRowList_Destroy( &layer->row_list );
 	free( layer );
@@ -444,7 +444,7 @@ static void TextLayer_InvalidateRowRect( LCUI_TextLayer layer, int row,
 {
 	LCUI_Rect rect;	
 	if( TextLayer_GetRowRect( layer, row, start, end, &rect ) == 0 ) {
-		DirtyRectList_Add( &layer->dirty_rect, &rect );
+		RectList_Add( &layer->dirty_rect, &rect );
 	}
 }
 
@@ -468,7 +468,7 @@ void TextLayer_InvalidateRowsRect( LCUI_TextLayer layer,
 	}
 	for( ; i<=end_row; ++i ) {
 		TextLayer_GetRowRect( layer, i, 0, -1, &rect);
-		DirtyRectList_Add( &layer->dirty_rect, &rect );
+		RectList_Add( &layer->dirty_rect, &rect );
 		y += layer->row_list.rows[i]->height;
 		if( y >= layer->max_height ) {
 			break;
@@ -594,7 +594,7 @@ void TextLayer_ClearText( LCUI_TextLayer layer )
 	layer->insert_y = 0;
 	TextLayer_InvalidateRowsRect( layer, 0, -1 );
 	TextRowList_Destroy( &layer->row_list );
-	LinkedList_Destroy( &layer->style_cache );
+	LinkedList_Clear( &layer->style_cache, TextStyle_Destroy );
 	layer->task.redraw_all = TRUE;
 }
 
@@ -764,7 +764,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer,
 	/* 如果没有可用的标签栈，则使用临时的标签栈 */
 	if( !tags ) {
 		is_tmp_tag_stack = TRUE;
-		StyleTags_Init( &tmp_tags );
+		TagList_Init( &tmp_tags );
 		tags = &tmp_tags;
 	}
 	p_end = wstr + wcslen(wstr);
@@ -840,7 +840,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer,
 	}
 	/* 如果使用的是临时标签栈，则销毁它 */
 	if( is_tmp_tag_stack ) {
-		StyleTags_Destroy( tags );
+		TagList_Clear( tags );
 	}
 	return 0;
 }
@@ -1219,13 +1219,11 @@ void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list )
 		layer->task.update_bitmap = FALSE;
 		layer->task.redraw_all = TRUE;
 	}
-
 	if( layer->task.update_typeset ) {
 		TextLayer_TextTypeset( layer, layer->task.typeset_start_row );
 		layer->task.update_typeset = FALSE;
 		layer->task.typeset_start_row = 0;
 	}
-
 	/* 如果坐标偏移量有变化，记录各个文本行区域 */
 	if( layer->new_offset_x != layer->offset_x
 	 || layer->new_offset_y != layer->offset_y ) {
@@ -1235,13 +1233,8 @@ void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list )
 		TextLayer_InvalidateRowsRect( layer, 0, -1 );
 		layer->task.redraw_all = TRUE;
 	}
-	
 	if( rect_list ) {
-		void *data_ptr;
-		/* 转移脏矩形记录，供利用 */
-		LinkedList_ForEach( data_ptr, 0, &layer->dirty_rect ) {
-			LinkedList_AppendCopy( rect_list, data_ptr );
-		}
+		LinkedList_Concat( rect_list, &layer->dirty_rect );
 	 } 
 }
 
@@ -1354,20 +1347,18 @@ int TextLayer_Draw( LCUI_TextLayer layer )
 /** 清除已记录的无效矩形 */
 void TextLayer_ClearInvalidRect( LCUI_TextLayer layer )
 {
-	LCUI_Rect *rect_ptr;
+	LinkedListNode *node;
 	LCUI_Graph invalid_graph;
 
 	if( !layer->is_using_buffer ) {
-		DirtyRectList_Destroy( &layer->dirty_rect );
-		DirtyRectList_Init( &layer->dirty_rect );
+		LinkedList_Clear( &layer->dirty_rect, free );
 		return;
 	}
-	LinkedList_ForEach( rect_ptr, 0, &layer->dirty_rect ) {
-		Graph_Quote( &invalid_graph, &layer->graph, rect_ptr );
+	LinkedList_ForEach( node, &layer->dirty_rect ) {
+		Graph_Quote( &invalid_graph, &layer->graph, node->data );
 		Graph_FillAlpha( &invalid_graph, 0 );
 	}
-	DirtyRectList_Destroy( &layer->dirty_rect );
-	DirtyRectList_Init( &layer->dirty_rect );
+	LinkedList_Clear( &layer->dirty_rect, free );
 }
 
 /** 设置全局文本样式 */

@@ -409,6 +409,11 @@ static void HandleRefresh( LCUI_Widget w )
 	Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 }
 
+static void HandleDestroy( LCUI_Widget w )
+{
+	Widget_ExecDestroy( &w );
+}
+
 static void HandleBorder( LCUI_Widget w )
 {
 	LCUI_Rect rect;
@@ -457,16 +462,6 @@ static void HandleBorder( LCUI_Widget w )
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 }
 
-/** 处理销毁任务 */
-static void HandleDestroy( LCUI_Widget w )
-{
-	/* 销毁先子部件，最后销毁自己 */
-	// code ...
-	/* 向父级部件添加相关任务 */
-	// code ...
-	LCUIMutex_Unlock( &w->mutex );
-}
-
 /** 更新当前任务状态，确保部件的任务能够被处理到 */
 void Widget_UpdateTaskStatus( LCUI_Widget widget )
 {
@@ -490,13 +485,12 @@ void Widget_UpdateTaskStatus( LCUI_Widget widget )
 /** 添加任务并扩散到子级部件 */
 void Widget_AddTaskToSpread( LCUI_Widget widget, int task_type )
 {
-	LCUI_Widget child;
-
+	LinkedListNode *node;
 	widget->task->buffer[task_type] = TRUE;
 	widget->task->for_self = TRUE;
 	widget->task->for_children = TRUE;
-	LinkedList_ForEach( child, 0, &widget->children ) {
-		Widget_AddTaskToSpread( child, task_type );
+	LinkedList_ForEach( node, &widget->children ) {
+		Widget_AddTaskToSpread( node->data, task_type );
 	}
 }
 
@@ -620,8 +614,11 @@ skip_proc_self_task:;
 	/* 如果子级部件中有待处理的部件，则递归进去 */
 	if( w->task->for_children ) {
 		LCUI_Widget child;
+		LinkedListNode *node;
+
 		w->task->for_children = FALSE;
-		LinkedList_ForEach( child, 0, &w->children ) {
+		LinkedList_ForEach( node, &w->children ) {
+			child = (LCUI_Widget)node->data;
 			/* 如果该级部件的任务需要留到下次再处理 */
 			if( Widget_ProcTask( child ) == 1 ) {
 				w->task->for_children = TRUE;
@@ -630,7 +627,6 @@ skip_proc_self_task:;
 	}
 	DEBUG_MSG("2,widget: %s, for_self: %d, for_children: %d\n",
 		   w->type, w->task->for_self, w->task->for_children);
-
 	return (w->task->for_self || w->task->for_children) ? 1:0;
 }
 

@@ -550,7 +550,7 @@ static int CompareName( void *data, const void *keydata )
 static ParserContextPtr NewParserContext( size_t buffer_size )
 {
 	ParserContextPtr ctx = NEW(ParserContext, 1);
-	LinkedList_Init( &ctx->selectors, sizeof(LCUI_Selector) );
+	LinkedList_Init( &ctx->selectors );
 	ctx->buffer = (char*)malloc( sizeof(char) * buffer_size );
 	ctx->buffer_size = buffer_size;
 	ctx->target_bak = is_none;
@@ -561,7 +561,7 @@ static ParserContextPtr NewParserContext( size_t buffer_size )
 static void DeleteParserContext( ParserContextPtr *ctx_ptr )
 {
 	ParserContextPtr ctx = *ctx_ptr;
-	LinkedList_Destroy( &ctx->selectors );
+	LinkedList_Clear( &ctx->selectors, DeleteSelector );
 	free( ctx->buffer );
 	free( ctx );
 	*ctx_ptr = NULL;
@@ -572,6 +572,7 @@ static int LCUI_LoadCSSBlock( ParserContextPtr ctx, const char *str )
 {
 	size_t size = 0;
 	LCUI_Selector s;
+	LinkedListNode *node;
 	
 	ctx->ptr = str;
 	for( ; *ctx->ptr && size < ctx->buffer_size; ++ctx->ptr, ++size ) {
@@ -681,10 +682,10 @@ proc_comment:
 put_css:
 		DEBUG_MSG("put css\n");
 		/* 将记录的样式表添加至匹配到的选择器中 */
-		LinkedList_ForEach( s, 0, &ctx->selectors ) {
-			LCUI_PutStyle( s, ctx->css );
+		LinkedList_ForEach( node, &ctx->selectors ) {
+			LCUI_PutStyle( node->data, ctx->css );
 		}
-		LinkedList_Destroy( &ctx->selectors );
+		LinkedList_Clear( &ctx->selectors, DeleteSelector );
 		DeleteStyleSheet( &ctx->css );
 		continue;
 select_parser:	

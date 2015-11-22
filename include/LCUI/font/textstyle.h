@@ -86,6 +86,8 @@ typedef struct LCUI_TextStyle {
 /** 初始化字体样式数据 */
 LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );
 
+LCUI_API void TextStyle_Destroy( LCUI_TextStyle *data );
+
 /**
  * 设置字体
  * @param[in][out] ts 字体样式数据
@@ -94,13 +96,10 @@ LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );
 LCUI_API int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str );
 
 /*-------------------------- StyleTag --------------------------------*/
-#define MAX_TAG_NUM 2
 
-/** 初始化样式标签栈 */
-LCUI_API void StyleTags_Init( LinkedList *tags );
+#define TagList_Init LinkedList_Init
 
-/** 销毁样式标签栈 */
-LCUI_API void StyleTags_Destroy( LinkedList *tags );
+LCUI_API void TagList_Clear( LinkedList *tags );
 
 /** 获取当前的文本样式 */
 LCUI_API LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags );

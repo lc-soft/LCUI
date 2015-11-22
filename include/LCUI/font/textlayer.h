@@ -101,7 +101,7 @@ typedef struct LCUI_TextLayerRec_  {
         LCUI_BOOL is_autowrap_mode;	/**< 是否启用自动换行模式 */
 	LCUI_BOOL is_using_style_tags;	/**< 是否使用文本样式标签 */
         LCUI_BOOL is_using_buffer;	/**< 是否使用缓存空间来存储文本位图 */
-	LCUI_DirtyRectList dirty_rect;	/**< 脏矩形记录 */
+	LinkedList dirty_rect;	/**< 脏矩形记录 */
 
         int text_align;			/**< 文本的对齐方式 */
         TextRowList row_list;		/**< 文本行列表 */

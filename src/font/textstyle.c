@@ -72,6 +72,14 @@ void TextStyle_Init( LCUI_TextStyle *data )
 	data->pixel_size = 13;
 }
 
+void TextStyle_Destroy( LCUI_TextStyle *data )
+{
+	if( data->font_ids ) {
+		free( data->font_ids );
+	}
+	data->font_ids = NULL;
+}
+
 /**
  * 设置字体
  * @param[in][out] ts 字体样式数据
@@ -130,16 +138,15 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 /*-------------------------- StyleTag --------------------------------*/
 #define MAX_TAG_NUM 2
 
-/** 初始化样式标签栈 */
-void StyleTags_Init( LinkedList *tags )
+static void DestroyTag( LCUI_StyleTag *tag )
 {
-	LinkedList_Init( tags, sizeof(LCUI_StyleTag) );
+	free( tag );
+	// XXX
 }
 
-/** 销毁样式标签栈 */
-void StyleTags_Destroy( LinkedList *tags )
+void TagList_Clear( LinkedList *tags )
 {
-	LinkedList_Destroy( tags );
+	LinkedList_Clear( tags, DestroyTag );
 }
 
 /** 获取当前的文本样式 */
@@ -147,18 +154,17 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 {
 	LCUI_StyleTag *tag_data;
 	LCUI_TextStyle *style_data;
-	int i, total, equal = 0, flags[MAX_TAG_NUM] = {0};
+	LinkedListNode *node;
+	int equal = 0, flags[MAX_TAG_NUM] = {0};
 	
-	total = LinkedList_GetTotal( tags );
-	if( total <= 0 ) {
+	if( tags->length <= 0 ) {
 		return NULL;
 	}
 	style_data = (LCUI_TextStyle*)malloc( sizeof(LCUI_TextStyle) );
 	TextStyle_Init( style_data );
 	/* 根据已经记录的各种样式，生成当前应有的文本样式 */
-	for(equal=0,i=total-1; i>=0; --i) {
-		LinkedList_Goto( tags, i );
-		tag_data = (LCUI_StyleTag*)LinkedList_Get( tags );
+	LinkedList_ForEachReverse( node, tags ) {
+		tag_data = (LCUI_StyleTag*)node->data;
 		DEBUG_MSG("tag id: %d\n", tag_data->id);
 		switch( tag_data->id ) {
 		    case TAG_ID_COLOR: 
@@ -197,23 +203,20 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 /** 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
 static void StyleTags_Delete( LinkedList *tags, int id )
 {
-	int i, total;
 	LCUI_StyleTag *p; 
-	 
-	total = LinkedList_GetTotal( tags );
+	LinkedListNode *node;
 	DEBUG_MSG("delete start, total tag: %d\n", total);
-	if(total <= 0) {
+	if( tags->length <= 0 ) {
 		return;
 	}
-	for(i=total-1; i>=0; --i) {
-		LinkedList_Goto( tags, i );
-		p = (LCUI_StyleTag*)LinkedList_Get( tags );
+	LinkedList_ForEach( node, tags ) {
+		p = (LCUI_StyleTag*)node->data;
 		if( p->id == id ) {
-			LinkedList_Delete( tags );
+			LinkedList_DeleteNode( tags, node );
 			break;
 		}
 	} 
-	DEBUG_MSG("delete end, total tag: %d\n", LinkedList_GetTotal( tags ));
+	DEBUG_MSG("delete end, total tag: %d\n", tags->length);
 }
 
 /** 清除字符串中的空格 */
@@ -422,26 +425,24 @@ scan_style_tag_data( const wchar_t *wstr, LCUI_StyleTag *tag )
 }
 
 /** 处理样式标签 */
-const wchar_t*
-StyleTags_ScanBeginTag( LinkedList *tags, const wchar_t *str )
+const wchar_t *StyleTags_ScanBeginTag( LinkedList *tags, const wchar_t *str )
 {
 	const wchar_t *q;
-	LCUI_StyleTag data;
-	
-	/* 开始处理样式标签 */
-	q = scan_style_tag_data( str, &data );
-	DEBUG_MSG2("handle_style_tag():%p\n", q);
+	LCUI_StyleTag *tag = NEW(LCUI_StyleTag, 1);
+	q = scan_style_tag_data( str, tag );
+	DEBUG_MSG2("%p\n", q);
 	if( q ) {
 		DEBUG_MSG2("add style data\n");
 		/* 将标签样式数据加入队列 */
-		LinkedList_AppendCopy( tags, &data );
+		LinkedList_Append( tags, tag );
+	} else {
+		free( tag );
 	}
 	return q;
 }
 
 /** 处理样式结束标签 */
-const wchar_t* 
-StyleTags_ScanEndingTag( LinkedList *tags, const wchar_t *str )
+const wchar_t* StyleTags_ScanEndingTag( LinkedList *tags, const wchar_t *str )
 {
 	const wchar_t *p;
 	char tag_name[256];

@@ -66,6 +66,7 @@ enum ParserBehavior {
 	PB_ENTER	/**< 进入子元素列表 */
 };
 
+typedef struct ParserContext ParserContext, *ParserContextPtr;
 typedef int(*ParserFuncPtr)(ParserContextPtr, xmlNodePtr);
 
 typedef struct Parser {
@@ -74,12 +75,12 @@ typedef struct Parser {
 	ParserFuncPtr parse;
 } Parser, *ParserPtr;
 
-typedef struct ParserContext {
+struct ParserContext {
 	int id;
 	LCUI_Widget widget;
 	LCUI_Widget root;
 	ParserPtr parent;
-} ParserContext, *ParserContextPtr;
+};
 
 static struct ModuleContext {
 	LCUI_BOOL is_inited;
@@ -119,7 +120,7 @@ static int ParseResource( ParserContextPtr ctx, xmlNodePtr node )
 			if( node->type != XML_TEXT_NODE ) {
 				continue;
 			}
-			LCUI_LoadCSS( node->content );
+			LCUI_LoadCSS( (char*)node->content );
 			node = node->next;
 		}
 	}

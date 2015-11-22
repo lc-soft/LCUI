@@ -116,23 +116,17 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD reason, LPVOID unused )
 /** 根据 hwnd 获取 Surface */
 static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 {
-	int i, n;
-	LCUI_Surface surface;
-
-	n = LinkedList_GetTotal( &win32.surfaces );
-	for( i = 0; i < n; ++i ) {
-		LinkedList_Goto( &win32.surfaces, i );
-		surface = (LCUI_Surface)LinkedList_Get( &win32.surfaces );
-		if( surface->hwnd == hwnd ) {
-			return surface;
+	LinkedListNode *node;
+	LinkedList_ForEach( node, &win32.surfaces ) {
+		if( ((LCUI_Surface)node->data)->hwnd == hwnd ) {
+			return (LCUI_Surface)node->data;
 		}
 	}
 	return NULL;
 }
 
-static void Win32Surface_OnDestroy( void *args )
+static void Win32Surface_Destroy( LCUI_Surface surface )
 {
-	LCUI_Surface surface = (LCUI_Surface)args;
 	surface->w = 0;
 	surface->h = 0;
 	if( surface->hwnd ) {
@@ -151,15 +145,11 @@ static void Win32Surface_OnDestroy( void *args )
 
 static void Win32Surface_ExecDelete( LCUI_Surface surface )
 {
-	int i, n;
-	LCUI_Surface s;
-
-	n = LinkedList_GetTotal( &win32.surfaces );
-	for( i = 0; i < n; ++i ) {
-		LinkedList_Goto( &win32.surfaces, i );
-		s = (LCUI_Surface)LinkedList_Get( &win32.surfaces );
-		if( surface == s ) {
-			LinkedList_Delete( &win32.surfaces );
+	LinkedListNode *node;
+	LinkedList_ForEach( node, &win32.surfaces ) {
+		if( node->data == surface ) {
+			Win32Surface_Destroy( (LCUI_Surface)node->data );
+			LinkedList_DeleteNode( &win32.surfaces, node );
 			break;
 		}
 	}
@@ -265,7 +255,7 @@ static LCUI_Surface Win32Surface_New(void)
 {
 	int i;
 	LCUI_Surface surface;
-	surface = (LCUI_Surface)LinkedList_Alloc( &win32.surfaces );
+	surface = NEW(struct LCUI_SurfaceRec_, 1);
 	surface->mode = RENDER_MODE_BIT_BLT;
 	surface->hwnd = NULL;
 	surface->fb_hdc = NULL;
@@ -276,6 +266,7 @@ static LCUI_Surface Win32Surface_New(void)
 	for( i=0; i<TASK_TOTAL_NUM; ++i ) {
 		surface->task_buffer[i].is_valid = FALSE;
 	}
+	LinkedList_Append( &win32.surfaces, surface );
 	if( !win32.is_ready ) {
 		LCUIMutex_Lock( &win32.mutex );
 		/* 等待 Surface 线程创建完 windows 消息队列 */
@@ -297,7 +288,7 @@ static void Win32Surface_ExecMove( LCUI_Surface surface, int x, int y )
 	x += GetSystemMetrics( SM_CXFIXEDFRAME );
 	y += GetSystemMetrics( SM_CYFIXEDFRAME );
 	SetWindowPos( surface->hwnd, HWND_NOTOPMOST,
-		x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+		      x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
 	return;
 }
 
@@ -570,10 +561,7 @@ LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info )
 	win32.methods.onEvent = NULL;
 	LCUICond_Init( &win32.cond );
 	LCUIMutex_Init( &win32.mutex );
-	LinkedList_Init( &win32.surfaces, sizeof( struct LCUI_SurfaceRec_ ) );
-	LinkedList_SetDataMemReuse( &win32.surfaces, TRUE );
-	LinkedList_SetDataNeedFree( &win32.surfaces, TRUE );
-	LinkedList_SetDestroyFunc( &win32.surfaces, Win32Surface_OnDestroy );
+	LinkedList_Init( &win32.surfaces );
 	LCUIThread_Create( &win32.loop_thread, LCUISurface_Loop, NULL );
 	return &win32.methods;
 }
