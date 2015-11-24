@@ -59,7 +59,7 @@ struct LinkedListRec_ {
 	for( node = (list)->head.next; node; node = node->next )
 
 #define LinkedList_ForEachReverse(node, list) \
-	for( node = (list)->tail.prev; node != &(list)->head; node = node->prev )
+	for( node = (list)->tail.prev; node && node != &(list)->head; node = node->prev )
 
 #define LinkedList_Init(list) {				\
 	(list)->length = 0;				\
@@ -95,9 +95,13 @@ struct LinkedListRec_ {
 	} else {					\
 		(list)->head.next = node;		\
 		(list)->tail.prev = node;		\
+		node->prev = &(list)->head;		\
 	}						\
 	(list)->length += 1;				\
 }
+
+#define LinkedList_Clear(list, func) LinkedList_ClearEx( list, func, 1 )
+#define LinkedList_ClearData(list, func) LinkedList_ClearEx( list, func, 0 )
 
 LCUI_API LinkedListNode *LinkedList_Append( LinkedList *list, void *data );
 LCUI_API LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data );
@@ -105,7 +109,7 @@ LCUI_API LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos );
 LCUI_API void *LinkedList_Get( LinkedList *list, int pos );
 LCUI_API void LinkedList_Delete( LinkedList *list, int pos );
 LCUI_API void LinkedList_Sort( LinkedList *list, void(*on_sort)(void*, void*) );
-LCUI_API void LinkedList_Clear( LinkedList *list, void(*on_destroy)(void*) );
+LCUI_API void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*), int free_node );
 LCUI_API void LinkedList_Concat( LinkedList *list1, LinkedList *list2 );
 
 LCUI_END_HEADER

@@ -771,7 +771,7 @@ int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 	LinkedList_ForEach( node, &list ) {
 		MergeStyleSheet( out_ss, node->data );
 	}
-	LinkedList_Clear( &list, DeleteStyleSheet );
+	LinkedList_Clear( &list, NULL );
 	return 0;
 }
 

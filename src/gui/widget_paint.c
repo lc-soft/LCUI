@@ -364,7 +364,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	}
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
 	LinkedList_ForEachReverse( node, &w->children_show ) {
-		child = (LCUI_Widget)node->data;
+		child = node->data;
 		if( !child->computed_style.visible ) {
 			continue;
 		}

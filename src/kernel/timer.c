@@ -189,7 +189,7 @@ static void TimerThread( void *arg )
 	long int n_ms;
 	LCUI_Task task = {0};
 	TimerData *timer = NULL;
-	LinkedListNode *node, *prev;
+	LinkedListNode *node;
 	int64_t lost_ms;
 
 	self.is_running = TRUE;
@@ -225,16 +225,13 @@ static void TimerThread( void *arg )
 		DEBUG_MSG("timer: %ld, start_time: %ldms, cur_time: %ldms, cur_ms: %ld, total_ms: %ld\n", 
 			timer->id, timer->start_time, LCUI_GetTickCount(), timer->total_ms-lost_ms, timer->total_ms);
 		/* 若需要重复使用，则重置剩余等待时间 */
+		LinkedList_Unlink( &self.timer_list, node );
 		if( timer->reuse ) {
 			timer->start_time = LCUI_GetTickCount();
 			timer->pause_ms = 0;
-			LinkedList_Unlink( &self.timer_list, node );
 			TimerList_AddNode( node );
 		} else {
-			prev = node->prev;
-			LinkedList_DeleteNode( &self.timer_list, node );
-			free( node->data );
-			node = prev;
+			free( timer );
 		}
 		DEBUG_MSG( "add task: %p, timer id: %ld\n", task.func, timer->id );
 		/* 添加该任务至指定程序的任务队列 */
@@ -293,6 +290,8 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 	timer->func = func;
 	timer->arg = arg;
 	node->data = timer;
+	node->next = NULL;
+	node->prev = NULL;
 	TimerList_AddNode( node );
 	LCUICond_Signal( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
@@ -320,7 +319,7 @@ int LCUITimer_Free( int timer_id )
 		return -1;
 	}
 	node = TimerNode( timer );
-	LinkedList_DeleteNode( &self.timer_list, node );
+	LinkedList_Unlink( &self.timer_list, node );
 	free( timer );
 	LCUICond_Signal( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );

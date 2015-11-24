@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * widget_base.c -- the widget base operation set.
  *
  * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
@@ -66,25 +66,18 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 	if( parent == widget ) {
 		return -2;
 	}
-	if( widget->parent ) {
-		prev_parent = widget->parent;
-	} else {
+	node = Widget_GetNode( widget );
+	if( !widget->parent ) {
 		goto remove_done;
 	}
-
+	prev_parent = widget->parent;
 	/* 移除在之前的容器中的记录 */
-	LinkedList_ForEach( node, &prev_parent->children ) {
-		if( node->data != widget ) {
-			continue;
-		}
-		LinkedList_DeleteNode( &prev_parent->children, node );
-		/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
-		if( prev_parent == LCUIRootWidget ) {
-			e.type_name = "TopLevelWidget";
-			e.target = widget;
-			Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
-		}
-		break;
+	LinkedList_Unlink( &prev_parent->children, node );
+	/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
+	if( prev_parent == LCUIRootWidget ) {
+		e.type_name = "TopLevelWidget";
+		e.target = widget;
+		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
 	}
 	LinkedList_ForEach( node, &prev_parent->children_show ) {
 		if( node->data != widget ) {
@@ -97,7 +90,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 remove_done:
 
 	widget->parent = parent;
-	LinkedList_Append( &parent->children, widget );
+	LinkedList_AppendNode( &parent->children, node );
 	LinkedList_Insert( &parent->children_show, 0, widget );
 	/* 如果是添加至根部件内，则触发 WET_ADD 事件 */
 	if( parent == LCUIRootWidget ) {
@@ -239,13 +232,14 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 	return widget;
 }
 
-static void Widget_OnDestroy( LCUI_Widget widget )
+static void Widget_OnDestroy( void *arg )
 {
 	LCUI_WidgetEvent e;
+	LCUI_Widget widget = (LCUI_Widget)arg;
 	Widget_DestroyTaskBox( widget );
 	LCUIEventBox_Destroy( widget->event );
 	widget->event = NULL;
-	LinkedList_Clear( &widget->children, Widget_OnDestroy );
+	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
 	LinkedList_Clear( &widget->children_show, NULL );
 	LinkedList_Clear( &widget->dirty_rects, free );
 	/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
@@ -887,21 +881,36 @@ void Widget_UpdateLayout( LCUI_Widget w )
 	}
 }
 
-static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth )
+static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix )
 {
-	int i;
+	int len;
 	LCUI_Widget child;
 	LinkedListNode *node;
+	char str[16], child_prefix[512];
 
+	len = strlen(prefix);
+	strcpy( child_prefix, prefix );
 	LinkedList_ForEach( node, &w->children ) {
-		child = (LCUI_Widget)node->data;
-		i = depth*4;
-		while( i-- ) {
-			printf(".");
+		if( node == w->children.tail.prev ) {
+			strcpy( str, "└" );
+			strcpy( &child_prefix[len], "   " );
 		}
-		printf("%s, xy:(%d,%d), size:(%d,%d)\n", child->type, 
-			child->x, child->y, child->width, child->height);
-		_LCUIWidget_PrintTree( child, depth+1 );
+		else if( node == w->children.head.next ) {
+			strcpy( str, "├" );
+			strcpy( &child_prefix[len], "│ " );
+		}
+		strcat( str, "─" );
+		child = (LCUI_Widget)node->data;
+		if( child->children.length == 0 ) {
+			strcat( str, "─" );
+		} else {
+			strcat( str, "┬" );
+		}
+		printf("%s%s %s, xy:(%d,%d), size:(%d,%d)\n", child_prefix,
+			str, child->type, child->x, child->y, 
+			child->width, child->height);
+
+		_LCUIWidget_PrintTree( child, depth+1, child_prefix );
 	}
 }
 
@@ -911,7 +920,7 @@ void LCUIWidget_PrintTree( LCUI_Widget w )
 		w = LCUIRootWidget;
 	}
 	printf("widget tree begin\n");
-	_LCUIWidget_PrintTree( w, 0 );
+	_LCUIWidget_PrintTree( w, 0, "" );
 	printf("widget tree end\n");
 }
 

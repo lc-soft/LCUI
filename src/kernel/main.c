@@ -251,7 +251,7 @@ int LCUI_AddTask( LCUI_Task *task )
 		node = LinkedList_Append( &MainApp.task_list, buff );
 	} else {
 		LCUIMutex_Lock( &MainApp.task_list_mutex );
-		node = LinkedList_Append( &MainApp.task_list, task );
+		node = LinkedList_Append( &MainApp.task_list, buff );
 		LCUIMutex_Unlock( &MainApp.task_list_mutex );
 		LCUICond_Broadcast( &MainApp.loop_cond );
 	}
@@ -296,7 +296,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 		LCUICond_Wait( &MainApp.loop_cond, &MainApp.task_list_mutex );
 		DEBUG_MSG("loop: %p, wakeup, lost_time: %ld\n", loop, ct);
 		LinkedList_ForEach( node, &MainApp.task_list ) {
-			task = (LCUI_Task*)node->data;
+			task = node->data;
 			if( !task || !task->func ) {
 				return -1;
 			}

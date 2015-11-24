@@ -390,7 +390,7 @@ void LCUIWidget_StepEvent(void)
 
 	DEBUG_MSG("widget total: %d\n", n);
 	LinkedList_ForEach( node, &self.pending_list ) {
-		widget = node->data;;
+		widget = node->data;
 		prev = node->prev;
 		LinkedList_DeleteNode( &self.pending_list, node );
 		node = prev;

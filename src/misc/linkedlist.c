@@ -41,22 +41,25 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 
-void LinkedList_Clear( LinkedList *list, void(*on_destroy)(void*) )
+void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*),
+			 int free_node )
 {
-	LinkedListNode *prev, *node;
-	node = list->head.next;
+	LinkedListNode *prev, *node = list->tail.prev;
 	list->head.next = NULL;
 	list->tail.prev = NULL;
-	list->length = 0;
-	while( node ) {
-		prev = node;
-		node = node->next;
-		free( prev );
+	while( node && node != &list->head ) {
+		prev = node->prev;
+		LinkedList_Unlink( list, node );
 		if( node->data && on_destroy ) {
-			on_destroy( prev->data );
-			prev->data = NULL;
+			on_destroy( node->data );
 		}
+		node->data = NULL;
+		if( free_node ) {
+			free( node );
+		}
+		node = prev;
 	}
+	list->length = 0;
 }
 
 LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos )
