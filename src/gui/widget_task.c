@@ -571,9 +571,11 @@ static int Widget_ProcTask( LCUI_Widget w )
 {
 	int ret = 1, i;
 	LCUI_BOOL *buffer;
+	LCUI_Widget child;
+	LinkedListNode *node, *next;
+
 	DEBUG_MSG("1,widget: %s, for_self: %d, for_children: %d\n",
 		   w->type, w->task->for_self, w->task->for_children);
-
 	/* 如果该部件有任务需要处理 */
 	if( w->task->for_self ) {
 		ret = LCUIMutex_TryLock( &w->mutex );
@@ -613,16 +615,21 @@ skip_proc_self_task:;
 
 	/* 如果子级部件中有待处理的部件，则递归进去 */
 	if( w->task->for_children ) {
-		LCUI_Widget child;
-		LinkedListNode *node;
-
 		w->task->for_children = FALSE;
-		LinkedList_ForEach( node, &w->children ) {
-			child = (LCUI_Widget)node->data;
+		node = w->children.head.next;
+		while( node ) {
+			child = node->data;
+			/* 如果当前部件有销毁任务，结点空间会连同部件一起被
+			 * 释放，为避免因访问非法空间而出现异常，预先保存下
+			 * 个结点。
+			 */
+			next = node->next;
+			ret = Widget_ProcTask( child );
 			/* 如果该级部件的任务需要留到下次再处理 */
-			if( Widget_ProcTask( child ) == 1 ) {
+			if( ret == 1 ) {
 				w->task->for_children = TRUE;
 			}
+			node = next;
 		}
 	}
 	DEBUG_MSG("2,widget: %s, for_self: %d, for_children: %d\n",
