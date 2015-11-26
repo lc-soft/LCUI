@@ -107,24 +107,47 @@ remove_done:
 
 int Widget_Unwrap( LCUI_Widget *widget )
 {
-	LCUI_Widget child;
+	LCUI_Widget self, child;
 	LinkedList *list, *list_show;
-	LinkedListNode *node;
+	LinkedListNode *target, *node, *prev;
 
-	if( !(*widget)->parent ) {
+	self = *widget;
+	if( !self->parent ) {
 		return -1;
 	}
-	list = &(*widget)->parent->children;
-	list_show = &(*widget)->parent->children_show;
-	LinkedList_ForEach( node, list ) {
+	list = &self->parent->children;
+	list_show = &self->parent->children_show;
+	node = Widget_GetNode( self );
+	target = node->prev;
+	LinkedList_ForEach( node, &self->children ) {
+		prev = node->prev;
 		child = node->data;
-		LinkedList_Append( list, child );
-		LinkedList_Append( list_show, child );
+		LinkedList_Unlink( &self->children, node );
+		LinkedList_Link( list, target, node );
+		child->parent = self->parent;
 		Widget_AddTaskToSpread( child, WTT_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
+		node = prev;
 	}
-	LinkedList_Clear( list, NULL );
-	Widget_AddTask( (*widget)->parent, WTT_LAYOUT );
+	LinkedList_ForEach( node, list_show ) {
+		if( node->data == self ) {
+			break;
+		}
+	}
+	if( node ) {
+		target = node->prev;
+	} else {
+		target = list_show->tail.prev;
+		if( !target ) {
+			target = &list_show->head;
+		}
+	}
+	LinkedList_ForEach( node, &self->children_show ) {
+		prev = node->prev;
+		LinkedList_Unlink( &self->children_show, node );
+		LinkedList_Link( list_show, target, node );
+		node = prev;
+	}
 	Widget_Destroy( widget );
 	return 0;
 }
@@ -248,6 +271,7 @@ static void Widget_OnDestroy( void *arg )
 		e.target = widget;
 		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
 	}
+	Widget_AddTask( widget->parent, WTT_LAYOUT );
 	free( widget );
 }
 
@@ -843,7 +867,7 @@ void Widget_UpdateLayout( LCUI_Widget w )
 		}
 	}
 	LinkedList_ForEach( node, &w->children ) {
-		child = (LCUI_Widget)node->data;
+		child = node->data;
 		if( child->computed_style.position != SV_STATIC ) {
 			continue;
 		}
@@ -893,20 +917,19 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 	LinkedList_ForEach( node, &w->children ) {
 		if( node == w->children.tail.prev ) {
 			strcpy( str, "└" );
-			strcpy( &child_prefix[len], "   " );
-		}
-		else if( node == w->children.head.next ) {
+			strcpy( &child_prefix[len], "    " );
+		} else {
 			strcpy( str, "├" );
-			strcpy( &child_prefix[len], "│ " );
-		}
+			strcpy( &child_prefix[len], "│  " );
+		} 
 		strcat( str, "─" );
-		child = (LCUI_Widget)node->data;
+		child = node->data;
 		if( child->children.length == 0 ) {
 			strcat( str, "─" );
 		} else {
 			strcat( str, "┬" );
 		}
-		printf("%s%s %s, xy:(%d,%d), size:(%d,%d)\n", child_prefix,
+		printf("%s%s %s, xy:(%d,%d), size:(%d,%d)\n", prefix,
 			str, child->type, child->x, child->y, 
 			child->width, child->height);
 
@@ -914,14 +937,12 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 	}
 }
 
-void LCUIWidget_PrintTree( LCUI_Widget w )
+void Widget_PrintTree( LCUI_Widget w )
 {
-	if( !w ) {
-		w = LCUIRootWidget;
-	}
-	printf("widget tree begin\n");
-	_LCUIWidget_PrintTree( w, 0, "" );
-	printf("widget tree end\n");
+	w = w ? w : LCUIRootWidget;
+	printf("%s, xy:(%d,%d), size:(%d,%d)\n", 
+		w->type, w->x, w->y, w->width, w->height);
+	_LCUIWidget_PrintTree( w, 0, "  " );
 }
 
 void LCUI_InitWidget(void)
