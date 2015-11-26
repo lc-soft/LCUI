@@ -41,6 +41,20 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 
+void LinkedList_Unlink( LinkedList *list, LinkedListNode *node )
+{
+	(list)->length -= 1;
+	if( node->next ) {
+		node->next->prev = node->prev;
+	}
+	if( node == list->tail.prev ) {
+		list->tail.prev = node->prev;
+	}
+	node->prev->next = node->next;
+	node->prev = NULL;
+	node->next = NULL;
+}
+
 void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*),
 			 int free_node )
 {
@@ -96,6 +110,29 @@ LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data )
 	target->prev = node;
 	++list->length;
 	return node;
+}
+
+void LinkedList_DeleteNode( LinkedList *list, LinkedListNode *node )
+{
+	LinkedList_Unlink(list, node);
+	node->data = NULL;
+	free( node );
+	node = NULL;
+}
+
+void LinkedList_AppendNode( LinkedList *list, LinkedListNode *node )
+{
+	if( list->head.next ) {
+		node->prev = list->tail.prev;
+		list->tail.prev->next = node;
+		list->tail.prev = node;
+	} else {
+		list->head.next = node;
+		list->tail.prev = node;
+		node->prev = &list->head;
+	}
+	node->next = NULL;
+	list->length += 1;
 }
 
 void LinkedList_Delete( LinkedList *list, int pos )
