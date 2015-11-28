@@ -729,7 +729,7 @@ int LCUI_LoadCSSFile( const char *filepath )
 		return -1;
 	}
 	ctx = NewParserContext( 512 );
-	while( fread(buff, 512, 1, fp) ) {
+	while( fread( buff, 1, 512, fp ) ) {
 		LCUI_LoadCSSBlock( ctx, buff );
 	}
 	DeleteParserContext( &ctx );

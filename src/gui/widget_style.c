@@ -547,7 +547,7 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 			}
 		}
 		if( (*sn_ptr)->type && strcmp("*", (*sn_ptr)->type) ) {
-			if( strcmp(w->type, (*sn_ptr)->type) ) {
+			if( !w->type || strcmp(w->type, (*sn_ptr)->type) ) {
 				continue;
 			}
 		}

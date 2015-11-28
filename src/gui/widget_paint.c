@@ -157,13 +157,14 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 	count = w->dirty_rects.length;
 	/* 取出当前记录的脏矩形 */
 	LinkedList_ForEach( node, &w->dirty_rects ) {
-		r = (LCUI_Rect*)node->data;
+		r = node->data;
 		/* 若有独立位图缓存，则重绘脏矩形区域 */
 		if( Graph_IsValid(&w->graph) ) {
 			LCUI_PaintContextRec_ paint;
 			paint.rect = *r;
 			Graph_Quote( &paint.canvas, &w->graph, &paint.rect );
-			DEBUG_MSG("[%s]: paint, rect:(%d,%d,%d,%d)\n", w->type, r->x, r->y, r->width, r->height);
+			DEBUG_MSG("[%s]: paint, rect:(%d,%d,%d,%d)\n", 
+				   w->type, r->x, r->y, r->width, r->height);
 			Widget_OnPaint( w, &paint );
 		}
 		/* 取出与容器内有效区域相交的区域 */
@@ -171,7 +172,8 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 			/* 转换相对于根级部件的坐标 */
 			rect.x += x;
 			rect.y += y;
-			DEBUG_MSG("[%s]: merge rect:(%d,%d,%d,%d)\n", w->type, rect.x, rect.y, rect.width, rect.height);
+			DEBUG_MSG("[%s]: merge rect:(%d,%d,%d,%d)\n", 
+				   w->type, rect.x, rect.y, rect.width, rect.height);
 			RectList_Add( rlist, &rect );
 		}
 	}

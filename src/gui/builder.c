@@ -115,8 +115,7 @@ static int ParseResource( ParserContextPtr ctx, xmlNodePtr node )
 	} 
 	else if( strstr(type, "text/css") ) {
 		LCUI_LoadCSSFile( src );
-		node = node->children;
-		while( node ) {
+		for( node = node->children; node; node = node->next ) {
 			if( node->type != XML_TEXT_NODE ) {
 				continue;
 			}
