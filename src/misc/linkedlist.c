@@ -99,16 +99,14 @@ LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos )
 LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data )
 {
 	LinkedListNode *node, *target;
-	target = LinkedList_GetNode( list, pos );
-	if( !target ) {
-		return NULL;
-	}
-	node = NEW(LinkedListNode, 1);
+	node = NEW( LinkedListNode, 1 );
 	node->data = data;
-	node->prev = target->prev;
-	node->next = target;
-	target->prev = node;
-	++list->length;
+	target = LinkedList_GetNode( list, pos );
+	if( target ) {
+		LinkedList_Link( list, target->prev, node );
+	} else {
+		LinkedList_AppendNode( list, node );
+	}
 	return node;
 }
 
