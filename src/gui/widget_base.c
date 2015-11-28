@@ -180,6 +180,7 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->custom_style = StyleSheet();
 	widget->cached_style = StyleSheet();
 	widget->style = StyleSheet();
+	widget->computed_style.visible = TRUE;
 	widget->computed_style.position = SV_STATIC;
 	widget->computed_style.display = SV_BLOCK;
 	widget->inherited_style = StyleSheet();
@@ -442,7 +443,7 @@ void Widget_GetContentSize( LCUI_Widget w, int *width, int *height )
 
 	*width = *height = 0;
 	LinkedList_ForEach( node, &w->children_show ) {
-		child = (LCUI_Widget)node->data;
+		child = node->data;
 		if( !child->computed_style.visible ) {
 			continue;
 		}
@@ -731,13 +732,15 @@ int StrList_Add( char ***strlist, const char *str )
 			continue;
 		}
 		if( i - 1 > head ) {
-			strncpy( buff, &str[i], i - head );
+			strncpy( buff, &str[head], i - head );
+			buff[i] = 0;
 			count += StrList_AddOne( strlist, buff );
 		}
 		head = i;
 	}
-	if( head < i - 1 ) {
-		strncpy( buff, &str[i], i - head );
+	if( i - 1 > head ) {
+		strncpy( buff, &str[head], i - head );
+		buff[i] = 0;
 		count += StrList_AddOne( strlist, buff );
 	}
 	return count;
@@ -929,9 +932,10 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 		} else {
 			strcat( str, "┬" );
 		}
-		printf("%s%s %s, xy:(%d,%d), size:(%d,%d)\n", prefix,
-			str, child->type, child->x, child->y, 
-			child->width, child->height);
+		printf("%s%s %s, xy:(%d,%d), size:(%d,%d), visible: %s\n", 
+			prefix, str, child->type, child->x, child->y, 
+			child->width, child->height, 
+			child->computed_style.visible ? "true":"false");
 
 		_LCUIWidget_PrintTree( child, depth+1, child_prefix );
 	}
@@ -940,8 +944,9 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 void Widget_PrintTree( LCUI_Widget w )
 {
 	w = w ? w : LCUIRootWidget;
-	printf("%s, xy:(%d,%d), size:(%d,%d)\n", 
-		w->type, w->x, w->y, w->width, w->height);
+	printf("%s, xy:(%d,%d), size:(%d,%d), visible: %s\n", 
+		w->type, w->x, w->y, w->width, w->height,
+		w->computed_style.visible ? "true":"false");
 	_LCUIWidget_PrintTree( w, 0, "  " );
 }
 
