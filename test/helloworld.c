@@ -9,6 +9,7 @@
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/button.h>
 #include <LCUI/gui/widget/sidebar.h>
+#include <LCUI/gui/builder.h>
 
 #ifdef LCUI_BUILD_IN_WIN32
 #include <io.h>
@@ -41,48 +42,14 @@ void onTimer( void *arg )
 	x += vx;
 	y += vy;
 	LCUI_PrintStyleLibrary();
+	Widget_PrintTree(NULL);
 	printf("sidebar visible: %d\n", sb->computed_style.visible);
-	LinkedList_ForEach( sbi, 0, &sb->children ) {
-		printf("item: %p, pos: %d,%d, size: %d,%d, visibale: %d\n", 
-			sbi, sbi->x, sbi->y, sbi->width, sbi->height, sbi->computed_style.visible );
-		LinkedList_ForEach( w, 0, &sbi->children ) {
-			printf("child: %p, pos: %d,%d, size: %d,%d, visibale: %d\n", 
-				w, w->x, w->y, w->width, w->height, w->computed_style.visible );
-		}
-	}
 	return;
 	//Widget_Move( arg, x, y );
 	//sprintf(str, "fps: %d", LCUIDisplay_GetFPS());
 	//Button_SetText(btn, str);
 	//_DEBUG_MSG("fps: %d\n", LCUIDisplay_GetFPS());
 }
-
-const char *main_css = ToString(
-
-debug-widget {
-	background-color: rgba(255,255,255,0.8);
-	background-size: 50% 200px;
-	background-position: bottom center;
-	border: 1px solid rgb(0,122,204);
-	box-shadow: 2px 2px 0 8px rgba(0,122,204,0.8);
-}
-
-root {
-	background-color: rgb(255,242,223);
-	background-image: file("images/background-image.png");
-	background-position: center;
-	background-size: 75% 75%;
-}
-
-sidebar-item .text {
-	font-family: Microsoft YaHei;
-}
-
-sidebar-item .icon {
-	font-family: GLYPHICONS Halflings;
-}
-
-);
 
 const wchar_t test_str[] = L"测试文本，呵呵。\n[size=12px]12px, 0123456789, hello,world! are you OK? I like this![/size]\n\
 [size=13px]13px, 0123456789, hello,world! are you OK? I like this![/size]\n\
@@ -94,34 +61,33 @@ const wchar_t test_str[] = L"测试文本，呵呵。\n[size=12px]12px, 01234567
 
 int main( int argc, char **argv )
 {
+	LCUI_Widget box;
 	LCUI_Widget w, root, sidebar, text;
 	
 #ifdef LCUI_BUILD_IN_WIN32
 	InitConsoleWindow();//test_gen_font_code();return 0;
 #endif
 	_DEBUG_MSG("test\n");
-	
 	LCUI_Init();
 	LCUIDisplay_SetMode( LDM_WINDOWED );
 	LCUIDisplay_SetSize( 960, 540 );
+	box = LCUIBuilder_LoadFile("hello.xml");
+	root = LCUIWidget_GetRoot();
 	w = LCUIWidget_New("debug-widget");
 	sidebar = LCUIWidget_New("sidebar");
-	text = LCUIWidget_New("textview");
-	TextView_SetTextW( text, test_str);
-	LCUIFont_LoadFile("../../../fonts/glyphicons-halflings-regular.ttf");
-	//SideBar_AppendItem( sidebar, L"item-home", L"\xe021", L"Home 测试" );
-	//SideBar_AppendItem( sidebar, L"item-widgets", L"\xe011", L"Widgets" );
-	//SideBar_AppendItem( sidebar, L"item-settings", L"\xe019", L"Settings" );
+	//text = LCUIWidget_New("textview");
+	//TextView_SetTextW( text, test_str);
+	SideBar_AppendItem( sidebar, L"item-home", L"\xf015", L"Home 测试" );
+	SideBar_AppendItem( sidebar, L"item-widgets", L"\xf00a", L"Widgets" );
+	SideBar_AppendItem( sidebar, L"item-settings", L"\xf085", L"Settings" );
 	Widget_Append( w, sidebar );
-	Widget_Append( w, text );
+	//Widget_Append( w, text );
+	Widget_Append( root, box );
+	Widget_Unwrap( &box );
 	Widget_Top( w );
-	Widget_Show( w );
-	Widget_Show( sidebar );
-	Widget_Show( text );
+	//Widget_Show( text );
 	Widget_Resize( w, 520, 240 );
 	Widget_Move( w, 200, 200 );
-	root = LCUIWidget_GetRoot();
-	LCUI_ParseStyle( main_css );
 	Widget_Update( root, TRUE );
 	Widget_Update( w, TRUE );
 	LCUITimer_Set( 2000, onTimer, sidebar, FALSE );
