@@ -327,5 +327,8 @@ void LCUI_InitWidget(void);
 
 void LCUI_ExitWidget(void);
 
+/** 计算背景样式 */
+void Widget_ComputeBackgroundStyle( LCUI_Widget widget );
+
 #endif
 

@@ -410,6 +410,9 @@
     <ClCompile Include="..\..\..\src\gui\widget\button.c">
       <Filter>源文件\gui\widget</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_background.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\README" />

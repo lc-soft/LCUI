@@ -733,14 +733,14 @@ int StrList_Add( char ***strlist, const char *str )
 		}
 		if( i - 1 > head ) {
 			strncpy( buff, &str[head], i - head );
-			buff[i] = 0;
+			buff[i - head] = 0;
 			count += StrList_AddOne( strlist, buff );
 		}
 		head = i;
 	}
 	if( i - 1 > head ) {
 		strncpy( buff, &str[head], i - head );
-		buff[i] = 0;
+		buff[i - head] = 0;
 		count += StrList_AddOne( strlist, buff );
 	}
 	return count;

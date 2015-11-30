@@ -155,6 +155,7 @@ typedef enum LCUI_StyleType {
 #define SVT_scale	SVT_SCALE
 #define SVT_style	SVT_STYLE
 #define SVT_data	SVT_DATA
+#define SVT_image	SVT_IMAGE
 #define SVT_string	SVT_STRING
 
 typedef struct LCUI_BoxShadow {

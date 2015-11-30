@@ -187,6 +187,31 @@ static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseImage( LCUI_StyleSheet ss, int key, const char *str )
 {
+	char *data;
+	int n;
+	const char *p, *head, *tail;
+
+	p = str;
+	data = malloc( strlen(str) * sizeof(char) );
+	tail = head = strstr( p, "url(" );
+	while( p ) {
+		tail = p;
+		p = strstr( p+1, ")" );
+	}
+	if( tail == head ) {
+		return -1;
+	}
+	head += 4;
+	if( *head == '"' ) {
+		++head;
+	}
+	n = tail - head;
+	strncpy( data, head, n );
+	data[n] = 0;
+	if( n > 0 && data[n - 1] == '"' ) {
+		data[n - 1] = 0;
+	}
+	SetStyle( ss, key, data, string );
 	return 0;
 }
 
@@ -672,7 +697,9 @@ proc_comment:
 		switch( *(ctx->ptr + 1) ) {
 		case '/': ctx->is_line_comment = TRUE; break;
 		case '*': ctx->is_line_comment = FALSE; break;
-		default: continue;
+		default: 
+			ctx->buffer[ctx->pos++] = *ctx->ptr;
+			continue;
 		}
 		if( ctx->target_bak != is_comment ) {
 			ctx->target_bak = ctx->target;

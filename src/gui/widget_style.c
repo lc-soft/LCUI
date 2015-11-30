@@ -193,13 +193,12 @@ int MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 		}
 		dest->sheet[i] = src->sheet[i];
 		dest->sheet[i].is_changed = TRUE;
+		++count;
 		if( src->sheet[i].type != SVT_STRING 
 		 || !src->sheet[i].string ) {
-			++count;
 			continue;
 		}
 		dest->sheet[i].string = strdup( dest->sheet[i].string );
-		++count;
 	}
 	return 0;
 }

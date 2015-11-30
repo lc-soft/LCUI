@@ -68,57 +68,6 @@ static void HandleTopLevelWidgetEvent( LCUI_Widget w, int event_type )
 	}
 }
 
-/** 计算背景样式 */
-static void ComputeBackgroundStyle( LCUI_StyleSheet ss, LCUI_Background *bg )
-{
-	LCUI_Style *style;
-	int key = key_background_start + 1;
-
-	for( ; key < key_background_end; ++key ) {
-		style = &ss->sheet[key];
-		if( !style->is_valid ) {
-			continue;
-		}
-		switch( key ) {
-		case key_background_color:
-			bg->color = style->color;
-			break;
-		case key_background_image:
-			if( !style->image ) {
-				Graph_Init( &bg->image );
-				break;
-			}
-			Graph_Quote( &bg->image, style->image, NULL );
-			break;
-		case key_background_position:
-			bg->position.using_value = TRUE;
-			bg->position.value = style->style;
-			break;
-		case key_background_position_x:
-			bg->position.using_value = FALSE;
-			bg->position.x = *style;
-			break;
-		case key_background_position_y:
-			bg->position.using_value = FALSE;
-			bg->position.y = *style;
-			break;
-		case key_background_size:
-			bg->size.using_value = TRUE;
-			bg->position.value = style->style;
-			break;
-		case key_background_size_width:
-			bg->size.using_value = FALSE;
-			bg->size.w = *style;
-			break;
-		case key_background_size_height:
-			bg->size.using_value = FALSE;
-			bg->size.h = *style;
-			break;
-		default: break;
-		}
-	}
-}
-
 /** 计算边框样式 */
 static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
 {
@@ -389,12 +338,6 @@ static void HandleShadow( LCUI_Widget w )
 	Widget_AddTask( w, WTT_POSITION );
 }
 
-static void HandleBackground( LCUI_Widget w )
-{
-	ComputeBackgroundStyle( w->style, &w->computed_style.background );
-	Widget_AddTask( w, WTT_BODY );
-}
-
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
 static void HandleBody( LCUI_Widget w )
 {
@@ -530,7 +473,7 @@ static void MapTaskHandler(void)
 	task_handlers[WTT_UPDATE_STYLE] = HandleUpdateStyle;
 	task_handlers[WTT_REFRESH_STYLE] = HandleRefreshStyle;
 	task_handlers[WTT_CACHE_STYLE] = HandleCacheStyle;
-	task_handlers[WTT_BACKGROUND] = HandleBackground;
+	task_handlers[WTT_BACKGROUND] = Widget_ComputeBackgroundStyle;
 	task_handlers[WTT_LAYOUT] = Widget_UpdateLayout;
 }
 
