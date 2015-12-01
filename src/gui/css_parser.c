@@ -446,6 +446,23 @@ static int OnParseMargin( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseBoxShadow( LCUI_StyleSheet ss, int key, const char *str )
 {
+	LCUI_Style s[5];
+	switch( SplitValues( str, s, 5, SPLIT_NUMBER | SPLIT_COLOR ) ) {
+	case 5:
+		ss->sheet[key_box_shadow_x] = s[0];
+		ss->sheet[key_box_shadow_y] = s[1];
+		ss->sheet[key_box_shadow_blur] = s[2];
+		ss->sheet[key_box_shadow_spread] = s[3];
+		ss->sheet[key_box_shadow_color] = s[4];
+		break;
+	case 4:
+		ss->sheet[key_box_shadow_x] = s[0];
+		ss->sheet[key_box_shadow_y] = s[1];
+		ss->sheet[key_box_shadow_blur] = s[2];
+		ss->sheet[key_box_shadow_color] = s[3];
+		break;
+	default: return -1;
+	}
 	return 0;
 }
 
