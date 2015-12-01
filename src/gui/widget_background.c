@@ -87,7 +87,8 @@ static void ExecLoadImage( void *arg1, void *arg2 )
 	cache->path = path;
 	RBTree_CustomInsert( &images, path, cache );
 	AddRef( widget, cache );
-	Graph_Quote( &widget->computed_style.background.image, &image, NULL );
+	Graph_Quote( &widget->computed_style.background.image,
+		     &cache->image, NULL );
 	Widget_AddTask( widget, WTT_BODY );
 }
 
