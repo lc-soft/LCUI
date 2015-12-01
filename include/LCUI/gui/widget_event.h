@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_event.h -- LCUI widget event module.
  * 
- * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_event.h -- LCUI部件事件模块
  *
- * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -124,6 +124,13 @@ LCUI_API int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *da
  * 这将会直接调用与事件绑定的事件处理器（回调函数）
  */
 LCUI_API int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data );
+
+/** 
+ * 投递 surface 事件
+ * surface 是与顶层部件绑定在一起的，只有当部件为顶层部件时，才能投递 surface 事件。
+ * surface 事件主要用于让 surface 与 widget 同步一些数据，如：大小、位置、显示/隐藏。
+ */
+LCUI_API int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type );
 
 /** 处理一次当前积累的部件事件 */
 void LCUIWidget_StepEvent(void);

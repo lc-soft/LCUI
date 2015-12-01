@@ -382,6 +382,20 @@ static void OnInput( LCUI_SystemEvent *e, void *arg )
 
 }
 
+int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
+{
+	LCUI_WidgetEvent e;
+	int *n = (int*)&event_type;
+
+	if( w->parent != LCUIRootWidget && w != LCUIRootWidget ) {
+		return -1;
+	}
+	e.target = w;
+	e.type_name = "surface";
+	DEBUG_MSG("widget: %s, post event: %d\n", w->type,event_type );
+	return Widget_PostEvent( LCUIRootWidget, &e, *((int**)n) );
+}
+
 /** 处理一次当前积累的部件事件 */
 void LCUIWidget_StepEvent(void)
 {

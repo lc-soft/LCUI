@@ -324,7 +324,7 @@ static void LCUIDisplay_Thread( void *unused )
 }
 
 /** 响应顶级部件的各种事件 */
-static void OnTopLevelWidgetEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
+static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 {
 	int e_type = *((int*)&arg);
 	LCUI_Surface surface;
@@ -522,8 +522,8 @@ int LCUI_InitDisplay( void )
 	display.methods->onEvent = OnEvent;
 	display.fc_ctx = FrameControl_Create();
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
-	Widget_BindEvent( LCUIRootWidget, "TopLevelWidget",
-			  OnTopLevelWidgetEvent, NULL, NULL );
+	Widget_BindEvent( LCUIRootWidget, "surface",
+			  OnSurfaceEvent, NULL, NULL );
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
 }
 

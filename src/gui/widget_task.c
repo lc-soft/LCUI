@@ -54,20 +54,6 @@ struct LCUI_WidgetTaskBoxRec_ {
 	LCUI_BOOL	buffer[WTT_TOTAL_NUM];		/**< 记录缓存 */
 };
 
-static void HandleTopLevelWidgetEvent( LCUI_Widget w, int event_type )
-{
-	if( w->parent == LCUIRootWidget || w == LCUIRootWidget ) {
-		int *n;
-		LCUI_WidgetEvent e;
-
-		n = (int*)&event_type;
-		e.type_name = "TopLevelWidget";
-		e.target = w;
-		DEBUG_MSG("widget: %s, post event: %d\n", w->type,event_type );
-		Widget_PostEvent( LCUIRootWidget, &e, *((int**)n) );
-	}
-}
-
 /** 计算边框样式 */
 static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
 {
@@ -180,8 +166,7 @@ static void HandleCacheStyle( LCUI_Widget w )
 	ReplaceStyleSheet( w->cached_style, w->style );
 }
 
-/** 处理位置变化 */
-static void HandlePosition( LCUI_Widget w )
+void Widget_FlushPosition( LCUI_Widget w )
 {
 	LCUI_Rect rect;
 	rect = w->box.graph;
@@ -194,17 +179,16 @@ static void HandlePosition( LCUI_Widget w )
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
 	}
 	/* 检测是否为顶级部件并做相应处理 */
-	HandleTopLevelWidgetEvent( w, WET_MOVE );
+	Widget_PostSurfaceEvent( w, WET_MOVE );
 }
 
 static void HandleSetTitle( LCUI_Widget w )
 {
 	_DEBUG_MSG("widget: %s\n", w->type);
-	HandleTopLevelWidgetEvent( w, WET_TITLE );
+	Widget_PostSurfaceEvent( w, WET_TITLE );
 }
 
-/** 处理尺寸调整 */
-static void HandleResize( LCUI_Widget w )
+void Widget_FlushSize( LCUI_Widget w )
 {
 	int i;
 	LCUI_Rect rect;
@@ -265,7 +249,7 @@ static void HandleResize( LCUI_Widget w )
 	e.data = NULL;
 	Widget_SendEvent( w, &e, NULL );
 	Widget_AddTask( w, WTT_REFRESH );
-	HandleTopLevelWidgetEvent( w, WET_RESIZE );
+	Widget_PostSurfaceEvent( w, WET_RESIZE );
 }
 
 /** 处理可见性 */
@@ -305,7 +289,7 @@ static void HandleVisibility( LCUI_Widget w )
 		}
 	}
 	DEBUG_MSG("visible: %s\n", visible ? "TRUE":"FALSE");
-	HandleTopLevelWidgetEvent( w, visible ? WET_SHOW:WET_HIDE );
+	Widget_PostSurfaceEvent( w, visible ? WET_SHOW:WET_HIDE );
 }
 
 /** 处理透明度 */
@@ -462,8 +446,8 @@ static void MapTaskHandler(void)
 {
 	task_handlers[WTT_DESTROY] = HandleDestroy;
 	task_handlers[WTT_VISIBLE] = HandleVisibility;
-	task_handlers[WTT_POSITION] = HandlePosition;
-	task_handlers[WTT_RESIZE] = HandleResize;
+	task_handlers[WTT_POSITION] = Widget_FlushPosition;
+	task_handlers[WTT_RESIZE] = Widget_FlushSize;
 	task_handlers[WTT_SHADOW] = HandleShadow;
 	task_handlers[WTT_BORDER] = HandleBorder;
 	task_handlers[WTT_OPACITY] = HandleOpacity;
