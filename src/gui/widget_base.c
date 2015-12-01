@@ -56,7 +56,6 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 {
 	LinkedListNode *node;
-	LCUI_WidgetEvent e;
 	LCUI_Widget prev_parent;
 
 	DEBUG_MSG("parent: %p, widget: %p\n", parent, widget);
@@ -71,14 +70,8 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 		goto remove_done;
 	}
 	prev_parent = widget->parent;
-	/* 移除在之前的容器中的记录 */
 	LinkedList_Unlink( &prev_parent->children, node );
-	/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
-	if( prev_parent == LCUIRootWidget ) {
-		e.type_name = "TopLevelWidget";
-		e.target = widget;
-		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
-	}
+	Widget_PostSurfaceEvent( widget, WET_REMOVE );
 	LinkedList_ForEach( node, &prev_parent->children_show ) {
 		if( node->data != widget ) {
 			continue;
@@ -86,18 +79,11 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 		LinkedList_DeleteNode( &prev_parent->children_show, node );
 		break;
 	}
-
 remove_done:
-
 	widget->parent = parent;
 	LinkedList_AppendNode( &parent->children, node );
 	LinkedList_Insert( &parent->children_show, 0, widget );
-	/* 如果是添加至根部件内，则触发 WET_ADD 事件 */
-	if( parent == LCUIRootWidget ) {
-		e.type_name = "TopLevelWidget";
-		e.target = widget;
-		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_ADD );
-	}
+	Widget_PostSurfaceEvent( widget, WET_ADD );
 	Widget_AddTaskToSpread( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_AddTask( parent, WTT_LAYOUT );
@@ -266,12 +252,7 @@ static void Widget_OnDestroy( void *arg )
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
 	LinkedList_Clear( &widget->children_show, NULL );
 	LinkedList_Clear( &widget->dirty_rects, free );
-	/* 如果是从根级部件中移出，则触发 WET_REMOVE 事件 */
-	if( widget->parent == LCUIRootWidget ) {
-		e.type_name = "TopLevelWidget";
-		e.target = widget;
-		Widget_PostEvent( LCUIRootWidget, &e, (int*)WET_REMOVE );
-	}
+	Widget_PostSurfaceEvent( widget, WET_REMOVE );
 	Widget_AddTask( widget->parent, WTT_LAYOUT );
 	free( widget );
 }
@@ -281,7 +262,14 @@ void Widget_ExecDestroy( LCUI_Widget *widget )
 	LCUI_Widget w = *widget;
 	LinkedListNode *node = Widget_GetNode( w );
 	if( w->parent ) {
+		LinkedList *list = &w->parent->children_show;
 		LinkedList_Unlink( &w->parent->children, node );
+		LinkedList_ForEach( node, list ) {
+			if( node->data == w ) {
+				LinkedList_DeleteNode( list, node );
+				break;
+			}
+		}
 	}
 	Widget_OnDestroy( w );
 	*widget = NULL;
@@ -898,7 +886,7 @@ void Widget_UpdateLayout( LCUI_Widget w )
 			break;
 		default: continue;
 		}
-		Widget_AddTask( child, WTT_POSITION );
+		Widget_FlushPosition( child );
 		ctx.prev = child;
 		ctx.prev_display = child->computed_style.display;
 	}
