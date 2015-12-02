@@ -94,7 +94,7 @@ static struct {
 	LCUI_SurfaceMethods methods;	/**< 方法集 */
 } win32;
 
-void Win32_LCUI_Init( HINSTANCE hInstance )
+void LCUI_InitWin32Mode( HINSTANCE hInstance )
 {
 	win32.main_instance = hInstance;
 }

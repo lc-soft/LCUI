@@ -80,6 +80,7 @@ typedef struct LCUI_DisplayInfo {
 } LCUI_DisplayInfo;
 
 #ifdef LCUI_BUILD_IN_WIN32
+LCUI_API void LCUI_InitWin32Mode( HINSTANCE hInstance );
 /** 初始化适用于 Win32 平台的 surface 支持 */
 LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info );
 int LCUIDisplay_ExitWin32( void );
@@ -90,8 +91,7 @@ int LCUIDisplay_ExitLinuxFB( void );
 #endif
 
 /** 一秒内的最大画面帧数 */
-#define MAX_FRAMES_PER_SEC	100
-
+#define MAX_FRAMES_PER_SEC 100
 
 /* 设置呈现模式 */
 LCUI_API int LCUIDisplay_SetMode( int mode );

@@ -81,7 +81,7 @@ typedef void* LCUI_MainLoop;
 
 #ifdef LCUI_BUILD_IN_WIN32
 #include <Windows.h>
-LCUI_API void Win32_LCUI_Init( HINSTANCE hInstance );
+LCUI_API void LCUI_InitWin32Mode( HINSTANCE hInstance );
 #endif
 
 /*-------------------------- system event <START> ---------------------------*/
