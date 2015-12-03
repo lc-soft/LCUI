@@ -244,7 +244,6 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 
 static void Widget_OnDestroy( void *arg )
 {
-	LCUI_WidgetEvent e;
 	LCUI_Widget widget = (LCUI_Widget)arg;
 	Widget_DestroyTaskBox( widget );
 	LCUIEventBox_Destroy( widget->event );

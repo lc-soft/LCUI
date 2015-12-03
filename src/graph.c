@@ -82,6 +82,26 @@ LCUI_Graph *Graph_New(void)
 	return g;
 }
 
+LCUI_Color RGB( uchar_t r, uchar_t g, uchar_t b )
+{
+	LCUI_Color color;
+	color.red = r;
+	color.green = g;
+	color.blue = b;
+	color.alpha = 255;
+	return color;
+}
+
+LCUI_Color ARGB( uchar_t a, uchar_t r, uchar_t g, uchar_t b )
+{
+	LCUI_Color color;
+	color.alpha = a;
+	color.red = r;
+	color.green = g;
+	color.blue = b;
+	return color;
+}
+
 static size_t get_pixel_size( int color_type )
 {
 	switch( color_type ) {
