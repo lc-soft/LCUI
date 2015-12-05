@@ -44,6 +44,10 @@
 
 #define FONT_CACHE_SIZE	32
 
+#ifdef LCUI_BUILD_IN_WIN32
+#define strcasecmp stricmp
+#endif
+
 /**
  * 库中缓存的字体位图是分组存放的，共有三级分组，分别为：
  * 字符->字体信息->字体大小
@@ -234,11 +238,11 @@ int LCUIFont_GetId( const char *family_name, const char *style_name )
 	LinkedList_ForEach( node, &fnode->styles ) {
 		font = (LCUI_Font*)node->data;
 		if( style_name ) {
-			if( stricmp( font->style_name, style_name ) ) {
+			if( strcasecmp( font->style_name, style_name ) ) {
 				continue;
 			}
 		} else {
-			if( stricmp( font->style_name, "regular" ) ) {
+			if( strcasecmp( font->style_name, "regular" ) ) {
 				continue;
 			}
 		}

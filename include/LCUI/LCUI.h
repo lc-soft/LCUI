@@ -144,7 +144,8 @@ typedef enum LCUI_StyleType {
 	SVT_IMAGE,
 	SVT_STYLE,
 	SVT_VALUE,
-	SVT_STRING
+	SVT_STRING,
+	SVT_WSTRING
 } LCUI_StyleType;
 
 #define SVT_px		SVT_PX
@@ -157,6 +158,7 @@ typedef enum LCUI_StyleType {
 #define SVT_data	SVT_DATA
 #define SVT_image	SVT_IMAGE
 #define SVT_string	SVT_STRING
+#define SVT_wstring	SVT_WSTRING
 
 typedef struct LCUI_BoxShadow {
 	int x, y;		/**< 位置 */
@@ -255,6 +257,8 @@ typedef struct LCUI_Style {
 		float val_scale;
 		char *string;
 		char *val_string;
+		wchar_t *wstring;
+		wchar_t *val_wstring;
 		LCUI_Color color;
 		LCUI_Color val_color;
 		LCUI_Graph *image;

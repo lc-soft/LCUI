@@ -139,13 +139,15 @@ void ClearStyleSheet( LCUI_StyleSheet ss )
 		s = &ss->sheet[i];
 		switch( s->type ) {
 		case SVT_STRING:
-			if( s->string ) {
+		case SVT_WSTRING:
+			if( s->is_valid && s->string ) {
 				free( s->string );
 			}
 			s->string = NULL;
 		default: break;
 		}
 		s->is_valid = FALSE;
+		s->is_changed = TRUE;
 	}
 }
 
@@ -173,32 +175,43 @@ static void DestroyStyleTreeNode( void *data )
 /** 合并两个样式表 */
 int MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 {
-	int i, count;
+	LCUI_Style *s;
+	int i, count, size;
+
 	if( src->length > dest->length ) {
-		LCUI_Style *sheet;
-		sheet = (LCUI_Style*)realloc( dest->sheet, 
-			sizeof(LCUI_Style)*src->length );
-		if( !sheet ) {
+		size = sizeof(LCUI_Style)*src->length;
+		s = (LCUI_Style*)realloc( dest->sheet, size );
+		if( !s ) {
 			return -1;
 		}
 		for( i=dest->length; i<src->length; ++i ) {
-			sheet[i].is_valid = FALSE;
+			s[i].is_valid = FALSE;
 		}
-		dest->sheet = sheet;
+		dest->sheet = s;
 		dest->length = src->length;
 	}
 	for( count=0,i=0; i<src->length; ++i ) {
-		if( !src->sheet[i].is_valid || dest->sheet[i].is_valid ) {
+		s = &dest->sheet[i];
+		if( !src->sheet[i].is_valid || s->is_valid ) {
 			continue;
 		}
-		dest->sheet[i] = src->sheet[i];
-		dest->sheet[i].is_changed = TRUE;
 		++count;
-		if( src->sheet[i].type != SVT_STRING 
-		 || !src->sheet[i].string ) {
-			continue;
+		switch( src->sheet[i].type ) {
+		case SVT_STRING:
+			s->string = strdup( src->sheet[i].string );
+			break;
+		case SVT_WSTRING:
+			size = wcslen( src->sheet[i].wstring ) + 1;
+			s->wstring = malloc( size * sizeof(wchar_t) );
+			wcscpy( s->wstring, src->sheet[i].wstring );
+			break; 
+		default:
+			*s = src->sheet[i];
+			break;
 		}
-		dest->sheet[i].string = strdup( dest->sheet[i].string );
+		s->is_valid = TRUE;
+		s->is_changed = TRUE;
+		s->type = src->sheet[i].type;
 	}
 	return 0;
 }
@@ -206,36 +219,48 @@ int MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 /** 覆盖样式表 */
 int ReplaceStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 {
-	int i, count;
+	LCUI_Style *s;
+	int i, count, size;
+
 	if( src->length > dest->length ) {
-		LCUI_Style *sheet;
-		sheet = (LCUI_Style*)realloc( dest->sheet, 
-			sizeof(LCUI_Style)*src->length );
-		if( !sheet ) {
+		size = sizeof(LCUI_Style)*src->length;
+		s = (LCUI_Style*)realloc( dest->sheet, size );
+		if( !s ) {
 			return -1;
 		}
-		dest->sheet = sheet;
+		for( i=dest->length; i<src->length; ++i ) {
+			s[i].is_valid = FALSE;
+		}
+		dest->sheet = s;
 		dest->length = src->length;
 	}
 	for( count=0,i=0; i<src->length; ++i ) {
 		if( !src->sheet[i].is_valid ) {
 			continue;
 		}
-		if( dest->sheet[i].is_valid
-		 && dest->sheet[i].type == SVT_STRING ) {
-			if( dest->sheet[i].string ) {
-				free( dest->sheet[i].string );
+		s = &dest->sheet[i];
+		switch( src->sheet[i].type ) {
+		case SVT_STRING:
+			if( s->is_valid && s->string ) {
+				free( s->string );
 			}
-			dest->sheet[i].string = NULL;
+			s->string = strdup( src->sheet[i].string );
+			break;
+		case SVT_WSTRING:
+			if( s->is_valid && s->string ) {
+				free( s->wstring );
+			}
+			size = wcslen( src->sheet[i].wstring ) + 1;
+			s->wstring = malloc( size * sizeof(wchar_t) );
+			wcscpy( s->wstring, src->sheet[i].wstring );
+			break;
+		default: 
+			*s = src->sheet[i];
+			break;
 		}
-		dest->sheet[i] = src->sheet[i];
-		dest->sheet[i].is_changed = TRUE;
-		if( src->sheet[i].type != SVT_STRING 
-		 || !src->sheet[i].string ) {
-			++count;
-			continue;
-		}
-		dest->sheet[i].string = strdup( dest->sheet[i].string );
+		s->is_valid = TRUE;
+		s->is_changed = TRUE;
+		s->type = src->sheet[i].type;
 		++count;
 	}
 	return count;

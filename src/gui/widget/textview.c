@@ -74,6 +74,7 @@ enum FontStyleKey {
 	key_font_family,
 	key_line_height,
 	key_text_align,
+	key_content,
 	TOTAL_FONT_STYLE_KEY
 };
 
@@ -84,6 +85,46 @@ enum FontStyleType {
 };
 
 static int style_key_map[TOTAL_FONT_STYLE_KEY];
+
+static int unescape( const wchar_t *instr, wchar_t *outstr )
+{
+	int i = -1;
+	char buff[6];
+	wchar_t *pout = outstr;
+	const wchar_t *pin = instr;
+
+	while( *pin++ ) {
+		if( i >= 0 ) {
+			buff[i++] = *pin;
+			if( i >= 4 ) {
+				sscanf( buff, "%x", pout );
+				++pout;
+				i = -1;
+			}
+			continue;
+		}
+		if( *pin == '\\' ) {
+			i = 0;
+			continue;
+		}
+		*pout++ = *pin;
+	}
+	if( i >= 4 ) {
+		sscanf( buff, "%x", pout );
+		++pout;
+	}
+	*pout = 0;
+	return pout - outstr;
+}
+
+static int OnParseContent( LCUI_StyleSheet ss, int key, const char *str )
+{
+	wchar_t *content;
+	LCUICharset_UTF8ToUnicode( str, &content );
+	unescape( content, content );
+	SetStyle( ss, style_key_map[key], content, wstring );
+	return 0;
+}
 
 static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 {
@@ -158,6 +199,7 @@ static LCUI_StyleParser style_parsers[] = {
 	{ key_font_weight, "font-weight", OnParseFontWeight },
 	{ key_text_align, "text-align", OnParseTextAlign },
 	{ key_line_height, "line-height", OnParseLineHeight },
+	{ key_content, "content", OnParseContent },
 };
 
 static void TextView_UpdateStyle( LCUI_Widget w )
@@ -203,14 +245,14 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 		case key_line_height:
 			TextLayer_SetLineHeight( txt->layer, s );
 			break;
-		default:
-			break;
+		case key_content:
+			TextView_SetTextW( w, s->wstring );
+		default:break;
 		}
 	}
 	TextLayer_SetTextStyle( txt->layer, &txt->style );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
-	
 }
 
 static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )

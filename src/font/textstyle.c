@@ -95,6 +95,10 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 		free( ts->font_ids );
 	}
 	ts->font_ids = NULL;
+	if( !str ) {
+		ts->has_family = FALSE;
+		return -1;
+	}
 	for( p = str, count = 1; *p; ++p ) {
 		if( *p == ',' ) {
 			++count;

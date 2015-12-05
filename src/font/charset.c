@@ -78,8 +78,7 @@ code_convert(	char *src_charset,	char *des_charset,
 #endif
 
 #define MAX_SAVE_NUM   20
-static wchar_t 
-covernt_code(unsigned char in[MAX_SAVE_NUM])
+static wchar_t covernt_code( unsigned char in[MAX_SAVE_NUM] )
 {
  	wchar_t unicode;
  	unicode = in[0];
@@ -100,54 +99,53 @@ covernt_code(unsigned char in[MAX_SAVE_NUM])
 }
 
 /* UTF-8转Unicode */
-LCUI_API int
-LCUICharset_UTF8ToUnicode( const char *src_utf8, wchar_t **des_unicode )
+int LCUICharset_UTF8ToUnicode( const char *src_utf8, wchar_t **des_unicode )
 {
 	wchar_t *buff;
 	unsigned char *p, t, save[MAX_SAVE_NUM];
 	unsigned int len, i, j, n, count;
 
- 	if( src_utf8 == NULL ) {
+ 	if( !src_utf8 ) {
 		*des_unicode = NULL;
 		return 0;
 	}
-	len = strlen(src_utf8)+1;  
-	buff = (wchar_t *)calloc(sizeof(wchar_t), len); 
+	len = strlen( src_utf8 ) + 1;
+	buff = (wchar_t *)calloc( sizeof( wchar_t ), len );
 	if( !buff ) {
 		return -1;
 	}
 	
-	for(count=0,i=0,j=0; i<len; ++i) {
+	for( count = 0, i = 0, j = 0; i < len; ++i ) {
 		t = src_utf8[i];
 		/* 结束符的判断 */
-		if(t == 0) {
+		if( t == 0 ) {
 			break;
 		}
-			
-		if((t>>7) == 0) {// 0xxxxxxx
+		if( (t>>7) == 0 ) {// 0xxxxxxx
 			buff[j] = t; 
 			++j;
-		} else if((t>>5) == 6) {// 110xxxxx 
-			count = 2; 
-		} else if((t>>4) == 14) {// 1110xxxx 
-			count = 3; 
-		} else if((t>>3) == 30) {// 11110xxx 
-			count = 4; 
-		} else if((t>>2) == 62) {// 111110xx 
-			count = 5; 
-		} else if((t>>1) == 126) {// 1111110x 
-			count = 6; 
+			continue;
 		}
-		if(count > 0) {
-			p = (unsigned char*)&src_utf8[i];
-			for(n=0; n<count; ++n) {
-				save[n] = *p++;
-			}
-			count = 0; 
-			buff[j] = covernt_code(save);
-			memset(save, 0, sizeof(save));
-			++j;
+		if( (t>>5) == 6 ) {// 110xxxxx 
+			count = 2;
+		} else if( (t>>4) == 14 ) {// 1110xxxx 
+			count = 3;
+		} else if( (t>>3) == 30 ) {// 11110xxx 
+			count = 4;
+		} else if( (t>>2) == 62 ) {// 111110xx 
+			count = 5;
+		} else if( (t >> 1) == 126 ) {// 1111110x 
+			count = 6;
+		} else {
+			continue;
 		}
+		p = (unsigned char*)&src_utf8[i];
+		for( n = 0; n < count; ++n ) {
+			save[n] = *p++;
+		}
+		count = 0; 
+		buff[j] = covernt_code( save );
+		++j;
 	}
 	/****
 	printf("result code:");
