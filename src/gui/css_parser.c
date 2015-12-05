@@ -764,6 +764,7 @@ parse_value:
 /** 从文件中载入CSS样式数据，并导入至样式库中 */
 int LCUI_LoadCSSFile( const char *filepath )
 {
+	int n;
 	FILE *fp;
 	char buff[512];
 	ParserContextPtr ctx;
@@ -773,7 +774,8 @@ int LCUI_LoadCSSFile( const char *filepath )
 		return -1;
 	}
 	ctx = NewParserContext( 512 );
-	while( fread( buff, 1, 512, fp ) ) {
+	while( n = fread( buff, 1, 511, fp ) ) {
+		buff[n] = 0;
 		LCUI_LoadCSSBlock( ctx, buff );
 	}
 	DeleteParserContext( &ctx );
