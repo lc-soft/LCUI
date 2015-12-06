@@ -163,10 +163,11 @@ void LinkedList_Concat( LinkedList *list1, LinkedList *list2 )
 	if( list1->head.next ) {
 		list1->tail.prev->next = list2->head.next;
 		list2->head.next->prev = list1->tail.prev;
-		list1->tail.prev = list2->tail.prev;
 	} else {
-		*list1 = *list2;
+		list1->head.next = list2->head.next;
+		list1->head.next->prev = &list1->head;
 	}
+	list1->tail.prev = list2->tail.prev;
 	list2->head.next = list2->tail.prev = NULL;
 	list1->length += list2->length;
 	list2->length = 0;
