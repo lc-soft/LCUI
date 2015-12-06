@@ -93,7 +93,7 @@ static int unescape( const wchar_t *instr, wchar_t *outstr )
 	wchar_t *pout = outstr;
 	const wchar_t *pin = instr;
 
-	while( *pin++ ) {
+	for( ; *pin; ++pin ) {
 		if( i >= 0 ) {
 			buff[i++] = *pin;
 			if( i >= 4 ) {
@@ -119,8 +119,20 @@ static int unescape( const wchar_t *instr, wchar_t *outstr )
 
 static int OnParseContent( LCUI_StyleSheet ss, int key, const char *str )
 {
+	int i;
 	wchar_t *content;
+
 	LCUICharset_UTF8ToUnicode( str, &content );
+	if( content[0] == '"' ) {
+		for( i = 0; content[i+1]; ++i ) {
+			content[i] = content[i+1];
+		}
+		if( content[i-1] != '"' ) {
+			free( content );
+			return -1;
+		}
+		content[i-1] = 0;
+	}
 	unescape( content, content );
 	SetStyle( ss, style_key_map[key], content, wstring );
 	return 0;
@@ -341,7 +353,7 @@ static void TextView_OnTask( LCUI_Widget w )
 		return;
 	}
 	txt->tasks[i].is_valid = FALSE;
-	txt = (LCUI_TextView*)w->private_data;
+	txt = w->private_data;
 	LinkedList_Init( &rects );
 	TextLayer_Update( txt->layer, &rects );
 	LinkedList_ForEach( node, &rects ) {
