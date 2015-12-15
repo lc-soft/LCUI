@@ -47,8 +47,8 @@ LCUI_BEGIN_HEADER
 LCUI_API LCUI_Rect Rect( int x, int y, int w, int h );
 
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
-LCUI_API void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
-							LCUI_Rect *cut );
+LCUI_API void LCUIRect_GetCutArea( int box_w, int box_h, 
+				   LCUI_Rect rect, LCUI_Rect *cut );
 
 #define LCUIRect_HasPoint(rect, x, y) (x >= (rect)->x && y >= (rect)->y \
 					&& x < (rect)->x + (rect)->width \

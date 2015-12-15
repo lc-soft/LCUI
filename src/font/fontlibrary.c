@@ -475,84 +475,94 @@ int FontBitmap_Print( LCUI_FontBitmap *fontbmp )
 	return 0;
 }
 
+static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
+				const LCUI_FontBitmap *bmp, LCUI_Color color, 
+				LCUI_Rect *read_rect )
+{
+	int x, y;
+	LCUI_ARGB *px, *px_row_des;
+	uchar_t a, *byte_ptr, *byte_row_ptr;
+	byte_row_ptr = bmp->buffer + read_rect->y*bmp->width;
+	byte_row_ptr += read_rect->x;
+	px_row_des = graph->argb + write_rect->y * graph->w;
+	px_row_des += write_rect->x;
+	for( y=0; y<read_rect->h; ++y ) {
+		px = px_row_des;
+		byte_ptr = byte_row_ptr;
+		for( x=0; x<read_rect->w; ++x,++byte_ptr,++px ) {
+			a = *byte_ptr;
+			px->r = (px->r * px->a + color.r * a) >> 8;
+			px->g = (px->g * px->a + color.r * a) >> 8;
+			px->b = (px->b * px->a + color.r * a) >> 8;
+			px->a = a + (((255 - px->a)*(255 - a)) >> 16);
+			if( px->a > 0 ) {
+				px->r += px->r * (255 - px->a) >> 8;
+				px->g += px->g * (255 - px->a) >> 8;
+				px->b += px->b * (255 - px->a) >> 8;
+			}
+		}
+		px_row_des += graph->w;
+		byte_row_ptr += bmp->width;
+	}
+}
+
+static void FontBitmap_MixRGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
+			       const LCUI_FontBitmap *bmp, LCUI_Color color, 
+			       LCUI_Rect *read_rect )
+{
+	int x, y;
+	uchar_t *byte_src, *byte_row_src, *byte_row_des, *byte_des;
+	byte_row_src = bmp->buffer + read_rect->y*bmp->width + read_rect->x;
+	byte_row_des = graph->bytes + write_rect->y * graph->bytes_per_row;
+	byte_row_des += write_rect->x*graph->bytes_per_pixel;
+	for( y=0; y<read_rect->h; ++y ) {
+		byte_src = byte_row_src;
+		byte_des = byte_row_des;
+		for( x=0; x<read_rect->w; ++x ) {
+			ALPHA_BLEND( *byte_des, color.b, *byte_src );
+			byte_des++;
+			ALPHA_BLEND( *byte_des, color.g, *byte_src );
+			byte_des++;
+			ALPHA_BLEND( *byte_des, color.r, *byte_src );
+			byte_des++;
+			++byte_src;
+		}
+		byte_row_des += graph->bytes_per_row;
+		byte_row_src += bmp->width;
+	}
+}
+
 /** 将字体位图绘制到目标图像上 */
 int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 		    const LCUI_FontBitmap *bmp, LCUI_Color color )
 {
-	int x, y;
-	LCUI_Rect read_rect, write_rect;
 	LCUI_Graph write_slot;
-	LCUI_ARGB *px_des, *px_row_des;
-	uchar_t *bmp_src, *bmp_row_src, *byte_row_des, *byte_des;
-
-	/* 起点位置的有效性检测 */
+	LCUI_Rect r_rect, w_rect;
 	if( pos.x > graph->w || pos.y > graph->h ) {
 		return -2;
 	}
 	/* 获取写入区域 */
-	write_rect.x = pos.x;
-	write_rect.y = pos.y;
-	write_rect.width = bmp->width;
-	write_rect.height = bmp->rows;
+	w_rect.x = pos.x;
+	w_rect.y = pos.y;
+	w_rect.width = bmp->width;
+	w_rect.height = bmp->rows;
 	/* 获取需要裁剪的区域 */
-	LCUIRect_GetCutArea( Size( graph->width, graph->height ),
-			     write_rect, &read_rect );
-	write_rect.x += read_rect.x;
-	write_rect.y += read_rect.y;
-	write_rect.width = read_rect.width;
-	write_rect.height = read_rect.height;
-	Graph_Quote( &write_slot, graph, &write_rect );
-	Graph_GetValidRect( &write_slot, &write_rect );
+	LCUIRect_GetCutArea( graph->width, graph->height, w_rect, &r_rect );
+	w_rect.x += r_rect.x;
+	w_rect.y += r_rect.y;
+	w_rect.width = r_rect.width;
+	w_rect.height = r_rect.height;
+	Graph_Quote( &write_slot, graph, &w_rect );
+	Graph_GetValidRect( &write_slot, &w_rect );
 	/* 获取背景图引用的源图形 */
 	graph = Graph_GetQuote( graph );
 	if( graph->color_type == COLOR_TYPE_ARGB ) {
-		bmp_row_src = bmp->buffer + read_rect.y*bmp->width;
-		bmp_row_src += read_rect.x;
-		px_row_des = graph->argb + write_rect.y * graph->w;
-		px_row_des += write_rect.x;
-		for( y=0; y<read_rect.h; ++y ) {
-			bmp_src = bmp_row_src;
-			px_des = px_row_des;
-			for( x=0; x<read_rect.w; ++x,++bmp_src,++px_des ) {
-				switch( *bmp_src ) {
-				case 255:
-					*px_des = color;
-					px_des->alpha = 255;
-				case 0: continue;
-				default:break;
-				}
-				ALPHA_BLEND( px_des->r, color.r, *bmp_src );
-				ALPHA_BLEND( px_des->g, color.g, *bmp_src );
-				ALPHA_BLEND( px_des->b, color.b, *bmp_src );
-				px_des->a = 255;
-			}
-			px_row_des += graph->w;
-			bmp_row_src += bmp->width;
-		}
-		return 0;
-	}
-
-	bmp_row_src = bmp->buffer + read_rect.y*bmp->width + read_rect.x;
-	byte_row_des = graph->bytes + write_rect.y * graph->bytes_per_row;
-	byte_row_des += write_rect.x*graph->bytes_per_pixel;
-	for( y=0; y<read_rect.h; ++y ) {
-		bmp_src = bmp_row_src;
-		byte_des = byte_row_des;
-		for( x=0; x<read_rect.w; ++x ) {
-			ALPHA_BLEND( *byte_des, color.b, *bmp_src );
-			byte_des++;
-			ALPHA_BLEND( *byte_des, color.g, *bmp_src );
-			byte_des++;
-			ALPHA_BLEND( *byte_des, color.r, *bmp_src );
-			byte_des++;
-			++bmp_src;
-		}
-		byte_row_des += graph->bytes_per_row;
-		bmp_row_src += bmp->width;
+		FontBitmap_MixARGB( graph, &w_rect, bmp, color, &r_rect );
+	} else { 
+		FontBitmap_MixRGB( graph, &w_rect, bmp, color, &r_rect );
 	}
 	return 0;
 }
-
 
 /** 载入字体位图 */
 int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch,

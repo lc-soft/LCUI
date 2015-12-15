@@ -60,8 +60,8 @@ LCUI_Rect Rect( int x, int y, int w, int h )
 }
 
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
-void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
-			  LCUI_Rect *cut )
+void LCUIRect_GetCutArea( int box_w, int box_h, 
+			  LCUI_Rect rect, LCUI_Rect *cut )
 {
 	cut->x = 0;
 	cut->y = 0;
@@ -72,16 +72,16 @@ void LCUIRect_GetCutArea( LCUI_Size box_size, LCUI_Rect rect,
 		cut->width += rect.x;
 		cut->x = 0 - rect.x;
 	}
-	if(rect.x + rect.width > box_size.w) {
-		cut->width -= (rect.x + rect.width - box_size.w); 
+	if(rect.x + rect.width > box_w) {
+		cut->width -= (rect.x + rect.width - box_w); 
 	}
 	
 	if(rect.y < 0) {
 		cut->height += rect.y;
 		cut->y = 0 - rect.y; 
 	}
-	if(rect.y + rect.height > box_size.h) {
-		cut->height -= (rect.y + rect.height - box_size.h); 
+	if(rect.y + rect.height > box_h) {
+		cut->height -= (rect.y + rect.height - box_h); 
 	}
 }
 

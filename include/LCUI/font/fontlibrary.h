@@ -55,15 +55,6 @@ typedef struct LCUI_FontBitmap_ {
 	LCUI_Pos advance;	/**< XY轴的跨距 */
 } LCUI_FontBitmap;
 
-/** 宽字符位图及相关数据 */
-typedef struct LCUI_WChar_ {
-	wchar_t		char_code;	/**< 字符码 */
-	LCUI_FontBitmap	*bitmap;	/**< 字符的位图数据 */
-	LCUI_Color	color;		/**< 该文字的配色 */
-	LCUI_BOOL	update;		/**< 标明这个字符是否需要刷新 */
-	int		color_type;	/**< 颜色类型(DEFAULT / CUSTOM) */
-} LCUI_WChar;
-
 typedef struct LCUI_FontEngine	LCUI_FontEngine;
 
 typedef struct LCUI_Font {
