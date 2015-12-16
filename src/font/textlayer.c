@@ -594,7 +594,7 @@ void TextLayer_ClearText( LCUI_TextLayer layer )
 	layer->insert_y = 0;
 	TextLayer_InvalidateRowsRect( layer, 0, -1 );
 	TextRowList_Destroy( &layer->row_list );
-	LinkedList_Clear( &layer->style_cache, TextStyle_Destroy );
+	LinkedList_Clear( &layer->style_cache, (FuncPtr)TextStyle_Destroy );
 	layer->task.redraw_all = TRUE;
 }
 

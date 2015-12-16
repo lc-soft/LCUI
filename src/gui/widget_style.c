@@ -169,7 +169,7 @@ static void DestroyStyleListNode( StyleListNode *node )
 static void DestroyStyleTreeNode( void *data )
 {
 	StyleTreeNode *node = (StyleTreeNode*)data;
-	LinkedList_Clear( &node->styles, DestroyStyleListNode );
+	LinkedList_Clear( &node->styles, (FuncPtr)DestroyStyleListNode );
 }
 
 /** 合并两个样式表 */

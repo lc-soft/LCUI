@@ -434,6 +434,11 @@ int TextView_SetText( LCUI_Widget w, const char *utf8_text )
 	return ret;
 }
 
+static void TextView_OnParseText( LCUI_Widget w, const char *text )
+{
+	TextView_SetText( w, text );
+}
+
 void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style *val )
 {
 	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
@@ -476,9 +481,8 @@ void LCUIWidget_AddTextView( void )
 	wc->methods.destroy = TextView_OnDestroy;
 	wc->methods.autosize = TextView_AutoSize;
 	wc->methods.update = TextView_UpdateStyle;
-	wc->methods.set_text = TextView_SetText;
+	wc->methods.set_text = TextView_OnParseText;
 	wc->task_handler = TextView_OnTask;
-	
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
 		style_key_map[style_parsers[i].key] = 
 		LCUICSSParser_Register( &style_parsers[i] );

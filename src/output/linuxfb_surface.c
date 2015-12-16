@@ -55,12 +55,13 @@
 #define FB_DEV 		"/dev/fb0"
 #define FB_BACKUP_FILE 	"/tmp/framebuffer.bak"
 
-static struct LinuxFBContent {
+static struct LinuxFBContext {
 	int dev_fd;
 	uchar_t *mem;
 	int mem_len;
 	int bits_per_pixel;
-	LCUI_Size screen_size;
+	int bytes_per_line;
+	int width, height;
 	LCUI_SurfaceMethods methods;
 } linuxfb;
 
@@ -90,12 +91,12 @@ static int LinuxFB_Restore(void)
 
 static int LinuxFB_GetWidth(void)
 {
-	return linuxfb.screen_size.w;
+	return linuxfb.width;
 }
 
 static int LinuxFB_GetHeight(void)
 {
-	return linuxfb.screen_size.h;
+	return linuxfb.height;
 }
 
 /** 打印屏幕相关的信息 */
@@ -215,7 +216,7 @@ static void LinuxFB_PutGraph32( LCUI_Rect rect, LCUI_Graph *canvas )
 	uchar_t *des_row, *src_row;
 	LCUI_Rect read_rect;
 
-	des_row_bytes = linuxfb.screen_size.w*4;
+	des_row_bytes = linuxfb.width*4;
 	des_row = linuxfb.mem + rect.y*des_row_bytes + rect.x*4;
 	Graph_GetValidRect( canvas, &read_rect );
 	if( read_rect.width <= 0 || read_rect.height <= 0 ) {
@@ -244,8 +245,8 @@ static void LinuxFB_PutGraph24( LCUI_Rect rect, LCUI_Graph *canvas )
 	uchar_t *dest_line, *dest, *src_pixel_line;
 	LCUI_Color *src_pixel;
 
-	dest_line = linuxfb.mem + rect.y*linuxfb.screen_size.w + rect.x;
-	dest_line_bytes = linuxfb.screen_size.w*3;
+	dest_line = linuxfb.mem + rect.y*linuxfb.width + rect.x;
+	dest_line_bytes = linuxfb.width*3;
 	src_pixel_line = canvas->bytes;
 	for( y=0; y<canvas->h; ++y ) {
 		dest = dest_line;
@@ -271,8 +272,8 @@ static void LinuxFB_PutGraph16( LCUI_Rect rect, LCUI_Graph *canvas )
 	uchar_t *dest_line, *dest, *src_pixel_line;
 	LCUI_Color *src_pixel;
 
-	dest_line = linuxfb.mem + rect.y*linuxfb.screen_size.w + rect.x;
-	dest_line_bytes = linuxfb.screen_size.w*2;
+	dest_line = linuxfb.mem + rect.y*linuxfb.width + rect.x;
+	dest_line_bytes = linuxfb.width*2;
 	src_pixel_line = canvas->bytes;
 	for( y=0; y<canvas->h; ++y ) {
 		dest = dest_line;
@@ -311,8 +312,8 @@ static void LinuxFB_PutGraph8( LCUI_Rect rect, LCUI_Graph *canvas )
 	kolor.green = calloc(256, sizeof(__u16));
 	kolor.blue = calloc(256, sizeof(__u16));
 	kolor.transp = 0;
-	dest_line = linuxfb.mem + rect.y*linuxfb.screen_size.w + rect.x;
-	dest_line_bytes = linuxfb.screen_size.w;
+	dest_line = linuxfb.mem + rect.y*linuxfb.width + rect.x;
+	dest_line_bytes = linuxfb.width;
 	src_pixel_line = canvas->bytes;
 
 	for( i=0; i<256; ++i ) {
@@ -349,7 +350,8 @@ void LinuxFB_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 	LCUI_Rect cut_rect;
 	LCUI_Graph canvas;
 
-	LCUIRect_GetCutArea( linuxfb.screen_size, paint_ctx->rect, &cut_rect );
+	LCUIRect_GetCutArea( linuxfb.width, linuxfb.height, 
+			     paint_ctx->rect, &cut_rect );
 	if( cut_rect.w <= 0 || cut_rect.h <= 0 ) {
 		free( paint_ctx );
 		return;
@@ -426,6 +428,7 @@ LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info )
 	}
 	nobuff_printf("[linuxfb] mapping framebuffer...");
 	linuxfb.bits_per_pixel = fb_vinfo.bits_per_pixel;
+	linuxfb.bytes_per_line = fb_fix.line_length;
 	linuxfb.mem_len = fb_fix.smem_len;
 	/* 映射帧缓存至内存空间 */
 	linuxfb.mem = mmap( NULL, fb_fix.smem_len,
@@ -440,8 +443,8 @@ LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info )
 		printf("success\n");
 	}
 	LinuxFB_Backup();
-	linuxfb.screen_size.w = fb_vinfo.xres;
-	linuxfb.screen_size.h = fb_vinfo.yres;
+	linuxfb.width = fb_vinfo.xres;
+	linuxfb.height = fb_vinfo.yres;
 	strncpy( info->name, "linux framebuffer", 32 );
 	info->getWidth = LinuxFB_GetWidth;
 	info->getHeight = LinuxFB_GetHeight;

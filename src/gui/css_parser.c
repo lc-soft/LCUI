@@ -603,7 +603,7 @@ static ParserContextPtr NewParserContext( size_t buffer_size )
 static void DeleteParserContext( ParserContextPtr *ctx_ptr )
 {
 	ParserContextPtr ctx = *ctx_ptr;
-	LinkedList_Clear( &ctx->selectors, DeleteSelector );
+	LinkedList_Clear( &ctx->selectors, (FuncPtr)DeleteSelector );
 	free( ctx->buffer );
 	free( ctx );
 	*ctx_ptr = NULL;
@@ -729,7 +729,7 @@ put_css:
 		LinkedList_ForEach( node, &ctx->selectors ) {
 			LCUI_PutStyle( node->data, ctx->css );
 		}
-		LinkedList_Clear( &ctx->selectors, DeleteSelector );
+		LinkedList_Clear( &ctx->selectors, (FuncPtr)DeleteSelector );
 		DeleteStyleSheet( &ctx->css );
 		continue;
 select_parser:	
@@ -774,9 +774,11 @@ int LCUI_LoadCSSFile( const char *filepath )
 		return -1;
 	}
 	ctx = NewParserContext( 512 );
-	while( n = fread( buff, 1, 511, fp ) ) {
+	n = fread( buff, 1, 511, fp );
+	while( n > 0 ) {
 		buff[n] = 0;
 		LCUI_LoadCSSBlock( ctx, buff );
+		n = fread( buff, 1, 511, fp );
 	}
 	DeleteParserContext( &ctx );
 	fclose( fp );

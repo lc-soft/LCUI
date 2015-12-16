@@ -150,7 +150,7 @@ static void DestroyTag( LCUI_StyleTag *tag )
 
 void TagList_Clear( LinkedList *tags )
 {
-	LinkedList_Clear( tags, DestroyTag );
+	LinkedList_Clear( tags, (FuncPtr)DestroyTag );
 }
 
 /** 获取当前的文本样式 */

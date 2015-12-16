@@ -301,6 +301,8 @@ typedef struct LCUI_PaintContextRec_ {
 	LCUI_Graph canvas;		/**< 绘制后的位图缓存（可称为：画布） */
 } LCUI_PaintContextRec_, *LCUI_PaintContext;
 
+typedef void (*FuncPtr)(void *);
+
 LCUI_END_HEADER
 
 #define nobuff_printf(format, ...) \
