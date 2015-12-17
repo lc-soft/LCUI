@@ -264,10 +264,10 @@ int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 /** 更新状态 */
 static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 {
-	LCUI_WidgetEvent e;
-	const char *sname = type == WST_HOVER ? "hover":"active";
-	LCUI_Widget w, new_w = widget, old_w = self.targets[type];
 	int depth = 0, i;
+	LCUI_WidgetEvent e;
+	const char *sname = (type == WST_HOVER ? "hover":"active");
+	LCUI_Widget w, new_w = widget, old_w = self.targets[type];
 
 	if( self.targets[type] == widget ) {
 		return;
@@ -282,10 +282,10 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 	}
 	i = depth > 0 ? depth : -depth;
 	/* 然后向父级遍历，直到两个部件的父级部件相同为止 */
-	for( ; new_w && old_w && new_w != old_w; ) {
+	while( new_w != old_w ) {
 		/* 如果是新部件嵌套得较深，则先遍历几次直到深度
 		 * 相同时再一起遍历 */
-		if( i == 0 || (i > 0 && depth > 0) ) {
+		if( new_w && (i == 0 || (i > 0 && depth > 0)) ) {
 			Widget_AddStatus( new_w, sname );
 			if( type == WST_HOVER ) {
 				e.target = w;
@@ -296,7 +296,7 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 			}
 			new_w = new_w->parent;
 		}
-		if( i == 0 || (i > 0 && depth < 0) ) {
+		if( old_w && (i == 0 || (i > 0 && depth < 0)) ) {
 			Widget_RemoveStatus( old_w, sname );
 			if( type == WST_HOVER ) {
 				e.target = old_w;
