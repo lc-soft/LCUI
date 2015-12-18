@@ -8,7 +8,9 @@ widget_library.c	\
 widget_style.c		\
 widget_task.c		\
 widget_paint.c 		\
+widget_background.c	\
 css_parser.c		\
 builder.c		\
 widget/textview.c	\
+widget/sidebar.c	\
 widget/button.c
