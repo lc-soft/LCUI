@@ -754,10 +754,8 @@ void Graph_Free( LCUI_Graph *graph )
 */
 int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect )
 {
-	LCUI_Size box_size;
 	LCUI_Rect quote_rect;
-
-	if( rect == NULL ) {
+	if( !rect ) {
 		quote_rect.x = 0;
 		quote_rect.y = 0;
 		quote_rect.width = source->width;
@@ -765,10 +763,7 @@ int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect )
 	} else {
 		quote_rect = *rect;
 	}
-
-	box_size.w = source->width;
-	box_size.h = source->height;
-	LCUIRect_ValidateArea( &quote_rect, box_size );
+	LCUIRect_ValidateArea( &quote_rect, source->width, source->height );
 	/* 如果引用源本身已经引用了另一个源 */
 	if( source->quote.is_valid ) {
 		quote_rect.x += source->quote.left;
@@ -966,7 +961,7 @@ int Graph_Cut( const LCUI_Graph *graph, LCUI_Rect rect,
 	if( !Graph_IsValid( graph ) ) {
 		return -2;
 	}
-	LCUIRect_ValidateArea( &rect, Size(graph->w, graph->h) );
+	LCUIRect_ValidateArea( &rect, graph->w, graph->h );
 	if( rect.width <= 0 || rect.height <= 0) {
 		return -3;
 	}

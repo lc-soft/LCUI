@@ -424,7 +424,7 @@ static int mystrcmp( const char *str1, const char *str2 )
 	if( str1 == NULL || str2 == NULL ) {
 		return -1;
 	}
-	return strcmp( str1, str2 );
+	return strcasecmp( str1, str2 );
 }
 
 /** 判断两个选择器是否相等 */
@@ -473,12 +473,12 @@ SelectStyleSheetByName( LCUI_Selector selector, const char *name )
 	}
 	stn = (StyleTreeNode*)tn->data;
 	LinkedList_ForEach( node, &stn->styles ) {
-		sln = (StyleListNode*)node->data;
+		sln = node->data;
 		if( SelectorIsEqual(sln->selector, selector) ) {
 			return sln->style;
 		}
 		if( pos == -1 ) {
-			if( selector->rank > sln->selector->rank ) {
+			if( selector->rank >= sln->selector->rank ) {
 				pos = i;
 			}
 		}

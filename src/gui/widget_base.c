@@ -109,7 +109,7 @@ int Widget_Unwrap( LCUI_Widget *widget )
 		prev = node->prev;
 		child = node->data;
 		LinkedList_Unlink( &self->children, node );
-		LinkedList_Link( list, target, node );
+		LinkedList_LinkNode( list, target, node );
 		child->parent = self->parent;
 		Widget_AddTaskToSpread( child, WTT_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
@@ -131,7 +131,7 @@ int Widget_Unwrap( LCUI_Widget *widget )
 	LinkedList_ForEach( node, &self->children_show ) {
 		prev = node->prev;
 		LinkedList_Unlink( &self->children_show, node );
-		LinkedList_Link( list_show, target, node );
+		LinkedList_LinkNode( list_show, target, node );
 		node = prev;
 	}
 	Widget_Destroy( widget );
@@ -153,7 +153,7 @@ void Widget_Front( LCUI_Widget widget )
 		    widget->computed_style.z_index ) {
 			continue;
 		}
-		LinkedList_Link( &parent->children_show, child_node, node );
+		LinkedList_LinkNode( &parent->children_show, child_node, node );
 		return;
 	}
 	LinkedList_AppendNode( &parent->children_show, node );

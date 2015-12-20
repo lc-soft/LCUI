@@ -738,7 +738,6 @@ select_parser:
 		ctx->pos = 0;
 		ctx->parser = RBTree_CustomGetData( &self.parser_tree,
 						    ctx->buffer );
-
 		DEBUG_MSG("select style: %s, parser: %p\n",
 			   ctx->buffer, ctx->parser);
 		continue;

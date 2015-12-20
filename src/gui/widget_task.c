@@ -301,10 +301,7 @@ static void HandleOpacity( LCUI_Widget w )
 /** 处理阴影（标记阴影区域为脏矩形，但不包括主体区域） */
 static void HandleShadow( LCUI_Widget w )
 {
-	LCUI_BoxShadow bs;
-
-	_DEBUG_MSG("update shadow\n");
-	bs = w->computed_style.shadow;
+	LCUI_BoxShadow bs = w->computed_style.shadow;
 	ComputeBoxShadowStyle( w->style, &w->computed_style.shadow );
 	/* 如果阴影变化并未导致图层尺寸变化，则只重绘阴影 */
 	if( bs.x == w->computed_style.shadow.x && bs.y == w->computed_style.shadow.y

@@ -158,11 +158,13 @@ static int OnParseFontSize( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseFontFamily( LCUI_StyleSheet ss, int key, const char *str )
 {
+	char *name = strdup( str );
 	if( ss->sheet[style_key_map[key]].is_valid
 	 && ss->sheet[style_key_map[key]].string) {
 		free( ss->sheet[style_key_map[key]].string );
 	}
-	SetStyle( ss, style_key_map[key], strdup(str), string );
+	strtrim( name, str, "'\"\n\r\t " );
+	SetStyle( ss, style_key_map[key], name, string );
 	return 0;
 }
 
@@ -380,10 +382,10 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	content_rect.width = w->box.content.width;
 	content_rect.height = w->box.content.height;
 	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect );
+	layer_pos.x = content_rect.x - paint->rect.x;
+	layer_pos.y = content_rect.y - paint->rect.y;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	layer_pos.x = -rect.x;
-	layer_pos.y = -rect.y;
 	TextLayer_DrawToGraph( txt->layer, rect, layer_pos, &paint->canvas );
 }
 

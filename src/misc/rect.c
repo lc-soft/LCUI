@@ -86,7 +86,7 @@ void LCUIRect_GetCutArea( int box_w, int box_h,
 }
 
 /** 将矩形区域范围调整在容器有效范围内 */
-void LCUIRect_ValidateArea( LCUI_Rect *rect, LCUI_Size box_size )
+void LCUIRect_ValidateArea( LCUI_Rect *rect, int box_w, int box_h )
 {
 	if( rect->x < 0 ) {
 		rect->width += rect->x;
@@ -97,16 +97,16 @@ void LCUIRect_ValidateArea( LCUI_Rect *rect, LCUI_Size box_size )
 		rect->y = 0;
 	}
 	
-	if( rect->x + rect->width > box_size.w ) {
-		if( rect->x < box_size.w ) {
-			rect->width = box_size.w - rect->x; 
+	if( rect->x + rect->width > box_w ) {
+		if( rect->x < box_w ) {
+			rect->width = box_w - rect->x; 
 		} else {
 			rect->width = 0;
 		}
 	}
-	if( rect->y + rect->height > box_size.h ) {
-		if( rect->y < box_size.h ) {
-			rect->height = box_size.h - rect->y; 
+	if( rect->y + rect->height > box_h ) {
+		if( rect->y < box_h ) {
+			rect->height = box_h - rect->y; 
 		} else {
 			rect->height = 0;
 		}

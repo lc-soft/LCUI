@@ -163,17 +163,11 @@ static void Win32Surface_Delete( LCUI_Surface surface )
 	}
 }
 
-static LRESULT CALLBACK
-WndProc( HWND hwnd, UINT msg, WPARAM arg1, LPARAM arg2 )
+static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg, 
+				 WPARAM arg1, LPARAM arg2 )
 {
-	LCUI_SystemEvent e;
-	LCUI_Surface surface;
-
-	e.type = LCUI_NONE;
-	e.rel_x = e.rel_y = e.key_code = 0;
-	e.type_name = NULL;
-
-	surface = GetSurfaceByHWND(hwnd);
+	LCUI_SystemEvent e = {0};
+	LCUI_Surface surface = GetSurfaceByHWND(hwnd);
 	DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
 	if( !surface ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );

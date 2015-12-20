@@ -157,7 +157,7 @@ static int ParseWidget( ParserContextPtr ctx, xmlNodePtr node )
 		if( !w ) {
 			return PB_ERROR;
 		}
-		_DEBUG_MSG("create widget: %p\n", w);
+		DEBUG_MSG("create widget: %p\n", w);
 		Widget_Append( parent, w );
 		ctx->widget = w;
 		break;
@@ -167,8 +167,8 @@ static int ParseWidget( ParserContextPtr ctx, xmlNodePtr node )
 			return PB_NEXT;
 		}
 		wc->methods.set_text( parent, (char*)node->content );
-		_DEBUG_MSG("widget: %s, set text: %s\n", 
-			    parent->type, (char*)node->content);
+		DEBUG_MSG("widget: %s, set text: %s\n", parent->type, 
+			  (char*)node->content);
 		return PB_NEXT;
 	default: return PB_ERROR;
 	}
@@ -176,7 +176,7 @@ static int ParseWidget( ParserContextPtr ctx, xmlNodePtr node )
 		const char *prop_val;
 		prop_val = (char*)xmlGetProp( node, prop->name );
 		if( PropNameIs("type") ) {
-			_DEBUG_MSG("widget: %p, set type: %s\n", w, prop_val);
+			DEBUG_MSG("widget: %p, set type: %s\n", w, prop_val);
 			wc = LCUIWidget_GetClass( prop_val );
 			if( wc && wc->methods.init ) {
 				wc->methods.init( w );

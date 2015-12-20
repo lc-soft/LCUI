@@ -44,10 +44,6 @@
 
 #define FONT_CACHE_SIZE	32
 
-#ifdef LCUI_BUILD_IN_WIN32
-#define strcasecmp stricmp
-#endif
-
 /**
  * 库中缓存的字体位图是分组存放的，共有三级分组，分别为：
  * 字符->字体信息->字体大小
@@ -270,6 +266,7 @@ void LCUIFont_SetDefault( int id )
 	p = LCUIFont_GetById( id );
 	if( p ) {
 		fontlib.default_font = p;
+		printf("[font] select: %s\n", p->family_name);
 	}
 }
 
@@ -386,6 +383,7 @@ int LCUIFont_LoadFile( const char *filepath )
 	int ret, id;
 	LCUI_Font *font;
 
+	printf( "[font] load file: %s\n", filepath );
 	/* 如果有同一文件路径的字族信息 */
 	id = LCUIFont_GetIdByPath( filepath );
 	if( id >= 0 ) {
@@ -400,6 +398,8 @@ int LCUIFont_LoadFile( const char *filepath )
 	}
 	font->engine = fontlib.engine;
 	id = LCUIFont_Add( font, filepath );
+	printf("[font] add family: %s, style name: %s, id: %d\n", 
+		font->family_name, font->family_name, id);
 	return id;
 }
 
@@ -646,17 +646,12 @@ void LCUI_InitFont( void )
 		if( !target_font ) {
 			continue;
 		}
-		printf( "[font] load font: %s\n", target_font );
 		/* 如果载入成功，则设定该字体为默认字体 */
 		font_id = LCUIFont_LoadFile( target_font );
 		if( font_id <= 0 ) {
 			continue;
 		}
 		LCUIFont_SetDefault( font_id );
-		if( fontlib.default_font ) {
-			printf("[font] select font: %s\n",
-				fontlib.default_font->family_name);
-		}
 		break;
 	} while( ++i, target_font = font_files[i], i<MAX_FONTFILE_NUM );
 }

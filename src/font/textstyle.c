@@ -116,7 +116,7 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 	case FONT_STYLE_OBLIQUE: style_name = "oblique"; break;
 	case FONT_STYLE_ITALIC: style_name = "italic"; break;
 	case FONT_STYLE_NORMAL:
-	default: style_name = "regular"; break;
+	default: style_name = NULL; break;
 	}
 	for( p = str, count = 0, i = 0; ; ++p ) {
 		if( *p != ',' && *p ) {
@@ -124,7 +124,7 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 			continue;
 		}
 		name[i] = 0;
-		strtrim( name, name );
+		strtrim( name, name, NULL );
 		ids[count] = LCUIFont_GetId( name, style_name );
 		if( ids[count] > 0 ) {
 			++count;
@@ -134,8 +134,14 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 			break;
 		}
 	}
-	ts->has_family = TRUE;
-	ts->font_ids = ids;
+	if( count > 0 ) {
+		ts->has_family = TRUE;
+		ts->font_ids = ids;
+	} else {
+		ts->has_family = FALSE;
+		ts->font_ids = NULL;
+		free(ids);
+	}
 	return 0;
 }
 

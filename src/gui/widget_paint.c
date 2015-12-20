@@ -65,7 +65,7 @@ static void Widget_AdjustArea(	LCUI_Widget w, LCUI_Rect *in_rect,
 	} else {
 		*out_rect = *in_rect;
 	}
-	LCUIRect_ValidateArea( out_rect, Size(box->w, box->h) );
+	LCUIRect_ValidateArea( out_rect, box->w, box->h );
 	/* 将坐标转换成相对于图像呈现区的坐标 */
 	out_rect->x += (box->x - w->box.graph.x);
 	out_rect->y += (box->y - w->box.graph.y);
