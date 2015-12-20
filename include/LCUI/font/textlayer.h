@@ -80,14 +80,6 @@ typedef struct TextRowList {
         TextRowData **rows;		/**< 每一行文本的数据 */
 } TextRowList;
 
-/* 任务数据 */
-typedef struct TaskData {
-        LCUI_BOOL update_bitmap;	/**< 更新文本的字体位图 */
-        LCUI_BOOL update_typeset;	/**< 重新对文本进行排版 */
-        int typeset_start_row;		/**< 排版处理的起始行 */	
-        LCUI_BOOL redraw_all;		/**< 重绘所有字体位图 */
-} TaskData;
-
 typedef struct LCUI_TextLayerRec_  {
         int offset_x;			/**< X轴坐标偏移量 */
         int offset_y;			/**< Y轴坐标偏移量 */
@@ -101,14 +93,19 @@ typedef struct LCUI_TextLayerRec_  {
         LCUI_BOOL is_autowrap_mode;	/**< 是否启用自动换行模式 */
 	LCUI_BOOL is_using_style_tags;	/**< 是否使用文本样式标签 */
         LCUI_BOOL is_using_buffer;	/**< 是否使用缓存空间来存储文本位图 */
-	LinkedList dirty_rect;	/**< 脏矩形记录 */
+	LinkedList dirty_rect;		/**< 脏矩形记录 */
 
         int text_align;			/**< 文本的对齐方式 */
         TextRowList row_list;		/**< 文本行列表 */
         LCUI_TextStyle text_style;	/**< 文本全局样式 */
 	LinkedList style_cache;		/**< 样式缓存 */
-	LCUI_Style line_height;	/**< 全局文本行高度 */
-        TaskData task;			/**< 任务 */
+	LCUI_Style line_height;		/**< 全局文本行高度 */
+	struct {
+		LCUI_BOOL update_bitmap;	/**< 更新文本的字体位图 */
+		LCUI_BOOL update_typeset;	/**< 重新对文本进行排版 */
+		int typeset_start_row;		/**< 排版处理的起始行 */	
+		LCUI_BOOL redraw_all;		/**< 重绘所有字体位图 */
+	} task;				/**< 待处理的任务 */
         LCUI_Graph graph;		/**< 文本位图缓存 */
 }* LCUI_TextLayer;
 
@@ -120,6 +117,9 @@ LCUI_API int TextLayer_GetRowHeight( LCUI_TextLayer layer, int row );
 
 /** 获取指定文本行的文本长度 */
 LCUI_API int TextLayer_GetRowTextLength( LCUI_TextLayer layer, int row );
+
+/** 添加 更新文本排版 的任务 */
+LCUI_API void TextLayer_AddUpdateTypeset( LCUI_TextLayer layer, int start_row );
 
 /** 设置文本颜色 */
 LCUI_API void TextLayer_SetFontColor( LCUI_TextLayer layer, LCUI_Color color );
