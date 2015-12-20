@@ -83,17 +83,28 @@ LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos )
 		pos += list->length;
 	}
 	if( pos > list->length / 2 ) {
+		pos = list->length - pos;
 		node = list->tail.prev;
-		while( --pos && node ) {
+		while( --pos > 0 && node ) {
 			node = node->prev;
 		}
 	} else {
 		node = list->head.next;
-		while( --pos && node ) {
+		while( --pos > 0 && node ) {
 			node = node->next;
 		}
 	}
 	return node;
+}
+
+void LinkedList_LinkNode( LinkedList *list, LinkedListNode *cur,
+			  LinkedListNode *node )
+{
+	node->prev = cur;
+	node->next = cur->next;
+	node->next->prev = node;
+	cur->next = node;
+	list->length += 1;
 }
 
 LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data )
@@ -103,7 +114,7 @@ LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data )
 	node->data = data;
 	target = LinkedList_GetNode( list, pos );
 	if( target ) {
-		LinkedList_Link( list, target->prev, node );
+		LinkedList_LinkNode( list, target->prev, node );
 	} else {
 		LinkedList_AppendNode( list, node );
 	}

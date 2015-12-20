@@ -156,7 +156,7 @@ static void TimerList_AddNode( LinkedListNode *node )
 		tt = LCUI_GetTicks( timer->start_time );
 		tt = timer->total_ms - tt + timer->pause_ms;
 		if( t <= tt ) {
-			LinkedList_Link( &self.timer_list, cur, node );
+			LinkedList_LinkNode( &self.timer_list, cur, node );
 			return;
 		}
 	}
