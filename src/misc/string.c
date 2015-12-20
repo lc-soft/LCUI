@@ -40,27 +40,23 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h> 
 
-#define case_in_blank_char	\
-	case '\t':		\
-	case ' ':		\
-	case '\n':		\
-	case '\r'
-
-/** 
- * 清除字符串首尾的空白符
- * @param[out] outstr 处理后的字符串
- * @param[in] instr 需要处理的字符串
- * @return 处理后的字符串的长度
- */
-int strtrim( char *outstr, const char *instr )
+int strtrim( char *outstr, const char *instr, const char *charlist )
 {
+	LCUI_BOOL clear, clear_left = TRUE;
 	char *op = outstr, *last_blank = NULL;
-	LCUI_BOOL clear_left = 1;
-	const char *ip = instr;
+	const char *default_char_list = "\t\n\r ", *ip = instr, *c;
 
+	if( !charlist ) {
+		charlist = default_char_list;
+	}
 	for( ; *ip; ip++ ) {
-		switch( *ip ) {
-		case_in_blank_char:
+		for( clear = FALSE, c = charlist; *c;  ++c ) {
+			if( *ip == *c ) {
+				clear = TRUE;
+				break;
+			}
+		}
+		if( clear ) {
 			if( !clear_left ) {	
 				*op = *ip;
 				if( !last_blank ) {
@@ -69,15 +65,13 @@ int strtrim( char *outstr, const char *instr )
 				++op;
 			}
 			continue;
-		default:
-			if( clear_left ) {
-				clear_left = FALSE;
-			}
-			last_blank = NULL;
-			*op = *ip;
-			++op;
-			break;
 		}
+		if( clear_left ) {
+			clear_left = FALSE;
+		}
+		last_blank = NULL;
+		*op = *ip;
+		++op;
 	}
 	if( last_blank ) {
 		*last_blank = 0;

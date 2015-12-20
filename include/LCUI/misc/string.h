@@ -42,6 +42,7 @@
 
 #ifdef LCUI_BUILD_IN_WIN32
 #include <tchar.h>
+#define strcasecmp stricmp
 #else
 #ifdef _UNICODE
 #define __T(x) L ## x
@@ -59,19 +60,16 @@ typedef char TCHAR;
 #define _TCHAR_DEFINED
 #endif
 
-#ifdef LCUI_BUILD_IN_LINUX
-#define stricmp strcasecmp 
-#endif
-
 LCUI_BEGIN_HEADER
 
-/** 
- * 清除字符串首尾的空白符
- * @param[out] outstr 处理后的字符串
- * @param[in] instr 需要处理的字符串
- * @return 处理后的字符串的长度
- */
-LCUI_API int strtrim( char *outstr, const char *instr );
+/**
+* 清除字符串首尾的字符
+* @param[out] outstr 处理后的字符串
+* @param[in] instr 需要处理的字符串
+* @param[in] charlist 需要清除的字符列表，当为NULL时，默认清除空白符
+* @return 处理后的字符串的长度
+*/
+LCUI_API int strtrim( char *outstr, const char *instr, const char *charlist );
 
 LCUI_END_HEADER
 
