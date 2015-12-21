@@ -97,13 +97,13 @@ LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos )
 	return node;
 }
 
-void LinkedList_LinkNode( LinkedList *list, LinkedListNode *cur,
-			  LinkedListNode *node )
+void LinkedList_Link( LinkedList *list, LinkedListNode *cur, 
+		      LinkedListNode *node )
 {
 	node->prev = cur;
 	node->next = cur->next;
 	node->next->prev = node;
-	cur->next = node;
+	node->prev->next = node;
 	list->length += 1;
 }
 
@@ -114,7 +114,7 @@ LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data )
 	node->data = data;
 	target = LinkedList_GetNode( list, pos );
 	if( target ) {
-		LinkedList_LinkNode( list, target->prev, node );
+		LinkedList_Link( list, target->prev, node );
 	} else {
 		LinkedList_AppendNode( list, node );
 	}
