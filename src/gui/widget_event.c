@@ -43,8 +43,6 @@
 #include <LCUI/cursor.h>
 #include <LCUI/thread.h>
 
-#define NEW_ONE(type) (type*)malloc(sizeof(type))
-
 typedef struct LCUI_WidgetEventPack {
 	void *data;			/**< 额外数据 */
 	LCUI_Widget widget;		/**< 当前处理该事件的部件 */
@@ -67,13 +65,7 @@ enum WidgetStatusType {
 static struct ModuleContext { 
 	LinkedList pending_list;		/**< 待处理部件列表（按事件触发时间先后排列） */
 	LCUI_Widget targets[WST_TOTAL];		/**< 相关的部件 */
-	LCUI_RBTree mark_tree;			/**< 记录当前已经标记的部件 */
 } self;
-
-static int CompareWidgetMark( void *data, const void *key )
-{
-	return data == key ? 0:(data > key ? 1:-1);
-}
 
 static void DestroyWidgetEventTask( void *arg )
 {
@@ -97,7 +89,6 @@ static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 	pack->event.type = event->id;
 	pack->event.type_name = event->name;
 	DEBUG_MSG("event: %s, task: %p\n", event->name, task);
-
 	switch( event->id ) {
 	case LCUI_INPUT:
 	case LCUI_MOUSEUP:
@@ -107,7 +98,6 @@ static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 	case LCUI_KEYPRESS:
 	default: break;
 	}
-	
 	widget = pack->widget;
 	task->func( widget, &pack->event, pack->data );
 	if( pack->event.cancel_bubble ) {
@@ -194,7 +184,7 @@ int Widget_BindEvent(	LCUI_Widget widget, const char *event_name,
 			void *func_data, void (*destroy_data)(void*) )
 {
 	LCUI_WidgetEventTask *task;
-	task = NEW_ONE(LCUI_WidgetEventTask);
+	task = NEW(LCUI_WidgetEventTask, 1);
 	task->func = func;
 	task->data = func_data;
 	task->data_destroy = destroy_data;
@@ -233,17 +223,14 @@ int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 	int ret;
 	LCUI_WidgetEventPack *pack;
 
-	pack = NEW_ONE(LCUI_WidgetEventPack);
+	pack = NEW(LCUI_WidgetEventPack, 1);
 	pack->data = data;
 	pack->event = *e;
 	pack->widget = widget;
 	pack->is_direct_run = FALSE;
 	DEBUG_MSG("pack: %p\n", pack);
 	ret = LCUIEventBox_Post( widget->event, e->type_name, pack, NULL );
-	if( !RBTree_CustomSearch( &self.mark_tree, widget ) ) {
-		RBTree_CustomInsert( &self.mark_tree, widget, widget );
-		LinkedList_Append( &self.pending_list, widget );
-	}
+	LinkedList_Append( &self.pending_list, widget );
 	return ret;
 }
 
@@ -410,7 +397,6 @@ void LCUIWidget_StepEvent(void)
 		node = prev;
 		DEBUG_MSG("dispatch event, widget: %p\n", widget->type);
 		LCUIEventBox_Dispatch( widget->event );
-		RBTree_CustomErase( &self.mark_tree, widget );
 	}
 	DEBUG_MSG("exit\n");
 }
@@ -418,9 +404,6 @@ void LCUIWidget_StepEvent(void)
 /** 初始化 LCUI 部件的事件系统 */
 void LCUIWidget_InitEvent(void)
 {
-	RBTree_Init( &self.mark_tree );
-	RBTree_OnJudge( &self.mark_tree, CompareWidgetMark );
-	RBTree_SetDataNeedFree( &self.mark_tree, FALSE );
 	LinkedList_Init( &self.pending_list );
 	LCUI_BindEvent( "mousedown", OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( "mousemove", OnMouseEvent, NULL, NULL );
