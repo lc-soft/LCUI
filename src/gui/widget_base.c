@@ -109,7 +109,7 @@ int Widget_Unwrap( LCUI_Widget *widget )
 		prev = node->prev;
 		child = node->data;
 		LinkedList_Unlink( &self->children, node );
-		LinkedList_LinkNode( list, target, node );
+		LinkedList_Link( list, target, node );
 		child->parent = self->parent;
 		Widget_AddTaskToSpread( child, WTT_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
@@ -131,7 +131,7 @@ int Widget_Unwrap( LCUI_Widget *widget )
 	LinkedList_ForEach( node, &self->children_show ) {
 		prev = node->prev;
 		LinkedList_Unlink( &self->children_show, node );
-		LinkedList_LinkNode( list_show, target, node );
+		LinkedList_Link( list_show, target, node );
 		node = prev;
 	}
 	Widget_Destroy( widget );
@@ -153,7 +153,7 @@ void Widget_Front( LCUI_Widget widget )
 		    widget->computed_style.z_index ) {
 			continue;
 		}
-		LinkedList_LinkNode( &parent->children_show, child_node, node );
+		LinkedList_Link( &parent->children_show, child_node, node );
 		return;
 	}
 	LinkedList_AppendNode( &parent->children_show, node );
@@ -341,7 +341,7 @@ void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 }
 
 /** 计算坐标 */
-void Widget_ComputePosition( LCUI_Widget w )
+static void Widget_ComputePosition( LCUI_Widget w )
 {
 	/* 如果有指定定位方式为绝对定位，则以样式表中指定的位置为准 */
 	if( w->computed_style.position == SV_ABSOLUTE ) {
@@ -398,8 +398,24 @@ void Widget_ComputePosition( LCUI_Widget w )
 	w->box.graph.y -= BoxShadow_GetBoxY(&w->computed_style.shadow);
 }
 
+void Widget_FlushPosition( LCUI_Widget w )
+{
+	LCUI_Rect rect;
+	rect = w->box.graph;
+	Widget_ComputePosition( w );
+	if( w->parent ) {
+		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
+		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
+		/* 标记移动前后的区域 */
+		Widget_InvalidateArea( w->parent, &w->box.graph, SV_CONTENT_BOX );
+		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
+	}
+	/* 检测是否为顶级部件并做相应处理 */
+	Widget_PostSurfaceEvent( w, WET_MOVE );
+}
+
 /** 更新位图尺寸 */
-void Widget_UpdateGraphBox( LCUI_Widget w )
+static void Widget_UpdateGraphBox( LCUI_Widget w )
 {
 	LCUI_Rect *rb = &w->box.border;
 	LCUI_Rect *rg = &w->box.graph;
@@ -446,7 +462,7 @@ void Widget_GetContentSize( LCUI_Widget w, int *width, int *height )
 }
 
 /** 计算尺寸 */
-void Widget_ComputeSize( LCUI_Widget w )
+static void Widget_ComputeSize( LCUI_Widget w )
 {
 	switch( w->computed_style.width.type ) {
 	case SVT_SCALE:
@@ -528,6 +544,90 @@ void Widget_ComputeSize( LCUI_Widget w )
 	}
 	/* 先暂时用边框盒区域作为外部区域，等加入外边距设置后再改 */
 	w->box.outer = w->box.border;
+}
+
+static void Widget_SendResizeEvent( LCUI_Widget w )
+{
+	LinkedListNode *node;
+	LCUI_Widget child;
+	LCUI_WidgetEvent e;
+	e.type_name = "resize";
+	e.type = WET_RESIZE;
+	e.cancel_bubble = TRUE;
+	e.target = w;
+	e.data = NULL;
+	Widget_SendEvent( w, &e, NULL );
+	Widget_AddTask( w, WTT_REFRESH );
+	Widget_PostSurfaceEvent( w, WET_RESIZE );
+	LinkedList_ForEach( node, &w->children ) {
+		child = node->data;
+		if( child->computed_style.width.type == SVT_SCALE || 
+		    child->computed_style.height.type == SVT_SCALE ) {
+			Widget_AddTask( child, WTT_RESIZE );
+		}
+	}
+}
+
+void Widget_FlushSize( LCUI_Widget w )
+{
+	int i;
+	LCUI_Rect rect;
+	struct { 
+		LCUI_Style *sval;
+		int *ival;
+		int key;
+	} pd_map[4] = {
+		{ &w->computed_style.padding.top, &w->padding.top, key_padding_top },
+		{ &w->computed_style.padding.right, &w->padding.right, key_padding_right },
+		{ &w->computed_style.padding.bottom, &w->padding.bottom, key_padding_bottom },
+		{ &w->computed_style.padding.left, &w->padding.left, key_padding_left }
+	};
+	rect = w->box.graph;
+	/* 从样式表中获取尺寸 */
+	w->computed_style.width = w->style->sheet[key_width];
+	w->computed_style.height = w->style->sheet[key_height];
+	/* 内边距的单位暂时都用 px  */
+	for( i=0; i<4; ++i ) {
+		if( !w->style->sheet[pd_map[i].key].is_valid
+		    || w->style->sheet[pd_map[i].key].type != SVT_PX ) {
+			pd_map[i].sval->type = SVT_PX;
+			pd_map[i].sval->px = 0;
+			*pd_map[i].ival = 0;
+			continue;
+		}
+		*pd_map[i].sval = w->style->sheet[pd_map[i].key];
+		*pd_map[i].ival = pd_map[i].sval->px;
+	}
+	Widget_ComputeSize( w );
+	Widget_UpdateGraphBox( w );
+	/* 若尺寸无变化则不继续处理 */
+	if( rect.width == w->box.graph.width && 
+	    rect.height == w->box.graph.height ) {
+		return;
+	}
+	/* 若在变化前后的宽高中至少有一个为 0，则不继续处理 */
+	if( (w->box.graph.width <= 0 || w->box.graph.height <= 0) &&
+	    (rect.width <= 0 || rect.height <= 0) ) {
+		return;
+	}
+	if( w->computed_style.width.type != SVT_AUTO ) {
+		Widget_AddTask( w, WTT_LAYOUT );
+	}
+	if( w->parent ) {
+		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
+		rect.width = w->box.graph.width;
+		rect.height = w->box.graph.height;
+		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );	
+		if( w->parent->computed_style.width.type == SVT_AUTO
+		    || w->parent->computed_style.height.type == SVT_AUTO ) {
+			Widget_AddTask( w->parent, WTT_RESIZE );
+		}
+		if( w->computed_style.display != SV_NONE
+		    && w->computed_style.position == SV_STATIC ) {
+			Widget_AddTask( w->parent, WTT_LAYOUT );
+		}
+	}
+	Widget_SendResizeEvent( w );
 }
 
 /** 计算内边距 */
@@ -851,10 +951,15 @@ void Widget_UpdateLayout( LCUI_Widget w )
 
 	ctx.max_width = 256;
 	for( child = w; child; child = child->parent ) {
-		if( child->computed_style.width.type != SVT_AUTO ) {
+		switch( child->computed_style.width.type ) {
+		case SVT_PX:
+		case SVT_SCALE:
 			ctx.max_width = child->box.content.width;
 			break;
+		case SVT_AUTO:
+		default:continue;
 		}
+		break;
 	}
 	LinkedList_ForEach( node, &w->children ) {
 		child = node->data;

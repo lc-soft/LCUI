@@ -166,90 +166,10 @@ static void HandleCacheStyle( LCUI_Widget w )
 	ReplaceStyleSheet( w->cached_style, w->style );
 }
 
-void Widget_FlushPosition( LCUI_Widget w )
-{
-	LCUI_Rect rect;
-	rect = w->box.graph;
-	Widget_ComputePosition( w );
-	if( w->parent ) {
-		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
-		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
-		/* 标记移动前后的区域 */
-		Widget_InvalidateArea( w->parent, &w->box.graph, SV_CONTENT_BOX );
-		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
-	}
-	/* 检测是否为顶级部件并做相应处理 */
-	Widget_PostSurfaceEvent( w, WET_MOVE );
-}
-
 static void HandleSetTitle( LCUI_Widget w )
 {
 	_DEBUG_MSG("widget: %s\n", w->type);
 	Widget_PostSurfaceEvent( w, WET_TITLE );
-}
-
-void Widget_FlushSize( LCUI_Widget w )
-{
-	int i;
-	LCUI_Rect rect;
-	LCUI_WidgetEvent e;
-	struct { 
-		LCUI_Style *sval;
-		int *ival;
-		int key;
-	} pd_map[4] = {
-		{ &w->computed_style.padding.top, &w->padding.top, key_padding_top },
-		{ &w->computed_style.padding.right, &w->padding.right, key_padding_right },
-		{ &w->computed_style.padding.bottom, &w->padding.bottom, key_padding_bottom },
-		{ &w->computed_style.padding.left, &w->padding.left, key_padding_left }
-	};
-	rect = w->box.graph;
-	/* 从样式表中获取尺寸 */
-	w->computed_style.width = w->style->sheet[key_width];
-	w->computed_style.height = w->style->sheet[key_height];
-	/* 内边距的单位暂时都用 px  */
-	for( i=0; i<4; ++i ) {
-		if( !w->style->sheet[pd_map[i].key].is_valid
-		 || w->style->sheet[pd_map[i].key].type != SVT_PX ) {
-			pd_map[i].sval->type = SVT_PX;
-			pd_map[i].sval->px = 0;
-			*pd_map[i].ival = 0;
-			continue;
-		}
-		*pd_map[i].sval = w->style->sheet[pd_map[i].key];
-		*pd_map[i].ival = pd_map[i].sval->px;
-	}
-	Widget_ComputeSize( w );
-	Widget_UpdateGraphBox( w );
-	if( rect.width == w->box.graph.width
-	 && rect.height == w->box.graph.height ) {
-		return;
-	}
-	if( w->computed_style.width.type != SVT_AUTO ) {
-		Widget_AddTask( w, WTT_LAYOUT );
-	}
-	if( w->parent ) {
-		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
-		rect.width = w->box.graph.width;
-		rect.height = w->box.graph.height;
-		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );	
-		if( w->parent->computed_style.width.type == SVT_AUTO
-		 || w->parent->computed_style.height.type == SVT_AUTO ) {
-			Widget_AddTask( w->parent, WTT_RESIZE );
-		}
-		if( w->computed_style.display != SV_NONE
-		 && w->computed_style.position == SV_STATIC ) {
-			Widget_AddTask( w->parent, WTT_LAYOUT );
-		}
-	}
-	e.type_name = "resize";
-	e.type = WET_RESIZE;
-	e.cancel_bubble = TRUE;
-	e.target = w;
-	e.data = NULL;
-	Widget_SendEvent( w, &e, NULL );
-	Widget_AddTask( w, WTT_REFRESH );
-	Widget_PostSurfaceEvent( w, WET_RESIZE );
 }
 
 /** 处理可见性 */

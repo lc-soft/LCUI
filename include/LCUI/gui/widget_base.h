@@ -271,14 +271,11 @@ LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 /** 设置部件为顶级部件 */
 LCUI_API int Widget_Top( LCUI_Widget w );
 
-/** 更新位图尺寸 */
-void Widget_UpdateGraphBox( LCUI_Widget w );
+/** 刷新位置 */
+LCUI_API void Widget_FlushPosition( LCUI_Widget w );
 
-/** 计算位置 */
-void Widget_ComputePosition( LCUI_Widget w );
-
-/** 计算尺寸 */
-void Widget_ComputeSize( LCUI_Widget w );
+/** 刷新尺寸 */
+LCUI_API void Widget_FlushSize( LCUI_Widget w );
 
 /** 计算部件通过继承得到的样式表 */
 LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
