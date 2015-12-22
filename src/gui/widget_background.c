@@ -74,10 +74,11 @@ static void DelRef( LCUI_Widget widget, ImageCache cache )
 static void ExecLoadImage( void *arg1, void *arg2 )
 {
 	char *path = arg2;
-	LCUI_Graph image = {0};
+	LCUI_Graph image;
 	LCUI_Widget widget = arg1;
 	ImageCache cache;
 
+	Graph_Init( &image );
 	if( Graph_LoadImage( path, &image ) != 0 ) {
 		return;
 	}
@@ -180,7 +181,7 @@ void Widget_ComputeBackgroundStyle( LCUI_Widget widget )
 				break;
 			case SVT_STRING:
 				AsyncLoadImage( widget, s->string );
-				break;
+			default: break;
 			}
 			break;
 		case key_background_position:

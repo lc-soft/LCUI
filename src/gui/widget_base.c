@@ -371,7 +371,6 @@ static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
 void Widget_FlushPosition( LCUI_Widget w )
 {
 	LCUI_Rect rect = w->box.graph;
-	LCUI_Style *s = &w->style->sheet[key_position];
 	int position = ComputeStyleOption( w, key_position, SV_STATIC );
 	w->computed_style.left = ComputePositionOffset( w, key_left );
 	w->computed_style.top = ComputePositionOffset( w, key_top );
