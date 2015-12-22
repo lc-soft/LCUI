@@ -340,44 +340,67 @@ void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 	Widget_AddTask( w, WTT_TITLE );
 }
 
-/** 计算坐标 */
-static void Widget_ComputePosition( LCUI_Widget w )
+static int ComputePositionOffset( LCUI_Widget w, int key )
 {
-	/* 如果有指定定位方式为绝对定位，则以样式表中指定的位置为准 */
-	if( w->computed_style.position == SV_ABSOLUTE ) {
-		switch( w->cached_style->sheet[key_left].type ) {
-		case SVT_SCALE:
-			if( !w->parent ) {
-				break;
-			}
-			w->x = w->parent->box.content.width;
-			w->x *= w->cached_style->sheet[key_left].scale;
-			break;
-		case SVT_PX:
-			w->x = w->cached_style->sheet[key_left].px;
-			break;
-		case SVT_NONE:
-		case SVT_AUTO:
-		default:
-			w->x = 0;
+	LCUI_Style *s = &w->style->sheet[key];
+	switch( s->type ) {
+	case SVT_SCALE:
+		if( !w->parent ) {
 			break;
 		}
-		switch( w->cached_style->sheet[key_top].type ) {
-		case SVT_SCALE:
-			if( !w->parent ) {
-				break;
+		return w->parent->box.content.width * s->scale;
+	case SVT_PX: return s->px;
+	case SVT_NONE:
+	case SVT_AUTO:
+	default: break;
+	}
+	return 0;
+}
+
+static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
+{
+	if( !w->style->sheet[key].is_valid ) {
+		return default_value;
+	}
+	if( w->style->sheet[key].type != SVT_STYLE ) {
+		return default_value;
+	}
+	return w->style->sheet[key].style;
+}
+
+void Widget_FlushPosition( LCUI_Widget w )
+{
+	LCUI_Rect rect = w->box.graph;
+	LCUI_Style *s = &w->style->sheet[key_position];
+	int position = ComputeStyleOption( w, key_position, SV_STATIC );
+	w->computed_style.left = ComputePositionOffset( w, key_left );
+	w->computed_style.top = ComputePositionOffset( w, key_top );
+	w->computed_style.right = ComputePositionOffset( w, key_right );
+	w->computed_style.bottom = ComputePositionOffset( w, key_bottom );
+	if( w->parent && w->computed_style.position != position ) {
+		Widget_AddTask( w->parent, WTT_LAYOUT );
+	}
+	w->computed_style.position = position;
+	if( position == SV_ABSOLUTE ) {
+		w->x = 0;
+		w->y = 0;
+		if( w->style->sheet[key_left].is_valid ) {
+			w->x = w->computed_style.left;
+		} else if( w->style->sheet[key_right].is_valid ) {
+			if( w->parent ) {
+				w->x = w->parent->box.content.width;
+				w->x -= w->width;
 			}
-			w->y = w->parent->box.content.height;
-			w->y *= w->cached_style->sheet[key_top].scale;
-			break;
-		case SVT_PX:
-			w->y = w->cached_style->sheet[key_top].px;
-			break;
-		case SVT_NONE:
-		case SVT_AUTO:
-		default:
-			w->y = 0;
-			break;
+			w->x -= w->computed_style.right;
+		}
+		if( w->style->sheet[key_top].is_valid ) {
+			w->x = w->computed_style.top;
+		} else if( w->style->sheet[key_bottom].is_valid ) {
+			if( w->parent ) {
+				w->y = w->parent->box.content.height;
+				w->y -= w->height;
+			}
+			w->y -= w->computed_style.bottom;
 		}
 	}
 	/* 以x、y为基础 */
@@ -396,13 +419,6 @@ static void Widget_ComputePosition( LCUI_Widget w )
 	w->box.outer.y -= w->margin.top;
 	w->box.graph.x -= BoxShadow_GetBoxX(&w->computed_style.shadow);
 	w->box.graph.y -= BoxShadow_GetBoxY(&w->computed_style.shadow);
-}
-
-void Widget_FlushPosition( LCUI_Widget w )
-{
-	LCUI_Rect rect;
-	rect = w->box.graph;
-	Widget_ComputePosition( w );
 	if( w->parent ) {
 		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
 		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);

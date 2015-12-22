@@ -545,6 +545,10 @@ static KeyNameGroup style_option_map[] = {
 static LCUI_StyleParser style_parser_map[] = {
 	{ key_width, NULL, OnParseNumber },
 	{ key_height, NULL, OnParseNumber },
+	{ key_top, NULL, OnParseNumber },
+	{ key_right, NULL, OnParseNumber },
+	{ key_bottom, NULL, OnParseNumber },
+	{ key_left, NULL, OnParseNumber },
 	{ key_position, NULL, OnParseStyleOption },
 	{ key_display, NULL, OnParseStyleOption },
 	{ key_background_color, NULL, OnParseColor },
