@@ -53,39 +53,30 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 }
 
 /** 追加子部件 */
-int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
+int Widget_Append( LCUI_Widget parent, LCUI_Widget w )
 {
-	LinkedListNode *node;
-	LCUI_Widget prev_parent;
-
-	DEBUG_MSG("parent: %p, widget: %p\n", parent, widget);
-	if( !parent || !widget || parent == widget->parent ) {
+	LinkedListNode *node, *snode;
+	DEBUG_MSG("parent: %p, w: %p\n", parent, w);
+	if( !parent || !w || parent == w->parent ) {
 		return -1;
 	}
-	if( parent == widget ) {
+	if( parent == w ) {
 		return -2;
 	}
-	node = Widget_GetNode( widget );
-	if( !widget->parent ) {
-		goto remove_done;
+	node = Widget_GetNode( w );
+	snode = Widget_GetShowNode( w );
+	if( w->parent ) {
+		LinkedList_Unlink( &w->parent->children, node );
+		LinkedList_Unlink( &w->parent->children_show, snode );
+		Widget_PostSurfaceEvent( w, WET_REMOVE );
 	}
-	prev_parent = widget->parent;
-	LinkedList_Unlink( &prev_parent->children, node );
-	Widget_PostSurfaceEvent( widget, WET_REMOVE );
-	LinkedList_ForEach( node, &prev_parent->children_show ) {
-		if( node->data != widget ) {
-			continue;
-		}
-		LinkedList_DeleteNode( &prev_parent->children_show, node );
-		break;
-	}
-remove_done:
-	widget->parent = parent;
+	w->parent = parent;
 	LinkedList_AppendNode( &parent->children, node );
-	LinkedList_Insert( &parent->children_show, 0, widget );
-	Widget_PostSurfaceEvent( widget, WET_ADD );
-	Widget_AddTaskToSpread( widget, WTT_REFRESH_STYLE );
-	Widget_UpdateTaskStatus( widget );
+	LinkedList_AppendNode( &parent->children_show, snode );
+	Widget_FlushZIndex( w );
+	Widget_PostSurfaceEvent( w, WET_ADD );
+	Widget_AddTaskToSpread( w, WTT_REFRESH_STYLE );
+	Widget_UpdateTaskStatus( w );
 	Widget_AddTask( parent, WTT_LAYOUT );
 	DEBUG_MSG("tip\n");
 	return 0;
@@ -95,7 +86,7 @@ int Widget_Unwrap( LCUI_Widget *widget )
 {
 	LCUI_Widget self, child;
 	LinkedList *list, *list_show;
-	LinkedListNode *target, *node, *prev;
+	LinkedListNode *target, *node, *prev, *snode;
 
 	self = *widget;
 	if( !self->parent ) {
@@ -108,30 +99,15 @@ int Widget_Unwrap( LCUI_Widget *widget )
 	LinkedList_ForEach( node, &self->children ) {
 		prev = node->prev;
 		child = node->data;
+		snode = Widget_GetShowNode( child );
 		LinkedList_Unlink( &self->children, node );
-		LinkedList_Link( list, target, node );
+		LinkedList_Unlink( &self->children_show, snode );
 		child->parent = self->parent;
+		LinkedList_Link( list, target, node );
+		LinkedList_AppendNode( list_show, snode );
+		Widget_FlushZIndex( child );
 		Widget_AddTaskToSpread( child, WTT_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
-		node = prev;
-	}
-	LinkedList_ForEach( node, list_show ) {
-		if( node->data == self ) {
-			break;
-		}
-	}
-	if( node ) {
-		target = node->prev;
-	} else {
-		target = list_show->tail.prev;
-		if( !target ) {
-			target = &list_show->head;
-		}
-	}
-	LinkedList_ForEach( node, &self->children_show ) {
-		prev = node->prev;
-		LinkedList_Unlink( &self->children_show, node );
-		LinkedList_Link( list_show, target, node );
 		node = prev;
 	}
 	Widget_Destroy( widget );
@@ -222,15 +198,15 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 {
 	LCUI_WidgetClass *wc;
 	LinkedListNode *node;
-	LCUI_Widget widget;
-	
-	widget = (LCUI_Widget)malloc( sizeof( struct LCUI_WidgetRec_ ) +
-				      sizeof(LinkedListNode));
+	LCUI_Widget widget = malloc( sizeof(struct LCUI_WidgetRec_) +
+				     sizeof(LinkedListNode)*2 );
 	Widget_Init( widget );
 	node = Widget_GetNode( widget );
 	node->data = widget;
-	node->next = NULL;
-	node->prev = NULL;
+	node->next = node->prev = NULL;
+	node = Widget_GetShowNode( widget );
+	node->data = widget;
+	node->next = node->prev = NULL;
 	if( type_name ) {
 		widget->type = strdup( type_name );
 		wc = LCUIWidget_GetClass( type_name );
@@ -249,7 +225,7 @@ static void Widget_OnDestroy( void *arg )
 	LCUIEventBox_Destroy( widget->event );
 	widget->event = NULL;
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
-	LinkedList_Clear( &widget->children_show, NULL );
+	LinkedList_ClearData( &widget->children_show, NULL );
 	LinkedList_Clear( &widget->dirty_rects, free );
 	Widget_PostSurfaceEvent( widget, WET_REMOVE );
 	Widget_AddTask( widget->parent, WTT_LAYOUT );
@@ -259,16 +235,11 @@ static void Widget_OnDestroy( void *arg )
 void Widget_ExecDestroy( LCUI_Widget *widget )
 {
 	LCUI_Widget w = *widget;
-	LinkedListNode *node = Widget_GetNode( w );
 	if( w->parent ) {
-		LinkedList *list = &w->parent->children_show;
+		LinkedListNode *node = Widget_GetNode( w );
 		LinkedList_Unlink( &w->parent->children, node );
-		LinkedList_ForEach( node, list ) {
-			if( node->data == w ) {
-				LinkedList_DeleteNode( list, node );
-				break;
-			}
-		}
+		node = Widget_GetShowNode( w );
+		LinkedList_Unlink( &w->parent->children_show, node );
 	}
 	Widget_OnDestroy( w );
 	*widget = NULL;
@@ -338,6 +309,70 @@ void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 		free( old_title );
 	}
 	Widget_AddTask( w, WTT_TITLE );
+}
+
+int Widget_GetIndex( LCUI_Widget w )
+{
+	int index = 0;
+	LinkedListNode *node;
+	if( !w->parent ) {
+		return 0;
+	}
+	node = Widget_GetNode( w );
+	node = node->prev;
+	while( node->prev ) {
+		node = node->prev;
+		++index;
+	}
+	return index;
+}
+
+void Widget_FlushZIndex( LCUI_Widget w )
+{
+	LinkedList *list;
+	int index = Widget_GetIndex( w );
+	LCUI_Style *s = &w->style->sheet[key_z_index];
+	LinkedListNode *cnode, *csnode, *snode = Widget_GetShowNode( w );
+	if( s->is_valid && s->type == SVT_VALUE ) {
+		w->computed_style.z_index = s->value;
+	} else {
+		w->computed_style.z_index = 0;
+	}
+	if( !w->parent ) {
+		return;
+	}
+	list = &w->parent->children_show;
+	LinkedList_Unlink( list, snode );
+	LinkedList_ForEach( cnode, list ) {
+		LCUI_Widget child = cnode->data;
+		LCUI_WidgetStyle *ccs = &child->computed_style;
+		csnode = Widget_GetShowNode( child );
+		if( ccs->position == w->computed_style.position ) {
+			if( w->computed_style.position == SV_STATIC ||
+			    w->computed_style.z_index < ccs->z_index ) {
+				continue;
+			}
+			if( index < Widget_GetIndex( child ) ) {
+				continue;
+			}
+		} else if( w->computed_style.position == SV_STATIC ) {
+			continue;
+		} else if( w->computed_style.z_index < ccs->z_index ) {
+			continue;
+		} else if( w->computed_style.z_index == ccs->z_index ) {
+			if( index < Widget_GetIndex( child ) ) {
+				continue;
+			}
+		}
+		LinkedList_Link( list, csnode->prev, snode );
+		break;
+	}
+	if( !cnode ) {
+		LinkedList_AppendNode( list, snode );
+	}
+	if( w->computed_style.position != SV_STATIC ) {
+		Widget_AddTask( w, WTT_REFRESH );
+	}
 }
 
 static int ComputePositionOffset( LCUI_Widget w, int key )

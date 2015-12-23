@@ -243,7 +243,7 @@ typedef struct LCUI_WidgetRec_ {
 
 
 #define Widget_GetNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec))
-
+#define Widget_GetShowNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode))
 #define Widget_NewPrivateData(w, type) (type*)(w->private_data = malloc(sizeof(type)))
 
 extern LCUI_Widget LCUIRootWidget;
@@ -270,6 +270,12 @@ LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 
 /** 设置部件为顶级部件 */
 LCUI_API int Widget_Top( LCUI_Widget w );
+
+/** 获取在部件列表中的位置 */
+LCUI_API int Widget_GetIndex( LCUI_Widget w );
+
+/** 刷新堆叠顺序 */
+LCUI_API void Widget_FlushZIndex( LCUI_Widget w );
 
 /** 刷新位置 */
 LCUI_API void Widget_FlushPosition( LCUI_Widget w );
