@@ -1,15 +1,14 @@
 # The LCUI Project
 
-![LCUI Logo](https://raw.github.com/lc-soft/LCUI-HomePage/gh-pages/files/images/lcui-project-logo.png)
+![LCUI Logo](http://lcui.org/files/images/lcui-project-logo.png)
 
 ## 说明
 
-LCUI 是一个 GUI 函数库，用于创建图形用户界面，其诞生目的主要是为作者开发的程序提
-供一个良好的GUI解决方案。
+LCUI 是一个简单的跨平台图形界面库，适用于开发一些简单的小程序，其诞生目的主要是方便作者开发GUI程序。
 
 LCUI 是一个自由软件项目，基于 GNU通用公共许可协议 发布，该许可协议要求 LCUI 及 LCUI 衍生软件无论以何种形式发布，都必须确保收受者能收到或得到源码。
 
-此项目主要由作者利用闲余时间进行开发/维护，项目的活跃度通常会受到各种因素的影响，大多数时间内都处于低活跃度状态。
+此项目主要由作者利用闲余时间进行开发和维护，项目的活跃度通常会受到各种因素的影响，大多数时间内都处于低活跃度状态。
 
 请阅读 `docs/CHANGES.zh-cn.md` 文件了解新版本的更新内容。
 
@@ -28,19 +27,29 @@ LCUI 的相关信息与资料可以在项目主页中找到，如果遇到问题
 
 我们已经使用 GitHub 托管 LCUI 项目，网址在上面，欢迎您参与 LCUI 项目的优化和改进。
 
-
 ## 文件目录结构
+
+以下是各个目录内容的相关说明：
 ```
 
 /                项目文件目录
 /bin/            在编译生成后库文件的存放目录
 /build/          参与项目编译、构建和生成的相关文件
-/build/VS2010/   windows平台的 VisualStudio 2010 工程文件
-/build/VS2012/   windows平台的 VisualStudio 2012 工程文件
+/build/VS2010/   VisualStudio 2010 工程文件
+/build/VS2012/   VisualStudio 2012 工程文件
 /docs/           相关文档
-/include/        头文件目录
-/src/            源码目录
-/test/           一些测试（示例）程序
+/include/        头文件
+/src/            源代码
+/src/gui/        图形界面
+/src/gui/widget/ 预置的图形界面组件
+/src/font/       文字和字体
+/src/draw/       图形绘制
+/src/bmp/        位图文件读写
+/src/input/      输入处理，例如：响应键盘和鼠标的输入
+/src/output/     输出处理，例如：输出图形至屏幕
+/src/thread/     各平台下的线程操作接口的封装
+/src/misc/       其它未分类的模块
+/test/           测试（示例）程序
 
 ```
 
@@ -78,9 +87,9 @@ windows系统上构建本项目方法，有两种：
  `LCUI.sln` 文件，然后生成解决方案即可，生成成功后，在 `bin/` 目录下可找到库文件。
 2. 使用Cygwin或MSYS，可按照上述1至6的步骤进行构建，在完成步骤3后，请修改include/LCUI/
 目录下的 `config.h` 文件，定义 `LCUI_BUILD_IN_WIN32` 宏，若有 `LCUI_BUILD_IN_LINUX` 宏，
-请删除它。
+请删除它。该方法并未实际测试，如有其它方法请告知。
 
-###当前的构建状态
+### 当前的构建状态
 LCUI基于 Travis CI 服务进行构建，每向该代码库推送一次代码提交，会将构建任务添加
 至持续集成服务的队列中，并且会运行一些测试以确保该项目的稳定。当前的构建状态是：
 [![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
@@ -100,14 +109,13 @@ LCUI基于 Travis CI 服务进行构建，每向该代码库推送一次代码�
 你可以通过GitHub向本项目提交合并请求，补丁应符合以下要求：
 
 1. 遵循现有代码风格。
-2. 一个commit应该做完整的一件事。
-3. commit信息应该从低于80个字符的摘要行后的空行开始，然后推理/分析为什么要修改（如果适
-   用）。
-4. 修复之前的commit（已经合并）中存在的bug，commit信息的摘要行应该以`fixup!`开头，
-   表示修复了它。如果你修复的是issues列表中未解决的bug，commit信息的摘要行应该以
+2. 一次提交应该做完整的一件事。
+3. 提交信息的第一行为摘要行，长度应低于80个字符，如果需要描述修改原因，请在摘要行后留空行，然后再补充。
+4. 修复之前的提交（已经合并）中存在的bug，提交信息的摘要行应该以`fixup!`开头，
+   表示修复了它。如果你修复的是issues列表中未解决的bug，提交信息的摘要行应该以
    `fix->`开头，并加上issues列表中对应bug信息的标题。
 5. 衍合你的分支至源项目的master分支。我们不希望抓取到冗余的合并请求。
-6. **要清楚什么许可证适用于你的补丁：** 该库中的文件基于GPLv2（或更高版本），但（原
+6. **要清楚什么许可证适用于你的补丁：** 该代码库中的文件基于GPLv2（或更高版本），但（原
    作者）我们仍然可以创建非自由的衍生工具。然而，如果给我们的补丁是基于GPL的，我们希望它
    以后不会进入任何非自由的衍生工具，因此，如果补丁发布于公共领域，会为我们带来方便（以及
    避免任何法律问题）。
@@ -120,18 +128,17 @@ LCUI基于 Travis CI 服务进行构建，每向该代码库推送一次代码�
 #### 初始设置
 
 1. 在GitHub上进行Fork (点击 Fork 按钮)
-2. Clone到计算机： `git clone git@github.com:«github account»/LCUI.git`
-3. cd 到你的库里面： `cd LCUI`
-4. 设置remote记录，假设该记录名为upstream，那么命令为： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
+2. Clone到计算机： `git clone git@github.com:你的用户名/LCUI.git`
+3. cd 到代码库中： `cd LCUI`
+4. 设置远程记录，假设该记录名为upstream，那么命令为： `git remote add -f upstream git://github.com/LC-Team/LCUI.git`
 
 #### 添加Feature
 
-1. 为新的feature创建一个分支(branch)，假设分支名为my_new_feature，那么命令为：
- `git checkout -b my_new_feature`
-2. 在你的feature上工作, 像往常一样添加和提交
+1. 为新的 feature 创建一个分支(branch)，假设分支名为 my_new_feature，那么命令为：`git checkout -b my_new_feature`
+2. 在你的分支上工作, 像往常一样添加和提交修改。
 
-创建一个分支并非必须的，但是，当已经合并至源项目时 可以方便删除你的分支，也可以在提交合并
-请求前 比较你的分支和源项目的最终版本，然后提交合并请求。
+创建一个分支并非必须的，但是，当已经合并至源项目时可以方便删除你的分支，也可以在提交合并
+请求前比较你的分支和源项目的最终版本，然后提交合并请求。
 
 #### 推送到GitHub
 
@@ -147,8 +154,8 @@ LCUI基于 Travis CI 服务进行构建，每向该代码库推送一次代码�
 
 这样会获取更改并重新应用你的commits。
 
-这一般比合并更好，它会给出一个清晰的画面，以表示哪些commit是本地到了你的分支中，如果同
-样的变更已经在源项目中应用，它也会“修剪”你的本地的commit。
+这一般比合并更好，它会给出一个清晰的视图，以表示哪些提交是你本地代码库的分支中，如果同
+样的变更已经在源项目中应用，它也会“修剪”你的本地的提交记录。
 
 你可以将`-i`和`rebase`一起使用，以选择“交互式”衍合，这允许你移除、重排、合并以及修改
 提交信息，例如：
