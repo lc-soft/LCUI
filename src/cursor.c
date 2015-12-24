@@ -227,5 +227,5 @@ LCUI_BOOL LCUICursor_IsCoverRect( LCUI_Rect rect )
 /* 将当前鼠标游标的图像叠加至目标图像指定位置 */
 int LCUICursor_MixGraph( LCUI_Graph *buff, LCUI_Pos pos )
 {
-	return Graph_Mix( buff, &global_cursor.graph, pos );
+	return Graph_Mix( buff, &global_cursor.graph, pos.x, pos.y );
 }

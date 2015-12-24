@@ -492,9 +492,9 @@ static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 		for( x=0; x<read_rect->w; ++x,++byte_ptr,++px ) {
 			a = *byte_ptr;
 			px->r = (px->r * px->a + color.r * a) >> 8;
-			px->g = (px->g * px->a + color.r * a) >> 8;
-			px->b = (px->b * px->a + color.r * a) >> 8;
-			px->a = a + (((255 - px->a)*(255 - a)) >> 16);
+			px->g = (px->g * px->a + color.g * a) >> 8;
+			px->b = (px->b * px->a + color.b * a) >> 8;
+			px->a = 255 - (((255 - px->a)*(255 - a)) >> 16);
 			if( px->a > 0 ) {
 				px->r += px->r * (255 - px->a) >> 8;
 				px->g += px->g * (255 - px->a) >> 8;

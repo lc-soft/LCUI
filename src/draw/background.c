@@ -41,7 +41,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 
-/** 初始化背景绘制参数 */
 void Background_Init( LCUI_Background *bg )
 {
 	bg->color = RGB( 255, 255, 255 );
@@ -52,22 +51,15 @@ void Background_Init( LCUI_Background *bg )
 	bg->position.value = SV_AUTO;
 }
 
-/** 
- * 绘制背景 
- * @param paint		绘制器的上下文句柄
- * @param box		背景区域
- * @param bg		背景样式参数
- */
-void Graph_DrawBackground(
-	LCUI_PaintContext	paint,
-	const LCUI_Rect		*box,
-	LCUI_Background		*bg
-)
+typedef void(*MixerPtr)(LCUI_Graph*, const LCUI_Graph *, int, int);
+
+void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
+			   LCUI_Background *bg )
 {
+	MixerPtr mixer;
 	LCUI_Graph graph;
-	LCUI_Size image_size;
-	LCUI_Pos image_pos = { 0, 0 };
 	LCUI_Rect read_rect, paint_rect;
+	int image_x, image_y, image_w, image_h;
 
 	/* 计算背景图应有的尺寸 */
 	if( bg->size.using_value ) {
@@ -79,45 +71,46 @@ void Graph_DrawBackground(
 			mode = bg->image.width > bg->image.height;
 		case SV_COVER:
 			if( mode ) {
-				image_size.w = box->w;
-				image_size.h = bg->image.height*box->w;
-				image_size.h = 1.0*image_size.h / bg->image.width;
-				image_pos.x = 0;
-				image_pos.y = (box->h - image_size.h) / 2;
+				image_w = box->w;
+				image_h = bg->image.height*box->w;
+				image_h = 1.0*image_h / bg->image.width;
+				image_x = 0;
+				image_y = (box->h - image_h) / 2;
 			} else {
-				image_size.h = box->h;
-				image_size.w = bg->image.width*box->h;
-				image_size.w = 1.0*image_size.w / bg->image.height;
-				image_pos.x = (box->w - image_size.w) / 2;
-				image_pos.y = 0;
+				image_h = box->h;
+				image_w = bg->image.width*box->h;
+				image_w = 1.0*image_w / bg->image.height;
+				image_x = (box->w - image_w) / 2;
+				image_y = 0;
 			}
 			break;
 		case SV_AUTO:
 		default:
-			Graph_GetSize( &bg->image, &image_size );
+			image_w = bg->image.width;
+			image_h = bg->image.height;
 			break;
 		}
 	} else {
 		switch( bg->size.w.type ) {
 		case SVT_SCALE:
-			image_size.w = box->w * bg->size.w.scale;
+			image_w = box->w * bg->size.w.scale;
 			break;
 		case SVT_PX:
-			image_size.w = bg->size.w.px;
+			image_w = bg->size.w.px;
 			break;
 		default:
-			image_size.w = bg->image.width;
+			image_w = bg->image.width;
 			break;
 		}
 		switch( bg->size.h.type ) {
 		case SVT_SCALE:
-			image_size.h = box->h * bg->size.h.scale;
+			image_h = box->h * bg->size.h.scale;
 			break;
 		case SVT_PX:
-			image_size.h = bg->size.h.px;
+			image_h = bg->size.h.px;
 			break;
 		default:
-			image_size.h = bg->image.height;
+			image_h = bg->image.height;
 			break;
 		}
 	}
@@ -126,67 +119,71 @@ void Graph_DrawBackground(
 		switch( bg->position.value ) {
 		case SV_TOP:
 		case SV_TOP_CENTER:
-			image_pos.x = (box->w - image_size.w) / 2;
-			image_pos.y = 0;
+			image_x = (box->w - image_w) / 2;
+			image_y = 0;
 			break;
 		case SV_TOP_RIGHT:
-			image_pos.x = box->w - image_size.w;
-			image_pos.y = 0;
+			image_x = box->w - image_w;
+			image_y = 0;
 			break;
 		case SV_CENTER_LEFT:
-			image_pos.x = 0;
-			image_pos.y = (box->h - image_size.h) / 2;
+			image_x = 0;
+			image_y = (box->h - image_h) / 2;
 			break;
 		case SV_CENTER:
 		case SV_CENTER_CENTER:
-			image_pos.x = (box->w - image_size.w) / 2;
-			image_pos.y = (box->h - image_size.h) / 2;
+			image_x = (box->w - image_w) / 2;
+			image_y = (box->h - image_h) / 2;
 			break;
 		case SV_CENTER_RIGHT:
-			image_pos.x = box->w - image_size.w;
-			image_pos.y = (box->h - image_size.h) / 2;
+			image_x = box->w - image_w;
+			image_y = (box->h - image_h) / 2;
 			break;
 		case SV_BOTTOM_LEFT:
-			image_pos.x = 0;
-			image_pos.y = box->h - image_size.h;
+			image_x = 0;
+			image_y = box->h - image_h;
 			break;
 		case SV_BOTTOM_CENTER:
-			image_pos.x = (box->w - image_size.w) / 2;
-			image_pos.y = box->h - image_size.h;
+			image_x = (box->w - image_w) / 2;
+			image_y = box->h - image_h;
 			break;
 		case SV_BOTTOM_RIGHT:
-			image_pos.x = box->w - image_size.w;
-			image_pos.y = box->h - image_size.h;
+			image_x = box->w - image_w;
+			image_y = box->h - image_h;
 			break;
 		case SV_TOP_LEFT:
-		default:
-			break;
+		default:image_x = image_y = 0; break;
 		}
 	} else {
 		switch( bg->position.x.type ) {
 		case SVT_SCALE:
-			image_pos.x = box->w - image_size.w;
-			image_pos.x *= bg->position.x.scale;
+			image_x = box->w - image_w;
+			image_x *= bg->position.x.scale;
 			break;
 		case SVT_PX:
-			image_pos.x = bg->position.x.px;
+			image_x = bg->position.x.px;
 			break;
-		default:break;
+		default:image_x = 0; break;
 		}
 		switch( bg->position.y.type ) {
 		case SVT_SCALE:
-			image_pos.y = box->h - image_size.h;
-			image_pos.y *= bg->position.y.scale;
+			image_y = box->h - image_h;
+			image_y *= bg->position.y.scale;
 			break;
 		case SVT_PX:
-			image_pos.y = bg->position.y.px;
+			image_y = bg->position.y.px;
 			break;
-		default:break;
+		default:image_y = 0; break;
 		}
 	}
 	/* 获取当前绘制区域与背景内容框的重叠区域 */
 	if( !LCUIRect_GetOverlayRect( box, &paint->rect, &paint_rect ) ) {
 		return;
+	}
+	if( bg->color.alpha < 255 ) {
+		mixer = Graph_Mix;
+	} else {
+		mixer = Graph_Mix2;
 	}
 	paint_rect.x -= paint->rect.x;
 	paint_rect.y -= paint->rect.y;
@@ -196,26 +193,26 @@ void Graph_DrawBackground(
 	paint_rect.x += paint->rect.x - box->x;
 	paint_rect.y += paint->rect.y - box->y;
 	/* 保存背景图像区域 */
-	read_rect.x = image_pos.x;
-	read_rect.y = image_pos.y;
-	read_rect.width = image_size.w;
-	read_rect.height = image_size.h;
+	read_rect.x = image_x;
+	read_rect.y = image_y;
+	read_rect.width = image_w;
+	read_rect.height = image_h;
 	/* 获取当前绘制区域与背景图像的重叠区域 */
 	if( !LCUIRect_GetOverlayRect( &read_rect, &paint_rect, &read_rect ) ) {
 		return;
 	}
 	/* 转换成相对于图像的坐标 */
-	read_rect.x -= image_pos.x;
-	read_rect.y -= image_pos.y;
+	read_rect.x -= image_x;
+	read_rect.y -= image_y;
 	/* 如果尺寸没有变化则直接引用 */
-	if( image_size.w == bg->image.w && image_size.h == bg->image.h ) {
+	if( image_w == bg->image.w && image_h == bg->image.h ) {
 		Graph_Quote( &graph, &bg->image, &read_rect );
 		/* 转换成相对于当前绘制区域的坐标 */
-		image_pos.x = image_pos.x + box->x - paint->rect.x;
-		image_pos.y = image_pos.y + box->y - paint->rect.y;
-		image_pos.x += read_rect.x;
-		image_pos.y += read_rect.y;
-		Graph_Mix( &paint->canvas, &graph, image_pos );
+		image_x = image_x + box->x - paint->rect.x;
+		image_y = image_y + box->y - paint->rect.y;
+		image_x += read_rect.x;
+		image_y += read_rect.y;
+		mixer( &paint->canvas, &graph, image_x, image_y );
 	} else {
 		float scale;
 		LCUI_Graph buffer;
@@ -224,28 +221,28 @@ void Graph_DrawBackground(
 		Graph_Init( &buffer );
 		quote_rect = read_rect;
 		/* 根据宽高的缩放比例，计算实际需要引用的区域 */
-		if( image_size.w != bg->image.w ) {
-			scale = 1.0 * bg->image.width / image_size.w;
+		if( image_w != bg->image.w ) {
+			scale = 1.0 * bg->image.width / image_w;
 			quote_rect.x *= scale;
 			quote_rect.width *= scale;
 		}
-		if( image_size.h != bg->image.h ) {
-			scale = 1.0 * bg->image.height / image_size.h;
+		if( image_h != bg->image.h ) {
+			scale = 1.0 * bg->image.height / image_h;
 			quote_rect.y *= scale;
 			quote_rect.height *= scale;
 		}
 		/* 引用源背景图像的一块区域 */
 		Graph_Quote( &graph, &bg->image, &quote_rect );
-		image_size.w = read_rect.width;
-		image_size.h = read_rect.height;
+		image_w = read_rect.width;
+		image_h = read_rect.height;
 		/* 计算相对于绘制区域的坐标 */
-		image_pos.x = read_rect.x + image_pos.x;
-		image_pos.x = image_pos.x + box->x - paint->rect.x;
-		image_pos.y = read_rect.y + image_pos.y;
-		image_pos.y = image_pos.y + box->y - paint->rect.y;
+		image_x = read_rect.x + image_x;
+		image_x = image_x + box->x - paint->rect.x;
+		image_y = read_rect.y + image_y;
+		image_y = image_y + box->y - paint->rect.y;
 		/* 按比例进行缩放 */
-		Graph_Zoom( &graph, &buffer, FALSE, image_size );
-		Graph_Mix( &paint->canvas, &buffer, image_pos );
+		Graph_Zoom( &graph, &buffer, FALSE, image_w, image_h );
+		mixer( &paint->canvas, &buffer, image_x, image_y );
 		Graph_Free( &buffer );
 	}
 }

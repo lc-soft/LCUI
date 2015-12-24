@@ -88,6 +88,12 @@ enum GraphColorType {
     __back__ =_ALPHA_BLEND(__back__,__fore__,__alpha__);	\
 }
 
+#define PIXEL_BLEND(px1, px2, a) {		\
+	ALPHA_BLEND( px1->r, px2->r, a );	\
+	ALPHA_BLEND( px1->g, px2->g, a );	\
+	ALPHA_BLEND( px1->b, px2->b, a );	\
+}
+
 /* 获取像素的RGB值 */
 #define RGB_FROM_RGB565(pixel, r, g, b)	\
 {\
@@ -198,7 +204,7 @@ LCUI_API int Graph_SetGreenBits( LCUI_Graph *graph, uchar_t *g, size_t size );
 LCUI_API int Graph_SetBlueBits( LCUI_Graph *graph, uchar_t *b, size_t size );
 
 LCUI_API int Graph_Zoom( const LCUI_Graph *graph, LCUI_Graph *buff,
-			 LCUI_BOOL keep_scale, LCUI_Size size );
+			 LCUI_BOOL keep_scale, int width, int height );
 
 LCUI_API int Graph_Cut( const LCUI_Graph *graph, LCUI_Rect rect,
 		        LCUI_Graph *buff );
@@ -217,10 +223,26 @@ LCUI_API int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha );
 LCUI_API int Graph_Tile( LCUI_Graph *buff,  const LCUI_Graph *graph,
 			 LCUI_BOOL replace );
 
-LCUI_API int Graph_Mix( LCUI_Graph *bg, const LCUI_Graph *fg, LCUI_Pos pos );
+/** 混合两张图层
+ * 如果两张图层都有Alpha通道，则会混合它们的Alpha通道，并覆盖背景图原有的Alpha通道。
+ * @param[in][out] back 背景图层
+ * @param[in] fore 前景图层
+ * @param[in] left 前景图层的左边距
+ * @param[in] top 前景图层的上边距
+ */
+LCUI_API int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top );
 
-LCUI_API int Graph_Replace( LCUI_Graph *bg,  const LCUI_Graph *fg,
-			    LCUI_Pos pos );
+/** 混合两张图层，忽略背景图层的Alpha通道
+ * 该函数主要针对不透明但又有Alpha通道的背景图，省去了多余的Alpha通道混合步骤。
+ * @warning 两张图层必须都有Alpha通道
+ * @param[in][out] back 背景图层
+ * @param[in] fore 前景图层
+ * @param[in] left 前景图层的左边距
+ * @param[in] top 前景图层的上边距
+ */
+LCUI_API int Graph_Mix2( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top );
+
+LCUI_API int Graph_Replace( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top );
 
 LCUI_END_HEADER
 

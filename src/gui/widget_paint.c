@@ -332,7 +332,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		/* 直接将部件绘制到目标位图缓存中 */
 		if( Graph_IsValid(&w->graph) ) {
 			Graph_Quote( &self_graph, &w->graph, &paint->rect );
-			Graph_Mix( &paint->canvas, &self_graph, Pos(0,0) );
+			Graph_Mix( &paint->canvas, &self_graph, 0, 0 );
 		} else {
 			Widget_OnPaint( w, paint );
 		}
@@ -409,14 +409,14 @@ content_paint_done:
 		Graph_Init( &layer_graph );
 		layer_graph.color_type = COLOR_TYPE_ARGB;
 		Graph_Copy( &layer_graph, &self_graph );
-		Graph_Mix( &layer_graph, &content_graph,
-			   Pos(content_rect.x, content_rect.y) );
+		Graph_Mix( &layer_graph, &content_graph, 
+			   content_rect.x, content_rect.y );
 		layer_graph.opacity = w->computed_style.opacity;
-		Graph_Mix( &paint->canvas, &layer_graph, Pos(0,0) );
+		Graph_Mix( &paint->canvas, &layer_graph, 0, 0 );
 	}
 	else if( has_content_graph ) {
 		Graph_Mix( &paint->canvas, &content_graph,
-			   Pos(content_rect.x, content_rect.y) );
+			   content_rect.x, content_rect.y );
 	}
 	Graph_Free( &layer_graph );
 	Graph_Free( &self_graph );

@@ -1325,6 +1325,8 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 int TextLayer_Draw( LCUI_TextLayer layer )
 {
 	LCUI_Rect rect;
+	LCUI_Pos pos = {0,0};
+
 	/* 如果文本位图缓存无效 */
 	if( layer->is_using_buffer && !Graph_IsValid( &layer->graph ) ) {
 		return -1;
@@ -1333,7 +1335,7 @@ int TextLayer_Draw( LCUI_TextLayer layer )
 	rect.y = 0;
 	rect.w = layer->max_width;
 	rect.h = layer->max_height;
-	return TextLayer_DrawToGraph( layer, rect, Pos(0,0), &layer->graph );
+	return TextLayer_DrawToGraph( layer, rect, pos, &layer->graph );
 }
 
 /** 清除已记录的无效矩形 */
