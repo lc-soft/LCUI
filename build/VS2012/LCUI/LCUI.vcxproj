@@ -239,7 +239,6 @@
     <ClCompile Include="..\..\..\src\misc\dirent.c" />
     <ClCompile Include="..\..\..\src\misc\framectrl.c" />
     <ClCompile Include="..\..\..\src\misc\linkedlist.c" />
-    <ClCompile Include="..\..\..\src\misc\misc.c" />
     <ClCompile Include="..\..\..\src\misc\parse.c" />
     <ClCompile Include="..\..\..\src\misc\rbtree.c" />
     <ClCompile Include="..\..\..\src\misc\rect.c" />

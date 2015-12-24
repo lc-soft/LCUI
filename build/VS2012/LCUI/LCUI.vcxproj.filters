@@ -260,9 +260,6 @@
     <ClCompile Include="..\..\..\src\misc\delay.c">
       <Filter>源文件\misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\misc.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\misc\rect.c">
       <Filter>源文件\misc</Filter>
     </ClCompile>
