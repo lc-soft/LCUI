@@ -356,7 +356,7 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 			break;
 		}
 		if( font_id <= 0 ) {
-			font_id = fontlib.incore_font->id;
+			font_id = fontlib.default_font->id;
 		}
 		ctx = SelectFont( ctx, font_id );
 		if( !ctx ) {
