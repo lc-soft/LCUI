@@ -423,63 +423,59 @@ static int Graph_CutARGB( const LCUI_Graph *graph, LCUI_Rect rect,
 	return 0;
 }
 
-static void Graph_ARGBMixARGB( LCUI_Graph *dest, LCUI_Rect des_rect,
+static void Graph_ARGBMixARGB( LCUI_Graph *dst, LCUI_Rect des_rect,
 			       const LCUI_Graph *src, int src_x, int src_y )
 {
-	int x, y, r, g, b, a;
-	LCUI_ARGB *px_src, *px_dest;
+	float a;
+	int x, y;
+	uchar_t src_a;
+	LCUI_ARGB *px_src, *px_dst;
 	LCUI_ARGB *px_row_src, *px_row_des;
 	px_row_src = src->argb + src_y*src->width + src_x;
-	px_row_des = dest->argb + des_rect.y*dest->width + des_rect.x;
+	px_row_des = dst->argb + des_rect.y*dst->width + des_rect.x;
 	if( src->opacity < 1.0 ) {
 		goto mix_with_opacity;
 	}
-	for( y=0; y<des_rect.height; ++y ) {
+	for( y=0; y<des_rect.h; ++y ) {
 		px_src = px_row_src;
-		px_dest = px_row_des;
-		for( x=0; x<des_rect.width; ++x ) {
-			r = px_dest->r * px_dest->a + px_src->r * px_src->a;
-			g = px_dest->g * px_dest->a + px_src->g * px_src->a;
-			b = px_dest->b * px_dest->a + px_src->b * px_src->a;
-			r >>= 8;
-			g >>= 8;
-			b >>= 8;
-			a = 255;
-			a -= ((255 - px_dest->a)*(255 - px_src->a)) >> 16;
-			px_dest->r = r + (r * (255 - a) >> 8);
-			px_dest->g = g + (g * (255 - a) >> 8);
-			px_dest->b = b + (b * (255 - a) >> 8);
-			px_dest->a = a;
+		px_dst = px_row_des;
+		for( x=0; x<des_rect.w; ++x ) {
+			a = ((255.0 - px_src->a) * px_dst->a) / 65025.0;
+			px_dst->r = px_dst->r * a;
+			px_dst->g = px_dst->g * a;
+			px_dst->b = px_dst->b * a;
+			px_dst->a = 255.0 * a;
+			px_dst->r += (px_src->r * px_src->a) >> 8;
+			px_dst->g += (px_src->r * px_src->a) >> 8;
+			px_dst->b += (px_src->r * px_src->a) >> 8;
+			px_dst->a += px_src->a;
 			++px_src;
-			++px_dest;
+			++px_dst;
 		}
-		px_row_des += dest->width;
-		px_row_src += src->width;
+		px_row_des += dst->w;
+		px_row_src += src->w;
 	}
 	return;
 
 mix_with_opacity:
 	for( y=0; y<des_rect.height; ++y ) {
 		px_src = px_row_src;
-		px_dest = px_row_des;
+		px_dst = px_row_des;
 		for( x=0; x<des_rect.width; ++x ) {
-			a = px_src->a * src->opacity;
-			r = (px_dest->r * px_dest->a + px_src->r * a);
-			g = (px_dest->g * px_dest->a + px_src->g * a);
-			b = (px_dest->b * px_dest->a + px_src->b * a);
-			a = ((255 - px_dest->a)*(255 - a)) >> 16;
-			a = 255 - a;
-			r += r * (255 - a);
-			g += g * (255 - a);
-			b += b * (255 - a);
-			px_dest->r = r >> 8;
-			px_dest->g = g >> 8;
-			px_dest->b = b >> 8;
-			px_dest->a = a;
+			src_a = px_src->a * src->opacity;
+			a = ((255.0 - px_src->a) * px_dst->a) / 65025.0;
+			px_dst->r = px_dst->r * a;
+			px_dst->g = px_dst->g * a;
+			px_dst->b = px_dst->b * a;
+			px_dst->a = 255.0 * a;
+			px_dst->r += (px_src->r * src_a) >> 8;
+			px_dst->g += (px_src->g * src_a) >> 8;
+			px_dst->b += (px_src->b * src_a) >> 8;
+			px_dst->a += src_a;
 			++px_src;
-			++px_dest;
+			++px_dst;
 		}
-		px_row_des += dest->width;
+		px_row_des += dst->width;
 		px_row_src += src->width;
 	}
 }
@@ -684,8 +680,7 @@ static int Graph_FillRectARGB( LCUI_Graph *graph, LCUI_Color color,
 
 /*-------------------------------- End ARGB --------------------------------*/
 
-/** 改变色彩类型 */
-int Graph_ChangeColorType( LCUI_Graph *graph, int color_type )
+int Graph_SetColorType( LCUI_Graph *graph, int color_type )
 {
 	if( graph->color_type == color_type ) {
 		return -1;

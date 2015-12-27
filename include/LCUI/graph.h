@@ -89,9 +89,9 @@ enum GraphColorType {
 }
 
 #define PIXEL_BLEND(px1, px2, a) {		\
-	ALPHA_BLEND( px1->r, px2->r, a );	\
-	ALPHA_BLEND( px1->g, px2->g, a );	\
-	ALPHA_BLEND( px1->b, px2->b, a );	\
+	ALPHA_BLEND( (px1)->r, (px1)->r, a );	\
+	ALPHA_BLEND( (px1)->g, (px1)->g, a );	\
+	ALPHA_BLEND( (px1)->b, (px1)->b, a );	\
 }
 
 /* 获取像素的RGB值 */
@@ -163,7 +163,7 @@ LCUI_API void PixelsFormat( const uchar_t *in_pixels, int in_color_type,
 		   	    size_t pixel_count );
 
 /** 改变色彩类型 */
-LCUI_API int Graph_ChangeColorType( LCUI_Graph *graph, int color_type );
+LCUI_API int Graph_SetColorType( LCUI_Graph *graph, int color_type );
 
 LCUI_API int Graph_Create( LCUI_Graph *graph, int w, int h );
 
@@ -224,7 +224,7 @@ LCUI_API int Graph_Tile( LCUI_Graph *buff,  const LCUI_Graph *graph,
 			 LCUI_BOOL replace );
 
 /** 混合两张图层
- * 如果两张图层都有Alpha通道，则会混合它们的Alpha通道，并覆盖背景图原有的Alpha通道。
+ * 将前景图混合到背景图上
  * @param[in][out] back 背景图层
  * @param[in] fore 前景图层
  * @param[in] left 前景图层的左边距
