@@ -2,6 +2,9 @@
 
 ![LCUI Logo](http://lcui.org/files/images/lcui-project-logo.png)
 
+[![Gitter](https://badges.gitter.im/LC-Team/LCUI.svg)](https://gitter.im/LC-Team/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
+
 ## 说明
 
 LCUI 是一个简单的跨平台图形界面库，适用于开发一些简单的小程序，其诞生目的主要是方便作者开发GUI程序。
@@ -88,11 +91,6 @@ windows系统上构建本项目方法，有两种：
 2. 使用Cygwin或MSYS，可按照上述1至6的步骤进行构建，在完成步骤3后，请修改include/LCUI/
 目录下的 `config.h` 文件，定义 `LCUI_BUILD_IN_WIN32` 宏，若有 `LCUI_BUILD_IN_LINUX` 宏，
 请删除它。该方法并未实际测试，如有其它方法请告知。
-
-### 当前的构建状态
-LCUI基于 Travis CI 服务进行构建，每向该代码库推送一次代码提交，会将构建任务添加
-至持续集成服务的队列中，并且会运行一些测试以确保该项目的稳定。当前的构建状态是：
-[![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
 
 ### 系统需求
 
