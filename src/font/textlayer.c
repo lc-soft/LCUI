@@ -1163,7 +1163,8 @@ int TextLayer_GetWidth( LCUI_TextLayer layer )
 	for( row=0,max_w=0; row<layer->row_list.length; ++row ) {
 		p_row = layer->row_list.rows[row];
 		for( i=0, w=0; i<p_row->length; ++i ) {
-			if( !p_row->string[i]->bitmap ) {
+			if( !p_row->string[i]->bitmap ||
+			    !p_row->string[i]->bitmap->buffer ) {
 				continue;
 			}
 			w += p_row->string[i]->bitmap->advance.x;
@@ -1197,9 +1198,6 @@ void TextLayer_ReloadCharBitmap( LCUI_TextLayer layer )
 		for( col=0; col<p_row->length; ++col ) {
 			p_char = p_row->string[col];
 			TextChar_UpdateBitmap( p_char, &layer->text_style );
-			if( !p_char->bitmap ) {
-				continue;
-			}
 		}
 		TextLayer_UpdateRowSize( layer, p_row );
 	}

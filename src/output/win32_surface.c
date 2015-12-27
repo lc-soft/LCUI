@@ -376,7 +376,7 @@ static void Win32Surface_SetRenderMode( LCUI_Surface surface, int mode )
 static LCUI_PaintContext Win32Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 {
 	LCUI_PaintContext paint;
-	paint = (LCUI_PaintContext)malloc(sizeof(LCUI_PaintContextRec_));
+	paint = (LCUI_PaintContext)malloc(sizeof(LCUI_PaintContextRec));
 	Graph_Init( &paint->canvas );
 	Graph_Quote( &paint->canvas, &surface->fb, rect );
 	paint->rect = *rect;

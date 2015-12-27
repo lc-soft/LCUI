@@ -74,7 +74,7 @@ LCUI_API void Widget_ValidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type );
 LCUI_API int Widget_ProcInvalidArea( LCUI_Widget w, LinkedList *rlist );
 
 /** 
- * 将转换部件中的矩形区域转换成指定范围框内有效的矩形区域
+ * 将部件中的矩形区域转换成指定范围框内有效的矩形区域
  * @param[in]	w		目标部件
  * @param[in]	in_rect		相对于部件呈现框的矩形区域
  * @param[out]	out_rect	转换后的区域

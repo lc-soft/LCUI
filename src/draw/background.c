@@ -51,7 +51,7 @@ void Background_Init( LCUI_Background *bg )
 	bg->position.value = SV_AUTO;
 }
 
-typedef void(*MixerPtr)(LCUI_Graph*, const LCUI_Graph *, int, int);
+typedef void(*MixerPtr)(LCUI_Graph*, const LCUI_Graph*, int, int);
 
 void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 			   LCUI_Background *bg )
