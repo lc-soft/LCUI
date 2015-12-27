@@ -1,6 +1,7 @@
 # The LCUI Project
 
 [![Join the chat at https://gitter.im/LC-Team/LCUI](https://badges.gitter.im/LC-Team/LCUI.svg)](https://gitter.im/LC-Team/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
 
 ![LCUI Logo](http://lcui.org/files/images/lcui-project-logo.png)
 
@@ -37,14 +38,6 @@ In the simplest case you would run:
 
 Please note that if you downloaded the source code (rather than cloned 
 via git) you likely miss the submodules and the build will therefor fail.
-
-## Current Build Status
-
-LCUI is built under Travis CI service. Every commit pushed to this repository 
-will queue a build into the continuous integration service and will run sime 
-tests to ensure that everything is going well and the project is stable. The 
-current build status is:
-[![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
 
 ## Bugs 
 
