@@ -1,5 +1,7 @@
 # The LCUI Project
 
+[![Join the chat at https://gitter.im/LC-Team/LCUI](https://badges.gitter.im/LC-Team/LCUI.svg)](https://gitter.im/LC-Team/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ![LCUI Logo](http://lcui.org/files/images/lcui-project-logo.png)
 
 ## Description
