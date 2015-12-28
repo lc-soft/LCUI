@@ -123,7 +123,7 @@ LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id,
 	return w;
 }
 
-void SideBarItem_OnInit( LCUI_Widget w )
+static void SideBarItem_OnInit( LCUI_Widget w )
 {
 	SideBarItem *sbi = Widget_NewPrivateData(w, SideBarItem);
 	sbi->icon = LCUIWidget_New("textview");
@@ -135,20 +135,38 @@ void SideBarItem_OnInit( LCUI_Widget w )
 	Widget_Append( w, sbi->text );
 }
 
-void SideBarItem_OnDestroy( LCUI_Widget w )
+static void SideBarItem_OnDestroy( LCUI_Widget w )
 {
 
 }
 
-void SideBar_OnInit( LCUI_Widget w )
+static void SideBar_OnInit( LCUI_Widget w )
 {
 	SideBar *sb = Widget_NewPrivateData( w, SideBar );
 	LinkedList_Init( &sb->items );
 }
 
-void SideBar_OnDestroy( LCUI_Widget w )
+static void SideBar_OnDestroy( LCUI_Widget w )
 {
 
+}
+
+static void OnToggle( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
+{
+	LCUI_Widget sidebar = w->parent->parent;
+	_DEBUG_MSG("on click\n");
+	if( Widget_HasClass( w, "sidebar-mini" ) ) {
+		Widget_RemoveClass( sidebar, "sidebar-mini" );
+	} else {
+		Widget_AddClass( sidebar, "sidebar-mini" );
+	}
+	Widget_Update( sidebar, FALSE );
+	e->cancel_bubble = TRUE;
+}
+
+static void SideBarToggle_OnInit( LCUI_Widget w )
+{
+	Widget_BindEvent( w, "click", OnToggle, NULL, NULL );
 }
 
 void LCUIWidget_AddSideBar(void)
@@ -160,5 +178,7 @@ void LCUIWidget_AddSideBar(void)
 	wc = LCUIWidget_AddClass("sidebar-item");
 	wc->methods.init = SideBarItem_OnInit;
 	wc->methods.destroy = SideBarItem_OnDestroy;
+	wc = LCUIWidget_AddClass("sidebar-toggle");
+	wc->methods.init = SideBarToggle_OnInit;
 	LCUI_LoadCSS( sidebar_css );
 }
