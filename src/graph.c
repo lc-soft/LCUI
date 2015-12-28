@@ -1158,8 +1158,6 @@ int Graph_Mix2( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top )
 {
 	LCUI_Graph w_slot;
 	LCUI_Rect r_rect, w_rect;
-	MixerPtr mixer = NULL;
-
 	if( !Graph_IsValid(back) || !Graph_IsValid(fore) ) {
 		return -1;
 	}
