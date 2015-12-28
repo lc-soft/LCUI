@@ -58,21 +58,19 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_StyleValue float_mode;	/**< 浮动模式 */
 	LCUI_StyleValue display;	/**< 显示方式，决定以何种布局显示该部件 */
 	LCUI_StyleValue box_sizing;	/**< 以何种方式计算宽度和高度 */
-
 	union {
 		LCUI_Style w, width;	/**< 部件区域宽度 */
 	};
 	union {
 		LCUI_Style h, height;	/**< 部件区域高度 */
 	};
-
 	struct {
 		LCUI_Style top, right, bottom, left;
 	} margin, padding;		/**< 外边距, 内边距 */
-
 	LCUI_Background background;	/**< 背景 */
 	LCUI_BoxShadow shadow;		/**< 阴影 */
 	LCUI_Border border;		/**< 边框 */
+	int pointer_events;		/**< 事件的处理方式 */
 } LCUI_WidgetStyle;
 
 /** 样式属性名 */
@@ -143,6 +141,7 @@ enum LCUI_StyleKeyName {
 	key_box_shadow_blur,
 	key_box_shadow_color,
 	key_box_shadow_end,
+	key_pointer_events,
 	STYLE_KEY_TOTAL
 };
 
@@ -174,6 +173,7 @@ enum WidgetTaskType {
 	WTT_REFRESH_STYLE,	/**< 刷新部件全部样式 */
 	WTT_UPDATE_STYLE,	/**< 更新部件自定义样式 */
 	WTT_TITLE,
+	WTT_PROPS,		/**< 更新一些属性 */
 	WTT_BOX_SIZING,
 	WTT_PADDING,
 	WTT_MARGIN,
@@ -282,6 +282,9 @@ LCUI_API void Widget_FlushPosition( LCUI_Widget w );
 
 /** 刷新尺寸 */
 LCUI_API void Widget_FlushSize( LCUI_Widget w );
+
+/** 刷新各项属性 */
+void Widget_FlushProps( LCUI_Widget w );
 
 /** 计算部件通过继承得到的样式表 */
 LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );

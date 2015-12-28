@@ -505,7 +505,8 @@ static KeyNameGroup style_name_map[] = {
 	{ key_border_top_style, "border-top-style" },
 	{ key_border_right_style, "border-right-style" },
 	{ key_border_bottom_style, "border-bottom-style" },
-	{ key_border_left_style, "border-left-style" }
+	{ key_border_left_style, "border-left-style" },
+	{ key_pointer_events, "pointer-events" }
 };
 
 /** 样式字符串与标识码的映射表 */
@@ -566,6 +567,7 @@ static LCUI_StyleParser style_parser_map[] = {
 	{ key_border_right_style, NULL, OnParseStyleOption },
 	{ key_border_bottom_style, NULL, OnParseStyleOption },
 	{ key_border_left_style, NULL, OnParseStyleOption },
+	{ key_pointer_events, NULL, OnParseStyleOption },
 	{ -1, "border", OnParseBorder },
 	{ -1, "border-left", OnParseBorderLeft },
 	{ -1, "border-top", OnParseBorderTop },

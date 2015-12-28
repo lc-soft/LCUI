@@ -145,6 +145,7 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->computed_style.visible = TRUE;
 	widget->computed_style.position = SV_STATIC;
 	widget->computed_style.display = SV_BLOCK;
+	widget->computed_style.pointer_events = SV_AUTO;
 	widget->inherited_style = StyleSheet();
 	widget->computed_style.width.type = SVT_AUTO;
 	widget->computed_style.height.type = SVT_AUTO;
@@ -678,6 +679,12 @@ void Widget_FlushSize( LCUI_Widget w )
 		}
 	}
 	Widget_SendResizeEvent( w );
+}
+
+void Widget_FlushProps( LCUI_Widget w )
+{
+	int prop = ComputeStyleOption( w, key_pointer_events, SV_AUTO );
+	w->computed_style.pointer_events = prop;
 }
 
 /** 计算内边距 */

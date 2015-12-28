@@ -817,7 +817,8 @@ void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
 		{ key_position_start, key_position_end, WTT_POSITION, TRUE },
 		{ key_border_start, key_border_end, WTT_BORDER, TRUE },
 		{ key_background_start, key_background_end, WTT_BACKGROUND, TRUE },
-		{ key_box_shadow_start, key_box_shadow_end, WTT_SHADOW, TRUE }
+		{ key_box_shadow_start, key_box_shadow_end, WTT_SHADOW, TRUE },
+		{ key_pointer_events, key_pointer_events, WTT_PROPS, TRUE }
 	};
 	if( is_update_all ) {
 		Widget_ComputeInheritStyle( w, w->inherited_style );

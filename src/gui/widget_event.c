@@ -80,11 +80,11 @@ static void DestroyWidgetEventTask( void *arg )
 /** 将原始事件转换成部件事件 */
 static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 {
-	LinkedList *children;
+	int x, y;
+	LCUI_Widget w;
 	LinkedListNode *node;
-	LCUI_Widget widget;
-	LCUI_WidgetEventPack *pack = (LCUI_WidgetEventPack*)event->data;
-
+	LCUI_WidgetEventPack *pack;
+	pack = (LCUI_WidgetEventPack*)event->data;
 	pack->event.data = task->data;
 	pack->event.type = event->id;
 	pack->event.type_name = event->name;
@@ -98,37 +98,49 @@ static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
 	case LCUI_KEYPRESS:
 	default: break;
 	}
-	widget = pack->widget;
-	task->func( widget, &pack->event, pack->data );
-	if( pack->event.cancel_bubble ) {
-		return;
+	w = pack->widget;
+	if( strcmp( event->name, "click" ) == 0 ) {
+		_DEBUG_MSG("tip\n");
 	}
+	/* 如果该部件需要事件处理 */
+	if( w->computed_style.pointer_events == SV_AUTO ) {
+		task->func( w, &pack->event, pack->data );
+		if( pack->event.cancel_bubble ) {
+			return;
+		}
+	}
+	pack->event.x += w->box.content.x;
+	pack->event.y += w->box.content.y;
 	/* 开始进行事件冒泡传播 */
-	while( widget && widget->parent ) {
-		if( widget->parent ) {
-			children = &widget->parent->children_show;	
-		} else {
-			children = &LCUIRootWidget->children_show;
-		}
-		/* 确定自己的显示位置，忽略显示在它前面的部件 */
-		LinkedList_ForEach( node, children ) {
-			if( widget == node->data ) {
-				node = node->next;
-				break;
-			}
-		}
-		/* 向后面的部件传播事件 */
-		while( node ) {
-			if( !widget->computed_style.visible ) {
+	for( w = w->parent; w; w = w->parent ) {
+		x = pack->event.x;
+		y = pack->event.y;
+		node = Widget_GetShowNode( w );
+		for( ; node; node = node->next ) {
+			w = node->data;
+			_DEBUG_MSG("bubble to sibling: %s\n", w->type);
+			/* 如果忽略事件处理，则向它底层的兄弟部件传播事件 */
+			if( w->computed_style.pointer_events == SV_NONE ) {
 				continue;
 			}
-			task->func( widget, &pack->event, pack->data );
+			if( !w->computed_style.visible ) {
+				continue;
+			}
+			if( !LCUIRect_HasPoint( &w->box.border, x, y ) ) {
+				continue;
+			}
+			_DEBUG_MSG("%s catched event\n", w->type);
+			pack->event.x = x - w->box.content.x;
+			pack->event.y = y - w->box.content.y;
+			task->func( w, &pack->event, pack->data );
 			if( pack->event.cancel_bubble ) {
 				return;
 			}
+			break;
 		}
-		/* 开始向父级部件传播事件 */
-		widget = widget->parent;
+		pack->event.x = x + w->box.content.x;
+		pack->event.y = y + w->box.content.y;
+		_DEBUG_MSG("bubble to parent: %s\n", w->parent ? w->parent->type:NULL);
 	}
 }
 
@@ -164,7 +176,7 @@ static void OnWidgetEvent( LCUI_Event *event, void *arg )
  * 预先注册一个事件，并指定事件名和事件ID
  * 如果需要将多个事件绑定在同一个事件处理器上，并且，不想通过进行字符串比较来
  * 区分事件类型，则可以使用该函数，但需要注意的是，指定的事件ID最好不要与系统
- * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WIDGET_USER 
+ * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WET_USER 
  * 以后的值都可以使用，例如：WET_USER + 1，WET_USER + 200。
  */
 int Widget_AddEvent( LCUI_Widget widget, const char *event_name, int id )
@@ -327,10 +339,12 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 		ebuff.type = WET_MOUSEUP;
 		ebuff.type_name = "mouseup";
 		Widget_PostEvent( target, &ebuff, NULL );
+		_DEBUG_MSG( "target: %s, prev: %s\n", target->type, 
+			    self.targets[WST_ACTIVE] ? self.targets[WST_ACTIVE]->type :"null" );
 		if( self.targets[WST_ACTIVE] == target ) {
+			_DEBUG_MSG("post click event\n");
 			ebuff.type = WET_CLICK;
 			ebuff.type_name = "click";
-			ebuff.cancel_bubble = TRUE;
 			Widget_PostEvent( target, &ebuff, NULL );
 		}
 		Widget_UpdateStatus( NULL, WST_ACTIVE );
@@ -386,6 +400,7 @@ int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 /** 处理一次当前积累的部件事件 */
 void LCUIWidget_StepEvent(void)
 {
+	int count;
 	LCUI_Widget widget;
 	LinkedListNode *prev, *node;
 
@@ -396,7 +411,10 @@ void LCUIWidget_StepEvent(void)
 		LinkedList_DeleteNode( &self.pending_list, node );
 		node = prev;
 		DEBUG_MSG("dispatch event, widget: %p\n", widget->type);
-		LCUIEventBox_Dispatch( widget->event );
+		count = LCUIEventBox_Dispatch( widget->event );
+		if( count == 0 ) {
+			//WidgetEventHandler( )
+		}
 	}
 	DEBUG_MSG("exit\n");
 }

@@ -64,6 +64,15 @@ typedef struct LCUI_TextView_ {
 	} tasks[TASK_TOTAL];
 } LCUI_TextView;
 
+
+static const char *textview_css = ToString(
+
+textview {
+	pointer-events: none;
+}
+
+);
+
 /*---------------------------- Private -------------------------------*/
 
 enum FontStyleKey {
@@ -489,4 +498,5 @@ void LCUIWidget_AddTextView( void )
 		style_key_map[style_parsers[i].key] = 
 		LCUICSSParser_Register( &style_parsers[i] );
 	}
+	LCUI_LoadCSS( textview_css );
 }
