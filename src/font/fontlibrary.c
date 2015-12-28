@@ -480,8 +480,8 @@ static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 				LCUI_Rect *read_rect )
 {
 	int x, y;
+	LCUI_ARGB *px, *px_row_des;
 	uchar_t a, *byte_ptr, *byte_row_ptr;
-	LCUI_ARGB *px, *px_row_des, *fc_ptr = &color;
 	byte_row_ptr = bmp->buffer + read_rect->y*bmp->width;
 	byte_row_ptr += read_rect->x;
 	px_row_des = graph->argb + write_rect->y * graph->w;

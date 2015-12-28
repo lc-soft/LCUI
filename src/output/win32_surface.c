@@ -298,7 +298,6 @@ static void Win32Surface_ExecResize( LCUI_Surface surface, int w, int h )
 {
 	HDC hdc_client;
 	HBITMAP old_bmp;
-
 	surface->w = w;
 	surface->h = h;
 	_DEBUG_MSG("w = %d, h = %d\n", w, h);

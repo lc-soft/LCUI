@@ -196,7 +196,7 @@ static void LinuxFB_SetRenderMode( LCUI_Surface surface, int mode )
 LCUI_PaintContext LinuxFB_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 {
 	LCUI_PaintContext paint;
-	paint = (LCUI_PaintContext)malloc(sizeof(LCUI_PaintContextRec_));
+	paint = (LCUI_PaintContext)malloc(sizeof(LCUI_PaintContextRec));
 	Graph_Init( &paint->canvas );
 	Graph_Create( &paint->canvas, rect->w, rect->h );
 	paint->rect = *rect;
