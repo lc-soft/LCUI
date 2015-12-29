@@ -154,13 +154,12 @@ static void SideBar_OnDestroy( LCUI_Widget w )
 static void OnToggle( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 {
 	LCUI_Widget sidebar = w->parent->parent;
-	_DEBUG_MSG("on click\n");
-	if( Widget_HasClass( w, "sidebar-mini" ) ) {
+	if( Widget_HasClass( sidebar, "sidebar-mini" ) ) {
 		Widget_RemoveClass( sidebar, "sidebar-mini" );
 	} else {
 		Widget_AddClass( sidebar, "sidebar-mini" );
 	}
-	Widget_Update( sidebar, FALSE );
+	Widget_Update( sidebar, TRUE );
 	e->cancel_bubble = TRUE;
 }
 
