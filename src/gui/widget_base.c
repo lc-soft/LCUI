@@ -904,7 +904,7 @@ LCUI_BOOL StrList_Has( char **strlist, const char *str )
 	return FALSE;
 }
 
-int StrList_Remove( char ***strlist, const char *str )
+static int StrList_RemoveOne( char ***strlist, const char *str )
 {
 	int i, pos, len;
 	char **newlist;
@@ -935,6 +935,30 @@ int StrList_Remove( char ***strlist, const char *str )
 	free( *strlist );
 	*strlist = newlist;
 	return 1;
+}
+
+int StrList_Remove( char ***strlist, const char *str )
+{
+	char buff[256];
+	int count = 0, i, head;
+
+	for( head = 0, i = 0; str[i]; ++i ) {
+		if( str[i] != ' ' ) {
+			continue;
+		}
+		if( i - 1 > head ) {
+			strncpy( buff, &str[head], i - head );
+			buff[i - head] = 0;
+			count += StrList_RemoveOne( strlist, buff );
+		}
+		head = i + 1;
+	}
+	if( i - 1 > head ) {
+		strncpy( buff, &str[head], i - head );
+		buff[i - head] = 0;
+		count += StrList_RemoveOne( strlist, buff );
+	}
+	return count;
 }
 
 /** 为部件添加一个类 */
