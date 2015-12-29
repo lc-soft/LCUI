@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * widget_event.c -- LCUI widget event module.
  * 
- * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_event.c -- LCUI部件事件模块
  *
- * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -78,70 +78,30 @@ static void DestroyWidgetEventTask( void *arg )
 }
 
 /** 将原始事件转换成部件事件 */
-static void WidgetEventHandler( LCUI_Event *event, LCUI_WidgetEventTask *task )
+static void WidgetEventHandler( LCUI_Event *e, LCUI_WidgetEventTask *task )
 {
-	int x, y;
 	LCUI_Widget w;
-	LinkedListNode *node;
 	LCUI_WidgetEventPack *pack;
-	pack = (LCUI_WidgetEventPack*)event->data;
+	pack = (LCUI_WidgetEventPack*)e->data;
 	pack->event.data = task->data;
-	pack->event.type = event->id;
-	pack->event.type_name = event->name;
-	DEBUG_MSG("event: %s, task: %p\n", event->name, task);
-	switch( event->id ) {
-	case LCUI_INPUT:
-	case LCUI_MOUSEUP:
-	case LCUI_MOUSEDOWN:
-	case LCUI_KEYUP:
-	case LCUI_KEYDOWN:
-	case LCUI_KEYPRESS:
-	default: break;
-	}
+	pack->event.type = e->id;
+	pack->event.type_name = e->name;
 	w = pack->widget;
-	if( strcmp( event->name, "click" ) == 0 ) {
-		_DEBUG_MSG("tip\n");
+	task->func( w, &pack->event, pack->data );
+	if( pack->event.cancel_bubble ) {
+		return;
 	}
-	/* 如果该部件需要事件处理 */
-	if( w->computed_style.pointer_events == SV_AUTO ) {
-		task->func( w, &pack->event, pack->data );
-		if( pack->event.cancel_bubble ) {
-			return;
-		}
+	if( !w->parent ) {
+		return;
 	}
-	pack->event.x += w->box.content.x;
-	pack->event.y += w->box.content.y;
-	/* 开始进行事件冒泡传播 */
-	for( w = w->parent; w; w = w->parent ) {
-		x = pack->event.x;
-		y = pack->event.y;
-		node = Widget_GetShowNode( w );
-		for( ; node; node = node->next ) {
-			w = node->data;
-			_DEBUG_MSG("bubble to sibling: %s\n", w->type);
-			/* 如果忽略事件处理，则向它底层的兄弟部件传播事件 */
-			if( w->computed_style.pointer_events == SV_NONE ) {
-				continue;
-			}
-			if( !w->computed_style.visible ) {
-				continue;
-			}
-			if( !LCUIRect_HasPoint( &w->box.border, x, y ) ) {
-				continue;
-			}
-			_DEBUG_MSG("%s catched event\n", w->type);
-			pack->event.x = x - w->box.content.x;
-			pack->event.y = y - w->box.content.y;
-			task->func( w, &pack->event, pack->data );
-			if( pack->event.cancel_bubble ) {
-				return;
-			}
-			break;
-		}
-		pack->event.x = x + w->box.content.x;
-		pack->event.y = y + w->box.content.y;
-		_DEBUG_MSG("bubble to parent: %s\n", w->parent ? w->parent->type:NULL);
-	}
+	pack->event.x += w->box.border.x;
+	pack->event.y += w->box.border.y;
+	w = w->parent;
+	pack->event.x += w->padding.left;
+	pack->event.y += w->padding.top;
+	pack->widget = w;
+	/** 向父级部件冒泡传递事件 */
+	LCUIEventBox_Send( w->event, e->name, pack );
 }
 
 /** 响应原始事件 */
@@ -172,25 +132,11 @@ static void OnWidgetEvent( LCUI_Event *event, void *arg )
 	LCUI_AddTask( &task );
 }
 
-/**
- * 预先注册一个事件，并指定事件名和事件ID
- * 如果需要将多个事件绑定在同一个事件处理器上，并且，不想通过进行字符串比较来
- * 区分事件类型，则可以使用该函数，但需要注意的是，指定的事件ID最好不要与系统
- * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WET_USER 
- * 以后的值都可以使用，例如：WET_USER + 1，WET_USER + 200。
- */
 int Widget_AddEvent( LCUI_Widget widget, const char *event_name, int id )
 {
 	return LCUIEventBox_AddEvent( &widget->event, event_name, id );
 }
 
-/**
- * 为部件绑定事件
- * 需要提供事件的名称、事件处理器（回调函数）、附加数据、数据销毁函数。
- * 通常，事件处理器可能会需要更多的参数，这些参数可作为附加数据，每次
- * 调用事件处理器时，都可以根据附加数据进行相应的操作。
- * 附加数据会在解除事件绑定时被释放。
- */
 int Widget_BindEvent(	LCUI_Widget widget, const char *event_name,
 			void(*func)(LCUI_Widget,LCUI_WidgetEvent*, void*), 
 			void *func_data, void (*destroy_data)(void*) )
@@ -207,56 +153,130 @@ int Widget_BindEvent(	LCUI_Widget widget, const char *event_name,
 	);
 }
 
-/** 
- * 解除与事件的绑定
- * 这将解除所有与该事件绑定的事件处理器，当传入事件名为NULL时，将解除所有事件
- * 绑定。
- */
 int Widget_UnbindEvent( LCUI_Widget widget, const char *event_name )
 {
 	return 0;
 }
 
-/** 
- * 解除指定的事件处理器的事件绑定
- * 需传入事件处理器的ID，该ID可在绑定事件时得到。
- */
 int Widget_UnbindEventById( LCUI_Widget widget, int id )
 {
 	return 0;
 }
 
-/** 
- * 将事件投递给事件处理器，等待处理
- * 事件将会追加至事件队列中，等待下一轮的批处理时让对应的事件处理器进行处理
- */
+static LCUI_Widget Widget_GetNextAt( LCUI_Widget widget, int x, int y )
+{
+	LCUI_Widget w;
+	LinkedListNode *node;
+	node = Widget_GetShowNode( widget );
+	for( node = node->next; node; node = node->next ) {
+		w = node->data;
+		/* 如果忽略事件处理，则向它底层的兄弟部件传播事件 */
+		if( w->computed_style.pointer_events == SV_NONE ) {
+			continue;
+		}
+		if( !w->computed_style.visible ) {
+			continue;
+		}
+		if( !LCUIRect_HasPoint( &w->box.border, x, y ) ) {
+			continue;
+		}
+		return w;
+	}
+	return NULL;
+}
+
 int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 {
 	int ret;
 	LCUI_WidgetEventPack *pack;
-
-	pack = NEW(LCUI_WidgetEventPack, 1);
+	pack = NEW( LCUI_WidgetEventPack, 1 );
+	pack->is_direct_run = FALSE;
+	pack->widget = widget;
 	pack->data = data;
 	pack->event = *e;
-	pack->widget = widget;
-	pack->is_direct_run = FALSE;
-	DEBUG_MSG("pack: %p\n", pack);
-	ret = LCUIEventBox_Post( widget->event, e->type_name, pack, NULL );
+	switch( e->type ) {
+	case WET_CLICK:
+	case WET_MOUSEDOWN:
+	case WET_MOUSEMOVE:
+	case WET_MOUSEUP:
+	case WET_MOUSEOVER:
+	case WET_MOUSEOUT:
+		if( widget->computed_style.pointer_events == SV_NONE ) {
+			break;
+		}
+	default:
+		ret = LCUIEventBox_Post( widget->event, e->type_name,
+					 pack, NULL );
+		if( ret == 0 ) {
+			LinkedList_Append( &self.pending_list, widget );
+			return 0;
+		}
+		free( pack );
+		if( !widget->parent ) {
+			return -1;
+		}
+		/* 如果事件投递失败，则向父级部件冒泡 */
+		return Widget_PostEvent( widget->parent, e, data );
+	}
+	if( !widget->parent ) {
+		free( pack );
+		return -1;
+	}
+	/* 转换成相对于父级部件内容框的坐标 */
+	pack->event.x += widget->box.border.x;
+	pack->event.y += widget->box.border.y;
+	/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
+	widget = Widget_GetNextAt( widget, pack->event.x, pack->event.y );
+	/* 找不到就向父级部件冒泡 */
+	if( !widget ) {
+		free( pack );
+		return Widget_PostEvent( widget->parent, e, data );
+	}
+	pack->event.x -= widget->box.border.x;
+	pack->event.y -= widget->box.border.y;
 	LinkedList_Append( &self.pending_list, widget );
-	return ret;
+	return LCUIEventBox_Post( widget->event, e->type_name, pack, NULL );
 }
 
-/** 
- * 直接将事件发送至处理器 
- * 这将会直接调用与事件绑定的事件处理器（回调函数）
- */
 int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 {
+	int ret;
 	LCUI_WidgetEventPack pack;
 	pack.data = data;
 	pack.event = *e;
 	pack.widget = widget;
 	pack.is_direct_run = TRUE;
+	switch( e->type ) {
+	case WET_CLICK:
+	case WET_MOUSEDOWN:
+	case WET_MOUSEMOVE:
+	case WET_MOUSEUP:
+	case WET_MOUSEOVER:
+	case WET_MOUSEOUT:
+		if( widget->computed_style.pointer_events == SV_NONE ) {
+			break;
+		}
+	default:
+		ret = LCUIEventBox_Send( widget->event, e->type_name, &pack );
+		if( ret == 0 ) {
+			return 0;
+		}
+		if( !widget->parent ) {
+			return -1;
+		}
+		return Widget_SendEvent( widget->parent, e, data );
+	}
+	if( !widget->parent ) {
+		return -1;
+	}
+	pack.event.x += widget->box.border.x;
+	pack.event.y += widget->box.border.y;
+	widget = Widget_GetNextAt( widget, pack.event.x, pack.event.y );
+	if( !widget ) {
+		return Widget_SendEvent( widget->parent, e, data );
+	}
+	pack.event.x -= widget->box.border.x;
+	pack.event.y -= widget->box.border.y;
 	return LCUIEventBox_Send( widget->event, e->type_name, &pack );
 }
 
@@ -397,7 +417,6 @@ int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 	return Widget_PostEvent( LCUIRootWidget, &e, *((int**)n) );
 }
 
-/** 处理一次当前积累的部件事件 */
 void LCUIWidget_StepEvent(void)
 {
 	int count;
@@ -419,7 +438,6 @@ void LCUIWidget_StepEvent(void)
 	DEBUG_MSG("exit\n");
 }
 
-/** 初始化 LCUI 部件的事件系统 */
 void LCUIWidget_InitEvent(void)
 {
 	LinkedList_Init( &self.pending_list );
@@ -434,7 +452,6 @@ void LCUIWidget_InitEvent(void)
 	self.targets[WST_HOVER] = NULL;
 }
 
-/** 销毁（释放） LCUI 部件的事件系统的相关资源 */
 void LCUIWidget_ExitEvent(void)
 {
 	

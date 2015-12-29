@@ -890,7 +890,7 @@ int StrList_Add( char ***strlist, const char *str )
 	return count;
 }
 
-LCUI_BOOL strlist_has_str( char **strlist, const char *str )
+LCUI_BOOL StrList_Has( char **strlist, const char *str )
 {
 	int i;
 	if( !strlist ) {
@@ -904,7 +904,7 @@ LCUI_BOOL strlist_has_str( char **strlist, const char *str )
 	return FALSE;
 }
 
-int strlist_remove_str( char ***strlist, const char *str )
+int StrList_Remove( char ***strlist, const char *str )
 {
 	int i, pos, len;
 	char **newlist;
@@ -951,13 +951,13 @@ int Widget_AddClass( LCUI_Widget w, const char *class_name )
 /** 判断部件是否包含指定的类 */
 LCUI_BOOL Widget_HasClass( LCUI_Widget w, const char *class_name )
 {
-	return strlist_has_str( w->classes, class_name );
+	return StrList_Has( w->classes, class_name );
 }
 
 /** 从部件中移除一个类 */
 int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 {
-	if( strlist_remove_str( &w->classes, class_name ) <= 0 ) {
+	if( StrList_Remove( &w->classes, class_name ) <= 0 ) {
 		return 0;
 	}
 	Widget_AddTask( w, WTT_REFRESH_STYLE );
@@ -979,13 +979,13 @@ int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 /** 判断部件是否包含指定的状态 */
 LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name )
 {
-	return strlist_has_str( w->pseudo_classes, status_name );
+	return StrList_Has( w->pseudo_classes, status_name );
 }
 
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 {
-	if( strlist_remove_str( &w->pseudo_classes, status_name ) != 1 ) {
+	if( StrList_Remove( &w->pseudo_classes, status_name ) != 1 ) {
 		return 0;
 	}
 	Widget_AddTask( w, WTT_REFRESH_STYLE );
