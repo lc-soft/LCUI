@@ -61,35 +61,34 @@ void RBTree_Init( LCUI_RBTree *rbt )
 	rbt->need_free_data = 0;
 }
 
-/** 销毁红黑树 */
-void RBTree_Destroy( LCUI_RBTree *rbt )
+static void DestroyRBTreeNode( LCUI_RBTree *rbt, LCUI_RBTreeNode *node )
 {
-	LCUI_RBTreeNode *node, *next_node;
-	node = RBTree_First( rbt );
 	if( !node ) {
 		return;
 	}
-	next_node = RBTree_Next( node );
-	while( next_node ) {
-		/* 移除在父节点中的记录 */
-		if( node->parent ) {
-			if( node->parent->left == node ) {
-				node->parent->left = NULL;
-			} else {
-				node->parent->right = NULL;
-			}
+	DestroyRBTreeNode( rbt, node->left );
+	DestroyRBTreeNode( rbt, node->right );
+	if( node->parent ) {
+		if( node->parent->left == node ) {
+			node->parent->left = NULL;
+		} else {
+			node->parent->right = NULL;
 		}
-		/* 释放该结点 */
-		if( rbt->destroy ) {
-			rbt->destroy( node->data );
-		}
-		if( rbt->need_free_data ) {
-			free( node->data );
-		}
-		free( node );
-		node = next_node;
-		next_node = RBTree_Next( node );
 	}
+	if( rbt->destroy ) {
+		rbt->destroy( node->data );
+	}
+	if( rbt->need_free_data ) {
+		free( node->data );
+	}
+	node->data = NULL;
+}
+
+/** 销毁红黑树 */
+void RBTree_Destroy( LCUI_RBTree *rbt )
+{
+	rbt->total_node = 0;
+	DestroyRBTreeNode( rbt, rbt->root );
 }
 
 /** 获取第一个结点 */

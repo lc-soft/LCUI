@@ -667,6 +667,9 @@ void LCUI_ExitFont( void )
 		--fontlib.font_cache_num;
 		for( i=0; i<FONT_CACHE_SIZE; ++i ) {
 			font = fontlib.font_cache[fontlib.font_cache_num][i];
+			if( !font ) {
+				continue;
+			}
 			free( font->family_name );
 			free( font->style_name );
 			if( font->data ) {

@@ -152,7 +152,9 @@ static void OnEvent( LCUI_Event *event, void *arg )
 static void FuncDataDestroy( void *arg )
 {
 	FuncData *data = (FuncData*)arg;
-	data->arg_destroy( data->arg );
+	if( data->arg ) {
+		data->arg_destroy( data->arg );
+	}
 	data->arg = NULL;
 }
 

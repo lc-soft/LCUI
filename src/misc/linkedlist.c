@@ -153,7 +153,7 @@ void LinkedList_Delete( LinkedList *list, int pos )
 void *LinkedList_Get( LinkedList *list, int pos )
 {
 	LinkedListNode *node = LinkedList_GetNode( list, pos );
-	return node->data;
+	return node ? node->data:NULL;
 }
 
 LinkedListNode *LinkedList_Append( LinkedList *list, void *data )

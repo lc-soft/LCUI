@@ -218,10 +218,7 @@ int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
 	handler->func_data = func_data;
 	handler->destroy_data = destroy_data;
 	LinkedList_Append( &slot->handlers, handler );
-	/* 将int类型的值转换成void×类型的值 */
-	data = &slot->id;
-	data = *(void**)data;
-	RBTree_Insert( &box->event_handler, handler->id, data );
+	RBTree_Insert( &box->event_handler, handler->id, handler );
 	return handler->id;
 }
 

@@ -62,7 +62,7 @@ int LCUICond_Init( LCUI_Cond *cond )
 /** 销毁一个条件变量 */
 int LCUICond_Destroy( LCUI_Cond *cond )
 {
-	CloseHandle(cond);
+	CloseHandle( *cond );
 	return 0;
 }
 
