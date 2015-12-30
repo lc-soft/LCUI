@@ -2,7 +2,6 @@
 
 [![Join the chat at https://gitter.im/LC-Team/LCUI](https://badges.gitter.im/LC-Team/LCUI.svg)](https://gitter.im/LC-Team/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
-[![Coverage Status](https://coveralls.io/repos/LC-Team/LCUI/badge.svg?branch=develop&service=github)](https://coveralls.io/github/LC-Team/LCUI?branch=develop)
 
 ![LCUI Logo](http://lcui.org/files/images/lcui-project-logo.png)
 

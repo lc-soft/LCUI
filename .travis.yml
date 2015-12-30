@@ -3,14 +3,9 @@ language: c
 compiler:
   - clang
   - gcc
-before_install:
-  - pip install --user cpp-coveralls
-  
+
 before_script: ./autogen.sh
 
 script:
-  - ./configure --enable-gcov
+  - ./configure
   - make
-  
-after_success:
-  - coveralls --exclude lib --exclude tests --gcov-options '\-lp'
