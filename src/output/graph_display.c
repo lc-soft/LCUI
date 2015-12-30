@@ -161,7 +161,11 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 	p_sr->surface = Surface_New();
 	Surface_SetCaptionW( p_sr->surface, widget->title );
 	p_rect = &widget->box.graph;
-	Surface_Move( p_sr->surface, p_rect->x, p_rect->y );
+
+	if( widget->style->sheet[key_top].is_valid && 
+	    widget->style->sheet[key_left].is_valid ) {
+		Surface_Move( p_sr->surface, p_rect->x, p_rect->y );
+	}
 	Surface_Resize( p_sr->surface, p_rect->w, p_rect->h );
 	if( widget->computed_style.visible ) {
 		Surface_Show( p_sr->surface );
@@ -229,7 +233,8 @@ static int LCUIDisplay_FullScreen( void )
 		return 0;
 	}
 	display.mode = LDM_FULLSCREEN;
-	LCUIDisplay_SetSize( display.info.getWidth(), display.info.getHeight() );
+	LCUIDisplay_SetSize( display.info.getWidth(), 
+			     display.info.getHeight() );
 	return 0;
 }
 
@@ -324,12 +329,12 @@ static void LCUIDisplay_Thread( void *unused )
 }
 
 /** 响应顶级部件的各种事件 */
-static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
+static void Widget_OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent *e, 
+				   void *arg )
 {
-	int e_type = *((int*)&arg);
-	LCUI_Surface surface;
 	LCUI_Rect *p_rect;
-
+	LCUI_Surface surface;
+	int e_type = *((int*)&arg);
 	DEBUG_MSG("tip, widget: %s, e_type = %d\n", w->type, e_type);
 	surface = LCUIDisplay_GetBindSurface( e->target );
 	if( display.mode == LDM_SEAMLESS ) {
@@ -371,6 +376,10 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 		}
 		break;
 	case WET_MOVE:
+		if( !w->style->sheet[key_top].is_valid ||
+		    !w->style->sheet[key_left].is_valid ) {
+			break;
+		}
 		DEBUG_MSG( "x: %d, y: %d\n", p_rect->left, p_rect->top );
 		Surface_Move( surface, p_rect->left, p_rect->top );
 		break;
@@ -378,7 +387,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 	}
 }
 
-static void OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
+static void Surface_OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
 {
 #ifdef LCUI_BUILD_IN_WIN32
 	if( display.mode == LDM_SEAMLESS ) {
@@ -394,7 +403,7 @@ static void OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
 }
 
 /** 在 surface 主动产生无效区域的时候 */
-static void OnInvalidRect( LCUI_Surface surface, LCUI_Rect *rect )
+static void Surface_OnInvalidRect( LCUI_Surface surface, LCUI_Rect *rect )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
@@ -518,12 +527,12 @@ int LCUI_InitDisplay( void )
 #elif defined(LCUI_VIDEO_DRIVER_FRAMEBUFFER)
 	display.methods = LCUIDisplay_InitLinuxFB( &display.info );
 #endif
-	display.methods->onInvalidRect = OnInvalidRect;
-	display.methods->onEvent = OnEvent;
+	display.methods->onInvalidRect = Surface_OnInvalidRect;
+	display.methods->onEvent = Surface_OnEvent;
 	display.fc_ctx = FrameControl_Create();
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( LCUIRootWidget, "surface",
-			  OnSurfaceEvent, NULL, NULL );
+			  Widget_OnSurfaceEvent, NULL, NULL );
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
 }
 

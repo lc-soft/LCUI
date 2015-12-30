@@ -223,6 +223,9 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 		return 0;
 	}
 	case WM_CLOSE:
+		if( LCUIDisplay_GetMode() != LDM_SEAMLESS ) {
+			LCUI_Quit();
+		}
 		break;
 	case WM_DESTROY:
 		Win32Surface_ExecDelete( surface );
@@ -422,7 +425,6 @@ static void Win32Surface_Present( LCUI_Surface surface )
 static void Win32Surface_Update( LCUI_Surface surface )
 {
 	LCUI_SurfaceTask *t;
-
 	if( !surface->hwnd ) {
 		return;
 	}
@@ -432,13 +434,11 @@ static void Win32Surface_Update( LCUI_Surface surface )
 		Win32Surface_ExecMove( surface, t->x, t->y );
 		t->is_valid = FALSE;
 	}
-
 	t = &surface->task_buffer[TASK_RESIZE];
 	if( t->is_valid ) {
 		Win32Surface_ExecResize( surface, t->width, t->height );
 		t->is_valid = FALSE;
 	}
-
 	t = &surface->task_buffer[TASK_SET_CAPTION];
 	if( t->is_valid ) {
 		SetWindowText( surface->hwnd, t->caption );
@@ -448,7 +448,6 @@ static void Win32Surface_Update( LCUI_Surface surface )
 		}
 	}
 	t->is_valid = FALSE;
-
 	t = &surface->task_buffer[TASK_SHOW];
 	DEBUG_MSG("surface: %p, hwnd: %p, is_valid: %d, show: %d\n",
 	 surface, surface->hwnd, t->is_valid, t->show);
