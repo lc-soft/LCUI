@@ -66,8 +66,8 @@ enum ParserBehavior {
 	PB_ENTER	/**< 进入子元素列表 */
 };
 
-typedef struct ParserContext ParserContext, *ParserContextPtr;
-typedef int(*ParserFuncPtr)(ParserContextPtr, xmlNodePtr);
+typedef struct XMLParserContextRec_ XMLParserContextRec, *XMLParserContext;
+typedef int(*ParserFuncPtr)(XMLParserContext, xmlNodePtr);
 
 typedef struct Parser {
 	int id;
@@ -75,7 +75,7 @@ typedef struct Parser {
 	ParserFuncPtr parse;
 } Parser, *ParserPtr;
 
-struct ParserContext {
+struct XMLParserContextRec_ {
 	int id;
 	LCUI_Widget widget;
 	LCUI_Widget root;
@@ -88,7 +88,7 @@ static struct ModuleContext {
 } self;
 
 /** 解析<resource>元素，根据相关参数载入资源 */
-static int ParseResource( ParserContextPtr ctx, xmlNodePtr node )
+static int ParseResource( XMLParserContext ctx, xmlNodePtr node )
 {
 	xmlAttrPtr prop;
 	const char *prop_val, *type = NULL, *src = NULL;
@@ -114,12 +114,12 @@ static int ParseResource( ParserContextPtr ctx, xmlNodePtr node )
 		LCUIFont_LoadFile( src );
 	} 
 	else if( strstr(type, "text/css") ) {
-		LCUI_LoadCSSFile( src );
+		LCUICSS_LoadFile( src );
 		for( node = node->children; node; node = node->next ) {
 			if( node->type != XML_TEXT_NODE ) {
 				continue;
 			}
-			LCUI_LoadCSS( (char*)node->content );
+			LCUICSS_LoadString( (char*)node->content );
 			node = node->next;
 		}
 	}
@@ -127,7 +127,7 @@ static int ParseResource( ParserContextPtr ctx, xmlNodePtr node )
 }
 
 /** 解析<ui>元素，主要作用是创建一个容纳全部部件的根级部件 */
-static int ParseUI( ParserContextPtr ctx, xmlNodePtr node )
+static int ParseUI( XMLParserContext ctx, xmlNodePtr node )
 {
 	if( node->type != XML_ELEMENT_NODE ) {
 		return PB_NEXT;
@@ -141,7 +141,7 @@ static int ParseUI( ParserContextPtr ctx, xmlNodePtr node )
 }
 
 /** 解析<widget>元素数据 */
-static int ParseWidget( ParserContextPtr ctx, xmlNodePtr node )
+static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 {
 	xmlAttrPtr prop;
 	LCUI_WidgetClass *wc = NULL;
@@ -226,11 +226,10 @@ static void LCUIBuilder_Init( void )
 }
 
 /** 解析 xml 文档结点 */
-static void ParseNode( ParserContextPtr ctx, xmlNodePtr node )
+static void ParseNode( XMLParserContext ctx, xmlNodePtr node )
 {
 	ParserPtr p;
-	ParserContext cur_ctx;
-
+	XMLParserContextRec cur_ctx;
 	for( ; node; node = node->next ) {
 		if( node->type == XML_ELEMENT_NODE ) {
 			p = RBTree_CustomGetData( &self.parsers, node->name );
@@ -271,8 +270,7 @@ LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
-	ParserContext ctx;
-
+	XMLParserContextRec ctx;
 	doc = xmlParseMemory( str, size );
 	if( !doc ) {
 		printf( "[builder] Failed to parse xml form memory\n" );
@@ -306,8 +304,7 @@ LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
-	ParserContext ctx;
-
+	XMLParserContextRec ctx;
 	doc = xmlParseFile( filepath );
 	if( !doc ) {
 		printf( "[builder] Failed to parse xml file: %s\n", filepath );

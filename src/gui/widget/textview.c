@@ -214,7 +214,7 @@ static int OnParseLineHeight( LCUI_StyleSheet ss, int key, const char *str )
 	return -1;
 }
 
-static LCUI_StyleParser style_parsers[] = { 
+static LCUI_StyleParserRec style_parsers[] = { 
 	{ key_color, "color", OnParseColor },
 	{ key_font_family, "font-family", OnParseFontFamily },
 	{ key_font_size, "font-size", OnParseFontSize },
@@ -496,7 +496,7 @@ void LCUIWidget_AddTextView( void )
 	wc->task_handler = TextView_OnTask;
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
 		style_key_map[style_parsers[i].key] = 
-		LCUICSSParser_Register( &style_parsers[i] );
+		LCUICSS_AddParser( &style_parsers[i] );
 	}
-	LCUI_LoadCSS( textview_css );
+	LCUICSS_LoadString( textview_css );
 }

@@ -273,8 +273,8 @@ void LCUIWidget_InitStyle( void )
 	RBTree_OnJudge( &style_library.style, CompareName );
 	RBTree_OnDestroy( &style_library.style, DestroyStyleTreeNode );
 	style_library.is_inited = TRUE;
-	LCUICSSParser_Init();
-	LCUI_LoadCSS( global_css );
+	LCUICSS_Init();
+	LCUICSS_LoadString( global_css );
 }
 
 /** 销毁，释放资源 */
@@ -282,17 +282,17 @@ void LCUIWidget_ExitStyle( void )
 {
 	RBTree_Destroy( &style_library.style );
 	style_library.is_inited = FALSE;
-	LCUICSSParser_Destroy();
+	LCUICSS_Destroy();
 }
 
 LCUI_StyleSheet StyleSheet( void )
 {
 	LCUI_StyleSheet ss;
-	ss = (LCUI_StyleSheet)malloc( sizeof(LCUI_StyleSheetRec_) );
+	ss = malloc( sizeof( LCUI_StyleSheetRec ) );
 	if( !ss ) {
 		return ss;
 	}
-	ss->length = LCUI_GetStyleTotal();
+	ss->length = LCUICSS_GetStyleTotal();
 	ss->sheet = NEW(LCUI_Style, ss->length + 1);
 	return ss;
 }
@@ -453,8 +453,8 @@ LCUI_BOOL SelectorIsEqual( LCUI_Selector s1, LCUI_Selector s2 )
 	return FALSE;
 }
 
-static LCUI_StyleSheet 
-SelectStyleSheetByName( LCUI_Selector selector, const char *name )
+static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector, 
+					       const char *name )
 {
 	int i = 0, pos = -1;
 	LinkedListNode *node;

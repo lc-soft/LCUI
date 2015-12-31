@@ -43,7 +43,7 @@
 #include <LCUI/gui/widget.h>
 
 /** 解析器的环境参数（上下文数据） */
-typedef struct ParserContext {
+typedef struct CSSParserContextRec_ {
 	enum {
 		is_none,		/**< 无 */
 		is_selector,		/**< 选择器 */
@@ -58,8 +58,8 @@ typedef struct ParserContext {
 	const char *ptr;		/**< 用于遍历字符串的指针 */
 	LinkedList selectors;		/**< 当前匹配到的选择器列表 */
 	LCUI_StyleSheet css;		/**< 当前缓存的样式表 */
-	LCUI_StyleParser *parser;	/**< 当前找到的解析器 */
-} ParserContext, *ParserContextPtr;
+	LCUI_StyleParser parser;	/**< 当前找到的解析器 */
+} CSSParserContextRec, *CSSParserContext;
 
 /** 样式字符串值与标识码 */
 typedef struct KeyNameGroup {
@@ -543,7 +543,7 @@ static KeyNameGroup style_option_map[] = {
 };
 
 /** 各个样式的解析器映射表 */
-static LCUI_StyleParser style_parser_map[] = {
+static LCUI_StyleParserRec style_parser_map[] = {
 	{ key_width, NULL, OnParseNumber },
 	{ key_height, NULL, OnParseNumber },
 	{ key_top, NULL, OnParseNumber },
@@ -584,7 +584,7 @@ static LCUI_StyleParser style_parser_map[] = {
 
 static int CompareParserName( void *data, const void *keydata )
 {
-	return strcmp(((LCUI_StyleParser*)data)->name, (const char*)keydata);
+	return strcmp(((LCUI_StyleParser)data)->name, (const char*)keydata);
 }
 
 static int CompareName( void *data, const void *keydata )
@@ -592,9 +592,9 @@ static int CompareName( void *data, const void *keydata )
 	return strcmp(((KeyNameGroup*)data)->name, (const char*)keydata);
 }
 
-static ParserContextPtr NewParserContext( size_t buffer_size )
+static CSSParserContext NewCSSParserContext( size_t buffer_size )
 {
-	ParserContextPtr ctx = NEW(ParserContext, 1);
+	CSSParserContext ctx = NEW(CSSParserContextRec, 1);
 	LinkedList_Init( &ctx->selectors );
 	ctx->buffer = (char*)malloc( sizeof(char) * buffer_size );
 	ctx->buffer_size = buffer_size;
@@ -603,9 +603,9 @@ static ParserContextPtr NewParserContext( size_t buffer_size )
 	return ctx;
 }
 
-static void DeleteParserContext( ParserContextPtr *ctx_ptr )
+static void DeleteCSSParserContext( CSSParserContext *ctx_ptr )
 {
-	ParserContextPtr ctx = *ctx_ptr;
+	CSSParserContext ctx = *ctx_ptr;
 	LinkedList_Clear( &ctx->selectors, (FuncPtr)DeleteSelector );
 	free( ctx->buffer );
 	free( ctx );
@@ -613,7 +613,7 @@ static void DeleteParserContext( ParserContextPtr *ctx_ptr )
 }
 
 /** 载入CSS代码块，用于实现CSS代码的分块载入 */
-static int LCUI_LoadCSSBlock( ParserContextPtr ctx, const char *str )
+static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
 {
 	size_t size = 0;
 	LCUI_Selector s;
@@ -764,56 +764,56 @@ parse_value:
 }
 
 /** 从文件中载入CSS样式数据，并导入至样式库中 */
-int LCUI_LoadCSSFile( const char *filepath )
+int LCUICSS_LoadFile( const char *filepath )
 {
 	int n;
 	FILE *fp;
 	char buff[512];
-	ParserContextPtr ctx;
+	CSSParserContext ctx;
 	
 	fp = fopen( filepath, "r" );
 	if( !fp ) {
 		return -1;
 	}
-	ctx = NewParserContext( 512 );
+	ctx = NewCSSParserContext( 512 );
 	n = fread( buff, 1, 511, fp );
 	while( n > 0 ) {
 		buff[n] = 0;
-		LCUI_LoadCSSBlock( ctx, buff );
+		LCUICSS_LoadBlock( ctx, buff );
 		n = fread( buff, 1, 511, fp );
 	}
-	DeleteParserContext( &ctx );
+	DeleteCSSParserContext( &ctx );
 	fclose( fp );
 	return 0;
 }
 
 /** 从字符串中解析出样式，并导入至样式库中 */
-int LCUI_LoadCSS( const char *str )
+int LCUICSS_LoadString( const char *str )
 {
 	int len = 1;
 	const char *cur;
-	ParserContextPtr ctx;
+	CSSParserContext ctx;
 	DEBUG_MSG("parse begin\n");
-	ctx = NewParserContext( 512 );
+	ctx = NewCSSParserContext( 512 );
 	for( cur = str; len > 0; cur += len ) {
-		len = LCUI_LoadCSSBlock( ctx, cur );
+		len = LCUICSS_LoadBlock( ctx, cur );
 	}
-	DeleteParserContext( &ctx );
+	DeleteCSSParserContext( &ctx );
 	DEBUG_MSG("parse end\n");
 	return 0;
 }
 
 /** 获取当前记录的样式属性的总数 */
-int LCUI_GetStyleTotal(void)
+int LCUICSS_GetStyleTotal(void)
 {
 	return self.count;
 }
 
 /** 注册新的属性和对应的属性值解析器 */
-int LCUICSSParser_Register( LCUI_StyleParser *sp )
+int LCUICSS_AddParser( LCUI_StyleParser sp )
 {
 	int key;
-	LCUI_StyleParser *new_sp;
+	LCUI_StyleParser new_sp;
 	if( !sp->name || strlen(sp->name) < 1 ) {
 		return -1;
 	}
@@ -821,7 +821,7 @@ int LCUICSSParser_Register( LCUI_StyleParser *sp )
 		return -2;
 	}
 	key = self.count++;
-	new_sp = calloc(1, sizeof(LCUI_StyleParser));
+	new_sp = NEW(LCUI_StyleParserRec, 1);
 	new_sp->key = sp->key;
 	new_sp->parse = sp->parse;
 	new_sp->name = strdup( sp->name );
@@ -831,11 +831,10 @@ int LCUICSSParser_Register( LCUI_StyleParser *sp )
 }
 
 /** 初始化 LCUI 的 CSS 代码解析功能 */
-void LCUICSSParser_Init(void)
+void LCUICSS_Init(void)
 {
-	LCUI_StyleParser *new_sp, *sp, *sp_end;
 	KeyNameGroup *skn, *skn_end;
-
+	LCUI_StyleParser new_sp, sp, sp_end;
 	/* 构建一个红黑树，方便按名称查找解析器 */
 	RBTree_Init( &self.parser_tree );
 	RBTree_Init( &self.option_tree );
@@ -851,9 +850,9 @@ void LCUICSSParser_Init(void)
 		RBTree_Insert( &self.name_tree, skn->key, skn->name );
 	}
 	sp = style_parser_map;
-	sp_end = sp + sizeof(style_parser_map)/sizeof(LCUI_StyleParser);
+	sp_end = sp + sizeof(style_parser_map)/sizeof(LCUI_StyleParserRec);
 	for( ; sp < sp_end; ++sp ) {
-		new_sp = malloc(sizeof(LCUI_StyleParser));
+		new_sp = malloc(sizeof(LCUI_StyleParserRec));
 		new_sp->key = sp->key;
 		new_sp->parse = sp->parse;
 		if( !sp->name && sp->key >= 0 ) {
@@ -871,7 +870,7 @@ void LCUICSSParser_Init(void)
 	self.count = STYLE_KEY_TOTAL;
 }
 
-void LCUICSSParser_Destroy(void)
+void LCUICSS_Destroy(void)
 {
 
 }

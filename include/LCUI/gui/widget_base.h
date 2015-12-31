@@ -148,7 +148,7 @@ enum LCUI_StyleKeyName {
 typedef struct LCUI_StyleSheetRec_ {
 	LCUI_Style *sheet;
 	int length;
-} LCUI_StyleSheetRec_, *LCUI_StyleSheet;
+} LCUI_StyleSheetRec, *LCUI_StyleSheet;
 
 typedef struct LCUI_SelectorNodeRec_ {
 	char *id;

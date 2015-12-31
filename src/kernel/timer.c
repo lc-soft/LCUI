@@ -38,7 +38,6 @@
  * ***************************************************************************/
 
 //#define DEBUG
-
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/misc/linkedlist.h>
@@ -62,7 +61,7 @@ typedef struct TimerDataRec_ {
 	long int pause_ms;		/**< 定时器处于暂停状态的时长（单位：毫秒） */
 	void (*func)(void*);		/**< 回调函数 */
 	void *arg;			/**< 函数的参数 */
-} TimerData;
+} TimerRec, *Timer;
 
 static struct TimerModule {
 	LinkedList timer_list;		/**< 定时器数据记录 */
@@ -73,7 +72,7 @@ static struct TimerModule {
 } self;
 
 #define TIME_WRAP_VALUE (~(int64_t)0)
-#define TimerNode(timer) (LinkedListNode*)(((char*)timer) + sizeof(TimerData))
+#define TimerNode(timer) (LinkedListNode*)(((char*)timer) + sizeof(TimerRec))
 
 #ifdef LCUI_BUILD_IN_WIN32
 
@@ -145,14 +144,14 @@ int64_t LCUI_GetTicks( int64_t start_ticks )
 static void TimerList_AddNode( LinkedListNode *node )
 {
 	int64_t t, tt;
-	TimerData *timer;
+	Timer timer;
 	LinkedListNode *cur;
 	/* 计算该定时器的剩余定时时长 */
-	timer = (TimerData*)node->data;
+	timer = node->data;
 	t = LCUI_GetTicks( timer->start_time );
 	t = timer->total_ms - t + timer->pause_ms;
 	LinkedList_ForEach( cur, &self.timer_list ) {
-		timer = (TimerData*)cur->data;
+		timer = cur->data;
 		tt = LCUI_GetTicks( timer->start_time );
 		tt = timer->total_ms - tt + timer->pause_ms;
 		if( t <= tt ) {
@@ -187,17 +186,16 @@ static void TimerList_Print( void )
 static void TimerThread( void *arg )
 {
 	long int n_ms;
-	LCUI_Task task = {0};
-	TimerData *timer = NULL;
-	LinkedListNode *node;
 	int64_t lost_ms;
-
+	Timer timer = NULL;
+	LCUI_Task task = {0};
+	LinkedListNode *node;
 	self.is_running = TRUE;
 	DEBUG_MSG("start\n");
 	LCUIMutex_Lock( &self.mutex );
 	while( self.is_running ) {
 		LinkedList_ForEach( node, &self.timer_list ) {
-			timer = (TimerData*)node->data;
+			timer = node->data;
 			if( timer && timer->state == STATE_RUN ) {
 				break;
 			}
@@ -212,11 +210,11 @@ static void TimerThread( void *arg )
 		lost_ms = LCUI_GetTicks( timer->start_time );
 		/* 减去处于暂停状态的时长 */
 		lost_ms -= timer->pause_ms;
-		/* 若流失的时间未达到总定时时长 */
+		/* 若流失的时间未达到总定时时长，则睡眠一段时间 */
 		if( lost_ms < timer->total_ms ) {
 			n_ms = timer->total_ms - lost_ms;
-			/* 开始睡眠 */
-			LCUICond_TimedWait( &self.sleep_cond, &self.mutex, n_ms );
+			LCUICond_TimedWait( &self.sleep_cond, 
+					    &self.mutex, n_ms );
 			continue;
 		}
 		/* 准备任务数据 */
@@ -227,8 +225,8 @@ static void TimerThread( void *arg )
 		/* 若需要重复使用，则重置剩余等待时间 */
 		LinkedList_Unlink( &self.timer_list, node );
 		if( timer->reuse ) {
-			timer->start_time = LCUI_GetTickCount();
 			timer->pause_ms = 0;
+			timer->start_time = LCUI_GetTickCount();
 			TimerList_AddNode( node );
 		} else {
 			free( timer );
@@ -241,12 +239,12 @@ static void TimerThread( void *arg )
 	LCUIThread_Exit(NULL);
 }
 
-static TimerData *TimerList_Find( int timer_id )
+static Timer TimerList_Find( int timer_id )
 {
-	TimerData *timer;
+	Timer timer;
 	LinkedListNode *node;
 	LinkedList_ForEach( node, &self.timer_list ) {
-		timer = (TimerData*)node->data;
+		timer = node->data;
 		if( timer && timer->id == timer_id ) {
 			return timer;
 		}
@@ -257,41 +255,26 @@ static TimerData *TimerList_Find( int timer_id )
 
 /*----------------------------- Public -------------------------------*/
 
-/**
- * 设置定时器
- * 定时器的作用是让一个任务在经过指定时间后才执行
- * @param n_ms
- *	等待的时间，单位为毫秒
- * @param func
- *	用于响应定时器的回调函数
- * @param reuse
- *	指示该定时器是否重复使用，如果要用于循环定时处理某些
- *	任务，可将它置为 TRUE，否则置于 FALSE。
- * @return
- *	该定时器的标识符
- * */
 int LCUITimer_Set( long int n_ms, void (*func)(void*),
 		   void *arg, LCUI_BOOL reuse )
 {
-	TimerData *timer;
+	Timer timer;
 	LinkedListNode *node;
 	static int id = 100;
-
 	LCUIMutex_Lock( &self.mutex );
-	timer = (TimerData*)malloc( sizeof(TimerData) +
-				    sizeof(LinkedListNode) );
+	timer = malloc( sizeof(TimerRec) + sizeof(LinkedListNode) );
 	node = TimerNode( timer );
-	timer->id = ++id;
-	timer->state = STATE_RUN;
-	timer->reuse = reuse;
-	timer->total_ms = n_ms;
-	timer->pause_ms = 0;
-	timer->start_time = LCUI_GetTickCount();
-	timer->func = func;
-	timer->arg = arg;
-	node->data = timer;
 	node->next = NULL;
 	node->prev = NULL;
+	node->data = timer;
+	timer->id = ++id;
+	timer->arg = arg;
+	timer->func = func;
+	timer->reuse = reuse;
+	timer->pause_ms = 0;
+	timer->total_ms = n_ms;
+	timer->state = STATE_RUN;
+	timer->start_time = LCUI_GetTickCount();
 	TimerList_AddNode( node );
 	LCUICond_Signal( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
@@ -299,18 +282,9 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 	return timer->id;
 }
 
-/**
- * 释放定时器
- * 当不需要定时器时，可以使用该函数释放定时器占用的资源，并移除程序任务队列
- * 中还未处理的定时器任务
- * @param timer_id
- *	需要释放的定时器的标识符
- * @return
- *	正常返回0，指定ID的定时器不存在则返回-1.
- * */
 int LCUITimer_Free( int timer_id )
 {
-	TimerData *timer;
+	Timer timer;
 	LinkedListNode *node;
 	
 	LCUIMutex_Lock( &self.mutex );
@@ -326,17 +300,9 @@ int LCUITimer_Free( int timer_id )
 	return 0;
 }
 
-/**
- * 暂停定时器的倒计时
- * 一般用于往复定时的定时器
- * @param timer_id
- *	目标定时器的标识符
- * @return
- *	正常返回0，指定ID的定时器不存在则返回-1.
- * */
 int LCUITimer_Pause( int timer_id )
 {
-	TimerData *timer;
+	Timer timer;
 	LCUIMutex_Lock( &self.mutex );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
@@ -349,16 +315,9 @@ int LCUITimer_Pause( int timer_id )
 	return timer ? 0:-1;
 }
 
-/**
- * 继续定时器的倒计时
- * @param timer_id
- *	目标定时器的标识符
- * @return
- *	正常返回0，指定ID的定时器不存在则返回-1.
- * */
 int LCUITimer_Continue( int timer_id )
 {
-	TimerData *timer;
+	Timer timer;
 	LCUIMutex_Lock( &self.mutex );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
@@ -371,42 +330,30 @@ int LCUITimer_Continue( int timer_id )
 	return timer ? 0:-1;
 }
 
-/**
- * 重设定时器的等待时间
- * @param timer_id
- *	需要释放的定时器的标识符
- * @param n_ms
- *	等待的时间，单位为毫秒
- * @return
- *	正常返回0，指定ID的定时器不存在则返回-1.
- * */
 int LCUITimer_Reset( int timer_id, long int n_ms )
 {
-	TimerData *timer;
-	
+	Timer timer;
 	LCUIMutex_Lock( &self.mutex );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
-		timer->start_time = LCUI_GetTickCount();
 		timer->pause_ms = 0;
 		timer->total_ms = n_ms;
+		timer->start_time = LCUI_GetTickCount();
 	}
 	LCUICond_Signal( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
 	return timer ? 0:-1;
 }
 
-/* 初始化定时器模块 */
 void LCUI_InitTimer( void )
 {
 	LCUI_StartTicks();
-	LinkedList_Init( &self.timer_list );
-	LCUICond_Init( &self.sleep_cond );
 	LCUIMutex_Init( &self.mutex );
+	LCUICond_Init( &self.sleep_cond );
+	LinkedList_Init( &self.timer_list );
 	LCUIThread_Create( &self.thread_id, TimerThread, NULL );
 }
 
-/* 停用定时器模块 */
 void LCUI_ExitTimer( void )
 {
 	self.is_running = FALSE;
