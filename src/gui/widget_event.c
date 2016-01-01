@@ -286,17 +286,18 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 	int depth = 0, i;
 	LCUI_WidgetEvent e;
 	const char *sname = (type == WST_HOVER ? "hover":"active");
-	LCUI_Widget w, new_w = widget, old_w = self.targets[type];
+	LCUI_Widget w, root, new_w = widget, old_w = self.targets[type];
 
 	if( self.targets[type] == widget ) {
 		return;
 	}
+	root = LCUIWidget_GetRoot();
 	self.targets[type] = widget;
 	/* 先计算两个部件的嵌套深度的差值 */
-	for( w = new_w; w != LCUIRootWidget && w; w = w->parent ) {
+	for( w = new_w; w != root && w; w = w->parent ) {
 		++depth;
 	}
-	for( w = old_w; w != LCUIRootWidget && w; w = w->parent ) {
+	for( w = old_w; w != root && w; w = w->parent ) {
 		--depth;
 	}
 	i = depth > 0 ? depth : -depth;
@@ -333,12 +334,12 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 /** 响应系统的鼠标移动事件，向目标部件投递相关鼠标事件 */
 static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 {
-	LCUI_Widget target;
-	LCUI_WidgetEvent ebuff;
 	LCUI_Pos pos;
-
+	LCUI_WidgetEvent ebuff;
+	LCUI_Widget target, root;
+	root = LCUIWidget_GetRoot();
 	LCUICursor_GetPos( &pos );
-	target = Widget_At( LCUIRootWidget, pos.x, pos.y );
+	target = Widget_At( root, pos.x, pos.y );
 	if( !target ) {
 		Widget_UpdateStatus( NULL, WST_HOVER );
 		return;
@@ -405,16 +406,17 @@ static void OnInput( LCUI_SystemEvent *e, void *arg )
 
 int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 {
+	LCUI_Widget root;
 	LCUI_WidgetEvent e;
 	int *n = (int*)&event_type;
-
-	if( w->parent != LCUIRootWidget && w != LCUIRootWidget ) {
+	root = LCUIWidget_GetRoot();
+	if( w->parent != root && w != root ) {
 		return -1;
 	}
 	e.target = w;
 	e.type_name = "surface";
 	DEBUG_MSG("widget: %s, post event: %d\n", w->type,event_type );
-	return Widget_PostEvent( LCUIRootWidget, &e, *((int**)n) );
+	return Widget_PostEvent( root, &e, *((int**)n) );
 }
 
 void LCUIWidget_StepEvent(void)

@@ -484,5 +484,5 @@ skip_proc_self_task:;
 /** 处理一次当前积累的部件任务 */
 void LCUIWidget_StepTask(void)
 {
-	Widget_ProcTask( LCUIRootWidget );
+	Widget_ProcTask(LCUIWidget_GetRoot() );
 }

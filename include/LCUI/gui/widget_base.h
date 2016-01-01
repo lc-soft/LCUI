@@ -246,9 +246,11 @@ typedef struct LCUI_WidgetRec_ {
 #define Widget_GetShowNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode))
 #define Widget_NewPrivateData(w, type) (type*)(w->private_data = malloc(sizeof(type)))
 
-extern LCUI_Widget LCUIRootWidget;
-
+/** 获取根级部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
+
+/** 获取指定ID的部件 */
+LCUI_API LCUI_Widget LCUIWidget_GetById( const char *idstr );
 
 /** 新建一个GUI部件 */
 LCUI_API LCUI_Widget LCUIWidget_New( const char *type_name );
@@ -292,9 +294,19 @@ LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 /** 设置部件标题 */
 LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 
+/** 设置部件ID */
+LCUI_API int Widget_SetId( LCUI_Widget w, const char *idstr );
+
+/** 设置内边距 */
+LCUI_API void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left );
+
+/** 设置外边距 */
+LCUI_API void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left );
+
 /** 移动部件位置 */
 LCUI_API void Widget_Move( LCUI_Widget w, int top, int left );
 
+/** 调整部件尺寸 */
 LCUI_API void Widget_Resize( LCUI_Widget w, int width, int height );
 
 LCUI_API void Widget_Show( LCUI_Widget w );

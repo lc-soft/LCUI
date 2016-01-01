@@ -44,15 +44,16 @@
 #include <LCUI/gui/widget/button.h>
 #include <LCUI/gui/widget/sidebar.h>
 
-LCUI_Widget LCUIRootWidget = NULL;
+static struct LCUIWidgetModule {
+	LCUI_Widget root;	/** 获取根级部件 */
+	LCUI_RBTree ids;	/** 各种部件的ID索引 */
+} LCUIWidget;
 
-/** 获取根级部件 */
 LCUI_Widget LCUIWidget_GetRoot(void)
 {
-	return LCUIRootWidget;
+	return LCUIWidget.root;
 }
 
-/** 追加子部件 */
 int Widget_Append( LCUI_Widget parent, LCUI_Widget w )
 {
 	LinkedListNode *node, *snode;
@@ -114,27 +115,6 @@ int Widget_Unwrap( LCUI_Widget *widget )
 	return 0;
 }
 
-void Widget_Front( LCUI_Widget widget )
-{
-	LCUI_Widget parent, child;
-	LinkedListNode *node, *child_node;
-
-	node = Widget_GetNode( widget );
-	parent = widget->parent ? widget->parent:LCUIRootWidget;
-	LinkedList_Unlink( &parent->children_show, node );
-	/* 先在队列中找到自己，以及z-index值小于或等于它的第一个部件 */
-	LinkedList_ForEach( child_node, &parent->children_show ) {
-		child = child_node->data;
-		if( child->computed_style.z_index >
-		    widget->computed_style.z_index ) {
-			continue;
-		}
-		LinkedList_Link( &parent->children_show, child_node, node );
-		return;
-	}
-	LinkedList_AppendNode( &parent->children_show, node );
-}
-
 /** 构造函数 */
 static void Widget_Init( LCUI_Widget widget )
 {
@@ -172,29 +152,6 @@ static void Widget_Init( LCUI_Widget widget )
 	LCUIMutex_Init( &widget->mutex );
 }
 
-/** 
- * 获取与选择器相匹配的第一个部件
- * 该方法主要用于精确搜索某个部件
- * @param[in] selector 选择器
- * @return  如果能找到匹配的部件，则返回该部件，否则返回 NULL
- */
-LCUI_Widget LCUIWidget_Get( const char *selector )
-{
-	return NULL;
-}
-
-/** 
- * 查询与选择器相匹配的部件列表
- * @param[in]	selector 选择器
- * @param[out]	list 部件列表
- * @return 匹配到的部件总数
- */
-int LCUIWidget_Find( const char *selector, LinkedList *list )
-{
-	return 0;
-}
-
-/** 新建一个GUI部件 */
 LCUI_Widget LCUIWidget_New( const char *type_name )
 {
 	LCUI_WidgetClass *wc;
@@ -222,6 +179,7 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 static void Widget_OnDestroy( void *arg )
 {
 	LCUI_Widget widget = (LCUI_Widget)arg;
+	Widget_SetId( widget, NULL );
 	Widget_DestroyTaskBox( widget );
 	LCUIEventBox_Destroy( widget->event );
 	widget->event = NULL;
@@ -252,7 +210,7 @@ void Widget_Destroy( LCUI_Widget *w )
 	while( root->parent ) {
 		root = root->parent;
 	}
-	if( root == LCUIRootWidget ) {
+	if( root == LCUIWidget.root ) {
 		Widget_AddTask( *w, WTT_DESTROY );
 		*w = NULL;
 	} else {
@@ -260,7 +218,6 @@ void Widget_Destroy( LCUI_Widget *w )
 	}
 }
 
-/** 获取当前点命中的最上层可见部件 */
 LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 {
 	LCUI_BOOL is_hit;
@@ -285,14 +242,20 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 	return (target == widget) ? NULL:target;
 }
 
-/** 设置部件为顶级部件 */
+LCUI_Widget LCUIWidget_GetById( const char *idstr )
+{
+	if( !idstr ) {
+		return NULL;
+	}
+	return RBTree_CustomGetData( &LCUIWidget.ids, idstr );
+}
+
 int Widget_Top( LCUI_Widget w )
 {
 	DEBUG_MSG("tip\n");
-	return Widget_Append( LCUIRootWidget, w );
+	return Widget_Append( LCUIWidget.root, w );
 }
 
-/** 设置部件标题 */
 void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 {
 	int len;
@@ -310,6 +273,23 @@ void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 		free( old_title );
 	}
 	Widget_AddTask( w, WTT_TITLE );
+}
+
+int Widget_SetId( LCUI_Widget w, const char *idstr )
+{
+	if( w->id ) {
+		RBTree_CustomErase( &LCUIWidget.ids, idstr );
+		free( w->id );
+		w->id = NULL;
+	}
+	if( !idstr ) {
+		return -1;
+	}
+	w->id = strdup( idstr );
+	if( RBTree_CustomInsert( &LCUIWidget.ids, idstr, w ) ) {
+		return 0;
+	}
+	return -2;
 }
 
 int Widget_GetIndex( LCUI_Widget w )
@@ -488,8 +468,8 @@ static void Widget_UpdateGraphBox( LCUI_Widget w )
 	Graph_Create( &w->graph, rg->width, rg->height );
 }
 
-/** 获取合适的内容框大小 */
-void Widget_GetContentSize( LCUI_Widget w, int *width, int *height )
+/** 计算合适的内容框大小 */
+static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 {
 	int n;
 	LCUI_Widget child;
@@ -558,7 +538,7 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		if( wc && wc->methods.autosize ) {
 			wc->methods.autosize( w, &width, &height );
 		} else {
-			Widget_GetContentSize( w, &width, &height );
+			Widget_ComputeContentSize( w, &width, &height );
 		}
 		if( w->computed_style.width.type == SVT_AUTO ) {
 			w->width = width;
@@ -788,16 +768,22 @@ void Widget_ComputeMargin( LCUI_Widget w )
 /** 设置内边距 */
 void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left )
 {
-
+	SetStyle( w->custom_style, key_padding_top, top, px );
+	SetStyle( w->custom_style, key_padding_right, right, px );
+	SetStyle( w->custom_style, key_padding_bottom, bottom, px );
+	SetStyle( w->custom_style, key_padding_left, left, px );
 }
 
 /** 设置外边距 */
 void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left )
 {
-
+	SetStyle( w->custom_style, key_margin_top, top, px );
+	SetStyle( w->custom_style, key_margin_right, right, px );
+	SetStyle( w->custom_style, key_margin_bottom, bottom, px );
+	SetStyle( w->custom_style, key_margin_left, left, px );
+	Widget_Update( w, FALSE );
 }
 
-/** 移动部件位置 */
 void Widget_Move( LCUI_Widget w, int left, int top )
 {
 	SetStyle( w->custom_style, key_top, top, px );
@@ -806,7 +792,6 @@ void Widget_Move( LCUI_Widget w, int left, int top )
 	Widget_Update( w, FALSE );
 }
 
-/** 调整部件尺寸 */
 void Widget_Resize( LCUI_Widget w, int width, int height )
 {
 	SetStyle( w->custom_style, key_width, width, px );
@@ -1116,11 +1101,16 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 
 void Widget_PrintTree( LCUI_Widget w )
 {
-	w = w ? w : LCUIRootWidget;
+	w = w ? w : LCUIWidget.root;
 	printf("%s, xy:(%d,%d), size:(%d,%d), visible: %s\n", 
 		w->type, w->x, w->y, w->width, w->height,
 		w->computed_style.visible ? "true":"false");
 	_LCUIWidget_PrintTree( w, 0, "  " );
+}
+
+static int CompareWidgetId( void *data, const void *keydata )
+{
+	return strcmp(((LCUI_Widget)data)->id, (const char*)keydata);
 }
 
 void LCUI_InitWidget(void)
@@ -1132,8 +1122,11 @@ void LCUI_InitWidget(void)
 	LCUIWidget_AddTextView();
 	LCUIWidget_AddButton();
 	LCUIWidget_AddSideBar();
-	LCUIRootWidget = LCUIWidget_New("root");
-	Widget_SetTitleW( LCUIRootWidget, L"LCUI Display" );
+	RBTree_Init( &LCUIWidget.ids );
+	RBTree_SetDataNeedFree( &LCUIWidget.ids, FALSE );
+	RBTree_OnJudge( &LCUIWidget.ids, CompareWidgetId );
+	LCUIWidget.root = LCUIWidget_New("root");
+	Widget_SetTitleW( LCUIWidget.root, L"LCUI Display" );
 }
 
 void LCUI_ExitWidget(void)

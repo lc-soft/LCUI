@@ -185,7 +185,7 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 			continue;
 		}
 		else if( PropNameIs("id") ) {
-			w->id = strdup( prop_val );
+			Widget_SetId( w, prop_val );
 		}
 		else if( PropNameIs("class") ) {
 			Widget_AddClass( w, prop_val );
