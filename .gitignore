@@ -11,12 +11,14 @@
 *.obj
 *.aps
 *.psess
+*.sbr
 .deps
 .libs
 *.la
 *.txt
 *.vspx
 *.vs
+*.res
 *~
 aclocal.m4
 Makefile

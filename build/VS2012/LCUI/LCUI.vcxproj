@@ -49,7 +49,7 @@
     <EmbedManifest>false</EmbedManifest>
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\..\bin\</OutDir>
-    <IntDir>$(SolutionDir)..\..\bin\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -57,7 +57,7 @@
     <CodeAnalysisRuleAssemblies />
     <TargetName>$(ProjectName)_D</TargetName>
     <OutDir>$(SolutionDir)..\..\bin\</OutDir>
-    <IntDir>$(SolutionDir)..\..\bin\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -75,13 +75,14 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <OpenMPSupport>true</OpenMPSupport>
       <BrowseInformation>true</BrowseInformation>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlib.lib;libpng16.lib;libjpeg.lib;libxml2.lib;freetype253.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>libxml2.lib;libpng16.lib;libjpeg.lib;freetype253.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRT;</IgnoreSpecificDefaultLibraries>
       <LinkStatus>false</LinkStatus>
     </Link>
     <ResourceCompile>
@@ -113,7 +114,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libxml2.lib;libpng16.lib;libjpeg.lib;freetype253.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBCMTD;LIBCMT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;</IgnoreSpecificDefaultLibraries>
     </Link>
     <Lib>
       <AdditionalDependencies>libpng15.lib;jpeg.lib;libfreetype2411MT.lib;zlib.lib;</AdditionalDependencies>
