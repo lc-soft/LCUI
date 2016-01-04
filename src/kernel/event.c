@@ -204,8 +204,6 @@ int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
 	LCUI_RBTreeNode *node;
 	LCUI_EventSlot *slot;
 	LCUI_EventHandler *handler;
-	void *data;
-
 	node = RBTree_Search( &box->event_slot, event_id );
 	if( !node ) {
 		return -1;
