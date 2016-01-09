@@ -2,7 +2,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 
-LCUI_API int LCUI_OpenDirA( char *filepath, LCUI_Dir *dir_data )
+LCUI_API int LCUI_OpenDirA( const char *filepath, LCUI_Dir *dir_data )
 {
 #if defined (LCUI_BUILD_IN_WIN32) || (_WIN32)
 	int len;
@@ -25,7 +25,7 @@ LCUI_API int LCUI_OpenDirA( char *filepath, LCUI_Dir *dir_data )
 	return 0;
 }
 
-LCUI_API int LCUI_OpenDirW( wchar_t *filepath, LCUI_Dir *dir_data )
+LCUI_API int LCUI_OpenDirW( const wchar_t *filepath, LCUI_Dir *dir_data )
 {
 #if defined (LCUI_BUILD_IN_WIN32) || (_WIN32)
 	int len;

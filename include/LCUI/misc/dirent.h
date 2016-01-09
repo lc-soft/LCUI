@@ -42,9 +42,9 @@ typedef struct LCUI_Dir_ {
 #endif
 
 
-LCUI_API int LCUI_OpenDirW( wchar_t *filepath, LCUI_Dir *dir_data );
+LCUI_API int LCUI_OpenDirW( const wchar_t *filepath, LCUI_Dir *dir_data );
 
-LCUI_API int LCUI_OpenDirA( char *filepath, LCUI_Dir *dir_data );
+LCUI_API int LCUI_OpenDirA( const char *filepath, LCUI_Dir *dir_data );
 
 LCUI_API LCUI_DirEntry* LCUI_ReadDirA( LCUI_Dir *dir_data );
 
