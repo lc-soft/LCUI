@@ -292,6 +292,202 @@ int Widget_SetId( LCUI_Widget w, const char *idstr )
 	return -2;
 }
 
+/** 计算边框样式 */
+static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
+{
+	LCUI_Style *style;
+	int key = key_border_start + 1;
+	for( ; key < key_border_end; ++key ) {
+		style = &ss->sheet[key];
+		if( !style->is_valid ) {
+			continue;
+		}
+		switch( key ) {
+		case key_border_color:
+			b->top.color = style->color;
+			b->right.color = style->color;
+			b->bottom.color = style->color;
+			b->left.color = style->color;
+			break;
+		case key_border_style:
+			b->top.style = style->value;
+			b->right.style = style->value;
+			b->bottom.style = style->value;
+			b->left.style = style->value;
+			break;
+		case key_border_width:
+			b->top.width = style->value;
+			b->right.width = style->value;
+			b->bottom.width = style->value;
+			b->left.width = style->value;
+			break;
+		case key_border_top_color:
+			b->top.color = style->color;
+			break;
+		case key_border_right_color:
+			b->right.color = style->color;
+			break;
+		case key_border_bottom_color:
+			b->bottom.color = style->color;
+			break;
+		case key_border_left_color:
+			b->left.color = style->color;
+			break;
+		case key_border_top_width:
+			b->top.width = style->value;
+			break;
+		case key_border_right_width:
+			b->right.width = style->value;
+			break;
+		case key_border_bottom_width:
+			b->bottom.width = style->value;
+			break;
+		case key_border_left_width:
+			b->left.width = style->value;
+			break;
+		case key_border_top_style:
+			b->top.style = style->value;
+			break;
+		case key_border_right_style:
+			b->right.style = style->value;
+			break;
+		case key_border_bottom_style:
+			b->bottom.style = style->value;
+			break;
+		case key_border_left_style:
+			b->left.style = style->value;
+			break;
+		default: break;
+		}
+	}
+}
+
+void Widget_FlushBorder( LCUI_Widget w )
+{
+	LCUI_Rect rect;
+	LCUI_Border ob, *nb;
+	ob = w->computed_style.border;
+	ComputeBorderStyle( w->style, &w->computed_style.border );
+	nb = &w->computed_style.border;
+	/* 如果边框变化并未导致图层尺寸变化的话，则只重绘边框 */
+	if( ob.top.width != nb->top.width || 
+	    ob.right.width != nb->right.width ||
+	    ob.bottom.width != nb->bottom.width ||
+	    ob.left.width != nb->left.width ) {
+		Widget_AddTask( w, WTT_RESIZE );
+		Widget_AddTask( w, WTT_POSITION );
+		return;
+	}
+	rect.x = rect.y = 0;
+	rect.width = w->box.border.width;
+	rect.width -= max( ob.top_right_radius, ob.right.width );
+	rect.height = max( ob.top_left_radius, ob.top.width );
+	/* 上 */
+	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
+	rect.x = w->box.border.w;
+	rect.width = max( ob.top_right_radius, ob.right.width );
+	rect.x -= rect.width;
+	rect.height = w->box.border.height;
+	rect.height -= max( ob.bottom_right_radius, ob.bottom.width );
+	/* 右 */
+	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
+	rect.x = max( ob.bottom_left_radius, ob.left.width );
+	rect.y = w->box.border.height;
+	rect.width = w->box.border.width;
+	rect.width -= rect.x;
+	rect.height = max( ob.bottom_right_radius, ob.bottom.width );
+	rect.y -= rect.height;
+	/* 下 */
+	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
+	rect.width = rect.x;
+	rect.x = 0;
+	rect.y = max( ob.top_left_radius, ob.left.width );
+	rect.height = w->box.border.height;
+	rect.height -= rect.y;
+	/* 左 */
+	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
+}
+
+/** 计算矩形阴影样式 */
+static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
+{
+	LCUI_Style *style;
+	int key = key_box_shadow_start + 1;
+	for( ; key < key_box_shadow_end; ++key ) {
+		style = &ss->sheet[key];
+		if( !style->is_valid ) {
+			continue;
+		}
+		switch( key ) {
+		case key_box_shadow_x: bsd->x = style->value; break;
+		case key_box_shadow_y: bsd->y = style->value; break;
+		case key_box_shadow_spread: bsd->spread = style->value; break;
+		case key_box_shadow_blur: bsd->blur = style->value; break;
+		case key_box_shadow_color: bsd->color = style->color; break;
+		default: break;
+		}
+	}
+}
+
+void Widget_FlushBoxShadow( LCUI_Widget w )
+{
+	LCUI_BoxShadow bs = w->computed_style.shadow;
+	ComputeBoxShadowStyle( w->style, &w->computed_style.shadow );
+	/* 如果阴影变化并未导致图层尺寸变化，则只重绘阴影 */
+	if( bs.x == w->computed_style.shadow.x && 
+	    bs.y == w->computed_style.shadow.y && 
+	    bs.spread == w->computed_style.shadow.spread ) {
+		LCUI_Rect rects[4];
+		LCUIRect_CutFourRect( &w->box.border,
+				      &w->box.graph, rects );
+		Widget_InvalidateArea( w, &rects[0], SV_GRAPH_BOX );
+		Widget_InvalidateArea( w, &rects[1], SV_GRAPH_BOX );
+		Widget_InvalidateArea( w, &rects[2], SV_GRAPH_BOX );
+		Widget_InvalidateArea( w, &rects[3], SV_GRAPH_BOX );
+		return;
+	}
+	Widget_AddTask( w, WTT_RESIZE );
+	Widget_AddTask( w, WTT_POSITION );
+}
+
+void Widget_FlushVisibility( LCUI_Widget w )
+{
+	LCUI_Style *s;
+	LCUI_BOOL visible = TRUE;
+	s = &w->cached_style->sheet[key_visible];
+	if( w->computed_style.display == SV_NONE
+	    || (s->is_valid && !s->value) ) {
+		visible = FALSE;
+	}
+	s = &w->style->sheet[key_display];
+	if( w->style->sheet[key_display].is_valid ) {
+		w->computed_style.display = s->style;
+	} else {
+		w->computed_style.display = SV_BLOCK;
+	}
+	w->computed_style.visible = TRUE;
+	s = &w->style->sheet[key_visible];
+	if( w->computed_style.display == SV_NONE || 
+	    (s->is_valid && !s->value) ) {
+		w->computed_style.visible = FALSE;
+	}
+	if( w->computed_style.visible == visible ) {
+		return;
+	}
+	visible = w->computed_style.visible;
+	if( w->parent ) {
+		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
+		if( (w->computed_style.display == SV_BLOCK ||
+		      w->computed_style.display == SV_INLINE_BLOCK)
+		    && w->computed_style.position == SV_STATIC
+		    && w->computed_style.float_mode == SV_NONE ) {
+			Widget_AddTask( w->parent, WTT_LAYOUT );
+		}
+	}
+	DEBUG_MSG( "visible: %s\n", visible ? "TRUE" : "FALSE" );
+	Widget_PostSurfaceEvent( w, visible ? WET_SHOW : WET_HIDE );
+}
+
 int Widget_GetIndex( LCUI_Widget w )
 {
 	int index = 0;
@@ -409,7 +605,7 @@ void Widget_FlushPosition( LCUI_Widget w )
 			w->x -= w->computed_style.right;
 		}
 		if( w->style->sheet[key_top].is_valid ) {
-			w->x = w->computed_style.top;
+			w->y = w->computed_style.top;
 		} else if( w->style->sheet[key_bottom].is_valid ) {
 			if( w->parent ) {
 				w->y = w->parent->box.content.height;
@@ -619,15 +815,15 @@ void Widget_FlushSize( LCUI_Widget w )
 	w->computed_style.height = w->style->sheet[key_height];
 	/* 内边距的单位暂时都用 px  */
 	for( i=0; i<4; ++i ) {
-		if( !w->style->sheet[pd_map[i].key].is_valid
-		    || w->style->sheet[pd_map[i].key].type != SVT_PX ) {
+		LCUI_Style *s = &w->style->sheet[pd_map[i].key];
+		if( !s->is_valid || s->type != SVT_PX ) {
 			pd_map[i].sval->type = SVT_PX;
 			pd_map[i].sval->px = 0;
 			*pd_map[i].ival = 0;
 			continue;
 		}
-		*pd_map[i].sval = w->style->sheet[pd_map[i].key];
-		*pd_map[i].ival = pd_map[i].sval->px;
+		*pd_map[i].sval = *s;
+		*pd_map[i].ival = s->px;
 	}
 	Widget_ComputeSize( w );
 	Widget_UpdateGraphBox( w );

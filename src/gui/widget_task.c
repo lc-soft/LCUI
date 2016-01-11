@@ -54,99 +54,6 @@ struct LCUI_WidgetTaskBoxRec_ {
 	LCUI_BOOL buffer[WTT_TOTAL_NUM];	/**< 记录缓存 */
 };
 
-/** 计算边框样式 */
-static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
-{
-	LCUI_Style *style;
-	int key = key_border_start + 1;
-
-	for( ; key < key_border_end; ++key ) {
-		style = &ss->sheet[key];
-		if( !style->is_valid ) {
-			continue;
-		}
-		switch( key ) {
-		case key_border_color:
-			b->top.color = style->color;
-			b->right.color = style->color;
-			b->bottom.color = style->color;
-			b->left.color = style->color;
-			break;
-		case key_border_style:
-			b->top.style = style->value;
-			b->right.style = style->value;
-			b->bottom.style = style->value;
-			b->left.style = style->value;
-			break;
-		case key_border_width:
-			b->top.width = style->value;
-			b->right.width = style->value;
-			b->bottom.width = style->value;
-			b->left.width = style->value;
-			break;
-		case key_border_top_color:
-			b->top.color = style->color;
-			break;
-		case key_border_right_color:
-			b->right.color = style->color;
-			break;
-		case key_border_bottom_color:
-			b->bottom.color = style->color;
-			break;
-		case key_border_left_color:
-			b->left.color = style->color;
-			break;
-		case key_border_top_width:
-			b->top.width = style->value;
-			break;
-		case key_border_right_width:
-			b->right.width = style->value;
-			break;
-		case key_border_bottom_width:
-			b->bottom.width = style->value;
-			break;
-		case key_border_left_width:
-			b->left.width = style->value;
-			break;
-		case key_border_top_style:
-			b->top.style = style->value;
-			break;
-		case key_border_right_style:
-			b->right.style = style->value;
-			break;
-		case key_border_bottom_style:
-			b->bottom.style = style->value;
-			break;
-		case key_border_left_style:
-			b->left.style = style->value;
-			break;
-		default: break;
-		}
-	}
-}
-
-/** 计算矩形阴影样式 */
-static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
-{
-	LCUI_Style *style;
-	int key = key_box_shadow_start + 1;
-
-	for( ; key < key_box_shadow_end; ++key ) {
-		style = &ss->sheet[key];
-		if( !style->is_valid ) {
-			continue;
-		}
-		switch( key ) {
-		case key_box_shadow_x: bsd->x = style->value; break;
-		case key_box_shadow_y: bsd->y = style->value; break;
-		case key_box_shadow_spread: bsd->spread = style->value; break;
-		case key_box_shadow_blur: bsd->blur = style->value; break;
-		case key_box_shadow_color: bsd->color = style->color; break;
-		default: break;
-		}
-	}
-}
-
 static void HandleRefreshStyle( LCUI_Widget w )
 {
 	Widget_Update( w, TRUE );
@@ -172,71 +79,10 @@ static void HandleSetTitle( LCUI_Widget w )
 	Widget_PostSurfaceEvent( w, WET_TITLE );
 }
 
-/** 处理可见性 */
-static void HandleVisibility( LCUI_Widget w )
-{
-	LCUI_Style *s;
-	LCUI_BOOL visible = TRUE;
-
-	s = &w->cached_style->sheet[key_visible];
-	if( w->computed_style.display == SV_NONE
-	 || (s->is_valid && !s->value) ) {
-		visible = FALSE;
-	}
-	s = &w->style->sheet[key_display];
-	if( w->style->sheet[key_display].is_valid ) {
-		w->computed_style.display = s->style;
-	} else {
-		w->computed_style.display = SV_BLOCK;
-	}
-	w->computed_style.visible = TRUE;
-	s = &w->style->sheet[key_visible];
-	if( w->computed_style.display == SV_NONE
-	|| (s->is_valid && !s->value) ) {
-		w->computed_style.visible = FALSE;
-	}
-	if( w->computed_style.visible == visible ) {
-		return;
-	}
-	visible = w->computed_style.visible;
-	if( w->parent ) {
-		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
-		if( (w->computed_style.display == SV_BLOCK
-		 || w->computed_style.display == SV_INLINE_BLOCK)
-		 && w->computed_style.position == SV_STATIC
-		 && w->computed_style.float_mode == SV_NONE ) {
-			Widget_AddTask( w->parent, WTT_LAYOUT );
-		}
-	}
-	DEBUG_MSG("visible: %s\n", visible ? "TRUE":"FALSE");
-	Widget_PostSurfaceEvent( w, visible ? WET_SHOW:WET_HIDE );
-}
-
 /** 处理透明度 */
 static void HandleOpacity( LCUI_Widget w )
 {
 
-}
-
-/** 处理阴影（标记阴影区域为脏矩形，但不包括主体区域） */
-static void HandleShadow( LCUI_Widget w )
-{
-	LCUI_BoxShadow bs = w->computed_style.shadow;
-	ComputeBoxShadowStyle( w->style, &w->computed_style.shadow );
-	/* 如果阴影变化并未导致图层尺寸变化，则只重绘阴影 */
-	if( bs.x == w->computed_style.shadow.x && bs.y == w->computed_style.shadow.y
-	 && bs.spread == w->computed_style.shadow.spread ) {
-		LCUI_Rect rects[4];
-		LCUIRect_CutFourRect( &w->box.border,
-				      &w->box.graph, rects );
-		Widget_InvalidateArea( w, &rects[0], SV_GRAPH_BOX );
-		Widget_InvalidateArea( w, &rects[1], SV_GRAPH_BOX );
-		Widget_InvalidateArea( w, &rects[2], SV_GRAPH_BOX );
-		Widget_InvalidateArea( w, &rects[3], SV_GRAPH_BOX );
-		return;
-	}
-	Widget_AddTask( w, WTT_RESIZE );
-	Widget_AddTask( w, WTT_POSITION );
 }
 
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
@@ -256,54 +102,6 @@ static void HandleRefresh( LCUI_Widget w )
 static void HandleDestroy( LCUI_Widget w )
 {
 	Widget_ExecDestroy( &w );
-}
-
-static void HandleBorder( LCUI_Widget w )
-{
-	LCUI_Rect rect;
-	LCUI_Border ob, *nb;
-	
-	ob = w->computed_style.border;
-	ComputeBorderStyle( w->style, &w->computed_style.border );
-	nb = &w->computed_style.border;
-	/* 如果边框变化并未导致图层尺寸变化的话，则只重绘边框 */
-	if( ob.top.width != nb->top.width
-	 || ob.right.width != nb->right.width
-	 || ob.bottom.width != nb->bottom.width
-	 || ob.left.width != nb->left.width ) {
-		Widget_AddTask( w, WTT_RESIZE );
-		Widget_AddTask( w, WTT_POSITION );
-		return;
-	}
-
-	rect.x = rect.y = 0;
-	rect.width = w->box.border.width;
-	rect.width -= max( ob.top_right_radius, ob.right.width );
-	rect.height = max( ob.top_left_radius, ob.top.width );
-	/* 上 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.x = w->box.border.w;
-	rect.width = max( ob.top_right_radius, ob.right.width );
-	rect.x -= rect.width;
-	rect.height = w->box.border.height;
-	rect.height -= max( ob.bottom_right_radius, ob.bottom.width );
-	/* 右 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.x = max( ob.bottom_left_radius, ob.left.width );
-	rect.y = w->box.border.height;
-	rect.width = w->box.border.width;
-	rect.width -= rect.x;
-	rect.height = max( ob.bottom_right_radius, ob.bottom.width );
-	rect.y -= rect.height;
-	/* 下 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.width = rect.x;
-	rect.x = 0;
-	rect.y = max( ob.top_left_radius, ob.left.width );
-	rect.height = w->box.border.height;
-	rect.height -= rect.y;
-	/* 左 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 }
 
 /** 更新当前任务状态，确保部件的任务能够被处理到 */
@@ -362,11 +160,11 @@ static callback task_handlers[WTT_TOTAL_NUM];
 static void MapTaskHandler(void)
 {
 	task_handlers[WTT_DESTROY] = HandleDestroy;
-	task_handlers[WTT_VISIBLE] = HandleVisibility;
+	task_handlers[WTT_VISIBLE] = Widget_FlushVisibility;
 	task_handlers[WTT_POSITION] = Widget_FlushPosition;
 	task_handlers[WTT_RESIZE] = Widget_FlushSize;
-	task_handlers[WTT_SHADOW] = HandleShadow;
-	task_handlers[WTT_BORDER] = HandleBorder;
+	task_handlers[WTT_SHADOW] = Widget_FlushBoxShadow;
+	task_handlers[WTT_BORDER] = Widget_FlushBorder;
 	task_handlers[WTT_OPACITY] = HandleOpacity;
 	task_handlers[WTT_BODY] = HandleBody;
 	task_handlers[WTT_TITLE] = HandleSetTitle;

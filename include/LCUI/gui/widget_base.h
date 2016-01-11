@@ -270,6 +270,14 @@ LCUI_API int Widget_Unwrap( LCUI_Widget *widget );
 /** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 
+/** 刷新部件的边框 */
+LCUI_API void Widget_FlushBorder( LCUI_Widget w );
+
+/** 刷新部件的矩形阴影 */
+LCUI_API void Widget_FlushBoxShadow( LCUI_Widget w );
+/** 刷新可见性 */
+LCUI_API void Widget_FlushVisibility( LCUI_Widget w );
+
 /** 设置部件为顶级部件 */
 LCUI_API int Widget_Top( LCUI_Widget w );
 
