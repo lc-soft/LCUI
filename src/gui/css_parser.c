@@ -475,7 +475,11 @@ static KeyNameGroup style_name_map[] = {
 	{ key_visible, "visible"},
 	{ key_width, "width" },
 	{ key_height, "height" },
-	{ key_display, "display" },
+	{key_display, "display"},
+	{key_top, "top"},
+	{key_right, "right"},
+	{key_left, "left"},
+	{key_bottom, "bottom"},
 	{ key_position, "position" },
 	{ key_background_color, "background-color" },
 	{ key_background_image, "background-image" },
@@ -506,7 +510,8 @@ static KeyNameGroup style_name_map[] = {
 	{ key_border_right_style, "border-right-style" },
 	{ key_border_bottom_style, "border-bottom-style" },
 	{ key_border_left_style, "border-left-style" },
-	{ key_pointer_events, "pointer-events" }
+	{ key_pointer_events, "pointer-events" },
+	{ key_box_sizing, "box-sizing" }
 };
 
 /** 样式字符串与标识码的映射表 */
@@ -568,6 +573,7 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ key_border_bottom_style, NULL, OnParseStyleOption },
 	{ key_border_left_style, NULL, OnParseStyleOption },
 	{ key_pointer_events, NULL, OnParseStyleOption },
+	{ key_box_sizing, NULL, OnParseStyleOption },
 	{ -1, "border", OnParseBorder },
 	{ -1, "border-left", OnParseBorderLeft },
 	{ -1, "border-top", OnParseBorderTop },
