@@ -301,6 +301,7 @@ static void Win32Surface_ExecResize( LCUI_Surface surface, int w, int h )
 {
 	HDC hdc_client;
 	HBITMAP old_bmp;
+	RECT rect_client, rect_window;
 	surface->w = w;
 	surface->h = h;
 	_DEBUG_MSG("w = %d, h = %d\n", w, h);
@@ -311,10 +312,12 @@ static void Win32Surface_ExecResize( LCUI_Surface surface, int w, int h )
 	if( old_bmp ) {
 		DeleteObject( old_bmp );
 	}
-	/* 加上窗口边框的尺寸 */
-	w += GetSystemMetrics( SM_CXFIXEDFRAME ) * 2;
-	h += GetSystemMetrics( SM_CYFIXEDFRAME ) * 2;
-	h += GetSystemMetrics( SM_CYCAPTION );
+	GetClientRect( surface->hwnd, &rect_client );
+	GetWindowRect( surface->hwnd, &rect_window );
+	w += rect_window.right - rect_window.left;
+	w -= rect_client.right - rect_client.left;
+	h += rect_window.bottom - rect_window.top;
+	h -= rect_client.bottom - rect_client.top;
 	//SetWindowLong( surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE );
 	SetWindowPos( surface->hwnd, HWND_NOTOPMOST,
 		      0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER );
