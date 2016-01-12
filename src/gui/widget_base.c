@@ -797,8 +797,8 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 
 void Widget_FlushSize( LCUI_Widget w )
 {
-	int i;
 	LCUI_Rect rect;
+	int i, box_sizing;
 	struct { 
 		LCUI_Style *sval;
 		int *ival;
@@ -825,10 +825,12 @@ void Widget_FlushSize( LCUI_Widget w )
 		*pd_map[i].sval = *s;
 		*pd_map[i].ival = s->px;
 	}
+	box_sizing = ComputeStyleOption( w, key_box_sizing, SV_CONTENT_BOX );
+	w->computed_style.box_sizing = box_sizing;
 	Widget_ComputeSize( w );
 	Widget_UpdateGraphBox( w );
 	/* 若尺寸无变化则不继续处理 */
-	if( rect.width == w->box.graph.width && 
+	if( rect.width == w->box.graph.width &&
 	    rect.height == w->box.graph.height ) {
 		return;
 	}
@@ -1264,10 +1266,10 @@ void Widget_UpdateLayout( LCUI_Widget w )
 
 static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix )
 {
-	int len;
+	int i, len;
 	LCUI_Widget child;
 	LinkedListNode *node;
-	char str[16], child_prefix[512];
+	char str[16], child_prefix[512], classes[512];
 
 	len = strlen(prefix);
 	strcpy( child_prefix, prefix );
@@ -1286,8 +1288,17 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 		} else {
 			strcat( str, "┬" );
 		}
-		printf("%s%s %s, xy:(%d,%d), size:(%d,%d), visible: %s\n", 
-			prefix, str, child->type, child->x, child->y, 
+		classes[0] = 0;
+		if( child->classes ) {
+			for( i = 0; child->classes[i]; ++i ) {
+				strcat( classes, child->classes[i] );
+				strcat( classes, " ");
+			}
+		} else {
+			strcpy( classes, "(null)" );
+		}
+		printf("%s%s type: %s, class: %s, xy:(%d,%d), size:(%d,%d), visible: %s\n", 
+			prefix, str, child->type, classes, child->x, child->y, 
 			child->width, child->height, 
 			child->computed_style.visible ? "true":"false");
 
