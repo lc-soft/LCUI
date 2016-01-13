@@ -481,7 +481,8 @@ static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 {
 	int x, y;
 	LCUI_ARGB *px, *px_row_des;
-	uchar_t a, *byte_ptr, *byte_row_ptr;
+	uchar_t *byte_ptr, *byte_row_ptr;
+	double a, out_a, out_r, out_g, out_b, src_a;
 	byte_row_ptr = bmp->buffer + read_rect->y*bmp->width;
 	byte_row_ptr += read_rect->x;
 	px_row_des = graph->argb + write_rect->y * graph->w;
@@ -490,11 +491,21 @@ static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 		px = px_row_des;
 		byte_ptr = byte_row_ptr;
 		for( x = 0; x < read_rect->w; ++x, ++byte_ptr, ++px ) {
-			a = *byte_ptr;
-			px->r = (color.r*a + px->r*px->a) >> 8;
-			px->g = (color.g*a + px->g*px->a) >> 8;
-			px->b = (color.b*a + px->b*px->a) >> 8;
-			px->a = a +((px->a*(255 - a)) >> 8);
+			src_a = *byte_ptr / 255.0;
+			a = (1.0 - src_a) * px->a / 255.0;
+			out_r = px->r * a + color.r * src_a;
+			out_g = px->g * a + color.g * src_a;
+			out_b = px->b * a + color.b * src_a;
+			out_a = src_a + a;
+			if( out_a > 0 ) {
+				out_r /= out_a;
+				out_g /= out_a;
+				out_b /= out_a;
+			}
+			px->r = (uchar_t)(out_r + 0.5);
+			px->g = (uchar_t)(out_g + 0.5);
+			px->b = (uchar_t)(out_b + 0.5);
+			px->a = (uchar_t)(255.0 * out_a + 0.5);
 		}
 		px_row_des += graph->w;
 		byte_row_ptr += bmp->width;
