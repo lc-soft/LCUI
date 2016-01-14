@@ -426,11 +426,10 @@ static int Graph_CutARGB( const LCUI_Graph *graph, LCUI_Rect rect,
 static void Graph_ARGBMixARGB( LCUI_Graph *dst, LCUI_Rect des_rect,
 			       const LCUI_Graph *src, int src_x, int src_y )
 {
-	float a;
 	int x, y;
-	uchar_t src_a;
 	LCUI_ARGB *px_src, *px_dst;
 	LCUI_ARGB *px_row_src, *px_row_des;
+	double a, out_a, out_r, out_g, out_b, src_a;
 	px_row_src = src->argb + src_y*src->width + src_x;
 	px_row_des = dst->argb + des_rect.y*dst->width + des_rect.x;
 	if( src->opacity < 1.0 ) {
@@ -440,15 +439,21 @@ static void Graph_ARGBMixARGB( LCUI_Graph *dst, LCUI_Rect des_rect,
 		px_src = px_row_src;
 		px_dst = px_row_des;
 		for( x=0; x<des_rect.w; ++x ) {
-			a = ((255.0 - px_src->a) * px_dst->a) / 65025.0;
-			px_dst->r = px_dst->r * a;
-			px_dst->g = px_dst->g * a;
-			px_dst->b = px_dst->b * a;
-			px_dst->a = 255.0 * a;
-			px_dst->r += (px_src->r * px_src->a) >> 8;
-			px_dst->g += (px_src->r * px_src->a) >> 8;
-			px_dst->b += (px_src->r * px_src->a) >> 8;
-			px_dst->a += px_src->a;
+			src_a = px_src->a / 255.0;
+			a = (1.0 - src_a) * px_dst->a / 255.0;
+			out_r = px_dst->r * a + px_src->r * src_a;
+			out_g = px_dst->g * a + px_src->g * src_a;
+			out_b = px_dst->b * a + px_src->b * src_a;
+			out_a = src_a + a;
+			if( out_a > 0 ) {
+				out_r /= out_a;
+				out_g /= out_a;
+				out_b /= out_a;
+			}
+			px_dst->r = (uchar_t)(out_r + 0.5);
+			px_dst->g = (uchar_t)(out_g + 0.5);
+			px_dst->b = (uchar_t)(out_b + 0.5);
+			px_dst->a = (uchar_t)(255.0 * out_a + 0.5);
 			++px_src;
 			++px_dst;
 		}
@@ -462,16 +467,21 @@ mix_with_opacity:
 		px_src = px_row_src;
 		px_dst = px_row_des;
 		for( x=0; x<des_rect.width; ++x ) {
-			src_a = px_src->a * src->opacity;
-			a = ((255.0 - px_src->a) * px_dst->a) / 65025.0;
-			px_dst->r = px_dst->r * a;
-			px_dst->g = px_dst->g * a;
-			px_dst->b = px_dst->b * a;
-			px_dst->a = 255.0 * a;
-			px_dst->r += (px_src->r * src_a) >> 8;
-			px_dst->g += (px_src->g * src_a) >> 8;
-			px_dst->b += (px_src->b * src_a) >> 8;
-			px_dst->a += src_a;
+			src_a = px_src->a / 255.0 * src->opacity;
+			a = (1.0 - src_a) * px_dst->a / 255.0;
+			out_r = px_dst->r * a + px_src->r * src_a;
+			out_g = px_dst->g * a + px_src->g * src_a;
+			out_b = px_dst->b * a + px_src->b * src_a;
+			out_a = src_a + a;
+			if( out_a > 0 ) {
+				out_r /= out_a;
+				out_g /= out_a;
+				out_b /= out_a;
+			}
+			px_dst->r = (uchar_t)(out_r + 0.5);
+			px_dst->g = (uchar_t)(out_g + 0.5);
+			px_dst->b = (uchar_t)(out_b + 0.5);
+			px_dst->a = (uchar_t)(255.0 * out_a + 0.5);
 			++px_src;
 			++px_dst;
 		}
