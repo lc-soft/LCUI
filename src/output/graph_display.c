@@ -55,21 +55,22 @@
 
 /** surface 记录 */
 typedef struct SurfaceRecord {
-	LCUI_Surface	surface;	/**< surface */
-	LCUI_Widget	widget;		/**< surface 所映射的 widget */
+	LCUI_Surface surface;	/**< surface */
+	LCUI_Widget widget;	/**< surface 所映射的 widget */
 } SurfaceRecord;
 
 /** 图形显示功能的上下文数据 */
 static struct DisplayContext {
-	LCUI_BOOL		is_working;	/**< 标志，指示当前模块是否处于工作状态 */
-	FrameCtrlCtx		fc_ctx;		/**< 上下文句柄，用于画面更新时的帧数控制 */
-	LCUI_Thread		thread;		/**< 线程，负责画面更新工作 */
-	LinkedList		surfaces;	/**< surface 列表 */
-	LCUI_Mutex		mutex;
-	int			mode;
-	LCUI_DisplayInfo	info;
-	LCUI_SurfaceMethods	*methods;
-} display = { FALSE, NULL, 0 };
+	int mode;			/**< 显示模式 */
+	LCUI_BOOL show_rect_border;	/**< 是否为重绘的区域显示边框 */
+	LCUI_BOOL is_working;		/**< 标志，指示当前模块是否处于工作状态 */
+	FrameCtrlCtx fc_ctx;		/**< 上下文句柄，用于画面更新时的帧数控制 */
+	LCUI_Thread thread;		/**< 线程，负责画面更新工作 */
+	LinkedList surfaces;		/**< surface 列表 */
+	LCUI_Mutex mutex;
+	LCUI_DisplayInfo info;
+	LCUI_SurfaceMethods *methods;
+} display = { LDM_DEFAULT, FALSE, FALSE, NULL };
 
 /** 获取当前的屏幕内容每秒更新的帧数 */
 int LCUIDisplay_GetFPS(void)
@@ -80,11 +81,14 @@ int LCUIDisplay_GetFPS(void)
 /** 更新各种图形元素的显示 */
 static void LCUIDisplay_Update(void)
 {
+	LCUI_Rect box;
+	LCUI_Border border;
+	LCUI_PaintContext paint;
+	LinkedListNode *sn, *rn;
 	SurfaceRecord *p_sr;
 	LinkedList rlist;
-	LinkedListNode *sn, *rn;
-	LCUI_PaintContext paint;
 
+	border = Border( 1, SV_SOLID, RGB( 255, 0, 0 ) );
 	LinkedList_Init( &rlist );
 	/* 遍历当前的 surface 记录列表 */
 	LinkedList_ForEach( sn, &display.surfaces ) {
@@ -93,7 +97,6 @@ static void LCUIDisplay_Update(void)
 		 || !Surface_IsReady(p_sr->surface) ) {
 			continue;
 		}
-		/* 更新表面 */
 		Surface_Update( p_sr->surface );
 		/* 收集无效区域记录 */
 		Widget_ProcInvalidArea( p_sr->widget, &rlist );
@@ -104,6 +107,12 @@ static void LCUIDisplay_Update(void)
 				p_sr->widget->type, paint->rect.left,
 				paint->rect.top, paint->rect.w, paint->rect.h );
 			Widget_Render( p_sr->widget, paint );
+			if( display.show_rect_border ) {
+				box.x = box.y = 0;
+				box.width = paint->rect.width;
+				box.height = paint->rect.height;
+				Graph_DrawBorder( paint, &box, &border );
+			}
 			Surface_EndPaint( p_sr->surface, paint );
 		}
 		if( rlist.length > 0 ) {
@@ -287,6 +296,16 @@ int LCUIDisplay_SetMode( int mode )
 int LCUIDisplay_GetMode(void)
 {
 	return display.mode;
+}
+
+void LCUIDisplay_ShowRectBorder(void)
+{
+	display.show_rect_border = TRUE;
+}
+
+void LCUIDisplay_HideRectBorder( void )
+{
+	display.show_rect_border = FALSE;
 }
 
 void LCUIDisplay_ExecResize( int width, int height )
