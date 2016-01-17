@@ -1283,7 +1283,6 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 			y += p_row->height;
 			continue;
 		}
-		x += layer_pos.x;
 		/* 遍历该行的文字 */
 		for( ; col<p_row->length; ++col ) {
 			p_char = p_row->string[col];
@@ -1291,8 +1290,9 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 				continue;
 			}
 			/* 计算字体位图的绘制坐标 */
-			char_pos.x = x + p_char->bitmap->left;
+			char_pos.x = layer_pos.x + x;
 			char_pos.y = layer_pos.y + y;
+			char_pos.x += p_char->bitmap->left;
 			char_pos.y += p_row->text_height * 4 / 5;
 			char_pos.y += (p_row->height - p_row->text_height) / 2;
 			char_pos.y -= p_char->bitmap->top;

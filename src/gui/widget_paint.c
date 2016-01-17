@@ -340,7 +340,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		child_rect = child->box.graph;
 		child_rect.x += (content_left - paint->rect.x);
 		child_rect.y += (content_top - paint->rect.y);
-		/* 获取于内容框重叠的区域，作为子部件的绘制区域 */
+		/* 获取与内容框重叠的区域，作为子部件的绘制区域 */
 		has_overlay = LCUIRect_GetOverlayRect(
 			&content_rect, &child_rect, &child_paint.rect
 		);
@@ -348,7 +348,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		if( !has_overlay ) {
 			continue;
 		}
-		/* 将子部件绘制区域转换相对于当前部件内容框 */
+		/* 将子部件绘制区域转换成相对于当前部件内容框 */
 		canvas_rect.x = child_paint.rect.x - content_rect.x;
 		canvas_rect.y = child_paint.rect.y - content_rect.y;
 		canvas_rect.width = child_paint.rect.width;
