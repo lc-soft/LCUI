@@ -294,7 +294,10 @@ LCUI_API void Widget_FlushPosition( LCUI_Widget w );
 LCUI_API void Widget_FlushSize( LCUI_Widget w );
 
 /** 刷新各项属性 */
-void Widget_FlushProps( LCUI_Widget w );
+LCUI_API void Widget_FlushProps( LCUI_Widget w );
+
+/** 处理部件中当前积累的任务 */
+LCUI_API int Widget_Flush( LCUI_Widget w );
 
 /** 计算部件通过继承得到的样式表 */
 LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );

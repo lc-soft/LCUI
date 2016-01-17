@@ -208,8 +208,8 @@ void Widget_DestroyTaskBox( LCUI_Widget widget )
 	widget->task = NULL;
 }
 
-/** 处理部件的各种任务 */
-static int Widget_ProcTask( LCUI_Widget w )
+/** 处理部件中当前积累的任务 */
+int Widget_Flush( LCUI_Widget w )
 {
 	int ret = 1, i;
 	LCUI_BOOL *buffer;
@@ -266,7 +266,7 @@ skip_proc_self_task:;
 			 * 个结点。
 			 */
 			next = node->next;
-			ret = Widget_ProcTask( child );
+			ret = Widget_Flush( child );
 			/* 如果该级部件的任务需要留到下次再处理 */
 			if( ret == 1 ) {
 				w->task->for_children = TRUE;
@@ -282,5 +282,5 @@ skip_proc_self_task:;
 /** 处理一次当前积累的部件任务 */
 void LCUIWidget_StepTask(void)
 {
-	Widget_ProcTask(LCUIWidget_GetRoot() );
+	Widget_Flush( LCUIWidget_GetRoot() );
 }

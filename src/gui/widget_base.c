@@ -223,6 +223,9 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 	LCUI_BOOL is_hit;
 	LinkedListNode *node;
 	LCUI_Widget target = widget, c = NULL;
+	if( !widget ) {
+		return NULL;
+	}
 	do {
 		is_hit = FALSE;
 		LinkedList_ForEach( node, &target->children_show ) {
