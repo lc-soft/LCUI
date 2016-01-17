@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "helloworld", "helloworld\helloworld.vcxproj", "{125F6442-33EA-428E-B75B-9F99FB73D077}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCUITest", "LCUITest\LCUITest.vcxproj", "{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,14 @@ Global
 		{125F6442-33EA-428E-B75B-9F99FB73D077}.Release|Win32.ActiveCfg = Release|Win32
 		{125F6442-33EA-428E-B75B-9F99FB73D077}.Release|Win32.Build.0 = Release|Win32
 		{125F6442-33EA-428E-B75B-9F99FB73D077}.Release|x64.ActiveCfg = Release|Win32
+		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Debug|ARM.ActiveCfg = Debug|Win32
+		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Debug|Win32.Build.0 = Debug|Win32
+		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Debug|x64.ActiveCfg = Debug|Win32
+		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Release|ARM.ActiveCfg = Release|Win32
+		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Release|Win32.ActiveCfg = Release|Win32
+		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Release|Win32.Build.0 = Release|Win32
+		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

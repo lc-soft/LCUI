@@ -1,0 +1,21 @@
+.window .content .btn textview {
+	width: 100px;
+}
+.window .content .btn .test {
+	height: 60px;
+}
+.window textview {
+	position: absolute;
+}
+#test-textview {
+	top: 12px;
+}
+.text {
+	left: 20px;
+}
+.btn:hover textview {
+	background-color: #f00;
+}
+.btn:hover .text {
+	background-size: contain;
+}
