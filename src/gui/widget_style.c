@@ -100,34 +100,45 @@ static int CompareName( void *data, const void *keydata )
 	return strcmp( ((StyleTreeNode*)data)->name, (const char*)keydata );
 }
 
-/** 删除选择器 */
-void DeleteSelector( LCUI_Selector *selector )
+static DeleteSelectorNode( LCUI_SelectorNode *node_ptr )
 {
-	LCUI_SelectorNode *node_ptr;
-	for( node_ptr=(*selector)->list; *node_ptr; ++node_ptr ) {
-		if( (*node_ptr)->type ) {
-			free( (*node_ptr)->type );
-			(*node_ptr)->type = NULL;
-		}
-		if( (*node_ptr)->class_name ) {
-			free( (*node_ptr)->class_name );
-			(*node_ptr)->class_name = NULL;
-		}
-		if( (*node_ptr)->id ) {
-			free( (*node_ptr)->id );
-			(*node_ptr)->id = NULL;
-		}
-		if( (*node_ptr)->pseudo_class_name ) {
-			free( (*node_ptr)->pseudo_class_name );
-			(*node_ptr)->pseudo_class_name = NULL;
-		}
-		free( *node_ptr );
+	LCUI_SelectorNode node = *node_ptr;
+	if( node->type ) {
+		free( node->type );
+		node->type = NULL;
 	}
-	(*selector)->rank = 0;
-	(*selector)->length = 0;
-	free( (*selector)->list );
-	free( *selector );
-	*selector = NULL;
+	if( node->class_name ) {
+		free( node->class_name );
+		node->class_name = NULL;
+	}
+	if( node->id ) {
+		free( node->id );
+		node->id = NULL;
+	}
+	if( node->pseudo_class_name ) {
+		free( node->pseudo_class_name );
+		node->pseudo_class_name = NULL;
+	}
+	free( node );
+	*node_ptr = NULL;
+}
+
+/** 删除选择器 */
+void DeleteSelector( LCUI_Selector *s_ptr )
+{
+	int i;
+	LCUI_Selector s = *s_ptr;
+	for( i = 0; i<MAX_SELECTOR_DEPTH; ++i ) {
+		if( !s->list[i] ) {
+			break;
+		}
+		DeleteSelectorNode( &s->list[i] );
+	}
+	s->rank = 0;
+	s->length = 0;
+	free( s->list );
+	free( s );
+	*s_ptr = NULL;
 }
 
 /** 清空样式表 */
@@ -297,36 +308,43 @@ LCUI_StyleSheet StyleSheet( void )
 	return ss;
 }
 
-static int SaveSelectorNode( LCUI_SelectorNode node, const char *name, char type )
+static int SaveSelectorNode( LCUI_SelectorNode node, 
+			     const char *name, int len, char type )
 {
-
+	char *str;
+	if( len < 1 ) {
+		return 0;
+	}
+	str = malloc( (len + 1)*sizeof( char ) );
+	strcpy( str, name );
 	switch( type ) {
 	case 0:
 		if( node->type ) {
-			return -1;
+			break;
 		}
-		node->type = strdup( name );
-		return 0;
+		node->type = str;
+		return TYPE_RANK;
 	case ':':
 		if( node->pseudo_class_name ) {
-			return -2;
+			break;
 		}
-		node->pseudo_class_name = strdup( name );
+		node->pseudo_class_name = str;
 		return PCLASS_RANK;
 	case '.':
 		if( node->class_name ) {
-			return -3;
+			break;
 		}
-		node->class_name = strdup( name );
+		node->class_name = str;
 		return CLASS_RANK;
 	case '#':
 		if( node->id ) {
-			return -4;
+			break;
 		}
-		node->id = strdup( name );
+		node->id = str;
 		return ID_RANK;
 	default: break;
 	}
+	free( str );
 	return 0;
 }
 
@@ -344,7 +362,7 @@ LCUI_Selector Selector( const char *selector )
 	s->list = NEW(LCUI_SelectorNode, MAX_SELECTOR_DEPTH);
 	for( ni = 0, si = 0, p = selector; *p; ++p ) {
 		if( !node && is_saving ) {
-			node = NEW(LCUI_SelectorNodeRec, 1);
+			node = NEW( LCUI_SelectorNodeRec, 1 );
 			if( si >= MAX_SELECTOR_DEPTH ) {
 				_DEBUG_MSG( "%s: selector node list is too long.\n",
 					    selector );
@@ -356,17 +374,21 @@ LCUI_Selector Selector( const char *selector )
 		case ':':
 		case '.':
 		case '#':
-			/* 保存上个结点 */
-			if( is_saving ) {
-				rank = SaveSelectorNode( node, name, type );
-				if( rank < 0 ) {
-					_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
-						    selector, p - selector - ni );
-					return NULL;
-				}
-				s->rank += rank;
-				ni = 0;
+			if( !is_saving ) {
+				is_saving = TRUE;
+				type = *p;
+				continue;
 			}
+			/* 保存上个结点 */
+			rank = SaveSelectorNode( node, name, ni, type );
+			if( rank > 0 ) {
+				s->rank += rank;
+			} else {
+				_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
+						selector, p - selector - ni );
+				DeleteSelectorNode( &node );
+			}
+			ni = 0;
 			is_saving = TRUE;
 			type = *p;
 			continue;
@@ -374,19 +396,24 @@ LCUI_Selector Selector( const char *selector )
 		case '\r':
 		case '\n':
 		case '\t':
-			if( is_saving ) {
-				rank = SaveSelectorNode( node, name, type );
-				if(  rank < 0 ) {
-					_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
-						    selector, p - selector - ni );
-					return NULL;
-				}
-				s->rank += rank;
-				is_saving = FALSE;
-				++si;
+			if( !is_saving ) {
+				ni = 0;
+				node = NULL;
+				continue;
 			}
+			is_saving = FALSE;
+			rank = SaveSelectorNode( node, name, ni, type );
+			if( rank > 0 ) {
+				si++;
+				ni = 0;
+				node = NULL;
+				s->rank += rank;
+				continue;
+			}
+			_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
+				    selector, p - selector - ni );
+			DeleteSelectorNode( &node );
 			ni = 0;
-			node = NULL;
 			continue;
 		default: break;
 		}
@@ -406,9 +433,12 @@ LCUI_Selector Selector( const char *selector )
 		return NULL;
 	}
 	if( is_saving ) {
-		rank = SaveSelectorNode( s->list[si++], name, type );
+		rank = SaveSelectorNode( s->list[si], name, ni, type );
 		if( rank > 0 ) {
 			s->rank += rank;
+			si++;
+		} else {
+			DeleteSelectorNode( &s->list[si] );
 		}
 	}
 	s->list[si] = NULL;

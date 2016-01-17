@@ -618,6 +618,12 @@ static void DeleteCSSParserContext( CSSParserContext *ctx_ptr )
 	*ctx_ptr = NULL;
 }
 
+static void OnDeleteSelector( void *data )
+{
+	LCUI_Selector s = data;
+	DeleteSelector( &s );
+}
+
 /** 载入CSS代码块，用于实现CSS代码的分块载入 */
 static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
 {
@@ -738,7 +744,7 @@ put_css:
 		LinkedList_ForEach( node, &ctx->selectors ) {
 			LCUI_PutStyle( node->data, ctx->css );
 		}
-		LinkedList_Clear( &ctx->selectors, (FuncPtr)DeleteSelector );
+		LinkedList_Clear( &ctx->selectors, OnDeleteSelector );
 		DeleteStyleSheet( &ctx->css );
 		continue;
 select_parser:	
