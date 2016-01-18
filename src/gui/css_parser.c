@@ -471,17 +471,34 @@ static int OnParseBackground( LCUI_StyleSheet ss, int key, const char *str )
 	return 0;
 }
 
+static int OnParseBackgroundSize( LCUI_StyleSheet ss, int key, const char *str )
+{
+	LCUI_Style slist[2];
+	int ret = OnParseStyleOption( ss, key, str );
+	if( ret == 0 ) {
+		return 0;
+	}
+	ret = SplitValues( str, slist, 2, SPLIT_NUMBER | SPLIT_STYLE );
+	if( ret != 2 ) {
+		return -1;
+	}
+	ss->sheet[key_background_size_width] = slist[0];
+	ss->sheet[key_background_size_height] = slist[1];
+	return 0;
+}
+
 static KeyNameGroup style_name_map[] = {
 	{ key_visible, "visible"},
 	{ key_width, "width" },
 	{ key_height, "height" },
-	{key_display, "display"},
-	{key_top, "top"},
-	{key_right, "right"},
-	{key_left, "left"},
-	{key_bottom, "bottom"},
+	{ key_display, "display" },
+	{ key_top, "top" },
+	{ key_right, "right" },
+	{ key_left, "left" },
+	{ key_bottom, "bottom" },
 	{ key_position, "position" },
 	{ key_background_color, "background-color" },
+	{ key_background_size, "background-size" },
 	{ key_background_image, "background-image" },
 	{ key_border_color, "border-color" },
 	{ key_border_width, "border-width" },
@@ -560,6 +577,7 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ key_display, NULL, OnParseStyleOption },
 	{ key_background_color, NULL, OnParseColor },
 	{ key_background_image, NULL, OnParseImage },
+	{ key_background_size, NULL, OnParseBackgroundSize },
 	{ key_border_top_color, NULL, OnParseColor },
 	{ key_border_right_color, NULL, OnParseColor },
 	{ key_border_bottom_color, NULL, OnParseColor },

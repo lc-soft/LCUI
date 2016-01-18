@@ -587,7 +587,7 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 {
 	int i, n;
 	LCUI_Widget *obj_ptr = wlist, w;
-	LCUI_SelectorNode *sn_ptr = selector->list;
+	LCUI_SelectorNode sn, *sn_ptr = selector->list;
 	/* 定位到最后一个元素 */
 	sn_ptr += selector->length-1;
 	for( ;*obj_ptr; ++obj_ptr );
@@ -595,21 +595,22 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 	/* 从右到左遍历，进行匹配 */
 	for( ; obj_ptr >= wlist && sn_ptr >= selector->list; --obj_ptr ) {
 		w = *obj_ptr;
-		if( (*sn_ptr)->id ) {
-			if( strcmp( w->id, (*sn_ptr)->id ) ) {
+		sn = *sn_ptr;
+		if( sn->id ) {
+			if( strcmp( w->id, sn->id ) ) {
 				continue;
 			}
 		}
-		if( (*sn_ptr)->type && strcmp("*", (*sn_ptr)->type) ) {
-			if( !w->type || strcmp(w->type, (*sn_ptr)->type) ) {
+		if( sn->type && strcmp("*", sn->type) ) {
+			if( !w->type || strcmp( w->type, sn->type ) ) {
 				continue;
 			}
 		}
-		if( (*sn_ptr)->class_name ) {
+		if( sn->class_name ) {
 			n = ptrslen( w->classes );
 			for( i = 0; i < n; ++i ) {
-				if( strcmp(w->classes[i],
-				 (*sn_ptr)->class_name) == 0 ) {
+				if( strcmp( w->classes[i],
+					    sn->class_name ) == 0 ) {
 					break;
 				}
 			}
@@ -617,11 +618,11 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 				continue;
 			}
 		}
-		if( (*sn_ptr)->pseudo_class_name ) {
+		if( sn->pseudo_class_name ) {
 			n = ptrslen( w->pseudo_classes );
 			for( i = 0; i < n; ++i ) {
-				if( strcmp(w->pseudo_classes[i],
-					(*sn_ptr)->pseudo_class_name) == 0 ) {
+				if( strcmp( w->pseudo_classes[i],
+					    sn->pseudo_class_name ) == 0 ) {
 					break;
 				}
 			}
@@ -668,7 +669,7 @@ static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 	}
 	styles = &((StyleTreeNode*)tn->data)->styles;
 	LinkedList_ForEach( node, styles ) {
-		sln = (StyleListNode*)node->data;
+		sln = node->data;
 		/* 如果当前元素在该样式结点的作用范围内 */
 		if( IsMatchPath(wlist, sln->selector) ) {
 			LinkedList_Append( list, sln->style );
@@ -802,10 +803,10 @@ void LCUI_PrintStyleLibrary(void)
 	printf("style library begin\n");
 	tn = RBTree_First( &style_library.style );
 	while( tn ) {
-		stn = (StyleTreeNode*)tn->data;
+		stn = tn->data;
 		printf("target: %s\n", stn->name);
 		LinkedList_ForEach( node, &stn->styles ) {
-			sln = (StyleListNode*)node->data;
+			sln = node->data;
 			LCUI_PrintSelector( sln->selector );
 			LCUI_PrintStyleSheet( sln->style );
 		}
