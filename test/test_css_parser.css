@@ -1,7 +1,7 @@
 .window .content .btn textview {
 	width: 100px;
 }
-.window .content .btn .test {
+.window .content .btn .text {
 	height: 60px;
 }
 .window textview {
@@ -13,9 +13,9 @@
 .text {
 	left: 20px;
 }
-.btn:hover textview {
+.window .content .btn:hover textview {
 	background-color: #f00;
 }
-.btn:hover .text {
+.window .content .btn:hover .text {
 	background-size: contain;
 }
