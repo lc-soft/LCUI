@@ -44,6 +44,9 @@
 #include <LCUI/gui/widget/button.h>
 #include <LCUI/gui/widget/sidebar.h>
 
+#undef max
+#define max(a,b)    (((a) > (b)) ? (a) : (b))
+
 static struct LCUIWidgetModule {
 	LCUI_Widget root;	/** 获取根级部件 */
 	LCUI_RBTree ids;	/** 各种部件的ID索引 */
@@ -76,7 +79,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget w )
 	LinkedList_AppendNode( &parent->children_show, snode );
 	Widget_FlushZIndex( w );
 	Widget_PostSurfaceEvent( w, WET_ADD );
-	Widget_AddTaskToSpread( w, WTT_REFRESH_STYLE );
+	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( w );
 	Widget_AddTask( parent, WTT_LAYOUT );
 	DEBUG_MSG("tip\n");
@@ -107,7 +110,7 @@ int Widget_Unwrap( LCUI_Widget *widget )
 		LinkedList_Link( list, target, node );
 		LinkedList_AppendNode( list_show, snode );
 		Widget_FlushZIndex( child );
-		Widget_AddTaskToSpread( child, WTT_REFRESH_STYLE );
+		Widget_AddTaskForChildren( child, WTT_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
 		node = prev;
 	}
@@ -982,7 +985,7 @@ void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left )
 	SetStyle( w->custom_style, key_margin_right, right, px );
 	SetStyle( w->custom_style, key_margin_bottom, bottom, px );
 	SetStyle( w->custom_style, key_margin_left, left, px );
-	Widget_Update( w, FALSE );
+	Widget_FlushStyle( w, FALSE );
 }
 
 void Widget_Move( LCUI_Widget w, int left, int top )
@@ -990,26 +993,26 @@ void Widget_Move( LCUI_Widget w, int left, int top )
 	SetStyle( w->custom_style, key_top, top, px );
 	SetStyle( w->custom_style, key_left, left, px );
 	DEBUG_MSG("top = %d, left = %d\n", top, left);
-	Widget_Update( w, FALSE );
+	Widget_FlushStyle( w, FALSE );
 }
 
 void Widget_Resize( LCUI_Widget w, int width, int height )
 {
 	SetStyle( w->custom_style, key_width, width, px );
 	SetStyle( w->custom_style, key_height, height, px );
-	Widget_Update( w, FALSE );
+	Widget_FlushStyle( w, FALSE );
 }
 
 void Widget_Show( LCUI_Widget w )
 {
 	SetStyle( w->custom_style, key_visible, TRUE, int );
-	Widget_Update( w, FALSE );
+	Widget_FlushStyle( w, FALSE );
 }
 
 void Widget_Hide( LCUI_Widget w )
 {
 	SetStyle( w->custom_style, key_visible, FALSE, int );
-	Widget_Update( w, FALSE );
+	Widget_FlushStyle( w, FALSE );
 }
 
 void Widget_SetBackgroundColor( LCUI_Widget w, LCUI_Color color )
@@ -1154,7 +1157,7 @@ int Widget_AddClass( LCUI_Widget w, const char *class_name )
 		return 0;
 	}
 	// 标记需要更新该部件及子级部件的样式表
-	Widget_AddTaskToSpread( w, WTT_UPDATE_STYLE );
+	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
 	return 1;
 }
 
@@ -1171,7 +1174,7 @@ int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 		return 0;
 	}
 	Widget_AddTask( w, WTT_REFRESH_STYLE );
-	Widget_AddTaskToSpread( w, WTT_REFRESH_STYLE );
+	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
 	return 1;
 }
 
@@ -1182,7 +1185,7 @@ int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 		return 0;
 	}
 	Widget_AddTask( w, WTT_REFRESH_STYLE );
-	Widget_AddTaskToSpread( w,  WTT_REFRESH_STYLE );
+	Widget_AddTaskForChildren( w,  WTT_REFRESH_STYLE );
 	return 1;
 }
 
@@ -1199,7 +1202,7 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 		return 0;
 	}
 	Widget_AddTask( w, WTT_REFRESH_STYLE );
-	Widget_AddTaskToSpread( w,  WTT_REFRESH_STYLE );
+	Widget_AddTaskForChildren( w,  WTT_REFRESH_STYLE );
 	return 1;
 }
 

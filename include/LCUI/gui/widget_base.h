@@ -302,6 +302,12 @@ LCUI_API int Widget_Flush( LCUI_Widget w );
 /** 计算部件通过继承得到的样式表 */
 LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 
+/** 更新当前部件的样式 */
+LCUI_API void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
+
+/** 直接更新当前部件的样式 */
+LCUI_API void Widget_FlushStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
+
 /** 设置部件标题 */
 LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 

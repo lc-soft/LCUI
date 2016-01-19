@@ -48,8 +48,8 @@ LCUI_API void Widget_UpdateTaskStatus( LCUI_Widget widget );
 /** 添加任务 */
 LCUI_API void Widget_AddTask( LCUI_Widget widget, int task_type );
 
-/** 添加任务并扩散到子级部件 */
-LCUI_API void Widget_AddTaskToSpread( LCUI_Widget widget, int task_type );
+/** 为子级部件添加任务 */
+LCUI_API void Widget_AddTaskForChildren( LCUI_Widget widget, int task );
 
 /** 初始化部件的任务处理 */
 void Widget_InitTaskBox( LCUI_Widget widget );

@@ -159,7 +159,7 @@ static void OnToggle( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 	} else {
 		Widget_AddClass( sidebar, "sidebar-mini" );
 	}
-	Widget_Update( sidebar, TRUE );
+	Widget_FlushStyle( sidebar, TRUE );
 	e->cancel_bubble = TRUE;
 }
 

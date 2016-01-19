@@ -45,25 +45,23 @@
 #include <LCUI/misc/rbtree.h>
 #include <LCUI/gui/widget.h>
 
-#undef max
-#define max(a,b)    (((a) > (b)) ? (a) : (b))
-
-struct LCUI_WidgetTaskBoxRec_ {
+typedef struct LCUI_WidgetTaskBoxRec_ {
 	LCUI_BOOL for_self;			/**< 标志，指示当前部件是否有待处理的任务 */
 	LCUI_BOOL for_children;			/**< 标志，指示是否有待处理的子级部件 */
 	LCUI_BOOL buffer[WTT_TOTAL_NUM];	/**< 记录缓存 */
-};
+} LCUI_WidgetTaskBoxRec;
 
 static void HandleRefreshStyle( LCUI_Widget w )
 {
-	Widget_Update( w, TRUE );
+	Widget_FlushStyle( w, TRUE );
 	w->task->buffer[WTT_UPDATE_STYLE] = FALSE;
 	w->task->buffer[WTT_CACHE_STYLE] = TRUE;
+	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
 }
 
 static void HandleUpdateStyle( LCUI_Widget w )
 {
-	Widget_Update( w, FALSE );
+	Widget_FlushStyle( w, FALSE );
 	w->task->buffer[WTT_CACHE_STYLE] = TRUE;
 }
 
@@ -124,25 +122,25 @@ void Widget_UpdateTaskStatus( LCUI_Widget widget )
 	}
 }
 
-/** 添加任务并扩散到子级部件 */
-void Widget_AddTaskToSpread( LCUI_Widget widget, int task_type )
+void Widget_AddTaskForChildren( LCUI_Widget widget, int task )
 {
+	LCUI_Widget child;
 	LinkedListNode *node;
-	widget->task->buffer[task_type] = TRUE;
-	widget->task->for_self = TRUE;
-	widget->task->for_children = TRUE;
 	LinkedList_ForEach( node, &widget->children ) {
-		Widget_AddTaskToSpread( node->data, task_type );
+		child = node->data;
+		child->task->for_self = TRUE;
+		child->task->for_children = TRUE;
+		child->task->buffer[task] = TRUE;
+		Widget_AddTaskForChildren( child, task );
 	}
 }
 
-/** 添加任务 */
-void Widget_AddTask( LCUI_Widget widget, int task_type )
+void Widget_AddTask( LCUI_Widget widget, int task )
 {
-	widget->task->buffer[task_type] = TRUE;
+	widget->task->buffer[task] = TRUE;
 	widget->task->for_self = TRUE;
 	DEBUG_MSG("widget: %s, for_self: %d, for_childen: %d, task_id: %d\n",
-	widget->type, widget->task->for_self, widget->task->for_children, task_type);
+	widget->type, widget->task->for_self, widget->task->for_children, task);
 	widget = widget->parent;
 	/* 向没有标记的父级部件添加标记 */
 	while( widget && !widget->task->for_children ) {
@@ -192,8 +190,7 @@ void LCUIWidget_ExitTask(void)
 void Widget_InitTaskBox( LCUI_Widget widget )
 {
 	int i;
-	widget->task = (LCUI_WidgetTaskBox)
-	malloc(sizeof(struct LCUI_WidgetTaskBoxRec_));
+	widget->task = NEW(LCUI_WidgetTaskBoxRec, 1);
 	widget->task->for_children = FALSE;
 	widget->task->for_self = FALSE;
 	for( i=0; i<WTT_TOTAL_NUM; ++i ) {

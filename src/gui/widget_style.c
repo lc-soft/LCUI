@@ -100,7 +100,7 @@ static int CompareName( void *data, const void *keydata )
 	return strcmp( ((StyleTreeNode*)data)->name, (const char*)keydata );
 }
 
-static DeleteSelectorNode( LCUI_SelectorNode *node_ptr )
+static void DeleteSelectorNode( LCUI_SelectorNode *node_ptr )
 {
 	LCUI_SelectorNode node = *node_ptr;
 	if( node->type ) {
@@ -123,7 +123,6 @@ static DeleteSelectorNode( LCUI_SelectorNode *node_ptr )
 	*node_ptr = NULL;
 }
 
-/** 删除选择器 */
 void DeleteSelector( LCUI_Selector *s_ptr )
 {
 	int i;
@@ -141,7 +140,6 @@ void DeleteSelector( LCUI_Selector *s_ptr )
 	*s_ptr = NULL;
 }
 
-/** 清空样式表 */
 void ClearStyleSheet( LCUI_StyleSheet ss )
 {
 	int i;
@@ -162,7 +160,6 @@ void ClearStyleSheet( LCUI_StyleSheet ss )
 	}
 }
 
-/** 删除样式表 */
 void DeleteStyleSheet( LCUI_StyleSheet *ss )
 {
 	ClearStyleSheet( *ss );
@@ -183,7 +180,6 @@ static void DestroyStyleTreeNode( void *data )
 	LinkedList_Clear( &node->styles, (FuncPtr)DestroyStyleListNode );
 }
 
-/** 合并两个样式表 */
 int MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 {
 	LCUI_Style *s;
@@ -227,7 +223,6 @@ int MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 	return 0;
 }
 
-/** 覆盖样式表 */
 int ReplaceStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 {
 	LCUI_Style *s;
@@ -277,7 +272,6 @@ int ReplaceStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 	return count;
 }
 
-/** 初始化 */
 void LCUIWidget_InitStyle( void )
 {
 	RBTree_Init( &style_library.style );
@@ -288,7 +282,6 @@ void LCUIWidget_InitStyle( void )
 	LCUICSS_LoadString( global_css );
 }
 
-/** 销毁，释放资源 */
 void LCUIWidget_ExitStyle( void )
 {
 	RBTree_Destroy( &style_library.style );
@@ -348,7 +341,6 @@ static int SaveSelectorNode( LCUI_SelectorNode node,
 	return 0;
 }
 
-/** 根据字符串内容生成相应的选择器 */
 LCUI_Selector Selector( const char *selector )
 {
 	int ni, si, rank;
@@ -457,7 +449,6 @@ static int mystrcmp( const char *str1, const char *str2 )
 	return strcasecmp( str1, str2 );
 }
 
-/** 判断两个选择器是否相等 */
 LCUI_BOOL SelectorIsEqual( LCUI_Selector s1, LCUI_Selector s2 )
 {
 	LCUI_SelectorNode *sn1_ptr = s1->list, *sn2_ptr = s2->list;
@@ -571,7 +562,6 @@ static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector )
 	return NULL;
 }
 
-/** 向样式库添加样式表 */
 int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
 {
 	LCUI_StyleSheet ss;
@@ -582,7 +572,6 @@ int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
 	return 0;
 }
 
-/** 匹配元素路径与样式结点路径 */
 LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 {
 	int i, n;
@@ -713,7 +702,6 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 	return count;
 }
 
-/** 打印样式表的内容 */
 void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 {
 	int key;
@@ -764,7 +752,6 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 	}
 }
 
-/** 打印选择器的内容 */
 void LCUI_PrintSelector( LCUI_Selector selector )
 {
 	char path[256];
@@ -792,7 +779,6 @@ void LCUI_PrintSelector( LCUI_Selector selector )
 	printf("\tpath: %s\n", path);
 }
 
-/** 打印样式库中的内容 */
 void LCUI_PrintStyleLibrary(void)
 {
 	LCUI_RBTreeNode *tn;
@@ -815,7 +801,6 @@ void LCUI_PrintStyleLibrary(void)
 	printf("style library end\n");
 }
 
-/** 计算部件继承得到的样式表 */
 int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 {
 	LinkedList list;
@@ -830,8 +815,16 @@ int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 	return 0;
 }
 
-/** 更新当前部件的样式 */
-void Widget_Update( LCUI_Widget w, LCUI_BOOL is_update_all )
+void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
+{
+	if( is_update_all ) {
+		Widget_AddTask( w, WTT_REFRESH_STYLE );
+	} else {
+		Widget_AddTask( w, WTT_UPDATE_STYLE );
+	}
+}
+
+void Widget_FlushStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
 	int i, key;
 	LCUI_WidgetClass *wc;
