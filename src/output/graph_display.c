@@ -171,7 +171,7 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 	Surface_SetCaptionW( p_sr->surface, widget->title );
 	p_rect = &widget->box.graph;
 
-	if( widget->style->sheet[key_top].is_valid && 
+	if( widget->style->sheet[key_top].is_valid &&
 	    widget->style->sheet[key_left].is_valid ) {
 		Surface_Move( p_sr->surface, p_rect->x, p_rect->y );
 	}
@@ -225,8 +225,7 @@ static int LCUIDisplay_Windowed( void )
 		break;
 	}
 	Widget_Show( root );
-	Widget_Resize( root, display.info.getWidth(), 
-		       display.info.getHeight() );
+	Widget_Resize( root, LCUIDisplay_GetWidth(), LCUIDisplay_GetHeight() );
 	display.mode = LDM_WINDOWED;
 	return 0;
 }
@@ -244,8 +243,7 @@ static int LCUIDisplay_FullScreen( void )
 		return 0;
 	}
 	display.mode = LDM_FULLSCREEN;
-	LCUIDisplay_SetSize( display.info.getWidth(), 
-			     display.info.getHeight() );
+	LCUIDisplay_SetSize( LCUIDisplay_GetWidth(), LCUIDisplay_GetHeight() );
 	return 0;
 }
 
@@ -327,13 +325,13 @@ void LCUIDisplay_SetSize( int width, int height )
 /** 获取屏幕宽度 */
 int LCUIDisplay_GetWidth( void )
 {
-	return display.info.getWidth();
+	return display.info.getWidth ? display.info.getWidth() : 0;
 }
 
 /** 获取屏幕高度 */
 int LCUIDisplay_GetHeight( void )
 {
-	return display.info.getHeight();
+	return display.info.getHeight ? display.info.getHeight() : 0;
 }
 
 /** LCUI的图形显示处理线程 */
@@ -442,17 +440,22 @@ static void Surface_OnInvalidRect( LCUI_Surface surface, LCUI_Rect *rect )
 
 void Surface_Delete( LCUI_Surface surface )
 {
-	display.methods->delete( surface );
+	if( display.methods && display.methods->delete ) {
+		display.methods->delete( surface );
+	}
 }
 
 LCUI_Surface Surface_New( void )
 {
-	return display.methods->new();
+	if( display.methods ) {
+		return display.methods->new();
+	}
+	return NULL;
 }
 
 LCUI_BOOL Surface_IsReady( LCUI_Surface surface )
 {
-	if( display.methods->isReady ) {
+	if( display.methods && display.methods->isReady ) {
 		return display.methods->isReady( surface );
 	}
 	return TRUE;
@@ -460,7 +463,7 @@ LCUI_BOOL Surface_IsReady( LCUI_Surface surface )
 
 void Surface_Move( LCUI_Surface surface, int x, int y )
 {
-	if( display.methods->move ) {
+	if( display.methods && display.methods->move ) {
 		display.methods->move( surface, x, y );
 	}
 }
@@ -474,21 +477,21 @@ void Surface_Resize( LCUI_Surface surface, int w, int h )
 
 void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 {
-	if( display.methods->setCaptionW ) {
+	if( display.methods && display.methods->setCaptionW ) {
 		display.methods->setCaptionW( surface, str );
 	}
 }
 
 void Surface_Show( LCUI_Surface surface )
 {
-	if( display.methods->show ) {
+	if( display.methods && display.methods->show ) {
 		display.methods->show( surface );
 	}
 }
 
 void Surface_Hide( LCUI_Surface surface )
 {
-	if( display.methods->hide ) {
+	if( display.methods && display.methods->hide ) {
 		display.methods->hide( surface );
 	}
 }
@@ -496,7 +499,7 @@ void Surface_Hide( LCUI_Surface surface )
 /** 设置 Surface 的渲染模式 */
 void Surface_SetRenderMode( LCUI_Surface surface, int mode )
 {
-	if( display.methods->setRenderMode ) {
+	if( display.methods && display.methods->setRenderMode ) {
 		display.methods->setRenderMode( surface, mode );
 	}
 }
@@ -504,7 +507,7 @@ void Surface_SetRenderMode( LCUI_Surface surface, int mode )
 /** 更新 surface，应用缓存的变更 */
 void Surface_Update( LCUI_Surface surface )
 {
-	if( display.methods->update ) {
+	if( display.methods && display.methods->update ) {
 		display.methods->update( surface );
 	}
 }
@@ -517,6 +520,9 @@ void Surface_Update( LCUI_Surface surface )
  */
 LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 {
+	if( !display.methods ) {
+		return NULL;
+	}
 	return display.methods->beginPaint( surface, rect );
 }
 
@@ -527,12 +533,18 @@ LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
  */
 void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 {
+	if( !display.methods ) {
+		return;
+	}
 	display.methods->endPaint( surface, paint_ctx );
 }
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
 void Surface_Present( LCUI_Surface surface )
 {
+	if( !display.methods ) {
+		return;
+	}
 	display.methods->present( surface );
 }
 
@@ -553,6 +565,9 @@ int LCUI_InitDisplay( void )
 #elif defined(LCUI_VIDEO_DRIVER_FRAMEBUFFER)
 	display.methods = LCUIDisplay_InitLinuxFB( &display.info );
 #endif
+	if( !display.methods ) {
+		return -2;
+	}
 	display.methods->onInvalidRect = Surface_OnInvalidRect;
 	display.methods->onEvent = Surface_OnEvent;
 	display.fc_ctx = FrameControl_Create();

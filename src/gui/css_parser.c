@@ -79,7 +79,7 @@ static struct {
 #define SPLIT_STYLE	(1<<2)
 
 int ParseStyleOption( const char *str )
-{ 
+{
 	LCUI_RBTreeNode *node;
 	node = RBTree_CustomSearch( &self.option_tree, str );
 	if( !node ) {
@@ -93,7 +93,7 @@ const char *GetStyleName( int key )
 	return RBTree_GetData( &self.name_tree, key );
 }
 
-static int SplitValues( const char *str, LCUI_Style *slist, 
+static int SplitValues( const char *str, LCUI_Style *slist,
 			int max_len, int mode )
 {
 	int val, vi = 0, vj = 0;
@@ -378,7 +378,7 @@ static int OnParsePadding( LCUI_StyleSheet ss, int key, const char *str )
 {
 	int value_count;
 	LCUI_Style s[4];
-	
+
 	value_count = SplitValues( str, s, 4, SPLIT_NUMBER );
 	switch( value_count ) {
 	case 1:
@@ -413,7 +413,7 @@ static int OnParseMargin( LCUI_StyleSheet ss, int key, const char *str )
 {
 	int value_count;
 	LCUI_Style s[4];
-	
+
 	value_count = SplitValues( str, s, 4, SPLIT_NUMBER );
 	switch( value_count ) {
 	case 1:
@@ -492,6 +492,7 @@ static KeyNameGroup style_name_map[] = {
 	{ key_width, "width" },
 	{ key_height, "height" },
 	{ key_display, "display" },
+	{ key_z_index, "z-index" },
 	{ key_top, "top" },
 	{ key_right, "right" },
 	{ key_left, "left" },
@@ -648,7 +649,7 @@ static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
 	size_t size = 0;
 	LCUI_Selector s;
 	LinkedListNode *node;
-	
+
 	ctx->ptr = str;
 	for( ; *ctx->ptr && size < ctx->buffer_size; ++ctx->ptr, ++size ) {
 		switch( ctx->target ) {
@@ -681,7 +682,7 @@ static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
 			case '\n':
 			case '\r':
 			case '\t':
-			case ';': 
+			case ';':
 				ctx->pos = 0;
 				continue;
 			case ':': break;
@@ -747,7 +748,7 @@ proc_comment:
 		switch( *(ctx->ptr + 1) ) {
 		case '/': ctx->is_line_comment = TRUE; break;
 		case '*': ctx->is_line_comment = FALSE; break;
-		default: 
+		default:
 			ctx->buffer[ctx->pos++] = *ctx->ptr;
 			continue;
 		}
@@ -765,7 +766,7 @@ put_css:
 		LinkedList_Clear( &ctx->selectors, OnDeleteSelector );
 		DeleteStyleSheet( &ctx->css );
 		continue;
-select_parser:	
+select_parser:
 		ctx->target = is_value;
 		ctx->buffer[ctx->pos] = 0;
 		ctx->pos = 0;
@@ -800,7 +801,7 @@ int LCUICSS_LoadFile( const char *filepath )
 	FILE *fp;
 	char buff[512];
 	CSSParserContext ctx;
-	
+
 	fp = fopen( filepath, "r" );
 	if( !fp ) {
 		return -1;
@@ -886,7 +887,12 @@ void LCUICSS_Init(void)
 		new_sp->key = sp->key;
 		new_sp->parse = sp->parse;
 		if( !sp->name && sp->key >= 0 ) {
-			new_sp->name = strdup( GetStyleName(sp->key) );
+			const char *name = GetStyleName(sp->key);
+			if( !name ) {
+				free( new_sp );
+				continue;
+			}
+			new_sp->name = strdup( name );
 		} else {
 			new_sp->name = strdup( sp->name );
 		}

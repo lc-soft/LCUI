@@ -200,7 +200,7 @@ LCUI_PaintContext LinuxFB_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 	Graph_Init( &paint->canvas );
 	Graph_Create( &paint->canvas, rect->w, rect->h );
 	paint->rect = *rect;
-	_DEBUG_MSG("canvas: %p, rect: %d,%d,%d,%d\n", 
+	_DEBUG_MSG("canvas: %p, rect: %d,%d,%d,%d\n",
 		&paint->canvas, rect->x, rect->y, rect->w, rect->h);
 	return paint;
 }
@@ -350,7 +350,7 @@ void LinuxFB_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 	LCUI_Rect cut_rect;
 	LCUI_Graph canvas;
 
-	LCUIRect_GetCutArea( linuxfb.width, linuxfb.height, 
+	LCUIRect_GetCutArea( linuxfb.width, linuxfb.height,
 			     paint_ctx->rect, &cut_rect );
 	if( cut_rect.w <= 0 || cut_rect.h <= 0 ) {
 		free( paint_ctx );
@@ -438,7 +438,7 @@ LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info )
 	if( (void *)-1 == linuxfb.mem ) {
 		printf("fail\n");
 		perror(strerror(errno));
-		exit(-1);
+		return NULL;
 	} else {
 		printf("success\n");
 	}

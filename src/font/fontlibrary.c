@@ -128,8 +128,8 @@ static void DestroyTreeNode( void *arg )
 	RBTree_Destroy( (LCUI_RBTree*)arg );
 }
 
-/** 
- * 添加字体信息记录，并返回该字体的ID 
+/**
+ * 添加字体信息记录，并返回该字体的ID
  * @warning 该函数仅仅是将 font 参数的引用添加至记录中，为保证记录的有效性，
  * 传入的 font 参数必须是动态分配的。
  */
@@ -143,7 +143,7 @@ int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 	if( font->id >= fontlib.font_cache_num * FONT_CACHE_SIZE ) {
 		LCUI_Font ***caches, **cache;
 		fontlib.font_cache_num += 1;
-		caches = (LCUI_Font***)realloc( fontlib.font_cache, 
+		caches = (LCUI_Font***)realloc( fontlib.font_cache,
 			fontlib.font_cache_num * sizeof(LCUI_Font**) );
 		if( caches == NULL ) {
 			fontlib.font_cache_num -= 1;
@@ -194,7 +194,7 @@ static LCUI_Font* LCUIFont_GetById( int id )
 	if( id < 0 || id >= fontlib.font_cache_num * FONT_CACHE_SIZE ) {
 		return NULL;
 	}
-	
+
 	return SelectFontCache(id);
 }
 
@@ -212,8 +212,8 @@ int LCUIFont_GetIdByPath( const char *filepath )
 	return font->id;
 }
 
-/** 
- * 获取字体的ID 
+/**
+ * 获取字体的ID
  * @param[in] family_name 字族名称
  * @param[in] style_name 样式名称，若设为 NULL，则默认获取 regular 样式或
  * 最后一个样式的字体
@@ -356,6 +356,9 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 			break;
 		}
 		if( font_id <= 0 ) {
+			if( !fontlib.default_font ) {
+				return -3;
+			}
 			font_id = fontlib.default_font->id;
 		}
 		ctx = SelectFont( ctx, font_id );
@@ -398,7 +401,7 @@ int LCUIFont_LoadFile( const char *filepath )
 	}
 	font->engine = fontlib.engine;
 	id = LCUIFont_Add( font, filepath );
-	printf("[font] add family: %s, style name: %s, id: %d\n", 
+	printf("[font] add family: %s, style name: %s, id: %d\n",
 		font->family_name, font->family_name, id);
 	return id;
 }
@@ -476,7 +479,7 @@ int FontBitmap_Print( LCUI_FontBitmap *fontbmp )
 }
 
 static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
-				const LCUI_FontBitmap *bmp, LCUI_Color color, 
+				const LCUI_FontBitmap *bmp, LCUI_Color color,
 				LCUI_Rect *read_rect )
 {
 	int x, y;
@@ -513,7 +516,7 @@ static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 }
 
 static void FontBitmap_MixRGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
-			       const LCUI_FontBitmap *bmp, LCUI_Color color, 
+			       const LCUI_FontBitmap *bmp, LCUI_Color color,
 			       LCUI_Rect *read_rect )
 {
 	int x, y;
@@ -564,7 +567,7 @@ int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 	graph = Graph_GetQuote( graph );
 	if( graph->color_type == COLOR_TYPE_ARGB ) {
 		FontBitmap_MixARGB( graph, &w_rect, bmp, color, &r_rect );
-	} else { 
+	} else {
 		FontBitmap_MixRGB( graph, &w_rect, bmp, color, &r_rect );
 	}
 	return 0;
@@ -589,10 +592,11 @@ int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch,
 			info = fontlib.incore_font;
 		}
 	}
+	if( !info ) {
+		return -1;
+	}
 	return info->engine->render( buff, ch, pixel_size, info );
 }
-
-
 
 #ifdef LCUI_BUILD_IN_WIN32
 #define MAX_FONTFILE_NUM        4
