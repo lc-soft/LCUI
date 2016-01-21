@@ -492,7 +492,7 @@ static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 		tn = RBTree_CustomInsert( &style_library.style, 
 					  (const void*)name, stn );
 	}
-	stn = (StyleTreeNode*)tn->data;
+	stn = tn->data;
 	LinkedList_ForEach( node, &stn->styles ) {
 		sln = node->data;
 		if( SelectorIsEqual(sln->selector, selector) ) {
@@ -628,6 +628,35 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 	return FALSE;
 }
 
+typedef struct LCUI_StyleSheetPackRec_ {
+	int rank;
+	LCUI_StyleSheet style;
+} LCUI_StyleSheetPackRec, *LCUI_StyleSheetPack;
+
+static void InsertStyleSheet( LinkedList *list, int rank, LCUI_StyleSheet ss )
+{
+	int pos = -1, i = 0;
+	LinkedListNode *node;
+	LCUI_StyleSheetPack pack;
+	LinkedList_ForEach( node, list ) {
+		pack = node->data;
+		if( pos == -1 ) {
+			if( rank >= pack->rank ) {
+				pos = i;
+			}
+		}
+		i += 1;
+	}
+	pack = NEW( LCUI_StyleSheetPackRec, 1 );
+	pack->rank = rank;
+	pack->style = ss;
+	if( pos >= 0 ) {
+		LinkedList_Insert( list, pos, pack );
+	} else {
+		LinkedList_Append( list, pack );
+	}
+}
+
 static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 				LinkedList *list )
 {
@@ -660,10 +689,11 @@ static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 	LinkedList_ForEach( node, styles ) {
 		sln = node->data;
 		/* 如果当前元素在该样式结点的作用范围内 */
-		if( IsMatchPath(wlist, sln->selector) ) {
-			LinkedList_Append( list, sln->style );
-			++count;
+		if( !IsMatchPath( wlist, sln->selector ) ) {
+			continue;
 		}
+		InsertStyleSheet( list, sln->selector->rank, sln->style );
+		++count;
 	}
 	return count;
 }
@@ -805,13 +835,15 @@ int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 {
 	LinkedList list;
 	LinkedListNode *node;
+	LCUI_StyleSheetPack pack;
 	LinkedList_Init( &list );
 	FindStyleNode( w, &list );
 	ClearStyleSheet( out_ss );
 	LinkedList_ForEach( node, &list ) {
-		MergeStyleSheet( out_ss, node->data );
+		pack = node->data;
+		MergeStyleSheet( out_ss, pack->style );
 	}
-	LinkedList_Clear( &list, NULL );
+	LinkedList_Clear( &list, free );
 	return 0;
 }
 
