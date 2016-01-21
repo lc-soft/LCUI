@@ -9,3 +9,7 @@ before_script: ./autogen.sh
 script:
   - ./configure
   - make
+  - cd test
+  - make
+  - ./test
+
