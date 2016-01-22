@@ -83,14 +83,14 @@ LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos )
 		pos += list->length;
 	}
 	if( pos > list->length / 2 ) {
-		pos = list->length - pos;
+		pos = list->length - pos - 1;
 		node = list->tail.prev;
-		while( --pos > 0 && node ) {
+		while( --pos >= 0 && node ) {
 			node = node->prev;
 		}
 	} else {
 		node = list->head.next;
-		while( --pos > 0 && node ) {
+		while( --pos >= 0 && node ) {
 			node = node->next;
 		}
 	}
@@ -102,8 +102,10 @@ void LinkedList_Link( LinkedList *list, LinkedListNode *cur,
 {
 	node->prev = cur;
 	node->next = cur->next;
-	node->next->prev = node;
-	node->prev->next = node;
+	if( cur->next ) {
+		cur->next->prev = node;
+	}
+	cur->next = node;
 	list->length += 1;
 }
 
