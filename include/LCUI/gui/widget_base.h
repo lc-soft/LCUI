@@ -161,6 +161,7 @@ typedef struct LCUI_SelectorRec_ {
 	LCUI_SelectorNode *list;	/**< 选择器结点列表 */
 	int length;			/**< 选择器结点长度 */
 	int rank;			/**< 权值，决定优先级 */
+	int batch_num;			/**< 批次号 */
 } LCUI_SelectorRec, *LCUI_Selector;
 
 #define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \

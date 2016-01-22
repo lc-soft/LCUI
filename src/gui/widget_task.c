@@ -56,7 +56,6 @@ static void HandleRefreshStyle( LCUI_Widget w )
 	Widget_FlushStyle( w, TRUE );
 	w->task->buffer[WTT_UPDATE_STYLE] = FALSE;
 	w->task->buffer[WTT_CACHE_STYLE] = TRUE;
-	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
 }
 
 static void HandleUpdateStyle( LCUI_Widget w )
@@ -126,10 +125,10 @@ void Widget_AddTaskForChildren( LCUI_Widget widget, int task )
 {
 	LCUI_Widget child;
 	LinkedListNode *node;
+	widget->task->for_children = TRUE;
 	LinkedList_ForEach( node, &widget->children ) {
 		child = node->data;
 		child->task->for_self = TRUE;
-		child->task->for_children = TRUE;
 		child->task->buffer[task] = TRUE;
 		Widget_AddTaskForChildren( child, task );
 	}

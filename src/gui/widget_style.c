@@ -53,15 +53,15 @@ enum SelectorRank {
 	ID_RANK = 100
 };
 
-typedef struct StyleListNode {
+typedef struct StyleListNodeRec_ {
 	LCUI_StyleSheet style;		/**< 样式表 */
 	LCUI_Selector selector;		/**< 作用范围 */
-} StyleListNode;
+} StyleListNodeRec, *StyleListNode;
 
-typedef struct StyleTreeNode {
+typedef struct StyleTreeNodeRec_ {
 	char name[MAX_NAME_LEN];	/**< 作用对象的名称 */
 	LinkedList styles;		/**< 其它样式表 */
-} StyleTreeNode;
+} StyleTreeNodeRec, *StyleTreeNode;
 
 static struct {
 	LCUI_BOOL is_inited;
@@ -97,7 +97,7 @@ static size_t ptrslen( char *const *list )
 
 static int CompareName( void *data, const void *keydata )
 {
-	return strcmp( ((StyleTreeNode*)data)->name, (const char*)keydata );
+	return strcmp( ((StyleTreeNode)data)->name, (const char*)keydata );
 }
 
 static void DeleteSelectorNode( LCUI_SelectorNode *node_ptr )
@@ -168,7 +168,7 @@ void DeleteStyleSheet( LCUI_StyleSheet *ss )
 	*ss = NULL;
 }
 
-static void DestroyStyleListNode( StyleListNode *node )
+static void DestroyStyleListNode( StyleListNode node )
 {
 	DeleteStyleSheet( &node->style );
 	DeleteSelector( &node->selector );
@@ -176,7 +176,7 @@ static void DestroyStyleListNode( StyleListNode *node )
 
 static void DestroyStyleTreeNode( void *data )
 {
-	StyleTreeNode *node = (StyleTreeNode*)data;
+	StyleTreeNode node = data;
 	LinkedList_Clear( &node->styles, (FuncPtr)DestroyStyleListNode );
 }
 
@@ -343,15 +343,16 @@ static int SaveSelectorNode( LCUI_SelectorNode node,
 
 LCUI_Selector Selector( const char *selector )
 {
-	int ni, si, rank;
 	const char *p;
+	int ni, si, rank;
+	static int batch_num = 0;
 	char type = 0, name[MAX_NAME_LEN];
 	LCUI_BOOL is_saving = FALSE;
 	LCUI_SelectorNode node = NULL;
-	LCUI_Selector s;
+	LCUI_Selector s = NEW( LCUI_SelectorRec, 1 );
 
-	s = NEW(LCUI_SelectorRec, 1);
-	s->list = NEW(LCUI_SelectorNode, MAX_SELECTOR_DEPTH);
+	s->batch_num = ++batch_num;
+	s->list = NEW( LCUI_SelectorNode, MAX_SELECTOR_DEPTH );
 	for( ni = 0, si = 0, p = selector; *p; ++p ) {
 		if( !node && is_saving ) {
 			node = NEW( LCUI_SelectorNodeRec, 1 );
@@ -478,15 +479,15 @@ static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 					       const char *name )
 {
 	int i = 0, pos = -1;
+	StyleTreeNode stn;
+	StyleListNode sln;
 	LinkedListNode *node;
 	LCUI_RBTreeNode *tn;
-	StyleTreeNode *stn;
-	StyleListNode *sln;
-	LCUI_SelectorNode new_sn, *sn_ptr;
+	LCUI_SelectorNode new_sn, *sn_ptr, sn;
 
 	tn = RBTree_CustomSearch( &style_library.style, (const void*)name );
 	if( !tn ) {
-		stn = NEW(StyleTreeNode, 1);
+		stn = NEW( StyleTreeNodeRec, 1 );
 		strncpy( stn->name, name, MAX_NAME_LEN );
 		LinkedList_Init( &stn->styles );
 		tn = RBTree_CustomInsert( &style_library.style, 
@@ -498,30 +499,38 @@ static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 		if( SelectorIsEqual(sln->selector, selector) ) {
 			return sln->style;
 		}
-		if( pos == -1 ) {
-			if( selector->rank >= sln->selector->rank ) {
+		if( pos != -1 ) {
+			i += 1;
+			continue;
+		}
+		if( selector->rank > sln->selector->rank ) {
+			pos = i;
+		} else if( selector->rank == sln->selector->rank ) {
+			if( selector->batch_num > sln->selector->batch_num ) {
 				pos = i;
+				break;
 			}
 		}
 		i += 1;
 	}
-	sln = NEW(StyleListNode, 1);
+	sln = NEW( StyleListNodeRec, 1 );
 	sln->style = StyleSheet();
-	sln->selector = NEW(LCUI_SelectorRec, 1);
-	sln->selector->list = NEW(LCUI_SelectorNode, selector->length+1);
+	sln->selector = NEW( LCUI_SelectorRec, 1 );
+	sln->selector->list = NEW( LCUI_SelectorNode, selector->length + 1 );
 	for( sn_ptr = selector->list, i = 0; *sn_ptr; ++sn_ptr, ++i ) {
-		new_sn = NEW(LCUI_SelectorNodeRec, 1);
-		if( (*sn_ptr)->type ) {
-			new_sn->type = strdup( (*sn_ptr)->type );
+		sn = *sn_ptr;
+		new_sn = NEW( LCUI_SelectorNodeRec, 1 );
+		if( sn->type ) {
+			new_sn->type = strdup( sn->type );
 		}
-		if( (*sn_ptr)->id ) {
-			new_sn->id = strdup( (*sn_ptr)->id );
+		if( sn->id ) {
+			new_sn->id = strdup( sn->id );
 		}
-		if( (*sn_ptr)->class_name ) {
-			new_sn->class_name = strdup( (*sn_ptr)->class_name );
+		if( sn->class_name ) {
+			new_sn->class_name = strdup( sn->class_name );
 		}
-		if( (*sn_ptr)->pseudo_class_name ) {
-			new_sn->pseudo_class_name = strdup( (*sn_ptr)->pseudo_class_name );
+		if( sn->pseudo_class_name ) {
+			new_sn->pseudo_class_name = strdup( sn->pseudo_class_name );
 		}
 		sln->selector->list[i] = new_sn;
 	}
@@ -628,41 +637,42 @@ LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector )
 	return FALSE;
 }
 
-typedef struct LCUI_StyleSheetPackRec_ {
-	int rank;
-	LCUI_StyleSheet style;
-} LCUI_StyleSheetPackRec, *LCUI_StyleSheetPack;
-
-static void InsertStyleSheet( LinkedList *list, int rank, LCUI_StyleSheet ss )
+static int InsertStyleSheet( LinkedList *list, LCUI_Selector s, 
+			     LCUI_StyleSheet ss )
 {
 	int pos = -1, i = 0;
+	StyleListNode pack;
 	LinkedListNode *node;
-	LCUI_StyleSheetPack pack;
 	LinkedList_ForEach( node, list ) {
 		pack = node->data;
-		if( pos == -1 ) {
-			if( rank >= pack->rank ) {
+		if( s->rank > pack->selector->rank ) {
+			pos = i;
+			break;
+		} else if( s->rank == pack->selector->rank ) {
+			if( s->batch_num > pack->selector->batch_num ) {
 				pos = i;
+				break;
 			}
 		}
 		i += 1;
 	}
-	pack = NEW( LCUI_StyleSheetPackRec, 1 );
-	pack->rank = rank;
+	pack = NEW( StyleListNodeRec, 1 );
+	pack->selector = s;
 	pack->style = ss;
 	if( pos >= 0 ) {
 		LinkedList_Insert( list, pos, pack );
 	} else {
 		LinkedList_Append( list, pack );
 	}
+	return pos;
 }
 
 static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 				LinkedList *list )
 {
-	LCUI_RBTreeNode *tn;
-	StyleListNode *sln;
+	StyleListNode sln;
 	LinkedList *styles;
+	LCUI_RBTreeNode *tn;
 	LinkedListNode *node;
 	LCUI_Widget w, wlist[MAX_SELECTOR_DEPTH];
 	int n, count = 0;
@@ -685,14 +695,14 @@ static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 			w = w->parent;
 		}
 	}
-	styles = &((StyleTreeNode*)tn->data)->styles;
+	styles = &((StyleTreeNode)tn->data)->styles;
 	LinkedList_ForEach( node, styles ) {
 		sln = node->data;
 		/* 如果当前元素在该样式结点的作用范围内 */
 		if( !IsMatchPath( wlist, sln->selector ) ) {
 			continue;
 		}
-		InsertStyleSheet( list, sln->selector->rank, sln->style );
+		InsertStyleSheet( list, sln->selector, sln->style );
 		++count;
 	}
 	return count;
@@ -813,8 +823,8 @@ void LCUI_PrintStyleLibrary(void)
 {
 	LCUI_RBTreeNode *tn;
 	LinkedListNode *node;
-	StyleTreeNode *stn;
-	StyleListNode *sln;
+	StyleTreeNode stn;
+	StyleListNode sln;
 	
 	printf("style library begin\n");
 	tn = RBTree_First( &style_library.style );
@@ -835,13 +845,13 @@ int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 {
 	LinkedList list;
 	LinkedListNode *node;
-	LCUI_StyleSheetPack pack;
+	StyleListNode sln;
 	LinkedList_Init( &list );
 	FindStyleNode( w, &list );
 	ClearStyleSheet( out_ss );
 	LinkedList_ForEach( node, &list ) {
-		pack = node->data;
-		MergeStyleSheet( out_ss, pack->style );
+		sln = node->data;
+		MergeStyleSheet( out_ss, sln->style );
 	}
 	LinkedList_Clear( &list, free );
 	return 0;

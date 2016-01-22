@@ -385,7 +385,7 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_Rect content_rect, rect;
 	LCUI_Pos layer_pos;
 
-	txt = (LCUI_TextView*)w->private_data;
+	txt = w->private_data;
 	content_rect.x = w->box.content.left - w->box.graph.left;
 	content_rect.y = w->box.content.top - w->box.graph.top;
 	content_rect.width = w->box.content.width;
