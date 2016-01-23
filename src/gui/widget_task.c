@@ -66,8 +66,8 @@ static void HandleUpdateStyle( LCUI_Widget w )
 
 static void HandleCacheStyle( LCUI_Widget w )
 {
-	ClearStyleSheet( w->cached_style );
-	ReplaceStyleSheet( w->cached_style, w->style );
+	StyleSheet_Clear( w->cached_style );
+	StyleSheet_Replace( w->cached_style, w->style );
 }
 
 static void HandleSetTitle( LCUI_Widget w )

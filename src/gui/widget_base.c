@@ -1059,7 +1059,6 @@ int StrList_Add( char ***strlist, const char *str )
 {
 	char buff[256];
 	int count = 0, i, head;
-
 	for( head = 0, i = 0; str[i]; ++i ) {
 		if( str[i] != ' ' ) {
 			continue;
@@ -1101,10 +1100,13 @@ static int StrList_RemoveOne( char ***strlist, const char *str )
 	if( !*strlist ) {
 		return 0;
 	}
-	for( pos = 0,i = 0; (*strlist)[i] != NULL; ++i ) {
-		if( strcmp((*strlist)[i], str) == 0 ) {
+	for( pos = -1, i = 0; (*strlist)[i]; ++i ) {
+		if( strcmp( (*strlist)[i], str ) == 0 ) {
 			pos = i;
 		}
+	}
+	if( pos == -1 ) {
+		return 0;
 	}
 	if( pos == 0 && i < 2 ) {
 		free( *strlist );
@@ -1153,11 +1155,15 @@ int StrList_Remove( char ***strlist, const char *str )
 /** 为部件添加一个类 */
 int Widget_AddClass( LCUI_Widget w, const char *class_name )
 {
+	if( StrList_Has( w->classes, class_name ) ) {
+		return 1;
+	}
 	if( StrList_Add(&w->classes, class_name) <= 0 ) {
 		return 0;
 	}
-	// 标记需要更新该部件及子级部件的样式表
+	/* 标记需要更新该部件及子级部件的样式表 */
 	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
+	Widget_UpdateStyle( w, TRUE );
 	return 1;
 }
 
@@ -1173,18 +1179,21 @@ int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 	if( StrList_Remove( &w->classes, class_name ) <= 0 ) {
 		return 0;
 	}
-	Widget_AddTask( w, WTT_REFRESH_STYLE );
 	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
+	Widget_UpdateStyle( w, TRUE );
 	return 1;
 }
 
 /** 为部件添加一个状态 */
 int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 {
-	if( StrList_Add( &w->pseudo_classes, status_name ) <= 0 ) {
+	if( StrList_Has( w->status, status_name ) ) {
 		return 0;
 	}
-	Widget_AddTask( w, WTT_REFRESH_STYLE );
+	if( StrList_Add( &w->status, status_name ) <= 0 ) {
+		return 0;
+	}
+	Widget_UpdateStyle( w, TRUE );
 	Widget_AddTaskForChildren( w,  WTT_REFRESH_STYLE );
 	return 1;
 }
@@ -1192,16 +1201,16 @@ int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 /** 判断部件是否包含指定的状态 */
 LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name )
 {
-	return StrList_Has( w->pseudo_classes, status_name );
+	return StrList_Has( w->status, status_name );
 }
 
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 {
-	if( StrList_Remove( &w->pseudo_classes, status_name ) != 1 ) {
+	if( StrList_Remove( &w->status, status_name ) != 1 ) {
 		return 0;
 	}
-	Widget_AddTask( w, WTT_REFRESH_STYLE );
+	Widget_UpdateStyle( w, TRUE );
 	Widget_AddTaskForChildren( w,  WTT_REFRESH_STYLE );
 	return 1;
 }

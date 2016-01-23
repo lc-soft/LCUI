@@ -631,7 +631,7 @@ static CSSParserContext NewCSSParserContext( size_t buffer_size )
 static void DeleteCSSParserContext( CSSParserContext *ctx_ptr )
 {
 	CSSParserContext ctx = *ctx_ptr;
-	LinkedList_Clear( &ctx->selectors, (FuncPtr)DeleteSelector );
+	LinkedList_Clear( &ctx->selectors, (FuncPtr)Selector_Delete );
 	free( ctx->buffer );
 	free( ctx );
 	*ctx_ptr = NULL;
@@ -640,7 +640,7 @@ static void DeleteCSSParserContext( CSSParserContext *ctx_ptr )
 static void OnDeleteSelector( void *data )
 {
 	LCUI_Selector s = data;
-	DeleteSelector( &s );
+	Selector_Delete( &s );
 }
 
 /** 载入CSS代码块，用于实现CSS代码的分块载入 */
@@ -764,7 +764,7 @@ put_css:
 			LCUI_PutStyle( node->data, ctx->css );
 		}
 		LinkedList_Clear( &ctx->selectors, OnDeleteSelector );
-		DeleteStyleSheet( &ctx->css );
+		StyleSheet_Delete( &ctx->css );
 		continue;
 select_parser:
 		ctx->target = is_value;

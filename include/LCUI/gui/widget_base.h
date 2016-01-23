@@ -217,7 +217,7 @@ typedef struct LCUI_WidgetRec_ {
 	char			*id;			/**< ID */
 	char			*type;			/**< 类型 */
 	char			**classes;		/**< 类列表 */
-	char			**pseudo_classes;	/**< 伪类列表 */
+	char			**status;		/**< 伪类列表 */
 	wchar_t			*title;			/**< 标题 */
 	LCUI_Rect2		padding;		/**< 内边距框 */
 	LCUI_Rect2		margin;			/**< 外边距框 */

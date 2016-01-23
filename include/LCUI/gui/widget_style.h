@@ -51,28 +51,28 @@ void LCUIWidget_ExitStyle( void );
 LCUI_API LCUI_StyleSheet StyleSheet( void );
 
 /** 清空样式表 */
-LCUI_API void ClearStyleSheet( LCUI_StyleSheet ss );
+LCUI_API void StyleSheet_Clear( LCUI_StyleSheet ss );
 
 /** 合并两个样式表 */
-LCUI_API int MergeStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src );
+LCUI_API int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src );
 
 /** 覆盖样式表 */
-LCUI_API int ReplaceStyleSheet( LCUI_StyleSheet dest, LCUI_StyleSheet src );
+LCUI_API int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src );
 
 /** 删除样式表 */
-LCUI_API void DeleteStyleSheet( LCUI_StyleSheet *ss );
+LCUI_API void StyleSheet_Delete( LCUI_StyleSheet *ss );
 
 /** 根据字符串内容生成相应的选择器 */
 LCUI_API LCUI_Selector Selector( const char *selector );
 
 /** 删除选择器 */
-LCUI_API void DeleteSelector( LCUI_Selector *selector );
+LCUI_API void Selector_Delete( LCUI_Selector *selector );
 
 /** 判断两个选择器是否相等 */
-LCUI_API LCUI_BOOL SelectorIsEqual( LCUI_Selector s1, LCUI_Selector s2 );
+LCUI_API LCUI_BOOL Selector_Compare( LCUI_Selector s1, LCUI_Selector s2 );
 
 /** 匹配元素路径与样式结点路径 */
-LCUI_API LCUI_BOOL IsMatchPath( LCUI_Widget *wlist, LCUI_Selector selector );
+LCUI_API LCUI_BOOL Selector_MatchPath( LCUI_Selector selector, LCUI_Widget *wlist );
 
 /** 向样式库添加样式表 */
 LCUI_API int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss );
