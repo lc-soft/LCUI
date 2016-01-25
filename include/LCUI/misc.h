@@ -43,6 +43,7 @@
 #include <LCUI/misc/dirent.h>
 #include <LCUI/misc/rbtree.h>
 #include <LCUI/misc/linkedlist.h>
+#include <LCUI/misc/dict.h>
 #include <LCUI/misc/rect.h>
 #include <LCUI/misc/framectrl.h>
 #include <LCUI/misc/string.h>

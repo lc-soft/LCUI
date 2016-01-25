@@ -179,6 +179,7 @@
     <ClInclude Include="..\..\..\include\LCUI\input.h" />
     <ClInclude Include="..\..\..\include\LCUI\ime.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc.h" />
+    <ClInclude Include="..\..\..\include\LCUI\misc\dict.h" />
     <ClInclude Include="..\..\..\include\LCUI\surface.h" />
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\misc\delay.h" />
@@ -234,6 +235,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
     <ClCompile Include="..\..\..\src\ime.c" />
+    <ClCompile Include="..\..\..\src\misc\dict.c" />
     <ClCompile Include="..\..\..\src\misc\mem_debug.c" />
     <ClCompile Include="..\..\..\src\misc\catch_screen.c" />
     <ClCompile Include="..\..\..\src\misc\delay.c" />
