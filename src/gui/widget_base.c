@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_base.c -- the widget base operation set.
  *
- * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_base.c -- 部件的基本操作集。
  *
- * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -652,10 +652,11 @@ static void Widget_UpdateGraphBox( LCUI_Widget w )
 {
 	LCUI_Rect *rb = &w->box.border;
 	LCUI_Rect *rg = &w->box.graph;
-	rg->x = w->x - BoxShadow_GetBoxX( &w->computed_style.shadow );
-	rg->y = w->y - BoxShadow_GetBoxY( &w->computed_style.shadow );
-	rg->width = BoxShadow_GetWidth( &w->computed_style.shadow, rb->width );
-	rg->height = BoxShadow_GetHeight( &w->computed_style.shadow, rb->height );
+	LCUI_BoxShadow *shadow = &w->computed_style.shadow;
+	rg->x = w->x - BoxShadow_GetBoxX( shadow );
+	rg->y = w->y - BoxShadow_GetBoxY( shadow );
+	rg->width = BoxShadow_GetWidth( shadow, rb->width );
+	rg->height = BoxShadow_GetHeight( shadow, rb->height );
 	/* 如果有会产生透明效果的样式 */
 	if( w->computed_style.border.bottom_left_radius > 0
 	 || w->computed_style.border.bottom_right_radius > 0

@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_paint.c -- LCUI widget paint module.
  *
- * Copyright (C) 2013-2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2013-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_paint.c -- LCUI部件绘制模块
  *
- * 版权所有 (C) 2013-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2013-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -107,9 +107,8 @@ void Widget_ValidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 /** 当前部件的绘制函数 */
 static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
-	LCUI_WidgetClass *wc;
 	LCUI_Rect box;
-
+	LCUI_WidgetClass *wc;
 	box.x = box.y = 0;
 	box.width = w->box.graph.width;
 	box.height = w->box.graph.height;
@@ -254,15 +253,13 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 
 void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
-	int content_left, content_top;
 	LinkedListNode *node;
-	LCUI_Widget child;
-	LCUI_Rect child_rect, canvas_rect, content_rect;
-	LCUI_PaintContextRec child_paint;
+	int content_left, content_top;
+	LCUI_Rect canvas_rect, content_rect;
 	LCUI_Graph content_graph, self_graph, layer_graph;
 	LCUI_BOOL has_overlay, has_content_graph = FALSE,
-		  has_self_graph = FALSE,has_layer_graph = FALSE,
-		  is_cover_border = FALSE;
+		has_self_graph = FALSE, has_layer_graph = FALSE,
+		is_cover_border = FALSE;
 
 	Graph_Init( &layer_graph );
 	Graph_Init( &self_graph );
@@ -332,7 +329,9 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	}
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
 	LinkedList_ForEachReverse( node, &w->children_show ) {
-		child = node->data;
+		LCUI_Rect child_rect;
+		LCUI_Widget child = node->data; 
+		LCUI_PaintContextRec child_paint;
 		if( !child->computed_style.visible ) {
 			continue;
 		}

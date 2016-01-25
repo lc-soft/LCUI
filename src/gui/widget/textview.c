@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * textview.c -- LCUI's TextView Widget
  *
- * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * textview.c -- LCUI 的文本显示部件
  *
- * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -384,7 +384,6 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_TextView *txt;
 	LCUI_Rect content_rect, rect;
 	LCUI_Pos layer_pos;
-
 	txt = w->private_data;
 	content_rect.x = w->box.content.left - w->box.graph.left;
 	content_rect.y = w->box.content.top - w->box.graph.top;

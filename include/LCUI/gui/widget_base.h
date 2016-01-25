@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_base.h -- the widget base operation set.
  *
- * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_base.h -- 部件的基本操作集。
  *
- * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -217,7 +217,7 @@ typedef struct LCUI_WidgetRec_ {
 	char			*id;			/**< ID */
 	char			*type;			/**< 类型 */
 	char			**classes;		/**< 类列表 */
-	char			**status;		/**< 伪类列表 */
+	char			**status;		/**< 状态列表 */
 	wchar_t			*title;			/**< 标题 */
 	LCUI_Rect2		padding;		/**< 内边距框 */
 	LCUI_Rect2		margin;			/**< 外边距框 */

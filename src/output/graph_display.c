@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * graph_display.c -- graphical display processing.
  *
- * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * graph_display.c -- 图形显示处理。
  *
- * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -82,17 +82,16 @@ int LCUIDisplay_GetFPS(void)
 static void LCUIDisplay_Update(void)
 {
 	LCUI_Rect box;
-	LCUI_Border border;
-	LCUI_PaintContext paint;
-	LinkedListNode *sn, *rn;
-	SurfaceRecord *p_sr;
 	LinkedList rlist;
-
+	LCUI_Border border;
+	SurfaceRecord *p_sr;
+	LinkedListNode *sn, *rn;
+	LCUI_PaintContext paint;
 	border = Border( 1, SV_SOLID, RGB( 255, 0, 0 ) );
 	LinkedList_Init( &rlist );
 	/* 遍历当前的 surface 记录列表 */
 	LinkedList_ForEach( sn, &display.surfaces ) {
-		p_sr = (SurfaceRecord*)sn->data;
+		p_sr = sn->data;
 		if( !p_sr->widget || !p_sr->surface
 		 || !Surface_IsReady(p_sr->surface) ) {
 			continue;
@@ -129,7 +128,7 @@ LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
 	SurfaceRecord *sr;
 	LinkedListNode *node;
 	LinkedList_ForEach( node, &display.surfaces ) {
-		sr = (SurfaceRecord*)node->data;
+		sr = node->data;
 		if( sr && sr->surface == surface ) {
 			return sr->widget;
 		}
@@ -141,9 +140,8 @@ static LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
-
 	LinkedList_ForEach( node, &display.surfaces ) {
-		sr = (SurfaceRecord*)node->data;
+		sr = node->data;
 		if( sr && sr->widget == widget ) {
 			return sr->surface;
 		}
@@ -156,7 +154,6 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 {
 	LCUI_Rect *p_rect;
 	SurfaceRecord *p_sr;
-
 	if( LCUIDisplay_GetBindSurface(widget) ) {
 		return;
 	}
@@ -191,7 +188,7 @@ static void LCUIDisplay_UnbindSurface( LCUI_Widget widget )
 	SurfaceRecord *sr;
 	LinkedListNode *node;
 	LinkedList_ForEach( node, &display.surfaces ) {
-		sr = (SurfaceRecord*)node->data;
+		sr = node->data;
 		if( sr && sr->widget == widget ) {
 			Surface_Delete( sr->surface );
 			LinkedList_DeleteNode( &display.surfaces, node );
@@ -205,7 +202,7 @@ static void LCUIDisplay_CleanSurfaces( void )
 	SurfaceRecord *sr;
 	LinkedListNode *node;
 	LinkedList_ForEach( node, &display.surfaces ) {
-		sr = (SurfaceRecord*)node->data;
+		sr = node->data;
 		Surface_Delete( sr->surface );
 		LinkedList_DeleteNode( &display.surfaces, node );
 	}
@@ -430,7 +427,7 @@ static void Surface_OnInvalidRect( LCUI_Surface surface, LCUI_Rect *rect )
 	SurfaceRecord *sr;
 	LinkedListNode *node;
 	LinkedList_ForEach( node, &display.surfaces ) {
-		sr = (SurfaceRecord*)node->data;
+		sr = node->data;
 		if( sr && sr->surface != surface ) {
 			continue;
 		}
