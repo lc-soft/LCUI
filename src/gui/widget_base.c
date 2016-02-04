@@ -301,7 +301,7 @@ int Widget_SetId( LCUI_Widget w, const char *idstr )
 /** 计算边框样式 */
 static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
 {
-	LCUI_Style *style;
+	LCUI_Style style;
 	int key = key_border_start + 1;
 	for( ; key < key_border_end; ++key ) {
 		style = &ss->sheet[key];
@@ -417,7 +417,7 @@ void Widget_FlushBorder( LCUI_Widget w )
 /** 计算矩形阴影样式 */
 static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
 {
-	LCUI_Style *style;
+	LCUI_Style style;
 	int key = key_box_shadow_start + 1;
 	for( ; key < key_box_shadow_end; ++key ) {
 		style = &ss->sheet[key];
@@ -458,7 +458,7 @@ void Widget_FlushBoxShadow( LCUI_Widget w )
 
 void Widget_FlushVisibility( LCUI_Widget w )
 {
-	LCUI_Style *s;
+	LCUI_Style s;
 	LCUI_BOOL visible = TRUE;
 	s = &w->cached_style->sheet[key_visible];
 	if( w->computed_style.display == SV_NONE
@@ -514,7 +514,7 @@ void Widget_FlushZIndex( LCUI_Widget w )
 {
 	LinkedList *list;
 	int index = Widget_GetIndex( w );
-	LCUI_Style *s = &w->style->sheet[key_z_index];
+	LCUI_Style s = &w->style->sheet[key_z_index];
 	LinkedListNode *cnode, *csnode, *snode = Widget_GetShowNode( w );
 	if( s->is_valid && s->type == SVT_VALUE ) {
 		w->computed_style.z_index = s->value;
@@ -560,7 +560,7 @@ void Widget_FlushZIndex( LCUI_Widget w )
 
 static int ComputePositionOffset( LCUI_Widget w, int key )
 {
-	LCUI_Style *s = &w->style->sheet[key];
+	LCUI_Style s = &w->style->sheet[key];
 	switch( s->type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
@@ -601,41 +601,44 @@ void Widget_FlushPosition( LCUI_Widget w )
 	if( position == SV_ABSOLUTE ) {
 		w->x = 0;
 		w->y = 0;
-		if( w->style->sheet[key_left].is_valid ) {
-			w->x = w->computed_style.left;
-		} else if( w->style->sheet[key_right].is_valid ) {
-			if( w->parent ) {
-				w->x = w->parent->box.content.width;
-				w->x -= w->width;
-			}
-			w->x -= w->computed_style.right;
-		}
-		if( w->style->sheet[key_top].is_valid ) {
-			w->y = w->computed_style.top;
-		} else if( w->style->sheet[key_bottom].is_valid ) {
-			if( w->parent ) {
-				w->y = w->parent->box.content.height;
-				w->y -= w->height;
-			}
-			w->y -= w->computed_style.bottom;
-		}
+	} else {
+		w->x = w->origin_x;
+		w->y = w->origin_y;
 	}
+	if( w->style->sheet[key_left].is_valid ) {
+		w->x = w->computed_style.left;
+	} else if( w->style->sheet[key_right].is_valid ) {
+		if( w->parent ) {
+			w->x = w->parent->box.content.width;
+			w->x -= w->width;
+		}
+		w->x -= w->computed_style.right;
+	}
+	if( w->style->sheet[key_top].is_valid ) {
+		w->y = w->computed_style.top;
+	} else if( w->style->sheet[key_bottom].is_valid ) {
+		if( w->parent ) {
+			w->y = w->parent->box.content.height;
+			w->y -= w->height;
+		}
+		w->y -= w->computed_style.bottom;
+	}
+	w->box.outer.x = w->x;
+	w->box.outer.y = w->y;
+	w->x += w->margin.left;
+	w->y += w->margin.top;
 	/* 以x、y为基础 */
 	w->box.border.x = w->x;
 	w->box.border.y = w->y;
 	w->box.content.x = w->x;
 	w->box.content.y = w->y;
-	w->box.outer.x = w->x;
-	w->box.outer.y = w->y;
 	w->box.graph.x = w->x;
 	w->box.graph.y = w->y;
 	/* 计算各个框的坐标 */
 	w->box.content.x += w->computed_style.border.left.width + w->padding.left;
 	w->box.content.y += w->computed_style.border.top.width + w->padding.top;
-	w->box.outer.x -= w->margin.left;
-	w->box.outer.y -= w->margin.top;
-	w->box.graph.x -= BoxShadow_GetBoxX(&w->computed_style.shadow);
-	w->box.graph.y -= BoxShadow_GetBoxY(&w->computed_style.shadow);
+	w->box.graph.x -= BoxShadow_GetBoxX( &w->computed_style.shadow );
+	w->box.graph.y -= BoxShadow_GetBoxY( &w->computed_style.shadow );
 	if( w->parent ) {
 		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
 		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
@@ -776,15 +779,17 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		w->box.border.height += w->padding.top;
 		w->box.border.height += w->padding.bottom;
 	}
-	/* 先暂时用边框盒区域作为外部区域，等加入外边距设置后再改 */
-	w->box.outer = w->box.border;
+	w->box.outer.width = w->box.border.width;
+	w->box.outer.height = w->box.border.height;
+	w->box.outer.width += w->margin.left + w->margin.right;
+	w->box.outer.height += w->margin.top + w->margin.bottom;
 }
 
 static void Widget_SendResizeEvent( LCUI_Widget w )
 {
-	LinkedListNode *node;
 	LCUI_Widget child;
 	LCUI_WidgetEvent e;
+	LinkedListNode *node;
 	e.type_name = "resize";
 	e.type = WET_RESIZE;
 	e.cancel_bubble = TRUE;
@@ -806,23 +811,29 @@ void Widget_FlushSize( LCUI_Widget w )
 {
 	LCUI_Rect rect;
 	int i, box_sizing;
+	LCUI_BoundBox *mbox = &w->computed_style.margin;
+	LCUI_BoundBox *pbox = &w->computed_style.padding;
 	struct { 
-		LCUI_Style *sval;
+		LCUI_Style sval;
 		int *ival;
 		int key;
-	} pd_map[4] = {
-		{ &w->computed_style.padding.top, &w->padding.top, key_padding_top },
-		{ &w->computed_style.padding.right, &w->padding.right, key_padding_right },
-		{ &w->computed_style.padding.bottom, &w->padding.bottom, key_padding_bottom },
-		{ &w->computed_style.padding.left, &w->padding.left, key_padding_left }
+	} pd_map[8] = {
+		{ &pbox->top, &w->padding.top, key_padding_top },
+		{ &pbox->right, &w->padding.right, key_padding_right },
+		{ &pbox->bottom, &w->padding.bottom, key_padding_bottom },
+		{ &pbox->left, &w->padding.left, key_padding_left },
+		{ &mbox->top, &w->margin.top, key_margin_top },
+		{ &mbox->right, &w->margin.right, key_margin_right },
+		{ &mbox->bottom, &w->margin.bottom, key_margin_bottom },
+		{ &mbox->left, &w->margin.left, key_margin_left }
 	};
 	rect = w->box.graph;
 	/* 从样式表中获取尺寸 */
 	w->computed_style.width = w->style->sheet[key_width];
 	w->computed_style.height = w->style->sheet[key_height];
 	/* 内边距的单位暂时都用 px  */
-	for( i=0; i<4; ++i ) {
-		LCUI_Style *s = &w->style->sheet[pd_map[i].key];
+	for( i = 0; i < 8; ++i ) {
+		LCUI_Style s = &w->style->sheet[pd_map[i].key];
 		if( !s->is_valid || s->type != SVT_PX ) {
 			pd_map[i].sval->type = SVT_PX;
 			pd_map[i].sval->px = 0;
@@ -878,7 +889,7 @@ void Widget_ComputePadding( LCUI_Widget w )
 	int i;
 	double result;
 	struct {
-		LCUI_Style *value;
+		LCUI_Style value;
 		int *buffer;
 		int size;
 	} map[4] = {
@@ -927,7 +938,7 @@ void Widget_ComputeMargin( LCUI_Widget w )
 	int i;
 	double result;
 	struct {
-		LCUI_Style *value;
+		LCUI_Style value;
 		int *buffer;
 		int size;
 	} map[4] = {
@@ -1249,15 +1260,15 @@ void Widget_UpdateLayout( LCUI_Widget w )
 		switch( child->computed_style.display ) {
 		case SV_NONE: continue;
 		case SV_BLOCK:
-			child->x = ctx.x;
-			child->y = ctx.y;
+			child->origin_x = ctx.x;
+			child->origin_y = ctx.y;
 			ctx.x = 0;
 			ctx.line_height = 0;
 			ctx.y += child->box.outer.height;
 			break;
 		case SV_INLINE_BLOCK:
-			child->x = ctx.x;
-			child->y = ctx.y;
+			child->origin_x = ctx.x;
+			child->origin_y = ctx.y;
 			if( child->box.outer.height > ctx.line_height ) {
 				ctx.line_height = child->box.outer.height;
 			}
@@ -1269,6 +1280,9 @@ void Widget_UpdateLayout( LCUI_Widget w )
 			ctx.x += child->box.outer.width;
 			break;
 		default: continue;
+		}
+		if( Widget_HasClass( child, "source-list" ) ) {
+			_DEBUG_MSG("x: %d, y: %d\n", child->x, child->y);
 		}
 		Widget_FlushPosition( child );
 		ctx.prev = child;
