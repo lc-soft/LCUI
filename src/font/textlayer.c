@@ -1369,7 +1369,7 @@ void TextLayer_SetTextAlign( LCUI_TextLayer layer, int align )
 }
 
 /** 设置文本行的高度 */
-void TextLayer_SetLineHeight( LCUI_TextLayer layer, LCUI_Style *val )
+void TextLayer_SetLineHeight( LCUI_TextLayer layer, LCUI_Style val )
 {
 	layer->line_height = *val;
 	layer->task.update_typeset = TRUE;

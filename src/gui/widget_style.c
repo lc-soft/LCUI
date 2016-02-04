@@ -178,14 +178,14 @@ LCUI_StyleSheet StyleSheet( void )
 		return ss;
 	}
 	ss->length = LCUICSS_GetStyleTotal();
-	ss->sheet = NEW(LCUI_Style, ss->length + 1);
+	ss->sheet = NEW(LCUI_StyleRec, ss->length + 1);
 	return ss;
 }
 
 void StyleSheet_Clear( LCUI_StyleSheet ss )
 {
 	int i;
-	LCUI_Style *s;
+	LCUI_Style s;
 	for( i=0; i<ss->length; ++i ) {
 		s = &ss->sheet[i];
 		switch( s->type ) {
@@ -212,12 +212,11 @@ void StyleSheet_Delete( LCUI_StyleSheet *ss )
 
 int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 {
-	LCUI_Style *s;
+	LCUI_Style s;
 	int i, count, size;
-
 	if( src->length > dest->length ) {
-		size = sizeof(LCUI_Style)*src->length;
-		s = (LCUI_Style*)realloc( dest->sheet, size );
+		size = sizeof(LCUI_StyleRec)*src->length;
+		s = realloc( dest->sheet, size );
 		if( !s ) {
 			return -1;
 		}
@@ -255,12 +254,11 @@ int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 
 int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 {
-	LCUI_Style *s;
+	LCUI_Style s;
 	int i, count, size;
-
 	if( src->length > dest->length ) {
-		size = sizeof(LCUI_Style)*src->length;
-		s = (LCUI_Style*)realloc( dest->sheet, size );
+		size = sizeof(LCUI_StyleRec)*src->length;
+		s = realloc( dest->sheet, size );
 		if( !s ) {
 			return -1;
 		}
@@ -877,9 +875,9 @@ void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 void Widget_FlushStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
 	int i, key;
+	LCUI_Style s;
 	LCUI_WidgetClass *wc;
 	LCUI_BOOL need_update_expend_style;
-	LCUI_Style *s;
 	typedef struct {
 		int start, end, task;
 		LCUI_BOOL is_valid;

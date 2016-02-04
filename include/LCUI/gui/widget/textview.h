@@ -51,7 +51,7 @@ LCUI_API int TextView_SetText( LCUI_Widget w, const char *utf8_text );
 
 LCUI_API void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style );
 
-LCUI_API void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style *val );
+LCUI_API void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style val );
 
 LCUI_API void TextView_GetTextStyle( LCUI_Widget w, LCUI_TextStyle *style );
 

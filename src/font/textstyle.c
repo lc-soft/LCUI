@@ -51,7 +51,7 @@ enum LCUI_StyleTagID {
 
 typedef struct LCUI_StyleTag {
 	int id;
-	LCUI_Style style;
+	LCUI_StyleRec style;
 } LCUI_StyleTag;
 
 /** 初始化字体样式数据 */
@@ -162,11 +162,10 @@ void TagList_Clear( LinkedList *tags )
 /** 获取当前的文本样式 */
 LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 {
+	LinkedListNode *node;
 	LCUI_StyleTag *tag_data;
 	LCUI_TextStyle *style_data;
-	LinkedListNode *node;
 	int equal = 0, flags[MAX_TAG_NUM] = {0};
-	
 	if( tags->length <= 0 ) {
 		return NULL;
 	}
@@ -174,7 +173,7 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 	TextStyle_Init( style_data );
 	/* 根据已经记录的各种样式，生成当前应有的文本样式 */
 	LinkedList_ForEachReverse( node, tags ) {
-		tag_data = (LCUI_StyleTag*)node->data;
+		tag_data = node->data;
 		DEBUG_MSG("tag id: %d\n", tag_data->id);
 		switch( tag_data->id ) {
 		    case TAG_ID_COLOR: 

@@ -59,14 +59,13 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_StyleValue display;	/**< 显示方式，决定以何种布局显示该部件 */
 	LCUI_StyleValue box_sizing;	/**< 以何种方式计算宽度和高度 */
 	union {
-		LCUI_Style w, width;	/**< 部件区域宽度 */
+		LCUI_StyleRec w, width;		/**< 部件区域宽度 */
 	};
 	union {
-		LCUI_Style h, height;	/**< 部件区域高度 */
+		LCUI_StyleRec h, height;	/**< 部件区域高度 */
 	};
-	struct {
-		LCUI_Style top, right, bottom, left;
-	} margin, padding;		/**< 外边距, 内边距 */
+	LCUI_BoundBox margin;		/**< 外边距 */
+	LCUI_BoundBox padding;		/**< 内边距 */
 	LCUI_Background background;	/**< 背景 */
 	LCUI_BoxShadow shadow;		/**< 阴影 */
 	LCUI_Border border;		/**< 边框 */
@@ -146,7 +145,7 @@ enum LCUI_StyleKeyName {
 };
 
 typedef struct LCUI_StyleSheetRec_ {
-	LCUI_Style *sheet;
+	LCUI_Style sheet;
 	int length;
 } LCUI_StyleSheetRec, *LCUI_StyleSheet;
 
@@ -212,7 +211,8 @@ typedef struct LCUI_WidgetRec_* LCUI_Widget;
 
 /** 部件结构 */
 typedef struct LCUI_WidgetRec_ {
-	int			x, y;			/**< 部件当前坐标 */
+	int			x, y;			/**< 当前坐标（由 origin 计算而来） */
+	int			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
 	int			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
 	char			*id;			/**< ID */
 	char			*type;			/**< 类型 */

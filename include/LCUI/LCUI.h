@@ -238,7 +238,7 @@ typedef enum LCUI_StyleValue {
 	SV_INLINE_BLOCK
 } LCUI_StyleValue;
 
-typedef struct LCUI_Style {
+typedef struct LCUI_StyleRec_ {
 	LCUI_BOOL is_valid:1;
 	LCUI_BOOL is_changed:1;
 	LCUI_StyleType type:30;
@@ -264,7 +264,11 @@ typedef struct LCUI_Style {
 		LCUI_Graph *image;
 		LCUI_Graph *val_image;
 	};
-} LCUI_Style;
+} LCUI_StyleRec, *LCUI_Style;
+
+typedef struct LCUI_BoundBoxRec {
+	LCUI_StyleRec top, right, bottom, left;
+} LCUI_BoundBox;
 
 typedef struct LCUI_Background {
 	LCUI_Graph image;	/**< 背景图 */
@@ -279,7 +283,7 @@ typedef struct LCUI_Background {
 		LCUI_BOOL using_value;
 		union {
 			struct {
-				LCUI_Style x, y;
+				LCUI_StyleRec x, y;
 			};
 			int value;
 		};
@@ -288,7 +292,7 @@ typedef struct LCUI_Background {
 		LCUI_BOOL using_value;
 		union {
 			struct {
-				LCUI_Style w, h;
+				LCUI_StyleRec w, h;
 			};
 			int value;
 		};

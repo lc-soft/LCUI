@@ -93,7 +93,7 @@ const char *GetStyleName( int key )
 	return RBTree_GetData( &self.name_tree, key );
 }
 
-static int SplitValues( const char *str, LCUI_Style *slist,
+static int SplitValues( const char *str, LCUI_Style slist,
 			int max_len, int mode )
 {
 	int val, vi = 0, vj = 0;
@@ -157,7 +157,7 @@ clean:
 
 static int OnParseNumber( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style *s = &ss->sheet[key];
+	LCUI_Style s = &ss->sheet[key];
 	if( ParseNumber( s, str ) ) {
 		return 0;
 	}
@@ -172,7 +172,7 @@ static int OnParseNumber( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style *s = &ss->sheet[key];
+	LCUI_Style s = &ss->sheet[key];
 	if( ParseColor( s, str ) ) {
 		return 0;
 	}
@@ -217,7 +217,7 @@ static int OnParseImage( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style *s = &ss->sheet[key];
+	LCUI_Style s = &ss->sheet[key];
 	int v = ParseStyleOption( str );
 	if( v < 0 ) {
 		return -1;
@@ -231,10 +231,8 @@ static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseBorder( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style slist[3];
-	int i, mode;
-
-	mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
+	LCUI_StyleRec slist[3];
+	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if( SplitValues(str, slist, 3, mode) < 3 ) {
 		return -1;
 	}
@@ -257,10 +255,8 @@ static int OnParseBorder( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseBorderLeft( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style slist[3];
-	int i, mode;
-
-	mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
+	LCUI_StyleRec slist[3];
+	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if( SplitValues(str, slist, 3, mode) < 3 ) {
 		return -1;
 	}
@@ -283,10 +279,8 @@ static int OnParseBorderLeft( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseBorderTop( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style slist[3];
-	int i, mode;
-
-	mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
+	LCUI_StyleRec slist[3];
+	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if( SplitValues(str, slist, 3, mode) < 3 ) {
 		return -1;
 	}
@@ -309,10 +303,8 @@ static int OnParseBorderTop( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseBorderRight( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style slist[3];
-	int i, mode;
-
-	mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
+	LCUI_StyleRec slist[3];
+	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if( SplitValues(str, slist, 3, mode) < 3 ) {
 		return -1;
 	}
@@ -335,10 +327,8 @@ static int OnParseBorderRight( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseBorderBottom( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style slist[3];
-	int i, mode;
-
-	mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
+	LCUI_StyleRec slist[3];
+	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if( SplitValues(str, slist, 3, mode) < 3 ) {
 		return -1;
 	}
@@ -376,11 +366,8 @@ static int OnParseBorderStyle( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParsePadding( LCUI_StyleSheet ss, int key, const char *str )
 {
-	int value_count;
-	LCUI_Style s[4];
-
-	value_count = SplitValues( str, s, 4, SPLIT_NUMBER );
-	switch( value_count ) {
+	LCUI_StyleRec s[4];
+	switch( SplitValues( str, s, 4, SPLIT_NUMBER ) ) {
 	case 1:
 		ss->sheet[key_padding_top] = s[0];
 		ss->sheet[key_padding_right] = s[0];
@@ -411,11 +398,8 @@ static int OnParsePadding( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseMargin( LCUI_StyleSheet ss, int key, const char *str )
 {
-	int value_count;
-	LCUI_Style s[4];
-
-	value_count = SplitValues( str, s, 4, SPLIT_NUMBER );
-	switch( value_count ) {
+	LCUI_StyleRec s[4];
+	switch( SplitValues( str, s, 4, SPLIT_NUMBER ) ) {
 	case 1:
 		ss->sheet[key_margin_top] = s[0];
 		ss->sheet[key_margin_right] = s[0];
@@ -446,7 +430,7 @@ static int OnParseMargin( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseBoxShadow( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style s[5];
+	LCUI_StyleRec s[5];
 	switch( SplitValues( str, s, 5, SPLIT_NUMBER | SPLIT_COLOR ) ) {
 	case 5:
 		ss->sheet[key_box_shadow_x] = s[0];
@@ -473,7 +457,7 @@ static int OnParseBackground( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseBackgroundSize( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style slist[2];
+	LCUI_StyleRec slist[2];
 	int ret = OnParseStyleOption( ss, key, str );
 	if( ret == 0 ) {
 		return 0;

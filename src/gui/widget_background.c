@@ -122,7 +122,7 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 {
 	ImageCache cache;
 	LCUI_Task task = {0};
-	LCUI_Style *s = &widget->cached_style->sheet[key_background_image];
+	LCUI_Style s = &widget->cached_style->sheet[key_background_image];
 
 	if( !is_inited ) {
 		RBTree_Init( &images );
@@ -156,7 +156,7 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 /** 计算背景样式 */
 void Widget_ComputeBackgroundStyle( LCUI_Widget widget )
 {
-	LCUI_Style *s;
+	LCUI_Style s;
 	LCUI_StyleSheet ss = widget->style;
 	LCUI_Background *bg = &widget->computed_style.background;
 	int key = key_background_start + 1;

@@ -3,7 +3,7 @@
 #include <LCUI/misc/parse.h>
 
 /** 从字符串中解析出数值，包括px、%、dp等单位 */
-LCUI_BOOL ParseNumber( LCUI_Style *s, const char *str )
+LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 {
 	int n = 0;
 	char num_str[32];
@@ -78,12 +78,11 @@ LCUI_BOOL ParseNumber( LCUI_Style *s, const char *str )
 }
 
 /** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A)、rgb(R,G,B) */
-LCUI_BOOL ParseColor( LCUI_Style *var, const char *str )
+LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 {
 	double a;
-	int len = 0, status = 0, r, g, b;
 	const char *p;
-	
+	int len = 0, status = 0, r, g, b;
 	for( p=str; *p; ++p, ++len ) {
 		switch( *p ) {
 		case '#':

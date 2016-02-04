@@ -149,7 +149,7 @@ static int OnParseContent( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style *s = &ss->sheet[style_key_map[key]];
+	LCUI_Style s = &ss->sheet[style_key_map[key]];
 	if( ParseColor( s, str ) ) {
 		return 0;
 	}
@@ -158,7 +158,7 @@ static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseFontSize( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style *s = &ss->sheet[style_key_map[key]];
+	LCUI_Style s = &ss->sheet[style_key_map[key]];
 	if( ParseNumber( s, str ) ) {
 		return 0;
 	}
@@ -203,7 +203,7 @@ static int OnParseTextAlign( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseLineHeight( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style sv;
+	LCUI_StyleRec sv;
 	if( !ParseNumber(&sv, str) ) {
 		return -1;
 	}
@@ -228,9 +228,8 @@ static LCUI_StyleParserRec style_parsers[] = {
 static void TextView_UpdateStyle( LCUI_Widget w )
 {
 	int i;
-	LCUI_Style *s;
-	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
-
+	LCUI_Style s;
+	LCUI_TextView *txt = w->private_data;
 	TextStyle_Init( &txt->style );
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
 		if( style_key_map[i] < 0 ) {
@@ -283,7 +282,7 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 	LinkedList rects;
 	LinkedListNode *node;
 	LCUI_Size new_size = {16, 16};
-	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	LCUI_TextView *txt = w->private_data;
 	
 	DEBUG_MSG("on resize\n");
 	if( w->width > new_size.w ) {
@@ -326,13 +325,13 @@ static void TextView_OnInit( LCUI_Widget w )
 static void TextView_OnDestroy( LCUI_Widget w )
 {
 	LCUI_TextView *txt;
-	txt = (LCUI_TextView*)w->private_data;
+	txt = w->private_data;
 	TextLayer_Destroy( &txt->layer );
 }
 
 static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )
 {
-	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	LCUI_TextView *txt = w->private_data;
 	*width = TextLayer_GetWidth( txt->layer );
 	*height = TextLayer_GetHeight( txt->layer );
 	DEBUG_MSG("width: %d, height: %d\n", *width, *height);
@@ -344,7 +343,7 @@ static void TextView_OnTask( LCUI_Widget w )
 	int i;
 	LinkedList rects;
 	LinkedListNode *node;
-	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	LCUI_TextView *txt = w->private_data;
 
 	LinkedList_Init( &rects );
 	i = TASK_SET_TEXT;
@@ -419,7 +418,7 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 		wcscpy( text_ptr, text );
 	}
 	Widget_Lock( w );
-	txt = (LCUI_TextView*)w->private_data;
+	txt = w->private_data;
 	if( txt->tasks[TASK_SET_TEXT].is_valid
 	 && txt->tasks[TASK_SET_TEXT].text ) {
 		free( txt->tasks[TASK_SET_TEXT].text );
@@ -449,9 +448,9 @@ static void TextView_OnParseText( LCUI_Widget w, const char *text )
 	TextView_SetText( w, text );
 }
 
-void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style *val )
+void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style val )
 {
-	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	LCUI_TextView *txt = w->private_data;
 	TextLayer_SetLineHeight( txt->layer, val );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
@@ -459,7 +458,7 @@ void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style *val )
 
 void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style ) 
 {
-	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	LCUI_TextView *txt = w->private_data;
 	TextLayer_SetTextStyle( txt->layer, style );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
@@ -467,13 +466,13 @@ void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 
 void TextView_GetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 {
-	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	LCUI_TextView *txt = w->private_data;
 	*style = txt->layer->text_style;
 }
 
 void TextView_SetTextAlign( LCUI_Widget w, int align )
 {
-	LCUI_TextView *txt = (LCUI_TextView*)w->private_data;
+	LCUI_TextView *txt = w->private_data;
 	txt->tasks[TASK_SET_TEXT_ALIGN].align = align;
 	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
