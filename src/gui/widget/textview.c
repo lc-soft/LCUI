@@ -371,8 +371,8 @@ static void TextView_OnTask( LCUI_Widget w )
 	}
 	LinkedList_Clear( &rects, free );
 	TextLayer_ClearInvalidRect( txt->layer );
-	if( w->computed_style.w.type == SVT_AUTO
-	 || w->computed_style.h.type == SVT_AUTO ) {
+	if( w->style->sheet[key_width].type == SVT_AUTO
+	 || w->style->sheet[key_height].type == SVT_AUTO ) {
 		Widget_AddTask( w, WTT_RESIZE );
 	}
 }

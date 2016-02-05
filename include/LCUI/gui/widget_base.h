@@ -58,12 +58,6 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_StyleValue float_mode;	/**< 浮动模式 */
 	LCUI_StyleValue display;	/**< 显示方式，决定以何种布局显示该部件 */
 	LCUI_StyleValue box_sizing;	/**< 以何种方式计算宽度和高度 */
-	union {
-		LCUI_StyleRec w, width;		/**< 部件区域宽度 */
-	};
-	union {
-		LCUI_StyleRec h, height;	/**< 部件区域高度 */
-	};
 	LCUI_BoundBox margin;		/**< 外边距 */
 	LCUI_BoundBox padding;		/**< 内边距 */
 	LCUI_Background background;	/**< 背景 */

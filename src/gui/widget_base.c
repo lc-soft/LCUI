@@ -130,8 +130,6 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->computed_style.display = SV_BLOCK;
 	widget->computed_style.pointer_events = SV_AUTO;
 	widget->inherited_style = StyleSheet();
-	widget->computed_style.width.type = SVT_AUTO;
-	widget->computed_style.height.type = SVT_AUTO;
 	widget->computed_style.box_sizing = SV_CONTENT_BOX;
 	widget->computed_style.opacity = 1.0;
 	widget->computed_style.margin.top.type = SVT_PX;
@@ -605,23 +603,25 @@ void Widget_FlushPosition( LCUI_Widget w )
 		w->x = w->origin_x;
 		w->y = w->origin_y;
 	}
-	if( w->style->sheet[key_left].is_valid ) {
-		w->x = w->computed_style.left;
-	} else if( w->style->sheet[key_right].is_valid ) {
-		if( w->parent ) {
-			w->x = w->parent->box.content.width;
-			w->x -= w->width;
+	if( position != SV_STATIC ) {
+		if( w->style->sheet[key_left].is_valid ) {
+			w->x = w->computed_style.left;
+		} else if( w->style->sheet[key_right].is_valid ) {
+			if( w->parent ) {
+				w->x = w->parent->box.content.width;
+				w->x -= w->width;
+			}
+			w->x -= w->computed_style.right;
 		}
-		w->x -= w->computed_style.right;
-	}
-	if( w->style->sheet[key_top].is_valid ) {
-		w->y = w->computed_style.top;
-	} else if( w->style->sheet[key_bottom].is_valid ) {
-		if( w->parent ) {
-			w->y = w->parent->box.content.height;
-			w->y -= w->height;
+		if( w->style->sheet[key_top].is_valid ) {
+			w->y = w->computed_style.top;
+		} else if( w->style->sheet[key_bottom].is_valid ) {
+			if( w->parent ) {
+				w->y = w->parent->box.content.height;
+				w->y -= w->height;
+			}
+			w->y -= w->computed_style.bottom;
 		}
-		w->y -= w->computed_style.bottom;
 	}
 	w->box.outer.x = w->x;
 	w->box.outer.y = w->y;
@@ -701,16 +701,16 @@ static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 /** 计算尺寸 */
 static void Widget_ComputeSize( LCUI_Widget w )
 {
-	switch( w->computed_style.width.type ) {
+	LCUI_Style s = &w->style->sheet[key_width];
+	switch( s->type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
-		w->width = w->parent->box.content.width;
-		w->width *= w->computed_style.width.scale;
+		w->width = w->parent->box.content.width * s->scale;
 		break;
 	case SVT_PX:
-		w->width = w->computed_style.width.px;
+		w->width = s->px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
@@ -718,16 +718,16 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		w->width = 0;
 		break;
 	}
-	switch( w->computed_style.height.type ) {
+	s = &w->style->sheet[key_height];
+	switch( s->type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
-		w->height = w->parent->box.content.height;
-		w->height *= w->computed_style.height.scale;
+		w->height = w->parent->box.content.height * s->scale;
 		break;
 	case SVT_PX:
-		w->height = w->computed_style.height.px;
+		w->height = s->px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
@@ -735,21 +735,18 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		w->height = 0;
 		break;
 	}
-	if( w->computed_style.height.type == SVT_AUTO
-	 || w->computed_style.width.type == SVT_AUTO ) {
-		LCUI_WidgetClass *wc;
+	if( s->type == SVT_AUTO || s->type == SVT_AUTO ) {
 		int width, height;
-
-		wc = LCUIWidget_GetClass( w->type );
+		LCUI_WidgetClass *wc = LCUIWidget_GetClass( w->type );
 		if( wc && wc->methods.autosize ) {
 			wc->methods.autosize( w, &width, &height );
 		} else {
 			Widget_ComputeContentSize( w, &width, &height );
 		}
-		if( w->computed_style.width.type == SVT_AUTO ) {
+		if( s->type == SVT_AUTO ) {
 			w->width = width;
 		}
-		if( w->computed_style.height.type == SVT_AUTO ) {
+		if( s->type == SVT_AUTO ) {
 			w->height = height;
 		}
 	}
@@ -800,8 +797,8 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 	Widget_PostSurfaceEvent( w, WET_RESIZE );
 	LinkedList_ForEach( node, &w->children ) {
 		child = node->data;
-		if( child->computed_style.width.type == SVT_SCALE || 
-		    child->computed_style.height.type == SVT_SCALE ) {
+		if( child->style->sheet[key_width].type == SVT_SCALE || 
+		    child->style->sheet[key_height].type == SVT_SCALE ) {
 			Widget_AddTask( child, WTT_RESIZE );
 		}
 	}
@@ -828,9 +825,6 @@ void Widget_FlushSize( LCUI_Widget w )
 		{ &mbox->left, &w->margin.left, key_margin_left }
 	};
 	rect = w->box.graph;
-	/* 从样式表中获取尺寸 */
-	w->computed_style.width = w->style->sheet[key_width];
-	w->computed_style.height = w->style->sheet[key_height];
 	/* 内边距的单位暂时都用 px  */
 	for( i = 0; i < 8; ++i ) {
 		LCUI_Style s = &w->style->sheet[pd_map[i].key];
@@ -847,6 +841,7 @@ void Widget_FlushSize( LCUI_Widget w )
 	w->computed_style.box_sizing = box_sizing;
 	Widget_ComputeSize( w );
 	Widget_UpdateGraphBox( w );
+	_DEBUG_MSG( "size: %d, %d\n", rect.width, rect.height );
 	/* 若尺寸无变化则不继续处理 */
 	if( rect.width == w->box.graph.width &&
 	    rect.height == w->box.graph.height ) {
@@ -857,7 +852,7 @@ void Widget_FlushSize( LCUI_Widget w )
 	    (rect.width <= 0 || rect.height <= 0) ) {
 		return;
 	}
-	if( w->computed_style.width.type != SVT_AUTO ) {
+	if( w->style->sheet[key_height].type != SVT_AUTO ) {
 		Widget_AddTask( w, WTT_LAYOUT );
 	}
 	if( w->parent ) {
@@ -865,8 +860,8 @@ void Widget_FlushSize( LCUI_Widget w )
 		rect.width = w->box.graph.width;
 		rect.height = w->box.graph.height;
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );	
-		if( w->parent->computed_style.width.type == SVT_AUTO
-		    || w->parent->computed_style.height.type == SVT_AUTO ) {
+		if( w->parent->style->sheet[key_width].type == SVT_AUTO
+		    || w->parent->style->sheet[key_height].type == SVT_AUTO ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
 		}
 		if( w->computed_style.display != SV_NONE
@@ -1242,7 +1237,7 @@ void Widget_UpdateLayout( LCUI_Widget w )
 
 	ctx.max_width = 256;
 	for( child = w; child; child = child->parent ) {
-		switch( child->computed_style.width.type ) {
+		switch( child->style->sheet[key_width].type ) {
 		case SVT_PX:
 		case SVT_SCALE:
 			ctx.max_width = child->box.content.width;
@@ -1288,8 +1283,8 @@ void Widget_UpdateLayout( LCUI_Widget w )
 		ctx.prev = child;
 		ctx.prev_display = child->computed_style.display;
 	}
-	if( w->computed_style.height.type == SVT_AUTO
-	 || w->computed_style.width.type == SVT_AUTO ) {
+	if( w->style->sheet[key_width].type == SVT_AUTO
+	 || w->style->sheet[key_height].type == SVT_AUTO ) {
 		Widget_AddTask( w, WTT_RESIZE );
 	}
 }
