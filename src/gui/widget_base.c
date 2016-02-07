@@ -701,16 +701,17 @@ static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 /** 计算尺寸 */
 static void Widget_ComputeSize( LCUI_Widget w )
 {
-	LCUI_Style s = &w->style->sheet[key_width];
-	switch( s->type ) {
+	LCUI_Style sw = &w->style->sheet[key_width];
+	LCUI_Style sh = &w->style->sheet[key_height];
+	switch( sw->type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
-		w->width = w->parent->box.content.width * s->scale;
+		w->width = w->parent->box.content.width * sw->scale;
 		break;
 	case SVT_PX:
-		w->width = s->px;
+		w->width = sw->px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
@@ -718,16 +719,15 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		w->width = 0;
 		break;
 	}
-	s = &w->style->sheet[key_height];
-	switch( s->type ) {
+	switch( sh->type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
 			break;
 		 }
-		w->height = w->parent->box.content.height * s->scale;
+		w->height = w->parent->box.content.height * sh->scale;
 		break;
 	case SVT_PX:
-		w->height = s->px;
+		w->height = sh->px;
 		break;
 	case SVT_NONE:
 	case SVT_AUTO:
@@ -735,7 +735,7 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		w->height = 0;
 		break;
 	}
-	if( s->type == SVT_AUTO || s->type == SVT_AUTO ) {
+	if( sw->type == SVT_AUTO || sh->type == SVT_AUTO ) {
 		int width, height;
 		LCUI_WidgetClass *wc = LCUIWidget_GetClass( w->type );
 		if( wc && wc->methods.autosize ) {
@@ -743,10 +743,10 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		} else {
 			Widget_ComputeContentSize( w, &width, &height );
 		}
-		if( s->type == SVT_AUTO ) {
+		if( sw->type == SVT_AUTO ) {
 			w->width = width;
 		}
-		if( s->type == SVT_AUTO ) {
+		if( sh->type == SVT_AUTO ) {
 			w->height = height;
 		}
 	}
