@@ -67,6 +67,8 @@ LCUI_API void Surface_Show( LCUI_Surface surface );
 
 LCUI_API void Surface_Hide( LCUI_Surface surface );
 
+LCUI_API void *Surface_GetHandle( LCUI_Surface surface );
+
 /** 设置 Surface 的渲染模式 */
 LCUI_API void Surface_SetRenderMode( LCUI_Surface surface, int mode );
 

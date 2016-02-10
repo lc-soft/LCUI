@@ -40,6 +40,7 @@
 #ifndef __LCUI_DISPLAY_H__
 #define __LCUI_DISPLAY_H__
 
+#include <LCUI/gui/widget.h>
 #include <LCUI/surface.h>
 
 LCUI_BEGIN_HEADER
@@ -68,6 +69,7 @@ typedef struct LCUI_SurfaceMethods {
 	void			(*endPaint)(LCUI_Surface,LCUI_PaintContext);
 	void			(*setCaptionW)(LCUI_Surface,const wchar_t*);
 	void			(*setRenderMode)(LCUI_Surface,int);
+	void*			(*getHandle)(LCUI_Surface);
 	void			(*setOpacity)(LCUI_Surface,float);
 	void			(*onInvalidRect)(LCUI_Surface,LCUI_Rect*);
 	void			(*onEvent)(LCUI_Surface,LCUI_SystemEvent*);
@@ -80,14 +82,22 @@ typedef struct LCUI_DisplayInfo {
 } LCUI_DisplayInfo;
 
 #ifdef LCUI_BUILD_IN_WIN32
+
+/** 初始化 win32 模式 */
 LCUI_API void LCUI_InitWin32Mode( HINSTANCE hInstance );
+
 /** 初始化适用于 Win32 平台的 surface 支持 */
 LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info );
+
+/** 退出 win32 模式 */
 int LCUIDisplay_ExitWin32( void );
+
 #elif defined(LCUI_VIDEO_DRIVER_FRAMEBUFFER)
+
 /** 初始化适用于 Linux 帧缓冲（FrameBuffer） 的 surface 支持 */
 LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info );
 int LCUIDisplay_ExitLinuxFB( void );
+
 #endif
 
 /** 一秒内的最大画面帧数 */
@@ -111,6 +121,15 @@ LCUI_API int LCUIDisplay_GetWidth( void );
 
 /** 获取屏幕高度 */
 LCUI_API int LCUIDisplay_GetHeight( void );
+
+/** 获取与 surface 绑定的 widget */
+LCUI_API LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface );
+
+/** 获取与 widget 绑定的 surface */
+LCUI_API LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget );
+
+/** 获取当前部件所属的 surface */
+LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner( LCUI_Widget w );
 
 /** 获取当前的屏幕内容每秒更新的帧数 */
 LCUI_API int LCUIDisplay_GetFPS(void);

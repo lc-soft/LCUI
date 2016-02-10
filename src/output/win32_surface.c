@@ -43,7 +43,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/thread.h>
-#include <LCUI/gui/widget.h>
 #include <LCUI/display.h>
 #include "resource.h"
 
@@ -119,7 +118,7 @@ static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 	LinkedListNode *node;
 	LinkedList_ForEach( node, &win32.surfaces ) {
 		if( ((LCUI_Surface)node->data)->hwnd == hwnd ) {
-			return (LCUI_Surface)node->data;
+			return node->data;
 		}
 	}
 	return NULL;
@@ -148,7 +147,7 @@ static void Win32Surface_ExecDelete( LCUI_Surface surface )
 	LinkedListNode *node;
 	LinkedList_ForEach( node, &win32.surfaces ) {
 		if( node->data == surface ) {
-			Win32Surface_Destroy( (LCUI_Surface)node->data );
+			Win32Surface_Destroy( node->data );
 			LinkedList_DeleteNode( &win32.surfaces, node );
 			break;
 		}
@@ -465,6 +464,11 @@ static void Win32Surface_Update( LCUI_Surface surface )
 	t->is_valid = FALSE;
 }
 
+static void* Win32Surface_GetHandle( LCUI_Surface s )
+{
+	return s->hwnd;
+}
+
 static void LCUISurface_Loop( void *args )
 {
 	MSG msg;
@@ -551,6 +555,7 @@ LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info )
 	win32.methods.setCaptionW = Win32Surface_SetCaptionW;
 	win32.methods.setRenderMode = Win32Surface_SetRenderMode;
 	win32.methods.setOpacity = Win32Surface_SetOpacity;
+	win32.methods.getHandle = Win32Surface_GetHandle;
 	win32.methods.beginPaint = Win32Surface_BeginPaint;
 	win32.methods.endPaint = Win32Surface_EndPaint;
 	win32.methods.onInvalidRect = NULL;

@@ -41,7 +41,6 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
-#include <LCUI/gui/widget.h>
 #include <LCUI/display.h>
 #include <LCUI/input.h>
 #include <LCUI/cursor.h>
@@ -122,7 +121,6 @@ static void LCUIDisplay_Update(void)
 	LinkedList_Clear( &rlist, free );
 }
 
-/** 获取与 surface 绑定的 widget */
 LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
 {
 	SurfaceRecord *sr;
@@ -136,7 +134,7 @@ LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
 	return NULL;
 }
 
-static LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
+LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
@@ -147,6 +145,18 @@ static LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
 		}
 	}
 	return NULL;
+}
+
+LCUI_Surface LCUIDisplay_GetSurfaceOwner( LCUI_Widget w )
+{
+	if( LCUIDisplay_GetMode() == LDM_SEAMLESS ) {
+		while( w->parent ) {
+			w = w->parent;
+		}
+	} else {
+		w = LCUIWidget_GetRoot();
+	}
+	return LCUIDisplay_GetBindSurface( w );
 }
 
 /** 将 widget 与 sruface 进行绑定 */
@@ -491,6 +501,14 @@ void Surface_Hide( LCUI_Surface surface )
 	if( display.methods && display.methods->hide ) {
 		display.methods->hide( surface );
 	}
+}
+
+void *Surface_GetHandle( LCUI_Surface surface )
+{
+	if( display.methods && display.methods->getHandle ) {
+		return display.methods->getHandle( surface );
+	}
+	return NULL;
 }
 
 /** 设置 Surface 的渲染模式 */
