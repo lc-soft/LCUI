@@ -1,8 +1,7 @@
 ﻿/* ***************************************************************************
  * charset.h -- The charset opreation set.
  * 
- * Copyright (C) 2012-2013 by
- * Liu Chao
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -21,10 +20,9 @@
  * ****************************************************************************/
  
 /* ****************************************************************************
- * charset.h -- 字符集的操作集
+ * charset.h -- 字符集的相关操作函数
  *
- * 版权所有 (C) 2013 归属于
- * 刘超
+ * 版权所有 (C) 2013-2016 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -44,18 +42,15 @@
 
 LCUI_BEGIN_HEADER
 
-/* UTF-8转Unicode */
-LCUI_API int
-LCUICharset_UTF8ToUnicode( const char *src_utf8, wchar_t **des_unicode );
+enum EncodingType {
+	ENCODING_UTF8
+};
 
-/* ASCII转Unicode */
-LCUI_API int
-LCUICharset_ASCIIToUnicode( const char *src_ascii, wchar_t **des_unicode );
+LCUI_API int LCUI_DecodeString( wchar_t *wstr, const char *str,
+				int max_len, int encoding );
 
-/* GB2312转Unicode */
-LCUI_API int
-LCUICharset_GB2312ToUnicode( const char *src_gb2312, wchar_t **des_unicode );
-
+LCUI_API int LCUI_EncodeString( char *str, const wchar_t *wstr,
+				int max_len, int encoding );
 LCUI_END_HEADER
 
 #endif

@@ -128,10 +128,11 @@ static int unescape( const wchar_t *instr, wchar_t *outstr )
 
 static int OnParseContent( LCUI_StyleSheet ss, int key, const char *str )
 {
-	int i;
+	int i, len;
 	wchar_t *content;
-
-	LCUICharset_UTF8ToUnicode( str, &content );
+	len = strlen( str ) + 1;
+	content = malloc( len*sizeof( wchar_t ) );
+	LCUI_DecodeString( content, str, len, ENCODING_UTF8 );
 	if( content[0] == '"' ) {
 		for( i = 0; content[i+1]; ++i ) {
 			content[i] = content[i+1];
@@ -432,10 +433,11 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 
 int TextView_SetText( LCUI_Widget w, const char *utf8_text )
 {
-	int ret;
+	int ret, len;
 	wchar_t *wstr;
-
-	LCUICharset_UTF8ToUnicode( utf8_text, &wstr );
+	len = strlen( utf8_text ) + 1;
+	wstr = malloc( sizeof( wchar_t )*len );
+	LCUI_DecodeString( wstr, utf8_text, len, ENCODING_UTF8 );
 	ret = TextView_SetTextW( w, wstr );
 	if( wstr ) {
 		free( wstr );
