@@ -43,12 +43,9 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
 #include <LCUI/cursor.h>
-#include <LCUI/display.h>
 #include <LCUI/font.h>
 #include <LCUI/input.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/surface.h>
-
+#include <LCUI/display.h>
 #include <time.h>
 
 #define STATE_ACTIVE 1

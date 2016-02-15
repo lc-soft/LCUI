@@ -42,7 +42,6 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/cursor.h>
-#include <LCUI/gui/widget.h>
 #include <LCUI/display.h>
 #include <LCUI/input.h>
 

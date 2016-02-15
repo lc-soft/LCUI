@@ -1,8 +1,7 @@
 ﻿/* ***************************************************************************
  * event.h -- event processing module
  * 
- * Copyright (C) 2012-2014 by
- * Liu Chao
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,8 +22,7 @@
 /* ****************************************************************************
  * event.h -- 事件处理模块
  *
- * 版权所有 (C) 2012-2014 归属于
- * 刘超
+ * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -63,7 +61,7 @@ typedef struct LCUI_EventBoxRec_* LCUI_EventBox;
 #endif
 
 /** 创建一个事件容器实例 */
-LCUI_EventBox $(Create)(void);
+LCUI_API LCUI_EventBox $(Create)(void);
 
 /** 销毁事件容器实例 */
 LCUI_API void $(Destroy)( LCUI_EventBox box );
