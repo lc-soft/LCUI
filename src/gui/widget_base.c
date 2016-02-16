@@ -841,7 +841,6 @@ void Widget_FlushSize( LCUI_Widget w )
 	w->computed_style.box_sizing = box_sizing;
 	Widget_ComputeSize( w );
 	Widget_UpdateGraphBox( w );
-	_DEBUG_MSG( "size: %d, %d\n", rect.width, rect.height );
 	/* 若尺寸无变化则不继续处理 */
 	if( rect.width == w->box.graph.width &&
 	    rect.height == w->box.graph.height ) {
@@ -1263,6 +1262,12 @@ void Widget_UpdateLayout( LCUI_Widget w )
 			break;
 		case SV_INLINE_BLOCK:
 			child->origin_x = ctx.x;
+			ctx.x += child->box.outer.width;
+			if( ctx.x > ctx.max_width ) {
+				child->origin_x = 0;
+				ctx.y += ctx.line_height;
+				ctx.x = child->box.outer.width;
+			}
 			child->origin_y = ctx.y;
 			if( child->box.outer.height > ctx.line_height ) {
 				ctx.line_height = child->box.outer.height;
@@ -1272,12 +1277,8 @@ void Widget_UpdateLayout( LCUI_Widget w )
 				ctx.y += ctx.line_height;
 				break;
 			}
-			ctx.x += child->box.outer.width;
 			break;
 		default: continue;
-		}
-		if( Widget_HasClass( child, "source-list" ) ) {
-			_DEBUG_MSG("x: %d, y: %d\n", child->x, child->y);
 		}
 		Widget_FlushPosition( child );
 		ctx.prev = child;
