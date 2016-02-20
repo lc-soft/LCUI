@@ -544,6 +544,7 @@ static KeyNameGroup style_option_map[] = {
 	{ SV_BORDER_BOX, "border-box" },
 	{ SV_GRAPH_BOX, "graph-box" },
 	{ SV_STATIC, "static" },
+	{ SV_RELATIVE, "relative" },
 	{ SV_ABSOLUTE, "absolute" },
 	{ SV_BLOCK, "block" },
 	{ SV_INLINE_BLOCK, "inline-block" }

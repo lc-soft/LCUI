@@ -236,8 +236,8 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 			}
 			if( LCUIRect_HasPoint(&c->box.border, x, y) ) {
 				target = c;
-				x -= c->box.content.x;
-				y -= c->box.content.y;
+				x -= c->box.padding.x;
+				y -= c->box.padding.y;
 				is_hit = TRUE;
 				break;
 			 }
@@ -596,19 +596,17 @@ void Widget_FlushPosition( LCUI_Widget w )
 		Widget_AddTask( w->parent, WTT_LAYOUT );
 	}
 	w->computed_style.position = position;
-	if( position == SV_ABSOLUTE ) {
+	w->x = w->origin_x;
+	w->y = w->origin_y;
+	switch( position ) {
+	case SV_ABSOLUTE:
 		w->x = 0;
 		w->y = 0;
-	} else {
-		w->x = w->origin_x;
-		w->y = w->origin_y;
-	}
-	if( position != SV_STATIC ) {
 		if( w->style->sheet[key_left].is_valid ) {
 			w->x = w->computed_style.left;
 		} else if( w->style->sheet[key_right].is_valid ) {
 			if( w->parent ) {
-				w->x = w->parent->box.content.width;
+				w->x = w->parent->box.border.width;
 				w->x -= w->width;
 			}
 			w->x -= w->computed_style.right;
@@ -617,26 +615,46 @@ void Widget_FlushPosition( LCUI_Widget w )
 			w->y = w->computed_style.top;
 		} else if( w->style->sheet[key_bottom].is_valid ) {
 			if( w->parent ) {
-				w->y = w->parent->box.content.height;
+				w->y = w->parent->box.border.height;
 				w->y -= w->height;
 			}
 			w->y -= w->computed_style.bottom;
 		}
+		break;
+	case SV_RELATIVE:
+		if( w->style->sheet[key_left].is_valid ) {
+			w->x -= w->computed_style.left;
+		} else if( w->style->sheet[key_right].is_valid ) {
+			w->x += w->computed_style.right;
+		}
+		if( w->style->sheet[key_top].is_valid ) {
+			w->y += w->computed_style.top;
+		} else if( w->style->sheet[key_bottom].is_valid ) {
+			w->y -= w->computed_style.bottom;
+		}
+	default:
+		if( w->parent ) {
+			w->x += w->parent->padding.left;
+			w->y += w->parent->padding.top;
+		}
+		break;
 	}
 	w->box.outer.x = w->x;
 	w->box.outer.y = w->y;
 	w->x += w->margin.left;
 	w->y += w->margin.top;
 	/* 以x、y为基础 */
+	w->box.padding.x = w->x;
+	w->box.padding.y = w->y;
 	w->box.border.x = w->x;
 	w->box.border.y = w->y;
-	w->box.content.x = w->x;
-	w->box.content.y = w->y;
 	w->box.graph.x = w->x;
 	w->box.graph.y = w->y;
 	/* 计算各个框的坐标 */
-	w->box.content.x += w->computed_style.border.left.width + w->padding.left;
-	w->box.content.y += w->computed_style.border.top.width + w->padding.top;
+	w->box.padding.x += w->computed_style.border.left.width;
+	w->box.padding.y += w->computed_style.border.top.width;
+	w->box.content.x = w->box.padding.x + w->padding.left;
+	w->box.content.y = w->box.padding.y + w->padding.top;
 	w->box.graph.x -= BoxShadow_GetBoxX( &w->computed_style.shadow );
 	w->box.graph.y -= BoxShadow_GetBoxY( &w->computed_style.shadow );
 	if( w->parent ) {
@@ -701,8 +719,10 @@ static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 /** 计算尺寸 */
 static void Widget_ComputeSize( LCUI_Widget w )
 {
+	LCUI_Rect *box, *pbox = &w->box.padding;
 	LCUI_Style sw = &w->style->sheet[key_width];
 	LCUI_Style sh = &w->style->sheet[key_height];
+	LCUI_Border *bbox = &w->computed_style.border;
 	switch( sw->type ) {
 	case SVT_SCALE:
 		if( !w->parent ) {
@@ -754,32 +774,33 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	w->box.border.height = w->height;
 	w->box.content.width = w->width;
 	w->box.content.height = w->height;
+	w->box.padding.width = w->width;
+	w->box.padding.height = w->height;
 	/* 如果是以边框盒作为尺寸调整对象，则需根据边框盒计算内容框尺寸 */
 	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
-		/* 名字太长了，都放一行里代码会太长，只好分解成多行了 */
-		w->box.content.width -= w->computed_style.border.left.width;
-		w->box.content.width -= w->computed_style.border.right.width;
-		w->box.content.width -= w->padding.left;
-		w->box.content.width -= w->padding.right;
-		w->box.content.height -= w->computed_style.border.top.width;
-		w->box.content.height -= w->computed_style.border.bottom.width;
-		w->box.content.height -= w->padding.top;
-		w->box.content.height -= w->padding.bottom;
+		box = &w->box.content;
+		pbox->width -= bbox->left.width + bbox->right.width;
+		pbox->height -= bbox->top.width + bbox->bottom.width;
+		box->width = pbox->width;
+		box->height = pbox->height;
+		box->width -= w->padding.left + w->padding.right;
+		box->height -= w->padding.top + w->padding.bottom;
 	} else {
 		/* 否则是以内容框作为尺寸调整对象，需计算边框盒的尺寸 */
-		w->box.border.width += w->computed_style.border.left.width;
-		w->box.border.width += w->computed_style.border.right.width;
-		w->box.border.width += w->padding.left;
-		w->box.border.width += w->padding.right;
-		w->box.border.height += w->computed_style.border.top.width;
-		w->box.border.height += w->computed_style.border.bottom.width;
-		w->box.border.height += w->padding.top;
-		w->box.border.height += w->padding.bottom;
+		box = &w->box.border;
+		pbox->width += w->padding.left + w->padding.right;
+		pbox->height += w->padding.top + w->padding.bottom;
+		box->width = pbox->width;
+		box->height = pbox->height;
+		box->width += bbox->left.width + bbox->right.width;
+		box->height += bbox->top.width + bbox->bottom.width;
 	}
 	w->box.outer.width = w->box.border.width;
 	w->box.outer.height = w->box.border.height;
 	w->box.outer.width += w->margin.left + w->margin.right;
 	w->box.outer.height += w->margin.top + w->margin.bottom;
+	w->width = w->box.border.width;
+	w->height = w->box.border.height;
 }
 
 static void Widget_SendResizeEvent( LCUI_Widget w )
@@ -863,8 +884,8 @@ void Widget_FlushSize( LCUI_Widget w )
 		    || w->parent->style->sheet[key_height].type == SVT_AUTO ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
 		}
-		if( w->computed_style.display != SV_NONE
-		    && w->computed_style.position == SV_STATIC ) {
+		if( w->computed_style.display != SV_NONE &&
+		    w->computed_style.position == SV_STATIC ) {
 			Widget_AddTask( w->parent, WTT_LAYOUT );
 		}
 	}
@@ -875,104 +896,6 @@ void Widget_FlushProps( LCUI_Widget w )
 {
 	int prop = ComputeStyleOption( w, key_pointer_events, SV_AUTO );
 	w->computed_style.pointer_events = prop;
-}
-
-/** 计算内边距 */
-void Widget_ComputePadding( LCUI_Widget w )
-{
-	int i;
-	double result;
-	struct {
-		LCUI_Style value;
-		int *buffer;
-		int size;
-	} map[4] = {
-		{
-			&w->computed_style.padding.top,
-			&w->padding.top,
-			w->parent->box.content.height
-		}, {
-			&w->computed_style.padding.right,
-			&w->padding.right,
-			w->parent->box.content.width
-		}, {
-			&w->computed_style.padding.bottom,
-			&w->padding.bottom,
-			w->parent->box.content.height
-		}, {
-			&w->computed_style.padding.left,
-			&w->padding.left,
-			w->parent->box.content.width
-		}
-	};
-	for( i=0; i<4; ++i ) {
-		switch( map[i].value->type ) {
-		case SVT_SCALE:
-			if( !w->parent ) {
-				break;
-			}
-			result = map[i].size * map[i].value->scale / 100;
-			*map[i].buffer = (int)result;
-			break;
-		case SVT_PX:
-			*map[i].buffer = map[i].value->px;
-			break;
-		case SVT_NONE:
-		case SVT_AUTO:
-		default:
-			// ...
-			break;
-		}
-	}
-}
-
-/** 计算内边距 */
-void Widget_ComputeMargin( LCUI_Widget w )
-{
-	int i;
-	double result;
-	struct {
-		LCUI_Style value;
-		int *buffer;
-		int size;
-	} map[4] = {
-		{
-			&w->computed_style.margin.top,
-			&w->margin.top,
-			w->parent->box.content.height
-		}, {
-			&w->computed_style.margin.right,
-			&w->margin.right,
-			w->parent->box.content.width
-		}, {
-			&w->computed_style.margin.bottom,
-			&w->margin.bottom,
-			w->parent->box.content.height
-		}, {
-			&w->computed_style.margin.left,
-			&w->margin.left,
-			w->parent->box.content.width
-		}
-	};
-	for( i=0; i<4; ++i ) {
-		switch( map[i].value->type ) {
-		case SVT_SCALE:
-			if( !w->parent ) {
-				break;
-			}
-			result = map[i].size * map[i].value->scale / 100;
-			*map[i].buffer = (int)result;
-			break;
-		case SVT_PX:
-			*map[i].buffer = map[i].value->px;
-			break;
-		case SVT_NONE:
-		case SVT_AUTO:
-		default:
-			// ...
-			break;
-		}
-	}
 }
 
 /** 设置内边距 */
@@ -1252,7 +1175,6 @@ void Widget_UpdateLayout( LCUI_Widget w )
 			continue;
 		}
 		switch( child->computed_style.display ) {
-		case SV_NONE: continue;
 		case SV_BLOCK:
 			child->origin_x = ctx.x;
 			child->origin_y = ctx.y;
@@ -1278,6 +1200,7 @@ void Widget_UpdateLayout( LCUI_Widget w )
 				break;
 			}
 			break;
+		case SV_NONE:
 		default: continue;
 		}
 		Widget_FlushPosition( child );

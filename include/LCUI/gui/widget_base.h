@@ -196,8 +196,9 @@ typedef struct LCUI_WidgetTaskBoxRec_* LCUI_WidgetTaskBox;
 
 typedef struct LCUI_WidgetBoxRect {
 	LCUI_Rect content;	/**< 内容框的区域 */
+	LCUI_Rect padding;	/**< 内边距框的区域 */
 	LCUI_Rect border;	/**< 边框盒的区域，包括内边距框和内容框区域 */
-	LCUI_Rect outer;	/**< 外边框的区域，包括边框盒和外边距框区域 */
+	LCUI_Rect outer;	/**< 外边距框的区域，包括边框盒和外边距框区域 */
 	LCUI_Rect graph;	/**< 图层的区域，包括边框盒和阴影区域 */
 } LCUI_WidgetBoxRect;
 

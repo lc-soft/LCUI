@@ -301,13 +301,13 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		}
 	}
 	/* 计算内容框相对于图层的坐标 */
-	content_left = w->box.content.x - w->box.graph.x;
-	content_top = w->box.content.y - w->box.graph.y;
+	content_left = w->box.padding.x - w->box.graph.x;
+	content_top = w->box.padding.y - w->box.graph.y;
 	/* 获取内容框 */
 	content_rect.x = content_left;
 	content_rect.y = content_top;
-	content_rect.width = w->box.content.width;
-	content_rect.height = w->box.content.height;
+	content_rect.width = w->box.padding.width;
+	content_rect.height = w->box.padding.height;
 	/* 获取内容框与脏矩形重叠的区域 */
 	has_overlay = LCUIRect_GetOverlayRect(
 		&content_rect, &paint->rect, &content_rect
