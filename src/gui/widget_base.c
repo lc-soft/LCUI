@@ -714,6 +714,9 @@ static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 			*height = n;
 		}
 	}
+	/* 计算的是内容框的尺寸，需减去内边距 */
+	*width -= w->padding.left;
+	*height -= w->padding.top;
 }
 
 /** 计算尺寸 */
