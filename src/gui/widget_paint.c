@@ -75,7 +75,8 @@ void Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 {
 	LCUI_Rect rect;
 	Widget_AdjustArea( w, r, &rect, box_type );
-	DEBUG_MSG("[%s]: invalidRect:(%d,%d,%d,%d)\n", w->type, rect.x, rect.y, rect.width, rect.height);
+	DEBUG_MSG("[%s]: invalidRect:(%d,%d,%d,%d)\n", w->type, 
+		   rect.x, rect.y, rect.width, rect.height);
 	RectList_Add( &w->dirty_rects, &rect );
 	while( w = w->parent, w && !w->has_dirty_child ) {
 		w->has_dirty_child = TRUE;
@@ -135,7 +136,6 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 	LCUI_Widget child;
 	LinkedListNode *node;
 	LCUI_Rect rect, child_box, *r;
-
 	count = w->dirty_rects.length;
 	/* 取出当前记录的脏矩形 */
 	LinkedList_ForEach( node, &w->dirty_rects ) {
@@ -165,23 +165,23 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 		return count;
 	}
 	/* 缩小有效区域到当前部件内容框内，若没有重叠区域，则不向子级部件递归 */
-	if( !LCUIRect_GetOverlayRect(valid_box, &w->box.content, &child_box) ) {
+	if( !LCUIRect_GetOverlayRect(valid_box, &w->box.padding, &child_box) ) {
 		return count;
 	}
 	/* 转换有效区域的坐标，相对于当前部件的内容框 */
-	child_box.x -= w->box.content.x;
-	child_box.y -= w->box.content.y;
+	child_box.x -= w->box.padding.x;
+	child_box.y -= w->box.padding.y;
 	/* 向子级部件递归 */
 	LinkedList_ForEach( node, &w->children ) {
 		int child_x, child_y;
-		child = (LCUI_Widget)node->data;
+		child = node->data;
 		if( !child->computed_style.visible ) {
 			continue;
 		}
 		child_x = child->box.graph.x + x;
-		child_x += w->box.content.x - w->box.graph.x;
+		child_x += w->box.padding.x - w->box.graph.x;
 		child_y = child->box.graph.y + y;
-		child_y += w->box.content.y - w->box.graph.y;
+		child_y += w->box.padding.y - w->box.graph.y;
 		count += _Widget_ProcInvalidArea( child, child_x, child_y, 
 						  &child_box, rlist );
 	}

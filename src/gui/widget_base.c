@@ -714,9 +714,17 @@ static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 			*height = n;
 		}
 	}
-	/* 计算的是内容框的尺寸，需减去内边距 */
-	*width -= w->padding.left;
-	*height -= w->padding.top;
+	/* 针对不同的对象来调整尺寸 */
+	switch(w->computed_style.box_sizing) {
+	case SV_BORDER_BOX:
+		*width += w->padding.right;
+		*height += w->padding.bottom;
+		break;
+	case SV_CONTENT_BOX:
+		*width -= w->padding.left;
+		*height -= w->padding.top;
+	default: break;
+	}
 }
 
 /** 计算尺寸 */
