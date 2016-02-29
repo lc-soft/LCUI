@@ -456,31 +456,28 @@ void Widget_FlushBoxShadow( LCUI_Widget w )
 
 void Widget_FlushVisibility( LCUI_Widget w )
 {
-	LCUI_Style s;
-	LCUI_BOOL visible = TRUE;
-	s = &w->cached_style->sheet[key_visible];
-	if( w->computed_style.display == SV_NONE
-	    || (s->is_valid && !s->value) ) {
+	LCUI_Style s = &w->style->sheet[key_visible];
+	LCUI_BOOL visible = w->computed_style.visible;
+	if( w->computed_style.display == SV_NONE ) {
 		visible = FALSE;
 	}
+	w->computed_style.visible = !(s->is_valid && !s->value);
 	s = &w->style->sheet[key_display];
-	if( w->style->sheet[key_display].is_valid ) {
+	if( s->is_valid ) {
 		w->computed_style.display = s->style;
+		if( w->computed_style.display == SV_NONE ) {
+			w->computed_style.visible = FALSE;
+		}
 	} else {
 		w->computed_style.display = SV_BLOCK;
 	}
-	w->computed_style.visible = TRUE;
-	s = &w->style->sheet[key_visible];
-	if( w->computed_style.display == SV_NONE || 
-	    (s->is_valid && !s->value) ) {
-		w->computed_style.visible = FALSE;
-	}
-	if( w->computed_style.visible == visible ) {
+	if( visible == w->computed_style.visible ) {
 		return;
 	}
 	visible = w->computed_style.visible;
 	if( w->parent ) {
-		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
+		Widget_InvalidateArea( w->parent, &w->box.graph, 
+				       SV_PADDING_BOX );
 		if( (w->computed_style.display == SV_BLOCK ||
 		      w->computed_style.display == SV_INLINE_BLOCK)
 		    && w->computed_style.position == SV_STATIC

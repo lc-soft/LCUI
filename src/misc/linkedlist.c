@@ -125,7 +125,7 @@ LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data )
 
 void LinkedList_DeleteNode( LinkedList *list, LinkedListNode *node )
 {
-	LinkedList_Unlink(list, node);
+	LinkedList_Unlink( list, node );
 	node->data = NULL;
 	free( node );
 	node = NULL;

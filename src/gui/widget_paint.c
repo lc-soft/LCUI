@@ -44,7 +44,8 @@
 /**
  * 根据所处框区域，调整矩形
  * @param[in] w		目标部件
- * @param[in,out] r	矩形区域
+ * @param[in] in_rect	矩形
+ * @param[out] out_rect	调整后的矩形
  * @param[in] box_type	区域相对于何种框进行定位
  */
 static void Widget_AdjustArea(	LCUI_Widget w, LCUI_Rect *in_rect,
@@ -54,6 +55,7 @@ static void Widget_AdjustArea(	LCUI_Widget w, LCUI_Rect *in_rect,
 	switch( box_type ) {
 	case SV_BORDER_BOX: box = &w->box.border; break;
 	case SV_GRAPH_BOX: box = &w->box.graph; break;
+	case SV_PADDING_BOX: box = &w->box.padding; break;
 	case SV_CONTENT_BOX:
 	default: box = &w->box.content; break;
 	}
@@ -78,7 +80,7 @@ void Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 	DEBUG_MSG("[%s]: invalidRect:(%d,%d,%d,%d)\n", w->type, 
 		   rect.x, rect.y, rect.width, rect.height);
 	RectList_Add( &w->dirty_rects, &rect );
-	while( w = w->parent, w && !w->has_dirty_child ) {
+	while( w = w->parent, w ) {
 		w->has_dirty_child = TRUE;
 	}
 }
@@ -89,7 +91,7 @@ int Widget_GetInvalidArea( LCUI_Widget widget, LCUI_Rect *area )
 	if( widget->dirty_rects.length <= 0 ) {
 		return -1;
 	}
-	rect = (LCUI_Rect*)LinkedList_Get( &widget->dirty_rects, 0 );
+	rect = LinkedList_Get( &widget->dirty_rects, 0 );
 	if( !rect ) {
 		return -2;
 	}
