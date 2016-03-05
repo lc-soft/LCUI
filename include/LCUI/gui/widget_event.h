@@ -74,7 +74,7 @@ typedef struct LCUI_WidgetEvent {
 	int type;			/**< 事件类型标识号 */
 	const char *type_name;		/**< 事件类型名称 */
 	int which;			/**< 指示按了哪个键或按钮 */
-	int x, y;			/**< 鼠标的坐标(相对于当前部件) */
+	int x, y;			/**< 鼠标的坐标(相对于当前部件的边框盒) */
 	void *data;			/**< 附加数据 */
 	LCUI_Widget target;		/**< 触发事件的部件 */
 	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */

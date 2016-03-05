@@ -344,11 +344,12 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 		Widget_UpdateStatus( NULL, WST_HOVER );
 		return;
 	}
-	ebuff.x = pos.x;
-	ebuff.y = pos.y;
+	Widget_GetAbsXY( target, NULL, &ebuff.x, &ebuff.y );
+	ebuff.cancel_bubble = FALSE;
+	ebuff.x = pos.x - ebuff.x;
+	ebuff.y = pos.y - ebuff.y;
 	ebuff.target = target;
 	ebuff.which = 0;
-	ebuff.cancel_bubble = FALSE;
 	switch( e->type ) {
 	case LCUI_MOUSEDOWN:
 		ebuff.type = WET_MOUSEDOWN;

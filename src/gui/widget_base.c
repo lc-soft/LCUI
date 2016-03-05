@@ -246,6 +246,18 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 	return (target == widget) ? NULL:target;
 }
 
+void Widget_GetAbsXY( LCUI_Widget w, LCUI_Widget parent, int *x, int *y )
+{
+	int tmp_x = 0, tmp_y = 0;
+	while( w && w != parent ) {
+		tmp_x += w->box.border.x;
+		tmp_y += w->box.border.y;
+		w = w->parent;
+	}
+	*x = tmp_x;
+	*y = tmp_y;
+}
+
 LCUI_Widget LCUIWidget_GetById( const char *idstr )
 {
 	if( !idstr ) {

@@ -266,6 +266,9 @@ LCUI_API int Widget_Unwrap( LCUI_Widget *widget );
 /** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 
+/** 获取相对于父级指定部件的 XY 坐标 */
+LCUI_API void Widget_GetAbsXY( LCUI_Widget w, LCUI_Widget parent, int *x, int *y );
+
 /** 刷新部件的边框 */
 LCUI_API void Widget_FlushBorder( LCUI_Widget w );
 
