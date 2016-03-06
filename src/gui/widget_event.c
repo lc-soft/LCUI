@@ -348,6 +348,8 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 	ebuff.cancel_bubble = FALSE;
 	ebuff.x = pos.x - ebuff.x;
 	ebuff.y = pos.y - ebuff.y;
+	ebuff.screen_x = pos.x;
+	ebuff.screen_y = pos.y;
 	ebuff.target = target;
 	ebuff.which = 0;
 	switch( e->type ) {
@@ -361,10 +363,9 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 		ebuff.type = WET_MOUSEUP;
 		ebuff.type_name = "mouseup";
 		Widget_PostEvent( target, &ebuff, NULL );
-		_DEBUG_MSG( "target: %s, prev: %s\n", target->type, 
+		DEBUG_MSG( "target: %s, prev: %s\n", target->type, 
 			    self.targets[WST_ACTIVE] ? self.targets[WST_ACTIVE]->type :"null" );
 		if( self.targets[WST_ACTIVE] == target ) {
-			_DEBUG_MSG("post click event\n");
 			ebuff.type = WET_CLICK;
 			ebuff.type_name = "click";
 			Widget_PostEvent( target, &ebuff, NULL );
