@@ -3,7 +3,7 @@
 [![Gitter](https://badges.gitter.im/LC-Team/LCUI.svg)](https://gitter.im/LC-Team/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
 
-![LCUI Logo](http://lcui.org/files/images/lcui-project-logo.png)
+![LCUI Logo](http://lcui.org/static/images/lcui-project-logo.png)
 
 ## 说明
 
