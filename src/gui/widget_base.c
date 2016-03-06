@@ -40,9 +40,6 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
-#include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/widget/button.h>
-#include <LCUI/gui/widget/sidebar.h>
 
 #undef max
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
@@ -1289,6 +1286,11 @@ static int CompareWidgetId( void *data, const void *keydata )
 	return strcmp(((LCUI_Widget)data)->id, (const char*)keydata);
 }
 
+extern void LCUIWidget_AddTextView( void );
+extern void LCUIWidget_AddButton( void );
+extern void LCUIWidget_AddSideBar( void );
+extern void LCUIWidget_AddTScrollBar( void );
+
 void LCUI_InitWidget(void)
 {
 	LCUIWidget_InitTask();
@@ -1298,6 +1300,7 @@ void LCUI_InitWidget(void)
 	LCUIWidget_AddTextView();
 	LCUIWidget_AddButton();
 	LCUIWidget_AddSideBar();
+	LCUIWidget_AddTScrollBar();
 	RBTree_Init( &LCUIWidget.ids );
 	RBTree_SetDataNeedFree( &LCUIWidget.ids, FALSE );
 	RBTree_OnJudge( &LCUIWidget.ids, CompareWidgetId );

@@ -123,34 +123,7 @@
     <ClInclude Include="..\..\..\include\LCUI\misc\string.h">
       <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\activebox.h">
-      <Filter>头文件\LCUI\gui\widget</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h">
-      <Filter>头文件\LCUI\gui\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\checkbox.h">
-      <Filter>头文件\LCUI\gui\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\menu.h">
-      <Filter>头文件\LCUI\gui\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\picturebox.h">
-      <Filter>头文件\LCUI\gui\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\progressbar.h">
-      <Filter>头文件\LCUI\gui\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\radiobutton.h">
-      <Filter>头文件\LCUI\gui\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h">
-      <Filter>头文件\LCUI\gui\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textbox.h">
-      <Filter>头文件\LCUI\gui\widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\window.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_library.h">
@@ -245,6 +218,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\misc\dict.h">
       <Filter>头文件\LCUI\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -415,6 +391,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\misc\dict.c">
       <Filter>源文件\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c">
+      <Filter>源文件\gui\widget</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

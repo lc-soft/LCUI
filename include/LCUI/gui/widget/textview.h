@@ -57,9 +57,6 @@ LCUI_API void TextView_GetTextStyle( LCUI_Widget w, LCUI_TextStyle *style );
 
 LCUI_API void TextView_SetTextAlign( LCUI_Widget w, int align );
 
-/** 添加 TextView 部件类型 */
-void LCUIWidget_AddTextView( void );
-
 LCUI_END_HEADER
 
 #endif

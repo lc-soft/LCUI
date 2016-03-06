@@ -64,7 +64,7 @@ enum LCUI_SystemEventType {
 	LCUI_USER = 100		/**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
 };
 
-typedef struct {
+typedef struct LCUI_SystemEvent_ {
 	int type;			/**< 事件类型标识号 */
 	const char *type_name;		/**< 事件类型名称 */
 	int key_code;			/**< 按键的键值 */
