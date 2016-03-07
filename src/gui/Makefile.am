@@ -13,4 +13,5 @@ css_parser.c		\
 builder.c		\
 widget/textview.c	\
 widget/sidebar.c	\
+widget/scrollbar.c	\
 widget/button.c
