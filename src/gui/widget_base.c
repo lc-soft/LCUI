@@ -602,6 +602,7 @@ void Widget_FlushPosition( LCUI_Widget w )
 		Widget_AddTask( w->parent, WTT_LAYOUT );
 	}
 	w->computed_style.position = position;
+	Widget_AddTask( w, WTT_ZINDEX );
 	w->x = w->origin_x;
 	w->y = w->origin_y;
 	switch( position ) {
@@ -702,22 +703,32 @@ static void Widget_UpdateGraphBox( LCUI_Widget w )
 static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 {
 	int n;
+	LCUI_Style s;
 	LCUI_Widget child;
 	LinkedListNode *node;
 
 	*width = *height = 0;
 	LinkedList_ForEach( node, &w->children_show ) {
 		child = node->data;
-		if( !child->computed_style.visible ) {
+		/* 忽略不可见、绝对定位的部件 */
+		if( !child->computed_style.visible ||
+		    child->computed_style.position == SV_ABSOLUTE ) {
 			continue;
 		}
-		n = child->box.outer.x + child->box.outer.width;
-		if( n > *width ) {
-			*width = n;
+		/* 忽略使用百分比作为尺寸单位的部件 */
+		s = &child->style->sheet[key_width];
+		if( !s->is_valid || s->type != SVT_SCALE ) {
+			n = child->box.outer.x + child->box.outer.width;
+			if( n > *width ) {
+				*width = n;
+			}
 		}
-		n = child->box.outer.y + child->box.outer.height;
-		if( n > *height ) {
-			*height = n;
+		s = &child->style->sheet[key_height];
+		if( !s->is_valid || s->type != SVT_SCALE ) {
+			n = child->box.outer.y + child->box.outer.height;
+			if( n > *height ) {
+				*height = n;
+			}
 		}
 	}
 	/* 针对不同的对象来调整尺寸 */

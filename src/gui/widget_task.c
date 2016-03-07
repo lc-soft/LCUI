@@ -171,6 +171,7 @@ static void MapTaskHandler(void)
 	task_handlers[WTT_CACHE_STYLE] = HandleCacheStyle;
 	task_handlers[WTT_BACKGROUND] = Widget_ComputeBackgroundStyle;
 	task_handlers[WTT_LAYOUT] = Widget_UpdateLayout;
+	task_handlers[WTT_ZINDEX] = Widget_FlushZIndex;
 }
 
 /** 初始化 LCUI 部件任务处理功能 */
