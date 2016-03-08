@@ -106,10 +106,11 @@ static void OnMouseMove( LCUI_SystemEvent *e, void *arg )
 	LCUI_Pos pos;
 	LCUI_Widget w = arg;
 	LCUI_ScrollBar scrollbar = w->private_data;
+	LCUI_Widget slider = scrollbar->slider;
 	LCUI_Widget layer = scrollbar->layer;
-	int x, y, box_size, layer_pos;
+	int x, y, box_size, size, layer_pos;
 
-	if( !scrollbar->is_dragging ) {
+	if( !scrollbar->is_dragging || !scrollbar->layer ) {
 		return;
 	}
 	LCUICursor_GetPos( &pos );
@@ -117,18 +118,46 @@ static void OnMouseMove( LCUI_SystemEvent *e, void *arg )
 		y = 0;
 		x = scrollbar->slider_x;
 		x += pos.x - scrollbar->mouse_x;
-		box_size = scrollbar->box->box.content.width;
-		n = 1.0 * w->x / (w->parent->box.content.width - w->width);
-		layer_pos = (scrollbar->layer->width - box_size) * n;
-		SetStyle( layer->custom_style, key_left, layer_pos, px );
+		if( scrollbar->box ) {
+			box_size = scrollbar->box->box.content.width;
+		} else {
+			box_size = w->parent->box.content.width;
+		}
+		layer_pos = scrollbar->layer->width - box_size;
+		size = w->box.content.width - slider->width;
+		if( x > size ) {
+			x = size;
+		} else if( x < 0 ) {
+			x = 0;
+		}
+		n = 1.0 * slider->x / size;
+		if( n > 1.0 ) {
+			n = 1;
+		}
+		layer_pos = layer_pos * n;
+		SetStyle( layer->custom_style, key_left, -layer_pos, px );
 	} else {
 		x = 0;
 		y = scrollbar->slider_y;
 		y += pos.y - scrollbar->mouse_y;
-		box_size = scrollbar->box->box.content.height;
-		n = 1.0 * w->y / (w->parent->box.content.height - w->height);
-		layer_pos = (scrollbar->layer->height - box_size) * n;
-		SetStyle( layer->custom_style, key_top, layer_pos, px );
+		if( scrollbar->box ) {
+			box_size = scrollbar->box->box.content.height;
+		} else {
+			box_size = w->parent->box.content.height;
+		}
+		layer_pos = scrollbar->layer->height - box_size;
+		size = w->box.content.height - slider->height;
+		if( y > size ) {
+			y = size;
+		} else if( y < 0 ) {
+			y = 0;
+		}
+		n = 1.0 * slider->y / size;
+		if( n > 1.0 ) {
+			n = 1;
+		}
+		layer_pos = layer_pos * n;
+		SetStyle( layer->custom_style, key_top, -layer_pos, px );
 	}
 	Widget_UpdateStyle( layer, FALSE );
 	Widget_Move( scrollbar->slider, x, y );
@@ -172,26 +201,26 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 	LCUI_Widget slider = scrollbar->slider;
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
 		if( scrollbar->layer ) {
-			size = scrollbar->layer->height;
-		} else {
-			size = 0;
-		}
-		box_size = scrollbar->box->height;
-		if( size > box_size && box_size > 0 ) {
-			n = 1.0 * size / box_size;
-		}
-		SetStyle( slider->custom_style, key_height, n, scale );
-	} else {
-		if( scrollbar->layer ) {
 			size = scrollbar->layer->width;
 		} else {
 			size = 0;
 		}
 		box_size = scrollbar->box->width;
 		if( size > box_size && box_size > 0 ) {
-			n = 1.0 * size / box_size;
+			n = 1.0 * box_size / size;
 		}
 		SetStyle( slider->custom_style, key_width, n, scale );
+	} else {
+		if( scrollbar->layer ) {
+			size = scrollbar->layer->height;
+		} else {
+			size = 0;
+		}
+		box_size = scrollbar->box->height;
+		if( size > box_size && box_size > 0 ) {
+			n = 1.0 * box_size / size;
+		}
+		SetStyle( slider->custom_style, key_height, n, scale );
 	}
 	Widget_UpdateStyle( slider, FALSE );
 }
@@ -271,7 +300,7 @@ static void ScrollBar_OnSetAttr( LCUI_Widget w, const char *name, const char *va
 		if( target ) {
 			ScrollBar_BindBox( w, target );
 		}
-	} else if( strcmp( value, "data-layer" ) == 0 ) {
+	} else if( strcmp( name, "data-layer" ) == 0 ) {
 		target = LCUIWidget_GetById( value );
 		if( target ) {
 			ScrollBar_BindLayer( w, target );
