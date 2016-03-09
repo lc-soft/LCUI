@@ -63,6 +63,7 @@ enum WidgetEventType {
 	WET_MOUSEOUT,
 	WET_MOUSEDOWN,
 	WET_MOUSEUP,
+	WET_MOUSEWHEEL,
 	WET_CLICK,
 	
 	WET_TITLE,
@@ -75,6 +76,7 @@ typedef struct LCUI_WidgetEvent {
 	const char *type_name;		/**< 事件类型名称 */
 	int which;			/**< 指示按了哪个键或按钮 */
 	int x, y;			/**< 事件触发时鼠标的坐标（相对于当前部件的边框盒） */
+	int z_delta;			/**< 鼠标滚轮滚动的距离差值 */
 	int screen_x, screen_y;		/**< 事件触发时鼠标的屏幕坐标 */
 	void *data;			/**< 附加数据 */
 	LCUI_Widget target;		/**< 触发事件的部件 */

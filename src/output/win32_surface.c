@@ -205,6 +205,10 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 		e.type = LCUI_MOUSEUP;
 		e.key_code = 2;
 		break;
+	case WM_MOUSEWHEEL:
+		e.type = LCUI_MOUSEWHEEL;
+		e.z_delta = GET_WHEEL_DELTA_WPARAM(arg1);
+		break;
 	case WM_PAINT: {
 		PAINTSTRUCT ps;
 		LCUI_Rect area;

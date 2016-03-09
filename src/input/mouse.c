@@ -77,7 +77,7 @@ static void OnMouseButtonEvent( LCUI_SystemEvent *e, void *arg )
 	if( e->key_code < 1 || e->key_code > 2 ) {
 		return;
 	}
-	_DEBUG_MSG("key_code: %d\n", e->key_code);
+	DEBUG_MSG("key_code: %d\n", e->key_code);
 	switch( e->type ) {
 	case LCUI_MOUSEDOWN:
 		mouse.button_state[e->key_code] = LCUIKEYSTATE_PRESSED;
@@ -214,6 +214,7 @@ int LCUI_InitMouse( void )
 	ret = LCUI_AddEvent( "mousedown", LCUI_MOUSEDOWN );
 	ret |= LCUI_AddEvent( "mouseup", LCUI_MOUSEUP );
 	ret |= LCUI_AddEvent( "mousemove", LCUI_MOUSEMOVE );
+	ret |= LCUI_AddEvent( "mousewheel", LCUI_MOUSEWHEEL );
 	ret |= LCUI_BindEvent( "mousedown", OnMouseButtonEvent, NULL, NULL );
 	ret |= LCUI_BindEvent( "mouseup", OnMouseButtonEvent, NULL, NULL );
 	nobuff_printf(ret < 0 ? "failed\n":"ok\n");

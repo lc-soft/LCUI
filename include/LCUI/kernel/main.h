@@ -59,6 +59,7 @@ enum LCUI_SystemEventType {
 	LCUI_MOUSEMOVE,		/**< 鼠标触发的鼠标移动事件 */
 	LCUI_MOUSEDOWN,		/**< 鼠标触发的按钮按下事件 */
 	LCUI_MOUSEUP,		/**< 鼠标触发的按钮释放事件 */
+	LCUI_MOUSEWHEEL,	/**< 鼠标触发的滚轮滚动事件 */
 	LCUI_INPUT,		/**< 输入法触发的文本输入事件 */
 	LCUI_WIDGET,
 	LCUI_USER = 100		/**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
@@ -69,6 +70,7 @@ typedef struct LCUI_SystemEvent_ {
 	const char *type_name;		/**< 事件类型名称 */
 	int key_code;			/**< 按键的键值 */
 	int rel_x, rel_y;		/**< 鼠标的坐标与上次坐标的差值 */
+	int z_delta;			/**< 鼠标滚轮滚动速度 */
 	void *data;			/**< 附加数据 */
 	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 } LCUI_SystemEvent;

@@ -43,18 +43,18 @@
 #include <LCUI/cursor.h>
 #include <LCUI/thread.h>
 
-typedef struct LCUI_WidgetEventPack {
+typedef struct LCUI_WidgetEventPackRec_ {
 	void *data;			/**< 额外数据 */
 	LCUI_Widget widget;		/**< 当前处理该事件的部件 */
 	LCUI_WidgetEvent event;		/**< 事件数据 */
 	LCUI_BOOL is_direct_run;	/**< 是否直接处理该事件 */
-} LCUI_WidgetEventPack;
+} LCUI_WidgetEventPackRec, *LCUI_WidgetEventPack;
 
-typedef struct LCUI_WidgetEventTask {
+typedef struct LCUI_WidgetEventTaskRec_ {
 	void (*func)(LCUI_Widget, LCUI_WidgetEvent*, void*);
 	void *data;
 	void (*data_destroy)(void*);
-} LCUI_WidgetEventTask;
+} LCUI_WidgetEventTaskRec, *LCUI_WidgetEventTask;
 
 enum WidgetStatusType { 
 	WST_HOVER,
@@ -69,7 +69,7 @@ static struct ModuleContext {
 
 static void DestroyWidgetEventTask( void *arg )
 {
-	LCUI_WidgetEventTask *task = (LCUI_WidgetEventTask*)arg;
+	LCUI_WidgetEventTask task = arg;
 	if( task->data ) {
 		task->data_destroy ? task->data_destroy( task->data ):FALSE;
 		free( task->data );
@@ -78,11 +78,10 @@ static void DestroyWidgetEventTask( void *arg )
 }
 
 /** 将原始事件转换成部件事件 */
-static void WidgetEventHandler( LCUI_Event *e, LCUI_WidgetEventTask *task )
+static void WidgetEventHandler( LCUI_Event *e, LCUI_WidgetEventTask task )
 {
 	LCUI_Widget w;
-	LCUI_WidgetEventPack *pack;
-	pack = (LCUI_WidgetEventPack*)e->data;
+	LCUI_WidgetEventPack pack = e->data;
 	pack->event.data = task->data;
 	pack->event.type = e->id;
 	pack->event.type_name = e->name;
@@ -108,8 +107,8 @@ static void WidgetEventHandler( LCUI_Event *e, LCUI_WidgetEventTask *task )
 static void OnWidgetEvent( LCUI_Event *event, void *arg )
 {
 	LCUI_Task task;
-	LCUI_WidgetEventTask *p_wet = (LCUI_WidgetEventTask*)arg;
-	LCUI_WidgetEventPack *p_wep = (LCUI_WidgetEventPack*)event->data;
+	LCUI_WidgetEventTask p_wet = arg;
+	LCUI_WidgetEventPack p_wep = event->data;
 	DEBUG_MSG("pack: %p, task: %p\n", p_wep, p_wet);
 	/* 如果需要直接执行 */
 	if( p_wep->is_direct_run ) {
@@ -119,7 +118,7 @@ static void OnWidgetEvent( LCUI_Event *event, void *arg )
 	/* 准备任务 */
 	task.func = (CallBackFunc)WidgetEventHandler;
 	task.arg[0] = malloc(sizeof(LCUI_Event));
-	task.arg[1] = malloc(sizeof(LCUI_WidgetEventPack));
+	task.arg[1] = malloc(sizeof(LCUI_WidgetEventPackRec));
 	/* 这两个参数都需要在任务执行完后释放 */
 	task.destroy_arg[0] = TRUE;
 	task.destroy_arg[1] = TRUE;
@@ -127,7 +126,7 @@ static void OnWidgetEvent( LCUI_Event *event, void *arg )
 	task.destroy_func[1] = NULL;
 	/* 复制所需数据，因为在本函数退出后，这两个参数会被销毁 */
 	*((LCUI_Event*)task.arg[0]) = *event;
-	*((LCUI_WidgetEventTask*)task.arg[1]) = *p_wet;
+	*((LCUI_WidgetEventTask)task.arg[1]) = *p_wet;
 	/* 把任务扔给当前跑主循环的线程 */
 	LCUI_AddTask( &task );
 }
@@ -141,8 +140,8 @@ int Widget_BindEvent(	LCUI_Widget widget, const char *event_name,
 			void(*func)(LCUI_Widget,LCUI_WidgetEvent*, void*), 
 			void *func_data, void (*destroy_data)(void*) )
 {
-	LCUI_WidgetEventTask *task;
-	task = NEW(LCUI_WidgetEventTask, 1);
+	LCUI_WidgetEventTask task;
+	task = NEW(LCUI_WidgetEventTaskRec, 1);
 	task->func = func;
 	task->data = func_data;
 	task->data_destroy = destroy_data;
@@ -188,8 +187,8 @@ static LCUI_Widget Widget_GetNextAt( LCUI_Widget widget, int x, int y )
 int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 {
 	int ret;
-	LCUI_WidgetEventPack *pack;
-	pack = NEW( LCUI_WidgetEventPack, 1 );
+	LCUI_WidgetEventPack pack;
+	pack = NEW( LCUI_WidgetEventPackRec, 1 );
 	pack->is_direct_run = FALSE;
 	pack->widget = widget;
 	pack->data = data;
@@ -241,7 +240,7 @@ int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 {
 	int ret;
-	LCUI_WidgetEventPack pack;
+	LCUI_WidgetEventPackRec pack;
 	pack.data = data;
 	pack.event = *e;
 	pack.widget = widget;
@@ -377,6 +376,11 @@ static void OnMouseEvent( LCUI_SystemEvent *e, void *arg )
 		ebuff.type_name = "mousemove";
 		Widget_PostEvent( target, &ebuff, NULL );
 		break;
+	case LCUI_MOUSEWHEEL:
+		ebuff.type = WET_MOUSEWHEEL;
+		ebuff.type_name = "mousewheel";
+		ebuff.z_delta = e->z_delta;
+		Widget_PostEvent( target, &ebuff, NULL );
 	default:return;
 	}
 	Widget_UpdateStatus( target, WST_HOVER );
@@ -448,6 +452,7 @@ void LCUIWidget_InitEvent(void)
 	LCUI_BindEvent( "mousedown", OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( "mousemove", OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( "mouseup", OnMouseEvent, NULL, NULL );
+	LCUI_BindEvent( "mousewheel", OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( "keyup", OnKeyUp, NULL, NULL );
 	LCUI_BindEvent( "keydown", OnKeyDown, NULL, NULL );
 	LCUI_BindEvent( "keypress", OnKeyPress, NULL, NULL );
