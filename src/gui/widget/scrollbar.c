@@ -53,6 +53,7 @@ typedef struct LCUI_ScrollBarRec_ {
 	int mouse_x, mouse_y;	/**< 拖拽开始时的鼠标坐标 */
 	int direction;		/**< 滚动条的方向（垂直或水平） */
 	int eids[2];		/**< 鼠标事件的绑定ID */
+	int scroll_step;	/**< 每次滚动的距离，主要针对使用鼠标滚轮触发的滚动 */
 	int pos;		/**< 当前的位置 */
 } LCUI_ScrollBarRec, *LCUI_ScrollBar;
 
@@ -187,6 +188,7 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	Widget_Append( w, slider );
 	self->direction = SBD_VERTICAL;
 	self->is_dragging = FALSE;
+	self->scroll_step = 40;
 	self->slider = slider;
 	self->layer = NULL;
 	self->box = NULL;
@@ -225,6 +227,19 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 	Widget_UpdateStyle( slider, FALSE );
 }
 
+static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent *e, void *arg )
+{
+	LCUI_Widget w = e->data;
+	LCUI_ScrollBar scrollbar = w->private_data;
+	int pos = ScrollBar_GetPosition( w );
+	if( e->z_delta > 0 ) {
+		pos -= scrollbar->scroll_step;
+	} else {
+		pos += scrollbar->scroll_step;
+	}
+	ScrollBar_SetPosition( w, pos );
+}
+
 static void ScrollBar_OnUpdateSize( LCUI_Widget box, LCUI_WidgetEvent *e, void *arg )
 {
 	ScrollBar_UpdateSize( e->data );
@@ -249,36 +264,57 @@ void ScrollBar_BindLayer( LCUI_Widget w, LCUI_Widget layer )
 	}
 	scrollbar->layer = layer;
 	Widget_BindEvent( layer, "resize", ScrollBar_OnUpdateSize, w, NULL );
+	Widget_BindEvent( layer, "mousewheel", ScrollLayer_OnWheel, w, NULL );
 	ScrollBar_UpdateSize( w );
 }
 
-void ScrollBar_ScrollTo( LCUI_Widget w, int pos )
+int ScrollBar_GetPosition( LCUI_Widget w )
+{
+	LCUI_ScrollBar scrollbar = w->private_data;
+	return scrollbar->pos;
+}
+
+void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 {
 	int box_size, size, slider_pos;
 	LCUI_ScrollBar scrollbar = w->private_data;
 	LCUI_Widget slider = scrollbar->slider;
+	LCUI_Widget layer = scrollbar->layer;
+
+	if( !layer ) {
+		return;
+	}
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
 		size = scrollbar->layer->width;
 		box_size = scrollbar->box->box.content.width;
-		if( pos + size > box_size ) {
-			pos = box_size - size;
+		if( pos + box_size > size ) {
+			pos = size - box_size;
+		}
+		if( pos < 0 ) {
+			pos = 0;
 		}
 		scrollbar->pos = pos;
 		slider_pos = w->box.content.width - slider->width;
-		slider_pos = slider_pos * pos / (box_size - size);
+		slider_pos = slider_pos * pos / (size - box_size);
 		SetStyle( slider->custom_style, key_left, slider_pos, px );
+		SetStyle( layer->custom_style, key_left, -pos, px );
 	} else {
 		size = scrollbar->layer->height;
 		box_size = scrollbar->box->box.content.height;
-		if( pos + size > box_size ) {
-			pos = box_size - size;
+		if( pos + box_size > size ) {
+			pos = size - box_size;
+		}
+		if( pos < 0 ) {
+			pos = 0;
 		}
 		scrollbar->pos = pos;
 		slider_pos = w->box.content.height - slider->height;
-		slider_pos = slider_pos * pos / (box_size - size);
+		slider_pos = slider_pos * pos / (size - box_size);
 		SetStyle( slider->custom_style, key_top, slider_pos, px );
+		SetStyle( layer->custom_style, key_top, -pos, px );
 	}
 	Widget_UpdateStyle( slider, FALSE );
+	Widget_UpdateStyle( layer, FALSE );
 }
 
 void ScrollBar_SetDirection( LCUI_Widget w, int direction )
