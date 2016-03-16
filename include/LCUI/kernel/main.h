@@ -146,7 +146,7 @@ LCUI_API int LCUI_Main( void );
 LCUI_API int LCUI_GetSelfVersion( char *out );
 
 /* 注册终止函数，以在LCUI程序退出时调用 */
-LCUI_API int LCUI_AtExit( void (*func)(void));
+LCUI_API void LCUI_AtQuit( void (*func)(void));
 
 /* 退出LCUI，释放LCUI占用的资源 */
 LCUI_API void LCUI_Quit( void );
