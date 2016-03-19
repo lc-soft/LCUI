@@ -61,19 +61,13 @@ struct LinkedListRec_ {
 #define LinkedList_ForEachReverse(node, list) \
 	for( node = (list)->tail.prev; node && node != &(list)->head; node = node->prev )
 
-#define LinkedList_Init(list) {				\
-	(list)->length = 0;				\
-	(list)->head.next = (list)->tail.next = NULL;	\
-	(list)->head.data = (list)->tail.data = NULL;	\
-	(list)->head.prev = (list)->tail.prev = NULL;	\
-}
-
 #define LinkedList_Clear(list, func) LinkedList_ClearEx( list, func, 1 )
 #define LinkedList_ClearData(list, func) LinkedList_ClearEx( list, func, 0 )
 
 LCUI_API LinkedListNode *LinkedList_Append( LinkedList *list, void *data );
 LCUI_API LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data );
 LCUI_API LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos );
+LCUI_API void LinkedList_Init( LinkedList *list );
 LCUI_API void *LinkedList_Get( LinkedList *list, int pos );
 LCUI_API void LinkedList_Unlink( LinkedList *list, LinkedListNode *node );
 LCUI_API void LinkedList_Link( LinkedList *list, LinkedListNode *cur, LinkedListNode *node );

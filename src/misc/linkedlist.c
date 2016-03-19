@@ -41,6 +41,14 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 
+void LinkedList_Init( LinkedList *list )
+{
+	list->length = 0;
+	list->head.next = list->tail.next = NULL;
+	list->head.data = list->tail.data = NULL;
+	list->head.prev = list->tail.prev = NULL;
+}
+
 void LinkedList_Unlink( LinkedList *list, LinkedListNode *node )
 {
 	(list)->length -= 1;
