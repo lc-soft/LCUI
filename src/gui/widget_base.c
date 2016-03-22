@@ -83,27 +83,26 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget w )
 	return 0;
 }
 
-int Widget_Unwrap( LCUI_Widget *widget )
+int Widget_Unwrap( LCUI_Widget widget )
 {
-	LCUI_Widget self, child;
+	LCUI_Widget child;
 	LinkedList *list, *list_show;
 	LinkedListNode *target, *node, *prev, *snode;
 
-	self = *widget;
-	if( !self->parent ) {
+	if( !widget->parent ) {
 		return -1;
 	}
-	list = &self->parent->children;
-	list_show = &self->parent->children_show;
-	node = Widget_GetNode( self );
+	list = &widget->parent->children;
+	list_show = &widget->parent->children_show;
+	node = Widget_GetNode( widget );
 	target = node->prev;
-	LinkedList_ForEach( node, &self->children ) {
+	LinkedList_ForEach( node, &widget->children ) {
 		prev = node->prev;
 		child = node->data;
 		snode = Widget_GetShowNode( child );
-		LinkedList_Unlink( &self->children, node );
-		LinkedList_Unlink( &self->children_show, snode );
-		child->parent = self->parent;
+		LinkedList_Unlink( &widget->children, node );
+		LinkedList_Unlink( &widget->children_show, snode );
+		child->parent = widget->parent;
 		LinkedList_Link( list, target, node );
 		LinkedList_AppendNode( list_show, snode );
 		Widget_FlushZIndex( child );
@@ -176,43 +175,63 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 
 static void Widget_OnDestroy( void *arg )
 {
-	LCUI_Widget widget = (LCUI_Widget)arg;
+	LCUI_Widget widget = arg;
+	LCUIWidget_ClearEventTarget( widget );
+	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
+	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
+	LinkedList_ClearData( &widget->children_show, NULL );
+	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
+	LinkedList_Clear( &widget->dirty_rects, free );
+	Widget_PostSurfaceEvent( widget, WET_REMOVE );
+	Widget_AddTask( widget->parent, WTT_LAYOUT );
 	Widget_SetId( widget, NULL );
 	Widget_DestroyTaskBox( widget );
 	LCUIEventBox_Destroy( widget->event );
 	widget->event = NULL;
-	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
-	LinkedList_ClearData( &widget->children_show, NULL );
-	LinkedList_Clear( &widget->dirty_rects, free );
-	Widget_PostSurfaceEvent( widget, WET_REMOVE );
-	Widget_AddTask( widget->parent, WTT_LAYOUT );
 	free( widget );
 }
 
-void Widget_ExecDestroy( LCUI_Widget *widget )
+void Widget_ExecDestroy( LCUI_Widget widget )
 {
-	LCUI_Widget w = *widget;
-	if( w->parent ) {
-		LinkedListNode *node = Widget_GetNode( w );
-		LinkedList_Unlink( &w->parent->children, node );
-		node = Widget_GetShowNode( w );
-		LinkedList_Unlink( &w->parent->children_show, node );
+	if( widget->parent ) {
+		LinkedListNode *node = Widget_GetNode( widget );
+		LinkedList_Unlink( &widget->parent->children, node );
+		node = Widget_GetShowNode( widget );
+		LinkedList_Unlink( &widget->parent->children_show, node );
 	}
-	Widget_OnDestroy( w );
-	*widget = NULL;
+	Widget_OnDestroy( widget );
 }
 
-void Widget_Destroy( LCUI_Widget *w )
+void Widget_Destroy( LCUI_Widget w )
 {
-	LCUI_Widget root = *w;
+	LCUI_Widget root = w;
 	while( root->parent ) {
 		root = root->parent;
 	}
 	if( root == LCUIWidget.root ) {
-		Widget_AddTask( *w, WTT_DESTROY );
-		*w = NULL;
+		Widget_AddTask( w, WTT_DESTROY );
 	} else {
 		Widget_ExecDestroy( w );
+	}
+}
+
+void Widget_Empty( LCUI_Widget widget )
+{
+	LinkedListNode *node;
+	LCUI_Widget root = widget;
+	while( root->parent ) {
+		root = root->parent;
+	}
+	if( root == LCUIWidget.root ) {
+		LinkedList_ForEach( node, &widget->children ) {
+			Widget_Destroy( node->data );
+		}
+		return;
+	}
+	LinkedList_ForEach( node, &widget->children ) {
+		LinkedListNode *next = node->next;
+		Widget_Destroy( node->data );
+		node = next;
 	}
 }
 

@@ -87,8 +87,8 @@ typedef struct LCUI_WidgetEvent {
  * 预先注册一个事件，并指定事件名和事件ID
  * 如果需要将多个事件绑定在同一个事件处理器上，并且，不想通过进行字符串比较来
  * 区分事件类型，则可以使用该函数，但需要注意的是，指定的事件ID最好不要与系统
- * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WIDGET_USER 
- * 以后的值都可以使用，例如：WET_USER + 1，WET_USER + 200。
+ * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WET_USER 以
+ * 后的值都可以使用，例如：WET_USER + 1，WET_USER + 200。
  */
 LCUI_API int Widget_AddEvent( LCUI_Widget widget, const char *event_name, int id );
 
@@ -134,6 +134,9 @@ LCUI_API int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *da
  * surface 事件主要用于让 surface 与 widget 同步一些数据，如：大小、位置、显示/隐藏。
  */
 LCUI_API int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type );
+
+/** 清除事件对象，通常在部件销毁时调用该函数，以避免部件销毁后还有事件发送给它 */
+LCUI_API void LCUIWidget_ClearEventTarget( LCUI_Widget widget );
 
 /** 处理一次当前积累的部件事件 */
 void LCUIWidget_StepEvent(void);

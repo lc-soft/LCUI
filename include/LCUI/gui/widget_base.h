@@ -253,16 +253,19 @@ LCUI_API LCUI_Widget LCUIWidget_GetById( const char *idstr );
 LCUI_API LCUI_Widget LCUIWidget_New( const char *type_name );
 
 /** 直接销毁部件 */
-LCUI_API void Widget_ExecDestroy( LCUI_Widget *w );
+LCUI_API void Widget_ExecDestroy( LCUI_Widget w );
 
 /** 销毁部件 */
-LCUI_API void Widget_Destroy( LCUI_Widget *w );
+LCUI_API void Widget_Destroy( LCUI_Widget w );
 
 /** 追加子部件 */
 LCUI_API int Widget_Append( LCUI_Widget container, LCUI_Widget widget );
 
 /** 移除部件，并将其子级部件转移至父部件内 */
-LCUI_API int Widget_Unwrap( LCUI_Widget *widget );
+LCUI_API int Widget_Unwrap( LCUI_Widget widget );
+
+/** 清空部件内的子级部件 */
+LCUI_API void Widget_Empty( LCUI_Widget widget );
 
 /** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );

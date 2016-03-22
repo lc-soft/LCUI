@@ -279,6 +279,16 @@ int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data )
 	return LCUIEventBox_Send( widget->event, e->type_name, &pack );
 }
 
+void LCUIWidget_ClearEventTarget( LCUI_Widget widget )
+{
+	int i;
+	for( i = 0; i < WST_TOTAL; ++i ) {
+		if( self.targets[i] == widget ) {
+			self.targets[i] = NULL;
+		}
+	}
+}
+
 /** 更新状态 */
 static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 {

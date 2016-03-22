@@ -96,11 +96,6 @@ static void HandleRefresh( LCUI_Widget w )
 	Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 }
 
-static void HandleDestroy( LCUI_Widget w )
-{
-	Widget_ExecDestroy( &w );
-}
-
 /** 更新当前任务状态，确保部件的任务能够被处理到 */
 void Widget_UpdateTaskStatus( LCUI_Widget widget )
 {
@@ -156,7 +151,7 @@ static callback task_handlers[WTT_TOTAL_NUM];
 /** 映射任务处理器 */
 static void MapTaskHandler(void)
 {
-	task_handlers[WTT_DESTROY] = HandleDestroy;
+	task_handlers[WTT_DESTROY] = Widget_ExecDestroy;
 	task_handlers[WTT_VISIBLE] = Widget_FlushVisibility;
 	task_handlers[WTT_POSITION] = Widget_FlushPosition;
 	task_handlers[WTT_RESIZE] = Widget_FlushSize;
