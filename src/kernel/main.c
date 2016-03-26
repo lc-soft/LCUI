@@ -63,11 +63,11 @@ struct LCUI_MainLoopRec_ {
 	unsigned long int tid;	/**< 当前运行该主循环的线程的ID */
 };
 
-typedef struct FuncDataRec_ {
-	void (*func)(LCUI_SystemEvent*,void*);
+typedef struct SysEventHandlerRec_ {
+	void (*func)(LCUI_SysEvent*, void*);
 	void *arg;
-	void (*arg_destroy)(void*);
-} FuncData;
+	void (*destroy_arg)(void*);
+} SysEventHandlerRec, *SysEventHandler;
 
 /** LCUI 系统相关数据 */
 static struct LCUI_System {
@@ -78,11 +78,8 @@ static struct LCUI_System {
 	unsigned long int main_tid;	/**< 主线程ID */
 
 	struct {
-		LCUI_BOOL is_running;	/**< 是否处于运行状态 */
-		LCUI_EventBox box;	/**< 系统事件容器 */
-		LCUI_Cond cond;		/**< 条件变量 */
-		LCUI_Mutex mutex;	/**< 互斥锁 */
-		LCUI_Thread tid;	/**< 线程ID */
+		LCUI_EventTrigger trigger;	/**< 系统事件容器 */
+		LCUI_Mutex mutex;		/**< 互斥锁 */
 	} event;
 
 	int exit_code;			/**< 退出码 */
@@ -104,120 +101,65 @@ static struct LCUI_App {
 
 #define EVENT_NAME_LIST_MAX_LEN 10
 
-/** 系统事件处理线程 */
-static void SystemEventThread(void *arg)
-{
-	System.event.is_running = TRUE;
-	while( System.event.is_running ) {
-		DEBUG_MSG("waiting event...\n");
-		LCUICond_Wait( &System.event.cond, &System.event.mutex );
-		DEBUG_MSG("get event.\n");
-		LCUIEventBox_Dispatch( System.event.box );
-		LCUIMutex_Unlock( &System.event.mutex );
-	}
-}
-
 /** 初始化事件模块 */
 static void LCUI_InitEvent(void)
 {
-	LCUICond_Init( &System.event.cond );
 	LCUIMutex_Init( &System.event.mutex );
-	System.event.box = LCUIEventBox_Create();
-	LCUIThread_Create( &System.event.tid, SystemEventThread, NULL );
+	System.event.trigger = EventTrigger();
 }
 
 /** 停用事件模块并进行清理 */
 static void LCUI_ExitEvent(void)
 {
-	System.event.is_running = FALSE;
-	LCUICond_Broadcast( &System.event.cond );
-	LCUIThread_Join( System.event.tid, NULL );
-	LCUICond_Destroy( &System.event.cond );
-	LCUIEventBox_Destroy( System.event.box );
-	System.event.box = NULL;
+	LCUIMutex_Destroy( System.event.mutex );
+	EventTrigger_Destroy( System.event.trigger );
+	System.event.trigger = NULL;
 }
 
-static void OnEvent( LCUI_Event *event, void *arg )
+static void OnEvent( LCUI_Event e, void *arg )
 {
-	FuncData *data = (FuncData*)arg;
-	LCUI_SystemEvent *sys_event = (LCUI_SystemEvent*)event->data;
-	sys_event->type = event->id;
-	sys_event->type_name = event->name;
-	data->func( sys_event, data->arg );
+	SysEventHandler handler = arg;
+	LCUI_SysEvent sys_event = e->data;
+	sys_event->type = e->id;
+	handler->func( sys_event, handler->arg );
 }
 
-static void FuncDataDestroy( void *arg )
+static void DestroySysEventHandler( void *arg )
 {
-	FuncData *data = (FuncData*)arg;
-	if( data->arg ) {
-		data->arg_destroy( data->arg );
+	SysEventHandler handler = arg;
+	if( handler->arg && handler->destroy_arg ) {
+		handler->destroy_arg( handler->arg );
 	}
-	data->arg = NULL;
+	handler->arg = NULL;
 }
 
-/** 预先注册指定名称和ID的事件 */
-int LCUI_AddEvent( const char *event_name, int id )
-{
-	return LCUIEventBox_AddEvent( System.event.box, event_name, id );
-}
-
-/** 绑定指定ID的事件 */
-int LCUI_BindEventById( int id, void(*func)(LCUI_SystemEvent*,void*),
-			void *func_arg, void (*arg_destroy)(void*) )
-{
-	FuncData *data;
-	data = (FuncData*)malloc(sizeof(FuncData));
-	data->func = func;
-	data->arg = func_arg;
-	data->arg_destroy = arg_destroy;
-	return LCUIEventBox_BindById( System.event.box, id, OnEvent,
-					data, FuncDataDestroy );
-}
-
-/** 绑定事件 */
-int LCUI_BindEvent( const char *event_name,
-		    void(*func)(LCUI_SystemEvent*,void*),
-		    void *func_arg, void (*arg_destroy)(void*) )
-{
-	FuncData *data;
-
-	data = (FuncData*)malloc(sizeof(FuncData));
-	data->func = func;
-	data->arg = func_arg;
-	data->arg_destroy = arg_destroy;
-	return LCUIEventBox_Bind( System.event.box, event_name,
-					OnEvent, data, FuncDataDestroy );
-}
-
-/** 解除事件绑定 */
-int LCUI_UnbindEvent( int event_handler_id )
-{
-	return LCUIEventBox_Unbind( System.event.box, event_handler_id );
-}
-
-/** 投递事件 */
-int LCUI_PostEvent( LCUI_SystemEvent *event )
+int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *func_arg, 
+		    void (*destroy_arg)(void*) )
 {
 	int ret;
-	const char *event_name;
-	LCUI_SystemEvent *sys_event;
+	SysEventHandler handler;
+	handler = NEW( SysEventHandlerRec, 1 );
+	handler->func = func;
+	handler->arg = func_arg;
+	handler->destroy_arg = destroy_arg;
+	LCUIMutex_Lock( System.event.mutex );
+	ret = EventTrigger_Bind( System.event.trigger, id, OnEvent,
+				 handler, DestroySysEventHandler );
+	LCUIMutex_Unlock( System.event.mutex );
+	return ret;
+}
 
-	event_name = event->type_name;
-	if( !event_name ) {
-		event_name = LCUIEventBox_GetEventName(
-			System.event.box, event->type
-		);
-		if( !event_name ) {
-			DEBUG_MSG("event handler dose not exist.\n");
-			return -1;
-		}
-	}
-	sys_event = (LCUI_SystemEvent*)malloc(sizeof(LCUI_SystemEvent));
-	*sys_event = *event;
-	ret = LCUIEventBox_Post( System.event.box, event_name, sys_event, free );
-	if( ret == 0 ) {
-		LCUICond_Broadcast( &System.event.cond );
-	}
+int LCUI_UnbindEvent( int handler_id )
+{
+	return EventTrigger_Unbind( System.event.trigger, handler_id );
+}
+
+int LCUI_SendEvent( LCUI_SysEvent e )
+{
+	int ret;
+	LCUIMutex_Lock( System.event.mutex );
+	ret = EventTrigger_Trigger( System.event.trigger, e->type, e, NULL );
+	LCUIMutex_Unlock( System.event.mutex );
 	return ret;
 }
 

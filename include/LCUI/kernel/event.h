@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * event.h -- event processing module
  * 
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * event.h -- 事件处理模块
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -39,76 +39,64 @@
 #ifndef __LCUI_KERNEL_EVENT_H__
 #define __LCUI_KERNEL_EVENT_H__
 
-/** 为本文件内的函数名加上前缀 */
-#define $(FUNC_NAME) LCUIEventBox_##FUNC_NAME
-
 LCUI_BEGIN_HEADER
 
-/** 事件 */
+/** 事件数据结构 */
 typedef struct LCUI_EventRec_ {
 	int id;				/**< 事件标识号 */
-	const char *name;		/**< 事件名（只读） */
 	void *data;			/**< 事件附加数据 */
-	void (*destroy_data)(void*);	/**< 用于销毁事件附加数据的回调函数 */
-} LCUI_Event;
+	void (*destroy_data)(void*);	/**< 事件附加数据的销毁函数 */
+} LCUI_EventRec, *LCUI_Event;
 
-typedef void(*EventCallBack)(LCUI_Event*, void*);
+typedef void(*LCUI_EventFunc)(LCUI_Event*, void*);
 
-#ifndef __IN_EVENT_SOURCE_FILE__
-typedef void* LCUI_EventBox;
-#else
-typedef struct LCUI_EventBoxRec_* LCUI_EventBox;
+#ifndef __LCUI_KERNEL_EVENT_C__
+typedef void* LCUI_EventTrigger;
 #endif
 
-/** 创建一个事件容器实例 */
-LCUI_API LCUI_EventBox $(Create)(void);
+/** 构建一个事件触发器 */
+LCUI_API LCUI_EventTrigger EventTrigger( void );
 
-/** 销毁事件容器实例 */
-LCUI_API void $(Destroy)( LCUI_EventBox box );
+/** 销毁一个事件触发器 */
+LCUI_API void EventTrigger_Destroy( LCUI_EventTrigger trigger );
 
-/** 注册事件，指定事件名称和ID */
-LCUI_API int $(AddEvent)( LCUI_EventBox box, const char *event_name, int id );
+/**
+ * 绑定一个事件处理器
+ * @param[in] event_id     事件标识号
+ * @param[in] func         事件处理函数
+ * @param[in] data         事件处理函数的附加参数
+ * @param[in] destroy_data 参数的销毁函数
+ * @returns 返回处理器ID
+ */
+LCUI_API int EventTrigger_Bind( LCUI_EventTrigger trigger, int event_id,
+				LCUI_EventFunc func, void *data,
+				void( *destroy_data )(void*) );
 
-/** 检测事件名是否已经存在（已注册） */
-LCUI_API int $(IsExistEventName)( LCUI_EventBox box, const char *event_name );
+/** 
+ * 解除绑定事件处理器
+ * @param[in] trigger  事件触发器
+ * @param[in] event_id 事件标识号
+ * @param[in] func     事件处理函数
+ * @returns 解绑成功返回 0，失败则返回 -1
+ */
+LCUI_API int EventTrigger_Unbind( LCUI_EventTrigger trigger, int event_id,
+				  LCUI_EventFunc func );
 
-/** 检测事件ID是否已经存在 */
-LCUI_API int $(IsExistEventId)( LCUI_EventBox box, int id );
+/** 
+* 根据事件处理器的标识号来解除事件绑定
+* @param[in] trigger    事件触发器
+* @param[in] handler_id 事件处理器的标识号
+* @returns 解绑成功返回 0，失败则返回 -1
+*/
+LCUI_API int EventTrigger_Unbind2( LCUI_EventTrigger trigger, int handler_id );
 
-/** 获取指定事件ID的名称 */
-LCUI_API const char *$(GetEventName)( LCUI_EventBox box, int id );
-
-/** 绑定指定ID的事件 */
-LCUI_API int $(BindById)( LCUI_EventBox box, int event_id, EventCallBack func,
-			void *func_data, void (*destroy_data)(void*) );
-
-/** 绑定指定名称的事件 */
-LCUI_API int $(Bind)(	LCUI_EventBox box, const char *event_name,
-			EventCallBack func, void *func_data, 
-			void (*destroy_data)(void*) );
-
-/** 解除事件连接 */
-LCUI_API int $(Unbind)( LCUI_EventBox box, int handler_id );
-
-/** 直接将事件发送至事件处理器进行处理 */
-LCUI_API int $(Send)( LCUI_EventBox box, const char *name, void *data );
-
-/** 将事件投递给事件处理器，等待处理 */
-LCUI_API int $(Post)(	LCUI_EventBox box, const char *name, void *data,
-			void (*destroy_data)(void*) );
-
-/** 派发当前待处理的事件至对应的处理器 */
-LCUI_API int $(Dispatch)( LCUI_EventBox box );
-
-/** 从已触发的事件记录中取出（不会移除）一个事件信息 */
-LCUI_API int $(GetEvent)( LCUI_EventBox box, LCUI_Event *ebuff );
-
-/** 从已触发的事件记录中删除一个事件信息 */
-LCUI_API int $(DeleteEvent)( LCUI_EventBox box );
-
-
-LCUI_END_HEADER
-
-#undef $
+/** 
+* 触发事件
+* @param[in] trigger    事件触发器
+* @param[in] event_id   事件标识号
+* @param[in] arg        与事件相关的数据
+* @returns 返回已调用的事件处理器的数量
+*/
+LCUI_API int EventTrigger_Trigger( LCUI_EventTrigger trigger, int event_id, void *arg );
 
 #endif

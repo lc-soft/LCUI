@@ -72,7 +72,7 @@ static struct LCUIMouseDeviceContext {
 	{LCUIKEYSTATE_RELEASE, LCUIKEYSTATE_RELEASE}
 };
 
-static void OnMouseButtonEvent( LCUI_SystemEvent *e, void *arg )
+static void OnMouseButtonEvent( LCUI_SysEvent e, void *arg )
 {
 	if( e->key_code < 1 || e->key_code > 2 ) {
 		return;
@@ -129,7 +129,7 @@ static LCUI_BOOL MouseProc( void )
 static LCUI_BOOL MouseProc( void )
 {
 	POINT new_pos;
-	LCUI_SystemEvent e;
+	LCUI_SysEventRec e;
 	static LCUI_Pos old_pos = {0, 0};
 
 	/* 如果是无缝模式则获取系统鼠标游标的坐标 */
@@ -140,7 +140,6 @@ static LCUI_BOOL MouseProc( void )
 		new_pos.y = mouse.y;
 	}
 	e.type = LCUI_MOUSEMOVE;
-	e.type_name = NULL;
 	e.data = e.destroy_data = NULL;
 	e.rel_x = new_pos.x - old_pos.x;
 	e.rel_y = new_pos.y - old_pos.y;
@@ -150,7 +149,7 @@ static LCUI_BOOL MouseProc( void )
 	old_pos.x = new_pos.x;
 	old_pos.y = new_pos.y;
 	DEBUG_MSG("x: %d, y: %d, rel_x: %d, rel_y: %d\n", new_pos.x, new_pos.y, e.rel_x, e.rel_y);
-	LCUI_PostEvent( &e );
+	LCUI_SendEvent( &e );
 	return TRUE;
 }
 
@@ -211,12 +210,8 @@ int LCUI_InitMouse( void )
 	mouse.state = STATE_REMOVE;	/* 鼠标为移除状态 */
 #endif
 	nobuff_printf("[mouse] set event ... ");
-	ret = LCUI_AddEvent( "mousedown", LCUI_MOUSEDOWN );
-	ret |= LCUI_AddEvent( "mouseup", LCUI_MOUSEUP );
-	ret |= LCUI_AddEvent( "mousemove", LCUI_MOUSEMOVE );
-	ret |= LCUI_AddEvent( "mousewheel", LCUI_MOUSEWHEEL );
-	ret |= LCUI_BindEvent( "mousedown", OnMouseButtonEvent, NULL, NULL );
-	ret |= LCUI_BindEvent( "mouseup", OnMouseButtonEvent, NULL, NULL );
+	ret = LCUI_BindEvent( LCUI_MOUSEDOWN, OnMouseButtonEvent, NULL, NULL );
+	ret |= LCUI_BindEvent( LCUI_MOUSEUP, OnMouseButtonEvent, NULL, NULL );
 	nobuff_printf(ret < 0 ? "failed\n":"ok\n");
 	ret |= LCUIDevice_Add( MouseInit, MouseProc, MouseExit );
 	return ret;

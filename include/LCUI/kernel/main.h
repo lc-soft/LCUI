@@ -50,7 +50,7 @@ typedef struct {
 	LCUI_BOOL destroy_arg[2];	/**< 指定在调用完回调函数后，是否释放参数 */
 } LCUI_Task;
 
-enum LCUI_SystemEventType {
+enum LCUI_SysEventType {
 	LCUI_NONE,
 	LCUI_KEYDOWN,		/**< 键盘触发的按键按下事件 */
 	LCUI_KEYPRESS,		/**< 按键输入事件，仅字母、数字等ANSI字符键可触发 */
@@ -65,15 +65,16 @@ enum LCUI_SystemEventType {
 	LCUI_USER = 100		/**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
 };
 
-typedef struct LCUI_SystemEvent_ {
+typedef struct LCUI_SysEventRec_ {
 	int type;			/**< 事件类型标识号 */
-	const char *type_name;		/**< 事件类型名称 */
 	int key_code;			/**< 按键的键值 */
 	int rel_x, rel_y;		/**< 鼠标的坐标与上次坐标的差值 */
 	int z_delta;			/**< 鼠标滚轮滚动速度 */
 	void *data;			/**< 附加数据 */
 	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
-} LCUI_SystemEvent;
+} LCUI_SysEventRec, *LCUI_SysEvent;
+
+typedef void(*LCUI_SysEventFunc)(LCUI_SysEvent*, void*);
 
 #ifdef __IN_MAIN_SOURCE_FILE__
 typedef struct LCUI_MainLoopRec_* LCUI_MainLoop;
@@ -88,19 +89,13 @@ LCUI_API void LCUI_InitWin32Mode( HINSTANCE hInstance );
 
 /*-------------------------- system event <START> ---------------------------*/
 
-/** 预先注册指定名称和ID的事件 */
-LCUI_API int LCUI_AddEvent( const char *event_name, int id );
+LCUI_API int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *func_arg,
+			     void( *destroy_arg )(void*) );
 
-/** 绑定事件 */
-LCUI_API int LCUI_BindEvent( const char *event_name,
-		    void(*func)(LCUI_SystemEvent*,void*),
-		    void *func_arg, void (*arg_destroy)(void*) );
+LCUI_API int LCUI_UnbindEvent( int handler_id );
 
-/** 解除事件绑定 */
-LCUI_API int LCUI_UnbindEvent( int event_handler_id );
+LCUI_API int LCUI_SendEvent( LCUI_SysEvent e );
 
-/** 投递事件 */
-LCUI_API int LCUI_PostEvent( LCUI_SystemEvent *event );
 
 /*--------------------------- system event <END> ----------------------------*/
 
