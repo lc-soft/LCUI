@@ -316,10 +316,10 @@ LCUI_END_HEADER
 		fflush(stdout); \
 	}
 
+#include <LCUI/misc.h>
 #include <LCUI/kernel/main.h>
 #include <LCUI/kernel/event.h>
 #include <LCUI/kernel/timer.h>
 #include <LCUI/kernel/device.h>
-#include <LCUI/misc.h>
 
 #endif /* __LCUI_H__ */
