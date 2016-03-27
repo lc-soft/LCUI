@@ -105,7 +105,7 @@ static int LCUICursor_LoadDefualtGraph(LCUI_Graph *buff )
 	return 0;
 }
 
-static void OnMouseMoveEvent( LCUI_SystemEvent *e, void *arg )
+static void OnMouseMoveEvent( LCUI_SysEvent e, void *arg )
 {
 	global_cursor.pos.x += e->rel_x;
 	global_cursor.pos.y += e->rel_y;
@@ -122,7 +122,7 @@ void LCUI_InitCursor( void )
 	/* 载入自带的游标的图形数据 */ 
 	LCUICursor_LoadDefualtGraph( &pic );
 	LCUICursor_SetGraph( &pic );
-	LCUI_BindEvent( "mousemove", OnMouseMoveEvent, NULL, NULL );
+	LCUI_BindEvent( LCUI_MOUSEMOVE, OnMouseMoveEvent, NULL, NULL );
 }
 
 void LCUI_ExitCursor( void )
@@ -147,6 +147,7 @@ void LCUICursor_Refresh( void )
 		return;
 	}
 	LCUICursor_GetRect( &rect );
+	LCUIDisplay_InvalidateArea( &rect );
 }
 
 /* 检测鼠标游标是否可见 */
@@ -165,9 +166,8 @@ void LCUICursor_Show( void )
 /* 隐藏鼠标游标 */
 void LCUICursor_Hide( void )
 {
-	LCUI_Rect rect;
+	LCUICursor_Refresh();
 	global_cursor.visible = FALSE;
-	LCUICursor_GetRect( &rect );
 }
 
 /* 更新鼠标指针的位置 */
@@ -207,13 +207,7 @@ int LCUICursor_SetGraph( LCUI_Graph *graph )
 /* 获取鼠标指针当前的坐标 */
 void LCUICursor_GetPos( LCUI_Pos *pos )
 {
-	*pos = global_cursor.current_pos;
-}
-
-/* 获取鼠标指针将要更新的坐标 */
-void LCUICursor_GetNewPos( LCUI_Pos *pos )
-{
-	*pos = global_cursor.new_pos;
+	*pos = global_cursor.pos;
 }
 
 /* 检测鼠标游标是否覆盖在矩形区域上 */

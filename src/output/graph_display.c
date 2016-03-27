@@ -121,6 +121,11 @@ static void LCUIDisplay_Update(void)
 	LinkedList_Clear( &rlist, free );
 }
 
+void LCUIDisplay_InvalidateArea(LCUI_Rect *rect )
+{
+	
+}
+
 LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
 {
 	SurfaceRecord *sr;
@@ -347,7 +352,6 @@ static void LCUIDisplay_Thread( void *unused )
 	while( LCUI_IsActive() && display.is_working ) {
 		LCUICursor_UpdatePos();		/* 更新鼠标位置 */
 		LCUIWidget_StepTask();		/* 处理所有部件任务 */
-		LCUIWidget_StepEvent();		/* 派发所有事件 */
 		LCUIMutex_Lock( &display.mutex );
 		LCUIDisplay_Update();
 		LCUIMutex_Unlock( &display.mutex );
@@ -358,7 +362,7 @@ static void LCUIDisplay_Thread( void *unused )
 }
 
 /** 响应顶级部件的各种事件 */
-static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
+static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_Rect *p_rect;
 	LCUI_Surface surface;
@@ -416,7 +420,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
 	}
 }
 
-static void Surface_OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
+static void Surface_OnEvent( LCUI_Surface surface, LCUI_SysEvent e )
 {
 #ifdef LCUI_BUILD_IN_WIN32
 	if( display.mode == LDM_SEAMLESS ) {
@@ -427,7 +431,7 @@ static void Surface_OnEvent( LCUI_Surface surface, LCUI_SystemEvent *e )
 		LCUIMouse_SetPos( e->rel_x, e->rel_y );
 		return;
 	}
-	LCUI_PostEvent( e );
+	LCUI_TriggerEvent( e );
 #endif
 }
 

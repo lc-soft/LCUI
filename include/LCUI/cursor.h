@@ -74,9 +74,6 @@ LCUI_API int LCUICursor_SetGraph( LCUI_Graph *graph );
 /* 获取鼠标指针当前的坐标 */
 LCUI_API void LCUICursor_GetPos( LCUI_Pos *pos );
 
-/* 获取鼠标指针将要更新的坐标 */
-LCUI_API void LCUICursor_GetNewPos( LCUI_Pos *pos );
-
 /* 检测鼠标游标是否覆盖在矩形区域上 */
 LCUI_BOOL LCUICursor_IsCoverRect( LCUI_Rect rect );
 

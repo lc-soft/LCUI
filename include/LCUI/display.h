@@ -72,7 +72,7 @@ typedef struct LCUI_SurfaceMethods {
 	void*			(*getHandle)(LCUI_Surface);
 	void			(*setOpacity)(LCUI_Surface,float);
 	void			(*onInvalidRect)(LCUI_Surface,LCUI_Rect*);
-	void			(*onEvent)(LCUI_Surface,LCUI_SystemEvent*);
+	void			(*onEvent)(LCUI_Surface,LCUI_SysEvent);
 } LCUI_SurfaceMethods;
 
 typedef struct LCUI_DisplayInfo {
@@ -121,6 +121,9 @@ LCUI_API int LCUIDisplay_GetWidth( void );
 
 /** 获取屏幕高度 */
 LCUI_API int LCUIDisplay_GetHeight( void );
+
+/** 添加无效区域 */
+LCUI_API void LCUIDisplay_InvalidateArea( LCUI_Rect *rect );
 
 /** 获取与 surface 绑定的 widget */
 LCUI_API LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface );

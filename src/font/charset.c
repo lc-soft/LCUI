@@ -55,6 +55,10 @@ static int DecodeFromUTF8( wchar_t *wstr, int max_len, const char *str )
 	const char *inptr;
 	int i, len = 0, count = 0;
 	unsigned char *p, byte, ch[MAX_SAVE_NUM];
+
+	if( max_len == -1 ) {
+		max_len = strlen( str );
+	}
 	for( inptr = str; *inptr && len < max_len; ++inptr ) {
 		byte = *inptr;
 		if( (byte >> 7) == 0 ) { // 0xxxxxxx
@@ -103,35 +107,36 @@ static int DecodeFromUTF8( wchar_t *wstr, int max_len, const char *str )
 	return len;
 }
 
-
-static int EncodeToUTF8( const wchar_t *wstr, char *str, int max_len )
-{
-#ifdef LCUI_BUILD_IN_WIN32
-	return WideCharToMultiByte( CP_UTF8, 0, wstr, -1, str,
-				    max_len, NULL, NULL );
-#else
-	return -1;
-#endif
-}
-
 int LCUI_DecodeString( wchar_t *wstr, const char *str, 
 		       int max_len, int encoding )
 {
 	// 暂时不处理其它编码方式
 	switch( encoding ) {
+	case ENCODING_ANSI:
 	case ENCODING_UTF8:
 	default: break;
 	}
 	return DecodeFromUTF8( wstr, max_len, str );
 }
 
+#ifdef LCUI_BUILD_IN_WIN32
+#define encode(CP, WSTR, STR, LEN) \
+WideCharToMultiByte(CP, 0, WSTR, -1, STR, LEN, NULL, NULL)
+#endif
+
 int LCUI_EncodeString( char *str, const wchar_t *wstr, 
 		       int max_len, int encoding )
 {
+#ifdef LCUI_BUILD_IN_WIN32
+	int cp;
 	// 暂时不处理其它编码方式
 	switch( encoding ) {
-	case ENCODING_UTF8:
-	default: break;
+	case ENCODING_ANSI: cp = CP_ACP; break;
+	case ENCODING_UTF8: cp = CP_UTF8; break;
+	default: return -1;
 	}
-	return EncodeToUTF8( wstr, str, max_len );
+	return encode( cp, wstr, str, max_len );
+#else
+	return -1;
+#endif
 }

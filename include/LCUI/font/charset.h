@@ -43,6 +43,7 @@
 LCUI_BEGIN_HEADER
 
 enum EncodingType {
+	ENCODING_ANSI,
 	ENCODING_UTF8
 };
 
