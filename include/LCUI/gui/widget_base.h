@@ -232,7 +232,7 @@ typedef struct LCUI_WidgetRec_ {
 
 	LCUI_Graph		graph;			/**< 位图缓存 */
 	LCUI_Mutex		mutex;			/**< 互斥锁 */
-	LCUI_EventBox		event;			/**< 事件记录 */
+	LCUI_EventTrigger	trigger;		/**< 事件触发器 */
 	LCUI_WidgetTaskBox	task;			/**< 任务记录 */
 	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
 	LCUI_BOOL		has_dirty_child;	/**< 标志，指示子级部件是否有无效区域 */

@@ -278,7 +278,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 	Widget_AddTask( w, WTT_USER );
 }
 
-static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
+static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	LinkedList rects;
 	LinkedListNode *node;

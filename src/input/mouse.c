@@ -149,7 +149,7 @@ static LCUI_BOOL MouseProc( void )
 	old_pos.x = new_pos.x;
 	old_pos.y = new_pos.y;
 	DEBUG_MSG("x: %d, y: %d, rel_x: %d, rel_y: %d\n", new_pos.x, new_pos.y, e.rel_x, e.rel_y);
-	LCUI_SendEvent( &e );
+	LCUI_TriggerEvent( &e );
 	return TRUE;
 }
 

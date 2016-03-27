@@ -37,8 +37,6 @@
 * 没有，请查看：<http://www.gnu.org/licenses/>.
 * ****************************************************************************/
 
-#define __LCUI_KERNEL_EVENT_C__
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -54,12 +52,6 @@ typedef struct LCUI_EventHandlerRec_ {
 	LinkedListNode node;		/**< 处理器列表中的节点 */
 	LinkedList *list;		/**< 所属处理器列表 */
 } LCUI_EventHandlerRec, *LCUI_EventHandler;
-
-typedef struct LCUI_EventTriggerRec_ {
-	int handler_base_id;		/**< 事件处理器ID */
-	LCUI_RBTree events;		/**< 事件绑定记录 */
-	LCUI_RBTree handlers;		/**< 事件处理器记录 */
-} LCUI_EventTriggerRec, *LCUI_EventTrigger;
 
 LCUI_EventTrigger EventTrigger( void )
 {
@@ -150,6 +142,35 @@ int EventTrigger_Unbind2( LCUI_EventTrigger trigger, int handler_id )
 	}
 	free( handler );
 	return 0;
+}
+
+int EventTrigger_Unbind3( LCUI_EventTrigger trigger, int event_id,
+			  int (*compare_func)(void*,void*), void *key )
+{
+	LinkedList *handlers;
+	LinkedListNode *handler_node;
+	LCUI_RBTreeNode *event_node;
+	LCUI_EventHandler handler;
+	event_node = RBTree_Search( &trigger->events, event_id );
+	if( !event_node ) {
+		return -1;
+	}
+	handlers = event_node->data;
+	LinkedList_ForEach( handler_node, handlers ) {
+		handler = handler_node->data;
+		if( !compare_func(key, handler->func_data) ) {
+			continue;
+		}
+		LinkedList_Unlink( handlers, handler_node );
+		RBTree_Erase( &trigger->handlers, handler->id );
+		if( handler->destroy_data && handler->func_data ) {
+			handler->destroy_data( handler->func_data );
+			handler->func_data = NULL;
+		}
+		free( handler );
+		return 0;
+	}
+	return -1;
 }
 
 int EventTrigger_Trigger( LCUI_EventTrigger trigger, int event_id, void *arg )

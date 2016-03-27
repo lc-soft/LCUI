@@ -41,14 +41,13 @@
 
 LCUI_BEGIN_HEADER
 
-typedef struct {
-	LCUI_ID id;			/**< 标识号 */
-	void (*func)(void*,void*);	/**< 函数指针 */
-	
+typedef void(*LCUI_AppTaskFunc)(void*, void*);
+
+typedef struct LCUI_AppTaskRec_ {
+	LCUI_AppTaskFunc func;		/**< 处理函数 */
 	void *arg[2];			/**< 传给函数的两个参数 */
-	void (*destroy_func[2])(void*);	/**< 参数的销毁函数 */
-	LCUI_BOOL destroy_arg[2];	/**< 指定在调用完回调函数后，是否释放参数 */
-} LCUI_Task;
+	void (*destroy_arg[2])(void*);	/**< 参数的销毁函数 */
+} LCUI_AppTaskRec, *LCUI_AppTask;
 
 enum LCUI_SysEventType {
 	LCUI_NONE,
@@ -74,7 +73,7 @@ typedef struct LCUI_SysEventRec_ {
 	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 } LCUI_SysEventRec, *LCUI_SysEvent;
 
-typedef void(*LCUI_SysEventFunc)(LCUI_SysEvent*, void*);
+typedef void(*LCUI_SysEventFunc)(LCUI_SysEvent, void*);
 
 #ifdef __IN_MAIN_SOURCE_FILE__
 typedef struct LCUI_MainLoopRec_* LCUI_MainLoop;
@@ -94,7 +93,7 @@ LCUI_API int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *func_arg,
 
 LCUI_API int LCUI_UnbindEvent( int handler_id );
 
-LCUI_API int LCUI_SendEvent( LCUI_SysEvent e );
+LCUI_API int LCUI_TriggerEvent( LCUI_SysEvent e );
 
 
 /*--------------------------- system event <END> ----------------------------*/
@@ -111,16 +110,7 @@ LCUI_API void LCUI_MainLoop_Quit( LCUI_MainLoop loop );
 
 /*----------------------- End MainLoop -------------------------------*/
 
-LCUI_API int LCUI_AddTask( LCUI_Task *task );
-
-/** 从程序任务队列中删除有指定回调函数的任务 */
-LCUI_API int LCUI_RemoveTask( CallBackFunc task_func, LCUI_BOOL need_lock );
-
-/** 锁住任务的运行 */
-void LCUI_LockRunTask(void);
-
-/** 解锁任务的运行 */
-void LCUI_UnlockRunTask(void);
+LCUI_API int LCUI_AddTask( LCUI_AppTask task );
 
 /* 检测LCUI是否活动 */ 
 LCUI_API LCUI_BOOL LCUI_IsActive(void);

@@ -207,7 +207,7 @@ static LCUI_BOOL LCUIKeyboard_Exit( void )
 	return TRUE;
 }
 
-static void OnKeyboardEvent( LCUI_SystemEvent *e, void *arg )
+static void OnKeyboardEvent( LCUI_SysEvent e, void *arg )
 {
 	if( e->type == LCUI_KEYDOWN ) {
 		LCUIKeyBoard_HitKey( e->key_code );
@@ -274,7 +274,7 @@ int LCUIKeyboard_GetKey( void )
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 static LCUI_BOOL LCUIKeyboard_Proc(void)
 {
-	LCUI_SystemEvent e;
+	LCUI_SysEvent e;
 	 /* 如果没有按键输入 */
 	if ( !LCUIKeyboard_IsHit() ) {
 		return FALSE;
@@ -295,10 +295,8 @@ int LCUI_InitKeyboard( void )
 	LCUIMutex_Init( &record_mutex );
 	LinkedList_Init( &key_state_record );
 	nobuff_printf("[keyboard] set event ... ");
-	ret = LCUI_AddEvent( "keydown", LCUI_KEYDOWN );
-	ret |= LCUI_AddEvent( "keyup", LCUI_KEYUP );
-	ret |= LCUI_BindEvent( "keydown", OnKeyboardEvent, NULL, NULL );
-	ret |= LCUI_BindEvent( "keyup", OnKeyboardEvent, NULL, NULL );
+	ret = LCUI_BindEvent( LCUI_KEYDOWN, OnKeyboardEvent, NULL, NULL );
+	ret |= LCUI_BindEvent( LCUI_KEYUP, OnKeyboardEvent, NULL, NULL );
 	nobuff_printf(ret < 0 ? "failed\n":"ok\n");
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 	ret |= LCUIDevice_Add( LCUIKeyboard_Init, LCUIKeyboard_Proc, LCUIKeyboard_Exit );

@@ -92,7 +92,7 @@ top: auto;
 
 );
 
-static void OnMouseUp( LCUI_SystemEvent *e, void *arg )
+static void OnMouseUp( LCUI_SysEvent e, void *arg )
 {
 	LCUI_Widget w = arg;
 	LCUI_ScrollBar scrollbar = w->private_data;
@@ -101,7 +101,7 @@ static void OnMouseUp( LCUI_SystemEvent *e, void *arg )
 	scrollbar->is_dragging = FALSE;
 }
 
-static void OnMouseMove( LCUI_SystemEvent *e, void *arg )
+static void OnMouseMove( LCUI_SysEvent e, void *arg )
 {
 	float n;
 	LCUI_Pos pos;
@@ -164,7 +164,7 @@ static void OnMouseMove( LCUI_SystemEvent *e, void *arg )
 	Widget_Move( scrollbar->slider, x, y );
 }
 
-static void OnMouseDown( LCUI_Widget slider, LCUI_WidgetEvent *e, void *arg )
+static void OnMouseDown( LCUI_Widget slider, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_Widget w = slider->parent;
 	LCUI_ScrollBar scrollbar = w->private_data;
@@ -173,8 +173,8 @@ static void OnMouseDown( LCUI_Widget slider, LCUI_WidgetEvent *e, void *arg )
 	scrollbar->mouse_x = e->screen_x;
 	scrollbar->mouse_y = e->screen_y;
 	scrollbar->is_dragging = TRUE;
-	scrollbar->eids[0] = LCUI_BindEvent( "mousemove", OnMouseMove, w, NULL );
-	scrollbar->eids[1] = LCUI_BindEvent( "mouseup", OnMouseUp, w, NULL );
+	scrollbar->eids[0] = LCUI_BindEvent( LCUI_MOUSEDOWN, OnMouseMove, w, NULL );
+	scrollbar->eids[1] = LCUI_BindEvent( LCUI_MOUSEUP, OnMouseUp, w, NULL );
 }
 
 static void ScrollBar_OnInit( LCUI_Widget w )
@@ -227,7 +227,7 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 	Widget_UpdateStyle( slider, FALSE );
 }
 
-static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent *e, void *arg )
+static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = w->private_data;
@@ -240,7 +240,7 @@ static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent *e, void *a
 	ScrollBar_SetPosition( w, pos );
 }
 
-static void ScrollBar_OnUpdateSize( LCUI_Widget box, LCUI_WidgetEvent *e, void *arg )
+static void ScrollBar_OnUpdateSize( LCUI_Widget box, LCUI_WidgetEvent e, void *arg )
 {
 	ScrollBar_UpdateSize( e->data );
 }
@@ -249,7 +249,8 @@ void ScrollBar_BindBox( LCUI_Widget w, LCUI_Widget box )
 {
 	LCUI_ScrollBar scrollbar = w->private_data;
 	if( scrollbar->box ) {
-		Widget_UnbindEvent( scrollbar->box, "resize" );
+		Widget_UnbindEvent( scrollbar->box, "resize",
+				    ScrollBar_OnUpdateSize );
 	}
 	scrollbar->box = box;
 	Widget_BindEvent( box, "resize", ScrollBar_OnUpdateSize, w, NULL );
@@ -260,7 +261,8 @@ void ScrollBar_BindLayer( LCUI_Widget w, LCUI_Widget layer )
 {
 	LCUI_ScrollBar scrollbar = w->private_data;
 	if( scrollbar->layer ) {
-		Widget_UnbindEvent( scrollbar->layer, "resize" );
+		Widget_UnbindEvent( scrollbar->layer, "resize", 
+				    ScrollBar_OnUpdateSize );
 	}
 	scrollbar->layer = layer;
 	Widget_BindEvent( layer, "resize", ScrollBar_OnUpdateSize, w, NULL );
@@ -280,10 +282,12 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 	LCUI_ScrollBar scrollbar = w->private_data;
 	LCUI_Widget slider = scrollbar->slider;
 	LCUI_Widget layer = scrollbar->layer;
+	LCUI_WidgetEvent e;
 
 	if( !layer ) {
 		return;
 	}
+	memset( &e, 0, sizeof( e ) );
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
 		size = scrollbar->layer->width;
 		box_size = scrollbar->box->box.content.width;

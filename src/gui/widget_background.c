@@ -121,7 +121,7 @@ static void OnDestroyCache( void *arg )
 static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 {
 	ImageCache cache;
-	LCUI_Task task = {0};
+	LCUI_AppTaskRec task = {0};
 	LCUI_Style s = &widget->cached_style->sheet[key_background_image];
 
 	if( !is_inited ) {

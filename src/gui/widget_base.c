@@ -136,8 +136,7 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->computed_style.padding.right.type = SVT_PX;
 	widget->computed_style.padding.bottom.type = SVT_PX;
 	widget->computed_style.padding.left.type = SVT_PX;
-	widget->event = LCUIEventBox_Create();
-	widget->event = LCUIEventBox_Create();
+	widget->trigger = EventTrigger();
 	Widget_InitTaskBox( widget );
 	Background_Init( &widget->computed_style.background );
 	BoxShadow_Init( &widget->computed_style.shadow );
@@ -186,8 +185,8 @@ static void Widget_OnDestroy( void *arg )
 	Widget_AddTask( widget->parent, WTT_LAYOUT );
 	Widget_SetId( widget, NULL );
 	Widget_DestroyTaskBox( widget );
-	LCUIEventBox_Destroy( widget->event );
-	widget->event = NULL;
+	EventTrigger_Destroy( widget->trigger );
+	widget->trigger = NULL;
 	free( widget );
 }
 
@@ -853,14 +852,13 @@ static void Widget_ComputeSize( LCUI_Widget w )
 static void Widget_SendResizeEvent( LCUI_Widget w )
 {
 	LCUI_Widget child;
-	LCUI_WidgetEvent e;
+	LCUI_WidgetEventRec e;
 	LinkedListNode *node;
-	e.type_name = "resize";
 	e.type = WET_RESIZE;
 	e.cancel_bubble = TRUE;
 	e.target = w;
 	e.data = NULL;
-	Widget_SendEvent( w, &e, NULL );
+	Widget_TriggerEvent( w, &e, NULL );
 	Widget_AddTask( w, WTT_REFRESH );
 	Widget_PostSurfaceEvent( w, WET_RESIZE );
 	LinkedList_ForEach( node, &w->children ) {

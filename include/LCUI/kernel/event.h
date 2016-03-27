@@ -48,11 +48,13 @@ typedef struct LCUI_EventRec_ {
 	void (*destroy_data)(void*);	/**< 事件附加数据的销毁函数 */
 } LCUI_EventRec, *LCUI_Event;
 
-typedef void(*LCUI_EventFunc)(LCUI_Event*, void*);
+typedef void(*LCUI_EventFunc)(LCUI_Event, void*);
 
-#ifndef __LCUI_KERNEL_EVENT_C__
-typedef void* LCUI_EventTrigger;
-#endif
+typedef struct LCUI_EventTriggerRec_ {
+	int handler_base_id;		/**< 事件处理器ID */
+	LCUI_RBTree events;		/**< 事件绑定记录 */
+	LCUI_RBTree handlers;		/**< 事件处理器记录 */
+} LCUI_EventTriggerRec, *LCUI_EventTrigger;
 
 /** 构建一个事件触发器 */
 LCUI_API LCUI_EventTrigger EventTrigger( void );
@@ -89,6 +91,17 @@ LCUI_API int EventTrigger_Unbind( LCUI_EventTrigger trigger, int event_id,
 * @returns 解绑成功返回 0，失败则返回 -1
 */
 LCUI_API int EventTrigger_Unbind2( LCUI_EventTrigger trigger, int handler_id );
+
+/** 
+* 根据自定义的判断方法来解除事件绑定
+* @param[in] trigger       事件触发器
+* @param[in] event_id      事件标识号
+* @param[in] compare_func  比较函数，一致返回 1，不一致则返回 0
+* @param[in] key           用于比较的关键数据
+* @returns 解绑成功返回 0，失败则返回 -1
+*/
+LCUI_API int EventTrigger_Unbind3( LCUI_EventTrigger trigger, int event_id,
+				   int (*compare_func)(void*, void*), void *key );
 
 /** 
 * 触发事件

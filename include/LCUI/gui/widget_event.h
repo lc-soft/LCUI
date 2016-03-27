@@ -71,9 +71,8 @@ enum WidgetEventType {
 };
 
 /** 面向部件级的事件内容结构 */
-typedef struct LCUI_WidgetEvent {
+typedef struct LCUI_WidgetEventRec_ {
 	int type;			/**< 事件类型标识号 */
-	const char *type_name;		/**< 事件类型名称 */
 	int which;			/**< 指示按了哪个键或按钮 */
 	int x, y;			/**< 事件触发时鼠标的坐标（相对于当前部件的边框盒） */
 	int z_delta;			/**< 鼠标滚轮滚动的距离差值 */
@@ -81,53 +80,70 @@ typedef struct LCUI_WidgetEvent {
 	void *data;			/**< 附加数据 */
 	LCUI_Widget target;		/**< 触发事件的部件 */
 	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */
-} LCUI_WidgetEvent;
+} LCUI_WidgetEventRec, *LCUI_WidgetEvent;
+
+typedef void(*LCUI_WidgetEventFunc)(LCUI_Widget, LCUI_WidgetEvent, void*);
+
+/** 触发事件，让事件处理器在主循环中调用 */
+LCUI_API int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent e, 
+			       void *data, void( *destroy_data )(void*) );
+
+/** 触发事件，直接调用事件处理器 */
+LCUI_API int Widget_TriggerEvent( LCUI_Widget widget, LCUI_WidgetEvent e,
+				  void *data );
+
+/** 自动分配一个可用的事件标识号 */
+LCUI_API int LCUIWidget_AllocEventId( void );
+
+/** 设置与事件标识号对应的名称 */
+LCUI_API int LCUIWidget_SetEventName( int event_id, const char *event_name );
+
+/** 获取与事件标识号对应的名称 */
+LCUI_API const char *LCUIWidget_GetEventName( int event_id );
+
+/** 获取与事件名称对应的标识号 */
+LCUI_API int LCUIWidget_GetEventId( const char *event_name );
 
 /**
- * 预先注册一个事件，并指定事件名和事件ID
- * 如果需要将多个事件绑定在同一个事件处理器上，并且，不想通过进行字符串比较来
- * 区分事件类型，则可以使用该函数，但需要注意的是，指定的事件ID最好不要与系统
- * 预置的部件事件ID相同（除非你是特意的），通常，部件事件ID号在 WET_USER 以
- * 后的值都可以使用，例如：WET_USER + 1，WET_USER + 200。
- */
-LCUI_API int Widget_AddEvent( LCUI_Widget widget, const char *event_name, int id );
+* 添加部件事件绑定
+* @param[in] widget 目标部件
+* @param[in] event_id 事件标识号
+* @param[in] func 事件处理函数
+* @param[in] data 事件处理函数的附加数据
+* @param[in] destroy_data 数据的销毁函数
+*/
+LCUI_API int Widget_BindEventById( LCUI_Widget widget, int event_id,
+				   LCUI_WidgetEventFunc func, void *data,
+				   void( *destroy_data )(void*) );
 
 /**
- * 为部件绑定事件
- * 需要提供事件的名称、事件处理器（回调函数）、附加数据、数据销毁函数。
- * 通常，事件处理器可能会需要更多的参数，这些参数可作为附加数据，每次
- * 调用事件处理器时，都可以根据附加数据进行相应的操作。
- * 附加数据会在解除事件绑定时被释放。
- */
-LCUI_API int Widget_BindEvent(	LCUI_Widget widget, const char *event_name,
-			void(*func)(LCUI_Widget,LCUI_WidgetEvent*, void*), 
-			void *func_data, void (*destroy_data)(void*) );
+* 添加部件事件绑定
+* @param[in] widget 目标部件
+* @param[in] event_name 事件名称
+* @param[in] func 事件处理函数
+* @param[in] data 事件处理函数的附加数据
+* @param[in] destroy_data 数据的销毁函数
+*/
+LCUI_API int Widget_BindEvent( LCUI_Widget widget, const char *event_name,
+			       LCUI_WidgetEventFunc func, void *data,
+			       void( *destroy_data )(void*) );
 
-/** 
- * 解除与事件的绑定
- * 这将解除所有与该事件绑定的事件处理器，当传入事件名为NULL时，将解除所有事件
- * 绑定。
+/**
+* 解除部件事件绑定
+* @param[in] widget 目标部件
+* @param[in] event_id 事件标识号
+* @param[in] func 与事件绑定的函数
+*/
+LCUI_API int Widget_UnbindEventById( LCUI_Widget widget, int event_id,
+				     LCUI_WidgetEventFunc func );
+/**
+ * 解除部件事件绑定
+ * @param[in] widget 目标部件
+ * @param[in] event_name 事件名称
+ * @param[in] func 与事件绑定的函数
  */
-LCUI_API int Widget_UnbindEvent( LCUI_Widget widget, const char *event_name );
-
-/** 
- * 解除指定的事件处理器的事件绑定
- * 需传入事件处理器的ID，该ID可在绑定事件时得到。
- */
-LCUI_API int Widget_UnbindEventById( LCUI_Widget widget, int id );
-
-/** 
- * 将事件投递给事件处理器，等待处理
- * 事件将会追加至事件队列中，等待下一轮的批处理时让对应的事件处理器进行处理
- */
-LCUI_API int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data );
-
-/** 
- * 直接将事件发送至处理器 
- * 这将会直接调用与事件绑定的事件处理器（回调函数）
- */
-LCUI_API int Widget_SendEvent( LCUI_Widget widget, LCUI_WidgetEvent *e, void *data );
-
+LCUI_API int Widget_UnbindEvent( LCUI_Widget widget, const char *event_name,
+				 LCUI_WidgetEventFunc func );
 /** 
  * 投递 surface 事件
  * surface 是与顶层部件绑定在一起的，只有当部件为顶层部件时，才能投递 surface 事件。
@@ -137,9 +153,6 @@ LCUI_API int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type );
 
 /** 清除事件对象，通常在部件销毁时调用该函数，以避免部件销毁后还有事件发送给它 */
 LCUI_API void LCUIWidget_ClearEventTarget( LCUI_Widget widget );
-
-/** 处理一次当前积累的部件事件 */
-void LCUIWidget_StepEvent(void);
 
 /** 初始化 LCUI 部件的事件系统 */
 void LCUIWidget_InitEvent(void);

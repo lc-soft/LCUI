@@ -151,7 +151,7 @@ static void SideBar_OnDestroy( LCUI_Widget w )
 
 }
 
-static void OnToggle( LCUI_Widget w, LCUI_WidgetEvent *e, void *arg )
+static void OnToggle( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_Widget sidebar = w->parent->parent;
 	if( Widget_HasClass( sidebar, "sidebar-mini" ) ) {

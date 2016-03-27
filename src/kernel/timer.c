@@ -188,7 +188,7 @@ static void TimerThread( void *arg )
 	long int n_ms;
 	int64_t lost_ms;
 	Timer timer = NULL;
-	LCUI_Task task = {0};
+	LCUI_AppTaskRec task = {0};
 	LinkedListNode *node;
 	self.is_running = TRUE;
 	DEBUG_MSG("start\n");
@@ -218,7 +218,7 @@ static void TimerThread( void *arg )
 			continue;
 		}
 		/* 准备任务数据 */
-		task.func = (CallBackFunc)timer->func;
+		task.func = (LCUI_AppTaskFunc)timer->func;
 		task.arg[0] = timer->arg;
 		DEBUG_MSG("timer: %ld, start_time: %ldms, cur_time: %ldms, cur_ms: %ld, total_ms: %ld\n", 
 			timer->id, timer->start_time, LCUI_GetTickCount(), timer->total_ms-lost_ms, timer->total_ms);

@@ -64,7 +64,7 @@ struct LCUI_MainLoopRec_ {
 };
 
 typedef struct SysEventHandlerRec_ {
-	void (*func)(LCUI_SysEvent*, void*);
+	LCUI_SysEventFunc func;
 	void *arg;
 	void (*destroy_arg)(void*);
 } SysEventHandlerRec, *SysEventHandler;
@@ -151,14 +151,14 @@ int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *func_arg,
 
 int LCUI_UnbindEvent( int handler_id )
 {
-	return EventTrigger_Unbind( System.event.trigger, handler_id );
+	return EventTrigger_Unbind2( System.event.trigger, handler_id );
 }
 
-int LCUI_SendEvent( LCUI_SysEvent e )
+int LCUI_TriggerEvent( LCUI_SysEvent e )
 {
 	int ret;
 	LCUIMutex_Lock( System.event.mutex );
-	ret = EventTrigger_Trigger( System.event.trigger, e->type, e, NULL );
+	ret = EventTrigger_Trigger( System.event.trigger, e->type, e );
 	LCUIMutex_Unlock( System.event.mutex );
 	return ret;
 }
@@ -168,25 +168,21 @@ int LCUI_SendEvent( LCUI_SysEvent e )
 /** 销毁程序任务 */
 static void DestroyTask( void *arg )
 {
-	LCUI_Task *task;
-	task = (LCUI_Task *)arg;
+	LCUI_AppTask task = arg;
 	if( task->destroy_arg[0] && task->arg[0] ) {
-		free( task->arg[0] );
-		task->arg[0] = NULL;
+		task->destroy_arg[0]( task->arg[0] );
 	}
 	if( task->destroy_arg[1] && task->arg[1] ) {
-		free( task->arg[1] );
-		task->arg[1] = NULL;
+		task->destroy_arg[1]( task->arg[1] );
 	}
 }
 
 /** 添加任务 */
-int LCUI_AddTask( LCUI_Task *task )
+int LCUI_AddTask( LCUI_AppTask task )
 {
-	LCUI_Task *buff;
+	LCUI_AppTask buff;
 	LinkedListNode *node;
-
-	buff = NEW( LCUI_Task, 1 );
+	buff = NEW( LCUI_AppTaskRec, 1 );
 	*buff = *task;
 	if( LCUI_IsOnMainLoop() ) {
 		node = LinkedList_Append( &MainApp.task_list, buff );
@@ -232,7 +228,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	LCUIMutex_Unlock( &MainApp.loop_changed );
 	loop->tid = LCUIThread_SelfID();
 	while( loop->state != STATE_EXITED ) {
-		LCUI_Task *task;
+		LCUI_AppTask task;
 		DEBUG_MSG("loop: %p, sleeping...\n", loop);
 		LCUICond_Wait( &MainApp.loop_cond, &MainApp.task_list_mutex );
 		DEBUG_MSG("loop: %p, wakeup, lost_time: %ld\n", loop, ct);
