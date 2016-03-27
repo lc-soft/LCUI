@@ -111,7 +111,7 @@ static void LCUI_InitEvent(void)
 /** 停用事件模块并进行清理 */
 static void LCUI_ExitEvent(void)
 {
-	LCUIMutex_Destroy( System.event.mutex );
+	LCUIMutex_Destroy( &System.event.mutex );
 	EventTrigger_Destroy( System.event.trigger );
 	System.event.trigger = NULL;
 }
@@ -142,24 +142,28 @@ int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *func_arg,
 	handler->func = func;
 	handler->arg = func_arg;
 	handler->destroy_arg = destroy_arg;
-	LCUIMutex_Lock( System.event.mutex );
+	LCUIMutex_Lock( &System.event.mutex );
 	ret = EventTrigger_Bind( System.event.trigger, id, OnEvent,
 				 handler, DestroySysEventHandler );
-	LCUIMutex_Unlock( System.event.mutex );
+	LCUIMutex_Unlock( &System.event.mutex );
 	return ret;
 }
 
 int LCUI_UnbindEvent( int handler_id )
 {
-	return EventTrigger_Unbind2( System.event.trigger, handler_id );
+	int ret;
+	LCUIMutex_Lock( &System.event.mutex );
+	ret = EventTrigger_Unbind2( System.event.trigger, handler_id );
+	LCUIMutex_Unlock( &System.event.mutex );
+	return ret;
 }
 
 int LCUI_TriggerEvent( LCUI_SysEvent e )
 {
 	int ret;
-	LCUIMutex_Lock( System.event.mutex );
+	LCUIMutex_Lock( &System.event.mutex );
 	ret = EventTrigger_Trigger( System.event.trigger, e->type, e );
-	LCUIMutex_Unlock( System.event.mutex );
+	LCUIMutex_Unlock( &System.event.mutex );
 	return ret;
 }
 
