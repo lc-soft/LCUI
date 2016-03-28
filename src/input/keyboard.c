@@ -274,16 +274,15 @@ int LCUIKeyboard_GetKey( void )
 #ifdef LCUI_KEYBOARD_DRIVER_LINUX
 static LCUI_BOOL LCUIKeyboard_Proc(void)
 {
-	LCUI_SysEvent e;
+	LCUI_SysEventRec e;
 	 /* 如果没有按键输入 */
 	if ( !LCUIKeyboard_IsHit() ) {
 		return FALSE;
 	}
 
 	e.type = LCUI_KEYDOWN;
-	e.type_name = NULL;
 	e.key_code = LCUIKeyboard_GetKey();
-	LCUI_PostEvent( &e );
+	LCUI_TriggerEvent( &e );
 	return TRUE;
 }
 #endif

@@ -442,8 +442,9 @@ int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 	return Widget_PostEvent( root, &e, *((int**)n), NULL );
 }
 
-static unsigned int Dict_KeyHash( const wchar_t *buf )
+static unsigned int Dict_KeyHash( const void *key )
 {
+	const char *buf = key;
 	unsigned int hash = 5381;
 	while( *buf ) {
 		hash = ((hash << 5) + hash) + (*buf++);
