@@ -81,11 +81,11 @@ static void DestroyWidgetEventHandler( void *arg )
 }
 
 /** 将原始事件转换成部件事件 */
-static void WidgetEventTranslator( LCUI_Event e, WidgetEventHandler handler )
+static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 {
-	LCUI_WidgetEventPack pack = e->data;
+	WidgetEventHandler handler = e->data;
 	LCUI_Widget w = pack->widget;
-	pack->event.type = e->id;
+	pack->event.type = e->type;
 	pack->event.data = handler->data;
 	handler->func( w, &pack->event, pack->data );
 	if( pack->event.cancel_bubble || !w->parent ) {
@@ -101,30 +101,30 @@ static void WidgetEventTranslator( LCUI_Event e, WidgetEventHandler handler )
 	pack->event.y += w->padding.top;
 	pack->widget = w;
 	/** 向父级部件冒泡传递事件 */
-	EventTrigger_Trigger( w->trigger, e->id, pack );
+	EventTrigger_Trigger( w->trigger, e->type, pack );
 }
 
 /** 响应原始事件 */
 static void OnWidgetEvent( LCUI_Event e, void *arg )
 {
 	LCUI_AppTaskRec task;
-	WidgetEventHandler handler = arg;
-	LCUI_WidgetEventPack pack = e->data;
+	WidgetEventHandler handler = e->data;
+	LCUI_WidgetEventPack pack = arg;
 	/* 如果需要直接执行 */
 	if( pack->is_direct_run ) {
-		WidgetEventTranslator( e, handler );
+		WidgetEventTranslator( e, pack );
 		return;
 	}
 	/* 准备任务 */
 	task.func = (LCUI_AppTaskFunc)WidgetEventTranslator;
 	task.arg[0] = malloc( sizeof( LCUI_EventRec ) );
-	task.arg[1] = malloc( sizeof( WidgetEventHandlerRec ) );
+	task.arg[1] = malloc( sizeof( LCUI_WidgetEventPackRec ) );
 	/* 这两个参数都需要在任务执行完后释放 */
 	task.destroy_arg[0] = free;
 	task.destroy_arg[1] = free;
 	/* 复制所需数据，因为在本函数退出后，这两个参数会被销毁 */
 	*((LCUI_Event)task.arg[0]) = *e;
-	*((WidgetEventHandler)task.arg[1]) = *handler;
+	*((LCUI_WidgetEventPack)task.arg[1]) = *pack;
 	/* 把任务扔给当前跑主循环的线程 */
 	LCUI_AddTask( &task );
 }
@@ -240,6 +240,7 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 				  LCUI_BOOL direct_run )
 {
 	int ret;
+	LCUI_Widget w;
 	LCUI_WidgetEventPackRec pack;
 	pack.event = *e;
 	pack.data = data;
@@ -274,9 +275,9 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 	pack.event.x += widget->box.border.x;
 	pack.event.y += widget->box.border.y;
 	/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
-	widget = Widget_GetNextAt( widget, pack.event.x, pack.event.y );
+	w = Widget_GetNextAt( widget, pack.event.x, pack.event.y );
 	/* 找不到就向父级部件冒泡 */
-	if( !widget ) {
+	if( !w ) {
 		return Widget_PostEvent( widget->parent, e,
 					 data, destroy_data );
 	}
@@ -438,7 +439,8 @@ int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 		return -1;
 	}
 	e.target = w;
-	DEBUG_MSG("widget: %s, post event: %d\n", w->type,event_type );
+	e.type = WET_SURFACE;
+	DEBUG_MSG("widget: %s, post event: %d\n", w->type, event_type );
 	return Widget_PostEvent( root, &e, *((int**)n), NULL );
 }
 
@@ -513,9 +515,18 @@ void LCUIWidget_InitEvent(void)
 		{ WET_BLUR, "blur" },
 		{ WET_SHOW, "show" },
 		{ WET_HIDE, "hide" },
+		{ WET_SURFACE, "surface" },
 		{ WET_TITLE, "title" }
 	};
-
+	RBTree_Init( &self.event_names );
+	self.targets[WST_ACTIVE] = NULL;
+	self.targets[WST_HOVER] = NULL;
+	self.base_event_id = WET_USER + 1000;
+	self.event_ids = Dict_Create( &DictType_String, NULL );
+	n = sizeof( mappings ) / sizeof( mappings[0] );
+	for( i = 0; i < n; ++i ) {
+		LCUIWidget_SetEventName( mappings[i].id, mappings[i].name );
+	}
 	LCUI_BindEvent( LCUI_MOUSEDOWN, OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( LCUI_MOUSEMOVE, OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( LCUI_MOUSEUP, OnMouseEvent, NULL, NULL );
@@ -524,15 +535,6 @@ void LCUIWidget_InitEvent(void)
 	LCUI_BindEvent( LCUI_KEYDOWN, OnKeyDown, NULL, NULL );
 	LCUI_BindEvent( LCUI_KEYPRESS, OnKeyPress, NULL, NULL );
 	LCUI_BindEvent( LCUI_INPUT, OnInput, NULL, NULL );
-	n = sizeof( mappings ) / sizeof( mappings[0] );
-	for( i = 0; i < n; ++i ) {
-		LCUIWidget_SetEventName( mappings[i].id, mappings[i].name );
-	}
-	RBTree_Init( &self.event_names );
-	self.targets[WST_ACTIVE] = NULL;
-	self.targets[WST_HOVER] = NULL;
-	self.event_ids = Dict_Create( &DictType_String, NULL );
-	self.base_event_id = WET_USER + 1000;
 }
 
 void LCUIWidget_ExitEvent(void)

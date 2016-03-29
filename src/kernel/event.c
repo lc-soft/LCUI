@@ -46,9 +46,9 @@
 /** 事件处理器 */
 typedef struct LCUI_EventHandlerRec_ {
 	int id;				/**< 标识号 */
-	LCUI_EventFunc func;		/**< 回调函数 */
-	void *func_data;		/**< 传给函数的数据 */
+	void *data;			/**< 相关数据 */
 	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
+	LCUI_EventFunc func;		/**< 事件处理函数 */
 	LinkedListNode node;		/**< 处理器列表中的节点 */
 	LinkedList *list;		/**< 所属处理器列表 */
 } LCUI_EventHandlerRec, *LCUI_EventHandler;
@@ -87,7 +87,7 @@ int EventTrigger_Bind( LCUI_EventTrigger trigger, int event_id,
 	handler = NEW( LCUI_EventHandlerRec, 1 );
 	handler->id = trigger->handler_base_id++;
 	handler->destroy_data = destroy_data;
-	handler->func_data = data;
+	handler->data = data;
 	handler->func = func;
 	handler->list = handlers;
 	handler->node.data = handler;
@@ -115,9 +115,9 @@ int EventTrigger_Unbind( LCUI_EventTrigger trigger, int event_id,
 		}
 		LinkedList_Unlink( handlers, handler_node );
 		RBTree_Erase( &trigger->handlers, handler->id );
-		if( handler->destroy_data && handler->func_data ) {
-			handler->destroy_data( handler->func_data );
-			handler->func_data = NULL;
+		if( handler->destroy_data && handler->data ) {
+			handler->destroy_data( handler->data );
+			handler->data = NULL;
 		}
 		free( handler );
 		return 0;
@@ -136,9 +136,9 @@ int EventTrigger_Unbind2( LCUI_EventTrigger trigger, int handler_id )
 	handler = node->data;
 	LinkedList_Unlink( handler->list, &handler->node );
 	RBTree_Erase( &trigger->handlers, handler->id );
-	if( handler->destroy_data && handler->func_data ) {
-		handler->destroy_data( handler->func_data );
-		handler->func_data = NULL;
+	if( handler->destroy_data && handler->data ) {
+		handler->destroy_data( handler->data );
+		handler->data = NULL;
 	}
 	free( handler );
 	return 0;
@@ -158,14 +158,14 @@ int EventTrigger_Unbind3( LCUI_EventTrigger trigger, int event_id,
 	handlers = event_node->data;
 	LinkedList_ForEach( handler_node, handlers ) {
 		handler = handler_node->data;
-		if( !compare_func(key, handler->func_data) ) {
+		if( !compare_func(key, handler->data) ) {
 			continue;
 		}
 		LinkedList_Unlink( handlers, handler_node );
 		RBTree_Erase( &trigger->handlers, handler->id );
-		if( handler->destroy_data && handler->func_data ) {
-			handler->destroy_data( handler->func_data );
-			handler->func_data = NULL;
+		if( handler->destroy_data && handler->data ) {
+			handler->destroy_data( handler->data );
+			handler->data = NULL;
 		}
 		free( handler );
 		return 0;
@@ -180,14 +180,17 @@ int EventTrigger_Trigger( LCUI_EventTrigger trigger, int event_id, void *arg )
 	LinkedListNode *handler_node;
 	LCUI_RBTreeNode *event_node;
 	LCUI_EventHandler handler;
+	LCUI_EventRec e;
 	event_node = RBTree_Search( &trigger->events, event_id );
 	if( !event_node ) {
 		return count;
 	}
+	e.type = event_id;
 	handlers = event_node->data;
 	LinkedList_ForEach( handler_node, handlers ) {
 		handler = handler_node->data;
-		handler->func( handler->func_data, arg );
+		e.data = handler->data;
+		handler->func( &e, arg );
 		++count;
 	}
 	return count;

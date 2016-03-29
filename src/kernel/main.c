@@ -99,8 +99,6 @@ static struct LCUI_App {
 
 /*-------------------------- system event <START> ---------------------------*/
 
-#define EVENT_NAME_LIST_MAX_LEN 10
-
 /** 初始化事件模块 */
 static void LCUI_InitEvent(void)
 {
@@ -118,9 +116,9 @@ static void LCUI_ExitEvent(void)
 
 static void OnEvent( LCUI_Event e, void *arg )
 {
-	SysEventHandler handler = arg;
-	LCUI_SysEvent sys_event = e->data;
-	sys_event->type = e->id;
+	SysEventHandler handler = e->data;
+	LCUI_SysEvent sys_event = arg;
+	sys_event->type = e->type;
 	handler->func( sys_event, handler->arg );
 }
 

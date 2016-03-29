@@ -43,9 +43,8 @@ LCUI_BEGIN_HEADER
 
 /** 事件数据结构 */
 typedef struct LCUI_EventRec_ {
-	int id;				/**< 事件标识号 */
+	int type;			/**< 事件类型 */
 	void *data;			/**< 事件附加数据 */
-	void (*destroy_data)(void*);	/**< 事件附加数据的销毁函数 */
 } LCUI_EventRec, *LCUI_Event;
 
 typedef void(*LCUI_EventFunc)(LCUI_Event, void*);
