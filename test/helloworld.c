@@ -38,7 +38,7 @@ int main( int argc, char **argv )
 	if( box ) {
 		root = LCUIWidget_GetRoot();
 		Widget_Append( root, box );
-		Widget_Unwrap( &box );
+		Widget_Unwrap( box );
 	}
 	return LCUI_Main();
 }
