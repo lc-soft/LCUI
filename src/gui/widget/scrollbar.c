@@ -313,7 +313,11 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		}
 		scrollbar->pos = pos;
 		slider_pos = w->box.content.height - slider->height;
-		slider_pos = slider_pos * pos / (size - box_size);
+		if( size == box_size ) {
+			slider_pos = 0;
+		} else {
+			slider_pos = slider_pos * pos / (size - box_size);
+		}
 		SetStyle( slider->custom_style, key_top, slider_pos, px );
 		SetStyle( layer->custom_style, key_top, -pos, px );
 	}
