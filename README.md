@@ -1,7 +1,7 @@
 # The LCUI Project
 
-[![Join the chat at https://gitter.im/LC-Team/LCUI](https://badges.gitter.im/LC-Team/LCUI.svg)](https://gitter.im/LC-Team/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
+[![Join the chat at https://gitter.im/lc-soft/LCUI](https://badges.gitter.im/lc-soft/LCUI.svg)](https://gitter.im/lc-soft/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
 
 ![LCUI Logo](http://lcui.org/static/images/lcui-project-logo.png)
 

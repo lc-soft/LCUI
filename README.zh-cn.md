@@ -1,7 +1,7 @@
 # The LCUI Project
 
-[![Gitter](https://badges.gitter.im/LC-Team/LCUI.svg)](https://gitter.im/LC-Team/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![Build Status](https://travis-ci.org/LC-Team/LCUI.png?branch=master)](https://travis-ci.org/LC-Team/LCUI)
+[![Gitter](https://badges.gitter.im/lc-soft/LCUI.svg)](https://gitter.im/lc-soft/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
 
 ![LCUI Logo](http://lcui.org/static/images/lcui-project-logo.png)
 
@@ -128,7 +128,7 @@ windows系统上构建本项目方法，有两种：
 1. 在GitHub上进行Fork (点击 Fork 按钮)
 2. Clone到计算机： `git clone git@github.com:你的用户名/LCUI.git`
 3. cd 到代码库中： `cd LCUI`
-4. 设置远程记录，假设该记录名为upstream，那么命令为： `git remote add -f upstream git://github.com/LC-Team/LCUI.git`
+4. 设置远程记录，假设该记录名为upstream，那么命令为： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
 
 #### 添加Feature
 
