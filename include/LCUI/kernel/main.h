@@ -61,6 +61,7 @@ enum LCUI_SysEventType {
 	LCUI_MOUSEWHEEL,	/**< 鼠标触发的滚轮滚动事件 */
 	LCUI_INPUT,		/**< 输入法触发的文本输入事件 */
 	LCUI_WIDGET,
+	LCUI_QUIT,		/**< 在 LCUI 退出前触发的事件 */
 	LCUI_USER = 100		/**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
 };
 
@@ -70,7 +71,6 @@ typedef struct LCUI_SysEventRec_ {
 	int rel_x, rel_y;		/**< 鼠标的坐标与上次坐标的差值 */
 	int z_delta;			/**< 鼠标滚轮滚动速度 */
 	void *data;			/**< 附加数据 */
-	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 } LCUI_SysEventRec, *LCUI_SysEvent;
 
 typedef void(*LCUI_SysEventFunc)(LCUI_SysEvent, void*);
@@ -88,13 +88,12 @@ LCUI_API void LCUI_InitWin32Mode( HINSTANCE hInstance );
 
 /*-------------------------- system event <START> ---------------------------*/
 
-LCUI_API int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *func_arg,
-			     void( *destroy_arg )(void*) );
+LCUI_API int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
+			     void( *destroy_data )(void*) );
 
 LCUI_API int LCUI_UnbindEvent( int handler_id );
 
-LCUI_API int LCUI_TriggerEvent( LCUI_SysEvent e );
-
+LCUI_API int LCUI_TriggerEvent( LCUI_SysEvent e, void *arg );
 
 /*--------------------------- system event <END> ----------------------------*/
 
@@ -129,9 +128,6 @@ LCUI_API int LCUI_Main( void );
 
 /* 获取LCUI的版本 */
 LCUI_API int LCUI_GetSelfVersion( char *out );
-
-/* 注册终止函数，以在LCUI程序退出时调用 */
-LCUI_API void LCUI_AtQuit( void (*func)(void));
 
 /* 退出LCUI，释放LCUI占用的资源 */
 LCUI_API void LCUI_Quit( void );

@@ -431,7 +431,7 @@ static void Surface_OnEvent( LCUI_Surface surface, LCUI_SysEvent e )
 		LCUIMouse_SetPos( e->rel_x, e->rel_y );
 		return;
 	}
-	LCUI_TriggerEvent( e );
+	LCUI_TriggerEvent( e, NULL );
 #endif
 }
 

@@ -65,9 +65,14 @@ struct LCUI_MainLoopRec_ {
 
 typedef struct SysEventHandlerRec_ {
 	LCUI_SysEventFunc func;
-	void *arg;
-	void (*destroy_arg)(void*);
+	void *data;
+	void (*destroy_data)(void*);
 } SysEventHandlerRec, *SysEventHandler;
+
+typedef struct SysEventPackRec_ {
+	LCUI_SysEvent event;
+	void *arg;
+} SysEventPackRec, *SysEventPack;
 
 /** LCUI 系统相关数据 */
 static struct LCUI_System {
@@ -117,29 +122,30 @@ static void LCUI_ExitEvent(void)
 static void OnEvent( LCUI_Event e, void *arg )
 {
 	SysEventHandler handler = e->data;
-	LCUI_SysEvent sys_event = arg;
-	sys_event->type = e->type;
-	handler->func( sys_event, handler->arg );
+	SysEventPack pack = arg;
+	pack->event->type = e->type;
+	pack->event->data = handler->data;
+	handler->func( pack->event, pack->arg );
 }
 
 static void DestroySysEventHandler( void *arg )
 {
 	SysEventHandler handler = arg;
-	if( handler->arg && handler->destroy_arg ) {
-		handler->destroy_arg( handler->arg );
+	if( handler->data && handler->destroy_data ) {
+		handler->destroy_data( handler->data );
 	}
-	handler->arg = NULL;
+	handler->data = NULL;
 }
 
-int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *func_arg, 
-		    void (*destroy_arg)(void*) )
+int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
+		    void (*destroy_data)(void*) )
 {
 	int ret;
 	SysEventHandler handler;
 	handler = NEW( SysEventHandlerRec, 1 );
 	handler->func = func;
-	handler->arg = func_arg;
-	handler->destroy_arg = destroy_arg;
+	handler->data = data;
+	handler->destroy_data = destroy_data;
 	LCUIMutex_Lock( &System.event.mutex );
 	ret = EventTrigger_Bind( System.event.trigger, id, OnEvent,
 				 handler, DestroySysEventHandler );
@@ -156,11 +162,14 @@ int LCUI_UnbindEvent( int handler_id )
 	return ret;
 }
 
-int LCUI_TriggerEvent( LCUI_SysEvent e )
+int LCUI_TriggerEvent( LCUI_SysEvent e, void *arg )
 {
 	int ret;
+	SysEventPackRec pack;
+	pack.arg = arg;
+	pack.event = e;
 	LCUIMutex_Lock( &System.event.mutex );
-	ret = EventTrigger_Trigger( System.event.trigger, e->type, e );
+	ret = EventTrigger_Trigger( System.event.trigger, e->type, &pack );
 	LCUIMutex_Unlock( &System.event.mutex );
 	return ret;
 }
@@ -431,10 +440,10 @@ int LCUI_Init(void)
 /** 释放LCUI占用的资源 */
 static int LCUI_Destroy( void )
 {
+	LCUI_SysEventRec e;
+	e.type = LCUI_QUIT;
+	LCUI_TriggerEvent( &e, NULL );
 	System.state = STATE_KILLED;
-	if( System.func_atexit ) {
-		System.func_atexit();
-	}
 	LCUI_ExitEvent();
 	LCUI_ExitCursor();
 	LCUI_ExitWidget();
@@ -468,12 +477,6 @@ int LCUI_Main( void )
 	loop = LCUI_MainLoop_New();
 	LCUI_MainLoop_Run( loop );
 	return LCUI_Destroy();
-}
-
-/** 注册一个函数，以在LCUI程序退出时调用 */
-void LCUI_AtQuit( void (*callback_func)(void) )
-{
-	System.func_atexit = callback_func;
 }
 
 /* 获取LCUI的版本 */

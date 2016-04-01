@@ -140,7 +140,6 @@ static LCUI_BOOL MouseProc( void )
 		new_pos.y = mouse.y;
 	}
 	e.type = LCUI_MOUSEMOVE;
-	e.data = e.destroy_data = NULL;
 	e.rel_x = new_pos.x - old_pos.x;
 	e.rel_y = new_pos.y - old_pos.y;
 	if( e.rel_x == 0 && e.rel_y == 0 ) {
@@ -149,7 +148,7 @@ static LCUI_BOOL MouseProc( void )
 	old_pos.x = new_pos.x;
 	old_pos.y = new_pos.y;
 	DEBUG_MSG("x: %d, y: %d, rel_x: %d, rel_y: %d\n", new_pos.x, new_pos.y, e.rel_x, e.rel_y);
-	LCUI_TriggerEvent( &e );
+	LCUI_TriggerEvent( &e, NULL );
 	return TRUE;
 }
 

@@ -94,7 +94,7 @@ top: auto;
 
 static void OnMouseUp( LCUI_SysEvent e, void *arg )
 {
-	LCUI_Widget w = arg;
+	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = w->private_data;
 	LCUI_UnbindEvent( scrollbar->eids[0] );
 	LCUI_UnbindEvent( scrollbar->eids[1] );
@@ -105,7 +105,7 @@ static void OnMouseMove( LCUI_SysEvent e, void *arg )
 {
 	float n;
 	LCUI_Pos pos;
-	LCUI_Widget w = arg;
+	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = w->private_data;
 	LCUI_Widget slider = scrollbar->slider;
 	LCUI_Widget layer = scrollbar->layer;
