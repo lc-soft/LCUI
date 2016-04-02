@@ -215,7 +215,7 @@ LCUI_BOOL LCUICursor_IsCoverRect( LCUI_Rect rect )
 {
 	LCUI_Rect cursor_rect;
 	LCUICursor_GetRect( &cursor_rect );
-	return LCUIRect_IsCoverRect( rect, cursor_rect );
+	return LCUIRect_IsCoverRect( &rect, &cursor_rect );
 }
 
 /* 将当前鼠标游标的图像叠加至目标图像指定位置 */

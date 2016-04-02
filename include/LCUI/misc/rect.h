@@ -58,8 +58,7 @@ LCUI_API void LCUIRect_GetCutArea( int box_w, int box_h,
 LCUI_API void LCUIRect_ValidateArea( LCUI_Rect *rect, int box_w, int box_h );
 
 /** 检测矩形是否遮盖另一个矩形 */
-LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 );
-
+LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect *rect1, LCUI_Rect *rect2 );
 
 /** 
  * 获取两个矩形中的重叠矩形

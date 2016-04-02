@@ -114,23 +114,23 @@ void LCUIRect_ValidateArea( LCUI_Rect *rect, int box_w, int box_h )
 }
 
 /** 检测矩形是否遮盖另一个矩形 */
-LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect rect1, LCUI_Rect rect2 )
+LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect *rect1, LCUI_Rect *rect2 )
 {
-	if( rect1.x > rect2.x ) {
-		if( rect2.x + rect2.w <= rect1.x ) {
+	if( rect1->x > rect2->x ) {
+		if( rect2->x + rect2->w <= rect1->x ) {
 			return FALSE;
 		}
 	} else {
-		if( rect1.x + rect1.w <= rect2.x ) {
+		if( rect1->x + rect1->w <= rect2->x ) {
 			return FALSE;
 		}
 	}
-	if( rect1.y > rect2.y ) {
-		if( rect2.y + rect2.h <= rect1.y ) {
+	if( rect1->y > rect2->y ) {
+		if( rect2->y + rect2->h <= rect1->y ) {
 			return FALSE;
 		}
 	} else {
-		if( rect1.y + rect1.h <= rect2.y ) {
+		if( rect1->y + rect1->h <= rect2->y ) {
 			return FALSE;
 		}
 	}
