@@ -51,13 +51,11 @@ void Background_Init( LCUI_Background *bg )
 	bg->position.value = SV_AUTO;
 }
 
-typedef int(*MixerPtr)(LCUI_Graph*, const LCUI_Graph*, int, int);
-
 void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 			   LCUI_Background *bg )
 {
-	MixerPtr mixer;
 	LCUI_Graph graph;
+	LCUI_BOOL with_alpha;
 	LCUI_Rect read_rect, paint_rect;
 	int image_x, image_y, image_w, image_h;
 
@@ -180,15 +178,11 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 	if( !LCUIRect_GetOverlayRect( box, &paint->rect, &paint_rect ) ) {
 		return;
 	}
-	if( bg->color.alpha < 255 ) {
-		mixer = Graph_Mix;
-	} else {
-		mixer = Graph_Mix2;
-	}
+	with_alpha = bg->color.alpha < 255;
 	paint_rect.x -= paint->rect.x;
 	paint_rect.y -= paint->rect.y;
 	Graph_Quote( &graph, &paint->canvas, &paint_rect );
-	Graph_FillColor( &graph, bg->color );
+	Graph_FillRect( &graph, bg->color, NULL, TRUE );
 	/* 将坐标转换为相对于背景内容框 */
 	paint_rect.x += paint->rect.x - box->x;
 	paint_rect.y += paint->rect.y - box->y;
@@ -212,7 +206,8 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 		image_y = image_y + box->y - paint->rect.y;
 		image_x += read_rect.x;
 		image_y += read_rect.y;
-		mixer( &paint->canvas, &graph, image_x, image_y );
+		Graph_Mix( &paint->canvas, &graph, image_x,
+			   image_y, with_alpha );
 	} else {
 		float scale;
 		LCUI_Graph buffer;
@@ -242,7 +237,8 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 		image_y = image_y + box->y - paint->rect.y;
 		/* 按比例进行缩放 */
 		Graph_Zoom( &graph, &buffer, FALSE, image_w, image_h );
-		mixer( &paint->canvas, &buffer, image_x, image_y );
+		Graph_Mix( &paint->canvas, &buffer, image_x, 
+			   image_y, with_alpha );
 		Graph_Free( &buffer );
 	}
 }

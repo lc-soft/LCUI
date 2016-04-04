@@ -703,6 +703,10 @@ static void Widget_UpdateGraphBox( LCUI_Widget w )
 	rg->y = w->y - BoxShadow_GetBoxY( shadow );
 	rg->width = BoxShadow_GetWidth( shadow, rb->width );
 	rg->height = BoxShadow_GetHeight( shadow, rb->height );
+	if( !w->enable_graph ) {
+		Graph_Free( &w->graph );
+		return;
+	}
 	/* 如果有会产生透明效果的样式 */
 	if( w->computed_style.border.bottom_left_radius > 0
 	 || w->computed_style.border.bottom_right_radius > 0

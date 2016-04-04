@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * graph.h -- The base graphics handling module for LCUI
  *
- * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * graph.h -- LCUI的基本图形处理模块
  *
- * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -41,26 +41,10 @@
 
 LCUI_BEGIN_HEADER
 
-#define COLOR_TURQUOISE		RGB(26, 188, 156)
-#define COLOR_EMERALD		RGB(46, 204, 113)
-#define COLOR_PETER_RIVER	RGB(52, 152, 219)
-#define COLOR_AMETHYST		RGB(155, 89, 182)
-#define COLOR_WET_ASPHALT	RGB(52, 73, 94)
-#define COLOR_GREEN_SEA		RGB(22, 160, 133)
-#define COLOR_NEPHRITIS		RGB(39, 174, 96)
-#define COLOR_BELIZE_HOLE	RGB(41, 128, 185)
-#define COLOR_WISTERIA		RGB(142, 68, 173)
-#define COLOR_MIDNIGHT_BLUE	RGB(44, 62, 80)
-#define COLOR_SUN_FLOWER	RGB(241, 196, 15)
-#define COLOR_CARROT		RGB(230, 126, 34)
-#define COLOR_ALIZARIN		RGB(231, 76, 60)
-#define COLOR_CLOUNDS		RGB(236, 240, 241)
-#define COLOR_CONCRETE		RGB(149, 165, 166)
-#define COLOR_ORANGE		RGB(243, 156, 18)
-#define COLOR_PUMPKIN		RGB(211, 84, 0)
-#define COLOR_POMEGRANATE	RGB(192, 57, 43)
-#define COLOR_SILVER		RGB(189, 195, 199)
-#define COLOR_ASBESTOS		RGB(127, 140, 141)
+/* 解除RGB宏 */
+#ifdef RGB
+#undef RGB
+#endif
 
 /** 色彩模式 */
 enum GraphColorType {
@@ -129,11 +113,6 @@ enum GraphColorType {
 {							\
 	pixel = (r<<16)|(g<<8)|b;			\
 }
-
-/* 解除RGB宏 */
-#ifdef RGB
-#undef RGB
-#endif
 
 #define Graph_GetQuote(g) (g)->quote.is_valid ? (g)->quote.source:(g)
 
@@ -211,34 +190,32 @@ LCUI_API int Graph_HorizFlip( const LCUI_Graph *graph, LCUI_Graph *buff );
 
 LCUI_API int Graph_VertiFlip( const LCUI_Graph *graph, LCUI_Graph *buff );
 
+/**
+ * 用颜色填充一块区域
+ * @param[in][out] graph 需要填充的图层
+ * @param[in] color 颜色
+ * @param[in] rect 区域，若值为 NULL，则填充整个图层
+ * @param[in] with_alpha 是否需要处理alpha通道
+ */
 LCUI_API int Graph_FillRect( LCUI_Graph *graph, LCUI_Color color,
-				LCUI_Rect rect );
-
-LCUI_API int Graph_FillColor( LCUI_Graph *graph, LCUI_Color color );
+			     LCUI_Rect *rect, LCUI_BOOL with_alpha );
 
 LCUI_API int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha );
 
-LCUI_API int Graph_Tile( LCUI_Graph *buff,  const LCUI_Graph *graph,
-			 LCUI_BOOL replace );
+LCUI_API int Graph_Tile( LCUI_Graph *buff, const LCUI_Graph *graph,
+			 LCUI_BOOL replace, LCUI_BOOL with_alpha );
 
-/** 混合两张图层
+/**
+ * 混合两张图层
  * 将前景图混合到背景图上
  * @param[in][out] back 背景图层
  * @param[in] fore 前景图层
  * @param[in] left 前景图层的左边距
  * @param[in] top 前景图层的上边距
+ * @param[in] with_alpha 是否需要处理alpha通道
  */
-LCUI_API int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top );
-
-/** 混合两张图层，忽略背景图层的Alpha通道
- * 该函数主要针对不透明但又有Alpha通道的背景图，省去了多余的Alpha通道混合步骤。
- * @warning 两张图层必须都有Alpha通道
- * @param[in][out] back 背景图层
- * @param[in] fore 前景图层
- * @param[in] left 前景图层的左边距
- * @param[in] top 前景图层的上边距
- */
-LCUI_API int Graph_Mix2( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top );
+LCUI_API int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore,
+			int left, int top, LCUI_BOOL with_alpha );
 
 LCUI_API int Graph_Replace( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top );
 

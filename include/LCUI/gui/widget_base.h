@@ -229,7 +229,7 @@ typedef struct LCUI_WidgetRec_ {
 
 	void			*private_data;		/**< 私有数据 */
 	void			*extend_data;		/**< 扩展数据 */
-
+	LCUI_BOOL		enable_graph;		/**< 是否启用位图缓存 */
 	LCUI_Graph		graph;			/**< 位图缓存 */
 	LCUI_Mutex		mutex;			/**< 互斥锁 */
 	LCUI_EventTrigger	trigger;		/**< 事件触发器 */

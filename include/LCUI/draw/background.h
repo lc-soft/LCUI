@@ -47,9 +47,9 @@ LCUI_API void Background_Init( LCUI_Background *bg );
 
 /** 
 * 绘制背景 
-* @param paint		绘制器的上下文句柄
-* @param box		背景区域
-* @param bg		背景样式参数
+* @param paint 绘制器的上下文句柄
+* @param box 背景区域
+* @param bg 背景样式参数
 */
 LCUI_API void Graph_DrawBackground( LCUI_PaintContext paint, 
 				    const LCUI_Rect *box,

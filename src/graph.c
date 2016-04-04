@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * graph.c -- LCUI base graphics processing module.
  *
- * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * graph.c -- LCUI 的基础图形处理模块
  *
- * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -337,7 +337,7 @@ static int Graph_VertiFlipRGB( const LCUI_Graph *graph, LCUI_Graph *buff )
 	return 0;
 }
 
-int Graph_FillRectRGB( LCUI_Graph *graph, LCUI_Color color, LCUI_Rect rect )
+static int Graph_FillRectRGB( LCUI_Graph *graph, LCUI_Color color, LCUI_Rect rect )
 {
 	int x, y;
 	LCUI_Graph canvas;
@@ -665,7 +665,7 @@ static int Graph_VertiFlipARGB( const LCUI_Graph *graph, LCUI_Graph *buff )
 }
 
 static int Graph_FillRectARGB( LCUI_Graph *graph, LCUI_Color color,
-			       LCUI_Rect rect )
+			       LCUI_Rect rect, LCUI_BOOL with_alpha )
 {
 	int x, y;
 	LCUI_Rect rect_src;
@@ -678,12 +678,24 @@ static int Graph_FillRectARGB( LCUI_Graph *graph, LCUI_Color color,
 	graph = Graph_GetQuote( graph );
 	px_row_p = graph->argb + (rect_src.y+rect.y)*graph->w;
 	px_row_p += rect.x + rect_src.x;
-	for( y=0; y<rect.h; ++y ) {
-		px_p = px_row_p;
-		for( x=0; x<rect.w; ++x ) {
-			*px_p++ = color;
+	if( with_alpha ) {
+		for( y = 0; y < rect.h; ++y ) {
+			px_p = px_row_p;
+			for( x = 0; x < rect.w; ++x ) {
+				*px_p++ = color;
+			}
+			px_row_p += graph->w;
 		}
-		px_row_p += graph->w;
+	} else {
+		for( y = 0; y < rect.h; ++y ) {
+			px_p = px_row_p;
+			for( x = 0; x < rect.w; ++x ) {
+				color.alpha = px_p->alpha;
+				*px_p = color;
+				px_p++;
+			}
+			px_row_p += graph->w;
+		}
 	}
 	return 0;
 }
@@ -733,11 +745,7 @@ int Graph_Create( LCUI_Graph *graph, int w, int h )
 	if( Graph_IsValid(graph) ) {
 		/* 如果现有图形尺寸大于要创建的图形的尺寸，直接改尺寸即可 */
 		if( graph->mem_size >= size ) {
-			if( (w != graph->w || h != graph->h)
-			 && graph->color_type == COLOR_TYPE_ARGB ) {
-				Graph_FillAlpha( graph, 0 );
-				Graph_FillColor(graph, RGB(255,255,255));
-			}
+			memset( graph->bytes, 0, graph->mem_size );
 			graph->w = w;
 			graph->h = h;
 			return 0;
@@ -745,16 +753,13 @@ int Graph_Create( LCUI_Graph *graph, int w, int h )
 		Graph_Free( graph );
 	}
 	graph->mem_size = size;
-	graph->bytes = (uchar_t*)malloc( size );
+	graph->bytes = malloc( size );
 	if( !graph->bytes ) {
 		graph->w = 0;
 		graph->h = 0;
 		return -2;
 	}
-	/* 默认全透明 */
-	if( graph->color_type == COLOR_TYPE_ARGB ) {
-		Graph_FillAlpha( graph, 0 );
-	}
+	memset( graph->bytes, 0, graph->mem_size );
 	graph->w = w;
 	graph->h = h;
 	return 0;
@@ -1046,21 +1051,24 @@ int Graph_VertiFlip( const LCUI_Graph *graph, LCUI_Graph *buff )
 }
 
 int Graph_FillRect( LCUI_Graph *graph, LCUI_Color color,
-				LCUI_Rect rect )
+		    LCUI_Rect *rect, LCUI_BOOL with_alpha )
 {
+	LCUI_Rect rect2;
+	if( rect ) {
+		rect2 = *rect;
+	} else {
+		rect2.x = rect2.y = 0;
+		rect2.width = graph->width;
+		rect2.height = graph->height;
+	}
 	switch( graph->color_type ) {
 	case COLOR_TYPE_RGB888:
-		return Graph_FillRectRGB( graph, color, rect );
+		return Graph_FillRectRGB( graph, color, rect2 );
 	case COLOR_TYPE_ARGB8888:
-		return Graph_FillRectARGB( graph, color, rect );
+		return Graph_FillRectARGB( graph, color, rect2, with_alpha );
 	default:break;
 	}
 	return -1;
-}
-
-int Graph_FillColor( LCUI_Graph *graph, LCUI_Color color )
-{
-	return Graph_FillRect( graph, color, Rect(0,0,graph->w, graph->h) );
 }
 
 int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha )
@@ -1077,7 +1085,6 @@ int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha )
 	if( !Graph_HasAlpha(graph) ) {
 		return -2;
 	}
-
 	pixel_row = graph->argb + rect.y*graph->w + rect.x;
 	for(y=0; y<rect.h; ++y) {
 		pixel = pixel_row;
@@ -1090,7 +1097,8 @@ int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha )
 	return 0;
 }
 
-int Graph_Tile( LCUI_Graph *buff, const LCUI_Graph *graph, LCUI_BOOL replace )
+int Graph_Tile( LCUI_Graph *buff, const LCUI_Graph *graph, 
+		LCUI_BOOL replace, LCUI_BOOL with_alpha )
 {
 	int ret = 0, x, y;
 	if( !Graph_IsValid(graph) || !Graph_IsValid(buff) ) {
@@ -1100,9 +1108,9 @@ int Graph_Tile( LCUI_Graph *buff, const LCUI_Graph *graph, LCUI_BOOL replace )
 		for( x = 0; x < buff->w; x += graph->w ) {
 			if( replace ) {
 				ret += Graph_Replace( buff, graph, y, x );
-			} else {
-				ret += Graph_Mix( buff, graph, y, x );
+				continue;
 			}
+			ret += Graph_Mix( buff, graph, y, x, with_alpha );
 		}
 	}
 	return ret;
@@ -1110,7 +1118,8 @@ int Graph_Tile( LCUI_Graph *buff, const LCUI_Graph *graph, LCUI_BOOL replace )
 
 typedef void(*MixerPtr)(LCUI_Graph*, LCUI_Rect, const LCUI_Graph *, int, int);
 
-int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top )
+int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore, 
+	       int left, int top, LCUI_BOOL with_alpha )
 {
 	LCUI_Graph w_slot;
 	LCUI_Rect r_rect, w_rect;
@@ -1151,7 +1160,11 @@ int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top )
 		break;
 	case COLOR_TYPE_ARGB8888:
 		if( back->color_type == COLOR_TYPE_RGB888 ) {
-			mixer = Graph_RGBMixARGB;
+			if( with_alpha ) {
+				mixer = Graph_ARGBMixARGB2;
+			} else {
+				mixer = Graph_RGBMixARGB;
+			}
 		} else {
 			mixer = Graph_ARGBMixARGB;
 		}
@@ -1162,41 +1175,6 @@ int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top )
 		return 0;
 	}
 	return -3;
-}
-
-int Graph_Mix2( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top )
-{
-	LCUI_Graph w_slot;
-	LCUI_Rect r_rect, w_rect;
-	if( !Graph_IsValid(back) || !Graph_IsValid(fore) ) {
-		return -1;
-	}
-	if( back->color_type != COLOR_TYPE_ARGB &&
-	    fore->color_type != COLOR_TYPE_ARGB ) {
-		return -2;
-	}
-	w_rect.x = left;
-	w_rect.y = top;
-	w_rect.width = fore->width;
-	w_rect.height = fore->height;
-	LCUIRect_GetCutArea( back->width, back->height, w_rect, &r_rect );
-	w_rect.x += r_rect.x;
-	w_rect.y += r_rect.y;
-	w_rect.width = r_rect.width;
-	w_rect.height = r_rect.height;
-	Graph_Quote( &w_slot, back, &w_rect );
-	Graph_GetValidRect( &w_slot, &w_rect );
-	Graph_GetValidRect( fore, &r_rect );
-	if( w_rect.width <= 0 || w_rect.height <= 0 ||
-	    r_rect.width <= 0 || r_rect.height <= 0 ) {
-		return -2;
-	}
-	top = r_rect.y;
-	left = r_rect.x;
-	fore = Graph_GetQuote( fore );
-	back = Graph_GetQuote( back );
-	Graph_ARGBMixARGB2( back, w_rect, fore, left, top );
-	return 0;
 }
 
 int Graph_Replace( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top )

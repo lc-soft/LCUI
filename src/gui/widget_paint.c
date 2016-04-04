@@ -112,20 +112,21 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LCUI_Rect box;
 	LCUI_WidgetClass *wc;
+	LCUI_WidgetStyle *s;
+	LCUI_BOOL with_alpha = FALSE;
+	s= &w->computed_style;
 	box.x = box.y = 0;
 	box.width = w->box.graph.width;
 	box.height = w->box.graph.height;
 	/* 如果是有位图缓存的话，则先清空缓存里的阴影区域 */
-	if( Graph_IsValid(&w->graph) ) {
-		Graph_ClearShadowArea( paint, &box, &w->computed_style.shadow );
-	}
-	Graph_DrawBoxShadow( paint, &box, &w->computed_style.shadow );
+	Graph_ClearShadowArea( paint, &box, &s->shadow );
+	Graph_DrawBoxShadow( paint, &box, &s->shadow );
 	box.x = w->box.border.x - w->box.graph.x;
 	box.y = w->box.border.y - w->box.graph.y;
 	box.width = w->box.border.width;
 	box.height = w->box.border.height;
-	Graph_DrawBackground( paint, &box, &w->computed_style.background );
-	Graph_DrawBorder( paint, &box, &w->computed_style.border );
+	Graph_DrawBackground( paint, &box, &s->background );
+	Graph_DrawBorder( paint, &box, &s->border );
 	wc = LCUIWidget_GetClass( w->type );
 	wc && wc->methods.paint ? wc->methods.paint(w, paint):FALSE;
 }
@@ -143,7 +144,7 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 	LinkedList_ForEach( node, &w->dirty_rects ) {
 		r = node->data;
 		/* 若有独立位图缓存，则重绘脏矩形区域 */
-		if( Graph_IsValid(&w->graph) ) {
+		if( w->enable_graph && Graph_IsValid(&w->graph) ) {
 			LCUI_PaintContextRec paint;
 			paint.rect = *r;
 			Graph_Quote( &paint.canvas, &w->graph, &paint.rect );
@@ -257,6 +258,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LinkedListNode *node;
 	int content_left, content_top;
+	LCUI_PaintContextRec self_paint;
 	LCUI_Rect canvas_rect, content_rect;
 	LCUI_Graph content_graph, self_graph, layer_graph;
 	LCUI_BOOL has_overlay, has_content_graph = FALSE,
@@ -280,27 +282,19 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		}
 		*/
 	}
-	/* 如果需要缓存自身的位图 */
-	if( has_self_graph ) {
-		LCUI_PaintContextRec self_paint;
-		/* 有位图缓存则直接截取出来，否则绘制一次 */
-		if( Graph_IsValid(&w->graph) ) {
-			Graph_Quote( &self_graph, &w->graph, &paint->rect );
-		} else {
-			Graph_Create( &self_graph, paint->rect.width,
-				      paint->rect.height );
-		}
+	if( w->enable_graph && Graph_IsValid(&w->graph) ) {
+		Graph_Quote( &self_graph, &w->graph, &paint->rect );
+	} else {
+		self_graph.color_type = COLOR_TYPE_ARGB;
+		Graph_Create( &self_graph, paint->rect.width,
+				paint->rect.height );
 		self_paint.canvas = self_graph;
 		self_paint.rect = paint->rect;
 		Widget_OnPaint( w, &self_paint );
-	} else {
-		/* 直接将部件绘制到目标位图缓存中 */
-		if( Graph_IsValid(&w->graph) ) {
-			Graph_Quote( &self_graph, &w->graph, &paint->rect );
-			Graph_Mix( &paint->canvas, &self_graph, 0, 0 );
-		} else {
-			Widget_OnPaint( w, paint );
-		}
+	}
+	/* 若不需要缓存自身位图则直接绘制到画布上 */
+	if( !has_self_graph ) {
+		Graph_Mix( &paint->canvas, &self_graph, 0, 0, FALSE );
 	}
 	/* 计算内容框相对于图层的坐标 */
 	content_left = w->box.padding.x - w->box.graph.x;
@@ -379,13 +373,13 @@ content_paint_done:
 		layer_graph.color_type = COLOR_TYPE_ARGB;
 		Graph_Copy( &layer_graph, &self_graph );
 		Graph_Mix( &layer_graph, &content_graph, 
-			   content_rect.x, content_rect.y );
+			   content_rect.x, content_rect.y, TRUE );
 		layer_graph.opacity = w->computed_style.opacity;
-		Graph_Mix( &paint->canvas, &layer_graph, 0, 0 );
+		Graph_Mix( &paint->canvas, &layer_graph, 0, 0, FALSE );
 	}
 	else if( has_content_graph ) {
 		Graph_Mix( &paint->canvas, &content_graph,
-			   content_rect.x, content_rect.y );
+			   content_rect.x, content_rect.y, FALSE );
 	}
 	Graph_Free( &layer_graph );
 	Graph_Free( &self_graph );
