@@ -143,8 +143,8 @@ int64_t LCUI_GetTicks( int64_t start_ticks )
 /** 更新定时器在定时器列表中的位置 */
 static void TimerList_AddNode( LinkedListNode *node )
 {
-	int64_t t, tt;
 	Timer timer;
+	int64_t t, tt;
 	LinkedListNode *cur;
 	/* 计算该定时器的剩余定时时长 */
 	timer = node->data;
@@ -155,7 +155,7 @@ static void TimerList_AddNode( LinkedListNode *node )
 		tt = LCUI_GetTicks( timer->start_time );
 		tt = timer->total_ms - tt + timer->pause_ms;
 		if( t <= tt ) {
-			LinkedList_Link( &self.timer_list, cur, node );
+			LinkedList_Link( &self.timer_list, cur->prev, node );
 			return;
 		}
 	}
@@ -167,16 +167,14 @@ static void TimerList_AddNode( LinkedListNode *node )
 /** 打印列表中的定时器信息 */
 static void TimerList_Print( void )
 {
-	int i;
-	TimerData *timer;
-
-	_DEBUG_MSG("timer list(%d) start:\n", n);
-	LinkedList_ForEach( timer, 0, &self.timer_list ) {
-		if( !timer ) {
-			continue;
-		}
+	int i = 0;
+	Timer timer;
+	LinkedListNode *node;
+	_DEBUG_MSG("timer list(%d) start:\n", self.timer_list.length);
+	LinkedList_ForEach( node, &self.timer_list ) {
+		timer = node->data;
 		_DEBUG_MSG("[%02d] %ld, func: %p, cur_ms: %ldms, total_ms: %ldms\n",
-			i, timer->id, timer->func, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
+			i++, timer->id, timer->func, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
 	}
 	_DEBUG_MSG("timer list end\n\n");
 }
@@ -278,7 +276,7 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 	TimerList_AddNode( node );
 	LCUICond_Signal( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
-	DEBUG_MSG("set timer, id: %ld, total_ms: %ld\n", timer.id, timer.total_ms);
+	DEBUG_MSG("set timer, id: %ld, total_ms: %ld\n", timer->id, timer->total_ms);
 	return timer->id;
 }
 
