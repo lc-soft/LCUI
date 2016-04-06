@@ -533,7 +533,7 @@ void Graph_ClearShadowArea( LCUI_PaintContext paint, LCUI_Rect *box,
 			rects[i].x -= paint->rect.x;
 			rects[i].y -= paint->rect.y;
 			Graph_Quote( &canvas, &paint->canvas, &rects[i] );
-			Graph_FillRect( &canvas, shadow->color, NULL, FALSE );
+			Graph_FillRect( &canvas, shadow->color, NULL, TRUE );
 		}
 	}
 }

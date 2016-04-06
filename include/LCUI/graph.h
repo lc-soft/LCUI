@@ -71,9 +71,9 @@ enum GraphColorType {
 }
 
 #define PIXEL_BLEND(px1, px2, a) {		\
-	ALPHA_BLEND( (px1)->r, (px1)->r, a );	\
-	ALPHA_BLEND( (px1)->g, (px1)->g, a );	\
-	ALPHA_BLEND( (px1)->b, (px1)->b, a );	\
+	ALPHA_BLEND( (px1)->r, (px2)->r, a );	\
+	ALPHA_BLEND( (px1)->g, (px2)->g, a );	\
+	ALPHA_BLEND( (px1)->b, (px2)->b, a );	\
 }
 
 /* 获取像素的RGB值 */

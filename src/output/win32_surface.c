@@ -389,6 +389,7 @@ static LCUI_PaintContext Win32Surface_BeginPaint( LCUI_Surface surface, LCUI_Rec
 	Graph_Init( &paint->canvas );
 	LCUIRect_ValidateArea( &paint->rect, surface->w, surface->h );
 	Graph_Quote( &paint->canvas, &surface->fb, &paint->rect );
+	Graph_FillRect( &paint->canvas, RGB( 255, 255, 255 ), NULL, TRUE );
 	return paint;
 }
 

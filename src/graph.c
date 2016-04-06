@@ -691,8 +691,7 @@ static int Graph_FillRectARGB( LCUI_Graph *graph, LCUI_Color color,
 			px_p = px_row_p;
 			for( x = 0; x < rect.w; ++x ) {
 				color.alpha = px_p->alpha;
-				*px_p = color;
-				px_p++;
+				*px_p++ = color;
 			}
 			px_row_p += graph->w;
 		}
@@ -1160,13 +1159,13 @@ int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore,
 		break;
 	case COLOR_TYPE_ARGB8888:
 		if( back->color_type == COLOR_TYPE_RGB888 ) {
-			if( with_alpha ) {
-				mixer = Graph_ARGBMixARGB2;
-			} else {
-				mixer = Graph_RGBMixARGB;
-			}
+			mixer = Graph_RGBMixARGB;
 		} else {
-			mixer = Graph_ARGBMixARGB;
+			if( with_alpha ) {
+				mixer = Graph_ARGBMixARGB;
+			} else {
+				mixer = Graph_ARGBMixARGB2;
+			}
 		}
 	default:break;
 	}

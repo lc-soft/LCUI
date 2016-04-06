@@ -266,7 +266,7 @@ int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *bord
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote( &canvas, &paint->canvas, &bound );
-		Graph_FillRect( &canvas, border->top.color, NULL, FALSE );
+		Graph_FillRect( &canvas, border->top.color, NULL, TRUE );
 	}
 	/* 绘制下边框线 */
 	bound.x = box->x;
@@ -278,7 +278,7 @@ int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *bord
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote( &canvas, &paint->canvas, &bound );
-		Graph_FillRect( &canvas, border->bottom.color, NULL, FALSE );
+		Graph_FillRect( &canvas, border->bottom.color, NULL, TRUE );
 	}
 	/* 绘制左边框线 */
 	bound.y = box->y + border->top_left_radius;
@@ -290,7 +290,7 @@ int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *bord
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote( &canvas, &paint->canvas, &bound );
-		Graph_FillRect( &canvas, border->left.color, NULL, FALSE );
+		Graph_FillRect( &canvas, border->left.color, NULL, TRUE );
 	}
 	/* 绘制右边框线 */
 	bound.x = box->x + box->width - border->right.width;
@@ -302,7 +302,7 @@ int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *bord
 		bound.x -= paint->rect.x;
 		bound.y -= paint->rect.y;
 		Graph_Quote( &canvas, &paint->canvas, &bound );
-		Graph_FillRect( &canvas, border->right.color, NULL, FALSE );
+		Graph_FillRect( &canvas, border->right.color, NULL, TRUE );
 	}
 	return 0;
 }
