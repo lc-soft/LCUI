@@ -62,7 +62,7 @@ static const char *scrollbar_css = ToString(
 scrollbar {
 top: 0;
 right: 0;
-width: 18px;
+width: 14px;
 height: 100%;
 position: absolute;
 background-color: #fafafa;
@@ -71,8 +71,8 @@ border: 1px solid #eee;
 scrollbar .slider {
 top: 0;
 left: 0;
-width: 18px;
-height: 18px;
+width: 14px;
+height: 14px;
 position: absolute;
 background-color: #888;
 }
@@ -83,7 +83,7 @@ left: 0;
 }
 .scrollbar-horizontal {
 width: 100%;
-height: 18px;
+height: 14px;
 bottom: 0;
 left: 0;
 right: auto;
@@ -160,6 +160,7 @@ static void OnMouseMove( LCUI_SysEvent e, void *arg )
 		layer_pos = layer_pos * n;
 		SetStyle( layer->custom_style, key_top, -layer_pos, px );
 	}
+	scrollbar->pos = layer_pos;
 	Widget_UpdateStyle( layer, FALSE );
 	Widget_Move( scrollbar->slider, x, y );
 }
@@ -173,7 +174,7 @@ static void OnMouseDown( LCUI_Widget slider, LCUI_WidgetEvent e, void *arg )
 	scrollbar->mouse_x = e->screen_x;
 	scrollbar->mouse_y = e->screen_y;
 	scrollbar->is_dragging = TRUE;
-	scrollbar->eids[0] = LCUI_BindEvent( LCUI_MOUSEDOWN, OnMouseMove, w, NULL );
+	scrollbar->eids[0] = LCUI_BindEvent( LCUI_MOUSEMOVE, OnMouseMove, w, NULL );
 	scrollbar->eids[1] = LCUI_BindEvent( LCUI_MOUSEUP, OnMouseUp, w, NULL );
 }
 
