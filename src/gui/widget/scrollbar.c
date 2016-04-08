@@ -57,6 +57,8 @@ typedef struct LCUI_ScrollBarRec_ {
 	int pos;		/**< 当前的位置 */
 } LCUI_ScrollBarRec, *LCUI_ScrollBar;
 
+static int scroll_event_id = -1;
+
 static const char *scrollbar_css = ToString(
 
 scrollbar {
@@ -159,6 +161,11 @@ static void OnMouseMove( LCUI_SysEvent e, void *arg )
 		}
 		layer_pos = layer_pos * n;
 		SetStyle( layer->custom_style, key_top, -layer_pos, px );
+	}
+	if( scrollbar->pos != layer_pos ) {
+		LCUI_WidgetEventRec e;
+		e.type = scroll_event_id;
+		Widget_TriggerEvent( layer, &e, &layer_pos );
 	}
 	scrollbar->pos = layer_pos;
 	Widget_UpdateStyle( layer, FALSE );
@@ -298,7 +305,6 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		if( pos < 0 ) {
 			pos = 0;
 		}
-		scrollbar->pos = pos;
 		slider_pos = w->box.content.width - slider->width;
 		slider_pos = slider_pos * pos / (size - box_size);
 		SetStyle( slider->custom_style, key_left, slider_pos, px );
@@ -312,7 +318,6 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		if( pos < 0 ) {
 			pos = 0;
 		}
-		scrollbar->pos = pos;
 		slider_pos = w->box.content.height - slider->height;
 		if( size == box_size ) {
 			slider_pos = 0;
@@ -322,6 +327,12 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		SetStyle( slider->custom_style, key_top, slider_pos, px );
 		SetStyle( layer->custom_style, key_top, -pos, px );
 	}
+	if( scrollbar->pos != pos ) {
+		LCUI_WidgetEventRec e;
+		e.type = scroll_event_id;
+		Widget_TriggerEvent( layer, &e, &pos );
+	}
+	scrollbar->pos = pos;
 	Widget_UpdateStyle( slider, FALSE );
 	Widget_UpdateStyle( layer, FALSE );
 }
@@ -358,5 +369,7 @@ void LCUIWidget_AddTScrollBar( void )
 	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "scrollbar" );
 	wc->methods.init = ScrollBar_OnInit;
 	wc->methods.set_attr = ScrollBar_OnSetAttr;
+	scroll_event_id = LCUIWidget_AllocEventId();
+	LCUIWidget_SetEventName( scroll_event_id, "scroll" );
 	LCUICSS_LoadString( scrollbar_css );
 }
