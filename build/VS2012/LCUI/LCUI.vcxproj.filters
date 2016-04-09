@@ -233,9 +233,6 @@
     <ClCompile Include="..\..\..\src\draw\smooth.c">
       <Filter>源文件\draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\catch_screen.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\misc\delay.c">
       <Filter>源文件\misc</Filter>
     </ClCompile>

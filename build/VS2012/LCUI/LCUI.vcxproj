@@ -234,7 +234,6 @@
     <ClCompile Include="..\..\..\src\ime.c" />
     <ClCompile Include="..\..\..\src\misc\dict.c" />
     <ClCompile Include="..\..\..\src\misc\mem_debug.c" />
-    <ClCompile Include="..\..\..\src\misc\catch_screen.c" />
     <ClCompile Include="..\..\..\src\misc\delay.c" />
     <ClCompile Include="..\..\..\src\misc\dirent.c" />
     <ClCompile Include="..\..\..\src\misc\framectrl.c" />
