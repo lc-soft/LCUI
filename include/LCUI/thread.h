@@ -82,22 +82,22 @@ LCUI_API int LCUIMutex_Unlock( LCUI_Mutex *mutex );
 /*------------------------------ Cond <START> -------------------------------*/
 
 /** 初始化一个条件变量 */
-int LCUICond_Init( LCUI_Cond *cond );
+LCUI_API int LCUICond_Init( LCUI_Cond *cond );
 
 /** 销毁一个条件变量 */
-int LCUICond_Destroy( LCUI_Cond *cond );
+LCUI_API int LCUICond_Destroy( LCUI_Cond *cond );
 
 /** 阻塞当前线程，等待条件成立 */
-int LCUICond_Wait( LCUI_Cond *cond, LCUI_Mutex *mutex );
+LCUI_API int LCUICond_Wait( LCUI_Cond *cond, LCUI_Mutex *mutex );
 
 /** 计时阻塞当前线程，等待条件成立 */
-int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms );
+LCUI_API int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms );
 
 /** 唤醒一个阻塞等待条件成立的线程 */
-int LCUICond_Signal( LCUI_Cond *cond );
+LCUI_API int LCUICond_Signal( LCUI_Cond *cond );
 
 /** 唤醒所有阻塞等待条件成立的线程 */
-int LCUICond_Broadcast( LCUI_Cond *cond );
+LCUI_API int LCUICond_Broadcast( LCUI_Cond *cond );
 
 /*------------------------------- Cond <END> --------------------------------*/
 

@@ -944,23 +944,30 @@ int Graph_Zoom( const LCUI_Graph *graph, LCUI_Graph *buff,
 {
 	LCUI_Rect rect;
 	int x, y, src_x, src_y;
-	double scale_x, scale_y;
-
-	if( !Graph_IsValid(graph) ) {
-		return -1;
-	}
-	if( width <= 0 || height <= 0 ) {
-		Graph_Free( buff );
+	double scale_x = 0.0, scale_y = 0.0;
+	if( !Graph_IsValid( graph ) || (width <= 0 && height <= 0) ) {
 		return -1;
 	}
 	/* 获取引用的有效区域，以及指向引用的对象的指针 */
 	Graph_GetValidRect( graph, &rect );
 	graph = Graph_GetQuote( graph );
-	scale_x = (double)rect.width / width;
-	scale_y = (double)rect.height / height;
+	if( width > 0 ) {
+		scale_x = 1.0 * rect.width / width;
+	}
+	if( height > 0 ) {
+		scale_y = 1.0 * rect.height / height;
+	}
+	if( width <= 0 ) {
+		scale_x = scale_y;
+		width = (int)(0.5 + 1.0 * graph->width / scale_x);
+	}
+	if( height <= 0 ) {
+		scale_y = scale_x;
+		height = (int)(0.5 + 1.0 * graph->height / scale_y);
+	}
 	/* 如果保持宽高比 */
 	if( keep_scale ) {
-		if (scale_x<scale_y) {
+		if( scale_x < scale_y ) {
 			scale_y = scale_x;
 		} else {
 			scale_x = scale_y;
