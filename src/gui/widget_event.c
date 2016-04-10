@@ -108,7 +108,6 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 static void OnWidgetEvent( LCUI_Event e, void *arg )
 {
 	LCUI_AppTaskRec task;
-	WidgetEventHandler handler = e->data;
 	LCUI_WidgetEventPack pack = arg;
 	/* 如果需要直接执行 */
 	if( pack->is_direct_run ) {

@@ -113,8 +113,7 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_Rect box;
 	LCUI_WidgetClass *wc;
 	LCUI_WidgetStyle *s;
-	LCUI_BOOL with_alpha = FALSE;
-	s= &w->computed_style;
+	s = &w->computed_style;
 	box.x = box.y = 0;
 	box.width = w->box.graph.width;
 	box.height = w->box.graph.height;

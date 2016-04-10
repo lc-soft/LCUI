@@ -282,7 +282,7 @@ static LCUI_BOOL LCUIKeyboard_Proc(void)
 
 	e.type = LCUI_KEYDOWN;
 	e.key_code = LCUIKeyboard_GetKey();
-	LCUI_TriggerEvent( &e );
+	LCUI_TriggerEvent( &e, NULL );
 	return TRUE;
 }
 #endif
