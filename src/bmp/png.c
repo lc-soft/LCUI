@@ -57,7 +57,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 	png_infop info_ptr;
 	png_bytep* row_pointers;
 	char buf[PNG_BYTES_TO_CHECK];
-	int w, h, x, y, ret, temp, color_type;
+	int w, h, x, y, ret = 0, temp, color_type;
 
 	fp = fopen( filepath, "rb" );
 	if( fp == NULL ) {
