@@ -42,7 +42,6 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/misc/rbtree.h>
 #include <LCUI/gui/widget.h>
 
 typedef struct LCUI_WidgetTaskBoxRec_ {

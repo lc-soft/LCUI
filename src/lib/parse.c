@@ -1,6 +1,6 @@
 ﻿#include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/misc/parse.h>
+#include <LCUI/lib/parse.h>
 
 /** 从字符串中解析出数值，包括px、%、dp等单位 */
 LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )

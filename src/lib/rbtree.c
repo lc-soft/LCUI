@@ -46,7 +46,7 @@
 #include <stdlib.h>
 
 #include <LCUI_Build.h>
-#include <LCUI/misc/rbtree.h>
+#include <LCUI/lib/rbtree.h>
 
 #define RED     0
 #define BLACK   1

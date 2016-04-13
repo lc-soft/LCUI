@@ -39,7 +39,6 @@
 //#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/misc/parse.h>
 #include <LCUI/gui/widget.h>
 
 /** 解析器的环境参数（上下文数据） */

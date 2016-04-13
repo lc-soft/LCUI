@@ -55,7 +55,10 @@ enum LCUIDisplayMode {
 #define LDM_DEFAULT LDM_SEAMLESS
 
 /** surface 的操作方法集 */
-typedef struct LCUI_SurfaceMethods {
+typedef struct LCUI_DisplayDriverRec_ {
+	char			name[256];
+	int			(*getWidth)(void);
+	int			(*getHeight)(void);
 	LCUI_Surface		(*new)(void);
 	void			(*delete)(LCUI_Surface);
 	void			(*resize)(LCUI_Surface,int,int);
@@ -71,26 +74,16 @@ typedef struct LCUI_SurfaceMethods {
 	void			(*setRenderMode)(LCUI_Surface,int);
 	void*			(*getHandle)(LCUI_Surface);
 	void			(*setOpacity)(LCUI_Surface,float);
-	void			(*onInvalidRect)(LCUI_Surface,LCUI_Rect*);
-	void			(*onEvent)(LCUI_Surface,LCUI_SysEvent);
-} LCUI_SurfaceMethods;
-
-typedef struct LCUI_DisplayInfo {
-	char name[32];
-	int (*getWidth)(void);
-	int (*getHeight)(void);
-} LCUI_DisplayInfo;
+	void			(*onInvalidRect)(void(*)(LCUI_Surface,LCUI_Rect*));
+} LCUI_DisplayDriverRec, *LCUI_DisplayDriver;
 
 #ifdef LCUI_BUILD_IN_WIN32
 
-/** 初始化 win32 模式 */
-LCUI_API void LCUI_InitWin32Mode( HINSTANCE hInstance );
-
 /** 初始化适用于 Win32 平台的 surface 支持 */
-LCUI_SurfaceMethods *LCUIDisplay_InitWin32( LCUI_DisplayInfo *info );
+int LCUI_InitWinDisplay( LCUI_DisplayDriver driver );
 
 /** 退出 win32 模式 */
-int LCUIDisplay_ExitWin32( void );
+int LCUI_ExitWinDisplay( void );
 
 #elif defined(LCUI_VIDEO_DRIVER_FRAMEBUFFER)
 

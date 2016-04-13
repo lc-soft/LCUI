@@ -15,9 +15,6 @@
     <Filter Include="头文件\LCUI\gui">
       <UniqueIdentifier>{9d79aeb1-91de-484b-a7e9-8b3faccf646f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\LCUI\kernel">
-      <UniqueIdentifier>{78b64566-1d16-400a-9ebb-e7e993015753}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\LCUI\draw">
       <UniqueIdentifier>{40b50852-87d3-40fc-84c4-cebfc3a2139f}</UniqueIdentifier>
     </Filter>
@@ -31,9 +28,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="源文件\kernel">
-      <UniqueIdentifier>{bf4c7a21-a3b4-49fb-8488-70a8e53861fd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\gui">
       <UniqueIdentifier>{f8918ee7-5cca-4f10-b318-834f3669a0c3}</UniqueIdentifier>
     </Filter>
@@ -42,15 +36,6 @@
     </Filter>
     <Filter Include="源文件\thread\win32">
       <UniqueIdentifier>{4238cadf-f552-49a7-9899-8400100a3536}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\input">
-      <UniqueIdentifier>{3f77af46-2c50-47d7-88b8-ce1c02cd320b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\output">
-      <UniqueIdentifier>{f3ca6972-897f-4db2-aae0-909dbca5f113}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\misc">
-      <UniqueIdentifier>{53f1feaf-d469-4266-9bc4-551f23bd0186}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\draw">
       <UniqueIdentifier>{12dc9c84-35f2-4835-a19f-edfa70d611e2}</UniqueIdentifier>
@@ -64,14 +49,26 @@
     <Filter Include="源文件\bmp">
       <UniqueIdentifier>{dd6d7c8f-2626-480f-b8ca-002f4a4ce989}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\LCUI\misc">
-      <UniqueIdentifier>{4cdcd8a4-d9b7-4909-9aee-1c5ea9143771}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\gui\widget">
       <UniqueIdentifier>{bb54efed-7e15-4cdf-a4ad-77a5c5ada8a1}</UniqueIdentifier>
     </Filter>
     <Filter Include="头文件\LCUI\gui\widget">
       <UniqueIdentifier>{4befbb5f-3339-421b-827f-ce6870f52aba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\platform">
+      <UniqueIdentifier>{a77e4d61-b822-44bb-b5d4-3c68d6bf5601}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\platform\windows">
+      <UniqueIdentifier>{8518f1e2-34ad-40ca-b429-b1d81a69b45c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\LCUI\platform">
+      <UniqueIdentifier>{827ea543-17f5-433b-ac85-93f9f85b3367}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\LCUI\platform\windows">
+      <UniqueIdentifier>{376d5e22-4a30-4794-9c47-3ef0b637dc0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\lib">
+      <UniqueIdentifier>{0eabc4c9-5cde-4669-b3dd-6d87e2c666b5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -96,32 +93,11 @@
     <ClInclude Include="..\..\..\include\LCUI\draw\border.h">
       <Filter>头文件\LCUI\draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\kernel\device.h">
-      <Filter>头文件\LCUI\kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\kernel\event.h">
-      <Filter>头文件\LCUI\kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\kernel\main.h">
-      <Filter>头文件\LCUI\kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\kernel\timer.h">
-      <Filter>头文件\LCUI\kernel</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\messagebox.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\draw\line.h">
       <Filter>头文件\LCUI\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\misc\delay.h">
-      <Filter>头文件\LCUI\misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\misc\rect.h">
-      <Filter>头文件\LCUI\misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\misc\string.h">
-      <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
@@ -138,26 +114,11 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_style.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\misc\dirent.h">
-      <Filter>头文件\LCUI\misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\misc\rbtree.h">
-      <Filter>头文件\LCUI\misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\misc\linkedlist.h">
-      <Filter>头文件\LCUI\misc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h">
       <Filter>头文件\LCUI\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\misc\framectrl.h">
-      <Filter>头文件\LCUI\misc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\misc\parse.h">
-      <Filter>头文件\LCUI\misc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_task.h">
       <Filter>头文件\LCUI\gui</Filter>
@@ -169,9 +130,6 @@
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>头文件\LCUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\misc.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\input.h">
@@ -216,11 +174,29 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\misc\dict.h">
-      <Filter>头文件\LCUI\misc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_events.h">
+      <Filter>头文件\LCUI\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\platform.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_display.h">
+      <Filter>头文件\LCUI\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_mouse.h">
+      <Filter>头文件\LCUI\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_keyboard.h">
+      <Filter>头文件\LCUI\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\main.h">
+      <Filter>头文件\LCUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -232,42 +208,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\draw\smooth.c">
       <Filter>源文件\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\delay.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\rect.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\string.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\input\keyboard.c">
-      <Filter>源文件\input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\input\mouse.c">
-      <Filter>源文件\input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\input\touchscreen.c">
-      <Filter>源文件\input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\kernel\device.c">
-      <Filter>源文件\kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\kernel\event.c">
-      <Filter>源文件\kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\kernel\main.c">
-      <Filter>源文件\kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\kernel\timer.c">
-      <Filter>源文件\kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\output\dummy.c">
-      <Filter>源文件\output</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\output\graph_display.c">
-      <Filter>源文件\output</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\thread\win32\mutex.c">
       <Filter>源文件\thread\win32</Filter>
@@ -314,26 +254,11 @@
     <ClCompile Include="..\..\..\src\gui\widget_style.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\dirent.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\rbtree.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\linkedlist.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_paint.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\draw\boxshadow.c">
       <Filter>源文件\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\output\win32_surface.c">
-      <Filter>源文件\output</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\framectrl.c">
-      <Filter>源文件\misc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\thread\win32\cond.c">
       <Filter>源文件\thread\win32</Filter>
@@ -353,9 +278,6 @@
     <ClCompile Include="..\..\..\src\draw\background.c">
       <Filter>源文件\draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\mem_debug.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\font\freetype.c">
       <Filter>源文件\font</Filter>
     </ClCompile>
@@ -374,9 +296,6 @@
     <ClCompile Include="..\..\..\src\gui\css_parser.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\parse.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\gui\builder.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
@@ -386,11 +305,59 @@
     <ClCompile Include="..\..\..\src\gui\widget_background.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\misc\dict.c">
-      <Filter>源文件\misc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c">
       <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\windows\windows_display.c">
+      <Filter>源文件\platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\windows\windows_events.c">
+      <Filter>源文件\platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\windows\windows_mouse.c">
+      <Filter>源文件\platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\windows\windows_keyboard.c">
+      <Filter>源文件\platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\main.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\display.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\delay.c">
+      <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\dict.c">
+      <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\dirent.c">
+      <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\event.c">
+      <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\framectrl.c">
+      <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\linkedlist.c">
+      <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\parse.c">
+      <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\rbtree.c">
+      <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\rect.c">
+      <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\string.c">
+      <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\timer.c">
+      <Filter>源文件\lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
