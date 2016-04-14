@@ -171,6 +171,17 @@
     <ClInclude Include="..\..\..\include\LCUI\input.h" />
     <ClInclude Include="..\..\..\include\LCUI\ime.h" />
     <ClInclude Include="..\..\..\include\LCUI\lib.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\delay.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\dict.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\dirent.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\event.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\framectrl.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\linkedlist.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\parse.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\rbtree.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\rect.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\string.h" />
+    <ClInclude Include="..\..\..\include\LCUI\lib\time.h" />
     <ClInclude Include="..\..\..\include\LCUI\main.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_display.h" />
@@ -179,6 +190,7 @@
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_mouse.h" />
     <ClInclude Include="..\..\..\include\LCUI\surface.h" />
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
+    <ClInclude Include="..\..\..\include\LCUI\timer.h" />
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -229,7 +241,7 @@
     <ClCompile Include="..\..\..\src\lib\rbtree.c" />
     <ClCompile Include="..\..\..\src\lib\rect.c" />
     <ClCompile Include="..\..\..\src\lib\string.c" />
-    <ClCompile Include="..\..\..\src\lib\timer.c" />
+    <ClCompile Include="..\..\..\src\lib\time.c" />
     <ClCompile Include="..\..\..\src\main.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_display.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_events.c" />
@@ -241,6 +253,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\timer.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\AUTHORS" />

@@ -45,11 +45,7 @@
 #define LCUI_VERSION "1.0.0"
 
 #include <wchar.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
-#include <stdarg.h>
 
 #ifndef FALSE
 #define FALSE 0
@@ -309,12 +305,6 @@ typedef struct LCUI_PaintContextRec_ {
 typedef void (*FuncPtr)(void *);
 
 LCUI_END_HEADER
-
-#define nobuff_printf(format, ...) \
-	{ \
-		printf(format, ##__VA_ARGS__); \
-		fflush(stdout); \
-	}
 
 #include <LCUI/lib.h>
 #include <LCUI/main.h>

@@ -120,6 +120,7 @@ int LCUI_InitWinApp( LCUI_AppDriver app )
 		MessageBox( NULL, str, szAppName, MB_ICONERROR );
 		return -1;
 	}
+	app->WaitEvent = WIN_WaitEvent;
 	app->PumbEvents = WIN_PumpEvents;
 	app->BreakEventWaiting = WIN_BreakEventWaiting;
 	app->BindSysEvent = WIN_BindSysEvent;

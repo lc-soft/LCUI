@@ -578,11 +578,11 @@ int LCUI_InitDisplay( void )
 	display.mode = LDM_DEFAULT;
 	LCUIMutex_Init( &display.mutex );
 	LinkedList_Init( &display.surfaces );
-	if( !LCUI_InitDisplayDriver( &display.driver ) ) {
+	if( LCUI_InitDisplayDriver( &display.driver ) != 0 ) {
 		return -2;
 	}
-	display.driver.onInvalidRect( Surface_OnInvalidRect );
 	display.fc_ctx = FrameControl_Create();
+	display.driver.onInvalidRect( Surface_OnInvalidRect );
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );

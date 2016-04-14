@@ -1,4 +1,4 @@
-#ifndef __WINDOWS_EVENTS_H__
+﻿#ifndef __WINDOWS_EVENTS_H__
 #define __WINDOWS_EVENTS_H__
 
 typedef struct WIN_SysEvent_ {
@@ -9,7 +9,7 @@ typedef struct WIN_SysEvent_ {
 	void *data;
 } WIN_SysEventRec, *WIN_SysEvent;
 
-void LCUI_PreInitWinApp( void *data );
+LCUI_API void LCUI_PreInitWinApp( void *data );
 
 int LCUI_InitWinApp( LCUI_AppDriver app );
 

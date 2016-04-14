@@ -38,6 +38,10 @@
 * ****************************************************************************/
 #include <tchar.h>
 #include <Windows.h>
+#include <LCUI_Build.h>
+#include <LCUI/LCUI.h>
+#include <LCUI/platform.h>
+#include LCUI_EVENTS_H
 #ifdef _UNICODE
 #define _tcstok_s wcstok_s
 #define _tcscpy_s wcscpy_s
@@ -47,7 +51,6 @@
 #endif
 
 extern int main( int argc, char *argv[] );
-extern void LCUI_InitWin32Mode( HINSTANCE hInstance );
 
 int APIENTRY WinMain( _In_ HINSTANCE hInstance,
 		      _In_opt_ HINSTANCE hPrevInstance,
@@ -60,7 +63,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance,
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-	LCUI_InitWin32Mode( hInstance );
+	LCUI_PreInitApp( hInstance );
 	p_cmd_line = GetCommandLine();
 	len = _tcslen( p_cmd_line ) + 1;
 	cmdline_buff = (TCHAR*)malloc( sizeof(TCHAR)*len );

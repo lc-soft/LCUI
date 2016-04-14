@@ -70,6 +70,9 @@
     <Filter Include="源文件\lib">
       <UniqueIdentifier>{0eabc4c9-5cde-4669-b3dd-6d87e2c666b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\LCUI\lib">
+      <UniqueIdentifier>{302400f4-b206-40b9-b900-d87046743774}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\LCUI_Build.h">
@@ -197,6 +200,42 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\main.h">
       <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\timer.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\delay.h">
+      <Filter>头文件\LCUI\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\dict.h">
+      <Filter>头文件\LCUI\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\dirent.h">
+      <Filter>头文件\LCUI\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\event.h">
+      <Filter>头文件\LCUI\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\framectrl.h">
+      <Filter>头文件\LCUI\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\linkedlist.h">
+      <Filter>头文件\LCUI\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\parse.h">
+      <Filter>头文件\LCUI\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\rbtree.h">
+      <Filter>头文件\LCUI\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\rect.h">
+      <Filter>头文件\LCUI\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\string.h">
+      <Filter>头文件\LCUI\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\lib\time.h">
+      <Filter>头文件\LCUI\lib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -356,7 +395,10 @@
     <ClCompile Include="..\..\..\src\lib\string.c">
       <Filter>源文件\lib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\timer.c">
+    <ClCompile Include="..\..\..\src\timer.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lib\time.c">
       <Filter>源文件\lib</Filter>
     </ClCompile>
   </ItemGroup>

@@ -39,6 +39,7 @@
 
 #ifndef __LCUI_MISC_H__
 #define __LCUI_MISC_H__
+#include <LCUI/lib/time.h>
 #include <LCUI/lib/delay.h>
 #include <LCUI/lib/dirent.h>
 #include <LCUI/lib/rbtree.h>
@@ -48,6 +49,5 @@
 #include <LCUI/lib/framectrl.h>
 #include <LCUI/lib/string.h>
 #include <LCUI/lib/parse.h>
-#include <LCUI/lib/timer.h>
 #include <LCUI/lib/event.h>
 #endif

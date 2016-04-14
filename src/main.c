@@ -40,9 +40,11 @@
 #define __IN_MAIN_SOURCE_FILE__
 
 #include <time.h>
+#include <stdio.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
+#include <LCUI/timer.h>
 #include <LCUI/cursor.h>
 #include <LCUI/font.h>
 #include <LCUI/input.h>
@@ -209,6 +211,7 @@ int LCUI_AddTask( LCUI_AppTask task )
 		LCUIMutex_Unlock( &MainApp.tasks_mutex );
 		LCUICond_Broadcast( &MainApp.loop_cond );
 	}
+	LCUI_BreakEventWaiting();
 	return node ? 0:-1;
 }
 

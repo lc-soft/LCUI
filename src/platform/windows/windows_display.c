@@ -1,42 +1,44 @@
-/* ***************************************************************************
-* win32_surface.c -- surface support for win platform.
-*
-* Copyright (C) 2014-2016 by Liu Chao <lc-soft@live.cn>
-*
-* This file is part of the LCUI project, and may only be used, modified, and
-* distributed under the terms of the GPLv2.
-*
-* (GPLv2 is abbreviation of GNU General Public License Version 2)
-*
-* By continuing to use, modify, or distribute this file you indicate that you
-* have read the license and understand and accept it fully.
-*
-* The LCUI project is distributed in the hope that it will be useful, but
-* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-* or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
-*
-* You should have received a copy of the GPLv2 along with this file. It is
-* usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
-* ***************************************************************************/
+ï»¿/* ***************************************************************************
+ * windows_display.c -- surface support for win platform.
+ *
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ *
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ *
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ *
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
 
 /* ****************************************************************************
-* win32_surface.c -- winÆ½Ì¨µÄ surface ¹¦ÄÜÖ§³Ö¡£
-*
-* °æÈ¨ËùÓĞ (C) 2014-2016 ¹éÊôÓÚ Áõ³¬ <lc-soft@live.cn>
-*
-* Õâ¸öÎÄ¼şÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾İGPLv2Ğí¿ÉĞ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
-*
-* (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ğí¿ÉÖ¤µÚ¶ş°æ µÄÓ¢ÎÄËõĞ´)
-*
-* ¼ÌĞøÊ¹ÓÃ¡¢ĞŞ¸Ä»ò·¢²¼±¾ÎÄ¼ş£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öĞí¿ÉĞ­Òé¡£
-*
-* LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔğÈÎ£¬ÉõÖÁÃ»ÓĞÊÊÏúĞÔ»òÌØ
-* ¶¨ÓÃÍ¾µÄÒşº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ğí¿ÉĞ­Òé¡£
-*
-* ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼şµÄGPLv2Ğí¿ÉĞ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼şÖĞ£¬Èç¹û
-* Ã»ÓĞ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>.
-* ***************************************************************************/
+ * windows_display.c -- winå¹³å°çš„å›¾å½¢æ˜¾ç¤ºåŠŸèƒ½æ”¯æŒã€‚
+ *
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2012-2016 å½’å±äº åˆ˜è¶… <lc-soft@live.cn>
+ *
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
+ *
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
+ *
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜æ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’Œæ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
+ *
+ * LCUI é¡¹ç›®æ˜¯åŸºäºä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
+ *
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
+
 //#define DEBUG
+#include <stdio.h>
 #include <LCUI_Build.h>
 #define __IN_SURFACE_SOURCE_FILE__
 #ifdef LCUI_BUILD_IN_WIN32
@@ -84,11 +86,11 @@ struct LCUI_SurfaceRec_ {
 
 static struct WIN_Display {
 	LCUI_BOOL is_inited;
-	void( *on_invalid_rect )(LCUI_Surface, LCUI_Rect*);
-	LinkedList surfaces;		/**< surface ¼ÇÂ¼ */
+	void (*on_invalid_rect)(LCUI_Surface, LCUI_Rect*);
+	LinkedList surfaces;		/**< surface è®°å½• */
 } win = {0};
 
-/** ¸ù¾İ hwnd »ñÈ¡ Surface */
+/** æ ¹æ® hwnd è·å– Surface */
 static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 {
 	LinkedListNode *node;
@@ -143,7 +145,7 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 	HINSTANCE instance;
 	LCUI_Surface surface = arg1;
 	instance = LCUI_GetAppData();
-	/* Îª Surface ´´½¨´°¿Ú */
+	/* ä¸º Surface åˆ›å»ºçª—å£ */
 	surface->hwnd = CreateWindow(
 		TEXT("LCUI"), TEXT("LCUI Surface"),
 		WIN32_WINDOW_STYLE,
@@ -157,7 +159,7 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 	DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 }
 
-/** ĞÂ½¨Ò»¸ö Surface */
+/** æ–°å»ºä¸€ä¸ª Surface */
 static LCUI_Surface WinSurface_New(void)
 {
 	int i;
@@ -200,7 +202,7 @@ static void WinSurface_ExecMove( LCUI_Surface surface, int x, int y )
 
 static void WinSurface_Move( LCUI_Surface surface, int x, int y )
 {
-	/* »º´æÈÎÎñ£¬µÈ»ñµÃ´°¿Ú¾ä±úºó´¦Àí */
+	/* ç¼“å­˜ä»»åŠ¡ï¼Œç­‰è·å¾—çª—å£å¥æŸ„åå¤„ç† */
 	surface->task_buffer[TASK_MOVE].x = x;
 	surface->task_buffer[TASK_MOVE].y = y;
 	surface->task_buffer[TASK_MOVE].is_valid = TRUE;
@@ -275,17 +277,17 @@ void WinSurface_SetOpacity( LCUI_Surface surface, float opacity )
 
 }
 
-/** ÉèÖÃ Surface µÄäÖÈ¾Ä£Ê½ */
+/** è®¾ç½® Surface çš„æ¸²æŸ“æ¨¡å¼ */
 static void WinSurface_SetRenderMode( LCUI_Surface surface, int mode )
 {
 	surface->mode = mode;
 }
 
 /**
-* ×¼±¸»æÖÆ Surface ÖĞµÄÄÚÈİ
-* @param[in] surface	Ä¿±ê surface
-* @param[in] rect	Ğè½øĞĞ»æÖÆµÄÇøÓò£¬ÈôÎªNULL£¬Ôò»æÖÆÕû¸ö surface
-* @return		·µ»Ø»æÖÆÉÏÏÂÎÄ¾ä±ú
+* å‡†å¤‡ç»˜åˆ¶ Surface ä¸­çš„å†…å®¹
+* @param[in] surface	ç›®æ ‡ surface
+* @param[in] rect	éœ€è¿›è¡Œç»˜åˆ¶çš„åŒºåŸŸï¼Œè‹¥ä¸ºNULLï¼Œåˆ™ç»˜åˆ¶æ•´ä¸ª surface
+* @return		è¿”å›ç»˜åˆ¶ä¸Šä¸‹æ–‡å¥æŸ„
 */
 static LCUI_PaintContext WinSurface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 {
@@ -300,16 +302,16 @@ static LCUI_PaintContext WinSurface_BeginPaint( LCUI_Surface surface, LCUI_Rect 
 }
 
 /**
-* ½áÊø¶Ô Surface µÄ»æÖÆ²Ù×÷
-* @param[in] surface	Ä¿±ê surface
-* @param[in] paint_ctx	»æÖÆÉÏÏÂÎÄ¾ä±ú
+* ç»“æŸå¯¹ Surface çš„ç»˜åˆ¶æ“ä½œ
+* @param[in] surface	ç›®æ ‡ surface
+* @param[in] paint_ctx	ç»˜åˆ¶ä¸Šä¸‹æ–‡å¥æŸ„
 */
 static void WinSurface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 {
 	free( paint_ctx );
 }
 
-/** ½«Ö¡»º´æÖĞµÄÊı¾İ³ÊÏÖÖÁSurfaceµÄ´°¿ÚÄÚ */
+/** å°†å¸§ç¼“å­˜ä¸­çš„æ•°æ®å‘ˆç°è‡³Surfaceçš„çª—å£å†… */
 static void WinSurface_Present( LCUI_Surface surface )
 {
 	HDC hdc_client;
@@ -335,7 +337,7 @@ static void WinSurface_Present( LCUI_Surface surface )
 	ValidateRect( surface->hwnd, NULL );
 }
 
-/** ¸üĞÂ surface£¬Ó¦ÓÃ»º´æµÄ±ä¸ü */
+/** æ›´æ–° surfaceï¼Œåº”ç”¨ç¼“å­˜çš„å˜æ›´ */
 static void WinSurface_Update( LCUI_Surface surface )
 {
 	LCUI_SurfaceTask *t;
@@ -382,7 +384,7 @@ static void WinSurface_OnWMPaint( LCUI_Event e, void *arg )
 	LCUI_Surface surface;
 	WIN_SysEvent sys_event = arg;
 	BeginPaint( sys_event->hwnd, &ps );
-	/* »ñÈ¡ÇøÓò×ø±ê¼°³ß´ç */
+	/* è·å–åŒºåŸŸåæ ‡åŠå°ºå¯¸ */
 	area.x = ps.rcPaint.left;
 	area.y = ps.rcPaint.top;
 	area.width = ps.rcPaint.right - area.x;
