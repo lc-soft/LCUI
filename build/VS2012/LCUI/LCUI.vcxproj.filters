@@ -67,11 +67,11 @@
     <Filter Include="头文件\LCUI\platform\windows">
       <UniqueIdentifier>{376d5e22-4a30-4794-9c47-3ef0b637dc0e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\lib">
-      <UniqueIdentifier>{0eabc4c9-5cde-4669-b3dd-6d87e2c666b5}</UniqueIdentifier>
+    <Filter Include="头文件\LCUI\util">
+      <UniqueIdentifier>{4a410afd-168d-414a-9c02-a2013304ee53}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\LCUI\lib">
-      <UniqueIdentifier>{302400f4-b206-40b9-b900-d87046743774}</UniqueIdentifier>
+    <Filter Include="源文件\util">
+      <UniqueIdentifier>{f90e49cb-1270-43d7-995a-0f3f0a803c8e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -204,38 +204,38 @@
     <ClInclude Include="..\..\..\include\LCUI\timer.h">
       <Filter>头文件\LCUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\delay.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\delay.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\dict.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\dict.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\dirent.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\dirent.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\event.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\event.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\framectrl.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\framectrl.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\linkedlist.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\parse.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\parse.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\rbtree.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\rect.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\rect.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\string.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\string.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib\time.h">
-      <Filter>头文件\LCUI\lib</Filter>
+    <ClInclude Include="..\..\..\include\LCUI\util\time.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -365,41 +365,44 @@
     <ClCompile Include="..\..\..\src\display.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\delay.c">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\dict.c">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\dirent.c">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\event.c">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\framectrl.c">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\linkedlist.c">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\parse.c">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\rbtree.c">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\rect.c">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\string.c">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\timer.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\lib\time.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\..\src\util\delay.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\dict.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\dirent.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\event.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\framectrl.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\linkedlist.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\mem_debug.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\parse.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\rbtree.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\rect.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\string.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\time.c">
+      <Filter>源文件\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

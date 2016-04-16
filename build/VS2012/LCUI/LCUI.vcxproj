@@ -171,17 +171,6 @@
     <ClInclude Include="..\..\..\include\LCUI\input.h" />
     <ClInclude Include="..\..\..\include\LCUI\ime.h" />
     <ClInclude Include="..\..\..\include\LCUI\lib.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\delay.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\dict.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\dirent.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\event.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\framectrl.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\linkedlist.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\parse.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\rbtree.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\rect.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\string.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib\time.h" />
     <ClInclude Include="..\..\..\include\LCUI\main.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_display.h" />
@@ -191,6 +180,17 @@
     <ClInclude Include="..\..\..\include\LCUI\surface.h" />
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\timer.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\delay.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\dict.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\dirent.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\event.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\framectrl.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\parse.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\rect.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\string.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\time.h" />
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -231,17 +231,6 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
     <ClCompile Include="..\..\..\src\ime.c" />
-    <ClCompile Include="..\..\..\src\lib\delay.c" />
-    <ClCompile Include="..\..\..\src\lib\dict.c" />
-    <ClCompile Include="..\..\..\src\lib\dirent.c" />
-    <ClCompile Include="..\..\..\src\lib\event.c" />
-    <ClCompile Include="..\..\..\src\lib\framectrl.c" />
-    <ClCompile Include="..\..\..\src\lib\linkedlist.c" />
-    <ClCompile Include="..\..\..\src\lib\parse.c" />
-    <ClCompile Include="..\..\..\src\lib\rbtree.c" />
-    <ClCompile Include="..\..\..\src\lib\rect.c" />
-    <ClCompile Include="..\..\..\src\lib\string.c" />
-    <ClCompile Include="..\..\..\src\lib\time.c" />
     <ClCompile Include="..\..\..\src\main.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_display.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_events.c" />
@@ -254,6 +243,18 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="..\..\..\src\timer.c" />
+    <ClCompile Include="..\..\..\src\util\delay.c" />
+    <ClCompile Include="..\..\..\src\util\dict.c" />
+    <ClCompile Include="..\..\..\src\util\dirent.c" />
+    <ClCompile Include="..\..\..\src\util\event.c" />
+    <ClCompile Include="..\..\..\src\util\framectrl.c" />
+    <ClCompile Include="..\..\..\src\util\linkedlist.c" />
+    <ClCompile Include="..\..\..\src\util\mem_debug.c" />
+    <ClCompile Include="..\..\..\src\util\parse.c" />
+    <ClCompile Include="..\..\..\src\util\rbtree.c" />
+    <ClCompile Include="..\..\..\src\util\rect.c" />
+    <ClCompile Include="..\..\..\src\util\string.c" />
+    <ClCompile Include="..\..\..\src\util\time.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\AUTHORS" />
