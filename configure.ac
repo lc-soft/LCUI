@@ -119,6 +119,14 @@ if test "$want_video_output" = yes; then
 		video_driver_name=framebuffer
 		AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_FRAMEBUFFER, 1, Define to 1 if you select FrameBuffer for video support)
 	], [video_driver_name=none])
+	AC_CHECK_HEADERS([X11/Xlib.h],[
+		AC_CHECK_LIB([X11], [XOpenDisplay], [
+			CFLAGS="$CFLAGS `pkg-config --cflags-only-I x11`"
+			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs x11`"
+			video_driver_name=x11
+			AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_X11, 1, Define to 1 if you select XWindow for video support)
+		], [])
+	], [])
 else
 	want_video_output=no
 	video_driver_name=none
@@ -187,20 +195,17 @@ AC_OUTPUT([Makefile
 	 include/LCUI/font/Makefile
 	 include/LCUI/draw/Makefile
 	 include/LCUI/gui/widget/Makefile
-	 include/LCUI/kernel/Makefile
 	 include/LCUI/gui/Makefile
-	 include/LCUI/misc/Makefile
+	 include/LCUI/util/Makefile
 	 src/Makefile
 	 src/font/Makefile
 	 src/font/in-core/Makefile
 	 src/draw/Makefile
 	 src/thread/Makefile
 	 src/bmp/Makefile
-	 src/misc/Makefile
-	 src/kernel/Makefile
-	 src/input/Makefile
-	 src/output/Makefile
+	 src/util/Makefile
 	 src/gui/Makefile
+	 src/platform/Makefile
 	 test/Makefile])
 echo
 echo

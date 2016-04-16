@@ -3,21 +3,12 @@ AUTOMAKE_OPTIONS=foreign
 AM_CFLAGS = -I$(abs_top_srcdir)/include
 ##以下是给Libtool的参数
 LCUI_LDFLAGS = -version-info 3:0:0
-LCUI_SOURCES = graph.c ime.c cursor.c
-LCUI_LIBADD = \
-	misc/libmisc.la \
-	thread/libthread.la \
-	kernel/libkernel.la \
-	font/libfont.la \
-	font/in-core/libfont_incore.la \
-	input/libinput.la \
-	output/liboutput.la \
-	bmp/libbmp.la	\
-	draw/libdraw.la \
-	gui/libgui.la \
-	$(LCUI_LIBS)
+LCUI_SOURCES = graph.c ime.c cursor.c main.c timer.c display.c
+LCUI_LIBADD = thread/libthread.la util/libutil.la platform/libplatform.la \
+bmp/libbmp.la draw/libdraw.la gui/libgui.la font/libfont.la \
+font/in-core/libfont_incore.la  $(LCUI_LIBS)
 
-SUBDIRS = bmp misc draw kernel font input output thread gui
+SUBDIRS = bmp util draw font thread gui platform
 
 ##库的编译需要这样
 lib_LTLIBRARIES = libLCUI.la
