@@ -578,12 +578,12 @@ int LCUI_InitDisplay( void )
 		printf("[display] init failed\n");
 		return -2;
 	}
+	display.is_working = TRUE;
 	display.fc_ctx = FrameControl_Create();
 	display.driver.onInvalidRect( Surface_OnInvalidRect );
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	LCUIDisplay_SetMode( LCDM_DEFAULT );
-	display.is_working = TRUE;
 	printf("[display] init ok.\n");
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
 }

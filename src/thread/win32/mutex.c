@@ -61,7 +61,6 @@ int LCUIMutex_TryLock( LCUI_Mutex *mutex )
 {
 	switch ( WaitForSingleObject( *mutex, 0 ) ) {
 	case WAIT_FAILED:
-		printf("Couldn't wait on mutex\n");
 		return -1;
 	case WAIT_OBJECT_0:
 		break;
