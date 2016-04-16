@@ -1,5 +1,6 @@
 ﻿
 #include <LCUI_Build.h>
+#ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
@@ -35,3 +36,5 @@ void LCUI_ExitWinKeyboard( void )
 	LCUI_UnbindSysEvent( WM_KEYDOWN, OnKeyboardMessage );
 	LCUI_UnbindSysEvent( WM_KEYUP, OnKeyboardMessage );
 }
+
+#endif

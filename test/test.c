@@ -1,4 +1,6 @@
-﻿#include <LCUI_Build.h>
+#include <stdio.h>
+#include <wchar.h>
+#include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include "test.h"
 

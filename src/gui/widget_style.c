@@ -37,6 +37,9 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
@@ -240,7 +243,7 @@ int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 			size = wcslen( src->sheet[i].wstring ) + 1;
 			s->wstring = malloc( size * sizeof(wchar_t) );
 			wcscpy( s->wstring, src->sheet[i].wstring );
-			break; 
+			break;
 		default:
 			*s = src->sheet[i];
 			break;
@@ -288,7 +291,7 @@ int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 			s->wstring = malloc( size * sizeof(wchar_t) );
 			wcscpy( s->wstring, src->sheet[i].wstring );
 			break;
-		default: 
+		default:
 			*s = src->sheet[i];
 			break;
 		}
@@ -300,7 +303,7 @@ int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 	return count;
 }
 
-static int SelectorNode_Save( LCUI_SelectorNode node, 
+static int SelectorNode_Save( LCUI_SelectorNode node,
 			      const char *name, int len, char type )
 {
 	char *str;
@@ -504,7 +507,7 @@ LCUI_BOOL Selector_Compare( LCUI_Selector s1, LCUI_Selector s2 )
 	return FALSE;
 }
 
-static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector, 
+static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 					       const char *name )
 {
 	StyleTreeNode stn;
@@ -517,7 +520,7 @@ static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 		stn = NEW( StyleTreeNodeRec, 1 );
 		strncpy( stn->name, name, MAX_NAME_LEN );
 		LinkedList_Init( &stn->styles );
-		tn = RBTree_CustomInsert( &style_library.style, 
+		tn = RBTree_CustomInsert( &style_library.style,
 					  (const void*)name, stn );
 	}
 	stn = tn->data;
@@ -643,7 +646,7 @@ LCUI_BOOL Selector_MatchPath( LCUI_Selector selector, LCUI_Widget *wlist )
 	return FALSE;
 }
 
-static int InsertStyleSheet( LinkedList *list, LCUI_Selector s, 
+static int InsertStyleSheet( LinkedList *list, LCUI_Selector s,
 			     LCUI_StyleSheet ss )
 {
 	int pos = -1, i = 0;
@@ -717,7 +720,7 @@ static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 {
 	int i, count = 0;
 	char fullname[MAX_NAME_LEN];
-	
+
 	i = ptrslen( w->status );
 	/* 记录伪类选择器匹配的样式表 */
 	while( --i >= 0 ) {
@@ -763,7 +766,7 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 		}
 		printf( "%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "" );
 		switch( ss->sheet[key].type ) {
-		case SVT_AUTO: 
+		case SVT_AUTO:
 			printf( "auto\n");
 			break;
 		case SVT_VALUE: {
@@ -821,7 +824,7 @@ void LCUI_PrintSelector( LCUI_Selector selector )
 		}
 		strcat( path, " " );
 	}
-	printf("\tpath: %s (rank = %d, batch_num = %d)\n", path, 
+	printf("\tpath: %s (rank = %d, batch_num = %d)\n", path,
 		selector->rank, selector->batch_num);
 }
 
@@ -831,7 +834,7 @@ void LCUI_PrintStyleLibrary(void)
 	LinkedListNode *node;
 	StyleTreeNode stn;
 	StyleListNode sln;
-	
+
 	printf("style library begin\n");
 	tn = RBTree_First( &style_library.style );
 	while( tn ) {

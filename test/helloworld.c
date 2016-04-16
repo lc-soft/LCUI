@@ -32,8 +32,6 @@ int main( int argc, char **argv )
 	InitConsoleWindow();
 #endif
 	LCUI_Init();
-	LCUIDisplay_SetMode( LDM_WINDOWED );
-	LCUIDisplay_SetSize( 960, 540 );
 	box = LCUIBuilder_LoadFile("hello.xml");
 	if( box ) {
 		root = LCUIWidget_GetRoot();

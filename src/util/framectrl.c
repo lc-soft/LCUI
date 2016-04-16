@@ -40,6 +40,7 @@
 
 #define __IN_FRAME_CONTROL_SOURCE_FILE__
 
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
@@ -106,7 +107,7 @@ void FrameControl_Remain( FrameCtrlCtx ctx )
 {
 	unsigned int n_ms, lost_ms;
 	int64_t current_time;
-	
+
 	if( ctx->state == FRAME_CTRL_STATE_QUIT ) {
 		return;
 	}

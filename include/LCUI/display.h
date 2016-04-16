@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
- * display.h -- APIs of graphics display..
+ * display.h -- graphic display control
  *
- * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,9 +20,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * display.h -- 与图形显示相关的接口。
+ * display.h -- 图形显示控制
  *
- * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -76,22 +76,6 @@ typedef struct LCUI_DisplayDriverRec_ {
 	void			(*setOpacity)(LCUI_Surface,float);
 	void			(*onInvalidRect)(void(*)(LCUI_Surface,LCUI_Rect*));
 } LCUI_DisplayDriverRec, *LCUI_DisplayDriver;
-
-#ifdef LCUI_BUILD_IN_WIN32
-
-/** 初始化适用于 Win32 平台的 surface 支持 */
-int LCUI_InitWinDisplay( LCUI_DisplayDriver driver );
-
-/** 退出 win32 模式 */
-int LCUI_ExitWinDisplay( void );
-
-#elif defined(LCUI_VIDEO_DRIVER_FRAMEBUFFER)
-
-/** 初始化适用于 Linux 帧缓冲（FrameBuffer） 的 surface 支持 */
-LCUI_SurfaceMethods *LCUIDisplay_InitLinuxFB( LCUI_DisplayInfo *info );
-int LCUIDisplay_ExitLinuxFB( void );
-
-#endif
 
 /** 一秒内的最大画面帧数 */
 #define MAX_FRAMES_PER_SEC 100

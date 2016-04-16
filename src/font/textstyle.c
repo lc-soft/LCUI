@@ -1,41 +1,44 @@
 /* ***************************************************************************
  * textstyle.c -- text style processing module.
- * 
- * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
- * 
+ *
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
- 
+
 /* ****************************************************************************
  * textstyle.c -- 文本样式处理模块
  *
- * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
- * 
+ * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
+
+#include <string.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
@@ -90,7 +93,7 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 	char name[256];
 	const char *p, *style_name;
 	int count, i, *ids;
-	
+
 	if( ts->has_family && ts->font_ids ) {
 		free( ts->font_ids );
 	}
@@ -176,7 +179,7 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 		tag_data = node->data;
 		DEBUG_MSG("tag id: %d\n", tag_data->id);
 		switch( tag_data->id ) {
-		    case TAG_ID_COLOR: 
+		    case TAG_ID_COLOR:
 			if( flags[0] != 0 ) {
 				break;
 			}
@@ -212,7 +215,7 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 /** 将指定标签的样式数据从队列中删除，只删除队列尾部第一个匹配的标签 */
 static void StyleTags_Delete( LinkedList *tags, int id )
 {
-	LCUI_StyleTag *p; 
+	LCUI_StyleTag *p;
 	LinkedListNode *node;
 	DEBUG_MSG("delete start, total tag: %d\n", total);
 	if( tags->length <= 0 ) {
@@ -224,7 +227,7 @@ static void StyleTags_Delete( LinkedList *tags, int id )
 			LinkedList_DeleteNode( tags, node );
 			break;
 		}
-	} 
+	}
 	DEBUG_MSG("delete end, total tag: %d\n", tags->length);
 }
 
@@ -246,12 +249,12 @@ void clear_space( char *in, char *out )
 const wchar_t* scan_style_ending_tag( const wchar_t *wstr, char *name )
 {
 	int i, j, len;
-	
+
 	len = wcslen ( wstr );
 	//printf("string: %S\n", wstr);
-	if( wstr[0] != '[' || wstr[1] != '/' ) { 
+	if( wstr[0] != '[' || wstr[1] != '/' ) {
 		return NULL;
-	} 
+	}
 	/* 匹配标签,获取标签名 */
 	for(j=0,i=2; i<len; ++i) {
 		switch( wstr[i] ) {
@@ -261,16 +264,16 @@ const wchar_t* scan_style_ending_tag( const wchar_t *wstr, char *name )
 			if( name ) {
 				name[j] = wstr[i];
 			}
-			++j; 
+			++j;
 			break;
 		}
 	}
-	
+
 end_tag_search:;
 	if( name ) {
 		name[j] = 0;
 	}
-	if( j < 1 ) { 
+	if( j < 1 ) {
 		return NULL;
 	}
 	return wstr+i;
@@ -280,7 +283,7 @@ end_tag_search:;
 const wchar_t* scan_style_tag( const wchar_t *wstr, char *name,
 			       int max_name_len, char *data )
 {
-	int i, j, len; 
+	int i, j, len;
 	LCUI_BOOL end_name = FALSE;
 
 	len = wcslen( wstr );
@@ -298,7 +301,7 @@ const wchar_t* scan_style_tag( const wchar_t *wstr, char *name,
 			}
 			/* 标签名首部和尾部可包含空格 */
 			if( j == 0 || max_name_len == 0
-			 || (max_name_len > 0 && end_name) ) { 
+			 || (max_name_len > 0 && end_name) ) {
 				continue;
 			}
 			/* 标签名中间不能包含空格 */
@@ -318,7 +321,7 @@ const wchar_t* scan_style_tag( const wchar_t *wstr, char *name,
 		}
 		++j;
 	}
-	
+
 	if( data ) {
 		name[j] = 0;
 	}
@@ -327,7 +330,7 @@ const wchar_t* scan_style_tag( const wchar_t *wstr, char *name,
 	for(j=0; i<len; ++i) {
 		DEBUG_MSG2("str[%d]: %c\n", i, str[i]);
 		if( wstr[i] == ' ' ) {
-			continue; 
+			continue;
 		}
 		/* 标签结束，退出 */
 		if( wstr[i] == '>' ) {
@@ -351,33 +354,33 @@ const wchar_t* scan_style_tag( const wchar_t *wstr, char *name,
 }
 
 /** 在字符串中获取指定样式标签中的数据 */
-static const wchar_t* 
+static const wchar_t*
 scan_style_tag_by_name( const wchar_t *wstr, const char *name, char *data )
 {
-	int i, j, len, tag_len; 
-	
+	int i, j, len, tag_len;
+
 	len = wcslen( wstr );
 	DEBUG_MSG2("len = %d\n", len);
 	tag_len = strlen( name );
 	if( wstr[0] != '[' ) {
 		DEBUG_MSG2("wstr[0] != '<'\n");
 		return NULL;
-	} 
+	}
 	/* 匹配标签前半部分 */
 	for( j=0,i=1; i<len; ++i ) {
-		if( wstr[i] == ' ' ) { 
-			if( j == 0 || j >= tag_len ) { 
+		if( wstr[i] == ' ' ) {
+			if( j == 0 || j >= tag_len ) {
 				continue;
 			}
 			return NULL;
 		}
-		else if( wstr[i] == name[j] ) { 
+		else if( wstr[i] == name[j] ) {
 			++j;
 			continue;
 		}
 		/* 如果标签名部分已经匹配完 */
 		if( j>= tag_len && wstr[i] == '=' ) {
-			++i; 
+			++i;
 			break;
 		}
 		/* 否则，有误 */
@@ -388,7 +391,7 @@ scan_style_tag_by_name( const wchar_t *wstr, const char *name, char *data )
 	for(j=0; i<len; ++i) {
 		DEBUG_MSG2("wstr[%d]: %c\n", i, wstr[i]);
 		if( wstr[i] == ' ' ) {
-			continue; 
+			continue;
 		}
 		/* 标签结束，退出 */
 		if( wstr[i] == ']' ) {
@@ -408,13 +411,13 @@ scan_style_tag_by_name( const wchar_t *wstr, const char *name, char *data )
 }
 
 /** 根据字符串中的标签得到相应的样式数据，并返回指向标签后面字符的指针 */
-static const wchar_t* 
+static const wchar_t*
 scan_style_tag_data( const wchar_t *wstr, LCUI_StyleTag *tag )
 {
-	const wchar_t *p, *q; 
+	const wchar_t *p, *q;
 	char tag_data[256];
-	
-	p = wstr; 
+
+	p = wstr;
 	if( (q = scan_style_tag_by_name( p, "color", tag_data)) ) {
 		DEBUG_MSG("is color style tag, data: %s\n", tag_data);
 		if( !ParseColor( &tag->style, tag_data ) ) {
@@ -463,7 +466,7 @@ const wchar_t* StyleTags_ScanEndingTag( LinkedList *tags, const wchar_t *str )
 	/* 删除相应的样式标签 */
 	if( strcmp(tag_name, "color") == 0 ) {
 		StyleTags_Delete( tags, TAG_ID_COLOR );
-	} 
+	}
 	else if( strcmp(tag_name, "size") == 0 ) {
 		StyleTags_Delete( tags, TAG_ID_SIZE );
 	} else {

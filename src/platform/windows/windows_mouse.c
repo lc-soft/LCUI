@@ -1,5 +1,6 @@
 ﻿
 #include <LCUI_Build.h>
+#ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
@@ -69,3 +70,4 @@ void LCUI_ExitWinMouse( void )
 	LCUI_UnbindSysEvent( WM_RBUTTONUP, OnMouseMessage );
 	LCUI_UnbindSysEvent( WM_MOUSEWHEEL, OnMouseMessage );
 }
+#endif

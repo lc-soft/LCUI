@@ -1,44 +1,45 @@
 /* ***************************************************************************
  * rect.c -- Rectangle area handling
- * 
+ *
  * Copyright (C) 2012-2014 by
  * Liu Chao
- * 
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************/
- 
+
 /* ****************************************************************************
  * rect.c -- 矩形区域处理
  *
  * 版权所有 (C) 2012-2014 归属于
  * 刘超
- * 
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 
@@ -60,7 +61,7 @@ LCUI_Rect Rect( int x, int y, int w, int h )
 }
 
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
-void LCUIRect_GetCutArea( int box_w, int box_h, 
+void LCUIRect_GetCutArea( int box_w, int box_h,
 			  LCUI_Rect rect, LCUI_Rect *cut )
 {
 	cut->x = 0;
@@ -73,15 +74,15 @@ void LCUIRect_GetCutArea( int box_w, int box_h,
 		cut->x = 0 - rect.x;
 	}
 	if(rect.x + rect.width > box_w) {
-		cut->width -= (rect.x + rect.width - box_w); 
+		cut->width -= (rect.x + rect.width - box_w);
 	}
-	
+
 	if(rect.y < 0) {
 		cut->height += rect.y;
-		cut->y = 0 - rect.y; 
+		cut->y = 0 - rect.y;
 	}
 	if(rect.y + rect.height > box_h) {
-		cut->height -= (rect.y + rect.height - box_h); 
+		cut->height -= (rect.y + rect.height - box_h);
 	}
 }
 
@@ -96,17 +97,17 @@ void LCUIRect_ValidateArea( LCUI_Rect *rect, int box_w, int box_h )
 		rect->height += rect->y;
 		rect->y = 0;
 	}
-	
+
 	if( rect->x + rect->width > box_w ) {
 		if( rect->x < box_w ) {
-			rect->width = box_w - rect->x; 
+			rect->width = box_w - rect->x;
 		} else {
 			rect->width = 0;
 		}
 	}
 	if( rect->y + rect->height > box_h ) {
 		if( rect->y < box_h ) {
-			rect->height = box_h - rect->y; 
+			rect->height = box_h - rect->y;
 		} else {
 			rect->height = 0;
 		}
@@ -137,15 +138,15 @@ LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect *rect1, LCUI_Rect *rect2 )
 	return TRUE;
 }
 
-/** 
+/**
  * 获取两个矩形中的重叠矩形
  * @param[in] a		矩形A
  * @param[in] b		矩形B
  * @param[out] out	矩形A和B重叠处的矩形
  * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
  */
-LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a, 
-				   const LCUI_Rect *b, 
+LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a,
+				   const LCUI_Rect *b,
 				   LCUI_Rect *out )
 {
 	if( a->x > b->x ) {
@@ -207,7 +208,7 @@ static void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b )
 	}
 }
 
-void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2, 
+void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 			   LCUI_Rect rects[4] )
 {
 	rects[0].x = rect2->x;
@@ -240,11 +241,11 @@ int RectList_Add( LinkedList *list, LCUI_Rect *rect )
 	if( rect->w <= 0 || rect->h <= 0 ) {
 		return -1;
 	}
-	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list, 
+	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list,
 		   list->length, rect->x, rect->y, rect->w, rect->h);
 	LinkedList_ForEach( node, list ) {
 		r = (LCUI_Rect*)node->data;
-		DEBUG_MSG("r(%d,%d,%d,%d)\n", 
+		DEBUG_MSG("r(%d,%d,%d,%d)\n",
 			r->x, r->y, r->w, r->h);
 		/* 如果被现有的矩形包含 */
 		if( LCUIRect_IsIncludeRect( r, rect ) ) {
@@ -268,7 +269,7 @@ int RectList_Add( LinkedList *list, LCUI_Rect *rect )
 		DEBUG_MSG("overlay rect(%d,%d,%d,%d)\n",or.x, or.y,
 			   or.w, or.h);
 		/* 如果两个矩形相距很近，则直接合并 */
-		if( (rect->w - or.w < 20 && rect->h - or.h < 20) || 
+		if( (rect->w - or.w < 20 && rect->h - or.h < 20) ||
 		    (r->w - or.w < 20 && r->h - or.h < 20) ) {
 			LCUIRect_MergeRect( &or, r, rect );
 			DEBUG_MSG("merge rect, rect(%d,%d,%d,%d)\n",
@@ -302,11 +303,11 @@ int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 	if( rect->w <= 0 || rect->h <= 0 ) {
 		return -1;
 	}
-	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list, 
+	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list,
 		   list->length, rect->x, rect->y, rect->w, rect->h);
 	LinkedList_ForEach( node, list ) {
 		p_rect = (LCUI_Rect*)node->data;
-		DEBUG_MSG("p_rect(%d,%d,%d,%d)\n", p_rect->x, 
+		DEBUG_MSG("p_rect(%d,%d,%d,%d)\n", p_rect->x,
 			   p_rect->y, p_rect->w, p_rect->h);
 		/* 如果包含现有的矩形 */
 		if( LCUIRect_IsIncludeRect( rect, p_rect ) ) {
@@ -332,9 +333,9 @@ int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 				}
 				LinkedList_Insert( list, 0, &tmp_rect[0] );
 			}
-			/* 
+			/*
 			 * 既然现有矩形包含了这个矩形，那么不用继续遍历了，
-			 * 因为不会有其它矩形会与这个矩形相交，直接退出即可。 
+			 * 因为不会有其它矩形会与这个矩形相交，直接退出即可。
 			 */
 			return 0;
 		}

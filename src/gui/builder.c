@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * builder.c -- the GUI build module, parse UI config code and build UI.
  *
- * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * builder.c -- 图形界面构建模块，主要用于解析界面配置代码并生成相应的图形界面
  *
- * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
@@ -112,7 +113,7 @@ static int ParseResource( XMLParserContext ctx, xmlNodePtr node )
 	}
 	if( strstr(type, "application/font-") ) {
 		LCUIFont_LoadFile( src );
-	} 
+	}
 	else if( strstr(type, "text/css") ) {
 		LCUICSS_LoadFile( src );
 		for( node = node->children; node; node = node->next ) {
@@ -152,7 +153,7 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		return PB_ERROR;
 	}
 	switch( node->type ) {
-	case XML_ELEMENT_NODE: 
+	case XML_ELEMENT_NODE:
 		w = LCUIWidget_New(NULL);
 		if( !w ) {
 			return PB_ERROR;
@@ -167,7 +168,7 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 			return PB_NEXT;
 		}
 		wc->methods.set_text( parent, (char*)node->content );
-		DEBUG_MSG("widget: %s, set text: %s\n", parent->type, 
+		DEBUG_MSG("widget: %s, set text: %s\n", parent->type,
 			  (char*)node->content);
 		return PB_NEXT;
 	default: return PB_ERROR;
@@ -241,7 +242,7 @@ static void ParseNode( XMLParserContext ctx, xmlNodePtr node )
 		}
 		cur_ctx = *ctx;
 		switch( p->parse(&cur_ctx, node) ) {
-		case PB_ENTER: 
+		case PB_ENTER:
 			cur_ctx.parent = p;
 			ParseNode( &cur_ctx, node->children );
 			break;

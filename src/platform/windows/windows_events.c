@@ -1,6 +1,7 @@
 ﻿
-#include <windows.h>
 #include <LCUI_Build.h>
+#ifdef LCUI_BUILD_IN_WIN32
+#include <windows.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
@@ -16,7 +17,7 @@ static struct WindowsDriver {
 	LCUI_EventTrigger trigger;
 } win;
 
-static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg, 
+static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 				 WPARAM arg1, LPARAM arg2 )
 {
 	WIN_SysEventRec win_event;
@@ -57,7 +58,7 @@ static void WIN_PumpEvents( void )
 	}
 }
 
-static int WIN_BindSysEvent( int event_id, LCUI_EventFunc func, 
+static int WIN_BindSysEvent( int event_id, LCUI_EventFunc func,
 			      void *data, void(*destroy_data)(void*) )
 {
 	return EventTrigger_Bind( win.trigger, event_id, func, data, destroy_data );
@@ -131,3 +132,5 @@ int LCUI_InitWinApp( LCUI_AppDriver app )
 	win.trigger = EventTrigger();
 	return 0;
 }
+
+#endif

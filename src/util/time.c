@@ -2,7 +2,7 @@
 #include <time.h>
 #include <stdint.h>
 #include <LCUI_Build.h>
-#include <LCUI/lib/time.h>
+#include <LCUI/util/time.h>
 
 #define TIME_WRAP_VALUE (~(int64_t)0)
 

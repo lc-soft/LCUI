@@ -39,7 +39,6 @@
 
 //#define DEBUG
 #include <LCUI_Build.h>
-
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/cursor.h>
@@ -119,7 +118,7 @@ void LCUI_InitCursor( void )
 	LCUI_Graph pic;
 	Graph_Init( &pic );
 	Graph_Init( &global_cursor.graph );
-	/* 载入自带的游标的图形数据 */ 
+	/* 载入自带的游标的图形数据 */
 	LCUICursor_LoadDefualtGraph( &pic );
 	LCUICursor_SetGraph( &pic );
 	global_cursor.pos.x = LCUIDisplay_GetWidth() / 2;

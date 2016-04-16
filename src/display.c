@@ -38,20 +38,18 @@
  * ****************************************************************************/
 
 //#define DEBUG
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
-#include <LCUI/display.h>
-#include <LCUI/platform.h>
 #include <LCUI/input.h>
 #include <LCUI/cursor.h>
 #include <LCUI/thread.h>
-
-#include <time.h>
-
-#ifdef LCUI_BUILD_IN_WIN32
-#include <Windows.h>
-#endif
+#include <LCUI/display.h>
+#include <LCUI/platform.h>
+#include LCUI_DISPLAY_H
 
 /** surface 记录 */
 typedef struct SurfaceRecord {
@@ -123,7 +121,7 @@ static void LCUIDisplay_Update(void)
 
 void LCUIDisplay_InvalidateArea(LCUI_Rect *rect )
 {
-	
+
 }
 
 LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
@@ -434,21 +432,6 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	}
 }
 
-static void Surface_OnEvent( LCUI_Surface surface, LCUI_SysEvent e )
-{
-#ifdef LCUI_BUILD_IN_WIN32
-	if( display.mode == LCDM_SEAMLESS ) {
-		return;
-	}
-	//DEBUG_MSG("surface: %p, event: %d, rel_x: %d, rel_y: %d\n", surface, e->type, e->rel_x, e->rel_y);
-	if( e->type == LCUI_MOUSEMOVE ) {
-		LCUIMouse_SetPos( e->rel_x, e->rel_y );
-		return;
-	}
-	LCUI_TriggerEvent( e, NULL );
-#endif
-}
-
 /** 在 surface 主动产生无效区域的时候 */
 static void Surface_OnInvalidRect( LCUI_Surface surface, LCUI_Rect *rect )
 {
@@ -586,12 +569,13 @@ int LCUI_InitDisplay( void )
 	if( display.is_working ) {
 		return -1;
 	}
+	printf("[display] init ...\n");
 	display.mode = 0;
-	display.is_working = TRUE;
 	root = LCUIWidget_GetRoot();
 	LCUIMutex_Init( &display.mutex );
 	LinkedList_Init( &display.surfaces );
 	if( LCUI_InitDisplayDriver( &display.driver ) != 0 ) {
+		printf("[display] init failed\n");
 		return -2;
 	}
 	display.fc_ctx = FrameControl_Create();
@@ -599,6 +583,8 @@ int LCUI_InitDisplay( void )
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	LCUIDisplay_SetMode( LCDM_DEFAULT );
+	display.is_working = TRUE;
+	printf("[display] init ok.\n");
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
 }
 

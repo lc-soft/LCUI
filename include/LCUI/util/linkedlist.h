@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LINKED_LIST_H__
-#define __LINKED_LIST_H__
+#ifndef __LCUI_UTIL_LINKEDLIST_H__
+#define __LCUI_UTIL_LINKEDLIST_H__
 
 LCUI_BEGIN_HEADER
 

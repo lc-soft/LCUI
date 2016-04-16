@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * rbtree.h -- Red Black Trees
  *
- * Copyright (C) 2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2014-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,9 +20,9 @@
  * ***************************************************************************/
 
 /* ****************************************************************************
- * rbtree.h -- 红黑树
+ * rbtree.h-- 红黑树
  *
- * 版权所有 (C) 2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2014-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
-#ifndef __RBTREE_H__
-#define __RBTREE_H__
+#ifndef __LCUI_UTIL_RBTREE_H__
+#define __LCUI_UTIL_RBTREE_H__
 
 LCUI_BEGIN_HEADER
 

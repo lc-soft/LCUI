@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * css_parser.c -- css parser module
  *
- * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * css_parser.c -- css 样式解析模块
  *
- * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,6 +37,9 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 //#define DEBUG
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>

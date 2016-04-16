@@ -1,43 +1,43 @@
 ﻿/* ***************************************************************************
-* rbtree.c -- Red Black Trees
- * 
- * Copyright (C) 2014 by Liu Chao <lc-soft@live.cn>
- * 
+ * rbtree.c -- Red Black Trees
+ *
+ * Copyright (C) 2014-2016 by Liu Chao <lc-soft@live.cn>
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ***************************************************************************/
- 
+
 /* ****************************************************************************
-* rbtree.c -- 红黑树
+ * rbtree.c -- 红黑树
  *
- * 版权所有 (C) 2014 归属于 刘超 <lc-soft@live.cn>
- * 
+ * 版权所有 (C) 2014-2016 归属于 刘超 <lc-soft@live.cn>
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
-/** 
+/**
  * 目前红黑树只适合记录引用数据，在销毁红黑树时，只会释放结点内存，不会释放
  * 结点中记录的数据的内存。
  */
@@ -46,7 +46,7 @@
 #include <stdlib.h>
 
 #include <LCUI_Build.h>
-#include <LCUI/lib/rbtree.h>
+#include <LCUI/util/rbtree.h>
 
 #define RED     0
 #define BLACK   1
@@ -109,13 +109,13 @@ LCUI_RBTreeNode *RBTree_First( const LCUI_RBTree *rbt )
 /** 获取下一个结点 */
 LCUI_RBTreeNode *RBTree_Next( const LCUI_RBTreeNode *node )
 {
-        LCUI_RBTreeNode *parent;  
+        LCUI_RBTreeNode *parent;
 
         if( node->parent == node ) {
-                return NULL;  
+                return NULL;
         }
         if( node->right ) {
-                node = node->right;   
+                node = node->right;
                 while( node->left ) {
                         node = node->left;
                 }
@@ -124,19 +124,19 @@ LCUI_RBTreeNode *RBTree_Next( const LCUI_RBTreeNode *node )
         while ((parent = node->parent) && node == parent->right ) {
                 node = parent;
         }
-        return parent;  
+        return parent;
 }
 
 /**
  * 树的左旋
  *
- *      node              right 
+ *      node              right
  *      / \       ==>     /  \
  *     a  right         node  y
- *    / \              / \        
+ *    / \              / \
  *   b   y            a   b
  */
-static LCUI_RBTreeNode* 
+static LCUI_RBTreeNode*
 rb_rotate_left( LCUI_RBTreeNode* node, LCUI_RBTreeNode* root )
 {
         LCUI_RBTreeNode* right = node->right;
@@ -161,15 +161,15 @@ rb_rotate_left( LCUI_RBTreeNode* node, LCUI_RBTreeNode* root )
 }
 
 /**
- * 树的右旋  
+ * 树的右旋
  *
  *        node           left
  *        /  \           /  \
- *      left  y   ==>   a   node 
+ *      left  y   ==>   a   node
  *      / \            / \
- *     a   b          b   y 
+ *     a   b          b   y
  */
-static LCUI_RBTreeNode* 
+static LCUI_RBTreeNode*
 rb_rotate_right( LCUI_RBTreeNode* node, LCUI_RBTreeNode* root )
 {
         LCUI_RBTreeNode* left = node->left;
@@ -193,20 +193,20 @@ rb_rotate_right( LCUI_RBTreeNode* node, LCUI_RBTreeNode* root )
         return root;
 }
 
-static LCUI_RBTreeNode* 
+static LCUI_RBTreeNode*
 rb_insert_rebalance( LCUI_RBTreeNode *root, LCUI_RBTreeNode *node )
 {
         LCUI_RBTreeNode *parent, *gparent, *uncle, *tmp;
 
         while ((parent = node->parent) && parent->color == RED) {
                 gparent = parent->parent;
-                
+
                 if (parent == gparent->left) {
                         uncle = gparent->right;
                         if (uncle && uncle->color == RED) {
                                 uncle->color = BLACK;
                                 parent->color = BLACK;
-                                gparent->color = RED; 
+                                gparent->color = RED;
                                 node = gparent;
                         } else {
                                 if (parent->right == node) {
@@ -245,7 +245,7 @@ rb_insert_rebalance( LCUI_RBTreeNode *root, LCUI_RBTreeNode *node )
 }
 
 /** 红黑树查找结点 */
-static LCUI_RBTreeNode* 
+static LCUI_RBTreeNode*
 rb_search_auxiliary( LCUI_RBTreeNode *root, int key, const void *keydata,
 		int (*judge)(void*,const void*), LCUI_RBTreeNode **save )
 {
@@ -274,7 +274,7 @@ rb_search_auxiliary( LCUI_RBTreeNode *root, int key, const void *keydata,
                         return node;
                 }
         }
-        if( save ) { 
+        if( save ) {
                 *save = parent;
         }
         return NULL;
@@ -314,7 +314,7 @@ static LCUI_RBTreeNode*
 rb_insert( LCUI_RBTree *rbt, int key, const void *keydata, void *data )
 {
         LCUI_RBTreeNode *root, *node, *parent_node;
-        
+
         parent_node = NULL;
         root = rbt->root;
 	node = rb_search_auxiliary( root, key, keydata, rbt->judge, &parent_node );
@@ -374,12 +374,12 @@ rb_erase_rebalance( LCUI_RBTreeNode *node, LCUI_RBTreeNode *parent,
                 if (parent->left == node) {
                         other = parent->right;
                         if (other->color == RED) {
-                                other->color = BLACK; 
+                                other->color = BLACK;
                                 parent->color = RED;
                                 root = rb_rotate_left(parent, root);
                                 other = parent->right;
                         }
-                        if ((!other->left || other->left->color == BLACK) 
+                        if ((!other->left || other->left->color == BLACK)
                          && (!other->right || other->right->color == BLACK)) {
                                 other->color = RED;
                                 node = parent;
@@ -389,7 +389,7 @@ rb_erase_rebalance( LCUI_RBTreeNode *node, LCUI_RBTreeNode *parent,
                         if (!other->right || other->right->color == BLACK) {
                                 if ((o_left = other->left)) {
                                         o_left->color = BLACK;
-                                } 
+                                }
                                 other->color = RED;
                                 root = rb_rotate_right(other, root);
                                 other = parent->right;
@@ -444,10 +444,10 @@ rb_erase_rebalance( LCUI_RBTreeNode *node, LCUI_RBTreeNode *parent,
 }
 
 /** 删除红黑树中的结点 */
-static int rb_erase( LCUI_RBTree *rbt, int key, const void *keydata )  
+static int rb_erase( LCUI_RBTree *rbt, int key, const void *keydata )
 {
         unsigned char color;
-        LCUI_RBTreeNode *root, *child = NULL, *parent, *old, *left, *node; 
+        LCUI_RBTreeNode *root, *child = NULL, *parent, *old, *left, *node;
 
         root = rbt->root;
         /* 查找要删除的结点 */
@@ -464,7 +464,7 @@ static int rb_erase( LCUI_RBTree *rbt, int key, const void *keydata )
                 child = node->right;
                 parent = node->parent;
                 color = node->color;
-                
+
                 if (child) {
                         child->parent = parent;
                 }
@@ -477,16 +477,16 @@ static int rb_erase( LCUI_RBTree *rbt, int key, const void *keydata )
                 } else {
                         root = child;
                 }
-                
+
                 if (node->parent == old) {
                         parent = node;
                 }
-                
+
                 node->parent = old->parent;
                 node->color = old->color;
                 node->right = old->right;
                 node->left = old->left;
-                
+
                 if (old->parent) {
                         if (old->parent->left == old) {
                                 old->parent->left = node;
@@ -496,7 +496,7 @@ static int rb_erase( LCUI_RBTree *rbt, int key, const void *keydata )
                 } else {
                         root = node;
                 }
-                
+
                 old->left->parent = node;
                 if (old->right) {
                         old->right->parent = node;
@@ -509,7 +509,7 @@ static int rb_erase( LCUI_RBTree *rbt, int key, const void *keydata )
                 }
                 parent = node->parent;
                 color = node->color;
-                
+
                 if (child) {
                         child->parent = parent;
                 }
@@ -540,7 +540,7 @@ static int rb_erase( LCUI_RBTree *rbt, int key, const void *keydata )
         return 0;
 }
 
-int RBTree_Erase( LCUI_RBTree *rbt, int key )  
+int RBTree_Erase( LCUI_RBTree *rbt, int key )
 {
 	return rb_erase( rbt, key, NULL );
 }

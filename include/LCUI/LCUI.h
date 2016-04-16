@@ -306,7 +306,7 @@ typedef void (*FuncPtr)(void *);
 
 LCUI_END_HEADER
 
-#include <LCUI/lib.h>
+#include <LCUI/util.h>
 #include <LCUI/main.h>
 
 #endif /* __LCUI_H__ */

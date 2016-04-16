@@ -37,6 +37,8 @@
 * 没有，请查看：<http://www.gnu.org/licenses/>.
 * ****************************************************************************/
 
+#include <string.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
@@ -269,7 +271,7 @@ void ScrollBar_BindLayer( LCUI_Widget w, LCUI_Widget layer )
 {
 	LCUI_ScrollBar scrollbar = w->private_data;
 	if( scrollbar->layer ) {
-		Widget_UnbindEvent( scrollbar->layer, "resize", 
+		Widget_UnbindEvent( scrollbar->layer, "resize",
 				    ScrollBar_OnUpdateSize );
 	}
 	scrollbar->layer = layer;

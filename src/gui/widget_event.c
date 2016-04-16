@@ -1,42 +1,44 @@
 /* ***************************************************************************
  * widget_event.c -- LCUI widget event module.
- * 
- * Copyright (C) 2012-2015 by Liu Chao <lc-soft@live.cn>
- * 
+ *
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
- * 
+ *
  * (GPLv2 is abbreviation of GNU General Public License Version 2)
- * 
+ *
  * By continuing to use, modify, or distribute this file you indicate that you
  * have read the license and understand and accept it fully.
- *  
- * The LCUI project is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
- * 
- * You should have received a copy of the GPLv2 along with this file. It is 
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
  * ***************************************************************************/
- 
+
 /* ****************************************************************************
  * widget_event.c -- LCUI部件事件模块
  *
- * 版权所有 (C) 2012-2015 归属于 刘超 <lc-soft@live.cn>
- * 
+ * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
  * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
- * 
+ *
  * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
- * 
+ *
  * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
  * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
- * 没有，请查看：<http://www.gnu.org/licenses/>. 
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 //#define DEBUG
+#include <stdlib.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
@@ -57,13 +59,13 @@ typedef struct LCUI_WidgetEventPackRec_ {
 	LCUI_BOOL is_direct_run;	/**< 是否直接处理该事件 */
 } LCUI_WidgetEventPackRec, *LCUI_WidgetEventPack;
 
-enum WidgetStatusType { 
+enum WidgetStatusType {
 	WST_HOVER,
 	WST_ACTIVE,
 	WST_TOTAL
 };
 
-static struct LCUIWidgetEvnetModule { 
+static struct LCUIWidgetEvnetModule {
 	LCUI_Widget targets[WST_TOTAL];		/**< 相关的部件 */
 	LCUI_RBTree event_names;		/**< 事件标识号 -> 名称映射表 */
 	Dict *event_ids;			/**< 事件名称 -> 标识号映射表 */
@@ -162,7 +164,7 @@ int LCUIWidget_GetEventId( const char *event_name )
 }
 
 int Widget_BindEventById( LCUI_Widget widget, int event_id,
-			  LCUI_WidgetEventFunc func, void *data, 
+			  LCUI_WidgetEventFunc func, void *data,
 			  void (*destroy_data)(void*) )
 {
 	WidgetEventHandler handler;
@@ -171,12 +173,12 @@ int Widget_BindEventById( LCUI_Widget widget, int event_id,
 	handler->data = data;
 	handler->destroy_data = destroy_data;
 	DEBUG_MSG("event: %s, task: %p\n", event_name, task);
-	return EventTrigger_Bind( widget->trigger, event_id, OnWidgetEvent, 
+	return EventTrigger_Bind( widget->trigger, event_id, OnWidgetEvent,
 				  handler, DestroyWidgetEventHandler);
 }
 
 int Widget_BindEvent( LCUI_Widget widget, const char *event_name,
-		      LCUI_WidgetEventFunc func, void *data, 
+		      LCUI_WidgetEventFunc func, void *data,
 		      void (*destroy_data)(void*) )
 {
 	int id = LCUIWidget_GetEventId( event_name );
@@ -198,7 +200,7 @@ static int CompareEventHandlerKey( void *key, void *func_data )
 int Widget_UnbindEventById( LCUI_Widget widget, int event_id,
 			    LCUI_WidgetEventFunc func )
 {
-	return EventTrigger_Unbind3( widget->trigger, event_id, 
+	return EventTrigger_Unbind3( widget->trigger, event_id,
 				     CompareEventHandlerKey, func );
 }
 
@@ -234,7 +236,7 @@ static LCUI_Widget Widget_GetNextAt( LCUI_Widget widget, int x, int y )
 	return NULL;
 }
 
-static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e, 
+static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 				  void *data, void (*destroy_data)(void*),
 				  LCUI_BOOL direct_run )
 {
@@ -263,7 +265,7 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 				return -1;
 			}
 			/* 如果事件投递失败，则向父级部件冒泡 */
-			return Widget_PostEvent( widget->parent, e, 
+			return Widget_PostEvent( widget->parent, e,
 						 data, destroy_data );
 		}
 	}
@@ -285,7 +287,7 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 	return EventTrigger_Trigger( widget->trigger, e->type, &pack );
 }
 
-int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data, 
+int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data,
 		      void (*destroy_data)(void*))
 {
 	return Widget_TriggerEventEx( widget, e, data, destroy_data, FALSE );

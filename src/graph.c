@@ -37,6 +37,9 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -1103,7 +1106,7 @@ int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha )
 	return 0;
 }
 
-int Graph_Tile( LCUI_Graph *buff, const LCUI_Graph *graph, 
+int Graph_Tile( LCUI_Graph *buff, const LCUI_Graph *graph,
 		LCUI_BOOL replace, LCUI_BOOL with_alpha )
 {
 	int ret = 0, x, y;
@@ -1124,7 +1127,7 @@ int Graph_Tile( LCUI_Graph *buff, const LCUI_Graph *graph,
 
 typedef void(*MixerPtr)(LCUI_Graph*, LCUI_Rect, const LCUI_Graph *, int, int);
 
-int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore, 
+int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore,
 	       int left, int top, LCUI_BOOL with_alpha )
 {
 	LCUI_Graph w_slot;

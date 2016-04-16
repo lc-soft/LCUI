@@ -37,6 +37,9 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>

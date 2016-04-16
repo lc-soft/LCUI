@@ -1,9 +1,9 @@
-#define DEBUG
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
-
-#include <math.h>
 
 static const double PI = 3.141592653;
 

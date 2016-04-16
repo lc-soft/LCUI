@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * in_core_font.c -- basic in-core font-engine.
  *
- * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,23 +20,25 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * in_core_font.c -- »ù´¡µÄÄÚÖÃ×ÖÌåÒýÇæ£¬¿ÉÓÃÓÚ´Ó³ÌÐòÄÚ²¿ÔØÈë×ÖÌåÎ»Í¼
+ * in_core_font.c -- åŸºç¡€çš„å†…ç½®å­—ä½“å¼•æ“Žï¼Œå¯ç”¨äºŽä»Žç¨‹åºå†…éƒ¨è½½å…¥å­—ä½“ä½å›¾
  *
- * °æÈ¨ËùÓÐ (C) 2015 ¹éÊôÓÚ Áõ³¬ <lc-soft@live.cn>
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2015-2016 å½’å±žäºŽ åˆ˜è¶… <lc-soft@live.cn>
  *
- * Õâ¸öÎÄ¼þÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾ÝGPLv2Ðí¿ÉÐ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ðí¿ÉÖ¤µÚ¶þ°æ µÄÓ¢ÎÄËõÐ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  *
- * ¼ÌÐøÊ¹ÓÃ¡¢ÐÞ¸Ä»ò·¢²¼±¾ÎÄ¼þ£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öÐí¿ÉÐ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜Žæ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’ŒæŽ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  *
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔðÈÎ£¬ÉõÖÁÃ»ÓÐÊÊÏúÐÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒþº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ðí¿ÉÐ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºŽä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼þµÄGPLv2Ðí¿ÉÐ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼þÖÐ£¬Èç¹û
- * Ã»ÓÐ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>.
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºŽæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æžœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <string.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
@@ -68,7 +70,7 @@ static void InCoreFont_Close( void *face )
 	free(face);
 }
 
-static int InCoreFont_Render( LCUI_FontBitmap *bmp, wchar_t ch, 
+static int InCoreFont_Render( LCUI_FontBitmap *bmp, wchar_t ch,
 			      int pixel_size, LCUI_Font *font )
 {
 	int *code = (int*)font->data;
@@ -84,10 +86,10 @@ int LCUIFont_InitInCoreFont( LCUI_FontEngine *engine )
 {
 	int *code;
 	LCUI_Font *font;
-	
+
 	strcpy( engine->name, "in-core" );
 	font = (LCUI_Font*)malloc(sizeof(LCUI_Font));
-	/* ÏÈÌí¼Ó LCUI ÄÚÖÃ×ÖÌåµÄÐÅÏ¢ */
+	/* å…ˆæ·»åŠ  LCUI å†…ç½®å­—ä½“çš„ä¿¡æ¯ */
 	font->style_name = strdup("regular");
 	font->family_name = strdup("inconsolata");
 	code = (int*)malloc(sizeof(int));

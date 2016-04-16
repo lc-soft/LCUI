@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * jpeg.c -- LCUI JPEG image file processing module.
  * 
- * Copyright (C) 2012-2014 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * jpeg.c -- LCUI的JPEG图像文件读写支持模块。
  *
- * 版权所有 (C) 2012-2014 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,6 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>

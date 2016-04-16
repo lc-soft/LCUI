@@ -37,6 +37,9 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 //#define DEBUG
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
@@ -215,7 +218,7 @@ static int OnParseLineHeight( LCUI_StyleSheet ss, int key, const char *str )
 	return -1;
 }
 
-static LCUI_StyleParserRec style_parsers[] = { 
+static LCUI_StyleParserRec style_parsers[] = {
 	{ key_color, "color", OnParseColor },
 	{ key_font_family, "font-family", OnParseFontFamily },
 	{ key_font_size, "font-size", OnParseFontSize },
@@ -284,7 +287,7 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LinkedListNode *node;
 	LCUI_Size new_size = {16, 16};
 	LCUI_TextView *txt = w->private_data;
-	
+
 	DEBUG_MSG("on resize\n");
 	if( w->width > new_size.w ) {
 		new_size.w = w->width;
@@ -458,7 +461,7 @@ void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style val )
 	Widget_AddTask( w, WTT_USER );
 }
 
-void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style ) 
+void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 {
 	LCUI_TextView *txt = w->private_data;
 	TextLayer_SetTextStyle( txt->layer, style );
@@ -495,7 +498,7 @@ void LCUIWidget_AddTextView( void )
 	wc->methods.set_text = TextView_OnParseText;
 	wc->task_handler = TextView_OnTask;
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
-		style_key_map[style_parsers[i].key] = 
+		style_key_map[style_parsers[i].key] =
 		LCUICSS_AddParser( &style_parsers[i] );
 	}
 	LCUICSS_LoadString( textview_css );
