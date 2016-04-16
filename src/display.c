@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * display.c -- graphical display processing.
+ * display.c -- graphical display control
  *
  * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  *
@@ -20,7 +20,7 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * display.c -- 图形显示处理。
+ * display.c -- 图形显示控制
  *
  * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
  *
@@ -69,7 +69,7 @@ static struct DisplayContext {
 	LinkedList surfaces;		/**< surface 列表 */
 	LCUI_Mutex mutex;
 	LCUI_DisplayDriverRec driver;
-} display = { LDM_DEFAULT, FALSE, FALSE, NULL };
+} display = { LCDM_DEFAULT, FALSE, FALSE, NULL };
 
 /** 获取当前的屏幕内容每秒更新的帧数 */
 int LCUIDisplay_GetFPS(void)
@@ -154,7 +154,7 @@ LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
 
 LCUI_Surface LCUIDisplay_GetSurfaceOwner( LCUI_Widget w )
 {
-	if( LCUIDisplay_GetMode() == LDM_SEAMLESS ) {
+	if( LCUIDisplay_GetMode() == LCDM_SEAMLESS ) {
 		while( w->parent ) {
 			w = w->parent;
 		}
@@ -227,10 +227,10 @@ static int LCUIDisplay_Windowed( void )
 {
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	switch( display.mode ) {
-	case LDM_FULLSCREEN:
-	case LDM_WINDOWED:
+	case LCDM_FULLSCREEN:
+	case LCDM_WINDOWED:
 		return 0;
-	case LDM_SEAMLESS:
+	case LCDM_SEAMLESS:
 	default:
 		LCUIDisplay_CleanSurfaces();
 		LCUIDisplay_BindSurface( root );
@@ -238,7 +238,7 @@ static int LCUIDisplay_Windowed( void )
 	}
 	Widget_Show( root );
 	Widget_Resize( root, LCUIDisplay_GetWidth(), LCUIDisplay_GetHeight() );
-	display.mode = LDM_WINDOWED;
+	display.mode = LCDM_WINDOWED;
 	return 0;
 }
 
@@ -246,15 +246,15 @@ static int LCUIDisplay_FullScreen( void )
 {
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	switch( display.mode ) {
-	case LDM_SEAMLESS:
+	case LCDM_SEAMLESS:
 		LCUIDisplay_CleanSurfaces();
 		LCUIDisplay_BindSurface(root );
-	case LDM_WINDOWED:
+	case LCDM_WINDOWED:
 	default: break;
-	case LDM_FULLSCREEN:
+	case LCDM_FULLSCREEN:
 		return 0;
 	}
-	display.mode = LDM_FULLSCREEN;
+	display.mode = LCDM_FULLSCREEN;
 	LCUIDisplay_SetSize( LCUIDisplay_GetWidth(), LCUIDisplay_GetHeight() );
 	return 0;
 }
@@ -265,10 +265,10 @@ static int LCUIDisplay_Seamless( void )
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	DEBUG_MSG("display.mode: %d\n", display.mode);
 	switch( display.mode ) {
-	case LDM_SEAMLESS:
+	case LCDM_SEAMLESS:
 		return 0;
-	case LDM_FULLSCREEN:
-	case LDM_WINDOWED:
+	case LCDM_FULLSCREEN:
+	case LCDM_WINDOWED:
 	default:
 		LCUIDisplay_CleanSurfaces();
 		break;
@@ -276,7 +276,7 @@ static int LCUIDisplay_Seamless( void )
 	LinkedList_ForEach( node, &root->children ) {
 		LCUIDisplay_BindSurface( node->data );
 	}
-	display.mode = LDM_SEAMLESS;
+	display.mode = LCDM_SEAMLESS;
 	return 0;
 }
 
@@ -287,13 +287,13 @@ int LCUIDisplay_SetMode( int mode )
 	DEBUG_MSG("mode: %d\n", mode);
 	LCUIMutex_Lock( &display.mutex );
 	switch( mode ) {
-	case LDM_WINDOWED:
+	case LCDM_WINDOWED:
 		ret = LCUIDisplay_Windowed();
 		break;
-	case LDM_SEAMLESS:
+	case LCDM_SEAMLESS:
 		ret = LCUIDisplay_Seamless();
 		break;
-	case LDM_FULLSCREEN:
+	case LCDM_FULLSCREEN:
 	default:
 		ret = LCUIDisplay_FullScreen();
 		break;
@@ -327,7 +327,7 @@ void LCUIDisplay_ExecResize( int width, int height )
 void LCUIDisplay_SetSize( int width, int height )
 {
 	LCUI_Widget root;
-	if( display.mode == LDM_SEAMLESS ) {
+	if( display.mode == LCDM_SEAMLESS ) {
 		return;
 	}
 	root = LCUIWidget_GetRoot();
@@ -337,13 +337,27 @@ void LCUIDisplay_SetSize( int width, int height )
 /** 获取屏幕宽度 */
 int LCUIDisplay_GetWidth( void )
 {
-	return display.is_working ? display.driver.getWidth() : 0;
+	if( !display.is_working ) {
+		return 0;
+	}
+	if( display.mode == LCDM_WINDOWED ||
+	    display.mode == LCDM_FULLSCREEN ) {
+		return LCUIWidget_GetRoot()->width;
+	}
+	return display.driver.getWidth();
 }
 
 /** 获取屏幕高度 */
 int LCUIDisplay_GetHeight( void )
 {
-	return display.is_working ? display.driver.getHeight() : 0;
+	if( !display.is_working ) {
+		return 0;
+	}
+	if( display.mode == LCDM_WINDOWED ||
+	    display.mode == LCDM_FULLSCREEN ) {
+		return LCUIWidget_GetRoot()->height;
+	}
+	return display.driver.getHeight();
 }
 
 /** LCUI的图形显示处理线程 */
@@ -370,7 +384,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	DEBUG_MSG("tip, widget: %s, e_type = %d\n", w->type, e_type);
 	surface = LCUIDisplay_GetBindSurface( e->target );
-	if( display.mode == LDM_SEAMLESS ) {
+	if( display.mode == LCDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
 			return;
 		}
@@ -404,7 +418,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		DEBUG_MSG( "resize, w: %d, h: %d\n", p_rect->w, p_rect->h );
 		Surface_Resize( surface, p_rect->w, p_rect->h );
 		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
-		if( w == root && display.mode != LDM_SEAMLESS ) {
+		if( w == root && display.mode != LCDM_SEAMLESS ) {
 			LCUIDisplay_ExecResize( p_rect->w, p_rect->h );
 		}
 		break;
@@ -423,7 +437,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 static void Surface_OnEvent( LCUI_Surface surface, LCUI_SysEvent e )
 {
 #ifdef LCUI_BUILD_IN_WIN32
-	if( display.mode == LDM_SEAMLESS ) {
+	if( display.mode == LCDM_SEAMLESS ) {
 		return;
 	}
 	//DEBUG_MSG("surface: %p, event: %d, rel_x: %d, rel_y: %d\n", surface, e->type, e->rel_x, e->rel_y);
@@ -518,16 +532,15 @@ void *Surface_GetHandle( LCUI_Surface surface )
 /** 设置 Surface 的渲染模式 */
 void Surface_SetRenderMode( LCUI_Surface surface, int mode )
 {
-	if( !display.is_working ) {
-		return;
+	if( display.is_working ) {
+		display.driver.setRenderMode( surface, mode );
 	}
-	display.driver.setRenderMode( surface, mode );
 }
 
 /** 更新 surface，应用缓存的变更 */
 void Surface_Update( LCUI_Surface surface )
 {
-	if( !display.is_working ) {
+	if( display.is_working ) {
 		display.driver.update( surface );
 	}
 }
@@ -573,9 +586,9 @@ int LCUI_InitDisplay( void )
 	if( display.is_working ) {
 		return -1;
 	}
-	root = LCUIWidget_GetRoot();
+	display.mode = 0;
 	display.is_working = TRUE;
-	display.mode = LDM_DEFAULT;
+	root = LCUIWidget_GetRoot();
 	LCUIMutex_Init( &display.mutex );
 	LinkedList_Init( &display.surfaces );
 	if( LCUI_InitDisplayDriver( &display.driver ) != 0 ) {
@@ -585,6 +598,7 @@ int LCUI_InitDisplay( void )
 	display.driver.onInvalidRect( Surface_OnInvalidRect );
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
+	LCUIDisplay_SetMode( LCDM_DEFAULT );
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
 }
 

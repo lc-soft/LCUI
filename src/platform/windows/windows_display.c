@@ -391,7 +391,7 @@ static void WinSurface_OnWMPaint( LCUI_Event e, void *arg )
 	area.height = ps.rcPaint.bottom - area.y;
 	EndPaint( sys_event->hwnd, &ps );
 	surface = GetSurfaceByHWND( sys_event->hwnd );
-	DEBUG_MSG( "surface: %p, msg: %d\n", surface, msg );
+	DEBUG_MSG( "surface: %p\n", surface );
 	if( win.on_invalid_rect ) {
 		win.on_invalid_rect( surface, &area );
 	}

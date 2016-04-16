@@ -7,9 +7,9 @@
 
 static void OnMouseMessage( LCUI_Event ev, void *arg )
 {
-	static POINT mouse_pos;
 	LCUI_SysEventRec sys_ev;
 	WIN_SysEvent win_ev = arg;
+	static POINT mouse_pos = {0, 0};
 	sys_ev.type = LCUI_NONE;
 	switch( win_ev->msg ) {
 	case WM_MOUSEMOVE: {
@@ -18,6 +18,8 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 		ScreenToClient( win_ev->hwnd, &new_pos );
 		sys_ev.rel_x = new_pos.x - mouse_pos.x;
 		sys_ev.rel_y = new_pos.y - mouse_pos.y;
+		mouse_pos.x = new_pos.x;
+		mouse_pos.y = new_pos.y;
 		sys_ev.type = LCUI_MOUSEMOVE;
 		break;
 	}

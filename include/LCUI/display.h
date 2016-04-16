@@ -47,12 +47,12 @@ LCUI_BEGIN_HEADER
 
 /** 图形显示模式 */
 enum LCUIDisplayMode {
-	LDM_WINDOWED,		/**< 窗口化 */
-	LDM_SEAMLESS,		/**< 与系统GUI无缝结合 */
-	LDM_FULLSCREEN		/**< 全屏模式 */
+	LCDM_WINDOWED = 1,	/**< 窗口化 */
+	LCDM_SEAMLESS,		/**< 与系统GUI无缝结合 */
+	LCDM_FULLSCREEN		/**< 全屏模式 */
 };
 
-#define LDM_DEFAULT LDM_SEAMLESS
+#define LCDM_DEFAULT LCDM_WINDOWED
 
 /** surface 的操作方法集 */
 typedef struct LCUI_DisplayDriverRec_ {

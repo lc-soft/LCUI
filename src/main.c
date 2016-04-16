@@ -459,17 +459,9 @@ int LCUI_Init(void)
 	LCUI_InitTimer();
 	LCUI_InitMouseDriver();
 	LCUI_InitKeyboardDriver();
-	LCUI_InitCursor();
 	LCUI_InitWidget();
 	LCUI_InitDisplay();
-	{
-		LCUI_Pos pos;
-		pos.x = LCUIDisplay_GetWidth()/2;
-		pos.y = LCUIDisplay_GetHeight()/2;
-		/* 让鼠标游标居中显示 */
-		LCUICursor_SetPos( pos );
-		LCUICursor_Show();
-	}
+	LCUI_InitCursor();
 	return 0;
 }
 

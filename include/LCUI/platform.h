@@ -7,9 +7,9 @@
 #define LCUI_PreInitApp LCUI_PreInitWinApp
 #define LCUI_InitDisplayDriver LCUI_InitWinDisplay
 #define LCUI_ExitDisplayDriver LCUI_ExitWinDisplay
-#define LCUI_InitMouseDriver LCUI_ExitWinMouse
+#define LCUI_InitMouseDriver LCUI_InitWinMouse
 #define LCUI_ExitMouseDriver LCUI_ExitWinMouse
-#define LCUI_InitKeyboardDriver LCUI_ExitWinKeyboard
+#define LCUI_InitKeyboardDriver LCUI_InitWinKeyboard
 #define LCUI_ExitKeyboardDriver LCUI_ExitWinKeyboard
 #define LCUI_EVENTS_H	<LCUI/platform/windows/windows_events.h>
 #define LCUI_MOUSE_H	<LCUI/platform/windows/windows_mouse.h>
