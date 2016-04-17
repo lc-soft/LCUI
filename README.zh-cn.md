@@ -35,24 +35,24 @@ LCUI 的相关信息与资料可以在项目主页中找到，如果遇到问题
 以下是各个目录内容的相关说明：
 ```
 
-/                项目文件目录
-/bin/            在编译生成后库文件的存放目录
-/build/          参与项目编译、构建和生成的相关文件
-/build/VS2010/   VisualStudio 2010 工程文件
-/build/VS2012/   VisualStudio 2012 工程文件
-/docs/           相关文档
-/include/        头文件
-/src/            源代码
-/src/gui/        图形界面
-/src/gui/widget/ 预置的图形界面组件
-/src/font/       文字和字体
-/src/draw/       图形绘制
-/src/bmp/        位图文件读写
-/src/input/      输入处理，例如：响应键盘和鼠标的输入
-/src/output/     输出处理，例如：输出图形至屏幕
-/src/thread/     各平台下的线程操作接口的封装
-/src/misc/       其它未分类的模块
-/test/           测试（示例）程序
+/                        项目文件目录
+/bin/                    在编译生成后库文件的存放目录
+/build/                  参与项目编译、构建和生成的相关文件
+/build/VS2012/           VisualStudio 2012 工程文件
+/docs/                   相关文档
+/include/                头文件
+/src/                    源文件
+/src/gui/                图形界面
+/src/gui/widget/         预置的图形界面组件
+/src/font/               文字和字体
+/src/draw/               图形绘制
+/src/bmp/                位图文件读写
+/src/thread/             各平台下的线程操作接口的封装
+/src/util/               一些常用工具集
+/src/platform/           平台相关支持
+/src/platform/windows    windows 平台支持
+/src/platform/linux    	 linux 平台支持
+/test/                   测试（示例）程序
 
 ```
 
