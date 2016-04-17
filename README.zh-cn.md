@@ -7,7 +7,7 @@
 
 ## 说明
 
-LCUI 是一个简单的跨平台图形界面库，适用于开发一些简单的小程序，其诞生目的主要是方便作者开发GUI程序。
+LCUI 是一个简单的跨平台图形界面库，适用于开发一些简单的小程序，其诞生目的主要是方便作者开发图形界面程序。
 
 LCUI 是一个自由软件项目，基于 GNU通用公共许可协议 发布，该许可协议要求 LCUI 及 LCUI 衍生软件无论以何种形式发布，都必须确保收受者能收到或得到源码。
 
@@ -70,7 +70,6 @@ LCUI 的相关信息与资料可以在项目主页中找到，如果遇到问题
 
 	git clone https://github.com/lc-soft/LCUI.git
 	cd LCUI
-	git submodule update --init
 	./configure
 
 如果未找到 ./configure，请运行 ./autogen.sh 脚本生成它。
@@ -86,33 +85,32 @@ LCUI 的相关信息与资料可以在项目主页中找到，如果遇到问题
 
 windows系统上构建本项目方法，有两种：
 
-1. 使用 Visual Studio 2010 或更高版本，你只需要使用它打开 `build/VisualStudio/` 目录下的
- `LCUI.sln` 文件，然后生成解决方案即可，生成成功后，在 `bin/` 目录下可找到库文件。
-2. 使用Cygwin或MSYS，可按照上述1至6的步骤进行构建，在完成步骤3后，请修改include/LCUI/
-目录下的 `config.h` 文件，定义 `LCUI_BUILD_IN_WIN32` 宏，若有 `LCUI_BUILD_IN_LINUX` 宏，
-请删除它。该方法并未实际测试，如有其它方法请告知。
+1. 使用 Visual Studio 2012 或更高版本，你只需要使用它打开 `build/VS2012/` 目录下的
+   `LCUI.sln` 文件，然后生成解决方案即可，生成成功后，在 `bin/` 目录下可找到库文件。
+2. 使用 Cygwin 或 MSYS，可按照上述1至6的步骤进行构建，在完成步骤3后，请修改
+   `include/LCUI/config.h` 文件，定义 `LCUI_BUILD_IN_WIN32` 宏，若有 
+   `LCUI_BUILD_IN_LINUX` 宏，请删除它。该方法并未实际测试，如有其它方法请告知。
 
 ### 系统需求
 
-* 字体处理： freetype2
-* 触屏支持： tslib
-* 线程支持： pthread
-* 图片处理： libpng 和 libjpeg
+* 字体处理：freetype2
+* XML 解析：libxml2
+* 线程支持：pthread
+* 图片处理：libpng 和 libjpeg
 
-为了你能正常使用LCUI，请先确保您的计算机已经安装了上述的函数库，并保持较新的版本。
+为了你能正常使用 LCUI 全部功能，请先确保您的计算机已经安装了上述的函数库，并保持较新的版本。
 理论上，LCUI 能在 GNU/Linux 系统环境中正常工作，LCUI 的图形输出，需要内核支持 FrameBuffer。
 
 ## 贡献
 
 你可以通过GitHub向本项目提交合并请求，补丁应符合以下要求：
 
-1. 遵循现有代码风格。
+1. 遵循现有代码风格，请参考 `docs/CodingStyle.zh-cn.md` 文件。
 2. 一次提交应该做完整的一件事。
 3. 提交信息的第一行为摘要行，长度应低于80个字符，如果需要描述修改原因，请在摘要行后留空行，然后再补充。
-4. 修复之前的提交（已经合并）中存在的bug，提交信息的摘要行应该以`fixup!`开头，
-   表示修复了它。如果你修复的是issues列表中未解决的bug，提交信息的摘要行应该以
-   `fix->`开头，并加上issues列表中对应bug信息的标题。
-5. 衍合你的分支至源项目的master分支。我们不希望抓取到冗余的合并请求。
+4. 修复之前的提交（已经合并）中存在的bug，提交信息的摘要行应该以 `修复` 或含义类似的词语开头，表示修复
+   了它。如果你修复的是 issues 列表中未解决的问题，需在摘要行中加上 issues 列表中对应问题的编号。
+5. 衍合你的分支至源项目的 master 分支。我们不希望落拉取到冗余的合并请求。
 6. **要清楚什么许可证适用于你的补丁：** 该代码库中的文件基于GPLv2（或更高版本），但（原
    作者）我们仍然可以创建非自由的衍生工具。然而，如果给我们的补丁是基于GPL的，我们希望它
    以后不会进入任何非自由的衍生工具，因此，如果补丁发布于公共领域，会为我们带来方便（以及
@@ -128,7 +126,7 @@ windows系统上构建本项目方法，有两种：
 1. 在GitHub上进行Fork (点击 Fork 按钮)
 2. Clone到计算机： `git clone git@github.com:你的用户名/LCUI.git`
 3. cd 到代码库中： `cd LCUI`
-4. 设置远程记录，假设该记录名为upstream，那么命令为： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
+4. 设置远程仓库记录，假设该记录名为upstream，那么命令为： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
 
 #### 添加Feature
 
@@ -141,7 +139,7 @@ windows系统上构建本项目方法，有两种：
 #### 推送到GitHub
 
 1. 推送分支至GitHub： `git push origin my_new_feature`
-2. 发出合并请求： 在Github上点击 Pull Request 按钮
+2. 发出合并请求： 在Github上点击 `Pull Request` 按钮
 
 #### 有用的命令
 
@@ -150,7 +148,7 @@ windows系统上构建本项目方法，有两种：
 	git fetch upstream
 	git rebase upstream/master
 
-这样会获取更改并重新应用你的commits。
+这样会获取更改并重新应用你的代码提交记录。
 
 这一般比合并更好，它会给出一个清晰的视图，以表示哪些提交是你本地代码库的分支中，如果同
 样的变更已经在源项目中应用，它也会“修剪”你的本地的提交记录。

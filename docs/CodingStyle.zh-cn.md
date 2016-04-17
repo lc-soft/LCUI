@@ -12,12 +12,11 @@
 限制代码的列数的主要目的不是为了适应那种显示空间有限的终端屏幕，现在的计算机显示屏
 的分辨率都比较高（但这并不是说你可以把代码写到和屏幕一样宽），有的代码编辑器支持多
 窗口编辑，通常是两个，左右各一个代码编辑窗口，为了能让代码能够在代码编辑框里完整呈
-现，有必要限制每行代码的列数，因此，决定限制为80列。
+现，减少多余的横向滚动条滚动操作，有必要限制每行代码的列数，因此，决定限制为80列。
 
-由于LCUI项目是一个函数库，其代码处于用户代码的底层，作为底层代码，并且用的是C，不
-会出现像JavaScript中的链式编程，不用去操作各种元素及其属性，也不用像HTML那样要写
-带一堆属性的标签，因此，LCUI中的代码不应该写得那么冗长、拥挤和臃肿，上述要求对实
-际编码不会有很大负面影响。
+由于LCUI项目是一个函数库，其代码处于用户代码的底层，作为底层代码，并且用的是C，
+不会出现其他编程语言中那种冗长的函数名和很深的代码缩进，因此，LCUI中的代码不应该写
+得那么冗长、拥挤和臃肿，上述要求对实际编码不会有很大负面影响。
 
 ##标识符的定义
 
@@ -56,29 +55,81 @@
 ```c
 int fun(int a)
 {
-        int result = 0;
-        char *buffer;
-        
-        buffer = malloc(SIZE);
-        ...
-        if( ... ) {
-            result = -1;
-            goto error_out;
-        }
-        ...
-        if( ... ) {
-            result = -2;
-            goto error_out;
-        }
-        ...
-        return 0;
-        
-error_out:
-        ...
-        free(buffer);
-        return result;
-}
+	int result = 0;
+	char *buffer;
 
+	buffer = malloc(SIZE);
+	...
+	if( ... ) {
+		result = -1;
+		goto error_out;
+	}
+	...
+	if( ... ) {
+		result = -2;
+		goto error_out;
+	}
+	...
+	while (1) {
+		for( ... ) {
+			for( ... ) {
+				if( ... ) {
+					result = -3;
+					goto error_out;
+				}
+			}
+		}
+	}
+	...
+	return 0;
+	
+error_out:
+	...
+	free(buffer);
+	return result;
+}
+```
+
+当想减少缩进，又不想添加新函数，可以这样：
+
+```
+int fun(int a)
+	for( ... ) {
+		switch( ... ) {
+		case 0:
+			switch( ... ) {
+			case 'a': 
+				...
+				goto func_a;
+			case 'b': 
+				...
+				goto func_b;
+			}
+		case 1:
+			if( ... ) {
+				goto_func_1;
+			} else if ( ... ) {
+				goto_func_2;
+			} else {
+				goto_func_3;
+			}
+		}
+		continue;
+func_a:
+		...
+		continue;
+func_b:
+		...
+		continue;
+func_1:
+		...
+		continue;
+func_2:
+		...
+		continue;
+func_3:
+	}
+}
 ```
 
 
@@ -93,11 +144,23 @@ error_out:
 函数命名示例：
 
 ```c
-    GraphLayer_SetPos();
+    Widget_AddClass();
 ```
 
-该函数属于GraphLayer模块，操作对象是图层（GraphLayer），实现的操作是设定（Set），
-被操作的对象属性是位置（Position），也就是设定图层的位置。
+该函数的操作对象是部件（Widget），实现的操作是添加（Add），
+被操作的对象属性是样式类（Class），也就是为部件添加新样式类。
+
+以下有三种命名风格可参考：
+
+```
+
+             A                        B                         C
+新建实例     w = LCUIWidget_New()     s = Selector()            Graph_Init(&g)
+相关操作     Widget_AddClass(w, ...)  Selector_Compare(s, ...)  Graph_Mix(&g, ...)
+销毁实例     Widget_Destroy(w)        Selector_Delete(s)        Graph_Free(&g)
+
+```
+
 
 如果你的函数仅在当前源文件中使用，那么可以不必遵循以上规则，但还是建议你的函数命名便于阅读和理解。
 
@@ -111,7 +174,7 @@ error_out:
 
 ```c
     static MyType* ObjectName_OperateAttribute( XXXX *object, XXXX arg1,
-                                                    XXXX arg2, XXXX arg3 )
+                                                XXXX arg2, XXXX arg3 )
 ```
 
 如果函数名前的修饰符较多，可以将它们放到单独行里，例如：
@@ -129,7 +192,8 @@ error_out:
     ObjName_OptAttr( XXXX *object, XXXX arg1, XXXX arg2, XXXX arg3 )
 ```
 
-由于作者使用的是VisualStudio 2012，如果函数的返回值类型和修饰符不与函数名同行，编辑器的代码提示功能会无法显示位于函数上方的注释内容，例如：
+由于作者使用的是VisualStudio 2012，如果函数的返回值类型和修饰符不与函数名同行，编辑
+器的代码提示功能会无法显示位于函数上方的注释内容，例如：
 
 ```c
 	/** this is function. */
@@ -146,10 +210,12 @@ error_out:
 ```
 
 ##注释
-函数注释：如果是在头文件中有声明的公用函数，那么函数注释只需要在头文件的函数声明中写上，而源文件中可以不用重复写注释，这样可以省去同时维护两个注释的麻烦。
+函数注释：如果是在头文件中有声明的公用函数，那么函数注释只需要在头文件的函数声明中写上，而
+源文件中可以不用重复写注释，这样可以省去同时维护两个注释的麻烦。
 
 代码中的注释：注释不应该太多，注释内容简单明了即可，没必要每行代码都加注释。
 
 数据定义时的注释：在定义结构体时，应该在每行的成员声明后面加上注释。
 
-关于注释风格，之前作者想用Doxygen文档生成工具根据代码中的注释整理成API文档，但作者也很纠结是否需要用Doxygen这个工具，因此项目中只有部分注释的风格是针对Doxygen的，搞得不伦不类。
+关于注释风格，之前作者想用Doxygen文档生成工具根据代码中的注释整理成API文档，但作者也很纠结是
+否需要用Doxygen这个工具，因此项目中只有部分注释的风格是针对Doxygen的。
