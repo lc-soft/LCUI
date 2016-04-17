@@ -93,7 +93,7 @@ error_out:
 当想减少缩进，又不想添加新函数，可以这样：
 
 ```c
-int fun(int a)
+int fun(int a) {
 	for( ... ) {
 		switch( ... ) {
 		case 0:
