@@ -1,4 +1,5 @@
 ﻿// dirent.c -- Directory Entry pperation set.
+#include <stdio.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 

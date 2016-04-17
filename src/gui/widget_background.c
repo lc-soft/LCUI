@@ -201,7 +201,7 @@ void Widget_ComputeBackgroundStyle( LCUI_Widget widget )
 			break;
 		case key_background_size:
 			bg->size.using_value = TRUE;
-			bg->position.value = s->value;
+			bg->size.value = s->value;
 			break;
 		case key_background_size_width:
 			bg->size.using_value = FALSE;
