@@ -459,7 +459,17 @@ static int OnParseBackground( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseBackgroundPosition( LCUI_StyleSheet ss, int key, const char *str )
 {
-	return 0;
+	LCUI_StyleRec slist[2];
+	int ret = OnParseStyleOption( ss, key, str );
+	if( ret == 0 ) {
+		return 0;
+	}
+	if( SplitValues( str, slist, 2, SPLIT_NUMBER ) == 2 ) {
+		ss->sheet[key_background_position_x] = slist[0];
+		ss->sheet[key_background_position_y] = slist[1];
+		return 0;
+	}
+	return -2;
 }
 
 static int OnParseBackgroundSize( LCUI_StyleSheet ss, int key, const char *str )

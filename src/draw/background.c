@@ -54,6 +54,7 @@ void Background_Init( LCUI_Background *bg )
 void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 			   LCUI_Background *bg )
 {
+	float scale;
 	LCUI_Graph graph;
 	LCUI_BOOL with_alpha;
 	LCUI_Rect read_rect, paint_rect;
@@ -61,25 +62,25 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 
 	/* 计算背景图应有的尺寸 */
 	if( bg->size.using_value ) {
-		/* 默认是取宽和高里最小的一个来计算缩放后的图形尺寸 */
-		int mode = bg->image.width < bg->image.height;
 		switch( bg->size.value ) {
 		case SV_CONTAIN:
-			/* 取宽和高里最大的一个来计算缩放后的图形尺寸 */
-			mode = bg->image.width > bg->image.height;
+			image_w = box->width;
+			scale = 1.0 * bg->image.width / image_w;
+			image_h = 1.0 * bg->image.height / scale;
+			if( image_h > box->height ) {
+				image_h = box->height;
+				scale = 1.0 * bg->image.height / box->height;
+				image_w = (int)(1.0 * bg->image.width / scale);
+			}
+			break;
 		case SV_COVER:
-			if( mode ) {
-				image_w = box->w;
-				image_h = bg->image.height*box->w;
-				image_h = 1.0*image_h / bg->image.width;
-				image_x = 0;
-				image_y = (box->h - image_h) / 2;
-			} else {
-				image_h = box->h;
-				image_w = bg->image.width*box->h;
-				image_w = 1.0*image_w / bg->image.height;
-				image_x = (box->w - image_w) / 2;
-				image_y = 0;
+			image_w = box->width;
+			scale = 1.0 * bg->image.width / image_w;
+			image_h = 1.0 * bg->image.height / scale;
+			if( image_h < box->height ) {
+				image_h = box->height;
+				scale = 1.0 * bg->image.height / image_h;
+				image_w = (int)(1.0 * bg->image.width / scale);
 			}
 			break;
 		case SV_AUTO:
