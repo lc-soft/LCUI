@@ -73,78 +73,70 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 #endif
 
 /* 载入jpeg图片文件 */
-LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *out )
+LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *buf )
 {
 #ifdef USE_LIBJPEG
 	FILE *fp;
 	uchar_t *bytep;
-	int row_stride,jaka;
-	int x,y, n, k;
 	short int JPsyg;
-	
-	struct jpeg_decompress_struct cinfo;
-	struct my_error_mgr jerr;
 	JSAMPARRAY buffer;
+	struct my_error_mgr jerr;
+	struct jpeg_decompress_struct cinfo;
+	int x, y, n, k, row_stride, jaka;
 
-	fp = fopen(filepath,"r");
-	if(fp == NULL) {
+	fp = fopen( filepath, "rb" );
+	if( fp == NULL ) {
 		return FILE_ERROR_OPEN_ERROR;
 	}
-	
-	if( fread( &JPsyg, sizeof(short int), 1, fp ) ) {
-		if ( JPsyg != -9985 ) {  /* 如果不是jpg图片 */
-			return  FILE_ERROR_UNKNOWN_FORMAT; 
+	if( fread( &JPsyg, sizeof( short int ), 1, fp ) ) {
+		if( JPsyg != -9985 ) {  /* 如果不是jpg图片 */
+			return  FILE_ERROR_UNKNOWN_FORMAT;
 		}
 	}
-	rewind(fp);
-	cinfo.err = jpeg_std_error(&jerr.pub);
+	rewind( fp );
+	cinfo.err = jpeg_std_error( &jerr.pub );
 	jerr.pub.error_exit = my_error_exit;
-	if (setjmp(jerr.setjmp_buffer)) {
-		jpeg_destroy_decompress(&cinfo);
+	if( setjmp( jerr.setjmp_buffer ) ) {
+		jpeg_destroy_decompress( &cinfo );
 		return 2;
 	}
-	
-	jpeg_create_decompress(&cinfo);
-	jpeg_stdio_src(&cinfo,fp);
-	(void) jpeg_read_header(&cinfo,TRUE);
-	(void) jpeg_start_decompress(&cinfo);    
-	
+	jpeg_create_decompress( &cinfo );
+	jpeg_stdio_src( &cinfo, fp );
+	(void)jpeg_read_header( &cinfo, TRUE );
+	(void)jpeg_start_decompress( &cinfo );
 	jaka = cinfo.num_components;
-	
-	//if (jaka==3) printf("color\n"); else printf("grayscale\n");
-	out->color_type = COLOR_TYPE_RGB;
-	n = Graph_Create(out, cinfo.output_width, cinfo.output_height);
-	if( n != 0 ){
-		_DEBUG_MSG("error");
-		exit(-1);
+	buf->color_type = COLOR_TYPE_RGB;
+	n = Graph_Create( buf, cinfo.output_width, cinfo.output_height );
+	if( n != 0 ) {
+		_DEBUG_MSG( "error" );
+		exit( -1 );
 	}
-	
 	row_stride = cinfo.output_width * cinfo.output_components;
-	buffer = (*cinfo.mem->alloc_sarray)(
-			(j_common_ptr) &cinfo,JPOOL_IMAGE,row_stride,1);
-	bytep = out->bytes;
-	for(y=0; cinfo.output_scanline <cinfo.output_height; ++y) {
-		(void) jpeg_read_scanlines(&cinfo, buffer, 1);
-		if ( jaka == 3 ) {
-			for (x=0;x<out->w;x++) {
-				k=x*3;
-				*bytep++ = buffer[0][k+2];
-				*bytep++ = buffer[0][k+1];
+	buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, 
+					     JPOOL_IMAGE, row_stride, 1);
+	bytep = buf->bytes;
+	for( y = 0; cinfo.output_scanline < cinfo.output_height; ++y ) {
+		(void)jpeg_read_scanlines( &cinfo, buffer, 1 );
+		if( jaka == 3 ) {
+			for( x = 0; x < buf->w; x++ ) {
+				k = x * 3;
+				*bytep++ = buffer[0][k + 2];
+				*bytep++ = buffer[0][k + 1];
 				*bytep++ = buffer[0][k];
 			}
 		} else {
-			for (x=0;x<out->w;x++) {
+			for( x = 0; x < buf->w; x++ ) {
 				*bytep++ = buffer[0][x];
 				*bytep++ = buffer[0][x];
 				*bytep++ = buffer[0][x];
 			}
-		} 
+		}
 	}
-	(void) jpeg_finish_decompress(&cinfo);
-	jpeg_destroy_decompress(&cinfo);
-	fclose(fp);
+	(void)jpeg_finish_decompress( &cinfo );
+	jpeg_destroy_decompress( &cinfo );
+	fclose( fp );
 #else
-	printf("warning: not JPEG support!"); 
+	printf( "warning: not JPEG support!" );
 #endif
 	return 0;
 }
