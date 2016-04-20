@@ -1228,13 +1228,21 @@ void Widget_UpdateLayout( LCUI_Widget w )
 		}
 		switch( child->computed_style.display ) {
 		case SV_BLOCK:
+			ctx.x = 0;
+			if( ctx.prev && ctx.prev_display != SV_BLOCK ) {
+				ctx.y += ctx.line_height;
+			}
 			child->origin_x = ctx.x;
 			child->origin_y = ctx.y;
-			ctx.x = 0;
-			ctx.line_height = 0;
+			ctx.line_height = child->box.outer.height;
 			ctx.y += child->box.outer.height;
 			break;
 		case SV_INLINE_BLOCK:
+			if( ctx.prev && ctx.prev_display == SV_BLOCK ) {
+				ctx.x = 0;
+				ctx.y += ctx.line_height;
+				ctx.line_height = 0;
+			}
 			child->origin_x = ctx.x;
 			ctx.x += child->box.outer.width;
 			if( ctx.x > ctx.max_width ) {

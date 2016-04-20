@@ -128,7 +128,7 @@ static void OnMouseMove( LCUI_SysEvent e, void *arg )
 		} else {
 			box_size = w->parent->box.content.width;
 		}
-		layer_pos = scrollbar->layer->width - box_size;
+		layer_pos = scrollbar->layer->box.outer.width - box_size;
 		size = w->box.content.width - slider->width;
 		if( x > size ) {
 			x = size;
@@ -150,7 +150,7 @@ static void OnMouseMove( LCUI_SysEvent e, void *arg )
 		} else {
 			box_size = w->parent->box.content.height;
 		}
-		layer_pos = scrollbar->layer->height - box_size;
+		layer_pos = scrollbar->layer->box.outer.height - box_size;
 		size = w->box.content.height - slider->height;
 		if( y > size ) {
 			y = size;
@@ -213,7 +213,7 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 	LCUI_Widget slider = scrollbar->slider;
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
 		if( scrollbar->layer ) {
-			size = scrollbar->layer->width;
+			size = scrollbar->layer->box.outer.width;
 		} else {
 			size = 0;
 		}
@@ -224,7 +224,7 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 		SetStyle( slider->custom_style, key_width, n, scale );
 	} else {
 		if( scrollbar->layer ) {
-			size = scrollbar->layer->height;
+			size = scrollbar->layer->box.outer.height;
 		} else {
 			size = 0;
 		}
@@ -234,6 +234,7 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 		}
 		SetStyle( slider->custom_style, key_height, n, scale );
 	}
+	ScrollBar_SetPosition( w, scrollbar->pos );
 	Widget_UpdateStyle( slider, FALSE );
 }
 
@@ -299,8 +300,12 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 	}
 	memset( &e, 0, sizeof( e ) );
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
-		size = scrollbar->layer->width;
-		box_size = scrollbar->box->box.content.width;
+		size = scrollbar->layer->box.outer.width;
+		if( scrollbar->box ) {
+			box_size = scrollbar->box->box.content.width;
+		} else {
+			box_size = w->parent->box.content.width;
+		}
 		if( pos + box_size > size ) {
 			pos = size - box_size;
 		}
@@ -312,8 +317,12 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		SetStyle( slider->custom_style, key_left, slider_pos, px );
 		SetStyle( layer->custom_style, key_left, -pos, px );
 	} else {
-		size = scrollbar->layer->height;
-		box_size = scrollbar->box->box.content.height;
+		size = scrollbar->layer->box.outer.height;
+		if( scrollbar->box ) {
+			box_size = scrollbar->box->box.content.height;
+		} else {
+			box_size = w->parent->box.content.height;
+		}
 		if( pos + box_size > size ) {
 			pos = size - box_size;
 		}
