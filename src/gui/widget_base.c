@@ -689,8 +689,8 @@ void Widget_FlushPosition( LCUI_Widget w )
 		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
 		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
 		/* 标记移动前后的区域 */
-		Widget_InvalidateArea( w->parent, &w->box.graph, SV_CONTENT_BOX );
-		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
+		Widget_InvalidateArea( w->parent, &w->box.graph, SV_PADDING_BOX );
+		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
 	}
 	/* 检测是否为顶级部件并做相应处理 */
 	Widget_PostSurfaceEvent( w, WET_MOVE );
