@@ -1196,6 +1196,36 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 	return 1;
 }
 
+int Widget_ComputeMaxWidth( LCUI_Widget w )
+{
+	LCUI_Style s;
+	LCUI_Widget child;
+	float scale = 1.0;
+	int width, padding = 0;
+	width = LCUIWidget.root->box.padding.width;
+	for( child = w; child->parent; child = child->parent ) {
+		s = &child->style->sheet[key_width];
+		switch( s->type ) {
+		case SVT_PX:
+			width = s->val_px;
+			break;
+		case SVT_SCALE:
+			scale *= s->val_scale;
+			padding += child->parent->padding.left;
+			padding += child->parent->padding.right;
+		case SVT_AUTO:
+		default: continue;
+		}
+		break;
+	}
+	width = scale * width;
+	width -= padding;
+	if( width < 0 ) {
+		width = 0;
+	}
+	return width;
+}
+
 /** 更新子部件的布局 */
 void Widget_UpdateLayout( LCUI_Widget w )
 {
@@ -1209,18 +1239,7 @@ void Widget_UpdateLayout( LCUI_Widget w )
 	LCUI_Widget child;
 	LinkedListNode *node;
 
-	ctx.max_width = 256;
-	for( child = w; child; child = child->parent ) {
-		switch( child->style->sheet[key_width].type ) {
-		case SVT_PX:
-		case SVT_SCALE:
-			ctx.max_width = child->box.content.width;
-			break;
-		case SVT_AUTO:
-		default:continue;
-		}
-		break;
-	}
+	ctx.max_width = Widget_ComputeMaxWidth( w );
 	LinkedList_ForEach( node, &w->children ) {
 		child = node->data;
 		if( child->computed_style.position != SV_STATIC ) {
@@ -1253,11 +1272,6 @@ void Widget_UpdateLayout( LCUI_Widget w )
 			child->origin_y = ctx.y;
 			if( child->box.outer.height > ctx.line_height ) {
 				ctx.line_height = child->box.outer.height;
-			}
-			if( ctx.prev && ctx.prev_display != SV_INLINE_BLOCK ) {
-				ctx.x = 0;
-				ctx.y += ctx.line_height;
-				break;
 			}
 			break;
 		case SV_NONE:

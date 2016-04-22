@@ -352,6 +352,9 @@ LCUI_API int Widget_AddStatus( LCUI_Widget w, const char *status_name );
 /** 判断部件是否包含指定的状态 */
 LCUI_API LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name );
 
+/** 计算部件的最大宽度 */
+LCUI_API int Widget_ComputeMaxWidth( LCUI_Widget w );
+
 /** 更新子部件的布局 */
 LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
 
