@@ -236,6 +236,7 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_WidgetTaskBox	task;			/**< 任务记录 */
 	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
 	LCUI_BOOL		has_dirty_child;	/**< 标志，指示子级部件是否有无效区域 */
+	LCUI_BOOL		layout_locked;		/**< 标志，指示子级部件布局是否已锁定 */
 } LCUI_WidgetRec;
 
 
@@ -357,6 +358,12 @@ LCUI_API int Widget_ComputeMaxWidth( LCUI_Widget w );
 
 /** 更新子部件的布局 */
 LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
+
+/** 锁定子部件的布局，让 LCUI 不自动更新布局 */
+LCUI_API void Widget_LockLayout( LCUI_Widget w );
+
+/** 解除锁定子部件的布局 */
+LCUI_API void Widget_UnlockLayout( LCUI_Widget w );
 
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );

@@ -1226,7 +1226,16 @@ int Widget_ComputeMaxWidth( LCUI_Widget w )
 	return width;
 }
 
-/** 更新子部件的布局 */
+void Widget_LockLayout( LCUI_Widget w )
+{
+	w->layout_locked = TRUE;
+}
+
+void Widget_UnlockLayout( LCUI_Widget w )
+{
+	w->layout_locked = FALSE;
+}
+
 void Widget_UpdateLayout( LCUI_Widget w )
 {
 	struct {
@@ -1239,6 +1248,9 @@ void Widget_UpdateLayout( LCUI_Widget w )
 	LCUI_Widget child;
 	LinkedListNode *node;
 
+	if( w->layout_locked ) {
+		return;
+	}
 	ctx.max_width = Widget_ComputeMaxWidth( w );
 	LinkedList_ForEach( node, &w->children ) {
 		child = node->data;
