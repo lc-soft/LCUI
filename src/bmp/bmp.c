@@ -55,79 +55,91 @@ typedef struct bmp_head {
 	short int nic4[11];
 } bmp_head;
 
-/** 载入BMP图片文件 */
 int Graph_LoadBMP( const char *filepath, LCUI_Graph *out )
 {
-	FILE *fp;
 	bmp_head bmp;
 	uchar_t *bytep;
 	int  x, y, tempi, pocz, omin;
-
-	fp = fopen(filepath,"rb");
-	if(fp == NULL) {
+	FILE *fp = fopen( filepath, "rb" );
+	if( !fp ) {
 		return FILE_ERROR_OPEN_ERROR;
 	}
-
 	/* 检测是否为bmp图片 */
-	tempi = fread(&bmp, 1, sizeof(bmp_head),fp);
-	if (tempi < sizeof(bmp_head) || bmp.BMPsyg != 19778) {
+	tempi = fread( &bmp, 1, sizeof( bmp_head ), fp );
+	if( tempi < sizeof( bmp_head ) || bmp.BMPsyg != 19778 ) {
 		return FILE_ERROR_UNKNOWN_FORMAT;
 	}
-
 	pocz = bmp.nic[4];
-	if ((bmp.depth != 32) && (bmp.depth != 24) ) {
-		_DEBUG_MSG("can not support  %i bit-depth !\n", bmp.depth);
+	if( (bmp.depth != 32) && (bmp.depth != 24) ) {
+		_DEBUG_MSG( "can not support  %i bit-depth !\n", bmp.depth );
 		return  FILE_ERROR_UNKNOWN_FORMAT;
 	}
 	out->color_type = COLOR_TYPE_RGB;
-	tempi = Graph_Create(out, bmp.ix, bmp.iy);
-	if(tempi != 0) {
-		_DEBUG_MSG("can not alloc memory\n");
+	tempi = Graph_Create( out, bmp.ix, bmp.iy );
+	if( tempi != 0 ) {
+		_DEBUG_MSG( "can not alloc memory\n" );
 		return 1;
 	}
-
-	fseek(fp,0,SEEK_END);
-	omin = ftell(fp);
-	omin = omin-pocz;
-	omin = omin-((out->w*out->h)*(bmp.depth/8));
-	omin = omin/(out->h);
-	fseek(fp,pocz,SEEK_SET);
-
+	fseek( fp, 0, SEEK_END );
+	omin = ftell( fp );
+	omin = omin - pocz;
+	omin = omin - ((out->w*out->h)*(bmp.depth / 8));
+	omin = omin / (out->h);
+	fseek( fp, pocz, SEEK_SET );
 	switch( bmp.depth ) {
 	case 32:
-		for (y=0; y<out->h; ++y) {
+		for( y = 0; y < out->h; ++y ) {
 			/* 从最后一行开始写入像素数据 */
-			bytep = out->bytes + ((out->h-y-1)*out->w)*3;
-			for (x=0; x<out->w; ++x) {
-				*bytep++ = fgetc(fp);
-				*bytep++ = fgetc(fp);
-				*bytep++ = fgetc(fp);
-				tempi = fgetc(fp);
+			bytep = out->bytes + ((out->h - y - 1)*out->w) * 3;
+			for( x = 0; x < out->w; ++x ) {
+				*bytep++ = fgetc( fp );
+				*bytep++ = fgetc( fp );
+				*bytep++ = fgetc( fp );
+				tempi = fgetc( fp );
 			}
 			/* 略过填充字符 */
-			if (omin>0) {
-				for (tempi=0;tempi<omin;tempi++) {
-					fgetc(fp);
+			if( omin > 0 ) {
+				for( tempi = 0; tempi < omin; tempi++ ) {
+					fgetc( fp );
 				}
 			}
 		}
 		break;
 	case 24:
-		for (y=0; y<out->h; ++y) {
-			bytep = out->bytes + ((out->h-y-1)*out->w)*3;
-			for (x=0; x<out->w; ++x) {
-				*bytep++ = fgetc(fp);
-				*bytep++ = fgetc(fp);
-				*bytep++ = fgetc(fp);
+		for( y = 0; y < out->h; ++y ) {
+			bytep = out->bytes + ((out->h - y - 1)*out->w) * 3;
+			for( x = 0; x < out->w; ++x ) {
+				*bytep++ = fgetc( fp );
+				*bytep++ = fgetc( fp );
+				*bytep++ = fgetc( fp );
 			}
-			if (omin>0) {
-				for (tempi=0;tempi<omin;tempi++) {
-					fgetc(fp);
+			if( omin > 0 ) {
+				for( tempi = 0; tempi < omin; tempi++ ) {
+					fgetc( fp );
 				}
 			}
 		}
 		break;
 	}
-	fclose(fp);
+	fclose( fp );
+	return 0;
+}
+
+int Graph_GetBMPSize( const char *filepath, int *width, int *height )
+{
+	int n;
+	bmp_head bmp;
+	FILE *fp = fopen( filepath, "rb" );
+	if( !fp ) {
+		return FILE_ERROR_OPEN_ERROR;
+	}
+	/* 检测是否为bmp图片 */
+	n = fread( &bmp, 1, sizeof( bmp_head ), fp );
+	if( n < sizeof( bmp_head ) || bmp.BMPsyg != 19778 ) {
+		return FILE_ERROR_UNKNOWN_FORMAT;
+	}
+	*width = bmp.ix;
+	*height = bmp.iy;
+	fclose( fp );
 	return 0;
 }

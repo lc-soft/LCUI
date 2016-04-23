@@ -49,7 +49,6 @@
 
 #define PNG_BYTES_TO_CHECK 4
 
-/* 载入png图片文件 */
 int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 {
 #ifdef USE_LIBPNG
@@ -150,7 +149,45 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 	return ret;
 }
 
-/* 将图像数据写入至png文件 */
+int Graph_GetPNGSize( const char *filepath, int *width, int *height )
+{
+#ifdef USE_LIBPNG
+	int ret;
+	png_infop info_ptr;
+	png_structp png_ptr;
+	char buf[PNG_BYTES_TO_CHECK];
+	FILE *fp = fopen( filepath, "rb" );
+	if( !fp ) {
+		return FILE_ERROR_OPEN_ERROR;
+	}
+	png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
+	info_ptr = png_create_info_struct( png_ptr );
+	setjmp( png_jmpbuf( png_ptr ) );
+	ret = fread( buf, 1, PNG_BYTES_TO_CHECK, fp );
+	if( ret < PNG_BYTES_TO_CHECK ) {
+		fclose( fp );
+		png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
+		return FILE_ERROR_UNKNOWN_FORMAT;
+	}
+	ret = png_sig_cmp( (png_bytep)buf, (png_size_t)0, PNG_BYTES_TO_CHECK );
+	if( ret != 0 ) {
+		fclose( fp );
+		png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
+		return FILE_ERROR_UNKNOWN_FORMAT;
+	}
+	rewind( fp );
+	png_init_io( png_ptr, fp );
+	png_read_png( png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0 );
+	*width = png_get_image_width( png_ptr, info_ptr );
+	*height = png_get_image_height( png_ptr, info_ptr );
+	fclose( fp );
+	png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
+#else
+	_DEBUG_MSG( "warning: not PNG support!" );
+#endif
+	return ret;
+}
+
 int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 {
 #ifdef USE_LIBPNG

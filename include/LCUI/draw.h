@@ -64,13 +64,34 @@ LCUI_BEGIN_HEADER
  */
 LCUI_API int Graph_Rotate( LCUI_Graph *src, int rotate_angle, LCUI_Graph *des );
 
-/* 将图像数据写入至png文件 */
+/** 从BMP文件中读取图像数据 */
+LCUI_API int Graph_LoadBMP( const char *filepath, LCUI_Graph *out );
+
+/** 从PNG文件中读取图像数据 */
+LCUI_API int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph );
+
+/** 从JPEG文件中读取图像数据 */
+LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *buf );
+
+/** 将图像数据写入至png文件 */
 LCUI_API int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph );
 
-/* 载入指定图片文件的图像数据 */
+/** 从BMP文件中获取图像尺寸 */
+LCUI_API int Graph_GetBMPSize( const char *filepath, int *width, int *height );
+
+/** 从PNG文件中获取图像尺寸 */
+LCUI_API int Graph_GetPNGSize( const char *filepath, int *width, int *height );
+
+/** 从JPEG文件中读取图像尺寸 */
+LCUI_API int Graph_GetJPEGSize( const char *filepath, int *width, int *height );
+
+/** 载入指定图片文件的图像数据 */
 LCUI_API int Graph_LoadImage( const char *filepath, LCUI_Graph *out );
 
-/* 对图像进行高斯模糊处理 */
+/** 从文件中获取图像尺寸 */
+LCUI_API int Graph_GetImageSize( const char *filepath, int *width, int *height );
+
+/** 对图像进行高斯模糊处理 */
 LCUI_API int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma );
 
 /* 对图像进行模糊处理 */

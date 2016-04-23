@@ -72,8 +72,7 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 }
 #endif
 
-/* 载入jpeg图片文件 */
-LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *buf )
+int Graph_LoadJPEG( const char *filepath, LCUI_Graph *buf )
 {
 #ifdef USE_LIBJPEG
 	FILE *fp;
@@ -85,7 +84,7 @@ LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *buf )
 	int x, y, n, k, row_stride, jaka;
 
 	fp = fopen( filepath, "rb" );
-	if( fp == NULL ) {
+	if( !fp ) {
 		return FILE_ERROR_OPEN_ERROR;
 	}
 	if( fread( &JPsyg, sizeof( short int ), 1, fp ) ) {
@@ -133,6 +132,42 @@ LCUI_API int Graph_LoadJPEG( const char *filepath, LCUI_Graph *buf )
 		}
 	}
 	(void)jpeg_finish_decompress( &cinfo );
+	jpeg_destroy_decompress( &cinfo );
+	fclose( fp );
+#else
+	printf( "warning: not JPEG support!" );
+#endif
+	return 0;
+}
+
+int Graph_GetJPEGSize( const char *filepath, int *width, int *height )
+{
+#ifdef USE_LIBJPEG
+	short int JPsyg;
+	struct my_error_mgr jerr;
+	struct jpeg_decompress_struct cinfo;
+	FILE *fp = fopen( filepath, "rb" );
+	if( !fp ) {
+		return FILE_ERROR_OPEN_ERROR;
+	}
+	if( fread( &JPsyg, sizeof( short int ), 1, fp ) ) {
+		if( JPsyg != -9985 ) {
+			return  FILE_ERROR_UNKNOWN_FORMAT;
+		}
+	}
+	rewind( fp );
+	cinfo.err = jpeg_std_error( &jerr.pub );
+	jerr.pub.error_exit = my_error_exit;
+	if( setjmp( jerr.setjmp_buffer ) ) {
+		jpeg_destroy_decompress( &cinfo );
+		return 2;
+	}
+	jpeg_create_decompress( &cinfo );
+	jpeg_stdio_src( &cinfo, fp );
+	(void)jpeg_read_header( &cinfo, TRUE );
+	(void)jpeg_start_decompress( &cinfo );
+	*width = cinfo.output_width;
+	*height = cinfo.output_height;
 	jpeg_destroy_decompress( &cinfo );
 	fclose( fp );
 #else
