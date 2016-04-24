@@ -1,5 +1,5 @@
 ﻿/* ***************************************************************************
- * windows_display.c -- surface support for win platform.
+ * windows_display.c -- surface support for windows platform.
  *
  * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
  *
@@ -20,7 +20,7 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * windows_display.c -- win平台的图形显示功能支持。
+ * windows_display.c -- windows 平台的图形显示功能支持。
  *
  * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
  *
@@ -391,7 +391,6 @@ static void WinSurface_OnWMPaint( LCUI_Event e, void *arg )
 	area.height = ps.rcPaint.bottom - area.y;
 	EndPaint( sys_event->hwnd, &ps );
 	surface = GetSurfaceByHWND( sys_event->hwnd );
-	DEBUG_MSG( "surface: %p\n", surface );
 	if( win.on_invalid_rect ) {
 		win.on_invalid_rect( surface, &area );
 	}
@@ -439,6 +438,7 @@ int LCUI_InitWinDisplay( LCUI_DisplayDriver driver )
 	driver->endPaint = WinSurface_EndPaint;
 	driver->onInvalidRect = WinSurface_OnInvalidRect;
 	LinkedList_Init( &win.surfaces );
+	LCUI_BindSysEvent( WM_PAINT, WinSurface_OnWMPaint, NULL, NULL );
 	win.is_inited = TRUE;
 	return 0;
 }

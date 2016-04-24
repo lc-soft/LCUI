@@ -229,7 +229,6 @@ LCUI_MainLoop LCUI_MainLoop_New( void )
 /** 运行目标主循环 */
 int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 {
-	LinkedListNode *node;
 	if( loop->state == STATE_RUNNING ) {
 		_DEBUG_MSG("error: main-loop already running.");
 		return -1;
@@ -248,20 +247,27 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	loop->tid = LCUIThread_SelfID();
 	while( loop->state != STATE_EXITED ) {
 		LCUI_AppTask task;
-		DEBUG_MSG("loop: %p, sleeping...\n", loop);
-		LCUI_WaitEvent();
+		LinkedListNode *node, *prev;
+		int len = MainApp.tasks.length;
+		if( len == 0 ) {
+			DEBUG_MSG("loop: %p, sleeping...\n", loop);
+			LCUI_WaitEvent();
+		}
 		DEBUG_MSG("loop: %p, wakeup, lost_time: %ld\n", loop, ct);
 		LCUI_PumbEvents();
-		LinkedList_ForEach( node, &MainApp.tasks ) {
+		node = MainApp.tasks.head.next;
+		while( node && len-- > 0 ) {
+			prev = node->prev;
 			task = node->data;
-			if( !task || !task->func ) {
-				return -1;
+			if( task && task->func ) {
+				DEBUG_MSG( "task: %p, start\n", task );
+				task->func( task->arg[0], task->arg[1] );
+				DEBUG_MSG( "task: %p, end\n", task );
 			}
-			DEBUG_MSG("task: %p, start\n", task);
-			task->func( task->arg[0], task->arg[1] );
-			DEBUG_MSG("task: %p, end\n", task);
+			DestroyTask( task );
+			LinkedList_DeleteNode( &MainApp.tasks, node );
+			node = prev->next;
 		}
-		LinkedList_Clear( &MainApp.tasks, DestroyTask );
 		LCUIMutex_Unlock( &MainApp.tasks_mutex );
 		if( MainApp.loop == loop ) {
 			continue;
