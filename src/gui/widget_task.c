@@ -152,7 +152,6 @@ static callback task_handlers[WTT_TOTAL_NUM];
 /** 映射任务处理器 */
 static void MapTaskHandler(void)
 {
-	task_handlers[WTT_DESTROY] = Widget_ExecDestroy;
 	task_handlers[WTT_VISIBLE] = Widget_FlushVisibility;
 	task_handlers[WTT_POSITION] = Widget_FlushPosition;
 	task_handlers[WTT_RESIZE] = Widget_FlushSize;
@@ -220,12 +219,6 @@ int Widget_Flush( LCUI_Widget w )
 		}
 		w->task->for_self = FALSE;
 		buffer = w->task->buffer;
-		/* 如果该部件需要销毁，其它任务就不用再处理了 */
-		if( buffer[WTT_DESTROY] ) {
-			buffer[WTT_DESTROY] = FALSE;
-			task_handlers[WTT_DESTROY]( w );
-			return -1;
-		}
 		/* 如果有用户自定义任务 */
 		if( buffer[WTT_USER] ) {
 			LCUI_WidgetClass *wc;
@@ -244,6 +237,14 @@ int Widget_Flush( LCUI_Widget w )
 			}
 		}
 		LCUIMutex_Unlock( &w->mutex );
+	}
+	/* 删除无用部件 */
+	node = w->children_trash.head.next;
+	while( node ) {
+		next = node->next;
+		LinkedList_Unlink( &w->children_trash, node );
+		Widget_ExecDestroy( node->data );
+		node = next;
 	}
 
 skip_proc_self_task:;

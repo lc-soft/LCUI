@@ -101,17 +101,18 @@ sidebar sidebar-item:active {
 LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id,
 				const wchar_t *icon, const wchar_t *text )
 {
-	int len = id ? wcslen(id):0;
-	wchar_t *new_id = (wchar_t*)malloc( sizeof(wchar_t)*(len+1) );
-	LCUI_Widget w = LCUIWidget_New("sidebar-item");
-	SideBarItem *sbi = (SideBarItem*)w->private_data;
-	SideBar *sb = (SideBar*)sidebar->private_data;
-
+	SideBar *sb;
+	SideBarItem *sbi;
+	LCUI_Widget w;
+	int len = id ? wcslen( id ) : 0;
+	wchar_t *new_id = malloc( sizeof( wchar_t )*(len + 1) );
 	if( !new_id ) {
-		Widget_AddTask( w, WTT_DESTROY );
 		return NULL;
 	}
-	id ? wcscpy( new_id, id ) : (new_id[0] = 0,NULL);
+	sb = sidebar->private_data;
+	w = LCUIWidget_New( "sidebar-item" );
+	sbi = w->private_data;
+	id ? wcscpy( new_id, id ) : (new_id[0] = 0, NULL);
 	sbi->id ? free( sbi->id ) : 0;
 	sbi->id = new_id;
 	Widget_Append( sidebar, w );

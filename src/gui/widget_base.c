@@ -146,6 +146,7 @@ static void Widget_Init( LCUI_Widget widget )
 	Border_Init( &widget->computed_style.border );
 	LinkedList_Init( &widget->children );
 	LinkedList_Init( &widget->children_show );
+	LinkedList_Init( &widget->children_trash );
 	LinkedList_Init( &widget->dirty_rects );
 	Graph_Init( &widget->graph );
 	LCUIMutex_Init( &widget->mutex );
@@ -177,10 +178,14 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 
 static void Widget_OnDestroy( void *arg )
 {
-	LCUI_Widget widget = arg;
+	Widget_ExecDestroy( arg );
+}
+
+void Widget_ExecDestroy( LCUI_Widget widget )
+{
 	LCUIWidget_ClearEventTarget( widget );
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
-	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
+	* 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
 	LinkedList_ClearData( &widget->children_show, NULL );
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
 	LinkedList_Clear( &widget->dirty_rects, free );
@@ -193,47 +198,34 @@ static void Widget_OnDestroy( void *arg )
 	free( widget );
 }
 
-void Widget_ExecDestroy( LCUI_Widget widget )
-{
-	if( widget->parent ) {
-		LinkedListNode *node = Widget_GetNode( widget );
-		LinkedList_Unlink( &widget->parent->children, node );
-		node = Widget_GetShowNode( widget );
-		LinkedList_Unlink( &widget->parent->children_show, node );
-	}
-	Widget_OnDestroy( widget );
-}
-
 void Widget_Destroy( LCUI_Widget w )
 {
+	LinkedListNode *node;
 	LCUI_Widget root = w;
 	while( root->parent ) {
 		root = root->parent;
 	}
-	if( root == LCUIWidget.root ) {
-		Widget_AddTask( w, WTT_DESTROY );
-	} else {
+	if( w->parent ) {
+		node = Widget_GetShowNode( w );
+		LinkedList_Unlink( &w->parent->children_show, node );
+		node = Widget_GetNode( w );
+		LinkedList_Unlink( &w->parent->children, node );
+		LinkedList_AppendNode( &w->parent->children_trash, node );
+	}
+	if( root != LCUIWidget.root ) {
 		Widget_ExecDestroy( w );
+		return;
 	}
 }
 
 void Widget_Empty( LCUI_Widget widget )
 {
-	LinkedListNode *node;
-	LCUI_Widget root = widget;
-	while( root->parent ) {
-		root = root->parent;
-	}
-	if( root == LCUIWidget.root ) {
-		LinkedList_ForEach( node, &widget->children ) {
-			Widget_Destroy( node->data );
-		}
-		return;
-	}
-	LinkedList_ForEach( node, &widget->children ) {
-		LinkedListNode *next = node->next;
+	LinkedListNode *node, *prev;
+	node = widget->children.head.next;
+	while( node ) {
+		prev = node->prev;
 		Widget_Destroy( node->data );
-		node = next;
+		node = prev->next;
 	}
 }
 
@@ -926,6 +918,12 @@ void Widget_FlushSize( LCUI_Widget w )
 	}
 	if( w->style->sheet[key_height].type != SVT_AUTO ) {
 		Widget_AddTask( w, WTT_LAYOUT );
+	}
+	/* 如果是绝对定位，且指定了右边距 */
+	if( w->computed_style.position == SV_ABSOLUTE &&
+	    w->style->sheet[key_right].is_valid && 
+	    w->style->sheet[key_right].type != SVT_AUTO ) {
+		Widget_FlushPosition( w );
 	}
 	if( w->parent ) {
 		Widget_InvalidateArea( w->parent, &rect, SV_CONTENT_BOX );
