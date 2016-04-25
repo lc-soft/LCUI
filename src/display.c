@@ -45,6 +45,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 #include <LCUI/input.h>
+#include <LCUI/timer.h>
 #include <LCUI/cursor.h>
 #include <LCUI/thread.h>
 #include <LCUI/display.h>
@@ -53,8 +54,8 @@
 
 /** surface 记录 */
 typedef struct SurfaceRecord {
-	LCUI_Surface surface;	/**< surface */
-	LCUI_Widget widget;	/**< surface 所映射的 widget */
+	LCUI_Surface surface;		/**< surface */
+	LCUI_Widget widget;		/**< surface 所映射的 widget */
 } SurfaceRecord;
 
 /** 图形显示功能的上下文数据 */
@@ -124,7 +125,7 @@ void LCUIDisplay_InvalidateArea(LCUI_Rect *rect )
 
 }
 
-LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
+static LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
@@ -137,7 +138,7 @@ LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
 	return NULL;
 }
 
-LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
+static LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
@@ -172,15 +173,9 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 	}
 	p_sr = NEW( SurfaceRecord, 1 );
 	p_sr->widget = widget;
-	/**
-	 * 初次调用 Surface_New() 耗时较长， 所以先为 p_sr->surface 设置初
-	 * 始值，避免在 Surface_New() 返回前被当成正常指针使用。
-	 */
-	p_sr->surface = NULL;
 	p_sr->surface = Surface_New();
 	Surface_SetCaptionW( p_sr->surface, widget->title );
 	p_rect = &widget->box.graph;
-
 	if( widget->style->sheet[key_top].is_valid &&
 	    widget->style->sheet[key_left].is_valid ) {
 		Surface_Move( p_sr->surface, p_rect->x, p_rect->y );
@@ -373,79 +368,6 @@ static void LCUIDisplay_Thread( void *unused )
 	LCUIThread_Exit(NULL);
 }
 
-/** 响应顶级部件的各种事件 */
-static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
-{
-	LCUI_Rect *p_rect;
-	LCUI_Surface surface;
-	int e_type = *((int*)&arg);
-	LCUI_Widget root = LCUIWidget_GetRoot();
-	DEBUG_MSG("tip, widget: %s, e_type = %d\n", w->type, e_type);
-	surface = LCUIDisplay_GetBindSurface( e->target );
-	if( display.mode == LCDM_SEAMLESS ) {
-		if( !surface && e_type != WET_ADD ) {
-			return;
-		}
-	} else if ( e->target == root ) {
-		if( !surface && e_type != WET_ADD ) {
-			return;
-		}
-	} else {
-		return;
-	}
-	p_rect = &e->target->box.graph;
-	switch( e_type ) {
-	case WET_ADD:
-		LCUIDisplay_BindSurface( e->target );
-		break;
-	case WET_REMOVE:
-	case WET_DESTROY:
-		LCUIDisplay_UnbindSurface( e->target );
-		break;
-	case WET_SHOW:
-		Surface_Show( surface );
-		break;
-	case WET_HIDE:
-		Surface_Hide( surface );
-		break;
-	case WET_TITLE:
-		DEBUG_MSG("%S\n", e->target->title );
-		Surface_SetCaptionW( surface, e->target->title );
-		break;
-	case WET_RESIZE:
-		DEBUG_MSG( "resize, w: %d, h: %d\n", p_rect->w, p_rect->h );
-		Surface_Resize( surface, p_rect->w, p_rect->h );
-		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
-		if( w == root && display.mode != LCDM_SEAMLESS ) {
-			LCUIDisplay_ExecResize( p_rect->w, p_rect->h );
-		}
-		break;
-	case WET_MOVE:
-		if( !w->style->sheet[key_top].is_valid ||
-		    !w->style->sheet[key_left].is_valid ) {
-			break;
-		}
-		DEBUG_MSG( "x: %d, y: %d\n", p_rect->left, p_rect->top );
-		Surface_Move( surface, p_rect->left, p_rect->top );
-		break;
-	default: break;
-	}
-}
-
-/** 在 surface 主动产生无效区域的时候 */
-static void Surface_OnInvalidRect( LCUI_Surface surface, LCUI_Rect *rect )
-{
-	SurfaceRecord *sr;
-	LinkedListNode *node;
-	LinkedList_ForEach( node, &display.surfaces ) {
-		sr = node->data;
-		if( sr && sr->surface != surface ) {
-			continue;
-		}
-		Widget_InvalidateArea( sr->widget, rect, SV_GRAPH_BOX );
-	}
-}
-
 void Surface_Delete( LCUI_Surface surface )
 {
 	if( display.is_working ) {
@@ -562,6 +484,94 @@ void Surface_Present( LCUI_Surface surface )
 	}
 }
 
+/** 响应顶级部件的各种事件 */
+static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
+{
+	int e_type;
+	LCUI_Widget root;
+	LCUI_Rect *p_rect;
+	LCUI_Surface surface;
+	e_type = *((int*)&arg);
+	root = LCUIWidget_GetRoot();
+	surface = LCUIDisplay_GetBindSurface( e->target );
+	DEBUG_MSG("tip, widget: %s, e_type = %d\n", w->type, e_type);
+	if( display.mode == LCDM_SEAMLESS ) {
+		if( !surface && e_type != WET_ADD ) {
+			return;
+		}
+	} else if ( e->target == root ) {
+		if( !surface && e_type != WET_ADD ) {
+			return;
+		}
+	} else {
+		return;
+	}
+	p_rect = &e->target->box.graph;
+	switch( e_type ) {
+	case WET_ADD:
+		LCUIDisplay_BindSurface( e->target );
+		break;
+	case WET_REMOVE:
+	case WET_DESTROY:
+		LCUIDisplay_UnbindSurface( e->target );
+		break;
+	case WET_SHOW:
+		Surface_Show( surface );
+		break;
+	case WET_HIDE:
+		Surface_Hide( surface );
+		break;
+	case WET_TITLE:
+		DEBUG_MSG("%S\n", e->target->title );
+		Surface_SetCaptionW( surface, e->target->title );
+		break;
+	case WET_RESIZE:
+		DEBUG_MSG( "resize, w: %d, h: %d\n", p_rect->w, p_rect->h );
+		Surface_Resize( surface, p_rect->w, p_rect->h );
+		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
+		if( w == root && display.mode != LCDM_SEAMLESS ) {
+			LCUIDisplay_ExecResize( p_rect->w, p_rect->h );
+		}
+		break;
+	case WET_MOVE:
+		if( !w->style->sheet[key_top].is_valid ||
+		    !w->style->sheet[key_left].is_valid ) {
+			break;
+		}
+		DEBUG_MSG( "x: %d, y: %d\n", p_rect->left, p_rect->top );
+		Surface_Move( surface, p_rect->left, p_rect->top );
+		break;
+	default: break;
+	}
+}
+
+/** 在 surface 主动产生无效区域并需要绘制的时候 */
+static void OnPaint( LCUI_Event e, void *arg )
+{
+	SurfaceRecord *sr;
+	LinkedListNode *node;
+	LCUI_DisplayEvent dpy_ev = arg;
+	LinkedList_ForEach( node, &display.surfaces ) {
+		sr = node->data;
+		if( sr && sr->surface != dpy_ev->surface ) {
+			continue;
+		}
+		Widget_InvalidateArea( sr->widget, &dpy_ev->paint.rect, 
+				       SV_GRAPH_BOX );
+	}
+}
+
+static void OnResize( LCUI_Event e, void *arg )
+{
+	LCUI_Widget widget;
+	LCUI_DisplayEvent dpy_ev = arg;
+	widget = LCUIDisplay_GetBindWidget( dpy_ev->surface );
+	if( !widget ) {
+		return;
+	}
+	Widget_Resize( widget, dpy_ev->resize.width, dpy_ev->resize.height );
+}
+
 /** 初始化图形输出模块 */
 int LCUI_InitDisplay( void )
 {
@@ -580,7 +590,8 @@ int LCUI_InitDisplay( void )
 	}
 	display.is_working = TRUE;
 	display.fc_ctx = FrameControl_Create();
-	display.driver.onInvalidRect( Surface_OnInvalidRect );
+	display.driver.bindEvent( DET_RESIZE, OnResize, NULL, NULL );
+	display.driver.bindEvent( DET_PAINT, OnPaint, NULL, NULL );
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	LCUIDisplay_SetMode( LCDM_DEFAULT );

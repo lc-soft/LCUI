@@ -54,6 +54,27 @@ enum LCUIDisplayMode {
 
 #define LCDM_DEFAULT LCDM_WINDOWED
 
+/** 显示驱动的事件类型 */
+enum LCUI_DisplayEventType {
+	DET_NONE,
+	DET_PAINT,
+	DET_RESIZE
+};
+
+/** 显示驱动的事件数据结构 */
+typedef struct LCUI_DisplayEventRec_ {
+	int type;
+	union {
+		struct {
+			LCUI_Rect rect;
+		} paint;
+		struct {
+			int width, height;
+		} resize;
+	};
+	LCUI_Surface surface;
+} LCUI_DisplayEventRec, *LCUI_DisplayEvent;
+
 /** surface 的操作方法集 */
 typedef struct LCUI_DisplayDriverRec_ {
 	char			name[256];
@@ -74,7 +95,7 @@ typedef struct LCUI_DisplayDriverRec_ {
 	void			(*setRenderMode)(LCUI_Surface,int);
 	void*			(*getHandle)(LCUI_Surface);
 	void			(*setOpacity)(LCUI_Surface,float);
-	void			(*onInvalidRect)(void(*)(LCUI_Surface,LCUI_Rect*));
+	int			(*bindEvent)(int,LCUI_EventFunc,void*,void(*)(void*));
 } LCUI_DisplayDriverRec, *LCUI_DisplayDriver;
 
 /** 一秒内的最大画面帧数 */
@@ -101,12 +122,6 @@ LCUI_API int LCUIDisplay_GetHeight( void );
 
 /** 添加无效区域 */
 LCUI_API void LCUIDisplay_InvalidateArea( LCUI_Rect *rect );
-
-/** 获取与 surface 绑定的 widget */
-LCUI_API LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface );
-
-/** 获取与 widget 绑定的 surface */
-LCUI_API LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget );
 
 /** 获取当前部件所属的 surface */
 LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner( LCUI_Widget w );

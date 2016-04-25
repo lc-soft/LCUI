@@ -111,7 +111,7 @@ int LCUI_InitWinApp( LCUI_AppDriver app )
 	/* 载入动态库里的图标 */
 	wndclass.hIcon         = LoadIcon( win.dll_instance, MAKEINTRESOURCE(IDI_LCUI_ICON) );
 	wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
-	wndclass.hbrBackground = (HBRUSH)GetStockObject( WHITE_BRUSH );
+	wndclass.hbrBackground = NULL;
 	wndclass.lpszMenuName  = NULL;
 	wndclass.lpszClassName = szAppName;
 

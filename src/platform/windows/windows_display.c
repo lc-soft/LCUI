@@ -49,7 +49,9 @@
 #include LCUI_DISPLAY_H
 #include LCUI_EVENTS_H
 
-#define WIN32_WINDOW_STYLE	(WS_OVERLAPPEDWINDOW &~WS_THICKFRAME &~WS_MAXIMIZEBOX)
+#define MIN_WIDTH		480
+#define MIN_HEIGHT		500
+#define WIN32_WINDOW_STYLE	(WS_OVERLAPPEDWINDOW | WS_MAXIMIZEBOX)
 
 enum SurfaceTaskType {
 	TASK_MOVE,
@@ -73,6 +75,7 @@ typedef struct LCUI_SurfaceTask {
 	};
 } LCUI_SurfaceTask;
 
+/** 适用于 windows 平台的 surface 数据结构 */
 struct LCUI_SurfaceRec_ {
 	HWND hwnd;
 	int mode;
@@ -80,14 +83,15 @@ struct LCUI_SurfaceRec_ {
 	HDC fb_hdc;
 	HBITMAP fb_bmp;
 	LCUI_BOOL is_ready;
-	LCUI_Graph fb;
+	LCUI_Graph fb;			/**< 帧缓存，保存当前窗口内呈现的图像内容 */
 	LCUI_SurfaceTask task_buffer[TASK_TOTAL_NUM];
 };
 
+/** windows 下图形显示功能所需的数据 */
 static struct WIN_Display {
 	LCUI_BOOL is_inited;
-	void (*on_invalid_rect)(LCUI_Surface, LCUI_Rect*);
 	LinkedList surfaces;		/**< surface 记录 */
+	LCUI_EventTrigger trigger;
 } win = {0};
 
 /** 根据 hwnd 获取 Surface */
@@ -377,11 +381,12 @@ static void WinSurface_Update( LCUI_Surface surface )
 	t->is_valid = FALSE;
 }
 
-static void WinSurface_OnWMPaint( LCUI_Event e, void *arg )
+static void OnWMPaint( LCUI_Event e, void *arg )
 {
 	PAINTSTRUCT ps;
 	LCUI_Rect area;
 	LCUI_Surface surface;
+	LCUI_DisplayEventRec dpy_ev;
 	WIN_SysEvent sys_event = arg;
 	BeginPaint( sys_event->hwnd, &ps );
 	/* 获取区域坐标及尺寸 */
@@ -391,14 +396,45 @@ static void WinSurface_OnWMPaint( LCUI_Event e, void *arg )
 	area.height = ps.rcPaint.bottom - area.y;
 	EndPaint( sys_event->hwnd, &ps );
 	surface = GetSurfaceByHWND( sys_event->hwnd );
-	if( win.on_invalid_rect ) {
-		win.on_invalid_rect( surface, &area );
+	if( !surface ) {
+		return;
 	}
+	dpy_ev.type = DET_PAINT;
+	dpy_ev.surface = surface;
+	dpy_ev.paint.rect = area;
+	EventTrigger_Trigger( win.trigger, DET_PAINT, &dpy_ev );
 }
 
-static void WinSurface_OnInvalidRect( void (*func)(LCUI_Surface, LCUI_Rect*) )
+static void OnWMGetMinMaxInfo( LCUI_Event e, void *arg )
 {
-	win.on_invalid_rect = func;
+	MINMAXINFO *mminfo;
+	WIN_SysEvent sys_event = arg;
+	mminfo = (PMINMAXINFO)sys_event->lparam;
+	mminfo->ptMinTrackSize.x = MIN_WIDTH;
+	mminfo->ptMinTrackSize.y = MIN_HEIGHT;
+}
+
+static void OnWMSize( LCUI_Event e, void *arg )
+{
+	LCUI_Surface surface;
+	LCUI_DisplayEventRec dpy_ev;
+	WIN_SysEvent sys_event = arg;
+	surface = GetSurfaceByHWND( sys_event->hwnd );
+	if( !surface ) {
+		return;
+	}
+	dpy_ev.surface = surface;
+	dpy_ev.type = DET_RESIZE;
+	dpy_ev.resize.width = LOWORD( sys_event->lparam );
+	dpy_ev.resize.height = HIWORD( sys_event->lparam );
+	EventTrigger_Trigger( win.trigger, DET_RESIZE, &dpy_ev );
+}
+
+static int WinDisplay_BindEvent( int event_id, LCUI_EventFunc func, 
+				 void *data, void (*destroy_data)(void*) )
+{
+	return EventTrigger_Bind( win.trigger, event_id, func, 
+				  data, destroy_data );
 }
 
 static void* WinSurface_GetHandle( LCUI_Surface s )
@@ -436,9 +472,12 @@ int LCUI_InitWinDisplay( LCUI_DisplayDriver driver )
 	driver->getHandle = WinSurface_GetHandle;
 	driver->beginPaint = WinSurface_BeginPaint;
 	driver->endPaint = WinSurface_EndPaint;
-	driver->onInvalidRect = WinSurface_OnInvalidRect;
+	driver->bindEvent = WinDisplay_BindEvent;
+	LCUI_BindSysEvent( WM_SIZE, OnWMSize, NULL, NULL );
+	LCUI_BindSysEvent( WM_PAINT, OnWMPaint, NULL, NULL );
+	LCUI_BindSysEvent( WM_GETMINMAXINFO, OnWMGetMinMaxInfo, NULL, NULL );
 	LinkedList_Init( &win.surfaces );
-	LCUI_BindSysEvent( WM_PAINT, WinSurface_OnWMPaint, NULL, NULL );
+	win.trigger = EventTrigger();
 	win.is_inited = TRUE;
 	return 0;
 }
