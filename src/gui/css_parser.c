@@ -123,6 +123,13 @@ static int SplitValues( const char *str, LCUI_Style slist,
 	vi++;
 	for( vj = 0; vj < vi; ++vj ) {
 		DEBUG_MSG("[%d] %s\n", vj, values[vj]);
+		if( strcmp( values[vj], "auto" ) == 0 ) {
+			slist[vj].type = SVT_AUTO;
+			slist[vj].value = SV_AUTO;
+			slist[vj].is_changed = TRUE;
+			slist[vj].is_valid = TRUE;
+			continue;
+		}
 		if( mode & SPLIT_NUMBER ) {
 			if( ParseNumber( &slist[vj], values[vj] ) ) {
 				DEBUG_MSG("[%d]:parse ok\n", vj);
@@ -492,6 +499,10 @@ static KeyNameGroup style_name_map[] = {
 	{ key_visible, "visible"},
 	{ key_width, "width" },
 	{ key_height, "height" },
+	{ key_min_width, "min-width" },
+	{ key_min_height, "min-height" },
+	{ key_max_width, "max-width" },
+	{ key_max_height, "max-height" },
 	{ key_display, "display" },
 	{ key_z_index, "z-index" },
 	{ key_top, "top" },
@@ -572,6 +583,10 @@ static KeyNameGroup style_option_map[] = {
 static LCUI_StyleParserRec style_parser_map[] = {
 	{ key_width, NULL, OnParseNumber },
 	{ key_height, NULL, OnParseNumber },
+	{ key_min_width, NULL, OnParseNumber },
+	{ key_min_height, NULL, OnParseNumber },
+	{ key_max_width, NULL, OnParseNumber },
+	{ key_max_height, NULL, OnParseNumber },
 	{ key_top, NULL, OnParseNumber },
 	{ key_right, NULL, OnParseNumber },
 	{ key_bottom, NULL, OnParseNumber },
