@@ -37,11 +37,31 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
+//#define DEBUG
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
+
+/** 判断部件是否有可绘制内容 */
+static LCUI_BOOL Widget_IsPaintable( LCUI_Widget w )
+{
+	LCUI_WidgetClass *wc;
+	LCUI_WidgetStyle *s = &w->computed_style;
+	if( s->background.color.alpha > 0 ||
+	    Graph_IsValid( &s->background.image ) ||
+	    s->border.top.width > 0 || s->border.right.width > 0 ||
+	    s->border.bottom.width > 0 || s->border.left.width > 0 ||
+	    s->shadow.blur > 0 || s->shadow.spread > 0 ) {
+		return TRUE;
+	}
+	wc = LCUIWidget_GetClass( w->type );
+	if( wc && wc->methods.paint ) {
+		return TRUE;
+	}
+	return FALSE;
+}
 
 /**
  * 根据所处框区域，调整矩形
@@ -129,7 +149,9 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	Graph_DrawBackground( paint, &box, &s->background );
 	Graph_DrawBorder( paint, &box, &s->border );
 	wc = LCUIWidget_GetClass( w->type );
-	wc && wc->methods.paint ? wc->methods.paint(w, paint):FALSE;
+	if( wc && wc->methods.paint ) {
+		wc->methods.paint( w, paint );
+	}
 }
 
 static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y, 
@@ -142,6 +164,7 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 	LCUI_Rect rect, child_box, *r;
 	count = w->dirty_rects.length;
 	/* 取出当前记录的脏矩形 */
+	DEBUG_MSG( "fixed xy: %d,%d\n", x, y );
 	LinkedList_ForEach( node, &w->dirty_rects ) {
 		r = node->data;
 		/* 若有独立位图缓存，则重绘脏矩形区域 */
@@ -175,6 +198,7 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 	/* 转换有效区域的坐标，相对于当前部件的内容框 */
 	child_box.x -= w->box.padding.x;
 	child_box.y -= w->box.padding.y;
+	DEBUG_MSG("child valid box: %d,%d,%d,%d\n", child_box.x, child_box.y, child_box.width, child_box.height);
 	/* 向子级部件递归 */
 	LinkedList_ForEach( node, &w->children ) {
 		int child_x, child_y;
@@ -182,9 +206,10 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 		if( !child->computed_style.visible ) {
 			continue;
 		}
+		DEBUG_MSG("child graph xy: %d,%d\n", child->box.graph.x, child->box.graph.y);
 		child_x = child->box.graph.x + x;
-		child_x += w->box.padding.x - w->box.graph.x;
 		child_y = child->box.graph.y + y;
+		child_x += w->box.padding.x - w->box.graph.x;
 		child_y += w->box.padding.y - w->box.graph.y;
 		count += _Widget_ProcInvalidArea( child, child_x, child_y, 
 						  &child_box, rlist );
@@ -283,19 +308,22 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		}
 		*/
 	}
-	if( w->enable_graph && Graph_IsValid(&w->graph) ) {
-		Graph_Quote( &self_graph, &w->graph, &paint->rect );
-	} else {
-		self_graph.color_type = COLOR_TYPE_ARGB;
-		Graph_Create( &self_graph, paint->rect.width,
-				paint->rect.height );
-		self_paint.canvas = self_graph;
-		self_paint.rect = paint->rect;
-		Widget_OnPaint( w, &self_paint );
-	}
-	/* 若不需要缓存自身位图则直接绘制到画布上 */
-	if( !has_self_graph ) {
-		Graph_Mix( &paint->canvas, &self_graph, 0, 0, FALSE );
+	/* 如果部件有需要绘制的内容 */
+	if( Widget_IsPaintable( w ) ) {
+		if( w->enable_graph && Graph_IsValid( &w->graph ) ) {
+			Graph_Quote( &self_graph, &w->graph, &paint->rect );
+		} else {
+			self_graph.color_type = COLOR_TYPE_ARGB;
+			Graph_Create( &self_graph, paint->rect.width,
+				      paint->rect.height );
+			self_paint.canvas = self_graph;
+			self_paint.rect = paint->rect;
+			Widget_OnPaint( w, &self_paint );
+		}
+		/* 若不需要缓存自身位图则直接绘制到画布上 */
+		if( !has_self_graph ) {
+			Graph_Mix( &paint->canvas, &self_graph, 0, 0, FALSE );
+		}
 	}
 	/* 计算内容框相对于图层的坐标 */
 	content_left = w->box.padding.x - w->box.graph.x;
