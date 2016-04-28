@@ -164,6 +164,18 @@ clean:
 	return vi;
 }
 
+static int OnParseValue( LCUI_StyleSheet ss, int key, const char *str )
+{
+	LCUI_Style s = &ss->sheet[key];
+	if( sscanf( str, "%d", &s->value ) == 1 ) {
+		s->is_valid = TRUE;
+		s->is_changed = TRUE;
+		s->type = SVT_VALUE;
+		return 0;
+	}
+	return -1;
+}
+
 static int OnParseNumber( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style s = &ss->sheet[key];
@@ -591,7 +603,7 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ key_right, NULL, OnParseNumber },
 	{ key_bottom, NULL, OnParseNumber },
 	{ key_left, NULL, OnParseNumber },
-	{ key_z_index, NULL, OnParseNumber },
+	{ key_z_index, NULL, OnParseValue },
 	{ key_position, NULL, OnParseStyleOption },
 	{ key_display, NULL, OnParseStyleOption },
 	{ key_background_color, NULL, OnParseColor },

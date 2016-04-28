@@ -547,20 +547,14 @@ void Widget_FlushZIndex( LCUI_Widget w )
 		LCUI_Widget child = cnode->data;
 		LCUI_WidgetStyle *ccs = &child->computed_style;
 		csnode = Widget_GetShowNode( child );
-		if( ccs->position == w->computed_style.position ) {
-			if( w->computed_style.position == SV_STATIC ||
-			    w->computed_style.z_index < ccs->z_index ) {
-				continue;
-			}
-			if( index < Widget_GetIndex( child ) ) {
-				continue;
-			}
-		} else if( w->computed_style.position == SV_STATIC ) {
-			continue;
-		} else if( w->computed_style.z_index < ccs->z_index ) {
+		if( w->computed_style.z_index < ccs->z_index ) {
 			continue;
 		} else if( w->computed_style.z_index == ccs->z_index ) {
-			if( index < Widget_GetIndex( child ) ) {
+			if( w->computed_style.position == ccs->position ) {
+				if( index < Widget_GetIndex( child ) ) {
+					continue;
+				}
+			} else if( w->computed_style.position < ccs->position ) {
 				continue;
 			}
 		}
