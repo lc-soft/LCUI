@@ -58,6 +58,7 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_StyleValue float_mode;	/**< 浮动模式 */
 	LCUI_StyleValue display;	/**< 显示方式，决定以何种布局显示该部件 */
 	LCUI_StyleValue box_sizing;	/**< 以何种方式计算宽度和高度 */
+	LCUI_StyleValue vertical_align;	/**< 垂直对齐方式 */
 	LCUI_BoundBox margin;		/**< 外边距 */
 	LCUI_BoundBox padding;		/**< 内边距 */
 	LCUI_Background background;	/**< 背景 */
@@ -96,6 +97,7 @@ enum LCUI_StyleKeyName {
 	key_padding_right,
 	key_padding_bottom,
 	key_padding_left,
+	key_vertical_align,
 	key_border_start,
 	key_border_color,
 	key_border_style,

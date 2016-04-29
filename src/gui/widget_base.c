@@ -618,6 +618,8 @@ void Widget_FlushPosition( LCUI_Widget w )
 {
 	LCUI_Rect rect = w->box.graph;
 	int position = ComputeStyleOption( w, key_position, SV_STATIC );
+	int valign = ComputeStyleOption( w, key_vertical_align, SV_TOP );
+	w->computed_style.vertical_align = valign;
 	w->computed_style.left = ComputeXNumber( w, key_left );
 	w->computed_style.top = ComputeXNumber( w, key_top );
 	w->computed_style.right = ComputeYNumber( w, key_right );
@@ -669,6 +671,21 @@ void Widget_FlushPosition( LCUI_Widget w )
 			w->y += w->parent->padding.top;
 		}
 		break;
+	}
+	switch( valign ) {
+	case SV_MIDDLE:
+		if( !w->parent ) {
+			break;
+		}
+		w->y += (w->parent->box.content.height - w->height) / 2;
+		break;
+	case SV_BOTTOM:
+		if( !w->parent ) {
+			break;
+		}
+		w->y += w->parent->box.content.height - w->height;
+	case SV_TOP:
+	default: break;
 	}
 	w->box.outer.x = w->x;
 	w->box.outer.y = w->y;
@@ -909,6 +926,9 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 		      child->style->sheet[key_bottom].is_valid) ) {
 			Widget_AddTask( child, WTT_POSITION );
 		}
+		if( child->computed_style.vertical_align != SV_TOP ) {
+			Widget_AddTask( child, WTT_POSITION );
+		}
 	}
 }
 
@@ -962,10 +982,11 @@ void Widget_FlushSize( LCUI_Widget w )
 	if( w->style->sheet[key_height].type != SVT_AUTO ) {
 		Widget_AddTask( w, WTT_LAYOUT );
 	}
-	/* 如果是绝对定位，且指定了右边距 */
-	if( w->computed_style.position == SV_ABSOLUTE &&
+	/* 如果是绝对定位，且指定了右边距，或者垂直对齐方式不为顶部对齐 */
+	if( (w->computed_style.position == SV_ABSOLUTE &&
 	    w->style->sheet[key_right].is_valid && 
-	    w->style->sheet[key_right].type != SVT_AUTO ) {
+	    w->style->sheet[key_right].type != SVT_AUTO) ||
+	    w->computed_style.vertical_align != SV_TOP ) {
 		Widget_FlushPosition( w );
 	}
 	if( w->parent ) {
