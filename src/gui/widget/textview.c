@@ -287,8 +287,6 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LinkedListNode *node;
 	LCUI_Size new_size = {16, 16};
 	LCUI_TextView *txt = w->private_data;
-
-	DEBUG_MSG("on resize\n");
 	if( w->width > new_size.w ) {
 		new_size.w = w->width;
 	}
@@ -296,6 +294,12 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		new_size.h = w->height;
 	}
 	LinkedList_Init( &rects );
+	if( w->style->sheet[key_width].is_valid && 
+	    w->style->sheet[key_width].type != SVT_AUTO ) {
+		TextLayer_SetAutoWrap( txt->layer, TRUE );
+	} else {
+		TextLayer_SetAutoWrap( txt->layer, FALSE );
+	}
 	TextLayer_SetMaxSize( txt->layer, new_size );
 	TextLayer_Update( txt->layer, &rects );
 	LinkedList_ForEach( node, &rects ) {

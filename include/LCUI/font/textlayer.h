@@ -48,11 +48,11 @@ enum TextAddType {
         TEXT_ADD_TYPE_APPEND		/**< 追加至文本末尾 */
 };
 
-typedef struct TextCharData {
+typedef struct TextCharRec_ {
         wchar_t char_code;		/**< 字符码 */
         LCUI_TextStyle *style;		/**< 该字符使用的样式数据 */
 	const LCUI_FontBitmap *bitmap;	/**< 字体位图数据(只读) */
-} TextCharData;
+} TextCharRec, *TextChar;
 
 /** 文本行结尾符 */
 typedef enum EOLChar {
@@ -63,22 +63,22 @@ typedef enum EOLChar {
 } EOLChar;
 
 /* 文本行 */
-typedef struct TextRowData {
+typedef struct TextRowRec_ {
         int width;			/**< 宽度 */
         int height;			/**< 高度 */
 	int text_height;		/**< 当前行中最大字体的高度 */
         int length;			/**< 该行文本长度 */
         int max_length;			/**< 该行文本最大长度 */
-        TextCharData **string;		/**< 该行文本的数据 */
+        TextChar *string;		/**< 该行文本的数据 */
 	EOLChar eol;			/**< 行尾结束类型 */
-} TextRowData;
+} TextRowRec, *TextRow;
 
 /* 文本行列表 */
-typedef struct TextRowList {
-        int length;			/**< 当前总行数 */
-        int max_length;			/**< 最大行数 */
-        TextRowData **rows;		/**< 每一行文本的数据 */
-} TextRowList;
+typedef struct TextRowListRec_ {
+        int length;		/**< 当前总行数 */
+        int max_length;		/**< 最大行数 */
+        TextRow *rows;		/**< 每一行文本的数据 */
+} TextRowListRec, *TextRowList;
 
 typedef struct LCUI_TextLayerRec_  {
         int offset_x;			/**< X轴坐标偏移量 */
@@ -96,7 +96,7 @@ typedef struct LCUI_TextLayerRec_  {
 	LinkedList dirty_rect;		/**< 脏矩形记录 */
 
         int text_align;			/**< 文本的对齐方式 */
-        TextRowList row_list;		/**< 文本行列表 */
+        TextRowListRec rowlist;		/**< 文本行列表 */
         LCUI_TextStyle text_style;	/**< 文本全局样式 */
 	LinkedList style_cache;		/**< 样式缓存 */
 	LCUI_StyleRec line_height;	/**< 全局文本行高度 */
@@ -107,7 +107,7 @@ typedef struct LCUI_TextLayerRec_  {
 		LCUI_BOOL redraw_all;		/**< 重绘所有字体位图 */
 	} task;				/**< 待处理的任务 */
         LCUI_Graph graph;		/**< 文本位图缓存 */
-}* LCUI_TextLayer;
+} LCUI_TextLayerRec, *LCUI_TextLayer;
 
 /** 获取文本行总数 */
 LCUI_API int TextLayer_GetRowTotal( LCUI_TextLayer layer );
