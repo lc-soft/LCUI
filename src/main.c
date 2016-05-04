@@ -66,11 +66,6 @@ enum MainLoopState {
 	STATE_EXITED
 };
 
-typedef struct LCUI_MainLoopRec_ {
-	int state;		/**< 主循环的状态 */
-	unsigned long int tid;	/**< 当前运行该主循环的线程的ID */
-} LCUI_MainLoopRec;
-
 typedef struct SysEventHandlerRec_ {
 	LCUI_SysEventFunc func;
 	void *data;
@@ -105,7 +100,6 @@ static struct LCUI_App {
 	LCUI_Mutex tasks_mutex;		/**< 任务记录互斥锁 */
 	LCUI_Mutex loop_mutex;		/**< 互斥锁，确保一次只允许一个线程跑主循环 */
 	LCUI_Mutex loop_changed;	/**< 互斥锁，用于指示当前运行的主循环是否改变 */
-	LCUI_Cond loop_cond;		/**< 条件变量，用于决定是否继续任务循环 */
 	LCUI_MainLoop loop;		/**< 当前运行的主循环 */
 	LinkedList loops;		/**< 主循环列表 */
 	LCUI_AppDriverRec driver;	/**< 程序事件驱动支持 */
@@ -210,7 +204,6 @@ int LCUI_AddTask( LCUI_AppTask task )
 		LCUIMutex_Lock( &MainApp.tasks_mutex );
 		node = LinkedList_Append( &MainApp.tasks, buff );
 		LCUIMutex_Unlock( &MainApp.tasks_mutex );
-		LCUICond_Broadcast( &MainApp.loop_cond );
 	}
 	LCUI_BreakEventWaiting();
 	return node ? 0:-1;
@@ -229,22 +222,26 @@ LCUI_MainLoop LCUI_MainLoop_New( void )
 /** 运行目标主循环 */
 int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 {
+	LCUI_BOOL at_same_thread = FALSE;
 	if( loop->state == STATE_RUNNING ) {
-		_DEBUG_MSG("error: main-loop already running.");
+		DEBUG_MSG("error: main-loop already running.");
 		return -1;
 	}
-	DEBUG_MSG("loop: %p, enter\n", loop);
 	loop->state = STATE_RUNNING;
-	/* 将主循环记录插入至列表表头 */
-	LinkedList_Insert( &MainApp.loops, 0, loop );
-	MainApp.loop = loop;
-	LCUIMutex_Lock( &MainApp.loop_changed );
-	/* 广播，让其它线程交出主循环运行权 */
-	LCUICond_Broadcast( &MainApp.loop_cond );
-	/* 获取运行权 */
-	LCUIMutex_Lock( &MainApp.loop_mutex );
-	LCUIMutex_Unlock( &MainApp.loop_changed );
 	loop->tid = LCUIThread_SelfID();
+	if( MainApp.loop ) {
+		at_same_thread = MainApp.loop->tid == loop->tid;
+	}
+	DEBUG_MSG("at_same_thread: %d\n", at_same_thread);
+	if( !at_same_thread ) {
+		LCUIMutex_Lock( &MainApp.loop_mutex );
+		LinkedList_Insert( &MainApp.loops, 0, loop );
+		LCUIMutex_Unlock( &MainApp.loop_mutex );
+	} else {
+		LinkedList_Insert( &MainApp.loops, 0, loop );
+	}
+	DEBUG_MSG("loop: %p, enter\n", loop);
+	MainApp.loop = loop;
 	while( loop->state != STATE_EXITED ) {
 		LCUI_AppTask task;
 		LinkedListNode *node, *prev;
@@ -253,35 +250,36 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 			DEBUG_MSG("loop: %p, sleeping...\n", loop);
 			LCUI_WaitEvent();
 		}
-		DEBUG_MSG("loop: %p, wakeup, lost_time: %ld\n", loop, ct);
+		DEBUG_MSG("loop: %p, wakeup\n", loop);
 		LCUI_PumbEvents();
 		node = MainApp.tasks.head.next;
 		while( node && len-- > 0 ) {
 			prev = node->prev;
 			task = node->data;
+			if( at_same_thread ) {
+				LinkedList_Unlink( &MainApp.tasks, node );
+			} else {
+				LCUIMutex_Lock( &MainApp.tasks_mutex );
+				LinkedList_Unlink( &MainApp.tasks, node );
+				LCUIMutex_Unlock( &MainApp.tasks_mutex );
+			}
 			if( task && task->func ) {
 				DEBUG_MSG( "task: %p, start\n", task );
 				task->func( task->arg[0], task->arg[1] );
 				DEBUG_MSG( "task: %p, end\n", task );
 			}
 			DestroyTask( task );
-			LinkedList_DeleteNode( &MainApp.tasks, node );
+			free( node->data );
+			free( node );
 			node = prev->next;
 		}
-		LCUIMutex_Unlock( &MainApp.tasks_mutex );
-		if( MainApp.loop == loop ) {
-			continue;
-		}
 		/* 如果当前运行的主循环不是自己 */
-		loop->state = STATE_PAUSED;
-		DEBUG_MSG("loop: %p, release control.\n", loop);
-		LCUIMutex_Unlock( &MainApp.loop_mutex );
-		/* 等待其它线程获得主循环运行权 */
-		LCUIMutex_Lock( &MainApp.loop_changed );
-		LCUIMutex_Unlock( &MainApp.loop_changed );
-		DEBUG_MSG("loop: %p, waiting...\n", loop);
-		/* 等待其它线程释放主循环运行权 */
-		LCUIMutex_Lock( &MainApp.loop_mutex );
+		while( MainApp.loop != loop ) {
+			loop->state = STATE_PAUSED;
+			LCUICond_Wait( &MainApp.loop_changed, 
+				       &MainApp.loop_mutex );
+			LCUIMutex_Unlock( &MainApp.loop_mutex );
+		}
 	}
 	loop->state = STATE_EXITED;
 	LinkedList_Delete( &MainApp.loops, 0 );
@@ -290,11 +288,9 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	if( loop ) {
 		/* 改变当前运行的主循环 */
 		MainApp.loop = loop;
-		LCUICond_Broadcast( &MainApp.loop_cond );
 	}
-	/* 释放运行权 */
-	LCUIMutex_Unlock( &MainApp.loop_mutex );
 	DEBUG_MSG("loop: %p, exit\n", loop);
+	LCUICond_Broadcast( &MainApp.loop_changed );
 	return 0;
 }
 
@@ -302,13 +298,11 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 void LCUI_MainLoop_Quit( LCUI_MainLoop loop )
 {
 	loop->state = STATE_EXITED;
-	LCUICond_Broadcast( &MainApp.loop_cond );
 }
 
 /** 初始化程序数据结构体 */
 static void LCUIApp_Init(void)
 {
-	LCUICond_Init( &MainApp.loop_cond );
 	LCUIMutex_Init( &MainApp.loop_changed );
 	LCUIMutex_Init( &MainApp.loop_mutex );
 	LinkedList_Init( &MainApp.loops );
@@ -359,7 +353,6 @@ static void LCUIApp_QuitAllMainLoop(void)
 			loop->state = STATE_EXITED;
 		}
 	}
-	LCUICond_Broadcast( &MainApp.loop_cond );
 }
 
 /* 销毁程序占用的资源 */
@@ -373,7 +366,6 @@ static void LCUIApp_Destroy(void)
 		LCUIThread_Join( loop->tid, NULL );
 	}
 	/* 开始清理 */
-	LCUICond_Destroy( &MainApp.loop_cond );
 	LCUIMutex_Destroy( &MainApp.loop_mutex );
 	LCUIMutex_Destroy( &MainApp.loop_changed );
 	LCUIMutex_Destroy( &MainApp.tasks_mutex );

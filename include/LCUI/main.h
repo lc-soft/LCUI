@@ -85,11 +85,11 @@ typedef struct LCUI_AppDriverRec_ {
 	void*(*GetData)(void);
 } LCUI_AppDriverRec, *LCUI_AppDriver;
 
-#ifdef __IN_MAIN_SOURCE_FILE__
-typedef struct LCUI_MainLoopRec_* LCUI_MainLoop;
-#else
-typedef void* LCUI_MainLoop;
-#endif
+typedef struct LCUI_MainLoopRec_ {
+	int state;		/**< 主循环的状态 */
+	unsigned long int tid;	/**< 当前运行该主循环的线程的ID */
+} LCUI_MainLoopRec, *LCUI_MainLoop;
+
 
 LCUI_API int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
 			     void( *destroy_data )(void*) );
