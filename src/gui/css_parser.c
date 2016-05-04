@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * css_parser.c -- css parser module
+ * css_parser.c -- css code parser module
  *
  * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
  *
@@ -20,7 +20,7 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * css_parser.c -- css 样式解析模块
+ * css_parser.c -- css 样式代码解析模块
  *
  * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
  *
@@ -47,11 +47,11 @@
 /** 解析器的环境参数（上下文数据） */
 typedef struct CSSParserContextRec_ {
 	enum {
-		is_none,		/**< 无 */
-		is_selector,		/**< 选择器 */
-		is_key,			/**< 属性名 */
-		is_value,		/**< 属性值 */
-		is_comment		/**< 注释 */
+		TARGET_NONE,		/**< 无 */
+		TARGET_SELECTOR,	/**< 选择器 */
+		TARGET_KEY,		/**< 属性名 */
+		TARGET_VALUE,		/**< 属性值 */
+		TARGET_COMMENT		/**< 注释 */
 	} target, target_bak;		/**< 当前解析中的目标，以及当前备份的目标 */
 	LCUI_BOOL is_line_comment;	/**< 是否为单行注释 */
 	char *buffer;			/**< 缓存中的字符串 */
@@ -666,8 +666,8 @@ static CSSParserContext NewCSSParserContext( size_t buffer_size )
 	LinkedList_Init( &ctx->selectors );
 	ctx->buffer = (char*)malloc( sizeof(char) * buffer_size );
 	ctx->buffer_size = buffer_size;
-	ctx->target_bak = is_none;
-	ctx->target = is_none;
+	ctx->target_bak = TARGET_NONE;
+	ctx->target = TARGET_NONE;
 	return ctx;
 }
 
@@ -696,11 +696,11 @@ static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
 	ctx->ptr = str;
 	for( ; *ctx->ptr && size < ctx->buffer_size; ++ctx->ptr, ++size ) {
 		switch( ctx->target ) {
-		case is_selector:
+		case TARGET_SELECTOR:
 			switch( *ctx->ptr ) {
 			case '/': goto proc_comment;
 			case '{':
-				ctx->target = is_key;
+				ctx->target = TARGET_KEY;
 				ctx->css = StyleSheet();
 			case ',':
 				ctx->buffer[ctx->pos] = 0;
@@ -718,7 +718,7 @@ static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
 				break;
 			}
 			break;
-		case is_key:
+		case TARGET_KEY:
 			switch( *ctx->ptr ) {
 			case '/': goto proc_comment;
 			case ' ':
@@ -730,14 +730,14 @@ static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
 				continue;
 			case ':': break;
 			case '}':
-				ctx->target = is_none;
+				ctx->target = TARGET_NONE;
 				goto put_css;
 			default:
 				ctx->buffer[ctx->pos++] = *ctx->ptr;
 				continue;
 			}
 			goto select_parser;
-		case is_value:
+		case TARGET_VALUE:
 			switch( *ctx->ptr ) {
 			case '/': goto proc_comment;
 			case '}':
@@ -755,7 +755,7 @@ static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
 				continue;
 			}
 			break;
-		case is_comment:
+		case TARGET_COMMENT:
 			if( ctx->is_line_comment ) {
 				if( *ctx->ptr == '\n' ) {
 					ctx->target = ctx->target_bak;
@@ -766,7 +766,7 @@ static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
 				ctx->target = ctx->target_bak;
 			}
 			break;
-		case is_none:
+		case TARGET_NONE:
 		default:
 			switch( *ctx->ptr ) {
 			case '/': goto proc_comment;
@@ -783,7 +783,7 @@ static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
 			}
 			ctx->pos = 0;
 			ctx->buffer[ctx->pos++] = *ctx->ptr;
-			ctx->target = is_selector;
+			ctx->target = TARGET_SELECTOR;
 			break;
 		}
 		continue;
@@ -795,9 +795,9 @@ proc_comment:
 			ctx->buffer[ctx->pos++] = *ctx->ptr;
 			continue;
 		}
-		if( ctx->target_bak != is_comment ) {
+		if( ctx->target_bak != TARGET_COMMENT ) {
 			ctx->target_bak = ctx->target;
-			ctx->target = is_comment;
+			ctx->target = TARGET_COMMENT;
 		}
 		continue;
 put_css:
@@ -810,7 +810,7 @@ put_css:
 		StyleSheet_Delete( &ctx->css );
 		continue;
 select_parser:
-		ctx->target = is_value;
+		ctx->target = TARGET_VALUE;
 		ctx->buffer[ctx->pos] = 0;
 		ctx->pos = 0;
 		ctx->parser = RBTree_CustomGetData( &self.parser_tree,
@@ -820,7 +820,7 @@ select_parser:
 		continue;
 parse_value:
 		if( *ctx->ptr == ';' ) {
-			ctx->target = is_key;
+			ctx->target = TARGET_KEY;
 		}
 		if( !ctx->parser ) {
 			continue;
@@ -830,7 +830,7 @@ parse_value:
 		ctx->parser->parse( ctx->css, ctx->parser->key, ctx->buffer );
 		DEBUG_MSG("parse style value: %s, result: %d\n", ctx->buffer);
 		if( *ctx->ptr == '}' ) {
-			ctx->target = is_none;
+			ctx->target = TARGET_NONE;
 			goto put_css;
 		}
 	}

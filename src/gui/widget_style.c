@@ -44,7 +44,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 
-#define MAX_NAME_LEN		128
+#define MAX_NAME_LEN		256
 #define MAX_NODE_DEPTH		32
 #define MAX_SELECTOR_DEPTH	32
 
@@ -66,9 +66,21 @@ typedef struct StyleTreeNodeRec_ {
 	LinkedList styles;		/**< 其它样式表 */
 } StyleTreeNodeRec, *StyleTreeNode;
 
+/* 样式表查找器的上下文数据结构 */
+typedef struct StyleSheetFinderRec_ {
+	int level;			/**< 当前选择器层级 */
+	int class_i;			/**< 当前处理到第几个类名 */
+	int status_i;			/**< 当前处理到第几个状态名（伪类名） */
+	int name_i;			/**< 选择器名称从第几个字符开始 */
+	char name[MAX_NAME_LEN];	/**< 选择器名称缓存 */
+	LinkedList classes;		/**< 已排序的类名列表 */
+	LinkedList status;		/**< 已排序的状态列表 */
+	LCUI_Widget widget;		/**< 针对的部件 */
+} StyleSheetFinderRec, *StyleSheetFinder;
+
 static struct {
 	LCUI_BOOL is_inited;
-	LCUI_RBTree style;		/**< 样式树 */
+	LCUI_RBTree tree;		/**< 样式树 */
 } style_library;
 
 const char *global_css = ToString(
@@ -158,9 +170,9 @@ static void DestroyStyleTreeNode( void *data )
 
 void LCUIWidget_InitStyle( void )
 {
-	RBTree_Init( &style_library.style );
-	RBTree_OnJudge( &style_library.style, CompareName );
-	RBTree_OnDestroy( &style_library.style, DestroyStyleTreeNode );
+	RBTree_Init( &style_library.tree );
+	RBTree_OnJudge( &style_library.tree, CompareName );
+	RBTree_OnDestroy( &style_library.tree, DestroyStyleTreeNode );
 	style_library.is_inited = TRUE;
 	LCUICSS_Init();
 	LCUICSS_LoadString( global_css );
@@ -168,7 +180,7 @@ void LCUIWidget_InitStyle( void )
 
 void LCUIWidget_ExitStyle( void )
 {
-	RBTree_Destroy( &style_library.style );
+	RBTree_Destroy( &style_library.tree );
 	style_library.is_inited = FALSE;
 	LCUICSS_Destroy();
 }
@@ -515,12 +527,12 @@ static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 	LCUI_RBTreeNode *tn;
 	LinkedListNode *node;
 	int i = 0, pos = -1;
-	tn = RBTree_CustomSearch( &style_library.style, (const void*)name );
+	tn = RBTree_CustomSearch( &style_library.tree, (const void*)name );
 	if( !tn ) {
 		stn = NEW( StyleTreeNodeRec, 1 );
 		strncpy( stn->name, name, MAX_NAME_LEN );
 		LinkedList_Init( &stn->styles );
-		tn = RBTree_CustomInsert( &style_library.style,
+		tn = RBTree_CustomInsert( &style_library.tree,
 					  (const void*)name, stn );
 	}
 	stn = tn->data;
@@ -556,28 +568,27 @@ static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
 
 static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector )
 {
-	char fullname[MAX_NAME_LEN];
+	char fullname[MAX_NAME_LEN] = "";
 	LCUI_SelectorNode sn = selector->list[selector->length-1];
-	/* 优先级：伪类 > 类 > ID > 名称 */
-	if( sn->pseudo_class_name ) {
-		fullname[0] = ':';
-		strncpy( fullname + 1, sn->pseudo_class_name, MAX_NAME_LEN-1 );
-		return SelectStyleSheetByName( selector, fullname );
-	}
-	if( sn->class_name ) {
-		fullname[0] = '.';
-		strncpy( fullname + 1, sn->class_name, MAX_NAME_LEN-1 );
-		return SelectStyleSheetByName( selector, fullname );
+	if( sn->type ) {
+		strcat( fullname, sn->type );
 	}
 	if( sn->id ) {
-		fullname[0] = '#';
-		strncpy( fullname + 1, sn->id, MAX_NAME_LEN-1 );
-		return SelectStyleSheetByName( selector, fullname );
+		strcat( fullname, "#" );
+		strcat( fullname, sn->id );
 	}
-	if( sn->type ) {
-		return SelectStyleSheetByName( selector, sn->type );
+	if( sn->class_name ) {
+		strcat( fullname, "." );
+		strcat( fullname, sn->class_name );
 	}
-	return NULL;
+	if( sn->pseudo_class_name ) {
+		strcat( fullname, ":" );
+		strcat( fullname, sn->pseudo_class_name );
+	}
+	if( fullname[0] == 0 ) {
+		return NULL;
+	}
+	return SelectStyleSheetByName( selector, fullname );
 }
 
 int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
@@ -685,7 +696,7 @@ static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 	LCUI_RBTreeNode *tn;
 	LinkedListNode *node;
 	LCUI_Widget w, wlist[MAX_SELECTOR_DEPTH];
-	tn = RBTree_CustomSearch( &style_library.style, (const void*)name );
+	tn = RBTree_CustomSearch( &style_library.tree, (const void*)name );
 	if( !tn ) {
 		return 0;
 	}
@@ -696,8 +707,8 @@ static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 	if( n == 0 ) {
 		wlist[0] = NULL;
 	} else {
-		wlist[n] = NULL;
 		w = widget;
+		wlist[n] = NULL;
 		while( --n >= 0 ) {
 			wlist[n] = w;
 			w = w->parent;
@@ -716,35 +727,228 @@ static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
 	return count;
 }
 
+/** 从小到大，排序名称列表 */
+static void SortNames( char **names, LinkedList *outnames )
+{
+	char *name;
+	int i, len;
+	LinkedListNode *node;
+	len = ptrslen( names );
+	while( --len >= 0 ) {
+		i = 0;
+		name = names[len];
+		LinkedList_ForEach( node, outnames ) {
+			if( strcmp(name, node->data) > 0 ) {
+				++i;
+				continue;
+			}
+			LinkedList_Insert( outnames, i, name );
+			break;
+		}
+		if( i >= outnames->length ) {
+			LinkedList_Append( outnames, name );
+		}
+	}
+}
+
+/** 初始化样式表查找器 */
+static void StyleSheetFinder_Init( StyleSheetFinder sfinder, LCUI_Widget w )
+{
+	sfinder->level = 0;
+	sfinder->class_i = 0;
+	sfinder->name_i = 0;
+	sfinder->status_i = 0;
+	sfinder->name[0] = 0;
+	sfinder->widget = w;
+	LinkedList_Init( &sfinder->classes );
+	LinkedList_Init( &sfinder->status );
+	SortNames( w->classes, &sfinder->classes );
+	SortNames( w->status, &sfinder->status );
+}
+
+/** 销毁样式表查找器 */
+static void StyleSheetFinder_Destroy( StyleSheetFinder sfinder )
+{
+	sfinder->level = 0;
+	sfinder->name[0] = 0;
+	sfinder->name_i = 0;
+	sfinder->class_i = 0;
+	sfinder->status_i = 0;
+	sfinder->widget = NULL;
+	LinkedList_Clear( &sfinder->classes, NULL );
+	LinkedList_Clear( &sfinder->status, NULL );
+}
+
+/* 查找匹配的样式表 */
+int StyleSheetFinder_Find( StyleSheetFinder sfinder, LinkedList *list )
+{
+	LinkedListNode *node;
+	int i, name_len, len, old_len, count = 0;
+	char *fullname = sfinder->name + sfinder->name_i;
+	old_len = len = strlen( fullname );
+	switch( sfinder->level ) {
+	case 0: 
+		/* 按类型选择器搜索样式表 */
+		if( sfinder->widget->type ) {
+			strcpy( fullname, sfinder->widget->type );
+			count += FindStyleNodeByName( fullname, 
+						      sfinder->widget, list );
+		}
+		sfinder->level += 1;
+		/* 递归到下一级 */
+		count += StyleSheetFinder_Find( sfinder, list );
+		sfinder->level -= 1;
+		break;
+	case 1: 
+		/* 按ID选择器搜索样式表 */
+		if( sfinder->widget->id ) {
+			fullname[len++] = '#';
+			strcpy( fullname + len, sfinder->widget->id );
+			count += FindStyleNodeByName( sfinder->widget->id, 
+						      sfinder->widget, list );
+			count += FindStyleNodeByName( fullname, 
+						      sfinder->widget, list );
+		}
+		sfinder->level += 1;
+		count += StyleSheetFinder_Find( sfinder, list );
+		sfinder->level -= 1;
+		break;
+	case 2:
+		/* 按类选择器搜索样式表 */
+		sfinder->level += 1;
+		/* 假设当前选择器全名为：textview#main-btn-text，且有 .a .b .c 
+		 * 这三个类，那么下面的处理将会拆分成以下三个选择器来匹配样式表：
+		 * textview#test-text.a
+		 * textview#test-text.b
+		 * textview#test-text.a
+		 */
+		LinkedList_ForEach( node, &sfinder->classes ) {
+			fullname[len] = '.';
+			strcpy( fullname + len + 1, node->data );
+			if( len > 0 ) {
+				count += FindStyleNodeByName( fullname + len,
+							      sfinder->widget,
+							      list );
+			}
+			count += FindStyleNodeByName( fullname, 
+						      sfinder->widget, list );
+			count += StyleSheetFinder_Find( sfinder, list );
+			sfinder->class_i += 1;
+		}
+		/* 同样是上面的假设，下面的处理会忽略前面的 textview#test-text，
+		 * 然后递归到下一级处理伪类选择器，结果类似于：
+		 * .a:hover
+		 * .b:active
+		 * .b:hover:active
+		 */
+		sfinder->level += 1;
+		sfinder->class_i = 0;
+		sfinder->name_i = old_len;
+		LinkedList_ForEach( node, &sfinder->classes ) {
+			fullname[len] = '.';
+			strcpy( fullname + len + 1, node->data );
+			count += StyleSheetFinder_Find( sfinder, list );
+			sfinder->class_i += 1;
+		}
+		fullname[old_len] = 0;
+		sfinder->name_i = 0;
+		sfinder->level -= 2;
+	case 3:
+		/* 按类选择器搜索交集样式表，结果类似于这样： 
+		 * textview#test-text.a.b
+		 * textview#test-text.a.c
+		 * textview#test-text.b.c
+		 * textview#test-text.a.b.c
+		 */
+		i = 0;
+		sfinder->level += 1;
+		LinkedList_ForEach( node, &sfinder->classes ) {
+			if( i < sfinder->class_i ) {
+				i += 1;
+				continue;
+			} else if( i == sfinder->class_i ) {
+				fullname[len++] = '.';
+				name_len = strlen( node->data );
+				strcpy( fullname + len, node->data );
+				len += name_len;
+				i += 1;
+				continue;
+			}
+			fullname[len++] = '.';
+			name_len = strlen( node->data );
+			strcpy( fullname + len, node->data );
+			count += FindStyleNodeByName( fullname + old_len, 
+						      sfinder->widget, list );
+			count += FindStyleNodeByName( fullname, 
+						      sfinder->widget, list );
+			count += StyleSheetFinder_Find( sfinder, list );
+			sfinder->name_i = old_len;
+			count += StyleSheetFinder_Find( sfinder, list );
+			sfinder->name_i = 0;
+			len += name_len;
+			i += 1;
+		}
+		fullname[old_len] = 0;
+		sfinder->level -= 1;
+		break;
+	case 4:
+		/* 按伪类选择器搜索样式表 */
+		sfinder->level += 1;
+		LinkedList_ForEach( node, &sfinder->status ) {
+			fullname[len] = ':';
+			strcpy( fullname + len + 1, node->data );
+			count += FindStyleNodeByName( fullname + len, 
+						      sfinder->widget, list );
+			count += FindStyleNodeByName( fullname, 
+						      sfinder->widget, list );
+			count += StyleSheetFinder_Find( sfinder, list );
+			sfinder->status_i += 1;
+		}
+		fullname[old_len] = 0;
+		sfinder->status_i = 0;
+		sfinder->level -= 1;
+	case 5:
+		/* 按伪类选择器搜索交集样式表 */
+		i = 0;
+		sfinder->level += 1;
+		fullname[len++] = '.';
+		LinkedList_ForEach( node, &sfinder->status ) {
+			if( i < sfinder->status_i ) {
+				i += 1;
+				continue;
+			} else if( i == sfinder->status_i ) {
+				fullname[len++] = '.';
+				name_len = strlen( node->data );
+				strcpy( fullname + len, node->data );
+				len += name_len;
+				i += 1;
+				continue;
+			}
+			fullname[len++] = ':';
+			name_len = strlen( node->data );
+			strcpy( fullname + len, node->data );
+			count += FindStyleNodeByName( fullname + len, 
+						      sfinder->widget, list );
+			count += FindStyleNodeByName( fullname, 
+						      sfinder->widget, list );
+			len += name_len;
+			i += 1;
+		}
+		fullname[old_len] = 0;
+		sfinder->level -= 1;
+	default:break;
+	}
+	return count;
+}
+
+/** 查找样式数据节点 */
 static int FindStyleNode( LCUI_Widget w, LinkedList *list )
 {
-	int i, count = 0;
-	char fullname[MAX_NAME_LEN];
-
-	i = ptrslen( w->status );
-	/* 记录伪类选择器匹配的样式表 */
-	while( --i >= 0 ) {
-		fullname[0] = ':';
-		strncpy( fullname + 1, w->status[i], MAX_NAME_LEN-1 );
-		count += FindStyleNodeByName( fullname, w, list );
-	}
-	i = ptrslen( w->classes );
-	/* 记录类选择器匹配的样式表 */
-	while( --i >= 0 ) {
-		fullname[0] = '.';
-		strncpy( fullname + 1, w->classes[i], MAX_NAME_LEN-1 );
-		count += FindStyleNodeByName( fullname, w, list );
-	}
-	/* 记录ID选择器匹配的样式表 */
-	if( w->id ) {
-		fullname[0] = '#';
-		strncpy( fullname + 1, w->id, MAX_NAME_LEN-1 );
-		count += FindStyleNodeByName( fullname, w, list );
-	}
-	/* 记录名称选择器匹配的样式表 */
-	if( w->type ) {
-		count += FindStyleNodeByName( w->type, w, list );
-	}
+	int count;
+	StyleSheetFinderRec sfinder;
+	StyleSheetFinder_Init( &sfinder, w );
+	count = StyleSheetFinder_Find( &sfinder, list );
+	StyleSheetFinder_Destroy( &sfinder );
 	/* 记录作用于全局元素的样式表 */
 	count += FindStyleNodeByName( "*", w, list );
 	return count;
@@ -836,7 +1040,7 @@ void LCUI_PrintStyleLibrary(void)
 	StyleListNode sln;
 
 	printf("style library begin\n");
-	tn = RBTree_First( &style_library.style );
+	tn = RBTree_First( &style_library.tree );
 	while( tn ) {
 		stn = tn->data;
 		printf("target: %s\n", stn->name);
