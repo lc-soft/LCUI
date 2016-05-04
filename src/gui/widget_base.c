@@ -57,6 +57,40 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 	return LCUIWidget.root;
 }
 
+/** 刷新在追加部件后的状态，例如：:first-child 和 :last-child */
+static void Widget_FlushStatusAfterAppend( LCUI_Widget w, 
+					   LCUI_BOOL is_remove_mode )
+{
+	int index = Widget_GetIndex( w );
+	LinkedListNode *node = Widget_GetNode( w );
+	if( index == 0 ) {
+		if( is_remove_mode ) {
+			Widget_RemoveStatus( w, "first-child" );
+			if( node->next ) {
+				Widget_AddStatus( node->next->data, 
+						  "first-child" );
+			}
+		} else {
+			Widget_AddStatus( w, "first-child" );
+		}
+	}
+	if( index == w->parent->children.length - 1 ) {
+		if( is_remove_mode ) {
+			Widget_RemoveStatus( w, "last-child" );
+			if( w->parent->children.length > 1 ) {
+				Widget_AddStatus( node->prev->data, 
+						  "last-child" );
+			}
+		} else {
+			Widget_AddStatus( w, "last-child" );
+			if( w->parent->children.length > 1 ) {
+				Widget_RemoveStatus( node->prev->data, 
+						     "last-child" );
+			}
+		}
+	}
+}
+
 int Widget_Append( LCUI_Widget parent, LCUI_Widget w )
 {
 	LinkedListNode *node, *snode;
@@ -70,6 +104,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget w )
 	node = Widget_GetNode( w );
 	snode = Widget_GetShowNode( w );
 	if( w->parent ) {
+		Widget_FlushStatusAfterAppend( w, TRUE );
 		LinkedList_Unlink( &w->parent->children, node );
 		LinkedList_Unlink( &w->parent->children_show, snode );
 		Widget_PostSurfaceEvent( w, WET_REMOVE );
@@ -82,6 +117,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget w )
 	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( w );
 	Widget_AddTask( parent, WTT_LAYOUT );
+	Widget_FlushStatusAfterAppend( w, FALSE );
 	DEBUG_MSG("tip\n");
 	return 0;
 }
@@ -103,11 +139,13 @@ int Widget_Unwrap( LCUI_Widget widget )
 		prev = node->prev;
 		child = node->data;
 		snode = Widget_GetShowNode( child );
+		Widget_FlushStatusAfterAppend( child, TRUE );
 		LinkedList_Unlink( &widget->children, node );
 		LinkedList_Unlink( &widget->children_show, snode );
 		child->parent = widget->parent;
 		LinkedList_Link( list, target, node );
 		LinkedList_AppendNode( list_show, snode );
+		Widget_FlushStatusAfterAppend( child, FALSE );
 		Widget_FlushZIndex( child );
 		Widget_AddTaskForChildren( child, WTT_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
