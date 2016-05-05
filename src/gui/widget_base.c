@@ -178,6 +178,7 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->computed_style.padding.bottom.type = SVT_PX;
 	widget->computed_style.padding.left.type = SVT_PX;
 	widget->trigger = EventTrigger();
+	widget->deleted = FALSE;
 	Widget_InitTaskBox( widget );
 	Background_Init( &widget->computed_style.background );
 	BoxShadow_Init( &widget->computed_style.shadow );
@@ -249,6 +250,12 @@ void Widget_Destroy( LCUI_Widget w )
 		node = Widget_GetNode( w );
 		LinkedList_Unlink( &w->parent->children, node );
 		LinkedList_AppendNode( &w->parent->children_trash, node );
+		if( w->computed_style.position != SV_ABSOLUTE ) {
+			Widget_AddTask( w->parent, WTT_LAYOUT );
+		}
+		Widget_InvalidateArea( w->parent, &w->box.graph, 
+				       SV_PADDING_BOX );
+		w->deleted = TRUE;
 	}
 	if( root != LCUIWidget.root ) {
 		Widget_ExecDestroy( w );
@@ -814,7 +821,7 @@ static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 			}
 		}
 	}
-	/* 针对不同的对象来调整尺寸 */
+	/* 计算出来的尺寸是包含 padding-left 和 padding-top 的，需要针对不同的对象来调整尺寸 */
 	switch(w->computed_style.box_sizing) {
 	case SV_BORDER_BOX:
 		*width += w->padding.right;

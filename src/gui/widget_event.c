@@ -90,6 +90,13 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 	pack->event.type = e->type;
 	pack->event.data = handler->data;
 	handler->func( w, &pack->event, pack->data );
+	while( w && !w->deleted ) {
+		w = w->parent;
+	}
+	if( w && w->deleted ) {
+		pack->event.cancel_bubble = TRUE;
+	}
+	w = pack->widget;
 	if( pack->event.cancel_bubble || !w->parent ) {
 		if( pack->data && pack->destroy_data ) {
 			pack->destroy_data( pack->data );

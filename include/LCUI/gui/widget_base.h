@@ -241,6 +241,7 @@ typedef struct LCUI_WidgetRec_ {
 	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
 	LCUI_BOOL		has_dirty_child;	/**< 标志，指示子级部件是否有无效区域 */
 	LCUI_BOOL		layout_locked;		/**< 标志，指示子级部件布局是否已锁定 */
+	LCUI_BOOL		deleted;		/**< 是否已经删除 */
 } LCUI_WidgetRec;
 
 
