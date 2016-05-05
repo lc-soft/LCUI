@@ -56,6 +56,17 @@ enum SelectorRank {
 	ID_RANK = 100
 };
 
+enum SelectorFinderLevel {
+	LEVEL_NONE,
+	LEVEL_TYPE,
+	LEVEL_ID,
+	LEVEL_CLASS,
+	LEVEL_CLASS_2,
+	LEVEL_STATUS,
+	LEVEL_STATUS_2,
+	LEVEL_TOTAL_NUM
+};
+
 typedef struct StyleListNodeRec_ {
 	LCUI_StyleSheet style;		/**< 样式表 */
 	LCUI_Selector selector;		/**< 作用范围 */
@@ -769,12 +780,12 @@ static void StyleSheetFinder_Init( StyleSheetFinder sfinder, LCUI_Widget w )
 /** 销毁样式表查找器 */
 static void StyleSheetFinder_Destroy( StyleSheetFinder sfinder )
 {
-	sfinder->level = 0;
-	sfinder->name[0] = 0;
 	sfinder->name_i = 0;
+	sfinder->name[0] = 0;
 	sfinder->class_i = 0;
 	sfinder->status_i = 0;
 	sfinder->widget = NULL;
+	sfinder->level = LEVEL_NONE;
 	LinkedList_Clear( &sfinder->classes, NULL );
 	LinkedList_Clear( &sfinder->status, NULL );
 }
@@ -783,77 +794,55 @@ static void StyleSheetFinder_Destroy( StyleSheetFinder sfinder )
 int StyleSheetFinder_Find( StyleSheetFinder sfinder, LinkedList *list )
 {
 	LinkedListNode *node;
-	int i, name_len, len, old_len, count = 0;
+	int i, name_len, len, old_len, old_level, count = 0;
 	char *fullname = sfinder->name + sfinder->name_i;
 	old_len = len = strlen( fullname );
+	old_level = sfinder->level;
 	switch( sfinder->level ) {
-	case 0: 
+	case LEVEL_TYPE: 
 		/* 按类型选择器搜索样式表 */
-		if( sfinder->widget->type ) {
-			strcpy( fullname, sfinder->widget->type );
-			count += FindStyleNodeByName( fullname, 
-						      sfinder->widget, list );
+		if( !sfinder->widget->type ) {
+			return 0;
 		}
-		sfinder->level += 1;
-		/* 递归到下一级 */
-		count += StyleSheetFinder_Find( sfinder, list );
-		sfinder->level -= 1;
+		strcpy( fullname, sfinder->widget->type );
+		count = FindStyleNodeByName( fullname, sfinder->widget, list );
 		break;
-	case 1: 
+	case LEVEL_ID: 
 		/* 按ID选择器搜索样式表 */
-		if( sfinder->widget->id ) {
-			fullname[len++] = '#';
-			strcpy( fullname + len, sfinder->widget->id );
-			count += FindStyleNodeByName( sfinder->widget->id, 
-						      sfinder->widget, list );
-			count += FindStyleNodeByName( fullname, 
-						      sfinder->widget, list );
+		if( !sfinder->widget->id ) {
+			return 0;
 		}
-		sfinder->level += 1;
-		count += StyleSheetFinder_Find( sfinder, list );
-		sfinder->level -= 1;
+		fullname[len++] = '#';
+		strcpy( fullname + len, sfinder->widget->id );
+		count = FindStyleNodeByName( fullname, sfinder->widget, list );
+		fullname[old_len] = 0;
 		break;
-	case 2:
-		/* 按类选择器搜索样式表 */
-		sfinder->level += 1;
-		/* 假设当前选择器全名为：textview#main-btn-text，且有 .a .b .c 
+	case LEVEL_CLASS:
+		/* 按类选择器搜索样式表
+		 * 假设当前选择器全名为：textview#main-btn-text，且有 .a .b .c 
 		 * 这三个类，那么下面的处理将会拆分成以下三个选择器来匹配样式表：
 		 * textview#test-text.a
 		 * textview#test-text.b
 		 * textview#test-text.a
 		 */
+		fullname[len++] = '.';
 		LinkedList_ForEach( node, &sfinder->classes ) {
-			fullname[len] = '.';
-			strcpy( fullname + len + 1, node->data );
-			if( len > 0 ) {
-				count += FindStyleNodeByName( fullname + len,
-							      sfinder->widget,
-							      list );
-			}
+			strcpy( fullname + len, node->data );
 			count += FindStyleNodeByName( fullname, 
 						      sfinder->widget, list );
-			count += StyleSheetFinder_Find( sfinder, list );
+			/* 将当前选择器名与其它层级的选择器名组合 */
+			for( i = sfinder->level + 1; i < LEVEL_TOTAL_NUM; ++i ) {
+				sfinder->level = i;
+				count += StyleSheetFinder_Find( sfinder, list );
+			}
+			sfinder->level = LEVEL_CLASS;
 			sfinder->class_i += 1;
 		}
-		/* 同样是上面的假设，下面的处理会忽略前面的 textview#test-text，
-		 * 然后递归到下一级处理伪类选择器，结果类似于：
-		 * .a:hover
-		 * .b:active
-		 * .b:hover:active
-		 */
-		sfinder->level += 1;
-		sfinder->class_i = 0;
-		sfinder->name_i = old_len;
-		LinkedList_ForEach( node, &sfinder->classes ) {
-			fullname[len] = '.';
-			strcpy( fullname + len + 1, node->data );
-			count += StyleSheetFinder_Find( sfinder, list );
-			sfinder->class_i += 1;
-		}
+		sfinder->level = LEVEL_CLASS;
 		fullname[old_len] = 0;
-		sfinder->name_i = 0;
-		sfinder->level -= 2;
-	case 3:
+		sfinder->class_i = 0;
+		return count;
+	case LEVEL_CLASS_2:
 		/* 按类选择器搜索交集样式表，结果类似于这样： 
 		 * textview#test-text.a.b
 		 * textview#test-text.a.c
@@ -861,83 +850,92 @@ int StyleSheetFinder_Find( StyleSheetFinder sfinder, LinkedList *list )
 		 * textview#test-text.a.b.c
 		 */
 		i = 0;
-		sfinder->level += 1;
+		fullname[len++] = '.';
 		LinkedList_ForEach( node, &sfinder->classes ) {
-			if( i < sfinder->class_i ) {
-				i += 1;
-				continue;
-			} else if( i == sfinder->class_i ) {
-				fullname[len++] = '.';
-				name_len = strlen( node->data );
-				strcpy( fullname + len, node->data );
-				len += name_len;
+			if( i <= sfinder->class_i ) {
 				i += 1;
 				continue;
 			}
-			fullname[len++] = '.';
 			name_len = strlen( node->data );
 			strcpy( fullname + len, node->data );
-			count += FindStyleNodeByName( fullname + old_len, 
-						      sfinder->widget, list );
 			count += FindStyleNodeByName( fullname, 
 						      sfinder->widget, list );
+			sfinder->class_i += 1;
 			count += StyleSheetFinder_Find( sfinder, list );
-			sfinder->name_i = old_len;
+			sfinder->class_i -= 1;
+			sfinder->level = LEVEL_STATUS;
+			/** 
+			 * 递归拼接伪类名，例如： 
+			 * textview#main-btn-text:active
+			 */
 			count += StyleSheetFinder_Find( sfinder, list );
-			sfinder->name_i = 0;
-			len += name_len;
+			sfinder->level = LEVEL_CLASS_2;
 			i += 1;
 		}
 		fullname[old_len] = 0;
-		sfinder->level -= 1;
-		break;
-	case 4:
-		/* 按伪类选择器搜索样式表 */
-		sfinder->level += 1;
+		sfinder->level = LEVEL_CLASS_2;
+		return count;
+	case LEVEL_STATUS:
+		fullname[len++] = ':';
+		sfinder->level = LEVEL_STATUS_2;
+		/**
+		 * 按伪类选择器搜索样式表
+		 * 假设当前选择器全名为：textview#main-btn-text:hover:focus:active
+		 * 那么下面的循环会将它拆分为以下几个选择器来匹配样式：
+		 * textview#main-btn-text:active
+		 * textview#main-btn-text:active:focus
+		 * textview#main-btn-text:active:focus:hover
+		 * textview#main-btn-text:active:hover
+		 * textview#main-btn-text:focus
+		 * textview#main-btn-text:focus:hover
+		 * textview#main-btn-text:hover
+		 */
 		LinkedList_ForEach( node, &sfinder->status ) {
-			fullname[len] = ':';
-			strcpy( fullname + len + 1, node->data );
-			count += FindStyleNodeByName( fullname + len, 
-						      sfinder->widget, list );
+			strcpy( fullname + len, node->data );
 			count += FindStyleNodeByName( fullname, 
 						      sfinder->widget, list );
+			/**
+			 * 递归调用，以一层层拼接出像下面这样的选择器：
+			 * textview#main-btn-text:active:focus:hover
+			 */
 			count += StyleSheetFinder_Find( sfinder, list );
 			sfinder->status_i += 1;
 		}
+		sfinder->level = LEVEL_STATUS;
 		fullname[old_len] = 0;
 		sfinder->status_i = 0;
-		sfinder->level -= 1;
-	case 5:
-		/* 按伪类选择器搜索交集样式表 */
+		return count;
+	case LEVEL_STATUS_2:
+		/** 按伪类选择器搜索交集样式表 */
 		i = 0;
-		sfinder->level += 1;
-		fullname[len++] = '.';
 		LinkedList_ForEach( node, &sfinder->status ) {
-			if( i < sfinder->status_i ) {
-				i += 1;
-				continue;
-			} else if( i == sfinder->status_i ) {
-				fullname[len++] = '.';
-				name_len = strlen( node->data );
-				strcpy( fullname + len, node->data );
-				len += name_len;
+			if( i <= sfinder->status_i ) {
 				i += 1;
 				continue;
 			}
-			fullname[len++] = ':';
+			fullname[len] = ':';
 			name_len = strlen( node->data );
-			strcpy( fullname + len, node->data );
-			count += FindStyleNodeByName( fullname + len, 
-						      sfinder->widget, list );
+			strcpy( fullname + len + 1, node->data );
 			count += FindStyleNodeByName( fullname, 
 						      sfinder->widget, list );
-			len += name_len;
+			sfinder->status_i += 1;
+			count += StyleSheetFinder_Find( sfinder, list );
+			sfinder->status_i -= 1;
 			i += 1;
 		}
 		fullname[old_len] = 0;
-		sfinder->level -= 1;
+		return count;
 	default:break;
 	}
+	for( i = sfinder->level + 1; i < LEVEL_TOTAL_NUM; ++i ) {
+		if( i == LEVEL_STATUS_2 || i == LEVEL_CLASS_2 ) {
+			continue;
+		}
+		sfinder->level = i;
+		count += StyleSheetFinder_Find( sfinder, list );
+	}
+	fullname[old_len] = 0;
+	sfinder->level = old_level;
 	return count;
 }
 
@@ -1057,8 +1055,8 @@ void LCUI_PrintStyleLibrary(void)
 int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 {
 	LinkedList list;
-	LinkedListNode *node;
 	StyleListNode sln;
+	LinkedListNode *node;
 	LinkedList_Init( &list );
 	FindStyleNode( w, &list );
 	StyleSheet_Clear( out_ss );
