@@ -8,10 +8,10 @@
 #include LCUI_EVENTS_H
 #include "resource.h"
 
-#define WM_LCUI_EVENT (WM_USER+1234)
+#define WM_LCUI_EVENT (WM_USER+20)
 
 static struct WindowsDriver {
-	DWORD main_tid;
+	HWND main_hwnd;
 	HINSTANCE main_instance;	/**< 主程序的资源句柄 */
 	HINSTANCE dll_instance;		/**< 动态库中的资源句柄 */
 	LCUI_EventTrigger trigger;
@@ -20,32 +20,40 @@ static struct WindowsDriver {
 static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 				 WPARAM arg1, LPARAM arg2 )
 {
+	LCUI_AppTask task;
 	WIN_SysEventRec win_event;
-	win_event.msg = msg;
-	win_event.hwnd = hwnd;
-	win_event.wparam = arg1;
-	win_event.lparam = arg2;
-	win_event.data = NULL;
 	switch( msg ) {
 	case WM_LCUI_EVENT:
+		task = (LCUI_AppTask)arg2;
+		LCUI_RunTask( task );
+		LCUI_DeleteTask( task );
 		return 0;
 	case WM_CLOSE:
 		LCUI_Quit();
 	default:break;
 	}
+	win_event.msg = msg;
+	win_event.hwnd = hwnd;
+	win_event.wparam = arg1;
+	win_event.lparam = arg2;
+	win_event.data = NULL;
 	if( EventTrigger_Trigger( win.trigger, msg, &win_event ) == 0 ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
 	return 0;
 }
 
-static void WIN_BreakEventWaiting( void )
+static LCUI_BOOL WIN_PostTask( LCUI_AppTask task )
 {
-	PostThreadMessage( win.main_tid, WM_LCUI_EVENT, 0, 0 );
+	return PostMessage( win.main_hwnd, WM_LCUI_EVENT, 0, (LPARAM)task );
 }
 
 static LCUI_BOOL WIN_WaitEvent( void )
 {
+	MSG msg;
+	if( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) ) {
+		return TRUE;
+	}
 	return WaitMessage();
 }
 
@@ -59,7 +67,7 @@ static void WIN_PumpEvents( void )
 }
 
 static int WIN_BindSysEvent( int event_id, LCUI_EventFunc func,
-			      void *data, void(*destroy_data)(void*) )
+			     void *data, void(*destroy_data)(void*) )
 {
 	return EventTrigger_Bind( win.trigger, event_id, func, data, destroy_data );
 }
@@ -103,17 +111,16 @@ int LCUI_InitWinApp( LCUI_AppDriver app )
 	WNDCLASS wndclass;
 	TCHAR szAppName[] = TEXT ("LCUI");
 
-	wndclass.style         = CS_HREDRAW | CS_VREDRAW;
-	wndclass.lpfnWndProc   = WndProc;
 	wndclass.cbClsExtra    = 0;
 	wndclass.cbWndExtra    = 0;
-	wndclass.hInstance     = win.main_instance;
-	/* 载入动态库里的图标 */
-	wndclass.hIcon         = LoadIcon( win.dll_instance, MAKEINTRESOURCE(IDI_LCUI_ICON) );
-	wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
 	wndclass.hbrBackground = NULL;
 	wndclass.lpszMenuName  = NULL;
+	wndclass.lpfnWndProc   = WndProc;
 	wndclass.lpszClassName = szAppName;
+	wndclass.hInstance     = win.main_instance;
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW;
+	wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
+	wndclass.hIcon         = LoadIcon( win.dll_instance, MAKEINTRESOURCE(IDI_LCUI_ICON) );
 
 	if( !RegisterClass(&wndclass) ) {
 		wchar_t str[256];
@@ -121,15 +128,24 @@ int LCUI_InitWinApp( LCUI_AppDriver app )
 		MessageBox( NULL, str, szAppName, MB_ICONERROR );
 		return -1;
 	}
+	app->GetData = WIN_GetData;
+	app->PostTask = WIN_PostTask;
 	app->WaitEvent = WIN_WaitEvent;
 	app->PumbEvents = WIN_PumpEvents;
-	app->BreakEventWaiting = WIN_BreakEventWaiting;
 	app->BindSysEvent = WIN_BindSysEvent;
 	app->UnbindSysEvent = WIN_UnbindSysEvent;
 	app->UnbindSysEvent2 = WIN_UnbindSysEvent2;
-	app->GetData = WIN_GetData;
-	win.main_tid = GetCurrentThreadId();
 	win.trigger = EventTrigger();
+	/**
+	 * 创建一个隐藏的主窗体，用于接收 LCUI 的任务
+	 * 之前用 PostThreadMessage() 无法发送自定义消息到主线程的消息循环，因此
+	 * 改成创建隐藏窗体兵用 PostMessage() 发送任务。
+	 */
+	win.main_hwnd = CreateWindow(
+		TEXT("LCUI"), TEXT("LCUI Task Receiver"), 0, 
+		CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL,
+		win.main_instance, NULL
+	);
 	return 0;
 }
 

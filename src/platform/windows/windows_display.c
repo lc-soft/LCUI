@@ -186,7 +186,7 @@ static LCUI_Surface WinSurface_New(void)
 	task.func = OnCreateSurface;
 	task.destroy_arg[0] = NULL;
 	task.destroy_arg[1] = NULL;
-	LCUI_AddTask( &task );
+	LCUI_PostTask( &task );
 	return surface;
 }
 
@@ -219,7 +219,7 @@ static void WinSurface_ExecResize( LCUI_Surface surface, int w, int h )
 	RECT rect_client, rect_window;
 	surface->w = w;
 	surface->h = h;
-	_DEBUG_MSG("w = %d, h = %d\n", w, h);
+	DEBUG_MSG("w = %d, h = %d\n", w, h);
 	Graph_Create( &surface->fb, w, h );
 	hdc_client = GetDC( surface->hwnd );
 	surface->fb_bmp = CreateCompatibleBitmap( hdc_client, w, h );

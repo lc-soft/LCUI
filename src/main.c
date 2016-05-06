@@ -179,10 +179,16 @@ int LCUI_TriggerEvent( LCUI_SysEvent e, void *arg )
 
 /*--------------------------- system event <END> ----------------------------*/
 
-/** 销毁程序任务 */
-static void DestroyTask( void *arg )
+LCUI_BOOL LCUI_PostTask( LCUI_AppTask task )
 {
-	LCUI_AppTask task = arg;
+	LCUI_AppTask buff;
+	buff = NEW( LCUI_AppTaskRec, 1 );
+	*buff = *task;
+	return MainApp.driver.PostTask( buff );
+}
+
+void LCUI_DeleteTask( LCUI_AppTask task )
+{
 	if( task->destroy_arg[0] && task->arg[0] ) {
 		task->destroy_arg[0]( task->arg[0] );
 	}
@@ -191,22 +197,13 @@ static void DestroyTask( void *arg )
 	}
 }
 
-/** 添加任务 */
-int LCUI_AddTask( LCUI_AppTask task )
+int LCUI_RunTask( LCUI_AppTask task )
 {
-	LCUI_AppTask buff;
-	LinkedListNode *node;
-	buff = NEW( LCUI_AppTaskRec, 1 );
-	*buff = *task;
-	if( LCUI_IsOnMainLoop() ) {
-		node = LinkedList_Append( &MainApp.tasks, buff );
-	} else {
-		LCUIMutex_Lock( &MainApp.tasks_mutex );
-		node = LinkedList_Append( &MainApp.tasks, buff );
-		LCUIMutex_Unlock( &MainApp.tasks_mutex );
+	if( task && task->func ) {
+		task->func( task->arg[0], task->arg[1] );
+		return 0;
 	}
-	LCUI_BreakEventWaiting();
-	return node ? 0:-1;
+	return -1;
 }
 
 /* 新建一个主循环 */
@@ -240,39 +237,11 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	} else {
 		LinkedList_Insert( &MainApp.loops, 0, loop );
 	}
-	DEBUG_MSG("loop: %p, enter\n", loop);
+	_DEBUG_MSG("loop: %p, enter\n", loop);
 	MainApp.loop = loop;
 	while( loop->state != STATE_EXITED ) {
-		LCUI_AppTask task;
-		LinkedListNode *node, *prev;
-		int len = MainApp.tasks.length;
-		if( len == 0 ) {
-			DEBUG_MSG("loop: %p, sleeping...\n", loop);
-			LCUI_WaitEvent();
-		}
-		DEBUG_MSG("loop: %p, wakeup\n", loop);
+		LCUI_WaitEvent();
 		LCUI_PumbEvents();
-		node = MainApp.tasks.head.next;
-		while( node && len-- > 0 ) {
-			prev = node->prev;
-			task = node->data;
-			if( at_same_thread ) {
-				LinkedList_Unlink( &MainApp.tasks, node );
-			} else {
-				LCUIMutex_Lock( &MainApp.tasks_mutex );
-				LinkedList_Unlink( &MainApp.tasks, node );
-				LCUIMutex_Unlock( &MainApp.tasks_mutex );
-			}
-			if( task && task->func ) {
-				DEBUG_MSG( "task: %p, start\n", task );
-				task->func( task->arg[0], task->arg[1] );
-				DEBUG_MSG( "task: %p, end\n", task );
-			}
-			DestroyTask( task );
-			free( node->data );
-			free( node );
-			node = prev->next;
-		}
 		/* 如果当前运行的主循环不是自己 */
 		while( MainApp.loop != loop ) {
 			loop->state = STATE_PAUSED;
@@ -335,11 +304,6 @@ void LCUI_PumbEvents( void )
 void *LCUI_GetAppData( void )
 {
 	return MainApp.driver.GetData();
-}
-
-void LCUI_BreakEventWaiting( void )
-{
-	MainApp.driver.BreakEventWaiting();
 }
 
 /** 退出所有主循环 */

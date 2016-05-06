@@ -163,7 +163,7 @@ static void TimerThread( void *arg )
 		}
 		DEBUG_MSG( "add task: %p, timer id: %ld\n", task.func, timer->id );
 		/* 添加该任务至指定程序的任务队列 */
-		LCUI_AddTask( &task );
+		LCUI_PostTask( &task );
 	}
 	LCUIMutex_Unlock( &self.mutex );
 	LCUIThread_Exit(NULL);

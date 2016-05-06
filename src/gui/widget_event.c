@@ -134,7 +134,7 @@ static void OnWidgetEvent( LCUI_Event e, void *arg )
 	*((LCUI_Event)task.arg[0]) = *e;
 	*((LCUI_WidgetEventPack)task.arg[1]) = *pack;
 	/* 把任务扔给当前跑主循环的线程 */
-	LCUI_AddTask( &task );
+	LCUI_PostTask( &task );
 }
 
 int LCUIWidget_SetEventName( int event_id, const char *event_name )

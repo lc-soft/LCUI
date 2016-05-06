@@ -153,7 +153,7 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 	task.func = ExecLoadImage;
 	task.arg[0] = widget;
 	task.arg[1] = strdup( path );
-	LCUI_AddTask( &task );
+	LCUI_PostTask( &task );
 }
 
 /** 计算背景样式 */

@@ -330,7 +330,7 @@ LCUI_API void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, 
 LCUI_API void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left );
 
 /** 移动部件位置 */
-LCUI_API void Widget_Move( LCUI_Widget w, int top, int left );
+LCUI_API void Widget_Move( LCUI_Widget w, int left, int top );
 
 /** 调整部件尺寸 */
 LCUI_API void Widget_Resize( LCUI_Widget w, int width, int height );
