@@ -102,6 +102,8 @@ static void OnMouseUp( LCUI_SysEvent e, void *arg )
 	LCUI_ScrollBar scrollbar = w->private_data;
 	LCUI_UnbindEvent( scrollbar->eids[0] );
 	LCUI_UnbindEvent( scrollbar->eids[1] );
+	scrollbar->eids[0] = -1;
+	scrollbar->eids[1] = -1;
 	scrollbar->is_dragging = FALSE;
 }
 
@@ -135,9 +137,12 @@ static void OnMouseMove( LCUI_SysEvent e, void *arg )
 		} else if( x < 0 ) {
 			x = 0;
 		}
-		n = 1.0 * slider->x / size;
-		if( n > 1.0 ) {
-			n = 1;
+		n = 0.0;
+		if( size > 0 ) {
+			n = 1.0 * slider->x / size;
+			if( n > 1.0 ) {
+				n = 1;
+			}
 		}
 		layer_pos = layer_pos * n;
 		SetStyle( layer->custom_style, key_left, -layer_pos, px );
@@ -157,9 +162,12 @@ static void OnMouseMove( LCUI_SysEvent e, void *arg )
 		} else if( y < 0 ) {
 			y = 0;
 		}
-		n = 1.0 * slider->y / size;
-		if( n > 1.0 ) {
-			n = 1;
+		n = 0.0;
+		if( size > 0 ) {
+			n = 1.0 * slider->y / size;
+			if( n > 1.0 ) {
+				n = 1;
+			}
 		}
 		layer_pos = layer_pos * n;
 		SetStyle( layer->custom_style, key_top, -layer_pos, px );
@@ -178,6 +186,9 @@ static void OnMouseDown( LCUI_Widget slider, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_Widget w = slider->parent;
 	LCUI_ScrollBar scrollbar = w->private_data;
+	if( scrollbar->is_dragging ) {
+		return;
+	}
 	scrollbar->slider_x = slider->x;
 	scrollbar->slider_y = slider->y;
 	scrollbar->mouse_x = e->screen_x;

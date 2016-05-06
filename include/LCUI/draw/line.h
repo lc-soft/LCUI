@@ -9,7 +9,4 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 LCUI_API void
 Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos start, int end_y );
 
-/* 绘制线条框 */
-LCUI_API void
-Graph_DrawBoxLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Rect rect );
 #endif
