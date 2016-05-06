@@ -76,16 +76,29 @@ int LCUIDisplay_GetFPS(void)
 	return FrameControl_GetFPS( display.fc_ctx );
 }
 
+static void DrawBorder( LCUI_PaintContext paint )
+{
+	LCUI_Pos pos;
+	LCUI_Color color;
+	int end_x = paint->rect.width - 1;
+	int end_y = paint->rect.height - 1;
+	pos.x = pos.y = 0;
+	color = RGB( 255, 0, 0 );
+	Graph_DrawHorizLine( &paint->canvas, color, 1, pos, end_x );
+	Graph_DrawVertiLine( &paint->canvas, color, 1, pos, end_y );
+	pos.x = paint->rect.width - 1;
+	Graph_DrawVertiLine( &paint->canvas, color, 1, pos, end_y );
+	pos.y = paint->rect.height - 1;
+	Graph_DrawHorizLine( &paint->canvas, color, 1, pos, end_x );
+}
+
 /** 更新各种图形元素的显示 */
 static void LCUIDisplay_Update(void)
 {
-	LCUI_Rect box;
 	LinkedList rlist;
-	LCUI_Border border;
 	SurfaceRecord *p_sr;
 	LinkedListNode *sn, *rn;
 	LCUI_PaintContext paint;
-	border = Border( 1, SV_SOLID, RGB( 255, 0, 0 ) );
 	LinkedList_Init( &rlist );
 	/* 遍历当前的 surface 记录列表 */
 	LinkedList_ForEach( sn, &display.surfaces ) {
@@ -105,10 +118,7 @@ static void LCUIDisplay_Update(void)
 				paint->rect.top, paint->rect.w, paint->rect.h );
 			Widget_Render( p_sr->widget, paint );
 			if( display.show_rect_border ) {
-				box.x = box.y = 0;
-				box.width = paint->rect.width;
-				box.height = paint->rect.height;
-				Graph_DrawBorder( paint, &box, &border );
+				DrawBorder( paint );
 			}
 			Surface_EndPaint( p_sr->surface, paint );
 		}
