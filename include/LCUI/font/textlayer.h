@@ -68,7 +68,6 @@ typedef struct TextRowRec_ {
         int height;			/**< 高度 */
 	int text_height;		/**< 当前行中最大字体的高度 */
         int length;			/**< 该行文本长度 */
-        int max_length;			/**< 该行文本最大长度 */
         TextChar *string;		/**< 该行文本的数据 */
 	EOLChar eol;			/**< 行尾结束类型 */
 } TextRowRec, *TextRow;
@@ -76,7 +75,6 @@ typedef struct TextRowRec_ {
 /* 文本行列表 */
 typedef struct TextRowListRec_ {
         int length;		/**< 当前总行数 */
-        int max_length;		/**< 最大行数 */
         TextRow *rows;		/**< 每一行文本的数据 */
 } TextRowListRec, *TextRowList;
 
