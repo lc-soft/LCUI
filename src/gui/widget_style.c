@@ -626,7 +626,7 @@ LCUI_BOOL Selector_MatchPath( LCUI_Selector selector, LCUI_Widget *wlist )
 		w = *obj_ptr;
 		sn = *sn_ptr;
 		if( sn->id ) {
-			if( strcmp( w->id, sn->id ) ) {
+			if( !w->id || strcmp( w->id, sn->id ) ) {
 				continue;
 			}
 		}
