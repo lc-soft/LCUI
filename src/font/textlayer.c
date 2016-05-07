@@ -561,7 +561,7 @@ static void TextLayer_BreakTextRow( LCUI_TextLayer layer, int i_row,
 	int n;
 	TextRow txtrow, next_txtrow;
 	txtrow = layer->rowlist.rows[i_row];
-	next_txtrow = TextRowList_InsertNewRow( &layer->rowlist, i_row+1 );
+	next_txtrow = TextRowList_InsertNewRow( &layer->rowlist, i_row + 1 );
 	/* 将本行原有的行尾符转移至下一行 */
 	next_txtrow->eol = txtrow->eol;
 	txtrow->eol = eol;
@@ -596,7 +596,7 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer layer, int row )
 		/* 累加行宽度 */
 		row_width += txtchar->bitmap->advance.x;
 		/* 如果是当前行的第一个字符，或者行宽度没有超过宽度限制 */
-		if( not_autowrap || col < 1 || txtrow->width <= layer->max_width ) {
+		if( not_autowrap || col < 1 || row_width <= layer->max_width ) {
 			continue;
 		}
 		TextLayer_BreakTextRow( layer, row, col, EOL_NONE );

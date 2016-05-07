@@ -314,7 +314,6 @@ static void TextView_OnInit( LCUI_Widget w )
 {
 	int i;
 	LCUI_TextView *txt;
-
 	txt = Widget_NewPrivateData( w, LCUI_TextView );
 	TextStyle_Init( &txt->style );
 	for( i = 0; i < TASK_TOTAL; ++i ) {
