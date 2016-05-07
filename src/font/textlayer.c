@@ -218,7 +218,7 @@ static int TextRow_Insert( TextRow txtrow, int ins_pos, TextChar txtchar )
 {
 	int i;
 	if( ins_pos < 0 ) {
-		ins_pos = txtrow->length + ins_pos;
+		ins_pos = txtrow->length + 1 + ins_pos;
 		if( ins_pos < 0 ) {
 			ins_pos = 0;
 		}
