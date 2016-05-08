@@ -247,6 +247,11 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 	}
 	ScrollBar_SetPosition( w, scrollbar->pos );
 	Widget_UpdateStyle( slider, FALSE );
+	if( n < 1.0 ) {
+		Widget_Show( w );
+	} else {
+		Widget_Hide( w );
+	}
 }
 
 static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent e, void *arg )

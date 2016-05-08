@@ -1378,7 +1378,6 @@ void Widget_UpdateLayout( LCUI_Widget w )
 		case SV_INLINE_BLOCK:
 			if( ctx.prev && ctx.prev_display == SV_BLOCK ) {
 				ctx.x = 0;
-				ctx.y += ctx.line_height;
 				ctx.line_height = 0;
 			}
 			child->origin_x = ctx.x;
@@ -1439,10 +1438,14 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 		} else {
 			strcpy( classes, "(null)" );
 		}
-		printf("%s%s type: %s, class: %s, xy:(%d,%d), size:(%d,%d), visible: %s\n", 
-			prefix, str, child->type, classes, child->x, child->y, 
-			child->width, child->height, 
-			child->computed_style.visible ? "true":"false");
+		printf( "%s%s type: %s, class: %s, xy:(%d,%d), size:(%d,%d), "
+			"visible: %s, padding: (%d,%d,%d,%d), margin: (%d,%d,%d,%d)\n",
+			prefix, str, child->type, classes, child->x, child->y,
+			child->width, child->height,
+			child->computed_style.visible ? "true" : "false",
+			child->padding.top, child->padding.right, child->padding.bottom,
+			child->padding.left, child->margin.top, child->margin.right, 
+			child->margin.bottom, child->margin.left );
 
 		_LCUIWidget_PrintTree( child, depth+1, child_prefix );
 	}
