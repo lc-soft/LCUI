@@ -39,6 +39,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+//#define DEBUG
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -196,7 +197,8 @@ static void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b )
 		big->w = b->x + b->w - big->x;
 	} else {
 		big->w = a->x + a->w - big->x;
-	}if( a->y < b->y ) {
+	}
+	if( a->y < b->y ) {
 		big->y = a->y;
 	} else {
 		big->y = b->y;
@@ -234,27 +236,19 @@ void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 
 int RectList_Add( LinkedList *list, LCUI_Rect *rect )
 {
-	int i, ret;
+	LCUI_Rect *added_rect, union_rect;
 	LinkedListNode *node, *prev;
-	LCUI_Rect *r, or, tr[4];
-
 	if( rect->w <= 0 || rect->h <= 0 ) {
 		return -1;
 	}
-	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list,
-		   list->length, rect->x, rect->y, rect->w, rect->h);
 	LinkedList_ForEach( node, list ) {
-		r = (LCUI_Rect*)node->data;
-		DEBUG_MSG("r(%d,%d,%d,%d)\n",
-			r->x, r->y, r->w, r->h);
+		added_rect = node->data;
 		/* 如果被现有的矩形包含 */
-		if( LCUIRect_IsIncludeRect( r, rect ) ) {
-			DEBUG_MSG("not add\n");
+		if( LCUIRect_IsIncludeRect( added_rect, rect ) ) {
 			return -2;
 		}
 		/* 如果包含现有的矩形 */
-		if( LCUIRect_IsIncludeRect( rect, r ) ) {
-			DEBUG_MSG("delete\n");
+		if( LCUIRect_IsIncludeRect( rect, added_rect ) ) {
 			prev = node->prev;
 			free( node->data );
 			LinkedList_DeleteNode( list, node );
@@ -262,35 +256,18 @@ int RectList_Add( LinkedList *list, LCUI_Rect *rect )
 			continue;
 		}
 		/* 如果与现有的矩形不重叠 */
-		if( !LCUIRect_GetOverlayRect( rect, r, &or ) ) {
-			DEBUG_MSG("skip\n");
+		if( !LCUIRect_GetOverlayRect( rect, added_rect, &union_rect ) ) {
 			continue;
 		}
-		DEBUG_MSG("overlay rect(%d,%d,%d,%d)\n",or.x, or.y,
-			   or.w, or.h);
-		/* 如果两个矩形相距很近，则直接合并 */
-		if( (rect->w - or.w < 20 && rect->h - or.h < 20) ||
-		    (r->w - or.w < 20 && r->h - or.h < 20) ) {
-			LCUIRect_MergeRect( &or, r, rect );
-			DEBUG_MSG("merge rect, rect(%d,%d,%d,%d)\n",
-				   or.x, or.y, or.w, or.h);
-			free( node->data );
-			LinkedList_DeleteNode( list, node );
-			return RectList_Add( list, &or );
-		}
-		LCUIRect_CutFourRect( &or, rect, tr );
-		for( ret=0,i=0; i<4&&ret==0; ++i ) {
-			ret = RectList_Add( list, &tr[i] );
-		}
-		if( ret != 0 ) {
-			return -3;
-		}
-		return 1;
+		/* 直接合并 */
+		LCUIRect_MergeRect( &union_rect, added_rect, rect );
+		free( node->data );
+		LinkedList_DeleteNode( list, node );
+		return RectList_Add( list, &union_rect );
 	}
-	DEBUG_MSG("add\n");
-	r = malloc( sizeof(LCUI_Rect) );
-	*r = *rect;
-	LinkedList_Append( list, r );
+	added_rect = malloc( sizeof(LCUI_Rect) );
+	*added_rect = *rect;
+	LinkedList_Append( list, added_rect );
 	return 0;
 }
 

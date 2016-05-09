@@ -88,6 +88,7 @@ static void DrawBorder( LCUI_PaintContext paint )
 	Graph_DrawVertiLine( &paint->canvas, color, 1, pos, end_y );
 	pos.x = paint->rect.width - 1;
 	Graph_DrawVertiLine( &paint->canvas, color, 1, pos, end_y );
+	pos.x = 0;
 	pos.y = paint->rect.height - 1;
 	Graph_DrawHorizLine( &paint->canvas, color, 1, pos, end_x );
 }
