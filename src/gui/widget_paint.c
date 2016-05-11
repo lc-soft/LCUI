@@ -140,7 +140,9 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	box.width = w->box.graph.width;
 	box.height = w->box.graph.height;
 	/* 如果是有位图缓存的话，则先清空缓存里的阴影区域 */
-	Graph_ClearShadowArea( paint, &box, &s->shadow );
+	if( w->enable_graph ) {
+		Graph_ClearShadowArea( paint, &box, &s->shadow );
+	}
 	Graph_DrawBoxShadow( paint, &box, &s->shadow );
 	box.x = w->box.border.x - w->box.graph.x;
 	box.y = w->box.border.y - w->box.graph.y;
