@@ -207,6 +207,12 @@ typedef struct LCUI_WidgetBoxRect {
 	LCUI_Rect graph;	/**< 图层的区域，包括边框盒和阴影区域 */
 } LCUI_WidgetBoxRect;
 
+typedef struct LCUI_WidgetTaskBoxRec_ {
+	LCUI_BOOL for_self;			/**< 标志，指示当前部件是否有待处理的任务 */
+	LCUI_BOOL for_children;			/**< 标志，指示是否有待处理的子级部件 */
+	LCUI_BOOL buffer[WTT_TOTAL_NUM];	/**< 记录缓存 */
+} LCUI_WidgetTaskBoxRec;
+
 typedef struct LCUI_WidgetRec_* LCUI_Widget;
 
 /** 部件结构 */
@@ -237,7 +243,7 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_Graph		graph;			/**< 位图缓存 */
 	LCUI_Mutex		mutex;			/**< 互斥锁 */
 	LCUI_EventTrigger	trigger;		/**< 事件触发器 */
-	LCUI_WidgetTaskBox	task;			/**< 任务记录 */
+	LCUI_WidgetTaskBoxRec	task;			/**< 任务记录 */
 	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
 	LCUI_BOOL		has_dirty_child;	/**< 标志，指示子级部件是否有无效区域 */
 	LCUI_BOOL		layout_locked;		/**< 标志，指示子级部件布局是否已锁定 */
@@ -280,12 +286,12 @@ LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 LCUI_API void Widget_GetAbsXY( LCUI_Widget w, LCUI_Widget parent, int *x, int *y );
 
 /** 刷新部件的边框 */
-LCUI_API void Widget_FlushBorder( LCUI_Widget w );
+LCUI_API void Widget_UpdateBorder( LCUI_Widget w );
 
 /** 刷新部件的矩形阴影 */
-LCUI_API void Widget_FlushBoxShadow( LCUI_Widget w );
+LCUI_API void Widget_UpdateBoxShadow( LCUI_Widget w );
 /** 刷新可见性 */
-LCUI_API void Widget_FlushVisibility( LCUI_Widget w );
+LCUI_API void Widget_UpdateVisibility( LCUI_Widget w );
 
 /** 设置部件为顶级部件 */
 LCUI_API int Widget_Top( LCUI_Widget w );
@@ -294,28 +300,24 @@ LCUI_API int Widget_Top( LCUI_Widget w );
 LCUI_API int Widget_GetIndex( LCUI_Widget w );
 
 /** 刷新堆叠顺序 */
-LCUI_API void Widget_FlushZIndex( LCUI_Widget w );
+LCUI_API void Widget_UpdateZIndex( LCUI_Widget w );
+
+LCUI_API void Widget_ExecUpdateZIndex( LCUI_Widget w );
 
 /** 刷新位置 */
-LCUI_API void Widget_FlushPosition( LCUI_Widget w );
+LCUI_API void Widget_UpdatePosition( LCUI_Widget w );
 
 /** 刷新尺寸 */
-LCUI_API void Widget_FlushSize( LCUI_Widget w );
+LCUI_API void Widget_UpdateSize( LCUI_Widget w );
 
 /** 刷新各项属性 */
-LCUI_API void Widget_FlushProps( LCUI_Widget w );
+LCUI_API void Widget_UpdateProps( LCUI_Widget w );
 
 /** 处理部件中当前积累的任务 */
-LCUI_API int Widget_Flush( LCUI_Widget w );
+LCUI_API int Widget_Update( LCUI_Widget w );
 
 /** 计算部件通过继承得到的样式表 */
 LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
-
-/** 更新当前部件的样式 */
-LCUI_API void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
-
-/** 直接更新当前部件的样式 */
-LCUI_API void Widget_FlushStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
 
 /** 设置部件标题 */
 LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
@@ -363,6 +365,8 @@ LCUI_API int Widget_ComputeMaxWidth( LCUI_Widget w );
 
 /** 更新子部件的布局 */
 LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
+
+LCUI_API void Widget_ExecUpdateLayout( LCUI_Widget w );
 
 /** 锁定子部件的布局，让 LCUI 不自动更新布局 */
 LCUI_API void Widget_LockLayout( LCUI_Widget w );

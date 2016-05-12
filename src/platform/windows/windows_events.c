@@ -33,10 +33,10 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 	default:break;
 	}
 	win_event.msg = msg;
+	win_event.data = NULL;
 	win_event.hwnd = hwnd;
 	win_event.wparam = arg1;
 	win_event.lparam = arg2;
-	win_event.data = NULL;
 	if( EventTrigger_Trigger( win.trigger, msg, &win_event ) == 0 ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}

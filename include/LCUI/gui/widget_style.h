@@ -90,7 +90,10 @@ LCUI_API void LCUI_PrintStyleLibrary(void);
 LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 
 /** 更新当前部件的样式 */
-LCUI_API void Widget_FlushStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
+LCUI_API void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
+
+/** 直接更新当前部件的样式 */
+LCUI_API void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
 
 #include <LCUI/gui/css_parser.h>
 

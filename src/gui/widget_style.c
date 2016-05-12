@@ -1077,7 +1077,7 @@ void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 	}
 }
 
-void Widget_FlushStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
+void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
 	int i, key;
 	LCUI_Style s;

@@ -58,7 +58,7 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 }
 
 /** 刷新在追加部件后的状态，例如：:first-child 和 :last-child */
-static void Widget_FlushStatusAfterAppend( LCUI_Widget w, 
+static void Widget_UpdateStatusAfterAppend( LCUI_Widget w, 
 					   LCUI_BOOL is_remove_mode )
 {
 	int index = Widget_GetIndex( w );
@@ -104,7 +104,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget w )
 	node = Widget_GetNode( w );
 	snode = Widget_GetShowNode( w );
 	if( w->parent ) {
-		Widget_FlushStatusAfterAppend( w, TRUE );
+		Widget_UpdateStatusAfterAppend( w, TRUE );
 		LinkedList_Unlink( &w->parent->children, node );
 		LinkedList_Unlink( &w->parent->children_show, snode );
 		Widget_PostSurfaceEvent( w, WET_REMOVE );
@@ -112,12 +112,14 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget w )
 	w->parent = parent;
 	LinkedList_AppendNode( &parent->children, node );
 	LinkedList_AppendNode( &parent->children_show, snode );
-	Widget_FlushZIndex( w );
+	DEBUG_MSG( "child: %p, type: %s, class: %s, prev: %p\n", 
+		    w, w->type, w->classes ? w->classes[0] : NULL, snode->prev );
+	Widget_UpdateZIndex( w );
 	Widget_PostSurfaceEvent( w, WET_ADD );
 	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( w );
 	Widget_AddTask( parent, WTT_LAYOUT );
-	Widget_FlushStatusAfterAppend( w, FALSE );
+	Widget_UpdateStatusAfterAppend( w, FALSE );
 	DEBUG_MSG("tip\n");
 	return 0;
 }
@@ -139,14 +141,14 @@ int Widget_Unwrap( LCUI_Widget widget )
 		prev = node->prev;
 		child = node->data;
 		snode = Widget_GetShowNode( child );
-		Widget_FlushStatusAfterAppend( child, TRUE );
+		Widget_UpdateStatusAfterAppend( child, TRUE );
 		LinkedList_Unlink( &widget->children, node );
 		LinkedList_Unlink( &widget->children_show, snode );
 		child->parent = widget->parent;
 		LinkedList_Link( list, target, node );
 		LinkedList_AppendNode( list_show, snode );
-		Widget_FlushStatusAfterAppend( child, FALSE );
-		Widget_FlushZIndex( child );
+		Widget_UpdateStatusAfterAppend( child, FALSE );
+		Widget_UpdateZIndex( child );
 		Widget_AddTaskForChildren( child, WTT_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
 		node = prev;
@@ -159,16 +161,18 @@ int Widget_Unwrap( LCUI_Widget widget )
 static void Widget_Init( LCUI_Widget widget )
 {
 	memset( widget, 0, sizeof(struct LCUI_WidgetRec_));
+	widget->deleted = FALSE;
+	widget->trigger = EventTrigger();
+	widget->style = StyleSheet();
 	widget->custom_style = StyleSheet();
 	widget->cached_style = StyleSheet();
-	widget->style = StyleSheet();
-	widget->computed_style.visible = TRUE;
-	widget->computed_style.position = SV_STATIC;
-	widget->computed_style.display = SV_BLOCK;
-	widget->computed_style.pointer_events = SV_AUTO;
 	widget->inherited_style = StyleSheet();
-	widget->computed_style.box_sizing = SV_CONTENT_BOX;
 	widget->computed_style.opacity = 1.0;
+	widget->computed_style.visible = TRUE;
+	widget->computed_style.display = SV_BLOCK;
+	widget->computed_style.position = SV_STATIC;
+	widget->computed_style.pointer_events = SV_AUTO;
+	widget->computed_style.box_sizing = SV_CONTENT_BOX;
 	widget->computed_style.margin.top.type = SVT_PX;
 	widget->computed_style.margin.right.type = SVT_PX;
 	widget->computed_style.margin.bottom.type = SVT_PX;
@@ -177,9 +181,6 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->computed_style.padding.right.type = SVT_PX;
 	widget->computed_style.padding.bottom.type = SVT_PX;
 	widget->computed_style.padding.left.type = SVT_PX;
-	widget->trigger = EventTrigger();
-	widget->deleted = FALSE;
-	Widget_InitTaskBox( widget );
 	Background_Init( &widget->computed_style.background );
 	BoxShadow_Init( &widget->computed_style.shadow );
 	Border_Init( &widget->computed_style.border );
@@ -187,8 +188,8 @@ static void Widget_Init( LCUI_Widget widget )
 	LinkedList_Init( &widget->children_show );
 	LinkedList_Init( &widget->children_trash );
 	LinkedList_Init( &widget->dirty_rects );
-	Graph_Init( &widget->graph );
 	LCUIMutex_Init( &widget->mutex );
+	Graph_Init( &widget->graph );
 }
 
 LCUI_Widget LCUIWidget_New( const char *type_name )
@@ -229,12 +230,12 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
 	LinkedList_Clear( &widget->dirty_rects, free );
 	Widget_PostSurfaceEvent( widget, WET_REMOVE );
-	Widget_AddTask( widget->parent, WTT_LAYOUT );
+	Widget_UpdateLayout( widget->parent );
 	Widget_SetId( widget, NULL );
-	Widget_DestroyTaskBox( widget );
 	EventTrigger_Destroy( widget->trigger );
 	widget->trigger = NULL;
 	free( widget );
+	_DEBUG_MSG("destroy: %p\n", widget);
 }
 
 void Widget_Destroy( LCUI_Widget w )
@@ -251,7 +252,7 @@ void Widget_Destroy( LCUI_Widget w )
 		LinkedList_Unlink( &w->parent->children, node );
 		LinkedList_AppendNode( &w->parent->children_trash, node );
 		if( w->computed_style.position != SV_ABSOLUTE ) {
-			Widget_AddTask( w->parent, WTT_LAYOUT );
+			Widget_UpdateLayout( w->parent );
 		}
 		Widget_InvalidateArea( w->parent, &w->box.graph, 
 				       SV_PADDING_BOX );
@@ -433,7 +434,7 @@ static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
 	}
 }
 
-void Widget_FlushBorder( LCUI_Widget w )
+void Widget_UpdateBorder( LCUI_Widget w )
 {
 	LCUI_Rect rect;
 	LCUI_Border ob, *nb;
@@ -500,7 +501,7 @@ static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
 	}
 }
 
-void Widget_FlushBoxShadow( LCUI_Widget w )
+void Widget_UpdateBoxShadow( LCUI_Widget w )
 {
 	LCUI_BoxShadow bs = w->computed_style.shadow;
 	ComputeBoxShadowStyle( w->style, &w->computed_style.shadow );
@@ -521,7 +522,7 @@ void Widget_FlushBoxShadow( LCUI_Widget w )
 	Widget_AddTask( w, WTT_POSITION );
 }
 
-void Widget_FlushVisibility( LCUI_Widget w )
+void Widget_UpdateVisibility( LCUI_Widget w )
 {
 	LCUI_Style s = &w->style->sheet[key_visible];
 	LCUI_BOOL visible = w->computed_style.visible;
@@ -549,7 +550,7 @@ void Widget_FlushVisibility( LCUI_Widget w )
 		      w->computed_style.display == SV_INLINE_BLOCK)
 		    && w->computed_style.position == SV_STATIC
 		    && w->computed_style.float_mode == SV_NONE ) {
-			Widget_AddTask( w->parent, WTT_LAYOUT );
+			Widget_UpdateLayout( w->parent );
 		}
 	}
 	DEBUG_MSG( "visible: %s\n", visible ? "TRUE" : "FALSE" );
@@ -572,12 +573,18 @@ int Widget_GetIndex( LCUI_Widget w )
 	return index;
 }
 
-void Widget_FlushZIndex( LCUI_Widget w )
+
+void Widget_UpdateZIndex( LCUI_Widget w )
 {
+	Widget_AddTask( w, WTT_ZINDEX );
+}
+
+void Widget_ExecUpdateZIndex( LCUI_Widget w )
+{
+	int index;
 	LinkedList *list;
-	int index = Widget_GetIndex( w );
+	LinkedListNode *cnode, *csnode, *snode;
 	LCUI_Style s = &w->style->sheet[key_z_index];
-	LinkedListNode *cnode, *csnode, *snode = Widget_GetShowNode( w );
 	if( s->is_valid && s->type == SVT_VALUE ) {
 		w->computed_style.z_index = s->value;
 	} else {
@@ -586,6 +593,8 @@ void Widget_FlushZIndex( LCUI_Widget w )
 	if( !w->parent ) {
 		return;
 	}
+	index = Widget_GetIndex( w );
+	snode = Widget_GetShowNode( w );
 	list = &w->parent->children_show;
 	LinkedList_Unlink( list, snode );
 	LinkedList_ForEach( cnode, list ) {
@@ -659,7 +668,7 @@ static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
 	return w->style->sheet[key].style;
 }
 
-void Widget_FlushPosition( LCUI_Widget w )
+void Widget_UpdatePosition( LCUI_Widget w )
 {
 	LCUI_Rect rect = w->box.graph;
 	int position = ComputeStyleOption( w, key_position, SV_STATIC );
@@ -670,7 +679,7 @@ void Widget_FlushPosition( LCUI_Widget w )
 	w->computed_style.right = ComputeYNumber( w, key_right );
 	w->computed_style.bottom = ComputeYNumber( w, key_bottom );
 	if( w->parent && w->computed_style.position != position ) {
-		Widget_AddTask( w->parent, WTT_LAYOUT );
+		Widget_UpdateLayout( w->parent );
 	}
 	w->computed_style.position = position;
 	Widget_AddTask( w, WTT_ZINDEX );
@@ -977,7 +986,7 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 	}
 }
 
-void Widget_FlushSize( LCUI_Widget w )
+void Widget_UpdateSize( LCUI_Widget w )
 {
 	LCUI_Rect rect;
 	int i, box_sizing;
@@ -1025,14 +1034,14 @@ void Widget_FlushSize( LCUI_Widget w )
 		return;
 	}
 	if( w->style->sheet[key_height].type != SVT_AUTO ) {
-		Widget_AddTask( w, WTT_LAYOUT );
+		Widget_UpdateLayout( w );
 	}
 	/* 如果是绝对定位，且指定了右边距，或者垂直对齐方式不为顶部对齐 */
 	if( (w->computed_style.position == SV_ABSOLUTE &&
 	    w->style->sheet[key_right].is_valid && 
 	    w->style->sheet[key_right].type != SVT_AUTO) ||
 	    w->computed_style.vertical_align != SV_TOP ) {
-		Widget_FlushPosition( w );
+		Widget_UpdatePosition( w );
 	}
 	if( w->parent ) {
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
@@ -1045,13 +1054,13 @@ void Widget_FlushSize( LCUI_Widget w )
 		}
 		if( w->computed_style.display != SV_NONE &&
 		    w->computed_style.position == SV_STATIC ) {
-			Widget_AddTask( w->parent, WTT_LAYOUT );
+			Widget_UpdateLayout( w->parent );
 		}
 	}
 	Widget_SendResizeEvent( w );
 }
 
-void Widget_FlushProps( LCUI_Widget w )
+void Widget_UpdateProps( LCUI_Widget w )
 {
 	int prop = ComputeStyleOption( w, key_pointer_events, SV_AUTO );
 	w->computed_style.pointer_events = prop;
@@ -1073,7 +1082,7 @@ void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left )
 	SetStyle( w->custom_style, key_margin_right, right, px );
 	SetStyle( w->custom_style, key_margin_bottom, bottom, px );
 	SetStyle( w->custom_style, key_margin_left, left, px );
-	Widget_FlushStyle( w, FALSE );
+	Widget_UpdateStyle( w, FALSE );
 }
 
 void Widget_Move( LCUI_Widget w, int left, int top )
@@ -1081,26 +1090,26 @@ void Widget_Move( LCUI_Widget w, int left, int top )
 	SetStyle( w->custom_style, key_top, top, px );
 	SetStyle( w->custom_style, key_left, left, px );
 	DEBUG_MSG("top = %d, left = %d\n", top, left);
-	Widget_FlushStyle( w, FALSE );
+	Widget_UpdateStyle( w, FALSE );
 }
 
 void Widget_Resize( LCUI_Widget w, int width, int height )
 {
 	SetStyle( w->custom_style, key_width, width, px );
 	SetStyle( w->custom_style, key_height, height, px );
-	Widget_FlushStyle( w, FALSE );
+	Widget_UpdateStyle( w, FALSE );
 }
 
 void Widget_Show( LCUI_Widget w )
 {
 	SetStyle( w->custom_style, key_visible, TRUE, int );
-	Widget_FlushStyle( w, FALSE );
+	Widget_UpdateStyle( w, FALSE );
 }
 
 void Widget_Hide( LCUI_Widget w )
 {
 	SetStyle( w->custom_style, key_visible, FALSE, int );
-	Widget_FlushStyle( w, FALSE );
+	Widget_UpdateStyle( w, FALSE );
 }
 
 void Widget_SetBackgroundColor( LCUI_Widget w, LCUI_Color color )
@@ -1345,6 +1354,14 @@ void Widget_UnlockLayout( LCUI_Widget w )
 
 void Widget_UpdateLayout( LCUI_Widget w )
 {
+	if( w->layout_locked ) {
+		return;
+	}
+	Widget_AddTask( w, WTT_LAYOUT );
+}
+
+void Widget_ExecUpdateLayout( LCUI_Widget w )
+{
 	struct {
 		int x, y;
 		int line_height;
@@ -1355,9 +1372,6 @@ void Widget_UpdateLayout( LCUI_Widget w )
 	LCUI_Widget child;
 	LinkedListNode *node;
 
-	if( w->layout_locked ) {
-		return;
-	}
 	ctx.max_width = Widget_ComputeMaxWidth( w );
 	LinkedList_ForEach( node, &w->children ) {
 		child = node->data;
@@ -1395,7 +1409,7 @@ void Widget_UpdateLayout( LCUI_Widget w )
 		case SV_NONE:
 		default: continue;
 		}
-		Widget_FlushPosition( child );
+		Widget_UpdatePosition( child );
 		ctx.prev = child;
 		ctx.prev_display = child->computed_style.display;
 	}
