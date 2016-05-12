@@ -59,7 +59,9 @@ void LinkedList_Unlink( LinkedList *list, LinkedListNode *node )
 	if( node == list->tail.prev ) {
 		list->tail.prev = node->prev;
 	}
-	node->prev->next = node->next;
+	if( node->prev ) {
+		node->prev->next = node->next;
+	}
 	node->prev = NULL;
 	node->next = NULL;
 }

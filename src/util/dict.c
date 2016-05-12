@@ -125,7 +125,6 @@ static void Dict_Reset( DictHashTable *ht )
 	ht->used = 0;
 }
 
-/** 创建一个新字典 */
 Dict *Dict_Create( DictType *type, void *privdata )
 {
 	static int inited = 0;
@@ -150,7 +149,6 @@ static int Dict_Init( Dict *d, DictType *type, void *privdata )
 	return 0;
 }
 
-/** 重新调整字典的大小，缩减多余空间 */
 int Dict_Resize( Dict *d )
 {
 	int minimal;
@@ -164,7 +162,6 @@ int Dict_Resize( Dict *d )
 	return Dict_Expand( d, minimal );
 }
 
-/** 对字典进行扩展 */
 int Dict_Expand( Dict *d, unsigned long size )
 {
 	DictHashTable n;
@@ -190,12 +187,6 @@ int Dict_Expand( Dict *d, unsigned long size )
 	return 0;
 }
 
-/** 
- * 字典的 rehash 函数
- * @param[in] n 要执行 rehash 的元素数量
- * @return 0 所有元素 rehash 完毕
- * @return 1 还有元素没有 rehash
-*/
 int Dict_Rehash( Dict *d, int n )
 {
 	if( !Dict_IsRehashing( d ) ) {
@@ -233,11 +224,6 @@ int Dict_Rehash( Dict *d, int n )
 
 #define timeInMilliseconds LCUI_GetTickCount
 
-/*
- * 在指定的时间内完成 rehash 操作
- * @param[in] ms 进行 rehash 的时间，以毫秒为单位
- * @returns rehashes 完成 rehash 的元素的数量
- */
 int Dict_RehashMilliseconds( Dict *d, int ms )
 {
 	long long start = timeInMilliseconds();
@@ -260,13 +246,6 @@ static void Dict_RehashStep( Dict *d )
 	}
 }
 
-/** 
- * 将元素添加到目标哈希表中
- * @param[in] d 字典指针
- * @param[in] key 新元素的关键字
- * @param[in] val 新元素的值
- * @returns 添加成功为 0，添加出错为 -1
- */
 int Dict_Add( Dict *d, void *key, void *val )
 {
 	DictEntry *entry = Dict_AddRaw( d, key );
@@ -277,7 +256,6 @@ int Dict_Add( Dict *d, void *key, void *val )
 	return 0;
 }
 
-/** 添加元素的底层实现函数(由 Dict_Add 调用) */
 DictEntry *Dict_AddRaw( Dict *d, void *key )
 {
 	int index;
@@ -302,13 +280,6 @@ DictEntry *Dict_AddRaw( Dict *d, void *key )
 	return entry;
 }
 
-/**
- * 将新元素添加到字典，如果 key 已经存在，那么新元素覆盖旧元素。
- * @param[in] key 新元素的关键字
- * @param[in] val 新元素的值
- * @return 1 key 不存在，新建元素添加成功
- * @return 0 key 已经存在，旧元素被新元素覆盖
- */
 int Dict_Replace( Dict *d, void *key, void *val )
 {
 	DictEntry *entry, auxentry;
@@ -381,7 +352,7 @@ int Dict_DeleteNoFree( Dict *ht, const void *key )
 }
 
 /** 清除字典中指定的哈希表 */
-void Dict_Clear( Dict *d, DictHashTable *ht )
+static void Dict_Clear( Dict *d, DictHashTable *ht )
 {
 	unsigned long i;
 	DictEntry *he, *next_he;
@@ -400,7 +371,6 @@ void Dict_Clear( Dict *d, DictHashTable *ht )
 	Dict_Reset( ht );
 }
 
-/** 删除字典 */
 void Dict_Release( Dict *d )
 {
 	Dict_Clear( d, &d->ht[0] );
@@ -408,11 +378,6 @@ void Dict_Release( Dict *d )
 	free( d );
 }
 
-/** 
- * 在字典中按指定的 key 查找
- * 查找过程是典型的 separate chaining find 操作
- * 具体参见：http://en.wikipedia.org/wiki/Hash_table#Separate_chaining
- */
 DictEntry *Dict_Find( Dict *d, const void *key )
 {
 	DictEntry *he;
@@ -440,22 +405,12 @@ DictEntry *Dict_Find( Dict *d, const void *key )
 	return NULL;
 }
 
-/** 查找给定 key 在字典 d 中的值 */
 void *Dict_FetchValue( Dict *d, const void *key )
 {
 	DictEntry *he = Dict_Find( d, key );
 	return he ? DictEntry_GetVal( he ) : NULL;
 }
 
-/**
- * 创建一个迭代器，用于遍历哈希表节点。
- *
- * safe 属性指示迭代器是否安全，如果迭代器是安全的，那么它可以在遍历的过程中
- * 进行增删操作，反之，如果迭代器是不安全的，那么它只能执行 Dict_Next 操作。
- *
- * 因为迭代进行的时候可以对列表的当前节点进行修改，为了避免修改造成指针丢失，
- * 所以不仅要有指向当前节点的 entry 属性，还需要指向下一节点的 next_entry 属性
- */
 DictIterator *Dict_GetIterator( Dict *d )
 {
 	DictIterator *iter = malloc( sizeof( *iter ) );
@@ -468,7 +423,6 @@ DictIterator *Dict_GetIterator( Dict *d )
 	return iter;
 }
 
-/** 创建一个安全迭代器 */
 DictIterator *Dict_GetSafeIterator( Dict *d )
 {
 	DictIterator *i = Dict_GetIterator( d );
@@ -476,7 +430,6 @@ DictIterator *Dict_GetSafeIterator( Dict *d )
 	return i;
 }
 
-/** 迭代器的推进函数 */
 DictEntry *Dict_Next( DictIterator *iter )
 {
 	DictHashTable *ht;
@@ -513,7 +466,6 @@ DictEntry *Dict_Next( DictIterator *iter )
 	return NULL;
 }
 
-/** 删除迭代器 */
 void Dict_ReleaseIterator( DictIterator *iter )
 {
 	if( iter->safe && !(iter->index == -1 && iter->table == 0) ) {
@@ -522,7 +474,6 @@ void Dict_ReleaseIterator( DictIterator *iter )
 	free( iter );
 }
 
-/* 从字典中随机获取一项 */
 DictEntry *Dict_GetRandomKey( Dict *d )
 {
 	DictEntry *he, *orighe;
@@ -629,7 +580,6 @@ static int Dict_KeyIndex( Dict *d, const void *key )
 	return idx;
 }
 
-/** 清空字典 */
 void Dict_Empty( Dict *d )
 {
 	Dict_Clear( d, &d->ht[0] );
