@@ -302,6 +302,7 @@ typedef struct LCUI_Background {
 typedef struct LCUI_PaintContextRec_ {
 	LCUI_Rect rect;			/**< 需要绘制的区域 */
 	LCUI_Graph canvas;		/**< 绘制后的位图缓存（可称为：画布） */
+	LCUI_BOOL with_alpha;		/**< 绘制时是否需要处理 alpha 通道 */
 } LCUI_PaintContextRec, *LCUI_PaintContext;
 
 typedef void (*FuncPtr)(void *);

@@ -298,6 +298,7 @@ static LCUI_PaintContext WinSurface_BeginPaint( LCUI_Surface surface, LCUI_Rect 
 	LCUI_PaintContext paint;
 	paint = malloc(sizeof(LCUI_PaintContextRec));
 	paint->rect = *rect;
+	paint->with_alpha = FALSE;
 	Graph_Init( &paint->canvas );
 	LCUIRect_ValidateArea( &paint->rect, surface->w, surface->h );
 	Graph_Quote( &paint->canvas, &surface->fb, &paint->rect );

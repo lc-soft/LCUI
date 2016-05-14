@@ -224,8 +224,9 @@ static void Widget_OnDestroy( void *arg )
 void Widget_ExecDestroy( LCUI_Widget widget )
 {
 	LCUIWidget_ClearEventTarget( widget );
+	Widget_DeleteTaskRecord( widget );
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
-	* 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
+	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
 	LinkedList_ClearData( &widget->children_show, NULL );
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
 	LinkedList_Clear( &widget->dirty_rects, free );
@@ -235,28 +236,27 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	EventTrigger_Destroy( widget->trigger );
 	widget->trigger = NULL;
 	free( widget );
-	_DEBUG_MSG("destroy: %p\n", widget);
 }
 
 void Widget_Destroy( LCUI_Widget w )
 {
-	LinkedListNode *node;
 	LCUI_Widget root = w;
 	while( root->parent ) {
 		root = root->parent;
 	}
+	w->deleted = TRUE;
 	if( w->parent ) {
-		node = Widget_GetShowNode( w );
-		LinkedList_Unlink( &w->parent->children_show, node );
-		node = Widget_GetNode( w );
+		LinkedListNode *node = Widget_GetNode( w );
+		LinkedListNode *snode = Widget_GetShowNode( w );
+		_DEBUG_MSG("node: %p\n", node);
 		LinkedList_Unlink( &w->parent->children, node );
+		LinkedList_Unlink( &w->parent->children_show, snode );
 		LinkedList_AppendNode( &w->parent->children_trash, node );
 		if( w->computed_style.position != SV_ABSOLUTE ) {
 			Widget_UpdateLayout( w->parent );
 		}
 		Widget_InvalidateArea( w->parent, &w->box.graph, 
 				       SV_PADDING_BOX );
-		w->deleted = TRUE;
 	}
 	if( root != LCUIWidget.root ) {
 		Widget_ExecDestroy( w );
@@ -557,6 +557,27 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 	Widget_PostSurfaceEvent( w, visible ? WET_SHOW : WET_HIDE );
 }
 
+void Widget_UpdateOpacity( LCUI_Widget w )
+{
+	float opacity = 1.0;
+	LCUI_Style s = &w->style->sheet[key_opacity];
+	if( s->is_valid ) {
+		switch( s->type ) {
+		case SVT_VALUE: opacity = 1.0 * s->value; break;
+		case SVT_SCALE: opacity = s->val_scale; break;
+		default: opacity = 1.0; break;
+		}
+		if( opacity > 1.0 ) {
+			opacity = 1.0;
+		} else if( opacity < 0.0 ) {
+			opacity = 0.0;
+		}
+	}
+	w->computed_style.opacity = opacity;
+	Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
+	DEBUG_MSG("opacity: %0.2f\n", opacity);
+}
+
 int Widget_GetIndex( LCUI_Widget w )
 {
 	int index = 0;
@@ -572,7 +593,6 @@ int Widget_GetIndex( LCUI_Widget w )
 	}
 	return index;
 }
-
 
 void Widget_UpdateZIndex( LCUI_Widget w )
 {

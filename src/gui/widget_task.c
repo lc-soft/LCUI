@@ -71,12 +71,6 @@ static void HandleSetTitle( LCUI_Widget w )
 	Widget_PostSurfaceEvent( w, WET_TITLE );
 }
 
-/** 处理透明度 */
-static void HandleOpacity( LCUI_Widget w )
-{
-
-}
-
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
 static void HandleBody( LCUI_Widget w )
 {
@@ -172,7 +166,7 @@ static void Widget_AddRecord( LCUI_Widget w )
 	LCUIMutex_Unlock( &self.mutex );
 }
 
-static void Widget_DeleteRecord( LCUI_Widget w )
+void Widget_DeleteTaskRecord( LCUI_Widget w )
 {
 	WidgetTaskRecord rec;
 	LCUIMutex_Lock( &self.mutex );
@@ -222,7 +216,7 @@ static void MapTaskHandler(void)
 	task_handlers[WTT_RESIZE] = Widget_UpdateSize;
 	task_handlers[WTT_SHADOW] = Widget_UpdateBoxShadow;
 	task_handlers[WTT_BORDER] = Widget_UpdateBorder;
-	task_handlers[WTT_OPACITY] = HandleOpacity;
+	task_handlers[WTT_OPACITY] = Widget_UpdateOpacity;
 	task_handlers[WTT_BODY] = HandleBody;
 	task_handlers[WTT_TITLE] = HandleSetTitle;
 	task_handlers[WTT_REFRESH] = HandleRefresh;
@@ -290,7 +284,6 @@ int Widget_Update( LCUI_Widget w )
 		LinkedListNode *next = node->next;
 		LinkedList_Unlink( &w->children_trash, node );
 		LinkedList_Append( &self.deleted_widgets, node->data );
-		Widget_DeleteRecord( node->data );
 		Widget_ExecDestroy( node->data );
 		node = next;
 	}
@@ -309,7 +302,7 @@ void LCUIWidget_StepTask(void)
 		rec = node->data;
 		ret = Widget_Update( rec->widget );
 		if( ret == 0 ) {
-			Widget_DeleteRecord( rec->widget );
+			Widget_DeleteTaskRecord( rec->widget );
 			node = prev->next;
 		} else {
 			node = node->next;

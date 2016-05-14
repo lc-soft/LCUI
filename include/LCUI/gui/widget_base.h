@@ -313,6 +313,9 @@ LCUI_API void Widget_UpdateSize( LCUI_Widget w );
 /** 刷新各项属性 */
 LCUI_API void Widget_UpdateProps( LCUI_Widget w );
 
+/** 更新透明度 */
+LCUI_API void Widget_UpdateOpacity( LCUI_Widget w );
+
 /** 处理部件中当前积累的任务 */
 LCUI_API int Widget_Update( LCUI_Widget w );
 

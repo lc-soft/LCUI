@@ -45,6 +45,9 @@ LCUI_BEGIN_HEADER
 /** 更新当前任务状态，确保部件的任务能够被处理到 */
 LCUI_API void Widget_UpdateTaskStatus( LCUI_Widget widget );
 
+/** 清除部件待处理的任务记录 */
+LCUI_API void Widget_DeleteTaskRecord( LCUI_Widget w );
+
 /** 添加任务 */
 LCUI_API void Widget_AddTask( LCUI_Widget widget, int task_type );
 

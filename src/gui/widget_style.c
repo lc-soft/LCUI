@@ -1089,6 +1089,7 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 	} TaskMap;
 	TaskMap task_map[] = {
 		{ key_display_start, key_display_end, WTT_VISIBLE, TRUE },
+		{ key_opacity, key_opacity, WTT_OPACITY, TRUE },
 		{ key_width, key_height, WTT_RESIZE, TRUE },
 		{ key_padding_top, key_padding_left, WTT_RESIZE, TRUE },
 		{ key_position_start, key_position_end, WTT_POSITION, TRUE },

@@ -287,15 +287,17 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	LinkedListNode *node;
 	int content_left, content_top;
 	LCUI_PaintContextRec self_paint;
+	LCUI_PaintContextRec child_paint;
 	LCUI_Rect canvas_rect, content_rect;
 	LCUI_Graph content_graph, self_graph, layer_graph;
 	LCUI_BOOL has_overlay, has_content_graph = FALSE,
 		has_self_graph = FALSE, has_layer_graph = FALSE,
-		is_cover_border = FALSE;
+		is_cover_border = FALSE, is_paintable;
 
-	Graph_Init( &layer_graph );
 	Graph_Init( &self_graph );
+	Graph_Init( &layer_graph );
 	Graph_Init( &content_graph );
+	layer_graph.color_type = COLOR_TYPE_ARGB;
 	/* 若部件本身是透明的 */
 	if( w->computed_style.opacity < 1.0 ) {
 		has_self_graph = TRUE;
@@ -310,8 +312,9 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		}
 		*/
 	}
+	is_paintable = Widget_IsPaintable( w );
 	/* 如果部件有需要绘制的内容 */
-	if( Widget_IsPaintable( w ) ) {
+	if( is_paintable ) {
 		if( w->enable_graph && Graph_IsValid( &w->graph ) ) {
 			Graph_Quote( &self_graph, &w->graph, &paint->rect );
 		} else {
@@ -324,7 +327,8 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		}
 		/* 若不需要缓存自身位图则直接绘制到画布上 */
 		if( !has_self_graph ) {
-			Graph_Mix( &paint->canvas, &self_graph, 0, 0, FALSE );
+			Graph_Mix( &paint->canvas, &self_graph,
+				   0, 0, paint->with_alpha );
 		}
 	}
 	/* 计算内容框相对于图层的坐标 */
@@ -348,9 +352,11 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	content_rect.y -= paint->rect.y;
 	/* 若需要部件内容区的位图缓存 */
 	if( has_content_graph ) {
+		child_paint.with_alpha = TRUE;
 		content_graph.color_type = COLOR_TYPE_ARGB;
 		Graph_Create( &content_graph, content_rect.w, content_rect.h );
 	} else {
+		child_paint.with_alpha = FALSE;
 		/* 引用该区域的位图，作为内容框的位图 */
 		Graph_Quote( &content_graph, &paint->canvas, &content_rect );
 	}
@@ -358,7 +364,6 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	LinkedList_ForEachReverse( node, &w->children_show ) {
 		LCUI_Rect child_rect;
 		LCUI_Widget child = node->data; 
-		LCUI_PaintContextRec child_paint;
 		if( !child->computed_style.visible ) {
 			continue;
 		}
@@ -400,17 +405,23 @@ content_paint_done:
 	 * 前部件的图层，然后将该图层混合到输出的位图中
 	 */
 	if( has_layer_graph ) {
-		Graph_Init( &layer_graph );
-		layer_graph.color_type = COLOR_TYPE_ARGB;
-		Graph_Copy( &layer_graph, &self_graph );
-		Graph_Mix( &layer_graph, &content_graph, 
-			   content_rect.x, content_rect.y, TRUE );
+		if( is_paintable ) {
+			Graph_Copy( &layer_graph, &self_graph );
+			Graph_Mix( &layer_graph, &content_graph,
+				   content_rect.x, content_rect.y, TRUE );
+		} else {
+			Graph_Create( &layer_graph, paint->rect.width, 
+				      paint->rect.height );
+			Graph_Replace( &layer_graph, &content_graph, 
+				       content_rect.x, content_rect.y );
+		}
 		layer_graph.opacity = w->computed_style.opacity;
-		Graph_Mix( &paint->canvas, &layer_graph, 0, 0, FALSE );
+		Graph_Mix( &paint->canvas, &layer_graph, 
+			   0, 0, paint->with_alpha );
 	}
 	else if( has_content_graph ) {
 		Graph_Mix( &paint->canvas, &content_graph,
-			   content_rect.x, content_rect.y, FALSE );
+			   content_rect.x, content_rect.y, TRUE );
 	}
 	Graph_Free( &layer_graph );
 	Graph_Free( &self_graph );
