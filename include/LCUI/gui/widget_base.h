@@ -220,6 +220,7 @@ typedef struct LCUI_WidgetRec_ {
 	int			x, y;			/**< 当前坐标（由 origin 计算而来） */
 	int			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
 	int			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
+	int			index;			/**< 部件索引位置 */
 	char			*id;			/**< ID */
 	char			*type;			/**< 类型 */
 	char			**classes;		/**< 类列表 */
@@ -245,9 +246,9 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_EventTrigger	trigger;		/**< 事件触发器 */
 	LCUI_WidgetTaskBoxRec	task;			/**< 任务记录 */
 	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
-	LCUI_BOOL		has_dirty_child;	/**< 标志，指示子级部件是否有无效区域 */
-	LCUI_BOOL		layout_locked;		/**< 标志，指示子级部件布局是否已锁定 */
+	LCUI_BOOL		has_dirty_child;	/**< 子级部件是否有无效区域 */
 	LCUI_BOOL		deleted;		/**< 是否已经删除 */
+	LCUI_BOOL		layout_locked;		/**< 子级部件布局是否已锁定 */
 } LCUI_WidgetRec;
 
 
@@ -285,6 +286,9 @@ LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 /** 获取相对于父级指定部件的 XY 坐标 */
 LCUI_API void Widget_GetAbsXY( LCUI_Widget w, LCUI_Widget parent, int *x, int *y );
 
+/** 更新部件背景样式 */
+LCUI_API void Widget_UpdateBackground( LCUI_Widget widget );
+
 /** 刷新部件的边框 */
 LCUI_API void Widget_UpdateBorder( LCUI_Widget w );
 
@@ -295,9 +299,6 @@ LCUI_API void Widget_UpdateVisibility( LCUI_Widget w );
 
 /** 设置部件为顶级部件 */
 LCUI_API int Widget_Top( LCUI_Widget w );
-
-/** 获取在部件列表中的位置 */
-LCUI_API int Widget_GetIndex( LCUI_Widget w );
 
 /** 刷新堆叠顺序 */
 LCUI_API void Widget_UpdateZIndex( LCUI_Widget w );
@@ -366,16 +367,18 @@ LCUI_API LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name );
 /** 计算部件的最大宽度 */
 LCUI_API int Widget_ComputeMaxWidth( LCUI_Widget w );
 
-/** 更新子部件的布局 */
-LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
-
-LCUI_API void Widget_ExecUpdateLayout( LCUI_Widget w );
-
 /** 锁定子部件的布局，让 LCUI 不自动更新布局 */
 LCUI_API void Widget_LockLayout( LCUI_Widget w );
 
 /** 解除锁定子部件的布局 */
 LCUI_API void Widget_UnlockLayout( LCUI_Widget w );
+
+LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
+
+/** 更新子部件的布局 */
+LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
+
+LCUI_API void Widget_ExecUpdateLayout( LCUI_Widget w );
 
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
@@ -387,8 +390,6 @@ void LCUI_InitWidget(void);
 
 void LCUI_ExitWidget(void);
 
-/** 计算背景样式 */
-void Widget_ComputeBackgroundStyle( LCUI_Widget widget );
 
 #endif
 

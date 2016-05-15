@@ -518,6 +518,7 @@ void LCUIWidget_InitEvent(void)
 		{ WET_MOUSEOUT, "mouseout" },
 		{ WET_MOUSEOVER, "mouseover" },
 		{ WET_RESIZE, "resize" },
+		{ WET_AFTERLAYOUT, "afterlayout" },
 		{ WET_FOCUS, "focus" },
 		{ WET_BLUR, "blur" },
 		{ WET_SHOW, "show" },

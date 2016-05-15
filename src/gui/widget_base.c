@@ -57,13 +57,12 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 	return LCUIWidget.root;
 }
 
-/** 刷新在追加部件后的状态，例如：:first-child 和 :last-child */
+/** 刷新在追加部件后的状态，例如 :first-child 和 :last-child */
 static void Widget_UpdateStatusAfterAppend( LCUI_Widget w, 
 					   LCUI_BOOL is_remove_mode )
 {
-	int index = Widget_GetIndex( w );
 	LinkedListNode *node = Widget_GetNode( w );
-	if( index == 0 ) {
+	if( w->index == 0 ) {
 		if( is_remove_mode ) {
 			Widget_RemoveStatus( w, "first-child" );
 			if( node->next ) {
@@ -74,7 +73,7 @@ static void Widget_UpdateStatusAfterAppend( LCUI_Widget w,
 			Widget_AddStatus( w, "first-child" );
 		}
 	}
-	if( index == w->parent->children.length - 1 ) {
+	if( w->index == w->parent->children.length - 1 ) {
 		if( is_remove_mode ) {
 			Widget_RemoveStatus( w, "last-child" );
 			if( w->parent->children.length > 1 ) {
@@ -91,36 +90,43 @@ static void Widget_UpdateStatusAfterAppend( LCUI_Widget w,
 	}
 }
 
-int Widget_Append( LCUI_Widget parent, LCUI_Widget w )
+int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 {
+	LCUI_Widget child;
 	LinkedListNode *node, *snode;
-	DEBUG_MSG("parent: %p, w: %p\n", parent, w);
-	if( !parent || !w || parent == w->parent ) {
+	DEBUG_MSG("parent: %p, widget: %p\n", parent, widget);
+	if( !parent || !widget || parent == widget->parent ) {
 		return -1;
 	}
-	if( parent == w ) {
+	if( parent == widget ) {
 		return -2;
 	}
-	node = Widget_GetNode( w );
-	snode = Widget_GetShowNode( w );
-	if( w->parent ) {
-		Widget_UpdateStatusAfterAppend( w, TRUE );
-		LinkedList_Unlink( &w->parent->children, node );
-		LinkedList_Unlink( &w->parent->children_show, snode );
-		Widget_PostSurfaceEvent( w, WET_REMOVE );
+	node = Widget_GetNode( widget );
+	snode = Widget_GetShowNode( widget );
+	if( widget->parent ) {
+		Widget_UpdateStatusAfterAppend( widget, TRUE );
+		/** 修改它后面的部件的 index 值 */
+		node = node->next;
+		while( node ) {
+			child = node->data;
+			child->index -= 1;
+			node = node->next;
+		}
+		node = Widget_GetNode( widget );
+		LinkedList_Unlink( &widget->parent->children, node );
+		LinkedList_Unlink( &widget->parent->children_show, snode );
+		Widget_PostSurfaceEvent( widget, WET_REMOVE );
 	}
-	w->parent = parent;
+	widget->parent = parent;
+	widget->index = parent->children.length;
 	LinkedList_AppendNode( &parent->children, node );
 	LinkedList_AppendNode( &parent->children_show, snode );
-	DEBUG_MSG( "child: %p, type: %s, class: %s, prev: %p\n", 
-		    w, w->type, w->classes ? w->classes[0] : NULL, snode->prev );
-	Widget_UpdateZIndex( w );
-	Widget_PostSurfaceEvent( w, WET_ADD );
-	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
-	Widget_UpdateTaskStatus( w );
+	Widget_UpdateZIndex( widget );
+	Widget_PostSurfaceEvent( widget, WET_ADD );
+	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
+	Widget_UpdateTaskStatus( widget );
 	Widget_AddTask( parent, WTT_LAYOUT );
-	Widget_UpdateStatusAfterAppend( w, FALSE );
-	DEBUG_MSG("tip\n");
+	Widget_UpdateStatusAfterAppend( widget, FALSE );
 	return 0;
 }
 
@@ -224,7 +230,6 @@ static void Widget_OnDestroy( void *arg )
 void Widget_ExecDestroy( LCUI_Widget widget )
 {
 	LCUIWidget_ClearEventTarget( widget );
-	Widget_DeleteTaskRecord( widget );
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
 	LinkedList_ClearData( &widget->children_show, NULL );
@@ -246,9 +251,17 @@ void Widget_Destroy( LCUI_Widget w )
 	}
 	w->deleted = TRUE;
 	if( w->parent ) {
-		LinkedListNode *node = Widget_GetNode( w );
-		LinkedListNode *snode = Widget_GetShowNode( w );
-		_DEBUG_MSG("node: %p\n", node);
+		LCUI_Widget child;
+		LinkedListNode *node, *snode;
+		node = Widget_GetNode( w );
+		node = node->next;
+		while( node ) {
+			child = node->data;
+			child->index -= 1;
+			node = node->next;
+		}
+		node = Widget_GetNode( w );
+		snode = Widget_GetShowNode( w );
 		LinkedList_Unlink( &w->parent->children, node );
 		LinkedList_Unlink( &w->parent->children_show, snode );
 		LinkedList_AppendNode( &w->parent->children_trash, node );
@@ -578,22 +591,6 @@ void Widget_UpdateOpacity( LCUI_Widget w )
 	DEBUG_MSG("opacity: %0.2f\n", opacity);
 }
 
-int Widget_GetIndex( LCUI_Widget w )
-{
-	int index = 0;
-	LinkedListNode *node;
-	if( !w->parent ) {
-		return 0;
-	}
-	node = Widget_GetNode( w );
-	node = node->prev;
-	while( node->prev ) {
-		node = node->prev;
-		++index;
-	}
-	return index;
-}
-
 void Widget_UpdateZIndex( LCUI_Widget w )
 {
 	Widget_AddTask( w, WTT_ZINDEX );
@@ -601,7 +598,6 @@ void Widget_UpdateZIndex( LCUI_Widget w )
 
 void Widget_ExecUpdateZIndex( LCUI_Widget w )
 {
-	int index;
 	LinkedList *list;
 	LinkedListNode *cnode, *csnode, *snode;
 	LCUI_Style s = &w->style->sheet[key_z_index];
@@ -613,7 +609,6 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 	if( !w->parent ) {
 		return;
 	}
-	index = Widget_GetIndex( w );
 	snode = Widget_GetShowNode( w );
 	list = &w->parent->children_show;
 	LinkedList_Unlink( list, snode );
@@ -625,7 +620,7 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 			continue;
 		} else if( w->computed_style.z_index == ccs->z_index ) {
 			if( w->computed_style.position == ccs->position ) {
-				if( index < Widget_GetIndex( child ) ) {
+				if( w->index < child->index ) {
 					continue;
 				}
 			} else if( w->computed_style.position < ccs->position ) {
@@ -1374,10 +1369,9 @@ void Widget_UnlockLayout( LCUI_Widget w )
 
 void Widget_UpdateLayout( LCUI_Widget w )
 {
-	if( w->layout_locked ) {
-		return;
+	if( !w->layout_locked ) {
+		Widget_AddTask( w, WTT_LAYOUT );
 	}
-	Widget_AddTask( w, WTT_LAYOUT );
 }
 
 void Widget_ExecUpdateLayout( LCUI_Widget w )
@@ -1390,6 +1384,7 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		int max_width;
 	} ctx = { 0 };
 	LCUI_Widget child;
+	LCUI_WidgetEventRec e;
 	LinkedListNode *node;
 
 	ctx.max_width = Widget_ComputeMaxWidth( w );
@@ -1437,6 +1432,9 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 	    || w->style->sheet[key_height].type == SVT_AUTO ) {
 		Widget_AddTask( w, WTT_RESIZE );
 	}
+	e.cancel_bubble = TRUE;
+	e.type = WET_AFTERLAYOUT;
+	Widget_TriggerEvent( w, &e, NULL );
 }
 
 static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix )

@@ -156,8 +156,8 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 	LCUI_PostTask( &task );
 }
 
-/** 计算背景样式 */
-void Widget_ComputeBackgroundStyle( LCUI_Widget widget )
+/** 更新部件背景样式 */
+void Widget_UpdateBackground( LCUI_Widget widget )
 {
 	LCUI_Style s;
 	LCUI_StyleSheet ss = widget->style;
