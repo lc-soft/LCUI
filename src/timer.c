@@ -44,9 +44,9 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
 #include <LCUI/timer.h>
+
 #define STATE_RUN	1
 #define STATE_PAUSE	0
-#define TimerNode(timer) (LinkedListNode*)(((char*)timer) + sizeof(TimerRec))
 
 /*----------------------------- Timer --------------------------------*/
 
@@ -60,14 +60,16 @@ typedef struct TimerDataRec_ {
 	long int pause_ms;		/**< 定时器处于暂停状态的时长（单位：毫秒） */
 	void (*func)(void*);		/**< 回调函数 */
 	void *arg;			/**< 函数的参数 */
+	LinkedListNode node;		/**< 位于定时器列表中的节点 */
 } TimerRec, *Timer;
 
 static struct TimerModule {
+	int id_count;			/**< 定时器ID计数 */
 	LinkedList timer_list;		/**< 定时器数据记录 */
 	LCUI_BOOL is_running;		/**< 定时器线程是否正在运行 */
 	LCUI_Cond sleep_cond;		/**< 用于控制定时器睡眠的条件变量 */
 	LCUI_Mutex mutex;		/**< 定时器记录操作互斥锁 */
-	LCUI_Thread thread_id;		/**< 定时器处理线程ID */
+	LCUI_Thread tid;		/**< 定时器处理线程ID */
 } self;
 
 /*----------------------------- Private ------------------------------*/
@@ -112,18 +114,18 @@ static void TimerList_Print( void )
 }
 #endif
 
+
 /** 定时器线程，用于处理列表中各个定时器 */
 static void TimerThread( void *arg )
 {
 	long int n_ms;
 	int64_t lost_ms;
-	Timer timer = NULL;
-	LCUI_AppTaskRec task = {0};
 	LinkedListNode *node;
+	LCUI_AppTaskRec task = {0};
 	self.is_running = TRUE;
-	DEBUG_MSG("start\n");
 	LCUIMutex_Lock( &self.mutex );
 	while( self.is_running ) {
+		Timer timer = NULL;
 		LinkedList_ForEach( node, &self.timer_list ) {
 			timer = node->data;
 			if( timer && timer->state == STATE_RUN ) {
@@ -133,7 +135,7 @@ static void TimerThread( void *arg )
 		/* 没有要处理的定时器，停留一段时间再进行下次循环 */
 		if( !node ) {
 			LCUIMutex_Unlock( &self.mutex );
-			LCUI_MSleep(10);
+			LCUI_MSleep( 10 );
 			LCUIMutex_Lock( &self.mutex );
 			continue;
 		}
@@ -150,8 +152,6 @@ static void TimerThread( void *arg )
 		/* 准备任务数据 */
 		task.func = (LCUI_AppTaskFunc)timer->func;
 		task.arg[0] = timer->arg;
-		DEBUG_MSG("timer: %ld, start_time: %ldms, cur_time: %ldms, cur_ms: %ld, total_ms: %ld\n",
-			timer->id, timer->start_time, LCUI_GetTickCount(), timer->total_ms-lost_ms, timer->total_ms);
 		/* 若需要重复使用，则重置剩余等待时间 */
 		LinkedList_Unlink( &self.timer_list, node );
 		if( timer->reuse ) {
@@ -161,12 +161,11 @@ static void TimerThread( void *arg )
 		} else {
 			free( timer );
 		}
-		DEBUG_MSG( "add task: %p, timer id: %ld\n", task.func, timer->id );
 		/* 添加该任务至指定程序的任务队列 */
 		LCUI_PostTask( &task );
 	}
 	LCUIMutex_Unlock( &self.mutex );
-	LCUIThread_Exit(NULL);
+	LCUIThread_Exit( NULL );
 }
 
 static Timer TimerList_Find( int timer_id )
@@ -189,23 +188,23 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 		   void *arg, LCUI_BOOL reuse )
 {
 	Timer timer;
-	LinkedListNode *node;
-	static int id = 100;
+	if( !self.is_running ) {
+		return -1;
+	}
 	LCUIMutex_Lock( &self.mutex );
-	timer = malloc( sizeof(TimerRec) + sizeof(LinkedListNode) );
-	node = TimerNode( timer );
-	node->next = NULL;
-	node->prev = NULL;
-	node->data = timer;
-	timer->id = ++id;
+	timer = malloc( sizeof(TimerRec) );
 	timer->arg = arg;
 	timer->func = func;
 	timer->reuse = reuse;
 	timer->pause_ms = 0;
 	timer->total_ms = n_ms;
 	timer->state = STATE_RUN;
+	timer->id = ++self.id_count;
 	timer->start_time = LCUI_GetTickCount();
-	TimerList_AddNode( node );
+	timer->node.next = NULL;
+	timer->node.prev = NULL;
+	timer->node.data = timer;
+	TimerList_AddNode( &timer->node );
 	LCUICond_Signal( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
 	DEBUG_MSG("set timer, id: %ld, total_ms: %ld\n", timer->id, timer->total_ms);
@@ -215,15 +214,16 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 int LCUITimer_Free( int timer_id )
 {
 	Timer timer;
-	LinkedListNode *node;
-
+	if( !self.is_running ) {
+		return -1;
+	}
 	LCUIMutex_Lock( &self.mutex );
 	timer = TimerList_Find( timer_id );
 	if( !timer ) {
+		LCUIMutex_Unlock( &self.mutex );
 		return -1;
 	}
-	node = TimerNode( timer );
-	LinkedList_Unlink( &self.timer_list, node );
+	LinkedList_Unlink( &self.timer_list, &timer->node );
 	free( timer );
 	LCUICond_Signal( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
@@ -233,6 +233,9 @@ int LCUITimer_Free( int timer_id )
 int LCUITimer_Pause( int timer_id )
 {
 	Timer timer;
+	if( !self.is_running ) {
+		return -1;
+	}
 	LCUIMutex_Lock( &self.mutex );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
@@ -248,6 +251,9 @@ int LCUITimer_Pause( int timer_id )
 int LCUITimer_Continue( int timer_id )
 {
 	Timer timer;
+	if( !self.is_running ) {
+		return -1;
+	}
 	LCUIMutex_Lock( &self.mutex );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
@@ -263,6 +269,9 @@ int LCUITimer_Continue( int timer_id )
 int LCUITimer_Reset( int timer_id, long int n_ms )
 {
 	Timer timer;
+	if( !self.is_running ) {
+		return -1;
+	}
 	LCUIMutex_Lock( &self.mutex );
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
@@ -281,17 +290,19 @@ void LCUI_InitTimer( void )
 	LCUIMutex_Init( &self.mutex );
 	LCUICond_Init( &self.sleep_cond );
 	LinkedList_Init( &self.timer_list );
-	LCUIThread_Create( &self.thread_id, TimerThread, NULL );
+	LCUIThread_Create( &self.tid, TimerThread, NULL );
 }
 
 void LCUI_ExitTimer( void )
 {
 	self.is_running = FALSE;
+	LCUIMutex_Lock( &self.mutex );
 	LCUICond_Broadcast( &self.sleep_cond );
-	LCUIThread_Join( self.thread_id, NULL );
+	LCUIMutex_Unlock( &self.mutex );
+	LCUIThread_Join( self.tid, NULL );
+	LinkedList_Clear( &self.timer_list, free );
 	LCUICond_Destroy( &self.sleep_cond );
 	LCUIMutex_Destroy( &self.mutex );
-	LinkedList_Clear( &self.timer_list, free );
 }
 /*---------------------------- End Public -----------------------------*/
 
