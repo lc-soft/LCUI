@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign
-INSTINCLUDES=textview.h
+INSTINCLUDES=scrollbar.h button.h sidebar.h textview.h
 
 # Headers to install
 pkginclude_HEADERS = $(INSTINCLUDES)
