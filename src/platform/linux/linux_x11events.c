@@ -16,9 +16,9 @@ static struct X11Driver {
 	LCUI_EventTrigger trigger;
 } x11;
 
-static void X11_BreakEventWaiting( void )
+static LCUI_BOOL X11_PostTask( LCUI_AppTask task )
 {
-
+	return FALSE;
 }
 
 static LCUI_BOOL X11_WaitEvent( void )
@@ -81,7 +81,7 @@ int LCUI_InitLinuxX11App( LCUI_AppDriver app )
 	x11.cmap = DefaultColormap( x11.display, x11.screen );
 	app->WaitEvent = X11_WaitEvent;
 	app->PumbEvents = X11_PumpEvents;
-	app->BreakEventWaiting = X11_BreakEventWaiting;
+	app->PostTask = X11_PostTask;
 	app->BindSysEvent = X11_BindSysEvent;
 	app->UnbindSysEvent = X11_UnbindSysEvent;
 	app->UnbindSysEvent2 = X11_UnbindSysEvent2;
