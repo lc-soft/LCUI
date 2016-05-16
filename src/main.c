@@ -99,7 +99,7 @@ static struct LCUI_App {
 	LinkedList tasks;		/**< 程序的任务队列 */
 	LCUI_Mutex tasks_mutex;		/**< 任务记录互斥锁 */
 	LCUI_Mutex loop_mutex;		/**< 互斥锁，确保一次只允许一个线程跑主循环 */
-	LCUI_Mutex loop_changed;	/**< 互斥锁，用于指示当前运行的主循环是否改变 */
+	LCUI_Cond loop_changed;		/**< 条件变量，用于指示当前运行的主循环是否改变 */
 	LCUI_MainLoop loop;		/**< 当前运行的主循环 */
 	LinkedList loops;		/**< 主循环列表 */
 	LCUI_AppDriverRec driver;	/**< 程序事件驱动支持 */
@@ -247,7 +247,6 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 			loop->state = STATE_PAUSED;
 			LCUICond_Wait( &MainApp.loop_changed, 
 				       &MainApp.loop_mutex );
-			LCUIMutex_Unlock( &MainApp.loop_mutex );
 		}
 	}
 	loop->state = STATE_EXITED;
@@ -272,7 +271,7 @@ void LCUI_MainLoop_Quit( LCUI_MainLoop loop )
 /** 初始化程序数据结构体 */
 static void LCUIApp_Init(void)
 {
-	LCUIMutex_Init( &MainApp.loop_changed );
+	LCUICond_Init( &MainApp.loop_changed );
 	LCUIMutex_Init( &MainApp.loop_mutex );
 	LinkedList_Init( &MainApp.loops );
 	LCUIMutex_Init( &MainApp.tasks_mutex );
@@ -331,7 +330,7 @@ static void LCUIApp_Destroy(void)
 	}
 	/* 开始清理 */
 	LCUIMutex_Destroy( &MainApp.loop_mutex );
-	LCUIMutex_Destroy( &MainApp.loop_changed );
+	LCUICond_Destroy( &MainApp.loop_changed );
 	LCUIMutex_Destroy( &MainApp.tasks_mutex );
 	LinkedList_Clear( &MainApp.loops, free );
 }

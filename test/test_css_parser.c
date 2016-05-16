@@ -15,7 +15,7 @@ int TestCSSParser(void)
 	}
 	text = LCUIWidget_GetById( "test-textview" );
 	Widget_UpdateStyle( text, TRUE );
-	Widget_Flush( text );
+	Widget_Update( text );
 	assert( text->style->sheet[key_width].val_px == 100 );
 	assert( text->style->sheet[key_height].val_px == 60 );
 	assert( text->style->sheet[key_position].val_style == SV_ABSOLUTE );
@@ -25,7 +25,7 @@ int TestCSSParser(void)
 	Widget_AddStatus( btn, "hover" );
 	Widget_UpdateStyle( btn, TRUE );
 	Widget_UpdateStyle( text, TRUE );
-	Widget_Flush( text );
+	Widget_Update( text );
 	assert( text->style->sheet[key_background_color].val_color.value == 0xffff0000 );
 	assert( text->style->sheet[key_background_size].val_style == SV_CONTAIN );
 	return 0;
