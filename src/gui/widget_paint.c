@@ -135,8 +135,10 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_Rect box;
 	LCUI_WidgetClass *wc;
 	LCUI_WidgetStyle *s;
-	s = &w->computed_style;
+
+	Widget_Lock( w );
 	box.x = box.y = 0;
+	s = &w->computed_style;
 	box.width = w->box.graph.width;
 	box.height = w->box.graph.height;
 	/* 如果是有位图缓存的话，则先清空缓存里的阴影区域 */
@@ -150,6 +152,7 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	box.height = w->box.border.height;
 	Graph_DrawBackground( paint, &box, &s->background );
 	Graph_DrawBorder( paint, &box, &s->border );
+	Widget_Unlock( w );
 	wc = LCUIWidget_GetClass( w->type );
 	if( wc && wc->methods.paint ) {
 		wc->methods.paint( w, paint );

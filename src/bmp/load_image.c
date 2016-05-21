@@ -26,35 +26,22 @@ int Graph_LoadImage( const char *filepath, LCUI_Graph *out )
 {
 	FILE *fp;
 	int ret = 0;
-	
-	Graph_Init(out); 
+	Graph_Init( out );
 	out->color_type = COLOR_TYPE_RGB;
-	fp = fopen(filepath,"rb");
-	if ( fp == NULL ) {
-		ret = FILE_ERROR_OPEN_ERROR; 
-	} else {
-		fgetc(fp);
-		if (!ferror (fp)) { /* 如果没出错 */
-			fseek(fp,0,SEEK_END);
-			if (ftell(fp)>4) {
-				fclose(fp);
-				ret = Graph_DetectImage(filepath, out); 
-			} else {
-				ret = FILE_ERROR_SHORT_FILE; /* 文件过小 */
-				fclose(fp);
-			}
-		}
+	fp = fopen( filepath, "rb" );
+	if( fp == NULL ) {
+		return FILE_ERROR_OPEN_ERROR;
 	}
-	switch(ret) {
-	case FILE_ERROR_SHORT_FILE:
-		printf("error: file is too short!\n");
-		break;
-	case FILE_ERROR_OPEN_ERROR:
-		perror(filepath);
-		break;
-	case FILE_ERROR_UNKNOWN_FORMAT:
-		printf("error: unknown format!\n");
-		break;
+	fgetc( fp );
+	if( !ferror( fp ) ) {
+		fseek( fp, 0, SEEK_END );
+		if( ftell( fp ) > 4 ) {
+			fclose( fp );
+			ret = Graph_DetectImage( filepath, out );
+		} else {
+			ret = FILE_ERROR_SHORT_FILE;
+			fclose( fp );
+		}
 	}
 	return ret;
 }
@@ -67,17 +54,6 @@ int Graph_GetImageSize( const char *filepath, int *width, int *height )
 	}
 	if( ret == FILE_ERROR_UNKNOWN_FORMAT ) {
 		ret = Graph_GetBMPSize( filepath, width, height );
-	}
-	switch( ret ) {
-	case FILE_ERROR_SHORT_FILE:
-		printf( "error: file is too short!\n" );
-		break;
-	case FILE_ERROR_OPEN_ERROR:
-		perror( filepath );
-		break;
-	case FILE_ERROR_UNKNOWN_FORMAT:
-		printf( "error: unknown format!\n" );
-		break;
 	}
 	return ret;
 }
