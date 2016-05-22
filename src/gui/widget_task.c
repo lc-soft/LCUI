@@ -66,14 +66,12 @@ static void HandleCacheStyle( LCUI_Widget w )
 
 static void HandleSetTitle( LCUI_Widget w )
 {
-	_DEBUG_MSG("widget: %s\n", w->type);
 	Widget_PostSurfaceEvent( w, WET_TITLE );
 }
 
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
 static void HandleBody( LCUI_Widget w )
 {
-	DEBUG_MSG( "body\n" );
 	Widget_InvalidateArea( w, NULL, SV_BORDER_BOX );
 }
 

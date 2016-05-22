@@ -1115,7 +1115,7 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 		s->is_changed = FALSE;
 		if( key >= STYLE_KEY_TOTAL ) {
 			need_update_expend_style = TRUE;
-			continue;
+			break;
 		}
 		for( i = 0; i < sizeof(task_map) / sizeof(TaskMap); ++i ) {
 			if( key >= task_map[i].start && key <= task_map[i].end ) {
