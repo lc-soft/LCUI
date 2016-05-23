@@ -90,10 +90,10 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 	pack->event.type = e->type;
 	pack->event.data = handler->data;
 	handler->func( w, &pack->event, pack->data );
-	while( w && !w->deleted ) {
+	while( w && w->state != WSTATUS_DELETED ) {
 		w = w->parent;
 	}
-	if( w && w->deleted ) {
+	if( w && w->state == WSTATUS_DELETED ) {
 		pack->event.cancel_bubble = TRUE;
 	}
 	w = pack->widget;
@@ -268,7 +268,7 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 	default:
 		ret = EventTrigger_Trigger( widget->trigger, e->type, &pack );
 		if( ret <= 0 ) {
-			if( !widget->parent ) {
+			if( !widget->parent || e->cancel_bubble ) {
 				return -1;
 			}
 			/* 如果事件投递失败，则向父级部件冒泡 */
@@ -509,6 +509,7 @@ void LCUIWidget_InitEvent(void)
 		int id;
 		const char *name;
 	} mappings[] = {
+		{ WET_READY, "ready" },
 		{ WET_DESTROY, "destroy" },
 		{ WET_MOUSEDOWN, "mousedown" },
 		{ WET_MOUSEUP, "mouseup" },

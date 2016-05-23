@@ -112,7 +112,7 @@ void Widget_AddTaskForChildren( LCUI_Widget widget, int task )
 
 void Widget_AddTask( LCUI_Widget widget, int task )
 {
-	if( widget->deleted ) {
+	if( widget->state == WSTATUS_DELETED ) {
 		return;
 	}
 	widget->task.for_self = TRUE;
@@ -168,9 +168,6 @@ int Widget_Update( LCUI_Widget w )
 	LCUI_BOOL *buffer;
 	LCUI_Widget child;
 	LinkedListNode *node, *next;
-
-	DEBUG_MSG( "1,widget: %s, for_self: %d, for_children: %d\n",
-		   w->type, w->task.for_self, w->task.for_children );
 	/* 如果该部件有任务需要处理 */
 	if( w->task.for_self ) {
 		ret = LCUIMutex_TryLock( &w->mutex );
@@ -197,6 +194,18 @@ int Widget_Update( LCUI_Widget w )
 			}
 		}
 		LCUIMutex_Unlock( &w->mutex );
+		/* 如果部件还处于未准备完毕的状态 */
+		if( w->state < WSTATUS_READY ) {
+			w->state |= WSTATUS_UPDATED;
+			/* 如果部件已经准备完毕则触发 ready 事件 */
+			if( w->state == WSTATUS_READY ) {
+				LCUI_WidgetEventRec e;
+				e.type = WET_READY;
+				e.cancel_bubble = TRUE;
+				Widget_TriggerEvent( w, &e, NULL );
+				w->state = WSTATUS_NORMAL;
+			}
+		}
 	}
 	/* 删除无用部件 */
 	node = w->children_trash.head.next;
@@ -228,8 +237,6 @@ skip_proc_self_task:;
 			node = next;
 		}
 	}
-	DEBUG_MSG( "2,widget: %s, for_self: %d, for_children: %d\n",
-		   w->type, w->task.for_self, w->task.for_children );
 	return (w->task.for_self || w->task.for_children) ? 1 : 0;
 }
 

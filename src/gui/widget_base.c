@@ -125,7 +125,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 	Widget_PostSurfaceEvent( widget, WET_ADD );
 	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
-	Widget_AddTask( parent, WTT_LAYOUT );
+	Widget_UpdateLayout( parent );
 	Widget_UpdateStatusAfterAppend( widget, FALSE );
 	return 0;
 }
@@ -167,7 +167,7 @@ int Widget_Unwrap( LCUI_Widget widget )
 static void Widget_Init( LCUI_Widget widget )
 {
 	memset( widget, 0, sizeof(struct LCUI_WidgetRec_));
-	widget->deleted = FALSE;
+	widget->state = WSTATUS_CREATED;
 	widget->trigger = EventTrigger();
 	widget->style = StyleSheet();
 	widget->custom_style = StyleSheet();
@@ -249,7 +249,7 @@ void Widget_Destroy( LCUI_Widget w )
 	while( root->parent ) {
 		root = root->parent;
 	}
-	w->deleted = TRUE;
+	w->state = WSTATUS_DELETED;
 	if( w->parent ) {
 		LCUI_Widget child;
 		LinkedListNode *node, *snode;
@@ -1425,6 +1425,18 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		default: continue;
 		}
 		Widget_UpdatePosition( child );
+		/* 如果部件还处于未准备完毕的状态 */
+		if( child->state < WSTATUS_READY ) {
+			child->state |= WSTATUS_LAYOUTED;
+			/* 如果部件已经准备完毕则触发 ready 事件 */
+			if( child->state == WSTATUS_READY ) {
+				LCUI_WidgetEventRec e;
+				e.type = WET_READY;
+				e.cancel_bubble = TRUE;
+				Widget_TriggerEvent( child, &e, NULL );
+				child->state = WSTATUS_NORMAL;
+			}
+		}
 		ctx.prev = child;
 		ctx.prev_display = child->computed_style.display;
 	}

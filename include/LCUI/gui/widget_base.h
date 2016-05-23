@@ -215,8 +215,19 @@ typedef struct LCUI_WidgetTaskBoxRec_ {
 
 typedef struct LCUI_WidgetRec_* LCUI_Widget;
 
+/** 部件状态 */
+enum LCUI_WidgetStatus {
+	WSTATUS_CREATED = 0,
+	WSTATUS_UPDATED,
+	WSTATUS_LAYOUTED,
+	WSTATUS_READY,
+	WSTATUS_NORMAL,
+	WSTATUS_DELETED,
+};
+
 /** 部件结构 */
 typedef struct LCUI_WidgetRec_ {
+	int			state;			/**< 状态 */
 	int			x, y;			/**< 当前坐标（由 origin 计算而来） */
 	int			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
 	int			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
@@ -247,10 +258,8 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_WidgetTaskBoxRec	task;			/**< 任务记录 */
 	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
 	LCUI_BOOL		has_dirty_child;	/**< 子级部件是否有无效区域 */
-	LCUI_BOOL		deleted;		/**< 是否已经删除 */
 	LCUI_BOOL		layout_locked;		/**< 子级部件布局是否已锁定 */
 } LCUI_WidgetRec;
-
 
 #define Widget_GetNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec))
 #define Widget_GetShowNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode))
