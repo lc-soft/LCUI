@@ -556,8 +556,9 @@ static int Dict_KeyCompare( void *privdata, const void *key1, const void *key2 )
 
 static void *Dict_KeyDup( void *privdata, const void *key )
 {
-	char *newkey = malloc( (wcslen( key ) + 1)*sizeof( char ) );
-	strcpy( newkey, key );
+	int len = strlen( key ) + 1;
+	char *newkey = malloc( len * sizeof( char ) );
+	strncpy( newkey, key, len );
 	return newkey;
 }
 
