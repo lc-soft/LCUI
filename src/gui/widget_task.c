@@ -112,7 +112,7 @@ void Widget_AddTaskForChildren( LCUI_Widget widget, int task )
 
 void Widget_AddTask( LCUI_Widget widget, int task )
 {
-	if( widget->state == WSTATUS_DELETED ) {
+	if( widget->state == WSTATE_DELETED ) {
 		return;
 	}
 	widget->task.for_self = TRUE;
@@ -195,15 +195,15 @@ int Widget_Update( LCUI_Widget w )
 		}
 		LCUIMutex_Unlock( &w->mutex );
 		/* 如果部件还处于未准备完毕的状态 */
-		if( w->state < WSTATUS_READY ) {
-			w->state |= WSTATUS_UPDATED;
+		if( w->state < WSTATE_READY ) {
+			w->state |= WSTATE_UPDATED;
 			/* 如果部件已经准备完毕则触发 ready 事件 */
-			if( w->state == WSTATUS_READY ) {
+			if( w->state == WSTATE_READY ) {
 				LCUI_WidgetEventRec e;
 				e.type = WET_READY;
 				e.cancel_bubble = TRUE;
 				Widget_TriggerEvent( w, &e, NULL );
-				w->state = WSTATUS_NORMAL;
+				w->state = WSTATE_NORMAL;
 			}
 		}
 	}

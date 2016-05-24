@@ -207,7 +207,7 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 		int child_x, child_y;
 		child = node->data;
 		if( !child->computed_style.visible || 
-		    child->state != WSTATUS_NORMAL ) {
+		    child->state != WSTATE_NORMAL ) {
 			continue;
 		}
 		child_x = child->box.graph.x + x;
@@ -372,7 +372,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		LCUI_Rect child_rect;
 		LCUI_Widget child = node->data; 
 		if( !child->computed_style.visible || 
-		    child->state != WSTATUS_NORMAL ) {
+		    child->state != WSTATE_NORMAL ) {
 			continue;
 		}
 		/* 转换子部件区域，由相对于内容框转换为相对于当前脏矩形 */

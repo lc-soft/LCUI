@@ -167,7 +167,7 @@ int Widget_Unwrap( LCUI_Widget widget )
 static void Widget_Init( LCUI_Widget widget )
 {
 	memset( widget, 0, sizeof(struct LCUI_WidgetRec_));
-	widget->state = WSTATUS_CREATED;
+	widget->state = WSTATE_CREATED;
 	widget->trigger = EventTrigger();
 	widget->style = StyleSheet();
 	widget->custom_style = StyleSheet();
@@ -229,6 +229,7 @@ static void Widget_OnDestroy( void *arg )
 
 void Widget_ExecDestroy( LCUI_Widget widget )
 {
+	Widget_StopEventPropagation( widget );
 	LCUIWidget_ClearEventTarget( widget );
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
@@ -249,7 +250,7 @@ void Widget_Destroy( LCUI_Widget w )
 	while( root->parent ) {
 		root = root->parent;
 	}
-	w->state = WSTATUS_DELETED;
+	w->state = WSTATE_DELETED;
 	if( w->parent ) {
 		LCUI_Widget child;
 		LinkedListNode *node, *snode;
@@ -1426,15 +1427,15 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		}
 		Widget_UpdatePosition( child );
 		/* 如果部件还处于未准备完毕的状态 */
-		if( child->state < WSTATUS_READY ) {
-			child->state |= WSTATUS_LAYOUTED;
+		if( child->state < WSTATE_READY ) {
+			child->state |= WSTATE_LAYOUTED;
 			/* 如果部件已经准备完毕则触发 ready 事件 */
-			if( child->state == WSTATUS_READY ) {
+			if( child->state == WSTATE_READY ) {
 				LCUI_WidgetEventRec e;
 				e.type = WET_READY;
 				e.cancel_bubble = TRUE;
 				Widget_TriggerEvent( child, &e, NULL );
-				child->state = WSTATUS_NORMAL;
+				child->state = WSTATE_NORMAL;
 			}
 		}
 		ctx.prev = child;

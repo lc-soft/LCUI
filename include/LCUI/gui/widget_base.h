@@ -216,13 +216,13 @@ typedef struct LCUI_WidgetTaskBoxRec_ {
 typedef struct LCUI_WidgetRec_* LCUI_Widget;
 
 /** 部件状态 */
-enum LCUI_WidgetStatus {
-	WSTATUS_CREATED = 0,
-	WSTATUS_UPDATED,
-	WSTATUS_LAYOUTED,
-	WSTATUS_READY,
-	WSTATUS_NORMAL,
-	WSTATUS_DELETED,
+enum LCUI_WidgetState {
+	WSTATE_CREATED = 0,
+	WSTATE_UPDATED,
+	WSTATE_LAYOUTED,
+	WSTATE_READY,
+	WSTATE_NORMAL,
+	WSTATE_DELETED,
 };
 
 /** 部件结构 */
