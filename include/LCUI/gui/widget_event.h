@@ -157,6 +157,9 @@ LCUI_API int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type );
 /** 清除事件对象，通常在部件销毁时调用该函数，以避免部件销毁后还有事件发送给它 */
 LCUI_API void LCUIWidget_ClearEventTarget( LCUI_Widget widget );
 
+/** 停止部件的事件传播 */
+LCUI_API int Widget_StopEventPropagation( LCUI_Widget widget );
+
 /** 初始化 LCUI 部件的事件系统 */
 void LCUIWidget_InitEvent(void);
 

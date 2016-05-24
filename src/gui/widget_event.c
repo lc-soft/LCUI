@@ -65,12 +65,33 @@ enum WidgetStatusType {
 	WST_TOTAL
 };
 
+/** 部件事件记录结点 */
+typedef struct EventRecordNodeRec_ {
+	LCUI_Widget widget;	/**< 所属部件 */
+	LinkedList records;	/**< 事件记录列表 */
+} EventRecordNodeRec, *EventRecordNode;
+
+/** 当前功能模块的相关数据 */
 static struct LCUIWidgetEvnetModule {
 	LCUI_Widget targets[WST_TOTAL];		/**< 相关的部件 */
+	LCUI_RBTree event_records;		/**< 当前正执行的事件的记录 */
 	LCUI_RBTree event_names;		/**< 事件标识号 -> 名称映射表 */
 	Dict *event_ids;			/**< 事件名称 -> 标识号映射表 */
 	int base_event_id;			/**< 事件标识号计数器 */
+	LCUI_Mutex mutex;			/**< 互斥锁 */
 } self;
+
+static int CompareEventRecord( void *data, const void *keydata )
+{
+	EventRecordNode node = data;
+	if( node->widget == (LCUI_Widget)keydata ) {
+		return 0;
+	} else if( node->widget < (LCUI_Widget)keydata ) {
+		return -1;
+	} else {
+		return 1;
+	}
+}
 
 static void DestroyWidgetEventHandler( void *arg )
 {
@@ -82,6 +103,44 @@ static void DestroyWidgetEventHandler( void *arg )
 	free( handler );
 }
 
+/** 添加事件记录 */
+static void Widget_AddEventRecord( LCUI_Widget widget, LCUI_WidgetEvent e )
+{
+	EventRecordNode node;
+	LCUIMutex_Lock( &self.mutex );
+	node = RBTree_CustomGetData( &self.event_records, widget );
+	if( !node ) {
+		node = NEW( EventRecordNodeRec, 1 );
+		LinkedList_Init( &node->records );
+		node->widget = widget;
+		RBTree_CustomInsert( &self.event_records, widget, node );
+	}
+	LinkedList_Append( &node->records, e );
+	LCUIMutex_Unlock( &self.mutex );
+}
+
+/** 删除事件记录 */
+static int Widget_DeleteEventRecord( LCUI_Widget widget, LCUI_WidgetEvent e )
+{
+	EventRecordNode enode;
+	LinkedListNode *node, *prev;
+	LCUIMutex_Lock( &self.mutex );
+	enode = RBTree_CustomGetData( &self.event_records, widget );
+	if( !enode ) {
+		LCUIMutex_Unlock( &self.mutex );
+		return -1;
+	}
+	LinkedList_ForEach( node, &enode->records ) {
+		prev = node->prev;
+		if( node->data == e ) {
+			LinkedList_DeleteNode( &enode->records, node );
+			node = prev;
+		}
+	}
+	LCUIMutex_Unlock( &self.mutex );
+	return 0;
+}
+
 /** 将原始事件转换成部件事件 */
 static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 {
@@ -89,14 +148,9 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 	LCUI_Widget w = pack->widget;
 	pack->event.type = e->type;
 	pack->event.data = handler->data;
+	Widget_AddEventRecord( w, &pack->event );
 	handler->func( w, &pack->event, pack->data );
-	while( w && w->state != WSTATUS_DELETED ) {
-		w = w->parent;
-	}
-	if( w && w->state == WSTATUS_DELETED ) {
-		pack->event.cancel_bubble = TRUE;
-	}
-	w = pack->widget;
+	Widget_DeleteEventRecord( w, &pack->event );
 	if( pack->event.cancel_bubble || !w->parent ) {
 		if( pack->data && pack->destroy_data ) {
 			pack->destroy_data( pack->data );
@@ -139,16 +193,20 @@ static void OnWidgetEvent( LCUI_Event e, void *arg )
 
 int LCUIWidget_SetEventName( int event_id, const char *event_name )
 {
-	int *id;
 	char *name;
+	int *id, ret;
+	LCUIMutex_Lock( &self.mutex );
 	if( Dict_FetchValue( self.event_ids, event_name ) ) {
+		LCUIMutex_Unlock( &self.mutex );
 		return -1;
 	}
 	id = malloc( sizeof( int ) );
 	name = strdup( event_name );
 	*id = event_id;
 	RBTree_Insert( &self.event_names, event_id, name );
-	return Dict_Add( self.event_ids, name, id );
+	ret = Dict_Add( self.event_ids, name, id );
+	LCUIMutex_Unlock( &self.mutex );
+	return ret;
 }
 
 int LCUIWidget_AllocEventId( void )
@@ -158,15 +216,23 @@ int LCUIWidget_AllocEventId( void )
 
 const char *LCUIWidget_GetEventName( int event_id )
 {
-	return RBTree_GetData( &self.event_names, event_id );
+	char *name;
+	LCUIMutex_Lock( &self.mutex );
+	name = RBTree_GetData( &self.event_names, event_id );
+	LCUIMutex_Unlock( &self.mutex );
+	return name;
 }
 
 int LCUIWidget_GetEventId( const char *event_name )
 {
-	int *val = Dict_FetchValue( self.event_ids, event_name );
+	int *val;
+	LCUIMutex_Lock( &self.mutex );
+	val = Dict_FetchValue( self.event_ids, event_name );
 	if( val ) {
+		LCUIMutex_Unlock( &self.mutex );
 		return *val;
 	}
+	LCUIMutex_Unlock( &self.mutex );
 	return -1;
 }
 
@@ -276,7 +342,7 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 						 data, destroy_data );
 		}
 	}
-	if( !widget->parent ) {
+	if( !widget->parent || e->cancel_bubble ) {
 		return -1;
 	}
 	/* 转换成相对于父级部件内容框的坐标 */
@@ -289,9 +355,9 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 		return Widget_PostEvent( widget->parent, e,
 					 data, destroy_data );
 	}
-	pack.event.x -= widget->box.border.x;
-	pack.event.y -= widget->box.border.y;
-	return EventTrigger_Trigger( widget->trigger, e->type, &pack );
+	pack.event.x -= w->box.border.x;
+	pack.event.y -= w->box.border.y;
+	return EventTrigger_Trigger( w->trigger, e->type, &pack );
 }
 
 int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data,
@@ -313,6 +379,25 @@ void LCUIWidget_ClearEventTarget( LCUI_Widget widget )
 			self.targets[i] = NULL;
 		}
 	}
+}
+
+int Widget_StopEventPropagation(LCUI_Widget widget )
+{
+	LCUI_WidgetEvent e;
+	LinkedListNode *node;
+	EventRecordNode enode;
+	LCUIMutex_Lock( &self.mutex );
+	enode = RBTree_CustomGetData( &self.event_records, widget );
+	if( !enode ) {
+		LCUIMutex_Unlock( &self.mutex );
+		return -1;
+	}
+	LinkedList_ForEach( node, &enode->records ) {
+		e = node->data;
+		e->cancel_bubble = TRUE;
+	}
+	LCUIMutex_Unlock( &self.mutex );
+	return 0;
 }
 
 /** 更新状态 */
@@ -527,7 +612,9 @@ void LCUIWidget_InitEvent(void)
 		{ WET_SURFACE, "surface" },
 		{ WET_TITLE, "title" }
 	};
+	LCUIMutex_Init( &self.mutex );
 	RBTree_Init( &self.event_names );
+	RBTree_Init( &self.event_records );
 	self.targets[WST_ACTIVE] = NULL;
 	self.targets[WST_HOVER] = NULL;
 	self.base_event_id = WET_USER + 1000;
@@ -536,18 +623,20 @@ void LCUIWidget_InitEvent(void)
 	for( i = 0; i < n; ++i ) {
 		LCUIWidget_SetEventName( mappings[i].id, mappings[i].name );
 	}
+	LCUI_BindEvent( LCUI_MOUSEWHEEL, OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( LCUI_MOUSEDOWN, OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( LCUI_MOUSEMOVE, OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( LCUI_MOUSEUP, OnMouseEvent, NULL, NULL );
-	LCUI_BindEvent( LCUI_MOUSEWHEEL, OnMouseEvent, NULL, NULL );
-	LCUI_BindEvent( LCUI_KEYUP, OnKeyUp, NULL, NULL );
-	LCUI_BindEvent( LCUI_KEYDOWN, OnKeyDown, NULL, NULL );
 	LCUI_BindEvent( LCUI_KEYPRESS, OnKeyPress, NULL, NULL );
+	LCUI_BindEvent( LCUI_KEYDOWN, OnKeyDown, NULL, NULL );
 	LCUI_BindEvent( LCUI_INPUT, OnInput, NULL, NULL );
+	LCUI_BindEvent( LCUI_KEYUP, OnKeyUp, NULL, NULL );
+	RBTree_OnJudge( &self.event_records, CompareEventRecord );
 }
 
 void LCUIWidget_ExitEvent(void)
 {
 	RBTree_Destroy( &self.event_names );
+	RBTree_Destroy( &self.event_records );
 	Dict_Release( self.event_ids );
 }
