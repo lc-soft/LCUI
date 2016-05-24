@@ -237,7 +237,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	} else {
 		LinkedList_Insert( &MainApp.loops, 0, loop );
 	}
-	_DEBUG_MSG("loop: %p, enter\n", loop);
+	DEBUG_MSG("loop: %p, enter\n", loop);
 	MainApp.loop = loop;
 	while( loop->state != STATE_EXITED ) {
 		LCUI_WaitEvent();

@@ -300,7 +300,7 @@ void LCUI_ExitTimer( void )
 	LCUICond_Broadcast( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
 	LCUIThread_Join( self.tid, NULL );
-	LinkedList_Clear( &self.timer_list, free );
+	LinkedList_ClearData( &self.timer_list, free );
 	LCUICond_Destroy( &self.sleep_cond );
 	LCUIMutex_Destroy( &self.mutex );
 }
