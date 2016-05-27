@@ -1,9 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 #
-# 具体用法，可参考Automake的中文文档：
-# http://www.linuxforum.net/books/autoconf.html
-# 也可以到这看英文版的：
 # http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/html_node/index.html
 
 AC_PREREQ([2.68])
@@ -65,14 +62,13 @@ want_thread=no
 thread_name=pthread
 AC_ARG_WITH(pthread, [  --with-pthread          use pthread	(default)])
 if test "x$with_pthread" != "xno"; then
-	##检测是否有pthread头文件及函数库，测试调用pthread_create函数
-	AC_CHECK_HEADERS([pthread.h],[
-		AC_CHECK_LIB([pthread], [pthread_create], [
-			want_thread=yes
-			LCUI_LIBS="$LCUI_LIBS -lpthread"
-			AC_DEFINE_UNQUOTED(LCUI_THREAD_PTHREAD, 1, Define to 1 if you using pthread support)
-		], want_thread=no)
-	], want_thread=no)
+	m4_include([m4/ax_pthread.m4])
+	AX_PTHREAD([
+		want_thread=yes
+		CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+		LCUI_LIBS="$LCUI_LIBS $PTHREAD_LIBS"
+		AC_DEFINE_UNQUOTED(LCUI_THREAD_PTHREAD, 1, Define to 1 if you using pthread support)
+	],  want_thread=no)
 fi
 
 ##检测是否有libxml2库，必须有 libxml2 库才能启用 LCUIBuilder 功能模块
