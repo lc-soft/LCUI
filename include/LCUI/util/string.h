@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef LCUI_MISC_STRING_H
-#define LCUI_MISC_STRING_H
+#ifndef LCUI_UTIL_STRING_H
+#define LCUI_UTIL_STRING_H
 
 #ifdef LCUI_BUILD_IN_WIN32
 #include <tchar.h>

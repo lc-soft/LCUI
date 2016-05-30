@@ -38,8 +38,8 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
-#ifndef LCUI_MISC_RECT_H
-#define LCUI_MISC_RECT_H
+#ifndef LCUI_UTIL_RECT_H
+#define LCUI_UTIL_RECT_H
 
 LCUI_BEGIN_HEADER
 
