@@ -272,9 +272,6 @@
     <ClCompile Include="..\..\..\src\bmp\jpeg.c">
       <Filter>源文件\bmp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\bmp\load_image.c">
-      <Filter>源文件\bmp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\bmp\png.c">
       <Filter>源文件\bmp</Filter>
     </ClCompile>
@@ -386,9 +383,6 @@
     <ClCompile Include="..\..\..\src\util\linkedlist.c">
       <Filter>源文件\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\util\mem_debug.c">
-      <Filter>源文件\util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\util\parse.c">
       <Filter>源文件\util</Filter>
     </ClCompile>
@@ -403,6 +397,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\time.c">
       <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\bmp\load_image.c">
+      <Filter>源文件\bmp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
