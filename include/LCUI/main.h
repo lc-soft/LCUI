@@ -60,17 +60,57 @@ enum LCUI_SysEventType {
 	LCUI_MOUSEUP,		/**< 鼠标触发的按钮释放事件 */
 	LCUI_MOUSEWHEEL,	/**< 鼠标触发的滚轮滚动事件 */
 	LCUI_INPUT,		/**< 输入法触发的文本输入事件 */
+	LCUI_TOUCH,
+	LCUI_TOUCHMOVE,
+	LCUI_TOUCHDOWN,
+	LCUI_TOUCHUP,
 	LCUI_WIDGET,
 	LCUI_QUIT,		/**< 在 LCUI 退出前触发的事件 */
 	LCUI_USER = 100		/**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
 };
 
+typedef struct LCUI_TouchPointRec_ {
+	int x;
+	int y;
+	int id;
+	int state;
+	LCUI_BOOL is_primary;
+} LCUI_TouchPointRec, *LCUI_TouchPoint;
+
+typedef struct LCUI_KeyboardEvent_ {
+	int code;
+} LCUI_KeyboardEvent;
+
+typedef struct LCUI_MouseMotionEvent_ {
+	int x, y;
+	int xrel, yrel;
+} LCUI_MouseMotionEvent;
+
+typedef struct LCUI_MouseButtonEvent_ {
+	int x, y;
+	int button;
+} LCUI_MouseButtonEvent;
+
+typedef struct LCUI_MouseWheelEvent_ {
+	int x, y;
+	int delta;
+} LCUI_MouseWheelEvent;
+
+typedef struct LCUI_TouchEvent_ {
+	int n_points;
+	LCUI_TouchPoint points;
+} LCUI_TouchEvent;
+
 typedef struct LCUI_SysEventRec_ {
-	int type;			/**< 事件类型标识号 */
-	int key_code;			/**< 按键的键值 */
-	int rel_x, rel_y;		/**< 鼠标的坐标与上次坐标的差值 */
-	int z_delta;			/**< 鼠标滚轮滚动速度 */
-	void *data;			/**< 附加数据 */
+	uint32_t type;
+	void *data;
+	union {
+		LCUI_MouseMotionEvent motion;
+		LCUI_MouseButtonEvent button;
+		LCUI_MouseWheelEvent wheel;
+		LCUI_KeyboardEvent key;
+		LCUI_TouchEvent touch;
+	};
 } LCUI_SysEventRec, *LCUI_SysEvent;
 
 typedef void(*LCUI_SysEventFunc)(LCUI_SysEvent, void*);
@@ -98,6 +138,8 @@ LCUI_API int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
 LCUI_API int LCUI_UnbindEvent( int handler_id );
 
 LCUI_API int LCUI_TriggerEvent( LCUI_SysEvent e, void *arg );
+
+LCUI_API void LCUI_DestroyEvent( LCUI_SysEvent e );
 
 LCUI_API LCUI_BOOL LCUI_WaitEvent( void );
 

@@ -139,13 +139,14 @@ int LCUI_InitWinApp( LCUI_AppDriver app )
 	/**
 	 * 创建一个隐藏的主窗体，用于接收 LCUI 的任务
 	 * 之前用 PostThreadMessage() 无法发送自定义消息到主线程的消息循环，因此
-	 * 改成创建隐藏窗体兵用 PostMessage() 发送任务。
+	 * 改成创建隐藏窗体并用 PostMessage() 发送任务。
 	 */
 	win.main_hwnd = CreateWindow(
 		TEXT("LCUI"), TEXT("LCUI Task Receiver"), 0, 
 		CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL,
 		win.main_instance, NULL
 	);
+	RegisterTouchWindow( win.main_hwnd, 0 );
 	return 0;
 }
 

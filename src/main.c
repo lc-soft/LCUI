@@ -177,6 +177,18 @@ int LCUI_TriggerEvent( LCUI_SysEvent e, void *arg )
 	return ret;
 }
 
+void LCUI_DestroyEvent( LCUI_SysEvent e )
+{
+	if( e->type == LCUI_TOUCH ) {
+		if( e->touch.n_points > 0 && e->touch.points ) {
+			free( e->touch.points );
+			e->touch.points = NULL;
+			e->touch.n_points = 0;
+		}
+	}
+	e->type = LCUI_NONE;
+}
+
 /*--------------------------- system event <END> ----------------------------*/
 
 LCUI_BOOL LCUI_PostTask( LCUI_AppTask task )

@@ -14,11 +14,11 @@ static void OnKeyboardMessage( LCUI_Event ev, void *arg )
 	switch( win_ev->msg ) {
 	case WM_KEYDOWN:
 		sys_ev.type = LCUI_KEYDOWN;
-		sys_ev.key_code = win_ev->wparam;
+		sys_ev.key.code = win_ev->wparam;
 		break;
 	case WM_KEYUP:
 		sys_ev.type = LCUI_KEYUP;
-		sys_ev.key_code = win_ev->wparam;
+		sys_ev.key.code = win_ev->wparam;
 		break;
 	default: return;
 	}

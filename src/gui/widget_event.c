@@ -490,7 +490,7 @@ static void OnMouseEvent( LCUI_SysEvent e, void *arg )
 		break;
 	case LCUI_MOUSEWHEEL:
 		ebuff.type = WET_MOUSEWHEEL;
-		ebuff.z_delta = e->z_delta;
+		ebuff.z_delta = e->wheel.delta;
 		Widget_PostEvent( target, &ebuff, NULL, NULL );
 	default:return;
 	}

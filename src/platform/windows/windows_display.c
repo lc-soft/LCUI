@@ -158,6 +158,7 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 		instance, NULL
 	);
 	hdc_client = GetDC( surface->hwnd );
+	RegisterTouchWindow( surface->hwnd, 0 );
 	surface->fb_hdc = CreateCompatibleDC( hdc_client );
 	surface->is_ready = TRUE;
 	DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
