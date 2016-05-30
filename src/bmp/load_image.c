@@ -1,22 +1,22 @@
 
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h> 
 
-#include <stdio.h>
-#include <stdlib.h>
-
 /** 检测图片格式，并解码图片 */
 static int Graph_DetectImage(const char *filepath, LCUI_Graph *out)
 {
-	int ret = FILE_ERROR_UNKNOWN_FORMAT;
-	if (ret == FILE_ERROR_UNKNOWN_FORMAT) {
+	int ret = -1;
+	if (ret == -1) {
 		ret = Graph_LoadPNG(filepath, out);  
 	}
-	if (ret == FILE_ERROR_UNKNOWN_FORMAT) {
+	if (ret == -1) {
 		ret = Graph_LoadJPEG(filepath, out);  
 	}
-	if (ret == FILE_ERROR_UNKNOWN_FORMAT) {
+	if (ret == -1) {
 		ret = Graph_LoadBMP(filepath, out); 
 	}
 	return ret;
@@ -30,7 +30,7 @@ int Graph_LoadImage( const char *filepath, LCUI_Graph *out )
 	out->color_type = COLOR_TYPE_RGB;
 	fp = fopen( filepath, "rb" );
 	if( fp == NULL ) {
-		return FILE_ERROR_OPEN_ERROR;
+		return ENOENT;
 	}
 	fgetc( fp );
 	if( !ferror( fp ) ) {
@@ -39,7 +39,7 @@ int Graph_LoadImage( const char *filepath, LCUI_Graph *out )
 			fclose( fp );
 			ret = Graph_DetectImage( filepath, out );
 		} else {
-			ret = FILE_ERROR_SHORT_FILE;
+			ret = -1;
 			fclose( fp );
 		}
 	}
@@ -49,10 +49,10 @@ int Graph_LoadImage( const char *filepath, LCUI_Graph *out )
 int Graph_GetImageSize( const char *filepath, int *width, int *height )
 {
 	int ret = Graph_GetPNGSize( filepath, width, height );
-	if( ret == FILE_ERROR_UNKNOWN_FORMAT ) {
+	if( ret != 0 ) {
 		ret = Graph_GetJPEGSize( filepath, width, height );
 	}
-	if( ret == FILE_ERROR_UNKNOWN_FORMAT ) {
+	if( ret != 0 ) {
 		ret = Graph_GetBMPSize( filepath, width, height );
 	}
 	return ret;

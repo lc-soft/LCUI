@@ -38,6 +38,7 @@
  * ***************************************************************************/
 
 #include <stdio.h>
+#include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -62,17 +63,17 @@ int Graph_LoadBMP( const char *filepath, LCUI_Graph *out )
 	int  x, y, tempi, pocz, omin;
 	FILE *fp = fopen( filepath, "rb" );
 	if( !fp ) {
-		return FILE_ERROR_OPEN_ERROR;
+		return ENOENT;
 	}
 	/* 检测是否为bmp图片 */
 	tempi = fread( &bmp, 1, sizeof( bmp_head ), fp );
 	if( tempi < sizeof( bmp_head ) || bmp.BMPsyg != 19778 ) {
-		return FILE_ERROR_UNKNOWN_FORMAT;
+		return -1;
 	}
 	pocz = bmp.nic[4];
 	if( (bmp.depth != 32) && (bmp.depth != 24) ) {
 		_DEBUG_MSG( "can not support  %i bit-depth !\n", bmp.depth );
-		return  FILE_ERROR_UNKNOWN_FORMAT;
+		return  -1;
 	}
 	out->color_type = COLOR_TYPE_RGB;
 	tempi = Graph_Create( out, bmp.ix, bmp.iy );
@@ -131,12 +132,12 @@ int Graph_GetBMPSize( const char *filepath, int *width, int *height )
 	bmp_head bmp;
 	FILE *fp = fopen( filepath, "rb" );
 	if( !fp ) {
-		return FILE_ERROR_OPEN_ERROR;
+		return ENOENT;
 	}
 	/* 检测是否为bmp图片 */
 	n = fread( &bmp, 1, sizeof( bmp_head ), fp );
 	if( n < sizeof( bmp_head ) || bmp.BMPsyg != 19778 ) {
-		return FILE_ERROR_UNKNOWN_FORMAT;
+		return -1;
 	}
 	*width = bmp.ix;
 	*height = bmp.iy;
