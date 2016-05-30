@@ -149,7 +149,6 @@
     <ClInclude Include="..\..\..\include\LCUI\font\textstyle.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\builder.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\messagebox.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h" />
@@ -170,7 +169,6 @@
     <ClInclude Include="..\..\..\include\LCUI\graph.h" />
     <ClInclude Include="..\..\..\include\LCUI\input.h" />
     <ClInclude Include="..\..\..\include\LCUI\ime.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib.h" />
     <ClInclude Include="..\..\..\include\LCUI\main.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_display.h" />

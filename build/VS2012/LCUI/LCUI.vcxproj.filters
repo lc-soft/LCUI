@@ -96,9 +96,6 @@
     <ClInclude Include="..\..\..\include\LCUI\draw\border.h">
       <Filter>头文件\LCUI\draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\messagebox.h">
-      <Filter>头文件\LCUI\gui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\draw\line.h">
       <Filter>头文件\LCUI\draw</Filter>
     </ClInclude>
@@ -194,9 +191,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_keyboard.h">
       <Filter>头文件\LCUI\platform\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\lib.h">
-      <Filter>头文件\LCUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\main.h">
       <Filter>头文件\LCUI</Filter>
