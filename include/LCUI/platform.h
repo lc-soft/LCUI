@@ -1,5 +1,5 @@
-#ifndef __LCUI_PLATFORM_H__
-#define __LCUI_PLATFORM_H__
+#ifndef LCUI_PLATFORM_H
+#define LCUI_PLATFORM_H
 
 #ifdef LCUI_BUILD_IN_WIN32
 #define LCUI_InitApp LCUI_InitWinApp

@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
-#ifndef __LCUI_INPUT_H__
-#define __LCUI_INPUT_H__
+#ifndef LCUI_INPUT_H
+#define LCUI_INPUT_H
 
 #define LCUIKEY_SPACE	' '
 #define LCUIKEY_0	'0'
@@ -170,4 +170,4 @@ LCUI_API int LCUI_ExitKeyboard( void );
 
 LCUI_END_HEADER
 
-#endif /* __LCUI_INPUT_H__ */
+#endif /* LCUI_INPUT_H */

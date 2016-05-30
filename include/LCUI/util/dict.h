@@ -34,8 +34,8 @@
 
 #include <stdint.h>
 
-#ifndef __DICT_H__
-#define __DICT_H__
+#ifndef __DICT_H
+#define __DICT_H
 
 /** 哈希表节点结构 */
 typedef struct DictEntry {
@@ -231,4 +231,4 @@ extern DictType dictTypeHeapStringCopyKey;
 extern DictType dictTypeHeapStrings;
 extern DictType dictTypeHeapStringCopyKeyValue;
 
-#endif /* __DICT_H__ */
+#endif /* __DICT_H */

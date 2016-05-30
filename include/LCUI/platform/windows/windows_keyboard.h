@@ -1,5 +1,5 @@
-﻿#ifndef __LCUI_WINDOWS_KEYBOARD__
-#define __LCUI_WINDOWS_KEYBOARD__
+﻿#ifndef LCUI_WINDOWS_KEYBOARD__
+#define LCUI_WINDOWS_KEYBOARD__
 
 void LCUI_InitWinKeyboard( void );
 

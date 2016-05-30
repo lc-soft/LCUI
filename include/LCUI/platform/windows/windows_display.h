@@ -37,8 +37,8 @@
 * 没有，请查看：<http://www.gnu.org/licenses/>.
 * ****************************************************************************/
 
-#ifndef __LCUI_WINDOWS_DISPLAY_H__
-#define __LCUI_WINDOWS_DISPLAY_H__
+#ifndef LCUI_WINDOWS_DISPLAY_H
+#define LCUI_WINDOWS_DISPLAY_H
 
 int LCUI_InitWinDisplay( LCUI_DisplayDriver driver );
 

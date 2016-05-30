@@ -38,8 +38,8 @@
  * ****************************************************************************/
 
 
-#ifndef __LCUI_WIDGET_STYLE_LIBRARY_H__
-#define __LCUI_WIDGET_STYLE_LIBRARY_H__
+#ifndef LCUI_WIDGET_STYLE_LIBRARY_H
+#define LCUI_WIDGET_STYLE_LIBRARY_H
 
 /** 初始化 */
 void LCUIWidget_InitStyle( void );

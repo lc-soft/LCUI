@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
-#ifndef __LCUI_WIDGET_TASK_H__
-#define __LCUI_WIDGET_TASK_H__
+#ifndef LCUI_WIDGET_TASK_H
+#define LCUI_WIDGET_TASK_H
 
 LCUI_BEGIN_HEADER
 

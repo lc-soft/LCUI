@@ -1,6 +1,6 @@
 ﻿
-#ifndef __LCUI_LIB_TIME_H__
-#define __LCUI_LIB_TIME_H__
+#ifndef LCUI_LIB_TIME_H
+#define LCUI_LIB_TIME_H
 
 LCUI_BEGIN_HEADER
 

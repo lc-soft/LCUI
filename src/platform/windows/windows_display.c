@@ -40,7 +40,7 @@
 //#define DEBUG
 #include <stdio.h>
 #include <LCUI_Build.h>
-#define __IN_SURFACE_SOURCE_FILE__
+#define LCUI_SURFACE_C
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>

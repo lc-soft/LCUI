@@ -38,7 +38,6 @@
  * ***************************************************************************/
 
 //#define DEBUG
-#define __IN_WIDGET_TASK_SOURCE_FILE__
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>

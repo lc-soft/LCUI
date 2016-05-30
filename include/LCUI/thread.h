@@ -39,8 +39,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_THREAD_H__
-#define __LCUI_THREAD_H__
+#ifndef LCUI_THREAD_H
+#define LCUI_THREAD_H
 
 #ifdef LCUI_THREAD_PTHREAD
 #include <pthread.h>

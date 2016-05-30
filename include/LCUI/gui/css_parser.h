@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_CSS_PARSER_H__
-#define __LCUI_CSS_PARSER_H__
+#ifndef LCUI_CSS_PARSER_H
+#define LCUI_CSS_PARSER_H
 
 LCUI_BEGIN_HEADER
 

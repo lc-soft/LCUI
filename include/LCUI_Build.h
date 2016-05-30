@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_BUILD_H__
-#define __LCUI_BUILD_H__
+#ifndef LCUI_BUILD_H
+#define LCUI_BUILD_H
 
 #if defined(__GNUC__)
 #  define LCUI_API

@@ -1,5 +1,5 @@
-﻿#ifndef __LCUI_IME_H__
-#define __LCUI_IME_H__
+﻿#ifndef LCUI_IME_H
+#define LCUI_IME_H
 
 LCUI_BEGIN_HEADER
 

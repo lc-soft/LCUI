@@ -39,8 +39,8 @@
  * ****************************************************************************/
 
 /* 为了解决结构体被重复定义，用宏进行头文件保护(其它地方出现类似的内容，将不再注释) */
-#ifndef __LCUI_H__  /* 如果没有定义 __LCUI_H__ 宏 */
-#define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */
+#ifndef LCUI_H  /* 如果没有定义 LCUI_H 宏 */
+#define LCUI_H  /* 定义 LCUI_H 宏 */
 
 #define LCUI_VERSION "1.0.0"
 
@@ -312,4 +312,4 @@ LCUI_END_HEADER
 #include <LCUI/util.h>
 #include <LCUI/main.h>
 
-#endif /* __LCUI_H__ */
+#endif /* LCUI_H */

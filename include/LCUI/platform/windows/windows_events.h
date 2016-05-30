@@ -1,5 +1,5 @@
-﻿#ifndef __WINDOWS_EVENTS_H__
-#define __WINDOWS_EVENTS_H__
+﻿#ifndef __WINDOWS_EVENTS_H
+#define __WINDOWS_EVENTS_H
 
 typedef struct WIN_SysEvent_ {
 	HWND hwnd;

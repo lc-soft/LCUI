@@ -1,5 +1,5 @@
-﻿#ifndef __LCUI_WINDOWS_MOUSE_H__
-#define __LCUI_WINDOWS_MOUSE_H__
+﻿#ifndef LCUI_WINDOWS_MOUSE_H
+#define LCUI_WINDOWS_MOUSE_H
 
 void LCUI_InitWinMouse( void );
 

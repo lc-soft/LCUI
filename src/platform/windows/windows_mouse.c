@@ -72,6 +72,7 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 		}
 		if( !GetTouchInputInfo( handle, n, inputs,
 					sizeof( TOUCHINPUT ) ) ) {
+			free( inputs );
 			break;
 		}
 		for( i = 0; i < n; ++i ) {

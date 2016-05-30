@@ -38,12 +38,12 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef  __LC_FRAME_CONTROL_H__
-#define __LC_FRAME_CONTROL_H__
+#ifndef  __LC_FRAME_CONTROL_H
+#define __LC_FRAME_CONTROL_H
 
 LCUI_BEGIN_HEADER
 
-#ifdef __IN_FRAME_CONTROL_SOURCE_FILE__
+#ifdef LCUI_FRAME_CONTROL_C
 typedef struct FrameControlContext* FrameCtrlCtx;
 #else
 typedef void* FrameCtrlCtx;

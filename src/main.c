@@ -37,8 +37,6 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 //#define DEBUG
-#define __IN_MAIN_SOURCE_FILE__
-
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>

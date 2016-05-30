@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_DISPLAY_H__
-#define __LCUI_DISPLAY_H__
+#ifndef LCUI_DISPLAY_CONTROL_H
+#define LCUI_DISPLAY_CONTROL_H
 
 #include <LCUI/gui/widget.h>
 #include <LCUI/surface.h>

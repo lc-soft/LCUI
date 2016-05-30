@@ -38,7 +38,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#define __IN_FRAME_CONTROL_SOURCE_FILE__
+#define LCUI_FRAME_CONTROL_C
 
 #include <stdlib.h>
 #include <LCUI_Build.h>

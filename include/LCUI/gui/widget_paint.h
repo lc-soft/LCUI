@@ -38,8 +38,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
-#ifndef __WIDGET_PAINT_H__
-#define __WIDGET_PAINT_H__
+#ifndef __WIDGET_PAINT_H
+#define __WIDGET_PAINT_H
 
 LCUI_BEGIN_HEADER
 

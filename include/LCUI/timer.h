@@ -37,8 +37,8 @@
 * 没有，请查看：<http://www.gnu.org/licenses/>. 
 * ***************************************************************************/
 
-#ifndef __LCUI_TIMER_H__
-#define __LCUI_TIMER_H__
+#ifndef LCUI_TIMER_H
+#define LCUI_TIMER_H
 
 LCUI_BEGIN_HEADER
 

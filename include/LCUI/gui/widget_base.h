@@ -37,13 +37,13 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_WIDGET_BASE_H__
-#define __LCUI_WIDGET_BASE_H__
+#ifndef LCUI_WIDGET_BASE_H
+#define LCUI_WIDGET_BASE_H
 
 LCUI_BEGIN_HEADER
 
 /** 如果没有包含 widget_build.h 头文件 */
-#ifndef __LCUI_WIDGET_BUILD_H__
+#ifndef LCUI_WIDGET_BUILD_H
 typedef struct LCUI_WidgetBase* LCUI_Widget;
 #endif
 
@@ -192,12 +192,6 @@ enum WidgetTaskType {
 	WTT_USER,
 	WTT_TOTAL_NUM
 };
-
-#ifndef __IN_WIDGET_TASK_SOURCE_FILE__
-typedef void* LCUI_WidgetTaskBox;
-#else
-typedef struct LCUI_WidgetTaskBoxRec_* LCUI_WidgetTaskBox;
-#endif
 
 typedef struct LCUI_WidgetBoxRect {
 	LCUI_Rect content;	/**< 内容框的区域 */

@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#ifndef __LCUI_TEXTLAYER_H__
-#define __LCUI_TEXTLAYER_H__
+#ifndef LCUI_TEXTLAYER_H
+#define LCUI_TEXTLAYER_H
 
 LCUI_BEGIN_HEADER
 

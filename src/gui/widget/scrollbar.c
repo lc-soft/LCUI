@@ -307,6 +307,9 @@ static void ScrollLayer_OnMouseDown( LCUI_Widget layer, LCUI_WidgetEvent e, void
 {
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = w->private_data;
+	if( scrollbar->is_dragging ) {
+		return;
+	}
 	scrollbar->eid_touch = LCUI_BindEvent( LCUI_TOUCH, OnTouch, w, NULL );
 	scrollbar->eid_mouseup = LCUI_BindEvent( LCUI_MOUSEUP, OnMouseUp, w, NULL );
 	scrollbar->mouse_x = e->screen_x;

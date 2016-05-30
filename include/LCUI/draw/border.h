@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
-#ifndef __LCUI_DRAW_BORDER_H__
-#define __LCUI_DRAW_BORDER_H__
+#ifndef LCUI_DRAW_BORDER_H
+#define LCUI_DRAW_BORDER_H
 
 LCUI_BEGIN_HEADER
 
