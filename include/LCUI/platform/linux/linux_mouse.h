@@ -1,5 +1,5 @@
-#ifndef __LCUI_LINUX_MOUSE_H__
-#define __LCUI_LINUX_MOUSE_H__
+#ifndef LCUI_LINUX_MOUSE_H
+#define LCUI_LINUX_MOUSE_H
 
 void LCUI_InitLinuxMouse( void );
 

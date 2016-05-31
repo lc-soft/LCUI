@@ -38,8 +38,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef  __LC_FRAME_CONTROL_H
-#define __LC_FRAME_CONTROL_H
+#ifndef LCUI_UTIL_FRAMECTRL_H
+#define LCUI_UTIL_FRAMECTRL_H
 
 LCUI_BEGIN_HEADER
 

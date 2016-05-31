@@ -34,8 +34,8 @@
 
 #include <stdint.h>
 
-#ifndef __DICT_H
-#define __DICT_H
+#ifndef LCUI_UTIL_DICT_H
+#define LCUI_UTIL_DICT_H
 
 /** 哈希表节点结构 */
 typedef struct DictEntry {

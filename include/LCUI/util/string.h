@@ -63,12 +63,12 @@ typedef char TCHAR;
 LCUI_BEGIN_HEADER
 
 /**
-* 清除字符串首尾的字符
-* @param[out] outstr 处理后的字符串
-* @param[in] instr 需要处理的字符串
-* @param[in] charlist 需要清除的字符列表，当为NULL时，默认清除空白符
-* @return 处理后的字符串的长度
-*/
+ * 清除字符串首尾的字符
+ * @param[out] outstr 处理后的字符串
+ * @param[in] instr 需要处理的字符串
+ * @param[in] charlist 需要清除的字符列表，当为NULL时，默认清除空白符
+ * @return 处理后的字符串的长度
+ */
 LCUI_API int strtrim( char *outstr, const char *instr, const char *charlist );
 
 LCUI_END_HEADER

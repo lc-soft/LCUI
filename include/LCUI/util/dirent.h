@@ -1,6 +1,6 @@
 ﻿// dirent.h -- Directory Entry pperation set.
-#ifndef LCUI_DIRECTORY_ENTRY_H
-#define LCUI_DIRECTORY_ENTRY_H
+#ifndef LCUI_UTIL_DIRENT_H
+#define LCUI_UTIL_DIRENT_H
 
 LCUI_BEGIN_HEADER
 
