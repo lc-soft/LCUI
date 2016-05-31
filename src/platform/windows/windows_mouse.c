@@ -31,24 +31,28 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 		sys_ev.button.button = 1;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
+		SetCapture( win_ev->hwnd );
 		break;
 	case WM_LBUTTONUP:
 		sys_ev.type = LCUI_MOUSEUP;
 		sys_ev.button.button = 1;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
+		ReleaseCapture();
 		break;
 	case WM_RBUTTONDOWN:
 		sys_ev.type = LCUI_MOUSEDOWN;
 		sys_ev.button.button = 2;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
+		SetCapture( win_ev->hwnd );
 		break;
 	case WM_RBUTTONUP:
 		sys_ev.type = LCUI_MOUSEUP;
 		sys_ev.button.button = 2;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
+		ReleaseCapture( win_ev->hwnd );
 		break;
 	case WM_MOUSEWHEEL:
 		sys_ev.type = LCUI_MOUSEWHEEL;
