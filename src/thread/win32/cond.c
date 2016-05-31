@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
+#include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
@@ -73,25 +74,41 @@ int LCUICond_Wait( LCUI_Cond *cond, LCUI_Mutex *mutex )
 	LCUIMutex_Unlock( mutex );
 	ret = WaitForSingleObject( *cond, INFINITE );
 	switch( ret ) {
-	case WAIT_TIMEOUT: break;
-	case WAIT_OBJECT_0: LCUIMutex_Lock( mutex ); return 0;
+	case WAIT_TIMEOUT:
+		ret = ETIMEDOUT;
+		break;
+	case WAIT_OBJECT_0:
+		ret = 0;
+		break;
 	case WAIT_FAILED: 
-	default: return -1;
+	default: 
+		ret = GetLastError();
+		break;
 	}
-	return 1;
+	LCUIMutex_Lock( mutex );
+	return ret;
 }
 
 /** 计时阻塞当前线程，等待条件成立 */
 int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms )
 {
+	int ret;
 	LCUIMutex_Unlock( mutex );
-	switch(  WaitForSingleObject( *cond, ms ) ) {
-	case WAIT_TIMEOUT: break;
-	case WAIT_OBJECT_0: LCUIMutex_Lock( mutex ); return 0;
+	ret = WaitForSingleObject( *cond, ms );
+	switch( ret ) {
+	case WAIT_TIMEOUT:
+		ret = ETIMEDOUT;
+		break;
+	case WAIT_OBJECT_0:
+		ret = 0;
+		break;
 	case WAIT_FAILED: 
-	default: return -1;
+	default: 
+		ret = GetLastError();
+		break;
 	}
-	return 1;
+	LCUIMutex_Lock( mutex );
+	return ret;
 }
 
 /** 唤醒一个阻塞等待条件成立的线程 */

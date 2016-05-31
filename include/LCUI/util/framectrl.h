@@ -43,7 +43,7 @@
 
 LCUI_BEGIN_HEADER
 
-#ifdef LCUI_FRAME_CONTROL_C
+#ifdef LCUI_UTIL_FRAMECTRL_C
 typedef struct FrameControlContext* FrameCtrlCtx;
 #else
 typedef void* FrameCtrlCtx;
