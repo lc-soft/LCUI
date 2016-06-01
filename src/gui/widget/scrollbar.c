@@ -180,6 +180,7 @@ static void ScrollBar_StartInertialScrolling( LCUI_Widget w )
 	effect->is_running = TRUE;
 	effect->timer = LCUITimer_Set( effect->interval, 
 				       OnInertialScrolling, w, FALSE );
+	DEBUG_MSG("start_pos: %d, end_pos: %d\n", effect->start_pos, effect->end_pos);
 	DEBUG_MSG("effect->speed: %d, distance: %d, time: %d\n", 
 		   effect->speed, distance, (int)time_delta);
 }
@@ -205,7 +206,7 @@ static void OnMouseUp( LCUI_SysEvent e, void *arg )
 	scrollbar->eid_mouseup = -1;
 	scrollbar->eid_touch = -1;
 	if( scrollbar->layer ) {
-		scrollbar->layer->event_blocked = FALSE;
+		Widget_BlockEvent( scrollbar->layer, FALSE );
 	}
 }
 
@@ -307,7 +308,8 @@ static void ScrollLayer_OnTouch( LCUI_SysEvent e, void *arg )
 			Widget_BlockEvent( scrollbar->layer, TRUE );
 		}
 		distance = pos - scrollbar->pos;
-		if( (scrollbar->distance > 0) != (distance > 0) ) {
+		if( (scrollbar->distance > 0) != (distance > 0) ||
+		    scrollbar->distance == 0 ) {
 			ScrollBar_UpdateInertialScrolling( w );
 		}
 		scrollbar->distance = distance;

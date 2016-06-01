@@ -115,7 +115,7 @@ void FrameControl_Remain( FrameCtrlCtx ctx )
 	lost_ms = 0;
 	current_time = LCUI_GetTickCount();
 	LCUIMutex_Lock( &ctx->mutex );
-	n_ms = (int)(current_time - ctx->prev_frame_start_time);
+	n_ms = (unsigned int)(current_time - ctx->prev_frame_start_time);
 	if( n_ms > ctx->one_frame_remain_time ) {
 		goto normal_exit;
 	}

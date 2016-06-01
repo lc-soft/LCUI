@@ -52,7 +52,7 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 		sys_ev.button.button = 2;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
-		ReleaseCapture( win_ev->hwnd );
+		ReleaseCapture();
 		break;
 	case WM_MOUSEWHEEL:
 		sys_ev.type = LCUI_MOUSEWHEEL;
