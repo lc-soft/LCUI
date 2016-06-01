@@ -253,6 +253,7 @@ typedef struct LCUI_WidgetRec_ {
 	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
 	LCUI_BOOL		has_dirty_child;	/**< 子级部件是否有无效区域 */
 	LCUI_BOOL		layout_locked;		/**< 子级部件布局是否已锁定 */
+	LCUI_BOOL		event_blocked;		/**< 是否阻止自己和子级部件的事件处理 */
 } LCUI_WidgetRec;
 
 #define Widget_GetNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec))

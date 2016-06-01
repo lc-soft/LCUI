@@ -87,6 +87,9 @@ typedef struct LCUI_WidgetEventRec_ {
 
 typedef void(*LCUI_WidgetEventFunc)(LCUI_Widget, LCUI_WidgetEvent, void*);
 
+/** 设置阻止部件及其子级部件的事件 */
+#define Widget_BlockEvent(WIDGET, FLAG) (WIDGET)->event_blocked = FLAG
+
 /** 触发事件，让事件处理器在主循环中调用 */
 LCUI_API int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent e,
 			       void *data, void( *destroy_data )(void*) );

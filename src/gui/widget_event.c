@@ -371,16 +371,6 @@ int Widget_TriggerEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data )
 	return Widget_TriggerEventEx( widget, e, data, NULL, TRUE );
 }
 
-void LCUIWidget_ClearEventTarget( LCUI_Widget widget )
-{
-	int i;
-	for( i = 0; i < WST_TOTAL; ++i ) {
-		if( self.targets[i] == widget ) {
-			self.targets[i] = NULL;
-		}
-	}
-}
-
 int Widget_StopEventPropagation(LCUI_Widget widget )
 {
 	LCUI_WidgetEvent e;
@@ -448,18 +438,33 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 	}
 }
 
+void LCUIWidget_ClearEventTarget( LCUI_Widget widget )
+{
+	int i;
+	for( i = 0; i < WST_TOTAL; ++i ) {
+		if( !widget || self.targets[i] == widget ) {
+			Widget_UpdateStatus( NULL, i );
+		}
+	}
+}
+
 /** 响应系统的鼠标移动事件，向目标部件投递相关鼠标事件 */
 static void OnMouseEvent( LCUI_SysEvent e, void *arg )
 {
 	LCUI_Pos pos;
 	LCUI_WidgetEventRec ebuff;
-	LCUI_Widget target, root;
-	root = LCUIWidget_GetRoot();
+	LCUI_Widget target, w;
+	w = LCUIWidget_GetRoot();
 	LCUICursor_GetPos( &pos );
-	target = Widget_At( root, pos.x, pos.y );
+	target = Widget_At( w, pos.x, pos.y );
 	if( !target ) {
 		Widget_UpdateStatus( NULL, WST_HOVER );
 		return;
+	}
+	for( w = target; w; w = w->parent ) {
+		if( w->event_blocked ) {
+			return;
+		}
 	}
 	Widget_GetAbsXY( target, NULL, &ebuff.x, &ebuff.y );
 	ebuff.cancel_bubble = FALSE;
