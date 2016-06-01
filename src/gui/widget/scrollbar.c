@@ -44,23 +44,41 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
 #include <LCUI/cursor.h>
+#include <LCUI/timer.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/scrollbar.h>
 
+#define EFFECT_FRAMES 50
+
+/** 惯性滚动效果的相关数据 */
+typedef struct InertialScrollingRec_ {
+	int start_pos;			/**< 起始位置 */
+	int end_pos;			/**< 结束位置 */
+	int timer;			/**< 定时器 */
+	int interval;			/**< 定时器的间隔时间 */
+	int speed;			/**< 滚动速度 */
+	int speed_delta;		/**< 速度差（加速度） */
+	int64_t timestamp;		/**< 开始时间 */
+	LCUI_BOOL is_running;		/**< 当前效果是否正在运行 */
+} InertialScrollingRec, *InertialScrolling;
+
+/** 滚动条的相关数据 */
 typedef struct LCUI_ScrollBarRec_ {
-	LCUI_Widget box;	/**< 容器 */
-	LCUI_Widget layer;	/**< 滚动层 */
-	LCUI_Widget slider;	/**< 滑块 */
-	LCUI_BOOL is_dragging;	/**< 是否处于拖拽状态 */
-	int slider_x, slider_y;	/**< 拖拽开始时的滑块位置 */
-	int mouse_x, mouse_y;	/**< 拖拽开始时的鼠标坐标 */
-	int direction;		/**< 滚动条的方向（垂直或水平） */
-	int eid_mousemove;
-	int eid_mouseup;
-	int eid_touch;
-	int scroll_step;	/**< 每次滚动的距离，主要针对使用鼠标滚轮触发的滚动 */
-	int pos;		/**< 当前的位置 */
-	int old_pos;		/**< 拖拽开始时的位置 */
+	LCUI_Widget box;		/**< 容器 */
+	LCUI_Widget layer;		/**< 滚动层 */
+	LCUI_Widget slider;		/**< 滑块 */
+	LCUI_BOOL is_dragging;		/**< 是否处于拖拽状态 */
+	int slider_x, slider_y;		/**< 拖拽开始时的滑块位置 */
+	int mouse_x, mouse_y;		/**< 拖拽开始时的鼠标坐标 */
+	int direction;			/**< 滚动条的方向（垂直或水平） */
+	int scroll_step;		/**< 每次滚动的距离，主要针对使用鼠标滚轮触发的滚动 */
+	int pos;			/**< 当前的位置 */
+	int old_pos;			/**< 拖拽开始时的位置 */
+	int distance;			/**< 滚动距离 */
+	InertialScrollingRec effect;	/**< 用于实现惯性滚动效果的相关数据 */
+	int eid_mousemove;		/**< MOUSEMOVE 事件的绑定ID */
+	int eid_mouseup;		/**< MOUSEUP 事件的绑定ID */
+	int eid_touch;			/**< TOUCH 事件的绑定ID */
 } LCUI_ScrollBarRec, *LCUI_ScrollBar;
 
 static int scroll_event_id = -1;
@@ -102,6 +120,70 @@ top: auto;
 
 );
 
+static void OnInertialScrolling( void *arg )
+{
+	int pos;
+	LCUI_Widget w = arg;
+	LCUI_ScrollBar scrollbar;
+	InertialScrolling effect;
+	scrollbar = w->private_data;
+	effect = &scrollbar->effect;
+	pos = scrollbar->pos + effect->speed;
+	effect->speed += effect->speed_delta;
+	ScrollBar_SetPosition( w, pos );
+	if( effect->speed == 0 || !effect->is_running ||
+	    (effect->speed_delta > 0) == (effect->speed > 0) ) {
+		effect->speed = 0;
+		effect->timer = -1;
+		effect->is_running = FALSE;
+		return;
+	}
+	effect->timer = LCUITimer_Set( effect->interval, 
+				       OnInertialScrolling, w, FALSE );
+}
+
+static void ScrollBar_UpdateInertialScrolling( LCUI_Widget w )
+{
+	LCUI_ScrollBar scrollbar;
+	scrollbar = w->private_data;
+	scrollbar->effect.speed = 0;
+	scrollbar->effect.is_running = FALSE;
+	scrollbar->effect.start_pos = scrollbar->pos;
+	scrollbar->effect.timestamp = LCUI_GetTickCount();
+}
+
+static void ScrollBar_StartInertialScrolling( LCUI_Widget w )
+{
+	int distance;
+	int64_t time_delta;
+	LCUI_ScrollBar scrollbar;
+	InertialScrolling effect;
+	scrollbar = w->private_data;
+	effect = &scrollbar->effect;
+	effect->end_pos = scrollbar->pos;
+	distance = effect->end_pos - effect->start_pos;
+	time_delta = LCUI_GetTicks( effect->timestamp );
+	/* 计算每一帧的滚动距离（速度） */
+	if( time_delta > 0 ) {
+		effect->speed = distance * effect->interval / (int)time_delta;
+	} else {
+		effect->speed = 0;
+	}
+	/* 计算加速度，该值的正负符号始终与速度值的相反 */
+	if( (effect->speed > 0) == (effect->speed_delta > 0) ) {
+		effect->speed_delta = -effect->speed_delta;
+	}
+	effect->timestamp = LCUI_GetTickCount();
+	if( effect->is_running ) {
+		return;
+	}
+	effect->is_running = TRUE;
+	effect->timer = LCUITimer_Set( effect->interval, 
+				       OnInertialScrolling, w, FALSE );
+	DEBUG_MSG("effect->speed: %d, distance: %d, time: %d\n", 
+		   effect->speed, distance, (int)time_delta);
+}
+
 static void OnMouseUp( LCUI_SysEvent e, void *arg )
 {
 	LCUI_Widget w = e->data;
@@ -114,14 +196,20 @@ static void OnMouseUp( LCUI_SysEvent e, void *arg )
 	}
 	if( scrollbar->eid_touch > 0 ) {
 		LCUI_UnbindEvent( scrollbar->eid_touch );
+		if( scrollbar->is_dragging ) {
+			ScrollBar_StartInertialScrolling( w );
+		}
 	}
+	scrollbar->is_dragging = FALSE;
 	scrollbar->eid_mousemove = -1;
 	scrollbar->eid_mouseup = -1;
 	scrollbar->eid_touch = -1;
-	scrollbar->is_dragging = FALSE;
+	if( scrollbar->layer ) {
+		scrollbar->layer->event_blocked = FALSE;
+	}
 }
 
-static void OnMouseMove( LCUI_SysEvent e, void *arg )
+static void Slider_OnMouseMove( LCUI_SysEvent e, void *arg )
 {
 	float n;
 	LCUI_Pos pos;
@@ -196,23 +284,39 @@ static void OnMouseMove( LCUI_SysEvent e, void *arg )
 	Widget_Move( scrollbar->slider, x, y );
 }
 
-static void OnTouch( LCUI_SysEvent e, void *arg )
+/** 滚动层的触屏事件响应 */
+static void ScrollLayer_OnTouch( LCUI_SysEvent e, void *arg )
 {
-	int pos;
+	int pos, distance;
 	LCUI_TouchPoint point;
 	LCUI_Widget w = e->data;
-	LCUI_ScrollBar scrollbar = w->private_data;
+	LCUI_ScrollBar scrollbar;
 	if( e->touch.n_points < 1 ) {
 		return;
 	}
 	point = &e->touch.points[0];
-	if( point->state == LCUI_TOUCHMOVE ) {
-		pos = scrollbar->old_pos - (point->y - scrollbar->mouse_y);
-		ScrollBar_SetPosition( w, pos );
+	if( point->state != LCUI_TOUCHMOVE ) {
+		return;
 	}
+	scrollbar = w->private_data;
+	pos = scrollbar->old_pos - (point->y - scrollbar->mouse_y);
+	if( pos != scrollbar->pos ) {
+		if( !scrollbar->is_dragging ) {
+			scrollbar->is_dragging = TRUE;
+			LCUIWidget_ClearEventTarget( NULL );
+			Widget_BlockEvent( scrollbar->layer, TRUE );
+		}
+		distance = pos - scrollbar->pos;
+		if( (scrollbar->distance > 0) != (distance > 0) ) {
+			ScrollBar_UpdateInertialScrolling( w );
+		}
+		scrollbar->distance = distance;
+	}
+	ScrollBar_SetPosition( w, pos );
 }
 
-static void OnMouseDown( LCUI_Widget slider, LCUI_WidgetEvent e, void *arg )
+static void Slider_OnMouseDown( LCUI_Widget slider, LCUI_WidgetEvent e,
+				void *arg )
 {
 	LCUI_Widget w = slider->parent;
 	LCUI_ScrollBar scrollbar = w->private_data;
@@ -225,7 +329,8 @@ static void OnMouseDown( LCUI_Widget slider, LCUI_WidgetEvent e, void *arg )
 	scrollbar->mouse_y = e->screen_y;
 	scrollbar->is_dragging = TRUE;
 	scrollbar->eid_mousemove = LCUI_BindEvent( LCUI_MOUSEMOVE, 
-						   OnMouseMove, w, NULL );
+						   Slider_OnMouseMove, 
+						   w, NULL );
 	scrollbar->eid_mouseup = LCUI_BindEvent( LCUI_MOUSEUP, 
 						 OnMouseUp, w, NULL );
 }
@@ -236,9 +341,6 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	LCUI_ScrollBar self;
 	slider = LCUIWidget_New( NULL );
 	self = Widget_NewPrivateData( w, LCUI_ScrollBarRec );
-	Widget_BindEvent( slider, "mousedown", OnMouseDown, NULL, NULL );
-	Widget_AddClass( slider, "slider" );
-	Widget_Append( w, slider );
 	self->direction = SBD_VERTICAL;
 	self->is_dragging = FALSE;
 	self->scroll_step = 40;
@@ -250,6 +352,18 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	self->box = NULL;
 	self->old_pos = 0;
 	self->pos = 0;
+	self->effect.timer = -1;
+	self->effect.end_pos = 0;
+	self->effect.start_pos = 0;
+	self->effect.timestamp = 0;
+	self->effect.speed = 0;
+	self->effect.speed_delta = 1;
+	self->effect.is_running = FALSE;
+	self->effect.interval = 1000 / EFFECT_FRAMES;
+	Widget_BindEvent( slider, "mousedown", 
+			  Slider_OnMouseDown, NULL, NULL );
+	Widget_AddClass( slider, "slider" );
+	Widget_Append( w, slider );
 }
 
 static void ScrollBar_UpdateSize( LCUI_Widget w )
@@ -306,16 +420,20 @@ static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 static void ScrollLayer_OnMouseDown( LCUI_Widget layer, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_Widget w = e->data;
-	LCUI_ScrollBar scrollbar = w->private_data;
+	LCUI_ScrollBar scrollbar;
+	scrollbar = w->private_data;
+	scrollbar->distance = 0;
+	scrollbar->effect.speed = 0;
+	scrollbar->effect.is_running = FALSE;
+	scrollbar->old_pos = scrollbar->pos;
 	if( scrollbar->is_dragging ) {
 		return;
 	}
-	scrollbar->eid_touch = LCUI_BindEvent( LCUI_TOUCH, OnTouch, w, NULL );
+	scrollbar->eid_touch = LCUI_BindEvent( LCUI_TOUCH,
+					       ScrollLayer_OnTouch, w, NULL );
 	scrollbar->eid_mouseup = LCUI_BindEvent( LCUI_MOUSEUP, OnMouseUp, w, NULL );
 	scrollbar->mouse_x = e->screen_x;
 	scrollbar->mouse_y = e->screen_y;
-	scrollbar->old_pos = scrollbar->pos;
-	scrollbar->is_dragging = TRUE;
 }
 
 static void ScrollBar_OnUpdateSize( LCUI_Widget box, LCUI_WidgetEvent e, void *arg )
