@@ -62,13 +62,13 @@ want_thread=no
 thread_name=pthread
 AC_ARG_WITH(pthread, [  --with-pthread          use pthread	(default)])
 if test "x$with_pthread" != "xno"; then
-	m4_include([m4/ax_pthread.m4])
 	AX_PTHREAD([
 		want_thread=yes
+		CC="$PTHREAD_CC"
 		CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 		LCUI_LIBS="$LCUI_LIBS $PTHREAD_LIBS"
-		AC_DEFINE_UNQUOTED(LCUI_THREAD_PTHREAD, 1, Define to 1 if you using pthread support)
-	],  want_thread=no)
+		AC_DEFINE_UNQUOTED(LCUI_THREAD_PTHREAD, 1, Define to 1 if you are using pthread support)
+	], [AC_MSG_ERROR(The support could not be configured for the POSIX thread programming interface.)])
 fi
 
 ##检测是否有libxml2库，必须有 libxml2 库才能启用 LCUIBuilder 功能模块
@@ -79,8 +79,8 @@ if test "$enable_builder" = "yes"; then
 	AC_CHECK_HEADERS([libxml/parser.h],[
 		AC_CHECK_LIB([xml2], [xmlParseFile], [
 			enable_builder=yes
-			CFLAGS="$CFLAGS -I/usr/include/libxml2"
 			LCUI_LIBS="$LCUI_LIBS -lxml2"
+			CFLAGS="$CFLAGS -I/usr/include/libxml2"
 			AC_DEFINE_UNQUOTED(USE_LCUI_BUILDER, 1, Define to 1 if you enabled LCUIBuilder function module)
 		], enable_builder=no)
 	], enable_builder=no)
@@ -95,9 +95,9 @@ if test "$want_font_engine" = yes; then
 	AC_CHECK_HEADERS([ft2build.h], [
 		AC_CHECK_LIB([freetype], [FT_Init_FreeType], [
 			want_font_engine=yes
-			CFLAGS="$CFLAGS -I/usr/include/freetype2"
-			LCUI_LIBS="$LCUI_LIBS -lfreetype"
 			font_engine_name=freetype2
+			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs freetype2`"
+			CFLAGS="$CFLAGS `pkg-config --cflags-only-I freetype2`"
 			AC_DEFINE_UNQUOTED(LCUI_FONT_ENGINE_FREETYPE, 1,  Define to 1 if you have the FreeType font engine)
 		], want_font_engine=no)
 	], [want_font_engine=no])
@@ -117,9 +117,9 @@ if test "$want_video_output" = yes; then
 	], [video_driver_name=none])
 	AC_CHECK_HEADERS([X11/Xlib.h],[
 		AC_CHECK_LIB([X11], [XOpenDisplay], [
-			CFLAGS="$CFLAGS `pkg-config --cflags-only-I x11`"
-			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs x11`"
 			video_driver_name=x11
+			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs x11`"
+			CFLAGS="$CFLAGS `pkg-config --cflags-only-I x11`"
 			AC_DEFINE_UNQUOTED(LCUI_VIDEO_DRIVER_X11, 1, Define to 1 if you select XWindow for video support)
 		], [])
 	], [])
@@ -144,7 +144,8 @@ if test "x$with_png" != "xno"; then
 	AC_CHECK_HEADERS([png.h],[
 		AC_CHECK_LIB([png], [png_sig_cmp],[
 			want_png=yes
-			LCUI_LIBS="$LCUI_LIBS -lpng"
+			LCUI_LIBS="$LCUI_LIBS `pkg-config --libs libpng`"
+			CFLAGS="$CFLAGS `pkg-config --cflags-only-I libpng`"
 			AC_DEFINE_UNQUOTED(USE_LIBPNG, 1, Define to 1 if you have the libpng)
 		],want_png=no)
 	],want_png=no)
