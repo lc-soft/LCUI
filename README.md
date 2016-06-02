@@ -7,9 +7,11 @@
 
 ## Description
 
-  The LCUI project is create by a China developer, and his English is 
-  not very good, so, some files will appear chinese character, 
-  please understand. thanks.
+  LCUI is a freely available software library to create GUI application.
+  
+  It is written in C, support the use XML and CSS describe the graphical 
+  interface. author is from China, but his English is not very good, so, some 
+  files will appear chinese character, please understand. thanks.
 
   Please read the file `docs/CHANGES.md`, it contains IMPORTANT INFORMATION.
 
@@ -33,11 +35,8 @@ In the simplest case you would run:
 
 	git clone https://github.com/lc-soft/LCUI.git
 	cd LCUI
-	git submodule update --init
+	./autogen.sh
 	./configure
-
-Please note that if you downloaded the source code (rather than cloned 
-via git) you likely miss the submodules and the build will therefor fail.
 
 ## Bugs 
 
@@ -106,9 +105,9 @@ If a lot of changes has happened upstream you can replay your local changes
 
 This will fetch changes and re-apply your commits on top of these.
 
-This is generally better than merge, as it will give a clear picture of
- which commits are local to your branch. It will also “prune” any of your
- local commits if the same changes have been applied upstream.
+This is generally better than merge, as it will give a clear picture of which 
+commits are local to your branch. It will also “prune” any of your local commits 
+if the same changes have been applied upstream.
 
 You can use `-i` with `rebase` for an “interactive” rebase. This allows
  you to drop, re-arrange, merge, and reword commits, e.g.:
@@ -123,7 +122,8 @@ The LCUI Project is released under the GNU General Public License as published
 option) any later version.
 
 ## Thanks to 
-  Liu Chao <lc-soft@live.cn>
+
+Liu Chao <lc-soft@live.cn>
 
 Special thanks to Liu Chao for his great work on the LCUI's development.
 
