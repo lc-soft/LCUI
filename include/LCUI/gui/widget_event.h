@@ -67,6 +67,10 @@ enum WidgetEventType {
 	WET_MOUSEUP,
 	WET_MOUSEWHEEL,
 	WET_CLICK,
+	WET_TOUCH,
+	WET_TOUCHDOWN,
+	WET_TOUCHUP,
+	WET_TOUCHMOVE,
 
 	WET_TITLE,
 	WET_SURFACE,
@@ -80,6 +84,8 @@ typedef struct LCUI_WidgetEventRec_ {
 	int x, y;			/**< 事件触发时鼠标的坐标（相对于当前部件的边框盒） */
 	int z_delta;			/**< 鼠标滚轮滚动的距离差值 */
 	int screen_x, screen_y;		/**< 事件触发时鼠标的屏幕坐标 */
+	int n_points;			/**< 触点数量 */
+	LCUI_TouchPoint points;		/**< 触点列表 */
 	void *data;			/**< 附加数据 */
 	LCUI_Widget target;		/**< 触发事件的部件 */
 	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */
@@ -162,6 +168,26 @@ LCUI_API void LCUIWidget_ClearEventTarget( LCUI_Widget widget );
 
 /** 停止部件的事件传播 */
 LCUI_API int Widget_StopEventPropagation( LCUI_Widget widget );
+
+/** 为部件设置鼠标捕获，设置后将捕获全局范围内的鼠标事件 */
+LCUI_API void Widget_SetMouseCapture( LCUI_Widget w );
+
+/** 为部件解除鼠标捕获 */
+LCUI_API void Widget_ReleaseMouseCapture( LCUI_Widget w );
+
+/**
+ * 为部件设置触点捕获，设置后将捕获全局范围内的触点事件
+ * @param[in] w 部件
+ * @param[in] point_id 触点ID，当值为 -1 时则捕获全部触点
+ */
+LCUI_API void Widget_SetTouchCapture( LCUI_Widget w, int point_id );
+
+/**
+ * 为部件解除触点捕获
+ * @param[in] w 部件
+ * @param[in] point_id 触点ID，当值为 -1 时则解除全部触点的捕获
+ */
+LCUI_API int Widget_ReleaseTouchCapture( LCUI_Widget w, int point_id );
 
 /** 初始化 LCUI 部件的事件系统 */
 void LCUIWidget_InitEvent(void);
