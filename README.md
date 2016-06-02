@@ -7,29 +7,28 @@
 
 ## Description
 
-  LCUI is a freely available software library to create GUI application.
+LCUI is a freely available software library to create GUI application.
   
-  It is written in C, support the use XML and CSS describe the graphical 
-  interface. author is from China, but his English is not very good, so, some 
-  files will appear chinese character, please understand. thanks.
+It is written in C, support the use XML and CSS describe the graphical 
+interface. author is from China, but his English is not very good, so, some 
+files will appear chinese character, please understand. thanks.
 
-  Please read the file `docs/CHANGES.md`, it contains IMPORTANT INFORMATION.
+Please read the file `docs/CHANGES.md`, it contains IMPORTANT INFORMATION.
 
-  Read the file `INSTALL` for installation instructions.
+Read the file `INSTALL` for installation instructions.
 
-  See the  file `docs/LICENSE.TXT`  for the available licenses.
+See the  file `docs/LICENSE.TXT`  for the available licenses.
 
 ## Documentation 
 
-  API reference documentation has not yet been prepared, development to 
-  more mature in this project will consider writing it.
-  At this stage, you can refer to the header files, source code, and 
-  sample programs .
+API reference documentation has not yet been prepared, development to more 
+mature in this project will consider writing it. At this stage, you can refer
+to the header files, source code, and sample programs.
 
 ## Building
 
-To bootstrap the build you need to run `./configure` (in the root of the
- source tree). 
+To bootstrap the build you need to run `./configure` (in the root of the 
+source tree). 
 
 In the simplest case you would run:
 
@@ -40,13 +39,15 @@ In the simplest case you would run:
 
 ## Bugs 
 
-  Please report bugs  by e-mail to `lc-soft@live.cn`. Don't forget to 
-  send a  detailed explanation of  the problem --  there is nothing 
-  worse than receiving a terse message that only says `it doesn't work`.
+Please report bugs  by e-mail to `lc-soft@live.cn`. Don't forget to send a 
+detailed explanation of  the problem --  there is nothing worse than receiving
+a terse message that only says `it doesn't work`.
 
 ## Contributing
 
-You can send pull requests via GitHub. Patches should:
+**You can send pull requests via GitHub.**
+
+Patches should:
 
 1. Follow the style of the existing code.
 2. One commit should do exactly one thing.
@@ -68,6 +69,12 @@ You can send pull requests via GitHub. Patches should:
    make it easier for us (and avoid any legal issues) we prefer if 
    patches are released as public domain.
 
+**You can donate support the development of LCUI.**
+
+I'm currently an independent developer and your contributions are useful. 
+I have setup an [LCUI Patreon page](https://www.patreon.com/lcsoft) if you 
+want to donate and enable me to spend more time improving the library. 
+One-off donations are also greatly appreciated. Thanks!
 
 ### GitHub Workflow
 
