@@ -42,6 +42,7 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
 #include <LCUI/gui/widget.h>
 
 /** 解析器的环境参数（上下文数据） */
@@ -69,11 +70,11 @@ typedef struct KeyNameGroup {
 	char *name;
 } KeyNameGroup;
 
-static struct {
-	LCUI_RBTree parser_tree;
-	LCUI_RBTree option_tree;
-	LCUI_RBTree name_tree;
-	int count;
+static struct CSSParserModule {
+	LCUI_RBTree parser_tree;	/**< 解析器树，以名称进行索引 */
+	LCUI_RBTree option_tree;	/**< 样式属性值树，以属性值进行索引 */
+	LCUI_RBTree name_tree;		/**< 样式属性名称树，以属性名称进行索引 */
+	int count;			/**< 当前记录的属性数量 */
 } self;
 
 #define SPLIT_NUMBER	1

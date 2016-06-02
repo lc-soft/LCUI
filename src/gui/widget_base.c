@@ -42,13 +42,14 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include <LCUI/graph.h>
 #include <LCUI/gui/widget.h>
 
 #undef max
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
 
 static struct LCUIWidgetModule {
-	LCUI_Widget root;	/** 获取根级部件 */
+	LCUI_Widget root;	/** 根级部件 */
 	LCUI_RBTree ids;	/** 各种部件的ID索引 */
 } LCUIWidget;
 
@@ -58,8 +59,8 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 }
 
 /** 刷新在追加部件后的状态，例如 :first-child 和 :last-child */
-static void Widget_UpdateStatusAfterAppend( LCUI_Widget w, 
-					   LCUI_BOOL is_remove_mode )
+static void Widget_UpdateStatusAfterAppend( LCUI_Widget w,
+					    LCUI_BOOL is_remove_mode )
 {
 	LinkedListNode *node = Widget_GetNode( w );
 	if( w->index == 0 ) {
