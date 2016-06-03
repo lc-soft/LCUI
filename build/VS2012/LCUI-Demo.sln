@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "helloworld", "helloworld\he
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCUITest", "LCUITest\LCUITest.vcxproj", "{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testtouch", "testtouch\testtouch.vcxproj", "{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -33,6 +35,14 @@ Global
 		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Release|Win32.ActiveCfg = Release|Win32
 		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Release|Win32.Build.0 = Release|Win32
 		{D639E1FA-B41B-40E5-8EC8-6FA3E5D946E7}.Release|x64.ActiveCfg = Release|Win32
+		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Debug|ARM.ActiveCfg = Debug|Win32
+		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Debug|Win32.Build.0 = Debug|Win32
+		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Debug|x64.ActiveCfg = Debug|Win32
+		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Release|ARM.ActiveCfg = Release|Win32
+		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Release|Win32.ActiveCfg = Release|Win32
+		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Release|Win32.Build.0 = Release|Win32
+		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
