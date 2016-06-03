@@ -63,7 +63,7 @@ static struct DisplayContext {
 	int mode;			/**< 显示模式 */
 	LCUI_BOOL show_rect_border;	/**< 是否为重绘的区域显示边框 */
 	LCUI_BOOL is_working;		/**< 标志，指示当前模块是否处于工作状态 */
-	FrameCtrlCtx fc_ctx;		/**< 上下文句柄，用于画面更新时的帧数控制 */
+	FrameControl fc_ctx;		/**< 上下文句柄，用于画面更新时的帧数控制 */
 	LCUI_Thread thread;		/**< 线程，负责画面更新工作 */
 	LinkedList surfaces;		/**< surface 列表 */
 	LCUI_Mutex mutex;
