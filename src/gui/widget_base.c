@@ -230,6 +230,8 @@ static void Widget_OnDestroy( void *arg )
 
 void Widget_ExecDestroy( LCUI_Widget widget )
 {
+	Widget_ReleaseMouseCapture( widget );
+	Widget_ReleaseTouchCapture( widget, -1 );
 	Widget_StopEventPropagation( widget );
 	LCUIWidget_ClearEventTarget( widget );
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用

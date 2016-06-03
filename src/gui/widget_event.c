@@ -48,6 +48,7 @@
 typedef struct TouchCapturerRec_ {
 	LinkedList points;
 	LCUI_Widget widget;
+	LinkedListNode node;
 } TouchCapturerRec, *TouchCapturer;
 
 typedef struct WidgetEventHandlerRec_ {
@@ -274,8 +275,9 @@ static void TouchCapturers_Add( LinkedList *list, LCUI_Widget w, int point_id )
 		}
 		tc = NEW( TouchCapturerRec, 1 );
 		tc->widget = w;
+		tc->node.data = tc;
 		LinkedList_Init( &tc->points );
-		LinkedList_Append( list, tc );
+		LinkedList_AppendNode( list, &tc->node );
 	}
 	/* 追加触点捕捉记录 */
 	data = NEW( int, 1 );
@@ -287,7 +289,8 @@ static int TouchCapturers_Delete( LinkedList *list, LCUI_Widget w, int point_id 
 {
 	TouchCapturer tc = NULL;
 	LinkedListNode *node, *ptnode;
-	LinkedList_ForEach( node, list ) {
+	LinkedList_ForEach( node, list )
+	{
 		tc = node->data;
 		if( tc->widget == w ) {
 			break;
@@ -297,14 +300,19 @@ static int TouchCapturers_Delete( LinkedList *list, LCUI_Widget w, int point_id 
 		return -1;
 	}
 	if( point_id < 0 ) {
-		LinkedList_Clear( &tc->points, free );;
+		LinkedList_Clear( &tc->points, free );
 	} else {
-		LinkedList_ForEach( ptnode, &tc->points ) {
+		LinkedList_ForEach( ptnode, &tc->points )
+		{
 			if( *(int*)ptnode->data == point_id ) {
 				free( node->data );
 				LinkedList_DeleteNode( &tc->points, ptnode );
 			}
 		}
+	}
+	if( tc->points.length == 0 ) {
+		LinkedList_Unlink( &self.touch_capturers, &tc->node );
+		free( tc );
 	}
 	return 0;
 }
@@ -716,7 +724,7 @@ static void OnTouchWithoutCapturers( LCUI_SysEvent sys_ev, void *arg )
 				break;
 			}
 		}
-		if( w->event_blocked ) {
+		if( w && w->event_blocked ) {
 			continue;
 		}
 		TouchCapturers_Add( &capturers, target, points[i].id );
@@ -867,6 +875,10 @@ void LCUIWidget_InitEvent(void)
 		{ WET_CLICK, "click" },
 		{ WET_MOUSEOUT, "mouseout" },
 		{ WET_MOUSEOVER, "mouseover" },
+		{ WET_TOUCH, "touch" },
+		{ WET_TOUCHDOWN, "touchdown" },
+		{ WET_TOUCHMOVE, "touchmove" },
+		{ WET_TOUCHUP, "touchup" },
 		{ WET_RESIZE, "resize" },
 		{ WET_AFTERLAYOUT, "afterlayout" },
 		{ WET_FOCUS, "focus" },
