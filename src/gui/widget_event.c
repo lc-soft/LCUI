@@ -240,7 +240,7 @@ static void DestroyTouchCapturer( void *arg )
 }
 
 #define TouchCapturers_Clear(LIST) \
-LinkedList_Clear( LIST, DestroyTouchCapturer )
+LinkedList_ClearData( LIST, DestroyTouchCapturer )
 
 static void TouchCapturers_Add( LinkedList *list, LCUI_Widget w, int point_id )
 {

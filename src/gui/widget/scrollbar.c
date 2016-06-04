@@ -76,9 +76,6 @@ typedef struct LCUI_ScrollBarRec_ {
 	int old_pos;			/**< 拖拽开始时的位置 */
 	int distance;			/**< 滚动距离 */
 	InertialScrollingRec effect;	/**< 用于实现惯性滚动效果的相关数据 */
-	int eid_mousemove;		/**< MOUSEMOVE 事件的绑定ID */
-	int eid_mouseup;		/**< MOUSEUP 事件的绑定ID */
-	int eid_touch;			/**< TOUCH 事件的绑定ID */
 } LCUI_ScrollBarRec, *LCUI_ScrollBar;
 
 static int scroll_event_id = -1;
@@ -185,38 +182,13 @@ static void ScrollBar_StartInertialScrolling( LCUI_Widget w )
 		   effect->speed, distance, (int)time_delta);
 }
 
-static void OnMouseUp( LCUI_SysEvent e, void *arg )
-{
-	LCUI_Widget w = e->data;
-	LCUI_ScrollBar scrollbar = w->private_data;
-	if( scrollbar->eid_mousemove > 0 ) {
-		LCUI_UnbindEvent( scrollbar->eid_mousemove );
-	}
-	if( scrollbar->eid_mouseup > 0 ) {
-		LCUI_UnbindEvent( scrollbar->eid_mouseup );
-	}
-	if( scrollbar->eid_touch > 0 ) {
-		LCUI_UnbindEvent( scrollbar->eid_touch );
-		if( scrollbar->is_dragging ) {
-			ScrollBar_StartInertialScrolling( w );
-		}
-	}
-	scrollbar->is_dragging = FALSE;
-	scrollbar->eid_mousemove = -1;
-	scrollbar->eid_mouseup = -1;
-	scrollbar->eid_touch = -1;
-	if( scrollbar->layer ) {
-		Widget_BlockEvent( scrollbar->layer, FALSE );
-	}
-}
-
-static void Slider_OnMouseMove( LCUI_SysEvent e, void *arg )
+static void Slider_OnMouseMove( LCUI_Widget slider, 
+				LCUI_WidgetEvent e, void *arg )
 {
 	float n;
 	LCUI_Pos pos;
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = w->private_data;
-	LCUI_Widget slider = scrollbar->slider;
 	LCUI_Widget layer = scrollbar->layer;
 	int x, y, box_size, size, layer_pos;
 
@@ -282,45 +254,24 @@ static void Slider_OnMouseMove( LCUI_SysEvent e, void *arg )
 	}
 	scrollbar->pos = layer_pos;
 	Widget_UpdateStyle( layer, FALSE );
-	Widget_Move( scrollbar->slider, x, y );
+	Widget_Move( slider, x, y );
 }
 
-/** 滚动层的触屏事件响应 */
-static void ScrollLayer_OnTouch( LCUI_SysEvent e, void *arg )
+static void Slider_OnMouseUp( LCUI_Widget slider, 
+			      LCUI_WidgetEvent e, void *arg )
 {
-	int pos, distance;
-	LCUI_TouchPoint point;
 	LCUI_Widget w = e->data;
-	LCUI_ScrollBar scrollbar;
-	if( e->touch.n_points < 1 ) {
-		return;
-	}
-	point = &e->touch.points[0];
-	if( point->state != LCUI_TOUCHMOVE ) {
-		return;
-	}
-	scrollbar = w->private_data;
-	pos = scrollbar->old_pos - (point->y - scrollbar->mouse_y);
-	if( pos != scrollbar->pos ) {
-		if( !scrollbar->is_dragging ) {
-			scrollbar->is_dragging = TRUE;
-			LCUIWidget_ClearEventTarget( NULL );
-			Widget_BlockEvent( scrollbar->layer, TRUE );
-		}
-		distance = pos - scrollbar->pos;
-		if( (scrollbar->distance > 0) != (distance > 0) ||
-		    scrollbar->distance == 0 ) {
-			ScrollBar_UpdateInertialScrolling( w );
-		}
-		scrollbar->distance = distance;
-	}
-	ScrollBar_SetPosition( w, pos );
+	LCUI_ScrollBar scrollbar = w->private_data;
+	Widget_UnbindEvent( slider, "mousemove", Slider_OnMouseMove );
+	Widget_UnbindEvent( slider, "mouseup", Slider_OnMouseUp );
+	Widget_ReleaseMouseCapture( slider );
+	scrollbar->is_dragging = FALSE;
 }
 
-static void Slider_OnMouseDown( LCUI_Widget slider, LCUI_WidgetEvent e,
-				void *arg )
+static void Slider_OnMouseDown( LCUI_Widget slider, 
+				LCUI_WidgetEvent e, void *arg )
 {
-	LCUI_Widget w = slider->parent;
+	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = w->private_data;
 	if( scrollbar->is_dragging ) {
 		return;
@@ -330,11 +281,9 @@ static void Slider_OnMouseDown( LCUI_Widget slider, LCUI_WidgetEvent e,
 	scrollbar->mouse_x = e->screen_x;
 	scrollbar->mouse_y = e->screen_y;
 	scrollbar->is_dragging = TRUE;
-	scrollbar->eid_mousemove = LCUI_BindEvent( LCUI_MOUSEMOVE, 
-						   Slider_OnMouseMove, 
-						   w, NULL );
-	scrollbar->eid_mouseup = LCUI_BindEvent( LCUI_MOUSEUP, 
-						 OnMouseUp, w, NULL );
+	Widget_SetMouseCapture( slider );
+	Widget_BindEvent( slider, "mousemove", Slider_OnMouseMove, w, NULL );
+	Widget_BindEvent( slider, "mouseup", Slider_OnMouseUp, w, NULL );
 }
 
 static void ScrollBar_OnInit( LCUI_Widget w )
@@ -346,9 +295,6 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	self->direction = SBD_VERTICAL;
 	self->is_dragging = FALSE;
 	self->scroll_step = 40;
-	self->eid_mousemove = -1;
-	self->eid_mouseup = -1;
-	self->eid_touch = -1;
 	self->slider = slider;
 	self->layer = NULL;
 	self->box = NULL;
@@ -363,7 +309,7 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	self->effect.is_running = FALSE;
 	self->effect.interval = 1000 / EFFECT_FRAMES;
 	Widget_BindEvent( slider, "mousedown", 
-			  Slider_OnMouseDown, NULL, NULL );
+			  Slider_OnMouseDown, w, NULL );
 	Widget_AddClass( slider, "slider" );
 	Widget_Append( w, slider );
 }
@@ -419,23 +365,70 @@ static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 	ScrollBar_SetPosition( w, pos );
 }
 
-static void ScrollLayer_OnMouseDown( LCUI_Widget layer, LCUI_WidgetEvent e, void *arg )
+/** 滚动层的触屏事件响应 */
+static void ScrollLayer_OnTouch( LCUI_Widget layer, LCUI_WidgetEvent e, void *arg )
 {
+	int i, pos, distance;
+	LCUI_TouchPoint point;
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar;
-	scrollbar = w->private_data;
-	scrollbar->distance = 0;
-	scrollbar->effect.speed = 0;
-	scrollbar->effect.is_running = FALSE;
-	scrollbar->old_pos = scrollbar->pos;
-	if( scrollbar->is_dragging ) {
+	if( e->n_points < 1 ) {
 		return;
 	}
-	scrollbar->eid_touch = LCUI_BindEvent( LCUI_TOUCH,
-					       ScrollLayer_OnTouch, w, NULL );
-	scrollbar->eid_mouseup = LCUI_BindEvent( LCUI_MOUSEUP, OnMouseUp, w, NULL );
-	scrollbar->mouse_x = e->screen_x;
-	scrollbar->mouse_y = e->screen_y;
+	scrollbar = w->private_data;
+	for( point = NULL, i = 0; i < e->n_points; ++i ) {
+		point = &e->points[i];
+		if( point->is_primary ) {
+			break;
+		}
+	}
+	if( !point ) {
+		return;
+	}
+	switch( point->state ) {
+	case WET_TOUCHDOWN:
+		scrollbar->distance = 0;
+		scrollbar->effect.speed = 0;
+		scrollbar->effect.is_running = FALSE;
+		scrollbar->old_pos = scrollbar->pos;
+		if( scrollbar->is_dragging ) {
+			return;
+		}
+		Widget_SetTouchCapture( layer, point->id );
+		scrollbar->mouse_x = point->x;
+		scrollbar->mouse_y = point->y;
+		break;
+	case WET_TOUCHUP:
+		Widget_ReleaseTouchCapture( layer, -1 );
+		if( scrollbar->is_dragging ) {
+			ScrollBar_StartInertialScrolling( w );
+		}
+		scrollbar->is_dragging = FALSE;
+		Widget_BlockEvent( layer, FALSE );
+		break;
+	case WET_TOUCHMOVE:
+		pos = scrollbar->old_pos;
+		if( scrollbar->direction == SBD_HORIZONTAL ) {
+			pos -= point->x - scrollbar->mouse_x;
+		} else {
+			pos -= point->y - scrollbar->mouse_y;
+		}
+		if( pos != scrollbar->pos ) {
+			if( !scrollbar->is_dragging ) {
+				scrollbar->is_dragging = TRUE;
+				LCUIWidget_ClearEventTarget( NULL );
+				Widget_BlockEvent( layer, TRUE );
+			}
+			distance = pos - scrollbar->pos;
+			if( (scrollbar->distance > 0) != (distance > 0) ||
+			    scrollbar->distance == 0 ) {
+				ScrollBar_UpdateInertialScrolling( w );
+			}
+			scrollbar->distance = distance;
+		}
+		ScrollBar_SetPosition( w, pos );
+	default: break;
+	}
 }
 
 static void ScrollBar_OnUpdateSize( LCUI_Widget box, LCUI_WidgetEvent e, void *arg )
@@ -465,7 +458,7 @@ void ScrollBar_BindLayer( LCUI_Widget w, LCUI_Widget layer )
 	scrollbar->layer = layer;
 	Widget_BindEvent( layer, "resize", ScrollBar_OnUpdateSize, w, NULL );
 	Widget_BindEvent( layer, "mousewheel", ScrollLayer_OnWheel, w, NULL );
-	Widget_BindEvent( layer, "mousedown", ScrollLayer_OnMouseDown, w, NULL );
+	Widget_BindEvent( layer, "touch", ScrollLayer_OnTouch, w, NULL );
 	ScrollBar_UpdateSize( w );
 }
 
