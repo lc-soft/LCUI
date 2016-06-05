@@ -258,21 +258,24 @@ static void TouchCapturers_Add( LinkedList *list, LCUI_Widget w, int point_id )
 	/* 获取该部件的触点捕捉记录 */
 	LinkedList_ForEach( node, list ) {
 		tc = node->data;
+		/* 清除与该触点绑定的其它捕捉记录 */
+		LinkedList_ForEach( ptnode, &tc->points ) {
+			if( point_id != *(int*)ptnode->data ) {
+				continue;
+			}
+			if( tc->widget == w ) {
+				return;
+			}
+			free( ptnode->data );
+			LinkedList_DeleteNode( &tc->points, ptnode );
+			break;
+		}
 		if( tc->widget == w ) {
 			break;
 		}
 	}
 	/* 如果没有该部件的触点捕捉记录 */
 	if( !tc || tc->widget != w ) {
-		/* 清除与该触点绑定的其它捕捉记录 */
-		LinkedList_ForEach( ptnode, list ) {
-			if( point_id != *(int*)ptnode->data ) {
-				continue;
-			}
-			free( ptnode->data );
-			LinkedList_DeleteNode( list, ptnode );
-			break;
-		}
 		tc = NEW( TouchCapturerRec, 1 );
 		tc->widget = w;
 		tc->node.data = tc;
@@ -289,8 +292,7 @@ static int TouchCapturers_Delete( LinkedList *list, LCUI_Widget w, int point_id 
 {
 	TouchCapturer tc = NULL;
 	LinkedListNode *node, *ptnode;
-	LinkedList_ForEach( node, list )
-	{
+	LinkedList_ForEach( node, list ) {
 		tc = node->data;
 		if( tc->widget == w ) {
 			break;
@@ -302,8 +304,7 @@ static int TouchCapturers_Delete( LinkedList *list, LCUI_Widget w, int point_id 
 	if( point_id < 0 ) {
 		LinkedList_Clear( &tc->points, free );
 	} else {
-		LinkedList_ForEach( ptnode, &tc->points )
-		{
+		LinkedList_ForEach( ptnode, &tc->points ) {
 			if( *(int*)ptnode->data == point_id ) {
 				free( node->data );
 				LinkedList_DeleteNode( &tc->points, ptnode );
@@ -666,55 +667,21 @@ static void ConvertTouchPoint( LCUI_TouchPoint point )
 	}
 }
 
-static void OnTouchWithCapturers( LCUI_SysEvent sys_ev, void *arg )
+/** 分发触控事件给对应的部件 */
+static int DispatchTouchEvent( LinkedList *capturers, LCUI_TouchPoint points, 
+			       int n_points )
 {
-	int i, n;
-	TouchCapturer tc;
-	LCUI_TouchPoint points;
-	LCUI_WidgetEventRec ev;
-	LinkedListNode *node, *ptnode;
-
-	ev.type = WET_TOUCH;
-	ev.cancel_bubble = FALSE;
-	n = sys_ev->touch.n_points;
-	points = sys_ev->touch.points;
-	ev.points = NEW( LCUI_TouchPointRec, n );
-	LinkedList_ForEach( node, &self.touch_capturers ) {
-		tc = node->data;
-		ev.n_points = 0;
-		LinkedList_ForEach( ptnode, &tc->points ) {
-			for( i = 0; i < n; ++i ) {
-				if( points[i].id != *(int*)ptnode->data ) {
-					continue;
-				}
-				ev.points[ev.n_points] = points[i];
-				ConvertTouchPoint( &ev.points[ev.n_points] );
-				++ev.n_points;
-			}
-		}
-		Widget_PostEvent( tc->widget, &ev, NULL, NULL );
-	}
-}
-
-static void OnTouchWithoutCapturers( LCUI_SysEvent sys_ev, void *arg )
-{
-	int i, n;
-	TouchCapturer tc;
-	LinkedList capturers;
-	LCUI_TouchPoint points;
+	int i, count;
 	LCUI_WidgetEventRec ev;
 	LCUI_Widget target, root, w;
 	LinkedListNode *node, *ptnode;
 
 	ev.type = WET_TOUCH;
 	ev.cancel_bubble = FALSE;
-	n = sys_ev->touch.n_points;
 	root = LCUIWidget_GetRoot();
-	points = sys_ev->touch.points;
-	ev.points = NEW( LCUI_TouchPointRec, n );
-	LinkedList_Init( &capturers );
+	ev.points = NEW( LCUI_TouchPointRec, n_points );
 	/* 先将各个触点按命中的部件进行分组 */
-	for( i = 0; i < n; ++i ) {
+	for( i = 0; i < n_points; ++i ) {
 		target = Widget_At( root, points[i].x, points[i].y );
 		if( !target ) {
 			continue;
@@ -727,20 +694,14 @@ static void OnTouchWithoutCapturers( LCUI_SysEvent sys_ev, void *arg )
 		if( w && w->event_blocked ) {
 			continue;
 		}
-		TouchCapturers_Add( &capturers, target, points[i].id );
+		TouchCapturers_Add( capturers, target, points[i].id );
 	}
+	count = 0;
+	ev.n_points = 0;
 	/* 然后向命中的部件发送触控事件 */
-	LinkedList_ForEach( node, &capturers ) {
-		tc = node->data;
-		ev.n_points = 0;
-		for( i = 0; i < n; ++i ) {
-			/* 如果没有触点记录，则说明是捕获全部触点 */
-			if( tc->points.length == 0 ) {
-				ev.points[ev.n_points] = points[i];
-				ConvertTouchPoint( &ev.points[ev.n_points] );
-				++ev.n_points;
-				continue;
-			}
+	LinkedList_ForEach( node, capturers ) {
+		TouchCapturer tc = node->data;
+		for( i = 0; i < n_points; ++i ) {
 			LinkedList_ForEach( ptnode, &tc->points ) {
 				if( points[i].id != *(int*)ptnode->data ) {
 					continue;
@@ -750,19 +711,50 @@ static void OnTouchWithoutCapturers( LCUI_SysEvent sys_ev, void *arg )
 				++ev.n_points;
 			}
 		}
+		if( ev.n_points == 0 ) {
+			continue;
+		}
 		Widget_PostEvent( tc->widget, &ev, NULL, NULL );
+		ev.n_points = 0;
+		++count;
 	}
-	TouchCapturers_Clear( &capturers );
+	free( ev.points );
+	return count;
 }
 
+/** 响应系统触控事件 */
 static void OnTouch( LCUI_SysEvent sys_ev, void *arg )
 {
+	int i, n;
+	LinkedList capturers;
+	LCUI_TouchPoint points;
+	LinkedListNode *node, *ptnode;
+
+	n = sys_ev->touch.n_points;
+	points = sys_ev->touch.points;
+	LinkedList_Init( &capturers );
 	LCUIMutex_Lock( &self.mutex );
-	if( self.touch_capturers.length > 0 ) {
-		OnTouchWithCapturers( sys_ev, arg );
-	} else {
-		OnTouchWithoutCapturers( sys_ev, arg );
+	/* 合并现有的触点捕捉记录 */
+	LinkedList_ForEach( node, &self.touch_capturers ) {
+		TouchCapturer tc = node->data;
+		for( i = 0; i < n; ++i ) {
+			/* 如果没有触点记录，则说明是捕获全部触点 */
+			if( tc->points.length == 0 ) {
+				TouchCapturers_Add( &capturers, tc->widget, 
+						    points[i].id );
+				continue;
+			}
+			LinkedList_ForEach( ptnode, &tc->points ) {
+				if( points[i].id != *(int*)ptnode->data ) {
+					continue;
+				}
+				TouchCapturers_Add( &capturers, tc->widget,
+						    points[i].id );
+			}
+		}
 	}
+	DispatchTouchEvent( &capturers, points, n );
+	TouchCapturers_Clear( &capturers );
 	LCUIMutex_Unlock( &self.mutex );
 }
 
