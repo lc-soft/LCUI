@@ -320,6 +320,9 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 	int size, box_size;
 	LCUI_ScrollBar scrollbar = w->private_data;
 	LCUI_Widget slider = scrollbar->slider;
+	if( !scrollbar->box ) {
+		return;
+	}
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
 		if( scrollbar->layer ) {
 			size = scrollbar->layer->box.outer.width;
