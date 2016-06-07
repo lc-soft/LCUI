@@ -287,11 +287,11 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LinkedListNode *node;
 	LCUI_Size new_size = {16, 16};
 	LCUI_TextView *txt = w->private_data;
-	if( w->width > new_size.w ) {
-		new_size.w = w->width;
+	if( w->box.content.width > new_size.w ) {
+		new_size.w = w->box.content.width;
 	}
-	if( w->height > new_size.h ) {
-		new_size.h = w->height;
+	if( w->box.content.height > new_size.h ) {
+		new_size.h = w->box.content.height;
 	}
 	LinkedList_Init( &rects );
 	if( w->style->sheet[key_width].is_valid && 
@@ -363,6 +363,12 @@ static void TextView_OnTask( LCUI_Widget w )
 	if( txt->tasks[i].is_valid ) {
 		txt->tasks[i].is_valid = FALSE;
 		TextLayer_SetAutoWrap( txt->layer, txt->tasks[i].autowrap );
+		txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	}
+	i = TASK_SET_TEXT_ALIGN;
+	if( txt->tasks[i].is_valid ) {
+		txt->tasks[i].is_valid = FALSE;
+		TextLayer_SetTextAlign( txt->layer, txt->tasks[i].align );
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_UPDATE;
