@@ -101,7 +101,14 @@ typedef struct LCUI_Pos_ {
 } LCUI_Pos;
 
 typedef struct LCUI_Size_ {
-	int w, h;
+	union {
+		int w;
+		int width;
+	};
+	union {
+		int h;
+		int height;
+	};
 } LCUI_Size;
 
 typedef struct LCUI_String_ {

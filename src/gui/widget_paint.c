@@ -42,7 +42,6 @@
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/gui/widget.h>
 
 /** 判断部件是否有可绘制内容 */

@@ -43,7 +43,6 @@
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/input.h>
 #include <LCUI/timer.h>
 #include <LCUI/cursor.h>

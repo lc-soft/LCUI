@@ -43,7 +43,6 @@
 #define LCUI_SURFACE_C
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
 #include LCUI_DISPLAY_H

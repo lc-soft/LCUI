@@ -108,20 +108,21 @@ static int ParseResource( XMLParserContext ctx, xmlNodePtr node )
 		}
 		prop = prop->next;
 	}
-	if( !type || !src ) {
+	if( !type && !src ) {
 		return PB_WARNING;
 	}
 	if( strstr(type, "application/font-") ) {
 		LCUIFont_LoadFile( src );
 	}
 	else if( strstr(type, "text/css") ) {
-		LCUICSS_LoadFile( src );
+		if( src ) {
+			LCUICSS_LoadFile( src );
+		}
 		for( node = node->children; node; node = node->next ) {
 			if( node->type != XML_TEXT_NODE ) {
 				continue;
 			}
 			LCUICSS_LoadString( (char*)node->content );
-			node = node->next;
 		}
 	}
 	return PB_NEXT;
