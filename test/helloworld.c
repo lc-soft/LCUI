@@ -1,43 +1,44 @@
-﻿#include <stdio.h>
-#include <LCUI_Build.h>
+﻿#include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/display.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
 
-#ifdef LCUI_BUILD_IN_WIN32
-#include <io.h>
-#include <fcntl.h>
-
-/* 在运行程序时会打开控制台，以查看打印的调试信息 */
-static void InitConsoleWindow(void)
+int main( int argc, char **argv )
 {
-	int hCrt;
-	FILE *hf;
-	AllocConsole();
-	hCrt=_open_osfhandle((long)GetStdHandle(STD_OUTPUT_HANDLE),_O_TEXT );
-	hf=_fdopen( hCrt, "w" );
-	*stdout=*hf;
-	setvbuf (stdout, NULL, _IONBF, 0);
-	// test code
-	printf ("InitConsoleWindow OK!\n");
+	LCUI_Widget root, pack;
+	LCUI_Init();
+	root = LCUIWidget_GetRoot();
+	pack = LCUIBuilder_LoadFile( "helloworld.xml" );
+	if( !pack ) {
+		return -1;
+	}
+	Widget_Append( root, pack ); 
+	Widget_Unwrap( pack );
+	return LCUI_Main();
 }
 
-#endif
+/* version 2
+#include <LCUI_Build.h>
+#include <LCUI/LCUI.h>
+#include <LCUI/gui/widget.h>
+#include <LCUI/gui/widget/textview.h>
 
 int main( int argc, char **argv )
 {
-	LCUI_Widget root, box;
-	
-#ifdef LCUI_BUILD_IN_WIN32
-	InitConsoleWindow();
-#endif
+	LCUI_Widget root, txt;
+
 	LCUI_Init();
-	box = LCUIBuilder_LoadFile("hello.xml");
-	if( box ) {
-		root = LCUIWidget_GetRoot();
-		Widget_Append( root, box );
-		Widget_Unwrap( box );
-	}
+	root = LCUIWidget_GetRoot();
+	txt = LCUIWidget_New( "textview" );
+	TextView_SetTextAlign( txt, SV_CENTER );
+	TextView_SetText( txt, "[size=18px]Hello, World![/size]" );
+	SetStyle( txt->custom_style, key_margin_top, 25, px );
+	SetStyle( txt->custom_style, key_margin_left, 25, px );
+	SetStyle( txt->custom_style, key_padding_top, 25, px );
+	SetStyle( txt->custom_style, key_border_width, 1, px );
+	SetStyle( txt->custom_style, key_border_color, RGB(0,0,0), color );
+	Widget_Resize( txt, 200, 100 );
+	Widget_Append( root, txt ); 
 	return LCUI_Main();
 }
+*/

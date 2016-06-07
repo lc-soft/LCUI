@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css" src="helloworld.css"/>
+  <resource type="application/font-ttf" src="C:/Windows/Fonts/comic.ttf"/>
+  <ui>
+    <widget type="textview" class="text-hello">Hello, World!</widget>
+  </ui>
+</lcui-app>
