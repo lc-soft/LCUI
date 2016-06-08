@@ -10,7 +10,11 @@
 LCUI is a freely available software library to create GUI application.
   
 It is written in C, support the use XML and CSS describe the graphical 
-interface. author is from China, but his English is not very good, so, some 
+interface, you can use it to make some simple effects, like in this example:
+
+![example screenshot](https://lcui.lc-soft.io/static/images/feature-screenshot-02.png)
+
+Author is from China, but his English is not very good, so, some 
 files will appear chinese character, please understand. thanks.
 
 Please read the file `docs/CHANGES.md`, it contains IMPORTANT INFORMATION.
