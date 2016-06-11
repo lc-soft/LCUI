@@ -70,6 +70,7 @@ typedef struct LCUI_ScrollBarRec_ {
 	LCUI_BOOL is_dragging;		/**< 是否处于拖拽状态 */
 	int slider_x, slider_y;		/**< 拖拽开始时的滑块位置 */
 	int mouse_x, mouse_y;		/**< 拖拽开始时的鼠标坐标 */
+	int touch_point_id;		/**< 触点的ID */
 	int direction;			/**< 滚动条的方向（垂直或水平） */
 	int scroll_step;		/**< 每次滚动的距离，主要针对使用鼠标滚轮触发的滚动 */
 	int pos;			/**< 当前的位置 */
@@ -300,6 +301,7 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	self->box = NULL;
 	self->old_pos = 0;
 	self->pos = 0;
+	self->touch_point_id = -1;
 	self->effect.timer = -1;
 	self->effect.end_pos = 0;
 	self->effect.start_pos = 0;
@@ -379,14 +381,24 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 		return;
 	}
 	scrollbar = w->private_data;
-	for( point = NULL, i = 0; i < e->n_points; ++i ) {
-		point = &e->points[i];
-		if( point->is_primary ) {
-			break;
+	if( scrollbar->touch_point_id == -1 ) {
+		point = &e->points[0];
+		/* 如果这个触点的状态不是 TOUCHDOWN，则说明是上次触控拖拽操
+		 * 作时的多余触点，直接忽略这次触控事件 */
+		if( point->state != WET_TOUCHDOWN ) {
+			return;
 		}
-	}
-	if( !point ) {
-		return;
+		scrollbar->touch_point_id = point->id;
+	} else {
+		for( point = NULL, i = 0; i < e->n_points; ++i ) {
+			point = &e->points[i];
+			if( point->id == scrollbar->touch_point_id ) {
+				break;
+			}
+		}
+		if( !point ) {
+			return;
+		}
 	}
 	switch( point->state ) {
 	case WET_TOUCHDOWN:
@@ -406,6 +418,7 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 		if( scrollbar->is_dragging ) {
 			ScrollBar_StartInertialScrolling( w );
 		}
+		scrollbar->touch_point_id = -1;
 		scrollbar->is_dragging = FALSE;
 		Widget_BlockEvent( layer, FALSE );
 		break;
