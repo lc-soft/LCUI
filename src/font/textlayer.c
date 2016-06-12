@@ -272,17 +272,15 @@ static void TextChar_UpdateBitmap( TextChar ch, LCUI_TextStyle *style )
 			size = ch->style->pixel_size;
 		}
 	}
-	if( !font_ids ) {
-		LCUIFont_GetBitmap( ch->char_code, -1, size, &ch->bitmap );
-		return;
-	}
-	while( font_ids[i] >= 0 ) {
-		if( 0 == LCUIFont_GetBitmap(ch->char_code,
-			style->font_ids[i], size, &ch->bitmap) ) {
-			break;
+	while( font_ids && font_ids[i] >= 0 ) {
+		int ret = LCUIFont_GetBitmap( ch->char_code, font_ids[i],
+					      size, &ch->bitmap );
+		if( ret == 0 ) {
+			return;
 		}
 		++i;
 	}
+	LCUIFont_GetBitmap( ch->char_code, -1, size, &ch->bitmap );
 }
 
 /** 新建文本图层 */

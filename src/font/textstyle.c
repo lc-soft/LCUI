@@ -91,8 +91,8 @@ void TextStyle_Destroy( LCUI_TextStyle *data )
 int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 {
 	char name[256];
-	const char *p, *style_name;
 	int count, i, *ids;
+	const char *p, *style_name;
 
 	if( ts->has_family && ts->font_ids ) {
 		free( ts->font_ids );
@@ -110,7 +110,7 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 	if( p - str == 0 ) {
 		return -1;
 	}
-	ids = (int*)malloc(sizeof(int)*(count+1));
+	ids = NEW( int, count + 1 );
 	if( !ids ) {
 		return -2;
 	}
@@ -127,7 +127,7 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 			continue;
 		}
 		name[i] = 0;
-		strtrim( name, name, NULL );
+		strtrim( name, name, "'\"\n\r\t " );
 		ids[count] = LCUIFont_GetId( name, style_name );
 		if( ids[count] > 0 ) {
 			++count;
@@ -143,7 +143,7 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 	} else {
 		ts->has_family = FALSE;
 		ts->font_ids = NULL;
-		free(ids);
+		free( ids );
 	}
 	return 0;
 }

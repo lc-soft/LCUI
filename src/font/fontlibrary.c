@@ -349,20 +349,20 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 	LCUI_RBTree *ctx;
 	LCUI_FontBitmap bmp_cache;
 
+	if( !fontlib.is_inited ) {
+		*bmp = NULL;
+		return -2;
+	}
+	if( font_id <= 0 ) {
+		if( !fontlib.default_font ) {
+			return -3;
+		}
+		font_id = fontlib.default_font->id;
+	}
 	/* 这里的 while 只是为了减少缩进 */
 	while( TRUE ) {
-		if( !fontlib.is_inited ) {
-			*bmp = NULL;
-			return -2;
-		}
 		if( !(ctx = SelectChar(ch)) ) {
 			break;
-		}
-		if( font_id <= 0 ) {
-			if( !fontlib.default_font ) {
-				return -3;
-			}
-			font_id = fontlib.default_font->id;
 		}
 		ctx = SelectFont( ctx, font_id );
 		if( !ctx ) {
@@ -376,9 +376,11 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 	}
 	FontBitmap_Init( &bmp_cache );
 	ret = FontBitmap_Load( &bmp_cache, ch, font_id, size );
-	*bmp = LCUIFont_AddBitmap( ch, font_id, size, &bmp_cache );
-	if( *bmp && ret == 0 ) {
-		return 0;
+	if( ret == 0 ) {
+		*bmp = LCUIFont_AddBitmap( ch, font_id, size, &bmp_cache );
+		if( *bmp ) {
+			return 0;
+		}
 	}
 	return -1;
 }

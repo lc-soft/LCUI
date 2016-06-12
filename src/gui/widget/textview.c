@@ -176,7 +176,6 @@ static int OnParseFontFamily( LCUI_StyleSheet ss, int key, const char *str )
 	 && ss->sheet[style_key_map[key]].string) {
 		free( ss->sheet[style_key_map[key]].string );
 	}
-	strtrim( name, str, "'\"\n\r\t " );
 	SetStyle( ss, style_key_map[key], name, string );
 	return 0;
 }
