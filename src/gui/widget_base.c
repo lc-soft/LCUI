@@ -157,6 +157,7 @@ int Widget_Unwrap( LCUI_Widget widget )
 		Widget_UpdateZIndex( child );
 		Widget_AddTaskForChildren( child, WTT_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
+		target = target->next;
 		node = prev;
 	}
 	Widget_Destroy( widget );
@@ -1393,7 +1394,8 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 	ctx.max_width = Widget_ComputeMaxWidth( w );
 	LinkedList_ForEach( node, &w->children ) {
 		child = node->data;
-		if( child->computed_style.position != SV_STATIC ) {
+		if( child->computed_style.position != SV_STATIC &&
+		    child->computed_style.position != SV_RELATIVE ) {
 			continue;
 		}
 		switch( child->computed_style.display ) {
