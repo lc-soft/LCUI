@@ -113,6 +113,7 @@ void LCUIWidget_AddButton( void )
 	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "button" );
 	wc->methods.init = Button_OnInit;
 	wc->methods.paint = Button_OnPaint;
+	wc->methods.set_text = Button_SetText;
 	wc->methods.destroy = Button_OnDestroy;
 	wc->task_handler = Button_OnTask;
 	LCUICSS_LoadString( button_css );
