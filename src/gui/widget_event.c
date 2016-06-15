@@ -60,6 +60,7 @@ typedef struct WidgetEventHandlerRec_ {
 typedef struct LCUI_WidgetEventPackRec_ {
 	void *data;			/**< 额外数据 */
 	void (*destroy_data)(void*);	/**< 数据的销毁函数 */
+	int x, y;			/**< 事件触发点的坐标，主要用于鼠标事件的传递  */
 	LCUI_Widget widget;		/**< 当前处理该事件的部件 */
 	LCUI_WidgetEventRec event;	/**< 事件数据 */
 	LCUI_BOOL is_direct_run;	/**< 是否直接处理该事件 */
@@ -165,11 +166,11 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 		}
 		return;
 	}
-	pack->event.x += w->box.border.x;
-	pack->event.y += w->box.border.y;
+	pack->x += w->box.border.x;
+	pack->y += w->box.border.y;
 	w = w->parent;
-	pack->event.x += w->padding.left;
-	pack->event.y += w->padding.top;
+	pack->x += w->padding.left;
+	pack->y += w->padding.top;
 	pack->widget = w;
 	/** 向父级部件冒泡传递事件 */
 	EventTrigger_Trigger( w->trigger, e->type, pack );
@@ -181,14 +182,15 @@ static void CopyWidgetEventPack( LCUI_WidgetEventPack dst,
 {
 	*dst = *src;
 	if( src->event.type == WET_TOUCH ) {
-		if( src->event.n_points > 0 ) {
-			int n = src->event.n_points;
+		if( src->event.touch.n_points > 0 ) {
+			int n = src->event.touch.n_points;
 			size_t size = sizeof( LCUI_TouchPointRec ) * n;
-			dst->event.points = malloc( size );
-			if( !dst->event.points ) {
+			dst->event.touch.points = malloc( size );
+			if( !dst->event.touch.points ) {
 				return;
 			}
-			memcpy( dst->event.points, src->event.points, size );
+			memcpy( dst->event.touch.points, 
+				src->event.touch.points, size );
 		}
 	}
 }
@@ -198,11 +200,11 @@ static void DestroyWidgetEventPack( void *arg )
 {
 	LCUI_WidgetEventPack pack = arg;
 	if( pack->event.type == WET_TOUCH ) {
-		if( pack->event.n_points > 0 ) {
-			free( pack->event.points );
+		if( pack->event.touch.n_points > 0 ) {
+			free( pack->event.touch.points );
 		}
-		pack->event.points = NULL;
-		pack->event.n_points = 0;
+		pack->event.touch.points = NULL;
+		pack->event.touch.n_points = 0;
 	}
 	free( pack );
 }
@@ -473,17 +475,17 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 		return -1;
 	}
 	/* 转换成相对于父级部件内容框的坐标 */
-	pack.event.x += widget->box.border.x;
-	pack.event.y += widget->box.border.y;
+	pack.x += widget->box.border.x;
+	pack.y += widget->box.border.y;
 	/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
-	w = Widget_GetNextAt( widget, pack.event.x, pack.event.y );
+	w = Widget_GetNextAt( widget, pack.x, pack.y );
 	/* 找不到就向父级部件冒泡 */
 	if( !w ) {
 		return Widget_PostEvent( widget->parent, e,
 					 data, destroy_data );
 	}
-	pack.event.x -= w->box.border.x;
-	pack.event.y -= w->box.border.y;
+	pack.x -= w->box.border.x;
+	pack.y -= w->box.border.y;
 	return EventTrigger_Trigger( w->trigger, e->type, &pack );
 }
 
@@ -597,22 +599,22 @@ static void OnMouseEvent( LCUI_SysEvent e, void *arg )
 			return;
 		}
 	}
-	Widget_GetAbsXY( target, NULL, &ebuff.x, &ebuff.y );
 	ebuff.cancel_bubble = FALSE;
-	ebuff.x = pos.x - ebuff.x;
-	ebuff.y = pos.y - ebuff.y;
-	ebuff.screen_x = pos.x;
-	ebuff.screen_y = pos.y;
 	ebuff.target = target;
-	ebuff.which = 0;
 	switch( e->type ) {
 	case LCUI_MOUSEDOWN:
 		ebuff.type = WET_MOUSEDOWN;
+		ebuff.button.x = pos.x;
+		ebuff.button.y = pos.y;
+		ebuff.button.button = e->button.button;
 		Widget_PostEvent( target, &ebuff, NULL, NULL );
 		Widget_UpdateStatus( target, WST_ACTIVE );
 		break;
 	case LCUI_MOUSEUP:
 		ebuff.type = WET_MOUSEUP;
+		ebuff.button.x = pos.x;
+		ebuff.button.y = pos.y;
+		ebuff.button.button = e->button.button;
 		Widget_PostEvent( target, &ebuff, NULL, NULL );
 		if( self.targets[WST_ACTIVE] == target ) {
 			ebuff.type = WET_CLICK;
@@ -622,11 +624,13 @@ static void OnMouseEvent( LCUI_SysEvent e, void *arg )
 		break;
 	case LCUI_MOUSEMOVE:
 		ebuff.type = WET_MOUSEMOVE;
+		ebuff.motion.x = pos.x;
+		ebuff.motion.y = pos.y;
 		Widget_PostEvent( target, &ebuff, NULL, NULL );
 		break;
 	case LCUI_MOUSEWHEEL:
 		ebuff.type = WET_MOUSEWHEEL;
-		ebuff.z_delta = e->wheel.delta;
+		ebuff.wheel.delta = e->wheel.delta;
 		Widget_PostEvent( target, &ebuff, NULL, NULL );
 	default:return;
 	}
@@ -679,7 +683,7 @@ static int DispatchTouchEvent( LinkedList *capturers, LCUI_TouchPoint points,
 	ev.type = WET_TOUCH;
 	ev.cancel_bubble = FALSE;
 	root = LCUIWidget_GetRoot();
-	ev.points = NEW( LCUI_TouchPointRec, n_points );
+	ev.touch.points = NEW( LCUI_TouchPointRec, n_points );
 	/* 先将各个触点按命中的部件进行分组 */
 	for( i = 0; i < n_points; ++i ) {
 		target = Widget_At( root, points[i].x, points[i].y );
@@ -697,28 +701,30 @@ static int DispatchTouchEvent( LinkedList *capturers, LCUI_TouchPoint points,
 		TouchCapturers_Add( capturers, target, points[i].id );
 	}
 	count = 0;
-	ev.n_points = 0;
+	ev.touch.n_points = 0;
 	/* 然后向命中的部件发送触控事件 */
 	LinkedList_ForEach( node, capturers ) {
 		TouchCapturer tc = node->data;
 		for( i = 0; i < n_points; ++i ) {
 			LinkedList_ForEach( ptnode, &tc->points ) {
+				LCUI_TouchPoint point;
 				if( points[i].id != *(int*)ptnode->data ) {
 					continue;
 				}
-				ev.points[ev.n_points] = points[i];
-				ConvertTouchPoint( &ev.points[ev.n_points] );
-				++ev.n_points;
+				point = &ev.touch.points[ev.touch.n_points];
+				*point = points[i];
+				ConvertTouchPoint( point );
+				++ev.touch.n_points;
 			}
 		}
-		if( ev.n_points == 0 ) {
+		if( ev.touch.n_points == 0 ) {
 			continue;
 		}
 		Widget_PostEvent( tc->widget, &ev, NULL, NULL );
-		ev.n_points = 0;
+		ev.touch.n_points = 0;
 		++count;
 	}
-	free( ev.points );
+	free( ev.touch.points );
 	return count;
 }
 

@@ -77,18 +77,31 @@ enum WidgetEventType {
 	WET_USER
 };
 
+/* 部件的事件数据结构和系统事件一样 */
+typedef LCUI_MouseMotionEvent LCUI_WidgetMouseMotionEvent;
+typedef LCUI_MouseButtonEvent LCUI_WidgetMouseButtonEvent;
+typedef LCUI_MouseWheelEvent LCUI_WidgetMouseWheelEvent;
+typedef LCUI_KeyboardEvent LCUI_WidgetKeyboardEvent;
+typedef LCUI_TouchEvent LCUI_WidgetTouchEvent;
+
+typedef struct LCUI_WidgetInputEvent_ {
+	wchar_t text[128];
+} LCUI_WidgetInputEvent;
+
 /** 面向部件级的事件内容结构 */
 typedef struct LCUI_WidgetEventRec_ {
-	int type;			/**< 事件类型标识号 */
-	int which;			/**< 指示按了哪个键或按钮 */
-	int x, y;			/**< 事件触发时鼠标的坐标（相对于当前部件的边框盒） */
-	int z_delta;			/**< 鼠标滚轮滚动的距离差值 */
-	int screen_x, screen_y;		/**< 事件触发时鼠标的屏幕坐标 */
-	int n_points;			/**< 触点数量 */
-	LCUI_TouchPoint points;		/**< 触点列表 */
+	uint32_t type;			/**< 事件类型标识号 */
 	void *data;			/**< 附加数据 */
 	LCUI_Widget target;		/**< 触发事件的部件 */
 	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */
+	union {
+		LCUI_WidgetMouseMotionEvent motion;
+		LCUI_WidgetMouseButtonEvent button;
+		LCUI_WidgetMouseWheelEvent wheel;
+		LCUI_WidgetKeyboardEvent key;
+		LCUI_WidgetTouchEvent touch;
+		LCUI_WidgetInputEvent input;
+	};
 } LCUI_WidgetEventRec, *LCUI_WidgetEvent;
 
 typedef void(*LCUI_WidgetEventFunc)(LCUI_Widget, LCUI_WidgetEvent, void*);
