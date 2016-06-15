@@ -279,8 +279,8 @@ static void Slider_OnMouseDown( LCUI_Widget slider,
 	}
 	scrollbar->slider_x = slider->x;
 	scrollbar->slider_y = slider->y;
-	scrollbar->mouse_x = e->screen_x;
-	scrollbar->mouse_y = e->screen_y;
+	scrollbar->mouse_x = e->motion.x;
+	scrollbar->mouse_y = e->motion.y;
 	scrollbar->is_dragging = TRUE;
 	Widget_SetMouseCapture( slider );
 	Widget_BindEvent( slider, "mousemove", Slider_OnMouseMove, w, NULL );
@@ -362,7 +362,7 @@ static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = w->private_data;
 	int pos = ScrollBar_GetPosition( w );
-	if( e->z_delta > 0 ) {
+	if( e->wheel.delta > 0 ) {
 		pos -= scrollbar->scroll_step;
 	} else {
 		pos += scrollbar->scroll_step;
@@ -377,12 +377,12 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 	LCUI_TouchPoint point;
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar;
-	if( e->n_points < 1 ) {
+	if( e->touch.n_points < 1 ) {
 		return;
 	}
 	scrollbar = w->private_data;
 	if( scrollbar->touch_point_id == -1 ) {
-		point = &e->points[0];
+		point = &e->touch.points[0];
 		/* 如果这个触点的状态不是 TOUCHDOWN，则说明是上次触控拖拽操
 		 * 作时的多余触点，直接忽略这次触控事件 */
 		if( point->state != WET_TOUCHDOWN ) {
@@ -390,8 +390,8 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 		}
 		scrollbar->touch_point_id = point->id;
 	} else {
-		for( point = NULL, i = 0; i < e->n_points; ++i ) {
-			point = &e->points[i];
+		for( point = NULL, i = 0; i < e->touch.n_points; ++i ) {
+			point = &e->touch.points[i];
 			if( point->id == scrollbar->touch_point_id ) {
 				break;
 			}
