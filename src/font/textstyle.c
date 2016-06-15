@@ -157,7 +157,7 @@ static void DestroyTag( LCUI_StyleTag *tag )
 	// XXX
 }
 
-void TagList_Clear( LinkedList *tags )
+void StyleTags_Clear( LinkedList *tags )
 {
 	LinkedList_Clear( tags, (FuncPtr)DestroyTag );
 }

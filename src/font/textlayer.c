@@ -333,14 +333,12 @@ static void TextRowList_Destroy( TextRowList list )
 }
 
 /** 销毁TextLayer */
-void TextLayer_Destroy( LCUI_TextLayer *layer_ptr )
+void TextLayer_Destroy( LCUI_TextLayer layer )
 {
-	LCUI_TextLayer layer = *layer_ptr;
 	LinkedList_Clear( &layer->dirty_rect, free );
 	Graph_Free( &layer->graph );
 	TextRowList_Destroy( &layer->rowlist );
 	free( layer );
-	*layer_ptr = NULL;
 }
 
 /** 获取指定文本行中的文本段的矩形区域 */
@@ -714,7 +712,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer,
 	/* 如果没有可用的标签栈，则使用临时的标签栈 */
 	if( !tags ) {
 		is_tmp_tag_stack = TRUE;
-		TagList_Init( &tmp_tags );
+		StyleTags_Init( &tmp_tags );
 		tags = &tmp_tags;
 	}
 	p_end = wstr + wcslen(wstr);
@@ -788,7 +786,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer,
 	}
 	/* 如果使用的是临时标签栈，则销毁它 */
 	if( is_tmp_tag_stack ) {
-		TagList_Clear( tags );
+		StyleTags_Clear( tags );
 	}
 	return 0;
 }

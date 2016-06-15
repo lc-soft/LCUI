@@ -332,7 +332,7 @@ static void TextView_OnDestroy( LCUI_Widget w )
 {
 	LCUI_TextView *txt;
 	txt = w->private_data;
-	TextLayer_Destroy( &txt->layer );
+	TextLayer_Destroy( txt->layer );
 }
 
 static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )

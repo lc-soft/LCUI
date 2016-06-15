@@ -97,11 +97,10 @@ LCUI_API int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str );
 
 /*-------------------------- StyleTag --------------------------------*/
 
-#define TagList_Init LinkedList_Init
+#define StyleTags_Init LinkedList_Init
 
-LCUI_API void TagList_Clear( LinkedList *tags );
+LCUI_API void StyleTags_Clear( LinkedList *tags );
 
-/** 获取当前的文本样式 */
 LCUI_API LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags );
 
 /** 在字符串中获取样式的结束标签，输出的是标签名 */

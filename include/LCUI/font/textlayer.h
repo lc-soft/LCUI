@@ -137,7 +137,7 @@ LCUI_API void TextLayer_SetOffset( LCUI_TextLayer layer, int offset_x, int offse
 LCUI_API LCUI_TextLayer TextLayer_New(void);
 
 /** 销毁TextLayer */
-LCUI_API void TextLayer_Destroy( LCUI_TextLayer *layer );
+LCUI_API void TextLayer_Destroy( LCUI_TextLayer layer );
 
 /** 标记指定范围内容的文本行的矩形为无效 */
 LCUI_API void TextLayer_InvalidateRowsRect( LCUI_TextLayer layer, 

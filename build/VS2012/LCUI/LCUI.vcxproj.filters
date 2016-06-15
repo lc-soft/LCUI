@@ -231,6 +231,9 @@
     <ClInclude Include="..\..\..\include\LCUI\util\time.h">
       <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textedit.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -394,6 +397,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\bmp\load_image.c">
       <Filter>源文件\bmp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\textedit.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\keyboard.c">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
