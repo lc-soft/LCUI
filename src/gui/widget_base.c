@@ -132,6 +132,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 
 int Widget_Unwrap( LCUI_Widget widget )
 {
+	int i;
 	LCUI_Widget child;
 	LinkedList *list, *list_show;
 	LinkedListNode *target, *node, *prev, *snode;
@@ -141,24 +142,36 @@ int Widget_Unwrap( LCUI_Widget widget )
 	}
 	list = &widget->parent->children;
 	list_show = &widget->parent->children_show;
+	if( widget->children.length > 0 ) {
+		node = LinkedList_GetNode( &widget->children, 0 );
+		Widget_RemoveStatus( node->data, "first-child" );
+		node = LinkedList_GetNode( &widget->children, -1 );
+		Widget_RemoveStatus( node->data, "last-child" );
+	}
 	node = Widget_GetNode( widget );
+	i = widget->children.length;
 	target = node->prev;
-	LinkedList_ForEach( node, &widget->children ) {
+	node = widget->children.tail.prev;
+	while( i-- > 0 ) {
 		prev = node->prev;
 		child = node->data;
 		snode = Widget_GetShowNode( child );
-		Widget_UpdateStatusAfterAppend( child, TRUE );
 		LinkedList_Unlink( &widget->children, node );
 		LinkedList_Unlink( &widget->children_show, snode );
 		child->parent = widget->parent;
 		LinkedList_Link( list, target, node );
 		LinkedList_AppendNode( list_show, snode );
-		Widget_UpdateStatusAfterAppend( child, FALSE );
 		Widget_UpdateZIndex( child );
 		Widget_AddTaskForChildren( child, WTT_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
-		target = target->next;
 		node = prev;
+	}
+	if( widget->index == 0 ) {
+		Widget_AddStatus( target->next->data, "first-child" );
+	}
+	if( widget->index == list->length - 1 ) {
+		node = LinkedList_GetNode( list, -1 );
+		Widget_AddStatus( node->data, "last-child" );
 	}
 	Widget_Destroy( widget );
 	return 0;
@@ -1518,6 +1531,7 @@ extern void LCUIWidget_AddTextView( void );
 extern void LCUIWidget_AddButton( void );
 extern void LCUIWidget_AddSideBar( void );
 extern void LCUIWidget_AddTScrollBar( void );
+extern void LCUIWidget_AddTextEdit( void );
 
 void LCUI_InitWidget(void)
 {
@@ -1529,6 +1543,7 @@ void LCUI_InitWidget(void)
 	LCUIWidget_AddButton();
 	LCUIWidget_AddSideBar();
 	LCUIWidget_AddTScrollBar();
+	LCUIWidget_AddTextEdit();
 	RBTree_Init( &LCUIWidget.ids );
 	RBTree_SetDataNeedFree( &LCUIWidget.ids, FALSE );
 	RBTree_OnJudge( &LCUIWidget.ids, CompareWidgetId );

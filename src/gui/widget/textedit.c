@@ -1,4 +1,4 @@
-/* ***************************************************************************
+ï»¿/* ***************************************************************************
  * textedit.c -- textedit widget, used to allow user edit text.
  *
  * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
@@ -20,21 +20,21 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * textedit.c -- ÎÄ±¾±à¼­²¿¼ş£¬ÓÃÓÚÈÃÓÃ»§±à¼­ÎÄ±¾¡£
+ * textedit.c -- æ–‡æœ¬ç¼–è¾‘éƒ¨ä»¶ï¼Œç”¨äºè®©ç”¨æˆ·ç¼–è¾‘æ–‡æœ¬ã€‚
  *
- * °æÈ¨ËùÓĞ (C) 2016 ¹éÊôÓÚ Áõ³¬ <lc-soft@live.cn>
+ * ç‰ˆæƒæ‰€æœ‰ (C) 2016 å½’å±äº åˆ˜è¶… <lc-soft@live.cn>
  *
- * Õâ¸öÎÄ¼şÊÇLCUIÏîÄ¿µÄÒ»²¿·Ö£¬²¢ÇÒÖ»¿ÉÒÔ¸ù¾İGPLv2Ğí¿ÉĞ­ÒéÀ´Ê¹ÓÃ¡¢¸ü¸ÄºÍ·¢²¼¡£
+ * è¿™ä¸ªæ–‡ä»¶æ˜¯LCUIé¡¹ç›®çš„ä¸€éƒ¨åˆ†ï¼Œå¹¶ä¸”åªå¯ä»¥æ ¹æ®GPLv2è®¸å¯åè®®æ¥ä½¿ç”¨ã€æ›´æ”¹å’Œå‘å¸ƒã€‚
  *
- * (GPLv2 ÊÇ GNUÍ¨ÓÃ¹«¹²Ğí¿ÉÖ¤µÚ¶ş°æ µÄÓ¢ÎÄËõĞ´)
+ * (GPLv2 æ˜¯ GNUé€šç”¨å…¬å…±è®¸å¯è¯ç¬¬äºŒç‰ˆ çš„è‹±æ–‡ç¼©å†™)
  *
- * ¼ÌĞøÊ¹ÓÃ¡¢ĞŞ¸Ä»ò·¢²¼±¾ÎÄ¼ş£¬±íÃ÷ÄúÒÑ¾­ÔÄ¶Á²¢ÍêÈ«Àí½âºÍ½ÓÊÜÕâ¸öĞí¿ÉĞ­Òé¡£
+ * ç»§ç»­ä½¿ç”¨ã€ä¿®æ”¹æˆ–å‘å¸ƒæœ¬æ–‡ä»¶ï¼Œè¡¨æ˜æ‚¨å·²ç»é˜…è¯»å¹¶å®Œå…¨ç†è§£å’Œæ¥å—è¿™ä¸ªè®¸å¯åè®®ã€‚
  *
- * LCUI ÏîÄ¿ÊÇ»ùÓÚÊ¹ÓÃÄ¿µÄ¶ø¼ÓÒÔÉ¢²¼µÄ£¬µ«²»¸ºÈÎºÎµ£±£ÔğÈÎ£¬ÉõÖÁÃ»ÓĞÊÊÏúĞÔ»òÌØ
- * ¶¨ÓÃÍ¾µÄÒşº¬µ£±££¬ÏêÇéÇë²ÎÕÕGPLv2Ğí¿ÉĞ­Òé¡£
+ * LCUI é¡¹ç›®æ˜¯åŸºäºä½¿ç”¨ç›®çš„è€ŒåŠ ä»¥æ•£å¸ƒçš„ï¼Œä½†ä¸è´Ÿä»»ä½•æ‹…ä¿è´£ä»»ï¼Œç”šè‡³æ²¡æœ‰é€‚é”€æ€§æˆ–ç‰¹
+ * å®šç”¨é€”çš„éšå«æ‹…ä¿ï¼Œè¯¦æƒ…è¯·å‚ç…§GPLv2è®¸å¯åè®®ã€‚
  *
- * ÄúÓ¦ÒÑÊÕµ½¸½ËæÓÚ±¾ÎÄ¼şµÄGPLv2Ğí¿ÉĞ­ÒéµÄ¸±±¾£¬ËüÍ¨³£ÔÚLICENSE.TXTÎÄ¼şÖĞ£¬Èç¹û
- * Ã»ÓĞ£¬Çë²é¿´£º<http://www.gnu.org/licenses/>.
+ * æ‚¨åº”å·²æ”¶åˆ°é™„éšäºæœ¬æ–‡ä»¶çš„GPLv2è®¸å¯åè®®çš„å‰¯æœ¬ï¼Œå®ƒé€šå¸¸åœ¨LICENSE.TXTæ–‡ä»¶ä¸­ï¼Œå¦‚æœ
+ * æ²¡æœ‰ï¼Œè¯·æŸ¥çœ‹ï¼š<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
 //#define DEBUG
@@ -58,32 +58,32 @@ enum TaskType {
 	TASK_TOTAL
 };
 
-/** ÎÄ±¾²åÈë·ûÏà¹ØÊı¾İ */
+/** æ–‡æœ¬æ’å…¥ç¬¦ç›¸å…³æ•°æ® */
 typedef struct LCUI_TextCaretRec_ {
 	int type;
-	int state;		/**< µ±Ç°×´Ì¬ */
-	int blink_time;		/**< ÉÁË¸¼ä¸ô */
-	int timer_id;		/**< ¶¨Ê±Æ÷ */
+	int state;		/**< å½“å‰çŠ¶æ€ */
+	int blink_time;		/**< é—ªçƒé—´éš” */
+	int timer_id;		/**< å®šæ—¶å™¨ */
 	LCUI_BOOL need_show;
 } LCUI_TextCaretRec, *LCUI_TextCaret;
 
 typedef struct LCUI_TextEditRec_ {
-	LCUI_TextLayer text;			/**< Êµ¼ÊÎÄ±¾ */
-	LCUI_TextLayer mask_text;		/**< ÆÁ±ÎºóµÄÎÄ±¾ */
-	LCUI_Widget scrollbar[2];		/**< Á½¸ö¹ö¶¯Ìõ */
-	LCUI_Widget caret;			/**< ÎÄ±¾²åÈë·û */
-	LCUI_BOOL read_only;			/**< ÊÇ·ñÖ»¶Á */
-	int block_size;				/**< ¿é´óĞ¡ */
-	LinkedList text_blocks;			/**< ÎÄ±¾¿é»º³åÇø */
-	LinkedList text_tags;			/**< µ±Ç°´¦ÀíµÄ±êÇ©ÁĞ±í */
-	LCUI_BOOL show_placeholder;		/**< ±íÊ¾Õ¼Î»·ûÊÇ·ñÒÑ¾­ÏÔÊ¾ */
-	wchar_t *placeholder;			/**< ÎÄ±¾¿òµÄÕ¼Î»·û */
-	wchar_t *allow_input_char;		/**< ÔÊĞíÊäÈëµÄ×Ö·û */
-	wchar_t password_char;			/**< ÆÁ±Î·ûµÄ¸±±¾ */
-	LCUI_TextStyle placeholder_style;	/**< Õ¼Î»·ûµÄÎÄ±¾ÑùÊ½ */
-	LCUI_TextStyle textstyle_bak;		/**< ÎÄ±¾¿òÄÚÎÄ±¾ÑùÊ½µÄ¸±±¾ */
-	LCUI_BOOL tasks[TASK_TOTAL];		/**< ´ı´¦ÀíµÄÈÎÎñ */
-	LCUI_Mutex mutex;			/**< »¥³âËø */
+	LCUI_TextLayer text;			/**< å®é™…æ–‡æœ¬ */
+	LCUI_TextLayer mask_text;		/**< å±è”½åçš„æ–‡æœ¬ */
+	LCUI_Widget scrollbar[2];		/**< ä¸¤ä¸ªæ»šåŠ¨æ¡ */
+	LCUI_Widget caret;			/**< æ–‡æœ¬æ’å…¥ç¬¦ */
+	LCUI_BOOL read_only;			/**< æ˜¯å¦åªè¯» */
+	int block_size;				/**< å—å¤§å° */
+	LinkedList text_blocks;			/**< æ–‡æœ¬å—ç¼“å†²åŒº */
+	LinkedList text_tags;			/**< å½“å‰å¤„ç†çš„æ ‡ç­¾åˆ—è¡¨ */
+	LCUI_BOOL show_placeholder;		/**< è¡¨ç¤ºå ä½ç¬¦æ˜¯å¦å·²ç»æ˜¾ç¤º */
+	wchar_t *placeholder;			/**< æ–‡æœ¬æ¡†çš„å ä½ç¬¦ */
+	wchar_t *allow_input_char;		/**< å…è®¸è¾“å…¥çš„å­—ç¬¦ */
+	wchar_t password_char;			/**< å±è”½ç¬¦çš„å‰¯æœ¬ */
+	LCUI_TextStyle placeholder_style;	/**< å ä½ç¬¦çš„æ–‡æœ¬æ ·å¼ */
+	LCUI_TextStyle textstyle_bak;		/**< æ–‡æœ¬æ¡†å†…æ–‡æœ¬æ ·å¼çš„å‰¯æœ¬ */
+	LCUI_BOOL tasks[TASK_TOTAL];		/**< å¾…å¤„ç†çš„ä»»åŠ¡ */
+	LCUI_Mutex mutex;			/**< äº’æ–¥é” */
 } LCUI_TextEditRec, *LCUI_TextEdit;
 
 enum TextBlockType_ {
@@ -92,11 +92,11 @@ enum TextBlockType_ {
 	TEXT_BLOCK_END
 };
 
-/** ÎÄ±¾¿éÊı¾İ½á¹¹ */
+/** æ–‡æœ¬å—æ•°æ®ç»“æ„ */
 typedef struct LCUI_TextBlockRec_ {
-	int type;			/**< ÎÄ±¾¿éÀàĞÍ */
-	int add_type;			/**< Ö¸¶¨¸ÃÎÄ±¾¿éµÄÌí¼Ó·½Ê½ */
-	wchar_t *text;			/**< ÎÄ±¾¿é(¶Î) */
+	int type;			/**< æ–‡æœ¬å—ç±»å‹ */
+	int add_type;			/**< æŒ‡å®šè¯¥æ–‡æœ¬å—çš„æ·»åŠ æ–¹å¼ */
+	wchar_t *text;			/**< æ–‡æœ¬å—(æ®µ) */
 } LCUI_TextBlockRec, *LCUI_TextBlock;
 
 /*---------------------------------- Caret ----------------------------------*/
@@ -117,6 +117,7 @@ min-width: 124px;
 min-height:14px;
 background-color: #fff;
 border: 1px solid #eee;
+padding: 4px;
 }
 );
 
@@ -174,11 +175,11 @@ static void TextCaret_OnInit( LCUI_Widget widget )
 	caret->state = CARET_HIDE;
 	caret->blink_time = 500;
 	caret->timer_id = LCUITimer_Set( caret->blink_time, 
-					 TextCaret_OnBlink, caret, TRUE );
+					 TextCaret_OnBlink, widget, TRUE );
 	LCUICSS_LoadString( textcaret_css );
 }
 
-/** ÉèÖÃÉÁË¸µÄÊ±¼ä¼ä¸ô */
+/** è®¾ç½®é—ªçƒçš„æ—¶é—´é—´éš” */
 static void TextCaret_SetBlinkTime( LCUI_Widget widget, unsigned int n_ms )
 {
 	LCUI_TextCaret caret = widget->private_data;
@@ -186,7 +187,7 @@ static void TextCaret_SetBlinkTime( LCUI_Widget widget, unsigned int n_ms )
 	LCUITimer_Reset( caret->timer_id, caret->blink_time );
 }
 
-/** Ïú»Ù²åÈë·û */
+/** é”€æ¯æ’å…¥ç¬¦ */
 static void TextCaret_OnDestroy( LCUI_Widget widget )
 {
 	LCUI_TextCaret caret = widget->private_data;
@@ -204,7 +205,7 @@ static void LCUIWidget_AddTextCaret( void )
 
 /*-------------------------------- End Caret --------------------------------*/
 
-/** ÒÆ¶¯ÎÄ±¾¿òÄÚµÄÎÄ±¾²åÈë·ûµÄĞĞÁĞ×ø±ê */
+/** ç§»åŠ¨æ–‡æœ¬æ¡†å†…çš„æ–‡æœ¬æ’å…¥ç¬¦çš„è¡Œåˆ—åæ ‡ */
 static void TextEdit_MoveCaret( LCUI_Widget widget, int row, int col )
 {
 	LCUI_Pos pos;
@@ -225,6 +226,7 @@ static void TextBlock_OnDestroy( void *arg )
 	LCUI_TextBlock blk = arg;
 	free( blk->text );
 	blk->text = NULL;
+	free( blk );
 }
 
 static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
@@ -240,24 +242,23 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 	for( i = 0; i < len; ++i ) {
 		txtblk = NEW( LCUI_TextBlockRec, 1 );
 		if( !txtblk ) {
-			return ENOMEM;
+			return -ENOMEM;
 		}
+		size = edit->block_size;
 		if( i == 0 ) {
 			txtblk->type = TEXT_BLOCK_BEGIN;
 		} else if( len - i > edit->block_size ) {
-			size = edit->block_size;
 			txtblk->type = TEXT_BLOCK_BODY;
 		} else {
 			size = len - i;
 			txtblk->type = TEXT_BLOCK_END;
 		}
-		size += 1;
 		txtblk->add_type = add_type;
 		txtblk->text = NEW( wchar_t, size );
 		if( !txtblk->text ) {
-			return ENOMEM;
+			return -ENOMEM;
 		}
-		/* Èç¹ûÎ´ÆôÓÃÑùÊ½±êÇ©¹¦ÄÜ */
+		/* å¦‚æœæœªå¯ç”¨æ ·å¼æ ‡ç­¾åŠŸèƒ½ */
 		if( !edit->text->is_using_style_tags ) {
 			for( j = 0; i < len && j < size - 1; ++j, ++i ) {
 				txtblk->text[j] = wtext[i];
@@ -267,10 +268,10 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 			LinkedList_Append( &edit->text_blocks, txtblk );
 			continue;
 		}
-		for( j = 0; i < len&&j < size - 1; ++j, ++i ) {
+		for( j = 0; i < len && j < size - 1; ++j, ++i ) {
 			wchar_t *text;
 			txtblk->text[j] = wtext[i];
-			/* ¼ì²âÊÇ·ñÓĞÑùÊ½±êÇ© */
+			/* æ£€æµ‹æ˜¯å¦æœ‰æ ·å¼æ ‡ç­¾ */
 			p = scan_style_tag( wtext + i, NULL, 0, NULL );
 			if( !p ) {
 				p = scan_style_ending_tag( wtext + i, NULL );
@@ -278,23 +279,23 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 					continue;
 				}
 			}
-			/* ¼ÆËã±êÇ©µÄ³¤¶È */
+			/* è®¡ç®—æ ‡ç­¾çš„é•¿åº¦ */
 			tag_len = p - wtext - i;
-			/* Èôµ±Ç°¿é´óĞ¡ÄÜ¹»ÈİÄÉÕâ¸ö±êÇ© */
+			/* è‹¥å½“å‰å—å¤§å°èƒ½å¤Ÿå®¹çº³è¿™ä¸ªæ ‡ç­¾ */
 			if( j + tag_len <= size - 1 ) {
 				continue;
 			}
-			/* ÖØĞÂ¼ÆËã¸ÃÎÄ±¾¿éµÄ´óĞ¡£¬²¢ÖØĞÂ·ÖÅäÄÚ´æ¿Õ¼ä */
+			/* é‡æ–°è®¡ç®—è¯¥æ–‡æœ¬å—çš„å¤§å°ï¼Œå¹¶é‡æ–°åˆ†é…å†…å­˜ç©ºé—´ */
 			size = j + tag_len + 1;
-			text = realloc( txtblk->text, sizeof(wchar_t) * size );
+			text = realloc( txtblk->text, sizeof( wchar_t ) * size );
 			if( !text ) {
-				return ENOMEM;
+				return -ENOMEM;
 			}
 			txtblk->text = text;
 		}
 		--i;
 		txtblk->text[j] = 0;
-		/* Ìí¼ÓÎÄ±¾¿éÖÁ»º³åÇø */
+		/* æ·»åŠ æ–‡æœ¬å—è‡³ç¼“å†²åŒº */
 		LinkedList_Append( &edit->text_blocks, txtblk );
 	}
 	edit->tasks[TASK_SET_TEXT] = TRUE;
@@ -302,22 +303,19 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 	return 0;
 }
 
-/** ¸üĞÂÎÄ±¾¿òÄÚµÄ×ÖÌåÎ»Í¼ */
+/** æ›´æ–°æ–‡æœ¬æ¡†å†…çš„å­—ä½“ä½å›¾ */
 static void TextEdit_ProcTextBlock( LCUI_Widget widget, LCUI_TextBlock txtblk )
 {
 	LCUI_TextEdit edit;
 	edit = widget->private_data;
-	if( edit->text_blocks.length <= 0 ) {
-		return;
-	}
 	switch( txtblk->add_type ) {
 	case TEXT_ADD_TYPE_APPEND:
-		/* ½«´ËÎÄ±¾¿é×·¼ÓÖÁÎÄ±¾Ä©Î² */
+		/* å°†æ­¤æ–‡æœ¬å—è¿½åŠ è‡³æ–‡æœ¬æœ«å°¾ */
 		TextLayer_AppendTextW( edit->text, txtblk->text, 
 				       &edit->text_tags );
 		break;
 	case TEXT_ADD_TYPE_INSERT:
-		/* ½«´ËÎÄ±¾¿é²åÈëÖÁÎÄ±¾²åÈë·ûËùÔÚ´¦ */
+		/* å°†æ­¤æ–‡æœ¬å—æ’å…¥è‡³æ–‡æœ¬æ’å…¥ç¬¦æ‰€åœ¨å¤„ */
 		TextLayer_InsertTextW( edit->text, txtblk->text, 
 				       &edit->text_tags );
 	default: break;
@@ -325,7 +323,7 @@ static void TextEdit_ProcTextBlock( LCUI_Widget widget, LCUI_TextBlock txtblk )
 }
 
 
-/** ¸üĞÂÎÄ±¾¿òµÄÎÄ±¾Í¼²ã */
+/** æ›´æ–°æ–‡æœ¬æ¡†çš„æ–‡æœ¬å›¾å±‚ */
 static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
 {
 	LinkedList rects;
@@ -335,7 +333,7 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
 
 	LinkedList_Init( &rects );
 	edit = widget->private_data;
-	/* ¸ù¾İÊÇ·ñÆôÓÃÆÁ±Î·û£¬ÅĞ¶ÏĞè¸üĞÂÄÄ¸öÎÄ±¾Í¼²ãµÄÊı¾İ */
+	/* æ ¹æ®æ˜¯å¦å¯ç”¨å±è”½ç¬¦ï¼Œåˆ¤æ–­éœ€æ›´æ–°å“ªä¸ªæ–‡æœ¬å›¾å±‚çš„æ•°æ® */
 	if( edit->password_char ) {
 		layer = edit->mask_text;
 	} else {
@@ -354,9 +352,9 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 	if( edit->tasks[TASK_SET_TEXT] ) {
 		LinkedList blocks;
 		LinkedListNode *node;
+		LinkedList_Init( &blocks );
 		LCUIMutex_Lock( &edit->mutex );
-		blocks = edit->text_blocks;
-		LinkedList_Init( &edit->text_blocks );
+		LinkedList_Concat( &blocks, &edit->text_blocks );
 		LCUIMutex_Unlock( &edit->mutex );
 		LinkedList_ForEach( node, &blocks ) {
 			TextEdit_ProcTextBlock( widget, node->data );
@@ -368,21 +366,21 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 
 /*----------------------------- End TextBlock ---------------------------------*/
 
-/** Ö¸¶¨ÎÄ±¾¿òÊÇ·ñ´¦Àí¿ØÖÆ·û */
+/** æŒ‡å®šæ–‡æœ¬æ¡†æ˜¯å¦å¤„ç†æ§åˆ¶ç¬¦ */
 void TextEdit_SetUsingStyleTags( LCUI_Widget widget, LCUI_BOOL is_true )
 {
 	LCUI_TextEdit edit = widget->private_data;
 	TextLayer_SetUsingStyleTags( edit->text, is_true );
 }
 
-/** Ö¸¶¨ÎÄ±¾¿òÊÇ·ñÆôÓÃ¶àĞĞÎÄ±¾ÏÔÊ¾ */
+/** æŒ‡å®šæ–‡æœ¬æ¡†æ˜¯å¦å¯ç”¨å¤šè¡Œæ–‡æœ¬æ˜¾ç¤º */
 void TextEdit_SetMultiline( LCUI_Widget widget, LCUI_BOOL is_true )
 {
 	LCUI_TextEdit edit = widget->private_data;
 	TextLayer_SetMultiline( edit->text, is_true );
 }
 
-/** Çå¿ÕÎÄ±¾ÄÚÈİ */
+/** æ¸…ç©ºæ–‡æœ¬å†…å®¹ */
 void TextEdit_ClearText( LCUI_Widget widget )
 {
 	LCUI_TextEdit edit;
@@ -396,7 +394,7 @@ void TextEdit_ClearText( LCUI_Widget widget )
 	Widget_Unlock( widget );
 }
 
-/** ÎªÎÄ±¾¿òÉèÖÃÎÄ±¾£¨¿í×Ö·û°æ£© */
+/** ä¸ºæ–‡æœ¬æ¡†è®¾ç½®æ–‡æœ¬ï¼ˆå®½å­—ç¬¦ç‰ˆï¼‰ */
 int TextEdit_SetTextW( LCUI_Widget widget, const wchar_t *wstr )
 {
 	TextEdit_ClearText( widget );
@@ -409,7 +407,7 @@ int TextEdit_SetText( LCUI_Widget widget, const char *utf8_str )
 	size_t len = strlen( utf8_str ) + 1;
 	wchar_t *wstr = malloc( len * sizeof( wchar_t ) );
 	if( !wstr ) {
-		return ENOMEM;
+		return -ENOMEM;
 	}
 	LCUI_DecodeString( wstr, utf8_str, len, ENCODING_UTF8 );
 	ret = TextEdit_SetTextW( widget, wstr );
@@ -417,13 +415,13 @@ int TextEdit_SetText( LCUI_Widget widget, const char *utf8_str )
 	return ret;
 }
 
-/** ÎªÎÄ±¾¿ò×·¼ÓÎÄ±¾£¨¿í×Ö·û°æ£© */
+/** ä¸ºæ–‡æœ¬æ¡†è¿½åŠ æ–‡æœ¬ï¼ˆå®½å­—ç¬¦ç‰ˆï¼‰ */
 int TextEdit_AppendTextW( LCUI_Widget widget, const wchar_t *wstr )
 {
 	return TextEdit_AddTextToBuffer( widget, wstr, TEXT_ADD_TYPE_APPEND );
 }
 
-/** ÎªÎÄ±¾¿ò²åÈëÎÄ±¾£¨¿í×Ö·û°æ£© */
+/** ä¸ºæ–‡æœ¬æ¡†æ’å…¥æ–‡æœ¬ï¼ˆå®½å­—ç¬¦ç‰ˆï¼‰ */
 int TextEdit_InsertTextW( LCUI_Widget widget, const wchar_t *wstr )
 {
 	return TextEdit_AddTextToBuffer( widget, wstr, TEXT_ADD_TYPE_INSERT );
@@ -433,7 +431,7 @@ static void TextEdit_OnFocus( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg 
 {
 	LCUI_TextEdit edit;
 	edit = widget->private_data;
-	/* Éè¶¨ÊäÈë·¨µÄÄ¿±ê */
+	/* è®¾å®šè¾“å…¥æ³•çš„ç›®æ ‡ */
 	LCUIIME_SetTarget( widget );
 	TextCaret_SetVisible( edit->caret, TRUE );
 	TextCaret_BlinkHide( edit->caret );
@@ -471,7 +469,7 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 	Widget_Unlock( widget );
 }
 
-/** ´¦Àí°´¼üÊÂ¼ş */
+/** å¤„ç†æŒ‰é”®äº‹ä»¶ */
 static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_TextEdit edit;
@@ -483,10 +481,10 @@ static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *ar
 	cols = TextLayer_GetRowTextLength( edit->text, cur_row );
 	rows = TextLayer_GetRowTotal( edit->text );
 	switch( e->key.code ) {
-	case LCUIKEY_HOMEPAGE: // home¼üÒÆ¶¯¹â±êÖÁĞĞÊ×
+	case LCUIKEY_HOMEPAGE: // homeé”®ç§»åŠ¨å…‰æ ‡è‡³è¡Œé¦–
 		cur_col = 0;
 		break;
-	case LCUIKEY_END: // end¼üÒÆ¶¯¹â±êÖÁĞĞÎ²
+	case LCUIKEY_END: // endé”®ç§»åŠ¨å…‰æ ‡è‡³è¡Œå°¾
 		cur_col = cols;
 		break;
 	case LCUIKEY_LEFT:
@@ -516,10 +514,10 @@ static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *ar
 			++cur_row;
 		}
 		break;
-	case LCUIKEY_BACKSPACE: // É¾³ı¹â±ê×ó±ßµÄ×Ö·û
+	case LCUIKEY_BACKSPACE: // åˆ é™¤å…‰æ ‡å·¦è¾¹çš„å­—ç¬¦
 		TextEdit_TextBackspace( widget, 1 );
 		break;
-	case LCUIKEY_DELETE: // É¾³ı¹â±êÓÒ±ßµÄ×Ö·û
+	case LCUIKEY_DELETE: // åˆ é™¤å…‰æ ‡å³è¾¹çš„å­—ç¬¦
 		TextEdit_TextDelete( widget, 1 );
 		break;
 	default:break;
@@ -527,7 +525,7 @@ static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *ar
 	TextEdit_MoveCaret( widget, cur_row, cur_col );
 }
 
-/** ´¦ÀíÊäÈë·¨¶ÔÎÄ±¾¿òÊäÈëµÄÄÚÈİ */
+/** å¤„ç†è¾“å…¥æ³•å¯¹æ–‡æœ¬æ¡†è¾“å…¥çš„å†…å®¹ */
 static void TextEdit_OnInput( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
 {
 	uint_t i;
@@ -537,26 +535,26 @@ static void TextEdit_OnInput( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg 
 	ptr = e->input.text;
 	edit = widget->private_data;
 	ptr_last = ptr + sizeof( e->input.text ) / sizeof( wchar_t );
-	/* Èç¹ûÎÄ±¾¿òÊÇÖ»¶ÁµÄ */
+	/* å¦‚æœæ–‡æœ¬æ¡†æ˜¯åªè¯»çš„ */
 	if( edit->read_only ) {
 		return;
 	}
 	for( ; ptr < ptr_last && *ptr != '\0'; ++ptr ) {
 		if( edit->allow_input_char ) {
-			/* ÅĞ¶Ïµ±Ç°×Ö·ûÊÇ·ñÎªÏŞÖÆ·¶Î§ÄÚµÄ×Ö·û */
+			/* åˆ¤æ–­å½“å‰å­—ç¬¦æ˜¯å¦ä¸ºé™åˆ¶èŒƒå›´å†…çš„å­—ç¬¦ */
 			for( i = 0; i < edit->allow_input_char[i]; ++i ) {
 				if( edit->allow_input_char[i] == *ptr ) {
 					break;
 				}
 			}
-			/* Èç¹ûÒÑÌáÇ°½áÊøÑ­»·£¬Ôò±íÃ÷µ±Ç°×Ö·ûÊÇÔÊĞíµÄ */
+			/* å¦‚æœå·²æå‰ç»“æŸå¾ªç¯ï¼Œåˆ™è¡¨æ˜å½“å‰å­—ç¬¦æ˜¯å…è®¸çš„ */
 			if( edit->allow_input_char[i] ) {
 				continue;
 			}
 		} else {
 			continue;
 		}
-		/* ·ñÔò²»ÊÇÔÊĞíµÄ×Ö·û£¬ĞèÒÆ³ı¸Ã×Ö·û */
+		/* å¦åˆ™ä¸æ˜¯å…è®¸çš„å­—ç¬¦ï¼Œéœ€ç§»é™¤è¯¥å­—ç¬¦ */
 		tmp_ptr = ptr;
 		while( tmp_ptr < ptr_last && *tmp_ptr != '\0' ) {
 			*tmp_ptr = *(tmp_ptr + 1);
@@ -577,16 +575,18 @@ static void TextEdit_OnInit( LCUI_Widget widget )
 	edit->mask_text = TextLayer_New();
 	edit->block_size = TEXT_BLOCK_SIZE;
 	edit->caret = LCUIWidget_New( "textcaret" );
-	TextLayer_SetUsingStyleTags( edit->text, FALSE );
-	TextEdit_SetMultiline( widget, FALSE );
 	LinkedList_Init( &edit->text_blocks );
-	Widget_Append( widget, edit->caret );
+	StyleTags_Init( &edit->text_tags );
+	TextEdit_SetMultiline( widget, FALSE );
 	TextLayer_SetAutoWrap( edit->text, TRUE );
 	TextLayer_SetAutoWrap( edit->mask_text, TRUE );
+	TextLayer_SetUsingStyleTags( edit->text, FALSE );
 	Widget_BindEvent( widget, "keydown", TextEdit_OnKeyDown, NULL, NULL );
 	Widget_BindEvent( widget, "input", TextEdit_OnInput, NULL, NULL );
 	Widget_BindEvent( widget, "focus", TextEdit_OnFocus, NULL, NULL );
 	Widget_BindEvent( widget, "blur", TextEdit_OnBlur, NULL, NULL );
+	Widget_Append( widget, edit->caret );
+	Widget_Hide( edit->caret );
 	LCUIMutex_Init( &edit->mutex );
 }
 
@@ -646,7 +646,7 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 }
 
 
-/** Ìí¼Ó TextEdit ²¿¼şÀàĞÍ */
+/** æ·»åŠ  TextEdit éƒ¨ä»¶ç±»å‹ */
 void LCUIWidget_AddTextEdit( void )
 {
 	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "textedit" );

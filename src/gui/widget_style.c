@@ -1082,7 +1082,7 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 	int i, key;
 	LCUI_Style s;
 	LCUI_WidgetClass *wc;
-	LCUI_BOOL need_update_expend_style;
+	LCUI_BOOL need_update_expend_style = FALSE;
 	typedef struct {
 		int start, end, task;
 		LCUI_BOOL is_valid;
