@@ -516,6 +516,7 @@ static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
 {
 	LCUI_Style style;
 	int key = key_box_shadow_start + 1;
+	memset( bsd, 0, sizeof( *bsd ) );
 	for( ; key < key_box_shadow_end; ++key ) {
 		style = &ss->sheet[key];
 		if( !style->is_valid ) {
