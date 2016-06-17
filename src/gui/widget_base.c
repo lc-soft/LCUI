@@ -189,6 +189,7 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->inherited_style = StyleSheet();
 	widget->computed_style.opacity = 1.0;
 	widget->computed_style.visible = TRUE;
+	widget->computed_style.focusable = TRUE;
 	widget->computed_style.display = SV_BLOCK;
 	widget->computed_style.position = SV_STATIC;
 	widget->computed_style.pointer_events = SV_AUTO;
@@ -1094,8 +1095,15 @@ void Widget_UpdateSize( LCUI_Widget w )
 
 void Widget_UpdateProps( LCUI_Widget w )
 {
+	LCUI_Style s;
 	int prop = ComputeStyleOption( w, key_pointer_events, SV_AUTO );
 	w->computed_style.pointer_events = prop;
+	s = &w->style->sheet[key_focusable];
+	if( s->is_valid && s->type == SVT_VALUE && s->value == 0 ) {
+		w->computed_style.focusable = FALSE;
+	} else {
+		w->computed_style.focusable = TRUE;
+	}
 }
 
 /** 设置内边距 */

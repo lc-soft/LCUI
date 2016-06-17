@@ -69,6 +69,7 @@ typedef struct LCUI_WidgetEventPackRec_ {
 enum WidgetStatusType {
 	WST_HOVER,
 	WST_ACTIVE,
+	WST_FOCUS,
 	WST_TOTAL
 };
 
@@ -578,11 +579,11 @@ void LCUIWidget_ClearEventTarget( LCUI_Widget widget )
 }
 
 /** 响应系统的鼠标移动事件，向目标部件投递相关鼠标事件 */
-static void OnMouseEvent( LCUI_SysEvent e, void *arg )
+static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 {
 	LCUI_Pos pos;
 	LCUI_Widget target, w;
-	LCUI_WidgetEventRec ebuff;
+	LCUI_WidgetEventRec ev;
 	w = LCUIWidget_GetRoot();
 	LCUICursor_GetPos( &pos );
 	if( self.mouse_capturer ) {
@@ -599,39 +600,62 @@ static void OnMouseEvent( LCUI_SysEvent e, void *arg )
 			return;
 		}
 	}
-	ebuff.cancel_bubble = FALSE;
-	ebuff.target = target;
-	switch( e->type ) {
+	ev.cancel_bubble = FALSE;
+	ev.target = target;
+	switch( sys_ev->type ) {
 	case LCUI_MOUSEDOWN:
-		ebuff.type = WET_MOUSEDOWN;
-		ebuff.button.x = pos.x;
-		ebuff.button.y = pos.y;
-		ebuff.button.button = e->button.button;
-		Widget_PostEvent( target, &ebuff, NULL, NULL );
+		ev.type = WET_MOUSEDOWN;
+		ev.button.x = pos.x;
+		ev.button.y = pos.y;
+		ev.button.button = sys_ev->button.button;
+		Widget_PostEvent( target, &ev, NULL, NULL );
 		Widget_UpdateStatus( target, WST_ACTIVE );
+		/* 开始处理焦点 */
+		for( w = target; w; w = w->parent ) {
+			if( w->computed_style.focusable ) {
+				break;
+			}
+		}
+		if( self.targets[WST_FOCUS] == w ) {
+			break;
+		}
+		if( self.targets[WST_FOCUS] ) {
+			ev.type = WET_BLUR;
+			ev.target = self.targets[WST_FOCUS];
+			Widget_RemoveStatus( ev.target, "focus" );
+			Widget_PostEvent( ev.target, &ev, NULL, NULL );
+		}
+		if( !w->computed_style.focusable ) {
+			break;
+		}
+		ev.target = w;
+		ev.type = WET_FOCUS;
+		self.targets[WST_FOCUS] = w;
+		Widget_AddStatus( ev.target, "focus" );
+		Widget_PostEvent( ev.target, &ev, NULL, NULL );
 		break;
 	case LCUI_MOUSEUP:
-		ebuff.type = WET_MOUSEUP;
-		ebuff.button.x = pos.x;
-		ebuff.button.y = pos.y;
-		ebuff.button.button = e->button.button;
-		Widget_PostEvent( target, &ebuff, NULL, NULL );
+		ev.type = WET_MOUSEUP;
+		ev.button.x = pos.x;
+		ev.button.y = pos.y;
+		ev.button.button = sys_ev->button.button;
+		Widget_PostEvent( target, &ev, NULL, NULL );
 		if( self.targets[WST_ACTIVE] == target ) {
-			ebuff.type = WET_CLICK;
-			Widget_PostEvent( target, &ebuff, NULL, NULL );
+			ev.type = WET_CLICK;
+			Widget_PostEvent( target, &ev, NULL, NULL );
 		}
 		Widget_UpdateStatus( NULL, WST_ACTIVE );
 		break;
 	case LCUI_MOUSEMOVE:
-		ebuff.type = WET_MOUSEMOVE;
-		ebuff.motion.x = pos.x;
-		ebuff.motion.y = pos.y;
-		Widget_PostEvent( target, &ebuff, NULL, NULL );
+		ev.type = WET_MOUSEMOVE;
+		ev.motion.x = pos.x;
+		ev.motion.y = pos.y;
+		Widget_PostEvent( target, &ev, NULL, NULL );
 		break;
 	case LCUI_MOUSEWHEEL:
-		ebuff.type = WET_MOUSEWHEEL;
-		ebuff.wheel.delta = e->wheel.delta;
-		Widget_PostEvent( target, &ebuff, NULL, NULL );
+		ev.type = WET_MOUSEWHEEL;
+		ev.wheel.delta = sys_ev->wheel.delta;
+		Widget_PostEvent( target, &ev, NULL, NULL );
 	default:return;
 	}
 	Widget_UpdateStatus( target, WST_HOVER );
@@ -672,8 +696,8 @@ static void ConvertTouchPoint( LCUI_TouchPoint point )
 }
 
 /** 分发触控事件给对应的部件 */
-static int DispatchTouchEvent( LinkedList *capturers, LCUI_TouchPoint points, 
-			       int n_points )
+static int DispatchTouchEvent( LinkedList *capturers, 
+			       LCUI_TouchPoint points, int n_points )
 {
 	int i, count;
 	LCUI_WidgetEventRec ev;
@@ -891,6 +915,7 @@ void LCUIWidget_InitEvent(void)
 	RBTree_Init( &self.event_records );
 	self.targets[WST_ACTIVE] = NULL;
 	self.targets[WST_HOVER] = NULL;
+	self.targets[WST_FOCUS] = NULL;
 	self.mouse_capturer = NULL;
 	self.base_event_id = WET_USER + 1000;
 	self.event_ids = Dict_Create( &DictType_String, NULL );

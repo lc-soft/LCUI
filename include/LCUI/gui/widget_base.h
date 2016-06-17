@@ -50,6 +50,7 @@ typedef struct LCUI_WidgetBase* LCUI_Widget;
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
+	LCUI_BOOL focusable;		/**< 是否能够得到焦点 */
 	int left, top;			/**< 左边界、顶边界的偏移距离 */
 	int right, bottom;		/**< 右边界、底边界的偏移距离 */
 	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
@@ -141,6 +142,7 @@ enum LCUI_StyleKeyName {
 	key_box_shadow_color,
 	key_box_shadow_end,
 	key_pointer_events,
+	key_focusable,
 	STYLE_KEY_TOTAL
 };
 

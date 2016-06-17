@@ -191,6 +191,29 @@ static int OnParseNumber( LCUI_StyleSheet ss, int key, const char *str )
 	return -1;
 }
 
+static int OnParseBoolean( LCUI_StyleSheet ss, int key, const char *str )
+{
+	LCUI_Style s = &ss->sheet[key];
+	if( strcasecmp(str, "true") == 0 ) {
+		s->is_valid = TRUE;
+		s->type = SVT_VALUE;
+		s->value = 1;
+		return 0;
+	} else if( strcasecmp(str, "false") == 0 ) {
+		s->is_valid = TRUE;
+		s->type = SVT_VALUE;
+		s->value = 0;
+		return 0;
+	}
+	if( strcmp("auto", str) == 0 ) {
+		s->is_valid = TRUE;
+		s->type = SVT_AUTO;
+		s->style = SV_AUTO;
+		return 0;
+	}
+	return -1;
+}
+
 static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style s = &ss->sheet[key];
@@ -635,6 +658,7 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ key_margin_right, NULL, OnParseNumber },
 	{ key_margin_bottom, NULL, OnParseNumber },
 	{ key_margin_left, NULL, OnParseNumber },
+	{ key_focusable, NULL, OnParseBoolean },
 	{ key_pointer_events, NULL, OnParseStyleOption },
 	{ key_box_sizing, NULL, OnParseStyleOption },
 	{ -1, "border", OnParseBorder },
