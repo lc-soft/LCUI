@@ -286,11 +286,11 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LinkedListNode *node;
 	LCUI_Size new_size = {16, 16};
 	LCUI_TextView *txt = w->private_data;
-	if( w->box.content.width > new_size.w ) {
-		new_size.w = w->box.content.width;
+	if( w->box.content.width > new_size.width ) {
+		new_size.width = w->box.content.width;
 	}
-	if( w->box.content.height > new_size.h ) {
-		new_size.h = w->box.content.height;
+	if( w->box.content.height > new_size.height ) {
+		new_size.height = w->box.content.height;
 	}
 	LinkedList_Init( &rects );
 	if( w->style->sheet[key_width].is_valid && 

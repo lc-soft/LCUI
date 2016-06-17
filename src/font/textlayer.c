@@ -892,15 +892,15 @@ LCUI_Graph* TextLayer_GetGraphBuffer( LCUI_TextLayer layer )
 }
 
 /** 设置最大尺寸 */
-int TextLayer_SetMaxSize( LCUI_TextLayer layer, LCUI_Size new_size )
+int TextLayer_SetMaxSize( LCUI_TextLayer layer, LCUI_Size size )
 {
-	if( new_size.w <= 0 || new_size.h <= 0 ) {
+	if( size.width <= 0 || size.height <= 0 ) {
 		return -1;
 	}
-	layer->max_width = new_size.w;
-	layer->max_height = new_size.h;
+	layer->max_width = size.width;
+	layer->max_height = size.height;
 	if( layer->is_using_buffer ) {
-		Graph_Create( &layer->graph, new_size.w, new_size.h );
+		Graph_Create( &layer->graph, size.width, size.height );
 	}
 	layer->task.redraw_all = TRUE;
 	if( layer->is_autowrap_mode ) {

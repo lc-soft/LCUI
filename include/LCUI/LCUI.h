@@ -101,25 +101,8 @@ typedef struct LCUI_Pos_ {
 } LCUI_Pos;
 
 typedef struct LCUI_Size_ {
-	union {
-		int w;
-		int width;
-	};
-	union {
-		int h;
-		int height;
-	};
+	int width, height;
 } LCUI_Size;
-
-typedef struct LCUI_String_ {
-	char   *string;
-	uint_t length;
-} LCUI_String;
-
-typedef struct LCUI_WString_ {
-	wchar_t *string;
-	uint_t length;
-} LCUI_WString;
 
 typedef struct LCUI_Rect_ {
 	union { int x, left; };
