@@ -42,6 +42,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
+#include <LCUI/ime.h>
 #include <LCUI/cursor.h>
 #include <LCUI/thread.h>
 
@@ -60,7 +61,6 @@ typedef struct WidgetEventHandlerRec_ {
 typedef struct LCUI_WidgetEventPackRec_ {
 	void *data;			/**< 额外数据 */
 	void (*destroy_data)(void*);	/**< 数据的销毁函数 */
-	int x, y;			/**< 事件触发点的坐标，主要用于鼠标事件的传递  */
 	LCUI_Widget widget;		/**< 当前处理该事件的部件 */
 	LCUI_WidgetEventRec event;	/**< 事件数据 */
 	LCUI_BOOL is_direct_run;	/**< 是否直接处理该事件 */
@@ -167,11 +167,7 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 		}
 		return;
 	}
-	pack->x += w->box.border.x;
-	pack->y += w->box.border.y;
 	w = w->parent;
-	pack->x += w->padding.left;
-	pack->y += w->padding.top;
 	pack->widget = w;
 	/** 向父级部件冒泡传递事件 */
 	EventTrigger_Trigger( w->trigger, e->type, pack );
@@ -181,18 +177,36 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 static void CopyWidgetEventPack( LCUI_WidgetEventPack dst,
 				 const LCUI_WidgetEventPack src )
 {
+	int n;
+	size_t size;
+	LCUI_WidgetEvent e;
+
 	*dst = *src;
-	if( src->event.type == WET_TOUCH ) {
-		if( src->event.touch.n_points > 0 ) {
-			int n = src->event.touch.n_points;
-			size_t size = sizeof( LCUI_TouchPointRec ) * n;
-			dst->event.touch.points = malloc( size );
-			if( !dst->event.touch.points ) {
-				return;
-			}
-			memcpy( dst->event.touch.points, 
-				src->event.touch.points, size );
+	e = &dst->event;
+	switch( src->event.type ) {
+	case WET_TOUCH:
+		if( e->touch.n_points <= 0 ) {
+			break;
 		}
+		n = e->touch.n_points;
+		size = sizeof( LCUI_TouchPointRec ) * n;
+		e->touch.points = malloc( size );
+		if( !e->touch.points ) {
+			return;
+		}
+		memcpy( e->touch.points,
+			src->event.touch.points, size );
+		break;
+	case WET_TEXTINPUT:
+		if( !e->text.text ) {
+			return;
+		}
+		e->text.text = NEW( wchar_t, e->text.length + 1 );
+		if( !e->text.text ) {
+			return;
+		}
+		wcsncpy( e->text.text, e->text.text, e->text.length + 1 );
+	default:break;
 	}
 }
 
@@ -200,12 +214,22 @@ static void CopyWidgetEventPack( LCUI_WidgetEventPack dst,
 static void DestroyWidgetEventPack( void *arg )
 {
 	LCUI_WidgetEventPack pack = arg;
-	if( pack->event.type == WET_TOUCH ) {
-		if( pack->event.touch.n_points > 0 ) {
-			free( pack->event.touch.points );
+	LCUI_WidgetEvent e = &pack->event;
+	switch( e->type ) {
+	case WET_TOUCH:
+		if( e->touch.points ) {
+			free( e->touch.points );
 		}
-		pack->event.touch.points = NULL;
-		pack->event.touch.n_points = 0;
+		e->touch.points = NULL;
+		e->touch.n_points = 0;
+		break;
+	case WET_TEXTINPUT:
+		if( e->text.text ) {
+			free( e->text.text );
+		}
+		e->text.text = NULL;
+		e->text.length = 0;
+		break;
 	}
 	free( pack );
 }
@@ -443,9 +467,10 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 				  void *data, void (*destroy_data)(void*),
 				  LCUI_BOOL direct_run )
 {
-	int ret;
 	LCUI_Widget w;
+	LCUI_BOOL is_pointer_event;
 	LCUI_WidgetEventPackRec pack;
+	int ret, pointer_x, pointer_y;
 	pack.event = *e;
 	pack.data = data;
 	pack.widget = widget;
@@ -454,8 +479,8 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 	switch( e->type ) {
 	case WET_CLICK:
 	case WET_MOUSEDOWN:
-	case WET_MOUSEMOVE:
 	case WET_MOUSEUP:
+	case WET_MOUSEMOVE:
 	case WET_MOUSEOVER:
 	case WET_MOUSEOUT:
 		if( widget->computed_style.pointer_events == SV_NONE ) {
@@ -475,19 +500,38 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 	if( !widget->parent || e->cancel_bubble ) {
 		return -1;
 	}
-	/* 转换成相对于父级部件内容框的坐标 */
-	pack.x += widget->box.border.x;
-	pack.y += widget->box.border.y;
-	/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
-	w = Widget_GetNextAt( widget, pack.x, pack.y );
-	/* 找不到就向父级部件冒泡 */
-	if( !w ) {
-		return Widget_PostEvent( widget->parent, e,
-					 data, destroy_data );
+	is_pointer_event = TRUE;
+	switch( e->type ) {
+	case WET_CLICK:
+	case WET_MOUSEDOWN:
+	case WET_MOUSEUP:
+		pointer_x = e->button.x;
+		pointer_y = e->button.y;
+		break;
+	case WET_MOUSEMOVE:
+	case WET_MOUSEOVER:
+	case WET_MOUSEOUT:
+		pointer_x = e->motion.x;
+		pointer_y = e->motion.y;
+		break;
+	default: 
+		is_pointer_event = FALSE;
+		break;
 	}
-	pack.x -= w->box.border.x;
-	pack.y -= w->box.border.y;
-	return EventTrigger_Trigger( w->trigger, e->type, &pack );
+	if( is_pointer_event ) {
+		int x, y;
+		Widget_GetAbsXY( widget->parent, NULL, &x, &y );
+		/* 转换成相对于父级部件内容框的坐标 */
+		x = pointer_x - x;
+		y = pointer_y - y;
+		/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
+		w = Widget_GetNextAt( widget, x, y );
+		if( w ) {
+			return EventTrigger_Trigger( w->trigger, 
+						     e->type, &pack );
+		}
+	}
+	return Widget_PostEvent( widget->parent, e, data, destroy_data );
 }
 
 int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data,
@@ -612,7 +656,8 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		Widget_UpdateStatus( target, WST_ACTIVE );
 		/* 开始处理焦点 */
 		for( w = target; w; w = w->parent ) {
-			if( w->computed_style.focusable ) {
+			if( w->computed_style.pointer_events != SV_NONE &&
+			    w->computed_style.focusable ) {
 				break;
 			}
 		}
@@ -661,28 +706,43 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 	Widget_UpdateStatus( target, WST_HOVER );
 }
 
-/** 响应按键的按下 */
-static void OnKeyDown( LCUI_SysEvent e, void *arg )
+static void OnKeyboardEvent( LCUI_SysEvent e, void *arg )
 {
-
-}
-
-/** 响应按键的释放 */
-static void OnKeyUp( LCUI_SysEvent e, void *arg )
-{
-
-}
-
-/** 响应按键的输入 */
-static void OnKeyPress( LCUI_SysEvent e, void *arg )
-{
-
+	LCUI_WidgetEventRec ev;
+	if( !self.targets[WST_FOCUS] ) {
+		return;
+	}
+	switch( e->type ) {
+	case LCUI_KEYDOWN: ev.type = WET_KEYDOWN; break;
+	case LCUI_KEYUP: ev.type = WET_KEYUP; break;
+	case LCUI_KEYPRESS: ev.type = WET_KEYPRESS; break;
+	default: return;
+	}
+	ev.target = self.targets[WST_FOCUS];
+	ev.key.code = e->key.code;
+	Widget_TriggerEvent( ev.target, &ev, NULL );
 }
 
 /** 响应输入法的输入 */
-static void OnInput( LCUI_SysEvent e, void *arg )
+static void OnTextInput( LCUI_SysEvent e, void *arg )
 {
-
+	LCUI_WidgetEventRec ev;
+	LCUI_Widget target = LCUIIME_GetTarget();
+	if( !target ) {
+		return;
+	}
+	ev.target = target;
+	ev.type = WET_TEXTINPUT;
+	ev.text.length = e->text.length;
+	ev.text.text = NEW( wchar_t, e->text.length + 1 );
+	if( !ev.text.text ) {
+		return;
+	}
+	wcsncpy( ev.text.text, e->text.text, e->text.length + 1 );
+	Widget_TriggerEvent( ev.target, &ev, NULL );
+	free( ev.text.text );
+	ev.text.text = NULL;
+	ev.text.length = 0;
 }
 
 static void ConvertTouchPoint( LCUI_TouchPoint point )
@@ -897,7 +957,11 @@ void LCUIWidget_InitEvent(void)
 		{ WET_CLICK, "click" },
 		{ WET_MOUSEOUT, "mouseout" },
 		{ WET_MOUSEOVER, "mouseover" },
+		{ WET_KEYDOWN, "keydown" },
+		{ WET_KEYUP, "keyup" },
+		{ WET_KEYPRESS, "keypress" },
 		{ WET_TOUCH, "touch" },
+		{ WET_TEXTINPUT, "textinput" },
 		{ WET_TOUCHDOWN, "touchdown" },
 		{ WET_TOUCHMOVE, "touchmove" },
 		{ WET_TOUCHUP, "touchup" },
@@ -927,11 +991,11 @@ void LCUIWidget_InitEvent(void)
 	LCUI_BindEvent( LCUI_MOUSEDOWN, OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( LCUI_MOUSEMOVE, OnMouseEvent, NULL, NULL );
 	LCUI_BindEvent( LCUI_MOUSEUP, OnMouseEvent, NULL, NULL );
-	LCUI_BindEvent( LCUI_KEYPRESS, OnKeyPress, NULL, NULL );
-	LCUI_BindEvent( LCUI_KEYDOWN, OnKeyDown, NULL, NULL );
+	LCUI_BindEvent( LCUI_KEYPRESS, OnKeyboardEvent, NULL, NULL );
+	LCUI_BindEvent( LCUI_KEYDOWN, OnKeyboardEvent, NULL, NULL );
+	LCUI_BindEvent( LCUI_KEYUP, OnKeyboardEvent, NULL, NULL );
 	LCUI_BindEvent( LCUI_TOUCH, OnTouch, NULL, NULL );
-	LCUI_BindEvent( LCUI_INPUT, OnInput, NULL, NULL );
-	LCUI_BindEvent( LCUI_KEYUP, OnKeyUp, NULL, NULL );
+	LCUI_BindEvent( LCUI_TEXTINPUT, OnTextInput, NULL, NULL );
 	RBTree_OnJudge( &self.event_records, CompareEventRecord );
 	LinkedList_Init( &self.touch_capturers );
 }

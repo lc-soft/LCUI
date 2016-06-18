@@ -58,7 +58,7 @@ enum WidgetEventType {
 	WET_KEYDOWN,
 	WET_KEYUP,
 	WET_KEYPRESS,
-	WET_INPUT,
+	WET_TEXTINPUT,
 
 	WET_MOUSEOVER,
 	WET_MOUSEMOVE,
@@ -81,12 +81,9 @@ enum WidgetEventType {
 typedef LCUI_MouseMotionEvent LCUI_WidgetMouseMotionEvent;
 typedef LCUI_MouseButtonEvent LCUI_WidgetMouseButtonEvent;
 typedef LCUI_MouseWheelEvent LCUI_WidgetMouseWheelEvent;
+typedef LCUI_TextInputEvent LCUI_WidgetTextInputEvent;
 typedef LCUI_KeyboardEvent LCUI_WidgetKeyboardEvent;
 typedef LCUI_TouchEvent LCUI_WidgetTouchEvent;
-
-typedef struct LCUI_WidgetInputEvent_ {
-	wchar_t text[128];
-} LCUI_WidgetInputEvent;
 
 /** 面向部件级的事件内容结构 */
 typedef struct LCUI_WidgetEventRec_ {
@@ -100,7 +97,7 @@ typedef struct LCUI_WidgetEventRec_ {
 		LCUI_WidgetMouseWheelEvent wheel;
 		LCUI_WidgetKeyboardEvent key;
 		LCUI_WidgetTouchEvent touch;
-		LCUI_WidgetInputEvent input;
+		LCUI_WidgetTextInputEvent text;
 	};
 } LCUI_WidgetEventRec, *LCUI_WidgetEvent;
 

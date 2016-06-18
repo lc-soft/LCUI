@@ -67,10 +67,13 @@ LCUI_API void LCUIIME_Switch( void );
 LCUI_API LCUI_BOOL LCUIIME_ProcessKey( LCUI_SysEvent e );
 
 /** 提交输入法输入的内容至目标 */
-LCUI_API int LCUIIME_Commit( const wchar_t *str );
+LCUI_API int LCUIIME_Commit( const wchar_t *str, int length );
 
 /** 设置输入法的目标 */
 LCUI_API int LCUIIME_SetTarget( LCUI_Widget widget );
+
+/** 获取输入法的目标 */
+LCUI_API LCUI_Widget LCUIIME_GetTarget( void );
 
 /** 清除输入法的目标 */
 LCUI_API int LCUIIME_ClearTarget( void );

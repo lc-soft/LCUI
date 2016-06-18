@@ -48,6 +48,7 @@
 #include <LCUI/font.h>
 #include <LCUI/input.h>
 #include <LCUI/display.h>
+#include <LCUI/ime.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
 #include LCUI_MOUSE_H
@@ -177,12 +178,21 @@ int LCUI_TriggerEvent( LCUI_SysEvent e, void *arg )
 
 void LCUI_DestroyEvent( LCUI_SysEvent e )
 {
-	if( e->type == LCUI_TOUCH ) {
-		if( e->touch.n_points > 0 && e->touch.points ) {
+	switch( e->type ) {
+	case LCUI_TOUCH:
+		if( e->touch.points ) {
 			free( e->touch.points );
-			e->touch.points = NULL;
-			e->touch.n_points = 0;
 		}
+		e->touch.points = NULL;
+		e->touch.n_points = 0;
+		break;
+	case LCUI_TEXTINPUT:
+		if( e->text.text ) {
+			free( e->text.text );
+		}
+		e->text.text = NULL;
+		e->text.length = 0;
+		break;
 	}
 	e->type = LCUI_NONE;
 }
@@ -431,6 +441,7 @@ int LCUI_Init(void)
 	LCUI_InitTimer();
 	LCUI_InitMouseDriver();
 	LCUI_InitKeyboardDriver();
+	LCUI_InitIME();
 	LCUI_InitWidget();
 	LCUI_InitDisplay();
 	LCUI_InitCursor();
@@ -444,6 +455,7 @@ static int LCUI_Destroy( void )
 	e.type = LCUI_QUIT;
 	LCUI_TriggerEvent( &e, NULL );
 	System.state = STATE_KILLED;
+	LCUI_ExitIME();
 	LCUI_ExitEvent();
 	LCUI_ExitCursor();
 	LCUI_ExitWidget();

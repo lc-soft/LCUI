@@ -111,30 +111,10 @@ int LCUIIME_Register( const char *name, LCUI_IMEHandler handler )
 	self.id_count += 1;
 	ime->id = self.id_count;
 	ime->node.data = ime;
-	memcpy( &ime->handler, handler, sizeof(LCUI_IMEHandler) );
+	strncpy( ime->name, name, len );
+	memcpy( &ime->handler, handler, sizeof(LCUI_IMEHandlerRec) );
 	LinkedList_AppendNode( &self.list, &ime->node );
 	return ime->id;
-}
-
-/* 选定输入法 */
-LCUI_BOOL LCUIIME_Select( int ime_id )
-{
-	LCUI_IME ime = LCUIIME_Find( ime_id );
-	if( ime ) {
-		self.ime = ime;
-		return TRUE;
-	}
-	return FALSE;
-}
-
-LCUI_BOOL LCUIIME_SelectByName( const char *name )
-{
-	LCUI_IME ime = LCUIIME_FindByName( name );
-	if( ime ) {
-		self.ime = ime;
-		return TRUE;
-	}
-	return FALSE;
 }
 
 /* 打开输入法 */
@@ -151,6 +131,31 @@ static LCUI_BOOL LCUIIME_Close( LCUI_IME ime )
 {
 	if( ime && ime->handler.close ) {
 		return ime->handler.open();
+	}
+	return FALSE;
+}
+
+/* 选定输入法 */
+LCUI_BOOL LCUIIME_Select( int ime_id )
+{
+	LCUI_IME ime = LCUIIME_Find( ime_id );
+	if( ime ) {
+		LCUIIME_Close( self.ime );
+		self.ime = ime;
+		LCUIIME_Open( self.ime );
+		return TRUE;
+	}
+	return FALSE;
+}
+
+LCUI_BOOL LCUIIME_SelectByName( const char *name )
+{
+	LCUI_IME ime = LCUIIME_FindByName( name );
+	if( ime ) {
+		LCUIIME_Close( self.ime );
+		self.ime = ime;
+		LCUIIME_Open( self.ime );
+		return TRUE;
 	}
 	return FALSE;
 }
@@ -267,20 +272,24 @@ LCUI_BOOL LCUIIME_ProcessKey( LCUI_SysEvent e )
 	return FALSE;
 }
 
-int LCUIIME_Commit( const wchar_t *str )
+int LCUIIME_Commit( const wchar_t *str, int length )
 {
-	LCUI_Widget widget;
-	LCUI_WidgetEventRec e;
-	if( !self.ime || !self.ime->handler.gettarget ) {
-		return -1;
+	LCUI_SysEventRec sys_ev;
+	if( length < 0 ) {
+		length = wcslen( str );
 	}
-	widget = self.ime->handler.gettarget();
-	if( !widget ) {
-		return -2;
+	sys_ev.type = LCUI_TEXTINPUT;
+	sys_ev.text.length = length;
+	sys_ev.text.text = NEW( wchar_t, length + 1 );
+	if( !sys_ev.text.text ) {
+		return -ENOMEM;
 	}
-	e.type = LCUI_INPUT;
-	wcscpy( e.input.text, str );
-	return Widget_PostEvent( widget, &e, NULL, NULL );
+	wcsncpy( sys_ev.text.text, str, length + 1 );
+	LCUI_TriggerEvent( &sys_ev, NULL );
+	free( sys_ev.text.text );
+	sys_ev.text.text = NULL;
+	sys_ev.text.length = 0;
+	return 0;
 }
 
 int LCUIIME_SetTarget( LCUI_Widget widget )
@@ -292,6 +301,13 @@ int LCUIIME_SetTarget( LCUI_Widget widget )
 	return -1;
 }
 
+LCUI_Widget LCUIIME_GetTarget( void )
+{
+	if( self.ime && self.ime->handler.gettarget ) {
+		return self.ime->handler.gettarget();
+	}
+	return NULL;
+}
 int LCUIIME_ClearTarget( void )
 {
 	if( self.ime && self.ime->handler.cleartarget ) {
@@ -321,6 +337,11 @@ void LCUI_ExitIME( void )
 
 
 /*-------------------------- 默认的输入法 ------------------------------*/
+
+#ifdef LCUI_BUILD_IN_WIN32
+#include <LCUI/platform.h>
+#include LCUI_EVENTS_H
+#endif
 
 static struct {
 	LCUI_Widget target;
@@ -415,6 +436,11 @@ static LCUI_Widget IME_GetTarget( void )
 	return default_ime.target;
 }
 
+static void IME_ClearTarget( void )
+{
+	default_ime.target = NULL;
+}
+
 static void IME_ToText( char ch )
 {
 	wchar_t text[2];
@@ -428,8 +454,31 @@ static void IME_ToText( char ch )
 	text[0] = ch;
 	text[1] = '\0';
 	DEBUG_MSG("%S, %d\n", text, ch);
-	LCUIIME_Commit( text ); // 直接提交该字符
+	LCUIIME_Commit( text, 2 ); // 直接提交该字符
 }
+
+
+#ifdef LCUI_BUILD_IN_WIN32
+
+static void WinIME_OnEndComposition( LCUI_Event e, void *arg )
+{
+	wchar_t *text;
+	size_t size, len;
+	WIN_SysEvent win_ev = arg;
+	HIMC imc = ImmGetContext( win_ev->hwnd );
+	size = ImmGetCompositionString( imc, GCS_RESULTSTR, NULL, 0 );
+	text = malloc( size + sizeof( wchar_t ) );
+	if( !text ) {
+		return;
+	}
+	size = ImmGetCompositionString( imc, GCS_RESULTSTR, text, size );
+	len = size / sizeof( wchar_t );
+	text[len] = 0;
+	LCUIIME_Commit( text, len );
+	wprintf(L"len: %d, text: %s\n", len, text);
+}
+
+#endif
 
 /**
  * 输入法被打开时的处理
@@ -437,12 +486,19 @@ static void IME_ToText( char ch )
  **/
 static LCUI_BOOL IME_Open(void)
 {
+#ifdef LCUI_BUILD_IN_WIN32
+	LCUI_BindSysEvent( WM_IME_ENDCOMPOSITION, 
+			   WinIME_OnEndComposition, NULL, NULL );
+#endif
 	return TRUE;
 }
 
 /** 输入法被关闭时的处理 */
 static LCUI_BOOL IME_Close(void)
 {
+#ifdef LCUI_BUILD_IN_WIN32
+	LCUI_UnbindSysEvent( WM_IME_ENDCOMPOSITION, WinIME_OnEndComposition );
+#endif
 	return TRUE;
 }
 
@@ -452,6 +508,7 @@ static int LCUI_RegisterDefaultIME( void )
 	LCUI_IMEHandlerRec handler;
 	handler.gettarget = IME_GetTarget;
 	handler.settarget = IME_SetTarget;
+	handler.cleartarget = IME_ClearTarget;
 	handler.prockey = IME_ProcessKey;
 	handler.totext = IME_ToText;
 	handler.close = IME_Close;

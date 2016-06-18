@@ -59,7 +59,7 @@ enum LCUI_SysEventType {
 	LCUI_MOUSEDOWN,		/**< 鼠标触发的按钮按下事件 */
 	LCUI_MOUSEUP,		/**< 鼠标触发的按钮释放事件 */
 	LCUI_MOUSEWHEEL,	/**< 鼠标触发的滚轮滚动事件 */
-	LCUI_INPUT,		/**< 输入法触发的文本输入事件 */
+	LCUI_TEXTINPUT,		/**< 输入法触发的文本输入事件 */
 	LCUI_TOUCH,
 	LCUI_TOUCHMOVE,
 	LCUI_TOUCHDOWN,
@@ -101,6 +101,11 @@ typedef struct LCUI_TouchEvent_ {
 	LCUI_TouchPoint points;
 } LCUI_TouchEvent;
 
+typedef struct LCUI_TextInputEvent_ {
+	wchar_t *text;
+	size_t length;
+} LCUI_TextInputEvent;
+
 typedef struct LCUI_SysEventRec_ {
 	uint32_t type;
 	void *data;
@@ -108,6 +113,7 @@ typedef struct LCUI_SysEventRec_ {
 		LCUI_MouseMotionEvent motion;
 		LCUI_MouseButtonEvent button;
 		LCUI_MouseWheelEvent wheel;
+		LCUI_TextInputEvent text;
 		LCUI_KeyboardEvent key;
 		LCUI_TouchEvent touch;
 	};
