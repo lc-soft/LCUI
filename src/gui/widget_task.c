@@ -146,6 +146,7 @@ static void MapTaskHandler(void)
 	task_handlers[WTT_BACKGROUND] = Widget_UpdateBackground;
 	task_handlers[WTT_LAYOUT] = Widget_ExecUpdateLayout;
 	task_handlers[WTT_ZINDEX] = Widget_ExecUpdateZIndex;
+	task_handlers[WTT_PROPS] = Widget_UpdateProps;
 }
 
 /** 初始化 LCUI 部件任务处理功能 */

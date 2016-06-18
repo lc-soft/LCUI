@@ -1100,7 +1100,7 @@ void Widget_UpdateProps( LCUI_Widget w )
 	int prop = ComputeStyleOption( w, key_pointer_events, SV_AUTO );
 	w->computed_style.pointer_events = prop;
 	s = &w->style->sheet[key_focusable];
-	if( s->is_valid && s->type == SVT_VALUE && s->value == 0 ) {
+	if( s->is_valid && s->type == SVT_BOOL && s->value == 0 ) {
 		w->computed_style.focusable = FALSE;
 	} else {
 		w->computed_style.focusable = TRUE;
@@ -1542,7 +1542,7 @@ extern void LCUIWidget_AddSideBar( void );
 extern void LCUIWidget_AddTScrollBar( void );
 extern void LCUIWidget_AddTextEdit( void );
 
-void LCUI_InitWidget(void)
+void LCUI_InitWidget( void )
 {
 	LCUIWidget_InitTask();
 	LCUIWidget_InitEvent();

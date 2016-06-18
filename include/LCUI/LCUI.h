@@ -130,6 +130,7 @@ typedef enum LCUI_StyleType {
 	SVT_IMAGE,
 	SVT_STYLE,
 	SVT_VALUE,
+	SVT_BOOL,
 	SVT_STRING,
 	SVT_WSTRING
 } LCUI_StyleType;
@@ -142,6 +143,7 @@ typedef enum LCUI_StyleType {
 #define SVT_scale	SVT_SCALE
 #define SVT_style	SVT_STYLE
 #define SVT_data	SVT_DATA
+#define SVT_bool	SVT_BOOL
 #define SVT_image	SVT_IMAGE
 #define SVT_string	SVT_STRING
 #define SVT_wstring	SVT_WSTRING
@@ -252,6 +254,7 @@ typedef struct LCUI_StyleRec_ {
 		LCUI_Color val_color;
 		LCUI_Graph *image;
 		LCUI_Graph *val_image;
+		LCUI_BOOL val_bool;
 	};
 } LCUI_StyleRec, *LCUI_Style;
 

@@ -957,7 +957,8 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 	int key;
 	const char *name;
 	for( key = 0; key<ss->length; ++key ) {
-		if( !ss->sheet[key].is_valid ) {
+		LCUI_Style s = &ss->sheet[key];
+		if( !s->is_valid ) {
 			continue;
 		}
 		name = GetStyleName(key);
@@ -967,17 +968,16 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 			printf( "\t\t<unknown style %d>", key);
 		}
 		printf( "%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "" );
-		switch( ss->sheet[key].type ) {
+		switch( s->type ) {
 		case SVT_AUTO:
 			printf( "auto\n");
 			break;
-		case SVT_VALUE: {
-			LCUI_BOOL b = ss->sheet[key].value;
-			printf( "%s\n", b ? "true" : "false" );
+		case SVT_BOOL: {
+			printf( "%s\n", s->val_bool ? "true" : "false" );
 			break;
 		}
 		case SVT_COLOR: {
-			LCUI_Color *clr = &ss->sheet[key].color;
+			LCUI_Color *clr = &s->val_color;
 			if( clr->alpha < 255 ) {
 				printf("rgba(%d,%d,%d,%0.2f)\n", clr->r,
 					clr->g, clr->b, clr->a / 255.0);
@@ -987,16 +987,20 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 			break;
 		}
 		case SVT_PX:
-			printf("%dpx\n", ss->sheet[key].px);
+			printf("%dpx\n", s->val_px);
 			break;
 		case SVT_STRING:
-			printf("%s\n", ss->sheet[key].string);
+			printf("%s\n", s->val_string);
 			break;
 		case SVT_SCALE:
-			printf("%.2lf%%\n", ss->sheet[key].scale*100);
+			printf("%.2lf%%\n", s->val_scale*100);
 			break;
+		case SVT_STYLE:{
+			printf("%s\n", GetStyleOptionName( s->val_style ));
+			break;
+		}
 		default:
-			printf("%d\n", ss->sheet[key].value);
+			printf("%d\n", s->value);
 			break;
 		}
 	}

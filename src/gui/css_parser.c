@@ -71,7 +71,8 @@ typedef struct KeyNameGroup {
 
 static struct CSSParserModule {
 	LCUI_RBTree parser_tree;	/**< 解析器树，以名称进行索引 */
-	LCUI_RBTree option_tree;	/**< 样式属性值树，以属性值进行索引 */
+	LCUI_RBTree option_name_tree;	/**< 样式属性值名称树，以值进行索引 */
+	LCUI_RBTree option_tree;	/**< 样式属性值树，以值的名称进行索引 */
 	LCUI_RBTree name_tree;		/**< 样式属性名称树，以属性名称进行索引 */
 	int count;			/**< 当前记录的属性数量 */
 } self;
@@ -80,7 +81,7 @@ static struct CSSParserModule {
 #define SPLIT_COLOR	(1<<1)
 #define SPLIT_STYLE	(1<<2)
 
-int ParseStyleOption( const char *str )
+int GetStyleOption( const char *str )
 {
 	LCUI_RBTreeNode *node;
 	node = RBTree_CustomSearch( &self.option_tree, str );
@@ -88,6 +89,16 @@ int ParseStyleOption( const char *str )
 		return -1;
 	}
 	return ((KeyNameGroup*)(node->data))->key;
+}
+
+const char *GetStyleOptionName( int val )
+{
+	LCUI_RBTreeNode *node;
+	node = RBTree_Search( &self.option_name_tree, val );
+	if( !node ) {
+		return NULL;
+	}
+	return ((KeyNameGroup*)(node->data))->name;
 }
 
 const char *GetStyleName( int key )
@@ -143,7 +154,7 @@ static int SplitValues( const char *str, LCUI_Style slist,
 			}
 		}
 		if( mode & SPLIT_STYLE ) {
-			val = ParseStyleOption( values[vj] );
+			val = GetStyleOption( values[vj] );
 			if( val > 0 )  {
 				slist[vj].style = val;
 				slist[vj].type = SVT_style;
@@ -196,13 +207,13 @@ static int OnParseBoolean( LCUI_StyleSheet ss, int key, const char *str )
 	LCUI_Style s = &ss->sheet[key];
 	if( strcasecmp(str, "true") == 0 ) {
 		s->is_valid = TRUE;
-		s->type = SVT_VALUE;
-		s->value = 1;
+		s->type = SVT_BOOL;
+		s->value = TRUE;
 		return 0;
 	} else if( strcasecmp(str, "false") == 0 ) {
 		s->is_valid = TRUE;
-		s->type = SVT_VALUE;
-		s->value = 0;
+		s->type = SVT_BOOL;
+		s->value = FALSE;
 		return 0;
 	}
 	if( strcmp("auto", str) == 0 ) {
@@ -262,12 +273,12 @@ static int OnParseImage( LCUI_StyleSheet ss, int key, const char *str )
 static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style s = &ss->sheet[key];
-	int v = ParseStyleOption( str );
+	int v = GetStyleOption( str );
 	if( v < 0 ) {
 		return -1;
 	}
-	s->type = SVT_style;
 	s->style = v;
+	s->type = SVT_STYLE;
 	s->is_valid = TRUE;
 	s->is_changed = TRUE;
 	return 0;
@@ -577,7 +588,13 @@ static KeyNameGroup style_name_map[] = {
 	{ key_border_right_style, "border-right-style" },
 	{ key_border_bottom_style, "border-bottom-style" },
 	{ key_border_left_style, "border-left-style" },
+	{ key_box_shadow_x, "box-shadow-x" },
+	{ key_box_shadow_y, "box-shadow-y" },
+	{ key_box_shadow_blur, "box-shadow-blur" },
+	{ key_box_shadow_spread, "box-shadow-spread" },
+	{ key_box_shadow_color, "box-shadow-color" },
 	{ key_pointer_events, "pointer-events" },
+	{ key_focusable, "focusable" },
 	{ key_box_sizing, "box-sizing" }
 };
 
@@ -935,12 +952,14 @@ void LCUICSS_Init(void)
 	KeyNameGroup *skn, *skn_end;
 	LCUI_StyleParser new_sp, sp, sp_end;
 	/* 构建一个红黑树，方便按名称查找解析器 */
+	RBTree_Init( &self.name_tree );
 	RBTree_Init( &self.parser_tree );
 	RBTree_Init( &self.option_tree );
-	RBTree_Init( &self.name_tree );
+	RBTree_Init( &self.option_name_tree );
+	RBTree_SetDataNeedFree( &self.name_tree, FALSE );
 	RBTree_SetDataNeedFree( &self.parser_tree, TRUE );
 	RBTree_SetDataNeedFree( &self.option_tree, FALSE );
-	RBTree_SetDataNeedFree( &self.name_tree, FALSE );
+	RBTree_SetDataNeedFree( &self.option_name_tree, FALSE );
 	RBTree_OnJudge( &self.parser_tree, CompareParserName );
 	RBTree_OnJudge( &self.option_tree, CompareName );
 	skn = style_name_map;
@@ -970,6 +989,7 @@ void LCUICSS_Init(void)
 	skn_end = skn + sizeof(style_option_map)/sizeof(KeyNameGroup);
 	for( ; skn < skn_end; ++skn ) {
 		RBTree_CustomInsert( &self.option_tree, skn->name, skn );
+		RBTree_Insert( &self.option_name_tree, skn->key, skn );
 	}
 	self.count = STYLE_KEY_TOTAL;
 }

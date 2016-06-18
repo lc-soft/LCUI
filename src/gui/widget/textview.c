@@ -196,7 +196,7 @@ static int OnParseFontWeight( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseTextAlign( LCUI_StyleSheet ss, int key, const char *str )
 {
-	int val = ParseStyleOption( str );
+	int val = GetStyleOption( str );
 	if( val < 0 ) {
 		return -1;
 	}

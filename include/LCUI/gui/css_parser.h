@@ -49,7 +49,9 @@ typedef struct LCUI_StyleParserRec_ {
 	int (*parse)(LCUI_StyleSheet, int, const char*);
 } LCUI_StyleParserRec, *LCUI_StyleParser;
 
-LCUI_API int ParseStyleOption( const char *str );
+LCUI_API int GetStyleOption( const char *str );
+
+LCUI_API const char *GetStyleOptionName( int val );
 
 LCUI_API const char *GetStyleName( int key );
 
