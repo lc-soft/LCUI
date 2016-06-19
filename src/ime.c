@@ -460,22 +460,13 @@ static void IME_ToText( char ch )
 
 #ifdef LCUI_BUILD_IN_WIN32
 
-static void WinIME_OnEndComposition( LCUI_Event e, void *arg )
+static void WinIME_OnChar( LCUI_Event e, void *arg )
 {
-	wchar_t *text;
-	size_t size, len;
+	wchar_t text[2];
 	WIN_SysEvent win_ev = arg;
-	HIMC imc = ImmGetContext( win_ev->hwnd );
-	size = ImmGetCompositionString( imc, GCS_RESULTSTR, NULL, 0 );
-	text = malloc( size + sizeof( wchar_t ) );
-	if( !text ) {
-		return;
-	}
-	size = ImmGetCompositionString( imc, GCS_RESULTSTR, text, size );
-	len = size / sizeof( wchar_t );
-	text[len] = 0;
-	LCUIIME_Commit( text, len );
-	wprintf(L"len: %d, text: %s\n", len, text);
+	text[0] = win_ev->wparam;
+	text[1] = 0;
+	LCUIIME_Commit( text, 2 );
 }
 
 #endif
@@ -487,8 +478,7 @@ static void WinIME_OnEndComposition( LCUI_Event e, void *arg )
 static LCUI_BOOL IME_Open(void)
 {
 #ifdef LCUI_BUILD_IN_WIN32
-	LCUI_BindSysEvent( WM_IME_ENDCOMPOSITION, 
-			   WinIME_OnEndComposition, NULL, NULL );
+	LCUI_BindSysEvent( WM_CHAR, WinIME_OnChar, NULL, NULL );
 #endif
 	return TRUE;
 }
@@ -497,7 +487,7 @@ static LCUI_BOOL IME_Open(void)
 static LCUI_BOOL IME_Close(void)
 {
 #ifdef LCUI_BUILD_IN_WIN32
-	LCUI_UnbindSysEvent( WM_IME_ENDCOMPOSITION, WinIME_OnEndComposition );
+	LCUI_UnbindSysEvent( WM_CHAR, WinIME_OnChar );
 #endif
 	return TRUE;
 }
