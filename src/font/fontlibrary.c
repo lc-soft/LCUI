@@ -349,8 +349,8 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 	LCUI_RBTree *ctx;
 	LCUI_FontBitmap bmp_cache;
 
+	*bmp = NULL;
 	if( !fontlib.is_inited ) {
-		*bmp = NULL;
 		return -2;
 	}
 	if( font_id <= 0 ) {
