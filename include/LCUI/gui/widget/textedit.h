@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * textedit.c -- textedit widget, used to allow user edit text.
  *
  * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
@@ -20,21 +20,21 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * textedit.c -- �ı��༭�������������û��༭�ı���
+ * textedit.c -- 文本编辑部件，用于让用户编辑文本。
  *
- * ��Ȩ���� (C) 2016 ������ ���� <lc-soft@live.cn>
+ * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
  *
- * ����ļ���LCUI��Ŀ��һ���֣�����ֻ���Ը���GPLv2����Э����ʹ�á����ĺͷ�����
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
- * (GPLv2 �� GNUͨ�ù�������֤�ڶ��� ��Ӣ����д)
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
  *
- * ����ʹ�á��޸Ļ򷢲����ļ����������Ѿ��Ķ�����ȫ����ͽ����������Э�顣
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
  *
- * LCUI ��Ŀ�ǻ���ʹ��Ŀ�Ķ�����ɢ���ģ��������κε������Σ�����û�������Ի���
- * ����;���������������������GPLv2����Э�顣
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
  *
- * ��Ӧ���յ������ڱ��ļ���GPLv2����Э��ĸ�������ͨ����LICENSE.TXT�ļ��У����
- * û�У���鿴��<http://www.gnu.org/licenses/>.
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 #ifndef LCUI_TEXTBOX_H
 #define LCUI_TEXTBOX_H
@@ -43,24 +43,27 @@ LCUI_BEGIN_HEADER
 
 #define TextEdit_New() Widget_New("textedit")
 
-/** ָ���ı����Ƿ������Ʒ� */
+/** 指定文本框是否处理控制符 */
 LCUI_API void TextEdit_SetUsingStyleTags( LCUI_Widget widget, LCUI_BOOL is_true );
 
-/** ָ���ı����Ƿ����ö����ı���ʾ */
+/** 指定文本框是否启用多行文本显示 */
 LCUI_API void TextEdit_SetMultiline( LCUI_Widget widget, LCUI_BOOL is_true );
 
-/** ����ı����� */
+/** 清空文本内容 */
 LCUI_API void TextEdit_ClearText( LCUI_Widget widget );
 
-/** Ϊ�ı��������ı������ַ��棩 */
+/** 获取文本内容 */
+LCUI_API int TextEdit_GetTextW( LCUI_Widget widget, int start, int max_len, wchar_t *buf );
+
+/** 为文本框设置文本（宽字符版） */
 LCUI_API int TextEdit_SetTextW( LCUI_Widget widget, const wchar_t *wstr );
 
 LCUI_API int TextEdit_SetText( LCUI_Widget widget, const char *utf8_str );
 
-/** Ϊ�ı���׷���ı������ַ��棩 */
+/** 为文本框追加文本（宽字符版） */
 LCUI_API int TextEdit_AppendTextW( LCUI_Widget widget, const wchar_t *wstr );
 
-/** Ϊ�ı�������ı������ַ��棩 */
+/** 为文本框插入文本（宽字符版） */
 LCUI_API int TextEdit_InsertTextW( LCUI_Widget widget, const wchar_t *wstr );
 
 LCUI_END_HEADER

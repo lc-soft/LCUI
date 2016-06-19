@@ -151,15 +151,9 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 /*-------------------------- StyleTag --------------------------------*/
 #define MAX_TAG_NUM 2
 
-static void DestroyTag( LCUI_StyleTag *tag )
-{
-	free( tag );
-	// XXX
-}
-
 void StyleTags_Clear( LinkedList *tags )
 {
-	LinkedList_Clear( tags, (FuncPtr)DestroyTag );
+	LinkedList_Clear( tags, free );
 }
 
 /** 获取当前的文本样式 */

@@ -666,10 +666,8 @@ static void TextLayer_TextTypeset( LCUI_TextLayer layer, int start_row )
 }
 
 /** 对文本进行预处理 */
-static int TextLayer_ProcessText( LCUI_TextLayer layer,
-				  const wchar_t *wstr,
-				  int add_type,
-				  LinkedList *tags )
+static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
+				  int add_type, LinkedList *tags )
 {
 	EOLChar eol;
 	TextRow txtrow;
@@ -693,7 +691,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer,
 		} else {
 			cur_row = 0;
 		}
-		txtrow =  TextLayer_GetRow( layer, cur_row );
+		txtrow = TextLayer_GetRow( layer, cur_row );
 		if( !txtrow ) {
 			txtrow = TextRowList_AddNewRow( &layer->rowlist );
 		}
@@ -715,8 +713,8 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer,
 		StyleTags_Init( &tmp_tags );
 		tags = &tmp_tags;
 	}
-	p_end = wstr + wcslen(wstr);
-	for( p=wstr; p<p_end; ++p ) {
+	p_end = wstr + wcslen( wstr );
+	for( p = wstr; p < p_end; ++p ) {
 		/* 如果启用的样式标签支持，则处理样式的结束标签 */
 		if( layer->is_using_style_tags ) {
 			pp = StyleTags_ScanEndingTag( tags, p );
@@ -739,7 +737,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer,
 		if( *p == '\r' || *p == '\n' ) {
 			/* 判断是哪一种换行模式 */
 			if( *p == '\r' ) {
-				if( p+1 < p_end && *(p+1) == '\n' ) {
+				if( p + 1 < p_end && *(p + 1) == '\n' ) {
 					eol = EOL_CR_LF;
 				} else {
 					eol = EOL_CR;
@@ -1056,7 +1054,7 @@ int TextLayer_Backspace( LCUI_TextLayer layer, int n_char )
 	char_x = layer->insert_x;
 	char_y = layer->insert_y;
 	/* 再计算删除 n_char 个字后的位置 */
-	for( n_del=n_char; char_y>=0; --char_y ) {
+	for( n_del = n_char; char_y >= 0; --char_y ) {
 		txtrow = layer->rowlist.rows[char_y];
 		/* 如果不是当前行，则重定位至行尾 */
 		if( char_y < layer->insert_y ) {
@@ -1083,8 +1081,8 @@ int TextLayer_Backspace( LCUI_TextLayer layer, int n_char )
 	TextLayer_DeleteText( layer, char_y, char_x, n_char );
 	/* 若最后一行被完全移除，则移动输入点至上一行的行尾处 */
 	if( char_x == 0 && layer->rowlist.length > 0
-	 && char_y >= layer->rowlist.length ) {
-		char_y = layer->rowlist.length-1;
+	    && char_y >= layer->rowlist.length ) {
+		char_y = layer->rowlist.length - 1;
 		char_x = layer->rowlist.rows[char_y]->length;
 	}
 	/* 更新文本光标的位置 */
@@ -1324,4 +1322,10 @@ void TextLayer_SetLineHeight( LCUI_TextLayer layer, LCUI_Style val )
 	layer->line_height = *val;
 	layer->task.update_typeset = TRUE;
 	layer->task.typeset_start_row = 0;
+}
+
+void TextLayer_SetOffset( LCUI_TextLayer layer, int offset_x, int offset_y )
+{
+	layer->new_offset_x = offset_x;
+	layer->new_offset_y = offset_y;
 }
