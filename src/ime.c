@@ -38,6 +38,7 @@
  * ****************************************************************************/
 
 #include <errno.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
@@ -317,7 +318,7 @@ int LCUIIME_ClearTarget( void )
 	return -1;
 }
 
-int LCUI_RegisterDefaultIME( void );
+static int LCUI_RegisterDefaultIME( void );
 
 /* 初始化LCUI输入法模块 */
 void LCUI_InitIME( void )

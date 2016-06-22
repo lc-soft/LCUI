@@ -119,7 +119,7 @@ static const char *textedit_css = ToString(
 
 textedit {
 min-width: 124px;
-min-height:14px;
+min-height: 14px;
 background-color: #fff;
 border: 1px solid #eee;
 padding: 5px 10px;
@@ -410,6 +410,9 @@ static void TextEdit_AutoSize( LCUI_Widget widget, int *width, int *height )
 		*height = TextLayer_GetHeight( edit->text );
 	}
 	*width = 176;
+	if( widget->computed_style.box_sizing != SV_CONTENT_BOX ) {
+		*height += widget->padding.top + widget->padding.bottom;
+	}
 }
 
 /*----------------------------- End TextBlock ---------------------------------*/
