@@ -39,6 +39,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
@@ -57,7 +58,6 @@ typedef struct LCUI_StyleTag {
 	LCUI_StyleRec style;
 } LCUI_StyleTag;
 
-/** 初始化字体样式数据 */
 void TextStyle_Init( LCUI_TextStyle *data )
 {
 	data->has_style = FALSE;
@@ -73,6 +73,23 @@ void TextStyle_Init( LCUI_TextStyle *data )
 	data->fore_color.value = 0x33333333;
 	data->back_color.value = 0xffffffff;
 	data->pixel_size = 13;
+}
+
+int TextStyle_Copy( LCUI_TextStyle *dst, LCUI_TextStyle *src )
+{
+	int len;
+	*dst = *src;
+	if( !dst->has_family ) {
+		return 0;
+	}
+	for( len = 0; dst->font_ids[len] != -1; ++len );
+	len += 1;
+	dst->font_ids = malloc( len * sizeof( int ) );
+	if( !dst->font_ids ) {
+		return -ENOMEM;
+	}
+	memcpy( dst->font_ids, src->font_ids, len * sizeof( int ) );
+	return 0;
 }
 
 void TextStyle_Destroy( LCUI_TextStyle *data )

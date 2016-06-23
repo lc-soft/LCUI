@@ -51,11 +51,12 @@
 
 #define CARET_HIDE 0
 #define CARET_SHOW 1
-#define TEXT_BLOCK_SIZE	512
+#define TBT_SIZE	512
 
 enum TaskType {
 	TASK_SET_TEXT,
 	TASK_UPDATE,
+	TASK_UPDATE_CARET,
 	TASK_TOTAL
 };
 
@@ -69,35 +70,45 @@ typedef struct LCUI_TextCaretRec_ {
 } LCUI_TextCaretRec, *LCUI_TextCaret;
 
 typedef struct LCUI_TextEditRec_ {
-	LCUI_TextLayer source_text;		/**< 实际文本层 */
-	LCUI_TextLayer mask_text;		/**< 屏蔽后的文本层 */
-	LCUI_TextLayer text;			/**< 当前使用的文本层 */
+	LCUI_TextLayer layer_source;		/**< 实际文本层 */
+	LCUI_TextLayer layer_mask;		/**< 屏蔽后的文本层 */
+	LCUI_TextLayer layer_placeholder;	/**< 占位符的文本层 */
+	LCUI_TextLayer layer;			/**< 当前使用的文本层 */
 	LCUI_Widget scrollbars[2];		/**< 两个滚动条 */
 	LCUI_Widget caret;			/**< 文本插入符 */
 	LCUI_BOOL is_read_only;			/**< 是否只读 */
 	LCUI_BOOL is_multiline_mode;		/**< 是否为多行模式 */
-	int block_size;				/**< 块大小 */
-	LinkedList text_blocks;			/**< 文本块缓冲区 */
-	LinkedList text_tags;			/**< 当前处理的标签列表 */
-	LCUI_BOOL show_placeholder;		/**< 表示占位符是否已经显示 */
-	wchar_t *placeholder;			/**< 文本框的占位符 */
+	LCUI_BOOL is_placeholder_shown;		/**< 是否已经显示占位符 */
+	wchar_t *placeholder;			/**< 占位符 */
 	wchar_t *allow_input_char;		/**< 允许输入的字符 */
 	wchar_t password_char;			/**< 屏蔽符的副本 */
-	LCUI_TextStyle placeholder_style;	/**< 占位符的文本样式 */
-	LCUI_TextStyle textstyle_bak;		/**< 文本框内文本样式的副本 */
+	int text_block_size;			/**< 块大小 */
+	LinkedList text_blocks;			/**< 文本块缓冲区 */
+	LinkedList text_tags;			/**< 当前处理的标签列表 */
 	LCUI_BOOL tasks[TASK_TOTAL];		/**< 待处理的任务 */
 	LCUI_Mutex mutex;			/**< 互斥锁 */
 } LCUI_TextEditRec, *LCUI_TextEdit;
 
-enum TextBlockType_ {
-	TEXT_BLOCK_BEGIN,
-	TEXT_BLOCK_BODY,
-	TEXT_BLOCK_END
+enum TextBlockType {
+	TBT_BEGIN,
+	TBT_BODY,
+	TBT_END
+};
+
+enum TextBlockAddType {
+	TBAT_INSERT,
+	TBAT_APPEND
+};
+
+enum TextBlockOwnerType {
+	TBOT_SOURCE,
+	TBOT_PLACEHOLDER
 };
 
 /** 文本块数据结构 */
 typedef struct LCUI_TextBlockRec_ {
 	int type;			/**< 文本块类型 */
+	int owner;			/**< 所属的文本层 */
 	int add_type;			/**< 指定该文本块的添加方式 */
 	wchar_t *text;			/**< 文本块(段) */
 } LCUI_TextBlockRec, *LCUI_TextBlock;
@@ -218,30 +229,37 @@ static void LCUIWidget_AddTextCaret( void )
 static void TextEdit_UpdateCaret( LCUI_Widget widget )
 {
 	LCUI_Pos pos;
+	LCUI_StyleSheet sheet;
 	LCUI_TextEdit edit = widget->private_data;
-	if( TextLayer_GetCaretPixelPos( edit->text, &pos ) == 0 ) {
-		int row = edit->text->insert_y;
-		int offset_x = 0, offset_y = 0;
-		int height = TextLayer_GetRowHeight( edit->text, row );
-		LCUI_StyleSheet sheet = edit->caret->custom_style;
-		SetStyle( sheet, key_height, height, px );
-		pos.x += widget->padding.left;
-		pos.y += widget->padding.top;
-		if( pos.x > widget->box.content.width ) {
-			offset_x = widget->box.content.width - pos.x;
-			offset_x -= edit->caret->width;
-			pos.x += offset_x;
+	int offset_x = 0, offset_y = 0, height, row;
+
+	if( edit->is_placeholder_shown ) {
+		pos.x = pos.y = 0;
+	} else {
+		if( TextLayer_GetCaretPixelPos( edit->layer, &pos ) != 0 ) {
+			return;
 		}
-		if( pos.y > widget->box.content.height ) {
-			offset_y = widget->box.content.height - pos.y;
-			offset_y -= edit->caret->height;
-			pos.y += offset_y;
-		}
-		TextLayer_SetOffset( edit->text, offset_x, offset_y );
-		Widget_Move( edit->caret, pos.x, pos.y );
-		edit->tasks[TASK_UPDATE] = TRUE;
-		Widget_AddTask( widget, WTT_USER );
 	}
+	row = edit->layer->insert_y;
+	sheet = edit->caret->custom_style;
+	height = TextLayer_GetRowHeight( edit->layer, row );
+	SetStyle( sheet, key_height, height, px );
+	pos.x += widget->padding.left;
+	pos.y += widget->padding.top;
+	if( pos.x > widget->box.content.width ) {
+		offset_x = widget->box.content.width - pos.x;
+		offset_x -= edit->caret->width;
+		pos.x += offset_x;
+	}
+	if( pos.y > widget->box.content.height ) {
+		offset_y = widget->box.content.height - pos.y;
+		offset_y -= edit->caret->height;
+		pos.y += offset_y;
+	}
+	TextLayer_SetOffset( edit->layer, offset_x, offset_y );
+	Widget_Move( edit->caret, pos.x, pos.y );
+	edit->tasks[TASK_UPDATE] = TRUE;
+	Widget_AddTask( widget, WTT_USER );
 	TextCaret_BlinkShow( edit->caret );
 }
 
@@ -249,7 +267,10 @@ static void TextEdit_UpdateCaret( LCUI_Widget widget )
 static void TextEdit_MoveCaret( LCUI_Widget widget, int row, int col )
 {
 	LCUI_TextEdit edit = widget->private_data;
-	TextLayer_SetCaretPos( edit->text, row, col );
+	if( edit->is_placeholder_shown ) {
+		row = col = 0;
+	}
+	TextLayer_SetCaretPos( edit->layer, row, col );
 	TextEdit_UpdateCaret( widget );
 }
 
@@ -263,13 +284,16 @@ static void TextBlock_OnDestroy( void *arg )
 }
 
 static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
-				     int add_type )
+				     int add_type, int owner )
 {
 	const wchar_t *p;
 	LCUI_TextEdit edit;
 	LCUI_TextBlock txtblk;
 	int i, j, len, tag_len, size;
 
+	if( !wtext ) {
+		return -1;
+	}
 	edit = widget->private_data;
 	len = wcslen( wtext );
 	for( i = 0; i < len; ++i ) {
@@ -277,22 +301,23 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 		if( !txtblk ) {
 			return -ENOMEM;
 		}
-		size = edit->block_size;
+		txtblk->owner = owner;
+		txtblk->add_type = add_type;
+		size = edit->text_block_size;
 		if( i == 0 ) {
-			txtblk->type = TEXT_BLOCK_BEGIN;
-		} else if( len - i > edit->block_size ) {
-			txtblk->type = TEXT_BLOCK_BODY;
+			txtblk->type = TBT_BEGIN;
+		} else if( len - i > edit->text_block_size ) {
+			txtblk->type = TBT_BODY;
 		} else {
 			size = len - i;
-			txtblk->type = TEXT_BLOCK_END;
+			txtblk->type = TBT_END;
 		}
-		txtblk->add_type = add_type;
 		txtblk->text = NEW( wchar_t, size );
 		if( !txtblk->text ) {
 			return -ENOMEM;
 		}
 		/* 如果未启用样式标签功能 */
-		if( !edit->text->is_using_style_tags ) {
+		if( !edit->layer->is_using_style_tags ) {
 			for( j = 0; i < len && j < size - 1; ++j, ++i ) {
 				txtblk->text[j] = wtext[i];
 			}
@@ -339,18 +364,29 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 /** 更新文本框内的字体位图 */
 static void TextEdit_ProcTextBlock( LCUI_Widget widget, LCUI_TextBlock txtblk )
 {
+	LinkedList *tags;
 	LCUI_TextEdit edit;
+	LCUI_TextLayer layer;
 	edit = widget->private_data;
-	switch( txtblk->add_type ) {
-	case TEXT_ADD_TYPE_APPEND:
-		/* 将此文本块追加至文本末尾 */
-		TextLayer_AppendTextW( edit->text, txtblk->text, 
-				       &edit->text_tags );
+	switch( txtblk->owner ) {
+	case TBOT_SOURCE:
+		layer = edit->layer_source;
+		tags = &edit->text_tags;
 		break;
-	case TEXT_ADD_TYPE_INSERT:
+	case TBOT_PLACEHOLDER:
+		layer = edit->layer_placeholder;
+		tags = NULL;
+		break;
+	default:return;
+	}
+	switch( txtblk->add_type ) {
+	case TBAT_APPEND:
+		/* 将此文本块追加至文本末尾 */
+		TextLayer_AppendTextW( layer, txtblk->text, tags );
+		break;
+	case TBAT_INSERT:
 		/* 将此文本块插入至文本插入符所在处 */
-		TextLayer_InsertTextW( edit->text, txtblk->text, 
-				       &edit->text_tags );
+		TextLayer_InsertTextW( layer, txtblk->text, tags );
 	default: break;
 	}
 }
@@ -361,21 +397,28 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
 {
 	LinkedList rects;
 	LCUI_TextEdit edit;
+	LCUI_TextStyle style;
 	LinkedListNode *node;
 	LinkedList_Init( &rects );
 	edit = widget->private_data;
-	TextLayer_Update( edit->text, &rects );
+	TextLayer_Update( edit->layer, &rects );
 	LinkedList_ForEach( node, &rects ) {
 		Widget_InvalidateArea( widget, node->data, SV_CONTENT_BOX );
 	}
 	LinkedList_Clear( &rects, free );
-	TextLayer_ClearInvalidRect( edit->text );
+	TextLayer_ClearInvalidRect( edit->layer );
+	TextStyle_Copy( &style, &edit->layer_source->text_style );
+	style.has_fore_color = TRUE;
+	style.fore_color.value = 0xC8C8C8;
+	TextLayer_SetTextStyle( edit->layer_placeholder, &style );
+	TextStyle_Destroy( &style );
 }
 
 static void TextEdit_OnTask( LCUI_Widget widget )
 {
 	LCUI_TextEdit edit = widget->private_data;
 	if( edit->tasks[TASK_SET_TEXT] ) {
+		LCUI_BOOL is_shown;
 		LinkedList blocks;
 		LinkedListNode *node;
 		LinkedList_Init( &blocks );
@@ -386,12 +429,28 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 			TextEdit_ProcTextBlock( widget, node->data );
 		}
 		LinkedList_Clear( &blocks, TextBlock_OnDestroy );
+		is_shown = edit->layer_source->length == 0;
+		if( is_shown ) {
+			edit->layer = edit->layer_placeholder;
+		} else {
+			edit->layer = edit->layer_source;
+		}
+		if( edit->is_placeholder_shown != is_shown ) {
+			Widget_InvalidateArea( widget, NULL, SV_PADDING_BOX );
+		}
+		edit->is_placeholder_shown = is_shown;
+		edit->tasks[TASK_UPDATE_CARET] = TRUE;
 		edit->tasks[TASK_SET_TEXT] = FALSE;
 		edit->tasks[TASK_UPDATE] = TRUE;
-		TextEdit_UpdateCaret( widget );
 	}
-	TextEdit_UpdateTextLayer( widget );
-	edit->tasks[TASK_UPDATE] = FALSE;
+	if( edit->tasks[TASK_UPDATE] ) {
+		TextEdit_UpdateTextLayer( widget );
+		edit->tasks[TASK_UPDATE] = FALSE;
+	}
+	if( edit->tasks[TASK_UPDATE_CARET] ) {
+		TextEdit_UpdateCaret( widget );
+		edit->tasks[TASK_UPDATE_CARET] = FALSE;
+	}
 }
 
 static void TextEdit_AutoSize( LCUI_Widget widget, int *width, int *height )
@@ -401,13 +460,13 @@ static void TextEdit_AutoSize( LCUI_Widget widget, int *width, int *height )
 	if( edit->is_multiline_mode ) {
 		int i, n;
 		*height = 0;
-		n = TextLayer_GetRowTotal( edit->text );
+		n = TextLayer_GetRowTotal( edit->layer );
 		n = n > 3 ? 3 : n;
 		for( i = 0; i < n; ++i ) {
-			*height += TextLayer_GetRowHeight( edit->text, i );
+			*height += TextLayer_GetRowHeight( edit->layer, i );
 		}
 	} else {
-		*height = TextLayer_GetHeight( edit->text );
+		*height = TextLayer_GetHeight( edit->layer );
 	}
 	*width = 176;
 	if( widget->computed_style.box_sizing != SV_CONTENT_BOX ) {
@@ -421,15 +480,15 @@ static void TextEdit_AutoSize( LCUI_Widget widget, int *width, int *height )
 void TextEdit_SetUsingStyleTags( LCUI_Widget widget, LCUI_BOOL is_true )
 {
 	LCUI_TextEdit edit = widget->private_data;
-	TextLayer_SetUsingStyleTags( edit->text, is_true );
+	TextLayer_SetUsingStyleTags( edit->layer, is_true );
 }
 
 /** 指定文本框是否启用多行文本显示 */
 void TextEdit_SetMultiline( LCUI_Widget widget, LCUI_BOOL is_true )
 {
 	LCUI_TextEdit edit = widget->private_data;
-	TextLayer_SetMultiline( edit->source_text, is_true );
-	TextLayer_SetMultiline( edit->mask_text, is_true );
+	TextLayer_SetMultiline( edit->layer_source, is_true );
+	TextLayer_SetMultiline( edit->layer_mask, is_true );
 	edit->is_multiline_mode = is_true;
 }
 
@@ -439,23 +498,23 @@ void TextEdit_ClearText( LCUI_Widget widget )
 	Widget_Lock( widget );
 	edit = widget->private_data;
 	LCUIMutex_Lock( &edit->mutex );
-	TextLayer_ClearText( edit->text );
+	TextLayer_ClearText( edit->layer );
 	StyleTags_Clear( &edit->text_tags );
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_InvalidateArea( widget, NULL, SV_PADDING_BOX );
 	Widget_Unlock( widget );
 }
 
-int TextEdit_GetTextW( LCUI_Widget widget, int start, int max_len, wchar_t *buf )
+int TextEdit_GetTextW( LCUI_Widget w, int start, int max_len, wchar_t *buf )
 {
-	LCUI_TextEdit edit = widget->private_data;
-	return TextLayer_GetTextW( edit->source_text, start, max_len, buf );
+	LCUI_TextEdit edit = w->private_data;
+	return TextLayer_GetTextW( edit->layer_source, start, max_len, buf );
 }
 
-int TextEdit_SetTextW( LCUI_Widget widget, const wchar_t *wstr )
+int TextEdit_SetTextW( LCUI_Widget w, const wchar_t *wstr )
 {
-	TextEdit_ClearText( widget );
-	return TextEdit_AddTextToBuffer( widget, wstr, TEXT_ADD_TYPE_APPEND );
+	TextEdit_ClearText( w );
+	return TextEdit_AddTextToBuffer( w, wstr, TBAT_APPEND, TBOT_SOURCE );
 }
 
 int TextEdit_SetText( LCUI_Widget widget, const char *utf8_str )
@@ -473,15 +532,44 @@ int TextEdit_SetText( LCUI_Widget widget, const char *utf8_str )
 }
 
 /** 为文本框追加文本（宽字符版） */
-int TextEdit_AppendTextW( LCUI_Widget widget, const wchar_t *wstr )
+int TextEdit_AppendTextW( LCUI_Widget w, const wchar_t *wstr )
 {
-	return TextEdit_AddTextToBuffer( widget, wstr, TEXT_ADD_TYPE_APPEND );
+	return TextEdit_AddTextToBuffer( w, wstr, TBAT_APPEND, TBOT_SOURCE );
 }
 
 /** 为文本框插入文本（宽字符版） */
-int TextEdit_InsertTextW( LCUI_Widget widget, const wchar_t *wstr )
+int TextEdit_InsertTextW( LCUI_Widget w, const wchar_t *wstr )
 {
-	return TextEdit_AddTextToBuffer( widget, wstr, TEXT_ADD_TYPE_INSERT );
+	return TextEdit_AddTextToBuffer( w, wstr, TBAT_INSERT, TBOT_SOURCE );
+}
+
+int TextEdit_SetPlaceHolderW( LCUI_Widget w, const wchar_t *wstr )
+{
+	LCUI_TextEdit edit = w->private_data;
+	Widget_Lock( w );
+	LCUIMutex_Lock( &edit->mutex );
+	TextLayer_ClearText( edit->layer_placeholder );
+	LCUIMutex_Unlock( &edit->mutex );
+	if( edit->is_placeholder_shown ) {
+		Widget_InvalidateArea( w, NULL, SV_PADDING_BOX );
+	}
+	Widget_Unlock( w );
+	return TextEdit_AddTextToBuffer( w, wstr, TBAT_INSERT, 
+					 TBOT_PLACEHOLDER );
+}
+
+int TextEdit_SetPlaceHolder( LCUI_Widget w, const char *str )
+{
+	int ret;
+	size_t len = strlen( str ) + 1;
+	wchar_t *wstr = malloc( len * sizeof( wchar_t ) );
+	if( !wstr ) {
+		return -ENOMEM;
+	}
+	LCUI_DecodeString( wstr, str, len, ENCODING_UTF8 );
+	ret = TextEdit_SetPlaceHolderW( w, wstr );
+	free( wstr );
+	return ret;
 }
 
 static void TextEdit_OnFocus( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
@@ -509,7 +597,10 @@ static void TextEdit_TextBackspace( LCUI_Widget widget, int n_ch )
 	Widget_Lock( widget );
 	edit = widget->private_data;
 	LCUIMutex_Lock( &edit->mutex );
-	TextLayer_Backspace( edit->text, n_ch );
+	TextLayer_TextBackspace( edit->layer_source, n_ch );
+	if( edit->password_char ) {
+		TextLayer_TextBackspace( edit->layer_mask, n_ch );
+	}
 	TextCaret_BlinkShow( edit->caret );
 	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask( widget, WTT_USER );
@@ -523,7 +614,10 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 	Widget_Lock( widget );
 	edit = widget->private_data;
 	LCUIMutex_Lock( &edit->mutex );
-	TextLayer_Delete( edit->text, n_ch );
+	TextLayer_TextDelete( edit->layer_source, n_ch );
+	if( edit->password_char ) {
+		TextLayer_TextDelete( edit->layer_mask, n_ch );
+	}
 	TextCaret_BlinkShow( edit->caret );
 	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask( widget, WTT_USER );
@@ -538,10 +632,10 @@ static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *ar
 	int cols, rows, cur_col, cur_row;
 
 	edit = widget->private_data;
-	cur_row = edit->text->insert_y;
-	cur_col = edit->text->insert_x;
-	rows = TextLayer_GetRowTotal( edit->text );
-	cols = TextLayer_GetRowTextLength( edit->text, cur_row );
+	cur_row = edit->layer->insert_y;
+	cur_col = edit->layer->insert_x;
+	rows = TextLayer_GetRowTotal( edit->layer );
+	cols = TextLayer_GetRowTextLength( edit->layer, cur_row );
 	switch( e->key.code ) {
 	case LCUIKEY_HOMEPAGE: // home键移动光标至行首
 		cur_col = 0;
@@ -554,7 +648,7 @@ static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *ar
 			--cur_col;
 		} else if( cur_row > 0 ) {
 			--cur_row;
-			cur_col = TextLayer_GetRowTextLength( edit->text,
+			cur_col = TextLayer_GetRowTextLength( edit->layer,
 							      cur_row );
 		}
 		break;
@@ -651,23 +745,27 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		new_size.height = w->box.content.height;
 	}
 	LinkedList_Init( &rects );
-	TextLayer_SetMaxSize( edit->text, new_size );
-	TextLayer_Update( edit->text, &rects );
+	TextLayer_SetMaxSize( edit->layer_mask, new_size );
+	TextLayer_SetMaxSize( edit->layer_source, new_size );
+	TextLayer_SetMaxSize( edit->layer_placeholder, new_size );
+	TextLayer_Update( edit->layer, &rects );
 	LinkedList_ForEach( node, &rects ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
 	LinkedList_Clear( &rects, free );
-	TextLayer_ClearInvalidRect( edit->text );
+	TextLayer_ClearInvalidRect( edit->layer );
 }
 
 static void TextEdit_OnMouseMove( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	int abs_x, abs_y, x, y;
 	LCUI_TextEdit edit = w->private_data;
-	Widget_GetAbsXY( w, NULL, &abs_x, &abs_y );
-	x = e->motion.x - abs_x - w->padding.left;
-	y = e->motion.y - abs_y - w->padding.top;
-	TextLayer_SetCaretPosByPixelPos( edit->text, x, y );
+	if( !edit->is_placeholder_shown ) {
+		Widget_GetAbsXY( w, NULL, &abs_x, &abs_y );
+		x = e->motion.x - abs_x - w->padding.left;
+		y = e->motion.y - abs_y - w->padding.top;
+		TextLayer_SetCaretPosByPixelPos( edit->layer, x, y );
+	}
 	TextEdit_UpdateCaret( w );
 }
 
@@ -684,10 +782,18 @@ static void TextEdit_OnMouseDown( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	Widget_GetAbsXY( w, NULL, &abs_x, &abs_y );
 	x = e->motion.x - abs_x - w->padding.left;
 	y = e->motion.y - abs_y - w->padding.top;
-	TextLayer_SetCaretPosByPixelPos( edit->text, x, y );
+	TextLayer_SetCaretPosByPixelPos( edit->layer, x, y );
 	TextEdit_UpdateCaret( w );
 	Widget_SetMouseCapture( w );
 	Widget_BindEvent( w, "mousemove", TextEdit_OnMouseMove, NULL, NULL );
+}
+
+static void TextEdit_SetAttr( LCUI_Widget w, const char *name, 
+			      const char *val )
+{
+	if( strcasecmp( name, "data-placeholder" ) == 0 ) {
+		TextEdit_SetPlaceHolder( w, val );
+	}
 }
 
 static void TextEdit_OnInit( LCUI_Widget w )
@@ -697,18 +803,20 @@ static void TextEdit_OnInit( LCUI_Widget w )
 	edit->is_read_only = FALSE;
 	edit->password_char = 0;
 	edit->allow_input_char = NULL;
-	edit->show_placeholder = FALSE;
-	edit->mask_text = TextLayer_New();
-	edit->source_text = TextLayer_New();
-	edit->text = edit->source_text;
-	edit->block_size = TEXT_BLOCK_SIZE;
+	edit->is_placeholder_shown = FALSE;
+	edit->layer_mask = TextLayer_New();
+	edit->layer_source = TextLayer_New();
+	edit->layer_placeholder = TextLayer_New();
+	edit->layer = edit->layer_source;
+	edit->text_block_size = TBT_SIZE;
+	memset( edit->tasks, 0, sizeof(edit->tasks) );
 	edit->caret = LCUIWidget_New( "textcaret" );
 	LinkedList_Init( &edit->text_blocks );
 	StyleTags_Init( &edit->text_tags );
 	TextEdit_SetMultiline( w, FALSE );
-	TextLayer_SetAutoWrap( edit->text, TRUE );
-	TextLayer_SetAutoWrap( edit->mask_text, TRUE );
-	TextLayer_SetUsingStyleTags( edit->text, FALSE );
+	TextLayer_SetAutoWrap( edit->layer, TRUE );
+	TextLayer_SetAutoWrap( edit->layer_mask, TRUE );
+	TextLayer_SetUsingStyleTags( edit->layer, FALSE );
 	Widget_BindEvent( w, "textinput", TextEdit_OnTextInput, NULL, NULL );
 	Widget_BindEvent( w, "mousedown", TextEdit_OnMouseDown, NULL, NULL );
 	Widget_BindEvent( w, "mouseup", TextEdit_OnMouseUp, NULL, NULL );
@@ -724,8 +832,8 @@ static void TextEdit_OnInit( LCUI_Widget w )
 static void TextEdit_OnDestroy( LCUI_Widget widget )
 {
 	LCUI_TextEdit edit = widget->private_data;
-	TextLayer_Destroy( edit->text );
-	TextLayer_Destroy( edit->mask_text );
+	TextLayer_Destroy( edit->layer );
+	TextLayer_Destroy( edit->layer_mask );
 	LinkedList_Clear( &edit->text_blocks, TextBlock_OnDestroy );
 }
 
@@ -745,7 +853,7 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	layer_pos.y = content_rect.y - paint->rect.y;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_DrawToGraph( edit->text, rect, layer_pos, &paint->canvas );
+	TextLayer_DrawToGraph( edit->layer, rect, layer_pos, &paint->canvas );
 }
 
 /** 添加 TextEdit 部件类型 */
@@ -756,6 +864,7 @@ void LCUIWidget_AddTextEdit( void )
 	wc->methods.paint = TextEdit_OnPaint;
 	wc->methods.destroy = TextEdit_OnDestroy;
 	wc->methods.set_text = TextEdit_SetText;
+	wc->methods.set_attr = TextEdit_SetAttr;
 	wc->methods.autosize = TextEdit_AutoSize;
 	wc->task_handler = TextEdit_OnTask;
 	LCUICSS_LoadString( textedit_css );

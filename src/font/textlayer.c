@@ -43,6 +43,12 @@
 #include <LCUI/graph.h>
 #include <LCUI/font.h>
 
+ /** 文本添加类型 */
+enum TextAddType {
+	TAT_INSERT,	/**< 插入至插入点处 */
+	TAT_APPEND	/**< 追加至文本末尾 */
+};
+
 #define TextRowList_AddNewRow(ROWLIST) TextRowList_InsertNewRow(ROWLIST, (ROWLIST)->length)
 #define TextLayer_GetRow(layer, n) (n >= layer->rowlist.length) ? NULL:layer->rowlist.rows[n]
 
@@ -288,6 +294,7 @@ LCUI_TextLayer TextLayer_New(void)
 {
 	LCUI_TextLayer layer;
 	layer = malloc( sizeof( LCUI_TextLayerRec ) );
+	layer->length = 0;
 	layer->offset_x = 0;
 	layer->offset_y = 0;
 	layer->insert_x = 0;
@@ -538,11 +545,13 @@ int TextLayer_GetCaretPixelPos( LCUI_TextLayer layer, LCUI_Pos *pixel_pos )
 /** 清空文本 */
 void TextLayer_ClearText( LCUI_TextLayer layer )
 {
+	layer->length = 0;
 	layer->insert_x = 0;
 	layer->insert_y = 0;
 	TextLayer_InvalidateRowsRect( layer, 0, -1 );
 	TextRowList_Destroy( &layer->rowlist );
 	LinkedList_Clear( &layer->style_cache, (FuncPtr)TextStyle_Destroy );
+	TextRowList_InsertNewRow( &layer->rowlist, 0 );
 	layer->task.redraw_all = TRUE;
 }
 
@@ -685,7 +694,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 	rect_has_added = FALSE;
 	is_tmp_tag_stack = FALSE;
 	/* 如果是将文本追加至文本末尾 */
-	if( add_type == TEXT_ADD_TYPE_APPEND ) {
+	if( add_type == TAT_APPEND ) {
 		if( layer->rowlist.length > 0 ) {
 			cur_row = layer->rowlist.length - 1;
 		} else {
@@ -754,6 +763,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 			/* 将当前行中的插入点为截点，进行断行 */
 			TextLayer_BreakTextRow( layer, ins_y, ins_x, eol );
 			need_typeset = TRUE;
+			++layer->length;
 			ins_x = 0;
 			++ins_y;
 			txtrow = TextLayer_GetRow( layer, ins_y );
@@ -763,11 +773,12 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 		txtchar.char_code = *p;
 		TextChar_UpdateBitmap( &txtchar, &layer->text_style );
 		TextRow_InsertCopy( txtrow, ins_x, &txtchar );
+		++layer->length;
 		++ins_x;
 	}
 	/* 更新当前行的尺寸 */
 	TextLayer_UpdateRowSize( layer, txtrow );
-	if( add_type == TEXT_ADD_TYPE_INSERT ) {
+	if( add_type == TAT_INSERT ) {
 		layer->insert_x = ins_x;
 		layer->insert_y = ins_y;
 	}
@@ -793,7 +804,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 int TextLayer_InsertTextW( LCUI_TextLayer layer, const wchar_t *wstr,
 			   LinkedList *tag_stack )
 {
-	return TextLayer_ProcessText( layer, wstr, TEXT_ADD_TYPE_INSERT,
+	return TextLayer_ProcessText( layer, wstr, TAT_INSERT,
 				      tag_stack );
 }
 
@@ -813,7 +824,7 @@ int TextLayer_InsertText( LCUI_TextLayer layer, const char *utf8_str )
 int TextLayer_AppendTextW( LCUI_TextLayer layer, const wchar_t *wstr,
 			   LinkedList *tag_stack )
 {
-	return TextLayer_ProcessText( layer, wstr, TEXT_ADD_TYPE_APPEND, 
+	return TextLayer_ProcessText( layer, wstr, TAT_APPEND, 
 				      tag_stack );
 }
 
@@ -919,8 +930,8 @@ void TextLayer_SetMultiline( LCUI_TextLayer layer, int is_true )
 }
 
 /** 删除指定行列的文字及其右边的文本 */
-static int TextLayer_DeleteText( LCUI_TextLayer layer, int char_y,
-				 int char_x, int n_char )
+static int TextLayer_TextDeleteEx( LCUI_TextLayer layer, int char_y,
+				   int char_x, int n_char )
 {
 	int end_x, end_y, i, j, len;
 	TextRow txtrow, end_txtrow, prev_txtrow;
@@ -941,6 +952,7 @@ static int TextLayer_DeleteText( LCUI_TextLayer layer, int char_y,
 	if( char_x > txtrow->length ) {
 		char_x = txtrow->length;
 	}
+	j = n_char;
 	--n_char;
 	end_x = char_x;
 	end_y = char_y;
@@ -962,6 +974,11 @@ static int TextLayer_DeleteText( LCUI_TextLayer layer, int char_y,
 		}
 		n_char -= (txtrow->length - end_x);
 		end_x = 0;
+	}
+	if( n_char >= 0 ) {
+		layer->length -= j - n_char;
+	} else {
+		layer->length -= n_char;
 	}
 	if( end_y >= layer->rowlist.length ) {
 		end_y = layer->rowlist.length - 1;
@@ -1037,14 +1054,14 @@ static int TextLayer_DeleteText( LCUI_TextLayer layer, int char_y,
 }
 
 /** 删除文本光标的当前坐标右边的文本 */
-int TextLayer_Delete( LCUI_TextLayer layer, int n_char )
+int TextLayer_TextDelete( LCUI_TextLayer layer, int n_char )
 {
-	return TextLayer_DeleteText(	layer, layer->insert_y,
+	return TextLayer_TextDeleteEx(	layer, layer->insert_y,
 					layer->insert_x, n_char );
 }
 
 /** 退格删除文本，即删除文本光标的当前坐标左边的文本 */
-int TextLayer_Backspace( LCUI_TextLayer layer, int n_char )
+int TextLayer_TextBackspace( LCUI_TextLayer layer, int n_char )
 {
 	int n_del;
 	int char_x, char_y;
@@ -1078,7 +1095,7 @@ int TextLayer_Backspace( LCUI_TextLayer layer, int n_char )
 		n_char -= n_del;
 	}
 	/* 开始删除文本 */
-	TextLayer_DeleteText( layer, char_y, char_x, n_char );
+	TextLayer_TextDeleteEx( layer, char_y, char_x, n_char );
 	/* 若最后一行被完全移除，则移动输入点至上一行的行尾处 */
 	if( char_x == 0 && layer->rowlist.length > 0
 	    && char_y >= layer->rowlist.length ) {
@@ -1304,7 +1321,8 @@ void TextLayer_ClearInvalidRect( LCUI_TextLayer layer )
 /** 设置全局文本样式 */
 void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle *style )
 {
-	layer->text_style = *style;
+	TextStyle_Destroy( &layer->text_style );
+	TextStyle_Copy( &layer->text_style, style );
 	layer->task.update_bitmap = TRUE;
 }
 

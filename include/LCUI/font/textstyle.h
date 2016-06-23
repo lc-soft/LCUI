@@ -86,6 +86,8 @@ typedef struct LCUI_TextStyle {
 /** 初始化字体样式数据 */
 LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );
 
+LCUI_API int TextStyle_Copy( LCUI_TextStyle *dst, LCUI_TextStyle *src );
+
 LCUI_API void TextStyle_Destroy( LCUI_TextStyle *data );
 
 /**

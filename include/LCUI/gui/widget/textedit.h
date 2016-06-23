@@ -66,6 +66,11 @@ LCUI_API int TextEdit_AppendTextW( LCUI_Widget widget, const wchar_t *wstr );
 /** 为文本框插入文本（宽字符版） */
 LCUI_API int TextEdit_InsertTextW( LCUI_Widget widget, const wchar_t *wstr );
 
+/** 设置占位符，当文本编辑框内容为空时显示占位符 */
+LCUI_API int TextEdit_SetPlaceHolderW( LCUI_Widget w, const wchar_t *wstr );
+
+LCUI_API int TextEdit_SetPlaceHolder( LCUI_Widget w, const char *str );
+
 LCUI_END_HEADER
 
 #endif

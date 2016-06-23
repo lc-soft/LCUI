@@ -42,12 +42,6 @@
 
 LCUI_BEGIN_HEADER
 
-/** 文本添加类型 */
-enum TextAddType {
-        TEXT_ADD_TYPE_INSERT,		/**< 插入至插入点处 */
-        TEXT_ADD_TYPE_APPEND		/**< 追加至文本末尾 */
-};
-
 typedef struct TextCharRec_ {
         wchar_t char_code;		/**< 字符码 */
         LCUI_TextStyle *style;		/**< 该字符使用的样式数据 */
@@ -87,12 +81,12 @@ typedef struct LCUI_TextLayerRec_  {
         int insert_y;			/**< 光标所在行数 */
         int max_width;			/**< 最大文本宽度 */
         int max_height;			/**< 最大文本高度 */
+	int length;			/**< 文本长度 */
 	LCUI_BOOL is_mulitiline_mode;	/**< 是否启用多行文本模式 */
         LCUI_BOOL is_autowrap_mode;	/**< 是否启用自动换行模式 */
 	LCUI_BOOL is_using_style_tags;	/**< 是否使用文本样式标签 */
         LCUI_BOOL is_using_buffer;	/**< 是否使用缓存空间来存储文本位图 */
 	LinkedList dirty_rect;		/**< 脏矩形记录 */
-
         int text_align;			/**< 文本的对齐方式 */
         TextRowListRec rowlist;		/**< 文本行列表 */
         LCUI_TextStyle text_style;	/**< 文本全局样式 */
@@ -203,10 +197,10 @@ LCUI_API int TextLayer_SetMaxSize( LCUI_TextLayer layer, LCUI_Size new_size );
 LCUI_API void TextLayer_SetMultiline( LCUI_TextLayer layer, int is_true );
 
 /** 删除文本光标的当前坐标右边的文本 */
-LCUI_API int TextLayer_Delete( LCUI_TextLayer layer, int n_char );
+LCUI_API int TextLayer_TextDelete( LCUI_TextLayer layer, int n_char );
 
 /** 退格删除文本，即删除文本光标的当前坐标左边的文本 */
-LCUI_API int TextLayer_Backspace( LCUI_TextLayer layer, int n_char );
+LCUI_API int TextLayer_TextBackspace( LCUI_TextLayer layer, int n_char );
 
 /** 设置是否启用自动换行模式 */
 LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer layer, int is_true );
