@@ -55,6 +55,9 @@ LCUI_API void TextEdit_ClearText( LCUI_Widget widget );
 /** 获取文本内容 */
 LCUI_API int TextEdit_GetTextW( LCUI_Widget widget, int start, int max_len, wchar_t *buf );
 
+/** 获取文本长度 */
+LCUI_API int TextEdit_GetTextLength( LCUI_Widget w );
+
 /** 为文本框设置文本（宽字符版） */
 LCUI_API int TextEdit_SetTextW( LCUI_Widget widget, const wchar_t *wstr );
 

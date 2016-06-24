@@ -79,7 +79,6 @@ typedef struct LCUI_TextEditRec_ {
 	LCUI_BOOL is_read_only;			/**< 是否只读 */
 	LCUI_BOOL is_multiline_mode;		/**< 是否为多行模式 */
 	LCUI_BOOL is_placeholder_shown;		/**< 是否已经显示占位符 */
-	wchar_t *placeholder;			/**< 占位符 */
 	wchar_t *allow_input_char;		/**< 允许输入的字符 */
 	wchar_t password_char;			/**< 屏蔽符的副本 */
 	int text_block_size;			/**< 块大小 */
@@ -112,6 +111,8 @@ typedef struct LCUI_TextBlockRec_ {
 	int add_type;			/**< 指定该文本块的添加方式 */
 	wchar_t *text;			/**< 文本块(段) */
 } LCUI_TextBlockRec, *LCUI_TextBlock;
+
+static int textedit_event_id = -1;
 
 /*---------------------------------- Caret ----------------------------------*/
 
@@ -421,6 +422,7 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 		LCUI_BOOL is_shown;
 		LinkedList blocks;
 		LinkedListNode *node;
+		LCUI_WidgetEventRec ev;
 		LinkedList_Init( &blocks );
 		LCUIMutex_Lock( &edit->mutex );
 		LinkedList_Concat( &blocks, &edit->text_blocks );
@@ -438,6 +440,8 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 		if( edit->is_placeholder_shown != is_shown ) {
 			Widget_InvalidateArea( widget, NULL, SV_PADDING_BOX );
 		}
+		ev.type = textedit_event_id;
+		Widget_TriggerEvent( widget, &ev, NULL );
 		edit->is_placeholder_shown = is_shown;
 		edit->tasks[TASK_UPDATE_CARET] = TRUE;
 		edit->tasks[TASK_SET_TEXT] = FALSE;
@@ -509,6 +513,12 @@ int TextEdit_GetTextW( LCUI_Widget w, int start, int max_len, wchar_t *buf )
 {
 	LCUI_TextEdit edit = w->private_data;
 	return TextLayer_GetTextW( edit->layer_source, start, max_len, buf );
+}
+
+int TextEdit_GetTextLength( LCUI_Widget w )
+{
+	LCUI_TextEdit edit = w->private_data;
+	return edit->layer_source->length;
 }
 
 int TextEdit_SetTextW( LCUI_Widget w, const wchar_t *wstr )
@@ -594,6 +604,7 @@ static void TextEdit_OnBlur( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
 static void TextEdit_TextBackspace( LCUI_Widget widget, int n_ch )
 {
 	LCUI_TextEdit edit;
+	LCUI_WidgetEventRec ev;
 	Widget_Lock( widget );
 	edit = widget->private_data;
 	LCUIMutex_Lock( &edit->mutex );
@@ -606,11 +617,14 @@ static void TextEdit_TextBackspace( LCUI_Widget widget, int n_ch )
 	Widget_AddTask( widget, WTT_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_Unlock( widget );
+	ev.type = textedit_event_id;
+	Widget_TriggerEvent( widget, &ev, NULL );
 }
 
 static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 {
 	LCUI_TextEdit edit;
+	LCUI_WidgetEventRec ev;
 	Widget_Lock( widget );
 	edit = widget->private_data;
 	LCUIMutex_Lock( &edit->mutex );
@@ -623,6 +637,8 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 	Widget_AddTask( widget, WTT_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_Unlock( widget );
+	ev.type = textedit_event_id;
+	Widget_TriggerEvent( widget, &ev, NULL );
 }
 
 /** 处理按键事件 */
@@ -630,7 +646,6 @@ static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *ar
 {
 	LCUI_TextEdit edit;
 	int cols, rows, cur_col, cur_row;
-
 	edit = widget->private_data;
 	cur_row = edit->layer->insert_y;
 	cur_col = edit->layer->insert_x;
@@ -869,4 +884,6 @@ void LCUIWidget_AddTextEdit( void )
 	wc->task_handler = TextEdit_OnTask;
 	LCUICSS_LoadString( textedit_css );
 	LCUIWidget_AddTextCaret();
+	textedit_event_id = LCUIWidget_AllocEventId();
+	LCUIWidget_SetEventName( textedit_event_id, "change" );
 }
