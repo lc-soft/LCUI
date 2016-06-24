@@ -256,6 +256,7 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_BOOL		has_dirty_child;	/**< 子级部件是否有无效区域 */
 	LCUI_BOOL		layout_locked;		/**< 子级部件布局是否已锁定 */
 	LCUI_BOOL		event_blocked;		/**< 是否阻止自己和子级部件的事件处理 */
+	LCUI_BOOL		disabled;		/**< 是否禁用 */
 } LCUI_WidgetRec;
 
 #define Widget_GetNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec))
@@ -369,6 +370,9 @@ LCUI_API int Widget_AddStatus( LCUI_Widget w, const char *status_name );
 
 /** 判断部件是否包含指定的状态 */
 LCUI_API LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name );
+
+/** 设置部件是否禁用 */
+LCUI_API void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled );
 
 /** 计算部件的最大宽度 */
 LCUI_API int Widget_ComputeMaxWidth( LCUI_Widget w );

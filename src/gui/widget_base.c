@@ -1163,6 +1163,16 @@ void Widget_SetBackgroundColor( LCUI_Widget w, LCUI_Color color )
 	w->computed_style.background.color = color;
 }
 
+void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled )
+{
+	w->disabled = disabled;
+	if( w->disabled ) {
+		Widget_AddStatus( w, "disabled" );
+	} else {
+		Widget_RemoveStatus( w, "disabled" );
+	}
+}
+
 void Widget_Lock( LCUI_Widget w )
 {
 	LCUIMutex_Lock( &w->mutex );

@@ -105,6 +105,10 @@ button:active {
 	background-color:rgb(215,215,215);
 }
 
+button:disabled textview {
+	color: #aaa;
+}
+
 );
 
 /** 添加按钮部件类型 */
