@@ -273,6 +273,10 @@ void Widget_Destroy( LCUI_Widget w )
 		root = root->parent;
 	}
 	w->state = WSTATE_DELETED;
+	if( root != LCUIWidget.root ) {
+		Widget_ExecDestroy( w );
+		return;
+	}
 	if( w->parent ) {
 		LCUI_Widget child;
 		LinkedListNode *node, *snode;
@@ -294,20 +298,37 @@ void Widget_Destroy( LCUI_Widget w )
 		Widget_InvalidateArea( w->parent, &w->box.graph, 
 				       SV_PADDING_BOX );
 	}
-	if( root != LCUIWidget.root ) {
-		Widget_ExecDestroy( w );
-		return;
-	}
 }
 
-void Widget_Empty( LCUI_Widget widget )
+void Widget_Empty( LCUI_Widget w )
 {
-	LinkedListNode *node, *prev;
-	node = widget->children.head.next;
-	while( node ) {
-		prev = node->prev;
-		Widget_Destroy( node->data );
-		node = prev->next;
+	LinkedListNode *node;
+	LCUI_Widget root = w, child;
+	while( root->parent ) {
+		root = root->parent;
+	}
+	LinkedList_ClearData( &w->children_show, NULL );
+	if( root == LCUIWidget.root ) {
+		LinkedList_ForEach( node, &w->children ) {
+			child = node->data;
+			child->state = WSTATE_DELETED;
+		}
+		LinkedList_Concat( &w->children_trash, &w->children );
+		Widget_InvalidateArea( w->parent, &w->box.graph, 
+				       SV_PADDING_BOX );
+		Widget_AddTask( w, WTT_LAYOUT );
+		return;
+	} else {
+		LinkedList list;
+		LinkedListNode *prev;
+		LinkedList_Init( &list );
+		LinkedList_Concat( &list, &w->children );
+		node = list.head.next;
+		while( node ) {
+			prev = node->prev;
+			Widget_ExecDestroy( node->data );
+			node = prev->next;
+		}
 	}
 }
 
