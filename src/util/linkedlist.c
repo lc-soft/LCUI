@@ -52,7 +52,10 @@ void LinkedList_Init( LinkedList *list )
 
 void LinkedList_Unlink( LinkedList *list, LinkedListNode *node )
 {
-	(list)->length -= 1;
+	list->length -= 1;
+	if( list->length < 0 ) {
+		abort();
+	}
 	if( node->next ) {
 		node->next->prev = node->prev;
 	}
@@ -78,7 +81,6 @@ void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*),
 		if( node->data && on_destroy ) {
 			on_destroy( node->data );
 		}
-		node->data = NULL;
 		if( free_node ) {
 			free( node );
 		}
