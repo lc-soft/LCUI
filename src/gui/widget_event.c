@@ -622,6 +622,37 @@ void LCUIWidget_ClearEventTarget( LCUI_Widget widget )
 	}
 }
 
+int LCUIWidget_SetFocus( LCUI_Widget widget )
+{
+	LCUI_Widget w;
+	LCUI_WidgetEventRec ev;
+	/* 开始处理焦点 */
+	for( w = widget; w; w = w->parent ) {
+		if( w->computed_style.pointer_events != SV_NONE &&
+		    w->computed_style.focusable && !w->disabled ) {
+			break;
+		}
+	}
+	if( self.targets[WST_FOCUS] == w ) {
+		return 0;
+	}
+	if( self.targets[WST_FOCUS] ) {
+		ev.type = WET_BLUR;
+		ev.target = self.targets[WST_FOCUS];
+		Widget_RemoveStatus( ev.target, "focus" );
+		Widget_PostEvent( ev.target, &ev, NULL, NULL );
+	}
+	if( !w->computed_style.focusable || w->disabled ) {
+		return -1;
+	}
+	ev.target = w;
+	ev.type = WET_FOCUS;
+	self.targets[WST_FOCUS] = w;
+	Widget_AddStatus( ev.target, "focus" );
+	Widget_PostEvent( ev.target, &ev, NULL, NULL );
+	return 0;
+}
+
 /** 响应系统的鼠标移动事件，向目标部件投递相关鼠标事件 */
 static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 {
@@ -654,30 +685,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		ev.button.button = sys_ev->button.button;
 		Widget_PostEvent( target, &ev, NULL, NULL );
 		Widget_UpdateStatus( target, WST_ACTIVE );
-		/* 开始处理焦点 */
-		for( w = target; w; w = w->parent ) {
-			if( w->computed_style.pointer_events != SV_NONE &&
-			    w->computed_style.focusable && !w->disabled ) {
-				break;
-			}
-		}
-		if( self.targets[WST_FOCUS] == w ) {
-			break;
-		}
-		if( self.targets[WST_FOCUS] ) {
-			ev.type = WET_BLUR;
-			ev.target = self.targets[WST_FOCUS];
-			Widget_RemoveStatus( ev.target, "focus" );
-			Widget_PostEvent( ev.target, &ev, NULL, NULL );
-		}
-		if( !w->computed_style.focusable || w->disabled ) {
-			break;
-		}
-		ev.target = w;
-		ev.type = WET_FOCUS;
-		self.targets[WST_FOCUS] = w;
-		Widget_AddStatus( ev.target, "focus" );
-		Widget_PostEvent( ev.target, &ev, NULL, NULL );
+		LCUIWidget_SetFocus( target );
 		break;
 	case LCUI_MOUSEUP:
 		ev.type = WET_MOUSEUP;
