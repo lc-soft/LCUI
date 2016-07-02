@@ -141,6 +141,10 @@ border: 1px solid #2196F3;
 box-shadow: 0 0 6px rgba(33,150,243,0.4);
 }
 
+textedit:disabled {
+background-color: #eaeaea;
+}
+
 );
 
 static void TextCaret_BlinkShow( LCUI_Widget widget )

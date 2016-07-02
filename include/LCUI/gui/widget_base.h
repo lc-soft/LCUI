@@ -56,7 +56,6 @@ typedef struct LCUI_WidgetStyle {
 	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
 	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
 	LCUI_StyleValue position;	/**< 定位方式 */
-	LCUI_StyleValue float_mode;	/**< 浮动模式 */
 	LCUI_StyleValue display;	/**< 显示方式，决定以何种布局显示该部件 */
 	LCUI_StyleValue box_sizing;	/**< 以何种方式计算宽度和高度 */
 	LCUI_StyleValue vertical_align;	/**< 垂直对齐方式 */

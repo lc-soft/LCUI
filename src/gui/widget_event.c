@@ -657,7 +657,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		/* 开始处理焦点 */
 		for( w = target; w; w = w->parent ) {
 			if( w->computed_style.pointer_events != SV_NONE &&
-			    w->computed_style.focusable ) {
+			    w->computed_style.focusable && !w->disabled ) {
 				break;
 			}
 		}
@@ -670,7 +670,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 			Widget_RemoveStatus( ev.target, "focus" );
 			Widget_PostEvent( ev.target, &ev, NULL, NULL );
 		}
-		if( !w->computed_style.focusable ) {
+		if( !w->computed_style.focusable || w->disabled ) {
 			break;
 		}
 		ev.target = w;

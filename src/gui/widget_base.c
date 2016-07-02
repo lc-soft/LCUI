@@ -582,6 +582,7 @@ void Widget_UpdateBoxShadow( LCUI_Widget w )
 
 void Widget_UpdateVisibility( LCUI_Widget w )
 {
+	int display = w->computed_style.display;
 	LCUI_Style s = &w->style->sheet[key_visible];
 	LCUI_BOOL visible = w->computed_style.visible;
 	if( w->computed_style.display == SV_NONE ) {
@@ -604,10 +605,8 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 	if( w->parent ) {
 		Widget_InvalidateArea( w->parent, &w->box.graph, 
 				       SV_PADDING_BOX );
-		if( (w->computed_style.display == SV_BLOCK ||
-		      w->computed_style.display == SV_INLINE_BLOCK)
-		    && w->computed_style.position == SV_STATIC
-		    && w->computed_style.float_mode == SV_NONE ) {
+		if( w->computed_style.display != display &&
+		    w->computed_style.position != SV_ABSOLUTE ) {
 			Widget_UpdateLayout( w->parent );
 		}
 	}
