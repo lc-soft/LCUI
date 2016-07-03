@@ -952,59 +952,61 @@ static int TextLayer_TextDeleteEx( LCUI_TextLayer layer, int char_y,
 	if( char_x > txtrow->length ) {
 		char_x = txtrow->length;
 	}
-	j = n_char;
-	--n_char;
+	i = n_char;
 	end_x = char_x;
 	end_y = char_y;
 	/* 计算结束点的位置 */
 	for( ; end_y < layer->rowlist.length && n_char > 0; ++end_y ) {
 		txtrow = layer->rowlist.rows[end_y];
-		if( txtrow->eol == EOL_NONE ) {
-			if( end_x + n_char < txtrow->length ) {
-				end_x += n_char;
-				n_char = 0;
-				break;
-			}
-		} else {
-			if( end_x + n_char <= txtrow->length ) {
-				end_x += n_char;
-				n_char = 0;
-				break;
-			}
+		if( end_x + n_char <= txtrow->length ) {
+			end_x += n_char;
+			n_char = 0;
+			break;
 		}
 		n_char -= (txtrow->length - end_x);
-		end_x = 0;
+		if( txtrow->eol == EOL_NONE ) {
+			end_x = 0;
+		} else {
+			n_char -= 1;
+			end_x = 0;
+		}
 	}
 	if( n_char >= 0 ) {
-		layer->length -= j - n_char;
+		layer->length -= i - n_char;
 	} else {
 		layer->length -= n_char;
 	}
 	if( end_y >= layer->rowlist.length ) {
 		end_y = layer->rowlist.length - 1;
+		end_txtrow = layer->rowlist.rows[end_y];
+		end_x = end_txtrow->length;
+	} else {
+		end_txtrow = layer->rowlist.rows[end_y];
 	}
-	end_txtrow = layer->rowlist.rows[end_y];
 	if( end_x > end_txtrow->length ) {
 		end_x = end_txtrow->length;
+	}
+	if( end_x == char_x && end_y == char_y ) {
+		return 0;
 	}
 	/* 获取上一行文本 */
 	prev_txtrow = layer->rowlist.rows[char_y - 1];
 	// 计算起始行与结束行拼接后的长度
 	// 起始行：0 1 2 3 4 5，起点位置：2
 	// 结束行：0 1 2 3 4 5，终点位置：4
-	// 拼接后的长度：2 + 6 - 4 - 1 = 3
-	len = char_x + end_txtrow->length - end_x - 1;
+	// 拼接后的长度：2 + 6 - 4 = 4
+	len = char_x + end_txtrow->length - end_x;
 	if( len < 0 ) {
 		return -3;
 	}
 	/* 如果是同一行 */
 	if( txtrow == end_txtrow ) {
-		if( end_x >= end_txtrow->length ) {
+		if( end_x > end_txtrow->length ) {
 			return -4;
 		}
 		TextLayer_InvalidateRowRect( layer, char_y, char_x, -1 );
 		TextLayer_AddUpdateTypeset( layer, char_y );
-		for( i = char_x, j = end_x + 1; j < txtrow->length; ++i, ++j ) {
+		for( i = char_x, j = end_x; j < txtrow->length; ++i, ++j ) {
 			txtrow->string[i] = txtrow->string[j];
 		}
 		/* 如果当前行为空，也不是第一行，并且上一行没有结束符 */
@@ -1087,7 +1089,7 @@ int TextLayer_TextBackspace( LCUI_TextLayer layer, int n_char )
 		}
 		n_del = n_del - char_x - 1;
 	}
-	if( char_y < 0 && n_del == n_char ) {
+	if( char_y < 0 || n_del == n_char ) {
 		return -1;
 	}
 	/* 若能够被删除的字不够 n_char 个，则调整需删除的字数 */

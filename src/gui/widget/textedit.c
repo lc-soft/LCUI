@@ -423,7 +423,6 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 {
 	LCUI_TextEdit edit = widget->private_data;
 	if( edit->tasks[TASK_SET_TEXT] ) {
-		LCUI_BOOL is_shown;
 		LinkedList blocks;
 		LinkedListNode *node;
 		LCUI_WidgetEventRec ev;
@@ -435,6 +434,15 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 			TextEdit_ProcTextBlock( widget, node->data );
 		}
 		LinkedList_Clear( &blocks, TextBlock_OnDestroy );
+		ev.type = textedit_event_id;
+		Widget_TriggerEvent( widget, &ev, NULL );
+		edit->tasks[TASK_UPDATE_CARET] = TRUE;
+		edit->tasks[TASK_SET_TEXT] = FALSE;
+		edit->tasks[TASK_UPDATE] = TRUE;
+	}
+	if( edit->tasks[TASK_UPDATE] ) {
+		LCUI_BOOL is_shown;
+		TextEdit_UpdateTextLayer( widget );
 		is_shown = edit->layer_source->length == 0;
 		if( is_shown ) {
 			edit->layer = edit->layer_placeholder;
@@ -444,15 +452,7 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 		if( edit->is_placeholder_shown != is_shown ) {
 			Widget_InvalidateArea( widget, NULL, SV_PADDING_BOX );
 		}
-		ev.type = textedit_event_id;
-		Widget_TriggerEvent( widget, &ev, NULL );
 		edit->is_placeholder_shown = is_shown;
-		edit->tasks[TASK_UPDATE_CARET] = TRUE;
-		edit->tasks[TASK_SET_TEXT] = FALSE;
-		edit->tasks[TASK_UPDATE] = TRUE;
-	}
-	if( edit->tasks[TASK_UPDATE] ) {
-		TextEdit_UpdateTextLayer( widget );
 		edit->tasks[TASK_UPDATE] = FALSE;
 	}
 	if( edit->tasks[TASK_UPDATE_CARET] ) {
@@ -594,7 +594,8 @@ static void TextEdit_OnFocus( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg 
 	LCUIIME_SetTarget( widget );
 	TextCaret_SetVisible( edit->caret, TRUE );
 	TextCaret_BlinkHide( edit->caret );
-	TextEdit_UpdateCaret( widget );
+	edit->tasks[TASK_UPDATE_CARET] = TRUE;
+	Widget_AddTask( widget, WTT_USER );
 }
 
 static void TextEdit_OnBlur( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
@@ -705,7 +706,7 @@ static void TextEdit_OnTextInput( LCUI_Widget widget,
 				  LCUI_WidgetEvent e, void *arg )
 {
 	uint_t i, j, k;
-	wchar_t ch, *text, excludes[8] = L"\b\r\t";
+	wchar_t ch, *text, excludes[8] = L"\b\r\t\x1b";
 	LCUI_TextEdit edit = widget->private_data;
 	/* 如果不是多行文本编辑模式则删除换行符 */
 	if( !edit->is_multiline_mode ) {
@@ -807,6 +808,11 @@ static void TextEdit_OnMouseDown( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	Widget_BindEvent( w, "mousemove", TextEdit_OnMouseMove, NULL, NULL );
 }
 
+static void TextEdit_OnReady( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
+{
+	TextEdit_UpdateCaret( w );
+}
+
 static void TextEdit_SetAttr( LCUI_Widget w, const char *name, 
 			      const char *val )
 {
@@ -843,6 +849,7 @@ static void TextEdit_OnInit( LCUI_Widget w )
 	Widget_BindEvent( w, "resize", TextEdit_OnResize, NULL, NULL );
 	Widget_BindEvent( w, "focus", TextEdit_OnFocus, NULL, NULL );
 	Widget_BindEvent( w, "blur", TextEdit_OnBlur, NULL, NULL );
+	Widget_BindEvent( w, "ready", TextEdit_OnReady, NULL, NULL );
 	Widget_Append( w, edit->caret );
 	Widget_Hide( edit->caret );
 	LCUIMutex_Init( &edit->mutex );
