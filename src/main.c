@@ -394,7 +394,7 @@ static void LCUI_ShowCopyrightText(void)
 		"\n"
 #endif
 		"Build at "__DATE__" - "__TIME__"\n"
-		"Copyright (C) 2012-2015 Liu Chao <lc-soft@live.cn>.\n"
+		"Copyright (C) 2012-2016 Liu Chao <lc-soft@live.cn>.\n"
 		"This is free software, licensed under GPLv2. \n"
 		"See source distribution for detailed copyright notices.\n"
 		"To learn more, visit http://www.lcui.org.\n\n"
