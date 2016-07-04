@@ -794,7 +794,7 @@ static void StyleSheetFinder_Destroy( StyleSheetFinder sfinder )
 int StyleSheetFinder_Find( StyleSheetFinder sfinder, LinkedList *list )
 {
 	LinkedListNode *node;
-	int i, name_len, len, old_len, old_level, count = 0;
+	int i, len, old_len, old_level, count = 0;
 	char *fullname = sfinder->name + sfinder->name_i;
 	old_len = len = strlen( fullname );
 	old_level = sfinder->level;
@@ -856,7 +856,6 @@ int StyleSheetFinder_Find( StyleSheetFinder sfinder, LinkedList *list )
 				i += 1;
 				continue;
 			}
-			name_len = strlen( node->data );
 			strcpy( fullname + len, node->data );
 			count += FindStyleNodeByName( fullname, 
 						      sfinder->widget, list );
@@ -914,7 +913,6 @@ int StyleSheetFinder_Find( StyleSheetFinder sfinder, LinkedList *list )
 				continue;
 			}
 			fullname[len] = ':';
-			name_len = strlen( node->data );
 			strcpy( fullname + len + 1, node->data );
 			count += FindStyleNodeByName( fullname, 
 						      sfinder->widget, list );

@@ -39,6 +39,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
@@ -334,6 +335,7 @@ void LCUI_InitIME( void )
 void LCUI_ExitIME( void )
 {
 	self.is_inited = FALSE;
+	LinkedList_ClearData( &self.list, LCUIIME_OnDestroy );
 }
 
 

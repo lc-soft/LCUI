@@ -12,6 +12,7 @@ widget_background.c	\
 css_parser.c		\
 builder.c		\
 widget/textview.c	\
+widget/textedit.c	\
 widget/sidebar.c	\
 widget/scrollbar.c	\
 widget/button.c
