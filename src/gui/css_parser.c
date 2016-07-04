@@ -631,7 +631,8 @@ static KeyNameGroup style_option_map[] = {
 	{ SV_RELATIVE, "relative" },
 	{ SV_ABSOLUTE, "absolute" },
 	{ SV_BLOCK, "block" },
-	{ SV_INLINE_BLOCK, "inline-block" }
+	{ SV_INLINE_BLOCK, "inline-block" },
+	{ SV_NOWRAP, "nowrap" }
 };
 
 /** 各个样式的解析器映射表 */

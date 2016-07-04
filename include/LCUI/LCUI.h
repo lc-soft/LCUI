@@ -226,7 +226,8 @@ typedef enum LCUI_StyleValue {
 	SV_FLOAT_LEFT,
 	SV_FLOAT_RIGHT,
 	SV_BLOCK,
-	SV_INLINE_BLOCK
+	SV_INLINE_BLOCK,
+	SV_NOWRAP
 } LCUI_StyleValue;
 
 typedef struct LCUI_StyleRec_ {

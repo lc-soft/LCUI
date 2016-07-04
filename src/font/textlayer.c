@@ -55,9 +55,15 @@ enum TextAddType {
 /* 根据对齐方式，计算文本行的起始X轴位置 */
 static int TextLayer_GetRowStartX( LCUI_TextLayer layer, TextRow txtrow )
 {
+	int width;
+	if( layer->fixed_width > 0 ) {
+		width = layer->fixed_width;
+	} else {
+		width = layer->width;
+	}
 	switch( layer->text_align ) {
-	case SV_CENTER: return (layer->max_width - txtrow->width)/2;
-	case SV_RIGHT: return layer->max_width - txtrow->width;
+	case SV_CENTER: return (width - txtrow->width) / 2;
+	case SV_RIGHT: return width - txtrow->width;
 	case SV_LEFT:
 	default: break;
 	}
@@ -294,6 +300,7 @@ LCUI_TextLayer TextLayer_New(void)
 {
 	LCUI_TextLayer layer;
 	layer = malloc( sizeof( LCUI_TextLayerRec ) );
+	layer->width = 0;
 	layer->length = 0;
 	layer->offset_x = 0;
 	layer->offset_y = 0;
@@ -301,6 +308,8 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->insert_y = 0;
 	layer->max_width = 0;
 	layer->max_height = 0;
+	layer->fixed_width = 0;
+	layer->fixed_height = 0;
 	layer->new_offset_x = 0;
 	layer->new_offset_y = 0;
 	layer->rowlist.length = 0;
@@ -386,7 +395,6 @@ static int TextLayer_GetRowRect( LCUI_TextLayer layer, int i_row,
 			rect->width += txtrow->string[i]->bitmap->advance.x;
 		}
 	}
-	LCUIRect_ValidateArea( rect, layer->max_width, layer->max_height );
 	if( rect->width <= 0 || rect->height <= 0 ) {
 		return 1;
 	}
@@ -411,18 +419,18 @@ void TextLayer_InvalidateRowsRect( LCUI_TextLayer layer,
 	LCUI_Rect rect;
 
 	if( end_row < 0 || end_row >= layer->rowlist.length ) {
-		end_row = layer->rowlist.length-1;
+		end_row = layer->rowlist.length - 1;
 	}
 
 	y = layer->offset_y;
-	for( i=0; i<layer->rowlist.length; ++i ) {
+	for( i = 0; i < layer->rowlist.length; ++i ) {
 		y += layer->rowlist.rows[i]->height;
 		if( i >= start_row && y >= 0 ) {
 			y -= layer->rowlist.rows[i]->height;
 			break;
 		}
 	}
-	for( ; i<=end_row; ++i ) {
+	for( ; i <= end_row; ++i ) {
 		TextLayer_GetRowRect( layer, i, 0, -1, &rect );
 		RectList_Add( &layer->dirty_rect, &rect );
 		y += layer->rowlist.rows[i]->height;
@@ -548,6 +556,7 @@ void TextLayer_ClearText( LCUI_TextLayer layer )
 	layer->length = 0;
 	layer->insert_x = 0;
 	layer->insert_y = 0;
+	layer->width = 0;
 	TextLayer_InvalidateRowsRect( layer, 0, -1 );
 	TextRowList_Destroy( &layer->rowlist );
 	LinkedList_Clear( &layer->style_cache, (FuncPtr)TextStyle_Destroy );
@@ -582,7 +591,13 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer layer, int row )
 	TextChar txtchar;
 	LCUI_BOOL not_autowrap;
 	int col, row_width = 0;
-	if( layer->max_width <= 0 || !layer->is_autowrap_mode ||
+	int max_width;
+	if( layer->fixed_width > 0 ) {
+		max_width = layer->fixed_width;
+	} else {
+		max_width = layer->max_width;
+	}
+	if( max_width <= 0 || !layer->is_autowrap_mode ||
 	    (layer->is_autowrap_mode && !layer->is_mulitiline_mode) ) {
 		not_autowrap = TRUE;
 	} else {
@@ -597,8 +612,7 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer layer, int row )
 		/* 累加行宽度 */
 		row_width += txtchar->bitmap->advance.x;
 		/* 如果是当前行的第一个字符，或者行宽度没有超过宽度限制 */
-		if( not_autowrap || col < 1 || 
-		    row_width <= layer->max_width ) {
+		if( not_autowrap || col < 1 || row_width <= max_width ) {
 			continue;
 		}
 		TextLayer_BreakTextRow( layer, row, col, EOL_NONE );
@@ -627,7 +641,7 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer layer, int row )
 			}
 			row_width += txtchar->bitmap->advance.x;
 			/* 如果没有超过宽度限制 */
-			if( not_autowrap || row_width <= layer->max_width ) {
+			if( not_autowrap || row_width <= max_width ) {
 				TextRow_Insert( txtrow, -1, txtchar );
 				next_txtrow->string[col] = NULL;
 				continue;
@@ -667,7 +681,7 @@ static void TextLayer_TextTypeset( LCUI_TextLayer layer, int start_row )
 	int row;
 	/* 记录排版前各个文本行的矩形区域 */
 	TextLayer_InvalidateRowsRect( layer, start_row, -1 );
-	for( row=start_row; row<layer->rowlist.length; ++row ) {
+	for( row = start_row; row < layer->rowlist.length; ++row ) {
 		TextLayer_TextRowTypeset( layer, row );
 	}
 	/* 记录排版后各个文本行的矩形区域 */
@@ -762,6 +776,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 			}
 			/* 将当前行中的插入点为截点，进行断行 */
 			TextLayer_BreakTextRow( layer, ins_y, ins_x, eol );
+			layer->width = max( layer->width, txtrow->width );
 			need_typeset = TRUE;
 			++layer->length;
 			ins_x = 0;
@@ -778,6 +793,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 	}
 	/* 更新当前行的尺寸 */
 	TextLayer_UpdateRowSize( layer, txtrow );
+	layer->width = max( layer->width, txtrow->width );
 	if( add_type == TAT_INSERT ) {
 		layer->insert_x = ins_x;
 		layer->insert_y = ins_y;
@@ -891,7 +907,6 @@ int TextLayer_GetTextW( LCUI_TextLayer layer, int start_pos,
 	return i;
 }
 
-/** 获取文本位图缓存 */
 LCUI_Graph* TextLayer_GetGraphBuffer( LCUI_TextLayer layer )
 {
 	if( layer->is_using_buffer ) {
@@ -900,16 +915,57 @@ LCUI_Graph* TextLayer_GetGraphBuffer( LCUI_TextLayer layer )
 	return NULL;
 }
 
-/** 设置最大尺寸 */
-int TextLayer_SetMaxSize( LCUI_TextLayer layer, LCUI_Size size )
+int TextLayer_GetWidth( LCUI_TextLayer layer )
 {
-	if( size.width <= 0 || size.height <= 0 ) {
-		return -1;
+	int i, row, w, max_w;
+	TextRow txtrow;
+
+	for( row = 0, max_w = 0; row < layer->rowlist.length; ++row ) {
+		txtrow = layer->rowlist.rows[row];
+		for( i = 0, w = 0; i < txtrow->length; ++i ) {
+			if( !txtrow->string[i]->bitmap ||
+			    !txtrow->string[i]->bitmap->buffer ) {
+				continue;
+			}
+			w += txtrow->string[i]->bitmap->advance.x;
+		}
+		if( w > max_w ) {
+			max_w = w;
+		}
 	}
-	layer->max_width = size.width;
-	layer->max_height = size.height;
+	return max_w;
+}
+
+int TextLayer_GetHeight( LCUI_TextLayer layer )
+{
+	int i, h;
+	for( i = 0, h = 0; i < layer->rowlist.length; ++i ) {
+		h += layer->rowlist.rows[i]->height;
+	}
+	return h;
+}
+
+int TextLayer_SetFixedSize( LCUI_TextLayer layer, int width, int height )
+{
+	layer->fixed_width = width;
+	layer->fixed_height = height;
 	if( layer->is_using_buffer ) {
-		Graph_Create( &layer->graph, size.width, size.height );
+		Graph_Create( &layer->graph, width, height );
+	}
+	layer->task.redraw_all = TRUE;
+	if( layer->is_autowrap_mode ) {
+		layer->task.typeset_start_row = 0;
+		layer->task.update_typeset = TRUE;
+	}
+	return 0;
+}
+
+int TextLayer_SetMaxSize( LCUI_TextLayer layer, int width, int height )
+{
+	layer->max_width = width;
+	layer->max_height = height;
+	if( layer->is_using_buffer ) {
+		Graph_Create( &layer->graph, width, height );
 	}
 	layer->task.redraw_all = TRUE;
 	if( layer->is_autowrap_mode ) {
@@ -1125,45 +1181,13 @@ void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_true )
 	layer->is_using_style_tags = is_true;
 }
 
-/** 计算并获取文本的宽度 */
-int TextLayer_GetWidth( LCUI_TextLayer layer )
-{
-	int i, row, w, max_w;
-	TextRow txtrow;
-
-	for( row=0,max_w=0; row<layer->rowlist.length; ++row ) {
-		txtrow = layer->rowlist.rows[row];
-		for( i=0, w=0; i<txtrow->length; ++i ) {
-			if( !txtrow->string[i]->bitmap ||
-			    !txtrow->string[i]->bitmap->buffer ) {
-				continue;
-			}
-			w += txtrow->string[i]->bitmap->advance.x;
-		}
-		if( w > max_w ) {
-			max_w = w;
-		}
-	}
-	return max_w;
-}
-
-/** 计算并获取文本的高度 */
-int TextLayer_GetHeight( LCUI_TextLayer layer )
-{
-	int i, h;
-	for( i=0,h=0; i<layer->rowlist.length; ++i ) {
-		h += layer->rowlist.rows[i]->height;
-	}
-	return h;
-}
-
 /** 重新载入各个文字的字体位图 */
 void TextLayer_ReloadCharBitmap( LCUI_TextLayer layer )
 {
 	int row, col;
-	for( row=0; row<layer->rowlist.length; ++row ) {
+	for( row = 0; row < layer->rowlist.length; ++row ) {
 		TextRow txtrow = layer->rowlist.rows[row];
-		for( col=0; col<txtrow->length; ++col ) {
+		for( col = 0; col < txtrow->length; ++col ) {
 			TextChar txtchar = txtrow->string[col];
 			TextChar_UpdateBitmap( txtchar, &layer->text_style );
 		}
@@ -1186,6 +1210,7 @@ void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list )
 		layer->task.update_typeset = FALSE;
 		layer->task.typeset_start_row = 0;
 	}
+	layer->width = TextLayer_GetWidth( layer );
 	/* 如果坐标偏移量有变化，记录各个文本行区域 */
 	if( layer->new_offset_x != layer->offset_x
 	 || layer->new_offset_y != layer->offset_y ) {
@@ -1200,23 +1225,26 @@ void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list )
 	 }
 }
 
-/**
- * 将文本图层中的指定区域的内容绘制至目标图像中
- * @param layer 要使用的文本图层
- * @param area 文本图层中需要绘制的区域
- * @param layer_pos 文本图层在目标图像中的位置
- * @param graph 目标图像
- */
 int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 			   LCUI_Pos layer_pos, LCUI_Graph *graph )
 {
 	TextRow txtrow;
 	TextChar txtchar;
 	LCUI_Pos char_pos;
-	int x, y, row, col;
+	int x, y, row, col, width, height;
 	y = layer->offset_y;
-	LCUIRect_ValidateArea( &area, layer->max_width, layer->max_height );
-	for( row=0; row<layer->rowlist.length; ++row ) {
+	if( layer->fixed_width > 0 ) {
+		width = layer->fixed_width;
+	} else {
+		width = layer->width;
+	}
+	if( layer->fixed_width > 0 ) {
+		height = layer->fixed_width;
+	} else {
+		height = TextLayer_GetHeight( layer );
+	}
+	LCUIRect_ValidateArea( &area, width, height );
+	for( row = 0; row < layer->rowlist.length; ++row ) {
 		txtrow = TextLayer_GetRow( layer, row );
 		y += txtrow->height;
 		if( y > area.y ) {
@@ -1233,7 +1261,7 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 		x = TextLayer_GetRowStartX( layer, txtrow );
 		x += layer->offset_x;
 		/* 确定从哪个文字开始绘制 */
-		for( col=0; col<txtrow->length; ++col ) {
+		for( col = 0; col < txtrow->length; ++col ) {
 			txtchar = txtrow->string[col];
 			/* 忽略无字体位图的文字 */
 			if( !txtchar->bitmap ) {
@@ -1251,7 +1279,7 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 			continue;
 		}
 		/* 遍历该行的文字 */
-		for( ; col<txtrow->length; ++col ) {
+		for( ; col < txtrow->length; ++col ) {
 			txtchar = txtrow->string[col];
 			if( !txtchar->bitmap ) {
 				continue;

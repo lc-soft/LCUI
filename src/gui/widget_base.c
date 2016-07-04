@@ -1403,8 +1403,11 @@ int Widget_ComputeMaxWidth( LCUI_Widget w )
 			break;
 		case SVT_SCALE:
 			scale *= s->val_scale;
-			padding += child->parent->padding.left;
-			padding += child->parent->padding.right;
+			if( child == w ) {
+				break;
+			}
+			padding += child->padding.left;
+			padding += child->padding.right;
 		case SVT_AUTO:
 		default: continue;
 		}

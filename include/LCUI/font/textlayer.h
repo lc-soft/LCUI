@@ -79,7 +79,10 @@ typedef struct LCUI_TextLayerRec_  {
 	int new_offset_y;		/**< 新的Y轴坐标偏移量 */
         int insert_x;			/**< 光标所在列数 */
         int insert_y;			/**< 光标所在行数 */
-        int max_width;			/**< 最大文本宽度 */
+	int width;			/**< 实际文本宽度 */
+	int fixed_width;		/**< 固定文本宽度 */
+	int fixed_height;		/**< 固定文本高度 */
+        int max_width;			/**< 最大文本宽度，当未设置固定宽度时，文字排版将按最大宽度进行 */
         int max_height;			/**< 最大文本高度 */
 	int length;			/**< 文本长度 */
 	LCUI_BOOL is_mulitiline_mode;	/**< 是否启用多行文本模式 */
@@ -112,15 +115,6 @@ LCUI_API int TextLayer_GetRowTextLength( LCUI_TextLayer layer, int row );
 
 /** 添加 更新文本排版 的任务 */
 LCUI_API void TextLayer_AddUpdateTypeset( LCUI_TextLayer layer, int start_row );
-
-/** 设置文本颜色 */
-LCUI_API void TextLayer_SetFontColor( LCUI_TextLayer layer, LCUI_Color color );
-
-/** 设置文本所使用的字体字族 */
-LCUI_API void TextLayer_SetFontFamily( LCUI_TextLayer layer, const char *family_name );
-
-/** 设置文本的字体像素大小 */
-LCUI_API void TextLayer_SetFontPixelSize( LCUI_TextLayer layer, int pixel_size );
 
 /** 设置文本对齐方式 */
 LCUI_API void TextLayer_SetTextAlign( LCUI_TextLayer layer, int align );
@@ -190,8 +184,17 @@ LCUI_API int TextLayer_GetTextW( LCUI_TextLayer layer, int start_pos,
 /** 获取文本位图缓存 */
 LCUI_API LCUI_Graph* TextLayer_GetGraphBuffer( LCUI_TextLayer layer );
 
+/** 计算并获取文本的宽度 */
+LCUI_API int TextLayer_GetWidth( LCUI_TextLayer layer );
+
+/** 计算并获取文本的高度 */
+LCUI_API int TextLayer_GetHeight( LCUI_TextLayer layer );
+
+/** 设置固定尺寸 */
+LCUI_API int TextLayer_SetFixedSize( LCUI_TextLayer layer, int width, int height );
+
 /** 设置最大尺寸 */
-LCUI_API int TextLayer_SetMaxSize( LCUI_TextLayer layer, LCUI_Size new_size );
+LCUI_API int TextLayer_SetMaxSize( LCUI_TextLayer layer, int width, int height );
 
 /** 设置是否启用多行文本模式 */
 LCUI_API void TextLayer_SetMultiline( LCUI_TextLayer layer, int is_true );
@@ -207,12 +210,6 @@ LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer layer, int is_true );
 
 /** 设置是否使用样式标签 */
 LCUI_API void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_true );
-
-/** 计算并获取文本的宽度 */
-LCUI_API int TextLayer_GetWidth( LCUI_TextLayer layer );
-
-/** 计算并获取文本的高度 */
-LCUI_API int TextLayer_GetHeight( LCUI_TextLayer layer );
 
 /** 重新载入各个文字的字体位图 */
 LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer layer );
