@@ -57,6 +57,8 @@ LCUI_API void TextView_GetTextStyle( LCUI_Widget w, LCUI_TextStyle *style );
 
 LCUI_API void TextView_SetTextAlign( LCUI_Widget w, int align );
 
+LCUI_API void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap );
+
 LCUI_END_HEADER
 
 #endif

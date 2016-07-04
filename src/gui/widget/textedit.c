@@ -508,6 +508,8 @@ void TextEdit_ClearText( LCUI_Widget widget )
 	LCUIMutex_Lock( &edit->mutex );
 	TextLayer_ClearText( edit->layer );
 	StyleTags_Clear( &edit->text_tags );
+	edit->tasks[TASK_UPDATE] = TRUE;
+	Widget_AddTask( widget, WTT_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_InvalidateArea( widget, NULL, SV_PADDING_BOX );
 	Widget_Unlock( widget );
@@ -756,18 +758,31 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	LinkedList rects;
 	LinkedListNode *node;
-	LCUI_Size new_size = {16, 16};
-	LCUI_TextEdit edit = w->private_data;
-	if( w->box.content.width > new_size.width ) {
-		new_size.width = w->box.content.width;
+	LCUI_TextEdit edit;
+	int width = 0, height = 0;
+	int max_width = 0, max_height = 0;
+
+	edit = w->private_data;
+	if( !w->style->sheet[key_width].is_valid ||
+	    w->style->sheet[key_width].type == SVT_AUTO ) {
+		max_width = Widget_ComputeMaxWidth( w );
+		max_width -= w->computed_style.border.left.width;
+		max_width -= w->computed_style.border.right.width;
+		max_width -= w->padding.left + w->padding.right;
+	} else {
+		max_width = width = w->box.content.width;
 	}
-	if( w->box.content.height > new_size.height ) {
-		new_size.height = w->box.content.height;
+	if( w->style->sheet[key_height].is_valid &&
+	    !w->style->sheet[key_height].type == SVT_AUTO ) {
+		max_height = height = w->box.content.width;
 	}
 	LinkedList_Init( &rects );
-	TextLayer_SetMaxSize( edit->layer_mask, new_size );
-	TextLayer_SetMaxSize( edit->layer_source, new_size );
-	TextLayer_SetMaxSize( edit->layer_placeholder, new_size );
+	TextLayer_SetFixedSize( edit->layer_mask, width, height );
+	TextLayer_SetFixedSize( edit->layer_source, width, height );
+	TextLayer_SetFixedSize( edit->layer_placeholder, width, height );
+	TextLayer_SetMaxSize( edit->layer_mask, max_width, max_height );
+	TextLayer_SetMaxSize( edit->layer_source, max_width, max_height );
+	TextLayer_SetMaxSize( edit->layer_placeholder, max_width, max_height );
 	TextLayer_Update( edit->layer, &rects );
 	LinkedList_ForEach( node, &rects ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
