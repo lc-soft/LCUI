@@ -39,6 +39,8 @@
 
 //#define DEBUG
 #include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -586,6 +588,19 @@ int TextEdit_SetPlaceHolder( LCUI_Widget w, const char *str )
 	return ret;
 }
 
+void TextEdit_SetCaretBlink( LCUI_Widget w, LCUI_BOOL enabled, int time )
+{
+	LCUI_TextEdit edit;
+	edit = w->private_data;
+	TextCaret_SetVisible( edit->caret, enabled );
+	TextCaret_SetBlinkTime( edit->caret, time ); 
+}
+
+static void TextEdit_OnParseText( LCUI_Widget w, const char *text )
+{
+	TextEdit_SetText( w, text );
+}
+
 static void TextEdit_OnFocus( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_TextEdit edit;
@@ -889,7 +904,7 @@ void LCUIWidget_AddTextEdit( void )
 	wc->methods.init = TextEdit_OnInit;
 	wc->methods.paint = TextEdit_OnPaint;
 	wc->methods.destroy = TextEdit_OnDestroy;
-	wc->methods.set_text = TextEdit_SetText;
+	wc->methods.set_text = TextEdit_OnParseText;
 	wc->methods.set_attr = TextEdit_SetAttr;
 	wc->methods.autosize = TextEdit_AutoSize;
 	wc->task_handler = TextEdit_OnTask;

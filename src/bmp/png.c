@@ -105,7 +105,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 		graph->color_type = COLOR_TYPE_ARGB;
 		temp = Graph_Create( graph, w, h );
 		if( temp != 0 ) {
-			ret = ENOMEM;
+			ret = -ENOMEM;
 			break;
 		}
 		pixel_ptr = graph->bytes;
@@ -127,7 +127,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 		graph->color_type = COLOR_TYPE_RGB;
 		temp = Graph_Create( graph, w, h );
 		if( temp != 0 ) {
-			ret = ENOMEM;
+			ret = -ENOMEM;
 			break;
 		}
 		pixel_ptr = graph->bytes;
@@ -144,10 +144,11 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 	}
 	fclose( fp );
 	png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
+	return ret;
 #else
 	_DEBUG_MSG( "warning: not PNG support!" );
+	return -1;
 #endif
-	return ret;
 }
 
 int Graph_GetPNGSize( const char *filepath, int *width, int *height )
@@ -183,10 +184,11 @@ int Graph_GetPNGSize( const char *filepath, int *width, int *height )
 	*height = png_get_image_height( png_ptr, info_ptr );
 	fclose( fp );
 	png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
+	return 0;
 #else
 	_DEBUG_MSG( "warning: not PNG support!" );
+	return -1;
 #endif
-	return ret;
 }
 
 int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )

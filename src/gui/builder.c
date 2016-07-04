@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <stdio.h>
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -44,7 +45,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
 
-#define WARNING_TEXT "[builder] warning: this module is not enabled before build."
+#define WARN_TXT "[builder] warning: this module is not enabled before build.\n"
 
 #ifdef USE_LCUI_BUILDER
 #include <libxml/xmlmemory.h>
@@ -268,7 +269,7 @@ static void ParseNode( XMLParserContext ctx, xmlNodePtr node )
 LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 {
 #ifndef USE_LCUI_BUILDER
-	printf(WARNING_TEXT);
+	printf(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -302,7 +303,7 @@ FAILED:
 LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 {
 #ifndef USE_LCUI_BUILDER
-	printf(WARNING_TEXT);
+	printf(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;

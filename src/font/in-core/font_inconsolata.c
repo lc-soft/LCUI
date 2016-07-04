@@ -7615,7 +7615,7 @@ static const unsigned char *font_bitmap[SIZE_TOTAL] = {
 
 int FontInconsolata_GetBitmap( LCUI_FontBitmap *bmp, wchar_t ch, int size )
 {
-	int i, j;
+	int i, j, *ptr;
 	const uchar_t *byte_ptr;
 
 	if( size < 12 || size > 18 ) {
@@ -7664,7 +7664,7 @@ int FontInconsolata_GetBitmap( LCUI_FontBitmap *bmp, wchar_t ch, int size )
 	i = size - 12;
 	j = ch - ' ';
 	*bmp = font_info_index[i][j];
-	j = *((int*)&bmp->buffer);
+	j = *(ptr = (int*)&bmp->buffer);
 	byte_ptr = &font_bitmap[i][j];
 	size = sizeof(unsigned char)*bmp->width*bmp->rows;
 	bmp->buffer = (uchar_t*)malloc(size);
