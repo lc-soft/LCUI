@@ -13,6 +13,10 @@ void LCUI_PreInitLinuxApp( void *data )
 
 int LCUI_InitLinuxApp( LCUI_AppDriver app )
 {
+	LCUI_BOOL is_x11_mode = TRUE;
+	if( is_x11_mode ) {
+		return LCUI_InitLinuxX11App( app );
+	}
 	return -1;
 }
 #endif

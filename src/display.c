@@ -113,6 +113,9 @@ static void LCUIDisplay_Update(void)
 		/* 在 surface 上逐个重绘无效区域 */
 		LinkedList_ForEach( rn, &rlist ) {
 			paint = Surface_BeginPaint( p_sr->surface, rn->data );
+			if( !paint ) {
+				continue;
+			}
 			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
 				p_sr->widget->type, paint->rect.left,
 				paint->rect.top, paint->rect.w, paint->rect.h );
@@ -504,7 +507,6 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	e_type = *((int*)&arg);
 	root = LCUIWidget_GetRoot();
 	surface = LCUIDisplay_GetBindSurface( e->target );
-	DEBUG_MSG("tip, widget: %s, e_type = %d\n", w->type, e_type);
 	if( display.mode == LCDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
 			return;
@@ -605,7 +607,7 @@ int LCUI_InitDisplay( void )
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	LCUIDisplay_SetMode( LCDM_DEFAULT );
-	printf("[display] init ok.\n");
+	printf("[display] init ok, driver name: %s\n", display.driver.name);
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
 }
 
