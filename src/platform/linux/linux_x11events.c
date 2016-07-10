@@ -10,45 +10,22 @@
 
 static LCUI_X11AppDriverRec x11;
 
-enum AppTaskAgentState {
-	STATE_NONE,
-	STATE_RUNNING,
-	STATE_PAUSE
-};
-
-static struct AppTaskAgent {
-	int state;
-	LinkedList tasks;
-	LCUI_Mutex mutex;
-	LCUI_Cond cond;
-} agent;
-
 void LCUI_SetLinuxX11MainWindow( Window win )
 {
-	LCUIMutex_Lock( &agent.mutex );
-	agent.state = STATE_PAUSE;
 	x11.win_main = win;
-	LCUICond_Signal( &agent.cond );
-	LCUIMutex_Unlock( &agent.mutex );
-	XSelectInput(x11.display, win, ExposureMask | KeyPressMask);
+	XSelectInput( x11.display, win, ExposureMask | KeyPressMask );
+	LCUI_SetTaskAgent( FALSE );
 }
 
 static LCUI_BOOL X11_PostTask( LCUI_AppTask task )
 {
-	LCUIMutex_Lock( &agent.mutex );
-	LinkedList_Append( &agent.tasks, task );
-	LCUICond_Signal( &agent.cond );
-	LCUIMutex_Unlock( &agent.mutex );
-	if( agent.state == STATE_PAUSE && x11.win_main != 0 ) {
-		XEvent ev;
-		memset( &ev, 0, sizeof (ev) );
-		ev.xclient.type = ClientMessage;
-		ev.xclient.window = x11.win_main;
-		ev.xclient.format = 32;
-		ev.xclient.message_type = x11.wm_lcui;
-		XSendEvent(x11.display, x11.win_main, FALSE, NoEventMask, &ev);
-		return TRUE;
-	}
+	XEvent ev;
+	memset( &ev, 0, sizeof (ev) );
+	ev.xclient.type = ClientMessage;
+	ev.xclient.window = x11.win_main;
+	ev.xclient.format = 32;
+	ev.xclient.message_type = x11.wm_lcui;
+	XSendEvent(x11.display, x11.win_main, FALSE, NoEventMask, &ev);
 	return TRUE;
 }
 
@@ -57,21 +34,6 @@ static LCUI_BOOL X11_WaitEvent( void )
 	int fd;
 	fd_set fdset;
 	struct timeval zero_time;
-	if( agent.tasks.length > 0 ) {
-		return TRUE;
-	}
-	if( agent.state == STATE_RUNNING ) {
-		LCUIMutex_Lock( &agent.mutex );
-		while( agent.state == STATE_RUNNING ) {
-			if( agent.tasks.length > 0 ) {
-				LCUIMutex_Unlock( &agent.mutex );
-				return TRUE;
-			}
-			LCUICond_Wait( &agent.cond, &agent.mutex );
-		}
-		LCUIMutex_Unlock( &agent.mutex );
-		return FALSE;
-	}
 	XFlush( x11.display );
 	fd = ConnectionNumber( x11.display );
 	if( XEventsQueued(x11.display, QueuedAlready) ) {
@@ -88,25 +50,6 @@ static LCUI_BOOL X11_WaitEvent( void )
 static void X11_DispatchEvent( void )
 {
 	XEvent xevent;
-	LCUI_AppTask task;
-	LinkedListNode *node;
-	LCUIMutex_Lock( &agent.mutex );
-	node = LinkedList_GetNode( &agent.tasks, 0 );
-	if( node ) {
-		task = node->data;
-		LinkedList_Unlink( &agent.tasks, node );
-		LCUIMutex_Unlock( &agent.mutex );
-		LCUI_RunTask( task );
-		LCUI_DeleteTask( task );
-		free( task );
-		free( node );
-		return;
-	} else {
-		LCUIMutex_Unlock( &agent.mutex );
-	}
-	if( agent.state == STATE_RUNNING ) {
-		return;
-	}
 	XNextEvent( x11.display, &xevent );
 	DEBUG_MSG("%d\n", xevent.type);
 	switch( xevent.type ) {
@@ -114,13 +57,6 @@ static void X11_DispatchEvent( void )
 	default: break;
 	}
 	EventTrigger_Trigger( x11.trigger, xevent.type, &xevent );
-}
-
-static void X11_PumpEvents( void )
-{
-	while( X11_WaitEvent() ) {
-		X11_DispatchEvent();
-	}
 }
 
 static int X11_BindSysEvent( int event_id, LCUI_EventFunc func,
@@ -161,16 +97,12 @@ int LCUI_InitLinuxX11App( LCUI_AppDriver app )
 	x11.wm_lcui = XInternAtom( x11.display, "WM_LCUI", FALSE );
 	XSetWMProtocols( x11.display, x11.win_root, &x11.wm_lcui, 1 );
 	app->WaitEvent = X11_WaitEvent;
-	app->PumbEvents = X11_PumpEvents;
+	app->DispatchEvent = X11_DispatchEvent;
 	app->PostTask = X11_PostTask;
 	app->BindSysEvent = X11_BindSysEvent;
 	app->UnbindSysEvent = X11_UnbindSysEvent;
 	app->UnbindSysEvent2 = X11_UnbindSysEvent2;
 	app->GetData = X11_GetData;
-	agent.state = STATE_RUNNING;
-	LinkedList_Init( &agent.tasks );
-	LCUIMutex_Init( &agent.mutex );
-	LCUICond_Init( &agent.cond );
 	x11.trigger = EventTrigger();
 	return 0;
 }

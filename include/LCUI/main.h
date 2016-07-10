@@ -123,7 +123,7 @@ typedef void(*LCUI_SysEventFunc)(LCUI_SysEvent, void*);
 
 /** LCUI 应用程序驱动接口，封装了各个平台下的应用程序相关功能支持接口 */
 typedef struct LCUI_AppDriverRec_ {
-	void( *PumbEvents )(void);
+	void( *DispatchEvent )(void);
 	LCUI_BOOL( *WaitEvent )(void);
 	LCUI_BOOL( *PostTask )(LCUI_AppTask);
 	int( *BindSysEvent )(int, LCUI_EventFunc, void*, void( *)(void*));
@@ -157,6 +157,8 @@ LCUI_API int LCUI_UnbindSysEvent( int event_id, LCUI_EventFunc func );
 LCUI_API void LCUI_PumbEvents( void );
 
 LCUI_API void *LCUI_GetAppData( void );
+
+LCUI_API void LCUI_SetTaskAgent( LCUI_BOOL enabled );
 
 /** 添加任务 */
 LCUI_API LCUI_BOOL LCUI_PostTask( LCUI_AppTask task );
