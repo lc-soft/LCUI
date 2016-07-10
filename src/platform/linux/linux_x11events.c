@@ -1,24 +1,32 @@
+
+#include <stdio.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
-#if defined(LCUI_BUILD_IN_LINUX)
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xos.h>
+#ifdef LCUI_BUILD_IN_LINUX
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
 
-static struct X11Driver {
-	int screen;
-	Display *display;
-	Window rootwin;
-	Colormap cmap;
-	LCUI_EventTrigger trigger;
-} x11;
+static LCUI_X11AppDriverRec x11;
+
+void LCUI_SetLinuxX11MainWindow( Window win )
+{
+	x11.win_main = win;
+	XSelectInput( x11.display, win, ExposureMask | KeyPressMask );
+	LCUI_SetTaskAgent( FALSE );
+}
 
 static LCUI_BOOL X11_PostTask( LCUI_AppTask task )
 {
-	return FALSE;
+	XEvent ev;
+	memset( &ev, 0, sizeof (ev) );
+	ev.xclient.type = ClientMessage;
+	ev.xclient.window = x11.win_main;
+	ev.xclient.format = 32;
+	ev.xclient.message_type = x11.wm_lcui;
+	XSendEvent(x11.display, x11.win_main, FALSE, NoEventMask, &ev);
+	return TRUE;
 }
 
 static LCUI_BOOL X11_WaitEvent( void )
@@ -39,9 +47,16 @@ static LCUI_BOOL X11_WaitEvent( void )
 	return FALSE;
 }
 
-static void X11_PumpEvents( void )
+static void X11_DispatchEvent( void )
 {
-
+	XEvent xevent;
+	XNextEvent( x11.display, &xevent );
+	DEBUG_MSG("%d\n", xevent.type);
+	switch( xevent.type ) {
+	case ClientMessage: 
+	default: break;
+	}
+	EventTrigger_Trigger( x11.trigger, xevent.type, &xevent );
 }
 
 static int X11_BindSysEvent( int event_id, LCUI_EventFunc func,
@@ -62,7 +77,7 @@ static int X11_UnbindSysEvent2( int handler_id )
 
 static void *X11_GetData( void )
 {
-	return NULL;
+	return &x11;
 }
 
 void LCUI_PreInitLinuxX11App( void *data )
@@ -77,10 +92,12 @@ int LCUI_InitLinuxX11App( LCUI_AppDriver app )
 		return -1;
 	}
 	x11.screen = DefaultScreen( x11.display );
-	x11.rootwin = RootWindow( x11.display, x11.screen );
+	x11.win_root = RootWindow( x11.display, x11.screen );
 	x11.cmap = DefaultColormap( x11.display, x11.screen );
+	x11.wm_lcui = XInternAtom( x11.display, "WM_LCUI", FALSE );
+	XSetWMProtocols( x11.display, x11.win_root, &x11.wm_lcui, 1 );
 	app->WaitEvent = X11_WaitEvent;
-	app->PumbEvents = X11_PumpEvents;
+	app->DispatchEvent = X11_DispatchEvent;
 	app->PostTask = X11_PostTask;
 	app->BindSysEvent = X11_BindSysEvent;
 	app->UnbindSysEvent = X11_UnbindSysEvent;
@@ -89,4 +106,5 @@ int LCUI_InitLinuxX11App( LCUI_AppDriver app )
 	x11.trigger = EventTrigger();
 	return 0;
 }
+
 #endif

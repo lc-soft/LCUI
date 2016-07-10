@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 //#define DEBUG
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <LCUI_Build.h>
@@ -496,6 +497,7 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 			return Widget_PostEvent( widget->parent, e,
 						 data, destroy_data );
 		}
+		return 0;
 	}
 	if( !widget->parent || e->cancel_bubble ) {
 		return -1;
@@ -893,7 +895,6 @@ int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 	}
 	e.target = w;
 	e.type = WET_SURFACE;
-	DEBUG_MSG("widget: %s, post event: %d\n", w->type, event_type );
 	return Widget_PostEvent( root, &e, *((int**)n), NULL );
 }
 

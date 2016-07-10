@@ -51,6 +51,9 @@
 #include <LCUI/platform.h>
 #include LCUI_DISPLAY_H
 
+#define DEFAULT_WIDTH	800
+#define DEFAULT_HEIGHT	600
+
 /** surface 记录 */
 typedef struct SurfaceRecord {
 	LCUI_Surface surface;		/**< surface */
@@ -113,6 +116,9 @@ static void LCUIDisplay_Update(void)
 		/* 在 surface 上逐个重绘无效区域 */
 		LinkedList_ForEach( rn, &rlist ) {
 			paint = Surface_BeginPaint( p_sr->surface, rn->data );
+			if( !paint ) {
+				continue;
+			}
 			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
 				p_sr->widget->type, paint->rect.left,
 				paint->rect.top, paint->rect.w, paint->rect.h );
@@ -230,9 +236,10 @@ static int LCUIDisplay_Windowed( void )
 {
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	switch( display.mode ) {
-	case LCDM_FULLSCREEN:
 	case LCDM_WINDOWED:
 		return 0;
+	case LCDM_FULLSCREEN:
+		break;
 	case LCDM_SEAMLESS:
 	default:
 		LCUIDisplay_CleanSurfaces();
@@ -240,7 +247,7 @@ static int LCUIDisplay_Windowed( void )
 		break;
 	}
 	Widget_Show( root );
-	Widget_Resize( root, LCUIDisplay_GetWidth(), LCUIDisplay_GetHeight() );
+	Widget_Resize( root, DEFAULT_WIDTH, DEFAULT_HEIGHT );
 	display.mode = LCDM_WINDOWED;
 	return 0;
 }
@@ -504,7 +511,6 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	e_type = *((int*)&arg);
 	root = LCUIWidget_GetRoot();
 	surface = LCUIDisplay_GetBindSurface( e->target );
-	DEBUG_MSG("tip, widget: %s, e_type = %d\n", w->type, e_type);
 	if( display.mode == LCDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
 			return;
@@ -605,7 +611,7 @@ int LCUI_InitDisplay( void )
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	LCUIDisplay_SetMode( LCDM_DEFAULT );
-	printf("[display] init ok.\n");
+	printf("[display] init ok, driver name: %s\n", display.driver.name);
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
 }
 
