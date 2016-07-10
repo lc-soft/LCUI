@@ -25,14 +25,12 @@ static struct AppTaskAgent {
 
 void LCUI_SetLinuxX11MainWindow( Window win )
 {
-	_DEBUG_MSG("set start.\n");
 	LCUIMutex_Lock( &agent.mutex );
 	agent.state = STATE_PAUSE;
 	x11.win_main = win;
 	LCUICond_Signal( &agent.cond );
 	LCUIMutex_Unlock( &agent.mutex );
 	XSelectInput(x11.display, win, ExposureMask | KeyPressMask);
-	_DEBUG_MSG("set done.\n");
 }
 
 static LCUI_BOOL X11_PostTask( LCUI_AppTask task )
@@ -42,17 +40,15 @@ static LCUI_BOOL X11_PostTask( LCUI_AppTask task )
 	LCUICond_Signal( &agent.cond );
 	LCUIMutex_Unlock( &agent.mutex );
 	if( agent.state == STATE_PAUSE && x11.win_main != 0 ) {
-		int ret;
 		XEvent ev;
 		memset( &ev, 0, sizeof (ev) );
 		ev.xclient.type = ClientMessage;
 		ev.xclient.window = x11.win_main;
 		ev.xclient.format = 32;
 		ev.xclient.message_type = x11.wm_lcui;
-		ret = XSendEvent(x11.display, x11.win_main, FALSE, NoEventMask, &ev);
+		XSendEvent(x11.display, x11.win_main, FALSE, NoEventMask, &ev);
 		return TRUE;
 	}
-	_DEBUG_MSG("agent mode\n");
 	return TRUE;
 }
 
@@ -65,7 +61,6 @@ static LCUI_BOOL X11_WaitEvent( void )
 		return TRUE;
 	}
 	if( agent.state == STATE_RUNNING ) {
-		_DEBUG_MSG("agent mode\n");
 		LCUIMutex_Lock( &agent.mutex );
 		while( agent.state == STATE_RUNNING ) {
 			if( agent.tasks.length > 0 ) {
@@ -95,7 +90,6 @@ static void X11_DispatchEvent( void )
 	XEvent xevent;
 	LCUI_AppTask task;
 	LinkedListNode *node;
-	DEBUG_MSG("proc lcui task, length: %d\n", agent.tasks.length);
 	LCUIMutex_Lock( &agent.mutex );
 	node = LinkedList_GetNode( &agent.tasks, 0 );
 	if( node ) {
@@ -113,22 +107,18 @@ static void X11_DispatchEvent( void )
 	if( agent.state == STATE_RUNNING ) {
 		return;
 	}
-	DEBUG_MSG("waiting xevent\n");
 	XNextEvent( x11.display, &xevent );
-	DEBUG_MSG("waitting is done\n");
 	DEBUG_MSG("%d\n", xevent.type);
 	switch( xevent.type ) {
 	case ClientMessage: 
-		DEBUG_MSG("message_type: %ld, wm_lcui: %ld\n", xevent.xclient.message_type, x11.wm_lcui);
 	default: break;
 	}
-	DEBUG_MSG("done\n");
+	EventTrigger_Trigger( x11.trigger, xevent.type, &xevent );
 }
 
 static void X11_PumpEvents( void )
 {
 	while( X11_WaitEvent() ) {
-		DEBUG_MSG("get event\n");
 		X11_DispatchEvent();
 	}
 }
@@ -168,8 +158,8 @@ int LCUI_InitLinuxX11App( LCUI_AppDriver app )
 	x11.screen = DefaultScreen( x11.display );
 	x11.win_root = RootWindow( x11.display, x11.screen );
 	x11.cmap = DefaultColormap( x11.display, x11.screen );
-	x11.wm_lcui = XInternAtom(x11.display, "WM_DELETE_WINDOW", FALSE);
-	XSetWMProtocols(x11.display, x11.win_root, &x11.wm_lcui, 1);
+	x11.wm_lcui = XInternAtom( x11.display, "WM_LCUI", FALSE );
+	XSetWMProtocols( x11.display, x11.win_root, &x11.wm_lcui, 1 );
 	app->WaitEvent = X11_WaitEvent;
 	app->PumbEvents = X11_PumpEvents;
 	app->PostTask = X11_PostTask;

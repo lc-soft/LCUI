@@ -51,6 +51,9 @@
 #include <LCUI/platform.h>
 #include LCUI_DISPLAY_H
 
+#define DEFAULT_WIDTH	800
+#define DEFAULT_HEIGHT	600
+
 /** surface 记录 */
 typedef struct SurfaceRecord {
 	LCUI_Surface surface;		/**< surface */
@@ -233,9 +236,10 @@ static int LCUIDisplay_Windowed( void )
 {
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	switch( display.mode ) {
-	case LCDM_FULLSCREEN:
 	case LCDM_WINDOWED:
 		return 0;
+	case LCDM_FULLSCREEN:
+		break;
 	case LCDM_SEAMLESS:
 	default:
 		LCUIDisplay_CleanSurfaces();
@@ -243,7 +247,7 @@ static int LCUIDisplay_Windowed( void )
 		break;
 	}
 	Widget_Show( root );
-	Widget_Resize( root, LCUIDisplay_GetWidth(), LCUIDisplay_GetHeight() );
+	Widget_Resize( root, DEFAULT_WIDTH, DEFAULT_HEIGHT );
 	display.mode = LCDM_WINDOWED;
 	return 0;
 }
