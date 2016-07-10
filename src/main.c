@@ -198,6 +198,30 @@ void LCUI_DestroyEvent( LCUI_SysEvent e )
 
 /*--------------------------- system event <END> ----------------------------*/
 
+static void LCUI_DispatchEvent( void )
+{
+	LCUI_AppTask task;
+	LinkedListNode *node;
+	LCUIMutex_Lock( &MainApp.agent.mutex );
+	node = LinkedList_GetNode( &MainApp.agent.tasks, 0 );
+	if( node ) {
+		task = node->data;
+		LinkedList_Unlink( &MainApp.agent.tasks, node );
+		LCUIMutex_Unlock( &MainApp.agent.mutex );
+		LCUI_RunTask( task );
+		LCUI_DeleteTask( task );
+		free( task );
+		free( node );
+		return;
+	} else {
+		LCUIMutex_Unlock( &MainApp.agent.mutex );
+	}
+	if( MainApp.agent.state == STATE_RUNNING ) {
+		return;
+	}
+	MainApp.driver.DispatchEvent();
+}
+
 LCUI_BOOL LCUI_PostTask( LCUI_AppTask task )
 {
 	LCUI_AppTask newtask;
@@ -264,7 +288,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	MainApp.loop = loop;
 	while( loop->state != STATE_EXITED ) {
 		LCUI_WaitEvent();
-		LCUI_PumbEvents();
+		LCUI_DispatchEvent();
 		/* 如果当前运行的主循环不是自己 */
 		while( MainApp.loop != loop ) {
 			loop->state = STATE_PAUSED;
@@ -333,37 +357,6 @@ int LCUI_BindSysEvent( int event_id, LCUI_EventFunc func,
 int LCUI_UnbindSysEvent( int event_id, LCUI_EventFunc func )
 {
 	return MainApp.driver.UnbindSysEvent( event_id, func );
-}
-
-static void LCUI_DispatchEvent( void )
-{
-	LCUI_AppTask task;
-	LinkedListNode *node;
-	LCUIMutex_Lock( &MainApp.agent.mutex );
-	node = LinkedList_GetNode( &MainApp.agent.tasks, 0 );
-	if( node ) {
-		task = node->data;
-		LinkedList_Unlink( &MainApp.agent.tasks, node );
-		LCUIMutex_Unlock( &MainApp.agent.mutex );
-		LCUI_RunTask( task );
-		LCUI_DeleteTask( task );
-		free( task );
-		free( node );
-		return;
-	} else {
-		LCUIMutex_Unlock( &MainApp.agent.mutex );
-	}
-	if( MainApp.agent.state == STATE_RUNNING ) {
-		return;
-	}
-	MainApp.driver.DispatchEvent();
-}
-
-void LCUI_PumbEvents( void )
-{
-	while( LCUI_WaitEvent() ) {
-		LCUI_DispatchEvent();
-	}
 }
 
 void *LCUI_GetAppData( void )

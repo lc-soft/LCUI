@@ -465,9 +465,9 @@ static void IME_ToText( char ch )
 
 static void WinIME_OnChar( LCUI_Event e, void *arg )
 {
+	MSG *msg = arg;
 	wchar_t text[2];
-	WIN_SysEvent win_ev = arg;
-	text[0] = win_ev->wparam;
+	text[0] = msg->wParam;
 	text[1] = 0;
 	LCUIIME_Commit( text, 2 );
 }

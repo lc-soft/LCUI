@@ -154,8 +154,6 @@ LCUI_API int LCUI_BindSysEvent( int event_id, LCUI_EventFunc func,
 
 LCUI_API int LCUI_UnbindSysEvent( int event_id, LCUI_EventFunc func );
 
-LCUI_API void LCUI_PumbEvents( void );
-
 LCUI_API void *LCUI_GetAppData( void );
 
 LCUI_API void LCUI_SetTaskAgent( LCUI_BOOL enabled );

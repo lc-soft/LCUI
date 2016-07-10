@@ -8,15 +8,15 @@
 
 static void OnMouseMessage( LCUI_Event ev, void *arg )
 {
+	MSG *msg = arg;
 	LCUI_SysEventRec sys_ev;
-	WIN_SysEvent win_ev = arg;
 	static POINT mouse_pos = {0, 0};
 	sys_ev.type = LCUI_NONE;
-	switch( win_ev->msg ) {
+	switch( msg->message ) {
 	case WM_MOUSEMOVE: {
 		POINT new_pos;
 		GetCursorPos( &new_pos );
-		ScreenToClient( win_ev->hwnd, &new_pos );
+		ScreenToClient( msg->hwnd, &new_pos );
 		sys_ev.motion.x = new_pos.x;
 		sys_ev.motion.y = new_pos.y;
 		sys_ev.motion.xrel = new_pos.x - mouse_pos.x;
@@ -31,7 +31,7 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 		sys_ev.button.button = 1;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
-		SetCapture( win_ev->hwnd );
+		SetCapture( msg->hwnd );
 		break;
 	case WM_LBUTTONUP:
 		sys_ev.type = LCUI_MOUSEUP;
@@ -45,7 +45,7 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 		sys_ev.button.button = 2;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
-		SetCapture( win_ev->hwnd );
+		SetCapture( msg->hwnd );
 		break;
 	case WM_RBUTTONUP:
 		sys_ev.type = LCUI_MOUSEUP;
@@ -58,12 +58,12 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 		sys_ev.type = LCUI_MOUSEWHEEL;
 		sys_ev.wheel.x = mouse_pos.x;
 		sys_ev.wheel.y = mouse_pos.y;
-		sys_ev.wheel.delta = GET_WHEEL_DELTA_WPARAM( win_ev->wparam );
+		sys_ev.wheel.delta = GET_WHEEL_DELTA_WPARAM( msg->wParam );
 		break;
 	case WM_TOUCH: {
-		UINT i, n = LOWORD( win_ev->wparam );
+		UINT i, n = LOWORD( msg->wParam );
 		PTOUCHINPUT inputs = NEW( TOUCHINPUT, n );
-		HTOUCHINPUT handle = (HTOUCHINPUT)win_ev->lparam;
+		HTOUCHINPUT handle = (HTOUCHINPUT)msg->lParam;
 		if( inputs == NULL ) {
 			break;
 		}
@@ -83,7 +83,7 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 			POINT pos;
 			pos.x = inputs[i].x / 100;
 			pos.y = inputs[i].y / 100;
-			ScreenToClient( win_ev->hwnd, &pos );
+			ScreenToClient( msg->hwnd, &pos );
 			sys_ev.touch.points[i].x = pos.x;
 			sys_ev.touch.points[i].y = pos.y;
 			sys_ev.touch.points[i].id = inputs[i].dwID;
