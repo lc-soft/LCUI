@@ -6,4 +6,8 @@ textview.text-hello {
   padding: 25px;
   margin: 25px 0 0 25px;
   border: 1px solid #000;
+  background-color: #fafafa;
+}
+#btn-ok, #edit {
+  margin: 25px 0 0 25px;
 }

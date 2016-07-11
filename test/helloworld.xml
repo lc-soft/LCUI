@@ -3,6 +3,8 @@
   <resource type="text/css" src="helloworld.css"/>
   <resource type="application/font-ttf" src="C:/Windows/Fonts/comic.ttf"/>
   <ui>
-    <widget type="textview" class="text-hello">Hello, World!</widget>
+    <widget id="text-hello" type="textview" class="text-hello">Hello, World!</widget>
+    <widget id="edit" type="textedit">Hello, World!</widget>
+    <widget id="btn-ok" type="button">确定</widget>
   </ui>
 </lcui-app>
