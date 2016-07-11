@@ -91,7 +91,7 @@ void LCUI_PreInitLinuxX11App( void *data )
 
 int LCUI_InitLinuxX11App( LCUI_AppDriver app )
 {
-	x11.display = XOpenDisplay(NULL);
+	x11.display = XOpenDisplay( NULL );
 	if( !x11.display ) {
 		return -1;
 	}

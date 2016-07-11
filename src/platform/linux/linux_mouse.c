@@ -42,6 +42,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
+#include LCUI_MOUSE_H
 
 void LCUI_InitLinuxMouse( void )
 {

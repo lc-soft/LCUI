@@ -44,7 +44,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
- #include LCUI_MOUSE_H
+#include LCUI_MOUSE_H
 
 static void OnMotionNotify( LCUI_Event e, void *arg )
 {

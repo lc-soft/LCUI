@@ -431,6 +431,9 @@ int LCUI_InitLinuxX11Display( LCUI_DisplayDriver driver )
 {
 	strcpy( driver->name, "x11" );
 	x11.app = LCUI_GetAppData();
+	if( !x11.app ) {
+		return -1;
+	}
 	driver->getWidth = X11Display_GetWidth;
 	driver->getHeight = X11Display_GetHeight;
 	driver->new = X11Surface_New;

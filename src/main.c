@@ -95,6 +95,7 @@ static struct LCUI_App {
 	LCUI_MainLoop loop;		/**< 当前运行的主循环 */
 	LinkedList loops;		/**< 主循环列表 */
 	LCUI_AppDriverRec driver;	/**< 程序事件驱动支持 */
+	LCUI_BOOL driver_ready;		/**< 事件驱动支持是否已经准备就绪 */
 	struct LCUI_AppTaskAgent {
 		int state;		/**< 状态 */
 		LinkedList tasks;	/**< 任务队列 */
@@ -219,7 +220,9 @@ static void LCUI_DispatchEvent( void )
 	if( MainApp.agent.state == STATE_RUNNING ) {
 		return;
 	}
-	MainApp.driver.DispatchEvent();
+	if( MainApp.driver_ready ) {
+		MainApp.driver.DispatchEvent();
+	}
 }
 
 LCUI_BOOL LCUI_PostTask( LCUI_AppTask task )
@@ -231,7 +234,10 @@ LCUI_BOOL LCUI_PostTask( LCUI_AppTask task )
 	LinkedList_Append( &MainApp.agent.tasks, newtask );
 	LCUICond_Signal( &MainApp.agent.cond );
 	LCUIMutex_Unlock( &MainApp.agent.mutex );
-	return MainApp.driver.PostTask( newtask );
+	if( MainApp.driver_ready ) {
+		return MainApp.driver.PostTask( newtask );
+	}
+	return TRUE;
 }
 
 void LCUI_DeleteTask( LCUI_AppTask task )
@@ -318,13 +324,16 @@ void LCUI_MainLoop_Quit( LCUI_MainLoop loop )
 /** 初始化程序数据结构体 */
 static void LCUIApp_Init(void)
 {
+	MainApp.driver_ready = FALSE;
 	LCUICond_Init( &MainApp.loop_changed );
 	LCUIMutex_Init( &MainApp.loop_mutex );
 	LinkedList_Init( &MainApp.loops );
 	LCUIMutex_Init( &MainApp.agent.mutex );
 	LCUICond_Init( &MainApp.agent.cond );
 	LinkedList_Init( &MainApp.agent.tasks );
-	LCUI_InitApp( &MainApp.driver );
+	if( LCUI_InitApp( &MainApp.driver ) == 0 ) {
+		MainApp.driver_ready = TRUE;
+	}
 	MainApp.agent.state = STATE_RUNNING;
 }
 
@@ -351,17 +360,27 @@ LCUI_BOOL LCUI_WaitEvent( void )
 int LCUI_BindSysEvent( int event_id, LCUI_EventFunc func,
 		       void *data, void( *destroy_data )(void*) )
 {
-	return MainApp.driver.BindSysEvent( event_id, func, data, destroy_data );
+	if( MainApp.driver_ready ) {
+		return MainApp.driver.BindSysEvent( event_id, func, 
+						    data, destroy_data );
+	}
+	return -1;
 }
 
 int LCUI_UnbindSysEvent( int event_id, LCUI_EventFunc func )
 {
-	return MainApp.driver.UnbindSysEvent( event_id, func );
+	if( MainApp.driver_ready ) {
+		return MainApp.driver.UnbindSysEvent( event_id, func );
+	}
+	return -1;
 }
 
 void *LCUI_GetAppData( void )
 {
-	return MainApp.driver.GetData();
+	if( MainApp.driver_ready ) {
+		return MainApp.driver.GetData();
+	}
+	return NULL;
 }
 
 void LCUI_SetTaskAgent( LCUI_BOOL enabled )
