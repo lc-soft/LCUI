@@ -13,7 +13,11 @@ static LCUI_X11AppDriverRec x11;
 void LCUI_SetLinuxX11MainWindow( Window win )
 {
 	x11.win_main = win;
-	XSelectInput( x11.display, win, ExposureMask | KeyPressMask );
+	XSelectInput( x11.display, win, ExposureMask | KeyPressMask | 
+		      ButtonPress | StructureNotifyMask | ButtonReleaseMask |
+                      KeyReleaseMask | EnterWindowMask | LeaveWindowMask |
+                      PointerMotionMask | Button1MotionMask | 
+                      VisibilityChangeMask );
 	LCUI_SetTaskAgent( FALSE );
 }
 

@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * linux_x11mouse.h -- mouse support for linux.
+ * linux_x11mouse.c -- mouse support for linux xwindow.
  *
  * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
  *
@@ -20,7 +20,7 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * linux_x11mouse.h -- linux 平台的鼠标支持
+ * linux_x11mouse.c -- linux 平台的鼠标支持，基于 xwindow。
  *
  * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
  *
@@ -37,13 +37,65 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef LCUI_LINUX_MOUSE_H
-#define LCUI_LINUX_MOUSE_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <LCUI_Build.h>
+#ifdef LCUI_BUILD_IN_LINUX
+#include <LCUI/LCUI.h>
+#include <LCUI/platform.h>
+#include LCUI_EVENTS_H
+ #include LCUI_MOUSE_H
 
-#include <LCUI/platform/linux/linux_x11mouse.h>
+static void OnMotionNotify( LCUI_Event e, void *arg )
+{
+	XEvent *ev = arg;
+	LCUI_SysEventRec sys_ev;
+	static LCUI_Pos mouse_pos = {0, 0};
+	sys_ev.type = LCUI_MOUSEMOVE;
+	sys_ev.motion.x = ev->xmotion.x;
+	sys_ev.motion.y = ev->xmotion.y;
+	sys_ev.motion.xrel = ev->xmotion.x - mouse_pos.x;
+	sys_ev.motion.yrel = ev->xmotion.y - mouse_pos.y;
+	mouse_pos.x = ev->xmotion.x;
+	mouse_pos.y = ev->xmotion.y;
+	LCUI_TriggerEvent( &sys_ev, NULL );
+	LCUI_DestroyEvent( &sys_ev );
+}
 
-void LCUI_InitLinuxMouse( void );
+static void OnButtonPress( LCUI_Event e, void *arg )
+{
+	XEvent *ev = arg;
+	LCUI_SysEventRec sys_ev;
+	sys_ev.type = LCUI_MOUSEDOWN;
+	sys_ev.button.x = ev->xbutton.x;
+	sys_ev.button.y = ev->xbutton.y;
+	sys_ev.button.button = ev->xbutton.button;
+	LCUI_TriggerEvent( &sys_ev, NULL );
+	LCUI_DestroyEvent( &sys_ev );
+}
 
-void LCUI_ExitLinuxMouse( void );
+static void OnButtonRelease( LCUI_Event e, void *arg )
+{
+	XEvent *ev = arg;
+	LCUI_SysEventRec sys_ev;
+	sys_ev.type = LCUI_MOUSEUP;
+	sys_ev.button.x = ev->xbutton.x;
+	sys_ev.button.y = ev->xbutton.y;
+	sys_ev.button.button = ev->xbutton.button;
+	LCUI_TriggerEvent( &sys_ev, NULL );
+	LCUI_DestroyEvent( &sys_ev );
+}
+
+void LCUI_InitLinuxX11Mouse( void )
+{
+	LCUI_BindSysEvent( MotionNotify, OnMotionNotify, NULL, NULL );
+	LCUI_BindSysEvent( ButtonPress, OnButtonPress, NULL, NULL );
+	LCUI_BindSysEvent( ButtonRelease, OnButtonRelease, NULL, NULL );
+}
+
+void LCUI_ExitLinuxX11Mouse( void )
+{
+	LCUI_UnbindSysEvent( MotionNotify, OnMotionNotify );
+}
 
 #endif

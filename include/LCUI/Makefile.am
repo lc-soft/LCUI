@@ -8,8 +8,9 @@ EXTRA_DIST=platform.h platform/linux/linux_display.h \
 platform/linux/linux_events.h platform/linux/linux_mouse.h \
 platform/linux/linux_keyboard.h platform/linux/linux_fbdisplay.h \
 platform/linux/linux_x11display.h platform/linux/linux_x11events.h \
-platform/windows/windows_display.h platform/windows/windows_events.h \
-platform/windows/windows_mouse.h platform/windows/windows_keyboard.h
+platform/linux/linux_x11mouse.h platform/windows/windows_display.h \
+platform/windows/windows_events.h platform/windows/windows_mouse.h \
+platform/windows/windows_keyboard.h
 
 # Headers to install
 pkginclude_HEADERS = $(INSTINCLUDES)

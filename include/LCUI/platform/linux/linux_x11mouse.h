@@ -1,5 +1,5 @@
 /* ***************************************************************************
- * linux_x11mouse.h -- mouse support for linux.
+ * linux_x11mouse.h -- mouse support for linux xwindow.
  *
  * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
  *
@@ -20,7 +20,7 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * linux_x11mouse.h -- linux 平台的鼠标支持
+ * linux_x11mouse.h -- linux 平台的鼠标支持，基于 xwindow。
  *
  * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
  *
@@ -37,13 +37,11 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef LCUI_LINUX_MOUSE_H
-#define LCUI_LINUX_MOUSE_H
+#ifndef LCUI_LINUX_X11_MOUSE_H
+#define LCUI_LINUX_X11_MOUSE_H
 
-#include <LCUI/platform/linux/linux_x11mouse.h>
+void LCUI_InitLinuxX11Mouse( void );
 
-void LCUI_InitLinuxMouse( void );
-
-void LCUI_ExitLinuxMouse( void );
+void LCUI_ExitLinuxX11Mouse( void );
 
 #endif
