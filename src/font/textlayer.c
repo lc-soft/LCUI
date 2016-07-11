@@ -49,6 +49,8 @@ enum TextAddType {
 	TAT_APPEND	/**< 追加至文本末尾 */
 };
 
+
+#define max(a, b) ((a) > (b) ? (a):(b))
 #define TextRowList_AddNewRow(ROWLIST) TextRowList_InsertNewRow(ROWLIST, (ROWLIST)->length)
 #define TextLayer_GetRow(layer, n) (n >= layer->rowlist.length) ? NULL:layer->rowlist.rows[n]
 

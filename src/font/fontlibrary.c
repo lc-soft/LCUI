@@ -75,8 +75,8 @@ static struct LCUI_FontLibraryContext {
 	LCUI_RBTree family_tree;		/**< 字族信息树，按字族名称记录着各个字体的信息 */
 	LCUI_RBTree bitmap_cache;		/**< 字体位图缓存区 */
 	LCUI_Font ***font_cache;		/**< 字体信息缓存区 */
-	LCUI_Font *default_font;		/**< 指针，引用的是默认字体信息 */
-	LCUI_Font *incore_font;			/**< 指针，引用的是内置字体的信息 */
+	LCUI_Font *default_font;		/**< 默认字体的信息 */
+	LCUI_Font *incore_font;			/**< 内置字体的信息 */
 	LCUI_FontEngine engines[2];		/**< 当前可用字体引擎列表 */
 	LCUI_FontEngine *engine;		/**< 当前选择的字体引擎 */
 } fontlib = {0, FALSE};
@@ -354,10 +354,11 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 		return -2;
 	}
 	if( font_id <= 0 ) {
-		if( !fontlib.default_font ) {
-			return -3;
+		if( fontlib.default_font ) {
+			font_id = fontlib.default_font->id;
+		} else {
+			font_id = fontlib.incore_font->id;
 		}
-		font_id = fontlib.default_font->id;
 	}
 	/* 这里的 while 只是为了减少缩进 */
 	while( TRUE ) {
@@ -402,6 +403,7 @@ int LCUIFont_LoadFile( const char *filepath )
 	}
 	ret = fontlib.engine->open( filepath, &font );
 	if( ret != 0 ) {
+		printf( "[font] failed to load file: %s\n", filepath );
 		return -2;
 	}
 	font->engine = fontlib.engine;
@@ -596,6 +598,7 @@ int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch,
 		} else {
 			info = fontlib.incore_font;
 		}
+		break;
 	}
 	if( !info ) {
 		return -1;
@@ -621,7 +624,7 @@ void LCUI_InitFont( void )
 		"C:/Windows/Fonts/simsun.ttc",
 		"C:/Windows/Fonts/consola.ttf"
 #else
-		"../fonts/msyh.ttf"
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf"
 #endif
 	};
 
@@ -643,6 +646,7 @@ void LCUI_InitFont( void )
 	LCUIFont_InitInCoreFont( &fontlib.engines[0] );
 	font_id = LCUIFont_GetId( "inconsolata", NULL );
 	fontlib.incore_font = LCUIFont_GetById( font_id );
+	fontlib.default_font = fontlib.incore_font;
 	fontlib.engine = &fontlib.engines[0];
 	/* 然后看情况启用其它字体引擎 */
 #ifdef LCUI_FONT_ENGINE_FREETYPE
