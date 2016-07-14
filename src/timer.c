@@ -122,7 +122,6 @@ static void TimerThread( void *arg )
 	int64_t lost_ms;
 	LinkedListNode *node;
 	LCUI_AppTaskRec task = {0};
-	self.is_running = TRUE;
 	LCUIMutex_Lock( &self.mutex );
 	while( self.is_running ) {
 		Timer timer = NULL;
@@ -291,6 +290,7 @@ void LCUI_InitTimer( void )
 	LCUICond_Init( &self.sleep_cond );
 	LinkedList_Init( &self.timer_list );
 	LCUIThread_Create( &self.tid, TimerThread, NULL );
+	self.is_running = TRUE;
 }
 
 void LCUI_ExitTimer( void )
