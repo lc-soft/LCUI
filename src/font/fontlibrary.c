@@ -377,13 +377,8 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 	}
 	FontBitmap_Init( &bmp_cache );
 	ret = FontBitmap_Load( &bmp_cache, ch, font_id, size );
-	if( ret == 0 ) {
-		*bmp = LCUIFont_AddBitmap( ch, font_id, size, &bmp_cache );
-		if( *bmp ) {
-			return 0;
-		}
-	}
-	return -1;
+	*bmp = LCUIFont_AddBitmap( ch, font_id, size, &bmp_cache );
+	return ret;
 }
 
 /** 载入字体值数据库中 */
