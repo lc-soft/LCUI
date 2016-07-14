@@ -220,9 +220,10 @@ static void X11Surface_OnTask( LCUI_Surface surface, LCUI_SurfaceTask task )
 		LinkedListNode *node;
 		LinkedList_ForEach( node, &surface->rects ) {
 			LCUI_Rect *rect = node->data;
-			XPutImage( x11.app->display, surface->window, surface->gc, 
-				   surface->ximage, 0, 0, rect->x, rect->y, 
-				   rect->width, rect->height);
+			XPutImage( x11.app->display, surface->window, 
+				   surface->gc, surface->ximage, 
+				   rect->x, rect->y, rect->x, rect->y, 
+				   rect->width, rect->height );
 		}
 		LinkedList_Clear( &surface->rects, free );
 		break;
