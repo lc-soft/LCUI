@@ -77,6 +77,10 @@ LCUI_API void LinkedList_Concat( LinkedList *list1, LinkedList *list2 );
 #define LinkedList_Clear(list, func) LinkedList_ClearEx( list, func, 1 )
 #define LinkedList_ClearData(list, func) LinkedList_ClearEx( list, func, 0 )
 
+LCUI_API void LinkedList_SwapNode( LinkedList *list, LinkedListNode *a, LinkedListNode *b );
+LCUI_API void LinkedList_QuickSort( LinkedList *list, int( *cmp )(void*, void*) );
+LCUI_API void LinkedList_BubbleSort( LinkedList *list, int( *cmp )(void*, void*) );
+
 LCUI_END_HEADER
 
 #endif
