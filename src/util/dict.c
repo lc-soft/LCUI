@@ -658,3 +658,43 @@ void Dict_DisableResize( void )
 {
 	dict_can_resize = 0;
 }
+
+static unsigned int StringCopyKeyDict_KeyHash( const void *key )
+{
+	const char *buf = key;
+	unsigned int hash = 5381;
+	while( *buf ) {
+		hash = ((hash << 5) + hash) + (*buf++);
+	}
+	return hash;
+}
+
+static int StringCopyKeyDict_KeyCompare( void *privdata, const void *key1,
+					 const void *key2 )
+{
+	if( strcmp( key1, key2 ) == 0 ) {
+		return 1;
+	}
+	return 0;
+}
+
+static void *StringCopyKeyDict_KeyDup( void *privdata, const void *key )
+{
+	char *newkey = malloc( (strlen( key ) + 1)*sizeof( char ) );
+	strcpy( newkey, key );
+	return newkey;
+}
+
+static void StringCopyKeyDict_KeyDestructor( void *privdata, void *key )
+{
+	free( key );
+}
+
+DictType DictType_StringCopyKey = {
+	StringCopyKeyDict_KeyHash,
+	StringCopyKeyDict_KeyDup,
+	NULL,
+	StringCopyKeyDict_KeyCompare,
+	StringCopyKeyDict_KeyDestructor,
+	NULL
+};

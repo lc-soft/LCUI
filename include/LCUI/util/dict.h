@@ -227,8 +227,6 @@ LCUI_API void Dict_SetHashFunctionSeed( unsigned int initval );
 LCUI_API unsigned int Dict_GetHashFunctionSeed( void );
 
 /* Hash table types */
-extern DictType dictTypeHeapStringCopyKey;
-extern DictType dictTypeHeapStrings;
-extern DictType dictTypeHeapStringCopyKeyValue;
+extern DictType DictType_StringCopyKey;
 
-#endif /* __DICT_H */
+#endif /* LCUI_UTIL_DICT_H */
