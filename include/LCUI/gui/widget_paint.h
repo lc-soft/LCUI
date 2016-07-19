@@ -52,6 +52,15 @@ LCUI_BEGIN_HEADER
 LCUI_API void Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type );
 
 /** 
+ * 将部件一个无效区域推送到根级部件中
+ * @param[in] w		目标部件
+ * @param[in] r		矩形区域
+ * @param[in] box_type	区域相对于何种框进行定位
+ * @returns 推送成功返回 TRUE，如果在推送过程中区域处于部件不可见区域内，则推送失败，返回FALSE
+ */
+LCUI_API LCUI_BOOL Widget_PushInvalidArea( LCUI_Widget widget,
+					   LCUI_Rect *r, int box_type );
+/** 
  * 获取部件中的无效区域
  * @param[in] widget	目标部件
  * @area[out] area	无效区域

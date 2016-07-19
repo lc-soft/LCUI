@@ -326,9 +326,6 @@ LCUI_API void Widget_UpdateOpacity( LCUI_Widget w );
 /** 处理部件中当前积累的任务 */
 LCUI_API int Widget_Update( LCUI_Widget w );
 
-/** 计算部件通过继承得到的样式表 */
-LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
-
 /** 设置部件标题 */
 LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 

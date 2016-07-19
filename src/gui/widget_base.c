@@ -94,7 +94,6 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 {
 	LCUI_Widget child;
 	LinkedListNode *node, *snode;
-	DEBUG_MSG("parent: %p, widget: %p\n", parent, widget);
 	if( !parent || !widget || parent == widget->parent ) {
 		return -1;
 	}
@@ -118,10 +117,10 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 		Widget_PostSurfaceEvent( widget, WET_REMOVE );
 	}
 	widget->parent = parent;
+	widget->state = WSTATE_CREATED;
 	widget->index = parent->children.length;
 	LinkedList_AppendNode( &parent->children, node );
 	LinkedList_AppendNode( &parent->children_show, snode );
-	Widget_UpdateZIndex( widget );
 	Widget_PostSurfaceEvent( widget, WET_ADD );
 	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
@@ -161,7 +160,6 @@ int Widget_Unwrap( LCUI_Widget widget )
 		child->parent = widget->parent;
 		LinkedList_Link( list, target, node );
 		LinkedList_AppendNode( list_show, snode );
-		Widget_UpdateZIndex( child );
 		Widget_AddTaskForChildren( child, WTT_REFRESH_STYLE );
 		Widget_UpdateTaskStatus( child );
 		node = prev;
@@ -295,8 +293,7 @@ void Widget_Destroy( LCUI_Widget w )
 		if( w->computed_style.position != SV_ABSOLUTE ) {
 			Widget_UpdateLayout( w->parent );
 		}
-		Widget_InvalidateArea( w->parent, &w->box.graph, 
-				       SV_PADDING_BOX );
+		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
 	}
 }
 
@@ -314,8 +311,7 @@ void Widget_Empty( LCUI_Widget w )
 			child->state = WSTATE_DELETED;
 		}
 		LinkedList_Concat( &w->children_trash, &w->children );
-		Widget_InvalidateArea( w->parent, &w->box.graph, 
-				       SV_PADDING_BOX );
+		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
 		Widget_AddTask( w, WTT_LAYOUT );
 		return;
 	} else {
@@ -603,8 +599,7 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 	}
 	visible = w->computed_style.visible;
 	if( w->parent ) {
-		Widget_InvalidateArea( w->parent, &w->box.graph, 
-				       SV_PADDING_BOX );
+		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
 		if( w->computed_style.display != display &&
 		    w->computed_style.position != SV_ABSOLUTE ) {
 			Widget_UpdateLayout( w->parent );
@@ -642,17 +637,24 @@ void Widget_UpdateZIndex( LCUI_Widget w )
 
 void Widget_ExecUpdateZIndex( LCUI_Widget w )
 {
+	int z_index;
 	LinkedList *list;
 	LinkedListNode *cnode, *csnode, *snode;
 	LCUI_Style s = &w->style->sheet[key_z_index];
 	if( s->is_valid && s->type == SVT_VALUE ) {
-		w->computed_style.z_index = s->value;
+		z_index = s->value;
 	} else {
-		w->computed_style.z_index = 0;
+		z_index = 0;
 	}
 	if( !w->parent ) {
 		return;
 	}
+	if( w->state == WSTATE_NORMAL ) {
+		if( w->computed_style.z_index == z_index ) {
+			return;
+		}
+	}
+	w->computed_style.z_index = z_index;
 	snode = Widget_GetShowNode( w );
 	list = &w->parent->children_show;
 	LinkedList_Unlink( list, snode );
@@ -741,7 +743,7 @@ void Widget_UpdatePosition( LCUI_Widget w )
 		Widget_UpdateLayout( w->parent );
 	}
 	w->computed_style.position = position;
-	Widget_AddTask( w, WTT_ZINDEX );
+	Widget_UpdateZIndex( w );
 	w->x = w->origin_x;
 	w->y = w->origin_y;
 	switch( position ) {
@@ -822,8 +824,8 @@ void Widget_UpdatePosition( LCUI_Widget w )
 		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
 		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
 		/* 标记移动前后的区域 */
-		Widget_InvalidateArea( w->parent, &w->box.graph, SV_PADDING_BOX );
-		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
+		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
+		Widget_PushInvalidArea( w->parent, &rect, SV_PADDING_BOX );
 	}
 	/* 检测是否为顶级部件并做相应处理 */
 	Widget_PostSurfaceEvent( w, WET_MOVE );
@@ -1456,6 +1458,18 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		child = node->data;
 		if( child->computed_style.position != SV_STATIC &&
 		    child->computed_style.position != SV_RELATIVE ) {
+			/* 如果部件还处于未准备完毕的状态 */
+			if( child->state < WSTATE_READY ) {
+				child->state |= WSTATE_LAYOUTED;
+				/* 如果部件已经准备完毕则触发 ready 事件 */
+				if( child->state == WSTATE_READY ) {
+					LCUI_WidgetEventRec e;
+					e.type = WET_READY;
+					e.cancel_bubble = TRUE;
+					Widget_TriggerEvent( child, &e, NULL );
+					child->state = WSTATE_NORMAL;
+				}
+			}
 			continue;
 		}
 		switch( child->computed_style.display ) {
@@ -1490,10 +1504,8 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		default: continue;
 		}
 		Widget_UpdatePosition( child );
-		/* 如果部件还处于未准备完毕的状态 */
 		if( child->state < WSTATE_READY ) {
 			child->state |= WSTATE_LAYOUTED;
-			/* 如果部件已经准备完毕则触发 ready 事件 */
 			if( child->state == WSTATE_READY ) {
 				LCUI_WidgetEventRec e;
 				e.type = WET_READY;

@@ -107,6 +107,32 @@ void Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 	}
 }
 
+LCUI_BOOL Widget_PushInvalidArea( LCUI_Widget widget, 
+				  LCUI_Rect *r, int box_type )
+{
+	LCUI_Rect rect;
+	LCUI_Widget w = widget;
+	LCUI_Widget root = LCUIWidget_GetRoot();
+
+	if( !w ) {
+		w = root;
+	}
+	Widget_AdjustArea( w, r, &rect, box_type );
+	while( w && w->parent ) {
+		int width = w->parent->box.padding.width;
+		int height = w->parent->box.padding.height;
+		rect.x += w->box.graph.x;
+		rect.y += w->box.graph.y;
+		LCUIRect_ValidateArea( &rect, width, height );
+		if( rect.width < 0 || rect.height < 0 ) {
+			return FALSE;
+		}
+		w = w->parent;
+	}
+	Widget_InvalidateArea( root, &rect, SV_PADDING_BOX );
+	return TRUE;
+}
+
 int Widget_GetInvalidArea( LCUI_Widget widget, LCUI_Rect *area )
 {
 	LCUI_Rect *rect;
@@ -370,7 +396,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
 	LinkedList_ForEachReverse( node, &w->children_show ) {
 		LCUI_Rect child_rect;
-		LCUI_Widget child = node->data; 
+		LCUI_Widget child = node->data;
 		if( !child->computed_style.visible || 
 		    child->state != WSTATE_NORMAL ) {
 			continue;
