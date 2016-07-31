@@ -62,7 +62,7 @@ void LCUICSS_Init(void);
 LCUI_API int LCUICSS_LoadFile( const char *filepath );
 
 /** 从字符串中载入CSS样式数据，并导入至样式库中 */
-LCUI_API int LCUICSS_LoadString( const char *str );
+LCUI_API int LCUICSS_LoadString( const char *str, const char *space );
 
 void LCUICSS_Destroy(void);
 

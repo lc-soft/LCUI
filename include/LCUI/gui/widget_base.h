@@ -150,18 +150,22 @@ typedef struct LCUI_StyleSheetRec_ {
 	int length;
 } LCUI_StyleSheetRec, *LCUI_StyleSheet;
 
+/** 选择器结点结构 */
 typedef struct LCUI_SelectorNodeRec_ {
-	char *id;
-	char *type;
-	char *class_name;
-	char *pseudo_class_name;
+	char *id;			/**< ID */
+	char *type;			/**< 类型名称 */
+	char **classes;			/**< 样式类列表 */
+	char **status;			/**< 状态列表 */
+	char *fullname;			/**< 全名，由 id、type、classes、status 组合而成 */
+	int rank;			/**< 权值 */
 } LCUI_SelectorNodeRec, *LCUI_SelectorNode;
 
+/** 选择器结构 */
 typedef struct LCUI_SelectorRec_ {
-	LCUI_SelectorNode *list;	/**< 选择器结点列表 */
-	int length;			/**< 选择器结点长度 */
 	int rank;			/**< 权值，决定优先级 */
 	int batch_num;			/**< 批次号 */
+	int length;			/**< 选择器结点长度 */
+	LCUI_SelectorNode *nodes;	/**< 选择器结点列表 */
 } LCUI_SelectorRec, *LCUI_Selector;
 
 #define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \

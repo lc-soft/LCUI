@@ -82,6 +82,7 @@ struct XMLParserContextRec_ {
 	LCUI_Widget widget;
 	LCUI_Widget root;
 	ParserPtr parent;
+	const char *space;
 };
 
 static struct ModuleContext {
@@ -123,7 +124,7 @@ static int ParseResource( XMLParserContext ctx, xmlNodePtr node )
 			if( node->type != XML_TEXT_NODE ) {
 				continue;
 			}
-			LCUICSS_LoadString( (char*)node->content );
+			LCUICSS_LoadString( (char*)node->content, ctx->space );
 		}
 	}
 	return PB_NEXT;
@@ -287,6 +288,7 @@ LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 	ctx.root = NULL;
 	ctx.widget = NULL;
 	ctx.parent = NULL;
+	ctx.space = NULL;
 	if( !self.is_inited ) {
 		LCUIBuilder_Init();
 	}
@@ -321,6 +323,7 @@ LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 	ctx.root = NULL;
 	ctx.widget = NULL;
 	ctx.parent = NULL;
+	ctx.space = filepath;
 	if( !self.is_inited ) {
 		LCUIBuilder_Init();
 	}

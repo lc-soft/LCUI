@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_style.c -- widget style library module for LCUI.
  *
- * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_style.c -- LCUI 的部件样式库模块。
  *
- * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,8 +46,11 @@
 #include <LCUI/gui/widget.h>
 
 #define MAX_NAME_LEN		256
+#define MAX_SELECTOR_LEN	1024
 #define MAX_NODE_DEPTH		32
 #define MAX_SELECTOR_DEPTH	32
+
+#define FindStyleSheet(S, L) FindStyleSheetFromGroup(0, S, L)
 
 enum SelectorRank {
 	GENERAL_RANK = 0,
@@ -67,38 +71,48 @@ enum SelectorFinderLevel {
 	LEVEL_TOTAL_NUM
 };
 
-typedef struct StyleListNodeRec_ {
-	LCUI_StyleSheet style;		/**< 样式表 */
-	LCUI_Selector selector;		/**< 作用范围 */
-} StyleListNodeRec, *StyleListNode;
-
-typedef struct StyleTreeNodeRec_ {
-	char name[MAX_NAME_LEN];	/**< 作用对象的名称 */
-	LinkedList styles;		/**< 其它样式表 */
-} StyleTreeNodeRec, *StyleTreeNode;
-
 /* 样式表查找器的上下文数据结构 */
-typedef struct StyleSheetFinderRec_ {
+typedef struct NamesFinderRec_ {
 	int level;			/**< 当前选择器层级 */
 	int class_i;			/**< 当前处理到第几个类名 */
 	int status_i;			/**< 当前处理到第几个状态名（伪类名） */
 	int name_i;			/**< 选择器名称从第几个字符开始 */
 	char name[MAX_NAME_LEN];	/**< 选择器名称缓存 */
-	LinkedList classes;		/**< 已排序的类名列表 */
-	LinkedList status;		/**< 已排序的状态列表 */
-	LCUI_Widget widget;		/**< 针对的部件 */
-} StyleSheetFinderRec, *StyleSheetFinder;
+	LCUI_SelectorNode node;		/**< 针对的选择器结点 */
+} NamesFinderRec, *NamesFinder;
+
+/** 样式链接记录组 */
+typedef struct StyleLinkGroupRec_ {
+	Dict *links;			/**< 样式链接表 */
+	char *name;			/**< 选择器名称 */
+	LCUI_SelectorNodeRec snode;	/**< 选择器结点 */
+} StyleLinkGroupRec, *StyleLinkGroup;
+
+/** 样式结点记录 */
+typedef struct StyleNodeRec_ {
+	int rank;		/**< 权值，决定优先级 */
+	int batch_num;		/**< 批次号 */
+	char *space;		/**< 所属的空间 */
+	LCUI_StyleSheet sheet;	/**< 样式表 */
+} StyleNodeRec, *StyleNode;
+
+/** 样式链接记录 */
+typedef struct StyleLinkRec_ {
+	StyleLinkGroup group;	/**< 所属组 */
+	LinkedList styles;	/**< 作用于当前选择器的样式 */
+	Dict *parents;		/**< 父级节点 */
+} StyleLinkRec, *StyleLink;
 
 static struct {
 	LCUI_BOOL is_inited;
-	LCUI_RBTree tree;		/**< 样式树 */
+	LinkedList groups;		/**< 样式组列表 */
 } style_library;
 
 const char *global_css = ToString(
 
 * {
 	width: auto;
-	height: auto;
+	height:	auto;
 	background-color: transparent;
 	display: block;
 	position: static;
@@ -108,92 +122,175 @@ const char *global_css = ToString(
 
 );
 
-/** 获取指针数组的长度 */
-static size_t ptrslen( char *const *list )
+static int SortedStrList_Add( char ***strlist, const char *str )
 {
-	char *const *p = list;
-	if( list == NULL ) {
-		return 0;
+	int i, n, len, pos;
+	char **newlist, *newstr;
+
+	if( *strlist ) {
+		for( i = 0; (*strlist)[i]; ++i );
+		len = i + 2;
+	} else {
+		len = 2;
 	}
-	while( *p ) {
-		p++;
+	newlist = realloc( *strlist, sizeof( char* ) * len );
+	if( !newlist ) {
+		return -ENOMEM;
 	}
-	return p - list;
+	newlist[len - 2] = NULL;
+	for( i = 0, pos = -1; newlist[i]; ++i ) {
+		n = strcmp( newlist[i], str );
+		if( n < 0 ) {
+			continue;
+		} else if( n == 0 ) {
+			return 1;
+		} else {
+			pos = i;
+		}
+	}
+	n = strlen( str ) + 1;
+	newstr = malloc( sizeof(char) * n );
+	if( !newstr ) {
+		return -ENOMEM;
+	}
+	strncpy( newstr, str, n );
+	if( pos >= 0 ) {
+		for( i = len - 2; i > pos; --i ) {
+			newlist[i] = newlist[i - 1];
+		}
+		newlist[pos] = newstr;
+	} else {
+		pos = len - 2;
+	}
+	newlist[pos] = newstr;
+	newlist[len - 1] = NULL;
+	*strlist = newlist;
+	return 0;
 }
 
-static int CompareName( void *data, const void *keydata )
+static void SortedStrList_Destroy( char **strlist )
 {
-	return strcmp( ((StyleTreeNode)data)->name, (const char*)keydata );
+	int i;
+	for( i = 0; strlist[i]; ++i ) {
+		free( strlist[i] );
+		strlist[i] = NULL;
+	}
+	free( strlist );
 }
 
-static void SelectorNode_Delete( LCUI_SelectorNode *node_ptr )
+/** 
+ * 匹配选择器节点
+ * 左边的选择器必须包含右边的选择器的所有属性。
+ */
+static LCUI_BOOL SelectorNode_Match( LCUI_SelectorNode sn1, 
+				     LCUI_SelectorNode sn2 )
 {
-	LCUI_SelectorNode node = *node_ptr;
+	int i, j;
+	if( sn2->id ) {
+		if( !sn1->id || strcmp( sn1->id, sn2->id ) != 0 ) {
+			return FALSE;
+		}
+	}
+	if( sn2->type ) {
+		if( !sn1->type || strcmp( sn1->type, sn2->type ) != 0 ) {
+			return FALSE;
+		}
+	}
+	if( sn2->classes ) {
+		if( !sn1->classes ) {
+			return FALSE;
+		}
+		for( i = 0; sn2->classes[i]; ++i ) {
+			for( j = 0; sn1->classes[j]; ++j ) {
+				if( strcmp( sn2->classes[i],
+					    sn1->classes[i] ) == 0 ) {
+					j = -1;
+					break;
+				}
+			}
+			if( j != -1 ) {
+				return FALSE;
+			}
+		}
+	}
+	if( sn2->status ) {
+		if( !sn1->status ) {
+			return FALSE;
+		}
+		for( i = 0; sn2->status[i]; ++i ) {
+			for( j = 0; sn1->status[j]; ++j ) {
+				if( strcmp( sn2->status[i],
+					    sn1->status[i] ) == 0 ) {
+					j = -1;
+					break;
+				}
+			}
+			if( j != -1 ) {
+				return FALSE;
+			}
+		}
+	}
+	return TRUE;
+}
+
+static void SelectorNode_Copy( LCUI_SelectorNode dst, LCUI_SelectorNode src )
+{
+	int i;
+	dst->id = src->id ? strdup( src->id ) : NULL;
+	dst->type = src->type ? strdup( src->type ) : NULL;
+	dst->fullname = src->fullname ? strdup( src->fullname ) : NULL;
+	if( src->classes ) {
+		for( i = 0; src->classes[i]; ++i ) {
+			SortedStrList_Add( &dst->classes, src->classes[i] );
+		}
+	}
+	if( src->status ) {
+		for( i = 0; src->status[i]; ++i ) {
+			SortedStrList_Add( &dst->status, src->status[i] );
+		}
+	}
+}
+
+static void SelectorNode_Delete( LCUI_SelectorNode node )
+{
 	if( node->type ) {
 		free( node->type );
 		node->type = NULL;
-	}
-	if( node->class_name ) {
-		free( node->class_name );
-		node->class_name = NULL;
 	}
 	if( node->id ) {
 		free( node->id );
 		node->id = NULL;
 	}
-	if( node->pseudo_class_name ) {
-		free( node->pseudo_class_name );
-		node->pseudo_class_name = NULL;
+	if( node->classes ) {
+		SortedStrList_Destroy( node->classes );
+		node->classes = NULL;
+	}
+	if( node->status ) {
+		SortedStrList_Destroy( node->status );
+		node->status = NULL;
+	}
+	if( node->fullname ) {
+		free( node->fullname );
+		node->fullname = NULL;
 	}
 	free( node );
-	*node_ptr = NULL;
 }
 
-void Selector_Delete( LCUI_Selector *s_ptr )
+void Selector_Delete( LCUI_Selector s )
 {
 	int i;
-	LCUI_Selector s = *s_ptr;
-	for( i = 0; i<MAX_SELECTOR_DEPTH; ++i ) {
-		if( !s->list[i] ) {
+	for( i = 0; i < MAX_SELECTOR_DEPTH; ++i ) {
+		if( !s->nodes[i] ) {
 			break;
 		}
-		SelectorNode_Delete( &s->list[i] );
+		SelectorNode_Delete( s->nodes[i] );
+		s->nodes[i] = NULL;
 	}
 	s->rank = 0;
 	s->length = 0;
 	s->batch_num = 0;
-	free( s->list );
+	free( s->nodes );
 	free( s );
-	*s_ptr = NULL;
-}
-
-static void DestroyStyleListNode( StyleListNode node )
-{
-	StyleSheet_Delete( &node->style );
-	Selector_Delete( &node->selector );
-}
-
-static void DestroyStyleTreeNode( void *data )
-{
-	StyleTreeNode node = data;
-	LinkedList_Clear( &node->styles, (FuncPtr)DestroyStyleListNode );
-}
-
-void LCUIWidget_InitStyle( void )
-{
-	RBTree_Init( &style_library.tree );
-	RBTree_OnJudge( &style_library.tree, CompareName );
-	RBTree_OnDestroy( &style_library.tree, DestroyStyleTreeNode );
-	style_library.is_inited = TRUE;
-	LCUICSS_Init();
-	LCUICSS_LoadString( global_css );
-}
-
-void LCUIWidget_ExitStyle( void )
-{
-	RBTree_Destroy( &style_library.tree );
-	style_library.is_inited = FALSE;
-	LCUICSS_Destroy();
 }
 
 LCUI_StyleSheet StyleSheet( void )
@@ -228,12 +325,11 @@ void StyleSheet_Clear( LCUI_StyleSheet ss )
 	}
 }
 
-void StyleSheet_Delete( LCUI_StyleSheet *ss )
+void StyleSheet_Delete( LCUI_StyleSheet ss )
 {
-	StyleSheet_Clear( *ss );
-	free( (*ss)->sheet );
-	free( *ss );
-	*ss = NULL;
+	StyleSheet_Clear( ss );
+	free( ss->sheet );
+	free( ss );
 }
 
 int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src )
@@ -326,6 +422,177 @@ int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 	return count;
 }
 
+/** 初始化样式表查找器 */
+static void NamesFinder_Init( NamesFinder sfinder, LCUI_SelectorNode snode )
+{
+	sfinder->level = 0;
+	sfinder->class_i = 0;
+	sfinder->name_i = 0;
+	sfinder->status_i = 0;
+	sfinder->name[0] = 0;
+	sfinder->node = snode;
+}
+
+/** 销毁样式表查找器 */
+static void NamesFinder_Destroy( NamesFinder sfinder )
+{
+	sfinder->name_i = 0;
+	sfinder->name[0] = 0;
+	sfinder->class_i = 0;
+	sfinder->status_i = 0;
+	sfinder->node = NULL;
+	sfinder->level = LEVEL_NONE;
+}
+
+/* 查找匹配的样式表 */
+static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
+{
+	int i, len, old_len, old_level, count = 0;
+	char *fullname = sfinder->name + sfinder->name_i;
+	old_len = len = strlen( fullname );
+	old_level = sfinder->level;
+	switch( sfinder->level ) {
+	case LEVEL_TYPE: 
+		/* 按类型选择器搜索样式表 */
+		if( !sfinder->node->type ) {
+			return 0;
+		}
+		strcpy( fullname, sfinder->node->type );
+		LinkedList_Append( list, strdup( fullname ) );
+		break;
+	case LEVEL_ID: 
+		/* 按ID选择器搜索样式表 */
+		if( !sfinder->node->id ) {
+			return 0;
+		}
+		fullname[len++] = '#';
+		strcpy( fullname + len, sfinder->node->id );
+		LinkedList_Append( list, strdup( fullname ) );
+		fullname[old_len] = 0;
+		break;
+	case LEVEL_CLASS:
+		if( !sfinder->node->classes ) {
+			return 0;
+		}
+		/* 按类选择器搜索样式表
+		* 假设当前选择器全名为：textview#main-btn-text，且有 .a .b .c 
+		* 这三个类，那么下面的处理将会拆分成以下三个选择器来匹配样式表：
+		* textview#test-text.a
+		* textview#test-text.b
+		* textview#test-text.a
+		*/
+		fullname[len++] = '.';
+		for( i = 0; sfinder->node->classes[i]; ++i ) {
+			sfinder->level += 1;
+			strcpy( fullname + len, sfinder->node->classes[i] );
+			LinkedList_Append( list, strdup( fullname ) );
+			/* 将当前选择器名与其它层级的选择器名组合 */
+			while( sfinder->level < LEVEL_TOTAL_NUM ) {
+				count += NamesFinder_Find( sfinder, list );
+				sfinder->level += 1;
+			}
+			sfinder->level = LEVEL_CLASS;
+			sfinder->class_i += 1;
+		}
+		sfinder->level = LEVEL_CLASS;
+		fullname[old_len] = 0;
+		sfinder->class_i = 0;
+		return count;
+	case LEVEL_CLASS_2:
+		if( !sfinder->node->classes ) {
+			return 0;
+		}
+		/* 按类选择器搜索交集样式表，结果类似于这样： 
+		* textview#test-text.a.b
+		* textview#test-text.a.c
+		* textview#test-text.b.c
+		* textview#test-text.a.b.c
+		*/
+		fullname[len++] = '.';
+		for( i = 0; sfinder->node->classes[i]; ++i ) {
+			if( i <= sfinder->class_i ) {
+				continue;
+			}
+			strcpy( fullname + len, sfinder->node->classes[i] );
+			LinkedList_Append( list, strdup( fullname ) );
+			sfinder->class_i += 1;
+			count += NamesFinder_Find( sfinder, list );
+			sfinder->class_i -= 1;
+			sfinder->level = LEVEL_STATUS;
+			/**
+			* 递归拼接伪类名，例如：
+			* textview#main-btn-text:active
+			*/
+			count += NamesFinder_Find( sfinder, list );
+			sfinder->level = LEVEL_CLASS_2;
+		}
+		fullname[old_len] = 0;
+		sfinder->level = LEVEL_CLASS_2;
+		return count;
+	case LEVEL_STATUS:
+		if( !sfinder->node->status ) {
+			return 0;
+		}
+		fullname[len++] = ':';
+		sfinder->level = LEVEL_STATUS_2;
+		/**
+		* 按伪类选择器搜索样式表
+		* 假设当前选择器全名为：textview#main-btn-text:hover:focus:active
+		* 那么下面的循环会将它拆分为以下几个选择器来匹配样式：
+		* textview#main-btn-text:active
+		* textview#main-btn-text:active:focus
+		* textview#main-btn-text:active:focus:hover
+		* textview#main-btn-text:active:hover
+		* textview#main-btn-text:focus
+		* textview#main-btn-text:focus:hover
+		* textview#main-btn-text:hover
+		*/
+		for( i = 0; sfinder->node->status[i]; ++i ) {
+			strcpy( fullname + len, sfinder->node->status[i] );
+			LinkedList_Append( list, strdup( fullname ) );
+			/**
+			 * 递归调用，以一层层拼接出像下面这样的选择器：
+			 * textview#main-btn-text:active:focus:hover
+			 */
+			count += NamesFinder_Find( sfinder, list );
+			sfinder->status_i += 1;
+		}
+		sfinder->level = LEVEL_STATUS;
+		fullname[old_len] = 0;
+		sfinder->status_i = 0;
+		return count;
+	case LEVEL_STATUS_2:
+		if( !sfinder->node->status ) {
+			return 0;
+		}
+		/** 按伪类选择器搜索交集样式表 */
+		for( i = 0; sfinder->node->status[i]; ++i ) {
+			if( i <= sfinder->status_i ) {
+				continue;
+			}
+			fullname[len] = ':';
+			strcpy( fullname + len + 1, sfinder->node->status[i] );
+			LinkedList_Append( list, strdup( fullname ) );
+			sfinder->status_i += 1;
+			count += NamesFinder_Find( sfinder, list );
+			sfinder->status_i -= 1;
+		}
+		fullname[old_len] = 0;
+		return count;
+	default:break;
+	}
+	for( i = sfinder->level + 1; i < LEVEL_TOTAL_NUM; ++i ) {
+		if( i == LEVEL_STATUS_2 || i == LEVEL_CLASS_2 ) {
+			continue;
+		}
+		sfinder->level = i;
+		count += NamesFinder_Find( sfinder, list );
+	}
+	fullname[old_len] = 0;
+	sfinder->level = old_level;
+	return count;
+}
+
 static int SelectorNode_Save( LCUI_SelectorNode node,
 			      const char *name, int len, char type )
 {
@@ -333,37 +600,113 @@ static int SelectorNode_Save( LCUI_SelectorNode node,
 	if( len < 1 ) {
 		return 0;
 	}
-	str = malloc( (len + 1)*sizeof( char ) );
-	strcpy( str, name );
 	switch( type ) {
 	case 0:
 		if( node->type ) {
 			break;
 		}
+		len += 1;
+		str = malloc( sizeof( char ) * len );
+		strncpy( str, name, len );
 		node->type = str;
 		return TYPE_RANK;
 	case ':':
-		if( node->pseudo_class_name ) {
-			break;
+		if( SortedStrList_Add( &node->status, name ) == 0 ) {
+			return PCLASS_RANK;
 		}
-		node->pseudo_class_name = str;
-		return PCLASS_RANK;
+		break;
 	case '.':
-		if( node->class_name ) {
-			break;
+		if( SortedStrList_Add( &node->classes, name ) == 0 ) {
+			return CLASS_RANK;
 		}
-		node->class_name = str;
-		return CLASS_RANK;
+		break;
 	case '#':
 		if( node->id ) {
 			break;
 		}
+		len += 1;
+		str = malloc( sizeof( char ) * len );
+		strncpy( str, name, len );
 		node->id = str;
 		return ID_RANK;
 	default: break;
 	}
-	free( str );
 	return 0;
+}
+
+static int SelectorNode_GetNames( LCUI_SelectorNode sn, LinkedList *names )
+{
+	int count;
+	NamesFinderRec sfinder;
+	NamesFinder_Init( &sfinder, sn );
+	count = NamesFinder_Find( &sfinder, names );
+	NamesFinder_Destroy( &sfinder );
+	return count;
+}
+
+static int SelectorNode_Update( LCUI_SelectorNode node )
+{
+	int i, len = 0;
+	char *fullname;
+
+	node->rank = 0;
+	if( node->id ) {
+		len += strlen( node->id ) + 2;
+		node->rank += ID_RANK;
+	}
+	if( node->type ) {
+		len += strlen( node->type ) + 2;
+		node->rank += TYPE_RANK;
+	}
+	if( node->classes ) {
+		for( i = 0; node->classes[i]; ++i ) {
+			len += strlen( node->classes[i] ) + 1;
+			node->rank += CLASS_RANK;
+		}
+		len += 1;
+	}
+	if( node->status ) {
+		for( i = 0; node->status[i]; ++i ) {
+			len += strlen( node->status[i] ) + 1;
+			node->rank += PCLASS_RANK;
+		}
+		len += 1;
+	}
+	if( len > 0 ) {
+		fullname = malloc( sizeof( char ) * len );
+		if( !fullname ) {
+			return -ENOMEM;
+		}
+		fullname[0] = 0;
+		if( node->type ) {
+			strcat( fullname, node->type );
+		}
+		if( node->id ) {
+			strcat( fullname, "#" );
+			strcat( fullname, node->id );
+		}
+		if( node->classes ) {
+			for( i = 0; node->classes[i]; ++i ) {
+				strcat( fullname, "." );
+				strcat( fullname, node->classes[i] );
+			}
+			len += 1;
+		}
+		if( node->status ) {
+			for( i = 0; node->status[i]; ++i ) {
+				strcat( fullname, ":" );
+				strcat( fullname, node->status[i] );
+			}
+			len += 1;
+		}
+	} else {
+		fullname = NULL;
+	}
+	if( node->fullname ) {
+		free( node->fullname );
+	}
+	node->fullname = fullname;
+	return len;
 }
 
 LCUI_Selector Selector( const char *selector )
@@ -377,7 +720,12 @@ LCUI_Selector Selector( const char *selector )
 	LCUI_Selector s = NEW( LCUI_SelectorRec, 1 );
 
 	s->batch_num = ++batch_num;
-	s->list = NEW( LCUI_SelectorNode, MAX_SELECTOR_DEPTH );
+	s->nodes = NEW( LCUI_SelectorNode, MAX_SELECTOR_DEPTH );
+	if( !selector ) {
+		s->length = 0;
+		s->nodes[0] = NULL;
+		return s;
+	}
 	for( ni = 0, si = 0, p = selector; *p; ++p ) {
 		if( !node && is_saving ) {
 			node = NEW( LCUI_SelectorNodeRec, 1 );
@@ -386,7 +734,7 @@ LCUI_Selector Selector( const char *selector )
 					    selector );
 				return NULL;
 			}
-			s->list[si] = node;
+			s->nodes[si] = node;
 		}
 		switch( *p ) {
 		case ':':
@@ -404,7 +752,8 @@ LCUI_Selector Selector( const char *selector )
 			} else {
 				_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
 						selector, p - selector - ni );
-				SelectorNode_Delete( &node );
+				SelectorNode_Delete( node );
+				node = NULL;
 			}
 			ni = 0;
 			is_saving = TRUE;
@@ -422,15 +771,17 @@ LCUI_Selector Selector( const char *selector )
 			is_saving = FALSE;
 			rank = SelectorNode_Save( node, name, ni, type );
 			if( rank > 0 ) {
-				si++;
-				ni = 0;
-				node = NULL;
+				SelectorNode_Update( node );
 				s->rank += rank;
+				node = NULL;
+				ni = 0;
+				si++;
 				continue;
 			}
 			_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
 				    selector, p - selector - ni );
-			SelectorNode_Delete( &node );
+			SelectorNode_Delete( node );
+			node = NULL;
 			ni = 0;
 			continue;
 		default: break;
@@ -451,502 +802,279 @@ LCUI_Selector Selector( const char *selector )
 		return NULL;
 	}
 	if( is_saving ) {
-		rank = SelectorNode_Save( s->list[si], name, ni, type );
+		rank = SelectorNode_Save( s->nodes[si], name, ni, type );
 		if( rank > 0 ) {
+			SelectorNode_Update( s->nodes[si] );
 			s->rank += rank;
 			si++;
 		} else {
-			SelectorNode_Delete( &s->list[si] );
+			SelectorNode_Delete( s->nodes[si] );
 		}
 	}
-	s->list[si] = NULL;
-	s->length += si;
+	s->nodes[si] = NULL;
+	s->length = si;
 	return s;
 }
 
-LCUI_Selector Selector_Dup( const LCUI_Selector src )
+static void DeleteStyleNode( StyleNode node )
 {
-	int i;
-	LCUI_SelectorNode new_sn, *sn_ptr, sn;
-	LCUI_Selector dst = NEW( LCUI_SelectorRec, 1 );
-	dst->list = NEW( LCUI_SelectorNode, src->length + 1 );
-	for( sn_ptr = src->list, i = 0; *sn_ptr; ++sn_ptr, ++i ) {
-		sn = *sn_ptr;
-		new_sn = NEW( LCUI_SelectorNodeRec, 1 );
-		if( sn->type ) {
-			new_sn->type = strdup( sn->type );
-		}
-		if( sn->id ) {
-			new_sn->id = strdup( sn->id );
-		}
-		if( sn->class_name ) {
-			new_sn->class_name = strdup( sn->class_name );
-		}
-		if( sn->pseudo_class_name ) {
-			new_sn->pseudo_class_name = strdup( sn->pseudo_class_name );
-		}
-		dst->list[i] = new_sn;
+	if( node->space ) {
+		free( node->space );
+		node->space = NULL;
 	}
-	dst->list[i] = NULL;
-	dst->length = i;
-	dst->rank = src->rank;
-	dst->batch_num = src->batch_num;
-	return dst;
+	StyleSheet_Delete( node->sheet );
+	node->sheet = NULL;
 }
 
-static int mystrcmp( const char *str1, const char *str2 )
+static StyleLink CreateStyleLink( void )
 {
-	if( str1 == str2 ) {
-		return 0;
-	}
-	if( str1 == NULL || str2 == NULL ) {
-		return -1;
-	}
-	return strcasecmp( str1, str2 );
+	StyleLink link = NEW( StyleLinkRec, 1 );
+	link->group = NULL;
+	LinkedList_Init( &link->styles );
+	link->parents = Dict_Create( &DictType_StringCopyKey, NULL );
+	return link;
 }
 
-LCUI_BOOL Selector_Compare( LCUI_Selector s1, LCUI_Selector s2 )
+static void DeleteStyleLink( StyleLink link )
 {
-	LCUI_SelectorNode *sn1_ptr = s1->list, *sn2_ptr = s2->list;
-	for( ; *sn1_ptr && *sn2_ptr; ++sn1_ptr,++sn2_ptr ) {
-		if( mystrcmp((*sn1_ptr)->type, (*sn2_ptr)->type) ) {
-			return FALSE;
-		}
-		if( mystrcmp((*sn1_ptr)->class_name,
-			(*sn2_ptr)->class_name) ) {
-			return FALSE;
-		}
-		if( mystrcmp((*sn1_ptr)->pseudo_class_name,
-			(*sn2_ptr)->pseudo_class_name) ) {
-			return FALSE;
-		}
-		if( mystrcmp((*sn1_ptr)->id, (*sn2_ptr)->id) ) {
-			return FALSE;
-		}
-	}
-	if( sn1_ptr == sn2_ptr ) {
-		return TRUE;
-	}
-	return FALSE;
+	link->group = NULL;
+	Dict_Release( link->parents );
+	link->parents = NULL;
+	LinkedList_Clear( &link->styles, (FuncPtr)DeleteStyleNode );
 }
 
-static LCUI_StyleSheet SelectStyleSheetByName( LCUI_Selector selector,
-					       const char *name )
+static void OnDeleteStyleLink( void *privdata, void *data )
 {
-	StyleTreeNode stn;
-	StyleListNode sln;
-	LCUI_RBTreeNode *tn;
+	DeleteStyleLink( data );
+}
+
+static StyleLinkGroup CreateStyleLinkGroup( LCUI_SelectorNode snode )
+{
+	DictType *dtype = NEW( DictType, 1 );
+	StyleLinkGroup group = NEW( StyleLinkGroupRec, 1 );
+	SelectorNode_Copy( &group->snode, snode );
+	group->name = group->snode.fullname;
+	*dtype = DictType_StringCopyKey;
+	dtype->valDestructor = OnDeleteStyleLink;
+	group->links = Dict_Create( dtype, dtype );
+	return group;
+}
+
+static void DeleteStyleLinkGroup( StyleLinkGroup group )
+{
+	free( group->name );
+	Dict_Release( group->links );
+	free( group->links->privdata );
+	group->name = NULL;
+	group->links = NULL;
+}
+
+static void OnDeleteStyleLinkGroup( void *privdata, void *data )
+{
+	DeleteStyleLinkGroup( data );
+}
+
+static Dict *CreateStyleGroup( void )
+{
+	Dict *dict;
+	DictType *dtype = NEW( DictType, 1 );
+	*dtype = DictType_StringCopyKey;
+	dtype->valDestructor = OnDeleteStyleLinkGroup;
+	dict = Dict_Create( dtype, dtype );
+	return dict;
+}
+
+static void DeleteStyleGroup( Dict *dict )
+{
+	Dict_Release( dict );
+	free( dict->privdata );
+	dict->privdata = NULL;
+}
+
+/** 根据选择器，选中匹配的样式表 */
+static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector, 
+					 const char *space )
+{
+	int i, right;
+	StyleLink link;
+	StyleNode snode;
+	StyleLinkGroup slg;
 	LinkedListNode *node;
-	int i = 0, pos = -1;
-	tn = RBTree_CustomSearch( &style_library.tree, (const void*)name );
-	if( !tn ) {
-		stn = NEW( StyleTreeNodeRec, 1 );
-		strncpy( stn->name, name, MAX_NAME_LEN );
-		LinkedList_Init( &stn->styles );
-		tn = RBTree_CustomInsert( &style_library.tree,
-					  (const void*)name, stn );
-	}
-	stn = tn->data;
-	LinkedList_ForEach( node, &stn->styles ) {
-		sln = node->data;
-		if( Selector_Compare(sln->selector, selector) ) {
-			return sln->style;
+	LCUI_SelectorNode sn;
+	Dict *group, *parents;
+
+	parents = NULL;
+	link = NULL;
+	for( i = 0, right = selector->length - 1; right >= 0; --right, ++i ) {
+		char fullname[MAX_SELECTOR_LEN], buf[MAX_SELECTOR_LEN];
+		group = LinkedList_Get( &style_library.groups, i );
+		if( !group ) {
+			group = CreateStyleGroup();
+			LinkedList_Append( &style_library.groups, group );
 		}
-		if( pos != -1 ) {
-			i += 1;
-			continue;
+		sn = selector->nodes[right];
+		slg = Dict_FetchValue( group, sn->fullname );
+		if( !slg ) {
+			slg = CreateStyleLinkGroup( sn );
+			Dict_Add( group, sn->fullname, slg );
 		}
-		if( selector->rank > sln->selector->rank ) {
-			pos = i;
-		} else if( selector->rank == sln->selector->rank ) {
-			if( selector->batch_num > sln->selector->batch_num ) {
-				pos = i;
-				break;
+		if( i == 0 ) {
+			strcpy( fullname, "*" );
+		} else {
+			if( i == 1 ) {
+				strcpy( fullname, sn->fullname );
+			} else {
+				strcpy( buf, fullname );
+				sprintf( fullname, "%s %s", sn->fullname, buf );
 			}
 		}
-		i += 1;
+		link = Dict_FetchValue( slg->links, fullname );
+		if( !link ) {
+			link = CreateStyleLink();
+			link->group = slg;
+			Dict_Add( slg->links, fullname, link );
+		}
+		/* 如果有上一级的父链接记录，则将当前链接添加进去 */
+		if( parents ) {
+			if( !Dict_FetchValue( parents, sn->fullname ) ) {
+				Dict_Add( parents, sn->fullname, link );
+			}
+		}
+		parents = link->parents;
 	}
-	sln = NEW( StyleListNodeRec, 1 );
-	sln->style = StyleSheet();
-	sln->selector = Selector_Dup( selector );
-	if( pos >= 0 ) {
-		LinkedList_Insert( &stn->styles, pos, sln );
-	} else {
-		LinkedList_Append( &stn->styles, sln );
-	}
-	return sln->style;
-}
-
-static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector )
-{
-	char fullname[MAX_NAME_LEN] = "";
-	LCUI_SelectorNode sn = selector->list[selector->length-1];
-	if( sn->type ) {
-		strcat( fullname, sn->type );
-	}
-	if( sn->id ) {
-		strcat( fullname, "#" );
-		strcat( fullname, sn->id );
-	}
-	if( sn->class_name ) {
-		strcat( fullname, "." );
-		strcat( fullname, sn->class_name );
-	}
-	if( sn->pseudo_class_name ) {
-		strcat( fullname, ":" );
-		strcat( fullname, sn->pseudo_class_name );
-	}
-	if( fullname[0] == 0 ) {
+	if( !link ) {
 		return NULL;
 	}
-	return SelectStyleSheetByName( selector, fullname );
+	LinkedList_ForEach( node, &link->styles ) {
+		snode = node->data;
+		if( !space ) {
+			if( !snode->space ) {
+				return snode->sheet;
+			}
+		} else if( strcmp(snode->space, space) == 0 ) {
+			return snode->sheet;
+		}
+	}
+	snode = NEW( StyleNodeRec, 1 );
+	if( space ) {
+		snode->space = NEW( char, strlen(space) + 1 );
+		strcpy( snode->space, space );
+	} else {
+		snode->space = NULL;
+	}
+	snode->sheet = StyleSheet();
+	snode->rank = selector->rank;
+	snode->batch_num = selector->batch_num;
+	LinkedList_Append( &link->styles, snode );
+	return snode->sheet;
 }
 
-int LCUI_PutStyle( LCUI_Selector selector, LCUI_StyleSheet in_ss )
+int LCUI_PutStyle( LCUI_Selector selector, 
+		   LCUI_StyleSheet in_ss, const char *space )
 {
 	LCUI_StyleSheet ss;
-	ss = SelectStyleSheet( selector );
+	ss = SelectStyleSheet( selector, space );
 	if( ss ) {
 		StyleSheet_Replace( ss, in_ss );
 	}
 	return 0;
 }
 
-LCUI_BOOL Selector_MatchPath( LCUI_Selector selector, LCUI_Widget *wlist )
+static int StyleLink_GetStyleSheets( StyleLink link, LinkedList *outlist )
 {
-	int i, n;
-	LCUI_Widget *obj_ptr = wlist, w;
-	LCUI_SelectorNode sn, *sn_ptr = selector->list;
-	/* 定位到最后一个元素 */
-	sn_ptr += selector->length-1;
-	for( ;*obj_ptr; ++obj_ptr );
-	--obj_ptr;
-	/* 从右到左遍历，进行匹配 */
-	for( ; obj_ptr >= wlist && sn_ptr >= selector->list; --obj_ptr ) {
-		w = *obj_ptr;
-		sn = *sn_ptr;
-		if( sn->id ) {
-			if( !w->id || strcmp( w->id, sn->id ) ) {
-				continue;
-			}
-		}
-		if( sn->type && strcmp("*", sn->type) ) {
-			if( !w->type || strcmp( w->type, sn->type ) ) {
-				continue;
-			}
-		}
-		if( sn->class_name ) {
-			n = ptrslen( w->classes );
-			for( i = 0; i < n; ++i ) {
-				if( strcmp( w->classes[i],
-					    sn->class_name ) == 0 ) {
-					break;
-				}
-			}
-			if( i >= n ) {
-				continue;
-			}
-		}
-		if( sn->pseudo_class_name ) {
-			n = ptrslen( w->status );
-			for( i = 0; i < n; ++i ) {
-				if( strcmp( w->status[i],
-					    sn->pseudo_class_name ) == 0 ) {
-					break;
-				}
-			}
-			if( i >= n ) {
-				continue;
-			}
-		}
-		--sn_ptr;
-	}
-	/* 匹配成功的标志是遍历完选择器列表 */
-	if( sn_ptr < selector->list ) {
-		return TRUE;
-	}
-	return FALSE;
-}
+	StyleNode snode, out_snode;
+	LinkedListNode *node, *out_node;
 
-static int InsertStyleSheet( LinkedList *list, LCUI_Selector s,
-			     LCUI_StyleSheet ss )
-{
-	int pos = -1, i = 0;
-	StyleListNode pack;
-	LinkedListNode *node;
-	LinkedList_ForEach( node, list ) {
-		pack = node->data;
-		if( s->rank > pack->selector->rank ) {
-			pos = i;
-			break;
-		} else if( s->rank == pack->selector->rank ) {
-			if( s->batch_num > pack->selector->batch_num ) {
+	if( !outlist ) {
+		return link->styles.length;
+	}
+	LinkedList_ForEach( node, &link->styles ) {
+		int pos = -1, i = 0;
+		snode = node->data;
+		LinkedList_ForEach( out_node, outlist ) {
+			out_snode = out_node->data;
+			if( snode->rank > out_snode->rank ) {
 				pos = i;
 				break;
 			}
+			if( snode->rank != out_snode->rank ) {
+				i += 1;
+				continue;
+			}
+			if( snode->batch_num > out_snode->batch_num ) {
+				pos = i;
+				break;
+			}
+			i += 1;
 		}
-		i += 1;
+		if( pos >= 0 ) {
+			LinkedList_Insert( outlist, pos, snode );
+		} else {
+			LinkedList_Append( outlist, snode );
+		}
 	}
-	pack = NEW( StyleListNodeRec, 1 );
-	pack->selector = s;
-	pack->style = ss;
-	if( pos >= 0 ) {
-		LinkedList_Insert( list, pos, pack );
-	} else {
-		LinkedList_Append( list, pack );
-	}
-	return pos;
+	return link->styles.length;
 }
 
-static int FindStyleNodeByName( const char *name, LCUI_Widget widget,
-				LinkedList *list )
+static int FindStyleSheetFromLink( StyleLink link, LCUI_Selector s,
+				   int i, LinkedList *list )
 {
-	int n, count = 0;
-	StyleListNode sln;
-	LinkedList *styles;
-	LCUI_RBTreeNode *tn;
+	int count = 0;
+	StyleLink parent;
+	LinkedList names;
 	LinkedListNode *node;
-	LCUI_Widget w, wlist[MAX_SELECTOR_DEPTH];
-	tn = RBTree_CustomSearch( &style_library.tree, (const void*)name );
-	if( !tn ) {
+	LCUI_SelectorNode sn;
+
+	LinkedList_Init( &names );
+	count += StyleLink_GetStyleSheets( link, list );
+	while( --i >= 0 ) {
+		sn = s->nodes[i];
+		SelectorNode_GetNames( sn, &names );
+		LinkedList_ForEach( node, &names ) {
+			parent = Dict_FetchValue( link->parents, node->data );
+			if( !parent ) {
+				continue;
+			}
+			count += FindStyleSheetFromLink( parent, s, i, list );
+		}
+		LinkedList_Clear( &names, free );
+	}
+	return count;
+}
+
+static int FindStyleSheetFromGroup( int group, LCUI_Selector s,
+				    LinkedList *list )
+{
+	int i, count;
+	Dict *groups;
+	StyleLinkGroup slg;
+	LinkedListNode *node;
+	LinkedList names;
+
+	groups = LinkedList_Get( &style_library.groups, group );
+	if( !groups ) {
 		return 0;
 	}
-	for( n = 0, w = widget; w; ++n, w = w->parent );
-	if( n >= MAX_SELECTOR_DEPTH ) {
-		return -1;
-	}
-	if( n == 0 ) {
-		wlist[0] = NULL;
-	} else {
-		w = widget;
-		wlist[n] = NULL;
-		while( --n >= 0 ) {
-			wlist[n] = w;
-			w = w->parent;
-		}
-	}
-	styles = &((StyleTreeNode)tn->data)->styles;
-	LinkedList_ForEach( node, styles ) {
-		sln = node->data;
-		/* 如果当前元素在该样式结点的作用范围内 */
-		if( !Selector_MatchPath( sln->selector, wlist ) ) {
+	count = 0;
+	i = s->length - 1;
+	LinkedList_Init( &names );
+	SelectorNode_GetNames( s->nodes[i], &names );
+	LinkedList_Append( &names, strdup( "*" ) );
+	LinkedList_ForEach( node, &names ) {
+		DictEntry *entry;
+		DictIterator *iter;
+		char *name = node->data;
+		slg = Dict_FetchValue( groups, name );
+		if( !slg ) {
 			continue;
 		}
-		InsertStyleSheet( list, sln->selector, sln->style );
-		++count;
-	}
-	return count;
-}
-
-/** 从小到大，排序名称列表 */
-static void SortNames( char **names, LinkedList *outnames )
-{
-	char *name;
-	int i, len;
-	LinkedListNode *node;
-	len = ptrslen( names );
-	while( --len >= 0 ) {
-		i = 0;
-		name = names[len];
-		LinkedList_ForEach( node, outnames ) {
-			if( strcmp(name, node->data) > 0 ) {
-				++i;
-				continue;
-			}
-			LinkedList_Insert( outnames, i, name );
-			break;
-		}
-		if( i >= outnames->length ) {
-			LinkedList_Append( outnames, name );
+		iter = Dict_GetIterator( slg->links );
+		while( entry = Dict_Next( iter ) ) {
+			StyleLink link = DictEntry_GetVal( entry );
+			count += FindStyleSheetFromLink( link, s, i, list );
 		}
 	}
-}
-
-/** 初始化样式表查找器 */
-static void StyleSheetFinder_Init( StyleSheetFinder sfinder, LCUI_Widget w )
-{
-	sfinder->level = 0;
-	sfinder->class_i = 0;
-	sfinder->name_i = 0;
-	sfinder->status_i = 0;
-	sfinder->name[0] = 0;
-	sfinder->widget = w;
-	LinkedList_Init( &sfinder->classes );
-	LinkedList_Init( &sfinder->status );
-	SortNames( w->classes, &sfinder->classes );
-	SortNames( w->status, &sfinder->status );
-}
-
-/** 销毁样式表查找器 */
-static void StyleSheetFinder_Destroy( StyleSheetFinder sfinder )
-{
-	sfinder->name_i = 0;
-	sfinder->name[0] = 0;
-	sfinder->class_i = 0;
-	sfinder->status_i = 0;
-	sfinder->widget = NULL;
-	sfinder->level = LEVEL_NONE;
-	LinkedList_Clear( &sfinder->classes, NULL );
-	LinkedList_Clear( &sfinder->status, NULL );
-}
-
-/* 查找匹配的样式表 */
-int StyleSheetFinder_Find( StyleSheetFinder sfinder, LinkedList *list )
-{
-	LinkedListNode *node;
-	int i, len, old_len, old_level, count = 0;
-	char *fullname = sfinder->name + sfinder->name_i;
-	old_len = len = strlen( fullname );
-	old_level = sfinder->level;
-	switch( sfinder->level ) {
-	case LEVEL_TYPE: 
-		/* 按类型选择器搜索样式表 */
-		if( !sfinder->widget->type ) {
-			return 0;
-		}
-		strcpy( fullname, sfinder->widget->type );
-		count = FindStyleNodeByName( fullname, sfinder->widget, list );
-		break;
-	case LEVEL_ID: 
-		/* 按ID选择器搜索样式表 */
-		if( !sfinder->widget->id ) {
-			return 0;
-		}
-		fullname[len++] = '#';
-		strcpy( fullname + len, sfinder->widget->id );
-		count = FindStyleNodeByName( fullname, sfinder->widget, list );
-		fullname[old_len] = 0;
-		break;
-	case LEVEL_CLASS:
-		/* 按类选择器搜索样式表
-		 * 假设当前选择器全名为：textview#main-btn-text，且有 .a .b .c 
-		 * 这三个类，那么下面的处理将会拆分成以下三个选择器来匹配样式表：
-		 * textview#test-text.a
-		 * textview#test-text.b
-		 * textview#test-text.a
-		 */
-		fullname[len++] = '.';
-		LinkedList_ForEach( node, &sfinder->classes ) {
-			strcpy( fullname + len, node->data );
-			count += FindStyleNodeByName( fullname, 
-						      sfinder->widget, list );
-			/* 将当前选择器名与其它层级的选择器名组合 */
-			for( i = sfinder->level + 1; i < LEVEL_TOTAL_NUM; ++i ) {
-				sfinder->level = i;
-				count += StyleSheetFinder_Find( sfinder, list );
-			}
-			sfinder->level = LEVEL_CLASS;
-			sfinder->class_i += 1;
-		}
-		sfinder->level = LEVEL_CLASS;
-		fullname[old_len] = 0;
-		sfinder->class_i = 0;
-		return count;
-	case LEVEL_CLASS_2:
-		/* 按类选择器搜索交集样式表，结果类似于这样： 
-		 * textview#test-text.a.b
-		 * textview#test-text.a.c
-		 * textview#test-text.b.c
-		 * textview#test-text.a.b.c
-		 */
-		i = 0;
-		fullname[len++] = '.';
-		LinkedList_ForEach( node, &sfinder->classes ) {
-			if( i <= sfinder->class_i ) {
-				i += 1;
-				continue;
-			}
-			strcpy( fullname + len, node->data );
-			count += FindStyleNodeByName( fullname, 
-						      sfinder->widget, list );
-			sfinder->class_i += 1;
-			count += StyleSheetFinder_Find( sfinder, list );
-			sfinder->class_i -= 1;
-			sfinder->level = LEVEL_STATUS;
-			/** 
-			 * 递归拼接伪类名，例如： 
-			 * textview#main-btn-text:active
-			 */
-			count += StyleSheetFinder_Find( sfinder, list );
-			sfinder->level = LEVEL_CLASS_2;
-			i += 1;
-		}
-		fullname[old_len] = 0;
-		sfinder->level = LEVEL_CLASS_2;
-		return count;
-	case LEVEL_STATUS:
-		fullname[len++] = ':';
-		sfinder->level = LEVEL_STATUS_2;
-		/**
-		 * 按伪类选择器搜索样式表
-		 * 假设当前选择器全名为：textview#main-btn-text:hover:focus:active
-		 * 那么下面的循环会将它拆分为以下几个选择器来匹配样式：
-		 * textview#main-btn-text:active
-		 * textview#main-btn-text:active:focus
-		 * textview#main-btn-text:active:focus:hover
-		 * textview#main-btn-text:active:hover
-		 * textview#main-btn-text:focus
-		 * textview#main-btn-text:focus:hover
-		 * textview#main-btn-text:hover
-		 */
-		LinkedList_ForEach( node, &sfinder->status ) {
-			strcpy( fullname + len, node->data );
-			count += FindStyleNodeByName( fullname, 
-						      sfinder->widget, list );
-			/**
-			 * 递归调用，以一层层拼接出像下面这样的选择器：
-			 * textview#main-btn-text:active:focus:hover
-			 */
-			count += StyleSheetFinder_Find( sfinder, list );
-			sfinder->status_i += 1;
-		}
-		sfinder->level = LEVEL_STATUS;
-		fullname[old_len] = 0;
-		sfinder->status_i = 0;
-		return count;
-	case LEVEL_STATUS_2:
-		/** 按伪类选择器搜索交集样式表 */
-		i = 0;
-		LinkedList_ForEach( node, &sfinder->status ) {
-			if( i <= sfinder->status_i ) {
-				i += 1;
-				continue;
-			}
-			fullname[len] = ':';
-			strcpy( fullname + len + 1, node->data );
-			count += FindStyleNodeByName( fullname, 
-						      sfinder->widget, list );
-			sfinder->status_i += 1;
-			count += StyleSheetFinder_Find( sfinder, list );
-			sfinder->status_i -= 1;
-			i += 1;
-		}
-		fullname[old_len] = 0;
-		return count;
-	default:break;
-	}
-	for( i = sfinder->level + 1; i < LEVEL_TOTAL_NUM; ++i ) {
-		if( i == LEVEL_STATUS_2 || i == LEVEL_CLASS_2 ) {
-			continue;
-		}
-		sfinder->level = i;
-		count += StyleSheetFinder_Find( sfinder, list );
-	}
-	fullname[old_len] = 0;
-	sfinder->level = old_level;
-	return count;
-}
-
-/** 查找样式数据节点 */
-static int FindStyleNode( LCUI_Widget w, LinkedList *list )
-{
-	int count;
-	StyleSheetFinderRec sfinder;
-	StyleSheetFinder_Init( &sfinder, w );
-	count = StyleSheetFinder_Find( &sfinder, list );
-	StyleSheetFinder_Destroy( &sfinder );
-	/* 记录作用于全局元素的样式表 */
-	count += FindStyleNodeByName( "*", w, list );
+	LinkedList_Clear( &names, free );
 	return count;
 }
 
@@ -961,46 +1089,47 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 		}
 		name = GetStyleName(key);
 		if( name ) {
-			printf( "\t\t%s", name );
+			printf( "\t%s", name );
 		} else {
-			printf( "\t\t<unknown style %d>", key);
+			printf( "\t<unknown style %d>", key);
 		}
 		printf( "%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "" );
 		switch( s->type ) {
 		case SVT_AUTO:
-			printf( "auto\n");
+			printf( "auto");
 			break;
 		case SVT_BOOL: {
-			printf( "%s\n", s->val_bool ? "true" : "false" );
+			printf( "%s", s->val_bool ? "true" : "false" );
 			break;
 		}
 		case SVT_COLOR: {
 			LCUI_Color *clr = &s->val_color;
 			if( clr->alpha < 255 ) {
-				printf("rgba(%d,%d,%d,%0.2f)\n", clr->r,
+				printf("rgba(%d,%d,%d,%0.2f)", clr->r,
 					clr->g, clr->b, clr->a / 255.0);
 			} else {
-				printf("#%02x%02x%02x\n", clr->r, clr->g, clr->b);
+				printf("#%02x%02x%02x", clr->r, clr->g, clr->b);
 			}
 			break;
 		}
 		case SVT_PX:
-			printf("%dpx\n", s->val_px);
+			printf("%dpx", s->val_px);
 			break;
 		case SVT_STRING:
-			printf("%s\n", s->val_string);
+			printf("%s", s->val_string);
 			break;
 		case SVT_SCALE:
-			printf("%.2lf%%\n", s->val_scale*100);
+			printf("%.2lf%%", s->val_scale*100);
 			break;
 		case SVT_STYLE:{
-			printf("%s\n", GetStyleOptionName( s->val_style ));
+			printf("%s", GetStyleOptionName( s->val_style ));
 			break;
 		}
 		default:
-			printf("%d\n", s->value);
+			printf("%d", s->value);
 			break;
 		}
+		printf( ";\n");
 	}
 }
 
@@ -1010,63 +1139,135 @@ void LCUI_PrintSelector( LCUI_Selector selector )
 	LCUI_SelectorNode *sn;
 
 	path[0] = 0;
-	for( sn = selector->list; *sn; ++sn ) {
-		if( (*sn)->id ) {
-			strcat( path, "#" );
-			strcat( path, (*sn)->id );
-		}
-		if( (*sn)->type ) {
-			strcat( path, (*sn)->type );
-		}
-		if( (*sn)->class_name ) {
-			strcat( path, "." );
-			strcat( path, (*sn)->class_name );
-		}
-		if( (*sn)->pseudo_class_name ) {
-			strcat( path, ":" );
-			strcat( path, (*sn)->pseudo_class_name );
-		}
+	for( sn = selector->nodes; *sn; ++sn ) {
+		strcat( path, (*sn)->fullname );
 		strcat( path, " " );
 	}
 	printf("\tpath: %s (rank = %d, batch_num = %d)\n", path,
 		selector->rank, selector->batch_num);
 }
 
-void LCUI_PrintStyleLibrary(void)
+static void LCUI_PrintStyleLink( StyleLink link, const char *selector )
 {
-	LCUI_RBTreeNode *tn;
+	DictEntry *entry;
+	DictIterator *iter;
 	LinkedListNode *node;
-	StyleTreeNode stn;
-	StyleListNode sln;
-
-	printf("style library begin\n");
-	tn = RBTree_First( &style_library.tree );
-	while( tn ) {
-		stn = tn->data;
-		printf("target: %s\n", stn->name);
-		LinkedList_ForEach( node, &stn->styles ) {
-			sln = node->data;
-			LCUI_PrintSelector( sln->selector );
-			LCUI_PrintStyleSheet( sln->style );
-		}
-		tn = RBTree_Next( tn );
+	char fullname[MAX_SELECTOR_LEN];
+	if( selector ) {
+		sprintf( fullname, "%s %s", link->group->name, selector );
+	} else {
+		strcpy( fullname, link->group->name );
 	}
-	printf("style library end\n");
+	LinkedList_ForEach( node, &link->styles ) {
+		StyleNode snode = node->data;
+		printf("\n[%s]\n", snode->space ? snode->space:"<none>");
+		printf("%s {\n", fullname);
+		LCUI_PrintStyleSheet( snode->sheet );
+		printf("}\n");
+	}
+	iter = Dict_GetIterator( link->parents );
+	while( entry = Dict_Next( iter ) ) {
+		StyleLink parent = DictEntry_GetVal( entry );
+		LCUI_PrintStyleLink( parent, fullname );
+	}
+	Dict_ReleaseIterator( iter );
+}
+
+void LCUI_PrintStyleLibrary( void )
+{
+	Dict *group;
+	StyleLink link;
+	StyleLinkGroup slg;
+	DictIterator *iter;
+	DictEntry *entry;
+
+	link = NULL;
+	printf( "style library begin\n" );
+	group = LinkedList_Get( &style_library.groups, 0 );
+	iter = Dict_GetIterator( group );
+	while( entry = Dict_Next(iter) ) {
+		DictEntry *entry_slg;
+		DictIterator *iter_slg;
+		slg = DictEntry_GetVal( entry );
+		iter_slg = Dict_GetIterator( slg->links );
+		while( entry_slg = Dict_Next(iter_slg) ) {
+			link = DictEntry_GetVal( entry_slg );
+			LCUI_PrintStyleLink( link, NULL );
+		}
+		Dict_ReleaseIterator( iter_slg );
+	}
+	Dict_ReleaseIterator( iter );
+	printf( "style library end\n" );
+}
+
+LCUI_Selector Widget_GetSelector( LCUI_Widget w )
+{
+	int ni = 0;
+	LinkedList list;
+	LCUI_Selector s;
+	LCUI_Widget parent;
+	LinkedListNode *node;
+	s = Selector( NULL );
+	LinkedList_Init( &list );
+	for( parent = w; parent; parent = parent->parent ) {
+		if( parent->id || parent->type || 
+		    parent->classes || parent->status ) {
+			LinkedList_Append( &list, parent );
+		}
+	}
+	if( list.length >= MAX_SELECTOR_DEPTH ) {
+		LinkedList_Clear( &list, NULL );
+		Selector_Delete( s );
+		return NULL;
+	}
+	LinkedList_ForEachReverse( node, &list ) {
+		int i;
+		LCUI_SelectorNode sn;
+		parent = node->data;
+		sn = NEW( LCUI_SelectorNodeRec, 1 );
+		if( parent->id ) {
+			sn->id = strdup( parent->id );
+		}
+		if( parent->type ) {
+			sn->type = strdup( parent->type );
+		}
+		if( parent->classes ) {
+			for( i = 0; parent->classes[i]; ++i ) {
+				SortedStrList_Add( &sn->classes, 
+						   parent->classes[i] );
+			}
+		}
+		if( parent->status ) {
+			for( i = 0; parent->status[i]; ++i ) {
+				SortedStrList_Add( &sn->status, 
+						   parent->status[i] );
+			}
+		}
+		SelectorNode_Update( sn );
+		s->nodes[ni] = sn;
+		s->rank += sn->rank;
+		ni += 1;
+	}
+	LinkedList_Clear( &list, NULL );
+	s->nodes[ni] = NULL;
+	s->length = ni;
+	return s;
 }
 
 int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 {
+	LCUI_Selector s;
 	LinkedList list;
-	StyleListNode sln;
 	LinkedListNode *node;
 	LinkedList_Init( &list );
-	FindStyleNode( w, &list );
 	StyleSheet_Clear( out_ss );
+	s = Widget_GetSelector( w );
+	FindStyleSheet( s, &list );
 	LinkedList_ForEach( node, &list ) {
-		sln = node->data;
-		StyleSheet_Merge( out_ss, sln->style );
+		StyleNode sn = node->data;
+		StyleSheet_Merge( out_ss, sn->sheet );
 	}
-	LinkedList_Clear( &list, free );
+	LinkedList_Clear( &list, NULL );
 	return 0;
 }
 
@@ -1092,6 +1293,7 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 	TaskMap task_map[] = {
 		{ key_display_start, key_display_end, WTT_VISIBLE, TRUE },
 		{ key_opacity, key_opacity, WTT_OPACITY, TRUE },
+		{ key_z_index, key_z_index, WTT_ZINDEX, TRUE },
 		{ key_width, key_height, WTT_RESIZE, TRUE },
 		{ key_padding_top, key_padding_left, WTT_RESIZE, TRUE },
 		{ key_position_start, key_position_end, WTT_POSITION, TRUE },
@@ -1134,4 +1336,19 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 		wc = LCUIWidget_GetClass( w->type );
 		wc && wc->methods.update ? wc->methods.update( w ) : 0;
 	}
+}
+
+void LCUIWidget_ExitStyle( void )
+{
+	LinkedList_Clear( &style_library.groups, (FuncPtr)DeleteStyleGroup );
+	style_library.is_inited = FALSE;
+	LCUICSS_Destroy();
+}
+
+void LCUIWidget_InitStyle( void )
+{
+	LinkedList_Init( &style_library.groups );
+	LCUICSS_Init();
+	LCUICSS_LoadString( global_css, NULL );
+	style_library.is_inited = TRUE;
 }

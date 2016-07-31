@@ -204,7 +204,6 @@ static void TextCaret_OnInit( LCUI_Widget widget )
 	caret->blink_time = 500;
 	caret->timer_id = LCUITimer_Set( caret->blink_time, 
 					 TextCaret_OnBlink, widget, TRUE );
-	LCUICSS_LoadString( textcaret_css );
 }
 
 /** 设置闪烁的时间间隔 */
@@ -228,7 +227,7 @@ static void LCUIWidget_AddTextCaret( void )
 	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "textcaret" );
 	wc->methods.init = TextCaret_OnInit;
 	wc->methods.destroy = TextCaret_OnDestroy;
-	LCUICSS_LoadString( textcaret_css );
+	LCUICSS_LoadString( textcaret_css, NULL );
 }
 
 /*-------------------------------- End Caret --------------------------------*/
@@ -923,7 +922,7 @@ void LCUIWidget_AddTextEdit( void )
 	wc->methods.set_attr = TextEdit_SetAttr;
 	wc->methods.autosize = TextEdit_AutoSize;
 	wc->task_handler = TextEdit_OnTask;
-	LCUICSS_LoadString( textedit_css );
+	LCUICSS_LoadString( textedit_css, NULL );
 	LCUIWidget_AddTextCaret();
 	textedit_event_id = LCUIWidget_AllocEventId();
 	LCUIWidget_SetEventName( textedit_event_id, "change" );

@@ -1369,7 +1369,7 @@ int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 		return 0;
 	}
 	Widget_UpdateStyle( w, TRUE );
-	Widget_AddTaskForChildren( w,  WTT_REFRESH_STYLE );
+	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
 	return 1;
 }
 
@@ -1386,7 +1386,7 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 		return 0;
 	}
 	Widget_UpdateStyle( w, TRUE );
-	Widget_AddTaskForChildren( w,  WTT_REFRESH_STYLE );
+	Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
 	return 1;
 }
 
