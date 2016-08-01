@@ -50,7 +50,7 @@
 #define MAX_NODE_DEPTH		32
 #define MAX_SELECTOR_DEPTH	32
 
-#define FindStyleSheet(S, L) FindStyleSheetFromGroup(0, S, L)
+#define FindStyleSheet(S, L) FindStyleSheetFromGroup(0, NULL, S, L)
 
 enum SelectorRank {
 	GENERAL_RANK = 0,
@@ -466,9 +466,9 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 			return 0;
 		}
 		fullname[len++] = '#';
+		fullname[len] = 0;
 		strcpy( fullname + len, sfinder->node->id );
 		LinkedList_Append( list, strdup( fullname ) );
-		fullname[old_len] = 0;
 		break;
 	case LEVEL_CLASS:
 		if( !sfinder->node->classes ) {
@@ -947,12 +947,14 @@ static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector,
 	}
 	LinkedList_ForEach( node, &link->styles ) {
 		snode = node->data;
-		if( !space ) {
-			if( !snode->space ) {
+		if( snode->space && space ) {
+			if( strcmp( snode->space, space ) == 0 ) {
 				return snode->sheet;
 			}
-		} else if( strcmp(snode->space, space) == 0 ) {
-			return snode->sheet;
+		} else {
+			if( snode->space == space ) {
+				return snode->sheet;
+			}
 		}
 	}
 	snode = NEW( StyleNodeRec, 1 );
@@ -1042,8 +1044,15 @@ static int FindStyleSheetFromLink( StyleLink link, LCUI_Selector s,
 	return count;
 }
 
-static int FindStyleSheetFromGroup( int group, LCUI_Selector s,
-				    LinkedList *list )
+/**
+ * 从指定组中查找样式表
+ * @param[in] group 组号
+ * @param[in] name 选择器结点名称，若为 NULL，则根据选择器结点生成名称
+ * @param[in] s 选择器
+ * @param[out] list 找到的样式表列表
+ */
+static int FindStyleSheetFromGroup( int group, const char *name, 
+				    LCUI_Selector s, LinkedList *list )
 {
 	int i, count;
 	Dict *groups;
@@ -1058,8 +1067,12 @@ static int FindStyleSheetFromGroup( int group, LCUI_Selector s,
 	count = 0;
 	i = s->length - 1;
 	LinkedList_Init( &names );
-	SelectorNode_GetNames( s->nodes[i], &names );
-	LinkedList_Append( &names, strdup( "*" ) );
+	if( name ) {
+		LinkedList_Append( &names, strdup( name ) );
+	} else {
+		SelectorNode_GetNames( s->nodes[i], &names );
+		LinkedList_Append( &names, strdup( "*" ) );
+	}
 	LinkedList_ForEach( node, &names ) {
 		DictEntry *entry;
 		DictIterator *iter;
@@ -1252,6 +1265,62 @@ LCUI_Selector Widget_GetSelector( LCUI_Widget w )
 	s->nodes[ni] = NULL;
 	s->length = ni;
 	return s;
+}
+
+int Widget_HandleChildrenStyleChange( LCUI_Widget w, int type, char *name )
+{
+	LCUI_Selector s;
+	LinkedList snames;
+	LinkedListNode *node;
+	int i, n, count = 0;
+	char ch, **names = NULL;
+
+	/* 选择相应的前缀 */
+	switch( type ) {
+	case 0: ch = '.';
+	case 1: ch = ':'; break;
+	default: return 0;
+	}
+	LinkedList_Init( &snames );
+	s = Widget_GetSelector( w );
+	n = strsplit( name, " ", &names );
+	/* 为分割出来的字符串加上前缀 */
+	for( i = 0; i < n; ++i ) {
+		int len = strlen( names[i] ) + 2;
+		char *str = malloc( len * sizeof( char ) );
+		strncpy( str + 1, names[i], len - 1 );
+		str[0] = ch;
+		free( names[i] );
+		names[i] = str;
+	}
+	SelectorNode_GetNames( s->nodes[s->length - 1], &snames );
+	LinkedList_ForEach( node, &snames ) {
+		char *sname = node->data;
+		/* 过滤掉不包含 name 中存在的名称 */
+		for( i = 0; i < n; ++i ) {
+			char *p = strstr( sname, names[i] );
+			if( p ) {
+				p += strlen( names[i] );
+				switch( *p ) {
+				case 0:
+				case ':':
+				case '.': break;
+				default: continue;
+				}
+				break;
+			}
+		}
+		if( i < n ) {
+			count += FindStyleSheetFromGroup( 1, sname, s, NULL );
+		}
+	}
+	Selector_Delete( s );
+	/* 若子部件的样式受到了影响，则标记子部件需要刷新 */
+	if( count > 0 ) {
+		Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
+	}
+	freestrs( names );
+	return count;
 }
 
 int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
