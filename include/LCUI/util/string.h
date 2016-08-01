@@ -71,6 +71,17 @@ LCUI_BEGIN_HEADER
  */
 LCUI_API int strtrim( char *outstr, const char *instr, const char *charlist );
 
+/**
+ * 分割字符串
+ * @param[in] instr 需分割的字符串
+ * @param[in] sep 分割标记字符串
+ * @param[out] outstrs 分割后的字符串列表
+ */
+LCUI_API int strsplit( const char *instr, const char *sep, char ***outstrs );
+
+/** 释放字符串组 */
+void freestrs( char **strs );
+
 LCUI_END_HEADER
 
 #endif

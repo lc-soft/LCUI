@@ -79,3 +79,51 @@ int strtrim( char *outstr, const char *instr, const char *charlist )
 	*op = 0;
 	return op - outstr;
 }
+
+void freestrs( char **strs )
+{
+	int i = 0;
+	while( strs[i] ) {
+		free( strs[i] );
+		++i;
+	}
+	free( strs );
+}
+
+int strsplit( const char *instr, const char *sep, char ***outstrs )
+{
+	int len, i = 0;
+	const char *prev = instr;
+	int sep_len = strlen( sep );
+	char *next = strstr( prev, sep );
+	char **newstrs = NULL;
+
+	while( 1 ) {
+		char **tmp, *str;
+		if( next ) {
+			len = next - prev + 1;
+		} else {
+			len = strlen( prev ) + 1;
+		}
+		str = malloc( sizeof( char ) * len );
+		tmp = realloc( newstrs, sizeof( char* ) * (i + 2) );
+		if( !tmp ) {
+			freestrs( newstrs );
+			return 0;
+		}
+		newstrs = tmp;
+		strncpy( str, prev, len - 1 );
+		str[len - 1] = 0;
+		newstrs[i] = str;
+		newstrs[i + 1] = NULL;
+		if( next ) {
+			prev = next + sep_len;
+		} else {
+			break;
+		}
+		next = strstr( prev, sep );
+		i += 1;
+	}
+	*outstrs = newstrs;
+	return i + 1;
+}
