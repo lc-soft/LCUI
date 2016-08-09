@@ -93,11 +93,13 @@ typedef struct StyleNodeRec_ {
 	int rank;		/**< 权值，决定优先级 */
 	int batch_num;		/**< 批次号 */
 	char *space;		/**< 所属的空间 */
+	char *selector;		/**< 选择器 */
 	LCUI_StyleSheet sheet;	/**< 样式表 */
 } StyleNodeRec, *StyleNode;
 
 /** 样式链接记录 */
 typedef struct StyleLinkRec_ {
+	char *selector;		/**< 选择器 */
 	StyleLinkGroup group;	/**< 所属组 */
 	LinkedList styles;	/**< 作用于当前选择器的样式 */
 	Dict *parents;		/**< 父级节点 */
@@ -822,6 +824,10 @@ static void DeleteStyleNode( StyleNode node )
 		free( node->space );
 		node->space = NULL;
 	}
+	if( node->selector ) {
+		free( node->selector );
+		node->selector = NULL;
+	}
 	StyleSheet_Delete( node->sheet );
 	node->sheet = NULL;
 }
@@ -902,11 +908,12 @@ static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector,
 	LinkedListNode *node;
 	LCUI_SelectorNode sn;
 	Dict *group, *parents;
+	char buf[MAX_SELECTOR_LEN];
+	char fullname[MAX_SELECTOR_LEN];
 
-	parents = NULL;
 	link = NULL;
+	parents = NULL;
 	for( i = 0, right = selector->length - 1; right >= 0; --right, ++i ) {
-		char fullname[MAX_SELECTOR_LEN], buf[MAX_SELECTOR_LEN];
 		group = LinkedList_Get( &style_library.groups, i );
 		if( !group ) {
 			group = CreateStyleGroup();
@@ -921,18 +928,20 @@ static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector,
 		if( i == 0 ) {
 			strcpy( fullname, "*" );
 		} else {
-			if( i == 1 ) {
-				strcpy( fullname, sn->fullname );
-			} else {
-				strcpy( buf, fullname );
-				sprintf( fullname, "%s %s", sn->fullname, buf );
-			}
+			strcpy( fullname, buf );
 		}
 		link = Dict_FetchValue( slg->links, fullname );
 		if( !link ) {
 			link = CreateStyleLink();
 			link->group = slg;
+			link->selector = strdup( fullname );
 			Dict_Add( slg->links, fullname, link );
+		}
+		if( i == 0 ) {
+			strcpy( buf, sn->fullname );
+		} else {
+			strcpy( fullname, buf );
+			sprintf( buf, "%s %s", sn->fullname, fullname );
 		}
 		/* 如果有上一级的父链接记录，则将当前链接添加进去 */
 		if( parents ) {
@@ -966,6 +975,7 @@ static LCUI_StyleSheet SelectStyleSheet( LCUI_Selector selector,
 	}
 	snode->sheet = StyleSheet();
 	snode->rank = selector->rank;
+	snode->selector = strdup( fullname );
 	snode->batch_num = selector->batch_num;
 	LinkedList_Append( &link->styles, snode );
 	return snode->sheet;
@@ -1148,7 +1158,7 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 
 void LCUI_PrintSelector( LCUI_Selector selector )
 {
-	char path[256];
+	char path[MAX_SELECTOR_LEN];
 	LCUI_SelectorNode *sn;
 
 	path[0] = 0;
@@ -1156,7 +1166,7 @@ void LCUI_PrintSelector( LCUI_Selector selector )
 		strcat( path, (*sn)->fullname );
 		strcat( path, " " );
 	}
-	printf("\tpath: %s (rank = %d, batch_num = %d)\n", path,
+	printf("path: %s (rank = %d, batch_num = %d)\n", path,
 		selector->rank, selector->batch_num);
 }
 
@@ -1267,7 +1277,7 @@ LCUI_Selector Widget_GetSelector( LCUI_Widget w )
 	return s;
 }
 
-int Widget_HandleChildrenStyleChange( LCUI_Widget w, int type, char *name )
+int Widget_HandleChildrenStyleChange( LCUI_Widget w, int type, const char *name )
 {
 	LCUI_Selector s;
 	LinkedList snames;
@@ -1277,7 +1287,7 @@ int Widget_HandleChildrenStyleChange( LCUI_Widget w, int type, char *name )
 
 	/* 选择相应的前缀 */
 	switch( type ) {
-	case 0: ch = '.';
+	case 0: ch = '.'; break;
 	case 1: ch = ':'; break;
 	default: return 0;
 	}
