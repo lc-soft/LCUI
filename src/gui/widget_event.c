@@ -696,8 +696,10 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		ev.button.button = sys_ev->button.button;
 		Widget_PostEvent( target, &ev, NULL, NULL );
 		if( self.targets[WST_ACTIVE] == target ) {
-			ev.type = WET_CLICK;
-			Widget_PostEvent( target, &ev, NULL, NULL );
+			if( ev.button.button == 1 ) {
+				ev.type = WET_CLICK;
+				Widget_PostEvent( target, &ev, NULL, NULL );
+			}
 		}
 		Widget_UpdateStatus( NULL, WST_ACTIVE );
 		break;

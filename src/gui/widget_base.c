@@ -1352,10 +1352,11 @@ int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 {
 	if( StrList_Has( w->classes, class_name ) ) {
 		Widget_HandleChildrenStyleChange( w, 0, class_name );
+		StrList_Remove( &w->classes, class_name );
+		Widget_UpdateStyle( w, TRUE );
+		return 1;
 	}
-	StrList_Remove( &w->classes, class_name );
-	Widget_UpdateStyle( w, TRUE );
-	return 1;
+	return 0;
 }
 
 /** 为部件添加一个状态 */
@@ -1383,10 +1384,11 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 {
 	if( StrList_Has( w->status, status_name ) ) {
 		Widget_HandleChildrenStyleChange( w, 1, status_name );
+		StrList_Remove( &w->status, status_name );
+		Widget_UpdateStyle( w, TRUE );
+		return 1;
 	}
-	StrList_Remove( &w->status, status_name );
-	Widget_UpdateStyle( w, TRUE );
-	return 1;
+	return 0;
 }
 
 int Widget_ComputeMaxWidth( LCUI_Widget w )

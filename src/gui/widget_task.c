@@ -85,7 +85,7 @@ static void HandleRefresh( LCUI_Widget w )
 void Widget_UpdateTaskStatus( LCUI_Widget widget )
 {
 	int i;
-	for( i=0; i<WTT_TOTAL_NUM; ++i ) {
+	for( i = 0; i < WTT_TOTAL_NUM; ++i ) {
 		if( widget->task.buffer[i] ) {
 			widget->task.for_self = TRUE;
 		}
@@ -168,6 +168,7 @@ int Widget_Update( LCUI_Widget w )
 	LCUI_BOOL *buffer;
 	LCUI_Widget child;
 	LinkedListNode *node, *next;
+
 	/* 如果该部件有任务需要处理 */
 	if( w->task.for_self ) {
 		ret = LCUIMutex_TryLock( &w->mutex );
