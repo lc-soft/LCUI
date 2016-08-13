@@ -65,6 +65,9 @@ LCUI_API void StyleSheet_Delete( LCUI_StyleSheet ss );
 /** 根据字符串内容生成相应的选择器 */
 LCUI_API LCUI_Selector Selector( const char *selector );
 
+/** 更新选择器内的数据 */
+LCUI_API void Selector_Update( LCUI_Selector s );
+
 /** 删除选择器 */
 LCUI_API void Selector_Delete( LCUI_Selector s );
 
@@ -88,7 +91,7 @@ LCUI_API void LCUI_PrintSelector( LCUI_Selector selector );
 LCUI_API void LCUI_PrintStyleLibrary(void);
 
 /** 计算部件继承得到的样式表 */
-LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
+LCUI_API void Widget_GetInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 
 /** 更新当前部件的样式 */
 LCUI_API void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
