@@ -843,7 +843,7 @@ proc_comment:
 put_css:
 		DEBUG_MSG("put css\n");
 		/* 将记录的样式表添加至匹配到的选择器中 */
-		LinkedList_ForEach( node, &ctx->selectors ) {
+		for( LinkedList_Each( node, &ctx->selectors ) ) {
 			LCUI_PutStyle( node->data, ctx->css, ctx->space );
 		}
 		LinkedList_Clear( &ctx->selectors, (FuncPtr)Selector_Delete );

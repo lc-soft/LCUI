@@ -68,7 +68,7 @@ static struct LCUIIMEModule {
 static LCUI_IME LCUIIME_Find( int ime_id )
 {
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &self.list ) {
+	for( LinkedList_Each( node, &self.list ) ) {
 		LCUI_IME ime = node->data;
 		if( ime->id == ime_id ) {
 			return ime;
@@ -81,7 +81,7 @@ static LCUI_IME LCUIIME_Find( int ime_id )
 static LCUI_IME LCUIIME_FindByName( const char *name )
 {
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &self.list ){
+	for( LinkedList_Each( node, &self.list ) ) {
 		LCUI_IME ime = node->data;
 		if( strcmp( ime->name, name ) == 0 ) {
 			return ime;

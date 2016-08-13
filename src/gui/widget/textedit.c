@@ -408,7 +408,7 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
 	LinkedList_Init( &rects );
 	edit = widget->private_data;
 	TextLayer_Update( edit->layer, &rects );
-	LinkedList_ForEach( node, &rects ) {
+	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( widget, node->data, SV_CONTENT_BOX );
 	}
 	LinkedList_Clear( &rects, free );
@@ -431,7 +431,7 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 		LCUIMutex_Lock( &edit->mutex );
 		LinkedList_Concat( &blocks, &edit->text_blocks );
 		LCUIMutex_Unlock( &edit->mutex );
-		LinkedList_ForEach( node, &blocks ) {
+		for( LinkedList_Each( node, &blocks ) ) {
 			TextEdit_ProcTextBlock( widget, node->data );
 		}
 		LinkedList_Clear( &blocks, TextBlock_OnDestroy );
@@ -798,7 +798,7 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	TextLayer_SetMaxSize( edit->layer_source, max_width, max_height );
 	TextLayer_SetMaxSize( edit->layer_placeholder, max_width, max_height );
 	TextLayer_Update( edit->layer, &rects );
-	LinkedList_ForEach( node, &rects ) {
+	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
 	LinkedList_Clear( &rects, free );

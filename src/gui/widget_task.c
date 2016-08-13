@@ -102,7 +102,7 @@ void Widget_AddTaskForChildren( LCUI_Widget widget, int task )
 	LCUI_Widget child;
 	LinkedListNode *node;
 	widget->task.for_children = TRUE;
-	LinkedList_ForEach( node, &widget->children ) {
+	for( LinkedList_Each( node, &widget->children ) ) {
 		child = node->data;
 		Widget_AddTask( child, task );
 		Widget_AddTaskForChildren( child, task );

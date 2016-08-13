@@ -328,7 +328,7 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	TextLayer_SetMaxSize( txt->layer, max_width, max_height );
 	TextLayer_SetFixedSize( txt->layer, width, height );
 	TextLayer_Update( txt->layer, &rects );
-	LinkedList_ForEach( node, &rects ) {
+	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
 	LinkedList_Clear( &rects, free );
@@ -405,7 +405,7 @@ static void TextView_OnTask( LCUI_Widget w )
 	txt = w->private_data;
 	LinkedList_Init( &rects );
 	TextLayer_Update( txt->layer, &rects );
-	LinkedList_ForEach( node, &rects ) {
+	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
 	LinkedList_Clear( &rects, free );

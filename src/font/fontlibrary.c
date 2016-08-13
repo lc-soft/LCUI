@@ -170,7 +170,7 @@ int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 		RBTree_CustomInsert( &fontlib.family_tree,
 				     font->family_name, fn );
 	}
-	LinkedList_ForEach( node, &fn->styles ) {
+	for( LinkedList_Each( node, &fn->styles ) ) {
 		f = (LCUI_Font*)node->data;
 		if( strcmp( f->style_name, font->style_name ) == 0 ) {
 			return -3;
@@ -236,7 +236,7 @@ int LCUIFont_GetId( const char *family_name, const char *style_name )
 	if( !fnode ) {
 		return -2;
 	}
-	LinkedList_ForEach( node, &fnode->styles ) {
+	for( LinkedList_Each( node, &fnode->styles ) ) {
 		font = (LCUI_Font*)node->data;
 		if( style_name ) {
 			if( strcasecmp( font->style_name, style_name ) ) {

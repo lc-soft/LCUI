@@ -97,7 +97,7 @@ static struct WIN_Display {
 static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 {
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &win.surfaces ) {
+	for( LinkedList_Each( node, &win.surfaces ) ) {
 		if( ((LCUI_Surface)node->data)->hwnd == hwnd ) {
 			return node->data;
 		}
@@ -126,7 +126,7 @@ static void WinSurface_Destroy( LCUI_Surface surface )
 static void WinSurface_ExecDelete( LCUI_Surface surface )
 {
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &win.surfaces ) {
+	for( LinkedList_Each( node, &win.surfaces ) ) {
 		if( node->data == surface ) {
 			WinSurface_Destroy( node->data );
 			LinkedList_DeleteNode( &win.surfaces, node );

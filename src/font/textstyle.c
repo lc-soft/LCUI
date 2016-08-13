@@ -232,7 +232,7 @@ static void StyleTags_Delete( LinkedList *tags, int id )
 	if( tags->length <= 0 ) {
 		return;
 	}
-	LinkedList_ForEach( node, tags ) {
+	for( LinkedList_Each( node, tags ) ) {
 		p = (LCUI_StyleTag*)node->data;
 		if( p->id == id ) {
 			LinkedList_DeleteNode( tags, node );

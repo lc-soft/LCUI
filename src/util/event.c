@@ -108,7 +108,7 @@ int EventTrigger_Unbind( LCUI_EventTrigger trigger, int event_id,
 		return -1;
 	}
 	handlers = event_node->data;
-	LinkedList_ForEach( handler_node, handlers ) {
+	for( LinkedList_Each( handler_node, handlers ) ) {
 		handler = handler_node->data;
 		if( handler->func != func ) {
 			continue;
@@ -154,7 +154,7 @@ int EventTrigger_Unbind3( LCUI_EventTrigger trigger, int event_id,
 		return -1;
 	}
 	handlers = event_node->data;
-	LinkedList_ForEach( handler_node, handlers ) {
+	for( LinkedList_Each( handler_node, handlers ) ) {
 		handler = handler_node->data;
 		if( !compare_func(key, handler->data) ) {
 			continue;

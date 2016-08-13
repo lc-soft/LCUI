@@ -306,7 +306,7 @@ void Widget_Empty( LCUI_Widget w )
 	}
 	LinkedList_ClearData( &w->children_show, NULL );
 	if( root == LCUIWidget.root ) {
-		LinkedList_ForEach( node, &w->children ) {
+		for( LinkedList_Each( node, &w->children ) ) {
 			child = node->data;
 			child->state = WSTATE_DELETED;
 		}
@@ -338,7 +338,7 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 	}
 	do {
 		is_hit = FALSE;
-		LinkedList_ForEach( node, &target->children_show ) {
+		for( LinkedList_Each( node, &target->children_show ) ) {
 			c = node->data;
 			if( !c->computed_style.visible ) {
 				continue;
@@ -658,7 +658,7 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 	snode = Widget_GetShowNode( w );
 	list = &w->parent->children_show;
 	LinkedList_Unlink( list, snode );
-	LinkedList_ForEach( cnode, list ) {
+	for( LinkedList_Each( cnode, list ) ) {
 		LCUI_Widget child = cnode->data;
 		LCUI_WidgetStyle *ccs = &child->computed_style;
 		csnode = Widget_GetShowNode( child );
@@ -868,7 +868,7 @@ static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 	LinkedListNode *node;
 
 	*width = *height = 0;
-	LinkedList_ForEach( node, &w->children_show ) {
+	for( LinkedList_Each( node, &w->children_show ) ) {
 		child = node->data;
 		/* 忽略不可见、绝对定位的部件 */
 		if( !child->computed_style.visible ||
@@ -1030,7 +1030,7 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 	Widget_TriggerEvent( w, &e, NULL );
 	Widget_AddTask( w, WTT_REFRESH );
 	Widget_PostSurfaceEvent( w, WET_RESIZE );
-	LinkedList_ForEach( node, &w->children ) {
+	for( LinkedList_Each( node, &w->children ) ) {
 		child = node->data;
 		if( child->style->sheet[key_width].type == SVT_SCALE || 
 		    child->style->sheet[key_height].type == SVT_SCALE ) {
@@ -1455,7 +1455,7 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 	LinkedListNode *node;
 
 	ctx.max_width = Widget_ComputeMaxWidth( w );
-	LinkedList_ForEach( node, &w->children ) {
+	for( LinkedList_Each( node, &w->children ) ) {
 		child = node->data;
 		if( child->computed_style.position != SV_STATIC &&
 		    child->computed_style.position != SV_RELATIVE ) {
@@ -1536,7 +1536,7 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 
 	len = strlen(prefix);
 	strcpy( child_prefix, prefix );
-	LinkedList_ForEach( node, &w->children ) {
+	for( LinkedList_Each( node, &w->children ) ) {
 		if( node == w->children.tail.prev ) {
 			strcpy( str, "└" );
 			strcpy( &child_prefix[len], "    " );

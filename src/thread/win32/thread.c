@@ -92,7 +92,7 @@ static LCUI_ThreadData *LCUIThread_Find( LCUI_Thread tid )
 {
 	LinkedListNode *node;
 	LCUI_ThreadData *thread_data;
-	LinkedList_ForEach( node, &thread_database ) {
+	for( LinkedList_Each( node, &thread_database ) ) {
 		thread_data = (LCUI_ThreadData*)node->data;
 		if( thread_data && thread_data->tid == tid ) {
 			return thread_data;
@@ -108,7 +108,7 @@ static int LCUIThread_Destroy( LCUI_Thread thread )
 	if(!thread){
 		return -1;
 	}
-	LinkedList_ForEach( node, &thread_database ) {
+	for( LinkedList_Each( node, &thread_database ) ) {
 		thread_data = (LCUI_ThreadData*)node->data;
 		if( thread_data && thread_data->tid == thread ) {
 			LinkedList_DeleteNode( &thread_database, node );

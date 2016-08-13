@@ -203,7 +203,7 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 	LCUI_Rect rect, child_box, *r;
 	count = w->dirty_rects.length;
 	/* 取出当前记录的无效区域 */
-	LinkedList_ForEach( node, &w->dirty_rects ) {
+	for( LinkedList_Each( node, &w->dirty_rects ) ) {
 		r = node->data;
 		/* 若有独立位图缓存，则重绘脏矩形区域 */
 		if( w->enable_graph && Graph_IsValid( &w->graph ) ) {
@@ -229,7 +229,7 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 	x += w->box.padding.x - w->box.graph.x;
 	y += w->box.padding.y - w->box.graph.y;
 	/* 向子级部件递归 */
-	LinkedList_ForEach( node, &w->children ) {
+	for( LinkedList_Each( node, &w->children ) ) {
 		int child_x, child_y;
 		child = node->data;
 		if( !child->computed_style.visible || 

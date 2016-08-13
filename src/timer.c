@@ -84,7 +84,7 @@ static void TimerList_AddNode( LinkedListNode *node )
 	timer = node->data;
 	t = LCUI_GetTicks( timer->start_time );
 	t = timer->total_ms - t + timer->pause_ms;
-	LinkedList_ForEach( cur, &self.timer_list ) {
+	for( LinkedList_Each( cur, &self.timer_list ) ) {
 		timer = cur->data;
 		tt = LCUI_GetTicks( timer->start_time );
 		tt = timer->total_ms - tt + timer->pause_ms;
@@ -105,7 +105,7 @@ static void TimerList_Print( void )
 	Timer timer;
 	LinkedListNode *node;
 	_DEBUG_MSG("timer list(%d) start:\n", self.timer_list.length);
-	LinkedList_ForEach( node, &self.timer_list ) {
+	for( LinkedList_Each( node, &self.timer_list ) {
 		timer = node->data;
 		_DEBUG_MSG("[%02d] %ld, func: %p, cur_ms: %ldms, total_ms: %ldms\n",
 			i++, timer->id, timer->func, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
@@ -125,7 +125,7 @@ static void TimerThread( void *arg )
 	LCUIMutex_Lock( &self.mutex );
 	while( self.is_running ) {
 		Timer timer = NULL;
-		LinkedList_ForEach( node, &self.timer_list ) {
+		for( LinkedList_Each( node, &self.timer_list ) ) {
 			timer = node->data;
 			if( timer && timer->state == STATE_RUN ) {
 				break;
@@ -171,7 +171,7 @@ static Timer TimerList_Find( int timer_id )
 {
 	Timer timer;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &self.timer_list ) {
+	for( LinkedList_Each( node, &self.timer_list ) ) {
 		timer = node->data;
 		if( timer && timer->id == timer_id ) {
 			return timer;

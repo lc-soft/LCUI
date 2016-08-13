@@ -400,7 +400,7 @@ static void LCUIApp_QuitAllMainLoop(void)
 {
 	LCUI_MainLoop loop;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &MainApp.loops ) {
+	for( LinkedList_Each( node, &MainApp.loops ) ) {
 		loop = node->data;
 		if( loop ) {
 			loop->state = STATE_EXITED;
@@ -419,7 +419,7 @@ static void LCUIApp_Destroy(void)
 {
 	LCUI_MainLoop loop;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &MainApp.loops ) {
+	for( LinkedList_Each( node, &MainApp.loops ) ) {
 		loop = node->data;
 		LCUI_MainLoop_Quit( loop );
 		LCUIThread_Join( loop->tid, NULL );

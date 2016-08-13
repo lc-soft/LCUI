@@ -1343,7 +1343,7 @@ void TextLayer_ClearInvalidRect( LCUI_TextLayer layer )
 		LinkedList_Clear( &layer->dirty_rect, free );
 		return;
 	}
-	LinkedList_ForEach( node, &layer->dirty_rect ) {
+	for( LinkedList_Each( node, &layer->dirty_rect ) ) {
 		Graph_Quote( &invalid_graph, &layer->graph, node->data );
 		Graph_FillAlpha( &invalid_graph, 0 );
 	}
