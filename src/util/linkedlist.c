@@ -38,6 +38,7 @@
  * ****************************************************************************/
 
 //#define DEBUG
+#include <time.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -307,10 +308,12 @@ void LinkedList_QuickSort( LinkedList *list, int (*cmp)(void*, void*) )
 		}
 		if( cmp( lnode->data, range.enode->data) >= 0 ) {
 			LinkedList_SwapNode( list, lnode, range.enode );
+			if( mnode == range.enode ) {
+				mnode = lnode;
+			}
 			node = lnode;
 			lnode = range.enode;
 			range.enode = node;
-			mnode = node;
 		} else {
 			left++, lnode = lnode->next;
 		}

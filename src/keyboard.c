@@ -149,7 +149,7 @@ void LCUI_InitKeyboard( void )
 {
 	LCUIMutex_Init( &self.mutex );
 	RBTree_Init( &self.state_tree );
-	RBTree_SetDataNeedFree( &self.state_tree, TRUE );
+	RBTree_OnDestroy( &self.state_tree, free );
 	LCUI_BindEvent( LCUI_KEYDOWN, OnKeyboardEvent, NULL, NULL );
 	LCUI_BindEvent( LCUI_KEYUP, OnKeyboardEvent, NULL, NULL );
 }

@@ -941,8 +941,15 @@ int LCUICSS_AddParser( LCUI_StyleParser sp )
 	return key;
 }
 
+static void OnDestroyStyleParser( void *arg )
+{
+	LCUI_StyleParser sp = arg;
+	free( sp->name );
+	free( sp );
+}
+
 /** 初始化 LCUI 的 CSS 代码解析功能 */
-void LCUICSS_Init(void)
+void LCUICSS_Init( void )
 {
 	KeyNameGroup *skn, *skn_end;
 	LCUI_StyleParser new_sp, sp, sp_end;
@@ -951,25 +958,22 @@ void LCUICSS_Init(void)
 	RBTree_Init( &self.parser_tree );
 	RBTree_Init( &self.option_tree );
 	RBTree_Init( &self.option_name_tree );
-	RBTree_SetDataNeedFree( &self.name_tree, FALSE );
-	RBTree_SetDataNeedFree( &self.parser_tree, TRUE );
-	RBTree_SetDataNeedFree( &self.option_tree, FALSE );
-	RBTree_SetDataNeedFree( &self.option_name_tree, FALSE );
+	RBTree_OnDestroy( &self.parser_tree, OnDestroyStyleParser );
 	RBTree_OnJudge( &self.parser_tree, CompareParserName );
 	RBTree_OnJudge( &self.option_tree, CompareName );
 	skn = style_name_map;
-	skn_end = skn + sizeof(style_name_map)/sizeof(KeyNameGroup);
+	skn_end = skn + sizeof( style_name_map ) / sizeof( KeyNameGroup );
 	for( ; skn < skn_end; ++skn ) {
 		RBTree_Insert( &self.name_tree, skn->key, skn->name );
 	}
-	sp = style_parser_map;
-	sp_end = sp + sizeof(style_parser_map)/sizeof(LCUI_StyleParserRec);
+	sp_end = sp = style_parser_map;
+	sp_end += sizeof( style_parser_map ) / sizeof( LCUI_StyleParserRec );
 	for( ; sp < sp_end; ++sp ) {
-		new_sp = malloc(sizeof(LCUI_StyleParserRec));
+		new_sp = malloc( sizeof( LCUI_StyleParserRec ) );
 		new_sp->key = sp->key;
 		new_sp->parse = sp->parse;
 		if( !sp->name && sp->key >= 0 ) {
-			const char *name = GetStyleName(sp->key);
+			const char *name = GetStyleName( sp->key );
 			if( !name ) {
 				free( new_sp );
 				continue;
@@ -981,7 +985,7 @@ void LCUICSS_Init(void)
 		RBTree_CustomInsert( &self.parser_tree, new_sp->name, new_sp );
 	}
 	skn = style_option_map;
-	skn_end = skn + sizeof(style_option_map)/sizeof(KeyNameGroup);
+	skn_end = skn + sizeof( style_option_map ) / sizeof( KeyNameGroup );
 	for( ; skn < skn_end; ++skn ) {
 		RBTree_CustomInsert( &self.option_tree, skn->name, skn );
 		RBTree_Insert( &self.option_name_tree, skn->key, skn );
@@ -989,7 +993,7 @@ void LCUICSS_Init(void)
 	self.count = STYLE_KEY_TOTAL;
 }
 
-void LCUICSS_Destroy(void)
+void LCUICSS_Destroy( void )
 {
 
 }

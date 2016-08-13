@@ -58,7 +58,6 @@ void RBTree_Init( LCUI_RBTree *rbt )
 	rbt->judge = NULL;
 	rbt->destroy = NULL;
         rbt->total_node = 0;
-	rbt->need_free_data = 0;
 }
 
 static void DestroyRBTreeNode( LCUI_RBTree *rbt, LCUI_RBTreeNode *node )
@@ -75,13 +74,11 @@ static void DestroyRBTreeNode( LCUI_RBTree *rbt, LCUI_RBTreeNode *node )
 			node->parent->right = NULL;
 		}
 	}
-	if( rbt->destroy ) {
+	if( rbt->destroy && node->data ) {
 		rbt->destroy( node->data );
 	}
-	if( rbt->need_free_data ) {
-		free( node->data );
-	}
 	node->data = NULL;
+	free( node );
 }
 
 /** 销毁红黑树 */
@@ -89,6 +86,7 @@ void RBTree_Destroy( LCUI_RBTree *rbt )
 {
 	rbt->total_node = 0;
 	DestroyRBTreeNode( rbt, rbt->root );
+	rbt->root = NULL;
 }
 
 /** 获取第一个结点 */
@@ -446,98 +444,95 @@ rb_erase_rebalance( LCUI_RBTreeNode *node, LCUI_RBTreeNode *parent,
 /** 删除红黑树中的结点 */
 static int rb_erase( LCUI_RBTree *rbt, int key, const void *keydata )
 {
-        unsigned char color;
-        LCUI_RBTreeNode *root, *child = NULL, *parent, *old, *left, *node;
+	unsigned char color;
+	LCUI_RBTreeNode *root, *child = NULL, *parent, *old, *left, *node;
 
-        root = rbt->root;
-        /* 查找要删除的结点 */
+	root = rbt->root;
+	/* 查找要删除的结点 */
 	node = rb_search_auxiliary( root, key, keydata, rbt->judge, NULL );
-        if( !node ) {
-                return -1;
-        }
-        old = node;
-        if (node->left && node->right) {
-                node = node->right;
-                while ((left = node->left) != NULL) {
-                        node = left;
-                }
-                child = node->right;
-                parent = node->parent;
-                color = node->color;
+	if( !node ) {
+		return -1;
+	}
+	old = node;
+	if( node->left && node->right ) {
+		node = node->right;
+		while( (left = node->left) != NULL ) {
+			node = left;
+		}
+		child = node->right;
+		parent = node->parent;
+		color = node->color;
 
-                if (child) {
-                        child->parent = parent;
-                }
-                if (parent) {
-                        if (parent->left == node) {
-                                parent->left = child;
-                        } else {
-                                parent->right = child;
-                        }
-                } else {
-                        root = child;
-                }
+		if( child ) {
+			child->parent = parent;
+		}
+		if( parent ) {
+			if( parent->left == node ) {
+				parent->left = child;
+			} else {
+				parent->right = child;
+			}
+		} else {
+			root = child;
+		}
 
-                if (node->parent == old) {
-                        parent = node;
-                }
+		if( node->parent == old ) {
+			parent = node;
+		}
 
-                node->parent = old->parent;
-                node->color = old->color;
-                node->right = old->right;
-                node->left = old->left;
+		node->parent = old->parent;
+		node->color = old->color;
+		node->right = old->right;
+		node->left = old->left;
 
-                if (old->parent) {
-                        if (old->parent->left == old) {
-                                old->parent->left = node;
-                        } else {
-                                old->parent->right = node;
-                        }
-                } else {
-                        root = node;
-                }
+		if( old->parent ) {
+			if( old->parent->left == old ) {
+				old->parent->left = node;
+			} else {
+				old->parent->right = node;
+			}
+		} else {
+			root = node;
+		}
 
-                old->left->parent = node;
-                if (old->right) {
-                        old->right->parent = node;
-                }
-        } else {
-                if (!node->left) {
-                        child = node->right;
-                } else if (!node->right) {
-                        child = node->left;
-                }
-                parent = node->parent;
-                color = node->color;
+		old->left->parent = node;
+		if( old->right ) {
+			old->right->parent = node;
+		}
+	} else {
+		if( !node->left ) {
+			child = node->right;
+		} else if( !node->right ) {
+			child = node->left;
+		}
+		parent = node->parent;
+		color = node->color;
 
-                if (child) {
-                        child->parent = parent;
-                }
-                if (parent) {
-                        if (parent->left == node) {
-                                parent->left = child;
-                        } else {
-                                parent->right = child;
-                        }
-                } else {
-                        root = child;
-                }
-        }
+		if( child ) {
+			child->parent = parent;
+		}
+		if( parent ) {
+			if( parent->left == node ) {
+				parent->left = child;
+			} else {
+				parent->right = child;
+			}
+		} else {
+			root = child;
+		}
+	}
 
-	if( rbt->destroy ) {
+	if( rbt->destroy && old->data ) {
 		rbt->destroy( old->data );
 	}
-	if( rbt->need_free_data ) {
-		free( old->data );
+	free( old );
+	if( color == BLACK ) {
+		/* 恢复红黑树性质 */
+		root = rb_erase_rebalance( child, parent, root );
 	}
-        free( old );
-        if (color == BLACK) {
-                /* 恢复红黑树性质 */
-                root = rb_erase_rebalance( child, parent, root );
-        }
-        rbt->root = root;
-        rbt->total_node -= 1;
-        return 0;
+	rbt->root = root;
+	rbt->total_node -= 1;
+	return 0;
 }
 
 int RBTree_Erase( LCUI_RBTree *rbt, int key )

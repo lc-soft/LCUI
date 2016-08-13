@@ -220,7 +220,6 @@ static void LCUIBuilder_Init( void )
 
 	RBTree_Init( &self.parsers );
 	RBTree_OnJudge( &self.parsers, CompareName );
-	RBTree_SetDataNeedFree( &self.parsers, FALSE );
 	len = sizeof(parser_list) / sizeof(parser_list[0]);
 	for( i = 0; i < len; ++i ) {
 		p = &parser_list[i];

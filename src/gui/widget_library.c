@@ -61,7 +61,6 @@ void LCUIWidget_InitLibrary(void)
 {
 	RBTree_Init( &widget_class_library );
 	RBTree_OnJudge( &widget_class_library, CompareName );
-	RBTree_SetDataNeedFree( &widget_class_library, FALSE );
 	RBTree_OnDestroy( &widget_class_library, OnDestroyWidgetClass );
 }
 

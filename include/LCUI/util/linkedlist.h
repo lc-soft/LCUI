@@ -55,11 +55,14 @@ struct LinkedListRec_ {
 	LinkedListNode head, tail;
 };
 
-#define LinkedList_ForEach(node, list) \
-	for( node = (list)->head.next; node; node = node->next )
+#define LinkedList_Each(node, list) \
+	node = (list)->head.next; node; node = node->next
 
-#define LinkedList_ForEachReverse(node, list) \
-	for( node = (list)->tail.prev; node && node != &(list)->head; node = node->prev )
+#define LinkedList_EachReverse(node, list) \
+	node = (list)->tail.prev; node && node != &(list)->head; node = node->prev
+
+#define LinkedList_ForEach(node, list) for( LinkedList_Each(node, list) )
+#define LinkedList_ForEachReverse(node, list) for( LinkedList_EachReverse(node, list) )
 
 LCUI_API LinkedListNode *LinkedList_Append( LinkedList *list, void *data );
 LCUI_API LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data );

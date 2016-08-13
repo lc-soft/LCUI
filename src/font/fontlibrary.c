@@ -113,7 +113,7 @@ static void DestroyFontPathNode( void *arg )
 
 static void DestroyFontFamilyNode( void *arg )
 {
-	LCUI_FontFamilyNode *node = (LCUI_FontFamilyNode*)arg;
+	LCUI_FontFamilyNode *node = arg;
 	if( node->family_name ) {
 		free( node->family_name );
 	}
@@ -123,12 +123,14 @@ static void DestroyFontFamilyNode( void *arg )
 
 static void DestroyFontBitmap( void *arg )
 {
-	FontBitmap_Free( (LCUI_FontBitmap*)arg );
+	FontBitmap_Free( arg );
+	free( arg );
 }
 
 static void DestroyTreeNode( void *arg )
 {
-	RBTree_Destroy( (LCUI_RBTree*)arg );
+	RBTree_Destroy( arg );
+	free( arg );
 }
 
 /**
@@ -299,7 +301,6 @@ LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 			return NULL;
 		}
 		RBTree_Init( tree_font );
-		RBTree_SetDataNeedFree( tree_font, TRUE );
 		RBTree_OnDestroy( tree_font, DestroyTreeNode );
 		RBTree_Insert( &fontlib.bitmap_cache, ch, tree_font );
 	}
@@ -316,7 +317,6 @@ LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 		}
 		RBTree_Init( tree_bmp );
 		RBTree_OnDestroy( tree_bmp, DestroyFontBitmap );
-		RBTree_SetDataNeedFree( tree_bmp, TRUE );
 		RBTree_Insert( tree_font, font_id, tree_bmp );
 	}
 	/* 在字体位图库中获取指定像素大小的字体位图 */
@@ -634,7 +634,6 @@ void LCUI_InitFont( void )
 	RBTree_OnDestroy( &fontlib.path_map, DestroyFontPathNode );
 	RBTree_OnDestroy( &fontlib.family_tree, DestroyFontFamilyNode );
 	RBTree_OnDestroy( &fontlib.bitmap_cache, DestroyTreeNode );
-	RBTree_SetDataNeedFree( &fontlib.bitmap_cache, TRUE );
 	fontlib.is_inited = TRUE;
 
 	/* 先初始化内置的字体引擎 */

@@ -1605,7 +1605,6 @@ void LCUI_InitWidget( void )
 	LCUIWidget_AddTScrollBar();
 	LCUIWidget_AddTextEdit();
 	RBTree_Init( &LCUIWidget.ids );
-	RBTree_SetDataNeedFree( &LCUIWidget.ids, FALSE );
 	RBTree_OnJudge( &LCUIWidget.ids, CompareWidgetId );
 	LCUIWidget.root = LCUIWidget_New("root");
 	Widget_SetTitleW( LCUIWidget.root, L"LCUI Display" );
