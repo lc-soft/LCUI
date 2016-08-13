@@ -27,11 +27,13 @@ See the  file `docs/LICENSE.TXT`  for the available licenses.
 
 ## Documentation 
 
-API reference documentation has not yet been prepared, development to more 
-mature in this project will consider writing it. At this stage, you can refer
-to the header files, source code, and sample programs.
+Tutorial: https://lcui.lc-soft.io/guide/
+
+API reference documentation has not yet been prepared, you can refer to the header files, source code, and sample programs.
 
 ## Building
+
+### Bootstrap
 
 To bootstrap the build you need to run `./configure` (in the root of the 
 source tree). 
@@ -42,6 +44,19 @@ In the simplest case you would run:
 	cd LCUI
 	./autogen.sh
 	./configure
+
+### Prerequisites
+
+If you want to build full-featured LCUI, we suggest you install the following dependent libraries:
+
+ * [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG image compression library
+ * [libjpeg](http://www.ijg.org/) — JPEG image compression library
+ * [libxml2](http://xmlsoft.org/) — The XML C parser and toolkit
+ * [freetype](https://www.freetype.org/) — Font engine
+
+If you system is Ubuntu, you can run following command to install dependencies:
+
+	apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev
 
 ## Bugs 
 
