@@ -1268,6 +1268,7 @@ LCUI_Selector Widget_GetSelector( LCUI_Widget w )
 		LCUI_SelectorNode sn;
 		parent = node->data;
 		sn = NEW( LCUI_SelectorNodeRec, 1 );
+		Widget_Lock( parent );
 		if( parent->id ) {
 			sn->id = strdup( parent->id );
 		}
@@ -1286,6 +1287,7 @@ LCUI_Selector Widget_GetSelector( LCUI_Widget w )
 						   parent->status[i] );
 			}
 		}
+		Widget_Unlock( parent );
 		SelectorNode_Update( sn );
 		s->nodes[ni] = sn;
 		s->rank += sn->rank;
@@ -1368,6 +1370,7 @@ void Widget_GetInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 	if( ss ) {
 		StyleSheet_Replace( out_ss, ss );
 		LCUIMutex_Unlock( &style_library.mutex );
+		Selector_Delete( s );
 		return;
 	}
 	ss = StyleSheet();
@@ -1380,6 +1383,7 @@ void Widget_GetInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 	RBTree_Insert( &style_library.cache, (int)s->hash, ss );
 	StyleSheet_Replace( out_ss, ss );
 	LCUIMutex_Unlock( &style_library.mutex );
+	Selector_Delete( s );
 }
 
 void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )

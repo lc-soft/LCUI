@@ -52,6 +52,130 @@ static struct LCUIWidgetModule {
 	LCUI_RBTree ids;	/** 各种部件的ID索引 */
 } LCUIWidget;
 
+#define StrList_Destroy freestrs
+
+static int StrList_AddOne( char ***strlist, const char *str )
+{
+	int i = 0;
+	char **newlist;
+
+	if( !*strlist ) {
+		newlist = (char**)malloc( sizeof(char*) * 2 );
+		goto check_done;
+	}
+	for( i = 0; (*strlist)[i]; ++i ) {
+		if( strcmp((*strlist)[i], str) == 0 ) {
+			return 0;
+		}
+	}
+	newlist = (char**)realloc( *strlist, (i+2)*sizeof(char*) );
+check_done:
+	if( !newlist ) {
+		return 0;
+	}
+	newlist[i] = strdup(str);
+	newlist[i+1] = NULL;
+	*strlist = newlist;
+	return 1;
+}
+
+static int StrList_Add( char ***strlist, const char *str )
+{
+	char buff[256];
+	int count = 0, i, head;
+	for( head = 0, i = 0; str[i]; ++i ) {
+		if( str[i] != ' ' ) {
+			continue;
+		}
+		if( i - 1 > head ) {
+			strncpy( buff, &str[head], i - head );
+			buff[i - head] = 0;
+			count += StrList_AddOne( strlist, buff );
+		}
+		head = i + 1;
+	}
+	if( i - 1 > head ) {
+		strncpy( buff, &str[head], i - head );
+		buff[i - head] = 0;
+		count += StrList_AddOne( strlist, buff );
+	}
+	return count;
+}
+
+static LCUI_BOOL StrList_Has( char **strlist, const char *str )
+{
+	int i;
+	if( !strlist ) {
+		return FALSE;
+	}
+	for( i = 0; strlist[i]; ++i ) {
+		if( strcmp(strlist[i], str) == 0 ) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+static int StrList_RemoveOne( char ***strlist, const char *str )
+{
+	int i, pos, len;
+	char **newlist;
+
+	if( !*strlist ) {
+		return 0;
+	}
+	for( pos = -1, i = 0; (*strlist)[i]; ++i ) {
+		if( strcmp( (*strlist)[i], str ) == 0 ) {
+			pos = i;
+		}
+	}
+	if( pos == -1 ) {
+		return 0;
+	}
+	if( pos == 0 && i < 2 ) {
+		free( *strlist );
+		*strlist = NULL;
+		return 1;
+	}
+	len = i - 1;
+	newlist = (char**)malloc( i * sizeof(char*) );
+	for( i = 0; i < pos; ++i ) {
+		newlist[i] = (*strlist)[i];
+	}
+	for( i = pos; i < len; ++i ) {
+		newlist[i] = (*strlist)[i+1];
+	}
+	newlist[i] = NULL;
+	free( (*strlist)[pos] );
+	free( *strlist );
+	*strlist = newlist;
+	return 1;
+}
+
+int StrList_Remove( char ***strlist, const char *str )
+{
+	char buff[256];
+	int count = 0, i, head;
+
+	for( head = 0, i = 0; str[i]; ++i ) {
+		if( str[i] != ' ' ) {
+			continue;
+		}
+		if( i - 1 > head ) {
+			strncpy( buff, &str[head], i - head );
+			buff[i - head] = 0;
+			count += StrList_RemoveOne( strlist, buff );
+		}
+		head = i + 1;
+	}
+	if( i - 1 > head ) {
+		strncpy( buff, &str[head], i - head );
+		buff[i - head] = 0;
+		count += StrList_RemoveOne( strlist, buff );
+	}
+	return count;
+}
+
 LCUI_Widget LCUIWidget_GetRoot(void)
 {
 	return LCUIWidget.root;
@@ -247,6 +371,10 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	Widget_ReleaseMouseCapture( widget );
 	Widget_ReleaseTouchCapture( widget, -1 );
 	Widget_StopEventPropagation( widget );
+	StyleSheet_Delete( widget->style );
+	StyleSheet_Delete( widget->cached_style );
+	StyleSheet_Delete( widget->custom_style );
+	StyleSheet_Delete( widget->inherited_style );
 	LCUIWidget_ClearEventTarget( widget );
 	if( wc && wc->methods.destroy ) {
 		wc->methods.destroy( widget );
@@ -254,11 +382,23 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
 	LinkedList_ClearData( &widget->children_show, NULL );
+	LinkedList_ClearData( &widget->children_trash, NULL );
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
 	LinkedList_Clear( &widget->dirty_rects, free );
 	Widget_PostSurfaceEvent( widget, WET_REMOVE );
 	Widget_UpdateLayout( widget->parent );
 	Widget_SetId( widget, NULL );
+	if( widget->type ) {
+		free( widget->type );
+		widget->type = NULL;
+	}
+	if( widget->title ) {
+		free( widget->title );
+		widget->title = NULL;
+	}
+	widget->classes ? StrList_Destroy( widget->classes ):0;
+	widget->status ? StrList_Destroy( widget->status ):0;
+	LCUIMutex_Destroy( &widget->mutex );
 	EventTrigger_Destroy( widget->trigger );
 	widget->trigger = NULL;
 	free( widget );
@@ -1205,189 +1345,93 @@ void Widget_Unlock( LCUI_Widget w )
 	LCUIMutex_Unlock( &w->mutex );
 }
 
-static int StrList_AddOne( char ***strlist, const char *str )
-{
-	int i = 0;
-	char **newlist;
-
-	if( !*strlist ) {
-		newlist = (char**)malloc( sizeof(char*) * 2 );
-		goto check_done;
-	}
-	for( i = 0; (*strlist)[i]; ++i ) {
-		if( strcmp((*strlist)[i], str) == 0 ) {
-			return 0;
-		}
-	}
-	newlist = (char**)realloc( *strlist, (i+2)*sizeof(char*) );
-check_done:
-	if( !newlist ) {
-		return 0;
-	}
-	newlist[i] = strdup(str);
-	newlist[i+1] = NULL;
-	*strlist = newlist;
-	return 1;
-}
-
-int StrList_Add( char ***strlist, const char *str )
-{
-	char buff[256];
-	int count = 0, i, head;
-	for( head = 0, i = 0; str[i]; ++i ) {
-		if( str[i] != ' ' ) {
-			continue;
-		}
-		if( i - 1 > head ) {
-			strncpy( buff, &str[head], i - head );
-			buff[i - head] = 0;
-			count += StrList_AddOne( strlist, buff );
-		}
-		head = i + 1;
-	}
-	if( i - 1 > head ) {
-		strncpy( buff, &str[head], i - head );
-		buff[i - head] = 0;
-		count += StrList_AddOne( strlist, buff );
-	}
-	return count;
-}
-
-LCUI_BOOL StrList_Has( char **strlist, const char *str )
-{
-	int i;
-	if( !strlist ) {
-		return FALSE;
-	}
-	for( i = 0; strlist[i]; ++i ) {
-		if( strcmp(strlist[i], str) == 0 ) {
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-static int StrList_RemoveOne( char ***strlist, const char *str )
-{
-	int i, pos, len;
-	char **newlist;
-
-	if( !*strlist ) {
-		return 0;
-	}
-	for( pos = -1, i = 0; (*strlist)[i]; ++i ) {
-		if( strcmp( (*strlist)[i], str ) == 0 ) {
-			pos = i;
-		}
-	}
-	if( pos == -1 ) {
-		return 0;
-	}
-	if( pos == 0 && i < 2 ) {
-		free( *strlist );
-		*strlist = NULL;
-		return 1;
-	}
-	len = i - 1;
-	newlist = (char**)malloc( i * sizeof(char*) );
-	for( i = 0; i < pos; ++i ) {
-		newlist[i] = (*strlist)[i];
-	}
-	for( i = pos; i < len; ++i ) {
-		newlist[i] = (*strlist)[i+1];
-	}
-	newlist[i] = NULL;
-	free( (*strlist)[pos] );
-	free( *strlist );
-	*strlist = newlist;
-	return 1;
-}
-
-int StrList_Remove( char ***strlist, const char *str )
-{
-	char buff[256];
-	int count = 0, i, head;
-
-	for( head = 0, i = 0; str[i]; ++i ) {
-		if( str[i] != ' ' ) {
-			continue;
-		}
-		if( i - 1 > head ) {
-			strncpy( buff, &str[head], i - head );
-			buff[i - head] = 0;
-			count += StrList_RemoveOne( strlist, buff );
-		}
-		head = i + 1;
-	}
-	if( i - 1 > head ) {
-		strncpy( buff, &str[head], i - head );
-		buff[i - head] = 0;
-		count += StrList_RemoveOne( strlist, buff );
-	}
-	return count;
-}
-
 /** 为部件添加一个类 */
 int Widget_AddClass( LCUI_Widget w, const char *class_name )
 {
+	Widget_Lock( w );
 	if( StrList_Has( w->classes, class_name ) ) {
+		Widget_Unlock( w );
 		return 1;
 	}
 	if( StrList_Add(&w->classes, class_name) <= 0 ) {
+		Widget_Unlock( w );
 		return 0;
 	}
 	Widget_HandleChildrenStyleChange( w, 0, class_name );
 	Widget_UpdateStyle( w, TRUE );
+	Widget_Unlock( w );
 	return 1;
 }
 
 /** 判断部件是否包含指定的类 */
 LCUI_BOOL Widget_HasClass( LCUI_Widget w, const char *class_name )
 {
-	return StrList_Has( w->classes, class_name );
+	Widget_Lock( w );
+	if( StrList_Has( w->classes, class_name ) ) {
+		Widget_Unlock( w );
+		return TRUE;
+	}
+	Widget_Unlock( w );
+	return FALSE;
 }
 
 /** 从部件中移除一个类 */
 int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 {
+	Widget_Lock( w );
 	if( StrList_Has( w->classes, class_name ) ) {
 		Widget_HandleChildrenStyleChange( w, 0, class_name );
 		StrList_Remove( &w->classes, class_name );
 		Widget_UpdateStyle( w, TRUE );
+		Widget_Unlock( w );
 		return 1;
 	}
+	Widget_Unlock( w );
 	return 0;
 }
 
 /** 为部件添加一个状态 */
 int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 {
+	Widget_Lock( w );
 	if( StrList_Has( w->status, status_name ) ) {
+		Widget_Unlock( w );
 		return 0;
 	}
 	if( StrList_Add( &w->status, status_name ) <= 0 ) {
+		Widget_Unlock( w );
 		return 0;
 	}
 	Widget_UpdateStyle( w, TRUE );
 	Widget_HandleChildrenStyleChange( w, 1, status_name );
+	Widget_Unlock( w );
 	return 1;
 }
 
 /** 判断部件是否包含指定的状态 */
 LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name )
 {
-	return StrList_Has( w->status, status_name );
+	Widget_Lock( w );
+	if( StrList_Has( w->status, status_name ) ) {
+		Widget_Unlock( w );
+		return TRUE;
+	}
+	Widget_Unlock( w );
+	return FALSE;
 }
 
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 {
+	Widget_Lock( w );
 	if( StrList_Has( w->status, status_name ) ) {
 		Widget_HandleChildrenStyleChange( w, 1, status_name );
 		StrList_Remove( &w->status, status_name );
 		Widget_UpdateStyle( w, TRUE );
+		Widget_Unlock( w );
 		return 1;
 	}
+	Widget_Unlock( w );
 	return 0;
 }
 
