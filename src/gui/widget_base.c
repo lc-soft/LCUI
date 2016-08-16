@@ -371,10 +371,6 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	Widget_ReleaseMouseCapture( widget );
 	Widget_ReleaseTouchCapture( widget, -1 );
 	Widget_StopEventPropagation( widget );
-	StyleSheet_Delete( widget->style );
-	StyleSheet_Delete( widget->cached_style );
-	StyleSheet_Delete( widget->custom_style );
-	StyleSheet_Delete( widget->inherited_style );
 	LCUIWidget_ClearEventTarget( widget );
 	if( wc && wc->methods.destroy ) {
 		wc->methods.destroy( widget );
@@ -385,6 +381,10 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	LinkedList_ClearData( &widget->children_trash, NULL );
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
 	LinkedList_Clear( &widget->dirty_rects, free );
+	StyleSheet_Delete( widget->inherited_style );
+	StyleSheet_Delete( widget->cached_style );
+	StyleSheet_Delete( widget->custom_style );
+	StyleSheet_Delete( widget->style );
 	Widget_PostSurfaceEvent( widget, WET_REMOVE );
 	Widget_UpdateLayout( widget->parent );
 	Widget_SetId( widget, NULL );
@@ -1348,52 +1348,38 @@ void Widget_Unlock( LCUI_Widget w )
 /** 为部件添加一个类 */
 int Widget_AddClass( LCUI_Widget w, const char *class_name )
 {
-	Widget_Lock( w );
 	if( StrList_Has( w->classes, class_name ) ) {
-		Widget_Unlock( w );
 		return 1;
 	}
 	if( StrList_Add(&w->classes, class_name) <= 0 ) {
-		Widget_Unlock( w );
 		return 0;
 	}
 	Widget_HandleChildrenStyleChange( w, 0, class_name );
 	Widget_UpdateStyle( w, TRUE );
-	Widget_Unlock( w );
 	return 1;
 }
 
 /** 判断部件是否包含指定的类 */
 LCUI_BOOL Widget_HasClass( LCUI_Widget w, const char *class_name )
 {
-	Widget_Lock( w );
-	if( StrList_Has( w->classes, class_name ) ) {
-		Widget_Unlock( w );
-		return TRUE;
-	}
-	Widget_Unlock( w );
-	return FALSE;
+	return StrList_Has( w->classes, class_name );
 }
 
 /** 从部件中移除一个类 */
 int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 {
-	Widget_Lock( w );
 	if( StrList_Has( w->classes, class_name ) ) {
 		Widget_HandleChildrenStyleChange( w, 0, class_name );
 		StrList_Remove( &w->classes, class_name );
 		Widget_UpdateStyle( w, TRUE );
-		Widget_Unlock( w );
 		return 1;
 	}
-	Widget_Unlock( w );
 	return 0;
 }
 
 /** 为部件添加一个状态 */
 int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 {
-	Widget_Lock( w );
 	if( StrList_Has( w->status, status_name ) ) {
 		Widget_Unlock( w );
 		return 0;
@@ -1404,34 +1390,24 @@ int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 	}
 	Widget_UpdateStyle( w, TRUE );
 	Widget_HandleChildrenStyleChange( w, 1, status_name );
-	Widget_Unlock( w );
 	return 1;
 }
 
 /** 判断部件是否包含指定的状态 */
 LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name )
 {
-	Widget_Lock( w );
-	if( StrList_Has( w->status, status_name ) ) {
-		Widget_Unlock( w );
-		return TRUE;
-	}
-	Widget_Unlock( w );
-	return FALSE;
+	return StrList_Has( w->status, status_name );
 }
 
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 {
-	Widget_Lock( w );
 	if( StrList_Has( w->status, status_name ) ) {
 		Widget_HandleChildrenStyleChange( w, 1, status_name );
 		StrList_Remove( &w->status, status_name );
 		Widget_UpdateStyle( w, TRUE );
-		Widget_Unlock( w );
 		return 1;
 	}
-	Widget_Unlock( w );
 	return 0;
 }
 

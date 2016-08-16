@@ -1268,7 +1268,6 @@ LCUI_Selector Widget_GetSelector( LCUI_Widget w )
 		LCUI_SelectorNode sn;
 		parent = node->data;
 		sn = NEW( LCUI_SelectorNodeRec, 1 );
-		Widget_Lock( parent );
 		if( parent->id ) {
 			sn->id = strdup( parent->id );
 		}
@@ -1287,7 +1286,6 @@ LCUI_Selector Widget_GetSelector( LCUI_Widget w )
 						   parent->status[i] );
 			}
 		}
-		Widget_Unlock( parent );
 		SelectorNode_Update( sn );
 		s->nodes[ni] = sn;
 		s->rank += sn->rank;

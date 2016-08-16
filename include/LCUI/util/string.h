@@ -80,7 +80,7 @@ LCUI_API int strtrim( char *outstr, const char *instr, const char *charlist );
 LCUI_API int strsplit( const char *instr, const char *sep, char ***outstrs );
 
 /** 释放字符串组 */
-void freestrs( char **strs );
+LCUI_API void freestrs( char **strs );
 
 LCUI_END_HEADER
 
