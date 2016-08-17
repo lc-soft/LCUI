@@ -186,8 +186,8 @@ static void SortedStrList_Destroy( char **strlist )
  * 匹配选择器节点
  * 左边的选择器必须包含右边的选择器的所有属性。
  */
-static LCUI_BOOL SelectorNode_Match( LCUI_SelectorNode sn1, 
-				     LCUI_SelectorNode sn2 )
+LCUI_BOOL SelectorNode_Match( LCUI_SelectorNode sn1, 
+			      LCUI_SelectorNode sn2 )
 {
 	int i, j;
 	if( sn2->id ) {
@@ -1112,7 +1112,7 @@ static int FindStyleSheetFromGroup( int group, const char *name,
 			continue;
 		}
 		iter = Dict_GetIterator( slg->links );
-		while( entry = Dict_Next( iter ) ) {
+		while( (entry = Dict_Next( iter )) ) {
 			StyleLink link = DictEntry_GetVal( entry );
 			count += FindStyleSheetFromLink( link, s, i, list );
 		}
@@ -1209,7 +1209,7 @@ static void LCUI_PrintStyleLink( StyleLink link, const char *selector )
 		printf("}\n");
 	}
 	iter = Dict_GetIterator( link->parents );
-	while( entry = Dict_Next( iter ) ) {
+	while( (entry = Dict_Next( iter )) ) {
 		StyleLink parent = DictEntry_GetVal( entry );
 		LCUI_PrintStyleLink( parent, fullname );
 	}
@@ -1228,12 +1228,12 @@ void LCUI_PrintStyleLibrary( void )
 	printf( "style library begin\n" );
 	group = LinkedList_Get( &style_library.groups, 0 );
 	iter = Dict_GetIterator( group );
-	while( entry = Dict_Next(iter) ) {
+	while( (entry = Dict_Next(iter)) ) {
 		DictEntry *entry_slg;
 		DictIterator *iter_slg;
 		slg = DictEntry_GetVal( entry );
 		iter_slg = Dict_GetIterator( slg->links );
-		while( entry_slg = Dict_Next(iter_slg) ) {
+		while( (entry_slg = Dict_Next(iter_slg)) ) {
 			link = DictEntry_GetVal( entry_slg );
 			LCUI_PrintStyleLink( link, NULL );
 		}
@@ -1268,6 +1268,7 @@ LCUI_Selector Widget_GetSelector( LCUI_Widget w )
 		LCUI_SelectorNode sn;
 		parent = node->data;
 		sn = NEW( LCUI_SelectorNodeRec, 1 );
+		Widget_Lock( parent );
 		if( parent->id ) {
 			sn->id = strdup( parent->id );
 		}
@@ -1286,6 +1287,7 @@ LCUI_Selector Widget_GetSelector( LCUI_Widget w )
 						   parent->status[i] );
 			}
 		}
+		Widget_Unlock( parent );
 		SelectorNode_Update( sn );
 		s->nodes[ni] = sn;
 		s->rank += sn->rank;
