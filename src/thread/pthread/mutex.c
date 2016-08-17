@@ -45,7 +45,10 @@
 /* init the mutex */
 int LCUIMutex_Init( LCUI_Mutex *mutex )
 {
-	return pthread_mutex_init( mutex, NULL );
+	pthread_mutexattr_t attr;
+	pthread_mutexattr_init( &attr );
+	pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
+	return pthread_mutex_init( mutex, &attr );
 }
 
 /* Free the mutex */
