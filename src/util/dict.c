@@ -222,7 +222,7 @@ int Dict_Rehash( Dict *d, int n )
 	return 1;
 }
 
-#define timeInMilliseconds LCUI_GetTickCount
+#define timeInMilliseconds LCUI_GetTime
 
 int Dict_RehashMilliseconds( Dict *d, int ms )
 {

@@ -147,7 +147,7 @@ static void ScrollBar_UpdateInertialScrolling( LCUI_Widget w )
 	scrollbar->effect.speed = 0;
 	scrollbar->effect.is_running = FALSE;
 	scrollbar->effect.start_pos = scrollbar->pos;
-	scrollbar->effect.timestamp = LCUI_GetTickCount();
+	scrollbar->effect.timestamp = LCUI_GetTime();
 }
 
 static void ScrollBar_StartInertialScrolling( LCUI_Widget w )
@@ -160,7 +160,7 @@ static void ScrollBar_StartInertialScrolling( LCUI_Widget w )
 	effect = &scrollbar->effect;
 	effect->end_pos = scrollbar->pos;
 	distance = effect->end_pos - effect->start_pos;
-	time_delta = LCUI_GetTicks( effect->timestamp );
+	time_delta = LCUI_GetTimeDelta( effect->timestamp );
 	/* 计算每一帧的滚动距离（速度） */
 	if( time_delta > 0 ) {
 		effect->speed = distance * effect->interval / (int)time_delta;
@@ -171,7 +171,7 @@ static void ScrollBar_StartInertialScrolling( LCUI_Widget w )
 	if( (effect->speed > 0) == (effect->speed_delta > 0) ) {
 		effect->speed_delta = -effect->speed_delta;
 	}
-	effect->timestamp = LCUI_GetTickCount();
+	effect->timestamp = LCUI_GetTime();
 	if( effect->is_running ) {
 		return;
 	}

@@ -71,8 +71,8 @@ FrameControl FrameControl_Create( void )
 	ctx->current_fps = 0;
 	ctx->pause_time = 0;
 	ctx->one_frame_remain_time = 10;
-	ctx->prev_frame_start_time = LCUI_GetTickCount();
-	ctx->prev_fps_update_time = LCUI_GetTickCount();
+	ctx->prev_frame_start_time = LCUI_GetTime();
+	ctx->prev_fps_update_time = LCUI_GetTime();
 	LCUICond_Init( &ctx->cond );
 	LCUIMutex_Init( &ctx->mutex );
 	return ctx;
@@ -105,7 +105,7 @@ void FrameControl_Remain( FrameControl ctx )
 		return;
 	}
 	lost_ms = 0;
-	current_time = LCUI_GetTickCount();
+	current_time = LCUI_GetTime();
 	LCUIMutex_Lock( &ctx->mutex );
 	n_ms = (unsigned int)(current_time - ctx->prev_frame_start_time);
 	if( n_ms > ctx->one_frame_remain_time ) {
@@ -118,16 +118,16 @@ void FrameControl_Remain( FrameControl ctx )
 	/* 睡眠一段时间 */
 	while( lost_ms < n_ms && ctx->state == STATE_RUN ) {
 		LCUICond_TimedWait( &ctx->cond, &ctx->mutex, n_ms - lost_ms );
-		lost_ms = (unsigned int)LCUI_GetTicks( current_time );
+		lost_ms = (unsigned int)LCUI_GetTimeDelta( current_time );
 	}
 	/* 睡眠结束后，如果当前状态为 PAUSE，则说明睡眠是因为要暂停而终止的 */
 	if( ctx->state == STATE_PAUSE ) {
-		current_time = LCUI_GetTickCount();
+		current_time = LCUI_GetTime();
 		/* 等待状态改为“继续” */
 		while( ctx->state == STATE_PAUSE ) {
 			LCUICond_Wait( &ctx->cond, &ctx->mutex );
 		}
-		lost_ms = (unsigned int)LCUI_GetTicks( current_time );
+		lost_ms = (unsigned int)LCUI_GetTimeDelta( current_time );
 		ctx->pause_time = lost_ms;
 		ctx->prev_frame_start_time += lost_ms;
 		LCUIMutex_Unlock( &ctx->mutex );
@@ -135,7 +135,7 @@ void FrameControl_Remain( FrameControl ctx )
 	}
 
 normal_exit:;
-	current_time = LCUI_GetTickCount();
+	current_time = LCUI_GetTime();
 	if( current_time - ctx->prev_fps_update_time >= 1000 ) {
 		ctx->current_fps = ctx->temp_fps;
 		ctx->prev_fps_update_time = current_time;

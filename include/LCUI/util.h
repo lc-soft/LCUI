@@ -37,10 +37,9 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_MISC_H__
-#define __LCUI_MISC_H__
+#ifndef __LCUI_UTIL_H__
+#define __LCUI_UTIL_H__
 #include <LCUI/util/time.h>
-#include <LCUI/util/delay.h>
 #include <LCUI/util/dirent.h>
 #include <LCUI/util/rbtree.h>
 #include <LCUI/util/linkedlist.h>
