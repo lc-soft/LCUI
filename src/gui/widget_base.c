@@ -372,6 +372,7 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	Widget_ReleaseTouchCapture( widget, -1 );
 	Widget_StopEventPropagation( widget );
 	LCUIWidget_ClearEventTarget( widget );
+	LCUIWidget_ClearTaskTarget( widget );
 	if( wc && wc->methods.destroy ) {
 		wc->methods.destroy( widget );
 	}
@@ -417,7 +418,7 @@ void Widget_Destroy( LCUI_Widget w )
 	}
 	if( w->parent ) {
 		LCUI_Widget child;
-		LinkedListNode *node, *snode;
+		LinkedListNode *node;
 		node = Widget_GetNode( w );
 		node = node->next;
 		while( node ) {
@@ -425,15 +426,11 @@ void Widget_Destroy( LCUI_Widget w )
 			child->index -= 1;
 			node = node->next;
 		}
-		node = Widget_GetNode( w );
-		snode = Widget_GetShowNode( w );
-		LinkedList_Unlink( &w->parent->children, node );
-		LinkedList_Unlink( &w->parent->children_show, snode );
-		LinkedList_AppendNode( &w->parent->children_trash, node );
 		if( w->computed_style.position != SV_ABSOLUTE ) {
 			Widget_UpdateLayout( w->parent );
 		}
 		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
+		Widget_AddToTrash( w );
 	}
 }
 
@@ -1648,7 +1645,7 @@ void LCUI_InitWidget( void )
 	LCUIWidget_AddTScrollBar();
 	LCUIWidget_AddTextEdit();
 	RBTree_Init( &LCUIWidget.ids );
-	RBTree_OnJudge( &LCUIWidget.ids, CompareWidgetId );
+	RBTree_OnCompare( &LCUIWidget.ids, CompareWidgetId );
 	LCUIWidget.root = LCUIWidget_New("root");
 	Widget_SetTitleW( LCUIWidget.root, L"LCUI Display" );
 }

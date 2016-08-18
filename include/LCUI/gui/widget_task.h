@@ -48,17 +48,23 @@ LCUI_API void Widget_UpdateTaskStatus( LCUI_Widget widget );
 /** 添加任务 */
 LCUI_API void Widget_AddTask( LCUI_Widget widget, int task_type );
 
+/** 将部件标记为垃圾，等待销毁 */
+LCUI_API void Widget_AddToTrash( LCUI_Widget w );
+
 /** 为子级部件添加任务 */
 LCUI_API void Widget_AddTaskForChildren( LCUI_Widget widget, int task );
 
+/** 移除指定部件的任务记录 */
+LCUI_API void LCUIWidget_ClearTaskTarget( LCUI_Widget w );
+
 /** 初始化 LCUI 部件任务处理功能 */
-void LCUIWidget_InitTask(void);
+void LCUIWidget_InitTask( void );
 
 /** 销毁（释放） LCUI 部件任务处理功能的相关资源 */
-void LCUIWidget_ExitTask(void);
+void LCUIWidget_ExitTask( void );
 
 /** 处理一次当前积累的部件任务 */
-void LCUIWidget_StepTask(void);
+void LCUIWidget_StepTask( void );
 
 LCUI_END_HEADER
 

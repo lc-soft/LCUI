@@ -38,11 +38,27 @@
  * ***************************************************************************/
 
 //#define DEBUG
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
+
+typedef void (*callback)(LCUI_Widget);
+
+typedef struct WidgetTaskIndexRec_ {
+	LCUI_Widget widget;
+	LinkedListNode node;
+} WidgetTaskIndexRec, *WidgetTaskIndex;
+
+static struct LCUIWidgetTaskModule {
+	LinkedList tasks;
+	LCUI_RBTree indexes;
+	LCUI_Mutex mutex;
+	LinkedList trash;
+	callback handlers[WTT_TOTAL_NUM];
+} self;
 
 static void HandleRefreshStyle( LCUI_Widget w )
 {
@@ -88,12 +104,8 @@ void Widget_UpdateTaskStatus( LCUI_Widget widget )
 	for( i = 0; i < WTT_TOTAL_NUM; ++i ) {
 		if( widget->task.buffer[i] ) {
 			widget->task.for_self = TRUE;
+			Widget_AddTask( widget, widget->task.buffer[i] );
 		}
-	}
-	widget = widget->parent;
-	while( widget ) {
-		widget->task.for_children = TRUE;
-		widget = widget->parent;
 	}
 }
 
@@ -101,12 +113,24 @@ void Widget_AddTaskForChildren( LCUI_Widget widget, int task )
 {
 	LCUI_Widget child;
 	LinkedListNode *node;
-	widget->task.for_children = TRUE;
 	for( LinkedList_Each( node, &widget->children ) ) {
 		child = node->data;
 		Widget_AddTask( child, task );
 		Widget_AddTaskForChildren( child, task );
 	}
+}
+
+void LCUIWidget_ClearTaskTarget( LCUI_Widget w )
+{
+	WidgetTaskIndex idx;
+	LCUIMutex_Lock( &self.mutex );
+	idx = RBTree_CustomGetData( &self.indexes, w );
+	if( idx ) {
+		LinkedList_Unlink( &self.tasks, &idx->node );
+		RBTree_CustomErase( &self.indexes, w );
+		free( idx );
+	}
+	LCUIMutex_Unlock( &self.mutex );
 }
 
 void Widget_AddTask( LCUI_Widget widget, int task )
@@ -116,65 +140,84 @@ void Widget_AddTask( LCUI_Widget widget, int task )
 	}
 	widget->task.for_self = TRUE;
 	widget->task.buffer[task] = TRUE;
-	widget = widget->parent;
-	/* 向没有标记的父级部件添加标记 */
-	while( widget && !widget->task.for_children ) {
-		widget->task.for_children = TRUE;
-		widget = widget->parent;
+	LCUIMutex_Lock( &self.mutex );
+	if( !RBTree_CustomGetData( &self.indexes, widget ) ) {
+		WidgetTaskIndex idx = NEW( WidgetTaskIndexRec, 1 );
+		idx->widget = widget;
+		idx->node.data = widget;
+		RBTree_CustomInsert( &self.indexes, widget, idx );
+		LinkedList_AppendNode( &self.tasks, &idx->node );
 	}
+	LCUIMutex_Unlock( &self.mutex );
 }
-
-typedef void (*callback)(LCUI_Widget);
-
-static callback task_handlers[WTT_TOTAL_NUM];
 
 /** 映射任务处理器 */
 static void MapTaskHandler(void)
 {
-	task_handlers[WTT_VISIBLE] = Widget_UpdateVisibility;
-	task_handlers[WTT_POSITION] = Widget_UpdatePosition;
-	task_handlers[WTT_RESIZE] = Widget_UpdateSize;
-	task_handlers[WTT_SHADOW] = Widget_UpdateBoxShadow;
-	task_handlers[WTT_BORDER] = Widget_UpdateBorder;
-	task_handlers[WTT_OPACITY] = Widget_UpdateOpacity;
-	task_handlers[WTT_BODY] = HandleBody;
-	task_handlers[WTT_TITLE] = HandleSetTitle;
-	task_handlers[WTT_REFRESH] = HandleRefresh;
-	task_handlers[WTT_UPDATE_STYLE] = HandleUpdateStyle;
-	task_handlers[WTT_REFRESH_STYLE] = HandleRefreshStyle;
-	task_handlers[WTT_CACHE_STYLE] = HandleCacheStyle;
-	task_handlers[WTT_BACKGROUND] = Widget_UpdateBackground;
-	task_handlers[WTT_LAYOUT] = Widget_ExecUpdateLayout;
-	task_handlers[WTT_ZINDEX] = Widget_ExecUpdateZIndex;
-	task_handlers[WTT_PROPS] = Widget_UpdateProps;
+	self.handlers[WTT_VISIBLE] = Widget_UpdateVisibility;
+	self.handlers[WTT_POSITION] = Widget_UpdatePosition;
+	self.handlers[WTT_RESIZE] = Widget_UpdateSize;
+	self.handlers[WTT_SHADOW] = Widget_UpdateBoxShadow;
+	self.handlers[WTT_BORDER] = Widget_UpdateBorder;
+	self.handlers[WTT_OPACITY] = Widget_UpdateOpacity;
+	self.handlers[WTT_BODY] = HandleBody;
+	self.handlers[WTT_TITLE] = HandleSetTitle;
+	self.handlers[WTT_REFRESH] = HandleRefresh;
+	self.handlers[WTT_UPDATE_STYLE] = HandleUpdateStyle;
+	self.handlers[WTT_REFRESH_STYLE] = HandleRefreshStyle;
+	self.handlers[WTT_CACHE_STYLE] = HandleCacheStyle;
+	self.handlers[WTT_BACKGROUND] = Widget_UpdateBackground;
+	self.handlers[WTT_LAYOUT] = Widget_ExecUpdateLayout;
+	self.handlers[WTT_ZINDEX] = Widget_ExecUpdateZIndex;
+	self.handlers[WTT_PROPS] = Widget_UpdateProps;
 }
 
-/** 初始化 LCUI 部件任务处理功能 */
-void LCUIWidget_InitTask(void)
+static int OnCompareIndex( void *data, const void *keydata )
+{
+	return ((WidgetTaskIndex)data)->widget - (LCUI_Widget)keydata;
+}
+
+void LCUIWidget_InitTask( void )
 {
 	MapTaskHandler();
+	LCUIMutex_Init( &self.mutex );
+	LinkedList_Init( &self.tasks );
+	LinkedList_Init( &self.trash );
+	RBTree_Init( &self.indexes );
+	RBTree_OnCompare( &self.indexes, OnCompareIndex );
 }
 
-/** 销毁（释放） LCUI 部件任务处理功能的相关资源 */
-void LCUIWidget_ExitTask(void)
+void LCUIWidget_ExitTask( void )
 {
-
+	LCUIMutex_Lock( &self.mutex );
+	LinkedList_Clear( &self.tasks, NULL );
+	RBTree_Destroy( &self.indexes );
+	LCUIMutex_Unlock( &self.mutex );
+	LCUIMutex_Destroy( &self.mutex );
 }
 
-/** 处理部件中当前积累的任务 */
+void Widget_AddToTrash( LCUI_Widget w )
+{
+	LinkedListNode *snode, *node;
+
+	if( !w->parent ) {
+		return;
+	}
+	node = Widget_GetNode( w );
+	snode = Widget_GetShowNode( w );
+	LinkedList_Unlink( &w->parent->children, node );
+	LinkedList_Unlink( &w->parent->children_show, snode );
+	LinkedList_AppendNode( &self.trash, node );
+}
+
 int Widget_Update( LCUI_Widget w )
 {
-	int ret = 1, i;
+	int i;
 	LCUI_BOOL *buffer;
-	LCUI_Widget child;
-	LinkedListNode *node, *next;
-
 	/* 如果该部件有任务需要处理 */
 	if( w->task.for_self ) {
-		ret = LCUIMutex_TryLock( &w->mutex );
-		if( ret != 0 ) {
-			ret = 1;
-			goto skip_proc_self_task;
+		if( LCUIMutex_TryLock( &w->mutex ) != 0 ) {
+			return 1;
 		}
 		w->task.for_self = FALSE;
 		buffer = w->task.buffer;
@@ -187,8 +230,8 @@ int Widget_Update( LCUI_Widget w )
 		for( i = 0; i < WTT_USER; ++i ) {
 			if( buffer[i] ) {
 				buffer[i] = FALSE;
-				if( task_handlers[i] ) {
-					task_handlers[i]( w );
+				if( self.handlers[i] ) {
+					self.handlers[i]( w );
 				}
 			} else {
 				buffer[i] = FALSE;
@@ -208,41 +251,49 @@ int Widget_Update( LCUI_Widget w )
 			}
 		}
 	}
-	/* 删除无用部件 */
-	node = w->children_trash.head.next;
-	while( node ) {
-		next = node->next;
-		LinkedList_Unlink( &w->children_trash, node );
-		Widget_ExecDestroy( node->data );
-		node = next;
-	}
-
-skip_proc_self_task:;
-
-	/* 如果子级部件中有待处理的部件，则递归进去 */
-	if( w->task.for_children ) {
-		w->task.for_children = FALSE;
-		node = w->children.head.next;
-		while( node ) {
-			child = node->data;
-			/* 如果当前部件有销毁任务，结点空间会连同部件一起被
-			 * 释放，为避免因访问非法空间而出现异常，预先保存下
-			 * 个结点。
-			 */
-			next = node->next;
-			ret = Widget_Update( child );
-			/* 如果该级部件的任务需要留到下次再处理 */
-			if( ret == 1 ) {
-				w->task.for_children = TRUE;
-			}
-			node = next;
-		}
-	}
-	return (w->task.for_self || w->task.for_children) ? 1 : 0;
+	return w->task.for_self;
 }
 
-/** 处理一次当前积累的部件任务 */
-void LCUIWidget_StepTask(void)
+void LCUIWidget_StepTask( void )
 {
-	Widget_Update( LCUIWidget_GetRoot() );
+	int i;
+	WidgetTaskIndex idx;
+	LinkedListNode *prev, *node;
+	int64_t current_time = LCUI_GetTime();
+	int64_t end_time = current_time + 30;
+	size_t offset = offsetof( WidgetTaskIndexRec, node );
+
+	while( current_time < end_time ) {
+		i = 0, node = NULL;
+		LCUIMutex_Lock( &self.mutex );
+		for( LinkedList_Each( node, &self.tasks ) ) {
+			if( i >= 50 ) {
+				break;
+			}
+			prev = node->prev;
+			if( Widget_Update( node->data ) ) {
+				i += 1;
+				continue;
+			}
+			idx = (WidgetTaskIndex)((char*)node - offset);
+			RBTree_CustomErase( &self.indexes, node->data );
+			LinkedList_Unlink( &self.tasks, node );
+			free( idx );
+			node = prev;
+			i += 1;
+		}
+		/* 删除无用部件 */
+		node = self.trash.head.next;
+		while( node && node != &self.trash.head ) {
+			prev = node->prev;
+			LinkedList_Unlink( &self.trash, node );
+			Widget_ExecDestroy( node->data );
+			node = prev;
+		}
+		LCUIMutex_Unlock( &self.mutex );
+		if( !node ) {
+			break;
+		}
+		current_time = LCUI_GetTime();
+	}
 }
