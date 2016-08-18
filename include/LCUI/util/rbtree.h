@@ -56,32 +56,24 @@ struct LCUI_RBTreeNodeRec_ {
 
 typedef struct LCUI_RBTreeRec_ {
         int total_node;
-	int (*judge)(void*, const void*);
+	int (*compare)(void*, const void*);
 	void (*destroy)(void*);
         LCUI_RBTreeNode *root;
 } LCUI_RBTree;
 
 #define RBTree_GetTotal(rbt) (rbt)->total_node;
-#define RBTree_OnJudge(rbt, func) (rbt)->judge = func
+#define RBTree_OnCompare(rbt, func) (rbt)->compare = func
 #define RBTree_OnDestroy(rbt, func) (rbt)->destroy = func
 
-/** 初始化红黑树 */
 LCUI_API void RBTree_Init( LCUI_RBTree *rbt );
-
-/** 销毁红黑树 */
 LCUI_API void RBTree_Destroy( LCUI_RBTree *rbt );
-
-/** 获取第一个结点 */
 LCUI_API LCUI_RBTreeNode *RBTree_First( const LCUI_RBTree *rbt );
-
-/** 获取下一个结点 */
 LCUI_API LCUI_RBTreeNode *RBTree_Next( const LCUI_RBTreeNode *node );
-
 LCUI_API LCUI_RBTreeNode* RBTree_Search( LCUI_RBTree* rbt, int key );
 LCUI_API void* RBTree_GetData( LCUI_RBTree* rbt, int key );
 LCUI_API LCUI_RBTreeNode* RBTree_Insert( LCUI_RBTree *rbt, int key, void *data );
 LCUI_API int RBTree_Erase( LCUI_RBTree *rbt, int key );
-
+LCUI_API void RBTree_EraseNode( LCUI_RBTree *rbt, LCUI_RBTreeNode *node );
 LCUI_API int RBTree_CustomErase( LCUI_RBTree *rbt, const void *keydata );
 LCUI_API LCUI_RBTreeNode* RBTree_CustomSearch( LCUI_RBTree* rbt, const void *keydata );
 LCUI_API void* RBTree_CustomGetData( LCUI_RBTree* rbt, const void *keydata );

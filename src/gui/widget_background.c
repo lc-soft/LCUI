@@ -129,8 +129,8 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 	if( !is_inited ) {
 		RBTree_Init( &images );
 		RBTree_Init( &refs );
-		RBTree_OnJudge( &refs, OnCompareWidget );
-		RBTree_OnJudge( &images, OnComparePath );
+		RBTree_OnCompare( &refs, OnCompareWidget );
+		RBTree_OnCompare( &images, OnComparePath );
 		RBTree_OnDestroy( &refs, free );
 		RBTree_OnDestroy( &images, OnDestroyCache );
 		is_inited = TRUE;

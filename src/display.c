@@ -104,7 +104,7 @@ static void LCUIDisplay_Update(void)
 	LCUI_PaintContext paint;
 	LinkedList_Init( &rlist );
 	/* 遍历当前的 surface 记录列表 */
-	LinkedList_ForEach( sn, &display.surfaces ) {
+	for( LinkedList_Each( sn, &display.surfaces ) ) {
 		p_sr = sn->data;
 		if( !p_sr->widget || !p_sr->surface
 		 || !Surface_IsReady(p_sr->surface) ) {
@@ -114,7 +114,7 @@ static void LCUIDisplay_Update(void)
 		/* 收集无效区域记录 */
 		Widget_ProcInvalidArea( p_sr->widget, &rlist );
 		/* 在 surface 上逐个重绘无效区域 */
-		LinkedList_ForEach( rn, &rlist ) {
+		for( LinkedList_Each( rn, &rlist ) ) {
 			paint = Surface_BeginPaint( p_sr->surface, rn->data );
 			if( !paint ) {
 				continue;
@@ -136,7 +136,7 @@ static void LCUIDisplay_Update(void)
 	LinkedList_Clear( &rlist, free );
 }
 
-void LCUIDisplay_InvalidateArea(LCUI_Rect *rect )
+void LCUIDisplay_InvalidateArea( LCUI_Rect *rect )
 {
 
 }
@@ -145,7 +145,7 @@ static LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &display.surfaces ) {
+	for( LinkedList_Each( node, &display.surfaces ) ) {
 		sr = node->data;
 		if( sr && sr->surface == surface ) {
 			return sr->widget;
@@ -158,7 +158,7 @@ static LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &display.surfaces ) {
+	for( LinkedList_Each( node, &display.surfaces ) ) {
 		sr = node->data;
 		if( sr && sr->widget == widget ) {
 			return sr->surface;
@@ -211,7 +211,7 @@ static void LCUIDisplay_UnbindSurface( LCUI_Widget widget )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &display.surfaces ) {
+	for( LinkedList_Each( node, &display.surfaces ) ) {
 		sr = node->data;
 		if( sr && sr->widget == widget ) {
 			Surface_Delete( sr->surface );
@@ -225,7 +225,7 @@ static void LCUIDisplay_CleanSurfaces( void )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &display.surfaces ) {
+	for( LinkedList_Each( node, &display.surfaces ) ) {
 		sr = node->data;
 		Surface_Delete( sr->surface );
 		LinkedList_DeleteNode( &display.surfaces, node );
@@ -283,7 +283,7 @@ static int LCUIDisplay_Seamless( void )
 		LCUIDisplay_CleanSurfaces();
 		break;
 	}
-	LinkedList_ForEach( node, &root->children ) {
+	for( LinkedList_Each( node, &root->children ) ) {
 		LCUIDisplay_BindSurface( node->data );
 	}
 	display.mode = LCDM_SEAMLESS;
@@ -567,7 +567,7 @@ static void OnPaint( LCUI_Event e, void *arg )
 	SurfaceRecord *sr;
 	LinkedListNode *node;
 	LCUI_DisplayEvent dpy_ev = arg;
-	LinkedList_ForEach( node, &display.surfaces ) {
+	for( LinkedList_Each( node, &display.surfaces ) ) {
 		sr = node->data;
 		if( sr && sr->surface != dpy_ev->surface ) {
 			continue;

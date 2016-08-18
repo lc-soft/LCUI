@@ -629,8 +629,8 @@ void LCUI_InitFont( void )
 	RBTree_Init( &fontlib.bitmap_cache );
 	RBTree_Init( &fontlib.path_map );
 	RBTree_Init( &fontlib.family_tree );
-	RBTree_OnJudge( &fontlib.path_map, OnComparePath );
-	RBTree_OnJudge( &fontlib.family_tree, OnCompareFamily );
+	RBTree_OnCompare( &fontlib.path_map, OnComparePath );
+	RBTree_OnCompare( &fontlib.family_tree, OnCompareFamily );
 	RBTree_OnDestroy( &fontlib.path_map, DestroyFontPathNode );
 	RBTree_OnDestroy( &fontlib.family_tree, DestroyFontFamilyNode );
 	RBTree_OnDestroy( &fontlib.bitmap_cache, DestroyTreeNode );

@@ -1007,7 +1007,7 @@ void LCUIWidget_InitEvent(void)
 	LCUI_BindEvent( LCUI_KEYUP, OnKeyboardEvent, NULL, NULL );
 	LCUI_BindEvent( LCUI_TOUCH, OnTouch, NULL, NULL );
 	LCUI_BindEvent( LCUI_TEXTINPUT, OnTextInput, NULL, NULL );
-	RBTree_OnJudge( &self.event_records, CompareEventRecord );
+	RBTree_OnCompare( &self.event_records, CompareEventRecord );
 	LinkedList_Init( &self.touch_capturers );
 }
 

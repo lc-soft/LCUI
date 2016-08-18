@@ -959,8 +959,8 @@ void LCUICSS_Init( void )
 	RBTree_Init( &self.option_tree );
 	RBTree_Init( &self.option_name_tree );
 	RBTree_OnDestroy( &self.parser_tree, OnDestroyStyleParser );
-	RBTree_OnJudge( &self.parser_tree, CompareParserName );
-	RBTree_OnJudge( &self.option_tree, CompareName );
+	RBTree_OnCompare( &self.parser_tree, CompareParserName );
+	RBTree_OnCompare( &self.option_tree, CompareName );
 	skn = style_name_map;
 	skn_end = skn + sizeof( style_name_map ) / sizeof( KeyNameGroup );
 	for( ; skn < skn_end; ++skn ) {
