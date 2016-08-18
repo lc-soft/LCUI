@@ -201,6 +201,7 @@ void Widget_AddToTrash( LCUI_Widget w )
 {
 	LinkedListNode *snode, *node;
 
+	w->state = WSTATE_DELETED;
 	if( !w->parent ) {
 		return;
 	}

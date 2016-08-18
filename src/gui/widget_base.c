@@ -329,7 +329,6 @@ static void Widget_Init( LCUI_Widget widget )
 	Border_Init( &widget->computed_style.border );
 	LinkedList_Init( &widget->children );
 	LinkedList_Init( &widget->children_show );
-	LinkedList_Init( &widget->children_trash );
 	LinkedList_Init( &widget->dirty_rects );
 	LCUIMutex_Init( &widget->mutex );
 	Graph_Init( &widget->graph );
@@ -379,7 +378,6 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
 	LinkedList_ClearData( &widget->children_show, NULL );
-	LinkedList_ClearData( &widget->children_trash, NULL );
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
 	LinkedList_Clear( &widget->dirty_rects, free );
 	StyleSheet_Delete( widget->inherited_style );
@@ -411,7 +409,6 @@ void Widget_Destroy( LCUI_Widget w )
 	while( root->parent ) {
 		root = root->parent;
 	}
-	w->state = WSTATE_DELETED;
 	if( root != LCUIWidget.root ) {
 		Widget_ExecDestroy( w );
 		return;
@@ -436,32 +433,26 @@ void Widget_Destroy( LCUI_Widget w )
 
 void Widget_Empty( LCUI_Widget w )
 {
-	LinkedListNode *node;
+	LinkedListNode *prev, *node;
 	LCUI_Widget root = w, child;
+
 	while( root->parent ) {
 		root = root->parent;
 	}
-	LinkedList_ClearData( &w->children_show, NULL );
 	if( root == LCUIWidget.root ) {
-		for( LinkedList_Each( node, &w->children ) ) {
-			child = node->data;
-			child->state = WSTATE_DELETED;
-		}
-		LinkedList_Concat( &w->children_trash, &w->children );
-		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
-		Widget_AddTask( w, WTT_LAYOUT );
-		return;
-	} else {
-		LinkedList list;
-		LinkedListNode *prev;
-		LinkedList_Init( &list );
-		LinkedList_Concat( &list, &w->children );
-		node = list.head.next;
+		node = w->children.tail.prev;
 		while( node ) {
 			prev = node->prev;
-			Widget_ExecDestroy( node->data );
-			node = prev->next;
+			child = node->data;
+			child->state = WSTATE_DELETED;
+			Widget_AddToTrash( node->data );
+			node = prev;
 		}
+		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
+		Widget_AddTask( w, WTT_LAYOUT );
+	} else {
+		LinkedList_ClearData( &w->children_show, NULL );
+		LinkedList_ClearData( &w->children, Widget_OnDestroy );
 	}
 }
 
