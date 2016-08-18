@@ -37,7 +37,6 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
-//#define DEBUG
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,17 +46,19 @@
 
 typedef void (*callback)(LCUI_Widget);
 
+/** 部件任务索引记录 */
 typedef struct WidgetTaskIndexRec_ {
-	LCUI_Widget widget;
-	LinkedListNode node;
+	LCUI_Widget widget;		/**< 部件 */
+	LinkedListNode node;		/**< 任务数据结点 */
 } WidgetTaskIndexRec, *WidgetTaskIndex;
 
-static struct LCUIWidgetTaskModule {
-	LinkedList tasks;
-	LCUI_RBTree indexes;
-	LCUI_Mutex mutex;
-	LinkedList trash;
-	callback handlers[WTT_TOTAL_NUM];
+/** 部件任务模块数据 */
+static struct WidgetTaskModule {
+	LinkedList tasks;			/**< 任务队列 */
+	LCUI_RBTree indexes;			/**< 索引记录 */
+	LCUI_Mutex mutex;			/**< 互斥锁 */
+	LinkedList trash;			/**< 待删除的部件列表 */
+	callback handlers[WTT_TOTAL_NUM];	/**< 任务处理器 */
 } self;
 
 static void HandleRefreshStyle( LCUI_Widget w )

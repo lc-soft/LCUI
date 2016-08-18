@@ -247,7 +247,6 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_Widget		parent;			/**< 父部件 */
 	LinkedList		children;		/**< 子部件 */
 	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
-	LinkedList		children_trash;		/**< 需被删除的子部件 */
 	void			*private_data;		/**< 私有数据 */
 	void			*extend_data;		/**< 扩展数据 */
 	LCUI_BOOL		enable_graph;		/**< 是否启用位图缓存 */
