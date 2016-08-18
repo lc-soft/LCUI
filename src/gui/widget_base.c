@@ -1345,9 +1345,14 @@ int Widget_AddClass( LCUI_Widget w, const char *class_name )
 		Widget_Unlock( w );
 		return 0;
 	}
+	Widget_Unlock( w );
+	/**
+	 * 先解除部件互斥锁，因为下面的函数所添加的部件任务可能会锁上全局任务锁和
+	 * 部件互斥锁，如果在处理任务时部件互斥锁没有解锁，那么整个部件任务功能都
+	 * 会进入死锁状态
+	 */
 	Widget_HandleChildrenStyleChange( w, 0, class_name );
 	Widget_UpdateStyle( w, TRUE );
-	Widget_Unlock( w );
 	return 1;
 }
 
@@ -1368,10 +1373,12 @@ int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 {
 	Widget_Lock( w );
 	if( StrList_Has( w->classes, class_name ) ) {
-		Widget_HandleChildrenStyleChange( w, 0, class_name );
-		StrList_Remove( &w->classes, class_name );
-		Widget_UpdateStyle( w, TRUE );
 		Widget_Unlock( w );
+		Widget_HandleChildrenStyleChange( w, 0, class_name );
+		Widget_Lock( w );
+		StrList_Remove( &w->classes, class_name );
+		Widget_Unlock( w );
+		Widget_UpdateStyle( w, TRUE );
 		return 1;
 	}
 	Widget_Unlock( w );
@@ -1390,9 +1397,9 @@ int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 		Widget_Unlock( w );
 		return 0;
 	}
-	Widget_UpdateStyle( w, TRUE );
-	Widget_HandleChildrenStyleChange( w, 1, status_name );
 	Widget_Unlock( w );
+	Widget_HandleChildrenStyleChange( w, 1, status_name );
+	Widget_UpdateStyle( w, TRUE );
 	return 1;
 }
 
@@ -1401,6 +1408,7 @@ LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name )
 {
 	Widget_Lock( w );
 	if( StrList_Has( w->status, status_name ) ) {
+		Widget_Unlock( w );
 		return TRUE;
 	}
 	Widget_Unlock( w );
@@ -1412,10 +1420,12 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 {
 	Widget_Lock( w );
 	if( StrList_Has( w->status, status_name ) ) {
-		Widget_HandleChildrenStyleChange( w, 1, status_name );
-		StrList_Remove( &w->status, status_name );
-		Widget_UpdateStyle( w, TRUE );
 		Widget_Unlock( w );
+		Widget_HandleChildrenStyleChange( w, 1, status_name );
+		Widget_Lock( w );
+		StrList_Remove( &w->status, status_name );
+		Widget_Unlock( w );
+		Widget_UpdateStyle( w, TRUE );
 		return 1;
 	}
 	Widget_Unlock( w );

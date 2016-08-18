@@ -1091,7 +1091,7 @@ static int FindStyleSheetFromGroup( int group, const char *name,
 	LinkedList names;
 
 	groups = LinkedList_Get( &style_library.groups, group );
-	if( !groups ) {
+	if( !groups || s->length < 1 ) {
 		return 0;
 	}
 	count = 0;
