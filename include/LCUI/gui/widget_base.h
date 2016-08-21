@@ -209,6 +209,7 @@ typedef struct LCUI_WidgetBoxRect {
 
 typedef struct LCUI_WidgetTaskBoxRec_ {
 	LCUI_BOOL for_self;			/**< 标志，指示当前部件是否有待处理的任务 */
+	LCUI_BOOL for_children;			/**< 标志，指示是否有待处理的子级部件 */
 	LCUI_BOOL buffer[WTT_TOTAL_NUM];	/**< 记录缓存 */
 } LCUI_WidgetTaskBoxRec;
 
@@ -325,9 +326,6 @@ LCUI_API void Widget_UpdateProps( LCUI_Widget w );
 
 /** 更新透明度 */
 LCUI_API void Widget_UpdateOpacity( LCUI_Widget w );
-
-/** 处理部件中当前积累的任务 */
-LCUI_API int Widget_Update( LCUI_Widget w );
 
 /** 设置部件标题 */
 LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );

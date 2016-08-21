@@ -40,6 +40,8 @@
 #ifndef LCUI_WIDGET_TASK_H
 #define LCUI_WIDGET_TASK_H
 
+#define Widget_Update(W) Widget_UpdateEx(W, FALSE)
+
 LCUI_BEGIN_HEADER
 
 /** 更新当前任务状态，确保部件的任务能够被处理到 */
@@ -48,14 +50,14 @@ LCUI_API void Widget_UpdateTaskStatus( LCUI_Widget widget );
 /** 添加任务 */
 LCUI_API void Widget_AddTask( LCUI_Widget widget, int task_type );
 
+/** 处理部件中当前积累的任务 */
+LCUI_API int Widget_UpdateEx( LCUI_Widget w, LCUI_BOOL has_timeout );
+
 /** 将部件标记为垃圾，等待销毁 */
 LCUI_API void Widget_AddToTrash( LCUI_Widget w );
 
 /** 为子级部件添加任务 */
 LCUI_API void Widget_AddTaskForChildren( LCUI_Widget widget, int task );
-
-/** 移除指定部件的任务记录 */
-LCUI_API void LCUIWidget_ClearTaskTarget( LCUI_Widget w );
 
 /** 初始化 LCUI 部件任务处理功能 */
 void LCUIWidget_InitTask( void );

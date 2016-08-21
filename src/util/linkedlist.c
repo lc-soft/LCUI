@@ -53,9 +53,8 @@ void LinkedList_Init( LinkedList *list )
 
 void LinkedList_Unlink( LinkedList *list, LinkedListNode *node )
 {
-	list->length -= 1;
-	if( list->length < 0 ) {
-		abort();
+	if( list->length > 0 ) {
+		list->length -= 1;
 	}
 	if( node->next ) {
 		node->next->prev = node->prev;

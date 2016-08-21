@@ -532,12 +532,10 @@ static void rb_erase_by_node( LCUI_RBTree *rbt, LCUI_RBTreeNode *node )
 /** 删除红黑树中的结点 */
 static int rb_erase( LCUI_RBTree *rbt, int key, const void *keydata )
 {
-	unsigned char color;
-	LCUI_RBTreeNode *root, *child = NULL, *parent, *old, *left, *node;
-
-	root = rbt->root;
+	LCUI_RBTreeNode *node;
 	/* 查找要删除的结点 */
-	node = rb_search_auxiliary( root, key, keydata, rbt->compare, NULL );
+	node = rb_search_auxiliary( rbt->root, key, keydata, 
+				    rbt->compare, NULL );
 	if( !node ) {
 		return -1;
 	}
