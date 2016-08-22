@@ -9,6 +9,8 @@
 
 ## Description
 
+[中文版说明文档](README.zh-cn.md)
+
 LCUI is a freely available software library to create GUI application.
   
 It is written in C, support the use XML and CSS describe the graphical 
