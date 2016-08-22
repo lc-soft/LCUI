@@ -29,7 +29,8 @@ See the  file `docs/LICENSE.TXT`  for the available licenses.
 
 Tutorial: https://lcui.lc-soft.io/guide/
 
-API reference documentation has not yet been prepared, you can refer to the header files, source code, and sample programs.
+API reference documentation has not yet been prepared, you can refer to the 
+header files, source code, and sample programs.
 
 ## Building
 
@@ -47,16 +48,23 @@ In the simplest case you would run:
 
 ### Prerequisites
 
-If you want to build full-featured LCUI, we suggest you install the following dependent libraries:
+If you want to build full-featured LCUI, we suggest you install the following
+ dependent libraries:
 
  * [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG image compression library
  * [libjpeg](http://www.ijg.org/) — JPEG image compression library
  * [libxml2](http://xmlsoft.org/) — The XML C parser and toolkit
+ * [libx11-dev](https://www.x.org/) — X11 client-side library
  * [freetype](https://www.freetype.org/) — Font engine
 
 If you system is Ubuntu, you can run following command to install dependencies:
 
-	apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev
+	apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
+
+### Building On Windows
+
+LCUI is mainly develop in the Windows environment, you can use VisualStudio 
+to open file `build/VS2012/LCUI.sln` and compile LCUI.
 
 ## Bugs 
 
@@ -134,8 +142,8 @@ If a lot of changes has happened upstream you can replay your local changes
 This will fetch changes and re-apply your commits on top of these.
 
 This is generally better than merge, as it will give a clear picture of which 
-commits are local to your branch. It will also “prune” any of your local commits 
-if the same changes have been applied upstream.
+commits are local to your branch. It will also “prune” any of your local 
+commits if the same changes have been applied upstream.
 
 You can use `-i` with `rebase` for an “interactive” rebase. This allows
  you to drop, re-arrange, merge, and reword commits, e.g.:
