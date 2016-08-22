@@ -1,17 +1,24 @@
 # The LCUI Project
 
-[![Gitter](https://badges.gitter.im/lc-soft/LCUI.svg)](https://gitter.im/lc-soft/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
-
 ![LCUI Logo](http://lcui.org/static/images/lcui-project-logo.png)
+
+[![Join the chat at https://gitter.im/lc-soft/LCUI](https://badges.gitter.im/lc-soft/LCUI.svg)](https://gitter.im/lc-soft/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
+[![Downloads](https://img.shields.io/sourceforge/dt/lc-ui.svg)](https://sourceforge.net/projects/lc-ui)
+[![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 
 ## 说明
 
-LCUI 是一个简单的跨平台图形界面库，适用于开发一些简单的小程序，其诞生目的主要是方便作者开发图形界面程序。
+LCUI 是一个简单的跨平台图形界面库，其诞生目的主要是方便作者开发图形界面程序，
+源代码主要由 C 语言编写，支持使用 XML 和 CSS 代码来描述图像界面，适用于开发一
+些简单的小程序，可以实现一些简单的效果，类似于这样：
 
-LCUI 是一个自由软件项目，基于 GNU通用公共许可协议 发布，该许可协议要求 LCUI 及 LCUI 衍生软件无论以何种形式发布，都必须确保收受者能收到或得到源码。
+![example screenshot](https://lcui.lc-soft.io/static/images/feature-screenshot-02.png)
 
-此项目主要由作者利用闲余时间进行开发和维护，项目的活跃度通常会受到各种因素的影响，大多数时间内都处于低活跃度状态。
+LCUI 是一个自由软件项目，基于 [GNU通用公共许可协议](http://www.gnu.org/licenses/gpl-2.0.html) 
+发布，该许可协议要求 LCUI 及 LCUI 衍生软件无论以何种形式发布，都必须确保收受者
+能收到或得到该版本的源代码。此项目主要由作者利用闲余时间进行开发和维护，项目的
+活跃度通常会受到各种因素的影响，大多数时间内都处于低活跃度状态。
 
 请阅读 `docs/CHANGES.zh-cn.md` 文件了解新版本的更新内容。
 
@@ -19,50 +26,22 @@ LCUI 是一个自由软件项目，基于 GNU通用公共许可协议 发布，�
 
 阅读 `docs/LICENSE.TXT`  文件了解 GPLv2 许可协议的具体内容。
 
-项目主页：http://www.lcui.org
+项目主页：http://lcui.lc-soft.io
 
 联系邮箱：lc-soft@live.cn
 
-项目托管：https://github.com/lc-soft/LCUI
-
-LCUI 的相关信息与资料可以在项目主页中找到，如果遇到问题、发现BUG或者有好的建议和
-想法，可以在项目主页上留言或发送邮件告诉我们。
-
-我们已经使用 GitHub 托管 LCUI 项目，网址在上面，欢迎您参与 LCUI 项目的优化和改进。
-
-## 文件目录结构
-
-以下是各个目录内容的相关说明：
-```
-
-/                        项目文件目录
-/bin/                    在编译生成后库文件的存放目录
-/build/                  参与项目编译、构建和生成的相关文件
-/build/VS2012/           VisualStudio 2012 工程文件
-/docs/                   相关文档
-/include/                头文件
-/src/                    源文件
-/src/gui/                图形界面
-/src/gui/widget/         预置的图形界面组件
-/src/font/               文字和字体
-/src/draw/               图形绘制
-/src/bmp/                位图文件读写
-/src/thread/             各平台下的线程操作接口的封装
-/src/util/               一些常用工具集
-/src/platform/           平台相关支持
-/src/platform/windows    windows 平台支持
-/src/platform/linux    	 linux 平台支持
-/test/                   测试（示例）程序
-
-```
+Github：https://github.com/lc-soft/LCUI
 
 ## 文档
 
-你可以访问LCUI的项目主页浏览开发文档，开发文档也托管在GitHub上，地址：https://github.com/lc-soft/LCUI-Documentation
+教程：https://lcui.lc-soft.io/guide/
 
-如果你通过LCUI的源代码和示例程序领悟到了一些些有趣的东西，可以帮助我们完善开发文档，与其他人分享你的成果。
+目前还没有 API 参考文档，你可以参考头文件、源代码、示例程序以及作者开发过的相
+关程序来了解基本用法。
 
 ## 构建
+
+### 引导
 
 你需要运行 `./configure` (在源码根目录中) 以引导项目的构建。
 
@@ -74,41 +53,50 @@ LCUI 的相关信息与资料可以在项目主页中找到，如果遇到问题
 
 如果未找到 ./configure，请运行 ./autogen.sh 脚本生成它。
 
-在 LCUI 的项目主页上发布的源码包，一般是比较稳定的版本，你只需要这样做：
+在 `./configure` 执行完后，运行以下命令编译源代码并安装 LCUI 的函数库和头文件：
 
-1. 解压LCUI的源码包。
-2. 进入解压后得到的新文件夹。
-3. 运行源码根目录中的configure脚本，以对系统环境进行检测。
-4. 使用make命令编译 LCUI 的源代码。
-5. 等待编译成功完成，如果在编译过程中遇到错误，请检查您的系统中是否有完整的编译环境。
-6. 使用make install命令安装 LCUI 的函数库和头文件。
+	make
+	make install
 
-windows系统上构建本项目方法，有两种：
+如果需要运行示例程序，可运行命令来编译生成示例程序：
 
-1. 使用 Visual Studio 2012 或更高版本，你只需要使用它打开 `build/VS2012/` 目录下的
-   `LCUI.sln` 文件，然后生成解决方案即可，生成成功后，在 `bin/` 目录下可找到库文件。
-2. 使用 Cygwin 或 MSYS，可按照上述1至6的步骤进行构建，在完成步骤3后，请修改
-   `include/LCUI/config.h` 文件，定义 `LCUI_BUILD_IN_WIN32` 宏，若有 
-   `LCUI_BUILD_IN_LINUX` 宏，请删除它。该方法并未实际测试，如有其它方法请告知。
+	cd test
+	make
 
-### 系统需求
+### 依赖项
 
-* 字体处理：freetype2
-* XML 解析：libxml2
-* 线程支持：pthread
-* 图片处理：libpng 和 libjpeg
+如果你想构建全特性的 LCUI，建议安装以下依赖库：
 
-为了你能正常使用 LCUI 全部功能，请先确保您的计算机已经安装了上述的函数库，并保持较新的版本。
-理论上，LCUI 能在 GNU/Linux 系统环境中正常工作，LCUI 的图形输出，需要内核支持 FrameBuffer。
+ * [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG 图像压缩库
+ * [libjpeg](http://www.ijg.org/) — JPEG 图像压缩库
+ * [libxml2](http://xmlsoft.org/) — XML 解析器及相关工具集
+ * [libx11-dev](https://www.x.org/) — X11 客户端库
+ * [freetype](https://www.freetype.org/) — 字体渲染引擎
+
+如果你的系统是 Ubuntu，可运行以下命令来安装依赖：
+
+	apt-get install libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev
+
+
+### 在 Windows 中构建
+
+LCUI 主要是在 Windows 系统环境下开发的，你可以使用 VisualStudio 打开 
+`/build/VS2012/LCUI.sln` 文件，然后编译生成 LCUI。如果你用的是其它 IDE，请尝
+试按该 IDE 的方式创建项目并将源文件添加至项目内，然后编译。
+
+上述的依赖库除 libx11 外，都可以在 Windows 下编译生成，如果觉得手动编译它们很
+麻烦，想要现成可用的依赖库和头文件，可以联系作者。
 
 ## 贡献
 
-你可以通过GitHub向本项目提交合并请求，补丁应符合以下要求：
+**你可以通过 GitHub 向本项目提交合并请求**
+
+补丁应符合以下要求：
 
 1. 遵循现有代码风格，请参考 `docs/CodingStyle.zh-cn.md` 文件。
 2. 一次提交应该做完整的一件事。
 3. 提交信息的第一行为摘要行，长度应低于80个字符，如果需要描述修改原因，请在摘要行后留空行，然后再补充。
-4. 修复之前的提交（已经合并）中存在的bug，提交信息的摘要行应该以 `修复` 或含义类似的词语开头，表示修复
+4. 修复之前的提交（已经合并）中存在的 bug，提交信息的摘要行应该以 `修复` 或含义类似的词语开头，表示修复
    了它。如果你修复的是 issues 列表中未解决的问题，需在摘要行中加上 issues 列表中对应问题的编号。
 5. 衍合你的分支至源项目的 master 分支。我们不希望落拉取到冗余的合并请求。
 6. **要清楚什么许可证适用于你的补丁：** 该代码库中的文件基于GPLv2（或更高版本），但（原
@@ -116,17 +104,21 @@ windows系统上构建本项目方法，有两种：
    以后不会进入任何非自由的衍生工具，因此，如果补丁发布于公共领域，会为我们带来方便（以及
    避免任何法律问题）。
 
+**你可以通过捐赠来支持 LCUI 的开发**
 
-### GitHub流程
+作者目前是一名独立开发者，你的贡献是非常有帮助的，如果你想通过捐赠来让作者能够花更多的时间来改进该项目，
+可以访问作者在 [Patreon](https://www.patreon.com/lcsoft) 上设立的页面。
+
+### GitHub 流程
 
 开发补丁应遵循以下流程：
 
 #### 初始设置
 
-1. 在GitHub上进行Fork (点击 Fork 按钮)
-2. Clone到计算机： `git clone git@github.com:你的用户名/LCUI.git`
+1. 在 GitHub 上进行Fork (点击 Fork 按钮)
+2. Clone 到计算机： `git clone git@github.com:你的用户名/LCUI.git`
 3. cd 到代码库中： `cd LCUI`
-4. 设置远程仓库记录，假设该记录名为upstream，那么命令为： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
+4. 设置远程仓库记录，假设该记录名为 upstream，那么命令为： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
 
 #### 添加Feature
 
