@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_UTIL_H__
-#define __LCUI_UTIL_H__
+#ifndef LCUI_UTIL_H
+#define LCUI_UTIL_H
 #include <LCUI/util/time.h>
 #include <LCUI/util/dirent.h>
 #include <LCUI/util/rbtree.h>
@@ -49,4 +49,5 @@
 #include <LCUI/util/string.h>
 #include <LCUI/util/parse.h>
 #include <LCUI/util/event.h>
+#include <LCUI/util/memdebug.h>
 #endif
