@@ -300,12 +300,12 @@ void Selector_Delete( LCUI_Selector s )
 LCUI_StyleSheet StyleSheet( void )
 {
 	LCUI_StyleSheet ss;
-	ss = malloc( sizeof( LCUI_StyleSheetRec ) );
+	ss = NEW( LCUI_StyleSheetRec, 1 );
 	if( !ss ) {
 		return ss;
 	}
 	ss->length = LCUICSS_GetStyleTotal();
-	ss->sheet = NEW(LCUI_StyleRec, ss->length + 1);
+	ss->sheet = NEW( LCUI_StyleRec, ss->length + 1 );
 	return ss;
 }
 
@@ -655,11 +655,11 @@ static int SelectorNode_Update( LCUI_SelectorNode node )
 
 	node->rank = 0;
 	if( node->id ) {
-		len += strlen( node->id ) + 2;
+		len += strlen( node->id ) + 1;
 		node->rank += ID_RANK;
 	}
 	if( node->type ) {
-		len += strlen( node->type ) + 2;
+		len += strlen( node->type ) + 1;
 		node->rank += TYPE_RANK;
 	}
 	if( node->classes ) {
@@ -667,17 +667,15 @@ static int SelectorNode_Update( LCUI_SelectorNode node )
 			len += strlen( node->classes[i] ) + 1;
 			node->rank += CLASS_RANK;
 		}
-		len += 1;
 	}
 	if( node->status ) {
 		for( i = 0; node->status[i]; ++i ) {
 			len += strlen( node->status[i] ) + 1;
 			node->rank += PCLASS_RANK;
 		}
-		len += 1;
 	}
 	if( len > 0 ) {
-		fullname = malloc( sizeof( char ) * len );
+		fullname = malloc( sizeof( char ) * (len + 1) );
 		if( !fullname ) {
 			return -ENOMEM;
 		}

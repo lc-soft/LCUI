@@ -307,7 +307,6 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->trigger = EventTrigger();
 	widget->style = StyleSheet();
 	widget->custom_style = StyleSheet();
-	widget->cached_style = StyleSheet();
 	widget->inherited_style = StyleSheet();
 	widget->computed_style.opacity = 1.0;
 	widget->computed_style.visible = TRUE;
@@ -380,7 +379,6 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
 	LinkedList_Clear( &widget->dirty_rects, free );
 	StyleSheet_Delete( widget->inherited_style );
-	StyleSheet_Delete( widget->cached_style );
 	StyleSheet_Delete( widget->custom_style );
 	StyleSheet_Delete( widget->style );
 	Widget_PostSurfaceEvent( widget, WET_REMOVE );
@@ -1145,6 +1143,7 @@ static void Widget_ComputeSize( LCUI_Widget w )
 
 static void Widget_SendResizeEvent( LCUI_Widget w )
 {
+	LCUI_Style s;
 	LCUI_Widget child;
 	LCUI_WidgetEventRec e;
 	LinkedListNode *node;
@@ -1157,14 +1156,19 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 	Widget_PostSurfaceEvent( w, WET_RESIZE );
 	for( LinkedList_Each( node, &w->children ) ) {
 		child = node->data;
-		if( child->style->sheet[key_width].type == SVT_SCALE || 
-		    child->style->sheet[key_height].type == SVT_SCALE ) {
+		s = child->style->sheet;
+		if( s[key_width].type == SVT_SCALE || 
+		    s[key_height].type == SVT_SCALE ) {
 			Widget_AddTask( child, WTT_RESIZE );
 		}
-		if( child->computed_style.position == SV_ABSOLUTE &&
-		    (child->style->sheet[key_right].is_valid ||
-		      child->style->sheet[key_bottom].is_valid) ) {
-			Widget_AddTask( child, WTT_POSITION );
+		if( child->computed_style.position == SV_ABSOLUTE ) {
+			if( s[key_right].is_valid || s[key_bottom].is_valid ) {
+				Widget_AddTask( child, WTT_POSITION );
+			}
+			else if( s[key_margin_left].is_valid && 
+				 s[key_margin_left].value == SV_AUTO ) {
+				Widget_AddTask( child, WTT_POSITION );
+			}
 		}
 		if( child->computed_style.vertical_align != SV_TOP ) {
 			Widget_AddTask( child, WTT_POSITION );

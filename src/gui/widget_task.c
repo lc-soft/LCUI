@@ -58,19 +58,11 @@ static void HandleRefreshStyle( LCUI_Widget w )
 {
 	Widget_ExecUpdateStyle( w, TRUE );
 	w->task.buffer[WTT_UPDATE_STYLE] = FALSE;
-	w->task.buffer[WTT_CACHE_STYLE] = TRUE;
 }
 
 static void HandleUpdateStyle( LCUI_Widget w )
 {
 	Widget_ExecUpdateStyle( w, FALSE );
-	w->task.buffer[WTT_CACHE_STYLE] = TRUE;
-}
-
-static void HandleCacheStyle( LCUI_Widget w )
-{
-	StyleSheet_Clear( w->cached_style );
-	StyleSheet_Replace( w->cached_style, w->style );
 }
 
 static void HandleSetTitle( LCUI_Widget w )
@@ -144,7 +136,6 @@ static void MapTaskHandler(void)
 	self.handlers[WTT_REFRESH] = HandleRefresh;
 	self.handlers[WTT_UPDATE_STYLE] = HandleUpdateStyle;
 	self.handlers[WTT_REFRESH_STYLE] = HandleRefreshStyle;
-	self.handlers[WTT_CACHE_STYLE] = HandleCacheStyle;
 	self.handlers[WTT_BACKGROUND] = Widget_UpdateBackground;
 	self.handlers[WTT_LAYOUT] = Widget_ExecUpdateLayout;
 	self.handlers[WTT_ZINDEX] = Widget_ExecUpdateZIndex;
@@ -182,78 +173,76 @@ int Widget_UpdateEx( LCUI_Widget w, LCUI_BOOL has_timeout )
 {
 	int i;
 	LCUI_BOOL *buffer;
-	LCUI_Widget child;
 	LinkedListNode *node, *next;
 
-	/* 如果该部件有任务需要处理 */
-	if( w->task.for_self ) {
-		if( LCUIMutex_TryLock( &w->mutex ) != 0 ) {
-			goto skip_proc_self_task;
-		}
-		w->task.for_self = FALSE;
-		buffer = w->task.buffer;
-		/* 如果有用户自定义任务 */
-		if( buffer[WTT_USER] ) {
-			LCUI_WidgetClass *wc;
-			wc = LCUIWidget_GetClass( w->type );
-			wc ? wc->task_handler( w ) : FALSE;
-		}
-		for( i = 0; i < WTT_USER; ++i ) {
-			if( buffer[i] ) {
-				buffer[i] = FALSE;
-				if( self.handlers[i] ) {
-					self.handlers[i]( w );
-				}
-			} else {
-				buffer[i] = FALSE;
-			}
-		}
-		LCUIMutex_Unlock( &w->mutex );
-		/* 如果部件还处于未准备完毕的状态 */
-		if( w->state < WSTATE_READY ) {
-			w->state |= WSTATE_UPDATED;
-			/* 如果部件已经准备完毕则触发 ready 事件 */
-			if( w->state == WSTATE_READY ) {
-				LCUI_WidgetEventRec e;
-				e.type = WET_READY;
-				e.cancel_bubble = TRUE;
-				Widget_TriggerEvent( w, &e, NULL );
-				w->state = WSTATE_NORMAL;
-			}
-		}
-		self.count += 1;
+	/* 如果该部件没有任务需要处理、或者被其它线程占用 */
+	if( !w->task.for_self || LCUIMutex_TryLock( &w->mutex ) != 0 ) {
+		goto proc_children_task;
 	}
-
-skip_proc_self_task:;
-
-	/* 如果子级部件中有待处理的部件，则递归进去 */
-	if( w->task.for_children ) {
-		w->task.for_children = FALSE;
-		node = w->children.head.next;
-		while( node ) {
-			child = node->data;
-			/* 如果当前部件有销毁任务，结点空间会连同部件一起被
-			 * 释放，为避免因访问非法空间而出现异常，预先保存下
-			 * 个结点。
-			 */
-			next = node->next;
-			/* 如果该级部件的任务需要留到下次再处理 */
-			if(  Widget_UpdateEx( child, has_timeout ) ) {
-				w->task.for_children = TRUE;
+	w->task.for_self = FALSE;
+	buffer = w->task.buffer;
+	/* 如果有用户自定义任务 */
+	if( buffer[WTT_USER] ) {
+		LCUI_WidgetClass *wc;
+		wc = LCUIWidget_GetClass( w->type );
+		wc ? wc->task_handler( w ) : FALSE;
+	}
+	for( i = 0; i < WTT_USER; ++i ) {
+		if( buffer[i] ) {
+			buffer[i] = FALSE;
+			if( self.handlers[i] ) {
+				self.handlers[i]( w );
 			}
-			if( has_timeout ) {
-				if( !self.is_timeout && self.count >= 50 ) {
-					self.count = 0;
-					if( LCUI_GetTime() >= self.timeout ) {
-						self.is_timeout = TRUE;
-					}
-				}
-				if( self.is_timeout ) {
-					break;
-				}
-			}
-			node = next;
+		} else {
+			buffer[i] = FALSE;
 		}
+	}
+	LCUIMutex_Unlock( &w->mutex );
+	/* 如果部件还处于未准备完毕的状态 */
+	if( w->state < WSTATE_READY ) {
+		w->state |= WSTATE_UPDATED;
+		/* 如果部件已经准备完毕则触发 ready 事件 */
+		if( w->state == WSTATE_READY ) {
+			LCUI_WidgetEventRec e;
+			e.type = WET_READY;
+			e.cancel_bubble = TRUE;
+			Widget_TriggerEvent( w, &e, NULL );
+			w->state = WSTATE_NORMAL;
+		}
+	}
+	self.count += 1;
+
+proc_children_task:
+
+	if( !w->task.for_children ) {
+		return w->task.for_self;
+	}
+	/* 如果子级部件中有待处理的部件，则递归进去 */
+	w->task.for_children = FALSE;
+	node = w->children.head.next;
+	while( node ) {
+		LCUI_Widget child = node->data;
+		/* 如果当前部件有销毁任务，结点空间会连同部件一起被
+		 * 释放，为避免因访问非法空间而出现异常，预先保存下
+		 * 个结点。
+		 */
+		next = node->next;
+		/* 如果该级部件的任务需要留到下次再处理 */
+		if(  Widget_UpdateEx( child, has_timeout ) ) {
+			w->task.for_children = TRUE;
+		}
+		if( has_timeout ) {
+			if( !self.is_timeout && self.count >= 50 ) {
+				self.count = 0;
+				if( LCUI_GetTime() >= self.timeout ) {
+					self.is_timeout = TRUE;
+				}
+			}
+			if( self.is_timeout ) {
+				break;
+			}
+		}
+		node = next;
 	}
 	return w->task.for_self || w->task.for_children;
 }

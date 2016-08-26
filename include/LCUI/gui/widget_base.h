@@ -194,7 +194,6 @@ enum WidgetTaskType {
 	WTT_OPACITY,
 	WTT_BODY,
 	WTT_REFRESH,
-	WTT_CACHE_STYLE,	/**< 缓存当前样式 */
 	WTT_USER,
 	WTT_TOTAL_NUM
 };
@@ -241,9 +240,8 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_Rect2		margin;			/**< 外边距框 */
 	LCUI_WidgetBoxRect	box;			/**< 部件的各个区域信息 */
 	LCUI_StyleSheet		style;			/**< 当前完整样式表 */
-	LCUI_StyleSheet		cached_style;		/**< 已缓存的完整样式表 */
-	LCUI_StyleSheet		inherited_style;	/**< 通过继承得到的样式表 */
 	LCUI_StyleSheet		custom_style;		/**< 自定义样式表 */
+	LCUI_StyleSheet		inherited_style;	/**< 通过继承得到的样式表 */
 	LCUI_WidgetStyle	computed_style;		/**< 已经计算的样式数据 */
 	LCUI_Widget		parent;			/**< 父部件 */
 	LinkedList		children;		/**< 子部件 */

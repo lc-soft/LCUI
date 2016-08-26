@@ -231,9 +231,9 @@ typedef enum LCUI_StyleValue {
 } LCUI_StyleValue;
 
 typedef struct LCUI_StyleRec_ {
-	LCUI_BOOL is_valid:1;
-	LCUI_BOOL is_changed:1;
-	LCUI_StyleType type:30;
+	LCUI_BOOL is_valid:2;
+	LCUI_BOOL is_changed:2;
+	unsigned short int type;
 	union {
 		int value;
 		int val_int;
