@@ -56,7 +56,8 @@ enum TaskType {
 
 typedef struct LCUI_TextView_ {
 	LCUI_TextStyle style;
-	LCUI_TextLayer layer;	/**< 文本图层 */
+	LCUI_BOOL has_content;		/**< 是否有设置 content 属性 */
+	LCUI_TextLayer layer;		/**< 文本图层 */
 	struct {
 		LCUI_BOOL is_valid;
 		union {
@@ -67,11 +68,6 @@ typedef struct LCUI_TextView_ {
 	} tasks[TASK_TOTAL];
 } LCUI_TextView;
 
-static const char *textview_css = ToString(
-textview{
-	white-space: normal;
-}
-);
 /*---------------------------- Private -------------------------------*/
 
 enum FontStyleKey {
@@ -251,42 +247,72 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 			continue;
 		}
 		s = &w->style->sheet[style_key_map[i]];
-		if( !s->is_valid ) {
-			continue;
-		}
 		switch( i ) {
 		case key_color:
-			txt->style.fore_color = s->color;
-			txt->style.has_fore_color = TRUE;
+			if( s->is_valid ) {
+				txt->style.fore_color = s->color;
+				txt->style.has_fore_color = TRUE;
+			} else {
+				txt->style.has_fore_color = FALSE;
+			}
 			break;
 		case key_font_family:
-			TextStyle_SetFont( &txt->style, s->string );
+			if( s->is_valid ) {
+				TextStyle_SetFont( &txt->style, s->string );
+			} else {
+				TextStyle_SetFont( &txt->style, NULL );
+			}
 			break;
 		case key_font_size:
-			if( s->type == SVT_PX ) {
-				txt->style.pixel_size = s->px;
-			} else if( s->type == SVT_PT ) {
-				// ...
+			txt->style.pixel_size = 14;
+			if( s->is_valid ) {
+				if( s->type == SVT_PX ) {
+					txt->style.pixel_size = s->px;
+				}
 			}
 			txt->style.has_pixel_size = TRUE;
 			break;
 		case key_font_style:
-			txt->style.style = s->value;
-			txt->style.has_style = TRUE;
+			txt->style.has_style = FALSE;
+			if( s->is_valid ) {
+				txt->style.style = s->value;
+				txt->style.has_style = TRUE;
+			}
 			break;
 		case key_font_weight:
 			break;
 		case key_text_align:
-			TextLayer_SetTextAlign( txt->layer, s->style );
+			if( s->is_valid ) {
+				TextLayer_SetTextAlign( txt->layer, s->style );
+			} else {
+				TextLayer_SetTextAlign( txt->layer, SV_LEFT );
+			}
 			break;
 		case key_line_height:
-			TextLayer_SetLineHeight( txt->layer, s );
+			if( s->is_valid ) {
+				TextLayer_SetLineHeight( txt->layer, s );
+			} else {
+				LCUI_StyleRec style;
+				style.val_scale = 1.5;
+				style.type = SVT_SCALE;
+				style.is_valid = TRUE;
+				TextLayer_SetLineHeight( txt->layer, &style );
+			}
 			break;
 		case key_content:
-			TextView_SetTextW( w, s->wstring );
+			if( s->is_valid ) {
+				txt->has_content = TRUE;
+				TextView_SetTextW( w, s->wstring );
+			} else {
+				if( txt->has_content ) {
+					txt->has_content = FALSE;
+					TextView_SetTextW( w, NULL );
+				}
+			}
 			break;
 		case key_white_space:
-			if( s->type != SVT_STYLE ) {
+			if( !s->is_valid || s->type != SVT_STYLE ) {
+				TextLayer_SetAutoWrap( txt->layer, FALSE );
 				break;
 			}
 			if( s->style == SV_NOWRAP ) {
@@ -345,6 +371,7 @@ static void TextView_OnInit( LCUI_Widget w )
 	for( i = 0; i < TASK_TOTAL; ++i ) {
 		txt->tasks[i].is_valid = FALSE;
 	}
+	txt->has_content = FALSE;
 	/* 初始化文本图层 */
 	txt->layer = TextLayer_New();
 	/* 启用多行文本显示 */
@@ -544,5 +571,4 @@ void LCUIWidget_AddTextView( void )
 		style_key_map[style_parsers[i].key] =
 		LCUICSS_AddParser( &style_parsers[i] );
 	}
-	LCUICSS_LoadString( textview_css, NULL );
 }

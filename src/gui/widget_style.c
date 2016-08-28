@@ -1397,6 +1397,7 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
 	int i, key;
 	LCUI_Style s;
+	LCUI_StyleSheet ss;
 	LCUI_WidgetClass *wc;
 	LCUI_BOOL need_update_expend_style = FALSE;
 	typedef struct {
@@ -1420,16 +1421,18 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 	if( is_update_all ) {
 		Widget_GetInheritStyle( w, w->inherited_style );
 	}
-	StyleSheet_Clear( w->style );
+	ss = w->style;
+	w->style = StyleSheet();
 	StyleSheet_Merge( w->style, w->custom_style );
 	StyleSheet_Merge( w->style, w->inherited_style );
 	/* 对比两张样式表，确定哪些需要更新 */
 	for( key = 0; key < w->style->length; ++key ) {
 		s = &w->style->sheet[key];
-		if( !s->is_changed ) {
+		if( ss->sheet[key].is_valid == s->is_valid &&
+		    ss->sheet[key].type == s->type &&
+		    ss->sheet[key].value == s->value ) {
 			continue;
 		}
-		s->is_changed = FALSE;
 		if( key >= STYLE_KEY_TOTAL ) {
 			need_update_expend_style = TRUE;
 			break;
@@ -1449,6 +1452,7 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 		wc = LCUIWidget_GetClass( w->type );
 		wc && wc->methods.update ? wc->methods.update( w ) : 0;
 	}
+	StyleSheet_Delete( ss );
 }
 
 void LCUIWidget_ExitStyle( void )
