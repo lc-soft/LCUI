@@ -181,5 +181,5 @@ void LCUIWidget_AddSideBar(void)
 	wc->methods.destroy = SideBarItem_OnDestroy;
 	wc = LCUIWidget_AddClass("sidebar-toggle");
 	wc->methods.init = SideBarToggle_OnInit;
-	LCUICSS_LoadString( sidebar_css, NULL );
+	LCUI_LoadCSSString( sidebar_css, NULL );
 }

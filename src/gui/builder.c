@@ -118,13 +118,13 @@ static int ParseResource( XMLParserContext ctx, xmlNodePtr node )
 	}
 	else if( strstr(type, "text/css") ) {
 		if( src ) {
-			LCUICSS_LoadFile( src );
+			LCUI_LoadCSSFile( src );
 		}
 		for( node = node->children; node; node = node->next ) {
 			if( node->type != XML_TEXT_NODE ) {
 				continue;
 			}
-			LCUICSS_LoadString( (char*)node->content, ctx->space );
+			LCUI_LoadCSSString( (char*)node->content, ctx->space );
 		}
 	}
 	return PB_NEXT;

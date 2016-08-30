@@ -227,7 +227,7 @@ static void LCUIWidget_AddTextCaret( void )
 	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "textcaret" );
 	wc->methods.init = TextCaret_OnInit;
 	wc->methods.destroy = TextCaret_OnDestroy;
-	LCUICSS_LoadString( textcaret_css, NULL );
+	LCUI_LoadCSSString( textcaret_css, NULL );
 }
 
 /*-------------------------------- End Caret --------------------------------*/
@@ -922,7 +922,7 @@ void LCUIWidget_AddTextEdit( void )
 	wc->methods.set_attr = TextEdit_SetAttr;
 	wc->methods.autosize = TextEdit_AutoSize;
 	wc->task_handler = TextEdit_OnTask;
-	LCUICSS_LoadString( textedit_css, NULL );
+	LCUI_LoadCSSString( textedit_css, NULL );
 	LCUIWidget_AddTextCaret();
 	textedit_event_id = LCUIWidget_AllocEventId();
 	LCUIWidget_SetEventName( textedit_event_id, "change" );

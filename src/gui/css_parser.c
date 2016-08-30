@@ -36,13 +36,21 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
-//#define DEBUG
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
+#include <LCUI/thread.h>
+#include <LCUI/gui/css_library.h>
+#include <LCUI/gui/css_parser.h>
+
+#define SPLIT_NUMBER	1
+#define SPLIT_COLOR	(1<<1)
+#define SPLIT_STYLE	(1<<2)
+
+#define LEN(A) sizeof( A ) / sizeof( *A )
 
 /** 解析器的环境参数（上下文数据） */
 typedef struct CSSParserContextRec_ {
@@ -64,48 +72,11 @@ typedef struct CSSParserContextRec_ {
 	char *space;			/**< 样式记录所属的空间 */
 } CSSParserContextRec, *CSSParserContext;
 
-/** 样式字符串值与标识码 */
-typedef struct KeyNameGroup {
-	int key;
-	char *name;
-} KeyNameGroup;
-
 static struct CSSParserModule {
-	LCUI_RBTree parser_tree;	/**< 解析器树，以名称进行索引 */
-	LCUI_RBTree option_name_tree;	/**< 样式属性值名称树，以值进行索引 */
-	LCUI_RBTree option_tree;	/**< 样式属性值树，以值的名称进行索引 */
-	LCUI_RBTree name_tree;		/**< 样式属性名称树，以属性名称进行索引 */
-	int count;			/**< 当前记录的属性数量 */
+	int count;
+	DictType dicttype;	/**< 解析器表的字典类型数据 */
+	Dict *parsers;		/**< 解析器表，以名称进行索引 */
 } self;
-
-#define SPLIT_NUMBER	1
-#define SPLIT_COLOR	(1<<1)
-#define SPLIT_STYLE	(1<<2)
-
-int GetStyleOption( const char *str )
-{
-	LCUI_RBTreeNode *node;
-	node = RBTree_CustomSearch( &self.option_tree, str );
-	if( !node ) {
-		return -1;
-	}
-	return ((KeyNameGroup*)(node->data))->key;
-}
-
-const char *GetStyleOptionName( int val )
-{
-	LCUI_RBTreeNode *node;
-	node = RBTree_Search( &self.option_name_tree, val );
-	if( !node ) {
-		return NULL;
-	}
-	return ((KeyNameGroup*)(node->data))->name;
-}
-
-const char *GetStyleName( int key )
-{
-	return RBTree_GetData( &self.name_tree, key );
-}
 
 static int SplitValues( const char *str, LCUI_Style slist,
 			int max_len, int mode )
@@ -155,7 +126,7 @@ static int SplitValues( const char *str, LCUI_Style slist,
 			}
 		}
 		if( mode & SPLIT_STYLE ) {
-			val = GetStyleOption( values[vj] );
+			val = LCUI_GetStyleValue( values[vj] );
 			if( val > 0 )  {
 				slist[vj].style = val;
 				slist[vj].type = SVT_style;
@@ -234,7 +205,10 @@ static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 	}
 	if( strcmp("transparent", str) == 0 ) {
 		s->is_valid = TRUE;
-		s->color = ARGB(0,255,255,255);
+		s->color.alpha = 0;
+		s->color.red = 255;
+		s->color.green = 255;
+		s->color.blue = 255;
 		s->type = SVT_COLOR;
 		return 0;
 	}
@@ -274,7 +248,7 @@ static int OnParseImage( LCUI_StyleSheet ss, int key, const char *str )
 static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style s = &ss->sheet[key];
-	int v = GetStyleOption( str );
+	int v = LCUI_GetStyleValue( str );
 	if( v < 0 ) {
 		return -1;
 	}
@@ -542,99 +516,6 @@ static int OnParseBackgroundSize( LCUI_StyleSheet ss, int key, const char *str )
 	return 0;
 }
 
-static KeyNameGroup style_name_map[] = {
-	{ key_visible, "visible"},
-	{ key_width, "width" },
-	{ key_height, "height" },
-	{ key_min_width, "min-width" },
-	{ key_min_height, "min-height" },
-	{ key_max_width, "max-width" },
-	{ key_max_height, "max-height" },
-	{ key_display, "display" },
-	{ key_z_index, "z-index" },
-	{ key_top, "top" },
-	{ key_right, "right" },
-	{ key_left, "left" },
-	{ key_bottom, "bottom" },
-	{ key_position, "position" },
-	{ key_vertical_align, "vertical-align" },
-	{ key_background_color, "background-color" },
-	{ key_background_position, "background-position" },
-	{ key_background_size, "background-size" },
-	{ key_background_image, "background-image" },
-	{ key_border_color, "border-color" },
-	{ key_border_width, "border-width" },
-	{ key_border_style, "border-style" },
-	{ key_padding_left, "padding-left" },
-	{ key_padding_right, "padding-right" },
-	{ key_padding_top, "padding-top" },
-	{ key_padding_bottom, "padding-bottom" },
-	{ key_margin_left, "margin-left" },
-	{ key_margin_right, "margin-right" },
-	{ key_margin_top, "margin-top" },
-	{ key_margin_bottom, "margin-bottom" },
-	{ key_border_top_color, "border-top-color" },
-	{ key_border_right_color, "border-right-color" },
-	{ key_border_bottom_color, "border-bottom-color" },
-	{ key_border_left_color, "border-left-color" },
-	{ key_border_top_width, "border-top-width" },
-	{ key_border_right_width, "border-right-width" },
-	{ key_border_bottom_width, "border-bottom-width" },
-	{ key_border_left_width, "border-left-width" },
-	{ key_border_top_width, "border-top-width" },
-	{ key_border_right_width, "border-right-width" },
-	{ key_border_bottom_width, "border-bottom-width" },
-	{ key_border_left_width, "border-left-width" },
-	{ key_border_top_style, "border-top-style" },
-	{ key_border_right_style, "border-right-style" },
-	{ key_border_bottom_style, "border-bottom-style" },
-	{ key_border_left_style, "border-left-style" },
-	{ key_box_shadow_x, "box-shadow-x" },
-	{ key_box_shadow_y, "box-shadow-y" },
-	{ key_box_shadow_blur, "box-shadow-blur" },
-	{ key_box_shadow_spread, "box-shadow-spread" },
-	{ key_box_shadow_color, "box-shadow-color" },
-	{ key_pointer_events, "pointer-events" },
-	{ key_focusable, "focusable" },
-	{ key_box_sizing, "box-sizing" }
-};
-
-/** 样式字符串与标识码的映射表 */
-static KeyNameGroup style_option_map[] = {
-	{ SV_NONE, "none" },
-	{ SV_AUTO, "auto" },
-	{ SV_CONTAIN, "contain" },
-	{ SV_COVER, "cover" },
-	{ SV_LEFT, "left" },
-	{ SV_CENTER, "center" },
-	{ SV_RIGHT, "right" },
-	{ SV_TOP, "top" },
-	{ SV_TOP_LEFT, "top left" },
-	{ SV_TOP_CENTER, "top center" },
-	{ SV_TOP_RIGHT, "top right" },
-	{ SV_MIDDLE, "middle" },
-	{ SV_CENTER_LEFT, "center left" },
-	{ SV_CENTER_CENTER, "center center" },
-	{ SV_CENTER_RIGHT, "center right" },
-	{ SV_BOTTOM, "bottom" },
-	{ SV_BOTTOM_LEFT, "bottom left" },
-	{ SV_BOTTOM_CENTER, "bottom center" },
-	{ SV_BOTTOM_RIGHT, "bottom right" },
-	{ SV_SOLID, "solid" },
-	{ SV_DOTTED, "dotted" },
-	{ SV_DOUBLE, "double" },
-	{ SV_DASHED, "dashed" },
-	{ SV_CONTENT_BOX, "content-box" },
-	{ SV_PADDING_BOX, "padding-box" },
-	{ SV_BORDER_BOX, "border-box" },
-	{ SV_GRAPH_BOX, "graph-box" },
-	{ SV_STATIC, "static" },
-	{ SV_RELATIVE, "relative" },
-	{ SV_ABSOLUTE, "absolute" },
-	{ SV_BLOCK, "block" },
-	{ SV_INLINE_BLOCK, "inline-block" },
-	{ SV_NOWRAP, "nowrap" }
-};
 
 /** 各个样式的解析器映射表 */
 static LCUI_StyleParserRec style_parser_map[] = {
@@ -699,11 +580,6 @@ static int CompareParserName( void *data, const void *keydata )
 	return strcmp(((LCUI_StyleParser)data)->name, (const char*)keydata);
 }
 
-static int CompareName( void *data, const void *keydata )
-{
-	return strcmp(((KeyNameGroup*)data)->name, (const char*)keydata);
-}
-
 static CSSParserContext NewCSSParserContext( size_t buffer_size, 
 					     const char *space )
 {
@@ -727,7 +603,7 @@ static void DeleteCSSParserContext( CSSParserContext *ctx_ptr )
 }
 
 /** 载入CSS代码块，用于实现CSS代码的分块载入 */
-static int LCUICSS_LoadBlock( CSSParserContext ctx, const char *str )
+static int LCUI_LoadCSSBlock( CSSParserContext ctx, const char *str )
 {
 	size_t size = 0;
 	LCUI_Selector s;
@@ -844,7 +720,7 @@ put_css:
 		DEBUG_MSG("put css\n");
 		/* 将记录的样式表添加至匹配到的选择器中 */
 		for( LinkedList_Each( node, &ctx->selectors ) ) {
-			LCUI_PutStyle( node->data, ctx->css, ctx->space );
+			LCUI_PutStyleSheet( node->data, ctx->css, ctx->space );
 		}
 		LinkedList_Clear( &ctx->selectors, (FuncPtr)Selector_Delete );
 		StyleSheet_Delete( ctx->css );
@@ -853,8 +729,7 @@ select_parser:
 		ctx->target = TARGET_VALUE;
 		ctx->buffer[ctx->pos] = 0;
 		ctx->pos = 0;
-		ctx->parser = RBTree_CustomGetData( &self.parser_tree,
-						    ctx->buffer );
+		ctx->parser = Dict_FetchValue( self.parsers, ctx->buffer );
 		DEBUG_MSG("select style: %s, parser: %p\n",
 			   ctx->buffer, ctx->parser);
 		continue;
@@ -878,7 +753,7 @@ parse_value:
 }
 
 /** 从文件中载入CSS样式数据，并导入至样式库中 */
-int LCUICSS_LoadFile( const char *filepath )
+int LCUI_LoadCSSFile( const char *filepath )
 {
 	int n;
 	FILE *fp;
@@ -893,7 +768,7 @@ int LCUICSS_LoadFile( const char *filepath )
 	n = fread( buff, 1, 511, fp );
 	while( n > 0 ) {
 		buff[n] = 0;
-		LCUICSS_LoadBlock( ctx, buff );
+		LCUI_LoadCSSBlock( ctx, buff );
 		n = fread( buff, 1, 511, fp );
 	}
 	DeleteCSSParserContext( &ctx );
@@ -901,7 +776,7 @@ int LCUICSS_LoadFile( const char *filepath )
 	return 0;
 }
 
-int LCUICSS_LoadString( const char *str, const char *space )
+int LCUI_LoadCSSString( const char *str, const char *space )
 {
 	int len = 1;
 	const char *cur;
@@ -909,71 +784,55 @@ int LCUICSS_LoadString( const char *str, const char *space )
 	DEBUG_MSG("parse begin\n");
 	ctx = NewCSSParserContext( 512, space );
 	for( cur = str; len > 0; cur += len ) {
-		len = LCUICSS_LoadBlock( ctx, cur );
+		len = LCUI_LoadCSSBlock( ctx, cur );
 	}
 	DeleteCSSParserContext( &ctx );
 	DEBUG_MSG("parse end\n");
 	return 0;
 }
 
-int LCUICSS_GetStyleTotal(void)
-{
-	return self.count;
-}
-
-int LCUICSS_AddParser( LCUI_StyleParser sp )
+int LCUI_AddCSSParser( LCUI_StyleParser sp )
 {
 	int key;
 	LCUI_StyleParser new_sp;
-	if( !sp->name || strlen(sp->name) < 1 ) {
+	if( !sp->name || strlen( sp->name ) < 1 ) {
 		return -1;
 	}
-	if( RBTree_CustomSearch(&self.name_tree, sp->name) ) {
+	if( Dict_FetchValue( self.parsers, sp->name ) ) {
 		return -2;
 	}
 	key = self.count++;
-	new_sp = NEW(LCUI_StyleParserRec, 1);
+	new_sp = NEW( LCUI_StyleParserRec, 1 );
 	new_sp->key = sp->key;
 	new_sp->parse = sp->parse;
 	new_sp->name = strdup( sp->name );
-	RBTree_Insert( &self.name_tree, key, new_sp->name );
-	RBTree_CustomInsert( &self.parser_tree, new_sp->name, new_sp );
+	Dict_Add( self.parsers, new_sp->name, new_sp );
 	return key;
 }
 
-static void OnDestroyStyleParser( void *arg )
+static void DestroyStyleParser( void *privdata, void *val )
 {
-	LCUI_StyleParser sp = arg;
+	LCUI_StyleParser sp = val;
 	free( sp->name );
 	free( sp );
 }
 
 /** 初始化 LCUI 的 CSS 代码解析功能 */
-void LCUICSS_Init( void )
+void LCUI_InitCSSParser( void )
 {
-	KeyNameGroup *skn, *skn_end;
 	LCUI_StyleParser new_sp, sp, sp_end;
-	/* 构建一个红黑树，方便按名称查找解析器 */
-	RBTree_Init( &self.name_tree );
-	RBTree_Init( &self.parser_tree );
-	RBTree_Init( &self.option_tree );
-	RBTree_Init( &self.option_name_tree );
-	RBTree_OnDestroy( &self.parser_tree, OnDestroyStyleParser );
-	RBTree_OnCompare( &self.parser_tree, CompareParserName );
-	RBTree_OnCompare( &self.option_tree, CompareName );
-	skn = style_name_map;
-	skn_end = skn + sizeof( style_name_map ) / sizeof( KeyNameGroup );
-	for( ; skn < skn_end; ++skn ) {
-		RBTree_Insert( &self.name_tree, skn->key, skn->name );
-	}
-	sp_end = sp = style_parser_map;
-	sp_end += sizeof( style_parser_map ) / sizeof( LCUI_StyleParserRec );
-	for( ; sp < sp_end; ++sp ) {
+
+	self.count = 0;
+	self.dicttype = DictType_StringKey;
+	self.dicttype.valDestructor = DestroyStyleParser;
+	self.parsers = Dict_Create( &self.dicttype, NULL );
+	sp_end = style_parser_map + LEN( style_parser_map );
+	for( sp = style_parser_map; sp < sp_end; ++sp ) {
 		new_sp = malloc( sizeof( LCUI_StyleParserRec ) );
 		new_sp->key = sp->key;
 		new_sp->parse = sp->parse;
 		if( !sp->name && sp->key >= 0 ) {
-			const char *name = GetStyleName( sp->key );
+			const char *name = LCUI_GetStyleName( sp->key );
 			if( !name ) {
 				free( new_sp );
 				continue;
@@ -982,18 +841,11 @@ void LCUICSS_Init( void )
 		} else {
 			new_sp->name = strdup( sp->name );
 		}
-		RBTree_CustomInsert( &self.parser_tree, new_sp->name, new_sp );
+		Dict_Add( self.parsers, new_sp->name, new_sp );
 	}
-	skn = style_option_map;
-	skn_end = skn + sizeof( style_option_map ) / sizeof( KeyNameGroup );
-	for( ; skn < skn_end; ++skn ) {
-		RBTree_CustomInsert( &self.option_tree, skn->name, skn );
-		RBTree_Insert( &self.option_name_tree, skn->key, skn );
-	}
-	self.count = STYLE_KEY_TOTAL;
 }
 
-void LCUICSS_Destroy( void )
+void LCUI_ExitCSSParser( void )
 {
-
+	Dict_Release( self.parsers );
 }

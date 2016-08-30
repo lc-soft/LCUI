@@ -690,6 +690,26 @@ static void StringCopyKeyDict_KeyDestructor( void *privdata, void *key )
 	free( key );
 }
 
+static unsigned int IntKeyDict_KeyHash( const void *key )
+{
+	unsigned int hash = (unsigned int)key;
+	return Dict_IntHashFunction( hash );
+}
+
+static unsigned int IdentityKeyDict_KeyHash( const void *key )
+{
+	return (unsigned int)key;
+}
+
+DictType DictType_StringKey = {
+	StringCopyKeyDict_KeyHash,
+	NULL,
+	NULL,
+	StringCopyKeyDict_KeyCompare,
+	NULL,
+	NULL
+};
+
 DictType DictType_StringCopyKey = {
 	StringCopyKeyDict_KeyHash,
 	StringCopyKeyDict_KeyDup,
@@ -697,4 +717,14 @@ DictType DictType_StringCopyKey = {
 	StringCopyKeyDict_KeyCompare,
 	StringCopyKeyDict_KeyDestructor,
 	NULL
+};
+
+DictType DictType_IntKey = {
+	IntKeyDict_KeyHash,
+	NULL, NULL, NULL, NULL, NULL
+};
+
+DictType DictType_IdentityKey = {
+	IdentityKeyDict_KeyHash,
+	NULL, NULL, NULL, NULL, NULL
 };

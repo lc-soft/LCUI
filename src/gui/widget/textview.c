@@ -189,7 +189,7 @@ static int OnParseFontWeight( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseTextAlign( LCUI_StyleSheet ss, int key, const char *str )
 {
-	int val = GetStyleOption( str );
+	int val = LCUI_GetStyleValue( str );
 	if( val < 0 ) {
 		return -1;
 	}
@@ -213,7 +213,7 @@ static int OnParseLineHeight( LCUI_StyleSheet ss, int key, const char *str )
 static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style s = &ss->sheet[style_key_map[key]];
-	int v = GetStyleOption( str );
+	int v = LCUI_GetStyleValue( str );
 	if( v < 0 ) {
 		return -1;
 	}
@@ -569,6 +569,6 @@ void LCUIWidget_AddTextView( void )
 	wc->task_handler = TextView_OnTask;
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
 		style_key_map[style_parsers[i].key] =
-		LCUICSS_AddParser( &style_parsers[i] );
+		LCUI_AddCSSParser( &style_parsers[i] );
 	}
 }

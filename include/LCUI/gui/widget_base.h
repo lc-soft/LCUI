@@ -42,10 +42,8 @@
 
 LCUI_BEGIN_HEADER
 
-/** 如果没有包含 widget_build.h 头文件 */
-#ifndef LCUI_WIDGET_BUILD_H
-typedef struct LCUI_WidgetBase* LCUI_Widget;
-#endif
+#include <LCUI/gui/css_library.h>
+#include <LCUI/gui/css_parser.h>
 
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
@@ -66,113 +64,6 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_Border border;		/**< 边框 */
 	int pointer_events;		/**< 事件的处理方式 */
 } LCUI_WidgetStyle;
-
-/** 样式属性名 */
-enum LCUI_StyleKeyName {
-	key_position_start,
-	key_left,
-	key_right,
-	key_top,
-	key_bottom,
-	key_position,
-	key_position_end,
-	key_display_start,
-	key_visible,
-	key_display,
-	key_display_end,
-	key_z_index,
-	key_opacity,
-	key_box_sizing,
-	key_width,
-	key_min_width,
-	key_max_width,
-	key_height,
-	key_min_height,
-	key_max_height,
-	key_margin_top,
-	key_margin_right,
-	key_margin_bottom,
-	key_margin_left,
-	key_padding_top,
-	key_padding_right,
-	key_padding_bottom,
-	key_padding_left,
-	key_vertical_align,
-	key_border_start,
-	key_border_color,
-	key_border_style,
-	key_border_width,
-	key_border_top_width,
-	key_border_top_style,
-	key_border_top_color,
-	key_border_right_width,
-	key_border_right_style,
-	key_border_right_color,
-	key_border_bottom_width,
-	key_border_bottom_style,
-	key_border_bottom_color,
-	key_border_left_width,
-	key_border_left_style,
-	key_border_left_color,
-	key_border_top_left_radius,
-	key_border_top_right_radius,
-	key_border_bottom_left_radius,
-	key_border_bottom_right_radius,
-	key_border_end,
-	key_background_start,
-	key_background_color,
-	key_background_image,
-	key_background_size,
-	key_background_size_width,
-	key_background_size_height,
-	key_background_repeat,
-	key_background_repeat_x,
-	key_background_repeat_y,
-	key_background_position,
-	key_background_position_x,
-	key_background_position_y,
-	key_background_origin,
-	key_background_end,
-	key_box_shadow_start,
-	key_box_shadow_x,
-	key_box_shadow_y,
-	key_box_shadow_spread,
-	key_box_shadow_blur,
-	key_box_shadow_color,
-	key_box_shadow_end,
-	key_pointer_events,
-	key_focusable,
-	STYLE_KEY_TOTAL
-};
-
-typedef struct LCUI_StyleSheetRec_ {
-	LCUI_Style sheet;
-	int length;
-} LCUI_StyleSheetRec, *LCUI_StyleSheet;
-
-/** 选择器结点结构 */
-typedef struct LCUI_SelectorNodeRec_ {
-	char *id;			/**< ID */
-	char *type;			/**< 类型名称 */
-	char **classes;			/**< 样式类列表 */
-	char **status;			/**< 状态列表 */
-	char *fullname;			/**< 全名，由 id、type、classes、status 组合而成 */
-	int rank;			/**< 权值 */
-} LCUI_SelectorNodeRec, *LCUI_SelectorNode;
-
-/** 选择器结构 */
-typedef struct LCUI_SelectorRec_ {
-	int rank;			/**< 权值，决定优先级 */
-	int batch_num;			/**< 批次号 */
-	int length;			/**< 选择器结点长度 */
-	unsigned int hash;		/**< 哈希值 */
-	LCUI_SelectorNode *nodes;	/**< 选择器结点列表 */
-} LCUI_SelectorRec, *LCUI_Selector;
-
-#define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \
-					S->sheet[NAME].is_changed = TRUE, \
-					S->sheet[NAME].type = SVT_##TYPE, \
-					S->sheet[NAME].val_##TYPE = VAL
 
 /** 部件任务类型，按照任务的依赖顺序排列 */
 enum WidgetTaskType {

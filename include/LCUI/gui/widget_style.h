@@ -78,7 +78,7 @@ LCUI_API LCUI_BOOL Selector_Compare( LCUI_Selector s1, LCUI_Selector s2 );
 LCUI_API LCUI_BOOL Selector_MatchPath( LCUI_Selector selector, LCUI_Widget *wlist );
 
 /** 向样式库添加样式表 */
-LCUI_API int LCUI_PutStyle( LCUI_Selector selector, 
+LCUI_API int LCUI_PutStyleSheet( LCUI_Selector selector, 
 			    LCUI_StyleSheet in_ss, const char *space );
 
 /** 打印样式表的内容 */
@@ -88,7 +88,7 @@ LCUI_API void LCUI_PrintStyleSheet( LCUI_StyleSheet ss );
 LCUI_API void LCUI_PrintSelector( LCUI_Selector selector );
 
 /** 打印样式库中的内容 */
-LCUI_API void LCUI_PrintStyleLibrary(void);
+LCUI_API void LCUI_PrintCSSLibrary(void);
 
 /** 计算部件继承得到的样式表 */
 LCUI_API void Widget_GetInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
@@ -107,7 +107,5 @@ LCUI_API LCUI_Selector Widget_GetSelector( LCUI_Widget w );
 
 /** 处理子级部件样式变化 */
 LCUI_API int Widget_HandleChildrenStyleChange( LCUI_Widget w, int type, const char *name );
-
-#include <LCUI/gui/css_parser.h>
 
 #endif

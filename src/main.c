@@ -512,6 +512,7 @@ int LCUI_Init(void)
 	LCUI_ShowCopyrightText();
 	LCUIApp_Init();
 	/* 初始化各个模块 */
+	LCUI_InitMemDebug();
 	LCUI_InitEvent();
 	LCUI_InitFont();
 	LCUI_InitTimer();
@@ -538,6 +539,7 @@ static int LCUI_Destroy( void )
 	LCUI_ExitFont();
 	LCUI_ExitTimer();
 	LCUI_ExitDisplay();
+	LCUI_ExitMemDebug();
 	LCUIApp_Destroy();
 	return 0;
 }
