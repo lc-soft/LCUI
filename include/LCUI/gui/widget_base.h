@@ -207,6 +207,9 @@ LCUI_API void Widget_ExecUpdateZIndex( LCUI_Widget w );
 /** 刷新位置 */
 LCUI_API void Widget_UpdatePosition( LCUI_Widget w );
 
+/** 刷新外间距 */
+LCUI_API void Widget_UpdateMargin( LCUI_Widget w );
+
 /** 刷新尺寸 */
 LCUI_API void Widget_UpdateSize( LCUI_Widget w );
 

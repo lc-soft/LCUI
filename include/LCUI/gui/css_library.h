@@ -67,14 +67,21 @@ enum LCUI_StyleKeyName {
 	key_height,
 	key_min_height,
 	key_max_height,
+	
+	// margin start
 	key_margin_top,
 	key_margin_right,
 	key_margin_bottom,
 	key_margin_left,
+	// margin end
+
+	// padding start
 	key_padding_top,
 	key_padding_right,
 	key_padding_bottom,
 	key_padding_left,
+	// padding end
+
 	key_vertical_align,
 
 	// border start
@@ -131,6 +138,10 @@ enum LCUI_StyleKeyName {
 #define key_display_end		key_display
 #define key_position_start	key_left
 #define key_position_end	key_position
+#define key_margin_start	key_margin_top
+#define key_margin_end		key_margin_left
+#define key_padding_start	key_padding_top
+#define key_padding_end		key_padding_left
 #define key_border_start	key_border_color
 #define key_border_end		key_border_bottom_right_radius
 #define key_background_start	key_background_color

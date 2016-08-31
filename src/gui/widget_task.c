@@ -131,6 +131,7 @@ static void MapTaskHandler(void)
 	self.handlers[WTT_SHADOW] = Widget_UpdateBoxShadow;
 	self.handlers[WTT_BORDER] = Widget_UpdateBorder;
 	self.handlers[WTT_OPACITY] = Widget_UpdateOpacity;
+	self.handlers[WTT_MARGIN] = Widget_UpdateMargin;
 	self.handlers[WTT_BODY] = HandleBody;
 	self.handlers[WTT_TITLE] = HandleSetTitle;
 	self.handlers[WTT_REFRESH] = HandleRefresh;
