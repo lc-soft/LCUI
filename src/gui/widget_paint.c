@@ -113,21 +113,22 @@ LCUI_BOOL Widget_PushInvalidArea( LCUI_Widget widget,
 	LCUI_Rect rect;
 	LCUI_Widget w = widget;
 	LCUI_Widget root = LCUIWidget_GetRoot();
-
 	if( !w ) {
 		w = root;
 	}
 	Widget_AdjustArea( w, r, &rect, box_type );
+	rect.x += w->box.graph.x;
+	rect.y += w->box.graph.y;
 	while( w && w->parent ) {
 		int width = w->parent->box.padding.width;
 		int height = w->parent->box.padding.height;
-		rect.x += w->box.graph.x;
-		rect.y += w->box.graph.y;
 		LCUIRect_ValidateArea( &rect, width, height );
 		if( rect.width < 0 || rect.height < 0 ) {
 			return FALSE;
 		}
 		w = w->parent;
+		rect.x += w->box.padding.x;
+		rect.y += w->box.padding.y;
 	}
 	Widget_InvalidateArea( root, &rect, SV_PADDING_BOX );
 	return TRUE;

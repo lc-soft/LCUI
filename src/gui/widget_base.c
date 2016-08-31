@@ -561,16 +561,18 @@ void Widget_UpdateBoxShadow( LCUI_Widget w )
 	LCUI_BoxShadow bs = w->computed_style.shadow;
 	ComputeBoxShadowStyle( w->style, &w->computed_style.shadow );
 	/* 如果阴影变化并未导致图层尺寸变化，则只重绘阴影 */
-	if( bs.x == w->computed_style.shadow.x && 
-	    bs.y == w->computed_style.shadow.y && 
-	    bs.spread == w->computed_style.shadow.spread ) {
+	if( bs.x == w->computed_style.shadow.x &&
+	    bs.y == w->computed_style.shadow.y &&
+	    bs.blur == w->computed_style.shadow.blur ) {
+		int i;
 		LCUI_Rect rects[4];
 		LCUIRect_CutFourRect( &w->box.border,
 				      &w->box.graph, rects );
-		Widget_InvalidateArea( w, &rects[0], SV_GRAPH_BOX );
-		Widget_InvalidateArea( w, &rects[1], SV_GRAPH_BOX );
-		Widget_InvalidateArea( w, &rects[2], SV_GRAPH_BOX );
-		Widget_InvalidateArea( w, &rects[3], SV_GRAPH_BOX );
+		for( i = 0; i < 4; ++i ) {
+			rects[i].x -= w->box.graph.x;
+			rects[i].y -= w->box.graph.y;
+			Widget_InvalidateArea( w, &rects[i], SV_GRAPH_BOX );
+		}
 		return;
 	}
 	Widget_AddTask( w, WTT_RESIZE );
