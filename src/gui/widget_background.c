@@ -162,9 +162,9 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 	LCUI_Style s;
 	LCUI_StyleSheet ss = widget->style;
 	LCUI_Background *bg = &widget->computed_style.background;
-	int key = key_background_start + 1;
+	int key = key_background_start;
 
-	for( ; key < key_background_end; ++key ) {
+	for( ; key <= key_background_end; ++key ) {
 		s = &ss->sheet[key];
 		if( !s->is_valid ) {
 			continue;

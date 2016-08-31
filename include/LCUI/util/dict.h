@@ -203,6 +203,10 @@ LCUI_API void Dict_PrintStats( Dict *d );
 
 LCUI_API unsigned int Dict_GenHashFunction( const unsigned char *buf, int len );
 LCUI_API unsigned int Dict_GenCaseHashFunction( const unsigned char *buf, int len );
+LCUI_API unsigned int Dict_IntHashFunction( unsigned int key );
+
+/* Identity hash function for integer keys */
+LCUI_API unsigned int Dict_IdentityHashFunction( unsigned int key );
 
 /** 清空字典 */
 LCUI_API void Dict_Empty( Dict *d );
@@ -229,7 +233,5 @@ LCUI_API unsigned int Dict_GetHashFunctionSeed( void );
 /* Hash table types */
 DictType DictType_StringKey;
 DictType DictType_StringCopyKey;
-DictType DictType_IntKey;
-DictType DictType_IdentityKey;
 
 #endif /* LCUI_UTIL_DICT_H */

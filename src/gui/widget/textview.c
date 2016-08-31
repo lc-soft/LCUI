@@ -568,7 +568,8 @@ void LCUIWidget_AddTextView( void )
 	wc->methods.set_text = TextView_OnParseText;
 	wc->task_handler = TextView_OnTask;
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
-		style_key_map[style_parsers[i].key] =
-		LCUI_AddCSSParser( &style_parsers[i] );
+		LCUI_StyleParser parser = &style_parsers[i];
+		style_key_map[parser->key] = LCUI_AddStyleName( parser->name );
+		LCUI_AddCSSParser( parser );
 	}
 }

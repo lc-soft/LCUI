@@ -793,7 +793,6 @@ int LCUI_LoadCSSString( const char *str, const char *space )
 
 int LCUI_AddCSSParser( LCUI_StyleParser sp )
 {
-	int key;
 	LCUI_StyleParser new_sp;
 	if( !sp->name || strlen( sp->name ) < 1 ) {
 		return -1;
@@ -801,13 +800,13 @@ int LCUI_AddCSSParser( LCUI_StyleParser sp )
 	if( Dict_FetchValue( self.parsers, sp->name ) ) {
 		return -2;
 	}
-	key = self.count++;
+	self.count += 1;
 	new_sp = NEW( LCUI_StyleParserRec, 1 );
 	new_sp->key = sp->key;
 	new_sp->parse = sp->parse;
 	new_sp->name = strdup( sp->name );
 	Dict_Add( self.parsers, new_sp->name, new_sp );
-	return key;
+	return 0;
 }
 
 static void DestroyStyleParser( void *privdata, void *val )

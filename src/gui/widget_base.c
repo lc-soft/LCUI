@@ -422,8 +422,8 @@ int Widget_SetId( LCUI_Widget w, const char *idstr )
 static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
 {
 	LCUI_Style style;
-	int key = key_border_start + 1;
-	for( ; key < key_border_end; ++key ) {
+	int key = key_border_start ;
+	for( ; key <= key_border_end; ++key ) {
 		style = &ss->sheet[key];
 		if( !style->is_valid ) {
 			continue;
@@ -538,9 +538,9 @@ void Widget_UpdateBorder( LCUI_Widget w )
 static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
 {
 	LCUI_Style style;
-	int key = key_box_shadow_start + 1;
+	int key = key_box_shadow_start;
 	memset( bsd, 0, sizeof( *bsd ) );
-	for( ; key < key_box_shadow_end; ++key ) {
+	for( ; key <= key_box_shadow_end; ++key ) {
 		style = &ss->sheet[key];
 		if( !style->is_valid ) {
 			continue;

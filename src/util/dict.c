@@ -718,13 +718,3 @@ DictType DictType_StringCopyKey = {
 	StringCopyKeyDict_KeyDestructor,
 	NULL
 };
-
-DictType DictType_IntKey = {
-	IntKeyDict_KeyHash,
-	NULL, NULL, NULL, NULL, NULL
-};
-
-DictType DictType_IdentityKey = {
-	IdentityKeyDict_KeyHash,
-	NULL, NULL, NULL, NULL, NULL
-};
