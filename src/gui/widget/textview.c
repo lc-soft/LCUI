@@ -312,7 +312,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 			break;
 		case key_white_space:
 			if( !s->is_valid || s->type != SVT_STYLE ) {
-				TextLayer_SetAutoWrap( txt->layer, FALSE );
+				TextLayer_SetAutoWrap( txt->layer, TRUE );
 				break;
 			}
 			if( s->style == SV_NOWRAP ) {
