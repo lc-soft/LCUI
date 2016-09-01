@@ -46,12 +46,14 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/css_library.h>
 
+/** 部件的缺省样式 */
 const char *global_css = ToString(
 
 * {
 	width: auto;
 	height:	auto;
 	background-color: transparent;
+	border: 0px solid #000;
 	display: block;
 	position: static;
 	padding: 0;

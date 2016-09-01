@@ -88,8 +88,8 @@ static void Widget_AdjustArea(	LCUI_Widget w, LCUI_Rect *in_rect,
 		out_rect->h = box->h;
 	} else {
 		*out_rect = *in_rect;
+		LCUIRect_ValidateArea( out_rect, box->w, box->h );
 	}
-	LCUIRect_ValidateArea( out_rect, box->w, box->h );
 	/* 将坐标转换成相对于图像呈现区的坐标 */
 	out_rect->x += (box->x - w->box.graph.x);
 	out_rect->y += (box->y - w->box.graph.y);
@@ -239,14 +239,20 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 		}
 		child_x = child->box.graph.x + x;
 		child_y = child->box.graph.y + y;
+		child_box = child->box.graph;
+		/* 部件坐标是相对于内容框的，所以加上内容框XY坐标 */
+		child_box.x += w->box.padding.x - w->box.graph.x;
+		child_box.y += w->box.padding.y - w->box.graph.y;
 		/* 若有效框与子部件没有重叠区域，则不向子级部件递归 */
-		if( !LCUIRect_GetOverlayRect( valid_box, &child->box.graph,
+		if( !LCUIRect_GetOverlayRect( valid_box, &child_box,
 					      &child_box ) ) {
 			continue;
 		}
 		/* 转换为相对于子部件的坐标 */
 		child_box.x -= child->box.graph.x;
 		child_box.y -= child->box.graph.y;
+		child_box.x -= w->box.padding.x - w->box.graph.x;
+		child_box.y -= w->box.padding.y - w->box.graph.y;
 		count += _Widget_ProcInvalidArea( child, child_x, child_y, 
 						  &child_box, rlist );
 	}
