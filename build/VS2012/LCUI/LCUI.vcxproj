@@ -148,6 +148,7 @@
     <ClInclude Include="..\..\..\include\LCUI\font\textlayer.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\textstyle.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\builder.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_library.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
@@ -179,12 +180,14 @@
     <ClInclude Include="..\..\..\include\LCUI\surface.h" />
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\timer.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\delay.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\dict.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\dirent.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\event.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\framectrl.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\memdebug.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\parse.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\rect.h" />
@@ -213,6 +216,7 @@
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
     <ClCompile Include="..\..\..\src\gui\builder.c" />
+    <ClCompile Include="..\..\..\src\gui\css_library.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
@@ -244,12 +248,12 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="..\..\..\src\timer.c" />
-    <ClCompile Include="..\..\..\src\util\delay.c" />
     <ClCompile Include="..\..\..\src\util\dict.c" />
     <ClCompile Include="..\..\..\src\util\dirent.c" />
     <ClCompile Include="..\..\..\src\util\event.c" />
     <ClCompile Include="..\..\..\src\util\framectrl.c" />
     <ClCompile Include="..\..\..\src\util\linkedlist.c" />
+    <ClCompile Include="..\..\..\src\util\memdebug.c" />
     <ClCompile Include="..\..\..\src\util\parse.c" />
     <ClCompile Include="..\..\..\src\util\rbtree.c" />
     <ClCompile Include="..\..\..\src\util\rect.c" />

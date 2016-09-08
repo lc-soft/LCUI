@@ -234,6 +234,15 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\textedit.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\memdebug.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_library.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -362,9 +371,6 @@
     <ClCompile Include="..\..\..\src\timer.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\util\delay.c">
-      <Filter>源文件\util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\util\dict.c">
       <Filter>源文件\util</Filter>
     </ClCompile>
@@ -403,6 +409,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\keyboard.c">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\memdebug.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\css_library.c">
+      <Filter>源文件\gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
