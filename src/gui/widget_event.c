@@ -583,7 +583,12 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 	for( w = new_w; w != root && w; w = w->parent ) {
 		++depth;
 	}
+	i = depth;
 	for( w = old_w; w != root && w; w = w->parent ) {
+		if( w->state == WSTATE_DELETED ) {
+			depth = i;
+			old_w = w;
+		}
 		--depth;
 	}
 	i = depth > 0 ? depth : -depth;
@@ -617,9 +622,17 @@ static void Widget_UpdateStatus( LCUI_Widget widget, int type )
 void LCUIWidget_ClearEventTarget( LCUI_Widget widget )
 {
 	int i;
+	LCUI_Widget w;
 	for( i = 0; i < WST_TOTAL; ++i ) {
-		if( !widget || self.targets[i] == widget ) {
+		if( !widget ) {
 			Widget_UpdateStatus( NULL, i );
+			continue;
+		}
+		for( w = self.targets[i]; w; w = w->parent ) {
+			if( w == widget ) {
+				Widget_UpdateStatus( NULL, i );
+				break;
+			}
 		}
 	}
 }
