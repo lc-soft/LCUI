@@ -248,13 +248,13 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	Widget_ReleaseTouchCapture( widget, -1 );
 	Widget_StopEventPropagation( widget );
 	LCUIWidget_ClearEventTarget( widget );
-	if( wc && wc->methods.destroy ) {
-		wc->methods.destroy( widget );
-	}
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
 	LinkedList_ClearData( &widget->children_show, NULL );
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
+	if( wc && wc->methods.destroy ) {
+		wc->methods.destroy( widget );
+	}
 	LinkedList_Clear( &widget->dirty_rects, free );
 	StyleSheet_Delete( widget->inherited_style );
 	StyleSheet_Delete( widget->custom_style );
@@ -603,7 +603,7 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 	visible = w->computed_style.visible;
 	if( w->parent ) {
 		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
-		if( w->computed_style.display != display &&
+		if( w->computed_style.display != display ||
 		    w->computed_style.position != SV_ABSOLUTE ) {
 			Widget_UpdateLayout( w->parent );
 		}
@@ -1481,8 +1481,8 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		ctx.prev = child;
 		ctx.prev_display = child->computed_style.display;
 	}
-	if( w->style->sheet[key_width].type == SVT_AUTO
-	    || w->style->sheet[key_height].type == SVT_AUTO ) {
+	if( w->style->sheet[key_width].type == SVT_AUTO ||
+	    w->style->sheet[key_height].type == SVT_AUTO ) {
 		Widget_AddTask( w, WTT_RESIZE );
 	}
 	e.cancel_bubble = TRUE;
