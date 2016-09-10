@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
-#ifndef __LCUI_FONT_H__
-#define __LCUI_FONT_H__
+#ifndef LCUI_FONT_H
+#define LCUI_FONT_H
 
 #include <LCUI/font/fontlibrary.h>
 #include <LCUI/font/textstyle.h>

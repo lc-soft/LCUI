@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#ifndef __LCUI_SIDEBAR_WIDGET_H__
-#define __LCUI_SIDEBAR_WIDGET_H__
+#ifndef LCUI_SIDEBAR_WIDGET_H
+#define LCUI_SIDEBAR_WIDGET_H
 
 LCUI_BEGIN_HEADER
 

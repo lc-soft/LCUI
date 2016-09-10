@@ -37,14 +37,15 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
-#ifndef __LCUI_WIDGET_EVENT_H__
-#define __LCUI_WIDGET_EVENT_H__
+#ifndef LCUI_WIDGET_EVENT_H
+#define LCUI_WIDGET_EVENT_H
 
 LCUI_BEGIN_HEADER
 
 enum WidgetEventType {
 	WET_NONE,
 	WET_ADD,
+	WET_READY,
 	WET_REMOVE,
 	WET_DESTROY,
 	WET_MOVE,
@@ -57,7 +58,7 @@ enum WidgetEventType {
 	WET_KEYDOWN,
 	WET_KEYUP,
 	WET_KEYPRESS,
-	WET_INPUT,
+	WET_TEXTINPUT,
 
 	WET_MOUSEOVER,
 	WET_MOUSEMOVE,
@@ -66,25 +67,44 @@ enum WidgetEventType {
 	WET_MOUSEUP,
 	WET_MOUSEWHEEL,
 	WET_CLICK,
+	WET_TOUCH,
+	WET_TOUCHDOWN,
+	WET_TOUCHUP,
+	WET_TOUCHMOVE,
 
 	WET_TITLE,
 	WET_SURFACE,
 	WET_USER
 };
 
+/* 部件的事件数据结构和系统事件一样 */
+typedef LCUI_MouseMotionEvent LCUI_WidgetMouseMotionEvent;
+typedef LCUI_MouseButtonEvent LCUI_WidgetMouseButtonEvent;
+typedef LCUI_MouseWheelEvent LCUI_WidgetMouseWheelEvent;
+typedef LCUI_TextInputEvent LCUI_WidgetTextInputEvent;
+typedef LCUI_KeyboardEvent LCUI_WidgetKeyboardEvent;
+typedef LCUI_TouchEvent LCUI_WidgetTouchEvent;
+
 /** 面向部件级的事件内容结构 */
 typedef struct LCUI_WidgetEventRec_ {
-	int type;			/**< 事件类型标识号 */
-	int which;			/**< 指示按了哪个键或按钮 */
-	int x, y;			/**< 事件触发时鼠标的坐标（相对于当前部件的边框盒） */
-	int z_delta;			/**< 鼠标滚轮滚动的距离差值 */
-	int screen_x, screen_y;		/**< 事件触发时鼠标的屏幕坐标 */
+	uint32_t type;			/**< 事件类型标识号 */
 	void *data;			/**< 附加数据 */
 	LCUI_Widget target;		/**< 触发事件的部件 */
 	LCUI_BOOL cancel_bubble;	/**< 是否取消事件冒泡 */
+	union {
+		LCUI_WidgetMouseMotionEvent motion;
+		LCUI_WidgetMouseButtonEvent button;
+		LCUI_WidgetMouseWheelEvent wheel;
+		LCUI_WidgetKeyboardEvent key;
+		LCUI_WidgetTouchEvent touch;
+		LCUI_WidgetTextInputEvent text;
+	};
 } LCUI_WidgetEventRec, *LCUI_WidgetEvent;
 
 typedef void(*LCUI_WidgetEventFunc)(LCUI_Widget, LCUI_WidgetEvent, void*);
+
+/** 设置阻止部件及其子级部件的事件 */
+#define Widget_BlockEvent(WIDGET, FLAG) (WIDGET)->event_blocked = FLAG
 
 /** 触发事件，让事件处理器在主循环中调用 */
 LCUI_API int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent e,
@@ -155,6 +175,32 @@ LCUI_API int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type );
 
 /** 清除事件对象，通常在部件销毁时调用该函数，以避免部件销毁后还有事件发送给它 */
 LCUI_API void LCUIWidget_ClearEventTarget( LCUI_Widget widget );
+
+/** 将一个部件设置为焦点 */
+LCUI_API int LCUIWidget_SetFocus( LCUI_Widget widget );
+
+/** 停止部件的事件传播 */
+LCUI_API int Widget_StopEventPropagation( LCUI_Widget widget );
+
+/** 为部件设置鼠标捕获，设置后将捕获全局范围内的鼠标事件 */
+LCUI_API void Widget_SetMouseCapture( LCUI_Widget w );
+
+/** 为部件解除鼠标捕获 */
+LCUI_API void Widget_ReleaseMouseCapture( LCUI_Widget w );
+
+/**
+ * 为部件设置触点捕获，设置后将捕获全局范围内的触点事件
+ * @param[in] w 部件
+ * @param[in] point_id 触点ID，当值为 -1 时则捕获全部触点
+ */
+LCUI_API void Widget_SetTouchCapture( LCUI_Widget w, int point_id );
+
+/**
+ * 为部件解除触点捕获
+ * @param[in] w 部件
+ * @param[in] point_id 触点ID，当值为 -1 时则解除全部触点的捕获
+ */
+LCUI_API int Widget_ReleaseTouchCapture( LCUI_Widget w, int point_id );
 
 /** 初始化 LCUI 部件的事件系统 */
 void LCUIWidget_InitEvent(void);

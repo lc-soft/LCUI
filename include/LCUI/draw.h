@@ -39,17 +39,10 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#ifndef __LCUI_DRAW_H__
-#define __LCUI_DRAW_H__
+#ifndef LCUI_DRAW_H
+#define LCUI_DRAW_H
 
 LCUI_BEGIN_HEADER
-	
-/* 打开文件时的错误 */
-#define FILE_ERROR_OPEN_ERROR		-1
-#define FILE_ERROR_SHORT_FILE		-2
-#define FILE_ERROR_BIG_FILE		-3
-#define FILE_ERROR_UNKNOWN_FORMAT	-4
-#define FILE_ERROR_MALLOC_ERROR		-5
 
 #include <LCUI/draw/line.h>
 #include <LCUI/draw/border.h>

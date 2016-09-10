@@ -1,0 +1,13 @@
+textview.text-hello {
+  color: #8cc63f;
+  font-size: 18px;
+  font-family: "Comic Sans MS";
+  text-align: center;
+  padding: 25px;
+  margin: 25px 0 0 25px;
+  border: 1px solid #000;
+  background-color: #fafafa;
+}
+#btn-ok, #edit {
+  margin: 25px 0 0 25px;
+}

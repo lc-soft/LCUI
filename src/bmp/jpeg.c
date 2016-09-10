@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -85,11 +86,11 @@ int Graph_LoadJPEG( const char *filepath, LCUI_Graph *buf )
 
 	fp = fopen( filepath, "rb" );
 	if( !fp ) {
-		return FILE_ERROR_OPEN_ERROR;
+		return ENOENT;
 	}
 	if( fread( &JPsyg, sizeof( short int ), 1, fp ) ) {
 		if( JPsyg != -9985 ) {  /* 如果不是jpg图片 */
-			return  FILE_ERROR_UNKNOWN_FORMAT;
+			return  -1;
 		}
 	}
 	rewind( fp );
@@ -148,11 +149,11 @@ int Graph_GetJPEGSize( const char *filepath, int *width, int *height )
 	struct jpeg_decompress_struct cinfo;
 	FILE *fp = fopen( filepath, "rb" );
 	if( !fp ) {
-		return FILE_ERROR_OPEN_ERROR;
+		return ENOENT;
 	}
 	if( fread( &JPsyg, sizeof( short int ), 1, fp ) ) {
 		if( JPsyg != -9985 ) {
-			return  FILE_ERROR_UNKNOWN_FORMAT;
+			return  -1;
 		}
 	}
 	rewind( fp );

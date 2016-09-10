@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_UTIL_LINKEDLIST_H__
-#define __LCUI_UTIL_LINKEDLIST_H__
+#ifndef LCUI_UTIL_LINKEDLIST_H
+#define LCUI_UTIL_LINKEDLIST_H
 
 LCUI_BEGIN_HEADER
 
@@ -55,14 +55,14 @@ struct LinkedListRec_ {
 	LinkedListNode head, tail;
 };
 
-#define LinkedList_ForEach(node, list) \
-	for( node = (list)->head.next; node; node = node->next )
+#define LinkedList_Each(node, list) \
+	node = (list)->head.next; node; node = node->next
 
-#define LinkedList_ForEachReverse(node, list) \
-	for( node = (list)->tail.prev; node && node != &(list)->head; node = node->prev )
+#define LinkedList_EachReverse(node, list) \
+	node = (list)->tail.prev; node && node != &(list)->head; node = node->prev
 
-#define LinkedList_Clear(list, func) LinkedList_ClearEx( list, func, 1 )
-#define LinkedList_ClearData(list, func) LinkedList_ClearEx( list, func, 0 )
+#define LinkedList_ForEach(node, list) for( LinkedList_Each(node, list) )
+#define LinkedList_ForEachReverse(node, list) for( LinkedList_EachReverse(node, list) )
 
 LCUI_API LinkedListNode *LinkedList_Append( LinkedList *list, void *data );
 LCUI_API LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data );
@@ -74,9 +74,15 @@ LCUI_API void LinkedList_Link( LinkedList *list, LinkedListNode *cur, LinkedList
 LCUI_API void LinkedList_Delete( LinkedList *list, int pos );
 LCUI_API void LinkedList_DeleteNode( LinkedList *list, LinkedListNode *node );
 LCUI_API void LinkedList_AppendNode( LinkedList *list, LinkedListNode *node );
-LCUI_API void LinkedList_Sort( LinkedList *list, void(*on_sort)(void*, void*) );
 LCUI_API void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*), int free_node );
 LCUI_API void LinkedList_Concat( LinkedList *list1, LinkedList *list2 );
+
+#define LinkedList_Clear(list, func) LinkedList_ClearEx( list, func, 1 )
+#define LinkedList_ClearData(list, func) LinkedList_ClearEx( list, func, 0 )
+
+LCUI_API void LinkedList_SwapNode( LinkedList *list, LinkedListNode *a, LinkedListNode *b );
+LCUI_API void LinkedList_QuickSort( LinkedList *list, int( *cmp )(void*, void*) );
+LCUI_API void LinkedList_BubbleSort( LinkedList *list, int( *cmp )(void*, void*) );
 
 LCUI_END_HEADER
 

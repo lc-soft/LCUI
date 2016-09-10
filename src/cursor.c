@@ -40,7 +40,6 @@
 //#define DEBUG
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/cursor.h>
 #include <LCUI/display.h>
 
@@ -106,8 +105,8 @@ static int LCUICursor_LoadDefualtGraph(LCUI_Graph *buff )
 
 static void OnMouseMoveEvent( LCUI_SysEvent e, void *arg )
 {
-	global_cursor.pos.x += e->rel_x;
-	global_cursor.pos.y += e->rel_y;
+	global_cursor.pos.x += e->motion.xrel;
+	global_cursor.pos.y += e->motion.yrel;
 	global_cursor.new_pos = global_cursor.pos;
 	DEBUG_MSG("x: %d, y: %d\n", global_cursor.pos.x, global_cursor.pos.y);
 }

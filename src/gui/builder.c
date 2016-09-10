@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <stdio.h>
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -44,7 +45,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
 
-#define WARNING_TEXT "[builder] warning: this module is not enabled before build."
+#define WARN_TXT "[builder] warning: this module is not enabled before build.\n"
 
 #ifdef USE_LCUI_BUILDER
 #include <libxml/xmlmemory.h>
@@ -81,6 +82,7 @@ struct XMLParserContextRec_ {
 	LCUI_Widget widget;
 	LCUI_Widget root;
 	ParserPtr parent;
+	const char *space;
 };
 
 static struct ModuleContext {
@@ -108,20 +110,21 @@ static int ParseResource( XMLParserContext ctx, xmlNodePtr node )
 		}
 		prop = prop->next;
 	}
-	if( !type || !src ) {
+	if( !type && !src ) {
 		return PB_WARNING;
 	}
 	if( strstr(type, "application/font-") ) {
 		LCUIFont_LoadFile( src );
 	}
 	else if( strstr(type, "text/css") ) {
-		LCUICSS_LoadFile( src );
+		if( src ) {
+			LCUI_LoadCSSFile( src );
+		}
 		for( node = node->children; node; node = node->next ) {
 			if( node->type != XML_TEXT_NODE ) {
 				continue;
 			}
-			LCUICSS_LoadString( (char*)node->content );
-			node = node->next;
+			LCUI_LoadCSSString( (char*)node->content, ctx->space );
 		}
 	}
 	return PB_NEXT;
@@ -216,8 +219,7 @@ static void LCUIBuilder_Init( void )
 	Parser *p;
 
 	RBTree_Init( &self.parsers );
-	RBTree_OnJudge( &self.parsers, CompareName );
-	RBTree_SetDataNeedFree( &self.parsers, FALSE );
+	RBTree_OnCompare( &self.parsers, CompareName );
 	len = sizeof(parser_list) / sizeof(parser_list[0]);
 	for( i = 0; i < len; ++i ) {
 		p = &parser_list[i];
@@ -267,7 +269,7 @@ static void ParseNode( XMLParserContext ctx, xmlNodePtr node )
 LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 {
 #ifndef USE_LCUI_BUILDER
-	printf(WARNING_TEXT);
+	printf(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -285,6 +287,7 @@ LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 	ctx.root = NULL;
 	ctx.widget = NULL;
 	ctx.parent = NULL;
+	ctx.space = NULL;
 	if( !self.is_inited ) {
 		LCUIBuilder_Init();
 	}
@@ -301,7 +304,7 @@ FAILED:
 LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 {
 #ifndef USE_LCUI_BUILDER
-	printf(WARNING_TEXT);
+	printf(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -319,6 +322,7 @@ LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 	ctx.root = NULL;
 	ctx.widget = NULL;
 	ctx.parent = NULL;
+	ctx.space = filepath;
 	if( !self.is_inited ) {
 		LCUIBuilder_Init();
 	}

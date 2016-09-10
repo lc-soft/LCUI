@@ -39,8 +39,8 @@
  * ****************************************************************************/
 
 /* 为了解决结构体被重复定义，用宏进行头文件保护(其它地方出现类似的内容，将不再注释) */
-#ifndef __LCUI_H__  /* 如果没有定义 __LCUI_H__ 宏 */
-#define __LCUI_H__  /* 定义 __LCUI_H__ 宏 */
+#ifndef LCUI_H  /* 如果没有定义 LCUI_H 宏 */
+#define LCUI_H  /* 定义 LCUI_H 宏 */
 
 #define LCUI_VERSION "1.0.0"
 
@@ -101,18 +101,8 @@ typedef struct LCUI_Pos_ {
 } LCUI_Pos;
 
 typedef struct LCUI_Size_ {
-	int w, h;
+	int width, height;
 } LCUI_Size;
-
-typedef struct LCUI_String_ {
-	char   *string;
-	uint_t length;
-} LCUI_String;
-
-typedef struct LCUI_WString_ {
-	wchar_t *string;
-	uint_t length;
-} LCUI_WString;
 
 typedef struct LCUI_Rect_ {
 	union { int x, left; };
@@ -140,6 +130,7 @@ typedef enum LCUI_StyleType {
 	SVT_IMAGE,
 	SVT_STYLE,
 	SVT_VALUE,
+	SVT_BOOL,
 	SVT_STRING,
 	SVT_WSTRING
 } LCUI_StyleType;
@@ -152,6 +143,7 @@ typedef enum LCUI_StyleType {
 #define SVT_scale	SVT_SCALE
 #define SVT_style	SVT_STYLE
 #define SVT_data	SVT_DATA
+#define SVT_bool	SVT_BOOL
 #define SVT_image	SVT_IMAGE
 #define SVT_string	SVT_STRING
 #define SVT_wstring	SVT_WSTRING
@@ -234,13 +226,14 @@ typedef enum LCUI_StyleValue {
 	SV_FLOAT_LEFT,
 	SV_FLOAT_RIGHT,
 	SV_BLOCK,
-	SV_INLINE_BLOCK
+	SV_INLINE_BLOCK,
+	SV_NOWRAP
 } LCUI_StyleValue;
 
 typedef struct LCUI_StyleRec_ {
-	LCUI_BOOL is_valid:1;
-	LCUI_BOOL is_changed:1;
-	LCUI_StyleType type:30;
+	LCUI_BOOL is_valid:2;
+	LCUI_BOOL is_changed:2;
+	unsigned short int type;
 	union {
 		int value;
 		int val_int;
@@ -262,6 +255,7 @@ typedef struct LCUI_StyleRec_ {
 		LCUI_Color val_color;
 		LCUI_Graph *image;
 		LCUI_Graph *val_image;
+		LCUI_BOOL val_bool;
 	};
 } LCUI_StyleRec, *LCUI_Style;
 
@@ -312,4 +306,4 @@ LCUI_END_HEADER
 #include <LCUI/util.h>
 #include <LCUI/main.h>
 
-#endif /* __LCUI_H__ */
+#endif /* LCUI_H */

@@ -34,8 +34,8 @@
 
 #include <stdint.h>
 
-#ifndef __DICT_H__
-#define __DICT_H__
+#ifndef LCUI_UTIL_DICT_H
+#define LCUI_UTIL_DICT_H
 
 /** 哈希表节点结构 */
 typedef struct DictEntry {
@@ -203,6 +203,10 @@ LCUI_API void Dict_PrintStats( Dict *d );
 
 LCUI_API unsigned int Dict_GenHashFunction( const unsigned char *buf, int len );
 LCUI_API unsigned int Dict_GenCaseHashFunction( const unsigned char *buf, int len );
+LCUI_API unsigned int Dict_IntHashFunction( unsigned int key );
+
+/* Identity hash function for integer keys */
+LCUI_API unsigned int Dict_IdentityHashFunction( unsigned int key );
 
 /** 清空字典 */
 LCUI_API void Dict_Empty( Dict *d );
@@ -227,8 +231,7 @@ LCUI_API void Dict_SetHashFunctionSeed( unsigned int initval );
 LCUI_API unsigned int Dict_GetHashFunctionSeed( void );
 
 /* Hash table types */
-extern DictType dictTypeHeapStringCopyKey;
-extern DictType dictTypeHeapStrings;
-extern DictType dictTypeHeapStringCopyKeyValue;
+DictType DictType_StringKey;
+DictType DictType_StringCopyKey;
 
-#endif /* __DICT_H__ */
+#endif /* LCUI_UTIL_DICT_H */

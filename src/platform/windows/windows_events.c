@@ -20,24 +20,19 @@ static struct WindowsDriver {
 static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 				 WPARAM arg1, LPARAM arg2 )
 {
-	LCUI_AppTask task;
-	WIN_SysEventRec win_event;
+	MSG win_ev;
 	switch( msg ) {
 	case WM_LCUI_EVENT:
-		task = (LCUI_AppTask)arg2;
-		LCUI_RunTask( task );
-		LCUI_DeleteTask( task );
 		return 0;
 	case WM_CLOSE:
 		LCUI_Quit();
 	default:break;
 	}
-	win_event.msg = msg;
-	win_event.data = NULL;
-	win_event.hwnd = hwnd;
-	win_event.wparam = arg1;
-	win_event.lparam = arg2;
-	if( EventTrigger_Trigger( win.trigger, msg, &win_event ) == 0 ) {
+	win_ev.hwnd = hwnd;
+	win_ev.wParam = arg1;
+	win_ev.lParam = arg2;
+	win_ev.message = msg;
+	if( EventTrigger_Trigger( win.trigger, msg, &win_ev ) == 0 ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
 	return 0;
@@ -57,10 +52,10 @@ static LCUI_BOOL WIN_WaitEvent( void )
 	return WaitMessage();
 }
 
-static void WIN_PumpEvents( void )
+static void WIN_DispatchEvent( void )
 {
 	MSG msg;
-	while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
+	if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
 		TranslateMessage( &msg );
 		DispatchMessage( &msg );
 	}
@@ -85,6 +80,11 @@ static int WIN_UnbindSysEvent2( int handler_id )
 static void *WIN_GetData( void )
 {
 	return win.main_instance;
+}
+
+void LCUI_SetMainWindow( HWND hwnd )
+{
+	win.main_hwnd = hwnd;
 }
 
 /** win32的动态库的入口函数 */
@@ -131,21 +131,11 @@ int LCUI_InitWinApp( LCUI_AppDriver app )
 	app->GetData = WIN_GetData;
 	app->PostTask = WIN_PostTask;
 	app->WaitEvent = WIN_WaitEvent;
-	app->PumbEvents = WIN_PumpEvents;
+	app->DispatchEvent = WIN_DispatchEvent;
 	app->BindSysEvent = WIN_BindSysEvent;
 	app->UnbindSysEvent = WIN_UnbindSysEvent;
 	app->UnbindSysEvent2 = WIN_UnbindSysEvent2;
 	win.trigger = EventTrigger();
-	/**
-	 * 创建一个隐藏的主窗体，用于接收 LCUI 的任务
-	 * 之前用 PostThreadMessage() 无法发送自定义消息到主线程的消息循环，因此
-	 * 改成创建隐藏窗体兵用 PostMessage() 发送任务。
-	 */
-	win.main_hwnd = CreateWindow(
-		TEXT("LCUI"), TEXT("LCUI Task Receiver"), 0, 
-		CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, NULL, NULL,
-		win.main_instance, NULL
-	);
 	return 0;
 }
 

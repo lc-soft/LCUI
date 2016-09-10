@@ -38,35 +38,35 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef  __LC_FRAME_CONTROL_H__
-#define __LC_FRAME_CONTROL_H__
+#ifndef LCUI_UTIL_FRAMECTRL_H
+#define LCUI_UTIL_FRAMECTRL_H
 
 LCUI_BEGIN_HEADER
 
-#ifdef __IN_FRAME_CONTROL_SOURCE_FILE__
-typedef struct FrameControlContext* FrameCtrlCtx;
+#ifdef LCUI_UTIL_FRAMECTRL_C
+typedef struct FrameControlRec_* FrameControl;
 #else
-typedef void* FrameCtrlCtx;
+typedef void* FrameControl;
 #endif
 
 /** 新建帧数控制实例 */
-LCUI_API FrameCtrlCtx FrameControl_Create( void );
+LCUI_API FrameControl FrameControl_Create( void );
 
 /** 销毁帧数控制相关资源 */
-LCUI_API void FrameControl_Destroy( FrameCtrlCtx ctx );
+LCUI_API void FrameControl_Destroy( FrameControl ctx );
 
 
 /** 设置最大FPS（帧数/秒） */
-LCUI_API void FrameControl_SetMaxFPS( FrameCtrlCtx ctx, unsigned int fps );
+LCUI_API void FrameControl_SetMaxFPS( FrameControl ctx, unsigned int fps );
 
 /** 获取当前FPS */
-LCUI_API int FrameControl_GetFPS( FrameCtrlCtx ctx );
+LCUI_API int FrameControl_GetFPS( FrameControl ctx );
 
 /** 让当前帧停留一定时间 */
-LCUI_API void FrameControl_Remain( FrameCtrlCtx ctx );
+LCUI_API void FrameControl_Remain( FrameControl ctx );
 
 /** 暂停数据帧的更新 */
-LCUI_API void FrameControl_Pause( FrameCtrlCtx ctx, LCUI_BOOL need_pause );
+LCUI_API void FrameControl_Pause( FrameControl ctx, LCUI_BOOL need_pause );
 
 LCUI_END_HEADER
 

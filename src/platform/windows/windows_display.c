@@ -40,10 +40,9 @@
 //#define DEBUG
 #include <stdio.h>
 #include <LCUI_Build.h>
-#define __IN_SURFACE_SOURCE_FILE__
+#define LCUI_SURFACE_C
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
 #include LCUI_DISPLAY_H
@@ -98,7 +97,7 @@ static struct WIN_Display {
 static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 {
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &win.surfaces ) {
+	for( LinkedList_Each( node, &win.surfaces ) ) {
 		if( ((LCUI_Surface)node->data)->hwnd == hwnd ) {
 			return node->data;
 		}
@@ -127,7 +126,7 @@ static void WinSurface_Destroy( LCUI_Surface surface )
 static void WinSurface_ExecDelete( LCUI_Surface surface )
 {
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &win.surfaces ) {
+	for( LinkedList_Each( node, &win.surfaces ) ) {
 		if( node->data == surface ) {
 			WinSurface_Destroy( node->data );
 			LinkedList_DeleteNode( &win.surfaces, node );
@@ -158,9 +157,12 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 		instance, NULL
 	);
 	hdc_client = GetDC( surface->hwnd );
+	RegisterTouchWindow( surface->hwnd, 0 );
 	surface->fb_hdc = CreateCompatibleDC( hdc_client );
 	surface->is_ready = TRUE;
 	DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
+	LCUI_SetMainWindow( surface->hwnd );
+	LCUI_SetTaskAgent( FALSE );
 }
 
 /** 新建一个 Surface */
@@ -384,19 +386,19 @@ static void WinSurface_Update( LCUI_Surface surface )
 
 static void OnWMPaint( LCUI_Event e, void *arg )
 {
+	MSG *msg = arg;
 	PAINTSTRUCT ps;
 	LCUI_Rect area;
 	LCUI_Surface surface;
 	LCUI_DisplayEventRec dpy_ev;
-	WIN_SysEvent sys_event = arg;
-	BeginPaint( sys_event->hwnd, &ps );
+	BeginPaint( msg->hwnd, &ps );
 	/* 获取区域坐标及尺寸 */
 	area.x = ps.rcPaint.left;
 	area.y = ps.rcPaint.top;
 	area.width = ps.rcPaint.right - area.x;
 	area.height = ps.rcPaint.bottom - area.y;
-	EndPaint( sys_event->hwnd, &ps );
-	surface = GetSurfaceByHWND( sys_event->hwnd );
+	EndPaint( msg->hwnd, &ps );
+	surface = GetSurfaceByHWND( msg->hwnd );
 	if( !surface ) {
 		return;
 	}
@@ -408,26 +410,26 @@ static void OnWMPaint( LCUI_Event e, void *arg )
 
 static void OnWMGetMinMaxInfo( LCUI_Event e, void *arg )
 {
+	MSG *msg = arg;
 	MINMAXINFO *mminfo;
-	WIN_SysEvent sys_event = arg;
-	mminfo = (PMINMAXINFO)sys_event->lparam;
+	mminfo = (PMINMAXINFO)msg->lParam;
 	mminfo->ptMinTrackSize.x = MIN_WIDTH;
 	mminfo->ptMinTrackSize.y = MIN_HEIGHT;
 }
 
 static void OnWMSize( LCUI_Event e, void *arg )
 {
+	MSG *msg = arg;
 	LCUI_Surface surface;
 	LCUI_DisplayEventRec dpy_ev;
-	WIN_SysEvent sys_event = arg;
-	surface = GetSurfaceByHWND( sys_event->hwnd );
+	surface = GetSurfaceByHWND( msg->hwnd );
 	if( !surface ) {
 		return;
 	}
 	dpy_ev.surface = surface;
 	dpy_ev.type = DET_RESIZE;
-	dpy_ev.resize.width = LOWORD( sys_event->lparam );
-	dpy_ev.resize.height = HIWORD( sys_event->lparam );
+	dpy_ev.resize.width = LOWORD( msg->lParam );
+	dpy_ev.resize.height = HIWORD( msg->lParam );
 	EventTrigger_Trigger( win.trigger, DET_RESIZE, &dpy_ev );
 }
 

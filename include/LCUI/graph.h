@@ -36,8 +36,8 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果s
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
-#ifndef __LCUI_GRAPH_H__
-#define __LCUI_GRAPH_H__
+#ifndef LCUI_GRAPH_H
+#define LCUI_GRAPH_H
 
 LCUI_BEGIN_HEADER
 
@@ -223,4 +223,4 @@ LCUI_END_HEADER
 
 #include <LCUI/draw.h>
 
-#endif /* __LCUI_GRAPH_H__ */
+#endif /* LCUI_GRAPH_H */

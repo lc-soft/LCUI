@@ -1,174 +1,192 @@
-// IME: Input Method Editor/Engine
-//#define NEED_IME
-#ifdef NEED_IME
+/* ***************************************************************************
+ * ime.c -- Input Method Editor/Engine
+ *
+ * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
+ *
+ * This file is part of the LCUI project, and may only be used, modified, and
+ * distributed under the terms of the GPLv2.
+ *
+ * (GPLv2 is abbreviation of GNU General Public License Version 2)
+ *
+ * By continuing to use, modify, or distribute this file you indicate that you
+ * have read the license and understand and accept it fully.
+ *
+ * The LCUI project is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GPL v2 for more details.
+ *
+ * You should have received a copy of the GPLv2 along with this file. It is
+ * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
+
+/* ****************************************************************************
+ * ime.c -- 输入法管理器
+ *
+ * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
+ *
+ * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
+ *
+ * (GPLv2 是 GNU通用公共许可证第二版 的英文缩写)
+ *
+ * 继续使用、修改或发布本文件，表明您已经阅读并完全理解和接受这个许可协议。
+ *
+ * LCUI 项目是基于使用目的而加以散布的，但不负任何担保责任，甚至没有适销性或特
+ * 定用途的隐含担保，详情请参照GPLv2许可协议。
+ *
+ * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
+ * 没有，请查看：<http://www.gnu.org/licenses/>.
+ * ****************************************************************************/
+
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/ime.h>
 
-typedef struct LCUIIME_Info_ {
-	int id;
-	LCUI_String name;
-	LCUIIME_Func func;
-} LCUIIME_Info;
+/** 输入法相关数据 */
+typedef struct LCUI_IMERec_ {
+	int id;				/**< 输入法ID */
+	char *name;			/**< 名称 */
+	LCUI_IMEHandlerRec handler;	/**< 处理器 */
+	LinkedListNode node;		/**< 在链表中的结点 */
+} LCUI_IMERec, *LCUI_IME;
 
-// 指示输入法列表是否初始化
-LCUI_BOOL imelist_init = FALSE;
+/** 输入法管理模块的相关数据 */
+static struct LCUIIMEModule {
+	LCUI_BOOL is_inited;		/**< 是否已经初始化 */
+	LinkedList list;		/**< 当前记录的输入法列表 */
+	LCUI_IME ime;			/**< 当前激活的输入法 */
+	LCUI_BOOL enable_caps_lock;	/**< 是否已经启用大写锁定  */
+	int id_count;			/**< ID 计数器，用于生成输入法的 ID */
+} self;
 
-// 输入法列表
-LCUI_Queue imelist;
-
-// 当前选择的输入法
-static LCUIIME_Info* current_ime = NULL;
-
-// 指示是否开启了大写锁定
-static LCUI_BOOL enable_capitals_lock = FALSE;
 
 /* 通过ID查找输入法信息 */
-static LCUIIME_Info* LCUIIME_Find( int ime_id )
+static LCUI_IME LCUIIME_Find( int ime_id )
 {
-	int n, i;
-	LCUIIME_Info *ptr;
-
-	n = Queue_GetTotal( &imelist );
-	for( i=0; i<n; ++i ) {
-		ptr = Queue_Get( &imelist, i );
-		if( !ptr || ptr->id != ime_id ) {
-			continue;
+	LinkedListNode *node;
+	for( LinkedList_Each( node, &self.list ) ) {
+		LCUI_IME ime = node->data;
+		if( ime->id == ime_id ) {
+			return ime;
 		}
-		return ptr;
 	}
 	return NULL;
 }
 
 /* 通过名字查找输入法信息 */
-static LCUIIME_Info* LCUIIME_FindByName( const char *name )
+static LCUI_IME LCUIIME_FindByName( const char *name )
 {
-	int n, i;
-	LCUIIME_Info *ptr;
-
-	n = Queue_GetTotal( &imelist );
-	for( i=0; i<n; ++i ) {
-		ptr = Queue_Get( &imelist, i );
-		if( !ptr ) {
-			continue;
-		}
-		if( _LCUIString_Cmp( &ptr->name, name ) == 0 ) {
-			return ptr;
+	LinkedListNode *node;
+	for( LinkedList_Each( node, &self.list ) ) {
+		LCUI_IME ime = node->data;
+		if( strcmp( ime->name, name ) == 0 ) {
+			return ime;
 		}
 	}
 	return NULL;
 }
 
 /* 注册一个输入法 */
-LCUI_API int LCUIIME_Register( const char *ime_name, LCUIIME_Func *ime_func )
+int LCUIIME_Register( const char *name, LCUI_IMEHandler handler )
 {
-	static int ime_id = 0; // 输入法的ID
-	LCUIIME_Info *ptr_data;
-
-	if( !imelist_init ) {
+	size_t len;
+	LCUI_IME ime;
+	if( !self.is_inited ) {
 		return -1;
 	}
-	if( LCUIIME_FindByName( ime_name ) != NULL ) {
+	if( LCUIIME_FindByName( name )  ) {
 		return -2;
 	}
-
-	ptr_data = (LCUIIME_Info*)malloc( sizeof(LCUIIME_Info) );
-	if( !ptr_data ) {
-		return -3;
+	ime = NEW( LCUI_IMERec, 1 );
+	if( !ime ) {
+		return -ENOMEM;
 	}
-	LCUIString_Init( &ptr_data->name );
-	_LCUIString_Copy( &ptr_data->name, ime_name );
-	ime_id = ime_id + 1;
-	ptr_data->id = ime_id;
-	memcpy( &ptr_data->func, ime_func, sizeof(LCUIIME_Func) );
-	Queue_AddPointer( &imelist, ptr_data );
-	return ime_id;
-}
-
-/* 选定输入法 */
-LCUI_API LCUI_BOOL LCUIIME_Select( int ime_id )
-{
-	LCUIIME_Info *ptr_data;
-	ptr_data = LCUIIME_Find( ime_id );
-	if( ptr_data == NULL ) {
-		return FALSE;
+	len = strlen( name ) + 1;
+	ime->name = malloc( len * sizeof(char) );
+	if( !ime->name ) {
+		return -ENOMEM;
 	}
-	current_ime = ptr_data;
-	return TRUE;
-}
-
-LCUI_API LCUI_BOOL LCUIIME_SelectByName( const char *name )
-{
-	LCUIIME_Info *ptr_data;
-	ptr_data = LCUIIME_FindByName( name );
-	if( ptr_data == NULL ) {
-		return FALSE;
-	}
-	current_ime = ptr_data;
-	return TRUE;
+	self.id_count += 1;
+	ime->id = self.id_count;
+	ime->node.data = ime;
+	strncpy( ime->name, name, len );
+	memcpy( &ime->handler, handler, sizeof(LCUI_IMEHandlerRec) );
+	LinkedList_AppendNode( &self.list, &ime->node );
+	return ime->id;
 }
 
 /* 打开输入法 */
-static LCUI_BOOL LCUIIME_Open( LCUIIME_Info *ime )
+static LCUI_BOOL LCUIIME_Open( LCUI_IME ime )
 {
-	if( ime == NULL ) {
-		return FALSE;
+	if( ime && ime->handler.open ) {
+		return ime->handler.open();
 	}
-	if( ime->func.open == NULL ) {
-		return FALSE;
-	}
-	return ime->func.open();
+	return FALSE;
 }
 
 /* 关闭输入法 */
-static LCUI_BOOL LCUIIME_Close( LCUIIME_Info *ime )
+static LCUI_BOOL LCUIIME_Close( LCUI_IME ime )
 {
-	if( ime == NULL ) {
-		return FALSE;
+	if( ime && ime->handler.close ) {
+		return ime->handler.open();
 	}
-	if( ime->func.close == NULL ) {
-		return FALSE;
+	return FALSE;
+}
+
+/* 选定输入法 */
+LCUI_BOOL LCUIIME_Select( int ime_id )
+{
+	LCUI_IME ime = LCUIIME_Find( ime_id );
+	if( ime ) {
+		LCUIIME_Close( self.ime );
+		self.ime = ime;
+		LCUIIME_Open( self.ime );
+		return TRUE;
 	}
-	return ime->func.close();
+	return FALSE;
+}
+
+LCUI_BOOL LCUIIME_SelectByName( const char *name )
+{
+	LCUI_IME ime = LCUIIME_FindByName( name );
+	if( ime ) {
+		LCUIIME_Close( self.ime );
+		self.ime = ime;
+		LCUIIME_Open( self.ime );
+		return TRUE;
+	}
+	return FALSE;
 }
 
 /* 切换至下一个输入法 */
-LCUI_API void LCUIIME_Switch(void)
+void LCUIIME_Switch( void )
 {
-	int i=0, n;
-	LCUIIME_Info *ime_ptr;
-
-	n = Queue_GetTotal( &imelist );
-	if( i>=n ) {
-		i = 0;
+	LCUI_IME ime;
+	if( self.ime && self.ime->node.next ) {
+		ime = self.ime->node.next->data;
+		LCUIIME_Close( self.ime );
+		self.ime = ime;
+		LCUIIME_Open( self.ime );
 	}
-	ime_ptr = Queue_Get( &imelist, i );
-	if( ime_ptr == NULL ) {
-		return;
-	}
-	if(ime_ptr != current_ime) {
-		LCUIIME_Close( current_ime );
-		current_ime = ime_ptr;
-		LCUIIME_Open( current_ime );
-	}
-	++i;
 }
 
 /* 销毁输入法信息 */
-static void LCUIIME_DestroyInfo( void *arg )
+static void LCUIIME_OnDestroy( void *arg )
 {
-	LCUIIME_Info *p;
-	p = (LCUIIME_Info*)arg;
-	LCUIString_Free( &p->name );
+	LCUI_IME ime = arg;
+	free( ime->name );
+	ime->name = NULL;
 }
 
-static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
+static void LCUIIME_ToText( LCUI_SysEvent e )
 {
 	char ch;
 
-	switch(event->key_code) {
+	switch(e->key.code) {
 #ifdef LCUI_BUILD_IN_WIN32
 	case 189: ch = '-'; break;
 	case 187: ch = '='; break;
@@ -181,19 +199,19 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 	case 221: ch = ']'; break;
 	case 219: ch = '['; break;
 #endif
-	default:ch = event->key_code;break;
+	default:ch = e->key.code;break;
 	}
 
 	DEBUG_MSG("key code: %d\n", event->key_code);
 	/* 如果没开启大写锁定，则将字母转换成小写 */
-	if( !enable_capitals_lock ) {
+	if( !self.enable_caps_lock ) {
 		if( ch >= 'A' && ch <= 'Z' ) {
-			ch = event->key_code + 32;
+			ch = e->key.code + 32;
 		}
 	}
 
 	/* 如果shift键处于按下状态 */
-	if( LCUIKey_IsHit(LCUIKEY_SHIFT) ) {
+	if( LCUIKeyboard_IsHit(LCUIKEY_SHIFT) ) {
 		if(ch >='a' && ch <= 'z') {
 			ch = ch - 32;
 		} else if(ch >='A' && ch <= 'Z') {
@@ -225,103 +243,113 @@ static void LCUIIME_ToText( const LCUI_KeyboardEvent *event  )
 		}
 	}
 	DEBUG_MSG("ch = %c\n", ch);
-	current_ime->func.totext( ch );
+	self.ime->handler.totext( ch );
 }
 
-/* 检测输入法是否要处理按键事件 */
-LCUI_API LCUI_BOOL LCUIIME_ProcessKey( const LCUI_KeyboardEvent *event )
+LCUI_BOOL LCUIIME_ProcessKey( LCUI_SysEvent e )
 {
 	int key_state;
 	/* 根据事件类型判定按键状态 */
-	if( event->type == LCUI_KEYUP ) {
+	if( e->type == LCUI_KEYUP ) {
 		key_state = LCUIKEYSTATE_RELEASE;
+		/* 如果是caps lock按键被释放 */
+		if( e->key.code == LCUIKEY_CAPITAL ) {
+			self.enable_caps_lock = !self.enable_caps_lock;
+			return FALSE;
+		}
 	} else {
 		key_state = LCUIKEYSTATE_PRESSED;
+		/* 如果按下的是 shift 键，但没释放，则直接退出 */
+		if( e->key.code == LCUIKEY_SHIFT ) {
+			return FALSE;
+		}
 	}
-	/* 如果按下的是shift键，但没释放，则直接退出 */
-	if( event->key_code == LCUIKEY_SHIFT
-	 && event->type == LCUI_KEYDOWN ) {
-		return FALSE;
-	}
-	/* 如果是caps lock按键被释放 */
-	if( event->key_code == LCUIKEY_CAPITAL
-	&& event->type == LCUI_KEYUP ) {
-		enable_capitals_lock = !enable_capitals_lock;
-		return FALSE;
-	}
-	if( current_ime == NULL ) {
-		return FALSE;
-	}
-	if( current_ime->func.prockey == NULL ) {
-		return FALSE;
-	}
-	/* 如果输入法要处理该键，则调用LCUIIME_ToText函数 */
-	if( current_ime->func.prockey( event->key_code, key_state ) ) {
-		LCUIIME_ToText( event );
-		return TRUE;
+	if( self.ime && self.ime->handler.prockey ) {
+		/* 如果输入法要处理该键，则调用LCUIIME_ToText函数 */
+		if( self.ime->handler.prockey( e->key.code, key_state ) ) {
+			LCUIIME_ToText( e );
+			return TRUE;
+		}
 	}
 	return FALSE;
 }
 
-/* 提交输入法输入的内容至目标 */
-LCUI_API int LCUIIME_Commit( const wchar_t *str )
+int LCUIIME_Commit( const wchar_t *str, int length )
 {
-	LCUI_Widget widget;
-	LCUI_WidgetEvent event;
-
-	if( current_ime == NULL ) {
-		return -1;
+	LCUI_SysEventRec sys_ev;
+	if( length < 0 ) {
+		length = wcslen( str );
 	}
-	if( current_ime->func.gettarget == NULL ) {
-		return -2;
+	sys_ev.type = LCUI_TEXTINPUT;
+	sys_ev.text.length = length;
+	sys_ev.text.text = NEW( wchar_t, length + 1 );
+	if( !sys_ev.text.text ) {
+		return -ENOMEM;
 	}
-	widget = current_ime->func.gettarget();
-	if(! widget ) {
-		return -3;
-	}
-	/* 设置事件 */
-	event.type = EVENT_INPUT;
-	wcscpy( event.input.text, str );
-	/* 派发事件 */
-	return Widget_DispatchEvent( widget, &event );
-}
-
-/* 设置输入法的目标 */
-LCUI_API int LCUIIME_SetTarget( LCUI_Widget widget )
-{
-	if( current_ime == NULL ) {
-		return -1;
-	}
-	if( current_ime->func.settarget == NULL ) {
-		return -2;
-	}
-	current_ime->func.settarget( widget );
+	wcsncpy( sys_ev.text.text, str, length + 1 );
+	LCUI_TriggerEvent( &sys_ev, NULL );
+	free( sys_ev.text.text );
+	sys_ev.text.text = NULL;
+	sys_ev.text.length = 0;
 	return 0;
 }
 
-static int LCUI_DefaultIMERegister(void);
+int LCUIIME_SetTarget( LCUI_Widget widget )
+{
+	if( self.ime && self.ime->handler.settarget ) {
+		self.ime->handler.settarget( widget );
+		return 0;
+	}
+	return -1;
+}
+
+LCUI_Widget LCUIIME_GetTarget( void )
+{
+	if( self.ime && self.ime->handler.gettarget ) {
+		return self.ime->handler.gettarget();
+	}
+	return NULL;
+}
+int LCUIIME_ClearTarget( void )
+{
+	if( self.ime && self.ime->handler.cleartarget ) {
+		self.ime->handler.cleartarget();
+		return 0;
+	}
+	return -1;
+}
+
+static int LCUI_RegisterDefaultIME( void );
 
 /* 初始化LCUI输入法模块 */
-LCUI_API void LCUI_InitIME(void)
+void LCUI_InitIME( void )
 {
 	int ime_id;
-	Queue_Init( &imelist, sizeof(LCUIIME_Info), LCUIIME_DestroyInfo );
-	imelist_init = TRUE;
-	ime_id = LCUI_DefaultIMERegister();
+	LinkedList_Init( &self.list );
+	self.is_inited = TRUE;
+	ime_id = LCUI_RegisterDefaultIME();
 	LCUIIME_Select( ime_id );
 }
 
 /* 停用LCUI输入法模块 */
-LCUI_API void LCUIModule_IME_End(void)
+void LCUI_ExitIME( void )
 {
-	imelist_init = FALSE;
+	self.is_inited = FALSE;
+	LinkedList_ClearData( &self.list, LCUIIME_OnDestroy );
 }
 
 
 /*-------------------------- 默认的输入法 ------------------------------*/
 
-// 目标部件
-static LCUI_Widget target_widget = NULL;
+#ifdef LCUI_BUILD_IN_WIN32
+#include <LCUI/platform.h>
+#include LCUI_EVENTS_H
+#endif
+
+static struct {
+	LCUI_Widget target;
+} default_ime;
+
 
 /**
 判断按键是否需要处理，也可以用于设置当前的输入法，比如：
@@ -403,12 +431,17 @@ static LCUI_BOOL IME_ProcessKey( int key, int key_state )
 
 static void IME_SetTarget( LCUI_Widget widget )
 {
-	target_widget = widget;
+	default_ime.target = widget;
 }
 
-static LCUI_Widget* IME_GetTarget( void )
+static LCUI_Widget IME_GetTarget( void )
 {
-	return target_widget;
+	return default_ime.target;
+}
+
+static void IME_ClearTarget( void )
+{
+	default_ime.target = NULL;
 }
 
 static void IME_ToText( char ch )
@@ -424,37 +457,54 @@ static void IME_ToText( char ch )
 	text[0] = ch;
 	text[1] = '\0';
 	DEBUG_MSG("%S, %d\n", text, ch);
-	LCUIIME_Commit( text ); // 直接提交该字符
+	LCUIIME_Commit( text, 2 ); // 直接提交该字符
 }
 
+
+#ifdef LCUI_BUILD_IN_WIN32
+
+static void WinIME_OnChar( LCUI_Event e, void *arg )
+{
+	MSG *msg = arg;
+	wchar_t text[2];
+	text[0] = msg->wParam;
+	text[1] = 0;
+	LCUIIME_Commit( text, 2 );
+}
+
+#endif
+
 /**
- 输入法被打开时的处理
- 可以在输入法被打开时，初始化相关数据，链接至词库什么的
+ * 输入法被打开时的处理
+ * 可以在输入法被打开时，初始化相关数据，链接至词库什么的
  **/
 static LCUI_BOOL IME_Open(void)
 {
+#ifdef LCUI_BUILD_IN_WIN32
+	LCUI_BindSysEvent( WM_CHAR, WinIME_OnChar, NULL, NULL );
+#endif
 	return TRUE;
 }
 
-
-/* 输入法被关闭时的处理 */
+/** 输入法被关闭时的处理 */
 static LCUI_BOOL IME_Close(void)
 {
+#ifdef LCUI_BUILD_IN_WIN32
+	LCUI_UnbindSysEvent( WM_CHAR, WinIME_OnChar );
+#endif
 	return TRUE;
 }
 
-/* 注册LCUI默认的输入法 */
-static int LCUI_DefaultIMERegister(void)
+/** 注册LCUI默认的输入法 */
+static int LCUI_RegisterDefaultIME( void )
 {
-	LCUIIME_Func ime_func;
-	ime_func.gettarget = IME_GetTarget;
-	ime_func.settarget = IME_SetTarget;
-	ime_func.prockey = IME_ProcessKey;
-	ime_func.totext = IME_ToText;
-	ime_func.close = IME_Close;
-	ime_func.open = IME_Open;
-	return LCUIIME_Register( "LCUI Input Method", &ime_func );
+	LCUI_IMEHandlerRec handler;
+	handler.gettarget = IME_GetTarget;
+	handler.settarget = IME_SetTarget;
+	handler.cleartarget = IME_ClearTarget;
+	handler.prockey = IME_ProcessKey;
+	handler.totext = IME_ToText;
+	handler.close = IME_Close;
+	handler.open = IME_Open;
+	return LCUIIME_Register( "LCUI Input Method", &handler );
 }
-/*------------------------------ END ----------------------------------*/
-
-#endif

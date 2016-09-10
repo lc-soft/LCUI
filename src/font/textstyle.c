@@ -39,6 +39,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
@@ -57,7 +58,6 @@ typedef struct LCUI_StyleTag {
 	LCUI_StyleRec style;
 } LCUI_StyleTag;
 
-/** 初始化字体样式数据 */
 void TextStyle_Init( LCUI_TextStyle *data )
 {
 	data->has_style = FALSE;
@@ -73,6 +73,23 @@ void TextStyle_Init( LCUI_TextStyle *data )
 	data->fore_color.value = 0x33333333;
 	data->back_color.value = 0xffffffff;
 	data->pixel_size = 13;
+}
+
+int TextStyle_Copy( LCUI_TextStyle *dst, LCUI_TextStyle *src )
+{
+	int len;
+	*dst = *src;
+	if( !dst->has_family ) {
+		return 0;
+	}
+	for( len = 0; dst->font_ids[len] != -1; ++len );
+	len += 1;
+	dst->font_ids = malloc( len * sizeof( int ) );
+	if( !dst->font_ids ) {
+		return -ENOMEM;
+	}
+	memcpy( dst->font_ids, src->font_ids, len * sizeof( int ) );
+	return 0;
 }
 
 void TextStyle_Destroy( LCUI_TextStyle *data )
@@ -91,8 +108,8 @@ void TextStyle_Destroy( LCUI_TextStyle *data )
 int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 {
 	char name[256];
-	const char *p, *style_name;
 	int count, i, *ids;
+	const char *p, *style_name;
 
 	if( ts->has_family && ts->font_ids ) {
 		free( ts->font_ids );
@@ -110,7 +127,7 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 	if( p - str == 0 ) {
 		return -1;
 	}
-	ids = (int*)malloc(sizeof(int)*(count+1));
+	ids = NEW( int, count + 1 );
 	if( !ids ) {
 		return -2;
 	}
@@ -127,7 +144,7 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 			continue;
 		}
 		name[i] = 0;
-		strtrim( name, name, NULL );
+		strtrim( name, name, "'\"\n\r\t " );
 		ids[count] = LCUIFont_GetId( name, style_name );
 		if( ids[count] > 0 ) {
 			++count;
@@ -143,7 +160,7 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 	} else {
 		ts->has_family = FALSE;
 		ts->font_ids = NULL;
-		free(ids);
+		free( ids );
 	}
 	return 0;
 }
@@ -151,15 +168,9 @@ int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str )
 /*-------------------------- StyleTag --------------------------------*/
 #define MAX_TAG_NUM 2
 
-static void DestroyTag( LCUI_StyleTag *tag )
+void StyleTags_Clear( LinkedList *tags )
 {
-	free( tag );
-	// XXX
-}
-
-void TagList_Clear( LinkedList *tags )
-{
-	LinkedList_Clear( tags, (FuncPtr)DestroyTag );
+	LinkedList_Clear( tags, free );
 }
 
 /** 获取当前的文本样式 */
@@ -221,7 +232,7 @@ static void StyleTags_Delete( LinkedList *tags, int id )
 	if( tags->length <= 0 ) {
 		return;
 	}
-	LinkedList_ForEach( node, tags ) {
+	for( LinkedList_Each( node, tags ) ) {
 		p = (LCUI_StyleTag*)node->data;
 		if( p->id == id ) {
 			LinkedList_DeleteNode( tags, node );

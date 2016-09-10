@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#ifndef __LCUI_TEXTVIEW_H__
-#define __LCUI_TEXTVIEW_H__
+#ifndef LCUI_TEXTVIEW_H
+#define LCUI_TEXTVIEW_H
 
 #include <LCUI/font.h>
 
@@ -56,6 +56,8 @@ LCUI_API void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style val );
 LCUI_API void TextView_GetTextStyle( LCUI_Widget w, LCUI_TextStyle *style );
 
 LCUI_API void TextView_SetTextAlign( LCUI_Widget w, int align );
+
+LCUI_API void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap );
 
 LCUI_END_HEADER
 

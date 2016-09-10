@@ -8,17 +8,17 @@
 
 static void OnKeyboardMessage( LCUI_Event ev, void *arg )
 {
+	MSG* msg = arg;
 	static POINT mouse_pos;
 	LCUI_SysEventRec sys_ev;
-	WIN_SysEvent win_ev = arg;
-	switch( win_ev->msg ) {
+	switch( msg->message ) {
 	case WM_KEYDOWN:
 		sys_ev.type = LCUI_KEYDOWN;
-		sys_ev.key_code = win_ev->wparam;
+		sys_ev.key.code = msg->wParam;
 		break;
 	case WM_KEYUP:
 		sys_ev.type = LCUI_KEYUP;
-		sys_ev.key_code = win_ev->wparam;
+		sys_ev.key.code = msg->wParam;
 		break;
 	default: return;
 	}

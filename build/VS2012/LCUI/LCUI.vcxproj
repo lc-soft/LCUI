@@ -113,7 +113,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libxml2.lib;libpng16.lib;libjpeg.lib;freetype253.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
@@ -148,12 +148,13 @@
     <ClInclude Include="..\..\..\include\LCUI\font\textlayer.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\textstyle.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\builder.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_library.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\messagebox.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\sidebar.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textedit.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\textview.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_base.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h" />
@@ -170,7 +171,6 @@
     <ClInclude Include="..\..\..\include\LCUI\graph.h" />
     <ClInclude Include="..\..\..\include\LCUI\input.h" />
     <ClInclude Include="..\..\..\include\LCUI\ime.h" />
-    <ClInclude Include="..\..\..\include\LCUI\lib.h" />
     <ClInclude Include="..\..\..\include\LCUI\main.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform.h" />
     <ClInclude Include="..\..\..\include\LCUI\platform\windows\windows_display.h" />
@@ -180,12 +180,14 @@
     <ClInclude Include="..\..\..\include\LCUI\surface.h" />
     <ClInclude Include="..\..\..\include\LCUI\thread.h" />
     <ClInclude Include="..\..\..\include\LCUI\timer.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\delay.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\dict.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\dirent.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\event.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\framectrl.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\memdebug.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\parse.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\rect.h" />
@@ -214,10 +216,12 @@
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
     <ClCompile Include="..\..\..\src\gui\builder.c" />
+    <ClCompile Include="..\..\..\src\gui\css_library.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\textedit.c" />
     <ClCompile Include="..\..\..\src\gui\widget\textview.c" />
     <ClCompile Include="..\..\..\src\gui\widget_background.c" />
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
@@ -231,6 +235,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
     <ClCompile Include="..\..\..\src\ime.c" />
+    <ClCompile Include="..\..\..\src\keyboard.c" />
     <ClCompile Include="..\..\..\src\main.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_display.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_events.c" />
@@ -243,13 +248,12 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="..\..\..\src\timer.c" />
-    <ClCompile Include="..\..\..\src\util\delay.c" />
     <ClCompile Include="..\..\..\src\util\dict.c" />
     <ClCompile Include="..\..\..\src\util\dirent.c" />
     <ClCompile Include="..\..\..\src\util\event.c" />
     <ClCompile Include="..\..\..\src\util\framectrl.c" />
     <ClCompile Include="..\..\..\src\util\linkedlist.c" />
-    <ClCompile Include="..\..\..\src\util\mem_debug.c" />
+    <ClCompile Include="..\..\..\src\util\memdebug.c" />
     <ClCompile Include="..\..\..\src\util\parse.c" />
     <ClCompile Include="..\..\..\src\util\rbtree.c" />
     <ClCompile Include="..\..\..\src\util\rect.c" />

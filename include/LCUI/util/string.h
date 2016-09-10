@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * string.h -- The string operation set.
  *
- * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * string.h -- 字符串相关操作函数。
  *
- * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_MISC_STRING_H__
-#define __LCUI_MISC_STRING_H__
+#ifndef LCUI_UTIL_STRING_H
+#define LCUI_UTIL_STRING_H
 
 #ifdef LCUI_BUILD_IN_WIN32
 #include <tchar.h>
@@ -63,13 +63,55 @@ typedef char TCHAR;
 LCUI_BEGIN_HEADER
 
 /**
-* 清除字符串首尾的字符
-* @param[out] outstr 处理后的字符串
-* @param[in] instr 需要处理的字符串
-* @param[in] charlist 需要清除的字符列表，当为NULL时，默认清除空白符
-* @return 处理后的字符串的长度
-*/
+ * 清除字符串首尾的字符
+ * @param[out] outstr 处理后的字符串
+ * @param[in] instr 需要处理的字符串
+ * @param[in] charlist 需要清除的字符列表，当为NULL时，默认清除空白符
+ * @return 处理后的字符串的长度
+ */
 LCUI_API int strtrim( char *outstr, const char *instr, const char *charlist );
+
+/**
+ * 分割字符串
+ * @param[in] instr 需分割的字符串
+ * @param[in] sep 分割标记字符串
+ * @param[out] outstrs 分割后的字符串列表
+ */
+LCUI_API int strsplit( const char *instr, const char *sep, char ***outstrs );
+
+
+/**
+ * 向字符串组添加字符串
+ * @param[in][out] strlist 字符串组
+ * @param[in] str 字符串
+ */
+LCUI_API int strsadd( char ***strlist, const char *str );
+
+/**
+ * 判断字符串组中是否包含指定字符串
+ * @param[in][out] strlist 字符串组
+ * @param[in] str 字符串
+ * @returns 如果包含则返回 1， 否则返回 0
+ */
+LCUI_API int strshas( char **strlist, const char *str );
+
+/**
+ * 从字符串组中删除指定字符串
+ * @param[in][out] strlist 字符串组
+ * @param[in] str 字符串
+ * @returns 如果删除成功则返回 1， 否则返回 0
+ */
+LCUI_API int strsdel( char ***strlist, const char *str );
+
+/**
+ * 向已排序的字符串组添加字符串
+ * @param[in][out] strlist 字符串组
+ * @param[in] str 字符串
+ */
+LCUI_API int sortedstrsadd( char ***strlist, const char *str );
+
+/** 释放字符串组 */
+LCUI_API void freestrs( char **strs );
 
 LCUI_END_HEADER
 

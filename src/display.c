@@ -43,7 +43,6 @@
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/input.h>
 #include <LCUI/timer.h>
 #include <LCUI/cursor.h>
@@ -51,6 +50,9 @@
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
 #include LCUI_DISPLAY_H
+
+#define DEFAULT_WIDTH	800
+#define DEFAULT_HEIGHT	600
 
 /** surface 记录 */
 typedef struct SurfaceRecord {
@@ -63,7 +65,7 @@ static struct DisplayContext {
 	int mode;			/**< 显示模式 */
 	LCUI_BOOL show_rect_border;	/**< 是否为重绘的区域显示边框 */
 	LCUI_BOOL is_working;		/**< 标志，指示当前模块是否处于工作状态 */
-	FrameCtrlCtx fc_ctx;		/**< 上下文句柄，用于画面更新时的帧数控制 */
+	FrameControl fc_ctx;		/**< 上下文句柄，用于画面更新时的帧数控制 */
 	LCUI_Thread thread;		/**< 线程，负责画面更新工作 */
 	LinkedList surfaces;		/**< surface 列表 */
 	LCUI_Mutex mutex;
@@ -102,7 +104,7 @@ static void LCUIDisplay_Update(void)
 	LCUI_PaintContext paint;
 	LinkedList_Init( &rlist );
 	/* 遍历当前的 surface 记录列表 */
-	LinkedList_ForEach( sn, &display.surfaces ) {
+	for( LinkedList_Each( sn, &display.surfaces ) ) {
 		p_sr = sn->data;
 		if( !p_sr->widget || !p_sr->surface
 		 || !Surface_IsReady(p_sr->surface) ) {
@@ -112,8 +114,11 @@ static void LCUIDisplay_Update(void)
 		/* 收集无效区域记录 */
 		Widget_ProcInvalidArea( p_sr->widget, &rlist );
 		/* 在 surface 上逐个重绘无效区域 */
-		LinkedList_ForEach( rn, &rlist ) {
+		for( LinkedList_Each( rn, &rlist ) ) {
 			paint = Surface_BeginPaint( p_sr->surface, rn->data );
+			if( !paint ) {
+				continue;
+			}
 			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
 				p_sr->widget->type, paint->rect.left,
 				paint->rect.top, paint->rect.w, paint->rect.h );
@@ -131,7 +136,7 @@ static void LCUIDisplay_Update(void)
 	LinkedList_Clear( &rlist, free );
 }
 
-void LCUIDisplay_InvalidateArea(LCUI_Rect *rect )
+void LCUIDisplay_InvalidateArea( LCUI_Rect *rect )
 {
 
 }
@@ -140,7 +145,7 @@ static LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &display.surfaces ) {
+	for( LinkedList_Each( node, &display.surfaces ) ) {
 		sr = node->data;
 		if( sr && sr->surface == surface ) {
 			return sr->widget;
@@ -153,7 +158,7 @@ static LCUI_Surface LCUIDisplay_GetBindSurface( LCUI_Widget widget )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &display.surfaces ) {
+	for( LinkedList_Each( node, &display.surfaces ) ) {
 		sr = node->data;
 		if( sr && sr->widget == widget ) {
 			return sr->surface;
@@ -206,7 +211,7 @@ static void LCUIDisplay_UnbindSurface( LCUI_Widget widget )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &display.surfaces ) {
+	for( LinkedList_Each( node, &display.surfaces ) ) {
 		sr = node->data;
 		if( sr && sr->widget == widget ) {
 			Surface_Delete( sr->surface );
@@ -220,7 +225,7 @@ static void LCUIDisplay_CleanSurfaces( void )
 {
 	SurfaceRecord *sr;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &display.surfaces ) {
+	for( LinkedList_Each( node, &display.surfaces ) ) {
 		sr = node->data;
 		Surface_Delete( sr->surface );
 		LinkedList_DeleteNode( &display.surfaces, node );
@@ -231,9 +236,10 @@ static int LCUIDisplay_Windowed( void )
 {
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	switch( display.mode ) {
-	case LCDM_FULLSCREEN:
 	case LCDM_WINDOWED:
 		return 0;
+	case LCDM_FULLSCREEN:
+		break;
 	case LCDM_SEAMLESS:
 	default:
 		LCUIDisplay_CleanSurfaces();
@@ -241,7 +247,7 @@ static int LCUIDisplay_Windowed( void )
 		break;
 	}
 	Widget_Show( root );
-	Widget_Resize( root, LCUIDisplay_GetWidth(), LCUIDisplay_GetHeight() );
+	Widget_Resize( root, DEFAULT_WIDTH, DEFAULT_HEIGHT );
 	display.mode = LCDM_WINDOWED;
 	return 0;
 }
@@ -277,7 +283,7 @@ static int LCUIDisplay_Seamless( void )
 		LCUIDisplay_CleanSurfaces();
 		break;
 	}
-	LinkedList_ForEach( node, &root->children ) {
+	for( LinkedList_Each( node, &root->children ) ) {
 		LCUIDisplay_BindSurface( node->data );
 	}
 	display.mode = LCDM_SEAMLESS;
@@ -505,7 +511,6 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	e_type = *((int*)&arg);
 	root = LCUIWidget_GetRoot();
 	surface = LCUIDisplay_GetBindSurface( e->target );
-	DEBUG_MSG("tip, widget: %s, e_type = %d\n", w->type, e_type);
 	if( display.mode == LCDM_SEAMLESS ) {
 		if( !surface && e_type != WET_ADD ) {
 			return;
@@ -562,7 +567,7 @@ static void OnPaint( LCUI_Event e, void *arg )
 	SurfaceRecord *sr;
 	LinkedListNode *node;
 	LCUI_DisplayEvent dpy_ev = arg;
-	LinkedList_ForEach( node, &display.surfaces ) {
+	for( LinkedList_Each( node, &display.surfaces ) ) {
 		sr = node->data;
 		if( sr && sr->surface != dpy_ev->surface ) {
 			continue;
@@ -606,7 +611,7 @@ int LCUI_InitDisplay( void )
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	LCUIDisplay_SetMode( LCDM_DEFAULT );
-	printf("[display] init ok.\n");
+	printf("[display] init ok, driver name: %s\n", display.driver.name);
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
 }
 

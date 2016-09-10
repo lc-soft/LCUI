@@ -55,10 +55,9 @@
 void RBTree_Init( LCUI_RBTree *rbt )
 {
         rbt->root = NULL;
-	rbt->judge = NULL;
+	rbt->compare = NULL;
 	rbt->destroy = NULL;
         rbt->total_node = 0;
-	rbt->need_free_data = 0;
 }
 
 static void DestroyRBTreeNode( LCUI_RBTree *rbt, LCUI_RBTreeNode *node )
@@ -75,13 +74,11 @@ static void DestroyRBTreeNode( LCUI_RBTree *rbt, LCUI_RBTreeNode *node )
 			node->parent->right = NULL;
 		}
 	}
-	if( rbt->destroy ) {
+	if( rbt->destroy && node->data ) {
 		rbt->destroy( node->data );
 	}
-	if( rbt->need_free_data ) {
-		free( node->data );
-	}
 	node->data = NULL;
+	free( node );
 }
 
 /** 销毁红黑树 */
@@ -89,6 +86,7 @@ void RBTree_Destroy( LCUI_RBTree *rbt )
 {
 	rbt->total_node = 0;
 	DestroyRBTreeNode( rbt, rbt->root );
+	rbt->root = NULL;
 }
 
 /** 获取第一个结点 */
@@ -282,18 +280,18 @@ rb_search_auxiliary( LCUI_RBTreeNode *root, int key, const void *keydata,
 
 LCUI_RBTreeNode* RBTree_CustomSearch( LCUI_RBTree* rbt, const void *keydata )
 {
-	return rb_search_auxiliary( rbt->root, 0, keydata, rbt->judge, NULL );
+	return rb_search_auxiliary( rbt->root, 0, keydata, rbt->compare, NULL );
 }
 
 LCUI_RBTreeNode* RBTree_Search( LCUI_RBTree* rbt, int key )
 {
-	return rb_search_auxiliary( rbt->root, key, NULL, rbt->judge, NULL );
+	return rb_search_auxiliary( rbt->root, key, NULL, rbt->compare, NULL );
 }
 
 void* RBTree_CustomGetData( LCUI_RBTree* rbt, const void *keydata )
 {
         LCUI_RBTreeNode *node;
-	node = rb_search_auxiliary( rbt->root, 0, keydata, rbt->judge, NULL );
+	node = rb_search_auxiliary( rbt->root, 0, keydata, rbt->compare, NULL );
         if( node ) {
                 return node->data;
         }
@@ -303,7 +301,7 @@ void* RBTree_CustomGetData( LCUI_RBTree* rbt, const void *keydata )
 void* RBTree_GetData( LCUI_RBTree* rbt, int key )
 {
         LCUI_RBTreeNode *node;
-	node = rb_search_auxiliary( rbt->root, key, NULL, rbt->judge, NULL );
+	node = rb_search_auxiliary( rbt->root, key, NULL, rbt->compare, NULL );
         if( node ) {
                 return node->data;
         }
@@ -317,7 +315,7 @@ rb_insert( LCUI_RBTree *rbt, int key, const void *keydata, void *data )
 
         parent_node = NULL;
         root = rbt->root;
-	node = rb_search_auxiliary( root, key, keydata, rbt->judge, &parent_node );
+	node = rb_search_auxiliary( root, key, keydata, rbt->compare, &parent_node );
         if( node ) {
                 return NULL;
         }
@@ -331,8 +329,8 @@ rb_insert( LCUI_RBTree *rbt, int key, const void *keydata, void *data )
         node->color = RED;
 
         if( parent_node ) {
-		if( rbt->judge && keydata ) {
-			if( rbt->judge( parent_node->data, keydata ) > 0 ) {
+		if( rbt->compare && keydata ) {
+			if( rbt->compare( parent_node->data, keydata ) > 0 ) {
 				parent_node->left = node;
 			} else {
 				parent_node->right = node;
@@ -443,106 +441,116 @@ rb_erase_rebalance( LCUI_RBTreeNode *node, LCUI_RBTreeNode *parent,
         return root;
 }
 
+static void rb_erase_by_node( LCUI_RBTree *rbt, LCUI_RBTreeNode *node )
+{
+	unsigned char color;
+	LCUI_RBTreeNode *parent;
+	LCUI_RBTreeNode *old = node;
+	LCUI_RBTreeNode *child = NULL;
+	LCUI_RBTreeNode *root = rbt->root;
+	if( node->left && node->right ) {
+		LCUI_RBTreeNode *left;
+		node = node->right;
+		while( (left = node->left) != NULL ) {
+			node = left;
+		}
+		child = node->right;
+		parent = node->parent;
+		color = node->color;
+
+		if( child ) {
+			child->parent = parent;
+		}
+		if( parent ) {
+			if( parent->left == node ) {
+				parent->left = child;
+			} else {
+				parent->right = child;
+			}
+		} else {
+			root = child;
+		}
+
+		if( node->parent == old ) {
+			parent = node;
+		}
+
+		node->parent = old->parent;
+		node->color = old->color;
+		node->right = old->right;
+		node->left = old->left;
+
+		if( old->parent ) {
+			if( old->parent->left == old ) {
+				old->parent->left = node;
+			} else {
+				old->parent->right = node;
+			}
+		} else {
+			root = node;
+		}
+
+		old->left->parent = node;
+		if( old->right ) {
+			old->right->parent = node;
+		}
+	} else {
+		if( !node->left ) {
+			child = node->right;
+		} else if( !node->right ) {
+			child = node->left;
+		}
+		parent = node->parent;
+		color = node->color;
+
+		if( child ) {
+			child->parent = parent;
+		}
+		if( parent ) {
+			if( parent->left == node ) {
+				parent->left = child;
+			} else {
+				parent->right = child;
+			}
+		} else {
+			root = child;
+		}
+	}
+
+	if( rbt->destroy && old->data ) {
+		rbt->destroy( old->data );
+	}
+	free( old );
+	if( color == BLACK ) {
+		/* 恢复红黑树性质 */
+		root = rb_erase_rebalance( child, parent, root );
+	}
+	rbt->root = root;
+	rbt->total_node -= 1;
+}
+
 /** 删除红黑树中的结点 */
 static int rb_erase( LCUI_RBTree *rbt, int key, const void *keydata )
 {
-        unsigned char color;
-        LCUI_RBTreeNode *root, *child = NULL, *parent, *old, *left, *node;
-
-        root = rbt->root;
-        /* 查找要删除的结点 */
-	node = rb_search_auxiliary( root, key, keydata, rbt->judge, NULL );
-        if( !node ) {
-                return -1;
-        }
-        old = node;
-        if (node->left && node->right) {
-                node = node->right;
-                while ((left = node->left) != NULL) {
-                        node = left;
-                }
-                child = node->right;
-                parent = node->parent;
-                color = node->color;
-
-                if (child) {
-                        child->parent = parent;
-                }
-                if (parent) {
-                        if (parent->left == node) {
-                                parent->left = child;
-                        } else {
-                                parent->right = child;
-                        }
-                } else {
-                        root = child;
-                }
-
-                if (node->parent == old) {
-                        parent = node;
-                }
-
-                node->parent = old->parent;
-                node->color = old->color;
-                node->right = old->right;
-                node->left = old->left;
-
-                if (old->parent) {
-                        if (old->parent->left == old) {
-                                old->parent->left = node;
-                        } else {
-                                old->parent->right = node;
-                        }
-                } else {
-                        root = node;
-                }
-
-                old->left->parent = node;
-                if (old->right) {
-                        old->right->parent = node;
-                }
-        } else {
-                if (!node->left) {
-                        child = node->right;
-                } else if (!node->right) {
-                        child = node->left;
-                }
-                parent = node->parent;
-                color = node->color;
-
-                if (child) {
-                        child->parent = parent;
-                }
-                if (parent) {
-                        if (parent->left == node) {
-                                parent->left = child;
-                        } else {
-                                parent->right = child;
-                        }
-                } else {
-                        root = child;
-                }
-        }
-
-	if( rbt->destroy ) {
-		rbt->destroy( old->data );
+	LCUI_RBTreeNode *node;
+	/* 查找要删除的结点 */
+	node = rb_search_auxiliary( rbt->root, key, keydata, 
+				    rbt->compare, NULL );
+	if( !node ) {
+		return -1;
 	}
-	if( rbt->need_free_data ) {
-		free( old->data );
-	}
-        free( old );
-        if (color == BLACK) {
-                /* 恢复红黑树性质 */
-                root = rb_erase_rebalance( child, parent, root );
-        }
-        rbt->root = root;
-        rbt->total_node -= 1;
-        return 0;
+	rb_erase_by_node( rbt, node );
+	return 0;
 }
 
 int RBTree_Erase( LCUI_RBTree *rbt, int key )
 {
 	return rb_erase( rbt, key, NULL );
+}
+
+void RBTree_EraseNode( LCUI_RBTree *rbt, LCUI_RBTreeNode *node )
+{
+	rb_erase_by_node( rbt, node );
 }
 
 int RBTree_CustomErase( LCUI_RBTree *rbt, const void *keydata )

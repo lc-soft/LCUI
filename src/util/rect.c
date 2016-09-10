@@ -241,7 +241,7 @@ int RectList_Add( LinkedList *list, LCUI_Rect *rect )
 	if( rect->w <= 0 || rect->h <= 0 ) {
 		return -1;
 	}
-	LinkedList_ForEach( node, list ) {
+	for( LinkedList_Each( node, list ) ) {
 		added_rect = node->data;
 		/* 如果被现有的矩形包含 */
 		if( LCUIRect_IsIncludeRect( added_rect, rect ) ) {
@@ -282,7 +282,7 @@ int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 	}
 	DEBUG_MSG("list: %p, total: %d, rect(%d,%d,%d,%d)\n", list,
 		   list->length, rect->x, rect->y, rect->w, rect->h);
-	LinkedList_ForEach( node, list ) {
+	for( LinkedList_Each( node, list ) ) {
 		p_rect = (LCUI_Rect*)node->data;
 		DEBUG_MSG("p_rect(%d,%d,%d,%d)\n", p_rect->x,
 			   p_rect->y, p_rect->w, p_rect->h);

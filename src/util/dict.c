@@ -222,7 +222,7 @@ int Dict_Rehash( Dict *d, int n )
 	return 1;
 }
 
-#define timeInMilliseconds LCUI_GetTickCount
+#define timeInMilliseconds LCUI_GetTime
 
 int Dict_RehashMilliseconds( Dict *d, int ms )
 {
@@ -658,3 +658,63 @@ void Dict_DisableResize( void )
 {
 	dict_can_resize = 0;
 }
+
+static unsigned int StringCopyKeyDict_KeyHash( const void *key )
+{
+	const char *buf = key;
+	unsigned int hash = 5381;
+	while( *buf ) {
+		hash = ((hash << 5) + hash) + (*buf++);
+	}
+	return hash;
+}
+
+static int StringCopyKeyDict_KeyCompare( void *privdata, const void *key1,
+					 const void *key2 )
+{
+	if( strcmp( key1, key2 ) == 0 ) {
+		return 1;
+	}
+	return 0;
+}
+
+static void *StringCopyKeyDict_KeyDup( void *privdata, const void *key )
+{
+	char *newkey = malloc( (strlen( key ) + 1)*sizeof( char ) );
+	strcpy( newkey, key );
+	return newkey;
+}
+
+static void StringCopyKeyDict_KeyDestructor( void *privdata, void *key )
+{
+	free( key );
+}
+
+static unsigned int IntKeyDict_KeyHash( const void *key )
+{
+	unsigned int hash = (unsigned int)key;
+	return Dict_IntHashFunction( hash );
+}
+
+static unsigned int IdentityKeyDict_KeyHash( const void *key )
+{
+	return (unsigned int)key;
+}
+
+DictType DictType_StringKey = {
+	StringCopyKeyDict_KeyHash,
+	NULL,
+	NULL,
+	StringCopyKeyDict_KeyCompare,
+	NULL,
+	NULL
+};
+
+DictType DictType_StringCopyKey = {
+	StringCopyKeyDict_KeyHash,
+	StringCopyKeyDict_KeyDup,
+	NULL,
+	StringCopyKeyDict_KeyCompare,
+	StringCopyKeyDict_KeyDestructor,
+	NULL
+};

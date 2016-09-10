@@ -37,16 +37,10 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#ifndef __LCUI_TEXTLAYER_H__
-#define __LCUI_TEXTLAYER_H__
+#ifndef LCUI_TEXTLAYER_H
+#define LCUI_TEXTLAYER_H
 
 LCUI_BEGIN_HEADER
-
-/** 文本添加类型 */
-enum TextAddType {
-        TEXT_ADD_TYPE_INSERT,		/**< 插入至插入点处 */
-        TEXT_ADD_TYPE_APPEND		/**< 追加至文本末尾 */
-};
 
 typedef struct TextCharRec_ {
         wchar_t char_code;		/**< 字符码 */
@@ -85,14 +79,17 @@ typedef struct LCUI_TextLayerRec_  {
 	int new_offset_y;		/**< 新的Y轴坐标偏移量 */
         int insert_x;			/**< 光标所在列数 */
         int insert_y;			/**< 光标所在行数 */
-        int max_width;			/**< 最大文本宽度 */
+	int width;			/**< 实际文本宽度 */
+	int fixed_width;		/**< 固定文本宽度 */
+	int fixed_height;		/**< 固定文本高度 */
+        int max_width;			/**< 最大文本宽度，当未设置固定宽度时，文字排版将按最大宽度进行 */
         int max_height;			/**< 最大文本高度 */
+	int length;			/**< 文本长度 */
 	LCUI_BOOL is_mulitiline_mode;	/**< 是否启用多行文本模式 */
         LCUI_BOOL is_autowrap_mode;	/**< 是否启用自动换行模式 */
 	LCUI_BOOL is_using_style_tags;	/**< 是否使用文本样式标签 */
         LCUI_BOOL is_using_buffer;	/**< 是否使用缓存空间来存储文本位图 */
 	LinkedList dirty_rect;		/**< 脏矩形记录 */
-
         int text_align;			/**< 文本的对齐方式 */
         TextRowListRec rowlist;		/**< 文本行列表 */
         LCUI_TextStyle text_style;	/**< 文本全局样式 */
@@ -119,15 +116,6 @@ LCUI_API int TextLayer_GetRowTextLength( LCUI_TextLayer layer, int row );
 /** 添加 更新文本排版 的任务 */
 LCUI_API void TextLayer_AddUpdateTypeset( LCUI_TextLayer layer, int start_row );
 
-/** 设置文本颜色 */
-LCUI_API void TextLayer_SetFontColor( LCUI_TextLayer layer, LCUI_Color color );
-
-/** 设置文本所使用的字体字族 */
-LCUI_API void TextLayer_SetFontFamily( LCUI_TextLayer layer, const char *family_name );
-
-/** 设置文本的字体像素大小 */
-LCUI_API void TextLayer_SetFontPixelSize( LCUI_TextLayer layer, int pixel_size );
-
 /** 设置文本对齐方式 */
 LCUI_API void TextLayer_SetTextAlign( LCUI_TextLayer layer, int align );
 
@@ -137,7 +125,7 @@ LCUI_API void TextLayer_SetOffset( LCUI_TextLayer layer, int offset_x, int offse
 LCUI_API LCUI_TextLayer TextLayer_New(void);
 
 /** 销毁TextLayer */
-LCUI_API void TextLayer_Destroy( LCUI_TextLayer *layer );
+LCUI_API void TextLayer_Destroy( LCUI_TextLayer layer );
 
 /** 标记指定范围内容的文本行的矩形为无效 */
 LCUI_API void TextLayer_InvalidateRowsRect( LCUI_TextLayer layer, 
@@ -196,29 +184,32 @@ LCUI_API int TextLayer_GetTextW( LCUI_TextLayer layer, int start_pos,
 /** 获取文本位图缓存 */
 LCUI_API LCUI_Graph* TextLayer_GetGraphBuffer( LCUI_TextLayer layer );
 
+/** 计算并获取文本的宽度 */
+LCUI_API int TextLayer_GetWidth( LCUI_TextLayer layer );
+
+/** 计算并获取文本的高度 */
+LCUI_API int TextLayer_GetHeight( LCUI_TextLayer layer );
+
+/** 设置固定尺寸 */
+LCUI_API int TextLayer_SetFixedSize( LCUI_TextLayer layer, int width, int height );
+
 /** 设置最大尺寸 */
-LCUI_API int TextLayer_SetMaxSize( LCUI_TextLayer layer, LCUI_Size new_size );
+LCUI_API int TextLayer_SetMaxSize( LCUI_TextLayer layer, int width, int height );
 
 /** 设置是否启用多行文本模式 */
 LCUI_API void TextLayer_SetMultiline( LCUI_TextLayer layer, int is_true );
 
 /** 删除文本光标的当前坐标右边的文本 */
-LCUI_API int TextLayer_Delete( LCUI_TextLayer layer, int n_char );
+LCUI_API int TextLayer_TextDelete( LCUI_TextLayer layer, int n_char );
 
 /** 退格删除文本，即删除文本光标的当前坐标左边的文本 */
-LCUI_API int TextLayer_Backspace( LCUI_TextLayer layer, int n_char );
+LCUI_API int TextLayer_TextBackspace( LCUI_TextLayer layer, int n_char );
 
 /** 设置是否启用自动换行模式 */
 LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer layer, int is_true );
 
 /** 设置是否使用样式标签 */
 LCUI_API void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_true );
-
-/** 计算并获取文本的宽度 */
-LCUI_API int TextLayer_GetWidth( LCUI_TextLayer layer );
-
-/** 计算并获取文本的高度 */
-LCUI_API int TextLayer_GetHeight( LCUI_TextLayer layer );
 
 /** 重新载入各个文字的字体位图 */
 LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer layer );

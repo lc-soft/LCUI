@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
- * delay.h -- time delay function.
+ * textedit.c -- textedit widget, used to allow user edit text.
  *
- * Copyright (C) 2013-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,9 +20,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * delay.h -- 一些提供延时功能的函数
+ * textedit.c -- 文本编辑部件，用于让用户编辑文本。
  *
- * 版权所有 (C) 2013-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -36,18 +36,47 @@
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
-#ifndef __LCUI_UTIL_DELAY_H__
-#define __LCUI_UTIL_DELAY_H__
+#ifndef LCUI_TEXTBOX_H
+#define LCUI_TEXTBOX_H
 
 LCUI_BEGIN_HEADER
 
-/* 秒级延时 */
-LCUI_API void LCUI_Sleep( unsigned int s );
+#define TextEdit_New() Widget_New("textedit")
 
-/* 毫秒级延时 */
-LCUI_API void LCUI_MSleep( unsigned int ms );
+/** 指定文本框是否处理控制符 */
+LCUI_API void TextEdit_SetUsingStyleTags( LCUI_Widget widget, LCUI_BOOL is_true );
+
+/** 指定文本框是否启用多行文本显示 */
+LCUI_API void TextEdit_SetMultiline( LCUI_Widget widget, LCUI_BOOL is_true );
+
+/** 清空文本内容 */
+LCUI_API void TextEdit_ClearText( LCUI_Widget widget );
+
+/** 获取文本内容 */
+LCUI_API int TextEdit_GetTextW( LCUI_Widget widget, int start, int max_len, wchar_t *buf );
+
+/** 获取文本长度 */
+LCUI_API int TextEdit_GetTextLength( LCUI_Widget w );
+
+/** 设置文本编辑框内的光标，指定是否闪烁、闪烁时间间隔 */
+LCUI_API void TextEdit_SetCaretBlink( LCUI_Widget w, LCUI_BOOL enabled, int time );
+
+/** 为文本框设置文本（宽字符版） */
+LCUI_API int TextEdit_SetTextW( LCUI_Widget widget, const wchar_t *wstr );
+
+LCUI_API int TextEdit_SetText( LCUI_Widget widget, const char *utf8_str );
+
+/** 为文本框追加文本（宽字符版） */
+LCUI_API int TextEdit_AppendTextW( LCUI_Widget widget, const wchar_t *wstr );
+
+/** 为文本框插入文本（宽字符版） */
+LCUI_API int TextEdit_InsertTextW( LCUI_Widget widget, const wchar_t *wstr );
+
+/** 设置占位符，当文本编辑框内容为空时显示占位符 */
+LCUI_API int TextEdit_SetPlaceHolderW( LCUI_Widget w, const wchar_t *wstr );
+
+LCUI_API int TextEdit_SetPlaceHolder( LCUI_Widget w, const char *str );
 
 LCUI_END_HEADER
 
 #endif
-

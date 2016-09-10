@@ -37,13 +37,13 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
-#ifndef __LCUI_SURFACE_H__
-#define __LCUI_SURFACE_H__
+#ifndef LCUI_SURFACE_H
+#define LCUI_SURFACE_H
 
 #define RENDER_MODE_BIT_BLT	0
 #define RENDER_MODE_STRETCH_BLT 1
 
-#ifdef __IN_SURFACE_SOURCE_FILE__
+#ifdef LCUI_SURFACE_C
 typedef struct LCUI_SurfaceRec_ * LCUI_Surface;
 #else
 typedef void* LCUI_Surface;

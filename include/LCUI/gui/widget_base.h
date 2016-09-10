@@ -37,25 +37,23 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_WIDGET_BASE_H__
-#define __LCUI_WIDGET_BASE_H__
+#ifndef LCUI_WIDGET_BASE_H
+#define LCUI_WIDGET_BASE_H
 
 LCUI_BEGIN_HEADER
 
-/** 如果没有包含 widget_build.h 头文件 */
-#ifndef __LCUI_WIDGET_BUILD_H__
-typedef struct LCUI_WidgetBase* LCUI_Widget;
-#endif
+#include <LCUI/gui/css_library.h>
+#include <LCUI/gui/css_parser.h>
 
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
+	LCUI_BOOL focusable;		/**< 是否能够得到焦点 */
 	int left, top;			/**< 左边界、顶边界的偏移距离 */
 	int right, bottom;		/**< 右边界、底边界的偏移距离 */
 	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
 	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
 	LCUI_StyleValue position;	/**< 定位方式 */
-	LCUI_StyleValue float_mode;	/**< 浮动模式 */
 	LCUI_StyleValue display;	/**< 显示方式，决定以何种布局显示该部件 */
 	LCUI_StyleValue box_sizing;	/**< 以何种方式计算宽度和高度 */
 	LCUI_StyleValue vertical_align;	/**< 垂直对齐方式 */
@@ -66,107 +64,6 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_Border border;		/**< 边框 */
 	int pointer_events;		/**< 事件的处理方式 */
 } LCUI_WidgetStyle;
-
-/** 样式属性名 */
-enum LCUI_StyleKeyName {
-	key_position_start,
-	key_left,
-	key_right,
-	key_top,
-	key_bottom,
-	key_position,
-	key_position_end,
-	key_display_start,
-	key_visible,
-	key_display,
-	key_display_end,
-	key_z_index,
-	key_opacity,
-	key_box_sizing,
-	key_width,
-	key_min_width,
-	key_max_width,
-	key_height,
-	key_min_height,
-	key_max_height,
-	key_margin_top,
-	key_margin_right,
-	key_margin_bottom,
-	key_margin_left,
-	key_padding_top,
-	key_padding_right,
-	key_padding_bottom,
-	key_padding_left,
-	key_vertical_align,
-	key_border_start,
-	key_border_color,
-	key_border_style,
-	key_border_width,
-	key_border_top_width,
-	key_border_top_style,
-	key_border_top_color,
-	key_border_right_width,
-	key_border_right_style,
-	key_border_right_color,
-	key_border_bottom_width,
-	key_border_bottom_style,
-	key_border_bottom_color,
-	key_border_left_width,
-	key_border_left_style,
-	key_border_left_color,
-	key_border_top_left_radius,
-	key_border_top_right_radius,
-	key_border_bottom_left_radius,
-	key_border_bottom_right_radius,
-	key_border_end,
-	key_background_start,
-	key_background_color,
-	key_background_image,
-	key_background_size,
-	key_background_size_width,
-	key_background_size_height,
-	key_background_repeat,
-	key_background_repeat_x,
-	key_background_repeat_y,
-	key_background_position,
-	key_background_position_x,
-	key_background_position_y,
-	key_background_origin,
-	key_background_end,
-	key_box_shadow_start,
-	key_box_shadow_x,
-	key_box_shadow_y,
-	key_box_shadow_spread,
-	key_box_shadow_blur,
-	key_box_shadow_color,
-	key_box_shadow_end,
-	key_pointer_events,
-	STYLE_KEY_TOTAL
-};
-
-typedef struct LCUI_StyleSheetRec_ {
-	LCUI_Style sheet;
-	int length;
-} LCUI_StyleSheetRec, *LCUI_StyleSheet;
-
-typedef struct LCUI_SelectorNodeRec_ {
-	char *id;
-	char *type;
-	char *class_name;
-	char *pseudo_class_name;
-} LCUI_SelectorNodeRec, *LCUI_SelectorNode;
-
-typedef struct LCUI_SelectorRec_ {
-	LCUI_SelectorNode *list;	/**< 选择器结点列表 */
-	int length;			/**< 选择器结点长度 */
-	int rank;			/**< 权值，决定优先级 */
-	int batch_num;			/**< 批次号 */
-} LCUI_SelectorRec, *LCUI_Selector;
-
-#define SetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = TRUE, \
-					S->sheet[NAME].is_changed = TRUE, \
-					S->sheet[NAME].type = SVT_##TYPE, \
-					S->sheet[NAME].val_##TYPE = VAL
 
 /** 部件任务类型，按照任务的依赖顺序排列 */
 enum WidgetTaskType {
@@ -188,16 +85,9 @@ enum WidgetTaskType {
 	WTT_OPACITY,
 	WTT_BODY,
 	WTT_REFRESH,
-	WTT_CACHE_STYLE,	/**< 缓存当前样式 */
 	WTT_USER,
 	WTT_TOTAL_NUM
 };
-
-#ifndef __IN_WIDGET_TASK_SOURCE_FILE__
-typedef void* LCUI_WidgetTaskBox;
-#else
-typedef struct LCUI_WidgetTaskBoxRec_* LCUI_WidgetTaskBox;
-#endif
 
 typedef struct LCUI_WidgetBoxRect {
 	LCUI_Rect content;	/**< 内容框的区域 */
@@ -215,8 +105,19 @@ typedef struct LCUI_WidgetTaskBoxRec_ {
 
 typedef struct LCUI_WidgetRec_* LCUI_Widget;
 
+/** 部件状态 */
+enum LCUI_WidgetState {
+	WSTATE_CREATED = 0,
+	WSTATE_UPDATED,
+	WSTATE_LAYOUTED,
+	WSTATE_READY,
+	WSTATE_NORMAL,
+	WSTATE_DELETED,
+};
+
 /** 部件结构 */
 typedef struct LCUI_WidgetRec_ {
+	int			state;			/**< 状态 */
 	int			x, y;			/**< 当前坐标（由 origin 计算而来） */
 	int			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
 	int			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
@@ -230,14 +131,12 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_Rect2		margin;			/**< 外边距框 */
 	LCUI_WidgetBoxRect	box;			/**< 部件的各个区域信息 */
 	LCUI_StyleSheet		style;			/**< 当前完整样式表 */
-	LCUI_StyleSheet		cached_style;		/**< 已缓存的完整样式表 */
-	LCUI_StyleSheet		inherited_style;	/**< 通过继承得到的样式表 */
 	LCUI_StyleSheet		custom_style;		/**< 自定义样式表 */
+	LCUI_StyleSheet		inherited_style;	/**< 通过继承得到的样式表 */
 	LCUI_WidgetStyle	computed_style;		/**< 已经计算的样式数据 */
 	LCUI_Widget		parent;			/**< 父部件 */
 	LinkedList		children;		/**< 子部件 */
 	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
-	LinkedList		children_trash;		/**< 需被删除的子部件 */
 	void			*private_data;		/**< 私有数据 */
 	void			*extend_data;		/**< 扩展数据 */
 	LCUI_BOOL		enable_graph;		/**< 是否启用位图缓存 */
@@ -247,10 +146,10 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_WidgetTaskBoxRec	task;			/**< 任务记录 */
 	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
 	LCUI_BOOL		has_dirty_child;	/**< 子级部件是否有无效区域 */
-	LCUI_BOOL		deleted;		/**< 是否已经删除 */
 	LCUI_BOOL		layout_locked;		/**< 子级部件布局是否已锁定 */
+	LCUI_BOOL		event_blocked;		/**< 是否阻止自己和子级部件的事件处理 */
+	LCUI_BOOL		disabled;		/**< 是否禁用 */
 } LCUI_WidgetRec;
-
 
 #define Widget_GetNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec))
 #define Widget_GetShowNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode))
@@ -308,6 +207,9 @@ LCUI_API void Widget_ExecUpdateZIndex( LCUI_Widget w );
 /** 刷新位置 */
 LCUI_API void Widget_UpdatePosition( LCUI_Widget w );
 
+/** 刷新外间距 */
+LCUI_API void Widget_UpdateMargin( LCUI_Widget w );
+
 /** 刷新尺寸 */
 LCUI_API void Widget_UpdateSize( LCUI_Widget w );
 
@@ -316,12 +218,6 @@ LCUI_API void Widget_UpdateProps( LCUI_Widget w );
 
 /** 更新透明度 */
 LCUI_API void Widget_UpdateOpacity( LCUI_Widget w );
-
-/** 处理部件中当前积累的任务 */
-LCUI_API int Widget_Update( LCUI_Widget w );
-
-/** 计算部件通过继承得到的样式表 */
-LCUI_API int Widget_ComputeInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 
 /** 设置部件标题 */
 LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
@@ -363,6 +259,9 @@ LCUI_API int Widget_AddStatus( LCUI_Widget w, const char *status_name );
 
 /** 判断部件是否包含指定的状态 */
 LCUI_API LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name );
+
+/** 设置部件是否禁用 */
+LCUI_API void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled );
 
 /** 计算部件的最大宽度 */
 LCUI_API int Widget_ComputeMaxWidth( LCUI_Widget w );

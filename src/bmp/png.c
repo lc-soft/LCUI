@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -62,7 +63,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 
 	fp = fopen( filepath, "rb" );
 	if( fp == NULL ) {
-		return FILE_ERROR_OPEN_ERROR;
+		return ENOENT;
 	}
 
 	png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
@@ -75,7 +76,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 	if( temp < PNG_BYTES_TO_CHECK ) {
 		fclose( fp );
 		png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
-		return FILE_ERROR_UNKNOWN_FORMAT;
+		return -1;
 	}
 	/* 检测数据是否为PNG的签名 */
 	temp = png_sig_cmp( (png_bytep)buf, (png_size_t)0, PNG_BYTES_TO_CHECK );
@@ -83,7 +84,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 	if( temp != 0 ) {
 		fclose( fp );
 		png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
-		return FILE_ERROR_UNKNOWN_FORMAT;
+		return -1;
 	}
 	/* 复位文件指针 */
 	rewind( fp );
@@ -104,7 +105,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 		graph->color_type = COLOR_TYPE_ARGB;
 		temp = Graph_Create( graph, w, h );
 		if( temp != 0 ) {
-			ret = FILE_ERROR_MALLOC_ERROR;
+			ret = -ENOMEM;
 			break;
 		}
 		pixel_ptr = graph->bytes;
@@ -126,7 +127,7 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 		graph->color_type = COLOR_TYPE_RGB;
 		temp = Graph_Create( graph, w, h );
 		if( temp != 0 ) {
-			ret = FILE_ERROR_MALLOC_ERROR;
+			ret = -ENOMEM;
 			break;
 		}
 		pixel_ptr = graph->bytes;
@@ -139,14 +140,15 @@ int Graph_LoadPNG( const char *filepath, LCUI_Graph *graph )
 		}
 		break;
 		/* 其它色彩类型的图像就读了 */
-	default: ret = FILE_ERROR_UNKNOWN_FORMAT; break;
+	default: ret = -1; break;
 	}
 	fclose( fp );
 	png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
+	return ret;
 #else
 	_DEBUG_MSG( "warning: not PNG support!" );
+	return -1;
 #endif
-	return ret;
 }
 
 int Graph_GetPNGSize( const char *filepath, int *width, int *height )
@@ -158,7 +160,7 @@ int Graph_GetPNGSize( const char *filepath, int *width, int *height )
 	char buf[PNG_BYTES_TO_CHECK];
 	FILE *fp = fopen( filepath, "rb" );
 	if( !fp ) {
-		return FILE_ERROR_OPEN_ERROR;
+		return ENOENT;
 	}
 	png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
 	info_ptr = png_create_info_struct( png_ptr );
@@ -167,13 +169,13 @@ int Graph_GetPNGSize( const char *filepath, int *width, int *height )
 	if( ret < PNG_BYTES_TO_CHECK ) {
 		fclose( fp );
 		png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
-		return FILE_ERROR_UNKNOWN_FORMAT;
+		return -1;
 	}
 	ret = png_sig_cmp( (png_bytep)buf, (png_size_t)0, PNG_BYTES_TO_CHECK );
 	if( ret != 0 ) {
 		fclose( fp );
 		png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
-		return FILE_ERROR_UNKNOWN_FORMAT;
+		return -1;
 	}
 	rewind( fp );
 	png_init_io( png_ptr, fp );
@@ -182,10 +184,11 @@ int Graph_GetPNGSize( const char *filepath, int *width, int *height )
 	*height = png_get_image_height( png_ptr, info_ptr );
 	fclose( fp );
 	png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
+	return 0;
 #else
 	_DEBUG_MSG( "warning: not PNG support!" );
+	return -1;
 #endif
-	return ret;
 }
 
 int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )

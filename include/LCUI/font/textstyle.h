@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_TEXTSTYLE_H__
-#define __LCUI_TEXTSTYLE_H__
+#ifndef LCUI_TEXTSTYLE_H
+#define LCUI_TEXTSTYLE_H
 
 LCUI_BEGIN_HEADER
 
@@ -86,6 +86,8 @@ typedef struct LCUI_TextStyle {
 /** 初始化字体样式数据 */
 LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );
 
+LCUI_API int TextStyle_Copy( LCUI_TextStyle *dst, LCUI_TextStyle *src );
+
 LCUI_API void TextStyle_Destroy( LCUI_TextStyle *data );
 
 /**
@@ -97,11 +99,10 @@ LCUI_API int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str );
 
 /*-------------------------- StyleTag --------------------------------*/
 
-#define TagList_Init LinkedList_Init
+#define StyleTags_Init LinkedList_Init
 
-LCUI_API void TagList_Clear( LinkedList *tags );
+LCUI_API void StyleTags_Clear( LinkedList *tags );
 
-/** 获取当前的文本样式 */
 LCUI_API LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags );
 
 /** 在字符串中获取样式的结束标签，输出的是标签名 */

@@ -42,7 +42,6 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/gui/widget.h>
 
 typedef struct ImageCacheRec_ {
@@ -125,13 +124,13 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 {
 	ImageCache cache;
 	LCUI_AppTaskRec task = {0};
-	LCUI_Style s = &widget->cached_style->sheet[key_background_image];
+	LCUI_Style s = &widget->style->sheet[key_background_image];
 
 	if( !is_inited ) {
 		RBTree_Init( &images );
 		RBTree_Init( &refs );
-		RBTree_OnJudge( &refs, OnCompareWidget );
-		RBTree_OnJudge( &images, OnComparePath );
+		RBTree_OnCompare( &refs, OnCompareWidget );
+		RBTree_OnCompare( &images, OnComparePath );
 		RBTree_OnDestroy( &refs, free );
 		RBTree_OnDestroy( &images, OnDestroyCache );
 		is_inited = TRUE;
@@ -153,6 +152,7 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 	task.func = ExecLoadImage;
 	task.arg[0] = widget;
 	task.arg[1] = strdup( path );
+	task.destroy_arg[1] = free;
 	LCUI_PostTask( &task );
 }
 
@@ -162,9 +162,9 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 	LCUI_Style s;
 	LCUI_StyleSheet ss = widget->style;
 	LCUI_Background *bg = &widget->computed_style.background;
-	int key = key_background_start + 1;
+	int key = key_background_start;
 
-	for( ; key < key_background_end; ++key ) {
+	for( ; key <= key_background_end; ++key ) {
 		s = &ss->sheet[key];
 		if( !s->is_valid ) {
 			continue;

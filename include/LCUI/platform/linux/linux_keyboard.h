@@ -1,5 +1,5 @@
-#ifndef __LCUI_LINUX_KEYBOARD_H__
-#define __LCUI_LINUX_KEYBOARD_H__
+#ifndef LCUI_LINUX_KEYBOARD_H
+#define LCUI_LINUX_KEYBOARD_H
 
 void LCUI_InitLinuxKeyboard( void );
 

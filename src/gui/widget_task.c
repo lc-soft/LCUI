@@ -37,43 +37,42 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
-//#define DEBUG
-#define __IN_WIDGET_TASK_SOURCE_FILE__
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 
+typedef void (*callback)(LCUI_Widget);
+
+/** 部件任务模块数据 */
+static struct WidgetTaskModule {
+	size_t count;
+	int64_t timeout;
+	LCUI_BOOL is_timeout;
+	LinkedList trash;			/**< 待删除的部件列表 */
+	callback handlers[WTT_TOTAL_NUM];	/**< 任务处理器 */
+} self;
+
 static void HandleRefreshStyle( LCUI_Widget w )
 {
 	Widget_ExecUpdateStyle( w, TRUE );
 	w->task.buffer[WTT_UPDATE_STYLE] = FALSE;
-	w->task.buffer[WTT_CACHE_STYLE] = TRUE;
 }
 
 static void HandleUpdateStyle( LCUI_Widget w )
 {
 	Widget_ExecUpdateStyle( w, FALSE );
-	w->task.buffer[WTT_CACHE_STYLE] = TRUE;
-}
-
-static void HandleCacheStyle( LCUI_Widget w )
-{
-	StyleSheet_Clear( w->cached_style );
-	StyleSheet_Replace( w->cached_style, w->style );
 }
 
 static void HandleSetTitle( LCUI_Widget w )
 {
-	_DEBUG_MSG("widget: %s\n", w->type);
 	Widget_PostSurfaceEvent( w, WET_TITLE );
 }
 
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
 static void HandleBody( LCUI_Widget w )
 {
-	DEBUG_MSG( "body\n" );
 	Widget_InvalidateArea( w, NULL, SV_BORDER_BOX );
 }
 
@@ -88,15 +87,11 @@ static void HandleRefresh( LCUI_Widget w )
 void Widget_UpdateTaskStatus( LCUI_Widget widget )
 {
 	int i;
-	for( i=0; i<WTT_TOTAL_NUM; ++i ) {
+	for( i = 0; i < WTT_TOTAL_NUM; ++i ) {
 		if( widget->task.buffer[i] ) {
 			widget->task.for_self = TRUE;
+			Widget_AddTask( widget, widget->task.buffer[i] );
 		}
-	}
-	widget = widget->parent;
-	while( widget ) {
-		widget->task.for_children = TRUE;
-		widget = widget->parent;
 	}
 }
 
@@ -105,7 +100,7 @@ void Widget_AddTaskForChildren( LCUI_Widget widget, int task )
 	LCUI_Widget child;
 	LinkedListNode *node;
 	widget->task.for_children = TRUE;
-	LinkedList_ForEach( node, &widget->children ) {
+	for( LinkedList_Each( node, &widget->children ) ) {
 		child = node->data;
 		Widget_AddTask( child, task );
 		Widget_AddTaskForChildren( child, task );
@@ -114,7 +109,7 @@ void Widget_AddTaskForChildren( LCUI_Widget widget, int task )
 
 void Widget_AddTask( LCUI_Widget widget, int task )
 {
-	if( widget->deleted ) {
+	if( widget->state == WSTATE_DELETED ) {
 		return;
 	}
 	widget->task.for_self = TRUE;
@@ -127,116 +122,144 @@ void Widget_AddTask( LCUI_Widget widget, int task )
 	}
 }
 
-typedef void (*callback)(LCUI_Widget);
-
-static callback task_handlers[WTT_TOTAL_NUM];
-
 /** 映射任务处理器 */
 static void MapTaskHandler(void)
 {
-	task_handlers[WTT_VISIBLE] = Widget_UpdateVisibility;
-	task_handlers[WTT_POSITION] = Widget_UpdatePosition;
-	task_handlers[WTT_RESIZE] = Widget_UpdateSize;
-	task_handlers[WTT_SHADOW] = Widget_UpdateBoxShadow;
-	task_handlers[WTT_BORDER] = Widget_UpdateBorder;
-	task_handlers[WTT_OPACITY] = Widget_UpdateOpacity;
-	task_handlers[WTT_BODY] = HandleBody;
-	task_handlers[WTT_TITLE] = HandleSetTitle;
-	task_handlers[WTT_REFRESH] = HandleRefresh;
-	task_handlers[WTT_UPDATE_STYLE] = HandleUpdateStyle;
-	task_handlers[WTT_REFRESH_STYLE] = HandleRefreshStyle;
-	task_handlers[WTT_CACHE_STYLE] = HandleCacheStyle;
-	task_handlers[WTT_BACKGROUND] = Widget_UpdateBackground;
-	task_handlers[WTT_LAYOUT] = Widget_ExecUpdateLayout;
-	task_handlers[WTT_ZINDEX] = Widget_ExecUpdateZIndex;
+	self.handlers[WTT_VISIBLE] = Widget_UpdateVisibility;
+	self.handlers[WTT_POSITION] = Widget_UpdatePosition;
+	self.handlers[WTT_RESIZE] = Widget_UpdateSize;
+	self.handlers[WTT_SHADOW] = Widget_UpdateBoxShadow;
+	self.handlers[WTT_BORDER] = Widget_UpdateBorder;
+	self.handlers[WTT_OPACITY] = Widget_UpdateOpacity;
+	self.handlers[WTT_MARGIN] = Widget_UpdateMargin;
+	self.handlers[WTT_BODY] = HandleBody;
+	self.handlers[WTT_TITLE] = HandleSetTitle;
+	self.handlers[WTT_REFRESH] = HandleRefresh;
+	self.handlers[WTT_UPDATE_STYLE] = HandleUpdateStyle;
+	self.handlers[WTT_REFRESH_STYLE] = HandleRefreshStyle;
+	self.handlers[WTT_BACKGROUND] = Widget_UpdateBackground;
+	self.handlers[WTT_LAYOUT] = Widget_ExecUpdateLayout;
+	self.handlers[WTT_ZINDEX] = Widget_ExecUpdateZIndex;
+	self.handlers[WTT_PROPS] = Widget_UpdateProps;
 }
 
-/** 初始化 LCUI 部件任务处理功能 */
-void LCUIWidget_InitTask(void)
+void LCUIWidget_InitTask( void )
 {
 	MapTaskHandler();
+	self.timeout = 0;
+	LinkedList_Init( &self.trash );
 }
 
-/** 销毁（释放） LCUI 部件任务处理功能的相关资源 */
-void LCUIWidget_ExitTask(void)
+void LCUIWidget_ExitTask( void )
 {
-
+	LinkedList_Clear( &self.trash, NULL );
 }
 
-/** 处理部件中当前积累的任务 */
-int Widget_Update( LCUI_Widget w )
+void Widget_AddToTrash( LCUI_Widget w )
 {
-	int ret = 1, i;
+	LinkedListNode *snode, *node;
+
+	w->state = WSTATE_DELETED;
+	if( !w->parent ) {
+		return;
+	}
+	node = Widget_GetNode( w );
+	snode = Widget_GetShowNode( w );
+	LinkedList_Unlink( &w->parent->children, node );
+	LinkedList_Unlink( &w->parent->children_show, snode );
+	LinkedList_AppendNode( &self.trash, node );
+}
+
+int Widget_UpdateEx( LCUI_Widget w, LCUI_BOOL has_timeout )
+{
+	int i;
 	LCUI_BOOL *buffer;
-	LCUI_Widget child;
 	LinkedListNode *node, *next;
 
-	DEBUG_MSG( "1,widget: %s, for_self: %d, for_children: %d\n",
-		   w->type, w->task.for_self, w->task.for_children );
-	/* 如果该部件有任务需要处理 */
-	if( w->task.for_self ) {
-		ret = LCUIMutex_TryLock( &w->mutex );
-		if( ret != 0 ) {
-			ret = 1;
-			goto skip_proc_self_task;
+	/* 如果该部件没有任务需要处理、或者被其它线程占用 */
+	if( !w->task.for_self || LCUIMutex_TryLock( &w->mutex ) != 0 ) {
+		goto proc_children_task;
+	}
+	w->task.for_self = FALSE;
+	buffer = w->task.buffer;
+	/* 如果有用户自定义任务 */
+	if( buffer[WTT_USER] ) {
+		LCUI_WidgetClass *wc;
+		wc = LCUIWidget_GetClass( w->type );
+		wc ? wc->task_handler( w ) : FALSE;
+	}
+	for( i = 0; i < WTT_USER; ++i ) {
+		if( buffer[i] ) {
+			buffer[i] = FALSE;
+			if( self.handlers[i] ) {
+				self.handlers[i]( w );
+			}
+		} else {
+			buffer[i] = FALSE;
 		}
-		w->task.for_self = FALSE;
-		buffer = w->task.buffer;
-		/* 如果有用户自定义任务 */
-		if( buffer[WTT_USER] ) {
-			LCUI_WidgetClass *wc;
-			wc = LCUIWidget_GetClass( w->type );
-			wc ? wc->task_handler( w ) : FALSE;
+	}
+	LCUIMutex_Unlock( &w->mutex );
+	/* 如果部件还处于未准备完毕的状态 */
+	if( w->state < WSTATE_READY ) {
+		w->state |= WSTATE_UPDATED;
+		/* 如果部件已经准备完毕则触发 ready 事件 */
+		if( w->state == WSTATE_READY ) {
+			LCUI_WidgetEventRec e;
+			e.type = WET_READY;
+			e.cancel_bubble = TRUE;
+			Widget_TriggerEvent( w, &e, NULL );
+			w->state = WSTATE_NORMAL;
 		}
-		for( i = 0; i < WTT_USER; ++i ) {
-			if( buffer[i] ) {
-				buffer[i] = FALSE;
-				if( task_handlers[i] ) {
-					task_handlers[i]( w );
+	}
+	self.count += 1;
+
+proc_children_task:
+
+	if( !w->task.for_children ) {
+		return w->task.for_self;
+	}
+	/* 如果子级部件中有待处理的部件，则递归进去 */
+	w->task.for_children = FALSE;
+	node = w->children.head.next;
+	while( node ) {
+		LCUI_Widget child = node->data;
+		/* 如果当前部件有销毁任务，结点空间会连同部件一起被
+		 * 释放，为避免因访问非法空间而出现异常，预先保存下
+		 * 个结点。
+		 */
+		next = node->next;
+		/* 如果该级部件的任务需要留到下次再处理 */
+		if(  Widget_UpdateEx( child, has_timeout ) ) {
+			w->task.for_children = TRUE;
+		}
+		if( has_timeout ) {
+			if( !self.is_timeout && self.count >= 50 ) {
+				self.count = 0;
+				if( LCUI_GetTime() >= self.timeout ) {
+					self.is_timeout = TRUE;
 				}
-			} else {
-				buffer[i] = FALSE;
+			}
+			if( self.is_timeout ) {
+				break;
 			}
 		}
-		LCUIMutex_Unlock( &w->mutex );
+		node = next;
 	}
+	return w->task.for_self || w->task.for_children;
+}
+
+void LCUIWidget_StepTask( void )
+{
+	LinkedListNode *node;
+	self.is_timeout = FALSE;
+	self.timeout = LCUI_GetTime() + 20;
+	Widget_UpdateEx( LCUIWidget_GetRoot(), TRUE );
 	/* 删除无用部件 */
-	node = w->children_trash.head.next;
+	node = self.trash.head.next;
 	while( node ) {
-		next = node->next;
-		LinkedList_Unlink( &w->children_trash, node );
+		LinkedListNode *next = node->next;
+		LinkedList_Unlink( &self.trash, node );
 		Widget_ExecDestroy( node->data );
 		node = next;
 	}
-
-skip_proc_self_task:;
-
-	/* 如果子级部件中有待处理的部件，则递归进去 */
-	if( w->task.for_children ) {
-		w->task.for_children = FALSE;
-		node = w->children.head.next;
-		while( node ) {
-			child = node->data;
-			/* 如果当前部件有销毁任务，结点空间会连同部件一起被
-			 * 释放，为避免因访问非法空间而出现异常，预先保存下
-			 * 个结点。
-			 */
-			next = node->next;
-			ret = Widget_Update( child );
-			/* 如果该级部件的任务需要留到下次再处理 */
-			if( ret == 1 ) {
-				w->task.for_children = TRUE;
-			}
-			node = next;
-		}
-	}
-	DEBUG_MSG( "2,widget: %s, for_self: %d, for_children: %d\n",
-		   w->type, w->task.for_self, w->task.for_children );
-	return (w->task.for_self || w->task.for_children) ? 1 : 0;
-}
-
-/** 处理一次当前积累的部件任务 */
-void LCUIWidget_StepTask(void)
-{
-	Widget_Update( LCUIWidget_GetRoot() );
 }

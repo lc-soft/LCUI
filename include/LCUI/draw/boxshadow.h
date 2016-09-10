@@ -37,8 +37,8 @@
 * 没有，请查看：<http://www.gnu.org/licenses/>. 
 * ***************************************************************************/
 
-#ifndef __LCUI_DRAW_BOXSHADOW_H__
-#define __LCUI_DRAW_BOXSHADOW_H__
+#ifndef LCUI_DRAW_BOXSHADOW_H
+#define LCUI_DRAW_BOXSHADOW_H
 
 LCUI_API LCUI_BoxShadow BoxShadow( int x, int y, int blur, LCUI_Color color );
 

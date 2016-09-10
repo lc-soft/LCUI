@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ****************************************************************************/
 
-#ifndef __LCUI_CHARSET_H__
-#define __LCUI_CHARSET_H__
+#ifndef LCUI_CHARSET_H
+#define LCUI_CHARSET_H
 
 LCUI_BEGIN_HEADER
 

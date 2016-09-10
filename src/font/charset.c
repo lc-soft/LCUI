@@ -1,7 +1,7 @@
 /* ***************************************************************************
 * charset.c -- The charset opreation set.
 *
-* Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+* Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
 *
 * This file is part of the LCUI project, and may only be used, modified, and
 * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
 * charset.c -- 字符集的相关操作函数
 *
-* 版权所有 (C) 2013-2016 归属于 刘超 <lc-soft@live.cn>
+* 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
 *
 * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
 *
@@ -39,7 +39,7 @@
 
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/font.h>
+#include <LCUI/font/charset.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,6 +48,25 @@
 
 #define MAX_SAVE_NUM   20
 
+#ifdef LCUI_BUILD_IN_LINUX
+static int SetLocaleByEncoding( int encoding )
+{
+	const char *locale;
+	switch( encoding ) {
+	case ENCODING_ANSI: 
+		locale = NULL;
+		break;
+	case ENCODING_UTF8:
+		locale = "zh_CN.UTF-8";
+		break;
+	default: return -1;
+	}
+	if( !setlocale( LC_CTYPE, locale ) ) {
+		return -1;
+	}
+	return 0;
+}
+#else 
 /** 将UTF-8字符串解码成 Unicode 字符串 */
 static int DecodeFromUTF8( wchar_t *wstr, int max_len, const char *str )
 {
@@ -107,9 +126,12 @@ static int DecodeFromUTF8( wchar_t *wstr, int max_len, const char *str )
 	return len;
 }
 
+#endif
+
 int LCUI_DecodeString( wchar_t *wstr, const char *str, 
 		       int max_len, int encoding )
 {
+#ifdef LCUI_BUILD_IN_WIN32
 	// 暂时不处理其它编码方式
 	switch( encoding ) {
 	case ENCODING_ANSI:
@@ -117,6 +139,12 @@ int LCUI_DecodeString( wchar_t *wstr, const char *str,
 	default: break;
 	}
 	return DecodeFromUTF8( wstr, max_len, str );
+#else
+	if( SetLocaleByEncoding( encoding ) != 0 ) {
+		return -1;
+	}
+	return mbstowcs( wstr, str, max_len );
+#endif
 }
 
 #ifdef LCUI_BUILD_IN_WIN32
@@ -137,6 +165,9 @@ int LCUI_EncodeString( char *str, const wchar_t *wstr,
 	}
 	return encode( cp, wstr, str, max_len );
 #else
-	return -1;
+	if( SetLocaleByEncoding( encoding ) != 0 ) {
+		return -1;
+	}
+	return wcstombs( str, wstr, max_len );
 #endif
 }

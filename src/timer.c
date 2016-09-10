@@ -82,11 +82,11 @@ static void TimerList_AddNode( LinkedListNode *node )
 	LinkedListNode *cur;
 	/* 计算该定时器的剩余定时时长 */
 	timer = node->data;
-	t = LCUI_GetTicks( timer->start_time );
+	t = LCUI_GetTimeDelta( timer->start_time );
 	t = timer->total_ms - t + timer->pause_ms;
-	LinkedList_ForEach( cur, &self.timer_list ) {
+	for( LinkedList_Each( cur, &self.timer_list ) ) {
 		timer = cur->data;
-		tt = LCUI_GetTicks( timer->start_time );
+		tt = LCUI_GetTimeDelta( timer->start_time );
 		tt = timer->total_ms - tt + timer->pause_ms;
 		if( t <= tt ) {
 			LinkedList_Link( &self.timer_list, cur->prev, node );
@@ -105,10 +105,10 @@ static void TimerList_Print( void )
 	Timer timer;
 	LinkedListNode *node;
 	_DEBUG_MSG("timer list(%d) start:\n", self.timer_list.length);
-	LinkedList_ForEach( node, &self.timer_list ) {
+	for( LinkedList_Each( node, &self.timer_list ) {
 		timer = node->data;
 		_DEBUG_MSG("[%02d] %ld, func: %p, cur_ms: %ldms, total_ms: %ldms\n",
-			i++, timer->id, timer->func, timer->total_ms - (long int)LCUI_GetTicks(timer->start_time), timer->total_ms );
+			i++, timer->id, timer->func, timer->total_ms - (long int)LCUI_GetTimeDelta(timer->start_time), timer->total_ms );
 	}
 	_DEBUG_MSG("timer list end\n\n");
 }
@@ -122,11 +122,10 @@ static void TimerThread( void *arg )
 	int64_t lost_ms;
 	LinkedListNode *node;
 	LCUI_AppTaskRec task = {0};
-	self.is_running = TRUE;
 	LCUIMutex_Lock( &self.mutex );
 	while( self.is_running ) {
 		Timer timer = NULL;
-		LinkedList_ForEach( node, &self.timer_list ) {
+		for( LinkedList_Each( node, &self.timer_list ) ) {
 			timer = node->data;
 			if( timer && timer->state == STATE_RUN ) {
 				break;
@@ -139,7 +138,7 @@ static void TimerThread( void *arg )
 			LCUIMutex_Lock( &self.mutex );
 			continue;
 		}
-		lost_ms = LCUI_GetTicks( timer->start_time );
+		lost_ms = LCUI_GetTimeDelta( timer->start_time );
 		/* 减去处于暂停状态的时长 */
 		lost_ms -= timer->pause_ms;
 		/* 若流失的时间未达到总定时时长，则睡眠一段时间 */
@@ -156,7 +155,7 @@ static void TimerThread( void *arg )
 		LinkedList_Unlink( &self.timer_list, node );
 		if( timer->reuse ) {
 			timer->pause_ms = 0;
-			timer->start_time = LCUI_GetTickCount();
+			timer->start_time = LCUI_GetTime();
 			TimerList_AddNode( node );
 		} else {
 			free( timer );
@@ -172,7 +171,7 @@ static Timer TimerList_Find( int timer_id )
 {
 	Timer timer;
 	LinkedListNode *node;
-	LinkedList_ForEach( node, &self.timer_list ) {
+	for( LinkedList_Each( node, &self.timer_list ) ) {
 		timer = node->data;
 		if( timer && timer->id == timer_id ) {
 			return timer;
@@ -200,7 +199,7 @@ int LCUITimer_Set( long int n_ms, void (*func)(void*),
 	timer->total_ms = n_ms;
 	timer->state = STATE_RUN;
 	timer->id = ++self.id_count;
-	timer->start_time = LCUI_GetTickCount();
+	timer->start_time = LCUI_GetTime();
 	timer->node.next = NULL;
 	timer->node.prev = NULL;
 	timer->node.data = timer;
@@ -240,7 +239,7 @@ int LCUITimer_Pause( int timer_id )
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
 		/* 记录暂停时的时间 */
-		timer->pause_time = LCUI_GetTickCount();
+		timer->pause_time = LCUI_GetTime();
 		timer->state = STATE_PAUSE;
 	}
 	LCUICond_Signal( &self.sleep_cond );
@@ -258,7 +257,7 @@ int LCUITimer_Continue( int timer_id )
 	timer = TimerList_Find( timer_id );
 	if( timer ) {
 		/* 计算处于暂停状态的时长 */
-		timer->pause_ms += (long int)LCUI_GetTicks( timer->pause_time );
+		timer->pause_ms += (long int)LCUI_GetTimeDelta( timer->pause_time );
 		timer->state = STATE_RUN;
 	}
 	LCUICond_Signal( &self.sleep_cond );
@@ -277,7 +276,7 @@ int LCUITimer_Reset( int timer_id, long int n_ms )
 	if( timer ) {
 		timer->pause_ms = 0;
 		timer->total_ms = n_ms;
-		timer->start_time = LCUI_GetTickCount();
+		timer->start_time = LCUI_GetTime();
 	}
 	LCUICond_Signal( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
@@ -286,11 +285,12 @@ int LCUITimer_Reset( int timer_id, long int n_ms )
 
 void LCUI_InitTimer( void )
 {
-	LCUI_StartTicks();
+	LCUITime_Init();
 	LCUIMutex_Init( &self.mutex );
 	LCUICond_Init( &self.sleep_cond );
 	LinkedList_Init( &self.timer_list );
 	LCUIThread_Create( &self.tid, TimerThread, NULL );
+	self.is_running = TRUE;
 }
 
 void LCUI_ExitTimer( void )
@@ -300,7 +300,7 @@ void LCUI_ExitTimer( void )
 	LCUICond_Broadcast( &self.sleep_cond );
 	LCUIMutex_Unlock( &self.mutex );
 	LCUIThread_Join( self.tid, NULL );
-	LinkedList_Clear( &self.timer_list, free );
+	LinkedList_ClearData( &self.timer_list, free );
 	LCUICond_Destroy( &self.sleep_cond );
 	LCUIMutex_Destroy( &self.mutex );
 }

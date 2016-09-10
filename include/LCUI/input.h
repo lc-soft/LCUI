@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
-#ifndef __LCUI_INPUT_H__
-#define __LCUI_INPUT_H__
+#ifndef LCUI_INPUT_H
+#define LCUI_INPUT_H
 
 #define LCUIKEY_SPACE	' '
 #define LCUIKEY_0	'0'
@@ -136,38 +136,26 @@
 
 LCUI_BEGIN_HEADER
 
-/** 初始化鼠标输入模块 */
-LCUI_API int LCUI_InitMouse( void );
-
-void LCUIMouse_SetPos( int x, int y );
+/** 检测指定键值的按键是否处于按下状态 */
+LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( int key_code );
 
 /**
- * 检测指定键值的按键是否按了两次
- * @param key_code
- *	要检测的按键的键值
- * @param interval_time
- *	该按键倒数第二次按下时的时间与当前时间的最大间隔
- */
-LCUI_API LCUI_BOOL LCUIKey_IsDoubleHit( int key_code, int interval_time );
+* 检测指定键值的按键是否按了两次
+* @param key_code 要检测的按键的键值
+* @param interval_time 该按键倒数第二次按下时的时间与当前时间的最大间隔
+*/
+LCUI_API LCUI_BOOL LCUIKeyboard_IsDoubleHit( int key_code, int interval_time );
 
 /** 添加已被按下的按键 */
-LCUI_API void LCUIKeyBoard_HitKey( int key_code );
+LCUI_API void LCUIKeyboard_HitKey( int key_code );
 
 /** 标记指定键值的按键已释放 */
-LCUI_API void LCUIKeyBoard_ReleaseKey( int key_code );
+LCUI_API void LCUIKeyboard_ReleaseKey( int key_code );
 
-/** 检测键盘是否有按键按下（类似于kbhit函数） */
-LCUI_API LCUI_BOOL LCUIKeyboard_IsHit( void );
+void LCUI_InitKeyboard( void );
 
-/** 获取被按下的按键的键值（类似于getch函数） */
-LCUI_API int LCUIKeyboard_GetKey( void );
-
-/** 初始化键盘输入模块 */
-LCUI_API int LCUI_InitKeyboard( void );
-
-/** 停用键盘输入模块 */
-LCUI_API int LCUI_ExitKeyboard( void );
+void LCUI_ExitKeyboard( void );
 
 LCUI_END_HEADER
 
-#endif /* __LCUI_INPUT_H__ */
+#endif /* LCUI_INPUT_H */

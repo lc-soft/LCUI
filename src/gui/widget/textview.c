@@ -56,7 +56,8 @@ enum TaskType {
 
 typedef struct LCUI_TextView_ {
 	LCUI_TextStyle style;
-	LCUI_TextLayer layer;	/**< 文本图层 */
+	LCUI_BOOL has_content;		/**< 是否有设置 content 属性 */
+	LCUI_TextLayer layer;		/**< 文本图层 */
 	struct {
 		LCUI_BOOL is_valid;
 		union {
@@ -66,15 +67,6 @@ typedef struct LCUI_TextView_ {
 		};
 	} tasks[TASK_TOTAL];
 } LCUI_TextView;
-
-
-static const char *textview_css = ToString(
-
-textview {
-	pointer-events: none;
-}
-
-);
 
 /*---------------------------- Private -------------------------------*/
 
@@ -87,6 +79,7 @@ enum FontStyleKey {
 	key_line_height,
 	key_text_align,
 	key_content,
+	key_white_space,
 	TOTAL_FONT_STYLE_KEY
 };
 
@@ -101,7 +94,7 @@ static int style_key_map[TOTAL_FONT_STYLE_KEY];
 static int unescape( const wchar_t *instr, wchar_t *outstr )
 {
 	int i = -1;
-	char buff[6];
+	wchar_t buff[6];
 	wchar_t *pout = outstr;
 	const wchar_t *pin = instr;
 
@@ -109,20 +102,20 @@ static int unescape( const wchar_t *instr, wchar_t *outstr )
 		if( i >= 0 ) {
 			buff[i++] = *pin;
 			if( i >= 4 ) {
-				sscanf( buff, "%x", pout );
+				swscanf( buff, L"%x", pout );
 				++pout;
 				i = -1;
 			}
 			continue;
 		}
-		if( *pin == '\\' ) {
+		if( *pin == L'\\' ) {
 			i = 0;
 			continue;
 		}
 		*pout++ = *pin;
 	}
 	if( i >= 4 ) {
-		sscanf( buff, "%x", pout );
+		swscanf( buff, L"%x", pout );
 		++pout;
 	}
 	*pout = 0;
@@ -176,7 +169,6 @@ static int OnParseFontFamily( LCUI_StyleSheet ss, int key, const char *str )
 	 && ss->sheet[style_key_map[key]].string) {
 		free( ss->sheet[style_key_map[key]].string );
 	}
-	strtrim( name, str, "'\"\n\r\t " );
 	SetStyle( ss, style_key_map[key], name, string );
 	return 0;
 }
@@ -197,7 +189,7 @@ static int OnParseFontWeight( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseTextAlign( LCUI_StyleSheet ss, int key, const char *str )
 {
-	int val = ParseStyleOption( str );
+	int val = LCUI_GetStyleValue( str );
 	if( val < 0 ) {
 		return -1;
 	}
@@ -218,6 +210,20 @@ static int OnParseLineHeight( LCUI_StyleSheet ss, int key, const char *str )
 	return -1;
 }
 
+static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
+{
+	LCUI_Style s = &ss->sheet[style_key_map[key]];
+	int v = LCUI_GetStyleValue( str );
+	if( v < 0 ) {
+		return -1;
+	}
+	s->style = v;
+	s->type = SVT_STYLE;
+	s->is_valid = TRUE;
+	s->is_changed = TRUE;
+	return 0;
+}
+
 static LCUI_StyleParserRec style_parsers[] = {
 	{ key_color, "color", OnParseColor },
 	{ key_font_family, "font-family", OnParseFontFamily },
@@ -227,6 +233,7 @@ static LCUI_StyleParserRec style_parsers[] = {
 	{ key_text_align, "text-align", OnParseTextAlign },
 	{ key_line_height, "line-height", OnParseLineHeight },
 	{ key_content, "content", OnParseContent },
+	{ key_white_space, "white-space", OnParseStyleOption }
 };
 
 static void TextView_UpdateStyle( LCUI_Widget w )
@@ -240,39 +247,79 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 			continue;
 		}
 		s = &w->style->sheet[style_key_map[i]];
-		if( !s->is_valid ) {
-			continue;
-		}
 		switch( i ) {
 		case key_color:
-			txt->style.fore_color = s->color;
-			txt->style.has_fore_color = TRUE;
+			if( s->is_valid ) {
+				txt->style.fore_color = s->color;
+				txt->style.has_fore_color = TRUE;
+			} else {
+				txt->style.has_fore_color = FALSE;
+			}
 			break;
 		case key_font_family:
-			TextStyle_SetFont( &txt->style, s->string );
+			if( s->is_valid ) {
+				TextStyle_SetFont( &txt->style, s->string );
+			} else {
+				TextStyle_SetFont( &txt->style, NULL );
+			}
 			break;
 		case key_font_size:
-			if( s->type == SVT_PX ) {
-				txt->style.pixel_size = s->px;
-			} else if( s->type == SVT_PT ) {
-				// ...
+			txt->style.pixel_size = 14;
+			if( s->is_valid ) {
+				if( s->type == SVT_PX ) {
+					txt->style.pixel_size = s->px;
+				}
 			}
 			txt->style.has_pixel_size = TRUE;
 			break;
 		case key_font_style:
-			txt->style.style = s->value;
-			txt->style.has_style = TRUE;
+			txt->style.has_style = FALSE;
+			if( s->is_valid ) {
+				txt->style.style = s->value;
+				txt->style.has_style = TRUE;
+			}
 			break;
 		case key_font_weight:
 			break;
 		case key_text_align:
-			TextLayer_SetTextAlign( txt->layer, s->style );
+			if( s->is_valid ) {
+				TextLayer_SetTextAlign( txt->layer, s->style );
+			} else {
+				TextLayer_SetTextAlign( txt->layer, SV_LEFT );
+			}
 			break;
 		case key_line_height:
-			TextLayer_SetLineHeight( txt->layer, s );
+			if( s->is_valid ) {
+				TextLayer_SetLineHeight( txt->layer, s );
+			} else {
+				LCUI_StyleRec style;
+				style.val_scale = 1.5;
+				style.type = SVT_SCALE;
+				style.is_valid = TRUE;
+				TextLayer_SetLineHeight( txt->layer, &style );
+			}
 			break;
 		case key_content:
-			TextView_SetTextW( w, s->wstring );
+			if( s->is_valid ) {
+				txt->has_content = TRUE;
+				TextView_SetTextW( w, s->wstring );
+			} else {
+				if( txt->has_content ) {
+					txt->has_content = FALSE;
+					TextView_SetTextW( w, NULL );
+				}
+			}
+			break;
+		case key_white_space:
+			if( !s->is_valid || s->type != SVT_STYLE ) {
+				TextLayer_SetAutoWrap( txt->layer, TRUE );
+				break;
+			}
+			if( s->style == SV_NOWRAP ) {
+				TextLayer_SetAutoWrap( txt->layer, FALSE );
+			} else {
+				TextLayer_SetAutoWrap( txt->layer, TRUE );
+			}
 		default:break;
 		}
 	}
@@ -285,24 +332,29 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	LinkedList rects;
 	LinkedListNode *node;
-	LCUI_Size new_size = {16, 16};
-	LCUI_TextView *txt = w->private_data;
-	if( w->width > new_size.w ) {
-		new_size.w = w->width;
-	}
-	if( w->height > new_size.h ) {
-		new_size.h = w->height;
-	}
+	LCUI_TextView *txt;
+	int width = 0, height = 0;
+	int max_width = 0, max_height = 0;
+
+	txt = w->private_data;
 	LinkedList_Init( &rects );
-	if( w->style->sheet[key_width].is_valid && 
-	    w->style->sheet[key_width].type != SVT_AUTO ) {
-		TextLayer_SetAutoWrap( txt->layer, TRUE );
+	if( !w->style->sheet[key_width].is_valid ||
+	    w->style->sheet[key_width].type == SVT_AUTO ) {
+		max_width = Widget_ComputeMaxWidth( w );
+		max_width -= w->computed_style.border.left.width;
+		max_width -= w->computed_style.border.right.width;
+		max_width -= w->padding.left + w->padding.right;
 	} else {
-		TextLayer_SetAutoWrap( txt->layer, FALSE );
+		max_width = width = w->box.content.width;
 	}
-	TextLayer_SetMaxSize( txt->layer, new_size );
+	if( w->style->sheet[key_height].is_valid &&
+	    !w->style->sheet[key_height].type == SVT_AUTO ) {
+		max_height = height = w->box.content.width;
+	}
+	TextLayer_SetMaxSize( txt->layer, max_width, max_height );
+	TextLayer_SetFixedSize( txt->layer, width, height );
 	TextLayer_Update( txt->layer, &rects );
-	LinkedList_ForEach( node, &rects ) {
+	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
 	LinkedList_Clear( &rects, free );
@@ -319,9 +371,11 @@ static void TextView_OnInit( LCUI_Widget w )
 	for( i = 0; i < TASK_TOTAL; ++i ) {
 		txt->tasks[i].is_valid = FALSE;
 	}
+	txt->has_content = FALSE;
 	/* 初始化文本图层 */
 	txt->layer = TextLayer_New();
 	/* 启用多行文本显示 */
+	TextLayer_SetAutoWrap( txt->layer, TRUE );
 	TextLayer_SetMultiline( txt->layer, TRUE );
 	/* 启用样式标签的支持 */
 	TextLayer_SetUsingStyleTags( txt->layer, TRUE );
@@ -333,7 +387,7 @@ static void TextView_OnDestroy( LCUI_Widget w )
 {
 	LCUI_TextView *txt;
 	txt = w->private_data;
-	TextLayer_Destroy( &txt->layer );
+	TextLayer_Destroy( txt->layer );
 }
 
 static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )
@@ -341,7 +395,6 @@ static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )
 	LCUI_TextView *txt = w->private_data;
 	*width = TextLayer_GetWidth( txt->layer );
 	*height = TextLayer_GetHeight( txt->layer );
-	DEBUG_MSG("width: %d, height: %d\n", *width, *height);
 }
 
 /** 私有的任务处理接口 */
@@ -365,6 +418,12 @@ static void TextView_OnTask( LCUI_Widget w )
 		TextLayer_SetAutoWrap( txt->layer, txt->tasks[i].autowrap );
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
+	i = TASK_SET_TEXT_ALIGN;
+	if( txt->tasks[i].is_valid ) {
+		txt->tasks[i].is_valid = FALSE;
+		TextLayer_SetTextAlign( txt->layer, txt->tasks[i].align );
+		txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	}
 	i = TASK_UPDATE;
 	if( !txt->tasks[i].is_valid ) {
 		return;
@@ -373,7 +432,7 @@ static void TextView_OnTask( LCUI_Widget w )
 	txt = w->private_data;
 	LinkedList_Init( &rects );
 	TextLayer_Update( txt->layer, &rects );
-	LinkedList_ForEach( node, &rects ) {
+	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
 	LinkedList_Clear( &rects, free );
@@ -486,6 +545,14 @@ void TextView_SetTextAlign( LCUI_Widget w, int align )
 	Widget_AddTask( w, WTT_USER );
 }
 
+void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
+{
+	LCUI_TextView *txt = w->private_data;
+	txt->tasks[TASK_SET_AUTOWRAP].autowrap = autowrap;
+	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
+}
+
 /*-------------------------- End Public ------------------------------*/
 
 /** 添加 TextView 部件类型 */
@@ -501,8 +568,8 @@ void LCUIWidget_AddTextView( void )
 	wc->methods.set_text = TextView_OnParseText;
 	wc->task_handler = TextView_OnTask;
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
-		style_key_map[style_parsers[i].key] =
-		LCUICSS_AddParser( &style_parsers[i] );
+		LCUI_StyleParser parser = &style_parsers[i];
+		style_key_map[parser->key] = LCUI_AddStyleName( parser->name );
+		LCUI_AddCSSParser( parser );
 	}
-	LCUICSS_LoadString( textview_css );
 }

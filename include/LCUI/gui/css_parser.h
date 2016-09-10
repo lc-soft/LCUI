@@ -37,8 +37,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef __LCUI_CSS_PARSER_H__
-#define __LCUI_CSS_PARSER_H__
+#ifndef LCUI_CSS_PARSER_H
+#define LCUI_CSS_PARSER_H
 
 LCUI_BEGIN_HEADER
 
@@ -49,26 +49,25 @@ typedef struct LCUI_StyleParserRec_ {
 	int (*parse)(LCUI_StyleSheet, int, const char*);
 } LCUI_StyleParserRec, *LCUI_StyleParser;
 
-LCUI_API int ParseStyleOption( const char *str );
+LCUI_API int LCUI_GetStyleValue( const char *str );
 
-LCUI_API const char *GetStyleName( int key );
+LCUI_API const char *LCUI_GetStyleValueName( int val );
+
+LCUI_API const char *LCUI_GetStyleName( int key );
 
 /** 初始化 LCUI 的 CSS 代码解析功能 */
-void LCUICSS_Init(void);
+LCUI_API void LCUI_InitCSSParser( void );
 
 /** 从文件中载入CSS样式数据，并导入至样式库中 */
-LCUI_API int LCUICSS_LoadFile( const char *filepath );
+LCUI_API int LCUI_LoadCSSFile( const char *filepath );
 
 /** 从字符串中载入CSS样式数据，并导入至样式库中 */
-LCUI_API int LCUICSS_LoadString( const char *str );
+LCUI_API int LCUI_LoadCSSString( const char *str, const char *space );
 
-void LCUICSS_Destroy(void);
-
-/** 获取当前记录的样式属性的总数 */
-int LCUICSS_GetStyleTotal(void);
+LCUI_API void LCUI_ExitCSSParser(void);
 
 /** 注册新的属性和对应的属性值解析器 */
-LCUI_API int LCUICSS_AddParser( LCUI_StyleParser sp );
+LCUI_API int LCUI_AddCSSParser( LCUI_StyleParser sp );
 
 LCUI_END_HEADER
 
