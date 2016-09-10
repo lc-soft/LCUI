@@ -575,11 +575,6 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ -1, "background", OnParseBackground }
 };
 
-static int CompareParserName( void *data, const void *keydata )
-{
-	return strcmp(((LCUI_StyleParser)data)->name, (const char*)keydata);
-}
-
 static CSSParserContext NewCSSParserContext( size_t buffer_size, 
 					     const char *space )
 {
