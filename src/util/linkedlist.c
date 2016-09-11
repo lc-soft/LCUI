@@ -221,12 +221,7 @@ static SortRange NewSortRange( int s, LinkedListNode *snode,
 
 void LinkedList_SwapNode( LinkedList *list, LinkedListNode *a, LinkedListNode *b )
 {
-	LinkedListNode *node;/*
-	void *data;
-	data = a->data;
-	a->data = b->data;
-	b->data = data;
-	return;*/
+	LinkedListNode *node;
 	if( list->tail.prev == a ) {
 		list->tail.prev = b;
 	} else if( list->tail.prev == b ) {

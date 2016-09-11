@@ -179,6 +179,12 @@ LCUI_API int Widget_Unwrap( LCUI_Widget widget );
 /** 清空部件内的子级部件 */
 LCUI_API void Widget_Empty( LCUI_Widget widget );
 
+/** 获取上一个部件 */
+LCUI_API LCUI_Widget Widget_GetPrev( LCUI_Widget w );
+
+/** 获取下一个部件 */
+LCUI_API LCUI_Widget Widget_GetNext( LCUI_Widget w );
+
 /** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 
@@ -193,6 +199,7 @@ LCUI_API void Widget_UpdateBorder( LCUI_Widget w );
 
 /** 刷新部件的矩形阴影 */
 LCUI_API void Widget_UpdateBoxShadow( LCUI_Widget w );
+
 /** 刷新可见性 */
 LCUI_API void Widget_UpdateVisibility( LCUI_Widget w );
 

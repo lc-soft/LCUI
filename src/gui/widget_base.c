@@ -376,6 +376,24 @@ LCUI_Widget LCUIWidget_GetById( const char *idstr )
 	return RBTree_CustomGetData( &LCUIWidget.ids, idstr );
 }
 
+LCUI_Widget Widget_GetPrev( LCUI_Widget w )
+{
+	LinkedListNode *node = Widget_GetNode( w );
+	if( node->prev && node != w->parent->children.head.next ) {
+		return node->prev->data;
+	}
+	return NULL;
+}
+
+LCUI_Widget Widget_GetNext( LCUI_Widget w )
+{
+	LinkedListNode *node = Widget_GetNode( w );
+	if( node->next ) {
+		return node->next->data;
+	}
+	return NULL;
+}
+
 int Widget_Top( LCUI_Widget w )
 {
 	DEBUG_MSG("tip\n");
