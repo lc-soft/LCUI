@@ -348,7 +348,7 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		max_width = width = w->box.content.width;
 	}
 	if( w->style->sheet[key_height].is_valid &&
-	    !w->style->sheet[key_height].type == SVT_AUTO ) {
+	    w->style->sheet[key_height].type != SVT_AUTO ) {
 		max_height = height = w->box.content.width;
 	}
 	TextLayer_SetMaxSize( txt->layer, max_width, max_height );
