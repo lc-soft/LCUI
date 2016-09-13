@@ -489,15 +489,15 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 		}
 	default:
 		ret = EventTrigger_Trigger( widget->trigger, e->type, &pack );
-		if( ret <= 0 ) {
-			if( !widget->parent || e->cancel_bubble ) {
-				return -1;
-			}
-			/* 如果事件投递失败，则向父级部件冒泡 */
-			return Widget_PostEvent( widget->parent, e,
-						 data, destroy_data );
+		if( ret > 0 ) {
+			return 0;
 		}
-		return 0;
+		if( !widget->parent || e->cancel_bubble ) {
+			return -1;
+		}
+		/* 如果事件投递失败，则向父级部件冒泡 */
+		return Widget_TriggerEventEx( widget->parent, e, data, 
+					      destroy_data, direct_run );
 	}
 	if( !widget->parent || e->cancel_bubble ) {
 		return -1;
@@ -533,7 +533,8 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 						     e->type, &pack );
 		}
 	}
-	return Widget_PostEvent( widget->parent, e, data, destroy_data );
+	return Widget_TriggerEventEx( widget->parent, e, data, 
+				      destroy_data, direct_run );
 }
 
 int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data,
