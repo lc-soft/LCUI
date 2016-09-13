@@ -447,9 +447,18 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 	}
 }
 
-static void ScrollBar_OnUpdateSize( LCUI_Widget box, LCUI_WidgetEvent e, void *arg )
+static void ScrollBar_OnUpdateSize( LCUI_Widget box, 
+				    LCUI_WidgetEvent e, void *arg )
 {
 	ScrollBar_UpdateSize( e->data );
+}
+
+static void ScrollBar_OnSetPosition( LCUI_Widget box, 
+				     LCUI_WidgetEvent e, void *arg )
+{
+	int *pos = arg;
+	ScrollBar_SetPosition( e->data, *pos );
+	e->cancel_bubble = TRUE;
 }
 
 void ScrollBar_BindBox( LCUI_Widget w, LCUI_Widget box )
@@ -461,6 +470,7 @@ void ScrollBar_BindBox( LCUI_Widget w, LCUI_Widget box )
 	}
 	scrollbar->box = box;
 	Widget_BindEvent( box, "resize", ScrollBar_OnUpdateSize, w, NULL );
+	Widget_BindEvent( box, "setscroll", ScrollBar_OnSetPosition, w, NULL );
 	ScrollBar_UpdateSize( w );
 }
 
@@ -574,10 +584,13 @@ static void ScrollBar_OnSetAttr( LCUI_Widget w, const char *name, const char *va
 
 void LCUIWidget_AddTScrollBar( void )
 {
+	int setscroll_event_id;
 	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "scrollbar" );
 	wc->methods.init = ScrollBar_OnInit;
 	wc->methods.set_attr = ScrollBar_OnSetAttr;
 	scroll_event_id = LCUIWidget_AllocEventId();
+	setscroll_event_id = LCUIWidget_AllocEventId();
 	LCUIWidget_SetEventName( scroll_event_id, "scroll" );
+	LCUIWidget_SetEventName( setscroll_event_id, "setscroll" );
 	LCUI_LoadCSSString( scrollbar_css, NULL );
 }
