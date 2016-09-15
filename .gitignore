@@ -1,5 +1,7 @@
 *.lo
 *.o
+*.db
+*.opendb
 *.dirstamp
 *.zip
 *.lastbuildstate
