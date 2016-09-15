@@ -468,10 +468,8 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 				  void *data, void (*destroy_data)(void*),
 				  LCUI_BOOL direct_run )
 {
-	LCUI_Widget w;
-	LCUI_BOOL is_pointer_event;
 	LCUI_WidgetEventPackRec pack;
-	int ret, pointer_x, pointer_y;
+
 	pack.event = *e;
 	pack.data = data;
 	pack.widget = widget;
@@ -488,8 +486,8 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 			break;
 		}
 	default:
-		ret = EventTrigger_Trigger( widget->trigger, e->type, &pack );
-		if( ret > 0 ) {
+		if( 0 < EventTrigger_Trigger( widget->trigger, 
+					      e->type, &pack ) ) {
 			return 0;
 		}
 		if( !widget->parent || e->cancel_bubble ) {
@@ -502,35 +500,39 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 	if( !widget->parent || e->cancel_bubble ) {
 		return -1;
 	}
-	is_pointer_event = TRUE;
-	switch( e->type ) {
-	case WET_CLICK:
-	case WET_MOUSEDOWN:
-	case WET_MOUSEUP:
-		pointer_x = e->button.x;
-		pointer_y = e->button.y;
-		break;
-	case WET_MOUSEMOVE:
-	case WET_MOUSEOVER:
-	case WET_MOUSEOUT:
-		pointer_x = e->motion.x;
-		pointer_y = e->motion.y;
-		break;
-	default: 
-		is_pointer_event = FALSE;
-		break;
-	}
-	if( is_pointer_event ) {
-		int x, y;
-		Widget_GetAbsXY( widget->parent, NULL, &x, &y );
-		/* 转换成相对于父级部件内容框的坐标 */
-		x = pointer_x - x;
-		y = pointer_y - y;
-		/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
-		w = Widget_GetNextAt( widget, x, y );
-		if( w ) {
-			return EventTrigger_Trigger( w->trigger, 
-						     e->type, &pack );
+	if( widget->computed_style.pointer_events == SV_NONE ) {
+		int pointer_x, pointer_y;
+		LCUI_BOOL is_pointer_event = TRUE;
+		switch( e->type ) {
+		case WET_CLICK:
+		case WET_MOUSEDOWN:
+		case WET_MOUSEUP:
+			pointer_x = e->button.x;
+			pointer_y = e->button.y;
+			break;
+		case WET_MOUSEMOVE:
+		case WET_MOUSEOVER:
+		case WET_MOUSEOUT:
+			pointer_x = e->motion.x;
+			pointer_y = e->motion.y;
+			break;
+		default: 
+			is_pointer_event = FALSE;
+			break;
+		}
+		if( is_pointer_event ) {
+			int x, y;
+			LCUI_Widget w;
+			Widget_GetAbsXY( widget->parent, NULL, &x, &y );
+			/* 转换成相对于父级部件内容框的坐标 */
+			x = pointer_x - x;
+			y = pointer_y - y;
+			/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
+			w = Widget_GetNextAt( widget, x, y );
+			if( w ) {
+				return EventTrigger_Trigger( w->trigger, 
+							     e->type, &pack );
+			}
 		}
 	}
 	return Widget_TriggerEventEx( widget->parent, e, data, 
