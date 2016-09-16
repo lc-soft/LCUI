@@ -601,27 +601,33 @@ int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch,
 	return info->engine->render( buff, ch, pixel_size, info );
 }
 
-#ifdef LCUI_BUILD_IN_WIN32
-#define MAX_FONTFILE_NUM        4
-#else
-#define MAX_FONTFILE_NUM        1
-#endif
-
 /** 初始化字体处理模块 */
 void LCUI_InitFont( void )
 {
 	char *target_font;
-	int font_id = -1, i = -1;
-	char *font_files[MAX_FONTFILE_NUM]={
+	int font_id = -1, i = -1, last_font_id;
+
 #ifdef LCUI_BUILD_IN_WIN32
+#define MAX_FONTFILE_NUM 4
+
+	char *font_files[MAX_FONTFILE_NUM] = {
 		"C:/Windows/Fonts/msyh.ttf",
 		"C:/Windows/Fonts/msyh.ttc",
 		"C:/Windows/Fonts/simsun.ttc",
 		"C:/Windows/Fonts/consola.ttf"
-#else
-		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf"
-#endif
 	};
+
+#else
+#define MAX_FONTFILE_NUM 4
+
+	char *font_files[MAX_FONTFILE_NUM] = {
+		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf",
+		"/usr/share/fonts/truetype/arphic/ukai.ttc",
+		"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+		"/usr/share/fonts/truetype/wqy/wqy-microhei.ttc"
+	};
+
+#endif
 
 	fontlib.font_cache_num = 1;
 	fontlib.font_cache = NEW(LCUI_Font**, 1);
@@ -653,6 +659,7 @@ void LCUI_InitFont( void )
 	} else {
 		printf("[font] warning: not font engine support!\n");
 	}
+	last_font_id = 0;
 	/* 如果在环境变量中定义了字体文件路径，那就使用它 */
 	target_font = getenv("LCUI_FONTFILE");
 	do {
@@ -661,12 +668,13 @@ void LCUI_InitFont( void )
 		}
 		/* 如果载入成功，则设定该字体为默认字体 */
 		font_id = LCUIFont_LoadFile( target_font );
-		if( font_id <= 0 ) {
-			continue;
+		if( font_id > 0 ) {
+			last_font_id = font_id;
 		}
-		LCUIFont_SetDefault( font_id );
-		break;
-	} while( ++i, target_font = font_files[i], i<MAX_FONTFILE_NUM );
+	} while( ++i, target_font = font_files[i], i < MAX_FONTFILE_NUM );
+	if( last_font_id > 0 ) {
+		LCUIFont_SetDefault( last_font_id );
+	}
 }
 
 /** 停用字体处理模块 */
