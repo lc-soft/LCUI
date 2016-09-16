@@ -611,10 +611,10 @@ void LCUI_InitFont( void )
 #define MAX_FONTFILE_NUM 4
 
 	char *font_files[MAX_FONTFILE_NUM] = {
-		"C:/Windows/Fonts/msyh.ttf",
-		"C:/Windows/Fonts/msyh.ttc",
+		"C:/Windows/Fonts/consola.ttf",
 		"C:/Windows/Fonts/simsun.ttc",
-		"C:/Windows/Fonts/consola.ttf"
+		"C:/Windows/Fonts/msyh.ttf",
+		"C:/Windows/Fonts/msyh.ttc"
 	};
 
 #else

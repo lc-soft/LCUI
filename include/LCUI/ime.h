@@ -84,6 +84,12 @@ void LCUI_InitIME( void );
 /* 停用LCUI输入法模块 */
 void LCUI_ExitIME( void );
 
+#ifdef LCUI_BUILD_IN_WIN32
+int LCUI_RegisterWin32IME( void );
+#else
+int LCUI_RegisterLinuxIME( void );
+#endif
+
 LCUI_END_HEADER
 
 #endif
