@@ -50,8 +50,8 @@
 #include LCUI_DISPLAY_H
 #include LCUI_EVENTS_H
 
-#define MIN_WIDTH 50
-#define MIN_HEIGHT 50
+#define MIN_WIDTH	320
+#define MIN_HEIGHT	240
 
 enum SurfaceTaskType {
 	TASK_CREATE,
@@ -91,6 +91,7 @@ typedef struct LCUI_SurfaceRec_ {
 	LCUI_BOOL is_ready;
 	LCUI_Graph fb;
 	LinkedList rects;
+	LCUI_Mutex mutex;
 	LinkedListNode node;
 } LCUI_SurfaceRec;
 
@@ -127,6 +128,9 @@ static void X11Surface_OnResize( LCUI_Surface s, int width, int height )
 	int depth;
     	XGCValues gcv;
 	Visual *visual;
+	if( width == s->width && height == s->height ) {
+		return;
+	}
 	if( s->ximage ) {
 		XDestroyImage( s->ximage );
 		s->ximage = NULL;
@@ -175,6 +179,7 @@ static void X11Surface_OnCreate( LCUI_Surface s )
 					 0, 100, MIN_WIDTH, MIN_HEIGHT, 1, 
 					 bdcolor, bgcolor );
 	LinkedList_Init( &s->rects );
+	LCUIMutex_Init( &s->mutex );
 	X11Surface_OnResize( s, MIN_WIDTH, MIN_HEIGHT );
 	s->is_ready = TRUE;
 	LCUI_SetLinuxX11MainWindow( s->window );
@@ -193,8 +198,10 @@ static void X11Surface_OnTask( LCUI_Surface surface, LCUI_SurfaceTask task )
 		int w = task->width , h = task->height;
 		w = MIN_WIDTH > w ? MIN_WIDTH: w;
 		h = MIN_HEIGHT > h ? MIN_HEIGHT: h;
+		LCUIMutex_Lock( &surface->mutex );
 		X11Surface_OnResize( surface, w, h );
 		XResizeWindow( dpy, win, w, h );
+		LCUIMutex_Unlock( &surface->mutex );
 		break;
 	}
 	case TASK_MOVE: 
@@ -218,6 +225,7 @@ static void X11Surface_OnTask( LCUI_Surface surface, LCUI_SurfaceTask task )
         }
         case TASK_PRESENT: {
 		LinkedListNode *node;
+		LCUIMutex_Lock( &surface->mutex );
 		LinkedList_ForEach( node, &surface->rects ) {
 			LCUI_Rect *rect = node->data;
 			XPutImage( x11.app->display, surface->window, 
@@ -226,6 +234,7 @@ static void X11Surface_OnTask( LCUI_Surface surface, LCUI_SurfaceTask task )
 				   rect->width, rect->height );
 		}
 		LinkedList_Clear( &surface->rects, free );
+		LCUIMutex_Unlock( &surface->mutex );
 		break;
         }
 	case TASK_DELETE:
@@ -353,6 +362,7 @@ static LCUI_PaintContext X11Surface_BeginPaint( LCUI_Surface surface,
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
 	Graph_Init( &paint->canvas );
+	LCUIMutex_Lock( &surface->mutex );
 	LCUIRect_ValidateArea( &paint->rect, surface->width, surface->height );
 	Graph_Quote( &paint->canvas, &surface->fb, &paint->rect );
 	Graph_FillRect( &paint->canvas, RGB( 255, 255, 255 ), NULL, TRUE );
@@ -367,6 +377,7 @@ static void X11Surface_EndPaint( LCUI_Surface surface,
 	*r = paint->rect;
 	LinkedList_Append( &surface->rects, r );
 	free( paint );
+	LCUIMutex_Unlock( &surface->mutex );
 }
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
@@ -428,6 +439,23 @@ static void OnExpose( LCUI_Event e, void *arg )
 	EventTrigger_Trigger( x11.trigger, DET_PAINT, &dpy_ev );
 }
 
+static void OnConfigureNotify( LCUI_Event e, void *arg )
+{
+	XEvent *ev = arg;
+	LCUI_DisplayEventRec dpy_ev;
+	XConfigureEvent xce = ev->xconfigure;
+	LCUI_Surface s = GetSurfaceByWindow( xce.window );
+	if( s->width == xce.width && s->height == xce.height ) {
+		return;
+	}
+	dpy_ev.surface = s;
+	dpy_ev.type = DET_RESIZE;
+	dpy_ev.resize.width = xce.width;
+	dpy_ev.resize.height = xce.height;
+	EventTrigger_Trigger( x11.trigger, DET_RESIZE, &dpy_ev );
+
+}
+
 int LCUI_InitLinuxX11Display( LCUI_DisplayDriver driver )
 {
 	strcpy( driver->name, "x11" );
@@ -455,6 +483,7 @@ int LCUI_InitLinuxX11Display( LCUI_DisplayDriver driver )
 	driver->bindEvent = WinDisplay_BindEvent;
 	LinkedList_Init( &x11.surfaces );
 	LCUI_BindSysEvent( Expose, OnExpose, NULL, NULL );
+	LCUI_BindSysEvent( ConfigureNotify, OnConfigureNotify, NULL, NULL );
 	x11.trigger = EventTrigger();
 	x11.is_inited = TRUE;
 	return 0;
