@@ -39,8 +39,8 @@
 /* Define to 1 if you have the <png.h> header file. */
 #undef HAVE_PNG_H
 
-/* Define to 1 if you have the <pthread.h> header file. */
-#undef HAVE_PTHREAD_H
+/* Have PTHREAD_PRIO_INHERIT. */
+#undef HAVE_PTHREAD_PRIO_INHERIT
 
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
@@ -96,20 +96,19 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
-/* Define to 1 if you have the FreeType font engine */
+/* Define to 1 if you have the FreeType font engine. */
 #undef LCUI_FONT_ENGINE_FREETYPE
 
-/* Define to 1 if you using pthread support */
+/* Define to 1 if you are using pthread support. */
 #undef LCUI_THREAD_PTHREAD
 
-/* Define to 1 if you select FrameBuffer for video support */
+/* Define to 1 if you select FrameBuffer for video support. */
 #undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 
-/* Define to 1 if you select XWindow for video support */
+/* Define to 1 if you select XWindow for video support. */
 #undef LCUI_VIDEO_DRIVER_X11
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
 /* Name of package */
@@ -133,23 +132,21 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Define to necessary symbol if this constant uses a non-standard name on
+   your system. */
+#undef PTHREAD_CREATE_JOINABLE
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* Define to 1 if you enabled LCUIBuilder function module */
+/* Define to 1 if you enabled LCUIBuilder function module. */
 #undef USE_LCUI_BUILDER
-
-/* Define to 1 if you have the libiconv */
-#undef USE_LIBICONV
 
 /* Define to 1 if you have the libjpeg */
 #undef USE_LIBJPEG
 
-/* Define to 1 if you have the libpng */
+/* Define to 1 if you have the libpng. */
 #undef USE_LIBPNG
-
-/* Define to 1 if you have the tslib */
-#undef USE_TSLIB
 
 /* Version number of package */
 #undef VERSION

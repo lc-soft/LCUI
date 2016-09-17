@@ -45,19 +45,7 @@ CFLAGS="-Wall -D _GNU_SOURCE"
 CXXFLAG="-Wall -D _GNU_SOURCE"
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/include/libxml2:/usr/include/freetype2/
 
-# Checks for libraries.
-# 检测LCUI所依赖的库是否存在并且能正常使用
-want_iconv=no
-AC_ARG_WITH(iconv, [  --with-iconv            use libiconv	(default)])
-if test "x$with_iconv" != "xno"; then
-	AC_CHECK_LIB([iconv], [iconv_open], [
-	want_iconv=yes
-	LCUI_LIBADD="$LCUI_LIBADD -liconv"
-	AC_DEFINE_UNQUOTED([USE_LIBICONV], 1, [Define to 1 if you have the libiconv.])
-], want_iconv=no)
-
-fi
-##检测是否启用线程支持
+# 检测是否启用线程支持
 want_thread=no
 thread_name=pthread
 AC_ARG_WITH(pthread, [  --with-pthread          use pthread	(default)])
@@ -71,7 +59,7 @@ if test "x$with_pthread" != "xno"; then
 	], [AC_MSG_ERROR([The support could not be configured for the POSIX thread programming interface.])])
 fi
 
-##检测是否有libxml2库，必须有 libxml2 库才能启用 LCUIBuilder 功能模块
+# 检测是否有libxml2库，必须有 libxml2 库才能启用 LCUIBuilder 功能模块
 enable_builder=yes
 AC_ARG_ENABLE(lcui-builder, AC_HELP_STRING([--enable-lcui-builder],
 [enable lcui-builder function module [[default=no]]]), [enable_builder=$enableval])
@@ -86,7 +74,7 @@ if test "$enable_builder" = "yes"; then
 	], [enable_builder=no])
 fi
 
-##检测是否有freetype库
+# 检测是否有freetype库
 want_font_engine=yes
 font_engine_name=none
 AC_ARG_ENABLE(font-engine, AC_HELP_STRING([--enable-font-engine],
@@ -105,7 +93,7 @@ else
 	want_font_engine=no
 fi
 
-## 检测图形输出设备
+# 检测图形输出设备
 want_video_output=yes
 video_driver_name=framebuffer
 AC_ARG_ENABLE(video-output, AC_HELP_STRING([--enable-video-output],
@@ -126,16 +114,6 @@ if test "$want_video_output" = yes; then
 else
 	want_video_output=no
 	video_driver_name=none
-fi
-
-want_ts=no
-AC_ARG_WITH(ts, [  --with-ts               use tslib	(default)])
-if test "x$with_ts" != "xno"; then
-	AC_CHECK_LIB([ts], [ts_open], [
-		want_ts=yes
-		LCUI_LIBS="$LCUI_LIBS -lts"
-		AC_DEFINE_UNQUOTED([USE_TSLIB], 1, [Define to 1 if you have the tslib])
-	], [want_ts=no])
 fi
 
 want_png=no
@@ -163,7 +141,6 @@ if test "x$with_jpeg" != "xno"; then
 	], [want_jpeg=no])
 fi
 
-# DEBUG option
 # 调试选项，如果需要对项目进行调试，可启用调试选项
 want_debug=no
 AC_MSG_CHECKING(whether to enable debugging)
@@ -179,11 +156,11 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-##输出变量到每个Makefile中
+# 输出变量到每个Makefile中
 AC_SUBST(LCUI_LIBS)
 AC_SUBST(CFLAGS)
 
-##输出文件
+# 输出文件
 AC_OUTPUT([Makefile
 	 lcui.pc
 	 build/Makefile
@@ -207,10 +184,8 @@ AC_OUTPUT([Makefile
 echo
 echo
 echo -e "Build with lcui-builder support .... : $enable_builder"
-echo -e "Build with tslib support ........... : $want_ts"
 echo -e "Build with libpng support .......... : $want_png"
 echo -e "Build with libjpeg support ......... : $want_jpeg"
-echo -e "Build with libiconv support ........ : $want_iconv"
 echo -e "Build with font-engine support ..... : $font_engine_name"
 echo -e "Build with thread support .......... : $thread_name"
 echo -e "Build with video support ........... : $video_driver_name"

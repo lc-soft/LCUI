@@ -40,6 +40,7 @@
 #define ENABLE_MEMDEBUG
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
@@ -95,7 +96,7 @@ void LCUI_PrintMemStats( void )
 	iter = Dict_GetIterator( self.groups );
 	while( (entry = Dict_Next(iter)) ) {
 		MemBlockGroup group = DictEntry_GetVal( entry );
-		printf( "[%40s] size: %.02f KB, count: %d\n", group->name, 
+		printf( "[%40s] size: %.02f KB, count: %lu\n", group->name, 
 			1.0 * group->size / 1024., group->count );
 	}
 	LCUIMutex_Unlock( &self.mutex );
