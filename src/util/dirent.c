@@ -102,10 +102,8 @@ LCUI_DirEntry* LCUI_ReadDirW( LCUI_Dir *dir_data )
 	}
 #else
 	struct dirent *d;
-	_DEBUG_MSG("handle: %p\n", dir_data->handle);
 	d = readdir( dir_data->handle );
 	if( !d ) {
-		perror("opendir() failed");
 		return NULL;
 	}
 	dir_data->entry.dirent = *d;
