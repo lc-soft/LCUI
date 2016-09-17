@@ -673,7 +673,7 @@ static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *ar
 	rows = TextLayer_GetRowTotal( edit->layer );
 	cols = TextLayer_GetRowTextLength( edit->layer, cur_row );
 	switch( e->key.code ) {
-	case LCUIKEY_HOMEPAGE: // home键移动光标至行首
+	case LCUIKEY_HOME: // home键移动光标至行首
 		cur_col = 0;
 		break;
 	case LCUIKEY_END: // end键移动光标至行尾

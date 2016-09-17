@@ -518,6 +518,7 @@ int LCUI_Init(void)
 	LCUI_InitTimer();
 	LCUI_InitMouseDriver();
 	LCUI_InitKeyboardDriver();
+	LCUI_InitKeyboard();
 	LCUI_InitIME();
 	LCUI_InitWidget();
 	LCUI_InitDisplay();
@@ -533,6 +534,7 @@ static int LCUI_Destroy( void )
 	LCUI_TriggerEvent( &e, NULL );
 	System.state = STATE_KILLED;
 	LCUI_ExitIME();
+	LCUI_ExitKeyboard();
 	LCUI_ExitEvent();
 	LCUI_ExitCursor();
 	LCUI_ExitWidget();

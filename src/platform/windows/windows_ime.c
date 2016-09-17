@@ -25,61 +25,6 @@ static struct {
 **/
 static LCUI_BOOL IME_ProcessKey( int key, int key_state )
 {
-	if( key_state != LCUIKEYSTATE_PRESSED ) {
-		return FALSE;
-	}
-	switch(key) {
-	case LCUIKEY_ENTER:
-	case LCUIKEY_SPACE:
-	case LCUIKEY_0:
-	case LCUIKEY_1:
-	case LCUIKEY_2:
-	case LCUIKEY_3:
-	case LCUIKEY_4:
-	case LCUIKEY_5:
-	case LCUIKEY_6:
-	case LCUIKEY_7:
-	case LCUIKEY_8:
-	case LCUIKEY_9:
-	case LCUIKEY_A:
-	case LCUIKEY_B:
-	case LCUIKEY_C:
-	case LCUIKEY_D:
-	case LCUIKEY_E:
-	case LCUIKEY_F:
-	case LCUIKEY_G:
-	case LCUIKEY_H:
-	case LCUIKEY_I:
-	case LCUIKEY_J:
-	case LCUIKEY_K:
-	case LCUIKEY_L:
-	case LCUIKEY_M:
-	case LCUIKEY_N:
-	case LCUIKEY_O:
-	case LCUIKEY_P:
-	case LCUIKEY_Q:
-	case LCUIKEY_R:
-	case LCUIKEY_S:
-	case LCUIKEY_T:
-	case LCUIKEY_U:
-	case LCUIKEY_V:
-	case LCUIKEY_W:
-	case LCUIKEY_X:
-	case LCUIKEY_Y:
-	case LCUIKEY_Z:
-	case 189:
-	case 187:
-	case 188:
-	case 190:
-	case 191:
-	case 222:
-	case 186:
-	case 220:
-	case 221:
-	case 219:
-		return TRUE;
-	default:break;
-	}
 	return FALSE;
 }
 
@@ -101,9 +46,19 @@ static void IME_ClearTarget( void )
 static void IME_ToText( char ch )
 {
 	wchar_t text[2];
-	/* 回车符转换行符 */
-	if( ch == '\r' ) {
-		ch = '\n';
+	switch( ch ) {
+	case '\r': ch = '\n'; break;
+	case 189: ch = '-'; break;
+	case 187: ch = '='; break;
+	case 188: ch = ','; break;
+	case 190: ch = '.'; break;
+	case 191: ch = '/'; break;
+	case 222: ch = '\''; break;
+	case 186: ch = ';'; break;
+	case 220: ch = '\\'; break;
+	case 221: ch = ']'; break;
+	case 219: ch = '['; break;
+	default: break;
 	}
 	text[0] = ch;
 	text[1] = '\0';

@@ -184,24 +184,7 @@ static void LCUIIME_OnDestroy( void *arg )
 
 static void LCUIIME_ToText( LCUI_SysEvent e )
 {
-	char ch;
-
-	switch(e->key.code) {
-#ifdef LCUI_BUILD_IN_WIN32
-	case 189: ch = '-'; break;
-	case 187: ch = '='; break;
-	case 188: ch = ','; break;
-	case 190: ch = '.'; break;
-	case 191: ch = '/'; break;
-	case 222: ch = '\''; break;
-	case 186: ch = ';'; break;
-	case 220: ch = '\\'; break;
-	case 221: ch = ']'; break;
-	case 219: ch = '['; break;
-#endif
-	default:ch = e->key.code;break;
-	}
-
+	char ch = e->key.code;
 	DEBUG_MSG("key code: %d\n", event->key_code);
 	/* 如果没开启大写锁定，则将字母转换成小写 */
 	if( !self.enable_caps_lock ) {
@@ -212,6 +195,7 @@ static void LCUIIME_ToText( LCUI_SysEvent e )
 
 	/* 如果shift键处于按下状态 */
 	if( LCUIKeyboard_IsHit(LCUIKEY_SHIFT) ) {
+		_DEBUG_MSG("hit shift, ch: %c\n", ch);
 		if(ch >='a' && ch <= 'z') {
 			ch = ch - 32;
 		} else if(ch >='A' && ch <= 'Z') {
@@ -265,11 +249,7 @@ LCUI_BOOL LCUIIME_ProcessKey( LCUI_SysEvent e )
 		}
 	}
 	if( self.ime && self.ime->handler.prockey ) {
-		/* 如果输入法要处理该键，则调用LCUIIME_ToText函数 */
-		if( self.ime->handler.prockey( e->key.code, key_state ) ) {
-			LCUIIME_ToText( e );
-			return TRUE;
-		}
+		return self.ime->handler.prockey( e->key.code, key_state );
 	}
 	return FALSE;
 }
@@ -319,12 +299,21 @@ int LCUIIME_ClearTarget( void )
 	return -1;
 }
 
+static void LCUIIME_OnKeyDown( LCUI_SysEvent e, void *arg )
+{
+	_DEBUG_MSG("on keydown\n");
+	if( LCUIIME_ProcessKey( e ) ) {
+		LCUIIME_ToText( e );
+	}
+}
+
 /* 初始化LCUI输入法模块 */
 void LCUI_InitIME( void )
 {
 	int ime_id;
 	LinkedList_Init( &self.list );
 	self.is_inited = TRUE;
+	LCUI_BindEvent( LCUI_KEYDOWN, LCUIIME_OnKeyDown, NULL, NULL );
 #ifdef LCUI_BUILD_IN_WIN32
 	ime_id = LCUI_RegisterWin32IME();
 #else
