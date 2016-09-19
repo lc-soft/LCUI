@@ -613,6 +613,7 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 		fullname[len++] = '.';
 		for( i = 0; sfinder->node->classes[i]; ++i ) {
 			sfinder->level += 1;
+			sfinder->class_i = i;
 			strcpy( fullname + len, sfinder->node->classes[i] );
 			LinkedList_Append( list, strdup( fullname ) );
 			/* 将当前选择器名与其它层级的选择器名组合 */
@@ -621,7 +622,6 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 				sfinder->level += 1;
 			}
 			sfinder->level = LEVEL_CLASS;
-			sfinder->class_i += 1;
 		}
 		sfinder->level = LEVEL_CLASS;
 		fullname[old_len] = 0;
@@ -644,9 +644,9 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 			}
 			strcpy( fullname + len, sfinder->node->classes[i] );
 			LinkedList_Append( list, strdup( fullname ) );
-			sfinder->class_i += 1;
+			sfinder->class_i = i;
 			count += NamesFinder_Find( sfinder, list );
-			sfinder->class_i -= 1;
+			sfinder->class_i  = 0;
 			sfinder->level = LEVEL_STATUS;
 			/**
 			 * 递归拼接伪类名，例如：
@@ -677,6 +677,7 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 		 * textview#main-btn-text:hover
 		 */
 		for( i = 0; sfinder->node->status[i]; ++i ) {
+			sfinder->status_i = i;
 			strcpy( fullname + len, sfinder->node->status[i] );
 			LinkedList_Append( list, strdup( fullname ) );
 			/**
@@ -684,7 +685,6 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 			 * textview#main-btn-text:active:focus:hover
 			 */
 			count += NamesFinder_Find( sfinder, list );
-			sfinder->status_i += 1;
 		}
 		sfinder->level = LEVEL_STATUS;
 		fullname[old_len] = 0;
@@ -702,9 +702,9 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 			fullname[len] = ':';
 			strcpy( fullname + len + 1, sfinder->node->status[i] );
 			LinkedList_Append( list, strdup( fullname ) );
-			sfinder->status_i += 1;
+			sfinder->status_i = i;
 			count += NamesFinder_Find( sfinder, list );
-			sfinder->status_i -= 1;
+			sfinder->status_i = 0;
 		}
 		fullname[old_len] = 0;
 		return count;

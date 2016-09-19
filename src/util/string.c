@@ -277,6 +277,7 @@ int sortedstrsadd( char ***strlist, const char *str )
 			return 1;
 		} else {
 			pos = i;
+			break;
 		}
 	}
 	n = strlen( str ) + 1;
