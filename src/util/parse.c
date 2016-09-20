@@ -142,7 +142,7 @@ LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 			break;
 		default:
 			if( status < 3 ) {
-				return FALSE;
+				break;
 			}
 		}
 	}
@@ -176,6 +176,16 @@ LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 		var->is_valid = TRUE;
 		var->is_changed = TRUE;
 		return TRUE;
+	} else {
+		if( strcmp("transparent", str) == 0 ) {
+			var->is_valid = TRUE;
+			var->color.alpha = 0;
+			var->color.red = 255;
+			var->color.green = 255;
+			var->color.blue = 255;
+			var->type = SVT_COLOR;
+			return TRUE;
+		}
 	}
 	return FALSE;
 }

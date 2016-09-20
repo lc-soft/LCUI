@@ -447,24 +447,6 @@ static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
 			continue;
 		}
 		switch( key ) {
-		case key_border_color:
-			b->top.color = style->color;
-			b->right.color = style->color;
-			b->bottom.color = style->color;
-			b->left.color = style->color;
-			break;
-		case key_border_style:
-			b->top.style = style->value;
-			b->right.style = style->value;
-			b->bottom.style = style->value;
-			b->left.style = style->value;
-			break;
-		case key_border_width:
-			b->top.width = style->value;
-			b->right.width = style->value;
-			b->bottom.width = style->value;
-			b->left.width = style->value;
-			break;
 		case key_border_top_color:
 			b->top.color = style->color;
 			break;

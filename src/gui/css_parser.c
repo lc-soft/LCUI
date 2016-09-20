@@ -203,15 +203,6 @@ static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 	if( ParseColor( s, str ) ) {
 		return 0;
 	}
-	if( strcmp("transparent", str) == 0 ) {
-		s->is_valid = TRUE;
-		s->color.alpha = 0;
-		s->color.red = 255;
-		s->color.green = 255;
-		s->color.blue = 255;
-		s->type = SVT_COLOR;
-		return 0;
-	}
 	return -1;
 }
 
@@ -269,13 +260,22 @@ static int OnParseBorder( LCUI_StyleSheet ss, int key, const char *str )
 	for( i = 0; i < 3; ++i ) {
 		switch( slist[i].type ) {
 		case SVT_COLOR:
-			ss->sheet[key_border_color] = slist[i];
+			ss->sheet[key_border_top_color] = slist[i];
+			ss->sheet[key_border_right_color] = slist[i];
+			ss->sheet[key_border_bottom_color] = slist[i];
+			ss->sheet[key_border_left_color] = slist[i];
 			break;
 		case SVT_PX:
-			ss->sheet[key_border_width] = slist[i];
+			ss->sheet[key_border_top_width] = slist[i];
+			ss->sheet[key_border_right_width] = slist[i];
+			ss->sheet[key_border_bottom_width] = slist[i];
+			ss->sheet[key_border_left_width] = slist[i];
 			break;
 		case SVT_style:
-			ss->sheet[key_border_style] = slist[i];
+			ss->sheet[key_border_top_style] = slist[i];
+			ss->sheet[key_border_right_style] = slist[i];
+			ss->sheet[key_border_bottom_style] = slist[i];
+			ss->sheet[key_border_left_style] = slist[i];
 			break;
 		default: return -1;
 		}
@@ -381,17 +381,44 @@ static int OnParseBorderBottom( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseBorderColor( LCUI_StyleSheet ss, int key, const char *str )
 {
-	return OnParseColor( ss, key_border_color, str );
+	LCUI_StyleRec s;
+	if( !ParseColor( &s, str ) ) {
+		return -1;
+	}
+	ss->sheet[key_border_top_color] = s;
+	ss->sheet[key_border_right_color] = s;
+	ss->sheet[key_border_bottom_color] = s;
+	ss->sheet[key_border_left_color] = s;
+	return 0;
 }
 
 static int OnParseBorderWidth( LCUI_StyleSheet ss, int key, const char *str )
 {
-	return OnParseNumber( ss, key_border_width, str );
+	LCUI_StyleRec s;
+	if( !ParseNumber( &s, str ) ) {
+		return -1;
+	}
+	ss->sheet[key_border_top_width] = s;
+	ss->sheet[key_border_right_width] = s;
+	ss->sheet[key_border_bottom_width] = s;
+	ss->sheet[key_border_left_width] = s;
+	return 0;
 }
 
 static int OnParseBorderStyle( LCUI_StyleSheet ss, int key, const char *str )
 {
-	return OnParseStyleOption( ss, key_border_style, str );
+	LCUI_StyleRec s;
+	s.is_valid = TRUE;
+	s.is_changed = TRUE;
+	s.val_style = LCUI_GetStyleValue( str );
+	if( s.val_style < 0 ) {
+		return -1;
+	}
+	ss->sheet[key_border_top_style] = s;
+	ss->sheet[key_border_right_style] = s;
+	ss->sheet[key_border_bottom_style] = s;
+	ss->sheet[key_border_left_style] = s;
+	return 0;
 }
 
 static int OnParsePadding( LCUI_StyleSheet ss, int key, const char *str )
