@@ -396,7 +396,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		content_graph.color_type = COLOR_TYPE_ARGB;
 		Graph_Create( &content_graph, content_rect.w, content_rect.h );
 	} else {
-		child_paint.with_alpha = FALSE;
+		child_paint.with_alpha = paint->with_alpha;
 		/* 引用该区域的位图，作为内容框的位图 */
 		Graph_Quote( &content_graph, &paint->canvas, &content_rect );
 	}
