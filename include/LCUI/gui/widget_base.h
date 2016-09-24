@@ -170,8 +170,11 @@ LCUI_API void Widget_ExecDestroy( LCUI_Widget w );
 /** 销毁部件 */
 LCUI_API void Widget_Destroy( LCUI_Widget w );
 
-/** 追加子部件 */
+/** 向子部件列表追加部件 */
 LCUI_API int Widget_Append( LCUI_Widget container, LCUI_Widget widget );
+
+/** 将部件插入到子部件列表的开头处 */
+LCUI_API int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget );
 
 /** 移除部件，并将其子级部件转移至父部件内 */
 LCUI_API int Widget_Unwrap( LCUI_Widget widget );

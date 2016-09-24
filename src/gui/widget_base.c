@@ -92,11 +92,37 @@ static void Widget_UpdateStatusAfterAppend( LCUI_Widget w,
 	}
 }
 
+/** 刷新在前置部件后的状态，例如 :first-child 和 :last-child */
+static void Widget_UpdateStatusAfterPrepend( LCUI_Widget w,
+					     LCUI_BOOL is_remove_mode )
+{
+	LinkedListNode *node = Widget_GetNode( w );
+	if( is_remove_mode ) {
+		Widget_RemoveStatus( w, "first-child" );
+		if( node->next ) {
+			Widget_AddStatus( node->next->data, "first-child" );
+		}
+	} else {
+		Widget_AddStatus( w, "first-child" );
+		if( node->next ) {
+			Widget_RemoveStatus( node->next->data, "first-child" );
+		}
+	}
+	if( w->index != 0 && w->parent->children.length != 1 ) {
+		return;
+	}
+	if( is_remove_mode ) {
+		Widget_RemoveStatus( w, "last-child" );
+	} else {
+		Widget_AddStatus( w, "last-child" );
+	}
+}
+
 int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 {
 	LCUI_Widget child;
 	LinkedListNode *node, *snode;
-	if( !parent || !widget || parent == widget->parent ) {
+	if( !parent || !widget ) {
 		return -1;
 	}
 	if( parent == widget ) {
@@ -128,6 +154,52 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateLayout( parent );
 	Widget_UpdateStatusAfterAppend( widget, FALSE );
+	return 0;
+}
+
+int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget )
+{
+	LCUI_Widget child;
+	LinkedListNode *node, *snode;
+	if( !parent || !widget ) {
+		return -1;
+	}
+	if( parent == widget ) {
+		return -2;
+	}
+	node = Widget_GetNode( widget );
+	snode = Widget_GetShowNode( widget );
+	if( widget->parent ) {
+		Widget_UpdateStatusAfterPrepend( widget, TRUE );
+		/** 修改它后面的部件的 index 值 */
+		node = node->next;
+		while( node ) {
+			child = node->data;
+			child->index -= 1;
+			node = node->next;
+		}
+		node = Widget_GetNode( widget );
+		LinkedList_Unlink( &widget->parent->children, node );
+		LinkedList_Unlink( &widget->parent->children_show, snode );
+		Widget_PostSurfaceEvent( widget, WET_REMOVE );
+	}
+	widget->index = 0;
+	widget->parent = parent;
+	widget->state = WSTATE_CREATED;
+	LinkedList_InsertNode( &parent->children, 0, node );
+	LinkedList_InsertNode( &parent->children_show, 0, snode );
+	/** 修改它后面的部件的 index 值 */
+	node = node->next;
+	while( node ) {
+		child = node->data;
+		child->index -= 1;
+		node = node->next;
+	}
+	Widget_PostSurfaceEvent( widget, WET_ADD );
+	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
+	Widget_UpdateTaskStatus( widget );
+	Widget_UpdateLayout( parent );
+	Widget_UpdateStatusAfterPrepend( widget, FALSE );
 	return 0;
 }
 

@@ -74,6 +74,7 @@ LCUI_API void LinkedList_Link( LinkedList *list, LinkedListNode *cur, LinkedList
 LCUI_API void LinkedList_Delete( LinkedList *list, int pos );
 LCUI_API void LinkedList_DeleteNode( LinkedList *list, LinkedListNode *node );
 LCUI_API void LinkedList_AppendNode( LinkedList *list, LinkedListNode *node );
+LCUI_API void LinkedList_InsertNode( LinkedList *list, int pos, LinkedListNode *node );
 LCUI_API void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*), int free_node );
 LCUI_API void LinkedList_Concat( LinkedList *list1, LinkedList *list2 );
 
