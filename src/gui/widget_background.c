@@ -166,14 +166,19 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 
 	for( ; key <= key_background_end; ++key ) {
 		s = &ss->sheet[key];
-		if( !s->is_valid ) {
-			continue;
-		}
 		switch( key ) {
 		case key_background_color:
-			bg->color = s->color;
+			if( s->is_valid ) {
+				bg->color = s->color;
+			} else {
+				bg->color.value = 0;
+			}
 			break;
 		case key_background_image:
+			if( !s->is_valid ) {
+				Graph_Init( &bg->image );
+				break;
+			}
 			switch( s->type ) {
 			case SVT_IMAGE:
 				if( !s->image ) {
@@ -188,28 +193,46 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 			}
 			break;
 		case key_background_position:
-			bg->position.using_value = TRUE;
-			bg->position.value = s->value;
+			if( s->is_valid && s->type != SVT_NONE ) {
+				bg->position.using_value = TRUE;
+				bg->position.value = s->value;
+			} else {
+				bg->position.using_value = FALSE;
+				bg->position.value = 0;
+			}
 			break;
 		case key_background_position_x:
-			bg->position.using_value = FALSE;
-			bg->position.x = *s;
+			if( s->is_valid && s->type != SVT_NONE ) {
+				bg->position.using_value = FALSE;
+				bg->position.x = *s;
+			}
 			break;
 		case key_background_position_y:
-			bg->position.using_value = FALSE;
-			bg->position.y = *s;
+			if( s->is_valid && s->type != SVT_NONE ) {
+				bg->position.using_value = FALSE;
+				bg->position.y = *s;
+			}
 			break;
 		case key_background_size:
-			bg->size.using_value = TRUE;
-			bg->size.value = s->value;
+			if( s->is_valid && s->type != SVT_NONE ) {
+				bg->size.using_value = TRUE;
+				bg->size.value = s->value;
+			} else {
+				bg->size.using_value = FALSE;
+				bg->size.value = 0;
+			}
 			break;
 		case key_background_size_width:
-			bg->size.using_value = FALSE;
-			bg->size.w = *s;
+			if( s->is_valid && s->type != SVT_NONE ) {
+				bg->size.using_value = FALSE;
+				bg->size.w = *s;
+			}
 			break;
 		case key_background_size_height:
-			bg->size.using_value = FALSE;
-			bg->size.h = *s;
+			if( s->is_valid && s->type != SVT_NONE ) {
+				bg->size.using_value = FALSE;
+				bg->size.h = *s;
+			}
 			break;
 		default: break;
 		}

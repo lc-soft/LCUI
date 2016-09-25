@@ -532,12 +532,15 @@ static int OnParseBackgroundSize( LCUI_StyleSheet ss, int key, const char *str )
 	LCUI_StyleRec slist[2];
 	int ret = OnParseStyleOption( ss, key, str );
 	if( ret == 0 ) {
+		SetStyle( ss, key_background_size_width, 0, 0 );
+		SetStyle( ss, key_background_size_height, 0, 0 );
 		return 0;
 	}
 	ret = SplitValues( str, slist, 2, SPLIT_NUMBER | SPLIT_STYLE );
 	if( ret != 2 ) {
 		return -1;
 	}
+	SetStyle( ss, key, 0, 0 );
 	ss->sheet[key_background_size_width] = slist[0];
 	ss->sheet[key_background_size_height] = slist[1];
 	return 0;
