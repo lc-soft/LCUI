@@ -70,7 +70,7 @@ Github：https://github.com/lc-soft/LCUI
  * [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG 图像压缩库
  * [libjpeg](http://www.ijg.org/) — JPEG 图像压缩库
  * [libxml2](http://xmlsoft.org/) — XML 解析器及相关工具集
- * [libx11-dev](https://www.x.org/) — X11 客户端库
+ * [libx11](https://www.x.org/) — X11 客户端库
  * [freetype](https://www.freetype.org/) — 字体渲染引擎
 
 如果你的系统是 Ubuntu，可运行以下命令来安装依赖：

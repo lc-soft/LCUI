@@ -56,7 +56,7 @@ If you want to build full-featured LCUI, we suggest you install the following
  * [libpng](http://www.libpng.org/pub/png/libpng.html) — PNG image compression library
  * [libjpeg](http://www.ijg.org/) — JPEG image compression library
  * [libxml2](http://xmlsoft.org/) — The XML C parser and toolkit
- * [libx11-dev](https://www.x.org/) — X11 client-side library
+ * [libx11](https://www.x.org/) — X11 client-side library
  * [freetype](https://www.freetype.org/) — Font engine
 
 If you system is Ubuntu, you can run following command to install dependencies:
