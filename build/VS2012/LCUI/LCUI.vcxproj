@@ -239,6 +239,7 @@
     <ClCompile Include="..\..\..\src\main.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_display.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_events.c" />
+    <ClCompile Include="..\..\..\src\platform\windows\windows_ime.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_keyboard.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_mouse.c" />
     <ClCompile Include="..\..\..\src\thread\win32\cond.c" />
