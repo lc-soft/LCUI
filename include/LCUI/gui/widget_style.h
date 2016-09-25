@@ -102,6 +102,9 @@ LCUI_API void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
 /** 查找作用于当前部件的样式表 */
 LCUI_API int Widget_FindStyles( LCUI_Widget w, LinkedList *list );
 
+/** 获取选择器结点 */
+LCUI_SelectorNode Widget_GetSelectorNode( LCUI_Widget w );
+
 /** 获取选择器 */
 LCUI_API LCUI_Selector Widget_GetSelector( LCUI_Widget w );
 

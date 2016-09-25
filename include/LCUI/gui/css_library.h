@@ -201,6 +201,8 @@ LCUI_API int SelectorNode_GetNames( LCUI_SelectorNode sn, LinkedList *names );
 
 LCUI_API int SelectorNode_Update( LCUI_SelectorNode node );
 
+LCUI_API void SelectorNode_Delete( LCUI_SelectorNode node );
+
 /** 
  * 匹配选择器节点
  * 左边的选择器必须包含右边的选择器的所有属性。

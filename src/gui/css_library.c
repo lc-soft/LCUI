@@ -377,7 +377,7 @@ static void SelectorNode_Copy( LCUI_SelectorNode dst, LCUI_SelectorNode src )
 	}
 }
 
-static void SelectorNode_Delete( LCUI_SelectorNode node )
+void SelectorNode_Delete( LCUI_SelectorNode node )
 {
 	if( node->type ) {
 		free( node->type );

@@ -59,63 +59,65 @@ LCUI_Widget LCUIWidget_GetRoot(void)
 	return LCUIWidget.root;
 }
 
-/** 刷新在追加部件后的状态，例如 :first-child 和 :last-child */
-static void Widget_UpdateStatusAfterAppend( LCUI_Widget w,
-					    LCUI_BOOL is_remove_mode )
+/** 刷新部件的状态 */
+static void Widget_UpdateStatus( LCUI_Widget widget )
 {
-	LinkedListNode *node = Widget_GetNode( w );
-	if( w->index == 0 ) {
-		if( is_remove_mode ) {
-			Widget_RemoveStatus( w, "first-child" );
-			if( node->next ) {
-				Widget_AddStatus( node->next->data, 
-						  "first-child" );
-			}
-		} else {
-			Widget_AddStatus( w, "first-child" );
+	LCUI_Widget child;
+	if( !widget->parent ) {
+		return;
+	}
+	if( widget->index == widget->parent->children.length - 1 ) {
+		Widget_AddStatus( widget, "last-child" );
+		child = Widget_GetPrev( widget );
+		if( child ) {
+			Widget_RemoveStatus( child, "last-child" );
 		}
 	}
-	if( w->index == w->parent->children.length - 1 ) {
-		if( is_remove_mode ) {
-			Widget_RemoveStatus( w, "last-child" );
-			if( w->parent->children.length > 1 ) {
-				Widget_AddStatus( node->prev->data, 
-						  "last-child" );
-			}
-		} else {
-			Widget_AddStatus( w, "last-child" );
-			if( w->parent->children.length > 1 ) {
-				Widget_RemoveStatus( node->prev->data, 
-						     "last-child" );
-			}
+	if( widget->index == 0 ) {
+		Widget_AddStatus( widget, "first-child" );
+		child = Widget_GetNext( widget );
+		if( child ) {
+			Widget_RemoveStatus( child, "first-child" );
 		}
 	}
 }
 
-/** 刷新在前置部件后的状态，例如 :first-child 和 :last-child */
-static void Widget_UpdateStatusAfterPrepend( LCUI_Widget w,
-					     LCUI_BOOL is_remove_mode )
+int Widget_Unlink( LCUI_Widget widget )
 {
-	LinkedListNode *node = Widget_GetNode( w );
-	if( is_remove_mode ) {
-		Widget_RemoveStatus( w, "first-child" );
-		if( node->next ) {
-			Widget_AddStatus( node->next->data, "first-child" );
+	LCUI_Widget child;
+	LinkedListNode *node, *snode;
+	if( !widget->parent ) {
+		return -1;
+	}
+	node = Widget_GetNode( widget );
+	snode = Widget_GetShowNode( widget );
+	if( widget->index == widget->parent->children.length - 1 ) {
+		Widget_RemoveStatus( widget, "last-child" );
+		child = Widget_GetPrev( widget );
+		if( child ) {
+			Widget_AddStatus( child, "last-child" );
 		}
-	} else {
-		Widget_AddStatus( w, "first-child" );
-		if( node->next ) {
-			Widget_RemoveStatus( node->next->data, "first-child" );
+	}
+	if( widget->index == 0 ) {
+		Widget_RemoveStatus( widget, "first-child" );
+		child = Widget_GetNext( widget );
+		if( child ) {
+			Widget_AddStatus( child, "first-child" );
 		}
 	}
-	if( w->index != 0 && w->parent->children.length != 1 ) {
-		return;
+	/** 修改它后面的部件的 index 值 */
+	node = node->next;
+	while( node ) {
+		child = node->data;
+		child->index -= 1;
+		node = node->next;
 	}
-	if( is_remove_mode ) {
-		Widget_RemoveStatus( w, "last-child" );
-	} else {
-		Widget_AddStatus( w, "last-child" );
-	}
+	node = Widget_GetNode( widget );
+	LinkedList_Unlink( &widget->parent->children, node );
+	LinkedList_Unlink( &widget->parent->children_show, snode );
+	Widget_PostSurfaceEvent( widget, WET_REMOVE );
+	widget->parent = NULL;
+	return 0;
 }
 
 int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
@@ -128,32 +130,26 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 	if( parent == widget ) {
 		return -2;
 	}
-	node = Widget_GetNode( widget );
-	snode = Widget_GetShowNode( widget );
-	if( widget->parent ) {
-		Widget_UpdateStatusAfterAppend( widget, TRUE );
-		/** 修改它后面的部件的 index 值 */
-		node = node->next;
-		while( node ) {
-			child = node->data;
-			child->index -= 1;
-			node = node->next;
-		}
-		node = Widget_GetNode( widget );
-		LinkedList_Unlink( &widget->parent->children, node );
-		LinkedList_Unlink( &widget->parent->children_show, snode );
-		Widget_PostSurfaceEvent( widget, WET_REMOVE );
-	}
+	Widget_Unlink( widget );
 	widget->parent = parent;
 	widget->state = WSTATE_CREATED;
 	widget->index = parent->children.length;
+	node = Widget_GetNode( widget );
+	snode = Widget_GetShowNode( widget );
 	LinkedList_AppendNode( &parent->children, node );
 	LinkedList_AppendNode( &parent->children_show, snode );
+	/** 修改它后面的部件的 index 值 */
+	node = node->next;
+	while( node ) {
+		child = node->data;
+		child->index += 1;
+		node = node->next;
+	}
 	Widget_PostSurfaceEvent( widget, WET_ADD );
 	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
+	Widget_UpdateStatus( widget );
 	Widget_UpdateLayout( parent );
-	Widget_UpdateStatusAfterAppend( widget, FALSE );
 	return 0;
 }
 
@@ -167,39 +163,27 @@ int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget )
 	if( parent == widget ) {
 		return -2;
 	}
-	node = Widget_GetNode( widget );
-	snode = Widget_GetShowNode( widget );
-	if( widget->parent ) {
-		Widget_UpdateStatusAfterPrepend( widget, TRUE );
-		/** 修改它后面的部件的 index 值 */
-		node = node->next;
-		while( node ) {
-			child = node->data;
-			child->index -= 1;
-			node = node->next;
-		}
-		node = Widget_GetNode( widget );
-		LinkedList_Unlink( &widget->parent->children, node );
-		LinkedList_Unlink( &widget->parent->children_show, snode );
-		Widget_PostSurfaceEvent( widget, WET_REMOVE );
-	}
+	child = widget->parent;
+	Widget_Unlink( widget );
 	widget->index = 0;
 	widget->parent = parent;
 	widget->state = WSTATE_CREATED;
+	node = Widget_GetNode( widget );
+	snode = Widget_GetShowNode( widget );
 	LinkedList_InsertNode( &parent->children, 0, node );
 	LinkedList_InsertNode( &parent->children_show, 0, snode );
 	/** 修改它后面的部件的 index 值 */
 	node = node->next;
 	while( node ) {
 		child = node->data;
-		child->index -= 1;
+		child->index += 1;
 		node = node->next;
 	}
 	Widget_PostSurfaceEvent( widget, WET_ADD );
 	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
+	Widget_UpdateStatus( widget );
 	Widget_UpdateLayout( parent );
-	Widget_UpdateStatusAfterPrepend( widget, FALSE );
 	return 0;
 }
 
@@ -1562,10 +1546,11 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 
 static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix )
 {
-	int i, len;
+	int len;
 	LCUI_Widget child;
 	LinkedListNode *node;
-	char str[16], child_prefix[512], classes[512];
+	LCUI_SelectorNode snode;
+	char str[16], child_prefix[512];
 
 	len = strlen(prefix);
 	strcpy( child_prefix, prefix );
@@ -1584,34 +1569,29 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 		} else {
 			strcat( str, "┬" );
 		}
-		classes[0] = 0;
-		if( child->classes ) {
-			for( i = 0; child->classes[i]; ++i ) {
-				strcat( classes, child->classes[i] );
-				strcat( classes, " ");
-			}
-		} else {
-			strcpy( classes, "(null)" );
-		}
-		printf( "%s%s type: %s, class: %s, xy:(%d,%d), size:(%d,%d), "
+		snode = Widget_GetSelectorNode( child );
+		printf( "%s%s %s, xy:(%d,%d), size:(%d,%d), "
 			"visible: %s, padding: (%d,%d,%d,%d), margin: (%d,%d,%d,%d)\n",
-			prefix, str, child->type, classes, child->x, child->y,
+			prefix, str, snode->fullname, child->x, child->y,
 			child->width, child->height,
 			child->computed_style.visible ? "true" : "false",
 			child->padding.top, child->padding.right, child->padding.bottom,
 			child->padding.left, child->margin.top, child->margin.right, 
 			child->margin.bottom, child->margin.left );
-
+		SelectorNode_Delete( snode );
 		_LCUIWidget_PrintTree( child, depth+1, child_prefix );
 	}
 }
 
 void Widget_PrintTree( LCUI_Widget w )
 {
+	LCUI_SelectorNode node;
 	w = w ? w : LCUIWidget.root;
+	node = Widget_GetSelectorNode( w );
 	printf("%s, xy:(%d,%d), size:(%d,%d), visible: %s\n", 
-		w->type, w->x, w->y, w->width, w->height,
+		node->fullname, w->x, w->y, w->width, w->height,
 		w->computed_style.visible ? "true":"false");
+	SelectorNode_Delete( node );
 	_LCUIWidget_PrintTree( w, 0, "  " );
 }
 

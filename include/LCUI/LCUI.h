@@ -55,13 +55,13 @@
 #define TRUE 1
 #endif
 
+#define assign(TYPE, NAME) TYPE NAME = calloc( 1, sizeof(TYPE##Rec) )
 #define NEW(type, count) (type*)calloc(count, sizeof(type))
 #define ToString(...) ""#__VA_ARGS__""
 
 LCUI_BEGIN_HEADER
 
 typedef unsigned int uint_t;
-typedef unsigned long int LCUI_ID;
 typedef unsigned char LCUI_BOOL;
 typedef unsigned char uchar_t;
 typedef void (*CallBackFunc)(void*,void*);
@@ -147,6 +147,8 @@ typedef enum LCUI_StyleType {
 #define SVT_image	SVT_IMAGE
 #define SVT_string	SVT_STRING
 #define SVT_wstring	SVT_WSTRING
+#define SVT_0		SVT_NONE
+#define SVT_none	SVT_NONE
 
 typedef struct LCUI_BoxShadow {
 	int x, y;		/**< 位置 */
@@ -237,6 +239,8 @@ typedef struct LCUI_StyleRec_ {
 	union {
 		int value;
 		int val_int;
+		int val_0;
+		int val_none;
 		int px;
 		int val_px;
 		int pt;

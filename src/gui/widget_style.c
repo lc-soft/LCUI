@@ -62,6 +62,35 @@ const char *global_css = ToString(
 
 );
 
+LCUI_SelectorNode Widget_GetSelectorNode( LCUI_Widget w )
+{
+	int i;
+	assign( LCUI_SelectorNode, sn );
+
+	Widget_Lock( w );
+	if( w->id ) {
+		sn->id = strdup( w->id );
+	}
+	if( w->type ) {
+		sn->type = strdup( w->type );
+	}
+	if( w->classes ) {
+		for( i = 0; w->classes[i]; ++i ) {
+			sortedstrsadd( &sn->classes, 
+				       w->classes[i] );
+		}
+	}
+	if( w->status ) {
+		for( i = 0; w->status[i]; ++i ) {
+			sortedstrsadd( &sn->status,
+				       w->status[i] );
+		}
+	}
+	Widget_Unlock( w );
+	SelectorNode_Update( sn );
+	return sn;
+}
+
 LCUI_Selector Widget_GetSelector( LCUI_Widget w )
 {
 	int ni = 0;
@@ -83,33 +112,9 @@ LCUI_Selector Widget_GetSelector( LCUI_Widget w )
 		return NULL;
 	}
 	for( LinkedList_EachReverse( node, &list ) ) {
-		int i;
-		LCUI_SelectorNode sn;
 		parent = node->data;
-		sn = NEW( LCUI_SelectorNodeRec, 1 );
-		Widget_Lock( parent );
-		if( parent->id ) {
-			sn->id = strdup( parent->id );
-		}
-		if( parent->type ) {
-			sn->type = strdup( parent->type );
-		}
-		if( parent->classes ) {
-			for( i = 0; parent->classes[i]; ++i ) {
-				sortedstrsadd( &sn->classes, 
-					      parent->classes[i] );
-			}
-		}
-		if( parent->status ) {
-			for( i = 0; parent->status[i]; ++i ) {
-				sortedstrsadd( &sn->status,
-					      parent->status[i] );
-			}
-		}
-		Widget_Unlock( parent );
-		SelectorNode_Update( sn );
-		s->nodes[ni] = sn;
-		s->rank += sn->rank;
+		s->nodes[ni] = Widget_GetSelectorNode( parent );
+		s->rank += s->nodes[ni]->rank;
 		ni += 1;
 	}
 	LinkedList_Clear( &list, NULL );
