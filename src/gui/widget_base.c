@@ -1082,16 +1082,14 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 			Widget_AddTask( child, WTT_RESIZE );
 		}
 		if( child->computed_style.position == SV_ABSOLUTE ) {
-			if( s[key_right].is_valid || s[key_bottom].is_valid ) {
+			if( s[key_right].is_valid || s[key_bottom].is_valid ||
+			    CheckStyleType( s, key_left, scale ) ||
+			    CheckStyleType( s, key_top, scale ) ) {
 				Widget_AddTask( child, WTT_POSITION );
 			}
 		}
-		if( s[key_margin_left].is_valid && 
-		    s[key_margin_left].value == SV_AUTO ) {
-			Widget_AddTask( child, WTT_MARGIN );
-		}
-		else if( s[key_margin_right].is_valid && 
-			 s[key_margin_right].value == SV_AUTO ) {
+		if( CheckStyleValue( s, key_margin_left, AUTO ) ||
+		    CheckStyleValue( s, key_margin_right, AUTO ) ) {
 			Widget_AddTask( child, WTT_MARGIN );
 		}
 		if( child->computed_style.vertical_align != SV_TOP ) {
