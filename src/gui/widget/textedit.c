@@ -411,7 +411,7 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
 	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( widget, node->data, SV_CONTENT_BOX );
 	}
-	LinkedList_Clear( &rects, free );
+	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( edit->layer );
 	TextStyle_Copy( &style, &edit->layer_source->text_style );
 	style.has_fore_color = TRUE;
@@ -801,7 +801,7 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
-	LinkedList_Clear( &rects, free );
+	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( edit->layer );
 }
 

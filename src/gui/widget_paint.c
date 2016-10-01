@@ -221,7 +221,7 @@ static int _Widget_ProcInvalidArea( LCUI_Widget w, int x, int y,
 			RectList_Add( rlist, &rect );
 		}
 	}
-	LinkedList_Clear( &w->dirty_rects, free );
+	RectList_Clear( &w->dirty_rects );
 	/* 若子级部件没有脏矩形记录 */
 	if( !w->has_dirty_child ) {
 		return count;

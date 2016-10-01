@@ -608,13 +608,13 @@ static LCUI_StyleParserRec style_parser_map[] = {
 static CSSParserContext NewCSSParserContext( size_t buffer_size, 
 					     const char *space )
 {
-	CSSParserContext ctx = NEW(CSSParserContextRec, 1);
-	LinkedList_Init( &ctx->selectors );
-	ctx->buffer = (char*)malloc( sizeof(char) * buffer_size );
+	CSSParserContext ctx = NEW( CSSParserContextRec, 1 );
+	ctx->buffer = NEW( char, buffer_size );
 	ctx->buffer_size = buffer_size;
-	ctx->target_bak = TARGET_NONE;
 	ctx->target = TARGET_NONE;
+	ctx->target_bak = TARGET_NONE;
 	ctx->space = space ? strdup( space ): NULL;
+	LinkedList_Init( &ctx->selectors );
 	return ctx;
 }
 

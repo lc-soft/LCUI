@@ -131,9 +131,9 @@ static void LCUIDisplay_Update(void)
 		if( rlist.length > 0 ) {
 			Surface_Present( p_sr->surface );
 		}
-		LinkedList_Clear( &rlist, free );
+		RectList_Clear( &rlist );
 	}
-	LinkedList_Clear( &rlist, free );
+	RectList_Clear( &rlist );
 }
 
 void LCUIDisplay_InvalidateArea( LCUI_Rect *rect )

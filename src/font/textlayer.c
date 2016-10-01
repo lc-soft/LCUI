@@ -353,7 +353,7 @@ static void TextRowList_Destroy( TextRowList list )
 /** 销毁TextLayer */
 void TextLayer_Destroy( LCUI_TextLayer layer )
 {
-	LinkedList_Clear( &layer->dirty_rect, free );
+	RectList_Clear( &layer->dirty_rect );
 	Graph_Free( &layer->graph );
 	TextRowList_Destroy( &layer->rowlist );
 	free( layer );
@@ -1340,14 +1340,14 @@ void TextLayer_ClearInvalidRect( LCUI_TextLayer layer )
 	LCUI_Graph invalid_graph;
 
 	if( !layer->is_using_buffer ) {
-		LinkedList_Clear( &layer->dirty_rect, free );
+		RectList_Clear( &layer->dirty_rect );
 		return;
 	}
 	for( LinkedList_Each( node, &layer->dirty_rect ) ) {
 		Graph_Quote( &invalid_graph, &layer->graph, node->data );
 		Graph_FillAlpha( &invalid_graph, 0 );
 	}
-	LinkedList_Clear( &layer->dirty_rect, free );
+	RectList_Clear( &layer->dirty_rect );
 }
 
 /** 设置全局文本样式 */

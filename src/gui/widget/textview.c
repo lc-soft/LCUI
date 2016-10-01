@@ -357,7 +357,7 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
-	LinkedList_Clear( &rects, free );
+	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
 }
 
@@ -435,7 +435,7 @@ static void TextView_OnTask( LCUI_Widget w )
 	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
-	LinkedList_Clear( &rects, free );
+	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
 	if( w->style->sheet[key_width].type == SVT_AUTO
 	 || w->style->sheet[key_height].type == SVT_AUTO ) {
