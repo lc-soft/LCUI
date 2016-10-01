@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#define ENABLE_MEMDEBUG
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -271,8 +272,8 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 {
 	LCUI_WidgetClass *wc;
 	LinkedListNode *node;
-	LCUI_Widget widget = malloc( sizeof(struct LCUI_WidgetRec_) +
-				     sizeof(LinkedListNode)*2 );
+	LCUI_Widget widget = malloc( sizeof( struct LCUI_WidgetRec_ ) +
+				     sizeof( LinkedListNode ) * 2 );
 	Widget_Init( widget );
 	node = Widget_GetNode( widget );
 	node->data = widget;
@@ -311,7 +312,7 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	if( wc && wc->methods.destroy ) {
 		wc->methods.destroy( widget );
 	}
-	LinkedList_Clear( &widget->dirty_rects, free );
+	RectList_Clear( &widget->dirty_rects );
 	StyleSheet_Delete( widget->inherited_style );
 	StyleSheet_Delete( widget->custom_style );
 	StyleSheet_Delete( widget->style );
