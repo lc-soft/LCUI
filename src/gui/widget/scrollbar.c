@@ -251,6 +251,7 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 	if( scrollbar->pos != layer_pos ) {
 		LCUI_WidgetEventRec e;
 		e.type = scroll_event_id;
+		e.cancel_bubble = TRUE;
 		Widget_TriggerEvent( layer, &e, &layer_pos );
 	}
 	scrollbar->pos = layer_pos;
@@ -548,6 +549,7 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 	if( scrollbar->pos != pos ) {
 		LCUI_WidgetEventRec e;
 		e.type = scroll_event_id;
+		e.cancel_bubble = TRUE;
 		Widget_TriggerEvent( layer, &e, &pos );
 	}
 	scrollbar->pos = pos;

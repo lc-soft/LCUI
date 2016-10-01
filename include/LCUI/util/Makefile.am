@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS=foreign
 
 # Headers to install
-pkginclude_HEADERS = dict.h rbtree.h linkedlist.h string.h rect.h \
-dirent.h time.h event.h framectrl.h parse.h memdebug.h
+pkginclude_HEADERS = dict.h rbtree.h linkedlist.h string.h rect.h dirent.h \
+time.h event.h framectrl.h parse.h
 pkgincludedir=$(prefix)/include/LCUI/util

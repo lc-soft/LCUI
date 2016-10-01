@@ -436,6 +436,7 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 		}
 		LinkedList_Clear( &blocks, TextBlock_OnDestroy );
 		ev.type = textedit_event_id;
+		ev.cancel_bubble = TRUE;
 		Widget_TriggerEvent( widget, &ev, NULL );
 		edit->tasks[TASK_UPDATE_CARET] = TRUE;
 		edit->tasks[TASK_SET_TEXT] = FALSE;
@@ -639,6 +640,7 @@ static void TextEdit_TextBackspace( LCUI_Widget widget, int n_ch )
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_Unlock( widget );
 	ev.type = textedit_event_id;
+	ev.cancel_bubble = TRUE;
 	Widget_TriggerEvent( widget, &ev, NULL );
 }
 
@@ -659,6 +661,7 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_Unlock( widget );
 	ev.type = textedit_event_id;
+	ev.cancel_bubble = TRUE;
 	Widget_TriggerEvent( widget, &ev, NULL );
 }
 

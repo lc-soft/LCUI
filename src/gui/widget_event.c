@@ -665,6 +665,7 @@ int LCUIWidget_SetFocus( LCUI_Widget widget )
 	}
 	ev.target = w;
 	ev.type = WET_FOCUS;
+	ev.cancel_bubble = FALSE;
 	self.targets[WST_FOCUS] = w;
 	Widget_AddStatus( ev.target, "focus" );
 	Widget_PostEvent( ev.target, &ev, NULL, NULL );
@@ -748,6 +749,7 @@ static void OnKeyboardEvent( LCUI_SysEvent e, void *arg )
 	}
 	ev.target = self.targets[WST_FOCUS];
 	ev.key.code = e->key.code;
+	ev.cancel_bubble = FALSE;
 	Widget_TriggerEvent( ev.target, &ev, NULL );
 }
 
@@ -761,6 +763,7 @@ static void OnTextInput( LCUI_SysEvent e, void *arg )
 	}
 	ev.target = target;
 	ev.type = WET_TEXTINPUT;
+	ev.cancel_bubble = FALSE;
 	ev.text.length = e->text.length;
 	ev.text.text = NEW( wchar_t, e->text.length + 1 );
 	if( !ev.text.text ) {
@@ -913,6 +916,7 @@ int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 	}
 	e.target = w;
 	e.type = WET_SURFACE;
+	e.cancel_bubble = TRUE;
 	return Widget_PostEvent( root, &e, *((int**)n), NULL );
 }
 

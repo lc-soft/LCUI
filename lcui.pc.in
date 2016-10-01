@@ -7,5 +7,5 @@ Name: LCUI
 Description: LCUI is a simple graphical interface library
 Version: @PACKAGE_VERSION@
 Libs: -L${libdir} -lLCUI
-Libs.private: -lpthread -lfreetype -lpng -ljpeg
+Libs.private: -lpthread -lfreetype -lpng -ljpeg -lX11 -lxml2
 Cflags: -I${includedir}

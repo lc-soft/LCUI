@@ -75,9 +75,11 @@ void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*),
 	LinkedListNode *prev, *node = list->tail.prev;
 	list->head.next = NULL;
 	list->tail.prev = NULL;
+	list->length = 0;
 	while( node && node != &list->head ) {
 		prev = node->prev;
-		LinkedList_Unlink( list, node );
+		node->prev = NULL;
+		node->next = NULL;
 		if( node->data && on_destroy ) {
 			on_destroy( node->data );
 		}
@@ -86,7 +88,6 @@ void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*),
 		}
 		node = prev;
 	}
-	list->length = 0;
 }
 
 LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos )
