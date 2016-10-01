@@ -76,6 +76,7 @@ typedef struct LCUI_ScrollBarRec_ {
 	int pos;			/**< 当前的位置 */
 	int old_pos;			/**< 拖拽开始时的位置 */
 	int distance;			/**< 滚动距离 */
+	int64_t timestamp;		/**< 数据更新时间，主要针对触控拖动时的位置变化 */
 	InertialScrollingRec effect;	/**< 用于实现惯性滚动效果的相关数据 */
 } LCUI_ScrollBarRec, *LCUI_ScrollBar;
 
@@ -374,6 +375,7 @@ static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 /** 滚动层的触屏事件响应 */
 static void ScrollLayer_OnTouch( LCUI_Widget layer, LCUI_WidgetEvent e, void *arg )
 {
+	uint_t time_delta;
 	int i, pos, distance;
 	LCUI_TouchPoint point;
 	LCUI_Widget w = e->data;
@@ -416,7 +418,8 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 		break;
 	case WET_TOUCHUP:
 		Widget_ReleaseTouchCapture( layer, -1 );
-		if( scrollbar->is_dragging ) {
+		time_delta = (uint_t)LCUI_GetTimeDelta( scrollbar->timestamp );
+		if( scrollbar->is_dragging && time_delta < 50 ) {
 			ScrollBar_StartInertialScrolling( w );
 		}
 		scrollbar->touch_point_id = -1;
@@ -442,6 +445,7 @@ static void ScrollLayer_OnTouch( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 				ScrollBar_UpdateInertialScrolling( w );
 			}
 			scrollbar->distance = distance;
+			scrollbar->timestamp = LCUI_GetTime();
 		}
 		ScrollBar_SetPosition( w, pos );
 	default: break;
