@@ -216,14 +216,13 @@ static int TextRow_SetLength( TextRow txtrow, int len )
 	if( len < 0 ) {
 		len = 0;
 	}
-	txtrow->length = len;
 	txtstr = realloc( txtrow->string, sizeof(TextChar)*(len + 1) );
 	if( !txtstr ) {
-		--txtrow->length;
 		return -1;
 	}
 	txtstr[len] = NULL;
 	txtrow->string = txtstr;
+	txtrow->length = len;
 	return 0;
 }
 
@@ -240,7 +239,7 @@ static int TextRow_Insert( TextRow txtrow, int ins_pos, TextChar txtchar )
 		ins_pos = txtrow->length;
 	}
 	TextRow_SetLength( txtrow, txtrow->length + 1 );
-	for( i = txtrow->length - 1; i >= ins_pos; --i ) {
+	for( i = txtrow->length - 1; i > ins_pos; --i ) {
 		txtrow->string[i] = txtrow->string[i - 1];
 	}
 	txtrow->string[ins_pos] = txtchar;
@@ -256,7 +255,7 @@ static int TextRow_InsertCopy( TextRow txtrow, int ins_pos, TextChar txtchar )
 	return TextRow_Insert( txtrow, ins_pos, txtchar2 );
 }
 
-/* 将文本行中的内容向左移动 */
+/** 将文本行中的内容向左移动 */
 static void TextRow_LeftMove( TextRow txtrow, int n )
 {
 	int i, j;
