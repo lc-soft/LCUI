@@ -47,20 +47,22 @@ enum in_core_font_type {
 	FONT_INCONSOLATA
 };
 
-static int InCoreFont_Open( const char *filepath, LCUI_Font **outfont )
+static int InCoreFont_Open( const char *filepath, LCUI_Font ***outfonts )
 {
 	int *code;
-	LCUI_Font *font;
+	LCUI_Font **fonts, *font;
 
-	code = (int*)malloc( sizeof( int ) );
+	code = malloc( sizeof( int ) );
+	fonts = malloc( sizeof( LCUI_Font* ) );
 	if( strcmp( filepath, "in-core.inconsolata" ) == 0 ) {
-		font = (LCUI_Font*)malloc(sizeof(LCUI_Font));
 		*code = FONT_INCONSOLATA;
-		font->data = code;
+		font = malloc( sizeof(LCUI_Font) );
 		font->family_name = strdup("inconsolata");
-		font->style_name = strdup("regular");
-		*outfont = font;
-		return 0;
+		font->style_name = strdup("Regular");
+		font->data = code;
+		fonts[0] = font;
+		*outfonts = fonts;
+		return 1;
 	}
 	return -1;
 }
@@ -87,19 +89,19 @@ int LCUIFont_InitInCoreFont( LCUI_FontEngine *engine )
 	int *code;
 	LCUI_Font *font;
 
-	strcpy( engine->name, "in-core" );
-	font = (LCUI_Font*)malloc(sizeof(LCUI_Font));
+	code = malloc( sizeof( int ) );
+	font = malloc( sizeof( LCUI_Font ) );
 	/* 先添加 LCUI 内置字体的信息 */
-	font->style_name = strdup("regular");
-	font->family_name = strdup("inconsolata");
-	code = (int*)malloc(sizeof(int));
 	*code = FONT_INCONSOLATA;
-	font->data = code;
+	font->family_name = strdup("inconsolata");
+	font->style_name = strdup("Regular");
 	font->engine = engine;
-	LCUIFont_Add( font, "in-core.inconsolata" );
+	font->data = code;
 	engine->render = InCoreFont_Render;
-	engine->open = InCoreFont_Open;
 	engine->close = InCoreFont_Close;
+	engine->open = InCoreFont_Open;
+	strcpy( engine->name, "in-core" );
+	LCUIFont_Add( font );
 	return 0;
 }
 

@@ -67,7 +67,7 @@ typedef struct LCUI_Font {
 
 struct LCUI_FontEngine {
 	char name[64];
-	int (*open)(const char*, LCUI_Font**);
+	int (*open)(const char*, LCUI_Font***);
 	int (*render)(LCUI_FontBitmap*, wchar_t, int, LCUI_Font*);
 	void (*close)(void*);
 };
@@ -115,10 +115,7 @@ LCUI_API int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch,
 LCUI_API void FontLIB_Init( void );
 
 /** 添加字体族，并返回该字族的ID */
-LCUI_API int LCUIFont_Add( LCUI_Font *font, const char *filepath );
-
-/** 通过字体文件路径来查找字体信息，并获取字体ID */
-LCUI_API int LCUIFont_GetIdByPath( const char *filepath );
+LCUI_API int LCUIFont_Add( LCUI_Font *font );
 
 /**
  * 获取字体的ID
@@ -158,7 +155,7 @@ LCUI_API LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 LCUI_API int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 				 const LCUI_FontBitmap **bmp );
 
-/** 载入字体值数据库中 */
+/** 载入字体至数据库中 */
 LCUI_API int LCUIFont_LoadFile( const char *filepath );
 
 /** 初始化字体处理模块 */

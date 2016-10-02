@@ -71,7 +71,6 @@ static struct LCUI_FontLibraryContext {
 	int count;				/**< 计数器，主要用于为字体信息生成标识号 */
 	int font_cache_num;			/**< 字体信息缓存区的数量 */
 	LCUI_BOOL is_inited;			/**< 标记，指示数据库是否初始化 */
-	LCUI_RBTree path_map;			/**< 字体路径映射表，用于实现按路径获取字体信息 */
 	LCUI_RBTree family_tree;		/**< 字族信息树，按字族名称记录着各个字体的信息 */
 	LCUI_RBTree bitmap_cache;		/**< 字体位图缓存区 */
 	LCUI_Font ***font_cache;		/**< 字体信息缓存区 */
@@ -91,24 +90,9 @@ static struct LCUI_FontLibraryContext {
 #define SelectFontCache(id) \
 	fontlib.font_cache[fontlib.font_cache_num-1][id % FONT_CACHE_SIZE]
 
-static int OnComparePath( void *data, const void *keydata )
-{
-	return strcmp(((LCUI_FontPathNode*)data)->path, keydata);
-}
-
 static int OnCompareFamily( void *data, const void *keydata )
 {
 	return strcmp(((LCUI_FontFamilyNode*)data)->family_name, keydata);
-}
-
-static void DestroyFontPathNode( void *arg )
-{
-	LCUI_FontPathNode *node = (LCUI_FontPathNode*)arg;
-	if( node->path ) {
-		free( node->path );
-	}
-	node->path = NULL;
-	node->font = NULL;
 }
 
 static void DestroyFontFamilyNode( void *arg )
@@ -138,7 +122,7 @@ static void DestroyTreeNode( void *arg )
  * @warning 该函数仅仅是将 font 参数的引用添加至记录中，为保证记录的有效性，
  * 传入的 font 参数必须是动态分配的。
  */
-int LCUIFont_Add( LCUI_Font *font, const char *filepath )
+int LCUIFont_Add( LCUI_Font *font )
 {
 	LCUI_Font *f;
 	LinkedListNode *node;
@@ -150,22 +134,22 @@ int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 		fontlib.font_cache_num += 1;
 		caches = (LCUI_Font***)realloc( fontlib.font_cache,
 			fontlib.font_cache_num * sizeof(LCUI_Font**) );
-		if( caches == NULL ) {
+		if( !caches ) {
 			fontlib.font_cache_num -= 1;
 			return -1;
 		}
-		cache = NEW(LCUI_Font*, FONT_CACHE_SIZE);
-		if( cache == NULL ) {
+		cache = NEW( LCUI_Font*, FONT_CACHE_SIZE );
+		if( !cache ) {
 			return -2;
 		}
 		caches[fontlib.font_cache_num-1] = cache;
 		fontlib.font_cache = caches;
 	}
-	SelectFontCache(font->id) = font;
-	fn = SelectFontFamliy(font->family_name);
+	SelectFontCache( font->id ) = font;
+	fn = SelectFontFamliy( font->family_name );
 	if( !fn ) {
-		fn = NEW(LCUI_FontFamilyNode, 1);
-		fn->family_name = strdup(font->family_name);
+		fn = NEW( LCUI_FontFamilyNode, 1 );
+		fn->family_name = strdup( font->family_name );
 		LinkedList_Init( &fn->styles );
 		RBTree_CustomInsert( &fontlib.family_tree,
 				     font->family_name, fn );
@@ -177,16 +161,6 @@ int LCUIFont_Add( LCUI_Font *font, const char *filepath )
 		}
 	}
 	LinkedList_Append( &fn->styles, font );
-	if( filepath ) {
-		LCUI_FontPathNode *fp;
-		if( LCUIFont_GetIdByPath( filepath ) >= 0 ) {
-			return -4;
-		}
-		fp = NEW(LCUI_FontPathNode, 1);
-		fp->path = strdup( filepath );
-		fp->font = font;
-		RBTree_CustomInsert( &fontlib.path_map, filepath, fp );
-	}
 	return font->id;
 }
 
@@ -203,20 +177,6 @@ static LCUI_Font* LCUIFont_GetById( int id )
 	return SelectFontCache(id);
 }
 
-/** 根据字体文件路径，获取字体的ID */
-int LCUIFont_GetIdByPath( const char *filepath )
-{
-	LCUI_Font *font;
-	if( !fontlib.is_inited ) {
-		return -1;
-	}
-	font = RBTree_CustomGetData( &fontlib.path_map, filepath );
-	if( !font ) {
-		return -2;
-	}
-	return font->id;
-}
-
 /**
  * 获取字体的ID
  * @param[in] family_name 字族名称
@@ -225,8 +185,8 @@ int LCUIFont_GetIdByPath( const char *filepath )
  */
 int LCUIFont_GetId( const char *family_name, const char *style_name )
 {
-	LCUI_Font *font = NULL;
 	LinkedListNode *node;
+	LCUI_Font *font = NULL;
 	LCUI_FontFamilyNode *fnode;
 
 	if( !fontlib.is_inited ) {
@@ -237,13 +197,13 @@ int LCUIFont_GetId( const char *family_name, const char *style_name )
 		return -2;
 	}
 	for( LinkedList_Each( node, &fnode->styles ) ) {
-		font = (LCUI_Font*)node->data;
+		font = node->data;
 		if( style_name ) {
 			if( strcasecmp( font->style_name, style_name ) ) {
 				continue;
 			}
 		} else {
-			if( strcasecmp( font->style_name, "regular" ) ) {
+			if( strcasecmp( font->style_name, "Regular" ) ) {
 				continue;
 			}
 		}
@@ -384,28 +344,26 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 /** 载入字体值数据库中 */
 int LCUIFont_LoadFile( const char *filepath )
 {
-	int ret, id;
-	LCUI_Font *font;
+	LCUI_Font **fonts;
+	int i, num_fonts, id;
 
 	printf( "[font] load file: %s\n", filepath );
-	/* 如果有同一文件路径的字族信息 */
-	id = LCUIFont_GetIdByPath( filepath );
-	if( id >= 0 ) {
-		return id;
-	}
 	if( !fontlib.engine ) {
 		return -1;
 	}
-	ret = fontlib.engine->open( filepath, &font );
-	if( ret != 0 ) {
+	num_fonts = fontlib.engine->open( filepath, &fonts );
+	if( num_fonts < 1 ) {
 		printf( "[font] failed to load file: %s\n", filepath );
 		return -2;
 	}
-	font->engine = fontlib.engine;
-	id = LCUIFont_Add( font, filepath );
-	printf("[font] add family: %s, style name: %s, id: %d\n",
-		font->family_name, font->family_name, id);
-	return id;
+	for( i = 0; i < num_fonts; ++i ) {
+		fonts[i]->engine = fontlib.engine;
+		id = LCUIFont_Add( fonts[i] );
+		printf( "[font] add family: %s, style name: %s, id: %d\n",
+			fonts[i]->family_name, fonts[i]->style_name, id );
+	}
+	free( fonts );
+	return 0;
 }
 
 /** 打印字体位图的信息 */
@@ -604,48 +562,58 @@ int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch,
 /** 初始化字体处理模块 */
 void LCUI_InitFont( void )
 {
-	char *target_font;
-	int font_id = -1, i = -1, last_font_id;
-
+	int i, fid;
 #ifdef LCUI_BUILD_IN_WIN32
+#define FONTDIR "C:/Windows/Fonts/"
 #define MAX_FONTFILE_NUM 4
-
-	char *font_files[MAX_FONTFILE_NUM] = {
-		"C:/Windows/Fonts/consola.ttf",
-		"C:/Windows/Fonts/simsun.ttc",
-		"C:/Windows/Fonts/msyh.ttf",
-		"C:/Windows/Fonts/msyh.ttc"
-	};
-
+	struct {
+		const char *path;
+		const char *family;
+		const char *style;
+	} fonts[MAX_FONTFILE_NUM] = {
+		{ FONTDIR"consola.ttf", "Consola", NULL },
+		{ FONTDIR"simsun.ttc", "SimSun", NULL },
+		{ FONTDIR"msyh.ttf", "Microsoft YaHei", NULL },
+		{ FONTDIR"msyh.ttc", "Microsoft YaHei", NULL }
+	}
 #else
+#define FONTDIR "/usr/share/fonts/"
 #define MAX_FONTFILE_NUM 4
-
-	char *font_files[MAX_FONTFILE_NUM] = {
-		"/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf",
-		"/usr/share/fonts/truetype/arphic/ukai.ttc",
-		"/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
-		"/usr/share/fonts/truetype/wqy/wqy-microhei.ttc"
+	struct {
+		const char *path;
+		const char *family;
+		const char *style;
+	} fonts[MAX_FONTFILE_NUM] = {
+		{
+			FONTDIR"/truetype/ubuntu-font-family/Ubuntu-R.ttf",
+			"Ubuntu", NULL
+		}, {
+			FONTDIR"/opentype/noto/NotoSansCJK-Regular.ttc",
+			"Noto Sans CJK SC", NULL
+		}, {
+			FONTDIR"/opentype/noto/NotoSansCJK.ttc",
+			"Noto Sans CJK SC", NULL
+		}, {
+			FONTDIR"/truetype/wqy/wqy-microhei.ttc",
+			"WenQuanYi Micro Hei", NULL
+		}
 	};
-
 #endif
 
 	fontlib.font_cache_num = 1;
-	fontlib.font_cache = NEW(LCUI_Font**, 1);
-	fontlib.font_cache[0] = NEW(LCUI_Font*, FONT_CACHE_SIZE);
+	fontlib.font_cache = NEW( LCUI_Font**, 1 );
+	fontlib.font_cache[0] = NEW( LCUI_Font*, FONT_CACHE_SIZE );
 	RBTree_Init( &fontlib.bitmap_cache );
-	RBTree_Init( &fontlib.path_map );
 	RBTree_Init( &fontlib.family_tree );
-	RBTree_OnCompare( &fontlib.path_map, OnComparePath );
 	RBTree_OnCompare( &fontlib.family_tree, OnCompareFamily );
-	RBTree_OnDestroy( &fontlib.path_map, DestroyFontPathNode );
 	RBTree_OnDestroy( &fontlib.family_tree, DestroyFontFamilyNode );
 	RBTree_OnDestroy( &fontlib.bitmap_cache, DestroyTreeNode );
 	fontlib.is_inited = TRUE;
 
 	/* 先初始化内置的字体引擎 */
 	LCUIFont_InitInCoreFont( &fontlib.engines[0] );
-	font_id = LCUIFont_GetId( "inconsolata", NULL );
-	fontlib.incore_font = LCUIFont_GetById( font_id );
+	fid = LCUIFont_GetId( "inconsolata", NULL );
+	fontlib.incore_font = LCUIFont_GetById( fid );
 	fontlib.default_font = fontlib.incore_font;
 	fontlib.engine = &fontlib.engines[0];
 	/* 然后看情况启用其它字体引擎 */
@@ -655,25 +623,20 @@ void LCUI_InitFont( void )
 	}
 #endif
 	if( fontlib.engine && fontlib.engine != &fontlib.engines[0] ) {
-		printf("[font] current font engine is: %s\n", fontlib.engine->name);
+		printf( "[font] current font engine is: %s\n", 
+			fontlib.engine->name );
 	} else {
-		printf("[font] warning: not font engine support!\n");
+		printf( "[font] warning: not font engine support!\n" );
 	}
-	last_font_id = 0;
-	/* 如果在环境变量中定义了字体文件路径，那就使用它 */
-	target_font = getenv("LCUI_FONTFILE");
-	do {
-		if( !target_font ) {
-			continue;
+	for( i = 0; i < MAX_FONTFILE_NUM; ++i ) {
+		LCUIFont_LoadFile( fonts[i].path );
+	}
+	for( i = MAX_FONTFILE_NUM - 1; i >= 0; --i ) {
+		fid = LCUIFont_GetId( fonts[i].family, fonts[i].style );
+		if( fid > 0 ) {
+			LCUIFont_SetDefault( fid );
+			break;
 		}
-		/* 如果载入成功，则设定该字体为默认字体 */
-		font_id = LCUIFont_LoadFile( target_font );
-		if( font_id > 0 ) {
-			last_font_id = font_id;
-		}
-	} while( ++i, target_font = font_files[i], i < MAX_FONTFILE_NUM );
-	if( last_font_id > 0 ) {
-		LCUIFont_SetDefault( last_font_id );
 	}
 }
 
@@ -687,7 +650,6 @@ void LCUI_ExitFont( void )
 		return;
 	}
 	fontlib.is_inited = FALSE;
-	RBTree_Destroy( &fontlib.path_map );
 	RBTree_Destroy( &fontlib.bitmap_cache );
 	while( fontlib.font_cache_num > 0 ) {
 		--fontlib.font_cache_num;

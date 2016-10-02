@@ -41,6 +41,8 @@
 #ifdef LCUI_FONT_ENGINE_FREETYPE
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
+#include <stdlib.h>
+#include <errno.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -55,24 +57,41 @@ static struct {
 	FT_Library library;
 } freetype;
 
-static int FreeType_Open( const char *filepath, LCUI_Font **outfont )
+static int FreeType_Open( const char *filepath, LCUI_Font ***outfonts )
 {
-	int err;
-	FT_Face ft_face;
-	LCUI_Font *font;
+	FT_Face face;
+	LCUI_Font **fonts;
+	int i, err, num_faces;
 
-	err = FT_New_Face( freetype.library, filepath, 0, &ft_face );
+	err = FT_New_Face( freetype.library, filepath, -1, &face );
 	if( err ) {
-		*outfont = NULL;
-		return err;
+		**outfonts = NULL;
+		return -1;
 	}
-	font = (LCUI_Font*)malloc(sizeof(LCUI_Font));
-	FT_Select_Charmap( ft_face, FT_ENCODING_UNICODE );
-	font->family_name = strdup(ft_face->family_name);
-	font->style_name = strdup(ft_face->style_name);
-	font->data = ft_face;
-	*outfont = font;
-	return 0;
+	num_faces = face->num_faces;
+	FT_Done_Face( face );
+	if( num_faces < 1 ) {
+		return 0;
+	}
+	fonts = malloc( sizeof(LCUI_Font*) * num_faces );
+	if( !fonts ) {
+		return -ENOMEM;
+	}
+	for( i = 0; i < num_faces; ++i ) {
+		LCUI_Font *font = malloc( sizeof( LCUI_Font ) );
+		err = FT_New_Face( freetype.library, filepath, i, &face );
+		if( err ) {
+			fonts[i] = NULL;
+			continue;
+		}
+		FT_Select_Charmap( face, FT_ENCODING_UNICODE );
+		font->family_name = strdup( face->family_name );
+		font->style_name = strdup( face->style_name );
+		font->data = face;
+		fonts[i] = font;
+	}
+	*outfonts = fonts;
+	return num_faces;
 }
 
 static void FreeType_Close( void *face )
