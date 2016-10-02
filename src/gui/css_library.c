@@ -1232,6 +1232,7 @@ int LCUI_FindStyleSheetFromGroup( int group, const char *name,
 			count += LCUI_FindStyleSheetFromLink( link, s, 
 							      i, list );
 		}
+		Dict_ReleaseIterator( iter );
 	}
 	LinkedList_Clear( &names, free );
 	return count;

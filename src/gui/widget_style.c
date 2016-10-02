@@ -173,6 +173,7 @@ int Widget_HandleChildrenStyleChange( LCUI_Widget w, int type, const char *name 
 		}
 	}
 	Selector_Delete( s );
+	LinkedList_Clear( &snames, free );
 	/* 若子部件的样式受到了影响，则标记子部件需要刷新 */
 	if( count > 0 ) {
 		Widget_AddTaskForChildren( w, WTT_REFRESH_STYLE );
