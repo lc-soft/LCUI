@@ -575,7 +575,7 @@ void LCUI_InitFont( void )
 		{ FONTDIR"simsun.ttc", "SimSun", NULL },
 		{ FONTDIR"msyh.ttf", "Microsoft YaHei", NULL },
 		{ FONTDIR"msyh.ttc", "Microsoft YaHei", NULL }
-	}
+	};
 #else
 #define FONTDIR "/usr/share/fonts/"
 #define MAX_FONTFILE_NUM 4

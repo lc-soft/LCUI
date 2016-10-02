@@ -65,7 +65,7 @@ static int FreeType_Open( const char *filepath, LCUI_Font ***outfonts )
 
 	err = FT_New_Face( freetype.library, filepath, -1, &face );
 	if( err ) {
-		**outfonts = NULL;
+		*outfonts = NULL;
 		return -1;
 	}
 	num_faces = face->num_faces;
