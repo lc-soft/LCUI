@@ -187,7 +187,6 @@
     <ClInclude Include="..\..\..\include\LCUI\util\event.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\framectrl.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\memdebug.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\parse.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\rect.h" />
@@ -254,7 +253,6 @@
     <ClCompile Include="..\..\..\src\util\event.c" />
     <ClCompile Include="..\..\..\src\util\framectrl.c" />
     <ClCompile Include="..\..\..\src\util\linkedlist.c" />
-    <ClCompile Include="..\..\..\src\util\memdebug.c" />
     <ClCompile Include="..\..\..\src\util\parse.c" />
     <ClCompile Include="..\..\..\src\util\rbtree.c" />
     <ClCompile Include="..\..\..\src\util\rect.c" />
