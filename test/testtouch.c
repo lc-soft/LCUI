@@ -22,11 +22,11 @@ static void OnTouchWidget( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_TouchPoint point;
 	TouchPointBinding binding;
-	if( e->n_points == 0 ) {
+	if( e->touch.n_points == 0 ) {
 		return;
 	}
 	binding = e->data;
-	point = & e->points[0];
+	point = & e->touch.points[0];
 	switch( point->state ) {
 	case WET_TOUCHMOVE:
 		Widget_Move( binding->widget, point->x - 32, point->y - 32 );
