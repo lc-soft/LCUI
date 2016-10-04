@@ -85,6 +85,10 @@ typedef struct LCUI_SurfaceRec_ {
 	int mode;			/**< 渲染模式 */
 	int width;			/**< 宽度 */
 	int height;			/**< 高度 */
+	struct {
+		int x, y;
+		int width, height;
+	} config;			/**< 当前缓存的配置  */
 	GC gc;				/**< 图形操作上下文 */
 	Window window;			/**< 对应的 X11 窗口 */
 	XImage *ximage;			/**< 适用于 X11 的图像数据 */
@@ -214,7 +218,6 @@ static void X11Surface_OnCreate( LCUI_Surface s )
 	LCUIMutex_Init( &s->mutex );
 	LinkedList_Init( &s->rects );
 	LinkedList_Init( &s->ignored_size );
-	s->is_ready = TRUE;
 	LCUI_SetLinuxX11MainWindow( s->window );
 }
 
@@ -311,6 +314,10 @@ static LCUI_Surface X11Surface_New( void )
 	surface->is_ready = FALSE;
 	surface->node.data = surface;
 	surface->timestamp = LCUI_GetTime();
+	surface->config.width = 0;
+	surface->config.height = 0;
+	surface->config.x = 0;
+	surface->config.y = 0;
 	Graph_Init( &surface->fb );
 	surface->fb.color_type = COLOR_TYPE_ARGB;
 	LinkedList_AppendNode( &x11.surfaces, &surface->node );
@@ -476,20 +483,26 @@ static void OnExpose( LCUI_Event e, void *arg )
 	EventTrigger_Trigger( x11.trigger, DET_PAINT, &dpy_ev );
 }
 
-/** 响应 X11 的 ConfigureNotify 事件，它通常在 x11 窗口尺寸改变时触发 */
+/** 响应 X11 的 ConfigureNotify 事件，它通常在 x11 窗口位置、尺寸改变时触发 */
 static void OnConfigureNotify( LCUI_Event e, void *arg )
 {
 	XEvent *ev = arg;
 	LCUI_DisplayEventRec dpy_ev;
 	XConfigureEvent xce = ev->xconfigure;
 	LCUI_Surface s = GetSurfaceByWindow( xce.window );
-	if( s->width == xce.width && s->height == xce.height ) {
+	if( s->config.width == xce.width && s->config.height == xce.height ) {
+		return;
+	}
+	if( !s->is_ready ) {
+		s->is_ready = TRUE;
 		return;
 	}
 	dpy_ev.surface = s;
 	dpy_ev.type = DET_RESIZE;
 	dpy_ev.resize.width = xce.width;
 	dpy_ev.resize.height = xce.height;
+	s->config.width = xce.width;
+	s->config.height = xce.height;
 	/* 标记该尺寸需要被忽略，表面尺寸改变后不需要再修改 x11 窗口的尺寸 */
 	AddIgnoredSize( s, xce.width, xce.height );
 	EventTrigger_Trigger( x11.trigger, DET_RESIZE, &dpy_ev );
