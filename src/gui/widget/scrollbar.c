@@ -48,7 +48,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/scrollbar.h>
 
-#define EFFECT_FRAMES 50
+#define EFFECT_FRAMES 80
 
 /** 惯性滚动效果的相关数据 */
 typedef struct InertialScrollingRec_ {
@@ -56,8 +56,8 @@ typedef struct InertialScrollingRec_ {
 	int end_pos;			/**< 结束位置 */
 	int timer;			/**< 定时器 */
 	int interval;			/**< 定时器的间隔时间 */
-	int speed;			/**< 滚动速度 */
-	int speed_delta;		/**< 速度差（加速度） */
+	double speed;			/**< 滚动速度 */
+	double speed_delta;		/**< 速度差（加速度） */
 	int64_t timestamp;		/**< 开始时间 */
 	LCUI_BOOL is_running;		/**< 当前效果是否正在运行 */
 } InertialScrollingRec, *InertialScrolling;
@@ -127,7 +127,7 @@ static void OnInertialScrolling( void *arg )
 	InertialScrolling effect;
 	scrollbar = w->private_data;
 	effect = &scrollbar->effect;
-	pos = scrollbar->pos + effect->speed;
+	pos = scrollbar->pos + (int)effect->speed;
 	effect->speed += effect->speed_delta;
 	ScrollBar_SetPosition( w, pos );
 	if( effect->speed == 0 || !effect->is_running ||
@@ -309,7 +309,7 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	self->effect.start_pos = 0;
 	self->effect.timestamp = 0;
 	self->effect.speed = 0;
-	self->effect.speed_delta = 1;
+	self->effect.speed_delta = 0.3;
 	self->effect.is_running = FALSE;
 	self->effect.interval = 1000 / EFFECT_FRAMES;
 	Widget_BindEvent( slider, "mousedown", 
