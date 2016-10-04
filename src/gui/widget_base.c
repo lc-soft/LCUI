@@ -1248,22 +1248,38 @@ void Widget_UpdateProps( LCUI_Widget w )
 	}
 }
 
-/** 设置内边距 */
-void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left )
+void Widget_SetBorder( LCUI_Widget w, int width, int style, LCUI_Color clr )
 {
-	SetStyle( w->custom_style, key_padding_top, top, px );
-	SetStyle( w->custom_style, key_padding_right, right, px );
-	SetStyle( w->custom_style, key_padding_bottom, bottom, px );
-	SetStyle( w->custom_style, key_padding_left, left, px );
+	Widget_SetStyle( w, key_border_top_color, clr, color );
+	Widget_SetStyle( w, key_border_right_color, clr, color );
+	Widget_SetStyle( w, key_border_bottom_color, clr, color );
+	Widget_SetStyle( w, key_border_left_color, clr, color );
+	Widget_SetStyle( w, key_border_top_width, width, px );
+	Widget_SetStyle( w, key_border_right_width, width, px );
+	Widget_SetStyle( w, key_border_bottom_width, width, px );
+	Widget_SetStyle( w, key_border_left_width, width, px );
+	Widget_SetStyle( w, key_border_top_style, style, style );
+	Widget_SetStyle( w, key_border_right_style, style, style );
+	Widget_SetStyle( w, key_border_bottom_style, style, style );
+	Widget_SetStyle( w, key_border_left_style, style, style );
+	Widget_UpdateStyle( w, FALSE );
 }
 
-/** 设置外边距 */
+void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left )
+{
+	Widget_SetStyle( w, key_padding_top, top, px );
+	Widget_SetStyle( w, key_padding_right, right, px );
+	Widget_SetStyle( w, key_padding_bottom, bottom, px );
+	Widget_SetStyle( w, key_padding_left, left, px );
+	Widget_UpdateStyle( w, FALSE );
+}
+
 void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left )
 {
-	SetStyle( w->custom_style, key_margin_top, top, px );
-	SetStyle( w->custom_style, key_margin_right, right, px );
-	SetStyle( w->custom_style, key_margin_bottom, bottom, px );
-	SetStyle( w->custom_style, key_margin_left, left, px );
+	Widget_SetStyle( w, key_margin_top, top, px );
+	Widget_SetStyle( w, key_margin_right, right, px );
+	Widget_SetStyle( w, key_margin_bottom, bottom, px );
+	Widget_SetStyle( w, key_margin_left, left, px );
 	Widget_UpdateStyle( w, FALSE );
 }
 

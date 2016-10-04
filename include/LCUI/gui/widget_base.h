@@ -154,6 +154,7 @@ typedef struct LCUI_WidgetRec_ {
 #define Widget_GetNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec))
 #define Widget_GetShowNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode))
 #define Widget_NewPrivateData(w, type) (type*)(w->private_data = malloc(sizeof(type)))
+#define Widget_SetStyle(W, K, V, T) SetStyle((W)->custom_style, K, V, T)
 
 /** 获取根级部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
@@ -238,6 +239,9 @@ LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 /** 设置部件ID */
 LCUI_API int Widget_SetId( LCUI_Widget w, const char *idstr );
 
+/** 设置边框 */
+LCUI_API void Widget_SetBorder( LCUI_Widget w, int width, int style, LCUI_Color clr );
+
 /** 设置内边距 */
 LCUI_API void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left );
 
@@ -298,10 +302,8 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
 /** 打印部件树 */
 LCUI_API void Widget_PrintTree( LCUI_Widget w );
 
-void LCUI_InitWidget(void);
+void LCUI_InitWidget( void );
 
-void LCUI_ExitWidget(void);
-
+void LCUI_ExitWidget( void );
 
 #endif
-
