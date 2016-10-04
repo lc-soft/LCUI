@@ -50,7 +50,7 @@
 
 /*----------------------------- Timer --------------------------------*/
 
-typedef struct TimerDataRec_ {
+typedef struct TimerRec_ {
 	int state;			/**< 状态 */
 	LCUI_BOOL reuse;		/**< 是否重复使用该定时器 */
 	long int id;			/**< 定时器ID */
