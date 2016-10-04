@@ -159,10 +159,10 @@ LCUI_API int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 LCUI_API int LCUIFont_LoadFile( const char *filepath );
 
 /** 初始化字体处理模块 */
-void LCUI_InitFont( void );
+LCUI_API void LCUI_InitFont( void );
 
 /** 停用字体处理模块 */
-void LCUI_ExitFont( void );
+LCUI_API void LCUI_ExitFont( void );
 
 LCUI_END_HEADER
 

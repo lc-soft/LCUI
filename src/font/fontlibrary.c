@@ -117,11 +117,6 @@ static void DestroyTreeNode( void *arg )
 	free( arg );
 }
 
-/**
- * 添加字体信息记录，并返回该字体的ID
- * @warning 该函数仅仅是将 font 参数的引用添加至记录中，为保证记录的有效性，
- * 传入的 font 参数必须是动态分配的。
- */
 int LCUIFont_Add( LCUI_Font *font )
 {
 	LCUI_Font *f;
@@ -177,12 +172,6 @@ static LCUI_Font* LCUIFont_GetById( int id )
 	return SelectFontCache(id);
 }
 
-/**
- * 获取字体的ID
- * @param[in] family_name 字族名称
- * @param[in] style_name 样式名称，若设为 NULL，则默认获取 regular 样式或
- * 最后一个样式的字体
- */
 int LCUIFont_GetId( const char *family_name, const char *style_name )
 {
 	LinkedListNode *node;
@@ -215,7 +204,6 @@ int LCUIFont_GetId( const char *family_name, const char *style_name )
 	return -3;
 }
 
-/** 获取默认的字体ID */
 int LCUIFont_GetDefault( void )
 {
 	if( !fontlib.default_font ) {
@@ -224,7 +212,6 @@ int LCUIFont_GetDefault( void )
 	return fontlib.default_font->id;
 }
 
-/** 设定默认的字体 */
 void LCUIFont_SetDefault( int id )
 {
 	LCUI_Font *p;
@@ -235,15 +222,6 @@ void LCUIFont_SetDefault( int id )
 	}
 }
 
-/**
- * 向字体缓存中添加字体位图
- * @param[in] ch 字符码
- * @param[in] font_id 使用的字体ID
- * @param[in] size 字体大小（单位为像素）
- * @param[out] bmp 要添加的字体位图
- * @warning 此函数仅仅是将 bmp 复制进缓存中，并未重新分配新的空间储存位图数
- * 据，因此，请勿在调用此函数后手动释放 bmp。
- */
 LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 				     int size, const LCUI_FontBitmap *bmp )
 {
@@ -293,15 +271,6 @@ LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 	return bmp_cache;
 }
 
-/**
- * 从缓存中获取字体位图
- * @param[in] ch 字符码
- * @param[in] font_id 使用的字体ID
- * @param[in] size 字体大小（单位为像素）
- * @param[out] bmp 输出的字体位图的引用
- * @warning 请勿释放 bmp，bmp 仅仅是引用缓存中的字体位图，并未建分配新
- * 空间存储字体位图的拷贝。
- */
 int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 			const LCUI_FontBitmap **bmp )
 {
@@ -341,7 +310,6 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 	return ret;
 }
 
-/** 载入字体值数据库中 */
 int LCUIFont_LoadFile( const char *filepath )
 {
 	LCUI_Font **fonts;
