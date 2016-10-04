@@ -78,15 +78,15 @@ typedef struct SysEventPackRec_ {
 
 /** LCUI 系统相关数据 */
 static struct LCUI_System {
+	LCUI_BOOL is_inited;		/**< 标志，指示LCUI是否初始化过 */
 	int state;			/**< 状态 */
 	int mode;			/**< LCUI的运行模式 */
-	LCUI_BOOL is_inited;		/**< 标志，指示LCUI是否初始化过 */
 	unsigned long int main_tid;	/**< 主线程ID */
 	struct {
 		LCUI_EventTrigger trigger;	/**< 系统事件容器 */
 		LCUI_Mutex mutex;		/**< 互斥锁 */
 	} event;
-} System;
+} System = { 0 };
 
 /** LCUI 应用程序数据 */
 static struct LCUI_App {
@@ -116,6 +116,9 @@ static void LCUI_InitEvent(void)
 /** 停用事件模块并进行清理 */
 static void LCUI_ExitEvent(void)
 {
+	if( !System.is_inited ) {
+		return;
+	}
 	LCUIMutex_Destroy( &System.event.mutex );
 	EventTrigger_Destroy( System.event.trigger );
 	System.event.trigger = NULL;
@@ -144,6 +147,9 @@ int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
 {
 	int ret;
 	SysEventHandler handler;
+	if( !System.is_inited ) {
+		return -1;
+	}
 	handler = NEW( SysEventHandlerRec, 1 );
 	handler->func = func;
 	handler->data = data;
@@ -158,6 +164,9 @@ int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
 int LCUI_UnbindEvent( int handler_id )
 {
 	int ret;
+	if( !System.is_inited ) {
+		return -1;
+	}
 	LCUIMutex_Lock( &System.event.mutex );
 	ret = EventTrigger_Unbind2( System.event.trigger, handler_id );
 	LCUIMutex_Unlock( &System.event.mutex );
