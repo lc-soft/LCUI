@@ -82,26 +82,59 @@ typedef struct LCUI_SurfaceTaskRec_ {
 } LCUI_SurfaceTaskRec, *LCUI_SurfaceTask;
 
 typedef struct LCUI_SurfaceRec_ {
-	int mode;
-	int width;
-	int height;
-	GC gc;
-	Window window;
-	XImage *ximage;
-	LCUI_BOOL is_ready;
-	LCUI_Graph fb;
-	LinkedList rects;
-	LCUI_Mutex mutex;
-	LinkedListNode node;
+	int mode;			/**< 渲染模式 */
+	int width;			/**< 宽度 */
+	int height;			/**< 高度 */
+	GC gc;				/**< 图形操作上下文 */
+	Window window;			/**< 对应的 X11 窗口 */
+	XImage *ximage;			/**< 适用于 X11 的图像数据 */
+	LCUI_BOOL is_ready;		/**< 标志，标识当前的表面是否已经准备好 */
+	LCUI_Graph fb;			/**< 帧缓存，它里面的数据会映射到窗口中 */
+	LCUI_Mutex mutex;		/**< 互斥锁 */
+	int64_t timestamp;		/**< 时间戳，记录上次清空 ignored_size 时的时间 */
+	LinkedList ignored_size;	/**< 列表，记录被忽略的尺寸，用于屏蔽重复的窗口尺寸更改操作 */
+	LinkedList rects;		/**< 列表，记录当前需要重绘的区域 */
+	LinkedListNode node;		/**< 在表面列表中的结点 */
 } LCUI_SurfaceRec;
 
 static struct X11_Display {
-    	XVisualInfo vinfo;
-	LCUI_BOOL is_inited;
-	LinkedList surfaces;
-	LCUI_X11AppDriver app;
-	LCUI_EventTrigger trigger;
-} x11;
+	LCUI_BOOL is_inited;		/**< 标记，标识当前模块是否已经初始化 */
+	LinkedList surfaces;		/**< 表面列表 */
+	LCUI_X11AppDriver app;		/**< X11 应用驱动 */
+	LCUI_EventTrigger trigger;	/**< 事件触发器 */
+} x11 = {0};
+
+/** 添加需要忽略的尺寸 */
+static void AddIgnoredSize( LCUI_Surface surface, int width, int height )
+{
+	LCUI_Size *size;
+	size = NEW( LCUI_Size, 1 );
+	size->width = width;
+	size->height = height;
+	LinkedList_Append( &surface->ignored_size, size );
+}
+
+/** 检查当前尺寸是否需要忽略掉 */
+static LCUI_BOOL CheckIgnoredSize( LCUI_Surface surface, int width, int height )
+{
+	int64_t timestamp;
+	LinkedListNode *node;
+	for( LinkedList_Each( node, &surface->ignored_size ) ) {
+		LCUI_Size *size = node->data;
+		if( size->width == width && size->height == height ) {
+			LinkedList_DeleteNode( &surface->ignored_size, node );
+			free( size );
+			return TRUE;
+		}
+	}
+	timestamp = LCUI_GetTime();
+	/* 每隔一段时间清空忽略尺寸列表，避免内存占用一直增长 */
+	if( timestamp - surface->timestamp > 1000 ) {
+		LinkedList_Clear( &surface->ignored_size, free );
+		surface->timestamp = timestamp;
+	}
+	return FALSE;
+}
 
 static void ReleaseSurfaceTask( void *arg )
 {
@@ -178,9 +211,9 @@ static void X11Surface_OnCreate( LCUI_Surface s )
 	s->window = XCreateSimpleWindow( x11.app->display, x11.app->win_root, 
 					 0, 100, MIN_WIDTH, MIN_HEIGHT, 1, 
 					 bdcolor, bgcolor );
-	LinkedList_Init( &s->rects );
 	LCUIMutex_Init( &s->mutex );
-	X11Surface_OnResize( s, MIN_WIDTH, MIN_HEIGHT );
+	LinkedList_Init( &s->rects );
+	LinkedList_Init( &s->ignored_size );
 	s->is_ready = TRUE;
 	LCUI_SetLinuxX11MainWindow( s->window );
 }
@@ -200,7 +233,10 @@ static void X11Surface_OnTask( LCUI_Surface surface, LCUI_SurfaceTask task )
 		h = MIN_HEIGHT > h ? MIN_HEIGHT: h;
 		LCUIMutex_Lock( &surface->mutex );
 		X11Surface_OnResize( surface, w, h );
-		XResizeWindow( dpy, win, w, h );
+		/* 如果当前尺寸没有被忽略，则修改 x11 窗口的尺寸 */
+		if( !CheckIgnoredSize( surface, w, h ) ) {
+			XResizeWindow( dpy, win, w, h );
+		}
 		LCUIMutex_Unlock( &surface->mutex );
 		break;
 	}
@@ -270,10 +306,11 @@ static LCUI_Surface X11Surface_New( void )
 	LCUI_SurfaceTaskRec task;
 	task.type = TASK_CREATE;
 	surface = NEW( LCUI_SurfaceRec, 1 );
-	surface->is_ready = FALSE;
-	surface->node.data = surface;
 	surface->gc = NULL;
 	surface->ximage = NULL;
+	surface->is_ready = FALSE;
+	surface->node.data = surface;
+	surface->timestamp = LCUI_GetTime();
 	Graph_Init( &surface->fb );
 	surface->fb.color_type = COLOR_TYPE_ARGB;
 	LinkedList_AppendNode( &x11.surfaces, &surface->node );
@@ -439,6 +476,7 @@ static void OnExpose( LCUI_Event e, void *arg )
 	EventTrigger_Trigger( x11.trigger, DET_PAINT, &dpy_ev );
 }
 
+/** 响应 X11 的 ConfigureNotify 事件，它通常在 x11 窗口尺寸改变时触发 */
 static void OnConfigureNotify( LCUI_Event e, void *arg )
 {
 	XEvent *ev = arg;
@@ -452,6 +490,8 @@ static void OnConfigureNotify( LCUI_Event e, void *arg )
 	dpy_ev.type = DET_RESIZE;
 	dpy_ev.resize.width = xce.width;
 	dpy_ev.resize.height = xce.height;
+	/* 标记该尺寸需要被忽略，表面尺寸改变后不需要再修改 x11 窗口的尺寸 */
+	AddIgnoredSize( s, xce.width, xce.height );
 	EventTrigger_Trigger( x11.trigger, DET_RESIZE, &dpy_ev );
 
 }
