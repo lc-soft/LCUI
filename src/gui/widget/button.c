@@ -46,46 +46,11 @@
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/button.h>
 
-typedef struct LCUI_Button {
+typedef struct LCUI_ButtonRec_ {
 	LCUI_Widget text;
-} LCUI_Button;
+} LCUI_ButtonRec, *LCUI_Button;
 
-static void Button_OnInit( LCUI_Widget w )
-{
-	LCUI_Button *btn;
-	btn = Widget_NewPrivateData( w, LCUI_Button );
-	btn->text = LCUIWidget_New("textview");
-	TextView_SetTextAlign( btn->text, SV_CENTER );
-	Widget_Append( w, btn->text );
-	Widget_Show( btn->text );
-}
-
-static void Button_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
-{
-
-}
-
-static void Button_OnDestroy( LCUI_Widget w )
-{
-
-}
-
-static void Button_OnTask( LCUI_Widget w )
-{
-
-}
-
-void Button_SetTextW( LCUI_Widget w, const wchar_t *wstr )
-{
-	LCUI_Button *btn = (LCUI_Button*)w->private_data;
-	TextView_SetTextW( btn->text, wstr );
-}
-
-void Button_SetText( LCUI_Widget w, const char *str )
-{
-	LCUI_Button *btn = (LCUI_Button*)w->private_data;
-	TextView_SetText( btn->text, str );
-}
+static LCUI_WidgetPrototype prototype = NULL;
 
 /** 按钮的 css 样式 */
 static const char *button_css = ToString(
@@ -111,14 +76,33 @@ button:disabled textview {
 
 );
 
+static void Button_OnInit( LCUI_Widget w )
+{
+	const size_t data_size = sizeof( LCUI_ButtonRec );
+	LCUI_Button btn = Widget_AddData( w, prototype, data_size );
+	btn->text = LCUIWidget_New("textview");
+	TextView_SetTextAlign( btn->text, SV_CENTER );
+	Widget_Append( w, btn->text );
+	Widget_Show( btn->text );
+}
+
+void Button_SetTextW( LCUI_Widget w, const wchar_t *wstr )
+{
+	LCUI_Button btn = Widget_GetData( w, prototype );
+	TextView_SetTextW( btn->text, wstr );
+}
+
+void Button_SetText( LCUI_Widget w, const char *str )
+{
+	LCUI_Button btn = Widget_GetData( w, prototype );
+	TextView_SetText( btn->text, str );
+}
+
 /** 添加按钮部件类型 */
 void LCUIWidget_AddButton( void )
 {
-	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "button" );
-	wc->methods.init = Button_OnInit;
-	wc->methods.paint = Button_OnPaint;
-	wc->methods.set_text = Button_SetText;
-	wc->methods.destroy = Button_OnDestroy;
-	wc->task_handler = Button_OnTask;
+	prototype = LCUIWidget_NewPrototype( "button", NULL );
+	prototype->init = Button_OnInit;
+	prototype->settext = Button_SetText;
 	LCUI_LoadCSSString( button_css, NULL );
 }

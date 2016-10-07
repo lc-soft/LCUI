@@ -44,17 +44,23 @@
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/sidebar.h>
 
-typedef struct {
+typedef struct SideBarItemRec_ {
 	wchar_t *id;
 	LCUI_Widget icon;
 	LCUI_Widget text;
 	LCUI_Widget item;
-} SideBarItem;
+} SideBarItemRec, *SideBarItem;
 
-typedef struct {
+typedef struct SideBarRec_ {
 	LinkedList items;
 	LCUI_Style line_height;
-} SideBar;
+} SideBarRec, *SideBar;
+
+static struct SideBarModule {
+	LCUI_WidgetPrototype sidebar;
+	LCUI_WidgetPrototype item;
+	LCUI_WidgetPrototype toggle;
+} self;
 
 static const char sidebar_css[] = ToString(
 
@@ -101,20 +107,20 @@ sidebar sidebar-item:active {
 LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id,
 				const wchar_t *icon, const wchar_t *text )
 {
-	SideBar *sb;
-	SideBarItem *sbi;
+	SideBar sb;
+	SideBarItem sbi;
 	LCUI_Widget w;
-	int len = id ? wcslen( id ) : 0;
-	wchar_t *new_id = malloc( sizeof( wchar_t )*(len + 1) );
-	if( !new_id ) {
+	int len = id ? wcslen( id ) + 1 : 0;
+	wchar_t *newid = NEW( wchar_t, len );
+	if( !newid ) {
 		return NULL;
 	}
-	sb = sidebar->private_data;
+	sb = Widget_GetData( sidebar, self.sidebar );
 	w = LCUIWidget_New( "sidebar-item" );
-	sbi = w->private_data;
-	id ? wcscpy( new_id, id ) : (new_id[0] = 0, NULL);
+	sbi = Widget_GetData( sidebar, self.item );
+	id ? wcscpy( newid, id ) : (newid[0] = 0, NULL);
 	sbi->id ? free( sbi->id ) : 0;
-	sbi->id = new_id;
+	sbi->id = newid;
 	Widget_Append( sidebar, w );
 	TextView_SetTextW( sbi->icon, icon );
 	TextView_SetTextW( sbi->text, text );
@@ -127,7 +133,9 @@ LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id,
 
 static void SideBarItem_OnInit( LCUI_Widget w )
 {
-	SideBarItem *sbi = Widget_NewPrivateData(w, SideBarItem);
+	const size_t data_size = sizeof( SideBarItemRec );
+	SideBarItem sbi = Widget_AddData( w, self.item, data_size );
+	Widget_AddData( w, self.item, data_size );
 	sbi->icon = LCUIWidget_New("textview");
 	sbi->text = LCUIWidget_New("textview");
 	Widget_AddClass( sbi->icon, "icon" );
@@ -144,7 +152,8 @@ static void SideBarItem_OnDestroy( LCUI_Widget w )
 
 static void SideBar_OnInit( LCUI_Widget w )
 {
-	SideBar *sb = Widget_NewPrivateData( w, SideBar );
+	const size_t data_size = sizeof( SideBarRec );
+	SideBar sb = Widget_AddData( w, self.item, data_size );
 	LinkedList_Init( &sb->items );
 }
 
@@ -172,14 +181,13 @@ static void SideBarToggle_OnInit( LCUI_Widget w )
 
 void LCUIWidget_AddSideBar(void)
 {
-	LCUI_WidgetClass *wc;
-	wc = LCUIWidget_AddClass("sidebar");
-	wc->methods.init = SideBar_OnInit;
-	wc->methods.destroy = SideBar_OnDestroy;
-	wc = LCUIWidget_AddClass("sidebar-item");
-	wc->methods.init = SideBarItem_OnInit;
-	wc->methods.destroy = SideBarItem_OnDestroy;
-	wc = LCUIWidget_AddClass("sidebar-toggle");
-	wc->methods.init = SideBarToggle_OnInit;
+	self.sidebar = LCUIWidget_NewPrototype( "sidebar", NULL );
+	self.item = LCUIWidget_NewPrototype( "sidebar-item", NULL );
+	self.toggle = LCUIWidget_NewPrototype( "sidebar-toggle", NULL );
+	self.sidebar->init = SideBar_OnInit;
+	self.sidebar->destroy = SideBar_OnDestroy;
+	self.item->init = SideBarItem_OnInit;
+	self.item->destroy = SideBarItem_OnDestroy;
+	self.toggle->init = SideBarToggle_OnInit;
 	LCUI_LoadCSSString( sidebar_css, NULL );
 }

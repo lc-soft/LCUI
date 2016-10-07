@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
- * widget.h -- GUI widget APIs.
+ * textcaret.h -- textcaret widget, used in textedit.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,9 +20,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * widget.h -- GUI部件操作相关的函数接口。
+ * textcaret.h -- 文本光标，主要用于文本编辑框中提示当前文本插入点。
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,16 +37,16 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef LCUI_WIDGET_BUILD_H
-#define LCUI_WIDGET_BUILD_H
+#ifndef LCUI_TEXTCARET_H
+#define LCUI_TEXTCARET_H
 
-#include <LCUI/graph.h>
-#include <LCUI/thread.h>
-#include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_task.h>
-#include <LCUI/gui/widget_paint.h>
-#include <LCUI/gui/widget_prototype.h>
-#include <LCUI/gui/widget_event.h>
-#include <LCUI/gui/widget_style.h>
+LCUI_API void TextCaret_BlinkShow( LCUI_Widget widget );
+
+LCUI_API void TextCaret_BlinkHide( LCUI_Widget widget );
+
+LCUI_API void TextCaret_SetVisible( LCUI_Widget widget, LCUI_BOOL visible );
+
+/** 设置闪烁的时间间隔 */
+LCUI_API void TextCaret_SetBlinkTime( LCUI_Widget widget, unsigned int n_ms );
 
 #endif

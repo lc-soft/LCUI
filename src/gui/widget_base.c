@@ -47,6 +47,7 @@
 
 #undef max
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
+#define WIDGET_SIZE (sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode) * 2)
 
 static struct LCUIWidgetModule {
 	LCUI_Widget root;	/** 根级部件 */
@@ -237,7 +238,7 @@ int Widget_Unwrap( LCUI_Widget widget )
 /** 构造函数 */
 static void Widget_Init( LCUI_Widget widget )
 {
-	memset( widget, 0, sizeof(struct LCUI_WidgetRec_));
+	ZEROSET( widget, LCUI_Widget );
 	widget->state = WSTATE_CREATED;
 	widget->trigger = EventTrigger();
 	widget->style = StyleSheet();
@@ -268,12 +269,11 @@ static void Widget_Init( LCUI_Widget widget )
 	Graph_Init( &widget->graph );
 }
 
-LCUI_Widget LCUIWidget_New( const char *type_name )
+LCUI_Widget LCUIWidget_New( const char *type )
 {
-	LCUI_WidgetClass *wc;
 	LinkedListNode *node;
-	LCUI_Widget widget = malloc( sizeof( struct LCUI_WidgetRec_ ) +
-				     sizeof( LinkedListNode ) * 2 );
+	LCUI_Widget widget = malloc( WIDGET_SIZE );
+
 	Widget_Init( widget );
 	node = Widget_GetNode( widget );
 	node->data = widget;
@@ -281,11 +281,11 @@ LCUI_Widget LCUIWidget_New( const char *type_name )
 	node = Widget_GetShowNode( widget );
 	node->data = widget;
 	node->next = node->prev = NULL;
-	if( type_name ) {
-		widget->type = strdup( type_name );
-		wc = LCUIWidget_GetClass( type_name );
-		if( wc ) {
-			wc->methods.init( widget );
+	if( type ) {
+		widget->proto = LCUIWidget_GetPrototype( type );
+		if( widget->proto ) {
+			widget->type = widget->proto->name;
+			widget->proto->init( widget );
 		}
 	}
 	Widget_AddTask( widget, WTT_REFRESH_STYLE );
@@ -299,8 +299,6 @@ static void Widget_OnDestroy( void *arg )
 
 void Widget_ExecDestroy( LCUI_Widget widget )
 {
-	LCUI_WidgetClass *wc;
-	wc = LCUIWidget_GetClass( widget->type );
 	Widget_ReleaseMouseCapture( widget );
 	Widget_ReleaseTouchCapture( widget, -1 );
 	Widget_StopEventPropagation( widget );
@@ -309,8 +307,8 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
 	LinkedList_ClearData( &widget->children_show, NULL );
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
-	if( wc && wc->methods.destroy ) {
-		wc->methods.destroy( widget );
+	if( widget->proto && widget->proto->destroy ) {
+		widget->proto->destroy( widget );
 	}
 	RectList_Clear( &widget->dirty_rects );
 	StyleSheet_Delete( widget->inherited_style );
@@ -319,10 +317,8 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	Widget_PostSurfaceEvent( widget, WET_REMOVE );
 	Widget_UpdateLayout( widget->parent );
 	Widget_SetId( widget, NULL );
-	if( widget->type ) {
-		free( widget->type );
-		widget->type = NULL;
-	}
+	widget->type = NULL;
+	widget->proto = NULL;
 	if( widget->title ) {
 		free( widget->title );
 		widget->title = NULL;
@@ -976,9 +972,8 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	w->height = ComputeYNumber( w, key_height );
 	if( sw->type == SVT_AUTO || sh->type == SVT_AUTO ) {
 		int width, height;
-		LCUI_WidgetClass *wc = LCUIWidget_GetClass( w->type );
-		if( wc && wc->methods.autosize ) {
-			wc->methods.autosize( w, &width, &height );
+		if( w->proto && w->proto->autosize ) {
+			w->proto->autosize( w, &width, &height );
 		} else {
 			Widget_ComputeContentSize( w, &width, &height );
 		}
@@ -1621,18 +1616,20 @@ extern void LCUIWidget_AddTextView( void );
 extern void LCUIWidget_AddButton( void );
 extern void LCUIWidget_AddSideBar( void );
 extern void LCUIWidget_AddTScrollBar( void );
+extern void LCUIWidget_AddTextCaret( void );
 extern void LCUIWidget_AddTextEdit( void );
 
 void LCUI_InitWidget( void )
 {
 	LCUIWidget_InitTask();
 	LCUIWidget_InitEvent();
-	LCUIWidget_InitLibrary();
+	LCUIWidget_InitPrototype();
 	LCUIWidget_InitStyle();
 	LCUIWidget_AddTextView();
 	LCUIWidget_AddButton();
 	LCUIWidget_AddSideBar();
 	LCUIWidget_AddTScrollBar();
+	LCUIWidget_AddTextCaret();
 	LCUIWidget_AddTextEdit();
 	RBTree_Init( &LCUIWidget.ids );
 	RBTree_OnCompare( &LCUIWidget.ids, CompareWidgetId );

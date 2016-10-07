@@ -47,8 +47,7 @@
 /** 判断部件是否有可绘制内容 */
 static LCUI_BOOL Widget_IsPaintable( LCUI_Widget w )
 {
-	LCUI_WidgetClass *wc;
-	LCUI_WidgetStyle *s = &w->computed_style;
+	const LCUI_WidgetStyle *s = &w->computed_style;
 	if( s->background.color.alpha > 0 ||
 	    Graph_IsValid( &s->background.image ) ||
 	    s->border.top.width > 0 || s->border.right.width > 0 ||
@@ -56,11 +55,7 @@ static LCUI_BOOL Widget_IsPaintable( LCUI_Widget w )
 	    s->shadow.blur > 0 || s->shadow.spread > 0 ) {
 		return TRUE;
 	}
-	wc = LCUIWidget_GetClass( w->type );
-	if( wc && wc->methods.paint ) {
-		return TRUE;
-	}
-	return FALSE;
+	return w->proto && w->proto->paint;
 }
 
 /**
@@ -160,7 +155,6 @@ void Widget_ValidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LCUI_Rect box;
-	LCUI_WidgetClass *wc;
 	LCUI_WidgetStyle *s;
 
 	Widget_Lock( w );
@@ -180,9 +174,8 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	Graph_DrawBackground( paint, &box, &s->background );
 	Graph_DrawBorder( paint, &box, &s->border );
 	Widget_Unlock( w );
-	wc = LCUIWidget_GetClass( w->type );
-	if( wc && wc->methods.paint ) {
-		wc->methods.paint( w, paint );
+	if( w->proto && w->proto->paint ) {
+		w->proto->paint( w, paint );
 	}
 }
 

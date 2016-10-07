@@ -43,16 +43,13 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/graph.h>
 #include <LCUI/font.h>
 #include <LCUI/input.h>
-#include <LCUI/timer.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textedit.h>
+#include <LCUI/gui/widget/textcaret.h>
 #include <LCUI/ime.h>
 
-#define CARET_HIDE 0
-#define CARET_SHOW 1
 #define TBT_SIZE	512
 
 enum TaskType {
@@ -61,15 +58,6 @@ enum TaskType {
 	TASK_UPDATE_CARET,
 	TASK_TOTAL
 };
-
-/** 文本插入符相关数据 */
-typedef struct LCUI_TextCaretRec_ {
-	int type;
-	int state;		/**< 当前状态 */
-	int blink_time;		/**< 闪烁间隔 */
-	int timer_id;		/**< 定时器 */
-	LCUI_BOOL need_show;
-} LCUI_TextCaretRec, *LCUI_TextCaret;
 
 typedef struct LCUI_TextEditRec_ {
 	LCUI_TextLayer layer_source;		/**< 实际文本层 */
@@ -114,20 +102,11 @@ typedef struct LCUI_TextBlockRec_ {
 	wchar_t *text;			/**< 文本块(段) */
 } LCUI_TextBlockRec, *LCUI_TextBlock;
 
-static int textedit_event_id = -1;
+static struct LCUI_TextEditModule {
+	int event_id;
+	LCUI_WidgetPrototype prototype;
+} self;
 
-/*---------------------------------- Caret ----------------------------------*/
-
-static const char *textcaret_css = ToString(
-textcaret {
-	pointer-events: none;
-	focusable: false;
-	width: 1px;
-	height:14px;
-	position: absolute;
-	background-color: #000;
-}
-);
 
 static const char *textedit_css = ToString(
 
@@ -149,94 +128,13 @@ background-color: #eaeaea;
 
 );
 
-static void TextCaret_BlinkShow( LCUI_Widget widget )
-{
-	LCUI_TextCaret caret = widget->private_data;
-	if( !caret->need_show ) {
-		return;
-	}
-	caret->state = CARET_SHOW;
-	LCUITimer_Reset( caret->timer_id, caret->blink_time );
-	Widget_Show( widget );
-}
-
-static void TextCaret_BlinkHide( LCUI_Widget widget )
-{
-	LCUI_TextCaret caret = widget->private_data;
-	caret->state = CARET_HIDE;
-	LCUITimer_Reset( caret->timer_id, caret->blink_time );
-	Widget_Hide( widget );
-}
-
-static void TextCaret_OnBlink( void *arg )
-{
-	LCUI_Widget widget = arg;
-	LCUI_TextCaret caret = widget->private_data;
-	if( caret->need_show ) {
-		if( caret->state == CARET_HIDE ) {
-			caret->state = CARET_SHOW;
-			Widget_Show( widget );
-		} else {
-			caret->state = CARET_HIDE;
-			Widget_Hide( widget );
-		}
-	}
-}
-
-static void TextCaret_SetVisible( LCUI_Widget widget, LCUI_BOOL visible )
-{
-	LCUI_TextCaret caret = widget->private_data;
-	caret->need_show = visible;
-	if( caret->need_show ) {
-		TextCaret_BlinkShow( widget );
-	} else {
-		TextCaret_BlinkHide( widget );
-	}
-}
-
-static void TextCaret_OnInit( LCUI_Widget widget )
-{
-	LCUI_TextCaret caret;
-	caret = Widget_NewPrivateData( widget, LCUI_TextCaretRec );
-	caret->type = 0;
-	caret->need_show = FALSE;
-	caret->state = CARET_HIDE;
-	caret->blink_time = 500;
-	caret->timer_id = LCUITimer_Set( caret->blink_time, 
-					 TextCaret_OnBlink, widget, TRUE );
-}
-
-/** 设置闪烁的时间间隔 */
-static void TextCaret_SetBlinkTime( LCUI_Widget widget, unsigned int n_ms )
-{
-	LCUI_TextCaret caret = widget->private_data;
-	caret->blink_time = n_ms;
-	LCUITimer_Reset( caret->timer_id, caret->blink_time );
-}
-
-/** 销毁插入符 */
-static void TextCaret_OnDestroy( LCUI_Widget widget )
-{
-	LCUI_TextCaret caret = widget->private_data;
-	LCUITimer_Free( caret->timer_id );
-	caret->timer_id = -1;
-}
-
-static void LCUIWidget_AddTextCaret( void )
-{
-	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "textcaret" );
-	wc->methods.init = TextCaret_OnInit;
-	wc->methods.destroy = TextCaret_OnDestroy;
-	LCUI_LoadCSSString( textcaret_css, NULL );
-}
-
 /*-------------------------------- End Caret --------------------------------*/
 
 static void TextEdit_UpdateCaret( LCUI_Widget widget )
 {
 	LCUI_Pos pos;
 	LCUI_StyleSheet sheet;
-	LCUI_TextEdit edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	int offset_x = 0, offset_y = 0, height, row;
 
 	if( edit->is_placeholder_shown ) {
@@ -272,7 +170,7 @@ static void TextEdit_UpdateCaret( LCUI_Widget widget )
 /** 移动文本框内的文本插入符的行列坐标 */
 static void TextEdit_MoveCaret( LCUI_Widget widget, int row, int col )
 {
-	LCUI_TextEdit edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	if( edit->is_placeholder_shown ) {
 		row = col = 0;
 	}
@@ -300,8 +198,8 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 	if( !wtext ) {
 		return -1;
 	}
-	edit = widget->private_data;
 	len = wcslen( wtext );
+	edit = Widget_GetData( widget, self.prototype );
 	for( i = 0; i < len; ++i ) {
 		txtblk = NEW( LCUI_TextBlockRec, 1 );
 		if( !txtblk ) {
@@ -373,7 +271,7 @@ static void TextEdit_ProcTextBlock( LCUI_Widget widget, LCUI_TextBlock txtblk )
 	LinkedList *tags;
 	LCUI_TextEdit edit;
 	LCUI_TextLayer layer;
-	edit = widget->private_data;
+	edit = Widget_GetData( widget, self.prototype );
 	switch( txtblk->owner ) {
 	case TBOT_SOURCE:
 		layer = edit->layer_source;
@@ -406,7 +304,7 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
 	LCUI_TextStyle style;
 	LinkedListNode *node;
 	LinkedList_Init( &rects );
-	edit = widget->private_data;
+	edit = Widget_GetData( widget, self.prototype );
 	TextLayer_Update( edit->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( widget, node->data, SV_CONTENT_BOX );
@@ -422,7 +320,7 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
 
 static void TextEdit_OnTask( LCUI_Widget widget )
 {
-	LCUI_TextEdit edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	if( edit->tasks[TASK_SET_TEXT] ) {
 		LinkedList blocks;
 		LinkedListNode *node;
@@ -435,7 +333,7 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 			TextEdit_ProcTextBlock( widget, node->data );
 		}
 		LinkedList_Clear( &blocks, TextBlock_OnDestroy );
-		ev.type = textedit_event_id;
+		ev.type = self.event_id;
 		ev.cancel_bubble = TRUE;
 		Widget_TriggerEvent( widget, &ev, NULL );
 		edit->tasks[TASK_UPDATE_CARET] = TRUE;
@@ -465,8 +363,7 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 
 static void TextEdit_AutoSize( LCUI_Widget widget, int *width, int *height )
 {
-	LCUI_TextEdit edit;
-	edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	if( edit->is_multiline_mode ) {
 		int i, n;
 		*height = 0;
@@ -489,14 +386,14 @@ static void TextEdit_AutoSize( LCUI_Widget widget, int *width, int *height )
 /** 指定文本框是否处理控制符 */
 void TextEdit_SetUsingStyleTags( LCUI_Widget widget, LCUI_BOOL is_true )
 {
-	LCUI_TextEdit edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	TextLayer_SetUsingStyleTags( edit->layer, is_true );
 }
 
 /** 指定文本框是否启用多行文本显示 */
 void TextEdit_SetMultiline( LCUI_Widget widget, LCUI_BOOL is_true )
 {
-	LCUI_TextEdit edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	TextLayer_SetMultiline( edit->layer_source, is_true );
 	TextLayer_SetMultiline( edit->layer_mask, is_true );
 	edit->is_multiline_mode = is_true;
@@ -506,7 +403,7 @@ void TextEdit_ClearText( LCUI_Widget widget )
 {
 	LCUI_TextEdit edit;
 	Widget_Lock( widget );
-	edit = widget->private_data;
+	edit = Widget_GetData( widget, self.prototype );
 	LCUIMutex_Lock( &edit->mutex );
 	TextLayer_ClearText( edit->layer );
 	StyleTags_Clear( &edit->text_tags );
@@ -519,13 +416,13 @@ void TextEdit_ClearText( LCUI_Widget widget )
 
 int TextEdit_GetTextW( LCUI_Widget w, int start, int max_len, wchar_t *buf )
 {
-	LCUI_TextEdit edit = w->private_data;
+	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	return TextLayer_GetTextW( edit->layer_source, start, max_len, buf );
 }
 
 int TextEdit_GetTextLength( LCUI_Widget w )
 {
-	LCUI_TextEdit edit = w->private_data;
+	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	return edit->layer_source->length;
 }
 
@@ -563,7 +460,7 @@ int TextEdit_InsertTextW( LCUI_Widget w, const wchar_t *wstr )
 
 int TextEdit_SetPlaceHolderW( LCUI_Widget w, const wchar_t *wstr )
 {
-	LCUI_TextEdit edit = w->private_data;
+	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	Widget_Lock( w );
 	LCUIMutex_Lock( &edit->mutex );
 	TextLayer_ClearText( edit->layer_placeholder );
@@ -592,8 +489,7 @@ int TextEdit_SetPlaceHolder( LCUI_Widget w, const char *str )
 
 void TextEdit_SetCaretBlink( LCUI_Widget w, LCUI_BOOL enabled, int time )
 {
-	LCUI_TextEdit edit;
-	edit = w->private_data;
+	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	TextCaret_SetVisible( edit->caret, enabled );
 	TextCaret_SetBlinkTime( edit->caret, time ); 
 }
@@ -605,8 +501,7 @@ static void TextEdit_OnParseText( LCUI_Widget w, const char *text )
 
 static void TextEdit_OnFocus( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
 {
-	LCUI_TextEdit edit;
-	edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	/* 设定输入法的目标 */
 	LCUIIME_SetTarget( widget );
 	TextCaret_SetVisible( edit->caret, TRUE );
@@ -617,8 +512,7 @@ static void TextEdit_OnFocus( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg 
 
 static void TextEdit_OnBlur( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
 {
-	LCUI_TextEdit edit;
-	edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	LCUIIME_ClearTarget();
 	TextCaret_SetVisible( edit->caret, FALSE );
 }
@@ -628,7 +522,7 @@ static void TextEdit_TextBackspace( LCUI_Widget widget, int n_ch )
 	LCUI_TextEdit edit;
 	LCUI_WidgetEventRec ev;
 	Widget_Lock( widget );
-	edit = widget->private_data;
+	edit = Widget_GetData( widget, self.prototype );
 	LCUIMutex_Lock( &edit->mutex );
 	TextLayer_TextBackspace( edit->layer_source, n_ch );
 	if( edit->password_char ) {
@@ -639,7 +533,7 @@ static void TextEdit_TextBackspace( LCUI_Widget widget, int n_ch )
 	Widget_AddTask( widget, WTT_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_Unlock( widget );
-	ev.type = textedit_event_id;
+	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
 	Widget_TriggerEvent( widget, &ev, NULL );
 }
@@ -649,7 +543,7 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 	LCUI_TextEdit edit;
 	LCUI_WidgetEventRec ev;
 	Widget_Lock( widget );
-	edit = widget->private_data;
+	edit = Widget_GetData( widget, self.prototype );
 	LCUIMutex_Lock( &edit->mutex );
 	TextLayer_TextDelete( edit->layer_source, n_ch );
 	if( edit->password_char ) {
@@ -660,7 +554,7 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 	Widget_AddTask( widget, WTT_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_Unlock( widget );
-	ev.type = textedit_event_id;
+	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
 	Widget_TriggerEvent( widget, &ev, NULL );
 }
@@ -668,9 +562,8 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 /** 处理按键事件 */
 static void TextEdit_OnKeyDown( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
 {
-	LCUI_TextEdit edit;
 	int cols, rows, cur_col, cur_row;
-	edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	cur_row = edit->layer->insert_y;
 	cur_col = edit->layer->insert_x;
 	rows = TextLayer_GetRowTotal( edit->layer );
@@ -726,7 +619,7 @@ static void TextEdit_OnTextInput( LCUI_Widget widget,
 {
 	uint_t i, j, k;
 	wchar_t ch, *text, excludes[8] = L"\b\r\t\x1b";
-	LCUI_TextEdit edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	/* 如果不是多行文本编辑模式则删除换行符 */
 	if( !edit->is_multiline_mode ) {
 		wcscat( excludes, L"\n" );
@@ -775,11 +668,9 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	LinkedList rects;
 	LinkedListNode *node;
-	LCUI_TextEdit edit;
 	int width = 0, height = 0;
 	int max_width = 0, max_height = 0;
-
-	edit = w->private_data;
+	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	if( !w->style->sheet[key_width].is_valid ||
 	    w->style->sheet[key_width].type == SVT_AUTO ) {
 		max_width = Widget_ComputeMaxWidth( w );
@@ -811,7 +702,7 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 static void TextEdit_OnMouseMove( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	int abs_x, abs_y, x, y;
-	LCUI_TextEdit edit = w->private_data;
+	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	if( !edit->is_placeholder_shown ) {
 		Widget_GetAbsXY( w, NULL, &abs_x, &abs_y );
 		x = e->motion.x - abs_x - w->padding.left;
@@ -830,7 +721,7 @@ static void TextEdit_OnMouseUp( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 static void TextEdit_OnMouseDown( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	int abs_x, abs_y, x, y;
-	LCUI_TextEdit edit = w->private_data;
+	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	Widget_GetAbsXY( w, NULL, &abs_x, &abs_y );
 	x = e->motion.x - abs_x - w->padding.left;
 	y = e->motion.y - abs_y - w->padding.top;
@@ -856,7 +747,8 @@ static void TextEdit_SetAttr( LCUI_Widget w, const char *name,
 static void TextEdit_OnInit( LCUI_Widget w )
 {
 	LCUI_TextEdit edit;
-	edit = Widget_NewPrivateData( w, LCUI_TextEditRec );
+	const size_t data_size = sizeof( LCUI_TextEditRec );
+	edit = Widget_AddData( w, self.prototype, data_size );
 	edit->is_read_only = FALSE;
 	edit->password_char = 0;
 	edit->allow_input_char = NULL;
@@ -889,7 +781,7 @@ static void TextEdit_OnInit( LCUI_Widget w )
 
 static void TextEdit_OnDestroy( LCUI_Widget widget )
 {
-	LCUI_TextEdit edit = widget->private_data;
+	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	TextLayer_Destroy( edit->layer );
 	TextLayer_Destroy( edit->layer_mask );
 	LinkedList_Clear( &edit->text_blocks, TextBlock_OnDestroy );
@@ -897,11 +789,9 @@ static void TextEdit_OnDestroy( LCUI_Widget widget )
 
 static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
-	LCUI_TextEdit edit;
 	LCUI_Pos layer_pos;
 	LCUI_Rect content_rect, rect;
-
-	edit = w->private_data;
+	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	content_rect.width = w->box.content.width;
 	content_rect.height = w->box.content.height;
 	content_rect.y = w->box.content.top - w->box.graph.top;
@@ -917,16 +807,15 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 /** 添加 TextEdit 部件类型 */
 void LCUIWidget_AddTextEdit( void )
 {
-	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "textedit" );
-	wc->methods.init = TextEdit_OnInit;
-	wc->methods.paint = TextEdit_OnPaint;
-	wc->methods.destroy = TextEdit_OnDestroy;
-	wc->methods.set_text = TextEdit_OnParseText;
-	wc->methods.set_attr = TextEdit_SetAttr;
-	wc->methods.autosize = TextEdit_AutoSize;
-	wc->task_handler = TextEdit_OnTask;
+	self.prototype = LCUIWidget_NewPrototype( "textedit", NULL );
+	self.prototype->init = TextEdit_OnInit;
+	self.prototype->paint = TextEdit_OnPaint;
+	self.prototype->destroy = TextEdit_OnDestroy;
+	self.prototype->settext = TextEdit_OnParseText;
+	self.prototype->setattr = TextEdit_SetAttr;
+	self.prototype->autosize = TextEdit_AutoSize;
+	self.prototype->runtask = TextEdit_OnTask;
 	LCUI_LoadCSSString( textedit_css, NULL );
-	LCUIWidget_AddTextCaret();
-	textedit_event_id = LCUIWidget_AllocEventId();
-	LCUIWidget_SetEventName( textedit_event_id, "change" );
+	self.event_id = LCUIWidget_AllocEventId();
+	LCUIWidget_SetEventName( self.event_id, "change" );
 }

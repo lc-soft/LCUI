@@ -38,9 +38,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-/* 为了解决结构体被重复定义，用宏进行头文件保护(其它地方出现类似的内容，将不再注释) */
-#ifndef LCUI_H  /* 如果没有定义 LCUI_H 宏 */
-#define LCUI_H  /* 定义 LCUI_H 宏 */
+#ifndef LCUI_H
+#define LCUI_H
 
 #define LCUI_VERSION "1.0.0"
 
@@ -55,8 +54,9 @@
 #define TRUE 1
 #endif
 
-#define assign(TYPE, NAME) TYPE NAME = calloc( 1, sizeof(TYPE##Rec) )
-#define NEW(type, count) (type*)calloc(count, sizeof(type))
+#define ASSIGN(NAME, TYPE) TYPE NAME = (TYPE)malloc( sizeof(TYPE##Rec) )
+#define ZEROSET(NAME, TYPE) memset(NAME, 0, sizeof(TYPE##Rec))
+#define NEW(TYPE, COUNT) (TYPE*)malloc((COUNT) * sizeof(TYPE))
 #define ToString(...) ""#__VA_ARGS__""
 
 LCUI_BEGIN_HEADER

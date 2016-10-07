@@ -148,7 +148,7 @@ static int ParseUI( XMLParserContext ctx, xmlNodePtr node )
 static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 {
 	xmlAttrPtr prop;
-	LCUI_WidgetClass *wc = NULL;
+	LCUI_WidgetPrototypeC proto = NULL;
 	LCUI_Widget w = NULL, parent = ctx->widget;
 
 	if( ctx->parent && ctx->parent->id != ID_UI &&
@@ -157,7 +157,7 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 	}
 	switch( node->type ) {
 	case XML_ELEMENT_NODE:
-		w = LCUIWidget_New(NULL);
+		w = LCUIWidget_New( NULL );
 		if( !w ) {
 			return PB_ERROR;
 		}
@@ -166,11 +166,11 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		ctx->widget = w;
 		break;
 	case XML_TEXT_NODE:
-		wc = LCUIWidget_GetClass( parent->type );
-		if( !wc || !wc->methods.set_text ) {
+		proto = parent->proto;
+		if( !proto || !proto->settext ) {
 			return PB_NEXT;
 		}
-		wc->methods.set_text( parent, (char*)node->content );
+		proto->settext( parent, (char*)node->content );
 		DEBUG_MSG("widget: %s, set text: %s\n", parent->type,
 			  (char*)node->content);
 		return PB_NEXT;
@@ -181,11 +181,12 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		prop_val = (char*)xmlGetProp( node, prop->name );
 		if( PropNameIs("type") ) {
 			DEBUG_MSG("widget: %p, set type: %s\n", w, prop_val);
-			wc = LCUIWidget_GetClass( prop_val );
-			if( wc && wc->methods.init ) {
-				wc->methods.init( w );
+			proto = LCUIWidget_GetPrototype( prop_val );
+			if( proto && proto->init ) {
+				proto->init( w );
+				w->type = proto->name;
+				w->proto = proto;
 			}
-			w->type = strdup( prop_val );
 			continue;
 		}
 		else if( PropNameIs("id") ) {
@@ -194,10 +195,10 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		else if( PropNameIs("class") ) {
 			Widget_AddClass( w, prop_val );
 		}
-		if( !wc || !wc->methods.set_attr ) {
+		if( !proto || !proto->setattr ) {
 			continue;
 		}
-		wc->methods.set_attr( w, (const char*)prop->name, prop_val );
+		proto->setattr( w, (const char*)prop->name, prop_val );
 	}
 	return PB_ENTER;
 }

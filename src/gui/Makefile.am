@@ -4,7 +4,7 @@ AM_CFLAGS = -I$(abs_top_srcdir)/include
 libgui_la_SOURCES =\
 widget_base.c		\
 widget_event.c		\
-widget_library.c	\
+widget_pototype.c	\
 widget_style.c		\
 widget_task.c		\
 widget_paint.c 		\

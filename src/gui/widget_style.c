@@ -46,6 +46,29 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/css_library.h>
 
+typedef struct {
+	int start, end, task;
+	LCUI_BOOL is_valid;
+} TaskMap;
+
+#define TASK_MAP_COUNT (sizeof(task_map) / sizeof(TaskMap))
+
+static TaskMap task_map[] = {
+	{ key_display_start, key_display_end, WTT_VISIBLE, TRUE },
+	{ key_opacity, key_opacity, WTT_OPACITY, TRUE },
+	{ key_z_index, key_z_index, WTT_ZINDEX, TRUE },
+	{ key_width, key_height, WTT_RESIZE, TRUE },
+	{ key_padding_start, key_padding_end, WTT_RESIZE, TRUE },
+	{ key_margin_start, key_margin_end, WTT_MARGIN, TRUE },
+	{ key_position_start, key_position_end, WTT_POSITION, TRUE },
+	{ key_vertical_align, key_vertical_align, WTT_POSITION, TRUE },
+	{ key_border_start, key_border_end, WTT_BORDER, TRUE },
+	{ key_background_start, key_background_end, WTT_BACKGROUND, TRUE },
+	{ key_box_shadow_start, key_box_shadow_end, WTT_SHADOW, TRUE },
+	{ key_pointer_events, key_focusable, WTT_PROPS, TRUE },
+	{ key_box_sizing, key_box_sizing, WTT_RESIZE, TRUE }
+};
+
 /** 部件的缺省样式 */
 const char *global_css = ToString(
 
@@ -65,8 +88,8 @@ const char *global_css = ToString(
 LCUI_SelectorNode Widget_GetSelectorNode( LCUI_Widget w )
 {
 	int i;
-	assign( LCUI_SelectorNode, sn );
-
+	ASSIGN( sn, LCUI_SelectorNode );
+	ZEROSET( sn, LCUI_SelectorNode );
 	Widget_Lock( w );
 	if( w->id ) {
 		sn->id = strdup( w->id );
@@ -204,27 +227,7 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 	int i, key;
 	LCUI_Style s;
 	LCUI_StyleSheet ss;
-	LCUI_WidgetClass *wc;
 	LCUI_BOOL need_update_expend_style = FALSE;
-	typedef struct {
-		int start, end, task;
-		LCUI_BOOL is_valid;
-	} TaskMap;
-	TaskMap task_map[] = {
-		{ key_display_start, key_display_end, WTT_VISIBLE, TRUE },
-		{ key_opacity, key_opacity, WTT_OPACITY, TRUE },
-		{ key_z_index, key_z_index, WTT_ZINDEX, TRUE },
-		{ key_width, key_height, WTT_RESIZE, TRUE },
-		{ key_padding_start, key_padding_end, WTT_RESIZE, TRUE },
-		{ key_margin_start, key_margin_end, WTT_MARGIN, TRUE },
-		{ key_position_start, key_position_end, WTT_POSITION, TRUE },
-		{ key_vertical_align, key_vertical_align, WTT_POSITION, TRUE },
-		{ key_border_start, key_border_end, WTT_BORDER, TRUE },
-		{ key_background_start, key_background_end, WTT_BACKGROUND, TRUE },
-		{ key_box_shadow_start, key_box_shadow_end, WTT_SHADOW, TRUE },
-		{ key_pointer_events, key_focusable, WTT_PROPS, TRUE },
-		{ key_box_sizing, key_box_sizing, WTT_RESIZE, TRUE }
-	};
 	if( is_update_all ) {
 		Widget_GetInheritStyle( w, w->inherited_style );
 	}
@@ -244,7 +247,7 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 			need_update_expend_style = TRUE;
 			break;
 		}
-		for( i = 0; i < sizeof(task_map) / sizeof(TaskMap); ++i ) {
+		for( i = 0; i < TASK_MAP_COUNT; ++i ) {
 			if( key >= task_map[i].start && key <= task_map[i].end ) {
 				if( !task_map[i].is_valid ) {
 					break;
@@ -254,10 +257,9 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 			}
 		}
 	}
-	if( need_update_expend_style ) {
+	if( need_update_expend_style && w->proto && w->proto->update ) {
 		/* 扩展部分的样式交给该部件自己处理 */
-		wc = LCUIWidget_GetClass( w->type );
-		wc && wc->methods.update ? wc->methods.update( w ) : 0;
+		w->proto->update( w );
 	}
 	StyleSheet_Delete( ss );
 }

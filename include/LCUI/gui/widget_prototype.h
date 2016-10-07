@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
- * widget.h -- GUI widget APIs.
+ * widget_prototype.h -- LCUI widget prototype library management module.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -17,12 +17,12 @@
  *
  * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * ***************************************************************************/
 
 /* ****************************************************************************
- * widget.h -- GUI部件操作相关的函数接口。
+ * widget_prototype.h -- LCUI 部件的原型管理模块
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -35,18 +35,27 @@
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * ***************************************************************************/
 
-#ifndef LCUI_WIDGET_BUILD_H
-#define LCUI_WIDGET_BUILD_H
+#ifndef LCUI_WIDGET_PROTOTYPE_H
+#define LCUI_WIDGET_PROTOTYPE_H
 
-#include <LCUI/graph.h>
-#include <LCUI/thread.h>
-#include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_task.h>
-#include <LCUI/gui/widget_paint.h>
-#include <LCUI/gui/widget_prototype.h>
-#include <LCUI/gui/widget_event.h>
-#include <LCUI/gui/widget_style.h>
+LCUI_BEGIN_HEADER
+
+LCUI_API void LCUIWidget_InitPrototype( void );
+
+LCUI_API void LCUIWidget_ExitPrototype( void );
+
+LCUI_API LCUI_WidgetPrototype LCUIWidget_GetPrototype( const char *name );
+
+LCUI_API LCUI_WidgetPrototype LCUIWidget_NewPrototype( const char *name,
+						       LCUI_WidgetPrototype parent );
+
+LCUI_API void *Widget_GetData( LCUI_Widget widget, LCUI_WidgetPrototype proto );
+
+LCUI_API void *Widget_AddData( LCUI_Widget widget,
+			       LCUI_WidgetPrototype proto, size_t data_size );
+
+LCUI_END_HEADER
 
 #endif

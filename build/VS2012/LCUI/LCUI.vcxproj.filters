@@ -102,9 +102,6 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget_library.h">
-      <Filter>头文件\LCUI\gui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
@@ -240,6 +237,12 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\css_library.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_prototype.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textcaret.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -285,9 +288,6 @@
       <Filter>源文件\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_base.c">
-      <Filter>源文件\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\gui\widget_library.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_style.c">
@@ -412,6 +412,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\platform\windows\windows_ime.c">
       <Filter>源文件\platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_prototype.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\textcaret.c">
+      <Filter>源文件\gui\widget</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

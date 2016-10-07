@@ -103,8 +103,6 @@ typedef struct LCUI_WidgetTaskBoxRec_ {
 	LCUI_BOOL buffer[WTT_TOTAL_NUM];	/**< 记录缓存 */
 } LCUI_WidgetTaskBoxRec;
 
-typedef struct LCUI_WidgetRec_* LCUI_Widget;
-
 /** 部件状态 */
 enum LCUI_WidgetState {
 	WSTATE_CREATED = 0,
@@ -114,6 +112,39 @@ enum LCUI_WidgetState {
 	WSTATE_NORMAL,
 	WSTATE_DELETED,
 };
+
+typedef struct LCUI_WidgetRec_* LCUI_Widget;
+typedef struct LCUI_WidgetPrototypeRec_ *LCUI_WidgetPrototype;
+typedef const struct LCUI_WidgetPrototypeRec_ *LCUI_WidgetPrototypeC;
+
+typedef void( *LCUI_WidgetFunction )(LCUI_Widget);
+typedef void( *LCUI_WidgetResizer )(LCUI_Widget, int*, int*);
+typedef void( *LCUI_WidgetAttrSetter )(LCUI_Widget, const char*, const char*);
+typedef void( *LCUI_WidgetTextSetter )(LCUI_Widget, const char*);
+typedef void( *LCUI_WidgetPainter )(LCUI_Widget, LCUI_PaintContext);
+
+typedef struct LCUI_WidgetPrototypeRec_ {
+	char *name;
+	LCUI_WidgetFunction init;
+	LCUI_WidgetFunction destroy;
+	LCUI_WidgetFunction update;
+	LCUI_WidgetFunction runtask;
+	LCUI_WidgetAttrSetter setattr;
+	LCUI_WidgetTextSetter settext;
+	LCUI_WidgetResizer autosize;
+	LCUI_WidgetPainter paint;
+	LCUI_WidgetPrototype proto;
+} LCUI_WidgetPrototypeRec;
+
+typedef struct LCUI_WidgetDataEntryRec_ {
+	void *data;
+	LCUI_WidgetPrototype proto;
+} LCUI_WidgetDataEntryRec;
+
+typedef struct LCUI_WidgetData_ {
+	uint_t length;
+	LCUI_WidgetDataEntryRec *list;
+} LCUI_WidgetData;
 
 /** 部件结构 */
 typedef struct LCUI_WidgetRec_ {
@@ -137,8 +168,8 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_Widget		parent;			/**< 父部件 */
 	LinkedList		children;		/**< 子部件 */
 	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
-	void			*private_data;		/**< 私有数据 */
-	void			*extend_data;		/**< 扩展数据 */
+	LCUI_WidgetData		data;			/**< 私有数据 */
+	LCUI_WidgetPrototypeC	proto;			/**< 原型 */
 	LCUI_BOOL		enable_graph;		/**< 是否启用位图缓存 */
 	LCUI_Graph		graph;			/**< 位图缓存 */
 	LCUI_Mutex		mutex;			/**< 互斥锁 */

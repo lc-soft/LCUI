@@ -54,7 +54,7 @@ enum TaskType {
 	TASK_TOTAL
 };
 
-typedef struct LCUI_TextView_ {
+typedef struct LCUI_TextViewRec_ {
 	LCUI_TextStyle style;
 	LCUI_BOOL has_content;		/**< 是否有设置 content 属性 */
 	LCUI_TextLayer layer;		/**< 文本图层 */
@@ -66,7 +66,7 @@ typedef struct LCUI_TextView_ {
 			int align;
 		};
 	} tasks[TASK_TOTAL];
-} LCUI_TextView;
+} LCUI_TextViewRec, *LCUI_TextView;
 
 /*---------------------------- Private -------------------------------*/
 
@@ -89,7 +89,10 @@ enum FontStyleType {
 	FS_OBLIQUE
 };
 
-static int style_key_map[TOTAL_FONT_STYLE_KEY];
+static struct LCUI_TextViewModule {
+	LCUI_WidgetPrototype prototype;
+	int keys[TOTAL_FONT_STYLE_KEY];
+} self;
 
 static int unescape( const wchar_t *instr, wchar_t *outstr )
 {
@@ -142,13 +145,13 @@ static int OnParseContent( LCUI_StyleSheet ss, int key, const char *str )
 		content[i-1] = 0;
 	}
 	unescape( content, content );
-	SetStyle( ss, style_key_map[key], content, wstring );
+	SetStyle( ss, self.keys[key], content, wstring );
 	return 0;
 }
 
 static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style s = &ss->sheet[style_key_map[key]];
+	LCUI_Style s = &ss->sheet[self.keys[key]];
 	if( ParseColor( s, str ) ) {
 		return 0;
 	}
@@ -157,7 +160,7 @@ static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseFontSize( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style s = &ss->sheet[style_key_map[key]];
+	LCUI_Style s = &ss->sheet[self.keys[key]];
 	if( ParseNumber( s, str ) ) {
 		return 0;
 	}
@@ -167,18 +170,18 @@ static int OnParseFontSize( LCUI_StyleSheet ss, int key, const char *str )
 static int OnParseFontFamily( LCUI_StyleSheet ss, int key, const char *str )
 {
 	char *name = strdup( str );
-	if( ss->sheet[style_key_map[key]].is_valid
-	 && ss->sheet[style_key_map[key]].string) {
-		free( ss->sheet[style_key_map[key]].string );
+	if( ss->sheet[self.keys[key]].is_valid
+	 && ss->sheet[self.keys[key]].string) {
+		free( ss->sheet[self.keys[key]].string );
 	}
-	SetStyle( ss, style_key_map[key], name, string );
+	SetStyle( ss, self.keys[key], name, string );
 	return 0;
 }
 
 static int OnParseFontStyle( LCUI_StyleSheet ss, int key, const char *str )
 {
 	if( strcmp(str, "normal") == 0 ) {
-		SetStyle( ss, style_key_map[key], 0, int );
+		SetStyle( ss, self.keys[key], 0, int );
 		return 0;
 	}
 	return -1;
@@ -195,7 +198,7 @@ static int OnParseTextAlign( LCUI_StyleSheet ss, int key, const char *str )
 	if( val < 0 ) {
 		return -1;
 	}
-	SetStyle( ss, style_key_map[key], val, style );
+	SetStyle( ss, self.keys[key], val, style );
 	return 0;
 }
 
@@ -206,7 +209,7 @@ static int OnParseLineHeight( LCUI_StyleSheet ss, int key, const char *str )
 		return -1;
 	}
 	if( sv.type == SVT_PX || sv.type == SVT_SCALE ) {
-		ss->sheet[style_key_map[key]] = sv;
+		ss->sheet[self.keys[key]] = sv;
 		return 0;
 	}
 	return -1;
@@ -214,7 +217,7 @@ static int OnParseLineHeight( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
 {
-	LCUI_Style s = &ss->sheet[style_key_map[key]];
+	LCUI_Style s = &ss->sheet[self.keys[key]];
 	int v = LCUI_GetStyleValue( str );
 	if( v < 0 ) {
 		return -1;
@@ -242,13 +245,14 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 {
 	int i;
 	LCUI_Style s;
-	LCUI_TextView *txt = w->private_data;
+	LCUI_TextView txt;
+	txt = Widget_GetData( w, self.prototype );
 	TextStyle_Init( &txt->style );
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
-		if( style_key_map[i] < 0 ) {
+		if( self.keys[i] < 0 ) {
 			continue;
 		}
-		s = &w->style->sheet[style_key_map[i]];
+		s = &w->style->sheet[self.keys[i]];
 		switch( i ) {
 		case key_color:
 			if( s->is_valid ) {
@@ -334,12 +338,12 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	LinkedList rects;
 	LinkedListNode *node;
-	LCUI_TextView *txt;
+	LCUI_TextView txt;
 	int width = 0, height = 0;
 	int max_width = 0, max_height = 0;
 
-	txt = w->private_data;
 	LinkedList_Init( &rects );
+	txt = Widget_GetData( w, self.prototype );
 	if( !w->style->sheet[key_width].is_valid ||
 	    w->style->sheet[key_width].type == SVT_AUTO ) {
 		max_width = Widget_ComputeMaxWidth( w );
@@ -367,8 +371,8 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 static void TextView_OnInit( LCUI_Widget w )
 {
 	int i;
-	LCUI_TextView *txt;
-	txt = Widget_NewPrivateData( w, LCUI_TextView );
+	LCUI_TextView txt;
+	txt = Widget_AddData( w, self.prototype, sizeof( LCUI_TextView ) );
 	TextStyle_Init( &txt->style );
 	for( i = 0; i < TASK_TOTAL; ++i ) {
 		txt->tasks[i].is_valid = FALSE;
@@ -387,14 +391,13 @@ static void TextView_OnInit( LCUI_Widget w )
 /** 释放 TextView 部件占用的资源 */
 static void TextView_OnDestroy( LCUI_Widget w )
 {
-	LCUI_TextView *txt;
-	txt = w->private_data;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	TextLayer_Destroy( txt->layer );
 }
 
 static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )
 {
-	LCUI_TextView *txt = w->private_data;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	*width = TextLayer_GetWidth( txt->layer );
 	*height = TextLayer_GetHeight( txt->layer );
 }
@@ -405,7 +408,7 @@ static void TextView_OnTask( LCUI_Widget w )
 	int i;
 	LinkedList rects;
 	LinkedListNode *node;
-	LCUI_TextView *txt = w->private_data;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 
 	LinkedList_Init( &rects );
 	i = TASK_SET_TEXT;
@@ -431,7 +434,6 @@ static void TextView_OnTask( LCUI_Widget w )
 		return;
 	}
 	txt->tasks[i].is_valid = FALSE;
-	txt = w->private_data;
 	LinkedList_Init( &rects );
 	TextLayer_Update( txt->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
@@ -448,10 +450,10 @@ static void TextView_OnTask( LCUI_Widget w )
 /** 绘制 TextView 部件 */
 static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
-	LCUI_TextView *txt;
-	LCUI_Rect content_rect, rect;
+	LCUI_TextView txt;
 	LCUI_Pos layer_pos;
-	txt = w->private_data;
+	LCUI_Rect content_rect, rect;
+	txt = Widget_GetData( w, self.prototype );
 	content_rect.x = w->box.content.left - w->box.graph.left;
 	content_rect.y = w->box.content.top - w->box.graph.top;
 	content_rect.width = w->box.content.width;
@@ -468,31 +470,30 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 
 /*---------------------------- Public --------------------------------*/
 
-/** 设定与 TextView 关联的文本内容 */
 int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 {
 	int len;
-	wchar_t *text_ptr;
-	LCUI_TextView *txt;
+	wchar_t *newtext;
+	LCUI_TextView txt;
 
-	len = text ? wcslen( text ):0;
-	text_ptr = (wchar_t*)malloc( sizeof(wchar_t)*(len+1) );
-	if( !text_ptr ) {
+	len = text ? wcslen( text ) + 1 : 0;
+	newtext = NEW( wchar_t, len );
+	if( !newtext ) {
 		return -1;
 	}
 	if( !text ) {
-		text_ptr[0] = 0;
+		newtext[0] = 0;
 	} else {
-		wcscpy( text_ptr, text );
+		wcscpy( newtext, text );
 	}
 	Widget_Lock( w );
-	txt = w->private_data;
+	txt = Widget_GetData( w, self.prototype );
 	if( txt->tasks[TASK_SET_TEXT].is_valid
 	 && txt->tasks[TASK_SET_TEXT].text ) {
 		free( txt->tasks[TASK_SET_TEXT].text );
 	}
 	txt->tasks[TASK_SET_TEXT].is_valid = TRUE;
-	txt->tasks[TASK_SET_TEXT].text = text_ptr;
+	txt->tasks[TASK_SET_TEXT].text = newtext;
 	Widget_AddTask( w, WTT_USER );
 	Widget_Unlock( w );
 	return 0;
@@ -519,7 +520,7 @@ static void TextView_OnParseText( LCUI_Widget w, const char *text )
 
 void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style val )
 {
-	LCUI_TextView *txt = w->private_data;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	TextLayer_SetLineHeight( txt->layer, val );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
@@ -527,7 +528,7 @@ void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style val )
 
 void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 {
-	LCUI_TextView *txt = w->private_data;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	TextLayer_SetTextStyle( txt->layer, style );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
@@ -535,13 +536,13 @@ void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 
 void TextView_GetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 {
-	LCUI_TextView *txt = w->private_data;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	*style = txt->layer->text_style;
 }
 
 void TextView_SetTextAlign( LCUI_Widget w, int align )
 {
-	LCUI_TextView *txt = w->private_data;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	txt->tasks[TASK_SET_TEXT_ALIGN].align = align;
 	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
@@ -549,7 +550,7 @@ void TextView_SetTextAlign( LCUI_Widget w, int align )
 
 void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 {
-	LCUI_TextView *txt = w->private_data;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	txt->tasks[TASK_SET_AUTOWRAP].autowrap = autowrap;
 	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
@@ -561,17 +562,17 @@ void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 void LCUIWidget_AddTextView( void )
 {
 	int i;
-	LCUI_WidgetClass *wc = LCUIWidget_AddClass( "textview" );
-	wc->methods.init = TextView_OnInit;
-	wc->methods.paint = TextView_OnPaint;
-	wc->methods.destroy = TextView_OnDestroy;
-	wc->methods.autosize = TextView_AutoSize;
-	wc->methods.update = TextView_UpdateStyle;
-	wc->methods.set_text = TextView_OnParseText;
-	wc->task_handler = TextView_OnTask;
+	self.prototype = LCUIWidget_NewPrototype( "textivew", NULL );
+	self.prototype->init = TextView_OnInit;
+	self.prototype->paint = TextView_OnPaint;
+	self.prototype->destroy = TextView_OnDestroy;
+	self.prototype->autosize = TextView_AutoSize;
+	self.prototype->update = TextView_UpdateStyle;
+	self.prototype->settext = TextView_OnParseText;
+	self.prototype->runtask = TextView_OnTask;
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
 		LCUI_StyleParser parser = &style_parsers[i];
-		style_key_map[parser->key] = LCUI_AddStyleName( parser->name );
+		self.keys[parser->key] = LCUI_AddStyleName( parser->name );
 		LCUI_AddCSSParser( parser );
 	}
 }

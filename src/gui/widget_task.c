@@ -183,10 +183,8 @@ int Widget_UpdateEx( LCUI_Widget w, LCUI_BOOL has_timeout )
 	w->task.for_self = FALSE;
 	buffer = w->task.buffer;
 	/* 如果有用户自定义任务 */
-	if( buffer[WTT_USER] ) {
-		LCUI_WidgetClass *wc;
-		wc = LCUIWidget_GetClass( w->type );
-		wc ? wc->task_handler( w ) : FALSE;
+	if( buffer[WTT_USER] && w->proto && w->proto->runtask ) {
+		w->proto->runtask( w );
 	}
 	for( i = 0; i < WTT_USER; ++i ) {
 		if( buffer[i] ) {
