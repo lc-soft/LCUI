@@ -372,7 +372,7 @@ static void TextView_OnInit( LCUI_Widget w )
 {
 	int i;
 	LCUI_TextView txt;
-	txt = Widget_AddData( w, self.prototype, sizeof( LCUI_TextView ) );
+	txt = Widget_AddData( w, self.prototype, sizeof( LCUI_TextViewRec ) );
 	TextStyle_Init( &txt->style );
 	for( i = 0; i < TASK_TOTAL; ++i ) {
 		txt->tasks[i].is_valid = FALSE;
