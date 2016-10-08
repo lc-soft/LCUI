@@ -185,6 +185,8 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 			if( w->proto && w->proto->init ) {
 				w->proto->init( w );
 				w->type = w->proto->name;
+			} else {
+				w->type = strdup( prop_val );
 			}
 			continue;
 		}

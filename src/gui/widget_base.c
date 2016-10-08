@@ -286,6 +286,8 @@ LCUI_Widget LCUIWidget_New( const char *type )
 		if( widget->proto ) {
 			widget->type = widget->proto->name;
 			widget->proto->init( widget );
+		} else {
+			widget->type = strdup( type );
 		}
 	}
 	Widget_AddTask( widget, WTT_REFRESH_STYLE );
@@ -317,7 +319,10 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	Widget_PostSurfaceEvent( widget, WET_REMOVE );
 	Widget_UpdateLayout( widget->parent );
 	Widget_SetId( widget, NULL );
-	widget->type = NULL;
+	if( widget->type && !widget->proto ) {
+		free( widget->type );
+		widget->type = NULL;
+	}
 	widget->proto = NULL;
 	if( widget->title ) {
 		free( widget->title );
