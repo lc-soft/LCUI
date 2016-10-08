@@ -181,11 +181,10 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		prop_val = (char*)xmlGetProp( node, prop->name );
 		if( PropNameIs("type") ) {
 			DEBUG_MSG("widget: %p, set type: %s\n", w, prop_val);
-			proto = LCUIWidget_GetPrototype( prop_val );
-			if( proto && proto->init ) {
-				proto->init( w );
-				w->type = proto->name;
-				w->proto = proto;
+			w->proto = LCUIWidget_GetPrototype( prop_val );
+			if( w->proto && w->proto->init ) {
+				w->proto->init( w );
+				w->type = w->proto->name;
 			}
 			continue;
 		}

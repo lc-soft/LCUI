@@ -562,7 +562,7 @@ void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 void LCUIWidget_AddTextView( void )
 {
 	int i;
-	self.prototype = LCUIWidget_NewPrototype( "textivew", NULL );
+	self.prototype = LCUIWidget_NewPrototype( "textview", NULL );
 	self.prototype->init = TextView_OnInit;
 	self.prototype->paint = TextView_OnPaint;
 	self.prototype->destroy = TextView_OnDestroy;

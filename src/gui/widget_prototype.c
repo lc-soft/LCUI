@@ -98,7 +98,7 @@ LCUI_WidgetPrototype LCUIWidget_NewPrototype( const char *name,
 
 void *Widget_GetData( LCUI_Widget widget, LCUI_WidgetPrototype proto )
 {
-	int i;
+	uint_t i;
 	if( !widget->data.list || !proto ) {
 		return NULL;
 	}

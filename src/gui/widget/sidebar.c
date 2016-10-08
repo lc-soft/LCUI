@@ -138,28 +138,18 @@ static void SideBarItem_OnInit( LCUI_Widget w )
 	Widget_AddData( w, self.item, data_size );
 	sbi->icon = LCUIWidget_New("textview");
 	sbi->text = LCUIWidget_New("textview");
+	sbi->id = NULL;
 	Widget_AddClass( sbi->icon, "icon" );
 	Widget_AddClass( sbi->text, "text" );
-	sbi->id = NULL;
 	Widget_Append( w, sbi->icon );
 	Widget_Append( w, sbi->text );
-}
-
-static void SideBarItem_OnDestroy( LCUI_Widget w )
-{
-
 }
 
 static void SideBar_OnInit( LCUI_Widget w )
 {
 	const size_t data_size = sizeof( SideBarRec );
-	SideBar sb = Widget_AddData( w, self.item, data_size );
+	SideBar sb = Widget_AddData( w, self.sidebar, data_size );
 	LinkedList_Init( &sb->items );
-}
-
-static void SideBar_OnDestroy( LCUI_Widget w )
-{
-
 }
 
 static void OnToggle( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
@@ -185,9 +175,7 @@ void LCUIWidget_AddSideBar(void)
 	self.item = LCUIWidget_NewPrototype( "sidebar-item", NULL );
 	self.toggle = LCUIWidget_NewPrototype( "sidebar-toggle", NULL );
 	self.sidebar->init = SideBar_OnInit;
-	self.sidebar->destroy = SideBar_OnDestroy;
 	self.item->init = SideBarItem_OnInit;
-	self.item->destroy = SideBarItem_OnDestroy;
 	self.toggle->init = SideBarToggle_OnInit;
 	LCUI_LoadCSSString( sidebar_css, NULL );
 }

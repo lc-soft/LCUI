@@ -1338,7 +1338,7 @@ int Widget_AddClass( LCUI_Widget w, const char *class_name )
 		Widget_Unlock( w );
 		return 1;
 	}
-	if( strsadd(&w->classes, class_name) <= 0 ) {
+	if( strsadd( &w->classes, class_name ) <= 0 ) {
 		Widget_Unlock( w );
 		return 0;
 	}

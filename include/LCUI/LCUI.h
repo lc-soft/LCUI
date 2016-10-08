@@ -56,7 +56,7 @@
 
 #define ASSIGN(NAME, TYPE) TYPE NAME = (TYPE)malloc( sizeof(TYPE##Rec) )
 #define ZEROSET(NAME, TYPE) memset(NAME, 0, sizeof(TYPE##Rec))
-#define NEW(TYPE, COUNT) (TYPE*)malloc((COUNT) * sizeof(TYPE))
+#define NEW(TYPE, COUNT) (TYPE*)calloc(COUNT, sizeof(TYPE))
 #define ToString(...) ""#__VA_ARGS__""
 
 LCUI_BEGIN_HEADER
