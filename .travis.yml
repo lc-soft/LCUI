@@ -13,3 +13,10 @@ script:
   - make
   - ./test
 
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/5b09ab7b7688f3152de0
+    on_success: change
+    on_failure: always
+    on_start: never
