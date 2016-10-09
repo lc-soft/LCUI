@@ -42,7 +42,7 @@
 
 #ifdef LCUI_BUILD_IN_WIN32
 #include <tchar.h>
-#define strcasecmp stricmp
+#define strcasecmp _stricmp
 #else
 #ifdef _UNICODE
 #define __T(x) L ## x
