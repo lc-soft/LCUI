@@ -73,17 +73,23 @@ LCUI_WidgetPrototype LCUIWidget_GetPrototype( const char *name )
 	return Dict_FetchValue( self.prototypes, name );
 }
 
-LCUI_WidgetPrototype LCUIWidget_NewPrototype( const char *name, 
-					      LCUI_WidgetPrototype parent )
+LCUI_WidgetPrototype LCUIWidget_NewPrototype( const char *name,
+					      const char *parent_name )
 {
 	LCUI_WidgetPrototype proto;
 	if( Dict_FetchValue( self.prototypes, name ) ) {
 		return NULL;
 	}
 	proto = NEW( LCUI_WidgetPrototypeRec, 1 );
-	if( parent ) {
-		*proto = *parent;
-		proto->proto = parent;
+	if( parent_name ) {
+		LCUI_WidgetPrototype parent;
+		parent = Dict_FetchValue( self.prototypes, parent_name );
+		if( parent ) {
+			*proto = *parent;
+			proto->proto = parent;
+		} else {
+			*proto = self.empty_prototype;
+		}
 	} else {
 		*proto = self.empty_prototype;
 	}

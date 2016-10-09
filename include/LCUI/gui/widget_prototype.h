@@ -49,7 +49,7 @@ LCUI_API void LCUIWidget_ExitPrototype( void );
 LCUI_API LCUI_WidgetPrototype LCUIWidget_GetPrototype( const char *name );
 
 LCUI_API LCUI_WidgetPrototype LCUIWidget_NewPrototype( const char *name,
-						       LCUI_WidgetPrototype parent );
+						       const char *parent_name );
 
 LCUI_API void *Widget_GetData( LCUI_Widget widget, LCUI_WidgetPrototype proto );
 
