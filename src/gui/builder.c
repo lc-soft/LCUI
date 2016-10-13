@@ -148,7 +148,6 @@ static int ParseUI( XMLParserContext ctx, xmlNodePtr node )
 static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 {
 	xmlAttrPtr prop;
-	LCUI_WidgetPrototypeC proto = NULL;
 	LCUI_Widget w = NULL, parent = ctx->widget;
 
 	if( ctx->parent && ctx->parent->id != ID_UI &&
@@ -166,11 +165,10 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		ctx->widget = w;
 		break;
 	case XML_TEXT_NODE:
-		proto = parent->proto;
-		if( !proto || !proto->settext ) {
+		if( !parent->proto || !parent->proto->settext ) {
 			return PB_NEXT;
 		}
-		proto->settext( parent, (char*)node->content );
+		parent->proto->settext( parent, (char*)node->content );
 		DEBUG_MSG("widget: %s, set text: %s\n", parent->type,
 			  (char*)node->content);
 		return PB_NEXT;
@@ -196,10 +194,10 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		else if( PropNameIs("class") ) {
 			Widget_AddClass( w, prop_val );
 		}
-		if( !proto || !proto->setattr ) {
+		if( !w->proto || !w->proto->setattr ) {
 			continue;
 		}
-		proto->setattr( w, (const char*)prop->name, prop_val );
+		w->proto->setattr( w, (const char*)prop->name, prop_val );
 	}
 	return PB_ENTER;
 }
