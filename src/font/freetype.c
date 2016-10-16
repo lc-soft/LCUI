@@ -212,6 +212,7 @@ static int FreeType_Render( LCUI_FontBitmap *bmp, wchar_t ch,
 	/* 如果是空格则将位图内容清空 */
 	if( has_space ) {
 		memset( bmp->buffer, 0, size );
+		bmp->advance.x = bmp->advance.x / 2 + 1;
 	}
 	return ret;
 }
