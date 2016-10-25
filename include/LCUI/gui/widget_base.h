@@ -40,10 +40,10 @@
 #ifndef LCUI_WIDGET_BASE_H
 #define LCUI_WIDGET_BASE_H
 
-LCUI_BEGIN_HEADER
-
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
+
+LCUI_BEGIN_HEADER
 
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
@@ -123,17 +123,18 @@ typedef void( *LCUI_WidgetAttrSetter )(LCUI_Widget, const char*, const char*);
 typedef void( *LCUI_WidgetTextSetter )(LCUI_Widget, const char*);
 typedef void( *LCUI_WidgetPainter )(LCUI_Widget, LCUI_PaintContext);
 
+/** 部件原型数据结构 */
 typedef struct LCUI_WidgetPrototypeRec_ {
-	char *name;
-	LCUI_WidgetFunction init;
-	LCUI_WidgetFunction destroy;
-	LCUI_WidgetFunction update;
-	LCUI_WidgetFunction runtask;
-	LCUI_WidgetAttrSetter setattr;
-	LCUI_WidgetTextSetter settext;
-	LCUI_WidgetResizer autosize;
-	LCUI_WidgetPainter paint;
-	LCUI_WidgetPrototype proto;
+	char *name;				/**< 名称 */
+	LCUI_WidgetFunction init;		/**< 构造函数  */
+	LCUI_WidgetFunction destroy;		/**< 析构函数 */
+	LCUI_WidgetFunction update;		/**< 样式处理函数 */
+	LCUI_WidgetFunction runtask;		/**< 自定义任务处理函数 */
+	LCUI_WidgetAttrSetter setattr;		/**< 属性设置函数 */
+	LCUI_WidgetTextSetter settext;		/**< 文本内容设置函数 */
+	LCUI_WidgetResizer autosize;		/**< 内容尺寸计算函数 */
+	LCUI_WidgetPainter paint;		/**< 绘制函数 */
+	LCUI_WidgetPrototype proto;		/**< 父级原型 */
 } LCUI_WidgetPrototypeRec;
 
 typedef struct LCUI_WidgetDataEntryRec_ {
@@ -336,5 +337,7 @@ LCUI_API void Widget_PrintTree( LCUI_Widget w );
 void LCUI_InitWidget( void );
 
 void LCUI_ExitWidget( void );
+
+LCUI_END_HEADER
 
 #endif

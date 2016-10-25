@@ -80,8 +80,8 @@ typedef struct LCUI_DisplayDriverRec_ {
 	char			name[256];
 	int			(*getWidth)(void);
 	int			(*getHeight)(void);
-	LCUI_Surface		(*new)(void);
-	void			(*delete)(LCUI_Surface);
+	LCUI_Surface		(*create)(void);
+	void			(*destroy)(LCUI_Surface);
 	void			(*resize)(LCUI_Surface,int,int);
 	void			(*move)(LCUI_Surface,int,int);
 	void			(*show)(LCUI_Surface);

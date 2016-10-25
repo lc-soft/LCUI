@@ -40,6 +40,8 @@
 #ifndef LCUI_CSS_LIBRARY_H
 #define LCUI_CSS_LIBRARY_H
 
+LCUI_BEGIN_HEADER
+
 #define MAX_SELECTOR_LEN	1024
 #define MAX_SELECTOR_DEPTH	32
 
@@ -248,5 +250,7 @@ LCUI_API void LCUI_PrintCSSLibrary( void );
 LCUI_API void LCUI_InitCSSLibrary( void );
 
 LCUI_API void LCUI_ExitCSSLibrary( void );
+
+LCUI_END_HEADER
 
 #endif

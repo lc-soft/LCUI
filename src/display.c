@@ -388,14 +388,14 @@ static void LCUIDisplay_Thread( void *unused )
 void Surface_Delete( LCUI_Surface surface )
 {
 	if( display.is_working ) {
-		display.driver.delete( surface );
+		display.driver.destroy( surface );
 	}
 }
 
 LCUI_Surface Surface_New( void )
 {
 	if( display.is_working ) {
-		return display.driver.new();
+		return display.driver.create();
 	}
 	return NULL;
 }

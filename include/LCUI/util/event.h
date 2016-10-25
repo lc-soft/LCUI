@@ -111,4 +111,6 @@ LCUI_API int EventTrigger_Unbind3( LCUI_EventTrigger trigger, int event_id,
 */
 LCUI_API int EventTrigger_Trigger( LCUI_EventTrigger trigger, int event_id, void *arg );
 
+LCUI_END_HEADER
+
 #endif
