@@ -460,8 +460,8 @@ int LCUI_InitWinDisplay( LCUI_DisplayDriver driver )
 	strcpy( driver->name, "windows" );
 	driver->getWidth = WinDisplay_GetWidth;
 	driver->getHeight = WinDisplay_GetHeight;
-	driver->new = WinSurface_New;
-	driver->delete = WinSurface_Delete;
+	driver->create = WinSurface_New;
+	driver->destroy = WinSurface_Delete;
 	driver->isReady = WinSurface_IsReady;
 	driver->show = WinSurface_Show;
 	driver->hide = WinSurface_Hide;

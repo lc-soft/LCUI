@@ -40,6 +40,8 @@
 #ifndef LCUI_SURFACE_H
 #define LCUI_SURFACE_H
 
+LCUI_BEGIN_HEADER
+
 #define RENDER_MODE_BIT_BLT	0
 #define RENDER_MODE_STRETCH_BLT 1
 
@@ -92,5 +94,7 @@ LCUI_API void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ct
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
 LCUI_API void Surface_Present( LCUI_Surface surface );
+
+LCUI_END_HEADER
 
 #endif

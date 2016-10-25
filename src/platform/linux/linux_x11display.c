@@ -518,8 +518,8 @@ int LCUI_InitLinuxX11Display( LCUI_DisplayDriver driver )
 	}
 	driver->getWidth = X11Display_GetWidth;
 	driver->getHeight = X11Display_GetHeight;
-	driver->new = X11Surface_New;
-	driver->delete = X11Surface_Delete;
+	driver->create = X11Surface_New;
+	driver->destroy = X11Surface_Delete;
 	driver->isReady = X11Surface_IsReady;
 	driver->show = X11Surface_Show;
 	driver->hide = X11Surface_Hide;
