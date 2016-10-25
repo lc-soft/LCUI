@@ -190,9 +190,11 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		}
 		else if( PropNameIs("id") ) {
 			Widget_SetId( w, prop_val );
+			continue;
 		}
 		else if( PropNameIs("class") ) {
 			Widget_AddClass( w, prop_val );
+			continue;
 		}
 		if( !w->proto || !w->proto->setattr ) {
 			continue;
