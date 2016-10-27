@@ -111,19 +111,19 @@ static struct LCUI_TextEditModule {
 static const char *textedit_css = ToString(
 
 textedit {
-min-width: 124px;
-min-height: 14px;
-background-color: #fff;
-border: 1px solid #eee;
-padding: 5px 10px;
+	min-width: 124px;
+	min-height: 14px;
+	background-color: #fff;
+	border: 1px solid #eee;
+	padding: 5px 10px;
 }
 textedit:focus {
-border: 1px solid #2196F3;
-box-shadow: 0 0 6px rgba(33,150,243,0.4);
+	border: 1px solid #2196F3;
+	box-shadow: 0 0 6px rgba(33,150,243,0.4);
 }
 
 textedit:disabled {
-background-color: #eaeaea;
+	opacity: 0.45;
 }
 
 );
