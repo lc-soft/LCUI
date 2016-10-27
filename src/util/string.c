@@ -204,11 +204,13 @@ static int strsdelone( char ***strlist, const char *str )
 	for( pos = -1, i = 0; (*strlist)[i]; ++i ) {
 		if( strcmp( (*strlist)[i], str ) == 0 ) {
 			pos = i;
+			break;
 		}
 	}
 	if( pos == -1 ) {
 		return 0;
 	}
+	for( ; (*strlist)[i]; ++i );
 	if( pos == 0 && i < 2 ) {
 		free( *strlist );
 		*strlist = NULL;
