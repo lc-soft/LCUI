@@ -104,7 +104,13 @@ scrollbar .slider {
 	min-width: 14px;
 	min-height: 14px;
 	position: absolute;
-	background-color: #888;
+	background-color: #aaa;
+}
+scrollbar .slider:hover {
+	background-color: #bbb;
+}
+scrollbar .slider:active {
+	background-color: #999;
 }
 .scrolllayer {
 	top: 0;
