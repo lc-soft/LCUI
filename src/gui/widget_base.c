@@ -930,45 +930,63 @@ static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 
 	*width = *height = 0;
 	for( LinkedList_Each( node, &w->children_show ) ) {
+		LCUI_WidgetBoxRect *box;
+		LCUI_WidgetStyle *style;
 		child = node->data;
+		box = &child->box;
+		style = &child->computed_style;
 		/* 忽略不可见、绝对定位的部件 */
-		if( !child->computed_style.visible ||
-		    child->computed_style.position == SV_ABSOLUTE ) {
+		if( !style->visible || style->position == SV_ABSOLUTE ) {
 			continue;
 		}
-		/* 忽略使用百分比作为尺寸单位的部件 */
 		s = &child->style->sheet[key_width];
-		if( !s->is_valid || s->type != SVT_SCALE ) {
-			n = child->box.outer.x + child->box.outer.width;
-			if( n > *width ) {
-				*width = n;
+		/* 对于宽度以百分比做单位的，计算尺寸时自动去除外间距框、内间距框和
+		 * 边框占用的空间
+		 */
+		if( s->type == SVT_SCALE ) {
+			if( style->box_sizing == SV_BORDER_BOX ) {
+				n = box->border.x + box->border.width;
+			} else {
+				n = box->content.x + box->content.width;
+				n -= box->content.x - box->border.x;
 			}
+			n -= box->outer.x - box->border.x;
+		} else if( box->outer.width <= 0 ) {
+			continue;
+		} else {
+			n = box->outer.x + box->outer.width;
+		}
+		if( n > *width ) {
+			*width = n;
 		}
 		s = &child->style->sheet[key_height];
-		if( !s->is_valid || s->type != SVT_SCALE ) {
-			n = child->box.outer.y + child->box.outer.height;
-			if( n > *height ) {
-				*height = n;
+		n = box->outer.y + box->outer.height;
+		if( s->type == SVT_SCALE ) {
+			if( style->box_sizing == SV_BORDER_BOX ) {
+				n = box->border.y + box->border.height;
+			} else {
+				n = box->content.y + box->content.height;
+				n -= box->content.y - box->border.y;
 			}
+			n -= box->outer.y - box->border.y;
+		} else if( box->outer.height <= 0 ) {
+			continue;
+		} else {
+			n = box->outer.y + box->outer.height;
+		}
+		if( n > *height ) {
+			*height = n;
 		}
 	}
-	/* 计算出来的尺寸是包含 padding-left 和 padding-top 的，需要针对不同的对象来调整尺寸 */
-	switch(w->computed_style.box_sizing) {
-	case SV_BORDER_BOX:
-		*width += w->padding.right;
-		*height += w->padding.bottom;
-		break;
-	case SV_CONTENT_BOX:
-		*width -= w->padding.left;
-		*height -= w->padding.top;
-	default: break;
-	}
+	/* 计算出来的尺寸是包含 padding-left 和 padding-top 的，因此需要减去它们 */
+	*width -= w->padding.left;
+	*height -= w->padding.top;
 }
 
 /** 计算尺寸 */
 static void Widget_ComputeSize( LCUI_Widget w )
 {
-	int n;
+	int n, width, height;
 	LCUI_Rect *box, *pbox = &w->box.padding;
 	LCUI_Style sw = &w->style->sheet[key_width];
 	LCUI_Style sh = &w->style->sheet[key_height];
@@ -976,17 +994,47 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	w->width = ComputeXNumber( w, key_width );
 	w->height = ComputeYNumber( w, key_height );
 	if( sw->type == SVT_AUTO || sh->type == SVT_AUTO ) {
-		int width, height;
 		if( w->proto && w->proto->autosize ) {
 			w->proto->autosize( w, &width, &height );
 		} else {
 			Widget_ComputeContentSize( w, &width, &height );
+		}
+		/* 以上计算出来的是内容框尺寸，如果尺寸调整模式是基于边框盒，则
+		 * 转换为边框盒尺寸
+		 */
+		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+			width += w->padding.left + w->padding.right;
+			width += bbox->left.width + bbox->right.width;
+			height += w->padding.top + w->padding.bottom;
+			height += bbox->top.width + bbox->bottom.width;
 		}
 		if( sw->type == SVT_AUTO ) {
 			w->width = width;
 		}
 		if( sh->type == SVT_AUTO ) {
 			w->height = height;
+		}
+	}
+	if( sw->type == SVT_SCALE && w->parent ) {
+		LCUI_Style psw = &w->parent->style->sheet[key_width];
+		if( psw->type == SVT_AUTO ) {
+			if( w->proto && w->proto->autosize ) {
+				w->proto->autosize( w, &width, &height );
+			} else {
+				Widget_ComputeContentSize( w, &width, 
+							   &height );
+			}
+			if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+				width += w->padding.left + w->padding.right;
+				width += bbox->left.width + bbox->right.width;
+				height += w->padding.top + w->padding.bottom;
+				height += bbox->top.width + bbox->bottom.width;
+			}
+			if( width > w->width ) {
+				w->width = width;
+				w->height = height;
+				Widget_AddTask( w->parent, WTT_RESIZE );
+			}
 		}
 	}
 	if( w->style->sheet[key_max_width].is_valid ) {
