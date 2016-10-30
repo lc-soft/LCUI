@@ -562,6 +562,7 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ key_z_index, NULL, OnParseValue },
 	{ key_opacity, NULL, OnParseNumber },
 	{ key_position, NULL, OnParseStyleOption },
+	{ key_visible, NULL, OnParseBoolean },
 	{ key_vertical_align, NULL, OnParseStyleOption },
 	{ key_display, NULL, OnParseStyleOption },
 	{ key_background_color, NULL, OnParseColor },
