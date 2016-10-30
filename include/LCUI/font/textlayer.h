@@ -215,7 +215,7 @@ LCUI_API void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_tr
 LCUI_API void TextLayer_ReloadCharBitmap( LCUI_TextLayer layer );
 
 /** 更新数据 */
-LCUI_API void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list );
+LCUI_API void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rects );
 
 /** 
  * 将文本图层中的指定区域的内容绘制至目标图像中

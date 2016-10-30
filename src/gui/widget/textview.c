@@ -398,6 +398,23 @@ static void TextView_OnDestroy( LCUI_Widget w )
 static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )
 {
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	/*如果自身的宽度单位是百分比，且父级部件宽度为自适应 */
+	while( w->parent && w->style->sheet[key_width].type == SVT_SCALE &&
+	       w->parent->style->sheet[key_width].type == SVT_AUTO ) {
+		int fixed_w = txt->layer->fixed_width;
+		int fixed_h = txt->layer->fixed_height;
+		LCUI_Style sw = &w->parent->style->sheet[key_width];
+		if( sw->type == SVT_PX ) {
+			break;
+		}
+		TextLayer_SetFixedSize( txt->layer, 0, 0 );
+		TextLayer_Update( txt->layer, NULL );
+		*width = TextLayer_GetWidth( txt->layer );
+		*height = TextLayer_GetHeight( txt->layer );
+		TextLayer_SetFixedSize( txt->layer, fixed_w, fixed_h );
+		TextLayer_Update( txt->layer, NULL );
+		return;
+	}
 	*width = TextLayer_GetWidth( txt->layer );
 	*height = TextLayer_GetHeight( txt->layer );
 }

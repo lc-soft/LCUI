@@ -1196,8 +1196,7 @@ void TextLayer_ReloadCharBitmap( LCUI_TextLayer layer )
 	}
 }
 
-/** 更新数据 */
-void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list )
+void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rects )
 {
 	if( layer->task.update_bitmap ) {
 		TextLayer_InvalidateRowsRect( layer, 0, -1 );
@@ -1221,8 +1220,8 @@ void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rect_list )
 		TextLayer_InvalidateRowsRect( layer, 0, -1 );
 		layer->task.redraw_all = TRUE;
 	}
-	if( rect_list ) {
-		LinkedList_Concat( rect_list, &layer->dirty_rect );
+	if( rects ) {
+		LinkedList_Concat( rects, &layer->dirty_rect );
 	 }
 }
 
