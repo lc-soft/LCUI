@@ -1,4 +1,4 @@
-﻿/* ****//***********************************************************************
+﻿/* **************************************************************************
  * widget_task.c -- LCUI widget task module.
  *
  * Copyright (C) 2014-2016 by Liu Chao <lc-soft@live.cn>
@@ -43,15 +43,13 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 
-typedef void (*callback)(LCUI_Widget);
-
 /** 部件任务模块数据 */
 static struct WidgetTaskModule {
-	size_t count;
-	int64_t timeout;
-	LCUI_BOOL is_timeout;
-	LinkedList trash;			/**< 待删除的部件列表 */
-	callback handlers[WTT_TOTAL_NUM];	/**< 任务处理器 */
+	size_t count;					/**< 当前已处理的部件数量 */
+	int64_t timeout;				/**< 超时时间点 */
+	LCUI_BOOL is_timeout;				/**< 是否已经超时 */
+	LinkedList trash;				/**< 待删除的部件列表 */
+	LCUI_WidgetFunction handlers[WTT_TOTAL_NUM];	/**< 任务处理器 */
 } self;
 
 static void HandleRefreshStyle( LCUI_Widget w )
@@ -231,7 +229,7 @@ proc_children_task:
 			w->task.for_children = TRUE;
 		}
 		if( has_timeout ) {
-			if( !self.is_timeout && self.count >= 50 ) {
+			if( !self.is_timeout && self.count >= 500 ) {
 				self.count = 0;
 				if( LCUI_GetTime() >= self.timeout ) {
 					self.is_timeout = TRUE;
@@ -248,10 +246,12 @@ proc_children_task:
 
 void LCUIWidget_StepTask( void )
 {
+	LCUI_Widget root;
 	LinkedListNode *node;
 	self.is_timeout = FALSE;
 	self.timeout = LCUI_GetTime() + 20;
-	Widget_UpdateEx( LCUIWidget_GetRoot(), TRUE );
+	root = LCUIWidget_GetRoot();
+	while( !self.is_timeout && Widget_UpdateEx( root, TRUE ) );
 	/* 删除无用部件 */
 	node = self.trash.head.next;
 	while( node ) {
