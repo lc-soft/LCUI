@@ -187,6 +187,7 @@ typedef struct LCUI_WidgetRec_ {
 #define Widget_GetShowNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode))
 #define Widget_NewPrivateData(w, type) (type*)(w->private_data = malloc(sizeof(type)))
 #define Widget_SetStyle(W, K, V, T) SetStyle((W)->custom_style, K, V, T)
+#define Widget_UnsetStyle(W, K, V, T) UnsetStyle((W)->custom_style, K, V, T)
 
 /** 获取根级部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
