@@ -114,7 +114,6 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 		return FALSE;
 	}
 	s->is_valid = TRUE;
-	s->is_changed = TRUE;
 	return TRUE;
 }
 
@@ -175,7 +174,6 @@ LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 		var->color.g = g;
 		var->color.b = b;
 		var->is_valid = TRUE;
-		var->is_changed = TRUE;
 		return TRUE;
 	} else {
 		if( strcmp("transparent", str) == 0 ) {

@@ -109,7 +109,6 @@ static int SplitValues( const char *str, LCUI_Style slist,
 		if( strcmp( values[vj], "auto" ) == 0 ) {
 			slist[vj].type = SVT_AUTO;
 			slist[vj].value = SV_AUTO;
-			slist[vj].is_changed = TRUE;
 			slist[vj].is_valid = TRUE;
 			continue;
 		}
@@ -152,7 +151,6 @@ static int OnParseValue( LCUI_StyleSheet ss, int key, const char *str )
 	LCUI_Style s = &ss->sheet[key];
 	if( sscanf( str, "%d", &s->value ) == 1 ) {
 		s->is_valid = TRUE;
-		s->is_changed = TRUE;
 		s->type = SVT_VALUE;
 		return 0;
 	}
@@ -246,7 +244,6 @@ static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
 	s->style = v;
 	s->type = SVT_STYLE;
 	s->is_valid = TRUE;
-	s->is_changed = TRUE;
 	return 0;
 }
 
@@ -409,7 +406,6 @@ static int OnParseBorderStyle( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_StyleRec s;
 	s.is_valid = TRUE;
-	s.is_changed = TRUE;
 	s.val_style = LCUI_GetStyleValue( str );
 	if( s.val_style < 0 ) {
 		return -1;

@@ -447,7 +447,6 @@ void StyleSheet_Clear( LCUI_StyleSheet ss )
 		default: break;
 		}
 		s->is_valid = FALSE;
-		s->is_changed = TRUE;
 	}
 }
 
@@ -494,7 +493,6 @@ int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 			break;
 		}
 		s->is_valid = TRUE;
-		s->is_changed = TRUE;
 		s->type = src->sheet[i].type;
 	}
 	return 0;
@@ -541,7 +539,6 @@ int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 			break;
 		}
 		s->is_valid = TRUE;
-		s->is_changed = TRUE;
 		s->type = src->sheet[i].type;
 		++count;
 	}

@@ -225,7 +225,6 @@ static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
 	s->style = v;
 	s->type = SVT_STYLE;
 	s->is_valid = TRUE;
-	s->is_changed = TRUE;
 	return 0;
 }
 
