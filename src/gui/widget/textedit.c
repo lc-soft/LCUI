@@ -376,9 +376,6 @@ static void TextEdit_AutoSize( LCUI_Widget widget, int *width, int *height )
 		*height = TextLayer_GetHeight( edit->layer );
 	}
 	*width = 176;
-	if( widget->computed_style.box_sizing != SV_CONTENT_BOX ) {
-		*height += widget->padding.top + widget->padding.bottom;
-	}
 }
 
 /*----------------------------- End TextBlock ---------------------------------*/

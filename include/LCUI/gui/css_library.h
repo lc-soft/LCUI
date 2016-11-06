@@ -180,9 +180,9 @@ typedef struct LCUI_SelectorRec_ {
 					S->sheet[NAME].type = SVT_##TYPE, \
 					S->sheet[NAME].val_##TYPE = VAL
 
-#define UnsetStyle(S, NAME, VAL, TYPE)	S->sheet[NAME].is_valid = FALSE, \
-					S->sheet[NAME].type = SVT_NONE, \
-					S->sheet[NAME].val_int = 0
+#define UnsetStyle(S, NAME)	S->sheet[NAME].is_valid = FALSE, \
+				S->sheet[NAME].type = SVT_NONE, \
+				S->sheet[NAME].val_int = 0
 
 #define LCUI_FindStyleSheet(S, L) LCUI_FindStyleSheetFromGroup(0, NULL, S, L)
 

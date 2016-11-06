@@ -67,7 +67,7 @@ button:hover {
 }
 
 button:active {
-	background-color:rgb(215,215,215);
+	background-color: #d7d7d7;
 }
 
 button:disabled textview {
