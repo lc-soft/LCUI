@@ -74,7 +74,7 @@ int EventTrigger_Bind( LCUI_EventTrigger trigger, int event_id,
 		       void (*destroy_data)(void*) )
 {
 	LinkedList *handlers;
-	LCUI_RBTreeNode *node;
+	RBTreeNode *node;
 	LCUI_EventHandler handler;
 	node = RBTree_Search( &trigger->events, event_id );
 	if( !node ) {
@@ -100,8 +100,8 @@ int EventTrigger_Unbind( LCUI_EventTrigger trigger, int event_id,
 			 LCUI_EventFunc func )
 {
 	LinkedList *handlers;
+	RBTreeNode *event_node;
 	LinkedListNode *handler_node;
-	LCUI_RBTreeNode *event_node;
 	LCUI_EventHandler handler;
 	event_node = RBTree_Search( &trigger->events, event_id );
 	if( !event_node ) {
@@ -126,7 +126,7 @@ int EventTrigger_Unbind( LCUI_EventTrigger trigger, int event_id,
 
 int EventTrigger_Unbind2( LCUI_EventTrigger trigger, int handler_id )
 {
-	LCUI_RBTreeNode *node;
+	RBTreeNode *node;
 	LCUI_EventHandler handler;
 	node = RBTree_Search( &trigger->handlers, handler_id );
 	if( !node ) {
@@ -147,7 +147,7 @@ int EventTrigger_Unbind3( LCUI_EventTrigger trigger, int event_id,
 {
 	LinkedList *handlers;
 	LinkedListNode *handler_node;
-	LCUI_RBTreeNode *event_node;
+	RBTreeNode *event_node;
 	LCUI_EventHandler handler;
 	event_node = RBTree_Search( &trigger->events, event_id );
 	if( !event_node ) {
@@ -175,7 +175,7 @@ int EventTrigger_Trigger( LCUI_EventTrigger trigger, int event_id, void *arg )
 	int count = 0;
 	LCUI_EventRec e;
 	LCUI_EventHandler handler;
-	LCUI_RBTreeNode *event_node;
+	RBTreeNode *event_node;
 	LinkedList *handlers;
 	LinkedListNode *handler_node, *next;
 	event_node = RBTree_Search( &trigger->events, event_id );

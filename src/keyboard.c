@@ -52,7 +52,7 @@ typedef struct KeyStateNodeRec_ {
 
 static struct LCUIKeyboardModule {
 	LCUI_Mutex mutex;
-	LCUI_RBTree state_tree;
+	RBTree state_tree;
 } self;
 
 /** 检测指定键值的按键是否处于按下状态 */

@@ -71,8 +71,8 @@ static struct LCUI_FontLibraryContext {
 	int count;				/**< 计数器，主要用于为字体信息生成标识号 */
 	int font_cache_num;			/**< 字体信息缓存区的数量 */
 	LCUI_BOOL is_inited;			/**< 标记，指示数据库是否初始化 */
-	LCUI_RBTree family_tree;		/**< 字族信息树，按字族名称记录着各个字体的信息 */
-	LCUI_RBTree bitmap_cache;		/**< 字体位图缓存区 */
+	RBTree family_tree;		/**< 字族信息树，按字族名称记录着各个字体的信息 */
+	RBTree bitmap_cache;		/**< 字体位图缓存区 */
 	LCUI_Font ***font_cache;		/**< 字体信息缓存区 */
 	LCUI_Font *default_font;		/**< 默认字体的信息 */
 	LCUI_Font *incore_font;			/**< 内置字体的信息 */
@@ -82,8 +82,8 @@ static struct LCUI_FontLibraryContext {
 
 /** 检测位图数据是否有效 */
 #define FontBitmap_IsValid(fbmp) (fbmp && fbmp->width>0 && fbmp->rows>0)
-#define SelectChar(ch) (LCUI_RBTree*)RBTree_GetData( &fontlib.bitmap_cache, ch )
-#define SelectFont(ch, font_id) (LCUI_RBTree*)RBTree_GetData( ch, font_id )
+#define SelectChar(ch) (RBTree*)RBTree_GetData( &fontlib.bitmap_cache, ch )
+#define SelectFont(ch, font_id) (RBTree*)RBTree_GetData( ch, font_id )
 #define SelectBitmap(font, size) (LCUI_FontBitmap*)RBTree_GetData( font, size )
 #define SelectFontFamliy(family_name) (LCUI_FontFamilyNode*)\
 	RBTree_CustomGetData( &fontlib.family_tree, family_name );
@@ -226,7 +226,7 @@ LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 				     int size, const LCUI_FontBitmap *bmp )
 {
 	LCUI_FontBitmap *bmp_cache;
-	LCUI_RBTree *tree_font, *tree_bmp;
+	RBTree *tree_font, *tree_bmp;
 
 	if( !fontlib.is_inited ) {
 		return NULL;
@@ -234,7 +234,7 @@ LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 	/* 获取字符的字体信息集 */
 	tree_font = SelectChar( ch );
 	if( !tree_font ) {
-		tree_font = NEW(LCUI_RBTree, 1);
+		tree_font = NEW(RBTree, 1);
 		if( !tree_font ) {
 			return NULL;
 		}
@@ -249,7 +249,7 @@ LCUI_FontBitmap* LCUIFont_AddBitmap( wchar_t ch, int font_id,
 	/* 获取相应字体样式标识号的字体位图库 */
 	tree_bmp = SelectFont( tree_font, font_id );
 	if( !tree_bmp ) {
-		tree_bmp = NEW(LCUI_RBTree, 1);
+		tree_bmp = NEW(RBTree, 1);
 		if( !tree_bmp ) {
 			return NULL;
 		}
@@ -275,7 +275,7 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 			const LCUI_FontBitmap **bmp )
 {
 	int ret;
-	LCUI_RBTree *ctx;
+	RBTree *ctx;
 	LCUI_FontBitmap bmp_cache;
 
 	*bmp = NULL;

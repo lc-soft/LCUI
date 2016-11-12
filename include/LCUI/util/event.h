@@ -51,8 +51,8 @@ typedef void(*LCUI_EventFunc)(LCUI_Event, void*);
 
 typedef struct LCUI_EventTriggerRec_ {
 	int handler_base_id;		/**< 事件处理器ID */
-	LCUI_RBTree events;		/**< 事件绑定记录 */
-	LCUI_RBTree handlers;		/**< 事件处理器记录 */
+	RBTree events;		/**< 事件绑定记录 */
+	RBTree handlers;		/**< 事件处理器记录 */
 } LCUI_EventTriggerRec, *LCUI_EventTrigger;
 
 /** 构建一个事件触发器 */

@@ -85,8 +85,8 @@ static struct LCUIWidgetEvnetModule {
 	LCUI_Widget mouse_capturer;
 	LinkedList touch_capturers;
 	LCUI_Widget targets[WST_TOTAL];		/**< 相关的部件 */
-	LCUI_RBTree event_records;		/**< 当前正执行的事件的记录 */
-	LCUI_RBTree event_names;		/**< 事件标识号 -> 名称映射表 */
+	RBTree event_records;		/**< 当前正执行的事件的记录 */
+	RBTree event_names;		/**< 事件标识号 -> 名称映射表 */
 	Dict *event_ids;			/**< 事件名称 -> 标识号映射表 */
 	int base_event_id;			/**< 事件标识号计数器 */
 	LCUI_Mutex mutex;			/**< 互斥锁 */

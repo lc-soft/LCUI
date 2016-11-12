@@ -51,7 +51,7 @@
 
 static struct LCUIWidgetModule {
 	LCUI_Widget root;	/** 根级部件 */
-	LCUI_RBTree ids;	/** 各种部件的ID索引 */
+	RBTree ids;	/** 各种部件的ID索引 */
 } LCUIWidget;
 
 #define StrList_Destroy freestrs

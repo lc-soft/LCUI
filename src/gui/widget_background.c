@@ -56,7 +56,7 @@ typedef struct ImageRefRec_{
 } ImageRefRec, *ImageRef;
 
 LCUI_BOOL is_inited = FALSE;
-LCUI_RBTree images, refs;
+RBTree images, refs;
 
 static void AddRef( LCUI_Widget widget, ImageCache cache )
 {

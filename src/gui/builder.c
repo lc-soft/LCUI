@@ -87,7 +87,7 @@ struct XMLParserContextRec_ {
 
 static struct ModuleContext {
 	LCUI_BOOL is_inited;
-	LCUI_RBTree parsers;
+	RBTree parsers;
 } self;
 
 /** 解析<resource>元素，根据相关参数载入资源 */
