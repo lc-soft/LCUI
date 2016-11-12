@@ -58,44 +58,44 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance,
 		      _In_ int nCmdShow )
 {
 	int ret, len, i = 0, argc = 0;
-	TCHAR *p_cmd_line, *cmdline_buff;
-	TCHAR *token = NULL, *next_token = NULL, **argv = NULL;
+	char *cmdline, *cmdline_buff;
+	char *token = NULL, *next_token = NULL, **argv = NULL;
 
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER( hPrevInstance );
+	UNREFERENCED_PARAMETER( lpCmdLine );
 	LCUI_PreInitApp( hInstance );
-	p_cmd_line = GetCommandLine();
-	len = _tcslen( p_cmd_line ) + 1;
-	cmdline_buff = (TCHAR*)malloc( sizeof(TCHAR)*len );
+	cmdline = GetCommandLineA();
+	len = strlen( cmdline ) + 1;
+	cmdline_buff = (char*)malloc( sizeof( char )*len );
 	if( !cmdline_buff ) {
 		return -1;
 	}
-	_tcscpy_s( cmdline_buff, len, p_cmd_line );
-	token = _tcstok_s( cmdline_buff, _T(" \r\t\n"), &next_token );
+	strcpy_s( cmdline_buff, len, cmdline );
+	token = strtok_s( cmdline_buff, " \r\t\n", &next_token );
 	while( token ) {
 		argc++;
-		token = _tcstok_s( NULL, _T(" \r\t\n"), &next_token );
+		token = strtok_s( NULL, " \r\t\n", &next_token );
 	}
 	if( argc > 0 ) {
-		argv = (TCHAR**)malloc(sizeof(TCHAR*)*argc);
+		argv = (char**)malloc( sizeof( char* )*argc );
 	}
 	if( !argv ) {
 		return -1;
 	}
-	_tcscpy_s( cmdline_buff, len, p_cmd_line );
-	token = _tcstok_s( cmdline_buff, _T(" \r\t\n"), &next_token );
-	while( token && i<argc ) {
-		len = _tcslen( token ) + 1;
-		argv[i] = (TCHAR*)malloc(sizeof(TCHAR)*len);
+	strcpy_s( cmdline_buff, len, cmdline );
+	token = strtok_s( cmdline_buff, " \r\t\n", &next_token );
+	while( token && i < argc ) {
+		len = strlen( token ) + 1;
+		argv[i] = (char*)malloc( sizeof( char )*len );
 		if( argv[i] == NULL ) {
 			return -1;
 		}
-		_tcscpy_s( argv[i], len, token );
-		token = _tcstok_s( NULL, _T(" \r\t\n"), &next_token );
+		strcpy_s( argv[i], len, token );
+		token = strtok_s( NULL, " \r\t\n", &next_token );
 		++i;
 	}
 	ret = main( argc, (char**)argv );
-	for(i=0; i<argc; ++i) {
+	for( i = 0; i < argc; ++i ) {
 		free( argv[i] );
 	}
 	free( argv );
