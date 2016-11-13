@@ -76,21 +76,21 @@ typedef struct LCUI_SurfaceTask {
 
 /** 适用于 windows 平台的 surface 数据结构 */
 struct LCUI_SurfaceRec_ {
-	HWND hwnd;
-	int mode;
-	int w, h;
-	HDC fb_hdc;
-	HBITMAP fb_bmp;
-	LCUI_BOOL is_ready;
-	LCUI_Graph fb;			/**< 帧缓存，保存当前窗口内呈现的图像内容 */
-	LCUI_SurfaceTask task_buffer[TASK_TOTAL_NUM];
+	HWND hwnd;				/**< windows 窗口句柄 */
+	int mode;				/**< 渲染模式 */
+	int w, h;				/**< 窗口宽高 */
+	HDC fb_hdc;				/**< 设备上下文 */
+	HBITMAP fb_bmp;				/**< 帧缓存 */
+	LCUI_BOOL is_ready;			/**< 是否已经准备好 */
+	LCUI_Graph fb;				/**< 帧缓存，保存当前窗口内呈现的图像内容 */
+	LCUI_SurfaceTask tasks[TASK_TOTAL_NUM];	/**< 任务缓存 */
 };
 
 /** windows 下图形显示功能所需的数据 */
 static struct WIN_Display {
-	LCUI_BOOL is_inited;
+	LCUI_BOOL is_inited;		/**< 是否已经初始化 */
 	LinkedList surfaces;		/**< surface 记录 */
-	LCUI_EventTrigger trigger;
+	LCUI_EventTrigger trigger;	/**< 事件触发器 */
 } win = {0};
 
 /** 根据 hwnd 获取 Surface */
@@ -146,7 +146,11 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 {
 	HDC hdc_client;
 	HINSTANCE instance;
+	LCUI_DisplayEventRec ev;
 	LCUI_Surface surface = arg1;
+
+	ev.type = DET_READY;
+	ev.surface = surface;
 	instance = LCUI_GetAppData();
 	/* 为 Surface 创建窗口 */
 	surface->hwnd = CreateWindow(
@@ -163,15 +167,16 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 	DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 	LCUI_SetMainWindow( surface->hwnd );
 	LCUI_SetTaskAgent( FALSE );
+	EventTrigger_Trigger( win.trigger, DET_READY, &ev );
 }
 
 /** 新建一个 Surface */
-static LCUI_Surface WinSurface_New(void)
+static LCUI_Surface WinSurface_New( void )
 {
 	int i;
 	LCUI_AppTaskRec task;
 	LCUI_Surface surface;
-	surface = NEW(struct LCUI_SurfaceRec_, 1);
+	surface = NEW( struct LCUI_SurfaceRec_, 1 );
 	surface->mode = RENDER_MODE_BIT_BLT;
 	surface->hwnd = NULL;
 	surface->fb_hdc = NULL;
@@ -179,8 +184,8 @@ static LCUI_Surface WinSurface_New(void)
 	surface->is_ready = FALSE;
 	Graph_Init( &surface->fb );
 	surface->fb.color_type = COLOR_TYPE_ARGB;
-	for( i=0; i<TASK_TOTAL_NUM; ++i ) {
-		surface->task_buffer[i].is_valid = FALSE;
+	for( i = 0; i < TASK_TOTAL_NUM; ++i ) {
+		surface->tasks[i].is_valid = FALSE;
 	}
 	LinkedList_Append( &win.surfaces, surface );
 	task.arg[1] = NULL;
@@ -209,9 +214,9 @@ static void WinSurface_ExecMove( LCUI_Surface surface, int x, int y )
 static void WinSurface_Move( LCUI_Surface surface, int x, int y )
 {
 	/* 缓存任务，等获得窗口句柄后处理 */
-	surface->task_buffer[TASK_MOVE].x = x;
-	surface->task_buffer[TASK_MOVE].y = y;
-	surface->task_buffer[TASK_MOVE].is_valid = TRUE;
+	surface->tasks[TASK_MOVE].x = x;
+	surface->tasks[TASK_MOVE].y = y;
+	surface->tasks[TASK_MOVE].is_valid = TRUE;
 }
 
 static void WinSurface_ExecResize( LCUI_Surface surface, int w, int h )
@@ -242,22 +247,22 @@ static void WinSurface_ExecResize( LCUI_Surface surface, int w, int h )
 
 static void WinSurface_Resize( LCUI_Surface surface, int w, int h )
 {
-	surface->task_buffer[TASK_RESIZE].width = w;
-	surface->task_buffer[TASK_RESIZE].height = h;
-	surface->task_buffer[TASK_RESIZE].is_valid = TRUE;
+	surface->tasks[TASK_RESIZE].width = w;
+	surface->tasks[TASK_RESIZE].height = h;
+	surface->tasks[TASK_RESIZE].is_valid = TRUE;
 }
 
 static void WinSurface_Show( LCUI_Surface surface )
 {
 	DEBUG_MSG("surface: %p, buffer show.\n", surface);
-	surface->task_buffer[TASK_SHOW].show = TRUE;
-	surface->task_buffer[TASK_SHOW].is_valid = TRUE;
+	surface->tasks[TASK_SHOW].show = TRUE;
+	surface->tasks[TASK_SHOW].is_valid = TRUE;
 }
 
 static void WinSurface_Hide( LCUI_Surface surface )
 {
-	surface->task_buffer[TASK_SHOW].show = FALSE;
-	surface->task_buffer[TASK_SHOW].is_valid = TRUE;
+	surface->tasks[TASK_SHOW].show = FALSE;
+	surface->tasks[TASK_SHOW].is_valid = TRUE;
 }
 
 static void WinSurface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
@@ -270,12 +275,12 @@ static void WinSurface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 		caption = (wchar_t*)malloc(sizeof(wchar_t)*len);
 		wcsncpy( caption, str, len );
 	}
-	if( surface->task_buffer[TASK_SET_CAPTION].is_valid
-	    && surface->task_buffer[TASK_SET_CAPTION].caption ) {
-		free( surface->task_buffer[TASK_SET_CAPTION].caption );
+	if( surface->tasks[TASK_SET_CAPTION].is_valid
+	    && surface->tasks[TASK_SET_CAPTION].caption ) {
+		free( surface->tasks[TASK_SET_CAPTION].caption );
 	}
-	surface->task_buffer[TASK_SET_CAPTION].caption = caption;
-	surface->task_buffer[TASK_SET_CAPTION].is_valid = TRUE;
+	surface->tasks[TASK_SET_CAPTION].caption = caption;
+	surface->tasks[TASK_SET_CAPTION].is_valid = TRUE;
 }
 
 void WinSurface_SetOpacity( LCUI_Surface surface, float opacity )
@@ -352,17 +357,17 @@ static void WinSurface_Update( LCUI_Surface surface )
 		return;
 	}
 	DEBUG_MSG("surface: %p\n", surface);
-	t = &surface->task_buffer[TASK_MOVE];
+	t = &surface->tasks[TASK_MOVE];
 	if( t->is_valid ) {
 		WinSurface_ExecMove( surface, t->x, t->y );
 		t->is_valid = FALSE;
 	}
-	t = &surface->task_buffer[TASK_RESIZE];
+	t = &surface->tasks[TASK_RESIZE];
 	if( t->is_valid ) {
 		WinSurface_ExecResize( surface, t->width, t->height );
 		t->is_valid = FALSE;
 	}
-	t = &surface->task_buffer[TASK_SET_CAPTION];
+	t = &surface->tasks[TASK_SET_CAPTION];
 	if( t->is_valid ) {
 		SetWindowText( surface->hwnd, t->caption );
 		if( t->caption ) {
@@ -371,7 +376,7 @@ static void WinSurface_Update( LCUI_Surface surface )
 		}
 	}
 	t->is_valid = FALSE;
-	t = &surface->task_buffer[TASK_SHOW];
+	t = &surface->tasks[TASK_SHOW];
 	DEBUG_MSG("surface: %p, hwnd: %p, is_valid: %d, show: %d\n",
 		   surface, surface->hwnd, t->is_valid, t->show);
 	if( t->is_valid ) {

@@ -58,7 +58,8 @@ enum LCUIDisplayMode {
 enum LCUI_DisplayEventType {
 	DET_NONE,
 	DET_PAINT,
-	DET_RESIZE
+	DET_RESIZE,
+	DET_READY
 };
 
 /** 显示驱动的事件数据结构 */
@@ -125,6 +126,10 @@ LCUI_API void LCUIDisplay_InvalidateArea( LCUI_Rect *rect );
 
 /** 获取当前部件所属的 surface */
 LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner( LCUI_Widget w );
+
+/** 绑定 surface 触发的事件 */
+LCUI_API int LCUIDisplay_BindEvent( int event_id, LCUI_EventFunc func, void *arg,
+				    void *data, void( *destroy_data )(void*) );
 
 /** 获取当前的屏幕内容每秒更新的帧数 */
 LCUI_API int LCUIDisplay_GetFPS(void);

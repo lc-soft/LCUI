@@ -120,11 +120,12 @@ int LCUI_InitWinApp( LCUI_AppDriver app )
 	wndclass.hInstance     = win.main_instance;
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW;
 	wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
-	wndclass.hIcon         = LoadIcon( win.dll_instance, MAKEINTRESOURCE(IDI_LCUI_ICON) );
+	wndclass.hIcon         = LoadIcon( win.dll_instance, 
+					   MAKEINTRESOURCE(IDI_LCUI_ICON) );
 
 	if( !RegisterClass(&wndclass) ) {
 		wchar_t str[256];
-		wsprintf(str, L"LCUI_InitApp(): error code: %d\n", GetLastError());
+		wsprintf(str, L"LCUI_InitWinApp(): error code: %d\n", GetLastError());
 		MessageBox( NULL, str, szAppName, MB_ICONERROR );
 		return -1;
 	}

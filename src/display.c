@@ -451,7 +451,6 @@ void *Surface_GetHandle( LCUI_Surface surface )
 	return NULL;
 }
 
-/** 设置 Surface 的渲染模式 */
 void Surface_SetRenderMode( LCUI_Surface surface, int mode )
 {
 	if( display.is_working ) {
@@ -459,7 +458,6 @@ void Surface_SetRenderMode( LCUI_Surface surface, int mode )
 	}
 }
 
-/** 更新 surface，应用缓存的变更 */
 void Surface_Update( LCUI_Surface surface )
 {
 	if( display.is_working ) {
@@ -467,12 +465,6 @@ void Surface_Update( LCUI_Surface surface )
 	}
 }
 
-/**
- * 准备绘制 Surface 中的内容
- * @param[in] surface	目标 surface
- * @param[in] rect	需进行绘制的区域，若为NULL，则绘制整个 surface
- * @return		返回绘制上下文句柄
- */
 LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 {
 	if( display.is_working ) {
@@ -481,11 +473,6 @@ LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 	return NULL;
 }
 
-/**
- * 结束对 Surface 的绘制操作
- * @param[in] surface	目标 surface
- * @param[in] paint_ctx	绘制上下文句柄
- */
 void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 {
 	if( display.is_working ) {
@@ -493,7 +480,6 @@ void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 	}
 }
 
-/** 将帧缓存中的数据呈现至Surface的窗口内 */
 void Surface_Present( LCUI_Surface surface )
 {
 	if( display.is_working ) {
@@ -586,6 +572,16 @@ static void OnResize( LCUI_Event e, void *arg )
 		return;
 	}
 	Widget_Resize( widget, dpy_ev->resize.width, dpy_ev->resize.height );
+}
+
+int LCUIDisplay_BindEvent( int event_id, LCUI_EventFunc func, void *arg,
+			   void *data, void( *destroy_data )(void*) )
+{
+	if( display.is_working ) {
+		return display.driver.bindEvent( event_id, func, 
+						 data, destroy_data );
+	}
+	return -1;
 }
 
 /** 初始化图形输出模块 */
