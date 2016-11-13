@@ -51,7 +51,8 @@
 
 static struct LCUIWidgetModule {
 	LCUI_Widget root;	/** 根级部件 */
-	RBTree ids;	/** 各种部件的ID索引 */
+	Dict *ids;		/** 各种部件的ID索引 */
+	LCUI_Mutex mutex;	/** 互斥锁 */
 } LCUIWidget;
 
 #define StrList_Destroy freestrs
@@ -428,10 +429,14 @@ void Widget_GetAbsXY( LCUI_Widget w, LCUI_Widget parent, int *x, int *y )
 
 LCUI_Widget LCUIWidget_GetById( const char *idstr )
 {
+	LCUI_Widget w;
 	if( !idstr ) {
 		return NULL;
 	}
-	return RBTree_CustomGetData( &LCUIWidget.ids, idstr );
+	LCUIMutex_Lock( &LCUIWidget.mutex );
+	w = Dict_FetchValue( LCUIWidget.ids, idstr );
+	LCUIMutex_Unlock( &LCUIWidget.mutex );
+	return w;
 }
 
 LCUI_Widget Widget_GetPrev( LCUI_Widget w )
@@ -479,18 +484,24 @@ void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 
 int Widget_SetId( LCUI_Widget w, const char *idstr )
 {
+	LCUIMutex_Lock( &LCUIWidget.mutex );
 	if( w->id ) {
-		RBTree_CustomErase( &LCUIWidget.ids, idstr );
+		Dict_Delete( LCUIWidget.ids, idstr );
 		free( w->id );
 		w->id = NULL;
 	}
 	if( !idstr ) {
+		LCUIMutex_Unlock( &LCUIWidget.mutex );
 		return -1;
 	}
 	w->id = strdup( idstr );
-	if( RBTree_CustomInsert( &LCUIWidget.ids, idstr, w ) ) {
+	if( Dict_Add( LCUIWidget.ids, w->id, w ) == 0 ) {
+		LCUIMutex_Unlock( &LCUIWidget.mutex );
 		return 0;
 	}
+	LCUIMutex_Unlock( &LCUIWidget.mutex );
+	free( w->id );
+	w->id = NULL;
 	return -2;
 }
 
@@ -1684,13 +1695,13 @@ void LCUI_InitWidget( void )
 	LCUIWidget_AddTScrollBar();
 	LCUIWidget_AddTextCaret();
 	LCUIWidget_AddTextEdit();
-	RBTree_Init( &LCUIWidget.ids );
-	RBTree_OnCompare( &LCUIWidget.ids, CompareWidgetId );
-	LCUIWidget.root = LCUIWidget_New("root");
+	LCUIMutex_Init( &LCUIWidget.mutex );
+	LCUIWidget.ids = Dict_Create( &DictType_StringKey, NULL );
+	LCUIWidget.root = LCUIWidget_New( "root" );
 	Widget_SetTitleW( LCUIWidget.root, L"LCUI Display" );
 }
 
-void LCUI_ExitWidget(void)
+void LCUI_ExitWidget( void )
 {
 
 }

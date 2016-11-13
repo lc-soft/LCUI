@@ -54,10 +54,10 @@
 /** 初始化红黑树 */
 void RBTree_Init( RBTree *rbt )
 {
-        rbt->root = NULL;
+	rbt->root = NULL;
 	rbt->compare = NULL;
 	rbt->destroy = NULL;
-        rbt->total_node = 0;
+	rbt->total_node = 0;
 }
 
 static void DestroyRBTreeNode( RBTree *rbt, RBTreeNode *node )
@@ -92,37 +92,37 @@ void RBTree_Destroy( RBTree *rbt )
 /** 获取第一个结点 */
 RBTreeNode *RBTree_First( const RBTree *rbt )
 {
-        RBTreeNode *node;
+	RBTreeNode *node;
 
-        node = rbt->root;
-        if( !node ) {
-                return NULL;
-        }
-        while( node->left ) {
-                node = node->left;
-        }
-        return node;
+	node = rbt->root;
+	if( !node ) {
+		return NULL;
+	}
+	while( node->left ) {
+		node = node->left;
+	}
+	return node;
 }
 
 /** 获取下一个结点 */
 RBTreeNode *RBTree_Next( const RBTreeNode *node )
 {
-        RBTreeNode *parent;
+	RBTreeNode *parent;
 
-        if( node->parent == node ) {
-                return NULL;
-        }
-        if( node->right ) {
-                node = node->right;
-                while( node->left ) {
-                        node = node->left;
-                }
-                return (RBTreeNode*)node;
-        }
-        while ((parent = node->parent) && node == parent->right ) {
-                node = parent;
-        }
-        return parent;
+	if( node->parent == node ) {
+		return NULL;
+	}
+	if( node->right ) {
+		node = node->right;
+		while( node->left ) {
+			node = node->left;
+		}
+		return (RBTreeNode*)node;
+	}
+	while ((parent = node->parent) && node == parent->right ) {
+		node = parent;
+	}
+	return parent;
 }
 
 /**
@@ -137,25 +137,25 @@ RBTreeNode *RBTree_Next( const RBTreeNode *node )
 static RBTreeNode*
 rb_rotate_left( RBTreeNode* node, RBTreeNode* root )
 {
-        RBTreeNode* right = node->right;
+	RBTreeNode* right = node->right;
 
-        if ((node->right = right->left)) {
-                right->left->parent = node;
-        }
-        right->left = node;
+	if ((node->right = right->left)) {
+		right->left->parent = node;
+	}
+	right->left = node;
 
-        if ((right->parent = node->parent)) {
-                if (node == node->parent->right) {
-                        node->parent->right = right;
-                } else {
-                        node->parent->left = right;
-                }
-        } else {
-                root = right;
-        }
-        node->parent = right;
+	if ((right->parent = node->parent)) {
+		if (node == node->parent->right) {
+			node->parent->right = right;
+		} else {
+			node->parent->left = right;
+		}
+	} else {
+		root = right;
+	}
+	node->parent = right;
 
-        return root;
+	return root;
 }
 
 /**
@@ -170,90 +170,90 @@ rb_rotate_left( RBTreeNode* node, RBTreeNode* root )
 static RBTreeNode*
 rb_rotate_right( RBTreeNode* node, RBTreeNode* root )
 {
-        RBTreeNode* left = node->left;
+	RBTreeNode* left = node->left;
 
-        if ((node->left = left->right)) {
-                left->right->parent = node;
-        }
-        left->right = node;
+	if ((node->left = left->right)) {
+		left->right->parent = node;
+	}
+	left->right = node;
 
-        if ((left->parent = node->parent)) {
-                if (node == node->parent->right) {
-                        node->parent->right = left;
-                } else {
-                        node->parent->left = left;
-                }
-        } else {
-                root = left;
-        }
-        node->parent = left;
+	if ((left->parent = node->parent)) {
+		if (node == node->parent->right) {
+			node->parent->right = left;
+		} else {
+			node->parent->left = left;
+		}
+	} else {
+		root = left;
+	}
+	node->parent = left;
 
-        return root;
+	return root;
 }
 
 static RBTreeNode*
 rb_insert_rebalance( RBTreeNode *root, RBTreeNode *node )
 {
-        RBTreeNode *parent, *gparent, *uncle, *tmp;
+	RBTreeNode *parent, *gparent, *uncle, *tmp;
 
-        while ((parent = node->parent) && parent->color == RED) {
-                gparent = parent->parent;
+	while ((parent = node->parent) && parent->color == RED) {
+		gparent = parent->parent;
 
-                if (parent == gparent->left) {
-                        uncle = gparent->right;
-                        if (uncle && uncle->color == RED) {
-                                uncle->color = BLACK;
-                                parent->color = BLACK;
-                                gparent->color = RED;
-                                node = gparent;
-                        } else {
-                                if (parent->right == node) {
-                                        root = rb_rotate_left(parent, root);
-                                        tmp = parent;
-                                        parent = node;
-                                        node = tmp;
-                                }
-                                parent->color = BLACK;
-                                gparent->color = RED;
-                                root = rb_rotate_right(gparent, root);
-                        }
-                } else {
-                        uncle = gparent->left;
-                        if (uncle && uncle->color == RED) {
-                                uncle->color = BLACK;
-                                parent->color = BLACK;
-                                gparent->color = RED;
-                                node = gparent;
-                        } else {
-                                if (parent->left == node) {
-                                        root = rb_rotate_right(parent, root);
-                                        tmp = parent;
-                                        parent = node;
-                                        node = tmp;
-                                }
-                                parent->color = BLACK;
-                                gparent->color = RED;
-                                root = rb_rotate_left(gparent, root);
-                        }
-                }
-        }
+		if (parent == gparent->left) {
+			uncle = gparent->right;
+			if (uncle && uncle->color == RED) {
+				uncle->color = BLACK;
+				parent->color = BLACK;
+				gparent->color = RED;
+				node = gparent;
+			} else {
+				if (parent->right == node) {
+					root = rb_rotate_left(parent, root);
+					tmp = parent;
+					parent = node;
+					node = tmp;
+				}
+				parent->color = BLACK;
+				gparent->color = RED;
+				root = rb_rotate_right(gparent, root);
+			}
+		} else {
+			uncle = gparent->left;
+			if (uncle && uncle->color == RED) {
+				uncle->color = BLACK;
+				parent->color = BLACK;
+				gparent->color = RED;
+				node = gparent;
+			} else {
+				if (parent->left == node) {
+					root = rb_rotate_right(parent, root);
+					tmp = parent;
+					parent = node;
+					node = tmp;
+				}
+				parent->color = BLACK;
+				gparent->color = RED;
+				root = rb_rotate_left(gparent, root);
+			}
+		}
+	}
 
-        root->color = BLACK;
-        return root;
+	root->color = BLACK;
+	return root;
 }
 
 /** 红黑树查找结点 */
 static RBTreeNode*
 rb_search_auxiliary( RBTreeNode *root, int key, const void *keydata,
-		int (*judge)(void*,const void*), RBTreeNode **save )
+		int (*cmp)(void*,const void*), RBTreeNode **save )
 {
 	int ret;
-        RBTreeNode *node = root, *parent = NULL;
+	RBTreeNode *node = root, *parent = NULL;
 
-        while( node ) {
-                parent = node;
-		if( judge && keydata ) {
-			ret = judge( node->data, keydata );
+	while( node ) {
+		parent = node;
+		if( cmp && keydata ) {
+			ret = cmp( node->data, keydata );
 			if( ret > 0 ) {
 				node = node->left;
 			}
@@ -264,18 +264,18 @@ rb_search_auxiliary( RBTreeNode *root, int key, const void *keydata,
 			}
 			continue;
 		}
-                if ( node->key > key ) {
-                        node = node->left;
-                } else if ( node->key < key ) {
-                        node = node->right;
-                } else {
-                        return node;
-                }
-        }
-        if( save ) {
-                *save = parent;
-        }
-        return NULL;
+		if ( node->key > key ) {
+			node = node->left;
+		} else if ( node->key < key ) {
+			node = node->right;
+		} else {
+			return node;
+		}
+	}
+	if( save ) {
+		*save = parent;
+	}
+	return NULL;
 }
 
 RBTreeNode* RBTree_CustomSearch( RBTree* rbt, const void *keydata )
@@ -290,45 +290,45 @@ RBTreeNode* RBTree_Search( RBTree* rbt, int key )
 
 void* RBTree_CustomGetData( RBTree* rbt, const void *keydata )
 {
-        RBTreeNode *node;
+	RBTreeNode *node;
 	node = rb_search_auxiliary( rbt->root, 0, keydata, rbt->compare, NULL );
-        if( node ) {
-                return node->data;
-        }
-        return NULL;
+	if( node ) {
+		return node->data;
+	}
+	return NULL;
 }
 
 void* RBTree_GetData( RBTree* rbt, int key )
 {
-        RBTreeNode *node;
+	RBTreeNode *node;
 	node = rb_search_auxiliary( rbt->root, key, NULL, rbt->compare, NULL );
-        if( node ) {
-                return node->data;
-        }
-        return NULL;
+	if( node ) {
+		return node->data;
+	}
+	return NULL;
 }
 
 static RBTreeNode*
 rb_insert( RBTree *rbt, int key, const void *keydata, void *data )
 {
-        RBTreeNode *root, *node, *parent_node;
+	RBTreeNode *root, *node, *parent_node;
 
-        parent_node = NULL;
-        root = rbt->root;
+	parent_node = NULL;
+	root = rbt->root;
 	node = rb_search_auxiliary( root, key, keydata, rbt->compare, &parent_node );
-        if( node ) {
-                return NULL;
-        }
+	if( node ) {
+		return NULL;
+	}
 
-        node = (RBTreeNode*)malloc( sizeof(RBTreeNode) );
-        node->left = NULL;
-        node->parent = parent_node;
-        node->right = NULL;
-        node->data = data;
-        node->key = key;
-        node->color = RED;
+	node = (RBTreeNode*)malloc( sizeof(RBTreeNode) );
+	node->left = NULL;
+	node->parent = parent_node;
+	node->right = NULL;
+	node->data = data;
+	node->key = key;
+	node->color = RED;
 
-        if( parent_node ) {
+	if( parent_node ) {
 		if( rbt->compare && keydata ) {
 			if( rbt->compare( parent_node->data, keydata ) > 0 ) {
 				parent_node->left = node;
@@ -342,13 +342,13 @@ rb_insert( RBTree *rbt, int key, const void *keydata, void *data )
 				parent_node->right = node;
 			}
 		}
-        } else {
-                root = node;
-        }
-        rbt->total_node += 1;
-        /* 调整红黑树的平衡 */
-        rbt->root = rb_insert_rebalance( root, node );
-        return node;
+	} else {
+		root = node;
+	}
+	rbt->total_node += 1;
+	/* 调整红黑树的平衡 */
+	rbt->root = rb_insert_rebalance( root, node );
+	return node;
 }
 
 RBTreeNode* RBTree_Insert( RBTree *rbt, int key, void *data )
@@ -364,81 +364,81 @@ RBTreeNode* RBTree_CustomInsert( RBTree *rbt, const void *keydata, void *data )
 /** 在树中的结点被删除后调整平衡 */
 static RBTreeNode*
 rb_erase_rebalance( RBTreeNode *node, RBTreeNode *parent,
-                                                RBTreeNode *root )
+		    RBTreeNode *root )
 {
-        RBTreeNode *other, *o_left, *o_right;
+	RBTreeNode *other, *o_left, *o_right;
 
-        while ((!node || node->color == BLACK) && node != root) {
-                if (parent->left == node) {
-                        other = parent->right;
-                        if (other->color == RED) {
-                                other->color = BLACK;
-                                parent->color = RED;
-                                root = rb_rotate_left(parent, root);
-                                other = parent->right;
-                        }
-                        if ((!other->left || other->left->color == BLACK)
-                         && (!other->right || other->right->color == BLACK)) {
-                                other->color = RED;
-                                node = parent;
-                                parent = node->parent;
-                                continue;
-                        }
-                        if (!other->right || other->right->color == BLACK) {
-                                if ((o_left = other->left)) {
-                                        o_left->color = BLACK;
-                                }
-                                other->color = RED;
-                                root = rb_rotate_right(other, root);
-                                other = parent->right;
-                        }
-                        other->color = parent->color;
-                        parent->color = BLACK;
-                        if (other->right) {
-                                other->right->color = BLACK;
-                        }
-                        root = rb_rotate_left(parent, root);
-                        node = root;
-                        break;
-                }
+	while( (!node || node->color == BLACK) && node != root ) {
+		if( parent->left == node ) {
+			other = parent->right;
+			if( other->color == RED ) {
+				other->color = BLACK;
+				parent->color = RED;
+				root = rb_rotate_left( parent, root );
+				other = parent->right;
+			}
+			if( (!other->left || other->left->color == BLACK)
+			    && (!other->right || other->right->color == BLACK) ) {
+				other->color = RED;
+				node = parent;
+				parent = node->parent;
+				continue;
+			}
+			if( !other->right || other->right->color == BLACK ) {
+				if( (o_left = other->left) ) {
+					o_left->color = BLACK;
+				}
+				other->color = RED;
+				root = rb_rotate_right( other, root );
+				other = parent->right;
+			}
+			other->color = parent->color;
+			parent->color = BLACK;
+			if( other->right ) {
+				other->right->color = BLACK;
+			}
+			root = rb_rotate_left( parent, root );
+			node = root;
+			break;
+		}
 
-                other = parent->left;
-                if (other->color == RED) {
-                        other->color = BLACK;
-                        parent->color = RED;
-                        root = rb_rotate_right(parent, root);
-                        other = parent->left;
-                }
-                if ((!other->left || other->left->color == BLACK)
-                 && (!other->right || other->right->color == BLACK)) {
-                        other->color = RED;
-                        node = parent;
-                        parent = node->parent;
-                        continue;
-                }
+		other = parent->left;
+		if( other->color == RED ) {
+			other->color = BLACK;
+			parent->color = RED;
+			root = rb_rotate_right( parent, root );
+			other = parent->left;
+		}
+		if( (!other->left || other->left->color == BLACK)
+		    && (!other->right || other->right->color == BLACK) ) {
+			other->color = RED;
+			node = parent;
+			parent = node->parent;
+			continue;
+		}
 
-                if (!other->left || other->left->color == BLACK) {
-                        if ((o_right = other->right)) {
-                                o_right->color = BLACK;
-                        }
-                        other->color = RED;
-                        root = rb_rotate_left(other, root);
-                        other = parent->left;
-                }
-                other->color = parent->color;
-                parent->color = BLACK;
-                if (other->left) {
-                        other->left->color = BLACK;
-                }
-                root = rb_rotate_right(parent, root);
-                node = root;
-                break;
-        }
+		if( !other->left || other->left->color == BLACK ) {
+			if( (o_right = other->right) ) {
+				o_right->color = BLACK;
+			}
+			other->color = RED;
+			root = rb_rotate_left( other, root );
+			other = parent->left;
+		}
+		other->color = parent->color;
+		parent->color = BLACK;
+		if( other->left ) {
+			other->left->color = BLACK;
+		}
+		root = rb_rotate_right( parent, root );
+		node = root;
+		break;
+	}
 
-        if( node ) {
-                node->color = BLACK;
-        }
-        return root;
+	if( node ) {
+		node->color = BLACK;
+	}
+	return root;
 }
 
 static void rb_erase_by_node( RBTree *rbt, RBTreeNode *node )
