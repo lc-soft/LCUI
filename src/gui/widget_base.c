@@ -486,7 +486,7 @@ int Widget_SetId( LCUI_Widget w, const char *idstr )
 {
 	LCUIMutex_Lock( &LCUIWidget.mutex );
 	if( w->id ) {
-		Dict_Delete( LCUIWidget.ids, idstr );
+		Dict_Delete( LCUIWidget.ids, w->id );
 		free( w->id );
 		w->id = NULL;
 	}
