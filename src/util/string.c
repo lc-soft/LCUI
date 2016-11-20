@@ -139,7 +139,7 @@ int cmdsplit( const char *cmd, char ***outargv )
 					goto faild;
 				}
 				len -= 1;
-				strncpy_s( argv[argc], size, p, len );
+				strncpy( argv[argc], p, len );
 				argv[argc][len] = 0;
 			}
 			p = NULL;

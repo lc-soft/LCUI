@@ -1671,11 +1671,6 @@ void Widget_PrintTree( LCUI_Widget w )
 	_LCUIWidget_PrintTree( w, 0, "  " );
 }
 
-static int CompareWidgetId( void *data, const void *keydata )
-{
-	return strcmp(((LCUI_Widget)data)->id, (const char*)keydata);
-}
-
 extern void LCUIWidget_AddTextView( void );
 extern void LCUIWidget_AddButton( void );
 extern void LCUIWidget_AddSideBar( void );
