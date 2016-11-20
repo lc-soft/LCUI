@@ -30,11 +30,14 @@ int main(void)
 	_wchdir( L"../test/" );
 	InitConsoleWindow();
 #endif
-	LCUI_Init();
-	ret += TestCSSParser();
+	ret |= test_string();/*
+	ret |= test_css_parser();
+	ret |= test_widget_render();
+	ret |= test_char_render();
+	ret |= test_string_render();*/
 	printf("test result code: %d\n", ret);
 #ifdef LCUI_BUILD_IN_WIN32
-	system("pause");
+	system( "pause" );
 #endif
 	return ret;
 }

@@ -1,14 +1,15 @@
-﻿#include <LCUI_Build.h>
+﻿#include <stdio.h>
+#include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
-#include <LCUI/gui/widget.h>
 #include <LCUI/gui/builder.h>
+#include "test.h"
 
-#define assert(X) if(!(X)) {return -1;}
-
-int TestCSSParser(void)
+int test_css_parser( void )
 {
 	LCUI_Widget box, btn, text;
+
+	LCUI_Init();
 	box = LCUIBuilder_LoadFile( "test_css_parser.xml" );
 	if( !box ) {
 		return -1;
@@ -16,6 +17,10 @@ int TestCSSParser(void)
 	text = LCUIWidget_GetById( "test-textview" );
 	Widget_UpdateStyle( text, TRUE );
 	Widget_Update( text );
+	LCUI_PrintCSSLibrary();
+	printf( "test widget style: {\n" );
+	LCUI_PrintStyleSheet( text->style );
+	printf( "}\n" );
 	assert( text->style->sheet[key_width].val_px == 100 );
 	assert( text->style->sheet[key_height].val_px == 60 );
 	assert( text->style->sheet[key_position].val_style == SV_ABSOLUTE );
@@ -28,5 +33,6 @@ int TestCSSParser(void)
 	Widget_Update( text );
 	assert( text->style->sheet[key_background_color].val_color.value == 0xffff0000 );
 	assert( text->style->sheet[key_background_size].val_style == SV_CONTAIN );
+	LCUI_Destroy();
 	return 0;
 }
