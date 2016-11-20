@@ -36,19 +36,13 @@
 * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
 * 没有，请查看：<http://www.gnu.org/licenses/>.
 * ****************************************************************************/
-#include <tchar.h>
+
+#include <errno.h>
 #include <Windows.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
-#ifdef _UNICODE
-#define _tcstok_s wcstok_s
-#define _tcscpy_s wcscpy_s
-#else
-#define _tcstok_s strtok_s
-#define _tcscpy_s strcpy_s
-#endif
 
 extern int main( int argc, char *argv[] );
 
@@ -57,48 +51,18 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance,
 		      _In_ LPSTR lpCmdLine,
 		      _In_ int nCmdShow )
 {
-	int ret, len, i = 0, argc = 0;
-	char *cmdline, *cmdline_buff;
-	char *token = NULL, *next_token = NULL, **argv = NULL;
-
+	char *cmdline;
+	int ret, argc = 0;
+	char **argv = NULL;
 	UNREFERENCED_PARAMETER( hPrevInstance );
 	UNREFERENCED_PARAMETER( lpCmdLine );
 	LCUI_PreInitApp( hInstance );
 	cmdline = GetCommandLineA();
-	len = strlen( cmdline ) + 1;
-	cmdline_buff = (char*)malloc( sizeof( char )*len );
-	if( !cmdline_buff ) {
-		return -1;
-	}
-	strcpy_s( cmdline_buff, len, cmdline );
-	token = strtok_s( cmdline_buff, " \r\t\n", &next_token );
-	while( token ) {
-		argc++;
-		token = strtok_s( NULL, " \r\t\n", &next_token );
-	}
-	if( argc > 0 ) {
-		argv = (char**)malloc( sizeof( char* )*argc );
-	}
-	if( !argv ) {
-		return -1;
-	}
-	strcpy_s( cmdline_buff, len, cmdline );
-	token = strtok_s( cmdline_buff, " \r\t\n", &next_token );
-	while( token && i < argc ) {
-		len = strlen( token ) + 1;
-		argv[i] = (char*)malloc( sizeof( char )*len );
-		if( argv[i] == NULL ) {
-			return -1;
-		}
-		strcpy_s( argv[i], len, token );
-		token = strtok_s( NULL, " \r\t\n", &next_token );
-		++i;
-	}
+	argc = cmdsplit( cmdline, &argv );
 	ret = main( argc, (char**)argv );
-	for( i = 0; i < argc; ++i ) {
-		free( argv[i] );
+	while( argc-- > 0 ) {
+		free( argv[argc] );
 	}
 	free( argv );
-	free( cmdline_buff );
 	return ret;
 }

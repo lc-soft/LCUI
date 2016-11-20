@@ -534,8 +534,7 @@ int LCUI_Init(void)
 	return 0;
 }
 
-/** 释放LCUI占用的资源 */
-static int LCUI_Destroy( void )
+int LCUI_Destroy( void )
 {
 	LCUI_SysEventRec e;
 	e.type = LCUI_QUIT;
@@ -553,7 +552,7 @@ static int LCUI_Destroy( void )
 	return 0;
 }
 
-void LCUI_Quit(void)
+void LCUI_Quit( void )
 {
 	System.state = STATE_KILLED;
 	LCUIApp_QuitAllMainLoop();

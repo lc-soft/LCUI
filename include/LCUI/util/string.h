@@ -72,6 +72,14 @@ LCUI_BEGIN_HEADER
 LCUI_API int strtrim( char *outstr, const char *instr, const char *charlist );
 
 /**
+* 分割命令行字符串
+* @param[in] cmd 需分割的命令行字符串
+* @param[out] outargv 分割后的命令行参数列表
+* @return 参数数量
+*/
+LCUI_API int cmdsplit( const char *cmd, char ***outargv );
+
+/**
  * 分割字符串
  * @param[in] instr 需分割的字符串
  * @param[in] sep 分割标记字符串

@@ -93,6 +93,96 @@ void freestrs( char **strs )
 	free( strs );
 }
 
+int cmdsplit( const char *cmd, char ***outargv )
+{
+	size_t size;
+	char **argv = NULL, **tmp;
+	const char *cur = cmd, *p = NULL;
+	int argc = 0, spaces = 0, qoutes = 0, len = 0;
+
+	if( outargv ) {
+		argv = malloc( sizeof( char* ) );
+		if( !argv ) {
+			return -ENOMEM;
+		}
+		argv[0] = NULL;
+	}
+	while( 1 ) {
+		switch( *cur ) {
+		case 0:
+		case '\n':
+		case '\r':
+		case '\t':
+		case ' ':
+			if( *cur != 0 ) {
+				if( spaces != 0 ) {
+					break;
+				}
+				++spaces;
+				if( qoutes > 0 && qoutes % 2 != 0 ) {
+					++len;
+					break;
+				}
+			}
+			if( argv && len > 0 ) {
+				size = sizeof( char* ) * (argc + 2);
+				tmp = realloc( argv, size );
+				if( !tmp ) {
+					goto faild;
+				}
+				len += 1;
+				argv = tmp;
+				argv[argc + 1] = NULL;
+				size = sizeof( char ) * len;
+				argv[argc] = malloc( size );
+				if( !argv[argc] ) {
+					goto faild;
+				}
+				len -= 1;
+				strncpy_s( argv[argc], size, p, len );
+				argv[argc][len] = 0;
+			}
+			p = NULL;
+			if( len > 0 ) {
+				++argc;
+			}
+			qoutes = 0;
+			len = 0;
+			if( *cur == 0 ) {
+				goto done;
+			}
+			break;
+		case '"':
+			++qoutes;
+		default: 
+			if( !p ) {
+				p = cur;
+			}
+			spaces = 0;
+			++len;
+			break;
+		}
+		++cur;
+	}
+
+done:
+	if( argv ) {
+		*outargv = argv;
+	}
+	return argc;
+
+faild:
+	argc += 1;
+	while( argc-- > 0 ) {
+		if( argv[argc] ) {
+			free( argv[argc] );
+			argv[argc] = NULL;
+		}
+	}
+	free( argv );
+	return -ENOMEM;
+}
+
 int strsplit( const char *instr, const char *sep, char ***outstrs )
 {
 	int len, i = 0;

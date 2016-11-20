@@ -194,10 +194,11 @@ LCUI_API int LCUI_Main( void );
 /* 获取LCUI的版本 */
 LCUI_API int LCUI_GetSelfVersion( char *out );
 
+/** 释放LCUI占用的资源 */
+LCUI_API int LCUI_Destroy( void );
+
 /* 退出LCUI，释放LCUI占用的资源 */
 LCUI_API void LCUI_Quit( void );
-
-LCUI_API void LCUI_Exit( int exit_code );
 
 /** 检测当前是否在主线程上 */
 LCUI_API LCUI_BOOL LCUI_IsOnMainLoop(void);
