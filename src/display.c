@@ -69,7 +69,7 @@ static struct DisplayContext {
 	LCUI_Thread thread;		/**< 线程，负责画面更新工作 */
 	LinkedList surfaces;		/**< surface 列表 */
 	LCUI_Mutex mutex;
-	LCUI_DisplayDriverRec driver;
+	LCUI_DisplayDriver driver;
 } display = { LCDM_DEFAULT, FALSE, FALSE, NULL };
 
 /** 获取当前的屏幕内容每秒更新的帧数 */
@@ -354,7 +354,7 @@ int LCUIDisplay_GetWidth( void )
 	    display.mode == LCDM_FULLSCREEN ) {
 		return LCUIWidget_GetRoot()->width;
 	}
-	return display.driver.getWidth();
+	return display.driver->getWidth();
 }
 
 /** 获取屏幕高度 */
@@ -367,7 +367,7 @@ int LCUIDisplay_GetHeight( void )
 	    display.mode == LCDM_FULLSCREEN ) {
 		return LCUIWidget_GetRoot()->height;
 	}
-	return display.driver.getHeight();
+	return display.driver->getHeight();
 }
 
 /** LCUI的图形显示处理线程 */
@@ -388,14 +388,14 @@ static void LCUIDisplay_Thread( void *unused )
 void Surface_Delete( LCUI_Surface surface )
 {
 	if( display.is_working ) {
-		display.driver.destroy( surface );
+		display.driver->destroy( surface );
 	}
 }
 
 LCUI_Surface Surface_New( void )
 {
 	if( display.is_working ) {
-		return display.driver.create();
+		return display.driver->create();
 	}
 	return NULL;
 }
@@ -403,7 +403,7 @@ LCUI_Surface Surface_New( void )
 LCUI_BOOL Surface_IsReady( LCUI_Surface surface )
 {
 	if( display.is_working ) {
-		return display.driver.isReady( surface );
+		return display.driver->isReady( surface );
 	}
 	return TRUE;
 }
@@ -411,42 +411,42 @@ LCUI_BOOL Surface_IsReady( LCUI_Surface surface )
 void Surface_Move( LCUI_Surface surface, int x, int y )
 {
 	if( display.is_working ) {
-		display.driver.move( surface, x, y );
+		display.driver->move( surface, x, y );
 	}
 }
 
 void Surface_Resize( LCUI_Surface surface, int w, int h )
 {
 	if( display.is_working ) {
-		display.driver.resize( surface, w, h );
+		display.driver->resize( surface, w, h );
 	}
 }
 
 void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 {
 	if( display.is_working ) {
-		display.driver.setCaptionW( surface, str );
+		display.driver->setCaptionW( surface, str );
 	}
 }
 
 void Surface_Show( LCUI_Surface surface )
 {
 	if( display.is_working ) {
-		display.driver.show( surface );
+		display.driver->show( surface );
 	}
 }
 
 void Surface_Hide( LCUI_Surface surface )
 {
 	if( display.is_working ) {
-		display.driver.hide( surface );
+		display.driver->hide( surface );
 	}
 }
 
 void *Surface_GetHandle( LCUI_Surface surface )
 {
 	if( display.is_working ) {
-		return display.driver.getHandle( surface );
+		return display.driver->getHandle( surface );
 	}
 	return NULL;
 }
@@ -454,21 +454,21 @@ void *Surface_GetHandle( LCUI_Surface surface )
 void Surface_SetRenderMode( LCUI_Surface surface, int mode )
 {
 	if( display.is_working ) {
-		display.driver.setRenderMode( surface, mode );
+		display.driver->setRenderMode( surface, mode );
 	}
 }
 
 void Surface_Update( LCUI_Surface surface )
 {
 	if( display.is_working ) {
-		display.driver.update( surface );
+		display.driver->update( surface );
 	}
 }
 
 LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 {
 	if( display.is_working ) {
-		return display.driver.beginPaint( surface, rect );
+		return display.driver->beginPaint( surface, rect );
 	}
 	return NULL;
 }
@@ -476,14 +476,14 @@ LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 {
 	if( display.is_working ) {
-		display.driver.endPaint( surface, paint_ctx );
+		display.driver->endPaint( surface, paint_ctx );
 	}
 }
 
 void Surface_Present( LCUI_Surface surface )
 {
 	if( display.is_working ) {
-		display.driver.present( surface );
+		display.driver->present( surface );
 	}
 }
 
@@ -578,36 +578,39 @@ int LCUIDisplay_BindEvent( int event_id, LCUI_EventFunc func, void *arg,
 			   void *data, void( *destroy_data )(void*) )
 {
 	if( display.is_working ) {
-		return display.driver.bindEvent( event_id, func, 
-						 data, destroy_data );
+		return display.driver->bindEvent( event_id, func,
+						  data, destroy_data );
 	}
 	return -1;
 }
 
-/** 初始化图形输出模块 */
-int LCUI_InitDisplay( void )
+int LCUI_InitDisplay( LCUI_DisplayDriver driver )
 {
 	LCUI_Widget root;
 	if( display.is_working ) {
 		return -1;
 	}
-	printf("[display] init ...\n");
+	LOG("[display] init ...\n");
 	display.mode = 0;
 	root = LCUIWidget_GetRoot();
 	LCUIMutex_Init( &display.mutex );
 	LinkedList_Init( &display.surfaces );
-	if( LCUI_InitDisplayDriver( &display.driver ) != 0 ) {
-		printf("[display] init failed\n");
-		return -2;
+	if( !driver ) {
+		driver = LCUI_CreateDisplayDriver();
+		if( !driver ) {
+			LOG("[display] init failed\n");
+			return -2;
+		}
 	}
+	display.driver = driver;
 	display.is_working = TRUE;
 	display.fc_ctx = FrameControl_Create();
-	display.driver.bindEvent( DET_RESIZE, OnResize, NULL, NULL );
-	display.driver.bindEvent( DET_PAINT, OnPaint, NULL, NULL );
+	display.driver->bindEvent( DET_RESIZE, OnResize, NULL, NULL );
+	display.driver->bindEvent( DET_PAINT, OnPaint, NULL, NULL );
 	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	LCUIDisplay_SetMode( LCDM_DEFAULT );
-	printf("[display] init ok, driver name: %s\n", display.driver.name);
+	LOG("[display] init ok, driver name: %s\n", display.driver->name);
 	return LCUIThread_Create( &display.thread, LCUIDisplay_Thread, NULL );
 }
 

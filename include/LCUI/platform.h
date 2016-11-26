@@ -5,8 +5,8 @@
 #define LCUI_InitApp LCUI_InitWinApp
 #define LCUI_ExitApp LCUI_ExitWinApp
 #define LCUI_PreInitApp LCUI_PreInitWinApp
-#define LCUI_InitDisplayDriver LCUI_InitWinDisplay
-#define LCUI_ExitDisplayDriver LCUI_ExitWinDisplay
+#define LCUI_CreateDisplayDriver LCUI_CreateWinDisplay
+#define LCUI_DestroyDisplayDriver LCUI_DestroyWinDisplay
 #define LCUI_InitMouseDriver LCUI_InitWinMouse
 #define LCUI_ExitMouseDriver LCUI_ExitWinMouse
 #define LCUI_InitKeyboardDriver LCUI_InitWinKeyboard
@@ -19,8 +19,8 @@
 #define LCUI_InitApp LCUI_InitLinuxApp
 #define LCUI_ExitApp LCUI_ExitLinuxApp
 #define LCUI_PreInitApp LCUI_PreInitLinuxApp
-#define LCUI_InitDisplayDriver LCUI_InitLinuxDisplay
-#define LCUI_ExitDisplayDriver LCUI_ExitLinuxDisplay
+#define LCUI_CreateDisplayDriver LCUI_CreateLinuxDisplay
+#define LCUI_DestroyDisplayDriver LCUI_DestroyLinuxDisplay
 #define LCUI_InitMouseDriver LCUI_InitLinuxMouse
 #define LCUI_ExitMouseDriver LCUI_ExitLinuxMouse
 #define LCUI_InitKeyboardDriver LCUI_InitLinuxKeyboard

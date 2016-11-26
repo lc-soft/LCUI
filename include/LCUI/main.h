@@ -158,6 +158,8 @@ LCUI_API void *LCUI_GetAppData( void );
 
 LCUI_API void LCUI_SetTaskAgent( LCUI_BOOL enabled );
 
+LCUI_API void LCUI_DispatchEvent( void );
+
 /** 添加任务 */
 LCUI_API LCUI_BOOL LCUI_PostTask( LCUI_AppTask task );
 
@@ -177,13 +179,15 @@ LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop loop );
 LCUI_API void LCUI_MainLoop_Quit( LCUI_MainLoop loop );
 
 /* 检测LCUI是否活动 */ 
-LCUI_API LCUI_BOOL LCUI_IsActive(void);
+LCUI_API LCUI_BOOL LCUI_IsActive( void );
+
+LCUI_API void LCUI_InitBase( void );
 
 /* 
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
  * */ 
-LCUI_API int LCUI_Init( void );
+LCUI_API void LCUI_Init( void );
 
 /* 
  * 功能：LCUI程序的主循环

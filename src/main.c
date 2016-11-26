@@ -208,7 +208,7 @@ void LCUI_DestroyEvent( LCUI_SysEvent e )
 
 /*--------------------------- system event <END> ----------------------------*/
 
-static void LCUI_DispatchEvent( void )
+void LCUI_DispatchEvent( void )
 {
 	LCUI_AppTask task;
 	LinkedListNode *node;
@@ -445,7 +445,7 @@ static void LCUIApp_Destroy(void)
 /** 打印LCUI的信息 */
 static void LCUI_ShowCopyrightText(void)
 {
-	printf( "           ________\n"
+	Logger_Log( "           ________\n"
 		" _        |______  |\n"
 		"| |   __    __   | |\n"
 		"| |  |  |  |__|  | |\n"
@@ -506,14 +506,10 @@ LCUI_BOOL LCUI_IsOnMainLoop(void)
 	return (MainApp.loop->tid == LCUIThread_SelfID());
 }
 
-/*
- * 功能：用于对LCUI进行初始化操作
- * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
- * */
-int LCUI_Init(void)
+void LCUI_InitBase( void )
 {
 	if( System.is_inited ) {
-		return -1;
+		return;
 	}
 	System.is_inited = TRUE;
 	System.state = STATE_ACTIVE;
@@ -524,14 +520,18 @@ int LCUI_Init(void)
 	LCUI_InitEvent();
 	LCUI_InitFont();
 	LCUI_InitTimer();
-	LCUI_InitMouseDriver();
-	LCUI_InitKeyboardDriver();
 	LCUI_InitKeyboard();
 	LCUI_InitIME();
 	LCUI_InitWidget();
-	LCUI_InitDisplay();
+}
+
+void LCUI_Init( void )
+{
+	LCUI_InitBase();
+	LCUI_InitMouseDriver();
+	LCUI_InitKeyboardDriver();
+	LCUI_InitDisplay( NULL );
 	LCUI_InitCursor();
-	return 0;
 }
 
 int LCUI_Destroy( void )

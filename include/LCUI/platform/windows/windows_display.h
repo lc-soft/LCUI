@@ -40,8 +40,8 @@
 #ifndef LCUI_WINDOWS_DISPLAY_H
 #define LCUI_WINDOWS_DISPLAY_H
 
-int LCUI_InitWinDisplay( LCUI_DisplayDriver driver );
+LCUI_DisplayDriver LCUI_CreateWinDisplay( void );
 
-int LCUI_ExitWinDisplay( void );
+void LCUI_DestroyWinDisplay( LCUI_DisplayDriver driver );
 
 #endif

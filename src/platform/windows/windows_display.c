@@ -460,8 +460,9 @@ static int WinDisplay_GetHeight( void )
 	return GetSystemMetrics( SM_CYSCREEN );
 }
 
-int LCUI_InitWinDisplay( LCUI_DisplayDriver driver )
+LCUI_DisplayDriver LCUI_CreateWinDisplay( void )
 {
+	ASSIGN( driver, LCUI_DisplayDriver );
 	strcpy( driver->name, "windows" );
 	driver->getWidth = WinDisplay_GetWidth;
 	driver->getHeight = WinDisplay_GetHeight;
@@ -487,13 +488,12 @@ int LCUI_InitWinDisplay( LCUI_DisplayDriver driver )
 	LinkedList_Init( &win.surfaces );
 	win.trigger = EventTrigger();
 	win.is_inited = TRUE;
-	return 0;
+	return driver;
 }
 
-int LCUI_ExitWinDisplay( void )
+void LCUI_DestroyWinDisplay( LCUI_DisplayDriver driver )
 {
-	// ...
-	return 0;
+	free( driver );
 }
 
 #endif

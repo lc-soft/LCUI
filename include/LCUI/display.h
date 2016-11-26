@@ -135,10 +135,10 @@ LCUI_API int LCUIDisplay_BindEvent( int event_id, LCUI_EventFunc func, void *arg
 LCUI_API int LCUIDisplay_GetFPS(void);
 
 /** 初始化图形输出模块 */
-int LCUI_InitDisplay( void );
+LCUI_API int LCUI_InitDisplay( LCUI_DisplayDriver driver );
 
 /** 停用图形输出模块 */
-int LCUI_ExitDisplay( void );
+LCUI_API int LCUI_ExitDisplay( void );
 
 LCUI_END_HEADER
 
