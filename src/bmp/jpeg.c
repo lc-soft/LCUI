@@ -136,7 +136,7 @@ int Graph_LoadJPEG( const char *filepath, LCUI_Graph *buf )
 	jpeg_destroy_decompress( &cinfo );
 	fclose( fp );
 #else
-	printf( "warning: not JPEG support!" );
+	LOG( "warning: not JPEG support!" );
 #endif
 	return 0;
 }
@@ -172,7 +172,7 @@ int Graph_GetJPEGSize( const char *filepath, int *width, int *height )
 	jpeg_destroy_decompress( &cinfo );
 	fclose( fp );
 #else
-	printf( "warning: not JPEG support!" );
+	LOG( "warning: not JPEG support!" );
 #endif
 	return 0;
 }

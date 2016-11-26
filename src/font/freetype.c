@@ -114,7 +114,7 @@ static size_t Convert_FTGlyph( LCUI_FontBitmap *bmp, FT_GlyphSlot slot, int mode
 		return -1;
 	}
 	/*---------------------- 打印字体信息 --------------------------
-	printf(" width= %ld,  met->height= %ld\n"
+	LOG(" width= %ld,  met->height= %ld\n"
 	"horiBearingX = %ld, horiBearingY = %ld, horiAdvance = %ld\n"
 	"vertBearingX = %ld, vertBearingY = %ld,  vertAdvance = %ld\n",
 	slot->metrics.width>>6, slot->metrics.height>>6,

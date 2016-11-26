@@ -295,7 +295,7 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 	fclose( fp );
 	return 0;
 #else
-	printf( "warning: not PNG support!" );
+	LOG( "warning: not PNG support!" );
 	return 0;
 #endif
 }

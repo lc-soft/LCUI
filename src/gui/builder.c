@@ -252,12 +252,12 @@ static void ParseNode( XMLParserContext ctx, xmlNodePtr node )
 			break;
 		case PB_NEXT: break;
 		case PB_WARNING:
-			printf( "[builder] %s (%d): warning: %s node.\n",
+			LOG( "[builder] %s (%d): warning: %s node.\n",
 				node->doc->name, node->line, node->name );
 			break;
 		case PB_ERROR:
 		default:
-			printf( "[builder] %s (%d): error: %s node.\n",
+			LOG( "[builder] %s (%d): error: %s node.\n",
 				node->doc->name, node->line, node->name );
 			break;
 		}
@@ -271,19 +271,19 @@ static void ParseNode( XMLParserContext ctx, xmlNodePtr node )
 LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 {
 #ifndef USE_LCUI_BUILDER
-	printf(WARN_TXT);
+	LOG(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 	XMLParserContextRec ctx;
 	doc = xmlParseMemory( str, size );
 	if( !doc ) {
-		printf( "[builder] Failed to parse xml form memory\n" );
+		LOG( "[builder] Failed to parse xml form memory\n" );
 		goto FAILED;
 	}
 	cur = xmlDocGetRootElement( doc );
 	if( xmlStrcasecmp(cur->name, BAD_CAST"lcui-app") ) {
-		printf( "[builder] error root node name: %s\n", cur->name );
+		LOG( "[builder] error root node name: %s\n", cur->name );
 		goto FAILED;
 	}
 	ctx.root = NULL;
@@ -306,19 +306,19 @@ FAILED:
 LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 {
 #ifndef USE_LCUI_BUILDER
-	printf(WARN_TXT);
+	LOG(WARN_TXT);
 #else
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 	XMLParserContextRec ctx;
 	doc = xmlParseFile( filepath );
 	if( !doc ) {
-		printf( "[builder] Failed to parse xml file: %s\n", filepath );
+		LOG( "[builder] Failed to parse xml file: %s\n", filepath );
 		goto FAILED;
 	}
 	cur = xmlDocGetRootElement( doc );
 	if( xmlStrcasecmp(cur->name, BAD_CAST"lcui-app") ) {
-		printf( "[builder] error root node name: %s\n", cur->name );
+		LOG( "[builder] error root node name: %s\n", cur->name );
 		goto FAILED;
 	}
 	ctx.root = NULL;

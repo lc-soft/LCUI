@@ -63,19 +63,8 @@
 #define DEBUG_MSG(format, ...)
 #endif
 
-#ifdef DEBUG1
-#define DEBUG_MSG1 _DEBUG_MSG
-#else
-#define DEBUG_MSG1(format, ...)
-#endif
-
-#ifdef DEBUG2
-#define DEBUG_MSG2 _DEBUG_MSG
-#else
-#define DEBUG_MSG2(format, ...)
-#endif
-
-#define _DEBUG_MSG(format, ...) printf(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
+#define LOG Logger_Log
+#define _DEBUG_MSG(format, ...) Logger_Log(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
 
 #if defined(WIN32) || defined(_WIN32)
 #define LCUI_BUILD_IN_WIN32
@@ -85,7 +74,6 @@
 #define USE_LIBPNG
 #define USE_LIBJPEG
 #define USE_LCUI_BUILDER
-#undef USE_TSLIB
 #undef LCUI_THREAD_PTHREAD
 #undef LCUI_VIDEO_DRIVER_FRAMEBUFFER
 #else

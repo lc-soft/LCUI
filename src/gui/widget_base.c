@@ -1646,7 +1646,7 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 			strcat( str, "┬" );
 		}
 		snode = Widget_GetSelectorNode( child );
-		printf( "%s%s %s, xy:(%d,%d), size:(%d,%d), "
+		LOG( "%s%s %s, xy:(%d,%d), size:(%d,%d), "
 			"visible: %s, padding: (%d,%d,%d,%d), margin: (%d,%d,%d,%d)\n",
 			prefix, str, snode->fullname, child->x, child->y,
 			child->width, child->height,
@@ -1664,7 +1664,7 @@ void Widget_PrintTree( LCUI_Widget w )
 	LCUI_SelectorNode node;
 	w = w ? w : LCUIWidget.root;
 	node = Widget_GetSelectorNode( w );
-	printf("%s, xy:(%d,%d), size:(%d,%d), visible: %s\n", 
+	LOG("%s, xy:(%d,%d), size:(%d,%d), visible: %s\n", 
 		node->fullname, w->x, w->y, w->width, w->height,
 		w->computed_style.visible ? "true":"false");
 	SelectorNode_Delete( node );

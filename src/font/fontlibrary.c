@@ -218,7 +218,7 @@ void LCUIFont_SetDefault( int id )
 	p = LCUIFont_GetById( id );
 	if( p ) {
 		fontlib.default_font = p;
-		printf("[font] select: %s\n", p->family_name);
+		LOG("[font] select: %s\n", p->family_name);
 	}
 }
 
@@ -315,19 +315,19 @@ int LCUIFont_LoadFile( const char *filepath )
 	LCUI_Font **fonts;
 	int i, num_fonts, id;
 
-	printf( "[font] load file: %s\n", filepath );
+	LOG( "[font] load file: %s\n", filepath );
 	if( !fontlib.engine ) {
 		return -1;
 	}
 	num_fonts = fontlib.engine->open( filepath, &fonts );
 	if( num_fonts < 1 ) {
-		printf( "[font] failed to load file: %s\n", filepath );
+		LOG( "[font] failed to load file: %s\n", filepath );
 		return -2;
 	}
 	for( i = 0; i < num_fonts; ++i ) {
 		fonts[i]->engine = fontlib.engine;
 		id = LCUIFont_Add( fonts[i] );
-		printf( "[font] add family: %s, style name: %s, id: %d\n",
+		LOG( "[font] add family: %s, style name: %s, id: %d\n",
 			fonts[i]->family_name, fonts[i]->style_name, id );
 	}
 	free( fonts );
@@ -337,11 +337,11 @@ int LCUIFont_LoadFile( const char *filepath )
 /** 打印字体位图的信息 */
 void FontBitmap_PrintInfo( LCUI_FontBitmap *bitmap )
 {
-	printf("address:%p\n",bitmap);
+	LOG("address:%p\n",bitmap);
 	if( !bitmap ) {
 		return;
 	}
-	printf("top: %d, left: %d, width:%d, rows:%d\n",
+	LOG("top: %d, left: %d, width:%d, rows:%d\n",
 	bitmap->top, bitmap->left, bitmap->width, bitmap->rows);
 }
 
@@ -393,16 +393,16 @@ int FontBitmap_Print( LCUI_FontBitmap *fontbmp )
 		m = y*fontbmp->width;
 		for(x = 0; x < fontbmp->width; ++x,++m){
 			if(fontbmp->buffer[m] > 128) {
-				printf("#");
+				LOG("#");
 			} else if(fontbmp->buffer[m] > 64) {
-				printf("-");
+				LOG("-");
 			} else {
-				printf(" ");
+				LOG(" ");
 			}
 		}
-		printf("\n");
+		LOG("\n");
 	}
-	printf("\n");
+	LOG("\n");
 	return 0;
 }
 
@@ -591,10 +591,10 @@ void LCUI_InitFont( void )
 	}
 #endif
 	if( fontlib.engine && fontlib.engine != &fontlib.engines[0] ) {
-		printf( "[font] current font engine is: %s\n", 
+		LOG( "[font] current font engine is: %s\n", 
 			fontlib.engine->name );
 	} else {
-		printf( "[font] warning: not font engine support!\n" );
+		LOG( "[font] warning: not font engine support!\n" );
 	}
 	for( i = 0; i < MAX_FONTFILE_NUM; ++i ) {
 		LCUIFont_LoadFile( fonts[i].path );

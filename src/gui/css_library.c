@@ -1246,45 +1246,45 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 		}
 		name = LCUI_GetStyleName( key );
 		if( name ) {
-			printf( "\t%s", name );
+			LOG( "\t%s", name );
 		} else {
-			printf( "\t<unknown style %d>", key );
+			LOG( "\t<unknown style %d>", key );
 		}
-		printf( "%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "" );
+		LOG( "%s: ", key > STYLE_KEY_TOTAL ? " (+)" : "" );
 		switch( s->type ) {
 		case SVT_AUTO:
-			printf( "auto" );
+			LOG( "auto" );
 			break;
 		case SVT_BOOL:
-			printf( "%s", s->val_bool ? "true" : "false" );
+			LOG( "%s", s->val_bool ? "true" : "false" );
 			break;
 		case SVT_COLOR: {
 			LCUI_Color *clr = &s->val_color;
 			if( clr->alpha < 255 ) {
-				printf( "rgba(%d,%d,%d,%0.2f)", clr->r,
+				LOG( "rgba(%d,%d,%d,%0.2f)", clr->r,
 					clr->g, clr->b, clr->a / 255.0 );
 			} else {
-				printf( "#%02x%02x%02x", clr->r, clr->g, clr->b );
+				LOG( "#%02x%02x%02x", clr->r, clr->g, clr->b );
 			}
 			break;
 		}
 		case SVT_PX:
-			printf( "%dpx", s->val_px );
+			LOG( "%dpx", s->val_px );
 			break;
 		case SVT_STRING:
-			printf( "%s", s->val_string );
+			LOG( "%s", s->val_string );
 			break;
 		case SVT_SCALE:
-			printf( "%.2lf%%", s->val_scale * 100 );
+			LOG( "%.2lf%%", s->val_scale * 100 );
 			break;
 		case SVT_STYLE:
-			printf( "%s", LCUI_GetStyleValueName( s->val_style ) );
+			LOG( "%s", LCUI_GetStyleValueName( s->val_style ) );
 			break;
 		default:
-			printf( "%d", s->value );
+			LOG( "%d", s->value );
 			break;
 		}
-		printf( ";\n" );
+		LOG( ";\n" );
 	}
 }
 
@@ -1298,7 +1298,7 @@ void LCUI_PrintSelector( LCUI_Selector selector )
 		strcat( path, (*sn)->fullname );
 		strcat( path, " " );
 	}
-	printf("path: %s (rank = %d, batch_num = %d)\n", path,
+	LOG("path: %s (rank = %d, batch_num = %d)\n", path,
 		selector->rank, selector->batch_num);
 }
 
@@ -1315,10 +1315,10 @@ static void LCUI_PrintStyleLink( StyleLink link, const char *selector )
 	}
 	for( LinkedList_Each( node, &link->styles ) ) {
 		StyleNode snode = node->data;
-		printf("\n[%s]\n", snode->space ? snode->space:"<none>");
-		printf("%s {\n", fullname);
+		LOG("\n[%s]\n", snode->space ? snode->space:"<none>");
+		LOG("%s {\n", fullname);
 		LCUI_PrintStyleSheet( snode->sheet );
-		printf("}\n");
+		LOG("}\n");
 	}
 	iter = Dict_GetIterator( link->parents );
 	while( (entry = Dict_Next( iter )) ) {
@@ -1337,7 +1337,7 @@ void LCUI_PrintCSSLibrary( void )
 	DictEntry *entry;
 
 	link = NULL;
-	printf( "style library begin\n" );
+	LOG( "style library begin\n" );
 	group = LinkedList_Get( &library.groups, 0 );
 	iter = Dict_GetIterator( group );
 	while( (entry = Dict_Next(iter)) ) {
@@ -1352,7 +1352,7 @@ void LCUI_PrintCSSLibrary( void )
 		Dict_ReleaseIterator( iter_slg );
 	}
 	Dict_ReleaseIterator( iter );
-	printf( "style library end\n" );
+	LOG( "style library end\n" );
 }
 
 void LCUI_GetStyleSheet( LCUI_Selector s, LCUI_StyleSheet out_ss )
