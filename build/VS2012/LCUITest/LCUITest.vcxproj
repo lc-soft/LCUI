@@ -101,6 +101,10 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\test\test.c" />
     <ClCompile Include="..\..\..\test\test_css_parser.c" />
+    <ClCompile Include="..\..\..\test\test_string.c" />
+    <ClCompile Include="..\..\..\test\test_char_render.c" />
+    <ClCompile Include="..\..\..\test\test_string_render.c" />
+    <ClCompile Include="..\..\..\test\test_widget_render.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\test.h" />
