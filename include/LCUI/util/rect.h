@@ -70,17 +70,20 @@ LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a,
 					    const LCUI_Rect *b, 
 					    LCUI_Rect *out );
 
+/** 合并两个矩形 */
+LCUI_API void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b );
+
 /** 
  * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形
  * 分割方法如下：
- * ┏━━┳━━━━━━┓
+ * ┏━━━━┳━━━━━━━━━━━┓
  * ┃    ┃     3      ┃
- * ┃ 0  ┣━━━┳━━┃
- * ┃    ┃rect1 ┃    ┃
- * ┃    ┃      ┃ 2  ┃
- * ┣━━┻━━━┫    ┃
+ * ┃ 0  ┣━━━━━━┳━━━━┃
+ * ┃    ┃rect1  ┃    ┃
+ * ┃    ┃       ┃ 2  ┃
+ * ┣━━━━┻━━━━━━┫    ┃
  * ┃     1      ┃    ┃
- * ┗━━━━━━┻━━┛
+ * ┗━━━━━━━━━━━┻━━━━┛
  *
  * rect2 必须被 rect1 完全包含
  */

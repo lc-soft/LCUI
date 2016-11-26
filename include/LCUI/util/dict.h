@@ -37,6 +37,8 @@
 #ifndef LCUI_UTIL_DICT_H
 #define LCUI_UTIL_DICT_H
 
+LCUI_BEGIN_HEADER
+
 /** 哈希表节点结构 */
 typedef struct DictEntry {
 	void *key;
@@ -231,7 +233,9 @@ LCUI_API void Dict_SetHashFunctionSeed( unsigned int initval );
 LCUI_API unsigned int Dict_GetHashFunctionSeed( void );
 
 /* Hash table types */
-DictType DictType_StringKey;
-DictType DictType_StringCopyKey;
+extern DictType DictType_StringKey;
+extern DictType DictType_StringCopyKey;
+
+LCUI_END_HEADER
 
 #endif /* LCUI_UTIL_DICT_H */
