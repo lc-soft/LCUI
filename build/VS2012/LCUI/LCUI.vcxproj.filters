@@ -243,6 +243,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\textcaret.h">
       <Filter>头文件\LCUI\gui\widget</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\logger.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -418,6 +421,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget\textcaret.c">
       <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\logger.c">
+      <Filter>源文件\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
