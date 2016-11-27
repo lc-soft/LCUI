@@ -64,6 +64,7 @@
 #endif
 
 #define LOG Logger_Log
+#define LOGW Logger_LogW
 #define _DEBUG_MSG(format, ...) Logger_Log(__FILE__" %d: %s(): "format, __LINE__, __FUNCTION__,##__VA_ARGS__)
 
 #if defined(WIN32) || defined(_WIN32)

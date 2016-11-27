@@ -46,7 +46,9 @@
 
 static struct Logger {
 	char buffer[BUFFER_SIZE];
+	wchar_t bufferw[BUFFER_SIZE];
 	void( *handler )(const char*);
+	void( *handlerw )(const wchar_t*);
 } logger;
 
 int Logger_Log( const char* fmt, ... )
@@ -65,7 +67,28 @@ int Logger_Log( const char* fmt, ... )
 	return len;
 }
 
+int Logger_LogW( const wchar_t* fmt, ... )
+{
+	int len;
+	va_list args;
+	va_start( args, fmt );
+	len = vswprintf( logger.bufferw, BUFFER_SIZE, fmt, args );
+	logger.bufferw[BUFFER_SIZE - 1] = 0;
+	if( logger.handlerw ) {
+		logger.handlerw( logger.bufferw );
+	} else {
+		wprintf( logger.bufferw );
+	}
+	va_end( args );
+	return len;
+}
+
 void Logger_SetHandler( void (*handler)(const char*) )
 {
 	logger.handler = handler;
+}
+
+void Logger_SetHandlerW( void (*handler)(const wchar_t*) )
+{
+	logger.handlerw = handler;
 }

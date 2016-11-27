@@ -44,7 +44,11 @@ LCUI_BEGIN_HEADER
 
 LCUI_API int Logger_Log( const char* fmt, ... );
 
+LCUI_API int Logger_LogW( const wchar_t* fmt, ... );
+
 LCUI_API void Logger_SetHandler( void( *handler )(const char*) );
+
+LCUI_API void Logger_SetHandlerW( void( *handler )(const wchar_t*) );
 
 LCUI_END_HEADER
 
