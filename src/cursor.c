@@ -43,13 +43,12 @@
 #include <LCUI/cursor.h>
 #include <LCUI/display.h>
 
-static struct LCUI_Cursor {
-	LCUI_Pos current_pos;	/* 当前帧的坐标 */
+static struct LCUICursorModule {
+	LCUI_Pos pos;	/* 当前帧的坐标 */
 	LCUI_Pos new_pos;	/* 下一帧将要更新的坐标 */
-	LCUI_Pos pos;		/* 当前实时坐标 */
-	int visible;		/* 是否可见 */
+	LCUI_BOOL visible;	/* 是否可见 */
 	LCUI_Graph graph;	/* 游标的图形 */
-} global_cursor;
+} cursor;
 
 static uchar_t cursor_img_rgba[4][12*19] = {
 	{3,3,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,3,229,3,3,0,0,0,0,0,
@@ -105,10 +104,9 @@ static int LCUICursor_LoadDefualtGraph(LCUI_Graph *buff )
 
 static void OnMouseMoveEvent( LCUI_SysEvent e, void *arg )
 {
-	global_cursor.pos.x += e->motion.xrel;
-	global_cursor.pos.y += e->motion.yrel;
-	global_cursor.new_pos = global_cursor.pos;
-	DEBUG_MSG("x: %d, y: %d\n", global_cursor.pos.x, global_cursor.pos.y);
+	cursor.new_pos.x += e->motion.xrel;
+	cursor.new_pos.y += e->motion.yrel;
+	_DEBUG_MSG("x: %d, y: %d\n", cursor.new_pos.x, cursor.new_pos.y);
 }
 
 /* 初始化游标数据 */
@@ -116,37 +114,35 @@ void LCUI_InitCursor( void )
 {
 	LCUI_Graph pic;
 	Graph_Init( &pic );
-	Graph_Init( &global_cursor.graph );
+	Graph_Init( &cursor.graph );
 	/* 载入自带的游标的图形数据 */
 	LCUICursor_LoadDefualtGraph( &pic );
 	LCUICursor_SetGraph( &pic );
-	global_cursor.pos.x = LCUIDisplay_GetWidth() / 2;
-	global_cursor.pos.y = LCUIDisplay_GetHeight() / 2;
-	global_cursor.new_pos.x = global_cursor.pos.x;
-	global_cursor.new_pos.y = global_cursor.pos.y;
+	cursor.new_pos.x = LCUIDisplay_GetWidth() / 2;
+	cursor.new_pos.y = LCUIDisplay_GetHeight() / 2;
 	LCUI_BindEvent( LCUI_MOUSEMOVE, OnMouseMoveEvent, NULL, NULL );
 	LCUICursor_Show();
 }
 
 void LCUI_ExitCursor( void )
 {
-	Graph_Free( &global_cursor.graph );
+	Graph_Free( &cursor.graph );
 }
 
 /* 获取鼠标游标的区域范围 */
 void LCUICursor_GetRect( LCUI_Rect *rect )
 {
-	rect->x = global_cursor.current_pos.x;
-	rect->y = global_cursor.current_pos.y;
-	rect->width = global_cursor.graph.w;
-	rect->height = global_cursor.graph.h;
+	rect->x = cursor.pos.x;
+	rect->y = cursor.pos.y;
+	rect->width = cursor.graph.w;
+	rect->height = cursor.graph.h;
 }
 
 /* 刷新鼠标游标在屏幕上显示的图形 */
 void LCUICursor_Refresh( void )
 {
 	LCUI_Rect rect;
-	if( !global_cursor.visible ) {
+	if( !cursor.visible ) {
 		return;
 	}
 	LCUICursor_GetRect( &rect );
@@ -156,13 +152,13 @@ void LCUICursor_Refresh( void )
 /* 检测鼠标游标是否可见 */
 LCUI_BOOL LCUICursor_IsVisible( void )
 {
-	return global_cursor.visible;
+	return cursor.visible;
 }
 
 /* 显示鼠标游标 */
 void LCUICursor_Show( void )
 {
-	global_cursor.visible = TRUE;	/* 标识游标为可见 */
+	cursor.visible = TRUE;	/* 标识游标为可见 */
 	LCUICursor_Refresh();
 }
 
@@ -170,26 +166,25 @@ void LCUICursor_Show( void )
 void LCUICursor_Hide( void )
 {
 	LCUICursor_Refresh();
-	global_cursor.visible = FALSE;
+	cursor.visible = FALSE;
 }
 
 /* 更新鼠标指针的位置 */
 void LCUICursor_UpdatePos( void )
 {
-	if( global_cursor.current_pos.x == global_cursor.new_pos.x
-	 && global_cursor.current_pos.y == global_cursor.new_pos.y ) {
+	if( cursor.pos.x == cursor.new_pos.x
+	 && cursor.pos.y == cursor.new_pos.y ) {
 		return;
 	}
 	LCUICursor_Refresh();
- 	global_cursor.current_pos = global_cursor.new_pos;
+ 	cursor.pos = cursor.new_pos;
 	LCUICursor_Refresh();
 }
 
 /* 设定游标的位置 */
 void LCUICursor_SetPos( LCUI_Pos pos )
 {
-	global_cursor.new_pos = pos;
-	DEBUG_MSG("new pos: %d,%d\n", pos.x, pos.y);
+	cursor.new_pos = pos;
 }
 
 /** 设置游标的图形 */
@@ -197,10 +192,10 @@ int LCUICursor_SetGraph( LCUI_Graph *graph )
 {
 	if( Graph_IsValid (graph) ) {
 		LCUICursor_Refresh();
-		if( Graph_IsValid(&global_cursor.graph) ) {
-			Graph_Free( &global_cursor.graph );
+		if( Graph_IsValid(&cursor.graph) ) {
+			Graph_Free( &cursor.graph );
 		}
-		Graph_Copy( &global_cursor.graph, graph );
+		Graph_Copy( &cursor.graph, graph );
 		LCUICursor_Refresh();
 		return 0;
 	}
@@ -210,7 +205,7 @@ int LCUICursor_SetGraph( LCUI_Graph *graph )
 /* 获取鼠标指针当前的坐标 */
 void LCUICursor_GetPos( LCUI_Pos *pos )
 {
-	*pos = global_cursor.pos;
+	*pos = cursor.new_pos;
 }
 
 /* 检测鼠标游标是否覆盖在矩形区域上 */
@@ -224,5 +219,5 @@ LCUI_BOOL LCUICursor_IsCoverRect( LCUI_Rect rect )
 /* 将当前鼠标游标的图像叠加至目标图像指定位置 */
 int LCUICursor_MixGraph( LCUI_Graph *buff, LCUI_Pos pos )
 {
-	return Graph_Mix( buff, &global_cursor.graph, pos.x, pos.y, FALSE );
+	return Graph_Mix( buff, &cursor.graph, pos.x, pos.y, FALSE );
 }
