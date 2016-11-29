@@ -2,6 +2,7 @@
 #include <LCUI_Build.h>
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
+#include <LCUI/input.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H
 #include LCUI_MOUSE_H
@@ -28,28 +29,28 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 	}
 	case WM_LBUTTONDOWN:
 		sys_ev.type = LCUI_MOUSEDOWN;
-		sys_ev.button.button = 1;
+		sys_ev.button.button = LCUIKEY_LEFTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		SetCapture( msg->hwnd );
 		break;
 	case WM_LBUTTONUP:
 		sys_ev.type = LCUI_MOUSEUP;
-		sys_ev.button.button = 1;
+		sys_ev.button.button = LCUIKEY_LEFTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		ReleaseCapture();
 		break;
 	case WM_RBUTTONDOWN:
 		sys_ev.type = LCUI_MOUSEDOWN;
-		sys_ev.button.button = 2;
+		sys_ev.button.button = LCUIKEY_RIGHTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		SetCapture( msg->hwnd );
 		break;
 	case WM_RBUTTONUP:
 		sys_ev.type = LCUI_MOUSEUP;
-		sys_ev.button.button = 2;
+		sys_ev.button.button = LCUIKEY_RIGHTBUTTON;
 		sys_ev.button.x = mouse_pos.x;
 		sys_ev.button.y = mouse_pos.y;
 		ReleaseCapture();

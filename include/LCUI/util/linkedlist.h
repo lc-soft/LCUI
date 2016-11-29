@@ -77,6 +77,7 @@ LCUI_API void LinkedList_AppendNode( LinkedList *list, LinkedListNode *node );
 LCUI_API void LinkedList_InsertNode( LinkedList *list, int pos, LinkedListNode *node );
 LCUI_API void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*), int free_node );
 LCUI_API void LinkedList_Concat( LinkedList *list1, LinkedList *list2 );
+LCUI_API void LinkedListNode_Delete( LinkedListNode *node );
 
 #define LinkedList_Clear(list, func) LinkedList_ClearEx( list, func, 1 )
 #define LinkedList_ClearData(list, func) LinkedList_ClearEx( list, func, 0 )

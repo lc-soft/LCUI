@@ -191,6 +191,11 @@ LinkedListNode *LinkedList_Append( LinkedList *list, void *data )
 	return node;
 }
 
+void LinkedListNode_Delete( LinkedListNode *node )
+{
+	free( node );
+}
+
 void LinkedList_Concat( LinkedList *list1, LinkedList *list2 )
 {
 	if( !list2->head.next ) {
