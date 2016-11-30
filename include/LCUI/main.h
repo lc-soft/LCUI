@@ -183,6 +183,8 @@ LCUI_API LCUI_BOOL LCUI_IsActive( void );
 
 LCUI_API void LCUI_InitBase( void );
 
+LCUI_API void LCUI_InitApp( LCUI_AppDriver app );
+
 /* 
  * 功能：用于对LCUI进行初始化操作 
  * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化

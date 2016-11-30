@@ -94,7 +94,7 @@ static struct LCUI_App {
 	LCUI_Cond loop_changed;		/**< 条件变量，用于指示当前运行的主循环是否改变 */
 	LCUI_MainLoop loop;		/**< 当前运行的主循环 */
 	LinkedList loops;		/**< 主循环列表 */
-	LCUI_AppDriverRec driver;	/**< 程序事件驱动支持 */
+	LCUI_AppDriver driver;		/**< 程序事件驱动支持 */
 	LCUI_BOOL driver_ready;		/**< 事件驱动支持是否已经准备就绪 */
 	struct LCUI_AppTaskAgent {
 		int state;		/**< 状态 */
@@ -102,7 +102,7 @@ static struct LCUI_App {
 		LCUI_Mutex mutex;	/**< 互斥锁 */
 		LCUI_Cond cond;		/**< 条件变量 */
 	} agent;
-} MainApp;
+} MainApp = { 0 };
 
 /*-------------------------- system event <START> ---------------------------*/
 
@@ -230,7 +230,7 @@ void LCUI_DispatchEvent( void )
 		return;
 	}
 	if( MainApp.driver_ready ) {
-		MainApp.driver.DispatchEvent();
+		MainApp.driver->DispatchEvent();
 	}
 }
 
@@ -244,7 +244,7 @@ LCUI_BOOL LCUI_PostTask( LCUI_AppTask task )
 	LCUICond_Signal( &MainApp.agent.cond );
 	LCUIMutex_Unlock( &MainApp.agent.mutex );
 	if( MainApp.driver_ready ) {
-		return MainApp.driver.PostTask( newtask );
+		return MainApp.driver->PostTask( newtask );
 	}
 	return TRUE;
 }
@@ -330,20 +330,52 @@ void LCUI_MainLoop_Quit( LCUI_MainLoop loop )
 	loop->state = STATE_EXITED;
 }
 
-/** 初始化程序数据结构体 */
-static void LCUIApp_Init(void)
+void LCUI_InitApp( LCUI_AppDriver app )
 {
+	if( MainApp.driver_ready ) {
+		return;
+	}
 	MainApp.driver_ready = FALSE;
+	MainApp.agent.state = STATE_RUNNING;
+	if( !app ) {
+		app = LCUI_CreateAppDriver();
+		if( !app ) {
+			return;
+		}
+	}
+	MainApp.driver = app;
+	MainApp.driver_ready = TRUE;
 	LCUICond_Init( &MainApp.loop_changed );
 	LCUIMutex_Init( &MainApp.loop_mutex );
 	LinkedList_Init( &MainApp.loops );
 	LCUIMutex_Init( &MainApp.agent.mutex );
 	LCUICond_Init( &MainApp.agent.cond );
 	LinkedList_Init( &MainApp.agent.tasks );
-	if( LCUI_InitApp( &MainApp.driver ) == 0 ) {
-		MainApp.driver_ready = TRUE;
+}
+
+static void OnDeleteTask( void *arg )
+{
+	LCUI_DeleteTask( arg );
+	free( arg );
+}
+
+static void LCUI_ExitApp( void )
+{
+	LCUI_MainLoop loop;
+	LinkedListNode *node;
+	for( LinkedList_Each( node, &MainApp.loops ) ) {
+		loop = node->data;
+		LCUI_MainLoop_Quit( loop );
+		LCUIThread_Join( loop->tid, NULL );
 	}
-	MainApp.agent.state = STATE_RUNNING;
+	LCUIMutex_Destroy( &MainApp.loop_mutex );
+	LCUICond_Destroy( &MainApp.loop_changed );
+	LCUIMutex_Destroy( &MainApp.agent.mutex );
+	LCUICond_Destroy( &MainApp.agent.cond );
+	LinkedList_Clear( &MainApp.loops, free );
+	LinkedList_Clear( &MainApp.agent.tasks, OnDeleteTask );
+	LCUI_DestroyAppDriver( MainApp.driver );
+	MainApp.driver_ready = FALSE;
 }
 
 LCUI_BOOL LCUI_WaitEvent( void )
@@ -352,7 +384,7 @@ LCUI_BOOL LCUI_WaitEvent( void )
 		return TRUE;
 	}
 	if( MainApp.agent.state != STATE_RUNNING ) {
-		return MainApp.driver.WaitEvent();
+		return MainApp.driver->WaitEvent();
 	}
 	LCUIMutex_Lock( &MainApp.agent.mutex );
 	while( MainApp.agent.state == STATE_RUNNING ) {
@@ -370,7 +402,7 @@ int LCUI_BindSysEvent( int event_id, LCUI_EventFunc func,
 		       void *data, void( *destroy_data )(void*) )
 {
 	if( MainApp.driver_ready ) {
-		return MainApp.driver.BindSysEvent( event_id, func, 
+		return MainApp.driver->BindSysEvent( event_id, func, 
 						    data, destroy_data );
 	}
 	return -1;
@@ -379,7 +411,7 @@ int LCUI_BindSysEvent( int event_id, LCUI_EventFunc func,
 int LCUI_UnbindSysEvent( int event_id, LCUI_EventFunc func )
 {
 	if( MainApp.driver_ready ) {
-		return MainApp.driver.UnbindSysEvent( event_id, func );
+		return MainApp.driver->UnbindSysEvent( event_id, func );
 	}
 	return -1;
 }
@@ -387,7 +419,7 @@ int LCUI_UnbindSysEvent( int event_id, LCUI_EventFunc func )
 void *LCUI_GetAppData( void )
 {
 	if( MainApp.driver_ready ) {
-		return MainApp.driver.GetData();
+		return MainApp.driver->GetData();
 	}
 	return NULL;
 }
@@ -415,31 +447,6 @@ static void LCUIApp_QuitAllMainLoop(void)
 			loop->state = STATE_EXITED;
 		}
 	}
-}
-
-static void OnDeleteTask( void *arg )
-{
-	LCUI_DeleteTask( arg );
-	free( arg );
-}
-
-/* 销毁程序占用的资源 */
-static void LCUIApp_Destroy(void)
-{
-	LCUI_MainLoop loop;
-	LinkedListNode *node;
-	for( LinkedList_Each( node, &MainApp.loops ) ) {
-		loop = node->data;
-		LCUI_MainLoop_Quit( loop );
-		LCUIThread_Join( loop->tid, NULL );
-	}
-	/* 开始清理 */
-	LCUIMutex_Destroy( &MainApp.loop_mutex );
-	LCUICond_Destroy( &MainApp.loop_changed );
-	LCUIMutex_Destroy( &MainApp.agent.mutex );
-	LCUICond_Destroy( &MainApp.agent.cond );
-	LinkedList_Clear( &MainApp.loops, free );
-	LinkedList_Clear( &MainApp.agent.tasks, OnDeleteTask );
 }
 
 /** 打印LCUI的信息 */
@@ -515,7 +522,6 @@ void LCUI_InitBase( void )
 	System.state = STATE_ACTIVE;
 	System.main_tid = LCUIThread_SelfID();
 	LCUI_ShowCopyrightText();
-	LCUIApp_Init();
 	/* 初始化各个模块 */
 	LCUI_InitEvent();
 	LCUI_InitFont();
@@ -528,6 +534,7 @@ void LCUI_InitBase( void )
 void LCUI_Init( void )
 {
 	LCUI_InitBase();
+	LCUI_InitApp( NULL );
 	LCUI_InitMouseDriver();
 	LCUI_InitKeyboardDriver();
 	LCUI_InitDisplay( NULL );
@@ -548,7 +555,7 @@ int LCUI_Destroy( void )
 	LCUI_ExitFont();
 	LCUI_ExitTimer();
 	LCUI_ExitDisplay();
-	LCUIApp_Destroy();
+	LCUI_ExitApp();
 	return 0;
 }
 

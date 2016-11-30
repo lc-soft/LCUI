@@ -5,6 +5,8 @@ LCUI_API void LCUI_PreInitWinApp( void *data );
 
 void LCUI_SetMainWindow( HWND hwnd );
 
-int LCUI_InitWinApp( LCUI_AppDriver app );
+LCUI_AppDriver LCUI_CreateWinAppDriver( void );
+
+void LCUI_DestroyWinAppDriver( LCUI_AppDriver app );
 
 #endif

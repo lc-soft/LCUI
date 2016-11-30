@@ -106,28 +106,28 @@ void LCUI_PreInitWinApp( void *data )
 	win.main_instance = data;
 }
 
-int LCUI_InitWinApp( LCUI_AppDriver app )
+LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 {
 	WNDCLASS wndclass;
-	TCHAR szAppName[] = TEXT ("LCUI");
+	TCHAR szAppName[] = TEXT( "LCUI" );
+	ASSIGN( app, LCUI_AppDriver );
 
-	wndclass.cbClsExtra    = 0;
-	wndclass.cbWndExtra    = 0;
+	wndclass.cbClsExtra = 0;
+	wndclass.cbWndExtra = 0;
 	wndclass.hbrBackground = NULL;
-	wndclass.lpszMenuName  = NULL;
-	wndclass.lpfnWndProc   = WndProc;
+	wndclass.lpszMenuName = NULL;
+	wndclass.lpfnWndProc = WndProc;
 	wndclass.lpszClassName = szAppName;
-	wndclass.hInstance     = win.main_instance;
-	wndclass.style         = CS_HREDRAW | CS_VREDRAW;
-	wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
-	wndclass.hIcon         = LoadIcon( win.dll_instance, 
-					   MAKEINTRESOURCE(IDI_LCUI_ICON) );
-
-	if( !RegisterClass(&wndclass) ) {
+	wndclass.hInstance = win.main_instance;
+	wndclass.style = CS_HREDRAW | CS_VREDRAW;
+	wndclass.hCursor = LoadCursor( NULL, IDC_ARROW );
+	wndclass.hIcon = LoadIcon( win.dll_instance,
+				   MAKEINTRESOURCE( IDI_LCUI_ICON ) );
+	if( !RegisterClass( &wndclass ) ) {
 		wchar_t str[256];
-		wsprintf(str, L"LCUI_InitWinApp(): error code: %d\n", GetLastError());
+		wsprintf( str, L"LCUI_CreateWinAppDriver(): error code: %d\n", GetLastError() );
 		MessageBox( NULL, str, szAppName, MB_ICONERROR );
-		return -1;
+		return NULL;
 	}
 	app->GetData = WIN_GetData;
 	app->PostTask = WIN_PostTask;
@@ -137,7 +137,13 @@ int LCUI_InitWinApp( LCUI_AppDriver app )
 	app->UnbindSysEvent = WIN_UnbindSysEvent;
 	app->UnbindSysEvent2 = WIN_UnbindSysEvent2;
 	win.trigger = EventTrigger();
-	return 0;
+	return app;
+}
+
+void LCUI_DestroyWinAppDriver( LCUI_AppDriver app )
+{
+	EventTrigger_Destroy( win.trigger );
+	free( app );
 }
 
 #endif

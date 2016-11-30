@@ -2,8 +2,8 @@
 #define LCUI_PLATFORM_H
 
 #ifdef LCUI_BUILD_IN_WIN32
-#define LCUI_InitApp LCUI_InitWinApp
-#define LCUI_ExitApp LCUI_ExitWinApp
+#define LCUI_CreateAppDriver LCUI_CreateWinAppDriver
+#define LCUI_DestroyAppDriver LCUI_DestroyWinAppDriver
 #define LCUI_PreInitApp LCUI_PreInitWinApp
 #define LCUI_CreateDisplayDriver LCUI_CreateWinDisplay
 #define LCUI_DestroyDisplayDriver LCUI_DestroyWinDisplay
@@ -16,8 +16,8 @@
 #define LCUI_KEYBOARD_H	<LCUI/platform/windows/windows_keyboard.h>
 #define LCUI_DISPLAY_H	<LCUI/platform/windows/windows_display.h>
 #elif defined(LCUI_BUILD_IN_LINUX)
-#define LCUI_InitApp LCUI_InitLinuxApp
-#define LCUI_ExitApp LCUI_ExitLinuxApp
+#define LCUI_CreateAppDriver LCUI_InitLinuxApp
+#define LCUI_DestroyAppDriver LCUI_ExitLinuxApp
 #define LCUI_PreInitApp LCUI_PreInitLinuxApp
 #define LCUI_CreateDisplayDriver LCUI_CreateLinuxDisplay
 #define LCUI_DestroyDisplayDriver LCUI_DestroyLinuxDisplay
