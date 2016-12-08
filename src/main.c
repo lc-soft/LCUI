@@ -527,7 +527,6 @@ void LCUI_InitBase( void )
 	LCUI_InitFont();
 	LCUI_InitTimer();
 	LCUI_InitKeyboard();
-	LCUI_InitIME();
 	LCUI_InitWidget();
 }
 
@@ -539,6 +538,7 @@ void LCUI_Init( void )
 	LCUI_InitKeyboardDriver();
 	LCUI_InitDisplay( NULL );
 	LCUI_InitCursor();
+	LCUI_InitIME();
 }
 
 int LCUI_Destroy( void )

@@ -40,28 +40,6 @@
 #ifndef LCUI_INPUT_H
 #define LCUI_INPUT_H
 
-#ifdef LCUI_BUILD_IN_WIN32
-#include <winuser.h>
-
-#define LCUIKEY_ESCAPE		VK_ESCAPE
-#define LCUIKEY_ENTER		VK_RETURN
-#define LCUIKEY_BACKSPACE	VK_BACK
-#define LCUIKEY_DELETE		VK_DELETE
-#define LCUIKEY_HOME		VK_HOME
-#define LCUIKEY_END		VK_END
-#define LCUIKEY_TAB		VK_TAB
-
-#define LCUIKEY_DOWN		VK_DOWN
-#define LCUIKEY_UP		VK_UP
-#define LCUIKEY_LEFT		VK_LEFT
-#define LCUIKEY_RIGHT		VK_RIGHT
-
-#define LCUIKEY_CAPITAL		VK_CAPITAL
-#define LCUIKEY_SHIFT		VK_SHIFT
-#define LCUIKEY_CONTROL		VK_CONTROL
-
-#else
-
 #define LCUIKEY_BACKSPACE	8
 #define LCUIKEY_TAB		9
 #define LCUIKEY_ENTER		13
@@ -70,6 +48,7 @@
 #define LCUIKEY_ALT		18
 #define LCUIKEY_CAPITAL		20
 #define LCUIKEY_ESCAPE		27
+#define LCUIKEY_SPACE		' '
 #define LCUIKEY_PAGEUP		33
 #define LCUIKEY_PAGEDOWN	34
 #define LCUIKEY_END		35
@@ -78,24 +57,8 @@
 #define LCUIKEY_UP		38
 #define LCUIKEY_RIGHT		39
 #define LCUIKEY_DOWN		40
-
 #define LCUIKEY_INSERT		45
 #define LCUIKEY_DELETE		46
-
-#endif
-
-#define LCUIKEY_SPACE		' '
-#define LCUIKEY_COMMA		','
-#define LCUIKEY_PERIOD		'.'
-#define LCUIKEY_SLASH 		'/'
-#define LCUIKEY_MINUS		'-'
-#define LCUIKEY_EQUAL		'='
-#define LCUIKEY_BRACKETLEFT	'['
-#define LCUIKEY_BRACKETRIGHT	']'
-#define LCUIKEY_BACKSLASH	'\\'
-#define LCUIKEY_SEMICOLON	';'
-#define LCUIKEY_APOSTROPHE	'\''
-#define LCUIKEY_GRAVE		'`'
 #define LCUIKEY_0		'0'
 #define LCUIKEY_1		'1'
 #define LCUIKEY_2		'2'
@@ -106,33 +69,43 @@
 #define LCUIKEY_7		'7'
 #define LCUIKEY_8		'8'
 #define LCUIKEY_9		'9'
-
-#define LCUIKEY_A		'a'
-#define LCUIKEY_B		'b'
-#define LCUIKEY_C		'c'
-#define LCUIKEY_D		'd'
-#define LCUIKEY_E		'e'
-#define LCUIKEY_F		'f'
-#define LCUIKEY_G		'g'
-#define LCUIKEY_H		'h'
-#define LCUIKEY_I		'i'
-#define LCUIKEY_J		'j'
-#define LCUIKEY_K		'k'
-#define LCUIKEY_L		'l'
-#define LCUIKEY_M		'm'
-#define LCUIKEY_N		'n'
-#define LCUIKEY_O		'o'
-#define LCUIKEY_P		'p'
-#define LCUIKEY_Q		'q'
-#define LCUIKEY_R		'r'
-#define LCUIKEY_S		's'
-#define LCUIKEY_T		't'
-#define LCUIKEY_U		'u'
-#define LCUIKEY_V		'v'
-#define LCUIKEY_W		'w'
-#define LCUIKEY_X		'x'
-#define LCUIKEY_Y		'y'
-#define LCUIKEY_Z		'z'
+#define LCUIKEY_A		'A'
+#define LCUIKEY_B		'B'
+#define LCUIKEY_C		'C'
+#define LCUIKEY_D		'D'
+#define LCUIKEY_E		'E'
+#define LCUIKEY_F		'F'
+#define LCUIKEY_G		'G'
+#define LCUIKEY_H		'H'
+#define LCUIKEY_I		'I'
+#define LCUIKEY_J		'J'
+#define LCUIKEY_K		'K'
+#define LCUIKEY_L		'L'
+#define LCUIKEY_M		'M'
+#define LCUIKEY_N		'N'
+#define LCUIKEY_O		'O'
+#define LCUIKEY_P		'P'
+#define LCUIKEY_Q		'Q'
+#define LCUIKEY_R		'R'
+#define LCUIKEY_S		'S'
+#define LCUIKEY_T		'T'
+#define LCUIKEY_U		'U'
+#define LCUIKEY_V		'V'
+#define LCUIKEY_W		'W'
+#define LCUIKEY_X		'X'
+#define LCUIKEY_Y		'Y'
+#define LCUIKEY_Z		'Z'
+#define LCUIKEY_SEMICOLON	186
+#define LCUIKEY_EQUAL		187
+#define LCUIKEY_COMMA		188
+#define LCUIKEY_MINUS		189
+#define LCUIKEY_PERIOD		190
+#define LCUIKEY_SLASH 		191
+#define LCUIKEY_GRAVE		192
+#define LCUIKEY_BRACKETLEFT	219
+#define LCUIKEY_BACKSLASH	220
+#define LCUIKEY_BRACKETRIGHT	221
+#define LCUIKEY_APOSTROPHE	222
 
 #define LCUIKEY_LEFTBUTTON	1	/* 鼠标左键 */
 #define LCUIKEY_RIGHTBUTTON	2	/* 鼠标右键 */

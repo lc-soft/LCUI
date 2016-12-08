@@ -106,7 +106,6 @@ static void OnMouseMoveEvent( LCUI_SysEvent e, void *arg )
 {
 	cursor.new_pos.x += e->motion.xrel;
 	cursor.new_pos.y += e->motion.yrel;
-	_DEBUG_MSG("x: %d, y: %d\n", cursor.new_pos.x, cursor.new_pos.y);
 }
 
 /* 初始化游标数据 */

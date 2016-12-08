@@ -1200,8 +1200,8 @@ void Widget_UpdateMargin( LCUI_Widget w )
 		}
 	}
 	if( w->parent ) {
-		if( w->parent->style->sheet[key_width].type == SVT_AUTO
-		    || w->parent->style->sheet[key_height].type == SVT_AUTO ) {
+		if( w->parent->style->sheet[key_width].type == SVT_AUTO ||
+		    w->parent->style->sheet[key_height].type == SVT_AUTO ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
 		}
 		if( w->computed_style.display != SV_NONE &&

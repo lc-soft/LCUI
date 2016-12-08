@@ -186,23 +186,38 @@ static void LCUIIME_OnDestroy( void *arg )
 static void LCUIIME_ToText( LCUI_SysEvent e )
 {
 	char ch = e->key.code;
-	DEBUG_MSG("key code: %d\n", event->key_code);
-	/* 如果没开启大写锁定，则将字母转换成小写 */
-	if( !self.enable_caps_lock ) {
-		if( ch >= 'A' && ch <= 'Z' ) {
-			ch = e->key.code + 32;
+	switch( ch ) {
+	case LCUIKEY_TAB: ch = '\t'; break;
+	case LCUIKEY_ENTER: ch = '\n'; break;
+	case LCUIKEY_SEMICOLON: ch = ';'; break;
+	case LCUIKEY_MINUS: ch = '-'; break;
+	case LCUIKEY_EQUAL: ch = '='; break;
+	case LCUIKEY_COMMA: ch = ','; break;
+	case LCUIKEY_PERIOD: ch = '.'; break;
+	case LCUIKEY_SLASH: ch = '/'; break;
+	case LCUIKEY_BRACKETLEFT: ch = '['; break;
+	case LCUIKEY_BACKSLASH: ch = '\\'; break;
+	case LCUIKEY_BRACKETRIGHT: ch = ']'; break;
+	case LCUIKEY_APOSTROPHE: ch = '\''; break;
+	default:
+		/* 如果没开启大写锁定，则将字母转换成小写 */
+		if( !self.enable_caps_lock ) {
+			if( ch >= 'A' && ch <= 'Z' ) {
+				ch = e->key.code + 32;
+			}
 		}
+		break;
 	}
-
 	/* 如果shift键处于按下状态 */
-	if( LCUIKeyboard_IsHit(LCUIKEY_SHIFT) ) {
-		_DEBUG_MSG("hit shift, ch: %c\n", ch);
-		if(ch >='a' && ch <= 'z') {
+	if( LCUIKeyboard_IsHit( LCUIKEY_SHIFT ) ) {
+		_DEBUG_MSG( "hit shift, ch: %c\n", ch );
+		if( ch >= 'a' && ch <= 'z' ) {
 			ch = ch - 32;
-		} else if(ch >='A' && ch <= 'Z') {
+		} else if( ch >= 'A' && ch <= 'Z' ) {
 			ch = ch + 32;
 		} else {
-			switch(ch) {
+			switch( ch ) {
+			case '0': ch = ')'; break;
 			case '1': ch = '!'; break;
 			case '2': ch = '@'; break;
 			case '3': ch = '#'; break;
@@ -212,7 +227,6 @@ static void LCUIIME_ToText( LCUI_SysEvent e )
 			case '7': ch = '&'; break;
 			case '8': ch = '*'; break;
 			case '9': ch = '('; break;
-			case '0': ch = ')'; break;
 			case '`': ch = '~'; break;
 			case '-': ch = '_'; break;
 			case '=': ch = '+'; break;
@@ -224,10 +238,18 @@ static void LCUIIME_ToText( LCUI_SysEvent e )
 			case ',': ch = '<'; break;
 			case '.': ch = '>'; break;
 			case '/': ch = '?'; break;
+			default: break;
 			}
 		}
 	}
-	DEBUG_MSG("ch = %c\n", ch);
+	if( ch >= 32 && ch <= 126 || ch == '\t' ||
+	    ch == '\n' || ch == ' ' ) {
+		LCUI_SysEventRec ev = { 0 };
+		ev.type = LCUI_KEYPRESS;
+		ev.key.code = ch;
+		LCUI_TriggerEvent( &ev, NULL );
+	}
+	DEBUG_MSG( "ch = %c\n", ch );
 	self.ime->handler.totext( ch );
 }
 
@@ -302,7 +324,6 @@ int LCUIIME_ClearTarget( void )
 
 static void LCUIIME_OnKeyDown( LCUI_SysEvent e, void *arg )
 {
-	_DEBUG_MSG("on keydown\n");
 	if( LCUIIME_ProcessKey( e ) ) {
 		LCUIIME_ToText( e );
 	}
