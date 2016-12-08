@@ -11,12 +11,21 @@ void LCUI_PreInitLinuxApp( void *data )
 	return;
 }
 
-int LCUI_InitLinuxApp( LCUI_AppDriver app )
+LCUI_AppDriver LCUI_CreateLinuxAppDriver( void )
 {
 	LCUI_BOOL is_x11_mode = TRUE;
 	if( is_x11_mode ) {
-		return LCUI_InitLinuxX11App( app );
+		return LCUI_CreateLinuxX11AppDriver();
 	}
-	return -1;
+	return NULL;
 }
+
+void LCUI_DestroyLinuxAppDriver( LCUI_AppDriver driver )
+{
+	LCUI_BOOL is_x11_mode = TRUE;
+	if( is_x11_mode ) {
+		LCUI_DestroyLinuxX11AppDriver( driver );
+	}
+}
+
 #endif

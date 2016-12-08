@@ -55,11 +55,11 @@
 #define LCUI_KEYBOARD_H	<LCUI/platform/windows/windows_keyboard.h>
 #define LCUI_DISPLAY_H	<LCUI/platform/windows/windows_display.h>
 #elif defined(LCUI_BUILD_IN_LINUX)
-#define LCUI_CreateAppDriver LCUI_InitLinuxApp
-#define LCUI_DestroyAppDriver LCUI_ExitLinuxApp
+#define LCUI_CreateAppDriver LCUI_CreateLinuxAppDriver
+#define LCUI_DestroyAppDriver LCUI_DestroyLinuxAppDriver
 #define LCUI_PreInitApp LCUI_PreInitLinuxApp
-#define LCUI_CreateDisplayDriver LCUI_CreateLinuxDisplay
-#define LCUI_DestroyDisplayDriver LCUI_DestroyLinuxDisplay
+#define LCUI_CreateDisplayDriver LCUI_CreateLinuxDisplayDriver
+#define LCUI_DestroyDisplayDriver LCUI_DestroyLinuxDisplayDriver
 #define LCUI_InitMouseDriver LCUI_InitLinuxMouse
 #define LCUI_ExitMouseDriver LCUI_ExitLinuxMouse
 #define LCUI_InitKeyboardDriver LCUI_InitLinuxKeyboard

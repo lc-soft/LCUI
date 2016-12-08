@@ -7,17 +7,20 @@
 #include LCUI_EVENTS_H
 #include LCUI_DISPLAY_H
 
-int LCUI_InitLinuxDisplay( LCUI_DisplayDriver driver )
+LCUI_DisplayDriver LCUI_CreateLinuxDisplayDriver( void )
 {
 	LCUI_BOOL is_x11_mode = TRUE;
 	if( is_x11_mode ) {
-		return LCUI_InitLinuxX11Display( driver );
+		return LCUI_CreateLinuxX11DisplayDriver();
 	}
-	return -1;
+	return NULL;
 }
 
-int LCUI_ExitLinuxDisplay( void )
+void LCUI_DestroyLinuxDisplayDriver( LCUI_DisplayDriver driver )
 {
-	return -1;
+	LCUI_BOOL is_x11_mode = TRUE;
+	if( is_x11_mode ) {
+		LCUI_DestroyLinuxX11DisplayDriver( driver );
+	}
 }
 #endif

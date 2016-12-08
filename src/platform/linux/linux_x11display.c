@@ -509,12 +509,13 @@ static void OnConfigureNotify( LCUI_Event e, void *arg )
 
 }
 
-int LCUI_InitLinuxX11Display( LCUI_DisplayDriver driver )
+LCUI_DisplayDriver LCUI_CreateLinuxX11Display( void )
 {
+	ASSIGN( driver, LCUI_DisplayDriver );
 	strcpy( driver->name, "x11" );
 	x11.app = LCUI_GetAppData();
 	if( !x11.app ) {
-		return -1;
+		return NULL;
 	}
 	driver->getWidth = X11Display_GetWidth;
 	driver->getHeight = X11Display_GetHeight;
@@ -539,7 +540,7 @@ int LCUI_InitLinuxX11Display( LCUI_DisplayDriver driver )
 	LCUI_BindSysEvent( ConfigureNotify, OnConfigureNotify, NULL, NULL );
 	x11.trigger = EventTrigger();
 	x11.is_inited = TRUE;
-	return 0;
+	return driver;
 }
 
 int LCUI_ExitLinuxX11Display( void )

@@ -131,11 +131,12 @@ void LCUI_PreInitLinuxX11App( void *data )
 	return;
 }
 
-int LCUI_InitLinuxX11App( LCUI_AppDriver app )
+LCUI_AppDriver LCUI_CreateLinuxX11AppDriver( void )
 {
+	ASSIGN( app, LCUI_AppDriver );
 	x11.display = XOpenDisplay( NULL );
 	if( !x11.display ) {
-		return -1;
+		return NULL;
 	}
 	x11.screen = DefaultScreen( x11.display );
 	x11.win_root = RootWindow( x11.display, x11.screen );
@@ -150,7 +151,11 @@ int LCUI_InitLinuxX11App( LCUI_AppDriver app )
 	app->UnbindSysEvent2 = X11_UnbindSysEvent2;
 	app->GetData = X11_GetData;
 	x11.trigger = EventTrigger();
-	return 0;
+	return app;
 }
 
+void LCUI_DestroyLinuxX11AppDriver( LCUI_AppDriver app )
+{
+
+}
 #endif

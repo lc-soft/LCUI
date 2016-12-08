@@ -185,7 +185,7 @@ static void LCUIIME_OnDestroy( void *arg )
 
 static void LCUIIME_ToText( LCUI_SysEvent e )
 {
-	char ch = e->key.code;
+	int ch = e->key.code;
 	switch( ch ) {
 	case LCUIKEY_TAB: ch = '\t'; break;
 	case LCUIKEY_ENTER: ch = '\n'; break;
@@ -242,7 +242,7 @@ static void LCUIIME_ToText( LCUI_SysEvent e )
 			}
 		}
 	}
-	if( ch >= 32 && ch <= 126 || ch == '\t' ||
+	if( (ch >= 32 && ch <= 126) || ch == '\t' ||
 	    ch == '\n' || ch == ' ' ) {
 		LCUI_SysEventRec ev = { 0 };
 		ev.type = LCUI_KEYPRESS;

@@ -42,6 +42,7 @@
 
 #include <LCUI/platform/linux/linux_x11events.h>
 
-int LCUI_InitLinuxApp( LCUI_AppDriver app );
+LCUI_AppDriver LCUI_CreateLinuxAppDriver( void );
+void LCUI_DestroyLinuxAppDriver( LCUI_AppDriver app );
 
 #endif

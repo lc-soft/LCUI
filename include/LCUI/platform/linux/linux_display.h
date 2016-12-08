@@ -4,8 +4,8 @@
 #include <LCUI/platform/linux/linux_fbdisplay.h>
 #include <LCUI/platform/linux/linux_x11display.h>
 
-int LCUI_InitLinuxDisplay( LCUI_DisplayDriver driver );
+LCUI_DisplayDriver LCUI_CreateLinuxDisplayDriver( void );
 
-int LCUI_ExitLinuxDisplay( void );
+void LCUI_DestroyLinuxDisplayDriver( LCUI_DisplayDriver driver );
 
 #endif

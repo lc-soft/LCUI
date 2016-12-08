@@ -59,6 +59,8 @@ void LCUI_SetLinuxX11MainWindow( Window win );
 
 void LCUI_PreInitLinuxX11App( void *data );
 
-int LCUI_InitLinuxX11App( LCUI_AppDriver app );
+LCUI_AppDriver LCUI_CreateLinuxX11AppDriver( void );
+
+void LCUI_DestroyLinuxX11AppDriver( LCUI_AppDriver driver );
 
 #endif
