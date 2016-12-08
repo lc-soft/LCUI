@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
-#include <LCUI/util/string.h>
+#include <LCUI/LCUI.h>
 
 static int test_cmdsplit( void )
 {

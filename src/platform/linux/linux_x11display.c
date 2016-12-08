@@ -509,7 +509,7 @@ static void OnConfigureNotify( LCUI_Event e, void *arg )
 
 }
 
-LCUI_DisplayDriver LCUI_CreateLinuxX11Display( void )
+LCUI_DisplayDriver LCUI_CreateLinuxX11DisplayDriver( void )
 {
 	ASSIGN( driver, LCUI_DisplayDriver );
 	strcpy( driver->name, "x11" );
@@ -543,10 +543,9 @@ LCUI_DisplayDriver LCUI_CreateLinuxX11Display( void )
 	return driver;
 }
 
-int LCUI_ExitLinuxX11Display( void )
+void LCUI_DestroyLinuxX11DisplayDriver( LCUI_DisplayDriver driver )
 {
-	// ...
-	return 0;
+	
 }
 
 #endif
