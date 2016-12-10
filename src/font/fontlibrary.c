@@ -304,10 +304,20 @@ int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 		}
 		break;
 	}
+	if( ch == 0 ) {
+		return -1;
+	}
 	FontBitmap_Init( &bmp_cache );
 	ret = FontBitmap_Load( &bmp_cache, ch, font_id, size );
-	*bmp = LCUIFont_AddBitmap( ch, font_id, size, &bmp_cache );
-	return ret;
+	if( ret == 0 ) {
+		*bmp = LCUIFont_AddBitmap( ch, font_id, size, &bmp_cache );
+		return 0;
+	}
+	ret = LCUIFont_GetBitmap( 0, font_id, size, bmp );
+	if( ret != 0 ) {
+		*bmp = LCUIFont_AddBitmap( 0, font_id, size, &bmp_cache );
+	}
+	return -1;
 }
 
 int LCUIFont_LoadFile( const char *filepath )
