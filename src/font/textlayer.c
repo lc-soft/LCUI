@@ -196,15 +196,18 @@ static void TextLayer_UpdateRowSize( LCUI_TextLayer layer, TextRow txtrow )
 			txtrow->text_height = txtchar->bitmap->advance.y;
 		}
 	}
+	txtrow->height = txtrow->text_height;
 	switch( layer->line_height.type ) {
+	case SVT_VALUE:
+		txtrow->height *= layer->line_height.value;
 	case SVT_SCALE:
-		txtrow->height = txtrow->text_height * layer->line_height.scale;
+		txtrow->height = (int)(txtrow->height * layer->line_height.scale);
 		break;
 	case SVT_PX:
 		txtrow->height = layer->line_height.px;
 		break;
 	default:
-		txtrow->height = txtrow->text_height * 11 / 10;
+		txtrow->height = (int)(txtrow->height * 11.0 / 10.0 + 0.5);
 		break;
 	}
 }

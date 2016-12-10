@@ -49,19 +49,18 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 	int n = 0;
 	char num_str[32];
 	const char *p = str;
-	LCUI_BOOL hasSign = FALSE, hasPoint = FALSE;
+	LCUI_BOOL has_sign = FALSE, has_point = FALSE;
 
 	if( str == NULL ) {
 		return FALSE;
 	}
 	/* 先取出数值 */
-	while(1) {
+	while( 1 ) {
 		if( *p >= '0' && *p <= '9' );
-		else if( !hasSign && (*p == '-' || *p == '+') ) {
-			hasSign = TRUE;
-		}
-		else if( !hasPoint && *p == '.' ) {
-			hasPoint = TRUE;
+		else if( !has_sign && (*p == '-' || *p == '+') ) {
+			has_sign = TRUE;
+		} else if( !has_point && *p == '.' ) {
+			has_point = TRUE;
 		} else {
 			break;
 		}
@@ -80,7 +79,7 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 		if( p[1] == 'p' || p[1] == 'P' ) {
 			s->type = SVT_DP;
 			sscanf( num_str, "%d", &s->dp );
-		}else {
+		} else {
 			s->type = SVT_NONE;
 		}
 		break;
@@ -97,15 +96,19 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 		}
 		break;
 	case '%':
-		if( 1 != sscanf(num_str, "%f", &s->scale) ) {
+		if( 1 != sscanf( num_str, "%f", &s->scale ) ) {
 			return FALSE;
 		}
 		s->scale /= 100.0;
 		s->type = SVT_SCALE;
 		break;
 	case 0:
-		if( 1 == sscanf(num_str, "%d", &s->px) ) {
-			s->type = SVT_PX;
+		if( has_point && 1 == sscanf( num_str, "%f", &s->scale ) ) {
+			s->type = SVT_SCALE;
+			break;
+		}
+		if( 1 == sscanf( num_str, "%d", &s->value ) ) {
+			s->type = SVT_VALUE;
 			break;
 		}
 	default:

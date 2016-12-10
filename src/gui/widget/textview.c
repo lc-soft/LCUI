@@ -208,11 +208,8 @@ static int OnParseLineHeight( LCUI_StyleSheet ss, int key, const char *str )
 	if( !ParseNumber(&sv, str) ) {
 		return -1;
 	}
-	if( sv.type == SVT_PX || sv.type == SVT_SCALE ) {
-		ss->sheet[self.keys[key]] = sv;
-		return 0;
-	}
-	return -1;
+	ss->sheet[self.keys[key]] = sv;
+	return 0;
 }
 
 static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
