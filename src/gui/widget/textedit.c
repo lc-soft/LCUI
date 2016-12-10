@@ -55,6 +55,7 @@
 enum TaskType {
 	TASK_SET_TEXT,
 	TASK_UPDATE,
+	TASK_UPDATE_MASK,
 	TASK_UPDATE_CARET,
 	TASK_TOTAL
 };
@@ -100,6 +101,7 @@ typedef struct LCUI_TextBlockRec_ {
 	int owner;			/**< 所属的文本层 */
 	int add_type;			/**< 指定该文本块的添加方式 */
 	wchar_t *text;			/**< 文本块(段) */
+	size_t length;			/**< 文本块的长度 */
 } LCUI_TextBlockRec, *LCUI_TextBlock;
 
 static struct LCUI_TextEditModule {
@@ -165,6 +167,11 @@ static void TextEdit_UpdateCaret( LCUI_Widget widget )
 	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask( widget, WTT_USER );
 	TextCaret_BlinkShow( edit->caret );
+	if( edit->password_char ) {
+		TextLayer_SetCaretPos( edit->layer_source, 
+				       edit->layer->insert_y, 
+				       edit->layer->insert_x );
+	}
 }
 
 /** 移动文本框内的文本插入符的行列坐标 */
@@ -227,6 +234,7 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 			}
 			--i;
 			txtblk->text[j] = 0;
+			txtblk->length = j;
 			LinkedList_Append( &edit->text_blocks, txtblk );
 			continue;
 		}
@@ -257,6 +265,7 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 		}
 		--i;
 		txtblk->text[j] = 0;
+		txtblk->length = j;
 		/* 添加文本块至缓冲区 */
 		LinkedList_Append( &edit->text_blocks, txtblk );
 	}
@@ -293,6 +302,18 @@ static void TextEdit_ProcTextBlock( LCUI_Widget widget, LCUI_TextBlock txtblk )
 		TextLayer_InsertTextW( layer, txtblk->text, tags );
 	default: break;
 	}
+	if( edit->password_char ) {
+		wchar_t *text = NEW( wchar_t, txtblk->length + 1 );
+		wcsncpy( text, txtblk->text, txtblk->length + 1 );
+		wcsset( text, edit->password_char );
+		layer = edit->layer_mask;
+		if( txtblk->add_type == TBAT_INSERT ) {
+			TextLayer_InsertTextW( layer, text, NULL );
+		} else {
+			TextLayer_AppendTextW( layer, text, NULL );
+		}
+		free( text );
+	}
 }
 
 
@@ -305,22 +326,43 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
 	LinkedListNode *node;
 	LinkedList_Init( &rects );
 	edit = Widget_GetData( widget, self.prototype );
-	TextLayer_Update( edit->layer, &rects );
-	for( LinkedList_Each( node, &rects ) ) {
-		Widget_InvalidateArea( widget, node->data, SV_CONTENT_BOX );
-	}
-	RectList_Clear( &rects );
-	TextLayer_ClearInvalidRect( edit->layer );
 	TextStyle_Copy( &style, &edit->layer_source->text_style );
+	if( edit->password_char ) {
+		TextLayer_SetTextStyle( edit->layer_mask, &style );
+	}
 	style.has_fore_color = TRUE;
 	style.fore_color.value = 0xC8C8C8;
 	TextLayer_SetTextStyle( edit->layer_placeholder, &style );
 	TextStyle_Destroy( &style );
+	TextLayer_Update( edit->layer, &rects );
+	for( LinkedList_Each( node, &rects ) ) {
+		Widget_InvalidateArea( widget, node->data, SV_CONTENT_BOX );
+	}
+	TextLayer_ClearInvalidRect( edit->layer );
+	RectList_Clear( &rects );
 }
 
 static void TextEdit_OnTask( LCUI_Widget widget )
 {
 	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
+	while( edit->tasks[TASK_UPDATE_MASK] ) {
+		int i, len;
+		wchar_t text[256];
+		edit->tasks[TASK_UPDATE] = TRUE;
+		edit->tasks[TASK_UPDATE_MASK] = FALSE;
+		TextLayer_ClearText( edit->layer_mask );
+		if( !edit->password_char ) {
+			edit->layer = edit->layer_source;
+			break;
+		}
+		edit->layer = edit->layer_mask;
+		len = TextEdit_GetTextLength( widget );
+		for( i = 0; i < len; i += 255 ) {
+			TextEdit_GetTextW( widget, i, 255, text );
+			wcsset( text, edit->password_char );
+			TextLayer_AppendTextW( edit->layer, text, NULL );
+		}
+	}
 	if( edit->tasks[TASK_SET_TEXT] ) {
 		LinkedList blocks;
 		LinkedListNode *node;
@@ -336,28 +378,31 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 		ev.type = self.event_id;
 		ev.cancel_bubble = TRUE;
 		Widget_TriggerEvent( widget, &ev, NULL );
-		edit->tasks[TASK_UPDATE_CARET] = TRUE;
 		edit->tasks[TASK_SET_TEXT] = FALSE;
 		edit->tasks[TASK_UPDATE] = TRUE;
 	}
 	if( edit->tasks[TASK_UPDATE] ) {
 		LCUI_BOOL is_shown;
-		TextEdit_UpdateTextLayer( widget );
 		is_shown = edit->layer_source->length == 0;
 		if( is_shown ) {
 			edit->layer = edit->layer_placeholder;
+		} else if( edit->password_char ) {
+			edit->layer = edit->layer_mask;
 		} else {
 			edit->layer = edit->layer_source;
 		}
+		TextEdit_UpdateTextLayer( widget );
 		if( edit->is_placeholder_shown != is_shown ) {
 			Widget_InvalidateArea( widget, NULL, SV_PADDING_BOX );
 		}
 		edit->is_placeholder_shown = is_shown;
+		edit->tasks[TASK_UPDATE_CARET] = TRUE;
 		edit->tasks[TASK_UPDATE] = FALSE;
 	}
 	if( edit->tasks[TASK_UPDATE_CARET] ) {
 		TextEdit_UpdateCaret( widget );
 		edit->tasks[TASK_UPDATE_CARET] = FALSE;
+		edit->tasks[TASK_UPDATE] = FALSE;
 	}
 }
 
@@ -441,6 +486,14 @@ int TextEdit_SetText( LCUI_Widget widget, const char *utf8_str )
 	ret = TextEdit_SetTextW( widget, wstr );
 	free( wstr );
 	return ret;
+}
+
+void TextEdit_SetPasswordChar( LCUI_Widget w, wchar_t ch )
+{
+	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
+	edit->password_char = ch;
+	edit->tasks[TASK_UPDATE_MASK] = TRUE;
+	Widget_AddTask( w, WTT_USER );
 }
 
 /** 为文本框追加文本（宽字符版） */
@@ -704,7 +757,7 @@ static void TextEdit_OnMouseMove( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		Widget_GetAbsXY( w, NULL, &abs_x, &abs_y );
 		x = e->motion.x - abs_x - w->padding.left;
 		y = e->motion.y - abs_y - w->padding.top;
-		TextLayer_SetCaretPosByPixelPos( edit->layer, x, y );
+		TextLayer_SetCaretPosByPixelPos( edit->layer_source, x, y );
 	}
 	TextEdit_UpdateCaret( w );
 }

@@ -697,17 +697,20 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 	TextRow txtrow;
 	TextCharRec txtchar;
 	LinkedList tmp_tags;
-	LCUI_TextStyle *style = NULL;
-	const wchar_t *p_end, *p, *pp;
+	const wchar_t *p;
 	int cur_col, cur_row, start_row, ins_x, ins_y;
-	LCUI_BOOL is_tmp_tag_stack, need_typeset, rect_has_added;
+	LCUI_BOOL need_typeset, rect_has_added;
+	LCUI_TextStyle *style = NULL;
 
 	if( !wstr ) {
 		return -1;
 	}
 	need_typeset = FALSE;
 	rect_has_added = FALSE;
-	is_tmp_tag_stack = FALSE;
+	StyleTags_Init( &tmp_tags );
+	if( !tags ) {
+		tags = &tmp_tags;
+	}
 	/* 如果是将文本追加至文本末尾 */
 	if( add_type == TAT_APPEND ) {
 		if( layer->rowlist.length > 0 ) {
@@ -731,17 +734,10 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 	start_row = cur_row;
 	ins_x = cur_col;
 	ins_y = cur_row;
-	/* 如果没有可用的标签栈，则使用临时的标签栈 */
-	if( !tags ) {
-		is_tmp_tag_stack = TRUE;
-		StyleTags_Init( &tmp_tags );
-		tags = &tmp_tags;
-	}
-	p_end = wstr + wcslen( wstr );
-	for( p = wstr; p < p_end; ++p ) {
+	for( p = wstr; *p; ++p ) {
 		/* 如果启用的样式标签支持，则处理样式的结束标签 */
 		if( layer->is_using_style_tags ) {
-			pp = StyleTags_ScanEndingTag( tags, p );
+			const wchar_t *pp = StyleTags_ScanEndingTag( tags, p );
 			if( pp ) {
 				/* 抵消本次循环后的++p，以在下次循环时还能够在当前位置 */
 				p = pp - 1;
@@ -761,7 +757,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 		if( *p == '\r' || *p == '\n' ) {
 			/* 判断是哪一种换行模式 */
 			if( *p == '\r' ) {
-				if( p + 1 < p_end && *(p + 1) == '\n' ) {
+				if( *(p + 1) == '\n' ) {
 					eol = EOL_CR_LF;
 				} else {
 					eol = EOL_CR;
@@ -810,10 +806,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 		TextLayer_InvalidateRowsRect( layer, start_row, -1 );
 		rect_has_added = TRUE;
 	}
-	/* 如果使用的是临时标签栈，则销毁它 */
-	if( is_tmp_tag_stack ) {
-		StyleTags_Clear( tags );
-	}
+	StyleTags_Clear( &tmp_tags );
 	return 0;
 }
 
