@@ -130,7 +130,15 @@ textedit:disabled {
 
 );
 
-/*-------------------------------- End Caret --------------------------------*/
+static void fillchar( wchar_t *str, wchar_t ch )
+{
+	if( str ) {
+		wchar_t *p;
+		for( p = str; *p; ++p ) {
+			*p = ch;
+		}
+	}
+}
 
 static void TextEdit_UpdateCaret( LCUI_Widget widget )
 {
@@ -305,7 +313,7 @@ static void TextEdit_ProcTextBlock( LCUI_Widget widget, LCUI_TextBlock txtblk )
 	if( edit->password_char ) {
 		wchar_t *text = NEW( wchar_t, txtblk->length + 1 );
 		wcsncpy( text, txtblk->text, txtblk->length + 1 );
-		wcsset( text, edit->password_char );
+		fillchar( text, edit->password_char );
 		layer = edit->layer_mask;
 		if( txtblk->add_type == TBAT_INSERT ) {
 			TextLayer_InsertTextW( layer, text, NULL );
@@ -359,7 +367,7 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 		len = TextEdit_GetTextLength( widget );
 		for( i = 0; i < len; i += 255 ) {
 			TextEdit_GetTextW( widget, i, 255, text );
-			wcsset( text, edit->password_char );
+			fillchar( text, edit->password_char );
 			TextLayer_AppendTextW( edit->layer, text, NULL );
 		}
 	}
@@ -832,7 +840,9 @@ static void TextEdit_OnInit( LCUI_Widget w )
 static void TextEdit_OnDestroy( LCUI_Widget widget )
 {
 	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
-	TextLayer_Destroy( edit->layer );
+	edit->layer = NULL;
+	TextLayer_Destroy( edit->layer_source );
+	TextLayer_Destroy( edit->layer_placeholder );
 	TextLayer_Destroy( edit->layer_mask );
 	LinkedList_Clear( &edit->text_blocks, TextBlock_OnDestroy );
 }
