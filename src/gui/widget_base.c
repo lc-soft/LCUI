@@ -801,6 +801,48 @@ static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
 	return w->style->sheet[key].style;
 }
 
+/** 清除已计算的尺寸 */
+static void Widget_ClearComputedSize( LCUI_Widget w )
+{
+	LCUI_Style sw = &w->style->sheet[key_width];
+	LCUI_Style sh = &w->style->sheet[key_height];
+	if( !sw->is_valid || (sw->is_valid && sw->type == SVT_AUTO) ) {
+		w->width = 0;
+		w->box.content.width = 0;
+	}
+	if( !sh->is_valid || (sh->is_valid && sh->type == SVT_AUTO) ) {
+		w->height = 0;
+		w->box.content.height = 0;
+	}
+}
+
+static void Widget_UpdateChildrenSize( LCUI_Widget w )
+{
+	LinkedListNode *node;
+	for( LinkedList_Each( node, &w->children ) ) {
+		LCUI_Widget child = node->data;
+		LCUI_Style s = child->style->sheet;
+		if( s[key_width].type == SVT_SCALE || 
+		    s[key_height].type == SVT_SCALE ) {
+			Widget_AddTask( child, WTT_RESIZE );
+		}
+		if( child->computed_style.position == SV_ABSOLUTE ) {
+			if( s[key_right].is_valid || s[key_bottom].is_valid ||
+			    CheckStyleType( s, key_left, scale ) ||
+			    CheckStyleType( s, key_top, scale ) ) {
+				Widget_AddTask( child, WTT_POSITION );
+			}
+		}
+		if( CheckStyleValue( s, key_margin_left, AUTO ) ||
+		    CheckStyleValue( s, key_margin_right, AUTO ) ) {
+			Widget_AddTask( child, WTT_MARGIN );
+		}
+		if( child->computed_style.vertical_align != SV_TOP ) {
+			Widget_AddTask( child, WTT_POSITION );
+		}
+	}
+}
+
 void Widget_UpdatePosition( LCUI_Widget w )
 {
 	LCUI_Rect rect = w->box.graph;
@@ -813,6 +855,8 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	w->computed_style.bottom = ComputeYNumber( w, key_bottom );
 	if( w->parent && w->computed_style.position != position ) {
 		Widget_UpdateLayout( w->parent );
+		Widget_ClearComputedSize( w );
+		Widget_UpdateChildrenSize( w );
 	}
 	w->computed_style.position = position;
 	Widget_UpdateZIndex( w );
@@ -1044,8 +1088,7 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		if( w->proto && w->proto->autosize ) {
 			w->proto->autosize( w, &width, &height );
 		} else {
-			Widget_ComputeContentSize( w, &width, 
-							&height );
+			Widget_ComputeContentSize( w, &width, &height );
 		}
 		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
 			width += w->padding.left + w->padding.right;
@@ -1119,10 +1162,7 @@ static void Widget_ComputeSize( LCUI_Widget w )
 
 static void Widget_SendResizeEvent( LCUI_Widget w )
 {
-	LCUI_Style s;
-	LCUI_Widget child;
 	LCUI_WidgetEventRec e;
-	LinkedListNode *node;
 	e.target = w;
 	e.data = NULL;
 	e.type = WET_RESIZE;
@@ -1130,28 +1170,6 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 	Widget_TriggerEvent( w, &e, NULL );
 	Widget_AddTask( w, WTT_REFRESH );
 	Widget_PostSurfaceEvent( w, WET_RESIZE );
-	for( LinkedList_Each( node, &w->children ) ) {
-		child = node->data;
-		s = child->style->sheet;
-		if( s[key_width].type == SVT_SCALE || 
-		    s[key_height].type == SVT_SCALE ) {
-			Widget_AddTask( child, WTT_RESIZE );
-		}
-		if( child->computed_style.position == SV_ABSOLUTE ) {
-			if( s[key_right].is_valid || s[key_bottom].is_valid ||
-			    CheckStyleType( s, key_left, scale ) ||
-			    CheckStyleType( s, key_top, scale ) ) {
-				Widget_AddTask( child, WTT_POSITION );
-			}
-		}
-		if( CheckStyleValue( s, key_margin_left, AUTO ) ||
-		    CheckStyleValue( s, key_margin_right, AUTO ) ) {
-			Widget_AddTask( child, WTT_MARGIN );
-		}
-		if( child->computed_style.vertical_align != SV_TOP ) {
-			Widget_AddTask( child, WTT_POSITION );
-		}
-	}
 }
 
 void Widget_UpdateMargin( LCUI_Widget w )
@@ -1271,7 +1289,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 	    padding.top == w->padding.top &&
 	    padding.right == w->padding.right &&
 	    padding.bottom == w->padding.bottom &&
-	    padding.left == w->padding.left) {
+	    padding.left == w->padding.left ) {
 		return;
 	}
 	/* 若在变化前后的宽高中至少有一个为 0，则不继续处理 */
@@ -1304,6 +1322,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 		}
 	}
 	Widget_SendResizeEvent( w );
+	Widget_UpdateChildrenSize( w );
 }
 
 void Widget_UpdateProps( LCUI_Widget w )
