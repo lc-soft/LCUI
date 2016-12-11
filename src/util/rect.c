@@ -280,15 +280,10 @@ int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 	if( rect->w <= 0 || rect->h <= 0 ) {
 		return -1;
 	}
-	DEBUG_MSG( "list: %p, total: %d, rect(%d,%d,%d,%d)\n", list,
-		   list->length, rect->x, rect->y, rect->w, rect->h );
 	for( LinkedList_Each( node, list ) ) {
-		p_rect = (LCUI_Rect*)node->data;
-		DEBUG_MSG( "p_rect(%d,%d,%d,%d)\n", p_rect->x,
-			   p_rect->y, p_rect->w, p_rect->h );
+		p_rect = node->data;
 		/* 如果包含现有的矩形 */
 		if( LCUIRect_IsIncludeRect( rect, p_rect ) ) {
-			DEBUG_MSG( "delete\n" );
 			prev = node->prev;
 			free( node->data );
 			LinkedList_DeleteNode( list, node );
@@ -297,7 +292,6 @@ int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 		}
 		/* 如果被现有的矩形包含，则分割现有矩形 */
 		if( LCUIRect_IsIncludeRect( p_rect, rect ) ) {
-			DEBUG_MSG( "cut 4\n" );
 			LCUIRect_CutFourRect( rect, p_rect, tmp_rect );
 			prev = node->prev;
 			free( node->data );
@@ -320,7 +314,6 @@ int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 		if( !LCUIRect_GetOverlayRect( rect, p_rect, &o_rect ) ) {
 			continue;
 		}
-		DEBUG_MSG( "cut 2\n" );
 		LCUIRect_CutFourRect( &o_rect, p_rect, tmp_rect );
 		prev = node->prev;
 		free( node->data );
@@ -333,6 +326,5 @@ int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 			LinkedList_Insert( list, 0, &tmp_rect[i] );
 		}
 	}
-	DEBUG_MSG( "quit\n" );
 	return 1;
 }
