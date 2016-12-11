@@ -1019,6 +1019,16 @@ static void Widget_ComputeSize( LCUI_Widget w )
 			height += w->padding.top + w->padding.bottom;
 			height += bbox->top.width + bbox->bottom.width;
 		}
+		if( sw->type == SVT_AUTO &&
+		    w->computed_style.display == SV_BLOCK &&
+		    w->computed_style.position != SV_ABSOLUTE ) {
+			width = w->parent->box.content.width;
+			width -= w->margin.left + w->margin.right;
+			if( w->computed_style.box_sizing != SV_BORDER_BOX ) {
+				width -= w->padding.left + w->padding.right;
+				width -= bbox->left.width + bbox->right.width;
+			}
+		}
 		if( sw->type == SVT_AUTO ) {
 			w->width = width;
 		}
@@ -1026,27 +1036,29 @@ static void Widget_ComputeSize( LCUI_Widget w )
 			w->height = height;
 		}
 	}
-	if( sw->type == SVT_SCALE && w->parent ) {
+	while( sw->type == SVT_SCALE && w->parent ) {
 		LCUI_Style psw = &w->parent->style->sheet[key_width];
-		if( psw->type == SVT_AUTO ) {
-			if( w->proto && w->proto->autosize ) {
-				w->proto->autosize( w, &width, &height );
-			} else {
-				Widget_ComputeContentSize( w, &width, 
-							   &height );
-			}
-			if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
-				width += w->padding.left + w->padding.right;
-				width += bbox->left.width + bbox->right.width;
-				height += w->padding.top + w->padding.bottom;
-				height += bbox->top.width + bbox->bottom.width;
-			}
-			if( width > w->width ) {
-				w->width = width;
-				w->height = height;
-				Widget_AddTask( w->parent, WTT_RESIZE );
-			}
+		if( psw->type != SVT_AUTO ) {
+			break;
 		}
+		if( w->proto && w->proto->autosize ) {
+			w->proto->autosize( w, &width, &height );
+		} else {
+			Widget_ComputeContentSize( w, &width, 
+							&height );
+		}
+		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+			width += w->padding.left + w->padding.right;
+			width += bbox->left.width + bbox->right.width;
+			height += w->padding.top + w->padding.bottom;
+			height += bbox->top.width + bbox->bottom.width;
+		}
+		if( width > w->width ) {
+			w->width = width;
+			w->height = height;
+			Widget_AddTask( w->parent, WTT_RESIZE );
+		}
+		break;
 	}
 	if( w->style->sheet[key_max_width].is_valid ) {
 		n = ComputeXNumber( w, key_max_width );
