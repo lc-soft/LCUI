@@ -44,8 +44,11 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/ime.h>
+#include <LCUI/input.h>
 #include <LCUI/cursor.h>
 #include <LCUI/thread.h>
+
+#define DBLCLICK_INTERVAL	500
 
 typedef struct TouchCapturerRec_ {
 	LinkedList points;
@@ -82,13 +85,14 @@ typedef struct EventRecordNodeRec_ {
 
 /** 当前功能模块的相关数据 */
 static struct LCUIWidgetEvnetModule {
-	LCUI_Widget mouse_capturer;
-	LinkedList touch_capturers;
+	LCUI_Widget mouse_capturer;		/**< 占用鼠标的部件 */
+	LinkedList touch_capturers;		/**< 触点占用记录 */
 	LCUI_Widget targets[WST_TOTAL];		/**< 相关的部件 */
-	RBTree event_records;		/**< 当前正执行的事件的记录 */
-	RBTree event_names;		/**< 事件标识号 -> 名称映射表 */
-	Dict *event_ids;			/**< 事件名称 -> 标识号映射表 */
+	RBTree event_records;			/**< 当前正执行的事件的记录 */
+	RBTree event_names;			/**< 事件名称表，以标识号作为索引 */
+	Dict *event_ids;			/**< 事件标识号表，以事件名称作为索引 */
 	int base_event_id;			/**< 事件标识号计数器 */
+	int64_t click_time;			/**< 上一次鼠标点击时间 */
 	LCUI_Mutex mutex;			/**< 互斥锁 */
 } self;
 
@@ -712,10 +716,18 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		ev.button.y = pos.y;
 		ev.button.button = sys_ev->button.button;
 		Widget_PostEvent( target, &ev, NULL, NULL );
-		if( self.targets[WST_ACTIVE] == target ) {
-			if( ev.button.button == 1 ) {
-				ev.type = WET_CLICK;
+		if( self.targets[WST_ACTIVE] == target &&
+		    ev.button.button == LCUIKEY_LEFTBUTTON ) {
+			int delta;
+			ev.type = WET_CLICK;
+			Widget_PostEvent( target, &ev, NULL, NULL );
+			delta = (int)LCUI_GetTimeDelta( self.click_time );
+			if( delta < DBLCLICK_INTERVAL ) {
+				ev.type = WET_DBLCLICK;
 				Widget_PostEvent( target, &ev, NULL, NULL );
+				self.click_time = 0;
+			} else {
+				self.click_time = LCUI_GetTime();
 			}
 		}
 		Widget_UpdateStatus( NULL, WST_ACTIVE );
@@ -986,6 +998,7 @@ void LCUIWidget_InitEvent(void)
 		{ WET_MOUSEMOVE, "mousemove" },
 		{ WET_MOUSEWHEEL, "mousewheel" },
 		{ WET_CLICK, "click" },
+		{ WET_DBLCLICK, "dblclick" },
 		{ WET_MOUSEOUT, "mouseout" },
 		{ WET_MOUSEOVER, "mouseover" },
 		{ WET_KEYDOWN, "keydown" },
@@ -1012,6 +1025,7 @@ void LCUIWidget_InitEvent(void)
 	self.targets[WST_HOVER] = NULL;
 	self.targets[WST_FOCUS] = NULL;
 	self.mouse_capturer = NULL;
+	self.click_time = 0;
 	self.base_event_id = WET_USER + 1000;
 	self.event_ids = Dict_Create( &DictType_String, NULL );
 	n = sizeof( mappings ) / sizeof( mappings[0] );
