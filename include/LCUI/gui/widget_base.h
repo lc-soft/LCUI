@@ -147,6 +147,18 @@ typedef struct LCUI_WidgetData_ {
 	LCUI_WidgetDataEntryRec *list;
 } LCUI_WidgetData;
 
+typedef struct LCUI_WidgetAttributeRec_ {
+	char *name;
+	struct {
+		int type;
+		void (*destructor)(void*);
+		union {
+			char *string;
+			void *data;
+		};
+	} value;
+} LCUI_WidgetAttributeRec, *LCUI_WidgetAttribute;
+
 /** 部件结构 */
 typedef struct LCUI_WidgetRec_ {
 	int			state;			/**< 状态 */
@@ -170,6 +182,7 @@ typedef struct LCUI_WidgetRec_ {
 	LinkedList		children;		/**< 子部件 */
 	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
 	LCUI_WidgetData		data;			/**< 私有数据 */
+	Dict			*attributes;
 	LCUI_WidgetPrototypeC	proto;			/**< 原型 */
 	LCUI_BOOL		enable_graph;		/**< 是否启用位图缓存 */
 	LCUI_Graph		graph;			/**< 位图缓存 */
@@ -294,6 +307,19 @@ LCUI_API void Widget_Hide( LCUI_Widget w );
 LCUI_API void Widget_Lock( LCUI_Widget w );
 
 LCUI_API void Widget_Unlock( LCUI_Widget w );
+
+/** 为部件设置属性 */
+LCUI_API int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
+				    int value_type, void( *value_destructor )(void*) );
+
+/** 为部件设置属性（字符串版） */
+LCUI_API int Widget_SetAttribute( LCUI_Widget w, const char *name, const char *value );
+
+/** 获取部件属性 */
+LCUI_API const char *Widget_GetAttribute( LCUI_Widget w, const char *name );
+
+/** 判断部件类型 */
+LCUI_API LCUI_BOOL Widget_CheckType( LCUI_Widget w, const char *type );
 
 /** 为部件添加一个类 */
 LCUI_API int Widget_AddClass( LCUI_Widget w, const char *class_name );

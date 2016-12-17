@@ -265,7 +265,6 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 
 void LCUIWidget_InitStyle( void )
 {
-
 	LCUI_InitCSSLibrary();
 	LCUI_InitCSSParser();
 	LCUI_LoadCSSString( global_css, NULL );

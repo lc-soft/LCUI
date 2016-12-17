@@ -40,6 +40,7 @@
 #define ENABLE_MEMDEBUG
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -50,9 +51,10 @@
 #define WIDGET_SIZE (sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode) * 2)
 
 static struct LCUIWidgetModule {
-	LCUI_Widget root;	/** 根级部件 */
-	Dict *ids;		/** 各种部件的ID索引 */
-	LCUI_Mutex mutex;	/** 互斥锁 */
+	LCUI_Widget root;		/**< 根级部件 */
+	Dict *ids;			/**< 各种部件的ID索引 */
+	LCUI_Mutex mutex;		/**< 互斥锁 */
+	DictType dt_attributes;		/**< 部件属性表的类型模板 */
 } LCUIWidget;
 
 #define StrList_Destroy freestrs
@@ -329,8 +331,9 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 		free( widget->title );
 		widget->title = NULL;
 	}
-	widget->classes ? StrList_Destroy( widget->classes ):0;
-	widget->status ? StrList_Destroy( widget->status ):0;
+	widget->attributes ? Dict_Release( widget->attributes ) : 0;
+	widget->classes ? StrList_Destroy( widget->classes ) : 0;
+	widget->status ? StrList_Destroy( widget->status ) : 0;
 	LCUIMutex_Destroy( &widget->mutex );
 	EventTrigger_Destroy( widget->trigger );
 	widget->trigger = NULL;
@@ -1425,6 +1428,73 @@ void Widget_Unlock( LCUI_Widget w )
 	LCUIMutex_Unlock( &w->mutex );
 }
 
+int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
+			   int value_type, void( *value_destructor )(void*) )
+{
+	LCUI_WidgetAttribute attr;
+	if( !w->attributes ) {
+		w->attributes = Dict_Create( &LCUIWidget.dt_attributes, NULL );
+	}
+	attr = Dict_FetchValue( w->attributes, name );
+	if( attr ) {
+		if( attr->value.destructor ) {
+			attr->value.destructor( attr->value.data );
+		}
+	} else {
+		attr = NEW( LCUI_WidgetAttributeRec, 1 );
+		attr->name = strdup( name );
+		Dict_Add( w->attributes, attr->name, attr );
+	}
+	attr->value.type = value_type;
+	attr->value.string = strdup( value );
+	attr->value.destructor = value_destructor;
+	return 0;
+}
+
+int Widget_SetAttribute( LCUI_Widget w, const char *name, const char *value )
+{
+	char *value_str;
+	if( !value ) {
+		return Widget_SetAttributeEx( w, name, NULL, SVT_NONE, NULL );
+	}
+	value_str = strdup( value );
+	if( !value_str ) {
+		return -ENOMEM;
+	}
+	return Widget_SetAttributeEx( w, name, value_str, SVT_STRING, free );
+}
+
+const char *Widget_GetAttribute( LCUI_Widget w, const char *name )
+{
+	LCUI_WidgetAttribute attr;
+	if( !w->attributes ) {
+		return NULL;
+	}
+	attr = Dict_FetchValue( w->attributes, name );
+	if( attr ) {
+		return attr->value.string;
+	}
+	return NULL;
+}
+
+LCUI_BOOL Widget_CheckType( LCUI_Widget w, const char *type )
+{
+	LCUI_WidgetPrototypeC prop;
+
+	if( ! w || !w->type ) {
+		return FALSE;
+	}
+	if( strcmp( w->type, type ) == 0 ) {
+		return TRUE;
+	}
+	for( prop = w->proto->proto; prop; prop = prop->proto ) {
+		if( strcmp( prop->name, type ) == 0 ) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 /** 为部件添加一个类 */
 int Widget_AddClass( LCUI_Widget w, const char *class_name )
 {
@@ -1702,6 +1772,17 @@ void Widget_PrintTree( LCUI_Widget w )
 	_LCUIWidget_PrintTree( w, 0, "  " );
 }
 
+static void OnClearWidgetAttribute( void *privdata, void *data )
+{
+	LCUI_WidgetAttribute attr = data;
+	if( attr->value.destructor ) {
+		attr->value.destructor( attr->value.data );
+	}
+	free( attr->name );
+	attr->name = NULL;
+	attr->value.data = NULL;
+}
+
 extern void LCUIWidget_AddTextView( void );
 extern void LCUIWidget_AddButton( void );
 extern void LCUIWidget_AddSideBar( void );
@@ -1724,6 +1805,8 @@ void LCUI_InitWidget( void )
 	LCUIMutex_Init( &LCUIWidget.mutex );
 	LCUIWidget.ids = Dict_Create( &DictType_StringKey, NULL );
 	LCUIWidget.root = LCUIWidget_New( "root" );
+	LCUIWidget.dt_attributes = DictType_StringCopyKey;
+	LCUIWidget.dt_attributes.valDestructor = OnClearWidgetAttribute;
 	Widget_SetTitleW( LCUIWidget.root, L"LCUI Display" );
 }
 

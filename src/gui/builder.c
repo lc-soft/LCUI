@@ -199,6 +199,7 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		if( !w->proto || !w->proto->setattr ) {
 			continue;
 		}
+		Widget_SetAttribute( w, (const char*)prop->name, prop_val );
 		w->proto->setattr( w, (const char*)prop->name, prop_val );
 	}
 	return PB_ENTER;
