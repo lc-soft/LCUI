@@ -1303,12 +1303,15 @@ void Widget_UpdateSize( LCUI_Widget w )
 	if( w->style->sheet[key_height].type != SVT_AUTO ) {
 		Widget_UpdateLayout( w );
 	}
-	/* 如果是绝对定位，且指定了右边距，或者垂直对齐方式不为顶部对齐 */
-	if( (w->computed_style.position == SV_ABSOLUTE &&
-	    w->style->sheet[key_right].is_valid && 
-	    w->style->sheet[key_right].type != SVT_AUTO) ||
-	    w->computed_style.vertical_align != SV_TOP ) {
+	/* 如果垂直对齐方式不为顶部对齐 */
+	if( w->computed_style.vertical_align != SV_TOP ) {
 		Widget_UpdatePosition( w );
+	} else if( w->computed_style.position == SV_ABSOLUTE ) {
+		/* 如果是绝对定位，且指定了右间距或底间距 */
+		if( !CheckStyleValue( w->style->sheet, key_right, AUTO ) ||
+		    !CheckStyleValue( w->style->sheet, key_bottom, AUTO ) ) {
+			Widget_UpdatePosition( w );
+		}
 	}
 	if( w->parent ) {
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
