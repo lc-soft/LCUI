@@ -508,10 +508,88 @@ int Widget_SetId( LCUI_Widget w, const char *idstr )
 	return -2;
 }
 
+static int ComputeXNumber( LCUI_Widget w, int key )
+{
+	LCUI_Style s = &w->style->sheet[key];
+	switch( s->type ) {
+	case SVT_SCALE:
+		if( !w->parent ) {
+			break;
+		}
+		return w->parent->box.content.width * s->scale;
+	case SVT_PX:
+		return s->px;
+	case SVT_NONE:
+	case SVT_AUTO:
+	default: break;
+	}
+	return 0;
+}
+
+static int ComputeYNumber( LCUI_Widget w, int key )
+{
+	LCUI_Style s = &w->style->sheet[key];
+	switch( s->type ) {
+	case SVT_SCALE:
+		if( !w->parent ) {
+			break;
+		}
+		return w->parent->box.content.height * s->scale;
+	case SVT_PX:
+		return s->px;
+	case SVT_NONE:
+	case SVT_AUTO:
+	default: break;
+	}
+	return 0;
+}
+
+static int ComputeSelfXNumber( LCUI_Widget w, int key )
+{
+	LCUI_Style s = &w->style->sheet[key];
+	switch( s->type ) {
+	case SVT_SCALE:
+		return w->width * s->scale;
+	case SVT_PX:
+		return s->px;
+	case SVT_NONE:
+	case SVT_AUTO:
+	default: break;
+	}
+	return 0;
+}
+
+static int ComputeSelfYNumber( LCUI_Widget w, int key )
+{
+	LCUI_Style s = &w->style->sheet[key];
+	switch( s->type ) {
+	case SVT_SCALE:
+		return w->height * s->scale;
+	case SVT_PX: return s->px;
+	case SVT_NONE:
+	case SVT_AUTO:
+	default: break;
+	}
+	return 0;
+}
+
+static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
+{
+	if( !w->style->sheet[key].is_valid ) {
+		return default_value;
+	}
+	if( w->style->sheet[key].type != SVT_STYLE ) {
+		return default_value;
+	}
+	return w->style->sheet[key].style;
+}
+
 /** 计算边框样式 */
-static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
+static void Widget_ComputeBorder( LCUI_Widget w )
 {
 	LCUI_Style style;
+	LCUI_StyleSheet ss = w->style;
+	LCUI_Border *b = &w->computed_style.border;
 	int key = key_border_start ;
 	for( ; key <= key_border_end; ++key ) {
 		style = &ss->sheet[key];
@@ -555,6 +633,18 @@ static void ComputeBorderStyle( LCUI_StyleSheet ss, LCUI_Border *b )
 		case key_border_left_style:
 			b->left.style = style->value;
 			break;
+		case key_border_top_left_radius:
+			b->top_left_radius = ComputeSelfXNumber( w, key );
+			break;
+		case key_border_top_right_radius:
+			b->top_right_radius = ComputeSelfXNumber( w, key );
+			break;
+		case key_border_bottom_left_radius:
+			b->bottom_left_radius = ComputeSelfXNumber( w, key );
+			break;
+		case key_border_bottom_right_radius:
+			b->bottom_right_radius = ComputeSelfXNumber( w, key );
+			break;
 		default: break;
 		}
 	}
@@ -565,7 +655,7 @@ void Widget_UpdateBorder( LCUI_Widget w )
 	LCUI_Rect rect;
 	LCUI_Border ob, *nb;
 	ob = w->computed_style.border;
-	ComputeBorderStyle( w->style, &w->computed_style.border );
+	Widget_ComputeBorder( w );
 	nb = &w->computed_style.border;
 	/* 如果边框变化并未导致图层尺寸变化的话，则只重绘边框 */
 	if( ob.top.width != nb->top.width || 
@@ -757,51 +847,6 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 	if( w->computed_style.position != SV_STATIC ) {
 		Widget_AddTask( w, WTT_REFRESH );
 	}
-}
-
-static int ComputeXNumber( LCUI_Widget w, int key )
-{
-	LCUI_Style s = &w->style->sheet[key];
-	switch( s->type ) {
-	case SVT_SCALE:
-		if( !w->parent ) {
-			break;
-		}
-		return w->parent->box.content.width * s->scale;
-	case SVT_PX: return s->px;
-	case SVT_NONE:
-	case SVT_AUTO:
-	default: break;
-	}
-	return 0;
-}
-
-static int ComputeYNumber( LCUI_Widget w, int key )
-{
-	LCUI_Style s = &w->style->sheet[key];
-	switch( s->type ) {
-	case SVT_SCALE:
-		if( !w->parent ) {
-			break;
-		}
-		return w->parent->box.content.height * s->scale;
-	case SVT_PX: return s->px;
-	case SVT_NONE:
-	case SVT_AUTO:
-	default: break;
-	}
-	return 0;
-}
-
-static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
-{
-	if( !w->style->sheet[key].is_valid ) {
-		return default_value;
-	}
-	if( w->style->sheet[key].type != SVT_STYLE ) {
-		return default_value;
-	}
-	return w->style->sheet[key].style;
 }
 
 /** 清除已计算的尺寸 */

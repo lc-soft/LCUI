@@ -280,6 +280,19 @@ static int OnParseBorder( LCUI_StyleSheet ss, int key, const char *str )
 	return 0;
 }
 
+static int OnParseBorderRadius( LCUI_StyleSheet ss, int key, const char *str )
+{
+	LCUI_StyleRec s;
+	if( !ParseNumber( &s, str ) ) {
+		return -1;
+	}
+	ss->sheet[key_border_top_left_radius] = s;
+	ss->sheet[key_border_top_right_radius] = s;
+	ss->sheet[key_border_bottom_left_radius] = s;
+	ss->sheet[key_border_bottom_right_radius] = s;
+	return 0;
+}
+
 static int OnParseBorderLeft( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_StyleRec slist[3];
@@ -604,6 +617,7 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ -1, "border-color", OnParseBorderColor },
 	{ -1, "border-width", OnParseBorderWidth },
 	{ -1, "border-style", OnParseBorderStyle },
+	{ -1, "border-radius", OnParseBorderRadius },
 	{ -1, "padding", OnParsePadding },
 	{ -1, "margin", OnParseMargin },
 	{ -1, "box-shadow", OnParseBoxShadow },
