@@ -51,8 +51,14 @@ LCUI_API LCUI_Border Border( unsigned int width_px, int style, LCUI_Color color 
 LCUI_API void Border_Radius( LCUI_Border *border, unsigned int radius );
 /* 设置边框的圆角半径 */
 
-/** 绘制边框 */
-LCUI_API int Graph_DrawBorder( LCUI_PaintContext paint, LCUI_Rect *box, LCUI_Border *border );
+/**
+ * 绘制边框
+ * @param[in] paint 绘制上下文
+ * @param[in] box 需要绘制边框的矩形框
+ * @param[in] border 边框参数
+ */
+LCUI_API int Graph_DrawBorder( LCUI_PaintContext paint, 
+			       LCUI_Rect *box, LCUI_Border *border );
 
 LCUI_END_HEADER
 
