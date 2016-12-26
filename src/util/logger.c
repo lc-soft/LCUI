@@ -41,22 +41,30 @@
 #include <stdarg.h>
 #include <wchar.h>
 #include <LCUI_Build.h>
+#include <LCUI/thread.h>
 #include <LCUI/util/logger.h>
 
 #define BUFFER_SIZE 2048
 
 static struct Logger {
+	char inited;
 	char buffer[BUFFER_SIZE];
 	wchar_t bufferw[BUFFER_SIZE];
 	void( *handler )(const char*);
 	void( *handlerw )(const wchar_t*);
-} logger;
+	LCUI_Mutex mutex;
+} logger = { 0 };
 
 int Logger_Log( const char* fmt, ... )
 {
 	int len;
 	va_list args;
+	if( !logger.inited ) {
+		LCUIMutex_Init( &logger.mutex );
+		logger.inited = 1;
+	}
 	va_start( args, fmt );
+	LCUIMutex_Lock( &logger.mutex );
 	len = vsnprintf( logger.buffer, BUFFER_SIZE, fmt, args );
 	logger.buffer[BUFFER_SIZE - 1] = 0;
 	if( logger.handler ) {
@@ -64,6 +72,7 @@ int Logger_Log( const char* fmt, ... )
 	} else {
 		puts( logger.buffer );
 	}
+	LCUIMutex_Unlock( &logger.mutex );
 	va_end( args );
 	return len;
 }
@@ -72,7 +81,12 @@ int Logger_LogW( const wchar_t* fmt, ... )
 {
 	int len;
 	va_list args;
+	if( !logger.inited ) {
+		LCUIMutex_Init( &logger.mutex );
+		logger.inited = 1;
+	}
 	va_start( args, fmt );
+	LCUIMutex_Lock( &logger.mutex );
 	len = vswprintf( logger.bufferw, BUFFER_SIZE, fmt, args );
 	logger.bufferw[BUFFER_SIZE - 1] = 0;
 	if( logger.handlerw ) {
@@ -80,6 +94,7 @@ int Logger_LogW( const wchar_t* fmt, ... )
 	} else {
 		wprintf( logger.bufferw );
 	}
+	LCUIMutex_Unlock( &logger.mutex );
 	va_end( args );
 	return len;
 }
