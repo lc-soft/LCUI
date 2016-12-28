@@ -83,6 +83,14 @@ typedef struct EventRecordNodeRec_ {
 	LinkedList records;	/**< 事件记录列表 */
 } EventRecordNodeRec, *EventRecordNode;
 
+/** 鼠标点击记录 */
+typedef struct ClickRecord_ {
+	int64_t time;		/**< 时间 */
+	int x, y;		/**< 坐标 */
+	int interval;		/**< 与上次点击时的时间间隔 */
+	LCUI_Widget widget;	/**< 被点击的部件 */
+} ClickRecord;
+
 /** 当前功能模块的相关数据 */
 static struct LCUIWidgetEvnetModule {
 	LCUI_Widget mouse_capturer;		/**< 占用鼠标的部件 */
@@ -92,7 +100,7 @@ static struct LCUIWidgetEvnetModule {
 	RBTree event_names;			/**< 事件名称表，以标识号作为索引 */
 	Dict *event_ids;			/**< 事件标识号表，以事件名称作为索引 */
 	int base_event_id;			/**< 事件标识号计数器 */
-	int64_t click_time;			/**< 上一次鼠标点击时间 */
+	ClickRecord click;			/**< 上次鼠标点击记录 */
 	LCUI_Mutex mutex;			/**< 互斥锁 */
 } self;
 
@@ -707,6 +715,19 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		ev.button.y = pos.y;
 		ev.button.button = sys_ev->button.button;
 		Widget_PostEvent( target, &ev, NULL, NULL );
+		self.click.interval = DBLCLICK_INTERVAL;
+		if( ev.button.button == LCUIKEY_LEFTBUTTON &&
+		    self.click.widget == target ) {
+			int delta;
+			delta = (int)LCUI_GetTimeDelta( self.click.time );
+			self.click.interval = delta;
+		} else if( ev.button.button == LCUIKEY_LEFTBUTTON &&
+			   self.click.widget != target ) {
+			self.click.x = pos.x;
+			self.click.y = pos.y;
+		}
+		self.click.time = LCUI_GetTime();
+		self.click.widget = target;
 		Widget_UpdateStatus( target, WST_ACTIVE );
 		LCUIWidget_SetFocus( target );
 		break;
@@ -716,19 +737,32 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		ev.button.y = pos.y;
 		ev.button.button = sys_ev->button.button;
 		Widget_PostEvent( target, &ev, NULL, NULL );
-		if( self.targets[WST_ACTIVE] == target &&
-		    ev.button.button == LCUIKEY_LEFTBUTTON ) {
-			int delta;
-			ev.type = WET_CLICK;
+		if( self.targets[WST_ACTIVE] != target ||
+		    ev.button.button != LCUIKEY_LEFTBUTTON ) {
+			self.click.x = 0;
+			self.click.y = 0;
+			self.click.time = 0;
+			self.click.widget = NULL;
+			Widget_UpdateStatus( NULL, WST_ACTIVE );
+			break;
+		}
+		ev.type = WET_CLICK;
+		Widget_PostEvent( target, &ev, NULL, NULL );
+		Widget_UpdateStatus( NULL, WST_ACTIVE );
+		if(self.click.widget != target ) {
+			self.click.x = 0;
+			self.click.y = 0;
+			self.click.time = 0;
+			self.click.widget = NULL;
+			break;
+		}
+		if( self.click.interval < DBLCLICK_INTERVAL ) {
+			ev.type = WET_DBLCLICK;
+			self.click.x = 0;
+			self.click.y = 0;
+			self.click.time = 0;
+			self.click.widget = NULL;
 			Widget_PostEvent( target, &ev, NULL, NULL );
-			delta = (int)LCUI_GetTimeDelta( self.click_time );
-			if( delta < DBLCLICK_INTERVAL ) {
-				ev.type = WET_DBLCLICK;
-				Widget_PostEvent( target, &ev, NULL, NULL );
-				self.click_time = 0;
-			} else {
-				self.click_time = LCUI_GetTime();
-			}
 		}
 		Widget_UpdateStatus( NULL, WST_ACTIVE );
 		break;
@@ -736,6 +770,11 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		ev.type = WET_MOUSEMOVE;
 		ev.motion.x = pos.x;
 		ev.motion.y = pos.y;
+		if( abs( self.click.x - pos.x ) >= 8 ||
+		    abs( self.click.y - pos.y ) >= 8 ) {
+			self.click.time = 0;
+			self.click.widget = NULL;
+		}
 		Widget_PostEvent( target, &ev, NULL, NULL );
 		break;
 	case LCUI_MOUSEWHEEL:
@@ -1025,7 +1064,11 @@ void LCUIWidget_InitEvent(void)
 	self.targets[WST_HOVER] = NULL;
 	self.targets[WST_FOCUS] = NULL;
 	self.mouse_capturer = NULL;
-	self.click_time = 0;
+	self.click.x = 0;
+	self.click.y = 0;
+	self.click.time = 0;
+	self.click.widget= NULL;
+	self.click.interval = DBLCLICK_INTERVAL;
 	self.base_event_id = WET_USER + 1000;
 	self.event_ids = Dict_Create( &DictType_String, NULL );
 	n = sizeof( mappings ) / sizeof( mappings[0] );
