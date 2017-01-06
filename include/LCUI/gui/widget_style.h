@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_style.h -- widget style library module for LCUI.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_style.h -- LCUI 的部件样式库模块。
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -70,12 +70,6 @@ LCUI_API void Selector_Update( LCUI_Selector s );
 
 /** 删除选择器 */
 LCUI_API void Selector_Delete( LCUI_Selector s );
-
-/** 判断两个选择器是否相等 */
-LCUI_API LCUI_BOOL Selector_Compare( LCUI_Selector s1, LCUI_Selector s2 );
-
-/** 匹配元素路径与样式结点路径 */
-LCUI_API LCUI_BOOL Selector_MatchPath( LCUI_Selector selector, LCUI_Widget *wlist );
 
 /** 向样式库添加样式表 */
 LCUI_API int LCUI_PutStyleSheet( LCUI_Selector selector, 

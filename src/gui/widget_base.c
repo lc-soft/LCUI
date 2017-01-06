@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_base.c -- the widget base operation set.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_base.c -- 部件的基本操作集。
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -304,6 +304,8 @@ static void Widget_OnDestroy( void *arg )
 
 void Widget_ExecDestroy( LCUI_Widget widget )
 {
+	LCUI_WidgetEventRec e = { WET_DESTROY, 0 };
+	Widget_TriggerEvent( widget, &e, NULL );
 	Widget_ReleaseMouseCapture( widget );
 	Widget_ReleaseTouchCapture( widget, -1 );
 	Widget_StopEventPropagation( widget );
@@ -319,7 +321,6 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	StyleSheet_Delete( widget->inherited_style );
 	StyleSheet_Delete( widget->custom_style );
 	StyleSheet_Delete( widget->style );
-	Widget_PostSurfaceEvent( widget, WET_REMOVE );
 	Widget_UpdateLayout( widget->parent );
 	Widget_SetId( widget, NULL );
 	if( widget->type && !widget->proto ) {
@@ -347,6 +348,10 @@ void Widget_Destroy( LCUI_Widget w )
 		root = root->parent;
 	}
 	if( root != LCUIWidget.root ) {
+		LCUI_WidgetEventRec e = { 0 };
+		e.type = WET_REMOVE;
+		w->state = WSTATE_DELETED;
+		Widget_TriggerEvent( w, &e, NULL );
 		Widget_ExecDestroy( w );
 		return;
 	}
@@ -1527,7 +1532,7 @@ const char *Widget_GetAttribute( LCUI_Widget w, const char *name )
 
 LCUI_BOOL Widget_CheckType( LCUI_Widget w, const char *type )
 {
-	LCUI_WidgetPrototypeC prop;
+	LCUI_WidgetPrototypeC proto;
 
 	if( ! w || !w->type ) {
 		return FALSE;
@@ -1535,8 +1540,19 @@ LCUI_BOOL Widget_CheckType( LCUI_Widget w, const char *type )
 	if( strcmp( w->type, type ) == 0 ) {
 		return TRUE;
 	}
-	for( prop = w->proto->proto; prop; prop = prop->proto ) {
-		if( strcmp( prop->name, type ) == 0 ) {
+	for( proto = w->proto->proto; proto; proto = proto->proto ) {
+		if( strcmp( proto->name, type ) == 0 ) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+LCUI_BOOL Widget_CheckPrototype( LCUI_Widget w, LCUI_WidgetPrototypeC proto )
+{
+	LCUI_WidgetPrototypeC p;
+	for( p = w->proto; p; p = p->proto ) {
+		if( p == proto ) {
 			return TRUE;
 		}
 	}

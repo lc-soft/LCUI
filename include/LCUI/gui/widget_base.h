@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_base.h -- the widget base operation set.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_base.h -- 部件的基本操作集。
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -320,6 +320,9 @@ LCUI_API const char *Widget_GetAttribute( LCUI_Widget w, const char *name );
 
 /** 判断部件类型 */
 LCUI_API LCUI_BOOL Widget_CheckType( LCUI_Widget w, const char *type );
+
+/** 判断部件原型 */
+LCUI_API LCUI_BOOL Widget_CheckPrototype( LCUI_Widget w, LCUI_WidgetPrototypeC proto );
 
 /** 为部件添加一个类 */
 LCUI_API int Widget_AddClass( LCUI_Widget w, const char *class_name );

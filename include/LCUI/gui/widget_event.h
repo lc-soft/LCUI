@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_event.h -- LCUI widget event module.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_event.h -- LCUI部件事件模块
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -42,36 +42,37 @@
 
 LCUI_BEGIN_HEADER
 
+/** 部件事件类型枚举 */
 enum WidgetEventType {
 	WET_NONE,
 	WET_ADD,
-	WET_READY,
-	WET_REMOVE,
-	WET_DESTROY,
-	WET_MOVE,
-	WET_RESIZE,
-	WET_SHOW,
-	WET_HIDE,
-	WET_FOCUS,
-	WET_BLUR,
-	WET_AFTERLAYOUT,
-	WET_KEYDOWN,
-	WET_KEYUP,
-	WET_KEYPRESS,
-	WET_TEXTINPUT,
+	WET_READY,		/**< 在初次更新尺寸和位置后 */
+	WET_REMOVE,		/**< 在被标记需要移除时 */
+	WET_DESTROY,		/**< 在开始彻底销毁前 */
+	WET_MOVE,		/**< 在移动位置时 */
+	WET_RESIZE,		/**< 改变尺寸 */
+	WET_SHOW,		/**< 显示 */
+	WET_HIDE,		/**< 隐藏 */
+	WET_FOCUS,		/**< 获得焦点 */
+	WET_BLUR,		/**< 失去焦点 */
+	WET_AFTERLAYOUT,	/**< 在子部件布局完成后 */
+	WET_KEYDOWN,		/**< 按键按下 */
+	WET_KEYUP,		/**< 按键释放 */
+	WET_KEYPRESS,		/**< 按键字符输入 */
+	WET_TEXTINPUT,		/**< 文本输入 */
 
-	WET_MOUSEOVER,
-	WET_MOUSEMOVE,
-	WET_MOUSEOUT,
-	WET_MOUSEDOWN,
-	WET_MOUSEUP,
-	WET_MOUSEWHEEL,
-	WET_CLICK,
-	WET_DBLCLICK,
-	WET_TOUCH,
-	WET_TOUCHDOWN,
-	WET_TOUCHUP,
-	WET_TOUCHMOVE,
+	WET_MOUSEOVER,		/**< 鼠标在部件上 */
+	WET_MOUSEMOVE,		/**< 鼠标在部件上移动 */
+	WET_MOUSEOUT,		/**< 鼠标从部件上移开 */
+	WET_MOUSEDOWN,		/**< 鼠标按键按下 */
+	WET_MOUSEUP,		/**< 鼠标按键释放 */
+	WET_MOUSEWHEEL,		/**< 鼠标滚轮滚动时 */
+	WET_CLICK,		/**< 鼠标单击 */
+	WET_DBLCLICK,		/**< 鼠标双击 */
+	WET_TOUCH,		/**< 触控 */
+	WET_TOUCHDOWN,		/**< 触点按下 */
+	WET_TOUCHUP,		/**< 触点释放 */
+	WET_TOUCHMOVE,		/**< 触点移动 */
 
 	WET_TITLE,
 	WET_SURFACE,

@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * widget_event.c -- LCUI widget event module.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_event.c -- LCUI部件事件模块
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -554,11 +554,17 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data,
 		      void (*destroy_data)(void*))
 {
+	if( !e->target ) {
+		e->target = widget;
+	}
 	return Widget_TriggerEventEx( widget, e, data, destroy_data, FALSE );
 }
 
 int Widget_TriggerEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data )
 {
+	if( !e->target ) {
+		e->target = widget;
+	}
 	return Widget_TriggerEventEx( widget, e, data, NULL, TRUE );
 }
 
@@ -1031,6 +1037,7 @@ void LCUIWidget_InitEvent(void)
 		const char *name;
 	} mappings[] = {
 		{ WET_READY, "ready" },
+		{ WET_REMOVE, "remove" },
 		{ WET_DESTROY, "destroy" },
 		{ WET_MOUSEDOWN, "mousedown" },
 		{ WET_MOUSEUP, "mouseup" },

@@ -1,7 +1,7 @@
 ﻿/* **************************************************************************
  * widget_task.c -- LCUI widget task module.
  *
- * Copyright (C) 2014-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2014-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_task.c -- LCUI部件任务处理模块
  *
- * 版权所有 (C) 2014-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2014-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -155,9 +155,12 @@ void LCUIWidget_ExitTask( void )
 
 void Widget_AddToTrash( LCUI_Widget w )
 {
+	LCUI_WidgetEventRec e = { 0 };
 	LinkedListNode *snode, *node;
 
+	e.type = WET_REMOVE;
 	w->state = WSTATE_DELETED;
+	Widget_TriggerEvent( w, &e, NULL );
 	if( !w->parent ) {
 		return;
 	}
@@ -166,6 +169,7 @@ void Widget_AddToTrash( LCUI_Widget w )
 	LinkedList_Unlink( &w->parent->children, node );
 	LinkedList_Unlink( &w->parent->children_show, snode );
 	LinkedList_AppendNode( &self.trash, node );
+	Widget_PostSurfaceEvent( w, WET_REMOVE );
 }
 
 int Widget_UpdateEx( LCUI_Widget w, LCUI_BOOL has_timeout )
