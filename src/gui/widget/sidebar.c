@@ -62,7 +62,7 @@ static struct SideBarModule {
 	LCUI_WidgetPrototype toggle;
 } self;
 
-static const char sidebar_css[] = ToString(
+static const char sidebar_css[] = CodeToString(
 
 sidebar {
 	width: 224px;

@@ -52,7 +52,7 @@ typedef struct {
 } TaskMap;
 
 /** 部件的缺省样式 */
-const char *global_css = ToString(
+const char *global_css = CodeToString(
 
 * {
 	width: auto;

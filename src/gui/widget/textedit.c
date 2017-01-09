@@ -110,7 +110,7 @@ static struct LCUI_TextEditModule {
 } self;
 
 
-static const char *textedit_css = ToString(
+static const char *textedit_css = CodeToString(
 
 textedit {
 	min-width: 124px;

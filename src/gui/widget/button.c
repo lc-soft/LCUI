@@ -53,7 +53,7 @@ typedef struct LCUI_ButtonRec_ {
 static LCUI_WidgetPrototype prototype = NULL;
 
 /** 按钮的 css 样式 */
-static const char *button_css = ToString(
+static const char *button_css = CodeToString(
 
 button {
 	padding: 6px 12px;

@@ -46,7 +46,7 @@
 
 int LCUIMutex_Init( LCUI_Mutex *mutex )
 {
-	*mutex = CreateMutex(NULL, FALSE, NULL);
+	*mutex = CreateMutex( NULL, FALSE, NULL );
 	return 0;
 }
 

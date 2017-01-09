@@ -85,7 +85,7 @@ static struct LCUI_ScrollbarModule {
 	LCUI_WidgetPrototype prototype;
 } self;
 
-static const char *scrollbar_css = ToString(
+static const char *scrollbar_css = CodeToString(
 
 scrollbar {
 	top: 0;

@@ -57,7 +57,7 @@ typedef struct LCUI_TextCaretRec_ {
 
 static LCUI_WidgetPrototype prototype = NULL;
 
-static const char *textcaret_css = ToString(
+static const char *textcaret_css = CodeToString(
 
 textcaret {
 	pointer-events: none;
