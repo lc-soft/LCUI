@@ -39,6 +39,11 @@
 
 #ifndef LCUI_UTIL_H
 #define LCUI_UTIL_H
+
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
+
 #include <LCUI/util/time.h>
 #include <LCUI/util/dirent.h>
 #include <LCUI/util/rbtree.h>

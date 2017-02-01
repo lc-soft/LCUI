@@ -160,7 +160,7 @@ static int Graph_DrawRoundBorderLeftTop( LCUI_Graph *dst, LCUI_Pos center,
 		}
 		/* 加上圆与背景图的左边距 */
 		bound_px += (center.x - radius);
-		for( px; px < bound_px; ++px ) {
+		for( ; px < bound_px; ++px ) {
 			px->alpha = 0;
 		}
 		/* 计算需要向右填充的像素点的个数n */
@@ -183,7 +183,7 @@ static int Graph_DrawRoundBorderLeftTop( LCUI_Graph *dst, LCUI_Pos center,
 		}
 		bound_px = px + n - 1;
 		/* 开始填充当前点右边的n-1个像素点 */
-		for( px; px < bound_px; ++px ) {
+		for( ; px < bound_px; ++px ) {
 			*px = color;
 		}
 	}
@@ -235,7 +235,7 @@ static int Graph_DrawRoundBorderTopLeft( LCUI_Graph *dst, LCUI_Pos center,
 		/* 加上圆与背景图的上边距 */
 		n += (center.y - radius);
 		bound_px = px - n * dst->width;
-		for( px; px > bound_px; px -= dst->width ) {
+		for( ; px > bound_px; px -= dst->width ) {
 			px->alpha = 0;
 		}
 		/* 计算需要向下填充的像素点的个数n */
@@ -257,7 +257,7 @@ static int Graph_DrawRoundBorderTopLeft( LCUI_Graph *dst, LCUI_Pos center,
 		}
 		bound_px = px + (n - 1) * dst->width;
 		/* 开始填充当前点下边的n-2个像素点 */
-		for( px; px < bound_px; px += dst->width ) {
+		for( ; px < bound_px; px += dst->width ) {
 			*px = color;
 		}
 	}
@@ -311,7 +311,7 @@ static int Graph_DrawRoundBorderRightTop( LCUI_Graph *dst, LCUI_Pos center,
 			px = center_px + x;
 		}
 		bound_px = px - n;
-		for( px; px > bound_px; --px ) {
+		for( ; px > bound_px; --px ) {
 			*px = color;
 		}
 	}
@@ -360,7 +360,7 @@ static int Graph_DrawRoundBorderTopRight( LCUI_Graph *dst, LCUI_Pos center,
 		px -= dst->width;
 		n += (center.y - radius);
 		bound_px = px - n * dst->width;
-		for( px; px > bound_px; px -= dst->width ) {
+		for( ; px > bound_px; px -= dst->width ) {
 			px->alpha = 0;
 		}
 		n = radius - y + width;
@@ -376,7 +376,7 @@ static int Graph_DrawRoundBorderTopRight( LCUI_Graph *dst, LCUI_Pos center,
 			n = bound.bottom - radius + y;
 		}
 		bound_px = px + (n - 1)*dst->width;
-		for( px; px < bound_px; px += dst->width ) {
+		for( ; px < bound_px; px += dst->width ) {
 			*px = color;
 		}
 	}
@@ -419,7 +419,7 @@ static int Graph_DrawRoundBorderLeftBottom( LCUI_Graph *dst, LCUI_Pos center,
 		}
 		n += (center.x - radius);
 		bound_px = px + n;
-		for( px; px < bound_px; ++px ) {
+		for( ; px < bound_px; ++px ) {
 			px->alpha = 0;
 		}
 		n = radius - x + width;
@@ -435,7 +435,7 @@ static int Graph_DrawRoundBorderLeftBottom( LCUI_Graph *dst, LCUI_Pos center,
 		}
 		++px;
 		bound_px = px + n - 1;
-		for( px; px < bound_px; ++px ) {
+		for( ; px < bound_px; ++px ) {
 			*px = color;
 		}
 	}
@@ -503,7 +503,7 @@ static int Graph_DrawRoundBorderBottomLeft( LCUI_Graph *dst, LCUI_Pos center,
 		}
 		bound_px = px - (n - 1) * dst->width;
 		/* 开始填充当前点下边的n-1个像素点 */
-		for( px; px > bound_px; px -= dst->width ) {
+		for( ; px > bound_px; px -= dst->width ) {
 			*px = color;
 		}
 	}
@@ -555,7 +555,7 @@ static int Graph_DrawRoundBorderRightBottom( LCUI_Graph *dst, LCUI_Pos center,
 			px = center_px + x;
 		}
 		bound_px = px - n;
-		for( px; px > bound_px; --px ) {
+		for( ; px > bound_px; --px ) {
 			*px = color;
 		}
 	}

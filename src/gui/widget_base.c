@@ -45,8 +45,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 
-#undef max
-#define max(a,b)    (((a) > (b)) ? (a) : (b))
 #define WIDGET_SIZE (sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode) * 2)
 
 static struct LCUIWidgetModule {
@@ -556,20 +554,6 @@ static float ComputeSelfXNumber( LCUI_Widget w, int key )
 		return w->width * s->scale;
 	case SVT_PX:
 		return s->px;
-	case SVT_NONE:
-	case SVT_AUTO:
-	default: break;
-	}
-	return 0;
-}
-
-static float ComputeSelfYNumber( LCUI_Widget w, int key )
-{
-	LCUI_Style s = &w->style->sheet[key];
-	switch( s->type ) {
-	case SVT_SCALE:
-		return w->height * s->scale;
-	case SVT_PX: return s->px;
 	case SVT_NONE:
 	case SVT_AUTO:
 	default: break;

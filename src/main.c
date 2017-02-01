@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * main.c -- The main functions for the LCUI normal work
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * main.c -- 使LCUI能够正常工作的相关主要函数
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -86,7 +86,7 @@ static struct LCUI_System {
 		LCUI_EventTrigger trigger;	/**< 系统事件容器 */
 		LCUI_Mutex mutex;		/**< 互斥锁 */
 	} event;
-} System = { 0 };
+} System;
 
 /** LCUI 应用程序数据 */
 static struct LCUI_App {
@@ -102,7 +102,7 @@ static struct LCUI_App {
 		LCUI_Mutex mutex;	/**< 互斥锁 */
 		LCUI_Cond cond;		/**< 条件变量 */
 	} agent;
-} MainApp = { 0 };
+} MainApp;
 
 /*-------------------------- system event <START> ---------------------------*/
 

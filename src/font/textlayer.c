@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * textlayer.c -- text bitmap layer processing module.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * textlayer.c -- 文本图层处理模块
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -49,8 +49,6 @@ enum TextAddType {
 	TAT_APPEND	/**< 追加至文本末尾 */
 };
 
-#undef max
-#define max(a, b) ((a) > (b) ? (a):(b))
 #define TextRowList_AddNewRow(ROWLIST) TextRowList_InsertNewRow(ROWLIST, (ROWLIST)->length)
 #define TextLayer_GetRow(layer, n) (n >= layer->rowlist.length) ? NULL:layer->rowlist.rows[n]
 
