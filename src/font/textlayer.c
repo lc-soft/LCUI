@@ -1322,8 +1322,8 @@ int TextLayer_Draw( LCUI_TextLayer layer )
 	}
 	rect.x = 0;
 	rect.y = 0;
-	rect.w = layer->max_width;
-	rect.h = layer->max_height;
+	rect.width = layer->max_width;
+	rect.height = layer->max_height;
 	return TextLayer_DrawToGraph( layer, rect, pos, &layer->graph );
 }
 

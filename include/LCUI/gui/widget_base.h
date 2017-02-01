@@ -49,8 +49,8 @@ LCUI_BEGIN_HEADER
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
 	LCUI_BOOL focusable;		/**< 是否能够得到焦点 */
-	int left, top;			/**< 左边界、顶边界的偏移距离 */
-	int right, bottom;		/**< 右边界、底边界的偏移距离 */
+	float left, top;		/**< 左边界、顶边界的偏移距离 */
+	float right, bottom;		/**< 右边界、底边界的偏移距离 */
 	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
 	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
 	LCUI_StyleValue position;	/**< 定位方式 */
@@ -90,11 +90,11 @@ enum WidgetTaskType {
 };
 
 typedef struct LCUI_WidgetBoxRect {
-	LCUI_Rect content;	/**< 内容框的区域 */
-	LCUI_Rect padding;	/**< 内边距框的区域 */
-	LCUI_Rect border;	/**< 边框盒的区域，包括内边距框和内容框区域 */
-	LCUI_Rect outer;	/**< 外边距框的区域，包括边框盒和外边距框区域 */
-	LCUI_Rect graph;	/**< 图层的区域，包括边框盒和阴影区域 */
+	LCUI_RectF content;	/**< 内容框的区域 */
+	LCUI_RectF padding;	/**< 内边距框的区域 */
+	LCUI_RectF border;	/**< 边框盒的区域，包括内边距框和内容框区域 */
+	LCUI_RectF outer;	/**< 外边距框的区域，包括边框盒和外边距框区域 */
+	LCUI_RectF graph;	/**< 图层的区域，包括边框盒和阴影区域 */
 } LCUI_WidgetBoxRect;
 
 typedef struct LCUI_WidgetTaskBoxRec_ {
@@ -118,7 +118,7 @@ typedef struct LCUI_WidgetPrototypeRec_ *LCUI_WidgetPrototype;
 typedef const struct LCUI_WidgetPrototypeRec_ *LCUI_WidgetPrototypeC;
 
 typedef void( *LCUI_WidgetFunction )(LCUI_Widget);
-typedef void( *LCUI_WidgetResizer )(LCUI_Widget, int*, int*);
+typedef void( *LCUI_WidgetResizer )(LCUI_Widget, float*, float*);
 typedef void( *LCUI_WidgetAttrSetter )(LCUI_Widget, const char*, const char*);
 typedef void( *LCUI_WidgetTextSetter )(LCUI_Widget, const char*);
 typedef void( *LCUI_WidgetPainter )(LCUI_Widget, LCUI_PaintContext);
@@ -162,17 +162,17 @@ typedef struct LCUI_WidgetAttributeRec_ {
 /** 部件结构 */
 typedef struct LCUI_WidgetRec_ {
 	int			state;			/**< 状态 */
-	int			x, y;			/**< 当前坐标（由 origin 计算而来） */
-	int			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
-	int			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
+	float			x, y;			/**< 当前坐标（由 origin 计算而来） */
+	float			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
+	float			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
 	int			index;			/**< 部件索引位置 */
 	char			*id;			/**< ID */
 	char			*type;			/**< 类型 */
 	char			**classes;		/**< 类列表 */
 	char			**status;		/**< 状态列表 */
 	wchar_t			*title;			/**< 标题 */
-	LCUI_Rect2		padding;		/**< 内边距框 */
-	LCUI_Rect2		margin;			/**< 外边距框 */
+	LCUI_Rect2F		padding;		/**< 内边距框 */
+	LCUI_Rect2F		margin;			/**< 外边距框 */
 	LCUI_WidgetBoxRect	box;			/**< 部件的各个区域信息 */
 	LCUI_StyleSheet		style;			/**< 当前完整样式表 */
 	LCUI_StyleSheet		custom_style;		/**< 自定义样式表 */
@@ -343,7 +343,7 @@ LCUI_API LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name );
 LCUI_API void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled );
 
 /** 计算部件的最大宽度 */
-LCUI_API int Widget_ComputeMaxWidth( LCUI_Widget w );
+LCUI_API float Widget_ComputeMaxWidth( LCUI_Widget w );
 
 /** 锁定子部件的布局，让 LCUI 不自动更新布局 */
 LCUI_API void Widget_LockLayout( LCUI_Widget w );

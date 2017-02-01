@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * background.c -- graph background image draw support.
  *
- * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * background.c -- 背景图像绘制支持
  *
- * 版权所有 (C) 2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -92,7 +92,7 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 	} else {
 		switch( bg->size.w.type ) {
 		case SVT_SCALE:
-			image_w = box->w * bg->size.w.scale;
+			image_w = box->width * bg->size.w.scale;
 			break;
 		case SVT_PX:
 			image_w = bg->size.w.px;
@@ -103,7 +103,7 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 		}
 		switch( bg->size.h.type ) {
 		case SVT_SCALE:
-			image_h = box->h * bg->size.h.scale;
+			image_h = box->height * bg->size.h.scale;
 			break;
 		case SVT_PX:
 			image_h = bg->size.h.px;
@@ -118,37 +118,37 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 		switch( bg->position.value ) {
 		case SV_TOP:
 		case SV_TOP_CENTER:
-			image_x = (box->w - image_w) / 2;
+			image_x = (box->width - image_w) / 2;
 			image_y = 0;
 			break;
 		case SV_TOP_RIGHT:
-			image_x = box->w - image_w;
+			image_x = box->width - image_w;
 			image_y = 0;
 			break;
 		case SV_CENTER_LEFT:
 			image_x = 0;
-			image_y = (box->h - image_h) / 2;
+			image_y = (box->height - image_h) / 2;
 			break;
 		case SV_CENTER:
 		case SV_CENTER_CENTER:
-			image_x = (box->w - image_w) / 2;
-			image_y = (box->h - image_h) / 2;
+			image_x = (box->width - image_w) / 2;
+			image_y = (box->height - image_h) / 2;
 			break;
 		case SV_CENTER_RIGHT:
-			image_x = box->w - image_w;
-			image_y = (box->h - image_h) / 2;
+			image_x = box->width - image_w;
+			image_y = (box->height - image_h) / 2;
 			break;
 		case SV_BOTTOM_LEFT:
 			image_x = 0;
-			image_y = box->h - image_h;
+			image_y = box->height - image_h;
 			break;
 		case SV_BOTTOM_CENTER:
-			image_x = (box->w - image_w) / 2;
-			image_y = box->h - image_h;
+			image_x = (box->width - image_w) / 2;
+			image_y = box->height - image_h;
 			break;
 		case SV_BOTTOM_RIGHT:
-			image_x = box->w - image_w;
-			image_y = box->h - image_h;
+			image_x = box->width - image_w;
+			image_y = box->height - image_h;
 			break;
 		case SV_TOP_LEFT:
 		default:image_x = image_y = 0; break;
@@ -156,7 +156,7 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 	} else {
 		switch( bg->position.x.type ) {
 		case SVT_SCALE:
-			image_x = box->w - image_w;
+			image_x = box->width - image_w;
 			image_x *= bg->position.x.scale;
 			break;
 		case SVT_PX:
@@ -166,7 +166,7 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 		}
 		switch( bg->position.y.type ) {
 		case SVT_SCALE:
-			image_y = box->h - image_h;
+			image_y = box->height - image_h;
 			image_y *= bg->position.y.scale;
 			break;
 		case SVT_PX:

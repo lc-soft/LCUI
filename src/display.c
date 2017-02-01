@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * display.c -- graphical display control
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * display.c -- 图形显示控制
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -121,7 +121,7 @@ static void LCUIDisplay_Update(void)
 			}
 			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
 				p_sr->widget->type, paint->rect.left,
-				paint->rect.top, paint->rect.w, paint->rect.h );
+				paint->rect.top, paint->rect.width, paint->rect.height );
 			Widget_Render( p_sr->widget, paint );
 			if( display.show_rect_border ) {
 				DrawBorder( paint );
@@ -182,28 +182,32 @@ LCUI_Surface LCUIDisplay_GetSurfaceOwner( LCUI_Widget w )
 /** 将 widget 与 sruface 进行绑定 */
 static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 {
-	LCUI_Rect *p_rect;
-	SurfaceRecord *p_sr;
+	LCUI_RectF *rect;
+	SurfaceRecord *sr;
+	int width, height;
+
 	if( LCUIDisplay_GetBindSurface(widget) ) {
 		return;
 	}
-	p_sr = NEW( SurfaceRecord, 1 );
-	p_sr->widget = widget;
-	p_sr->surface = Surface_New();
-	Surface_SetCaptionW( p_sr->surface, widget->title );
-	p_rect = &widget->box.graph;
+	rect = &widget->box.graph;
+	sr = NEW( SurfaceRecord, 1 );
+	sr->surface = Surface_New();
+	sr->widget = widget;
+	Surface_SetCaptionW( sr->surface, widget->title );
 	if( widget->style->sheet[key_top].is_valid &&
 	    widget->style->sheet[key_left].is_valid ) {
-		Surface_Move( p_sr->surface, p_rect->x, p_rect->y );
+		Surface_Move( sr->surface, rect->x, rect->y );
 	}
-	Surface_Resize( p_sr->surface, p_rect->w, p_rect->h );
+	width = (int)(rect->width + 0.5);
+	height = (int)(rect->height + 0.5);
+	Surface_Resize( sr->surface, width, height );
 	if( widget->computed_style.visible ) {
-		Surface_Show( p_sr->surface );
+		Surface_Show( sr->surface );
 	} else {
-		Surface_Hide( p_sr->surface );
+		Surface_Hide( sr->surface );
 	}
 	Widget_InvalidateArea( widget, NULL, SV_GRAPH_BOX );
-	LinkedList_Append( &display.surfaces, p_sr );
+	LinkedList_Append( &display.surfaces, sr );
 }
 
 /** 解除 widget 与 sruface 的绑定 */
@@ -492,7 +496,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	int e_type;
 	LCUI_Widget root;
-	LCUI_Rect *p_rect;
+	LCUI_RectF *rect;
 	LCUI_Surface surface;
 	e_type = *((int*)&arg);
 	root = LCUIWidget_GetRoot();
@@ -508,7 +512,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	} else {
 		return;
 	}
-	p_rect = &e->target->box.graph;
+	rect = &e->target->box.graph;
 	switch( e_type ) {
 	case WET_ADD:
 		LCUIDisplay_BindSurface( e->target );
@@ -528,21 +532,29 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		Surface_SetCaptionW( surface, e->target->title );
 		break;
 	case WET_RESIZE:
-		DEBUG_MSG( "resize, w: %d, h: %d\n", p_rect->w, p_rect->h );
-		Surface_Resize( surface, p_rect->w, p_rect->h );
+	{
+		int width = (int)(rect->width + 0.5);
+		int height = (int)(rect->height + 0.5);
+		DEBUG_MSG( "resize, w: %d, h: %d\n", width, height );
+		Surface_Resize( surface, width, height );
 		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 		if( w == root && display.mode != LCDM_SEAMLESS ) {
-			LCUIDisplay_ExecResize( p_rect->w, p_rect->h );
+			LCUIDisplay_ExecResize( width, height );
 		}
 		break;
+	}
 	case WET_MOVE:
+	{
+		int x = (int)(rect->x + 0.5);
+		int y = (int)(rect->y + 0.5);
 		if( !w->style->sheet[key_top].is_valid ||
 		    !w->style->sheet[key_left].is_valid ) {
 			break;
 		}
-		DEBUG_MSG( "x: %d, y: %d\n", p_rect->left, p_rect->top );
-		Surface_Move( surface, p_rect->left, p_rect->top );
+		DEBUG_MSG( "x: %d, y: %d\n", x, y );
+		Surface_Move( surface, x, y );
 		break;
+	}
 	default: break;
 	}
 }
@@ -568,13 +580,15 @@ static void OnResize( LCUI_Event e, void *arg )
 	LCUI_Widget widget;
 	LCUI_DisplayEvent dpy_ev = arg;
 	widget = LCUIDisplay_GetBindWidget( dpy_ev->surface );
+	LOG( "[display] resize: (%d,%d)\n", dpy_ev->resize.width, dpy_ev->resize.height );
 	if( !widget ) {
 		return;
 	}
 	Widget_Resize( widget, dpy_ev->resize.width, dpy_ev->resize.height );
 }
 
-int LCUIDisplay_BindEvent( int event_id, LCUI_EventFunc func, void *arg,
+int LCUIDisplay_BindEvent( int event_id, 
+			   LCUI_EventFunc func, void *arg,
 			   void *data, void( *destroy_data )(void*) )
 {
 	if( display.is_working ) {

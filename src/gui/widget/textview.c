@@ -391,7 +391,7 @@ static void TextView_OnDestroy( LCUI_Widget w )
 	TextLayer_Destroy( txt->layer );
 }
 
-static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )
+static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 {
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	/*如果自身的宽度单位是百分比，且父级部件宽度为自适应 */
@@ -405,14 +405,14 @@ static void TextView_AutoSize( LCUI_Widget w, int *width, int *height )
 		}
 		TextLayer_SetFixedSize( txt->layer, 0, 0 );
 		TextLayer_Update( txt->layer, NULL );
-		*width = TextLayer_GetWidth( txt->layer );
-		*height = TextLayer_GetHeight( txt->layer );
+		*width = TextLayer_GetWidth( txt->layer ) * 1.0;
+		*height = TextLayer_GetHeight( txt->layer ) * 1.0;
 		TextLayer_SetFixedSize( txt->layer, fixed_w, fixed_h );
 		TextLayer_Update( txt->layer, NULL );
 		return;
 	}
-	*width = TextLayer_GetWidth( txt->layer );
-	*height = TextLayer_GetHeight( txt->layer );
+	*width = TextLayer_GetWidth( txt->layer ) * 1.0;
+	*height = TextLayer_GetHeight( txt->layer ) * 1.0;
 }
 
 /** 私有的任务处理接口 */
@@ -467,10 +467,10 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_Pos layer_pos;
 	LCUI_Rect content_rect, rect;
 	txt = Widget_GetData( w, self.prototype );
-	content_rect.x = w->box.content.left - w->box.graph.left;
-	content_rect.y = w->box.content.top - w->box.graph.top;
 	content_rect.width = w->box.content.width;
 	content_rect.height = w->box.content.height;
+	content_rect.x = (int)(w->box.content.x - w->box.graph.x + 0.5);
+	content_rect.y = (int)(w->box.content.y - w->box.graph.y + 0.5);
 	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect );
 	layer_pos.x = content_rect.x - paint->rect.x;
 	layer_pos.y = content_rect.y - paint->rect.y;

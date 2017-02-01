@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * graph.h -- The base graphics handling module for LCUI
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * graph.h -- LCUI的基本图形处理模块
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -149,11 +149,11 @@ LCUI_API void Graph_Copy( LCUI_Graph *des, const LCUI_Graph *src );
 LCUI_API void Graph_Free( LCUI_Graph *graph );
 
 /**
-* 为图像创建一个引用
-* @param self	用于存放图像引用的缓存区
-* @param source	引用的源图像
-* &param rect	引用的区域，若为NULL，则引用整个图像
-*/
+ * 为图像创建一个引用
+ * @param self 用于存放图像引用的缓存区
+ * @param source 引用的源图像
+ * &param rect 引用的区域，若为NULL，则引用整个图像
+ */
 LCUI_API int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect );
 
 /** 判断图像是否有Alpha透明通道 */

@@ -252,7 +252,7 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 		LCUI_ARGB *px_ptr, *px_row_ptr;
 
 		row_size = png_get_rowbytes( png_ptr, info_ptr );
-		px_row_ptr = graph->argb + rect.top * graph->width + rect.left;
+		px_row_ptr = graph->argb + rect.y * graph->width + rect.x;
 		row_pointers = (png_bytep*)malloc( rect.height*sizeof( png_bytep ) );
 		for( y = 0; y < rect.height; ++y ) {
 			row_pointers[y] = png_malloc( png_ptr, row_size );
@@ -269,8 +269,8 @@ int Graph_WritePNG( const char *file_name, const LCUI_Graph *graph )
 		uchar_t *px_ptr, *px_row_ptr;
 
 		row_size = png_get_rowbytes( png_ptr, info_ptr );
-		px_row_ptr = graph->bytes + rect.top * graph->bytes_per_row;
-		px_row_ptr += rect.left * graph->bytes_per_pixel;
+		px_row_ptr = graph->bytes + rect.y * graph->bytes_per_row;
+		px_row_ptr += rect.x * graph->bytes_per_pixel;
 		row_pointers = (png_bytep*)malloc( rect.height*sizeof( png_bytep ) );
 		for( y = 0; y < rect.height; ++y ) {
 			row_pointers[y] = (png_bytep)malloc( row_size );

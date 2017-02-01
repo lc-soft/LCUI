@@ -414,21 +414,21 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 	}
 }
 
-static void TextEdit_AutoSize( LCUI_Widget widget, int *width, int *height )
+static void TextEdit_AutoSize( LCUI_Widget widget,
+			       float *width, float *height )
 {
 	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
 	if( edit->is_multiline_mode ) {
-		int i, n;
-		*height = 0;
-		n = TextLayer_GetRowTotal( edit->layer );
-		n = n > 3 ? 3 : n;
+		int i, n, h = 0;
+		n = max( TextLayer_GetRowTotal( edit->layer ), 3);
 		for( i = 0; i < n; ++i ) {
-			*height += TextLayer_GetRowHeight( edit->layer, i );
+			h += TextLayer_GetRowHeight( edit->layer, i );
 		}
+		*height = 1.0 * h;
 	} else {
-		*height = TextLayer_GetHeight( edit->layer );
+		*height = TextLayer_GetHeight( edit->layer ) * 1.0;
 	}
-	*width = 176;
+	*width = 176.0;
 }
 
 /*----------------------------- End TextBlock ---------------------------------*/
@@ -726,8 +726,8 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	LinkedList rects;
 	LinkedListNode *node;
-	int width = 0, height = 0;
-	int max_width = 0, max_height = 0;
+	float width = 0, height = 0;
+	float max_width = 0, max_height = 0;
 	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	if( !w->style->sheet[key_width].is_valid ||
 	    w->style->sheet[key_width].type == SVT_AUTO ) {
@@ -854,8 +854,8 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	content_rect.width = w->box.content.width;
 	content_rect.height = w->box.content.height;
-	content_rect.y = w->box.content.top - w->box.graph.top;
-	content_rect.x = w->box.content.left - w->box.graph.left;
+	content_rect.y = (int)(w->box.content.y - w->box.graph.y + 0.5);
+	content_rect.x = (int)(w->box.content.x - w->box.graph.x + 0.5);
 	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect );
 	layer_pos.x = content_rect.x - paint->rect.x;
 	layer_pos.y = content_rect.y - paint->rect.y;

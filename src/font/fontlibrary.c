@@ -428,10 +428,10 @@ static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 	byte_row_ptr += read_rect->x;
 	px_row_des = graph->argb + write_rect->y * graph->w;
 	px_row_des += write_rect->x;
-	for( y = 0; y < read_rect->h; ++y ) {
+	for( y = 0; y < read_rect->height; ++y ) {
 		px = px_row_des;
 		byte_ptr = byte_row_ptr;
-		for( x = 0; x < read_rect->w; ++x, ++byte_ptr, ++px ) {
+		for( x = 0; x < read_rect->width; ++x, ++byte_ptr, ++px ) {
 			src_a = *byte_ptr / 255.0;
 			a = (1.0 - src_a) * px->a / 255.0;
 			out_r = px->r * a + color.r * src_a;
@@ -462,10 +462,10 @@ static void FontBitmap_MixRGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 	byte_row_src = bmp->buffer + read_rect->y*bmp->width + read_rect->x;
 	byte_row_des = graph->bytes + write_rect->y * graph->bytes_per_row;
 	byte_row_des += write_rect->x*graph->bytes_per_pixel;
-	for( y=0; y<read_rect->h; ++y ) {
+	for( y=0; y<read_rect->height; ++y ) {
 		byte_src = byte_row_src;
 		byte_des = byte_row_des;
-		for( x=0; x<read_rect->w; ++x ) {
+		for( x=0; x<read_rect->width; ++x ) {
 			ALPHA_BLEND( *byte_des, color.b, *byte_src );
 			byte_des++;
 			ALPHA_BLEND( *byte_des, color.g, *byte_src );

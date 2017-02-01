@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * rect.h -- Rectangle area handling
  * 
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * rect.h -- 矩形区域处理
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -41,6 +41,13 @@
 #define LCUI_UTIL_RECT_H
 
 LCUI_BEGIN_HEADER
+
+#define RectF2Rect(rf, r) do { \
+	(r).x = (int)((rf).x + 0.5); \
+	(r).y = (int)((rf).y + 0.5); \
+	(r).width = (int)((rf).width + 0.5); \
+	(r).height = (int)((rf).height + 0.5); \
+} while( 0 );
 
 /* 将数值转换成LCUI_Rect型结构体 */
 LCUI_API LCUI_Rect Rect( int x, int y, int w, int h );
@@ -76,14 +83,14 @@ LCUI_API void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b );
 /** 
  * 根据重叠矩形 rect1，将矩形 rect2 分割成四个矩形
  * 分割方法如下：
- * ┏━━━━┳━━━━━━━━━━━┓
+ * ┏━━┳━━━━━━┓
  * ┃    ┃     3      ┃
- * ┃ 0  ┣━━━━━━┳━━━━┃
- * ┃    ┃rect1  ┃    ┃
- * ┃    ┃       ┃ 2  ┃
- * ┣━━━━┻━━━━━━┫    ┃
+ * ┃ 0  ┣━━━┳━━┃
+ * ┃    ┃rect1 ┃    ┃
+ * ┃    ┃      ┃ 2  ┃
+ * ┣━━┻━━━┫    ┃
  * ┃     1      ┃    ┃
- * ┗━━━━━━━━━━━┻━━━━┛
+ * ┗━━━━━━┻━━┛
  *
  * rect2 必须被 rect1 完全包含
  */

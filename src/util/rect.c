@@ -45,10 +45,8 @@
 #include <LCUI/LCUI.h>
 
 #define LCUIRect_IsIncludeRect(a,b)	\
-	b->x >= a->x && b->x + b->w <= a->x + a->w \
-	&& b->y >= a->y && b->y + b->h <= a->y + a->h
-
-#define LCUIRect_IsMergeable(a, b)
+	b->x >= a->x && b->x + b->width <= a->x + a->width \
+	&& b->y >= a->y && b->y + b->height <= a->y + a->height
 
 /* 将数值转换成LCUI_Rect型结构体 */
 LCUI_Rect Rect( int x, int y, int w, int h )
@@ -56,8 +54,8 @@ LCUI_Rect Rect( int x, int y, int w, int h )
 	LCUI_Rect r;
 	r.x = x;
 	r.y = y;
-	r.w = w;
-	r.h = h;
+	r.width = w;
+	r.height = h;
 	return r;
 }
 
@@ -119,20 +117,20 @@ void LCUIRect_ValidateArea( LCUI_Rect *rect, int box_w, int box_h )
 LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect *rect1, LCUI_Rect *rect2 )
 {
 	if( rect1->x > rect2->x ) {
-		if( rect2->x + rect2->w <= rect1->x ) {
+		if( rect2->x + rect2->width <= rect1->x ) {
 			return FALSE;
 		}
 	} else {
-		if( rect1->x + rect1->w <= rect2->x ) {
+		if( rect1->x + rect1->width <= rect2->x ) {
 			return FALSE;
 		}
 	}
 	if( rect1->y > rect2->y ) {
-		if( rect2->y + rect2->h <= rect1->y ) {
+		if( rect2->y + rect2->height <= rect1->y ) {
 			return FALSE;
 		}
 	} else {
-		if( rect1->y + rect1->h <= rect2->y ) {
+		if( rect1->y + rect1->height <= rect2->y ) {
 			return FALSE;
 		}
 	}
@@ -151,36 +149,36 @@ LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a,
 				   LCUI_Rect *out )
 {
 	if( a->x > b->x ) {
-		if( b->x + b->w > a->x + a->w ) {
-			out->w = a->w;
+		if( b->x + b->width > a->x + a->width ) {
+			out->width = a->width;
 		} else {
-			out->w = b->x + b->w - a->x;
+			out->width = b->x + b->width - a->x;
 		}
 		out->x = a->x;
 	} else {
-		if( a->x + a->w > b->x + b->w ) {
-			out->w = b->w;
+		if( a->x + a->width > b->x + b->width ) {
+			out->width = b->width;
 		} else {
-			out->w = a->x + a->w - b->x;
+			out->width = a->x + a->width - b->x;
 		}
 		out->x = b->x;
 	}
 	if( a->y > b->y ) {
-		if( b->y + b->h > a->y + a->h ) {
-			out->h = a->h;
+		if( b->y + b->height > a->y + a->height ) {
+			out->height = a->height;
 		} else {
-			out->h = b->y + b->h - a->y;
+			out->height = b->y + b->height - a->y;
 		}
 		out->y = a->y;
 	} else {
-		if( a->y + a->h > b->y + b->h ) {
-			out->h = b->h;
+		if( a->y + a->height > b->y + b->height ) {
+			out->height = b->height;
 		} else {
-			out->h = a->y + a->h - b->y;
+			out->height = a->y + a->height - b->y;
 		}
 		out->y = b->y;
 	}
-	if( out->w <= 0 || out->h <= 0 ) {
+	if( out->width <= 0 || out->height <= 0 ) {
 		return FALSE;
 	}
 	return TRUE;
@@ -193,20 +191,20 @@ void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b )
 	} else {
 		big->x = b->x;
 	}
-	if( a->x + a->w < b->x + b->w ) {
-		big->w = b->x + b->w - big->x;
+	if( a->x + a->width < b->x + b->width ) {
+		big->width = b->x + b->width - big->x;
 	} else {
-		big->w = a->x + a->w - big->x;
+		big->width = a->x + a->width - big->x;
 	}
 	if( a->y < b->y ) {
 		big->y = a->y;
 	} else {
 		big->y = b->y;
 	}
-	if( a->y + a->h < b->y + b->h ) {
-		big->h = b->y + b->h - big->y;
+	if( a->y + a->height < b->y + b->height ) {
+		big->height = b->y + b->height - big->y;
 	} else {
-		big->h = a->y + a->h - big->y;
+		big->height = a->y + a->height - big->y;
 	}
 }
 
@@ -215,30 +213,30 @@ void LCUIRect_CutFourRect( LCUI_Rect *rect1, LCUI_Rect *rect2,
 {
 	rects[0].x = rect2->x;
 	rects[0].y = rect2->y;
-	rects[0].w = rect1->x - rect2->x;
-	rects[0].h = rect1->y + rect1->h - rect2->y;
+	rects[0].width = rect1->x - rect2->x;
+	rects[0].height = rect1->y + rect1->height - rect2->y;
 
 	rects[1].x = rect2->x;
-	rects[1].y = rect1->y + rect1->h;
-	rects[1].w = rect1->x + rect1->w - rect2->x;
-	rects[1].h = rect2->y + rect2->h - rects[1].y;
+	rects[1].y = rect1->y + rect1->height;
+	rects[1].width = rect1->x + rect1->width - rect2->x;
+	rects[1].height = rect2->y + rect2->height - rects[1].y;
 
-	rects[2].x = rect1->x + rect1->w;
+	rects[2].x = rect1->x + rect1->width;
 	rects[2].y = rect1->y;
-	rects[2].w = rect2->w - rects[1].w;
-	rects[2].h = rect2->y + rect2->h - rects[2].y;
+	rects[2].width = rect2->width - rects[1].width;
+	rects[2].height = rect2->y + rect2->height - rects[2].y;
 
 	rects[3].x = rect1->x;
 	rects[3].y = rect2->y;
-	rects[3].w = rect2->x + rect2->w - rects[3].x;
-	rects[3].h = rect1->y - rect2->y;
+	rects[3].width = rect2->x + rect2->width - rects[3].x;
+	rects[3].height = rect1->y - rect2->y;
 }
 
 int RectList_Add( LinkedList *list, LCUI_Rect *rect )
 {
 	LCUI_Rect *added_rect, union_rect;
 	LinkedListNode *node, *prev;
-	if( rect->w <= 0 || rect->h <= 0 ) {
+	if( rect->width <= 0 || rect->height <= 0 ) {
 		return -1;
 	}
 	for( LinkedList_Each( node, list ) ) {
@@ -277,7 +275,7 @@ int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 	LinkedListNode *prev, *node;
 	LCUI_Rect *p_rect, o_rect, tmp_rect[4];
 
-	if( rect->w <= 0 || rect->h <= 0 ) {
+	if( rect->width <= 0 || rect->height <= 0 ) {
 		return -1;
 	}
 	for( LinkedList_Each( node, list ) ) {
@@ -298,8 +296,8 @@ int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 			LinkedList_DeleteNode( list, node );
 			node = prev;
 			for( i = 0; i < 4; ++i ) {
-				if( tmp_rect[i].w <= 0
-				    || tmp_rect[i].h <= 0 ) {
+				if( tmp_rect[i].width <= 0
+				    || tmp_rect[i].height <= 0 ) {
 					continue;
 				}
 				LinkedList_Insert( list, 0, &tmp_rect[0] );
@@ -320,7 +318,7 @@ int RectList_Delete( LinkedList *list, LCUI_Rect *rect )
 		LinkedList_DeleteNode( list, node );
 		node = prev;
 		for( i = 0; i < 4; ++i ) {
-			if( tmp_rect[i].w <= 0 || tmp_rect[i].h <= 0 ) {
+			if( tmp_rect[i].width <= 0 || tmp_rect[i].height <= 0 ) {
 				continue;
 			}
 			LinkedList_Insert( list, 0, &tmp_rect[i] );

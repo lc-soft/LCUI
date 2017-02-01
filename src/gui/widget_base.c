@@ -37,7 +37,6 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#define ENABLE_MEMDEBUG
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -513,7 +512,7 @@ int Widget_SetId( LCUI_Widget w, const char *idstr )
 	return -2;
 }
 
-static int ComputeXNumber( LCUI_Widget w, int key )
+static float ComputeXNumber( LCUI_Widget w, int key )
 {
 	LCUI_Style s = &w->style->sheet[key];
 	switch( s->type ) {
@@ -531,7 +530,7 @@ static int ComputeXNumber( LCUI_Widget w, int key )
 	return 0;
 }
 
-static int ComputeYNumber( LCUI_Widget w, int key )
+static float ComputeYNumber( LCUI_Widget w, int key )
 {
 	LCUI_Style s = &w->style->sheet[key];
 	switch( s->type ) {
@@ -549,7 +548,7 @@ static int ComputeYNumber( LCUI_Widget w, int key )
 	return 0;
 }
 
-static int ComputeSelfXNumber( LCUI_Widget w, int key )
+static float ComputeSelfXNumber( LCUI_Widget w, int key )
 {
 	LCUI_Style s = &w->style->sheet[key];
 	switch( s->type ) {
@@ -564,7 +563,7 @@ static int ComputeSelfXNumber( LCUI_Widget w, int key )
 	return 0;
 }
 
-static int ComputeSelfYNumber( LCUI_Widget w, int key )
+static float ComputeSelfYNumber( LCUI_Widget w, int key )
 {
 	LCUI_Style s = &w->style->sheet[key];
 	switch( s->type ) {
@@ -596,6 +595,8 @@ static void Widget_ComputeBorder( LCUI_Widget w )
 	LCUI_StyleSheet ss = w->style;
 	LCUI_Border *b = &w->computed_style.border;
 	int key = key_border_start ;
+	unsigned int val;
+
 	for( ; key <= key_border_end; ++key ) {
 		style = &ss->sheet[key];
 		if( !style->is_valid ) {
@@ -615,16 +616,16 @@ static void Widget_ComputeBorder( LCUI_Widget w )
 			b->left.color = style->color;
 			break;
 		case key_border_top_width:
-			b->top.width = style->value;
+			b->top.width = (unsigned int)style->px;
 			break;
 		case key_border_right_width:
-			b->right.width = style->value;
+			b->right.width = (unsigned int)style->px;
 			break;
 		case key_border_bottom_width:
-			b->bottom.width = style->value;
+			b->bottom.width = (unsigned int)style->px;
 			break;
 		case key_border_left_width:
-			b->left.width = style->value;
+			b->left.width = (unsigned int)style->px;
 			break;
 		case key_border_top_style:
 			b->top.style = style->value;
@@ -639,16 +640,20 @@ static void Widget_ComputeBorder( LCUI_Widget w )
 			b->left.style = style->value;
 			break;
 		case key_border_top_left_radius:
-			b->top_left_radius = ComputeSelfXNumber( w, key );
+			val = (unsigned int)ComputeSelfXNumber( w, key );
+			b->top_left_radius = val;
 			break;
 		case key_border_top_right_radius:
-			b->top_right_radius = ComputeSelfXNumber( w, key );
+			val = (unsigned int)ComputeSelfXNumber( w, key );
+			b->top_right_radius = val;
 			break;
 		case key_border_bottom_left_radius:
-			b->bottom_left_radius = ComputeSelfXNumber( w, key );
+			val = (unsigned int)ComputeSelfXNumber( w, key );
+			b->bottom_left_radius = val;
 			break;
 		case key_border_bottom_right_radius:
-			b->bottom_right_radius = ComputeSelfXNumber( w, key );
+			val = (unsigned int)ComputeSelfXNumber( w, key );
+			b->bottom_right_radius = val;
 			break;
 		default: break;
 		}
@@ -677,7 +682,7 @@ void Widget_UpdateBorder( LCUI_Widget w )
 	rect.height = max( ob.top_left_radius, ob.top.width );
 	/* 上 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.x = w->box.border.w;
+	rect.x = w->box.border.width;
 	rect.width = max( ob.top_right_radius, ob.right.width );
 	rect.x -= rect.width;
 	rect.height = w->box.border.height;
@@ -713,11 +718,21 @@ static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
 			continue;
 		}
 		switch( key ) {
-		case key_box_shadow_x: bsd->x = style->value; break;
-		case key_box_shadow_y: bsd->y = style->value; break;
-		case key_box_shadow_spread: bsd->spread = style->value; break;
-		case key_box_shadow_blur: bsd->blur = style->value; break;
-		case key_box_shadow_color: bsd->color = style->color; break;
+		case key_box_shadow_x:
+			bsd->x = (int)style->px;
+			break;
+		case key_box_shadow_y:
+			bsd->y = (int)style->px;
+			break;
+		case key_box_shadow_spread:
+			bsd->spread = (int)style->px;
+			break;
+		case key_box_shadow_blur:
+			bsd->blur = (int)style->px;
+			break;
+		case key_box_shadow_color:
+			bsd->color = style->color;
+			break;
 		default: break;
 		}
 	}
@@ -732,9 +747,10 @@ void Widget_UpdateBoxShadow( LCUI_Widget w )
 	    bs.y == w->computed_style.shadow.y &&
 	    bs.blur == w->computed_style.shadow.blur ) {
 		int i;
-		LCUI_Rect rects[4];
-		LCUIRect_CutFourRect( &w->box.border,
-				      &w->box.graph, rects );
+		LCUI_Rect rects[4], rb, rg;
+		RectF2Rect( w->box.border, rb );
+		RectF2Rect( w->box.graph, rg );
+		LCUIRect_CutFourRect( &rb, &rg, rects );
 		for( i = 0; i < 4; ++i ) {
 			rects[i].x -= w->box.graph.x;
 			rects[i].y -= w->box.graph.y;
@@ -898,7 +914,7 @@ static void Widget_UpdateChildrenSize( LCUI_Widget w )
 
 void Widget_UpdatePosition( LCUI_Widget w )
 {
-	LCUI_Rect rect = w->box.graph;
+	LCUI_Rect rect;
 	int position = ComputeStyleOption( w, key_position, SV_STATIC );
 	int valign = ComputeStyleOption( w, key_vertical_align, SV_TOP );
 	w->computed_style.vertical_align = valign;
@@ -912,6 +928,7 @@ void Widget_UpdatePosition( LCUI_Widget w )
 		Widget_UpdateChildrenSize( w );
 	}
 	w->computed_style.position = position;
+	RectF2Rect( w->box.graph, rect );
 	Widget_UpdateZIndex( w );
 	w->x = w->origin_x;
 	w->y = w->origin_y;
@@ -991,7 +1008,7 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	w->box.graph.y -= BoxShadow_GetBoxY( &w->computed_style.shadow );
 	if( w->parent ) {
 		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
-		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.w, rect.h);
+		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
 		/* 标记移动前后的区域 */
 		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
 		Widget_PushInvalidArea( w->parent, &rect, SV_PADDING_BOX );
@@ -1003,8 +1020,8 @@ void Widget_UpdatePosition( LCUI_Widget w )
 /** 更新位图尺寸 */
 static void Widget_UpdateGraphBox( LCUI_Widget w )
 {
-	LCUI_Rect *rb = &w->box.border;
-	LCUI_Rect *rg = &w->box.graph;
+	LCUI_RectF *rb = &w->box.border;
+	LCUI_RectF *rg = &w->box.graph;
 	LCUI_BoxShadow *shadow = &w->computed_style.shadow;
 	rg->x = w->x - BoxShadow_GetBoxX( shadow );
 	rg->y = w->y - BoxShadow_GetBoxY( shadow );
@@ -1029,20 +1046,18 @@ static void Widget_UpdateGraphBox( LCUI_Widget w )
 }
 
 /** 计算合适的内容框大小 */
-static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
+static void Widget_ComputeContentSize( LCUI_Widget w,
+				       float *width, float *height )
 {
-	int n;
+	float n;
 	LCUI_Style s;
-	LCUI_Widget child;
 	LinkedListNode *node;
 
-	*width = *height = 0;
+	*width = *height = 0.0;
 	for( LinkedList_Each( node, &w->children_show ) ) {
-		LCUI_WidgetBoxRect *box;
-		LCUI_WidgetStyle *style;
-		child = node->data;
-		box = &child->box;
-		style = &child->computed_style;
+		LCUI_Widget child = node->data;
+		LCUI_WidgetBoxRect *box = &child->box;
+		LCUI_WidgetStyle *style = &child->computed_style;
 		/* 忽略不可见、绝对定位的部件 */
 		if( !style->visible || style->position == SV_ABSOLUTE ) {
 			continue;
@@ -1094,8 +1109,8 @@ static void Widget_ComputeContentSize( LCUI_Widget w, int *width, int *height )
 /** 计算尺寸 */
 static void Widget_ComputeSize( LCUI_Widget w )
 {
-	int n, width, height;
-	LCUI_Rect *box, *pbox = &w->box.padding;
+	float n, width, height;
+	LCUI_RectF *box, *pbox = &w->box.padding;
 	LCUI_Style sw = &w->style->sheet[key_width];
 	LCUI_Style sh = &w->style->sheet[key_height];
 	LCUI_Border *bbox = &w->computed_style.border;
@@ -1123,7 +1138,9 @@ static void Widget_ComputeSize( LCUI_Widget w )
 			width -= w->margin.left + w->margin.right;
 			if( w->computed_style.box_sizing != SV_BORDER_BOX ) {
 				width -= w->padding.left + w->padding.right;
-				width -= bbox->left.width + bbox->right.width;
+				/* 边框的宽度为整数，不使用浮点数 */
+				width -= bbox->left.width * 1.0;
+				width -= bbox->right.width * 1.0;
 			}
 		}
 		if( sw->type == SVT_AUTO ) {
@@ -1231,7 +1248,7 @@ void Widget_UpdateMargin( LCUI_Widget w )
 	LCUI_BoundBox *mbox = &w->computed_style.margin;
 	struct { 
 		LCUI_Style sval;
-		int *ival;
+		float *fval;
 		int key;
 	} pd_map[4] = {
 		{ &mbox->top, &w->margin.top, key_margin_top },
@@ -1243,12 +1260,12 @@ void Widget_UpdateMargin( LCUI_Widget w )
 		LCUI_Style s = &w->style->sheet[pd_map[i].key];
 		if( !s->is_valid || s->type != SVT_PX ) {
 			pd_map[i].sval->type = SVT_PX;
-			pd_map[i].sval->px = 0;
-			*pd_map[i].ival = 0;
+			pd_map[i].sval->px = 0.0;
+			*pd_map[i].fval = 0.0;
 			continue;
 		}
 		*pd_map[i].sval = *s;
-		*pd_map[i].ival = s->px;
+		*pd_map[i].fval = s->px;
 	}
 	/* 如果有父级部件，则处理 margin-left 和 margin-right 的值 */
 	if( w->parent ) {
@@ -1297,13 +1314,13 @@ void Widget_UpdateMargin( LCUI_Widget w )
 
 void Widget_UpdateSize( LCUI_Widget w )
 {
-	LCUI_Rect rect;
+	LCUI_RectF rect;
 	int i, box_sizing;
-	LCUI_Rect2 padding = w->padding;
+	LCUI_Rect2F padding = w->padding;
 	LCUI_BoundBox *pbox = &w->computed_style.padding;
 	struct { 
 		LCUI_Style sval;
-		int *ival;
+		float *ival;
 		int key;
 	} pd_map[4] = {
 		{ &pbox->top, &w->padding.top, key_padding_top },
@@ -1317,8 +1334,8 @@ void Widget_UpdateSize( LCUI_Widget w )
 		LCUI_Style s = &w->style->sheet[pd_map[i].key];
 		if( !s->is_valid || s->type != SVT_PX ) {
 			pd_map[i].sval->type = SVT_PX;
-			pd_map[i].sval->px = 0;
-			*pd_map[i].ival = 0;
+			pd_map[i].sval->px = 0.0;
+			*pd_map[i].ival = 0.0;
 			continue;
 		}
 		*pd_map[i].sval = *s;
@@ -1364,10 +1381,12 @@ void Widget_UpdateSize( LCUI_Widget w )
 		}
 	}
 	if( w->parent ) {
-		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
-		rect.width = w->box.graph.width;
-		rect.height = w->box.graph.height;
-		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );	
+		LCUI_Rect r;
+		RectF2Rect( rect, r );
+		Widget_InvalidateArea( w->parent, &r, SV_PADDING_BOX );
+		r.width = (int)(w->box.graph.width + 0.5);
+		r.height = (int)(w->box.graph.height + 0.5);
+		Widget_InvalidateArea( w->parent, &r, SV_PADDING_BOX );	
 		if( w->parent->style->sheet[key_width].type == SVT_AUTO
 		    || w->parent->style->sheet[key_height].type == SVT_AUTO ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
@@ -1649,12 +1668,12 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 	return 0;
 }
 
-int Widget_ComputeMaxWidth( LCUI_Widget w )
+float Widget_ComputeMaxWidth( LCUI_Widget w )
 {
 	LCUI_Style s;
 	LCUI_Widget child;
 	float scale = 1.0;
-	int width, padding = 0;
+	float width, padding = 0;
 	width = LCUIWidget.root->box.padding.width;
 	for( child = w; child->parent; child = child->parent ) {
 		s = &child->style->sheet[key_width];
@@ -1702,11 +1721,11 @@ void Widget_UpdateLayout( LCUI_Widget w )
 void Widget_ExecUpdateLayout( LCUI_Widget w )
 {
 	struct {
-		int x, y;
-		int line_height;
+		float x, y;
+		float line_height;
 		LCUI_Widget prev;
 		int prev_display;
-		int max_width;
+		float max_width;
 	} ctx = { 0 };
 	LCUI_Widget child;
 	LCUI_WidgetEventRec e;
@@ -1811,14 +1830,14 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 			strcat( str, "┬" );
 		}
 		snode = Widget_GetSelectorNode( child );
-		LOG( "%s%s %s, xy:(%d,%d), size:(%d,%d), "
-			"visible: %s, padding: (%d,%d,%d,%d), margin: (%d,%d,%d,%d)\n",
-			prefix, str, snode->fullname, child->x, child->y,
-			child->width, child->height,
-			child->computed_style.visible ? "true" : "false",
-			child->padding.top, child->padding.right, child->padding.bottom,
-			child->padding.left, child->margin.top, child->margin.right, 
-			child->margin.bottom, child->margin.left );
+		LOG( "%s%s %s, xy:(%.2f,%.2f), size:(%.2f,%.2f), "
+		     "visible: %s, padding: (%.2f,%.2f,%.2f,%.2f), margin: (%.2f,%.2f,%.2f,%.2f)\n",
+		     prefix, str, snode->fullname, child->x, child->y,
+		     child->width, child->height,
+		     child->computed_style.visible ? "true" : "false",
+		     child->padding.top, child->padding.right, child->padding.bottom,
+		     child->padding.left, child->margin.top, child->margin.right,
+		     child->margin.bottom, child->margin.left );
 		SelectorNode_Delete( snode );
 		_LCUIWidget_PrintTree( child, depth+1, child_prefix );
 	}
@@ -1829,9 +1848,9 @@ void Widget_PrintTree( LCUI_Widget w )
 	LCUI_SelectorNode node;
 	w = w ? w : LCUIWidget.root;
 	node = Widget_GetSelectorNode( w );
-	LOG("%s, xy:(%d,%d), size:(%d,%d), visible: %s\n", 
-		node->fullname, w->x, w->y, w->width, w->height,
-		w->computed_style.visible ? "true":"false");
+	LOG( "%s, xy:(%.2f,%.2f), size:(%.2f,%.2f), visible: %s\n",
+	     node->fullname, w->x, w->y, w->width, w->height,
+	     w->computed_style.visible ? "true" : "false" );
 	SelectorNode_Delete( node );
 	_LCUIWidget_PrintTree( w, 0, "  " );
 }

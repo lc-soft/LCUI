@@ -1269,7 +1269,7 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 			break;
 		}
 		case SVT_PX:
-			LOG( "%dpx", s->val_px );
+			LOG( "%.4fpx", s->val_px );
 			break;
 		case SVT_STRING:
 			LOG( "%s", s->val_string );

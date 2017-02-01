@@ -2,7 +2,7 @@
  * LCUI.h -- Records with common data type definitions, macro definitions and
  * function declarations
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * LCUI.h -- 记录着常用的数据类型定义，宏定义，以及函数声明
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -105,18 +105,20 @@ typedef struct LCUI_Size_ {
 } LCUI_Size;
 
 typedef struct LCUI_Rect_ {
-	union { int x, left; };
-	union { int y, top; };
-	union { int w, width; };
-	union { int h, height; };
+	int x, y, width, height;
 } LCUI_Rect;
 
 typedef struct LCUI_Rect2_ {
-	union { int left, l; };
-	union { int top, t; };
-	union { int right, r; };
-	union { int bottom, b; };
+	int left, top, right, bottom;
 } LCUI_Rect2;
+
+typedef struct LCUI_RectF_ {
+	float x, y, width, height;
+} LCUI_RectF;
+
+typedef struct LCUI_Rect2F_ {
+	float left, top, right, bottom;
+} LCUI_Rect2F;
 
 /** 样式变量类型 */
 typedef enum LCUI_StyleType {
@@ -240,12 +242,12 @@ typedef struct LCUI_StyleRec_ {
 		int val_int;
 		int val_0;
 		int val_none;
-		int px;
-		int val_px;
-		int pt;
-		int val_pt;
-		int dp;
-		int val_dp;
+		float px;
+		float val_px;
+		float pt;
+		float val_pt;
+		float dp;
+		float val_dp;
 		int style;
 		int val_style;
 		float scale;
