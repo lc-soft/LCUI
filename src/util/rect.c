@@ -184,6 +184,46 @@ LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a,
 	return TRUE;
 }
 
+LCUI_BOOL LCUIRectF_GetOverlayRect( const LCUI_RectF *a,
+				    const LCUI_RectF *b,
+				    LCUI_RectF *out )
+{
+	if( a->x > b->x ) {
+		if( b->x + b->width > a->x + a->width ) {
+			out->width = a->width;
+		} else {
+			out->width = b->x + b->width - a->x;
+		}
+		out->x = a->x;
+	} else {
+		if( a->x + a->width > b->x + b->width ) {
+			out->width = b->width;
+		} else {
+			out->width = a->x + a->width - b->x;
+		}
+		out->x = b->x;
+	}
+	if( a->y > b->y ) {
+		if( b->y + b->height > a->y + a->height ) {
+			out->height = a->height;
+		} else {
+			out->height = b->y + b->height - a->y;
+		}
+		out->y = a->y;
+	} else {
+		if( a->y + a->height > b->y + b->height ) {
+			out->height = b->height;
+		} else {
+			out->height = a->y + a->height - b->y;
+		}
+		out->y = b->y;
+	}
+	if( out->width <= 0 || out->height <= 0 ) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
 void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b )
 {
 	if( a->x < b->x ) {

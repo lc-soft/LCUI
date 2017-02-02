@@ -77,6 +77,10 @@ LCUI_API LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a,
 					    const LCUI_Rect *b, 
 					    LCUI_Rect *out );
 
+LCUI_API LCUI_BOOL LCUIRectF_GetOverlayRect( const LCUI_RectF *a,
+					     const LCUI_RectF *b,
+					     LCUI_RectF *out );
+
 /** 合并两个矩形 */
 LCUI_API void LCUIRect_MergeRect( LCUI_Rect *big, LCUI_Rect *a, LCUI_Rect *b );
 

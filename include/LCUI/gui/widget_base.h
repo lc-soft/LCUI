@@ -289,16 +289,18 @@ LCUI_API int Widget_SetId( LCUI_Widget w, const char *idstr );
 LCUI_API void Widget_SetBorder( LCUI_Widget w, int width, int style, LCUI_Color clr );
 
 /** 设置内边距 */
-LCUI_API void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left );
+LCUI_API void Widget_SetPadding( LCUI_Widget w, float top, float right,
+				 float bottom, float left );
 
 /** 设置外边距 */
-LCUI_API void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left );
+LCUI_API void Widget_SetMargin( LCUI_Widget w, float top, float right,
+				float bottom, float left );
 
 /** 移动部件位置 */
-LCUI_API void Widget_Move( LCUI_Widget w, int left, int top );
+LCUI_API void Widget_Move( LCUI_Widget w, float left, float top );
 
 /** 调整部件尺寸 */
-LCUI_API void Widget_Resize( LCUI_Widget w, int width, int height );
+LCUI_API void Widget_Resize( LCUI_Widget w, float width, float height );
 
 LCUI_API void Widget_Show( LCUI_Widget w );
 

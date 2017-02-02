@@ -1414,7 +1414,7 @@ void Widget_SetBorder( LCUI_Widget w, int width, int style, LCUI_Color clr )
 	Widget_UpdateStyle( w, FALSE );
 }
 
-void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left )
+void Widget_SetPadding( LCUI_Widget w, float top, float right, float bottom, float left )
 {
 	Widget_SetStyle( w, key_padding_top, top, px );
 	Widget_SetStyle( w, key_padding_right, right, px );
@@ -1423,7 +1423,7 @@ void Widget_SetPadding( LCUI_Widget w, int top, int right, int bottom, int left 
 	Widget_UpdateStyle( w, FALSE );
 }
 
-void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left )
+void Widget_SetMargin( LCUI_Widget w, float top, float right, float bottom, float left )
 {
 	Widget_SetStyle( w, key_margin_top, top, px );
 	Widget_SetStyle( w, key_margin_right, right, px );
@@ -1432,7 +1432,7 @@ void Widget_SetMargin( LCUI_Widget w, int top, int right, int bottom, int left )
 	Widget_UpdateStyle( w, FALSE );
 }
 
-void Widget_Move( LCUI_Widget w, int left, int top )
+void Widget_Move( LCUI_Widget w, float left, float top )
 {
 	SetStyle( w->custom_style, key_top, top, px );
 	SetStyle( w->custom_style, key_left, left, px );
@@ -1440,7 +1440,7 @@ void Widget_Move( LCUI_Widget w, int left, int top )
 	Widget_UpdateStyle( w, FALSE );
 }
 
-void Widget_Resize( LCUI_Widget w, int width, int height )
+void Widget_Resize( LCUI_Widget w, float width, float height )
 {
 	SetStyle( w->custom_style, key_width, width, px );
 	SetStyle( w->custom_style, key_height, height, px );

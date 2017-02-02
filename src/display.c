@@ -120,8 +120,9 @@ static void LCUIDisplay_Update(void)
 				continue;
 			}
 			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
-				p_sr->widget->type, paint->rect.left,
-				paint->rect.top, paint->rect.width, paint->rect.height );
+				   p_sr->widget->type,
+				   paint->rect.x, paint->rect.y,
+				   paint->rect.width, paint->rect.height );
 			Widget_Render( p_sr->widget, paint );
 			if( display.show_rect_border ) {
 				DrawBorder( paint );
@@ -579,12 +580,13 @@ static void OnResize( LCUI_Event e, void *arg )
 {
 	LCUI_Widget widget;
 	LCUI_DisplayEvent dpy_ev = arg;
+	float width = (float)( dpy_ev->resize.width );
+	float height = (float)( dpy_ev->resize.height );
+	LOG( "[display] resize: (%.2f,%.2f)\n", width, height );
 	widget = LCUIDisplay_GetBindWidget( dpy_ev->surface );
-	LOG( "[display] resize: (%d,%d)\n", dpy_ev->resize.width, dpy_ev->resize.height );
-	if( !widget ) {
-		return;
+	if( widget ) {
+		Widget_Resize( widget, width, height );
 	}
-	Widget_Resize( widget, dpy_ev->resize.width, dpy_ev->resize.height );
 }
 
 int LCUIDisplay_BindEvent( int event_id, 
