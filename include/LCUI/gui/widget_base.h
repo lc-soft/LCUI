@@ -186,7 +186,6 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_WidgetPrototypeC	proto;			/**< 原型 */
 	LCUI_BOOL		enable_graph;		/**< 是否启用位图缓存 */
 	LCUI_Graph		graph;			/**< 位图缓存 */
-	LCUI_Mutex		mutex;			/**< 互斥锁 */
 	LCUI_EventTrigger	trigger;		/**< 事件触发器 */
 	LCUI_WidgetTaskBoxRec	task;			/**< 任务记录 */
 	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
@@ -305,10 +304,6 @@ LCUI_API void Widget_Resize( LCUI_Widget w, float width, float height );
 LCUI_API void Widget_Show( LCUI_Widget w );
 
 LCUI_API void Widget_Hide( LCUI_Widget w );
-
-LCUI_API void Widget_Lock( LCUI_Widget w );
-
-LCUI_API void Widget_Unlock( LCUI_Widget w );
 
 /** 为部件设置属性 */
 LCUI_API int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,

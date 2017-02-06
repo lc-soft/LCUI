@@ -90,13 +90,15 @@ static LCUI_BOOL WIN_WaitEvent( void )
 	return WaitMessage();
 }
 
-static void WIN_DispatchEvent( void )
+static LCUI_BOOL WIN_DispatchEvent( void )
 {
 	MSG msg;
 	if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
 		TranslateMessage( &msg );
 		DispatchMessage( &msg );
+		return TRUE;
 	}
+	return FALSE;
 }
 
 static int WIN_BindSysEvent( int event_id, LCUI_EventFunc func,
@@ -170,7 +172,7 @@ LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 	app->GetData = WIN_GetData;
 	app->PostTask = WIN_PostTask;
 	app->WaitEvent = WIN_WaitEvent;
-	app->DispatchEvent = WIN_DispatchEvent;
+	app->ProcessEvents = WIN_DispatchEvent;
 	app->BindSysEvent = WIN_BindSysEvent;
 	app->UnbindSysEvent = WIN_UnbindSysEvent;
 	app->UnbindSysEvent2 = WIN_UnbindSysEvent2;

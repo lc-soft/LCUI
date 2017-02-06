@@ -60,13 +60,13 @@ LCUI_API void Widget_AddToTrash( LCUI_Widget w );
 LCUI_API void Widget_AddTaskForChildren( LCUI_Widget widget, int task );
 
 /** 初始化 LCUI 部件任务处理功能 */
-void LCUIWidget_InitTask( void );
+void LCUIWidget_InitTasks( void );
 
 /** 销毁（释放） LCUI 部件任务处理功能的相关资源 */
-void LCUIWidget_ExitTask( void );
+void LCUIWidget_ExitTasks( void );
 
 /** 处理一次当前积累的部件任务 */
-void LCUIWidget_StepTask( void );
+void LCUIWidget_Update( void );
 
 LCUI_END_HEADER
 

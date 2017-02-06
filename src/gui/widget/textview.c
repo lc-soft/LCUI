@@ -499,7 +499,6 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	} else {
 		wcscpy( newtext, text );
 	}
-	Widget_Lock( w );
 	txt = Widget_GetData( w, self.prototype );
 	if( txt->tasks[TASK_SET_TEXT].is_valid
 	 && txt->tasks[TASK_SET_TEXT].text ) {
@@ -508,7 +507,6 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	txt->tasks[TASK_SET_TEXT].is_valid = TRUE;
 	txt->tasks[TASK_SET_TEXT].text = newtext;
 	Widget_AddTask( w, WTT_USER );
-	Widget_Unlock( w );
 	return 0;
 }
 

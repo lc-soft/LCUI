@@ -452,7 +452,6 @@ void TextEdit_SetMultiline( LCUI_Widget widget, LCUI_BOOL is_true )
 void TextEdit_ClearText( LCUI_Widget widget )
 {
 	LCUI_TextEdit edit;
-	Widget_Lock( widget );
 	edit = Widget_GetData( widget, self.prototype );
 	LCUIMutex_Lock( &edit->mutex );
 	TextLayer_ClearText( edit->layer );
@@ -461,7 +460,6 @@ void TextEdit_ClearText( LCUI_Widget widget )
 	Widget_AddTask( widget, WTT_USER );
 	LCUIMutex_Unlock( &edit->mutex );
 	Widget_InvalidateArea( widget, NULL, SV_PADDING_BOX );
-	Widget_Unlock( widget );
 }
 
 int TextEdit_GetTextW( LCUI_Widget w, int start, int max_len, wchar_t *buf )
@@ -519,14 +517,12 @@ int TextEdit_InsertTextW( LCUI_Widget w, const wchar_t *wstr )
 int TextEdit_SetPlaceHolderW( LCUI_Widget w, const wchar_t *wstr )
 {
 	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
-	Widget_Lock( w );
 	LCUIMutex_Lock( &edit->mutex );
 	TextLayer_ClearText( edit->layer_placeholder );
 	LCUIMutex_Unlock( &edit->mutex );
 	if( edit->is_placeholder_shown ) {
 		Widget_InvalidateArea( w, NULL, SV_PADDING_BOX );
 	}
-	Widget_Unlock( w );
 	return TextEdit_AddTextToBuffer( w, wstr, TBAT_INSERT, 
 					 TBOT_PLACEHOLDER );
 }
@@ -579,7 +575,6 @@ static void TextEdit_TextBackspace( LCUI_Widget widget, int n_ch )
 {
 	LCUI_TextEdit edit;
 	LCUI_WidgetEventRec ev;
-	Widget_Lock( widget );
 	edit = Widget_GetData( widget, self.prototype );
 	LCUIMutex_Lock( &edit->mutex );
 	TextLayer_TextBackspace( edit->layer_source, n_ch );
@@ -590,7 +585,6 @@ static void TextEdit_TextBackspace( LCUI_Widget widget, int n_ch )
 	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask( widget, WTT_USER );
 	LCUIMutex_Unlock( &edit->mutex );
-	Widget_Unlock( widget );
 	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
 	Widget_TriggerEvent( widget, &ev, NULL );
@@ -600,7 +594,6 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 {
 	LCUI_TextEdit edit;
 	LCUI_WidgetEventRec ev;
-	Widget_Lock( widget );
 	edit = Widget_GetData( widget, self.prototype );
 	LCUIMutex_Lock( &edit->mutex );
 	TextLayer_TextDelete( edit->layer_source, n_ch );
@@ -611,7 +604,6 @@ static void TextEdit_TextDelete(LCUI_Widget widget, int n_ch )
 	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask( widget, WTT_USER );
 	LCUIMutex_Unlock( &edit->mutex );
-	Widget_Unlock( widget );
 	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
 	Widget_TriggerEvent( widget, &ev, NULL );

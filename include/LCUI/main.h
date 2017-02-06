@@ -123,7 +123,7 @@ typedef void(*LCUI_SysEventFunc)(LCUI_SysEvent, void*);
 
 /** LCUI 应用程序驱动接口，封装了各个平台下的应用程序相关功能支持接口 */
 typedef struct LCUI_AppDriverRec_ {
-	void( *DispatchEvent )(void);
+	void ( *ProcessEvents )(void);
 	LCUI_BOOL( *WaitEvent )(void);
 	LCUI_BOOL( *PostTask )(LCUI_AppTask);
 	int( *BindSysEvent )(int, LCUI_EventFunc, void*, void( *)(void*));
@@ -158,7 +158,8 @@ LCUI_API void *LCUI_GetAppData( void );
 
 LCUI_API void LCUI_SetTaskAgent( LCUI_BOOL enabled );
 
-LCUI_API void LCUI_DispatchEvent( void );
+/** 处理当前所有事件 */
+LCUI_API void LCUI_ProcessEvents( void );
 
 /** 添加任务 */
 LCUI_API LCUI_BOOL LCUI_PostTask( LCUI_AppTask task );
@@ -170,13 +171,13 @@ LCUI_API void LCUI_DeleteTask( LCUI_AppTask task );
 LCUI_API int LCUI_RunTask( LCUI_AppTask task );
 
 /* 新建一个主循环 */
-LCUI_API LCUI_MainLoop LCUI_MainLoop_New( void );
+LCUI_API LCUI_MainLoop LCUIMainLoop_New( void );
 
 /* 运行目标循环 */
-LCUI_API int LCUI_MainLoop_Run( LCUI_MainLoop loop );
+LCUI_API int LCUIMainLoop_Run( LCUI_MainLoop loop );
 
 /* 标记目标主循环需要退出 */
-LCUI_API void LCUI_MainLoop_Quit( LCUI_MainLoop loop );
+LCUI_API void LCUIMainLoop_Quit( LCUI_MainLoop loop );
 
 /* 检测LCUI是否活动 */ 
 LCUI_API LCUI_BOOL LCUI_IsActive( void );

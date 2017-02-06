@@ -158,7 +158,6 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_Rect box;
 	LCUI_WidgetStyle *s;
 
-	Widget_Lock( w );
 	box.x = box.y = 0;
 	s = &w->computed_style;
 	box.width = w->box.graph.width;
@@ -174,7 +173,6 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	box.height = w->box.border.height;
 	Graph_DrawBackground( paint, &box, &s->background );
 	Graph_DrawBorder( paint, &box, &s->border );
-	Widget_Unlock( w );
 	if( w->proto && w->proto->paint ) {
 		w->proto->paint( w, paint );
 	}

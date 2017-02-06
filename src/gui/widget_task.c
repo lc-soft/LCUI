@@ -141,14 +141,14 @@ static void MapTaskHandler(void)
 	self.handlers[WTT_PROPS] = Widget_UpdateProps;
 }
 
-void LCUIWidget_InitTask( void )
+void LCUIWidget_InitTasks( void )
 {
 	MapTaskHandler();
 	self.timeout = 0;
 	LinkedList_Init( &self.trash );
 }
 
-void LCUIWidget_ExitTask( void )
+void LCUIWidget_ExitTasks( void )
 {
 	LinkedList_Clear( &self.trash, NULL );
 }
@@ -178,8 +178,8 @@ int Widget_UpdateEx( LCUI_Widget w, LCUI_BOOL has_timeout )
 	LCUI_BOOL *buffer;
 	LinkedListNode *node, *next;
 
-	/* 如果该部件没有任务需要处理、或者被其它线程占用 */
-	if( !w->task.for_self || LCUIMutex_TryLock( &w->mutex ) != 0 ) {
+	/* 如果该部件没有任务需要处理 */
+	if( !w->task.for_self ) {
 		goto proc_children_task;
 	}
 	w->task.for_self = FALSE;
@@ -198,7 +198,6 @@ int Widget_UpdateEx( LCUI_Widget w, LCUI_BOOL has_timeout )
 			buffer[i] = FALSE;
 		}
 	}
-	LCUIMutex_Unlock( &w->mutex );
 	/* 如果部件还处于未准备完毕的状态 */
 	if( w->state < WSTATE_READY ) {
 		w->state |= WSTATE_UPDATED;
@@ -248,7 +247,7 @@ proc_children_task:
 	return w->task.for_self || w->task.for_children;
 }
 
-void LCUIWidget_StepTask( void )
+void LCUIWidget_Update( void )
 {
 	LCUI_Widget root;
 	LinkedListNode *node;

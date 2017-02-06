@@ -265,7 +265,6 @@ static void Widget_Init( LCUI_Widget widget )
 	LinkedList_Init( &widget->children );
 	LinkedList_Init( &widget->children_show );
 	LinkedList_Init( &widget->dirty_rects );
-	LCUIMutex_Init( &widget->mutex );
 	Graph_Init( &widget->graph );
 }
 
@@ -332,7 +331,6 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	widget->attributes ? Dict_Release( widget->attributes ) : 0;
 	widget->classes ? StrList_Destroy( widget->classes ) : 0;
 	widget->status ? StrList_Destroy( widget->status ) : 0;
-	LCUIMutex_Destroy( &widget->mutex );
 	EventTrigger_Destroy( widget->trigger );
 	widget->trigger = NULL;
 	free( widget );
@@ -1474,16 +1472,6 @@ void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled )
 	}
 }
 
-void Widget_Lock( LCUI_Widget w )
-{
-	LCUIMutex_Lock( &w->mutex );
-}
-
-void Widget_Unlock( LCUI_Widget w )
-{
-	LCUIMutex_Unlock( &w->mutex );
-}
-
 int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
 			   int value_type, void( *value_destructor )(void*) )
 {
@@ -1565,16 +1553,12 @@ LCUI_BOOL Widget_CheckPrototype( LCUI_Widget w, LCUI_WidgetPrototypeC proto )
 /** 为部件添加一个类 */
 int Widget_AddClass( LCUI_Widget w, const char *class_name )
 {
-	Widget_Lock( w );
 	if( strshas( w->classes, class_name ) ) {
-		Widget_Unlock( w );
 		return 1;
 	}
 	if( strsadd( &w->classes, class_name ) <= 0 ) {
-		Widget_Unlock( w );
 		return 0;
 	}
-	Widget_Unlock( w );
 	Widget_HandleChildrenStyleChange( w, 0, class_name );
 	Widget_UpdateStyle( w, TRUE );
 	return 1;
@@ -1583,72 +1567,53 @@ int Widget_AddClass( LCUI_Widget w, const char *class_name )
 /** 判断部件是否包含指定的类 */
 LCUI_BOOL Widget_HasClass( LCUI_Widget w, const char *class_name )
 {
-	Widget_Lock( w );
 	if( strshas( w->classes, class_name ) ) {
-		Widget_Unlock( w );
 		return TRUE;
 	}
-	Widget_Unlock( w );
 	return FALSE;
 }
 
 /** 从部件中移除一个类 */
 int Widget_RemoveClass( LCUI_Widget w, const char *class_name )
 {
-	Widget_Lock( w );
 	if( strshas( w->classes, class_name ) ) {
 		Widget_HandleChildrenStyleChange( w, 0, class_name );
 		strsdel( &w->classes, class_name );
 		Widget_UpdateStyle( w, TRUE );
-		Widget_Unlock( w );
 		return 1;
 	}
-	Widget_Unlock( w );
 	return 0;
 }
 
-/** 为部件添加一个状态 */
 int Widget_AddStatus( LCUI_Widget w, const char *status_name )
 {
-	Widget_Lock( w );
 	if( strshas( w->status, status_name ) ) {
-		Widget_Unlock( w );
 		return 0;
 	}
 	if( strsadd( &w->status, status_name ) <= 0 ) {
-		Widget_Unlock( w );
 		return 0;
 	}
-	Widget_Unlock( w );
 	Widget_HandleChildrenStyleChange( w, 1, status_name );
 	Widget_UpdateStyle( w, TRUE );
 	return 1;
 }
 
-/** 判断部件是否包含指定的状态 */
 LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name )
 {
-	Widget_Lock( w );
 	if( strshas( w->status, status_name ) ) {
-		Widget_Unlock( w );
 		return TRUE;
 	}
-	Widget_Unlock( w );
 	return FALSE;
 }
 
-/** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 {
-	Widget_Lock( w );
 	if( strshas( w->status, status_name ) ) {
 		Widget_HandleChildrenStyleChange( w, 1, status_name );
 		strsdel( &w->status, status_name );
 		Widget_UpdateStyle( w, TRUE );
-		Widget_Unlock( w );
 		return 1;
 	}
-	Widget_Unlock( w );
 	return 0;
 }
 
@@ -1859,7 +1824,7 @@ extern void LCUIWidget_AddTextEdit( void );
 
 void LCUI_InitWidget( void )
 {
-	LCUIWidget_InitTask();
+	LCUIWidget_InitTasks();
 	LCUIWidget_InitEvent();
 	LCUIWidget_InitPrototype();
 	LCUIWidget_InitStyle();

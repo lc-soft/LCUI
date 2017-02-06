@@ -208,7 +208,7 @@ void LCUI_DestroyEvent( LCUI_SysEvent e )
 
 /*--------------------------- system event <END> ----------------------------*/
 
-void LCUI_DispatchEvent( void )
+LCUI_BOOL LCUI_ProcessTask( void )
 {
 	LCUI_AppTask task;
 	LinkedListNode *node;
@@ -222,15 +222,18 @@ void LCUI_DispatchEvent( void )
 		LCUI_DeleteTask( task );
 		free( task );
 		free( node );
-		return;
-	} else {
-		LCUIMutex_Unlock( &MainApp.agent.mutex );
+		return TRUE;
 	}
-	if( MainApp.agent.state == STATE_RUNNING ) {
-		return;
-	}
+	LCUIMutex_Unlock( &MainApp.agent.mutex );
+	return FALSE;
+}
+
+void LCUI_ProcessEvents( void )
+{
+	int i;
+	for( i = 0; LCUI_ProcessTask() && i < 100; ++i );
 	if( MainApp.driver_ready ) {
-		MainApp.driver->DispatchEvent();
+		return MainApp.driver->ProcessEvents();
 	}
 }
 
@@ -269,7 +272,7 @@ int LCUI_RunTask( LCUI_AppTask task )
 }
 
 /* 新建一个主循环 */
-LCUI_MainLoop LCUI_MainLoop_New( void )
+LCUI_MainLoop LCUIMainLoop_New( void )
 {
 	LCUI_MainLoop loop;
 	loop = NEW( LCUI_MainLoopRec, 1 );
@@ -279,11 +282,11 @@ LCUI_MainLoop LCUI_MainLoop_New( void )
 }
 
 /** 运行目标主循环 */
-int LCUI_MainLoop_Run( LCUI_MainLoop loop )
+int LCUIMainLoop_Run( LCUI_MainLoop loop )
 {
 	LCUI_BOOL at_same_thread = FALSE;
 	if( loop->state == STATE_RUNNING ) {
-		DEBUG_MSG("error: main-loop already running.");
+		DEBUG_MSG( "error: main-loop already running.\n" );
 		return -1;
 	}
 	loop->state = STATE_RUNNING;
@@ -291,7 +294,7 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	if( MainApp.loop ) {
 		at_same_thread = MainApp.loop->tid == loop->tid;
 	}
-	DEBUG_MSG("at_same_thread: %d\n", at_same_thread);
+	DEBUG_MSG( "at_same_thread: %d\n", at_same_thread );
 	if( !at_same_thread ) {
 		LCUIMutex_Lock( &MainApp.loop_mutex );
 		LinkedList_Insert( &MainApp.loops, 0, loop );
@@ -299,15 +302,18 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 	} else {
 		LinkedList_Insert( &MainApp.loops, 0, loop );
 	}
-	DEBUG_MSG("loop: %p, enter\n", loop);
+	DEBUG_MSG( "loop: %p, enter\n", loop );
 	MainApp.loop = loop;
 	while( loop->state != STATE_EXITED ) {
 		LCUI_WaitEvent();
-		LCUI_DispatchEvent();
+		LCUI_ProcessEvents();
+		LCUIDisplay_Update();
+		LCUIDisplay_Render();
+		LCUIDisplay_Present();
 		/* 如果当前运行的主循环不是自己 */
 		while( MainApp.loop != loop ) {
 			loop->state = STATE_PAUSED;
-			LCUICond_Wait( &MainApp.loop_changed, 
+			LCUICond_Wait( &MainApp.loop_changed,
 				       &MainApp.loop_mutex );
 		}
 	}
@@ -319,13 +325,13 @@ int LCUI_MainLoop_Run( LCUI_MainLoop loop )
 		/* 改变当前运行的主循环 */
 		MainApp.loop = loop;
 	}
-	DEBUG_MSG("loop: %p, exit\n", loop);
+	DEBUG_MSG( "loop: %p, exit\n", loop );
 	LCUICond_Broadcast( &MainApp.loop_changed );
 	return 0;
 }
 
 /** 标记目标主循环需要退出 */
-void LCUI_MainLoop_Quit( LCUI_MainLoop loop )
+void LCUIMainLoop_Quit( LCUI_MainLoop loop )
 {
 	loop->state = STATE_EXITED;
 }
@@ -365,7 +371,7 @@ static void LCUI_ExitApp( void )
 	LinkedListNode *node;
 	for( LinkedList_Each( node, &MainApp.loops ) ) {
 		loop = node->data;
-		LCUI_MainLoop_Quit( loop );
+		LCUIMainLoop_Quit( loop );
 		LCUIThread_Join( loop->tid, NULL );
 	}
 	LCUIMutex_Destroy( &MainApp.loop_mutex );
@@ -495,8 +501,7 @@ static void LCUI_ShowCopyrightText(void)
 	);
 }
 
-/** 检测LCUI是否活动 */
-LCUI_BOOL LCUI_IsActive(void)
+LCUI_BOOL LCUI_IsActive( void )
 {
 	if( System.state == STATE_ACTIVE ) {
 		return TRUE;
@@ -504,8 +509,7 @@ LCUI_BOOL LCUI_IsActive(void)
 	return FALSE;
 }
 
-/** 检测当前是否在主线程上 */
-LCUI_BOOL LCUI_IsOnMainLoop(void)
+LCUI_BOOL LCUI_IsOnMainLoop( void )
 {
 	if( !MainApp.loop ) {
 		return FALSE;
@@ -565,19 +569,14 @@ void LCUI_Quit( void )
 	LCUIApp_QuitAllMainLoop();
 }
 
-/*
- * 功能：LCUI程序的主循环
- * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
- *  */
 int LCUI_Main( void )
 {
 	LCUI_MainLoop loop;
-	loop = LCUI_MainLoop_New();
-	LCUI_MainLoop_Run( loop );
+	loop = LCUIMainLoop_New();
+	LCUIMainLoop_Run( loop );
 	return LCUI_Destroy();
 }
 
-/* 获取LCUI的版本 */
 int LCUI_GetSelfVersion( char *out )
 {
 	return sprintf(out, "%s", LCUI_VERSION);

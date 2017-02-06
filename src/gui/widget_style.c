@@ -72,7 +72,6 @@ LCUI_SelectorNode Widget_GetSelectorNode( LCUI_Widget w )
 	int i;
 	ASSIGN( sn, LCUI_SelectorNode );
 	ZEROSET( sn, LCUI_SelectorNode );
-	Widget_Lock( w );
 	if( w->id ) {
 		sn->id = strdup( w->id );
 	}
@@ -91,7 +90,6 @@ LCUI_SelectorNode Widget_GetSelectorNode( LCUI_Widget w )
 				       w->status[i] );
 		}
 	}
-	Widget_Unlock( w );
 	SelectorNode_Update( sn );
 	return sn;
 }
