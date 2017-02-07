@@ -12,7 +12,6 @@ linux/linux_x11display.c \
 linux/linux_ime.c \
 linux/linux_fbdisplay.c \
 windows/windows_events.c \
-linux/linux_fbdisplay.c \
 windows/windows_keyboard.c \
 windows/windows_display.c \
 windows/windows_mouse.c \

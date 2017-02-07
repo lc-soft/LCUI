@@ -91,18 +91,26 @@ static LCUI_BOOL X11_WaitEvent( void )
 	return FALSE;
 }
 
-static void X11_DispatchEvent( void )
+static LCUI_BOOL X11_DispatchEvent( void )
 {
 	XEvent xevent;
 	if( !XEventsQueued(x11.display, QueuedAlready) ) {
-		return;
+		return FALSE;
 	}
 	XNextEvent( x11.display, &xevent );
 	switch( xevent.type ) {
 	case ClientMessage:
+		// ...
 	default: break;
 	}
 	EventTrigger_Trigger( x11.trigger, xevent.type, &xevent );
+	return TRUE;
+}
+
+static void X11_ProcessEvents( void )
+{
+	int i;
+	for( i = 0; X11_DispatchEvent() && i < 10000; ++i );
 }
 
 static int X11_BindSysEvent( int event_id, LCUI_EventFunc func,
@@ -144,7 +152,7 @@ LCUI_AppDriver LCUI_CreateLinuxX11AppDriver( void )
 	x11.wm_lcui = XInternAtom( x11.display, "WM_LCUI", FALSE );
 	XSetWMProtocols( x11.display, x11.win_root, &x11.wm_lcui, 1 );
 	app->WaitEvent = X11_WaitEvent;
-	app->DispatchEvent = X11_DispatchEvent;
+	app->ProcessEvents = X11_ProcessEvents;
 	app->PostTask = X11_PostTask;
 	app->BindSysEvent = X11_BindSysEvent;
 	app->UnbindSysEvent = X11_UnbindSysEvent;
