@@ -5,10 +5,10 @@ AM_CFLAGS = -I$(abs_top_srcdir)/include
 LCUI_LDFLAGS = -version-info 3:0:0
 LCUI_SOURCES = graph.c ime.c cursor.c main.c timer.c display.c keyboard.c
 LCUI_LIBADD = thread/libthread.la util/libutil.la platform/libplatform.la \
-bmp/libbmp.la draw/libdraw.la gui/libgui.la font/libfont.la \
+image/libimage.la draw/libdraw.la gui/libgui.la font/libfont.la \
 font/in-core/libfont_incore.la  $(LCUI_LIBS)
 
-SUBDIRS = bmp util draw font thread gui platform
+SUBDIRS = image util draw font thread gui platform
 
 ##库的编译需要这样
 lib_LTLIBRARIES = libLCUI.la

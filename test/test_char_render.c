@@ -1,6 +1,7 @@
 ﻿#include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
+#include <LCUI/image.h>
 #include <LCUI/font.h>
 
 int test_char_render( void )
@@ -33,7 +34,7 @@ int test_char_render( void )
 		}
 		/* 绘制红色文字到图像上 */
 		FontBitmap_Mix( &img, pos, &bmp, RGB( 255, 0, 0 ) );
-		Graph_WritePNG( "test_char_render.png", &img );
+		LCUI_WritePNGFile( "test_char_render.png", &img );
 		/* 释放内存资源 */
 		FontBitmap_Free( &bmp );
 		Graph_Free( &img );

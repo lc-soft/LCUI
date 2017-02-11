@@ -1,6 +1,7 @@
 ﻿#include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
+#include <LCUI/image.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 
@@ -50,7 +51,7 @@ int test_widget_render( void )
 
 	/* 渲染部件 */
 	Widget_Render( box, &paint );
-	ret = Graph_WritePNG( "test_widget_render.png", &canvas );
+	ret = LCUI_WritePNGFile( "test_widget_render.png", &canvas );
 	Graph_Free( &canvas );
 
 	LCUI_Destroy();

@@ -1,6 +1,7 @@
 ﻿#include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
+#include <LCUI/image.h>
 #include <LCUI/font.h>
 
 int test_string_render( void )
@@ -34,7 +35,7 @@ int test_string_render( void )
 
 	/* 将文本图层绘制到图像中，然后将图像写入至 png 文件中 */
 	TextLayer_DrawToGraph( txt, area, pos, &img );
-	ret = Graph_WritePNG( "test_string_render.png", &img );
+	ret = LCUI_WritePNGFile( "test_string_render.png", &img );
 	Graph_Free( &img );
 
 	/* 退出字体处理功能 */

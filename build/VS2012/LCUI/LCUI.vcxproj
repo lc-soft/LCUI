@@ -163,6 +163,7 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_task.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_style.h" />
+    <ClInclude Include="..\..\..\include\LCUI\image.h" />
     <ClInclude Include="..\..\..\include\LCUI\LCUI.h" />
     <ClInclude Include="..\..\..\include\LCUI\config.h" />
     <ClInclude Include="..\..\..\include\LCUI\cursor.h" />
@@ -199,10 +200,6 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\bmp\bmp.c" />
-    <ClCompile Include="..\..\..\src\bmp\jpeg.c" />
-    <ClCompile Include="..\..\..\src\bmp\load_image.c" />
-    <ClCompile Include="..\..\..\src\bmp\png.c" />
     <ClCompile Include="..\..\..\src\display.c" />
     <ClCompile Include="..\..\..\src\draw\background.c" />
     <ClCompile Include="..\..\..\src\draw\border.c" />
@@ -237,6 +234,10 @@
     <ClCompile Include="..\..\..\src\graph.c">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\image\bmp.c" />
+    <ClCompile Include="..\..\..\src\image\jpeg.c" />
+    <ClCompile Include="..\..\..\src\image\png.c" />
+    <ClCompile Include="..\..\..\src\image\reader.c" />
     <ClCompile Include="..\..\..\src\ime.c" />
     <ClCompile Include="..\..\..\src\keyboard.c" />
     <ClCompile Include="..\..\..\src\main.c" />

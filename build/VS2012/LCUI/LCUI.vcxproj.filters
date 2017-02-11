@@ -46,9 +46,6 @@
     <Filter Include="源文件\font\in-core">
       <UniqueIdentifier>{63e93ebf-e556-4a4e-b7cf-153c206bf8ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\bmp">
-      <UniqueIdentifier>{dd6d7c8f-2626-480f-b8ca-002f4a4ce989}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\gui\widget">
       <UniqueIdentifier>{bb54efed-7e15-4cdf-a4ad-77a5c5ada8a1}</UniqueIdentifier>
     </Filter>
@@ -72,6 +69,9 @@
     </Filter>
     <Filter Include="源文件\util">
       <UniqueIdentifier>{f90e49cb-1270-43d7-995a-0f3f0a803c8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\image">
+      <UniqueIdentifier>{dd6d7c8f-2626-480f-b8ca-002f4a4ce989}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -249,6 +249,9 @@
     <ClInclude Include="..\..\..\include\LCUI\util\math.h">
       <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\image.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -277,15 +280,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\font\textstyle.c">
       <Filter>源文件\font</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\bmp\bmp.c">
-      <Filter>源文件\bmp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\bmp\jpeg.c">
-      <Filter>源文件\bmp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\bmp\png.c">
-      <Filter>源文件\bmp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\draw\line.c">
       <Filter>源文件\draw</Filter>
@@ -404,9 +398,6 @@
     <ClCompile Include="..\..\..\src\util\time.c">
       <Filter>源文件\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\bmp\load_image.c">
-      <Filter>源文件\bmp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget\textedit.c">
       <Filter>源文件\gui\widget</Filter>
     </ClCompile>
@@ -430,6 +421,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\math.c">
       <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\image\bmp.c">
+      <Filter>源文件\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\image\jpeg.c">
+      <Filter>源文件\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\image\png.c">
+      <Filter>源文件\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\image\reader.c">
+      <Filter>源文件\image</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

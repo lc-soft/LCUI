@@ -42,6 +42,7 @@
 #include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include <LCUI/image.h>
 #include <LCUI/gui/widget.h>
 
 typedef struct ImageCacheRec_ {
@@ -81,7 +82,7 @@ static void ExecLoadImage( void *arg1, void *arg2 )
 	ImageCache cache;
 
 	Graph_Init( &image );
-	if( Graph_LoadImage( path, &image ) != 0 ) {
+	if( LCUI_ReadImageFile( path, &image ) != 0 ) {
 		return;
 	}
 	cache = NEW(ImageCacheRec, 1);
