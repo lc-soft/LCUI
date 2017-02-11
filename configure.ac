@@ -6,6 +6,9 @@
 AC_PREREQ([2.68])
 AC_INIT(LCUI, 1.0.0, lc-soft@live.cn)
 
+# Silence warning: ar: 'u' modifier ignored since 'D' is the default
+AC_SUBST(AR_FLAGS, [cr])
+
 # Check system type
 AC_CANONICAL_TARGET
 
@@ -176,7 +179,7 @@ AC_OUTPUT([Makefile
 	 src/font/in-core/Makefile
 	 src/draw/Makefile
 	 src/thread/Makefile
-	 src/bmp/Makefile
+	 src/image/Makefile
 	 src/util/Makefile
 	 src/gui/Makefile
 	 src/platform/Makefile

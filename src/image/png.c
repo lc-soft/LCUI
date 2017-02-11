@@ -91,7 +91,7 @@ static size_t OnReadFile( void *data, void *buffer, size_t size )
 static LCUI_BOOL LCUI_CheckImageIsPNG( LCUI_ImageReader reader )
 {
 	size_t n;
-	char buf[PNG_BYTES_TO_CHECK];
+	png_byte buf[PNG_BYTES_TO_CHECK];
 	n = reader->func( reader->stream_data, buf, PNG_BYTES_TO_CHECK );
 	if( n < PNG_BYTES_TO_CHECK ) {
 		return FALSE;
