@@ -139,7 +139,6 @@ void LCUIDisplay_Render( void )
 		record->rendered = FALSE;
 		/* 在 surface 上逐个重绘无效区域 */
 		for( LinkedList_Each( rn, &record->rects ) ) {
-			LCUI_Rect *rect = rn->data;
 			paint = Surface_BeginPaint( surface, rn->data );
 			if( !paint ) {
 				continue;
@@ -179,7 +178,6 @@ void LCUIDisplay_Present( void )
 
 void LCUIDisplay_InvalidateArea( LCUI_Rect *rect )
 {
-	LinkedListNode *node;
 	if( !display.is_working ) {
 		return;
 	}
