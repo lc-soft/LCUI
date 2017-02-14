@@ -256,7 +256,7 @@
     <ClCompile Include="..\..\..\src\util\dict.c" />
     <ClCompile Include="..\..\..\src\util\dirent.c" />
     <ClCompile Include="..\..\..\src\util\event.c" />
-    <ClCompile Include="..\..\..\src\util\framectrl.c" />
+    <ClCompile Include="..\..\..\src\util\steptimer.c" />
     <ClCompile Include="..\..\..\src\util\linkedlist.c" />
     <ClCompile Include="..\..\..\src\util\logger.c" />
     <ClCompile Include="..\..\..\src\util\math.c" />

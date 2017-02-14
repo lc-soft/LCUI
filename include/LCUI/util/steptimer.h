@@ -1,8 +1,8 @@
 ﻿/* ***************************************************************************
- * framectrl.h -- frame control, limit the maximum number of tasks for program
- * in 1 sec.
+ * steptimer.h -- step timer, Mainly used to control the count of frames per
+ * second for the rendering loop.
  *
- * Copyright (C) 2014-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2014-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -21,9 +21,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * framectrl.h -- 帧数控制，能够限制程序在一秒内执行的最大任务数量。
+ * steptimer.h -- 步进计时器，主要用于控制渲染循环每秒更新的帧数。
  *
- * 版权所有 (C) 2014-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2014-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -38,35 +38,34 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef LCUI_UTIL_FRAMECTRL_H
-#define LCUI_UTIL_FRAMECTRL_H
+#ifndef LCUI_UTIL_STEPTIMER_H
+#define LCUI_UTIL_STEPTIMER_H
 
 LCUI_BEGIN_HEADER
 
-#ifdef LCUI_UTIL_FRAMECTRL_C
-typedef struct FrameControlRec_* FrameControl;
+#ifdef LCUI_UTIL_STEPTIMER_C
+typedef struct StepTimerRec_* StepTimer;
 #else
-typedef void* FrameControl;
+typedef void* StepTimer;
 #endif
 
 /** 新建帧数控制实例 */
-LCUI_API FrameControl FrameControl_Create( void );
+LCUI_API StepTimer StepTimer_Create( void );
 
 /** 销毁帧数控制相关资源 */
-LCUI_API void FrameControl_Destroy( FrameControl ctx );
-
+LCUI_API void StepTimer_Destroy( StepTimer timer );
 
 /** 设置最大FPS（帧数/秒） */
-LCUI_API void FrameControl_SetMaxFPS( FrameControl ctx, unsigned int fps );
+LCUI_API void StepTimer_SetFrameLimit( StepTimer timer, unsigned int max );
 
 /** 获取当前FPS */
-LCUI_API int FrameControl_GetFPS( FrameControl ctx );
+LCUI_API int StepTimer_GetFrameCount( StepTimer timer );
 
 /** 让当前帧停留一定时间 */
-LCUI_API void FrameControl_Remain( FrameControl ctx );
+LCUI_API void StepTimer_Remain( StepTimer timer );
 
 /** 暂停数据帧的更新 */
-LCUI_API void FrameControl_Pause( FrameControl ctx, LCUI_BOOL need_pause );
+LCUI_API void StepTimer_Pause( StepTimer timer, LCUI_BOOL need_pause );
 
 LCUI_END_HEADER
 

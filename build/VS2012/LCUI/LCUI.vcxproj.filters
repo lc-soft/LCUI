@@ -377,9 +377,6 @@
     <ClCompile Include="..\..\..\src\util\event.c">
       <Filter>源文件\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\util\framectrl.c">
-      <Filter>源文件\util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\util\linkedlist.c">
       <Filter>源文件\util</Filter>
     </ClCompile>
@@ -433,6 +430,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\image\reader.c">
       <Filter>源文件\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\steptimer.c">
+      <Filter>源文件\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,8 @@
 ﻿/* ***************************************************************************
- * framectrl.c -- frame control, limit the maximum number of tasks for program
- * in 1 sec.
+ * steptimer.c -- step timer, Mainly used to control the count of frames per
+ * second for the rendering loop.
  *
- * Copyright (C) 2014-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2014-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -21,9 +21,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * framectrl.c -- 帧数控制，能够限制程序在一秒内执行的最大任务数量。
+ * steptimer.c -- 步进计时器，主要用于控制渲染循环每秒更新的帧数。
  *
- * 版权所有 (C) 2014-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2014-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -38,20 +38,20 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#define LCUI_UTIL_FRAMECTRL_C
+#define LCUI_UTIL_STEPTIMER_C
 
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
 
-enum FrameControlState {
+enum StepTimerState {
 	STATE_RUN,
 	STATE_PAUSE,
 	STATE_QUIT
 };
 
-typedef struct FrameControlRec_ {
+typedef struct StepTimerRec_ {
 	int state;
 	LCUI_Cond cond;
 	LCUI_Mutex mutex;
@@ -61,102 +61,102 @@ typedef struct FrameControlRec_ {
 	unsigned int pause_time;
 	int64_t prev_frame_start_time;
 	int64_t prev_fps_update_time;
-} FrameControlRec;
+} StepTimerRec;
 
-FrameControl FrameControl_Create( void )
+StepTimer StepTimer_Create( void )
 {
-	FrameControl ctx;
-	ctx = NEW( FrameControlRec, 1 );
-	ctx->temp_fps = 0;
-	ctx->current_fps = 0;
-	ctx->pause_time = 0;
-	ctx->one_frame_remain_time = 10;
-	ctx->prev_frame_start_time = LCUI_GetTime();
-	ctx->prev_fps_update_time = LCUI_GetTime();
-	LCUICond_Init( &ctx->cond );
-	LCUIMutex_Init( &ctx->mutex );
-	return ctx;
+	StepTimer timer;
+	timer = NEW( StepTimerRec, 1 );
+	timer->temp_fps = 0;
+	timer->current_fps = 0;
+	timer->pause_time = 0;
+	timer->one_frame_remain_time = 10;
+	timer->prev_frame_start_time = LCUI_GetTime();
+	timer->prev_fps_update_time = LCUI_GetTime();
+	LCUICond_Init( &timer->cond );
+	LCUIMutex_Init( &timer->mutex );
+	return timer;
 }
 
-void FrameControl_Destroy( FrameControl ctx )
+void StepTimer_Destroy( StepTimer timer )
 {
-	LCUIMutex_Unlock( &ctx->mutex );
-	LCUICond_Destroy( &ctx->cond );
-	LCUIMutex_Destroy( &ctx->mutex );
-	free( ctx );
+	LCUIMutex_Unlock( &timer->mutex );
+	LCUICond_Destroy( &timer->cond );
+	LCUIMutex_Destroy( &timer->mutex );
+	free( timer );
 }
 
-void FrameControl_SetMaxFPS( FrameControl ctx, unsigned int fps )
+void StepTimer_SetFrameLimit( StepTimer timer, unsigned int max )
 {
-	ctx->one_frame_remain_time = (int)(1000.0/fps);
+	timer->one_frame_remain_time = (int)(1000.0 / max);
 }
 
-int FrameControl_GetFPS( FrameControl ctx )
+int StepTimer_GetFrameCount( StepTimer timer )
 {
-	return ctx->current_fps;
+	return timer->current_fps;
 }
 
-void FrameControl_Remain( FrameControl ctx )
+void StepTimer_Remain( StepTimer timer )
 {
 	int64_t current_time;
 	unsigned int n_ms, lost_ms;
 
-	if( ctx->state == STATE_QUIT ) {
+	if( timer->state == STATE_QUIT ) {
 		return;
 	}
 	lost_ms = 0;
 	current_time = LCUI_GetTime();
-	LCUIMutex_Lock( &ctx->mutex );
-	n_ms = (unsigned int)(current_time - ctx->prev_frame_start_time);
-	if( n_ms > ctx->one_frame_remain_time ) {
+	LCUIMutex_Lock( &timer->mutex );
+	n_ms = (unsigned int)(current_time - timer->prev_frame_start_time);
+	if( n_ms > timer->one_frame_remain_time ) {
 		goto normal_exit;
 	}
-	n_ms = ctx->one_frame_remain_time - n_ms;
+	n_ms = timer->one_frame_remain_time - n_ms;
 	if( n_ms < 1 ) {
 		goto normal_exit;
 	}
 	/* 睡眠一段时间 */
-	while( lost_ms < n_ms && ctx->state == STATE_RUN ) {
-		LCUICond_TimedWait( &ctx->cond, &ctx->mutex, n_ms - lost_ms );
+	while( lost_ms < n_ms && timer->state == STATE_RUN ) {
+		LCUICond_TimedWait( &timer->cond, &timer->mutex, n_ms - lost_ms );
 		lost_ms = (unsigned int)LCUI_GetTimeDelta( current_time );
 	}
 	/* 睡眠结束后，如果当前状态为 PAUSE，则说明睡眠是因为要暂停而终止的 */
-	if( ctx->state == STATE_PAUSE ) {
+	if( timer->state == STATE_PAUSE ) {
 		current_time = LCUI_GetTime();
 		/* 等待状态改为“继续” */
-		while( ctx->state == STATE_PAUSE ) {
-			LCUICond_Wait( &ctx->cond, &ctx->mutex );
+		while( timer->state == STATE_PAUSE ) {
+			LCUICond_Wait( &timer->cond, &timer->mutex );
 		}
 		lost_ms = (unsigned int)LCUI_GetTimeDelta( current_time );
-		ctx->pause_time = lost_ms;
-		ctx->prev_frame_start_time += lost_ms;
-		LCUIMutex_Unlock( &ctx->mutex );
+		timer->pause_time = lost_ms;
+		timer->prev_frame_start_time += lost_ms;
+		LCUIMutex_Unlock( &timer->mutex );
 		return;
 	}
 
 normal_exit:;
 	current_time = LCUI_GetTime();
-	if( current_time - ctx->prev_fps_update_time >= 1000 ) {
-		ctx->current_fps = ctx->temp_fps;
-		ctx->prev_fps_update_time = current_time;
-		ctx->temp_fps = 0;
+	if( current_time - timer->prev_fps_update_time >= 1000 ) {
+		timer->current_fps = timer->temp_fps;
+		timer->prev_fps_update_time = current_time;
+		timer->temp_fps = 0;
 	}
-	ctx->prev_frame_start_time = current_time;
-	++ctx->temp_fps;
-	LCUIMutex_Unlock( &ctx->mutex );
+	timer->prev_frame_start_time = current_time;
+	++timer->temp_fps;
+	LCUIMutex_Unlock( &timer->mutex );
 }
 
-void FrameControl_Pause( FrameControl ctx, LCUI_BOOL need_pause )
+void StepTimer_Pause( StepTimer timer, LCUI_BOOL need_pause )
 {
-	if( ctx->state == STATE_RUN && need_pause ) {
-		LCUIMutex_Lock( &ctx->mutex );
-		ctx->state = STATE_PAUSE;
-		LCUICond_Signal( &ctx->cond );
-		LCUIMutex_Unlock( &ctx->mutex );
-	} else if( ctx->state == STATE_PAUSE && !need_pause ) {
-		LCUIMutex_Lock( &ctx->mutex );
-		ctx->state = STATE_RUN;
-		LCUICond_Signal( &ctx->cond );
-		LCUIMutex_Unlock( &ctx->mutex );
+	if( timer->state == STATE_RUN && need_pause ) {
+		LCUIMutex_Lock( &timer->mutex );
+		timer->state = STATE_PAUSE;
+		LCUICond_Signal( &timer->cond );
+		LCUIMutex_Unlock( &timer->mutex );
+	} else if( timer->state == STATE_PAUSE && !need_pause ) {
+		LCUIMutex_Lock( &timer->mutex );
+		timer->state = STATE_RUN;
+		LCUICond_Signal( &timer->cond );
+		LCUIMutex_Unlock( &timer->mutex );
 	}
 }

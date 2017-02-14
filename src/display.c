@@ -67,17 +67,11 @@ static struct DisplayContext {
 	int mode;			/**< 显示模式 */
 	LCUI_BOOL show_rect_border;	/**< 是否为重绘的区域显示边框 */
 	LCUI_BOOL is_working;		/**< 标志，指示当前模块是否处于工作状态 */
-	FrameControl fc_ctx;		/**< 上下文句柄，用于画面更新时的帧数控制 */
 	LCUI_Thread thread;		/**< 线程，负责画面更新工作 */
 	LinkedList surfaces;		/**< surface 列表 */
+	LinkedList rects;		/**< 无效区域列表 */
 	LCUI_DisplayDriver driver;
-} display = { LCDM_DEFAULT, FALSE, FALSE, NULL };
-
-/** 获取当前的屏幕内容每秒更新的帧数 */
-int LCUIDisplay_GetFPS(void)
-{
-	return FrameControl_GetFPS( display.fc_ctx );
-}
+} display;
 
 static void DrawBorder( LCUI_PaintContext paint )
 {
@@ -98,14 +92,19 @@ static void DrawBorder( LCUI_PaintContext paint )
 
 void LCUIDisplay_Update( void )
 {
-	LinkedListNode *sn;
+	LCUI_Surface surface;
+	LinkedListNode *node;
+	SurfaceRecord record = NULL;
+
+	if( !display.is_working ) {
+		return;
+	}
 	LCUICursor_Update();
 	LCUIWidget_Update();
 	/* 遍历当前的 surface 记录列表 */
-	for( LinkedList_Each( sn, &display.surfaces ) ) {
-		SurfaceRecord record = sn->data;
-		LCUI_Surface surface = record->surface;
-
+	for( LinkedList_Each( node, &display.surfaces ) ) {
+		record = node->data;
+		surface = record->surface;
 		if( !record->widget || !surface ||
 		    !Surface_IsReady( surface ) ) {
 			continue;
@@ -114,6 +113,10 @@ void LCUIDisplay_Update( void )
 		/* 收集无效区域记录 */
 		Widget_ProcInvalidArea( record->widget, &record->rects );
 	}
+	if( display.mode == LCDM_SEAMLESS || !record ) {
+		return;
+	}
+	LinkedList_Concat( &record->rects, &display.rects );
 }
 
 void LCUIDisplay_Render( void )
@@ -121,6 +124,9 @@ void LCUIDisplay_Render( void )
 	LinkedListNode *sn, *rn;
 	LCUI_PaintContext paint;
 
+	if( !display.is_working ) {
+		return;
+	}
 	/* 遍历当前的 surface 记录列表 */
 	for( LinkedList_Each( sn, &display.surfaces ) ) {
 		SurfaceRecord record = sn->data;
@@ -130,14 +136,16 @@ void LCUIDisplay_Render( void )
 		    !Surface_IsReady( surface ) ) {
 			continue;
 		}
+		record->rendered = FALSE;
 		/* 在 surface 上逐个重绘无效区域 */
 		for( LinkedList_Each( rn, &record->rects ) ) {
+			LCUI_Rect *rect = rn->data;
 			paint = Surface_BeginPaint( surface, rn->data );
 			if( !paint ) {
 				continue;
 			}
 			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
-				   p_sr->widget->type,
+				   record->widget->type,
 				   paint->rect.x, paint->rect.y,
 				   paint->rect.width, paint->rect.height );
 			Widget_Render( record->widget, paint );
@@ -145,15 +153,18 @@ void LCUIDisplay_Render( void )
 				DrawBorder( paint );
 			}
 			Surface_EndPaint( surface, paint );
+			record->rendered = TRUE;
 		}
 		RectList_Clear( &record->rects );
-		record->rendered = TRUE;
 	}
 }
 
 void LCUIDisplay_Present( void )
 {
 	LinkedListNode *sn;
+	if( !display.is_working ) {
+		return;
+	}
 	for( LinkedList_Each( sn, &display.surfaces ) ) {
 		SurfaceRecord record = sn->data;
 		LCUI_Surface surface = record->surface;
@@ -168,8 +179,11 @@ void LCUIDisplay_Present( void )
 
 void LCUIDisplay_InvalidateArea( LCUI_Rect *rect )
 {
-	LCUI_Widget root = LCUIWidget_GetRoot();
-	Widget_InvalidateArea( root, rect, SV_BORDER_BOX );
+	LinkedListNode *node;
+	if( !display.is_working ) {
+		return;
+	}
+	RectList_Add( &display.rects, rect );
 }
 
 static LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
@@ -359,11 +373,6 @@ void LCUIDisplay_HideRectBorder( void )
 	display.show_rect_border = FALSE;
 }
 
-void LCUIDisplay_ExecResize( int width, int height )
-{
-	// ...
-}
-
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
 void LCUIDisplay_SetSize( int width, int height )
 {
@@ -432,7 +441,12 @@ void Surface_Move( LCUI_Surface surface, int x, int y )
 void Surface_Resize( LCUI_Surface surface, int w, int h )
 {
 	if( display.is_working ) {
+		LCUI_Rect rect;
 		display.driver->resize( surface, w, h );
+		rect.x = rect.y = 0;
+		rect.width = w;
+		rect.height = h;
+		LCUIDisplay_InvalidateArea( &rect );
 	}
 }
 
@@ -537,34 +551,19 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	case WET_HIDE:
 		Surface_Hide( surface );
 		break;
+	case WET_RESIZE:
+	{
+		LCUI_Rect area;
+		area.x = area.y = 0;
+		area.width = roundi( rect->width );
+		area.height = roundi( rect->height );
+		LCUIDisplay_InvalidateArea( &area );
+		break;
+	}
 	case WET_TITLE:
 		DEBUG_MSG("%S\n", e->target->title );
 		Surface_SetCaptionW( surface, e->target->title );
 		break;
-	case WET_RESIZE:
-	{
-		int width = (int)(rect->width + 0.5);
-		int height = (int)(rect->height + 0.5);
-		DEBUG_MSG( "resize, w: %d, h: %d\n", width, height );
-		Surface_Resize( surface, width, height );
-		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
-		if( w == root && display.mode != LCDM_SEAMLESS ) {
-			LCUIDisplay_ExecResize( width, height );
-		}
-		break;
-	}
-	case WET_MOVE:
-	{
-		int x = (int)(rect->x + 0.5);
-		int y = (int)(rect->y + 0.5);
-		if( !w->style->sheet[key_top].is_valid ||
-		    !w->style->sheet[key_left].is_valid ) {
-			break;
-		}
-		DEBUG_MSG( "x: %d, y: %d\n", x, y );
-		Surface_Move( surface, x, y );
-		break;
-	}
 	default: break;
 	}
 }
@@ -617,6 +616,7 @@ int LCUI_InitDisplay( LCUI_DisplayDriver driver )
 	LOG( "[display] init ...\n" );
 	display.mode = 0;
 	root = LCUIWidget_GetRoot();
+	LinkedList_Init( &display.rects );
 	LinkedList_Init( &display.surfaces );
 	if( !driver ) {
 		driver = LCUI_CreateDisplayDriver();
@@ -627,10 +627,8 @@ int LCUI_InitDisplay( LCUI_DisplayDriver driver )
 	}
 	display.driver = driver;
 	display.is_working = TRUE;
-	display.fc_ctx = FrameControl_Create();
 	display.driver->bindEvent( DET_RESIZE, OnResize, NULL, NULL );
 	display.driver->bindEvent( DET_PAINT, OnPaint, NULL, NULL );
-	FrameControl_SetMaxFPS( display.fc_ctx, MAX_FRAMES_PER_SEC );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	LCUIDisplay_SetMode( LCDM_DEFAULT );
 	LOG( "[display] init ok, driver name: %s\n", display.driver->name );
@@ -644,6 +642,7 @@ int LCUI_ExitDisplay( void )
 		return -1;
 	}
 	display.is_working = FALSE;
-	FrameControl_Destroy( display.fc_ctx );
+	RectList_Clear( &display.rects );
+	LCUIDisplay_CleanSurfaces();
 	return 0;
 }

@@ -1116,8 +1116,8 @@ static LCUI_StyleSheet LCUI_SelectStyleSheet( LCUI_Selector selector,
 	return snode->sheet;
 }
 
-int LCUI_PutStyleSheet( LCUI_Selector selector, 
-		   LCUI_StyleSheet in_ss, const char *space )
+int LCUI_PutStyleSheet( LCUI_Selector selector,
+			LCUI_StyleSheet in_ss, const char *space )
 {
 	LCUI_StyleSheet ss;
 	LCUIMutex_Lock( &library.mutex );

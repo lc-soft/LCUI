@@ -161,8 +161,20 @@ LCUI_API void LCUI_SetTaskAgent( LCUI_BOOL enabled );
 /** 处理当前所有事件 */
 LCUI_API void LCUI_ProcessEvents( void );
 
-/** 添加任务 */
+/**
+ * 添加任务
+ * 该任务将会添加至 UI 线程中执行
+ */
 LCUI_API LCUI_BOOL LCUI_PostTask( LCUI_AppTask task );
+
+/** LCUI_PostTask 的简化版本 */
+#define LCUI_PostSimpleTask(FUNC, ARG1, ARG2) do {\
+	LCUI_AppTaskRec task = { 0 };\
+	task.arg[0] = (void*)ARG1;\
+	task.arg[1] = (void*)ARG2;\
+	task.func = (LCUI_AppTaskFunc)(FUNC);\
+	LCUI_PostTask( &task );\
+} while( 0 );
 
 /** 销毁任务 */
 LCUI_API void LCUI_DeleteTask( LCUI_AppTask task );
@@ -186,19 +198,17 @@ LCUI_API void LCUI_InitBase( void );
 
 LCUI_API void LCUI_InitApp( LCUI_AppDriver app );
 
-/* 
- * 功能：用于对LCUI进行初始化操作 
- * 说明：每个使用LCUI实现图形界面的程序，都需要先调用此函数进行LCUI的初始化
- * */ 
+/** 初始化 LCUI 各项功能 */ 
 LCUI_API void LCUI_Init( void );
 
-/* 
- * 功能：LCUI程序的主循环
- * 说明：每个LCUI程序都需要调用它，此函数会让程序执行LCUI分配的任务
- *  */
+/**
+ * 进入 LCUI 主循环
+ * 调用该函数后，LCUI 会将当前线程作为 UI 线程，用于处理部件更新、布局、渲染等
+ * 与图形界面相关的任务。
+ */
 LCUI_API int LCUI_Main( void );
 
-/* 获取LCUI的版本 */
+/** 获取LCUI的版本 */
 LCUI_API int LCUI_GetSelfVersion( char *out );
 
 /** 释放LCUI占用的资源 */

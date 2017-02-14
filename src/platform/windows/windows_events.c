@@ -46,7 +46,7 @@
 #include LCUI_EVENTS_H
 #include "resource.h"
 
-#define WM_LCUI_EVENT (WM_USER+20)
+#define WM_LCUI_TASK (WM_USER+20)
 
 static struct WindowsDriver {
 	HWND main_hwnd;
@@ -60,7 +60,9 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 {
 	MSG win_ev;
 	switch( msg ) {
-	case WM_LCUI_EVENT:
+	case WM_LCUI_TASK:
+		LCUI_RunTask( (LCUI_AppTask)arg2 );
+		LCUI_DeleteTask( (LCUI_AppTask)arg2 );
 		return 0;
 	case WM_CLOSE:
 		LCUI_Quit();
@@ -78,7 +80,7 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 
 static LCUI_BOOL WIN_PostTask( LCUI_AppTask task )
 {
-	return PostMessage( win.main_hwnd, WM_LCUI_EVENT, 0, (LPARAM)task );
+	return PostMessage( win.main_hwnd, WM_LCUI_TASK, 0, (LPARAM)task );
 }
 
 static LCUI_BOOL WIN_WaitEvent( void )
@@ -90,15 +92,13 @@ static LCUI_BOOL WIN_WaitEvent( void )
 	return WaitMessage();
 }
 
-static LCUI_BOOL WIN_DispatchEvent( void )
+static void WIN_ProcessEvents( void )
 {
 	MSG msg;
-	if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
+	while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
 		TranslateMessage( &msg );
 		DispatchMessage( &msg );
-		return TRUE;
 	}
-	return FALSE;
 }
 
 static int WIN_BindSysEvent( int event_id, LCUI_EventFunc func,
@@ -172,7 +172,7 @@ LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 	app->GetData = WIN_GetData;
 	app->PostTask = WIN_PostTask;
 	app->WaitEvent = WIN_WaitEvent;
-	app->ProcessEvents = WIN_DispatchEvent;
+	app->ProcessEvents = WIN_ProcessEvents;
 	app->BindSysEvent = WIN_BindSysEvent;
 	app->UnbindSysEvent = WIN_UnbindSysEvent;
 	app->UnbindSysEvent2 = WIN_UnbindSysEvent2;

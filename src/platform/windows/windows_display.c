@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * windows_display.c -- surface support for windows platform.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * windows_display.c -- windows 平台的图形显示功能支持。
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -55,6 +55,7 @@
 enum SurfaceTaskType {
 	TASK_MOVE,
 	TASK_RESIZE,
+	TASK_RESIZE_FB,
 	TASK_SHOW,
 	TASK_SET_CAPTION,
 	TASK_TOTAL_NUM
@@ -78,7 +79,7 @@ typedef struct LCUI_SurfaceTask {
 struct LCUI_SurfaceRec_ {
 	HWND hwnd;				/**< windows 窗口句柄 */
 	int mode;				/**< 渲染模式 */
-	int w, h;				/**< 窗口宽高 */
+	int width, height;			/**< 窗口宽高 */
 	HDC fb_hdc;				/**< 设备上下文 */
 	HBITMAP fb_bmp;				/**< 帧缓存 */
 	LCUI_BOOL is_ready;			/**< 是否已经准备好 */
@@ -91,7 +92,7 @@ static struct WIN_Display {
 	LCUI_BOOL is_inited;		/**< 是否已经初始化 */
 	LinkedList surfaces;		/**< surface 记录 */
 	LCUI_EventTrigger trigger;	/**< 事件触发器 */
-} win = {0};
+} win;
 
 /** 根据 hwnd 获取 Surface */
 static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
@@ -107,8 +108,8 @@ static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 
 static void WinSurface_Destroy( LCUI_Surface surface )
 {
-	surface->w = 0;
-	surface->h = 0;
+	surface->width = 0;
+	surface->height = 0;
 	if( surface->hwnd ) {
 		if( surface->fb_hdc ) {
 			ReleaseDC( surface->hwnd, surface->fb_hdc );
@@ -174,7 +175,6 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 static LCUI_Surface WinSurface_New( void )
 {
 	int i;
-	LCUI_AppTaskRec task;
 	LCUI_Surface surface;
 	surface = NEW( struct LCUI_SurfaceRec_, 1 );
 	surface->mode = RENDER_MODE_BIT_BLT;
@@ -188,12 +188,7 @@ static LCUI_Surface WinSurface_New( void )
 		surface->tasks[i].is_valid = FALSE;
 	}
 	LinkedList_Append( &win.surfaces, surface );
-	task.arg[1] = NULL;
-	task.arg[0] = surface;
-	task.func = OnCreateSurface;
-	task.destroy_arg[0] = NULL;
-	task.destroy_arg[1] = NULL;
-	LCUI_PostTask( &task );
+	LCUI_PostSimpleTask( OnCreateSurface, surface, NULL );
 	return surface;
 }
 
@@ -219,14 +214,16 @@ static void WinSurface_Move( LCUI_Surface surface, int x, int y )
 	surface->tasks[TASK_MOVE].is_valid = TRUE;
 }
 
-static void WinSurface_ExecResize( LCUI_Surface surface, int w, int h )
+static void WinSurface_ExecResizeFrameBuffer( LCUI_Surface surface,
+					      int w, int h )
 {
 	HDC hdc_client;
 	HBITMAP old_bmp;
-	RECT rect_client, rect_window;
-	surface->w = w;
-	surface->h = h;
-	DEBUG_MSG("w = %d, h = %d\n", w, h);
+	LCUI_Rect rect;
+
+	if( surface->width == w && surface->height == h ) {
+		return;
+	}
 	Graph_Create( &surface->fb, w, h );
 	hdc_client = GetDC( surface->hwnd );
 	surface->fb_bmp = CreateCompatibleBitmap( hdc_client, w, h );
@@ -234,6 +231,21 @@ static void WinSurface_ExecResize( LCUI_Surface surface, int w, int h )
 	if( old_bmp ) {
 		DeleteObject( old_bmp );
 	}
+	surface->width = w;
+	surface->height = h;
+	rect.x = rect.y = 0;
+	rect.width = w;
+	rect.height = 0;
+	LCUIDisplay_InvalidateArea( &rect );
+}
+
+static void WinSurface_ExecResize( LCUI_Surface surface, int w, int h )
+{
+	RECT rect_client, rect_window;
+	if( surface->width == w && surface->height == h ) {
+		return;
+	}
+	WinSurface_ExecResizeFrameBuffer( surface, w, h );
 	GetClientRect( surface->hwnd, &rect_client );
 	GetWindowRect( surface->hwnd, &rect_window );
 	w += rect_window.right - rect_window.left;
@@ -250,6 +262,13 @@ static void WinSurface_Resize( LCUI_Surface surface, int w, int h )
 	surface->tasks[TASK_RESIZE].width = w;
 	surface->tasks[TASK_RESIZE].height = h;
 	surface->tasks[TASK_RESIZE].is_valid = TRUE;
+}
+
+static void WinSurface_ResizeFrameBuffer( LCUI_Surface surface, int w, int h )
+{
+	surface->tasks[TASK_RESIZE_FB].width = w;
+	surface->tasks[TASK_RESIZE_FB].height = h;
+	surface->tasks[TASK_RESIZE_FB].is_valid = TRUE;
 }
 
 static void WinSurface_Show( LCUI_Surface surface )
@@ -307,7 +326,7 @@ static LCUI_PaintContext WinSurface_BeginPaint( LCUI_Surface surface, LCUI_Rect 
 	paint->rect = *rect;
 	paint->with_alpha = FALSE;
 	Graph_Init( &paint->canvas );
-	LCUIRect_ValidateArea( &paint->rect, surface->w, surface->h );
+	LCUIRect_ValidateArea( &paint->rect, surface->width, surface->height );
 	Graph_Quote( &paint->canvas, &surface->fb, &paint->rect );
 	Graph_FillRect( &paint->canvas, RGB( 255, 255, 255 ), NULL, TRUE );
 	return paint;
@@ -329,20 +348,20 @@ static void WinSurface_Present( LCUI_Surface surface )
 	HDC hdc_client;
 	RECT client_rect;
 
-	DEBUG_MSG("surface: %p, hwnd: %p\n", surface, surface->hwnd);
+	DEBUG_MSG( "surface: %p, hwnd: %p\n", surface, surface->hwnd );
 	hdc_client = GetDC( surface->hwnd );
 	SetBitmapBits( surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes );
-	switch(surface->mode) {
+	switch( surface->mode ) {
 	case RENDER_MODE_STRETCH_BLT:
 		GetClientRect( surface->hwnd, &client_rect );
 		StretchBlt( hdc_client, 0, 0,
 			    client_rect.right, client_rect.bottom,
 			    surface->fb_hdc, 0, 0,
-			    surface->w, surface->h, SRCCOPY );
+			    surface->width, surface->height, SRCCOPY );
 		break;
 	case RENDER_MODE_BIT_BLT:
 	default:
-		BitBlt( hdc_client, 0, 0, surface->w, surface->h,
+		BitBlt( hdc_client, 0, 0, surface->width, surface->height,
 			surface->fb_hdc, 0, 0, SRCCOPY );
 		break;
 	}
@@ -365,6 +384,12 @@ static void WinSurface_Update( LCUI_Surface surface )
 	t = &surface->tasks[TASK_RESIZE];
 	if( t->is_valid ) {
 		WinSurface_ExecResize( surface, t->width, t->height );
+		t->is_valid = FALSE;
+	}
+	t = &surface->tasks[TASK_RESIZE_FB];
+	if( t->is_valid ) {
+		WinSurface_ExecResizeFrameBuffer( surface,
+						  t->width, t->height );
 		t->is_valid = FALSE;
 	}
 	t = &surface->tasks[TASK_SET_CAPTION];
@@ -436,6 +461,8 @@ static void OnWMSize( LCUI_Event e, void *arg )
 	dpy_ev.resize.width = LOWORD( msg->lParam );
 	dpy_ev.resize.height = HIWORD( msg->lParam );
 	EventTrigger_Trigger( win.trigger, DET_RESIZE, &dpy_ev );
+	WinSurface_ResizeFrameBuffer( surface, dpy_ev.resize.width,
+				      dpy_ev.resize.height );
 }
 
 static int WinDisplay_BindEvent( int event_id, LCUI_EventFunc func, 

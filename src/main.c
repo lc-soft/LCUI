@@ -58,6 +58,9 @@
 #define STATE_ACTIVE 1
 #define STATE_KILLED 0
 
+/** 一秒内的最大更新帧数 */
+#define MAX_FRAMES_PER_SEC 100
+
 /** 主循环的状态 */
 enum MainLoopState {
 	STATE_PAUSED,
@@ -94,6 +97,7 @@ static struct LCUI_App {
 	LCUI_Cond loop_changed;		/**< 条件变量，用于指示当前运行的主循环是否改变 */
 	LCUI_MainLoop loop;		/**< 当前运行的主循环 */
 	LinkedList loops;		/**< 主循环列表 */
+	StepTimer timer;		/**< 渲染循环计数器 */
 	LCUI_AppDriver driver;		/**< 程序事件驱动支持 */
 	LCUI_BOOL driver_ready;		/**< 事件驱动支持是否已经准备就绪 */
 	struct LCUI_AppTaskAgent {
@@ -233,7 +237,7 @@ void LCUI_ProcessEvents( void )
 	int i;
 	for( i = 0; LCUI_ProcessTask() && i < 100; ++i );
 	if( MainApp.driver_ready ) {
-		return MainApp.driver->ProcessEvents();
+		MainApp.driver->ProcessEvents();
 	}
 }
 
@@ -242,12 +246,13 @@ LCUI_BOOL LCUI_PostTask( LCUI_AppTask task )
 	LCUI_AppTask newtask;
 	newtask = NEW( LCUI_AppTaskRec, 1 );
 	*newtask = *task;
-	LCUIMutex_Lock( &MainApp.agent.mutex );
-	LinkedList_Append( &MainApp.agent.tasks, newtask );
-	LCUICond_Signal( &MainApp.agent.cond );
-	LCUIMutex_Unlock( &MainApp.agent.mutex );
-	if( MainApp.driver_ready ) {
+	if( MainApp.driver_ready && MainApp.agent.state != STATE_RUNNING ) {
 		return MainApp.driver->PostTask( newtask );
+	} else {
+		LCUIMutex_Lock( &MainApp.agent.mutex );
+		LinkedList_Append( &MainApp.agent.tasks, newtask );
+		LCUICond_Signal( &MainApp.agent.cond );
+		LCUIMutex_Unlock( &MainApp.agent.mutex );
 	}
 	return TRUE;
 }
@@ -305,11 +310,12 @@ int LCUIMainLoop_Run( LCUI_MainLoop loop )
 	DEBUG_MSG( "loop: %p, enter\n", loop );
 	MainApp.loop = loop;
 	while( loop->state != STATE_EXITED ) {
-		LCUI_WaitEvent();
+		//LCUI_WaitEvent();
 		LCUI_ProcessEvents();
 		LCUIDisplay_Update();
 		LCUIDisplay_Render();
 		LCUIDisplay_Present();
+		StepTimer_Remain( MainApp.timer );
 		/* 如果当前运行的主循环不是自己 */
 		while( MainApp.loop != loop ) {
 			loop->state = STATE_PAUSED;
@@ -351,12 +357,14 @@ void LCUI_InitApp( LCUI_AppDriver app )
 	}
 	MainApp.driver = app;
 	MainApp.driver_ready = TRUE;
+	MainApp.timer = StepTimer_Create();
 	LCUICond_Init( &MainApp.loop_changed );
 	LCUIMutex_Init( &MainApp.loop_mutex );
 	LinkedList_Init( &MainApp.loops );
 	LCUIMutex_Init( &MainApp.agent.mutex );
 	LCUICond_Init( &MainApp.agent.cond );
 	LinkedList_Init( &MainApp.agent.tasks );
+	StepTimer_SetFrameLimit( MainApp.timer, MAX_FRAMES_PER_SEC );
 }
 
 static void OnDeleteTask( void *arg )
@@ -374,6 +382,7 @@ static void LCUI_ExitApp( void )
 		LCUIMainLoop_Quit( loop );
 		LCUIThread_Join( loop->tid, NULL );
 	}
+	StepTimer_Destroy( MainApp.timer );
 	LCUIMutex_Destroy( &MainApp.loop_mutex );
 	LCUICond_Destroy( &MainApp.loop_changed );
 	LCUIMutex_Destroy( &MainApp.agent.mutex );
@@ -394,7 +403,8 @@ LCUI_BOOL LCUI_WaitEvent( void )
 	}
 	LCUIMutex_Lock( &MainApp.agent.mutex );
 	while( MainApp.agent.state == STATE_RUNNING ) {
-		if( MainApp.agent.tasks.length > 0 ) {
+		if( MainApp.agent.tasks.length > 0 ||
+		    MainApp.agent.state != STATE_RUNNING ) {
 			LCUIMutex_Unlock( &MainApp.agent.mutex );
 			return TRUE;
 		}

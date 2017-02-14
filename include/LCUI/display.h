@@ -99,9 +99,6 @@ typedef struct LCUI_DisplayDriverRec_ {
 	int			(*bindEvent)(int,LCUI_EventFunc,void*,void(*)(void*));
 } LCUI_DisplayDriverRec, *LCUI_DisplayDriver;
 
-/** 一秒内的最大画面帧数 */
-#define MAX_FRAMES_PER_SEC 100
-
 /* 设置呈现模式 */
 LCUI_API int LCUIDisplay_SetMode( int mode );
 
@@ -139,9 +136,6 @@ LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner( LCUI_Widget w );
 /** 绑定 surface 触发的事件 */
 LCUI_API int LCUIDisplay_BindEvent( int event_id, LCUI_EventFunc func, void *arg,
 				    void *data, void( *destroy_data )(void*) );
-
-/** 获取当前的屏幕内容每秒更新的帧数 */
-LCUI_API int LCUIDisplay_GetFPS(void);
 
 /** 初始化图形输出模块 */
 LCUI_API int LCUI_InitDisplay( LCUI_DisplayDriver driver );
