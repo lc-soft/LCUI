@@ -873,8 +873,14 @@ static void Widget_UpdateChildrenSize( LCUI_Widget w )
 	for( LinkedList_Each( node, &w->children ) ) {
 		LCUI_Widget child = node->data;
 		LCUI_Style s = child->style->sheet;
-		if( s[key_width].type == SVT_SCALE || 
-		    s[key_height].type == SVT_SCALE ) {
+		if( child->computed_style.display == SV_BLOCK ) {
+			if( CheckStyleType( s, key_width, AUTO ) ||
+			    CheckStyleType( s, key_height, AUTO ) ) {
+				Widget_AddTask( child, WTT_RESIZE );
+			}
+		}
+		if( CheckStyleType( s, key_width, SCALE ) ||
+		    CheckStyleType( s, key_height, SCALE ) ) {
 			Widget_AddTask( child, WTT_RESIZE );
 		}
 		if( child->computed_style.position == SV_ABSOLUTE ) {
@@ -1300,7 +1306,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 	int i, box_sizing;
 	LCUI_Rect2F padding = w->padding;
 	LCUI_BoundBox *pbox = &w->computed_style.padding;
-	struct { 
+	struct {
 		LCUI_Style sval;
 		float *ival;
 		int key;
@@ -1368,7 +1374,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 		Widget_InvalidateArea( w->parent, &r, SV_PADDING_BOX );
 		r.width = (int)(w->box.graph.width + 0.5);
 		r.height = (int)(w->box.graph.height + 0.5);
-		Widget_InvalidateArea( w->parent, &r, SV_PADDING_BOX );	
+		Widget_InvalidateArea( w->parent, &r, SV_PADDING_BOX );
 		if( w->parent->style->sheet[key_width].type == SVT_AUTO
 		    || w->parent->style->sheet[key_height].type == SVT_AUTO ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
