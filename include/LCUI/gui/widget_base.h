@@ -49,6 +49,8 @@ LCUI_BEGIN_HEADER
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;		/**< 是否可见 */
 	LCUI_BOOL focusable;		/**< 是否能够得到焦点 */
+	float min_width, min_height;	/**< 最小尺寸 */
+	float max_width, max_height;	/**< 最大尺寸 */
 	float left, top;		/**< 左边界、顶边界的偏移距离 */
 	float right, bottom;		/**< 右边界、底边界的偏移距离 */
 	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */

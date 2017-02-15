@@ -1097,11 +1097,12 @@ static void Widget_ComputeContentSize( LCUI_Widget w,
 /** 计算尺寸 */
 static void Widget_ComputeSize( LCUI_Widget w )
 {
-	float n, width, height;
+	float width, height;
 	LCUI_RectF *box, *pbox = &w->box.padding;
+	LCUI_WidgetStyle *style = &w->computed_style;
 	LCUI_Style sw = &w->style->sheet[key_width];
 	LCUI_Style sh = &w->style->sheet[key_height];
-	LCUI_Border *bbox = &w->computed_style.border;
+	LCUI_Border *bbox = &style->border;
 	w->width = ComputeXNumber( w, key_width );
 	w->height = ComputeYNumber( w, key_height );
 	if( sw->type == SVT_AUTO || sh->type == SVT_AUTO ) {
@@ -1119,7 +1120,7 @@ static void Widget_ComputeSize( LCUI_Widget w )
 			height += w->padding.top + w->padding.bottom;
 			height += bbox->top.width + bbox->bottom.width;
 		}
-		if( sw->type == SVT_AUTO &&
+		if( w->parent && sw->type == SVT_AUTO &&
 		    w->computed_style.display == SV_BLOCK &&
 		    w->computed_style.position != SV_ABSOLUTE ) {
 			width = w->parent->box.content.width;
@@ -1162,28 +1163,36 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		break;
 	}
 	if( w->style->sheet[key_max_width].is_valid ) {
-		n = ComputeXNumber( w, key_max_width );
-		if( w->width > n ) {
-			w->width = n;
-		}
+		style->max_width = ComputeXNumber( w, key_max_width );
+	} else {
+		style->max_width = -1;
 	}
 	if( w->style->sheet[key_min_width].is_valid ) {
-		n = ComputeXNumber( w, key_min_width );
-		if( w->width < n ) {
-			w->width = n;
-		}
+		style->min_width = ComputeXNumber( w, key_min_width );
+	} else {
+		style->min_width = -1;
 	}
 	if( w->style->sheet[key_max_height].is_valid ) {
-		n = ComputeYNumber( w, key_max_height );
-		if( w->height > n ) {
-			w->height = n;
-		}
+		style->max_height = ComputeXNumber( w, key_max_height );
+	} else {
+		style->max_height = -1;
 	}
 	if( w->style->sheet[key_min_height].is_valid ) {
-		n = ComputeYNumber( w, key_min_height );
-		if( w->height < n ) {
-			w->height = n;
-		}
+		style->min_height = ComputeXNumber( w, key_min_height );
+	} else {
+		style->min_height = -1;
+	}
+	if( style->max_width > -1 && w->width > style->max_width ) {
+		w->width = style->max_width;
+	}
+	if( style->max_height > -1 && w->height > style->max_height ) {
+		w->height = style->max_height;
+	}
+	if( w->width < style->min_width ) {
+		w->width = style->min_width;
+	}
+	if( w->height < style->min_height ) {
+		w->height = style->min_height;
 	}
 	w->box.border.width = w->width;
 	w->box.border.height = w->height;
