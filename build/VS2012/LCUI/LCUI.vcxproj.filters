@@ -207,9 +207,6 @@
     <ClInclude Include="..\..\..\include\LCUI\util\event.h">
       <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\LCUI\util\framectrl.h">
-      <Filter>头文件\LCUI\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h">
       <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
@@ -251,6 +248,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\LCUI\image.h">
       <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\steptimer.h">
+      <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

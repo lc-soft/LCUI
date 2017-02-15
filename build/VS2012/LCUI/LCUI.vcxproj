@@ -187,7 +187,7 @@
     <ClInclude Include="..\..\..\include\LCUI\util\dict.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\dirent.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\event.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\framectrl.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\steptimer.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\logger.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\math.h" />
