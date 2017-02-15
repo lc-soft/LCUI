@@ -51,8 +51,11 @@ typedef struct LCUI_SurfaceRec_ * LCUI_Surface;
 typedef void* LCUI_Surface;
 #endif
 
-/** 删除 Surface */
-LCUI_API void Surface_Delete( LCUI_Surface surface );
+/** 关闭 surface */
+LCUI_API void Surface_Close( LCUI_Surface surface );
+
+/** 直接销毁 surface */
+LCUI_API void Surface_Destroy( LCUI_Surface surface );
 
 /** 新建一个 Surface */
 LCUI_API LCUI_Surface Surface_New(void);

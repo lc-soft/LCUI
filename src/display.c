@@ -65,6 +65,7 @@ typedef struct SurfaceRecordRec_ {
 /** 图形显示功能的上下文数据 */
 static struct DisplayContext {
 	int mode;			/**< 显示模式 */
+	size_t width, height;		/**< 当前缓存的屏幕尺寸 */
 	LCUI_BOOL show_rect_border;	/**< 是否为重绘的区域显示边框 */
 	LCUI_BOOL is_working;		/**< 标志，指示当前模块是否处于工作状态 */
 	LCUI_Thread thread;		/**< 线程，负责画面更新工作 */
@@ -72,6 +73,15 @@ static struct DisplayContext {
 	LinkedList rects;		/**< 无效区域列表 */
 	LCUI_DisplayDriver driver;
 } display;
+
+#define LCUIDisplay_CleanSurfaces() \
+LinkedList_Clear( &display.surfaces, OnDestroySurfaceRecord )
+
+static void OnDestroySurfaceRecord( void *data )
+{
+	SurfaceRecord record = data;
+	Surface_Close( record->surface );
+}
 
 static void DrawBorder( LCUI_PaintContext paint )
 {
@@ -220,6 +230,18 @@ LCUI_Surface LCUIDisplay_GetSurfaceOwner( LCUI_Widget w )
 	return LCUIDisplay_GetBindSurface( w );
 }
 
+LCUI_Surface LCUIDisplay_GetSurfaceByHandle( void *handle )
+{
+	LinkedListNode *node;
+	for( LinkedList_Each( node, &display.surfaces ) ) {
+		SurfaceRecord record = node->data;
+		if( Surface_GetHandle( record->surface ) == handle ) {
+			return record->surface;
+		}
+	}
+	return NULL;
+}
+
 /** 将 widget 与 sruface 进行绑定 */
 static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 {
@@ -227,7 +249,7 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 	SurfaceRecord record;
 	int width, height;
 
-	if( LCUIDisplay_GetBindSurface(widget) ) {
+	if( LCUIDisplay_GetBindSurface( widget ) ) {
 		return;
 	}
 	rect = &widget->box.graph;
@@ -260,20 +282,10 @@ static void LCUIDisplay_UnbindSurface( LCUI_Widget widget )
 	for( LinkedList_Each( node, &display.surfaces ) ) {
 		SurfaceRecord record = node->data;
 		if( record && record->widget == widget ) {
-			Surface_Delete( record->surface );
+			Surface_Close( record->surface );
 			LinkedList_DeleteNode( &display.surfaces, node );
 			break;
 		}
-	}
-}
-
-static void LCUIDisplay_CleanSurfaces( void )
-{
-	LinkedListNode *node;
-	for( LinkedList_Each( node, &display.surfaces ) ) {
-		SurfaceRecord record = node->data;
-		Surface_Delete( record->surface );
-		LinkedList_DeleteNode( &display.surfaces, node );
 	}
 }
 
@@ -284,6 +296,7 @@ static int LCUIDisplay_Windowed( void )
 	case LCDM_WINDOWED:
 		return 0;
 	case LCDM_FULLSCREEN:
+		LCUIDisplay_GetBindSurface( root );
 		break;
 	case LCDM_SEAMLESS:
 	default:
@@ -291,8 +304,7 @@ static int LCUIDisplay_Windowed( void )
 		LCUIDisplay_BindSurface( root );
 		break;
 	}
-	Widget_Show( root );
-	Widget_Resize( root, DEFAULT_WIDTH, DEFAULT_HEIGHT );
+	LCUIDisplay_SetSize( display.width, display.height );
 	display.mode = LCDM_WINDOWED;
 	return 0;
 }
@@ -310,7 +322,9 @@ static int LCUIDisplay_FullScreen( void )
 		return 0;
 	}
 	display.mode = LCDM_FULLSCREEN;
-	LCUIDisplay_SetSize( LCUIDisplay_GetWidth(), LCUIDisplay_GetHeight() );
+	display.width = LCUIDisplay_GetWidth();
+	display.height = LCUIDisplay_GetHeight();
+	LCUIDisplay_SetSize( display.width, display.height );
 	return 0;
 }
 
@@ -375,11 +389,13 @@ void LCUIDisplay_HideRectBorder( void )
 void LCUIDisplay_SetSize( int width, int height )
 {
 	LCUI_Widget root;
+	LCUI_Surface surface;
 	if( display.mode == LCDM_SEAMLESS ) {
 		return;
 	}
 	root = LCUIWidget_GetRoot();
-	Widget_Resize( root, width, height );
+	surface = LCUIDisplay_GetBindSurface( root );
+	Surface_Resize( surface, width, height );
 }
 
 int LCUIDisplay_GetWidth( void )
@@ -406,7 +422,14 @@ int LCUIDisplay_GetHeight( void )
 	return display.driver->getHeight();
 }
 
-void Surface_Delete( LCUI_Surface surface )
+void Surface_Close( LCUI_Surface surface )
+{
+	if( display.is_working ) {
+		display.driver->close( surface );
+	}
+}
+
+void Surface_Destroy( LCUI_Surface surface )
 {
 	if( display.is_working ) {
 		display.driver->destroy( surface );
@@ -625,6 +648,8 @@ int LCUI_InitDisplay( LCUI_DisplayDriver driver )
 	}
 	display.driver = driver;
 	display.is_working = TRUE;
+	display.width = DEFAULT_WIDTH;
+	display.height = DEFAULT_HEIGHT;
 	display.driver->bindEvent( DET_RESIZE, OnResize, NULL, NULL );
 	display.driver->bindEvent( DET_PAINT, OnPaint, NULL, NULL );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );

@@ -59,12 +59,16 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 				 WPARAM arg1, LPARAM arg2 )
 {
 	MSG win_ev;
+	LCUI_Surface surface;
+
 	switch( msg ) {
 	case WM_LCUI_TASK:
 		LCUI_RunTask( (LCUI_AppTask)arg2 );
 		LCUI_DeleteTask( (LCUI_AppTask)arg2 );
 		return 0;
 	case WM_CLOSE:
+		surface = LCUIDisplay_GetSurfaceByHandle( hwnd );
+		Surface_Destroy( surface );
 		LCUI_Quit();
 	default:break;
 	}

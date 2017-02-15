@@ -83,6 +83,7 @@ typedef struct LCUI_DisplayDriverRec_ {
 	int			(*getHeight)(void);
 	LCUI_Surface		(*create)(void);
 	void			(*destroy)(LCUI_Surface);
+	void			(*close)(LCUI_Surface);
 	void			(*resize)(LCUI_Surface,int,int);
 	void			(*move)(LCUI_Surface,int,int);
 	void			(*show)(LCUI_Surface);
@@ -132,6 +133,9 @@ LCUI_API void LCUIDisplay_InvalidateArea( LCUI_Rect *rect );
 
 /** 获取当前部件所属的 surface */
 LCUI_API LCUI_Surface LCUIDisplay_GetSurfaceOwner( LCUI_Widget w );
+
+/** 根据 handle 获取 surface */
+LCUI_Surface LCUIDisplay_GetSurfaceByHandle( void *handle );
 
 /** 绑定 surface 触发的事件 */
 LCUI_API int LCUIDisplay_BindEvent( int event_id, LCUI_EventFunc func, void *arg,

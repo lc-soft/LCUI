@@ -85,6 +85,7 @@ struct LCUI_SurfaceRec_ {
 	LCUI_BOOL is_ready;			/**< 是否已经准备好 */
 	LCUI_Graph fb;				/**< 帧缓存，保存当前窗口内呈现的图像内容 */
 	LCUI_SurfaceTask tasks[TASK_TOTAL_NUM];	/**< 任务缓存 */
+	LinkedListNode node;			/**< 在链表中的结点 */
 };
 
 /** windows 下图形显示功能所需的数据 */
@@ -106,7 +107,7 @@ static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 	return NULL;
 }
 
-static void WinSurface_Destroy( LCUI_Surface surface )
+static void WinSurface_ExecDestroy( LCUI_Surface surface )
 {
 	surface->width = 0;
 	surface->height = 0;
@@ -124,19 +125,13 @@ static void WinSurface_Destroy( LCUI_Surface surface )
 	Graph_Free( &surface->fb );
 }
 
-static void WinSurface_ExecDelete( LCUI_Surface surface )
+static void WinSurface_Destroy( LCUI_Surface surface )
 {
-	LinkedListNode *node;
-	for( LinkedList_Each( node, &win.surfaces ) ) {
-		if( node->data == surface ) {
-			WinSurface_Destroy( node->data );
-			LinkedList_DeleteNode( &win.surfaces, node );
-			break;
-		}
-	}
+	LinkedList_Unlink( &win.surfaces, &surface->node );
+	WinSurface_ExecDestroy( surface );
 }
 
-static void WinSurface_Delete( LCUI_Surface surface )
+static void WinSurface_Close( LCUI_Surface surface )
 {
 	if( surface->hwnd ) {
 		PostMessage( surface->hwnd, WM_CLOSE, 0, 0 );
@@ -182,12 +177,13 @@ static LCUI_Surface WinSurface_New( void )
 	surface->fb_hdc = NULL;
 	surface->fb_bmp = NULL;
 	surface->is_ready = FALSE;
+	surface->node.data = surface;
 	Graph_Init( &surface->fb );
 	surface->fb.color_type = COLOR_TYPE_ARGB;
 	for( i = 0; i < TASK_TOTAL_NUM; ++i ) {
 		surface->tasks[i].is_valid = FALSE;
 	}
-	LinkedList_Append( &win.surfaces, surface );
+	LinkedList_AppendNode( &win.surfaces, &surface->node );
 	LCUI_PostSimpleTask( OnCreateSurface, surface, NULL );
 	return surface;
 }
@@ -442,9 +438,27 @@ static void OnWMGetMinMaxInfo( LCUI_Event e, void *arg )
 {
 	MSG *msg = arg;
 	MINMAXINFO *mminfo;
+	LCUI_Widget root = LCUIWidget_GetRoot();
+	LCUI_WidgetStyle *style = &root->computed_style;
+
 	mminfo = (PMINMAXINFO)msg->lParam;
 	mminfo->ptMinTrackSize.x = MIN_WIDTH;
 	mminfo->ptMinTrackSize.y = MIN_HEIGHT;
+	mminfo->ptMaxTrackSize.x = GetSystemMetrics( SM_CXMAXTRACK );
+	mminfo->ptMaxTrackSize.y = GetSystemMetrics( SM_CYMAXTRACK );
+	if( style->min_width >= 0 ) {
+		mminfo->ptMinTrackSize.x = (LONG)style->min_width;
+	}
+	if( style->max_width >= 0 ) {
+		mminfo->ptMaxTrackSize.x = (LONG)style->max_width;
+	}
+	if( style->min_height >= 0 ) {
+		mminfo->ptMinTrackSize.y = (LONG)style->min_height;
+	}
+	if( style->max_height >= 0 ) {
+		mminfo->ptMaxTrackSize.y = (LONG)style->max_height;
+	}
+
 }
 
 static void OnWMSize( LCUI_Event e, void *arg )
@@ -494,7 +508,8 @@ LCUI_DisplayDriver LCUI_CreateWinDisplay( void )
 	driver->getWidth = WinDisplay_GetWidth;
 	driver->getHeight = WinDisplay_GetHeight;
 	driver->create = WinSurface_New;
-	driver->destroy = WinSurface_Delete;
+	driver->close = WinSurface_Close;
+	driver->destroy = WinSurface_Destroy;
 	driver->isReady = WinSurface_IsReady;
 	driver->show = WinSurface_Show;
 	driver->hide = WinSurface_Hide;
