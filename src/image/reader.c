@@ -48,34 +48,33 @@
 /** 检测图片格式，并解码图片 */
 static int LCUI_DetectImage( const char *filepath, LCUI_Graph *out )
 {
-	int ret = -1;
-	if( ret == -1 ) {
-		ret = LCUI_ReadPNGFile( filepath, out );
-	}
-	if( ret == -1 ) {
+	int ret = LCUI_ReadPNGFile( filepath, out );
+	if( ret != 0 ) {
 		ret = LCUI_ReadJPEGFile( filepath, out );
 	}
-	if( ret == -1 ) {
+	if( ret != 0 ) {
 		ret = LCUI_ReadBMPFile( filepath, out );
 	}
 	return ret;
 }
 
-LCUI_ImageReader LCUI_CreateImageReader( void *data,
-					 LCUI_ImageReaderFunction func )
+int LCUI_InitImageReader( LCUI_ImageReader reader )
 {
-	LCUI_ImageReader reader;
-	reader = LCUI_CreatePNGReader( data, func );
-	if( reader ) {
-		return reader;
+	if( LCUI_InitPNGReader( reader ) == 0 ) {
+		return 0;
 	}
-	return reader;
+	reader->fn_rewind( reader->stream_data );
+	if( LCUI_InitJPEGReader( reader ) == 0 ) {
+		return 0;
+	}
+	reader->fn_rewind( reader->stream_data );
+	return -ENOENT;
 }
 
 void LCUI_DestroyImageReader( LCUI_ImageReader reader )
 {
 	reader->destructor( reader->data );
-	free( reader );
+	reader->type = LCUI_UNKNOWN_READER;
 }
 
 int LCUI_ReadImage( LCUI_ImageReader reader, LCUI_Graph *out )
@@ -84,6 +83,7 @@ int LCUI_ReadImage( LCUI_ImageReader reader, LCUI_Graph *out )
 	case LCUI_PNG_READER:
 		return LCUI_ReadPNG( reader, out );
 	case LCUI_JPEG_READER:
+		return LCUI_ReadJPEG( reader, out );
 	case LCUI_BMP_READER:
 	default: break;
 	}
@@ -97,8 +97,8 @@ int LCUI_ReadImageFile( const char *filepath, LCUI_Graph *out )
 	Graph_Init( out );
 	out->color_type = COLOR_TYPE_RGB;
 	fp = fopen( filepath, "rb" );
-	if( fp == NULL ) {
-		return ENOENT;
+	if( !fp ) {
+		return -ENOENT;
 	}
 	fgetc( fp );
 	if( !ferror( fp ) ) {
@@ -107,7 +107,7 @@ int LCUI_ReadImageFile( const char *filepath, LCUI_Graph *out )
 			fclose( fp );
 			ret = LCUI_DetectImage( filepath, out );
 		} else {
-			ret = -1;
+			ret = -ENODATA;
 			fclose( fp );
 		}
 	}

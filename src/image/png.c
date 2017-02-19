@@ -59,14 +59,13 @@ typedef struct LCUI_PNGReaderRec_ {
 	png_infop info_ptr;
 } LCUI_PNGReaderRec, *LCUI_PNGReader;
 
-static void DeletePNGReader( void *data )
+static void DestroyPNGReader( void *data )
 {
 	LCUI_PNGReader reader = data;
 	if( reader->png_ptr ) {
 		png_destroy_read_struct( &reader->png_ptr,
 					 &reader->info_ptr, NULL );
 	}
-	free( reader );
 }
 
 static void PNGReader_OnRead( png_structp png_ptr,
@@ -77,9 +76,12 @@ static void PNGReader_OnRead( png_structp png_ptr,
 	if( !reader || reader->has_error ) {
 		return;
 	}
-	read_size = reader->func( reader->stream_data, buffer, size );
+	read_size = reader->fn_read( reader->stream_data, buffer, size );
 	if( read_size != size ) {
 		reader->has_error = TRUE;
+		if( reader->fn_end ) {
+			reader->fn_end( reader->stream_data );
+		}
 	}
 }
 
@@ -92,7 +94,7 @@ static LCUI_BOOL LCUI_CheckImageIsPNG( LCUI_ImageReader reader )
 {
 	size_t n;
 	png_byte buf[PNG_BYTES_TO_CHECK];
-	n = reader->func( reader->stream_data, buf, PNG_BYTES_TO_CHECK );
+	n = reader->fn_read( reader->stream_data, buf, PNG_BYTES_TO_CHECK );
 	if( n < PNG_BYTES_TO_CHECK ) {
 		return FALSE;
 	}
@@ -102,11 +104,9 @@ static LCUI_BOOL LCUI_CheckImageIsPNG( LCUI_ImageReader reader )
 
 #endif
 
-LCUI_ImageReader LCUI_CreatePNGReader( void *data,
-				       LCUI_ImageReaderFunction func )
+int LCUI_InitPNGReader( LCUI_ImageReader reader )
 {
 #ifdef USE_LIBPNG
-	ASSIGN( reader, LCUI_ImageReader );
 	ASSIGN( png_reader, LCUI_PNGReader );
 	png_reader->png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING,
 						      NULL, NULL, NULL );
@@ -115,20 +115,21 @@ LCUI_ImageReader LCUI_CreatePNGReader( void *data,
 	ASSERT( png_reader->info_ptr );
 	ASSERT( setjmp( png_jmpbuf( (png_reader->png_ptr) ) ) == 0 );
 	png_set_read_fn( png_reader->png_ptr, reader, PNGReader_OnRead );
-	reader->destructor = DeletePNGReader;
-	reader->stream_data = data;
+	reader->destructor = DestroyPNGReader;
 	reader->has_error = FALSE;
 	reader->data = png_reader;
-	reader->func = func;
 	reader->type = LCUI_PNG_READER;
+	if( reader->fn_begin ) {
+		reader->fn_begin( reader->stream_data );
+	}
 	ASSERT( LCUI_CheckImageIsPNG( reader ) );
 	png_set_sig_bytes( png_reader->png_ptr, PNG_BYTES_TO_CHECK );
-	return reader;
+	return 0;
 
 error:
 	LCUI_DestroyImageReader( reader );
 #endif
-	return NULL;
+	return -1;
 }
 
 int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
@@ -208,14 +209,17 @@ int LCUI_ReadPNGFile( const char *filepath, LCUI_Graph *graph )
 #ifdef USE_LIBPNG
 	int ret;
 	FILE *fp;
-	LCUI_ImageReader reader;
+	LCUI_ImageReaderRec reader = { 0 };
+
 	fp = fopen( filepath, "rb" );
 	if( fp == NULL ) {
 		return -ENOENT;
 	}
-	reader = LCUI_CreatePNGReader( fp, OnReadFile );
-	ret = LCUI_ReadPNG( reader, graph );
-	LCUI_DestroyImageReader( reader );
+	reader.stream_data = fp;
+	reader.fn_read = OnReadFile;
+	LCUI_InitPNGReader( &reader );
+	ret = LCUI_ReadPNG( &reader, graph );
+	LCUI_DestroyImageReader( &reader );
 	fclose( fp );
 	return ret;
 #else
