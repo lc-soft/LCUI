@@ -188,8 +188,16 @@ void LCUIDisplay_Present( void )
 
 void LCUIDisplay_InvalidateArea( LCUI_Rect *rect )
 {
+	LCUI_Rect screen;
 	if( !display.is_working ) {
 		return;
+	}
+	if( !rect ) {
+		screen.x = 0;
+		screen.y = 0;
+		screen.width = LCUIDisplay_GetWidth();
+		screen.height = LCUIDisplay_GetHeight();
+		rect = &screen;
 	}
 	RectList_Add( &display.rects, rect );
 }
