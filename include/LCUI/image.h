@@ -76,6 +76,9 @@ LCUI_API int LCUI_InitPNGReader( LCUI_ImageReader reader );
 /** 初始化适用于 JPEG 图像的读取器 */
 LCUI_API int LCUI_InitJPEGReader( LCUI_ImageReader reader );
 
+/** 初始化适用于 BMP 图像的读取器 */
+LCUI_API int LCUI_InitBMPReader( LCUI_ImageReader reader );
+
 /** 创建图像读取器 */
 LCUI_API int LCUI_InitImageReader( LCUI_ImageReader reader );
 
@@ -85,6 +88,8 @@ LCUI_API void LCUI_DestroyImageReader( LCUI_ImageReader reader );
 LCUI_API int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph );
 
 LCUI_API int LCUI_ReadJPEG( LCUI_ImageReader reader, LCUI_Graph *graph );
+
+LCUI_API int LCUI_ReadBMP( LCUI_ImageReader reader, LCUI_Graph *graph );
 
 LCUI_API int LCUI_ReadImage( LCUI_ImageReader reader, LCUI_Graph *graph );
 

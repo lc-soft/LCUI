@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * bmp.c -- LCUI BMP image file processing module.
  * 
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * bmp.c -- LCUI的BMP位图文件读写支持模块。
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2017 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -42,105 +42,188 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
+#include <LCUI/image.h>
 
-/* 这个结构体用于存储bmp文件的文件头的信息 */
-typedef struct bmp_head {
-	short int BMPsyg;
-	short int nic[8];
-	short int ix;
-	short int nic2;
-	short int iy;
-	short int nic3[2];
-	short int depth;
-	short int rle;
-	short int nic4[11];
-} bmp_head;
+typedef struct {
+	uint16_t type;		/**< Magic identifier */
+	uint32_t size;		/**< File size in bytes */
+	uint16_t reserved1;
+	uint16_t reserved2;
+	uint32_t offset;	/**< Offset to image data, bytes */
+} HEADER;
 
-int LCUI_ReadBMPFile( const char *filepath, LCUI_Graph *out )
+typedef struct {
+	uint32_t size;				/**< Header size in bytes */
+	uint32_t width, height;			/**< Width and height of image */
+	uint16_t planes;			/**< Number of colour planes */
+	uint16_t bits;				/**< Bits per pixel */
+	uint32_t compression;			/**< Compression type */
+	uint32_t imagesize;			/**< Image size in bytes */
+	int32_t xresolution, yresolution;	/**< Pixels per meter */
+	uint32_t ncolours;			/**< Number of colours */
+	uint32_t importantcolours;		/**< Important colours */
+} INFOHEADER;
+
+typedef struct {
+	unsigned char r, g, b, junk;
+} COLOURINDEX;
+
+
+typedef struct LCUI_BMPReaderRec_ {
+	HEADER header;
+	INFOHEADER info;
+} LCUI_BMPReaderRec, *LCUI_BMPReader;
+
+static void BMPHeader_Init( HEADER *header, uint16_t buffer[8] )
 {
-	bmp_head bmp;
-	uchar_t *bytep;
-	int  x, y, tempi, pocz, omin;
-	FILE *fp = fopen( filepath, "rb" );
-	if( !fp ) {
-		return ENOENT;
+	header->type = buffer[0];
+	header->size = *(uint32_t*)(buffer + 1);
+	header->reserved1 = buffer[3];
+	header->reserved2 = buffer[4];
+	header->offset = buffer[5];
+}
+
+int LCUI_InitBMPReader( LCUI_ImageReader reader )
+{
+	size_t size;
+	uint16_t buffer[8];
+	ASSIGN( bmp_reader, LCUI_BMPReader );
+	reader->data = bmp_reader;
+	reader->destructor = free;
+	reader->type = LCUI_BMP_READER;
+	if( reader->fn_begin ) {
+		reader->fn_begin( reader->stream_data );
 	}
-	/* 检测是否为bmp图片 */
-	tempi = fread( &bmp, 1, sizeof( bmp_head ), fp );
-	if( tempi < sizeof( bmp_head ) || bmp.BMPsyg != 19778 ) {
-		return -1;
+	size = reader->fn_read( reader->stream_data, buffer, 14 );
+	/* 受到字节对齐影响，直接将读到的写到结构体变量里会让最后一个成员
+	 * 变量的值不正常，因此需要手动为其成员变量赋值 */
+	BMPHeader_Init( &bmp_reader->header, buffer );
+	if( size < 14 || bmp_reader->header.type != 0x4D42 ) {
+		LCUI_DestroyImageReader( reader );
+		return -ENODATA;
 	}
-	pocz = bmp.nic[4];
-	if( (bmp.depth != 32) && (bmp.depth != 24) ) {
-		_DEBUG_MSG( "can not support  %i bit-depth !\n", bmp.depth );
-		return  -1;
-	}
-	out->color_type = COLOR_TYPE_RGB;
-	tempi = Graph_Create( out, bmp.ix, bmp.iy );
-	if( tempi != 0 ) {
-		_DEBUG_MSG( "can not alloc memory\n" );
-		return 1;
-	}
-	fseek( fp, 0, SEEK_END );
-	omin = ftell( fp );
-	omin = omin - pocz;
-	omin = omin - ((out->w*out->h)*(bmp.depth / 8));
-	omin = omin / (out->h);
-	fseek( fp, pocz, SEEK_SET );
-	switch( bmp.depth ) {
-	case 32:
-		for( y = 0; y < out->h; ++y ) {
-			/* 从最后一行开始写入像素数据 */
-			bytep = out->bytes + ((out->h - y - 1)*out->w) * 3;
-			for( x = 0; x < out->w; ++x ) {
-				*bytep++ = fgetc( fp );
-				*bytep++ = fgetc( fp );
-				*bytep++ = fgetc( fp );
-				tempi = fgetc( fp );
-			}
-			/* 略过填充字符 */
-			if( omin > 0 ) {
-				for( tempi = 0; tempi < omin; tempi++ ) {
-					fgetc( fp );
-				}
-			}
-		}
-		break;
-	case 24:
-		for( y = 0; y < out->h; ++y ) {
-			bytep = out->bytes + ((out->h - y - 1)*out->w) * 3;
-			for( x = 0; x < out->w; ++x ) {
-				*bytep++ = fgetc( fp );
-				*bytep++ = fgetc( fp );
-				*bytep++ = fgetc( fp );
-			}
-			if( omin > 0 ) {
-				for( tempi = 0; tempi < omin; tempi++ ) {
-					fgetc( fp );
-				}
-			}
-		}
-		break;
-	}
-	fclose( fp );
 	return 0;
+}
+
+static int LCUI_ReadBMPInfo( LCUI_ImageReader reader )
+{
+	size_t n;
+	LCUI_BMPReader bmp_reader = reader->data;
+	INFOHEADER *info = &bmp_reader->info;
+	if( reader->type != LCUI_BMP_READER ) {
+		return -EINVAL;
+	}
+	n = reader->fn_read( reader->stream_data, info, sizeof( INFOHEADER ) );
+	if( n < sizeof( INFOHEADER ) ) {
+		return -ENODATA;
+	}
+	return 0;
+}
+
+int LCUI_ReadBMP( LCUI_ImageReader reader, LCUI_Graph *graph )
+{
+	size_t n, row, bytes_per_row;
+	unsigned char *buffer, *dest;
+	LCUI_BMPReader bmp_reader = reader->data;
+	INFOHEADER *info = &bmp_reader->info;
+	if( reader->type != LCUI_BMP_READER ) {
+		return -EINVAL;
+	}
+	n = reader->fn_read( reader->stream_data, info, sizeof( INFOHEADER ) );
+	if( n < sizeof( INFOHEADER ) ) {
+		return -ENODATA;
+	}
+	/* 信息头中的偏移位置是相对于起始处，需要减去当前已经偏移的位置 */
+	n = bmp_reader->header.offset - bmp_reader->info.size - 14;
+	reader->fn_skip( reader->stream_data, n );
+	if( 0 != Graph_Create( graph, info->width, info->height ) ) {
+		return -ENOMEM;
+	}
+	/* 暂时不实现其它色彩类型处理 */
+	if( info->bits != 24 ) {
+		return -ENOSYS;
+	}
+	bytes_per_row = (info->bits * info->width + 31) / 32 * 4;
+	if( bytes_per_row < graph->bytes_per_row ) {
+		return -EINVAL;
+	}
+	buffer = malloc( bytes_per_row );
+	if( !buffer ) {
+		return -ENOMEM;
+	}
+	/* 从最后一行开始保存 */
+	dest = graph->bytes + graph->bytes_per_row * (graph->height - 1);
+	for( row = 0; row < info->height; ++row ) {
+		n = reader->fn_read( reader->stream_data,
+				     buffer, bytes_per_row );
+		if( n < bytes_per_row ) {
+			break;
+		}
+		memcpy( dest, buffer, graph->bytes_per_row );
+		dest -= graph->bytes_per_row;
+	}
+	free( buffer );
+	return 0;
+}
+
+static size_t FileStream_OnRead( void *data, void *buffer, size_t size )
+{
+	return fread( buffer, 1, size, data );
+}
+
+static void FileStream_OnSkip( void *data, long offset )
+{
+	fseek( data, offset, SEEK_CUR );
+}
+
+int LCUI_ReadBMPFile( const char *filepath, LCUI_Graph *graph )
+{
+	int ret;
+	FILE *fp;
+	LCUI_ImageReaderRec reader = { 0 };
+
+	fp = fopen( filepath, "rb" );
+	if( fp == NULL ) {
+		return -ENOENT;
+	}
+	reader.stream_data = fp;
+	reader.fn_read = FileStream_OnRead;
+	reader.fn_skip = FileStream_OnSkip;
+	LCUI_InitBMPReader( &reader );
+	ret = LCUI_ReadBMP( &reader, graph );
+	LCUI_DestroyImageReader( &reader );
+	fclose( fp );
+	return ret;
 }
 
 int Graph_GetBMPSize( const char *filepath, int *width, int *height )
 {
-	int n;
-	bmp_head bmp;
-	FILE *fp = fopen( filepath, "rb" );
-	if( !fp ) {
-		return ENOENT;
+	int ret;
+	FILE *fp;
+	LCUI_BMPReader bmp;
+	LCUI_ImageReaderRec reader = { 0 };
+
+	fp = fopen( filepath, "rb" );
+	if( fp == NULL ) {
+		return -ENOENT;
 	}
-	/* 检测是否为bmp图片 */
-	n = fread( &bmp, 1, sizeof( bmp_head ), fp );
-	if( n < sizeof( bmp_head ) || bmp.BMPsyg != 19778 ) {
-		return -1;
+	reader.stream_data = fp;
+	reader.fn_read = FileStream_OnRead;
+	reader.fn_skip = FileStream_OnSkip;
+	ret = LCUI_InitBMPReader( &reader );
+	if( ret != 0 ) {
+		goto exit;
 	}
-	*width = bmp.ix;
-	*height = bmp.iy;
+	ret = LCUI_ReadBMPInfo( &reader );
+	if( ret != 0 ) {
+		goto exit;
+	}
+	bmp = reader.data;
+	*width = bmp->info.width;
+	*height = bmp->info.height;
+	LCUI_DestroyImageReader( &reader );
+
+exit:
 	fclose( fp );
-	return 0;
+	return ret;
 }

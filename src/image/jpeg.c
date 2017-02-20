@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * jpeg.c -- LCUI JPEG image file processing module.
  * 
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * jpeg.c -- LCUI的JPEG图像文件读写支持模块。
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -85,7 +85,11 @@ METHODDEF( void ) my_error_exit( j_common_ptr cinfo )
 static void DestroyJPEGReader( void *data )
 {
 	j_decompress_ptr cinfo = data;
-	jpeg_finish_decompress( cinfo );
+	LCUI_JPEGReader jpeg_reader;
+	jpeg_reader = (LCUI_JPEGReader)cinfo->src;
+	if( jpeg_reader->base->type == LCUI_JPEG_READER ) {
+		jpeg_finish_decompress( cinfo );
+	}
 	jpeg_destroy_decompress( cinfo );
 	free( data );
 }
@@ -106,11 +110,6 @@ static void JPEGReader_OnInit( j_decompress_ptr cinfo )
 	if( reader->fn_begin ) {
 		reader->fn_begin( reader->stream_data );
 	}
-}
-
-static size_t JPEGReader_Rewind( LCUI_JPEGReader reader )
-{
-
 }
 
 static boolean JPEGReader_OnRead( j_decompress_ptr cinfo )
@@ -204,7 +203,7 @@ int LCUI_InitJPEGReader( LCUI_ImageReader reader )
 	jpeg_reader->src.next_input_byte = NULL;
 	jpeg_reader->base = reader;
 	reader->data = cinfo;
-	reader->type = LCUI_JPEG_READER;
+	reader->type = LCUI_UNKNOWN_READER;
 	reader->destructor = DestroyJPEGReader;
 	cinfo->src = (struct jpeg_source_mgr*)jpeg_reader;
 	cinfo->err = jpeg_std_error( &jpeg_reader->err.err );
@@ -214,6 +213,7 @@ int LCUI_InitJPEGReader( LCUI_ImageReader reader )
 		return -1;
 	}
 	if( LCUI_CheckImageIsJPEG( reader ) ) {
+		reader->type = LCUI_JPEG_READER;
 		return 0;
 	}
 	if( reader->fn_rewind ) {
@@ -284,6 +284,7 @@ static void FileStream_OnRewind( void *data )
 
 int LCUI_ReadJPEGFile( const char *filepath, LCUI_Graph *graph )
 {
+	int ret;
 	FILE *fp;
 	LCUI_ImageReaderRec reader = { 0 };
 	fp = fopen( filepath, "rb" );
@@ -297,7 +298,10 @@ int LCUI_ReadJPEGFile( const char *filepath, LCUI_Graph *graph )
 	if( LCUI_InitJPEGReader( &reader ) != 0 ) {
 		return -ENODATA;
 	}
-	return LCUI_ReadJPEG( &reader, graph );
+	ret = LCUI_ReadJPEG( &reader, graph );
+	LCUI_DestroyImageReader( &reader );
+	fclose( fp );
+	return ret;
 }
 
 int LCUI_ReadJPEGFile2( const char *filepath, LCUI_Graph *buf )

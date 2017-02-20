@@ -212,7 +212,7 @@ int LCUI_ReadPNGFile( const char *filepath, LCUI_Graph *graph )
 	LCUI_ImageReaderRec reader = { 0 };
 
 	fp = fopen( filepath, "rb" );
-	if( fp == NULL ) {
+	if( !fp ) {
 		return -ENOENT;
 	}
 	reader.stream_data = fp;

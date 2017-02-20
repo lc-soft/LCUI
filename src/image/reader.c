@@ -45,19 +45,6 @@
 #include <LCUI/graph.h>
 #include <LCUI/image.h> 
 
-/** 检测图片格式，并解码图片 */
-static int LCUI_DetectImage( const char *filepath, LCUI_Graph *out )
-{
-	int ret = LCUI_ReadPNGFile( filepath, out );
-	if( ret != 0 ) {
-		ret = LCUI_ReadJPEGFile( filepath, out );
-	}
-	if( ret != 0 ) {
-		ret = LCUI_ReadBMPFile( filepath, out );
-	}
-	return ret;
-}
-
 int LCUI_InitImageReader( LCUI_ImageReader reader )
 {
 	if( LCUI_InitPNGReader( reader ) == 0 ) {
@@ -68,12 +55,19 @@ int LCUI_InitImageReader( LCUI_ImageReader reader )
 		return 0;
 	}
 	reader->fn_rewind( reader->stream_data );
+	if( LCUI_InitBMPReader( reader ) == 0 ) {
+		return 0;
+	}
+	reader->fn_rewind( reader->stream_data );
 	return -ENOENT;
 }
 
 void LCUI_DestroyImageReader( LCUI_ImageReader reader )
 {
-	reader->destructor( reader->data );
+	if( reader->data ) {
+		reader->destructor( reader->data );
+	}
+	reader->data = NULL;
 	reader->type = LCUI_UNKNOWN_READER;
 }
 
@@ -85,6 +79,7 @@ int LCUI_ReadImage( LCUI_ImageReader reader, LCUI_Graph *out )
 	case LCUI_JPEG_READER:
 		return LCUI_ReadJPEG( reader, out );
 	case LCUI_BMP_READER:
+		return LCUI_ReadBMP( reader, out );
 	default: break;
 	}
 	return -ENODATA;
@@ -92,26 +87,18 @@ int LCUI_ReadImage( LCUI_ImageReader reader, LCUI_Graph *out )
 
 int LCUI_ReadImageFile( const char *filepath, LCUI_Graph *out )
 {
-	FILE *fp;
-	int ret = 0;
+	int ret;
 	Graph_Init( out );
 	out->color_type = COLOR_TYPE_RGB;
-	fp = fopen( filepath, "rb" );
-	if( !fp ) {
-		return -ENOENT;
+	ret = LCUI_ReadPNGFile( filepath, out );
+	if( ret == 0 ) {
+		return 0;
 	}
-	fgetc( fp );
-	if( !ferror( fp ) ) {
-		fseek( fp, 0, SEEK_END );
-		if( ftell( fp ) > 4 ) {
-			fclose( fp );
-			ret = LCUI_DetectImage( filepath, out );
-		} else {
-			ret = -ENODATA;
-			fclose( fp );
-		}
+	ret = LCUI_ReadJPEGFile( filepath, out );
+	if( ret == 0 ) {
+		return 0;
 	}
-	return ret;
+	return LCUI_ReadBMPFile( filepath, out );
 }
 
 int LCUI_GetImageSize( const char *filepath, int *width, int *height )
