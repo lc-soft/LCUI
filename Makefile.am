@@ -12,6 +12,19 @@ test/README.zh-cn \
 test/Makefile.in \
 test/Makefile.am \
 test/helloworld.c \
+test/helloworld.css \
+test/helloworld.xml \
+test/test.c \
+test/test.h \
+test/testtouch.c \
+test/test_string.c \
+test/test_string_render.c \
+test/test_widget_render.c \
+test/test_char_render.c \
 test/test_css_parser.css \
 test/test_css_parser.xml \
-test/test_css_parser.c
+test/test_css_parser.c \
+test/test_image_reader.c \
+test/test_image_reader.bmp \
+test/test_image_reader.jpg \
+test/test_image_reader.png

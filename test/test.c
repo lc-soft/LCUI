@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <wchar.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
@@ -27,11 +27,12 @@ int main(void)
 {
 	int ret = 0;
 #ifdef LCUI_BUILD_IN_WIN32
-	_wchdir( L"../test/" );
+	_wchdir( L"F:\\代码库\\GitHub\\LCUI\\build\\VS2012\\LCUITest" );
 	InitConsoleWindow();
 #endif
-	ret |= test_string();/*
-	ret |= test_css_parser();
+	ret |= test_string();
+	ret |= test_image_reader();
+	ret |= test_css_parser();/*
 	ret |= test_widget_render();
 	ret |= test_char_render();
 	ret |= test_string_render();*/
