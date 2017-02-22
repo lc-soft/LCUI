@@ -98,7 +98,7 @@ METHODDEF( void ) JPEGReader_OnErrorExit( j_common_ptr cinfo )
 {
 	LCUI_JPEGErr err = (LCUI_JPEGErr)cinfo->err;
 	cinfo->err->output_message( cinfo );
-	//longjmp( err->setjmp_buffer, 1 );
+	longjmp( err->setjmp_buffer, 1 );
 }
 
 static void JPEGReader_OnInit( j_decompress_ptr cinfo )
@@ -251,9 +251,9 @@ int LCUI_ReadJPEG( LCUI_ImageReader reader, LCUI_Graph *graph )
 	row_stride = cinfo->output_width * cinfo->output_components;
 	buffer = cinfo->mem->alloc_sarray( (j_common_ptr)cinfo,
 					   JPOOL_IMAGE, row_stride, 1 );
-	for( y = 0; cinfo->output_scanline < cinfo->output_height; ++y ) {
+	for( y = 0; y < graph->height; ++y ) {
 		jpeg_read_scanlines( cinfo, buffer, 1 );
-		for( x = 0; x < graph->width; x++ ) {
+		for( x = 0; x < graph->width; ++x ) {
 			k = x * 3;
 			*bytep++ = buffer[0][k + 2];
 			*bytep++ = buffer[0][k + 1];
