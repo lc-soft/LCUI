@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * logger.c -- logger module
  *
- * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016-1017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * logger.c -- 日志记录器
  *
- * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016-1017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -65,12 +65,12 @@ int Logger_Log( const char* fmt, ... )
 	}
 	va_start( args, fmt );
 	LCUIMutex_Lock( &logger.mutex );
-	len = vsnprintf( logger.buffer, BUFFER_SIZE, fmt, args );
-	logger.buffer[BUFFER_SIZE - 1] = 0;
 	if( logger.handler ) {
+		len = vsnprintf( logger.buffer, BUFFER_SIZE, fmt, args );
+		logger.buffer[BUFFER_SIZE - 1] = 0;
 		logger.handler( logger.buffer );
 	} else {
-		puts( logger.buffer );
+		len = vprintf( fmt, args );
 	}
 	LCUIMutex_Unlock( &logger.mutex );
 	va_end( args );
@@ -87,12 +87,12 @@ int Logger_LogW( const wchar_t* fmt, ... )
 	}
 	va_start( args, fmt );
 	LCUIMutex_Lock( &logger.mutex );
-	len = vswprintf( logger.bufferw, BUFFER_SIZE, fmt, args );
-	logger.bufferw[BUFFER_SIZE - 1] = 0;
 	if( logger.handlerw ) {
+		len = vswprintf( logger.bufferw, BUFFER_SIZE, fmt, args );
+		logger.bufferw[BUFFER_SIZE - 1] = 0;
 		logger.handlerw( logger.bufferw );
 	} else {
-		wprintf( logger.bufferw );
+		len = vwprintf( fmt, args );
 	}
 	LCUIMutex_Unlock( &logger.mutex );
 	va_end( args );
