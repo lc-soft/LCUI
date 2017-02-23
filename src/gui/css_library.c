@@ -1261,7 +1261,7 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 		case SVT_COLOR: {
 			LCUI_Color *clr = &s->val_color;
 			if( clr->alpha < 255 ) {
-				LOG( "rgba(%d,%d,%d,%0.2f)", clr->r,
+				LOG( "rgba(%d,%d,%d,%g)", clr->r,
 					clr->g, clr->b, clr->a / 255.0 );
 			} else {
 				LOG( "#%02x%02x%02x", clr->r, clr->g, clr->b );
@@ -1269,13 +1269,13 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 			break;
 		}
 		case SVT_PX:
-			LOG( "%.4fpx", s->val_px );
+			LOG( "%gpx", s->val_px );
 			break;
 		case SVT_STRING:
 			LOG( "%s", s->val_string );
 			break;
 		case SVT_SCALE:
-			LOG( "%.2lf%%", s->val_scale * 100 );
+			LOG( "%g%%", s->val_scale * 100 );
 			break;
 		case SVT_STYLE:
 			LOG( "%s", LCUI_GetStyleValueName( s->val_style ) );
