@@ -230,7 +230,7 @@ int LCUI_ReadJPEG( LCUI_ImageReader reader, LCUI_Graph *graph )
 	uchar_t *bytep;
 	JSAMPARRAY buffer;
 	j_decompress_ptr cinfo;
-	int x, y, k, row_stride;
+	int x, k, row_stride;
 
 	if( reader->type != LCUI_JPEG_READER ) {
 		return -EINVAL;
@@ -247,11 +247,12 @@ int LCUI_ReadJPEG( LCUI_ImageReader reader, LCUI_Graph *graph )
 			       cinfo->output_height ) ) {
 		return -ENOMEM;
 	}
-	bytep = graph->bytes;
 	row_stride = cinfo->output_width * cinfo->output_components;
 	buffer = cinfo->mem->alloc_sarray( (j_common_ptr)cinfo,
 					   JPOOL_IMAGE, row_stride, 1 );
-	for( y = 0; y < graph->height; ++y ) {
+	while( cinfo->output_scanline < cinfo->output_height ) {
+		bytep = graph->bytes;
+		bytep += cinfo->output_scanline * graph->bytes_per_row;
 		jpeg_read_scanlines( cinfo, buffer, 1 );
 		for( x = 0; x < graph->width; ++x ) {
 			k = x * 3;
