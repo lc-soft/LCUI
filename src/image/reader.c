@@ -39,26 +39,88 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
-#include <LCUI/image.h> 
+#include <LCUI/image.h>
+
+typedef struct LCUI_ImageInterfaceRec_ {
+	const char *suffix;
+	int (*init)(LCUI_ImageReader);
+	int (*read_header)(LCUI_ImageReader);
+	int (*read)(LCUI_ImageReader, LCUI_Graph*);
+} LCUI_ImageInterfaceRec, *LCUI_ImageInterface;
+
+static const LCUI_ImageInterfaceRec interfaces[] = {
+	{ ".png", LCUI_InitPNGReader, LCUI_ReadPNGHeader, LCUI_ReadPNG },
+	{ ".jpeg .jpg", LCUI_InitJPEGReader, LCUI_ReadJPEGHeader, LCUI_ReadJPEG },
+	{ ".bmp", LCUI_InitBMPReader, LCUI_ReadBMPHeader, LCUI_ReadBMP }
+};
+
+static int n_interfaces = sizeof(interfaces) / sizeof(LCUI_ImageInterfaceRec);
+
+static size_t FileStream_OnRead( void *data, void *buffer, size_t size )
+{
+	return fread( buffer, 1, size, data );
+}
+
+static void FileStream_OnSkip( void *data, long offset )
+{
+	fseek( data, offset, SEEK_CUR );
+}
+
+static void FileStream_OnRewind( void *data )
+{
+	rewind( data );
+}
+
+void LCUI_SetImageReaderForFile( LCUI_ImageReader reader, FILE *fp )
+{
+	reader->stream_data = fp;
+	reader->fn_skip = FileStream_OnSkip;
+	reader->fn_read = FileStream_OnRead;
+	reader->fn_rewind = FileStream_OnRewind;
+}
+
+static int DetectImageType( const char *filename )
+{
+	int i;
+	for( i = 0; i < n_interfaces; ++i ) {
+		if( strstr( filename, interfaces[i].suffix ) ) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+static int LCUI_InitImageReaderByType( LCUI_ImageReader reader, int type )
+{
+	int ret;
+	reader->fn_rewind( reader->stream_data );
+	ret = interfaces[type].init( reader );
+	if( ret != 0 ) {
+		return -ENODATA;
+	}
+	if( LCUI_SetImageReaderJump( reader ) ) {
+		return -ENODATA;
+	}
+	return interfaces[type].read_header( reader );
+}
 
 int LCUI_InitImageReader( LCUI_ImageReader reader )
 {
-	if( LCUI_InitPNGReader( reader ) == 0 ) {
-		return 0;
+	int ret, i;
+	for( i = 0; i < n_interfaces; ++i ) {
+		reader->fn_rewind( reader->stream_data );
+		ret = LCUI_InitImageReaderByType( reader, i );
+		if( ret == 0 ) {
+			return 0;
+		}
 	}
 	reader->fn_rewind( reader->stream_data );
-	if( LCUI_InitJPEGReader( reader ) == 0 ) {
-		return 0;
-	}
-	reader->fn_rewind( reader->stream_data );
-	if( LCUI_InitBMPReader( reader ) == 0 ) {
-		return 0;
-	}
-	reader->fn_rewind( reader->stream_data );
+	reader->type = LCUI_UNKNOWN_READER;
 	return -ENOENT;
 }
 
@@ -69,18 +131,23 @@ void LCUI_DestroyImageReader( LCUI_ImageReader reader )
 	}
 	reader->data = NULL;
 	reader->type = LCUI_UNKNOWN_READER;
+	reader->header.type = LCUI_UNKNOWN_IMAGE;
+}
+
+int LCUI_ReadImageHeader( LCUI_ImageReader reader )
+{
+	int i = reader->type - 1;
+	if( i < n_interfaces && i >= 0 ) {
+		return interfaces[i].read_header( reader );
+	}
+	return -ENODATA;
 }
 
 int LCUI_ReadImage( LCUI_ImageReader reader, LCUI_Graph *out )
 {
-	switch( reader->type ) {
-	case LCUI_PNG_READER:
-		return LCUI_ReadPNG( reader, out );
-	case LCUI_JPEG_READER:
-		return LCUI_ReadJPEG( reader, out );
-	case LCUI_BMP_READER:
-		return LCUI_ReadBMP( reader, out );
-	default: break;
+	int i = reader->type - 1;
+	if( i < n_interfaces && i >= 0 ) {
+		return interfaces[i].read( reader, out );
 	}
 	return -ENODATA;
 }
@@ -88,27 +155,60 @@ int LCUI_ReadImage( LCUI_ImageReader reader, LCUI_Graph *out )
 int LCUI_ReadImageFile( const char *filepath, LCUI_Graph *out )
 {
 	int ret;
-	Graph_Init( out );
-	out->color_type = COLOR_TYPE_RGB;
-	ret = LCUI_ReadPNGFile( filepath, out );
-	if( ret == 0 ) {
-		return 0;
+	FILE *fp;
+	LCUI_ImageReaderRec reader = { 0 };
+
+	fp = fopen( filepath, "rb" );
+	if( !fp ) {
+		return -ENOENT;
 	}
-	ret = LCUI_ReadJPEGFile( filepath, out );
-	if( ret == 0 ) {
-		return 0;
+	ret = DetectImageType( filepath );
+	LCUI_SetImageReaderForFile( &reader, fp );
+	if( ret >= 0 ) {
+		ret = LCUI_InitImageReaderByType( &reader, ret );
 	}
-	return LCUI_ReadBMPFile( filepath, out );
+	if( ret < 0 ) {
+		if( LCUI_InitImageReader( &reader ) != 0 ) {
+			fclose( fp );
+			return -ENODATA;
+		}
+	}
+	if( LCUI_SetImageReaderJump( &reader ) ) {
+		ret = -ENODATA;
+		goto exit;
+	}
+	ret = LCUI_ReadImage( &reader, out );
+exit:
+	LCUI_DestroyImageReader( &reader );
+	fclose( fp );
+	return  ret;
 }
 
 int LCUI_GetImageSize( const char *filepath, int *width, int *height )
 {
-	int ret = Graph_GetPNGSize( filepath, width, height );
-	if( ret != 0 ) {
-		ret = Graph_GetJPEGSize( filepath, width, height );
+	int ret;
+	FILE *fp;
+	LCUI_ImageReaderRec reader = { 0 };
+
+	fp = fopen( filepath, "rb" );
+	if( !fp ) {
+		return -ENOENT;
 	}
-	if( ret != 0 ) {
-		ret = Graph_GetBMPSize( filepath, width, height );
+	ret = DetectImageType( filepath );
+	LCUI_SetImageReaderForFile( &reader, fp );
+	if( ret >= 0 ) {
+		ret = LCUI_InitImageReaderByType( &reader, ret );
 	}
-	return ret;
+	if( ret < 0 ) {
+		if( LCUI_InitImageReader( &reader ) != 0 ) {
+			fclose( fp );
+			return -ENODATA;
+		}
+	}
+	*width = reader.header.width;
+	*height = reader.header.height;
+	LCUI_DestroyImageReader( &reader );
+	fclose( fp );
+	return 0;
 }
+

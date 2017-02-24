@@ -52,53 +52,33 @@
 
 #include <jpeglib.h>
 #include <jerror.h>
-#include <setjmp.h>
 
 #define BUFFER_SIZE 4096
 
-struct my_error_mgr {
+typedef struct LCUI_JPEGErrorRec_ {
 	struct jpeg_error_mgr pub;
-	jmp_buf setjmp_buffer;
-};
-
-typedef struct LCUI_JPEGErrRec_ {
-	struct jpeg_error_mgr err;	/**< JPEG 的错误处理接口 */
-	jmp_buf setjmp_buffer;		/**< setjump 的缓存 */
-} LCUI_JPEGErrRec, *LCUI_JPEGErr;
+	LCUI_ImageReader reader;
+} LCUI_JPEGErrorRec, *LCUI_JPEGError;
 
 typedef struct LCUI_JPEGReaderRec_ {
 	struct jpeg_source_mgr src;		/**< JPEG 资源管理接口 */
-	LCUI_JPEGErrRec err;			/**< 用于错误处理相关的数据 */
+	LCUI_JPEGErrorRec err;			/**< JPEG 的错误处理接口 */
 	LCUI_ImageReader base;			/**< 所属的图片读取器 */
 	unsigned char buffer[BUFFER_SIZE];	/**< 数据缓存 */
 } LCUI_JPEGReaderRec, *LCUI_JPEGReader;
 
-typedef struct my_error_mgr * my_error_ptr;
-
-METHODDEF( void ) my_error_exit( j_common_ptr cinfo )
-{
-	my_error_ptr myerr = (my_error_ptr)cinfo->err;
-	cinfo->err->output_message( cinfo );
-	longjmp( myerr->setjmp_buffer, 1 );
-}
-
 static void DestroyJPEGReader( void *data )
 {
 	j_decompress_ptr cinfo = data;
-	LCUI_JPEGReader jpeg_reader;
-	jpeg_reader = (LCUI_JPEGReader)cinfo->src;
-	if( jpeg_reader->base->type == LCUI_JPEG_READER ) {
-		jpeg_finish_decompress( cinfo );
-	}
 	jpeg_destroy_decompress( cinfo );
 	free( data );
 }
 
 METHODDEF( void ) JPEGReader_OnErrorExit( j_common_ptr cinfo )
 {
-	LCUI_JPEGErr err = (LCUI_JPEGErr)cinfo->err;
+	LCUI_JPEGError err = (LCUI_JPEGError)cinfo->err;
 	cinfo->err->output_message( cinfo );
-	longjmp( err->setjmp_buffer, 1 );
+	longjmp( *err->reader->env, 1 );
 }
 
 static void JPEGReader_OnInit( j_decompress_ptr cinfo )
@@ -167,21 +147,40 @@ static void *jpeg_malloc( j_decompress_ptr cinfo, size_t size )
 					JPOOL_PERMANENT, size );
 }
 
-static LCUI_BOOL LCUI_CheckImageIsJPEG( LCUI_ImageReader reader )
+int LCUI_ReadJPEGHeader( LCUI_ImageReader reader )
 {
 	size_t size;
 	short int mark;
-	j_decompress_ptr cinfo = reader->data;
-	LCUI_JPEGReader jpeg_reader = (LCUI_JPEGReader)cinfo->src;
+	j_decompress_ptr cinfo;
+	LCUI_JPEGReader jpeg_reader;
+	LCUI_ImageHeader header = &reader->header;
+	if( reader->type != LCUI_JPEG_READER ) {
+		return -EINVAL;
+	}
+	cinfo = reader->data;
+	jpeg_reader = (LCUI_JPEGReader)cinfo->src;
 	size = reader->fn_read( reader->stream_data, jpeg_reader->buffer,
 				sizeof( short int ) );
 	if( size < sizeof( short int ) ) {
-		return FALSE;
+		return -ENODATA;
 	}
 	jpeg_reader->src.bytes_in_buffer = sizeof( short int );
 	jpeg_reader->src.next_input_byte = jpeg_reader->buffer;
 	mark = *((short int*)jpeg_reader->buffer);
-	return mark == -9985;
+	if( mark != -9985 ) {
+		return -ENODATA;
+	}
+	jpeg_read_header( cinfo, TRUE );
+	header->width = cinfo->image_width;
+	header->height = cinfo->image_height;
+	header->type = LCUI_JPEG_IMAGE;
+	if( cinfo->jpeg_color_space == JCS_RGB ) {
+		header->color_type = COLOR_TYPE_RGB;
+		header->bit_depth = 24;
+	} else {
+		header->color_type = 0;
+	}
+	return 0;
 }
 
 #endif
@@ -203,23 +202,16 @@ int LCUI_InitJPEGReader( LCUI_ImageReader reader )
 	jpeg_reader->src.next_input_byte = NULL;
 	jpeg_reader->base = reader;
 	reader->data = cinfo;
-	reader->type = LCUI_UNKNOWN_READER;
+	reader->type = LCUI_JPEG_READER;
+	reader->header.type = LCUI_UNKNOWN_IMAGE;
 	reader->destructor = DestroyJPEGReader;
+	reader->env = &reader->env_src;
 	cinfo->src = (struct jpeg_source_mgr*)jpeg_reader;
-	cinfo->err = jpeg_std_error( &jpeg_reader->err.err );
-	jpeg_reader->err.err.error_exit = JPEGReader_OnErrorExit;
-	if( setjmp( jpeg_reader->err.setjmp_buffer ) ) {
-		reader->type = LCUI_UNKNOWN_READER;
-		return -1;
-	}
-	if( LCUI_CheckImageIsJPEG( reader ) ) {
-		reader->type = LCUI_JPEG_READER;
-		return 0;
-	}
-	if( reader->fn_rewind ) {
-		reader->fn_rewind( reader->stream_data );
-	}
-	LCUI_DestroyImageReader( reader );
+	cinfo->err = jpeg_std_error( &jpeg_reader->err.pub );
+	jpeg_reader->err.pub.error_exit = JPEGReader_OnErrorExit;
+	return 0;
+#else
+	LOG( "warning: not JPEG support!" );
 #endif
 	return -1;
 }
@@ -235,8 +227,12 @@ int LCUI_ReadJPEG( LCUI_ImageReader reader, LCUI_Graph *graph )
 	if( reader->type != LCUI_JPEG_READER ) {
 		return -EINVAL;
 	}
+	if( reader->header.type == LCUI_UNKNOWN_IMAGE ) {
+		if( LCUI_ReadJPEGHeader( reader ) != 0 ) {
+			return -ENODATA;
+		}
+	}
 	cinfo = reader->data;
-	jpeg_read_header( cinfo, TRUE );
 	jpeg_start_decompress( cinfo );
 	/* 暂时不处理其它色彩类型的图像 */
 	if( cinfo->num_components != 3 ) {
@@ -268,142 +264,3 @@ int LCUI_ReadJPEG( LCUI_ImageReader reader, LCUI_Graph *graph )
 	return -ENOSYS;
 }
 
-static size_t FileStream_OnRead( void *data, void *buffer, size_t size )
-{
-	return fread( buffer, 1, size, data );
-}
-
-static void FileStream_OnSkip( void *data, long offset )
-{
-	fseek( data, offset, SEEK_CUR );
-}
-
-static void FileStream_OnRewind( void *data )
-{
-	rewind( data );
-}
-
-int LCUI_ReadJPEGFile( const char *filepath, LCUI_Graph *graph )
-{
-	int ret;
-	FILE *fp;
-	LCUI_ImageReaderRec reader = { 0 };
-	fp = fopen( filepath, "rb" );
-	if( !fp ) {
-		return -ENOENT;
-	}
-	reader.stream_data = fp;
-	reader.fn_read = FileStream_OnRead;
-	reader.fn_skip = FileStream_OnSkip;
-	reader.fn_rewind = FileStream_OnRewind;
-	if( LCUI_InitJPEGReader( &reader ) != 0 ) {
-		return -ENODATA;
-	}
-	ret = LCUI_ReadJPEG( &reader, graph );
-	LCUI_DestroyImageReader( &reader );
-	fclose( fp );
-	return ret;
-}
-
-int LCUI_ReadJPEGFile2( const char *filepath, LCUI_Graph *buf )
-{
-#ifdef USE_LIBJPEG
-	FILE *fp;
-	uchar_t *bytep;
-	short int JPsyg;
-	JSAMPARRAY buffer;
-	struct my_error_mgr jerr;
-	struct jpeg_decompress_struct cinfo;
-	int x, y, n, k, row_stride, jaka;
-
-	fp = fopen( filepath, "rb" );
-	if( !fp ) {
-		return ENOENT;
-	}
-	if( fread( &JPsyg, sizeof( short int ), 1, fp ) ) {
-		if( JPsyg != -9985 ) {  /* 如果不是jpg图片 */
-			return  -1;
-		}
-	}
-	rewind( fp );
-	cinfo.err = jpeg_std_error( &jerr.pub );
-	jerr.pub.error_exit = my_error_exit;
-	if( setjmp( jerr.setjmp_buffer ) ) {
-		jpeg_destroy_decompress( &cinfo );
-		return 2;
-	}
-	jpeg_create_decompress( &cinfo );
-	jpeg_stdio_src( &cinfo, fp );
-	(void)jpeg_read_header( &cinfo, TRUE );
-	(void)jpeg_start_decompress( &cinfo );
-	jaka = cinfo.num_components;
-	buf->color_type = COLOR_TYPE_RGB;
-	n = Graph_Create( buf, cinfo.output_width, cinfo.output_height );
-	if( n != 0 ) {
-		_DEBUG_MSG( "error" );
-		exit( -1 );
-	}
-	row_stride = cinfo.output_width * cinfo.output_components;
-	buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo,
-					     JPOOL_IMAGE, row_stride, 1);
-	bytep = buf->bytes;
-	for( y = 0; cinfo.output_scanline < cinfo.output_height; ++y ) {
-		(void)jpeg_read_scanlines( &cinfo, buffer, 1 );
-		if( jaka == 3 ) {
-			for( x = 0; x < buf->w; x++ ) {
-				k = x * 3;
-				*bytep++ = buffer[0][k + 2];
-				*bytep++ = buffer[0][k + 1];
-				*bytep++ = buffer[0][k];
-			}
-		} else {
-			for( x = 0; x < buf->w; x++ ) {
-				*bytep++ = buffer[0][x];
-				*bytep++ = buffer[0][x];
-				*bytep++ = buffer[0][x];
-			}
-		}
-	}
-	(void)jpeg_finish_decompress( &cinfo );
-	jpeg_destroy_decompress( &cinfo );
-	fclose( fp );
-#else
-	LOG( "warning: not JPEG support!" );
-#endif
-	return 0;
-}
-
-int Graph_GetJPEGSize( const char *filepath, int *width, int *height )
-{
-#ifdef USE_LIBJPEG
-	short int JPsyg;
-	struct my_error_mgr jerr;
-	struct jpeg_decompress_struct cinfo;
-	FILE *fp = fopen( filepath, "rb" );
-	if( !fp ) {
-		return ENOENT;
-	}
-	if( fread( &JPsyg, sizeof( short int ), 1, fp ) ) {
-		if( JPsyg != -9985 ) {
-			return  -1;
-		}
-	}
-	rewind( fp );
-	cinfo.err = jpeg_std_error( &jerr.pub );
-	jerr.pub.error_exit = my_error_exit;
-	if( setjmp( jerr.setjmp_buffer ) ) {
-		jpeg_destroy_decompress( &cinfo );
-		return 2;
-	}
-	jpeg_create_decompress( &cinfo );
-	jpeg_stdio_src( &cinfo, fp );
-	(void)jpeg_read_header( &cinfo, TRUE );
-	*width = cinfo.output_width;
-	*height = cinfo.output_height;
-	jpeg_destroy_decompress( &cinfo );
-	fclose( fp );
-#else
-	LOG( "warning: not JPEG support!" );
-#endif
-	return 0;
-}

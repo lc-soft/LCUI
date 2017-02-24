@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * png.c -- LCUI PNG image file processing module.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * png.c -- LCUI的PNG图像文件读写支持模块。
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -42,7 +42,6 @@
 #include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
-#include <LCUI/image.h>
 
 #ifdef ASSERT
 #undef ASSERT
@@ -51,6 +50,7 @@
 
 #ifdef USE_LIBPNG
 #include <png.h>
+#include <LCUI/image.h>
 
 #define PNG_BYTES_TO_CHECK 4
 
@@ -84,24 +84,8 @@ static void PNGReader_OnRead( png_structp png_ptr,
 		}
 	}
 }
-
-static size_t OnReadFile( void *data, void *buffer, size_t size )
-{
-	return fread( buffer, 1, size, data );
-}
-
-static LCUI_BOOL LCUI_CheckImageIsPNG( LCUI_ImageReader reader )
-{
-	size_t n;
-	png_byte buf[PNG_BYTES_TO_CHECK];
-	n = reader->fn_read( reader->stream_data, buf, PNG_BYTES_TO_CHECK );
-	if( n < PNG_BYTES_TO_CHECK ) {
-		return FALSE;
-	}
-	/* 检测数据是否为PNG的签名 */
-	return png_check_sig( buf, PNG_BYTES_TO_CHECK );
-}
-
+#else
+#include <LCUI/image.h>
 #endif
 
 int LCUI_InitPNGReader( LCUI_ImageReader reader )
@@ -113,23 +97,69 @@ int LCUI_InitPNGReader( LCUI_ImageReader reader )
 	ASSERT( png_reader->png_ptr );
 	png_reader->info_ptr = png_create_info_struct( png_reader->png_ptr );
 	ASSERT( png_reader->info_ptr );
-	ASSERT( setjmp( png_jmpbuf( (png_reader->png_ptr) ) ) == 0 );
 	png_set_read_fn( png_reader->png_ptr, reader, PNGReader_OnRead );
 	reader->destructor = DestroyPNGReader;
 	reader->has_error = FALSE;
 	reader->data = png_reader;
 	reader->type = LCUI_PNG_READER;
-	if( reader->fn_begin ) {
-		reader->fn_begin( reader->stream_data );
-	}
-	ASSERT( LCUI_CheckImageIsPNG( reader ) );
-	png_set_sig_bytes( png_reader->png_ptr, PNG_BYTES_TO_CHECK );
+	reader->header.type = LCUI_UNKNOWN_IMAGE;
+	reader->env = &png_jmpbuf( png_reader->png_ptr );
 	return 0;
 
 error:
 	LCUI_DestroyImageReader( reader );
+#else
+	_DEBUG_MSG( "warning: not PNG support!" );
 #endif
 	return -1;
+}
+
+int LCUI_ReadPNGHeader( LCUI_ImageReader reader )
+{
+#ifdef USE_LIBPNG
+	size_t n;
+	png_infop info_ptr;
+	png_structp png_ptr;
+	LCUI_PNGReader png_reader;
+	if( reader->type != LCUI_PNG_READER ) {
+		return -EINVAL;
+	}
+	png_reader = reader->data;
+	png_ptr = png_reader->png_ptr;
+	info_ptr = png_reader->info_ptr;
+	png_byte buf[PNG_BYTES_TO_CHECK];
+	n = reader->fn_read( reader->stream_data, buf, PNG_BYTES_TO_CHECK );
+	if( n < PNG_BYTES_TO_CHECK ) {
+		return -ENODATA;
+	}
+	/* 检测数据是否为PNG的签名 */
+	if( !png_check_sig( buf, PNG_BYTES_TO_CHECK ) ) {
+		return -ENODATA;
+	}
+	png_set_sig_bytes( png_reader->png_ptr, PNG_BYTES_TO_CHECK );
+	/* 读取PNG图片信息 */
+	png_read_png( png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0 );
+	reader->header.width = png_get_image_width( png_ptr, info_ptr );
+	reader->header.height = png_get_image_height( png_ptr, info_ptr );
+	reader->header.bit_depth = png_get_bit_depth( png_ptr, info_ptr );
+	reader->header.color_type = png_get_color_type( png_ptr, info_ptr );
+	reader->header.type = LCUI_PNG_IMAGE;
+	switch( reader->header.color_type ) {
+	case PNG_COLOR_TYPE_RGB_ALPHA:
+		reader->header.color_type = COLOR_TYPE_ARGB;
+		break;
+	case PNG_COLOR_TYPE_RGB:
+		reader->header.color_type = COLOR_TYPE_RGB;
+		break;
+	default:
+		reader->header.color_type = 0;
+		break;
+	}
+	return 0;
+#else
+	_DEBUG_MSG( "warning: not PNG support!" );
+	return -ENOSYS;
+#endif
 }
 
 int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
@@ -140,36 +170,39 @@ int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 	png_infop info_ptr;
 	png_structp png_ptr;
 	LCUI_PNGReader png_reader;
-	int ret = 0, x, y, width, height;
+	LCUI_ImageHeader header;
+	int ret = 0, x, y;
 
 	if( reader->type != LCUI_PNG_READER ) {
 		return -EINVAL;
 	}
+	header = &reader->header;
 	png_reader = reader->data;
 	png_ptr = png_reader->png_ptr;
 	info_ptr = png_reader->info_ptr;
-	/* 读取PNG图片信息 */
-	png_read_png( png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0 );
-	/* 获取图像的宽高 */
-	width = png_get_image_width( png_ptr, info_ptr );
-	height = png_get_image_height( png_ptr, info_ptr );
+	if( header->type == LCUI_UNKNOWN_IMAGE ) {
+		if( LCUI_ReadPNGHeader( reader ) != 0 ) {
+			return -ENODATA;
+		}
+	}
 	/* 获取所有行像素数据，row_pointers里边就是rgba数据 */
 	rows = png_get_rows( png_ptr, info_ptr );
 	/* 根据不同的色彩类型进行相应处理 */
-	switch( png_get_color_type( png_ptr, info_ptr ) ) {
-	case PNG_COLOR_TYPE_RGB_ALPHA:
+	switch( header->color_type ) {
+	case COLOR_TYPE_ARGB:
 		graph->color_type = COLOR_TYPE_ARGB;
-		if( Graph_Create( graph, width, height ) != 0 ) {
+		ret = Graph_Create( graph, header->width, header->height );
+		if( ret != 0 ) {
 			ret = -ENOMEM;
 			break;
 		}
 		byte = graph->bytes;
-		for( y = 0; y < height; ++y ) {
+		for( y = 0; y < header->height; ++y ) {
 			/*
 			* Graph的像素数据存储格式是BGRA，而PNG库
 			* 提供像素数据的是RGBA格式的，因此需要调整写入顺序
 			*/
-			for( x = 0; x < width * 4; x += 4 ) {
+			for( x = 0; x < header->width * 4; x += 4 ) {
 				*byte++ = rows[y][x + 2];
 				*byte++ = rows[y][x + 1];
 				*byte++ = rows[y][x];
@@ -177,15 +210,16 @@ int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 			}
 		}
 		break;
-	case PNG_COLOR_TYPE_RGB:
+	case COLOR_TYPE_RGB:
 		graph->color_type = COLOR_TYPE_RGB;
-		if( Graph_Create( graph, width, height ) != 0 ) {
+		ret = Graph_Create( graph, header->width, header->height );
+		if( ret != 0 ) {
 			ret = -ENOMEM;
 			break;
 		}
 		byte = graph->bytes;
-		for( y = 0; y < height; ++y ) {
-			for( x = 0; x < width * 3; x += 3 ) {
+		for( y = 0; y < header->height; ++y ) {
+			for( x = 0; x < header->width * 3; x += 3 ) {
 				*byte++ = rows[y][x + 2];
 				*byte++ = rows[y][x + 1];
 				*byte++ = rows[y][x];
@@ -200,71 +234,7 @@ int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 	return ret;
 #else
 	_DEBUG_MSG( "warning: not PNG support!" );
-	return -1;
-#endif
-}
-
-int LCUI_ReadPNGFile( const char *filepath, LCUI_Graph *graph )
-{
-#ifdef USE_LIBPNG
-	int ret;
-	FILE *fp;
-	LCUI_ImageReaderRec reader = { 0 };
-
-	fp = fopen( filepath, "rb" );
-	if( !fp ) {
-		return -ENOENT;
-	}
-	reader.stream_data = fp;
-	reader.fn_read = OnReadFile;
-	LCUI_InitPNGReader( &reader );
-	ret = LCUI_ReadPNG( &reader, graph );
-	LCUI_DestroyImageReader( &reader );
-	fclose( fp );
-	return ret;
-#else
-	_DEBUG_MSG( "warning: not PNG support!" );
-	return -1;
-#endif
-}
-
-int Graph_GetPNGSize( const char *filepath, int *width, int *height )
-{
-#ifdef USE_LIBPNG
-	int ret;
-	png_infop info_ptr;
-	png_structp png_ptr;
-	char buf[PNG_BYTES_TO_CHECK];
-	FILE *fp = fopen( filepath, "rb" );
-	if( !fp ) {
-		return ENOENT;
-	}
-	png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
-	info_ptr = png_create_info_struct( png_ptr );
-	setjmp( png_jmpbuf( png_ptr ) );
-	ret = fread( buf, 1, PNG_BYTES_TO_CHECK, fp );
-	if( ret < PNG_BYTES_TO_CHECK ) {
-		fclose( fp );
-		png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
-		return -1;
-	}
-	ret = png_sig_cmp( (png_bytep)buf, (png_size_t)0, PNG_BYTES_TO_CHECK );
-	if( ret != 0 ) {
-		fclose( fp );
-		png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
-		return -1;
-	}
-	rewind( fp );
-	png_init_io( png_ptr, fp );
-	png_read_png( png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0 );
-	*width = png_get_image_width( png_ptr, info_ptr );
-	*height = png_get_image_height( png_ptr, info_ptr );
-	fclose( fp );
-	png_destroy_read_struct( &png_ptr, &info_ptr, 0 );
-	return 0;
-#else
-	_DEBUG_MSG( "warning: not PNG support!" );
-	return -1;
+	return -ENOSYS
 #endif
 }
 
@@ -373,6 +343,7 @@ int LCUI_WritePNGFile( const char *file_name, const LCUI_Graph *graph )
 	return 0;
 #else
 	LOG( "warning: not PNG support!" );
-	return 0;
+	return -ENOSYS;
 #endif
 }
+

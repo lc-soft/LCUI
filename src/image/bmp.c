@@ -87,37 +87,44 @@ static void BMPHeader_Init( HEADER *header, uint16_t buffer[8] )
 
 int LCUI_InitBMPReader( LCUI_ImageReader reader )
 {
-	size_t size;
-	uint16_t buffer[8];
 	ASSIGN( bmp_reader, LCUI_BMPReader );
 	reader->data = bmp_reader;
 	reader->destructor = free;
 	reader->type = LCUI_BMP_READER;
+	reader->env = &reader->env_src;
 	if( reader->fn_begin ) {
 		reader->fn_begin( reader->stream_data );
-	}
-	size = reader->fn_read( reader->stream_data, buffer, 14 );
-	/* 受到字节对齐影响，直接将读到的写到结构体变量里会让最后一个成员
-	 * 变量的值不正常，因此需要手动为其成员变量赋值 */
-	BMPHeader_Init( &bmp_reader->header, buffer );
-	if( size < 14 || bmp_reader->header.type != 0x4D42 ) {
-		LCUI_DestroyImageReader( reader );
-		return -ENODATA;
 	}
 	return 0;
 }
 
-static int LCUI_ReadBMPInfo( LCUI_ImageReader reader )
+int LCUI_ReadBMPHeader( LCUI_ImageReader reader )
 {
 	size_t n;
+	uint16_t buffer[8];
 	LCUI_BMPReader bmp_reader = reader->data;
 	INFOHEADER *info = &bmp_reader->info;
+	reader->header.type = LCUI_UNKNOWN_IMAGE;
 	if( reader->type != LCUI_BMP_READER ) {
 		return -EINVAL;
+	}
+	n = reader->fn_read( reader->stream_data, buffer, 14 );
+	/* 受到字节对齐影响，直接将读到的写到结构体变量里会让最后一个成员
+	 * 变量的值不正常，因此需要手动为其成员变量赋值 */
+	BMPHeader_Init( &bmp_reader->header, buffer );
+	if( n < 14 || bmp_reader->header.type != 0x4D42 ) {
+		return -ENODATA;
 	}
 	n = reader->fn_read( reader->stream_data, info, sizeof( INFOHEADER ) );
 	if( n < sizeof( INFOHEADER ) ) {
 		return -ENODATA;
+	}
+	reader->header.width = info->width;
+	reader->header.height = info->height;
+	reader->header.type = LCUI_BMP_IMAGE;
+	if( info->bits == 24 ) {
+		reader->header.color_type = COLOR_TYPE_RGB;
+		reader->header.bit_depth = 24;
 	}
 	return 0;
 }
@@ -131,9 +138,10 @@ int LCUI_ReadBMP( LCUI_ImageReader reader, LCUI_Graph *graph )
 	if( reader->type != LCUI_BMP_READER ) {
 		return -EINVAL;
 	}
-	n = reader->fn_read( reader->stream_data, info, sizeof( INFOHEADER ) );
-	if( n < sizeof( INFOHEADER ) ) {
-		return -ENODATA;
+	if( reader->header.type == LCUI_UNKNOWN_IMAGE ) {
+		if( LCUI_ReadBMPHeader( reader ) != 0 ) {
+			return -ENODATA;
+		}
 	}
 	/* 信息头中的偏移位置是相对于起始处，需要减去当前已经偏移的位置 */
 	n = bmp_reader->header.offset - bmp_reader->info.size - 14;
@@ -168,64 +176,3 @@ int LCUI_ReadBMP( LCUI_ImageReader reader, LCUI_Graph *graph )
 	return 0;
 }
 
-static size_t FileStream_OnRead( void *data, void *buffer, size_t size )
-{
-	return fread( buffer, 1, size, data );
-}
-
-static void FileStream_OnSkip( void *data, long offset )
-{
-	fseek( data, offset, SEEK_CUR );
-}
-
-int LCUI_ReadBMPFile( const char *filepath, LCUI_Graph *graph )
-{
-	int ret;
-	FILE *fp;
-	LCUI_ImageReaderRec reader = { 0 };
-
-	fp = fopen( filepath, "rb" );
-	if( fp == NULL ) {
-		return -ENOENT;
-	}
-	reader.stream_data = fp;
-	reader.fn_read = FileStream_OnRead;
-	reader.fn_skip = FileStream_OnSkip;
-	LCUI_InitBMPReader( &reader );
-	ret = LCUI_ReadBMP( &reader, graph );
-	LCUI_DestroyImageReader( &reader );
-	fclose( fp );
-	return ret;
-}
-
-int Graph_GetBMPSize( const char *filepath, int *width, int *height )
-{
-	int ret;
-	FILE *fp;
-	LCUI_BMPReader bmp;
-	LCUI_ImageReaderRec reader = { 0 };
-
-	fp = fopen( filepath, "rb" );
-	if( fp == NULL ) {
-		return -ENOENT;
-	}
-	reader.stream_data = fp;
-	reader.fn_read = FileStream_OnRead;
-	reader.fn_skip = FileStream_OnSkip;
-	ret = LCUI_InitBMPReader( &reader );
-	if( ret != 0 ) {
-		goto exit;
-	}
-	ret = LCUI_ReadBMPInfo( &reader );
-	if( ret != 0 ) {
-		goto exit;
-	}
-	bmp = reader.data;
-	*width = bmp->info.width;
-	*height = bmp->info.height;
-	LCUI_DestroyImageReader( &reader );
-
-exit:
-	fclose( fp );
-	return ret;
-}

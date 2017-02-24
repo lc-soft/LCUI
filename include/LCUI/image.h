@@ -39,6 +39,7 @@
 #ifndef LCUI_IMAGE_H
 #define LCUI_IMAGE_H
 
+#include <setjmp.h>
 #include <LCUI/graph.h>
 
 LCUI_BEGIN_HEADER
@@ -55,10 +56,25 @@ enum LCUI_ImageReaderType {
 	LCUI_BMP_READER
 };
 
+#define LCUI_UNKNOWN_IMAGE	LCUI_UNKNOWN_READER
+#define LCUI_PNG_IMAGE		LCUI_PNG_READER
+#define LCUI_JPEG_IMAGE		LCUI_JPEG_READER
+#define LCUI_BMP_IMAGE		LCUI_BMP_READER
+
+#define LCUI_SetImageReaderJump(X) (X)->env && setjmp(*((X)->env))
+
+typedef struct LCUI_ImageHeaderRec_ {
+	int type;
+	int bit_depth;
+	int color_type;
+	unsigned int width, height;
+} LCUI_ImageHeaderRec, *LCUI_ImageHeader;
+
 /** 图像读取器 */
 typedef struct LCUI_ImageReaderRec_ {
 	void *stream_data;		/**< 自定义的输入流数据 */
 	LCUI_BOOL has_error;		/**< 是否有错误 */
+	LCUI_ImageHeaderRec header;	/**< 图像头部信息 */
 	LCUI_ImageFunction fn_begin;	/**< 在开始读取前调用的函数 */
 	LCUI_ImageFunction fn_end;	/**< 在结束读取时调用的函数 */
 	LCUI_ImageFunction fn_rewind;	/**< 游标重置函数，用于重置当前读取位置到数据流的开头处 */
@@ -68,6 +84,8 @@ typedef struct LCUI_ImageReaderRec_ {
 	int type;			/**< 图片读取器类型 */
 	void *data;			/**< 私有数据 */
 	void( *destructor )(void*);	/**< 私有数据的析构函数 */
+	jmp_buf *env;			/**< 堆栈环境缓存的指针，用于 setjump() */
+	jmp_buf env_src;		/**< 默认堆栈环境缓存 */
 } LCUI_ImageReaderRec, *LCUI_ImageReader;
 
 /** 初始化适用于 PNG 图像的读取器 */
@@ -79,11 +97,21 @@ LCUI_API int LCUI_InitJPEGReader( LCUI_ImageReader reader );
 /** 初始化适用于 BMP 图像的读取器 */
 LCUI_API int LCUI_InitBMPReader( LCUI_ImageReader reader );
 
+LCUI_API void LCUI_SetImageReaderForFile( LCUI_ImageReader reader, FILE *fp );
+
 /** 创建图像读取器 */
 LCUI_API int LCUI_InitImageReader( LCUI_ImageReader reader );
 
 /** 销毁图像读取器 */
 LCUI_API void LCUI_DestroyImageReader( LCUI_ImageReader reader );
+
+LCUI_API int LCUI_ReadPNGHeader( LCUI_ImageReader reader );
+
+LCUI_API int LCUI_ReadJPEGHeader( LCUI_ImageReader reader );
+
+LCUI_API int LCUI_ReadBMPHeader( LCUI_ImageReader reader );
+
+LCUI_API int LCUI_ReadImageHeader( LCUI_ImageReader reader );
 
 LCUI_API int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph );
 
@@ -93,26 +121,8 @@ LCUI_API int LCUI_ReadBMP( LCUI_ImageReader reader, LCUI_Graph *graph );
 
 LCUI_API int LCUI_ReadImage( LCUI_ImageReader reader, LCUI_Graph *graph );
 
-/** 从BMP文件中读取图像数据 */
-LCUI_API int LCUI_ReadBMPFile( const char *filepath, LCUI_Graph *out );
-
-/** 从PNG文件中读取图像数据 */
-LCUI_API int LCUI_ReadPNGFile( const char *filepath, LCUI_Graph *graph );
-
-/** 从JPEG文件中读取图像数据 */
-LCUI_API int LCUI_ReadJPEGFile( const char *filepath, LCUI_Graph *graph );
-
 /** 将图像数据写入至png文件 */
 LCUI_API int LCUI_WritePNGFile( const char *file_name, const LCUI_Graph *graph );
-
-/** 从BMP文件中获取图像尺寸 */
-LCUI_API int Graph_GetBMPSize( const char *filepath, int *width, int *height );
-
-/** 从PNG文件中获取图像尺寸 */
-LCUI_API int Graph_GetPNGSize( const char *filepath, int *width, int *height );
-
-/** 从JPEG文件中读取图像尺寸 */
-LCUI_API int Graph_GetJPEGSize( const char *filepath, int *width, int *height );
 
 /** 载入指定图片文件的图像数据 */
 LCUI_API int LCUI_ReadImageFile( const char *filepath, LCUI_Graph *out );
