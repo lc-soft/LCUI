@@ -287,6 +287,11 @@ LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 	XMLParserContextRec ctx;
+
+	ctx.root = NULL;
+	ctx.widget = NULL;
+	ctx.parent = NULL;
+	ctx.space = NULL;
 	doc = xmlParseMemory( str, size );
 	if( !doc ) {
 		LOG( "[builder] Failed to parse xml form memory\n" );
@@ -297,10 +302,6 @@ LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 		LOG( "[builder] error root node name: %s\n", cur->name );
 		goto FAILED;
 	}
-	ctx.root = NULL;
-	ctx.widget = NULL;
-	ctx.parent = NULL;
-	ctx.space = NULL;
 	if( !self.is_inited ) {
 		LCUIBuilder_Init();
 	}
@@ -309,8 +310,9 @@ FAILED:
 	if( doc ) {
 		xmlFreeDoc( doc );
 	}
-#endif
 	return ctx.root;
+#endif
+	return NULL;
 }
 
 LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
@@ -321,6 +323,11 @@ LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 	XMLParserContextRec ctx;
+
+	ctx.root = NULL;
+	ctx.widget = NULL;
+	ctx.parent = NULL;
+	ctx.space = filepath;
 	doc = xmlParseFile( filepath );
 	if( !doc ) {
 		LOG( "[builder] Failed to parse xml file: %s\n", filepath );
@@ -331,10 +338,6 @@ LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 		LOG( "[builder] error root node name: %s\n", cur->name );
 		goto FAILED;
 	}
-	ctx.root = NULL;
-	ctx.widget = NULL;
-	ctx.parent = NULL;
-	ctx.space = filepath;
 	if( !self.is_inited ) {
 		LCUIBuilder_Init();
 	}
@@ -343,6 +346,7 @@ FAILED:
 	if( doc ) {
 		xmlFreeDoc( doc );
 	}
-#endif
 	return ctx.root;
+#endif
+	return NULL;
 }

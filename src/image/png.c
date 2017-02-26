@@ -121,6 +121,7 @@ int LCUI_ReadPNGHeader( LCUI_ImageReader reader )
 	size_t n;
 	png_infop info_ptr;
 	png_structp png_ptr;
+	png_byte buf[PNG_BYTES_TO_CHECK];
 	LCUI_PNGReader png_reader;
 	if( reader->type != LCUI_PNG_READER ) {
 		return -EINVAL;
@@ -128,7 +129,6 @@ int LCUI_ReadPNGHeader( LCUI_ImageReader reader )
 	png_reader = reader->data;
 	png_ptr = png_reader->png_ptr;
 	info_ptr = png_reader->info_ptr;
-	png_byte buf[PNG_BYTES_TO_CHECK];
 	n = reader->fn_read( reader->stream_data, buf, PNG_BYTES_TO_CHECK );
 	if( n < PNG_BYTES_TO_CHECK ) {
 		return -ENODATA;
@@ -172,7 +172,8 @@ int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 	png_structp png_ptr;
 	LCUI_PNGReader png_reader;
 	LCUI_ImageHeader header;
-	int ret = 0, x, y;
+	unsigned int x, y;
+	int ret = 0;
 
 	if( reader->type != LCUI_PNG_READER ) {
 		return -EINVAL;
