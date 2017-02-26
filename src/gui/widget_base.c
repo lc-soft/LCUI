@@ -1692,7 +1692,7 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		float max_width;
 	} ctx = { 0 };
 	LCUI_Widget child;
-	LCUI_WidgetEventRec e;
+	LCUI_WidgetEventRec e = { 0 };
 	LinkedListNode *node;
 
 	ctx.max_width = Widget_ComputeMaxWidth( w );
@@ -1859,5 +1859,7 @@ void LCUI_InitWidget( void )
 
 void LCUI_ExitWidget( void )
 {
-
+	LCUIWidget_ExitEvent();
+	LCUIWidget_ExitTasks();
+	LCUIWidget_ExitPrototype();
 }

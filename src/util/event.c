@@ -1,7 +1,7 @@
 /* ***************************************************************************
 * event.c -- event processing module
 *
-* Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
+* Copyright (C) 2016-2017 by Liu Chao <lc-soft@live.cn>
 *
 * This file is part of the LCUI project, and may only be used, modified, and
 * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
 * event.c -- 事件处理模块
 *
-* 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
+* 版权所有 (C) 2016-2017 归属于 刘超 <lc-soft@live.cn>
 *
 * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
 *
@@ -43,6 +43,12 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 
+/** 事件绑定记录 */
+typedef struct LCUI_EventRecordRec_ {
+	int id;				/**< 事件标识号 */
+	LinkedList handlers;		/**< 事件处理器列表 */
+} LCUI_EventRecordRec, *LCUI_EventRecord;
+
 /** 事件处理器 */
 typedef struct LCUI_EventHandlerRec_ {
 	int id;				/**< 标识号 */
@@ -50,8 +56,32 @@ typedef struct LCUI_EventHandlerRec_ {
 	void (*destroy_data)(void*);	/**< 用于销毁数据的回调函数 */
 	LCUI_EventFunc func;		/**< 事件处理函数 */
 	LinkedListNode node;		/**< 处理器列表中的节点 */
-	LinkedList *list;		/**< 所属处理器列表 */
+	LCUI_EventRecord record;	/**< 所属事件绑定记录 */
 } LCUI_EventHandlerRec, *LCUI_EventHandler;
+
+static void DestroyEventHandler( void *data )
+{
+	LCUI_EventHandler handler = data;
+	LinkedList_Unlink( &handler->record->handlers, &handler->node );
+	if( handler->destroy_data && handler->data ) {
+		handler->destroy_data( handler->data );
+	}
+	handler->data = NULL;
+	free( handler );
+}
+
+static void DestroyEventRecord( void *data )
+{
+	LinkedListNode *node;
+	LCUI_EventRecord record = data;
+	while( record->handlers.length > 0 ) {
+		node = LinkedList_GetNode( &record->handlers, 0 );
+		if( node ) {
+			DestroyEventHandler( node->data );
+		}
+	}
+	free( record );
+}
 
 LCUI_EventTrigger EventTrigger( void )
 {
@@ -59,6 +89,7 @@ LCUI_EventTrigger EventTrigger( void )
 	trigger->handler_base_id = 1;
 	RBTree_Init( &trigger->handlers );
 	RBTree_Init( &trigger->events );
+	RBTree_OnDestroy( &trigger->events, DestroyEventRecord );
 	return trigger;
 }
 
@@ -73,25 +104,23 @@ int EventTrigger_Bind( LCUI_EventTrigger trigger, int event_id,
 		       LCUI_EventFunc func, void *data,
 		       void (*destroy_data)(void*) )
 {
-	LinkedList *handlers;
-	RBTreeNode *node;
+	LCUI_EventRecord record;
 	LCUI_EventHandler handler;
-	node = RBTree_Search( &trigger->events, event_id );
-	if( !node ) {
-		handlers = NEW( LinkedList, 1 );
-		LinkedList_Init( handlers );
-		RBTree_Insert( &trigger->events, event_id, handlers );
-	} else {
-		handlers = node->data;
+	record = RBTree_GetData( &trigger->events, event_id );
+	if( !record ) {
+		record = NEW( LCUI_EventRecordRec, 1 );
+		LinkedList_Init( &record->handlers );
+		record->id = event_id;
+		RBTree_Insert( &trigger->events, event_id, record );
 	}
 	handler = NEW( LCUI_EventHandlerRec, 1 );
 	handler->id = trigger->handler_base_id++;
 	handler->destroy_data = destroy_data;
 	handler->data = data;
 	handler->func = func;
-	handler->list = handlers;
+	handler->record = record;
 	handler->node.data = handler;
-	LinkedList_AppendNode( handlers, &handler->node );
+	LinkedList_AppendNode( &record->handlers, &handler->node );
 	RBTree_Insert( &trigger->handlers, handler->id, handler );
 	return handler->id;
 }
@@ -99,73 +128,71 @@ int EventTrigger_Bind( LCUI_EventTrigger trigger, int event_id,
 int EventTrigger_Unbind( LCUI_EventTrigger trigger, int event_id, 
 			 LCUI_EventFunc func )
 {
-	LinkedList *handlers;
-	RBTreeNode *event_node;
-	LinkedListNode *handler_node;
+	LCUI_EventRecord record;
 	LCUI_EventHandler handler;
-	event_node = RBTree_Search( &trigger->events, event_id );
-	if( !event_node ) {
+	LinkedListNode *node = NULL;
+	record = RBTree_GetData( &trigger->events, event_id );
+	if( !record ) {
 		return -1;
 	}
-	handlers = event_node->data;
-	for( LinkedList_Each( handler_node, handlers ) ) {
-		handler = handler_node->data;
+	for( LinkedList_Each( node, &record->handlers ) ) {
+		handler = node->data;
 		if( handler->func != func ) {
 			continue;
 		}
-		LinkedList_Unlink( handlers, handler_node );
-		if( handler->destroy_data && handler->data ) {
-			handler->destroy_data( handler->data );
-			handler->data = NULL;
-		}
-		free( handler );
-		return 0;
+		RBTree_Erase( &trigger->handlers, handler->id );
+		DestroyEventHandler( handler );
+		break;
 	}
-	return -1;
+	if( record->handlers.length < 1 ) {
+		RBTree_Erase( &trigger->events, record->id );
+	}
+	if( !node ) {
+		return -1;
+	}
+	return 0;
 }
 
 int EventTrigger_Unbind2( LCUI_EventTrigger trigger, int handler_id )
 {
 	RBTreeNode *node;
+	LCUI_EventRecord record;
 	LCUI_EventHandler handler;
 	node = RBTree_Search( &trigger->handlers, handler_id );
 	if( !node ) {
 		return -1;
 	}
 	handler = node->data;
-	LinkedList_Unlink( handler->list, &handler->node );
-	if( handler->destroy_data && handler->data ) {
-		handler->destroy_data( handler->data );
-		handler->data = NULL;
+	record = handler->record;
+	RBTree_Erase( &trigger->handlers, handler->id );
+	DestroyEventHandler( handler );
+	if( record->handlers.length < 1 ) {
+		RBTree_Erase( &trigger->events, record->id );
 	}
-	free( handler );
 	return 0;
 }
 
 int EventTrigger_Unbind3( LCUI_EventTrigger trigger, int event_id,
 			  int (*compare_func)(void*,void*), void *key )
 {
-	LinkedList *handlers;
-	LinkedListNode *handler_node;
-	RBTreeNode *event_node;
+	LCUI_EventRecord record;
 	LCUI_EventHandler handler;
-	event_node = RBTree_Search( &trigger->events, event_id );
-	if( !event_node ) {
+	LinkedListNode *node = NULL;
+	record = RBTree_GetData( &trigger->events, event_id );
+	if( !record ) {
 		return -1;
 	}
-	handlers = event_node->data;
-	for( LinkedList_Each( handler_node, handlers ) ) {
-		handler = handler_node->data;
+	for( LinkedList_Each( node, &record->handlers ) ) {
+		handler = node->data;
 		if( !compare_func(key, handler->data) ) {
 			continue;
 		}
-		LinkedList_Unlink( handlers, handler_node );
-		if( handler->destroy_data && handler->data ) {
-			handler->destroy_data( handler->data );
-			handler->data = NULL;
-		}
-		free( handler );
-		return 0;
+		RBTree_Erase( &trigger->handlers, handler->id );
+		DestroyEventHandler( handler );
+		break;
+	}
+	if( handler->record->handlers.length < 1 ) {
+		RBTree_Erase( &trigger->events, record->id );
 	}
 	return -1;
 }

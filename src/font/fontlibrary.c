@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * fontlibrary.c -- The font info and font bitmap cache module.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * fontlibrary.c -- 字体信息和字体位图缓存模块。
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -78,7 +78,7 @@ static struct LCUI_FontLibraryContext {
 	LCUI_Font *incore_font;			/**< 内置字体的信息 */
 	LCUI_FontEngine engines[2];		/**< 当前可用字体引擎列表 */
 	LCUI_FontEngine *engine;		/**< 当前选择的字体引擎 */
-} fontlib = {0, FALSE};
+} fontlib;
 
 /** 检测位图数据是否有效 */
 #define FontBitmap_IsValid(fbmp) (fbmp && fbmp->width>0 && fbmp->rows>0)
@@ -638,9 +638,7 @@ void LCUI_ExitFont( void )
 			}
 			free( font->family_name );
 			free( font->style_name );
-			if( font->data ) {
-				free( font->data );
-			}
+			font->engine->close( font->data );
 			font->data = NULL;
 			font->engine = NULL;
 		}
@@ -648,4 +646,8 @@ void LCUI_ExitFont( void )
 	}
 	free( fontlib.font_cache );
 	fontlib.font_cache = NULL;
+	LCUIFont_ExitInCoreFont();
+#ifdef LCUI_FONT_ENGINE_FREETYPE
+	LCUIFont_ExitFreeType();
+#endif
 }

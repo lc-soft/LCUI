@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * builder.c -- the GUI build module, parse UI config code and build UI.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * builder.c -- 图形界面构建模块，主要用于解析界面配置代码并生成相应的图形界面
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -94,7 +94,7 @@ static struct ModuleContext {
 static int ParseResource( XMLParserContext ctx, xmlNodePtr node )
 {
 	xmlAttrPtr prop;
-	const char *prop_val, *type = NULL, *src = NULL;
+	char *prop_val, *type = NULL, *src = NULL;
 
 	if( node->type != XML_ELEMENT_NODE ) {
 		return PB_NEXT;
@@ -119,6 +119,7 @@ static int ParseResource( XMLParserContext ctx, xmlNodePtr node )
 	else if( strstr(type, "text/css") ) {
 		if( src ) {
 			LCUI_LoadCSSFile( src );
+			xmlFree( src );
 		}
 		for( node = node->children; node; node = node->next ) {
 			if( node->type != XML_TEXT_NODE ) {
@@ -126,6 +127,9 @@ static int ParseResource( XMLParserContext ctx, xmlNodePtr node )
 			}
 			LCUI_LoadCSSString( (char*)node->content, ctx->space );
 		}
+	}
+	if( type ) {
+		xmlFree( type );
 	}
 	return PB_NEXT;
 }
@@ -148,6 +152,7 @@ static int ParseUI( XMLParserContext ctx, xmlNodePtr node )
 static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 {
 	xmlAttrPtr prop;
+	char *prop_val = NULL;
 	LCUI_Widget w = NULL, parent = ctx->widget;
 
 	if( ctx->parent && ctx->parent->id != ID_UI &&
@@ -175,7 +180,9 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 	default: return PB_ERROR;
 	}
 	for( prop = node->properties; prop; prop = prop->next ) {
-		const char *prop_val;
+		if( prop_val ) {
+			xmlFree( prop_val );
+		}
 		prop_val = (char*)xmlGetProp( node, prop->name );
 		if( PropNameIs("type") ) {
 			DEBUG_MSG("widget: %p, set type: %s\n", w, prop_val);
@@ -201,6 +208,9 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		}
 		Widget_SetAttribute( w, (const char*)prop->name, prop_val );
 		w->proto->setattr( w, (const char*)prop->name, prop_val );
+	}
+	if( prop_val ) {
+		xmlFree( prop_val );
 	}
 	return PB_ENTER;
 }
@@ -295,13 +305,12 @@ LCUI_Widget LCUIBuilder_LoadString( const char *str, int size )
 		LCUIBuilder_Init();
 	}
 	ParseNode( &ctx, cur->children );
-	return ctx.root;
 FAILED:
 	if( doc ) {
 		xmlFreeDoc( doc );
 	}
 #endif
-	return NULL;
+	return ctx.root;
 }
 
 LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
@@ -330,11 +339,10 @@ LCUI_Widget LCUIBuilder_LoadFile( const char *filepath )
 		LCUIBuilder_Init();
 	}
 	ParseNode( &ctx, cur->children );
-	return ctx.root;
 FAILED:
 	if( doc ) {
 		xmlFreeDoc( doc );
 	}
 #endif
-	return NULL;
+	return ctx.root;
 }

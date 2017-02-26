@@ -83,6 +83,12 @@ typedef struct EventRecordNodeRec_ {
 	LinkedList records;	/**< 事件记录列表 */
 } EventRecordNodeRec, *EventRecordNode;
 
+/** 事件标识号与名称的映射记录 */
+typedef struct EventMappingRec_ {
+	int id;
+	char *name;
+} EventMappingRec, *EventMapping;
+
 /** 鼠标点击记录 */
 typedef struct ClickRecord_ {
 	int64_t time;		/**< 时间 */
@@ -96,6 +102,8 @@ static struct LCUIWidgetEvnetModule {
 	LCUI_Widget mouse_capturer;		/**< 占用鼠标的部件 */
 	LinkedList touch_capturers;		/**< 触点占用记录 */
 	LCUI_Widget targets[WST_TOTAL];		/**< 相关的部件 */
+	LinkedList events;			/**< 已绑定的事件 */
+	LinkedList event_mappings;		/**< 事件标识号和名称映射记录列表  */
 	RBTree event_records;			/**< 当前正执行的事件的记录 */
 	RBTree event_names;			/**< 事件名称表，以标识号作为索引 */
 	Dict *event_ids;			/**< 事件标识号表，以事件名称作为索引 */
@@ -103,6 +111,13 @@ static struct LCUIWidgetEvnetModule {
 	ClickRecord click;			/**< 上次鼠标点击记录 */
 	LCUI_Mutex mutex;			/**< 互斥锁 */
 } self;
+
+static void DestroyEventMapping( void *data )
+{
+	EventMapping mapping = data;
+	free( mapping->name );
+	free( mapping );
+}
 
 static int CompareEventRecord( void *data, const void *keydata )
 {
@@ -360,18 +375,19 @@ static int TouchCapturers_Delete( LinkedList *list, LCUI_Widget w, int point_id 
 
 int LCUIWidget_SetEventName( int event_id, const char *event_name )
 {
-	char *name;
-	int *id, ret;
+	int ret;
+	EventMapping mapping;
 	LCUIMutex_Lock( &self.mutex );
 	if( Dict_FetchValue( self.event_ids, event_name ) ) {
 		LCUIMutex_Unlock( &self.mutex );
 		return -1;
 	}
-	id = malloc( sizeof( int ) );
-	name = strdup( event_name );
-	*id = event_id;
-	RBTree_Insert( &self.event_names, event_id, name );
-	ret = Dict_Add( self.event_ids, name, id );
+	mapping = malloc( sizeof( EventMappingRec ) );
+	mapping->name = strdup( event_name );
+	mapping->id = event_id;
+	LinkedList_Append( &self.event_mappings, mapping );
+	RBTree_Insert( &self.event_names, event_id, mapping );
+	ret = Dict_Add( self.event_ids, mapping->name, mapping );
 	LCUIMutex_Unlock( &self.mutex );
 	return ret;
 }
@@ -383,24 +399,20 @@ int LCUIWidget_AllocEventId( void )
 
 const char *LCUIWidget_GetEventName( int event_id )
 {
-	char *name;
+	EventMapping mapping;
 	LCUIMutex_Lock( &self.mutex );
-	name = RBTree_GetData( &self.event_names, event_id );
+	mapping = RBTree_GetData( &self.event_names, event_id );
 	LCUIMutex_Unlock( &self.mutex );
-	return name;
+	return mapping ? mapping->name : NULL;
 }
 
 int LCUIWidget_GetEventId( const char *event_name )
 {
-	int *val;
+	EventMapping mapping;
 	LCUIMutex_Lock( &self.mutex );
-	val = Dict_FetchValue( self.event_ids, event_name );
-	if( val ) {
-		LCUIMutex_Unlock( &self.mutex );
-		return *val;
-	}
+	mapping = Dict_FetchValue( self.event_ids, event_name );
 	LCUIMutex_Unlock( &self.mutex );
-	return -1;
+	return mapping ? mapping->id : -1;
 }
 
 int Widget_BindEventById( LCUI_Widget widget, int event_id,
@@ -977,57 +989,12 @@ int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 	return Widget_PostEvent( root, &e, *((int**)n), NULL );
 }
 
-static unsigned int Dict_KeyHash( const void *key )
+static void BindSysEvent( int e, LCUI_SysEventFunc func )
 {
-	const char *buf = key;
-	unsigned int hash = 5381;
-	while( *buf ) {
-		hash = ((hash << 5) + hash) + (*buf++);
-	}
-	return hash;
+	int *id = malloc( sizeof( int ) );
+	*id = LCUI_BindEvent( e, func, NULL, NULL );
+	LinkedList_Append( &self.events, id );
 }
-
-static int Dict_KeyCompare( void *privdata, const void *key1, const void *key2 )
-{
-	if( strcmp( key1, key2 ) == 0 ) {
-		return 1;
-	}
-	return 0;
-}
-
-static void *Dict_KeyDup( void *privdata, const void *key )
-{
-	int len = strlen( key ) + 1;
-	char *newkey = malloc( len * sizeof( char ) );
-	strncpy( newkey, key, len );
-	return newkey;
-}
-
-static void *Dict_ValueDup( void *privdata, const void *val )
-{
-	int *newval = malloc( sizeof( int ) );
-	*newval = *((int*)val);
-	return newval;
-}
-
-static void Dict_KeyDestructor( void *privdata, void *key )
-{
-	free( key );
-}
-
-static void Dict_ValueDestructor( void *privdata, void *val )
-{
-	free( val );
-}
-
-static DictType DictType_String = {
-	Dict_KeyHash,
-	Dict_KeyDup,
-	Dict_ValueDup,
-	Dict_KeyCompare,
-	Dict_KeyDestructor,
-	Dict_ValueDestructor
-};
 
 void LCUIWidget_InitEvent(void)
 {
@@ -1067,6 +1034,8 @@ void LCUIWidget_InitEvent(void)
 	LCUIMutex_Init( &self.mutex );
 	RBTree_Init( &self.event_names );
 	RBTree_Init( &self.event_records );
+	LinkedList_Init( &self.events );
+	LinkedList_Init( &self.event_mappings );
 	self.targets[WST_ACTIVE] = NULL;
 	self.targets[WST_HOVER] = NULL;
 	self.targets[WST_FOCUS] = NULL;
@@ -1077,31 +1046,38 @@ void LCUIWidget_InitEvent(void)
 	self.click.widget= NULL;
 	self.click.interval = DBLCLICK_INTERVAL;
 	self.base_event_id = WET_USER + 1000;
-	self.event_ids = Dict_Create( &DictType_String, NULL );
+	self.event_ids = Dict_Create( &DictType_StringKey, NULL );
 	n = sizeof( mappings ) / sizeof( mappings[0] );
 	for( i = 0; i < n; ++i ) {
 		LCUIWidget_SetEventName( mappings[i].id, mappings[i].name );
 	}
-	LCUI_BindEvent( LCUI_MOUSEWHEEL, OnMouseEvent, NULL, NULL );
-	LCUI_BindEvent( LCUI_MOUSEDOWN, OnMouseEvent, NULL, NULL );
-	LCUI_BindEvent( LCUI_MOUSEMOVE, OnMouseEvent, NULL, NULL );
-	LCUI_BindEvent( LCUI_MOUSEUP, OnMouseEvent, NULL, NULL );
-	LCUI_BindEvent( LCUI_KEYPRESS, OnKeyboardEvent, NULL, NULL );
-	LCUI_BindEvent( LCUI_KEYDOWN, OnKeyboardEvent, NULL, NULL );
-	LCUI_BindEvent( LCUI_KEYUP, OnKeyboardEvent, NULL, NULL );
-	LCUI_BindEvent( LCUI_TOUCH, OnTouch, NULL, NULL );
-	LCUI_BindEvent( LCUI_TEXTINPUT, OnTextInput, NULL, NULL );
+	BindSysEvent( LCUI_MOUSEWHEEL, OnMouseEvent );
+	BindSysEvent( LCUI_MOUSEDOWN, OnMouseEvent );
+	BindSysEvent( LCUI_MOUSEMOVE, OnMouseEvent );
+	BindSysEvent( LCUI_MOUSEUP, OnMouseEvent );
+	BindSysEvent( LCUI_KEYPRESS, OnKeyboardEvent );
+	BindSysEvent( LCUI_KEYDOWN, OnKeyboardEvent );
+	BindSysEvent( LCUI_KEYUP, OnKeyboardEvent );
+	BindSysEvent( LCUI_TOUCH, OnTouch );
+	BindSysEvent( LCUI_TEXTINPUT, OnTextInput );
 	RBTree_OnCompare( &self.event_records, CompareEventRecord );
 	LinkedList_Init( &self.touch_capturers );
 }
 
-void LCUIWidget_ExitEvent(void)
+void LCUIWidget_ExitEvent( void )
 {
+	LinkedListNode *node;
 	LCUIMutex_Lock( &self.mutex );
+	for( LinkedList_Each( node, &self.events ) ) {
+		int *id = node->data;
+		LCUI_UnbindEvent( *id );
+	}
 	RBTree_Destroy( &self.event_names );
 	RBTree_Destroy( &self.event_records );
 	Dict_Release( self.event_ids );
 	TouchCapturers_Clear( &self.touch_capturers );
+	LinkedList_Clear( &self.events, free );
+	LinkedList_Clear( &self.event_mappings, DestroyEventMapping );
 	LCUIMutex_Unlock( &self.mutex );
 	LCUIMutex_Destroy( &self.mutex );
 }

@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * timer.c -- timer support.
  *
- * Copyright (C) 2013-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2013-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * timer.c -- 定时器支持
  *
- * 版权所有 (C) 2013-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2013-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -123,6 +123,7 @@ static void TimerThread( void *arg )
 	LinkedListNode *node;
 	LCUI_AppTaskRec task = {0};
 	LCUIMutex_Lock( &self.mutex );
+	LOG( "[timer] timer thread is working\n" );
 	while( self.is_running ) {
 		Timer timer = NULL;
 		for( LinkedList_Each( node, &self.timer_list ) ) {
@@ -163,8 +164,8 @@ static void TimerThread( void *arg )
 		/* 添加该任务至指定程序的任务队列 */
 		LCUI_PostTask( &task );
 	}
+	LOG( "[timer] timer thread stopped working\n" );
 	LCUIMutex_Unlock( &self.mutex );
-	LCUIThread_Exit( NULL );
 }
 
 static Timer TimerList_Find( int timer_id )
@@ -285,6 +286,7 @@ int LCUITimer_Reset( int timer_id, long int n_ms )
 
 void LCUI_InitTimer( void )
 {
+	LOG( "[timer] init ...\n" );
 	LCUITime_Init();
 	LCUIMutex_Init( &self.mutex );
 	LCUICond_Init( &self.sleep_cond );

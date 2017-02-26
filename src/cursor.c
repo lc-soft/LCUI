@@ -116,11 +116,12 @@ void LCUI_InitCursor( void )
 	Graph_Init( &cursor.graph );
 	/* 载入自带的游标的图形数据 */
 	LCUICursor_LoadDefualtGraph( &pic );
-	LCUICursor_SetGraph( &pic );
 	cursor.new_pos.x = LCUIDisplay_GetWidth() / 2;
 	cursor.new_pos.y = LCUIDisplay_GetHeight() / 2;
 	LCUI_BindEvent( LCUI_MOUSEMOVE, OnMouseMoveEvent, NULL, NULL );
+	LCUICursor_SetGraph( &pic );
 	LCUICursor_Show();
+	Graph_Free( &pic );
 }
 
 void LCUI_ExitCursor( void )

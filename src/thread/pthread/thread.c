@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * thread.c -- the pthread edition thread opreation set.
  *
- * Copyright (C) 2013-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2013-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * thread.c -- pthread版的线程操作集
  *
- * 版权所有 (C) 2013-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2013-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -38,40 +38,38 @@
  * ****************************************************************************/
 
 #include <stdlib.h>
+#include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
 
 #ifdef LCUI_THREAD_PTHREAD
 
-typedef struct _arglist {
+typedef struct LCUI_ThreadTaskRec {
 	void (*func)(void*);
 	void *arg;
-} arglist;
+} LCUI_ThreadTaskRec, *LCUI_ThreadTask;
 
-static void *run_thread(void *arg)
+static void *LCUIThread_RunTask( void *arg )
 {
-	arglist *ptr;
-	ptr = (arglist*)arg;
-	ptr->func( ptr->arg );
-	free( ptr );
-	pthread_exit(NULL);
+	LCUI_ThreadTask task = arg;
+	task->func( task->arg );
+	free( task );
+	pthread_exit( NULL );
 }
 
 int LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 {
 	int ret;
-	arglist *list;
-
-	list = malloc( sizeof(arglist) );
-	if( !list ) {
-		return -1;
+	ASSIGN( task, LCUI_ThreadTask );
+	if( !task ) {
+		return -ENOMEM;
 	}
-	list->func = func;
-	list->arg = arg;
-	ret = pthread_create( thread, NULL, run_thread, list );
+	task->func = func;
+	task->arg = arg;
+	ret = pthread_create( thread, NULL, LCUIThread_RunTask, task );
 	if( ret != 0 ) {
-		free( list );
+		free( task );
 	}
 	return ret;
 }

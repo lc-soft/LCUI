@@ -118,6 +118,7 @@ int LCUI_InitImageReader( LCUI_ImageReader reader )
 		if( ret == 0 ) {
 			return 0;
 		}
+		LCUI_DestroyImageReader( reader );
 	}
 	reader->fn_rewind( reader->stream_data );
 	reader->type = LCUI_UNKNOWN_READER;

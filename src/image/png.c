@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * png.c -- LCUI PNG image file processing module.
  *
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * png.c -- LCUI的PNG图像文件读写支持模块。
  *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -66,6 +66,7 @@ static void DestroyPNGReader( void *data )
 		png_destroy_read_struct( &reader->png_ptr,
 					 &reader->info_ptr, NULL );
 	}
+	free( reader );
 }
 
 static void PNGReader_OnRead( png_structp png_ptr,

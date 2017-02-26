@@ -144,6 +144,7 @@ static void DestroySysEventHandler( void *arg )
 		handler->destroy_data( handler->data );
 	}
 	handler->data = NULL;
+	free( arg );
 }
 
 int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
@@ -563,12 +564,12 @@ int LCUI_Destroy( void )
 	System.state = STATE_KILLED;
 	LCUI_ExitIME();
 	LCUI_ExitKeyboard();
-	LCUI_ExitEvent();
 	LCUI_ExitCursor();
 	LCUI_ExitWidget();
 	LCUI_ExitFont();
 	LCUI_ExitTimer();
 	LCUI_ExitDisplay();
+	LCUI_ExitEvent();
 	LCUI_ExitApp();
 	return 0;
 }
