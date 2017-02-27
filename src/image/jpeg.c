@@ -209,6 +209,7 @@ int LCUI_InitJPEGReader( LCUI_ImageReader reader )
 	cinfo->src = (struct jpeg_source_mgr*)jpeg_reader;
 	cinfo->err = jpeg_std_error( &jpeg_reader->err.pub );
 	jpeg_reader->err.pub.error_exit = JPEGReader_OnErrorExit;
+	jpeg_reader->err.reader = reader;
 	return 0;
 #else
 	LOG( "warning: not JPEG support!" );
