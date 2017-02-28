@@ -1732,7 +1732,8 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 			}
 			child->origin_x = ctx.x;
 			ctx.x += child->box.outer.width;
-			if( ctx.x > ctx.max_width ) {
+			/* 只考虑小数点后两位 */
+			if( ctx.x - ctx.max_width >= 0.01 ) {
 				child->origin_x = 0;
 				ctx.y += ctx.line_height;
 				ctx.x = child->box.outer.width;
