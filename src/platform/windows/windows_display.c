@@ -80,7 +80,8 @@ struct LCUI_SurfaceRec_ {
 	HWND hwnd;				/**< windows 窗口句柄 */
 	int mode;				/**< 渲染模式 */
 	int width, height;			/**< 窗口宽高 */
-	HDC fb_hdc;				/**< 设备上下文 */
+	HDC hdc_fb;				/**< 帧缓存的设备上下文 */
+	HDC hdc_client;				/**< 窗口的设备上下文 */
 	HBITMAP fb_bmp;				/**< 帧缓存 */
 	LCUI_BOOL is_ready;			/**< 是否已经准备好 */
 	LCUI_Graph fb;				/**< 帧缓存，保存当前窗口内呈现的图像内容 */
@@ -112,14 +113,18 @@ static void WinSurface_ExecDestroy( LCUI_Surface surface )
 	surface->width = 0;
 	surface->height = 0;
 	if( surface->hwnd ) {
-		if( surface->fb_hdc ) {
-			ReleaseDC( surface->hwnd, surface->fb_hdc );
+		if( surface->hdc_fb ) {
+			ReleaseDC( surface->hwnd, surface->hdc_fb );
+		}
+		if( surface->hdc_client ) {
+			ReleaseDC( surface->hwnd, surface->hdc_client );
 		}
 	}
 	if( surface->fb_bmp ) {
 		DeleteObject( surface->fb_bmp );
 	}
-	surface->fb_hdc = NULL;
+	surface->hdc_fb = NULL;
+	surface->hdc_client = NULL;
 	surface->fb_bmp = NULL;
 	surface->hwnd = NULL;
 	Graph_Free( &surface->fb );
@@ -140,7 +145,6 @@ static void WinSurface_Close( LCUI_Surface surface )
 
 static void OnCreateSurface( void *arg1, void *arg2 )
 {
-	HDC hdc_client;
 	HINSTANCE instance;
 	LCUI_DisplayEventRec ev;
 	LCUI_Surface surface = arg1;
@@ -156,9 +160,9 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 		0, 0, NULL, NULL,
 		instance, NULL
 	);
-	hdc_client = GetDC( surface->hwnd );
 	RegisterTouchWindow( surface->hwnd, 0 );
-	surface->fb_hdc = CreateCompatibleDC( hdc_client );
+	surface->hdc_client = GetDC( surface->hwnd );
+	surface->hdc_fb = CreateCompatibleDC( surface->hdc_client );
 	surface->is_ready = TRUE;
 	DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 	LCUI_SetMainWindow( surface->hwnd );
@@ -174,7 +178,8 @@ static LCUI_Surface WinSurface_New( void )
 	surface = NEW( struct LCUI_SurfaceRec_, 1 );
 	surface->mode = RENDER_MODE_BIT_BLT;
 	surface->hwnd = NULL;
-	surface->fb_hdc = NULL;
+	surface->hdc_fb = NULL;
+	surface->hdc_client = NULL;
 	surface->fb_bmp = NULL;
 	surface->is_ready = FALSE;
 	surface->node.data = surface;
@@ -213,7 +218,6 @@ static void WinSurface_Move( LCUI_Surface surface, int x, int y )
 static void WinSurface_ExecResizeFrameBuffer( LCUI_Surface surface,
 					      int w, int h )
 {
-	HDC hdc_client;
 	HBITMAP old_bmp;
 	LCUI_Rect rect;
 
@@ -221,9 +225,8 @@ static void WinSurface_ExecResizeFrameBuffer( LCUI_Surface surface,
 		return;
 	}
 	Graph_Create( &surface->fb, w, h );
-	hdc_client = GetDC( surface->hwnd );
-	surface->fb_bmp = CreateCompatibleBitmap( hdc_client, w, h );
-	old_bmp = (HBITMAP)SelectObject( surface->fb_hdc, surface->fb_bmp );
+	surface->fb_bmp = CreateCompatibleBitmap( surface->hdc_client, w, h );
+	old_bmp = (HBITMAP)SelectObject( surface->hdc_fb, surface->fb_bmp );
 	if( old_bmp ) {
 		DeleteObject( old_bmp );
 	}
@@ -341,24 +344,24 @@ static void WinSurface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_c
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
 static void WinSurface_Present( LCUI_Surface surface )
 {
-	HDC hdc_client;
 	RECT client_rect;
 
 	DEBUG_MSG( "surface: %p, hwnd: %p\n", surface, surface->hwnd );
-	hdc_client = GetDC( surface->hwnd );
-	SetBitmapBits( surface->fb_bmp, surface->fb.mem_size, surface->fb.bytes );
+	SetBitmapBits( surface->fb_bmp,
+		       surface->fb.mem_size, surface->fb.bytes );
 	switch( surface->mode ) {
 	case RENDER_MODE_STRETCH_BLT:
 		GetClientRect( surface->hwnd, &client_rect );
-		StretchBlt( hdc_client, 0, 0,
+		StretchBlt( surface->hdc_client, 0, 0,
 			    client_rect.right, client_rect.bottom,
-			    surface->fb_hdc, 0, 0,
+			    surface->hdc_fb, 0, 0,
 			    surface->width, surface->height, SRCCOPY );
 		break;
 	case RENDER_MODE_BIT_BLT:
 	default:
-		BitBlt( hdc_client, 0, 0, surface->width, surface->height,
-			surface->fb_hdc, 0, 0, SRCCOPY );
+		BitBlt( surface->hdc_client, 0, 0,
+			surface->width, surface->height,
+			surface->hdc_fb, 0, 0, SRCCOPY );
 		break;
 	}
 	ValidateRect( surface->hwnd, NULL );
