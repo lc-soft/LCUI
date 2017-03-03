@@ -46,7 +46,9 @@
 /** 事件绑定记录 */
 typedef struct LCUI_EventRecordRec_ {
 	int id;				/**< 事件标识号 */
+	LCUI_BOOL blocked;		/**< 是否已经锁定 */
 	LinkedList handlers;		/**< 事件处理器列表 */
+	LinkedList trash;		/**< 待移除的处理器列表 */
 } LCUI_EventRecordRec, *LCUI_EventRecord;
 
 /** 事件处理器 */
@@ -80,7 +82,24 @@ static void DestroyEventRecord( void *data )
 			DestroyEventHandler( node->data );
 		}
 	}
+	LinkedList_Clear( &record->trash, NULL );
 	free( record );
+}
+
+
+static void EventTrigger_RemoveHandler( LCUI_EventTrigger trigger,
+					LCUI_EventHandler handler )
+{
+	LCUI_EventRecord record = handler->record;
+	if( record->blocked ) {
+		LinkedList_Append( &record->trash, handler );
+	} else {
+		RBTree_Erase( &trigger->handlers, handler->id );
+		DestroyEventHandler( handler );
+		if( record->handlers.length < 1 ) {
+			RBTree_Erase( &trigger->events, record->id );
+		}
+	}
 }
 
 LCUI_EventTrigger EventTrigger( void )
@@ -109,8 +128,10 @@ int EventTrigger_Bind( LCUI_EventTrigger trigger, int event_id,
 	record = RBTree_GetData( &trigger->events, event_id );
 	if( !record ) {
 		record = NEW( LCUI_EventRecordRec, 1 );
-		LinkedList_Init( &record->handlers );
 		record->id = event_id;
+		record->blocked = FALSE;
+		LinkedList_Init( &record->trash );
+		LinkedList_Init( &record->handlers );
 		RBTree_Insert( &trigger->events, event_id, record );
 	}
 	handler = NEW( LCUI_EventHandlerRec, 1 );
@@ -140,35 +161,20 @@ int EventTrigger_Unbind( LCUI_EventTrigger trigger, int event_id,
 		if( handler->func != func ) {
 			continue;
 		}
-		RBTree_Erase( &trigger->handlers, handler->id );
-		DestroyEventHandler( handler );
-		break;
+		EventTrigger_RemoveHandler( trigger, handler );
+		return 0;
 	}
-	if( record->handlers.length < 1 ) {
-		RBTree_Erase( &trigger->events, record->id );
-	}
-	if( !node ) {
-		return -1;
-	}
-	return 0;
+	return -1;
 }
 
 int EventTrigger_Unbind2( LCUI_EventTrigger trigger, int handler_id )
 {
-	RBTreeNode *node;
-	LCUI_EventRecord record;
 	LCUI_EventHandler handler;
-	node = RBTree_Search( &trigger->handlers, handler_id );
-	if( !node ) {
+	handler = RBTree_GetData( &trigger->handlers, handler_id );
+	if( !handler ) {
 		return -1;
 	}
-	handler = node->data;
-	record = handler->record;
-	RBTree_Erase( &trigger->handlers, handler->id );
-	DestroyEventHandler( handler );
-	if( record->handlers.length < 1 ) {
-		RBTree_Erase( &trigger->events, record->id );
-	}
+	EventTrigger_RemoveHandler( trigger, handler );
 	return 0;
 }
 
@@ -187,11 +193,7 @@ int EventTrigger_Unbind3( LCUI_EventTrigger trigger, int event_id,
 		if( !compare_func( key, handler->data ) ) {
 			continue;
 		}
-		RBTree_Erase( &trigger->handlers, handler->id );
-		DestroyEventHandler( handler );
-		if( record->handlers.length < 1 ) {
-			RBTree_Erase( &trigger->events, record->id );
-		}
+		EventTrigger_RemoveHandler( trigger, handler );
 		return 0;
 	}
 	return -1;
@@ -203,24 +205,27 @@ int EventTrigger_Trigger( LCUI_EventTrigger trigger, int event_id, void *arg )
 	LCUI_EventRec e;
 	LCUI_EventHandler handler;
 	LCUI_EventRecord record;
-	LinkedListNode *node, *next;
+	LinkedListNode *node;
 	record = RBTree_GetData( &trigger->events, event_id );
 	if( !record ) {
 		return count;
 	}
 	e.type = event_id;
-	node = record->handlers.head.next;
-	while( node ) {
-		/*
-		 * 考虑到事件处理器中会有事件解绑操作的情况，为避免解绑后访问无效
-		 * 的结点数据，这里用 next 指针预先保存下个结点 
-		 */
-		next = node->next;
+	record->blocked = TRUE;
+	for( LinkedList_Each( node, &record->handlers ) ) {
 		handler = node->data;
 		e.data = handler->data;
 		handler->func( &e, arg );
-		node = next;
 		++count;
+	}
+	record->blocked = FALSE;
+	for( LinkedList_Each( node, &record->trash ) ) {
+		handler = node->data;
+		RBTree_Erase( &trigger->handlers, handler->id );
+		DestroyEventHandler( handler );
+	}
+	if( record->handlers.length < 1 ) {
+		RBTree_Erase( &trigger->events, record->id );
 	}
 	return count;
 }

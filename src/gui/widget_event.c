@@ -67,7 +67,6 @@ typedef struct LCUI_WidgetEventPackRec_ {
 	void (*destroy_data)(void*);	/**< 数据的销毁函数 */
 	LCUI_Widget widget;		/**< 当前处理该事件的部件 */
 	LCUI_WidgetEventRec event;	/**< 事件数据 */
-	LCUI_BOOL is_direct_run;	/**< 是否直接处理该事件 */
 } LCUI_WidgetEventPackRec, *LCUI_WidgetEventPack;
 
 enum WidgetStatusType {
@@ -262,30 +261,6 @@ static void DestroyWidgetEventPack( void *arg )
 	free( pack );
 }
 
-/** 响应原始事件 */
-static void OnWidgetEvent( LCUI_Event e, void *arg )
-{
-	LCUI_AppTaskRec task;
-	LCUI_WidgetEventPack pack = arg;
-	/* 如果需要直接执行 */
-	if( pack->is_direct_run ) {
-		WidgetEventTranslator( e, pack );
-		return;
-	}
-	/* 准备任务 */
-	task.func = (LCUI_AppTaskFunc)WidgetEventTranslator;
-	task.arg[0] = malloc( sizeof( LCUI_EventRec ) );
-	task.arg[1] = malloc( sizeof( LCUI_WidgetEventPackRec ) );
-	/* 这两个参数都需要在任务执行完后释放 */
-	task.destroy_arg[0] = free;
-	task.destroy_arg[1] = DestroyWidgetEventPack;
-	/* 复制所需数据，因为在本函数退出后，这两个参数会被销毁 */
-	*((LCUI_Event)task.arg[0]) = *e;
-	CopyWidgetEventPack( task.arg[1], pack );
-	/* 把任务扔给当前跑主循环的线程 */
-	LCUI_PostTask( &task );
-}
-
 static void DestroyTouchCapturer( void *arg )
 {
 	TouchCapturer tc = arg;
@@ -417,16 +392,17 @@ int LCUIWidget_GetEventId( const char *event_name )
 
 int Widget_BindEventById( LCUI_Widget widget, int event_id,
 			  LCUI_WidgetEventFunc func, void *data,
-			  void (*destroy_data)(void*) )
+			  void( *destroy_data )(void*) )
 {
 	WidgetEventHandler handler;
-	handler = NEW(WidgetEventHandlerRec, 1);
+	handler = NEW( WidgetEventHandlerRec, 1 );
 	handler->func = func;
 	handler->data = data;
 	handler->destroy_data = destroy_data;
-	DEBUG_MSG("event: %s, task: %p\n", event_name, task);
-	return EventTrigger_Bind( widget->trigger, event_id, OnWidgetEvent,
-				  handler, DestroyWidgetEventHandler);
+	DEBUG_MSG( "event: %s, task: %p\n", event_name, task );
+	return EventTrigger_Bind( widget->trigger, event_id,
+				  (LCUI_EventFunc)WidgetEventTranslator,
+				  handler, DestroyWidgetEventHandler );
 }
 
 int Widget_BindEvent( LCUI_Widget widget, const char *event_name,
@@ -488,17 +464,9 @@ static LCUI_Widget Widget_GetNextAt( LCUI_Widget widget, int x, int y )
 	return NULL;
 }
 
-static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
-				  void *data, void (*destroy_data)(void*),
-				  LCUI_BOOL direct_run )
+static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack )
 {
-	LCUI_WidgetEventPackRec pack;
-
-	pack.event = *e;
-	pack.data = data;
-	pack.widget = widget;
-	pack.is_direct_run = direct_run;
-	pack.destroy_data = destroy_data;
+	LCUI_WidgetEvent e = &pack->event;
 	switch( e->type ) {
 	case WET_CLICK:
 	case WET_MOUSEDOWN:
@@ -511,22 +479,23 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 		}
 	default:
 		if( 0 < EventTrigger_Trigger( widget->trigger, 
-					      e->type, &pack ) ) {
+					      e->type, pack ) ) {
 			return 0;
 		}
 		if( !widget->parent || e->cancel_bubble ) {
 			return -1;
 		}
 		/* 如果事件投递失败，则向父级部件冒泡 */
-		return Widget_TriggerEventEx( widget->parent, e, data, 
-					      destroy_data, direct_run );
+		return Widget_TriggerEventEx( widget->parent, pack );
 	}
 	if( !widget->parent || e->cancel_bubble ) {
 		return -1;
 	}
-	if( widget->computed_style.pointer_events == SV_NONE ) {
-		int pointer_x, pointer_y;
+	while( widget->computed_style.pointer_events == SV_NONE ) {
+		LCUI_Widget w;
 		LCUI_BOOL is_pointer_event = TRUE;
+		int x, y, pointer_x, pointer_y;
+
 		switch( e->type ) {
 		case WET_CLICK:
 		case WET_MOUSEDOWN:
@@ -544,40 +513,68 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEvent e,
 			is_pointer_event = FALSE;
 			break;
 		}
-		if( is_pointer_event ) {
-			int x, y;
-			LCUI_Widget w;
-			Widget_GetAbsXY( widget->parent, NULL, &x, &y );
-			/* 转换成相对于父级部件内容框的坐标 */
-			x = pointer_x - x;
-			y = pointer_y - y;
-			/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
-			w = Widget_GetNextAt( widget, x, y );
-			if( w ) {
-				return EventTrigger_Trigger( w->trigger, 
-							     e->type, &pack );
-			}
+		if( !is_pointer_event ) {
+			break;
 		}
+		Widget_GetAbsXY( widget->parent, NULL, &x, &y );
+		/* 转换成相对于父级部件内容框的坐标 */
+		x = pointer_x - x;
+		y = pointer_y - y;
+		/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
+		w = Widget_GetNextAt( widget, x, y );
+		if( !w ) {
+			break;
+		}
+		return EventTrigger_Trigger( w->trigger, e->type, pack );
 	}
-	return Widget_TriggerEventEx( widget->parent, e, data, 
-				      destroy_data, direct_run );
+	return Widget_TriggerEventEx( widget->parent, pack );
 }
 
-int Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data,
-		      void (*destroy_data)(void*))
+static void OnWidgetEvent( LCUI_Event e, LCUI_WidgetEventPack pack )
 {
-	if( !e->target ) {
-		e->target = widget;
+	EventTrigger_Trigger( pack->widget->trigger, e->type, pack );
+}
+
+LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
+			    void *data, void( *destroy_data )(void*) )
+{
+	LCUI_EventRec sys_ev;
+	LCUI_AppTaskRec task;
+	ASSIGN( pack, LCUI_WidgetEventPack );
+	if( !ev->target ) {
+		ev->target = widget;
 	}
-	return Widget_TriggerEventEx( widget, e, data, destroy_data, FALSE );
+	sys_ev.data = pack;
+	sys_ev.type = ev->type;
+	pack->event = *ev;
+	pack->data = data;
+	pack->widget = widget;
+	pack->destroy_data = destroy_data;
+	/* 准备任务 */
+	task.func = (LCUI_AppTaskFunc)OnWidgetEvent;
+	task.arg[0] = malloc( sizeof( LCUI_EventRec ) );
+	task.arg[1] = malloc( sizeof( LCUI_WidgetEventPackRec ) );
+	/* 这两个参数都需要在任务执行完后释放 */
+	task.destroy_arg[0] = free;
+	task.destroy_arg[1] = DestroyWidgetEventPack;
+	/* 复制所需数据，因为在本函数退出后，这两个参数会被销毁 */
+	*((LCUI_Event)task.arg[0]) = sys_ev;
+	CopyWidgetEventPack( task.arg[1], pack );
+	/* 把任务扔给当前跑主循环的线程 */
+	return LCUI_PostTask( &task );
 }
 
 int Widget_TriggerEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data )
 {
+	LCUI_WidgetEventPackRec pack;
 	if( !e->target ) {
 		e->target = widget;
 	}
-	return Widget_TriggerEventEx( widget, e, data, NULL, TRUE );
+	pack.event = *e;
+	pack.data = data;
+	pack.widget = widget;
+	pack.destroy_data = NULL;
+	return Widget_TriggerEventEx( widget, &pack );
 }
 
 int Widget_StopEventPropagation(LCUI_Widget widget )
@@ -707,7 +704,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 {
 	LCUI_Pos pos;
 	LCUI_Widget target, w;
-	LCUI_WidgetEventRec ev;
+	LCUI_WidgetEventRec ev = { 0 };
 	w = LCUIWidget_GetRoot();
 	LCUICursor_GetPos( &pos );
 	if( self.mouse_capturer ) {
@@ -806,7 +803,7 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 
 static void OnKeyboardEvent( LCUI_SysEvent e, void *arg )
 {
-	LCUI_WidgetEventRec ev;
+	LCUI_WidgetEventRec ev = { 0 };
 	if( !self.targets[WST_FOCUS] ) {
 		return;
 	}
@@ -825,7 +822,7 @@ static void OnKeyboardEvent( LCUI_SysEvent e, void *arg )
 /** 响应输入法的输入 */
 static void OnTextInput( LCUI_SysEvent e, void *arg )
 {
-	LCUI_WidgetEventRec ev;
+	LCUI_WidgetEventRec ev = { 0 };
 	LCUI_Widget target = LCUIIME_GetTarget();
 	if( !target ) {
 		return;
@@ -860,7 +857,7 @@ static int DispatchTouchEvent( LinkedList *capturers,
 			       LCUI_TouchPoint points, int n_points )
 {
 	int i, count;
-	LCUI_WidgetEventRec ev;
+	LCUI_WidgetEventRec ev = { 0 };
 	LCUI_Widget target, root, w;
 	LinkedListNode *node, *ptnode;
 
@@ -977,7 +974,7 @@ int Widget_ReleaseTouchCapture( LCUI_Widget w, int point_id )
 int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 {
 	LCUI_Widget root;
-	LCUI_WidgetEventRec e;
+	LCUI_WidgetEventRec e = { 0 };
 	int *n = (int*)&event_type;
 	root = LCUIWidget_GetRoot();
 	if( w->parent != root && w != root ) {
