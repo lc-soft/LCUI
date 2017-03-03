@@ -444,6 +444,7 @@ void TextEdit_SetUsingStyleTags( LCUI_Widget widget, LCUI_BOOL is_true )
 void TextEdit_SetMultiline( LCUI_Widget widget, LCUI_BOOL is_true )
 {
 	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
+	TextLayer_SetMultiline( edit->layer_placeholder, is_true );
 	TextLayer_SetMultiline( edit->layer_source, is_true );
 	TextLayer_SetMultiline( edit->layer_mask, is_true );
 	edit->is_multiline_mode = is_true;
@@ -454,7 +455,7 @@ void TextEdit_ClearText( LCUI_Widget widget )
 	LCUI_TextEdit edit;
 	edit = Widget_GetData( widget, self.prototype );
 	LCUIMutex_Lock( &edit->mutex );
-	TextLayer_ClearText( edit->layer );
+	TextLayer_ClearText( edit->layer_source );
 	StyleTags_Clear( &edit->text_tags );
 	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask( widget, WTT_USER );
