@@ -61,7 +61,7 @@ enum LCUI_ImageReaderType {
 #define LCUI_JPEG_IMAGE		LCUI_JPEG_READER
 #define LCUI_BMP_IMAGE		LCUI_BMP_READER
 
-#define LCUI_SetImageReaderJump(X) (X)->env && setjmp(*((X)->env))
+#define LCUI_SetImageReaderJump(READER) (READER)->env && setjmp(*((READER)->env))
 
 typedef struct LCUI_ImageHeaderRec_ {
 	int type;

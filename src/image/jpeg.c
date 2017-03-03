@@ -76,8 +76,10 @@ static void DestroyJPEGReader( void *data )
 
 METHODDEF( void ) JPEGReader_OnErrorExit( j_common_ptr cinfo )
 {
+	char msg[JMSG_LENGTH_MAX];
 	LCUI_JPEGError err = (LCUI_JPEGError)cinfo->err;
-	cinfo->err->output_message( cinfo );
+	cinfo->err->format_message( cinfo, msg );
+	LOG( "%s\n", msg );
 	longjmp( *err->reader->env, 1 );
 }
 
