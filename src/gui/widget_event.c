@@ -399,7 +399,6 @@ int Widget_BindEventById( LCUI_Widget widget, int event_id,
 	handler->func = func;
 	handler->data = data;
 	handler->destroy_data = destroy_data;
-	DEBUG_MSG( "event: %s, task: %p\n", event_name, task );
 	return EventTrigger_Bind( widget->trigger, event_id,
 				  (LCUI_EventFunc)WidgetEventTranslator,
 				  handler, DestroyWidgetEventHandler );
@@ -532,7 +531,7 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack 
 
 static void OnWidgetEvent( LCUI_Event e, LCUI_WidgetEventPack pack )
 {
-	EventTrigger_Trigger( pack->widget->trigger, e->type, pack );
+	Widget_TriggerEventEx( pack->widget, pack );
 }
 
 LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
@@ -721,8 +720,8 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 			return;
 		}
 	}
-	ev.cancel_bubble = FALSE;
 	ev.target = target;
+	ev.cancel_bubble = FALSE;
 	switch( sys_ev->type ) {
 	case LCUI_MOUSEDOWN:
 		ev.type = WET_MOUSEDOWN;
