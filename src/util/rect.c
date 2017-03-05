@@ -1,8 +1,7 @@
 /* ***************************************************************************
  * rect.c -- Rectangle area handling
  *
- * Copyright (C) 2012-2014 by
- * Liu Chao
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,8 +22,7 @@
 /* ****************************************************************************
  * rect.c -- 矩形区域处理
  *
- * 版权所有 (C) 2012-2014 归属于
- * 刘超
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -106,6 +104,33 @@ void LCUIRect_ValidateArea( LCUI_Rect *rect, int box_w, int box_h )
 	}
 	if( rect->y + rect->height > box_h ) {
 		if( rect->y < box_h ) {
+			rect->height = box_h - rect->y;
+		} else {
+			rect->height = 0;
+		}
+	}
+}
+
+void LCUIRectF_ValidateArea( LCUI_RectF *rect, float box_w, float box_h )
+{
+	if( rect->x < 0.01 ) {
+		rect->width += rect->x;
+		rect->x = 0;
+	}
+	if( rect->y < 0.01 ) {
+		rect->height += rect->y;
+		rect->y = 0;
+	}
+
+	if( rect->x + rect->width - box_w > 0.01 ) {
+		if( rect->x - box_w < 0.01 ) {
+			rect->width = box_w - rect->x;
+		} else {
+			rect->width = 0;
+		}
+	}
+	if( rect->y + rect->height - box_h > 0.01 ) {
+		if( rect->y - box_h < 0.01 ) {
 			rect->height = box_h - rect->y;
 		} else {
 			rect->height = 0;
