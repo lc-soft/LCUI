@@ -113,24 +113,24 @@ void LCUIRect_ValidateArea( LCUI_Rect *rect, int box_w, int box_h )
 
 void LCUIRectF_ValidateArea( LCUI_RectF *rect, float box_w, float box_h )
 {
-	if( rect->x < 0.01 ) {
+	if( rect->x < 0 ) {
 		rect->width += rect->x;
 		rect->x = 0;
 	}
-	if( rect->y < 0.01 ) {
+	if( rect->y < 0 ) {
 		rect->height += rect->y;
 		rect->y = 0;
 	}
 
-	if( rect->x + rect->width - box_w > 0.01 ) {
-		if( rect->x - box_w < 0.01 ) {
+	if( rect->x + rect->width - box_w > 0 ) {
+		if( rect->x - box_w < 0 ) {
 			rect->width = box_w - rect->x;
 		} else {
 			rect->width = 0;
 		}
 	}
-	if( rect->y + rect->height - box_h > 0.01 ) {
-		if( rect->y - box_h < 0.01 ) {
+	if( rect->y + rect->height - box_h > 0 ) {
+		if( rect->y - box_h < 0 ) {
 			rect->height = box_h - rect->y;
 		} else {
 			rect->height = 0;

@@ -95,8 +95,8 @@ void Widget_InvalidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 {
 	LCUI_Rect rect;
 	Widget_AdjustArea( w, r, &rect, box_type );
-	DEBUG_MSG("[%s]: invalidRect:(%d,%d,%d,%d)\n", w->type, 
-		   rect.x, rect.y, rect.width, rect.height);
+	DEBUG_MSG( "[%s]: invalidRect:(%d,%d,%d,%d)\n", w->type,
+		   rect.x, rect.y, rect.width, rect.height );
 	RectList_Add( &w->dirty_rects, &rect );
 	while( w = w->parent, w ) {
 		w->has_dirty_child = TRUE;
@@ -116,13 +116,13 @@ LCUI_BOOL Widget_PushInvalidArea( LCUI_Widget widget,
 	}
 	Widget_AdjustArea( w, r, &rect, box_type );
 	rectf.x = rect.x + w->box.graph.x;
-	rectf.y = rect.x + w->box.graph.y;
+	rectf.y = rect.y + w->box.graph.y;
 	rectf.width = rect.width;
 	rectf.height = rect.height;
 	while( w && w->parent ) {
 		LCUIRectF_ValidateArea( &rectf, w->parent->box.padding.width,
 					w->parent->box.padding.height );
-		if( rect.width < 0.01 || rect.height < 0.01 ) {
+		if( rectf.width < 0.5 || rectf.height < 0.5 ) {
 			return FALSE;
 		}
 		w = w->parent;
