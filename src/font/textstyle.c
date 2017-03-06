@@ -70,7 +70,7 @@ void TextStyle_Init( LCUI_TextStyle *data )
 	data->style = FONT_STYLE_NORMAL;
 	data->weight = FONT_WEIGHT_NORMAL;
 	data->decoration = FONT_DECORATION_NONE;
-	data->fore_color.value = 0x33333333;
+	data->fore_color.value = 0xff333333;
 	data->back_color.value = 0xffffffff;
 	data->pixel_size = 13;
 }
