@@ -5,22 +5,15 @@
 #include "test.h"
 
 #ifdef LCUI_BUILD_IN_WIN32
-#include <io.h>
-#include <fcntl.h>
-
-static void InitConsoleWindow( void )
+static void LoggerHandler( const char *str )
 {
-	int hCrt;
-	FILE *hf;
-	AllocConsole();
-	hCrt = _open_osfhandle( (long)GetStdHandle( STD_OUTPUT_HANDLE ), _O_TEXT );
-	hf = _fdopen( hCrt, "w" );
-	*stdout = *hf;
-	setvbuf( stdout, NULL, _IONBF, 0 );
-	// test code
-	printf( "InitConsoleWindow OK!\n" );
+	OutputDebugStringA( str );
 }
 
+static void LoggerHandlerW( const wchar_t *str )
+{
+	OutputDebugStringW( str );
+}
 #endif
 
 int main(void)
@@ -28,7 +21,8 @@ int main(void)
 	int ret = 0;
 #ifdef LCUI_BUILD_IN_WIN32
 	_wchdir( L"F:\\代码库\\GitHub\\LCUI\\build\\VS2012\\LCUITest" );
-	InitConsoleWindow();
+	Logger_SetHandler( LoggerHandler );
+	Logger_SetHandlerW( LoggerHandlerW );
 #endif
 	ret |= test_string();
 	ret |= test_image_reader();/*
@@ -37,8 +31,5 @@ int main(void)
 	ret |= test_char_render();
 	ret |= test_string_render();*/
 	printf("test result code: %d\n", ret);
-#ifdef LCUI_BUILD_IN_WIN32
-	system( "pause" );
-#endif
 	return ret;
 }
