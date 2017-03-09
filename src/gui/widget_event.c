@@ -40,6 +40,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
@@ -77,10 +78,10 @@ enum WidgetStatusType {
 };
 
 /** 部件事件记录结点 */
-typedef struct EventRecordNodeRec_ {
+typedef struct WidgetEventRecordRec_ {
 	LCUI_Widget widget;	/**< 所属部件 */
 	LinkedList records;	/**< 事件记录列表 */
-} EventRecordNodeRec, *EventRecordNode;
+} WidgetEventRecordRec, *WidgetEventRecord;
 
 /** 事件标识号与名称的映射记录 */
 typedef struct EventMappingRec_ {
@@ -118,9 +119,9 @@ static void DestroyEventMapping( void *data )
 	free( mapping );
 }
 
-static int CompareEventRecord( void *data, const void *keydata )
+static int CompareWidgetEventRecord( void *data, const void *keydata )
 {
-	EventRecordNode node = data;
+	WidgetEventRecord node = data;
 	if( node->widget == (LCUI_Widget)keydata ) {
 		return 0;
 	} else if( node->widget < (LCUI_Widget)keydata ) {
@@ -140,37 +141,42 @@ static void DestroyWidgetEventHandler( void *arg )
 	free( handler );
 }
 
-/** 添加事件记录 */
-static void Widget_AddEventRecord( LCUI_Widget widget, LCUI_WidgetEvent e )
+/**
+ * 添加事件记录
+ * 记录当前待处理的事件和目标部件，方便在部件被销毁时清除待处理的事件
+ */
+static void Widget_AddEventRecord( LCUI_Widget widget,
+				   LCUI_WidgetEventPack pack )
 {
-	EventRecordNode node;
+	WidgetEventRecord record;
 	LCUIMutex_Lock( &self.mutex );
-	node = RBTree_CustomGetData( &self.event_records, widget );
-	if( !node ) {
-		node = NEW( EventRecordNodeRec, 1 );
-		LinkedList_Init( &node->records );
-		node->widget = widget;
-		RBTree_CustomInsert( &self.event_records, widget, node );
+	record = RBTree_CustomGetData( &self.event_records, widget );
+	if( !record ) {
+		record = NEW( WidgetEventRecordRec, 1 );
+		LinkedList_Init( &record->records );
+		record->widget = widget;
+		RBTree_CustomInsert( &self.event_records, widget, record );
 	}
-	LinkedList_Append( &node->records, e );
+	LinkedList_Append( &record->records, pack );
 	LCUIMutex_Unlock( &self.mutex );
 }
 
 /** 删除事件记录 */
-static int Widget_DeleteEventRecord( LCUI_Widget widget, LCUI_WidgetEvent e )
+static int Widget_DeleteEventRecord( LCUI_Widget widget,
+				     LCUI_WidgetEventPack pack )
 {
-	EventRecordNode enode;
+	WidgetEventRecord record;
 	LinkedListNode *node, *prev;
 	LCUIMutex_Lock( &self.mutex );
-	enode = RBTree_CustomGetData( &self.event_records, widget );
-	if( !enode ) {
+	record = RBTree_CustomGetData( &self.event_records, widget );
+	if( !record ) {
 		LCUIMutex_Unlock( &self.mutex );
 		return -1;
 	}
-	for( LinkedList_Each( node, &enode->records ) ) {
+	for( LinkedList_Each( node, &record->records ) ) {
 		prev = node->prev;
-		if( node->data == e ) {
-			LinkedList_DeleteNode( &enode->records, node );
+		if( node->data == pack ) {
+			LinkedList_DeleteNode( &record->records, node );
 			node = prev;
 		}
 	}
@@ -183,15 +189,13 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 {
 	WidgetEventHandler handler = e->data;
 	LCUI_Widget w = pack->widget;
+	if( !w ) {
+		return;
+	}
 	pack->event.type = e->type;
 	pack->event.data = handler->data;
-	Widget_AddEventRecord( w, &pack->event );
 	handler->func( w, &pack->event, pack->data );
-	Widget_DeleteEventRecord( w, &pack->event );
 	if( pack->event.cancel_bubble || !w->parent ) {
-		if( pack->data && pack->destroy_data ) {
-			pack->destroy_data( pack->data );
-		}
 		return;
 	}
 	w = w->parent;
@@ -200,48 +204,46 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 	EventTrigger_Trigger( w->trigger, e->type, pack );
 }
 
-/** 复制部件事件包 */
-static void CopyWidgetEventPack( LCUI_WidgetEventPack dst,
-				 const LCUI_WidgetEventPack src )
+/** 复制部件事件 */
+static int CopyWidgetEvent( LCUI_WidgetEvent dst,
+			    const LCUI_WidgetEvent src )
 {
 	int n;
 	size_t size;
-	LCUI_WidgetEvent e;
 
 	*dst = *src;
-	e = &dst->event;
-	switch( src->event.type ) {
+	switch( src->type ) {
 	case WET_TOUCH:
-		if( e->touch.n_points <= 0 ) {
+		if( dst->touch.n_points <= 0 ) {
 			break;
 		}
-		n = e->touch.n_points;
+		n = dst->touch.n_points;
 		size = sizeof( LCUI_TouchPointRec ) * n;
-		e->touch.points = malloc( size );
-		if( !e->touch.points ) {
-			return;
+		dst->touch.points = malloc( size );
+		NEW( LCUI_TouchPointRec, n );
+		if( !dst->touch.points ) {
+			return -ENOMEM;
 		}
-		memcpy( e->touch.points,
-			src->event.touch.points, size );
+		memcpy( dst->touch.points,
+			src->touch.points, size );
 		break;
 	case WET_TEXTINPUT:
-		if( !e->text.text ) {
-			return;
+		if( !dst->text.text ) {
+			break;
 		}
-		e->text.text = NEW( wchar_t, e->text.length + 1 );
-		if( !e->text.text ) {
-			return;
+		dst->text.text = NEW( wchar_t, dst->text.length + 1 );
+		if( !dst->text.text ) {
+			return -ENOMEM;
 		}
-		wcsncpy( e->text.text, e->text.text, e->text.length + 1 );
+		wcsncpy( dst->text.text, src->text.text,
+			 dst->text.length + 1 );
 	default:break;
 	}
+	return 0;
 }
 
-/** 销毁部件事件包 */
-static void DestroyWidgetEventPack( void *arg )
+static void DestroyWidgetEvent( LCUI_WidgetEvent e )
 {
-	LCUI_WidgetEventPack pack = arg;
-	LCUI_WidgetEvent e = &pack->event;
 	switch( e->type ) {
 	case WET_TOUCH:
 		if( e->touch.points ) {
@@ -258,6 +260,18 @@ static void DestroyWidgetEventPack( void *arg )
 		e->text.length = 0;
 		break;
 	}
+}
+
+/** 销毁部件事件包 */
+static void DestroyWidgetEventPack( void *arg )
+{
+	LCUI_WidgetEventPack pack = arg;
+	Widget_DeleteEventRecord( pack->event.target, pack );
+	if( pack->data && pack->destroy_data ) {
+		pack->destroy_data( pack->data );
+	}
+	DestroyWidgetEvent( &pack->event );
+	pack->data = NULL;
 	free( pack );
 }
 
@@ -466,6 +480,7 @@ static LCUI_Widget Widget_GetNextAt( LCUI_Widget widget, int x, int y )
 static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack )
 {
 	LCUI_WidgetEvent e = &pack->event;
+	pack->widget = widget;
 	switch( e->type ) {
 	case WET_CLICK:
 	case WET_MOUSEDOWN:
@@ -531,34 +546,39 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack 
 
 static void OnWidgetEvent( LCUI_Event e, LCUI_WidgetEventPack pack )
 {
-	Widget_TriggerEventEx( pack->widget, pack );
+	if( pack->widget ) {
+		Widget_TriggerEventEx( pack->widget, pack );
+	}
 }
 
 LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
 			    void *data, void( *destroy_data )(void*) )
 {
-	LCUI_EventRec sys_ev;
+	LCUI_Event sys_ev;
 	LCUI_AppTaskRec task;
-	ASSIGN( pack, LCUI_WidgetEventPack );
+	LCUI_WidgetEventPack pack;
+	if( widget->state == WSTATE_DELETED ) {
+		return FALSE;
+	}
 	if( !ev->target ) {
 		ev->target = widget;
 	}
-	sys_ev.data = pack;
-	sys_ev.type = ev->type;
-	pack->event = *ev;
-	pack->data = data;
-	pack->widget = widget;
-	pack->destroy_data = destroy_data;
 	/* 准备任务 */
 	task.func = (LCUI_AppTaskFunc)OnWidgetEvent;
 	task.arg[0] = malloc( sizeof( LCUI_EventRec ) );
 	task.arg[1] = malloc( sizeof( LCUI_WidgetEventPackRec ) );
 	/* 这两个参数都需要在任务执行完后释放 */
-	task.destroy_arg[0] = free;
 	task.destroy_arg[1] = DestroyWidgetEventPack;
-	/* 复制所需数据，因为在本函数退出后，这两个参数会被销毁 */
-	*((LCUI_Event)task.arg[0]) = sys_ev;
-	CopyWidgetEventPack( task.arg[1], pack );
+	task.destroy_arg[0] = free;
+	sys_ev = task.arg[0];
+	pack = task.arg[1];
+	sys_ev->data = pack;
+	sys_ev->type = ev->type;
+	pack->data = data;
+	pack->widget = widget;
+	pack->destroy_data = destroy_data;
+	CopyWidgetEvent( &pack->event, ev );
+	Widget_AddEventRecord( widget, pack );
 	/* 把任务扔给当前跑主循环的线程 */
 	return LCUI_PostTask( &task );
 }
@@ -578,18 +598,18 @@ int Widget_TriggerEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data )
 
 int Widget_StopEventPropagation(LCUI_Widget widget )
 {
-	LCUI_WidgetEvent e;
 	LinkedListNode *node;
-	EventRecordNode enode;
+	WidgetEventRecord record;
+	LCUI_WidgetEventPack pack;
 	LCUIMutex_Lock( &self.mutex );
-	enode = RBTree_CustomGetData( &self.event_records, widget );
-	if( !enode ) {
+	record = RBTree_CustomGetData( &self.event_records, widget );
+	if( !record ) {
 		LCUIMutex_Unlock( &self.mutex );
 		return -1;
 	}
-	for( LinkedList_Each( node, &enode->records ) ) {
-		e = node->data;
-		e->cancel_bubble = TRUE;
+	for( LinkedList_Each( node, &record->records ) ) {
+		pack = node->data;
+		pack->event.cancel_bubble = TRUE;
 	}
 	LCUIMutex_Unlock( &self.mutex );
 	return 0;
@@ -652,6 +672,19 @@ void LCUIWidget_ClearEventTarget( LCUI_Widget widget )
 {
 	int i;
 	LCUI_Widget w;
+	LinkedListNode *node;
+	WidgetEventRecord record;
+	LCUI_WidgetEventPack pack;
+	LCUIMutex_Lock( &self.mutex );
+	record = RBTree_CustomGetData( &self.event_records, widget );
+	if( record ) {
+		for( LinkedList_Each( node, &record->records ) ) {
+			pack = node->data;
+			pack->widget = NULL;
+			pack->event.cancel_bubble = TRUE;
+		}
+	}
+	LCUIMutex_Unlock( &self.mutex );
 	for( i = 0; i < WST_TOTAL; ++i ) {
 		if( !widget ) {
 			Widget_UpdateStatus( NULL, i );
@@ -1056,7 +1089,7 @@ void LCUIWidget_InitEvent(void)
 	BindSysEvent( LCUI_KEYUP, OnKeyboardEvent );
 	BindSysEvent( LCUI_TOUCH, OnTouch );
 	BindSysEvent( LCUI_TEXTINPUT, OnTextInput );
-	RBTree_OnCompare( &self.event_records, CompareEventRecord );
+	RBTree_OnCompare( &self.event_records, CompareWidgetEventRecord );
 	LinkedList_Init( &self.touch_capturers );
 }
 

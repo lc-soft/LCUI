@@ -109,8 +109,8 @@ typedef void(*LCUI_WidgetEventFunc)(LCUI_Widget, LCUI_WidgetEvent, void*);
 #define Widget_BlockEvent(WIDGET, FLAG) (WIDGET)->event_blocked = FLAG
 
 /** 触发事件，让事件处理器在主循环中调用 */
-LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
-			    void *data, void( *destroy_data )(void*) );
+LCUI_API LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
+				     void *data, void( *destroy_data )(void*) );
 
 /** 触发事件，直接调用事件处理器 */
 LCUI_API int Widget_TriggerEvent( LCUI_Widget widget,
