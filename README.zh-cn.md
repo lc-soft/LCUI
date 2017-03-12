@@ -9,16 +9,13 @@
 
 ## 说明
 
-LCUI 是一个简单的跨平台图形界面库，其诞生目的主要是方便作者开发图形界面程序，
-源代码主要由 C 语言编写，支持使用 XML 和 CSS 代码来描述图像界面，适用于开发一
-些简单的小程序，可以实现一些简单的效果，类似于这样：
+LCUI 是一个简单的跨平台图形界面库，其诞生目的主要是方便作者开发图形界面程序，源代码主要由 C 语言编写，支持使用 XML 和 CSS 代码来描述图像界面，适用于开发一些简单的小程序，可以实现一些简单的效果，类似于这样：
 
 ![example screenshot](https://lcui.lc-soft.io/static/images/feature-screenshot-02.png)
 
-LCUI 是一个自由软件项目，基于 [GNU通用公共许可协议](http://www.gnu.org/licenses/gpl-2.0.html) 
-发布，该许可协议要求 LCUI 及 LCUI 衍生软件无论以何种形式发布，都必须确保收受者
-能收到或得到该版本的源代码。此项目主要由作者利用闲余时间进行开发和维护，项目的
-活跃度通常会受到各种因素的影响，大多数时间内都处于低活跃度状态。
+LCUI 是一个自由软件项目，任何人都可以参与改进它，但由于它并不是由一个专业的团队在负责全职开发工作，开发进度非常慢，大多数的功能都是按作者的需求而开发的，因此，如果你遇到 BUG，或者想添加一些新功能，请尽量尝试自己手动处理，作者也非常乐意接受你在 GitHub 上通过 Pull Request 功能贡献的代码。如果你需要一个成熟稳定的图形界面解决方案，请使用主流的图形界面开发库。
+
+基于 [GNU通用公共许可协议](http://www.gnu.org/licenses/gpl-2.0.html) 发布，该许可协议要求 LCUI 及 LCUI 衍生软件无论以何种形式发布，都必须确保收受者能收到或得到该版本的源代码。此项目主要由作者利用闲余时间进行开发和维护，项目的活跃度通常会受到各种因素的影响，大多数时间内都处于低活跃度状态。
 
 请阅读 `docs/CHANGES.zh-cn.md` 文件了解新版本的更新内容。
 
@@ -28,9 +25,15 @@ LCUI 是一个自由软件项目，基于 [GNU通用公共许可协议](http://w
 
 项目主页：http://lcui.lc-soft.io
 
-联系邮箱：lc-soft@live.cn
+联系邮箱：root@lc-soft.io
 
 Github：https://github.com/lc-soft/LCUI
+
+## 许可
+
+LCUI 采用的开源许可证是 GNU 通用公共许可证第二版，简称 GPLv2。简而言之，你有权利使用、修改、传播 LCUI 的源代码，当你传播给其他人时，你也必须让他们对你传播的 LCUI 副本拥有同样的权利。另外需要注意的是，如果你的应用程序用到了 LCUI 的代码，并且想传播给其他人，那么除 Windows API、MFC、DirectX 等这类系统级的函数库外，该应用程序及其它依赖库的源代码都必须向他们公开。
+
+或许该许可协议在国内没有多大作用，如果你不想遵循该许可协议，那么使用 LCUI 也就意味着你需要独自解决它带来的各种问题，例如：功能缺陷、偶尔崩溃、性能和内存占用等问题，作者不承担任何责任，也不要试图联系作者协助解决问题，因为作者没有义务为违反协议的人提供技术支持。
 
 ## 文档
 
@@ -80,12 +83,9 @@ Github：https://github.com/lc-soft/LCUI
 
 ### 在 Windows 中构建
 
-LCUI 主要是在 Windows 系统环境下开发的，你可以使用 VisualStudio 打开 
-`/build/VS2012/LCUI.sln` 文件，然后编译生成 LCUI。如果你用的是其它 IDE，请尝
-试按该 IDE 的方式创建项目并将源文件添加至项目内，然后编译。
+LCUI 主要是在 Windows 系统环境下开发的，你可以使用 VisualStudio 打开 `/build/VS2012/LCUI.sln` 文件，然后编译生成 LCUI。如果你用的是其它 IDE，请尝试按该 IDE 的方式创建项目并将源文件添加至项目内，然后编译。
 
-上述的依赖库除 libx11 外，都可以在 Windows 下编译生成，如果觉得手动编译它们很
-麻烦，想要现成可用的依赖库和头文件，可以联系作者。
+上述的依赖库中除 Windows 系统用不到的 libx11 库外，都可以在 Windows 系统环境下编译生成，如果觉得手动编译它们很 麻烦，想要现成可用的依赖库和头文件，可以在网上搜索，或者联系作者。
 
 ## 贡献
 
@@ -96,19 +96,13 @@ LCUI 主要是在 Windows 系统环境下开发的，你可以使用 VisualStudi
 1. 遵循现有代码风格，请参考 `docs/CodingStyle.zh-cn.md` 文件。
 2. 一次提交应该做完整的一件事。
 3. 提交信息的第一行为摘要行，长度应低于80个字符，如果需要描述修改原因，请在摘要行后留空行，然后再补充。
-4. 修复之前的提交（已经合并）中存在的 bug，提交信息的摘要行应该以 `修复` 或含义类似的词语开头，表示修复
-   了它。如果你修复的是 issues 列表中未解决的问题，需在摘要行中加上 issues 列表中对应问题的编号。
+4. 修复之前的提交（已经合并）中存在的 bug，提交信息的摘要行应该以 `修复` 或含义类似的词语开头，表示修复了它。如果你修复的是 issues 列表中未解决的问题，需在摘要行中加上 issues 列表中对应问题的编号。
 5. 衍合你的分支至源项目的 master 分支。我们不希望落拉取到冗余的合并请求。
-6. **要清楚什么许可证适用于你的补丁：** 该代码库中的文件基于GPLv2（或更高版本），但（原
-   作者）我们仍然可以创建非自由的衍生工具。然而，如果给我们的补丁是基于GPL的，我们希望它
-   以后不会进入任何非自由的衍生工具，因此，如果补丁发布于公共领域，会为我们带来方便（以及
-   避免任何法律问题）。
+6. **要清楚什么许可证适用于你的补丁：** 该代码库中的文件基于GPLv2（或更高版本），但（原作者）我们仍然可以创建非自由的衍生工具。然而，如果给我们的补丁是基于GPL的，我们希望它以后不会进入任何非自由的衍生工具，因此，如果补丁发布于公共领域，会为我们带来方便（以及避免任何法律问题）。
 
 **你可以通过捐赠来支持 LCUI 的开发**
 
-作者目前是一名独立开发者，你的贡献是非常有帮助的，如果你想通过捐赠来让作者能够花更多的时间来改进该项目，
-可以访问作者在 [Patreon](https://www.patreon.com/lcsoft) 上设立的页面。
-
+作者目前是一名独立开发者，你的贡献是非常有帮助的，如果你想通过捐赠来让作者能够花更多的时间来改进该项目，可以访问作者在 [Patreon](https://www.patreon.com/lcsoft) 和 [OpenCollective](https://opencollective.com/lcui) 上设立的页面。
 ### GitHub 流程
 
 开发补丁应遵循以下流程：
@@ -120,35 +114,86 @@ LCUI 主要是在 Windows 系统环境下开发的，你可以使用 VisualStudi
 3. cd 到代码库中： `cd LCUI`
 4. 设置远程仓库记录，假设该记录名为 upstream，那么命令为： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
 
-#### 添加Feature
+#### 添加特性
 
-1. 为新的 feature 创建一个分支(branch)，假设分支名为 my_new_feature，那么命令为：`git checkout -b my_new_feature`
+1. 为新的特性创建一个分支(branch)，假设分支名为 my_new_feature，那么命令为：`git checkout -b my_new_feature`
 2. 在你的分支上工作, 像往常一样添加和提交修改。
 
-创建一个分支并非必须的，但是，当已经合并至源项目时可以方便删除你的分支，也可以在提交合并
-请求前比较你的分支和源项目的最终版本，然后提交合并请求。
+创建一个分支并非必须的，但是，当已经合并至源项目时可以方便删除你的分支，也可以在提交合并请求前比较你的分支和源项目的最终版本，然后提交合并请求。
 
-#### 推送到GitHub
+#### 推送到 GitHub
 
-1. 推送分支至GitHub： `git push origin my_new_feature`
+1. 推送分支至 GitHub： `git push origin my_new_feature`
 2. 发出合并请求： 在Github上点击 `Pull Request` 按钮
 
-#### 有用的命令
+## 支持者
 
-如果源项目发生了很大的变化，最重要的是，你可以重现你的本地修改，这叫做`rebase`，例如：
+每月捐赠支持该项目的持续发展。 [[成为支持者](https://opencollective.com/lcui#backer)]
 
-	git fetch upstream
-	git rebase upstream/master
+<a href="https://opencollective.com/lcui/backer/0/website" target="_blank"><img src="https://opencollective.com/lcui/backer/0/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/1/website" target="_blank"><img src="https://opencollective.com/lcui/backer/1/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/2/website" target="_blank"><img src="https://opencollective.com/lcui/backer/2/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/3/website" target="_blank"><img src="https://opencollective.com/lcui/backer/3/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/4/website" target="_blank"><img src="https://opencollective.com/lcui/backer/4/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/5/website" target="_blank"><img src="https://opencollective.com/lcui/backer/5/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/6/website" target="_blank"><img src="https://opencollective.com/lcui/backer/6/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/7/website" target="_blank"><img src="https://opencollective.com/lcui/backer/7/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/8/website" target="_blank"><img src="https://opencollective.com/lcui/backer/8/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/9/website" target="_blank"><img src="https://opencollective.com/lcui/backer/9/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/10/website" target="_blank"><img src="https://opencollective.com/lcui/backer/10/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/11/website" target="_blank"><img src="https://opencollective.com/lcui/backer/11/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/12/website" target="_blank"><img src="https://opencollective.com/lcui/backer/12/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/13/website" target="_blank"><img src="https://opencollective.com/lcui/backer/13/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/14/website" target="_blank"><img src="https://opencollective.com/lcui/backer/14/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/15/website" target="_blank"><img src="https://opencollective.com/lcui/backer/15/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/16/website" target="_blank"><img src="https://opencollective.com/lcui/backer/16/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/17/website" target="_blank"><img src="https://opencollective.com/lcui/backer/17/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/18/website" target="_blank"><img src="https://opencollective.com/lcui/backer/18/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/19/website" target="_blank"><img src="https://opencollective.com/lcui/backer/19/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/20/website" target="_blank"><img src="https://opencollective.com/lcui/backer/20/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/21/website" target="_blank"><img src="https://opencollective.com/lcui/backer/21/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/22/website" target="_blank"><img src="https://opencollective.com/lcui/backer/22/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/23/website" target="_blank"><img src="https://opencollective.com/lcui/backer/23/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/24/website" target="_blank"><img src="https://opencollective.com/lcui/backer/24/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/25/website" target="_blank"><img src="https://opencollective.com/lcui/backer/25/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/26/website" target="_blank"><img src="https://opencollective.com/lcui/backer/26/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/27/website" target="_blank"><img src="https://opencollective.com/lcui/backer/27/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/28/website" target="_blank"><img src="https://opencollective.com/lcui/backer/28/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/backer/29/website" target="_blank"><img src="https://opencollective.com/lcui/backer/29/avatar.svg"></a>
 
-这样会获取更改并重新应用你的代码提交记录。
+## 赞助商
 
-这一般比合并更好，它会给出一个清晰的视图，以表示哪些提交是你本地代码库的分支中，如果同
-样的变更已经在源项目中应用，它也会“修剪”你的本地的提交记录。
+成为赞助商，将你的 LOGO 展示在 README 文档和项目主页里。 [[成为赞助商](https://opencollective.com/lcui#sponsor)]
 
-你可以将`-i`和`rebase`一起使用，以选择“交互式”衍合，这允许你移除、重排、合并以及修改
-提交信息，例如：
-
-	git rebase -i upstream/master
-
+<a href="https://opencollective.com/lcui/sponsor/0/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/1/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/2/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/3/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/4/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/5/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/6/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/7/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/8/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/9/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/9/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/10/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/10/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/11/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/11/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/12/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/12/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/13/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/13/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/14/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/14/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/15/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/15/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/16/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/16/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/17/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/17/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/18/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/18/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/19/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/19/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/20/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/20/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/21/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/21/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/22/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/22/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/23/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/23/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/24/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/24/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/25/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/25/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/26/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/26/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/27/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/27/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/28/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/28/avatar.svg"></a>
+<a href="https://opencollective.com/lcui/sponsor/29/website" target="_blank"><img src="https://opencollective.com/lcui/sponsor/29/avatar.svg"></a>
 
 --- end of README.zh-cn.md ---
