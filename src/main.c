@@ -40,6 +40,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
@@ -111,14 +112,14 @@ static struct LCUI_App {
 /*-------------------------- system event <START> ---------------------------*/
 
 /** 初始化事件模块 */
-static void LCUI_InitEvent(void)
+static void LCUI_InitEvent( void )
 {
 	LCUIMutex_Init( &System.event.mutex );
 	System.event.trigger = EventTrigger();
 }
 
 /** 停用事件模块并进行清理 */
-static void LCUI_ExitEvent(void)
+static void LCUI_ExitEvent( void )
 {
 	if( !System.is_inited ) {
 		return;
@@ -188,6 +189,21 @@ int LCUI_TriggerEvent( LCUI_SysEvent e, void *arg )
 	ret = EventTrigger_Trigger( System.event.trigger, e->type, &pack );
 	LCUIMutex_Unlock( &System.event.mutex );
 	return ret;
+}
+
+int LCUI_CreateTouchEvent( LCUI_SysEvent e,
+			   LCUI_TouchPoint points, int n_points )
+{
+	e->type = LCUI_TOUCH;
+	e->touch.n_points = n_points;
+	e->touch.points = NEW( LCUI_TouchPointRec, n_points );
+	if( !e->touch.points ) {
+		return -ENOMEM;
+	}
+	for( n_points -= 1; n_points >= 0; --n_points ) {
+		e->touch.points[n_points] = points[n_points];
+	}
+	return 0;
 }
 
 void LCUI_DestroyEvent( LCUI_SysEvent e )

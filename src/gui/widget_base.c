@@ -56,7 +56,7 @@ static struct LCUIWidgetModule {
 
 #define StrList_Destroy freestrs
 
-LCUI_Widget LCUIWidget_GetRoot(void)
+LCUI_Widget LCUIWidget_GetRoot( void )
 {
 	return LCUIWidget.root;
 }
@@ -246,7 +246,7 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->inherited_style = StyleSheet();
 	widget->computed_style.opacity = 1.0;
 	widget->computed_style.visible = TRUE;
-	widget->computed_style.focusable = TRUE;
+	widget->computed_style.focusable = FALSE;
 	widget->computed_style.display = SV_BLOCK;
 	widget->computed_style.position = SV_STATIC;
 	widget->computed_style.pointer_events = SV_AUTO;

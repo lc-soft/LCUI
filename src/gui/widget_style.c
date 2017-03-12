@@ -65,6 +65,10 @@ const char *global_css = CodeToString(
 	margin: 0;
 }
 
+root {
+	focusable: true;
+}
+
 );
 
 LCUI_SelectorNode Widget_GetSelectorNode( LCUI_Widget w )

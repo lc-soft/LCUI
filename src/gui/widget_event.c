@@ -719,7 +719,7 @@ int LCUIWidget_SetFocus( LCUI_Widget widget )
 		Widget_RemoveStatus( ev.target, "focus" );
 		Widget_PostEvent( ev.target, &ev, NULL, NULL );
 	}
-	if( !w->computed_style.focusable || w->disabled ) {
+	if( !w || !w->computed_style.focusable || w->disabled ) {
 		return -1;
 	}
 	ev.target = w;
@@ -855,7 +855,7 @@ static void OnKeyboardEvent( LCUI_SysEvent e, void *arg )
 static void OnTextInput( LCUI_SysEvent e, void *arg )
 {
 	LCUI_WidgetEventRec ev = { 0 };
-	LCUI_Widget target = LCUIIME_GetTarget();
+	LCUI_Widget target = self.targets[WST_FOCUS];
 	if( !target ) {
 		return;
 	}
@@ -877,8 +877,8 @@ static void OnTextInput( LCUI_SysEvent e, void *arg )
 static void ConvertTouchPoint( LCUI_TouchPoint point )
 {
 	switch( point->state ) {
-	case LCUI_TOUCHUP: point->state = WET_TOUCHUP; break;
 	case LCUI_TOUCHDOWN: point->state = WET_TOUCHDOWN; break;
+	case LCUI_TOUCHUP: point->state = WET_TOUCHUP; break;
 	case LCUI_TOUCHMOVE: point->state = WET_TOUCHMOVE; break;
 	default:break;
 	}

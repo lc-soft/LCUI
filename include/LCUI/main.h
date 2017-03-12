@@ -145,6 +145,9 @@ LCUI_API int LCUI_UnbindEvent( int handler_id );
 
 LCUI_API int LCUI_TriggerEvent( LCUI_SysEvent e, void *arg );
 
+LCUI_API int LCUI_CreateTouchEvent( LCUI_SysEvent e,
+				    LCUI_TouchPoint points, int n_points );
+
 LCUI_API void LCUI_DestroyEvent( LCUI_SysEvent e );
 
 LCUI_API LCUI_BOOL LCUI_WaitEvent( void );

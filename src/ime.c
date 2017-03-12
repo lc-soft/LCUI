@@ -183,6 +183,31 @@ static void LCUIIME_OnDestroy( void *arg )
 	ime->name = NULL;
 }
 
+LCUI_BOOL LCUIIME_CheckCharKey( int key )
+{
+	switch( key ) {
+	case LCUIKEY_TAB:
+	case LCUIKEY_ENTER:
+	case LCUIKEY_SEMICOLON:
+	case LCUIKEY_MINUS:
+	case LCUIKEY_EQUAL:
+	case LCUIKEY_COMMA:
+	case LCUIKEY_PERIOD:
+	case LCUIKEY_SLASH:
+	case LCUIKEY_BRACKETLEFT:
+	case LCUIKEY_BACKSLASH:
+	case LCUIKEY_BRACKETRIGHT:
+	case LCUIKEY_APOSTROPHE:
+		return TRUE;
+	default:
+		if( key >= LCUIKEY_0 && key <= LCUIKEY_Z ) {
+			return TRUE;
+		}
+		break;
+	}
+	return FALSE;
+}
+
 static void LCUIIME_ToText( LCUI_SysEvent e )
 {
 	int ch = e->key.code;
@@ -259,7 +284,7 @@ LCUI_BOOL LCUIIME_ProcessKey( LCUI_SysEvent e )
 	/* 根据事件类型判定按键状态 */
 	if( e->type == LCUI_KEYUP ) {
 		key_state = LCUIKEYSTATE_RELEASE;
-		/* 如果是caps lock按键被释放 */
+		/* 如果是 caps lock 按键被释放 */
 		if( e->key.code == LCUIKEY_CAPITAL ) {
 			self.enable_caps_lock = !self.enable_caps_lock;
 			return FALSE;
@@ -295,31 +320,6 @@ int LCUIIME_Commit( const wchar_t *str, int length )
 	sys_ev.text.text = NULL;
 	sys_ev.text.length = 0;
 	return 0;
-}
-
-int LCUIIME_SetTarget( LCUI_Widget widget )
-{
-	if( self.ime && self.ime->handler.settarget ) {
-		self.ime->handler.settarget( widget );
-		return 0;
-	}
-	return -1;
-}
-
-LCUI_Widget LCUIIME_GetTarget( void )
-{
-	if( self.ime && self.ime->handler.gettarget ) {
-		return self.ime->handler.gettarget();
-	}
-	return NULL;
-}
-int LCUIIME_ClearTarget( void )
-{
-	if( self.ime && self.ime->handler.cleartarget ) {
-		self.ime->handler.cleartarget();
-		return 0;
-	}
-	return -1;
 }
 
 static void LCUIIME_OnKeyDown( LCUI_SysEvent e, void *arg )

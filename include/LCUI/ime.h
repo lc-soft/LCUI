@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * ime.h -- Input Method Editor/Engine
  *
- * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * ime.h -- 输入法管理器
  *
- * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -43,11 +43,8 @@
 LCUI_BEGIN_HEADER
 
 typedef struct LCUI_IMEHandlerRec_ {
-	LCUI_BOOL (*prockey)(int,int);
-	void (*settarget)(LCUI_Widget);
-	void (*cleartarget)(void);
-	LCUI_Widget (*gettarget)(void);
-	void (*totext)(char);
+	LCUI_BOOL (*prockey)(int, int);
+	void (*totext)(int);
 	LCUI_BOOL (*open)(void);
 	LCUI_BOOL (*close)(void);
 } LCUI_IMEHandlerRec, *LCUI_IMEHandler;
@@ -60,6 +57,9 @@ LCUI_API LCUI_BOOL LCUIIME_Select( int ime_id );
 
 LCUI_API LCUI_BOOL LCUIIME_SelectByName( const char *name );
 
+/** 检测键值是否为字符键值 */
+LCUI_API LCUI_BOOL LCUIIME_CheckCharKey( int key );
+
 /** 切换至下一个输入法 */
 LCUI_API void LCUIIME_Switch( void );
 
@@ -69,20 +69,11 @@ LCUI_API LCUI_BOOL LCUIIME_ProcessKey( LCUI_SysEvent e );
 /** 提交输入法输入的内容至目标 */
 LCUI_API int LCUIIME_Commit( const wchar_t *str, int length );
 
-/** 设置输入法的目标 */
-LCUI_API int LCUIIME_SetTarget( LCUI_Widget widget );
-
-/** 获取输入法的目标 */
-LCUI_API LCUI_Widget LCUIIME_GetTarget( void );
-
-/** 清除输入法的目标 */
-LCUI_API int LCUIIME_ClearTarget( void );
-
 /* 初始化LCUI输入法模块 */
-void LCUI_InitIME( void );
+LCUI_API void LCUI_InitIME( void );
 
 /* 停用LCUI输入法模块 */
-void LCUI_ExitIME( void );
+LCUI_API void LCUI_ExitIME( void );
 
 #ifdef LCUI_BUILD_IN_WIN32
 int LCUI_RegisterWin32IME( void );

@@ -109,7 +109,6 @@ static struct LCUI_TextEditModule {
 	LCUI_WidgetPrototype prototype;
 } self;
 
-
 static const char *textedit_css = CodeToString(
 
 textedit {
@@ -118,6 +117,7 @@ textedit {
 	background-color: #fff;
 	border: 1px solid #eee;
 	padding: 5px 10px;
+	focusable: true;
 }
 textedit:focus {
 	border: 1px solid #2196F3;
@@ -557,8 +557,6 @@ static void TextEdit_OnParseText( LCUI_Widget w, const char *text )
 static void TextEdit_OnFocus( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
-	/* 设定输入法的目标 */
-	LCUIIME_SetTarget( widget );
 	TextCaret_SetVisible( edit->caret, TRUE );
 	TextCaret_BlinkHide( edit->caret );
 	edit->tasks[TASK_UPDATE_CARET] = TRUE;
@@ -568,7 +566,6 @@ static void TextEdit_OnFocus( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg 
 static void TextEdit_OnBlur( LCUI_Widget widget, LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
-	LCUIIME_ClearTarget();
 	TextCaret_SetVisible( edit->caret, FALSE );
 }
 
