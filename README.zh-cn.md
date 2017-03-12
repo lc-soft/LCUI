@@ -6,6 +6,8 @@
 [![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
 [![Downloads](https://img.shields.io/sourceforge/dt/lc-ui.svg)](https://sourceforge.net/projects/lc-ui)
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+[![OpenCollective](https://opencollective.com/lcui/backers/badge.svg)](#backers) 
+[![OpenCollective](https://opencollective.com/lcui/sponsors/badge.svg)](#sponsors)
 
 ## 说明
 
@@ -14,8 +16,6 @@ LCUI 是一个简单的跨平台图形界面库，其诞生目的主要是方便
 ![example screenshot](https://lcui.lc-soft.io/static/images/feature-screenshot-02.png)
 
 LCUI 是一个自由软件项目，任何人都可以参与改进它，但由于它并不是由一个专业的团队在负责全职开发工作，开发进度非常慢，大多数的功能都是按作者的需求而开发的，因此，如果你遇到 BUG，或者想添加一些新功能，请尽量尝试自己手动处理，作者也非常乐意接受你在 GitHub 上通过 Pull Request 功能贡献的代码。如果你需要一个成熟稳定的图形界面解决方案，请使用主流的图形界面开发库。
-
-基于 [GNU通用公共许可协议](http://www.gnu.org/licenses/gpl-2.0.html) 发布，该许可协议要求 LCUI 及 LCUI 衍生软件无论以何种形式发布，都必须确保收受者能收到或得到该版本的源代码。此项目主要由作者利用闲余时间进行开发和维护，项目的活跃度通常会受到各种因素的影响，大多数时间内都处于低活跃度状态。
 
 请阅读 `docs/CHANGES.zh-cn.md` 文件了解新版本的更新内容。
 
@@ -31,7 +31,7 @@ Github：https://github.com/lc-soft/LCUI
 
 ## 许可
 
-LCUI 采用的开源许可证是 GNU 通用公共许可证第二版，简称 GPLv2。简而言之，你有权利使用、修改、传播 LCUI 的源代码，当你传播给其他人时，你也必须让他们对你传播的 LCUI 副本拥有同样的权利。另外需要注意的是，如果你的应用程序用到了 LCUI 的代码，并且想传播给其他人，那么除 Windows API、MFC、DirectX 等这类系统级的函数库外，该应用程序及其它依赖库的源代码都必须向他们公开。
+LCUI 采用的开源许可证是 [GNU通用公共许可证第二版](http://www.gnu.org/licenses/gpl-2.0.html)，简称 GPLv2。简而言之，你有权利使用、修改、传播 LCUI 的源代码，当你传播给其他人时，你也必须让他们对你传播的 LCUI 副本拥有同样的权利。另外需要注意的是，如果你的应用程序用到了 LCUI 的代码，并且想传播给其他人，那么除 Windows API、MFC、DirectX 等这类系统级的函数库外，该应用程序及其它依赖库的源代码都必须向他们公开。
 
 或许该许可协议在国内没有多大作用，如果你不想遵循该许可协议，那么使用 LCUI 也就意味着你需要独自解决它带来的各种问题，例如：功能缺陷、偶尔崩溃、性能和内存占用等问题，作者不承担任何责任，也不要试图联系作者协助解决问题，因为作者没有义务为违反协议的人提供技术支持。
 
