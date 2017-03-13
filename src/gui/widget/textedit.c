@@ -339,7 +339,7 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
 		TextLayer_SetTextStyle( edit->layer_mask, &style );
 	}
 	style.has_fore_color = TRUE;
-	style.fore_color.value = 0xC8C8C8;
+	style.fore_color = RGB(140, 140, 140);
 	TextLayer_SetTextStyle( edit->layer_placeholder, &style );
 	TextStyle_Destroy( &style );
 	TextLayer_Update( edit->layer, &rects );
