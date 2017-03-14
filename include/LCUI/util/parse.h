@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * parse.h -- parse data from string
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * parse.h -- 字符串中的书局解析
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -44,6 +44,10 @@ LCUI_BEGIN_HEADER
 
 /** 从字符串中解析出数字，支持的单位：点(pt)、像素(px)、百分比(%) */
 LCUI_API LCUI_BOOL ParseNumber( LCUI_Style var, const char *str );
+
+LCUI_API LCUI_BOOL ParseRGB( LCUI_Style var, const char *str );
+
+LCUI_API LCUI_BOOL ParseRGBA( LCUI_Style var, const char *str );
 
 /** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A)、rgb(R,G,B) */
 LCUI_API LCUI_BOOL ParseColor( LCUI_Style var, const char *str );

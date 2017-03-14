@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * parse.c -- parse data from string
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * parse.c -- 字符串中的书局解析
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -120,13 +120,92 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 	return TRUE;
 }
 
+LCUI_BOOL ParseRGBA( LCUI_Style var, const char *str )
+{
+	float data[4];
+	char buf[16];
+	const char *p;
+	int i, buf_i;
+
+	if( !strstr( str, "rgba(" ) ) {
+		return FALSE;
+	}
+	for( p = str + 5, i = 0, buf_i = 0; *p && i < 4; ++p ) {
+		if( *p == '.' || (*p >= '0' && *p <= '9') ) {
+			if( buf_i < 15 ) {
+				buf[buf_i++] = *p;
+			}
+			continue;
+		}
+		if( *p == ' ' ) {
+			buf_i = 0;
+			continue;
+		}
+		if( *p == ',' || *p == ')' ) {
+			buf[buf_i] = 0;
+			data[i] = atof( buf );
+			buf_i = 0;
+			i += 1;
+		}
+	}
+	if( *p ) {
+		return FALSE;
+	}
+	var->type = SVT_COLOR;
+	var->color.a = (uchar_t)(255.0 * data[3]);
+	var->color.r = (uchar_t)data[0];
+	var->color.g = (uchar_t)data[1];
+	var->color.b = (uchar_t)data[2];
+	var->is_valid = TRUE;
+	return TRUE;
+}
+
+LCUI_BOOL ParseRGB( LCUI_Style var, const char *str )
+{
+	float data[3];
+	char buf[16];
+	const char *p;
+	int i, buf_i;
+
+	if( !strstr( str, "rgb(" ) ) {
+		return FALSE;
+	}
+	for( p = str + 4, i = 0, buf_i = 0; *p && i < 3; ++p ) {
+		if( *p == '.' || (*p >= '0' && *p <= '9') ) {
+			if( buf_i < 15 ) {
+				buf[buf_i++] = *p;
+			}
+			continue;
+		}
+		if( *p == ' ' ) {
+			buf_i = 0;
+			continue;
+		}
+		if( *p == ',' || *p == ')' ) {
+			buf[buf_i] = 0;
+			data[i] = atof( buf );
+			buf_i = 0;
+			i += 1;
+		}
+	}
+	if( *p ) {
+		return FALSE;
+	}
+	var->type = SVT_COLOR;
+	var->color.a = 255;
+	var->color.r = (uchar_t)data[0];
+	var->color.g = (uchar_t)data[1];
+	var->color.b = (uchar_t)data[2];
+	var->is_valid = TRUE;
+	return TRUE;
+}
+
 /** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A)、rgb(R,G,B) */
 LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 {
-	double a;
 	const char *p;
 	int len = 0, status = 0, r, g, b;
-	for( p=str; *p; ++p, ++len ) {
+	for( p = str; *p; ++p, ++len ) {
 		switch( *p ) {
 		case '#':
 			len == 0 ? status = 3 : 0;
@@ -154,40 +233,32 @@ LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 		status = 0;
 		if( len == 4 ) {
 			status = sscanf( str, "#%1X%1X%1X", &r, &g, &b );
-			r *= 255/0xf; g *= 255/0xf; b *= 255/0xf;
+			r *= 255 / 0xf; g *= 255 / 0xf; b *= 255 / 0xf;
 		} else if( len == 7 ) {
 			status = sscanf( str, "#%2X%2X%2X", &r, &g, &b );
 		}
 		break;
-	case 4:
-		status = sscanf( str, "rgb(%d,%d,%d)", &r, &g, &b );
-		break;
-	case 8:
-		status = sscanf( str, "rgba(%d,%d,%d,%lf)", &r, &g, &b, &a );
+	case 4: return ParseRGB( var, str );
+	case 8: return ParseRGBA( var, str );
 	default:break;
 	}
-	if( status >= 3 ) {
+	if( status == 3 ) {
 		var->type = SVT_COLOR;
-		if( status == 4 ) {
-			var->color.a = (uchar_t)(255.0*a);
-		} else {
-			var->color.a = 255;
-		}
+		var->color.a = 255;
 		var->color.r = r;
 		var->color.g = g;
 		var->color.b = b;
 		var->is_valid = TRUE;
 		return TRUE;
-	} else {
-		if( strcmp("transparent", str) == 0 ) {
-			var->is_valid = TRUE;
-			var->color.alpha = 0;
-			var->color.red = 255;
-			var->color.green = 255;
-			var->color.blue = 255;
-			var->type = SVT_COLOR;
-			return TRUE;
-		}
+	}
+	if( strcmp( "transparent", str ) == 0 ) {
+		var->is_valid = TRUE;
+		var->color.alpha = 0;
+		var->color.red = 255;
+		var->color.green = 255;
+		var->color.blue = 255;
+		var->type = SVT_COLOR;
+		return TRUE;
 	}
 	return FALSE;
 }

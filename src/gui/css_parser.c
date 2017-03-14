@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * css_parser.c -- css code parser module
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * css_parser.c -- css 样式代码解析模块
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -81,14 +81,22 @@ static struct CSSParserModule {
 static int SplitValues( const char *str, LCUI_Style slist,
 			int max_len, int mode )
 {
-	int val, vi = 0, vj = 0;
 	char **values;
 	const char *p;
+	int val, vi = 0, vj = 0, n_quotes = 0;
 
-	values = (char**)calloc(max_len, sizeof(char*));
-	values[0] = (char*)malloc(sizeof(char)*64);
+	values = (char**)calloc( max_len, sizeof( char* ) );
+	values[0] = (char*)malloc( sizeof( char ) * 64 );
 	for( p = str; *p; ++p ) {
-		if( *p != ' ' ) {
+		if( *p == '(' ) {
+			n_quotes += 1;
+			values[vi][vj++] = *p;
+			continue;
+		} else if( *p == ')' ) {
+			n_quotes -= 1;
+			values[vi][vj++] = *p;
+			continue;
+		} else if( *p != ' ' || n_quotes != 0 ) {
 			values[vi][vj++] = *p;
 			continue;
 		}
@@ -99,13 +107,13 @@ static int SplitValues( const char *str, LCUI_Style slist,
 			if( vi >= max_len ) {
 				goto clean;
 			}
-			values[vi] = (char*)malloc(sizeof(char)*64);
+			values[vi] = (char*)malloc( sizeof( char ) * 64 );
 		}
 	}
 	values[vi][vj] = 0;
 	vi++;
 	for( vj = 0; vj < vi; ++vj ) {
-		DEBUG_MSG("[%d] %s\n", vj, values[vj]);
+		DEBUG_MSG( "[%d] %s\n", vj, values[vj] );
 		if( strcmp( values[vj], "auto" ) == 0 ) {
 			slist[vj].type = SVT_AUTO;
 			slist[vj].value = SV_AUTO;
@@ -114,33 +122,33 @@ static int SplitValues( const char *str, LCUI_Style slist,
 		}
 		if( mode & SPLIT_NUMBER ) {
 			if( ParseNumber( &slist[vj], values[vj] ) ) {
-				DEBUG_MSG("[%d]:parse ok\n", vj);
+				DEBUG_MSG( "[%d]:parse ok\n", vj );
 				continue;
 			}
 		}
 		if( mode & SPLIT_COLOR ) {
-			if( ParseColor(&slist[vj], values[vj]) ) {
-				DEBUG_MSG("[%d]:parse ok\n", vj);
+			if( ParseColor( &slist[vj], values[vj] ) ) {
+				DEBUG_MSG( "[%d]:parse ok\n", vj );
 				continue;
 			}
 		}
 		if( mode & SPLIT_STYLE ) {
 			val = LCUI_GetStyleValue( values[vj] );
-			if( val > 0 )  {
+			if( val > 0 ) {
 				slist[vj].style = val;
 				slist[vj].type = SVT_style;
 				slist[vj].is_valid = TRUE;
-				DEBUG_MSG("[%d]:parse ok\n", vj);
+				DEBUG_MSG( "[%d]:parse ok\n", vj );
 				continue;
 			}
 		}
 		vi = -1;
-		DEBUG_MSG("[%d]:parse error\n", vj);
+		DEBUG_MSG( "[%d]:parse error\n", vj );
 		goto clean;
 	}
 clean:
 	for( vj = 0; vj < max_len; ++vj ) {
-		values[vj] ? free(values[vj]) : 0;
+		values[vj] ? free( values[vj] ) : 0;
 	}
 	free( values );
 	return vi;
