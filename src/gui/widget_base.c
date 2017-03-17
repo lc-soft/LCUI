@@ -1381,8 +1381,8 @@ void Widget_UpdateSize( LCUI_Widget w )
 		LCUI_Rect r;
 		RectF2Rect( rect, r );
 		Widget_InvalidateArea( w->parent, &r, SV_PADDING_BOX );
-		r.width = (int)(w->box.graph.width + 0.5);
-		r.height = (int)(w->box.graph.height + 0.5);
+		r.width = roundi( w->box.graph.width );
+		r.height = roundi( w->box.graph.height );
 		Widget_InvalidateArea( w->parent, &r, SV_PADDING_BOX );
 		if( w->parent->style->sheet[key_width].type == SVT_AUTO
 		    || w->parent->style->sheet[key_height].type == SVT_AUTO ) {
