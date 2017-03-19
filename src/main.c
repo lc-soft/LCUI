@@ -485,43 +485,27 @@ static void LCUIApp_QuitAllMainLoop(void)
 /** 打印LCUI的信息 */
 static void LCUI_ShowCopyrightText(void)
 {
-	Logger_Log( "           ________\n"
-		" _        |______  |\n"
-		"| |   __    __   | |\n"
-		"| |  |  |  |__|  | |\n"
-		"| |  |  |   __   | |\n"
-		"| |  |  |__|  |  | |\n"
-		"| |  \\________/  | |\n"
-		"| |_____    _____| |\n"
-		"\\_______|  |_______/\n\n"
+	Logger_Log(
 		"LCUI (LC's UI) version "LCUI_VERSION"\n"
 #ifdef _MSC_VER
 		"Build tool: "
-#if (_MSC_VER > 1800)
+#if (_MSC_VER > 1900)
 		"MS VC++ (higher version)"
+#elif (_MSC_VER == 1900)
+		"MS VC++ 14.0 (VisualStudio 2015)"
 #elif (_MSC_VER == 1800)
-		"MS VC++ 12.0"
+		"MS VC++ 12.0 (VisualStudio 2013)"
 #elif (_MSC_VER == 1700)
-		"MS VC++ 11.0"
+		"MS VC++ 11.0 (VisualStudio 2012)"
 #elif (_MSC_VER == 1600)
-		"MS VC++ 10.0"
-#elif (_MSC_VER == 1500)
-		"MS VC++ 9.0"
-#elif (_MSC_VER == 1400)
-		"MS VC++ 8.0"
-#elif (_MSC_VER == 1310)
-		"MS VC++ 7.1"
-#elif (_MSC_VER == 1300)
-		"MS VC++ 7.0"
-#elif (_MSC_VER == 1200)
-		"MS VC++ 6.0"
+		"MS VC++ 10.0 (VisualStudio 2010)"
 #else
-		"MS VC++"
+		"MS VC++ (older version)"
 #endif
 		"\n"
 #endif
 		"Build at "__DATE__" - "__TIME__"\n"
-		"Copyright (C) 2012-2017 Liu Chao <lc-soft@live.cn>.\n"
+		"Copyright (C) 2012-2017 Liu Chao <root@lc-soft.io>.\n"
 		"This is free software, licensed under GPLv2. \n"
 		"See source distribution for detailed copyright notices.\n"
 		"To learn more, visit http://www.lcui.org.\n\n"
