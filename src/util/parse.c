@@ -143,7 +143,7 @@ LCUI_BOOL ParseRGBA( LCUI_Style var, const char *str )
 		}
 		if( *p == ',' || *p == ')' ) {
 			buf[buf_i] = 0;
-			data[i] = atof( buf );
+			sscanf( buf, "%f", &data[i] );
 			buf_i = 0;
 			i += 1;
 		}
@@ -183,7 +183,7 @@ LCUI_BOOL ParseRGB( LCUI_Style var, const char *str )
 		}
 		if( *p == ',' || *p == ')' ) {
 			buf[buf_i] = 0;
-			data[i] = atof( buf );
+			sscanf( buf, "%f", &data[i] );
 			buf_i = 0;
 			i += 1;
 		}
