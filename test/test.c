@@ -25,8 +25,8 @@ int main(void)
 	Logger_SetHandlerW( LoggerHandlerW );
 #endif
 	ret |= test_string();
-	ret |= test_image_reader();/*
-	ret |= test_css_parser();
+	ret |= test_image_reader();
+	ret |= test_css_parser();/*
 	ret |= test_widget_render();
 	ret |= test_char_render();
 	ret |= test_string_render();*/

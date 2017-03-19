@@ -81,6 +81,7 @@ static void OnDestroySurfaceRecord( void *data )
 {
 	SurfaceRecord record = data;
 	Surface_Close( record->surface );
+	free( record );
 }
 
 static void DrawBorder( LCUI_PaintContext paint )

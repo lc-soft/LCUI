@@ -341,6 +341,7 @@ static void TextRowList_Destroy( TextRowList list )
 	int row;
 	for( row=0; row<list->length; ++row ) {
 		TextRow_Destroy( list->rows[row] );
+		free( list->rows[row] );
 		list->rows[row] = NULL;
 	}
 	list->length = 0;

@@ -649,6 +649,9 @@ static void DeleteCSSParserContext( CSSParserContext *ctx_ptr )
 {
 	CSSParserContext ctx = *ctx_ptr;
 	LinkedList_Clear( &ctx->selectors, (FuncPtr)Selector_Delete );
+	if( ctx->space ) {
+		free( ctx->space );
+	}
 	free( ctx->buffer );
 	free( ctx );
 	*ctx_ptr = NULL;
