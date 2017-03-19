@@ -106,7 +106,7 @@ static int unescape( const wchar_t *instr, wchar_t *outstr )
 			buff[i++] = *pin;
 			if( i >= 4 ) {
 				buff[i] = 0;
-				swscanf( buff, L"%x", pout );
+				swscanf( buff, L"%hx", pout );
 				++pout;
 				i = -1;
 			}
@@ -120,7 +120,7 @@ static int unescape( const wchar_t *instr, wchar_t *outstr )
 	}
 	if( i >= 4 ) {
 		buff[i] = 0;
-		swscanf( buff, L"%x", pout );
+		swscanf( buff, L"%hx", pout );
 		++pout;
 	}
 	*pout = 0;

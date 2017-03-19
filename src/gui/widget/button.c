@@ -57,6 +57,7 @@ static const char *button_css = CodeToString(
 
 button {
 	padding: 6px 12px;
+	focusable: true;
 	border: 1px solid #eaeaea;
 	background-color: #fff;
 }
@@ -81,6 +82,7 @@ static void Button_OnInit( LCUI_Widget w )
 	const size_t data_size = sizeof( LCUI_ButtonRec );
 	LCUI_Button btn = Widget_AddData( w, prototype, data_size );
 	btn->text = LCUIWidget_New( "textview" );
+	w->computed_style.focusable = TRUE;
 	TextView_SetTextAlign( btn->text, SV_CENTER );
 	Widget_Append( w, btn->text );
 	Widget_Show( btn->text );

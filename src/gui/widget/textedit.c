@@ -806,8 +806,9 @@ static void TextEdit_OnInit( LCUI_Widget w )
 	edit->layer_placeholder = TextLayer_New();
 	edit->layer = edit->layer_source;
 	edit->text_block_size = TBT_SIZE;
-	memset( edit->tasks, 0, sizeof(edit->tasks) );
 	edit->caret = LCUIWidget_New( "textcaret" );
+	w->computed_style.focusable = TRUE;
+	memset( edit->tasks, 0, sizeof( edit->tasks ) );
 	LinkedList_Init( &edit->text_blocks );
 	StyleTags_Init( &edit->text_tags );
 	TextEdit_SetMultiline( w, FALSE );
