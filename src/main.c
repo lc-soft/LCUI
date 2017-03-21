@@ -366,14 +366,6 @@ void LCUI_InitApp( LCUI_AppDriver app )
 	}
 	MainApp.driver_ready = FALSE;
 	MainApp.agent.state = STATE_RUNNING;
-	if( !app ) {
-		app = LCUI_CreateAppDriver();
-		if( !app ) {
-			return;
-		}
-	}
-	MainApp.driver = app;
-	MainApp.driver_ready = TRUE;
 	MainApp.timer = StepTimer_Create();
 	LCUICond_Init( &MainApp.loop_changed );
 	LCUIMutex_Init( &MainApp.loop_mutex );
@@ -382,6 +374,14 @@ void LCUI_InitApp( LCUI_AppDriver app )
 	LCUICond_Init( &MainApp.agent.cond );
 	LinkedList_Init( &MainApp.agent.tasks );
 	StepTimer_SetFrameLimit( MainApp.timer, MAX_FRAMES_PER_SEC );
+	if( !app ) {
+		app = LCUI_CreateAppDriver();
+		if( !app ) {
+			return;
+		}
+	}
+	MainApp.driver = app;
+	MainApp.driver_ready = TRUE;
 }
 
 static void OnDeleteTask( void *arg )
@@ -406,7 +406,9 @@ static void LCUI_ExitApp( void )
 	LCUICond_Destroy( &MainApp.agent.cond );
 	LinkedList_Clear( &MainApp.loops, free );
 	LinkedList_Clear( &MainApp.agent.tasks, OnDeleteTask );
-	LCUI_DestroyAppDriver( MainApp.driver );
+	if( MainApp.driver_ready ) {
+		LCUI_DestroyAppDriver( MainApp.driver );
+	}
 	MainApp.driver_ready = FALSE;
 }
 
@@ -470,7 +472,7 @@ void LCUI_SetTaskAgent( LCUI_BOOL enabled )
 }
 
 /** 退出所有主循环 */
-static void LCUIApp_QuitAllMainLoop(void)
+static void LCUIApp_QuitAllMainLoop( void )
 {
 	LCUI_MainLoop loop;
 	LinkedListNode *node;

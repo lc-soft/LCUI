@@ -82,10 +82,10 @@ static int DecodeFromUTF8( wchar_t *wstr, int max_len, const char *str )
 	int i, len = 0, count = 0;
 	unsigned char *p, byte, ch[MAX_SAVE_NUM];
 
-	if( max_len == -1 ) {
-		max_len = strlen( str );
-	}
-	for( inptr = str; *inptr && len < max_len; ++inptr ) {
+	for( inptr = str; *inptr; ++inptr ) {
+		if( max_len > 0 && len >= max_len ) {
+			break;
+		}
 		byte = *inptr;
 		if( (byte >> 7) == 0 ) { // 0xxxxxxx
 			if( wstr ) {

@@ -80,7 +80,6 @@ StepTimer StepTimer_Create( void )
 
 void StepTimer_Destroy( StepTimer timer )
 {
-	LCUIMutex_Unlock( &timer->mutex );
 	LCUICond_Destroy( &timer->cond );
 	LCUIMutex_Destroy( &timer->mutex );
 	free( timer );

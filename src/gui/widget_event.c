@@ -220,7 +220,6 @@ static int CopyWidgetEvent( LCUI_WidgetEvent dst,
 		n = dst->touch.n_points;
 		size = sizeof( LCUI_TouchPointRec ) * n;
 		dst->touch.points = malloc( size );
-		NEW( LCUI_TouchPointRec, n );
 		if( !dst->touch.points ) {
 			return -ENOMEM;
 		}

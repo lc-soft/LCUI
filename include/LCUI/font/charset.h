@@ -47,6 +47,12 @@ enum EncodingType {
 	ENCODING_UTF8
 };
 
+#define LCUI_DecodeUTF8String(WSTR, STR, MAXLEN ) \
+LCUI_DecodeString(WSTR, STR, MAXLEN, ENCODING_UTF8)
+
+#define LCUI_EncodeUTF8String(STR, WSTR, MAXLEN ) \
+LCUI_DecodeString(STR, WSTR, MAXLEN, ENCODING_UTF8)
+
 LCUI_API int LCUI_DecodeString( wchar_t *wstr, const char *str,
 				int max_len, int encoding );
 

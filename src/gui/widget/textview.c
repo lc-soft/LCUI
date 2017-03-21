@@ -489,7 +489,7 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	wchar_t *newtext;
 	LCUI_TextView txt;
 
-	len = text ? wcslen( text ) + 1 : 0;
+	len = text ? wcslen( text ) + 1 : 1;
 	newtext = NEW( wchar_t, len );
 	if( !newtext ) {
 		return -1;
