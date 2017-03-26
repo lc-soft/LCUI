@@ -141,6 +141,18 @@ static void MapTaskHandler(void)
 	self.handlers[WTT_PROPS] = Widget_UpdateProps;
 }
 
+static void LCUIWidget_ClearTrash( void )
+{
+	LinkedListNode *node;
+	node = self.trash.head.next;
+	while( node ) {
+		LinkedListNode *next = node->next;
+		LinkedList_Unlink( &self.trash, node );
+		Widget_ExecDestroy( node->data );
+		node = next;
+	}
+}
+
 void LCUIWidget_InitTasks( void )
 {
 	MapTaskHandler();
@@ -150,7 +162,7 @@ void LCUIWidget_InitTasks( void )
 
 void LCUIWidget_ExitTasks( void )
 {
-	LinkedList_Clear( &self.trash, NULL );
+	LCUIWidget_ClearTrash();
 }
 
 void Widget_AddToTrash( LCUI_Widget w )
@@ -250,17 +262,9 @@ proc_children_task:
 void LCUIWidget_Update( void )
 {
 	LCUI_Widget root;
-	LinkedListNode *node;
 	self.is_timeout = FALSE;
-	self.timeout = LCUI_GetTime() + 20;
+	self.timeout = LCUI_GetTime() + 15;
 	root = LCUIWidget_GetRoot();
 	while( !self.is_timeout && Widget_UpdateEx( root, TRUE ) );
-	/* 删除无用部件 */
-	node = self.trash.head.next;
-	while( node ) {
-		LinkedListNode *next = node->next;
-		LinkedList_Unlink( &self.trash, node );
-		Widget_ExecDestroy( node->data );
-		node = next;
-	}
+	LCUIWidget_ClearTrash();
 }
