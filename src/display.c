@@ -405,6 +405,7 @@ void LCUIDisplay_SetSize( int width, int height )
 	root = LCUIWidget_GetRoot();
 	surface = LCUIDisplay_GetBindSurface( root );
 	Surface_Resize( surface, width, height );
+	Widget_Resize( root, width, height );
 }
 
 int LCUIDisplay_GetWidth( void )
@@ -663,6 +664,7 @@ int LCUI_InitDisplay( LCUI_DisplayDriver driver )
 	display.driver->bindEvent( DET_PAINT, OnPaint, NULL, NULL );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	LCUIDisplay_SetMode( LCDM_DEFAULT );
+	LCUIDisplay_Update();
 	LOG( "[display] init ok, driver name: %s\n", display.driver->name );
 	return 0;
 }
