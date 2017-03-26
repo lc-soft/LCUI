@@ -86,6 +86,12 @@ LCUI_Graph *Graph_New( void )
 	return g;
 }
 
+void Graph_Delete( LCUI_Graph *graph )
+{
+	Graph_Free( graph );
+	free( graph );
+}
+
 LCUI_Color RGB( uchar_t r, uchar_t g, uchar_t b )
 {
 	LCUI_Color color;
