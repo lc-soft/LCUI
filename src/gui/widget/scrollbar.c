@@ -330,7 +330,7 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 	scrollbar = Widget_AddData( w, self.prototype, data_size );
 	scrollbar->direction = SBD_VERTICAL;
 	scrollbar->is_dragging = FALSE;
-	scrollbar->scroll_step = 40;
+	scrollbar->scroll_step = 64;
 	scrollbar->slider = slider;
 	scrollbar->layer = NULL;
 	scrollbar->box = NULL;
