@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * textview.c -- LCUI's TextView Widget
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * textview.c -- LCUI 的文本显示部件
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -57,6 +57,7 @@ enum TaskType {
 typedef struct LCUI_TextViewRec_ {
 	LCUI_TextStyle style;
 	LCUI_BOOL has_content;		/**< 是否有设置 content 属性 */
+	LCUI_Mutex mutex;		/**< 互斥锁 */
 	LCUI_TextLayer layer;		/**< 文本图层 */
 	struct {
 		LCUI_BOOL is_valid;
@@ -382,6 +383,7 @@ static void TextView_OnInit( LCUI_Widget w )
 	/* 启用样式标签的支持 */
 	TextLayer_SetUsingStyleTags( txt->layer, TRUE );
 	Widget_BindEvent( w, "resize", TextView_OnResize, NULL, NULL );
+	LCUIMutex_Init( &txt->mutex );
 }
 
 /** 释放 TextView 部件占用的资源 */
@@ -389,6 +391,7 @@ static void TextView_OnDestroy( LCUI_Widget w )
 {
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	TextLayer_Destroy( txt->layer );
+	LCUIMutex_Unlock( &txt->mutex );
 }
 
 static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
@@ -426,9 +429,11 @@ static void TextView_OnTask( LCUI_Widget w )
 	LinkedList_Init( &rects );
 	i = TASK_SET_TEXT;
 	if( txt->tasks[i].is_valid ) {
+		LCUIMutex_Lock( &txt->mutex );
 		txt->tasks[i].is_valid = FALSE;
 		TextLayer_SetTextW( txt->layer, txt->tasks[i].text, NULL );
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
+		LCUIMutex_Unlock( &txt->mutex );
 	}
 	i = TASK_SET_AUTOWRAP;
 	if( txt->tasks[i].is_valid ) {
@@ -500,6 +505,7 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 		wcscpy( newtext, text );
 	}
 	txt = Widget_GetData( w, self.prototype );
+	LCUIMutex_Lock( &txt->mutex );
 	if( txt->tasks[TASK_SET_TEXT].is_valid
 	 && txt->tasks[TASK_SET_TEXT].text ) {
 		free( txt->tasks[TASK_SET_TEXT].text );
@@ -507,6 +513,7 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	txt->tasks[TASK_SET_TEXT].is_valid = TRUE;
 	txt->tasks[TASK_SET_TEXT].text = newtext;
 	Widget_AddTask( w, WTT_USER );
+	LCUIMutex_Unlock( &txt->mutex );
 	return 0;
 }
 
