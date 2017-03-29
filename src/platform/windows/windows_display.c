@@ -114,9 +114,11 @@ static void WinSurface_ExecDestroy( LCUI_Surface surface )
 	surface->height = 0;
 	if( surface->hwnd ) {
 		if( surface->hdc_fb ) {
-			ReleaseDC( surface->hwnd, surface->hdc_fb );
+			/* DeleteDC only for CreateDC */
+			DeleteDC( surface->hdc_fb );
 		}
 		if( surface->hdc_client ) {
+			/* ReleaseDC only for GetDC */
 			ReleaseDC( surface->hwnd, surface->hdc_client );
 		}
 	}
