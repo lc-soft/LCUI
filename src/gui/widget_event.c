@@ -121,10 +121,10 @@ static void DestroyEventMapping( void *data )
 
 static int CompareWidgetEventRecord( void *data, const void *keydata )
 {
-	WidgetEventRecord node = data;
-	if( node->widget == (LCUI_Widget)keydata ) {
+	WidgetEventRecord record = data;
+	if( record->widget == (LCUI_Widget)keydata ) {
 		return 0;
-	} else if( node->widget < (LCUI_Widget)keydata ) {
+	} else if( record->widget < (LCUI_Widget)keydata ) {
 		return -1;
 	} else {
 		return 1;
@@ -165,6 +165,7 @@ static void Widget_AddEventRecord( LCUI_Widget widget,
 static int Widget_DeleteEventRecord( LCUI_Widget widget,
 				     LCUI_WidgetEventPack pack )
 {
+	int ret = 0;
 	WidgetEventRecord record;
 	LinkedListNode *node, *prev;
 	LCUIMutex_Lock( &self.mutex );
@@ -178,10 +179,11 @@ static int Widget_DeleteEventRecord( LCUI_Widget widget,
 		if( node->data == pack ) {
 			LinkedList_DeleteNode( &record->records, node );
 			node = prev;
+			ret = 1;
 		}
 	}
 	LCUIMutex_Unlock( &self.mutex );
-	return 0;
+	return ret;
 }
 
 /** 将原始事件转换成部件事件 */
@@ -265,13 +267,15 @@ static void DestroyWidgetEvent( LCUI_WidgetEvent e )
 static void DestroyWidgetEventPack( void *arg )
 {
 	LCUI_WidgetEventPack pack = arg;
-	Widget_DeleteEventRecord( pack->event.target, pack );
-	if( pack->data && pack->destroy_data ) {
-		pack->destroy_data( pack->data );
+	/* 如果删除成功则说明有记录，需要销毁数据 */
+	if( Widget_DeleteEventRecord( pack->event.target, pack ) == 1 ) {
+		if( pack->data && pack->destroy_data ) {
+			pack->destroy_data( pack->data );
+		}
+		DestroyWidgetEvent( &pack->event );
+		pack->data = NULL;
+		free( pack );
 	}
-	DestroyWidgetEvent( &pack->event );
-	pack->data = NULL;
-	free( pack );
 }
 
 static void DestroyTouchCapturer( void *arg )
