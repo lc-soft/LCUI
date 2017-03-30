@@ -46,10 +46,6 @@
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/button.h>
 
-typedef struct LCUI_ButtonRec_ {
-	LCUI_Widget text;
-} LCUI_ButtonRec, *LCUI_Button;
-
 static LCUI_WidgetPrototype prototype = NULL;
 
 /** 按钮的 css 样式 */
@@ -58,6 +54,7 @@ static const char *button_css = CodeToString(
 button {
 	padding: 6px 12px;
 	focusable: true;
+	display: inline-block;
 	border: 1px solid #eaeaea;
 	background-color: #fff;
 }
@@ -79,32 +76,25 @@ button:disabled textview {
 
 static void Button_OnInit( LCUI_Widget w )
 {
-	const size_t data_size = sizeof( LCUI_ButtonRec );
-	LCUI_Button btn = Widget_AddData( w, prototype, data_size );
-	btn->text = LCUIWidget_New( "textview" );
+	prototype->proto->init( w );
 	w->computed_style.focusable = TRUE;
-	TextView_SetTextAlign( btn->text, SV_CENTER );
-	Widget_Append( w, btn->text );
-	Widget_Show( btn->text );
+	TextView_SetTextAlign( w, SV_CENTER );
 }
 
 void Button_SetTextW( LCUI_Widget w, const wchar_t *wstr )
 {
-	LCUI_Button btn = Widget_GetData( w, prototype );
-	TextView_SetTextW( btn->text, wstr );
+	TextView_SetTextW( w, wstr );
 }
 
 void Button_SetText( LCUI_Widget w, const char *str )
 {
-	LCUI_Button btn = Widget_GetData( w, prototype );
-	TextView_SetText( btn->text, str );
+	TextView_SetText( w, str );
 }
 
 /** 添加按钮部件类型 */
 void LCUIWidget_AddButton( void )
 {
-	prototype = LCUIWidget_NewPrototype( "button", NULL );
+	prototype = LCUIWidget_NewPrototype( "button", "textview" );
 	prototype->init = Button_OnInit;
-	prototype->settext = Button_SetText;
-	LCUI_LoadCSSString( button_css, NULL );
+	LCUI_LoadCSSString( button_css, __FILE__ );
 }
