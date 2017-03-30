@@ -626,5 +626,5 @@ void LCUIWidget_AddTScrollBar( void )
 	setscroll_event_id = LCUIWidget_AllocEventId();
 	LCUIWidget_SetEventName( self.event_id, "scroll" );
 	LCUIWidget_SetEventName( setscroll_event_id, "setscroll" );
-	LCUI_LoadCSSString( scrollbar_css, NULL );
+	LCUI_LoadCSSString( scrollbar_css, __FILE__ );
 }

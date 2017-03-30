@@ -147,5 +147,5 @@ void LCUIWidget_AddTextCaret( void )
 	prototype = LCUIWidget_NewPrototype( "textcaret", NULL );
 	prototype->init = TextCaret_OnInit;
 	prototype->destroy = TextCaret_OnDestroy;
-	LCUI_LoadCSSString( textcaret_css, NULL );
+	LCUI_LoadCSSString( textcaret_css, __FILE__ );
 }

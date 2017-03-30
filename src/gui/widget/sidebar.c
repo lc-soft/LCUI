@@ -177,5 +177,5 @@ void LCUIWidget_AddSideBar(void)
 	self.sidebar->init = SideBar_OnInit;
 	self.item->init = SideBarItem_OnInit;
 	self.toggle->init = SideBarToggle_OnInit;
-	LCUI_LoadCSSString( sidebar_css, NULL );
+	LCUI_LoadCSSString( sidebar_css, __FILE__ );
 }

@@ -118,6 +118,7 @@ textedit {
 	border: 1px solid #eee;
 	padding: 5px 10px;
 	focusable: true;
+	display: inline-block;
 }
 textedit:focus {
 	border: 1px solid #2196F3;
@@ -866,7 +867,7 @@ void LCUIWidget_AddTextEdit( void )
 	self.prototype->setattr = TextEdit_SetAttr;
 	self.prototype->autosize = TextEdit_AutoSize;
 	self.prototype->runtask = TextEdit_OnTask;
-	LCUI_LoadCSSString( textedit_css, NULL );
 	self.event_id = LCUIWidget_AllocEventId();
 	LCUIWidget_SetEventName( self.event_id, "change" );
+	LCUI_LoadCSSString( textedit_css, __FILE__ );
 }
