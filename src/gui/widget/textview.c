@@ -43,6 +43,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
+#include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 
@@ -240,11 +241,11 @@ static LCUI_StyleParserRec style_parsers[] = {
 
 static void TextView_UpdateStyle( LCUI_Widget w )
 {
-	int i;
+	int i, value;
 	LCUI_Style s;
-	LCUI_TextView txt;
-	txt = Widget_GetData( w, self.prototype );
-	TextStyle_Init( &txt->style );
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	LCUI_TextStyle *ts = &txt->style;
+	TextStyle_Init( ts );
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
 		if( self.keys[i] < 0 ) {
 			continue;
@@ -253,10 +254,10 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 		switch( i ) {
 		case key_color:
 			if( s->is_valid ) {
-				txt->style.fore_color = s->color;
-				txt->style.has_fore_color = TRUE;
+				ts->fore_color = s->color;
+				ts->has_fore_color = TRUE;
 			} else {
-				txt->style.has_fore_color = FALSE;
+				ts->has_fore_color = FALSE;
 			}
 			break;
 		case key_font_family:
@@ -267,19 +268,20 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 			}
 			break;
 		case key_font_size:
-			txt->style.pixel_size = 14;
-			if( s->is_valid ) {
-				if( s->type == SVT_PX ) {
-					txt->style.pixel_size = s->px;
-				}
+			if( !s->is_valid ) {
+				ts->pixel_size = 14;
+				ts->has_pixel_size = TRUE;
+				break;
 			}
-			txt->style.has_pixel_size = TRUE;
+			value = roundi( LCUIMetrics_ApplyDimension( s ) );
+			ts->pixel_size = max( 12, value );
+			ts->has_pixel_size = TRUE;
 			break;
 		case key_font_style:
-			txt->style.has_style = FALSE;
+			ts->has_style = FALSE;
 			if( s->is_valid ) {
-				txt->style.style = s->value;
-				txt->style.has_style = TRUE;
+				ts->style = s->value;
+				ts->has_style = TRUE;
 			}
 			break;
 		case key_font_weight:
@@ -292,15 +294,23 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 			}
 			break;
 		case key_line_height:
-			if( s->is_valid ) {
-				TextLayer_SetLineHeight( txt->layer, s );
-			} else {
+			if( !s->is_valid ) {
 				LCUI_StyleRec style;
 				style.val_scale = 1.5;
 				style.type = SVT_SCALE;
 				style.is_valid = TRUE;
 				TextLayer_SetLineHeight( txt->layer, &style );
+				break;
 			}
+			switch( s->type ) {
+			case SVT_SCALE:
+			case SVT_PX: break;
+			default:
+				s->val_px = LCUIMetrics_ApplyDimension( s );
+				s->type = SVT_PX;
+				break;
+			}
+			TextLayer_SetLineHeight( txt->layer, s );
 			break;
 		case key_content:
 			if( s->is_valid ) {
@@ -326,7 +336,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 		default:break;
 		}
 	}
-	TextLayer_SetTextStyle( txt->layer, &txt->style );
+	TextLayer_SetTextStyle( txt->layer, ts );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
 }

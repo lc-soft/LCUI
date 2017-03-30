@@ -44,6 +44,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
+#include <LCUI/gui/metrics.h>
 
 #define WIDGET_SIZE (sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode) * 2)
 
@@ -508,55 +509,37 @@ int Widget_SetId( LCUI_Widget w, const char *idstr )
 	return -2;
 }
 
-static float ComputeXNumber( LCUI_Widget w, int key )
+static float ComputeXMetric( LCUI_Widget w, int key )
 {
 	LCUI_Style s = &w->style->sheet[key];
-	switch( s->type ) {
-	case SVT_SCALE:
+	if( s->type == SVT_SCALE ) {
 		if( !w->parent ) {
-			break;
+			return 0;
 		}
 		return w->parent->box.content.width * s->scale;
-	case SVT_PX:
-		return s->px;
-	case SVT_NONE:
-	case SVT_AUTO:
-	default: break;
 	}
-	return 0;
+	return LCUIMetrics_ApplyDimension( s );
 }
 
-static float ComputeYNumber( LCUI_Widget w, int key )
+static float ComputeYMetric( LCUI_Widget w, int key )
 {
 	LCUI_Style s = &w->style->sheet[key];
-	switch( s->type ) {
-	case SVT_SCALE:
+	if( s->type == SVT_SCALE ) {
 		if( !w->parent ) {
-			break;
+			return 0;
 		}
 		return w->parent->box.content.height * s->scale;
-	case SVT_PX:
-		return s->px;
-	case SVT_NONE:
-	case SVT_AUTO:
-	default: break;
 	}
-	return 0;
+	return LCUIMetrics_ApplyDimension( s );
 }
 
-static float ComputeSelfXNumber( LCUI_Widget w, int key )
+static float ComputeSelfXMetric( LCUI_Widget w, int key )
 {
 	LCUI_Style s = &w->style->sheet[key];
-	switch( s->type ) {
-	case SVT_SCALE:
+	if( s->type == SVT_SCALE ) {
 		return w->width * s->scale;
-	case SVT_PX:
-		return s->px;
-	case SVT_NONE:
-	case SVT_AUTO:
-	default: break;
 	}
-	return 0;
+	return LCUIMetrics_ApplyDimension( s );
 }
 
 static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
@@ -622,19 +605,19 @@ static void Widget_ComputeBorder( LCUI_Widget w )
 			b->left.style = style->value;
 			break;
 		case key_border_top_left_radius:
-			val = (unsigned int)ComputeSelfXNumber( w, key );
+			val = (unsigned int)ComputeSelfXMetric( w, key );
 			b->top_left_radius = val;
 			break;
 		case key_border_top_right_radius:
-			val = (unsigned int)ComputeSelfXNumber( w, key );
+			val = (unsigned int)ComputeSelfXMetric( w, key );
 			b->top_right_radius = val;
 			break;
 		case key_border_bottom_left_radius:
-			val = (unsigned int)ComputeSelfXNumber( w, key );
+			val = (unsigned int)ComputeSelfXMetric( w, key );
 			b->bottom_left_radius = val;
 			break;
 		case key_border_bottom_right_radius:
-			val = (unsigned int)ComputeSelfXNumber( w, key );
+			val = (unsigned int)ComputeSelfXMetric( w, key );
 			b->bottom_right_radius = val;
 			break;
 		default: break;
@@ -906,10 +889,10 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	int position = ComputeStyleOption( w, key_position, SV_STATIC );
 	int valign = ComputeStyleOption( w, key_vertical_align, SV_TOP );
 	w->computed_style.vertical_align = valign;
-	w->computed_style.left = ComputeXNumber( w, key_left );
-	w->computed_style.top = ComputeXNumber( w, key_top );
-	w->computed_style.right = ComputeYNumber( w, key_right );
-	w->computed_style.bottom = ComputeYNumber( w, key_bottom );
+	w->computed_style.left = ComputeXMetric( w, key_left );
+	w->computed_style.top = ComputeXMetric( w, key_top );
+	w->computed_style.right = ComputeYMetric( w, key_right );
+	w->computed_style.bottom = ComputeYMetric( w, key_bottom );
 	if( w->parent && w->computed_style.position != position ) {
 		Widget_UpdateLayout( w->parent );
 		Widget_ClearComputedSize( w );
@@ -1103,8 +1086,8 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	LCUI_Style sw = &w->style->sheet[key_width];
 	LCUI_Style sh = &w->style->sheet[key_height];
 	LCUI_Border *bbox = &style->border;
-	w->width = ComputeXNumber( w, key_width );
-	w->height = ComputeYNumber( w, key_height );
+	w->width = ComputeXMetric( w, key_width );
+	w->height = ComputeYMetric( w, key_height );
 	if( sw->type == SVT_AUTO || sh->type == SVT_AUTO ) {
 		if( w->proto && w->proto->autosize ) {
 			w->proto->autosize( w, &width, &height );
@@ -1163,22 +1146,22 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		break;
 	}
 	if( w->style->sheet[key_max_width].is_valid ) {
-		style->max_width = ComputeXNumber( w, key_max_width );
+		style->max_width = ComputeXMetric( w, key_max_width );
 	} else {
 		style->max_width = -1;
 	}
 	if( w->style->sheet[key_min_width].is_valid ) {
-		style->min_width = ComputeXNumber( w, key_min_width );
+		style->min_width = ComputeXMetric( w, key_min_width );
 	} else {
 		style->min_width = -1;
 	}
 	if( w->style->sheet[key_max_height].is_valid ) {
-		style->max_height = ComputeXNumber( w, key_max_height );
+		style->max_height = ComputeXMetric( w, key_max_height );
 	} else {
 		style->max_height = -1;
 	}
 	if( w->style->sheet[key_min_height].is_valid ) {
-		style->min_height = ComputeXNumber( w, key_min_height );
+		style->min_height = ComputeXMetric( w, key_min_height );
 	} else {
 		style->min_height = -1;
 	}
@@ -1255,14 +1238,14 @@ void Widget_UpdateMargin( LCUI_Widget w )
 	};
 	for( i = 0; i < 4; ++i ) {
 		LCUI_Style s = &w->style->sheet[pd_map[i].key];
-		if( !s->is_valid || s->type != SVT_PX ) {
+		if( !s->is_valid ) {
 			pd_map[i].sval->type = SVT_PX;
 			pd_map[i].sval->px = 0.0;
 			*pd_map[i].fval = 0.0;
 			continue;
 		}
 		*pd_map[i].sval = *s;
-		*pd_map[i].fval = s->px;
+		*pd_map[i].fval = LCUIMetrics_ApplyDimension( s );;
 	}
 	/* 如果有父级部件，则处理 margin-left 和 margin-right 的值 */
 	if( w->parent ) {
@@ -1329,14 +1312,14 @@ void Widget_UpdateSize( LCUI_Widget w )
 	/* 内边距的单位暂时都用 px  */
 	for( i = 0; i < 4; ++i ) {
 		LCUI_Style s = &w->style->sheet[pd_map[i].key];
-		if( !s->is_valid || s->type != SVT_PX ) {
+		if( !s->is_valid ) {
 			pd_map[i].sval->type = SVT_PX;
 			pd_map[i].sval->px = 0.0;
 			*pd_map[i].ival = 0.0;
 			continue;
 		}
 		*pd_map[i].sval = *s;
-		*pd_map[i].ival = s->px;
+		*pd_map[i].ival = LCUIMetrics_ApplyDimension( s );
 	}
 	box_sizing = ComputeStyleOption( w, key_box_sizing, SV_CONTENT_BOX );
 	w->computed_style.box_sizing = box_sizing;

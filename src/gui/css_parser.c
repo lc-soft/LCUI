@@ -807,7 +807,6 @@ parse_value:
 	return size;
 }
 
-/** 从文件中载入CSS样式数据，并导入至样式库中 */
 int LCUI_LoadCSSFile( const char *filepath )
 {
 	int n;

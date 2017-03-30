@@ -40,6 +40,7 @@
 #ifndef LCUI_DISPLAY_CONTROL_H
 #define LCUI_DISPLAY_CONTROL_H
 
+#include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/surface.h>
 

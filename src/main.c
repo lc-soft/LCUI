@@ -545,6 +545,7 @@ void LCUI_InitBase( void )
 	LCUI_InitTimer();
 	LCUI_InitKeyboard();
 	LCUI_InitWidget();
+	LCUI_InitMetrics();
 }
 
 void LCUI_Init( void )
@@ -572,6 +573,7 @@ int LCUI_Destroy( void )
 	LCUI_ExitTimer();
 	LCUI_ExitDisplay();
 	LCUI_ExitEvent();
+	LCUI_ExitMetrics();
 	LCUI_ExitApp();
 	return 0;
 }

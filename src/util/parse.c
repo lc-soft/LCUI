@@ -76,9 +76,28 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 	switch( *p ) {
 	case 'd':
 	case 'D':
+		s->type = SVT_NONE;
+		if( !p[1] ) {
+			break;
+		}
 		if( p[1] == 'p' || p[1] == 'P' ) {
-			s->type = SVT_DP;
-			sscanf( num_str, "%f", &s->dp );
+			s->type = SVT_DIP;
+			sscanf( num_str, "%f", &s->dip );
+			break;
+		}
+		if( p[1] == 'i' || p[1] == 'I' ) {
+			if( p[2] == 'p' || p[2] == 'P' ) {
+				s->type = SVT_DIP;
+				sscanf( num_str, "%f", &s->dip );
+				break;
+			}
+		}
+		break;
+	case 's':
+	case 'S':
+		if( p[1] == 'p' || p[1] == 'P' ) {
+			s->type = SVT_SP;
+			sscanf( num_str, "%f", &s->sp );
 		} else {
 			s->type = SVT_NONE;
 		}
