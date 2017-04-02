@@ -220,9 +220,11 @@ int EventTrigger_Trigger( LCUI_EventTrigger trigger, int event_id, void *arg )
 	}
 	record->blocked = FALSE;
 	while( record->trash.length > 0 ) {
-		handler = LinkedList_Get( &record->trash, 0 );
+		node = record->trash.head.next;
+		handler = node->data;
 		RBTree_Erase( &trigger->handlers, handler->id );
-		LinkedList_Unlink( &record->trash, &handler->node );
+		LinkedList_Unlink( &record->handlers, &handler->node );
+		LinkedList_DeleteNode( &record->trash, node );
 		if( handler->destroy_data && handler->data ) {
 			handler->destroy_data( handler->data );
 		}
