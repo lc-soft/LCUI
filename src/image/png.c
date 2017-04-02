@@ -139,7 +139,7 @@ int LCUI_ReadPNGHeader( LCUI_ImageReader reader )
 	}
 	png_set_sig_bytes( png_reader->png_ptr, PNG_BYTES_TO_CHECK );
 	/* 读取PNG图片信息 */
-	png_read_png( png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0 );
+	png_read_info( png_ptr,info_ptr );
 	reader->header.width = png_get_image_width( png_ptr, info_ptr );
 	reader->header.height = png_get_image_height( png_ptr, info_ptr );
 	reader->header.bit_depth = png_get_bit_depth( png_ptr, info_ptr );
@@ -166,14 +166,14 @@ int LCUI_ReadPNGHeader( LCUI_ImageReader reader )
 int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 {
 #ifdef USE_LIBPNG
-	uchar_t *byte;
-	png_bytep* rows;
+	png_uint_32 i;
+	png_bytep row;
 	png_infop info_ptr;
 	png_structp png_ptr;
-	LCUI_PNGReader png_reader;
 	LCUI_ImageHeader header;
-	unsigned int x, y;
-	int ret = 0;
+	LCUI_PNGReader png_reader;
+	int pass, number_passes, ret = 0;
+	float progress;
 
 	if( reader->type != LCUI_PNG_READER ) {
 		return -EINVAL;
@@ -187,8 +187,6 @@ int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 			return -ENODATA;
 		}
 	}
-	/* 获取所有行像素数据，row_pointers里边就是rgba数据 */
-	rows = png_get_rows( png_ptr, info_ptr );
 	/* 根据不同的色彩类型进行相应处理 */
 	switch( header->color_type ) {
 	case COLOR_TYPE_ARGB:
@@ -198,19 +196,6 @@ int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 			ret = -ENOMEM;
 			break;
 		}
-		byte = graph->bytes;
-		for( y = 0; y < header->height; ++y ) {
-			/*
-			* Graph的像素数据存储格式是BGRA，而PNG库
-			* 提供像素数据的是RGBA格式的，因此需要调整写入顺序
-			*/
-			for( x = 0; x < header->width * 4; x += 4 ) {
-				*byte++ = rows[y][x + 2];
-				*byte++ = rows[y][x + 1];
-				*byte++ = rows[y][x];
-				*byte++ = rows[y][x + 3];
-			}
-		}
 		break;
 	case COLOR_TYPE_RGB:
 		graph->color_type = COLOR_TYPE_RGB;
@@ -219,19 +204,24 @@ int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 			ret = -ENOMEM;
 			break;
 		}
-		byte = graph->bytes;
-		for( y = 0; y < header->height; ++y ) {
-			for( x = 0; x < header->width * 3; x += 3 ) {
-				*byte++ = rows[y][x + 2];
-				*byte++ = rows[y][x + 1];
-				*byte++ = rows[y][x];
-			}
-		}
 		break;
 	default:
 		/* 其它色彩类型的图像就不处理了 */
-		ret = -ENODATA;
-		break;
+		return -ENODATA;
+	}
+	png_set_bgr( png_ptr );
+	png_set_expand( png_ptr );
+	png_read_update_info( png_ptr, info_ptr );
+	number_passes = png_set_interlace_handling( png_ptr );
+	for( pass = 0; pass < number_passes; ++pass ) {
+		for( i = 0; i < graph->height; ++i ) {
+			row = graph->bytes + i * graph->bytes_per_row;
+			png_read_row( png_ptr, row, NULL );
+			if( reader->fn_prog ) {
+				progress = 100.0 * i / graph->height;
+				reader->fn_prog( reader->prog_arg, progress );
+			}
+		}
 	}
 	return ret;
 #else
@@ -288,7 +278,7 @@ int LCUI_WritePNGFile( const char *file_name, const LCUI_Graph *graph )
 		color_type = PNG_COLOR_TYPE_RGB;
 	}
 	/* write header */
-	png_set_IHDR( png_ptr, info_ptr, graph->w, graph->h,
+	png_set_IHDR( png_ptr, info_ptr, graph->width, graph->height,
 		      8, color_type, PNG_INTERLACE_NONE,
 		      PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE );
 
@@ -312,7 +302,7 @@ int LCUI_WritePNGFile( const char *file_name, const LCUI_Graph *graph )
 				row_pointers[y][x++] = px_ptr->blue;
 				row_pointers[y][x++] = px_ptr->alpha;
 			}
-			px_row_ptr += graph->w;
+			px_row_ptr += graph->width;
 		}
 	} else {
 		uchar_t *px_ptr, *px_row_ptr;

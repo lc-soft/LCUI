@@ -44,9 +44,10 @@
 
 LCUI_BEGIN_HEADER
 
-typedef size_t( *LCUI_ImageReadFunction )(void*, void*, size_t);
-typedef void( *LCUI_ImageSkipFunction )(void*, long);
-typedef void( *LCUI_ImageFunction )(void*);
+typedef void( *LCUI_ImageProgressFunc )(void*, float);
+typedef size_t( *LCUI_ImageReadFunc )(void*, void*, size_t);
+typedef void( *LCUI_ImageSkipFunc )(void*, long);
+typedef void( *LCUI_ImageFunc )(void*);
 
 /** 图像读取器的类型 */
 enum LCUI_ImageReaderType {
@@ -72,20 +73,22 @@ typedef struct LCUI_ImageHeaderRec_ {
 
 /** 图像读取器 */
 typedef struct LCUI_ImageReaderRec_ {
-	void *stream_data;		/**< 自定义的输入流数据 */
-	LCUI_BOOL has_error;		/**< 是否有错误 */
-	LCUI_ImageHeaderRec header;	/**< 图像头部信息 */
-	LCUI_ImageFunction fn_begin;	/**< 在开始读取前调用的函数 */
-	LCUI_ImageFunction fn_end;	/**< 在结束读取时调用的函数 */
-	LCUI_ImageFunction fn_rewind;	/**< 游标重置函数，用于重置当前读取位置到数据流的开头处 */
-	LCUI_ImageReadFunction fn_read;	/**< 数据读取函数，用于从数据流中读取数据 */
-	LCUI_ImageSkipFunction fn_skip;	/**< 游标移动函数，用于跳过一段数据 */
+	void *stream_data;			/**< 自定义的输入流数据 */
+	LCUI_BOOL has_error;			/**< 是否有错误 */
+	LCUI_ImageHeaderRec header;		/**< 图像头部信息 */
+	LCUI_ImageFunc fn_begin;		/**< 在开始读取前调用的函数 */
+	LCUI_ImageFunc fn_end;			/**< 在结束读取时调用的函数 */
+	LCUI_ImageFunc fn_rewind;		/**< 游标重置函数，用于重置当前读取位置到数据流的开头处 */
+	LCUI_ImageReadFunc fn_read;		/**< 数据读取函数，用于从数据流中读取数据 */
+	LCUI_ImageSkipFunc fn_skip;		/**< 游标移动函数，用于跳过一段数据 */
+	LCUI_ImageProgressFunc fn_prog;		/**< 用于接收图像读取进度的函数 */
+	void *prog_arg;				/**< 接收图像读取进度时的附加参数 */
 
-	int type;			/**< 图片读取器类型 */
-	void *data;			/**< 私有数据 */
-	void( *destructor )(void*);	/**< 私有数据的析构函数 */
-	jmp_buf *env;			/**< 堆栈环境缓存的指针，用于 setjump() */
-	jmp_buf env_src;		/**< 默认堆栈环境缓存 */
+	int type;				/**< 图片读取器类型 */
+	void *data;				/**< 私有数据 */
+	void( *destructor )(void*);		/**< 私有数据的析构函数 */
+	jmp_buf *env;				/**< 堆栈环境缓存的指针，用于 setjump() */
+	jmp_buf env_src;			/**< 默认堆栈环境缓存 */
 } LCUI_ImageReaderRec, *LCUI_ImageReader;
 
 /** 初始化适用于 PNG 图像的读取器 */

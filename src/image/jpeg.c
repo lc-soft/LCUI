@@ -259,6 +259,11 @@ int LCUI_ReadJPEG( LCUI_ImageReader reader, LCUI_Graph *graph )
 			*bytep++ = buffer[0][k + 1];
 			*bytep++ = buffer[0][k];
 		}
+		if( reader->fn_prog ) {
+			reader->fn_prog( reader->prog_arg,
+					 100.0 * cinfo->output_scanline
+					 / cinfo->output_height );
+		}
 	}
 	return 0;
 #else

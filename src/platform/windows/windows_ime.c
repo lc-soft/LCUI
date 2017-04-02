@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * windows_ime.c -- input method engine support for windows platform.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * windows_ime.c -- windows 平台输入法引擎支持。
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -45,7 +45,6 @@
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
 #include <LCUI/input.h>
-#include <LCUI/gui/widget.h>
 #include <LCUI/ime.h>
 #include <LCUI/platform.h>
 #include LCUI_EVENTS_H

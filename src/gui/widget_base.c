@@ -318,7 +318,9 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	StyleSheet_Delete( widget->inherited_style );
 	StyleSheet_Delete( widget->custom_style );
 	StyleSheet_Delete( widget->style );
-	Widget_UpdateLayout( widget->parent );
+	if( widget->parent ) {
+		Widget_UpdateLayout( widget->parent );
+	}
 	Widget_SetId( widget, NULL );
 	if( widget->type && !widget->proto ) {
 		free( widget->type );
@@ -516,6 +518,9 @@ static float ComputeXMetric( LCUI_Widget w, int key )
 		if( !w->parent ) {
 			return 0;
 		}
+		if( w->computed_style.position == SV_ABSOLUTE ) {
+			return w->parent->box.padding.width * s->scale;
+		}
 		return w->parent->box.content.width * s->scale;
 	}
 	return LCUIMetrics_ApplyDimension( s );
@@ -527,6 +532,9 @@ static float ComputeYMetric( LCUI_Widget w, int key )
 	if( s->type == SVT_SCALE ) {
 		if( !w->parent ) {
 			return 0;
+		}
+		if( w->computed_style.position == SV_ABSOLUTE ) {
+			return w->parent->box.padding.height * s->scale;
 		}
 		return w->parent->box.content.height * s->scale;
 	}

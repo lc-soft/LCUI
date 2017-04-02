@@ -138,6 +138,9 @@ void LCUI_DestroyImageReader( LCUI_ImageReader reader )
 int LCUI_ReadImageHeader( LCUI_ImageReader reader )
 {
 	int i = reader->type - 1;
+	if( reader->header.type != LCUI_UNKNOWN_IMAGE ) {
+		return 0;
+	}
 	if( i < n_interfaces && i >= 0 ) {
 		return interfaces[i].read_header( reader );
 	}

@@ -112,6 +112,9 @@ static void WinSurface_ExecDestroy( LCUI_Surface surface )
 {
 	surface->width = 0;
 	surface->height = 0;
+	if( surface->fb_bmp ) {
+		DeleteObject( surface->fb_bmp );
+	}
 	if( surface->hwnd ) {
 		if( surface->hdc_fb ) {
 			/* DeleteDC only for CreateDC */
@@ -121,9 +124,6 @@ static void WinSurface_ExecDestroy( LCUI_Surface surface )
 			/* ReleaseDC only for GetDC */
 			ReleaseDC( surface->hwnd, surface->hdc_client );
 		}
-	}
-	if( surface->fb_bmp ) {
-		DeleteObject( surface->fb_bmp );
 	}
 	surface->hdc_fb = NULL;
 	surface->hdc_client = NULL;

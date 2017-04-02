@@ -449,7 +449,7 @@ static void FontBitmap_MixARGB( LCUI_Graph *graph, LCUI_Rect *write_rect,
 			px->b = (uchar_t)(out_b + 0.5);
 			px->a = (uchar_t)(255.0 * out_a + 0.5);
 		}
-		px_row_des += graph->w;
+		px_row_des += graph->width;
 		byte_row_ptr += bmp->width;
 	}
 }
@@ -487,7 +487,7 @@ int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 {
 	LCUI_Graph write_slot;
 	LCUI_Rect r_rect, w_rect;
-	if( pos.x > graph->w || pos.y > graph->h ) {
+	if( pos.x > (int)graph->width || pos.y > (int)graph->height ) {
 		return -2;
 	}
 	/* 获取写入区域 */

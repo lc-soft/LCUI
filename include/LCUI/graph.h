@@ -165,10 +165,10 @@ LCUI_API int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect 
 	) : ((G)->color_type == COLOR_TYPE_ARGB))
 
 /** 判断图像是否有效 */
-#define Graph_IsValid(G)						\
-	((G)->quote.is_valid ? ((G)->quote.source			\
-	 && (G)->quote.source->w > 0 && (G)->quote.source->h > 0	\
-	) : ((G) && (G)->bytes && (G)->h > 0 && (G)->w > 0))
+#define Graph_IsValid(G)							\
+	((G)->quote.is_valid ? ((G)->quote.source				\
+	 && (G)->quote.source->width > 0 && (G)->quote.source->height > 0	\
+	) : ((G) && (G)->bytes && (G)->height > 0 && (G)->width > 0))
 
 #define Graph_GetSize(G, S) ((S)->w = (G)->w, (S)->h = (G)->h)
 

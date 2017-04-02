@@ -76,68 +76,70 @@ static void VertiSmoothARGB( LCUI_ARGB *pSrcPixels, LCUI_ARGB *pDesPixels,
 }
 
 /** 对图像进行高斯模糊处理 */
-LCUI_API int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
+int GaussianSmooth( LCUI_Graph *src, LCUI_Graph *des, double sigma )
 {
-	LCUI_Graph temp;
-	int kcenter, i;
-	int x, y, ksize;
+	size_t x, y;
+	int kcenter, i, ksize;
 	double *kernel, scale, cons, sum = 0;
 	LCUI_ARGB *p_src_px, *p_des_px;
-	
+	LCUI_Graph temp;
+
 	sigma = sigma > 0 ? sigma : -sigma;
 	// ksize为奇数 
-	ksize = ceil(sigma * 3) * 2 + 1; 
-	if(ksize == 1) {
+	ksize = ceil( sigma * 3 ) * 2 + 1;
+	if( ksize == 1 ) {
 		Graph_Copy( des, src );
 		return 0;
 	}
 
 	// 计算一维高斯核 
-	scale = -0.5/(sigma*sigma);
-	cons = 1/sqrt(-scale / PI); 
-	kcenter = ksize/2; 
-	kernel = (double*)malloc( ksize*sizeof(double) );
-	for(i = 0; i < ksize; ++i) {
+	scale = -0.5 / (sigma*sigma);
+	cons = 1 / sqrt( -scale / PI );
+	kcenter = ksize / 2;
+	kernel = (double*)malloc( ksize * sizeof( double ) );
+	for( i = 0; i < ksize; ++i ) {
 		int x = i - kcenter;
-		*(kernel+i) = cons * exp(x * x * scale); // 一维高斯函数
-		sum += *(kernel+i);
-	} 
-	// 归一化,确保高斯权值在[0,1]之间
-	for(i = 0; i < ksize; i++) {
-		*(kernel+i) /= sum;
+		*(kernel + i) = cons * exp( x * x * scale ); // 一维高斯函数
+		sum += *(kernel + i);
 	}
-	
+	// 归一化,确保高斯权值在[0,1]之间
+	for( i = 0; i < ksize; i++ ) {
+		*(kernel + i) /= sum;
+	}
+
 	des->color_type = src->color_type;
-	if( Graph_Create( des, src->w, src->h ) != 0 ) {
+	if( Graph_Create( des, src->width, src->height ) != 0 ) {
 		return -1;
 	}
-	
+
 	Graph_Init( &temp );
 	temp.color_type = src->color_type;
-	if( Graph_Create( &temp, src->w, src->h ) != 0 ) {
+	if( Graph_Create( &temp, src->width, src->height ) != 0 ) {
 		return -2;
 	}
-	
+
 	// x方向一维高斯模糊
 	p_des_px = temp.argb;
 	p_src_px = src->argb - kcenter;
-	for( y=0; y<src->h; ++y ) {
-		HorizSmoothARGB( p_src_px, p_des_px, src->w, kernel, kcenter );
-		p_des_px += temp.w;
-		p_src_px += src->w;
+	for( y = 0; y < src->height; ++y ) {
+		HorizSmoothARGB( p_src_px, p_des_px,
+				 src->width, kernel, kcenter );
+		p_des_px += temp.width;
+		p_src_px += src->width;
 	}
 
 	// y方向一维高斯模糊
 	p_des_px = temp.argb;
-	p_src_px = src->argb - kcenter*temp.w;
-	for( x=0; x<temp.w; ++x ) {
-		VertiSmoothARGB( p_src_px, p_des_px, src->h, src->w, kernel, kcenter );
+	p_src_px = src->argb - kcenter*temp.width;
+	for( x = 0; x < temp.width; ++x ) {
+		VertiSmoothARGB( p_src_px, p_des_px, src->height,
+				 src->width, kernel, kcenter );
 		++p_des_px;
 		++p_src_px;
 	}
-	
+
 	Graph_Free( &temp );
-	free(kernel);
+	free( kernel );
 	return 0;
 }
 

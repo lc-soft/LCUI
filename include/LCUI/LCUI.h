@@ -178,8 +178,8 @@ typedef struct LCUI_Border {
 
 typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
-	union { int w, width; };	/**< 宽度，一个整数值，单位为像素(px) */
-	union { int h, height; };	/**< 高度，一个整数值，单位为像素(px) */
+	size_t width;			/**< 宽度，一个整数值，单位为像素(px) */
+	size_t height;			/**< 高度，一个整数值，单位为像素(px) */
 	struct {
 		int top;		/**< 源图形中的引用区域的上边距 */
 		int left;		/**< 源图形中的引用区域的左边距 */

@@ -171,6 +171,10 @@ int LCUI_ReadBMP( LCUI_ImageReader reader, LCUI_Graph *graph )
 		}
 		memcpy( dest, buffer, graph->bytes_per_row );
 		dest -= graph->bytes_per_row;
+		if( reader->fn_prog ) {
+			reader->fn_prog( reader->prog_arg,
+					 100.0 * row / info->height );
+		}
 	}
 	free( buffer );
 	return 0;
