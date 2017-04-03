@@ -829,6 +829,8 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 		break;
 	case LCUI_MOUSEWHEEL:
 		ev.type = WET_MOUSEWHEEL;
+		ev.wheel.x = pos.x;
+		ev.wheel.y = pos.y;
 		ev.wheel.delta = sys_ev->wheel.delta;
 		Widget_PostEvent( target, &ev, NULL, NULL );
 	default:return;
