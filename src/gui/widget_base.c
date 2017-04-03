@@ -898,13 +898,19 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	int valign = ComputeStyleOption( w, key_vertical_align, SV_TOP );
 	w->computed_style.vertical_align = valign;
 	w->computed_style.left = ComputeXMetric( w, key_left );
-	w->computed_style.top = ComputeXMetric( w, key_top );
-	w->computed_style.right = ComputeYMetric( w, key_right );
+	w->computed_style.right = ComputeXMetric( w, key_right );
+	w->computed_style.top = ComputeYMetric( w, key_top );
 	w->computed_style.bottom = ComputeYMetric( w, key_bottom );
 	if( w->parent && w->computed_style.position != position ) {
+		w->computed_style.position = position;
 		Widget_UpdateLayout( w->parent );
 		Widget_ClearComputedSize( w );
 		Widget_UpdateChildrenSize( w );
+		/* 当部件尺寸是按百分比动态计算的时候需要重新计算尺寸 */
+		if( CheckStyleType( w->style->sheet, key_width, scale ) ||
+		    CheckStyleType( w->style->sheet, key_height, scale ) ) {
+			Widget_UpdateSize( w );
+		}
 	}
 	w->computed_style.position = position;
 	RectF2Rect( w->box.graph, rect );
@@ -913,8 +919,7 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	w->y = w->origin_y;
 	switch( position ) {
 	case SV_ABSOLUTE:
-		w->x = 0;
-		w->y = 0;
+		w->x = w->y = 0;
 		if( w->style->sheet[key_left].is_valid ) {
 			w->x = w->computed_style.left;
 		} else if( w->style->sheet[key_right].is_valid ) {
@@ -1042,8 +1047,8 @@ static void Widget_ComputeContentSize( LCUI_Widget w,
 			continue;
 		}
 		s = &child->style->sheet[key_width];
-		/* 对于宽度以百分比做单位的，计算尺寸时自动去除外间距框、内间距框和
-		 * 边框占用的空间
+		/* 对于宽度以百分比做单位的，计算尺寸时自动去除外间距框、
+		 * 内间距框和边框占用的空间
 		 */
 		if( s->type == SVT_SCALE ) {
 			if( style->box_sizing == SV_BORDER_BOX ) {

@@ -45,9 +45,6 @@
 
 /** 部件任务模块数据 */
 static struct WidgetTaskModule {
-	size_t count;					/**< 当前已处理的部件数量 */
-	int64_t timeout;				/**< 超时时间点 */
-	LCUI_BOOL is_timeout;				/**< 是否已经超时 */
 	LinkedList trash;				/**< 待删除的部件列表 */
 	LCUI_WidgetFunction handlers[WTT_TOTAL_NUM];	/**< 任务处理器 */
 } self;
@@ -156,7 +153,6 @@ static void LCUIWidget_ClearTrash( void )
 void LCUIWidget_InitTasks( void )
 {
 	MapTaskHandler();
-	self.timeout = 0;
 	LinkedList_Init( &self.trash );
 }
 
@@ -184,7 +180,7 @@ void Widget_AddToTrash( LCUI_Widget w )
 	Widget_PostSurfaceEvent( w, WET_REMOVE );
 }
 
-int Widget_UpdateEx( LCUI_Widget w, LCUI_BOOL has_timeout )
+int Widget_Update( LCUI_Widget w )
 {
 	int i;
 	LCUI_BOOL *buffer;
@@ -222,7 +218,6 @@ int Widget_UpdateEx( LCUI_Widget w, LCUI_BOOL has_timeout )
 			w->state = WSTATE_NORMAL;
 		}
 	}
-	self.count += 1;
 
 proc_children_task:
 
@@ -240,19 +235,8 @@ proc_children_task:
 		 */
 		next = node->next;
 		/* 如果该级部件的任务需要留到下次再处理 */
-		if(  Widget_UpdateEx( child, has_timeout ) ) {
+		if(  Widget_Update( child ) ) {
 			w->task.for_children = TRUE;
-		}
-		if( has_timeout ) {
-			if( !self.is_timeout && self.count >= 500 ) {
-				self.count = 0;
-				if( LCUI_GetTime() >= self.timeout ) {
-					self.is_timeout = TRUE;
-				}
-			}
-			if( self.is_timeout ) {
-				break;
-			}
 		}
 		node = next;
 	}
@@ -261,10 +245,9 @@ proc_children_task:
 
 void LCUIWidget_Update( void )
 {
+	int count = 0;
 	LCUI_Widget root;
-	self.is_timeout = FALSE;
-	self.timeout = LCUI_GetTime() + 15;
 	root = LCUIWidget_GetRoot();
-	while( !self.is_timeout && Widget_UpdateEx( root, TRUE ) );
+	while( Widget_Update( root ) && count++ < 5 );
 	LCUIWidget_ClearTrash();
 }
