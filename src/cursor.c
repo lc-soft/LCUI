@@ -134,8 +134,8 @@ void LCUICursor_GetRect( LCUI_Rect *rect )
 {
 	rect->x = cursor.pos.x;
 	rect->y = cursor.pos.y;
-	rect->width = cursor.graph.w;
-	rect->height = cursor.graph.h;
+	rect->width = cursor.graph.width;
+	rect->height = cursor.graph.height;
 }
 
 /* 刷新鼠标游标在屏幕上显示的图形 */

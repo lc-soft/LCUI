@@ -226,7 +226,7 @@ int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 	return ret;
 #else
 	_DEBUG_MSG( "warning: not PNG support!" );
-	return -ENOSYS
+	return -ENOSYS;
 #endif
 }
 
