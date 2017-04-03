@@ -12,6 +12,7 @@ widget_background.c	\
 css_parser.c		\
 css_library.c		\
 builder.c		\
+metrics.c		\
 widget/textview.c	\
 widget/textcaret.c	\
 widget/textedit.c	\

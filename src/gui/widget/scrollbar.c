@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
 * scrollbar.c -- LCUI's scrollbar widget
 *
-* Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
+* Copyright (C) 2016-2017 by Liu Chao <lc-soft@live.cn>
 *
 * This file is part of the LCUI project, and may only be used, modified, and
 * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
 * scrollbar.c -- LCUI 的滚动条部件
 *
-* 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
+* 版权所有 (C) 2016-2017 归属于 刘超 <lc-soft@live.cn>
 *
 * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
 *
@@ -146,8 +146,8 @@ static void OnInertialScrolling( void *arg )
 		   effect->speed + effect->speed_delta * time );
 	while( effect->is_running ) {
 		double speed = effect->speed + effect->speed_delta * time;
-		if( effect->speed > 0 && speed <= 0 ||
-		    effect->speed < 0 && speed >= 0 ) {
+		if( (effect->speed > 0 && speed <= 0) ||
+		    (effect->speed < 0 && speed >= 0) ) {
 			break;
 		}
 		ScrollBar_SetPosition( w, pos );

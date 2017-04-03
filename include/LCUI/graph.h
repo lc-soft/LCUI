@@ -116,14 +116,15 @@ enum GraphColorType {
 
 #define Graph_GetQuote(g) (g)->quote.is_valid ? (g)->quote.source:(g)
 
-#define Graph_SetPixel(G, X, Y, C) 				\
-	if( (G)->color_type == COLOR_TYPE_ARGB ) {		\
-		(G)->argb[(G)->w*(Y)+(X)] = (C);		\
-	} else {						\
-		(G)->bytes[((G)->w*(Y)+(X))*3] = (C).value>>8;	\
+#define Graph_SetPixel(G, X, Y, C) 						\
+	if( (G)->color_type == COLOR_TYPE_ARGB ) {				\
+		(G)->argb[(G)->width*(Y)+(X)] = (C);			\
+	} else {								\
+		(G)->bytes[(G)->bytes_per_row*(Y)+(X)*3] = (C).value>>8;	\
 	}
 
-#define Graph_SetPixelAlpha(G, X, Y, A) (G)->argb[(G)->w*(Y)+(X)].alpha = (A)
+#define Graph_SetPixelAlpha(G, X, Y, A)\
+(G)->argb[(G)->width*(Y)+(X)].alpha = (A)
 
 LCUI_API void Graph_PrintInfo( LCUI_Graph *graph );
 
@@ -169,8 +170,6 @@ LCUI_API int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect 
 	((G)->quote.is_valid ? ((G)->quote.source				\
 	 && (G)->quote.source->width > 0 && (G)->quote.source->height > 0	\
 	) : ((G) && (G)->bytes && (G)->height > 0 && (G)->width > 0))
-
-#define Graph_GetSize(G, S) ((S)->w = (G)->w, (S)->h = (G)->h)
 
 LCUI_API void Graph_GetValidRect( const LCUI_Graph *graph, LCUI_Rect *rect );
 

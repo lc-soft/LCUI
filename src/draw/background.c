@@ -200,7 +200,7 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 	read_rect.x -= image_x;
 	read_rect.y -= image_y;
 	/* 如果尺寸没有变化则直接引用 */
-	if( image_w == bg->image.w && image_h == bg->image.h ) {
+	if( image_w == bg->image.width && image_h == bg->image.height ) {
 		Graph_Quote( &graph, &bg->image, &read_rect );
 		/* 转换成相对于当前绘制区域的坐标 */
 		image_x = image_x + box->x - paint->rect.x;
@@ -217,12 +217,12 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 		Graph_Init( &buffer );
 		quote_rect = read_rect;
 		/* 根据宽高的缩放比例，计算实际需要引用的区域 */
-		if( image_w != bg->image.w ) {
+		if( image_w != bg->image.width ) {
 			scale = 1.0 * bg->image.width / image_w;
 			quote_rect.x *= scale;
 			quote_rect.width *= scale;
 		}
-		if( image_h != bg->image.h ) {
+		if( image_h != bg->image.height ) {
 			scale = 1.0 * bg->image.height / image_h;
 			quote_rect.y *= scale;
 			quote_rect.height *= scale;

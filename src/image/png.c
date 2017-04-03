@@ -211,8 +211,8 @@ int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 	}
 	png_set_bgr( png_ptr );
 	png_set_expand( png_ptr );
-	png_read_update_info( png_ptr, info_ptr );
 	number_passes = png_set_interlace_handling( png_ptr );
+	png_read_update_info( png_ptr, info_ptr );
 	for( pass = 0; pass < number_passes; ++pass ) {
 		for( i = 0; i < graph->height; ++i ) {
 			row = graph->bytes + i * graph->bytes_per_row;

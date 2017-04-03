@@ -3,8 +3,8 @@
 #include <LCUI/graph.h>
 
 /* 绘制水平线 */
-LCUI_API void
-Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos start, int len )
+void Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size,
+			  LCUI_Pos start, int len )
 {
 	int y, x;
 	LCUI_Rect area;
@@ -31,7 +31,7 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 	}
 	if( des->color_type == COLOR_TYPE_ARGB ) {
 		LCUI_ARGB *pPixel, *pRowPixel;
-		pRowPixel = des->argb + start.y*des->w + start.x;
+		pRowPixel = des->argb + start.y*des->width + start.x;
 		for( y=0; y<size; ++y ) {
 			pPixel = pRowPixel;
 			for( x=0; x<len; ++x ) {
@@ -41,11 +41,11 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 				pPixel->a = 255;
 				++pPixel;
 			}
-			pRowPixel += des->w;
+			pRowPixel += des->width;
 		}
 	} else {
 		uchar_t *pByte, *pRowByte;
-		pRowByte = des->bytes + (start.y*des->w + start.x)*3;
+		pRowByte = des->bytes + start.y*des->bytes_per_row + start.x*3;
 		for( y=0; y<size; ++y ) {
 			pByte = pRowByte;
 			for( x=0; x<len; ++x ) {
@@ -53,7 +53,7 @@ Graph_DrawHorizLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 				*pByte++ = color.green;
 				*pByte++ = color.red;
 			}
-			pRowByte += des->w*3;
+			pRowByte += des->bytes_per_row;
 		}
 	}
 }
@@ -89,7 +89,7 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 
 	if( des->color_type == COLOR_TYPE_ARGB ) {
 		LCUI_ARGB *pPixel, *pRowPixel;
-		pRowPixel = des->argb + start.y*des->w + start.x;
+		pRowPixel = des->argb + start.y*des->width + start.x;
 		for( y=0; y<len; ++y ) {
 			pPixel = pRowPixel;
 			for( x=0; x<size; ++x ) {
@@ -99,11 +99,11 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 				pPixel->a = 255;
 				++pPixel;
 			}
-			pRowPixel += des->w;
+			pRowPixel += des->width;
 		}
 	} else {
 		uchar_t *pByte, *pRowByte;
-		pRowByte = des->bytes + (start.y*des->w + start.x)*3;
+		pRowByte = des->bytes + start.y*des->bytes_per_row + start.x*3;
 		for( y=0; y<len; ++y ) {
 			pByte = pRowByte;
 			for( x=0; x<size; ++x ) {
@@ -111,7 +111,7 @@ Graph_DrawVertiLine( LCUI_Graph *graph, LCUI_Color color, int size, LCUI_Pos sta
 				*pByte++ = color.green;
 				*pByte++ = color.red;
 			}
-			pRowByte += des->w*3;
+			pRowByte += des->bytes_per_row;
 		}
 	}
 }

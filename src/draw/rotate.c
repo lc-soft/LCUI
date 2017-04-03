@@ -36,9 +36,9 @@ LCUI_API int Graph_Rotate( LCUI_Graph *src, int rotate_angle, LCUI_Graph *des )
 		return -1;
 	}
 	// 获取图像的"宽度"（4的倍数）   
-	width = src->w; 
+	width = src->width;
 	// 获取图像的高度   
-	height = src->h;   
+	height = src->height;
 	   
 	// 将旋转角度从度转换到弧度   
 	fRotateAngle = (double) radian(rotate_angle); 
@@ -119,13 +119,8 @@ LCUI_API int Graph_Rotate( LCUI_Graph *src, int rotate_angle, LCUI_Graph *des )
 				}
 			}
 		}
-		if( src->color_type == COLOR_TYPE_ARGB ) {
-			pDesRowByte += des->w*4;
-			pSrcRowByte += src->w*4;
-		} else {
-			pDesRowByte += des->w*3;
-			pSrcRowByte += src->w*3;
-		}
+		pDesRowByte += des->bytes_per_row;
+		pSrcRowByte += src->bytes_per_row;
 	}
 	return 0;
 }
