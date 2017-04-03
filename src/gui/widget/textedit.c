@@ -311,7 +311,7 @@ static void TextEdit_ProcTextBlock( LCUI_Widget widget, LCUI_TextBlock txtblk )
 		TextLayer_InsertTextW( layer, txtblk->text, tags );
 	default: break;
 	}
-	if( edit->password_char ) {
+	if( edit->password_char && txtblk->owner == TBOT_SOURCE ) {
 		wchar_t *text = NEW( wchar_t, txtblk->length + 1 );
 		wcsncpy( text, txtblk->text, txtblk->length + 1 );
 		fillchar( text, edit->password_char );
