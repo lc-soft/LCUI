@@ -225,7 +225,8 @@ int LCUI_ReadJPEG( LCUI_ImageReader reader, LCUI_Graph *graph )
 	uchar_t *bytep;
 	JSAMPARRAY buffer;
 	j_decompress_ptr cinfo;
-	int x, k, row_stride;
+	int k, row_stride;
+	size_t x;
 
 	if( reader->type != LCUI_JPEG_READER ) {
 		return -EINVAL;

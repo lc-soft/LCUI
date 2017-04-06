@@ -82,17 +82,11 @@ LCUI_SelectorNode Widget_GetSelectorNode( LCUI_Widget w )
 	if( w->type ) {
 		sn->type = strdup( w->type );
 	}
-	if( w->classes ) {
-		for( i = 0; w->classes[i]; ++i ) {
-			sortedstrsadd( &sn->classes, 
-				       w->classes[i] );
-		}
+	for( i = 0; w->classes && w->classes[i]; ++i ) {
+		sortedstrsadd( &sn->classes, w->classes[i] );
 	}
-	if( w->status ) {
-		for( i = 0; w->status[i]; ++i ) {
-			sortedstrsadd( &sn->status,
-				       w->status[i] );
-		}
+	for( i = 0; w->status && w->status[i]; ++i ) {
+		sortedstrsadd( &sn->status, w->status[i] );
 	}
 	SelectorNode_Update( sn );
 	return sn;
