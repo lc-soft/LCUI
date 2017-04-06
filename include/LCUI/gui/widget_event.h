@@ -194,8 +194,9 @@ LCUI_API void Widget_ReleaseMouseCapture( LCUI_Widget w );
  * 为部件设置触点捕获，设置后将捕获全局范围内的触点事件
  * @param[in] w 部件
  * @param[in] point_id 触点ID，当值为 -1 时则捕获全部触点
+ * @returns 设置成功返回 0，如果其它部件已经捕获该触点则返回 -1
  */
-LCUI_API void Widget_SetTouchCapture( LCUI_Widget w, int point_id );
+LCUI_API int Widget_SetTouchCapture( LCUI_Widget w, int point_id );
 
 /**
  * 为部件解除触点捕获

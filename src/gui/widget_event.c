@@ -289,7 +289,7 @@ static void DestroyTouchCapturer( void *arg )
 #define TouchCapturers_Clear(LIST) \
 LinkedList_ClearData( LIST, DestroyTouchCapturer )
 
-static void TouchCapturers_Add( LinkedList *list, LCUI_Widget w, int point_id )
+static int TouchCapturers_Add( LinkedList *list, LCUI_Widget w, int point_id )
 {
 	int *data;
 	TouchCapturer tc = NULL;
@@ -300,29 +300,26 @@ static void TouchCapturers_Add( LinkedList *list, LCUI_Widget w, int point_id )
 		LinkedList_Init( &tc->points );
 		TouchCapturers_Clear( list );
 		LinkedList_Append( list, tc );
-		return;
+		return 0;
 	}
 	/* 获取该部件的触点捕捉记录 */
 	for( LinkedList_Each( node, list ) ) {
 		tc = node->data;
 		/* 清除与该触点绑定的其它捕捉记录 */
 		for( LinkedList_Each( ptnode, &tc->points ) ) {
-			if( point_id != *(int*)ptnode->data ) {
-				continue;
+			if( point_id == *(int*)ptnode->data ) {
+				if( tc->widget == w ) {
+					return 0;
+				}
+				return -1;
 			}
-			if( tc->widget == w ) {
-				return;
-			}
-			free( ptnode->data );
-			LinkedList_DeleteNode( &tc->points, ptnode );
-			break;
 		}
 		if( tc->widget == w ) {
 			break;
 		}
 	}
 	/* 如果没有该部件的触点捕捉记录 */
-	if( !tc || tc->widget != w ) {
+	if( !tc ) {
 		tc = NEW( TouchCapturerRec, 1 );
 		tc->widget = w;
 		tc->node.data = tc;
@@ -333,6 +330,7 @@ static void TouchCapturers_Add( LinkedList *list, LCUI_Widget w, int point_id )
 	data = NEW( int, 1 );
 	*data = point_id;
 	LinkedList_Append( &tc->points, data );
+	return 0;
 }
 
 static int TouchCapturers_Delete( LinkedList *list, LCUI_Widget w, int point_id )
@@ -992,11 +990,13 @@ void Widget_ReleaseMouseCapture( LCUI_Widget w )
 	self.mouse_capturer = NULL;
 }
 
-void Widget_SetTouchCapture( LCUI_Widget w, int point_id )
+int Widget_SetTouchCapture( LCUI_Widget w, int point_id )
 {
+	int ret;
 	LCUIMutex_Lock( &self.mutex );
-	TouchCapturers_Add( &self.touch_capturers, w, point_id );
+	ret = TouchCapturers_Add( &self.touch_capturers, w, point_id );
 	LCUIMutex_Unlock( &self.mutex );
+	return ret;
 }
 
 int Widget_ReleaseTouchCapture( LCUI_Widget w, int point_id )

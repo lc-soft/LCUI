@@ -385,7 +385,8 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 	}
 }
 
-static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent e, void *arg )
+static void ScrollLayer_OnWheel( LCUI_Widget layer,
+				 LCUI_WidgetEvent e, void *arg )
 {
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
@@ -399,7 +400,8 @@ static void ScrollLayer_OnWheel( LCUI_Widget layer, LCUI_WidgetEvent e, void *ar
 }
 
 /** 滚动层的触屏事件响应 */
-static void ScrollLayer_OnTouch( LCUI_Widget layer, LCUI_WidgetEvent e, void *arg )
+static void ScrollLayer_OnTouch( LCUI_Widget layer,
+				 LCUI_WidgetEvent e, void *arg )
 {
 	uint_t time_delta;
 	int i, pos, distance;
@@ -554,8 +556,8 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		}
 		slider_pos = w->box.content.width - slider->width;
 		slider_pos = slider_pos * pos / (size - box_size);
-		SetStyle( slider->custom_style, key_left, slider_pos, px );
-		SetStyle( layer->custom_style, key_left, -pos, px );
+		Widget_SetStyle( slider, key_left, slider_pos, px );
+		Widget_SetStyle( layer, key_left, -pos, px );
 	} else {
 		size = scrollbar->layer->box.outer.height;
 		if( scrollbar->box ) {
@@ -575,8 +577,8 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		} else {
 			slider_pos = slider_pos * pos / (size - box_size);
 		}
-		SetStyle( slider->custom_style, key_top, slider_pos, px );
-		SetStyle( layer->custom_style, key_top, -pos, px );
+		Widget_SetStyle( slider, key_top, slider_pos, px );
+		Widget_SetStyle( layer, key_top, -pos, px );
 	}
 	if( scrollbar->pos != pos ) {
 		LCUI_WidgetEventRec e;
@@ -593,14 +595,15 @@ void ScrollBar_SetDirection( LCUI_Widget w, int direction )
 {
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
 	if( direction == SBD_HORIZONTAL ) {
-		Widget_RemoveClass( w, "scrollbar-Horizontal" );
+		Widget_RemoveClass( w, "scrollbar-horizontal" );
 	} else {
-		Widget_AddClass( w, "scrollbar-Horizontal" );
+		Widget_AddClass( w, "scrollbar-horizontal" );
 	}
 	scrollbar->direction = direction;
 }
 
-static void ScrollBar_OnSetAttr( LCUI_Widget w, const char *name, const char *value )
+static void ScrollBar_OnSetAttr( LCUI_Widget w,
+				 const char *name, const char *value )
 {
 	LCUI_Widget target;
 	if( strcmp( name, "data-parent" ) == 0 ) {
