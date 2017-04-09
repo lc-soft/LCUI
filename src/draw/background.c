@@ -58,7 +58,7 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 	LCUI_Graph graph;
 	LCUI_BOOL with_alpha;
 	LCUI_Rect read_rect, paint_rect;
-	int image_x, image_y, image_w, image_h;
+	int image_x = 0, image_y = 0, image_w, image_h;
 
 	/* 计算背景图应有的尺寸 */
 	if( bg->size.using_value ) {
@@ -82,6 +82,8 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 				scale = 1.0 * bg->image.height / image_h;
 				image_w = (int)(1.0 * bg->image.width / scale);
 			}
+			image_x = (box->width - image_w) / 2;
+			image_y = (box->height - image_h) / 2;
 			break;
 		case SV_AUTO:
 		default:
@@ -151,7 +153,7 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 			image_y = box->height - image_h;
 			break;
 		case SV_TOP_LEFT:
-		default:image_x = image_y = 0; break;
+		default: break;
 		}
 	} else {
 		switch( bg->position.x.type ) {
@@ -161,8 +163,7 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 			break;
 		case SVT_PX:
 			image_x = bg->position.x.px;
-			break;
-		default:image_x = 0; break;
+		default:break;
 		}
 		switch( bg->position.y.type ) {
 		case SVT_SCALE:
@@ -171,8 +172,7 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 			break;
 		case SVT_PX:
 			image_y = bg->position.y.px;
-			break;
-		default:image_y = 0; break;
+		default:break;
 		}
 	}
 	/* 获取当前绘制区域与背景内容框的重叠区域 */
