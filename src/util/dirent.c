@@ -192,9 +192,7 @@ wchar_t *LCUI_GetFileNameW( LCUI_DirEntry *entry )
 int LCUI_FileIsDirectory( LCUI_DirEntry *entry )
 {
 #if defined (LCUI_BUILD_IN_WIN32) || (_WIN32)
-	/* 由于entry是共用体，entry->dataA和entry->dataW的dwFileAttributes
-	 * 都是在同一内存空间，因此可直接用entry->dataA */
-	return entry->dataA.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+	return entry->dataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
 #else
 	return entry->dirent.d_type == DT_DIR;
 #endif
@@ -203,7 +201,7 @@ int LCUI_FileIsDirectory( LCUI_DirEntry *entry )
 int LCUI_FileIsArchive( LCUI_DirEntry *entry )
 {
 #if defined (LCUI_BUILD_IN_WIN32) || (_WIN32)
-	return entry->dataA.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE;
+	return !(entry->dataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 #else
 	return entry->dirent.d_type == DT_REG;
 #endif
