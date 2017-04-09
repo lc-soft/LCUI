@@ -86,19 +86,24 @@ static void DestroyEventRecord( void *data )
 	free( record );
 }
 
-
 static void EventTrigger_RemoveHandler( LCUI_EventTrigger trigger,
 					LCUI_EventHandler handler )
 {
+	LinkedListNode *node;
 	LCUI_EventRecord record = handler->record;
 	if( record->blocked ) {
-		LinkedList_Append( &record->trash, handler );
-	} else {
-		RBTree_Erase( &trigger->handlers, handler->id );
-		DestroyEventHandler( handler );
-		if( record->handlers.length < 1 ) {
-			RBTree_Erase( &trigger->events, record->id );
+		for( LinkedList_Each( node, &record->trash ) ) {
+			if( node->data == handler ) {
+				return;
+			}
 		}
+		LinkedList_Append( &record->trash, handler );
+		return;
+	}
+	RBTree_Erase( &trigger->handlers, handler->id );
+	DestroyEventHandler( handler );
+	if( record->handlers.length < 1 ) {
+		RBTree_Erase( &trigger->events, record->id );
 	}
 }
 
@@ -203,8 +208,8 @@ int EventTrigger_Trigger( LCUI_EventTrigger trigger, int event_id, void *arg )
 {
 	int count = 0;
 	LCUI_EventRec e;
-	LCUI_EventHandler handler;
 	LCUI_EventRecord record;
+	LCUI_EventHandler handler;
 	LinkedListNode *node;
 	record = RBTree_GetData( &trigger->events, event_id );
 	if( !record ) {
