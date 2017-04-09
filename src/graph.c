@@ -201,7 +201,7 @@ void PixelsFormat( const uchar_t *in_pixels, int in_color_type,
 
 static int Graph_RGBToARGB( LCUI_Graph *graph )
 {
-	int x, y;
+	size_t x, y;
 	LCUI_ARGB *px_des, *px_row_des, *buffer;
 	uchar_t *byte_row_src, *byte_src;
 
@@ -382,7 +382,7 @@ static int Graph_FillRectRGB( LCUI_Graph *graph, LCUI_Color color, LCUI_Rect rec
 
 static int Graph_ARGBToRGB( LCUI_Graph *graph )
 {
-	int x, y;
+	size_t x, y;
 	LCUI_ARGB *px_src, *px_row_src;
 	uchar_t *buffer, *byte_row_des, *byte_des;
 
@@ -1114,7 +1114,9 @@ int Graph_FillAlpha( LCUI_Graph *graph, uchar_t alpha )
 int Graph_Tile( LCUI_Graph *buff, const LCUI_Graph *graph,
 		LCUI_BOOL replace, LCUI_BOOL with_alpha )
 {
-	int ret = 0, x, y;
+	int ret = 0;
+	size_t x, y;
+
 	if( !Graph_IsValid( graph ) || !Graph_IsValid( buff ) ) {
 		return -1;
 	}
