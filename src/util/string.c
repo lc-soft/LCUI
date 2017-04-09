@@ -83,6 +83,29 @@ int strtrim( char *outstr, const char *instr, const char *charlist )
 	return op - outstr;
 }
 
+int wcsreplace( wchar_t *str, size_t max_len,
+		const wchar_t *substr, const wchar_t *newstr )
+{
+	size_t len, buf_len;
+	wchar_t *buf, *p, *q;
+	len = wcslen( newstr );
+	p = wcsstr( str, substr );
+	if( !p ) {
+		return 0;
+	}
+	buf_len = wcslen( str ) + len;
+	buf = malloc( buf_len * sizeof( wchar_t ) );
+	wcscpy( buf, str );
+	q = buf + (p - str);
+	wcscpy( q, newstr );
+	p += wcslen( substr );
+	q += len;
+	wcscpy( q, p );
+	wcsncpy( str, buf, max_len );
+	free( buf );
+	return 1;
+}
+
 void freestrs( char **strs )
 {
 	int i = 0;

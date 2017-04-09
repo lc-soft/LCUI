@@ -72,6 +72,16 @@ LCUI_BEGIN_HEADER
 LCUI_API int strtrim( char *outstr, const char *instr, const char *charlist );
 
 /**
+ * 字符串替换
+ * @param[in][out] str 需要处理的字符串，替换成功后字符串内容也会被修改
+ * @param[in] max_len 输出字符串的最大长度
+ * @param[in] substr 字符串中需要被替换的子字符串
+ * @param[in] newstr 替换的新字符串
+ */
+LCUI_API int wcsreplace( wchar_t *str, size_t max_len,
+			 const wchar_t *substr, const wchar_t *newstr );
+
+/**
 * 分割命令行字符串
 * @param[in] cmd 需分割的命令行字符串
 * @param[out] outargv 分割后的命令行参数列表
