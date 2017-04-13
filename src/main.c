@@ -101,12 +101,9 @@ static struct LCUI_App {
 	StepTimer timer;		/**< 渲染循环计数器 */
 	LCUI_AppDriver driver;		/**< 程序事件驱动支持 */
 	LCUI_BOOL driver_ready;		/**< 事件驱动支持是否已经准备就绪 */
-	struct LCUI_AppTaskAgent {
-		int state;		/**< 状态 */
-		LinkedList tasks;	/**< 任务队列 */
-		LCUI_Mutex mutex;	/**< 互斥锁 */
-		LCUI_Cond cond;		/**< 条件变量 */
-	} agent;
+	LinkedList tasks;		/**< 任务队列 */
+	LCUI_Mutex tasks_mutex;		/**< 互斥锁 */
+	LCUI_Cond tasks_cond;		/**< 条件变量 */
 } MainApp;
 
 /*-------------------------- system event <START> ---------------------------*/
@@ -233,19 +230,19 @@ LCUI_BOOL LCUI_ProcessTask( void )
 {
 	LCUI_AppTask task;
 	LinkedListNode *node;
-	LCUIMutex_Lock( &MainApp.agent.mutex );
-	node = LinkedList_GetNode( &MainApp.agent.tasks, 0 );
+	LCUIMutex_Lock( &MainApp.tasks_mutex );
+	node = LinkedList_GetNode( &MainApp.tasks, 0 );
 	if( node ) {
 		task = node->data;
-		LinkedList_Unlink( &MainApp.agent.tasks, node );
-		LCUIMutex_Unlock( &MainApp.agent.mutex );
+		LinkedList_Unlink( &MainApp.tasks, node );
+		LCUIMutex_Unlock( &MainApp.tasks_mutex );
 		LCUI_RunTask( task );
 		LCUI_DeleteTask( task );
 		free( task );
 		free( node );
 		return TRUE;
 	}
-	LCUIMutex_Unlock( &MainApp.agent.mutex );
+	LCUIMutex_Unlock( &MainApp.tasks_mutex );
 	return FALSE;
 }
 
@@ -263,14 +260,10 @@ LCUI_BOOL LCUI_PostTask( LCUI_AppTask task )
 	LCUI_AppTask newtask;
 	newtask = NEW( LCUI_AppTaskRec, 1 );
 	*newtask = *task;
-	if( MainApp.driver_ready && MainApp.agent.state != STATE_RUNNING ) {
-		return MainApp.driver->PostTask( newtask );
-	} else {
-		LCUIMutex_Lock( &MainApp.agent.mutex );
-		LinkedList_Append( &MainApp.agent.tasks, newtask );
-		LCUICond_Signal( &MainApp.agent.cond );
-		LCUIMutex_Unlock( &MainApp.agent.mutex );
-	}
+	LCUIMutex_Lock( &MainApp.tasks_mutex );
+	LinkedList_Append( &MainApp.tasks, newtask );
+	LCUICond_Signal( &MainApp.tasks_cond );
+	LCUIMutex_Unlock( &MainApp.tasks_mutex );
 	return TRUE;
 }
 
@@ -327,7 +320,6 @@ int LCUIMainLoop_Run( LCUI_MainLoop loop )
 	DEBUG_MSG( "loop: %p, enter\n", loop );
 	MainApp.loop = loop;
 	while( loop->state != STATE_EXITED ) {
-		//LCUI_WaitEvent();
 		LCUI_ProcessEvents();
 		LCUIDisplay_Update();
 		LCUIDisplay_Render();
@@ -365,14 +357,13 @@ void LCUI_InitApp( LCUI_AppDriver app )
 		return;
 	}
 	MainApp.driver_ready = FALSE;
-	MainApp.agent.state = STATE_RUNNING;
 	MainApp.timer = StepTimer_Create();
 	LCUICond_Init( &MainApp.loop_changed );
 	LCUIMutex_Init( &MainApp.loop_mutex );
 	LinkedList_Init( &MainApp.loops );
-	LCUIMutex_Init( &MainApp.agent.mutex );
-	LCUICond_Init( &MainApp.agent.cond );
-	LinkedList_Init( &MainApp.agent.tasks );
+	LCUIMutex_Init( &MainApp.tasks_mutex );
+	LCUICond_Init( &MainApp.tasks_cond );
+	LinkedList_Init( &MainApp.tasks );
 	StepTimer_SetFrameLimit( MainApp.timer, MAX_FRAMES_PER_SEC );
 	if( !app ) {
 		app = LCUI_CreateAppDriver();
@@ -402,35 +393,14 @@ static void LCUI_ExitApp( void )
 	StepTimer_Destroy( MainApp.timer );
 	LCUIMutex_Destroy( &MainApp.loop_mutex );
 	LCUICond_Destroy( &MainApp.loop_changed );
-	LCUIMutex_Destroy( &MainApp.agent.mutex );
-	LCUICond_Destroy( &MainApp.agent.cond );
+	LCUIMutex_Destroy( &MainApp.tasks_mutex );
+	LCUICond_Destroy( &MainApp.tasks_cond );
 	LinkedList_Clear( &MainApp.loops, free );
-	LinkedList_Clear( &MainApp.agent.tasks, OnDeleteTask );
+	LinkedList_Clear( &MainApp.tasks, OnDeleteTask );
 	if( MainApp.driver_ready ) {
 		LCUI_DestroyAppDriver( MainApp.driver );
 	}
 	MainApp.driver_ready = FALSE;
-}
-
-LCUI_BOOL LCUI_WaitEvent( void )
-{
-	if( MainApp.agent.tasks.length > 0 ) {
-		return TRUE;
-	}
-	if( MainApp.agent.state != STATE_RUNNING ) {
-		return MainApp.driver->WaitEvent();
-	}
-	LCUIMutex_Lock( &MainApp.agent.mutex );
-	while( MainApp.agent.state == STATE_RUNNING ) {
-		if( MainApp.agent.tasks.length > 0 ||
-		    MainApp.agent.state != STATE_RUNNING ) {
-			LCUIMutex_Unlock( &MainApp.agent.mutex );
-			return TRUE;
-		}
-		LCUICond_Wait( &MainApp.agent.cond, &MainApp.agent.mutex );
-	}
-	LCUIMutex_Unlock( &MainApp.agent.mutex );
-	return FALSE;
 }
 
 int LCUI_BindSysEvent( int event_id, LCUI_EventFunc func,
@@ -457,18 +427,6 @@ void *LCUI_GetAppData( void )
 		return MainApp.driver->GetData();
 	}
 	return NULL;
-}
-
-void LCUI_SetTaskAgent( LCUI_BOOL enabled )
-{
-	LCUIMutex_Lock( &MainApp.agent.mutex );
-	if( enabled ) {
-		MainApp.agent.state = STATE_RUNNING;
-	} else {
-		MainApp.agent.state = STATE_PAUSED;
-	}
-	LCUICond_Signal( &MainApp.agent.cond );
-	LCUIMutex_Unlock( &MainApp.agent.mutex );
 }
 
 /** 退出所有主循环 */

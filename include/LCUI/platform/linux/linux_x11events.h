@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * linux_x11events.c -- event loop support for linux xwindow.
  *
- * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * linux_x11events.c -- linux 平台的事件驱动支持，基于 xwindow。
  *
- * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -50,8 +50,8 @@ typedef struct LCUI_X11AppDriverRec_ {
 	Display *display;
 	Window win_root;
 	Window win_main;
+	Atom wm_delete;
 	Colormap cmap;
-	Atom wm_lcui;
 	LCUI_EventTrigger trigger;
 } LCUI_X11AppDriverRec, *LCUI_X11AppDriver;
 

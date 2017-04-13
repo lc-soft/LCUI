@@ -51,24 +51,13 @@ static LCUI_X11AppDriverRec x11;
 void LCUI_SetLinuxX11MainWindow( Window win )
 {
 	x11.win_main = win;
+	XSetWMProtocols( x11.display, win, &x11.wm_delete, 1 );
 	XSelectInput( x11.display, win, ExposureMask | KeyPressMask | 
 		      ButtonPress | StructureNotifyMask | ButtonReleaseMask |
                       KeyReleaseMask | EnterWindowMask | LeaveWindowMask |
                       PointerMotionMask | Button1MotionMask | 
                       VisibilityChangeMask );
-	LCUI_SetTaskAgent( FALSE );
-}
-
-static LCUI_BOOL X11_PostTask( LCUI_AppTask task )
-{
-	XEvent ev;
-	memset( &ev, 0, sizeof (ev) );
-	ev.xclient.type = ClientMessage;
-	ev.xclient.window = x11.win_main;
-	ev.xclient.format = 32;
-	ev.xclient.message_type = x11.wm_lcui;
-	XSendEvent( x11.display, x11.win_main, FALSE, NoEventMask, &ev );
-	return TRUE;
+	XFlush( x11.display );
 }
 
 static LCUI_BOOL X11_WaitEvent( void )
@@ -78,7 +67,7 @@ static LCUI_BOOL X11_WaitEvent( void )
 	struct timeval tv;
 	XFlush( x11.display );
 	fd = ConnectionNumber( x11.display );
-	if( XEventsQueued(x11.display, QueuedAlready) ) {
+	if( XEventsQueued( x11.display, QueuedAlready ) ) {
 		return TRUE;
 	}
 	FD_ZERO( &fdset );
@@ -94,29 +83,33 @@ static LCUI_BOOL X11_WaitEvent( void )
 static LCUI_BOOL X11_DispatchEvent( void )
 {
 	XEvent xevent;
-	if( !XEventsQueued(x11.display, QueuedAlready) ) {
+	if( !XEventsQueued( x11.display, QueuedAlready ) ) {
 		return FALSE;
 	}
 	XNextEvent( x11.display, &xevent );
-	switch( xevent.type ) {
-	case ClientMessage:
-		// ...
-	default: break;
-	}
 	EventTrigger_Trigger( x11.trigger, xevent.type, &xevent );
+	if( xevent.type == ClientMessage ) {
+		if( xevent.xclient.data.l[0] == x11.wm_delete ) {
+			LCUI_Quit();
+		}
+	}
 	return TRUE;
 }
 
 static void X11_ProcessEvents( void )
 {
 	int i;
-	for( i = 0; X11_DispatchEvent() && i < 10000; ++i );
+	if( !X11_WaitEvent() ) {
+		return;
+	}
+	for( i = 0; X11_DispatchEvent() && i < 100; ++i );
 }
 
 static int X11_BindSysEvent( int event_id, LCUI_EventFunc func,
 			      void *data, void(*destroy_data)(void*) )
 {
-	return EventTrigger_Bind( x11.trigger, event_id, func, data, destroy_data );
+	return EventTrigger_Bind( x11.trigger, event_id,
+				  func, data, destroy_data );
 }
 
 static int X11_UnbindSysEvent( int event_id, LCUI_EventFunc func )
@@ -149,11 +142,8 @@ LCUI_AppDriver LCUI_CreateLinuxX11AppDriver( void )
 	x11.screen = DefaultScreen( x11.display );
 	x11.win_root = RootWindow( x11.display, x11.screen );
 	x11.cmap = DefaultColormap( x11.display, x11.screen );
-	x11.wm_lcui = XInternAtom( x11.display, "WM_LCUI", FALSE );
-	XSetWMProtocols( x11.display, x11.win_root, &x11.wm_lcui, 1 );
-	app->WaitEvent = X11_WaitEvent;
+	x11.wm_delete = XInternAtom( x11.display, "WM_DELETE_WINDOW", FALSE );
 	app->ProcessEvents = X11_ProcessEvents;
-	app->PostTask = X11_PostTask;
 	app->BindSysEvent = X11_BindSysEvent;
 	app->UnbindSysEvent = X11_UnbindSysEvent;
 	app->UnbindSysEvent2 = X11_UnbindSysEvent2;
@@ -164,6 +154,6 @@ LCUI_AppDriver LCUI_CreateLinuxX11AppDriver( void )
 
 void LCUI_DestroyLinuxX11AppDriver( LCUI_AppDriver app )
 {
-
+	XCloseDisplay( x11.display );
 }
 #endif

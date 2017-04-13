@@ -97,33 +97,4 @@ int LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
 	return pthread_join( thread, retval );
 }
-
-// 以下是测试程序
-#ifdef need_test_this_code
-void test_thread(void *arg)
-{
-	char *ret_str;
-	ret_str = malloc(200);
-	sprintf( ret_str, "my tid is %lu", LCUIThread_SelfID() );
-	printf( "[TID: %lu] %s\n", LCUIThread_SelfID(), (char*)arg );
-	_LCUIThread_Exit( ret_str );
-}
-
-int main()
-{
-	LCUI_Thread thread[2];
-	char *str="Hello, World.";
-	char *ret_str[2];
-
-	_LCUIThread_Create( &thread[0], test_thread, str );
-	_LCUIThread_Create( &thread[1], test_thread, str );
-	_LCUIThread_Join( thread[0], (void*)&ret_str[0] );
-	_LCUIThread_Join( thread[1], (void*)&ret_str[1] );
-	printf("ret_str[0]: %s\n", ret_str[0]);
-	printf("ret_str[1]: %s\n", ret_str[1]);
-	free(ret_str[0]);
-	free(ret_str[1]);
-	return 0;
-}
-#endif
 #endif

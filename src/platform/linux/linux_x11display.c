@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * linux_x11display.c -- surface support for linux xwindow.
  *
- * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * linux_x11display.c -- linux 平台的图形显示功能支持，基于 xwindow。
  *
- * 版权所有 (C) 2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -54,18 +54,16 @@
 #define MIN_HEIGHT	240
 
 enum SurfaceTaskType {
-	TASK_CREATE,
 	TASK_MOVE,
 	TASK_RESIZE,
 	TASK_SHOW,
 	TASK_SET_CAPTION,
-	TASK_PRESENT,
 	TASK_DELETE,
 	TASK_TOTAL_NUM
 };
 
 typedef struct LCUI_SurfaceTaskRec_ {
-	int type;
+	LCUI_BOOL is_valid;
 	union {
 		struct {
 			int x, y;
@@ -80,23 +78,19 @@ typedef struct LCUI_SurfaceTaskRec_ {
 		};
 	};
 } LCUI_SurfaceTaskRec, *LCUI_SurfaceTask;
+typedef LCUI_SurfaceTaskRec LCUI_SurfaceTasks[TASK_TOTAL_NUM];
 
 typedef struct LCUI_SurfaceRec_ {
 	int mode;			/**< 渲染模式 */
 	int width;			/**< 宽度 */
 	int height;			/**< 高度 */
-	struct {
-		int x, y;
-		int width, height;
-	} config;			/**< 当前缓存的配置  */
 	GC gc;				/**< 图形操作上下文 */
 	Window window;			/**< 对应的 X11 窗口 */
 	XImage *ximage;			/**< 适用于 X11 的图像数据 */
 	LCUI_BOOL is_ready;		/**< 标志，标识当前的表面是否已经准备好 */
 	LCUI_Graph fb;			/**< 帧缓存，它里面的数据会映射到窗口中 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
-	int64_t timestamp;		/**< 时间戳，记录上次清空 ignored_size 时的时间 */
-	LinkedList ignored_size;	/**< 列表，记录被忽略的尺寸，用于屏蔽重复的窗口尺寸更改操作 */
+	LCUI_SurfaceTasks tasks;
 	LinkedList rects;		/**< 列表，记录当前需要重绘的区域 */
 	LinkedListNode node;		/**< 在表面列表中的结点 */
 } LCUI_SurfaceRec;
@@ -108,45 +102,19 @@ static struct X11_Display {
 	LCUI_EventTrigger trigger;	/**< 事件触发器 */
 } x11 = {0};
 
-/** 添加需要忽略的尺寸 */
-static void AddIgnoredSize( LCUI_Surface surface, int width, int height )
+static void X11Surface_ReleaseTask( LCUI_Surface surface, int type )
 {
-	LCUI_Size *size;
-	size = NEW( LCUI_Size, 1 );
-	size->width = width;
-	size->height = height;
-	LinkedList_Append( &surface->ignored_size, size );
-}
-
-/** 检查当前尺寸是否需要忽略掉 */
-static LCUI_BOOL CheckIgnoredSize( LCUI_Surface surface, int width, int height )
-{
-	int64_t timestamp;
-	LinkedListNode *node;
-	for( LinkedList_Each( node, &surface->ignored_size ) ) {
-		LCUI_Size *size = node->data;
-		if( size->width == width && size->height == height ) {
-			LinkedList_DeleteNode( &surface->ignored_size, node );
-			free( size );
-			return TRUE;
-		}
+	LCUI_SurfaceTask task = &surface->tasks[type];
+	if( !task->is_valid ) {
+		return;
 	}
-	timestamp = LCUI_GetTime();
-	/* 每隔一段时间清空忽略尺寸列表，避免内存占用一直增长 */
-	if( timestamp - surface->timestamp > 1000 ) {
-		LinkedList_Clear( &surface->ignored_size, free );
-		surface->timestamp = timestamp;
-	}
-	return FALSE;
-}
-
-static void ReleaseSurfaceTask( void *arg )
-{
-	LCUI_SurfaceTask task = arg;
-	if( task->type == TASK_SET_CAPTION ) {
+	switch( type ) {
+	case TASK_SET_CAPTION:
 		free( task->caption );
 		task->caption = NULL;
+	default: break;
 	}
+	task->is_valid = FALSE;
 }
 
 static LCUI_Surface GetSurfaceByWindow( Window win )
@@ -186,7 +154,7 @@ static void X11Surface_OnResize( LCUI_Surface s, int width, int height )
 		s->fb.color_type = COLOR_TYPE_ARGB;
 		break;
 	default: 
-		printf("[x11display] unsupport depth: %d.\n", depth);
+		LOG("[x11display] unsupport depth: %d.\n", depth);
 		break;
 	}
 	Graph_Create( &s->fb, width, height );
@@ -196,50 +164,32 @@ static void X11Surface_OnResize( LCUI_Surface s, int width, int height )
                       		  width, height, 32, 0 );
 	if( !s->ximage ) {
 		Graph_Free( &s->fb );
-		printf("[x11display] create XImage faild.\n");
+		LOG("[x11display] create XImage faild.\n");
 		return;
 	}
     	gcv.graphics_exposures = False;
 	s->gc = XCreateGC( x11.app->display, s->window, 
 			   GCGraphicsExposures, &gcv );
 	if( !s->gc ) {
-		printf("[x11display] create graphics context faild.\n");
+		LOG("[x11display] create graphics context faild.\n");
 		return;
 	}
 }
 
-static void X11Surface_OnCreate( LCUI_Surface s )
-{
-    	unsigned long bdcolor = BlackPixel(x11.app->display, x11.app->screen);
-	unsigned long bgcolor = WhitePixel(x11.app->display, x11.app->screen);
-	s->window = XCreateSimpleWindow( x11.app->display, x11.app->win_root, 
-					 0, 100, MIN_WIDTH, MIN_HEIGHT, 1, 
-					 bdcolor, bgcolor );
-	LCUIMutex_Init( &s->mutex );
-	LinkedList_Init( &s->rects );
-	LinkedList_Init( &s->ignored_size );
-	LCUI_SetLinuxX11MainWindow( s->window );
-}
-
-static void X11Surface_OnTask( LCUI_Surface surface, LCUI_SurfaceTask task )
+static void X11Surface_RunTask( LCUI_Surface surface, int type )
 {
 	Window win = surface->window;
 	Display *dpy = x11.app->display;
+	LCUI_SurfaceTask task = &surface->tasks[type];
 
-	switch( task->type ) {
-	case TASK_CREATE: 
-		X11Surface_OnCreate( surface );
-		break;
+	switch( type ) {
 	case TASK_RESIZE: {
 		int w = task->width , h = task->height;
 		w = MIN_WIDTH > w ? MIN_WIDTH: w;
 		h = MIN_HEIGHT > h ? MIN_HEIGHT: h;
 		LCUIMutex_Lock( &surface->mutex );
 		X11Surface_OnResize( surface, w, h );
-		/* 如果当前尺寸没有被忽略，则修改 x11 窗口的尺寸 */
-		if( !CheckIgnoredSize( surface, w, h ) ) {
-			XResizeWindow( dpy, win, w, h );
-		}
+		XResizeWindow( dpy, win, w, h );
 		LCUIMutex_Unlock( &surface->mutex );
 		break;
 	}
@@ -262,66 +212,58 @@ static void X11Surface_OnTask( LCUI_Surface surface, LCUI_SurfaceTask task )
         	XSetWMName( dpy, win, &name );
         	break;
         }
-        case TASK_PRESENT: {
-		LinkedListNode *node;
-		LCUIMutex_Lock( &surface->mutex );
-		LinkedList_ForEach( node, &surface->rects ) {
-			LCUI_Rect *rect = node->data;
-			XPutImage( x11.app->display, surface->window, 
-				   surface->gc, surface->ximage, 
-				   rect->x, rect->y, rect->x, rect->y, 
-				   rect->width, rect->height );
-		}
-		LinkedList_Clear( &surface->rects, free );
-		LCUIMutex_Unlock( &surface->mutex );
-		break;
-        }
 	case TASK_DELETE:
+		LinkedList_Unlink( &x11.surfaces, &surface->node );
 	default: break;
 	}
 }
 
-static void X11Surface_SendTask( LCUI_Surface surface, LCUI_SurfaceTask task )
-{
-	LCUI_AppTaskRec apptask;
-	LCUI_SurfaceTask newtask;
-	newtask = NEW( LCUI_SurfaceTaskRec, 1 );
-	*newtask = *task;
-	apptask.arg[0] = surface;
-	apptask.arg[1] = newtask;
-	apptask.destroy_arg[0] = NULL;
-	apptask.destroy_arg[1] = ReleaseSurfaceTask;
-	apptask.func = (LCUI_AppTaskFunc)X11Surface_OnTask;
-	LCUI_PostTask( &apptask );
-}
-
 static void X11Surface_Delete( LCUI_Surface surface )
 {
-	LCUI_SurfaceTaskRec task;
-	task.type = TASK_DELETE;
-	LinkedList_Unlink( &x11.surfaces, &surface->node );
-	X11Surface_SendTask( surface, &task );
+	surface->tasks[TASK_DELETE].is_valid = TRUE;
+}
+
+static void X11Surface_Show( LCUI_Surface surface )
+{
+	surface->tasks[TASK_SHOW].show = TRUE;
+	surface->tasks[TASK_SHOW].is_valid = TRUE;
+}
+
+static void X11Surface_Hide( LCUI_Surface surface )
+{
+	surface->tasks[TASK_SHOW].show = FALSE;
+	surface->tasks[TASK_SHOW].is_valid = TRUE;
+}
+
+static void X11Surface_OnCreate( void *arg1, void *arg2 )
+{
+	LCUI_Surface s = arg1;
+	unsigned long bdcolor = BlackPixel(x11.app->display, x11.app->screen);
+	unsigned long bgcolor = WhitePixel(x11.app->display, x11.app->screen);
+	s->window = XCreateSimpleWindow( x11.app->display, x11.app->win_root,
+					 100, 100, MIN_WIDTH, MIN_HEIGHT, 1,
+					 bdcolor, bgcolor );
+	s->is_ready = TRUE;
+	LCUI_SetLinuxX11MainWindow( s->window );
+	X11Surface_Show( s );
 }
 
 static LCUI_Surface X11Surface_New( void )
 {
 	LCUI_Surface surface;
-	LCUI_SurfaceTaskRec task;
-	task.type = TASK_CREATE;
 	surface = NEW( LCUI_SurfaceRec, 1 );
 	surface->gc = NULL;
 	surface->ximage = NULL;
 	surface->is_ready = FALSE;
 	surface->node.data = surface;
-	surface->timestamp = LCUI_GetTime();
-	surface->config.width = 0;
-	surface->config.height = 0;
-	surface->config.x = 0;
-	surface->config.y = 0;
+	surface->width = MIN_WIDTH;
+	surface->height = MIN_HEIGHT;
 	Graph_Init( &surface->fb );
+	LCUIMutex_Init( &surface->mutex );
+	LinkedList_Init( &surface->rects );
 	surface->fb.color_type = COLOR_TYPE_ARGB;
 	LinkedList_AppendNode( &x11.surfaces, &surface->node );
-	X11Surface_SendTask( surface, &task );
+	LCUI_PostSimpleTask( X11Surface_OnCreate, surface, NULL );
 	return surface;
 }
 
@@ -332,43 +274,23 @@ static LCUI_BOOL X11Surface_IsReady( LCUI_Surface surface )
 
 static void X11Surface_Move( LCUI_Surface surface, int x, int y )
 {
-	LCUI_SurfaceTaskRec task;
-	task.type = TASK_MOVE;
-	task.x = x;
-	task.y = y;
-	X11Surface_SendTask( surface, &task );
+	surface->tasks[TASK_MOVE].x = x;
+	surface->tasks[TASK_MOVE].y = y;
+	surface->tasks[TASK_MOVE].is_valid = TRUE;
 }
 
 static void X11Surface_Resize( LCUI_Surface surface, int width, int height )
 {
-	LCUI_SurfaceTaskRec task;
-	task.type = TASK_RESIZE;
-	task.width = width;
-	task.height = height;
-	X11Surface_SendTask( surface, &task );
-}
-
-static void X11Surface_Show( LCUI_Surface surface )
-{
-	LCUI_SurfaceTaskRec task;
-	task.type = TASK_SHOW;
-	task.show = TRUE;
-	X11Surface_SendTask( surface, &task );
-}
-
-static void X11Surface_Hide( LCUI_Surface surface )
-{
-	LCUI_SurfaceTaskRec task;
-	task.type = TASK_SHOW;
-	task.show = FALSE;
-	X11Surface_SendTask( surface, &task );
+	surface->tasks[TASK_RESIZE].width = width;
+	surface->tasks[TASK_RESIZE].height = height;
+	surface->tasks[TASK_RESIZE].is_valid = TRUE;
 }
 
 static void X11Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *wstr )
 {
 	int len;
-	LCUI_SurfaceTaskRec task;
-
+	LCUI_SurfaceTask task;
+	task = &surface->tasks[TASK_SET_CAPTION];
 	if( wstr ) {
 		char *caption;
 		len = LCUI_EncodeString( NULL, wstr, 0, ENCODING_UTF8 ) + 1;
@@ -377,14 +299,13 @@ static void X11Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *wstr )
 			return;
 		}
 		LCUI_EncodeString( caption, wstr, len, ENCODING_UTF8 );
-		task.caption = caption;
-		task.caption_len = len - 1;
+		task->caption = caption;
+		task->caption_len = len - 1;
 	} else {
-		task.caption = NULL;
-		task.caption_len = 0;
+		task->caption = NULL;
+		task->caption_len = 0;
 	}
-	task.type = TASK_SET_CAPTION;
-	X11Surface_SendTask( surface, &task );
+	task->is_valid = TRUE;
 }
 
 void X11Surface_SetOpacity( LCUI_Surface surface, float opacity )
@@ -427,16 +348,29 @@ static void X11Surface_EndPaint( LCUI_Surface surface,
 /** 将帧缓存中的数据呈现至Surface的窗口内 */
 static void X11Surface_Present( LCUI_Surface surface )
 {
-
-	LCUI_SurfaceTaskRec task;
-	task.type = TASK_PRESENT;
-	X11Surface_SendTask( surface, &task );
+	LinkedListNode *node;
+	LCUIMutex_Lock( &surface->mutex );
+	LinkedList_ForEach( node, &surface->rects ) {
+		LCUI_Rect *rect = node->data;
+		XPutImage( x11.app->display, surface->window,
+			   surface->gc, surface->ximage,
+			   rect->x, rect->y, rect->x, rect->y,
+			   rect->width, rect->height );
+	}
+	LinkedList_Clear( &surface->rects, free );
+	LCUIMutex_Unlock( &surface->mutex );
 }
 
 /** 更新 surface，应用缓存的变更 */
 static void X11Surface_Update( LCUI_Surface surface )
 {
-	return;
+	int i;
+	for( i = 0; i < TASK_TOTAL_NUM; ++i ) {
+		if( surface->tasks[i].is_valid ) {
+			X11Surface_RunTask( surface, i );
+			X11Surface_ReleaseTask( surface, i );
+		}
+	}
 }
 
 static int WinDisplay_BindEvent( int event_id, LCUI_EventFunc func, 
@@ -490,21 +424,11 @@ static void OnConfigureNotify( LCUI_Event e, void *arg )
 	LCUI_DisplayEventRec dpy_ev;
 	XConfigureEvent xce = ev->xconfigure;
 	LCUI_Surface s = GetSurfaceByWindow( xce.window );
-	if( s->config.width == xce.width && s->config.height == xce.height ) {
-		return;
-	}
-	if( !s->is_ready ) {
-		s->is_ready = TRUE;
-		return;
-	}
 	dpy_ev.surface = s;
 	dpy_ev.type = DET_RESIZE;
 	dpy_ev.resize.width = xce.width;
 	dpy_ev.resize.height = xce.height;
-	s->config.width = xce.width;
-	s->config.height = xce.height;
-	/* 标记该尺寸需要被忽略，表面尺寸改变后不需要再修改 x11 窗口的尺寸 */
-	AddIgnoredSize( s, xce.width, xce.height );
+	X11Surface_OnResize( s, xce.width,xce.height );
 	EventTrigger_Trigger( x11.trigger, DET_RESIZE, &dpy_ev );
 
 }

@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * main.h -- The main functions for the LCUI normal work
  * 
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * main.h -- 使LCUI能够正常工作的相关主要函数
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -124,8 +124,6 @@ typedef void(*LCUI_SysEventFunc)(LCUI_SysEvent, void*);
 /** LCUI 应用程序驱动接口，封装了各个平台下的应用程序相关功能支持接口 */
 typedef struct LCUI_AppDriverRec_ {
 	void ( *ProcessEvents )(void);
-	LCUI_BOOL( *WaitEvent )(void);
-	LCUI_BOOL( *PostTask )(LCUI_AppTask);
 	int( *BindSysEvent )(int, LCUI_EventFunc, void*, void( *)(void*));
 	int( *UnbindSysEvent )(int, LCUI_EventFunc);
 	int( *UnbindSysEvent2 )(int);
@@ -150,16 +148,12 @@ LCUI_API int LCUI_CreateTouchEvent( LCUI_SysEvent e,
 
 LCUI_API void LCUI_DestroyEvent( LCUI_SysEvent e );
 
-LCUI_API LCUI_BOOL LCUI_WaitEvent( void );
-
 LCUI_API int LCUI_BindSysEvent( int event_id, LCUI_EventFunc func,
 				void *data, void( *destroy_data )(void*) );
 
 LCUI_API int LCUI_UnbindSysEvent( int event_id, LCUI_EventFunc func );
 
 LCUI_API void *LCUI_GetAppData( void );
-
-LCUI_API void LCUI_SetTaskAgent( LCUI_BOOL enabled );
 
 /** 处理当前所有事件 */
 LCUI_API void LCUI_ProcessEvents( void );
