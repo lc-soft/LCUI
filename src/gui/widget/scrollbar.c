@@ -68,7 +68,7 @@ typedef struct LCUI_ScrollBarRec_ {
 	LCUI_Widget layer;		/**< 滚动层 */
 	LCUI_Widget slider;		/**< 滑块 */
 	LCUI_BOOL is_dragging;		/**< 是否处于拖拽状态 */
-	int slider_x, slider_y;		/**< 拖拽开始时的滑块位置 */
+	float slider_x, slider_y;	/**< 拖拽开始时的滑块位置 */
 	int mouse_x, mouse_y;		/**< 拖拽开始时的鼠标坐标 */
 	int touch_point_id;		/**< 触点的ID */
 	int direction;			/**< 滚动条的方向（垂直或水平） */
@@ -216,12 +216,11 @@ static void StartInertialScrolling( LCUI_Widget w )
 static void Slider_OnMouseMove( LCUI_Widget slider, 
 				LCUI_WidgetEvent e, void *arg )
 {
-	float n;
 	LCUI_Pos pos;
 	LCUI_Widget layer;
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar;
-	int x, y, box_size, size, layer_pos;
+	float n, box_size, size, layer_pos, x, y;
 
 	scrollbar = Widget_GetData( w, self.prototype );
 	if( !scrollbar->is_dragging || !scrollbar->layer ) {
@@ -247,7 +246,7 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 		}
 		n = 0.0;
 		if( size > 0 ) {
-			n = 1.0 * slider->x / size;
+			n = slider->x / size;
 			if( n > 1.0 ) {
 				n = 1;
 			}
@@ -272,7 +271,7 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 		}
 		n = 0.0;
 		if( size > 0 ) {
-			n = 1.0 * slider->y / size;
+			n = slider->y / size;
 			if( n > 1.0 ) {
 				n = 1;
 			}
@@ -280,13 +279,13 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 		layer_pos = layer_pos * n;
 		SetStyle( layer->custom_style, key_top, -layer_pos, px );
 	}
-	if( scrollbar->pos != layer_pos ) {
+	if( scrollbar->pos != roundi( layer_pos ) ) {
 		LCUI_WidgetEventRec e;
 		e.type = self.event_id;
 		e.cancel_bubble = TRUE;
 		Widget_TriggerEvent( layer, &e, &layer_pos );
 	}
-	scrollbar->pos = layer_pos;
+	scrollbar->pos = roundi( layer_pos );
 	Widget_UpdateStyle( layer, FALSE );
 	Widget_Move( slider, x, y );
 }
@@ -346,8 +345,7 @@ static void ScrollBar_OnInit( LCUI_Widget w )
 
 static void ScrollBar_UpdateSize( LCUI_Widget w )
 {
-	float n = 1.0;
-	int size, box_size;
+	float n = 1.0, size, box_size;
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
 	LCUI_Widget slider = scrollbar->slider;
 	if( !scrollbar->box ) {
@@ -361,7 +359,7 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 		}
 		box_size = scrollbar->box->width;
 		if( size > box_size && box_size > 0 ) {
-			n = 1.0 * box_size / size;
+			n = box_size / size;
 		}
 		SetStyle( slider->custom_style, key_width, n, scale );
 	} else {
@@ -372,7 +370,7 @@ static void ScrollBar_UpdateSize( LCUI_Widget w )
 		}
 		box_size = scrollbar->box->height;
 		if( size > box_size && box_size > 0 ) {
-			n = 1.0 * box_size / size;
+			n = box_size / size;
 		}
 		SetStyle( slider->custom_style, key_height, n, scale );
 	}
@@ -531,7 +529,7 @@ int ScrollBar_GetPosition( LCUI_Widget w )
 
 void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 {
-	int box_size, size, slider_pos;
+	float new_pos, box_size, size, slider_pos;
 	LCUI_ScrollBar scrollbar = Widget_GetData( w, self.prototype );
 	LCUI_Widget slider = scrollbar->slider;
 	LCUI_Widget layer = scrollbar->layer;
@@ -540,6 +538,7 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 	if( !layer ) {
 		return;
 	}
+	new_pos = 1.0f * pos;
 	memset( &e, 0, sizeof( e ) );
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
 		size = scrollbar->layer->box.outer.width;
@@ -548,16 +547,16 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		} else {
 			box_size = w->parent->box.content.width;
 		}
-		if( pos + box_size > size ) {
-			pos = size - box_size;
+		if( new_pos + box_size > size ) {
+			new_pos = size - box_size;
 		}
-		if( pos < 0 ) {
-			pos = 0;
+		if( new_pos < 0.0f ) {
+			new_pos = 0.0f;
 		}
 		slider_pos = w->box.content.width - slider->width;
-		slider_pos = slider_pos * pos / (size - box_size);
+		slider_pos = slider_pos * new_pos / (size - box_size);
 		Widget_SetStyle( slider, key_left, slider_pos, px );
-		Widget_SetStyle( layer, key_left, -pos, px );
+		Widget_SetStyle( layer, key_left, -new_pos, px );
 	} else {
 		size = scrollbar->layer->box.outer.height;
 		if( scrollbar->box ) {
@@ -565,26 +564,27 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		} else {
 			box_size = w->parent->box.content.height;
 		}
-		if( pos + box_size > size ) {
-			pos = size - box_size;
+		if( new_pos + box_size > size ) {
+			new_pos = size - box_size;
 		}
-		if( pos < 0 ) {
-			pos = 0;
+		if( new_pos < 0 ) {
+			new_pos = 0;
 		}
 		slider_pos = w->box.content.height - slider->height;
 		if( size == box_size ) {
 			slider_pos = 0;
 		} else {
-			slider_pos = slider_pos * pos / (size - box_size);
+			slider_pos = slider_pos * new_pos / (size - box_size);
 		}
 		Widget_SetStyle( slider, key_top, slider_pos, px );
-		Widget_SetStyle( layer, key_top, -pos, px );
+		Widget_SetStyle( layer, key_top, -new_pos, px );
 	}
+	pos = roundi( new_pos );
 	if( scrollbar->pos != pos ) {
 		LCUI_WidgetEventRec e;
 		e.type = self.event_id;
 		e.cancel_bubble = TRUE;
-		Widget_TriggerEvent( layer, &e, &pos );
+		Widget_TriggerEvent( layer, &e, &new_pos );
 	}
 	scrollbar->pos = pos;
 	Widget_UpdateStyle( slider, FALSE );

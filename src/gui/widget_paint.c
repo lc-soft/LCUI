@@ -117,12 +117,12 @@ LCUI_BOOL Widget_PushInvalidArea( LCUI_Widget widget,
 	Widget_AdjustArea( w, r, &rect, box_type );
 	rectf.x = rect.x + w->box.graph.x;
 	rectf.y = rect.y + w->box.graph.y;
-	rectf.width = rect.width;
-	rectf.height = rect.height;
+	rectf.width = (float)rect.width;
+	rectf.height = (float)rect.height;
 	while( w && w->parent ) {
 		LCUIRectF_ValidateArea( &rectf, w->parent->box.padding.width,
 					w->parent->box.padding.height );
-		if( rectf.width < 0.5 || rectf.height < 0.5 ) {
+		if( rectf.width < 0.5f || rectf.height < 0.5f ) {
 			return FALSE;
 		}
 		w = w->parent;
@@ -164,17 +164,17 @@ static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 
 	box.x = box.y = 0;
 	s = &w->computed_style;
-	box.width = w->box.graph.width;
-	box.height = w->box.graph.height;
+	box.width = roundi( w->box.graph.width );
+	box.height = roundi( w->box.graph.height );
 	/* 如果是有位图缓存的话，则先清空缓存里的阴影区域 */
 	if( w->enable_graph ) {
 		Graph_ClearShadowArea( paint, &box, &s->shadow );
 	}
 	Graph_DrawBoxShadow( paint, &box, &s->shadow );
-	box.x = w->box.border.x - w->box.graph.x;
-	box.y = w->box.border.y - w->box.graph.y;
-	box.width = w->box.border.width;
-	box.height = w->box.border.height;
+	box.x = roundi( w->box.border.x - w->box.graph.x );
+	box.y = roundi( w->box.border.y - w->box.graph.y );
+	box.width = roundi( w->box.border.width );
+	box.height = roundi( w->box.border.height );
 	Graph_DrawBackground( paint, &box, &s->background );
 	Graph_DrawBorder( paint, &box, &s->border );
 	if( w->proto && w->proto->paint ) {
@@ -296,8 +296,8 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 	/* 转换成相对坐标 */
 	rect.x -= w->box.graph.x;
 	rect.y -= w->box.graph.y;
-	out_rect->x = in_rect->x - rect.x;
-	out_rect->y = in_rect->y - rect.y;
+	out_rect->x = in_rect->x - (int)rect.x;
+	out_rect->y = in_rect->y - (int)rect.y;
 	out_rect->width = in_rect->width;
 	out_rect->height = in_rect->height;
 	/* 裁剪掉超出范围的区域 */
@@ -309,11 +309,11 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 		out_rect->height += out_rect->y;
 		out_rect->y = 0;
 	}
-	if( out_rect->x + out_rect->width > rect.width ) {
-		out_rect->width = rect.width - out_rect->x;
+	if( out_rect->x + out_rect->width > (int)rect.width ) {
+		out_rect->width = (int)rect.width - out_rect->x;
 	}
-	if( out_rect->y + out_rect->height > rect.height ) {
-		out_rect->height = rect.height - out_rect->y;
+	if( out_rect->y + out_rect->height > (int)rect.height ) {
+		out_rect->height = (int)rect.height - out_rect->y;
 	}
 	return 0;
 }

@@ -168,7 +168,6 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 	surface->is_ready = TRUE;
 	DEBUG_MSG("surface: %p, surface->hwnd: %p\n", surface, surface->hwnd);
 	LCUI_SetMainWindow( surface->hwnd );
-	LCUI_SetTaskAgent( FALSE );
 	EventTrigger_Trigger( win.trigger, DET_READY, &ev );
 }
 
@@ -395,7 +394,7 @@ static void WinSurface_Update( LCUI_Surface surface )
 	}
 	t = &surface->tasks[TASK_SET_CAPTION];
 	if( t->is_valid ) {
-		SetWindowText( surface->hwnd, t->caption );
+		SetWindowTextW( surface->hwnd, t->caption );
 		if( t->caption ) {
 			free( t->caption );
 			t->caption = NULL;

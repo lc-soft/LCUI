@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * string.c -- The string operation set.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * string.c -- 字符串相关操作函数。
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -42,6 +42,17 @@
 #include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h> 
+
+char *strdup2( const char *str )
+{
+	size_t len = strlen( str ) + 1;
+	char *out = malloc( sizeof( char ) * len );
+	if( !out ) {
+		return NULL;
+	}
+	strncpy( out, str, len );
+	return out;
+}
 
 int strtrim( char *outstr, const char *instr, const char *charlist )
 {
@@ -208,9 +219,9 @@ faild:
 
 int strsplit( const char *instr, const char *sep, char ***outstrs )
 {
-	int len, i = 0;
+	int i = 0;
 	const char *prev = instr;
-	int sep_len = strlen( sep );
+	size_t len, sep_len = strlen( sep );
 	char *next = strstr( prev, sep );
 	char **newstrs = NULL;
 
@@ -263,7 +274,7 @@ check_done:
 	if( !newlist ) {
 		return 0;
 	}
-	newlist[i] = strdup(str);
+	newlist[i] = strdup2(str);
 	newlist[i+1] = NULL;
 	*strlist = newlist;
 	return 1;
@@ -370,7 +381,8 @@ int strsdel( char ***strlist, const char *str )
 
 int sortedstrsadd( char ***strlist, const char *str )
 {
-	int i, n, len, pos;
+	size_t n;
+	int i, len, pos;
 	char **newlist, *newstr;
 
 	if( *strlist ) {

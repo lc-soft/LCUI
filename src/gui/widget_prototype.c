@@ -93,7 +93,7 @@ LCUI_WidgetPrototype LCUIWidget_NewPrototype( const char *name,
 	} else {
 		*proto = self.empty_prototype;
 	}
-	proto->name = strdup( name );
+	proto->name = strdup2( name );
 	if( Dict_Add( self.prototypes, proto->name, proto ) == 0 ) {
 		return proto;	
 	}

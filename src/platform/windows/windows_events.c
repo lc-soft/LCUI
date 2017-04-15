@@ -153,7 +153,7 @@ void LCUI_PreInitWinApp( void *data )
 LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 {
 	WNDCLASS wndclass;
-	TCHAR szAppName[] = TEXT( "LCUI" );
+	wchar_t szAppName[] = L"LCUI";
 	ASSIGN( app, LCUI_AppDriver );
 
 	wndclass.cbClsExtra = 0;
@@ -169,13 +169,12 @@ LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 				   MAKEINTRESOURCE( IDI_LCUI_ICON ) );
 	if( !RegisterClass( &wndclass ) ) {
 		wchar_t str[256];
-		wsprintf( str, L"LCUI_CreateWinAppDriver(): error code: %d\n", GetLastError() );
-		MessageBox( NULL, str, szAppName, MB_ICONERROR );
+		swprintf( str, 255, __FUNCTIONW__
+			  L": error code: %d\n", GetLastError() );
+		MessageBoxW( NULL, str, szAppName, MB_ICONERROR );
 		return NULL;
 	}
 	app->GetData = WIN_GetData;
-	app->PostTask = WIN_PostTask;
-	app->WaitEvent = WIN_WaitEvent;
 	app->ProcessEvents = WIN_ProcessEvents;
 	app->BindSysEvent = WIN_BindSysEvent;
 	app->UnbindSysEvent = WIN_UnbindSysEvent;

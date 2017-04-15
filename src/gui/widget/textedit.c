@@ -72,7 +72,7 @@ typedef struct LCUI_TextEditRec_ {
 	LCUI_BOOL is_placeholder_shown;		/**< 是否已经显示占位符 */
 	wchar_t *allow_input_char;		/**< 允许输入的字符 */
 	wchar_t password_char;			/**< 屏蔽符的副本 */
-	int text_block_size;			/**< 块大小 */
+	size_t text_block_size;			/**< 块大小 */
 	LinkedList text_blocks;			/**< 文本块缓冲区 */
 	LinkedList text_tags;			/**< 当前处理的标签列表 */
 	LCUI_BOOL tasks[TASK_TOTAL];		/**< 待处理的任务 */
@@ -143,36 +143,39 @@ static void fillchar( wchar_t *str, wchar_t ch )
 
 static void TextEdit_UpdateCaret( LCUI_Widget widget )
 {
-	LCUI_Pos pos;
 	LCUI_StyleSheet sheet;
 	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
-	int offset_x = 0, offset_y = 0, height, row;
+	float x, y, height, offset_x = 0, offset_y = 0;
+	int row;
 
 	if( edit->is_placeholder_shown ) {
-		pos.x = pos.y = 0;
+		x = y = 0;
 	} else {
+		LCUI_Pos pos;
 		if( TextLayer_GetCaretPixelPos( edit->layer, &pos ) != 0 ) {
 			return;
 		}
+		x = 1.0f * pos.x;
+		y = 1.0f * pos.y;
 	}
 	row = edit->layer->insert_y;
 	sheet = edit->caret->custom_style;
-	height = TextLayer_GetRowHeight( edit->layer, row );
-	SetStyle( sheet, key_height, height, px );
-	pos.x += widget->padding.left;
-	pos.y += widget->padding.top;
-	if( pos.x > widget->box.content.width ) {
-		offset_x = widget->box.content.width - pos.x;
+	height = (float)TextLayer_GetRowHeight( edit->layer, row );
+	Widget_SetStyle( edit->caret, key_height, height, px );
+	x += widget->padding.left;
+	y += widget->padding.top;
+	if( x > widget->box.content.width ) {
+		offset_x = widget->box.content.width - x;
 		offset_x -= edit->caret->width;
-		pos.x += offset_x;
+		x += offset_x;
 	}
-	if( pos.y > widget->box.content.height ) {
-		offset_y = widget->box.content.height - pos.y;
+	if( y > widget->box.content.height ) {
+		offset_y = widget->box.content.height - y;
 		offset_y -= edit->caret->height;
-		pos.y += offset_y;
+		y += offset_y;
 	}
-	TextLayer_SetOffset( edit->layer, offset_x, offset_y );
-	Widget_Move( edit->caret, pos.x, pos.y );
+	TextLayer_SetOffset( edit->layer, (int)offset_x, (int)offset_y );
+	Widget_Move( edit->caret, x, y );
 	edit->tasks[TASK_UPDATE] = TRUE;
 	Widget_AddTask( widget, WTT_USER );
 	TextCaret_BlinkShow( edit->caret );
@@ -209,7 +212,7 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 	const wchar_t *p;
 	LCUI_TextEdit edit;
 	LCUI_TextBlock txtblk;
-	int i, j, len, tag_len, size;
+	size_t i, j, len, tag_len, size;
 
 	if( !wtext ) {
 		return -1;
@@ -251,9 +254,9 @@ static int TextEdit_AddTextToBuffer( LCUI_Widget widget, const wchar_t *wtext,
 			wchar_t *text;
 			txtblk->text[j] = wtext[i];
 			/* 检测是否有样式标签 */
-			p = scan_style_tag( wtext + i, NULL, 0, NULL );
+			p = ScanStyleTag( wtext + i, NULL, 0, NULL );
 			if( !p ) {
-				p = scan_style_ending_tag( wtext + i, NULL );
+				p = ScanStyleEndingTag( wtext + i, NULL );
 				if( !p ) {
 					continue;
 				}
@@ -425,9 +428,9 @@ static void TextEdit_AutoSize( LCUI_Widget widget,
 		for( i = 0; i < n; ++i ) {
 			h += TextLayer_GetRowHeight( edit->layer, i );
 		}
-		*height = 1.0 * h;
+		*height = 1.0f * h;
 	} else {
-		*height = TextLayer_GetHeight( edit->layer ) * 1.0;
+		*height = TextLayer_GetHeight( edit->layer ) * 1.0f;
 	}
 	*width = 176.0;
 }
@@ -490,7 +493,7 @@ int TextEdit_SetText( LCUI_Widget widget, const char *utf8_str )
 	if( !wstr ) {
 		return -ENOMEM;
 	}
-	LCUI_DecodeString( wstr, utf8_str, len, ENCODING_UTF8 );
+	LCUI_DecodeString( wstr, utf8_str, (int)len, ENCODING_UTF8 );
 	ret = TextEdit_SetTextW( widget, wstr );
 	free( wstr );
 	return ret;
@@ -537,7 +540,7 @@ int TextEdit_SetPlaceHolder( LCUI_Widget w, const char *str )
 	if( !wstr ) {
 		return -ENOMEM;
 	}
-	LCUI_DecodeString( wstr, str, len, ENCODING_UTF8 );
+	LCUI_DecodeString( wstr, str, (int)len, ENCODING_UTF8 );
 	ret = TextEdit_SetPlaceHolderW( w, wstr );
 	free( wstr );
 	return ret;
@@ -715,6 +718,7 @@ static void TextEdit_OnTextInput( LCUI_Widget widget,
 
 static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
+	int iw, ih;
 	LinkedList rects;
 	LinkedListNode *node;
 	float width = 0, height = 0;
@@ -734,12 +738,16 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		max_height = height = w->box.content.width;
 	}
 	LinkedList_Init( &rects );
-	TextLayer_SetFixedSize( edit->layer_mask, width, height );
-	TextLayer_SetFixedSize( edit->layer_source, width, height );
-	TextLayer_SetFixedSize( edit->layer_placeholder, width, height );
-	TextLayer_SetMaxSize( edit->layer_mask, max_width, max_height );
-	TextLayer_SetMaxSize( edit->layer_source, max_width, max_height );
-	TextLayer_SetMaxSize( edit->layer_placeholder, max_width, max_height );
+	iw = roundi( width );
+	ih = roundi( height );
+	TextLayer_SetFixedSize( edit->layer_mask, iw, ih );
+	TextLayer_SetFixedSize( edit->layer_source, iw, ih );
+	TextLayer_SetFixedSize( edit->layer_placeholder, iw, ih );
+	iw = roundi( max_width );
+	ih = roundi( max_height );
+	TextLayer_SetMaxSize( edit->layer_mask, iw, ih );
+	TextLayer_SetMaxSize( edit->layer_source, iw, ih );
+	TextLayer_SetMaxSize( edit->layer_placeholder, iw, ih );
 	TextLayer_Update( edit->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
@@ -750,12 +758,13 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 
 static void TextEdit_OnMouseMove( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
-	int abs_x, abs_y, x, y;
+	int x, y;
+	float offset_x, offset_y;
 	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
 	if( !edit->is_placeholder_shown ) {
-		Widget_GetAbsXY( w, NULL, &abs_x, &abs_y );
-		x = e->motion.x - abs_x - w->padding.left;
-		y = e->motion.y - abs_y - w->padding.top;
+		Widget_GetOffset( w, NULL, &offset_x, &offset_y );
+		x = e->motion.x - roundi( offset_x + w->padding.left );
+		y = e->motion.y - roundi( offset_y + w->padding.top );
 		TextLayer_SetCaretPosByPixelPos( edit->layer_source, x, y );
 	}
 	TextEdit_UpdateCaret( w );
@@ -769,11 +778,12 @@ static void TextEdit_OnMouseUp( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 
 static void TextEdit_OnMouseDown( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
-	int abs_x, abs_y, x, y;
+	int x, y;
+	float offset_x, offset_y;
 	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
-	Widget_GetAbsXY( w, NULL, &abs_x, &abs_y );
-	x = e->motion.x - abs_x - w->padding.left;
-	y = e->motion.y - abs_y - w->padding.top;
+	Widget_GetOffset( w, NULL, &offset_x, &offset_y );
+	x = e->motion.x - roundi( offset_x + w->padding.left );
+	y = e->motion.y - roundi( offset_y + w->padding.top );
 	TextLayer_SetCaretPosByPixelPos( edit->layer, x, y );
 	TextEdit_UpdateCaret( w );
 	Widget_SetMouseCapture( w );
@@ -844,8 +854,8 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_Pos layer_pos;
 	LCUI_Rect content_rect, rect;
 	LCUI_TextEdit edit = Widget_GetData( w, self.prototype );
-	content_rect.width = w->box.content.width;
-	content_rect.height = w->box.content.height;
+	content_rect.width = roundi( w->box.content.width );
+	content_rect.height = roundi( w->box.content.height );
 	content_rect.y = (int)(w->box.content.y - w->box.graph.y + 0.5);
 	content_rect.x = (int)(w->box.content.x - w->box.graph.x + 0.5);
 	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect );

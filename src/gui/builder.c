@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+//#define DEBUG
 #include <stdio.h>
 #include <string.h>
 #include <LCUI_Build.h>
@@ -191,15 +192,17 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 				w->proto->init( w );
 				w->type = w->proto->name;
 			} else {
-				w->type = strdup( prop_val );
+				w->type = strdup2( prop_val );
 			}
 			continue;
 		}
 		else if( PropNameIs("id") ) {
+			DEBUG_MSG("widget: %p, set id: %s\n", w, prop_val);
 			Widget_SetId( w, prop_val );
 			continue;
 		}
 		else if( PropNameIs("class") ) {
+			DEBUG_MSG("widget: %p, add class: %s\n", w, prop_val);
 			Widget_AddClass( w, prop_val );
 			continue;
 		}

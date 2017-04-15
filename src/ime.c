@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * ime.c -- Input Method Editor/Engine
  *
  * Copyright (C) 2016 by Liu Chao <lc-soft@live.cn>
@@ -302,19 +302,19 @@ LCUI_BOOL LCUIIME_ProcessKey( LCUI_SysEvent e )
 	return FALSE;
 }
 
-int LCUIIME_Commit( const wchar_t *str, int length )
+int LCUIIME_Commit( const wchar_t *str, size_t len )
 {
 	LCUI_SysEventRec sys_ev;
-	if( length < 0 ) {
-		length = wcslen( str );
+	if( len == 0 ) {
+		len = wcslen( str );
 	}
 	sys_ev.type = LCUI_TEXTINPUT;
-	sys_ev.text.length = length;
-	sys_ev.text.text = NEW( wchar_t, length + 1 );
+	sys_ev.text.length = len;
+	sys_ev.text.text = NEW( wchar_t, len + 1 );
 	if( !sys_ev.text.text ) {
 		return -ENOMEM;
 	}
-	wcsncpy( sys_ev.text.text, str, length + 1 );
+	wcsncpy( sys_ev.text.text, str, len + 1 );
 	LCUI_TriggerEvent( &sys_ev, NULL );
 	free( sys_ev.text.text );
 	sys_ev.text.text = NULL;
@@ -332,16 +332,18 @@ static void LCUIIME_OnKeyDown( LCUI_SysEvent e, void *arg )
 /* 初始化LCUI输入法模块 */
 void LCUI_InitIME( void )
 {
-	int ime_id;
 	LinkedList_Init( &self.list );
 	self.is_inited = TRUE;
 	LCUI_BindEvent( LCUI_KEYDOWN, LCUIIME_OnKeyDown, NULL, NULL );
-#ifdef LCUI_BUILD_IN_WIN32
-	ime_id = LCUI_RegisterWin32IME();
+#ifdef WINAPI_FAMILY_APP
+	return;
 #else
-	ime_id = LCUI_RegisterLinuxIME();
+#  ifdef LCUI_BUILD_IN_WIN32
+	LCUIIME_Select( LCUI_RegisterWin32IME() );
+#  else
+	LCUIIME_Select( LCUI_RegisterLinuxIME() );
+#  endif
 #endif
-	LCUIIME_Select( ime_id );
 }
 
 /* 停用LCUI输入法模块 */

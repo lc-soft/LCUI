@@ -287,7 +287,7 @@ LCUI_Widget LCUIWidget_New( const char *type )
 			widget->type = widget->proto->name;
 			widget->proto->init( widget );
 		} else {
-			widget->type = strdup( type );
+			widget->type = strdup2( type );
 		}
 	}
 	Widget_AddTask( widget, WTT_REFRESH_STYLE );
@@ -394,14 +394,17 @@ void Widget_Empty( LCUI_Widget w )
 	}
 }
 
-LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
+LCUI_Widget Widget_At( LCUI_Widget widget, int ix, int iy )
 {
+	float x, y;
 	LCUI_BOOL is_hit;
 	LinkedListNode *node;
 	LCUI_Widget target = widget, c = NULL;
 	if( !widget ) {
 		return NULL;
 	}
+	x = 1.0f * ix;
+	y = 1.0f * iy;
 	do {
 		is_hit = FALSE;
 		for( LinkedList_Each( node, &target->children_show ) ) {
@@ -409,7 +412,9 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 			if( !c->computed_style.visible ) {
 				continue;
 			}
-			if( LCUIRect_HasPoint(&c->box.border, x, y) ) {
+			ix = roundi( x );
+			iy = roundi( y );
+			if( LCUIRect_HasPoint(&c->box.border, ix, iy) ) {
 				target = c;
 				x -= c->box.padding.x;
 				y -= c->box.padding.y;
@@ -421,16 +426,17 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y )
 	return (target == widget) ? NULL:target;
 }
 
-void Widget_GetAbsXY( LCUI_Widget w, LCUI_Widget parent, int *x, int *y )
+void Widget_GetOffset( LCUI_Widget w, LCUI_Widget parent,
+		       float *offset_x, float *offset_y )
 {
-	int tmp_x = 0, tmp_y = 0;
+	float x = 0, y = 0;
 	while( w && w != parent ) {
-		tmp_x += w->box.border.x;
-		tmp_y += w->box.border.y;
+		x += w->box.border.x;
+		y += w->box.border.y;
 		w = w->parent;
 	}
-	*x = tmp_x;
-	*y = tmp_y;
+	*offset_x = x;
+	*offset_y = y;
 }
 
 LCUI_Widget LCUIWidget_GetById( const char *idstr )
@@ -500,7 +506,7 @@ int Widget_SetId( LCUI_Widget w, const char *idstr )
 		LCUIMutex_Unlock( &LCUIWidget.mutex );
 		return -1;
 	}
-	w->id = strdup( idstr );
+	w->id = strdup2( idstr );
 	if( Dict_Add( LCUIWidget.ids, w->id, w ) == 0 ) {
 		LCUIMutex_Unlock( &LCUIWidget.mutex );
 		return 0;
@@ -650,21 +656,21 @@ void Widget_UpdateBorder( LCUI_Widget w )
 		return;
 	}
 	rect.x = rect.y = 0;
-	rect.width = w->box.border.width;
+	rect.width = roundi( w->box.border.width );
 	rect.width -= max( ob.top_right_radius, ob.right.width );
 	rect.height = max( ob.top_left_radius, ob.top.width );
 	/* 上 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.x = w->box.border.width;
+	rect.x = roundi( w->box.border.width );
 	rect.width = max( ob.top_right_radius, ob.right.width );
 	rect.x -= rect.width;
-	rect.height = w->box.border.height;
+	rect.height = roundi( w->box.border.height );
 	rect.height -= max( ob.bottom_right_radius, ob.bottom.width );
 	/* 右 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
 	rect.x = max( ob.bottom_left_radius, ob.left.width );
-	rect.y = w->box.border.height;
-	rect.width = w->box.border.width;
+	rect.y = roundi( w->box.border.height );
+	rect.width = roundi( w->box.border.width );
 	rect.width -= rect.x;
 	rect.height = max( ob.bottom_right_radius, ob.bottom.width );
 	rect.y -= rect.height;
@@ -673,7 +679,7 @@ void Widget_UpdateBorder( LCUI_Widget w )
 	rect.width = rect.x;
 	rect.x = 0;
 	rect.y = max( ob.top_left_radius, ob.left.width );
-	rect.height = w->box.border.height;
+	rect.height = roundi( w->box.border.height );
 	rect.height -= rect.y;
 	/* 左 */
 	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
@@ -725,8 +731,8 @@ void Widget_UpdateBoxShadow( LCUI_Widget w )
 		RectF2Rect( w->box.graph, rg );
 		LCUIRect_CutFourRect( &rb, &rg, rects );
 		for( i = 0; i < 4; ++i ) {
-			rects[i].x -= w->box.graph.x;
-			rects[i].y -= w->box.graph.y;
+			rects[i].x -= roundi( w->box.graph.x );
+			rects[i].y -= roundi( w->box.graph.y );
 			Widget_InvalidateArea( w, &rects[i], SV_GRAPH_BOX );
 		}
 		return;
@@ -774,9 +780,9 @@ void Widget_UpdateOpacity( LCUI_Widget w )
 	LCUI_Style s = &w->style->sheet[key_opacity];
 	if( s->is_valid ) {
 		switch( s->type ) {
-		case SVT_VALUE: opacity = 1.0 * s->value; break;
+		case SVT_VALUE: opacity = 1.0f * s->value; break;
 		case SVT_SCALE: opacity = s->val_scale; break;
-		default: opacity = 1.0; break;
+		default: opacity = 1.0f; break;
 		}
 		if( opacity > 1.0 ) {
 			opacity = 1.0;
@@ -1026,7 +1032,7 @@ static void Widget_UpdateGraphBox( LCUI_Widget w )
 	} else {
 		w->graph.color_type = COLOR_TYPE_RGB;
 	}
-	Graph_Create( &w->graph, rg->width, rg->height );
+	Graph_Create( &w->graph, roundi( rg->width ), roundi( rg->height ) );
 }
 
 /** 计算合适的内容框大小 */
@@ -1124,8 +1130,8 @@ static void Widget_ComputeSize( LCUI_Widget w )
 			if( w->computed_style.box_sizing != SV_BORDER_BOX ) {
 				width -= w->padding.left + w->padding.right;
 				/* 边框的宽度为整数，不使用浮点数 */
-				width -= bbox->left.width * 1.0;
-				width -= bbox->right.width * 1.0;
+				width -= bbox->left.width * 1.0f;
+				width -= bbox->right.width * 1.0f;
 			}
 		}
 		if( sw->type == SVT_AUTO ) {
@@ -1262,8 +1268,8 @@ void Widget_UpdateMargin( LCUI_Widget w )
 	}
 	/* 如果有父级部件，则处理 margin-left 和 margin-right 的值 */
 	if( w->parent ) {
-		int width = w->parent->box.content.width;
-		int margin_left = SVT_AUTO, margin_right = SVT_AUTO;
+		float width = w->parent->box.content.width;
+		float margin_left = SVT_AUTO, margin_right = SVT_AUTO;
 		if( w->style->sheet[key_margin_left].is_valid ) {
 			margin_left = w->style->sheet[key_margin_left].type;
 		}
@@ -1406,7 +1412,7 @@ void Widget_UpdateProps( LCUI_Widget w )
 	}
 }
 
-void Widget_SetBorder( LCUI_Widget w, int width, int style, LCUI_Color clr )
+void Widget_SetBorder( LCUI_Widget w, float width, int style, LCUI_Color clr )
 {
 	Widget_SetStyle( w, key_border_top_color, clr, color );
 	Widget_SetStyle( w, key_border_right_color, clr, color );
@@ -1423,7 +1429,8 @@ void Widget_SetBorder( LCUI_Widget w, int width, int style, LCUI_Color clr )
 	Widget_UpdateStyle( w, FALSE );
 }
 
-void Widget_SetPadding( LCUI_Widget w, float top, float right, float bottom, float left )
+void Widget_SetPadding( LCUI_Widget w, float top, float right, 
+			float bottom, float left )
 {
 	Widget_SetStyle( w, key_padding_top, top, px );
 	Widget_SetStyle( w, key_padding_right, right, px );
@@ -1432,7 +1439,8 @@ void Widget_SetPadding( LCUI_Widget w, float top, float right, float bottom, flo
 	Widget_UpdateStyle( w, FALSE );
 }
 
-void Widget_SetMargin( LCUI_Widget w, float top, float right, float bottom, float left )
+void Widget_SetMargin( LCUI_Widget w, float top, float right,
+		       float bottom, float left )
 {
 	Widget_SetStyle( w, key_margin_top, top, px );
 	Widget_SetStyle( w, key_margin_right, right, px );
@@ -1497,11 +1505,11 @@ int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
 		}
 	} else {
 		attr = NEW( LCUI_WidgetAttributeRec, 1 );
-		attr->name = strdup( name );
+		attr->name = strdup2( name );
 		Dict_Add( w->attributes, attr->name, attr );
 	}
 	attr->value.type = value_type;
-	attr->value.string = strdup( value );
+	attr->value.string = strdup2( value );
 	attr->value.destructor = value_destructor;
 	return 0;
 }
@@ -1512,7 +1520,7 @@ int Widget_SetAttribute( LCUI_Widget w, const char *name, const char *value )
 	if( !value ) {
 		return Widget_SetAttributeEx( w, name, NULL, SVT_NONE, NULL );
 	}
-	value_str = strdup( value );
+	value_str = strdup2( value );
 	if( !value_str ) {
 		return -ENOMEM;
 	}

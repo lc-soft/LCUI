@@ -77,10 +77,10 @@ LCUI_SelectorNode Widget_GetSelectorNode( LCUI_Widget w )
 	ASSIGN( sn, LCUI_SelectorNode );
 	ZEROSET( sn, LCUI_SelectorNode );
 	if( w->id ) {
-		sn->id = strdup( w->id );
+		sn->id = strdup2( w->id );
 	}
 	if( w->type ) {
-		sn->type = strdup( w->type );
+		sn->type = strdup2( w->type );
 	}
 	for( i = 0; w->classes && w->classes[i]; ++i ) {
 		sortedstrsadd( &sn->classes, w->classes[i] );

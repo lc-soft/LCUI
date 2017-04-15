@@ -67,7 +67,7 @@ LCUI_API void LCUIIME_Switch( void );
 LCUI_API LCUI_BOOL LCUIIME_ProcessKey( LCUI_SysEvent e );
 
 /** 提交输入法输入的内容至目标 */
-LCUI_API int LCUIIME_Commit( const wchar_t *str, int length );
+LCUI_API int LCUIIME_Commit( const wchar_t *str, size_t len );
 
 /* 初始化LCUI输入法模块 */
 LCUI_API void LCUI_InitIME( void );

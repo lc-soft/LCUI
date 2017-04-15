@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * jpeg.c -- LCUI JPEG image file processing module.
  * 
  * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
@@ -168,7 +168,7 @@ int LCUI_ReadJPEGHeader( LCUI_ImageReader reader )
 	}
 	jpeg_reader->src.bytes_in_buffer = sizeof( short int );
 	jpeg_reader->src.next_input_byte = jpeg_reader->buffer;
-	mark = *((short int*)jpeg_reader->buffer);
+	mark = ((short int*)jpeg_reader->buffer)[0];
 	if( mark != -9985 ) {
 		return -ENODATA;
 	}
@@ -262,7 +262,7 @@ int LCUI_ReadJPEG( LCUI_ImageReader reader, LCUI_Graph *graph )
 		}
 		if( reader->fn_prog ) {
 			reader->fn_prog( reader->prog_arg,
-					 100.0 * cinfo->output_scanline
+					 100.0f * cinfo->output_scanline
 					 / cinfo->output_height );
 		}
 	}

@@ -202,7 +202,7 @@ static void TextLayer_UpdateRowSize( LCUI_TextLayer layer, TextRow txtrow )
 		txtrow->height = (int)(txtrow->height * layer->line_height.scale);
 		break;
 	case SVT_PX:
-		txtrow->height = layer->line_height.px;
+		txtrow->height = roundi( layer->line_height.px );
 		break;
 	default:
 		txtrow->height = (int)(txtrow->height * 11.0 / 10.0 + 0.5);
@@ -739,7 +739,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 	for( p = wstr; *p; ++p ) {
 		/* 如果启用的样式标签支持，则处理样式的结束标签 */
 		if( layer->is_using_style_tags ) {
-			const wchar_t *pp = StyleTags_ScanEndingTag( tags, p );
+			const wchar_t *pp = StyleTags_GetEnd( tags, p );
 			if( pp ) {
 				/* 抵消本次循环后的++p，以在下次循环时还能够在当前位置 */
 				p = pp - 1;
@@ -747,7 +747,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 				LinkedList_Append( &layer->style_cache, style );
 				continue;
 			}
-			pp = StyleTags_ScanBeginTag( tags, p );
+			pp = StyleTags_GetStart( tags, p );
 			if( pp ) {
 				p = pp - 1;
 				style = StyleTags_GetTextStyle( tags );

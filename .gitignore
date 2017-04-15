@@ -22,6 +22,9 @@
 *.vs
 *.res
 *~
+*.intermediate
+Debug
+Release
 aclocal.m4
 Makefile
 Makefile.in
@@ -45,10 +48,8 @@ bin/
 build/*/*.sdf
 build/*/*.opensdf
 build/*/*.suo
-build/VS2010/include
-build/VS2010/lib
-build/VS2012/include
-build/VS2012/lib
+vendor/include
+vendor/lib
 build/*.png
 build/*.jpg
 build/VS2012/*/*.png

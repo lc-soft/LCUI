@@ -1,0 +1,399 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\LCUI">
+      <UniqueIdentifier>{d9706f60-899c-44f0-926a-fd36ffe24b10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\LCUI\gui">
+      <UniqueIdentifier>{9d79aeb1-91de-484b-a7e9-8b3faccf646f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\LCUI\draw">
+      <UniqueIdentifier>{40b50852-87d3-40fc-84c4-cebfc3a2139f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\LCUI\font">
+      <UniqueIdentifier>{e82633f2-1d26-4ccb-9d8b-acf3bca828a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="docs">
+      <UniqueIdentifier>{55f58a5e-9a60-4e9d-b65e-7377c4486a7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="源文件\gui">
+      <UniqueIdentifier>{f8918ee7-5cca-4f10-b318-834f3669a0c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\thread">
+      <UniqueIdentifier>{19d018c7-169c-4dcb-a52f-fe7bfd3750b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\thread\win32">
+      <UniqueIdentifier>{4238cadf-f552-49a7-9899-8400100a3536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\draw">
+      <UniqueIdentifier>{12dc9c84-35f2-4835-a19f-edfa70d611e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\font">
+      <UniqueIdentifier>{185bc9d3-84a5-49b4-9a7c-dc59c8f0b08e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\font\in-core">
+      <UniqueIdentifier>{63e93ebf-e556-4a4e-b7cf-153c206bf8ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\gui\widget">
+      <UniqueIdentifier>{bb54efed-7e15-4cdf-a4ad-77a5c5ada8a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\LCUI\gui\widget">
+      <UniqueIdentifier>{4befbb5f-3339-421b-827f-ce6870f52aba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\LCUI\util">
+      <UniqueIdentifier>{4a410afd-168d-414a-9c02-a2013304ee53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\util">
+      <UniqueIdentifier>{f90e49cb-1270-43d7-995a-0f3f0a803c8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\image">
+      <UniqueIdentifier>{dd6d7c8f-2626-480f-b8ca-002f4a4ce989}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\LCUI_Build.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\LCUI.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\font\charset.h">
+      <Filter>头文件\LCUI\font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\font\fontlibrary.h">
+      <Filter>头文件\LCUI\font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\font\textlayer.h">
+      <Filter>头文件\LCUI\font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\font\textstyle.h">
+      <Filter>头文件\LCUI\font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\draw\border.h">
+      <Filter>头文件\LCUI\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\draw\line.h">
+      <Filter>头文件\LCUI\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_base.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_style.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h">
+      <Filter>头文件\LCUI\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_task.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\thread.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\surface.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\input.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\ime.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\graph.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\font.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\draw.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\display.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\cursor.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\config.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\draw\background.h">
+      <Filter>头文件\LCUI\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textview.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\sidebar.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\builder.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\platform.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\main.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\timer.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\delay.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\dict.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\dirent.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\event.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\parse.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\rect.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\string.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\time.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textedit.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_library.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_prototype.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textcaret.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\logger.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\math.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\image.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\util\steptimer.h">
+      <Filter>头文件\LCUI\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\metrics.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\draw\border.c">
+      <Filter>源文件\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thread\win32\mutex.c">
+      <Filter>源文件\thread\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thread\win32\thread.c">
+      <Filter>源文件\thread\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\font\charset.c">
+      <Filter>源文件\font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\font\fontlibrary.c">
+      <Filter>源文件\font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\font\textlayer.c">
+      <Filter>源文件\font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\font\textstyle.c">
+      <Filter>源文件\font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\draw\line.c">
+      <Filter>源文件\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_event.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_base.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_style.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_paint.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\draw\boxshadow.c">
+      <Filter>源文件\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thread\win32\cond.c">
+      <Filter>源文件\thread\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\ime.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\graph.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cursor.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_task.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\draw\background.c">
+      <Filter>源文件\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\font\freetype.c">
+      <Filter>源文件\font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\font\in-core\font_inconsolata.c">
+      <Filter>源文件\font\in-core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\font\in_core_font.c">
+      <Filter>源文件\font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\textview.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\sidebar.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\css_parser.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\builder.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\button.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_background.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\main.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\display.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\timer.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\dict.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\dirent.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\event.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\linkedlist.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\parse.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\rbtree.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\rect.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\string.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\time.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\textedit.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\keyboard.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\css_library.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_prototype.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\textcaret.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\logger.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\math.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\image\bmp.c">
+      <Filter>源文件\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\image\jpeg.c">
+      <Filter>源文件\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\image\png.c">
+      <Filter>源文件\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\image\reader.c">
+      <Filter>源文件\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\steptimer.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\metrics.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

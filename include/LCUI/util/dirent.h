@@ -99,7 +99,7 @@ LCUI_API wchar_t *LCUI_GetFileNameW( LCUI_DirEntry *entry );
 
 LCUI_API int LCUI_FileIsDirectory( LCUI_DirEntry *entry );
 
-LCUI_API int LCUI_FileIsArchive( LCUI_DirEntry *entry );
+LCUI_API int LCUI_FileIsRegular( LCUI_DirEntry *entry );
 
 LCUI_END_HEADER
 

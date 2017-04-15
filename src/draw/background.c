@@ -54,7 +54,7 @@ void Background_Init( LCUI_Background *bg )
 void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 			   LCUI_Background *bg )
 {
-	float scale;
+	double scale;
 	LCUI_Graph graph;
 	LCUI_BOOL with_alpha;
 	LCUI_Rect read_rect, paint_rect;
@@ -66,21 +66,21 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 		case SV_CONTAIN:
 			image_w = box->width;
 			scale = 1.0 * bg->image.width / image_w;
-			image_h = 1.0 * bg->image.height / scale;
+			image_h = (int)( bg->image.height / scale );
 			if( image_h > box->height ) {
 				image_h = box->height;
 				scale = 1.0 * bg->image.height / box->height;
-				image_w = (int)(1.0 * bg->image.width / scale);
+				image_w = roundi( bg->image.width / scale );
 			}
 			break;
 		case SV_COVER:
 			image_w = box->width;
 			scale = 1.0 * bg->image.width / image_w;
-			image_h = 1.0 * bg->image.height / scale;
+			image_h = (int)(bg->image.height / scale);
 			if( image_h < box->height ) {
 				image_h = box->height;
 				scale = 1.0 * bg->image.height / image_h;
-				image_w = (int)(1.0 * bg->image.width / scale);
+				image_w = (int)( bg->image.width / scale );
 			}
 			image_x = (box->width - image_w) / 2;
 			image_y = (box->height - image_h) / 2;
@@ -94,10 +94,10 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 	} else {
 		switch( bg->size.w.type ) {
 		case SVT_SCALE:
-			image_w = box->width * bg->size.w.scale;
+			image_w = roundi( box->width * bg->size.w.scale );
 			break;
 		case SVT_PX:
-			image_w = bg->size.w.px;
+			image_w = roundi( bg->size.w.px );
 			break;
 		default:
 			image_w = bg->image.width;
@@ -105,10 +105,10 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 		}
 		switch( bg->size.h.type ) {
 		case SVT_SCALE:
-			image_h = box->height * bg->size.h.scale;
+			image_h = roundi( box->height * bg->size.h.scale );
 			break;
 		case SVT_PX:
-			image_h = bg->size.h.px;
+			image_h = roundi( bg->size.h.px );
 			break;
 		default:
 			image_h = bg->image.height;
@@ -159,19 +159,19 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 		switch( bg->position.x.type ) {
 		case SVT_SCALE:
 			image_x = box->width - image_w;
-			image_x *= bg->position.x.scale;
+			image_x = roundi( image_x * bg->position.x.scale );
 			break;
 		case SVT_PX:
-			image_x = bg->position.x.px;
+			image_x = roundi( bg->position.x.px );
 		default:break;
 		}
 		switch( bg->position.y.type ) {
 		case SVT_SCALE:
 			image_y = box->height - image_h;
-			image_y *= bg->position.y.scale;
+			image_y = roundi( image_y * bg->position.y.scale );
 			break;
 		case SVT_PX:
-			image_y = bg->position.y.px;
+			image_y = roundi( bg->position.y.px );
 		default:break;
 		}
 	}
@@ -210,25 +210,24 @@ void Graph_DrawBackground( LCUI_PaintContext paint, const LCUI_Rect *box,
 		Graph_Mix( &paint->canvas, &graph, image_x,
 			   image_y, with_alpha );
 	} else {
-		float scale;
 		LCUI_Graph buffer;
-		LCUI_Rect quote_rect;
+		LCUI_Rect rect;
 
 		Graph_Init( &buffer );
-		quote_rect = read_rect;
+		rect = read_rect;
 		/* 根据宽高的缩放比例，计算实际需要引用的区域 */
 		if( image_w != bg->image.width ) {
 			scale = 1.0 * bg->image.width / image_w;
-			quote_rect.x *= scale;
-			quote_rect.width *= scale;
+			rect.x = roundi( rect.x * scale );
+			rect.width = roundi( rect.width * scale );
 		}
 		if( image_h != bg->image.height ) {
 			scale = 1.0 * bg->image.height / image_h;
-			quote_rect.y *= scale;
-			quote_rect.height *= scale;
+			rect.y = roundi( rect.y * scale );
+			rect.height = roundi( rect.height * scale );
 		}
 		/* 引用源背景图像的一块区域 */
-		Graph_Quote( &graph, &bg->image, &quote_rect );
+		Graph_Quote( &graph, &bg->image, &rect );
 		image_w = read_rect.width;
 		image_h = read_rect.height;
 		/* 计算相对于绘制区域的坐标 */

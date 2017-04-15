@@ -214,7 +214,7 @@ static KeyNameGroupRec style_value_map[] = {
 static int LCUI_DirectAddStyleName( int key, const char *name )
 {
 	unsigned int *newkey;
-	char *newname = strdup( name );
+	char *newname = strdup2( name );
 	if( !newname ) {
 		return -ENOMEM;
 	}
@@ -238,7 +238,7 @@ int LCUI_SetStyleName( int key, const char *name )
 	LCUIMutex_Lock( &library.mutex );
 	entry = Dict_Find( library.names, &key );
 	if( entry ) {
-		newname = strdup( name );
+		newname = strdup2( name );
 		free( DictEntry_GetVal( entry ) );
 		Dict_SetVal( library.names, entry, newname );
 		LCUIMutex_Unlock( &library.mutex );
@@ -266,7 +266,7 @@ int LCUI_AddStyleValue( int key, const char *name )
 {
 	char *newname;
 	unsigned int *val;
-	newname = strdup( name );
+	newname = strdup2( name );
 	if( !newname ) {
 		return -ENOMEM;
 	}
@@ -362,9 +362,9 @@ LCUI_BOOL SelectorNode_Match( LCUI_SelectorNode sn1,
 static void SelectorNode_Copy( LCUI_SelectorNode dst, LCUI_SelectorNode src )
 {
 	int i;
-	dst->id = src->id ? strdup( src->id ) : NULL;
-	dst->type = src->type ? strdup( src->type ) : NULL;
-	dst->fullname = src->fullname ? strdup( src->fullname ) : NULL;
+	dst->id = src->id ? strdup2( src->id ) : NULL;
+	dst->type = src->type ? strdup2( src->type ) : NULL;
+	dst->fullname = src->fullname ? strdup2( src->fullname ) : NULL;
 	if( src->classes ) {
 		for( i = 0; src->classes[i]; ++i ) {
 			sortedstrsadd( &dst->classes, src->classes[i] );
@@ -481,7 +481,7 @@ int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 		++count;
 		switch( src->sheet[i].type ) {
 		case SVT_STRING:
-			s->string = strdup( src->sheet[i].string );
+			s->string = strdup2( src->sheet[i].string );
 			break;
 		case SVT_WSTRING:
 			size = wcslen( src->sheet[i].wstring ) + 1;
@@ -524,7 +524,7 @@ int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src )
 			if( s->is_valid && s->string ) {
 				free( s->string );
 			}
-			s->string = strdup( src->sheet[i].string );
+			s->string = strdup2( src->sheet[i].string );
 			break;
 		case SVT_WSTRING:
 			if( s->is_valid && s->string ) {
@@ -581,7 +581,7 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 			return 0;
 		}
 		strcpy( fullname, sfinder->node->type );
-		LinkedList_Append( list, strdup( fullname ) );
+		LinkedList_Append( list, strdup2( fullname ) );
 		break;
 	case LEVEL_ID: 
 		/* 按ID选择器生成选择器全名 */
@@ -591,7 +591,7 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 		fullname[len++] = '#';
 		fullname[len] = 0;
 		strcpy( fullname + len, sfinder->node->id );
-		LinkedList_Append( list, strdup( fullname ) );
+		LinkedList_Append( list, strdup2( fullname ) );
 		break;
 	case LEVEL_CLASS:
 		if( !sfinder->node->classes ) {
@@ -609,7 +609,7 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 			sfinder->level += 1;
 			sfinder->class_i = i;
 			strcpy( fullname + len, sfinder->node->classes[i] );
-			LinkedList_Append( list, strdup( fullname ) );
+			LinkedList_Append( list, strdup2( fullname ) );
 			/* 将当前选择器名与其它层级的选择器名组合 */
 			while( sfinder->level < LEVEL_TOTAL_NUM ) {
 				count += NamesFinder_Find( sfinder, list );
@@ -637,7 +637,7 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 				continue;
 			}
 			strcpy( fullname + len, sfinder->node->classes[i] );
-			LinkedList_Append( list, strdup( fullname ) );
+			LinkedList_Append( list, strdup2( fullname ) );
 			sfinder->class_i = i;
 			count += NamesFinder_Find( sfinder, list );
 			sfinder->class_i  = 0;
@@ -673,7 +673,7 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 		for( i = 0; sfinder->node->status[i]; ++i ) {
 			sfinder->status_i = i;
 			strcpy( fullname + len, sfinder->node->status[i] );
-			LinkedList_Append( list, strdup( fullname ) );
+			LinkedList_Append( list, strdup2( fullname ) );
 			/**
 			 * 递归调用，以一层层拼接出像下面这样的选择器：
 			 * textview#main-btn-text:active:focus:hover
@@ -695,7 +695,7 @@ static int NamesFinder_Find( NamesFinder sfinder, LinkedList *list )
 			}
 			fullname[len] = ':';
 			strcpy( fullname + len + 1, sfinder->node->status[i] );
-			LinkedList_Append( list, strdup( fullname ) );
+			LinkedList_Append( list, strdup2( fullname ) );
 			sfinder->status_i = i;
 			count += NamesFinder_Find( sfinder, list );
 			sfinder->status_i = 0;
@@ -1068,7 +1068,7 @@ static LCUI_StyleSheet LCUI_SelectStyleSheet( LCUI_Selector selector,
 		if( !link ) {
 			link = CreateStyleLink();
 			link->group = slg;
-			link->selector = strdup( fullname );
+			link->selector = strdup2( fullname );
 			Dict_Add( slg->links, fullname, link );
 		}
 		if( i == 0 ) {
@@ -1110,7 +1110,7 @@ static LCUI_StyleSheet LCUI_SelectStyleSheet( LCUI_Selector selector,
 	}
 	snode->sheet = StyleSheet();
 	snode->rank = selector->rank;
-	snode->selector = strdup( fullname );
+	snode->selector = strdup2( fullname );
 	snode->batch_num = selector->batch_num;
 	LinkedList_Append( &link->styles, snode );
 	return snode->sheet;
@@ -1210,10 +1210,10 @@ int LCUI_FindStyleSheetFromGroup( int group, const char *name,
 	i = s->length - 1;
 	LinkedList_Init( &names );
 	if( name ) {
-		LinkedList_Append( &names, strdup( name ) );
+		LinkedList_Append( &names, strdup2( name ) );
 	} else {
 		SelectorNode_GetNames( s->nodes[i], &names );
-		LinkedList_Append( &names, strdup( "*" ) );
+		LinkedList_Append( &names, strdup2( "*" ) );
 	}
 	for( LinkedList_Each( node, &names ) ) {
 		DictEntry *entry;

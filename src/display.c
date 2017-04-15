@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * display.c -- graphical display control
  *
  * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
@@ -270,7 +270,8 @@ static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 	Surface_SetCaptionW( record->surface, widget->title );
 	if( widget->style->sheet[key_top].is_valid &&
 	    widget->style->sheet[key_left].is_valid ) {
-		Surface_Move( record->surface, rect->x, rect->y );
+		Surface_Move( record->surface, roundi( rect->x ),
+			      roundi( rect->y ) );
 	}
 	width = roundi( rect->width );
 	height = roundi( rect->height );
@@ -405,7 +406,7 @@ void LCUIDisplay_SetSize( int width, int height )
 	root = LCUIWidget_GetRoot();
 	surface = LCUIDisplay_GetBindSurface( root );
 	Surface_Resize( surface, width, height );
-	Widget_Resize( root, width, height );
+	Widget_Resize( root, (float)width, (float)height );
 }
 
 int LCUIDisplay_GetWidth( void )
@@ -415,7 +416,7 @@ int LCUIDisplay_GetWidth( void )
 	}
 	if( display.mode == LCDM_WINDOWED ||
 	    display.mode == LCDM_FULLSCREEN ) {
-		return LCUIWidget_GetRoot()->width;
+		return roundi( LCUIWidget_GetRoot()->width );
 	}
 	return display.driver->getWidth();
 }
@@ -427,7 +428,7 @@ int LCUIDisplay_GetHeight( void )
 	}
 	if( display.mode == LCDM_WINDOWED ||
 	    display.mode == LCDM_FULLSCREEN ) {
-		return LCUIWidget_GetRoot()->height;
+		return roundi( LCUIWidget_GetRoot()->height );
 	}
 	return display.driver->getHeight();
 }
@@ -553,7 +554,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LCUI_Widget root;
 	LCUI_RectF *rect;
 	LCUI_Surface surface;
-	e_type = *((int*)&arg);
+	e_type = *((int*)arg);
 	root = LCUIWidget_GetRoot();
 	surface = LCUIDisplay_GetBindSurface( e->target );
 	if( display.mode == LCDM_SEAMLESS ) {

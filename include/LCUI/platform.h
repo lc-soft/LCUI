@@ -41,6 +41,17 @@
 #define LCUI_PLATFORM_H
 
 #ifdef LCUI_BUILD_IN_WIN32
+#ifdef WINAPI_FAMILY_APP
+#define LCUI_CreateAppDriver() NULL 
+#define LCUI_DestroyAppDriver(X) NULL
+#define LCUI_PreInitApp() NULL
+#define LCUI_CreateDisplayDriver() NULL
+#define LCUI_DestroyDisplayDriver() NULL
+#define LCUI_InitMouseDriver()
+#define LCUI_ExitMouseDriver()
+#define LCUI_InitKeyboardDriver()
+#define LCUI_ExitKeyboardDriver()
+#else
 #define LCUI_CreateAppDriver LCUI_CreateWinAppDriver
 #define LCUI_DestroyAppDriver LCUI_DestroyWinAppDriver
 #define LCUI_PreInitApp LCUI_PreInitWinApp
@@ -50,6 +61,7 @@
 #define LCUI_ExitMouseDriver LCUI_ExitWinMouse
 #define LCUI_InitKeyboardDriver LCUI_InitWinKeyboard
 #define LCUI_ExitKeyboardDriver LCUI_ExitWinKeyboard
+#endif
 #define LCUI_EVENTS_H	<LCUI/platform/windows/windows_events.h>
 #define LCUI_MOUSE_H	<LCUI/platform/windows/windows_mouse.h>
 #define LCUI_KEYBOARD_H	<LCUI/platform/windows/windows_keyboard.h>

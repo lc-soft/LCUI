@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * rect.c -- Rectangle area handling
  *
  * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
@@ -57,7 +57,6 @@ LCUI_Rect Rect( int x, int y, int w, int h )
 	return r;
 }
 
-/** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
 void LCUIRect_GetCutArea( int box_w, int box_h,
 			  LCUI_Rect rect, LCUI_Rect *cut )
 {
@@ -83,7 +82,6 @@ void LCUIRect_GetCutArea( int box_w, int box_h,
 	}
 }
 
-/** 将矩形区域范围调整在容器有效范围内 */
 void LCUIRect_ValidateArea( LCUI_Rect *rect, int box_w, int box_h )
 {
 	if( rect->x < 0 ) {

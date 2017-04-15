@@ -110,7 +110,7 @@ LCUI_Widget SideBar_AppendItem( LCUI_Widget sidebar, const wchar_t *id,
 	SideBar sb;
 	SideBarItem sbi;
 	LCUI_Widget w;
-	int len = id ? wcslen( id ) + 1 : 0;
+	size_t len = id ? wcslen( id ) + 1 : 0;
 	wchar_t *newid = NEW( wchar_t, len );
 	if( !newid ) {
 		return NULL;

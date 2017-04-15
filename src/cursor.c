@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * cursor.c -- mouse cursor operation set.
  *
  * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
@@ -134,8 +134,8 @@ void LCUICursor_GetRect( LCUI_Rect *rect )
 {
 	rect->x = cursor.pos.x;
 	rect->y = cursor.pos.y;
-	rect->width = cursor.graph.width;
-	rect->height = cursor.graph.height;
+	rect->width = (int)cursor.graph.width;
+	rect->height = (int)cursor.graph.height;
 }
 
 /* 刷新鼠标游标在屏幕上显示的图形 */

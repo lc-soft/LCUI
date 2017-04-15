@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * in_core_font.c -- basic in-core font-engine.
  *
  * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
@@ -57,8 +57,8 @@ static int InCoreFont_Open( const char *filepath, LCUI_Font ***outfonts )
 	if( strcmp( filepath, "in-core.inconsolata" ) == 0 ) {
 		*code = FONT_INCONSOLATA;
 		font = malloc( sizeof(LCUI_Font) );
-		font->family_name = strdup("inconsolata");
-		font->style_name = strdup("Regular");
+		font->family_name = strdup2("inconsolata");
+		font->style_name = strdup2("Regular");
 		font->data = code;
 		fonts[0] = font;
 		*outfonts = fonts;
@@ -93,8 +93,8 @@ int LCUIFont_InitInCoreFont( LCUI_FontEngine *engine )
 	font = malloc( sizeof( LCUI_Font ) );
 	/* 先添加 LCUI 内置字体的信息 */
 	*code = FONT_INCONSOLATA;
-	font->family_name = strdup("inconsolata");
-	font->style_name = strdup("Regular");
+	font->family_name = strdup2("inconsolata");
+	font->style_name = strdup2("Regular");
 	font->engine = engine;
 	font->data = code;
 	engine->render = InCoreFont_Render;

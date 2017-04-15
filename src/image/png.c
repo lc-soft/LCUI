@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * png.c -- LCUI PNG image file processing module.
  *
  * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
@@ -218,7 +218,7 @@ int LCUI_ReadPNG( LCUI_ImageReader reader, LCUI_Graph *graph )
 			row = graph->bytes + i * graph->bytes_per_row;
 			png_read_row( png_ptr, row, NULL );
 			if( reader->fn_prog ) {
-				progress = 100.0 * i / graph->height;
+				progress = 100.0f * i / graph->height;
 				reader->fn_prog( reader->prog_arg, progress );
 			}
 		}

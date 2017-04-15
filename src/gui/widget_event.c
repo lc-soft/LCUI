@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * widget_event.c -- LCUI widget event module.
  *
  * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
@@ -373,7 +373,7 @@ int LCUIWidget_SetEventName( int event_id, const char *event_name )
 		return -1;
 	}
 	mapping = malloc( sizeof( EventMappingRec ) );
-	mapping->name = strdup( event_name );
+	mapping->name = strdup2( event_name );
 	mapping->id = event_id;
 	LinkedList_Append( &self.event_mappings, mapping );
 	RBTree_Insert( &self.event_names, event_id, mapping );
@@ -509,7 +509,8 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack 
 	while( widget->computed_style.pointer_events == SV_NONE ) {
 		LCUI_Widget w;
 		LCUI_BOOL is_pointer_event = TRUE;
-		int x, y, pointer_x, pointer_y;
+		int pointer_x, pointer_y;
+		float  x, y;
 
 		switch( e->type ) {
 		case WET_CLICK:
@@ -531,12 +532,12 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack 
 		if( !is_pointer_event ) {
 			break;
 		}
-		Widget_GetAbsXY( widget->parent, NULL, &x, &y );
+		Widget_GetOffset( widget->parent, NULL, &x, &y );
 		/* 转换成相对于父级部件内容框的坐标 */
 		x = pointer_x - x;
 		y = pointer_y - y;
 		/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
-		w = Widget_GetNextAt( widget, x, y );
+		w = Widget_GetNextAt( widget, roundi( x ), roundi( y ) );
 		if( !w ) {
 			break;
 		}
@@ -1010,17 +1011,21 @@ int Widget_ReleaseTouchCapture( LCUI_Widget w, int point_id )
 
 int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 {
-	LCUI_Widget root;
+	int *data;
 	LCUI_WidgetEventRec e = { 0 };
-	int *n = (int*)&event_type;
-	root = LCUIWidget_GetRoot();
+	LCUI_Widget root = LCUIWidget_GetRoot();
 	if( w->parent != root && w != root ) {
 		return -1;
 	}
 	e.target = w;
 	e.type = WET_SURFACE;
 	e.cancel_bubble = TRUE;
-	return Widget_PostEvent( root, &e, *((int**)n), NULL );
+	data = malloc( sizeof( int ) );
+	if( !data ) {
+		return -ENOMEM;
+	}
+	*data = event_type;
+	return Widget_PostEvent( root, &e, data, free );
 }
 
 static void BindSysEvent( int e, LCUI_SysEventFunc func )

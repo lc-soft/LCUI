@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * timer.c -- timer support.
  *
  * Copyright (C) 2013-2017 by Liu Chao <lc-soft@live.cn>
@@ -118,8 +118,7 @@ static void TimerList_Print( void )
 /** 定时器线程，用于处理列表中各个定时器 */
 static void TimerThread( void *arg )
 {
-	long int n_ms;
-	int64_t lost_ms;
+	long n_ms, lost_ms;
 	LinkedListNode *node;
 	LCUI_AppTaskRec task = {0};
 	LCUIMutex_Lock( &self.mutex );
@@ -139,7 +138,7 @@ static void TimerThread( void *arg )
 			LCUIMutex_Lock( &self.mutex );
 			continue;
 		}
-		lost_ms = LCUI_GetTimeDelta( timer->start_time );
+		lost_ms = (long)LCUI_GetTimeDelta( timer->start_time );
 		/* 减去处于暂停状态的时长 */
 		lost_ms -= timer->pause_ms;
 		/* 若流失的时间未达到总定时时长，则睡眠一段时间 */

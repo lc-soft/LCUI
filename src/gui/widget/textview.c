@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * textview.c -- LCUI's TextView Widget
  *
  * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
@@ -131,20 +131,20 @@ static int unescape( const wchar_t *instr, wchar_t *outstr )
 
 static int OnParseContent( LCUI_StyleSheet ss, int key, const char *str )
 {
-	int i, len;
+	int i;
 	wchar_t *content;
-	len = strlen( str ) + 1;
-	content = malloc( len*sizeof( wchar_t ) );
-	LCUI_DecodeString( content, str, len, ENCODING_UTF8 );
+	size_t len = strlen( str ) + 1;
+	content = malloc( len * sizeof( wchar_t ) );
+	LCUI_DecodeString( content, str, (int)len, ENCODING_UTF8 );
 	if( content[0] == '"' ) {
-		for( i = 0; content[i+1]; ++i ) {
-			content[i] = content[i+1];
+		for( i = 0; content[i + 1]; ++i ) {
+			content[i] = content[i + 1];
 		}
-		if( content[i-1] != '"' ) {
+		if( content[i - 1] != '"' ) {
 			free( content );
 			return -1;
 		}
-		content[i-1] = 0;
+		content[i - 1] = 0;
 	}
 	unescape( content, content );
 	SetStyle( ss, self.keys[key], content, wstring );
@@ -171,7 +171,7 @@ static int OnParseFontSize( LCUI_StyleSheet ss, int key, const char *str )
 
 static int OnParseFontFamily( LCUI_StyleSheet ss, int key, const char *str )
 {
-	char *name = strdup( str );
+	char *name = strdup2( str );
 	if( ss->sheet[self.keys[key]].is_valid
 	 && ss->sheet[self.keys[key]].string) {
 		free( ss->sheet[self.keys[key]].string );
@@ -347,7 +347,7 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LinkedListNode *node;
 	LCUI_TextView txt;
 	int width = 0, height = 0;
-	int max_width = 0, max_height = 0;
+	float max_width = 0, max_height = 0;
 
 	LinkedList_Init( &rects );
 	txt = Widget_GetData( w, self.prototype );
@@ -358,14 +358,18 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		max_width -= w->computed_style.border.right.width;
 		max_width -= w->padding.left + w->padding.right;
 	} else {
-		max_width = width = w->box.content.width;
+		max_width = w->box.content.width;
+		width = roundi( max_width );
 	}
 	if( w->style->sheet[key_height].is_valid &&
 	    w->style->sheet[key_height].type != SVT_AUTO ) {
-		max_height = height = w->box.content.width;
+		max_height = w->box.content.width;
+		height = roundi( height );
 	}
-	TextLayer_SetMaxSize( txt->layer, max_width, max_height );
 	TextLayer_SetFixedSize( txt->layer, width, height );
+	width = roundi( max_width );
+	height = roundi( max_height );
+	TextLayer_SetMaxSize( txt->layer, width, height );
 	TextLayer_Update( txt->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
@@ -418,14 +422,14 @@ static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 		}
 		TextLayer_SetFixedSize( txt->layer, 0, 0 );
 		TextLayer_Update( txt->layer, NULL );
-		*width = TextLayer_GetWidth( txt->layer ) * 1.0;
-		*height = TextLayer_GetHeight( txt->layer ) * 1.0;
+		*width = TextLayer_GetWidth( txt->layer ) * 1.0f;
+		*height = TextLayer_GetHeight( txt->layer ) * 1.0f;
 		TextLayer_SetFixedSize( txt->layer, fixed_w, fixed_h );
 		TextLayer_Update( txt->layer, NULL );
 		return;
 	}
-	*width = TextLayer_GetWidth( txt->layer ) * 1.0;
-	*height = TextLayer_GetHeight( txt->layer ) * 1.0;
+	*width = TextLayer_GetWidth( txt->layer ) * 1.0f;
+	*height = TextLayer_GetHeight( txt->layer ) * 1.0f;
 }
 
 /** 私有的任务处理接口 */
@@ -482,10 +486,10 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_Pos layer_pos;
 	LCUI_Rect content_rect, rect;
 	txt = Widget_GetData( w, self.prototype );
-	content_rect.width = w->box.content.width;
-	content_rect.height = w->box.content.height;
-	content_rect.x = (int)(w->box.content.x - w->box.graph.x + 0.5);
-	content_rect.y = (int)(w->box.content.y - w->box.graph.y + 0.5);
+	content_rect.width = roundi( w->box.content.width );
+	content_rect.height = roundi( w->box.content.height );
+	content_rect.x = roundi( w->box.content.x - w->box.graph.x );
+	content_rect.y = roundi( w->box.content.y - w->box.graph.y );
 	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect );
 	layer_pos.x = content_rect.x - paint->rect.x;
 	layer_pos.y = content_rect.y - paint->rect.y;
@@ -500,7 +504,7 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 
 int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 {
-	int len;
+	size_t len;
 	wchar_t *newtext;
 	LCUI_TextView txt;
 
@@ -529,9 +533,9 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 
 int TextView_SetText( LCUI_Widget w, const char *utf8_text )
 {
-	int ret, len;
+	int ret;
 	wchar_t *wstr;
-	len = strlen( utf8_text ) + 1;
+	size_t len = strlen( utf8_text ) + 1;
 	wstr = malloc( sizeof( wchar_t )*len );
 	LCUI_DecodeString( wstr, utf8_text, len, ENCODING_UTF8 );
 	ret = TextView_SetTextW( w, wstr );

@@ -47,10 +47,10 @@ LCUI_API int BoxShadow_GetBoxWidth( LCUI_BoxShadow *shadow, int w );
 LCUI_API int BoxShadow_GetBoxHeight( LCUI_BoxShadow *shadow, int h );
 
 /** 计算Box在添加阴影后的宽度 */
-LCUI_API int BoxShadow_GetWidth( LCUI_BoxShadow *shadow, int box_w );
+LCUI_API float BoxShadow_GetWidth( LCUI_BoxShadow *shadow, float box_w );
 
 /** 计算Box在添加阴影后的高度 */
-LCUI_API int BoxShadow_GetHeight( LCUI_BoxShadow *shadow, int box_h );
+LCUI_API float BoxShadow_GetHeight( LCUI_BoxShadow *shadow, float box_h );
 
 LCUI_API int BoxShadow_GetBoxX( LCUI_BoxShadow *shadow );
 

@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * fontlibrary.c -- The font info and font bitmap cache module.
  *
  * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
@@ -144,7 +144,7 @@ int LCUIFont_Add( LCUI_Font *font )
 	fn = SelectFontFamliy( font->family_name );
 	if( !fn ) {
 		fn = NEW( LCUI_FontFamilyNode, 1 );
-		fn->family_name = strdup( font->family_name );
+		fn->family_name = strdup2( font->family_name );
 		LinkedList_Init( &fn->styles );
 		RBTree_CustomInsert( &fontlib.family_tree,
 				     font->family_name, fn );

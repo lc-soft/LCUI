@@ -101,25 +101,24 @@ LCUI_API int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str );
 
 #define StyleTags_Init LinkedList_Init
 
+/** 从字符串中获取样式标签的名字及样式属性 */
+LCUI_API const wchar_t *ScanStyleTag( const wchar_t *wstr, wchar_t *name,
+				      int max_name_len, wchar_t *data );
+
+/** 在字符串中获取样式的结束标签，输出的是标签名 */
+LCUI_API const wchar_t *ScanStyleEndingTag( const wchar_t *wstr, wchar_t *name );
+
 LCUI_API void StyleTags_Clear( LinkedList *tags );
 
 LCUI_API LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags );
 
-/** 在字符串中获取样式的结束标签，输出的是标签名 */
-LCUI_API const wchar_t* scan_style_ending_tag( const wchar_t *wstr,
-						char *name_buff );
-
-/** 从字符串中获取样式标签的名字及样式属性 */
-LCUI_API const wchar_t* scan_style_tag(	const wchar_t *wstr, char *name_buff,
-					int max_name_len, char *data_buff );
-
 /** 处理样式标签 */
-LCUI_API const wchar_t* StyleTags_ScanBeginTag( LinkedList *tags,
+LCUI_API const wchar_t* StyleTags_GetStart( LinkedList *tags,
 						const wchar_t *str );
 
 /** 处理样式结束标签 */
-LCUI_API const wchar_t* StyleTags_ScanEndingTag( LinkedList *tags,
-							const wchar_t *str );
+LCUI_API const wchar_t* StyleTags_GetEnd( LinkedList *tags,
+						 const wchar_t *str );
 
 /*------------------------- End StyleTag -----------------------------*/
 

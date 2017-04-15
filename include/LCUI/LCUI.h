@@ -178,8 +178,8 @@ typedef struct LCUI_Border {
 
 typedef struct LCUI_Graph_ LCUI_Graph;
 struct LCUI_Graph_ {
-	size_t width;			/**< 宽度，一个整数值，单位为像素(px) */
-	size_t height;			/**< 高度，一个整数值，单位为像素(px) */
+	uint32_t width;			/**< 宽度，一个整数值，单位为像素(px) */
+	uint32_t height;			/**< 高度，一个整数值，单位为像素(px) */
 	struct {
 		int top;		/**< 源图形中的引用区域的上边距 */
 		int left;		/**< 源图形中的引用区域的左边距 */
@@ -192,8 +192,8 @@ struct LCUI_Graph_ {
 		LCUI_ARGB *argb;	/**< 指针，用于一次访问一个像素的数据 */
 	};
 	int color_type;			/**< 色彩类型 */
-	size_t bytes_per_pixel;		/**< 每个像素共占多少个字节 */
-	size_t bytes_per_row;		/**< 每行像素共占多少个字节 */
+	uint32_t bytes_per_pixel;	/**< 每个像素共占多少个字节 */
+	uint32_t bytes_per_row;		/**< 每行像素共占多少个字节 */
 	float opacity;			/**< 全局不透明度，取值范围为 0~1.0 */
 	size_t mem_size;		/**< 像素数据缓冲区大小 */
 	uchar_t *palette;		/**< 调色板 */

@@ -1,0 +1,333 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\LCUI\draw\background.h" />
+    <ClInclude Include="..\..\..\include\LCUI\draw\border.h" />
+    <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h" />
+    <ClInclude Include="..\..\..\include\LCUI\draw\line.h" />
+    <ClInclude Include="..\..\..\include\LCUI\font\charset.h" />
+    <ClInclude Include="..\..\..\include\LCUI\font\fontlibrary.h" />
+    <ClInclude Include="..\..\..\include\LCUI\font\textlayer.h" />
+    <ClInclude Include="..\..\..\include\LCUI\font\textstyle.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\builder.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_library.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\metrics.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\sidebar.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textcaret.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textedit.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textview.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_base.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_prototype.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_task.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_style.h" />
+    <ClInclude Include="..\..\..\include\LCUI\image.h" />
+    <ClInclude Include="..\..\..\include\LCUI\LCUI.h" />
+    <ClInclude Include="..\..\..\include\LCUI\config.h" />
+    <ClInclude Include="..\..\..\include\LCUI\cursor.h" />
+    <ClInclude Include="..\..\..\include\LCUI\display.h" />
+    <ClInclude Include="..\..\..\include\LCUI\draw.h" />
+    <ClInclude Include="..\..\..\include\LCUI\font.h" />
+    <ClInclude Include="..\..\..\include\LCUI\graph.h" />
+    <ClInclude Include="..\..\..\include\LCUI\input.h" />
+    <ClInclude Include="..\..\..\include\LCUI\ime.h" />
+    <ClInclude Include="..\..\..\include\LCUI\main.h" />
+    <ClInclude Include="..\..\..\include\LCUI\platform.h" />
+    <ClInclude Include="..\..\..\include\LCUI\surface.h" />
+    <ClInclude Include="..\..\..\include\LCUI\thread.h" />
+    <ClInclude Include="..\..\..\include\LCUI\timer.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\delay.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\dict.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\dirent.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\event.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\steptimer.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\logger.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\math.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\parse.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\rect.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\string.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\time.h" />
+    <ClInclude Include="..\..\..\include\LCUI_Build.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\display.c" />
+    <ClCompile Include="..\..\..\src\draw\background.c" />
+    <ClCompile Include="..\..\..\src\draw\border.c" />
+    <ClCompile Include="..\..\..\src\draw\boxshadow.c" />
+    <ClCompile Include="..\..\..\src\draw\line.c" />
+    <ClCompile Include="..\..\..\src\font\charset.c" />
+    <ClCompile Include="..\..\..\src\font\fontlibrary.c" />
+    <ClCompile Include="..\..\..\src\font\freetype.c" />
+    <ClCompile Include="..\..\..\src\font\in-core\font_inconsolata.c" />
+    <ClCompile Include="..\..\..\src\font\in_core_font.c" />
+    <ClCompile Include="..\..\..\src\font\textlayer.c" />
+    <ClCompile Include="..\..\..\src\font\textstyle.c" />
+    <ClCompile Include="..\..\..\src\gui\builder.c" />
+    <ClCompile Include="..\..\..\src\gui\css_library.c" />
+    <ClCompile Include="..\..\..\src\gui\css_parser.c" />
+    <ClCompile Include="..\..\..\src\gui\metrics.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\button.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\textcaret.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\textedit.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\textview.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_background.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_base.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_event.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_prototype.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_style.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_task.c" />
+    <ClCompile Include="..\..\..\src\cursor.c" />
+    <ClCompile Include="..\..\..\src\graph.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\image\bmp.c" />
+    <ClCompile Include="..\..\..\src\image\jpeg.c" />
+    <ClCompile Include="..\..\..\src\image\png.c" />
+    <ClCompile Include="..\..\..\src\image\reader.c" />
+    <ClCompile Include="..\..\..\src\ime.c" />
+    <ClCompile Include="..\..\..\src\keyboard.c" />
+    <ClCompile Include="..\..\..\src\main.c" />
+    <ClCompile Include="..\..\..\src\thread\win32\cond.c" />
+    <ClCompile Include="..\..\..\src\thread\win32\mutex.c" />
+    <ClCompile Include="..\..\..\src\thread\win32\thread.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\timer.c" />
+    <ClCompile Include="..\..\..\src\util\dict.c" />
+    <ClCompile Include="..\..\..\src\util\dirent.c" />
+    <ClCompile Include="..\..\..\src\util\event.c" />
+    <ClCompile Include="..\..\..\src\util\steptimer.c" />
+    <ClCompile Include="..\..\..\src\util\linkedlist.c" />
+    <ClCompile Include="..\..\..\src\util\logger.c" />
+    <ClCompile Include="..\..\..\src\util\math.c" />
+    <ClCompile Include="..\..\..\src\util\parse.c" />
+    <ClCompile Include="..\..\..\src\util\rbtree.c" />
+    <ClCompile Include="..\..\..\src\util\rect.c" />
+    <ClCompile Include="..\..\..\src\util\string.c" />
+    <ClCompile Include="..\..\..\src\util\time.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{48523b96-5f4e-4efd-8580-6b1c0a762ee4}</ProjectGuid>
+    <Keyword>DynamicLibrary</Keyword>
+    <RootNamespace>LCUIUWP</RootNamespace>
+    <DefaultLanguage>zh-CN</DefaultLanguage>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <AppContainerApplication>true</AppContainerApplication>
+    <ApplicationType>Windows Store</ApplicationType>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.10586.0</WindowsTargetPlatformMinVersion>
+    <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <GenerateManifest>false</GenerateManifest>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <TargetName>LCUI</TargetName>
+    <OutDir>$(SolutionDir)..\..\bin\$(Configuration)\uwp\</OutDir>
+    <IntDir>$(ProjectDir)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <GenerateManifest>false</GenerateManifest>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <TargetName>LCUI</TargetName>
+    <OutDir>$(SolutionDir)..\..\bin\$(Configuration)\uwp\</OutDir>
+    <IntDir>$(ProjectDir)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <GenerateManifest>false</GenerateManifest>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <GenerateManifest>false</GenerateManifest>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <GenerateManifest>false</GenerateManifest>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <GenerateManifest>false</GenerateManifest>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LCUI_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\vendor\include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <AdditionalDependencies>kernel32.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;libxml2.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\uwp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ShowProgress>NotSet</ShowProgress>
+      <IgnoreSpecificDefaultLibraries>MSVCRT</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LCUI_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\vendor\include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <AdditionalDependencies>kernel32.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;libxml2.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\uwp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <CompileAsWinRT>false</CompileAsWinRT>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

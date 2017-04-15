@@ -243,7 +243,8 @@ LCUI_API LCUI_Widget Widget_GetNext( LCUI_Widget w );
 LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 
 /** 获取相对于父级指定部件的 XY 坐标 */
-LCUI_API void Widget_GetAbsXY( LCUI_Widget w, LCUI_Widget parent, int *x, int *y );
+LCUI_API void Widget_GetOffset( LCUI_Widget w, LCUI_Widget parent,
+				float *offset_x, float *offset_y );
 
 /** 更新部件背景样式 */
 LCUI_API void Widget_UpdateBackground( LCUI_Widget widget );
@@ -287,7 +288,7 @@ LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 LCUI_API int Widget_SetId( LCUI_Widget w, const char *idstr );
 
 /** 设置边框 */
-LCUI_API void Widget_SetBorder( LCUI_Widget w, int width, int style, LCUI_Color clr );
+LCUI_API void Widget_SetBorder( LCUI_Widget w, float width, int style, LCUI_Color clr );
 
 /** 设置内边距 */
 LCUI_API void Widget_SetPadding( LCUI_Widget w, float top, float right,

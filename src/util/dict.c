@@ -131,7 +131,7 @@ Dict *Dict_Create( DictType *type, void *privdata )
 	Dict *d = malloc( sizeof( Dict ) );
 	Dict_Init( d, type, privdata );
 	if( !inited ) {
-		srand( time( NULL ) );
+		srand( (unsigned int)time( NULL ) );
 		inited = 1;
 	}
 	return d;

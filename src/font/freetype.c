@@ -85,8 +85,8 @@ static int FreeType_Open( const char *filepath, LCUI_Font ***outfonts )
 			continue;
 		}
 		FT_Select_Charmap( face, FT_ENCODING_UNICODE );
-		font->family_name = strdup( face->family_name );
-		font->style_name = strdup( face->style_name );
+		font->family_name = strdup2( face->family_name );
+		font->style_name = strdup2( face->style_name );
 		font->data = face;
 		fonts[i] = font;
 	}

@@ -1,7 +1,7 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * textstyle.c -- text style processing module.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * textstyle.c -- 文本样式处理模块
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -203,7 +203,7 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 				break;
 			}
 			style_data->has_pixel_size = TRUE;
-			style_data->pixel_size = tag_data->style.px;
+			style_data->pixel_size = roundi( tag_data->style.px );
 			flags[1] = 1;
 			++equal;
 			break;
@@ -242,7 +242,7 @@ static void StyleTags_Delete( LinkedList *tags, int id )
 /** 清除字符串中的空格 */
 void clear_space( char *in, char *out )
 {
-	int j, i, len = strlen( in );
+	size_t j, i, len = strlen( in );
 	for( j = i = 0; i < len; ++i ) {
 		if( in[i] == ' ' ) {
 			continue;
@@ -254,9 +254,9 @@ void clear_space( char *in, char *out )
 }
 
 /** 在字符串中获取样式的结束标签，输出的是标签名 */
-const wchar_t* scan_style_ending_tag( const wchar_t *wstr, char *name )
+const wchar_t *ScanStyleEndingTag( const wchar_t *wstr, wchar_t *name )
 {
-	int i, j, len;
+	size_t i, j, len;
 
 	len = wcslen( wstr );
 	//LOG("string: %S\n", wstr);
@@ -288,10 +288,10 @@ end_tag_search:;
 }
 
 /** 从字符串中获取样式标签的名字及样式属性 */
-const wchar_t* scan_style_tag( const wchar_t *wstr, char *name,
-			       int max_name_len, char *data )
+const wchar_t *ScanStyleTag( const wchar_t *wstr, wchar_t *name,
+			       int max_name_len, wchar_t *data )
 {
-	int i, j, len;
+	size_t i, j, len;
 	LCUI_BOOL end_name = FALSE;
 
 	len = wcslen( wstr );
@@ -357,13 +357,14 @@ const wchar_t* scan_style_tag( const wchar_t *wstr, char *name,
 }
 
 /** 在字符串中获取指定样式标签中的数据 */
-static const wchar_t *scan_style_tag_by_name( const wchar_t *wstr, 
-					      const char *name, char *data )
+static const wchar_t *ScanStyleTagByName( const wchar_t *wstr,
+					  const wchar_t *name,
+					  char *data )
 {
-	int i, j, len, tag_len;
+	size_t i, j, len, tag_len;
 
 	len = wcslen( wstr );
-	tag_len = strlen( name );
+	tag_len = wcslen( name );
 	if( wstr[0] != '[' ) {
 		return NULL;
 	}
@@ -397,7 +398,7 @@ static const wchar_t *scan_style_tag_by_name( const wchar_t *wstr,
 			break;
 		}
 		/* 保存标签内的数据 */
-		data[j] = wstr[i];
+		data[j] = (char)wstr[i];
 		++j;
 	}
 	data[j] = 0;
@@ -408,21 +409,21 @@ static const wchar_t *scan_style_tag_by_name( const wchar_t *wstr,
 }
 
 /** 根据字符串中的标签得到相应的样式数据，并返回指向标签后面字符的指针 */
-static const wchar_t *scan_style_tag_data( const wchar_t *wstr, 
-					   LCUI_StyleTag *tag )
+static const wchar_t *ScanStyleTagData( const wchar_t *wstr,
+					LCUI_StyleTag *tag )
 {
 	const wchar_t *p, *q;
 	char tag_data[256];
 
 	p = wstr;
-	if( (q = scan_style_tag_by_name( p, "color", tag_data )) ) {
+	if( (q = ScanStyleTagByName( p, L"color", tag_data )) ) {
 		if( !ParseColor( &tag->style, tag_data ) ) {
 			return NULL;
 		}
 		tag->id = TAG_ID_COLOR;
 		return q;
 	}
-	if( (q = scan_style_tag_by_name( p, "size", tag_data )) ) {
+	if( (q = ScanStyleTagByName( p, L"size", tag_data )) ) {
 		if( !ParseNumber( &tag->style, tag_data ) ) {
 			return NULL;
 		}
@@ -433,11 +434,11 @@ static const wchar_t *scan_style_tag_data( const wchar_t *wstr,
 }
 
 /** 处理样式标签 */
-const wchar_t *StyleTags_ScanBeginTag( LinkedList *tags, const wchar_t *str )
+const wchar_t *StyleTags_GetStart( LinkedList *tags, const wchar_t *str )
 {
 	const wchar_t *q;
 	LCUI_StyleTag *tag = NEW( LCUI_StyleTag, 1 );
-	q = scan_style_tag_data( str, tag );
+	q = ScanStyleTagData( str, tag );
 	if( q ) {
 		/* 将标签样式数据加入队列 */
 		LinkedList_Append( tags, tag );
@@ -448,19 +449,19 @@ const wchar_t *StyleTags_ScanBeginTag( LinkedList *tags, const wchar_t *str )
 }
 
 /** 处理样式结束标签 */
-const wchar_t* StyleTags_ScanEndingTag( LinkedList *tags, const wchar_t *str )
+const wchar_t* StyleTags_GetEnd( LinkedList *tags, const wchar_t *str )
 {
 	const wchar_t *p;
-	char tag_name[256];
+	wchar_t tagname[256];
 	/* 获取标签名 */
-	p = scan_style_ending_tag( str, tag_name );
+	p = ScanStyleEndingTag( str, tagname );
 	if( !p ) {
 		return NULL;
 	}
 	/* 删除相应的样式标签 */
-	if( strcmp( tag_name, "color" ) == 0 ) {
+	if( wcscmp( tagname, L"color" ) == 0 ) {
 		StyleTags_Delete( tags, TAG_ID_COLOR );
-	} else if( strcmp( tag_name, "size" ) == 0 ) {
+	} else if( wcscmp( tagname, L"size" ) == 0 ) {
 		StyleTags_Delete( tags, TAG_ID_SIZE );
 	} else {
 		return NULL;

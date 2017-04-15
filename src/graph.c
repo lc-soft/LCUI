@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * graph.c -- LCUI base graphics processing module.
  *
  * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
@@ -292,7 +292,8 @@ static void Graph_RGBReplaceRGB( LCUI_Graph *des, LCUI_Rect des_rect,
 
 static int Graph_HorizFlipRGB( const LCUI_Graph *graph, LCUI_Graph *buff )
 {
-	int x, y, n;
+	int x, y;
+	size_t n_bytes;
 	LCUI_Rect rect;
 	uchar_t *byte_src, *byte_des;
 
@@ -308,9 +309,9 @@ static int Graph_HorizFlipRGB( const LCUI_Graph *graph, LCUI_Graph *buff )
 
 	for( y = 0; y < rect.height; ++y ) {
 		byte_des = buff->bytes + y * buff->bytes_per_row;
-		n = (rect.y + y) * graph->bytes_per_row;
-		n += (rect.x + rect.width - 1) * 3;
-		byte_src = buff->bytes + n;
+		n_bytes = (rect.y + y) * graph->bytes_per_row;
+		n_bytes += (rect.x + rect.width - 1) * 3;
+		byte_src = buff->bytes + n_bytes;
 		for( x = 0; x < rect.width; ++x ) {
 			*byte_des++ = *byte_src--;
 			*byte_des++ = *byte_src--;
@@ -506,7 +507,8 @@ mix_with_opacity:
 static void Graph_ARGBMixARGB2( LCUI_Graph *dest, LCUI_Rect des_rect,
 				const LCUI_Graph *src, int src_x, int src_y )
 {
-	int x, y, a;
+	int x, y;
+	uchar_t a;
 	LCUI_ARGB *px_src, *px_dest;
 	LCUI_ARGB *px_row_src, *px_row_des;
 	px_row_src = src->argb + src_y*src->width + src_x;
@@ -532,7 +534,7 @@ mix_with_opacity:
 		px_src = px_row_src;
 		px_dest = px_row_des;
 		for( x = 0; x < des_rect.width; ++x ) {
-			a = px_src->a * src->opacity;
+			a = (uchar_t)(px_src->a * src->opacity);
 			PIXEL_BLEND( px_dest, px_src, a );
 			++px_src;
 			++px_dest;
@@ -578,7 +580,7 @@ mix_with_opacity:
 		px = px_row;
 		bytep = rowbytep;
 		for( x = 0; x < des_rect.width; ++x, ++px ) {
-			a = px->a * src->opacity;
+			a = (uchar_t)(px->a * src->opacity);
 			*bytep = _ALPHA_BLEND( *bytep, px->b, a );
 			++bytep;
 			*bytep = _ALPHA_BLEND( *bytep, px->g, a );
@@ -606,7 +608,7 @@ static int Graph_ARGBReplaceARGB( LCUI_Graph *des, LCUI_Rect des_rect,
 				px_des->b = px_src->b;
 				px_des->g = px_src->g;
 				px_des->r = px_src->r;
-				px_des->a = src->opacity*px_src->a;
+				px_des->a = (uchar_t)(src->opacity*px_src->a);
 			}
 			px_row_src += src->width;
 			px_row_des += des->width;
@@ -741,26 +743,26 @@ int Graph_SetColorType( LCUI_Graph *graph, int color_type )
 	return -2;
 }
 
-int Graph_Create( LCUI_Graph *graph, int w, int h )
+int Graph_Create( LCUI_Graph *graph, size_t width, size_t height )
 {
 	size_t size;
-	if( w > 10000 || h > 10000 ) {
+	if( width > 10000 || height > 10000 ) {
 		_DEBUG_MSG( "graph size is too large!" );
 		abort();
 	}
-	if( h <= 0 || w <= 0 ) {
+	if( width < 1 || width < 1 ) {
 		Graph_Free( graph );
 		return -1;
 	}
 	graph->bytes_per_pixel = get_pixel_size( graph->color_type );
-	graph->bytes_per_row = graph->bytes_per_pixel * w;
-	size = graph->bytes_per_row * h;
+	graph->bytes_per_row = graph->bytes_per_pixel * width;
+	size = graph->bytes_per_row * height;
 	if( Graph_IsValid( graph ) ) {
 		/* 如果现有图形尺寸大于要创建的图形的尺寸，直接改尺寸即可 */
 		if( graph->mem_size >= size ) {
 			memset( graph->bytes, 0, graph->mem_size );
-			graph->width = w;
-			graph->height = h;
+			graph->width = width;
+			graph->height = height;
 			return 0;
 		}
 		Graph_Free( graph );
@@ -773,8 +775,8 @@ int Graph_Create( LCUI_Graph *graph, int w, int h )
 		return -2;
 	}
 	memset( graph->bytes, 0, graph->mem_size );
-	graph->width = w;
-	graph->height = h;
+	graph->width = width;
+	graph->height = height;
 	return 0;
 }
 
@@ -988,12 +990,12 @@ int Graph_Zoom( const LCUI_Graph *graph, LCUI_Graph *buff,
 	if( graph->color_type == COLOR_TYPE_ARGB ) {
 		LCUI_ARGB *px_src, *px_des, *px_row_src;
 		for( y = 0; y < height; ++y ) {
-			src_y = y * scale_y;
+			src_y = (int)(y * scale_y);
 			px_row_src = graph->argb;
 			px_row_src += (src_y + rect.y) * graph->width + rect.x;
 			px_des = buff->argb + y * width;
 			for( x = 0; x < width; ++x ) {
-				src_x = x * scale_x;
+				src_x = (int)(x * scale_x);
 				px_src = px_row_src + src_x;
 				*px_des++ = *px_src;
 			}
@@ -1001,13 +1003,13 @@ int Graph_Zoom( const LCUI_Graph *graph, LCUI_Graph *buff,
 	} else {
 		uchar_t *byte_src, *byte_des, *byte_row_src;
 		for( y = 0; y < height; ++y ) {
-			src_y = y * scale_y;
+			src_y = (int)(y * scale_y);
 			byte_row_src = graph->bytes;
 			byte_row_src += (src_y + rect.y) * graph->bytes_per_row;
 			byte_row_src += rect.x * graph->bytes_per_pixel;
 			byte_des = buff->bytes + y * buff->bytes_per_row;
 			for( x = 0; x < width; ++x ) {
-				src_x = x * scale_x;
+				src_x = (int)(x * scale_x);
 				src_x *= graph->bytes_per_pixel;
 				byte_src = byte_row_src + src_x;
 				*byte_des++ = *byte_src++;

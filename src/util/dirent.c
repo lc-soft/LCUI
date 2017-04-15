@@ -198,7 +198,7 @@ int LCUI_FileIsDirectory( LCUI_DirEntry *entry )
 #endif
 }
 
-int LCUI_FileIsArchive( LCUI_DirEntry *entry )
+int LCUI_FileIsRegular( LCUI_DirEntry *entry )
 {
 #if defined (LCUI_BUILD_IN_WIN32) || (_WIN32)
 	return !(entry->dataW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);

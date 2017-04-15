@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * css_parser.c -- css code parser module
  *
  * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
@@ -640,7 +640,7 @@ static CSSParserContext NewCSSParserContext( size_t buffer_size,
 	ctx->buffer_size = buffer_size;
 	ctx->target = TARGET_NONE;
 	ctx->target_bak = TARGET_NONE;
-	ctx->space = space ? strdup( space ): NULL;
+	ctx->space = space ? strdup2( space ): NULL;
 	LinkedList_Init( &ctx->selectors );
 	return ctx;
 }
@@ -858,7 +858,7 @@ int LCUI_AddCSSParser( LCUI_StyleParser sp )
 	new_sp = NEW( LCUI_StyleParserRec, 1 );
 	new_sp->key = sp->key;
 	new_sp->parse = sp->parse;
-	new_sp->name = strdup( sp->name );
+	new_sp->name = strdup2( sp->name );
 	Dict_Add( self.parsers, new_sp->name, new_sp );
 	return 0;
 }
@@ -890,9 +890,9 @@ void LCUI_InitCSSParser( void )
 				free( new_sp );
 				continue;
 			}
-			new_sp->name = strdup( name );
+			new_sp->name = strdup2( name );
 		} else {
-			new_sp->name = strdup( sp->name );
+			new_sp->name = strdup2( sp->name );
 		}
 		Dict_Add( self.parsers, new_sp->name, new_sp );
 	}

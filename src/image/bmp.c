@@ -1,4 +1,4 @@
-/* ***************************************************************************
+﻿/* ***************************************************************************
  * bmp.c -- LCUI BMP image file processing module.
  * 
  * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
@@ -173,7 +173,7 @@ int LCUI_ReadBMP( LCUI_ImageReader reader, LCUI_Graph *graph )
 		dest -= graph->bytes_per_row;
 		if( reader->fn_prog ) {
 			reader->fn_prog( reader->prog_arg,
-					 100.0 * row / info->height );
+					 100.0f * row / info->height );
 		}
 	}
 	free( buffer );

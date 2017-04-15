@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
 * time.c -- The time operation set.
 *
-* Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+* Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
 *
 * This file is part of the LCUI project, and may only be used, modified, and
 * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
 * time.c -- 时间相关函数集
 *
-* 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+* 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
 *
 * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
 *
@@ -46,34 +46,31 @@
 
 #ifdef LCUI_BUILD_IN_WIN32
 #include <Windows.h>
-#include <Mmsystem.h>
-#pragma comment(lib, "Winmm.lib")
 
-static int hires_timer_available;	/**< 标志，指示高精度计数器是否可用 */
-static double hires_ticks_per_second;	/**< 高精度计数器每秒的滴答数 */
+static int hires_timer_available = 0;	/**< 标志，指示高精度计数器是否可用 */
+static LONGLONG hires_ticks_per_second;	/**< 高精度计数器每秒的滴答数 */
 
 void LCUITime_Init( void )
 {
 	LARGE_INTEGER hires;
-	if( QueryPerformanceFrequency(&hires) ) {
+	if( QueryPerformanceFrequency( &hires ) ) {
 		hires_timer_available = 1;
 		hires_ticks_per_second = hires.QuadPart;
-	} else {
-		hires_timer_available = 0;
-		timeBeginPeriod(1);
 	}
 }
 
 int64_t LCUI_GetTime( void )
 {
+	int64_t time;
 	LARGE_INTEGER hires_now;
+	FILETIME *ft = (FILETIME*)&time;
 	if( hires_timer_available ) {
 		QueryPerformanceCounter( &hires_now );
-		hires_now.QuadPart *= 1000;
-		hires_now.QuadPart /= hires_ticks_per_second;
-		return (int64_t)hires_now.QuadPart;
+		time = hires_now.QuadPart * 1000;
+		return time / hires_ticks_per_second;
 	}
-	return (int64_t)timeGetTime();
+	GetSystemTimeAsFileTime( ft );
+	return time / 1000 - 11644473600000;
 }
 
 #elif defined LCUI_BUILD_IN_LINUX

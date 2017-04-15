@@ -114,10 +114,15 @@ int LCUICond_TimedWait( LCUI_Cond *cond, LCUI_Mutex *mutex, unsigned int ms )
 /** 唤醒一个阻塞等待条件成立的线程 */
 int LCUICond_Signal( LCUI_Cond *cond )
 {
+	/* 当编译为 Windows 运行时组件时，直接改为广播 */
+#ifdef WINAPI_FAMILY_APP
+	return LCUICond_Broadcast( cond );
+#else
 	if( PulseEvent( *cond ) ) {
 		return 0;
 	}
 	return -1;
+#endif
 }
 
 /** 唤醒所有阻塞等待条件成立的线程 */
