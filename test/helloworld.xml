@@ -5,6 +5,6 @@
   <ui>
     <widget id="text-hello" type="textview" class="text-hello">Hello, World!</widget>
     <widget id="edit" type="textedit">Hello, World!</widget>
-    <widget id="btn-ok" type="button">确定</widget>
+    <widget id="btn-ok" type="button">Submit</widget>
   </ui>
 </lcui-app>
