@@ -188,6 +188,7 @@ LCUI_BOOL LCUIIME_CheckCharKey( int key )
 	switch( key ) {
 	case LCUIKEY_TAB:
 	case LCUIKEY_ENTER:
+	case LCUIKEY_SPACE:
 	case LCUIKEY_SEMICOLON:
 	case LCUIKEY_MINUS:
 	case LCUIKEY_EQUAL:

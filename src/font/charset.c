@@ -55,25 +55,6 @@ WideCharToMultiByte(CP, 0, WSTR, -1, STR, LEN, NULL, NULL)
 MultiByteToWideChar(CP, 0, STR, -1, WSTR, LEN)
 #endif
 
-#ifdef LCUI_BUILD_IN_LINUX
-static int SetLocaleByEncoding( int encoding )
-{
-	const char *locale;
-	switch( encoding ) {
-	case ENCODING_ANSI: 
-		locale = NULL;
-		break;
-	case ENCODING_UTF8:
-		locale = "zh_CN.UTF-8";
-		break;
-	default: return -1;
-	}
-	if( !setlocale( LC_CTYPE, locale ) ) {
-		return -1;
-	}
-	return 0;
-}
-#else 
 /** 将UTF-8字符串解码成 Unicode 字符串 */
 static int DecodeFromUTF8( wchar_t *wstr, int max_len, const char *str )
 {
@@ -137,8 +118,6 @@ static int DecodeFromUTF8( wchar_t *wstr, int max_len, const char *str )
 	return len;
 }
 
-#endif
-
 int LCUI_DecodeString( wchar_t *wstr, const char *str, 
 		       int max_len, int encoding )
 {
@@ -151,12 +130,8 @@ int LCUI_DecodeString( wchar_t *wstr, const char *str,
 		return DecodeFromUTF8( wstr, max_len, str );
 	default: break;
 	}
-	return 0;
 #else
-	if( SetLocaleByEncoding( encoding ) != 0 ) {
-		return -1;
-	}
-	return mbstowcs( wstr, str, max_len );
+	return DecodeFromUTF8( wstr, max_len, str );
 #endif
 }
 
@@ -173,9 +148,6 @@ int LCUI_EncodeString( char *str, const wchar_t *wstr,
 	}
 	return encode( cp, wstr, str, max_len );
 #else
-	if( SetLocaleByEncoding( encoding ) != 0 ) {
-		return -1;
-	}
 	return wcstombs( str, wstr, max_len );
 #endif
 }

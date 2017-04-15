@@ -15,7 +15,6 @@
 
 static LCUI_BOOL X11IME_ProcessKey( int key, int key_state )
 {
-	_DEBUG_MSG("key: %d\n", key);
 	return LCUIIME_CheckCharKey( key );
 }
 
@@ -24,7 +23,6 @@ static void X11IME_ToText( int ch )
 	wchar_t text[2];
 	text[0] = ch;
 	text[1] = '\0';
-	_DEBUG_MSG("%S, %d\n", text, ch);
 	LCUIIME_Commit( text, 2 );
 }
 

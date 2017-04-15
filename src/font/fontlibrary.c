@@ -565,16 +565,16 @@ void LCUI_InitFont( void )
 		const char *style;
 	} fonts[MAX_FONTFILE_NUM] = {
 		{
-			FONTDIR"/truetype/ubuntu-font-family/Ubuntu-R.ttf",
+			FONTDIR"truetype/ubuntu-font-family/Ubuntu-R.ttf",
 			"Ubuntu", NULL
 		}, {
-			FONTDIR"/opentype/noto/NotoSansCJK-Regular.ttc",
+			FONTDIR"opentype/noto/NotoSansCJK-Regular.ttc",
 			"Noto Sans CJK SC", NULL
 		}, {
-			FONTDIR"/opentype/noto/NotoSansCJK.ttc",
+			FONTDIR"opentype/noto/NotoSansCJK.ttc",
 			"Noto Sans CJK SC", NULL
 		}, {
-			FONTDIR"/truetype/wqy/wqy-microhei.ttc",
+			FONTDIR"truetype/wqy/wqy-microhei.ttc",
 			"WenQuanYi Micro Hei", NULL
 		}
 	};

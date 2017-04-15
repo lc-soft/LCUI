@@ -424,6 +424,9 @@ static void OnConfigureNotify( LCUI_Event e, void *arg )
 	LCUI_DisplayEventRec dpy_ev;
 	XConfigureEvent xce = ev->xconfigure;
 	LCUI_Surface s = GetSurfaceByWindow( xce.window );
+	if( s->width == xce.width && s->height == xce.height ) {
+		return;
+	}
 	dpy_ev.surface = s;
 	dpy_ev.type = DET_RESIZE;
 	dpy_ev.resize.width = xce.width;

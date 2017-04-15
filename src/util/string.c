@@ -381,48 +381,48 @@ int strsdel( char ***strlist, const char *str )
 
 int sortedstrsadd( char ***strlist, const char *str )
 {
-	size_t n;
-	int i, len, pos;
+	int i, pos;
+	size_t len, n;
 	char **newlist, *newstr;
 
 	if( *strlist ) {
 		for( i = 0; (*strlist)[i]; ++i );
-		len = i + 2;
+		n = i + 2;
 	} else {
-		len = 2;
+		n = 2;
 	}
-	newlist = realloc( *strlist, sizeof( char* ) * len );
+	newlist = realloc( *strlist, sizeof( char* ) * n );
 	if( !newlist ) {
 		return -ENOMEM;
 	}
-	newlist[len - 2] = NULL;
+	newlist[n - 2] = NULL;
 	for( i = 0, pos = -1; newlist[i]; ++i ) {
-		n = strcmp( newlist[i], str );
-		if( n < 0 ) {
+		int tmp = strcmp( newlist[i], str );
+		if( tmp < 0 ) {
 			continue;
-		} else if( n == 0 ) {
+		} else if( tmp == 0 ) {
 			return 1;
 		} else {
 			pos = i;
 			break;
 		}
 	}
-	n = strlen( str ) + 1;
-	newstr = malloc( sizeof(char) * n );
+	len = strlen( str ) + 1;
+	newstr = malloc( sizeof(char) * len );
 	if( !newstr ) {
 		return -ENOMEM;
 	}
-	strncpy( newstr, str, n );
+	strncpy( newstr, str, len );
 	if( pos >= 0 ) {
-		for( i = len - 2; i > pos; --i ) {
+		for( i = n - 2; i > pos; --i ) {
 			newlist[i] = newlist[i - 1];
 		}
 		newlist[pos] = newstr;
 	} else {
-		pos = len - 2;
+		pos = n - 2;
 	}
 	newlist[pos] = newstr;
-	newlist[len - 1] = NULL;
+	newlist[n - 1] = NULL;
 	*strlist = newlist;
 	return 0;
 }

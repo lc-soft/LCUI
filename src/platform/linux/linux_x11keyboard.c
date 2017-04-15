@@ -66,11 +66,9 @@ static void OnKeyboardMessage( LCUI_Event ev, void *arg )
 	x11 = LCUI_GetAppData();
 	XAutoRepeatOn( x11->display );
 	//keysym = XKeycodeToKeysym( x11->display, x_ev->xkey.keycode, 0 );
-	printf("keycode to keysym...\n");
 	//XLookupString( &x_ev->xkey, buf, sizeof buf, &keysym, NULL );
 	//keysym = XLookupKeysym( &x_ev->xkey, 0 );
 	keysym = XkbKeycodeToKeysym( x11->display, x_ev->xkey.keycode, 0, 0 );
-	printf("keycode to keysym... ok\n");
 	switch( keysym ) {
 	case XK_Tab: key = LCUIKEY_TAB; break;
 	case XK_Escape: key = LCUIKEY_ESCAPE; break;
@@ -103,10 +101,15 @@ static void OnKeyboardMessage( LCUI_Event ev, void *arg )
 	case XK_backslash: key = LCUIKEY_BACKSLASH; break;
 	case XK_apostrophe: key = LCUIKEY_APOSTROPHE; break;
 	case XK_grave: key = LCUIKEY_GRAVE; break;
-	default: key = keysym; break;
+	default:
+		key = keysym;
+		if( key >= XK_a && key <= XK_z ) {
+			key -= 'a' - 'A';
+		}
+		break;
 	}
+	_DEBUG_MSG("keyname: %s\n", XKeysymToString(keysym));
 	sys_ev.key.code = key;
-	printf("%s\n", XKeysymToString(keysym));
 	_DEBUG_MSG("keycode: %d, keyscancode: %u, keysym: %lu\n", key, x_ev->xkey.keycode, keysym);
 	LCUI_TriggerEvent( &sys_ev, NULL );
 	keysym = XkbKeycodeToKeysym( x11->display, x_ev->xkey.keycode, 0, 
@@ -114,6 +117,7 @@ static void OnKeyboardMessage( LCUI_Event ev, void *arg )
 	if( keysym >= XK_space && keysym <= XK_asciitilde ) {
 		sys_ev.key.code = keysym;
 		sys_ev.type = LCUI_KEYPRESS;
+		_DEBUG_MSG("char: %c\n", keysym);
 		LCUI_TriggerEvent( &sys_ev, NULL );
 	}
 }
