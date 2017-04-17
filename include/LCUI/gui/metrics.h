@@ -50,7 +50,7 @@ typedef enum LCUI_DensityLevel {
 } LCUI_DensityLevel;
 
 /** 转换成单位为 px 的度量值 */
-LCUI_API float LCUIMetrics_ApplyDimension( LCUI_Style s );
+LCUI_API float LCUIMetrics_Compute( LCUI_Style s );
 
 /** 设置密度 */
 LCUI_API void LCUIMetrics_SetDensity( float density );

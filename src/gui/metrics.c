@@ -48,7 +48,7 @@ static struct LCUI_MetricsModule {
 	float scale;
 } metrics;
 
-float LCUIMetrics_ApplyDimension( LCUI_Style s )
+float LCUIMetrics_Compute( LCUI_Style s )
 {
 	float value = 0.0;
 	switch( s->type ) {

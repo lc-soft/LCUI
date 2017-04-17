@@ -273,7 +273,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 				ts->has_pixel_size = TRUE;
 				break;
 			}
-			value = roundi( LCUIMetrics_ApplyDimension( s ) );
+			value = roundi( LCUIMetrics_Compute( s ) );
 			ts->pixel_size = max( 12, value );
 			ts->has_pixel_size = TRUE;
 			break;
@@ -306,7 +306,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 			case SVT_SCALE:
 			case SVT_PX: break;
 			default:
-				s->val_px = LCUIMetrics_ApplyDimension( s );
+				s->val_px = LCUIMetrics_Compute( s );
 				s->type = SVT_PX;
 				break;
 			}

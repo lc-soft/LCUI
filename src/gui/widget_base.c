@@ -529,7 +529,7 @@ static float ComputeXMetric( LCUI_Widget w, int key )
 		}
 		return w->parent->box.content.width * s->scale;
 	}
-	return LCUIMetrics_ApplyDimension( s );
+	return LCUIMetrics_Compute( s );
 }
 
 static float ComputeYMetric( LCUI_Widget w, int key )
@@ -544,7 +544,7 @@ static float ComputeYMetric( LCUI_Widget w, int key )
 		}
 		return w->parent->box.content.height * s->scale;
 	}
-	return LCUIMetrics_ApplyDimension( s );
+	return LCUIMetrics_Compute( s );
 }
 
 static float ComputeSelfXMetric( LCUI_Widget w, int key )
@@ -553,7 +553,7 @@ static float ComputeSelfXMetric( LCUI_Widget w, int key )
 	if( s->type == SVT_SCALE ) {
 		return w->width * s->scale;
 	}
-	return LCUIMetrics_ApplyDimension( s );
+	return LCUIMetrics_Compute( s );
 }
 
 static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
@@ -1264,7 +1264,7 @@ void Widget_UpdateMargin( LCUI_Widget w )
 			continue;
 		}
 		*pd_map[i].sval = *s;
-		*pd_map[i].fval = LCUIMetrics_ApplyDimension( s );;
+		*pd_map[i].fval = LCUIMetrics_Compute( s );;
 	}
 	/* 如果有父级部件，则处理 margin-left 和 margin-right 的值 */
 	if( w->parent ) {
@@ -1338,7 +1338,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 			continue;
 		}
 		*pd_map[i].sval = *s;
-		*pd_map[i].ival = LCUIMetrics_ApplyDimension( s );
+		*pd_map[i].ival = LCUIMetrics_Compute( s );
 	}
 	box_sizing = ComputeStyleOption( w, key_box_sizing, SV_CONTENT_BOX );
 	w->computed_style.box_sizing = box_sizing;
