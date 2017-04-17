@@ -1,4 +1,22 @@
-#LCUI ChangeLog
+# LCUI ChangeLog
+
+## CHANGES BETWEEN 0.15.0 and 1.0 alpha
+
+- Improved bmp, jpeg, png file processing, add image reader
+- Added Scrollbar widget
+- Improved Button widget
+- Improved TextView widget
+- Improved TextEdit widget
+- Improved widget types, events, layouts and styles processing
+- Imrpoved UI rendering performance
+- Added touch screen support
+- Added XML and CSS support
+- Removed Linux Framebuffer support
+- Added Linux XWindow support
+- Added simple support for Universal Windows Platform (UWP)
+- Imrpoved Windows support
+- Added some tutorials (only Chinese version)
+- Fixed some bugs
 
 ## CHANGES BETWEEN 0.14.0 and 0.15.0
 
