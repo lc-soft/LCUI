@@ -130,6 +130,7 @@ int LCUI_DecodeString( wchar_t *wstr, const char *str,
 		return DecodeFromUTF8( wstr, max_len, str );
 	default: break;
 	}
+	return 0;
 #else
 	return DecodeFromUTF8( wstr, max_len, str );
 #endif

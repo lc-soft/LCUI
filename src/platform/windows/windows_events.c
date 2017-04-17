@@ -152,7 +152,7 @@ void LCUI_PreInitWinApp( void *data )
 
 LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 {
-	WNDCLASS wndclass;
+	WNDCLASSW wndclass;
 	wchar_t szAppName[] = L"LCUI";
 	ASSIGN( app, LCUI_AppDriver );
 
