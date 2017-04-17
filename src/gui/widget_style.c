@@ -191,6 +191,13 @@ void Widget_GetInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss )
 	Selector_Delete( s );
 }
 
+void Widget_PrintStyleSheets( LCUI_Widget w )
+{
+	LCUI_Selector s = Widget_GetSelector( w );
+	LCUI_PrintStyleSheetsBySelector( s );
+	Selector_Delete( s );
+}
+
 void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 {
 	if( is_update_all ) {

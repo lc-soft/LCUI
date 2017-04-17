@@ -87,6 +87,9 @@ LCUI_API void LCUI_PrintCSSLibrary(void);
 /** 计算部件继承得到的样式表 */
 LCUI_API void Widget_GetInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 
+/** 打印部件的样式表 */
+LCUI_API void Widget_PrintStyleSheets( LCUI_Widget w );
+
 /** 更新当前部件的样式 */
 LCUI_API void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
 

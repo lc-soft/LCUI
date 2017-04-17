@@ -1315,8 +1315,9 @@ static void LCUI_PrintStyleLink( StyleLink link, const char *selector )
 	}
 	for( LinkedList_Each( node, &link->styles ) ) {
 		StyleNode snode = node->data;
-		LOG("\n[%s]\n", snode->space ? snode->space:"<none>");
-		LOG("%s {\n", fullname);
+		LOG( "\n[%s]\n", snode->space ? snode->space : "<none>" );
+		LOG( "[rank: %d]\n%s {\n", snode->rank, snode->selector );
+		LOG( "%s {\n", fullname );
 		LCUI_PrintStyleSheet( snode->sheet );
 		LOG("}\n");
 	}
@@ -1379,6 +1380,31 @@ void LCUI_GetStyleSheet( LCUI_Selector s, LCUI_StyleSheet out_ss )
 	Dict_Add( library.cache, &s->hash, ss );
 	StyleSheet_Replace( out_ss, ss );
 	LCUIMutex_Unlock( &library.mutex );
+}
+
+void LCUI_PrintStyleSheetsBySelector( LCUI_Selector s )
+{
+	LinkedList list;
+	LinkedListNode *node;
+	LCUI_StyleSheet ss;
+	LinkedList_Init( &list );
+	ss = StyleSheet();
+	LCUI_FindStyleSheet( s, &list );
+	LOG( "selector(%u) stylesheets begin\n", s->hash );
+	for( LinkedList_Each( node, &list ) ) {
+		StyleNode sn = node->data;
+		LOG( "\n[%s]", sn->space ? sn->space : "<none>" );
+		LOG( "[rank: %d]\n%s {\n", sn->rank, sn->selector );
+		LCUI_PrintStyleSheet( sn->sheet );
+		LOG("}\n");
+		StyleSheet_Merge( ss, sn->sheet );
+	}
+	LinkedList_Clear( &list, NULL );
+	LOG( "[selector(%u) final stylesheet] {\n", s->hash );
+	LCUI_PrintStyleSheet( ss );
+	LOG( "}\n");
+	StyleSheet_Delete( ss );
+	LOG( "selector(%u) stylesheets end\n", s->hash );
 }
 
 static void DestroyStyleSheetCache( void *privdata, void *val )

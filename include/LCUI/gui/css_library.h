@@ -230,6 +230,8 @@ LCUI_API int LCUI_FindStyleSheetFromGroup( int group, const char *name,
 
 LCUI_API void LCUI_GetStyleSheet( LCUI_Selector s, LCUI_StyleSheet out_ss );
 
+LCUI_API void LCUI_PrintStyleSheetsBySelector( LCUI_Selector s );
+
 LCUI_API int LCUI_SetStyleName( int key, const char *name );
 
 LCUI_API int LCUI_AddStyleName( const char *name );
