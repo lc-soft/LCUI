@@ -8,6 +8,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCUIUWP", "LCUIUWP\LCUIUWP.vcxproj", "{48523B96-5F4E-4EFD-8580-6B1C0A762EE4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCUIMain", "LCUIMain\LCUIMain.vcxproj", "{41884B84-1C73-418E-A572-0B4A27866BB2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9} = {1B527CF3-CF0E-482A-BA63-1AF04AB8F4E9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
