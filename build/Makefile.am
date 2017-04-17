@@ -1,15 +1,23 @@
 AUTOMAKE_OPTIONS=foreign
-EXTRA_DIST= VS2012/LCUI/LCUI.rc \
-VS2012/LCUI/LCUI.vcxproj.filters \
-VS2012/LCUI/LCUI.vcxproj \
-VS2012/LCUI/resource.h \
-VS2012/LCUI/lcui.ico \
-VS2012/LCUI-Demo.sln \
-VS2012/LCUI.sln \
-VS2012/helloworld/helloworld.vcxproj.filters \
-VS2012/helloworld/helloworld.vcxproj \
-VS2012/LCUITest/LCUITest.vcxproj.filters \
-VS2012/LCUITest/LCUITest.vcxproj \
-VS2012/LCUIMain/LCUIMain.vcxproj.filters \
-VS2012/LCUIMain/LCUIMain.vcxproj \
-VS2012/LCUIMain/win32_main.c
+EXTRA_DIST=windows/LCUIUWP/LCUIUWP.vcxproj \
+windows/LCUIUWP/LCUIUWP.vcxproj.filters \
+windows/testtouch/testtouch.vcxproj.filters \
+windows/testtouch/testtouch.vcxproj \
+windows/LCUI.sln \
+windows/LCUIMain/LCUIMain.vcxproj.filters \
+windows/LCUIMain/win32_main.c \
+windows/LCUIMain/LCUIMain.vcxproj \
+windows/LCUITest/LCUITest.vcxproj \
+windows/LCUITest/LCUITest.vcxproj.filters \
+windows/LCUI/resource.h \
+windows/LCUI/LCUI.vcxproj \
+windows/LCUI/lcui.ico \
+windows/LCUI/LCUI.vcxproj.user \
+windows/LCUI/helloworld.css \
+windows/LCUI/helloworld.xml \
+windows/LCUI/LCUI.vcxproj.filters \
+windows/LCUI/LCUI.rc \
+windows/LCUI-Demo.sln \
+windows/helloworld/helloworld.vcxproj \
+windows/helloworld/helloworld.vcxproj.filters
+
