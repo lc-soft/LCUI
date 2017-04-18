@@ -132,8 +132,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libxml2.lib;libpng16.lib;jpeg.lib;freetype271.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRT;</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
       <LinkStatus>false</LinkStatus>
+      <ShowProgress>NotSet</ShowProgress>
     </Link>
     <ResourceCompile>
       <Culture>0x0804</Culture>
@@ -198,6 +199,7 @@
       <AdditionalDependencies>libxml2.lib;libpng16.lib;jpeg.lib;freetype271.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <ShowProgress>NotSet</ShowProgress>
     </Link>
     <Lib>
       <AdditionalDependencies>libpng16.lib;libxml2.lib;jpeg.lib;freetype271.lib;zlib.lib;</AdditionalDependencies>
