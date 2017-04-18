@@ -1,8 +1,7 @@
 ﻿/* ***************************************************************************
  * thread.c -- the win32 edition thread opreation set.
  * 
- * Copyright (C) 2013-2015 by
- * Liu Chao
+ * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,8 +22,7 @@
 /* ****************************************************************************
  * thread.c -- win32版的线程操作集
  *
- * 版权所有 (C) 2013-2015 归属于
- * 刘超
+ * 版权所有 (C) 2017 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -159,15 +157,18 @@ void LCUIThread_Cancel( LCUI_Thread tid )
 
 int LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
+	DWORD code;
 	LCUI_ThreadContext ctx;
 	ctx = LCUIThread_Find( thread );
 	if( ctx == NULL ) {
 		return -1;
 	}
 	ctx->has_waiter = TRUE;
-	WaitForSingleObject( ctx->handle, INFINITE );
-	if( retval ) {
-		*retval = ctx->retval;
+	if( !GetExitCodeThread( ctx->handle, &code ) ) {
+		WaitForSingleObject( ctx->handle, 5000 );
+		if( retval ) {
+			*retval = ctx->retval;
+		}
 	}
 	LCUIThread_Destroy( ctx );
 	return 0;
