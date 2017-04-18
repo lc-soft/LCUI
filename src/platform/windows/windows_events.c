@@ -167,7 +167,7 @@ LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 	wndclass.hCursor = LoadCursor( NULL, IDC_ARROW );
 	wndclass.hIcon = LoadIcon( win.dll_instance,
 				   MAKEINTRESOURCE( IDI_LCUI_ICON ) );
-	if( !RegisterClass( &wndclass ) ) {
+	if( !RegisterClassW( &wndclass ) ) {
 		wchar_t str[256];
 		swprintf( str, 255, __FUNCTIONW__
 			  L": error code: %d\n", GetLastError() );
