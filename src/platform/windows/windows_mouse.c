@@ -99,6 +99,7 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 		sys_ev.wheel.y = mouse_pos.y;
 		sys_ev.wheel.delta = GET_WHEEL_DELTA_WPARAM( msg->wParam );
 		break;
+#ifdef ENABLE_TOUCH_SUPPORT
 	case WM_TOUCH: {
 		UINT i, n = LOWORD( msg->wParam );
 		PTOUCHINPUT inputs = NEW( TOUCHINPUT, n );
@@ -145,6 +146,7 @@ static void OnMouseMessage( LCUI_Event ev, void *arg )
 		}
 		break;
 	}
+#endif
 	default: break;
 	}
 	if( sys_ev.type != LCUI_NONE ) {

@@ -162,7 +162,9 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 		0, 0, NULL, NULL,
 		instance, NULL
 	);
+#ifdef ENABLE_TOUCH_SUPPORT
 	RegisterTouchWindow( surface->hwnd, 0 );
+#endif
 	surface->hdc_client = GetDC( surface->hwnd );
 	surface->hdc_fb = CreateCompatibleDC( surface->hdc_client );
 	surface->is_ready = TRUE;
