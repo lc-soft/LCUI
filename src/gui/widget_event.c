@@ -319,7 +319,7 @@ static int TouchCapturers_Add( LinkedList *list, LCUI_Widget w, int point_id )
 		}
 	}
 	/* 如果没有该部件的触点捕捉记录 */
-	if( !tc ) {
+	if( !tc || tc->widget != w ) {
 		tc = NEW( TouchCapturerRec, 1 );
 		tc->widget = w;
 		tc->node.data = tc;
