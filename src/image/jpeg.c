@@ -63,7 +63,7 @@ typedef struct LCUI_JPEGErrorRec_ {
 typedef struct LCUI_JPEGReaderRec_ {
 	struct jpeg_source_mgr src;		/**< JPEG 资源管理接口 */
 	LCUI_JPEGErrorRec err;			/**< JPEG 的错误处理接口 */
-	LCUI_BOOL start_of_file;		/**< have we gotten any data yet? */
+	LCUI_BOOL start_of_file;		/**< 是否刚开始读文件 */
 	LCUI_ImageReader base;			/**< 所属的图片读取器 */
 	unsigned char buffer[BUFFER_SIZE];	/**< 数据缓存 */
 } LCUI_JPEGReaderRec, *LCUI_JPEGReader;
