@@ -46,8 +46,6 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
 
-#define WIDGET_SIZE (sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode) * 2)
-
 static struct LCUIWidgetModule {
 	LCUI_Widget root;		/**< 根级部件 */
 	Dict *ids;			/**< 各种部件的ID索引 */
@@ -92,8 +90,8 @@ int Widget_Unlink( LCUI_Widget widget )
 	if( !widget->parent ) {
 		return -1;
 	}
-	node = Widget_GetNode( widget );
-	snode = Widget_GetShowNode( widget );
+	node = &widget->node;
+	snode = &widget->node_show;
 	if( widget->index == widget->parent->children.length - 1 ) {
 		Widget_RemoveStatus( widget, "last-child" );
 		child = Widget_GetPrev( widget );
@@ -115,7 +113,7 @@ int Widget_Unlink( LCUI_Widget widget )
 		child->index -= 1;
 		node = node->next;
 	}
-	node = Widget_GetNode( widget );
+	node = &widget->node;
 	LinkedList_Unlink( &widget->parent->children, node );
 	LinkedList_Unlink( &widget->parent->children_show, snode );
 	Widget_PostSurfaceEvent( widget, WET_REMOVE );
@@ -137,8 +135,8 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 	widget->parent = parent;
 	widget->state = WSTATE_CREATED;
 	widget->index = parent->children.length;
-	node = Widget_GetNode( widget );
-	snode = Widget_GetShowNode( widget );
+	node = &widget->node;
+	snode = &widget->node_show;
 	LinkedList_AppendNode( &parent->children, node );
 	LinkedList_AppendNode( &parent->children_show, snode );
 	/** 修改它后面的部件的 index 值 */
@@ -171,8 +169,8 @@ int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget )
 	widget->index = 0;
 	widget->parent = parent;
 	widget->state = WSTATE_CREATED;
-	node = Widget_GetNode( widget );
-	snode = Widget_GetShowNode( widget );
+	node = &widget->node;
+	snode = &widget->node_show;
 	LinkedList_InsertNode( &parent->children, 0, node );
 	LinkedList_InsertNode( &parent->children_show, 0, snode );
 	/** 修改它后面的部件的 index 值 */
@@ -208,14 +206,14 @@ int Widget_Unwrap( LCUI_Widget widget )
 		node = LinkedList_GetNode( &widget->children, -1 );
 		Widget_RemoveStatus( node->data, "last-child" );
 	}
-	node = Widget_GetNode( widget );
+	node = &widget->node;
 	i = widget->children.length;
 	target = node->prev;
 	node = widget->children.tail.prev;
 	while( i-- > 0 ) {
 		prev = node->prev;
 		child = node->data;
-		snode = Widget_GetShowNode( child );
+		snode = &child->node_show;
 		LinkedList_Unlink( &widget->children, node );
 		LinkedList_Unlink( &widget->children_show, snode );
 		child->parent = widget->parent;
@@ -271,16 +269,12 @@ static void Widget_Init( LCUI_Widget widget )
 
 LCUI_Widget LCUIWidget_New( const char *type )
 {
-	LinkedListNode *node;
-	LCUI_Widget widget = malloc( WIDGET_SIZE );
-
+	ASSIGN( widget, LCUI_Widget );
 	Widget_Init( widget );
-	node = Widget_GetNode( widget );
-	node->data = widget;
-	node->next = node->prev = NULL;
-	node = Widget_GetShowNode( widget );
-	node->data = widget;
-	node->next = node->prev = NULL;
+	widget->node.data = widget;
+	widget->node_show.data = widget;
+	widget->node.next = widget->node.prev = NULL;
+	widget->node_show.next = widget->node_show.prev = NULL;
 	if( type ) {
 		widget->proto = LCUIWidget_GetPrototype( type );
 		if( widget->proto ) {
@@ -356,7 +350,7 @@ void Widget_Destroy( LCUI_Widget w )
 	if( w->parent ) {
 		LCUI_Widget child;
 		LinkedListNode *node;
-		node = Widget_GetNode( w );
+		node = &w->node;
 		node = node->next;
 		while( node ) {
 			child = node->data;
@@ -453,7 +447,7 @@ LCUI_Widget LCUIWidget_GetById( const char *idstr )
 
 LCUI_Widget Widget_GetPrev( LCUI_Widget w )
 {
-	LinkedListNode *node = Widget_GetNode( w );
+	LinkedListNode *node = &w->node;
 	if( node->prev && node != w->parent->children.head.next ) {
 		return node->prev->data;
 	}
@@ -462,7 +456,7 @@ LCUI_Widget Widget_GetPrev( LCUI_Widget w )
 
 LCUI_Widget Widget_GetNext( LCUI_Widget w )
 {
-	LinkedListNode *node = Widget_GetNode( w );
+	LinkedListNode *node = &w->node;
 	if( node->next ) {
 		return node->next->data;
 	}
@@ -820,13 +814,14 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 		}
 	}
 	w->computed_style.z_index = z_index;
-	snode = Widget_GetShowNode( w );
+	snode = &w->node_show;
 	list = &w->parent->children_show;
 	LinkedList_Unlink( list, snode );
 	for( LinkedList_Each( cnode, list ) ) {
 		LCUI_Widget child = cnode->data;
 		LCUI_WidgetStyle *ccs = &child->computed_style;
-		csnode = Widget_GetShowNode( child );
+
+		csnode = &child->node_show;
 		if( w->computed_style.z_index < ccs->z_index ) {
 			continue;
 		} else if( w->computed_style.z_index == ccs->z_index ) {
@@ -1709,7 +1704,7 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 				child->state |= WSTATE_LAYOUTED;
 				/* 如果部件已经准备完毕则触发 ready 事件 */
 				if( child->state == WSTATE_READY ) {
-					LCUI_WidgetEventRec e;
+					LCUI_WidgetEventRec e = { 0 };
 					e.type = WET_READY;
 					e.cancel_bubble = TRUE;
 					Widget_TriggerEvent( child, &e, NULL );

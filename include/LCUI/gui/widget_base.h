@@ -184,7 +184,7 @@ typedef struct LCUI_WidgetRec_ {
 	LinkedList		children;		/**< 子部件 */
 	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
 	LCUI_WidgetData		data;			/**< 私有数据 */
-	Dict			*attributes;
+	Dict			*attributes;		/**< 属性记录 */
 	LCUI_WidgetPrototypeC	proto;			/**< 原型 */
 	LCUI_BOOL		enable_graph;		/**< 是否启用位图缓存 */
 	LCUI_Graph		graph;			/**< 位图缓存 */
@@ -195,11 +195,10 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_BOOL		layout_locked;		/**< 子级部件布局是否已锁定 */
 	LCUI_BOOL		event_blocked;		/**< 是否阻止自己和子级部件的事件处理 */
 	LCUI_BOOL		disabled;		/**< 是否禁用 */
+	LinkedListNode		node;			/**< 在部件链表中的结点 */
+	LinkedListNode		node_show;		/**< 在部件显示链表中的结点 */
 } LCUI_WidgetRec;
 
-#define Widget_GetNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec))
-#define Widget_GetShowNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode))
-#define Widget_NewPrivateData(w, type) (type*)(w->private_data = malloc(sizeof(type)))
 #define Widget_SetStyle(W, K, V, T) SetStyle((W)->custom_style, K, V, T)
 #define Widget_UnsetStyle(W, K) UnsetStyle((W)->custom_style, K)
 

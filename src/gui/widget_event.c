@@ -460,7 +460,7 @@ static LCUI_Widget Widget_GetNextAt( LCUI_Widget widget, int x, int y )
 {
 	LCUI_Widget w;
 	LinkedListNode *node;
-	node = Widget_GetShowNode( widget );
+	node = &widget->node;
 	for( node = node->next; node; node = node->next ) {
 		w = node->data;
 		/* 如果忽略事件处理，则向它底层的兄弟部件传播事件 */

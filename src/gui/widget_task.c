@@ -164,19 +164,15 @@ void LCUIWidget_ExitTasks( void )
 void Widget_AddToTrash( LCUI_Widget w )
 {
 	LCUI_WidgetEventRec e = { 0 };
-	LinkedListNode *snode, *node;
-
 	e.type = WET_REMOVE;
 	w->state = WSTATE_DELETED;
 	Widget_TriggerEvent( w, &e, NULL );
 	if( !w->parent ) {
 		return;
 	}
-	node = Widget_GetNode( w );
-	snode = Widget_GetShowNode( w );
-	LinkedList_Unlink( &w->parent->children, node );
-	LinkedList_Unlink( &w->parent->children_show, snode );
-	LinkedList_AppendNode( &self.trash, node );
+	LinkedList_Unlink( &w->parent->children, &w->node );
+	LinkedList_Unlink( &w->parent->children_show, &w->node_show );
+	LinkedList_AppendNode( &self.trash, &w->node );
 	Widget_PostSurfaceEvent( w, WET_REMOVE );
 }
 
@@ -211,7 +207,7 @@ int Widget_Update( LCUI_Widget w )
 		w->state |= WSTATE_UPDATED;
 		/* 如果部件已经准备完毕则触发 ready 事件 */
 		if( w->state == WSTATE_READY ) {
-			LCUI_WidgetEventRec e;
+			LCUI_WidgetEventRec e = { 0 };
 			e.type = WET_READY;
 			e.cancel_bubble = TRUE;
 			Widget_TriggerEvent( w, &e, NULL );
