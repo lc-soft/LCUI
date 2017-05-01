@@ -359,13 +359,14 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		max_width -= w->padding.left + w->padding.right;
 	} else {
 		max_width = w->box.content.width;
-		width = roundi( max_width );
 	}
 	if( w->style->sheet[key_height].is_valid &&
 	    w->style->sheet[key_height].type != SVT_AUTO ) {
-		max_height = w->box.content.width;
-		height = roundi( height );
+		max_height = w->box.content.height;
 	}
+	/* 将当前部件宽高作为文本层的固定宽高 */
+	width = roundi( w->box.content.width );
+	height = roundi( w->box.content.height );
 	TextLayer_SetFixedSize( txt->layer, width, height );
 	width = roundi( max_width );
 	height = roundi( max_height );
@@ -420,10 +421,12 @@ static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 		if( sw->type == SVT_PX ) {
 			break;
 		}
+		/* 解除固定宽高设置，以计算最大宽高 */
 		TextLayer_SetFixedSize( txt->layer, 0, 0 );
 		TextLayer_Update( txt->layer, NULL );
 		*width = TextLayer_GetWidth( txt->layer ) * 1.0f;
 		*height = TextLayer_GetHeight( txt->layer ) * 1.0f;
+		/* 还原固定宽高设置 */
 		TextLayer_SetFixedSize( txt->layer, fixed_w, fixed_h );
 		TextLayer_Update( txt->layer, NULL );
 		return;

@@ -556,11 +556,11 @@ int TextLayer_GetCaretPixelPos( LCUI_TextLayer layer, LCUI_Pos *pixel_pos )
 /** 清空文本 */
 void TextLayer_ClearText( LCUI_TextLayer layer )
 {
+	TextLayer_InvalidateRowsRect( layer, 0, -1 );
+	layer->width = 0;
 	layer->length = 0;
 	layer->insert_x = 0;
 	layer->insert_y = 0;
-	layer->width = 0;
-	TextLayer_InvalidateRowsRect( layer, 0, -1 );
 	TextRowList_Destroy( &layer->rowlist );
 	LinkedList_Clear( &layer->style_cache, (FuncPtr)TextStyle_Destroy );
 	TextRowList_InsertNewRow( &layer->rowlist, 0 );
@@ -1227,13 +1227,17 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 	TextChar txtchar;
 	LCUI_Pos char_pos;
 	int x, y, row, col, width, height;
+
 	y = layer->offset_y;
+	/* 确定可绘制的最大区域范围 */
 	if( layer->fixed_width > 0 ) {
 		width = layer->fixed_width;
+	} else if( layer->max_width > 0 ) {
+		width = layer->max_width;
 	} else {
 		width = layer->width;
 	}
-	if( layer->fixed_width > 0 ) {
+	if( layer->fixed_height > 0 ) {
 		height = layer->fixed_width;
 	} else {
 		height = TextLayer_GetHeight( layer );

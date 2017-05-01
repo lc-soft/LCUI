@@ -80,10 +80,19 @@ typedef struct LCUI_TextLayerRec_  {
         int insert_x;			/**< 光标所在列数 */
         int insert_y;			/**< 光标所在行数 */
 	int width;			/**< 实际文本宽度 */
-	int fixed_width;		/**< 固定文本宽度 */
-	int fixed_height;		/**< 固定文本高度 */
-        int max_width;			/**< 最大文本宽度，当未设置固定宽度时，文字排版将按最大宽度进行 */
-        int max_height;			/**< 最大文本高度 */
+
+	/**
+	 * 固定宽高
+	 * 当它们等于0时，文本宽高会根据文本内容自动适应
+	 * 当它们大于0时，会直接根据该值处理文本对齐
+	 */
+	int fixed_width, fixed_height;
+	/**
+	 * 最大文本宽高
+	 * 当未设置固定宽度时，文字排版将按最大宽度进行
+	 */
+	int max_width, max_height;
+
 	int length;			/**< 文本长度 */
 	LCUI_BOOL is_mulitiline_mode;	/**< 是否启用多行文本模式 */
         LCUI_BOOL is_autowrap_mode;	/**< 是否启用自动换行模式 */
