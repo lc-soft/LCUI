@@ -533,13 +533,11 @@ int TextLayer_GetCharPixelPos( LCUI_TextLayer layer, int row,
 	txtrow = layer->rowlist.rows[row];
 	pixel_x = TextLayer_GetRowStartX( layer, txtrow );
 	for( i = 0; i < col; ++i ) {
-		if( !txtrow->string[i] ) {
-			break;
-		}
-		if( !txtrow->string[i]->bitmap ) {
+		TextChar txtchar = txtrow->string[i];
+		if( !txtchar || !txtchar->bitmap ) {
 			continue;
 		}
-		pixel_x += txtrow->string[i]->bitmap->advance.x;
+		pixel_x += txtchar->bitmap->advance.x;
 	}
 	pixel_pos->x = pixel_x;
 	pixel_pos->y = pixel_y;

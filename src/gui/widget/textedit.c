@@ -143,27 +143,20 @@ static void fillchar( wchar_t *str, wchar_t ch )
 
 static void TextEdit_UpdateCaret( LCUI_Widget widget )
 {
-	LCUI_StyleSheet sheet;
+	LCUI_Pos pos;
 	LCUI_TextEdit edit = Widget_GetData( widget, self.prototype );
-	float x, y, height, offset_x = 0, offset_y = 0;
-	int row;
+	float height, x = 0, y = 0, offset_x = 0, offset_y = 0;
+	int row = edit->layer->insert_y;
 
-	if( edit->is_placeholder_shown ) {
-		x = y = 0;
-	} else {
-		LCUI_Pos pos;
+	if( !edit->is_placeholder_shown ) {
 		if( TextLayer_GetCaretPixelPos( edit->layer, &pos ) != 0 ) {
 			return;
 		}
 		x = 1.0f * pos.x;
 		y = 1.0f * pos.y;
 	}
-	row = edit->layer->insert_y;
-	sheet = edit->caret->custom_style;
 	height = (float)TextLayer_GetRowHeight( edit->layer, row );
 	Widget_SetStyle( edit->caret, key_height, height, px );
-	x += widget->padding.left;
-	y += widget->padding.top;
 	if( x > widget->box.content.width ) {
 		offset_x = widget->box.content.width - x;
 		offset_x -= edit->caret->width;
@@ -174,10 +167,17 @@ static void TextEdit_UpdateCaret( LCUI_Widget widget )
 		offset_y -= edit->caret->height;
 		y += offset_y;
 	}
-	TextLayer_SetOffset( edit->layer, (int)offset_x, (int)offset_y );
+	x += widget->padding.left;
+	y += widget->padding.top;
+	if( edit->layer->offset_x != offset_x ||
+	    edit->layer->offset_y != offset_y ) {
+		int ix = (int)offset_x;
+		int iy = (int)offset_y;
+		TextLayer_SetOffset( edit->layer, ix, iy );
+		edit->tasks[TASK_UPDATE] = TRUE;
+		Widget_AddTask( widget, WTT_USER );
+	}
 	Widget_Move( edit->caret, x, y );
-	edit->tasks[TASK_UPDATE] = TRUE;
-	Widget_AddTask( widget, WTT_USER );
 	TextCaret_BlinkShow( edit->caret );
 	if( edit->password_char ) {
 		TextLayer_SetCaretPos( edit->layer_source, 
@@ -412,9 +412,8 @@ static void TextEdit_OnTask( LCUI_Widget widget )
 		edit->tasks[TASK_UPDATE] = FALSE;
 	}
 	if( edit->tasks[TASK_UPDATE_CARET] ) {
-		TextEdit_UpdateCaret( widget );
 		edit->tasks[TASK_UPDATE_CARET] = FALSE;
-		edit->tasks[TASK_UPDATE] = FALSE;
+		TextEdit_UpdateCaret( widget );
 	}
 }
 
