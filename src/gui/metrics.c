@@ -48,17 +48,21 @@ static struct LCUI_MetricsModule {
 	float scale;
 } metrics;
 
-float LCUIMetrics_Compute( LCUI_Style s )
+float LCUIMetrics_Compute( float value, LCUI_StyleType type )
 {
-	float value = 0.0;
-	switch( s->type ) {
-	case SVT_PX: value = s->val_px; break;
-	case SVT_DIP: value = s->val_dip * metrics.density; break;
-	case SVT_SP: value = s->val_sp * metrics.scaled_density; break;
-	case SVT_PT: value = s->val_pt * metrics.dpi * (1.0f / 72); break;
-	default: break;
+	switch( type ) {
+	case SVT_PX: break;
+	case SVT_DIP: value = value * metrics.density; break;
+	case SVT_SP: value = value * metrics.scaled_density; break;
+	case SVT_PT: value = value * metrics.dpi / 72.0f; break;
+	default: value = 0; break;
 	}
-	return value * metrics.scale;
+	return value;
+}
+
+int LCUIMetrics_ComputeActual( float value, LCUI_StyleType type )
+{
+	return roundi( LCUIMetrics_Compute( value, type ) * metrics.scale );
 }
 
 static float ComputeDensityByLevel( LCUI_DensityLevel level )

@@ -159,24 +159,9 @@ void Widget_ValidateArea( LCUI_Widget w, LCUI_Rect *r, int box_type )
 /** 当前部件的绘制函数 */
 static void Widget_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
-	LCUI_Rect box;
-	LCUI_WidgetStyle *s;
-
-	box.x = box.y = 0;
-	s = &w->computed_style;
-	box.width = roundi( w->box.graph.width );
-	box.height = roundi( w->box.graph.height );
-	/* 如果是有位图缓存的话，则先清空缓存里的阴影区域 */
-	if( w->enable_graph ) {
-		Graph_ClearShadowArea( paint, &box, &s->shadow );
-	}
-	Graph_DrawBoxShadow( paint, &box, &s->shadow );
-	box.x = roundi( w->box.border.x - w->box.graph.x );
-	box.y = roundi( w->box.border.y - w->box.graph.y );
-	box.width = roundi( w->box.border.width );
-	box.height = roundi( w->box.border.height );
-	Graph_DrawBackground( paint, &box, &s->background );
-	Graph_DrawBorder( paint, &box, &s->border );
+	Widget_PaintBoxShadow( w, paint );
+	Widget_PaintBakcground( w, paint );
+	Widget_PaintBorder( w, paint );
 	if( w->proto && w->proto->paint ) {
 		w->proto->paint( w, paint );
 	}

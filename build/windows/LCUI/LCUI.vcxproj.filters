@@ -440,6 +440,12 @@
     <ClCompile Include="..\..\..\src\gui\metrics.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_border.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_shadow.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\README" />

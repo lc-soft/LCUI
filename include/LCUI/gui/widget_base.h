@@ -45,26 +45,32 @@
 
 LCUI_BEGIN_HEADER
 
+/** 部件实际样式 */
+typedef struct LCUI_WidgetActualStyle {
+	int x, y;
+	int width, height;
+} LCUI_WidgetActualStyle;
+
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
-	LCUI_BOOL visible;		/**< 是否可见 */
-	LCUI_BOOL focusable;		/**< 是否能够得到焦点 */
-	float min_width, min_height;	/**< 最小尺寸 */
-	float max_width, max_height;	/**< 最大尺寸 */
-	float left, top;		/**< 左边界、顶边界的偏移距离 */
-	float right, bottom;		/**< 右边界、底边界的偏移距离 */
-	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
-	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
-	LCUI_StyleValue position;	/**< 定位方式 */
-	LCUI_StyleValue display;	/**< 显示方式，决定以何种布局显示该部件 */
-	LCUI_StyleValue box_sizing;	/**< 以何种方式计算宽度和高度 */
-	LCUI_StyleValue vertical_align;	/**< 垂直对齐方式 */
-	LCUI_BoundBox margin;		/**< 外边距 */
-	LCUI_BoundBox padding;		/**< 内边距 */
-	LCUI_Background background;	/**< 背景 */
-	LCUI_BoxShadow shadow;		/**< 阴影 */
-	LCUI_Border border;		/**< 边框 */
-	int pointer_events;		/**< 事件的处理方式 */
+	LCUI_BOOL visible;			/**< 是否可见 */
+	LCUI_BOOL focusable;			/**< 是否能够得到焦点 */
+	float min_width, min_height;		/**< 最小尺寸 */
+	float max_width, max_height;		/**< 最大尺寸 */
+	float left, top;			/**< 左边界、顶边界的偏移距离 */
+	float right, bottom;			/**< 右边界、底边界的偏移距离 */
+	int z_index;				/**< 堆叠顺序，该值越高，部件显示得越靠前 */
+	float opacity;				/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
+	LCUI_StyleValue position;		/**< 定位方式 */
+	LCUI_StyleValue display;		/**< 显示方式，决定以何种布局显示该部件 */
+	LCUI_StyleValue box_sizing;		/**< 以何种方式计算宽度和高度 */
+	LCUI_StyleValue vertical_align;		/**< 垂直对齐方式 */
+	LCUI_BoundBox margin;			/**< 外边距 */
+	LCUI_BoundBox padding;			/**< 内边距 */
+	LCUI_BorderStyle border;		/**< 边框 */
+	LCUI_BoxShadowStyle shadow;		/**< 盒形阴影 */
+	LCUI_BackgroundStyle background;	/**< 背景 */
+	int pointer_events;			/**< 事件的处理方式 */
 } LCUI_WidgetStyle;
 
 /** 部件任务类型，按照任务的依赖顺序排列 */
@@ -180,6 +186,7 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_StyleSheet		custom_style;		/**< 自定义样式表 */
 	LCUI_StyleSheet		inherited_style;	/**< 通过继承得到的样式表 */
 	LCUI_WidgetStyle	computed_style;		/**< 已经计算的样式数据 */
+	LCUI_WidgetActualStyle	actual_style;		/**< 最终用于渲染的样式值 */
 	LCUI_Widget		parent;			/**< 父部件 */
 	LinkedList		children;		/**< 子部件 */
 	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
@@ -245,16 +252,52 @@ LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 LCUI_API void Widget_GetOffset( LCUI_Widget w, LCUI_Widget parent,
 				float *offset_x, float *offset_y );
 
+/** 初始化部件背景样式 */
+LCUI_API void Widget_InitBackground( LCUI_Widget w );
+
 /** 更新部件背景样式 */
 LCUI_API void Widget_UpdateBackground( LCUI_Widget widget );
 
-/** 刷新部件的边框 */
+/** 绘制部件背景 */
+LCUI_API void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint );
+
+/** 设置边框样式 */
+LCUI_API void Widget_SetBorder( LCUI_Widget w, float width,
+				int style, LCUI_Color clr );
+
+/** 更新部件边框样式 */
 LCUI_API void Widget_UpdateBorder( LCUI_Widget w );
 
-/** 刷新部件的矩形阴影 */
+/** 绘制部件边框 */
+LCUI_API void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint );
+
+LCUI_API float Widget_GetGraphWidth( LCUI_Widget widget );
+
+LCUI_API float Widget_GetGraphHeight( LCUI_Widget widget );
+
+/** 设置阴影样式 */
+LCUI_API void Widget_SetBoxShadow( LCUI_Widget w, float x, float y,
+				   float blur, LCUI_Color color );
+
+/** 根据阴影参数获取部件区域的横向偏移距离 */
+LCUI_API float Widget_GetBoxShadowOffsetX( LCUI_Widget w );
+
+/** 根据阴影参数获取部件区域的纵向偏移距离 */
+LCUI_API float Widget_GetBoxShadowOffsetY( LCUI_Widget w );
+
+/** 获取部件在添加阴影后的高度 */
+LCUI_API float Widget_GetGraphWidth( LCUI_Widget w );
+
+/** 获取部件在添加阴影后的宽度 */
+LCUI_API float Widget_GetGraphWidth( LCUI_Widget w );
+
+/** 更新部件矩形阴影样式 */
 LCUI_API void Widget_UpdateBoxShadow( LCUI_Widget w );
 
-/** 刷新可见性 */
+/** 绘制部件阴影 */
+LCUI_API void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint );
+
+/** 更新可见性 */
 LCUI_API void Widget_UpdateVisibility( LCUI_Widget w );
 
 /** 设置部件为顶级部件 */
@@ -285,9 +328,6 @@ LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 
 /** 设置部件ID */
 LCUI_API int Widget_SetId( LCUI_Widget w, const char *idstr );
-
-/** 设置边框 */
-LCUI_API void Widget_SetBorder( LCUI_Widget w, float width, int style, LCUI_Color clr );
 
 /** 设置内边距 */
 LCUI_API void Widget_SetPadding( LCUI_Widget w, float top, float right,

@@ -126,7 +126,7 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 			s->type = SVT_SCALE;
 			break;
 		}
-		if( 1 == sscanf( num_str, "%d", &s->value ) ) {
+		if( 1 == sscanf( num_str, "%d", &s->val_int ) ) {
 			s->type = SVT_VALUE;
 			break;
 		}

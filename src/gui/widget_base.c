@@ -258,9 +258,7 @@ static void Widget_Init( LCUI_Widget widget )
 	widget->computed_style.padding.right.type = SVT_PX;
 	widget->computed_style.padding.bottom.type = SVT_PX;
 	widget->computed_style.padding.left.type = SVT_PX;
-	Background_Init( &widget->computed_style.background );
-	BoxShadow_Init( &widget->computed_style.shadow );
-	Border_Init( &widget->computed_style.border );
+	Widget_InitBackground( widget );
 	LinkedList_Init( &widget->children );
 	LinkedList_Init( &widget->children_show );
 	LinkedList_Init( &widget->dirty_rects );
@@ -523,7 +521,7 @@ static float ComputeXMetric( LCUI_Widget w, int key )
 		}
 		return w->parent->box.content.width * s->scale;
 	}
-	return LCUIMetrics_Compute( s );
+	return LCUIMetrics_Compute( s->value, s->type );
 }
 
 static float ComputeYMetric( LCUI_Widget w, int key )
@@ -538,7 +536,7 @@ static float ComputeYMetric( LCUI_Widget w, int key )
 		}
 		return w->parent->box.content.height * s->scale;
 	}
-	return LCUIMetrics_Compute( s );
+	return LCUIMetrics_Compute( s->value, s->type );
 }
 
 static float ComputeSelfXMetric( LCUI_Widget w, int key )
@@ -547,7 +545,7 @@ static float ComputeSelfXMetric( LCUI_Widget w, int key )
 	if( s->type == SVT_SCALE ) {
 		return w->width * s->scale;
 	}
-	return LCUIMetrics_Compute( s );
+	return LCUIMetrics_Compute( s->value, s->type );
 }
 
 static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
@@ -559,180 +557,6 @@ static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
 		return default_value;
 	}
 	return w->style->sheet[key].style;
-}
-
-/** 计算边框样式 */
-static void Widget_ComputeBorder( LCUI_Widget w )
-{
-	LCUI_Style style;
-	LCUI_StyleSheet ss = w->style;
-	LCUI_Border *b = &w->computed_style.border;
-	int key = key_border_start ;
-	unsigned int val;
-
-	for( ; key <= key_border_end; ++key ) {
-		style = &ss->sheet[key];
-		if( !style->is_valid ) {
-			continue;
-		}
-		switch( key ) {
-		case key_border_top_color:
-			b->top.color = style->color;
-			break;
-		case key_border_right_color:
-			b->right.color = style->color;
-			break;
-		case key_border_bottom_color:
-			b->bottom.color = style->color;
-			break;
-		case key_border_left_color:
-			b->left.color = style->color;
-			break;
-		case key_border_top_width:
-			b->top.width = (unsigned int)style->px;
-			break;
-		case key_border_right_width:
-			b->right.width = (unsigned int)style->px;
-			break;
-		case key_border_bottom_width:
-			b->bottom.width = (unsigned int)style->px;
-			break;
-		case key_border_left_width:
-			b->left.width = (unsigned int)style->px;
-			break;
-		case key_border_top_style:
-			b->top.style = style->value;
-			break;
-		case key_border_right_style:
-			b->right.style = style->value;
-			break;
-		case key_border_bottom_style:
-			b->bottom.style = style->value;
-			break;
-		case key_border_left_style:
-			b->left.style = style->value;
-			break;
-		case key_border_top_left_radius:
-			val = (unsigned int)ComputeSelfXMetric( w, key );
-			b->top_left_radius = val;
-			break;
-		case key_border_top_right_radius:
-			val = (unsigned int)ComputeSelfXMetric( w, key );
-			b->top_right_radius = val;
-			break;
-		case key_border_bottom_left_radius:
-			val = (unsigned int)ComputeSelfXMetric( w, key );
-			b->bottom_left_radius = val;
-			break;
-		case key_border_bottom_right_radius:
-			val = (unsigned int)ComputeSelfXMetric( w, key );
-			b->bottom_right_radius = val;
-			break;
-		default: break;
-		}
-	}
-}
-
-void Widget_UpdateBorder( LCUI_Widget w )
-{
-	LCUI_Rect rect;
-	LCUI_Border ob, *nb;
-	ob = w->computed_style.border;
-	Widget_ComputeBorder( w );
-	nb = &w->computed_style.border;
-	/* 如果边框变化并未导致图层尺寸变化的话，则只重绘边框 */
-	if( ob.top.width != nb->top.width || 
-	    ob.right.width != nb->right.width ||
-	    ob.bottom.width != nb->bottom.width ||
-	    ob.left.width != nb->left.width ) {
-		Widget_AddTask( w, WTT_RESIZE );
-		Widget_AddTask( w, WTT_POSITION );
-		return;
-	}
-	rect.x = rect.y = 0;
-	rect.width = roundi( w->box.border.width );
-	rect.width -= max( ob.top_right_radius, ob.right.width );
-	rect.height = max( ob.top_left_radius, ob.top.width );
-	/* 上 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.x = roundi( w->box.border.width );
-	rect.width = max( ob.top_right_radius, ob.right.width );
-	rect.x -= rect.width;
-	rect.height = roundi( w->box.border.height );
-	rect.height -= max( ob.bottom_right_radius, ob.bottom.width );
-	/* 右 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.x = max( ob.bottom_left_radius, ob.left.width );
-	rect.y = roundi( w->box.border.height );
-	rect.width = roundi( w->box.border.width );
-	rect.width -= rect.x;
-	rect.height = max( ob.bottom_right_radius, ob.bottom.width );
-	rect.y -= rect.height;
-	/* 下 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.width = rect.x;
-	rect.x = 0;
-	rect.y = max( ob.top_left_radius, ob.left.width );
-	rect.height = roundi( w->box.border.height );
-	rect.height -= rect.y;
-	/* 左 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-}
-
-/** 计算矩形阴影样式 */
-static void ComputeBoxShadowStyle( LCUI_StyleSheet ss, LCUI_BoxShadow *bsd )
-{
-	LCUI_Style style;
-	int key = key_box_shadow_start;
-	memset( bsd, 0, sizeof( *bsd ) );
-	for( ; key <= key_box_shadow_end; ++key ) {
-		style = &ss->sheet[key];
-		if( !style->is_valid ) {
-			continue;
-		}
-		switch( key ) {
-		case key_box_shadow_x:
-			bsd->x = (int)style->px;
-			break;
-		case key_box_shadow_y:
-			bsd->y = (int)style->px;
-			break;
-		case key_box_shadow_spread:
-			bsd->spread = (int)style->px;
-			break;
-		case key_box_shadow_blur:
-			bsd->blur = (int)style->px;
-			break;
-		case key_box_shadow_color:
-			bsd->color = style->color;
-			break;
-		default: break;
-		}
-	}
-}
-
-void Widget_UpdateBoxShadow( LCUI_Widget w )
-{
-	LCUI_BoxShadow bs = w->computed_style.shadow;
-	ComputeBoxShadowStyle( w->style, &w->computed_style.shadow );
-	/* 如果阴影变化并未导致图层尺寸变化，则只重绘阴影 */
-	if( bs.x == w->computed_style.shadow.x &&
-	    bs.y == w->computed_style.shadow.y &&
-	    bs.blur == w->computed_style.shadow.blur ) {
-		int i;
-		LCUI_Rect rects[4], rb, rg;
-		RectF2Rect( w->box.border, rb );
-		RectF2Rect( w->box.graph, rg );
-		LCUIRect_CutFourRect( &rb, &rg, rects );
-		for( i = 0; i < 4; ++i ) {
-			rects[i].x -= roundi( w->box.graph.x );
-			rects[i].y -= roundi( w->box.graph.y );
-			Widget_InvalidateArea( w, &rects[i], SV_GRAPH_BOX );
-		}
-		return;
-	}
-	Widget_AddTask( w, WTT_RESIZE );
-	Widget_AddTask( w, WTT_POSITION );
 }
 
 void Widget_UpdateVisibility( LCUI_Widget w )
@@ -989,8 +813,8 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	w->box.padding.y += w->computed_style.border.top.width;
 	w->box.content.x = w->box.padding.x + w->padding.left;
 	w->box.content.y = w->box.padding.y + w->padding.top;
-	w->box.graph.x -= BoxShadow_GetBoxX( &w->computed_style.shadow );
-	w->box.graph.y -= BoxShadow_GetBoxY( &w->computed_style.shadow );
+	w->box.graph.x -= Widget_GetBoxShadowOffsetX( w );
+	w->box.graph.y -= Widget_GetBoxShadowOffsetY( w );
 	if( w->parent ) {
 		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
 		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
@@ -1005,24 +829,23 @@ void Widget_UpdatePosition( LCUI_Widget w )
 /** 更新位图尺寸 */
 static void Widget_UpdateGraphBox( LCUI_Widget w )
 {
-	LCUI_RectF *rb = &w->box.border;
 	LCUI_RectF *rg = &w->box.graph;
-	LCUI_BoxShadow *shadow = &w->computed_style.shadow;
-	rg->x = w->x - BoxShadow_GetBoxX( shadow );
-	rg->y = w->y - BoxShadow_GetBoxY( shadow );
-	rg->width = BoxShadow_GetWidth( shadow, rb->width );
-	rg->height = BoxShadow_GetHeight( shadow, rb->height );
+	LCUI_BoxShadowStyle *shadow = &w->computed_style.shadow;
+	rg->x = w->x - Widget_GetBoxShadowOffsetX( w );
+	rg->y = w->y - Widget_GetBoxShadowOffsetY( w );
+	rg->width = Widget_GetGraphWidth( w );
+	rg->height = Widget_GetGraphHeight( w );
 	if( !w->enable_graph ) {
 		Graph_Free( &w->graph );
 		return;
 	}
 	/* 如果有会产生透明效果的样式 */
-	if( w->computed_style.border.bottom_left_radius > 0
-	    || w->computed_style.border.bottom_right_radius > 0
-	    || w->computed_style.border.top_left_radius > 0
-	    || w->computed_style.border.top_right_radius > 0
-	    || w->computed_style.background.color.alpha < 255
-	    || w->computed_style.shadow.blur > 0 ) {
+	if( w->computed_style.border.bottom_left_radius > 0 ||
+	    w->computed_style.border.bottom_right_radius > 0 ||
+	    w->computed_style.border.top_left_radius > 0 ||
+	    w->computed_style.border.top_right_radius > 0 ||
+	    w->computed_style.background.color.alpha < 255 ||
+	    w->computed_style.shadow.blur > 0 ) {
 		w->graph.color_type = COLOR_TYPE_ARGB;
 	} else {
 		w->graph.color_type = COLOR_TYPE_RGB;
@@ -1099,7 +922,7 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	LCUI_WidgetStyle *style = &w->computed_style;
 	LCUI_Style sw = &w->style->sheet[key_width];
 	LCUI_Style sh = &w->style->sheet[key_height];
-	LCUI_Border *bbox = &style->border;
+	LCUI_BorderStyle *bbox = &style->border;
 	w->width = ComputeXMetric( w, key_width );
 	w->height = ComputeYMetric( w, key_height );
 	if( sw->type == SVT_AUTO || sh->type == SVT_AUTO ) {
@@ -1259,7 +1082,7 @@ void Widget_UpdateMargin( LCUI_Widget w )
 			continue;
 		}
 		*pd_map[i].sval = *s;
-		*pd_map[i].fval = LCUIMetrics_Compute( s );;
+		*pd_map[i].fval = LCUIMetrics_Compute( s->value, s->type );
 	}
 	/* 如果有父级部件，则处理 margin-left 和 margin-right 的值 */
 	if( w->parent ) {
@@ -1333,7 +1156,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 			continue;
 		}
 		*pd_map[i].sval = *s;
-		*pd_map[i].ival = LCUIMetrics_Compute( s );
+		*pd_map[i].ival = LCUIMetrics_Compute( s->value, s->type );
 	}
 	box_sizing = ComputeStyleOption( w, key_box_sizing, SV_CONTENT_BOX );
 	w->computed_style.box_sizing = box_sizing;
@@ -1407,23 +1230,6 @@ void Widget_UpdateProps( LCUI_Widget w )
 	}
 }
 
-void Widget_SetBorder( LCUI_Widget w, float width, int style, LCUI_Color clr )
-{
-	Widget_SetStyle( w, key_border_top_color, clr, color );
-	Widget_SetStyle( w, key_border_right_color, clr, color );
-	Widget_SetStyle( w, key_border_bottom_color, clr, color );
-	Widget_SetStyle( w, key_border_left_color, clr, color );
-	Widget_SetStyle( w, key_border_top_width, width, px );
-	Widget_SetStyle( w, key_border_right_width, width, px );
-	Widget_SetStyle( w, key_border_bottom_width, width, px );
-	Widget_SetStyle( w, key_border_left_width, width, px );
-	Widget_SetStyle( w, key_border_top_style, style, style );
-	Widget_SetStyle( w, key_border_right_style, style, style );
-	Widget_SetStyle( w, key_border_bottom_style, style, style );
-	Widget_SetStyle( w, key_border_left_style, style, style );
-	Widget_UpdateStyle( w, FALSE );
-}
-
 void Widget_SetPadding( LCUI_Widget w, float top, float right, 
 			float bottom, float left )
 {
@@ -1448,7 +1254,6 @@ void Widget_Move( LCUI_Widget w, float left, float top )
 {
 	SetStyle( w->custom_style, key_top, top, px );
 	SetStyle( w->custom_style, key_left, left, px );
-	DEBUG_MSG("top = %d, left = %d\n", top, left);
 	Widget_UpdateStyle( w, FALSE );
 }
 
@@ -1469,11 +1274,6 @@ void Widget_Hide( LCUI_Widget w )
 {
 	SetStyle( w->custom_style, key_visible, FALSE, int );
 	Widget_UpdateStyle( w, FALSE );
-}
-
-void Widget_SetBackgroundColor( LCUI_Widget w, LCUI_Color color )
-{
-	w->computed_style.background.color = color;
 }
 
 void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled )

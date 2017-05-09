@@ -157,7 +157,7 @@ clean:
 static int OnParseValue( LCUI_StyleSheet ss, int key, const char *str )
 {
 	LCUI_Style s = &ss->sheet[key];
-	if( sscanf( str, "%d", &s->value ) == 1 ) {
+	if( sscanf( str, "%d", &s->val_int ) == 1 ) {
 		s->is_valid = TRUE;
 		s->type = SVT_VALUE;
 		return 0;

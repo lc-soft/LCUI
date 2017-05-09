@@ -350,9 +350,11 @@
     <ClCompile Include="..\..\..\src\gui\widget\textview.c" />
     <ClCompile Include="..\..\..\src\gui\widget_background.c" />
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_border.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
     <ClCompile Include="..\..\..\src\gui\widget_prototype.c" />
     <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_shadow.c" />
     <ClCompile Include="..\..\..\src\gui\widget_style.c" />
     <ClCompile Include="..\..\..\src\gui\widget_task.c" />
     <ClCompile Include="..\..\..\src\cursor.c" />

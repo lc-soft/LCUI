@@ -1,7 +1,7 @@
 ﻿/* ****************************************************************************
 * boxshadow.h -- graph box shadow draw support.
 * 
-* Copyright (C) 2014-2016 by Liu Chao <lc-soft@live.cn>
+* Copyright (C) 2014-2017 by Liu Chao <lc-soft@live.cn>
 * 
 * This file is part of the LCUI project, and may only be used, modified, and
 * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
 * boxshadow.h -- 矩形阴影绘制支持
 *
-* 版权所有 (C) 2014-2016 归属于 刘超 <lc-soft@live.cn>
+* 版权所有 (C) 2014-2017 归属于 刘超 <lc-soft@live.cn>
 * 
 * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
 *
@@ -40,32 +40,14 @@
 #ifndef LCUI_DRAW_BOXSHADOW_H
 #define LCUI_DRAW_BOXSHADOW_H
 
-LCUI_API LCUI_BoxShadow BoxShadow( int x, int y, int blur, LCUI_Color color );
+#define SHADOW_WIDTH(sd) (sd->blur + sd->spread)
 
-LCUI_API int BoxShadow_GetBoxWidth( LCUI_BoxShadow *shadow, int w );
+LCUI_API void Graph_ClearShadowArea( LCUI_PaintContext paint,
+				     const LCUI_Rect *box,
+				     const LCUI_BoxShadow *shadow );
 
-LCUI_API int BoxShadow_GetBoxHeight( LCUI_BoxShadow *shadow, int h );
-
-/** 计算Box在添加阴影后的宽度 */
-LCUI_API float BoxShadow_GetWidth( LCUI_BoxShadow *shadow, float box_w );
-
-/** 计算Box在添加阴影后的高度 */
-LCUI_API float BoxShadow_GetHeight( LCUI_BoxShadow *shadow, float box_h );
-
-LCUI_API int BoxShadow_GetBoxX( LCUI_BoxShadow *shadow );
-
-LCUI_API int BoxShadow_GetBoxY( LCUI_BoxShadow *shadow );
-
-LCUI_API int BoxShadow_GetY( LCUI_BoxShadow *shadow );
-
-LCUI_API int BoxShadow_GetX( LCUI_BoxShadow *shadow );
-
-LCUI_API void BoxShadow_Init( LCUI_BoxShadow *shadow );
-
-LCUI_API void Graph_ClearShadowArea( LCUI_PaintContext paint, LCUI_Rect *box,
-				     LCUI_BoxShadow *shadow );
-
-LCUI_API int Graph_DrawBoxShadow( LCUI_PaintContext paint, LCUI_Rect *box,
-				  LCUI_BoxShadow *shadow );
+LCUI_API int Graph_DrawBoxShadow( LCUI_PaintContext paint,
+				  const LCUI_Rect *box,
+				  const LCUI_BoxShadow *shadow );
 
 #endif

@@ -156,6 +156,14 @@ typedef enum LCUI_StyleType {
 #define SVT_0		SVT_NONE
 #define SVT_none	SVT_NONE
 
+typedef struct LCUI_BoxShadowStyle {
+	float x, y;
+	float blur;
+	float spread;
+	LCUI_Color color;
+} LCUI_BoxShadowStyle;
+
+/** 盒形阴影相关参数 */
 typedef struct LCUI_BoxShadow {
 	int x, y;		/**< 位置 */
 	int blur;		/**< 模糊距离 */
@@ -163,7 +171,19 @@ typedef struct LCUI_BoxShadow {
 	LCUI_Color color;	/**<　颜色　*/
 } LCUI_BoxShadow;
 
-/* 完整的边框信息 */
+typedef struct LCUI_BorderStyle {
+	struct {
+		int style;
+		float width;
+		LCUI_Color color;
+	} top, right, bottom, left;
+	float top_left_radius;
+	float top_right_radius;
+	float bottom_left_radius;
+	float bottom_right_radius;
+} LCUI_BorderStyle;
+
+/** 边框相关参数 */
 typedef struct LCUI_Border {
 	struct {
 		int style;
@@ -249,10 +269,10 @@ typedef struct LCUI_StyleRec_ {
 	LCUI_BOOL is_valid:2;
 	unsigned short int type;
 	union {
-		int value;
 		int val_int;
 		int val_0;
 		int val_none;
+		float value;
 		float px;
 		float val_px;
 		float pt;
@@ -283,32 +303,47 @@ typedef struct LCUI_BoundBoxRec {
 	LCUI_StyleRec top, right, bottom, left;
 } LCUI_BoundBox;
 
-typedef struct LCUI_Background {
-	LCUI_Graph image;	/**< 背景图 */
-	LCUI_Color color;	/**< 背景色 */
-	int clip;		/**< 背景图的裁剪方式 */
-	int origin;		/**< 相对于何种位置进行定位 */
+typedef struct LCUI_BackgroundPosition {
+	LCUI_BOOL using_value;
+	union {
+		struct {
+			LCUI_StyleRec x, y;
+		};
+		int value;
+	};
+} LCUI_BackgroundPosition;
 
+typedef struct LCUI_BackgroundSize {
+	LCUI_BOOL using_value;
+	union {
+		struct {
+			LCUI_StyleRec width, height;
+		};
+		int value;
+	};
+} LCUI_BackgroundSize;
+
+typedef struct LCUI_BackgroundStyle {
+	LCUI_Graph image;			/**< 背景图 */
+	LCUI_Color color;			/**< 背景色 */
+	struct {
+		LCUI_BOOL x, y;
+	} repeat;				/**< 背景图是否重复 */
+	LCUI_BackgroundPosition position;	/**< 定位方式 */
+	LCUI_BackgroundSize size;		/**< 尺寸 */
+} LCUI_BackgroundStyle;
+
+typedef struct LCUI_Background {
+	LCUI_Graph *image;	/**< 背景图 */
+	LCUI_Color color;	/**< 背景色 */
 	struct {
 		LCUI_BOOL x, y;
 	} repeat;		/**< 背景图是否重复 */
 	struct {
-		LCUI_BOOL using_value;
-		union {
-			struct {
-				LCUI_StyleRec x, y;
-			};
-			int value;
-		};
-	} position;		/**< 定位方式 */
+		int x, y;
+	} position;
 	struct {
-		LCUI_BOOL using_value;
-		union {
-			struct {
-				LCUI_StyleRec w, h;
-			};
-			int value;
-		};
+		int width, height;
 	} size;
 } LCUI_Background;
 
