@@ -159,6 +159,16 @@ LCUI_API void Graph_Free( LCUI_Graph *graph );
  */
 LCUI_API int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect );
 
+/**
+* 为图像创建一个只读引用
+* @param self 用于存放图像引用的缓存区
+* @param source 引用的源图像
+* &param rect 引用的区域，若为NULL，则引用整个图像
+*/
+LCUI_API int Graph_QuoteReadOnly( LCUI_Graph *self,
+				  const LCUI_Graph *source,
+				  const LCUI_Rect *rect );
+
 /** 判断图像是否有Alpha透明通道 */
 #define Graph_HasAlpha(G) 						\
 	((G)->quote.is_valid ? (					\
@@ -170,6 +180,9 @@ LCUI_API int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect 
 	((G)->quote.is_valid ? ((G)->quote.source				\
 	 && (G)->quote.source->width > 0 && (G)->quote.source->height > 0	\
 	) : ((G) && (G)->bytes && (G)->height > 0 && (G)->width > 0))
+
+#define Graph_IsWritable(G) Graph_IsValid(G) && \
+	((G)->quote.is_valid ? (G)->quote.is_writable : TRUE)
 
 LCUI_API void Graph_GetValidRect( const LCUI_Graph *graph, LCUI_Rect *rect );
 

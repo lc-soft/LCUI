@@ -811,7 +811,9 @@ void Graph_Free( LCUI_Graph *graph )
 	graph->mem_size = 0;
 }
 
-int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect )
+int Graph_QuoteReadOnly( LCUI_Graph *self,
+			 const LCUI_Graph *source,
+			 const LCUI_Rect *rect )
 {
 	LCUI_Rect quote_rect;
 	if( !rect ) {
@@ -838,21 +840,29 @@ int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect )
 		self->bytes = NULL;
 		self->quote.source = NULL;
 		self->quote.is_valid = FALSE;
-		return -2;
+		return -EINVAL;
 	}
-	self->width = quote_rect.width;
-	self->height = quote_rect.height;
 	self->opacity = 1.0;
 	self->bytes = NULL;
 	self->mem_size = 0;
+	self->width = quote_rect.width;
+	self->height = quote_rect.height;
 	self->color_type = source->color_type;
 	self->bytes_per_pixel = source->bytes_per_pixel;
 	self->bytes_per_row = source->bytes_per_row;
 	self->quote.is_valid = TRUE;
-	self->quote.source = source;
+	self->quote.source_ro = source;
 	self->quote.left = quote_rect.x;
 	self->quote.top = quote_rect.y;
+	self->quote.is_writable = FALSE;
 	return 0;
+}
+
+int Graph_Quote( LCUI_Graph *self, LCUI_Graph *source, const LCUI_Rect *rect )
+{
+	int ret = Graph_QuoteReadOnly( self, source, rect );
+	self->quote.is_writable = TRUE;
+	return ret;
 }
 
 void Graph_GetValidRect( const LCUI_Graph *graph, LCUI_Rect *rect )
@@ -1143,7 +1153,7 @@ int Graph_Mix( LCUI_Graph *back, const LCUI_Graph *fore,
 	LCUI_Rect r_rect, w_rect;
 	MixerPtr mixer = NULL;
 
-	if( !Graph_IsValid( back ) || !Graph_IsValid( fore ) ) {
+	if( !Graph_IsWritable( back ) || !Graph_IsValid( fore ) ) {
 		return -1;
 	}
 	w_rect.x = left;
@@ -1200,7 +1210,7 @@ int Graph_Replace( LCUI_Graph *back, const LCUI_Graph *fore, int left, int top )
 	LCUI_Graph write_slot;
 	LCUI_Rect read_rect, write_rect;
 
-	if( !Graph_IsValid( back ) || !Graph_IsValid( fore ) ) {
+	if( !Graph_IsWritable( back ) || !Graph_IsValid( fore ) ) {
 		return -1;
 	}
 	write_rect.x = left;

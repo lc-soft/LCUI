@@ -177,15 +177,22 @@ typedef struct LCUI_Border {
 } LCUI_Border;
 
 typedef struct LCUI_Graph_ LCUI_Graph;
+
+typedef struct LCUI_GraphQuote_ {
+	int top;		/**< 源图形中的引用区域的上间距 */
+	int left;		/**< 源图形中的引用区域的左间距 */
+	LCUI_BOOL is_valid;	/**< 标志，指示是否引用了另一图形 */
+	LCUI_BOOL is_writable;	/**< 标志，指示源图形是否可写 */
+	union {
+		LCUI_Graph *source;		/**< 所引用的源图形 */
+		const LCUI_Graph *source_ro;	/**< 所引用的源图形(只读) */
+	};
+} LCUI_GraphQuote;
+
 struct LCUI_Graph_ {
-	uint32_t width;			/**< 宽度，一个整数值，单位为像素(px) */
-	uint32_t height;			/**< 高度，一个整数值，单位为像素(px) */
-	struct {
-		int top;		/**< 源图形中的引用区域的上边距 */
-		int left;		/**< 源图形中的引用区域的左边距 */
-		LCUI_BOOL is_valid;	/**< 标志，指示是否引用了另一图形 */
-		LCUI_Graph *source;	/**< 所引用的源图形 */
-	} quote;
+	uint32_t width;			/**< 宽度 */
+	uint32_t height;		/**< 高度 */
+	LCUI_GraphQuote quote;		/**< 引用记录 */
 	/** 像素数据缓存区 */
 	union {
 		uchar_t *bytes;		/**< 指针，用于一次访问一个字节的数据 */
