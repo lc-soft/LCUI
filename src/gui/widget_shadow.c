@@ -192,10 +192,6 @@ void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint )
 	LCUI_Rect box;
 	LCUI_BoxShadow shadow;
 	box.x = box.y = 0;
-	/* 如果是有位图缓存的话，则先清空缓存里的阴影区域 */
-	if( w->enable_graph ) {
-		Graph_ClearShadowArea( paint, &box, &shadow );
-	}
 	Widget_ComputeBoxShadow( w, &shadow );
 	box.width = LCUIMetrics_ComputeActual( w->box.graph.width, SVT_PX );
 	box.height = LCUIMetrics_ComputeActual( w->box.graph.height, SVT_PX );

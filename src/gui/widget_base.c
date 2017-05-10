@@ -261,8 +261,6 @@ static void Widget_Init( LCUI_Widget widget )
 	Widget_InitBackground( widget );
 	LinkedList_Init( &widget->children );
 	LinkedList_Init( &widget->children_show );
-	LinkedList_Init( &widget->dirty_rects );
-	Graph_Init( &widget->graph );
 }
 
 LCUI_Widget LCUIWidget_New( const char *type )
@@ -306,7 +304,6 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	if( widget->proto && widget->proto->destroy ) {
 		widget->proto->destroy( widget );
 	}
-	RectList_Clear( &widget->dirty_rects );
 	StyleSheet_Delete( widget->inherited_style );
 	StyleSheet_Delete( widget->custom_style );
 	StyleSheet_Delete( widget->style );
@@ -358,7 +355,7 @@ void Widget_Destroy( LCUI_Widget w )
 		if( w->computed_style.position != SV_ABSOLUTE ) {
 			Widget_UpdateLayout( w->parent );
 		}
-		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
+		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 		Widget_AddToTrash( w );
 	}
 }
@@ -378,7 +375,7 @@ void Widget_Empty( LCUI_Widget w )
 			Widget_AddToTrash( node->data );
 			node = next;
 		}
-		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
+		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 		Widget_AddTask( w, WTT_LAYOUT );
 	} else {
 		LinkedList_ClearData( &w->children_show, NULL );
@@ -582,7 +579,7 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 	}
 	visible = w->computed_style.visible;
 	if( w->parent ) {
-		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
+		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 		if( w->computed_style.display != display ||
 		    w->computed_style.position != SV_ABSOLUTE ) {
 			Widget_UpdateLayout( w->parent );
@@ -819,8 +816,8 @@ void Widget_UpdatePosition( LCUI_Widget w )
 		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
 		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
 		/* 标记移动前后的区域 */
-		Widget_PushInvalidArea( w, NULL, SV_GRAPH_BOX );
-		Widget_PushInvalidArea( w->parent, &rect, SV_PADDING_BOX );
+		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
+		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
 	}
 	/* 检测是否为顶级部件并做相应处理 */
 	Widget_PostSurfaceEvent( w, WET_MOVE );
@@ -835,22 +832,6 @@ static void Widget_UpdateGraphBox( LCUI_Widget w )
 	rg->y = w->y - Widget_GetBoxShadowOffsetY( w );
 	rg->width = Widget_GetGraphWidth( w );
 	rg->height = Widget_GetGraphHeight( w );
-	if( !w->enable_graph ) {
-		Graph_Free( &w->graph );
-		return;
-	}
-	/* 如果有会产生透明效果的样式 */
-	if( w->computed_style.border.bottom_left_radius > 0 ||
-	    w->computed_style.border.bottom_right_radius > 0 ||
-	    w->computed_style.border.top_left_radius > 0 ||
-	    w->computed_style.border.top_right_radius > 0 ||
-	    w->computed_style.background.color.alpha < 255 ||
-	    w->computed_style.shadow.blur > 0 ) {
-		w->graph.color_type = COLOR_TYPE_ARGB;
-	} else {
-		w->graph.color_type = COLOR_TYPE_RGB;
-	}
-	Graph_Create( &w->graph, roundi( rg->width ), roundi( rg->height ) );
 }
 
 /** 计算合适的内容框大小 */
@@ -1464,21 +1445,9 @@ float Widget_ComputeMaxWidth( LCUI_Widget w )
 	return width;
 }
 
-void Widget_LockLayout( LCUI_Widget w )
-{
-	w->layout_locked = TRUE;
-}
-
-void Widget_UnlockLayout( LCUI_Widget w )
-{
-	w->layout_locked = FALSE;
-}
-
 void Widget_UpdateLayout( LCUI_Widget w )
 {
-	if( !w->layout_locked ) {
-		Widget_AddTask( w, WTT_LAYOUT );
-	}
+	Widget_AddTask( w, WTT_LAYOUT );
 }
 
 void Widget_ExecUpdateLayout( LCUI_Widget w )
@@ -1643,6 +1612,7 @@ void LCUI_InitWidget( void )
 	LCUIWidget_InitEvent();
 	LCUIWidget_InitPrototype();
 	LCUIWidget_InitStyle();
+	LCUIWidget_InitRenderer();
 	LCUIWidget_AddTextView();
 	LCUIWidget_AddButton();
 	LCUIWidget_AddSideBar();
@@ -1662,4 +1632,5 @@ void LCUI_ExitWidget( void )
 	LCUIWidget_ExitEvent();
 	LCUIWidget_ExitTasks();
 	LCUIWidget_ExitPrototype();
+	LCUIWidget_ExitRenderer();
 }

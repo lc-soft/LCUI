@@ -122,7 +122,7 @@ void LCUIDisplay_Update( void )
 		}
 		Surface_Update( surface );
 		/* 收集无效区域记录 */
-		Widget_ProcInvalidArea( record->widget, &record->rects );
+		Widget_GetInvalidArea( record->widget, &record->rects );
 	}
 	if( display.mode == LCDM_SEAMLESS || !record ) {
 		return;

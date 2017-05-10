@@ -193,13 +193,8 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_WidgetData		data;			/**< 私有数据 */
 	Dict			*attributes;		/**< 属性记录 */
 	LCUI_WidgetPrototypeC	proto;			/**< 原型 */
-	LCUI_BOOL		enable_graph;		/**< 是否启用位图缓存 */
-	LCUI_Graph		graph;			/**< 位图缓存 */
 	LCUI_EventTrigger	trigger;		/**< 事件触发器 */
 	LCUI_WidgetTaskBoxRec	task;			/**< 任务记录 */
-	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
-	LCUI_BOOL		has_dirty_child;	/**< 子级部件是否有无效区域 */
-	LCUI_BOOL		layout_locked;		/**< 子级部件布局是否已锁定 */
 	LCUI_BOOL		event_blocked;		/**< 是否阻止自己和子级部件的事件处理 */
 	LCUI_BOOL		disabled;		/**< 是否禁用 */
 	LinkedListNode		node;			/**< 在部件链表中的结点 */
@@ -383,12 +378,6 @@ LCUI_API void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled );
 
 /** 计算部件的最大宽度 */
 LCUI_API float Widget_ComputeMaxWidth( LCUI_Widget w );
-
-/** 锁定子部件的布局，让 LCUI 不自动更新布局 */
-LCUI_API void Widget_LockLayout( LCUI_Widget w );
-
-/** 解除锁定子部件的布局 */
-LCUI_API void Widget_UnlockLayout( LCUI_Widget w );
 
 LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
 
