@@ -256,6 +256,8 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 	return 0;
 }
 
+#define ComputeActualPX(VAL) LCUIMetrics_ComputeActual( VAL, SVT_PX )
+
 void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LinkedListNode *node;
@@ -305,10 +307,10 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	content_left = w->box.padding.x - w->box.graph.x;
 	content_top = w->box.padding.y - w->box.graph.y;
 	/* 获取内容框 */
-	content_rect.x = roundi( content_left );
-	content_rect.y = roundi( content_top );
-	content_rect.width = roundi( w->box.padding.width );
-	content_rect.height = roundi( w->box.padding.height );
+	content_rect.x = ComputeActualPX( content_left );
+	content_rect.y = ComputeActualPX( content_top );
+	content_rect.width = ComputeActualPX( w->box.padding.width );
+	content_rect.height = ComputeActualPX( w->box.padding.height );
 	/* 获取内容框与脏矩形重叠的区域 */
 	has_overlay = LCUIRect_GetOverlayRect(
 		&content_rect, &paint->rect, &content_rect
@@ -324,8 +326,8 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	if( has_content_graph ) {
 		child_paint.with_alpha = TRUE;
 		content_graph.color_type = COLOR_TYPE_ARGB;
-		Graph_Create( &content_graph,
-			      content_rect.width, content_rect.height );
+		Graph_Create( &content_graph, content_rect.width,
+			      content_rect.height );
 	} else {
 		child_paint.with_alpha = paint->with_alpha;
 		/* 引用该区域的位图，作为内容框的位图 */
@@ -333,6 +335,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 	}
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
 	LinkedList_ForEachReverse( node, &w->children_show ) {
+		LCUI_RectF rect;
 		LCUI_Rect child_rect;
 		LCUI_Widget child = node->data;
 		if( !child->computed_style.visible || 
@@ -340,10 +343,11 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 			continue;
 		}
 		/* 转换子部件区域，由相对于内容框转换为相对于当前脏矩形 */
-		child_rect.x = roundi( child->box.graph.x + content_left );
-		child_rect.y = roundi( child->box.graph.y + content_top );
-		child_rect.width = roundi( child->box.graph.width );
-		child_rect.height = roundi( child->box.graph.height );
+		rect.x = child->box.graph.x + content_left;
+		rect.y = child->box.graph.y + content_top;
+		rect.width = child->box.graph.width;
+		rect.height = child->box.graph.height;
+		LCUIMetrics_ComputeRectActual( &child_rect, &rect );
 		child_rect.x -= paint->rect.x;
 		child_rect.y -= paint->rect.y;
 		/* 获取与内容框重叠的区域，作为子部件的绘制区域 */
@@ -362,7 +366,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		/* 将绘制区域转换为相对于子部件 */
 		child_paint.rect.x -= child_rect.x;
 		child_paint.rect.y -= child_rect.y;
-		DEBUG_MSG( "[%s]: canvas_rect:(%d,%d,%d,%d)\n", w->type,
+		_DEBUG_MSG( "[%s]: canvas_rect:(%d,%d,%d,%d)\n", w->type,
 			   canvas_rect.x, canvas_rect.y,
 			   canvas_rect.width, canvas_rect.height );
 		/* 在内容位图中引用所需的区域，作为子部件的画布 */

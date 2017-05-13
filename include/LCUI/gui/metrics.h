@@ -52,8 +52,14 @@ typedef enum LCUI_DensityLevel {
 /** 转换成单位为 px 的度量值 */
 LCUI_API float LCUIMetrics_Compute( float value, LCUI_StyleType type );
 
+/** 将矩形中的度量值的单位转换为 px */
+LCUI_API void LCUIMetrics_ComputeRectActual( LCUI_Rect *dst, const LCUI_RectF *src );
+
 /** 转换成单位为 px 的实际度量值 */
 LCUI_API int LCUIMetrics_ComputeActual( float value, LCUI_StyleType type );
+
+/** 获取当前的全局缩放比例 */
+LCUI_API float LCUIMetrics_GetScale( void );
 
 /** 设置密度 */
 LCUI_API void LCUIMetrics_SetDensity( float density );

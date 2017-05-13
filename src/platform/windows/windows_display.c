@@ -464,7 +464,6 @@ static void OnWMGetMinMaxInfo( LCUI_Event e, void *arg )
 	if( style->max_height >= 0 ) {
 		mminfo->ptMaxTrackSize.y = (LONG)style->max_height;
 	}
-
 }
 
 static void OnWMSize( LCUI_Event e, void *arg )

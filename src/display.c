@@ -132,12 +132,14 @@ void LCUIDisplay_Update( void )
 
 void LCUIDisplay_Render( void )
 {
+	float scale;
 	LinkedListNode *sn, *rn;
 	LCUI_PaintContext paint;
 
 	if( !display.is_working ) {
 		return;
 	}
+	scale = LCUIMetrics_GetScale();
 	/* 遍历当前的 surface 记录列表 */
 	for( LinkedList_Each( sn, &display.surfaces ) ) {
 		SurfaceRecord record = sn->data;
@@ -150,11 +152,17 @@ void LCUIDisplay_Render( void )
 		record->rendered = FALSE;
 		/* 在 surface 上逐个重绘无效区域 */
 		for( LinkedList_Each( rn, &record->rects ) ) {
-			paint = Surface_BeginPaint( surface, rn->data );
+			LCUI_Rect rect;
+			LCUI_Rect *r = rn->data;
+			rect.x = r->x * scale;
+			rect.y = r->y * scale;
+			rect.width = r->width * scale;
+			rect.height = r->height * scale;
+			paint = Surface_BeginPaint( surface, &rect );
 			if( !paint ) {
 				continue;
 			}
-			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
+			_DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
 				   record->widget->type,
 				   paint->rect.x, paint->rect.y,
 				   paint->rect.width, paint->rect.height );
@@ -254,28 +262,23 @@ LCUI_Surface LCUIDisplay_GetSurfaceByHandle( void *handle )
 /** 将 widget 与 sruface 进行绑定 */
 static void LCUIDisplay_BindSurface( LCUI_Widget widget )
 {
-	LCUI_RectF *rect;
+	LCUI_Rect rect;
 	SurfaceRecord record;
-	int width, height;
-
 	if( LCUIDisplay_GetBindSurface( widget ) ) {
 		return;
 	}
-	rect = &widget->box.graph;
 	record = NEW( SurfaceRecordRec, 1 );
 	record->surface = Surface_New();
 	record->widget = widget;
 	record->rendered = FALSE;
 	LinkedList_Init( &record->rects );
 	Surface_SetCaptionW( record->surface, widget->title );
+	LCUIMetrics_ComputeRectActual( &rect, &widget->box.graph );
 	if( widget->style->sheet[key_top].is_valid &&
 	    widget->style->sheet[key_left].is_valid ) {
-		Surface_Move( record->surface, roundi( rect->x ),
-			      roundi( rect->y ) );
+		Surface_Move( record->surface, rect.x, rect.y );
 	}
-	width = roundi( rect->width );
-	height = roundi( rect->height );
-	Surface_Resize( record->surface, width, height );
+	Surface_Resize( record->surface, rect.width, rect.height );
 	if( widget->computed_style.visible ) {
 		Surface_Show( record->surface );
 	} else {
@@ -398,15 +401,17 @@ void LCUIDisplay_HideRectBorder( void )
 /** 设置显示区域的尺寸，仅在窗口化、全屏模式下有效 */
 void LCUIDisplay_SetSize( int width, int height )
 {
+	float scale;
 	LCUI_Widget root;
 	LCUI_Surface surface;
 	if( display.mode == LCDM_SEAMLESS ) {
 		return;
 	}
 	root = LCUIWidget_GetRoot();
+	scale = LCUIMetrics_GetScale();
 	surface = LCUIDisplay_GetBindSurface( root );
 	Surface_Resize( surface, width, height );
-	Widget_Resize( root, (float)width, (float)height );
+	Widget_Resize( root, width / scale, height / scale );
 }
 
 int LCUIDisplay_GetWidth( void )
@@ -619,13 +624,15 @@ static void OnResize( LCUI_Event e, void *arg )
 {
 	LCUI_Widget widget;
 	LCUI_DisplayEvent dpy_ev = arg;
-	float width = (float)( dpy_ev->resize.width );
-	float height = (float)( dpy_ev->resize.height );
-	LOG( "[display] resize: (%.2f,%.2f)\n", width, height );
+	float scale = LCUIMetrics_GetScale();
+	float width = dpy_ev->resize.width / scale;
+	float height = dpy_ev->resize.height / scale;
 	widget = LCUIDisplay_GetBindWidget( dpy_ev->surface );
 	if( widget ) {
 		Widget_Resize( widget, width, height );
 	}
+	LOG( "[display] resize: (%d,%d)\n",
+	     dpy_ev->resize.width, dpy_ev->resize.height );
 }
 
 int LCUIDisplay_BindEvent( int event_id, 

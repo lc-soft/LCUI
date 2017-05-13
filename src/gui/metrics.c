@@ -65,6 +65,19 @@ int LCUIMetrics_ComputeActual( float value, LCUI_StyleType type )
 	return roundi( LCUIMetrics_Compute( value, type ) * metrics.scale );
 }
 
+void LCUIMetrics_ComputeRectActual( LCUI_Rect *dst, const LCUI_RectF *src )
+{
+	dst->x = LCUIMetrics_ComputeActual( src->x, SVT_PX );
+	dst->y = LCUIMetrics_ComputeActual( src->y, SVT_PX );
+	dst->width = LCUIMetrics_ComputeActual( src->width, SVT_PX );
+	dst->height = LCUIMetrics_ComputeActual( src->height, SVT_PX );
+}
+
+float LCUIMetrics_GetScale( void )
+{
+	return metrics.scale;
+}
+
 static float ComputeDensityByLevel( LCUI_DensityLevel level )
 {
 	float density = metrics.dpi / 96.0f;
