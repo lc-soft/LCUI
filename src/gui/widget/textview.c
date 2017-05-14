@@ -273,7 +273,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 				ts->has_pixel_size = TRUE;
 				break;
 			}
-			value = roundi( LCUIMetrics_Compute( s->value, s->type ) );
+			value = LCUIMetrics_ComputeActual( s->value, s->type );
 			ts->pixel_size = max( 12, value );
 			ts->has_pixel_size = TRUE;
 			break;
@@ -306,7 +306,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 			case SVT_SCALE:
 			case SVT_PX: break;
 			default:
-				s->val_px = LCUIMetrics_Compute( s->value, s->type );
+				s->val_px = LCUIMetrics_ComputeActual( s->value, s->type );
 				s->type = SVT_PX;
 				break;
 			}
@@ -347,9 +347,10 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LinkedListNode *node;
 	LCUI_TextView txt;
 	int width = 0, height = 0;
-	float max_width = 0, max_height = 0;
+	float scale, max_width = 0, max_height = 0;
 
 	LinkedList_Init( &rects );
+	scale = LCUIMetrics_GetScale();
 	txt = Widget_GetData( w, self.prototype );
 	if( !w->style->sheet[key_width].is_valid ||
 	    w->style->sheet[key_width].type == SVT_AUTO ) {
@@ -365,14 +366,15 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		max_height = w->box.content.height;
 	}
 	/* 将当前部件宽高作为文本层的固定宽高 */
-	width = roundi( w->box.content.width );
-	height = roundi( w->box.content.height );
+	width = LCUIMetrics_ComputeActual( w->box.content.width, SVT_PX );
+	height = LCUIMetrics_ComputeActual( w->box.content.height, SVT_PX );
 	TextLayer_SetFixedSize( txt->layer, width, height );
-	width = roundi( max_width );
-	height = roundi( max_height );
+	width = LCUIMetrics_ComputeActual( max_width, SVT_PX );
+	height = LCUIMetrics_ComputeActual( max_height, SVT_PX );
 	TextLayer_SetMaxSize( txt->layer, width, height );
 	TextLayer_Update( txt->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
+		LCUIRect_Scale( node->data, node->data, 1.0f / scale );
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
 	RectList_Clear( &rects );
@@ -411,34 +413,35 @@ static void TextView_OnDestroy( LCUI_Widget w )
 
 static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 {
+	float scale = LCUIMetrics_GetScale();
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	/*如果自身的宽度单位是百分比，且父级部件宽度为自适应 */
-	while( w->parent && w->style->sheet[key_width].type == SVT_SCALE &&
-	       w->parent->style->sheet[key_width].type == SVT_AUTO ) {
+	while( w->parent && Widget_CheckStyleType( w, key_width, scale ) &&
+	       Widget_CheckStyleType( w->parent, key_width, AUTO ) ) {
 		int fixed_w = txt->layer->fixed_width;
 		int fixed_h = txt->layer->fixed_height;
-		LCUI_Style sw = &w->parent->style->sheet[key_width];
-		if( sw->type == SVT_PX ) {
+		if( Widget_CheckStyleType( w->parent, key_width, px ) ) {
 			break;
 		}
 		/* 解除固定宽高设置，以计算最大宽高 */
 		TextLayer_SetFixedSize( txt->layer, 0, 0 );
 		TextLayer_Update( txt->layer, NULL );
-		*width = TextLayer_GetWidth( txt->layer ) * 1.0f;
-		*height = TextLayer_GetHeight( txt->layer ) * 1.0f;
+		*width = TextLayer_GetWidth( txt->layer ) / scale;
+		*height = TextLayer_GetHeight( txt->layer ) / scale;
 		/* 还原固定宽高设置 */
 		TextLayer_SetFixedSize( txt->layer, fixed_w, fixed_h );
 		TextLayer_Update( txt->layer, NULL );
 		return;
 	}
-	*width = TextLayer_GetWidth( txt->layer ) * 1.0f;
-	*height = TextLayer_GetHeight( txt->layer ) * 1.0f;
+	*width = TextLayer_GetWidth( txt->layer ) / scale;
+	*height = TextLayer_GetHeight( txt->layer ) / scale;
 }
 
 /** 私有的任务处理接口 */
 static void TextView_OnTask( LCUI_Widget w )
 {
 	int i;
+	float scale;
 	LinkedList rects;
 	LinkedListNode *node;
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
@@ -470,8 +473,10 @@ static void TextView_OnTask( LCUI_Widget w )
 	}
 	txt->tasks[i].is_valid = FALSE;
 	LinkedList_Init( &rects );
+	scale = LCUIMetrics_GetScale();
 	TextLayer_Update( txt->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
+		LCUIRect_Scale( node->data, node->data, 1.0f / scale );
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
 	RectList_Clear( &rects );
@@ -485,20 +490,22 @@ static void TextView_OnTask( LCUI_Widget w )
 /** 绘制 TextView 部件 */
 static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
-	LCUI_TextView txt;
-	LCUI_Pos layer_pos;
+	LCUI_Pos pos;
+	LCUI_RectF rectf;
 	LCUI_Rect content_rect, rect;
-	txt = Widget_GetData( w, self.prototype );
-	content_rect.width = roundi( w->box.content.width );
-	content_rect.height = roundi( w->box.content.height );
-	content_rect.x = roundi( w->box.content.x - w->box.graph.x );
-	content_rect.y = roundi( w->box.content.y - w->box.graph.y );
+	LCUI_TextView txt;
+
+	rectf = w->box.content;
+	rectf.x -= w->box.graph.x;
+	rectf.y -= w->box.graph.y;
+	LCUIMetrics_ComputeRectActual( &content_rect, &rectf );
 	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect );
-	layer_pos.x = content_rect.x - paint->rect.x;
-	layer_pos.y = content_rect.y - paint->rect.y;
+	pos.x = content_rect.x - paint->rect.x;
+	pos.y = content_rect.y - paint->rect.y;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_DrawToGraph( txt->layer, rect, layer_pos, &paint->canvas );
+	txt = Widget_GetData( w, self.prototype );
+	TextLayer_DrawToGraph( txt->layer, rect, pos, &paint->canvas );
 }
 
 /*-------------------------- End Private -----------------------------*/
