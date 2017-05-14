@@ -52,6 +52,9 @@ LCUI_BEGIN_HEADER
 /* 将数值转换成LCUI_Rect型结构体 */
 LCUI_API LCUI_Rect Rect( int x, int y, int w, int h );
 
+/** 按比例缩放矩形 */
+LCUI_API void LCUIRect_Scale( LCUI_Rect *dst, const LCUI_Rect *src, float scale );
+
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
 LCUI_API void LCUIRect_GetCutArea( int box_w, int box_h, 
 				   LCUI_Rect rect, LCUI_Rect *cut );

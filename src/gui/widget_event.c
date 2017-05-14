@@ -43,6 +43,7 @@
 #include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/ime.h>
 #include <LCUI/input.h>
@@ -736,11 +737,15 @@ int LCUIWidget_SetFocus( LCUI_Widget widget )
 /** 响应系统的鼠标移动事件，向目标部件投递相关鼠标事件 */
 static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 {
+	float scale;
 	LCUI_Pos pos;
 	LCUI_Widget target, w;
 	LCUI_WidgetEventRec ev = { 0 };
 	w = LCUIWidget_GetRoot();
 	LCUICursor_GetPos( &pos );
+	scale = LCUIMetrics_GetScale();
+	pos.x = roundi( pos.x / scale );
+	pos.y = roundi( pos.y / scale );
 	if( self.mouse_capturer ) {
 		target = self.mouse_capturer;
 	} else {
@@ -880,12 +885,16 @@ static void OnTextInput( LCUI_SysEvent e, void *arg )
 
 static void ConvertTouchPoint( LCUI_TouchPoint point )
 {
+	float scale;
 	switch( point->state ) {
 	case LCUI_TOUCHDOWN: point->state = WET_TOUCHDOWN; break;
 	case LCUI_TOUCHUP: point->state = WET_TOUCHUP; break;
 	case LCUI_TOUCHMOVE: point->state = WET_TOUCHMOVE; break;
 	default:break;
 	}
+	scale = LCUIMetrics_GetScale();
+	point->x = roundi( point->x / scale );
+	point->y = roundi( point->y / scale );
 }
 
 /** 分发触控事件给对应的部件 */

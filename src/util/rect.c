@@ -57,6 +57,14 @@ LCUI_Rect Rect( int x, int y, int w, int h )
 	return r;
 }
 
+void LCUIRect_Scale( LCUI_Rect *dst, const LCUI_Rect *src, float scale )
+{
+	dst->x = (int)( src->x * scale );
+	dst->y = (int)( src->y * scale );
+	dst->width = roundi( src->height * scale );
+	dst->height = roundi( src->height * scale );
+}
+
 void LCUIRect_GetCutArea( int box_w, int box_h,
 			  LCUI_Rect rect, LCUI_Rect *cut )
 {
