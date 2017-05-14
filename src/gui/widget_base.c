@@ -685,7 +685,7 @@ static void Widget_UpdateChildrenSize( LCUI_Widget w )
 	LinkedListNode *node;
 	for( LinkedList_Each( node, &w->children ) ) {
 		LCUI_Widget child = node->data;
-		LCUI_Style s = child->style->sheet;
+		LCUI_StyleSheet s = child->style;
 		if( child->computed_style.display == SV_BLOCK ) {
 			if( CheckStyleType( s, key_width, AUTO ) ||
 			    CheckStyleType( s, key_height, AUTO ) ) {
@@ -697,7 +697,8 @@ static void Widget_UpdateChildrenSize( LCUI_Widget w )
 			Widget_AddTask( child, WTT_RESIZE );
 		}
 		if( child->computed_style.position == SV_ABSOLUTE ) {
-			if( s[key_right].is_valid || s[key_bottom].is_valid ||
+			if( s->sheet[key_right].is_valid ||
+			    s->sheet[key_bottom].is_valid ||
 			    CheckStyleType( s, key_left, scale ) ||
 			    CheckStyleType( s, key_top, scale ) ) {
 				Widget_AddTask( child, WTT_POSITION );
@@ -729,8 +730,8 @@ void Widget_UpdatePosition( LCUI_Widget w )
 		Widget_ClearComputedSize( w );
 		Widget_UpdateChildrenSize( w );
 		/* 当部件尺寸是按百分比动态计算的时候需要重新计算尺寸 */
-		if( CheckStyleType( w->style->sheet, key_width, scale ) ||
-		    CheckStyleType( w->style->sheet, key_height, scale ) ) {
+		if( Widget_CheckStyleType( w, key_width, scale ) ||
+		    Widget_CheckStyleType( w, key_height, scale ) ) {
 			Widget_UpdateSize( w );
 		}
 	}
@@ -1173,8 +1174,8 @@ void Widget_UpdateSize( LCUI_Widget w )
 		Widget_UpdatePosition( w );
 	} else if( w->computed_style.position == SV_ABSOLUTE ) {
 		/* 如果是绝对定位，且指定了右间距或底间距 */
-		if( !CheckStyleValue( w->style->sheet, key_right, AUTO ) ||
-		    !CheckStyleValue( w->style->sheet, key_bottom, AUTO ) ) {
+		if( !Widget_CheckStyleValue( w, key_right, AUTO ) ||
+		    !Widget_CheckStyleValue( w, key_bottom, AUTO ) ) {
 			Widget_UpdatePosition( w );
 		}
 	}
