@@ -247,3 +247,8 @@ void LCUIWidget_Update( void )
 	while( Widget_Update( root ) && count++ < 5 );
 	LCUIWidget_ClearTrash();
 }
+
+void LCUIWidget_RefreshStyle( void )
+{
+	Widget_AddTaskForChildren( LCUIWidget_GetRoot(), WTT_REFRESH_STYLE );
+}

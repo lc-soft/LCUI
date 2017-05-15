@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css" src="test_scaling_support.css"/>
+  <ui>
+    <widget class="container">
+      <widget type="textview" class="text-box text-sp">font size: 18sp</widget>
+      <widget type="textview" class="text-box text-px">font size: 18px</widget>
+      <widget type="textview" class="text-box text-pt">font size: 12pt</widget>
+    </widget>
+    <widget type="textview" class="p">Density level: </widget>
+    <widget class="container">
+      <widget type="button" id="btn-density-small">Small</widget>
+      <widget type="button" id="btn-density-normal">Normal</widget>
+      <widget type="button" id="btn-density-large">Large</widget>
+      <widget type="button" id="btn-density-big">Big</widget>
+    </widget>
+    <widget type="textview" class="p">Scaled density level: </widget>
+    <widget class="container">
+      <widget type="button" id="btn-scaled-density-small">Small</widget>
+      <widget type="button" id="btn-scaled-density-normal">Normal</widget>
+      <widget type="button" id="btn-scaled-density-large">Large</widget>
+      <widget type="button" id="btn-scaled-density-big">Big</widget>
+    </widget>
+    <widget type="textview" class="p" id="debug-text">Scale level: </widget>
+    <widget class="container">
+      <widget type="button" id="btn-scale-small">Small</widget>
+      <widget type="button" id="btn-scale-normal">Normal</widget>
+      <widget type="button" id="btn-scale-large">Large</widget>
+      <widget type="button" id="btn-scale-big">Big</widget>
+    </widget>
+  </ui>
+</lcui-app>

@@ -21,6 +21,9 @@
 *.vspx
 *.vs
 *.res
+*.vcxproj.user
+build/windows/*/*.css
+build/windows/*/*.xml
 *~
 *.intermediate
 Debug
