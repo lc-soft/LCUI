@@ -536,15 +536,6 @@ static float ComputeYMetric( LCUI_Widget w, int key )
 	return LCUIMetrics_Compute( s->value, s->type );
 }
 
-static float ComputeSelfXMetric( LCUI_Widget w, int key )
-{
-	LCUI_Style s = &w->style->sheet[key];
-	if( s->type == SVT_SCALE ) {
-		return w->width * s->scale;
-	}
-	return LCUIMetrics_Compute( s->value, s->type );
-}
-
 static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
 {
 	if( !w->style->sheet[key].is_valid ) {
@@ -828,7 +819,6 @@ void Widget_UpdatePosition( LCUI_Widget w )
 static void Widget_UpdateGraphBox( LCUI_Widget w )
 {
 	LCUI_RectF *rg = &w->box.graph;
-	LCUI_BoxShadowStyle *shadow = &w->computed_style.shadow;
 	rg->x = w->x - Widget_GetBoxShadowOffsetX( w );
 	rg->y = w->y - Widget_GetBoxShadowOffsetY( w );
 	rg->width = Widget_GetGraphWidth( w );

@@ -45,12 +45,6 @@
 
 LCUI_BEGIN_HEADER
 
-/** 部件实际样式 */
-typedef struct LCUI_WidgetActualStyle {
-	int x, y;
-	int width, height;
-} LCUI_WidgetActualStyle;
-
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
 	LCUI_BOOL visible;			/**< 是否可见 */
@@ -186,7 +180,6 @@ typedef struct LCUI_WidgetRec_ {
 	LCUI_StyleSheet		custom_style;		/**< 自定义样式表 */
 	LCUI_StyleSheet		inherited_style;	/**< 通过继承得到的样式表 */
 	LCUI_WidgetStyle	computed_style;		/**< 已经计算的样式数据 */
-	LCUI_WidgetActualStyle	actual_style;		/**< 最终用于渲染的样式值 */
 	LCUI_Widget		parent;			/**< 父部件 */
 	LinkedList		children;		/**< 子部件 */
 	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */

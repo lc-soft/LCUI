@@ -166,7 +166,7 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		if( !w ) {
 			return PB_ERROR;
 		}
-		DEBUG_MSG("create widget: %p\n", w);
+		DEBUG_MSG( "create widget: %p\n", w );
 		Widget_Append( parent, w );
 		ctx->widget = w;
 		break;
@@ -175,8 +175,8 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 			return PB_NEXT;
 		}
 		parent->proto->settext( parent, (char*)node->content );
-		DEBUG_MSG("widget: %s, set text: %s\n", parent->type,
-			  (char*)node->content);
+		DEBUG_MSG( "widget: %s, set text: %s\n", parent->type,
+			(char*)node->content );
 		return PB_NEXT;
 	default: return PB_ERROR;
 	}
@@ -185,8 +185,8 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 			xmlFree( prop_val );
 		}
 		prop_val = (char*)xmlGetProp( node, prop->name );
-		if( PropNameIs("type") ) {
-			DEBUG_MSG("widget: %p, set type: %s\n", w, prop_val);
+		if( PropNameIs( "type" ) ) {
+			DEBUG_MSG( "widget: %p, set type: %s\n", w, prop_val );
 			w->proto = LCUIWidget_GetPrototype( prop_val );
 			if( w->proto && w->proto->init ) {
 				w->proto->init( w );
@@ -195,14 +195,12 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 				w->type = strdup2( prop_val );
 			}
 			continue;
-		}
-		else if( PropNameIs("id") ) {
-			DEBUG_MSG("widget: %p, set id: %s\n", w, prop_val);
+		} else if( PropNameIs( "id" ) ) {
+			DEBUG_MSG( "widget: %p, set id: %s\n", w, prop_val );
 			Widget_SetId( w, prop_val );
 			continue;
-		}
-		else if( PropNameIs("class") ) {
-			DEBUG_MSG("widget: %p, add class: %s\n", w, prop_val);
+		} else if( PropNameIs( "class" ) ) {
+			DEBUG_MSG( "widget: %p, add class: %s\n", w, prop_val );
 			Widget_AddClass( w, prop_val );
 			continue;
 		}

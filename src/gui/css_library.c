@@ -882,17 +882,18 @@ LCUI_Selector Selector( const char *selector )
 			}
 			/* 保存上个结点 */
 			rank = SelectorNode_Save( node, name, ni, type );
-			if( rank > 0 ) {
-				s->rank += rank;
-			} else {
-				_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
-					    selector, p - selector - ni );
-				SelectorNode_Delete( node );
-				node = NULL;
-			}
-			ni = 0;
 			is_saving = TRUE;
 			type = *p;
+			if( rank > 0 ) {
+				s->rank += rank;
+				ni = 0;
+				continue;
+			}
+			_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
+					selector, p - selector - ni );
+			SelectorNode_Delete( node );
+			node = NULL;
+			ni = 0;
 			continue;
 		case ' ':
 		case '\r':
