@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>. 
  * ***************************************************************************/
 
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/metrics.h>
@@ -77,7 +78,7 @@ static void Widget_ComputeBoxShadowStyle( LCUI_Widget w )
 			sd->x = ComputeXMetric( w, s );
 			break;
 		case key_box_shadow_y:
-			sd->y = ComputeXMetric( w, s );
+			sd->y = ComputeYMetric( w, s );
 			break;
 		case key_box_shadow_spread:
 			sd->spread = LCUIMetrics_Compute( s->value, s->type );

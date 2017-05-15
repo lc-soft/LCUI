@@ -120,8 +120,8 @@ void LCUIMetrics_SetDpi( float dpi )
 
 void LCUIMetrics_SetScale( float scale )
 {
-	scale = max( 0.5, scale );
-	scale = min( 5, scale );
+	scale = max( 0.5f, scale );
+	scale = min( 5.0f, scale );
 	metrics.scale = scale;
 }
 
