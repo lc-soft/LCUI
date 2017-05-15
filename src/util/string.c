@@ -288,14 +288,14 @@ int strsadd( char ***strlist, const char *str )
 		if( str[i] != ' ' ) {
 			continue;
 		}
-		if( i - 1 > head ) {
+		if( i > head ) {
 			strncpy( buff, &str[head], i - head );
 			buff[i - head] = 0;
 			count += strsaddone( strlist, buff );
 		}
 		head = i + 1;
 	}
-	if( i - 1 > head ) {
+	if( i > head ) {
 		strncpy( buff, &str[head], i - head );
 		buff[i - head] = 0;
 		count += strsaddone( strlist, buff );
