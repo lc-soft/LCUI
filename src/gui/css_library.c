@@ -1272,6 +1272,12 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 		case SVT_PX:
 			LOG( "%gpx", s->val_px );
 			break;
+		case SVT_DIP:
+			LOG( "%gdip", s->val_dip );
+			break;
+		case SVT_SP:
+			LOG( "%gsp", s->val_sp );
+			break;
 		case SVT_STRING:
 			LOG( "%s", s->val_string );
 			break;
@@ -1317,8 +1323,7 @@ static void LCUI_PrintStyleLink( StyleLink link, const char *selector )
 	for( LinkedList_Each( node, &link->styles ) ) {
 		StyleNode snode = node->data;
 		LOG( "\n[%s]\n", snode->space ? snode->space : "<none>" );
-		LOG( "[rank: %d]\n%s {\n", snode->rank, snode->selector );
-		LOG( "%s {\n", fullname );
+		LOG( "[rank: %d]\n", snode->rank, fullname );
 		LCUI_PrintStyleSheet( snode->sheet );
 		LOG("}\n");
 	}
