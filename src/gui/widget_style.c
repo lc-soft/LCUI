@@ -212,7 +212,6 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 	int i, key;
 	LCUI_Style s;
 	LCUI_StyleSheet ss;
-	LCUI_BOOL need_update_expend_style = FALSE;
 	TaskMap task_map[] = {
 		{ key_display_start, key_display_end, WTT_VISIBLE, TRUE },
 		{ key_opacity, key_opacity, WTT_OPACITY, TRUE },
@@ -237,16 +236,12 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 	StyleSheet_Merge( w->style, w->custom_style );
 	StyleSheet_Merge( w->style, w->inherited_style );
 	/* 对比两张样式表，确定哪些需要更新 */
-	for( key = 0; key < w->style->length; ++key ) {
+	for( key = 0; key < STYLE_KEY_TOTAL; ++key ) {
 		s = &w->style->sheet[key];
 		if( ss->sheet[key].is_valid == s->is_valid &&
 		    ss->sheet[key].type == s->type &&
 		    ss->sheet[key].value == s->value ) {
 			continue;
-		}
-		if( key >= STYLE_KEY_TOTAL ) {
-			need_update_expend_style = TRUE;
-			break;
 		}
 		for( i = 0; i < sizeof( task_map ) / sizeof( TaskMap ); ++i ) {
 			if( key >= task_map[i].start &&
@@ -259,7 +254,8 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 			}
 		}
 	}
-	if( need_update_expend_style && w->proto && w->proto->update ) {
+	if( w->proto && w->proto->update && 
+	    w->style->length > STYLE_KEY_TOTAL ) {
 		/* 扩展部分的样式交给该部件自己处理 */
 		w->proto->update( w );
 	}

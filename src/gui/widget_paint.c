@@ -366,7 +366,7 @@ void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 		/* 将绘制区域转换为相对于子部件 */
 		child_paint.rect.x -= child_rect.x;
 		child_paint.rect.y -= child_rect.y;
-		_DEBUG_MSG( "[%s]: canvas_rect:(%d,%d,%d,%d)\n", w->type,
+		DEBUG_MSG( "[%s]: canvas_rect:(%d,%d,%d,%d)\n", w->type,
 			   canvas_rect.x, canvas_rect.y,
 			   canvas_rect.width, canvas_rect.height );
 		/* 在内容位图中引用所需的区域，作为子部件的画布 */

@@ -352,8 +352,7 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LinkedList_Init( &rects );
 	scale = LCUIMetrics_GetScale();
 	txt = Widget_GetData( w, self.prototype );
-	if( !w->style->sheet[key_width].is_valid ||
-	    w->style->sheet[key_width].type == SVT_AUTO ) {
+	if( Widget_HasAutoWidth( w ) ) {
 		max_width = Widget_ComputeMaxWidth( w );
 		max_width -= w->computed_style.border.left.width;
 		max_width -= w->computed_style.border.right.width;
@@ -361,8 +360,7 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	} else {
 		max_width = w->box.content.width;
 	}
-	if( w->style->sheet[key_height].is_valid &&
-	    w->style->sheet[key_height].type != SVT_AUTO ) {
+	if( Widget_HasAutoStyle( w, key_height ) ) {
 		max_height = w->box.content.height;
 	}
 	/* 将当前部件宽高作为文本层的固定宽高 */
@@ -415,26 +413,29 @@ static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 {
 	float scale = LCUIMetrics_GetScale();
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
-	/*如果自身的宽度单位是百分比，且父级部件宽度为自适应 */
-	while( w->parent && Widget_CheckStyleType( w, key_width, scale ) &&
-	       Widget_CheckStyleType( w->parent, key_width, AUTO ) ) {
+	if( Widget_HasAutoWidth( w ) ) {
 		int fixed_w = txt->layer->fixed_width;
 		int fixed_h = txt->layer->fixed_height;
-		if( Widget_CheckStyleType( w->parent, key_width, px ) ) {
-			break;
-		}
 		/* 解除固定宽高设置，以计算最大宽高 */
-		TextLayer_SetFixedSize( txt->layer, 0, 0 );
+		TextLayer_SetFixedSize( txt->layer, (int)*width, 0 );
 		TextLayer_Update( txt->layer, NULL );
-		*width = TextLayer_GetWidth( txt->layer ) / scale;
-		*height = TextLayer_GetHeight( txt->layer ) / scale;
+		if( *width <= 0 ) {
+			*width = TextLayer_GetWidth( txt->layer ) / scale;
+		}
+		if( *height <= 0 ) {
+			*height = TextLayer_GetHeight( txt->layer ) / scale;
+		}
 		/* 还原固定宽高设置 */
 		TextLayer_SetFixedSize( txt->layer, fixed_w, fixed_h );
 		TextLayer_Update( txt->layer, NULL );
 		return;
 	}
-	*width = TextLayer_GetWidth( txt->layer ) / scale;
-	*height = TextLayer_GetHeight( txt->layer ) / scale;
+	if( *width <= 0 ) {
+		*width = TextLayer_GetWidth( txt->layer ) / scale;
+	}
+	if( *height <= 0 ) {
+		*height = TextLayer_GetHeight( txt->layer ) / scale;
+	}
 }
 
 /** 私有的任务处理接口 */

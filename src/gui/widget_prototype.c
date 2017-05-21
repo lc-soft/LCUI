@@ -102,6 +102,24 @@ LCUI_WidgetPrototype LCUIWidget_NewPrototype( const char *name,
 	return NULL;
 }
 
+LCUI_BOOL Widget_CheckType( LCUI_Widget w, const char *type )
+{
+	LCUI_WidgetPrototypeC proto;
+
+	if( ! w || !w->type ) {
+		return FALSE;
+	}
+	if( strcmp( w->type, type ) == 0 ) {
+		return TRUE;
+	}
+	for( proto = w->proto->proto; proto; proto = proto->proto ) {
+		if( strcmp( proto->name, type ) == 0 ) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 void *Widget_GetData( LCUI_Widget widget, LCUI_WidgetPrototype proto )
 {
 	uint_t i;

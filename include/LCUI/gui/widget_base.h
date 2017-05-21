@@ -198,6 +198,22 @@ typedef struct LCUI_WidgetRec_ {
 #define Widget_UnsetStyle(W, K) UnsetStyle((W)->custom_style, K)
 #define Widget_CheckStyleType(W, K, T) CheckStyleType((W)->style, K, T)
 #define Widget_CheckStyleValue(W, K, T) CheckStyleValue((W)->style, K, T)
+#define Widget_CheckStyleValid(W, K) W->style->sheet[K].is_valid
+
+#define Widget_HasAbsolutePosition(W) \
+((W)->computed_style.position == SV_ABSOLUTE)
+
+#define Widget_HasBlockDisplay(W) \
+((W)->computed_style.display == SV_BLOCK)
+
+#define Widget_HasInlineBlockDisplay(W) \
+((W)->computed_style.display == SV_INLINE_BLOCK)
+
+/** 部件是否有值为自动（默认）的样式 */
+LCUI_API LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key );
+
+/** 部件是否有能够自动调整的宽度 */
+LCUI_API LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w );
 
 /** 获取根级部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);

@@ -162,7 +162,7 @@ void LCUIDisplay_Render( void )
 			if( !paint ) {
 				continue;
 			}
-			_DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
+			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
 				   record->widget->type,
 				   paint->rect.x, paint->rect.y,
 				   paint->rect.width, paint->rect.height );
