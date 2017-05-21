@@ -47,6 +47,9 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 
+#define DEFAULT_FONT_SIZE	14
+#define MIN_FONT_SIZE		12
+
 enum TaskType {
 	TASK_SET_TEXT,
 	TASK_SET_AUTOWRAP,
@@ -56,7 +59,8 @@ enum TaskType {
 };
 
 typedef struct LCUI_TextViewRec_ {
-	LCUI_TextStyle style;
+	LCUI_TextStyle style;		/**< 文字样式 */
+	LCUI_Widget widget;		/**< 所属的部件 */
 	LCUI_BOOL has_content;		/**< 是否有设置 content 属性 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
 	LCUI_TextLayer layer;		/**< 文本图层 */
@@ -91,8 +95,11 @@ enum FontStyleType {
 	FS_OBLIQUE
 };
 
+typedef void (*StyleHandler)( LCUI_TextView, LCUI_Style );
+
 static struct LCUI_TextViewModule {
 	LCUI_WidgetPrototype prototype;
+	StyleHandler handlers[TOTAL_FONT_STYLE_KEY];
 	int keys[TOTAL_FONT_STYLE_KEY];
 } self;
 
@@ -239,104 +246,130 @@ static LCUI_StyleParserRec style_parsers[] = {
 	{ key_white_space, "white-space", OnParseStyleOption }
 };
 
+static void OnComputeFontSize( LCUI_TextView txt, LCUI_Style s )
+{
+	int size;
+	if( s->is_valid ) {
+		size = max( MIN_FONT_SIZE, s->value );
+		size = LCUIMetrics_ComputeActual( size, s->type );
+	} else {
+		size = LCUIMetrics_ComputeActual( DEFAULT_FONT_SIZE, SVT_PX );
+	}
+	txt->style.pixel_size = size;
+	txt->style.has_pixel_size = TRUE;
+}
+
+static void OnComputeColor( LCUI_TextView txt, LCUI_Style s )
+{
+	if( s->is_valid ) {
+		txt->style.fore_color = s->color;
+		txt->style.has_fore_color = TRUE;
+	} else {
+		txt->style.has_fore_color = FALSE;
+	}
+}
+
+static void OnComputeFontFamily( LCUI_TextView txt, LCUI_Style s )
+{
+	if( s->is_valid ) {
+		TextStyle_SetFont( &txt->style, s->string );
+	} else {
+		TextStyle_SetFont( &txt->style, NULL );
+	}
+}
+
+static void OnComputeFontStyle( LCUI_TextView txt, LCUI_Style s )
+{
+	txt->style.has_style = FALSE;
+	if( s->is_valid ) {
+		txt->style.style = s->value;
+		txt->style.has_style = TRUE;
+	}
+}
+
+static void OnComputeFontWeight( LCUI_TextView txt, LCUI_Style s )
+{
+	
+}
+
+static void OnComputeTextAlign( LCUI_TextView txt, LCUI_Style s )
+{
+	TextLayer_SetTextAlign( txt->layer, s->is_valid ? s->style : SV_LEFT );
+}
+
+static void OnComputeLineHeight( LCUI_TextView txt, LCUI_Style s )
+{
+	LCUI_StyleRec style;
+	if( !s->is_valid ) {
+		style.val_scale = 1.5;
+		style.type = SVT_SCALE;
+		style.is_valid = TRUE;
+		TextLayer_SetLineHeight( txt->layer, &style );
+		return;
+	}
+	if( s->type == SVT_SCALE || s->type == SVT_PX ) {
+		TextLayer_SetLineHeight( txt->layer, s );
+		return;
+	}
+	style.type = SVT_PX;
+	style.val_px = LCUIMetrics_ComputeActual( s->value, s->type );
+	TextLayer_SetLineHeight( txt->layer, &style );
+}
+
+static void OnComputeContent( LCUI_TextView txt, LCUI_Style s )
+{
+	if( s->is_valid ) {
+		txt->has_content = TRUE;
+		TextView_SetTextW( txt->widget, s->wstring );
+	} else if( txt->has_content ) {
+		txt->has_content = FALSE;
+		TextView_SetTextW( txt->widget, NULL );
+	}
+}
+
+static void OnComputeWhiteSpace( LCUI_TextView txt, LCUI_Style s )
+{
+	if( !s->is_valid || s->type != SVT_STYLE ) {
+		TextLayer_SetAutoWrap( txt->layer, TRUE );
+		return;
+	}
+	TextLayer_SetAutoWrap( txt->layer, s->style != SV_NOWRAP );
+}
+
+static void InitStyleHandlers( void )
+{
+	self.handlers[key_color] = OnComputeColor;
+	self.handlers[key_font_size] = OnComputeFontSize;
+	self.handlers[key_font_family] = OnComputeFontFamily;
+	self.handlers[key_font_style] = OnComputeFontStyle;
+	self.handlers[key_font_weight] = OnComputeFontWeight;
+	self.handlers[key_line_height] = OnComputeLineHeight;
+	self.handlers[key_text_align] = OnComputeTextAlign;
+	self.handlers[key_content] = OnComputeContent;
+	self.handlers[key_white_space] = OnComputeWhiteSpace;
+}
+
+static void InitStyleParsers( void )
+{
+	int i;
+	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
+		LCUI_StyleParser parser = &style_parsers[i];
+		self.keys[parser->key] = LCUI_AddStyleName( parser->name );
+		LCUI_AddCSSParser( parser );
+	}
+}
+
 static void TextView_UpdateStyle( LCUI_Widget w )
 {
-	int i, value;
-	LCUI_Style s;
+	int i;
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
-	LCUI_TextStyle *ts = &txt->style;
-	TextStyle_Init( ts );
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
 		if( self.keys[i] < 0 ) {
 			continue;
 		}
-		s = &w->style->sheet[self.keys[i]];
-		switch( i ) {
-		case key_color:
-			if( s->is_valid ) {
-				ts->fore_color = s->color;
-				ts->has_fore_color = TRUE;
-			} else {
-				ts->has_fore_color = FALSE;
-			}
-			break;
-		case key_font_family:
-			if( s->is_valid ) {
-				TextStyle_SetFont( &txt->style, s->string );
-			} else {
-				TextStyle_SetFont( &txt->style, NULL );
-			}
-			break;
-		case key_font_size:
-			if( !s->is_valid ) {
-				ts->pixel_size = 14;
-				ts->has_pixel_size = TRUE;
-				break;
-			}
-			value = LCUIMetrics_ComputeActual( s->value, s->type );
-			ts->pixel_size = max( 12, value );
-			ts->has_pixel_size = TRUE;
-			break;
-		case key_font_style:
-			ts->has_style = FALSE;
-			if( s->is_valid ) {
-				ts->style = s->value;
-				ts->has_style = TRUE;
-			}
-			break;
-		case key_font_weight:
-			break;
-		case key_text_align:
-			if( s->is_valid ) {
-				TextLayer_SetTextAlign( txt->layer, s->style );
-			} else {
-				TextLayer_SetTextAlign( txt->layer, SV_LEFT );
-			}
-			break;
-		case key_line_height:
-			if( !s->is_valid ) {
-				LCUI_StyleRec style;
-				style.val_scale = 1.5;
-				style.type = SVT_SCALE;
-				style.is_valid = TRUE;
-				TextLayer_SetLineHeight( txt->layer, &style );
-				break;
-			}
-			switch( s->type ) {
-			case SVT_SCALE:
-			case SVT_PX: break;
-			default:
-				s->val_px = LCUIMetrics_ComputeActual( s->value, s->type );
-				s->type = SVT_PX;
-				break;
-			}
-			TextLayer_SetLineHeight( txt->layer, s );
-			break;
-		case key_content:
-			if( s->is_valid ) {
-				txt->has_content = TRUE;
-				TextView_SetTextW( w, s->wstring );
-			} else {
-				if( txt->has_content ) {
-					txt->has_content = FALSE;
-					TextView_SetTextW( w, NULL );
-				}
-			}
-			break;
-		case key_white_space:
-			if( !s->is_valid || s->type != SVT_STYLE ) {
-				TextLayer_SetAutoWrap( txt->layer, TRUE );
-				break;
-			}
-			if( s->style == SV_NOWRAP ) {
-				TextLayer_SetAutoWrap( txt->layer, FALSE );
-			} else {
-				TextLayer_SetAutoWrap( txt->layer, TRUE );
-			}
-		default:break;
-		}
+		self.handlers[i]( txt, &w->style->sheet[self.keys[i]] );
 	}
-	TextLayer_SetTextStyle( txt->layer, ts );
+	TextLayer_SetTextStyle( txt->layer, &txt->style );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
 }
@@ -384,11 +417,12 @@ static void TextView_OnInit( LCUI_Widget w )
 {
 	int i;
 	LCUI_TextView txt;
-	txt = Widget_AddData( w, self.prototype, sizeof( LCUI_TextViewRec ) );
-	TextStyle_Init( &txt->style );
+	txt = Widget_AddData( w, self.prototype,
+			      sizeof( LCUI_TextViewRec ) );
 	for( i = 0; i < TASK_TOTAL; ++i ) {
 		txt->tasks[i].is_valid = FALSE;
 	}
+	txt->widget = w;
 	txt->has_content = FALSE;
 	/* 初始化文本图层 */
 	txt->layer = TextLayer_New();
@@ -398,6 +432,7 @@ static void TextView_OnInit( LCUI_Widget w )
 	/* 启用样式标签的支持 */
 	TextLayer_SetUsingStyleTags( txt->layer, TRUE );
 	Widget_BindEvent( w, "resize", TextView_OnResize, NULL, NULL );
+	TextStyle_Init( &txt->style );
 	LCUIMutex_Init( &txt->mutex );
 }
 
@@ -604,7 +639,6 @@ void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 /** 添加 TextView 部件类型 */
 void LCUIWidget_AddTextView( void )
 {
-	int i;
 	self.prototype = LCUIWidget_NewPrototype( "textview", NULL );
 	self.prototype->init = TextView_OnInit;
 	self.prototype->paint = TextView_OnPaint;
@@ -613,9 +647,6 @@ void LCUIWidget_AddTextView( void )
 	self.prototype->update = TextView_UpdateStyle;
 	self.prototype->settext = TextView_OnParseText;
 	self.prototype->runtask = TextView_OnTask;
-	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
-		LCUI_StyleParser parser = &style_parsers[i];
-		self.keys[parser->key] = LCUI_AddStyleName( parser->name );
-		LCUI_AddCSSParser( parser );
-	}
+	InitStyleParsers();
+	InitStyleHandlers();
 }
