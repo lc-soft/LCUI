@@ -531,7 +531,7 @@ static float ComputeYMetric( LCUI_Widget w, int key )
 		if( Widget_HasAbsolutePosition( w ) ) {
 			return w->parent->box.padding.height * s->scale;
 		}
-		return 0;
+		return w->parent->box.padding.height * s->scale;
 	}
 	return LCUIMetrics_Compute( s->value, s->type );
 }
@@ -613,7 +613,7 @@ void Widget_ExecUpdateZIndex( LCUI_Widget w )
 	LinkedListNode *cnode, *csnode, *snode;
 	LCUI_Style s = &w->style->sheet[key_z_index];
 	if( s->is_valid && s->type == SVT_VALUE ) {
-		z_index = s->value;
+		z_index = s->val_int;
 	} else {
 		z_index = 0;
 	}
@@ -882,8 +882,8 @@ static void Widget_ComputeContentSize( LCUI_Widget w,
 		}
 	}
 	/* 计算出来的尺寸是包含 padding-left 和 padding-top 的，因此需要减去它们 */
-	*out_width -= w->padding.left;
-	*out_height -= w->padding.top;
+	width -= w->padding.left;
+	height -= w->padding.top;
 	if( *out_width <= 0 ) {
 		*out_width = width;
 	}
@@ -908,7 +908,7 @@ LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w )
 float Widget_GetFillAvailableWidth( LCUI_Widget w )
 {
 	float width;
-	if( Widget_HasAutoWidth( w->parent ) ) {
+	if( !w->parent || Widget_HasAutoWidth( w->parent ) ) {
 		return 0;
 	}
 	width = Widget_ComputeMaxWidth( w );
@@ -946,8 +946,8 @@ static void Widget_ComputeSize( LCUI_Widget w )
 			width += bbox->left.width + bbox->right.width;
 		}
 		/* 如果该部件和父部件的宽度都是自适应 */
-		if( Widget_HasAutoWidth( w->parent ) && width > 0 &&
-		    !Widget_HasAbsolutePosition( w ) ) {
+		if( w->parent && Widget_HasAutoWidth( w->parent ) &&
+		    width > 0 && !Widget_HasAbsolutePosition( w ) ) {
 			/* 如果超出父部件的内容框宽度，则让父部件重新调整宽度 */
 			if( width > w->parent->box.content.width ) {
 				Widget_AddTask( w->parent, WTT_RESIZE );

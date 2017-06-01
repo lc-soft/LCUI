@@ -154,7 +154,6 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 	task.func = ExecLoadImage;
 	task.arg[0] = widget;
 	task.arg[1] = strdup2( path );
-	task.destroy_arg[1] = free;
 	LCUI_PostTask( &task );
 }
 
@@ -292,10 +291,10 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			height = bg->image.height;
 			break;
 		}
-		out->position.x = LCUIMetrics_Compute( x, SVT_PX );
-		out->position.y = LCUIMetrics_Compute( y, SVT_PX );
-		out->size.width = LCUIMetrics_Compute( width, SVT_PX );
-		out->size.height = LCUIMetrics_Compute( height, SVT_PX );
+		out->position.x = LCUIMetrics_ComputeActual( x, SVT_PX );
+		out->position.y = LCUIMetrics_ComputeActual( y, SVT_PX );
+		out->size.width = LCUIMetrics_ComputeActual( width, SVT_PX );
+		out->size.height = LCUIMetrics_ComputeActual( height, SVT_PX );
 	} else {
 		type = SVT_PX;
 		switch( type ) {
@@ -311,7 +310,7 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			type = bg->size.width.type;
 			break;
 		}
-		out->size.width = LCUIMetrics_Compute( width, type );
+		out->size.width = LCUIMetrics_ComputeActual( width, type );
 		type = SVT_PX;
 		switch( type ) {
 		case SVT_SCALE:
@@ -325,7 +324,7 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			height = bg->size.height.value;
 			break;
 		}
-		out->size.height = LCUIMetrics_Compute( height, type );
+		out->size.height = LCUIMetrics_ComputeActual( height, type );
 	}
 	/* 计算背景图的像素坐标 */
 	if( bg->position.using_value ) {
@@ -382,7 +381,7 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			type = bg->position.x.type;
 			break;
 		}
-		out->position.x = LCUIMetrics_Compute( x, type );
+		out->position.x = LCUIMetrics_ComputeActual( x, type );
 		type = SVT_PX;
 		switch( bg->position.y.type ) {
 		case SVT_SCALE:
@@ -397,7 +396,7 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			type = bg->position.y.type;
 			break;
 		}
-		out->position.y = LCUIMetrics_Compute( y, type );
+		out->position.y = LCUIMetrics_ComputeActual( y, type );
 	}
 	out->color = bg->color;
 	out->image = &bg->image;

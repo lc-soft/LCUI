@@ -125,7 +125,7 @@ LCUI_BOOL Widget_InvalidateArea( LCUI_Widget widget,
 	while( w && w->parent ) {
 		LCUIRectF_ValidateArea( &rectf, w->parent->box.padding.width,
 					w->parent->box.padding.height );
-		if( rectf.width < 0.5f || rectf.height < 0.5f ) {
+		if( rectf.width <= 0 || rectf.height <= 0 ) {
 			return FALSE;
 		}
 		if( mode != LCDM_SEAMLESS && w->parent == root ) {
