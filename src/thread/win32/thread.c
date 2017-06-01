@@ -94,17 +94,25 @@ int LCUIThread_Create( LCUI_Thread *tid, void( *func )(void*), void *arg )
 	*tid = ctx->tid;
 	return 0;
 }
-
 static LCUI_ThreadContext LCUIThread_Find( LCUI_Thread tid )
 {
 	LinkedListNode *node;
-	LCUI_ThreadContext ctx = NULL;
-	LCUIMutex_Lock( &self.mutex );
+	LCUI_ThreadContext ctx;
 	for( LinkedList_Each( node, &self.threads ) ) {
 		ctx = node->data;
 		if( ctx && ctx->tid == tid ) {
-			break;
+			return ctx;
 		}
+	}
+	return NULL;
+}
+static LCUI_ThreadContext LCUIThread_Get( LCUI_Thread tid )
+{
+	LCUI_ThreadContext ctx;
+	LCUIMutex_Lock( &self.mutex );
+	ctx = LCUIThread_Find( tid );
+	if( ctx ) {
+		LinkedList_Unlink( &self.threads, &ctx->node );
 	}
 	LCUIMutex_Unlock( &self.mutex );
 	return ctx;
@@ -112,9 +120,6 @@ static LCUI_ThreadContext LCUIThread_Find( LCUI_Thread tid )
 
 static void LCUIThread_Destroy( LCUI_ThreadContext ctx )
 {
-	LCUIMutex_Lock( &self.mutex );
-	LinkedList_Unlink( &self.threads, &ctx->node );
-	LCUIMutex_Unlock( &self.mutex );
 	CloseHandle( ctx->handle );
 	ctx->handle = NULL;
 	free( ctx );
@@ -130,7 +135,7 @@ void LCUIThread_Exit( void *retval )
 	LCUI_Thread tid;
 	LCUI_ThreadContext ctx;
 	tid = LCUIThread_SelfID();
-	ctx = LCUIThread_Find( tid );
+	ctx = LCUIThread_Get( tid );
 	if( !ctx ) {
 		return;
 	}
@@ -147,7 +152,7 @@ void LCUIThread_Cancel( LCUI_Thread tid )
 	abort();
 #else
 	LCUI_ThreadContext ctx;
-	ctx = LCUIThread_Find( tid );
+	ctx = LCUIThread_Get( tid );
 	if( ctx ) {
 		TerminateThread( ctx->handle, 0 );
 		LCUIThread_Destroy( ctx );
@@ -159,19 +164,26 @@ int LCUIThread_Join( LCUI_Thread thread, void **retval )
 {
 	DWORD code;
 	LCUI_ThreadContext ctx;
+	LCUIMutex_Lock( &self.mutex );
 	ctx = LCUIThread_Find( thread );
 	if( ctx == NULL ) {
+		LCUIMutex_Unlock( &self.mutex );
 		return -1;
 	}
 	ctx->has_waiter = TRUE;
+	LCUIMutex_Unlock( &self.mutex );
 	if( !GetExitCodeThread( ctx->handle, &code ) ) {
 		WaitForSingleObject( ctx->handle, 5000 );
+	}
+	ctx = LCUIThread_Get( thread );
+	if( ctx ) {
 		if( retval ) {
 			*retval = ctx->retval;
 		}
+		LCUIThread_Destroy( ctx );
+		return 0;
 	}
-	LCUIThread_Destroy( ctx );
-	return 0;
+	return -1;
 }
 
 #endif
