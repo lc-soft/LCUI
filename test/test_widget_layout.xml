@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css" src="test_widget_layout.css"/>
+  <ui>
+    <widget id="sidebar" type="textview" class="sidebar">sidebar</widget>
+    <widget class="body-wrapper">
+      <widget id="body" class="body">
+        <widget id="navbar" class="navbar">
+          <widget id="navbar-btn-1" type="textview" class="navbar-btn">Button 1</widget>
+        </widget>
+        <widget id="content" type="textview" class="content">
+          <widget id="picture" type="textview" class="picture">Picture</widget>
+          <widget id="overflow-box" class="overflow-box" type="textview">Overflow box</widget>
+          <widget id="offset-box" class="offset-box" type="textview">Offset box</widget>
+        </widget>
+        <widget id="alert" class="alert">
+          <widget class="alert-title" type="textview">Title</widget>
+          <widget id="alert-text" class="alert-text" type="textview">Simple message, Hello, world!</widget>
+        </widget>
+      </widget>
+    </widget>
+  </ui>
+</lcui-app>

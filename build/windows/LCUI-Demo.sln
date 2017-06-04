@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_scaling_support", "tes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_touch", "test_touch\test_touch.vcxproj", "{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_widget_layout", "test_widget_layout\test_widget_layout.vcxproj", "{F40D9FBF-8E13-4251-90F1-B8321163EA4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -57,6 +59,16 @@ Global
 		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Release|Win32.ActiveCfg = Release|Win32
 		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Release|Win32.Build.0 = Release|Win32
 		{E5E79245-9412-49C8-8FE7-3AF7A7111E2F}.Release|x64.ActiveCfg = Release|Win32
+		{F40D9FBF-8E13-4251-90F1-B8321163EA4D}.Debug|ARM.ActiveCfg = Debug|Win32
+		{F40D9FBF-8E13-4251-90F1-B8321163EA4D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F40D9FBF-8E13-4251-90F1-B8321163EA4D}.Debug|Win32.Build.0 = Debug|Win32
+		{F40D9FBF-8E13-4251-90F1-B8321163EA4D}.Debug|x64.ActiveCfg = Debug|x64
+		{F40D9FBF-8E13-4251-90F1-B8321163EA4D}.Debug|x64.Build.0 = Debug|x64
+		{F40D9FBF-8E13-4251-90F1-B8321163EA4D}.Release|ARM.ActiveCfg = Release|Win32
+		{F40D9FBF-8E13-4251-90F1-B8321163EA4D}.Release|Win32.ActiveCfg = Release|Win32
+		{F40D9FBF-8E13-4251-90F1-B8321163EA4D}.Release|Win32.Build.0 = Release|Win32
+		{F40D9FBF-8E13-4251-90F1-B8321163EA4D}.Release|x64.ActiveCfg = Release|x64
+		{F40D9FBF-8E13-4251-90F1-B8321163EA4D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
