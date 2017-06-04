@@ -1128,4 +1128,5 @@ void LCUIWidget_ExitEvent( void )
 	LinkedList_Clear( &self.event_mappings, DestroyEventMapping );
 	LCUIMutex_Unlock( &self.mutex );
 	LCUIMutex_Destroy( &self.mutex );
+	self.event_ids = NULL;
 }

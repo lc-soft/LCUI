@@ -734,7 +734,6 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	switch( position ) {
 	case SV_ABSOLUTE:
 		w->x = w->y = 0;
-		
 		if( Widget_CheckStyleValid( w, key_left ) ) {
 			w->x = w->computed_style.left;
 		} else if( Widget_CheckStyleValid( w, key_right ) ) {
@@ -756,9 +755,9 @@ void Widget_UpdatePosition( LCUI_Widget w )
 		break;
 	case SV_RELATIVE:
 		if( Widget_CheckStyleValid( w, key_left ) ) {
-			w->x -= w->computed_style.left;
+			w->x += w->computed_style.left;
 		} else if( Widget_CheckStyleValid( w, key_right ) ) {
-			w->x += w->computed_style.right;
+			w->x -= w->computed_style.right;
 		}
 		if( Widget_CheckStyleValid( w, key_top ) ) {
 			w->y += w->computed_style.top;
@@ -884,10 +883,10 @@ static void Widget_ComputeContentSize( LCUI_Widget w,
 	/* 计算出来的尺寸是包含 padding-left 和 padding-top 的，因此需要减去它们 */
 	width -= w->padding.left;
 	height -= w->padding.top;
-	if( *out_width <= 0 ) {
+	if( out_width && *out_width <= 0 ) {
 		*out_width = width;
 	}
-	if( *out_height <= 0 ) {
+	if( out_height && *out_height <= 0 ) {
 		*out_height = height;
 	}
 }
@@ -902,7 +901,41 @@ LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w )
 {
 	return Widget_HasAutoStyle( w, key_width ) && (
 		Widget_HasAbsolutePosition( w ) ||
+		Widget_HasAbsolutePosition( w->parent ) ||
 		Widget_HasInlineBlockDisplay( w ));
+}
+
+/** 根据当前部件的内外间距，获取调整后宽度 */
+static float Widget_GetAdjustedWidth( LCUI_Widget w, float width )
+{
+	/* 如果不是块级元素，或为绝对定位，则不根据内/外间距调整宽度 */
+	if( !Widget_HasBlockDisplay( w ) ||
+	    Widget_HasAbsolutePosition( w ) ) {
+		return width;
+	}
+	if( !Widget_HasAutoStyle( w, key_margin_left ) ) {
+		width -= w->margin.left;
+	}
+	if( !Widget_HasAutoStyle( w, key_margin_right ) ) {
+		width -= w->margin.right;
+	}
+	/* 如果不是按内容框调整尺寸的，则不根据内间距调整宽度 */
+	if( w->computed_style.box_sizing != SV_CONTENT_BOX ) {
+		return width;
+	}
+	if( !Widget_HasAutoStyle( w, key_padding_left ) ) {
+		width -= w->padding.left;
+	}
+	if( !Widget_HasAutoStyle( w, key_padding_right ) ) {
+		width -= w->padding.right;
+	}
+	if( !Widget_HasAutoStyle( w, key_border_left_width ) ) {
+		width -= w->computed_style.border.left.width;
+	}
+	if( !Widget_HasAutoStyle( w, key_border_right_width ) ) {
+		width -= w->computed_style.border.right.width;
+	}
+	return width;
 }
 
 float Widget_GetFillAvailableWidth( LCUI_Widget w )
@@ -912,8 +945,7 @@ float Widget_GetFillAvailableWidth( LCUI_Widget w )
 		return 0;
 	}
 	width = Widget_ComputeMaxWidth( w );
-	width -= w->margin.left + w->margin.right;
-	return width;
+	return Widget_GetAdjustedWidth( w, width );
 }
 
 /** 计算尺寸 */
@@ -922,12 +954,14 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	float width = 0, height = 0;
 	LCUI_RectF *box, *pbox = &w->box.padding;
 	LCUI_WidgetStyle *style = &w->computed_style;
-	LCUI_Style sw = &w->style->sheet[key_width];
-	LCUI_Style sh = &w->style->sheet[key_height];
 	LCUI_BorderStyle *bbox = &style->border;
 	width = ComputeXMetric( w, key_width );
 	height = ComputeYMetric( w, key_height );
+	if( Widget_HasClass( w, "overflow-box" ) ) {
+		_DEBUG_MSG( "width: %d\n", width );
+	}
 	while( width <= 0 && Widget_HasAutoStyle( w, key_width ) ) {
+		float content_width = 0;
 		if( Widget_HasBlockDisplay( w ) &&
 		    !Widget_HasAbsolutePosition( w ) ) {
 			width = Widget_GetFillAvailableWidth( w );
@@ -937,9 +971,9 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		}
 		if( w->proto && w->proto->autosize ) {
 			w->proto->autosize( w, &width, &height );
-		} else {
-			Widget_ComputeContentSize( w, &width, &height );
 		}
+		Widget_ComputeContentSize( w, &content_width, NULL );
+		width = max( width, content_width );
 		/* 转换为边框盒宽度 */
 		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
 			width += w->padding.left + w->padding.right;
@@ -948,21 +982,23 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		/* 如果该部件和父部件的宽度都是自适应 */
 		if( w->parent && Widget_HasAutoWidth( w->parent ) &&
 		    width > 0 && !Widget_HasAbsolutePosition( w ) ) {
-			/* 如果超出父部件的内容框宽度，则让父部件重新调整宽度 */
+			/* 如果超出父部件的内容框宽度则让父部件重新调整宽度 */
 			if( width > w->parent->box.content.width ) {
 				Widget_AddTask( w->parent, WTT_RESIZE );
 			} else if( Widget_HasBlockDisplay( w ) ) {
 				width = w->parent->box.content.width;
 			}
 		}
+		width = Widget_GetAdjustedWidth( w, width );
 		break;
 	}
 	while( height <= 0 && Widget_HasAutoStyle( w, key_height ) ) {
+		float content_height = 0;
 		if( w->proto && w->proto->autosize ) {
 			w->proto->autosize( w, &width, &height );
-		} else {
-			Widget_ComputeContentSize( w, &width, &height );
 		}
+		Widget_ComputeContentSize( w, NULL, &content_height );
+		height = max( height, content_height );
 		/* 转换为边框盒高度 */
 		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
 			height += w->padding.top + w->padding.bottom;
@@ -1399,33 +1435,24 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 	return 0;
 }
 
-float Widget_ComputeMaxWidth( LCUI_Widget w )
+float Widget_ComputeMaxWidth( LCUI_Widget widget )
 {
 	LCUI_Style s;
-	LCUI_Widget parent;
-	float scale = 1.0;
-	float width, padding = 0;
-	width = LCUIWidget.root->box.padding.width;
-	for( parent = w; parent->parent; parent = parent->parent ) {
-		s = &parent->style->sheet[key_width];
-		switch( s->type ) {
-		case SVT_PX:
-			width = s->val_px;
+	LCUI_Widget w;
+	float width = 0, padding = 0;
+	for( w = widget->parent; w && w->parent; w = w->parent ) {
+		s = &w->style->sheet[key_width];
+		padding += w->box.border.width - w->box.content.width;
+		if( Widget_CheckStyleType( w, key_width, px ) ||
+		    Widget_CheckStyleType( w, key_width, scale ) ) {
+			width = w->box.content.width;
 			break;
-		case SVT_SCALE:
-			scale *= s->val_scale;
-			if( parent == w ) {
-				break;
-			}
-			padding += parent->padding.left;
-			padding += parent->padding.right;
-		case SVT_AUTO:
-		default: continue;
 		}
-		break;
 	}
-	width = scale * width;
 	width -= padding;
+	if( Widget_HasAbsolutePosition( widget ) ) {
+		width += widget->padding.left + widget->padding.right;
+	}
 	if( width < 0 ) {
 		width = 0;
 	}
@@ -1614,10 +1641,20 @@ void LCUI_InitWidget( void )
 	Widget_SetTitleW( LCUIWidget.root, L"LCUI Display" );
 }
 
+static void LCUIWidget_DestroyRoot( void )
+{
+	Widget_ExecDestroy( LCUIWidget.root );
+}
+
 void LCUI_ExitWidget( void )
 {
-	LCUIWidget_ExitEvent();
 	LCUIWidget_ExitTasks();
+	LCUIWidget_DestroyRoot();
+	LCUIWidget_ExitEvent();
 	LCUIWidget_ExitPrototype();
 	LCUIWidget_ExitRenderer();
+	Dict_Release( LCUIWidget.ids );
+	LCUIMutex_Destroy( &LCUIWidget.mutex );
+	LCUIWidget.ids = NULL;
+	LCUIWidget.root = NULL;
 }

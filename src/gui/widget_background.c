@@ -207,7 +207,7 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 		case key_background_position:
 			if( s->is_valid && s->type != SVT_NONE ) {
 				bg->position.using_value = TRUE;
-				bg->position.value = s->value;
+				bg->position.value = s->val_style;
 			} else {
 				bg->position.using_value = FALSE;
 				bg->position.value = 0;
@@ -228,7 +228,7 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 		case key_background_size:
 			if( s->is_valid && s->type != SVT_NONE ) {
 				bg->size.using_value = TRUE;
-				bg->size.value = s->value;
+				bg->size.value = s->val_style;
 			} else {
 				bg->size.using_value = FALSE;
 				bg->size.value = 0;
