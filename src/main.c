@@ -82,7 +82,6 @@ typedef struct SysEventPackRec_ {
 
 /** LCUI 系统相关数据 */
 static struct LCUI_System {
-	LCUI_BOOL is_inited;		/**< 标志，指示LCUI是否初始化过 */
 	int state;			/**< 状态 */
 	int mode;			/**< LCUI的运行模式 */
 	unsigned long int main_tid;	/**< 主线程ID */
@@ -118,7 +117,7 @@ static void LCUI_InitEvent( void )
 /** 停用事件模块并进行清理 */
 static void LCUI_ExitEvent( void )
 {
-	if( !System.is_inited ) {
+	if( System.state != STATE_ACTIVE ) {
 		return;
 	}
 	LCUIMutex_Destroy( &System.event.mutex );
@@ -150,7 +149,7 @@ int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
 {
 	int ret;
 	SysEventHandler handler;
-	if( !System.is_inited ) {
+	if( System.state != STATE_ACTIVE ) {
 		return -1;
 	}
 	handler = NEW( SysEventHandlerRec, 1 );
@@ -167,7 +166,7 @@ int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
 int LCUI_UnbindEvent( int handler_id )
 {
 	int ret;
-	if( !System.is_inited ) {
+	if( System.state != STATE_ACTIVE ) {
 		return -1;
 	}
 	LCUIMutex_Lock( &System.event.mutex );
@@ -490,10 +489,9 @@ LCUI_BOOL LCUI_IsOnMainLoop( void )
 
 void LCUI_InitBase( void )
 {
-	if( System.is_inited ) {
+	if( System.state == STATE_ACTIVE ) {
 		return;
 	}
-	System.is_inited = TRUE;
 	System.state = STATE_ACTIVE;
 	System.main_tid = LCUIThread_SelfID();
 	LCUI_ShowCopyrightText();
@@ -552,5 +550,5 @@ int LCUI_Main( void )
 
 int LCUI_GetSelfVersion( char *out )
 {
-	return sprintf(out, "%s", LCUI_VERSION);
+	return sprintf( out, "%s", LCUI_VERSION );
 }
