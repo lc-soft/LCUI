@@ -686,5 +686,6 @@ int LCUI_ExitDisplay( void )
 	display.is_working = FALSE;
 	RectList_Clear( &display.rects );
 	LCUIDisplay_CleanSurfaces();
+	LCUI_DestroyDisplayDriver( display.driver );
 	return 0;
 }

@@ -138,6 +138,11 @@ static void WinSurface_Destroy( LCUI_Surface surface )
 	WinSurface_ExecDestroy( surface );
 }
 
+static void WinSurface_OnDestroy( void *data )
+{
+	WinSurface_ExecDestroy( data );
+}
+
 static void WinSurface_Close( LCUI_Surface surface )
 {
 	if( surface->hwnd ) {
@@ -540,6 +545,12 @@ LCUI_DisplayDriver LCUI_CreateWinDisplay( void )
 
 void LCUI_DestroyWinDisplay( LCUI_DisplayDriver driver )
 {
+	win.is_inited = FALSE;
+	LCUI_UnbindSysEvent( WM_SIZE, OnWMSize );
+	LCUI_UnbindSysEvent( WM_PAINT, OnWMPaint );
+	LCUI_UnbindSysEvent( WM_GETMINMAXINFO, OnWMGetMinMaxInfo );
+	LinkedList_ClearData( &win.surfaces, WinSurface_OnDestroy );
+	EventTrigger_Destroy( win.trigger );
 	free( driver );
 }
 

@@ -53,6 +53,7 @@ static struct WindowsDriver {
 	HINSTANCE main_instance;	/**< 主程序的资源句柄 */
 	HINSTANCE dll_instance;		/**< 动态库中的资源句柄 */
 	LCUI_EventTrigger trigger;
+	const wchar_t *class_name;
 } win;
 
 static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
@@ -153,15 +154,15 @@ void LCUI_PreInitWinApp( void *data )
 LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 {
 	WNDCLASSW wndclass;
-	wchar_t szAppName[] = L"LCUI";
 	ASSIGN( app, LCUI_AppDriver );
 
+	win.class_name = L"LCUI";
 	wndclass.cbClsExtra = 0;
 	wndclass.cbWndExtra = 0;
 	wndclass.hbrBackground = NULL;
 	wndclass.lpszMenuName = NULL;
 	wndclass.lpfnWndProc = WndProc;
-	wndclass.lpszClassName = szAppName;
+	wndclass.lpszClassName = win.class_name;
 	wndclass.hInstance = win.main_instance;
 	wndclass.style = CS_HREDRAW | CS_VREDRAW;
 	wndclass.hCursor = LoadCursor( NULL, IDC_ARROW );
@@ -171,7 +172,7 @@ LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 		wchar_t str[256];
 		swprintf( str, 255, __FUNCTIONW__
 			  L": error code: %d\n", GetLastError() );
-		MessageBoxW( NULL, str, szAppName, MB_ICONERROR );
+		MessageBoxW( NULL, str, win.class_name, MB_ICONERROR );
 		return NULL;
 	}
 	app->GetData = WIN_GetData;
@@ -185,6 +186,7 @@ LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 
 void LCUI_DestroyWinAppDriver( LCUI_AppDriver app )
 {
+	UnregisterClassW( win.class_name, win.main_instance );
 	EventTrigger_Destroy( win.trigger );
 	free( app );
 }
