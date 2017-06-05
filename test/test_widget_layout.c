@@ -122,10 +122,12 @@ static void LoggerHandlerW( const wchar_t *str )
 }
 #endif
 
+#ifdef PREVIEW_MODE
 static void run_test( void *arg1, void *arg2 )
 {
 	PRINT_TEST_RESULT( check_layout() );
 }
+#endif
 
 int test_widget_layout( void )
 {
