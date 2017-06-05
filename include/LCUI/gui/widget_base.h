@@ -387,8 +387,11 @@ LCUI_API LCUI_BOOL Widget_HasStatus( LCUI_Widget w, const char *status_name );
 /** 设置部件是否禁用 */
 LCUI_API void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled );
 
-/** 计算部件的最大可用宽度 */
+/** 计算部件的最大宽度 */
 LCUI_API float Widget_ComputeMaxWidth( LCUI_Widget w );
+
+/** 计算部件的最大可用宽度 */
+LCUI_API float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget );
 
 LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
 

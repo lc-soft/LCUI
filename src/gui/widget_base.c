@@ -944,7 +944,7 @@ float Widget_GetFillAvailableWidth( LCUI_Widget w )
 	if( !w->parent || Widget_HasAutoWidth( w->parent ) ) {
 		return 0;
 	}
-	width = Widget_ComputeMaxWidth( w );
+	width = Widget_ComputeMaxAvaliableWidth( w );
 	return Widget_GetAdjustedWidth( w, width );
 }
 
@@ -957,9 +957,6 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	LCUI_BorderStyle *bbox = &style->border;
 	width = ComputeXMetric( w, key_width );
 	height = ComputeYMetric( w, key_height );
-	if( Widget_HasClass( w, "overflow-box" ) ) {
-		_DEBUG_MSG( "width: %d\n", width );
-	}
 	while( width <= 0 && Widget_HasAutoStyle( w, key_width ) ) {
 		float content_width = 0;
 		if( Widget_HasBlockDisplay( w ) &&
@@ -1435,7 +1432,7 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 	return 0;
 }
 
-float Widget_ComputeMaxWidth( LCUI_Widget widget )
+float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 {
 	LCUI_Style s;
 	LCUI_Widget w;
@@ -1455,6 +1452,23 @@ float Widget_ComputeMaxWidth( LCUI_Widget widget )
 	}
 	if( width < 0 ) {
 		width = 0;
+	}
+	return width;
+}
+
+float Widget_ComputeMaxWidth( LCUI_Widget widget )
+{
+	float width;
+	if( Widget_HasAutoStyle( widget, key_width ) ) {
+		width = Widget_ComputeMaxAvaliableWidth( widget );
+	} else {
+		width = widget->width;
+	}
+	if( !Widget_HasAutoStyle( widget, key_max_width ) ) {
+		if( widget->computed_style.max_width > -1 &&
+		    width < widget->computed_style.max_width ) {
+			width = widget->computed_style.max_width;
+		}
 	}
 	return width;
 }
