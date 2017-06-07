@@ -436,12 +436,24 @@ static void TextView_OnInit( LCUI_Widget w )
 	LCUIMutex_Init( &txt->mutex );
 }
 
+static void TextView_ClearTasks( LCUI_Widget w )
+{
+	int i = TASK_SET_TEXT;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	if( txt->tasks[i].is_valid ) {
+		txt->tasks[i].is_valid = FALSE;
+		free( txt->tasks[i].text );
+		txt->tasks[i].text = NULL;
+	}
+}
+
 /** 释放 TextView 部件占用的资源 */
 static void TextView_OnDestroy( LCUI_Widget w )
 {
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	TextLayer_Destroy( txt->layer );
 	LCUIMutex_Unlock( &txt->mutex );
+	TextView_ClearTasks( w );
 }
 
 static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
@@ -489,6 +501,8 @@ static void TextView_OnTask( LCUI_Widget w )
 		txt->tasks[i].is_valid = FALSE;
 		TextLayer_SetTextW( txt->layer, txt->tasks[i].text, NULL );
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
+		free( txt->tasks[i].text );
+		txt->tasks[i].text = NULL;
 		LCUIMutex_Unlock( &txt->mutex );
 	}
 	i = TASK_SET_AUTOWRAP;

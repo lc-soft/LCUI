@@ -108,6 +108,17 @@ static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 	return NULL;
 }
 
+static void WinSurface_ClearTasks( LCUI_Surface surface )
+{
+	LCUI_SurfaceTask *t;
+	t = &surface->tasks[TASK_SET_CAPTION];
+	if( t->caption ) {
+		free( t->caption );
+		t->caption = NULL;
+	}
+	t->is_valid = FALSE;
+}
+
 static void WinSurface_ExecDestroy( LCUI_Surface surface )
 {
 	surface->width = 0;
@@ -130,6 +141,8 @@ static void WinSurface_ExecDestroy( LCUI_Surface surface )
 	surface->fb_bmp = NULL;
 	surface->hwnd = NULL;
 	Graph_Free( &surface->fb );
+	WinSurface_ClearTasks( surface );
+	free( surface );
 }
 
 static void WinSurface_Destroy( LCUI_Surface surface )
@@ -293,12 +306,12 @@ static void WinSurface_Hide( LCUI_Surface surface )
 
 static void WinSurface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 {
-	int len;
+	size_t len;
 	wchar_t *caption = NULL;
 
 	if( str ) {
-		len = wcslen(str) + 1;
-		caption = (wchar_t*)malloc(sizeof(wchar_t)*len);
+		len = wcslen( str ) + 1;
+		caption = (wchar_t*)malloc( sizeof( wchar_t )*len );
 		wcsncpy( caption, str, len );
 	}
 	if( surface->tasks[TASK_SET_CAPTION].is_valid
@@ -380,6 +393,7 @@ static void WinSurface_Update( LCUI_Surface surface )
 {
 	LCUI_SurfaceTask *t;
 	if( !surface->hwnd ) {
+		WinSurface_ClearTasks( surface );
 		return;
 	}
 	DEBUG_MSG("surface: %p\n", surface);
@@ -402,10 +416,6 @@ static void WinSurface_Update( LCUI_Surface surface )
 	t = &surface->tasks[TASK_SET_CAPTION];
 	if( t->is_valid ) {
 		SetWindowTextW( surface->hwnd, t->caption );
-		if( t->caption ) {
-			free( t->caption );
-			t->caption = NULL;
-		}
 	}
 	t->is_valid = FALSE;
 	t = &surface->tasks[TASK_SHOW];
@@ -419,6 +429,7 @@ static void WinSurface_Update( LCUI_Surface surface )
 		}
 	}
 	t->is_valid = FALSE;
+	WinSurface_ClearTasks( surface );
 }
 
 static void OnWMPaint( LCUI_Event e, void *arg )

@@ -213,22 +213,7 @@ static KeyNameGroupRec style_value_map[] = {
 
 static int LCUI_DirectAddStyleName( int key, const char *name )
 {
-	unsigned int *newkey;
-	char *newname = strdup2( name );
-	if( !newname ) {
-		return -ENOMEM;
-	}
-	newkey = malloc( sizeof(unsigned int) );
-	if( !newkey ) {
-		free( newname );
-		return -ENOMEM;
-	}
-	*newkey = key;
-	if( Dict_Add( library.names, newkey, newname ) == 0 ) {
-		return 0;
-	}
-	free( newname );
-	return -1;
+	return Dict_Add( library.names, &key, name );
 }
 
 int LCUI_SetStyleName( int key, const char *name )
@@ -1418,6 +1403,11 @@ static void DestroyStyleSheetCache( void *privdata, void *val )
 	StyleSheet_Delete( val );
 }
 
+static void *DupStyleName( void *privdata, void *val )
+{
+	return strdup2( val );
+}
+
 static void DestroyStyleName( void *privdata, void *val )
 {
 	free( val );
@@ -1455,11 +1445,12 @@ void LCUI_InitCSSLibrary( void )
 	cachedict.hashFunction = IntKeyDict_HashFunction;
 	cachedict.keyDestructor = IntKeyDict_KeyDestructor;
 	cachedict.valDestructor = DestroyStyleSheetCache;
-	cachedict.valDup = namedict.valDup = NULL;
+	cachedict.valDup = NULL;
 	namedict.keyDup = IntKeyDict_KeyDup;
 	namedict.keyCompare = IntKeyDict_KeyCompare;
 	namedict.hashFunction = IntKeyDict_HashFunction;
 	namedict.keyDestructor = IntKeyDict_KeyDestructor;
+	namedict.valDup = DupStyleName;
 	namedict.valDestructor = DestroyStyleName;
 	library.names = Dict_Create( &namedict, NULL );
 	library.cache = Dict_Create( &cachedict, NULL );

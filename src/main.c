@@ -117,9 +117,6 @@ static void LCUI_InitEvent( void )
 /** 停用事件模块并进行清理 */
 static void LCUI_ExitEvent( void )
 {
-	if( System.state != STATE_ACTIVE ) {
-		return;
-	}
 	LCUIMutex_Destroy( &System.event.mutex );
 	EventTrigger_Destroy( System.event.trigger );
 	System.event.trigger = NULL;
@@ -521,6 +518,7 @@ int LCUI_Destroy( void )
 	e.type = LCUI_QUIT;
 	LCUI_TriggerEvent( &e, NULL );
 	System.state = STATE_KILLED;
+	LCUI_ExitApp();
 	LCUI_ExitIME();
 	LCUI_ExitKeyboard();
 	LCUI_ExitCursor();
@@ -530,7 +528,6 @@ int LCUI_Destroy( void )
 	LCUI_ExitDisplay();
 	LCUI_ExitEvent();
 	LCUI_ExitMetrics();
-	LCUI_ExitApp();
 	return 0;
 }
 

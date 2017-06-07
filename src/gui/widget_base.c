@@ -301,9 +301,6 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
 	LinkedList_ClearData( &widget->children_show, NULL );
 	LinkedList_ClearData( &widget->children, Widget_OnDestroy );
-	if( widget->proto && widget->proto->destroy ) {
-		widget->proto->destroy( widget );
-	}
 	StyleSheet_Delete( widget->inherited_style );
 	StyleSheet_Delete( widget->custom_style );
 	StyleSheet_Delete( widget->style );
@@ -311,11 +308,7 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 		Widget_UpdateLayout( widget->parent );
 	}
 	Widget_SetId( widget, NULL );
-	if( widget->type && !widget->proto ) {
-		free( widget->type );
-		widget->type = NULL;
-	}
-	widget->proto = NULL;
+	Widget_ClearPrototype( widget );
 	if( widget->title ) {
 		free( widget->title );
 		widget->title = NULL;

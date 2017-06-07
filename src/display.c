@@ -81,6 +81,7 @@ static void OnDestroySurfaceRecord( void *data )
 {
 	SurfaceRecord record = data;
 	Surface_Close( record->surface );
+	LinkedList_Clear( &record->rects, free );
 	free( record );
 }
 

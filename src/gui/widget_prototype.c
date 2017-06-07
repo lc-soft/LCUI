@@ -151,3 +151,22 @@ void *Widget_AddData( LCUI_Widget widget,
 	widget->data.length += 1;
 	return data;
 }
+
+void Widget_ClearPrototype( LCUI_Widget widget )
+{
+	if( widget->proto && widget->proto->destroy ) {
+		widget->proto->destroy( widget );
+	}
+	while( widget->data.length > 0 ) {
+		widget->data.length -= 1;
+		free( widget->data.list[widget->data.length].data );
+	}
+	if( widget->data.list ) {
+		free( widget->data.list );
+	}
+	if( widget->type && !widget->proto ) {
+		free( widget->type );
+		widget->type = NULL;
+	}
+	widget->proto = NULL;
+}

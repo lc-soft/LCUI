@@ -109,7 +109,8 @@ static void WIN_ProcessEvents( void )
 static int WIN_BindSysEvent( int event_id, LCUI_EventFunc func,
 			     void *data, void(*destroy_data)(void*) )
 {
-	return EventTrigger_Bind( win.trigger, event_id, func, data, destroy_data );
+	return EventTrigger_Bind( win.trigger, event_id, func,
+				  data, destroy_data );
 }
 
 static int WIN_UnbindSysEvent( int event_id, LCUI_EventFunc func )

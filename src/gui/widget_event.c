@@ -120,6 +120,44 @@ static void DestroyEventMapping( void *data )
 	free( mapping );
 }
 
+static void DestroyWidgetEvent( LCUI_WidgetEvent e )
+{
+	switch( e->type ) {
+	case WET_TOUCH:
+		if( e->touch.points ) {
+			free( e->touch.points );
+		}
+		e->touch.points = NULL;
+		e->touch.n_points = 0;
+		break;
+	case WET_TEXTINPUT:
+		if( e->text.text ) {
+			free( e->text.text );
+		}
+		e->text.text = NULL;
+		e->text.length = 0;
+		break;
+	}
+}
+
+static void DirectDestroyWidgetEventPack( void *data )
+{
+	LCUI_WidgetEventPack pack = data;
+	if( pack->data && pack->destroy_data ) {
+		pack->destroy_data( pack->data );
+	}
+	DestroyWidgetEvent( &pack->event );
+	pack->data = NULL;
+	free( pack );
+}
+
+static void DestoryWidgetEventRecord( void *data )
+{
+	WidgetEventRecord record = data;
+	LinkedList_Clear( &record->records, DirectDestroyWidgetEventPack );
+	free( record );
+}
+
 static int CompareWidgetEventRecord( void *data, const void *keydata )
 {
 	WidgetEventRecord record = data;
@@ -244,38 +282,13 @@ static int CopyWidgetEvent( LCUI_WidgetEvent dst,
 	return 0;
 }
 
-static void DestroyWidgetEvent( LCUI_WidgetEvent e )
-{
-	switch( e->type ) {
-	case WET_TOUCH:
-		if( e->touch.points ) {
-			free( e->touch.points );
-		}
-		e->touch.points = NULL;
-		e->touch.n_points = 0;
-		break;
-	case WET_TEXTINPUT:
-		if( e->text.text ) {
-			free( e->text.text );
-		}
-		e->text.text = NULL;
-		e->text.length = 0;
-		break;
-	}
-}
-
 /** 销毁部件事件包 */
 static void DestroyWidgetEventPack( void *arg )
 {
 	LCUI_WidgetEventPack pack = arg;
 	/* 如果删除成功则说明有记录，需要销毁数据 */
 	if( Widget_DeleteEventRecord( pack->event.target, pack ) == 1 ) {
-		if( pack->data && pack->destroy_data ) {
-			pack->destroy_data( pack->data );
-		}
-		DestroyWidgetEvent( &pack->event );
-		pack->data = NULL;
-		free( pack );
+		DirectDestroyWidgetEventPack( pack );
 	}
 }
 
@@ -1109,6 +1122,7 @@ void LCUIWidget_InitEvent(void)
 	BindSysEvent( LCUI_TOUCH, OnTouch );
 	BindSysEvent( LCUI_TEXTINPUT, OnTextInput );
 	RBTree_OnCompare( &self.event_records, CompareWidgetEventRecord );
+	RBTree_OnDestroy( &self.event_records, DestoryWidgetEventRecord );
 	LinkedList_Init( &self.touch_capturers );
 }
 
