@@ -8,7 +8,7 @@
 int test_css_parser( void )
 {
 	int ret = 0;
-	LCUI_Widget box, btn, text;
+	LCUI_Widget root, box, btn, text;
 
 	LCUI_Init();
 	CHECK( box = LCUIBuilder_LoadFile( "test_css_parser.xml" ) );
@@ -16,6 +16,9 @@ int test_css_parser( void )
 		LCUI_Destroy();
 		return ret;
 	}
+	root = LCUIWidget_GetRoot();
+	Widget_Append( root, box );
+	Widget_Unwrap( box );
 	text = LCUIWidget_GetById( "test-textview" );
 	Widget_UpdateStyle( text, TRUE );
 	Widget_Update( text );

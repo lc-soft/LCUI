@@ -27,7 +27,25 @@ static int test_cmdsplit( void )
 	return ret;
 }
 
+int test_strs( void )
+{
+	int ret = 0;
+	char **strs = NULL;
+	strsadd( &strs, "first-child" );
+	strsadd( &strs, "last-child" );
+	CHECK( strshas( strs, "first-child" ) );
+	CHECK( strshas( strs, "last-child" ) );
+	CHECK( strsdel( &strs, "first-child" ) );
+	CHECK( !strshas( strs, "first-child" ) );
+	CHECK( strsadd( &strs, "first-child" ) );
+	freestrs( strs );
+	return ret;
+}
+
 int test_string( void )
 {
-	return test_cmdsplit();
+	int ret = 0;
+	ret += test_cmdsplit();
+	ret += test_strs();
+	return ret;
 }

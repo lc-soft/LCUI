@@ -16,7 +16,7 @@ static void LoggerHandlerW( const wchar_t *str )
 }
 #endif
 
-int main(void)
+int main( void )
 {
 	int ret = 0;
 #ifdef LCUI_BUILD_IN_WIN32

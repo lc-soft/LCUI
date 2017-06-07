@@ -261,21 +261,21 @@ static int strsaddone( char ***strlist, const char *str )
 	char **newlist;
 
 	if( !*strlist ) {
-		newlist = (char**)malloc( sizeof(char*) * 2 );
+		newlist = (char**)malloc( sizeof( char* ) * 2 );
 		goto check_done;
 	}
 	for( i = 0; (*strlist)[i]; ++i ) {
-		if( strcmp((*strlist)[i], str) == 0 ) {
+		if( strcmp( (*strlist)[i], str ) == 0 ) {
 			return 0;
 		}
 	}
-	newlist = (char**)realloc( *strlist, (i+2)*sizeof(char*) );
+	newlist = (char**)realloc( *strlist, (i + 2) * sizeof( char* ) );
 check_done:
 	if( !newlist ) {
 		return 0;
 	}
-	newlist[i] = strdup2(str);
-	newlist[i+1] = NULL;
+	newlist[i] = strdup2( str );
+	newlist[i + 1] = NULL;
 	*strlist = newlist;
 	return 1;
 }
