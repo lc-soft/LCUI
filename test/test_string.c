@@ -35,6 +35,7 @@ int test_strs( void )
 	strsadd( &strs, "last-child" );
 	CHECK( strshas( strs, "first-child" ) );
 	CHECK( strshas( strs, "last-child" ) );
+	CHECK( strsdel( &strs, "last-child" ) );
 	CHECK( strsdel( &strs, "first-child" ) );
 	CHECK( !strshas( strs, "first-child" ) );
 	CHECK( strsadd( &strs, "first-child" ) );

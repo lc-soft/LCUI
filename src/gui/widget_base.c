@@ -1658,6 +1658,7 @@ void LCUI_ExitWidget( void )
 	LCUIWidget_ExitTasks();
 	LCUIWidget_DestroyRoot();
 	LCUIWidget_ExitEvent();
+	LCUIWidget_ExitStyle();
 	LCUIWidget_ExitPrototype();
 	LCUIWidget_ExitRenderer();
 	Dict_Release( LCUIWidget.ids );

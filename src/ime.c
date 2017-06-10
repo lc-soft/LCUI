@@ -179,8 +179,11 @@ void LCUIIME_Switch( void )
 static void LCUIIME_OnDestroy( void *arg )
 {
 	LCUI_IME ime = arg;
+	if( self.ime == ime ) {
+		self.ime = NULL;
+	}
 	free( ime->name );
-	ime->name = NULL;
+	free( ime );
 }
 
 LCUI_BOOL LCUIIME_CheckCharKey( int key )

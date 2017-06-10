@@ -325,7 +325,8 @@ static int strsdelone( char ***strlist, const char *str )
 	if( !*strlist ) {
 		return 0;
 	}
-	for( pos = -1, i = 0; (*strlist)[i]; ++i ) {
+	for( len = 0; (*strlist)[len]; ++len );
+	for( pos = -1, i = 0; i < len; ++i ) {
 		if( strcmp( (*strlist)[i], str ) == 0 ) {
 			pos = i;
 			break;
@@ -334,22 +335,20 @@ static int strsdelone( char ***strlist, const char *str )
 	if( pos == -1 ) {
 		return 0;
 	}
-	for( ; (*strlist)[i]; ++i );
-	if( pos == 0 && i < 2 ) {
+	free( (*strlist)[pos] );
+	if( pos == 0 && len < 2 ) {
 		free( *strlist );
 		*strlist = NULL;
 		return 1;
 	}
-	len = i - 1;
-	newlist = (char**)malloc( i * sizeof(char*) );
+	newlist = (char**)malloc( len * sizeof( char* ) );
 	for( i = 0; i < pos; ++i ) {
 		newlist[i] = (*strlist)[i];
 	}
 	for( i = pos; i < len; ++i ) {
-		newlist[i] = (*strlist)[i+1];
+		newlist[i] = (*strlist)[i + 1];
 	}
-	newlist[i] = NULL;
-	free( (*strlist)[pos] );
+	newlist[len - 1] = NULL;
 	free( *strlist );
 	*strlist = newlist;
 	return 1;
