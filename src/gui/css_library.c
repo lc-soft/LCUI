@@ -1530,8 +1530,7 @@ void LCUI_InitCSSLibrary( void )
 	LinkedList_Init( &library.groups );
 	skn_end = style_name_map + LEN( style_name_map );
 	for( skn = style_name_map; skn < skn_end; ++skn ) {
-		int ret = LCUI_DirectAddStyleName( skn->key, skn->name );
-		_DEBUG_MSG( "ret: %d, key: %d, name: %s\n", ret, skn->key, skn->name );
+		LCUI_DirectAddStyleName( skn->key, skn->name );
 	}
 	skn_end = style_value_map + LEN( style_value_map );
 	for( skn = style_value_map; skn < skn_end; ++skn ) {
