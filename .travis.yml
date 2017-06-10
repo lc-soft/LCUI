@@ -1,8 +1,13 @@
+dist: trusty
 language: c
 
 compiler:
   - clang
   - gcc
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install valgrind libpng-dev libjpeg-dev libxml2-dev libfreetype6-dev libx11-dev -qq
 
 before_script: ./autogen.sh
 
@@ -12,6 +17,7 @@ script:
   - cd test
   - make
   - ./test
+  - valgrind --leak-check=full --error-exitcode=42 .libs/lt-test
 
 notifications:
   webhooks:
