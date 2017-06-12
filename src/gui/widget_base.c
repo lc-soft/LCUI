@@ -1430,7 +1430,7 @@ float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 	LCUI_Style s;
 	LCUI_Widget w;
 	float width = 0, padding = 0;
-	for( w = widget->parent; w && w->parent; w = w->parent ) {
+	for( w = widget->parent; w; w = w->parent ) {
 		s = &w->style->sheet[key_width];
 		padding += w->box.border.width - w->box.content.width;
 		if( Widget_CheckStyleType( w, key_width, px ) ||
