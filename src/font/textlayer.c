@@ -355,8 +355,9 @@ static void TextRowList_Destroy( TextRowList list )
 void TextLayer_Destroy( LCUI_TextLayer layer )
 {
 	RectList_Clear( &layer->dirty_rect );
-	Graph_Free( &layer->graph );
+	TextStyle_Destroy( &layer->text_style );
 	TextRowList_Destroy( &layer->rowlist );
+	Graph_Free( &layer->graph );
 	free( layer );
 }
 

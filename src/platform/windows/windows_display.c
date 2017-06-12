@@ -136,10 +136,11 @@ static void WinSurface_ExecDestroy( LCUI_Surface surface )
 			ReleaseDC( surface->hwnd, surface->hdc_client );
 		}
 	}
+	surface->hwnd = NULL;
+	surface->fb_bmp = NULL;
 	surface->hdc_fb = NULL;
 	surface->hdc_client = NULL;
-	surface->fb_bmp = NULL;
-	surface->hwnd = NULL;
+	surface->is_ready = FALSE;
 	Graph_Free( &surface->fb );
 	WinSurface_ClearTasks( surface );
 	free( surface );

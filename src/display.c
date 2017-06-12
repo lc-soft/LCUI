@@ -448,8 +448,18 @@ void Surface_Close( LCUI_Surface surface )
 
 void Surface_Destroy( LCUI_Surface surface )
 {
-	if( display.is_working ) {
-		display.driver->destroy( surface );
+	if( !display.is_working ) {
+		return;
+	}
+	LinkedListNode *node;
+	for( LinkedList_Each( node, &display.surfaces ) ) {
+		SurfaceRecord record = node->data;
+		if( record && record->surface == surface ) {
+			LinkedList_DeleteNode( &display.surfaces, node );
+			display.driver->destroy( surface );
+			free( record );
+			break;
+		}
 	}
 }
 

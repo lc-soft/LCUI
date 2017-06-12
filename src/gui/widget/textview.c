@@ -451,6 +451,7 @@ static void TextView_ClearTasks( LCUI_Widget w )
 static void TextView_OnDestroy( LCUI_Widget w )
 {
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	TextStyle_Destroy( &txt->style );
 	TextLayer_Destroy( txt->layer );
 	LCUIMutex_Unlock( &txt->mutex );
 	TextView_ClearTasks( w );
