@@ -47,9 +47,9 @@
 #include <LCUI/gui/widget.h>
 
 typedef struct ImageCacheRec_ {
-	int ref_count;
-	LCUI_Graph image;
 	char *path;
+	LCUI_Graph image;
+	LinkedList refs;
 } ImageCacheRec, *ImageCache;
 
 typedef struct ImageRefRec_{
@@ -57,21 +57,72 @@ typedef struct ImageRefRec_{
 	ImageCache cache;
 } ImageRefRec, *ImageRef;
 
-LCUI_BOOL is_inited = FALSE;
-RBTree images, refs;
+struct LCUI_WidgetBackgroundModule {
+	LCUI_BOOL is_inited;
+	DictType dtype;
+	Dict *images;
+	RBTree refs;
+} self;
 
-static void AddRef( LCUI_Widget widget, ImageCache cache )
+static void DestroyImageCache( ImageCache cache )
 {
-	RBTree_CustomInsert( &refs, widget, cache );
-	cache->ref_count += 1;
+	LinkedListNode *node;
+	while( node = LinkedList_GetNode( &cache->refs, 0 ) ) {
+		LCUI_Widget w = node->data;
+		RBTree_CustomErase( &self.refs, node->data );
+		Widget_UnsetStyle( w, key_background_image );
+		Graph_Init( &w->computed_style.background.image );
+		LinkedList_DeleteNode( &cache->refs, node );
+	}
+	Graph_Free( &cache->image );
+	free( cache->path );
+	cache->path = NULL;
+	free( cache );
 }
 
-static void DelRef( LCUI_Widget widget, ImageCache cache )
+static void ImageCacheDestructor( void *privdata, void *data )
 {
-	cache->ref_count -= 1;
-	RBTree_CustomErase( &refs, widget );
-	if( cache->ref_count <= 0 ) {
-		RBTree_CustomErase( &images, cache->path );
+	DestroyImageCache( data );
+}
+
+static void AddImageRef( LCUI_Widget widget, ImageCache cache )
+{
+	ASSIGN( ref, ImageRef );
+	ref->cache = cache;
+	ref->widget = widget;
+	RBTree_CustomInsert( &self.refs, widget, ref );
+	LinkedList_Append( &cache->refs, widget );
+}
+
+static ImageRef GetImageRef( LCUI_Widget widget )
+{
+	return RBTree_CustomGetData( &self.refs, widget );
+}
+
+static void DeleteImageRef( LCUI_Widget widget )
+{
+	ImageRef ref;
+	ImageCache cache;
+	LinkedListNode *node;
+	ref = GetImageRef( widget );
+	if( !ref ) {
+		return;
+	}
+	cache = ref->cache;
+	for( LinkedList_Each( node, &cache->refs ) ) {
+		LCUI_Widget w = node->data;
+		if( w != widget ) {
+			continue;
+		}
+		RBTree_CustomErase( &self.refs, node->data );
+		Widget_UnsetStyle( w, key_background_image );
+		Graph_Init( &w->computed_style.background.image );
+		LinkedList_DeleteNode( &cache->refs, node );
+		break;
+	}
+	RBTree_CustomErase( &self.refs, widget );
+	if( cache->refs.length < 1 ) {
+		Dict_Delete( self.images, cache->path );
 	}
 }
 
@@ -86,12 +137,15 @@ static void ExecLoadImage( void *arg1, void *arg2 )
 	if( LCUI_ReadImageFile( path, &image ) != 0 ) {
 		return;
 	}
-	cache = NEW(ImageCacheRec, 1);
-	cache->ref_count = 0;
+	cache = NEW( ImageCacheRec, 1 );
 	cache->image = image;
-	cache->path = path;
-	RBTree_CustomInsert( &images, path, cache );
-	AddRef( widget, cache );
+	cache->path = strdup( path );
+	LinkedList_Init( &cache->refs );
+	if( Dict_Add( self.images, cache->path, cache ) == 0 ) {
+		AddImageRef( widget, cache );
+	} else {
+		DestroyImageCache( cache );
+	}
 	Graph_Quote( &widget->computed_style.background.image,
 		     &cache->image, NULL );
 	Widget_AddTask( widget, WTT_BODY );
@@ -109,43 +163,28 @@ static int OnCompareWidget( void *data, const void *keydata )
 	return -1;
 }
 
-static int OnComparePath( void *data, const void *keydata )
-{
-	return strcmp(((ImageCache)data)->path, (const char*)keydata);
-}
-
-static void OnDestroyCache( void *arg )
-{
-	ImageCache cache = arg;
-	Graph_Free( &cache->image );
-	free( cache->path );
-	cache->path = NULL;
-}
-
 static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 {
+	ImageRef ref;
 	ImageCache cache;
-	LCUI_AppTaskRec task = {0};
+	LCUI_AppTaskRec task = { 0 };
 	LCUI_Style s = &widget->style->sheet[key_background_image];
 
-	if( !is_inited ) {
-		RBTree_Init( &images );
-		RBTree_Init( &refs );
-		RBTree_OnCompare( &refs, OnCompareWidget );
-		RBTree_OnCompare( &images, OnComparePath );
-		RBTree_OnDestroy( &refs, free );
-		RBTree_OnDestroy( &images, OnDestroyCache );
-		is_inited = TRUE;
+	if( !self.is_inited ) {
+		return;
 	}
-	if( s->is_valid && s->type == SVT_STRING ) {
-		cache = RBTree_CustomGetData( &images, s->string );
-		if( cache ) {
-			DelRef( widget, cache );
+	if( Widget_CheckStyleType( widget, key_background_image, string ) ) {
+		ref = GetImageRef( widget );
+		if( ref && strcmp( ref->cache->path, s->string ) == 0 ) {
+			return;
+		}
+		if( ref ) {
+			DeleteImageRef( widget );
 		}
 	}
-	cache = RBTree_CustomGetData( &images, path );
+	cache = Dict_FetchValue( self.images, path );
 	if( cache ) {
-		AddRef( widget, cache );
+		AddImageRef( widget, cache );
 		Graph_Quote( &widget->computed_style.background.image,
 			     &cache->image, NULL );
 		Widget_AddTask( widget, WTT_BODY );
@@ -158,6 +197,25 @@ static void AsyncLoadImage( LCUI_Widget widget, const char *path )
 	LCUI_PostTask( &task );
 }
 
+void LCUIWidget_InitImageLoader( void )
+{
+	RBTree_Init( &self.refs );
+	self.dtype = DictType_StringKey;
+	self.dtype.valDestructor = ImageCacheDestructor;
+	self.images = Dict_Create( &self.dtype, NULL );
+	RBTree_OnCompare( &self.refs, OnCompareWidget );
+	RBTree_OnDestroy( &self.refs, free );
+	self.is_inited = TRUE;
+}
+
+void LCUIWidget_ExitImageLoader( void )
+{
+	Dict_Release( self.images );
+	RBTree_Destroy( &self.refs );
+	self.images = NULL;
+	self.is_inited = FALSE;
+}
+
 void Widget_InitBackground( LCUI_Widget w )
 {
 	LCUI_BackgroundStyle *bg;
@@ -168,6 +226,15 @@ void Widget_InitBackground( LCUI_Widget w )
 	bg->size.value = SV_AUTO;
 	bg->position.using_value = TRUE;
 	bg->position.value = SV_AUTO;
+}
+
+void Widget_DestroyBackground( LCUI_Widget w )
+{
+	Widget_UnsetStyle( w, key_background_image );
+	Graph_Init( &w->computed_style.background.image );
+	if( Widget_CheckStyleType( w, key_background_image, string ) ) {
+		DeleteImageRef( w );
+	}
 }
 
 void Widget_UpdateBackground( LCUI_Widget widget )
@@ -193,15 +260,16 @@ void Widget_UpdateBackground( LCUI_Widget widget )
 				break;
 			}
 			switch( s->type ) {
+			case SVT_STRING:
+				AsyncLoadImage( widget, s->string );
+				break;
 			case SVT_IMAGE:
 				if( !s->image ) {
 					Graph_Init( &bg->image );
 					break;
 				}
 				Graph_Quote( &bg->image, s->image, NULL );
-				break;
-			case SVT_STRING:
-				AsyncLoadImage( widget, s->string );
+				DeleteImageRef( widget );
 			default: break;
 			}
 			break;

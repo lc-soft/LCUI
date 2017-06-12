@@ -296,6 +296,7 @@ void Widget_ExecDestroy( LCUI_Widget widget )
 	Widget_ReleaseMouseCapture( widget );
 	Widget_ReleaseTouchCapture( widget, -1 );
 	Widget_StopEventPropagation( widget );
+	Widget_DestroyBackground( widget );
 	LCUIWidget_ClearEventTarget( widget );
 	/* 先释放显示列表，后销毁部件列表，因为部件在这两个链表中的节点是和它共用
 	 * 一块内存空间的，销毁部件列表会把部件释放掉，所以把这个操作放在后面 */
@@ -1634,6 +1635,7 @@ void LCUI_InitWidget( void )
 	LCUIWidget_InitPrototype();
 	LCUIWidget_InitStyle();
 	LCUIWidget_InitRenderer();
+	LCUIWidget_InitImageLoader();
 	LCUIWidget_AddTextView();
 	LCUIWidget_AddButton();
 	LCUIWidget_AddSideBar();
@@ -1661,6 +1663,7 @@ void LCUI_ExitWidget( void )
 	LCUIWidget_ExitStyle();
 	LCUIWidget_ExitPrototype();
 	LCUIWidget_ExitRenderer();
+	LCUIWidget_ExitImageLoader();
 	Dict_Release( LCUIWidget.ids );
 	LCUIMutex_Destroy( &LCUIWidget.mutex );
 	LCUIWidget.ids = NULL;

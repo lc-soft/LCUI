@@ -258,8 +258,17 @@ LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 LCUI_API void Widget_GetOffset( LCUI_Widget w, LCUI_Widget parent,
 				float *offset_x, float *offset_y );
 
+/** 初始化图片加载器，用于加载部件背景图 */
+LCUI_API void LCUIWidget_InitImageLoader( void );
+
+/** 退出并销毁图片加载器 */
+LCUI_API void LCUIWidget_ExitImageLoader( void );
+
 /** 初始化部件背景样式 */
 LCUI_API void Widget_InitBackground( LCUI_Widget w );
+
+/** 销毁部件背景相关数据 */
+LCUI_API void Widget_DestroyBackground( LCUI_Widget w );
 
 /** 更新部件背景样式 */
 LCUI_API void Widget_UpdateBackground( LCUI_Widget widget );
