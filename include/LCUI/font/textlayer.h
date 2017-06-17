@@ -103,7 +103,7 @@ typedef struct LCUI_TextLayerRec_  {
         TextRowListRec rowlist;		/**< 文本行列表 */
         LCUI_TextStyle text_style;	/**< 文本全局样式 */
 	LinkedList style_cache;		/**< 样式缓存 */
-	LCUI_StyleRec line_height;	/**< 全局文本行高度 */
+	int line_height;		/**< 全局文本行高度 */
 	struct {
 		LCUI_BOOL update_bitmap;	/**< 更新文本的字体位图 */
 		LCUI_BOOL update_typeset;	/**< 重新对文本进行排版 */
@@ -246,7 +246,7 @@ LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer layer );
 LCUI_API void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle *style );
 
 /** 设置文本行的高度 */
-LCUI_API void TextLayer_SetLineHeight( LCUI_TextLayer layer, LCUI_Style val );
+LCUI_API void TextLayer_SetLineHeight( LCUI_TextLayer layer, int height );
 
 LCUI_END_HEADER
 

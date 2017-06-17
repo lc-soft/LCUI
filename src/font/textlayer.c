@@ -51,6 +51,7 @@ enum TextAddType {
 
 #define TextRowList_AddNewRow(ROWLIST) TextRowList_InsertNewRow(ROWLIST, (ROWLIST)->length)
 #define TextLayer_GetRow(layer, n) (n >= layer->rowlist.length) ? NULL:layer->rowlist.rows[n]
+#define GetDefaultLineHeight(H) roundi( H * 1.42857143 )
 
 /* 根据对齐方式，计算文本行的起始X轴位置 */
 static int TextLayer_GetRowStartX( LCUI_TextLayer layer, TextRow txtrow )
@@ -194,19 +195,10 @@ static void TextLayer_UpdateRowSize( LCUI_TextLayer layer, TextRow txtrow )
 			txtrow->text_height = txtchar->bitmap->advance.y;
 		}
 	}
-	txtrow->height = txtrow->text_height;
-	switch( layer->line_height.type ) {
-	case SVT_VALUE:
-		txtrow->height *= layer->line_height.value;
-	case SVT_SCALE:
-		txtrow->height = (int)(txtrow->height * layer->line_height.scale);
-		break;
-	case SVT_PX:
-		txtrow->height = roundi( layer->line_height.px );
-		break;
-	default:
-		txtrow->height = (int)(txtrow->height * 11.0 / 10.0 + 0.5);
-		break;
+	if( layer->line_height > -1 ) {
+		txtrow->height = layer->line_height;
+	} else {
+		txtrow->height = GetDefaultLineHeight( txtrow->height );
 	}
 }
 
@@ -314,6 +306,7 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->fixed_height = 0;
 	layer->new_offset_x = 0;
 	layer->new_offset_y = 0;
+	layer->line_height = -1;
 	layer->rowlist.length = 0;
 	layer->rowlist.rows = NULL;
 	layer->text_align = SV_LEFT;
@@ -321,8 +314,6 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->is_autowrap_mode = FALSE;
 	layer->is_mulitiline_mode = FALSE;
 	layer->is_using_style_tags = FALSE;
-	layer->line_height.scale = 1.428f;
-	layer->line_height.type = SVT_SCALE;
 	TextStyle_Init( &layer->text_style );
 	LinkedList_Init( &layer->style_cache );
 	layer->task.typeset_start_row = 0;
@@ -1363,9 +1354,9 @@ void TextLayer_SetTextAlign( LCUI_TextLayer layer, int align )
 }
 
 /** 设置文本行的高度 */
-void TextLayer_SetLineHeight( LCUI_TextLayer layer, LCUI_Style val )
+void TextLayer_SetLineHeight( LCUI_TextLayer layer, int height )
 {
-	layer->line_height = *val;
+	layer->line_height = height;
 	layer->task.update_typeset = TRUE;
 	layer->task.typeset_start_row = 0;
 }

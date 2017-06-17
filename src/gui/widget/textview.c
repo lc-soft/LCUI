@@ -49,6 +49,8 @@
 
 #define DEFAULT_FONT_SIZE	14
 #define MIN_FONT_SIZE		12
+#define LINE_HEIGHT_SCALE	1.42857143
+
 
 enum TaskType {
 	TASK_SET_TEXT,
@@ -299,21 +301,21 @@ static void OnComputeTextAlign( LCUI_TextView txt, LCUI_Style s )
 
 static void OnComputeLineHeight( LCUI_TextView txt, LCUI_Style s )
 {
-	LCUI_StyleRec style;
+	int h;
 	if( !s->is_valid ) {
-		style.val_scale = 1.5;
-		style.type = SVT_SCALE;
-		style.is_valid = TRUE;
-		TextLayer_SetLineHeight( txt->layer, &style );
+		h = roundi( txt->style.pixel_size * LINE_HEIGHT_SCALE );
+		TextLayer_SetLineHeight( txt->layer, h );
 		return;
 	}
-	if( s->type == SVT_SCALE || s->type == SVT_PX ) {
-		TextLayer_SetLineHeight( txt->layer, s );
-		return;
+	switch( s->type ) {
+	case SVT_SCALE:
+		h = roundi( txt->style.pixel_size * s->val_scale );
+		break;
+	default:
+		h = LCUIMetrics_ComputeActual( s->value, s->type );
+		break;
 	}
-	style.type = SVT_PX;
-	style.val_px = LCUIMetrics_ComputeActual( s->value, s->type );
-	TextLayer_SetLineHeight( txt->layer, &style );
+	TextLayer_SetLineHeight( txt->layer, h );
 }
 
 static void OnComputeContent( LCUI_TextView txt, LCUI_Style s )
@@ -611,10 +613,10 @@ static void TextView_OnParseText( LCUI_Widget w, const char *text )
 	TextView_SetText( w, text );
 }
 
-void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style val )
+void TextView_SetLineHeight( LCUI_Widget w, int height )
 {
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
-	TextLayer_SetLineHeight( txt->layer, val );
+	TextLayer_SetLineHeight( txt->layer, height );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
 }
