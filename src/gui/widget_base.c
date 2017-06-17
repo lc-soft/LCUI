@@ -1433,12 +1433,11 @@ float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 	float width = 0, padding = 0;
 	for( w = widget->parent; w; w = w->parent ) {
 		s = &w->style->sheet[key_width];
-		padding += w->box.border.width - w->box.content.width;
-		if( Widget_CheckStyleType( w, key_width, px ) ||
-		    Widget_CheckStyleType( w, key_width, scale ) ) {
+		if( !Widget_HasAutoWidth( w ) ) {
 			width = w->box.content.width;
 			break;
 		}
+		padding += w->box.border.width - w->box.content.width;
 	}
 	width -= padding;
 	if( Widget_HasAbsolutePosition( widget ) ) {
