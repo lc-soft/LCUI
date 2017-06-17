@@ -216,7 +216,6 @@ static void StartInertialScrolling( LCUI_Widget w )
 static void Slider_OnMouseMove( LCUI_Widget slider, 
 				LCUI_WidgetEvent e, void *arg )
 {
-	LCUI_Pos pos;
 	LCUI_Widget layer;
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar;
@@ -227,11 +226,10 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 		return;
 	}
 	layer = scrollbar->layer;
-	LCUICursor_GetPos( &pos );
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
 		y = 0;
 		x = scrollbar->slider_x;
-		x += pos.x - scrollbar->mouse_x;
+		x += e->motion.x - scrollbar->mouse_x;
 		if( scrollbar->box ) {
 			box_size = scrollbar->box->box.content.width;
 		} else {
@@ -256,7 +254,7 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 	} else {
 		x = 0;
 		y = scrollbar->slider_y;
-		y += pos.y - scrollbar->mouse_y;
+		y += e->motion.y - scrollbar->mouse_y;
 		if( scrollbar->box ) {
 			box_size = scrollbar->box->box.content.height;
 		} else {
