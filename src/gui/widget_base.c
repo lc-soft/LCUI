@@ -525,7 +525,7 @@ static float ComputeYMetric( LCUI_Widget w, int key )
 		if( Widget_HasAbsolutePosition( w ) ) {
 			return w->parent->box.padding.height * s->scale;
 		}
-		return w->parent->box.padding.height * s->scale;
+		return w->parent->box.content.height * s->scale;
 	}
 	return LCUIMetrics_Compute( s->value, s->type );
 }
@@ -1584,8 +1584,8 @@ static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix 
 			strcat( str, "┬" );
 		}
 		snode = Widget_GetSelectorNode( child );
-		LOG( "%s%s %s, xy:(%.2f,%.2f), size:(%.2f,%.2f), "
-		     "visible: %s, padding: (%.2f,%.2f,%.2f,%.2f), margin: (%.2f,%.2f,%.2f,%.2f)\n",
+		LOG( "%s%s %s, xy:(%g,%g), size:(%g,%g), "
+		     "visible: %s, padding: (%g,%g,%g,%g), margin: (%g,%g,%g,%g)\n",
 		     prefix, str, snode->fullname, child->x, child->y,
 		     child->width, child->height,
 		     child->computed_style.visible ? "true" : "false",
@@ -1602,7 +1602,7 @@ void Widget_PrintTree( LCUI_Widget w )
 	LCUI_SelectorNode node;
 	w = w ? w : LCUIWidget.root;
 	node = Widget_GetSelectorNode( w );
-	LOG( "%s, xy:(%.2f,%.2f), size:(%.2f,%.2f), visible: %s\n",
+	LOG( "%s, xy:(%g,%g), size:(%g,%g), visible: %s\n",
 	     node->fullname, w->x, w->y, w->width, w->height,
 	     w->computed_style.visible ? "true" : "false" );
 	SelectorNode_Delete( node );
