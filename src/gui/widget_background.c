@@ -67,7 +67,7 @@ struct LCUI_WidgetBackgroundModule {
 static void DestroyImageCache( ImageCache cache )
 {
 	LinkedListNode *node;
-	while( node = LinkedList_GetNode( &cache->refs, 0 ) ) {
+	while( (node = LinkedList_GetNode( &cache->refs, 0 )) ) {
 		LCUI_Widget w = node->data;
 		RBTree_CustomErase( &self.refs, node->data );
 		Widget_UnsetStyle( w, key_background_image );

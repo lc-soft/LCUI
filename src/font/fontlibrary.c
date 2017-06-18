@@ -174,6 +174,55 @@ static LCUI_Font* LCUIFont_GetById( int id )
 	return SelectFontCache(id);
 }
 
+size_t LCUIFont_GetIdByNames( int **font_ids, const char *style,
+			      const char *names )
+{
+	int *ids;
+	char name[256];
+	const char *p;
+	size_t count, i;
+
+	*font_ids = NULL;
+	if( !names ) {
+		return 0;
+	}
+	for( p = names, count = 1; *p; ++p ) {
+		if( *p == ',' ) {
+			++count;
+		}
+	}
+	if( p - names == 0 ) {
+		return 0;
+	}
+	ids = NEW( int, count + 1 );
+	if( !ids ) {
+		return 0;
+	}
+	ids[count] = -1;
+	for( p = names, count = 0, i = 0; ; ++p ) {
+		if( *p != ',' && *p ) {
+			name[i++] = *p;
+			continue;
+		}
+		name[i] = 0;
+		strtrim( name, name, "'\"\n\r\t " );
+		ids[count] = LCUIFont_GetId( name, style );
+		if( ids[count] > 0 ) {
+			++count;
+		}
+		i = 0;
+		if( !*p ) {
+			break;
+		}
+	}
+	if( count < 1 ) {
+		free( ids );
+		ids = NULL;
+	}
+	*font_ids = ids;
+	return count;
+}
+
 int LCUIFont_GetId( const char *family_name, const char *style_name )
 {
 	LinkedListNode *node;

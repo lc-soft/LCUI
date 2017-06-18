@@ -13,6 +13,7 @@ widget_border.c		\
 widget_shadow.c		\
 css_parser.c		\
 css_library.c		\
+css_fontstyle.c		\
 builder.c		\
 metrics.c		\
 widget/textview.c	\

@@ -45,6 +45,7 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/css_library.h>
+#include <LCUI/gui/css_fontstyle.h>
 
 typedef struct {
 	int start, end, task;
@@ -266,11 +267,13 @@ void LCUIWidget_InitStyle( void )
 {
 	LCUI_InitCSSLibrary();
 	LCUI_InitCSSParser();
+	LCUI_InitCSSFontStyle();
 	LCUI_LoadCSSString( global_css, NULL );
 }
 
 void LCUIWidget_ExitStyle( void )
 {
+	LCUI_ExitCSSFontStyle();
 	LCUI_ExitCSSLibrary();
 	LCUI_ExitCSSParser();
 }

@@ -45,12 +45,8 @@
 #include <LCUI/font.h>
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
+#include <LCUI/gui/css_fontstyle.h>
 #include <LCUI/gui/widget/textview.h>
-
-#define DEFAULT_FONT_SIZE	14
-#define MIN_FONT_SIZE		12
-#define LINE_HEIGHT_SCALE	1.42857143
-
 
 enum TaskType {
 	TASK_SET_TEXT,
@@ -61,11 +57,11 @@ enum TaskType {
 };
 
 typedef struct LCUI_TextViewRec_ {
-	LCUI_TextStyle style;		/**< 文字样式 */
 	LCUI_Widget widget;		/**< 所属的部件 */
 	LCUI_BOOL has_content;		/**< 是否有设置 content 属性 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
 	LCUI_TextLayer layer;		/**< 文本图层 */
+	LCUI_FontStyleRec style;	/**< 文字样式 */
 	struct {
 		LCUI_BOOL is_valid;
 		union {
@@ -78,302 +74,64 @@ typedef struct LCUI_TextViewRec_ {
 
 /*---------------------------- Private -------------------------------*/
 
-enum FontStyleKey {
-	key_color,
-	key_font_size,
-	key_font_style,
-	key_font_weight,
-	key_font_family,
-	key_line_height,
-	key_text_align,
-	key_content,
-	key_white_space,
-	TOTAL_FONT_STYLE_KEY
-};
-
-enum FontStyleType {
-	FS_NORMAL,
-	FS_ITALIC,
-	FS_OBLIQUE
-};
-
-typedef void (*StyleHandler)( LCUI_TextView, LCUI_Style );
-
 static struct LCUI_TextViewModule {
 	LCUI_WidgetPrototype prototype;
-	StyleHandler handlers[TOTAL_FONT_STYLE_KEY];
-	int keys[TOTAL_FONT_STYLE_KEY];
 } self;
-
-static int unescape( const wchar_t *instr, wchar_t *outstr )
+static void TextView_OnParseText( LCUI_Widget w, const char *text )
 {
-	int i = -1;
-	wchar_t buff[6];
-	wchar_t *pout = outstr;
-	const wchar_t *pin = instr;
-
-	for( ; *pin; ++pin ) {
-		if( i >= 0 ) {
-			buff[i++] = *pin;
-			if( i >= 4 ) {
-				buff[i] = 0;
-				swscanf( buff, L"%hx", pout );
-				++pout;
-				i = -1;
-			}
-			continue;
-		}
-		if( *pin == L'\\' ) {
-			i = 0;
-			continue;
-		}
-		*pout++ = *pin;
-	}
-	if( i >= 4 ) {
-		buff[i] = 0;
-		swscanf( buff, L"%hx", pout );
-		++pout;
-	}
-	*pout = 0;
-	return pout - outstr;
+	TextView_SetText( w, text );
 }
 
-static int OnParseContent( LCUI_StyleSheet ss, int key, const char *str )
+static void TextView_SetTaskForLineHeight( LCUI_Widget w, int height )
 {
-	int i;
-	wchar_t *content;
-	size_t len = strlen( str ) + 1;
-	content = malloc( len * sizeof( wchar_t ) );
-	LCUI_DecodeString( content, str, (int)len, ENCODING_UTF8 );
-	if( content[0] == '"' ) {
-		for( i = 0; content[i + 1]; ++i ) {
-			content[i] = content[i + 1];
-		}
-		if( content[i - 1] != '"' ) {
-			free( content );
-			return -1;
-		}
-		content[i - 1] = 0;
-	}
-	unescape( content, content );
-	SetStyle( ss, self.keys[key], content, wstring );
-	return 0;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	TextLayer_SetLineHeight( txt->layer, height );
+	txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
 }
 
-static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
+static void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 {
-	LCUI_Style s = &ss->sheet[self.keys[key]];
-	if( ParseColor( s, str ) ) {
-		return 0;
-	}
-	return -1;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	TextLayer_SetTextStyle( txt->layer, style );
+	txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
 }
 
-static int OnParseFontSize( LCUI_StyleSheet ss, int key, const char *str )
+static void TextView_SetTaskForTextAlign( LCUI_Widget w, int align )
 {
-	LCUI_Style s = &ss->sheet[self.keys[key]];
-	if( ParseNumber( s, str ) ) {
-		return 0;
-	}
-	return -1;
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	txt->tasks[TASK_SET_TEXT_ALIGN].align = align;
+	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
 }
 
-static int OnParseFontFamily( LCUI_StyleSheet ss, int key, const char *str )
+static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 {
-	char *name = strdup2( str );
-	if( ss->sheet[self.keys[key]].is_valid
-	 && ss->sheet[self.keys[key]].string) {
-		free( ss->sheet[self.keys[key]].string );
-	}
-	SetStyle( ss, self.keys[key], name, string );
-	return 0;
-}
-
-static int OnParseFontStyle( LCUI_StyleSheet ss, int key, const char *str )
-{
-	if( strcmp(str, "normal") == 0 ) {
-		SetStyle( ss, self.keys[key], 0, int );
-		return 0;
-	}
-	return -1;
-}
-
-static int OnParseFontWeight( LCUI_StyleSheet ss, int key, const char *str )
-{
-	return -1;
-}
-
-static int OnParseTextAlign( LCUI_StyleSheet ss, int key, const char *str )
-{
-	int val = LCUI_GetStyleValue( str );
-	if( val < 0 ) {
-		return -1;
-	}
-	SetStyle( ss, self.keys[key], val, style );
-	return 0;
-}
-
-static int OnParseLineHeight( LCUI_StyleSheet ss, int key, const char *str )
-{
-	LCUI_StyleRec sv;
-	if( !ParseNumber(&sv, str) ) {
-		return -1;
-	}
-	ss->sheet[self.keys[key]] = sv;
-	return 0;
-}
-
-static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
-{
-	LCUI_Style s = &ss->sheet[self.keys[key]];
-	int v = LCUI_GetStyleValue( str );
-	if( v < 0 ) {
-		return -1;
-	}
-	s->style = v;
-	s->type = SVT_STYLE;
-	s->is_valid = TRUE;
-	return 0;
-}
-
-static LCUI_StyleParserRec style_parsers[] = {
-	{ key_color, "color", OnParseColor },
-	{ key_font_family, "font-family", OnParseFontFamily },
-	{ key_font_size, "font-size", OnParseFontSize },
-	{ key_font_style, "font-style", OnParseFontStyle },
-	{ key_font_weight, "font-weight", OnParseFontWeight },
-	{ key_text_align, "text-align", OnParseTextAlign },
-	{ key_line_height, "line-height", OnParseLineHeight },
-	{ key_content, "content", OnParseContent },
-	{ key_white_space, "white-space", OnParseStyleOption }
-};
-
-static void OnComputeFontSize( LCUI_TextView txt, LCUI_Style s )
-{
-	int size;
-	if( s->is_valid ) {
-		size = max( MIN_FONT_SIZE, s->value );
-		size = LCUIMetrics_ComputeActual( size, s->type );
-	} else {
-		size = LCUIMetrics_ComputeActual( DEFAULT_FONT_SIZE, SVT_PX );
-	}
-	txt->style.pixel_size = size;
-	txt->style.has_pixel_size = TRUE;
-}
-
-static void OnComputeColor( LCUI_TextView txt, LCUI_Style s )
-{
-	if( s->is_valid ) {
-		txt->style.fore_color = s->color;
-		txt->style.has_fore_color = TRUE;
-	} else {
-		txt->style.has_fore_color = FALSE;
-	}
-}
-
-static void OnComputeFontFamily( LCUI_TextView txt, LCUI_Style s )
-{
-	if( s->is_valid ) {
-		TextStyle_SetFont( &txt->style, s->string );
-	} else {
-		TextStyle_SetFont( &txt->style, NULL );
-	}
-}
-
-static void OnComputeFontStyle( LCUI_TextView txt, LCUI_Style s )
-{
-	txt->style.has_style = FALSE;
-	if( s->is_valid ) {
-		txt->style.style = s->value;
-		txt->style.has_style = TRUE;
-	}
-}
-
-static void OnComputeFontWeight( LCUI_TextView txt, LCUI_Style s )
-{
-	
-}
-
-static void OnComputeTextAlign( LCUI_TextView txt, LCUI_Style s )
-{
-	TextLayer_SetTextAlign( txt->layer, s->is_valid ? s->style : SV_LEFT );
-}
-
-static void OnComputeLineHeight( LCUI_TextView txt, LCUI_Style s )
-{
-	int h;
-	if( !s->is_valid ) {
-		h = roundi( txt->style.pixel_size * LINE_HEIGHT_SCALE );
-		TextLayer_SetLineHeight( txt->layer, h );
-		return;
-	}
-	switch( s->type ) {
-	case SVT_SCALE:
-		h = roundi( txt->style.pixel_size * s->val_scale );
-		break;
-	default:
-		h = LCUIMetrics_ComputeActual( s->value, s->type );
-		break;
-	}
-	TextLayer_SetLineHeight( txt->layer, h );
-}
-
-static void OnComputeContent( LCUI_TextView txt, LCUI_Style s )
-{
-	if( s->is_valid ) {
-		txt->has_content = TRUE;
-		TextView_SetTextW( txt->widget, s->wstring );
-	} else if( txt->has_content ) {
-		txt->has_content = FALSE;
-		TextView_SetTextW( txt->widget, NULL );
-	}
-}
-
-static void OnComputeWhiteSpace( LCUI_TextView txt, LCUI_Style s )
-{
-	if( !s->is_valid || s->type != SVT_STYLE ) {
-		TextLayer_SetAutoWrap( txt->layer, TRUE );
-		return;
-	}
-	TextLayer_SetAutoWrap( txt->layer, s->style != SV_NOWRAP );
-}
-
-static void InitStyleHandlers( void )
-{
-	self.handlers[key_color] = OnComputeColor;
-	self.handlers[key_font_size] = OnComputeFontSize;
-	self.handlers[key_font_family] = OnComputeFontFamily;
-	self.handlers[key_font_style] = OnComputeFontStyle;
-	self.handlers[key_font_weight] = OnComputeFontWeight;
-	self.handlers[key_line_height] = OnComputeLineHeight;
-	self.handlers[key_text_align] = OnComputeTextAlign;
-	self.handlers[key_content] = OnComputeContent;
-	self.handlers[key_white_space] = OnComputeWhiteSpace;
-}
-
-static void InitStyleParsers( void )
-{
-	int i;
-	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
-		LCUI_StyleParser parser = &style_parsers[i];
-		self.keys[parser->key] = LCUI_AddStyleName( parser->name );
-		LCUI_AddCSSParser( parser );
-	}
+	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	txt->tasks[TASK_SET_AUTOWRAP].autowrap = autowrap;
+	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
 }
 
 static void TextView_UpdateStyle( LCUI_Widget w )
 {
-	int i;
+	LCUI_TextStyle ts;
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
-	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
-		if( self.keys[i] < 0 ) {
-			continue;
-		}
-		self.handlers[i]( txt, &w->style->sheet[self.keys[i]] );
+	LCUI_FontStyle fs = &txt->style;
+	const wchar_t *content = fs->content;
+	LCUIFontStyle_Compute( fs, w->style );
+	LCUIFontStyle_GetTextStyle( fs, &ts );
+	TextView_SetTaskForTextAlign( w, fs->text_align );
+	TextView_SetTaskForLineHeight( w, fs->line_height );
+	TextView_SetTaskForAutoWrap( w, fs->white_space != SV_NOWRAP );
+	TextView_SetTextStyle( w, &ts );
+	if( content != fs->content ) {
+		TextView_SetTextW( w, fs->content );
 	}
-	TextLayer_SetTextStyle( txt->layer, &txt->style );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
+	TextStyle_Destroy( &ts );
 }
 
 static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
@@ -434,7 +192,7 @@ static void TextView_OnInit( LCUI_Widget w )
 	/* 启用样式标签的支持 */
 	TextLayer_SetUsingStyleTags( txt->layer, TRUE );
 	Widget_BindEvent( w, "resize", TextView_OnResize, NULL, NULL );
-	TextStyle_Init( &txt->style );
+	LCUIFontStyle_Init( &txt->style );
 	LCUIMutex_Init( &txt->mutex );
 }
 
@@ -453,7 +211,7 @@ static void TextView_ClearTasks( LCUI_Widget w )
 static void TextView_OnDestroy( LCUI_Widget w )
 {
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
-	TextStyle_Destroy( &txt->style );
+	LCUIFontStyle_Destroy( &txt->style );
 	TextLayer_Destroy( txt->layer );
 	LCUIMutex_Unlock( &txt->mutex );
 	TextView_ClearTasks( w );
@@ -608,47 +366,23 @@ int TextView_SetText( LCUI_Widget w, const char *utf8_text )
 	return ret;
 }
 
-static void TextView_OnParseText( LCUI_Widget w, const char *text )
-{
-	TextView_SetText( w, text );
-}
-
 void TextView_SetLineHeight( LCUI_Widget w, int height )
 {
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
-	TextLayer_SetLineHeight( txt->layer, height );
-	txt->tasks[TASK_UPDATE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
-}
-
-void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
-{
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
-	TextLayer_SetTextStyle( txt->layer, style );
-	txt->tasks[TASK_UPDATE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
-}
-
-void TextView_GetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
-{
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
-	*style = txt->layer->text_style;
+	Widget_SetFontStyle( w, key_line_height, height, px );
 }
 
 void TextView_SetTextAlign( LCUI_Widget w, int align )
 {
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
-	txt->tasks[TASK_SET_TEXT_ALIGN].align = align;
-	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	Widget_SetFontStyle( w, key_text_align, align, style );
 }
 
 void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 {
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
-	txt->tasks[TASK_SET_AUTOWRAP].autowrap = autowrap;
-	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
+	if( autowrap ) {
+		Widget_SetFontStyle( w, key_white_space, SV_AUTO, style );
+	} else {
+		Widget_SetFontStyle( w, key_white_space, SV_NOWRAP, style );
+	}
 }
 
 /*-------------------------- End Public ------------------------------*/
@@ -664,6 +398,4 @@ void LCUIWidget_AddTextView( void )
 	self.prototype->update = TextView_UpdateStyle;
 	self.prototype->settext = TextView_OnParseText;
 	self.prototype->runtask = TextView_OnTask;
-	InitStyleParsers();
-	InitStyleHandlers();
 }

@@ -120,10 +120,20 @@ LCUI_API int LCUIFont_Add( LCUI_Font *font );
 /**
  * 获取字体的ID
  * @param[in] family_name 字族名称
- * @param[in] style_name 样式名称，若设为 NULL，则默认获取 regular 样式或
- * 最后一个样式的字体
+ * @param[in] style_name 风格名称，若设为 NULL，则默认获取 regular 风格或
+ * 字体中记录的最后一个风格
  */
 LCUI_API int LCUIFont_GetId( const char *family_name, const char *style_name );
+
+/**
+ * 根据字族名称获取对应的字体 ID 列表
+ * @param[out] ids 输出的字体 ID 列表
+ * @param[in] style 字体风格，若设为 NULL，则默认获取 regular 风格或
+ * 字体中记录的最后一个风格
+ * @param[in] names 字族名称，多个名字用逗号隔开
+ * @return 获取到的字体 ID 的数量
+ */
+LCUI_API size_t LCUIFont_GetIdByNames( int **ids, const char *style, const char *names );
 
 /** 获取默认的字体ID */
 LCUI_API int LCUIFont_GetDefault( void );
