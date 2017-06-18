@@ -47,7 +47,7 @@ static int check_content( void )
 	int ret = 0;
 	SelectWidget( content, "content" );
 	CHECK( content->width == 860 );
-	CHECK( content->height == 566 );
+	CHECK( content->height == 590 );
 	return ret;
 }
 
