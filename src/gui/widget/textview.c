@@ -303,8 +303,8 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LCUI_Pos pos;
 	LCUI_RectF rectf;
-	LCUI_Rect content_rect, rect;
 	LCUI_TextView txt;
+	LCUI_Rect content_rect, rect;
 
 	rectf = w->box.content;
 	rectf.x -= w->box.graph.x;
