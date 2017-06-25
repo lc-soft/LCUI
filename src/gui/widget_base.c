@@ -1261,27 +1261,39 @@ void Widget_SetMargin( LCUI_Widget w, float top, float right,
 
 void Widget_Move( LCUI_Widget w, float left, float top )
 {
-	SetStyle( w->custom_style, key_top, top, px );
-	SetStyle( w->custom_style, key_left, left, px );
+	Widget_SetStyle( w, key_top, top, px );
+	Widget_SetStyle( w, key_left, left, px );
 	Widget_UpdateStyle( w, FALSE );
 }
 
 void Widget_Resize( LCUI_Widget w, float width, float height )
 {
-	SetStyle( w->custom_style, key_width, width, px );
-	SetStyle( w->custom_style, key_height, height, px );
+	Widget_SetStyle( w, key_width, width, px );
+	Widget_SetStyle( w, key_height, height, px );
 	Widget_UpdateStyle( w, FALSE );
 }
 
 void Widget_Show( LCUI_Widget w )
 {
-	SetStyle( w->custom_style, key_visible, TRUE, int );
+	Widget_SetStyle( w, key_visible, TRUE, int );
 	Widget_UpdateStyle( w, FALSE );
 }
 
 void Widget_Hide( LCUI_Widget w )
 {
-	SetStyle( w->custom_style, key_visible, FALSE, int );
+	Widget_SetStyle( w, key_visible, FALSE, int );
+	Widget_UpdateStyle( w, FALSE );
+}
+
+void Widget_SetPosition( LCUI_Widget w, LCUI_StyleValue position )
+{
+	Widget_SetStyle( w, key_position, position, style );
+	Widget_UpdateStyle( w, FALSE );
+}
+
+void Widget_SetBoxSizing( LCUI_Widget w, LCUI_StyleValue sizing )
+{
+	Widget_SetStyle( w, key_box_sizing, sizing, style );
 	Widget_UpdateStyle( w, FALSE );
 }
 

@@ -362,6 +362,10 @@ LCUI_API void Widget_Show( LCUI_Widget w );
 
 LCUI_API void Widget_Hide( LCUI_Widget w );
 
+LCUI_API void Widget_SetPosition( LCUI_Widget w, LCUI_StyleValue position );
+
+LCUI_API void Widget_SetBoxSizing( LCUI_Widget w, LCUI_StyleValue sizing );
+
 /** 为部件设置属性 */
 LCUI_API int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
 				    int value_type, void( *value_destructor )(void*) );
