@@ -926,7 +926,6 @@ static void TextEdit_OnUpdate( LCUI_Widget w )
 	TextStyle_Destroy( &ts );
 }
 
-/** 添加 TextEdit 部件类型 */
 void LCUIWidget_AddTextEdit( void )
 {
 	self.prototype = LCUIWidget_NewPrototype( "textedit", NULL );

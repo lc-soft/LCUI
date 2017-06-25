@@ -91,7 +91,6 @@ void Button_SetText( LCUI_Widget w, const char *str )
 	TextView_SetText( w, str );
 }
 
-/** 添加按钮部件类型 */
 void LCUIWidget_AddButton( void )
 {
 	prototype = LCUIWidget_NewPrototype( "button", "textview" );

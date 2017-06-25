@@ -415,9 +415,11 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
 /** 打印部件树 */
 LCUI_API void Widget_PrintTree( LCUI_Widget w );
 
-void LCUI_InitWidget( void );
+LCUI_API void LCUIWidget_InitBase( void );
 
-void LCUI_ExitWidget( void );
+LCUI_API void LCUIWidget_DestroyRoot( void );
+
+LCUI_API void LCUIWidget_ExitBase( void );
 
 LCUI_END_HEADER
 

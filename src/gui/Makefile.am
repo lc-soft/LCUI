@@ -2,6 +2,7 @@ AUTOMAKE_OPTIONS=foreign subdir-objects
 noinst_LTLIBRARIES = libgui.la
 AM_CFLAGS = -I$(abs_top_srcdir)/include
 libgui_la_SOURCES =\
+widget.c		\
 widget_base.c		\
 widget_event.c		\
 widget_prototype.c	\

@@ -344,6 +344,7 @@
     <ClCompile Include="..\..\..\src\gui\css_library.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
     <ClCompile Include="..\..\..\src\gui\metrics.c" />
+    <ClCompile Include="..\..\..\src\gui\widget.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />

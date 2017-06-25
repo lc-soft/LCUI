@@ -49,4 +49,6 @@ LCUI_API void TextCaret_SetVisible( LCUI_Widget widget, LCUI_BOOL visible );
 /** 设置闪烁的时间间隔 */
 LCUI_API void TextCaret_SetBlinkTime( LCUI_Widget widget, unsigned int n_ms );
 
+LCUI_API void LCUIWidget_AddTextCaret( void );
+
 #endif

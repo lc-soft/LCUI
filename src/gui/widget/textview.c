@@ -387,7 +387,6 @@ void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 
 /*-------------------------- End Public ------------------------------*/
 
-/** 添加 TextView 部件类型 */
 void LCUIWidget_AddTextView( void )
 {
 	self.prototype = LCUIWidget_NewPrototype( "textview", NULL );

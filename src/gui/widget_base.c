@@ -1620,27 +1620,8 @@ static void OnClearWidgetAttribute( void *privdata, void *data )
 	attr->value.data = NULL;
 }
 
-extern void LCUIWidget_AddTextView( void );
-extern void LCUIWidget_AddButton( void );
-extern void LCUIWidget_AddSideBar( void );
-extern void LCUIWidget_AddTScrollBar( void );
-extern void LCUIWidget_AddTextCaret( void );
-extern void LCUIWidget_AddTextEdit( void );
-
-void LCUI_InitWidget( void )
+void LCUIWidget_InitBase( void )
 {
-	LCUIWidget_InitTasks();
-	LCUIWidget_InitEvent();
-	LCUIWidget_InitPrototype();
-	LCUIWidget_InitStyle();
-	LCUIWidget_InitRenderer();
-	LCUIWidget_InitImageLoader();
-	LCUIWidget_AddTextView();
-	LCUIWidget_AddButton();
-	LCUIWidget_AddSideBar();
-	LCUIWidget_AddTScrollBar();
-	LCUIWidget_AddTextCaret();
-	LCUIWidget_AddTextEdit();
 	LCUIMutex_Init( &LCUIWidget.mutex );
 	LCUIWidget.ids = Dict_Create( &DictType_StringKey, NULL );
 	LCUIWidget.root = LCUIWidget_New( "root" );
@@ -1649,20 +1630,13 @@ void LCUI_InitWidget( void )
 	Widget_SetTitleW( LCUIWidget.root, L"LCUI Display" );
 }
 
-static void LCUIWidget_DestroyRoot( void )
+void LCUIWidget_DestroyRoot( void )
 {
 	Widget_ExecDestroy( LCUIWidget.root );
 }
 
-void LCUI_ExitWidget( void )
+void LCUIWidget_ExitBase( void )
 {
-	LCUIWidget_ExitTasks();
-	LCUIWidget_DestroyRoot();
-	LCUIWidget_ExitEvent();
-	LCUIWidget_ExitStyle();
-	LCUIWidget_ExitPrototype();
-	LCUIWidget_ExitRenderer();
-	LCUIWidget_ExitImageLoader();
 	Dict_Release( LCUIWidget.ids );
 	LCUIMutex_Destroy( &LCUIWidget.mutex );
 	LCUIWidget.ids = NULL;
