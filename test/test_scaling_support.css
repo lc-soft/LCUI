@@ -6,8 +6,28 @@
     padding: 5px 10px;
     white-space: nowrap;
 }
+.image {
+    width: 91px;
+    height: 69px;
+    border: 1px solid #eee;
+    background-image: url(test_image_reader.png);
+    background-size:contain;
+    margin-bottom: 10px;
+}
+.container {
+    margin-bottom: 10px;
+}
 .text-sp {
     font-size: 18sp;
+}
+.box-px {
+    width:80px;
+    text-align: center;
+}
+.box-dp {
+    width: 80dp;
+    border-width: 5dp;
+    text-align: center;
 }
 .text-px {
     font-size: 18px;

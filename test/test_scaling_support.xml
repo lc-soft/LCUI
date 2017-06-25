@@ -2,6 +2,14 @@
 <lcui-app>
   <resource type="text/css" src="test_scaling_support.css"/>
   <ui>
+    <widget class="image"></widget>
+    <widget class="container">
+      <widget id="edit" type="textedit">Hello, World!</widget>
+    </widget>
+    <widget class="container">
+      <widget type="textview" class="text-box box-px">width: 80px</widget>
+      <widget type="textview" class="text-box box-dp">width: 80dp</widget>
+    </widget>
     <widget class="container">
       <widget type="textview" class="text-box text-sp">font size: 18sp</widget>
       <widget type="textview" class="text-box text-px">font size: 18px</widget>

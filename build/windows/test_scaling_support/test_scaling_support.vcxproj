@@ -103,8 +103,10 @@
     <PreBuildEvent>
       <Command>copy "$(SolutionDir)..\..\test\$(ProjectName).xml" "$(OutDir)"
 copy "$(SolutionDir)..\..\test\$(ProjectName).css" "$(OutDir)"
+copy "$(SolutionDir)..\..\test\test_image_reader.png" "$(OutDir)"
 copy "$(SolutionDir)..\..\test\$(ProjectName).xml" "$(ProjectDir)"
-copy "$(SolutionDir)..\..\test\$(ProjectName).css" "$(ProjectDir)"</Command>
+copy "$(SolutionDir)..\..\test\$(ProjectName).css" "$(ProjectDir)"
+copy "$(SolutionDir)..\..\test\test_image_reader.png" "$(ProjectDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -140,8 +142,10 @@ copy "$(SolutionDir)..\..\test\$(ProjectName).css" "$(ProjectDir)"</Command>
     <PreBuildEvent>
       <Command>copy "$(SolutionDir)..\..\test\$(ProjectName).xml" "$(OutDir)"
 copy "$(SolutionDir)..\..\test\$(ProjectName).css" "$(OutDir)"
+copy "$(SolutionDir)..\..\test\test_image_reader.png" "$(OutDir)"
 copy "$(SolutionDir)..\..\test\$(ProjectName).xml" "$(ProjectDir)"
-copy "$(SolutionDir)..\..\test\$(ProjectName).css" "$(ProjectDir)"</Command>
+copy "$(SolutionDir)..\..\test\$(ProjectName).css" "$(ProjectDir)"
+copy "$(SolutionDir)..\..\test\test_image_reader.png" "$(ProjectDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -167,7 +171,9 @@ copy "$(SolutionDir)..\..\test\$(ProjectName).css" "$(ProjectDir)"</Command>
     <None Include="..\..\..\test\test_scaling_support.css" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\..\test\test_scaling_support.xml" />
+    <Xml Include="..\..\..\test\test_scaling_support.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
