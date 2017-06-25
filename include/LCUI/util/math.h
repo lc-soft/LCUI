@@ -51,7 +51,7 @@
 LCUI_BEGIN_HEADER
 
  /** round double to interger */
-LCUI_API int roundi( double x );
+LCUI_API int iround( double x );
 
 LCUI_END_HEADER
 

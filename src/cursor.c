@@ -134,10 +134,10 @@ void LCUICursor_GetRect( LCUI_Rect *rect )
 {
 	float scale;
 	scale = LCUIMetrics_GetScale();
-	rect->x = roundi( cursor.pos.x / scale );
-	rect->y = roundi( cursor.pos.y / scale );
-	rect->width = roundi( cursor.graph.width / scale );
-	rect->height = roundi( cursor.graph.height / scale );
+	rect->x = iround( cursor.pos.x / scale );
+	rect->y = iround( cursor.pos.y / scale );
+	rect->width = iround( cursor.graph.width / scale );
+	rect->height = iround( cursor.graph.height / scale );
 }
 
 /* 刷新鼠标游标在屏幕上显示的图形 */

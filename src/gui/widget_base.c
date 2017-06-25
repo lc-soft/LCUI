@@ -395,8 +395,8 @@ LCUI_Widget Widget_At( LCUI_Widget widget, int ix, int iy )
 			if( !c->computed_style.visible ) {
 				continue;
 			}
-			ix = roundi( x );
-			iy = roundi( y );
+			ix = iround( x );
+			iy = iround( y );
 			if( LCUIRect_HasPoint(&c->box.border, ix, iy) ) {
 				target = c;
 				x -= c->box.padding.x;

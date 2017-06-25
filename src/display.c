@@ -422,7 +422,7 @@ int LCUIDisplay_GetWidth( void )
 	}
 	if( display.mode == LCDM_WINDOWED ||
 	    display.mode == LCDM_FULLSCREEN ) {
-		return roundi( LCUIWidget_GetRoot()->width );
+		return iround( LCUIWidget_GetRoot()->width );
 	}
 	return display.driver->getWidth();
 }
@@ -434,7 +434,7 @@ int LCUIDisplay_GetHeight( void )
 	}
 	if( display.mode == LCDM_WINDOWED ||
 	    display.mode == LCDM_FULLSCREEN ) {
-		return roundi( LCUIWidget_GetRoot()->height );
+		return iround( LCUIWidget_GetRoot()->height );
 	}
 	return display.driver->getHeight();
 }
@@ -603,8 +603,8 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	{
 		LCUI_Rect area;
 		area.x = area.y = 0;
-		area.width = roundi( rect->width );
-		area.height = roundi( rect->height );
+		area.width = iround( rect->width );
+		area.height = iround( rect->height );
 		LCUIDisplay_InvalidateArea( &area );
 		break;
 	}

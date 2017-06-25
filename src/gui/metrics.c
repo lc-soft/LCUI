@@ -62,7 +62,7 @@ float LCUIMetrics_Compute( float value, LCUI_StyleType type )
 
 int LCUIMetrics_ComputeActual( float value, LCUI_StyleType type )
 {
-	return roundi( LCUIMetrics_Compute( value, type ) * metrics.scale );
+	return iround( LCUIMetrics_Compute( value, type ) * metrics.scale );
 }
 
 void LCUIMetrics_ComputeRectActual( LCUI_Rect *dst, const LCUI_RectF *src )

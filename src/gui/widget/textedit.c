@@ -180,8 +180,8 @@ static void TextEdit_UpdateCaret( LCUI_Widget widget )
 	y += widget->padding.top;
 	if( edit->layer->offset_x != offset_x ||
 	    edit->layer->offset_y != offset_y ) {
-		int ix = roundi( offset_x * scale );
-		int iy = roundi( offset_y * scale );
+		int ix = iround( offset_x * scale );
+		int iy = iround( offset_y * scale );
 		TextLayer_SetOffset( edit->layer, ix, iy );
 		edit->tasks[TASK_UPDATE] = TRUE;
 		Widget_AddTask( widget, WTT_USER );

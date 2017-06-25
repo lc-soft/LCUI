@@ -279,12 +279,12 @@ static void OnComputeLineHeight( LCUI_FontStyle fs, LCUI_Style s )
 	int h;
 	if( s->is_valid ) {
 		if( s->type == SVT_SCALE ) {
-			h = roundi( fs->font_size * s->val_scale );
+			h = iround( fs->font_size * s->val_scale );
 		} else {
 			h = LCUIMetrics_ComputeActual( s->value, s->type );
 		}
 	} else {
-		h = roundi( fs->font_size * LINE_HEIGHT_SCALE );
+		h = iround( fs->font_size * LINE_HEIGHT_SCALE );
 	}
 	fs->line_height = h;
 }

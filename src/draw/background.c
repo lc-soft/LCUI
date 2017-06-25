@@ -85,13 +85,13 @@ void Graph_DrawBackground( LCUI_PaintContext paint,
 		/* 根据宽高的缩放比例，计算实际需要引用的区域 */
 		if( width != bg->image->width ) {
 			scale = 1.0 * bg->image->width / width;
-			rect.x = roundi( rect.x * scale );
-			rect.width = roundi( rect.width * scale );
+			rect.x = iround( rect.x * scale );
+			rect.width = iround( rect.width * scale );
 		}
 		if( height != bg->image->height ) {
 			scale = 1.0 * bg->image->height / height;
-			rect.y = roundi( rect.y * scale );
-			rect.height = roundi( rect.height * scale );
+			rect.y = iround( rect.y * scale );
+			rect.height = iround( rect.height * scale );
 		}
 		/* 引用源背景图像的一块区域 */
 		Graph_QuoteReadOnly( &graph, bg->image, &rect );

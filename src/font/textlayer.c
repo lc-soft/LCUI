@@ -51,7 +51,7 @@ enum TextAddType {
 
 #define TextRowList_AddNewRow(ROWLIST) TextRowList_InsertNewRow(ROWLIST, (ROWLIST)->length)
 #define TextLayer_GetRow(layer, n) (n >= layer->rowlist.length) ? NULL:layer->rowlist.rows[n]
-#define GetDefaultLineHeight(H) roundi( H * 1.42857143 )
+#define GetDefaultLineHeight(H) iround( H * 1.42857143 )
 
 /* 根据对齐方式，计算文本行的起始X轴位置 */
 static int TextLayer_GetRowStartX( LCUI_TextLayer layer, TextRow txtrow )

@@ -551,7 +551,7 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack 
 		x = pointer_x - x;
 		y = pointer_y - y;
 		/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
-		w = Widget_GetNextAt( widget, roundi( x ), roundi( y ) );
+		w = Widget_GetNextAt( widget, iround( x ), iround( y ) );
 		if( !w ) {
 			break;
 		}
@@ -757,8 +757,8 @@ static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 	w = LCUIWidget_GetRoot();
 	LCUICursor_GetPos( &pos );
 	scale = LCUIMetrics_GetScale();
-	pos.x = roundi( pos.x / scale );
-	pos.y = roundi( pos.y / scale );
+	pos.x = iround( pos.x / scale );
+	pos.y = iround( pos.y / scale );
 	if( self.mouse_capturer ) {
 		target = self.mouse_capturer;
 	} else {
@@ -906,8 +906,8 @@ static void ConvertTouchPoint( LCUI_TouchPoint point )
 	default:break;
 	}
 	scale = LCUIMetrics_GetScale();
-	point->x = roundi( point->x / scale );
-	point->y = roundi( point->y / scale );
+	point->x = iround( point->x / scale );
+	point->y = iround( point->y / scale );
 }
 
 /** 分发触控事件给对应的部件 */
