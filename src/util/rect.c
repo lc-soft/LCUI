@@ -46,7 +46,6 @@
 	b->x >= a->x && b->x + b->width <= a->x + a->width \
 	&& b->y >= a->y && b->y + b->height <= a->y + a->height
 
-/* 将数值转换成LCUI_Rect型结构体 */
 LCUI_Rect Rect( int x, int y, int w, int h )
 {
 	LCUI_Rect r;
@@ -57,12 +56,31 @@ LCUI_Rect Rect( int x, int y, int w, int h )
 	return r;
 }
 
-void LCUIRect_Scale( LCUI_Rect *dst, const LCUI_Rect *src, float scale )
+void LCUIRect_ToRectF( const LCUI_Rect *rect,
+		       LCUI_RectF *rectf, float scale )
 {
-	dst->x = (int)( src->x * scale );
-	dst->y = (int)( src->y * scale );
-	dst->width = roundi( src->width * scale );
-	dst->height = roundi( src->height * scale );
+	rectf->x = rect->x * scale;
+	rectf->y = rect->y * scale;
+	rectf->width = rect->width * scale;
+	rectf->height = rect->height * scale;
+}
+
+void LCUIRect_Scale( const LCUI_Rect *src,
+		     LCUI_Rect *dst, float scale )
+{
+	dst->x = iround( src->x * scale );
+	dst->y = iround( src->y * scale );
+	dst->width = iround( src->width * scale );
+	dst->height = iround( src->height * scale );
+}
+
+void LCUIRectF_ToRect( const LCUI_RectF *rectf,
+		       LCUI_Rect *rect, float scale )
+{
+	rect->x = iround( rectf->x * scale );
+	rect->y = iround( rectf->y * scale );
+	rect->width = iround( rectf->width * scale );
+	rect->height = iround( rectf->height * scale );
 }
 
 void LCUIRect_GetCutArea( int box_w, int box_h,
@@ -144,7 +162,6 @@ void LCUIRectF_ValidateArea( LCUI_RectF *rect, float box_w, float box_h )
 	}
 }
 
-/** 检测矩形是否遮盖另一个矩形 */
 LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect *rect1, LCUI_Rect *rect2 )
 {
 	if( rect1->x > rect2->x ) {
@@ -168,13 +185,6 @@ LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect *rect1, LCUI_Rect *rect2 )
 	return TRUE;
 }
 
-/**
- * 获取两个矩形中的重叠矩形
- * @param[in] a		矩形A
- * @param[in] b		矩形B
- * @param[out] out	矩形A和B重叠处的矩形
- * @returns 如果两个矩形重叠，则返回TRUE，否则返回FALSE
- */
 LCUI_BOOL LCUIRect_GetOverlayRect( const LCUI_Rect *a,
 				   const LCUI_Rect *b,
 				   LCUI_Rect *out )

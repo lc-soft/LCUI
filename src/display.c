@@ -133,14 +133,14 @@ void LCUIDisplay_Update( void )
 
 void LCUIDisplay_Render( void )
 {
-	float scale;
 	LinkedListNode *sn, *rn;
 	LCUI_PaintContext paint;
+	LCUI_SysEventRec ev;
 
 	if( !display.is_working ) {
 		return;
 	}
-	scale = LCUIMetrics_GetScale();
+	ev.type = LCUI_PAINT;
 	/* 遍历当前的 surface 记录列表 */
 	for( LinkedList_Each( sn, &display.surfaces ) ) {
 		SurfaceRecord record = sn->data;
@@ -153,16 +153,13 @@ void LCUIDisplay_Render( void )
 		record->rendered = FALSE;
 		/* 在 surface 上逐个重绘无效区域 */
 		for( LinkedList_Each( rn, &record->rects ) ) {
-			LCUI_Rect rect;
 			LCUI_Rect *r = rn->data;
-			rect.x = r->x * scale;
-			rect.y = r->y * scale;
-			rect.width = r->width * scale;
-			rect.height = r->height * scale;
-			paint = Surface_BeginPaint( surface, &rect );
+			paint = Surface_BeginPaint( surface, r );
 			if( !paint ) {
 				continue;
 			}
+			ev.paint.rect = *r;
+			LCUI_TriggerEvent( &ev, NULL );
 			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
 				   record->widget->type,
 				   paint->rect.x, paint->rect.y,
@@ -198,18 +195,20 @@ void LCUIDisplay_Present( void )
 
 void LCUIDisplay_InvalidateArea( LCUI_Rect *rect )
 {
-	LCUI_Rect screen;
+	LCUI_Rect area;
 	if( !display.is_working ) {
 		return;
 	}
-	if( !rect ) {
-		screen.x = 0;
-		screen.y = 0;
-		screen.width = LCUIDisplay_GetWidth();
-		screen.height = LCUIDisplay_GetHeight();
-		rect = &screen;
+	if( rect ) {
+		area.x = 0;
+		area.y = 0;
+		area.width = LCUIDisplay_GetWidth();
+		area.height = LCUIDisplay_GetHeight();
+		RectList_Add( &display.rects, &area );
+	} else {
+		RectToInvalidArea( rect, &area );
+		RectList_Add( &display.rects, &area );
 	}
-	RectList_Add( &display.rects, rect );
 }
 
 static LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
@@ -619,6 +618,7 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 /** 在 surface 主动产生无效区域并需要绘制的时候 */
 static void OnPaint( LCUI_Event e, void *arg )
 {
+	LCUI_RectF rect;
 	LinkedListNode *node;
 	LCUI_DisplayEvent dpy_ev = arg;
 	for( LinkedList_Each( node, &display.surfaces ) ) {
@@ -626,8 +626,8 @@ static void OnPaint( LCUI_Event e, void *arg )
 		if( record && record->surface != dpy_ev->surface ) {
 			continue;
 		}
-		Widget_InvalidateArea( record->widget, 
-				       &dpy_ev->paint.rect, SV_GRAPH_BOX );
+		LCUIRect_ToRectF( &dpy_ev->paint.rect, &rect, 1.0f );
+		Widget_InvalidateArea( record->widget, &rect, SV_GRAPH_BOX );
 	}
 }
 

@@ -38,6 +38,7 @@
  * ***************************************************************************/
 
 #include <string.h>
+#include <math.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/metrics.h>
@@ -142,9 +143,26 @@ void Widget_SetBorder( LCUI_Widget w, float width, int style, LCUI_Color clr )
 	Widget_UpdateStyle( w, FALSE );
 }
 
+static unsigned int ComputeActual( float width )
+{
+	unsigned int w;
+	w = LCUIMetrics_ComputeActual( width, SVT_PX );
+	if( width > 0 && w < 1 ) {
+		return 1;
+	}
+	return w;
+}
+
+static float ComputeBorderWidth( float width )
+{
+	if( width < 1.0f && width > 0 ) {
+		return 1.0f;
+	}
+	return roundf( width );
+}
+
 void Widget_UpdateBorder( LCUI_Widget w )
 {
-	LCUI_Rect rect;
 	LCUI_BorderStyle ob, *nb;
 	ob = w->computed_style.border;
 	Widget_ComputeBorderStyle( w );
@@ -158,37 +176,8 @@ void Widget_UpdateBorder( LCUI_Widget w )
 		Widget_AddTask( w, WTT_POSITION );
 		return;
 	}
-	rect.x = rect.y = 0;
-	rect.width = roundi( w->box.border.width );
-	rect.width -= max( ob.top_right_radius, ob.right.width );
-	rect.height = max( ob.top_left_radius, ob.top.width );
-	/* 上 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.x = roundi( w->box.border.width );
-	rect.width = max( ob.top_right_radius, ob.right.width );
-	rect.x -= rect.width;
-	rect.height = roundi( w->box.border.height );
-	rect.height -= max( ob.bottom_right_radius, ob.bottom.width );
-	/* 右 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.x = max( ob.bottom_left_radius, ob.left.width );
-	rect.y = roundi( w->box.border.height );
-	rect.width = roundi( w->box.border.width );
-	rect.width -= rect.x;
-	rect.height = max( ob.bottom_right_radius, ob.bottom.width );
-	rect.y -= rect.height;
-	/* 下 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
-	rect.width = rect.x;
-	rect.x = 0;
-	rect.y = max( ob.top_left_radius, ob.left.width );
-	rect.height = roundi( w->box.border.height );
-	rect.height -= rect.y;
-	/* 左 */
-	Widget_InvalidateArea( w, &rect, SV_BORDER_BOX );
+	Widget_InvalidateArea( w, NULL, SV_BORDER_BOX );
 }
-
-#define ComputeActual(VALUE) LCUIMetrics_ComputeActual( VALUE, SVT_PX )
 
 /** 计算部件边框样式的实际值 */
 static void Widget_ComputeBorder( LCUI_Widget w, LCUI_Border *out )

@@ -77,8 +77,8 @@ static LCUI_BOOL Widget_IsPaintable( LCUI_Widget w )
  * @param[out] out_rect	调整后的矩形
  * @param[in] box_type	区域相对于何种框进行定位
  */
-static void Widget_AdjustArea(	LCUI_Widget w, LCUI_Rect *in_rect,
-				LCUI_Rect *out_rect, int box_type )
+static void Widget_AdjustArea(	LCUI_Widget w, LCUI_RectF *in_rect,
+				LCUI_RectF *out_rect, int box_type )
 {
 	LCUI_RectF *box;
 	switch( box_type ) {
@@ -91,24 +91,35 @@ static void Widget_AdjustArea(	LCUI_Widget w, LCUI_Rect *in_rect,
 	/* 如果为NULL，则视为使用整个部件区域 */
 	if( !in_rect ) {
 		out_rect->x = out_rect->y = 0;
-		out_rect->width = roundi( box->width );
-		out_rect->height = roundi( box->height );
+		out_rect->width = box->width;
+		out_rect->height = box->height;
 	} else {
 		*out_rect = *in_rect;
-		LCUIRect_ValidateArea( out_rect, roundi( box->width ),
-				       roundi( box->height ) );
+		LCUIRectF_ValidateArea( out_rect, box->width, box->height );
 	}
 	/* 将坐标转换成相对于图像呈现区的坐标 */
-	out_rect->x += roundi( box->x - w->box.graph.x );
-	out_rect->y += roundi( box->y - w->box.graph.y );
+	out_rect->x += box->x - w->box.graph.x;
+	out_rect->y += box->y - w->box.graph.y;
+}
+
+void RectFToInvalidArea( const LCUI_RectF *rect, LCUI_Rect *area )
+{
+	LCUIMetrics_ComputeRectActual( area, rect );
+}
+
+void RectToInvalidArea( const LCUI_Rect *rect, LCUI_Rect *area )
+{
+	LCUI_RectF rectf;
+	LCUIRect_ToRectF( rect, &rectf, 1.0f );
+	LCUIMetrics_ComputeRectActual( area, &rectf );
 }
 
 LCUI_BOOL Widget_InvalidateArea( LCUI_Widget widget,
-				 LCUI_Rect *r, int box_type )
+				 LCUI_RectF *in_rect, int box_type )
 {
 	int mode;
-	LCUI_Rect rect;
-	LCUI_RectF rectf;
+	LCUI_Rect area;
+	LCUI_RectF rect;
 	LCUI_Widget w = widget;
 	LCUI_Widget root = LCUIWidget_GetRoot();
 	LCUI_RectGroup group;
@@ -117,27 +128,25 @@ LCUI_BOOL Widget_InvalidateArea( LCUI_Widget widget,
 		w = root;
 	}
 	mode = LCUIDisplay_GetMode();
-	Widget_AdjustArea( w, r, &rect, box_type );
-	rectf.x = rect.x + w->box.graph.x;
-	rectf.y = rect.y + w->box.graph.y;
-	rectf.width = (float)rect.width;
-	rectf.height = (float)rect.height;
+	Widget_AdjustArea( w, in_rect, &rect, box_type );
+	rect.x += w->box.graph.x;
+	rect.y += w->box.graph.y;
 	while( w && w->parent ) {
-		LCUIRectF_ValidateArea( &rectf, w->parent->box.padding.width,
+		LCUIRectF_ValidateArea( &rect, w->parent->box.padding.width,
 					w->parent->box.padding.height );
-		if( rectf.width <= 0 || rectf.height <= 0 ) {
+		if( rect.width <= 0 || rect.height <= 0 ) {
 			return FALSE;
 		}
 		if( mode != LCDM_SEAMLESS && w->parent == root ) {
 			break;
 		}
 		w = w->parent;
-		rectf.x += w->box.padding.x;
-		rectf.y += w->box.padding.y;
+		rect.x += w->box.padding.x;
+		rect.y += w->box.padding.y;
 	}
-	RectF2Rect( rectf, rect );
+	RectFToInvalidArea( &rect, &area );
 	if( mode != LCDM_SEAMLESS ) {
-		RectList_Add( &self.rects, &rect );
+		RectList_Add( &self.rects, &area );
 		return TRUE;
 	}
 	group = RBTree_CustomGetData( &self.groups, w );
@@ -147,7 +156,7 @@ LCUI_BOOL Widget_InvalidateArea( LCUI_Widget widget,
 		LinkedList_Init( &group->rects );
 		RBTree_CustomInsert( &self.groups, w, group );
 	}
-	return RectList_Add( &group->rects, &rect ) == 0;
+	return RectList_Add( &group->rects, &area ) == 0;
 }
 
 size_t Widget_GetInvalidArea( LCUI_Widget w, LinkedList *rects )

@@ -358,14 +358,17 @@ static void TextEdit_ProcTextBlock( LCUI_Widget widget, LCUI_TextBlock txtblk )
 }
 
 /** 更新文本框的文本图层 */
-static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
+static void TextEdit_UpdateTextLayer( LCUI_Widget w )
 {
+	float scale;
 	LinkedList rects;
+	LCUI_RectF rect;
 	LCUI_TextEdit edit;
 	LCUI_TextStyle style;
 	LinkedListNode *node;
 	LinkedList_Init( &rects );
-	edit = Widget_GetData( widget, self.prototype );
+	scale = LCUIMetrics_GetScale();
+	edit = Widget_GetData( w, self.prototype );
 	TextStyle_Copy( &style, &edit->layer_source->text_style );
 	if( edit->password_char ) {
 		TextLayer_SetTextStyle( edit->layer_mask, &style );
@@ -376,7 +379,8 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget widget )
 	TextStyle_Destroy( &style );
 	TextLayer_Update( edit->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
-		Widget_InvalidateArea( widget, node->data, SV_CONTENT_BOX );
+		LCUIRect_ToRectF( node->data, &rect, 1.0f / scale );
+		Widget_InvalidateArea( w, &rect, SV_CONTENT_BOX );
 	}
 	TextLayer_ClearInvalidRect( edit->layer );
 	RectList_Clear( &rects );
@@ -750,9 +754,10 @@ static void TextEdit_OnTextInput( LCUI_Widget widget,
 static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
 	int iw, ih;
+	LCUI_RectF rect;
 	LinkedList rects;
 	LinkedListNode *node;
-	float width = 0, height = 0;
+	float scale, width = 0, height = 0;
 	float max_width = 0, max_height = 0;
 	LCUI_TextEdit edit = GetData( w );
 	if( !w->style->sheet[key_width].is_valid ||
@@ -769,18 +774,20 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 		max_height = height = w->box.content.width;
 	}
 	LinkedList_Init( &rects );
-	iw = roundi( width );
-	ih = roundi( height );
+	iw = iround( width );
+	ih = iround( height );
 	TextLayer_SetFixedSize( edit->layer_mask, iw, ih );
 	TextLayer_SetFixedSize( edit->layer_source, iw, ih );
 	TextLayer_SetFixedSize( edit->layer_placeholder, iw, ih );
-	iw = roundi( max_width );
-	ih = roundi( max_height );
+	iw = iround( max_width );
+	ih = iround( max_height );
 	TextLayer_SetMaxSize( edit->layer_mask, iw, ih );
 	TextLayer_SetMaxSize( edit->layer_source, iw, ih );
 	TextLayer_SetMaxSize( edit->layer_placeholder, iw, ih );
 	TextLayer_Update( edit->layer, &rects );
+	scale = LCUIMetrics_GetScale();
 	for( LinkedList_Each( node, &rects ) ) {
+		LCUIRect_ToRectF( node->data, &rect, 1.0f / scale );
 		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
 	}
 	RectList_Clear( &rects );

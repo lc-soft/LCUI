@@ -701,7 +701,7 @@ static void Widget_UpdateChildrenSize( LCUI_Widget w )
 
 void Widget_UpdatePosition( LCUI_Widget w )
 {
-	LCUI_Rect rect;
+	LCUI_RectF rect;
 	int position = ComputeStyleOption( w, key_position, SV_STATIC );
 	int valign = ComputeStyleOption( w, key_vertical_align, SV_TOP );
 	w->computed_style.vertical_align = valign;
@@ -721,8 +721,8 @@ void Widget_UpdatePosition( LCUI_Widget w )
 		}
 	}
 	w->computed_style.position = position;
-	RectF2Rect( w->box.graph, rect );
 	Widget_UpdateZIndex( w );
+	rect = w->box.graph;
 	w->x = w->origin_x;
 	w->y = w->origin_y;
 	switch( position ) {
@@ -799,8 +799,6 @@ void Widget_UpdatePosition( LCUI_Widget w )
 	w->box.graph.x -= Widget_GetBoxShadowOffsetX( w );
 	w->box.graph.y -= Widget_GetBoxShadowOffsetY( w );
 	if( w->parent ) {
-		DEBUG_MSG("new-rect: %d,%d,%d,%d\n", w->box.graph.x, w->box.graph.y, w->box.graph.w, w->box.graph.h);
-		DEBUG_MSG("old-rect: %d,%d,%d,%d\n", rect.x, rect.y, rect.width, rect.height);
 		/* 标记移动前后的区域 */
 		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
@@ -1211,12 +1209,10 @@ void Widget_UpdateSize( LCUI_Widget w )
 		}
 	}
 	if( w->parent ) {
-		LCUI_Rect r;
-		RectF2Rect( rect, r );
-		Widget_InvalidateArea( w->parent, &r, SV_PADDING_BOX );
-		r.width = roundi( w->box.graph.width );
-		r.height = roundi( w->box.graph.height );
-		Widget_InvalidateArea( w->parent, &r, SV_PADDING_BOX );
+		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
+		rect.width = w->box.graph.width;
+		rect.height = w->box.graph.height;
+		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
 		if( w->parent->style->sheet[key_width].type == SVT_AUTO
 		    || w->parent->style->sheet[key_height].type == SVT_AUTO ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );

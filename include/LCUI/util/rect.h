@@ -42,18 +42,8 @@
 
 LCUI_BEGIN_HEADER
 
-#define RectF2Rect(rf, r) do { \
-	(r).x = (int)((rf).x + 0.5); \
-	(r).y = (int)((rf).y + 0.5); \
-	(r).width = (int)((rf).width + 0.5); \
-	(r).height = (int)((rf).height + 0.5); \
-} while( 0 );
-
 /* 将数值转换成LCUI_Rect型结构体 */
 LCUI_API LCUI_Rect Rect( int x, int y, int w, int h );
-
-/** 按比例缩放矩形 */
-LCUI_API void LCUIRect_Scale( LCUI_Rect *dst, const LCUI_Rect *src, float scale );
 
 /** 根据容器尺寸，获取指定区域中需要裁剪的区域 */
 LCUI_API void LCUIRect_GetCutArea( int box_w, int box_h, 
@@ -67,6 +57,15 @@ LCUI_API void LCUIRect_GetCutArea( int box_w, int box_h,
 LCUI_API void LCUIRect_ValidateArea( LCUI_Rect *rect, int box_w, int box_h );
 
 LCUI_API void LCUIRectF_ValidateArea( LCUI_RectF *rect, float box_w, float box_h );
+
+LCUI_API void LCUIRect_ToRectF( const LCUI_Rect *rect,
+				LCUI_RectF *rectf, float scale );
+
+LCUI_API void LCUIRect_Scale( const LCUI_Rect *src,
+			      LCUI_Rect *dst, float scale );
+
+LCUI_API void LCUIRectF_ToRect( const LCUI_RectF *rectf,
+				LCUI_Rect *rect, float scale );
 
 /** 检测矩形是否遮盖另一个矩形 */
 LCUI_API LCUI_BOOL LCUIRect_IsCoverRect( LCUI_Rect *rect1, LCUI_Rect *rect2 );

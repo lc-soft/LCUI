@@ -136,9 +136,10 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 
 static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
+	LCUI_RectF rect;
+	LCUI_TextView txt;
 	LinkedList rects;
 	LinkedListNode *node;
-	LCUI_TextView txt;
 	int width = 0, height = 0;
 	float scale, max_width = 0, max_height = 0;
 
@@ -165,8 +166,8 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	TextLayer_SetMaxSize( txt->layer, width, height );
 	TextLayer_Update( txt->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
-		LCUIRect_Scale( node->data, node->data, 1.0f / scale );
-		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
+		LCUIRect_ToRectF( node->data, &rect, 1.0f / scale );
+		Widget_InvalidateArea( w, &rect, SV_CONTENT_BOX );
 	}
 	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
@@ -251,6 +252,7 @@ static void TextView_OnTask( LCUI_Widget w )
 {
 	int i;
 	float scale;
+	LCUI_RectF rect;
 	LinkedList rects;
 	LinkedListNode *node;
 	LCUI_TextView txt = Widget_GetData( w, self.prototype );
@@ -287,8 +289,8 @@ static void TextView_OnTask( LCUI_Widget w )
 	scale = LCUIMetrics_GetScale();
 	TextLayer_Update( txt->layer, &rects );
 	for( LinkedList_Each( node, &rects ) ) {
-		LCUIRect_Scale( node->data, node->data, 1.0f / scale );
-		Widget_InvalidateArea( w, node->data, SV_CONTENT_BOX );
+		LCUIRect_ToRectF( node->data, &rect, 1.0f / scale );
+		Widget_InvalidateArea( w, &rect, SV_CONTENT_BOX );
 	}
 	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );

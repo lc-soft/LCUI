@@ -2,7 +2,7 @@
 /* ***************************************************************************
  * widget_paint.h -- LCUI widget paint module.
  * 
- * Copyright (C) 2013-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2013-2017 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * widget_paint.h -- LCUI部件绘制模块
  *
- * 版权所有 (C) 2013-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2013-2017 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -43,7 +43,7 @@
 
 LCUI_BEGIN_HEADER
 
-/** 
+/**
  * 标记部件中的无效区域
  * @param[in] w		区域所在的部件
  * @param[in] r		矩形区域
@@ -51,8 +51,7 @@ LCUI_BEGIN_HEADER
  * @returns 标记成功返回 TRUE，如果该区域处于屏幕可见区域外则标记失败，返回FALSE
  */
 LCUI_API LCUI_BOOL Widget_InvalidateArea( LCUI_Widget widget,
-					   LCUI_Rect *r, int box_type );
-
+					  LCUI_RectF *in_rect, int box_type );
 
 /**
  * 取出部件中的无效区域
@@ -60,7 +59,7 @@ LCUI_API LCUI_BOOL Widget_InvalidateArea( LCUI_Widget widget,
  * @param[out] rects	输出的区域列表
  * @return 无效区域的数量
  */
-size_t Widget_GetInvalidArea( LCUI_Widget w, LinkedList *rects );
+LCUI_API size_t Widget_GetInvalidArea( LCUI_Widget w, LinkedList *rects );
 
 /** 
  * 将部件中的矩形区域转换成指定范围框内有效的矩形区域
@@ -72,6 +71,12 @@ size_t Widget_GetInvalidArea( LCUI_Widget w, LinkedList *rects );
 LCUI_API int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 				LCUI_Rect *out_rect, int box_type );
 
+/** 将 LCUI_RectF 类型数据转换为无效区域 */
+LCUI_API void RectFToInvalidArea( const LCUI_RectF *rect, LCUI_Rect *area );
+
+/** 将 LCUI_Rect 类型数据转换为无效区域 */
+LCUI_API void RectToInvalidArea( const LCUI_Rect *rect, LCUI_Rect *area );
+
 /**
  * 渲染指定部件呈现的图形内容
  * @param[in] w		部件
@@ -82,6 +87,7 @@ LCUI_API void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint );
 LCUI_API void LCUIWidget_InitRenderer( void );
 
 LCUI_API void LCUIWidget_ExitRenderer( void );
+
 LCUI_END_HEADER
 
 #endif
