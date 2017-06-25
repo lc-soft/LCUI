@@ -49,6 +49,7 @@
 #define WM_LCUI_TASK (WM_USER+20)
 
 static struct WindowsDriver {
+	LCUI_BOOL active;
 	HWND main_hwnd;
 	HINSTANCE main_instance;	/**< 主程序的资源句柄 */
 	HINSTANCE dll_instance;		/**< 动态库中的资源句柄 */
@@ -67,6 +68,8 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 		LCUI_RunTask( (LCUI_AppTask)arg2 );
 		LCUI_DeleteTask( (LCUI_AppTask)arg2 );
 		return 0;
+	case WM_DESTROY:
+		return 0;
 	case WM_CLOSE:
 		surface = LCUIDisplay_GetSurfaceByHandle( hwnd );
 		Surface_Destroy( surface );
@@ -77,6 +80,9 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 	win_ev.wParam = arg1;
 	win_ev.lParam = arg2;
 	win_ev.message = msg;
+	if( !win.active ) {
+		return DefWindowProc( hwnd, msg, arg1, arg2 );
+	}
 	if( EventTrigger_Trigger( win.trigger, msg, &win_ev ) == 0 ) {
 		return DefWindowProc( hwnd, msg, arg1, arg2 );
 	}
@@ -182,11 +188,13 @@ LCUI_AppDriver LCUI_CreateWinAppDriver( void )
 	app->UnbindSysEvent = WIN_UnbindSysEvent;
 	app->UnbindSysEvent2 = WIN_UnbindSysEvent2;
 	win.trigger = EventTrigger();
+	win.active = TRUE;
 	return app;
 }
 
 void LCUI_DestroyWinAppDriver( LCUI_AppDriver app )
 {
+	win.active = FALSE;
 	UnregisterClassW( win.class_name, win.main_instance );
 	EventTrigger_Destroy( win.trigger );
 	free( app );

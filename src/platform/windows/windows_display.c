@@ -136,6 +136,7 @@ static void WinSurface_ExecDestroy( LCUI_Surface surface )
 			ReleaseDC( surface->hwnd, surface->hdc_client );
 		}
 	}
+	DestroyWindow( surface->hwnd );
 	surface->hwnd = NULL;
 	surface->fb_bmp = NULL;
 	surface->hdc_fb = NULL;

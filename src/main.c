@@ -84,6 +84,7 @@ typedef struct SysEventPackRec_ {
 static struct LCUI_System {
 	int state;			/**< 状态 */
 	int mode;			/**< LCUI的运行模式 */
+	int exit_code;			/**< 退出码 */
 	unsigned long int main_tid;	/**< 主线程ID */
 	struct {
 		LCUI_EventTrigger trigger;	/**< 系统事件容器 */
@@ -489,6 +490,7 @@ void LCUI_InitBase( void )
 	if( System.state == STATE_ACTIVE ) {
 		return;
 	}
+	System.exit_code = 0;
 	System.state = STATE_ACTIVE;
 	System.main_tid = LCUIThread_SelfID();
 	LCUI_ShowCopyrightText();
@@ -518,6 +520,7 @@ int LCUI_Destroy( void )
 	e.type = LCUI_QUIT;
 	LCUI_TriggerEvent( &e, NULL );
 	System.state = STATE_KILLED;
+	LCUI_ExitDisplay();
 	LCUI_ExitApp();
 	LCUI_ExitIME();
 	LCUI_ExitKeyboard();
@@ -525,16 +528,21 @@ int LCUI_Destroy( void )
 	LCUI_ExitWidget();
 	LCUI_ExitFont();
 	LCUI_ExitTimer();
-	LCUI_ExitDisplay();
 	LCUI_ExitEvent();
 	LCUI_ExitMetrics();
-	return 0;
+	return System.exit_code;
 }
 
 void LCUI_Quit( void )
 {
 	System.state = STATE_KILLED;
 	LCUIApp_QuitAllMainLoop();
+}
+
+void LCUI_Exit( int code )
+{
+	System.exit_code = code;
+	LCUI_Quit();
 }
 
 int LCUI_Main( void )
