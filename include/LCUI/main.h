@@ -194,6 +194,8 @@ LCUI_API int LCUIMainLoop_Run( LCUI_MainLoop loop );
 /* 标记目标主循环需要退出 */
 LCUI_API void LCUIMainLoop_Quit( LCUI_MainLoop loop );
 
+LCUI_API void LCUIMainLoop_Destroy( LCUI_MainLoop loop );
+
 /* 检测LCUI是否活动 */ 
 LCUI_API LCUI_BOOL LCUI_IsActive( void );
 

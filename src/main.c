@@ -330,22 +330,25 @@ int LCUIMainLoop_Run( LCUI_MainLoop loop )
 		}
 	}
 	loop->state = STATE_EXITED;
+	DEBUG_MSG( "loop: %p, exit\n", loop );
+	LCUIMainLoop_Destroy( loop );
 	LinkedList_Delete( &MainApp.loops, 0 );
 	/* 获取处于列表表头的主循环 */
 	loop = LinkedList_Get( &MainApp.loops, 0 );
-	if( loop ) {
-		/* 改变当前运行的主循环 */
-		MainApp.loop = loop;
-	}
-	DEBUG_MSG( "loop: %p, exit\n", loop );
+	/* 改变当前运行的主循环 */
+	MainApp.loop = loop;
 	LCUICond_Broadcast( &MainApp.loop_changed );
 	return 0;
 }
 
-/** 标记目标主循环需要退出 */
 void LCUIMainLoop_Quit( LCUI_MainLoop loop )
 {
 	loop->state = STATE_EXITED;
+}
+
+void LCUIMainLoop_Destroy( LCUI_MainLoop loop )
+{
+	free( loop );
 }
 
 void LCUI_InitApp( LCUI_AppDriver app )
@@ -372,6 +375,11 @@ void LCUI_InitApp( LCUI_AppDriver app )
 	MainApp.driver_ready = TRUE;
 }
 
+static void OnDeleteMainLoop( void *arg )
+{
+	LCUIMainLoop_Destroy( arg );
+}
+
 static void OnDeleteTask( void *arg )
 {
 	LCUI_DeleteTask( arg );
@@ -392,7 +400,7 @@ static void LCUI_ExitApp( void )
 	LCUICond_Destroy( &MainApp.loop_changed );
 	LCUIMutex_Destroy( &MainApp.tasks_mutex );
 	LCUICond_Destroy( &MainApp.tasks_cond );
-	LinkedList_Clear( &MainApp.loops, free );
+	LinkedList_Clear( &MainApp.loops, OnDeleteMainLoop );
 	LinkedList_Clear( &MainApp.tasks, OnDeleteTask );
 	if( MainApp.driver_ready ) {
 		LCUI_DestroyAppDriver( MainApp.driver );
