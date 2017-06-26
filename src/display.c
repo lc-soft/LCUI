@@ -117,11 +117,9 @@ void LCUIDisplay_Update( void )
 	for( LinkedList_Each( node, &display.surfaces ) ) {
 		record = node->data;
 		surface = record->surface;
-		if( !record->widget || !surface ||
-		    !Surface_IsReady( surface ) ) {
-			continue;
+		if( record->widget && surface && Surface_IsReady( surface ) ) {
+			Surface_Update( surface );
 		}
-		Surface_Update( surface );
 		/* 收集无效区域记录 */
 		Widget_GetInvalidArea( record->widget, &record->rects );
 	}
@@ -133,9 +131,13 @@ void LCUIDisplay_Update( void )
 
 void LCUIDisplay_Render( void )
 {
-	LinkedListNode *sn, *rn;
-	LCUI_PaintContext paint;
+	LCUI_BOOL skip;
+	LCUI_Rect *rect;
 	LCUI_SysEventRec ev;
+	LCUI_Surface surface;
+	LCUI_PaintContext paint;
+	LinkedListNode *sn, *rn;
+	SurfaceRecord record;
 
 	if( !display.is_working ) {
 		return;
@@ -143,23 +145,26 @@ void LCUIDisplay_Render( void )
 	ev.type = LCUI_PAINT;
 	/* 遍历当前的 surface 记录列表 */
 	for( LinkedList_Each( sn, &display.surfaces ) ) {
-		SurfaceRecord record = sn->data;
-		LCUI_Surface surface = record->surface;
-
-		if( !record->widget || !surface ||
-		    !Surface_IsReady( surface ) ) {
-			continue;
-		}
+		record = sn->data;
 		record->rendered = FALSE;
+		surface = record->surface;
+		if( record->widget && surface && Surface_IsReady( surface ) ) {
+			skip = FALSE;
+		} else {
+			skip = TRUE;
+		}
 		/* 在 surface 上逐个重绘无效区域 */
 		for( LinkedList_Each( rn, &record->rects ) ) {
-			LCUI_Rect *r = rn->data;
-			paint = Surface_BeginPaint( surface, r );
+			rect = rn->data;
+			ev.paint.rect = *rect;
+			LCUI_TriggerEvent( &ev, NULL );
+			if( skip ) {
+				continue;
+			}
+			paint = Surface_BeginPaint( surface, rect );
 			if( !paint ) {
 				continue;
 			}
-			ev.paint.rect = *r;
-			LCUI_TriggerEvent( &ev, NULL );
 			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
 				   record->widget->type,
 				   paint->rect.x, paint->rect.y,
@@ -464,7 +469,7 @@ void Surface_Destroy( LCUI_Surface surface )
 
 LCUI_Surface Surface_New( void )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		return display.driver->create();
 	}
 	return NULL;
@@ -472,7 +477,7 @@ LCUI_Surface Surface_New( void )
 
 LCUI_BOOL Surface_IsReady( LCUI_Surface surface )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		return display.driver->isReady( surface );
 	}
 	return TRUE;
@@ -480,14 +485,14 @@ LCUI_BOOL Surface_IsReady( LCUI_Surface surface )
 
 void Surface_Move( LCUI_Surface surface, int x, int y )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		display.driver->move( surface, x, y );
 	}
 }
 
 void Surface_Resize( LCUI_Surface surface, int w, int h )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		LCUI_Rect rect;
 		display.driver->resize( surface, w, h );
 		rect.x = rect.y = 0;
@@ -499,28 +504,28 @@ void Surface_Resize( LCUI_Surface surface, int w, int h )
 
 void Surface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		display.driver->setCaptionW( surface, str );
 	}
 }
 
 void Surface_Show( LCUI_Surface surface )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		display.driver->show( surface );
 	}
 }
 
 void Surface_Hide( LCUI_Surface surface )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		display.driver->hide( surface );
 	}
 }
 
 void *Surface_GetHandle( LCUI_Surface surface )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		return display.driver->getHandle( surface );
 	}
 	return NULL;
@@ -528,21 +533,21 @@ void *Surface_GetHandle( LCUI_Surface surface )
 
 void Surface_SetRenderMode( LCUI_Surface surface, int mode )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		display.driver->setRenderMode( surface, mode );
 	}
 }
 
 void Surface_Update( LCUI_Surface surface )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		display.driver->update( surface );
 	}
 }
 
 LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		return display.driver->beginPaint( surface, rect );
 	}
 	return NULL;
@@ -550,14 +555,14 @@ LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 
 void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		display.driver->endPaint( surface, paint_ctx );
 	}
 }
 
 void Surface_Present( LCUI_Surface surface )
 {
-	if( display.is_working ) {
+	if( display.driver ) {
 		display.driver->present( surface );
 	}
 }
@@ -665,20 +670,22 @@ int LCUI_InitDisplay( LCUI_DisplayDriver driver )
 	}
 	LOG( "[display] init ...\n" );
 	display.mode = 0;
-	root = LCUIWidget_GetRoot();
-	LinkedList_Init( &display.rects );
-	LinkedList_Init( &display.surfaces );
-	if( !driver ) {
-		driver = LCUI_CreateDisplayDriver();
-		if( !driver ) {
-			LOG( "[display] init failed\n" );
-			return -2;
-		}
-	}
 	display.driver = driver;
 	display.is_working = TRUE;
 	display.width = DEFAULT_WIDTH;
 	display.height = DEFAULT_HEIGHT;
+	LinkedList_Init( &display.rects );
+	LinkedList_Init( &display.surfaces );
+	if( !display.driver ) {
+		display.driver = LCUI_CreateDisplayDriver();
+	}
+	if( !display.driver ) {
+		LOG( "[display] init failed\n" );
+		LCUIDisplay_SetMode( LCDM_DEFAULT );
+		LCUIDisplay_Update();
+		return -2;
+	}
+	root = LCUIWidget_GetRoot();
 	display.driver->bindEvent( DET_RESIZE, OnResize, NULL, NULL );
 	display.driver->bindEvent( DET_PAINT, OnPaint, NULL, NULL );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
@@ -697,6 +704,8 @@ int LCUI_ExitDisplay( void )
 	display.is_working = FALSE;
 	RectList_Clear( &display.rects );
 	LCUIDisplay_CleanSurfaces();
-	LCUI_DestroyDisplayDriver( display.driver );
+	if( display.driver ) {
+		LCUI_DestroyDisplayDriver( display.driver );
+	}
 	return 0;
 }
