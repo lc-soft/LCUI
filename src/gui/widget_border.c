@@ -153,14 +153,6 @@ static unsigned int ComputeActual( float width )
 	return w;
 }
 
-static float ComputeBorderWidth( float width )
-{
-	if( width < 1.0f && width > 0 ) {
-		return 1.0f;
-	}
-	return roundf( width );
-}
-
 void Widget_UpdateBorder( LCUI_Widget w )
 {
 	LCUI_BorderStyle ob, *nb;

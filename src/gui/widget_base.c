@@ -1436,11 +1436,9 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name )
 
 float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 {
-	LCUI_Style s;
 	LCUI_Widget w;
 	float width = 0, padding = 0;
 	for( w = widget->parent; w; w = w->parent ) {
-		s = &w->style->sheet[key_width];
 		if( !Widget_HasAutoWidth( w ) ) {
 			width = w->box.content.width;
 			break;

@@ -108,8 +108,8 @@ static void check_widget_rect( LCUI_SysEvent ev, void *arg )
 	LCUIRect_MergeRect( &rect, &rect, &old_rect );
 	CHECK2( self.count, check_rect_correct( &rect, paint_rect ) );
 	if( ret != 0 ) {
-		TEST_LOG( "[%d] correct: (%d, %d, %d, %d), actual: (%d, %d, %d, %d)\n",
-			  self.step,
+		TEST_LOG( "[%d] correct: (%d, %d, %d, %d),"
+			  " actual: (%d, %d, %d, %d)\n", self.step,
 			  rect.x, rect.y, rect.width, rect.height,
 			  paint_rect->x, paint_rect->y,
 			  paint_rect->width, paint_rect->height );

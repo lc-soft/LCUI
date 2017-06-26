@@ -175,7 +175,7 @@ static void *jpeg_malloc( j_decompress_ptr cinfo, size_t size )
 int LCUI_ReadJPEGHeader( LCUI_ImageReader reader )
 {
 	size_t size;
-	short int mark;
+	short int *buffer;
 	j_decompress_ptr cinfo;
 	LCUI_JPEGReader jpeg_reader;
 	LCUI_ImageHeader header = &reader->header;
@@ -191,8 +191,8 @@ int LCUI_ReadJPEGHeader( LCUI_ImageReader reader )
 	}
 	jpeg_reader->src.bytes_in_buffer = sizeof( short int );
 	jpeg_reader->src.next_input_byte = jpeg_reader->buffer;
-	mark = ((short int*)jpeg_reader->buffer)[0];
-	if( mark != -9985 ) {
+	buffer = (short int*)jpeg_reader->buffer;
+	if( buffer[0] != -9985 ) {
 		return -ENODATA;
 	}
 	jpeg_read_header( cinfo, TRUE );
