@@ -226,7 +226,7 @@ static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 		int fixed_w = txt->layer->fixed_width;
 		int fixed_h = txt->layer->fixed_height;
 		/* 解除固定宽高设置，以计算最大宽高 */
-		TextLayer_SetFixedSize( txt->layer, (int)*width, 0 );
+		TextLayer_SetFixedSize( txt->layer, (int)(*width * scale), 0 );
 		TextLayer_Update( txt->layer, NULL );
 		if( *width <= 0 ) {
 			*width = TextLayer_GetWidth( txt->layer ) / scale;
