@@ -250,5 +250,7 @@ void LCUIWidget_Update( void )
 
 void LCUIWidget_RefreshStyle( void )
 {
-	Widget_AddTaskForChildren( LCUIWidget_GetRoot(), WTT_REFRESH_STYLE );
+	LCUI_Widget root = LCUIWidget_GetRoot();
+	Widget_UpdateStyle( root, TRUE );
+	Widget_AddTaskForChildren( root, WTT_REFRESH_STYLE );
 }
