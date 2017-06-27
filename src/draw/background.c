@@ -77,9 +77,6 @@ void Graph_DrawBackground( LCUI_PaintContext paint,
 	if( bg->size.width == bg->image->width &&
 	    bg->size.height == bg->image->height ) {
 		Graph_QuoteReadOnly( &graph, bg->image, &read_rect );
-		/* 转换成相对于当前绘制区域的坐标 */
-		x += box->x - paint->rect.x + read_rect.x;
-		y += box->y - paint->rect.y + read_rect.y;
 	} else {
 		rect = read_rect;
 		/* 根据宽高的缩放比例，计算实际需要引用的区域 */
