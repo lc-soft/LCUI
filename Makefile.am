@@ -28,3 +28,6 @@ test/test_image_reader.c \
 test/test_image_reader.bmp \
 test/test_image_reader.jpg \
 test/test_image_reader.png
+
+@CODE_COVERAGE_RULES@
+

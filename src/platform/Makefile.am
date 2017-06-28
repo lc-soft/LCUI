@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS=foreign subdir-objects
-AM_CFLAGS = -I$(abs_top_srcdir)/include
+AM_CFLAGS = -I$(abs_top_srcdir)/include $(CODE_COVERAGE_CFLAGS)
 noinst_LTLIBRARIES = libplatform.la
 libplatform_la_SOURCES = linux/linux_events.c \
 linux/linux_keyboard.c \

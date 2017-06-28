@@ -18,10 +18,12 @@
 .libs
 *.la
 *.txt
+*.gcda
 *.vspx
 *.vs
 *.res
 *.vcxproj.user
+*.gcno
 build/windows/*/*.css
 build/windows/*/*.xml
 *~

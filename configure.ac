@@ -43,6 +43,8 @@ AC_TYPE_UINT32_T
 # Checks for library functions.
 AC_CHECK_FUNCS([memset munmap select strcasecmp sysinfo])
 
+AX_CODE_COVERAGE
+
 LCUI_LIBS=""
 CFLAGS="-Wall -D _GNU_SOURCE"
 CXXFLAG="-Wall -D _GNU_SOURCE"
@@ -51,7 +53,7 @@ export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/include/libxml2:/usr/include/freetype
 # 检测是否启用线程支持
 want_thread=no
 thread_name=pthread
-AC_ARG_WITH(pthread, [  --with-pthread          use pthread	(default)])
+AC_ARG_WITH(pthread, AC_HELP_STRING([--with-pthread], [use pthread (default)]))
 if test "x$with_pthread" != "xno"; then
 	AX_PTHREAD([
 		want_thread=yes
@@ -65,7 +67,7 @@ fi
 # 检测是否有libxml2库，必须有 libxml2 库才能启用 LCUIBuilder 功能模块
 enable_builder=yes
 AC_ARG_ENABLE(lcui-builder, AC_HELP_STRING([--enable-lcui-builder],
-[enable lcui-builder function module [[default=no]]]), [enable_builder=$enableval])
+[enable lcui-builder function module [[default=yes]]]), [enable_builder=$enableval])
 if test "$enable_builder" = "yes"; then
 	AC_CHECK_HEADERS([libxml/parser.h],[
 		AC_CHECK_LIB([xml2], [xmlParseFile], [
@@ -120,7 +122,7 @@ else
 fi
 
 want_png=no
-AC_ARG_WITH(png, [  --with-png              use libpng	(default)])
+AC_ARG_WITH(png, AC_HELP_STRING([--with-png], [use libpng (default)]))
 if test "x$with_png" != "xno"; then
 	AC_CHECK_HEADERS([png.h],[
 		AC_CHECK_LIB([png], [png_sig_cmp],[
@@ -133,7 +135,7 @@ if test "x$with_png" != "xno"; then
 fi
 
 want_jpeg=no
-AC_ARG_WITH(jpeg, [  --with-jpeg             use libjpeg	(default)])
+AC_ARG_WITH(jpeg, AC_HELP_STRING([--with-jpeg], [use libjpeg (default)]))
 if test "x$with_jpeg" != "xno"; then
 	AC_CHECK_HEADERS([jpeglib.h setjmp.h],[
 		AC_CHECK_LIB([jpeg], [jpeg_start_decompress],[
