@@ -54,6 +54,17 @@ char *strdup2( const char *str )
 	return out;
 }
 
+wchar_t *wcsdup2( const wchar_t *str )
+{
+	size_t len = wcslen( str ) + 1;
+	wchar_t *out = malloc( sizeof( wchar_t ) * len );
+	if( !out ) {
+		return NULL;
+	}
+	wcsncpy( out, str, len );
+	return out;
+}
+
 int strtrim( char *outstr, const char *instr, const char *charlist )
 {
 	LCUI_BOOL clear, clear_left = TRUE;
