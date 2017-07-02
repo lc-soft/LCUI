@@ -1,4 +1,4 @@
-#include <string.h>
+﻿#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/timer.h>
@@ -106,7 +106,7 @@ static void check_widget_rect( LCUI_SysEvent ev, void *arg )
 	LCUIMetrics_ComputeRectActual( &old_rect, &rectf );
 	LCUIMetrics_ComputeRectActual( &rect, &self.widget->box.graph );
 	LCUIRect_MergeRect( &rect, &rect, &old_rect );
-	CHECK2( self.count, check_rect_correct( &rect, paint_rect ) );
+	CHECK2( check_rect_correct( &rect, paint_rect ) );
 	if( ret != 0 ) {
 		TEST_LOG( "[%d] correct: (%d, %d, %d, %d),"
 			  " actual: (%d, %d, %d, %d)\n", self.step,
@@ -115,6 +115,7 @@ static void check_widget_rect( LCUI_SysEvent ev, void *arg )
 			  paint_rect->width, paint_rect->height );
 	}
 	self.pass += ret;
+	self.count += 1;
 	self.x = self.widget->x;
 	self.y = self.widget->y;
 	LCUI_PostSimpleTask( test_move_widget, NULL, NULL );
@@ -131,6 +132,12 @@ static void LoggerHandlerW( const wchar_t *str )
 	OutputDebugStringW( str );
 }
 #endif
+
+static void start_test( void *arg )
+{
+	test_move_widget( NULL, NULL );
+	LCUI_BindEvent( LCUI_PAINT, check_widget_rect, NULL, NULL );
+}
 
 static LCUI_Widget create_widget( void )
 {
@@ -165,8 +172,8 @@ int test_widget_rect( void )
 		self.widget = create_widget();
 		LCUIMetrics_SetScale( values[i] );
 		LCUIDisplay_SetSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-		LCUI_PostSimpleTask( test_move_widget, NULL, NULL );
-		LCUI_BindEvent( LCUI_PAINT, check_widget_rect, NULL, NULL );
+		/* 等一段时间后再开始测试，避免初始化 LCUI 时产生的脏矩形影响测试结果 */
+		LCUITimer_Set( 100, start_test, NULL, FALSE );
 		LCUIWidget_Update();
 		ret += LCUI_Main() == 0 ? 0 : -1;
 	}
