@@ -27,133 +27,59 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\LCUI\draw\background.h" />
-    <ClInclude Include="..\..\..\include\LCUI\draw\border.h" />
-    <ClInclude Include="..\..\..\include\LCUI\draw\boxshadow.h" />
-    <ClInclude Include="..\..\..\include\LCUI\draw\line.h" />
-    <ClInclude Include="..\..\..\include\LCUI\font\charset.h" />
-    <ClInclude Include="..\..\..\include\LCUI\font\fontlibrary.h" />
-    <ClInclude Include="..\..\..\include\LCUI\font\textlayer.h" />
-    <ClInclude Include="..\..\..\include\LCUI\font\textstyle.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\builder.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\css_library.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\metrics.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\sidebar.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textcaret.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textedit.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget\textview.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget_base.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget_prototype.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget_task.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h" />
-    <ClInclude Include="..\..\..\include\LCUI\gui\widget_style.h" />
-    <ClInclude Include="..\..\..\include\LCUI\image.h" />
-    <ClInclude Include="..\..\..\include\LCUI\LCUI.h" />
-    <ClInclude Include="..\..\..\include\LCUI\config.h" />
-    <ClInclude Include="..\..\..\include\LCUI\cursor.h" />
-    <ClInclude Include="..\..\..\include\LCUI\display.h" />
-    <ClInclude Include="..\..\..\include\LCUI\draw.h" />
-    <ClInclude Include="..\..\..\include\LCUI\font.h" />
-    <ClInclude Include="..\..\..\include\LCUI\graph.h" />
-    <ClInclude Include="..\..\..\include\LCUI\input.h" />
-    <ClInclude Include="..\..\..\include\LCUI\ime.h" />
-    <ClInclude Include="..\..\..\include\LCUI\main.h" />
-    <ClInclude Include="..\..\..\include\LCUI\platform.h" />
-    <ClInclude Include="..\..\..\include\LCUI\surface.h" />
-    <ClInclude Include="..\..\..\include\LCUI\thread.h" />
-    <ClInclude Include="..\..\..\include\LCUI\timer.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\delay.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\dict.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\dirent.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\event.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\steptimer.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\linkedlist.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\logger.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\math.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\parse.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\rect.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\string.h" />
-    <ClInclude Include="..\..\..\include\LCUI\util\time.h" />
-    <ClInclude Include="..\..\..\include\LCUI_Build.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\..\src\platform\windows\Common\DeviceResources.h" />
+    <ClInclude Include="..\..\..\src\platform\windows\Common\DirectXHelper.h" />
+    <ClInclude Include="..\..\..\src\platform\windows\Common\StepTimer.h" />
+    <ClInclude Include="..\..\..\src\platform\windows\pch.h" />
+    <ClInclude Include="..\..\..\src\platform\windows\uwp_app.h" />
+    <ClInclude Include="..\..\..\src\platform\windows\uwp_input.h" />
+    <ClInclude Include="..\..\..\src\platform\windows\uwp_main.h" />
+    <ClInclude Include="..\..\..\src\platform\windows\uwp_renderer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\display.c" />
-    <ClCompile Include="..\..\..\src\draw\background.c" />
-    <ClCompile Include="..\..\..\src\draw\border.c" />
-    <ClCompile Include="..\..\..\src\draw\boxshadow.c" />
-    <ClCompile Include="..\..\..\src\draw\line.c" />
-    <ClCompile Include="..\..\..\src\font\charset.c" />
-    <ClCompile Include="..\..\..\src\font\fontlibrary.c" />
-    <ClCompile Include="..\..\..\src\font\freetype.c" />
-    <ClCompile Include="..\..\..\src\font\in-core\font_inconsolata.c" />
-    <ClCompile Include="..\..\..\src\font\in_core_font.c" />
-    <ClCompile Include="..\..\..\src\font\textlayer.c" />
-    <ClCompile Include="..\..\..\src\font\textstyle.c" />
-    <ClCompile Include="..\..\..\src\gui\builder.c" />
-    <ClCompile Include="..\..\..\src\gui\css_fontstyle.c" />
-    <ClCompile Include="..\..\..\src\gui\css_library.c" />
-    <ClCompile Include="..\..\..\src\gui\css_parser.c" />
-    <ClCompile Include="..\..\..\src\gui\metrics.c" />
-    <ClCompile Include="..\..\..\src\gui\widget.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\button.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\textcaret.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\textedit.c" />
-    <ClCompile Include="..\..\..\src\gui\widget\textview.c" />
-    <ClCompile Include="..\..\..\src\gui\widget_background.c" />
-    <ClCompile Include="..\..\..\src\gui\widget_base.c" />
-    <ClCompile Include="..\..\..\src\gui\widget_border.c" />
-    <ClCompile Include="..\..\..\src\gui\widget_event.c" />
-    <ClCompile Include="..\..\..\src\gui\widget_prototype.c" />
-    <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
-    <ClCompile Include="..\..\..\src\gui\widget_shadow.c" />
-    <ClCompile Include="..\..\..\src\gui\widget_style.c" />
-    <ClCompile Include="..\..\..\src\gui\widget_task.c" />
-    <ClCompile Include="..\..\..\src\cursor.c" />
-    <ClCompile Include="..\..\..\src\graph.c">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
+    <ClCompile Include="..\..\..\src\platform\windows\Common\DeviceResources.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsWinRT>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\image\bmp.c" />
-    <ClCompile Include="..\..\..\src\image\jpeg.c" />
-    <ClCompile Include="..\..\..\src\image\png.c" />
-    <ClCompile Include="..\..\..\src\image\reader.c" />
-    <ClCompile Include="..\..\..\src\ime.c" />
-    <ClCompile Include="..\..\..\src\keyboard.c" />
-    <ClCompile Include="..\..\..\src\main.c" />
-    <ClCompile Include="..\..\..\src\thread\win32\cond.c" />
-    <ClCompile Include="..\..\..\src\thread\win32\mutex.c" />
-    <ClCompile Include="..\..\..\src\thread\win32\thread.c">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)include;$(SolutionDir)include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    <ClCompile Include="..\..\..\src\platform\windows\pch.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\timer.c" />
-    <ClCompile Include="..\..\..\src\util\dict.c" />
-    <ClCompile Include="..\..\..\src\util\dirent.c" />
-    <ClCompile Include="..\..\..\src\util\event.c" />
-    <ClCompile Include="..\..\..\src\util\steptimer.c" />
-    <ClCompile Include="..\..\..\src\util\linkedlist.c" />
-    <ClCompile Include="..\..\..\src\util\logger.c" />
-    <ClCompile Include="..\..\..\src\util\math.c" />
-    <ClCompile Include="..\..\..\src\util\parse.c" />
-    <ClCompile Include="..\..\..\src\util\rbtree.c" />
-    <ClCompile Include="..\..\..\src\util\rect.c" />
-    <ClCompile Include="..\..\..\src\util\string.c" />
-    <ClCompile Include="..\..\..\src\util\time.c" />
+    <ClCompile Include="..\..\..\src\platform\windows\uwp_app.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\windows\uwp_input.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\windows\uwp_main.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\windows\uwp_renderer.cpp">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsWinRT>
+    </ClCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{48523b96-5f4e-4efd-8580-6b1c0a762ee4}</ProjectGuid>
+    <ProjectGuid>{6BA8BA7C-5D52-4926-BE88-B8EAA02B87D7}</ProjectGuid>
     <Keyword>DynamicLibrary</Keyword>
     <RootNamespace>LCUIUWP</RootNamespace>
     <DefaultLanguage>zh-CN</DefaultLanguage>
@@ -226,14 +152,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <GenerateManifest>false</GenerateManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
-    <TargetName>LCUI</TargetName>
+    <TargetName>LCUIApp</TargetName>
     <OutDir>$(SolutionDir)..\..\bin\$(Configuration)\uwp\</OutDir>
     <IntDir>$(ProjectDir)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <GenerateManifest>false</GenerateManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
-    <TargetName>LCUI</TargetName>
+    <TargetName>LCUIApp</TargetName>
     <OutDir>$(SolutionDir)..\..\bin\$(Configuration)\uwp\</OutDir>
     <IntDir>$(ProjectDir)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -255,8 +181,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <CompileAsWinRT>true</CompileAsWinRT>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LCUI_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\src\platform\windows;$(SolutionDir)..\..\vendor\include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -265,16 +191,16 @@
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalDependencies>kernel32.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;libxml2.lib;WindowsApp.lib;vccorlibd.lib;msvcrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\uwp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LCUI.lib;WindowsApp.lib;vccorlibd.lib;msvcrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ShowProgress>NotSet</ShowProgress>
       <IgnoreSpecificDefaultLibraries>msvcrt;vccorlibd.lib;msvcrtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <CompileAsWinRT>true</CompileAsWinRT>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LCUI_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\src\platform\windows;$(SolutionDir)..\..\vendor\include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -283,8 +209,8 @@
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalDependencies>kernel32.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;libxml2.lib;vccorlibd.lib;msvcrt.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\uwp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LCUI.lib;vccorlibd.lib;msvcrt.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>vccorlib;msvcrt;msvcrtd</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>

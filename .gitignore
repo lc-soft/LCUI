@@ -1,5 +1,7 @@
 *.lo
 *.o
+*.dll
+*.lib
 *.db
 *.opendb
 *.dirstamp

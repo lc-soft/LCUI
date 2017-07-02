@@ -51,10 +51,18 @@
 #include <LCUI/display.h>
 #include <LCUI/ime.h>
 #include <LCUI/platform.h>
+#ifdef LCUI_EVENTS_H
 #include LCUI_EVENTS_H
+#endif
+#ifdef LCUI_MOUSE_H
 #include LCUI_MOUSE_H
+#endif
+#ifdef LCUI_KEYBOARD_H
 #include LCUI_KEYBOARD_H
+#endif
+#ifdef LCUI_DISPLAY_H
 #include LCUI_DISPLAY_H
+#endif
 
 #define STATE_ACTIVE 1
 #define STATE_KILLED 0
