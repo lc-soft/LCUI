@@ -805,8 +805,8 @@ static void TextEdit_OnMouseMove( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	}
 	scale = LCUIMetrics_GetScale();
 	Widget_GetOffset( w, NULL, &offset_x, &offset_y );
-	x = (e->motion.x - offset_x - w->padding.left) * scale;
-	y = (e->motion.y - offset_y + w->padding.top) * scale;
+	x = iround( (e->motion.x - offset_x - w->padding.left) * scale );
+	y = iround( (e->motion.y - offset_y + w->padding.top) * scale );
 	TextLayer_SetCaretPosByPixelPos( edit->layer_source, x, y );
 	TextEdit_UpdateCaret( w );
 }
@@ -824,8 +824,8 @@ static void TextEdit_OnMouseDown( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LCUI_TextEdit edit = GetData( w );
 	float scale = LCUIMetrics_GetScale();
 	Widget_GetOffset( w, NULL, &offset_x, &offset_y );
-	x = (e->motion.x - offset_x - w->padding.left) * scale;
-	y = (e->motion.y - offset_y + w->padding.top) * scale;
+	x = iround( (e->motion.x - offset_x - w->padding.left) * scale );
+	y = iround( (e->motion.y - offset_y + w->padding.top) * scale );
 	TextLayer_SetCaretPosByPixelPos( edit->layer, x, y );
 	TextEdit_UpdateCaret( w );
 	Widget_SetMouseCapture( w );

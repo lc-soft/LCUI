@@ -49,7 +49,9 @@
 #include <LCUI/thread.h>
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
+#ifdef LCUI_DISPLAY_H
 #include LCUI_DISPLAY_H
+#endif
 
 #define DEFAULT_WIDTH	800
 #define DEFAULT_HEIGHT	600
@@ -205,13 +207,13 @@ void LCUIDisplay_InvalidateArea( LCUI_Rect *rect )
 		return;
 	}
 	if( rect ) {
+		RectToInvalidArea( rect, &area );
+		RectList_Add( &display.rects, &area );
+	} else {
 		area.x = 0;
 		area.y = 0;
 		area.width = LCUIDisplay_GetWidth();
 		area.height = LCUIDisplay_GetHeight();
-		RectList_Add( &display.rects, &area );
-	} else {
-		RectToInvalidArea( rect, &area );
 		RectList_Add( &display.rects, &area );
 	}
 }

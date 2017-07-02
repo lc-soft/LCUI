@@ -139,7 +139,7 @@ static void ExecLoadImage( void *arg1, void *arg2 )
 	}
 	cache = NEW( ImageCacheRec, 1 );
 	cache->image = image;
-	cache->path = strdup( path );
+	cache->path = strdup2( path );
 	LinkedList_Init( &cache->refs );
 	if( Dict_Add( self.images, cache->path, cache ) == 0 ) {
 		AddImageRef( widget, cache );
@@ -348,16 +348,16 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			height = bg->image.height / scale;
 			if( height < box->height ) {
 				height = box->height;
-				scale = 1.0 * bg->image.height / height;
+				scale = 1.0f * bg->image.height / height;
 				width = bg->image.width / scale;
 			}
-			x = (box->width - width) / 2;
-			y = (box->height - height) / 2;
+			x = (box->width - width) / 2.0f;
+			y = (box->height - height) / 2.0f;
 			break;
 		case SV_AUTO:
 		default:
-			width = bg->image.width;
-			height = bg->image.height;
+			width = (float)bg->image.width;
+			height = (float)bg->image.height;
 			break;
 		}
 		out->position.x = LCUIMetrics_ComputeActual( x, SVT_PX );
@@ -372,7 +372,7 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			break;
 		case SVT_NONE:
 		case SVT_AUTO:
-			width = bg->image.width;
+			width = (float)bg->image.width;
 			break;
 		default:
 			width = bg->size.width.value;
@@ -387,10 +387,10 @@ void Widget_ComputeBackground( LCUI_Widget w, LCUI_Background *out )
 			break;
 		case SVT_NONE:
 		case SVT_AUTO:
-			height = bg->image.height;
+			height = (float)bg->image.height;
 			break;
 		default:
-			height = bg->size.height.value;
+			height = (float)bg->size.height.value;
 			break;
 		}
 		out->size.height = LCUIMetrics_ComputeActual( height, type );

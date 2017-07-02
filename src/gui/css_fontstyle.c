@@ -211,15 +211,13 @@ static LCUI_StyleParserRec style_parsers[] = {
 
 static void OnComputeFontSize( LCUI_FontStyle fs, LCUI_Style s )
 {
-	int size;
 	if( s->is_valid ) {
-		size = max( MIN_FONT_SIZE, s->value );
-		size = LCUIMetrics_ComputeActual( size, s->type );
-	} else {
-		size = DEFAULT_FONT_SIZE;
-		size = LCUIMetrics_ComputeActual( size, SVT_PX );
+		fs->font_size = LCUIMetrics_ComputeActual(
+			max( MIN_FONT_SIZE, s->value ), s->type
+		);
+		return;
 	}
-	fs->font_size = size;
+	fs->font_size = LCUIMetrics_ComputeActual( DEFAULT_FONT_SIZE, SVT_PX );
 }
 
 static void OnComputeColor( LCUI_FontStyle fs, LCUI_Style s )
@@ -298,7 +296,7 @@ static void OnComputeContent( LCUI_FontStyle fs, LCUI_Style s )
 		fs->content = NULL;
 	}
 	if( s->is_valid ) {
-		fs->content = wcsdup( s->wstring );
+		fs->content = wcsdup2( s->wstring );
 	}
 }
 

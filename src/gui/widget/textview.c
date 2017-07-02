@@ -370,7 +370,7 @@ int TextView_SetText( LCUI_Widget w, const char *utf8_text )
 
 void TextView_SetLineHeight( LCUI_Widget w, int height )
 {
-	Widget_SetFontStyle( w, key_line_height, height, px );
+	Widget_SetFontStyle( w, key_line_height, (float)height, px );
 }
 
 void TextView_SetTextAlign( LCUI_Widget w, int align )

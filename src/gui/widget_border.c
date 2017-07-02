@@ -98,16 +98,16 @@ void Widget_ComputeBorderStyle( LCUI_Widget w )
 			b->left.width = ComputeYMetric( w, s );
 			break;
 		case key_border_top_style:
-			b->top.style = s->value;
+			b->top.style = s->val_style;
 			break;
 		case key_border_right_style:
-			b->right.style = s->value;
+			b->right.style = s->val_style;
 			break;
 		case key_border_bottom_style:
-			b->bottom.style = s->value;
+			b->bottom.style = s->val_style;
 			break;
 		case key_border_left_style:
-			b->left.style = s->value;
+			b->left.style = s->val_style;
 			break;
 		case key_border_top_left_radius:
 			b->top_left_radius = ComputeXMetric( w, s );
