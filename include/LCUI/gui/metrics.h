@@ -81,7 +81,7 @@ LCUI_API void LCUIMetrics_SetScale( float scale );
 
 LCUI_API void LCUI_InitMetrics( void );
 
-void LCUI_ExitMetrics( void );
+void LCUI_FreeMetrics( void );
 
 LCUI_END_HEADER
 

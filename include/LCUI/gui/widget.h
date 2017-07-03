@@ -51,6 +51,6 @@
 
 void LCUI_InitWidget( void );
 
-void LCUI_ExitWidget( void );
+void LCUI_FreeWidget( void );
 
 #endif

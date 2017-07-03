@@ -124,7 +124,7 @@ void LCUI_InitCursor( void )
 	Graph_Free( &pic );
 }
 
-void LCUI_ExitCursor( void )
+void LCUI_FreeCursor( void )
 {
 	Graph_Free( &cursor.graph );
 }

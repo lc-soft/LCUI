@@ -86,7 +86,7 @@ LCUI_API void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint );
 
 LCUI_API void LCUIWidget_InitRenderer( void );
 
-LCUI_API void LCUIWidget_ExitRenderer( void );
+LCUI_API void LCUIWidget_FreeRenderer( void );
 
 LCUI_END_HEADER
 

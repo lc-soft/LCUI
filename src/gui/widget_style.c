@@ -271,9 +271,9 @@ void LCUIWidget_InitStyle( void )
 	LCUI_LoadCSSString( global_css, NULL );
 }
 
-void LCUIWidget_ExitStyle( void )
+void LCUIWidget_FreeStyle( void )
 {
-	LCUI_ExitCSSFontStyle();
-	LCUI_ExitCSSLibrary();
-	LCUI_ExitCSSParser();
+	LCUI_FreeCSSFontStyle();
+	LCUI_FreeCSSLibrary();
+	LCUI_FreeCSSParser();
 }

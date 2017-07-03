@@ -385,7 +385,7 @@ void LCUI_InitCSSFontStyle( void )
 	self.handlers[key_content] = OnComputeContent;
 }
 
-void LCUI_ExitCSSFontStyle( void )
+void LCUI_FreeCSSFontStyle( void )
 {
 
 }

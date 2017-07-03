@@ -254,7 +254,7 @@ LCUI_API void LCUI_PrintCSSLibrary( void );
 
 LCUI_API void LCUI_InitCSSLibrary( void );
 
-LCUI_API void LCUI_ExitCSSLibrary( void );
+LCUI_API void LCUI_FreeCSSLibrary( void );
 
 LCUI_END_HEADER
 

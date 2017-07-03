@@ -63,7 +63,7 @@ void LCUIWidget_InitPrototype( void )
 	self.prototypes = Dict_Create( &self.dicttype, NULL );
 }
 
-void LCUIWidget_ExitPrototype( void )
+void LCUIWidget_FreePrototype( void )
 {
 	Dict_Release( self.prototypes );
 }

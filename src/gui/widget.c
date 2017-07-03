@@ -64,14 +64,14 @@ void LCUI_InitWidget( void )
 	LCUIWidget_InitBase();
 }
 
-void LCUI_ExitWidget( void )
+void LCUI_FreeWidget( void )
 {
-	LCUIWidget_ExitTasks();
-	LCUIWidget_DestroyRoot();
-	LCUIWidget_ExitEvent();
-	LCUIWidget_ExitStyle();
-	LCUIWidget_ExitPrototype();
-	LCUIWidget_ExitRenderer();
-	LCUIWidget_ExitImageLoader();
-	LCUIWidget_ExitBase();
+	LCUIWidget_FreeTasks();
+	LCUIWidget_FreeRoot();
+	LCUIWidget_FreeEvent();
+	LCUIWidget_FreeStyle();
+	LCUIWidget_FreePrototype();
+	LCUIWidget_FreeRenderer();
+	LCUIWidget_FreeImageLoader();
+	LCUIWidget_FreeBase();
 }

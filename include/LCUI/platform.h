@@ -48,9 +48,9 @@
 #define LCUI_CreateDisplayDriver() NULL
 #define LCUI_DestroyDisplayDriver(X) NULL
 #define LCUI_InitMouseDriver()
-#define LCUI_ExitMouseDriver()
+#define LCUI_FreeMouseDriver()
 #define LCUI_InitKeyboardDriver()
-#define LCUI_ExitKeyboardDriver()
+#define LCUI_FreeKeyboardDriver()
 #else
 #define LCUI_CreateAppDriver LCUI_CreateWinAppDriver
 #define LCUI_DestroyAppDriver LCUI_DestroyWinAppDriver
@@ -58,9 +58,9 @@
 #define LCUI_CreateDisplayDriver LCUI_CreateWinDisplay
 #define LCUI_DestroyDisplayDriver LCUI_DestroyWinDisplay
 #define LCUI_InitMouseDriver LCUI_InitWinMouse
-#define LCUI_ExitMouseDriver LCUI_ExitWinMouse
+#define LCUI_FreeMouseDriver LCUI_FreeWinMouse
 #define LCUI_InitKeyboardDriver LCUI_InitWinKeyboard
-#define LCUI_ExitKeyboardDriver LCUI_ExitWinKeyboard
+#define LCUI_FreeKeyboardDriver LCUI_FreeWinKeyboard
 #endif
 #if defined(WINAPI_PARTITION_APP)
 #define LCUI_APP_H	<LCUI/platform/windows/uwp.h>
@@ -77,9 +77,9 @@
 #define LCUI_CreateDisplayDriver LCUI_CreateLinuxDisplayDriver
 #define LCUI_DestroyDisplayDriver LCUI_DestroyLinuxDisplayDriver
 #define LCUI_InitMouseDriver LCUI_InitLinuxMouse
-#define LCUI_ExitMouseDriver LCUI_ExitLinuxMouse
+#define LCUI_FreeMouseDriver LCUI_FreeLinuxMouse
 #define LCUI_InitKeyboardDriver LCUI_InitLinuxKeyboard
-#define LCUI_ExitKeyboardDriver LCUI_ExitLinuxKeyboard
+#define LCUI_FreeKeyboardDriver LCUI_FreeLinuxKeyboard
 #ifdef linux
 #undef linux
 #endif

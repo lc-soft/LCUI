@@ -124,7 +124,7 @@ static void LCUI_InitEvent( void )
 }
 
 /** 停用事件模块并进行清理 */
-static void LCUI_ExitEvent( void )
+static void LCUI_FreeEvent( void )
 {
 	LCUIMutex_Destroy( &System.event.mutex );
 	EventTrigger_Destroy( System.event.trigger );
@@ -394,7 +394,7 @@ static void OnDeleteTask( void *arg )
 	free( arg );
 }
 
-static void LCUI_ExitApp( void )
+static void LCUI_FreeApp( void )
 {
 	LCUI_MainLoop loop;
 	LinkedListNode *node;
@@ -536,16 +536,16 @@ int LCUI_Destroy( void )
 	e.type = LCUI_QUIT;
 	LCUI_TriggerEvent( &e, NULL );
 	System.state = STATE_KILLED;
-	LCUI_ExitDisplay();
-	LCUI_ExitApp();
-	LCUI_ExitIME();
-	LCUI_ExitKeyboard();
-	LCUI_ExitCursor();
-	LCUI_ExitWidget();
-	LCUI_ExitFont();
-	LCUI_ExitTimer();
-	LCUI_ExitEvent();
-	LCUI_ExitMetrics();
+	LCUI_FreeDisplay();
+	LCUI_FreeApp();
+	LCUI_FreeIME();
+	LCUI_FreeKeyboard();
+	LCUI_FreeCursor();
+	LCUI_FreeWidget();
+	LCUI_FreeFont();
+	LCUI_FreeTimer();
+	LCUI_FreeEvent();
+	LCUI_FreeMetrics();
 	return System.exit_code;
 }
 
@@ -555,7 +555,7 @@ void LCUI_Quit( void )
 	LCUIApp_QuitAllMainLoop();
 }
 
-void LCUI_Exit( int code )
+void LCUI_Free( int code )
 {
 	System.exit_code = code;
 	LCUI_Quit();

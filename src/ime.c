@@ -351,7 +351,7 @@ void LCUI_InitIME( void )
 }
 
 /* 停用LCUI输入法模块 */
-void LCUI_ExitIME( void )
+void LCUI_FreeIME( void )
 {
 	self.is_inited = FALSE;
 	LinkedList_ClearData( &self.list, LCUIIME_OnDestroy );

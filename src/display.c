@@ -698,7 +698,7 @@ int LCUI_InitDisplay( LCUI_DisplayDriver driver )
 }
 
 /** 停用图形输出模块 */
-int LCUI_ExitDisplay( void )
+int LCUI_FreeDisplay( void )
 {
 	if( !display.is_working ) {
 		return -1;

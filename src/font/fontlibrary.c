@@ -688,7 +688,7 @@ static void LCUIFont_Delete( LCUI_Font *font )
 }
 
 /** 停用字体处理模块 */
-void LCUI_ExitFont( void )
+void LCUI_FreeFont( void )
 {
 	int i;
 	LCUI_Font *font;

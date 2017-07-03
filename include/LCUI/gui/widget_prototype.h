@@ -44,7 +44,7 @@ LCUI_BEGIN_HEADER
 
 LCUI_API void LCUIWidget_InitPrototype( void );
 
-LCUI_API void LCUIWidget_ExitPrototype( void );
+LCUI_API void LCUIWidget_FreePrototype( void );
 
 LCUI_API LCUI_WidgetPrototype LCUIWidget_GetPrototype( const char *name );
 

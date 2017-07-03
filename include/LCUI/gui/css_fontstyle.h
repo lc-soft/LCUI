@@ -85,6 +85,6 @@ void LCUIFontStyle_GetTextStyle( LCUI_FontStyle fs, LCUI_TextStyle *ts );
 
 void LCUI_InitCSSFontStyle( void );
 
-void LCUI_ExitCSSFontStyle( void );
+void LCUI_FreeCSSFontStyle( void );
 
 #endif

@@ -898,7 +898,7 @@ void LCUI_InitCSSParser( void )
 	}
 }
 
-void LCUI_ExitCSSParser( void )
+void LCUI_FreeCSSParser( void )
 {
 	Dict_Release( self.parsers );
 }

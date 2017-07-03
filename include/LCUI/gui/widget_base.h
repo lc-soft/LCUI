@@ -262,7 +262,7 @@ LCUI_API void Widget_GetOffset( LCUI_Widget w, LCUI_Widget parent,
 LCUI_API void LCUIWidget_InitImageLoader( void );
 
 /** 退出并销毁图片加载器 */
-LCUI_API void LCUIWidget_ExitImageLoader( void );
+LCUI_API void LCUIWidget_FreeImageLoader( void );
 
 /** 初始化部件背景样式 */
 LCUI_API void Widget_InitBackground( LCUI_Widget w );
@@ -421,9 +421,9 @@ LCUI_API void Widget_PrintTree( LCUI_Widget w );
 
 LCUI_API void LCUIWidget_InitBase( void );
 
-LCUI_API void LCUIWidget_DestroyRoot( void );
+LCUI_API void LCUIWidget_FreeRoot( void );
 
-LCUI_API void LCUIWidget_ExitBase( void );
+LCUI_API void LCUIWidget_FreeBase( void );
 
 LCUI_END_HEADER
 

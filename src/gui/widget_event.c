@@ -1126,7 +1126,7 @@ void LCUIWidget_InitEvent(void)
 	LinkedList_Init( &self.touch_capturers );
 }
 
-void LCUIWidget_ExitEvent( void )
+void LCUIWidget_FreeEvent( void )
 {
 	LinkedListNode *node;
 	LCUIMutex_Lock( &self.mutex );

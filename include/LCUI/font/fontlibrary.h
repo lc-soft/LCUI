@@ -172,7 +172,7 @@ LCUI_API int LCUIFont_LoadFile( const char *filepath );
 LCUI_API void LCUI_InitFont( void );
 
 /** 停用字体处理模块 */
-LCUI_API void LCUI_ExitFont( void );
+LCUI_API void LCUI_FreeFont( void );
 
 LCUI_END_HEADER
 

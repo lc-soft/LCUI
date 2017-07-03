@@ -61,7 +61,7 @@ LCUI_API void Widget_AddTaskForChildren( LCUI_Widget widget, int task );
 LCUI_API void LCUIWidget_InitTasks( void );
 
 /** 销毁（释放） LCUI 部件任务处理功能的相关资源 */
-LCUI_API void LCUIWidget_ExitTasks( void );
+LCUI_API void LCUIWidget_FreeTasks( void );
 
 /** 处理一次当前积累的部件任务 */
 LCUI_API void LCUIWidget_Update( void );

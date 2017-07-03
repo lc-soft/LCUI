@@ -223,7 +223,7 @@ LCUI_API int LCUI_Destroy( void );
 LCUI_API void LCUI_Quit( void );
 
 /** 退出 LCUI，并设置退出码 */
-LCUI_API void LCUI_Exit( int code );
+LCUI_API void LCUI_Free( int code );
 
 /** 检测当前是否在主线程上 */
 LCUI_API LCUI_BOOL LCUI_IsOnMainLoop(void);

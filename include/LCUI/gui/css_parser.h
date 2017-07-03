@@ -64,7 +64,7 @@ LCUI_API int LCUI_LoadCSSFile( const char *filepath );
 /** 从字符串中载入CSS样式数据，并导入至样式库中 */
 LCUI_API int LCUI_LoadCSSString( const char *str, const char *space );
 
-LCUI_API void LCUI_ExitCSSParser(void);
+LCUI_API void LCUI_FreeCSSParser(void);
 
 /** 注册新的属性和对应的属性值解析器 */
 LCUI_API int LCUI_AddCSSParser( LCUI_StyleParser sp );

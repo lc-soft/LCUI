@@ -195,7 +195,7 @@ void LCUIWidget_InitRenderer( void )
 	self.active = TRUE;
 }
 
-void LCUIWidget_ExitRenderer( void )
+void LCUIWidget_FreeRenderer( void )
 {
 	self.active = FALSE;
 	RectList_Clear( &self.rects );

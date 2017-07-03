@@ -156,7 +156,7 @@ void LCUIWidget_InitTasks( void )
 	LinkedList_Init( &self.trash );
 }
 
-void LCUIWidget_ExitTasks( void )
+void LCUIWidget_FreeTasks( void )
 {
 	LCUIWidget_ClearTrash();
 }

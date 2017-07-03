@@ -131,7 +131,7 @@ void LCUI_InitMetrics( void )
 	LCUIMetrics_SetDpi( 96.0f );
 }
 
-void LCUI_ExitMetrics( void )
+void LCUI_FreeMetrics( void )
 {
 
 }

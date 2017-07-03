@@ -73,7 +73,7 @@ LCUI_API int LCUIIME_Commit( const wchar_t *str, size_t len );
 LCUI_API void LCUI_InitIME( void );
 
 /* 停用LCUI输入法模块 */
-LCUI_API void LCUI_ExitIME( void );
+LCUI_API void LCUI_FreeIME( void );
 
 #ifdef LCUI_BUILD_IN_WIN32
 int LCUI_RegisterWin32IME( void );

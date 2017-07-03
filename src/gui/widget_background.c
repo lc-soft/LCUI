@@ -208,7 +208,7 @@ void LCUIWidget_InitImageLoader( void )
 	self.is_inited = TRUE;
 }
 
-void LCUIWidget_ExitImageLoader( void )
+void LCUIWidget_FreeImageLoader( void )
 {
 	Dict_Release( self.images );
 	RBTree_Destroy( &self.refs );

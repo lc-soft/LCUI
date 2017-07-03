@@ -1540,7 +1540,7 @@ void LCUI_InitCSSLibrary( void )
 	library.is_inited = TRUE;
 }
 
-void LCUI_ExitCSSLibrary( void )
+void LCUI_FreeCSSLibrary( void )
 {
 	library.is_inited = FALSE;
 	LCUI_DestroyStylesheetCache();

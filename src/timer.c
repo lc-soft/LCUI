@@ -294,7 +294,7 @@ void LCUI_InitTimer( void )
 	self.is_running = TRUE;
 }
 
-void LCUI_ExitTimer( void )
+void LCUI_FreeTimer( void )
 {
 	self.is_running = FALSE;
 	LCUIMutex_Lock( &self.mutex );

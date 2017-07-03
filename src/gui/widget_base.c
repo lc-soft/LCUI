@@ -1636,12 +1636,12 @@ void LCUIWidget_InitBase( void )
 	Widget_SetTitleW( LCUIWidget.root, L"LCUI Display" );
 }
 
-void LCUIWidget_DestroyRoot( void )
+void LCUIWidget_FreeRoot( void )
 {
 	Widget_ExecDestroy( LCUIWidget.root );
 }
 
-void LCUIWidget_ExitBase( void )
+void LCUIWidget_FreeBase( void )
 {
 	Dict_Release( LCUIWidget.ids );
 	LCUIMutex_Destroy( &LCUIWidget.mutex );
