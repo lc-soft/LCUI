@@ -555,7 +555,7 @@ void LCUI_Quit( void )
 	LCUIApp_QuitAllMainLoop();
 }
 
-void LCUI_Free( int code )
+void LCUI_Exit( int code )
 {
 	System.exit_code = code;
 	LCUI_Quit();

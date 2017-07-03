@@ -41,7 +41,7 @@ int test_char_render( void )
 		break;
 	}
 
-	/* 退出字体处理功能 */
-	LCUI_ExitFont();
+	/* 释放字体处理功能相关资源 */
+	LCUI_FreeFont();
 	return ret;
 }
