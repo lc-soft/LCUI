@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
- * widget.h -- GUI widget APIs.
+ * widget.c -- GUI widget helper APIs.
  *
- * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,9 +20,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * widget.h -- GUI部件操作相关的函数接口。
+ * widget.c -- GUI 部件辅助接口，用于简化部件操作
  *
- * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,21 +37,39 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef LCUI_WIDGET_BUILD_H
-#define LCUI_WIDGET_BUILD_H
+#ifndef LCUI_WIDGET_HELPER_H
+#define LCUI_WIDGET_HELPER_H
 
-#include <LCUI/graph.h>
-#include <LCUI/thread.h>
-#include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_helper.h>
-#include <LCUI/gui/widget_task.h>
-#include <LCUI/gui/widget_paint.h>
-#include <LCUI/gui/widget_prototype.h>
-#include <LCUI/gui/widget_event.h>
-#include <LCUI/gui/widget_style.h>
+LCUI_BEGIN_HEADER
 
-void LCUI_InitWidget( void );
+ /** 设置内边距 */
+LCUI_API void Widget_SetPadding( LCUI_Widget w, float top, float right,
+				 float bottom, float left );
 
-void LCUI_FreeWidget( void );
+/** 设置外边距 */
+LCUI_API void Widget_SetMargin( LCUI_Widget w, float top, float right,
+				float bottom, float left );
+
+/** 设置边框样式 */
+LCUI_API void Widget_SetBorder( LCUI_Widget w, float width,
+				int style, LCUI_Color clr );
+
+/** 设置阴影样式 */
+LCUI_API void Widget_SetBoxShadow( LCUI_Widget w, float x, float y,
+				   float blur, LCUI_Color color );
+
+/** 移动部件位置 */
+LCUI_API void Widget_Move( LCUI_Widget w, float left, float top );
+
+/** 调整部件尺寸 */
+LCUI_API void Widget_Resize( LCUI_Widget w, float width, float height );
+
+LCUI_API void Widget_Show( LCUI_Widget w );
+
+LCUI_API void Widget_Hide( LCUI_Widget w );
+
+LCUI_API void Widget_SetPosition( LCUI_Widget w, LCUI_StyleValue position );
+
+LCUI_API void Widget_SetBoxSizing( LCUI_Widget w, LCUI_StyleValue sizing );
 
 #endif

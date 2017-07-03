@@ -4,6 +4,7 @@ AM_CFLAGS = -I$(abs_top_srcdir)/include $(CODE_COVERAGE_CFLAGS)
 libgui_la_SOURCES =\
 widget.c		\
 widget_base.c		\
+widget_helper.c		\
 widget_event.c		\
 widget_prototype.c	\
 widget_style.c		\

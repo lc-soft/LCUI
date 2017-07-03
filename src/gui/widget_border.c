@@ -126,23 +126,6 @@ void Widget_ComputeBorderStyle( LCUI_Widget w )
 	}
 }
 
-void Widget_SetBorder( LCUI_Widget w, float width, int style, LCUI_Color clr )
-{
-	Widget_SetStyle( w, key_border_top_color, clr, color );
-	Widget_SetStyle( w, key_border_right_color, clr, color );
-	Widget_SetStyle( w, key_border_bottom_color, clr, color );
-	Widget_SetStyle( w, key_border_left_color, clr, color );
-	Widget_SetStyle( w, key_border_top_width, width, px );
-	Widget_SetStyle( w, key_border_right_width, width, px );
-	Widget_SetStyle( w, key_border_bottom_width, width, px );
-	Widget_SetStyle( w, key_border_left_width, width, px );
-	Widget_SetStyle( w, key_border_top_style, style, style );
-	Widget_SetStyle( w, key_border_right_style, style, style );
-	Widget_SetStyle( w, key_border_bottom_style, style, style );
-	Widget_SetStyle( w, key_border_left_style, style, style );
-	Widget_UpdateStyle( w, FALSE );
-}
-
 static unsigned int ComputeActual( float width )
 {
 	unsigned int w;

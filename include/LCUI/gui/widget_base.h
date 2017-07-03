@@ -276,10 +276,6 @@ LCUI_API void Widget_UpdateBackground( LCUI_Widget widget );
 /** 绘制部件背景 */
 LCUI_API void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint );
 
-/** 设置边框样式 */
-LCUI_API void Widget_SetBorder( LCUI_Widget w, float width,
-				int style, LCUI_Color clr );
-
 /** 更新部件边框样式 */
 LCUI_API void Widget_UpdateBorder( LCUI_Widget w );
 
@@ -289,10 +285,6 @@ LCUI_API void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint );
 LCUI_API float Widget_GetGraphWidth( LCUI_Widget widget );
 
 LCUI_API float Widget_GetGraphHeight( LCUI_Widget widget );
-
-/** 设置阴影样式 */
-LCUI_API void Widget_SetBoxShadow( LCUI_Widget w, float x, float y,
-				   float blur, LCUI_Color color );
 
 /** 根据阴影参数获取部件区域的横向偏移距离 */
 LCUI_API float Widget_GetBoxShadowOffsetX( LCUI_Widget w );
@@ -343,28 +335,6 @@ LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 
 /** 设置部件ID */
 LCUI_API int Widget_SetId( LCUI_Widget w, const char *idstr );
-
-/** 设置内边距 */
-LCUI_API void Widget_SetPadding( LCUI_Widget w, float top, float right,
-				 float bottom, float left );
-
-/** 设置外边距 */
-LCUI_API void Widget_SetMargin( LCUI_Widget w, float top, float right,
-				float bottom, float left );
-
-/** 移动部件位置 */
-LCUI_API void Widget_Move( LCUI_Widget w, float left, float top );
-
-/** 调整部件尺寸 */
-LCUI_API void Widget_Resize( LCUI_Widget w, float width, float height );
-
-LCUI_API void Widget_Show( LCUI_Widget w );
-
-LCUI_API void Widget_Hide( LCUI_Widget w );
-
-LCUI_API void Widget_SetPosition( LCUI_Widget w, LCUI_StyleValue position );
-
-LCUI_API void Widget_SetBoxSizing( LCUI_Widget w, LCUI_StyleValue sizing );
 
 /** 为部件设置属性 */
 LCUI_API int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,

@@ -168,16 +168,6 @@ float Widget_GetGraphHeight( LCUI_Widget widget )
 	return height + SHADOW_WIDTH( shadow ) * 2;
 }
 
-void Widget_SetBoxShadow( LCUI_Widget w, float x, float y,
-			  float blur, LCUI_Color color )
-{
-	Widget_SetStyle( w, key_box_shadow_x, x, px );
-	Widget_SetStyle( w, key_box_shadow_y, y, px );
-	Widget_SetStyle( w, key_box_shadow_blur, blur, px );
-	Widget_SetStyle( w, key_box_shadow_color, color, color );
-	Widget_UpdateStyle( w, FALSE );
-}
-
 /** 计算部件阴影样式的实际值 */
 static void Widget_ComputeBoxShadow( LCUI_Widget w, LCUI_BoxShadow *out )
 {
