@@ -17,3 +17,17 @@ windows/windows_display.c \
 windows/windows_mouse.c \
 windows/windows_ime.c
 
+EXTRA_DIST = windows/pch.cpp \
+windows/pch.h \
+windows/uwp_app.cpp \
+windows/uwp_app.h \
+windows/uwp_input.cpp \
+windows/uwp_input.h \
+windows/uwp_main.cpp \
+windows/uwp_main.h \
+windows/uwp_renderer.cpp \
+windows/uwp_renderer.h \
+windows/Common/DeviceResources.cpp \
+windows/Common/DeviceResources.h \
+windows/Common/StepTimer.h \
+windows/Common/DirectXHelper.h
