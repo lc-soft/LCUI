@@ -28,6 +28,7 @@ notifications:
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/5b09ab7b7688f3152de0
+      - https://hook.bearychat.com/=bwASg/travis/5b13360858a94c2c3caa6a4ab2dca9e5
     on_success: change
     on_failure: always
     on_start: never
