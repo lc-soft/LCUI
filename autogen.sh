@@ -45,7 +45,6 @@ fi
 	DIE=1
 }
 
-
 # if no automake, don't bother testing for aclocal
 test -n "$NO_AUTOMAKE" || (aclocal --version) < /dev/null > /dev/null 2>&1 || {
 	echo
