@@ -189,13 +189,13 @@ func_3:
     ObjName_OptAttr( XXXX *object, XXXX arg1, XXXX arg2, XXXX arg3 )
 ```
 
-由于作者使用的是VisualStudio 2012，如果函数的返回值类型和修饰符不与函数名同行，编辑
+由于作者使用的开发工具是 VisualStudio，如果函数的返回值类型和修饰符不与函数名同行，编辑
 器的代码提示功能会无法显示位于函数上方的注释内容，例如：
 
 ```c
-	/** this is function. */
+    /** this is function. */
     static struct mydata*
-	test_function(void);
+    test_function(void);
 ```
 
 因此，建议最好将返回值类型和修饰符与函数名写在同一行。
