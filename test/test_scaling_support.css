@@ -11,11 +11,11 @@
     height: 69px;
     border: 1px solid #eee;
     background-image: url(test_image_reader.png);
-    background-size:contain;
-    margin-bottom: 10px;
+    background-size: contain;
+    margin: 5px 0;
 }
 .container {
-    margin-bottom: 10px;
+    padding: 5px 0;
 }
 .text-sp {
     font-size: 18sp;
