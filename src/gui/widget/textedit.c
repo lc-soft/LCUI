@@ -151,41 +151,53 @@ static void fillchar( wchar_t *str, wchar_t ch )
 
 static void TextEdit_UpdateCaret( LCUI_Widget widget )
 {
-	LCUI_Pos pos;
+	LCUI_BOOL update_offset = FALSE;
 	LCUI_TextEdit edit = GetData( widget );
 	int row = edit->layer->insert_y;
 	float scale = LCUIMetrics_GetScale();
-	float height, x = 0, y = 0, offset_x = 0, offset_y = 0;
+	float x, y, caret_x = 0, caret_y = 0;
+	float height, offset_x, offset_y;
 
 	if( !edit->is_placeholder_shown ) {
+		LCUI_Pos pos;
 		if( TextLayer_GetCaretPixelPos( edit->layer, &pos ) != 0 ) {
 			return;
 		}
-		x = pos.x / scale;
-		y = pos.y / scale;
+		caret_x = pos.x / scale;
+		caret_y = pos.y / scale;
 	}
+	offset_x = edit->layer->offset_x / scale;
+	offset_y = edit->layer->offset_y / scale;
+	x = caret_x + offset_x;
+	y = caret_y + offset_y;
 	height = TextLayer_GetRowHeight( edit->layer, row ) / scale;
 	Widget_SetStyle( edit->caret, key_height, height, px );
-	if( x > widget->box.content.width ) {
-		offset_x = widget->box.content.width - x;
-		offset_x -= edit->caret->width;
-		x += offset_x;
+	/* 如果光标超出可见区域，则重新计算文本偏移距离 */
+	if( x < 0 ) {
+		x = 0;
+		update_offset = TRUE;
 	}
-	if( y > widget->box.content.height ) {
-		offset_y = widget->box.content.height - y;
-		offset_y -= edit->caret->height;
-		y += offset_y;
+	if( y < 0 ) {
+		y = 0;
+		update_offset = TRUE;
 	}
-	x += widget->padding.left;
-	y += widget->padding.top;
-	if( edit->layer->offset_x != offset_x ||
-	    edit->layer->offset_y != offset_y ) {
-		int ix = iround( offset_x * scale );
-		int iy = iround( offset_y * scale );
+	if( x + edit->caret->width > widget->box.content.width ) {
+		x = widget->box.content.width - edit->caret->width;
+		update_offset = TRUE;
+	}
+	if( y + edit->caret->height > widget->box.content.height ) {
+		y = widget->box.content.height - edit->caret->height;
+		update_offset = TRUE;
+	}
+	if( update_offset ) {
+		int ix = iround( (x - caret_x) * scale );
+		int iy = iround( (y - caret_y) * scale );
 		TextLayer_SetOffset( edit->layer, ix, iy );
 		edit->tasks[TASK_UPDATE] = TRUE;
 		Widget_AddTask( widget, WTT_USER );
 	}
+	x += widget->padding.left;
+	y += widget->padding.top;
 	Widget_Move( edit->caret, x, y );
 	TextCaret_BlinkShow( edit->caret );
 	if( edit->password_char ) {
@@ -467,7 +479,7 @@ static void TextEdit_AutoSize( LCUI_Widget widget,
 		*height = h / scale;
 	}
 	if( *width <= 0 ) {
-		*width = DEFAULT_WIDTH / scale;
+		*width = DEFAULT_WIDTH;
 	}
 }
 
@@ -806,8 +818,9 @@ static void TextEdit_OnMouseMove( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	scale = LCUIMetrics_GetScale();
 	Widget_GetOffset( w, NULL, &offset_x, &offset_y );
 	x = iround( (e->motion.x - offset_x - w->padding.left) * scale );
-	y = iround( (e->motion.y - offset_y + w->padding.top) * scale );
-	TextLayer_SetCaretPosByPixelPos( edit->layer_source, x, y );
+	y = iround( (e->motion.y - offset_y - w->padding.top) * scale );
+	_DEBUG_MSG("xy: %d, %d\n", x, y);
+	TextLayer_SetCaretPosByPixelPos( edit->layer, x, y );
 	TextEdit_UpdateCaret( w );
 }
 
@@ -825,7 +838,7 @@ static void TextEdit_OnMouseDown( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	float scale = LCUIMetrics_GetScale();
 	Widget_GetOffset( w, NULL, &offset_x, &offset_y );
 	x = iround( (e->motion.x - offset_x - w->padding.left) * scale );
-	y = iround( (e->motion.y - offset_y + w->padding.top) * scale );
+	y = iround( (e->motion.y - offset_y - w->padding.top) * scale );
 	TextLayer_SetCaretPosByPixelPos( edit->layer, x, y );
 	TextEdit_UpdateCaret( w );
 	Widget_SetMouseCapture( w );

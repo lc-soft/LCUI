@@ -448,7 +448,6 @@ void TextLayer_SetCaretPos( LCUI_TextLayer layer, int row, int col )
 			row = layer->rowlist.length-1;
 		}
 	}
-
 	if( col < 0 ) {
 		col = 0;
 	}
@@ -468,7 +467,8 @@ int TextLayer_SetCaretPosByPixelPos( LCUI_TextLayer layer, int x, int y )
 {
 	TextRow txtrow;
 	int i, pixel_pos, ins_x, ins_y;
-	for( pixel_pos = 0, i = 0; i < layer->rowlist.length; ++i ) {
+	pixel_pos = layer->offset_y;
+	for( i = 0; i < layer->rowlist.length; ++i ) {
 		pixel_pos += layer->rowlist.rows[i]->height;;
 		if( pixel_pos >= y ) {
 			ins_y = i;
@@ -486,7 +486,8 @@ int TextLayer_SetCaretPosByPixelPos( LCUI_TextLayer layer, int x, int y )
 	}
 	txtrow = layer->rowlist.rows[ins_y];
 	ins_x = txtrow->length;
-	pixel_pos = TextLayer_GetRowStartX( layer, txtrow );
+	pixel_pos = layer->offset_x;
+	pixel_pos += TextLayer_GetRowStartX( layer, txtrow );
 	for( i = 0; i < txtrow->length; ++i ) {
 		TextChar txtchar;
 		txtchar = txtrow->string[i];
