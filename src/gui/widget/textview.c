@@ -324,19 +324,26 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LCUI_Pos pos;
 	LCUI_RectF rectf;
-	LCUI_TextView txt = GetData( w );
+	LCUI_Graph canvas;
 	LCUI_Rect content_rect, rect;
+	LCUI_TextView txt = GetData( w );
 
 	rectf = w->box.content;
 	rectf.x -= w->box.graph.x;
 	rectf.y -= w->box.graph.y;
 	LCUIMetrics_ComputeRectActual( &content_rect, &rectf );
-	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect );
-	pos.x = content_rect.x - paint->rect.x;
-	pos.y = content_rect.y - paint->rect.y;
+	if( !LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect ) ) {
+		return;
+	}
+	pos.x = content_rect.x - rect.x;
+	pos.y = content_rect.y - rect.y;
+	rect.x -= paint->rect.x;
+	rect.y -= paint->rect.y;
+	Graph_Quote( &canvas, &paint->canvas, &rect );
+	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_DrawToGraph( txt->layer, rect, pos, &paint->canvas );
+	TextLayer_DrawToGraph( txt->layer, rect, pos, &canvas );
 }
 
 int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )

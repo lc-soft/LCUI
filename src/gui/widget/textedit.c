@@ -819,7 +819,6 @@ static void TextEdit_OnMouseMove( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	Widget_GetOffset( w, NULL, &offset_x, &offset_y );
 	x = iround( (e->motion.x - offset_x - w->padding.left) * scale );
 	y = iround( (e->motion.y - offset_y - w->padding.top) * scale );
-	_DEBUG_MSG("xy: %d, %d\n", x, y);
 	TextLayer_SetCaretPosByPixelPos( edit->layer, x, y );
 	TextEdit_UpdateCaret( w );
 }
@@ -908,6 +907,7 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LCUI_Pos pos;
 	LCUI_RectF rectf;
+	LCUI_Graph canvas;
 	LCUI_Rect content_rect, rect;
 	LCUI_TextEdit edit = GetData( w );
 
@@ -915,12 +915,18 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	rectf.x -= w->box.graph.x;
 	rectf.y -= w->box.graph.y;
 	LCUIMetrics_ComputeRectActual( &content_rect, &rectf );
-	LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect );
-	pos.x = content_rect.x - paint->rect.x;
-	pos.y = content_rect.y - paint->rect.y;
+	if( !LCUIRect_GetOverlayRect( &content_rect, &paint->rect, &rect ) ) {
+		return;
+	}
+	pos.x = content_rect.x - rect.x;
+	pos.y = content_rect.y - rect.y;
+	rect.x -= paint->rect.x;
+	rect.y -= paint->rect.y;
+	Graph_Quote( &canvas, &paint->canvas, &rect );
+	rect = paint->rect;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	TextLayer_DrawToGraph( edit->layer, rect, pos, &paint->canvas );
+	TextLayer_DrawToGraph( edit->layer, rect, pos, &canvas );
 }
 
 static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *ts )
