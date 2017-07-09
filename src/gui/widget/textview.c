@@ -48,10 +48,13 @@
 #include <LCUI/gui/css_fontstyle.h>
 #include <LCUI/gui/widget/textview.h>
 
+#define GetData(W) Widget_GetData(W, self.prototype)
+
 enum TaskType {
 	TASK_SET_TEXT,
 	TASK_SET_AUTOWRAP,
 	TASK_SET_TEXT_ALIGN,
+	TASK_UPDATE_SIZE,
 	TASK_UPDATE,
 	TASK_TOTAL
 };
@@ -72,11 +75,10 @@ typedef struct LCUI_TextViewRec_ {
 	} tasks[TASK_TOTAL];
 } LCUI_TextViewRec, *LCUI_TextView;
 
-/*---------------------------- Private -------------------------------*/
-
 static struct LCUI_TextViewModule {
 	LCUI_WidgetPrototype prototype;
 } self;
+
 static void TextView_OnParseText( LCUI_Widget w, const char *text )
 {
 	TextView_SetText( w, text );
@@ -84,7 +86,7 @@ static void TextView_OnParseText( LCUI_Widget w, const char *text )
 
 static void TextView_SetTaskForLineHeight( LCUI_Widget w, int height )
 {
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	LCUI_TextView txt = GetData( w );
 	TextLayer_SetLineHeight( txt->layer, height );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
@@ -92,7 +94,7 @@ static void TextView_SetTaskForLineHeight( LCUI_Widget w, int height )
 
 static void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 {
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	LCUI_TextView txt = GetData( w );
 	TextLayer_SetTextStyle( txt->layer, style );
 	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
@@ -100,7 +102,7 @@ static void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 
 static void TextView_SetTaskForTextAlign( LCUI_Widget w, int align )
 {
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	LCUI_TextView txt = GetData( w );
 	txt->tasks[TASK_SET_TEXT_ALIGN].align = align;
 	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
@@ -108,7 +110,7 @@ static void TextView_SetTaskForTextAlign( LCUI_Widget w, int align )
 
 static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 {
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	LCUI_TextView txt = GetData( w );
 	txt->tasks[TASK_SET_AUTOWRAP].autowrap = autowrap;
 	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
@@ -117,7 +119,7 @@ static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 static void TextView_UpdateStyle( LCUI_Widget w )
 {
 	LCUI_TextStyle ts;
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	LCUI_TextView txt = GetData( w );
 	LCUI_FontStyle fs = &txt->style;
 	const wchar_t *content = fs->content;
 	LCUIFontStyle_Compute( fs, w->style );
@@ -134,7 +136,7 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 	TextStyle_Destroy( &ts );
 }
 
-static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
+static void TextView_UpdateSize( LCUI_Widget w )
 {
 	LCUI_RectF rect;
 	LCUI_TextView txt;
@@ -143,9 +145,9 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	int width = 0, height = 0;
 	float scale, max_width = 0, max_height = 0;
 
+	txt = GetData( w );
 	LinkedList_Init( &rects );
 	scale = LCUIMetrics_GetScale();
-	txt = Widget_GetData( w, self.prototype );
 	if( Widget_HasAutoWidth( w ) ) {
 		max_width = Widget_ComputeMaxWidth( w );
 		max_width -= w->computed_style.border.left.width;
@@ -171,6 +173,11 @@ static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	}
 	RectList_Clear( &rects );
 	TextLayer_ClearInvalidRect( txt->layer );
+}
+
+static void TextView_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
+{
+	TextView_UpdateSize( w );
 }
 
 /** 初始化 TextView 部件数据 */
@@ -200,7 +207,7 @@ static void TextView_OnInit( LCUI_Widget w )
 static void TextView_ClearTasks( LCUI_Widget w )
 {
 	int i = TASK_SET_TEXT;
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	LCUI_TextView txt = GetData( w );
 	if( txt->tasks[i].is_valid ) {
 		txt->tasks[i].is_valid = FALSE;
 		free( txt->tasks[i].text );
@@ -211,7 +218,7 @@ static void TextView_ClearTasks( LCUI_Widget w )
 /** 释放 TextView 部件占用的资源 */
 static void TextView_OnDestroy( LCUI_Widget w )
 {
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	LCUI_TextView txt = GetData( w );
 	LCUIFontStyle_Destroy( &txt->style );
 	TextLayer_Destroy( txt->layer );
 	LCUIMutex_Unlock( &txt->mutex );
@@ -220,8 +227,8 @@ static void TextView_OnDestroy( LCUI_Widget w )
 
 static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 {
+	LCUI_TextView txt = GetData( w );
 	float scale = LCUIMetrics_GetScale();
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
 	if( Widget_HasAutoWidth( w ) ) {
 		int fixed_w = txt->layer->fixed_width;
 		int fixed_h = txt->layer->fixed_height;
@@ -247,6 +254,13 @@ static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 	}
 }
 
+static void TextView_OnRefresh( LCUI_Widget w )
+{
+	LCUI_TextView txt = GetData( w );
+	txt->tasks[TASK_UPDATE_SIZE].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
+}
+
 /** 私有的任务处理接口 */
 static void TextView_OnTask( LCUI_Widget w )
 {
@@ -255,7 +269,7 @@ static void TextView_OnTask( LCUI_Widget w )
 	LCUI_RectF rect;
 	LinkedList rects;
 	LinkedListNode *node;
-	LCUI_TextView txt = Widget_GetData( w, self.prototype );
+	LCUI_TextView txt = GetData( w );
 
 	LinkedList_Init( &rects );
 	i = TASK_SET_TEXT;
@@ -279,6 +293,11 @@ static void TextView_OnTask( LCUI_Widget w )
 		txt->tasks[i].is_valid = FALSE;
 		TextLayer_SetTextAlign( txt->layer, txt->tasks[i].align );
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	}
+	i = TASK_UPDATE_SIZE;
+	if( txt->tasks[i].is_valid ) {
+		TextView_UpdateSize( w );
+		txt->tasks[i].is_valid = FALSE;
 	}
 	i = TASK_UPDATE;
 	if( !txt->tasks[i].is_valid ) {
@@ -305,7 +324,7 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	LCUI_Pos pos;
 	LCUI_RectF rectf;
-	LCUI_TextView txt;
+	LCUI_TextView txt = GetData( w );
 	LCUI_Rect content_rect, rect;
 
 	rectf = w->box.content;
@@ -317,13 +336,8 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	pos.y = content_rect.y - paint->rect.y;
 	rect.x -= content_rect.x;
 	rect.y -= content_rect.y;
-	txt = Widget_GetData( w, self.prototype );
 	TextLayer_DrawToGraph( txt->layer, rect, pos, &paint->canvas );
 }
-
-/*-------------------------- End Private -----------------------------*/
-
-/*---------------------------- Public --------------------------------*/
 
 int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 {
@@ -341,7 +355,7 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 	} else {
 		wcscpy( newtext, text );
 	}
-	txt = Widget_GetData( w, self.prototype );
+	txt = GetData( w );
 	LCUIMutex_Lock( &txt->mutex );
 	if( txt->tasks[TASK_SET_TEXT].is_valid
 	 && txt->tasks[TASK_SET_TEXT].text ) {
@@ -387,13 +401,12 @@ void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 	}
 }
 
-/*-------------------------- End Public ------------------------------*/
-
 void LCUIWidget_AddTextView( void )
 {
 	self.prototype = LCUIWidget_NewPrototype( "textview", NULL );
 	self.prototype->init = TextView_OnInit;
 	self.prototype->paint = TextView_OnPaint;
+	self.prototype->refresh = TextView_OnRefresh;
 	self.prototype->destroy = TextView_OnDestroy;
 	self.prototype->autosize = TextView_AutoSize;
 	self.prototype->update = TextView_UpdateStyle;

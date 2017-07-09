@@ -129,6 +129,7 @@ typedef void( *LCUI_WidgetPainter )(LCUI_Widget, LCUI_PaintContext);
 typedef struct LCUI_WidgetPrototypeRec_ {
 	char *name;				/**< 名称 */
 	LCUI_WidgetFunction init;		/**< 构造函数  */
+	LCUI_WidgetFunction refresh;		/**< 数据刷新函数 */
 	LCUI_WidgetFunction destroy;		/**< 析构函数 */
 	LCUI_WidgetFunction update;		/**< 样式处理函数 */
 	LCUI_WidgetFunction runtask;		/**< 自定义任务处理函数 */

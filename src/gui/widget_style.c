@@ -230,6 +230,10 @@ void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
 	};
 
 	if( is_update_all ) {
+		/* 刷新该部件的相关数据 */
+		if( w->proto && w->proto->refresh ) {
+			w->proto->refresh( w );
+		}
 		Widget_GetInheritStyle( w, w->inherited_style );
 	}
 	ss = w->style;
