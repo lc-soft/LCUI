@@ -72,4 +72,6 @@ LCUI_API void Widget_SetPosition( LCUI_Widget w, LCUI_StyleValue position );
 
 LCUI_API void Widget_SetBoxSizing( LCUI_Widget w, LCUI_StyleValue sizing );
 
+LCUI_END_HEADER
+
 #endif

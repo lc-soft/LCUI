@@ -72,7 +72,7 @@ static void gradient_init( gradient_t *g, int t )
 /** 计算渐变后的值 */
 static uchar_t gradient_compute( gradient_t *g, int t, int val )
 {
-	val *= g->s - (g->v*t - (g->a*t*t) / 2);
+	val *= g->s - (int)(g->v*t - (g->a*t*t) / 2);
 	return (uchar_t)(val >> 8);
 }
 
