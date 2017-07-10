@@ -1,5 +1,26 @@
 # LCUI ChangeLog
 
+## CHANGES BETWEEN 1.0 alpha and 1.0 alpha2
+
+- Adjust the code structure
+- Improved TextView widget
+- Improved caret positioning and text rendering for TextEdit widget
+- Improved widget box-shadow rendering
+- Add drivers for UWP Application, [here](https://github.com/lc-soft/LCUI/blob/develop/build/windows/LCUIApp/App.cpp) is example
+- Improved support for high-resolution screen
+  - Add dp and sp unit, Similar to dp and sp unit in Android
+  - Add support scaling, It is possible to set the appropriate zoom ratio according to the screen pixel density
+- Improve automation build and test
+  - Add unit testing
+  - Add code coverage testing
+  - Enabled the [valgrind](http://valgrind.org/) memory check tool
+- Fixed all memory leak BUGs and memory access errors
+- Fixed some widget layout bugs
+- Fixed jpeg reader sometimes fail to read data
+- Fixed other known bugs
+
+You can view [this pull request](https://github.com/lc-soft/LCUI/pull/83). for detailed code changes.
+
 ## CHANGES BETWEEN 0.15.0 and 1.0 alpha
 
 - Improved bmp, jpeg, png file processing, add image reader
