@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * border.c -- graph border draw support.
  *
- * Copyright (C) 2015 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2013-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * border.c -- 边框绘制支持
  *
- * 版权所有 (C) 2013-2015 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2013-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -41,59 +41,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
 #include <math.h>
-
-/** 初始化边框数据 */
-void Border_Init( LCUI_Border *border )
-{
-	border->top.width = 0;
-	border->bottom.width = 0;
-	border->left.width = 0;
-	border->right.width = 0;
-	border->top.style = 0;
-	border->bottom.style = 0;
-	border->left.style = 0;
-	border->right.style = 0;
-	border->top.color = RGB(0,0,0);
-	border->bottom.color = RGB(0,0,0);
-	border->left.color = RGB(0,0,0);
-	border->right.color = RGB(0,0,0);
-	border->top_left_radius = 0;
-	border->top_right_radius = 0;
-	border->bottom_left_radius = 0;
-	border->bottom_right_radius = 0;
-}
-
-/** 简单的设置边框样式，并获取该样式数据 */
-LCUI_Border Border( unsigned int width_px, int style, LCUI_Color color )
-{
-	LCUI_Border border;
-	border.top.width = width_px;
-	border.bottom.width = width_px;
-	border.left.width = width_px;
-	border.right.width = width_px;
-	border.top.style = style;
-	border.bottom.style = style;
-	border.left.style = style;
-	border.right.style = style;
-	border.top.color = color;
-	border.bottom.color = color;
-	border.left.color = color;
-	border.right.color = color;
-	border.top_left_radius = 0;
-	border.top_right_radius = 0;
-	border.bottom_left_radius = 0;
-	border.bottom_right_radius = 0;
-	return border;
-}
-
-/** 设置边框的圆角半径 */
-void Border_Radius( LCUI_Border *border, unsigned int radius )
-{
-	border->top_left_radius = radius;
-	border->top_right_radius = radius;
-	border->bottom_left_radius = radius;
-	border->bottom_right_radius = radius;
-}
 
 static void GetRoundBound( LCUI_Rect2 *bound, LCUI_Rect *rect,
 			   int radius, LCUI_Pos center )
@@ -625,7 +572,8 @@ static int Graph_DrawRoundBorderBottomRight( LCUI_Graph *dst, LCUI_Pos center,
 }
 
 int Graph_DrawBorder( LCUI_PaintContext paint, 
-		      LCUI_Rect *box, LCUI_Border *border )
+		      const LCUI_Rect *box,
+		      const LCUI_Border *border )
 {
 	LCUI_Pos pos;
 	LCUI_Graph canvas;

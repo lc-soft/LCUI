@@ -179,8 +179,11 @@ void LCUIIME_Switch( void )
 static void LCUIIME_OnDestroy( void *arg )
 {
 	LCUI_IME ime = arg;
+	if( self.ime == ime ) {
+		self.ime = NULL;
+	}
 	free( ime->name );
-	ime->name = NULL;
+	free( ime );
 }
 
 LCUI_BOOL LCUIIME_CheckCharKey( int key )
@@ -348,7 +351,7 @@ void LCUI_InitIME( void )
 }
 
 /* 停用LCUI输入法模块 */
-void LCUI_ExitIME( void )
+void LCUI_FreeIME( void )
 {
 	self.is_inited = FALSE;
 	LinkedList_ClearData( &self.list, LCUIIME_OnDestroy );

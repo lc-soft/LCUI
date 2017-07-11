@@ -54,6 +54,17 @@ char *strdup2( const char *str )
 	return out;
 }
 
+wchar_t *wcsdup2( const wchar_t *str )
+{
+	size_t len = wcslen( str ) + 1;
+	wchar_t *out = malloc( sizeof( wchar_t ) * len );
+	if( !out ) {
+		return NULL;
+	}
+	wcsncpy( out, str, len );
+	return out;
+}
+
 int strtrim( char *outstr, const char *instr, const char *charlist )
 {
 	LCUI_BOOL clear, clear_left = TRUE;
@@ -261,21 +272,21 @@ static int strsaddone( char ***strlist, const char *str )
 	char **newlist;
 
 	if( !*strlist ) {
-		newlist = (char**)malloc( sizeof(char*) * 2 );
+		newlist = (char**)malloc( sizeof( char* ) * 2 );
 		goto check_done;
 	}
 	for( i = 0; (*strlist)[i]; ++i ) {
-		if( strcmp((*strlist)[i], str) == 0 ) {
+		if( strcmp( (*strlist)[i], str ) == 0 ) {
 			return 0;
 		}
 	}
-	newlist = (char**)realloc( *strlist, (i+2)*sizeof(char*) );
+	newlist = (char**)realloc( *strlist, (i + 2) * sizeof( char* ) );
 check_done:
 	if( !newlist ) {
 		return 0;
 	}
-	newlist[i] = strdup2(str);
-	newlist[i+1] = NULL;
+	newlist[i] = strdup2( str );
+	newlist[i + 1] = NULL;
 	*strlist = newlist;
 	return 1;
 }
@@ -288,14 +299,14 @@ int strsadd( char ***strlist, const char *str )
 		if( str[i] != ' ' ) {
 			continue;
 		}
-		if( i - 1 > head ) {
+		if( i > head ) {
 			strncpy( buff, &str[head], i - head );
 			buff[i - head] = 0;
 			count += strsaddone( strlist, buff );
 		}
 		head = i + 1;
 	}
-	if( i - 1 > head ) {
+	if( i > head ) {
 		strncpy( buff, &str[head], i - head );
 		buff[i - head] = 0;
 		count += strsaddone( strlist, buff );
@@ -325,7 +336,8 @@ static int strsdelone( char ***strlist, const char *str )
 	if( !*strlist ) {
 		return 0;
 	}
-	for( pos = -1, i = 0; (*strlist)[i]; ++i ) {
+	for( len = 0; (*strlist)[len]; ++len );
+	for( pos = -1, i = 0; i < len; ++i ) {
 		if( strcmp( (*strlist)[i], str ) == 0 ) {
 			pos = i;
 			break;
@@ -334,22 +346,20 @@ static int strsdelone( char ***strlist, const char *str )
 	if( pos == -1 ) {
 		return 0;
 	}
-	for( ; (*strlist)[i]; ++i );
-	if( pos == 0 && i < 2 ) {
+	free( (*strlist)[pos] );
+	if( pos == 0 && len < 2 ) {
 		free( *strlist );
 		*strlist = NULL;
 		return 1;
 	}
-	len = i - 1;
-	newlist = (char**)malloc( i * sizeof(char*) );
+	newlist = (char**)malloc( len * sizeof( char* ) );
 	for( i = 0; i < pos; ++i ) {
 		newlist[i] = (*strlist)[i];
 	}
 	for( i = pos; i < len; ++i ) {
-		newlist[i] = (*strlist)[i+1];
+		newlist[i] = (*strlist)[i + 1];
 	}
-	newlist[i] = NULL;
-	free( (*strlist)[pos] );
+	newlist[len - 1] = NULL;
 	free( *strlist );
 	*strlist = newlist;
 	return 1;

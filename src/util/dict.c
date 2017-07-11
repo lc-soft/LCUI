@@ -256,6 +256,20 @@ int Dict_Add( Dict *d, void *key, void *val )
 	return 0;
 }
 
+int Dict_AddCopy( Dict *d, void *key, const void *val )
+{
+	DictEntry *entry;
+	if( !d->type->valDup ) {
+		return -2;
+	}
+	entry = Dict_AddRaw( d, key );
+	if( !entry ) {
+		return -1;
+	}
+	entry->v.val = d->type->valDup( d->privdata, val );
+	return 0;
+}
+
 DictEntry *Dict_AddRaw( Dict *d, void *key )
 {
 	int index;

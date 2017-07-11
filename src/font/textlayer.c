@@ -51,6 +51,7 @@ enum TextAddType {
 
 #define TextRowList_AddNewRow(ROWLIST) TextRowList_InsertNewRow(ROWLIST, (ROWLIST)->length)
 #define TextLayer_GetRow(layer, n) (n >= layer->rowlist.length) ? NULL:layer->rowlist.rows[n]
+#define GetDefaultLineHeight(H) iround( H * 1.42857143 )
 
 /* 根据对齐方式，计算文本行的起始X轴位置 */
 static int TextLayer_GetRowStartX( LCUI_TextLayer layer, TextRow txtrow )
@@ -194,19 +195,10 @@ static void TextLayer_UpdateRowSize( LCUI_TextLayer layer, TextRow txtrow )
 			txtrow->text_height = txtchar->bitmap->advance.y;
 		}
 	}
-	txtrow->height = txtrow->text_height;
-	switch( layer->line_height.type ) {
-	case SVT_VALUE:
-		txtrow->height *= layer->line_height.value;
-	case SVT_SCALE:
-		txtrow->height = (int)(txtrow->height * layer->line_height.scale);
-		break;
-	case SVT_PX:
-		txtrow->height = roundi( layer->line_height.px );
-		break;
-	default:
-		txtrow->height = (int)(txtrow->height * 11.0 / 10.0 + 0.5);
-		break;
+	if( layer->line_height > -1 ) {
+		txtrow->height = layer->line_height;
+	} else {
+		txtrow->height = GetDefaultLineHeight( txtrow->height );
 	}
 }
 
@@ -314,6 +306,7 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->fixed_height = 0;
 	layer->new_offset_x = 0;
 	layer->new_offset_y = 0;
+	layer->line_height = -1;
 	layer->rowlist.length = 0;
 	layer->rowlist.rows = NULL;
 	layer->text_align = SV_LEFT;
@@ -321,8 +314,6 @@ LCUI_TextLayer TextLayer_New(void)
 	layer->is_autowrap_mode = FALSE;
 	layer->is_mulitiline_mode = FALSE;
 	layer->is_using_style_tags = FALSE;
-	layer->line_height.scale = 1.428f;
-	layer->line_height.type = SVT_SCALE;
 	TextStyle_Init( &layer->text_style );
 	LinkedList_Init( &layer->style_cache );
 	layer->task.typeset_start_row = 0;
@@ -355,8 +346,9 @@ static void TextRowList_Destroy( TextRowList list )
 void TextLayer_Destroy( LCUI_TextLayer layer )
 {
 	RectList_Clear( &layer->dirty_rect );
-	Graph_Free( &layer->graph );
+	TextStyle_Destroy( &layer->text_style );
 	TextRowList_Destroy( &layer->rowlist );
+	Graph_Free( &layer->graph );
 	free( layer );
 }
 
@@ -456,7 +448,6 @@ void TextLayer_SetCaretPos( LCUI_TextLayer layer, int row, int col )
 			row = layer->rowlist.length-1;
 		}
 	}
-
 	if( col < 0 ) {
 		col = 0;
 	}
@@ -476,7 +467,8 @@ int TextLayer_SetCaretPosByPixelPos( LCUI_TextLayer layer, int x, int y )
 {
 	TextRow txtrow;
 	int i, pixel_pos, ins_x, ins_y;
-	for( pixel_pos = 0, i = 0; i < layer->rowlist.length; ++i ) {
+	pixel_pos = layer->offset_y;
+	for( i = 0; i < layer->rowlist.length; ++i ) {
 		pixel_pos += layer->rowlist.rows[i]->height;;
 		if( pixel_pos >= y ) {
 			ins_y = i;
@@ -494,7 +486,8 @@ int TextLayer_SetCaretPosByPixelPos( LCUI_TextLayer layer, int x, int y )
 	}
 	txtrow = layer->rowlist.rows[ins_y];
 	ins_x = txtrow->length;
-	pixel_pos = TextLayer_GetRowStartX( layer, txtrow );
+	pixel_pos = layer->offset_x;
+	pixel_pos += TextLayer_GetRowStartX( layer, txtrow );
 	for( i = 0; i < txtrow->length; ++i ) {
 		TextChar txtchar;
 		txtchar = txtrow->string[i];
@@ -533,13 +526,11 @@ int TextLayer_GetCharPixelPos( LCUI_TextLayer layer, int row,
 	txtrow = layer->rowlist.rows[row];
 	pixel_x = TextLayer_GetRowStartX( layer, txtrow );
 	for( i = 0; i < col; ++i ) {
-		if( !txtrow->string[i] ) {
-			break;
-		}
-		if( !txtrow->string[i]->bitmap ) {
+		TextChar txtchar = txtrow->string[i];
+		if( !txtchar || !txtchar->bitmap ) {
 			continue;
 		}
-		pixel_x += txtrow->string[i]->bitmap->advance.x;
+		pixel_x += txtchar->bitmap->advance.x;
 	}
 	pixel_pos->x = pixel_x;
 	pixel_pos->y = pixel_y;
@@ -556,11 +547,11 @@ int TextLayer_GetCaretPixelPos( LCUI_TextLayer layer, LCUI_Pos *pixel_pos )
 /** 清空文本 */
 void TextLayer_ClearText( LCUI_TextLayer layer )
 {
+	TextLayer_InvalidateRowsRect( layer, 0, -1 );
+	layer->width = 0;
 	layer->length = 0;
 	layer->insert_x = 0;
 	layer->insert_y = 0;
-	layer->width = 0;
-	TextLayer_InvalidateRowsRect( layer, 0, -1 );
 	TextRowList_Destroy( &layer->rowlist );
 	LinkedList_Clear( &layer->style_cache, (FuncPtr)TextStyle_Destroy );
 	TextRowList_InsertNewRow( &layer->rowlist, 0 );
@@ -1227,13 +1218,17 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 	TextChar txtchar;
 	LCUI_Pos char_pos;
 	int x, y, row, col, width, height;
+
 	y = layer->offset_y;
+	/* 确定可绘制的最大区域范围 */
 	if( layer->fixed_width > 0 ) {
 		width = layer->fixed_width;
+	} else if( layer->max_width > 0 ) {
+		width = layer->max_width;
 	} else {
 		width = layer->width;
 	}
-	if( layer->fixed_width > 0 ) {
+	if( layer->fixed_height > 0 ) {
 		height = layer->fixed_width;
 	} else {
 		height = TextLayer_GetHeight( layer );
@@ -1360,9 +1355,9 @@ void TextLayer_SetTextAlign( LCUI_TextLayer layer, int align )
 }
 
 /** 设置文本行的高度 */
-void TextLayer_SetLineHeight( LCUI_TextLayer layer, LCUI_Style val )
+void TextLayer_SetLineHeight( LCUI_TextLayer layer, int height )
 {
-	layer->line_height = *val;
+	layer->line_height = height;
 	layer->task.update_typeset = TRUE;
 	layer->task.typeset_start_row = 0;
 }

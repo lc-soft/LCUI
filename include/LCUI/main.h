@@ -64,6 +64,7 @@ enum LCUI_SysEventType {
 	LCUI_TOUCHMOVE,
 	LCUI_TOUCHDOWN,
 	LCUI_TOUCHUP,
+	LCUI_PAINT,
 	LCUI_WIDGET,
 	LCUI_QUIT,		/**< 在 LCUI 退出前触发的事件 */
 	LCUI_USER = 100		/**< 用户事件，可以把这个当成系统事件与用户事件的分界 */
@@ -76,6 +77,10 @@ typedef struct LCUI_TouchPointRec_ {
 	int state;
 	LCUI_BOOL is_primary;
 } LCUI_TouchPointRec, *LCUI_TouchPoint;
+
+typedef struct LCUI_PaintEvent_ {
+	LCUI_Rect rect;
+} LCUI_PaintEvent;
 
 typedef struct LCUI_KeyboardEvent_ {
 	int code;
@@ -116,6 +121,7 @@ typedef struct LCUI_SysEventRec_ {
 		LCUI_TextInputEvent text;
 		LCUI_KeyboardEvent key;
 		LCUI_TouchEvent touch;
+		LCUI_PaintEvent paint;
 	};
 } LCUI_SysEventRec, *LCUI_SysEvent;
 
@@ -188,6 +194,8 @@ LCUI_API int LCUIMainLoop_Run( LCUI_MainLoop loop );
 /* 标记目标主循环需要退出 */
 LCUI_API void LCUIMainLoop_Quit( LCUI_MainLoop loop );
 
+LCUI_API void LCUIMainLoop_Destroy( LCUI_MainLoop loop );
+
 /* 检测LCUI是否活动 */ 
 LCUI_API LCUI_BOOL LCUI_IsActive( void );
 
@@ -211,8 +219,11 @@ LCUI_API int LCUI_GetSelfVersion( char *out );
 /** 释放LCUI占用的资源 */
 LCUI_API int LCUI_Destroy( void );
 
-/* 退出LCUI，释放LCUI占用的资源 */
+/** 退出LCUI，释放LCUI占用的资源 */
 LCUI_API void LCUI_Quit( void );
+
+/** 退出 LCUI，并设置退出码 */
+LCUI_API void LCUI_Exit( int code );
 
 /** 检测当前是否在主线程上 */
 LCUI_API LCUI_BOOL LCUI_IsOnMainLoop(void);

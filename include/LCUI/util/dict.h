@@ -145,6 +145,11 @@ LCUI_API int Dict_Expand( Dict *d, unsigned long size );
  * @returns 添加成功为 0，添加出错为 -1
  */
 LCUI_API int Dict_Add( Dict *d, void *key, void *val );
+/** 
+ * 将元素添加到目标哈希表中
+ * 功能与 Dict_Add() 相同，但必须指定 valDup 才能添加成功
+*/
+LCUI_API int Dict_AddCopy( Dict *d, void *key, const void *val );
 
 /** 添加元素的底层实现函数(由 Dict_Add 调用) */
 LCUI_API DictEntry *Dict_AddRaw( Dict *d, void *key );

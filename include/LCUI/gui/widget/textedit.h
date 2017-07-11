@@ -80,6 +80,8 @@ LCUI_API int TextEdit_SetPlaceHolder( LCUI_Widget w, const char *str );
 /** 设置密码屏蔽符 */
 LCUI_API void TextEdit_SetPasswordChar( LCUI_Widget w, wchar_t ch );
 
+LCUI_API void LCUIWidget_AddTextEdit( void );
+
 LCUI_END_HEADER
 
 #endif

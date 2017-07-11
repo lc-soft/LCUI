@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="资产">
+      <UniqueIdentifier>4777b514-4fda-4c09-84e3-20641473fa7e</UniqueIdentifier>
+      <Extensions>bmp;fbx;gif;jpg;jpeg;tga;tiff;tif;png</Extensions>
+    </Filter>
+    <Image Include="Assets\LockScreenLogo.scale-200.png">
+      <Filter>资产</Filter>
+    </Image>
+    <Image Include="Assets\SplashScreen.scale-200.png">
+      <Filter>资产</Filter>
+    </Image>
+    <Image Include="Assets\Square150x150Logo.scale-200.png">
+      <Filter>资产</Filter>
+    </Image>
+    <Image Include="Assets\Square44x44Logo.scale-200.png">
+      <Filter>资产</Filter>
+    </Image>
+    <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
+      <Filter>资产</Filter>
+    </Image>
+    <Image Include="Assets\StoreLogo.png">
+      <Filter>资产</Filter>
+    </Image>
+    <Image Include="Assets\Wide310x150Logo.scale-200.png">
+      <Filter>资产</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="pch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LCUIApp_TemporaryKey.pfx" />
+    <None Include="..\..\..\test\helloworld.css">
+      <Filter>资产</Filter>
+    </None>
+    <None Include="LCUI.dll" />
+    <None Include="LCUIApp.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\..\test\helloworld.xml">
+      <Filter>资产</Filter>
+    </Xml>
+  </ItemGroup>
+</Project>

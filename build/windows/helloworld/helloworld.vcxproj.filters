@@ -19,4 +19,14 @@
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\test\helloworld.css">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\..\test\helloworld.xml">
+      <Filter>资源文件</Filter>
+    </Xml>
+  </ItemGroup>
 </Project>

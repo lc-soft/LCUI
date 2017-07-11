@@ -140,7 +140,7 @@ static void OnInertialScrolling( void *arg )
 	effect = &scrollbar->effect;
 	time = (double)LCUI_GetTimeDelta( effect->timestamp ) / 1000;
 	distance = (effect->speed + 0.5 * effect->speed_delta * time) * time;
-	pos = effect->end_pos + roundi( distance );
+	pos = effect->end_pos + iround( distance );
 	DEBUG_MSG( "distance: %g, pos: %d, speed_delta: %g, speed: %g\n",
 		   distance, pos, effect->speed_delta,
 		   effect->speed + effect->speed_delta * time );
@@ -216,7 +216,6 @@ static void StartInertialScrolling( LCUI_Widget w )
 static void Slider_OnMouseMove( LCUI_Widget slider, 
 				LCUI_WidgetEvent e, void *arg )
 {
-	LCUI_Pos pos;
 	LCUI_Widget layer;
 	LCUI_Widget w = e->data;
 	LCUI_ScrollBar scrollbar;
@@ -227,11 +226,10 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 		return;
 	}
 	layer = scrollbar->layer;
-	LCUICursor_GetPos( &pos );
 	if( scrollbar->direction == SBD_HORIZONTAL ) {
 		y = 0;
 		x = scrollbar->slider_x;
-		x += pos.x - scrollbar->mouse_x;
+		x += e->motion.x - scrollbar->mouse_x;
 		if( scrollbar->box ) {
 			box_size = scrollbar->box->box.content.width;
 		} else {
@@ -256,7 +254,7 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 	} else {
 		x = 0;
 		y = scrollbar->slider_y;
-		y += pos.y - scrollbar->mouse_y;
+		y += e->motion.y - scrollbar->mouse_y;
 		if( scrollbar->box ) {
 			box_size = scrollbar->box->box.content.height;
 		} else {
@@ -279,13 +277,13 @@ static void Slider_OnMouseMove( LCUI_Widget slider,
 		layer_pos = layer_pos * n;
 		SetStyle( layer->custom_style, key_top, -layer_pos, px );
 	}
-	if( scrollbar->pos != roundi( layer_pos ) ) {
+	if( scrollbar->pos != iround( layer_pos ) ) {
 		LCUI_WidgetEventRec e;
 		e.type = self.event_id;
 		e.cancel_bubble = TRUE;
 		Widget_TriggerEvent( layer, &e, &layer_pos );
 	}
-	scrollbar->pos = roundi( layer_pos );
+	scrollbar->pos = iround( layer_pos );
 	Widget_UpdateStyle( layer, FALSE );
 	Widget_Move( slider, x, y );
 }
@@ -579,7 +577,7 @@ void ScrollBar_SetPosition( LCUI_Widget w, int pos )
 		Widget_SetStyle( slider, key_top, slider_pos, px );
 		Widget_SetStyle( layer, key_top, -new_pos, px );
 	}
-	pos = roundi( new_pos );
+	pos = iround( new_pos );
 	if( scrollbar->pos != pos ) {
 		LCUI_WidgetEventRec e;
 		e.type = self.event_id;

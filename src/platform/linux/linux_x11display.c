@@ -235,6 +235,21 @@ static void X11Surface_Hide( LCUI_Surface surface )
 	surface->tasks[TASK_SHOW].is_valid = TRUE;
 }
 
+static void X11Surface_ClearTasks( LCUI_Surface surface )
+{
+	int i = TASK_SET_CAPTION;
+	if( surface->tasks[i].is_valid ) {
+		X11Surface_ReleaseTask( surface, i );
+	}
+}
+
+static void OnDestroySurface( void *data )
+{
+	LCUI_Surface s = data;
+	X11Surface_ClearTasks( s );
+	free( s );
+}
+
 static void X11Surface_OnCreate( void *arg1, void *arg2 )
 {
 	LCUI_Surface s = arg1;
@@ -442,6 +457,7 @@ LCUI_DisplayDriver LCUI_CreateLinuxX11DisplayDriver( void )
 	strcpy( driver->name, "x11" );
 	x11.app = LCUI_GetAppData();
 	if( !x11.app ) {
+		free( driver );
 		return NULL;
 	}
 	driver->getWidth = X11Display_GetWidth;
@@ -472,7 +488,13 @@ LCUI_DisplayDriver LCUI_CreateLinuxX11DisplayDriver( void )
 
 void LCUI_DestroyLinuxX11DisplayDriver( LCUI_DisplayDriver driver )
 {
-	
+	EventTrigger_Destroy( x11.trigger );
+	LinkedList_ClearData( &x11.surfaces, OnDestroySurface );
+	LCUI_UnbindSysEvent( ConfigureNotify, OnConfigureNotify );
+	LCUI_UnbindSysEvent( Expose, OnExpose );
+	x11.trigger = NULL;
+	x11.is_inited = FALSE;
+	free( driver );
 }
 
 #endif

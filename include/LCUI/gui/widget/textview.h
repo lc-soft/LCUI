@@ -40,8 +40,6 @@
 #ifndef LCUI_TEXTVIEW_H
 #define LCUI_TEXTVIEW_H
 
-#include <LCUI/font.h>
-
 LCUI_BEGIN_HEADER
 
 /** 设定与标签关联的文本内容 */
@@ -49,15 +47,13 @@ LCUI_API int TextView_SetTextW( LCUI_Widget w, const wchar_t *text );
 
 LCUI_API int TextView_SetText( LCUI_Widget w, const char *utf8_text );
 
-LCUI_API void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style );
-
-LCUI_API void TextView_SetLineHeight( LCUI_Widget w, LCUI_Style val );
-
-LCUI_API void TextView_GetTextStyle( LCUI_Widget w, LCUI_TextStyle *style );
+LCUI_API void TextView_SetLineHeight( LCUI_Widget w, int height );
 
 LCUI_API void TextView_SetTextAlign( LCUI_Widget w, int align );
 
 LCUI_API void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap );
+
+LCUI_API void LCUIWidget_AddTextView( void );
 
 LCUI_END_HEADER
 

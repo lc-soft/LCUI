@@ -137,6 +137,7 @@ LCUI_AppDriver LCUI_CreateLinuxX11AppDriver( void )
 	ASSIGN( app, LCUI_AppDriver );
 	x11.display = XOpenDisplay( NULL );
 	if( !x11.display ) {
+		free( app );
 		return NULL;
 	}
 	x11.screen = DefaultScreen( x11.display );
@@ -154,6 +155,9 @@ LCUI_AppDriver LCUI_CreateLinuxX11AppDriver( void )
 
 void LCUI_DestroyLinuxX11AppDriver( LCUI_AppDriver app )
 {
+	EventTrigger_Destroy( x11.trigger );
 	XCloseDisplay( x11.display );
+	x11.trigger = NULL;
+	free( app );
 }
 #endif

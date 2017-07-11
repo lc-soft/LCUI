@@ -51,10 +51,18 @@
 #include <LCUI/display.h>
 #include <LCUI/ime.h>
 #include <LCUI/platform.h>
+#ifdef LCUI_EVENTS_H
 #include LCUI_EVENTS_H
+#endif
+#ifdef LCUI_MOUSE_H
 #include LCUI_MOUSE_H
+#endif
+#ifdef LCUI_KEYBOARD_H
 #include LCUI_KEYBOARD_H
+#endif
+#ifdef LCUI_DISPLAY_H
 #include LCUI_DISPLAY_H
+#endif
 
 #define STATE_ACTIVE 1
 #define STATE_KILLED 0
@@ -82,9 +90,9 @@ typedef struct SysEventPackRec_ {
 
 /** LCUI 系统相关数据 */
 static struct LCUI_System {
-	LCUI_BOOL is_inited;		/**< 标志，指示LCUI是否初始化过 */
 	int state;			/**< 状态 */
 	int mode;			/**< LCUI的运行模式 */
+	int exit_code;			/**< 退出码 */
 	unsigned long int main_tid;	/**< 主线程ID */
 	struct {
 		LCUI_EventTrigger trigger;	/**< 系统事件容器 */
@@ -116,11 +124,8 @@ static void LCUI_InitEvent( void )
 }
 
 /** 停用事件模块并进行清理 */
-static void LCUI_ExitEvent( void )
+static void LCUI_FreeEvent( void )
 {
-	if( !System.is_inited ) {
-		return;
-	}
 	LCUIMutex_Destroy( &System.event.mutex );
 	EventTrigger_Destroy( System.event.trigger );
 	System.event.trigger = NULL;
@@ -150,7 +155,7 @@ int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
 {
 	int ret;
 	SysEventHandler handler;
-	if( !System.is_inited ) {
+	if( System.state != STATE_ACTIVE ) {
 		return -1;
 	}
 	handler = NEW( SysEventHandlerRec, 1 );
@@ -167,7 +172,7 @@ int LCUI_BindEvent( int id, LCUI_SysEventFunc func, void *data,
 int LCUI_UnbindEvent( int handler_id )
 {
 	int ret;
-	if( !System.is_inited ) {
+	if( System.state != STATE_ACTIVE ) {
 		return -1;
 	}
 	LCUIMutex_Lock( &System.event.mutex );
@@ -333,22 +338,25 @@ int LCUIMainLoop_Run( LCUI_MainLoop loop )
 		}
 	}
 	loop->state = STATE_EXITED;
+	DEBUG_MSG( "loop: %p, exit\n", loop );
+	LCUIMainLoop_Destroy( loop );
 	LinkedList_Delete( &MainApp.loops, 0 );
 	/* 获取处于列表表头的主循环 */
 	loop = LinkedList_Get( &MainApp.loops, 0 );
-	if( loop ) {
-		/* 改变当前运行的主循环 */
-		MainApp.loop = loop;
-	}
-	DEBUG_MSG( "loop: %p, exit\n", loop );
+	/* 改变当前运行的主循环 */
+	MainApp.loop = loop;
 	LCUICond_Broadcast( &MainApp.loop_changed );
 	return 0;
 }
 
-/** 标记目标主循环需要退出 */
 void LCUIMainLoop_Quit( LCUI_MainLoop loop )
 {
 	loop->state = STATE_EXITED;
+}
+
+void LCUIMainLoop_Destroy( LCUI_MainLoop loop )
+{
+	free( loop );
 }
 
 void LCUI_InitApp( LCUI_AppDriver app )
@@ -375,13 +383,18 @@ void LCUI_InitApp( LCUI_AppDriver app )
 	MainApp.driver_ready = TRUE;
 }
 
+static void OnDeleteMainLoop( void *arg )
+{
+	LCUIMainLoop_Destroy( arg );
+}
+
 static void OnDeleteTask( void *arg )
 {
 	LCUI_DeleteTask( arg );
 	free( arg );
 }
 
-static void LCUI_ExitApp( void )
+static void LCUI_FreeApp( void )
 {
 	LCUI_MainLoop loop;
 	LinkedListNode *node;
@@ -395,7 +408,7 @@ static void LCUI_ExitApp( void )
 	LCUICond_Destroy( &MainApp.loop_changed );
 	LCUIMutex_Destroy( &MainApp.tasks_mutex );
 	LCUICond_Destroy( &MainApp.tasks_cond );
-	LinkedList_Clear( &MainApp.loops, free );
+	LinkedList_Clear( &MainApp.loops, OnDeleteMainLoop );
 	LinkedList_Clear( &MainApp.tasks, OnDeleteTask );
 	if( MainApp.driver_ready ) {
 		LCUI_DestroyAppDriver( MainApp.driver );
@@ -490,10 +503,10 @@ LCUI_BOOL LCUI_IsOnMainLoop( void )
 
 void LCUI_InitBase( void )
 {
-	if( System.is_inited ) {
+	if( System.state == STATE_ACTIVE ) {
 		return;
 	}
-	System.is_inited = TRUE;
+	System.exit_code = 0;
 	System.state = STATE_ACTIVE;
 	System.main_tid = LCUIThread_SelfID();
 	LCUI_ShowCopyrightText();
@@ -523,23 +536,29 @@ int LCUI_Destroy( void )
 	e.type = LCUI_QUIT;
 	LCUI_TriggerEvent( &e, NULL );
 	System.state = STATE_KILLED;
-	LCUI_ExitIME();
-	LCUI_ExitKeyboard();
-	LCUI_ExitCursor();
-	LCUI_ExitWidget();
-	LCUI_ExitFont();
-	LCUI_ExitTimer();
-	LCUI_ExitDisplay();
-	LCUI_ExitEvent();
-	LCUI_ExitMetrics();
-	LCUI_ExitApp();
-	return 0;
+	LCUI_FreeDisplay();
+	LCUI_FreeApp();
+	LCUI_FreeIME();
+	LCUI_FreeKeyboard();
+	LCUI_FreeCursor();
+	LCUI_FreeWidget();
+	LCUI_FreeFont();
+	LCUI_FreeTimer();
+	LCUI_FreeEvent();
+	LCUI_FreeMetrics();
+	return System.exit_code;
 }
 
 void LCUI_Quit( void )
 {
 	System.state = STATE_KILLED;
 	LCUIApp_QuitAllMainLoop();
+}
+
+void LCUI_Exit( int code )
+{
+	System.exit_code = code;
+	LCUI_Quit();
 }
 
 int LCUI_Main( void )
@@ -552,5 +571,5 @@ int LCUI_Main( void )
 
 int LCUI_GetSelfVersion( char *out )
 {
-	return sprintf(out, "%s", LCUI_VERSION);
+	return sprintf( out, "%s", LCUI_VERSION );
 }

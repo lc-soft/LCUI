@@ -146,7 +146,7 @@ LCUI_API int LCUIDisplay_BindEvent( int event_id, LCUI_EventFunc func, void *arg
 LCUI_API int LCUI_InitDisplay( LCUI_DisplayDriver driver );
 
 /** 停用图形输出模块 */
-LCUI_API int LCUI_ExitDisplay( void );
+LCUI_API int LCUI_FreeDisplay( void );
 
 LCUI_END_HEADER
 

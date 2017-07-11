@@ -54,9 +54,10 @@ static const char *button_css = CodeToString(
 button {
 	padding: 6px 12px;
 	focusable: true;
+	text-align: center;
 	display: inline-block;
-	border: 1px solid #eaeaea;
 	background-color: #fff;
+	border: 1px solid #eaeaea;
 }
 
 button:hover {
@@ -68,7 +69,7 @@ button:active {
 	background-color: #d7d7d7;
 }
 
-button:disabled textview {
+button:disabled {
 	color: #aaa;
 }
 
@@ -78,7 +79,6 @@ static void Button_OnInit( LCUI_Widget w )
 {
 	prototype->proto->init( w );
 	w->computed_style.focusable = TRUE;
-	TextView_SetTextAlign( w, SV_CENTER );
 }
 
 void Button_SetTextW( LCUI_Widget w, const wchar_t *wstr )
@@ -91,7 +91,6 @@ void Button_SetText( LCUI_Widget w, const char *str )
 	TextView_SetText( w, str );
 }
 
-/** 添加按钮部件类型 */
 void LCUIWidget_AddButton( void )
 {
 	prototype = LCUIWidget_NewPrototype( "button", "textview" );

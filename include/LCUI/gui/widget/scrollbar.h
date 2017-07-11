@@ -60,6 +60,8 @@ LCUI_API void ScrollBar_SetPosition( LCUI_Widget w, int pos );
 /** 设置滚动条的方向 */
 LCUI_API void ScrollBar_SetDirection( LCUI_Widget w, int direction );
 
+LCUI_API void LCUIWidget_AddTScrollBar( void );
+
 LCUI_END_HEADER
 
 #endif

@@ -62,7 +62,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;BATCH_TEST;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)\include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
@@ -81,7 +81,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;BATCH_TEST;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;$(SolutionDir)\include\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <BrowseInformation>true</BrowseInformation>
@@ -105,6 +105,8 @@
     <ClCompile Include="..\..\..\test\test_string.c" />
     <ClCompile Include="..\..\..\test\test_char_render.c" />
     <ClCompile Include="..\..\..\test\test_string_render.c" />
+    <ClCompile Include="..\..\..\test\test_widget_layout.c" />
+    <ClCompile Include="..\..\..\test\test_widget_rect.c" />
     <ClCompile Include="..\..\..\test\test_widget_render.c" />
   </ItemGroup>
   <ItemGroup>

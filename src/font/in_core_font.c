@@ -51,20 +51,19 @@ static int InCoreFont_Open( const char *filepath, LCUI_Font ***outfonts )
 {
 	int *code;
 	LCUI_Font **fonts, *font;
-
-	code = malloc( sizeof( int ) );
-	fonts = malloc( sizeof( LCUI_Font* ) );
-	if( strcmp( filepath, "in-core.inconsolata" ) == 0 ) {
-		*code = FONT_INCONSOLATA;
-		font = malloc( sizeof(LCUI_Font) );
-		font->family_name = strdup2("inconsolata");
-		font->style_name = strdup2("Regular");
-		font->data = code;
-		fonts[0] = font;
-		*outfonts = fonts;
-		return 1;
+	if( strcmp( filepath, "in-core.inconsolata" ) != 0 ) {
+		return 0;
 	}
-	return -1;
+	code = malloc( sizeof( int ) );
+	*code = FONT_INCONSOLATA;
+	fonts = malloc( sizeof( LCUI_Font* ) );
+	font = malloc( sizeof( LCUI_Font ) );
+	font->family_name = strdup2( "inconsolata" );
+	font->style_name = strdup2( "Regular" );
+	font->data = code;
+	fonts[0] = font;
+	*outfonts = fonts;
+	return 1;
 }
 
 static void InCoreFont_Close( void *face )
@@ -86,22 +85,10 @@ static int InCoreFont_Render( LCUI_FontBitmap *bmp, wchar_t ch,
 
 int LCUIFont_InitInCoreFont( LCUI_FontEngine *engine )
 {
-	int *code;
-	LCUI_Font *font;
-
-	code = malloc( sizeof( int ) );
-	font = malloc( sizeof( LCUI_Font ) );
-	/* 先添加 LCUI 内置字体的信息 */
-	*code = FONT_INCONSOLATA;
-	font->family_name = strdup2("inconsolata");
-	font->style_name = strdup2("Regular");
-	font->engine = engine;
-	font->data = code;
 	engine->render = InCoreFont_Render;
 	engine->close = InCoreFont_Close;
 	engine->open = InCoreFont_Open;
 	strcpy( engine->name, "in-core" );
-	LCUIFont_Add( font );
 	return 0;
 }
 

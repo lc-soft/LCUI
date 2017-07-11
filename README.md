@@ -3,8 +3,10 @@
 ![LCUI Logo](https://lcui.lc-soft.io/static/images/lcui-logo-lg.png)
 
 [![Join the chat at https://gitter.im/lc-soft/LCUI](https://badges.gitter.im/lc-soft/LCUI.svg)](https://gitter.im/lc-soft/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![加入讨论组 https://lcsoft.bearychat.com/apply](https://img.shields.io/badge/%E8%AE%A8%E8%AE%BA%E7%BB%84-bearychat-2dbe60.svg)](https://lcsoft.bearychat.com/apply)
 [![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
-[![Downloads](https://img.shields.io/sourceforge/dt/lc-ui.svg)](https://sourceforge.net/projects/lc-ui)
+[![Coverage Status](https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop)](https://coveralls.io/github/lc-soft/LCUI?branch=develop)
+[![Github All Releases](https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg)](https://github.com/lc-soft/LCUI/releases)
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![OpenCollective](https://opencollective.com/lcui/backers/badge.svg)](#backers) 
 [![OpenCollective](https://opencollective.com/lcui/sponsors/badge.svg)](#sponsors)
@@ -68,7 +70,7 @@ If you system is Ubuntu, you can run following command to install dependencies:
 ### Building On Windows
 
 LCUI is mainly develop in the Windows environment, you can use VisualStudio 
-to open file `build/VS2012/LCUI.sln` and compile LCUI.
+to open file `build/windows/LCUI.sln` and compile LCUI.
 
 ## Bugs 
 

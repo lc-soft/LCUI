@@ -154,7 +154,7 @@ void LCUI_InitKeyboard( void )
 	LCUI_BindEvent( LCUI_KEYUP, OnKeyboardEvent, NULL, NULL );
 }
 
-void LCUI_ExitKeyboard( void )
+void LCUI_FreeKeyboard( void )
 {
 	RBTree_Destroy( &self.state_tree );
 	LCUIMutex_Destroy( &self.mutex );

@@ -203,7 +203,7 @@ LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags )
 				break;
 			}
 			style_data->has_pixel_size = TRUE;
-			style_data->pixel_size = roundi( tag_data->style.px );
+			style_data->pixel_size = iround( tag_data->style.px );
 			flags[1] = 1;
 			++equal;
 			break;

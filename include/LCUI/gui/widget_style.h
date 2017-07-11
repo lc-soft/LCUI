@@ -45,7 +45,7 @@
 void LCUIWidget_InitStyle( void );
 
 /** 销毁，释放资源 */
-void LCUIWidget_ExitStyle( void );
+void LCUIWidget_FreeStyle( void );
 
 /** 新建一个样式表 */
 LCUI_API LCUI_StyleSheet StyleSheet( void );

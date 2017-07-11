@@ -42,18 +42,15 @@
 
 LCUI_BEGIN_HEADER
 
-/** 初始化背景绘制参数 */
-LCUI_API void Background_Init( LCUI_Background *bg );
-
 /** 
 * 绘制背景 
 * @param paint 绘制器的上下文句柄
-* @param box 背景区域
-* @param bg 背景样式参数
+* @param[in] box 背景区域
+* @param[in] bg 背景样式参数
 */
 LCUI_API void Graph_DrawBackground( LCUI_PaintContext paint, 
 				    const LCUI_Rect *box,
-				    LCUI_Background *bg );
+				    const LCUI_Background *bg );
 
 LCUI_END_HEADER
 

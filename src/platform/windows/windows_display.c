@@ -108,6 +108,17 @@ static LCUI_Surface GetSurfaceByHWND( HWND hwnd )
 	return NULL;
 }
 
+static void WinSurface_ClearTasks( LCUI_Surface surface )
+{
+	LCUI_SurfaceTask *t;
+	t = &surface->tasks[TASK_SET_CAPTION];
+	if( t->caption ) {
+		free( t->caption );
+		t->caption = NULL;
+	}
+	t->is_valid = FALSE;
+}
+
 static void WinSurface_ExecDestroy( LCUI_Surface surface )
 {
 	surface->width = 0;
@@ -125,17 +136,26 @@ static void WinSurface_ExecDestroy( LCUI_Surface surface )
 			ReleaseDC( surface->hwnd, surface->hdc_client );
 		}
 	}
+	DestroyWindow( surface->hwnd );
+	surface->hwnd = NULL;
+	surface->fb_bmp = NULL;
 	surface->hdc_fb = NULL;
 	surface->hdc_client = NULL;
-	surface->fb_bmp = NULL;
-	surface->hwnd = NULL;
+	surface->is_ready = FALSE;
 	Graph_Free( &surface->fb );
+	WinSurface_ClearTasks( surface );
+	free( surface );
 }
 
 static void WinSurface_Destroy( LCUI_Surface surface )
 {
 	LinkedList_Unlink( &win.surfaces, &surface->node );
 	WinSurface_ExecDestroy( surface );
+}
+
+static void WinSurface_OnDestroy( void *data )
+{
+	WinSurface_ExecDestroy( data );
 }
 
 static void WinSurface_Close( LCUI_Surface surface )
@@ -162,7 +182,9 @@ static void OnCreateSurface( void *arg1, void *arg2 )
 		0, 0, NULL, NULL,
 		instance, NULL
 	);
+#ifdef ENABLE_TOUCH_SUPPORT
 	RegisterTouchWindow( surface->hwnd, 0 );
+#endif
 	surface->hdc_client = GetDC( surface->hwnd );
 	surface->hdc_fb = CreateCompatibleDC( surface->hdc_client );
 	surface->is_ready = TRUE;
@@ -286,12 +308,12 @@ static void WinSurface_Hide( LCUI_Surface surface )
 
 static void WinSurface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 {
-	int len;
+	size_t len;
 	wchar_t *caption = NULL;
 
 	if( str ) {
-		len = wcslen(str) + 1;
-		caption = (wchar_t*)malloc(sizeof(wchar_t)*len);
+		len = wcslen( str ) + 1;
+		caption = (wchar_t*)malloc( sizeof( wchar_t )*len );
 		wcsncpy( caption, str, len );
 	}
 	if( surface->tasks[TASK_SET_CAPTION].is_valid
@@ -373,6 +395,7 @@ static void WinSurface_Update( LCUI_Surface surface )
 {
 	LCUI_SurfaceTask *t;
 	if( !surface->hwnd ) {
+		WinSurface_ClearTasks( surface );
 		return;
 	}
 	DEBUG_MSG("surface: %p\n", surface);
@@ -395,10 +418,6 @@ static void WinSurface_Update( LCUI_Surface surface )
 	t = &surface->tasks[TASK_SET_CAPTION];
 	if( t->is_valid ) {
 		SetWindowTextW( surface->hwnd, t->caption );
-		if( t->caption ) {
-			free( t->caption );
-			t->caption = NULL;
-		}
 	}
 	t->is_valid = FALSE;
 	t = &surface->tasks[TASK_SHOW];
@@ -412,6 +431,7 @@ static void WinSurface_Update( LCUI_Surface surface )
 		}
 	}
 	t->is_valid = FALSE;
+	WinSurface_ClearTasks( surface );
 }
 
 static void OnWMPaint( LCUI_Event e, void *arg )
@@ -462,7 +482,6 @@ static void OnWMGetMinMaxInfo( LCUI_Event e, void *arg )
 	if( style->max_height >= 0 ) {
 		mminfo->ptMaxTrackSize.y = (LONG)style->max_height;
 	}
-
 }
 
 static void OnWMSize( LCUI_Event e, void *arg )
@@ -539,6 +558,12 @@ LCUI_DisplayDriver LCUI_CreateWinDisplay( void )
 
 void LCUI_DestroyWinDisplay( LCUI_DisplayDriver driver )
 {
+	win.is_inited = FALSE;
+	LCUI_UnbindSysEvent( WM_SIZE, OnWMSize );
+	LCUI_UnbindSysEvent( WM_PAINT, OnWMPaint );
+	LCUI_UnbindSysEvent( WM_GETMINMAXINFO, OnWMGetMinMaxInfo );
+	LinkedList_ClearData( &win.surfaces, WinSurface_OnDestroy );
+	EventTrigger_Destroy( win.trigger );
 	free( driver );
 }
 

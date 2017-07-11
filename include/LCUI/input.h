@@ -132,7 +132,7 @@ LCUI_API void LCUIKeyboard_ReleaseKey( int key_code );
 
 void LCUI_InitKeyboard( void );
 
-void LCUI_ExitKeyboard( void );
+void LCUI_FreeKeyboard( void );
 
 LCUI_END_HEADER
 

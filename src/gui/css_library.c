@@ -83,7 +83,7 @@ typedef struct NamesFinderRec_ {
 typedef struct StyleLinkGroupRec_ {
 	Dict *links;			/**< 样式链接表 */
 	char *name;			/**< 选择器名称 */
-	LCUI_SelectorNodeRec snode;	/**< 选择器结点 */
+	LCUI_SelectorNode snode;	/**< 选择器结点 */
 } StyleLinkGroupRec, *StyleLinkGroup;
 
 /** 样式结点记录 */
@@ -213,22 +213,7 @@ static KeyNameGroupRec style_value_map[] = {
 
 static int LCUI_DirectAddStyleName( int key, const char *name )
 {
-	unsigned int *newkey;
-	char *newname = strdup2( name );
-	if( !newname ) {
-		return -ENOMEM;
-	}
-	newkey = malloc( sizeof(unsigned int) );
-	if( !newkey ) {
-		free( newname );
-		return -ENOMEM;
-	}
-	*newkey = key;
-	if( Dict_Add( library.names, newkey, newname ) == 0 ) {
-		return 0;
-	}
-	free( newname );
-	return -1;
+	return Dict_AddCopy( library.names, &key, name );
 }
 
 int LCUI_SetStyleName( int key, const char *name )
@@ -239,8 +224,8 @@ int LCUI_SetStyleName( int key, const char *name )
 	entry = Dict_Find( library.names, &key );
 	if( entry ) {
 		newname = strdup2( name );
-		free( DictEntry_GetVal( entry ) );
-		Dict_SetVal( library.names, entry, newname );
+		free( entry->v.val );
+		entry->v.val = newname;
 		LCUIMutex_Unlock( &library.mutex );
 		return 0;
 	}
@@ -262,45 +247,64 @@ int LCUI_AddStyleName( const char *name )
 	return key;
 }
 
+const char *LCUI_GetStyleName( int key )
+{
+	return Dict_FetchValue( library.names, &key );
+}
+
+static KeyNameGroup CreateKeyNameGroup( int key, const char *name )
+{
+	KeyNameGroup group;
+	group = malloc( sizeof( KeyNameGroupRec ) );
+	group->name = strdup2( name );
+	group->key = key;
+	return group;
+}
+
+static void DestroyKeyNameGroup( void *data )
+{
+	KeyNameGroup group = data;
+	free( group->name );
+	free( group );
+}
+
+static void KeyNameGroupDestructor( void *privdata, void *data )
+{
+	DestroyKeyNameGroup( data );
+}
+
 int LCUI_AddStyleValue( int key, const char *name )
 {
-	char *newname;
-	unsigned int *val;
-	newname = strdup2( name );
-	if( !newname ) {
-		return -ENOMEM;
-	}
-	val = malloc( sizeof( unsigned int ) );
-	if( !val ) {
-		free( newname );
-		return -ENOMEM;
-	}
-	*val = key;
-	if( Dict_Add( library.value_keys, newname, val ) ) {
-		free( newname );
-		free( val );
+	KeyNameGroup group = CreateKeyNameGroup( key, name );
+	if( Dict_Add( library.value_keys, group->name, group ) ) {
+		DestroyKeyNameGroup( group );
 		return -1;
 	}
-	return Dict_Add( library.value_names, val, newname );
+	if( Dict_Add( library.value_names, &group->key, group ) ) {
+		DestroyKeyNameGroup( group );
+		return -2;
+	}
+	return 0;
 }
 
 int LCUI_GetStyleValue( const char *str )
 {
-	int *val = Dict_FetchValue( library.value_keys, str );
-	if( val ) {
-		return *val;
+	KeyNameGroup group;
+	group = Dict_FetchValue( library.value_keys, str );
+	if( group ) {
+		return group->key;
 	}
 	return -1;
 }
 
 const char *LCUI_GetStyleValueName( int val )
 {
-	return Dict_FetchValue( library.value_names, &val );
-}
-
-const char *LCUI_GetStyleName( int key )
-{
-	return Dict_FetchValue( library.names, &key );
+	KeyNameGroup group;
+	group = Dict_FetchValue( library.value_names, &val );
+	if( group ) {
+		return group->name;
+	}
+	return NULL;
 }
 
 int LCUI_GetStyleTotal( void )
@@ -882,17 +886,18 @@ LCUI_Selector Selector( const char *selector )
 			}
 			/* 保存上个结点 */
 			rank = SelectorNode_Save( node, name, ni, type );
-			if( rank > 0 ) {
-				s->rank += rank;
-			} else {
-				_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
-					    selector, p - selector - ni );
-				SelectorNode_Delete( node );
-				node = NULL;
-			}
-			ni = 0;
 			is_saving = TRUE;
 			type = *p;
+			if( rank > 0 ) {
+				s->rank += rank;
+				ni = 0;
+				continue;
+			}
+			_DEBUG_MSG( "%s: invalid selector node at %ld.\n",
+					selector, p - selector - ni );
+			SelectorNode_Delete( node );
+			node = NULL;
+			ni = 0;
 			continue;
 		case ' ':
 		case '\r':
@@ -964,6 +969,7 @@ static void DeleteStyleNode( StyleNode node )
 	}
 	StyleSheet_Delete( node->sheet );
 	node->sheet = NULL;
+	free( node );
 }
 
 static StyleLink CreateStyleLink( void )
@@ -977,13 +983,16 @@ static StyleLink CreateStyleLink( void )
 
 static void DeleteStyleLink( StyleLink link )
 {
-	link->group = NULL;
 	Dict_Release( link->parents );
-	link->parents = NULL;
 	LinkedList_Clear( &link->styles, (FuncPtr)DeleteStyleNode );
+	free( link->selector );
+	link->selector = NULL;
+	link->parents = NULL;
+	link->group = NULL;
+	free( link );
 }
 
-static void OnDeleteStyleLink( void *privdata, void *data )
+static void StyleLinkDestructor( void *privdata, void *data )
 {
 	DeleteStyleLink( data );
 }
@@ -992,24 +1001,26 @@ static StyleLinkGroup CreateStyleLinkGroup( LCUI_SelectorNode snode )
 {
 	DictType *dtype = NEW( DictType, 1 );
 	StyleLinkGroup group = NEW( StyleLinkGroupRec, 1 );
-	SelectorNode_Copy( &group->snode, snode );
-	group->name = group->snode.fullname;
+	group->snode = NEW( LCUI_SelectorNodeRec, 1 );
+	SelectorNode_Copy( group->snode, snode );
+	group->name = group->snode->fullname;
 	*dtype = DictType_StringCopyKey;
-	dtype->valDestructor = OnDeleteStyleLink;
+	dtype->valDestructor = StyleLinkDestructor;
 	group->links = Dict_Create( dtype, dtype );
 	return group;
 }
 
 static void DeleteStyleLinkGroup( StyleLinkGroup group )
 {
-	free( group->name );
+	DictType *dtype;
+	dtype = group->links->privdata;
+	SelectorNode_Delete( group->snode );
 	Dict_Release( group->links );
-	free( group->links->privdata );
-	group->name = NULL;
-	group->links = NULL;
+	free( dtype );
+	free( group );
 }
 
-static void OnDeleteStyleLinkGroup( void *privdata, void *data )
+static void StyleLinkGroupDestructor( void *privdata, void *data )
 {
 	DeleteStyleLinkGroup( data );
 }
@@ -1019,16 +1030,17 @@ static Dict *CreateStyleGroup( void )
 	Dict *dict;
 	DictType *dtype = NEW( DictType, 1 );
 	*dtype = DictType_StringCopyKey;
-	dtype->valDestructor = OnDeleteStyleLinkGroup;
+	dtype->valDestructor = StyleLinkGroupDestructor;
 	dict = Dict_Create( dtype, dtype );
 	return dict;
 }
 
 static void DeleteStyleGroup( Dict *dict )
 {
+	DictType *dtype;
+	dtype = dict->privdata;
 	Dict_Release( dict );
-	free( dict->privdata );
-	dict->privdata = NULL;
+	free( dtype );
 }
 
 /** 根据选择器，选中匹配的样式表 */
@@ -1271,6 +1283,12 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 		case SVT_PX:
 			LOG( "%gpx", s->val_px );
 			break;
+		case SVT_DIP:
+			LOG( "%gdip", s->val_dip );
+			break;
+		case SVT_SP:
+			LOG( "%gsp", s->val_sp );
+			break;
 		case SVT_STRING:
 			LOG( "%s", s->val_string );
 			break;
@@ -1316,8 +1334,7 @@ static void LCUI_PrintStyleLink( StyleLink link, const char *selector )
 	for( LinkedList_Each( node, &link->styles ) ) {
 		StyleNode snode = node->data;
 		LOG( "\n[%s]\n", snode->space ? snode->space : "<none>" );
-		LOG( "[rank: %d]\n%s {\n", snode->rank, snode->selector );
-		LOG( "%s {\n", fullname );
+		LOG( "[rank: %d]\n", snode->rank, fullname );
 		LCUI_PrintStyleSheet( snode->sheet );
 		LOG("}\n");
 	}
@@ -1407,12 +1424,17 @@ void LCUI_PrintStyleSheetsBySelector( LCUI_Selector s )
 	LOG( "selector(%u) stylesheets end\n", s->hash );
 }
 
-static void DestroyStyleSheetCache( void *privdata, void *val )
+static void StyleSheetCacheDestructor( void *privdata, void *val )
 {
 	StyleSheet_Delete( val );
 }
 
-static void DestroyStyleName( void *privdata, void *val )
+static void *DupStyleName( void *privdata, const void *val )
+{
+	return strdup2( val );
+}
+
+static void StyleNameDestructor( void *privdata, void *val )
 {
 	free( val );
 }
@@ -1440,27 +1462,72 @@ static void *IntKeyDict_KeyDup( void *privdata, const void *key )
 	return newkey;
 }
 
-void LCUI_InitCSSLibrary( void )
+static void LCUI_InitStylesheetCache( void )
 {
-	KeyNameGroup skn, skn_end;
-	static DictType cachedict, namedict;
+	static DictType cachedict;
+	cachedict.valDup = NULL;
 	cachedict.keyDup = IntKeyDict_KeyDup;
 	cachedict.keyCompare = IntKeyDict_KeyCompare;
 	cachedict.hashFunction = IntKeyDict_HashFunction;
 	cachedict.keyDestructor = IntKeyDict_KeyDestructor;
-	cachedict.valDestructor = DestroyStyleSheetCache;
-	cachedict.valDup = namedict.valDup = NULL;
+	cachedict.valDestructor = StyleSheetCacheDestructor;
+	cachedict.keyDestructor = IntKeyDict_KeyDestructor;
+	library.cache = Dict_Create( &cachedict, NULL );
+}
+
+static void LCUI_DestroyStylesheetCache( void )
+{
+	Dict_Release( library.cache );
+	library.cache = NULL;
+}
+
+static void LCUI_InitStyleNameLibrary( void )
+{
+	static DictType namedict = { 0 };
+	namedict.valDup = DupStyleName;
 	namedict.keyDup = IntKeyDict_KeyDup;
 	namedict.keyCompare = IntKeyDict_KeyCompare;
+	namedict.valDestructor = StyleNameDestructor;
 	namedict.hashFunction = IntKeyDict_HashFunction;
 	namedict.keyDestructor = IntKeyDict_KeyDestructor;
-	namedict.valDestructor = DestroyStyleName;
 	library.names = Dict_Create( &namedict, NULL );
-	library.cache = Dict_Create( &cachedict, NULL );
+}
+
+static void LCUI_DestroyStyleNameLibrary( void )
+{
+	Dict_Release( library.names );
+	library.names = NULL;
+}
+
+static void LCUI_InitStyleValueLibrary( void )
+{
+	static DictType valdict, namedict = { 0 };
+	valdict = DictType_StringKey;
+	namedict.keyCompare = IntKeyDict_KeyCompare;
+	namedict.hashFunction = IntKeyDict_HashFunction;
+	valdict.valDestructor = KeyNameGroupDestructor;
+	/* value_keys 表用于存放 key 和 name 数据 */
+	library.value_keys = Dict_Create( &valdict, NULL );
+	/* value_names 表仅引用 value_keys 里的数据  */
 	library.value_names = Dict_Create( &namedict, NULL );
-	library.value_keys = Dict_Create( &DictType_StringKey, NULL );
-	LinkedList_Init( &library.groups );
+}
+
+static void LCUI_DestroyStyleValueLibrary( void )
+{
+	Dict_Release( library.value_names );
+	Dict_Release( library.value_keys );
+	library.value_keys = NULL;
+	library.value_names = NULL;
+}
+
+void LCUI_InitCSSLibrary( void )
+{
+	KeyNameGroup skn, skn_end;
+	LCUI_InitStylesheetCache();
+	LCUI_InitStyleNameLibrary();
+	LCUI_InitStyleValueLibrary();
 	LCUIMutex_Init( &library.mutex );
+	LinkedList_Init( &library.groups );
 	skn_end = style_name_map + LEN( style_name_map );
 	for( skn = style_name_map; skn < skn_end; ++skn ) {
 		LCUI_DirectAddStyleName( skn->key, skn->name );
@@ -1473,13 +1540,12 @@ void LCUI_InitCSSLibrary( void )
 	library.is_inited = TRUE;
 }
 
-void LCUI_ExitCSSLibrary( void )
+void LCUI_FreeCSSLibrary( void )
 {
 	library.is_inited = FALSE;
-	Dict_Release( library.names );
-	Dict_Release( library.cache );
-	Dict_Release( library.value_keys );
-	Dict_Release( library.value_names );
+	LCUI_DestroyStylesheetCache();
+	LCUI_DestroyStyleNameLibrary();
+	LCUI_DestroyStyleValueLibrary();
 	LCUIMutex_Destroy( &library.mutex );
 	LinkedList_Clear( &library.groups, (FuncPtr)DeleteStyleGroup );
 }

@@ -1,9 +1,12 @@
 *.lo
 *.o
+*.dll
+*.lib
 *.db
 *.opendb
 *.dirstamp
 *.zip
+*.pfx
 *.lastbuildstate
 *.unsuccessfulbuild
 *.pdb
@@ -18,9 +21,14 @@
 .libs
 *.la
 *.txt
+*.gcda
 *.vspx
 *.vs
 *.res
+*.vcxproj.user
+*.gcno
+build/windows/*/*.css
+build/windows/*/*.xml
 *~
 *.intermediate
 Debug

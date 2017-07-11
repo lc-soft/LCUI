@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * jpeg.c -- LCUI JPEG image file processing module.
  * 
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * jpeg.c -- LCUI的JPEG图像文件读写支持模块。
  *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2017 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -63,6 +63,7 @@ typedef struct LCUI_JPEGErrorRec_ {
 typedef struct LCUI_JPEGReaderRec_ {
 	struct jpeg_source_mgr src;		/**< JPEG 资源管理接口 */
 	LCUI_JPEGErrorRec err;			/**< JPEG 的错误处理接口 */
+	LCUI_BOOL start_of_file;		/**< 是否刚开始读文件 */
 	LCUI_ImageReader base;			/**< 所属的图片读取器 */
 	unsigned char buffer[BUFFER_SIZE];	/**< 数据缓存 */
 } LCUI_JPEGReaderRec, *LCUI_JPEGReader;
@@ -88,6 +89,7 @@ static void JPEGReader_OnInit( j_decompress_ptr cinfo )
 	LCUI_ImageReader reader;
 	LCUI_JPEGReader jpeg_reader;
 	jpeg_reader = (LCUI_JPEGReader)cinfo->src;
+	jpeg_reader->start_of_file = TRUE;
 	reader = jpeg_reader->base;
 	if( reader->fn_begin ) {
 		reader->fn_begin( reader->stream_data );
@@ -103,33 +105,54 @@ static boolean JPEGReader_OnRead( j_decompress_ptr cinfo )
 	reader = jpeg_reader->base;
 	size = reader->fn_read( reader->stream_data,
 				jpeg_reader->buffer, BUFFER_SIZE );
+	if( size <= 0 ) {
+		/* 将空的输入文件视为致命错误 */
+		if( jpeg_reader->start_of_file ) {
+			ERREXIT( cinfo, JERR_INPUT_EMPTY );
+		}
+		WARNMS( cinfo, JWRN_JPEG_EOF );
+		/* 插入一个无用的 EOI 标记 */
+		jpeg_reader->buffer[0] = (JOCTET)0xFF;
+		jpeg_reader->buffer[1] = (JOCTET)JPEG_EOI;
+		size = 2;
+	}
 	/* 设置数据缓存地址和大小，供 jpeg 解码器使用 */
 	jpeg_reader->src.next_input_byte = jpeg_reader->buffer;
 	jpeg_reader->src.bytes_in_buffer = size;
-	if( size < BUFFER_SIZE ) {
-		return FALSE;
-	}
+	jpeg_reader->start_of_file = FALSE;
 	return TRUE;
 }
 
 static void JPEGReader_OnSkip( j_decompress_ptr cinfo, long num_bytes )
 {
-	size_t size;
 	LCUI_ImageReader reader;
 	LCUI_JPEGReader jpeg_reader;
+	struct jpeg_source_mgr *src = cinfo->src;
 	jpeg_reader = (LCUI_JPEGReader)cinfo->src;
 	reader = jpeg_reader->base;
-	/* 如果跳过的字节数小于当前缓存的数据大小，则直接移动数据读取指针 */
-	if( jpeg_reader->src.bytes_in_buffer > (size_t)num_bytes ) {
-		jpeg_reader->src.next_input_byte += num_bytes;
-		jpeg_reader->src.bytes_in_buffer -= num_bytes;
+	if( !reader->fn_skip ) {
+		if( num_bytes <= 0 ) {
+			return;
+		}
+		while( num_bytes > (long)src->bytes_in_buffer ) {
+			num_bytes -= (long)src->bytes_in_buffer;
+			src->fill_input_buffer( cinfo );
+		}
+		src->next_input_byte += (size_t)num_bytes;
+		src->bytes_in_buffer -= (size_t)num_bytes;
 		return;
 	}
-	size = num_bytes - jpeg_reader->src.bytes_in_buffer;
-	reader->fn_skip( reader->stream_data, size );
+	/* 如果跳过的字节数小于当前缓存的数据大小，则直接移动数据读取指针 */
+	if( src->bytes_in_buffer > (size_t)num_bytes ) {
+		src->next_input_byte += num_bytes;
+		src->bytes_in_buffer -= num_bytes;
+		return;
+	}
+	num_bytes -= (long)src->bytes_in_buffer;
+	reader->fn_skip( reader->stream_data, num_bytes );
 	/* 重置当前缓存 */
-	jpeg_reader->src.bytes_in_buffer = 0;
-	jpeg_reader->src.next_input_byte = jpeg_reader->buffer;
+	src->bytes_in_buffer = 0;
+	src->next_input_byte = jpeg_reader->buffer;
 }
 
 static void JPEGReader_OnTerminate( j_decompress_ptr cinfo )
@@ -152,7 +175,7 @@ static void *jpeg_malloc( j_decompress_ptr cinfo, size_t size )
 int LCUI_ReadJPEGHeader( LCUI_ImageReader reader )
 {
 	size_t size;
-	short int mark;
+	short int *buffer;
 	j_decompress_ptr cinfo;
 	LCUI_JPEGReader jpeg_reader;
 	LCUI_ImageHeader header = &reader->header;
@@ -168,8 +191,8 @@ int LCUI_ReadJPEGHeader( LCUI_ImageReader reader )
 	}
 	jpeg_reader->src.bytes_in_buffer = sizeof( short int );
 	jpeg_reader->src.next_input_byte = jpeg_reader->buffer;
-	mark = ((short int*)jpeg_reader->buffer)[0];
-	if( mark != -9985 ) {
+	buffer = (short int*)jpeg_reader->buffer;
+	if( buffer[0] != -9985 ) {
 		return -ENODATA;
 	}
 	jpeg_read_header( cinfo, TRUE );

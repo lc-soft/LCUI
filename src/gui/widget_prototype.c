@@ -63,7 +63,7 @@ void LCUIWidget_InitPrototype( void )
 	self.prototypes = Dict_Create( &self.dicttype, NULL );
 }
 
-void LCUIWidget_ExitPrototype( void )
+void LCUIWidget_FreePrototype( void )
 {
 	Dict_Release( self.prototypes );
 }
@@ -102,6 +102,24 @@ LCUI_WidgetPrototype LCUIWidget_NewPrototype( const char *name,
 	return NULL;
 }
 
+LCUI_BOOL Widget_CheckType( LCUI_Widget w, const char *type )
+{
+	LCUI_WidgetPrototypeC proto;
+
+	if( ! w || !w->type ) {
+		return FALSE;
+	}
+	if( strcmp( w->type, type ) == 0 ) {
+		return TRUE;
+	}
+	for( proto = w->proto->proto; proto; proto = proto->proto ) {
+		if( strcmp( proto->name, type ) == 0 ) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 void *Widget_GetData( LCUI_Widget widget, LCUI_WidgetPrototype proto )
 {
 	uint_t i;
@@ -132,4 +150,23 @@ void *Widget_AddData( LCUI_Widget widget,
 	widget->data.list = list;
 	widget->data.length += 1;
 	return data;
+}
+
+void Widget_ClearPrototype( LCUI_Widget widget )
+{
+	if( widget->proto && widget->proto->destroy ) {
+		widget->proto->destroy( widget );
+	}
+	while( widget->data.length > 0 ) {
+		widget->data.length -= 1;
+		free( widget->data.list[widget->data.length].data );
+	}
+	if( widget->data.list ) {
+		free( widget->data.list );
+	}
+	if( widget->type && !widget->proto ) {
+		free( widget->type );
+		widget->type = NULL;
+	}
+	widget->proto = NULL;
 }

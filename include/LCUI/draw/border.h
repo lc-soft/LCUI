@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * border.h -- graph border draw support.
  * 
- * Copyright (C) 2013-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2013-2017 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * border.h -- 边框绘制支持
  *
- * 版权所有 (C) 2013-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2013-2017 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -42,15 +42,6 @@
 
 LCUI_BEGIN_HEADER
 
-LCUI_API void Border_Init( LCUI_Border *border );
-/* 初始化边框数据 */
-
-LCUI_API LCUI_Border Border( unsigned int width_px, int style, LCUI_Color color );
-/* 简单的设置边框样式，并获取该样式数据 */
-
-LCUI_API void Border_Radius( LCUI_Border *border, unsigned int radius );
-/* 设置边框的圆角半径 */
-
 /**
  * 绘制边框
  * @param[in] paint 绘制上下文
@@ -58,7 +49,8 @@ LCUI_API void Border_Radius( LCUI_Border *border, unsigned int radius );
  * @param[in] border 边框参数
  */
 LCUI_API int Graph_DrawBorder( LCUI_PaintContext paint, 
-			       LCUI_Rect *box, LCUI_Border *border );
+			       const LCUI_Rect *box,
+			       const LCUI_Border *border );
 
 LCUI_END_HEADER
 

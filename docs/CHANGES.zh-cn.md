@@ -1,5 +1,26 @@
 # LCUI的更新记录
 
+## 1.0 alpha 和 1.0 alpha2 之间的变化
+
+- 调整代码结构
+- 改进 TextView 部件
+- 改进 TextEdit 部件的光标定位与文本渲染
+- 改进部件的盒形阴影（box-shadow）绘制
+- 添加适用于 UWP 应用的驱动支持，示例应用代码[在这里](https://github.com/lc-soft/LCUI/blob/develop/build/windows/LCUIApp/App.cpp)。
+- 改进对高分屏的支持
+  - 添加 dp、sp 度量单位，功能与 Android 中的同名单位相似
+  - 添加缩放支持，可根据屏幕像素密度设置合适的缩放比例
+- 完善自动化构建和测试
+  - 添加单元测试
+  - 添加代码覆盖率测试
+  - 引入 valgrind 内存检查工具
+- 解决所有内存泄露和内存访问越界问题
+- 解决部件布局功能中存在的一些问题
+- 解决 jpeg 图像读取器有时会读取失败的问题
+- 其它已知 BUG 修复
+
+你可以查看此[拉取请求](https://github.com/lc-soft/LCUI/pull/83)来了解详细的代码变更记录
+
 ## 0.15.0 和 1.0 alpha 之间的变化
 
 - 改进 bmp、jpeg、png 图片的读取接口

@@ -5,38 +5,26 @@
 #include <LCUI/image.h>
 #include "test.h"
 
+int tests_count = 0;
+
 int test_image_reader( void )
 {
 	LCUI_Graph img;
-	int ret, width, height;
+	int ret = 0, i, width, height;
+	char file[256], *formats[] = { "png", "bmp", "jpg" };
 
-	width = height = 0;
-	Graph_Init( &img );
-	_DEBUG_MSG("test png image reader...\n");
-	ret = LCUI_ReadImageFile( "test_image_reader.png", &img );
-	assert( ret == 0 && img.width == 91 && img.height == 69 );
-	ret = LCUI_GetImageSize( "test_image_reader.png", &width, &height );
-	_DEBUG_MSG("png image size is: (%d, %d)\n", width, height);
-	assert( ret == 0 && width == 91 && height == 69 );
-	Graph_Free( &img );
-
-	width = height = 0;
-	_DEBUG_MSG("test jpeg image reader...\n");
-	ret = LCUI_ReadImageFile( "test_image_reader.jpg", &img );
-	assert( ret == 0 && img.width == 91 && img.height == 69 );
-	ret = LCUI_GetImageSize( "test_image_reader.jpg", &width, &height );
-	_DEBUG_MSG("jpeg image size is: (%d, %d)\n", width, height);
-	assert( ret == 0 && width == 91 && height == 69 );
-	Graph_Free( &img );
-
-	width = height = 0;
-	_DEBUG_MSG("test bmp image reader...\n");
-	ret = LCUI_ReadImageFile( "test_image_reader.bmp", &img );
-	assert( ret == 0 && img.width == 91 && img.height == 69 );
-	ret = LCUI_GetImageSize( "test_image_reader.bmp", &width, &height );
-	_DEBUG_MSG("bmp image size is: (%d, %d)\n", width, height);
-	assert( ret == 0 && width == 91 && height == 69 );
-	Graph_Free( &img );
-	return 0;
+	for( i = 0; i < 3; ++i ) {
+		width = height = 0;
+		Graph_Init( &img );
+		snprintf( file, 255, "test_image_reader.%s", formats[i] );
+		TEST_LOG( "image file: %s\n", file );
+		CHECK( LCUI_ReadImageFile( file, &img ) == 0 );
+		CHECK( img.width == 91 && img.height == 69 );
+		CHECK( LCUI_GetImageSize( file, &width, &height ) == 0 );
+		TEST_LOG( "image size: (%d, %d)\n", width, height );
+		CHECK( width == 91 && height == 69 );
+		Graph_Free( &img );
+	}
+	return ret;
 }
 

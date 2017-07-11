@@ -29,14 +29,14 @@ static void OnTouchWidget( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	point = & e->touch.points[0];
 	switch( point->state ) {
 	case WET_TOUCHMOVE:
-		Widget_Move( binding->widget, point->x - 32, point->y - 32 );
+		Widget_Move( w, point->x - 32.0f, point->y - 32.0f );
 		break;
 	case WET_TOUCHUP:
 		if( !binding->is_valid ) {
 			break;
 		}
 		/* 当触点释放后销毁部件及绑定记录 */
-		Widget_ReleaseTouchCapture( binding->widget, -1 );
+		Widget_ReleaseTouchCapture( w, -1 );
 		LinkedList_Unlink( &touch_bindings, &binding->node );
 		binding->is_valid = FALSE;
 		Widget_Destroy( w );
@@ -50,13 +50,16 @@ static void OnTouchWidget( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 static void OnTouch( LCUI_SysEvent e, void *arg )
 {
 	int i;
+	LCUI_Widget w;
 	LinkedListNode *node;
-	LCUI_StyleSheet sheet;
 	LCUI_TouchPoint point;
+	LCUI_Color bgcolor = RGB( 255, 0, 0 );
+
 	for( i = 0; i < e->touch.n_points; ++i ) {
 		TouchPointBinding binding;
 		LCUI_BOOL is_existed = FALSE;
 		point = &e->touch.points[i];
+		_DEBUG_MSG( "point: %d\n", point->id );
 		/* 检查该触点是否已经被绑定 */
 		LinkedList_ForEach( node, &touch_bindings ) {
 			binding = node->data;
@@ -67,22 +70,22 @@ static void OnTouch( LCUI_SysEvent e, void *arg )
 		if( is_existed ) {
 			continue;
 		}
+		w = LCUIWidget_New( NULL );
 		/* 新建绑定记录 */
 		binding = NEW( TouchPointBindingRec, 1 );
-		binding->widget = LCUIWidget_New( NULL );
 		binding->point_id = point->id;
-		binding->is_valid = TRUE;
 		binding->node.data = binding;
-		Widget_Resize( binding->widget, 64, 64 );
-		Widget_Move( binding->widget, point->x - 32, point->y - 32 );
+		binding->is_valid = TRUE;
+		binding->widget = w;
+		Widget_Resize( w, 64, 64 );
+		Widget_Move( w, point->x - 32.0f, point->y - 32.0f );
 		/* 设置让该部件捕获当前触点 */
-		Widget_SetTouchCapture( binding->widget, binding->point_id );
-		Widget_BindEvent( binding->widget, "touch", OnTouchWidget, binding, NULL );
-		sheet = binding->widget->custom_style;
-		SetStyle( sheet, key_position, SV_ABSOLUTE,  style );
-		SetStyle( sheet, key_background_color, RGB( 255, 0, 0 ), color );
+		Widget_SetTouchCapture( w, binding->point_id );
+		Widget_BindEvent( w, "touch", OnTouchWidget, binding, NULL );
+		Widget_SetStyle( w, key_position, SV_ABSOLUTE,  style );
+		Widget_SetStyle( w, key_background_color, bgcolor, color );
 		LinkedList_AppendNode( &touch_bindings, &binding->node );
-		Widget_Top( binding->widget );
+		Widget_Top( w );
 	}
 }
 

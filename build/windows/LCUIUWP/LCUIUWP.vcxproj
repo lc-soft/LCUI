@@ -48,6 +48,7 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\textview.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_base.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_helper.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_prototype.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_task.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h" />
@@ -98,9 +99,11 @@
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
     <ClCompile Include="..\..\..\src\gui\builder.c" />
+    <ClCompile Include="..\..\..\src\gui\css_fontstyle.c" />
     <ClCompile Include="..\..\..\src\gui\css_library.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
     <ClCompile Include="..\..\..\src\gui\metrics.c" />
+    <ClCompile Include="..\..\..\src\gui\widget.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
@@ -109,9 +112,12 @@
     <ClCompile Include="..\..\..\src\gui\widget\textview.c" />
     <ClCompile Include="..\..\..\src\gui\widget_background.c" />
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_border.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_helper.c" />
     <ClCompile Include="..\..\..\src\gui\widget_prototype.c" />
     <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_shadow.c" />
     <ClCompile Include="..\..\..\src\gui\widget_style.c" />
     <ClCompile Include="..\..\..\src\gui\widget_task.c" />
     <ClCompile Include="..\..\..\src\cursor.c" />
@@ -254,16 +260,17 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LCUI_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\vendor\include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\src\platform\windows;$(SolutionDir)..\..\vendor\include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalDependencies>kernel32.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;libxml2.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;libxml2.lib;WindowsApp.lib;vccorlibd.lib;msvcrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\uwp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ShowProgress>NotSet</ShowProgress>
-      <IgnoreSpecificDefaultLibraries>MSVCRT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>msvcrt;vccorlibd.lib;msvcrtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -271,16 +278,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;LCUI_EXPORTS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\vendor\include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\src\platform\windows;$(SolutionDir)..\..\vendor\include;$(SolutionDir)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalDependencies>kernel32.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;libxml2.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;freetype.lib;zlib.lib;libpng16.lib;jpeg.lib;libxml2.lib;vccorlibd.lib;msvcrt.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib\uwp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>vccorlib;msvcrt;msvcrtd</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">

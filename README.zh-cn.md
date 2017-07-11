@@ -2,9 +2,11 @@
 
 ![LCUI Logo](https://lcui.lc-soft.io/static/images/lcui-logo-lg.png)
 
-[![Join the chat at https://gitter.im/lc-soft/LCUI](https://badges.gitter.im/lc-soft/LCUI.svg)](https://gitter.im/lc-soft/LCUI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/lc-soft/LCUI](https://img.shields.io/badge/%E8%AE%A8%E8%AE%BA%E7%BB%84-bearychat-2dbe60.svg)](https://img.shields.io/badge/%E8%AE%A8%E8%AE%BA%E7%BB%84-bearychat-2dbe60.svg)
+[![加入讨论组 https://lcsoft.bearychat.com/apply](https://img.shields.io/badge/%E8%AE%A8%E8%AE%BA%E7%BB%84-bearychat-2dbe60.svg)](https://lcsoft.bearychat.com/apply)
 [![Build Status](https://travis-ci.org/lc-soft/LCUI.png?branch=master)](https://travis-ci.org/lc-soft/LCUI)
-[![Downloads](https://img.shields.io/sourceforge/dt/lc-ui.svg)](https://sourceforge.net/projects/lc-ui)
+[![Coverage Status](https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop)](https://coveralls.io/github/lc-soft/LCUI?branch=develop)
+[![Github All Releases](https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg)](https://github.com/lc-soft/LCUI/releases)
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![OpenCollective](https://opencollective.com/lcui/backers/badge.svg)](#backers) 
 [![OpenCollective](https://opencollective.com/lcui/sponsors/badge.svg)](#sponsors)
@@ -82,7 +84,7 @@ LCUI 采用的开源许可证是 [GNU通用公共许可证第二版](http://www.
 
 ### 在 Windows 中构建
 
-LCUI 主要是在 Windows 系统环境下开发的，你可以使用 VisualStudio 打开 `/build/VS2012/LCUI.sln` 文件，然后编译生成 LCUI。如果你用的是其它 IDE，请尝试按该 IDE 的方式创建项目并将源文件添加至项目内，然后编译。
+LCUI 主要是在 Windows 系统环境下开发的，你可以使用 VisualStudio 打开 `/build/windows/LCUI.sln` 文件，然后编译生成 LCUI。如果你用的是其它 IDE，请尝试按该 IDE 的方式创建项目并将源文件添加至项目内，然后编译。
 
 上述的依赖库中除 Windows 系统用不到的 libx11 库外，都可以在 Windows 系统环境下编译生成，如果觉得手动编译它们很 麻烦，想要现成可用的依赖库和头文件，可以在网上搜索，或者联系作者。
 
@@ -96,7 +98,7 @@ LCUI 主要是在 Windows 系统环境下开发的，你可以使用 VisualStudi
 2. 一次提交应该做完整的一件事。
 3. 提交信息的第一行为摘要行，长度应低于80个字符，如果需要描述修改原因，请在摘要行后留空行，然后再补充。
 4. 修复之前的提交（已经合并）中存在的 bug，提交信息的摘要行应该以 `修复` 或含义类似的词语开头，表示修复了它。如果你修复的是 issues 列表中未解决的问题，需在摘要行中加上 issues 列表中对应问题的编号。
-5. 衍合你的分支至源项目的 master 分支。我们不希望落拉取到冗余的合并请求。
+5. 衍合你的分支至源项目的 develop 分支。我们不希望落拉取到冗余的合并请求。
 6. **要清楚什么许可证适用于你的补丁：** 该代码库中的文件基于GPLv2（或更高版本），但（原作者）我们仍然可以创建非自由的衍生工具。然而，如果给我们的补丁是基于GPL的，我们希望它以后不会进入任何非自由的衍生工具，因此，如果补丁发布于公共领域，会为我们带来方便（以及避免任何法律问题）。
 
 **你可以通过捐赠来支持 LCUI 的开发**
@@ -109,21 +111,21 @@ LCUI 主要是在 Windows 系统环境下开发的，你可以使用 VisualStudi
 #### 初始设置
 
 1. 在 GitHub 上进行Fork (点击 Fork 按钮)
-2. Clone 到计算机： `git clone git@github.com:你的用户名/LCUI.git`
-3. cd 到代码库中： `cd LCUI`
-4. 设置远程仓库记录，假设该记录名为 upstream，那么命令为： `git remote add -f upstream git://github.com/lc-soft/LCUI.git`
+2. Clone 到计算机：`git clone git@github.com:你的用户名/LCUI.git`
+3. cd 到代码库中：`cd LCUI`
+4. 设置远程仓库记录，假设该记录名为 upstream，那么命令为：`git remote add -f upstream git://github.com/lc-soft/LCUI.git`
 
 #### 添加特性
 
-1. 为新的特性创建一个分支(branch)，假设分支名为 my_new_feature，那么命令为：`git checkout -b my_new_feature`
+1. 为新的特性创建一个分支，假设分支名为 my_new_feature，那么命令为：`git checkout -b my_new_feature`
 2. 在你的分支上工作, 像往常一样添加和提交修改。
 
 创建一个分支并非必须的，但是，当已经合并至源项目时可以方便删除你的分支，也可以在提交合并请求前比较你的分支和源项目的最终版本，然后提交合并请求。
 
 #### 推送到 GitHub
 
-1. 推送分支至 GitHub： `git push origin my_new_feature`
-2. 发出合并请求： 在Github上点击 `Pull Request` 按钮
+1. 推送分支至 GitHub：`git push origin my_new_feature`
+2. 发起合并请求：在Github上点击 `Pull Request` 按钮
 
 ## 支持者
 

@@ -315,7 +315,8 @@ rb_insert( RBTree *rbt, int key, const void *keydata, void *data )
 
 	parent_node = NULL;
 	root = rbt->root;
-	node = rb_search_auxiliary( root, key, keydata, rbt->compare, &parent_node );
+	node = rb_search_auxiliary( root, key, keydata,
+				    rbt->compare, &parent_node );
 	if( node ) {
 		return NULL;
 	}

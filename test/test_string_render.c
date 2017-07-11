@@ -38,7 +38,7 @@ int test_string_render( void )
 	ret = LCUI_WritePNGFile( "test_string_render.png", &img );
 	Graph_Free( &img );
 
-	/* 退出字体处理功能 */
-	LCUI_ExitFont();
+	/* 释放字体处理功能相关资源 */
+	LCUI_FreeFont();
 	return ret;
 }

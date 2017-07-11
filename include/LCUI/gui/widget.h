@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget.h -- GUI widget APIs.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget.h -- GUI部件操作相关的函数接口。
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -43,10 +43,15 @@
 #include <LCUI/graph.h>
 #include <LCUI/thread.h>
 #include <LCUI/gui/widget_base.h>
+#include <LCUI/gui/widget_helper.h>
 #include <LCUI/gui/widget_task.h>
 #include <LCUI/gui/widget_paint.h>
 #include <LCUI/gui/widget_prototype.h>
 #include <LCUI/gui/widget_event.h>
 #include <LCUI/gui/widget_style.h>
+
+void LCUI_InitWidget( void );
+
+void LCUI_FreeWidget( void );
 
 #endif

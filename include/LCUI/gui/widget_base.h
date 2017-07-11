@@ -47,24 +47,24 @@ LCUI_BEGIN_HEADER
 
 /** 部件样式 */
 typedef struct LCUI_WidgetStyle {
-	LCUI_BOOL visible;		/**< 是否可见 */
-	LCUI_BOOL focusable;		/**< 是否能够得到焦点 */
-	float min_width, min_height;	/**< 最小尺寸 */
-	float max_width, max_height;	/**< 最大尺寸 */
-	float left, top;		/**< 左边界、顶边界的偏移距离 */
-	float right, bottom;		/**< 右边界、底边界的偏移距离 */
-	int z_index;			/**< 堆叠顺序，该值越高，部件显示得越靠前 */
-	float opacity;			/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
-	LCUI_StyleValue position;	/**< 定位方式 */
-	LCUI_StyleValue display;	/**< 显示方式，决定以何种布局显示该部件 */
-	LCUI_StyleValue box_sizing;	/**< 以何种方式计算宽度和高度 */
-	LCUI_StyleValue vertical_align;	/**< 垂直对齐方式 */
-	LCUI_BoundBox margin;		/**< 外边距 */
-	LCUI_BoundBox padding;		/**< 内边距 */
-	LCUI_Background background;	/**< 背景 */
-	LCUI_BoxShadow shadow;		/**< 阴影 */
-	LCUI_Border border;		/**< 边框 */
-	int pointer_events;		/**< 事件的处理方式 */
+	LCUI_BOOL visible;			/**< 是否可见 */
+	LCUI_BOOL focusable;			/**< 是否能够得到焦点 */
+	float min_width, min_height;		/**< 最小尺寸 */
+	float max_width, max_height;		/**< 最大尺寸 */
+	float left, top;			/**< 左边界、顶边界的偏移距离 */
+	float right, bottom;			/**< 右边界、底边界的偏移距离 */
+	int z_index;				/**< 堆叠顺序，该值越高，部件显示得越靠前 */
+	float opacity;				/**< 不透明度，有效范围从 0.0 （完全透明）到 1.0（完全不透明） */
+	LCUI_StyleValue position;		/**< 定位方式 */
+	LCUI_StyleValue display;		/**< 显示方式，决定以何种布局显示该部件 */
+	LCUI_StyleValue box_sizing;		/**< 以何种方式计算宽度和高度 */
+	LCUI_StyleValue vertical_align;		/**< 垂直对齐方式 */
+	LCUI_BoundBox margin;			/**< 外边距 */
+	LCUI_BoundBox padding;			/**< 内边距 */
+	LCUI_BorderStyle border;		/**< 边框 */
+	LCUI_BoxShadowStyle shadow;		/**< 盒形阴影 */
+	LCUI_BackgroundStyle background;	/**< 背景 */
+	int pointer_events;			/**< 事件的处理方式 */
 } LCUI_WidgetStyle;
 
 /** 部件任务类型，按照任务的依赖顺序排列 */
@@ -129,6 +129,7 @@ typedef void( *LCUI_WidgetPainter )(LCUI_Widget, LCUI_PaintContext);
 typedef struct LCUI_WidgetPrototypeRec_ {
 	char *name;				/**< 名称 */
 	LCUI_WidgetFunction init;		/**< 构造函数  */
+	LCUI_WidgetFunction refresh;		/**< 数据刷新函数 */
 	LCUI_WidgetFunction destroy;		/**< 析构函数 */
 	LCUI_WidgetFunction update;		/**< 样式处理函数 */
 	LCUI_WidgetFunction runtask;		/**< 自定义任务处理函数 */
@@ -184,24 +185,36 @@ typedef struct LCUI_WidgetRec_ {
 	LinkedList		children;		/**< 子部件 */
 	LinkedList		children_show;		/**< 子部件的堆叠顺序记录，由顶到底 */
 	LCUI_WidgetData		data;			/**< 私有数据 */
-	Dict			*attributes;
+	Dict			*attributes;		/**< 属性记录 */
 	LCUI_WidgetPrototypeC	proto;			/**< 原型 */
-	LCUI_BOOL		enable_graph;		/**< 是否启用位图缓存 */
-	LCUI_Graph		graph;			/**< 位图缓存 */
 	LCUI_EventTrigger	trigger;		/**< 事件触发器 */
 	LCUI_WidgetTaskBoxRec	task;			/**< 任务记录 */
-	LinkedList		dirty_rects;		/**< 记录无效区域（脏矩形） */
-	LCUI_BOOL		has_dirty_child;	/**< 子级部件是否有无效区域 */
-	LCUI_BOOL		layout_locked;		/**< 子级部件布局是否已锁定 */
 	LCUI_BOOL		event_blocked;		/**< 是否阻止自己和子级部件的事件处理 */
 	LCUI_BOOL		disabled;		/**< 是否禁用 */
+	LinkedListNode		node;			/**< 在部件链表中的结点 */
+	LinkedListNode		node_show;		/**< 在部件显示链表中的结点 */
 } LCUI_WidgetRec;
 
-#define Widget_GetNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec))
-#define Widget_GetShowNode(w) (LinkedListNode*)(((char*)w) + sizeof(LCUI_WidgetRec) + sizeof(LinkedListNode))
-#define Widget_NewPrivateData(w, type) (type*)(w->private_data = malloc(sizeof(type)))
 #define Widget_SetStyle(W, K, V, T) SetStyle((W)->custom_style, K, V, T)
 #define Widget_UnsetStyle(W, K) UnsetStyle((W)->custom_style, K)
+#define Widget_CheckStyleType(W, K, T) CheckStyleType((W)->style, K, T)
+#define Widget_CheckStyleValue(W, K, T) CheckStyleValue((W)->style, K, T)
+#define Widget_CheckStyleValid(W, K) W->style->sheet[K].is_valid
+
+#define Widget_HasAbsolutePosition(W) \
+((W)->computed_style.position == SV_ABSOLUTE)
+
+#define Widget_HasBlockDisplay(W) \
+((W)->computed_style.display == SV_BLOCK)
+
+#define Widget_HasInlineBlockDisplay(W) \
+((W)->computed_style.display == SV_INLINE_BLOCK)
+
+/** 部件是否有值为自动（默认）的样式 */
+LCUI_API LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key );
+
+/** 部件是否有能够自动调整的宽度 */
+LCUI_API LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w );
 
 /** 获取根级部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
@@ -246,16 +259,53 @@ LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 LCUI_API void Widget_GetOffset( LCUI_Widget w, LCUI_Widget parent,
 				float *offset_x, float *offset_y );
 
+/** 初始化图片加载器，用于加载部件背景图 */
+LCUI_API void LCUIWidget_InitImageLoader( void );
+
+/** 退出并销毁图片加载器 */
+LCUI_API void LCUIWidget_FreeImageLoader( void );
+
+/** 初始化部件背景样式 */
+LCUI_API void Widget_InitBackground( LCUI_Widget w );
+
+/** 销毁部件背景相关数据 */
+LCUI_API void Widget_DestroyBackground( LCUI_Widget w );
+
 /** 更新部件背景样式 */
 LCUI_API void Widget_UpdateBackground( LCUI_Widget widget );
 
-/** 刷新部件的边框 */
+/** 绘制部件背景 */
+LCUI_API void Widget_PaintBakcground( LCUI_Widget w, LCUI_PaintContext paint );
+
+/** 更新部件边框样式 */
 LCUI_API void Widget_UpdateBorder( LCUI_Widget w );
 
-/** 刷新部件的矩形阴影 */
+/** 绘制部件边框 */
+LCUI_API void Widget_PaintBorder( LCUI_Widget w, LCUI_PaintContext paint );
+
+LCUI_API float Widget_GetGraphWidth( LCUI_Widget widget );
+
+LCUI_API float Widget_GetGraphHeight( LCUI_Widget widget );
+
+/** 根据阴影参数获取部件区域的横向偏移距离 */
+LCUI_API float Widget_GetBoxShadowOffsetX( LCUI_Widget w );
+
+/** 根据阴影参数获取部件区域的纵向偏移距离 */
+LCUI_API float Widget_GetBoxShadowOffsetY( LCUI_Widget w );
+
+/** 获取部件在添加阴影后的高度 */
+LCUI_API float Widget_GetGraphWidth( LCUI_Widget w );
+
+/** 获取部件在添加阴影后的宽度 */
+LCUI_API float Widget_GetGraphWidth( LCUI_Widget w );
+
+/** 更新部件矩形阴影样式 */
 LCUI_API void Widget_UpdateBoxShadow( LCUI_Widget w );
 
-/** 刷新可见性 */
+/** 绘制部件阴影 */
+LCUI_API void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint );
+
+/** 更新可见性 */
 LCUI_API void Widget_UpdateVisibility( LCUI_Widget w );
 
 /** 设置部件为顶级部件 */
@@ -286,27 +336,6 @@ LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 
 /** 设置部件ID */
 LCUI_API int Widget_SetId( LCUI_Widget w, const char *idstr );
-
-/** 设置边框 */
-LCUI_API void Widget_SetBorder( LCUI_Widget w, float width, int style, LCUI_Color clr );
-
-/** 设置内边距 */
-LCUI_API void Widget_SetPadding( LCUI_Widget w, float top, float right,
-				 float bottom, float left );
-
-/** 设置外边距 */
-LCUI_API void Widget_SetMargin( LCUI_Widget w, float top, float right,
-				float bottom, float left );
-
-/** 移动部件位置 */
-LCUI_API void Widget_Move( LCUI_Widget w, float left, float top );
-
-/** 调整部件尺寸 */
-LCUI_API void Widget_Resize( LCUI_Widget w, float width, float height );
-
-LCUI_API void Widget_Show( LCUI_Widget w );
-
-LCUI_API void Widget_Hide( LCUI_Widget w );
 
 /** 为部件设置属性 */
 LCUI_API int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
@@ -345,11 +374,8 @@ LCUI_API void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled );
 /** 计算部件的最大宽度 */
 LCUI_API float Widget_ComputeMaxWidth( LCUI_Widget w );
 
-/** 锁定子部件的布局，让 LCUI 不自动更新布局 */
-LCUI_API void Widget_LockLayout( LCUI_Widget w );
-
-/** 解除锁定子部件的布局 */
-LCUI_API void Widget_UnlockLayout( LCUI_Widget w );
+/** 计算部件的最大可用宽度 */
+LCUI_API float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget );
 
 LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
 
@@ -364,9 +390,11 @@ int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
 /** 打印部件树 */
 LCUI_API void Widget_PrintTree( LCUI_Widget w );
 
-void LCUI_InitWidget( void );
+LCUI_API void LCUIWidget_InitBase( void );
 
-void LCUI_ExitWidget( void );
+LCUI_API void LCUIWidget_FreeRoot( void );
+
+LCUI_API void LCUIWidget_FreeBase( void );
 
 LCUI_END_HEADER
 

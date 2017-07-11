@@ -169,7 +169,7 @@ static void SideBarToggle_OnInit( LCUI_Widget w )
 	Widget_BindEvent( w, "click", OnToggle, NULL, NULL );
 }
 
-void LCUIWidget_AddSideBar(void)
+void LCUIWidget_AddSideBar( void )
 {
 	self.sidebar = LCUIWidget_NewPrototype( "sidebar", NULL );
 	self.item = LCUIWidget_NewPrototype( "sidebar-item", NULL );

@@ -45,7 +45,7 @@ LCUI_BEGIN_HEADER
 /* 初始化游标数据 */
 LCUI_API void LCUI_InitCursor( void );
 
-LCUI_API void LCUI_ExitCursor( void );
+LCUI_API void LCUI_FreeCursor( void );
 
 /* 获取鼠标游标的区域范围 */
 LCUI_API void LCUICursor_GetRect( LCUI_Rect *rect );

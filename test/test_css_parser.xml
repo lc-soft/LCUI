@@ -5,8 +5,7 @@
   <widget id="test-window" class="window">
     <widget class="content">
       <widget id="test-btn" class="btn">
-        <widget id="test-textview" type="textview" class="text">
-        </widget>
+        <widget id="test-textview" type="textview" class="text">test</widget>
       </widget>
     </widget>
   </widget>

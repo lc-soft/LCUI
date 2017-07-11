@@ -231,6 +231,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\metrics.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_helper.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -393,6 +396,21 @@
       <Filter>源文件\util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\metrics.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\css_fontstyle.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_border.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_shadow.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_helper.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
   </ItemGroup>

@@ -16,7 +16,7 @@ test/helloworld.css \
 test/helloworld.xml \
 test/test.c \
 test/test.h \
-test/testtouch.c \
+test/test_touch.c \
 test/test_string.c \
 test/test_string_render.c \
 test/test_widget_render.c \
@@ -27,4 +27,11 @@ test/test_css_parser.c \
 test/test_image_reader.c \
 test/test_image_reader.bmp \
 test/test_image_reader.jpg \
-test/test_image_reader.png
+test/test_image_reader.png \
+test/test_widget_layout.c \
+test/test_widget_layout.css \
+test/test_widget_layout.xml \
+test/test_widget_rect.c
+
+@CODE_COVERAGE_RULES@
+

@@ -40,7 +40,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/util/math.h>
 
-int roundi( double x )
+int iround( double x )
 {
 	if( x < 0 ) {
 		return (int)(x - 0.5);

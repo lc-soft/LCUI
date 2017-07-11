@@ -65,6 +65,8 @@ LCUI_BEGIN_HEADER
 /** strdup() 的再实现版本，用于清除编译错误 */
 LCUI_API char *strdup2( const char *str );
 
+LCUI_API wchar_t *wcsdup2( const wchar_t *str );
+
 /**
  * 清除字符串首尾的字符
  * @param[out] outstr 处理后的字符串

@@ -16,20 +16,22 @@ static void LoggerHandlerW( const wchar_t *str )
 }
 #endif
 
-int main(void)
+int main( void )
 {
 	int ret = 0;
 #ifdef LCUI_BUILD_IN_WIN32
-	_wchdir( L"F:\\代码库\\GitHub\\LCUI\\build\\VS2012\\LCUITest" );
+	_wchdir( L"F:\\代码库\\GitHub\\LCUI\\test" );
 	Logger_SetHandler( LoggerHandler );
 	Logger_SetHandlerW( LoggerHandlerW );
 #endif
-	ret |= test_string();
-	ret |= test_image_reader();
-	ret |= test_css_parser();/*
-	ret |= test_widget_render();
-	ret |= test_char_render();
-	ret |= test_string_render();*/
-	printf("test result code: %d\n", ret);
+	ret += test_string();
+	ret += test_image_reader();
+	ret += test_css_parser();
+	ret += test_widget_layout();
+	ret += test_widget_rect();/*
+	ret += test_widget_render();
+	ret += test_char_render();
+	ret += test_string_render();*/
+	PRINT_TEST_RESULT( ret );
 	return ret;
 }

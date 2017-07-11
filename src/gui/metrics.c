@@ -48,17 +48,34 @@ static struct LCUI_MetricsModule {
 	float scale;
 } metrics;
 
-float LCUIMetrics_Compute( LCUI_Style s )
+float LCUIMetrics_Compute( float value, LCUI_StyleType type )
 {
-	float value = 0.0;
-	switch( s->type ) {
-	case SVT_PX: value = s->val_px; break;
-	case SVT_DIP: value = s->val_dip * metrics.density; break;
-	case SVT_SP: value = s->val_sp * metrics.scaled_density; break;
-	case SVT_PT: value = s->val_pt * metrics.dpi * (1.0f / 72); break;
-	default: break;
+	switch( type ) {
+	case SVT_PX: break;
+	case SVT_DIP: value = value * metrics.density; break;
+	case SVT_SP: value = value * metrics.scaled_density; break;
+	case SVT_PT: value = value * metrics.dpi / 72.0f; break;
+	default: value = 0; break;
 	}
-	return value * metrics.scale;
+	return value;
+}
+
+int LCUIMetrics_ComputeActual( float value, LCUI_StyleType type )
+{
+	return iround( LCUIMetrics_Compute( value, type ) * metrics.scale );
+}
+
+void LCUIMetrics_ComputeRectActual( LCUI_Rect *dst, const LCUI_RectF *src )
+{
+	dst->x = LCUIMetrics_ComputeActual( src->x, SVT_PX );
+	dst->y = LCUIMetrics_ComputeActual( src->y, SVT_PX );
+	dst->width = LCUIMetrics_ComputeActual( src->width, SVT_PX );
+	dst->height = LCUIMetrics_ComputeActual( src->height, SVT_PX );
+}
+
+float LCUIMetrics_GetScale( void )
+{
+	return metrics.scale;
 }
 
 static float ComputeDensityByLevel( LCUI_DensityLevel level )
@@ -103,6 +120,8 @@ void LCUIMetrics_SetDpi( float dpi )
 
 void LCUIMetrics_SetScale( float scale )
 {
+	scale = max( 0.5f, scale );
+	scale = min( 5.0f, scale );
 	metrics.scale = scale;
 }
 
@@ -112,7 +131,7 @@ void LCUI_InitMetrics( void )
 	LCUIMetrics_SetDpi( 96.0f );
 }
 
-void LCUI_ExitMetrics( void )
+void LCUI_FreeMetrics( void )
 {
 
 }

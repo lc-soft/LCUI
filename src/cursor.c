@@ -44,7 +44,7 @@
 #include <LCUI/display.h>
 
 static struct LCUICursorModule {
-	LCUI_Pos pos;	/* 当前帧的坐标 */
+	LCUI_Pos pos;		/* 当前帧的坐标 */
 	LCUI_Pos new_pos;	/* 下一帧将要更新的坐标 */
 	LCUI_BOOL visible;	/* 是否可见 */
 	LCUI_Graph graph;	/* 游标的图形 */
@@ -124,7 +124,7 @@ void LCUI_InitCursor( void )
 	Graph_Free( &pic );
 }
 
-void LCUI_ExitCursor( void )
+void LCUI_FreeCursor( void )
 {
 	Graph_Free( &cursor.graph );
 }
@@ -132,10 +132,12 @@ void LCUI_ExitCursor( void )
 /* 获取鼠标游标的区域范围 */
 void LCUICursor_GetRect( LCUI_Rect *rect )
 {
-	rect->x = cursor.pos.x;
-	rect->y = cursor.pos.y;
-	rect->width = (int)cursor.graph.width;
-	rect->height = (int)cursor.graph.height;
+	float scale;
+	scale = LCUIMetrics_GetScale();
+	rect->x = iround( cursor.pos.x / scale );
+	rect->y = iround( cursor.pos.y / scale );
+	rect->width = iround( cursor.graph.width / scale );
+	rect->height = iround( cursor.graph.height / scale );
 }
 
 /* 刷新鼠标游标在屏幕上显示的图形 */

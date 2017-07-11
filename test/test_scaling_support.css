@@ -1,0 +1,48 @@
+.text-box {
+    border: 1px solid #eee;
+    background: #f0f0f0;
+    display: inline-block;
+    margin-right: 10px;
+    padding: 5px 10px;
+    white-space: nowrap;
+}
+.image {
+    width: 91px;
+    height: 69px;
+    border: 1px solid #eee;
+    background-image: url(test_image_reader.png);
+    background-size: contain;
+    margin: 5px 0;
+}
+.container {
+    padding: 5px 0;
+}
+.text-sp {
+    font-size: 18sp;
+}
+.box-px {
+    width:80px;
+    text-align: center;
+}
+.box-dp {
+    width: 80dp;
+    border-width: 5dp;
+    text-align: center;
+}
+.text-px {
+    font-size: 18px;
+}
+.text-pt {
+    font-size: 12pt;
+}
+.p {
+    display: block;
+    font-size: 14px;
+    margin: 10px 0;
+}
+button {
+    margin-right: 10px;
+}
+root {
+    padding: 20px;
+}

@@ -132,8 +132,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libxml2.lib;libpng16.lib;jpeg.lib;freetype271.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCMTD;MSVCRT;</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;MSVCRT</IgnoreSpecificDefaultLibraries>
       <LinkStatus>false</LinkStatus>
+      <ShowProgress>NotSet</ShowProgress>
     </Link>
     <ResourceCompile>
       <Culture>0x0804</Culture>
@@ -197,7 +198,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libxml2.lib;libpng16.lib;jpeg.lib;freetype271.lib;zlib.lib;kernel32.lib;user32.lib;gdi32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\vendor\lib</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;MSVCRTD</IgnoreSpecificDefaultLibraries>
+      <ShowProgress>NotSet</ShowProgress>
     </Link>
     <Lib>
       <AdditionalDependencies>libpng16.lib;libxml2.lib;jpeg.lib;freetype271.lib;zlib.lib;</AdditionalDependencies>
@@ -269,6 +271,7 @@
     <ClInclude Include="..\..\..\include\LCUI\font\textlayer.h" />
     <ClInclude Include="..\..\..\include\LCUI\font\textstyle.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\builder.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_fontstyle.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\css_library.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\metrics.h" />
@@ -281,6 +284,7 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\textview.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_base.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_helper.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_prototype.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_task.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h" />
@@ -337,9 +341,11 @@
     <ClCompile Include="..\..\..\src\font\textlayer.c" />
     <ClCompile Include="..\..\..\src\font\textstyle.c" />
     <ClCompile Include="..\..\..\src\gui\builder.c" />
+    <ClCompile Include="..\..\..\src\gui\css_fontstyle.c" />
     <ClCompile Include="..\..\..\src\gui\css_library.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
     <ClCompile Include="..\..\..\src\gui\metrics.c" />
+    <ClCompile Include="..\..\..\src\gui\widget.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
@@ -348,9 +354,12 @@
     <ClCompile Include="..\..\..\src\gui\widget\textview.c" />
     <ClCompile Include="..\..\..\src\gui\widget_background.c" />
     <ClCompile Include="..\..\..\src\gui\widget_base.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_border.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_helper.c" />
     <ClCompile Include="..\..\..\src\gui\widget_prototype.c" />
     <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_shadow.c" />
     <ClCompile Include="..\..\..\src\gui\widget_style.c" />
     <ClCompile Include="..\..\..\src\gui\widget_task.c" />
     <ClCompile Include="..\..\..\src\cursor.c" />

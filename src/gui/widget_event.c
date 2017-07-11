@@ -43,6 +43,7 @@
 #include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
+#include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/ime.h>
 #include <LCUI/input.h>
@@ -117,6 +118,44 @@ static void DestroyEventMapping( void *data )
 	EventMapping mapping = data;
 	free( mapping->name );
 	free( mapping );
+}
+
+static void DestroyWidgetEvent( LCUI_WidgetEvent e )
+{
+	switch( e->type ) {
+	case WET_TOUCH:
+		if( e->touch.points ) {
+			free( e->touch.points );
+		}
+		e->touch.points = NULL;
+		e->touch.n_points = 0;
+		break;
+	case WET_TEXTINPUT:
+		if( e->text.text ) {
+			free( e->text.text );
+		}
+		e->text.text = NULL;
+		e->text.length = 0;
+		break;
+	}
+}
+
+static void DirectDestroyWidgetEventPack( void *data )
+{
+	LCUI_WidgetEventPack pack = data;
+	if( pack->data && pack->destroy_data ) {
+		pack->destroy_data( pack->data );
+	}
+	DestroyWidgetEvent( &pack->event );
+	pack->data = NULL;
+	free( pack );
+}
+
+static void DestoryWidgetEventRecord( void *data )
+{
+	WidgetEventRecord record = data;
+	LinkedList_Clear( &record->records, DirectDestroyWidgetEventPack );
+	free( record );
 }
 
 static int CompareWidgetEventRecord( void *data, const void *keydata )
@@ -243,38 +282,13 @@ static int CopyWidgetEvent( LCUI_WidgetEvent dst,
 	return 0;
 }
 
-static void DestroyWidgetEvent( LCUI_WidgetEvent e )
-{
-	switch( e->type ) {
-	case WET_TOUCH:
-		if( e->touch.points ) {
-			free( e->touch.points );
-		}
-		e->touch.points = NULL;
-		e->touch.n_points = 0;
-		break;
-	case WET_TEXTINPUT:
-		if( e->text.text ) {
-			free( e->text.text );
-		}
-		e->text.text = NULL;
-		e->text.length = 0;
-		break;
-	}
-}
-
 /** 销毁部件事件包 */
 static void DestroyWidgetEventPack( void *arg )
 {
 	LCUI_WidgetEventPack pack = arg;
 	/* 如果删除成功则说明有记录，需要销毁数据 */
 	if( Widget_DeleteEventRecord( pack->event.target, pack ) == 1 ) {
-		if( pack->data && pack->destroy_data ) {
-			pack->destroy_data( pack->data );
-		}
-		DestroyWidgetEvent( &pack->event );
-		pack->data = NULL;
-		free( pack );
+		DirectDestroyWidgetEventPack( pack );
 	}
 }
 
@@ -319,7 +333,7 @@ static int TouchCapturers_Add( LinkedList *list, LCUI_Widget w, int point_id )
 		}
 	}
 	/* 如果没有该部件的触点捕捉记录 */
-	if( !tc ) {
+	if( !tc || tc->widget != w ) {
 		tc = NEW( TouchCapturerRec, 1 );
 		tc->widget = w;
 		tc->node.data = tc;
@@ -460,7 +474,7 @@ static LCUI_Widget Widget_GetNextAt( LCUI_Widget widget, int x, int y )
 {
 	LCUI_Widget w;
 	LinkedListNode *node;
-	node = Widget_GetShowNode( widget );
+	node = &widget->node;
 	for( node = node->next; node; node = node->next ) {
 		w = node->data;
 		/* 如果忽略事件处理，则向它底层的兄弟部件传播事件 */
@@ -537,7 +551,7 @@ static int Widget_TriggerEventEx( LCUI_Widget widget, LCUI_WidgetEventPack pack 
 		x = pointer_x - x;
 		y = pointer_y - y;
 		/* 从当前部件后面找到当前坐标点命中的兄弟部件 */
-		w = Widget_GetNextAt( widget, roundi( x ), roundi( y ) );
+		w = Widget_GetNextAt( widget, iround( x ), iround( y ) );
 		if( !w ) {
 			break;
 		}
@@ -736,11 +750,15 @@ int LCUIWidget_SetFocus( LCUI_Widget widget )
 /** 响应系统的鼠标移动事件，向目标部件投递相关鼠标事件 */
 static void OnMouseEvent( LCUI_SysEvent sys_ev, void *arg )
 {
+	float scale;
 	LCUI_Pos pos;
 	LCUI_Widget target, w;
 	LCUI_WidgetEventRec ev = { 0 };
 	w = LCUIWidget_GetRoot();
 	LCUICursor_GetPos( &pos );
+	scale = LCUIMetrics_GetScale();
+	pos.x = iround( pos.x / scale );
+	pos.y = iround( pos.y / scale );
 	if( self.mouse_capturer ) {
 		target = self.mouse_capturer;
 	} else {
@@ -880,12 +898,16 @@ static void OnTextInput( LCUI_SysEvent e, void *arg )
 
 static void ConvertTouchPoint( LCUI_TouchPoint point )
 {
+	float scale;
 	switch( point->state ) {
 	case LCUI_TOUCHDOWN: point->state = WET_TOUCHDOWN; break;
 	case LCUI_TOUCHUP: point->state = WET_TOUCHUP; break;
 	case LCUI_TOUCHMOVE: point->state = WET_TOUCHMOVE; break;
 	default:break;
 	}
+	scale = LCUIMetrics_GetScale();
+	point->x = iround( point->x / scale );
+	point->y = iround( point->y / scale );
 }
 
 /** 分发触控事件给对应的部件 */
@@ -1100,10 +1122,11 @@ void LCUIWidget_InitEvent(void)
 	BindSysEvent( LCUI_TOUCH, OnTouch );
 	BindSysEvent( LCUI_TEXTINPUT, OnTextInput );
 	RBTree_OnCompare( &self.event_records, CompareWidgetEventRecord );
+	RBTree_OnDestroy( &self.event_records, DestoryWidgetEventRecord );
 	LinkedList_Init( &self.touch_capturers );
 }
 
-void LCUIWidget_ExitEvent( void )
+void LCUIWidget_FreeEvent( void )
 {
 	LinkedListNode *node;
 	LCUIMutex_Lock( &self.mutex );
@@ -1119,4 +1142,5 @@ void LCUIWidget_ExitEvent( void )
 	LinkedList_Clear( &self.event_mappings, DestroyEventMapping );
 	LCUIMutex_Unlock( &self.mutex );
 	LCUIMutex_Destroy( &self.mutex );
+	self.event_ids = NULL;
 }
