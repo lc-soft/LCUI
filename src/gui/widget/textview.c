@@ -40,6 +40,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
@@ -399,9 +400,16 @@ int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 {
 	LCUI_TextView txt = GetData( w );
 	wchar_t *newtext = malloc( wcssize( text ) );
-	txt->content = malloc( wcssize( text ) );
 	if( !newtext ) {
-		return -1;
+		return -ENOMEM;
+	}
+	if( txt->content ) {
+		free( txt->content );
+	}
+	txt->content = malloc( wcssize( text ) );
+	if( !txt->content ) {
+		free( newtext );
+		return -ENOMEM;
 	}
 	do {
 		if( !text ) {
