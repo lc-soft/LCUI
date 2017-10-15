@@ -155,7 +155,7 @@ static int ParseUI( XMLParserContext ctx, xmlNodePtr node )
 static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 {
 	xmlAttrPtr prop;
-	char *prop_val = NULL;
+	char *prop_val = NULL, *prop_name;
 	LCUI_Widget w = NULL, parent = ctx->widget;
 
 	if( ctx->parent && ctx->parent->id != ID_UI &&
@@ -209,8 +209,11 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 		if( !w->proto || !w->proto->setattr ) {
 			continue;
 		}
-		Widget_SetAttribute( w, (const char*)prop->name, prop_val );
-		w->proto->setattr( w, (const char*)prop->name, prop_val );
+		prop_name = malloc( strsize( (const char*)prop->name ) );
+		strtolower( prop_name, (const char*)prop->name );
+		Widget_SetAttribute( w, prop_name, prop_val );
+		w->proto->setattr( w, prop_name, prop_val );
+		free( prop_name );
 	}
 	if( prop_val ) {
 		xmlFree( prop_val );

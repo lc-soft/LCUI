@@ -54,6 +54,7 @@ enum TaskType {
 	TASK_SET_TEXT,
 	TASK_SET_AUTOWRAP,
 	TASK_SET_TEXT_ALIGN,
+	TASK_SET_MULITILINE,
 	TASK_UPDATE_SIZE,
 	TASK_UPDATE,
 	TASK_TOTAL
@@ -61,7 +62,8 @@ enum TaskType {
 
 typedef struct LCUI_TextViewRec_ {
 	LCUI_Widget widget;		/**< 所属的部件 */
-	LCUI_BOOL has_content;		/**< 是否有设置 content 属性 */
+	wchar_t *content;		/**< 原始内容 */
+	LCUI_BOOL trimming;		/**< 是否清除首尾空白符 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
 	LCUI_TextLayer layer;		/**< 文本图层 */
 	LCUI_FontStyleRec style;	/**< 文字样式 */
@@ -69,7 +71,7 @@ typedef struct LCUI_TextViewRec_ {
 		LCUI_BOOL is_valid;
 		union {
 			wchar_t *text;
-			LCUI_BOOL autowrap;
+			LCUI_BOOL enable;
 			int align;
 		};
 	} tasks[TASK_TOTAL];
@@ -78,6 +80,36 @@ typedef struct LCUI_TextViewRec_ {
 static struct LCUI_TextViewModule {
 	LCUI_WidgetPrototype prototype;
 } self;
+
+static LCUI_BOOL ParseBoolean( const char *str )
+{
+	if( strcmp( str, "on" ) == 0 &&
+	    strcmp( str, "true" ) == 0 &&
+	    strcmp( str, "yes" ) == 0 &&
+	    strcmp( str, "1" ) == 0 ) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+static void TextView_OnParseAttr( LCUI_Widget w, const char *name, 
+				  const char *value )
+{
+	LCUI_TextView txt = GetData( w );
+	if( strcmp( name, "trimming" ) == 0 ) {
+		if( ParseBoolean( value ) != txt->trimming ) {
+			txt->trimming = !txt->trimming;
+			TextView_SetTextW( w, txt->content );
+		}
+		return;
+	}
+	if( strcmp( name, "multiline" ) == 0 ) {
+		LCUI_BOOL mulitiline = ParseBoolean( value );
+		if( mulitiline != txt->layer->is_mulitiline_mode ) {
+			TextLayer_SetMultiline(txt->layer, mulitiline );
+		}
+	}
+}
 
 static void TextView_OnParseText( LCUI_Widget w, const char *text )
 {
@@ -100,6 +132,14 @@ static void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 	Widget_AddTask( w, WTT_USER );
 }
 
+static void TextView_SetTaskForMulitiline( LCUI_Widget w, LCUI_BOOL is_true )
+{
+	LCUI_TextView txt = GetData( w );
+	txt->tasks[TASK_SET_MULITILINE].enable = is_true;
+	txt->tasks[TASK_SET_MULITILINE].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
+}
+
 static void TextView_SetTaskForTextAlign( LCUI_Widget w, int align )
 {
 	LCUI_TextView txt = GetData( w );
@@ -111,7 +151,7 @@ static void TextView_SetTaskForTextAlign( LCUI_Widget w, int align )
 static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
 {
 	LCUI_TextView txt = GetData( w );
-	txt->tasks[TASK_SET_AUTOWRAP].autowrap = autowrap;
+	txt->tasks[TASK_SET_AUTOWRAP].enable = autowrap;
 	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
 }
@@ -191,7 +231,9 @@ static void TextView_OnInit( LCUI_Widget w )
 		txt->tasks[i].is_valid = FALSE;
 	}
 	txt->widget = w;
-	txt->has_content = FALSE;
+	txt->content = NULL;
+	/* 默认清除首尾空白符 */
+	txt->trimming = TRUE;
 	/* 初始化文本图层 */
 	txt->layer = TextLayer_New();
 	/* 启用多行文本显示 */
@@ -223,6 +265,7 @@ static void TextView_OnDestroy( LCUI_Widget w )
 	TextLayer_Destroy( txt->layer );
 	LCUIMutex_Unlock( &txt->mutex );
 	TextView_ClearTasks( w );
+	free( txt->content );
 }
 
 static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
@@ -285,13 +328,19 @@ static void TextView_OnTask( LCUI_Widget w )
 	i = TASK_SET_AUTOWRAP;
 	if( txt->tasks[i].is_valid ) {
 		txt->tasks[i].is_valid = FALSE;
-		TextLayer_SetAutoWrap( txt->layer, txt->tasks[i].autowrap );
+		TextLayer_SetAutoWrap( txt->layer, txt->tasks[i].enable );
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_SET_TEXT_ALIGN;
 	if( txt->tasks[i].is_valid ) {
 		txt->tasks[i].is_valid = FALSE;
 		TextLayer_SetTextAlign( txt->layer, txt->tasks[i].align );
+		txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	}
+	i = TASK_SET_MULITILINE;
+	if( txt->tasks[i].is_valid ) {
+		txt->tasks[i].is_valid = FALSE;
+		TextLayer_SetMultiline( txt->layer, txt->tasks[i].enable );
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_UPDATE_SIZE;
@@ -348,24 +397,28 @@ static void TextView_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 
 int TextView_SetTextW( LCUI_Widget w, const wchar_t *text )
 {
-	size_t len;
-	wchar_t *newtext;
-	LCUI_TextView txt;
-
-	len = text ? wcslen( text ) + 1 : 1;
-	newtext = NEW( wchar_t, len );
+	LCUI_TextView txt = GetData( w );
+	wchar_t *newtext = malloc( wcssize( text ) );
+	txt->content = malloc( wcssize( text ) );
 	if( !newtext ) {
 		return -1;
 	}
-	if( !text ) {
-		newtext[0] = 0;
-	} else {
-		wcscpy( newtext, text );
-	}
-	txt = GetData( w );
+	do {
+		if( !text ) {
+			newtext[0] = 0;
+			txt->content[0] = 0;
+			break;
+		}
+		wcscpy( txt->content, text );
+		if( !txt->trimming ) {
+			wcscpy( newtext, text );
+			break;
+		}
+		wcstrim( newtext, text, NULL );
+	} while( 0 );
 	LCUIMutex_Lock( &txt->mutex );
-	if( txt->tasks[TASK_SET_TEXT].is_valid
-	 && txt->tasks[TASK_SET_TEXT].text ) {
+	if( txt->tasks[TASK_SET_TEXT].is_valid &&
+	    txt->tasks[TASK_SET_TEXT].text ) {
 		free( txt->tasks[TASK_SET_TEXT].text );
 	}
 	txt->tasks[TASK_SET_TEXT].is_valid = TRUE;
@@ -418,5 +471,6 @@ void LCUIWidget_AddTextView( void )
 	self.prototype->autosize = TextView_AutoSize;
 	self.prototype->update = TextView_UpdateStyle;
 	self.prototype->settext = TextView_OnParseText;
+	self.prototype->setattr = TextView_OnParseAttr;
 	self.prototype->runtask = TextView_OnTask;
 }

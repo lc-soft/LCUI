@@ -64,8 +64,14 @@ LCUI_BEGIN_HEADER
 
 /** strdup() 的再实现版本，用于清除编译错误 */
 LCUI_API char *strdup2( const char *str );
-
 LCUI_API wchar_t *wcsdup2( const wchar_t *str );
+
+/** 计算字符串占用的内存空间大小 */
+LCUI_API size_t strsize( const char *str );
+LCUI_API size_t wcssize( const wchar_t *str );
+
+/** 将字符串中的字母转成小写字母 */
+LCUI_API size_t strtolower( char *outstr, const char *instr );
 
 /**
  * 清除字符串首尾的字符
@@ -75,6 +81,7 @@ LCUI_API wchar_t *wcsdup2( const wchar_t *str );
  * @return 处理后的字符串的长度
  */
 LCUI_API int strtrim( char *outstr, const char *instr, const char *charlist );
+LCUI_API int wcstrim( wchar_t *outstr, const wchar_t *instr, const wchar_t *charlist );
 
 /**
  * 字符串替换
