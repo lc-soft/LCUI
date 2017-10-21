@@ -1211,16 +1211,32 @@ void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rects )
 	 }
 }
 
-int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
-			   LCUI_Pos layer_pos, LCUI_Graph *graph )
+static int TextRow_DrawChar( TextRow txtrow, int pos, int x, int y,
+			     LCUI_Graph *graph, LCUI_Color default_color )
 {
-	TextRow txtrow;
-	TextChar txtchar;
-	LCUI_Pos char_pos;
-	int x, y, row, col, width, height;
+	LCUI_Pos ch_pos = { x, y };
+	int baseline = txtrow->text_height * 4 / 5;
+	TextChar ch = txtrow->string[pos];
 
-	y = layer->offset_y;
-	/* 确定可绘制的最大区域范围 */
+	if( !ch->bitmap ) {
+		return 0;
+	}
+	/* 计算字体位图的绘制坐标 */
+	ch_pos.x += ch->bitmap->left + ch->bitmap->advance.x;
+	ch_pos.y += baseline + (txtrow->height - baseline) / 2;
+	ch_pos.y += -ch->bitmap->top;
+	/* 判断文字使用的前景颜色，再进行绘制 */
+	if( ch->style && ch->style->has_fore_color ) {
+		FontBitmap_Mix( graph, ch_pos, ch->bitmap,
+				ch->style->fore_color );
+	} else {
+		FontBitmap_Mix( graph, ch_pos, ch->bitmap, default_color );
+	}
+}
+
+static void TextLyaer_ValidateArea( LCUI_TextLayer layer, LCUI_Rect *area )
+{
+	int width, height;
 	if( layer->fixed_width > 0 ) {
 		width = layer->fixed_width;
 	} else if( layer->max_width > 0 ) {
@@ -1233,7 +1249,33 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 	} else {
 		height = TextLayer_GetHeight( layer );
 	}
-	LCUIRect_ValidateArea( &area, width, height );
+	LCUIRect_ValidateArea( area, width, height );
+}
+
+static void TextLayer_DrawChar( LCUI_TextLayer layer, TextChar ch,
+		    LCUI_Graph *graph, LCUI_Pos ch_pos )
+{
+	/* 判断文字使用的前景颜色，再进行绘制 */
+	if( ch->style && ch->style->has_fore_color ) {
+		FontBitmap_Mix( graph, ch_pos, ch->bitmap,
+				ch->style->fore_color );
+	} else {
+		FontBitmap_Mix( graph, ch_pos, ch->bitmap,
+				layer->text_style.fore_color );
+	}
+}
+
+int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
+			   LCUI_Pos layer_pos, LCUI_Graph *graph )
+{
+	TextRow txtrow;
+	TextChar txtchar;
+	LCUI_Pos ch_pos;
+	int x, y, row, col, baseline;
+
+	y = layer->offset_y;
+	/* 确定可绘制的最大区域范围 */
+	TextLyaer_ValidateArea( layer, &area );
 	for( row = 0; row < layer->rowlist.length; ++row ) {
 		txtrow = TextLayer_GetRow( layer, row );
 		y += txtrow->height;
@@ -1248,6 +1290,7 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 	}
 	for( ; row < layer->rowlist.length; ++row ) {
 		txtrow = TextLayer_GetRow( layer, row );
+		baseline = txtrow->text_height * 4 / 5;
 		x = TextLayer_GetRowStartX( layer, txtrow );
 		x += layer->offset_x;
 		/* 确定从哪个文字开始绘制 */
@@ -1275,21 +1318,14 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 				continue;
 			}
 			/* 计算字体位图的绘制坐标 */
-			char_pos.x = layer_pos.x + x;
-			char_pos.y = layer_pos.y + y;
-			char_pos.x += txtchar->bitmap->left;
-			char_pos.y += txtrow->text_height * 4 / 5;
-			char_pos.y += (txtrow->height - txtrow->text_height) / 2;
-			char_pos.y -= txtchar->bitmap->top;
+			ch_pos.x = layer_pos.x + x;
+			ch_pos.y = layer_pos.y + y;
+			ch_pos.x += txtchar->bitmap->left;
+			ch_pos.y += baseline;
+			ch_pos.y += (txtrow->height - baseline) / 2;
+			ch_pos.y -= txtchar->bitmap->top;
+			TextLayer_DrawChar( layer, txtchar, graph, ch_pos );
 			x += txtchar->bitmap->advance.x;
-			/* 判断文字使用的前景颜色，再进行绘制 */
-			if( txtchar->style && txtchar->style->has_fore_color ) {
-				FontBitmap_Mix( graph, char_pos, txtchar->bitmap,
-						txtchar->style->fore_color );
-			} else {
-				FontBitmap_Mix( graph, char_pos, txtchar->bitmap,
-						layer->text_style.fore_color );
-			}
 			/* 如果超过绘制区域则不继续绘制该行文本 */
 			if( x > area.x + area.width ) {
 				break;
