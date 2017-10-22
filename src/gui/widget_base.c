@@ -891,10 +891,21 @@ LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key )
 
 LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w )
 {
-	return Widget_HasAutoStyle( w, key_width ) && (
-		Widget_HasAbsolutePosition( w ) ||
-		Widget_HasAbsolutePosition( w->parent ) ||
-		Widget_HasInlineBlockDisplay( w ));
+	if( Widget_HasAutoStyle( w, key_width ) ) {
+		if( Widget_HasAbsolutePosition( w ) ||
+		    Widget_HasAbsolutePosition( w->parent ) ||
+		    Widget_HasInlineBlockDisplay( w ) ) {
+			return TRUE;
+		}
+		if( !w->parent ||  Widget_HasAutoWidth( w->parent ) ) {
+			return TRUE;
+		}
+	} else if( Widget_CheckStyleType( w, key_width, scale ) ) {
+		if( !w->parent || Widget_HasAutoWidth( w->parent ) ) {
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 /** 根据当前部件的内外间距，获取调整后宽度 */
@@ -967,6 +978,10 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
 			width += w->padding.left + w->padding.right;
 			width += bbox->left.width + bbox->right.width;
+			if( w->proto && w->proto->autosize ) {
+				height += w->padding.top + w->padding.bottom;
+				height += bbox->top.width + bbox->bottom.width;
+			}
 		}
 		/* 如果该部件和父部件的宽度都是自适应 */
 		if( w->parent && Widget_HasAutoWidth( w->parent ) &&
