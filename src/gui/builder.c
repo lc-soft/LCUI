@@ -222,9 +222,10 @@ static int ParseWidget( XMLParserContext ctx, xmlNodePtr node )
 }
 
 static Parser parser_list[] = {
-	{ID_UI, "ui", ParseUI },
-	{ID_WIDGET, "widget", ParseWidget },
-	{ID_RESOURCE, "resource", ParseResource }
+	{ ID_UI, "ui", ParseUI },
+	{ ID_WIDGET, "w", ParseWidget },
+	{ ID_WIDGET, "widget", ParseWidget },
+	{ ID_RESOURCE, "resource", ParseResource }
 };
 
 static int CompareName( void *data, const void *keydata )
