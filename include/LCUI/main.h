@@ -41,13 +41,8 @@
 
 LCUI_BEGIN_HEADER
 
-typedef void(*LCUI_AppTaskFunc)(void*, void*);
-
-typedef struct LCUI_AppTaskRec_ {
-	LCUI_AppTaskFunc func;		/**< 处理函数 */
-	void *arg[2];			/**< 传给函数的两个参数 */
-	void (*destroy_arg[2])(void*);	/**< 参数的销毁函数 */
-} LCUI_AppTaskRec, *LCUI_AppTask;
+typedef LCUI_TaskFunc LCUI_AppTaskFunc;
+typedef LCUI_Task LCUI_Task;
 
 enum LCUI_SysEventType {
 	LCUI_NONE,
@@ -168,22 +163,22 @@ LCUI_API void LCUI_ProcessEvents( void );
  * 添加任务
  * 该任务将会添加至 UI 线程中执行
  */
-LCUI_API LCUI_BOOL LCUI_PostTask( LCUI_AppTask task );
+LCUI_API LCUI_BOOL LCUI_PostTask( LCUI_Task task );
+
+/**
+ * 添加异步任务
+ * 该任务将会添加至工作线程中执行
+ */
+LCUI_API void LCUI_PostAsyncTask( LCUI_Task task );
 
 /** LCUI_PostTask 的简化版本 */
 #define LCUI_PostSimpleTask(FUNC, ARG1, ARG2) do {\
-	LCUI_AppTaskRec task = { 0 };\
+	LCUI_TaskRec task = { 0 };\
 	task.arg[0] = (void*)ARG1;\
 	task.arg[1] = (void*)ARG2;\
 	task.func = (LCUI_AppTaskFunc)(FUNC);\
 	LCUI_PostTask( &task );\
 } while( 0 );
-
-/** 销毁任务 */
-LCUI_API void LCUI_DeleteTask( LCUI_AppTask task );
-
-/* 运行任务 */
-LCUI_API int LCUI_RunTask( LCUI_AppTask task );
 
 /* 新建一个主循环 */
 LCUI_API LCUI_MainLoop LCUIMainLoop_New( void );

@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
- * util.h  no specific categories of miscellaneous function
+ * worker.h -- worker threading and task
  *
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -17,12 +17,12 @@
  *
  * You should have received a copy of the GPLv2 along with this file. It is
  * usually in the LICENSE.TXT file, If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * ***************************************************************************/
 
 /* ****************************************************************************
- * util.h  没有具体分类的杂项功能
+ * worker.h -- 工作线程与任务
  *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -35,22 +35,25 @@
  *
  * 您应已收到附随于本文件的GPLv2许可协议的副本，它通常在LICENSE.TXT文件中，如果
  * 没有，请查看：<http://www.gnu.org/licenses/>.
- * ****************************************************************************/
+ * ***************************************************************************/
 
-#ifndef LCUI_UTIL_H
-#define LCUI_UTIL_H
-#include <LCUI/util/math.h>
-#include <LCUI/util/time.h>
-#include <LCUI/util/dirent.h>
-#include <LCUI/util/rbtree.h>
-#include <LCUI/util/linkedlist.h>
-#include <LCUI/util/dict.h>
-#include <LCUI/util/rect.h>
-#include <LCUI/util/steptimer.h>
-#include <LCUI/util/string.h>
-#include <LCUI/util/parse.h>
-#include <LCUI/util/event.h>
-#include <LCUI/util/logger.h>
-#include <LCUI/util/task.h>
+#ifndef LCUI_WORKER_H
+#define LCUI_WORKER_H
+
+#ifdef LCUI_WORKER_C
+typedef struct LCUI_WorkerRec_ *LCUI_Worker;
+#else
+typedef void* LCUI_Worker;
 #endif
 
+LCUI_API LCUI_Worker LCUIWorker_New( void );
+
+LCUI_API void LCUIWorker_PostTask( LCUI_Worker worker, LCUI_Task task );
+
+LCUI_API LCUI_BOOL LCUIWorker_RunTask( LCUI_Worker worker );
+
+LCUI_API int LCUIWorker_RunAsync( LCUI_Worker worker );
+
+LCUI_API void LCUIWorker_Destroy( LCUI_Worker worker );
+
+#endif

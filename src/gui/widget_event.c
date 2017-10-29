@@ -571,7 +571,7 @@ LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
 			    void *data, void( *destroy_data )(void*) )
 {
 	LCUI_Event sys_ev;
-	LCUI_AppTaskRec task;
+	LCUI_TaskRec task;
 	LCUI_WidgetEventPack pack;
 	if( widget->state == WSTATE_DELETED ) {
 		return FALSE;
@@ -580,7 +580,7 @@ LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
 		ev->target = widget;
 	}
 	/* 准备任务 */
-	task.func = (LCUI_AppTaskFunc)OnWidgetEvent;
+	task.func = (LCUI_TaskFunc)OnWidgetEvent;
 	task.arg[0] = malloc( sizeof( LCUI_EventRec ) );
 	task.arg[1] = malloc( sizeof( LCUI_WidgetEventPackRec ) );
 	/* 这两个参数都需要在任务执行完后释放 */
@@ -596,7 +596,11 @@ LCUI_BOOL Widget_PostEvent( LCUI_Widget widget, LCUI_WidgetEvent ev,
 	CopyWidgetEvent( &pack->event, ev );
 	Widget_AddEventRecord( widget, pack );
 	/* 把任务扔给当前跑主循环的线程 */
-	return LCUI_PostTask( &task );
+	if( !LCUI_PostTask( &task ) ) {
+		LCUITask_Destroy( &task );
+		return FALSE;
+	}
+	return TRUE;
 }
 
 int Widget_TriggerEvent( LCUI_Widget widget, LCUI_WidgetEvent e, void *data )

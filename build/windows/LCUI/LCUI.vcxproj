@@ -28,7 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -321,7 +321,9 @@
     <ClInclude Include="..\..\..\include\LCUI\util\rbtree.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\rect.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\string.h" />
+    <ClInclude Include="..\..\..\include\LCUI\util\task.h" />
     <ClInclude Include="..\..\..\include\LCUI\util\time.h" />
+    <ClInclude Include="..\..\..\include\LCUI\worker.h" />
     <ClInclude Include="..\..\..\include\LCUI_Build.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -379,6 +381,8 @@
     <ClCompile Include="..\..\..\src\platform\windows\windows_ime.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_keyboard.c" />
     <ClCompile Include="..\..\..\src\platform\windows\windows_mouse.c" />
+    <ClCompile Include="..\..\..\src\util\task.c" />
+    <ClCompile Include="..\..\..\src\worker.c" />
     <ClCompile Include="..\..\..\src\thread\win32\cond.c" />
     <ClCompile Include="..\..\..\src\thread\win32\mutex.c" />
     <ClCompile Include="..\..\..\src\thread\win32\thread.c">
