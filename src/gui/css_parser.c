@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -219,8 +220,10 @@ static int OnParseImage( LCUI_StyleSheet ss, int key, const char *str )
 	const char *p, *head, *tail;
 
 	p = str;
-	data = malloc( strlen(str) * sizeof(char) );
 	tail = head = strstr( p, "url(" );
+	if( !head ) {
+		return -EINVAL;
+	}
 	while( p ) {
 		tail = p;
 		p = strstr( p+1, ")" );
@@ -233,6 +236,7 @@ static int OnParseImage( LCUI_StyleSheet ss, int key, const char *str )
 		++head;
 	}
 	n = tail - head;
+	data = malloc( strsize( str ) );
 	strncpy( data, head, n );
 	data[n] = 0;
 	if( n > 0 && data[n - 1] == '"' ) {
