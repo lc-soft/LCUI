@@ -45,32 +45,76 @@
 
 #ifdef LCUI_THREAD_PTHREAD
 
-typedef struct LCUI_ThreadTaskRec {
+typedef struct LCUI_ThreadContextRec {
 	void (*func)(void*);
 	void *arg;
-} LCUI_ThreadTaskRec, *LCUI_ThreadTask;
+	LCUI_Thread tid;
+	LinkedListNode node;
+} LCUI_ThreadContextRec, *LCUI_ThreadContext;
 
-static void *LCUIThread_RunTask( void *arg )
+static struct LCUIThreadModule {
+	LCUI_BOOL is_inited;
+	LCUI_Mutex mutex;
+	LinkedList threads;
+} self;
+
+static void *LCUIThread_Run( void *arg )
 {
-	LCUI_ThreadTask task = arg;
-	task->func( task->arg );
-	free( task );
-	pthread_exit( NULL );
+	LCUI_ThreadContext ctx = arg;
+	ctx->func( ctx->arg );
+	return NULL;
+}
+
+static LCUI_ThreadContext LCUIThread_Find( LCUI_Thread tid )
+{
+	LinkedListNode *node;
+	LCUI_ThreadContext ctx;
+	for( LinkedList_Each( node, &self.threads ) ) {
+		ctx = node->data;
+		if( ctx && ctx->tid == tid ) {
+			return ctx;
+		}
+	}
+	return NULL;
+}
+
+static LCUI_ThreadContext LCUIThread_Get( LCUI_Thread tid )
+{
+	LCUI_ThreadContext ctx;
+	LCUIMutex_Lock( &self.mutex );
+	ctx = LCUIThread_Find( tid );
+	if( ctx ) {
+		LinkedList_Unlink( &self.threads, &ctx->node );
+	}
+	LCUIMutex_Unlock( &self.mutex );
+	return ctx;
 }
 
 int LCUIThread_Create( LCUI_Thread *thread, void(*func)(void*), void *arg )
 {
 	int ret;
-	ASSIGN( task, LCUI_ThreadTask );
-	if( !task ) {
+	LCUI_ThreadContext ctx;
+	if( !self.is_inited ) {
+		LinkedList_Init( &self.threads );
+		LCUIMutex_Init( &self.mutex );
+		self.is_inited = TRUE;
+	}
+	ctx = NEW( LCUI_ThreadContextRec, 1 );
+	if( !ctx ) {
 		return -ENOMEM;
 	}
-	task->func = func;
-	task->arg = arg;
-	ret = pthread_create( thread, NULL, LCUIThread_RunTask, task );
+	ctx->arg = arg;
+	ctx->func = func;
+	ctx->node.data = ctx;
+	ret = pthread_create( &ctx->tid, NULL, LCUIThread_Run, ctx );
 	if( ret != 0 ) {
-		free( task );
+		free( ctx );
+		return ret;
 	}
+	LCUIMutex_Lock( &self.mutex );
+	LinkedList_AppendNode( &self.threads, &ctx->node );
+	LCUIMutex_Unlock( &self.mutex );
+	*thread = ctx->tid;
 	return ret;
 }
 
@@ -81,6 +125,14 @@ LCUI_Thread LCUIThread_SelfID( void )
 
 void LCUIThread_Exit( void *retval )
 {
+	LCUI_Thread tid;
+	LCUI_ThreadContext ctx;
+	tid = LCUIThread_SelfID();
+	ctx = LCUIThread_Get( tid );
+	if( !ctx ) {
+		return;
+	}
+	free( ctx );
 	pthread_exit( retval );
 }
 

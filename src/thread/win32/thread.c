@@ -78,6 +78,9 @@ int LCUIThread_Create( LCUI_Thread *tid, void( *func )(void*), void *arg )
 		self.is_inited = TRUE;
 	}
 	ctx = NEW( LCUI_ThreadContextRec, 1 );
+	if( !ctx ) {
+		return -ENOMEM;
+	}
 	ctx->func = func;
 	ctx->arg = arg;
 	ctx->retval = NULL;
@@ -94,6 +97,7 @@ int LCUIThread_Create( LCUI_Thread *tid, void( *func )(void*), void *arg )
 	*tid = ctx->tid;
 	return 0;
 }
+
 static LCUI_ThreadContext LCUIThread_Find( LCUI_Thread tid )
 {
 	LinkedListNode *node;
@@ -106,6 +110,7 @@ static LCUI_ThreadContext LCUIThread_Find( LCUI_Thread tid )
 	}
 	return NULL;
 }
+
 static LCUI_ThreadContext LCUIThread_Get( LCUI_Thread tid )
 {
 	LCUI_ThreadContext ctx;

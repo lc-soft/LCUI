@@ -165,6 +165,7 @@ static void TimerThread( void *arg )
 	}
 	LOG( "[timer] timer thread stopped working\n" );
 	LCUIMutex_Unlock( &self.mutex );
+	LCUIThread_Exit( NULL );
 }
 
 static Timer TimerList_Find( int timer_id )
