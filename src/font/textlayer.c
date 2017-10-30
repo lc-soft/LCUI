@@ -1211,29 +1211,6 @@ void TextLayer_Update( LCUI_TextLayer layer, LinkedList *rects )
 	 }
 }
 
-static int TextRow_DrawChar( TextRow txtrow, int pos, int x, int y,
-			     LCUI_Graph *graph, LCUI_Color default_color )
-{
-	LCUI_Pos ch_pos = { x, y };
-	int baseline = txtrow->text_height * 4 / 5;
-	TextChar ch = txtrow->string[pos];
-
-	if( !ch->bitmap ) {
-		return 0;
-	}
-	/* 计算字体位图的绘制坐标 */
-	ch_pos.x += ch->bitmap->left + ch->bitmap->advance.x;
-	ch_pos.y += baseline + (txtrow->height - baseline) / 2;
-	ch_pos.y += -ch->bitmap->top;
-	/* 判断文字使用的前景颜色，再进行绘制 */
-	if( ch->style && ch->style->has_fore_color ) {
-		FontBitmap_Mix( graph, ch_pos, ch->bitmap,
-				ch->style->fore_color );
-	} else {
-		FontBitmap_Mix( graph, ch_pos, ch->bitmap, default_color );
-	}
-}
-
 static void TextLyaer_ValidateArea( LCUI_TextLayer layer, LCUI_Rect *area )
 {
 	int width, height;
@@ -1253,7 +1230,7 @@ static void TextLyaer_ValidateArea( LCUI_TextLayer layer, LCUI_Rect *area )
 }
 
 static void TextLayer_DrawChar( LCUI_TextLayer layer, TextChar ch,
-		    LCUI_Graph *graph, LCUI_Pos ch_pos )
+				LCUI_Graph *graph, LCUI_Pos ch_pos )
 {
 	/* 判断文字使用的前景颜色，再进行绘制 */
 	if( ch->style && ch->style->has_fore_color ) {

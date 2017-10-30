@@ -105,9 +105,9 @@ static void TextView_OnParseAttr( LCUI_Widget w, const char *name,
 		return;
 	}
 	if( strcmp( name, "multiline" ) == 0 ) {
-		LCUI_BOOL mulitiline = ParseBoolean( value );
-		if( mulitiline != txt->layer->is_mulitiline_mode ) {
-			TextLayer_SetMultiline(txt->layer, mulitiline );
+		LCUI_BOOL enable = ParseBoolean( value );
+		if( enable != txt->layer->is_mulitiline_mode ) {
+			TextView_SetMulitiline( w, enable );
 		}
 	}
 }
@@ -133,14 +133,6 @@ static void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
 	Widget_AddTask( w, WTT_USER );
 }
 
-static void TextView_SetTaskForMulitiline( LCUI_Widget w, LCUI_BOOL is_true )
-{
-	LCUI_TextView txt = GetData( w );
-	txt->tasks[TASK_SET_MULITILINE].enable = is_true;
-	txt->tasks[TASK_SET_MULITILINE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
-}
-
 static void TextView_SetTaskForTextAlign( LCUI_Widget w, int align )
 {
 	LCUI_TextView txt = GetData( w );
@@ -149,10 +141,10 @@ static void TextView_SetTaskForTextAlign( LCUI_Widget w, int align )
 	Widget_AddTask( w, WTT_USER );
 }
 
-static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
+static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL enable )
 {
 	LCUI_TextView txt = GetData( w );
-	txt->tasks[TASK_SET_AUTOWRAP].enable = autowrap;
+	txt->tasks[TASK_SET_AUTOWRAP].enable = enable;
 	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
 }
@@ -460,13 +452,21 @@ void TextView_SetTextAlign( LCUI_Widget w, int align )
 	Widget_SetFontStyle( w, key_text_align, align, style );
 }
 
-void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL autowrap )
+void TextView_SetAutoWrap( LCUI_Widget w, LCUI_BOOL enable )
 {
-	if( autowrap ) {
+	if( enable ) {
 		Widget_SetFontStyle( w, key_white_space, SV_AUTO, style );
 	} else {
 		Widget_SetFontStyle( w, key_white_space, SV_NOWRAP, style );
 	}
+}
+
+void TextView_SetMulitiline( LCUI_Widget w, LCUI_BOOL enable )
+{
+	LCUI_TextView txt = GetData( w );
+	txt->tasks[TASK_SET_MULITILINE].enable = enable;
+	txt->tasks[TASK_SET_MULITILINE].is_valid = TRUE;
+	Widget_AddTask( w, WTT_USER );
 }
 
 void LCUIWidget_AddTextView( void )
