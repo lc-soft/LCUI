@@ -1271,8 +1271,8 @@ int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
 		attr->name = strdup2( name );
 		Dict_Add( w->attributes, attr->name, attr );
 	}
+	attr->value.data = value;
 	attr->value.type = value_type;
-	attr->value.string = strdup2( value );
 	attr->value.destructor = value_destructor;
 	return 0;
 }
@@ -1571,6 +1571,7 @@ static void OnClearWidgetAttribute( void *privdata, void *data )
 	free( attr->name );
 	attr->name = NULL;
 	attr->value.data = NULL;
+	free( attr );
 }
 
 void LCUIWidget_InitBase( void )

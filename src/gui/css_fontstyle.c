@@ -234,8 +234,10 @@ static void OnComputeFontFamily( LCUI_FontStyle fs, LCUI_Style s )
 	const char *style;
 	if( fs->font_ids ) {
 		free( fs->font_ids );
-		free( fs->font_family );
 		fs->font_ids = NULL;
+	}
+	if( fs->font_family ) {
+		free( fs->font_family );
 		fs->font_family = NULL;
 	}
 	if( !s->is_valid ) {
@@ -320,8 +322,10 @@ void LCUIFontStyle_Destroy( LCUI_FontStyle fs )
 {
 	if( fs->font_ids ) {
 		free( fs->font_ids );
-		free( fs->font_family );
 		fs->font_ids = NULL;
+	}
+	if( fs->font_family ) {
+		free( fs->font_family );
 		fs->font_family = NULL;
 	}
 	if( fs->content ) {
