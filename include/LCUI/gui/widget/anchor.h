@@ -1,5 +1,6 @@
 ﻿/* ***************************************************************************
- * widget.c -- GUI widget APIs.
+ * anchor.c -- The anchor widget, used to link view resource, its function is
+ * similar to <a> element in HTML.
  *
  * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
  *
@@ -20,7 +21,7 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * widget.c -- GUI 部件相关功能的初始化与释放接口
+ * anchor.c -- 锚点部件，用于链接视图资源，功能类似于 HTML 中的 <a> 标签
  *
  * 版权所有 (C) 2017 归属于 刘超 <lc-soft@live.cn>
  *
@@ -37,43 +38,11 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
-#include <LCUI/gui/widget.h>
-#include <LCUI/gui/widget/textview.h>
-#include <LCUI/gui/widget/textcaret.h>
-#include <LCUI/gui/widget/textedit.h>
-#include <LCUI/gui/widget/anchor.h>
-#include <LCUI/gui/widget/button.h>
-#include <LCUI/gui/widget/sidebar.h>
-#include <LCUI/gui/widget/scrollbar.h>
+#ifndef LCUI_WIDGET_ANCHOR_H
+#define LCUI_WIDGET_ANCHOR_H
 
-void LCUI_InitWidget( void )
-{
-	LCUIWidget_InitTasks();
-	LCUIWidget_InitEvent();
-	LCUIWidget_InitPrototype();
-	LCUIWidget_InitStyle();
-	LCUIWidget_InitRenderer();
-	LCUIWidget_InitImageLoader();
-	LCUIWidget_AddTextView();
-	LCUIWidget_AddAnchor();
-	LCUIWidget_AddButton();
-	LCUIWidget_AddSideBar();
-	LCUIWidget_AddTScrollBar();
-	LCUIWidget_AddTextCaret();
-	LCUIWidget_AddTextEdit();
-	LCUIWidget_InitBase();
-}
+LCUI_API void Anchor_Open( LCUI_Widget w );
 
-void LCUI_FreeWidget( void )
-{
-	LCUIWidget_FreeTasks();
-	LCUIWidget_FreeRoot();
-	LCUIWidget_FreeEvent();
-	LCUIWidget_FreeStyle();
-	LCUIWidget_FreePrototype();
-	LCUIWidget_FreeRenderer();
-	LCUIWidget_FreeImageLoader();
-	LCUIWidget_FreeBase();
-}
+LCUI_API void LCUIWidget_AddAnchor( void );
+
+#endif

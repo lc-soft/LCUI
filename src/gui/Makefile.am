@@ -23,4 +23,5 @@ widget/textcaret.c	\
 widget/textedit.c	\
 widget/sidebar.c	\
 widget/scrollbar.c	\
+widget/anchor.c		\
 widget/button.c

@@ -276,6 +276,7 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\metrics.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\anchor.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\button.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\scrollbar.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\sidebar.h" />
@@ -348,6 +349,7 @@
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
     <ClCompile Include="..\..\..\src\gui\metrics.c" />
     <ClCompile Include="..\..\..\src\gui\widget.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\anchor.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />

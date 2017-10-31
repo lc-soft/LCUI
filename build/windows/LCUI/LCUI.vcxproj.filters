@@ -267,6 +267,9 @@
     <ClInclude Include="..\..\..\include\LCUI\util\task.h">
       <Filter>头文件\LCUI\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget\anchor.h">
+      <Filter>头文件\LCUI\gui\widget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -472,6 +475,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\task.c">
       <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\anchor.c">
+      <Filter>源文件\gui\widget</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
