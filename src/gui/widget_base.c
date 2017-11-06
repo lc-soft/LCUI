@@ -116,7 +116,7 @@ int Widget_Unlink( LCUI_Widget widget )
 	node = &widget->node;
 	LinkedList_Unlink( &widget->parent->children, node );
 	LinkedList_Unlink( &widget->parent->children_show, snode );
-	Widget_PostSurfaceEvent( widget, WET_REMOVE );
+	Widget_PostSurfaceEvent( widget, WET_REMOVE, TRUE );
 	widget->parent = NULL;
 	return 0;
 }
@@ -146,7 +146,7 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 		child->index += 1;
 		node = node->next;
 	}
-	Widget_PostSurfaceEvent( widget, WET_ADD );
+	Widget_PostSurfaceEvent( widget, WET_ADD, TRUE );
 	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateStatus( widget );
@@ -180,7 +180,7 @@ int Widget_Prepend( LCUI_Widget parent, LCUI_Widget widget )
 		child->index += 1;
 		node = node->next;
 	}
-	Widget_PostSurfaceEvent( widget, WET_ADD );
+	Widget_PostSurfaceEvent( widget, WET_ADD, TRUE );
 	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateStatus( widget );
@@ -571,7 +571,7 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 		}
 	}
 	DEBUG_MSG( "visible: %s\n", visible ? "TRUE" : "FALSE" );
-	Widget_PostSurfaceEvent( w, visible ? WET_SHOW : WET_HIDE );
+	Widget_PostSurfaceEvent( w, visible ? WET_SHOW : WET_HIDE, TRUE );
 }
 
 void Widget_UpdateOpacity( LCUI_Widget w )
@@ -804,7 +804,7 @@ void Widget_UpdatePosition( LCUI_Widget w )
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
 	}
 	/* 检测是否为顶级部件并做相应处理 */
-	Widget_PostSurfaceEvent( w, WET_MOVE );
+	Widget_PostSurfaceEvent( w, WET_MOVE, TRUE );
 }
 
 /** 更新位图尺寸 */
@@ -1082,7 +1082,7 @@ static void Widget_SendResizeEvent( LCUI_Widget w )
 	e.cancel_bubble = TRUE;
 	Widget_TriggerEvent( w, &e, NULL );
 	Widget_AddTask( w, WTT_REFRESH );
-	Widget_PostSurfaceEvent( w, WET_RESIZE );
+	Widget_PostSurfaceEvent( w, WET_RESIZE, FALSE );
 }
 
 void Widget_UpdateMargin( LCUI_Widget w )
@@ -1239,6 +1239,12 @@ void Widget_UpdateSize( LCUI_Widget w )
 	}
 	Widget_SendResizeEvent( w );
 	Widget_UpdateChildrenSize( w );
+}
+
+void Widget_UpdateSizeWithSurface( LCUI_Widget w )
+{
+	Widget_UpdateSize( w );
+	Widget_PostSurfaceEvent( w, WET_RESIZE, TRUE );
 }
 
 void Widget_UpdateProps( LCUI_Widget w )

@@ -62,7 +62,7 @@ static void HandleUpdateStyle( LCUI_Widget w )
 
 static void HandleSetTitle( LCUI_Widget w )
 {
-	Widget_PostSurfaceEvent( w, WET_TITLE );
+	Widget_PostSurfaceEvent( w, WET_TITLE, TRUE );
 }
 
 /** 处理主体刷新（标记主体区域为脏矩形，但不包括阴影区域） */
@@ -123,6 +123,7 @@ static void MapTaskHandler(void)
 	self.handlers[WTT_VISIBLE] = Widget_UpdateVisibility;
 	self.handlers[WTT_POSITION] = Widget_UpdatePosition;
 	self.handlers[WTT_RESIZE] = Widget_UpdateSize;
+	self.handlers[WTT_RESIZE_WITH_SURFACE] = Widget_UpdateSizeWithSurface;
 	self.handlers[WTT_SHADOW] = Widget_UpdateBoxShadow;
 	self.handlers[WTT_BORDER] = Widget_UpdateBorder;
 	self.handlers[WTT_OPACITY] = Widget_UpdateOpacity;
@@ -173,7 +174,7 @@ void Widget_AddToTrash( LCUI_Widget w )
 	LinkedList_Unlink( &w->parent->children, &w->node );
 	LinkedList_Unlink( &w->parent->children_show, &w->node_show );
 	LinkedList_AppendNode( &self.trash, &w->node );
-	Widget_PostSurfaceEvent( w, WET_REMOVE );
+	Widget_PostSurfaceEvent( w, WET_REMOVE, TRUE );
 }
 
 int Widget_Update( LCUI_Widget w )
@@ -243,6 +244,7 @@ void LCUIWidget_Update( void )
 {
 	int count = 0;
 	LCUI_Widget root;
+	LCUIWidget_RefreshStyle();
 	root = LCUIWidget_GetRoot();
 	while( Widget_Update( root ) && count++ < 5 );
 	LCUIWidget_ClearTrash();

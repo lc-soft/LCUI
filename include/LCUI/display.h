@@ -60,6 +60,7 @@ enum LCUI_DisplayEventType {
 	DET_NONE,
 	DET_PAINT,
 	DET_RESIZE,
+	DET_MINMAXINFO,
 	DET_READY
 };
 
@@ -73,6 +74,9 @@ typedef struct LCUI_DisplayEventRec_ {
 		struct {
 			int width, height;
 		} resize;
+		struct {
+			int min_width, min_height, max_width, max_height;
+		} minmaxinfo;
 	};
 	LCUI_Surface surface;
 } LCUI_DisplayEventRec, *LCUI_DisplayEvent;
@@ -97,6 +101,8 @@ typedef struct LCUI_DisplayDriverRec_ {
 	void			(*setCaptionW)(LCUI_Surface,const wchar_t*);
 	void			(*setRenderMode)(LCUI_Surface,int);
 	void*			(*getHandle)(LCUI_Surface);
+	int			(*getSurfaceWidth)(LCUI_Surface);
+	int			(*getSurfaceHeight)(LCUI_Surface);
 	void			(*setOpacity)(LCUI_Surface,float);
 	int			(*bindEvent)(int,LCUI_EventFunc,void*,void(*)(void*));
 } LCUI_DisplayDriverRec, *LCUI_DisplayDriver;

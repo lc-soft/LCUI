@@ -1035,7 +1035,8 @@ int Widget_ReleaseTouchCapture( LCUI_Widget w, int point_id )
 	return ret;
 }
 
-int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
+int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type,
+			     LCUI_BOOL sync_props )
 {
 	int *data;
 	LCUI_WidgetEventRec e = { 0 };
@@ -1046,11 +1047,12 @@ int Widget_PostSurfaceEvent( LCUI_Widget w, int event_type )
 	e.target = w;
 	e.type = WET_SURFACE;
 	e.cancel_bubble = TRUE;
-	data = malloc( sizeof( int ) );
+	data = malloc( sizeof( int ) * 2 );
 	if( !data ) {
 		return -ENOMEM;
 	}
-	*data = event_type;
+	data[0] = event_type;
+	data[1] = sync_props;
 	return Widget_PostEvent( root, &e, data, free );
 }
 

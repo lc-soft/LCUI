@@ -82,6 +82,7 @@ enum WidgetTaskType {
 	WTT_BACKGROUND,
 	WTT_LAYOUT,
 	WTT_RESIZE,
+	WTT_RESIZE_WITH_SURFACE,
 	WTT_POSITION,
 	WTT_ZINDEX,
 	WTT_OPACITY,
@@ -324,6 +325,9 @@ LCUI_API void Widget_UpdateMargin( LCUI_Widget w );
 
 /** 刷新尺寸 */
 LCUI_API void Widget_UpdateSize( LCUI_Widget w );
+
+/** 刷新部件尺寸以及与之绑定的表面的尺寸 */
+LCUI_API void Widget_UpdateSizeWithSurface( LCUI_Widget w );
 
 /** 刷新各项属性 */
 LCUI_API void Widget_UpdateProps( LCUI_Widget w );

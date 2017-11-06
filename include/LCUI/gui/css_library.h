@@ -64,10 +64,10 @@ enum LCUI_StyleKeyName {
 	key_opacity,
 	key_box_sizing,
 	key_width,
-	key_min_width,
-	key_max_width,
 	key_height,
+	key_min_width,
 	key_min_height,
+	key_max_width,
 	key_max_height,
 	
 	// margin start

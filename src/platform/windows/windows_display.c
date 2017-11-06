@@ -261,19 +261,24 @@ static void WinSurface_ExecResizeFrameBuffer( LCUI_Surface surface,
 	LCUIDisplay_InvalidateArea( &rect );
 }
 
-static void WinSurface_ExecResize( LCUI_Surface surface, int w, int h )
+static void SurfaceSizeToWindowSize( LCUI_Surface surface, int *w, int *h )
 {
 	RECT rect_client, rect_window;
+	GetClientRect( surface->hwnd, &rect_client );
+	GetWindowRect( surface->hwnd, &rect_window );
+	*w += rect_window.right - rect_window.left;
+	*w -= rect_client.right - rect_client.left;
+	*h += rect_window.bottom - rect_window.top;
+	*h -= rect_client.bottom - rect_client.top;
+}
+
+static void WinSurface_ExecResize( LCUI_Surface surface, int w, int h )
+{
 	if( surface->width == w && surface->height == h ) {
 		return;
 	}
 	WinSurface_ExecResizeFrameBuffer( surface, w, h );
-	GetClientRect( surface->hwnd, &rect_client );
-	GetWindowRect( surface->hwnd, &rect_window );
-	w += rect_window.right - rect_window.left;
-	w -= rect_client.right - rect_client.left;
-	h += rect_window.bottom - rect_window.top;
-	h -= rect_client.bottom - rect_client.top;
+	SurfaceSizeToWindowSize( surface, &w, &h );
 	//SetWindowLong( surface->hwnd, GWL_STYLE, WIN32_WINDOW_STYLE );
 	SetWindowPos( surface->hwnd, HWND_NOTOPMOST,
 		      0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER );
@@ -324,9 +329,19 @@ static void WinSurface_SetCaptionW( LCUI_Surface surface, const wchar_t *str )
 	surface->tasks[TASK_SET_CAPTION].is_valid = TRUE;
 }
 
-void WinSurface_SetOpacity( LCUI_Surface surface, float opacity )
+static void WinSurface_SetOpacity( LCUI_Surface surface, float opacity )
 {
 
+}
+
+static int WinSurface_GetWidth( LCUI_Surface surface )
+{
+	return surface->width;
+}
+
+static int WinSurface_GetHeight( LCUI_Surface surface )
+{
+	return surface->height;
 }
 
 /** 设置 Surface 的渲染模式 */
@@ -461,27 +476,28 @@ static void OnWMPaint( LCUI_Event e, void *arg )
 static void OnWMGetMinMaxInfo( LCUI_Event e, void *arg )
 {
 	MSG *msg = arg;
-	MINMAXINFO *mminfo;
-	LCUI_Widget root = LCUIWidget_GetRoot();
-	LCUI_WidgetStyle *style = &root->computed_style;
+	LCUI_DisplayEventRec dpy_ev;
+	LCUI_Surface surface = GetSurfaceByHWND( msg->hwnd );
+	MINMAXINFO *mminfo = (PMINMAXINFO)msg->lParam;
 
-	mminfo = (PMINMAXINFO)msg->lParam;
-	mminfo->ptMinTrackSize.x = MIN_WIDTH;
-	mminfo->ptMinTrackSize.y = MIN_HEIGHT;
-	mminfo->ptMaxTrackSize.x = GetSystemMetrics( SM_CXMAXTRACK );
-	mminfo->ptMaxTrackSize.y = GetSystemMetrics( SM_CYMAXTRACK );
-	if( style->min_width >= 0 ) {
-		mminfo->ptMinTrackSize.x = (LONG)style->min_width;
+	if( !surface ) {
+		return;
 	}
-	if( style->max_width >= 0 ) {
-		mminfo->ptMaxTrackSize.x = (LONG)style->max_width;
-	}
-	if( style->min_height >= 0 ) {
-		mminfo->ptMinTrackSize.y = (LONG)style->min_height;
-	}
-	if( style->max_height >= 0 ) {
-		mminfo->ptMaxTrackSize.y = (LONG)style->max_height;
-	}
+	dpy_ev.surface = surface;
+	dpy_ev.type = DET_MINMAXINFO;
+	dpy_ev.minmaxinfo.min_width = MIN_WIDTH;
+	dpy_ev.minmaxinfo.min_height = MIN_HEIGHT;
+	dpy_ev.minmaxinfo.max_width = GetSystemMetrics( SM_CXMAXTRACK );
+	dpy_ev.minmaxinfo.max_height = GetSystemMetrics( SM_CYMAXTRACK );
+	EventTrigger_Trigger( win.trigger, DET_MINMAXINFO, &dpy_ev );
+	SurfaceSizeToWindowSize( surface, &dpy_ev.minmaxinfo.min_width,
+				 &dpy_ev.minmaxinfo.min_height );
+	SurfaceSizeToWindowSize( surface, &dpy_ev.minmaxinfo.max_width,
+				 &dpy_ev.minmaxinfo.max_height );
+	mminfo->ptMinTrackSize.x = dpy_ev.minmaxinfo.min_width;
+	mminfo->ptMinTrackSize.y = dpy_ev.minmaxinfo.min_height;
+	mminfo->ptMaxTrackSize.x = dpy_ev.minmaxinfo.max_width;
+	mminfo->ptMaxTrackSize.y = dpy_ev.minmaxinfo.max_height;
 }
 
 static void OnWMSize( LCUI_Event e, void *arg )
@@ -530,6 +546,8 @@ LCUI_DisplayDriver LCUI_CreateWinDisplay( void )
 	strcpy( driver->name, "windows" );
 	driver->getWidth = WinDisplay_GetWidth;
 	driver->getHeight = WinDisplay_GetHeight;
+	driver->getSurfaceWidth = WinSurface_GetWidth;
+	driver->getSurfaceHeight = WinSurface_GetHeight;
 	driver->create = WinSurface_New;
 	driver->close = WinSurface_Close;
 	driver->destroy = WinSurface_Destroy;

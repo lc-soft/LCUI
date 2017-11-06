@@ -492,6 +492,22 @@ void Surface_Move( LCUI_Surface surface, int x, int y )
 	}
 }
 
+int Surface_GetWidth( LCUI_Surface surface )
+{
+	if( display.driver ) {
+		return display.driver->getSurfaceWidth( surface );
+	}
+	return 0;
+}
+
+int Surface_GetHeight( LCUI_Surface surface )
+{
+	if( display.driver ) {
+		return display.driver->getSurfaceHeight( surface );
+	}
+	return 0;
+}
+
 void Surface_Resize( LCUI_Surface surface, int w, int h )
 {
 	if( display.driver ) {
@@ -572,26 +588,29 @@ void Surface_Present( LCUI_Surface surface )
 /** 响应顶级部件的各种事件 */
 static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 {
-	int e_type;
 	LCUI_Widget root;
 	LCUI_RectF *rect;
 	LCUI_Surface surface;
-	e_type = *((int*)arg);
+	int *data, event_type, sync_props;
+
+	data = (int*)arg;
+	event_type = data[0];
+	sync_props = data[1];
 	root = LCUIWidget_GetRoot();
 	surface = LCUIDisplay_GetBindSurface( e->target );
 	if( display.mode == LCDM_SEAMLESS ) {
-		if( !surface && e_type != WET_ADD ) {
+		if( !surface && event_type != WET_ADD ) {
 			return;
 		}
 	} else if ( e->target == root ) {
-		if( !surface && e_type != WET_ADD ) {
+		if( !surface && event_type != WET_ADD ) {
 			return;
 		}
 	} else {
 		return;
 	}
 	rect = &e->target->box.graph;
-	switch( e_type ) {
+	switch( event_type ) {
 	case WET_ADD:
 		LCUIDisplay_BindSurface( e->target );
 		break;
@@ -608,14 +627,14 @@ static void OnSurfaceEvent( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	case WET_RESIZE:
 	{
 		LCUI_Rect area;
-		area.x = area.y = 0;
-		area.width = iround( rect->width );
-		area.height = iround( rect->height );
+		RectFToInvalidArea( rect, &area );
+		if( sync_props ) {
+			Surface_Resize( surface, area.width, area.height );
+		}
 		LCUIDisplay_InvalidateArea( &area );
 		break;
 	}
 	case WET_TITLE:
-		DEBUG_MSG("%S\n", e->target->title );
 		Surface_SetCaptionW( surface, e->target->title );
 		break;
 	default: break;
@@ -651,6 +670,39 @@ static void OnResize( LCUI_Event e, void *arg )
 	}
 	LOG( "[display] resize: (%d,%d)\n",
 	     dpy_ev->resize.width, dpy_ev->resize.height );
+}
+
+static void OnMinMaxInfo( LCUI_Event e, void *arg )
+{
+	LCUI_BOOL resizable = FALSE;
+	LCUI_DisplayEvent dpy_ev = arg;
+	LCUI_Surface s = dpy_ev->surface;
+	LCUI_Widget widget = LCUIDisplay_GetBindWidget( s );
+	LCUI_WidgetStyle *style = &widget->computed_style;
+	int width = Surface_GetWidth( s );
+	int height = Surface_GetHeight( s );
+
+	if( style->min_width >= 0 ) {
+		dpy_ev->minmaxinfo.min_width = iround( style->min_width );
+		resizable = resizable || width < style->min_width;
+	}
+	if( style->max_width >= 0 ) {
+		dpy_ev->minmaxinfo.max_width = iround( style->max_width );
+		resizable = resizable || width > style->max_width;
+	}
+	if( style->min_height >= 0 ) {
+		dpy_ev->minmaxinfo.min_height = iround( style->min_height );
+		resizable = resizable || height < style->min_height;
+	}
+	if( style->max_height >= 0 ) {
+		dpy_ev->minmaxinfo.max_height = iround( style->max_height );
+		resizable = resizable || height > style->max_height;
+	}
+	if( resizable ) {
+		LCUI_Rect area;
+		RectFToInvalidArea( &widget->box.graph, &area );
+		Surface_Resize( s, area.width, area.height );
+	}
 }
 
 int LCUIDisplay_BindEvent( int event_id, 
@@ -689,6 +741,7 @@ int LCUI_InitDisplay( LCUI_DisplayDriver driver )
 	}
 	root = LCUIWidget_GetRoot();
 	display.driver->bindEvent( DET_RESIZE, OnResize, NULL, NULL );
+	display.driver->bindEvent( DET_MINMAXINFO, OnMinMaxInfo, NULL, NULL );
 	display.driver->bindEvent( DET_PAINT, OnPaint, NULL, NULL );
 	Widget_BindEvent( root, "surface", OnSurfaceEvent, NULL, NULL );
 	LCUIDisplay_SetMode( LCDM_DEFAULT );

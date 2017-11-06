@@ -64,6 +64,9 @@ LCUI_API void Widget_Move( LCUI_Widget w, float left, float top );
 /** 调整部件尺寸 */
 LCUI_API void Widget_Resize( LCUI_Widget w, float width, float height );
 
+LCUI_API void Widget_ResizeWithSurface( LCUI_Widget w,
+					float width, float height );
+
 LCUI_API void Widget_Show( LCUI_Widget w );
 
 LCUI_API void Widget_Hide( LCUI_Widget w );
