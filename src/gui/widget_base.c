@@ -1210,9 +1210,7 @@ void Widget_UpdateSize( LCUI_Widget w )
 	    (rect.width <= 0 || rect.height <= 0) ) {
 		return;
 	}
-	if( w->style->sheet[key_height].type != SVT_AUTO ) {
-		Widget_UpdateLayout( w );
-	}
+	Widget_UpdateLayout( w );
 	/* 如果垂直对齐方式不为顶部对齐 */
 	if( w->computed_style.vertical_align != SV_TOP ) {
 		Widget_UpdatePosition( w );

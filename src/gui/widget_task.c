@@ -47,6 +47,7 @@
 static struct WidgetTaskModule {
 	LinkedList trash;				/**< 待删除的部件列表 */
 	LCUI_WidgetFunction handlers[WTT_TOTAL_NUM];	/**< 任务处理器 */
+	unsigned int update_count;			/**< 刷新次数 */
 } self;
 
 static void HandleRefreshStyle( LCUI_Widget w )
@@ -244,7 +245,12 @@ void LCUIWidget_Update( void )
 {
 	int count = 0;
 	LCUI_Widget root;
-	LCUIWidget_RefreshStyle();
+	/* 前两次更新需要主动刷新所有部件的样式，主要是为了省去在应用程序里手动调用
+	 * LCUIWidget_RefreshStyle() 的麻烦 */
+	if( self.update_count < 2 ) {
+		LCUIWidget_RefreshStyle();
+		self.update_count += 1;
+	}
 	root = LCUIWidget_GetRoot();
 	while( Widget_Update( root ) && count++ < 5 );
 	LCUIWidget_ClearTrash();
