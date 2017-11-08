@@ -72,6 +72,12 @@ typedef struct TextRowListRec_ {
         TextRow *rows;		/**< 每一行文本的数据 */
 } TextRowListRec, *TextRowList;
 
+/** 单词内断行模式 */
+typedef enum WordBreakMode {
+	WORD_BREAK_MODE_NORMAL,		/**< 默认的断行规则，将宽度溢出的单词放到下一行 */
+	WORD_BREAK_MODE_BREAK_ALL	/**< 任意字符间断行 */
+} WordBreakMode;
+
 typedef struct LCUI_TextLayerRec_  {
         int offset_x;			/**< X轴坐标偏移量 */
         int offset_y;			/**< Y轴坐标偏移量 */
@@ -94,13 +100,14 @@ typedef struct LCUI_TextLayerRec_  {
 	int max_width, max_height;
 
 	int length;			/**< 文本长度 */
+	WordBreakMode word_break;	/**< 单词内断行模式 */
 	LCUI_BOOL is_mulitiline_mode;	/**< 是否启用多行文本模式 */
         LCUI_BOOL is_autowrap_mode;	/**< 是否启用自动换行模式 */
 	LCUI_BOOL is_using_style_tags;	/**< 是否使用文本样式标签 */
         LCUI_BOOL is_using_buffer;	/**< 是否使用缓存空间来存储文本位图 */
 	LinkedList dirty_rect;		/**< 脏矩形记录 */
         int text_align;			/**< 文本的对齐方式 */
-        TextRowListRec rowlist;		/**< 文本行列表 */
+        TextRowListRec text_rows;	/**< 文本行列表 */
         LCUI_TextStyle text_style;	/**< 文本全局样式 */
 	LinkedList style_cache;		/**< 样式缓存 */
 	int line_height;		/**< 全局文本行高度 */
@@ -112,6 +119,10 @@ typedef struct LCUI_TextLayerRec_  {
 	} task;				/**< 待处理的任务 */
         LCUI_Graph graph;		/**< 文本位图缓存 */
 } LCUI_TextLayerRec, *LCUI_TextLayer;
+
+#define TextLayer_SetWordBreak(LAYER, MODE) do {\
+	(LAYER)->word_break = MODE;\
+} while(0)
 
 /** 获取文本行总数 */
 LCUI_API int TextLayer_GetRowTotal( LCUI_TextLayer layer );
