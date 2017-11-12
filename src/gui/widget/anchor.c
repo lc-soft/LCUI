@@ -38,6 +38,8 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <stdlib.h>
+#include <string.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
@@ -77,7 +79,7 @@ void Anchor_Open( LCUI_Widget w )
 	}
 	target = LCUIWidget_GetById( attr_target );
 	if( !target ) {
-		LOG( "[anchor] target (%s): not fund\n", attr_target );
+		LOG( "[anchor] target (%s): not found\n", attr_target );
 		return;
 	}
 	if( attr_href[0] != '/' ) {
