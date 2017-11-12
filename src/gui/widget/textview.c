@@ -189,7 +189,7 @@ static void TextView_UpdateSize( LCUI_Widget w )
 	} else {
 		max_width = w->box.content.width;
 	}
-	if( Widget_HasAutoStyle( w, key_height ) ) {
+	if( !Widget_HasAutoStyle( w, key_height ) ) {
 		max_height = w->box.content.height;
 	}
 	/* 将当前部件宽高作为文本层的固定宽高 */
@@ -284,10 +284,13 @@ static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 	}
 	if( *width <= 0 ) {
 		*width = TextLayer_GetWidth( txt->layer ) / scale;
+		if( *width <= 0 ) {
+			return;
+		}
 	}
-	if( *height <= 0 ) {
-		*height = TextLayer_GetHeight( txt->layer ) / scale;
-	}
+	TextLayer_SetFixedSize( txt->layer, (int)(*width * scale), 0 );
+	TextLayer_Update( txt->layer, NULL );
+	*height = TextLayer_GetHeight( txt->layer ) / scale;
 }
 
 static void TextView_OnRefresh( LCUI_Widget w )
