@@ -236,13 +236,12 @@ static void WidgetEventTranslator( LCUI_Event e, LCUI_WidgetEventPack pack )
 	pack->event.type = e->type;
 	pack->event.data = handler->data;
 	handler->func( w, &pack->event, pack->data );
-	if( pack->event.cancel_bubble || !w->parent ) {
-		return;
+	while( !pack->event.cancel_bubble && w->parent ) {
+		w = w->parent;
+		pack->widget = w;
+		/** 向父级部件冒泡传递事件 */
+		EventTrigger_Trigger( w->trigger, e->type, pack );
 	}
-	w = w->parent;
-	pack->widget = w;
-	/** 向父级部件冒泡传递事件 */
-	EventTrigger_Trigger( w->trigger, e->type, pack );
 }
 
 /** 复制部件事件 */
