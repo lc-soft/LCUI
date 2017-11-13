@@ -49,14 +49,32 @@
 #define DEFAULT_PATH
 
 static struct LCUI_Anchor {
+	int event_id;
 	LCUI_WidgetPrototype proto;
 } self;
 
-void AppendToTarget( LCUI_Widget target, LCUI_Widget box )
+void AppendToTarget( LCUI_Widget w, LCUI_Widget box )
 {
+	const char *attr_target;
+	LCUI_Widget target, root;
+	LCUI_WidgetEventRec ev = { 0 };
+
+	attr_target = Widget_GetAttribute( w, "target" );
+	if( !attr_target ) {
+		return;
+	}
+	target = LCUIWidget_GetById( attr_target );
+	if( !target ) {
+		return;
+	}
+	root = LCUIWidget_GetRoot();
 	Widget_Empty( target );
 	Widget_Append( target, box );
 	Widget_Unwrap( box );
+	ev.target = w;
+	ev.type = self.event_id;
+	ev.cancel_bubble = TRUE;
+	Widget_TriggerEvent( root, &ev, NULL );
 }
 
 void Anchor_Open( LCUI_Widget w )
@@ -91,18 +109,18 @@ void Anchor_Open( LCUI_Widget w )
 		strcpy( href, prefix );
 		strcat( href, attr_href );
 		box = LCUIBuilder_LoadFile( href );
-		attr_href = href;
+		free( href );
+		if( box ) {
+			LCUI_PostSimpleTask( AppendToTarget, w, box );
+			return;
+		}
 	}
 	box = LCUIBuilder_LoadFile( attr_href );
 	if( box ) {
-		LCUI_PostSimpleTask( AppendToTarget, target, box );
-	} else {
-		LOG( "[anchor] href (%s): cannot load xml resource\n",
-		     attr_href );
+		LCUI_PostSimpleTask( AppendToTarget, w, box );
+		return;
 	}
-	if( href ) {
-		free( href );
-	}
+	LOG( "[anchor] href (%s): cannot load xml resource\n", attr_href );
 }
 
 static void Anchor_OnClick( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
@@ -123,4 +141,6 @@ void LCUIWidget_AddAnchor( void )
 {
 	self.proto = LCUIWidget_NewPrototype( "a", "textview" );
 	self.proto->init = Anchor_OnInit;
+	self.event_id = LCUIWidget_AllocEventId();
+	LCUIWidget_SetEventName( self.event_id, "loaded.anchor" );
 }
