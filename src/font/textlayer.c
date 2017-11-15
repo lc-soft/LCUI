@@ -643,10 +643,10 @@ static void TextLayer_TextRowTypeset( LCUI_TextLayer layer, int row )
 			continue;
 		}
 		if( layer->word_break == WORD_BREAK_MODE_NORMAL ) {
-			col = word_col;
-			if( col < 1 ) {
+			if( word_col < 1 ) {
 				continue;
 			}
+			col = word_col;
 		}
 		TextLayer_BreakTextRow( layer, row, col, EOL_NONE );
 		return;
