@@ -107,14 +107,14 @@ typedef struct LCUI_WidgetTaskBoxRec_ {
 } LCUI_WidgetTaskBoxRec;
 
 /** 部件状态 */
-enum LCUI_WidgetState {
+typedef enum LCUI_WidgetState {
 	WSTATE_CREATED = 0,
 	WSTATE_UPDATED,
 	WSTATE_LAYOUTED,
 	WSTATE_READY,
 	WSTATE_NORMAL,
 	WSTATE_DELETED,
-};
+} LCUI_WidgetState;
 
 typedef struct LCUI_WidgetRec_* LCUI_Widget;
 typedef struct LCUI_WidgetPrototypeRec_ *LCUI_WidgetPrototype;
@@ -165,7 +165,7 @@ typedef struct LCUI_WidgetAttributeRec_ {
 
 /** 部件结构 */
 typedef struct LCUI_WidgetRec_ {
-	int			state;			/**< 状态 */
+	LCUI_WidgetState	state;			/**< 状态 */
 	float			x, y;			/**< 当前坐标（由 origin 计算而来） */
 	float			origin_x, origin_y;	/**< 当前布局下计算出的坐标 */
 	float			width, height;		/**< 部件区域大小，包括边框和内边距占用区域 */
