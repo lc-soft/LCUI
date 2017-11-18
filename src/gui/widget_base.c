@@ -1023,10 +1023,10 @@ static void Widget_ComputeSize( LCUI_Widget w )
 		style->min_width = ComputeXMetric( w, key_min_width );
 	}
 	if( Widget_CheckStyleValid( w, key_max_height ) ) {
-		style->max_height = ComputeXMetric( w, key_max_height );
+		style->max_height = ComputeYMetric( w, key_max_height );
 	}
 	if( Widget_CheckStyleValid( w, key_min_height ) ) {
-		style->min_height = ComputeXMetric( w, key_min_height );
+		style->min_height = ComputeYMetric( w, key_min_height );
 	}
 	if( style->max_width > -1 && w->width > style->max_width ) {
 		w->width = style->max_width;
@@ -1409,7 +1409,7 @@ float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 float Widget_ComputeMaxWidth( LCUI_Widget widget )
 {
 	float width;
-	if( Widget_HasAutoStyle( widget, key_width ) ) {
+	if( Widget_HasAutoWidth( widget ) ) {
 		width = Widget_ComputeMaxAvaliableWidth( widget );
 	} else {
 		width = widget->width;
