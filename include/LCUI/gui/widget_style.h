@@ -47,43 +47,6 @@ void LCUIWidget_InitStyle( void );
 /** 销毁，释放资源 */
 void LCUIWidget_FreeStyle( void );
 
-/** 新建一个样式表 */
-LCUI_API LCUI_StyleSheet StyleSheet( void );
-
-/** 清空样式表 */
-LCUI_API void StyleSheet_Clear( LCUI_StyleSheet ss );
-
-/** 合并两个样式表 */
-LCUI_API int StyleSheet_Merge( LCUI_StyleSheet dest, LCUI_StyleSheet src );
-
-/** 覆盖样式表 */
-LCUI_API int StyleSheet_Replace( LCUI_StyleSheet dest, LCUI_StyleSheet src );
-
-/** 删除样式表 */
-LCUI_API void StyleSheet_Delete( LCUI_StyleSheet ss );
-
-/** 根据字符串内容生成相应的选择器 */
-LCUI_API LCUI_Selector Selector( const char *selector );
-
-/** 更新选择器内的数据 */
-LCUI_API void Selector_Update( LCUI_Selector s );
-
-/** 删除选择器 */
-LCUI_API void Selector_Delete( LCUI_Selector s );
-
-/** 向样式库添加样式表 */
-LCUI_API int LCUI_PutStyleSheet( LCUI_Selector selector, 
-			    LCUI_StyleSheet in_ss, const char *space );
-
-/** 打印样式表的内容 */
-LCUI_API void LCUI_PrintStyleSheet( LCUI_StyleSheet ss );
-
-/** 打印选择器的内容 */
-LCUI_API void LCUI_PrintSelector( LCUI_Selector selector );
-
-/** 打印样式库中的内容 */
-LCUI_API void LCUI_PrintCSSLibrary(void);
-
 /** 计算部件继承得到的样式表 */
 LCUI_API void Widget_GetInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 
@@ -95,9 +58,6 @@ LCUI_API void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
 
 /** 直接更新当前部件的样式 */
 LCUI_API void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
-
-/** 查找作用于当前部件的样式表 */
-LCUI_API int Widget_FindStyles( LCUI_Widget w, LinkedList *list );
 
 /** 获取选择器结点 */
 LCUI_SelectorNode Widget_GetSelectorNode( LCUI_Widget w );

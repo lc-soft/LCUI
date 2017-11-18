@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * css_library.c -- css library operation module.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * css_library.c -- CSS 样式库操作模块
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -1051,7 +1051,6 @@ static LCUI_StyleSheet LCUI_SelectStyleSheet( LCUI_Selector selector,
 	StyleLink link;
 	StyleNode snode;
 	StyleLinkGroup slg;
-	LinkedListNode *node;
 	LCUI_SelectorNode sn;
 	Dict *group, *parents;
 	char buf[MAX_SELECTOR_LEN];
@@ -1100,18 +1099,6 @@ static LCUI_StyleSheet LCUI_SelectStyleSheet( LCUI_Selector selector,
 	}
 	if( !link ) {
 		return NULL;
-	}
-	for( LinkedList_Each( node, &link->styles ) ) {
-		snode = node->data;
-		if( snode->space && space ) {
-			if( strcmp( snode->space, space ) == 0 ) {
-				return snode->sheet;
-			}
-		} else {
-			if( snode->space == space ) {
-				return snode->sheet;
-			}
-		}
 	}
 	snode = NEW( StyleNodeRec, 1 );
 	if( space ) {
