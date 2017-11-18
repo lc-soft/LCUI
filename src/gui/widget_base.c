@@ -951,15 +951,74 @@ float Widget_GetFillAvailableWidth( LCUI_Widget w )
 	return Widget_GetAdjustedWidth( w, width );
 }
 
+static void Widget_ComputeLimitSize( LCUI_Widget w )
+{
+	LCUI_WidgetStyle *style;
+	style = &w->computed_style;
+	style->max_width = -1;
+	style->min_width = -1;
+	style->max_height = -1;
+	style->min_height = -1;
+	if( Widget_CheckStyleValid( w, key_max_width ) ) {
+		style->max_width = ComputeXMetric( w, key_max_width );
+	}
+	if( Widget_CheckStyleValid( w, key_min_width ) ) {
+		style->min_width = ComputeXMetric( w, key_min_width );
+	}
+	if( Widget_CheckStyleValid( w, key_max_height ) ) {
+		style->max_height = ComputeYMetric( w, key_max_height );
+	}
+	if( Widget_CheckStyleValid( w, key_min_height ) ) {
+		style->min_height = ComputeYMetric( w, key_min_height );
+	}
+}
+
+static float GetLimitedWidth( LCUI_Widget w, float width )
+{
+	LCUI_WidgetStyle *style;
+	style = &w->computed_style;
+	if( style->max_width > -1 && width > style->max_width ) {
+		width = style->max_width;
+	}
+	if( width < style->min_width ) {
+		width = style->min_width;
+	}
+	return width;
+}
+
+static float GetLimitedHeight( LCUI_Widget w, float height )
+{
+	LCUI_WidgetStyle *style;
+	style = &w->computed_style;
+	if( style->max_height > -1 && height > style->max_height ) {
+		height = style->max_height;
+	}
+	if( height < style->min_height ) {
+		height = style->min_height;
+	}
+	return height;
+}
+
 /** 计算尺寸 */
 static void Widget_ComputeSize( LCUI_Widget w )
 {
-	float width = 0, height = 0;
-	LCUI_RectF *box, *pbox = &w->box.padding;
-	LCUI_WidgetStyle *style = &w->computed_style;
-	LCUI_BorderStyle *bbox = &style->border;
+	float width, height;
+	LCUI_RectF *box, *pbox;
+	LCUI_BorderStyle *bbox;
+
+	Widget_ComputeLimitSize( w );
+	pbox = &w->box.padding;
+	bbox = &w->computed_style.border;
 	width = ComputeXMetric( w, key_width );
 	height = ComputeYMetric( w, key_height );
+	if( w->computed_style.max_width >= 0 &&
+	    width > w->computed_style.max_width ) {
+		width = w->computed_style.max_width;
+	}
+	if( w->computed_style.max_height >= 0 &&
+	    height > w->computed_style.max_height ) {
+		height = w->computed_style.max_height;
+	}
 	while( width <= 0 && Widget_HasAutoStyle( w, key_width ) ) {
 		float content_width = 0;
 		if( Widget_HasBlockDisplay( w ) &&
@@ -1012,34 +1071,8 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	}
 	w->width = width;
 	w->height = height;
-	style->max_width = -1;
-	style->min_width = -1;
-	style->max_height = -1;
-	style->min_height = -1;
-	if( Widget_CheckStyleValid( w, key_max_width ) ) {
-		style->max_width = ComputeXMetric( w, key_max_width );
-	}
-	if( Widget_CheckStyleValid( w, key_min_width ) ) {
-		style->min_width = ComputeXMetric( w, key_min_width );
-	}
-	if( Widget_CheckStyleValid( w, key_max_height ) ) {
-		style->max_height = ComputeYMetric( w, key_max_height );
-	}
-	if( Widget_CheckStyleValid( w, key_min_height ) ) {
-		style->min_height = ComputeYMetric( w, key_min_height );
-	}
-	if( style->max_width > -1 && w->width > style->max_width ) {
-		w->width = style->max_width;
-	}
-	if( style->max_height > -1 && w->height > style->max_height ) {
-		w->height = style->max_height;
-	}
-	if( w->width < style->min_width ) {
-		w->width = style->min_width;
-	}
-	if( w->height < style->min_height ) {
-		w->height = style->min_height;
-	}
+	w->width = GetLimitedWidth( w, width );
+	w->height = GetLimitedHeight( w, height );
 	w->box.border.width = w->width;
 	w->box.border.height = w->height;
 	w->box.content.width = w->width;
