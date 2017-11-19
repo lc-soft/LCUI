@@ -53,24 +53,37 @@
 
 #define LEN(A) sizeof( A ) / sizeof( *A )
 
+typedef enum ParserTargetType {
+	TARGET_NONE,		/**< 无 */
+	TARGET_SELECTOR,	/**< 选择器 */
+	TARGET_KEY,		/**< 属性名 */
+	TARGET_VALUE,		/**< 属性值 */
+	TARGET_COMMENT,		/**< 注释 */
+	TARGET_TOTAL_NUM
+} ParserTargetType;
+
+typedef void(*ParserFunction)(struct CSSParserContextRec_ *ctx, const char *str);
+
+typedef struct ParserContextRec_ {
+	ParserFunction parse;
+} ParserContextRec, *ParserContext, ParsersContextRec[TARGET_TOTAL_NUM];
+
 /** 解析器的环境参数（上下文数据） */
 typedef struct CSSParserContextRec_ {
-	enum {
-		TARGET_NONE,		/**< 无 */
-		TARGET_SELECTOR,	/**< 选择器 */
-		TARGET_KEY,		/**< 属性名 */
-		TARGET_VALUE,		/**< 属性值 */
-		TARGET_COMMENT		/**< 注释 */
-	} target, target_bak;		/**< 当前解析中的目标，以及当前备份的目标 */
-	LCUI_BOOL is_line_comment;	/**< 是否为单行注释 */
+	int pos;			/**< 缓存中的字符串的下标位置 */
+	const char *cur;		/**< 用于遍历字符串的指针 */
+	char *space;			/**< 样式记录所属的空间 */
 	char *buffer;			/**< 缓存中的字符串 */
 	size_t buffer_size;		/**< 缓存区大小 */
-	int pos;			/**< 缓存中的字符串的下标位置 */
-	const char *ptr;		/**< 用于遍历字符串的指针 */
+
+	ParserTargetType target;	/**< 当前解析目标 */
+	ParserTargetType target_bak;	/**< 备份的解析目标 */
+	ParsersContextRec parsers;	/**< 可供使用的解析器列表 */
+
 	LinkedList selectors;		/**< 当前匹配到的选择器列表 */
-	LCUI_StyleSheet css;		/**< 当前缓存的样式表 */
-	LCUI_StyleParser parser;	/**< 当前找到的解析器 */
-	char *space;			/**< 样式记录所属的空间 */
+	LCUI_StyleSheet style_sheet;	/**< 当前缓存的样式表 */
+	LCUI_StyleParser style_parser;	/**< 当前找到的样式属性解析器 */
+	LCUI_BOOL is_line_comment;	/**< 是否为单行注释 */
 } CSSParserContextRec, *CSSParserContext;
 
 static struct CSSParserModule {
@@ -575,6 +588,10 @@ static int OnParseBackgroundSize( LCUI_StyleSheet ss, int key, const char *str )
 	return 0;
 }
 
+static int OnParseBackgroundRepeat( LCUI_StyleSheet ss, int key, const char *str )
+{
+	return 0;
+}
 
 /** 各个样式的解析器映射表 */
 static LCUI_StyleParserRec style_parser_map[] = {
@@ -598,6 +615,7 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ key_background_image, NULL, OnParseImage },
 	{ key_background_position, NULL, OnParseBackgroundPosition },
 	{ key_background_size, NULL, OnParseBackgroundSize },
+	{ key_background_repeat, NULL, OnParseBackgroundRepeat },
 	{ key_border_top_color, NULL, OnParseColor },
 	{ key_border_right_color, NULL, OnParseColor },
 	{ key_border_bottom_color, NULL, OnParseColor },
@@ -636,15 +654,176 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ -1, "background", OnParseBackground }
 };
 
-static CSSParserContext NewCSSParserContext( size_t buffer_size, 
+static void CSSParser_ParseComment( CSSParserContext ctx, const char *str )
+{
+	if( ctx->is_line_comment ) {
+		if( *ctx->cur == '\n' ) {
+			ctx->target = ctx->target_bak;
+		}
+		return;
+	}
+	if( *ctx->cur == '/' && *(ctx->cur - 1) == '*' ) {
+		ctx->target = ctx->target_bak;
+	}
+}
+
+static void CSSParser_StartParseComment( CSSParserContext ctx, const char *str )
+{
+	switch( *(ctx->cur + 1) ) {
+	case '/': ctx->is_line_comment = TRUE; break;
+	case '*': ctx->is_line_comment = FALSE; break;
+	default:
+		ctx->buffer[ctx->pos++] = *ctx->cur;
+		return;
+	}
+	if( ctx->target_bak != TARGET_COMMENT ) {
+		ctx->target_bak = ctx->target;
+		ctx->target = TARGET_COMMENT;
+	}
+}
+
+static void CSSParser_FinishParseSheet( CSSParserContext ctx, const char *str )
+{
+	LinkedListNode *node;
+	/* 将记录的样式表添加至匹配到的选择器中 */
+	for( LinkedList_Each( node, &ctx->selectors ) ) {
+		LCUI_PutStyleSheet( node->data, ctx->style_sheet, ctx->space );
+	}
+	LinkedList_Clear( &ctx->selectors, (FuncPtr)Selector_Delete );
+	StyleSheet_Delete( ctx->style_sheet );
+}
+
+static void CSSParser_ParseSelector( CSSParserContext ctx, const char *str )
+{
+	LCUI_Selector s;
+	switch( *ctx->cur ) {
+	case '/':
+		CSSParser_StartParseComment( ctx, str );
+		break;
+	case '{':
+		ctx->target = TARGET_KEY;
+		ctx->style_sheet = StyleSheet();
+	case ',':
+		ctx->buffer[ctx->pos] = 0;
+		ctx->pos = 0;
+		DEBUG_MSG( "selector: %s\n", ctx->buffer );
+		s = Selector( ctx->buffer );
+		if( !s ) {
+			// 解析出错 ...
+			break;
+		}
+		LinkedList_Append( &ctx->selectors, s );
+		break;
+	default:
+		ctx->buffer[ctx->pos++] = *ctx->cur;
+		break;
+	}
+}
+
+static void CSSParser_ParseStyleName( CSSParserContext ctx, const char *str )
+{
+	switch( *ctx->cur ) {
+	case '/':
+		CSSParser_StartParseComment( ctx, str );
+		break;
+	case ' ':
+	case '\n':
+	case '\r':
+	case '\t':
+	case ';':
+		ctx->pos = 0;
+		break;
+	case ':':
+		ctx->target = TARGET_VALUE;
+		ctx->buffer[ctx->pos] = 0;
+		ctx->pos = 0;
+		ctx->style_parser = Dict_FetchValue( self.parsers, ctx->buffer );
+		DEBUG_MSG( "select style: %s, parser: %p\n",
+			   ctx->buffer, ctx->style_parser );
+		break;
+	case '}':
+		ctx->target = TARGET_NONE;
+		CSSParser_FinishParseSheet( ctx, str );
+	default:
+		ctx->buffer[ctx->pos++] = *ctx->cur;
+		break;
+	}
+}
+
+static void CSSParser_ParseStyleValue( CSSParserContext ctx, const char *str )
+{
+	switch( *ctx->cur ) {
+	case '/':
+		CSSParser_StartParseComment( ctx, str );
+		return;
+	case '}':
+	case ';':
+		break;
+	case '\n':
+	case '\r':
+	case '\t':
+	case ' ':
+		if( ctx->pos == 0 ) {
+			return;
+		}
+	default:
+		ctx->buffer[ctx->pos++] = *ctx->cur;
+		return;
+	}
+	if( *ctx->cur == ';' ) {
+		ctx->target = TARGET_KEY;
+	}
+	if( !ctx->style_parser ) {
+		return;
+	}
+	ctx->buffer[ctx->pos] = 0;
+	ctx->pos = 0;
+	ctx->style_parser->parse( ctx->style_sheet, 
+				  ctx->style_parser->key, ctx->buffer );
+	DEBUG_MSG( "parse style value: %s\n", ctx->buffer );
+	if( *ctx->cur == '}' ) {
+		ctx->target = TARGET_NONE;
+		CSSParser_FinishParseSheet( ctx, str );
+	}
+}
+
+static void CSSParser_ParseTarget( CSSParserContext ctx, const char *str )
+{
+	switch( *ctx->cur ) {
+	case '/':
+		CSSParser_StartParseComment( ctx, str );
+		break;
+	case '\n':
+	case '\t':
+	case '\r':
+	case ' ':
+	case ',':
+	case '{':
+	case '\\':
+	case '"':
+	case '}':
+		return;
+	default:
+		break;
+	}
+	ctx->pos = 0;
+	ctx->buffer[ctx->pos++] = *ctx->cur;
+	ctx->target = TARGET_SELECTOR;
+}
+
+static CSSParserContext NewCSSParserContext( size_t buffer_size,
 					     const char *space )
 {
-	CSSParserContext ctx = NEW( CSSParserContextRec, 1 );
+	ASSIGN( ctx, CSSParserContext );
 	ctx->buffer = NEW( char, buffer_size );
 	ctx->buffer_size = buffer_size;
-	ctx->target = TARGET_NONE;
-	ctx->target_bak = TARGET_NONE;
-	ctx->space = space ? strdup2( space ): NULL;
+	ctx->target = ctx->target_bak = TARGET_NONE;
+	ctx->space = space ? strdup2( space ) : NULL;
+	ctx->parsers[TARGET_NONE].parse = CSSParser_ParseTarget;
+	ctx->parsers[TARGET_SELECTOR].parse = CSSParser_ParseSelector;
+	ctx->parsers[TARGET_KEY].parse = CSSParser_ParseStyleName;
+	ctx->parsers[TARGET_VALUE].parse = CSSParser_ParseStyleValue;
+	ctx->parsers[TARGET_COMMENT].parse = CSSParser_ParseComment;
 	LinkedList_Init( &ctx->selectors );
 	return ctx;
 }
@@ -664,149 +843,10 @@ static void DeleteCSSParserContext( CSSParserContext *ctx_ptr )
 /** 载入CSS代码块，用于实现CSS代码的分块载入 */
 static int LCUI_LoadCSSBlock( CSSParserContext ctx, const char *str )
 {
-	size_t size = 0;
-	LCUI_Selector s;
-	LinkedListNode *node;
-
-	ctx->ptr = str;
-	for( ; *ctx->ptr && size < ctx->buffer_size; ++ctx->ptr, ++size ) {
-		switch( ctx->target ) {
-		case TARGET_SELECTOR:
-			switch( *ctx->ptr ) {
-			case '/': goto proc_comment;
-			case '{':
-				ctx->target = TARGET_KEY;
-				ctx->css = StyleSheet();
-			case ',':
-				ctx->buffer[ctx->pos] = 0;
-				ctx->pos = 0;
-				DEBUG_MSG("selector: %s\n", ctx->buffer);
-				s = Selector( ctx->buffer );
-				if( !s ) {
-					// 解析出错 ...
-					break;
-				}
-				LinkedList_Append( &ctx->selectors, s );
-				break;
-			default:
-				ctx->buffer[ctx->pos++] = *ctx->ptr;
-				break;
-			}
-			break;
-		case TARGET_KEY:
-			switch( *ctx->ptr ) {
-			case '/': goto proc_comment;
-			case ' ':
-			case '\n':
-			case '\r':
-			case '\t':
-			case ';':
-				ctx->pos = 0;
-				continue;
-			case ':': break;
-			case '}':
-				ctx->target = TARGET_NONE;
-				goto put_css;
-			default:
-				ctx->buffer[ctx->pos++] = *ctx->ptr;
-				continue;
-			}
-			goto select_parser;
-		case TARGET_VALUE:
-			switch( *ctx->ptr ) {
-			case '/': goto proc_comment;
-			case '}':
-			case ';':
-				goto parse_value;
-			case '\n':
-			case '\r':
-			case '\t':
-			case ' ':
-				if( ctx->pos == 0 ) {
-					continue;
-				}
-			default:
-				ctx->buffer[ctx->pos++] = *ctx->ptr;
-				continue;
-			}
-			break;
-		case TARGET_COMMENT:
-			if( ctx->is_line_comment ) {
-				if( *ctx->ptr == '\n' ) {
-					ctx->target = ctx->target_bak;
-				}
-				break;
-			}
-			if( *ctx->ptr == '/' && *(ctx->ptr - 1) == '*' ) {
-				ctx->target = ctx->target_bak;
-			}
-			break;
-		case TARGET_NONE:
-		default:
-			switch( *ctx->ptr ) {
-			case '/': goto proc_comment;
-			case '\n':
-			case '\t':
-			case '\r':
-			case ' ':
-			case ',':
-			case '{':
-			case '\\':
-			case '"':
-			case '}': continue;
-			default: break;
-			}
-			ctx->pos = 0;
-			ctx->buffer[ctx->pos++] = *ctx->ptr;
-			ctx->target = TARGET_SELECTOR;
-			break;
-		}
-		continue;
-proc_comment:
-		switch( *(ctx->ptr + 1) ) {
-		case '/': ctx->is_line_comment = TRUE; break;
-		case '*': ctx->is_line_comment = FALSE; break;
-		default:
-			ctx->buffer[ctx->pos++] = *ctx->ptr;
-			continue;
-		}
-		if( ctx->target_bak != TARGET_COMMENT ) {
-			ctx->target_bak = ctx->target;
-			ctx->target = TARGET_COMMENT;
-		}
-		continue;
-put_css:
-		DEBUG_MSG("put css\n");
-		/* 将记录的样式表添加至匹配到的选择器中 */
-		for( LinkedList_Each( node, &ctx->selectors ) ) {
-			LCUI_PutStyleSheet( node->data, ctx->css, ctx->space );
-		}
-		LinkedList_Clear( &ctx->selectors, (FuncPtr)Selector_Delete );
-		StyleSheet_Delete( ctx->css );
-		continue;
-select_parser:
-		ctx->target = TARGET_VALUE;
-		ctx->buffer[ctx->pos] = 0;
-		ctx->pos = 0;
-		ctx->parser = Dict_FetchValue( self.parsers, ctx->buffer );
-		DEBUG_MSG("select style: %s, parser: %p\n",
-			   ctx->buffer, ctx->parser);
-		continue;
-parse_value:
-		if( *ctx->ptr == ';' ) {
-			ctx->target = TARGET_KEY;
-		}
-		if( !ctx->parser ) {
-			continue;
-		}
-		ctx->buffer[ctx->pos] = 0;
-		ctx->pos = 0;
-		ctx->parser->parse( ctx->css, ctx->parser->key, ctx->buffer );
-		DEBUG_MSG("parse style value: %s, result: %d\n", ctx->buffer);
-		if( *ctx->ptr == '}' ) {
-			ctx->target = TARGET_NONE;
-			goto put_css;
-		}
+	size_t size;
+	ctx->cur = str;
+	for( size = 0; *ctx->cur && size < ctx->buffer_size; ++ctx->cur, ++size ) {
+		ctx->parsers[ctx->target].parse( ctx, str );
 	}
 	return size;
 }
