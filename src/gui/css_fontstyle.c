@@ -376,7 +376,7 @@ void LCUI_InitCSSFontStyle( void )
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
 		LCUI_StyleParser parser = &style_parsers[i];
 		self.keys[parser->key] = LCUI_AddStyleName( parser->name );
-		LCUI_AddCSSParser( parser );
+		LCUI_AddCSSStyleParser( parser );
 	}
 	self.handlers[key_color] = OnComputeColor;
 	self.handlers[key_font_size] = OnComputeFontSize;

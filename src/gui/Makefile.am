@@ -14,6 +14,7 @@ widget_background.c	\
 widget_border.c		\
 widget_shadow.c		\
 css_parser.c		\
+css_rule_font_face.c	\
 css_library.c		\
 css_fontstyle.c		\
 builder.c		\

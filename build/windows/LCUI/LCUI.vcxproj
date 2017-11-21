@@ -274,6 +274,7 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\css_fontstyle.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\css_library.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\css_parser.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\css_rule_font_face.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\metrics.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget\anchor.h" />
@@ -347,6 +348,7 @@
     <ClCompile Include="..\..\..\src\gui\css_fontstyle.c" />
     <ClCompile Include="..\..\..\src\gui\css_library.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
+    <ClCompile Include="..\..\..\src\gui\css_rule_font_face.c" />
     <ClCompile Include="..\..\..\src\gui\metrics.c" />
     <ClCompile Include="..\..\..\src\gui\widget.c" />
     <ClCompile Include="..\..\..\src\gui\widget\anchor.c" />
