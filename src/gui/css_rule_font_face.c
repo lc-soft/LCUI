@@ -78,6 +78,20 @@ static int FontFaceParser_Begin( LCUI_CSSParserContext ctx )
 	return 0;
 }
 
+static int GetFontFaceKey( const char *name )
+{
+	if( strcmp( name, "font-family" ) == 0 ) {
+		return KEY_FONT_FAMILY;
+	} else if( strcmp( name, "font-style" ) == 0 ) {
+		return KEY_FONT_STYLE;
+	} else if( strcmp( name, "font-weight" ) == 0 ) {
+		return KEY_FONT_WEIGHT;
+	} else if( strcmp( name, "src" ) == 0 ) {
+		return KEY_SRC;
+	}
+	return KEY_NONE;
+}
+
 static void FontFaceParser_End( LCUI_CSSParserContext ctx )
 {
 	FontFaceParserContext data;
@@ -113,21 +127,17 @@ static int FontFaceParser_ParseHead( LCUI_CSSParserContext ctx )
 	return 0;
 }
 
-static int FontFaceParser_ParseKey( LCUI_CSSParserContext ctx )
+static int FontFaceParser_ParseTail( LCUI_CSSParserContext ctx )
 {
-	switch( *ctx->cur ) {
-	CASE_WHITE_SPACE:
-		if( ctx->pos > 0 ) {
-			ctx->rule.state = FFP_STATE_KEY_END;
-		}
-		return 0;
-	case ':':
-		CSSParser_EndBuffer( ctx );
-		ctx->rule.state = FFP_STATE_VALUE;
-		break;
-	default:
-		CSSParser_GetChar( ctx );
-		break;
+	FontFaceParserContext data;
+	data = GetParserContext( ctx );
+	if( data->callback ) {
+		data->callback( data->face );
+	}
+	FontFaceParser_End( ctx );
+	CSSParser_EndParseRuleData( ctx );
+	if( ctx->pos > 0 ) {
+		return -1;
 	}
 	return 0;
 }
@@ -140,24 +150,38 @@ static int FontFaceParser_ParseKeyEnd( LCUI_CSSParserContext ctx )
 		return 0;
 	case ':':
 		break;
+	case '}':
+		return FontFaceParser_ParseTail( ctx );
 	default:
 		FontFaceParser_End( ctx ); 
 		return -1;
 	}
 	CSSParser_EndBuffer( ctx );
 	data = GetParserContext( ctx );
-	if( strcmp( ctx->buffer, "font-family" ) == 0 ) {
-		data->key = KEY_FONT_FAMILY;
-	} else if( strcmp( ctx->buffer, "font-style" ) == 0 ) {
-		data->key = KEY_FONT_STYLE;
-	} else if( strcmp( ctx->buffer, "font-weight" ) == 0 ) {
-		data->key = KEY_FONT_WEIGHT;
-	} else if( strcmp( ctx->buffer, "src" ) == 0 ) {
-		data->key = KEY_SRC;
-	} else {
-		data->key = KEY_NONE;
-	}
+	data->key = GetFontFaceKey( ctx->buffer );
 	ctx->rule.state = FFP_STATE_VALUE;
+	return 0;
+}
+
+static int FontFaceParser_ParseKey( LCUI_CSSParserContext ctx )
+{
+	FontFaceParserContext data;
+	switch( *ctx->cur ) {
+	CASE_WHITE_SPACE:
+		if( ctx->pos > 0 ) {
+			ctx->rule.state = FFP_STATE_KEY_END;
+			return 0;
+		}
+		break;
+	case '}':
+		return FontFaceParser_ParseTail( ctx );
+	case ':':
+		FontFaceParser_ParseKeyEnd( ctx );
+		break;
+	default:
+		CSSParser_GetChar( ctx );
+		break;
+	}
 	return 0;
 }
 

@@ -810,10 +810,10 @@ static int CSSParser_ParseTarget( LCUI_CSSParserContext ctx )
 		break;
 	}
 	ctx->pos = 0;
-	CSSParser_GetChar( ctx );
-	if( 0 && *ctx->cur == '@' ) {
+	if( *ctx->cur == '@' ) {
 		ctx->target = CSS_TARGET_RULE_NAME;
 	} else {
+		CSSParser_GetChar( ctx );
 		ctx->target = CSS_TARGET_SELECTOR;
 	}
 	return 0;
