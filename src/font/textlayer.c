@@ -38,6 +38,7 @@
  * ****************************************************************************/
 
 #include <stdlib.h>
+#include <ctype.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/graph.h>
@@ -248,22 +249,6 @@ static int TextRow_InsertCopy( TextRow txtrow, int ins_pos, TextChar txtchar )
 	txtchar2 = malloc( sizeof(TextCharRec) );
 	*txtchar2 = *txtchar;
 	return TextRow_Insert( txtrow, ins_pos, txtchar2 );
-}
-
-/** 将文本行中的内容向左移动 */
-static void TextRow_LeftMove( TextRow txtrow, int n )
-{
-	int i, j;
-	if( n <= 0 ) {
-		return;
-	}
-	if( n > txtrow->length ) {
-		n = txtrow->length;
-	}
-	txtrow->length -= n;
-	for( i=0,j=n; i<txtrow->length; ++i,++j ) {
-		txtrow->string[i] = txtrow->string[j];
-	}
 }
 
 /** 更新字体位图 */
