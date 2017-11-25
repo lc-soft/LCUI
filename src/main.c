@@ -104,6 +104,7 @@ static struct LCUI_System {
 
 /** LCUI 应用程序数据 */
 static struct LCUI_App {
+	LCUI_BOOL	active;				/**< 是否已经初始化并处于活动状态 */
 	LCUI_Mutex	loop_mutex;			/**< 互斥锁，确保一次只允许一个线程跑主循环 */
 	LCUI_Cond	loop_changed;			/**< 条件变量，用于指示当前运行的主循环是否改变 */
 	LCUI_MainLoop	loop;				/**< 当前运行的主循环 */
@@ -253,6 +254,11 @@ LCUI_BOOL LCUI_PostTask( LCUI_Task task )
 
 void LCUI_PostAsyncTask( LCUI_Task task )
 {
+	if( !MainApp.active ) {
+		LCUITask_Run( task );
+		LCUITask_Destroy( task );
+		return;
+	}
 	if( MainApp.worker_next >= LCUI_WORKER_NUM ) {
 		MainApp.worker_next = 0;
 	}
@@ -351,6 +357,7 @@ void LCUI_InitApp( LCUI_AppDriver app )
 			return;
 		}
 	}
+	MainApp.active = TRUE;
 	MainApp.driver = app;
 	MainApp.driver_ready = TRUE;
 }
@@ -365,6 +372,7 @@ static void LCUI_FreeApp( void )
 	int i;
 	LCUI_MainLoop loop;
 	LinkedListNode *node;
+	MainApp.active = FALSE;
 	for( LinkedList_Each( node, &MainApp.loops ) ) {
 		loop = node->data;
 		LCUIMainLoop_Quit( loop );
