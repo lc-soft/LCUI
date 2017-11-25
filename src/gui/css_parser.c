@@ -46,6 +46,7 @@
 #include <LCUI/thread.h>
 #include <LCUI/gui/css_library.h>
 #include <LCUI/gui/css_parser.h>
+#include <LCUI/font.h>
 
 #define SPLIT_NUMBER	1
 #define SPLIT_COLOR	(1<<1)
@@ -196,34 +197,15 @@ static int OnParseColor( LCUI_StyleSheet ss, int key, const char *str )
 static int OnParseImage( LCUI_StyleSheet ss, int key, const char *str )
 {
 	char *data;
-	int n;
-	const char *p, *head, *tail;
-
-	p = str;
-	tail = head = strstr( p, "url(" );
-	if( !head ) {
-		return -EINVAL;
-	}
-	while( p ) {
-		tail = p;
-		p = strstr( p+1, ")" );
-	}
-	if( tail == head ) {
-		return -1;
-	}
-	head += 4;
-	if( *head == '"' ) {
-		++head;
-	}
-	n = tail - head;
 	data = malloc( strsize( str ) );
-	strncpy( data, head, n );
-	data[n] = 0;
-	if( n > 0 && data[n - 1] == '"' ) {
-		data[n - 1] = 0;
+	if( !data ) {
+		return -ENOMEM;
 	}
-	SetStyle( ss, key, data, string );
-	return 0;
+	if( CSSValueParser_ParseUrl( str, data ) > 0 ) {
+		SetStyle( ss, key, data, string );
+		return 0;
+	}
+	return -1;
 }
 
 static int OnParseStyleOption( LCUI_StyleSheet ss, int key, const char *str )
@@ -621,6 +603,37 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ -1, "background", OnParseBackground }
 };
 
+int CSSValueParser_ParseUrl( const char *str, char *out_url )
+{
+	size_t n;
+	const char *p, *head, *tail;
+
+	p = str;
+	tail = head = strstr( p, "url(" );
+	if( !head ) {
+		return -EINVAL;
+	}
+	while( p ) {
+		tail = p;
+		p = strstr( p + 1, ")" );
+	}
+	if( tail == head ) {
+		return -1;
+	}
+	head += 4;
+	if( *head == '"' ) {
+		++head;
+	}
+	n = tail - head;
+	strncpy( out_url, head, n );
+	out_url[n] = 0;
+	if( n > 0 && out_url[n - 1] == '"' ) {
+		n -= 1;
+		out_url[n] = 0;
+	}
+	return (int)n;
+}
+
 static int CSSParser_ParseComment( LCUI_CSSParserContext ctx )
 {
 	if( ctx->comment.is_line_comment ) {
@@ -825,6 +838,20 @@ void CSSParser_EndParseRuleData( LCUI_CSSParserContext ctx )
 	ctx->target = CSS_TARGET_NONE;
 }
 
+static void LoadFontFile( void *arg1, void *arg2 )
+{
+	LCUIFont_LoadFile( arg1 );
+}
+
+static void OnParsedFontFace( LCUI_CSSFontFace face )
+{
+	LCUI_TaskRec task = { 0 };
+	task.func = LoadFontFile;
+	task.arg[0] = strdup2( face->src );
+	task.destroy_arg[0] = free;
+	LCUI_PostAsyncTask( &task );
+}
+
 LCUI_CSSParserContext CSSParser_Begin( size_t buffer_size, const char *space )
 {
 	ASSIGN( ctx, LCUI_CSSParserContext );
@@ -843,6 +870,7 @@ LCUI_CSSParserContext CSSParser_Begin( size_t buffer_size, const char *space )
 	LinkedList_Init( &ctx->style.selectors );
 	memset( &ctx->rule, 0, sizeof( ctx->rule ) );
 	CSSParser_InitFontFaceRuleParser( ctx );
+	CSSRuleParser_OnFontFace( ctx, OnParsedFontFace );
 	return ctx;
 }
 

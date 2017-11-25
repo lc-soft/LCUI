@@ -100,10 +100,6 @@ static void FontFaceParser_End( LCUI_CSSParserContext ctx )
 		free( data->face->font_family );
 		data->face->font_family = NULL;
 	}
-	if( data->face->font_style ) {
-		free( data->face->font_style );
-		data->face->font_style = NULL;
-	}
 	if( data->face->src ) {
 		free( data->face->src );
 		data->face->src = NULL;
@@ -165,7 +161,6 @@ static int FontFaceParser_ParseKeyEnd( LCUI_CSSParserContext ctx )
 
 static int FontFaceParser_ParseKey( LCUI_CSSParserContext ctx )
 {
-	FontFaceParserContext data;
 	switch( *ctx->cur ) {
 	CASE_WHITE_SPACE:
 		if( ctx->pos > 0 ) {
@@ -183,6 +178,60 @@ static int FontFaceParser_ParseKey( LCUI_CSSParserContext ctx )
 		break;
 	}
 	return 0;
+}
+
+static int FontFace_ParseFontWeight( LCUI_CSSFontFace face, const char *str )
+{
+	if( strcmp( str, "normal" ) == 0 ) {
+		face->font_weight = FONT_WEIGHT_NORMAL;
+		return 0;
+	}
+	if( strcmp( str, "bold" ) == 0 ) {
+		face->font_weight = FONT_WEIGHT_BOLD;
+		return 0;
+	}
+	if( sscanf( str, "%d", &face->font_weight ) != 1 ) {
+		return -1;
+	}
+	if( face->font_weight < 100 ) {
+		face->font_weight = FONT_WEIGHT_THIN;
+		return 0;
+	}
+	face->font_weight = iround( face->font_weight / 100.0 ) * 100;
+	return 0;
+}
+
+static int FontFace_ParseFontStyle( LCUI_CSSFontFace face, const char *str )
+{
+	char value[64] = "";
+	strtrim( value, str, NULL );
+	if( strcmp( value, "normal" ) == 0 ) {
+		face->font_style = FONT_STYLE_NORMAL;
+	}else if( strcmp( value, "italic" ) == 0 ) {
+		face->font_style = FONT_STYLE_ITALIC;
+	} else if( strcmp( value, "oblique" ) == 0 ) {
+		face->font_style = FONT_STYLE_OBLIQUE;
+	} else {
+		return -1;
+	}
+	return 0;
+}
+
+static int FontFace_ParseSrc( LCUI_CSSFontFace face, const char *str )
+{
+	if( face->src ) {
+		free( face->src );
+	}
+	face->src = malloc( strsize( str ) );
+	if( !face->src ) {
+		return -ENOMEM;
+	}
+	if( CSSValueParser_ParseUrl( str, face->src ) > 0 ) {
+		return 0;
+	}
+	free( face->src );
+	face->src = NULL;
+	return -1;
 }
 
 static int FontFaceParser_ParseValue( LCUI_CSSParserContext ctx )
@@ -210,24 +259,13 @@ static int FontFaceParser_ParseValue( LCUI_CSSParserContext ctx )
 		strtrim( data->face->font_family, ctx->buffer, " \"" );
 		break;
 	case KEY_FONT_STYLE:
-		if( data->face->font_style ) {
-			free( data->face->font_style );
-		}
-		data->face->font_style = malloc( strsize( ctx->buffer ) );
-		if( !data->face->font_style ) {
-			return -ENOMEM;
-		}
-		strtrim( data->face->font_style, ctx->buffer, " \"" );
+		FontFace_ParseFontStyle( data->face, ctx->buffer );
+		break;
+	case KEY_FONT_WEIGHT:
+		FontFace_ParseFontWeight( data->face, ctx->buffer );
 		break;
 	case KEY_SRC:
-		if( data->face->src ) {
-			free( data->face->src );
-		}
-		data->face->src = malloc( strsize( ctx->buffer ) );
-		if( !data->face->src ) {
-			return -ENOMEM;
-		}
-		strtrim( data->face->src, ctx->buffer, NULL );
+		FontFace_ParseSrc( data->face, ctx->buffer );
 		break;
 	default: break;
 	}
@@ -236,12 +274,7 @@ static int FontFaceParser_ParseValue( LCUI_CSSParserContext ctx )
 		ctx->rule.state = FFP_STATE_KEY;
 		return 0;
 	}
-	if( data->callback ) {
-		data->callback( data->face );
-	}
-	FontFaceParser_End( ctx );
-	CSSParser_EndParseRuleData( ctx );
-	return 0;
+	return FontFaceParser_ParseTail( ctx );
 }
 
 int FontFaceParser_Parse( LCUI_CSSParserContext ctx )
@@ -285,8 +318,8 @@ int CSSParser_InitFontFaceRuleParser( LCUI_CSSParserContext ctx )
 	}
 	data->face->src = NULL;
 	data->face->font_family = NULL;
-	data->face->font_style = NULL;
-	data->face->font_weight = 400;
+	data->face->font_style = FONT_STYLE_NORMAL;
+	data->face->font_weight = FONT_WEIGHT_NORMAL;
 	parser->data = data;
 	parser->parse = FontFaceParser_Parse;
 	parser->begin = FontFaceParser_Begin;

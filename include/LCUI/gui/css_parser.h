@@ -146,6 +146,8 @@ LCUI_API const char *LCUI_GetStyleValueName( int val );
 
 LCUI_API const char *LCUI_GetStyleName( int key );
 
+LCUI_API int CSSValueParser_ParseUrl( const char *str, char *out_url );
+
 /** 初始化 LCUI 的 CSS 代码解析功能 */
 LCUI_API void LCUI_InitCSSParser( void );
 

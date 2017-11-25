@@ -21,6 +21,7 @@ Logger_Log("[test] %d tests, %d pass.\n", tests_count, tests_count + N)
 } while( 0 );
 
 int test_string( void );
+int test_font_load( void );
 int test_css_parser( void );
 int test_char_render( void );
 int test_string_render( void );
