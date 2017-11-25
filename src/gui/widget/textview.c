@@ -67,7 +67,7 @@ typedef struct LCUI_TextViewRec_ {
 	LCUI_BOOL trimming;		/**< 是否清除首尾空白符 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
 	LCUI_TextLayer layer;		/**< 文本图层 */
-	LCUI_FontStyleRec style;	/**< 文字样式 */
+	LCUI_CSSFontStyleRec style;	/**< 文字样式 */
 	struct {
 		LCUI_BOOL is_valid;
 		union {
@@ -153,10 +153,10 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 {
 	LCUI_TextStyle ts;
 	LCUI_TextView txt = GetData( w );
-	LCUI_FontStyle fs = &txt->style;
+	LCUI_CSSFontStyle fs = &txt->style;
 	const wchar_t *content = fs->content;
-	LCUIFontStyle_Compute( fs, w->style );
-	LCUIFontStyle_GetTextStyle( fs, &ts );
+	CSSFontStyle_Compute( fs, w->style );
+	CSSFontStyle_GetTextStyle( fs, &ts );
 	TextView_SetTaskForTextAlign( w, fs->text_align );
 	TextView_SetTaskForLineHeight( w, fs->line_height );
 	TextView_SetTaskForAutoWrap( w, fs->white_space != SV_NOWRAP );
@@ -235,7 +235,7 @@ static void TextView_OnInit( LCUI_Widget w )
 	/* 启用样式标签的支持 */
 	TextLayer_SetUsingStyleTags( txt->layer, TRUE );
 	Widget_BindEvent( w, "resize", TextView_OnResize, NULL, NULL );
-	LCUIFontStyle_Init( &txt->style );
+	CSSFontStyle_Init( &txt->style );
 	LCUIMutex_Init( &txt->mutex );
 }
 
@@ -254,7 +254,7 @@ static void TextView_ClearTasks( LCUI_Widget w )
 static void TextView_OnDestroy( LCUI_Widget w )
 {
 	LCUI_TextView txt = GetData( w );
-	LCUIFontStyle_Destroy( &txt->style );
+	CSSFontStyle_Destroy( &txt->style );
 	TextLayer_Destroy( txt->layer );
 	LCUIMutex_Unlock( &txt->mutex );
 	TextView_ClearTasks( w );

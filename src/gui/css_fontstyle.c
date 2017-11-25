@@ -58,7 +58,7 @@ enum FontStyleType {
 	FS_OBLIQUE
 };
 
-typedef void (*StyleHandler)( LCUI_FontStyle, LCUI_Style );
+typedef void (*StyleHandler)( LCUI_CSSFontStyle, LCUI_Style );
 
 static struct LCUI_CSSFontStyleModule{
 	int keys[TOTAL_FONT_STYLE_KEY];
@@ -209,7 +209,7 @@ static LCUI_StyleParserRec style_parsers[] = {
 	{ key_white_space, "white-space", OnParseStyleOption }
 };
 
-static void OnComputeFontSize( LCUI_FontStyle fs, LCUI_Style s )
+static void OnComputeFontSize( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 	if( s->is_valid ) {
 		fs->font_size = LCUIMetrics_ComputeActual(
@@ -220,7 +220,7 @@ static void OnComputeFontSize( LCUI_FontStyle fs, LCUI_Style s )
 	fs->font_size = LCUIMetrics_ComputeActual( DEFAULT_FONT_SIZE, SVT_PX );
 }
 
-static void OnComputeColor( LCUI_FontStyle fs, LCUI_Style s )
+static void OnComputeColor( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 	if( s->is_valid ) {
 		fs->color = s->color;
@@ -229,7 +229,7 @@ static void OnComputeColor( LCUI_FontStyle fs, LCUI_Style s )
 	}
 }
 
-static void OnComputeFontFamily( LCUI_FontStyle fs, LCUI_Style s )
+static void OnComputeFontFamily( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 	const char *style;
 	if( fs->font_ids ) {
@@ -253,7 +253,7 @@ static void OnComputeFontFamily( LCUI_FontStyle fs, LCUI_Style s )
 	LCUIFont_GetIdByNames( &fs->font_ids, style, fs->font_family );
 }
 
-static void OnComputeFontStyle( LCUI_FontStyle fs, LCUI_Style s )
+static void OnComputeFontStyle( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 	if( s->is_valid ) {
 		fs->font_style = s->val_style;
@@ -262,12 +262,12 @@ static void OnComputeFontStyle( LCUI_FontStyle fs, LCUI_Style s )
 	}
 }
 
-static void OnComputeFontWeight( LCUI_FontStyle fs, LCUI_Style s )
+static void OnComputeFontWeight( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 
 }
 
-static void OnComputeTextAlign( LCUI_FontStyle fs, LCUI_Style s )
+static void OnComputeTextAlign( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 	if( s->is_valid ) {
 		fs->text_align = s->val_style;
@@ -276,7 +276,7 @@ static void OnComputeTextAlign( LCUI_FontStyle fs, LCUI_Style s )
 	}
 }
 
-static void OnComputeLineHeight( LCUI_FontStyle fs, LCUI_Style s )
+static void OnComputeLineHeight( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 	int h;
 	if( s->is_valid ) {
@@ -291,7 +291,7 @@ static void OnComputeLineHeight( LCUI_FontStyle fs, LCUI_Style s )
 	fs->line_height = h;
 }
 
-static void OnComputeContent( LCUI_FontStyle fs, LCUI_Style s )
+static void OnComputeContent( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 	if( fs->content ) {
 		free( fs->content );
@@ -302,7 +302,7 @@ static void OnComputeContent( LCUI_FontStyle fs, LCUI_Style s )
 	}
 }
 
-static void OnComputeWhiteSpace( LCUI_FontStyle fs, LCUI_Style s )
+static void OnComputeWhiteSpace( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 	if( s->is_valid && s->type == SVT_STYLE ) {
 		fs->white_space = s->val_style;
@@ -311,14 +311,14 @@ static void OnComputeWhiteSpace( LCUI_FontStyle fs, LCUI_Style s )
 	}
 }
 
-void LCUIFontStyle_Init( LCUI_FontStyle fs )
+void CSSFontStyle_Init( LCUI_CSSFontStyle fs )
 {
 	fs->content = NULL;
 	fs->font_ids = NULL;
 	fs->font_family = NULL;
 }
 
-void LCUIFontStyle_Destroy( LCUI_FontStyle fs )
+void CSSFontStyle_Destroy( LCUI_CSSFontStyle fs )
 {
 	if( fs->font_ids ) {
 		free( fs->font_ids );
@@ -339,7 +339,7 @@ int LCUI_GetFontStyleKey( int key )
 	return self.keys[key];
 }
 
-void LCUIFontStyle_Compute( LCUI_FontStyle fs, LCUI_StyleSheet ss )
+void CSSFontStyle_Compute( LCUI_CSSFontStyle fs, LCUI_StyleSheet ss )
 {
 	int i;
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
@@ -350,7 +350,7 @@ void LCUIFontStyle_Compute( LCUI_FontStyle fs, LCUI_StyleSheet ss )
 	}
 }
 
-void LCUIFontStyle_GetTextStyle( LCUI_FontStyle fs, LCUI_TextStyle *ts )
+void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle *ts )
 {
 	size_t len;
 	ts->font_ids = NULL;

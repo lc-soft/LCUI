@@ -42,8 +42,8 @@
 
 typedef struct LCUI_CSSFontFaceRec_ {
 	char *font_family;
-	char *font_style;
-	int font_weight;
+	LCUI_FontStyle font_style;
+	LCUI_FontWeight font_weight;
 	char *src;
 } LCUI_CSSFontFaceRec, *LCUI_CSSFontFace;
 

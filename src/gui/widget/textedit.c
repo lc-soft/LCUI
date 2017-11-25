@@ -68,7 +68,7 @@ enum TaskType {
 };
 
 typedef struct LCUI_TextEditRec_ {
-	LCUI_FontStyleRec style;		/**< 字体样式 */
+	LCUI_CSSFontStyleRec style;		/**< 字体样式 */
 	LCUI_TextLayer layer_source;		/**< 实际文本层 */
 	LCUI_TextLayer layer_mask;		/**< 屏蔽后的文本层 */
 	LCUI_TextLayer layer_placeholder;	/**< 占位符的文本层 */
@@ -889,7 +889,7 @@ static void TextEdit_OnInit( LCUI_Widget w )
 	Widget_Append( w, edit->caret );
 	Widget_Hide( edit->caret );
 	LCUIMutex_Init( &edit->mutex );
-	LCUIFontStyle_Init( &edit->style );
+	CSSFontStyle_Init( &edit->style );
 }
 
 static void TextEdit_OnDestroy( LCUI_Widget widget )
@@ -899,7 +899,7 @@ static void TextEdit_OnDestroy( LCUI_Widget widget )
 	TextLayer_Destroy( edit->layer_source );
 	TextLayer_Destroy( edit->layer_placeholder );
 	TextLayer_Destroy( edit->layer_mask );
-	LCUIFontStyle_Destroy( &edit->style );
+	CSSFontStyle_Destroy( &edit->style );
 	LinkedList_Clear( &edit->text_blocks, TextBlock_OnDestroy );
 }
 
@@ -943,9 +943,9 @@ static void TextEdit_OnUpdate( LCUI_Widget w )
 {
 	LCUI_TextStyle ts;
 	LCUI_TextEdit edit = GetData( w );
-	LCUI_FontStyle fs = &edit->style;
-	LCUIFontStyle_Compute( fs, w->style );
-	LCUIFontStyle_GetTextStyle( fs, &ts );
+	LCUI_CSSFontStyle fs = &edit->style;
+	CSSFontStyle_Compute( fs, w->style );
+	CSSFontStyle_GetTextStyle( fs, &ts );
 	TextEdit_SetTaskForLineHeight( w, fs->line_height );
 	TextEdit_SetTaskForMultiline( w, fs->white_space != SV_NOWRAP );
 	TextEdit_SetTextStyle( w, &ts );
