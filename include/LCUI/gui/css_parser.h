@@ -84,48 +84,67 @@ typedef enum LCUI_CSSRule {
 	CSS_RULE_TOTAL_NUM
 } LCUI_CSSRule;
 
-typedef int( *LCUI_CSSParserFunction )(struct LCUI_CSSParserContextRec_ *ctx);
+struct LCUI_CSSRuleParserRec_;
+struct LCUI_CSSParserContextRec_;
+struct LCUI_CSSParserStyleContextRec_;
+struct LCUI_CSSParserRec_;
+struct LCUI_StyleParserRec_;
 
-typedef struct LCUI_CSSParserRec_ {
+typedef struct LCUI_CSSRuleParserRec_ LCUI_CSSRuleParserRec;
+typedef struct LCUI_CSSRuleParserRec_ *LCUI_CSSRuleParser;
+typedef struct LCUI_CSSParserContextRec_ LCUI_CSSParserContextRec;
+typedef struct LCUI_CSSParserContextRec_ *LCUI_CSSParserContext;
+typedef struct LCUI_CSSParserStyleContextRec_ LCUI_CSSParserStyleContextRec;
+typedef struct LCUI_CSSParserStyleContextRec_ *LCUI_CSSParserStyleContext;
+typedef struct LCUI_CSSParserRec_ LCUI_CSSParserRec, *LCUI_CSSParser;
+typedef struct LCUI_StyleParserRec_ LCUI_StyleParserRec, *LCUI_StyleParser;
+typedef struct LCUI_CSSParserCommentContextRec_ LCUI_CSSParserCommentContextRec;
+typedef struct LCUI_CSSParserCommentContextRec_ *LCUI_CSSParserCommentContext;
+typedef struct LCUI_CSSParserRuleContextRec_ LCUI_CSSParserRuleContextRec;
+typedef struct LCUI_CSSParserRuleContextRec_ *LCUI_CSSParserRuleContext;
+typedef LCUI_CSSParserRec LCUI_CSSParsers[CSS_TARGET_TOTAL_NUM];
+typedef LCUI_CSSRuleParserRec LCUI_CSSRuleParsers[CSS_RULE_TOTAL_NUM];
+typedef int( *LCUI_CSSParserFunction )(LCUI_CSSParserContext ctx);
+
+struct LCUI_CSSParserRec_ {
 	LCUI_CSSParserFunction parse;
-} LCUI_CSSParserRec, *LCUI_CSSParser;
+};
 
-typedef struct LCUI_CSSRuleParserRec_ {
+struct LCUI_CSSRuleParserRec_ {
 	char name[32];
 	void *data;
 	LCUI_CSSParserFunction begin;
 	LCUI_CSSParserFunction parse;
-} LCUI_CSSRuleParserRec, *LCUI_CSSRuleParser;
-
-typedef LCUI_CSSParserRec LCUI_CSSParsers[CSS_TARGET_TOTAL_NUM];
-typedef LCUI_CSSRuleParserRec LCUI_CSSRuleParsers[CSS_RULE_TOTAL_NUM];
+};
 
 /** 样式的解析器 */
-typedef struct LCUI_StyleParserRec_ {
+struct LCUI_StyleParserRec_ {
 	int key;
 	char *name;
-	int( *parse )(LCUI_StyleSheet, int, const char*);
-} LCUI_StyleParserRec, *LCUI_StyleParser;
+	int( *parse )(LCUI_CSSParserStyleContext, const char*);
+};
 
-typedef struct LCUI_CSSParserStyleContext_ {
+struct LCUI_CSSParserStyleContextRec_ {
+	char *dirname;			/**< 当前所在的目录 */
+	const char *space;		/**< 样式记录所属的空间 */
 	LinkedList selectors;		/**< 当前匹配到的选择器列表 */
 	LCUI_StyleSheet sheet;		/**< 当前缓存的样式表 */
 	LCUI_StyleParser parser;	/**< 当前找到的样式属性解析器 */
-} LCUI_CSSParserStyleContext;
+};
 
-typedef struct LCUI_CSSParserCommentContext_ {
+struct LCUI_CSSParserCommentContextRec_ {
 	LCUI_BOOL is_line_comment;		/**< 是否为单行注释 */
 	LCUI_CSSParserTarget prev_target;	/**< 保存的上一个目标，解析完注释后将还原成该目标 */
-} LCUI_CSSParserCommentContext;
+};
 
-typedef struct LCUI_CSSParserRuleContext_ {
+struct LCUI_CSSParserRuleContextRec_ {
 	int state;			/**< 规则解析器的状态 */
 	LCUI_CSSRule rule;		/**< 当前规则 */
 	LCUI_CSSRuleParsers parsers;	/**< 规则解析器列表 */
-} LCUI_CSSParserRuleContext;
+};
 
 /** CSS 代码解析器的环境参数（上下文数据） */
-typedef struct LCUI_CSSParserContextRec_ {
+struct LCUI_CSSParserContextRec_ {
 	int pos;			/**< 缓存中的字符串的下标位置 */
 	const char *cur;		/**< 用于遍历字符串的指针 */
 	char *space;			/**< 样式记录所属的空间 */
@@ -135,18 +154,16 @@ typedef struct LCUI_CSSParserContextRec_ {
 	LCUI_CSSParserTarget target;		/**< 当前解析目标 */
 	LCUI_CSSParsers parsers;		/**< 可供使用的解析器列表 */
 
-	LCUI_CSSParserStyleContext style;
-	LCUI_CSSParserCommentContext comment;
-	LCUI_CSSParserRuleContext rule;
-} LCUI_CSSParserContextRec, *LCUI_CSSParserContext;
+	LCUI_CSSParserRuleContextRec rule;
+	LCUI_CSSParserStyleContextRec style;
+	LCUI_CSSParserCommentContextRec comment;
+};
 
 LCUI_API int LCUI_GetStyleValue( const char *str );
 
 LCUI_API const char *LCUI_GetStyleValueName( int val );
 
 LCUI_API const char *LCUI_GetStyleName( int key );
-
-LCUI_API int CSSValueParser_ParseUrl( const char *str, char *out_url );
 
 /** 初始化 LCUI 的 CSS 代码解析功能 */
 LCUI_API void LCUI_InitCSSParser( void );

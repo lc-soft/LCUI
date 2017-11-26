@@ -217,16 +217,16 @@ static int FontFace_ParseFontStyle( LCUI_CSSFontFace face, const char *str )
 	return 0;
 }
 
-static int FontFace_ParseSrc( LCUI_CSSFontFace face, const char *str )
+static int FontFace_ParseSrc( LCUI_CSSFontFace face, const char *str,
+			      const char *dirname )
 {
+	LCUI_StyleRec style;
+
 	if( face->src ) {
 		free( face->src );
 	}
-	face->src = malloc( strsize( str ) );
-	if( !face->src ) {
-		return -ENOMEM;
-	}
-	if( CSSValueParser_ParseUrl( str, face->src ) > 0 ) {
+	if( ParseUrl( &style, str, dirname ) ) {
+		face->src = style.val_string;
 		return 0;
 	}
 	free( face->src );
@@ -265,7 +265,8 @@ static int FontFaceParser_ParseValue( LCUI_CSSParserContext ctx )
 		FontFace_ParseFontWeight( data->face, ctx->buffer );
 		break;
 	case KEY_SRC:
-		FontFace_ParseSrc( data->face, ctx->buffer );
+		FontFace_ParseSrc( data->face, ctx->buffer,
+				   ctx->style.dirname );
 		break;
 	default: break;
 	}

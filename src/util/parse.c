@@ -43,7 +43,6 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/util/parse.h>
 
-/** 从字符串中解析出数值，包括px、%、dp等单位 */
 LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 {
 	int n = 0;
@@ -219,7 +218,6 @@ LCUI_BOOL ParseRGB( LCUI_Style var, const char *str )
 	return TRUE;
 }
 
-/** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A)、rgb(R,G,B) */
 LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 {
 	const char *p;
@@ -280,4 +278,56 @@ LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 		return TRUE;
 	}
 	return FALSE;
+}
+
+LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname )
+{
+	size_t n, dirname_len;
+	const char *p, *head, *tail;
+
+	p = str;
+	tail = head = strstr( p, "url(" );
+	if( !head ) {
+		return FALSE;
+	}
+	while( p ) {
+		tail = p;
+		p = strstr( p + 1, ")" );
+	}
+	if( tail == head ) {
+		return FALSE;
+	}
+	head += 4;
+	if( *head == '"' ) {
+		++head;
+	}
+	n = tail - head;
+	s->type = SVT_STRING;
+	if( dirname && head[0] != '/' ) {
+		n += (dirname_len = strlen( dirname ));
+		s->val_string = malloc( n * sizeof( char ) );
+		if( !s->val_string ) {
+			return FALSE;
+		}
+		strcpy( s->val_string, dirname );
+		if( s->val_string[dirname_len - 1] != '/' ) {
+			s->val_string[dirname_len] = '/';
+			dirname_len += 1;
+		}
+		strncpy( s->val_string + dirname_len, 
+			 head, n - dirname_len );
+		s->val_string[n] = 0;
+	} else {
+		s->val_string = malloc( n * sizeof( char ) );
+		if( !s->val_string ) {
+			return FALSE;
+		}
+		strncpy( s->val_string, head, n );
+	}
+	s->val_string[n] = 0;
+	if( n > 0 && s->val_string[n - 1] == '"' ) {
+		n -= 1;
+		s->val_string[n] = 0;
+	}
+	return TRUE;
 }

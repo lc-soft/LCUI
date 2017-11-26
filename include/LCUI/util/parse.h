@@ -52,6 +52,9 @@ LCUI_API LCUI_BOOL ParseRGBA( LCUI_Style var, const char *str );
 /** 从字符串中解析出色彩值，支持格式：#fff、#ffffff, rgba(R,G,B,A)、rgb(R,G,B) */
 LCUI_API LCUI_BOOL ParseColor( LCUI_Style var, const char *str );
 
+/** 解析资源路径 */
+LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname );
+
 LCUI_END_HEADER
 
 #endif
