@@ -305,7 +305,7 @@ LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname )
 	s->type = SVT_STRING;
 	if( dirname && head[0] != '/' ) {
 		n += (dirname_len = strlen( dirname ));
-		s->val_string = malloc( n * sizeof( char ) );
+		s->val_string = malloc( (n + 1) * sizeof( char ) );
 		if( !s->val_string ) {
 			return FALSE;
 		}
@@ -318,12 +318,13 @@ LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname )
 			 head, n - dirname_len );
 		s->val_string[n] = 0;
 	} else {
-		s->val_string = malloc( n * sizeof( char ) );
+		s->val_string = malloc( (n + 1) * sizeof( char ) );
 		if( !s->val_string ) {
 			return FALSE;
 		}
 		strncpy( s->val_string, head, n );
 	}
+	s->is_valid = TRUE;
 	s->val_string[n] = 0;
 	if( n > 0 && s->val_string[n - 1] == '"' ) {
 		n -= 1;

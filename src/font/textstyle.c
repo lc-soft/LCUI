@@ -62,14 +62,12 @@ void TextStyle_Init( LCUI_TextStyle *data )
 {
 	data->has_style = FALSE;
 	data->has_weight = FALSE;
-	data->has_decoration = FALSE;
 	data->has_family = FALSE;
 	data->has_back_color = FALSE;
 	data->has_fore_color = FALSE;
 	data->font_ids = NULL;
 	data->style = FONT_STYLE_NORMAL;
 	data->weight = FONT_WEIGHT_NORMAL;
-	data->decoration = FONT_DECORATION_NONE;
 	data->fore_color.value = 0xff333333;
 	data->back_color.value = 0xffffffff;
 	data->pixel_size = 13;

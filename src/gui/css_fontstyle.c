@@ -362,7 +362,6 @@ void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle *ts )
 	ts->has_family = FALSE;
 	ts->has_style = FALSE;
 	ts->has_back_color = FALSE;
-	ts->has_decoration = FALSE;
 	ts->has_pixel_size = TRUE;
 	ts->has_fore_color = TRUE;
 	ts->fore_color = fs->color;

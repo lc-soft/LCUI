@@ -102,8 +102,6 @@ typedef struct LCUI_CSSParserCommentContextRec_ LCUI_CSSParserCommentContextRec;
 typedef struct LCUI_CSSParserCommentContextRec_ *LCUI_CSSParserCommentContext;
 typedef struct LCUI_CSSParserRuleContextRec_ LCUI_CSSParserRuleContextRec;
 typedef struct LCUI_CSSParserRuleContextRec_ *LCUI_CSSParserRuleContext;
-typedef LCUI_CSSParserRec LCUI_CSSParsers[CSS_TARGET_TOTAL_NUM];
-typedef LCUI_CSSRuleParserRec LCUI_CSSRuleParsers[CSS_RULE_TOTAL_NUM];
 typedef int( *LCUI_CSSParserFunction )(LCUI_CSSParserContext ctx);
 
 struct LCUI_CSSParserRec_ {
@@ -116,6 +114,9 @@ struct LCUI_CSSRuleParserRec_ {
 	LCUI_CSSParserFunction begin;
 	LCUI_CSSParserFunction parse;
 };
+
+typedef LCUI_CSSParserRec LCUI_CSSParsers[CSS_TARGET_TOTAL_NUM];
+typedef LCUI_CSSRuleParserRec LCUI_CSSRuleParsers[CSS_RULE_TOTAL_NUM];
 
 /** 样式的解析器 */
 struct LCUI_StyleParserRec_ {

@@ -684,7 +684,7 @@ static int CSSParser_SetRuleParser( LCUI_CSSParserContext ctx,
 	LCUI_CSSRuleParser parser;
 	for( rule = CSS_RULE_NONE; rule < CSS_RULE_TOTAL_NUM; ++rule ) {
 		parser = &ctx->rule.parsers[rule];
-		if( !parser->name ) {
+		if( strlen(parser->name) < 1 ) {
 			continue;
 		}
 		if( strcmp( parser->name, name ) == 0 ) {

@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * textstyle.h -- text style processing module.
  *
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * textstyle.h -- 文本样式处理模块
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -62,27 +62,17 @@ typedef enum LCUI_FontWeight {
 	FONT_WEIGHT_BLACK = 900
 } LCUI_FontWeight;
 
-enum FontDecoration {
-	FONT_DECORATION_NONE,		/* 无装饰 */
-	FONT_DECORATION_BLINK,		/* 闪烁 */
-	FONT_DECORATION_UNDERLINE,	/* 下划线 */
-	FONT_DECORATION_LINE_THROUGH,	/* 贯穿线 */
-	FONT_DECORATION_OVERLINE	/* 上划线 */
-};
-
 typedef struct LCUI_TextStyle {
 	LCUI_BOOL has_family:1;
 	LCUI_BOOL has_style:1;
 	LCUI_BOOL has_weight:1;
-	LCUI_BOOL has_decoration:1;
 	LCUI_BOOL has_back_color:1;
 	LCUI_BOOL has_fore_color:1;
 	LCUI_BOOL has_pixel_size:1;
 
+	int style;
+	int weight;
 	int *font_ids;
-	int style:3;
-	int weight:3;
-	int decoration:4;
 
 	LCUI_Color fore_color;
 	LCUI_Color back_color;
