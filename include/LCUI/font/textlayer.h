@@ -44,7 +44,7 @@ LCUI_BEGIN_HEADER
 
 typedef struct TextCharRec_ {
         wchar_t char_code;		/**< 字符码 */
-        LCUI_TextStyle *style;		/**< 该字符使用的样式数据 */
+        LCUI_TextStyle style;		/**< 该字符使用的样式数据 */
 	const LCUI_FontBitmap *bitmap;	/**< 字体位图数据(只读) */
 } TextCharRec, *TextChar;
 
@@ -108,7 +108,7 @@ typedef struct LCUI_TextLayerRec_  {
 	LinkedList dirty_rect;		/**< 脏矩形记录 */
         int text_align;			/**< 文本的对齐方式 */
         TextRowListRec text_rows;	/**< 文本行列表 */
-        LCUI_TextStyle text_style;	/**< 文本全局样式 */
+        LCUI_TextStyleRec text_style;	/**< 文本全局样式 */
 	LinkedList style_cache;		/**< 样式缓存 */
 	int line_height;		/**< 全局文本行高度 */
 	struct {
@@ -254,7 +254,7 @@ LCUI_API int TextLayer_Draw( LCUI_TextLayer layer );
 LCUI_API void TextLayer_ClearInvalidRect( LCUI_TextLayer layer );
 
 /** 设置全局文本样式 */
-LCUI_API void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle *style );
+LCUI_API void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle style );
 
 /** 设置文本行的高度 */
 LCUI_API void TextLayer_SetLineHeight( LCUI_TextLayer layer, int height );

@@ -252,7 +252,7 @@ static int TextRow_InsertCopy( TextRow txtrow, int ins_pos, TextChar txtchar )
 }
 
 /** 更新字体位图 */
-static void TextChar_UpdateBitmap( TextChar ch, LCUI_TextStyle *style )
+static void TextChar_UpdateBitmap( TextChar ch, LCUI_TextStyle style )
 {
 	int i = 0;
 	int size = style->pixel_size;
@@ -675,7 +675,7 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 	const wchar_t *p;
 	int cur_col, cur_row, start_row, ins_x, ins_y;
 	LCUI_BOOL need_typeset, rect_has_added;
-	LCUI_TextStyle *style = NULL;
+	LCUI_TextStyle style = NULL;
 
 	if( !wstr ) {
 		return -1;
@@ -1224,13 +1224,69 @@ static void TextLayer_DrawChar( LCUI_TextLayer layer, TextChar ch,
 	}
 }
 
+static void TextLayer_DrawTextRow( LCUI_TextLayer layer, LCUI_Rect *area,
+				  LCUI_Graph *graph, LCUI_Pos layer_pos,
+				   TextRow txtrow, int y )
+{
+	TextChar txtchar;
+	LCUI_Pos ch_pos;
+	int baseline, col, x;
+	baseline = txtrow->text_height * 4 / 5;
+	x = TextLayer_GetRowStartX( layer, txtrow ) + layer->offset_x;
+	/* 确定从哪个文字开始绘制 */
+	for( col = 0; col < txtrow->length; ++col ) {
+		txtchar = txtrow->string[col];
+		/* 忽略无字体位图的文字 */
+		if( !txtchar->bitmap ) {
+			continue;
+		}
+		x += txtchar->bitmap->advance.x;
+		if( x > area->x ) {
+			x -= txtchar->bitmap->advance.x;
+			break;
+		}
+	}
+	/* 若一整行的文本都不在可绘制区域内 */
+	if( col >= txtrow->length ) {
+		y += txtrow->height;
+		return;
+	}
+	/* 遍历该行的文字 */
+	for( ; col < txtrow->length; ++col ) {
+		txtchar = txtrow->string[col];
+		if( !txtchar->bitmap ) {
+			continue;
+		}
+		/* 计算字体位图的绘制坐标 */
+		ch_pos.x = layer_pos.x + x;
+		ch_pos.y = layer_pos.y + y;
+		if( txtchar->style &&  txtchar->style->has_back_color ) {
+			LCUI_Rect rect;
+			rect.x = ch_pos.x;
+			rect.y = ch_pos.y;
+			rect.height = txtrow->height;
+			rect.width = txtchar->bitmap->advance.x;
+			Graph_FillRect( graph, txtchar->style->back_color,
+					&rect, TRUE );
+		}
+		ch_pos.x += txtchar->bitmap->left;
+		ch_pos.y += baseline;
+		ch_pos.y += (txtrow->height - baseline) / 2;
+		ch_pos.y -= txtchar->bitmap->top;
+		TextLayer_DrawChar( layer, txtchar, graph, ch_pos );
+		x += txtchar->bitmap->advance.x;
+		/* 如果超过绘制区域则不继续绘制该行文本 */
+		if( x > area->x + area->width ) {
+			break;
+		}
+	}
+}
+
 int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 			   LCUI_Pos layer_pos, LCUI_Graph *graph )
 {
+	int y, row;
 	TextRow txtrow;
-	TextChar txtchar;
-	LCUI_Pos ch_pos;
-	int x, y, row, col, baseline;
 
 	y = layer->offset_y;
 	/* 确定可绘制的最大区域范围 */
@@ -1249,47 +1305,8 @@ int TextLayer_DrawToGraph( LCUI_TextLayer layer, LCUI_Rect area,
 	}
 	for( ; row < layer->text_rows.length; ++row ) {
 		txtrow = TextLayer_GetRow( layer, row );
-		baseline = txtrow->text_height * 4 / 5;
-		x = TextLayer_GetRowStartX( layer, txtrow );
-		x += layer->offset_x;
-		/* 确定从哪个文字开始绘制 */
-		for( col = 0; col < txtrow->length; ++col ) {
-			txtchar = txtrow->string[col];
-			/* 忽略无字体位图的文字 */
-			if( !txtchar->bitmap ) {
-				continue;
-			}
-			x += txtchar->bitmap->advance.x;
-			if( x > area.x ) {
-				x -= txtchar->bitmap->advance.x;
-				break;
-			}
-		}
-		/* 若一整行的文本都不在可绘制区域内 */
-		if( col >= txtrow->length ) {
-			y += txtrow->height;
-			continue;
-		}
-		/* 遍历该行的文字 */
-		for( ; col < txtrow->length; ++col ) {
-			txtchar = txtrow->string[col];
-			if( !txtchar->bitmap ) {
-				continue;
-			}
-			/* 计算字体位图的绘制坐标 */
-			ch_pos.x = layer_pos.x + x;
-			ch_pos.y = layer_pos.y + y;
-			ch_pos.x += txtchar->bitmap->left;
-			ch_pos.y += baseline;
-			ch_pos.y += (txtrow->height - baseline) / 2;
-			ch_pos.y -= txtchar->bitmap->top;
-			TextLayer_DrawChar( layer, txtchar, graph, ch_pos );
-			x += txtchar->bitmap->advance.x;
-			/* 如果超过绘制区域则不继续绘制该行文本 */
-			if( x > area.x + area.width ) {
-				break;
-			}
-		}
+		TextLayer_DrawTextRow( layer, &area, graph,
+				       layer_pos, txtrow, y );
 		y += txtrow->height;
 		/* 超出绘制区域范围就不绘制了 */
 		if( y > area.y + area.height ) {
@@ -1334,7 +1351,7 @@ void TextLayer_ClearInvalidRect( LCUI_TextLayer layer )
 }
 
 /** 设置全局文本样式 */
-void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle *style )
+void TextLayer_SetTextStyle( LCUI_TextLayer layer, LCUI_TextStyle style )
 {
 	TextStyle_Destroy( &layer->text_style );
 	TextStyle_Copy( &layer->text_style, style );

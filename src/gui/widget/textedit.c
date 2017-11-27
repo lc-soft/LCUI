@@ -376,7 +376,7 @@ static void TextEdit_UpdateTextLayer( LCUI_Widget w )
 	LinkedList rects;
 	LCUI_RectF rect;
 	LCUI_TextEdit edit;
-	LCUI_TextStyle style;
+	LCUI_TextStyleRec style;
 	LinkedListNode *node;
 	LinkedList_Init( &rects );
 	scale = LCUIMetrics_GetScale();
@@ -929,7 +929,7 @@ static void TextEdit_OnPaint( LCUI_Widget w, LCUI_PaintContext paint )
 	TextLayer_DrawToGraph( edit->layer, rect, pos, &canvas );
 }
 
-static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *ts )
+static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle ts )
 {
 	LCUI_TextEdit edit = GetData( w );
 	TextLayer_SetTextStyle( edit->layer_placeholder, ts );
@@ -941,7 +941,7 @@ static void TextEdit_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *ts )
 
 static void TextEdit_OnUpdate( LCUI_Widget w )
 {
-	LCUI_TextStyle ts;
+	LCUI_TextStyleRec ts;
 	LCUI_TextEdit edit = GetData( w );
 	LCUI_CSSFontStyle fs = &edit->style;
 	CSSFontStyle_Compute( fs, w->style );

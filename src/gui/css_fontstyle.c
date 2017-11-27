@@ -355,7 +355,7 @@ void CSSFontStyle_Compute( LCUI_CSSFontStyle fs, LCUI_StyleSheet ss )
 	}
 }
 
-void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle *ts )
+void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle ts )
 {
 	size_t len;
 	ts->font_ids = NULL;

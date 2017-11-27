@@ -81,7 +81,7 @@ void CSSFontStyle_Destroy( LCUI_CSSFontStyle fs );
 
 void CSSFontStyle_Compute( LCUI_CSSFontStyle fs, LCUI_StyleSheet ss );
 
-void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle *ts );
+void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle ts );
 
 void LCUI_InitCSSFontStyle( void );
 

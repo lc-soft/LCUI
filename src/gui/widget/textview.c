@@ -125,7 +125,7 @@ static void TextView_SetTaskForLineHeight( LCUI_Widget w, int height )
 	Widget_AddTask( w, WTT_USER );
 }
 
-static void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle *style )
+static void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle style )
 {
 	LCUI_TextView txt = GetData( w );
 	TextLayer_SetTextStyle( txt->layer, style );
@@ -151,7 +151,7 @@ static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL enable )
 
 static void TextView_UpdateStyle( LCUI_Widget w )
 {
-	LCUI_TextStyle ts;
+	LCUI_TextStyleRec ts;
 	LCUI_TextView txt = GetData( w );
 	LCUI_CSSFontStyle fs = &txt->style;
 	const wchar_t *content = fs->content;

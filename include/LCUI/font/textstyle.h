@@ -62,7 +62,7 @@ typedef enum LCUI_FontWeight {
 	FONT_WEIGHT_BLACK = 900
 } LCUI_FontWeight;
 
-typedef struct LCUI_TextStyle {
+typedef struct LCUI_TextStyleRec_ {
 	LCUI_BOOL has_family:1;
 	LCUI_BOOL has_style:1;
 	LCUI_BOOL has_weight:1;
@@ -78,21 +78,21 @@ typedef struct LCUI_TextStyle {
 	LCUI_Color back_color;
 
 	int pixel_size;
-} LCUI_TextStyle;
+} LCUI_TextStyleRec, *LCUI_TextStyle;
 
 /** 初始化字体样式数据 */
-LCUI_API void TextStyle_Init ( LCUI_TextStyle *data );
+LCUI_API void TextStyle_Init( LCUI_TextStyle data );
 
-LCUI_API int TextStyle_Copy( LCUI_TextStyle *dst, LCUI_TextStyle *src );
+LCUI_API int TextStyle_Copy( LCUI_TextStyle dst, LCUI_TextStyle src );
 
-LCUI_API void TextStyle_Destroy( LCUI_TextStyle *data );
+LCUI_API void TextStyle_Destroy( LCUI_TextStyle data );
 
 /**
  * 设置字体
  * @param[in][out] ts 字体样式数据
  * @param[in] str 字体名称，如果有多个名称则用逗号分隔
  */
-LCUI_API int TextStyle_SetFont( LCUI_TextStyle *ts, const char *str );
+LCUI_API int TextStyle_SetFont( LCUI_TextStyle ts, const char *str );
 
 /*-------------------------- StyleTag --------------------------------*/
 
@@ -107,7 +107,7 @@ LCUI_API const wchar_t *ScanStyleEndingTag( const wchar_t *wstr, wchar_t *name )
 
 LCUI_API void StyleTags_Clear( LinkedList *tags );
 
-LCUI_API LCUI_TextStyle* StyleTags_GetTextStyle( LinkedList *tags );
+LCUI_API LCUI_TextStyle StyleTags_GetTextStyle( LinkedList *tags );
 
 /** 处理样式标签 */
 LCUI_API const wchar_t* StyleTags_GetStart( LinkedList *tags,
