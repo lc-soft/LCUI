@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ***************************************************************************/
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <LCUI_Build.h>
@@ -280,6 +281,17 @@ LCUI_BOOL ParseColor( LCUI_Style var, const char *str )
 	return FALSE;
 }
 
+static LCUI_BOOL IsAbsolutePath( const char *path )
+{
+	if( path[0] == '/' ) {
+		return TRUE;
+	}
+	if( isalpha( path[0] ) && path[1] == ':' && path[2] == '/' ) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
 LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname )
 {
 	size_t n, dirname_len;
@@ -303,7 +315,7 @@ LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname )
 	}
 	n = tail - head;
 	s->type = SVT_STRING;
-	if( dirname && head[0] != '/' ) {
+	if( dirname && !IsAbsolutePath( head ) ) {
 		n += (dirname_len = strlen( dirname ));
 		s->val_string = malloc( (n + 1) * sizeof( char ) );
 		if( !s->val_string ) {
@@ -314,7 +326,7 @@ LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname )
 			s->val_string[dirname_len] = '/';
 			dirname_len += 1;
 		}
-		strncpy( s->val_string + dirname_len, 
+		strncpy( s->val_string + dirname_len,
 			 head, n - dirname_len );
 		s->val_string[n] = 0;
 	} else {
