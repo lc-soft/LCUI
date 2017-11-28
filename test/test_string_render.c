@@ -11,7 +11,7 @@ int test_string_render( void )
 	LCUI_Pos pos = {0, 80};
 	LCUI_Rect area = {0, 0, 320, 240};
 	LCUI_TextLayer txt = TextLayer_New();
-	LCUI_TextStyle txtstyle;
+	LCUI_TextStyleRec txtstyle;
 
 	/* 初始化字体处理功能 */
 	LCUI_InitFont();
