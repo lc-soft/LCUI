@@ -42,26 +42,6 @@
 
 LCUI_BEGIN_HEADER
 
-/** 下面三种字体样式虽然有定义，但还未添加能够实现该字体样式效果的功能 */
-
-typedef enum LCUI_FontStyle {
-	FONT_STYLE_NORMAL,
-	FONT_STYLE_ITALIC,
-	FONT_STYLE_OBLIQUE
-} LCUI_FontStyle;
-
-typedef enum LCUI_FontWeight {
-	FONT_WEIGHT_THIN = 100,
-	FONT_WEIGHT_EXTRA_LIGHT = 200,
-	FONT_WEIGHT_LIGHT = 300,
-	FONT_WEIGHT_NORMAL = 400,
-	FONT_WEIGHT_MEDIUM = 500,
-	FONT_WEIGHT_SEMI_BOLD = 600,
-	FONT_WEIGHT_BOLD = 700,
-	FONT_WEIGHT_EXTRA_BOLD = 800,
-	FONT_WEIGHT_BLACK = 900
-} LCUI_FontWeight;
-
 typedef struct LCUI_TextStyleRec_ {
 	LCUI_BOOL has_family:1;
 	LCUI_BOOL has_style:1;

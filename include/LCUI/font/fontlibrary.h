@@ -42,6 +42,25 @@
 
 LCUI_BEGIN_HEADER
 
+typedef enum LCUI_FontStyle {
+	FONT_STYLE_NORMAL,
+	FONT_STYLE_ITALIC,
+	FONT_STYLE_OBLIQUE,
+	FONT_STYLE_TOTAL_NUM
+} LCUI_FontStyle;
+
+typedef enum LCUI_FontWeight {
+	FONT_WEIGHT_THIN = 100,
+	FONT_WEIGHT_EXTRA_LIGHT = 200,
+	FONT_WEIGHT_LIGHT = 300,
+	FONT_WEIGHT_NORMAL = 400,
+	FONT_WEIGHT_MEDIUM = 500,
+	FONT_WEIGHT_SEMI_BOLD = 600,
+	FONT_WEIGHT_BOLD = 700,
+	FONT_WEIGHT_EXTRA_BOLD = 800,
+	FONT_WEIGHT_BLACK = 900
+} LCUI_FontWeight;
+
 /** 字体位图数据 */
 typedef struct LCUI_FontBitmap_ {
 	int top;		/**< 与顶边框的距离 */
@@ -57,18 +76,18 @@ typedef struct LCUI_FontBitmap_ {
 
 typedef struct LCUI_FontEngine LCUI_FontEngine;
 
-typedef struct LCUI_Font {
+typedef struct LCUI_FontRec_ {
 	int id;                         /**< 字体信息ID */
 	char *style_name;		/**< 样式名称 */
 	char *family_name;		/**< 字族名称 */
 	void *data;			/**< 相关数据 */
 	LCUI_FontEngine *engine;	/**< 所属的字体引擎 */
-} LCUI_Font;
+} LCUI_FontRec, *LCUI_Font;
 
 struct LCUI_FontEngine {
 	char name[64];
-	int (*open)(const char*, LCUI_Font***);
-	int (*render)(LCUI_FontBitmap*, wchar_t, int, LCUI_Font*);
+	int (*open)(const char*, LCUI_Font**);
+	int (*render)(LCUI_FontBitmap*, wchar_t, int, LCUI_Font);
 	void (*close)(void*);
 };
 
@@ -108,14 +127,11 @@ LCUI_API int FontBitmap_Mix( LCUI_Graph *graph, LCUI_Pos pos,
 			     const LCUI_FontBitmap *bmp, LCUI_Color color );
 
 /** 载入字体位图 */
-LCUI_API int FontBitmap_Load( LCUI_FontBitmap *buff, wchar_t ch,
+LCUI_API int LCUIFont_RenderBitmap( LCUI_FontBitmap *buff, wchar_t ch,
 			   int font_id, int pixel_size );
 
-/** 初始化字体数据库 */
-LCUI_API void FontLIB_Init( void );
-
 /** 添加字体族，并返回该字族的ID */
-LCUI_API int LCUIFont_Add( LCUI_Font *font );
+LCUI_API int LCUIFont_Add( LCUI_Font font );
 
 /**
  * 获取字体的ID
@@ -123,7 +139,7 @@ LCUI_API int LCUIFont_Add( LCUI_Font *font );
  * @param[in] style_name 风格名称，若设为 NULL，则默认获取 regular 风格或
  * 字体中记录的最后一个风格
  */
-LCUI_API int LCUIFont_GetId( const char *family_name, const char *style_name );
+LCUI_API int LCUIFont_GetId( const char *family_name, LCUI_FontStyle style );
 
 /**
  * 根据字族名称获取对应的字体 ID 列表
@@ -133,7 +149,7 @@ LCUI_API int LCUIFont_GetId( const char *family_name, const char *style_name );
  * @param[in] names 字族名称，多个名字用逗号隔开
  * @return 获取到的字体 ID 的数量
  */
-LCUI_API size_t LCUIFont_GetIdByNames( int **ids, const char *style, const char *names );
+LCUI_API size_t LCUIFont_GetIdByNames( int **ids, LCUI_FontStyle style, const char *names );
 
 /** 获取默认的字体ID */
 LCUI_API int LCUIFont_GetDefault( void );
@@ -169,10 +185,10 @@ LCUI_API int LCUIFont_GetBitmap( wchar_t ch, int font_id, int size,
 LCUI_API int LCUIFont_LoadFile( const char *filepath );
 
 /** 初始化字体处理模块 */
-LCUI_API void LCUI_InitFont( void );
+LCUI_API void LCUI_InitFontLibrary( void );
 
 /** 停用字体处理模块 */
-LCUI_API void LCUI_FreeFont( void );
+LCUI_API void LCUI_FreeFontLibrary( void );
 
 LCUI_END_HEADER
 

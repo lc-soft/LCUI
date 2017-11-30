@@ -109,6 +109,17 @@ size_t strtolower( char *outstr, const char *instr )
 	return ip - instr;
 }
 
+size_t strntolower( char *outstr, size_t max_len, const char *instr )
+{
+	char *op = outstr;
+	const char *ip = instr;
+	for( ; *ip && max_len > 1; ++ip, ++op, --max_len ) {
+		*op = tolower( *ip );
+	}
+	*op = 0;
+	return ip - instr;
+}
+
 char *strdup2( const char *str )
 {
 	size_t len = strlen( str ) + 1;

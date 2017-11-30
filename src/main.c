@@ -490,7 +490,7 @@ void LCUI_InitBase( void )
 	LCUI_ShowCopyrightText();
 	/* 初始化各个模块 */
 	LCUI_InitEvent();
-	LCUI_InitFont();
+	LCUI_InitFontLibrary();
 	LCUI_InitTimer();
 	LCUI_InitKeyboard();
 	LCUI_InitWidget();
@@ -520,7 +520,7 @@ int LCUI_Destroy( void )
 	LCUI_FreeKeyboard();
 	LCUI_FreeCursor();
 	LCUI_FreeWidget();
-	LCUI_FreeFont();
+	LCUI_FreeFontLibrary();
 	LCUI_FreeTimer();
 	LCUI_FreeEvent();
 	LCUI_FreeMetrics();

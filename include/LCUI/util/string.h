@@ -73,6 +73,8 @@ LCUI_API size_t wcssize( const wchar_t *str );
 /** 将字符串中的字母转成小写字母 */
 LCUI_API size_t strtolower( char *outstr, const char *instr );
 
+LCUI_API size_t strntolower( char *outstr, size_t max_len, const char *instr );
+
 /**
  * 清除字符串首尾的字符
  * @param[out] outstr 处理后的字符串

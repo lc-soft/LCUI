@@ -105,9 +105,9 @@ void TextStyle_Destroy( LCUI_TextStyle data )
  */
 int TextStyle_SetFont( LCUI_TextStyle ts, const char *str )
 {
+	const char *p;
 	char name[256];
 	int count, i, *ids;
-	const char *p, *style_name;
 
 	if( ts->has_family && ts->font_ids ) {
 		free( ts->font_ids );
@@ -130,12 +130,6 @@ int TextStyle_SetFont( LCUI_TextStyle ts, const char *str )
 		return -2;
 	}
 	ids[count] = -1;
-	switch( ts->style ) {
-	case FONT_STYLE_OBLIQUE: style_name = "oblique"; break;
-	case FONT_STYLE_ITALIC: style_name = "italic"; break;
-	case FONT_STYLE_NORMAL:
-	default: style_name = NULL; break;
-	}
 	for( p = str, count = 0, i = 0; ; ++p ) {
 		if( *p != ',' && *p ) {
 			name[i++] = *p;
@@ -143,7 +137,7 @@ int TextStyle_SetFont( LCUI_TextStyle ts, const char *str )
 		}
 		name[i] = 0;
 		strtrim( name, name, "'\"\n\r\t " );
-		ids[count] = LCUIFont_GetId( name, style_name );
+		ids[count] = LCUIFont_GetId( name, ts->style );
 		if( ids[count] > 0 ) {
 			++count;
 		}

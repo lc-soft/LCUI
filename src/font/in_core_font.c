@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * in_core_font.c -- basic in-core font-engine.
  *
- * Copyright (C) 2015-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -47,17 +47,17 @@ enum in_core_font_type {
 	FONT_INCONSOLATA
 };
 
-static int InCoreFont_Open( const char *filepath, LCUI_Font ***outfonts )
+static int InCoreFont_Open( const char *filepath, LCUI_Font **outfonts )
 {
 	int *code;
-	LCUI_Font **fonts, *font;
+	LCUI_Font *fonts, font;
 	if( strcmp( filepath, "in-core.inconsolata" ) != 0 ) {
 		return 0;
 	}
 	code = malloc( sizeof( int ) );
 	*code = FONT_INCONSOLATA;
-	fonts = malloc( sizeof( LCUI_Font* ) );
-	font = malloc( sizeof( LCUI_Font ) );
+	fonts = malloc( sizeof( LCUI_Font ) );
+	font = malloc( sizeof( LCUI_FontRec ) );
 	font->family_name = strdup2( "inconsolata" );
 	font->style_name = strdup2( "Regular" );
 	font->data = code;
@@ -72,7 +72,7 @@ static void InCoreFont_Close( void *face )
 }
 
 static int InCoreFont_Render( LCUI_FontBitmap *bmp, wchar_t ch,
-			      int pixel_size, LCUI_Font *font )
+			      int pixel_size, LCUI_Font font )
 {
 	int *code = (int*)font->data;
 	switch( *code ) {

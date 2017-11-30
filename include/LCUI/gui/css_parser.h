@@ -40,7 +40,7 @@
 #ifndef LCUI_CSS_PARSER_H
 #define LCUI_CSS_PARSER_H
 
-#include <LCUI/font/textstyle.h>
+#include <LCUI/font/fontlibrary.h>
 
 LCUI_BEGIN_HEADER
 

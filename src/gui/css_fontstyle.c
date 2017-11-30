@@ -236,7 +236,6 @@ static void OnComputeColor( LCUI_CSSFontStyle fs, LCUI_Style s )
 
 static void OnComputeFontFamily( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
-	const char *style;
 	if( fs->font_ids ) {
 		free( fs->font_ids );
 		fs->font_ids = NULL;
@@ -248,14 +247,9 @@ static void OnComputeFontFamily( LCUI_CSSFontStyle fs, LCUI_Style s )
 	if( !s->is_valid ) {
 		return;
 	}
-	switch( fs->font_style ) {
-	case FONT_STYLE_OBLIQUE: style = "oblique"; break;
-	case FONT_STYLE_ITALIC: style = "italic"; break;
-	case FONT_STYLE_NORMAL:
-	default: style = NULL; break;
-	}
 	fs->font_family = strdup2( s->string );
-	LCUIFont_GetIdByNames( &fs->font_ids, style, fs->font_family );
+	LCUIFont_GetIdByNames( &fs->font_ids,
+			       fs->font_style, fs->font_family );
 }
 
 static void OnComputeFontStyle( LCUI_CSSFontStyle fs, LCUI_Style s )

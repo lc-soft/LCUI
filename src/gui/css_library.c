@@ -942,6 +942,15 @@ LCUI_Selector Selector( const char *selector )
 		return NULL;
 	}
 	if( is_saving ) {
+		if( !node ) {
+			node = NEW( LCUI_SelectorNodeRec, 1 );
+			if( si >= MAX_SELECTOR_DEPTH ) {
+				_DEBUG_MSG( "%s: selector node list is too long.\n",
+					    selector );
+				return NULL;
+			}
+			s->nodes[si] = node;
+		}
 		rank = SelectorNode_Save( s->nodes[si], name, ni, type );
 		if( rank > 0 ) {
 			SelectorNode_Update( s->nodes[si] );
