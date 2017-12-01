@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -146,7 +147,21 @@ static LCUI_FontStyle GetFontStyle( const char *str )
 int LCUIFont_Add( LCUI_Font font )
 {
 	LCUI_FontStyle style;
-	LCUI_FontFamilyNode fn;
+	LCUI_FontFamilyNode node;
+	style = GetFontStyle( font->style_name );
+	node = SelectFontFamliy( font->family_name );
+	if( !node ) {
+		node = NEW( LCUI_FontFamilyNodeRec, 1 );
+		node->family_name = strdup2( font->family_name );
+		memset( node->styles, 0, sizeof( node->styles ) );
+		Dict_Add( fontlib.font_families, node->family_name, node );
+	}
+	if( node->styles[style] ) {
+		font->id = node->styles[style]->id;
+		DestroyFont( node->styles[style] );
+	} else {
+		font->id = ++fontlib.count;
+	}
 	if( font->id >= fontlib.font_cache_num * FONT_CACHE_SIZE ) {
 		size_t size;
 		LCUI_Font **caches, *cache;
@@ -155,30 +170,16 @@ int LCUIFont_Add( LCUI_Font font )
 		caches = realloc( fontlib.font_cache, size );
 		if( !caches ) {
 			fontlib.font_cache_num -= 1;
-			return -1;
+			return -ENOMEM;
 		}
 		cache = NEW( LCUI_Font, FONT_CACHE_SIZE );
 		if( !cache ) {
-			return -2;
+			return -ENOMEM;
 		}
 		caches[fontlib.font_cache_num - 1] = cache;
 		fontlib.font_cache = caches;
 	}
-	fn = SelectFontFamliy( font->family_name );
-	if( !fn ) {
-		fn = NEW( LCUI_FontFamilyNodeRec, 1 );
-		fn->family_name = strdup2( font->family_name );
-		memset( fn->styles, 0, sizeof( fn->styles ) );
-		Dict_Add( fontlib.font_families, fn->family_name, fn );
-	}
-	style = GetFontStyle( font->style_name );
-	if( fn->styles[style] ) {
-		font->id = fn->styles[style]->id;
-		DestroyFont( fn->styles[style] );
-	} else {
-		font->id = ++fontlib.count;
-	}
-	fn->styles[style] = font;
+	node->styles[style] = font;
 	SetFontCache( font );
 	return font->id;
 }
