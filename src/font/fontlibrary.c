@@ -56,10 +56,17 @@
  * 位图。
  */
 
+typedef struct LCUI_FontStyleNodeRec_ {
+	/* 字体列表，按粗细程度存放 */
+	LCUI_Font weights[FONT_WEIGHT_TOTAL_NUM];
+} LCUI_FontStyleNodeRec, *LCUI_FontStyleNode;
+
+typedef LCUI_FontStyleNodeRec LCUI_FontStyleList[FONT_STYLE_TOTAL_NUM];
+
 /** 字体字族索引结点 */
 typedef struct LCUI_FontFamilyNodeRec_ {
-	char *family_name;			/**< 字体的字族名称  */
-	LCUI_Font styles[FONT_STYLE_TOTAL_NUM];	/**< 字体的风格记录 */
+	char *family_name;		/**< 字体的字族名称  */
+	LCUI_FontStyleList styles;	/**< 字体列表，按风格存放 */
 } LCUI_FontFamilyNodeRec, *LCUI_FontFamilyNode;
 
 /** 字体路径索引结点 */
@@ -88,6 +95,11 @@ static struct LCUI_FontLibraryModule {
 #define SelectBitmap(font, size) (LCUI_FontBitmap*)RBTree_GetData( font, size )
 #define SelectFontFamliy(family_name) (LCUI_FontFamilyNode)\
 	Dict_FetchValue( fontlib.font_families, family_name );
+#define SelectFontStyle(FNODE, S) (&(FNODE)->styles[S])
+#define SelectFontWeight(SNODE, W) ((SNODE)->weights[W / 100 - 1])
+#define SetFontWeight(SNODE, FONT) do {\
+	(SNODE)->weights[(FONT)->weight / 100 - 1] = FONT;\
+} while( 0 );
 #define SelectFontCache(id) \
 	fontlib.font_cache[fontlib.font_cache_num-1][id % FONT_CACHE_SIZE]
 
@@ -95,7 +107,64 @@ static struct LCUI_FontLibraryModule {
 	SelectFontCache(font->id) = font;\
 } while( 0 );
 
-static void DestroyFont( LCUI_Font font )
+LCUI_FontWeight LCUIFont_DetechWeight( const char *str )
+{
+	char *buf = malloc( strsize( str ) );
+	strtolower( buf, str );
+	if( strstr( buf, "bold" ) ) {
+		return FONT_WEIGHT_BOLD;
+	}
+	if( strstr( buf, "thin" ) ) {
+		return FONT_WEIGHT_THIN;
+	}
+	if( strstr( buf, "light" ) ) {
+		return FONT_WEIGHT_EXTRA_LIGHT;
+	}
+	if( strstr( buf, "semilight" ) ) {
+		return FONT_WEIGHT_LIGHT;
+	}
+	if( strstr( buf, "medium" ) ) {
+		return FONT_WEIGHT_MEDIUM;
+	}
+	if( strstr( buf, "semibold" ) ) {
+		return FONT_WEIGHT_SEMI_BOLD;
+	}
+	if( strstr( buf, "bold" ) ) {
+		return FONT_WEIGHT_BOLD;
+	}
+	if( strstr( buf, "black" ) ) {
+		return FONT_WEIGHT_BLACK;
+	}
+	return FONT_WEIGHT_NORMAL;
+}
+
+LCUI_FontStyle LCUIFont_DetechStyle( const char *str )
+{
+	char *buf = malloc( strsize( str ) );
+	strtolower( buf, str );
+	if( strstr( buf, "oblique" ) ) {
+		return FONT_STYLE_OBLIQUE;
+	}
+	if( strstr( buf, "italic" ) ) {
+		return FONT_STYLE_ITALIC;
+	}
+	return FONT_STYLE_NORMAL;
+}
+
+LCUI_Font Font( const char *family_name, const char *style_name )
+{
+	ASSIGN( font, LCUI_Font );
+	font->id = 0;
+	font->data = NULL;
+	font->engine = NULL;
+	font->family_name = strdup2( family_name );
+	font->style_name = strdup2( style_name );
+	font->weight = LCUIFont_DetechWeight( style_name );
+	font->style = LCUIFont_DetechStyle( style_name );
+	return font;
+}
+
+void DeleteFont( LCUI_Font font )
 {
 	free( font->family_name );
 	free( font->style_name );
@@ -128,27 +197,11 @@ static void DestroyTreeNode( void *arg )
 	free( arg );
 }
 
-static LCUI_FontStyle GetFontStyle( const char *str )
-{
-	char name[64];
-	if( !str ) {
-		return FONT_STYLE_NORMAL;
-	}
-	strntolower( name, 64, str );
-	if( strcmp( name, "italic" ) == 0 ) {
-		return FONT_STYLE_ITALIC;
-	}
-	if( strcmp( name, "oblique" ) == 0 ) {
-		return FONT_STYLE_OBLIQUE;
-	}
-	return FONT_STYLE_NORMAL;
-}
-
 int LCUIFont_Add( LCUI_Font font )
 {
-	LCUI_FontStyle style;
+	LCUI_Font exists_font;
 	LCUI_FontFamilyNode node;
-	style = GetFontStyle( font->style_name );
+	LCUI_FontStyleNode snode;
 	node = SelectFontFamliy( font->family_name );
 	if( !node ) {
 		node = NEW( LCUI_FontFamilyNodeRec, 1 );
@@ -156,9 +209,15 @@ int LCUIFont_Add( LCUI_Font font )
 		memset( node->styles, 0, sizeof( node->styles ) );
 		Dict_Add( fontlib.font_families, node->family_name, node );
 	}
-	if( node->styles[style] ) {
-		font->id = node->styles[style]->id;
-		DestroyFont( node->styles[style] );
+	snode = SelectFontStyle( node, font->style );
+	exists_font = SelectFontWeight( snode, font->weight );
+	if( exists_font ) {
+		font->id = exists_font->id;
+		if( fontlib.default_font &&
+		    font->id == fontlib.default_font->id ) {
+			fontlib.default_font = font;
+		}
+		DeleteFont( exists_font );
 	} else {
 		font->id = ++fontlib.count;
 	}
@@ -179,7 +238,7 @@ int LCUIFont_Add( LCUI_Font font )
 		caches[fontlib.font_cache_num - 1] = cache;
 		fontlib.font_cache = caches;
 	}
-	node->styles[style] = font;
+	SetFontWeight( snode, font );
 	SetFontCache( font );
 	return font->id;
 }
@@ -196,7 +255,42 @@ static LCUI_Font LCUIFont_GetById( int id )
 	return SelectFontCache( id );
 }
 
-size_t LCUIFont_GetIdByNames( int **font_ids, LCUI_FontStyle style,
+size_t LCUIFont_UpdateWeight( const int *font_ids,
+			      LCUI_FontWeight weight,
+			      int **new_font_ids )
+{
+	int id, *ids;
+	LCUI_Font font;
+	size_t i, count, len;
+
+	if( !font_ids ) {
+		return 0;
+	}
+	for( len = 0; font_ids[len] != -1; ++len );
+	if( len < 1 ) {
+		return 0;
+	}
+	ids = malloc( (len + 1) * sizeof( int ) );
+	if( !ids ) {
+		return 0;
+	}
+	for( i = 0, count = 0; i < len; ++i ) {
+		font = LCUIFont_GetById( font_ids[i] );
+		id = LCUIFont_GetId( font->family_name, font->style, weight );
+		if( id > 0 ) {
+			ids[count++] = id;
+		}
+	}
+	ids[count] = 0;
+	if( new_font_ids ) {
+		*new_font_ids = ids;
+	}
+	return count;
+}
+
+size_t LCUIFont_GetIdByNames( int **font_ids,
+			      LCUI_FontStyle style,
+			      LCUI_FontWeight weight,
 			      const char *names )
 {
 	int *ids;
@@ -220,7 +314,6 @@ size_t LCUIFont_GetIdByNames( int **font_ids, LCUI_FontStyle style,
 	if( !ids ) {
 		return 0;
 	}
-	ids[count] = -1;
 	for( p = names, count = 0, i = 0; ; ++p ) {
 		if( *p != ',' && *p ) {
 			name[i++] = *p;
@@ -228,7 +321,7 @@ size_t LCUIFont_GetIdByNames( int **font_ids, LCUI_FontStyle style,
 		}
 		name[i] = 0;
 		strtrim( name, name, "'\"\n\r\t " );
-		ids[count] = LCUIFont_GetId( name, style );
+		ids[count] = LCUIFont_GetId( name, style, weight );
 		if( ids[count] > 0 ) {
 			++count;
 		}
@@ -237,6 +330,7 @@ size_t LCUIFont_GetIdByNames( int **font_ids, LCUI_FontStyle style,
 			break;
 		}
 	}
+	ids[count] = -1;
 	if( count < 1 ) {
 		free( ids );
 		ids = NULL;
@@ -245,10 +339,66 @@ size_t LCUIFont_GetIdByNames( int **font_ids, LCUI_FontStyle style,
 	return count;
 }
 
-int LCUIFont_GetId( const char *family_name, LCUI_FontStyle style )
+static LCUI_FontWeight FindBolderWeight( LCUI_FontStyleNode snode,
+					  LCUI_FontWeight weight )
 {
-	LCUI_Font font = NULL;
+	for( weight += 100; weight <= FONT_WEIGHT_BLACK; weight += 100 ) {
+		if( SelectFontWeight( snode, weight ) ) {
+			return weight;
+		}
+	}
+	return FONT_WEIGHT_NONE;
+}
+
+static LCUI_FontWeight FindLighterWeight( LCUI_FontStyleNode snode,
+					  LCUI_FontWeight weight )
+{
+	for( weight -= 100; weight >= FONT_WEIGHT_THIN; weight -= 100 ) {
+		if( SelectFontWeight( snode, weight ) ) {
+			return weight;
+		}
+	}
+	return FONT_WEIGHT_NONE;
+}
+
+/**
+ * 在未找到指定粗细程度的字体时进行回退，找到合适的字体
+ * 回退规则的参考文档：https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight#Fallback_weights
+ */
+static LCUI_FontWeight FontWeightFallback( LCUI_FontStyleNode snode,
+					   LCUI_FontWeight weight )
+{
+	if( weight > FONT_WEIGHT_MEDIUM ) {
+		return FindBolderWeight( snode, weight );
+	}
+	if( weight < FONT_WEIGHT_NORMAL ) {
+		return FindLighterWeight( snode, weight );
+	}
+	if( weight == FONT_WEIGHT_NORMAL ) {
+		if( SelectFontWeight( snode, FONT_WEIGHT_MEDIUM ) ) {
+			return FONT_WEIGHT_MEDIUM;
+		}
+	} else if( weight == FONT_WEIGHT_MEDIUM ) {
+		if( SelectFontWeight( snode, FONT_WEIGHT_NORMAL ) ) {
+			return FONT_WEIGHT_NORMAL;
+		}
+	}
+	weight = FindLighterWeight( snode, weight );
+	if( weight != FONT_WEIGHT_NONE ) {
+		return weight;
+	}
+	return FONT_WEIGHT_NONE;
+}
+
+int LCUIFont_GetId( const char *family_name,
+		    LCUI_FontStyle style,
+		    LCUI_FontWeight weight )
+{
+	LCUI_FontStyle s;
+	LCUI_FontWeight w;
+	LCUI_FontStyleNode snode;
 	LCUI_FontFamilyNode fnode;
+
 	if( !fontlib.is_inited ) {
 		return -1;
 	}
@@ -256,12 +406,18 @@ int LCUIFont_GetId( const char *family_name, LCUI_FontStyle style )
 	if( !fnode ) {
 		return -2;
 	}
-	while( style >= FONT_STYLE_NORMAL ) {
-		font = fnode->styles[style];
-		if( font ) {
-			return font->id;
+	if( weight == 0 ) {
+		weight = FONT_WEIGHT_NORMAL;
+	}
+	for( s = style; s >= FONT_STYLE_NORMAL; --s ) {
+		snode = &fnode->styles[s];
+		if( SelectFontWeight( snode, weight ) ) {
+			return SelectFontWeight( snode, weight )->id;
 		}
-		style -= 1;
+		w = FontWeightFallback( snode, weight );
+		if( w ) {
+			return SelectFontWeight( snode, w )->id;
+		}
 	}
 	return -3;
 }
@@ -276,11 +432,10 @@ int LCUIFont_GetDefault( void )
 
 void LCUIFont_SetDefault( int id )
 {
-	LCUI_Font p;
-	p = LCUIFont_GetById( id );
-	if( p ) {
-		fontlib.default_font = p;
-		LOG("[font] select: %s\n", p->family_name);
+	LCUI_Font font = LCUIFont_GetById( id );
+	if( font ) {
+		fontlib.default_font = font;
+		LOG( "[font] select: %s\n", font->family_name );
 	}
 }
 
@@ -657,7 +812,7 @@ void LCUI_InitFontLibrary( void )
 	fontlib.engine = &fontlib.engines[0];
 	LCUIFont_InitInCoreFont( fontlib.engine );
 	LCUIFont_LoadFile( "in-core.inconsolata" );
-	fid = LCUIFont_GetId( "inconsolata", FONT_STYLE_NORMAL );
+	fid = LCUIFont_GetId( "inconsolata", 0, 0 );
 	fontlib.incore_font = LCUIFont_GetById( fid );
 	fontlib.default_font = fontlib.incore_font;
 	/* 然后看情况启用其它字体引擎 */
@@ -676,8 +831,7 @@ void LCUI_InitFontLibrary( void )
 		LCUIFont_LoadFile( fonts[i].path );
 	}
 	for( i = MAX_FONTFILE_NUM - 1; i >= 0; --i ) {
-		LCUI_FontStyle style = GetFontStyle( fonts[i].style );
-		fid = LCUIFont_GetId( fonts[i].family, style );
+		fid = LCUIFont_GetId( fonts[i].family, 0, 0 );
 		if( fid > 0 ) {
 			LCUIFont_SetDefault( fid );
 			break;
@@ -699,7 +853,7 @@ void LCUI_FreeFontLibrary( void )
 		for( i = 0; i < FONT_CACHE_SIZE; ++i ) {
 			font = fontlib.font_cache[fontlib.font_cache_num][i];
 			if( font ) {
-				DestroyFont( font );
+				DeleteFont( font );
 			}
 		}
 		free( fontlib.font_cache[fontlib.font_cache_num] );

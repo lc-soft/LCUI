@@ -48,9 +48,11 @@ enum LCUI_TextStyleTagType {
 	TEXT_STYLE_FAMILY,
 	TEXT_STYLE_STYLE,
 	TEXT_STYLE_WIEGHT,
+	TEXT_STYLE_BOLD,
 	TEXT_STYLE_SIZE,
 	TEXT_STYLE_COLOR,
-	TEXT_STYLE_BG_COLOR
+	TEXT_STYLE_BG_COLOR,
+	TEXT_STYLE_TOTAL_NUM
 };
 
 typedef struct LCUI_StyleTag {
@@ -98,67 +100,37 @@ void TextStyle_Destroy( LCUI_TextStyle data )
 	data->font_ids = NULL;
 }
 
-/**
- * 设置字体
- * @param[in][out] ts 字体样式数据
- * @param[in] str 字体名称，如果有多个名称则用逗号分隔
- */
+int TextStyle_SetWeight( LCUI_TextStyle ts, LCUI_FontWeight weight )
+{
+	int *font_ids;
+	ts->weight = weight;
+	ts->has_weight = TRUE;
+	if( LCUIFont_UpdateWeight( ts->font_ids, weight, &font_ids ) > 0 ) {
+		free( ts->font_ids );
+		ts->font_ids = font_ids;
+		return 0;
+	}
+	return -1;
+}
+
 int TextStyle_SetFont( LCUI_TextStyle ts, const char *str )
 {
-	const char *p;
-	char name[256];
-	int count, i, *ids;
-
+	size_t count;
 	if( ts->has_family && ts->font_ids ) {
 		free( ts->font_ids );
 	}
 	ts->font_ids = NULL;
-	if( !str ) {
-		ts->has_family = FALSE;
-		return -1;
-	}
-	for( p = str, count = 1; *p; ++p ) {
-		if( *p == ',' ) {
-			++count;
-		}
-	}
-	if( p - str == 0 ) {
-		return -1;
-	}
-	ids = NEW( int, count + 1 );
-	if( !ids ) {
-		return -2;
-	}
-	ids[count] = -1;
-	for( p = str, count = 0, i = 0; ; ++p ) {
-		if( *p != ',' && *p ) {
-			name[i++] = *p;
-			continue;
-		}
-		name[i] = 0;
-		strtrim( name, name, "'\"\n\r\t " );
-		ids[count] = LCUIFont_GetId( name, ts->style );
-		if( ids[count] > 0 ) {
-			++count;
-		}
-		i = 0;
-		if( !*p ) {
-			break;
-		}
-	}
+	ts->has_family = FALSE;
+	count = LCUIFont_GetIdByNames( &ts->font_ids, ts->style,
+				       ts->weight, str );
 	if( count > 0 ) {
 		ts->has_family = TRUE;
-		ts->font_ids = ids;
-	} else {
-		ts->has_family = FALSE;
-		ts->font_ids = NULL;
-		free( ids );
+		return 0;
 	}
-	return 0;
+	return -1;
 }
 
 /*-------------------------- StyleTag --------------------------------*/
-#define MAX_TAG_NUM 3
 
 void StyleTags_Clear( LinkedList *tags )
 {
@@ -168,10 +140,12 @@ void StyleTags_Clear( LinkedList *tags )
 /** 获取当前的文本样式 */
 LCUI_TextStyle StyleTags_GetTextStyle( LinkedList *tags )
 {
+	int count = 0;
 	LinkedListNode *node;
 	LCUI_TextStyleTag *tag;
 	LCUI_TextStyle style;
-	int count = 0, found_tags[MAX_TAG_NUM] = { 0 };
+	LCUI_BOOL found_tags[TEXT_STYLE_TOTAL_NUM] = { 0 };
+
 	if( tags->length <= 0 ) {
 		return NULL;
 	}
@@ -182,35 +156,43 @@ LCUI_TextStyle StyleTags_GetTextStyle( LinkedList *tags )
 		tag = node->data;
 		switch( tag->id ) {
 		case TEXT_STYLE_COLOR:
-			if( found_tags[0] != 0 ) {
+			if( found_tags[tag->id] ) {
 				break;
 			}
 			style->has_fore_color = TRUE;
 			style->fore_color = tag->style.color;
-			found_tags[0] = 1;
+			found_tags[tag->id] = TRUE;
 			++count;
 			break;
 		case TEXT_STYLE_BG_COLOR:
-			if( found_tags[1] != 0 ) {
+			if( found_tags[tag->id] ) {
 				break;
 			}
 			style->has_back_color = TRUE;
 			style->back_color = tag->style.color;
-			found_tags[1] = 1;
+			found_tags[tag->id] = TRUE;
+			++count;
+			break;
+		case TEXT_STYLE_BOLD:
+			if( found_tags[tag->id] ) {
+				break;
+			}
+			found_tags[tag->id] = TRUE;
+			TextStyle_SetWeight( style, FONT_WEIGHT_BOLD );
 			++count;
 			break;
 		case TEXT_STYLE_SIZE:
-			if( found_tags[1] != 0 ) {
+			if( found_tags[tag->id] ) {
 				break;
 			}
 			style->has_pixel_size = TRUE;
 			style->pixel_size = iround( tag->style.px );
-			found_tags[2] = 1;
+			found_tags[tag->id] = TRUE;
 			++count;
 			break;
 		default: break;
 		}
-		if( count == MAX_TAG_NUM ) {
+		if( count == 4 ) {
 			break;
 		}
 	}
@@ -376,16 +358,18 @@ static const wchar_t *ScanStyleTagByName( const wchar_t *wstr,
 				continue;
 			}
 			return NULL;
-		} else if( wstr[i] == name[j] ) {
-			++j;
-			continue;
 		}
-		/* 如果标签名部分已经匹配完 */
-		if( j >= tag_len && wstr[i] == '=' ) {
+		if( j < tag_len ) {
+			if( wstr[i] == name[j] ) {
+				++j;
+				continue;
+			}
+		} else if( wstr[i] == '=' ) {
 			++i;
 			break;
+		} else if( wstr[i] == ']' ) {
+			break;
 		}
-		/* 否则，有误 */
 		return NULL;
 	}
 	/* 获取标签后半部分 */
@@ -438,6 +422,10 @@ static const wchar_t *ScanStyleTagData( const wchar_t *wstr,
 		tag->id = TEXT_STYLE_SIZE;
 		return q;
 	}
+	if( (q = ScanStyleTagByName( p, L"b", tag_data )) ) {
+		tag->id = TEXT_STYLE_BOLD;
+		return q;
+	}
 	return NULL;
 }
 
@@ -473,6 +461,8 @@ const wchar_t* StyleTags_GetEnd( LinkedList *tags, const wchar_t *str )
 		StyleTags_Delete( tags, TEXT_STYLE_BG_COLOR );
 	} else if( wcscmp( tagname, L"size" ) == 0 ) {
 		StyleTags_Delete( tags, TEXT_STYLE_SIZE );
+	} else if( wcscmp( tagname, L"b" ) == 0 ) {
+		StyleTags_Delete( tags, TEXT_STYLE_BOLD );
 	} else {
 		return NULL;
 	}

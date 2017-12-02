@@ -248,8 +248,8 @@ static void OnComputeFontFamily( LCUI_CSSFontStyle fs, LCUI_Style s )
 		return;
 	}
 	fs->font_family = strdup2( s->string );
-	LCUIFont_GetIdByNames( &fs->font_ids,
-			       fs->font_style, fs->font_family );
+	LCUIFont_GetIdByNames( &fs->font_ids, fs->font_style,
+			       fs->font_weight, fs->font_family );
 }
 
 static void OnComputeFontStyle( LCUI_CSSFontStyle fs, LCUI_Style s )
@@ -315,6 +315,8 @@ void CSSFontStyle_Init( LCUI_CSSFontStyle fs )
 	fs->content = NULL;
 	fs->font_ids = NULL;
 	fs->font_family = NULL;
+	fs->font_style = FONT_STYLE_NORMAL;
+	fs->font_weight = FONT_WEIGHT_NORMAL;
 }
 
 void CSSFontStyle_Destroy( LCUI_CSSFontStyle fs )

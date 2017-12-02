@@ -664,6 +664,34 @@ static void TextLayer_TextTypeset( LCUI_TextLayer layer, int start_row )
 	TextLayer_InvalidateRowsRect( layer, start_row, -1 );
 }
 
+static const wchar_t *TextLayer_ProcessStyleTag( LCUI_TextLayer layer,
+						 const wchar_t *p,
+						 LinkedList *tags,
+						 LCUI_TextStyle *style )
+{
+	LCUI_TextStyle s;
+	const wchar_t *pp;
+	pp = StyleTags_GetEnd( tags, p );
+	if( pp ) {
+		s = StyleTags_GetTextStyle( tags );
+		if( s ) {
+			LinkedList_Append( &layer->style_cache, s );
+		}
+		*style = s;
+		return pp;
+	}
+	pp = StyleTags_GetStart( tags, p );
+	if( pp ) {
+		s = StyleTags_GetTextStyle( tags );
+		if( s ) {
+			LinkedList_Append( &layer->style_cache, s );
+		}
+		*style = s;
+		return pp;
+	}
+	return NULL;
+}
+
 /** 对文本进行预处理 */
 static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 				  int add_type, LinkedList *tags )
@@ -710,25 +738,15 @@ static int TextLayer_ProcessText( LCUI_TextLayer layer, const wchar_t *wstr,
 	ins_x = cur_col;
 	ins_y = cur_row;
 	for( p = wstr; *p; ++p ) {
-		/* 如果启用的样式标签支持，则处理样式的结束标签 */
 		if( layer->is_using_style_tags ) {
-			const wchar_t *pp = StyleTags_GetEnd( tags, p );
-			if( pp ) {
-				/* 抵消本次循环后的++p，以在下次循环时还能够在当前位置 */
-				p = pp - 1;
-				style = StyleTags_GetTextStyle( tags );
-				LinkedList_Append( &layer->style_cache, style );
-				continue;
-			}
-			pp = StyleTags_GetStart( tags, p );
+			const wchar_t *pp;
+			pp = TextLayer_ProcessStyleTag( layer, p,
+							tags, &style );
 			if( pp ) {
 				p = pp - 1;
-				style = StyleTags_GetTextStyle( tags );
-				LinkedList_Append( &layer->style_cache, style );
 				continue;
 			}
 		}
-
 		if( *p == '\r' || *p == '\n' ) {
 			/* 判断是哪一种换行模式 */
 			if( *p == '\r' ) {
@@ -1153,7 +1171,20 @@ void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_true )
 /** 重新载入各个文字的字体位图 */
 void TextLayer_ReloadCharBitmap( LCUI_TextLayer layer )
 {
-	int row, col;
+	LinkedListNode *node;
+	int row, col, *font_ids;
+	/* 替换缺省字体，确保能够正确应用字体粗细程度设置 */
+	for( LinkedList_Each( node, &layer->style_cache ) ) {
+		LCUI_TextStyle style = node->data;
+		if( style->has_family || !style->has_weight ) {
+			continue;
+		}
+		if( LCUIFont_UpdateWeight( layer->text_style.font_ids,
+					   style->weight, &font_ids ) > 0 ) {
+			style->has_family = TRUE;
+			style->font_ids = font_ids;
+		}
+	}
 	for( row = 0; row < layer->text_rows.length; ++row ) {
 		TextRow txtrow = layer->text_rows.rows[row];
 		for( col = 0; col < txtrow->length; ++col ) {

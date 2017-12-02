@@ -67,6 +67,9 @@ LCUI_API int TextStyle_Copy( LCUI_TextStyle dst, LCUI_TextStyle src );
 
 LCUI_API void TextStyle_Destroy( LCUI_TextStyle data );
 
+/* 设置字体粗细程度 */
+LCUI_API int TextStyle_SetWeight( LCUI_TextStyle ts, LCUI_FontWeight weight );
+
 /**
  * 设置字体
  * @param[in][out] ts 字体样式数据

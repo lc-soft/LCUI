@@ -60,7 +60,7 @@ static struct {
 static int FreeType_Open( const char *filepath, LCUI_Font **outfonts )
 {
 	FT_Face face;
-	LCUI_Font *fonts;
+	LCUI_Font font, *fonts;
 	int i, err, num_faces;
 
 	err = FT_New_Face( freetype.library, filepath, -1, &face );
@@ -78,15 +78,13 @@ static int FreeType_Open( const char *filepath, LCUI_Font **outfonts )
 		return -ENOMEM;
 	}
 	for( i = 0; i < num_faces; ++i ) {
-		LCUI_Font font = malloc( sizeof( LCUI_FontRec ) );
 		err = FT_New_Face( freetype.library, filepath, i, &face );
 		if( err ) {
 			fonts[i] = NULL;
 			continue;
 		}
 		FT_Select_Charmap( face, FT_ENCODING_UNICODE );
-		font->family_name = strdup2( face->family_name );
-		font->style_name = strdup2( face->style_name );
+		font = Font( face->family_name, face->style_name );
 		font->data = face;
 		fonts[i] = font;
 	}

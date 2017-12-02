@@ -50,6 +50,7 @@ typedef enum LCUI_FontStyle {
 } LCUI_FontStyle;
 
 typedef enum LCUI_FontWeight {
+	FONT_WEIGHT_NONE = 0,
 	FONT_WEIGHT_THIN = 100,
 	FONT_WEIGHT_EXTRA_LIGHT = 200,
 	FONT_WEIGHT_LIGHT = 300,
@@ -58,7 +59,8 @@ typedef enum LCUI_FontWeight {
 	FONT_WEIGHT_SEMI_BOLD = 600,
 	FONT_WEIGHT_BOLD = 700,
 	FONT_WEIGHT_EXTRA_BOLD = 800,
-	FONT_WEIGHT_BLACK = 900
+	FONT_WEIGHT_BLACK = 900,
+	FONT_WEIGHT_TOTAL_NUM = 9
 } LCUI_FontWeight;
 
 /** 字体位图数据 */
@@ -81,6 +83,8 @@ typedef struct LCUI_FontRec_ {
 	char *style_name;		/**< 样式名称 */
 	char *family_name;		/**< 字族名称 */
 	void *data;			/**< 相关数据 */
+	LCUI_FontStyle style;		/**< 风格 */
+	LCUI_FontWeight weight;		/**< 粗细程度 */
 	LCUI_FontEngine *engine;	/**< 所属的字体引擎 */
 } LCUI_FontRec, *LCUI_Font;
 
@@ -91,6 +95,21 @@ struct LCUI_FontEngine {
 	void (*close)(void*);
 };
 
+/**
+ * 根据字符串内容猜测字体粗细程度
+ * 文档：https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
+ */
+LCUI_API LCUI_FontWeight LCUIFont_DetechWeight( const char *str );
+
+/**
+ * 根据字符串内容猜测字体风格
+ * 文档：https://developer.mozilla.org/en-US/docs/Web/CSS/font-style
+ */
+LCUI_API LCUI_FontStyle LCUIFont_DetechStyle( const char *str );
+
+LCUI_API LCUI_Font Font( const char *family_name, const char *style_name );
+
+LCUI_API void DeleteFont( LCUI_Font font );
 
 int LCUIFont_InitInCoreFont( LCUI_FontEngine *engine );
 
@@ -136,20 +155,34 @@ LCUI_API int LCUIFont_Add( LCUI_Font font );
 /**
  * 获取字体的ID
  * @param[in] family_name 字族名称
- * @param[in] style_name 风格名称，若设为 NULL，则默认获取 regular 风格或
- * 字体中记录的最后一个风格
+ * @param[in] style 字体风格
+ * @param[in] weight 字体粗细程度，若为值 0，则默认为 FONT_WEIGHT_NORMAL
  */
-LCUI_API int LCUIFont_GetId( const char *family_name, LCUI_FontStyle style );
+LCUI_API int LCUIFont_GetId( const char *family_name,
+			     LCUI_FontStyle style,
+			     LCUI_FontWeight weight );
 
+/**
+ * 更新当前字体的粗细程度
+ * @param[in] font_ids 当前的字体 id 列表
+ * @params[in] weight 字体粗细程度
+ * @params[out] new_font_ids 更新字体粗细程度后的字体 id 列表
+ */
+LCUI_API size_t LCUIFont_UpdateWeight( const int *font_ids,
+				       LCUI_FontWeight weight,
+				       int **new_font_ids );
 /**
  * 根据字族名称获取对应的字体 ID 列表
  * @param[out] ids 输出的字体 ID 列表
- * @param[in] style 字体风格，若设为 NULL，则默认获取 regular 风格或
- * 字体中记录的最后一个风格
+ * @param[in] style 字体风格
+ * @param[in] weight 字体粗细程度，若为值 0，则默认为 FONT_WEIGHT_NORMAL
  * @param[in] names 字族名称，多个名字用逗号隔开
  * @return 获取到的字体 ID 的数量
  */
-LCUI_API size_t LCUIFont_GetIdByNames( int **ids, LCUI_FontStyle style, const char *names );
+LCUI_API size_t LCUIFont_GetIdByNames( int **font_ids,
+				       LCUI_FontStyle style,
+				       LCUI_FontWeight weight,
+				       const char *names );
 
 /** 获取默认的字体ID */
 LCUI_API int LCUIFont_GetDefault( void );

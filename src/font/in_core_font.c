@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * in_core_font.c -- 基础的内置字体引擎，可用于从程序内部载入字体位图
  *
- * 版权所有 (C) 2015-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -56,10 +56,8 @@ static int InCoreFont_Open( const char *filepath, LCUI_Font **outfonts )
 	}
 	code = malloc( sizeof( int ) );
 	*code = FONT_INCONSOLATA;
+	font = Font( "inconsolata", "Regular" );
 	fonts = malloc( sizeof( LCUI_Font ) );
-	font = malloc( sizeof( LCUI_FontRec ) );
-	font->family_name = strdup2( "inconsolata" );
-	font->style_name = strdup2( "Regular" );
 	font->data = code;
 	fonts[0] = font;
 	*outfonts = fonts;
@@ -68,7 +66,7 @@ static int InCoreFont_Open( const char *filepath, LCUI_Font **outfonts )
 
 static void InCoreFont_Close( void *face )
 {
-	free(face);
+	free( face );
 }
 
 static int InCoreFont_Render( LCUI_FontBitmap *bmp, wchar_t ch,
