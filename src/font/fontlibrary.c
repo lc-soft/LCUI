@@ -107,7 +107,7 @@ static struct LCUI_FontLibraryModule {
 	SelectFontCache(font->id) = font;\
 } while( 0 );
 
-LCUI_FontWeight LCUIFont_DetechWeight( const char *str )
+LCUI_FontWeight LCUIFont_DetectWeight( const char *str )
 {
 	char *buf;
 	LCUI_FontWeight weight = FONT_WEIGHT_NORMAL;
@@ -136,7 +136,7 @@ LCUI_FontWeight LCUIFont_DetechWeight( const char *str )
 	return weight;
 }
 
-LCUI_FontStyle LCUIFont_DetechStyle( const char *str )
+LCUI_FontStyle LCUIFont_DetectStyle( const char *str )
 {
 	char *buf;
 	LCUI_FontStyle style = FONT_STYLE_NORMAL;
@@ -151,7 +151,7 @@ LCUI_FontStyle LCUIFont_DetechStyle( const char *str )
 		style = FONT_STYLE_ITALIC;
 	}
 	free( buf );
-	return FONT_STYLE_NORMAL;
+	return style;
 }
 
 LCUI_Font Font( const char *family_name, const char *style_name )
@@ -162,8 +162,8 @@ LCUI_Font Font( const char *family_name, const char *style_name )
 	font->engine = NULL;
 	font->family_name = strdup2( family_name );
 	font->style_name = strdup2( style_name );
-	font->weight = LCUIFont_DetechWeight( style_name );
-	font->style = LCUIFont_DetechStyle( style_name );
+	font->weight = LCUIFont_DetectWeight( style_name );
+	font->style = LCUIFont_DetectStyle( style_name );
 	return font;
 }
 

@@ -99,13 +99,13 @@ struct LCUI_FontEngine {
  * 根据字符串内容猜测字体粗细程度
  * 文档：https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
  */
-LCUI_API LCUI_FontWeight LCUIFont_DetechWeight( const char *str );
+LCUI_API LCUI_FontWeight LCUIFont_DetectWeight( const char *str );
 
 /**
  * 根据字符串内容猜测字体风格
  * 文档：https://developer.mozilla.org/en-US/docs/Web/CSS/font-style
  */
-LCUI_API LCUI_FontStyle LCUIFont_DetechStyle( const char *str );
+LCUI_API LCUI_FontStyle LCUIFont_DetectStyle( const char *str );
 
 #ifndef _XTYPEDEF_FONT
 LCUI_API LCUI_Font Font( const char *family_name, const char *style_name );
