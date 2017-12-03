@@ -107,7 +107,9 @@ LCUI_API LCUI_FontWeight LCUIFont_DetechWeight( const char *str );
  */
 LCUI_API LCUI_FontStyle LCUIFont_DetechStyle( const char *str );
 
+#ifndef _XTYPEDEF_FONT
 LCUI_API LCUI_Font Font( const char *family_name, const char *style_name );
+#endif
 
 LCUI_API void DeleteFont( LCUI_Font font );
 

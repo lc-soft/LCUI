@@ -46,11 +46,10 @@
 #include <LCUI/thread.h>
 #include <LCUI/timer.h>
 #include <LCUI/cursor.h>
-#include <LCUI/font.h>
 #include <LCUI/input.h>
-#include <LCUI/display.h>
 #include <LCUI/ime.h>
 #include <LCUI/platform.h>
+#include <LCUI/display.h>
 #ifdef LCUI_EVENTS_H
 #include LCUI_EVENTS_H
 #endif
@@ -63,6 +62,7 @@
 #ifdef LCUI_DISPLAY_H
 #include LCUI_DISPLAY_H
 #endif
+#include <LCUI/font.h>
 
 #define STATE_ACTIVE 1
 #define STATE_KILLED 0
