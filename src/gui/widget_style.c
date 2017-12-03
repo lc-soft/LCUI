@@ -44,7 +44,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
-#include <LCUI/gui/css_library.h>
+#include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 
 typedef struct {

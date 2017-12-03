@@ -23,7 +23,7 @@ int test_char_render( void )
 	ret = LCUIFont_LoadFile( "C:/Windows/fonts/simsun.ttc" );
 	while( ret == 0 ) {
 		/* 获取字体ID */
-		fid = LCUIFont_GetId( "SimSun", 0 );
+		fid = LCUIFont_GetId( "SimSun", 0, 0 );
 		if( fid < 0 ) {
 			break;
 		}

@@ -47,6 +47,7 @@
 #include <LCUI/timer.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/scrollbar.h>
+#include <LCUI/gui/css_parser.h>
 
 #define EFFECT_FRAMES 80
 

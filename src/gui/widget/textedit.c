@@ -47,6 +47,7 @@
 #include <LCUI/input.h>
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/metrics.h>
+#include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 #include <LCUI/gui/widget/textedit.h>
 #include <LCUI/gui/widget/textcaret.h>
