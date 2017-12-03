@@ -109,45 +109,48 @@ static struct LCUI_FontLibraryModule {
 
 LCUI_FontWeight LCUIFont_DetechWeight( const char *str )
 {
-	char *buf = malloc( strsize( str ) );
+	char *buf;
+	LCUI_FontWeight weight = FONT_WEIGHT_NORMAL;
+	if( !(buf = malloc( strsize( str ) )) ) {
+		return weight;
+	}
 	strtolower( buf, str );
 	if( strstr( buf, "bold" ) ) {
-		return FONT_WEIGHT_BOLD;
+		weight = FONT_WEIGHT_BOLD;
+	} else if( strstr( buf, "thin" ) ) {
+		weight = FONT_WEIGHT_THIN;
+	} else if( strstr( buf, "light" ) ) {
+		weight = FONT_WEIGHT_EXTRA_LIGHT;
+	} else if( strstr( buf, "semilight" ) ) {
+		weight = FONT_WEIGHT_LIGHT;
+	} else if( strstr( buf, "medium" ) ) {
+		weight = FONT_WEIGHT_MEDIUM;
+	} else if( strstr( buf, "semibold" ) ) {
+		weight = FONT_WEIGHT_SEMI_BOLD;
+	} else if( strstr( buf, "bold" ) ) {
+		weight = FONT_WEIGHT_BOLD;
+	} else if( strstr( buf, "black" ) ) {
+		weight = FONT_WEIGHT_BLACK;
 	}
-	if( strstr( buf, "thin" ) ) {
-		return FONT_WEIGHT_THIN;
-	}
-	if( strstr( buf, "light" ) ) {
-		return FONT_WEIGHT_EXTRA_LIGHT;
-	}
-	if( strstr( buf, "semilight" ) ) {
-		return FONT_WEIGHT_LIGHT;
-	}
-	if( strstr( buf, "medium" ) ) {
-		return FONT_WEIGHT_MEDIUM;
-	}
-	if( strstr( buf, "semibold" ) ) {
-		return FONT_WEIGHT_SEMI_BOLD;
-	}
-	if( strstr( buf, "bold" ) ) {
-		return FONT_WEIGHT_BOLD;
-	}
-	if( strstr( buf, "black" ) ) {
-		return FONT_WEIGHT_BLACK;
-	}
-	return FONT_WEIGHT_NORMAL;
+	free( buf );
+	return weight;
 }
 
 LCUI_FontStyle LCUIFont_DetechStyle( const char *str )
 {
-	char *buf = malloc( strsize( str ) );
+	char *buf;
+	LCUI_FontStyle style = FONT_STYLE_NORMAL;
+
+	if( !(buf = malloc( strsize( str ) )) ) {
+		return style;
+	}
 	strtolower( buf, str );
 	if( strstr( buf, "oblique" ) ) {
-		return FONT_STYLE_OBLIQUE;
+		style = FONT_STYLE_OBLIQUE;
+	} else if( strstr( buf, "italic" ) ) {
+		style = FONT_STYLE_ITALIC;
 	}
-	if( strstr( buf, "italic" ) ) {
-		return FONT_STYLE_ITALIC;
-	}
+	free( buf );
 	return FONT_STYLE_NORMAL;
 }
 

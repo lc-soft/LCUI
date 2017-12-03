@@ -45,6 +45,7 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/gui/widget/textview.h>
 #include <LCUI/gui/widget/button.h>
+#include <LCUI/gui/css_parser.h>
 
 static LCUI_WidgetPrototype prototype = NULL;
 
