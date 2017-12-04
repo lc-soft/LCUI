@@ -75,21 +75,31 @@ void TextStyle_Init( LCUI_TextStyle data )
 	data->pixel_size = 13;
 }
 
-int TextStyle_Copy( LCUI_TextStyle dst, LCUI_TextStyle src )
+int TextStyle_CopyFamily( LCUI_TextStyle dst, LCUI_TextStyle src )
 {
-	int len;
-	*dst = *src;
-	if( !dst->has_family ) {
+	size_t len;
+	if( !src->has_family ) {
 		return 0;
 	}
-	for( len = 0; dst->font_ids[len] != -1; ++len );
+	for( len = 0; src->font_ids[len] != -1; ++len );
 	len += 1;
+	if( dst->font_ids ) {
+		free( dst->font_ids );
+	}
 	dst->font_ids = malloc( len * sizeof( int ) );
 	if( !dst->font_ids ) {
 		return -ENOMEM;
 	}
+	dst->has_family = TRUE;
 	memcpy( dst->font_ids, src->font_ids, len * sizeof( int ) );
 	return 0;
+}
+
+int TextStyle_Copy( LCUI_TextStyle dst, LCUI_TextStyle src )
+{
+	*dst = *src;
+	dst->font_ids = NULL;
+	return TextStyle_CopyFamily( dst, src );
 }
 
 void TextStyle_Destroy( LCUI_TextStyle data )
@@ -98,6 +108,37 @@ void TextStyle_Destroy( LCUI_TextStyle data )
 		free( data->font_ids );
 	}
 	data->font_ids = NULL;
+}
+
+void TextStyle_Merge( LCUI_TextStyle base, LCUI_TextStyle target )
+{
+	int *font_ids = NULL;
+	if( !base->has_family && target->has_family ) {
+		base->has_family = TRUE;
+		TextStyle_CopyFamily( base, target );
+	}
+	if( target->has_style && !base->has_style &&
+	    target->style != FONT_STYLE_NORMAL ) {
+		base->has_style = TRUE;
+		base->style = target->style;
+		if( LCUIFont_UpdateStyle( base->font_ids,
+					  base->style,
+					  &font_ids ) > 0 ) {
+			free( base->font_ids );
+			base->font_ids = font_ids;
+		}
+	}
+	if( target->has_weight && !base->has_weight &&
+	    target->weight != FONT_WEIGHT_NORMAL ) {
+		base->has_weight = TRUE;
+		base->weight = target->weight;
+		if( LCUIFont_UpdateWeight( base->font_ids,
+					   base->weight,
+					   &font_ids ) > 0 ) {
+			free( base->font_ids );
+			base->font_ids = font_ids;
+		}
+	}
 }
 
 int TextStyle_SetWeight( LCUI_TextStyle ts, LCUI_FontWeight weight )

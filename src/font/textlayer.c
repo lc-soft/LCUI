@@ -1168,23 +1168,20 @@ void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_true )
 	layer->is_using_style_tags = is_true;
 }
 
+static void TextLayer_UpdateTextStyleCache( LCUI_TextLayer layer )
+{
+	LinkedListNode *node;
+	/* 替换缺省字体，确保能够正确应用字体设置 */
+	for( LinkedList_Each( node, &layer->style_cache ) ) {
+		TextStyle_Merge( node->data, &layer->text_style );
+	}
+}
+
 /** 重新载入各个文字的字体位图 */
 void TextLayer_ReloadCharBitmap( LCUI_TextLayer layer )
 {
-	LinkedListNode *node;
-	int row, col, *font_ids;
-	/* 替换缺省字体，确保能够正确应用字体粗细程度设置 */
-	for( LinkedList_Each( node, &layer->style_cache ) ) {
-		LCUI_TextStyle style = node->data;
-		if( style->has_family || !style->has_weight ) {
-			continue;
-		}
-		if( LCUIFont_UpdateWeight( layer->text_style.font_ids,
-					   style->weight, &font_ids ) > 0 ) {
-			style->has_family = TRUE;
-			style->font_ids = font_ids;
-		}
-	}
+	int row, col;
+	TextLayer_UpdateTextStyleCache( layer );
 	for( row = 0; row < layer->text_rows.length; ++row ) {
 		TextRow txtrow = layer->text_rows.rows[row];
 		for( col = 0; col < txtrow->length; ++col ) {

@@ -63,9 +63,13 @@ typedef struct LCUI_TextStyleRec_ {
 /** 初始化字体样式数据 */
 LCUI_API void TextStyle_Init( LCUI_TextStyle data );
 
+LCUI_API int TextStyle_CopyFamily( LCUI_TextStyle dst, LCUI_TextStyle src );
+
 LCUI_API int TextStyle_Copy( LCUI_TextStyle dst, LCUI_TextStyle src );
 
 LCUI_API void TextStyle_Destroy( LCUI_TextStyle data );
+
+LCUI_API void TextStyle_Merge( LCUI_TextStyle base, LCUI_TextStyle target );
 
 /* 设置字体粗细程度 */
 LCUI_API int TextStyle_SetWeight( LCUI_TextStyle ts, LCUI_FontWeight weight );
