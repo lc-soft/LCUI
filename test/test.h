@@ -13,6 +13,12 @@ Logger_Log("[test] %d tests, %d pass.\n", tests_count, tests_count + N)
 	    (X) ? "PASS" : (ret -= 1, "NO PASS!"));\
 } while( 0 );
 
+#define CHECK_WITH_TEXT(TEXT, X) do {\
+	tests_count += 1;\
+	LOG("[test] %s(): %s. # %s\n", __FUNCTION__, TEXT,\
+	    (X) ? "PASS" : (ret -= 1, "NO PASS!"));\
+} while( 0 );
+
 #define CHECK2(X) do {\
 	if( !(X) ) {\
 		LOG( "[test] %s(): %s. # NO PASS!\n", __FUNCTION__, ""#X"" );\
