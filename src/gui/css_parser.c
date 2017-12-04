@@ -821,11 +821,16 @@ static void LoadFontFile( void *arg1, void *arg2 )
 
 static void OnParsedFontFace( LCUI_CSSFontFace face )
 {
+	static int worker_id = -1;
 	LCUI_TaskRec task = { 0 };
 	task.func = LoadFontFile;
 	task.arg[0] = strdup2( face->src );
 	task.destroy_arg[0] = free;
-	LCUI_PostAsyncTask( &task );
+	if( worker_id > -1 ) {
+		LCUI_PostAsyncTaskTo( &task, worker_id );
+	} else {
+		worker_id = LCUI_PostAsyncTask( &task );
+	}
 }
 
 static char *getdirname( const char *path )

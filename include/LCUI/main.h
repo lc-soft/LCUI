@@ -167,9 +167,17 @@ LCUI_API LCUI_BOOL LCUI_PostTask( LCUI_Task task );
 
 /**
  * 添加异步任务
+ * 该任务将会添加至指定 id 的工作线程中执行
+ * @param[in] task 任务数据
+ * @param[in] target_worker_id 目标工作线程的编号
+ */
+LCUI_API void LCUI_PostAsyncTaskTo( LCUI_Task task, int target_worker_id );
+
+/**
+ * 添加异步任务
  * 该任务将会添加至工作线程中执行
  */
-LCUI_API void LCUI_PostAsyncTask( LCUI_Task task );
+LCUI_API int LCUI_PostAsyncTask( LCUI_Task task );
 
 /** LCUI_PostTask 的简化版本 */
 #define LCUI_PostSimpleTask(FUNC, ARG1, ARG2) do {\

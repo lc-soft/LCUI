@@ -252,18 +252,30 @@ LCUI_BOOL LCUI_PostTask( LCUI_Task task )
 	return TRUE;
 }
 
-void LCUI_PostAsyncTask( LCUI_Task task )
+void LCUI_PostAsyncTaskTo( LCUI_Task task, int worker_id )
 {
+	int id = 0;
 	if( !MainApp.active ) {
 		LCUITask_Run( task );
 		LCUITask_Destroy( task );
 		return;
 	}
+	if( id >= LCUI_WORKER_NUM ) {
+		id = 0;
+	}
+	LCUIWorker_PostTask( MainApp.workers[id], task );
+}
+
+int LCUI_PostAsyncTask( LCUI_Task task )
+{
+	int id;
 	if( MainApp.worker_next >= LCUI_WORKER_NUM ) {
 		MainApp.worker_next = 0;
 	}
-	LCUIWorker_PostTask( MainApp.workers[MainApp.worker_next], task );
+	id = MainApp.worker_next;
+	LCUI_PostAsyncTaskTo( task, id );
 	MainApp.worker_next += 1;
+	return id;
 }
 
 /* 新建一个主循环 */
