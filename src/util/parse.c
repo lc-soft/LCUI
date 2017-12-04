@@ -43,6 +43,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/util/parse.h>
+#include <LCUI/font/fontlibrary.h>
 
 LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 {
@@ -341,6 +342,45 @@ LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname )
 	if( n > 0 && s->val_string[n - 1] == '"' ) {
 		n -= 1;
 		s->val_string[n] = 0;
+	}
+	return TRUE;
+}
+
+LCUI_BOOL ParseFontWeight( const char *str, int *weight )
+{
+	int value;
+	if( strcmp( str, "normal" ) == 0 ) {
+		*weight = FONT_WEIGHT_NORMAL;
+		return TRUE;
+	}
+	if( strcmp( str, "bold" ) == 0 ) {
+		*weight = FONT_WEIGHT_BOLD;
+		return TRUE;
+	}
+	if( sscanf( str, "%d", &value ) != 1 ) {
+		*weight = FONT_WEIGHT_NORMAL;
+		return FALSE;
+	}
+	if( value < 100 ) {
+		*weight = FONT_WEIGHT_THIN;
+		return TRUE;
+	}
+	*weight = iround( value / 100.0 ) * 100;
+	return TRUE;
+}
+
+LCUI_BOOL ParseFontStyle( const char *str, int *style )
+{
+	char value[64] = "";
+	strtrim( value, str, NULL );
+	if( strcmp( value, "normal" ) == 0 ) {
+		*style = FONT_STYLE_NORMAL;
+	} else if( strcmp( value, "italic" ) == 0 ) {
+		*style = FONT_STYLE_ITALIC;
+	} else if( strcmp( value, "oblique" ) == 0 ) {
+		*style = FONT_STYLE_OBLIQUE;
+	} else {
+		return FALSE;
 	}
 	return TRUE;
 }

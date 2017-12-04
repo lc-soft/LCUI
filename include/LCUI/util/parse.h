@@ -55,6 +55,10 @@ LCUI_API LCUI_BOOL ParseColor( LCUI_Style var, const char *str );
 /** 解析资源路径 */
 LCUI_BOOL ParseUrl( LCUI_Style s, const char *str, const char *dirname );
 
+LCUI_BOOL ParseFontWeight( const char *str, int *weight );
+
+LCUI_BOOL ParseFontStyle( const char *str, int *style );
+
 LCUI_END_HEADER
 
 #endif

@@ -183,46 +183,27 @@ static int FontFaceParser_ParseKey( LCUI_CSSParserContext ctx )
 static int FontFace_ParseFontWeight( LCUI_CSSFontFace face, const char *str )
 {
 	int weight;
-	if( strcmp( str, "normal" ) == 0 ) {
-		face->font_weight = FONT_WEIGHT_NORMAL;
+	if( ParseFontWeight( str, &weight ) ) {
+		face->font_weight = weight;
 		return 0;
 	}
-	if( strcmp( str, "bold" ) == 0 ) {
-		face->font_weight = FONT_WEIGHT_BOLD;
-		return 0;
-	}
-	if( sscanf( str, "%d", &weight ) != 1 ) {
-		return -1;
-	}
-	if( weight < 100 ) {
-		face->font_weight = FONT_WEIGHT_THIN;
-		return 0;
-	}
-	face->font_weight = iround( weight / 100.0 ) * 100;
-	return 0;
+	return -1;
 }
 
 static int FontFace_ParseFontStyle( LCUI_CSSFontFace face, const char *str )
 {
-	char value[64] = "";
-	strtrim( value, str, NULL );
-	if( strcmp( value, "normal" ) == 0 ) {
-		face->font_style = FONT_STYLE_NORMAL;
-	}else if( strcmp( value, "italic" ) == 0 ) {
-		face->font_style = FONT_STYLE_ITALIC;
-	} else if( strcmp( value, "oblique" ) == 0 ) {
-		face->font_style = FONT_STYLE_OBLIQUE;
-	} else {
-		return -1;
+	int style;
+	if( ParseFontStyle( str, &style ) ) {
+		face->font_style = style;
+		return 0;
 	}
-	return 0;
+	return -1;
 }
 
 static int FontFace_ParseSrc( LCUI_CSSFontFace face, const char *str,
 			      const char *dirname )
 {
 	LCUI_StyleRec style;
-
 	if( face->src ) {
 		free( face->src );
 	}

@@ -157,8 +157,9 @@ static int OnParseFontFamily( LCUI_CSSParserStyleContext ctx, const char *str )
 
 static int OnParseFontStyle( LCUI_CSSParserStyleContext ctx, const char *str )
 {
-	if( strcmp(str, "normal") == 0 ) {
-		SetFontStyle( ctx, 0, int );
+	int style;
+	if( ParseFontStyle( str, &style ) ) {
+		SetFontStyle( ctx, style, int );
 		return 0;
 	}
 	return -1;
@@ -166,6 +167,11 @@ static int OnParseFontStyle( LCUI_CSSParserStyleContext ctx, const char *str )
 
 static int OnParseFontWeight( LCUI_CSSParserStyleContext ctx, const char *str )
 {
+	int weight;
+	if( ParseFontWeight( str, &weight ) ) {
+		SetFontStyle( ctx, weight, int );
+		return 0;
+	}
 	return -1;
 }
 
@@ -255,7 +261,7 @@ static void OnComputeFontFamily( LCUI_CSSFontStyle fs, LCUI_Style s )
 static void OnComputeFontStyle( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
 	if( s->is_valid ) {
-		fs->font_style = s->val_style;
+		fs->font_style = s->val_int;
 	} else {
 		fs->font_style = FONT_STYLE_NORMAL;
 	}
@@ -263,7 +269,11 @@ static void OnComputeFontStyle( LCUI_CSSFontStyle fs, LCUI_Style s )
 
 static void OnComputeFontWeight( LCUI_CSSFontStyle fs, LCUI_Style s )
 {
-
+	if( s->is_valid ) {
+		fs->font_weight = s->val_int;
+	} else {
+		fs->font_weight = FONT_WEIGHT_NORMAL;
+	}
 }
 
 static void OnComputeTextAlign( LCUI_CSSFontStyle fs, LCUI_Style s )
@@ -355,13 +365,16 @@ void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle ts )
 {
 	size_t len;
 	ts->font_ids = NULL;
+	ts->has_style = TRUE;
+	ts->has_weight = TRUE;
 	ts->has_family = FALSE;
-	ts->has_style = FALSE;
 	ts->has_back_color = FALSE;
 	ts->has_pixel_size = TRUE;
 	ts->has_fore_color = TRUE;
 	ts->fore_color = fs->color;
 	ts->pixel_size = fs->font_size;
+	ts->weight = fs->font_weight;
+	ts->style = fs->font_style;
 	if( fs->font_ids ) {
 		for( len = 0; fs->font_ids[len] != -1; ++len );
 		ts->font_ids = malloc( sizeof( int ) * ++len );

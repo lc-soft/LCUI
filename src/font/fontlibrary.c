@@ -63,6 +63,10 @@ typedef struct LCUI_FontStyleNodeRec_ {
 
 typedef LCUI_FontStyleNodeRec LCUI_FontStyleList[FONT_STYLE_TOTAL_NUM];
 
+typedef struct LCUI_FontCacheRec {
+	LCUI_Font fonts[FONT_CACHE_SIZE];
+} LCUI_FontCacheRec, *LCUI_FontCache;
+
 /** 字体字族索引结点 */
 typedef struct LCUI_FontFamilyNodeRec_ {
 	char *family_name;		/**< 字体的字族名称  */
@@ -82,7 +86,7 @@ static struct LCUI_FontLibraryModule {
 	Dict *font_families;		/**< 字族信息库，以字族名称索引字体信息 */
 	DictType font_families_type;	/**< 字族信息库的字典类型数据 */
 	RBTree bitmap_cache;		/**< 字体位图缓存区 */
-	LCUI_Font **font_cache;		/**< 字体信息缓存区 */
+	LCUI_FontCache *font_cache;	/**< 字体信息缓存区 */
 	LCUI_Font default_font;		/**< 默认字体的信息 */
 	LCUI_Font incore_font;		/**< 内置字体的信息 */
 	LCUI_FontEngine engines[2];	/**< 当前可用字体引擎列表 */
@@ -101,11 +105,33 @@ static struct LCUI_FontLibraryModule {
 	(SNODE)->weights[(FONT)->weight / 100 - 1] = FONT;\
 } while( 0 );
 #define SelectFontCache(id) \
-	fontlib.font_cache[fontlib.font_cache_num-1][id % FONT_CACHE_SIZE]
+	fontlib.font_cache[fontlib.font_cache_num-1]->fonts[id % FONT_CACHE_SIZE]
 
 #define SetFontCache(font) do {\
 	SelectFontCache(font->id) = font;\
 } while( 0 );
+
+static LCUI_FontCache FontCache( void )
+{
+	LCUI_FontCache cache;
+	if( !(cache = malloc( sizeof( LCUI_FontCacheRec ) )) ) {
+		return NULL;
+	}
+	memset( cache->fonts, 0, sizeof( cache->fonts ) );
+	return cache;
+}
+
+static void DeleteFontCache( LCUI_FontCache cache )
+{
+	int i;
+	for( i = 0; i < FONT_CACHE_SIZE; ++i ) {
+		if( cache->fonts[i] ) {
+			DeleteFont( cache->fonts[i] );
+		}
+		cache->fonts[i] = NULL;
+	}
+	free( cache );
+}
 
 LCUI_FontWeight LCUIFont_DetectWeight( const char *str )
 {
@@ -226,15 +252,15 @@ int LCUIFont_Add( LCUI_Font font )
 	}
 	if( font->id >= fontlib.font_cache_num * FONT_CACHE_SIZE ) {
 		size_t size;
-		LCUI_Font **caches, *cache;
+		LCUI_FontCache *caches, cache;
 		fontlib.font_cache_num += 1;
-		size = fontlib.font_cache_num * sizeof( LCUI_Font* );
+		size = fontlib.font_cache_num * sizeof( LCUI_FontCache );
 		caches = realloc( fontlib.font_cache, size );
 		if( !caches ) {
 			fontlib.font_cache_num -= 1;
 			return -ENOMEM;
 		}
-		cache = NEW( LCUI_Font, FONT_CACHE_SIZE );
+		cache = FontCache();
 		if( !cache ) {
 			return -ENOMEM;
 		}
@@ -246,8 +272,7 @@ int LCUIFont_Add( LCUI_Font font )
 	return font->id;
 }
 
-/** 获取指定字体ID的字体信息 */
-static LCUI_Font LCUIFont_GetById( int id )
+LCUI_Font LCUIFont_GetById( int id )
 {
 	if( !fontlib.is_inited ) {
 		return NULL;
@@ -280,6 +305,39 @@ size_t LCUIFont_UpdateWeight( const int *font_ids,
 	for( i = 0, count = 0; i < len; ++i ) {
 		font = LCUIFont_GetById( font_ids[i] );
 		id = LCUIFont_GetId( font->family_name, font->style, weight );
+		if( id > 0 ) {
+			ids[count++] = id;
+		}
+	}
+	ids[count] = 0;
+	if( new_font_ids ) {
+		*new_font_ids = ids;
+	}
+	return count;
+}
+
+size_t LCUIFont_UpdateStyle( const int *font_ids,
+			     LCUI_FontStyle style,
+			     int **new_font_ids )
+{
+	int id, *ids;
+	LCUI_Font font;
+	size_t i, count, len;
+
+	if( !font_ids ) {
+		return 0;
+	}
+	for( len = 0; font_ids[len] != -1; ++len );
+	if( len < 1 ) {
+		return 0;
+	}
+	ids = malloc( (len + 1) * sizeof( int ) );
+	if( !ids ) {
+		return 0;
+	}
+	for( i = 0, count = 0; i < len; ++i ) {
+		font = LCUIFont_GetById( font_ids[i] );
+		id = LCUIFont_GetId( font->family_name, style, font->weight );
 		if( id > 0 ) {
 			ids[count++] = id;
 		}
@@ -802,8 +860,8 @@ void LCUI_InitFontLibrary( void )
 #endif
 
 	fontlib.font_cache_num = 1;
-	fontlib.font_cache = NEW( LCUI_Font*, 1 );
-	fontlib.font_cache[0] = NEW( LCUI_Font, FONT_CACHE_SIZE );
+	fontlib.font_cache = NEW( LCUI_FontCache, 1 );
+	fontlib.font_cache[0] = FontCache();
 	RBTree_Init( &fontlib.bitmap_cache );
 	fontlib.font_families_type = DictType_StringKey;
 	fontlib.font_families_type.valDestructor = DestroyFontFamilyNode;
@@ -844,22 +902,13 @@ void LCUI_InitFontLibrary( void )
 
 void LCUI_FreeFontLibrary( void )
 {
-	int i;
-	LCUI_Font font;
-
 	if( !fontlib.is_inited ) {
 		return;
 	}
 	fontlib.is_inited = FALSE;
 	while( fontlib.font_cache_num > 0 ) {
 		--fontlib.font_cache_num;
-		for( i = 0; i < FONT_CACHE_SIZE; ++i ) {
-			font = fontlib.font_cache[fontlib.font_cache_num][i];
-			if( font ) {
-				DeleteFont( font );
-			}
-		}
-		free( fontlib.font_cache[fontlib.font_cache_num] );
+		DeleteFontCache( fontlib.font_cache[fontlib.font_cache_num] );
 	}
 	Dict_Release( fontlib.font_families );
 	RBTree_Destroy( &fontlib.bitmap_cache );

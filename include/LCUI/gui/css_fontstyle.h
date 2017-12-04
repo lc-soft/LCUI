@@ -57,15 +57,15 @@ enum LCUI_CSSFontStyleKey {
 
 typedef struct LCUI_CSSFontStyleRec_ {
 	int font_size;
-	int font_weight;
-	int font_style;
+	int line_height;
 	int *font_ids;
 	char *font_family;
-	int text_align;
-	int white_space;
-	int line_height;
-	LCUI_Color color;
 	wchar_t *content;
+	LCUI_Color color;
+	LCUI_FontStyle font_style;
+	LCUI_FontWeight font_weight;
+	LCUI_StyleValue text_align;
+	LCUI_StyleValue white_space;
 } LCUI_CSSFontStyleRec, *LCUI_CSSFontStyle;
 
 #define Widget_SetFontStyle(W, K, V, T) do {\

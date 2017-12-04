@@ -173,6 +173,17 @@ LCUI_API int LCUIFont_GetId( const char *family_name,
 LCUI_API size_t LCUIFont_UpdateWeight( const int *font_ids,
 				       LCUI_FontWeight weight,
 				       int **new_font_ids );
+
+/**
+ * 更新当前字体的风格
+ * @param[in] font_ids 当前的字体 id 列表
+ * @params[in] style 字体风格
+ * @params[out] new_font_ids 更新字体粗细程度后的字体 id 列表
+ */
+LCUI_API size_t LCUIFont_UpdateStyle( const int *font_ids,
+				      LCUI_FontStyle style,
+				      int **new_font_ids );
+
 /**
  * 根据字族名称获取对应的字体 ID 列表
  * @param[out] ids 输出的字体 ID 列表
@@ -185,6 +196,9 @@ LCUI_API size_t LCUIFont_GetIdByNames( int **font_ids,
 				       LCUI_FontStyle style,
 				       LCUI_FontWeight weight,
 				       const char *names );
+
+/** 获取指定字体ID的字体信息 */
+LCUI_API LCUI_Font LCUIFont_GetById( int id );
 
 /** 获取默认的字体ID */
 LCUI_API int LCUIFont_GetDefault( void );
