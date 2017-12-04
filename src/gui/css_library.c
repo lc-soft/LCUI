@@ -1329,8 +1329,8 @@ static void LCUI_PrintStyleLink( StyleLink link, const char *selector )
 	}
 	for( LinkedList_Each( node, &link->styles ) ) {
 		StyleNode snode = node->data;
-		LOG( "\n[%s]\n", snode->space ? snode->space : "<none>" );
-		LOG( "[rank: %d]\n", snode->rank, fullname );
+		LOG( "\n[%s]", snode->space ? snode->space : "<none>" );
+		LOG( "[rank: %d]\n%s {\n", snode->rank, fullname );
 		LCUI_PrintStyleSheet( snode->sheet );
 		LOG("}\n");
 	}
