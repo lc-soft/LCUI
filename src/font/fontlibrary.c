@@ -141,9 +141,7 @@ LCUI_FontWeight LCUIFont_DetectWeight( const char *str )
 		return weight;
 	}
 	strtolower( buf, str );
-	if( strstr( buf, "bold" ) ) {
-		weight = FONT_WEIGHT_BOLD;
-	} else if( strstr( buf, "thin" ) ) {
+	if( strstr( buf, "thin" ) ) {
 		weight = FONT_WEIGHT_THIN;
 	} else if( strstr( buf, "light" ) ) {
 		weight = FONT_WEIGHT_EXTRA_LIGHT;
