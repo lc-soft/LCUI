@@ -853,7 +853,7 @@ static void TextEdit_OnReady( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 static void TextEdit_SetAttr( LCUI_Widget w, const char *name, 
 			      const char *val )
 {
-	if( strcasecmp( name, "data-placeholder" ) == 0 ) {
+	if( strcmp( name, "placeholder" ) == 0 ) {
 		TextEdit_SetPlaceHolder( w, val );
 	}
 }
