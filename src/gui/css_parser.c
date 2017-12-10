@@ -770,11 +770,10 @@ static int CSSParser_ParseStyleValue( LCUI_CSSParserContext ctx )
 	if( *ctx->cur == ';' ) {
 		ctx->target = CSS_TARGET_KEY;
 	}
-	if( !ctx->style.parser ) {
-		return -1;
-	}
 	CSSParser_EndBuffer( ctx );
-	ctx->style.parser->parse( &ctx->style, ctx->buffer );
+	if( ctx->style.parser ) {
+		ctx->style.parser->parse( &ctx->style, ctx->buffer );
+	}
 	DEBUG_MSG( "parse style value: %s\n", ctx->buffer );
 	if( *ctx->cur == '}' ) {
 		ctx->target = CSS_TARGET_NONE;
