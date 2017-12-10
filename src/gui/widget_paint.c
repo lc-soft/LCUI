@@ -45,10 +45,30 @@
 #include <LCUI/gui/widget.h>
 #include <LCUI/display.h>
 
+#define ComputeActualPX(VAL) LCUIMetrics_ComputeActual( VAL, SVT_PX )
+
 typedef struct LCUI_RectGroupRec_ {
 	LCUI_Widget widget;
 	LinkedList rects;
 }LCUI_RectGroupRec, *LCUI_RectGroup;
+
+typedef struct LCUI_WidgetRendererRec_ {
+	float content_top;
+	float content_left;
+	LCUI_Widget target;
+	LCUI_PaintContext paint;
+	LCUI_PaintContextRec self_paint;
+	LCUI_Graph content_graph;
+	LCUI_Graph self_graph;
+	LCUI_Graph layer_graph;
+	LCUI_Rect content_rect;
+	LCUI_BOOL has_content_graph;
+	LCUI_BOOL has_self_graph;
+	LCUI_BOOL has_layer_graph;
+	LCUI_BOOL is_cover_border;
+	LCUI_BOOL can_render_self;
+	LCUI_BOOL can_render;
+} LCUI_WidgetRendererRec, *LCUI_WidgetRenderer;
 
 static struct LCUI_WidgetRenderModule {
 	LCUI_BOOL active;
@@ -265,153 +285,178 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 	return 0;
 }
 
-#define ComputeActualPX(VAL) LCUIMetrics_ComputeActual( VAL, SVT_PX )
-
-void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
+LCUI_WidgetRenderer WidgetRenderer( LCUI_Widget w, LCUI_PaintContext paint )
 {
-	LinkedListNode *node;
-	float content_left, content_top;
-	LCUI_PaintContextRec self_paint;
-	LCUI_PaintContextRec child_paint;
-	LCUI_Rect canvas_rect, content_rect;
-	LCUI_Graph content_graph, self_graph, layer_graph;
-	LCUI_BOOL has_overlay, has_content_graph = FALSE,
-		has_self_graph = FALSE, has_layer_graph = FALSE,
-		is_cover_border = FALSE, is_paintable;
-
-	Graph_Init( &self_graph );
-	Graph_Init( &layer_graph );
-	Graph_Init( &content_graph );
-	layer_graph.color_type = COLOR_TYPE_ARGB;
+	ASSIGN( that, LCUI_WidgetRenderer );
+	Graph_Init( &that->self_graph );
+	Graph_Init( &that->layer_graph );
+	Graph_Init( &that->content_graph );
+	that->layer_graph.color_type = COLOR_TYPE_ARGB;
 	/* 若部件本身是透明的 */
 	if( w->computed_style.opacity < 1.0 ) {
-		has_self_graph = TRUE;
-		has_content_graph = TRUE;
-		has_layer_graph = TRUE;
+		that->has_self_graph = TRUE;
+		that->has_content_graph = TRUE;
+		that->has_layer_graph = TRUE;
 	} else {
 		/* 若使用了圆角边框，则判断当前脏矩形区域是否在圆角边框内
 		...
 		if( ... ) {
-			has_content_graph = TRUE;
-			is_cover_border = TRUE;
+		has_content_graph = TRUE;
+		is_cover_border = TRUE;
 		}
 		*/
 	}
-	is_paintable = Widget_IsPaintable( w );
-	/* 如果部件有需要绘制的内容 */
-	if( is_paintable ) {
-		self_graph.color_type = COLOR_TYPE_ARGB;
-		Graph_Create( &self_graph, paint->rect.width,
-				paint->rect.height );
-		self_paint.canvas = self_graph;
-		self_paint.rect = paint->rect;
-		Widget_OnPaint( w, &self_paint );
-		/* 若不需要缓存自身位图则直接绘制到画布上 */
-		if( !has_self_graph ) {
-			Graph_Mix( &paint->canvas, &self_graph,
-				   0, 0, paint->with_alpha );
-		}
-	}
+	that->can_render_self = Widget_IsPaintable( w );
 	/* 计算内容框相对于图层的坐标 */
-	content_left = w->box.padding.x - w->box.graph.x;
-	content_top = w->box.padding.y - w->box.graph.y;
+	that->content_left = w->box.padding.x - w->box.graph.x;
+	that->content_top = w->box.padding.y - w->box.graph.y;
 	/* 获取内容框 */
-	content_rect.x = ComputeActualPX( content_left );
-	content_rect.y = ComputeActualPX( content_top );
-	content_rect.width = ComputeActualPX( w->box.padding.width );
-	content_rect.height = ComputeActualPX( w->box.padding.height );
+	that->content_rect.x = ComputeActualPX( that->content_left );
+	that->content_rect.y = ComputeActualPX( that->content_top );
+	that->content_rect.width = ComputeActualPX( w->box.padding.width );
+	that->content_rect.height = ComputeActualPX( w->box.padding.height );
 	/* 获取内容框与脏矩形重叠的区域 */
-	has_overlay = LCUIRect_GetOverlayRect(
-		&content_rect, &paint->rect, &content_rect
+	that->can_render = LCUIRect_GetOverlayRect(
+		&that->content_rect, &paint->rect, &that->content_rect
 	);
-	/* 如果没有与内容框重叠，则跳过内容绘制 */
-	if( !has_overlay ) {
-		goto content_paint_done;
+	if( that->can_render ) {
+		/* 将重叠区域的坐标转换为相对于脏矩形的坐标 */
+		that->content_rect.x -= paint->rect.x;
+		that->content_rect.y -= paint->rect.y;
 	}
-	/* 将重叠区域的坐标转换为相对于脏矩形的坐标 */
-	content_rect.x -= paint->rect.x;
-	content_rect.y -= paint->rect.y;
-	/* 若需要部件内容区的位图缓存 */
-	if( has_content_graph ) {
-		child_paint.with_alpha = TRUE;
-		content_graph.color_type = COLOR_TYPE_ARGB;
-		Graph_Create( &content_graph, content_rect.width,
-			      content_rect.height );
+	that->paint = paint;
+	that->target = w;
+	return that;
+}
+
+void WidgetRenderer_Delete( LCUI_WidgetRenderer renderer )
+{
+	Graph_Free( &renderer->layer_graph );
+	Graph_Free( &renderer->self_graph );
+	Graph_Free( &renderer->content_graph );
+	free( renderer );
+}
+
+void WidgetRenderer_RenderChildren( LCUI_WidgetRenderer renderer )
+{
+	LCUI_RectF rect;
+	LCUI_Widget child;
+	LinkedListNode *node;
+	LCUI_PaintContextRec paint;
+	LCUI_Rect child_rect, canvas_rect;
+	LCUI_WidgetRenderer that = renderer;
+	if( that->has_content_graph ) {
+		paint.with_alpha = TRUE;
 	} else {
-		child_paint.with_alpha = paint->with_alpha;
-		/* 引用该区域的位图，作为内容框的位图 */
-		Graph_Quote( &content_graph, &paint->canvas, &content_rect );
+		paint.with_alpha = that->paint->with_alpha;
 	}
 	/* 按照显示顺序，从底到顶，递归遍历子级部件 */
-	LinkedList_ForEachReverse( node, &w->children_show ) {
-		LCUI_RectF rect;
-		LCUI_Rect child_rect;
-		LCUI_Widget child = node->data;
-		if( !child->computed_style.visible || 
+	for( LinkedList_EachReverse( node, &that->target->children_show ) ) {
+		child = node->data;
+		if( !child->computed_style.visible ||
 		    child->state != WSTATE_NORMAL ) {
 			continue;
 		}
 		/* 转换子部件区域，由相对于内容框转换为相对于当前脏矩形 */
-		rect.x = child->box.graph.x + content_left;
-		rect.y = child->box.graph.y + content_top;
+		rect.x = child->box.graph.x + that->content_left;
+		rect.y = child->box.graph.y + that->content_top;
 		rect.width = child->box.graph.width;
 		rect.height = child->box.graph.height;
 		LCUIMetrics_ComputeRectActual( &child_rect, &rect );
-		child_rect.x -= paint->rect.x;
-		child_rect.y -= paint->rect.y;
-		/* 获取与内容框重叠的区域，作为子部件的绘制区域 */
-		has_overlay = LCUIRect_GetOverlayRect(
-			&content_rect, &child_rect, &child_paint.rect
-		);
-		/* 区域无效则不绘制 */
-		if( !has_overlay ) {
+		child_rect.x -= that->paint->rect.x;
+		child_rect.y -= that->paint->rect.y;
+		/* 获取与内容框重叠的区域，作为子部件的绘制区域 */;
+		if( !LCUIRect_GetOverlayRect( &that->content_rect,
+					      &child_rect,
+					      &paint.rect ) ) {
 			continue;
 		}
 		/* 将子部件绘制区域转换成相对于当前部件内容框 */
-		canvas_rect.x = child_paint.rect.x - content_rect.x;
-		canvas_rect.y = child_paint.rect.y - content_rect.y;
-		canvas_rect.width = child_paint.rect.width;
-		canvas_rect.height = child_paint.rect.height;
+		canvas_rect.x = paint.rect.x - that->content_rect.x;
+		canvas_rect.y = paint.rect.y - that->content_rect.y;
+		canvas_rect.width = paint.rect.width;
+		canvas_rect.height = paint.rect.height;
 		/* 将绘制区域转换为相对于子部件 */
-		child_paint.rect.x -= child_rect.x;
-		child_paint.rect.y -= child_rect.y;
+		paint.rect.x -= child_rect.x;
+		paint.rect.y -= child_rect.y;
 		DEBUG_MSG( "[%s]: canvas_rect:(%d,%d,%d,%d)\n", w->type,
 			   canvas_rect.x, canvas_rect.y,
 			   canvas_rect.width, canvas_rect.height );
 		/* 在内容位图中引用所需的区域，作为子部件的画布 */
-		Graph_Quote( &child_paint.canvas, &content_graph, &canvas_rect );
-		Widget_Render( child, &child_paint );
+		Graph_Quote( &paint.canvas, &that->content_graph,
+			     &canvas_rect );
+		Widget_Render( child, &paint );
 	}
+}
+
+void WidgetRenderer_Render( LCUI_WidgetRenderer renderer )
+{
+	LCUI_WidgetRenderer that = renderer;
+	if( !that->can_render ) {
+		return;
+	}
+	/* 如果部件有需要绘制的内容 */
+	if( that->can_render_self ) {
+		that->self_graph.color_type = COLOR_TYPE_ARGB;
+		Graph_Create( &that->self_graph,
+			      that->paint->rect.width,
+			      that->paint->rect.height );
+		that->self_paint.canvas = that->self_graph;
+		that->self_paint.rect = that->paint->rect;
+		Widget_OnPaint( that->target, &that->self_paint );
+		/* 若不需要缓存自身位图则直接绘制到画布上 */
+		if( !that->has_self_graph ) {
+			Graph_Mix( &that->paint->canvas,
+				   &that->self_graph, 0, 0,
+				   that->paint->with_alpha );
+		}
+	}
+	/* 若需要部件内容区的位图缓存 */
+	if( that->has_content_graph ) {
+		that->content_graph.color_type = COLOR_TYPE_ARGB;
+		Graph_Create( &that->content_graph,
+			      that->content_rect.width,
+			      that->content_rect.height );
+	} else {
+		/* 引用该区域的位图，作为内容框的位图 */
+		Graph_Quote( &that->content_graph, &that->paint->canvas,
+			     &that->content_rect );
+	}
+	WidgetRenderer_RenderChildren( that );
 	/* 如果与圆角边框重叠，则裁剪掉边框外的内容 */
-	if( is_cover_border ) {
+	if( that->is_cover_border ) {
 		/* content_graph ... */
 	}
-
-content_paint_done:
-
+	if( !that->has_layer_graph ) {
+		if( that->has_content_graph ) {
+			Graph_Mix( &that->paint->canvas, &that->content_graph,
+				   that->content_rect.x, that->content_rect.y,
+				   TRUE );
+		}
+		return;
+	}
 	/* 若需要绘制的是当前部件图层，则先混合部件自身位图和内容位图，得出当
 	 * 前部件的图层，然后将该图层混合到输出的位图中
 	 */
-	if( has_layer_graph ) {
-		if( is_paintable ) {
-			Graph_Copy( &layer_graph, &self_graph );
-			Graph_Mix( &layer_graph, &content_graph,
-				   content_rect.x, content_rect.y, TRUE );
-		} else {
-			Graph_Create( &layer_graph, paint->rect.width, 
-				      paint->rect.height );
-			Graph_Replace( &layer_graph, &content_graph, 
-				       content_rect.x, content_rect.y );
-		}
-		layer_graph.opacity = w->computed_style.opacity;
-		Graph_Mix( &paint->canvas, &layer_graph, 
-			   0, 0, paint->with_alpha );
+	if( that->can_render_self ) {
+		Graph_Copy( &that->layer_graph, &that->self_graph );
+		Graph_Mix( &that->layer_graph, &that->content_graph,
+			   that->content_rect.x, that->content_rect.y, TRUE );
+	} else {
+		Graph_Create( &that->layer_graph, that->paint->rect.width,
+			      that->paint->rect.height );
+		Graph_Replace( &that->layer_graph, &that->content_graph,
+			       that->content_rect.x, that->content_rect.y );
 	}
-	else if( has_content_graph ) {
-		Graph_Mix( &paint->canvas, &content_graph,
-			   content_rect.x, content_rect.y, TRUE );
-	}
-	Graph_Free( &layer_graph );
-	Graph_Free( &self_graph );
-	Graph_Free( &content_graph );
+	that->layer_graph.opacity = that->target->computed_style.opacity;
+	Graph_Mix( &that->paint->canvas, &that->layer_graph,
+		   0, 0, that->paint->with_alpha );
+}
+
+void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
+{
+	LCUI_WidgetRenderer renderer;
+	renderer = WidgetRenderer( w, paint );
+	WidgetRenderer_Render( renderer );
+	WidgetRenderer_Delete( renderer );
 }
