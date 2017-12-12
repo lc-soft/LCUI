@@ -218,13 +218,16 @@ static int OnParseStyleOption( LCUI_CSSParserStyleContext ctx, const char *str )
 
 static int OnParseBorder( LCUI_CSSParserStyleContext ctx, const char *str )
 {
-	LCUI_StyleRec slist[3];
+	LCUI_StyleRec slist[3] = { 0 };
 	LCUI_StyleSheet ss = ctx->sheet;
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
-	if( SplitValues(str, slist, 3, mode) < 3 ) {
+	if( SplitValues(str, slist, 3, mode) < 1 ) {
 		return -1;
 	}
 	for( i = 0; i < 3; ++i ) {
+		if( !slist[i].is_valid ) {
+			break;
+		}
 		switch( slist[i].type ) {
 		case SVT_COLOR:
 			ss->sheet[key_border_top_color] = slist[i];
@@ -233,6 +236,7 @@ static int OnParseBorder( LCUI_CSSParserStyleContext ctx, const char *str )
 			ss->sheet[key_border_left_color] = slist[i];
 			break;
 		case SVT_PX:
+		case SVT_VALUE:
 			ss->sheet[key_border_top_width] = slist[i];
 			ss->sheet[key_border_right_width] = slist[i];
 			ss->sheet[key_border_bottom_width] = slist[i];
