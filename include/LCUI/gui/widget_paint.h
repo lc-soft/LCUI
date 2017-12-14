@@ -81,8 +81,9 @@ LCUI_API void RectToInvalidArea( const LCUI_Rect *rect, LCUI_Rect *area );
  * 渲染指定部件呈现的图形内容
  * @param[in] w		部件
  * @param[in] paint 	进行绘制时所需的上下文
+ * @return		返回实际渲染的部件的数量
  */
-LCUI_API void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint );
+LCUI_API size_t Widget_Render( LCUI_Widget w, LCUI_PaintContext paint );
 
 LCUI_API void LCUIWidget_InitRenderer( void );
 

@@ -117,7 +117,7 @@ LCUI_API int LCUIDisplay_GetMode( void );
 LCUI_API void LCUIDisplay_Update( void );
 
 /** 渲染内容 */
-LCUI_API void LCUIDisplay_Render( void );
+LCUI_API size_t LCUIDisplay_Render( void );
 
 /** 呈现渲染后的内容 */
 LCUI_API void LCUIDisplay_Present( void );

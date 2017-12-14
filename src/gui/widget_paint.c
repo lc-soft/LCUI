@@ -57,7 +57,6 @@ typedef struct LCUI_WidgetRendererRec_ {
 	float content_left;
 	LCUI_Widget target;
 	LCUI_PaintContext paint;
-	LCUI_PaintContextRec self_paint;
 	LCUI_Graph content_graph;
 	LCUI_Graph self_graph;
 	LCUI_Graph layer_graph;
@@ -288,10 +287,13 @@ int Widget_ConvertArea( LCUI_Widget w, LCUI_Rect *in_rect,
 LCUI_WidgetRenderer WidgetRenderer( LCUI_Widget w, LCUI_PaintContext paint )
 {
 	ASSIGN( that, LCUI_WidgetRenderer );
-	Graph_Init( &that->self_graph );
-	Graph_Init( &that->layer_graph );
-	Graph_Init( &that->content_graph );
-	that->layer_graph.color_type = COLOR_TYPE_ARGB;
+
+	that->target = w;
+	that->paint = paint;
+	that->is_cover_border = FALSE;
+	that->has_self_graph = FALSE;
+	that->has_layer_graph = FALSE;
+	that->has_content_graph = FALSE;
 	/* 若部件本身是透明的 */
 	if( w->computed_style.opacity < 1.0 ) {
 		that->has_self_graph = TRUE;
@@ -301,12 +303,22 @@ LCUI_WidgetRenderer WidgetRenderer( LCUI_Widget w, LCUI_PaintContext paint )
 		/* 若使用了圆角边框，则判断当前脏矩形区域是否在圆角边框内
 		...
 		if( ... ) {
-		has_content_graph = TRUE;
-		is_cover_border = TRUE;
+			that->has_content_graph = TRUE;
+			that->is_cover_border = TRUE;
 		}
 		*/
 	}
+	Graph_Init( &that->self_graph );
+	Graph_Init( &that->layer_graph );
+	Graph_Init( &that->content_graph );
+	that->layer_graph.color_type = COLOR_TYPE_ARGB;
 	that->can_render_self = Widget_IsPaintable( w );
+	if( that->can_render_self ) {
+		that->self_graph.color_type = COLOR_TYPE_ARGB;
+		Graph_Create( &that->self_graph,
+			      that->paint->rect.width,
+			      that->paint->rect.height );
+	}
 	/* 计算内容框相对于图层的坐标 */
 	that->content_left = w->box.padding.x - w->box.graph.x;
 	that->content_top = w->box.padding.y - w->box.graph.y;
@@ -319,13 +331,23 @@ LCUI_WidgetRenderer WidgetRenderer( LCUI_Widget w, LCUI_PaintContext paint )
 	that->can_render = LCUIRect_GetOverlayRect(
 		&that->content_rect, &paint->rect, &that->content_rect
 	);
-	if( that->can_render ) {
-		/* 将重叠区域的坐标转换为相对于脏矩形的坐标 */
-		that->content_rect.x -= paint->rect.x;
-		that->content_rect.y -= paint->rect.y;
+	/* 将重叠区域的坐标转换为相对于脏矩形的坐标 */
+	that->content_rect.x -= paint->rect.x;
+	that->content_rect.y -= paint->rect.y;
+	if( !that->can_render ) {
+		return that;
 	}
-	that->paint = paint;
-	that->target = w;
+	/* 若需要部件内容区的位图缓存 */
+	if( that->has_content_graph ) {
+		that->content_graph.color_type = COLOR_TYPE_ARGB;
+		Graph_Create( &that->content_graph,
+				that->content_rect.width,
+				that->content_rect.height );
+	} else {
+		/* 引用该区域的位图，作为内容框的位图 */
+		Graph_Quote( &that->content_graph, &that->paint->canvas,
+				&that->content_rect );
+	}
 	return that;
 }
 
@@ -337,8 +359,9 @@ void WidgetRenderer_Delete( LCUI_WidgetRenderer renderer )
 	free( renderer );
 }
 
-void WidgetRenderer_RenderChildren( LCUI_WidgetRenderer renderer )
+size_t WidgetRenderer_RenderChildren( LCUI_WidgetRenderer renderer )
 {
+	size_t count = 0;
 	LCUI_RectF rect;
 	LCUI_Widget child;
 	LinkedListNode *node;
@@ -385,25 +408,25 @@ void WidgetRenderer_RenderChildren( LCUI_WidgetRenderer renderer )
 		/* 在内容位图中引用所需的区域，作为子部件的画布 */
 		Graph_Quote( &paint.canvas, &that->content_graph,
 			     &canvas_rect );
-		Widget_Render( child, &paint );
+		count += Widget_Render( child, &paint );
 	}
+	return count;
 }
 
-void WidgetRenderer_Render( LCUI_WidgetRenderer renderer )
+size_t WidgetRenderer_Render( LCUI_WidgetRenderer renderer )
 {
+	size_t count = 0;
+	LCUI_PaintContextRec self_paint;
 	LCUI_WidgetRenderer that = renderer;
 	if( !that->can_render ) {
-		return;
+		return count;
 	}
+	count += 1;
 	/* 如果部件有需要绘制的内容 */
 	if( that->can_render_self ) {
-		that->self_graph.color_type = COLOR_TYPE_ARGB;
-		Graph_Create( &that->self_graph,
-			      that->paint->rect.width,
-			      that->paint->rect.height );
-		that->self_paint.canvas = that->self_graph;
-		that->self_paint.rect = that->paint->rect;
-		Widget_OnPaint( that->target, &that->self_paint );
+		self_paint.canvas = that->self_graph;
+		self_paint.rect = that->paint->rect;
+		Widget_OnPaint( that->target, &self_paint );
 		/* 若不需要缓存自身位图则直接绘制到画布上 */
 		if( !that->has_self_graph ) {
 			Graph_Mix( &that->paint->canvas,
@@ -411,18 +434,7 @@ void WidgetRenderer_Render( LCUI_WidgetRenderer renderer )
 				   that->paint->with_alpha );
 		}
 	}
-	/* 若需要部件内容区的位图缓存 */
-	if( that->has_content_graph ) {
-		that->content_graph.color_type = COLOR_TYPE_ARGB;
-		Graph_Create( &that->content_graph,
-			      that->content_rect.width,
-			      that->content_rect.height );
-	} else {
-		/* 引用该区域的位图，作为内容框的位图 */
-		Graph_Quote( &that->content_graph, &that->paint->canvas,
-			     &that->content_rect );
-	}
-	WidgetRenderer_RenderChildren( that );
+	count += WidgetRenderer_RenderChildren( that );
 	/* 如果与圆角边框重叠，则裁剪掉边框外的内容 */
 	if( that->is_cover_border ) {
 		/* content_graph ... */
@@ -433,7 +445,7 @@ void WidgetRenderer_Render( LCUI_WidgetRenderer renderer )
 				   that->content_rect.x, that->content_rect.y,
 				   TRUE );
 		}
-		return;
+		return count;
 	}
 	/* 若需要绘制的是当前部件图层，则先混合部件自身位图和内容位图，得出当
 	 * 前部件的图层，然后将该图层混合到输出的位图中
@@ -451,12 +463,15 @@ void WidgetRenderer_Render( LCUI_WidgetRenderer renderer )
 	that->layer_graph.opacity = that->target->computed_style.opacity;
 	Graph_Mix( &that->paint->canvas, &that->layer_graph,
 		   0, 0, that->paint->with_alpha );
+	return count;
 }
 
-void Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
+size_t Widget_Render( LCUI_Widget w, LCUI_PaintContext paint )
 {
+	size_t count;
 	LCUI_WidgetRenderer renderer;
 	renderer = WidgetRenderer( w, paint );
-	WidgetRenderer_Render( renderer );
+	count = WidgetRenderer_Render( renderer );
 	WidgetRenderer_Delete( renderer );
+	return count;
 }

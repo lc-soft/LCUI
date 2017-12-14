@@ -131,8 +131,9 @@ void LCUIDisplay_Update( void )
 	LinkedList_Concat( &record->rects, &display.rects );
 }
 
-void LCUIDisplay_Render( void )
+size_t LCUIDisplay_Render( void )
 {
+	size_t count = 0;
 	LCUI_BOOL skip;
 	LCUI_Rect *rect;
 	LCUI_SysEventRec ev;
@@ -142,7 +143,7 @@ void LCUIDisplay_Render( void )
 	SurfaceRecord record;
 
 	if( !display.is_working ) {
-		return;
+		return 0;
 	}
 	ev.type = LCUI_PAINT;
 	/* 遍历当前的 surface 记录列表 */
@@ -171,7 +172,7 @@ void LCUIDisplay_Render( void )
 				   record->widget->type,
 				   paint->rect.x, paint->rect.y,
 				   paint->rect.width, paint->rect.height );
-			Widget_Render( record->widget, paint );
+			count += Widget_Render( record->widget, paint );
 			if( display.show_rect_border ) {
 				DrawBorder( paint );
 			}
@@ -180,6 +181,7 @@ void LCUIDisplay_Render( void )
 		}
 		RectList_Clear( &record->rects );
 	}
+	return count;
 }
 
 void LCUIDisplay_Present( void )
