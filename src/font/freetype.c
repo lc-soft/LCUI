@@ -188,16 +188,10 @@ static int FreeType_Render( LCUI_FontBitmap *bmp, wchar_t ch,
 	int ret = 0;
 	size_t size;
 	FT_UInt index;
-	LCUI_BOOL has_space = FALSE;
 	FT_Face ft_face = (FT_Face)font->data;
 
 	/* 设定字体尺寸 */
 	FT_Set_Pixel_Sizes( ft_face, 0, pixel_size );
-	/* 如果是空格 */
-	if( ch == ' ' ) {
-		ch = 'a';
-		has_space = TRUE;
-	}
 	index = FT_Get_Char_Index( ft_face, ch );
 	if( index == 0 ) {
 		ret = -1;
@@ -207,11 +201,6 @@ static int FreeType_Render( LCUI_FontBitmap *bmp, wchar_t ch,
 		return -2;
 	}
 	size = Convert_FTGlyph( bmp, ft_face->glyph, LCUI_FONT_RENDER_MODE );
-	/* 如果是空格则将位图内容清空 */
-	if( has_space ) {
-		memset( bmp->buffer, 0, size );
-		bmp->advance.x = bmp->advance.x / 2 + 1;
-	}
 	return ret;
 }
 
