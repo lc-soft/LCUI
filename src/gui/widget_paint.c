@@ -66,7 +66,7 @@ typedef struct LCUI_WidgetRendererRec_ {
 	LCUI_BOOL has_layer_graph;
 	LCUI_BOOL is_cover_border;
 	LCUI_BOOL can_render_self;
-	LCUI_BOOL can_render;
+	LCUI_BOOL can_render_centent;
 } LCUI_WidgetRendererRec, *LCUI_WidgetRenderer;
 
 static struct LCUI_WidgetRenderModule {
@@ -328,13 +328,13 @@ LCUI_WidgetRenderer WidgetRenderer( LCUI_Widget w, LCUI_PaintContext paint )
 	that->content_rect.width = ComputeActualPX( w->box.padding.width );
 	that->content_rect.height = ComputeActualPX( w->box.padding.height );
 	/* 获取内容框与脏矩形重叠的区域 */
-	that->can_render = LCUIRect_GetOverlayRect(
+	that->can_render_centent = LCUIRect_GetOverlayRect(
 		&that->content_rect, &paint->rect, &that->content_rect
 	);
 	/* 将重叠区域的坐标转换为相对于脏矩形的坐标 */
 	that->content_rect.x -= paint->rect.x;
 	that->content_rect.y -= paint->rect.y;
-	if( !that->can_render ) {
+	if( !that->can_render_centent ) {
 		return that;
 	}
 	/* 若需要部件内容区的位图缓存 */
@@ -418,12 +418,9 @@ size_t WidgetRenderer_Render( LCUI_WidgetRenderer renderer )
 	size_t count = 0;
 	LCUI_PaintContextRec self_paint;
 	LCUI_WidgetRenderer that = renderer;
-	if( !that->can_render ) {
-		return count;
-	}
-	count += 1;
 	/* 如果部件有需要绘制的内容 */
 	if( that->can_render_self ) {
+		count += 1;
 		self_paint.canvas = that->self_graph;
 		self_paint.rect = that->paint->rect;
 		Widget_OnPaint( that->target, &self_paint );
@@ -434,7 +431,9 @@ size_t WidgetRenderer_Render( LCUI_WidgetRenderer renderer )
 				   that->paint->with_alpha );
 		}
 	}
-	count += WidgetRenderer_RenderChildren( that );
+	if( that->can_render_centent ) {
+		count += WidgetRenderer_RenderChildren( that );
+	}
 	/* 如果与圆角边框重叠，则裁剪掉边框外的内容 */
 	if( that->is_cover_border ) {
 		/* content_graph ... */
