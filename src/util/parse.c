@@ -48,27 +48,32 @@
 LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 {
 	int n = 0;
+	const char *p;
 	char num_str[32];
-	const char *p = str;
 	LCUI_BOOL has_sign = FALSE, has_point = FALSE;
 
 	if( str == NULL ) {
 		return FALSE;
 	}
 	/* 先取出数值 */
-	while( 1 ) {
+	for( p = str; *p && n < 30; ++p ) {
 		if( *p >= '0' && *p <= '9' );
-		else if( !has_sign && (*p == '-' || *p == '+') ) {
+		else if( *p == '-' || *p == '+' ) {
+			if( n > 0 ) {
+				n = 0;
+				break;
+			}
 			has_sign = TRUE;
-		} else if( !has_point && *p == '.' ) {
+		} else if( *p == '.' ) {
+			if( has_point ) {
+				n = 0;
+				break;
+			}
 			has_point = TRUE;
 		} else {
 			break;
 		}
-		if( n < 30 ) {
-			num_str[n++] = *p;
-		}
-		++p;
+		num_str[n++] = *p;
 	}
 	if( n == 0 ) {
 		return FALSE;

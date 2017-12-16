@@ -135,6 +135,7 @@ static KeyNameGroupRec style_name_map[] = {
 	{ key_left, "left" },
 	{ key_bottom, "bottom" },
 	{ key_position, "position" },
+	{ key_opacity, "opacity" },
 	{ key_vertical_align, "vertical-align" },
 	{ key_background_color, "background-color" },
 	{ key_background_position, "background-position" },
@@ -1294,8 +1295,11 @@ void LCUI_PrintStyleSheet( LCUI_StyleSheet ss )
 		case SVT_STYLE:
 			LOG( "%s", LCUI_GetStyleValueName( s->val_style ) );
 			break;
+		case SVT_VALUE:
+			LOG( "%d", s->val_int );
+			break;
 		default:
-			LOG( "%d", s->value );
+			LOG( "%g", s->value );
 			break;
 		}
 		LOG( ";\n" );
