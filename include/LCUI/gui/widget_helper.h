@@ -42,6 +42,8 @@
 
 LCUI_BEGIN_HEADER
 
+#define Widget_IsVisible(W) (W)->computed_style.visible
+
  /** 设置内边距 */
 LCUI_API void Widget_SetPadding( LCUI_Widget w, float top, float right,
 				 float bottom, float left );
