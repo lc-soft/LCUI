@@ -202,6 +202,9 @@ LCUI_API void LCUIMainLoop_Destroy( LCUI_MainLoop loop );
 /* 检测LCUI是否活动 */ 
 LCUI_API LCUI_BOOL LCUI_IsActive( void );
 
+/** 获取当前帧数 */
+LCUI_API int LCUI_GetFrameCount( void );
+
 LCUI_API void LCUI_InitBase( void );
 
 LCUI_API void LCUI_InitApp( LCUI_AppDriver app );

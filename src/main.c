@@ -346,6 +346,11 @@ void LCUIMainLoop_Destroy( LCUI_MainLoop loop )
 	free( loop );
 }
 
+int LCUI_GetFrameCount( void )
+{
+	return StepTimer_GetFrameCount( MainApp.timer );
+}
+
 void LCUI_InitApp( LCUI_AppDriver app )
 {
 	int i;
