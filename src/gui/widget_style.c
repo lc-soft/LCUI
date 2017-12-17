@@ -199,12 +199,23 @@ void Widget_PrintStyleSheets( LCUI_Widget w )
 	Selector_Delete( s );
 }
 
-void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all )
+void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_refresh_all )
 {
-	if( is_update_all ) {
+	if( is_refresh_all ) {
+		StyleSheet_Clear( w->style );
 		Widget_AddTask( w, WTT_REFRESH_STYLE );
 	} else {
 		Widget_AddTask( w, WTT_UPDATE_STYLE );
+	}
+}
+
+void Widget_UpdateChildrenStyle( LCUI_Widget w, LCUI_BOOL is_refresh_all )
+{
+	LinkedListNode *node;
+	w->task.for_children = TRUE;
+	for( LinkedList_Each( node, &w->children ) ) {
+		Widget_UpdateStyle( node->data, is_refresh_all );
+		Widget_UpdateChildrenStyle( node->data, is_refresh_all );
 	}
 }
 

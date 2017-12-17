@@ -146,8 +146,9 @@ int Widget_Append( LCUI_Widget parent, LCUI_Widget widget )
 		child->index += 1;
 		node = node->next;
 	}
+	Widget_UpdateStyle( widget, TRUE );
+	Widget_UpdateChildrenStyle( widget, TRUE );
 	Widget_PostSurfaceEvent( widget, WET_ADD, TRUE );
-	Widget_AddTaskForChildren( widget, WTT_REFRESH_STYLE );
 	Widget_UpdateTaskStatus( widget );
 	Widget_UpdateStatus( widget );
 	Widget_UpdateLayout( parent );

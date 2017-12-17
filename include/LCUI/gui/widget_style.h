@@ -54,7 +54,10 @@ LCUI_API void Widget_GetInheritStyle( LCUI_Widget w, LCUI_StyleSheet out_ss );
 LCUI_API void Widget_PrintStyleSheets( LCUI_Widget w );
 
 /** 更新当前部件的样式 */
-LCUI_API void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
+LCUI_API void Widget_UpdateStyle( LCUI_Widget w, LCUI_BOOL is_refresh_all );
+
+/** 更新当前部件的子级部件样式 */
+LCUI_API void Widget_UpdateChildrenStyle( LCUI_Widget w, LCUI_BOOL is_refresh_all );
 
 /** 直接更新当前部件的样式 */
 LCUI_API void Widget_ExecUpdateStyle( LCUI_Widget w, LCUI_BOOL is_update_all );
