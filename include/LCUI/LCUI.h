@@ -183,6 +183,20 @@ typedef struct LCUI_BorderStyle {
 	float bottom_right_radius;
 } LCUI_BorderStyle;
 
+/** 弹性（Flex）布局相关样式 */
+typedef struct LCUI_FlexLayoutStyle {
+	LCUI_StyleType wrap;
+	LCUI_StyleType flow;
+	LCUI_StyleType grow;
+	LCUI_StyleType shrink;
+	LCUI_StyleType basis;
+	LCUI_StyleType direction;
+	LCUI_StyleType align_self;
+	LCUI_StyleType align_items;
+	LCUI_StyleType align_content;
+	LCUI_StyleType justify_content;
+} LCUI_FlexLayoutStyle;
+
 /** 边框相关参数 */
 typedef struct LCUI_Border {
 	struct {
@@ -262,6 +276,9 @@ typedef enum LCUI_StyleValue {
 	SV_FLOAT_RIGHT,
 	SV_BLOCK,
 	SV_INLINE_BLOCK,
+	SV_FLEX,
+	SV_FLEX_START,
+	SV_FLEX_END,
 	SV_NOWRAP
 } LCUI_StyleValue;
 

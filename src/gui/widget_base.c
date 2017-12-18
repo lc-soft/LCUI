@@ -501,6 +501,22 @@ int Widget_SetId( LCUI_Widget w, const char *idstr )
 	return -2;
 }
 
+void Widget_AddState( LCUI_Widget w, LCUI_WidgetState state )
+{
+	/* 如果部件还处于未准备完毕的状态 */
+	if( w->state < WSTATE_READY ) {
+		w->state |= state;
+		/* 如果部件已经准备完毕则触发 ready 事件 */
+		if( w->state == WSTATE_READY ) {
+			LCUI_WidgetEventRec e = { 0 };
+			e.type = WET_READY;
+			e.cancel_bubble = TRUE;
+			Widget_TriggerEvent( w, &e, NULL );
+			w->state = WSTATE_NORMAL;
+		}
+	}
+}
+
 static float ComputeXMetric( LCUI_Widget w, int key )
 {
 	LCUI_Style s = &w->style->sheet[key];
@@ -548,11 +564,26 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 	LCUI_Style s = &w->style->sheet[key_visible];
 	LCUI_BOOL visible = w->computed_style.visible;
 	if( w->computed_style.display == SV_NONE ) {
-		visible = FALSE;
+		w->computed_style.visible = FALSE;
+	} else if( s->is_valid && s->type == SVT_BOOL ) {
+		w->computed_style.visible = s->val_bool;
 	}
-	w->computed_style.visible = !(s->is_valid && !s->value);
-	s = &w->style->sheet[key_display];
-	if( s->is_valid ) {
+	if( visible == w->computed_style.visible ) {
+		return;
+	}
+	if( w->parent ) {
+		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
+	}
+	visible = w->computed_style.visible;
+	DEBUG_MSG( "visible: %s\n", visible ? "TRUE" : "FALSE" );
+	Widget_PostSurfaceEvent( w, visible ? WET_SHOW : WET_HIDE, TRUE );
+}
+
+void Widget_UpdateDisplay( LCUI_Widget w )
+{
+	int display = w->computed_style.display;
+	LCUI_Style s = &w->style->sheet[key_display];
+	if( s->is_valid && s->type == SVT_STYLE ) {
 		w->computed_style.display = s->style;
 		if( w->computed_style.display == SV_NONE ) {
 			w->computed_style.visible = FALSE;
@@ -560,19 +591,14 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 	} else {
 		w->computed_style.display = SV_BLOCK;
 	}
-	if( visible == w->computed_style.visible ) {
+	if( w->computed_style.display == display ) {
 		return;
 	}
-	visible = w->computed_style.visible;
-	if( w->parent ) {
-		Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
-		if( w->computed_style.display != display ||
-		    w->computed_style.position != SV_ABSOLUTE ) {
-			Widget_UpdateLayout( w->parent );
-		}
+	if( w->parent && display == SV_NONE &&
+	    w->computed_style.position != SV_ABSOLUTE ) {
+		Widget_UpdateLayout( w->parent );
 	}
-	DEBUG_MSG( "visible: %s\n", visible ? "TRUE" : "FALSE" );
-	Widget_PostSurfaceEvent( w, visible ? WET_SHOW : WET_HIDE, TRUE );
+	Widget_UpdateLayout( w );
 }
 
 void Widget_UpdateOpacity( LCUI_Widget w )
@@ -1455,98 +1481,6 @@ float Widget_ComputeMaxWidth( LCUI_Widget widget )
 		}
 	}
 	return width;
-}
-
-void Widget_UpdateLayout( LCUI_Widget w )
-{
-	Widget_AddTask( w, WTT_LAYOUT );
-}
-
-void Widget_ExecUpdateLayout( LCUI_Widget w )
-{
-	struct {
-		float x, y;
-		float line_height;
-		LCUI_Widget prev;
-		int prev_display;
-		float max_width;
-	} ctx = { 0 };
-	LCUI_Widget child;
-	LCUI_WidgetEventRec e = { 0 };
-	LinkedListNode *node;
-
-	ctx.max_width = Widget_ComputeMaxWidth( w );
-	for( LinkedList_Each( node, &w->children ) ) {
-		child = node->data;
-		if( child->computed_style.position != SV_STATIC &&
-		    child->computed_style.position != SV_RELATIVE ) {
-			/* 如果部件还处于未准备完毕的状态 */
-			if( child->state < WSTATE_READY ) {
-				child->state |= WSTATE_LAYOUTED;
-				/* 如果部件已经准备完毕则触发 ready 事件 */
-				if( child->state == WSTATE_READY ) {
-					LCUI_WidgetEventRec e = { 0 };
-					e.type = WET_READY;
-					e.cancel_bubble = TRUE;
-					Widget_TriggerEvent( child, &e, NULL );
-					child->state = WSTATE_NORMAL;
-				}
-			}
-			continue;
-		}
-		switch( child->computed_style.display ) {
-		case SV_BLOCK:
-			ctx.x = 0;
-			if( ctx.prev && ctx.prev_display != SV_BLOCK ) {
-				ctx.y += ctx.line_height;
-			}
-			child->origin_x = ctx.x;
-			child->origin_y = ctx.y;
-			ctx.line_height = child->box.outer.height;
-			ctx.y += child->box.outer.height;
-			break;
-		case SV_INLINE_BLOCK:
-			if( ctx.prev && ctx.prev_display == SV_BLOCK ) {
-				ctx.x = 0;
-				ctx.line_height = 0;
-			}
-			child->origin_x = ctx.x;
-			ctx.x += child->box.outer.width;
-			/* 只考虑小数点后两位 */
-			if( ctx.x - ctx.max_width >= 0.01 ) {
-				child->origin_x = 0;
-				ctx.y += ctx.line_height;
-				ctx.x = child->box.outer.width;
-			}
-			child->origin_y = ctx.y;
-			if( child->box.outer.height > ctx.line_height ) {
-				ctx.line_height = child->box.outer.height;
-			}
-			break;
-		case SV_NONE:
-		default: continue;
-		}
-		Widget_UpdatePosition( child );
-		if( child->state < WSTATE_READY ) {
-			child->state |= WSTATE_LAYOUTED;
-			if( child->state == WSTATE_READY ) {
-				LCUI_WidgetEventRec e;
-				e.type = WET_READY;
-				e.cancel_bubble = TRUE;
-				Widget_TriggerEvent( child, &e, NULL );
-				child->state = WSTATE_NORMAL;
-			}
-		}
-		ctx.prev = child;
-		ctx.prev_display = child->computed_style.display;
-	}
-	if( w->style->sheet[key_width].type == SVT_AUTO ||
-	    w->style->sheet[key_height].type == SVT_AUTO ) {
-		Widget_AddTask( w, WTT_RESIZE );
-	}
-	e.cancel_bubble = TRUE;
-	e.type = WET_AFTERLAYOUT;
-	Widget_TriggerEvent( w, &e, NULL );
 }
 
 static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix )

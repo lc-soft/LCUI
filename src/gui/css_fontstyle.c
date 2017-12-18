@@ -65,7 +65,7 @@ enum FontStyleType {
 
 typedef void (*StyleHandler)( LCUI_CSSFontStyle, LCUI_Style );
 
-static struct LCUI_CSSFontStyleModule{
+static struct LCUI_CSSFontStyleModule {
 	int keys[TOTAL_FONT_STYLE_KEY];
 	StyleHandler handlers[TOTAL_FONT_STYLE_KEY];
 } self;

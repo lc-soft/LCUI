@@ -128,13 +128,15 @@ enum LCUI_StyleKeyName {
 	key_box_shadow_color,
 	// box shadow end
 
+	key_justify_content,
+
 	key_pointer_events,
 	key_focusable,
 	STYLE_KEY_TOTAL
 };
 
-#define key_display_start	key_visible
-#define key_display_end		key_display
+#define key_flex_style_start	key_justify_content
+#define key_flex_style_end	key_justify_content
 #define key_position_start	key_left
 #define key_position_end	key_position
 #define key_margin_start	key_margin_top
@@ -185,6 +187,8 @@ typedef struct LCUI_SelectorRec_ {
 				S->sheet[NAME].val_int = 0
 
 #define LCUI_FindStyleSheet(S, L) LCUI_FindStyleSheetFromGroup(0, NULL, S, L)
+
+#define StyleSheet_GetStyle(S, K) &((S)->sheet[K])
 
 LCUI_API LCUI_StyleSheet StyleSheet( void );
 

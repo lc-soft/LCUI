@@ -172,7 +172,8 @@ static KeyNameGroupRec style_name_map[] = {
 	{ key_box_shadow_color, "box-shadow-color" },
 	{ key_pointer_events, "pointer-events" },
 	{ key_focusable, "focusable" },
-	{ key_box_sizing, "box-sizing" }
+	{ key_box_sizing, "box-sizing" },
+	{ key_justify_content, "justify-content" }
 };
 
 /** 样式字符串与标识码的映射表 */
@@ -209,7 +210,9 @@ static KeyNameGroupRec style_value_map[] = {
 	{ SV_ABSOLUTE, "absolute" },
 	{ SV_BLOCK, "block" },
 	{ SV_INLINE_BLOCK, "inline-block" },
-	{ SV_NOWRAP, "nowrap" }
+	{ SV_NOWRAP, "nowrap" },
+	{ SV_FLEX_START, "flex-start" },
+	{ SV_FLEX_END, "flex-end" }
 };
 
 static int LCUI_DirectAddStyleName( int key, const char *name )

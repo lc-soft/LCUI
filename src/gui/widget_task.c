@@ -137,6 +137,7 @@ static void MapTaskHandler(void)
 	self.handlers[WTT_BACKGROUND] = Widget_UpdateBackground;
 	self.handlers[WTT_LAYOUT] = Widget_ExecUpdateLayout;
 	self.handlers[WTT_ZINDEX] = Widget_ExecUpdateZIndex;
+	self.handlers[WTT_DISPLAY] = Widget_UpdateDisplay;
 	self.handlers[WTT_PROPS] = Widget_UpdateProps;
 }
 
@@ -204,18 +205,7 @@ int Widget_Update( LCUI_Widget w )
 			buffer[i] = FALSE;
 		}
 	}
-	/* 如果部件还处于未准备完毕的状态 */
-	if( w->state < WSTATE_READY ) {
-		w->state |= WSTATE_UPDATED;
-		/* 如果部件已经准备完毕则触发 ready 事件 */
-		if( w->state == WSTATE_READY ) {
-			LCUI_WidgetEventRec e = { 0 };
-			e.type = WET_READY;
-			e.cancel_bubble = TRUE;
-			Widget_TriggerEvent( w, &e, NULL );
-			w->state = WSTATE_NORMAL;
-		}
-	}
+	Widget_AddState( w, WSTATE_UPDATED );
 
 proc_children_task:
 

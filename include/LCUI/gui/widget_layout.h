@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
- * widget.h -- GUI widget APIs.
+ * widget_layout.c -- the widget layout processing module.
  *
- * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -20,9 +20,9 @@
  * ****************************************************************************/
 
 /* ****************************************************************************
- * widget.h -- GUI部件操作相关的函数接口。
+ * widget_layout.c -- 部件的布局处理模块。
  *
- * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2017 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,22 +37,11 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-#ifndef LCUI_WIDGET_BUILD_H
-#define LCUI_WIDGET_BUILD_H
+#ifndef LCUI_WIDGET_LAYOUT_H
+#define LCUI_WIDGET_LAYOUT_H
 
-#include <LCUI/graph.h>
-#include <LCUI/thread.h>
-#include <LCUI/gui/widget_base.h>
-#include <LCUI/gui/widget_helper.h>
-#include <LCUI/gui/widget_layout.h>
-#include <LCUI/gui/widget_task.h>
-#include <LCUI/gui/widget_paint.h>
-#include <LCUI/gui/widget_prototype.h>
-#include <LCUI/gui/widget_event.h>
-#include <LCUI/gui/widget_style.h>
+LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
 
-void LCUI_InitWidget( void );
-
-void LCUI_FreeWidget( void );
+LCUI_API void Widget_ExecUpdateLayout( LCUI_Widget w );
 
 #endif

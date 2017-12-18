@@ -287,6 +287,7 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_base.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_event.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_helper.h" />
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_layout.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_prototype.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_task.h" />
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_paint.h" />
@@ -363,6 +364,7 @@
     <ClCompile Include="..\..\..\src\gui\widget_border.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
     <ClCompile Include="..\..\..\src\gui\widget_helper.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_layout.c" />
     <ClCompile Include="..\..\..\src\gui\widget_prototype.c" />
     <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
     <ClCompile Include="..\..\..\src\gui\widget_shadow.c" />

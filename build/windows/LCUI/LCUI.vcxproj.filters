@@ -273,6 +273,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\css_rule_font_face.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\gui\widget_layout.h">
+      <Filter>头文件\LCUI\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -483,6 +486,9 @@
       <Filter>源文件\gui\widget</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\css_rule_font_face.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_layout.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
   </ItemGroup>

@@ -63,6 +63,7 @@ typedef struct LCUI_WidgetStyle {
 	LCUI_BorderStyle border;		/**< 边框 */
 	LCUI_BoxShadowStyle shadow;		/**< 盒形阴影 */
 	LCUI_BackgroundStyle background;	/**< 背景 */
+	LCUI_FlexLayoutStyle flex;		/**< 弹性布局相关样式 */
 	int pointer_events;			/**< 事件的处理方式 */
 } LCUI_WidgetStyle;
 
@@ -76,6 +77,7 @@ enum WidgetTaskType {
 	WTT_PADDING,
 	WTT_MARGIN,
 	WTT_VISIBLE,
+	WTT_DISPLAY,
 	WTT_SHADOW,
 	WTT_BORDER,
 	WTT_BACKGROUND,
@@ -308,6 +310,9 @@ LCUI_API void Widget_PaintBoxShadow( LCUI_Widget w, LCUI_PaintContext paint );
 /** 更新可见性 */
 LCUI_API void Widget_UpdateVisibility( LCUI_Widget w );
 
+/** 更新显示方式 */
+LCUI_API void Widget_UpdateDisplay( LCUI_Widget w );
+
 /** 设置部件为顶级部件 */
 LCUI_API int Widget_Top( LCUI_Widget w );
 
@@ -339,6 +344,9 @@ LCUI_API void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title );
 
 /** 设置部件ID */
 LCUI_API int Widget_SetId( LCUI_Widget w, const char *idstr );
+
+/** 为部件添加状态 */
+LCUI_API void Widget_AddState( LCUI_Widget w, LCUI_WidgetState state );
 
 /** 为部件设置属性 */
 LCUI_API int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
@@ -379,13 +387,6 @@ LCUI_API float Widget_ComputeMaxWidth( LCUI_Widget w );
 
 /** 计算部件的最大可用宽度 */
 LCUI_API float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget );
-
-LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
-
-/** 更新子部件的布局 */
-LCUI_API void Widget_UpdateLayout( LCUI_Widget w );
-
-LCUI_API void Widget_ExecUpdateLayout( LCUI_Widget w );
 
 /** 从部件中移除一个状态 */
 int Widget_RemoveStatus( LCUI_Widget w, const char *status_name );
