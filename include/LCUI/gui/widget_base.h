@@ -209,8 +209,19 @@ typedef struct LCUI_WidgetRec_ {
 #define Widget_HasBlockDisplay(W) \
 ((W)->computed_style.display == SV_BLOCK)
 
+#define Widget_HasFlexDisplay(W) \
+((W)->computed_style.display == SV_FLEX)
+
 #define Widget_HasInlineBlockDisplay(W) \
 ((W)->computed_style.display == SV_INLINE_BLOCK)
+
+#define Widget_HasFillAvailableWidth(W) \
+((Widget_HasBlockDisplay( W ) || Widget_HasFlexDisplay( W )) && \
+!Widget_HasAbsolutePosition( W ))
+
+#define Widget_HasScaleSize(W) \
+(Widget_CheckStyleType( W, key_width, SCALE ) ||\
+Widget_CheckStyleType( W, key_height, SCALE ))
 
 /** 部件是否有值为自动（默认）的样式 */
 LCUI_API LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key );

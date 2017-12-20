@@ -210,9 +210,10 @@ static KeyNameGroupRec style_value_map[] = {
 	{ SV_ABSOLUTE, "absolute" },
 	{ SV_BLOCK, "block" },
 	{ SV_INLINE_BLOCK, "inline-block" },
-	{ SV_NOWRAP, "nowrap" },
+	{ SV_FLEX, "flex" },
 	{ SV_FLEX_START, "flex-start" },
-	{ SV_FLEX_END, "flex-end" }
+	{ SV_FLEX_END, "flex-end" },
+	{ SV_NOWRAP, "nowrap" }
 };
 
 static int LCUI_DirectAddStyleName( int key, const char *name )

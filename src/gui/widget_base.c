@@ -560,7 +560,6 @@ static int ComputeStyleOption( LCUI_Widget w, int key, int default_value )
 
 void Widget_UpdateVisibility( LCUI_Widget w )
 {
-	int display = w->computed_style.display;
 	LCUI_Style s = &w->style->sheet[key_visible];
 	LCUI_BOOL visible = w->computed_style.visible;
 	if( w->computed_style.display == SV_NONE ) {
@@ -698,17 +697,12 @@ static void Widget_UpdateChildrenSize( LCUI_Widget w )
 	for( LinkedList_Each( node, &w->children ) ) {
 		LCUI_Widget child = node->data;
 		LCUI_StyleSheet s = child->style;
-		if( child->computed_style.display == SV_BLOCK ) {
-			if( CheckStyleType( s, key_width, AUTO ) ||
-			    CheckStyleType( s, key_height, AUTO ) ) {
-				Widget_AddTask( child, WTT_RESIZE );
-			}
-		}
-		if( CheckStyleType( s, key_width, SCALE ) ||
-		    CheckStyleType( s, key_height, SCALE ) ) {
+		if( Widget_HasFillAvailableWidth( child ) ) {
+			Widget_AddTask( child, WTT_RESIZE );
+		} else if( Widget_HasScaleSize( child ) ) {
 			Widget_AddTask( child, WTT_RESIZE );
 		}
-		if( child->computed_style.position == SV_ABSOLUTE ) {
+		if( Widget_HasAbsolutePosition( child ) ) {
 			if( s->sheet[key_right].is_valid ||
 			    s->sheet[key_bottom].is_valid ||
 			    CheckStyleType( s, key_left, scale ) ||
@@ -938,9 +932,8 @@ LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w )
 /** 根据当前部件的内外间距，获取调整后宽度 */
 static float Widget_GetAdjustedWidth( LCUI_Widget w, float width )
 {
-	/* 如果不是块级元素，或为绝对定位，则不根据内/外间距调整宽度 */
-	if( !Widget_HasBlockDisplay( w ) ||
-	    Widget_HasAbsolutePosition( w ) ) {
+	/* 如果部件的宽度不具备自动填满剩余空间的特性，则不调整 */
+	if( !Widget_HasFillAvailableWidth( w ) ) {
 		return width;
 	}
 	if( !Widget_HasAutoStyle( w, key_margin_left ) ) {
@@ -1048,8 +1041,7 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	}
 	while( width <= 0 && Widget_HasAutoStyle( w, key_width ) ) {
 		float content_width = 0;
-		if( Widget_HasBlockDisplay( w ) &&
-		    !Widget_HasAbsolutePosition( w ) ) {
+		if( Widget_HasFillAvailableWidth( w ) ) {
 			width = Widget_GetFillAvailableWidth( w );
 			if( width > 0 ) {
 				break;
@@ -1075,7 +1067,7 @@ static void Widget_ComputeSize( LCUI_Widget w )
 			/* 如果超出父部件的内容框宽度则让父部件重新调整宽度 */
 			if( width > w->parent->box.content.width ) {
 				Widget_AddTask( w->parent, WTT_RESIZE );
-			} else if( Widget_HasBlockDisplay( w ) ) {
+			} else if( Widget_HasFillAvailableWidth( w ) ) {
 				width = w->parent->box.content.width;
 			}
 		}

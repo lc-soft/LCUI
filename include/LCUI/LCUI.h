@@ -120,6 +120,48 @@ typedef struct LCUI_Rect2F_ {
 	float left, top, right, bottom;
 } LCUI_Rect2F;
 
+/** 样式值枚举，用于代替使用字符串 */
+typedef enum LCUI_StyleValue {
+	SV_NONE,
+	SV_AUTO,
+	SV_CONTAIN,
+	SV_COVER,
+	SV_LEFT,
+	SV_CENTER,
+	SV_RIGHT,
+	SV_TOP,
+	SV_TOP_LEFT,
+	SV_TOP_CENTER,
+	SV_TOP_RIGHT,
+	SV_MIDDLE,
+	SV_CENTER_LEFT,
+	SV_CENTER_CENTER,
+	SV_CENTER_RIGHT,
+	SV_BOTTOM,
+	SV_BOTTOM_LEFT,
+	SV_BOTTOM_CENTER,
+	SV_BOTTOM_RIGHT,
+	SV_SOLID,
+	SV_DOTTED,
+	SV_DOUBLE,
+	SV_DASHED,
+	SV_CONTENT_BOX,
+	SV_PADDING_BOX,
+	SV_BORDER_BOX,
+	SV_GRAPH_BOX,
+	SV_STATIC,
+	SV_RELATIVE,
+	SV_ABSOLUTE,
+	SV_FLOAT_LEFT,
+	SV_FLOAT_RIGHT,
+	SV_BLOCK,
+	SV_INLINE_BLOCK,
+	SV_FLEX,
+	SV_FLEX_START,
+	SV_FLEX_END,
+	SV_NOWRAP
+} LCUI_StyleValue;
+
 /** 样式变量类型 */
 typedef enum LCUI_StyleType {
 	SVT_NONE,
@@ -185,16 +227,16 @@ typedef struct LCUI_BorderStyle {
 
 /** 弹性（Flex）布局相关样式 */
 typedef struct LCUI_FlexLayoutStyle {
-	LCUI_StyleType wrap;
-	LCUI_StyleType flow;
-	LCUI_StyleType grow;
-	LCUI_StyleType shrink;
-	LCUI_StyleType basis;
-	LCUI_StyleType direction;
-	LCUI_StyleType align_self;
-	LCUI_StyleType align_items;
-	LCUI_StyleType align_content;
-	LCUI_StyleType justify_content;
+	LCUI_StyleValue wrap:8;
+	LCUI_StyleValue flow:8;
+	LCUI_StyleValue grow:8;
+	LCUI_StyleValue shrink:8;
+	LCUI_StyleValue basis:8;
+	LCUI_StyleValue direction:8;
+	LCUI_StyleValue align_self:8;
+	LCUI_StyleValue align_items:8;
+	LCUI_StyleValue align_content:8;
+	LCUI_StyleValue justify_content:8;
 } LCUI_FlexLayoutStyle;
 
 /** 边框相关参数 */
@@ -239,48 +281,6 @@ struct LCUI_Graph_ {
 	size_t mem_size;		/**< 像素数据缓冲区大小 */
 	uchar_t *palette;		/**< 调色板 */
 };
-
-/** 样式值枚举，用于代替使用字符串 */
-typedef enum LCUI_StyleValue {
-	SV_NONE,
-	SV_AUTO,
-	SV_CONTAIN,
-	SV_COVER,
-	SV_LEFT,
-	SV_CENTER,
-	SV_RIGHT,
-	SV_TOP,
-	SV_TOP_LEFT,
-	SV_TOP_CENTER,
-	SV_TOP_RIGHT,
-	SV_MIDDLE,
-	SV_CENTER_LEFT,
-	SV_CENTER_CENTER,
-	SV_CENTER_RIGHT,
-	SV_BOTTOM,
-	SV_BOTTOM_LEFT,
-	SV_BOTTOM_CENTER,
-	SV_BOTTOM_RIGHT,
-	SV_SOLID,
-	SV_DOTTED,
-	SV_DOUBLE,
-	SV_DASHED,
-	SV_CONTENT_BOX,
-	SV_PADDING_BOX,
-	SV_BORDER_BOX,
-	SV_GRAPH_BOX,
-	SV_STATIC,
-	SV_RELATIVE,
-	SV_ABSOLUTE,
-	SV_FLOAT_LEFT,
-	SV_FLOAT_RIGHT,
-	SV_BLOCK,
-	SV_INLINE_BLOCK,
-	SV_FLEX,
-	SV_FLEX_START,
-	SV_FLEX_END,
-	SV_NOWRAP
-} LCUI_StyleValue;
 
 typedef struct LCUI_StyleRec_ {
 	LCUI_BOOL is_valid:2;

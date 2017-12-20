@@ -600,6 +600,7 @@ static LCUI_StyleParserRec style_parser_map[] = {
 	{ key_focusable, NULL, OnParseBoolean },
 	{ key_pointer_events, NULL, OnParseStyleOption },
 	{ key_box_sizing, NULL, OnParseStyleOption },
+	{ key_justify_content, NULL, OnParseStyleOption },
 	{ -1, "border", OnParseBorder },
 	{ -1, "border-left", OnParseBorderLeft },
 	{ -1, "border-top", OnParseBorderTop },

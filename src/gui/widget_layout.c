@@ -37,6 +37,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <stdlib.h>
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/gui/widget.h>
@@ -67,15 +68,18 @@ static void HandleJustifyContent( LCUI_FlexLayoutStyle *data, LCUI_Style style )
 	data->justify_content = style->val_style;
 }
 
-void Widget_UpdateLayout( LCUI_Widget w )
-{
-	Widget_AddTask( w, WTT_LAYOUT );
-}
-
 void Widget_ComputeFlexLayoutStyle( LCUI_Widget w )
 {
 	LCUI_FlexLayoutStyle *data = &w->computed_style.flex;
 	HandleStyle( w, data, HandleJustifyContent, key_justify_content );
+}
+
+void Widget_UpdateLayout( LCUI_Widget w )
+{
+	if( w->computed_style.display == SV_FLEX ) {
+		Widget_ComputeFlexLayoutStyle( w );
+	}
+	Widget_AddTask( w, WTT_LAYOUT );
 }
 
 /** 布局当前行的所有元素 */
@@ -87,12 +91,13 @@ static void LCUILayout_HandleCurrentLine( LCUI_LayoutContext ctx )
 	LCUI_Widget child;
 
 	style = &ctx->container->computed_style;
-	if( !style->display == SV_FLEX ) {
+	if( style->display != SV_FLEX || !ctx->start ) {
 		goto finish_layout;
 	}
 	switch( style->flex.justify_content ) {
 	case SV_CENTER:
 		offset_x = (ctx->max_width - ctx->line_width) / 2;
+		break;
 	case SV_FLEX_END:
 		offset_x = ctx->max_width - ctx->line_width;
 		break;
@@ -109,6 +114,7 @@ static void LCUILayout_HandleCurrentLine( LCUI_LayoutContext ctx )
 		}
 		child = node->data;
 		child->origin_x += offset_x;
+		Widget_UpdatePosition( child );
 		node = node->next;
 	}
 	ctx->start = ctx->current;
@@ -123,12 +129,6 @@ finish_layout:
 /** 布局当前内联块级元素 */
 static void LCUILayout_HandleInlineBlock( LCUI_LayoutContext ctx )
 {
-	if( ctx->prev ) {
-		if( ctx->prev_display == SV_BLOCK ||
-		    ctx->prev_display == SV_FLEX ) {
-			LCUILayout_HandleCurrentLine( ctx );
-		}
-	}
 	ctx->current->origin_x = ctx->x;
 	ctx->x += ctx->current->box.outer.width;
 	ctx->line_width += ctx->current->box.outer.width;;
@@ -152,8 +152,9 @@ static void LCUILayout_HandleBlock( LCUI_LayoutContext ctx )
 	}
 	ctx->current->origin_x = ctx->x;
 	ctx->current->origin_y = ctx->y;
-	ctx->line_height = ctx->current->box.outer.height;
+	ctx->line_height = 0;
 	ctx->y += ctx->current->box.outer.height;
+	ctx->start = Widget_GetNext( ctx->current );
 }
 
 static LCUI_LayoutContext LCUILayout_Begin( LCUI_Widget w )
@@ -170,8 +171,12 @@ static LCUI_LayoutContext LCUILayout_Begin( LCUI_Widget w )
 	return ctx;
 }
 
-static LCUILayout_End( LCUI_LayoutContext ctx )
+static void LCUILayout_End( LCUI_LayoutContext ctx )
 {
+	if( ctx->current ) {
+		ctx->current = Widget_GetNext( ctx->current );
+	}
+	LCUILayout_HandleCurrentLine( ctx );
 	free( ctx );
 }
 
@@ -205,7 +210,6 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		ctx->prev_display = ctx->current->computed_style.display;
 		ctx->prev = ctx->current;
 	}
-	LCUILayout_HandleCurrentLine( ctx );
 	LCUILayout_End( ctx );
 	if( w->style->sheet[key_width].type == SVT_AUTO ||
 	    w->style->sheet[key_height].type == SVT_AUTO ) {
