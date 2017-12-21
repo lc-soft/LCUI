@@ -34,6 +34,9 @@ test/test_image_reader.png \
 test/test_widget_layout.c \
 test/test_widget_layout.css \
 test/test_widget_layout.xml \
+test/test_widget_flex_layout.c \
+test/test_widget_flex_layout.css \
+test/test_widget_flex_layout.xml \
 test/test_widget_rect.c
 
 @CODE_COVERAGE_RULES@

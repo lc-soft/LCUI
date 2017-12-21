@@ -28,6 +28,7 @@ int main( void )
 	ret += test_image_reader();
 	ret += test_css_parser();
 	ret += test_widget_layout();
+	ret += test_widget_flex_layout();
 	ret += test_widget_rect();/*
 	ret += test_widget_render();
 	ret += test_char_render();

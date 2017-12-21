@@ -1,0 +1,29 @@
+.flex-items-left {
+    display: flex;
+    justify-content: flex-start;
+}
+.flex-items-center {
+    display: flex;
+    justify-content: center;
+}
+.flex-items-right {
+    display: flex;
+    justify-content: flex-end;
+}
+.inline-block {
+    padding: 5px;
+    display: inline-block;
+}
+.block {
+    padding: 5px;
+    display: block;
+}
+.box-1 {
+    width: 64px;
+    height: 64px;
+    background-color: #80bdff;
+}
+.box-2 {
+    height: 64px;
+    background-color: #957bbe;
+}
