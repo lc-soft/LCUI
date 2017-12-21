@@ -396,6 +396,9 @@ LCUI_API void Widget_SetDisabled( LCUI_Widget w, LCUI_BOOL disabled );
 /** 计算部件的最大宽度 */
 LCUI_API float Widget_ComputeMaxWidth( LCUI_Widget w );
 
+/** 计算部件的最大内容宽度 */
+LCUI_API float Widget_ComputeMaxContentWidth( LCUI_Widget w );
+
 /** 计算部件的最大可用宽度 */
 LCUI_API float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget );
 

@@ -163,7 +163,7 @@ static LCUI_LayoutContext LCUILayout_Begin( LCUI_Widget w )
 	ctx->container = w;
 	ctx->x = ctx->y = 0;
 	ctx->line_height = ctx->line_width = 0;
-	ctx->max_width = Widget_ComputeMaxWidth( w );
+	ctx->max_width = Widget_ComputeMaxContentWidth( w );
 	ctx->current = LinkedList_Get( &w->children, 0 );
 	ctx->start = ctx->current;
 	ctx->prev_display = SV_BLOCK;

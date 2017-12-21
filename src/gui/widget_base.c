@@ -1475,6 +1475,15 @@ float Widget_ComputeMaxWidth( LCUI_Widget widget )
 	return width;
 }
 
+float Widget_ComputeMaxContentWidth( LCUI_Widget w )
+{
+	float width = Widget_ComputeMaxWidth( w );
+	width -= w->computed_style.border.left.width;
+	width -= w->computed_style.border.right.width;
+	width -= w->padding.left + w->padding.right;
+	return width;
+}
+
 static void _LCUIWidget_PrintTree( LCUI_Widget w, int depth, const char *prefix )
 {
 	int len;

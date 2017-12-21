@@ -775,10 +775,7 @@ static void TextEdit_OnResize( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
 	LCUI_TextEdit edit = GetData( w );
 	if( !w->style->sheet[key_width].is_valid ||
 	    w->style->sheet[key_width].type == SVT_AUTO ) {
-		max_width = Widget_ComputeMaxWidth( w );
-		max_width -= w->computed_style.border.left.width;
-		max_width -= w->computed_style.border.right.width;
-		max_width -= w->padding.left + w->padding.right;
+		max_width = Widget_ComputeMaxContentWidth( w );
 	} else {
 		max_width = width = w->box.content.width;
 	}

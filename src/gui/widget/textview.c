@@ -182,10 +182,7 @@ static void TextView_UpdateSize( LCUI_Widget w )
 	LinkedList_Init( &rects );
 	scale = LCUIMetrics_GetScale();
 	if( Widget_HasAutoWidth( w ) ) {
-		max_width = Widget_ComputeMaxWidth( w );
-		max_width -= w->computed_style.border.left.width;
-		max_width -= w->computed_style.border.right.width;
-		max_width -= w->padding.left + w->padding.right;
+		max_width = Widget_ComputeMaxContentWidth( w );
 	} else {
 		max_width = w->box.content.width;
 	}
