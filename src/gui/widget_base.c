@@ -566,6 +566,8 @@ void Widget_UpdateVisibility( LCUI_Widget w )
 		w->computed_style.visible = FALSE;
 	} else if( s->is_valid && s->type == SVT_BOOL ) {
 		w->computed_style.visible = s->val_bool;
+	} else {
+		w->computed_style.visible = TRUE;
 	}
 	if( visible == w->computed_style.visible ) {
 		return;
@@ -597,6 +599,7 @@ void Widget_UpdateDisplay( LCUI_Widget w )
 	    w->computed_style.position != SV_ABSOLUTE ) {
 		Widget_UpdateLayout( w->parent );
 	}
+	Widget_UpdateVisibility( w );
 	Widget_UpdateLayout( w );
 }
 
