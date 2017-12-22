@@ -79,15 +79,21 @@ static void HandleRefresh( LCUI_Widget w )
 	Widget_InvalidateArea( w, NULL, SV_GRAPH_BOX );
 }
 
-/** 更新当前任务状态，确保部件的任务能够被处理到 */
 void Widget_UpdateTaskStatus( LCUI_Widget widget )
 {
 	int i;
 	for( i = 0; i < WTT_TOTAL_NUM; ++i ) {
 		if( widget->task.buffer[i] ) {
-			widget->task.for_self = TRUE;
-			Widget_AddTask( widget, widget->task.buffer[i] );
+			break;
 		}
+	}
+	if( i >= WTT_TOTAL_NUM ) {
+		return;
+	}
+	widget->task.for_self = TRUE;
+	while( widget && !widget->task.for_children ) {
+		widget->task.for_children = TRUE;
+		widget = widget->parent;
 	}
 }
 
