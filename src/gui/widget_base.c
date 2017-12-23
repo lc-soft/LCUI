@@ -845,55 +845,33 @@ static void Widget_UpdateGraphBox( LCUI_Widget w )
 static void Widget_ComputeContentSize( LCUI_Widget w,
 				       float *out_width, float *out_height )
 {
-	LCUI_Style s;
 	LinkedListNode *node;
-	float n, width = 0, height = 0;
+	float width = 0, height = 0;
 
 	for( LinkedList_Each( node, &w->children_show ) ) {
 		LCUI_Widget child = node->data;
 		LCUI_WidgetBoxRect *box = &child->box;
 		LCUI_WidgetStyle *style = &child->computed_style;
 		/* 忽略不可见、绝对定位的部件 */
-		if( !style->visible || style->position == SV_ABSOLUTE ) {
+		if( style->display == SV_NONE || 
+		    style->position == SV_ABSOLUTE ) {
 			continue;
 		}
-		s = &child->style->sheet[key_width];
-		/* 对于宽度以百分比做单位的，计算尺寸时自动去除外间距框、
-		 * 内间距框和边框占用的空间
-		 */
-		if( s->type == SVT_SCALE ) {
-			if( style->box_sizing == SV_BORDER_BOX ) {
-				n = box->border.x + box->border.width;
-			} else {
-				n = box->content.x + box->content.width;
-				n -= box->content.x - box->border.x;
+		if( !Widget_HasScaleWidth( child ) ) {
+			if( box->outer.width <= 0 ) {
+				continue;
 			}
-			n -= box->outer.x - box->border.x;
-		} else if( box->outer.width <= 0 ) {
-			continue;
-		} else {
-			n = box->outer.x + box->outer.width;
-		}
-		if( n > width ) {
-			width = n;
-		}
-		s = &child->style->sheet[key_height];
-		n = box->outer.y + box->outer.height;
-		if( s->type == SVT_SCALE ) {
-			if( style->box_sizing == SV_BORDER_BOX ) {
-				n = box->border.y + box->border.height;
-			} else {
-				n = box->content.y + box->content.height;
-				n -= box->content.y - box->border.y;
+			if( box->outer.x + box->outer.width > width ) {
+				width = box->outer.x + box->outer.width;
 			}
-			n -= box->outer.y - box->border.y;
-		} else if( box->outer.height <= 0 ) {
-			continue;
-		} else {
-			n = box->outer.y + box->outer.height;
 		}
-		if( n > height ) {
-			height = n;
+		if( !Widget_HasScaleHeight( child ) ) {
+			if( box->outer.height <= 0 ) {
+				continue;
+			}
+			if( box->outer.y + box->outer.height > height ) {
+				height = box->outer.y + box->outer.height;
+			}
 		}
 	}
 	/* 计算出来的尺寸是包含 padding-left 和 padding-top 的，因此需要减去它们 */
@@ -913,7 +891,25 @@ LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key )
 		Widget_CheckStyleType( w, key, AUTO );
 }
 
-LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w )
+LCUI_BOOL Widget_HasScaleWidth( LCUI_Widget w )
+{
+	if( Widget_CheckStyleType( w, key_width, scale ) ) {
+		return TRUE;
+	}
+	if( Widget_HasAutoStyle( w, key_width ) ) {
+		if( Widget_HasFillAvailableWidth( w ) ) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+LCUI_BOOL Widget_HasScaleHeight( LCUI_Widget w )
+{
+	return Widget_CheckStyleType( w, key_height, scale );
+}
+
+LCUI_BOOL Widget_HasFitContentWidth( LCUI_Widget w )
 {
 	if( Widget_HasAutoStyle( w, key_width ) ) {
 		if( Widget_HasAbsolutePosition( w ) ||
@@ -921,11 +917,11 @@ LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w )
 		    Widget_HasInlineBlockDisplay( w ) ) {
 			return TRUE;
 		}
-		if( !w->parent ||  Widget_HasAutoWidth( w->parent ) ) {
+		if( !w->parent ||  Widget_HasFitContentWidth( w->parent ) ) {
 			return TRUE;
 		}
 	} else if( Widget_CheckStyleType( w, key_width, scale ) ) {
-		if( !w->parent || Widget_HasAutoWidth( w->parent ) ) {
+		if( !w->parent || Widget_HasFitContentWidth( w->parent ) ) {
 			return TRUE;
 		}
 	}
@@ -967,7 +963,7 @@ static float Widget_GetAdjustedWidth( LCUI_Widget w, float width )
 float Widget_GetFillAvailableWidth( LCUI_Widget w )
 {
 	float width;
-	if( !w->parent || Widget_HasAutoWidth( w->parent ) ) {
+	if( !w->parent ) {
 		return 0;
 	}
 	width = Widget_ComputeMaxAvaliableWidth( w );
@@ -1022,75 +1018,11 @@ static float GetLimitedHeight( LCUI_Widget w, float height )
 	return height;
 }
 
-/** 计算尺寸 */
-static void Widget_ComputeSize( LCUI_Widget w )
+static void Widget_SetSize( LCUI_Widget w, float width, float height )
 {
-	float width, height;
 	LCUI_RectF *box, *pbox;
 	LCUI_BorderStyle *bbox;
 
-	Widget_ComputeLimitSize( w );
-	pbox = &w->box.padding;
-	bbox = &w->computed_style.border;
-	width = ComputeXMetric( w, key_width );
-	height = ComputeYMetric( w, key_height );
-	if( w->computed_style.max_width >= 0 &&
-	    width > w->computed_style.max_width ) {
-		width = w->computed_style.max_width;
-	}
-	if( w->computed_style.max_height >= 0 &&
-	    height > w->computed_style.max_height ) {
-		height = w->computed_style.max_height;
-	}
-	while( width <= 0 && Widget_HasAutoStyle( w, key_width ) ) {
-		float content_width = 0;
-		if( Widget_HasFillAvailableWidth( w ) ) {
-			width = Widget_GetFillAvailableWidth( w );
-			if( width > 0 ) {
-				break;
-			}
-		}
-		if( w->proto && w->proto->autosize ) {
-			w->proto->autosize( w, &width, &height );
-		}
-		Widget_ComputeContentSize( w, &content_width, NULL );
-		width = max( width, content_width );
-		/* 转换为边框盒宽度 */
-		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
-			width += w->padding.left + w->padding.right;
-			width += bbox->left.width + bbox->right.width;
-			if( w->proto && w->proto->autosize ) {
-				height += w->padding.top + w->padding.bottom;
-				height += bbox->top.width + bbox->bottom.width;
-			}
-		}
-		/* 如果该部件和父部件的宽度都是自适应 */
-		if( w->parent && Widget_HasAutoWidth( w->parent ) &&
-		    width > 0 && !Widget_HasAbsolutePosition( w ) ) {
-			/* 如果超出父部件的内容框宽度则让父部件重新调整宽度 */
-			if( width > w->parent->box.content.width ) {
-				Widget_AddTask( w->parent, WTT_RESIZE );
-			} else if( Widget_HasFillAvailableWidth( w ) ) {
-				width = w->parent->box.content.width;
-			}
-		}
-		width = Widget_GetAdjustedWidth( w, width );
-		break;
-	}
-	while( height <= 0 && Widget_HasAutoStyle( w, key_height ) ) {
-		float content_height = 0;
-		if( w->proto && w->proto->autosize ) {
-			w->proto->autosize( w, &width, &height );
-		}
-		Widget_ComputeContentSize( w, NULL, &content_height );
-		height = max( height, content_height );
-		/* 转换为边框盒高度 */
-		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
-			height += w->padding.top + w->padding.bottom;
-			height += bbox->top.width + bbox->bottom.width;
-		}
-		break;
-	}
 	w->width = width;
 	w->height = height;
 	w->width = GetLimitedWidth( w, width );
@@ -1101,6 +1033,8 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	w->box.content.height = w->height;
 	w->box.padding.width = w->width;
 	w->box.padding.height = w->height;
+	pbox = &w->box.padding;
+	bbox = &w->computed_style.border;
 	/* 如果是以边框盒作为尺寸调整对象，则需根据边框盒计算内容框尺寸 */
 	if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
 		box = &w->box.content;
@@ -1126,6 +1060,90 @@ static void Widget_ComputeSize( LCUI_Widget w )
 	w->box.outer.height = w->box.border.height;
 	w->box.outer.width += w->margin.left + w->margin.right;
 	w->box.outer.height += w->margin.top + w->margin.bottom;
+}
+
+static float Widget_ComputeScaleWidth( LCUI_Widget w )
+{
+	LCUI_Style s = &w->style->sheet[key_width];
+	if( !w->parent ) {
+		return 0;
+	}
+	if( Widget_HasAbsolutePosition( w ) ) {
+		return w->parent->box.padding.width * s->scale;
+	}
+	if( Widget_HasFitContentWidth( w ) ) {
+		return 0;
+	}
+	return w->parent->box.content.width * s->scale;
+}
+
+/** 计算尺寸 */
+static void Widget_ComputeSize( LCUI_Widget w )
+{
+	float width, height;
+	LCUI_BorderStyle *bbox;
+	Widget_ComputeLimitSize( w );
+	width = ComputeXMetric( w, key_width );
+	height = ComputeYMetric( w, key_height );
+	if( w->computed_style.max_width >= 0 &&
+	    width > w->computed_style.max_width ) {
+		width = w->computed_style.max_width;
+	}
+	if( w->computed_style.max_height >= 0 &&
+	    height > w->computed_style.max_height ) {
+		height = w->computed_style.max_height;
+	}
+	bbox = &w->computed_style.border;
+	while( width <= 0 && Widget_HasAutoStyle( w, key_width ) ) {
+		float content_width = 0;
+		if( Widget_HasFillAvailableWidth( w ) ) {
+			width = Widget_GetFillAvailableWidth( w );
+			if( width > 0 ) {
+				break;
+			}
+		}
+		if( w->proto && w->proto->autosize ) {
+			w->proto->autosize( w, &width, &height );
+		}
+		Widget_ComputeContentSize( w, &content_width, NULL );
+		width = max( width, content_width );
+		/* 转换为边框盒宽度 */
+		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+			width += w->padding.left + w->padding.right;
+			width += bbox->left.width + bbox->right.width;
+			if( w->proto && w->proto->autosize ) {
+				height += w->padding.top + w->padding.bottom;
+				height += bbox->top.width + bbox->bottom.width;
+			}
+		}
+		/* 如果该部件和父部件的宽度都是自适应 */
+		if( w->parent && Widget_HasFitContentWidth( w->parent ) &&
+		    width > 0 && !Widget_HasAbsolutePosition( w ) ) {
+			/* 如果超出父部件的内容框宽度则让父部件重新调整宽度 */
+			if( width > w->parent->box.content.width ) {
+				Widget_AddTask( w->parent, WTT_RESIZE );
+			} else if( Widget_HasFillAvailableWidth( w ) ) {
+				width = w->parent->box.content.width;
+			}
+		}
+		width = Widget_GetAdjustedWidth( w, width );
+		break;
+	}
+	while( height <= 0 && Widget_HasAutoStyle( w, key_height ) ) {
+		float content_height = 0;
+		if( w->proto && w->proto->autosize ) {
+			w->proto->autosize( w, &width, &height );
+		}
+		Widget_ComputeContentSize( w, NULL, &content_height );
+		height = max( height, content_height );
+		/* 转换为边框盒高度 */
+		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+			height += w->padding.top + w->padding.bottom;
+			height += bbox->top.width + bbox->bottom.width;
+		}
+		break;
+	}
+	Widget_SetSize( w, width, height );
 }
 
 static void Widget_SendResizeEvent( LCUI_Widget w )
@@ -1445,8 +1463,12 @@ float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 	LCUI_Widget w;
 	float width = 0, padding = 0;
 	for( w = widget->parent; w; w = w->parent ) {
-		if( !Widget_HasAutoWidth( w ) ) {
+		if( !Widget_HasFitContentWidth( w ) ) {
 			width = w->box.content.width;
+			break;
+		}
+		if( w->computed_style.max_width >= 0 ) {
+			width = w->computed_style.max_width;
 			break;
 		}
 		padding += w->box.border.width - w->box.content.width;
@@ -1464,7 +1486,7 @@ float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 float Widget_ComputeMaxWidth( LCUI_Widget widget )
 {
 	float width;
-	if( Widget_HasAutoWidth( widget ) ) {
+	if( Widget_HasFitContentWidth( widget ) ) {
 		width = Widget_ComputeMaxAvaliableWidth( widget );
 	} else {
 		width = widget->width;

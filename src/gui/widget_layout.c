@@ -191,6 +191,7 @@ void Widget_ExecUpdateLayout( LCUI_Widget w )
 		ctx->current = node->data;
 		if( ctx->current->computed_style.position != SV_STATIC &&
 		    ctx->current->computed_style.position != SV_RELATIVE ) {
+			Widget_AddState( ctx->current, WSTATE_LAYOUTED );
 			continue;
 		}
 		switch( ctx->current->computed_style.display ) {

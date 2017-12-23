@@ -226,8 +226,14 @@ Widget_CheckStyleType( W, key_height, SCALE ))
 /** 部件是否有值为自动（默认）的样式 */
 LCUI_API LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key );
 
+/** 部件是否有百分比单位的宽度 */
+LCUI_API LCUI_BOOL Widget_HasScaleWidth( LCUI_Widget w );
+
+/** 部件是否有百分比单位的高度 */
+LCUI_API LCUI_BOOL Widget_HasScaleHeight( LCUI_Widget w );
+
 /** 部件是否有能够自动调整的宽度 */
-LCUI_API LCUI_BOOL Widget_HasAutoWidth( LCUI_Widget w );
+LCUI_API LCUI_BOOL Widget_HasFitContentWidth( LCUI_Widget w );
 
 /** 获取根级部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
