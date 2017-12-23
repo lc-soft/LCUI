@@ -10,6 +10,9 @@
     display: flex;
     justify-content: flex-end;
 }
+.flex-box {
+    border-bottom: 1px solid #ddd;
+}
 .inline-block {
     padding: 5px;
     display: inline-block;
@@ -26,4 +29,21 @@
 .box-2 {
     height: 64px;
     background-color: #957bbe;
+}
+.bottom {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+}
+.bottom-box {
+    width: auto;
+    max-width: 480px;
+    margin: 20px auto;
+}
+.bottom-content {
+    width: 100%;
+    position: relative;
+    background-color: #f0f0f0;
 }
