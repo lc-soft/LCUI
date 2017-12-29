@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lcui-app>
+  <resource type="text/css" src="test_widget_inline_block_layout.css"/>
+  <ui>
+    <w id="box-container" class="inline-block">
+      <w class="inline-block">
+        <w class="inline-block">
+          <w class="box-1" />
+        </w>
+        <w class="inline-block">
+          <w class="box-1" />
+        </w>
+      </w>
+      <w class="inline-block">
+        <w class="inline-block">
+          <w class="box-1" />
+        </w>
+        <w class="inline-block">
+          <w type="textview" class="box-2">Hello, World!</w>
+        </w>
+      </w>
+    </w>
+  </ui>
+</lcui-app>

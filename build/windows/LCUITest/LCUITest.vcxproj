@@ -107,6 +107,7 @@
     <ClCompile Include="..\..\..\test\test_char_render.c" />
     <ClCompile Include="..\..\..\test\test_string_render.c" />
     <ClCompile Include="..\..\..\test\test_widget_flex_layout.c" />
+    <ClCompile Include="..\..\..\test\test_widget_inline_block_layout.c" />
     <ClCompile Include="..\..\..\test\test_widget_layout.c" />
     <ClCompile Include="..\..\..\test\test_widget_rect.c" />
     <ClCompile Include="..\..\..\test\test_widget_render.c" />
