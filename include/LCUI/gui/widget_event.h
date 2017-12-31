@@ -129,37 +129,48 @@ LCUI_API const char *LCUIWidget_GetEventName( int event_id );
 LCUI_API int LCUIWidget_GetEventId( const char *event_name );
 
 /**
-* 添加部件事件绑定
-* @param[in] widget 目标部件
-* @param[in] event_id 事件标识号
-* @param[in] func 事件处理函数
-* @param[in] data 事件处理函数的附加数据
-* @param[in] destroy_data 数据的销毁函数
+ * 添加部件事件绑定
+ * @param[in] widget 目标部件
+ * @param[in] event_id 事件标识号
+ * @param[in] func 事件处理函数
+ * @param[in] data 事件处理函数的附加数据
+ * @param[in] destroy_data 数据的销毁函数
+ * @return 成功则返回事件处理器的标识号，失败则返回负数
 */
 LCUI_API int Widget_BindEventById( LCUI_Widget widget, int event_id,
 				   LCUI_WidgetEventFunc func, void *data,
 				   void( *destroy_data )(void*) );
 
 /**
-* 添加部件事件绑定
-* @param[in] widget 目标部件
-* @param[in] event_name 事件名称
-* @param[in] func 事件处理函数
-* @param[in] data 事件处理函数的附加数据
-* @param[in] destroy_data 数据的销毁函数
-*/
+ * 添加部件事件绑定
+ * @param[in] widget 目标部件
+ * @param[in] event_name 事件名称
+ * @param[in] func 事件处理函数
+ * @param[in] data 事件处理函数的附加数据
+ * @param[in] destroy_data 数据的销毁函数
+ * @return 成功则返回事件处理器的标识号，失败则返回负数
+ */
 LCUI_API int Widget_BindEvent( LCUI_Widget widget, const char *event_name,
 			       LCUI_WidgetEventFunc func, void *data,
 			       void( *destroy_data )(void*) );
 
 /**
-* 解除部件事件绑定
-* @param[in] widget 目标部件
-* @param[in] event_id 事件标识号
-* @param[in] func 与事件绑定的函数
-*/
+ * 解除部件事件绑定
+ * @param[in] widget 目标部件
+ * @param[in] event_id 事件标识号
+ * @param[in] func 与事件绑定的函数
+ */
 LCUI_API int Widget_UnbindEventById( LCUI_Widget widget, int event_id,
 				     LCUI_WidgetEventFunc func );
+
+
+/**
+ * 解除部件事件绑定
+ * @param[in] widget 目标部件
+ * @param[in] handler_id 事件处理器标识号
+ */
+LCUI_API int Widget_UnbindEventByHandlerId( LCUI_Widget widget, int handler_id );
+
 /**
  * 解除部件事件绑定
  * @param[in] widget 目标部件

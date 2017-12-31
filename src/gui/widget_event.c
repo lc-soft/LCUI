@@ -459,6 +459,11 @@ int Widget_UnbindEventById( LCUI_Widget widget, int event_id,
 				     CompareEventHandlerKey, func );
 }
 
+int Widget_UnbindEventByHandlerId( LCUI_Widget widget, int handler_id )
+{
+	return EventTrigger_Unbind2( widget->trigger, handler_id );
+}
+
 int Widget_UnbindEvent( LCUI_Widget widget, const char *event_name,
 			LCUI_WidgetEventFunc func )
 {
