@@ -284,7 +284,7 @@ struct LCUI_Graph_ {
 
 typedef struct LCUI_StyleRec_ {
 	LCUI_BOOL is_valid:2;
-	unsigned short int type;
+	LCUI_StyleType type:6;
 	union {
 		int val_int;
 		int val_0;
