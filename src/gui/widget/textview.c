@@ -181,10 +181,10 @@ static void TextView_UpdateSize( LCUI_Widget w )
 	txt = GetData( w );
 	LinkedList_Init( &rects );
 	scale = LCUIMetrics_GetScale();
-	if( Widget_HasStaticWidthParent( w ) ) {
-		max_width = w->box.content.width;
-	} else {
+	if( Widget_HasFitContentWidth( w ) ) {
 		max_width = Widget_ComputeMaxContentWidth( w );
+	} else {
+		max_width = w->box.content.width;
 	}
 	if( !Widget_HasAutoStyle( w, key_height ) ) {
 		max_height = w->box.content.height;
@@ -262,7 +262,8 @@ static void TextView_AutoSize( LCUI_Widget w, float *width, float *height )
 {
 	LCUI_TextView txt = GetData( w );
 	float scale = LCUIMetrics_GetScale();
-	if( !Widget_HasStaticWidthParent( w ) ) {
+	if( Widget_HasFitContentWidth( w ) ||
+	    !Widget_HasStaticWidthParent( w ) ) {
 		int fixed_w = txt->layer->fixed_width;
 		int fixed_h = txt->layer->fixed_height;
 		/* 解除固定宽高设置，以计算最大宽高 */

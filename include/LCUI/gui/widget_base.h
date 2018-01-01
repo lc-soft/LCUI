@@ -229,6 +229,9 @@ LCUI_API LCUI_BOOL Widget_HasAutoStyle( LCUI_Widget w, int key );
 /** 父级部件有可直接获取的静态宽度 */
 LCUI_API LCUI_BOOL Widget_HasStaticWidthParent( LCUI_Widget widget );
 
+/** 如果部件具有自适应内容的宽度 */
+LCUI_API LCUI_BOOL Widget_HasFitContentWidth( LCUI_Widget w );
+
 /** 获取根级部件 */
 LCUI_API LCUI_Widget LCUIWidget_GetRoot(void);
 
