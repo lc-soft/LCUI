@@ -20,5 +20,10 @@
         </w>
       </w>
     </w>
+    <w id="test-dropdown" class="dropdown-menu">
+      <w type="textview" class="dropdown-item">Hello, World!</w>
+      <w type="textview" class="dropdown-item">Test dropdown menu auto width</w>
+      <w type="textview" class="dropdown-item">Dropdown menu item</w>
+    </w>
   </ui>
 </lcui-app>
