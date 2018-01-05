@@ -5,15 +5,14 @@
   <h3 align="center">LCUI</h3>
   <p align="center">
     面向 C 的图形界面开发库，可借助 XML 和 CSS 构建简单的跨平台桌面应用
-    <br>
-    <a href="https://docs.lcui.lc-soft.io/"><strong>浏览 LCUI 文档 »</strong></a>
   </p>
-</p>
-<p align="center">
-  <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
-  <a href="https://coveralls.io/github/lc-soft/LCUI?branch=develop"><img src="https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop" alt="Coverage Status"></a>
-  <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
-  <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/license-GPLv2-blue.svg" alt="License"></a>
+  <p align="center">
+    <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
+    <a href="https://coveralls.io/github/lc-soft/LCUI?branch=develop"><img src="https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop" alt="Coverage Status"></a>
+    <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
+    <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/license-GPLv2-blue.svg" alt="License"></a>
+  </p>
+
 </p>
 
 ## 目录
@@ -29,15 +28,19 @@
 
 ## 介绍
 
-LCUI 是一种自由和开放源代码的图形界面开发库，主要使用 C 语言编写，支持使用 CSS 和 XML 描述界面布局和样式，可用于构建简单的桌面应用程序。
+LCUI 是一种自由和开放源代码的图形界面开发库，主要使用 C 语言编写，支持使用 CSS 和 XML 描述界面结构和样式，可用于构建简单的桌面应用程序。
 
 ### 主要特性
 
-- C 语言编写。适用于体积较小且主要使用C语言实现的应用程序，以及偏向使用C语言编写简单应用的开发者。
-- 支持使用 XML 和 CSS 描述界面布局及样式，节省界面开发时间和维护成本。
-- 支持 Windows 和 GNU/Linux 系统。可以用于开发简单的 Windows 桌面应用和通用应用，以及 Linux 桌面应用。
-- 支持缩放。可通过设置缩放比例来适应不同像素密度的屏幕，也可以使用 sp、dp 单位表示界面元素位置和大小，使界面能够根据屏幕像素密度自适应。
-- 支持多点触控。
+- **C 语言编写：** 适用于体积较小且主要使用 C 语言实现的应用程序，以及偏向使用C语言编写简单应用的开发者。
+- **跨平台：** 支持 Windows 和 GNU/Linux 系统，可开发简单的 Windows 桌面应用和通用应用，以及 Linux 桌面应用。
+- **XML 和 CSS：** 支持使用 XML 和 CSS 描述图形界面的结构和表现，能够节省界面开发时间和维护成本。
+- **类 HTML 布局：** 与浏览器处理的网页布局类似，但目前只支持块级（block）、内联块级（inline-block）和简单的弹性（flex）布局，如果你有网页开发经验的话会比较容易上手。
+- **界面缩放：** 支持通过设置缩放比例来让界面适应不同像素密度的屏幕，也可以使用 sp、dp 单位表示界面元素的位置和大小，使界面能够根据屏幕像素密度自适应。
+- **文本绘制：** 支持为文本设置全局字体、行高、水平对齐方式，可对局部文本块单独设置颜色、背景色、加粗、斜体。
+- **字体管理：** 支持加载多个字体文件，支持自定义界面中的标题、正文、引用、强调等类型的文本所使用的字体的字族和风格。
+- **图片处理：** 提供图片读取接口，支持 jpg、png 和 bmp 格式的图片。支持逐行读取，可在读取图片的过程反馈读取进度。
+- **触控：** 支持多点触控，但目前支持 Windows 系统。
 
 ## 许可
 
