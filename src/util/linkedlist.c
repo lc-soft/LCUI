@@ -38,10 +38,9 @@
  * ****************************************************************************/
 
 //#define DEBUG
-#include <time.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
-#include <LCUI/LCUI.h>
+#include <LCUI/util/linkedlist.h>
 
 void LinkedList_Init( LinkedList *list )
 {
@@ -72,7 +71,8 @@ void LinkedList_Unlink( LinkedList *list, LinkedListNode *node )
 void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*),
 			 int free_node )
 {
-	LinkedListNode *prev, *node = list->tail.prev;
+	LinkedListNode *prev, *node;
+	node = list->tail.prev;
 	list->head.next = NULL;
 	list->tail.prev = NULL;
 	list->length = 0;
@@ -90,24 +90,36 @@ void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*),
 	}
 }
 
-LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos )
+LinkedListNode *LinkedList_GetNodeAtTail( LinkedList *list, size_t pos )
 {
 	LinkedListNode *node;
-	if( pos < 0 ) {
-		pos += list->length;
+	if( pos >= list->length ) {
+		return NULL;
 	}
+	pos += 1;
+	node = list->tail.prev;
+	while( --pos >= 1 && node ) {
+		node = node->prev;
+	}
+	return node;
+}
+
+LinkedListNode *LinkedList_GetNode( LinkedList *list, size_t pos )
+{
+	LinkedListNode *node;
 	if( pos >= list->length ) {
 		return NULL;
 	}
 	if( pos > list->length / 2 ) {
-		pos = list->length - pos - 1;
+		pos = list->length - pos;
 		node = list->tail.prev;
-		while( --pos >= 0 && node ) {
+		while( --pos >= 1 && node ) {
 			node = node->prev;
 		}
 	} else {
+		pos += 1;
 		node = list->head.next;
-		while( --pos >= 0 && node ) {
+		while( --pos >= 1 && node ) {
 			node = node->next;
 		}
 	}
@@ -126,7 +138,7 @@ void LinkedList_Link( LinkedList *list, LinkedListNode *cur,
 	list->length += 1;
 }
 
-void LinkedList_InsertNode( LinkedList *list, int pos, LinkedListNode *node )
+void LinkedList_InsertNode( LinkedList *list, size_t pos, LinkedListNode *node )
 {
 	LinkedListNode *target;
 	target = LinkedList_GetNode( list, pos );
@@ -137,10 +149,10 @@ void LinkedList_InsertNode( LinkedList *list, int pos, LinkedListNode *node )
 	}
 }
 
-LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data )
+LinkedListNode *LinkedList_Insert( LinkedList *list, size_t pos, void *data )
 {
 	LinkedListNode *node;
-	node = NEW( LinkedListNode, 1 );
+	node = malloc( sizeof( LinkedListNode ) );
 	node->data = data;
 	LinkedList_InsertNode( list, pos, node );
 	return node;
@@ -169,13 +181,13 @@ void LinkedList_AppendNode( LinkedList *list, LinkedListNode *node )
 	list->length += 1;
 }
 
-void LinkedList_Delete( LinkedList *list, int pos )
+void LinkedList_Delete( LinkedList *list, size_t pos )
 {
 	LinkedListNode *node = LinkedList_GetNode( list, pos );
 	LinkedList_DeleteNode( list, node );
 }
 
-void *LinkedList_Get( LinkedList *list, int pos )
+void *LinkedList_Get( LinkedList *list, size_t pos )
 {
 	LinkedListNode *node = LinkedList_GetNode( list, pos );
 	return node ? node->data:NULL;
@@ -184,7 +196,7 @@ void *LinkedList_Get( LinkedList *list, int pos )
 LinkedListNode *LinkedList_Append( LinkedList *list, void *data )
 {
 	LinkedListNode *node;
-	node = NEW(LinkedListNode, 1);
+	node = malloc( sizeof( LinkedListNode ) );
 	node->data = data;
 	node->next = NULL;
 	LinkedList_AppendNode( list, node );
@@ -333,10 +345,10 @@ void LinkedList_QuickSort( LinkedList *list, int (*cmp)(void*, void*) )
 
 void LinkedList_BubbleSort( LinkedList *list, int( *cmp )(void*, void*) )
 {
-	int i, j;
+	size_t i, j;
 	LinkedListNode *node, *cur, *next;
 	for( i = 0; i < list->length - 1; ++i ) {
-		LCUI_BOOL no_swap = TRUE;
+		int no_swap = 1;
 		cur = list->head.next;
 		for( j = 0; j < list->length - 1 - i; ++j ) {
 			next = cur->next;
@@ -345,7 +357,7 @@ void LinkedList_BubbleSort( LinkedList *list, int( *cmp )(void*, void*) )
 				node = cur;
 				cur = next;
 				next = node;
-				no_swap = FALSE;
+				no_swap = 0;
 			}
 			cur = cur->next;
 		}

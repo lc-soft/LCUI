@@ -51,7 +51,7 @@ struct LinkedListNodeRec_ {
 };
 
 struct LinkedListRec_ {
-	int length;
+	size_t length;
 	LinkedListNode head, tail;
 };
 
@@ -65,16 +65,17 @@ struct LinkedListRec_ {
 #define LinkedList_ForEachReverse(node, list) for( LinkedList_EachReverse(node, list) )
 
 LCUI_API LinkedListNode *LinkedList_Append( LinkedList *list, void *data );
-LCUI_API LinkedListNode *LinkedList_Insert( LinkedList *list, int pos, void *data );
-LCUI_API LinkedListNode *LinkedList_GetNode( LinkedList *list, int pos );
+LCUI_API LinkedListNode *LinkedList_Insert( LinkedList *list, size_t pos, void *data );
+LCUI_API LinkedListNode *LinkedList_GetNode( LinkedList *list, size_t pos );
+LCUI_API LinkedListNode *LinkedList_GetNodeAtTail( LinkedList *list, size_t pos );
 LCUI_API void LinkedList_Init( LinkedList *list );
-LCUI_API void *LinkedList_Get( LinkedList *list, int pos );
+LCUI_API void *LinkedList_Get( LinkedList *list, size_t pos );
 LCUI_API void LinkedList_Unlink( LinkedList *list, LinkedListNode *node );
 LCUI_API void LinkedList_Link( LinkedList *list, LinkedListNode *cur, LinkedListNode *node );
-LCUI_API void LinkedList_Delete( LinkedList *list, int pos );
+LCUI_API void LinkedList_Delete( LinkedList *list, size_t pos );
 LCUI_API void LinkedList_DeleteNode( LinkedList *list, LinkedListNode *node );
 LCUI_API void LinkedList_AppendNode( LinkedList *list, LinkedListNode *node );
-LCUI_API void LinkedList_InsertNode( LinkedList *list, int pos, LinkedListNode *node );
+LCUI_API void LinkedList_InsertNode( LinkedList *list, size_t pos, LinkedListNode *node );
 LCUI_API void LinkedList_ClearEx( LinkedList *list, void(*on_destroy)(void*), int free_node );
 LCUI_API void LinkedList_Concat( LinkedList *list1, LinkedList *list2 );
 LCUI_API void LinkedListNode_Delete( LinkedListNode *node );
