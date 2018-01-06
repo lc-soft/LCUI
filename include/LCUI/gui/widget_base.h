@@ -268,6 +268,9 @@ LCUI_API LCUI_Widget Widget_GetPrev( LCUI_Widget w );
 /** 获取下一个部件 */
 LCUI_API LCUI_Widget Widget_GetNext( LCUI_Widget w );
 
+/** 获取一个子部件 */
+LCUI_API LCUI_Widget Widget_GetChild( LCUI_Widget w, size_t index );
+
 /** 获取当前点命中的最上层可见部件 */
 LCUI_API LCUI_Widget Widget_At( LCUI_Widget widget, int x, int y );
 

@@ -232,7 +232,7 @@ int Widget_Unwrap( LCUI_Widget widget )
 	if( widget->children.length > 0 ) {
 		node = LinkedList_GetNode( &widget->children, 0 );
 		Widget_RemoveStatus( node->data, "first-child" );
-		node = LinkedList_GetNode( &widget->children, -1 );
+		node = LinkedList_GetNodeAtTail( &widget->children, 0 );
 		Widget_RemoveStatus( node->data, "last-child" );
 	}
 	node = &widget->node;
@@ -256,7 +256,7 @@ int Widget_Unwrap( LCUI_Widget widget )
 		Widget_AddStatus( target->next->data, "first-child" );
 	}
 	if( widget->index == list->length - 1 ) {
-		node = LinkedList_GetNode( list, -1 );
+		node = LinkedList_GetNodeAtTail( list, 0 );
 		Widget_AddStatus( node->data, "last-child" );
 	}
 	Widget_Destroy( widget );
@@ -477,6 +477,15 @@ LCUI_Widget Widget_GetNext( LCUI_Widget w )
 	LinkedListNode *node = &w->node;
 	if( node->next ) {
 		return node->next->data;
+	}
+	return NULL;
+}
+
+LCUI_Widget Widget_GetChild( LCUI_Widget w, size_t index )
+{
+	LinkedListNode *node = LinkedList_GetNode( &w->children, index );
+	if( node ) {
+		return node->data;
 	}
 	return NULL;
 }
