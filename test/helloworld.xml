@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <lcui-app>
   <resource type="text/css" src="helloworld.css"/>
-  <resource type="application/font-ttf" src="C:/Windows/Fonts/comic.ttf"/>
+  <resource type="application/font-ttf" src="C:/windows/fonts/segoeui.ttf"/>
+  <resource type="application/font-ttf" src="C:/windows/fonts/segoeuib.ttf"/>
+  <resource type="application/font-ttf" src="C:/windows/fonts/segoeuii.ttf"/>
+  <resource type="application/font-ttf" src="C:/windows/fonts/segoeuiz.ttf"/>
   <ui>
-    <widget id="text-hello" type="textview" class="text-hello">Hello, World!</widget>
-    <widget id="edit" type="textedit">Hello, World!</widget>
-    <widget id="btn-ok" type="button">Submit</widget>
+    <widget id="text-hello" type="textview" class="text-hello">
+      [i][color=#f00]Hello[/color][/i], [b][color=#fff][bgcolor=#f00]World![/bgcolor][/color][/b]
+    </widget>
+    <widget id="edit" type="textedit">[i][color=#f00]Hello[/color][/i], [b][color=#fff][bgcolor=#f00]World![/bgcolor][/color][/b]</widget>
+    <widget id="btn" type="button">Change</widget>
   </ui>
 </lcui-app>
