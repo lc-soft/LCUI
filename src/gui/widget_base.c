@@ -1555,6 +1555,9 @@ float Widget_ComputeMaxAvaliableWidth( LCUI_Widget widget )
 float Widget_ComputeMaxWidth( LCUI_Widget widget )
 {
 	float width;
+	if( !Widget_HasAutoStyle( widget, key_width ) ) {
+		return widget->box.border.width;
+	}
 	width = Widget_ComputeMaxAvaliableWidth( widget );
 	if( !Widget_HasAutoStyle( widget, key_max_width ) ) {
 		if( widget->computed_style.max_width > -1 &&
@@ -1569,9 +1572,7 @@ float Widget_ComputeMaxContentWidth( LCUI_Widget w )
 {
 	float width = Widget_ComputeMaxWidth( w );
 	width = Widget_GetAdjustedWidth( w, width );
-	width -= w->computed_style.border.left.width;
-	width -= w->computed_style.border.right.width;
-	width -= w->padding.left + w->padding.right;
+	width = ToContentBoxWidth( w, width );
 	return width;
 }
 
