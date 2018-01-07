@@ -136,6 +136,7 @@ static void LCUILayout_HandleInlineBlock( LCUI_LayoutContext ctx )
 	if( ctx->x - ctx->max_width >= 0.01 ) {
 		LCUILayout_HandleCurrentLine( ctx );
 		ctx->current->origin_x = 0;
+		ctx->x += ctx->current->box.outer.width;
 	}
 	ctx->current->origin_y = ctx->y;
 	if( ctx->current->box.outer.height > ctx->line_height ) {
