@@ -12,7 +12,6 @@
     <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
     <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/license-GPLv2-blue.svg" alt="License"></a>
   </p>
-
 </p>
 
 ## 目录
@@ -41,6 +40,14 @@ LCUI 是一种自由和开放源代码的图形界面开发库，主要使用 C 
 - **字体管理：** 支持加载多个字体文件，支持自定义界面中的标题、正文、引用、强调等类型的文本所使用的字体的字族和风格。
 - **图片处理：** 提供图片读取接口，支持 jpg、png 和 bmp 格式的图片。支持逐行读取，可在读取图片的过程反馈读取进度。
 - **触控：** 支持多点触控，但目前支持 Windows 系统。
+
+### 效果图
+
+![Hello, World!](https://lcui.lc-soft.io/static/images/screenshot-lcui-hello.png)
+
+[![LCUI.css](https://lcui.lc-soft.io/static/images/screenshot-lcui-css.png)](https://github.com/lc-ui/LCUI.css)
+
+[![LCFinder](https://lcui.lc-soft.io/static/images/screenshot-lcfinder.png)](https://github.com/lc-soft/LC-Finder)
 
 ## 许可
 
