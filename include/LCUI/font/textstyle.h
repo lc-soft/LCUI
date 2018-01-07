@@ -74,12 +74,17 @@ LCUI_API void TextStyle_Merge( LCUI_TextStyle base, LCUI_TextStyle target );
 /* 设置字体粗细程度 */
 LCUI_API int TextStyle_SetWeight( LCUI_TextStyle ts, LCUI_FontWeight weight );
 
+LCUI_API int TextStyle_SetStyle( LCUI_TextStyle ts, LCUI_FontStyle style );
+
 /**
  * 设置字体
  * @param[in][out] ts 字体样式数据
  * @param[in] str 字体名称，如果有多个名称则用逗号分隔
  */
 LCUI_API int TextStyle_SetFont( LCUI_TextStyle ts, const char *str );
+
+/** 设置使用默认的字体 */
+int TextStyle_SetDefaultFont( LCUI_TextStyle ts );
 
 /*-------------------------- StyleTag --------------------------------*/
 

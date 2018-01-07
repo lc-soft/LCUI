@@ -292,7 +292,7 @@ size_t LCUIFont_UpdateWeight( const int *font_ids,
 	if( !font_ids ) {
 		return 0;
 	}
-	for( len = 0; font_ids[len] != -1; ++len );
+	for( len = 0; font_ids[len]; ++len );
 	if( len < 1 ) {
 		return 0;
 	}
@@ -325,7 +325,7 @@ size_t LCUIFont_UpdateStyle( const int *font_ids,
 	if( !font_ids ) {
 		return 0;
 	}
-	for( len = 0; font_ids[len] != -1; ++len );
+	for( len = 0; font_ids[len]; ++len );
 	if( len < 1 ) {
 		return 0;
 	}
@@ -389,7 +389,7 @@ size_t LCUIFont_GetIdByNames( int **font_ids,
 			break;
 		}
 	}
-	ids[count] = -1;
+	ids[count] = 0;
 	if( count < 1 ) {
 		free( ids );
 		ids = NULL;

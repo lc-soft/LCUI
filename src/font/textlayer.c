@@ -675,6 +675,7 @@ static const wchar_t *TextLayer_ProcessStyleTag( LCUI_TextLayer layer,
 	if( pp ) {
 		s = StyleTags_GetTextStyle( tags );
 		if( s ) {
+			TextStyle_Merge( s, &layer->text_style );
 			LinkedList_Append( &layer->style_cache, s );
 		}
 		*style = s;
@@ -684,6 +685,7 @@ static const wchar_t *TextLayer_ProcessStyleTag( LCUI_TextLayer layer,
 	if( pp ) {
 		s = StyleTags_GetTextStyle( tags );
 		if( s ) {
+			TextStyle_Merge( s, &layer->text_style );
 			LinkedList_Append( &layer->style_cache, s );
 		}
 		*style = s;
@@ -1171,6 +1173,9 @@ void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_true )
 static void TextLayer_UpdateTextStyleCache( LCUI_TextLayer layer )
 {
 	LinkedListNode *node;
+	if( !layer->text_style.has_family ) {
+		TextStyle_SetDefaultFont( &layer->text_style );
+	}
 	/* 替换缺省字体，确保能够正确应用字体设置 */
 	for( LinkedList_Each( node, &layer->style_cache ) ) {
 		TextStyle_Merge( node->data, &layer->text_style );

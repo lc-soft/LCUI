@@ -378,7 +378,7 @@ void CSSFontStyle_GetTextStyle( LCUI_CSSFontStyle fs, LCUI_TextStyle ts )
 	ts->weight = fs->font_weight;
 	ts->style = fs->font_style;
 	if( fs->font_ids ) {
-		for( len = 0; fs->font_ids[len] != -1; ++len );
+		for( len = 0; fs->font_ids[len]; ++len );
 		ts->font_ids = malloc( sizeof( int ) * ++len );
 		memcpy( ts->font_ids, fs->font_ids, len * sizeof( int ) );
 		ts->has_family = TRUE;

@@ -44,19 +44,18 @@
 #include <LCUI/LCUI.h>
 #include <LCUI/font.h>
 
-enum LCUI_TextStyleTagType {
-	TEXT_STYLE_FAMILY,
+typedef enum LCUI_TextStyleTagType_ {
 	TEXT_STYLE_STYLE,
-	TEXT_STYLE_WIEGHT,
 	TEXT_STYLE_BOLD,
+	TEXT_STYLE_ITALIC,
 	TEXT_STYLE_SIZE,
 	TEXT_STYLE_COLOR,
 	TEXT_STYLE_BG_COLOR,
 	TEXT_STYLE_TOTAL_NUM
-};
+} LCUI_TextStyleTagType;
 
 typedef struct LCUI_StyleTag {
-	int id;
+	LCUI_TextStyleTagType id;
 	LCUI_StyleRec style;
 } LCUI_TextStyleTag;
 
@@ -81,7 +80,7 @@ int TextStyle_CopyFamily( LCUI_TextStyle dst, LCUI_TextStyle src )
 	if( !src->has_family ) {
 		return 0;
 	}
-	for( len = 0; src->font_ids[len] != -1; ++len );
+	for( len = 0; src->font_ids[len]; ++len );
 	len += 1;
 	if( dst->font_ids ) {
 		free( dst->font_ids );
@@ -113,31 +112,29 @@ void TextStyle_Destroy( LCUI_TextStyle data )
 void TextStyle_Merge( LCUI_TextStyle base, LCUI_TextStyle target )
 {
 	int *font_ids = NULL;
-	if( !base->has_family && target->has_family ) {
-		base->has_family = TRUE;
-		TextStyle_CopyFamily( base, target );
-	}
+	base->has_family = TRUE;
+	TextStyle_CopyFamily( base, target );
 	if( target->has_style && !base->has_style &&
 	    target->style != FONT_STYLE_NORMAL ) {
 		base->has_style = TRUE;
 		base->style = target->style;
-		if( LCUIFont_UpdateStyle( base->font_ids,
-					  base->style,
-					  &font_ids ) > 0 ) {
-			free( base->font_ids );
-			base->font_ids = font_ids;
-		}
+	}
+	if( LCUIFont_UpdateStyle( base->font_ids,
+				  base->style,
+				  &font_ids ) > 0 ) {
+		free( base->font_ids );
+		base->font_ids = font_ids;
 	}
 	if( target->has_weight && !base->has_weight &&
 	    target->weight != FONT_WEIGHT_NORMAL ) {
 		base->has_weight = TRUE;
 		base->weight = target->weight;
-		if( LCUIFont_UpdateWeight( base->font_ids,
-					   base->weight,
-					   &font_ids ) > 0 ) {
-			free( base->font_ids );
-			base->font_ids = font_ids;
-		}
+	}
+	if( LCUIFont_UpdateWeight( base->font_ids,
+				   base->weight,
+				   &font_ids ) > 0 ) {
+		free( base->font_ids );
+		base->font_ids = font_ids;
 	}
 }
 
@@ -147,6 +144,19 @@ int TextStyle_SetWeight( LCUI_TextStyle ts, LCUI_FontWeight weight )
 	ts->weight = weight;
 	ts->has_weight = TRUE;
 	if( LCUIFont_UpdateWeight( ts->font_ids, weight, &font_ids ) > 0 ) {
+		free( ts->font_ids );
+		ts->font_ids = font_ids;
+		return 0;
+	}
+	return -1;
+}
+
+int TextStyle_SetStyle( LCUI_TextStyle ts, LCUI_FontStyle style )
+{
+	int *font_ids;
+	ts->style = style;
+	ts->has_style = TRUE;
+	if( LCUIFont_UpdateStyle( ts->font_ids, style, &font_ids ) > 0 ) {
 		free( ts->font_ids );
 		ts->font_ids = font_ids;
 		return 0;
@@ -169,6 +179,23 @@ int TextStyle_SetFont( LCUI_TextStyle ts, const char *str )
 		return 0;
 	}
 	return -1;
+}
+
+int TextStyle_SetDefaultFont( LCUI_TextStyle ts )
+{
+	if( ts->has_family && ts->font_ids ) {
+		free( ts->font_ids );
+		ts->has_family = FALSE;
+	}
+	ts->font_ids = malloc( sizeof( int ) * 2 );
+	if( !ts->font_ids ) {
+		ts->font_ids = NULL;
+		return -ENOMEM;
+	}
+	ts->has_family = TRUE;
+	ts->font_ids[0] = LCUIFont_GetDefault();
+	ts->font_ids[1] = 0;
+	return 0;
 }
 
 /*-------------------------- StyleTag --------------------------------*/
@@ -220,6 +247,14 @@ LCUI_TextStyle StyleTags_GetTextStyle( LinkedList *tags )
 			}
 			found_tags[tag->id] = TRUE;
 			TextStyle_SetWeight( style, FONT_WEIGHT_BOLD );
+			++count;
+			break;
+		case TEXT_STYLE_ITALIC:
+			if( found_tags[tag->id] ) {
+				break;
+			}
+			found_tags[tag->id] = TRUE;
+			TextStyle_SetStyle( style, FONT_STYLE_ITALIC );
 			++count;
 			break;
 		case TEXT_STYLE_SIZE:
@@ -467,6 +502,10 @@ static const wchar_t *ScanStyleTagData( const wchar_t *wstr,
 		tag->id = TEXT_STYLE_BOLD;
 		return q;
 	}
+	if( (q = ScanStyleTagByName( p, L"i", tag_data )) ) {
+		tag->id = TEXT_STYLE_ITALIC;
+		return q;
+	}
 	return NULL;
 }
 
@@ -504,6 +543,8 @@ const wchar_t* StyleTags_GetEnd( LinkedList *tags, const wchar_t *str )
 		StyleTags_Delete( tags, TEXT_STYLE_SIZE );
 	} else if( wcscmp( tagname, L"b" ) == 0 ) {
 		StyleTags_Delete( tags, TEXT_STYLE_BOLD );
+	} else if( wcscmp( tagname, L"i" ) == 0 ) {
+		StyleTags_Delete( tags, TEXT_STYLE_ITALIC );
 	} else {
 		return NULL;
 	}
