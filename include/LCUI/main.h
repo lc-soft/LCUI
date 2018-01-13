@@ -160,7 +160,7 @@ LCUI_API void LCUI_ProcessEvents( void );
 
 /**
  * 添加任务
- * 该任务将会添加至 UI 线程中执行
+ * 该任务将会添加至主线程中执行
  */
 LCUI_API LCUI_BOOL LCUI_PostTask( LCUI_Task task );
 

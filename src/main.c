@@ -44,6 +44,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
+#include <LCUI/worker.h>
 #include <LCUI/timer.h>
 #include <LCUI/cursor.h>
 #include <LCUI/input.h>
@@ -68,7 +69,7 @@
 #define STATE_KILLED 0
 
 /** 一秒内的最大更新帧数 */
-#define MAX_FRAMES_PER_SEC 100
+#define MAX_FRAMES_PER_SEC 120
 
 /** 主循环的状态 */
 enum MainLoopState {
@@ -112,7 +113,7 @@ static struct LCUI_App {
 	StepTimer	timer;				/**< 渲染循环计数器 */
 	LCUI_AppDriver	driver;				/**< 程序事件驱动支持 */
 	LCUI_BOOL	driver_ready;			/**< 事件驱动支持是否已经准备就绪 */
-	LCUI_Worker	ui_worker;			/**< UI 工作线程 */
+	LCUI_Worker	main_worker;			/**< 主工作线程 */
 	LCUI_Worker	workers[LCUI_WORKER_NUM];	/**< 普通工作线程 */
 	int		worker_next;			/**< 下一个工作线程编号 */
 } MainApp;
@@ -236,8 +237,7 @@ void LCUI_DestroyEvent( LCUI_SysEvent e )
 
 void LCUI_ProcessEvents( void )
 {
-	int i;
-	for( i = 0; LCUIWorker_RunTask(MainApp.ui_worker) && i < 100; ++i );
+	LCUIWorker_RunTask( MainApp.main_worker );
 	if( MainApp.driver_ready ) {
 		MainApp.driver->ProcessEvents();
 	}
@@ -245,10 +245,10 @@ void LCUI_ProcessEvents( void )
 
 LCUI_BOOL LCUI_PostTask( LCUI_Task task )
 {
-	if( !MainApp.ui_worker ) {
+	if( !MainApp.main_worker ) {
 		return FALSE;
 	}
-	LCUIWorker_PostTask( MainApp.ui_worker, task );
+	LCUIWorker_PostTask( MainApp.main_worker, task );
 	return TRUE;
 }
 
@@ -362,7 +362,7 @@ void LCUI_InitApp( LCUI_AppDriver app )
 	LCUICond_Init( &MainApp.loop_changed );
 	LCUIMutex_Init( &MainApp.loop_mutex );
 	LinkedList_Init( &MainApp.loops );
-	MainApp.ui_worker = LCUIWorker_New();
+	MainApp.main_worker = LCUIWorker_New();
 	for( i = 0; i < LCUI_WORKER_NUM; ++i ) {
 		MainApp.workers[i] = LCUIWorker_New();
 		LCUIWorker_RunAsync( MainApp.workers[i] );
@@ -407,8 +407,8 @@ static void LCUI_FreeApp( void )
 		LCUIWorker_Destroy( MainApp.workers[i] );
 		MainApp.workers[i] = NULL;
 	}
-	LCUIWorker_Destroy( MainApp.ui_worker );
-	MainApp.ui_worker = NULL;
+	LCUIWorker_Destroy( MainApp.main_worker );
+	MainApp.main_worker = NULL;
 }
 
 int LCUI_BindSysEvent( int event_id, LCUI_EventFunc func,

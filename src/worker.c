@@ -44,6 +44,7 @@
 #include <LCUI_Build.h>
 #include <LCUI/LCUI.h>
 #include <LCUI/thread.h>
+#include <LCUI/worker.h>
 
 typedef struct LCUI_WorkerRec_ {
 	LCUI_BOOL active;		/**< 是否处于活动状态 */
