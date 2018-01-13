@@ -42,7 +42,6 @@
 LCUI_BEGIN_HEADER
 
 typedef LCUI_TaskFunc LCUI_AppTaskFunc;
-typedef LCUI_Task LCUI_Task;
 
 enum LCUI_SysEventType {
 	LCUI_NONE,
