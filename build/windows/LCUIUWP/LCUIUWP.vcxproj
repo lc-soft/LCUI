@@ -102,8 +102,10 @@
     <ClCompile Include="..\..\..\src\gui\css_fontstyle.c" />
     <ClCompile Include="..\..\..\src\gui\css_library.c" />
     <ClCompile Include="..\..\..\src\gui\css_parser.c" />
+    <ClCompile Include="..\..\..\src\gui\css_rule_font_face.c" />
     <ClCompile Include="..\..\..\src\gui\metrics.c" />
     <ClCompile Include="..\..\..\src\gui\widget.c" />
+    <ClCompile Include="..\..\..\src\gui\widget\anchor.c" />
     <ClCompile Include="..\..\..\src\gui\widget\button.c" />
     <ClCompile Include="..\..\..\src\gui\widget\scrollbar.c" />
     <ClCompile Include="..\..\..\src\gui\widget\sidebar.c" />
@@ -115,6 +117,7 @@
     <ClCompile Include="..\..\..\src\gui\widget_border.c" />
     <ClCompile Include="..\..\..\src\gui\widget_event.c" />
     <ClCompile Include="..\..\..\src\gui\widget_helper.c" />
+    <ClCompile Include="..\..\..\src\gui\widget_layout.c" />
     <ClCompile Include="..\..\..\src\gui\widget_prototype.c" />
     <ClCompile Include="..\..\..\src\gui\widget_paint.c" />
     <ClCompile Include="..\..\..\src\gui\widget_shadow.c" />
@@ -152,7 +155,9 @@
     <ClCompile Include="..\..\..\src\util\rbtree.c" />
     <ClCompile Include="..\..\..\src\util\rect.c" />
     <ClCompile Include="..\..\..\src\util\string.c" />
+    <ClCompile Include="..\..\..\src\util\task.c" />
     <ClCompile Include="..\..\..\src\util\time.c" />
+    <ClCompile Include="..\..\..\src\worker.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{48523b96-5f4e-4efd-8580-6b1c0a762ee4}</ProjectGuid>

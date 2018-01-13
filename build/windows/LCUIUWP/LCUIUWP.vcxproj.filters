@@ -413,5 +413,20 @@
     <ClCompile Include="..\..\..\src\gui\widget_helper.c">
       <Filter>源文件\gui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\css_rule_font_face.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\worker.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\task.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget\anchor.c">
+      <Filter>源文件\gui\widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\gui\widget_layout.c">
+      <Filter>源文件\gui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
