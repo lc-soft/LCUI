@@ -89,20 +89,6 @@ static LRESULT CALLBACK WndProc( HWND hwnd, UINT msg,
 	return 0;
 }
 
-static LCUI_BOOL WIN_PostTask( LCUI_Task task )
-{
-	return PostMessage( win.main_hwnd, WM_LCUI_TASK, 0, (LPARAM)task );
-}
-
-static LCUI_BOOL WIN_WaitEvent( void )
-{
-	MSG msg;
-	if( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) ) {
-		return TRUE;
-	}
-	return WaitMessage();
-}
-
 static void WIN_ProcessEvents( void )
 {
 	MSG msg;
