@@ -38,6 +38,7 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <LCUI_Build.h>
@@ -46,7 +47,11 @@
 #include <LCUI/gui/widget/anchor.h>
 #include <LCUI/gui/builder.h>
 
-#define DEFAULT_PATH
+#ifdef LCUI_BUILD_IN_WIN32
+#define URL_LUANCHER "start"
+#else
+#define URL_LUANCHER "xdg-open"
+#endif
 
 static struct LCUI_Anchor {
 	int event_id;
@@ -68,13 +73,37 @@ void AppendToTarget( LCUI_Widget w, LCUI_Widget box )
 		return;
 	}
 	root = LCUIWidget_GetRoot();
-	Widget_Empty( target );
 	Widget_Append( target, box );
 	Widget_Unwrap( box );
 	ev.target = w;
 	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
 	Widget_TriggerEvent( root, &ev, NULL );
+}
+
+void StartAppendToTarget( LCUI_Widget w, LCUI_Widget box )
+{
+	LCUI_Widget target;
+	const char *attr_target;
+
+	attr_target = Widget_GetAttribute( w, "target" );
+	if( !attr_target ) {
+		return;
+	}
+	target = LCUIWidget_GetById( attr_target );
+	if( !target ) {
+		return;
+	}
+	Widget_Empty( target );
+	/* 等下一帧再向目标添加新的内容 */
+	LCUI_PostSimpleTask( AppendToTarget, w, box );
+}
+
+static int OpenUrl( const char *url )
+{
+	char cmd[512] = { 0 };
+	snprintf( cmd, 511, URL_LUANCHER" %s", url );
+	return system( cmd );
 }
 
 void Anchor_Open( LCUI_Widget w )
@@ -85,14 +114,21 @@ void Anchor_Open( LCUI_Widget w )
 	const char *attr_target = Widget_GetAttribute( w, "target" );
 	LCUI_Widget target, box;
 
-	if( !attr_href || !attr_target ) {
-		LOG( "[anchor] href and target are required\n" );
+	if( !attr_href ) {
+		LOG( "[anchor] href are required\n" );
 		return;
 	}
-	if( strstr( attr_href, "http://" ) ||
-	    strstr( attr_href, "https://" ) ) {
-		LOG( "[anchor] href (%s): http link are not allowed\n",
-		     attr_href );
+	if( strstr( attr_href, "file:" ) == attr_href ) {
+		OpenUrl( attr_href + 5 );
+		return;
+	}
+	if( strstr( attr_href, "http://" ) == attr_href ||
+	    strstr( attr_href, "https://" ) == attr_href ) {
+		OpenUrl( attr_href );
+		return;
+	}
+	if( !attr_target ) {
+		LOG( "[anchor] target are required\n" );
 		return;
 	}
 	target = LCUIWidget_GetById( attr_target );
@@ -111,13 +147,13 @@ void Anchor_Open( LCUI_Widget w )
 		box = LCUIBuilder_LoadFile( href );
 		free( href );
 		if( box ) {
-			LCUI_PostSimpleTask( AppendToTarget, w, box );
+			LCUI_PostSimpleTask( StartAppendToTarget, w, box );
 			return;
 		}
 	}
 	box = LCUIBuilder_LoadFile( attr_href );
 	if( box ) {
-		LCUI_PostSimpleTask( AppendToTarget, w, box );
+		LCUI_PostSimpleTask( StartAppendToTarget, w, box );
 		return;
 	}
 	LOG( "[anchor] href (%s): cannot load xml resource\n", attr_href );
