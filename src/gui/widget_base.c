@@ -50,6 +50,7 @@ static struct LCUIWidgetModule {
 	LCUI_Widget root;		/**< 根级部件 */
 	Dict *ids;			/**< 各种部件的ID索引 */
 	LCUI_Mutex mutex;		/**< 互斥锁 */
+	DictType dt_ids;		/**< 部件ID映射表的类型模板 */
 	DictType dt_attributes;		/**< 部件属性表的类型模板 */
 } LCUIWidget;
 
@@ -451,14 +452,19 @@ void Widget_GetOffset( LCUI_Widget w, LCUI_Widget parent,
 	*offset_y = y;
 }
 
-LCUI_Widget LCUIWidget_GetById( const char *idstr )
-{
-	LCUI_Widget w;
-	if( !idstr ) {
+LCUI_Widget LCUIWidget_GetById( const char *id )
+{;
+	LinkedList *list;
+	LCUI_Widget w = NULL;
+
+	if( !id ) {
 		return NULL;
 	}
 	LCUIMutex_Lock( &LCUIWidget.mutex );
-	w = Dict_FetchValue( LCUIWidget.ids, idstr );
+	list = Dict_FetchValue( LCUIWidget.ids, id );
+	if( list ) {
+		w = LinkedList_Get( list, 0 );
+	}
 	LCUIMutex_Unlock( &LCUIWidget.mutex );
 	return w;
 }
@@ -515,26 +521,66 @@ void Widget_SetTitleW( LCUI_Widget w, const wchar_t *title )
 	Widget_AddTask( w, WTT_TITLE );
 }
 
+static int Widget_RemoveId( LCUI_Widget w )
+{
+	LinkedList *list;
+	LinkedListNode *node;
+
+	if( !w->id ) {
+		return -1;
+	}
+	list = Dict_FetchValue( LCUIWidget.ids, w->id );
+	if( !list ) {
+		return -2;
+	}
+	for( LinkedList_Each( node, list ) ) {
+		if( node->data == w ) {
+			w->id = NULL;
+			LinkedList_Unlink( list, node );
+			LinkedListNode_Delete( node );
+			return 0;
+		}
+	}
+	return -3;
+}
+
 int Widget_SetId( LCUI_Widget w, const char *idstr )
 {
+	LinkedList *list;
 	LCUIMutex_Lock( &LCUIWidget.mutex );
-	if( w->id ) {
-		Dict_Delete( LCUIWidget.ids, w->id );
-		free( w->id );
-		w->id = NULL;
-	}
+	Widget_RemoveId( w );
 	if( !idstr ) {
 		LCUIMutex_Unlock( &LCUIWidget.mutex );
 		return -1;
 	}
 	w->id = strdup2( idstr );
-	if( Dict_Add( LCUIWidget.ids, w->id, w ) == 0 ) {
-		LCUIMutex_Unlock( &LCUIWidget.mutex );
-		return 0;
+	if( !w->id ) {
+		goto error_exit;
+	}
+	list = Dict_FetchValue( LCUIWidget.ids, w->id );
+	if( !list ) {
+		list = malloc( sizeof( LinkedList ) );
+		if( !list ) {
+			goto error_exit;
+		}
+		LinkedList_Init( list );
+		if( Dict_Add( LCUIWidget.ids, w->id, list ) != 0 ) {
+			free( list );
+			goto error_exit;
+		}
+	}
+	if( !LinkedList_Append( list, w ) ) {
+		goto error_exit;
 	}
 	LCUIMutex_Unlock( &LCUIWidget.mutex );
-	free( w->id );
-	w->id = NULL;
+	return 0;
+
+error_exit:
+	LCUIMutex_Unlock( &LCUIWidget.mutex );
+	if( w->id ) {
+		free( w->id );
+		w->id = NULL;
+	}
 	return -2;
 }
 
@@ -1639,13 +1685,22 @@ static void OnClearWidgetAttribute( void *privdata, void *data )
 	free( attr );
 }
 
+static void OnClearWidgetList( void *privdata, void *data )
+{
+	LinkedList *list = data;
+	LinkedList_Clear( list, NULL );
+	free( list );
+}
+
 void LCUIWidget_InitBase( void )
 {
 	LCUIMutex_Init( &LCUIWidget.mutex );
-	LCUIWidget.ids = Dict_Create( &DictType_StringKey, NULL );
 	LCUIWidget.root = LCUIWidget_New( "root" );
+	LCUIWidget.dt_ids = DictType_StringCopyKey;
+	LCUIWidget.dt_ids.valDestructor = OnClearWidgetList;
 	LCUIWidget.dt_attributes = DictType_StringCopyKey;
 	LCUIWidget.dt_attributes.valDestructor = OnClearWidgetAttribute;
+	LCUIWidget.ids = Dict_Create( &LCUIWidget.dt_ids, NULL );
 	Widget_SetTitleW( LCUIWidget.root, L"LCUI Display" );
 }
 
