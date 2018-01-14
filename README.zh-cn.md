@@ -9,8 +9,11 @@
   <p align="center">
     <a href="https://travis-ci.org/lc-soft/LCUI"><img src="https://travis-ci.org/lc-soft/LCUI.png?branch=master" alt="Build Status"></a>
     <a href="https://coveralls.io/github/lc-soft/LCUI?branch=develop"><img src="https://coveralls.io/repos/github/lc-soft/LCUI/badge.svg?branch=develop" alt="Coverage Status"></a>
-    <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
     <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/license-GPLv2-blue.svg" alt="License"></a>
+    <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/release/lc-soft/LCUI/all.svg" alt="Github Release"></a>
+    <a href="https://github.com/lc-soft/LCUI/releases"><img src="https://img.shields.io/github/downloads/lc-soft/LCUI/total.svg" alt="Github All Releases"></a>
+    <img src="https://img.shields.io/github/repo-size/lc-soft/LCUI.svg" alt="Repo size">
+    <img src="https://img.shields.io/github/languages/code-size/lc-soft/LCUI.svg" alt="Code size">
   </p>
 </p>
 
@@ -31,14 +34,15 @@ LCUI 是一种自由和开放源代码的图形界面开发库，主要使用 C 
 
 ### 主要特性
 
-- **C 语言编写：** 适用于体积较小且主要使用 C 语言实现的应用程序，以及偏向使用C语言编写简单应用的开发者。
+- **C 语言编写：** 适用于体积较小且主要使用 C 语言实现的应用程序，以及偏向使用 C 语言编写简单应用的开发者。
 - **跨平台：** 支持 Windows 和 GNU/Linux 系统，可开发简单的 Windows 桌面应用和通用应用，以及 Linux 桌面应用。
-- **XML 和 CSS：** 支持使用 XML 和 CSS 描述图形界面的结构和表现，能够节省界面开发时间和维护成本。
+- **XML 解析：** 支持使用 XML 标记语言描述界面的结构，能够方便的实现界面的结构与逻辑代码分离。
+- **CSS 解析：** 支持使用简单的 CSS 代码描述界面的布局和样式，能够方便的实现界面的表现与逻辑代码分离，节省界面开发时间和维护成本。
 - **类 HTML 布局：** 与浏览器处理的网页布局类似，但目前只支持块级（block）、内联块级（inline-block）和简单的弹性（flex）布局，如果你有网页开发经验的话会比较容易上手。
-- **界面缩放：** 支持通过设置缩放比例来让界面适应不同像素密度的屏幕，也可以使用 sp、dp 单位表示界面元素的位置和大小，使界面能够根据屏幕像素密度自适应。
+- **界面缩放：** 支持通过设置全局缩放比例来让界面适应不同像素密度的屏幕，也支持使用基于屏幕密度的 sp 和 dp 单位表示界面元素的位置和大小。
 - **文本绘制：** 支持为文本设置全局字体、行高、水平对齐方式，可对局部文本块单独设置颜色、背景色、加粗、斜体。
 - **字体管理：** 支持加载多个字体文件，支持自定义界面中的标题、正文、引用、强调等类型的文本所使用的字体的字族和风格。
-- **图片处理：** 提供图片读取接口，支持 jpg、png 和 bmp 格式的图片。支持逐行读取，可在读取图片的过程反馈读取进度。
+- **图片处理：** 提供图片读取接口，支持读取 jpg、png 和 bmp 格式的图片。支持逐行读取，可在读取图片的过程反馈读取进度。
 - **触控：** 支持多点触控，但目前支持 Windows 系统。
 
 ### 效果图
@@ -133,16 +137,7 @@ LCUI 还有很多需要完善的地方，相信有经验的人很容易就能发
 - 示例太少。
 - 组件太少。
 
-受限于时间成本问题，像图形渲染优化、输入法支持、文档撰写等这类耗时长、收益低的工作，现阶段都不会安排在主线分支上。如果你有相关问题解决经验，可以向此项目提供支持。
-
-如果你想贡献代码（开发补丁），补丁应符合以下要求：
-
-1. 遵循现有代码风格，请参考 `docs/CodingStyle.zh-cn.md` 文件。
-1. 一次提交应该做完整的一件事。
-1. 提交信息的第一行为摘要行，长度应低于80个字符，如果需要描述修改原因，请在摘要行后留空行，然后再补充。
-1. 修复之前的提交（已经合并）中存在的 bug，提交信息的摘要行应该以 `修复` 或含义类似的词语开头，表示修复了它。如果你修复的是问题列表中未解决的问题，需在摘要行中加上对应问题的编号，例如：`修复部件宽度计算错误的问题 (#123)`，或者：`修复 (#123): 部件宽度计算错误`。
-1. 针对上游 develop 分支衍合你的分支。我们不希望落拉取到冗余的合并请求。
-1. **要清楚什么许可证适用于你的补丁：** 该代码库中的文件基于GPLv2（或更高版本），但（原作者）我们仍然可以创建非自由的衍生工具。然而，如果给我们的补丁是基于GPL的，我们希望它以后不会进入任何非自由的衍生工具，因此，如果补丁发布于公共领域，会为我们带来方便（以及避免任何法律问题）。
+受限于时间成本问题，像图形渲染优化、输入法支持、文档撰写、琐碎小功能等这类耗时长、收益低的工作，现阶段都不会安排在主线分支上。本项目是以技术交流为主要目的而开放源代码的，如果你有相关问题解决经验，可以向此项目提供支持，与其他人分享你的经验。
 
 ### 捐赠
 
