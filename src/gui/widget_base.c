@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * widget_base.c -- the widget base operation set.
  *
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -534,6 +534,7 @@ static int Widget_RemoveId( LCUI_Widget w )
 	}
 	for( LinkedList_Each( node, list ) ) {
 		if( node->data == w ) {
+			free( w->id );
 			w->id = NULL;
 			LinkedList_Unlink( list, node );
 			LinkedListNode_Delete( node );
