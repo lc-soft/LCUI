@@ -457,7 +457,7 @@ int TextLayer_SetCaretPosByPixelPos( LCUI_TextLayer layer, int x, int y )
 	int i, pixel_pos, ins_x, ins_y;
 	pixel_pos = layer->offset_y;
 	for( i = 0; i < layer->text_rows.length; ++i ) {
-		pixel_pos += layer->text_rows.rows[i]->height;;
+		pixel_pos += layer->text_rows.rows[i]->height;
 		if( pixel_pos >= y ) {
 			ins_y = i;
 			break;
@@ -970,7 +970,7 @@ void TextLayer_SetMultiline( LCUI_TextLayer layer, int is_true )
 	if( (layer->is_mulitiline_mode && !is_true)
 	 || (!layer->is_mulitiline_mode && is_true) ) {
 		layer->is_mulitiline_mode = is_true;
-		TextLayer_AddUpdateTypeset( layer, 0 );;
+		TextLayer_AddUpdateTypeset( layer, 0 );
 	}
 }
 
@@ -1096,7 +1096,7 @@ static int TextLayer_TextDeleteEx( LCUI_TextLayer layer, int char_y,
 		TextLayer_InvalidateRowRect( layer, char_y, 0, -1 );
 		TextRowList_RemoveRow( &layer->text_rows, char_y );
 	}
-	TextLayer_AddUpdateTypeset( layer, char_y );;
+	TextLayer_AddUpdateTypeset( layer, char_y );
 	return 0;
 }
 

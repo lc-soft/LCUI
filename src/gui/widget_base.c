@@ -453,7 +453,7 @@ void Widget_GetOffset( LCUI_Widget w, LCUI_Widget parent,
 }
 
 LCUI_Widget LCUIWidget_GetById( const char *id )
-{;
+{
 	LinkedList *list;
 	LCUI_Widget w = NULL;
 
@@ -498,7 +498,6 @@ LCUI_Widget Widget_GetChild( LCUI_Widget w, size_t index )
 
 int Widget_Top( LCUI_Widget w )
 {
-	DEBUG_MSG("tip\n");
 	return Widget_Append( LCUIWidget.root, w );
 }
 
