@@ -24,6 +24,8 @@ test/test_char_render.c \
 test/test_css_parser.css \
 test/test_css_parser.xml \
 test/test_css_parser.c \
+test/test_xml_parser.xml \
+test/test_xml_parser.c \
 test/test_font_load.c \
 test/test_font_load.css \
 test/test_font_load.ttf \

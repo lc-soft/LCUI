@@ -111,6 +111,7 @@
     <ClCompile Include="..\..\..\test\test_widget_layout.c" />
     <ClCompile Include="..\..\..\test\test_widget_rect.c" />
     <ClCompile Include="..\..\..\test\test_widget_render.c" />
+    <ClCompile Include="..\..\..\test\test_xml_parser.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test\test.h" />

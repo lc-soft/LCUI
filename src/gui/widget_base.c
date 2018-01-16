@@ -1474,6 +1474,14 @@ int Widget_SetAttributeEx( LCUI_Widget w, const char *name, void *value,
 int Widget_SetAttribute( LCUI_Widget w, const char *name, const char *value )
 {
 	char *value_str;
+	if( strcmp( name, "disabled" ) == 0 ) {
+		if( !value || strcmp( value, "false" ) != 0 ) {
+			Widget_SetDisabled( w, TRUE );
+		} else {
+			Widget_SetDisabled( w, FALSE );
+		}
+		return 0;
+	}
 	if( !value ) {
 		return Widget_SetAttributeEx( w, name, NULL, SVT_NONE, NULL );
 	}

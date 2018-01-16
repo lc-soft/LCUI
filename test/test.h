@@ -29,6 +29,7 @@ Logger_Log("[test] %d tests, %d pass.\n", tests_count, tests_count + N)
 int test_string( void );
 int test_font_load( void );
 int test_css_parser( void );
+int test_xml_parser( void );
 int test_char_render( void );
 int test_string_render( void );
 int test_widget_render( void );
