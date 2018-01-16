@@ -795,8 +795,8 @@ static void Widget_UpdateChildrenSize( LCUI_Widget w )
 				Widget_AddTask( child, WTT_POSITION );
 			}
 		}
-		if( CheckStyleValue( s, key_margin_left, AUTO ) ||
-		    CheckStyleValue( s, key_margin_right, AUTO ) ) {
+		if( Widget_HasAutoStyle( child, key_margin_left ) ||
+		    Widget_HasAutoStyle( child, key_margin_right ) ) {
 			Widget_AddTask( child, WTT_MARGIN );
 		}
 		if( child->computed_style.vertical_align != SV_TOP ) {
@@ -1240,13 +1240,11 @@ static float Widget_ComputeAutoHeight( LCUI_Widget w, float *width )
 /** 计算尺寸 */
 static void Widget_ComputeSize( LCUI_Widget w )
 {
-	LCUI_BorderStyle *bbox;
-	float width, height, max_width = -1;
+	float width, height;
 
 	Widget_ComputeLimitSize( w );
 	width = ComputeXMetric( w, key_width );
 	height = ComputeYMetric( w, key_height );
-	bbox = &w->computed_style.border;
 	/* 当宽度可被直接计算出来时，转换成内容宽度，作为计算自动尺寸时的初始宽度 */
 	if( width > 0 ) {
 		width = GetLimitedWidth( w, width );
@@ -1303,15 +1301,8 @@ void Widget_UpdateMargin( LCUI_Widget w )
 	/* 如果有父级部件，则处理 margin-left 和 margin-right 的值 */
 	if( w->parent ) {
 		float width = w->parent->box.content.width;
-		float margin_left = SVT_AUTO, margin_right = SVT_AUTO;
-		if( w->style->sheet[key_margin_left].is_valid ) {
-			margin_left = w->style->sheet[key_margin_left].type;
-		}
-		if( w->style->sheet[key_margin_right].is_valid ) {
-			margin_right = w->style->sheet[key_margin_right].type;
-		}
-		if( margin_left == SVT_AUTO ) {
-			if( margin_right == SVT_AUTO ) {
+		if( Widget_HasAutoStyle( w, key_margin_left ) ) {
+			if( Widget_HasAutoStyle( w, key_margin_right ) ) {
 				w->margin.left = (width - w->width) / 2;
 				if( w->margin.left < 0 ) {
 					w->margin.left = 0;
@@ -1324,7 +1315,7 @@ void Widget_UpdateMargin( LCUI_Widget w )
 					w->margin.left = 0;
 				}
 			}
-		} else if( margin_right == SVT_AUTO ) {
+		} else if( Widget_HasAutoStyle( w, key_margin_right ) ) {
 			w->margin.right = width - w->width;
 			w->margin.right -= w->margin.left;
 			if( w->margin.right < 0 ) {
@@ -1333,8 +1324,8 @@ void Widget_UpdateMargin( LCUI_Widget w )
 		}
 	}
 	if( w->parent ) {
-		if( w->parent->style->sheet[key_width].type == SVT_AUTO ||
-		    w->parent->style->sheet[key_height].type == SVT_AUTO ) {
+		if( Widget_HasAutoStyle( w->parent, key_width ) ||
+		    Widget_HasAutoStyle( w->parent, key_height ) ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
 		}
 		if( w->computed_style.display != SV_NONE &&
@@ -1406,8 +1397,8 @@ void Widget_UpdateSize( LCUI_Widget w )
 		Widget_UpdatePosition( w );
 	} else if( w->computed_style.position == SV_ABSOLUTE ) {
 		/* 如果是绝对定位，且指定了右间距或底间距 */
-		if( !Widget_CheckStyleValue( w, key_right, AUTO ) ||
-		    !Widget_CheckStyleValue( w, key_bottom, AUTO ) ) {
+		if( !Widget_HasAutoStyle( w, key_right ) ||
+		    !Widget_HasAutoStyle( w, key_bottom ) ) {
 			Widget_UpdatePosition( w );
 		}
 	}
@@ -1416,8 +1407,8 @@ void Widget_UpdateSize( LCUI_Widget w )
 		rect.width = w->box.graph.width;
 		rect.height = w->box.graph.height;
 		Widget_InvalidateArea( w->parent, &rect, SV_PADDING_BOX );
-		if( w->parent->style->sheet[key_width].type == SVT_AUTO
-		    || w->parent->style->sheet[key_height].type == SVT_AUTO ) {
+		if( Widget_HasAutoStyle( w->parent, key_width ) ||
+		    Widget_HasAutoStyle( w->parent, key_height ) ) {
 			Widget_AddTask( w->parent, WTT_RESIZE );
 		}
 		if( w->computed_style.display != SV_NONE &&

@@ -50,7 +50,7 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 	int n = 0;
 	const char *p;
 	char num_str[32];
-	LCUI_BOOL has_sign = FALSE, has_point = FALSE;
+	LCUI_BOOL has_point = FALSE;
 
 	if( str == NULL ) {
 		return FALSE;
@@ -63,7 +63,6 @@ LCUI_BOOL ParseNumber( LCUI_Style s, const char *str )
 				n = 0;
 				break;
 			}
-			has_sign = TRUE;
 		} else if( *p == '.' ) {
 			if( has_point ) {
 				n = 0;

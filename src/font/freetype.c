@@ -186,7 +186,6 @@ static int FreeType_Render( LCUI_FontBitmap *bmp, wchar_t ch,
 			    int pixel_size, LCUI_Font font )
 {
 	int ret = 0;
-	size_t size;
 	FT_UInt index;
 	FT_Face ft_face = (FT_Face)font->data;
 
@@ -200,7 +199,7 @@ static int FreeType_Render( LCUI_FontBitmap *bmp, wchar_t ch,
 	if( FT_Load_Glyph( ft_face, index, LCUI_FONT_LOAD_FALGS ) != 0 ) {
 		return -2;
 	}
-	size = Convert_FTGlyph( bmp, ft_face->glyph, LCUI_FONT_RENDER_MODE );
+	Convert_FTGlyph( bmp, ft_face->glyph, LCUI_FONT_RENDER_MODE );
 	return ret;
 }
 
