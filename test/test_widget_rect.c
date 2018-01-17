@@ -113,8 +113,9 @@ static void check_widget_rect( LCUI_SysEvent ev, void *arg )
 			  rect.x, rect.y, rect.width, rect.height,
 			  paint_rect->x, paint_rect->y,
 			  paint_rect->width, paint_rect->height );
+	} else {
+		self.pass += 1;
 	}
-	self.pass -= ret;
 	self.count += 1;
 	self.x = self.widget->x;
 	self.y = self.widget->y;
