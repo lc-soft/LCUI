@@ -1,7 +1,7 @@
 /* ***************************************************************************
  * linux_x11display.c -- surface support for linux xwindow.
  *
- * Copyright (C) 2016-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2016-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * linux_x11display.c -- linux 平台的图形显示功能支持，基于 xwindow。
  *
- * 版权所有 (C) 2016-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2016-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,12 +37,11 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-//#define DEBUG
 #include <stdio.h>
 #include <stdlib.h>
 #include <LCUI_Build.h>
 #define LCUI_SURFACE_C
-#ifdef LCUI_BUILD_IN_LINUX
+#if defined(LCUI_BUILD_IN_LINUX) && defined(LCUI_VIDEO_DRIVER_X11)
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
 #include <LCUI/platform.h>
