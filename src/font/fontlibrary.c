@@ -453,7 +453,7 @@ int LCUIFont_GetId( const char *family_name,
 		    LCUI_FontStyle style,
 		    LCUI_FontWeight weight )
 {
-	LCUI_FontStyle s;
+	int style_num;
 	LCUI_FontWeight w;
 	LCUI_FontStyleNode snode;
 	LCUI_FontFamilyNode fnode;
@@ -468,8 +468,8 @@ int LCUIFont_GetId( const char *family_name,
 	if( weight == 0 ) {
 		weight = FONT_WEIGHT_NORMAL;
 	}
-	for( s = style; s >= FONT_STYLE_NORMAL; --s ) {
-		snode = &fnode->styles[s];
+	for( style_num = style; style_num >= 0; --style_num ) {
+		snode = &fnode->styles[style_num];
 		if( SelectFontWeight( snode, weight ) ) {
 			return SelectFontWeight( snode, weight )->id;
 		}
