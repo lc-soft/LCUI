@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * css_parser.c -- css code parser module
  *
- * Copyright (C) 2015-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2015-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * css_parser.c -- css 样式代码解析模块
  *
- * 版权所有 (C) 2015-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2015-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -218,8 +218,8 @@ static int OnParseStyleOption( LCUI_CSSParserStyleContext ctx, const char *str )
 
 static int OnParseBorder( LCUI_CSSParserStyleContext ctx, const char *str )
 {
-	LCUI_StyleRec slist[3] = { 0 };
 	LCUI_StyleSheet ss = ctx->sheet;
+	LCUI_StyleRec slist[3] = { { 0 }, { 0 }, { 0 } };
 	int i, mode = SPLIT_COLOR | SPLIT_NUMBER | SPLIT_STYLE;
 	if( SplitValues(str, slist, 3, mode) < 1 ) {
 		return -1;

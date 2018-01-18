@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * widget_base.c -- 部件的基本操作集。
  *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -1178,6 +1178,9 @@ static float Widget_ComputeAutoWidth( LCUI_Widget w, float *height )
 		width = 0;
 	}
 	if( w->proto && w->proto->autosize ) {
+		if( w->computed_style.box_sizing == SV_BORDER_BOX ) {
+			*height = ToContentBoxHeight( w, *height );
+		}
 		w->proto->autosize( w, &width, height );
 	}
 	Widget_ComputeContentSize( w, &content_width, NULL );
