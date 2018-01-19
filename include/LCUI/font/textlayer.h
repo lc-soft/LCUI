@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * textlayer.h -- text bitmap layer processing module.
  * 
- * Copyright (C) 2012-2016 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2018 by Liu Chao <lc-soft@live.cn>
  * 
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * textlayer.h -- 文本图层处理模块
  *
- * 版权所有 (C) 2012-2016 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2018 归属于 刘超 <lc-soft@live.cn>
  * 
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -119,10 +119,6 @@ typedef struct LCUI_TextLayerRec_  {
 	} task;				/**< 待处理的任务 */
         LCUI_Graph graph;		/**< 文本位图缓存 */
 } LCUI_TextLayerRec, *LCUI_TextLayer;
-
-#define TextLayer_SetWordBreak(LAYER, MODE) do {\
-	(LAYER)->word_break = MODE;\
-} while(0)
 
 /** 获取文本行总数 */
 LCUI_API int TextLayer_GetRowTotal( LCUI_TextLayer layer );
@@ -226,7 +222,10 @@ LCUI_API int TextLayer_TextDelete( LCUI_TextLayer layer, int n_char );
 LCUI_API int TextLayer_TextBackspace( LCUI_TextLayer layer, int n_char );
 
 /** 设置是否启用自动换行模式 */
-LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer layer, int is_true );
+LCUI_API void TextLayer_SetAutoWrap( LCUI_TextLayer layer, LCUI_BOOL autowrap );
+
+/** 设置单词内断行模式 */
+LCUI_API void TextLayer_SetWordBreak( LCUI_TextLayer layer, WordBreakMode mode );
 
 /** 设置是否使用样式标签 */
 LCUI_API void TextLayer_SetUsingStyleTags( LCUI_TextLayer layer, LCUI_BOOL is_true );

@@ -46,6 +46,7 @@
 #include <LCUI/font.h>
 #include <LCUI/gui/metrics.h>
 #include <LCUI/gui/widget.h>
+#include <LCUI/gui/css_parser.h>
 #include <LCUI/gui/css_fontstyle.h>
 #include <LCUI/gui/widget/textview.h>
 
@@ -79,6 +80,7 @@ typedef struct LCUI_TextViewRec_ {
 } LCUI_TextViewRec, *LCUI_TextView;
 
 static struct LCUI_TextViewModule {
+	int key_word_break;
 	LCUI_WidgetPrototype prototype;
 } self;
 
@@ -91,6 +93,31 @@ static LCUI_BOOL ParseBoolean( const char *str )
 		return TRUE;
 	}
 	return FALSE;
+}
+
+static int OnParseWordBreak( LCUI_CSSParserStyleContext ctx,
+			     const char *value )
+{
+	char *str = strdup2( value );
+	LCUI_Style s = &ctx->sheet->sheet[self.key_word_break];
+	if( s->is_valid && s->string ) {
+		free( s->string );
+	}
+	s->type = SVT_STRING;
+	s->is_valid = TRUE;
+	s->string = str;
+	return 0;
+}
+
+static WordBreakMode ComputeWordBreakMode( LCUI_StyleSheet sheet )
+{
+	LCUI_Style s = &sheet->sheet[self.key_word_break];
+	if( s->is_valid && s->type == SVT_STRING && s->string ) {
+		if( strcmp( s->string, "break-all" ) == 0 ) {
+			return WORD_BREAK_MODE_BREAK_ALL;
+		}
+	}
+	return WORD_BREAK_MODE_NORMAL;
 }
 
 static void TextView_OnParseAttr( LCUI_Widget w, const char *name, 
@@ -117,38 +144,6 @@ static void TextView_OnParseText( LCUI_Widget w, const char *text )
 	TextView_SetText( w, text );
 }
 
-static void TextView_SetTaskForLineHeight( LCUI_Widget w, int height )
-{
-	LCUI_TextView txt = GetData( w );
-	TextLayer_SetLineHeight( txt->layer, height );
-	txt->tasks[TASK_UPDATE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
-}
-
-static void TextView_SetTextStyle( LCUI_Widget w, LCUI_TextStyle style )
-{
-	LCUI_TextView txt = GetData( w );
-	TextLayer_SetTextStyle( txt->layer, style );
-	txt->tasks[TASK_UPDATE].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
-}
-
-static void TextView_SetTaskForTextAlign( LCUI_Widget w, int align )
-{
-	LCUI_TextView txt = GetData( w );
-	txt->tasks[TASK_SET_TEXT_ALIGN].align = align;
-	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
-}
-
-static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL enable )
-{
-	LCUI_TextView txt = GetData( w );
-	txt->tasks[TASK_SET_AUTOWRAP].enable = enable;
-	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
-	Widget_AddTask( w, WTT_USER );
-}
-
 static void TextView_UpdateStyle( LCUI_Widget w )
 {
 	LCUI_TextStyleRec ts;
@@ -157,14 +152,14 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 	const wchar_t *content = fs->content;
 	CSSFontStyle_Compute( fs, w->style );
 	CSSFontStyle_GetTextStyle( fs, &ts );
-	TextView_SetTaskForTextAlign( w, fs->text_align );
-	TextView_SetTaskForLineHeight( w, fs->line_height );
-	TextView_SetTaskForAutoWrap( w, fs->white_space != SV_NOWRAP );
-	TextView_SetTextStyle( w, &ts );
+	TextLayer_SetTextAlign( txt->layer, fs->text_align );
+	TextLayer_SetWordBreak( txt->layer, ComputeWordBreakMode( w->style ) );
+	TextLayer_SetAutoWrap( txt->layer, fs->white_space != SV_NOWRAP );
+	TextLayer_SetLineHeight( txt->layer, fs->line_height );
+	TextLayer_SetTextStyle( txt->layer, &ts );
 	if( content != fs->content ) {
 		TextView_SetTextW( w, fs->content );
 	}
-	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
 	TextStyle_Destroy( &ts );
 }
@@ -472,6 +467,10 @@ void TextView_SetMulitiline( LCUI_Widget w, LCUI_BOOL enable )
 
 void LCUIWidget_AddTextView( void )
 {
+	LCUI_CSSPropertyParserRec parser = {
+		0, "word-break", OnParseWordBreak
+	};
+	self.key_word_break = LCUI_AddCSSPropertyName( "word-break" );
 	self.prototype = LCUIWidget_NewPrototype( "textview", NULL );
 	self.prototype->init = TextView_OnInit;
 	self.prototype->paint = TextView_OnPaint;
@@ -482,4 +481,5 @@ void LCUIWidget_AddTextView( void )
 	self.prototype->settext = TextView_OnParseText;
 	self.prototype->setattr = TextView_OnParseAttr;
 	self.prototype->runtask = TextView_OnTask;
+	LCUI_AddCSSPropertyParser( &parser );
 }

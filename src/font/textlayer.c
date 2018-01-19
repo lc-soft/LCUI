@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * textlayer.c -- text bitmap layer processing module.
  *
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * textlayer.c -- 文本图层处理模块
  *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -1154,12 +1154,18 @@ int TextLayer_TextBackspace( LCUI_TextLayer layer, int n_char )
 	return 0;
 }
 
-/** 设置是否启用自动换行模式 */
-void TextLayer_SetAutoWrap( LCUI_TextLayer layer, int is_true )
+void TextLayer_SetAutoWrap( LCUI_TextLayer layer, LCUI_BOOL autowrap )
 {
-	if( (!layer->is_autowrap_mode && is_true)
-	 || (layer->is_autowrap_mode && !is_true) ) {
-		layer->is_autowrap_mode = is_true;
+	if( layer->is_autowrap_mode != autowrap ) {
+		layer->is_autowrap_mode = autowrap;
+		TextLayer_AddUpdateTypeset( layer, 0 );
+	}
+}
+
+void TextLayer_SetWordBreak( LCUI_TextLayer layer, WordBreakMode mode )
+{
+	if( layer->word_break != mode ) {
+		layer->word_break = mode;
 		TextLayer_AddUpdateTypeset( layer, 0 );
 	}
 }
