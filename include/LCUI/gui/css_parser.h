@@ -84,11 +84,11 @@ typedef enum LCUI_CSSRule {
 	CSS_RULE_TOTAL_NUM
 } LCUI_CSSRule;
 
+struct LCUI_CSSParserRec_;
 struct LCUI_CSSRuleParserRec_;
 struct LCUI_CSSParserContextRec_;
 struct LCUI_CSSParserStyleContextRec_;
-struct LCUI_CSSParserRec_;
-struct LCUI_StyleParserRec_;
+struct LCUI_CSSPropertyParserRec_;
 
 typedef struct LCUI_CSSRuleParserRec_ LCUI_CSSRuleParserRec;
 typedef struct LCUI_CSSRuleParserRec_ *LCUI_CSSRuleParser;
@@ -96,8 +96,10 @@ typedef struct LCUI_CSSParserContextRec_ LCUI_CSSParserContextRec;
 typedef struct LCUI_CSSParserContextRec_ *LCUI_CSSParserContext;
 typedef struct LCUI_CSSParserStyleContextRec_ LCUI_CSSParserStyleContextRec;
 typedef struct LCUI_CSSParserStyleContextRec_ *LCUI_CSSParserStyleContext;
-typedef struct LCUI_CSSParserRec_ LCUI_CSSParserRec, *LCUI_CSSParser;
-typedef struct LCUI_StyleParserRec_ LCUI_StyleParserRec, *LCUI_StyleParser;
+typedef struct LCUI_CSSParserRec_ *LCUI_CSSParser;
+typedef struct LCUI_CSSParserRec_ LCUI_CSSParserRec;
+typedef struct LCUI_CSSPropertyParserRec_ *LCUI_CSSPropertyParser;
+typedef struct LCUI_CSSPropertyParserRec_ LCUI_CSSPropertyParserRec;
 typedef struct LCUI_CSSParserCommentContextRec_ LCUI_CSSParserCommentContextRec;
 typedef struct LCUI_CSSParserCommentContextRec_ *LCUI_CSSParserCommentContext;
 typedef struct LCUI_CSSParserRuleContextRec_ LCUI_CSSParserRuleContextRec;
@@ -118,10 +120,10 @@ struct LCUI_CSSRuleParserRec_ {
 typedef LCUI_CSSParserRec LCUI_CSSParsers[CSS_TARGET_TOTAL_NUM];
 typedef LCUI_CSSRuleParserRec LCUI_CSSRuleParsers[CSS_RULE_TOTAL_NUM];
 
-/** 样式的解析器 */
-struct LCUI_StyleParserRec_ {
-	int key;
-	char *name;
+/** 样式属性的解析器 */
+struct LCUI_CSSPropertyParserRec_ {
+	int key;	/**< 标识，在解析数据时可以使用它访问样式表中的自定义属性 */
+	char *name;	/**< 名称，对应 CSS 样式属性名称 */
 	int( *parse )(LCUI_CSSParserStyleContext, const char*);
 };
 
@@ -130,7 +132,7 @@ struct LCUI_CSSParserStyleContextRec_ {
 	const char *space;		/**< 样式记录所属的空间 */
 	LinkedList selectors;		/**< 当前匹配到的选择器列表 */
 	LCUI_StyleSheet sheet;		/**< 当前缓存的样式表 */
-	LCUI_StyleParser parser;	/**< 当前找到的样式属性解析器 */
+	LCUI_CSSPropertyParser parser;	/**< 当前找到的样式属性解析器 */
 };
 
 struct LCUI_CSSParserCommentContextRec_ {
@@ -186,7 +188,7 @@ LCUI_API int CSSParser_BeginParseComment( LCUI_CSSParserContext ctx );
 LCUI_API void LCUI_FreeCSSParser(void);
 
 /** 注册新的属性和对应的属性值解析器 */
-LCUI_API int LCUI_AddCSSStyleParser( LCUI_StyleParser sp );
+LCUI_API int LCUI_AddCSSPropertyParser( LCUI_CSSPropertyParser sp );
 
 #include <LCUI/gui/css_rule_font_face.h>
 

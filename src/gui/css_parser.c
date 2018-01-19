@@ -555,7 +555,7 @@ static int OnParseBackgroundRepeat( LCUI_CSSParserStyleContext ctx, const char *
 }
 
 /** 各个样式的解析器映射表 */
-static LCUI_StyleParserRec style_parser_map[] = {
+static LCUI_CSSPropertyParserRec style_parser_map[] = {
 	{ key_width, NULL, OnParseNumber },
 	{ key_height, NULL, OnParseNumber },
 	{ key_min_width, NULL, OnParseNumber },
@@ -954,9 +954,9 @@ int LCUI_LoadCSSString( const char *str, const char *space )
 	return 0;
 }
 
-int LCUI_AddCSSStyleParser( LCUI_StyleParser sp )
+int LCUI_AddCSSPropertyParser( LCUI_CSSPropertyParser sp )
 {
-	LCUI_StyleParser new_sp;
+	LCUI_CSSPropertyParser new_sp;
 	if( !sp->name || strlen( sp->name ) < 1 ) {
 		return -1;
 	}
@@ -964,7 +964,7 @@ int LCUI_AddCSSStyleParser( LCUI_StyleParser sp )
 		return -2;
 	}
 	self.count += 1;
-	new_sp = NEW( LCUI_StyleParserRec, 1 );
+	new_sp = NEW( LCUI_CSSPropertyParserRec, 1 );
 	new_sp->key = sp->key;
 	new_sp->parse = sp->parse;
 	new_sp->name = strdup2( sp->name );
@@ -974,7 +974,7 @@ int LCUI_AddCSSStyleParser( LCUI_StyleParser sp )
 
 static void DestroyStyleParser( void *privdata, void *val )
 {
-	LCUI_StyleParser sp = val;
+	LCUI_CSSPropertyParser sp = val;
 	free( sp->name );
 	free( sp );
 }
@@ -982,7 +982,7 @@ static void DestroyStyleParser( void *privdata, void *val )
 /** 初始化 LCUI 的 CSS 代码解析功能 */
 void LCUI_InitCSSParser( void )
 {
-	LCUI_StyleParser new_sp, sp, sp_end;
+	LCUI_CSSPropertyParser new_sp, sp, sp_end;
 
 	self.count = 0;
 	self.dicttype = DictType_StringKey;
@@ -990,7 +990,7 @@ void LCUI_InitCSSParser( void )
 	self.parsers = Dict_Create( &self.dicttype, NULL );
 	sp_end = style_parser_map + LEN( style_parser_map );
 	for( sp = style_parser_map; sp < sp_end; ++sp ) {
-		new_sp = malloc( sizeof( LCUI_StyleParserRec ) );
+		new_sp = malloc( sizeof( LCUI_CSSPropertyParserRec ) );
 		new_sp->key = sp->key;
 		new_sp->parse = sp->parse;
 		if( !sp->name && sp->key >= 0 ) {

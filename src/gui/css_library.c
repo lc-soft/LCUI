@@ -238,7 +238,7 @@ int LCUI_SetStyleName( int key, const char *name )
 	return -1;
 }
 
-int LCUI_AddStyleName( const char *name )
+int LCUI_AddCSSPropertyName( const char *name )
 {
 	int key;
 	LCUIMutex_Lock( &library.mutex );

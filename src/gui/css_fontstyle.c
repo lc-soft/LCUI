@@ -208,7 +208,7 @@ static int OnParseStyleOption( LCUI_CSSParserStyleContext ctx, const char *str )
 	return 0;
 }
 
-static LCUI_StyleParserRec style_parsers[] = {
+static LCUI_CSSPropertyParserRec style_parsers[] = {
 	{ key_color, "color", OnParseColor },
 	{ key_font_family, "font-family", OnParseFontFamily },
 	{ key_font_size, "font-size", OnParseFontSize },
@@ -389,9 +389,9 @@ void LCUI_InitCSSFontStyle( void )
 {
 	int i;
 	for( i = 0; i < TOTAL_FONT_STYLE_KEY; ++i ) {
-		LCUI_StyleParser parser = &style_parsers[i];
-		self.keys[parser->key] = LCUI_AddStyleName( parser->name );
-		LCUI_AddCSSStyleParser( parser );
+		LCUI_CSSPropertyParser p = &style_parsers[i];
+		self.keys[p->key] = LCUI_AddCSSPropertyName( p->name );
+		LCUI_AddCSSPropertyParser( p );
 	}
 	self.handlers[key_color] = OnComputeColor;
 	self.handlers[key_font_size] = OnComputeFontSize;
