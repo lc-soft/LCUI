@@ -54,9 +54,11 @@
 
 enum TaskType {
 	TASK_SET_TEXT,
-	TASK_SET_AUTOWRAP,
 	TASK_SET_TEXT_ALIGN,
+	TASK_SET_TEXT_STYLE,
+	TASK_SET_WORD_BREAK,
 	TASK_SET_MULITILINE,
+	TASK_SET_AUTOWRAP,
 	TASK_UPDATE_SIZE,
 	TASK_UPDATE,
 	TASK_TOTAL
@@ -74,6 +76,8 @@ typedef struct LCUI_TextViewRec_ {
 		union {
 			wchar_t *text;
 			LCUI_BOOL enable;
+			WordBreakMode mode;
+			LCUI_TextStyleRec style;
 			int align;
 		};
 	} tasks[TASK_TOTAL];
@@ -144,6 +148,41 @@ static void TextView_OnParseText( LCUI_Widget w, const char *text )
 	TextView_SetText( w, text );
 }
 
+static void TextView_SetTaskForLineHeight( LCUI_Widget w, int height )
+{
+	LCUI_TextView txt = GetData( w );
+	TextLayer_SetLineHeight( txt->layer, height );
+	txt->tasks[TASK_UPDATE].is_valid = TRUE;
+}
+
+static void TextView_SetTaskForTextStyle( LCUI_Widget w, LCUI_TextStyle style )
+{
+	LCUI_TextView txt = GetData( w );
+	TextStyle_Copy( &txt->tasks[TASK_SET_TEXT_STYLE].style, style );
+	txt->tasks[TASK_SET_TEXT_STYLE].is_valid = TRUE;
+}
+
+static void TextView_SetTaskForTextAlign( LCUI_Widget w, int align )
+{
+	LCUI_TextView txt = GetData( w );
+	txt->tasks[TASK_SET_TEXT_ALIGN].align = align;
+	txt->tasks[TASK_SET_TEXT_ALIGN].is_valid = TRUE;
+}
+
+static void TextView_SetTaskForAutoWrap( LCUI_Widget w, LCUI_BOOL enable )
+{
+	LCUI_TextView txt = GetData( w );
+	txt->tasks[TASK_SET_AUTOWRAP].enable = enable;
+	txt->tasks[TASK_SET_AUTOWRAP].is_valid = TRUE;
+}
+
+static void TextView_SetTaskForWordBreak( LCUI_Widget w, WordBreakMode mode )
+{
+	LCUI_TextView txt = GetData( w );
+	txt->tasks[TASK_SET_WORD_BREAK].mode = mode;
+	txt->tasks[TASK_SET_WORD_BREAK].is_valid = TRUE;
+}
+
 static void TextView_UpdateStyle( LCUI_Widget w )
 {
 	LCUI_TextStyleRec ts;
@@ -152,14 +191,16 @@ static void TextView_UpdateStyle( LCUI_Widget w )
 	const wchar_t *content = fs->content;
 	CSSFontStyle_Compute( fs, w->style );
 	CSSFontStyle_GetTextStyle( fs, &ts );
-	TextLayer_SetTextAlign( txt->layer, fs->text_align );
-	TextLayer_SetWordBreak( txt->layer, ComputeWordBreakMode( w->style ) );
-	TextLayer_SetAutoWrap( txt->layer, fs->white_space != SV_NOWRAP );
-	TextLayer_SetLineHeight( txt->layer, fs->line_height );
-	TextLayer_SetTextStyle( txt->layer, &ts );
+	/* 设置任务，统一处理属性变更 */
+	TextView_SetTaskForTextAlign( w, fs->text_align );
+	TextView_SetTaskForLineHeight( w, fs->line_height );
+	TextView_SetTaskForAutoWrap( w, fs->white_space != SV_NOWRAP );
+	TextView_SetTaskForWordBreak( w, ComputeWordBreakMode( w->style ) );
+	TextView_SetTaskForTextStyle( w, &ts );
 	if( content != fs->content ) {
 		TextView_SetTextW( w, fs->content );
 	}
+	txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	Widget_AddTask( w, WTT_USER );
 	TextStyle_Destroy( &ts );
 }
@@ -318,6 +359,19 @@ static void TextView_OnTask( LCUI_Widget w )
 	if( txt->tasks[i].is_valid ) {
 		txt->tasks[i].is_valid = FALSE;
 		TextLayer_SetAutoWrap( txt->layer, txt->tasks[i].enable );
+		txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	}
+	i = TASK_SET_WORD_BREAK;
+	if( txt->tasks[i].is_valid ) {
+		txt->tasks[i].is_valid = FALSE;
+		TextLayer_SetWordBreak( txt->layer, txt->tasks[i].mode );
+		txt->tasks[TASK_UPDATE].is_valid = TRUE;
+	}
+	i = TASK_SET_TEXT_STYLE;
+	if( txt->tasks[i].is_valid ) {
+		txt->tasks[i].is_valid = FALSE;
+		TextLayer_SetTextStyle( txt->layer, &txt->tasks[i].style );
+		TextStyle_Destroy( &txt->tasks[i].style );
 		txt->tasks[TASK_UPDATE].is_valid = TRUE;
 	}
 	i = TASK_SET_TEXT_ALIGN;
