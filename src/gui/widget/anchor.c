@@ -2,7 +2,7 @@
  * anchor.c -- The anchor widget, used to link view resource, its function is
  * similar to <a> element in HTML.
  *
- * Copyright (C) 2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2017-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -23,7 +23,7 @@
 /* ****************************************************************************
  * anchor.c -- 锚点部件，用于链接视图资源，功能类似于 HTML 中的 <a> 标签
  *
- * 版权所有 (C) 2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2017-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -81,22 +81,53 @@ void AppendToTarget( LCUI_Widget w, LCUI_Widget box )
 	Widget_TriggerEvent( root, &ev, NULL );
 }
 
-void StartAppendToTarget( LCUI_Widget w, LCUI_Widget box )
+void LoadXMLFile( LCUI_Widget w )
+{
+	LCUI_Widget pack;
+	char *href, prefix[] = "assets/views/";
+	const char *attr_href = Widget_GetAttribute( w, "href" );
+
+	if( attr_href[0] != '/' ) {
+		href = malloc( strsize( attr_href ) + sizeof( prefix ) );
+		if( !href ) {
+			LOG( "[anchor] out of memory\n" );
+			return;
+		}
+		strcpy( href, prefix );
+		strcat( href, attr_href );
+		pack = LCUIBuilder_LoadFile( href );
+		free( href );
+		if( pack ) {
+			LCUI_PostSimpleTask( AppendToTarget, w, pack );
+			return;
+		}
+	}
+	pack = LCUIBuilder_LoadFile( attr_href );
+	if( pack ) {
+		LCUI_PostSimpleTask( AppendToTarget, w, pack );
+		return;
+	}
+	LOG( "[anchor] href (%s): cannot load xml resource\n", attr_href );
+}
+
+void StartLoadXMLFile( LCUI_Widget w )
 {
 	LCUI_Widget target;
-	const char *attr_target;
-
-	attr_target = Widget_GetAttribute( w, "target" );
+	LCUI_TaskRec task = { 0 };
+	const char *attr_target = Widget_GetAttribute( w, "target" );
 	if( !attr_target ) {
+		LOG( "[anchor] target are required\n" );
 		return;
 	}
 	target = LCUIWidget_GetById( attr_target );
 	if( !target ) {
+		LOG( "[anchor] target (%s): not found\n", attr_target );
 		return;
 	}
 	Widget_Empty( target );
-	/* 等下一帧再向目标添加新的内容 */
-	LCUI_PostSimpleTask( AppendToTarget, w, box );
+	task.arg[0] = w;
+	task.func = (LCUI_TaskFunc)LoadXMLFile;
+	LCUI_PostAsyncTask( &task );
 }
 
 static int OpenUrl( const char *url )
@@ -108,12 +139,7 @@ static int OpenUrl( const char *url )
 
 void Anchor_Open( LCUI_Widget w )
 {
-	char *href = NULL;
-	char prefix[] = "assets/views/";
 	const char *attr_href = Widget_GetAttribute( w, "href" );
-	const char *attr_target = Widget_GetAttribute( w, "target" );
-	LCUI_Widget target, box;
-
 	if( !attr_href ) {
 		LOG( "[anchor] href are required\n" );
 		return;
@@ -127,36 +153,7 @@ void Anchor_Open( LCUI_Widget w )
 		OpenUrl( attr_href );
 		return;
 	}
-	if( !attr_target ) {
-		LOG( "[anchor] target are required\n" );
-		return;
-	}
-	target = LCUIWidget_GetById( attr_target );
-	if( !target ) {
-		LOG( "[anchor] target (%s): not found\n", attr_target );
-		return;
-	}
-	if( attr_href[0] != '/' ) {
-		href = malloc( strsize( attr_href ) + sizeof( prefix ) );
-		if( !href ) {
-			LOG( "[anchor] out of memory\n" );
-			return;
-		}
-		strcpy( href, prefix );
-		strcat( href, attr_href );
-		box = LCUIBuilder_LoadFile( href );
-		free( href );
-		if( box ) {
-			LCUI_PostSimpleTask( StartAppendToTarget, w, box );
-			return;
-		}
-	}
-	box = LCUIBuilder_LoadFile( attr_href );
-	if( box ) {
-		LCUI_PostSimpleTask( StartAppendToTarget, w, box );
-		return;
-	}
-	LOG( "[anchor] href (%s): cannot load xml resource\n", attr_href );
+	LCUI_PostSimpleTask( StartLoadXMLFile, w, NULL );
 }
 
 static void Anchor_OnClick( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
