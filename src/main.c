@@ -315,6 +315,7 @@ int LCUIMainLoop_Run( LCUI_MainLoop loop )
 	MainApp.loop = loop;
 	while( loop->state != STATE_EXITED ) {
 		LCUI_ProcessEvents();
+		LCUIDisplay_Update();
 		LCUIDisplay_Render();
 		LCUIDisplay_Present();
 		StepTimer_Remain( MainApp.timer );
