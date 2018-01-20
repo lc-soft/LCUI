@@ -53,80 +53,129 @@
 #define URL_LUANCHER "xdg-open"
 #endif
 
+typedef struct LCUI_XMLLoaderRec_ {
+	char *key;		/**< 键，作为在视图加载完后传给事件处理器的额外参数 */
+	char *filepath;		/**< 视图文件路径 */
+	char *target_id;	/**< 目标容器部件的标识 */
+	LCUI_Widget pack;	/**< 已经加载的视图内容包 */
+	LCUI_Widget widget;	/**< 触发视图加载器的部件 */
+} LCUI_XMLLoaderRec, *LCUI_XMLLoader;
+
 static struct LCUI_Anchor {
 	int event_id;
 	LCUI_WidgetPrototype proto;
 } self;
 
-void AppendToTarget( LCUI_Widget w, LCUI_Widget box )
+static void Loader_OnClearWidget( LCUI_Widget w,
+				  LCUI_WidgetEvent e, void *arg )
 {
-	const char *attr_target;
+	LCUI_XMLLoader loader = e->data;
+	loader->widget = NULL;
+}
+
+static void XMLLoader_Destroy( LCUI_XMLLoader loader )
+{
+	if( loader->widget ) {
+		Widget_UnbindEvent( loader->widget, "destroy",
+				    Loader_OnClearWidget );
+	}
+	if( loader->key ) {
+		free( loader->key );
+	}
+	loader->key = NULL;
+	loader->pack = NULL;
+	loader->widget = NULL;
+	free( loader->target_id );
+	free( loader->filepath );
+	free( loader );
+}
+
+static LCUI_XMLLoader XMLLoader_New( LCUI_Widget w )
+{
+	LCUI_XMLLoader loader;
+	const char *key = Widget_GetAttribute( w, "key" );
+	loader = malloc( sizeof( LCUI_XMLLoaderRec ) );
+	if( !loader ) {
+		return NULL;
+	}
+	loader->widget = w;
+	loader->filepath = strdup2( Widget_GetAttribute( w, "href" ) );
+	loader->target_id = strdup2( Widget_GetAttribute( w, "target" ) );
+	Widget_BindEvent( w, "destroy", Loader_OnClearWidget, loader, NULL );
+	if( key ) {
+		loader->key = strdup2( key );
+	} else {
+		loader->key = NULL;
+	}
+	return loader;
+}
+
+static void XMLLoader_AppendToTarget( LCUI_XMLLoader loader )
+{
 	LCUI_Widget target, root;
 	LCUI_WidgetEventRec ev = { 0 };
 
-	attr_target = Widget_GetAttribute( w, "target" );
-	if( !attr_target ) {
-		return;
-	}
-	target = LCUIWidget_GetById( attr_target );
+	target = LCUIWidget_GetById( loader->target_id );
 	if( !target ) {
+		XMLLoader_Destroy( loader );
 		return;
 	}
 	root = LCUIWidget_GetRoot();
-	Widget_Append( target, box );
-	Widget_Unwrap( box );
-	ev.target = w;
+	Widget_Append( target, loader->pack );
+	Widget_Unwrap( loader->pack );
 	ev.type = self.event_id;
 	ev.cancel_bubble = TRUE;
-	Widget_TriggerEvent( root, &ev, NULL );
+	ev.target = loader->widget;
+	Widget_TriggerEvent( root, &ev, loader->key );
+	XMLLoader_Destroy( loader );
 }
 
-void LoadXMLFile( LCUI_Widget w )
+static void XMLLoader_Load( LCUI_XMLLoader loader )
 {
 	LCUI_Widget pack;
-	char *href, prefix[] = "assets/views/";
-	const char *attr_href = Widget_GetAttribute( w, "href" );
+	char *path, dirname[] = "assets/views/";
 
-	if( attr_href[0] != '/' ) {
-		href = malloc( strsize( attr_href ) + sizeof( prefix ) );
-		if( !href ) {
+	if( loader->filepath[0] != '/' ) {
+		path = malloc( strsize( loader->filepath ) +
+			       sizeof( dirname ) );
+		if( !path ) {
 			LOG( "[anchor] out of memory\n" );
 			return;
 		}
-		strcpy( href, prefix );
-		strcat( href, attr_href );
-		pack = LCUIBuilder_LoadFile( href );
-		free( href );
+		strcpy( path, dirname );
+		strcat( path, loader->filepath );
+		pack = LCUIBuilder_LoadFile( path );
+		free( path );
 		if( pack ) {
-			LCUI_PostSimpleTask( AppendToTarget, w, pack );
+			loader->pack = pack;
+			LCUI_PostSimpleTask( XMLLoader_AppendToTarget,
+					     loader, NULL );
 			return;
 		}
 	}
-	pack = LCUIBuilder_LoadFile( attr_href );
+	pack = LCUIBuilder_LoadFile( loader->filepath );
 	if( pack ) {
-		LCUI_PostSimpleTask( AppendToTarget, w, pack );
+		loader->pack = pack;
+		LCUI_PostSimpleTask( XMLLoader_AppendToTarget, loader, NULL );
 		return;
 	}
-	LOG( "[anchor] href (%s): cannot load xml resource\n", attr_href );
+	LOG( "[anchor] href (%s): cannot load xml resource\n",
+	     loader->filepath );
+	XMLLoader_Destroy( loader );
 }
 
-void StartLoadXMLFile( LCUI_Widget w )
+static void XMLLoader_StartLoad( LCUI_XMLLoader loader )
 {
 	LCUI_Widget target;
 	LCUI_TaskRec task = { 0 };
-	const char *attr_target = Widget_GetAttribute( w, "target" );
-	if( !attr_target ) {
-		LOG( "[anchor] target are required\n" );
-		return;
-	}
-	target = LCUIWidget_GetById( attr_target );
+	target = LCUIWidget_GetById( loader->target_id );
 	if( !target ) {
-		LOG( "[anchor] target (%s): not found\n", attr_target );
+		LOG( "[anchor] target (%s): not found\n", loader->target_id );
 		return;
 	}
 	Widget_Empty( target );
-	task.arg[0] = w;
-	task.func = (LCUI_TaskFunc)LoadXMLFile;
+	task.arg[0] = loader;
+	task.func = (LCUI_TaskFunc)XMLLoader_Load;
 	LCUI_PostAsyncTask( &task );
 }
 
@@ -139,7 +188,10 @@ static int OpenUrl( const char *url )
 
 void Anchor_Open( LCUI_Widget w )
 {
+	LCUI_XMLLoader loader;
 	const char *attr_href = Widget_GetAttribute( w, "href" );
+	const char *attr_target = Widget_GetAttribute( w, "target" );
+
 	if( !attr_href ) {
 		LOG( "[anchor] href are required\n" );
 		return;
@@ -153,7 +205,12 @@ void Anchor_Open( LCUI_Widget w )
 		OpenUrl( attr_href );
 		return;
 	}
-	LCUI_PostSimpleTask( StartLoadXMLFile, w, NULL );
+	loader = XMLLoader_New( w );
+	if( !loader ) {
+		LOG( "[anchor] out of memory\n" );
+		return;
+	}
+	LCUI_PostSimpleTask( XMLLoader_StartLoad, loader, NULL );
 }
 
 static void Anchor_OnClick( LCUI_Widget w, LCUI_WidgetEvent e, void *arg )
