@@ -1,7 +1,7 @@
 ﻿/* ***************************************************************************
  * windows_display.c -- surface support for windows platform.
  *
- * Copyright (C) 2012-2017 by Liu Chao <lc-soft@live.cn>
+ * Copyright (C) 2012-2018 by Liu Chao <lc-soft@live.cn>
  *
  * This file is part of the LCUI project, and may only be used, modified, and
  * distributed under the terms of the GPLv2.
@@ -22,7 +22,7 @@
 /* ****************************************************************************
  * windows_display.c -- windows 平台的图形显示功能支持。
  *
- * 版权所有 (C) 2012-2017 归属于 刘超 <lc-soft@live.cn>
+ * 版权所有 (C) 2012-2018 归属于 刘超 <lc-soft@live.cn>
  *
  * 这个文件是LCUI项目的一部分，并且只可以根据GPLv2许可协议来使用、更改和发布。
  *
@@ -37,13 +37,13 @@
  * 没有，请查看：<http://www.gnu.org/licenses/>.
  * ****************************************************************************/
 
-//#define DEBUG
 #include <stdio.h>
 #include <LCUI_Build.h>
 #define LCUI_SURFACE_C
 #ifdef LCUI_BUILD_IN_WIN32
 #include <LCUI/LCUI.h>
 #include <LCUI/display.h>
+#include <LCUI/painter.h>
 #include <LCUI/platform.h>
 #include LCUI_DISPLAY_H
 #include LCUI_EVENTS_H
@@ -356,15 +356,10 @@ static void WinSurface_SetRenderMode( LCUI_Surface surface, int mode )
 * @param[in] rect	需进行绘制的区域，若为NULL，则绘制整个 surface
 * @return		返回绘制上下文句柄
 */
-static LCUI_PaintContext WinSurface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
+static LCUI_PaintContext WinSurface_BeginPaint( LCUI_Surface surface,
+						LCUI_Rect *rect )
 {
-	LCUI_PaintContext paint;
-	paint = malloc(sizeof(LCUI_PaintContextRec));
-	paint->rect = *rect;
-	paint->with_alpha = FALSE;
-	Graph_Init( &paint->canvas );
-	LCUIRect_ValidateArea( &paint->rect, surface->width, surface->height );
-	Graph_Quote( &paint->canvas, &surface->fb, &paint->rect );
+	LCUI_PaintContext paint = LCUIPainter_Begin( &surface->fb, rect );
 	Graph_FillRect( &paint->canvas, RGB( 255, 255, 255 ), NULL, TRUE );
 	return paint;
 }
@@ -374,9 +369,9 @@ static LCUI_PaintContext WinSurface_BeginPaint( LCUI_Surface surface, LCUI_Rect 
 * @param[in] surface	目标 surface
 * @param[in] paint_ctx	绘制上下文句柄
 */
-static void WinSurface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
+static void WinSurface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint )
 {
-	free( paint_ctx );
+	LCUIPainter_End( paint );
 }
 
 /** 将帧缓存中的数据呈现至Surface的窗口内 */

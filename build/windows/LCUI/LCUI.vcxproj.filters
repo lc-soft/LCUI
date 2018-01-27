@@ -276,6 +276,9 @@
     <ClInclude Include="..\..\..\include\LCUI\gui\widget_layout.h">
       <Filter>头文件\LCUI\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\LCUI\painter.h">
+      <Filter>头文件\LCUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\draw\border.c">
@@ -490,6 +493,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\gui\widget_layout.c">
       <Filter>源文件\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\painter.c">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

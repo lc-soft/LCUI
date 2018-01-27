@@ -133,45 +133,38 @@ void LCUIDisplay_Update( void )
 
 size_t LCUIDisplay_Render( void )
 {
+	float scale;
 	size_t count = 0;
-	LCUI_BOOL skip;
-	LCUI_Rect *rect;
+	LCUI_Rect *area;
 	LCUI_SysEventRec ev;
-	LCUI_Surface surface;
 	LCUI_PaintContext paint;
 	LinkedListNode *sn, *rn;
-	SurfaceRecord record;
 
 	if( !display.is_working ) {
 		return 0;
 	}
 	ev.type = LCUI_PAINT;
+	scale = LCUIMetrics_GetScale();
 	/* 遍历当前的 surface 记录列表 */
 	for( LinkedList_Each( sn, &display.surfaces ) ) {
-		record = sn->data;
+		SurfaceRecord record = sn->data;
+		LCUI_Surface surface = record->surface;
+		LCUI_BOOL can_render = record->widget && surface &&
+					Surface_IsReady( surface );
+
 		record->rendered = FALSE;
-		surface = record->surface;
-		if( record->widget && surface && Surface_IsReady( surface ) ) {
-			skip = FALSE;
-		} else {
-			skip = TRUE;
-		}
 		/* 在 surface 上逐个重绘无效区域 */
 		for( LinkedList_Each( rn, &record->rects ) ) {
-			rect = rn->data;
-			ev.paint.rect = *rect;
+			area = rn->data;
+			ev.paint.rect = *area;
 			LCUI_TriggerEvent( &ev, NULL );
-			if( skip ) {
+			if( !can_render ) {
 				continue;
 			}
-			paint = Surface_BeginPaint( surface, rect );
+			paint = Surface_BeginPaint( surface, area );
 			if( !paint ) {
 				continue;
 			}
-			DEBUG_MSG( "[%s]: render rect: (%d,%d,%d,%d)\n",
-				   record->widget->type,
-				   paint->rect.x, paint->rect.y,
-				   paint->rect.width, paint->rect.height );
 			count += Widget_Render( record->widget, paint );
 			if( display.show_rect_border ) {
 				DrawBorder( paint );
@@ -208,16 +201,15 @@ void LCUIDisplay_InvalidateArea( LCUI_Rect *rect )
 	if( !display.is_working ) {
 		return;
 	}
-	if( rect ) {
-		RectToInvalidArea( rect, &area );
-		RectList_Add( &display.rects, &area );
-	} else {
+	if( !rect ) {
 		area.x = 0;
 		area.y = 0;
 		area.width = LCUIDisplay_GetWidth();
 		area.height = LCUIDisplay_GetHeight();
-		RectList_Add( &display.rects, &area );
+		rect = &area;
 	}
+	RectToInvalidArea( rect, &area );
+	RectList_Add( &display.rects, &area );
 }
 
 static LCUI_Widget LCUIDisplay_GetBindWidget( LCUI_Surface surface )
@@ -573,10 +565,10 @@ LCUI_PaintContext Surface_BeginPaint( LCUI_Surface surface, LCUI_Rect *rect )
 	return NULL;
 }
 
-void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint_ctx )
+void Surface_EndPaint( LCUI_Surface surface, LCUI_PaintContext paint )
 {
 	if( display.driver ) {
-		display.driver->endPaint( surface, paint_ctx );
+		display.driver->endPaint( surface, paint );
 	}
 }
 
