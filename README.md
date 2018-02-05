@@ -57,7 +57,7 @@ LCUI is a freely available software library for building user interfaces. It is 
 ## Documentation
 
 - Tutorial: [https://lcui.lc-soft.io/guide/](https://lcui.lc-soft.io/guide/)
-- Changelog: [docs/CHANGES.zh-cn.md](docs/CHANGES.md)
+- Changelog: [docs/CHANGES.md](docs/CHANGES.md)
 
 API reference documentation has not yet been prepared, you can refer to the header files, source code, and tests.
 
@@ -73,13 +73,7 @@ In the simplest case you would run:
     cd LCUI
     ./autogen.sh
     ./configure
-
-After `./configure` is finished running, you can run the following command to compile the source code:
-
     make
-
-If you want to install the LCUI library and header files, please run:
-
     make install
 
 If you want to experience the effect of demo, please run:
@@ -87,6 +81,8 @@ If you want to experience the effect of demo, please run:
     cd test
     make
     ./hellowrold
+
+If you want to custom building options, please read the [INSTALL](INSTALL) file for more details.
 
 ### Prerequisites
 
@@ -109,7 +105,7 @@ LCUI is mainly develop in the Windows environment, you can use VisualStudio to o
 
 ## Contribution
 
-Please read through our [contributing guidelines](CONTRIBUTING.md). Included are directions for opening issues, coding standards, and notes on development.
+Please read through our [contributing guidelines](/.github/CONTRIBUTING.md). Included are directions for opening issues, coding standards, and notes on development.
 
 ## License
 
