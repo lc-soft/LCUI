@@ -1,5 +1,47 @@
 # LCUI的更新记录
 
+## 1.0 Beta (2018-02-07)
+
+### 新特性
+
+- **font:** 添加支持按字重（font-weight）和风格（font-style）选择字体
+- **textlayer:** 添加 `[bgcolor]` 标签支持，用于设置文本背景色 (#110)
+- **textlayer:** 添加 `[i]` 标签支持，用于设置文本为斜体 (#115)
+- **textlayer:** 添加 `[b]` 标签支持，用于设置文本为粗体 (#112)
+- **textlayer:** 使用 FreeType 字体引擎默认的方式获取空格宽度
+- **widget:** 为 textview 添加内容修剪支持，启用后会去除文本首尾空白符 (#97)
+- **widget:** 添加锚点（anchor）组件 (#105)
+- **widget:** 为 textview 添加 word-break 属性支持，用于设置单词断行方式 (#71)
+- **widget:** 添加 `WTT_RESIZE_WITH_SURFACE` 任务类型，用于将表面（surface）大小与部件同步 (#104)
+- **widget:** 添加 Widget_UnbindEventByHandlerId() 函数，用于根据事件处理器标识号取消事件绑定
+- **css:** 添加 font-face 规则解析器，可用于在 css 代码中定义字体信息 (#95)
+- **css:** 为 url() 的解析器添加支持处理相对路径 (#98)
+- **css:** 添加针对 justify-content 的属性解析器 (#117)
+- **css:** 为 border 的属性解析器添加支持解析 "border: 0"
+- **css:** 为 line-height 的属性解析器添加支持解析 "line-height: 1"
+- **layout:** 添加简单的 flex 显示方式和 justify-content 属性支持 (#117)
+- **bulder:** 为 `<widget>` 添加短名称 `<w>` (#103)
+- **core:** 添加 LCUIWorker 用于处理异步任务 (#106)
+
+### 问题修复
+
+- **textlayer:** 文本没有垂直居中对齐 (#100)
+- **widget:** textview 的高度计算错误 (#111)
+- **css:** 样式表选取问题，同名选择器会共用同一优先级 (#113)
+- **graphic:** Graph_FillRectARGB() 段错误 (#110)
+- **linux:** 设置 "--enable-video-ouput=no" 选项后会导致链接器报错
+- **renderer:** 部件位置为非整数时，在渲染时边框会时有时无 (#108)
+
+### 改进
+
+- **layout:** 改进部件尺寸计算
+- **layout:** 改进块（block）和内联块（inline-block）元素的布局处理
+- **font:** 改进字体数据的存储和操作方式
+- **mainloop:** 设置每帧运行任务队列中的所有任务
+- **mainloop:** 设置每帧至少更新一次部件树
+
+你可以查看此[拉取请求](https://github.com/lc-soft/LCUI/pull/120)来了解详细的代码变更记录。
+
 ## 1.0 alpha 和 1.0 alpha2 之间的变化
 
 - 调整代码结构
@@ -19,7 +61,7 @@
 - 解决 jpeg 图像读取器有时会读取失败的问题
 - 其它已知 BUG 修复
 
-你可以查看此[拉取请求](https://github.com/lc-soft/LCUI/pull/83)来了解详细的代码变更记录
+你可以查看此[拉取请求](https://github.com/lc-soft/LCUI/pull/83)来了解详细的代码变更记录。
 
 ## 0.15.0 和 1.0 alpha 之间的变化
 
