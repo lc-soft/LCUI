@@ -96,7 +96,7 @@ LCUI 采用的开源许可证是 [GNU通用公共许可证第二版](http://www.
 
 运行 helloworld 示例：
 
-  ./helloworld
+    ./helloworld
 
 ### 依赖项
 
