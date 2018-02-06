@@ -459,8 +459,10 @@ static void LCUI_ShowCopyrightText(void)
 		"LCUI (LC's UI) version "LCUI_VERSION"\n"
 #ifdef _MSC_VER
 		"Build tool: "
-#if (_MSC_VER > 1900)
+#if (_MSC_VER > 1912)
 		"MS VC++ (higher version)"
+#elif (_MSC_VER >= 1910 && _MSC_VER <= 1912)
+		"MS VC++ 14.1 (VisualStudio 2017)"
 #elif (_MSC_VER == 1900)
 		"MS VC++ 14.0 (VisualStudio 2015)"
 #elif (_MSC_VER == 1800)
@@ -475,7 +477,7 @@ static void LCUI_ShowCopyrightText(void)
 		"\n"
 #endif
 		"Build at "__DATE__" - "__TIME__"\n"
-		"Copyright (C) 2012-2017 Liu Chao <root@lc-soft.io>.\n"
+		"Copyright (C) 2012-2018 Liu Chao <root@lc-soft.io>.\n"
 		"This is free software, licensed under GPLv2. \n"
 		"See source distribution for detailed copyright notices.\n"
 		"To learn more, visit http://www.lcui.org.\n\n"
