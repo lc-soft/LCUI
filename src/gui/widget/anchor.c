@@ -181,16 +181,19 @@ static void XMLLoader_StartLoad( LCUI_XMLLoader loader )
 
 static int OpenUrl( const char *url )
 {
+#if defined(LCUI_BUILD_IN_WIN32) && defined(WINAPI_PARTITION_APP)
+	return -1;
+#else
 	char cmd[512] = { 0 };
 	snprintf( cmd, 511, URL_LUANCHER" %s", url );
 	return system( cmd );
+#endif
 }
 
 void Anchor_Open( LCUI_Widget w )
 {
 	LCUI_XMLLoader loader;
 	const char *attr_href = Widget_GetAttribute( w, "href" );
-	const char *attr_target = Widget_GetAttribute( w, "target" );
 
 	if( !attr_href ) {
 		LOG( "[anchor] href are required\n" );
